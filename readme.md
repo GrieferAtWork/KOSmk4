@@ -8,9 +8,10 @@ KOSmk4 no longer is a small kernel. I'd say it has reached the point of really b
 - [KOS Features](#features)
 - [Project rules / Code guidelines](#rules)
 - [Building KOS](#building)
+	- [Getting a Shell](#shell)
+	- [Recommended Build Environment](#build-env)
 - [Programming KOS with an IDE](#programming)
 - [Notes on building KOS](#building-notes)
-- [Recommended Build Environment](#build-env)
 - [Building & using Bochs to run KOS](#bochs)
 - [Automatic System Headers](#headers)
 
@@ -342,6 +343,45 @@ Building+Running KOS (from $PROJPATH):
 
 
 
+<a name="shell"></a>
+## Getting a Shell
+
+Just like its predecessors, KOS mk4 uses [busybox](https://www.busybox.net/) to provide you with the full user-space bash-like shell experience (Personally, I'm really only interested in the whole kernel-space side of hobby OS programming, alongside the design and implementation of user-space libraries). When it comes to front-ends (and yes: I'm calling a commandline a front-end; deal with it *puts-on-sunglasses*), I loose all interest.
+
+However, I made it as simple as ever for you to get going with an installation of busybox onto your KOS disk image:
+
+```
+$ # Make sure that you've already set up the KOS toolchain
+$ bash $PROJPATH/kos/misc/make_toolchain.sh i386-kos
+$
+$ # Make sure that you've built the entirety of KOS at least once (here: in no-optimize-debug mode)
+$ deemon $PROJPATH/magic.dee --target=i386 --config=nOD
+$
+$ # Do the actual work of downloading, configuring & building busybox
+$ bash $PROJPATH/kos/misc/make_utility.sh i386 busybox
+```
+
+That's it. That last command will download, build & install busybox into every KOS disk image that it can find under `$PROJPATH/bin/...`, also meaning that if you choose to clear out `$PROJPATH/bin` (or have just build KOS for a specific configuration for the first time), you will have to ensure that `magic.dee` was run at least once for your intended configuration, followed by re-executing the `make_utility.sh` command
+
+The plan is to add more software to `make_utility.sh` in the future, so that you'll be able to install select third-party software with this easy-to-use method of building them.
+
+If you have any suggestions for software (or even better: code snippets for use in `make_utility.sh` alongside any required patch files), feel free to send them to me and I might add them so that everyone can use them.
+
+
+<a name="build-env"></a>
+## Recommended Build Environment
+
+I neither have the time nor will too make sure that any kind of build environment works.
+
+So with that in mind, I can only recommend you'd use the same one I'm using:
+
+- Windows
+- Visual Studio 2017 (Community Edition)
+- Cygwin
+- QEMU
+
+
+
 <a name="programming"></a>
 ## Programming KOS with an IDE
 
@@ -387,28 +427,14 @@ Now assuming that some functionality is missing from linked libraries, this mani
 
 With these substitutions in place, libraries and the kernel can still be built, however will result in below-optimal code being generated, simple due to the rediculous amount of redundancies.
 
-For more information about the header substitution system, and how it makes it possible to use KOS's headers for toolchains other than KOS itself (requiring only minor, to no modifications at all), take a look at the second on `Automatic System Headers`
-
-
-
-<a name="build-env"></a>
-## Recommended Build Environment
-
-I neither have the time nor will too make sure that any kind of build environment works.
-
-So with that in mind, I can only recommend you'd use the same one I'm using:
-
-- Windows
-- Visual Studio 2017 (Community Edition)
-- Cygwin
-- QEMU
+For more information about the header substitution system, and how it makes it possible to use KOS's headers for toolchains other than KOS itself (requiring only minor, to no modifications at all), take a look at the second on [Automatic System Headers](#headers)
 
 
 
 <a name="bochs"></a>
 ## Building & using Bochs to run KOS
 
-First, you must patch the Bochs source to fix a bug that normally breaks the unmaintained `load32bitOShack` feature which KOS makes use of to quickly have itself be loaded into memory, forgoing the need of the usual ISO+bootloader combination required to load a custom kernel into Bochs.
+First, you must patch the Bochs source to fix a bug that normally breaks the unmaintained `load32bitOShack()` feature which KOS makes use of to quickly have itself be loaded into memory, forgoing the need of the usual ISO+bootloader combination required to load a custom kernel into Bochs.
 
 To use bochs, download and extract version 2.6.9 to `$PROJPATH/binutils/src/bochs-2.6.9`
 
@@ -427,9 +453,9 @@ Then, you must build Bochs:
 `$ cd $PROJPATH/binutils/build-bochs-2.6.9`
 `$ bash ../src/bochs-2.6.9/configure --enable-disasm --enable-debugger --enable-debugger-gui --enable-pci --enable-smp --enable-3dnow --enable-x86-64 --enable-svm --enable-avx --enable-x86-debugger --enable-monitor-mwait --enable-sb16 --enable-es1370 --enable-gameport --enable-voodoo --enable-usb --enable-usb-ohci --enable-usb-ehci --enable-usb-xhci`
 
-Now, copy the file `$PROJPATH/misc/kos.bxrc` to `$PROJPATH/bin/i386-kos/kos.bxrc` and open it in a text editor
+Now, copy the file `$PROJPATH/kos/misc/config/kos.bxrc` to `$PROJPATH/bin/i386-kos-$CONFIG/kos.bxrc` and open it in a text editor
 
-Download a pre-built version of `bochs-2.6.9` to get the files `BIOS-bochs-latest` and `VGABIOS-lgpl-latest`. Afterwards, update the following 2 lines in `$PROJPATH/bin/i386-kos/kos.bxrc` to point to the location of the 2 BIOS files:
+Download a pre-built version of `bochs-2.6.9` to get the files `BIOS-bochs-latest` and `VGABIOS-lgpl-latest`. Afterwards, update the following 2 lines in `$PROJPATH/bin/i386-kos-$CONFIG/kos.bxrc` to point to the location of the 2 BIOS files:
 
 ```
 + romimage: file="<YOUR_PATH_TO_BOCHS-2.6.8-HERE>/BIOS-bochs-latest"
@@ -440,7 +466,7 @@ Download a pre-built version of `bochs-2.6.9` to get the files `BIOS-bochs-lates
 
 Now, you can start bochs directly using:
 
-	`$ binutils/build-bochs-2.6.9/bochs -q -f bin/i386-kos/kos.bxrc`
+	`$ binutils/build-bochs-2.6.9/bochs -q -f bin/i386-kos-$CONFIG/kos.bxrc`
 	
 Or you can directly build+run KOS with:
 
@@ -455,13 +481,13 @@ Or you can directly build+run KOS with:
 
 KOS uses various interpreter/intermediate compilers for centralizing the definition, substitution, aliasing, binding, and documentation of most system headers containing definitions of functions exported from libc. (A similar system also exists for defining and updating system calls)
 
-This system is tightly interwoven with the CRT feature files described in the section `Notes on building KOS`, and will automatically provide and substitute definitions for not only C-standard headers, but also a variety of others.
+This system is tightly interwoven with the CRT feature files described in the section [Notes on building KOS](#building-notes), and will automatically provide and substitute definitions for not only C-standard headers, but also a variety of others.
 
-This is done via a custom function definition protocol implemented by a deemon program found in `$PROJPATH/kos/misc/generate_headers.dee`, which when run, will parse and link the definition files from `$PROJPATH/kos/misc/libc/*.c` to gain knowledge of what goes where, how everything looks like, what annotations may be applied to functions, how functions are implemented, and so on...
+This is done via a custom function definition protocol implemented by a deemon program found in `$PROJPATH/kos/misc/magicgenerator/generate_headers.dee`, which when run, will parse and link the definition files from `$PROJPATH/kos/src/libc/magic/*.c` to gain knowledge of what goes where, how everything looks like, what annotations may be applied to functions, how functions are implemented, and so on...
 
-As the end result, KOS is able to provide definitions for many header functions while simultaniously exporting them from both libc (and sometimes the kernel) in such a way that the possibility of mistakes happening due to redundancy falls away (e.g. all function prototypes of memcpy() are annotated with `ATTR_NONNULL((1,2))`, and despite this specific annotation exists in possibly more than 20 places, any changes to it would only require a single modification of the tags in `/kos/misc/libc/string.c`)
+As the end result, KOS is able to provide definitions for many header functions while simultaniously exporting them from both libc (and sometimes the kernel) in such a way that the possibility of mistakes happening due to redundancy falls away (e.g. all function prototypes of memcpy() are annotated with `ATTR_NONNULL((1,2))`, and despite this specific annotation exists in possibly more than 20 places, any changes to it would only require a single modification of the tags in `/kos/src/libc/magic/string.c`)
 
-Additionally, when using KOS headers with a CRT other than KOS, this makes it possible to substitute KOS-specific extensions such as `strend()` by automatically providing a local implementation of the function though `/kos/include/local/string/strend.h`, where this variant of the function is implemented identically to the variant exported by KOS's libc, meaning that in the event of changes having to be made to its implementation, all that's required is another single alteration in `/kos/misc/libc/string.c`
+Additionally, when using KOS headers with a CRT other than KOS, this makes it possible to substitute KOS-specific extensions such as `strend()` by automatically providing a local implementation of the function though `/kos/include/local/string/strend.h`, where this variant of the function is implemented identically to the variant exported by KOS's libc, meaning that in the event of changes having to be made to its implementation, all that's required is another single alteration in `/kos/src/libc/magic/string.c`
 
 In the end, thanks to the feature definition files (which basically just needs to contain a list of all the symbols exported from the CRT against which the hosted binary is to-be linked), 90% of the usual work of having KOS headers be hosted by some new libc will only require the addition of a new crt-features file, as well as making use of it in `/kos/include/__crt.h`, making the KOS toolchain extremely configurable, as well as versatile and portable. (That is: once you understand how everything fits together)
 
