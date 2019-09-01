@@ -115,18 +115,24 @@ NOTHROW_NCX(CC libkeymap_instrlen)(byte_t const *__restrict code,
 		}	break;
 
 		case KMP_OP_SETKEY:
-		case KMP_OP_SETKEYMOD:
-			++code;
+			code += 1;
 			break;
 
 		case KMP_OP_SETKEY2:
-		case KMP_OP_SETKEYMOD2:
 			code += 2;
 			break;
+
+		case KMP_OP_SETKEYMOD:
+			code += 1;
+			goto skip_character;
+		case KMP_OP_SETKEYMOD2:
+			code += 2;
+			goto skip_character;
 
 		case KMP_OP_SETPRESS:
 		case KMP_OP_SETSHIFT:
 		case KMP_OP_SETALTGR:
+skip_character:
 			switch (*preg_enc) {
 
 			case KMP_ENCODING_LATIN1:
