@@ -51,6 +51,7 @@ KOSmk4 no longer is a small kernel. I'd say it has reached the point of really b
 				- ...
 					- Many other options exist, but few important enough to be documented here
 		- An arbitrary number of additional drivers to-be loaded during boot
+			- Especially useful to provide additional drivers that would be required for detecting the boot-device
 - i386
 	- Kernel-space ring 0
 	- User-space ring 3
@@ -102,7 +103,7 @@ KOSmk4 no longer is a small kernel. I'd say it has reached the point of really b
 		- `invlpg` (selected using `cpuid`)
 		- `P32` (normal) and `PAE` paging (selected using `cpuid`)
 		- `PGE` global pages (selected using `cpuid`)
-		- `PAE.2MiB` and `P32.4MiB` pages pages (selected using `cpuid`)
+		- `PAE.2MiB` and `P32.4MiB` large pages (selected using `cpuid`)
 		- `PAE.XD` (Execute-disable) (selected using `cpuid`)
 	- `mmap()` with support for write-back file mappings
 	- Lazy file mappings / Copy-on-write
@@ -112,10 +113,10 @@ KOSmk4 no longer is a small kernel. I'd say it has reached the point of really b
 		- This is quite the expansive system, as it requires emulating __every__ x86 instruction which could possibly access memory
 			- The idea is to simply (yeah, emulating ~70% of the x86 ISA is totally simple...) emulate all such instruction and have their memory accesses be performed by dispatching them through a table of virtual memory access primitives (read/write/cmpxch/...)
 			- With this done, update the register state like the user of the instruction would expect, before resuming execution
-			- The result is a the ability to seamlessly inject custom, runtime behavior at arbitrary memory locations
+			- The result is the ability to seamlessly inject custom, runtime behavior at arbitrary memory locations
 			- Here are a couple of examples which KOS makes possible with this:
 				- A memory-mapped identity-copy of the current register state
-					- What I find really funny about this is I remember seeing this video on YouTube about that mov-only C compiler, and the dev having to do some questionable hacking to be able to actually have his program loop around. - Well. With this, you can now literally do a `movl $SOME_ADDRESS, %fs:OFFSETOF_REGISTER_MAP_EIP` as an alias for `jmp SOME_ADDRESS`
+					- What I find really funny about this is I remember seeing this video on YouTube about that mov-only C compiler, and the dev having to do some questionable hacking to be able to actually have his program loop around. - Well. With this, you can now literally do a `movl $SOME_ADDRESS, %gs:OFFSETOF_REGISTER_MAP_EIP` as an alias for `jmp SOME_ADDRESS`
 				- A page of memory that always returns a random value when read
 					- You're literally able to `mmap("/dev/urandom")`, and the result is a memory mapping where every read, regardless of where is't made, will return a random value each time it is made.
 					- And just to re-emphasize: reads from the same location will return different values each time!
@@ -123,11 +124,11 @@ KOSmk4 no longer is a small kernel. I'd say it has reached the point of really b
 				- Fields for reading (and for some: writing) the uid/gid/tid/pid/pgid/sid of the current thread
 			- Really though: the possibilities are endless here, and this really isn't something that I've seen before (probably because of the insanity that is emulating every x86 instruction that may access memory), I call dips on naming it VIO!
 - Kernel heap system
-	- Custom heap implementation
+	- Custom heap implementation (home-made)
 	- GC-based memory leak detection
 		- Suspend the entire kernel and recursively scan all threads and static memory segments for pointers to heap structures
 		- Any such pointer found will mark the associated structure as reachable
-		- Any allocatedheap structure that didn't get reached can be considered a leak
+		- Any allocated heap structure that didn't get reached can be considered a leak
 	- 3-part implementation
 		- `heap_alloc()`: Raw heap allocators (need to specify size when freeing memory)
 			- Used to implement `kmalloc()`
@@ -136,25 +137,28 @@ KOSmk4 no longer is a small kernel. I'd say it has reached the point of really b
 			- Used to implement `kmalloc()`
 			- Slabs are sections of memory suitable for allocating fixed-length structures
 			- Slabs are very fast and efficient since they impose minimal overhead for any given allocation (especially for small allocations)
-			- Memory allocated from slabs has the downside of not being `realloc()`-able
+			- Memory allocated from slabs has the downside of not being `realloc()`-able (so `krealloc()` has to emulate it as `malloc()+memcpy()+free()` for slabs)
 		- `kmalloc()`: Pretty much the same as the user-space `malloc()`, but takes a set of flags describing its behavior
 			- Implemented twice
 				- `kmalloc()` throws an exception (`E_BADALLOC`) when the allocation failed
-				- `kmalloc_nx()` returns `NULL` when something went wrong
+				- `kmalloc_nx()` returns `NULL` when something went wrong (`nx` standing for `NoExcept`)
 - File System
 	- Support for the well-known FS/VFS-split also seen in linux
 		- Any arbitrary directory can be re-used as a mounting point for another filesystem
-	- Support for both DOS (Windows) and UNIX-like paths, with the ability of bind arbitrary folders for drivers
+	- Support for both DOS (Windows) and UNIX-like paths, with the ability to bind arbitrary folders for drives
 		- KOS provides flags `O_DOSPATH` and `AT_DOSPATH` to specify that some given path should be interpreted using DOS semantics
 	- Support for symbolic links
-	- Support for device files (both block- and character-devices)
+	- Support for device files (both block-(`S_ISBLK()`) and character(`S_ISCHR()`)-devices)
 	- Support for devfs (`/dev/...`)
 	- Support for ram file system (as one would expect `/tmp` to be)
 - System calls
-	- `int 80h` (with linux ABI compatibility)
+	- `int 80h`
+		- With linux ABI compatibility
 	- `lcall $7, $0` (as required by SysV)
+		- As a KOS exception, you can also use `lcall $7, $<sysno>` instead of having to use `%eax`
 	- `sysenter`
-	- Custom mechanism: Call into ukern segment
+		- This one isn't compatible with linux's ABI
+	- Custom mechanism: Call into ukern segment (s.a. `/kos/include/kos/ukern.h:userkern_syscall()`)
 	- System call tracing
 		- Every time a system call is invoked, its name and arguments can be logged in a human-readable format
 - Modular kernel
@@ -162,13 +166,14 @@ KOSmk4 no longer is a small kernel. I'd say it has reached the point of really b
 	- Drivers are ELF binaries
 	- Drivers can also be provided by the bootloader (s.a. multiboot)
 - Misc. features
-	- The kernel has the notion of a `.free` section of memory within the core that contains code used only during initialization (e.g. the kernel's bootloader initial entry point)
+	- The kernel has the notion of a `.free` section of memory within the core that contains everything that is only used during initialization (e.g. the kernel's bootloader initial entry point, or device initialization code)
 		- Just before transitioning to user-space for the first time, this section is unmapped and made available to the page frame allocator
 	- Branch profiling support
 		- Using preprocessor maging, every `if`-statement and every use `likely` / `unlikely` within any kernel source file keeps track of which of its branches got taken what number of times
 		- Allows for easy detection of ~hot~ zones within the kernel, as well as `likely` / `unlikely` annotations that are just plainly wrong
 - Drivers
 	- pci
+		- Required for detecting IDE ports
 	- ide (ata)
 		- Support for DMA, LBA48 and LBA28 addressing (preferring DMA)
 			- This is real DMA support I might note, as in "Hey, IDE. Copy sector 123 to memory location XYZ and tell me when your done"
@@ -204,12 +209,16 @@ KOSmk4 no longer is a small kernel. I'd say it has reached the point of really b
 				- Linear mode (all file descriptors indices have low values)
 				- hash-table (file descriptors can have arbitrarily great values)
 - Various custom libraries for different sub-systems
-	- libansitty (user/kernel)
-		- Implement ANSI tty escape code processing (`\e[0m`)
+	- <a name="libansitty"></a>libansitty (user/kernel)
+		- Implement [ANSI tty escape code](https://en.wikipedia.org/wiki/ANSI_escape_code) processing (`\e[0m`)
 	- libbuffer (user/kernel)
 		- Implement line/ring buffers used for implementing `pipe()` and terminal canon buffers
 	- libc (user/kernel-limited)
 		- Hand-written and optimized to minimize the number of necessary startup relocations
+			- Have you ever done `readelf -r /lib/i386-linux-gnu/libc.so.6`?
+			- Do you realize that every single one of the lines your terminal just got spammed with will slow down the startup of any program you run on your system?
+				- Even with lazy symbol resolving, rtld has to perform 1 write to memory for every relocation it finds
+			- Well... Doing the same with my `libc.so`, I'm counting around 35 relocations (But mine still has all the same functionality, with almost 100% API-compatibility, and at least 95% ABI-compatibility)
 		- Enourmous support for practically everything also found in GLIBc (plus some KOS exceptions)
 		- Of note is the fact that the KOS system headers aren't dependent on KOS's particular libc implementation
 			- The system headers will automatically try to detect libc features and substitute anything that isn't supported with inline functions to provide KOS-specific extensions such as `strend()` in a truely portable (as in: not bound to KOS) manner
@@ -219,11 +228,12 @@ KOSmk4 no longer is a small kernel. I'd say it has reached the point of really b
 	- libcmdline (user/kernel)
 		- Provide functionality for bash-like decoding of command lines (with support for `\`, `'` and `"` escaping)
 	- libdebuginfo (user/kernel)
-		- Parse information found in `.debug_info`, `.debug_line`, `.debug_...` to
-			- Convert addresses to file/line/name triples (plus some more information)
-			- Get/Set the names and values of locally defined variables at runtime (s.a. `Builtin debugging capabilities`)
+		- Parse information found in `.debug_info`, `.debug_line`, `.debug_...` to...
+			- convert addresses to file/line/name triples (plus some more information)
+			- get/set the names and values of locally defined variables at runtime (s.a. [Builtin debugging capabilities](#features))
 	- libdemangle (user)
 		- Demangle itanium (g++) mangled c++ symbol names into human-readable representations
+			- Not really used at the moment since everything in the kernel and user-space uses C linkage with optional C++ wrappers
 	- libdisasm (user/kernel)
 		- Disassemble x86 assembly into human-readable assembly dumps
 		- Used to provide disassembly support within the builtin debugger
@@ -251,7 +261,7 @@ KOSmk4 no longer is a small kernel. I'd say it has reached the point of really b
 		- Determine the length of any given x86 instruction
 		- Mainly used by the kernel to aid during unwinding and exception handling
 	- libjson (user/kernel)
-		- Implementation of a standard-compliant json parser/generator
+		- Implementation of a fully standard-compliant json parser/generator
 		- Used to parse runtime configuration options in some places (e.g. the kernel commandline `ram=[{ ... }, ...]` option)
 		- Provides a codec-based system for easily converting Json to/from regular, old `struct` objects
 	- libkeymap (user/kernel)
@@ -259,7 +269,7 @@ KOSmk4 no longer is a small kernel. I'd say it has reached the point of really b
 		- Uses a proprietary, custom file format called KMP, that is documented in `<libkeymap/keymap.h>`
 		- A compiler is provided for creating KMP files from self-explainatory conf-like files found in `/kos/src/misc/keymaps/*`
 	- libm (user)
-		- Thin wrapper around math function actually provided by libc
+		- Thin wrapper around math functions actually provided by libc
 	- libregdump (user/kernel)
 		- Utilities for converting register state structures into human-readable text
 	- libregex (user)
@@ -268,23 +278,25 @@ KOSmk4 no longer is a small kernel. I'd say it has reached the point of really b
 	- librpc (user)
 		- Library for sending remote procedure calls to arbitrary threads/processes
 		- KOS provides a system call `sys_rpc_schedule()` that comes alongside a tiny, non-turing-complete assembly language which can be used to describe arbitrary register-save-and-load transformations before some given RPC callback function gets invoked
-		- The main (intended) purpose of RPC functions in KOS is to allow user-space to implement a kind of `terminate_thread()` function that works by scheduling an RPC that will interrupt a blocking operation in the target thread and get executed at the next valid cancelation point (as defined by posix:libpthread), at which point that RPC can simply throw an `E_EXIT_THREAD` exception to unwind the stack, executing finalizers along the way
+		- The main (intended) purpose of RPC functions in KOS is to allow user-space to implement a kind of `terminate_thread()` function that works by scheduling an RPC that will interrupt a blocking operation in the target thread and get executed at the next valid cancelation point (as defined by posix:libpthread), at which point that RPC can simply throw an `E_EXIT_THREAD` exception to unwind the stack, executing finalizers as needed along the way
 	- libssp (user)
 		- Minimal implementation to satisfy GCC's stack-smash-protection function during linking
 	- libterm (user/kernel)
-		- Provide support for all of the different transformation flags in `struct termios`
-		- This library provides the functionality required for top-level TTY objects in kernel-space, where-as libansitty provides low-level support for ANSI escape codes for stuff like terminal color support, which is then used by hardware display drivers and the builtin debugger.
+		- Provide support for all of the different transformation flags in [`struct termios`](https://en.wikipedia.org/wiki/POSIX_terminal_interface#POSIX:_Consolidation_and_abstraction)
+		- This library provides the functionality required for top-level TTY objects in kernel-space, where-as [libansitty](#libansitty) provides high-level support for [ANSI escape codes](https://en.wikipedia.org/wiki/ANSI_escape_code) for stuff like terminal color support, which is then used by hardware display drivers and the builtin debugger.
 	- libunwind (user/kernel)
 		- Provide for `.eh_frame`-based unwinding of the stack, both in user-space, as well as in kernel-space
-		- This library is the back-bone of the entire exception handling system all throughout KOSmk4
+		- This library is the back-bone of the entire exception handling system seen all throughout KOSmk4
 		- This library supports everything required by the CFI/CFA/FDE-subset of DWARF, including the ability to write turing-complete programs to describe register restore expressions (which are actually used in a couple of places)
 			- Note that to simplify encoding of CFA expression, you may make use of `/kos/misc/libgen/cfi/compiler.dee:compileExpression()`
 	- libvideo (user/kernel)
 		- Provide generic software-based video codec converter functions, as well as the (future) system for interacting with (potentially hardware-accelerated) video processing in the form of simple 2D surface operations
+		- Note that currently, none of that actually happens already (that's all left up to future me to (possibly) implement)
 	- libvm86 (user/kernel)
 		- An entire software-based emulator of the 8086 and its instruction set
-		- Yes: I wrote yet another decoder and interpreter for the x86 instruction set (as if `vio.c` and `hw_illegal_instruction.c` wern't enough already)
+		- Yes: I wrote yet another decoder and interpreter for the x86 instruction set (as if `vio.c` and `hw_illegal_instruction.c` weren't enough already)
 		- Allows BIOS functions to-be called from protected mode, or even from long-mode (still pending full support)
+	- ... More libraries may get added in the future without being documented here
 
 
 
@@ -295,10 +307,12 @@ KOSmk4 no longer is a small kernel. I'd say it has reached the point of really b
 - Any function defined by a library other than libc should be located in a folder `<libmylibrary/...>` and must always contain a file `<libmylibrary/api.h>` that defines the common calling convention, as well as the `dlopen(3)` name for the library, as well as a configuration option `LIBMYLIBRARY_WANT_PROTOTYPES`
 	- Each function exported by such a library should appear 2 times:
 		- `typedef RETURN_TYPE (LIBMYLIBRARY_CC *PNAME_OF_EXPORTED_FUNCTION)(int x, int y)`
-		- ```#ifdef LIBMYLIBRARY_WANT_PROTOTYPES
-LIBMYLIBRARY_DECL RETURN_TYPE LIBMYLIBRARY_CC name_of_exported_function(int x, int y);
-#endif /* LIBMYLIBRARY_WANT_PROTOTYPES */```
-- As much a possible from `/kos/include/*` should be generated automatically using `/kos/misc/generate_headers.dee`
+		- ```
+		#ifdef LIBMYLIBRARY_WANT_PROTOTYPES
+		LIBMYLIBRARY_DECL RETURN_TYPE LIBMYLIBRARY_CC name_of_exported_function(int x, int y);
+		#endif /* LIBMYLIBRARY_WANT_PROTOTYPES */
+		```
+- As much a possible from `/kos/include/*` should be generated automatically using `/kos/misc/magicgenerator/generate_headers.dee`
 - `/kos/include/hybrid/*` must not have any cross-dependencies to files other `/kos/include/__std(cxx|inc).h` and `/kos/include/compiler/*`
 	- The hybrid API should not be bound to only work under KOS and/or GCC
 - The provided `/kos/.clang-format` file is not perfect:
@@ -311,7 +325,7 @@ LIBMYLIBRARY_DECL RETURN_TYPE LIBMYLIBRARY_CC name_of_exported_function(int x, i
 	- Always allow an assembler or linker script to include any arbirary header found in `/kos/include/`
 - Libc:
 	- Try to maintain header (API) compatibility with GLIBc, MSVC and CYGWIN
-	- Try to maintain binary (ABI) compatibility with GLIBc and MSVC (CYGWIN as far as that is possible)
+	- Try to maintain binary (ABI) compatibility with GLIBc and MSVC (CYGWIN only as far as that is possible)
 - KOS-specific, object-related kernel function can be exported as a `HOP\_*` command (s.a. `/kos/include/kos/hop.h`)
 
 
