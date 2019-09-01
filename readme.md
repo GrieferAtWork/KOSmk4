@@ -4,7 +4,18 @@
 KOSmk4 no longer is a small kernel. I'd say it has reached the point of really being allowed to call itself a monolithic kernel (the kernel's ELF binary is ~10MiB with debug information included, and ~5MiB without)
 
 
+## Table of contents
+- [KOS Features](#features)
+- [Project rules / Code guidelines](#rules)
+- [Building KOS](#building)
+- [Programming KOS with an IDE](#programming)
+- [Notes on building KOS](#building-notes)
+- [Recommended Build Environment](#build-env)
+- [Building & using Bochs to run KOS](#bochs)
+- [Automatic System Headers](#headers)
 
+
+<a name="features"></a>
 ## KOS Features
 
 - Written in c++ (though only using minimal c++ features; the entire ABI is also accessible from c)
@@ -276,6 +287,7 @@ KOSmk4 no longer is a small kernel. I'd say it has reached the point of really b
 
 
 
+<a name="rules"></a>
 ## Project rules / Code guidelines
 
 - Any libc function exposed by KOS-headers under `/kos/include/*` must check if `__CRT_HAVE_{name}` is defined
@@ -303,6 +315,7 @@ LIBMYLIBRARY_DECL RETURN_TYPE LIBMYLIBRARY_CC name_of_exported_function(int x, i
 
 
 
+<a name="building"></a>
 ## Building KOS
 
 Requirements:
@@ -331,6 +344,7 @@ Building+Running KOS (from $PROJPATH):
 
 
 
+<a name="programming"></a>
 ## Programming KOS with an IDE
 
 I personally use Visual Studio 2017 Community Edition for this, as it actually has a fairly unknown feature `Open Folder` which allows for a hacky way to get full support for GDB debugging without having to pay an insane sum of up to $340 for [VisualGDB](https://visualgdb.com/buy/) (I'm doing this as a hobby; I don't have that kind of money; Jeez: I could barely scrape together $10 if that was the asking price)
@@ -356,6 +370,7 @@ So here are your options:
 
 
 
+<a name="building-notes"></a>
 ## Notes on building KOS
 
 The KOS build system is quite complex, as KOS system headers depend on CRT feature definition files which it will automatically generate/update as features are added to the kernel or libc.
@@ -378,6 +393,7 @@ For more information about the header substitution system, and how it makes it p
 
 
 
+<a name="build-env"></a>
 ## Recommended Build Environment
 
 I neither have the time nor will too make sure that any kind of build environment works.
@@ -391,6 +407,7 @@ So with that in mind, I can only recommend you'd use the same one I'm using:
 
 
 
+<a name="bochs"></a>
 ## Building & using Bochs to run KOS
 
 First, you must patch the Bochs source to fix a bug that normally breaks the unmaintained `load32bitOShack` feature which KOS makes use of to quickly have itself be loaded into memory, forgoing the need of the usual ISO+bootloader combination required to load a custom kernel into Bochs.
@@ -435,6 +452,7 @@ Or you can directly build+run KOS with:
 
 
 
+<a name="headers"></a>
 ## Automatic System Headers
 
 KOS uses various interpreter/intermediate compilers for centralizing the definition, substitution, aliasing, binding, and documentation of most system headers containing definitions of functions exported from libc. (A similar system also exists for defining and updating system calls)
