@@ -1,0 +1,427 @@
+/* Copyright (c) 2019 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+
+/* Compiler for converting keymap definition files into .kmp files,
+ * following the KOS proprietary file format for KMP files. */
+
+import * from deemon;
+
+
+final global KMP_MAG0            = 'K'.ord();
+final global KMP_MAG1            = 'm'.ord();
+final global KMP_MAG2            = 'p'.ord();
+final global KMP_MAG3            = 0x35;
+final global KMP_VERSION_CURRENT = 1;
+
+//typedef struct __ATTR_PACKED {
+//	__uint8_t   h_magic[4]; /* Header magic. */
+//	__uint8_t   h_version;  /* File version. */
+//	__uint8_t   h_hdrsize;  /* Total size of the header. (Absolute file-offset to a `Kmp_Data' structure) */
+//} Kmp_Header;
+
+
+@@All characters are encoded as 7-bit ascii characters with the 8th bit ZERO
+final global KMP_ENCODING_ASCII   = 0x00;
+
+@@All characters are encoded as 8-bit integers (single-byte LATIN-1 characters)
+final global KMP_ENCODING_LATIN1  = 0x00;
+
+@@All characters are encoded as UTF-8 sequences.
+final global KMP_ENCODING_UTF8    = 0x01;
+
+@@All characters are encoded as UTF-16 sequences (Little endian) with a length
+@@of a single character each (max. 2 UTF-16 characters; 1 if it isn't a surrogate)
+final global KMP_ENCODING_UTF16LE = 0x02;
+
+@@Same as `KMP_ENCODING_UTF16LE', but big endian.
+final global KMP_ENCODING_UTF16BE = 0x03;
+
+@@Characters are encoded as UTF32, little-endian (max 1 character)
+final global KMP_ENCODING_UTF32LE = 0x04;
+
+@@Characters are encoded as UTF32, big-endian
+final global KMP_ENCODING_UTF32BE = 0x05;
+
+@@Multi-character-string (each character is encoded as UTF-8,
+@@and the sequence is terminated by a NUL-character)
+final global KMP_ENCODING_MCS     = 0x06;
+
+@@Max recognized encoding.
+final global KMP_ENCODING_MAX     = 0x06;
+
+//typedef struct __ATTR_PACKED {
+//	__uint8_t   d_encoding; /* KMP default encoding (One of `KMP_ENCODING_*'). */
+//	__uint8_t   d_zero;     /* Must be zero */
+//	__uint8_t   d_code[1];  /* keyboard mapping pseudo-code (see below) */
+//} Kmp_Data;
+
+
+/* KMP registers:
+ *   - %pc            The current program counter.
+ *   - %key           Points to the next key to-be defined. Pre-initialized to `KEY(0,0)'
+ *   - %enc           The current encoding for large characters (Pre-initialized to `d_encoding')
+ *   - CURRENT_KEY    The key that got pressed.
+ *   - CURRENT_KEYMOD Set of keyboard modifiers currently active.
+ */
+@@OPCODE: Stop execution
+final global KMP_OP_STOP       = 0x00;
+
+@@OPCODE: %key += KEY(0, 1);
+final global KMP_OP_INCCOL     = 0x01;
+
+@@OPCODE: %key -= KEY(0, 1);
+final global KMP_OP_DECCOL     = 0x02;
+
+@@OPCODE: %enc  = *%pc; %pc += 1;
+final global KMP_OP_SETENC     = 0x03;
+
+@@OPCODE: %key  = *%pc; %pc += 1;
+final global KMP_OP_SETKEY     = 0x04;
+
+@@OPCODE: %enc  = DEFAULT_ENCODING; (DEFAULT_ENCODING == `d_encoding')
+final global KMP_OP_DEFENC     = 0x05;
+
+@@OPCODE: %key  = *(u16 *)*%pc; %pc += 2;
+final global KMP_OP_SETKEY2    = 0x06;
+
+@@OPCODE: mask = *(u16 *)%pc; %pc += 2;
+@@        kchr = READ_CHARACTER(%pc, %enc);
+@@        if (CURRENT_KEYMOD == mask)
+@@            return kchr;
+final global KMP_OP_SETKEYMOD2 = 0x1a;
+
+@@OPCODE: mask = *(u8 *)%pc; %pc += 1;
+@@        kchr = READ_CHARACTER(%pc, %enc);
+@@        if (CURRENT_KEYMOD == mask)
+@@            return kchr;
+final global KMP_OP_SETKEYMOD  = 0x1b;
+
+@@OPCODE: kchr = READ_CHARACTER(%pc, %enc);
+@@         if (CURRENT_KEY == %key && KEYMOD_ISNORMAL(CURRENT_KEYMOD))
+@@             return kchr;
+@@         %key += KEY(0,1);
+final global KMP_OP_SETPRESS   = 0x1c;
+
+@@OPCODE: kchr = READ_CHARACTER(%pc, %enc);
+@@         if (CURRENT_KEY == %key && KEYMOD_ISSHIFT(CURRENT_KEYMOD))
+@@             return kchr;
+final global KMP_OP_SETSHIFT   = 0x1d;
+
+@@OPCODE: kchr = READ_CHARACTER(%pc, %enc);
+@@         if (CURRENT_KEY == %key && KEYMOD_ISALTGR(CURRENT_KEYMOD))
+@@             return kchr;
+final global KMP_OP_SETALTGR   = 0x1e;
+
+@@OPCODE: // no-op
+final global KMP_OP_NOP        = 0x1f;
+
+
+/* Special opcodes that encode their operand as part of the instruction. */
+
+@@Mask for merged operand instructions.
+@@ if ((op & KMP_OP_MEXTENDED) == KMP_OP_FDEFLATIN) ...;
+@@ if ((op & KMP_OP_MEXTENDED) == KMP_OP_FDEFDIGIT) ...;
+@@ if ((op & KMP_OP_MEXTENDED) == KMP_OP_FSETROW) ...;
+@@ if ((op & KMP_OP_MEXTENDED) == KMP_OP_FSETCOL) ...;
+final global KMP_OP_MEXTENDED = 0xe0;
+
+@@ press[%key] = 'a' + (op & 0x1f);
+@@ shift[%key] = 'A' + (op & 0x1f);
+@@ %key += KEY(0,1);
+final global KMP_OP_FDEFLATIN = 0x20;
+
+@@ press[%key] = '1' + (op & 0x1f);
+@@ shift[%key] = '!' + (op & 0x1f);
+@@ %key += KEY(0,1);
+final global KMP_OP_FDEFDIGIT = 0x40;
+
+@@`%key = KEY(op & 0x1f, 0);'
+final global KMP_OP_FSETROW   = 0xc0;
+
+@@`%key = KEY(KEY_GETROW(%key), op & 0x1f);'
+final global KMP_OP_FSETCOL   = 0xe0;
+
+
+final global KEYBOARD_COL_BITS = 5;
+final global KEYBOARD_ROW_BITS = 3;
+
+
+final global KEYMOD_LCTRL      = 0x0001; /* KEY_LCTRL */
+final global KEYMOD_RCTRL      = 0x0002; /* KEY_RCTRL */
+final global KEYMOD_LSHIFT     = 0x0004; /* KEY_LSHIFT */
+final global KEYMOD_RSHIFT     = 0x0008; /* KEY_RSHIFT */
+final global KEYMOD_LGUI       = 0x0010; /* KEY_LGUI */
+final global KEYMOD_RGUI       = 0x0020; /* KEY_RGUI */
+final global KEYMOD_LALT       = 0x0040; /* KEY_LALT */
+final global KEYMOD_RALT       = 0x0080; /* KEY_RALT */
+final global KEYMOD_CAPSLOCK   = 0x0100; /* KEY_CAPSLOCK */
+
+
+#define KEY_GETROW(key) ((key) >> KEYBOARD_COL_BITS)
+#define KEY_GETCOL(key) ((key) & ((1 << KEYBOARD_COL_BITS) - 1))
+#define KEY(r, c)       (((r) << KEYBOARD_COL_BITS) | c)
+
+
+@@Link @defs, which is a mapping (KEY_CODE: { MODS : MAPPED_STRING })
+@@into a KMP file that is written to @fp
+function linkKeymap(fp: File, defs: {int: {int : string}}) {
+	local usedDefs = Dict();
+	for (local keyCode, modMappings: defs) {
+		local maps = usedDefs.get(keyCode);
+		if (maps is none)
+			usedDefs[keyCode] = maps = Dict();
+		maps.update(modMappings);
+	}
+	local keycodes = usedDefs.keys.sorted();
+	/* Kmp_Header */
+	fp.putc(KMP_MAG0);
+	fp.putc(KMP_MAG1);
+	fp.putc(KMP_MAG2);
+	fp.putc(KMP_MAG3);
+	fp.putc(KMP_VERSION_CURRENT);
+	fp.putc(6);
+	@@Total number of mappings
+	local num_mappings = 0;
+	@@Number of mappings that produce multiple characters
+	local num_mappings_multichar = 0;
+	@@Number of single-char mappings that produce latin1 characters
+	local num_mappings_latin1 = 0;
+	@@Number of single-char mappings that produce non-latin1 characters
+	local num_mappings_nonlatin1 = 0;
+	for (local none, maps: usedDefs) {
+		for (local none,s: maps) {
+			++num_mappings;
+			if (#s != 1) {
+				++num_mappings_multichar;
+				continue;
+			}
+			local ch = s.first.ord();
+			if (ch <= 0xff) {
+				++num_mappings_latin1;
+			} else {
+				++num_mappings_nonlatin1;
+			}
+		}
+	}
+	local reg_default_enc;
+	if (num_mappings_multichar > num_mappings_latin1 &&
+	    num_mappings_multichar > num_mappings_nonlatin1) {
+		reg_default_enc = KMP_ENCODING_MCS;
+	} else if (num_mappings_latin1 > num_mappings_multichar &&
+	           num_mappings_latin1 > num_mappings_nonlatin1) {
+		reg_default_enc = KMP_ENCODING_LATIN1;
+	} else {
+		reg_default_enc = KMP_ENCODING_UTF8;
+	}
+	/* Kmp_Data */
+	fp.putc(reg_default_enc);
+	fp.putc(0);
+	local reg_key = Cell(KEY(0, 0));
+	local reg_enc = Cell(reg_default_enc);
+	function setEncoding(enc: int) {
+		if (enc == reg_enc.value)
+			return;
+		if (enc == reg_default_enc) {
+			fp.putc(KMP_OP_DEFENC);
+		} else {
+			fp.putc(KMP_OP_SETENC);
+			fp.putc(enc);
+		}
+		reg_enc.value = enc;
+	}
+	function setKey(key: int) {
+		local oldKey = reg_key.value;
+		if (oldKey == key)
+			return;
+		if (oldKey + 1 == key) {
+			fp.putc(KMP_OP_INCCOL);
+		} else if (oldKey - 1 == key) {
+			fp.putc(KMP_OP_DECCOL);
+		} else {
+			local newRow = KEY_GETROW(key);
+			local newCol = KEY_GETCOL(key);
+			if (KEY_GETROW(oldKey) == newRow && newCol <= 0x1f) {
+				fp.putc(KMP_OP_FSETCOL | newCol);
+			} else if (newCol == 0 && newRow <= 0x1f) {
+				fp.putc(KMP_OP_FSETROW | newRow);
+			} else if (key <= 0xff) {
+				fp.putc(KMP_OP_SETKEY);
+				fp.putc(key);
+			} else {
+				fp.putc(KMP_OP_SETKEY2);
+				fp.putc(key & 0xff);
+				fp.putc((key >> 8) & 0xff);
+			}
+		}
+		reg_key.value = key;
+	}
+	function encodeString(s: string, firstStep: bool) {
+		if (#s == 1) {
+			local ch = s.first.ord();
+			if (firstStep) {
+				if (ch > 0xff)
+					setEncoding(KMP_ENCODING_UTF8);
+				else if (num_mappings_latin1 > num_mappings_nonlatin1)
+					setEncoding(KMP_ENCODING_LATIN1);
+				else {
+					setEncoding(KMP_ENCODING_UTF8);
+				}
+			} else {
+				if (ch <= 0x7f) {
+					fp.putc(ch);
+					return;
+				}
+				if (ch <= 0xff && reg_enc.value == KMP_ENCODING_LATIN1) {
+					fp.putc(ch);
+					return;
+				}
+				assert reg_enc.value == KMP_ENCODING_UTF8;
+				fp.write(string.chr(ch).encode("utf-8"));
+			}
+			return;
+		}
+		if (firstStep) {
+			setEncoding(KMP_ENCODING_MCS);
+		} else {
+			fp.write(s.encode("utf-8"));
+			fp.putc(0);
+		}
+	}
+	for (local code: keycodes) {
+		local mappings = usedDefs[code];
+		if (!mappings)
+			continue;
+		setKey(code);
+		local commonPress = none;
+		local commonShift = none;
+		local commonAltGr = none;
+		/* Extract generic mappings. */
+		commonPress = mappings.get(0);
+		commonShift = mappings.get(KEYMOD_LSHIFT);
+		if (commonShift !is none) {
+			final local alts = {
+				KEYMOD_RSHIFT,
+				KEYMOD_LSHIFT | KEYMOD_RSHIFT,
+				KEYMOD_CAPSLOCK
+			};
+			for (local a: alts) {
+				local temp = mappings.get(a);
+				if (temp is none || temp != commonShift) {
+					commonShift = none;
+					break;
+				}
+			}
+		}
+		commonAltGr = mappings.get(KEYMOD_RALT);
+		if (commonAltGr !is none) {
+			final local alts = {
+				KEYMOD_LCTRL | KEYMOD_LALT,
+				KEYMOD_LCTRL | KEYMOD_RALT,
+				KEYMOD_RCTRL | KEYMOD_LALT,
+				KEYMOD_RCTRL | KEYMOD_RALT,
+				KEYMOD_CAPSLOCK | KEYMOD_RALT,
+				KEYMOD_CAPSLOCK | KEYMOD_LCTRL | KEYMOD_LALT,
+				KEYMOD_CAPSLOCK | KEYMOD_LCTRL | KEYMOD_RALT,
+				KEYMOD_CAPSLOCK | KEYMOD_RCTRL | KEYMOD_LALT,
+				KEYMOD_CAPSLOCK | KEYMOD_RCTRL | KEYMOD_RALT,
+			};
+			for (local a: alts) {
+				local temp = mappings.get(a);
+				if (temp is none || temp != commonAltGr) {
+					commonAltGr = none;
+					break;
+				}
+			}
+		}
+		/* Encode non-standard combinatory mappings. */
+		for (local mods, s: mappings) {
+			if (s === commonPress || s === commonShift || s === commonAltGr)
+				continue;
+			encodeString(s, true);
+			if (mods <= 0xff) {
+				fp.putc(KMP_OP_SETKEYMOD);
+				fp.putc(mods);
+			} else {
+				fp.putc(KMP_OP_SETKEYMOD2);
+				fp.putc(mods & 0xff);
+				fp.putc((mods >> 8) & 0xff);
+			}
+			encodeString(s, false);
+		}
+		/* Encode an ALT+GR mapping if there is one. */
+		if (commonAltGr !is none) {
+			encodeString(commonAltGr, true);
+			fp.putc(KMP_OP_SETALTGR);
+			encodeString(commonAltGr, false);
+		}
+		/* Check if it is possible to use special encodings for NORMAL/SHIFT */
+		if (commonShift !is none && commonPress !is none &&
+		    (#commonShift == 1 && #commonPress == 1)) {
+			local pressOrd = commonPress.first.ord();
+			local shiftOrd = commonShift.first.ord();
+			local simpleMapOpcode = none;
+			if (pressOrd >= 'a'.ord() && pressOrd <= ('a'.ord() + 0x1f) &&
+			    pressOrd == shiftOrd + ('a'.ord() - 'A'.ord())) {
+				simpleMapOpcode = KMP_OP_FDEFLATIN | (pressOrd - 'a'.ord());
+			} else if (pressOrd >= '0'.ord() && pressOrd <= ('0'.ord() + 0x1f) &&
+			           pressOrd == shiftOrd + ('0'.ord() - '!'.ord())) {
+				simpleMapOpcode = KMP_OP_FDEFDIGIT | (pressOrd - '0'.ord());
+			}
+			if (simpleMapOpcode !is none) {
+				fp.putc(simpleMapOpcode);
+				reg_key.value += KEY(0, 1);
+				continue;
+			}
+		}
+		/* Must encode shift/press normally (if they are even defined) */
+		if (commonShift !is none) {
+			encodeString(commonShift, true);
+			fp.putc(KMP_OP_SETSHIFT);
+			encodeString(commonShift, false);
+		}
+		if (commonPress !is none) {
+			encodeString(commonPress, true);
+			fp.putc(KMP_OP_SETPRESS);
+			encodeString(commonPress, false);
+			reg_key.value += KEY(0, 1);
+		}
+	}
+	/* Terminate the keymap program sequence */
+	fp.putc(KMP_OP_STOP);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,14 @@
+/.vs
+/bin
+/binutils
+/build
+/kos/.vs/slnx.sqlite
+/kos/.vs/kos
+/kos/.vs/config
+/kos/.vs/ProjectSettings.json
+/asm.S
+/kos/include/i386-kos/c++
+__ice__
+*.dec
+*.latest
+*.stackdump

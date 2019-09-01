@@ -1,0 +1,138 @@
+/* Copyright (c) 2019 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+
+BEGIN
+	DEFINE("__KERNEL__")
+	INCLUDE({
+		"/kos/src/kernel/include",
+		"/kos/src/kernel/include/" + TARGET_XARCH + "-kos",
+	})
+	//LD_FLAGS({ "--gc-sections" })
+	GCC_FLAGS({
+		"-fno-rtti",
+		"-ffreestanding",
+	})
+
+	/* Arch-specific configurations. */
+	if (TARGET_ARCH in ["i386", "x86_64"]) {
+		CC_FLAGS({
+			"-mno-sse",
+			"-mno-sse2",
+			"-mno-sse3",
+			"-mno-sse4",
+			"-mno-ssse3",
+			"-mno-mmx",
+			"-mno-3dnow",
+			"-mno-avx",
+			"-mtls-direct-seg-refs",
+			"-mcld", /* Because user-space may modify this flag... */
+		})
+	}
+	/* Without SEE (disabled above), 4/8-byte (2^<2/3>) stack alignment is all we really need. */
+	if (TARGET_ARCH == "i386") {
+		CC_FLAGS({
+			"-mpreferred-stack-boundary=2",
+		})
+	} else if (TARGET_ARCH == "x86_64") {
+		CC_FLAGS({
+			"-mpreferred-stack-boundary=3",
+			"-mno-red-zone",     /* Disable the red zone in kernel-space */
+			"-mcmodel=kernel",   /* Configure GCC for a memory model to address -2Gb...2Gb */
+		})
+	}
+
+	BEGIN GROUP("kernelspace._verify") { COMPILE };
+		SOURCE({
+			"../_verify/arch/" + TARGET_XARCH + "/*.c",
+			"../_verify/*.c",
+		})
+	END
+
+
+	/* Kernel core. */
+#include "core/.sources"
+
+	/* Drivers */
+	BEGIN
+		SET_NOSTDLIB()
+		STATIC_USELIBGCC()
+		STATIC_USELIB("libssp")
+		LIBPATH({ "/" + BINPATH + "/drivers/" })
+		LD_FLAGS({ "--nmagic" })
+		if (TARGET_ARCH == "x86_64")
+			LD_FLAGS({ "-z", "noreloc-overflow" })
+		GCC_FLAGS({
+			"-shared",
+//			"-fPIC", /* Not needed, and would produce slower code... */
+		})
+
+#define DEFINE_SIMPLE_DRIVER(name, ...)                     \
+		BEGIN GROUP("mod." name) { COMPILE, LINK, MCOPY };  \
+			SET_OUTPUT("/" + BINPATH + "/os/drivers/" name) \
+			SET_DISKFILE("/os/drivers/" name)               \
+			LD_FLAGS({ "-soname=" name })                   \
+			SOURCE({ "mod" name "/" "*.c" })                \
+			__VA_ARGS__                                     \
+		END
+#define DEFINE_SIMPLE_ARCH_DRIVER(name)                                                               \
+		BEGIN GROUP("mod." name) { COMPILE };                                                         \
+			SET_LANGUAGE("assembler-with-cpp")                                                        \
+			SOURCE({ "mod" name "/arch/" + TARGET_XARCH + "/" "*" + TARGET_BITS_PER_POINTER + ".S" }) \
+		END                                                                                           \
+		BEGIN GROUP("mod." name) { COMPILE };                                                         \
+			SOURCE({ "mod" name "/" "*.c" })                                                          \
+			SOURCE({ "mod" name "/arch/" + TARGET_XARCH + "/" "*.c" })                                \
+		END                                                                                           \
+		BEGIN GROUP("mod." name) { LINK, MCOPY };                                                     \
+			SET_OUTPUT("/" + BINPATH + "/os/drivers/" name)                                           \
+			SET_DISKFILE("/os/drivers/" name)                                                         \
+			LD_FLAGS({ "-soname=" name })                                                             \
+			SOURCE({                                                                                  \
+				"mod" name "/" "*.c",                                                                 \
+				"mod" name "/arch/" + TARGET_XARCH + "/" "*.c",                                       \
+				"mod" name "/arch/" + TARGET_XARCH + "/" "*" + TARGET_BITS_PER_POINTER + ".S",        \
+			})                                                                                        \
+		END
+
+		DEFINE_SIMPLE_DRIVER("ext2fs")
+		DEFINE_SIMPLE_DRIVER("iso9660")
+		DEFINE_SIMPLE_DRIVER("vga")
+		DEFINE_SIMPLE_DRIVER("ps2")
+
+		DEFINE_SIMPLE_ARCH_DRIVER("gdbstub")
+
+#undef DEFINE_SIMPLE_ARCH_DRIVER
+#undef DEFINE_SIMPLE_DRIVER
+	END
+END
+
+
+
+
+
+
+
+
+
+
+
+
+
+

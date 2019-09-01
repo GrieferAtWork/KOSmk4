@@ -1,0 +1,74 @@
+/* Copyright (c) 2019 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef GUARD_LIBC_USER_SYS_PTRACE_C
+#define GUARD_LIBC_USER_SYS_PTRACE_C 1
+
+#include "../api.h"
+#include "sys.ptrace.h"
+
+#include <kos/syscalls.h>
+
+DECL_BEGIN
+
+
+
+
+
+/*[[[start:implementation]]]*/
+
+/*[[[head:ptrace,hash:0x2a815e82]]]*/
+/* Perform process tracing functions. REQUEST is one of
+ * the values above, and determines the action to be taken.
+ * For all requests except PTRACE_TRACEME, PID specifies the process to be traced.
+ *
+ * PID and the other arguments described above for the various requests should
+ * appear (those that are used for the particular request) as:
+ *     pid_t PID, void *ADDR, int DATA, void *ADDR2
+ * after REQUEST */
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.ptrace.ptrace") long int
+NOTHROW_NCX(VLIBCCALL libc_ptrace)(__ptrace_request_t request,
+                                   ...)
+/*[[[body:ptrace]]]*/
+{
+	syscall_slong_t result;
+	va_list args;
+	pid_t pid;
+	void *addr, *data;
+	va_start(args, request);
+	pid  = va_arg(args, pid_t);
+	addr = va_arg(args, void *);
+	data = va_arg(args, void *);
+	va_end(args);
+	result = sys_ptrace(request, pid, addr, data);
+	return (long int)libc_seterrno_syserr(result);
+}
+/*[[[end:ptrace]]]*/
+
+/*[[[end:implementation]]]*/
+
+
+
+/*[[[start:exports,hash:0x1ae6e848]]]*/
+#undef ptrace
+DEFINE_PUBLIC_WEAK_ALIAS(ptrace, libc_ptrace);
+/*[[[end:exports]]]*/
+
+DECL_END
+
+#endif /* !GUARD_LIBC_USER_SYS_PTRACE_C */

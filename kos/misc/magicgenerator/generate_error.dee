@@ -1,0 +1,799 @@
+local copyright =
+"/* Copyright (c) 2019 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */";
+
+import fs;
+import * from deemon;
+
+/* Automatically generate exception classes, as well as meta-data
+ * INPUT:
+ *    /include/kos/except.def
+ *    /include/kos/asm/except.def
+ *    /include/i386-kos/kos/asm/except.def
+ * OUTPUT:
+ *    /include/kos/except.h
+ *    /include/kos/asm/except.h
+ *    /include/i386-kos/kos/asm/except.h
+ *    /include/kos/except-codes.h
+ */
+
+fs.chdir(fs.joinpath(fs.headof(__FILE__), "../.."));
+
+
+global ErrorClass;
+global Constant;
+
+class ErrorClassMember {
+	this = default;
+	@@Name of this member
+	member name: string;
+	@@Type of this member
+	member typ: string;
+	@@Documentation of this member
+	member doc: string | none;
+	@@Expression used to convert @this error member to a string
+	@@This expression is formatted as
+	@@>tostr_expr.format({ "MEMBER_NAME" : "REAL_MEMBER_NAME" ... })
+	member tostr_expr: string | none;
+	@@Implementation prefix for supporting `tostr_expr' (placed after DECL_BEGIN)
+	member tostr_expr_impl_prefix: string | none;
+	@@Implementation prefix for supporting `tostr_expr' (placed before DECL_BEGIN)
+	member tostr_expr_dependency_prefix: string | none;
+}
+
+class ErrorClass {
+	this = default;
+	@@Name of this error class
+	member name: string;
+	@@Code for this error class
+	member code: string;
+	@@Name of the base of this error class
+	member basename: string | none;
+	@@The expression used to generate the errno of this error class
+	@@When set to :none, no ERRNO code is available
+	member errno_expr: string | none;
+	@@Error message for this error class
+	member message: string | none;
+	@@Documentation of this class
+	member doc: string | none;
+	@@Sequence of members of @this error class
+	member members: {ErrorClassMember...} = [];
+	@@The base class of @this error class
+	member base: ErrorClass | none;
+}
+class Constant {
+	this = default;
+	@@Name of this constant
+	member name: string;
+	@@Value of this constant
+	member value: string;
+	@@Documentation of this constant
+	member doc: string | none;
+}
+class ImmediateString {
+	this = default;
+	@@The text of this string
+	member text: string;
+	@@The locations where this string should appear
+	member locations: {string...};
+}
+
+function print_doc_as_c_comment(fp: File, doc: string) {
+	local lines = List(doc.rstrip().splitlines());
+	if (!lines)
+		return;
+	if ("*/" in doc) {
+		for (local l: lines)
+			fp << "// " << l.rstrip() << "\n";
+	} else {
+		local isfirst = true;
+		for (local l: lines) {
+			if (isfirst) {
+				fp << "/* ";
+				isfirst = false;
+			} else {
+				fp << "\n * ";
+			}
+			fp << l.rstrip();
+		}
+		if (#lines >= 15)
+			fp << "\n";
+		fp << " */\n";
+	}
+}
+
+
+
+function split_tags(err: Callable, i: int, tag_content: string): {(string, string | none)...} {
+	local orig_content = tag_content;
+	tag_content = tag_content.strip();
+	while (tag_content) {
+		if (!tag_content.issymstrt(0))
+			err(i + (#orig_content - #tag_content),
+				"Expected symbol start character, but got " + repr tag_content[0] + " in " + tag_content);
+		local name_end = 1;
+		while (name_end < #tag_content && tag_content.issymcont(name_end))
+			++name_end;
+		local tag_name = tag_content[:name_end];
+		tag_content = tag_content[name_end:].lstrip();
+		local tag_args = none;
+		if (tag_content.startswith("(")) {
+			local args_end = tag_content.findmatch("(", ")", 1);
+			if (args_end < 0)
+				err(i + (#orig_content - #tag_content),
+					"Unmatched `('");
+			tag_args = tag_content[1:args_end];
+			tag_content = tag_content[args_end + 1:].lstrip();
+		}
+		yield (tag_name, tag_args);
+		if (!tag_content)
+			break;
+		if (!tag_content.startswith(","))
+			err(i + (#orig_content - #tag_content),
+				"Expected `,' or `]' to end tag, but got " +
+				repr tag_content[0] + " in " + tag_content);
+		tag_content = tag_content[1:].lstrip();
+	}
+}
+
+function do_load_error_def(filename: string): {(ErrorClass, Constant, ImmediateString)...} {
+	local text = File.open(filename).read().decode("utf-8");
+	local i = 0, end = #text;
+	local current_doc = none;
+	local current_message = none;
+	local current_errno = none;
+	function err(i, message) {
+		throw Error("{}({}) : Error : {}".format({
+			filename,
+			text.count("\n", 0, i) + 1,
+			message
+		}));
+	}
+
+	while (i < end) {
+		local ch = text[i];
+		if (ch.isspace()) {
+			++i;
+			continue;
+		}
+		if (ch == "/" && i + 1 < end) {
+			if (text[i + 1] == "/") {
+				i = text.find("\n", i + 2);
+				if (i < 0)
+					break;
+				++i;
+				continue;
+			}
+			if (text[i + 1] == "*") {
+				i = text.find("*/", i + 2);
+				if (i < 0)
+					break;
+				i += 2;
+				continue;
+			}
+		}
+		if (ch == "@" && i + 1 < end && text[i + 1] == "@") {
+			/* Doc-string line */
+			i += 2;
+			local line_end = text.find("\n", i);
+			if (line_end < 0)
+				line_end = end;
+			if (current_doc is none)
+				current_doc = text[i:line_end];
+			else {
+				current_doc += "\n";
+				current_doc += text[i:line_end];
+			}
+			i = line_end + 1;
+			continue;
+		}
+		if (ch == "%") {
+			++i;
+			local preamble_begin;
+			local ch = text[i];
+			if (ch == "{") {
+				/* STD-header re-export. */
+				++i;
+				preamble_begin = i;
+				i = text.findmatch("{", "}", preamble_begin);
+				if (i < 0)
+					err(preamble_begin, "No matching `}' after `%{'");
+				if (text.islf(preamble_begin))
+					++preamble_begin;
+				yield ImmediateString(text.substr(preamble_begin, i), pack "c");
+				++i;
+			} else if (ch == "(") {
+				local group_start = i + 1;
+				i = text.findmatch("(", ")", group_start);
+				if (i < 0)
+					err(group_start, "No matching `)' after `%('");
+				local group_list = text.substr(group_start, i);
+				++i;
+				group_list = Tuple(for (local x: group_list.split(",")) x.strip());
+				local ch = text[i];
+				if (ch == "{") {
+					++i;
+					preamble_begin = i;
+					i = text.findmatch("{", "}", preamble_begin);
+					if (i < 0)
+						err(preamble_begin, "No matching `}' for `{'");
+					if (text.islf(preamble_begin))
+						++preamble_begin;
+					yield ImmediateString(text.substr(preamble_begin, i), group_list);
+					++i;
+				} else {
+					preamble_begin = i;
+					i = text.find("\n", i);
+					if (i < 0) {
+						i = end;
+						yield ImmediateString(text.substr(preamble_begin, i) + "\n", group_list);
+					} else {
+						++i;
+						yield ImmediateString(text.substr(preamble_begin, i), group_list);
+					}
+				}
+			} else {
+				preamble_begin = i;
+				i = text.find("\n", i);
+				if (i < 0) {
+					i = end;
+					yield ImmediateString(text.substr(preamble_begin, i) + "\n", pack "c");
+				} else {
+					++i;
+					yield ImmediateString(text.substr(preamble_begin, i), pack "c");
+				}
+			}
+			continue;
+		}
+		if (ch == "[") {
+			/* Tag */
+			local tag_end = text.findmatch("[", "]", i + 1);
+			if (tag_end < 0)
+				err(i, "Unmatched `[' character");
+			local tag_content = text[i + 1:tag_end].strip();
+			for (local tag_name, args: split_tags(err, i + 1, tag_content)) {
+				switch (tag_name) {
+				case "message":
+					args = args.strip();
+					if (args is none || !args.startswith("\"") || !args.endswith("\""))
+						err(i, "message-tag requires a string argument");
+					current_message = args.decode("c-escape");
+					args = none;
+					break;
+				case "errno":
+					if (args is none)
+						err(i, "errno-tag requires an argument");
+					current_errno = args.strip();
+					args = none;
+					break;
+				default:
+					err(i, "Unknown tag " + repr(tag_name));
+					break;
+				}
+				if (args !is none)
+					err(i, "Tag " + repr(tag_name) + " does not take arguments");
+			}
+			i = tag_end + 1;
+			continue;
+		}
+		if (ch.issymstrt()) {
+			local kwd_end = i + 1;
+			while (kwd_end < end && text.issymcont(kwd_end))
+				++kwd_end;
+			local keyword = text[i:kwd_end];
+			i = kwd_end;
+			while (i < end && text.isspace(i))
+				++i;
+			switch (keyword) {
+
+			case "class": {
+				if (i >= end || !text.issymstrt(i))
+					err(i, "Expected keyword after `class', but got " + text.substr(i, i+1));
+				local name_end = i + 1;
+				while (name_end < end && text.issymcont(name_end))
+					++name_end;
+				local class_name = text[i:name_end];
+				i = name_end;
+				while (i < end && text.isspace(i))
+					++i;
+				local class_basename: string | none = none;
+				if (i >= end || text[i] !in [":", "="])
+					err(i, "Expected `:' or `=' after `class', but got " + text.substr(i, i+1));
+				if (text[i] == ":") {
+					++i;
+					while (i < end && text.isspace(i))
+						++i;
+					if (i >= end || !text.issymstrt(i))
+						err(i, "Expected keyword after `class ...:', but got " + text.substr(i, i+1));
+					local name_end = i + 1;
+					while (name_end < end && text.issymcont(name_end))
+						++name_end;
+					class_basename = text[i:name_end];
+					i = name_end;
+					while (i < end && text.isspace(i))
+						++i;
+					if (i >= end || text[i] != "=")
+						err(i, "Expected `=' after `class ...: ...', but got " + text.substr(i, i+1));
+				}
+				++i;
+				while (i < end && text.isspace(i))
+					++i;
+				local value_end = text.find("{", i);
+				if (value_end < 0)
+					err(i, "Missing `{' after `class'");
+				local class_codename = text[i:value_end].rstrip();
+				i = value_end + 1;
+				local body_end = text.findmatch("{", "}", i);
+				if (body_end < 0)
+					err(i - 1, "Unmatched `{' after `class'");
+				local result = ErrorClass(
+					name: class_name,
+					code: class_codename,
+					basename: class_basename,
+					errno_expr: current_errno,
+					message: current_message,
+					doc: current_doc !is none
+						? current_doc
+						: current_message);
+				current_doc = none;
+				current_errno = none;
+				current_message = none;
+
+				local current_tostr_expr = none;
+				local current_tostr_expr_impl_prefix = none;
+				local current_tostr_expr_dependency_prefix = none;
+				while (i < body_end) {
+					local ch = text[i];
+					if (ch.isspace()) {
+						++i;
+						continue;
+					}
+					if (ch == "/" && i + 1 < body_end) {
+						if (text[i + 1] == "/") {
+							i = text.find("\n", i + 2, body_end);
+							if (i < 0)
+								break;
+							++i;
+							continue;
+						}
+						if (text[i + 1] == "*") {
+							i = text.find("*/", i + 2, body_end);
+							if (i < 0)
+								break;
+							i += 2;
+							continue;
+						}
+					}
+					if (ch == "@" && i + 1 < body_end && text[i + 1] == "@") {
+						/* Doc-string line */
+						i += 2;
+						local line_end = text.find("\n", i, body_end);
+						if (line_end < 0)
+							line_end = body_end;
+						if (current_doc is none)
+							current_doc = text[i:line_end];
+						else {
+							current_doc += "\n";
+							current_doc += text[i:line_end];
+						}
+						i = line_end + 1;
+						continue;
+					}
+					if (ch == "[") {
+						/* Tag */
+						local tag_end = text.findmatch("[", "]", i + 1, body_end);
+						if (tag_end < 0)
+							err(i, "Unmatched `[' character");
+						local tag_content = text[i + 1:tag_end].strip();
+						for (local tag_name, args: split_tags(err, i + 1, tag_content)) {
+							switch (tag_name) {
+							case "tostr":
+								if (args is none)
+									err(i, "tostr-tag requires an argument");
+								current_tostr_expr = args.strip();
+								/* TODO: Decode `select()' expressions! */
+								args = none;
+								break;
+							default:
+								err(i, "Unknown tag " + repr(tag_name));
+								break;
+							}
+							if (args !is none)
+								err(i, "Tag " + repr(tag_name) + " does not take arguments");
+						}
+						i = tag_end + 1;
+						continue;
+					}
+					if (ch.issymstrt()) {
+						local kwd_end = i + 1;
+						while (kwd_end < body_end && text.issymcont(kwd_end))
+							++kwd_end;
+						local keyword = text[i:kwd_end];
+						i = kwd_end;
+						while (i < body_end && text.isspace(i))
+							++i;
+						switch (keyword) {
+						case "member": {
+							local m = ErrorClassMember(
+								doc: current_doc,
+								tostr_expr: current_tostr_expr,
+								tostr_expr_impl_prefix: current_tostr_expr_impl_prefix,
+								tostr_expr_dependency_prefix: current_tostr_expr_dependency_prefix);
+							current_doc = none;
+							current_tostr_expr = none;
+							current_tostr_expr_impl_prefix = none;
+							current_tostr_expr_dependency_prefix = none;
+							if (i >= body_end || !text.issymstrt(i))
+								err(i, "Unexpected keyword after `member' in class, but got " + repr(text.substr(i, i+1)));
+							local name_end = i + 1;
+							while (name_end < body_end && text.issymcont(name_end))
+								++name_end;
+							m.name = text[i:name_end];
+							i = name_end;
+							while (i < body_end && text.isspace(i))
+								++i;
+							if (i >= body_end || text[i] != ":")
+								err(i, "Expected `:' after `member ...' in class, but got " + repr(text.substr(i, i+1)));
+							++i;
+							while (i < body_end && text.isspace(i))
+								++i;
+							local typ_end = text.find(";", i, body_end);
+							if (typ_end < 0)
+								err(i, "Missing `;' after `member ...: ...' in class");
+							m.typ = text[i:typ_end].rstrip();
+							i = typ_end + 1;
+							result.members.append(m);
+						}	break;
+						default:
+							err(i, "Unexpected keyword " + repr(keyword) + " in class");
+							break;
+						}
+						continue;
+					}
+					err(i, "Unexpected character " + repr(ch) + " in class");
+				}
+				yield result;
+				i = body_end + 1;
+			}	break;
+
+			case "const": {
+				if (i >= end || !text.issymstrt(i))
+					err(i, "Expected keyword after `const', but got " + text.substr(i, i+1));
+				local name_end = i + 1;
+				while (name_end < end && text.issymcont(name_end))
+					++name_end;
+				local const_name = text[i:name_end];
+				i = name_end;
+				while (i < end && text.isspace(i))
+					++i;
+				if (i >= end || text[i] != "=")
+					err(i, "Expected `=' after `const', but got " + text.substr(i, i+1));
+				++i;
+				while (i < end && text.isspace(i))
+					++i;
+				local value_end = text.find(";", i);
+				if (value_end < 0)
+					err(i, "Missing `;' after `const'");
+				local const_value = text[i:value_end].rstrip();
+				i = value_end + 1;
+				local result = Constant(
+						name: const_name,
+						value: const_value,
+						doc: current_doc);
+				yield result;
+				current_doc = none;
+			}	break;
+
+			default:
+				err(kwd_end - #keyword, "Unexpected keyword " + repr(keyword));
+			}
+			continue;
+		}
+		err(i, "Unexpected character " + repr(ch));
+	}
+}
+
+
+function load_error_def(filename, base_decls = none): {(ErrorClass, Constant, ImmediateString)...} {
+	local result = List(do_load_error_def(filename));
+	local classes: {(string, ErrorClass)...} = Dict();
+	local constants: {(string, Constant)...} = Dict();
+	for (local x: result) {
+		if (x is ErrorClass)
+			classes[x.name] = x;
+		else if (x is Constant)
+			constants[x.name] = x;
+	}
+
+	/* Bind base-classes. */
+	for (local x: result) {
+		if (x !is ErrorClass)
+			continue;
+		if (x.basename is none) {
+			x.base = none;
+			continue;
+		}
+		local base = classes.get(x.basename);
+		if (base is none) {
+			for (local c: base_decls) {
+				if (c is ErrorClass && c.name == x.basename) {
+					base = c;
+					break;
+				}
+			}
+			if (base is none)
+				throw Error("Unknown base class " + repr(x.basename));
+		}
+		x.base = base;
+	}
+	/* TODO: Bind `select()' and `flagset()' to-str tags */
+	return result;
+}
+
+function write_hashed_file(filename: string, fp_writer: Callable) {
+	try {
+		local firstline, old_text;
+		with (local old_fp = File.open(filename, "r")) {
+			firstline = old_fp.readline();
+			old_text = old_fp.read();
+		}
+		if (!firstline)
+			goto do_overwrite_file;
+		local old_hash = firstline.scanf(" /* HASH %[^ *]")...;
+		old_hash = old_hash.strip();
+		local expected_old_hash = old_text.operator hash().hex();
+		if (old_hash != expected_old_hash) {
+			print "\n\nERROR: File", repr filename, "has been modified";
+			print "\tStored hash:  ", old_hash;
+			print "\tExpected hash:", expected_old_hash;
+			throw "Don't overwrite modified file";
+		}
+	} catch (Error.SystemError.FSError.FileNotFound) {
+		/* Fallthough -- Re-write the file. */
+	} catch (Error.ValueError.UnpackError) {
+		print "\n\nERROR: File", repr filename, "has been modified";
+		print "\tNo hash information tag found within the file";
+		throw "Don't overwrite modified file";
+	}
+do_overwrite_file:
+	with (local fp = File.open(filename, "w")) {
+		File.Writer contents;
+		fp_writer(contents);
+		contents = contents.string.encode("utf-8").bytes();
+		local new_hash = contents.operator hash().hex();
+		fp << "/* HASH " << new_hash << " */\n";
+		fp.write(contents);
+	}
+}
+
+
+
+function generate_header(filename: string, defs) {
+	write_hashed_file(filename, [](fp) {
+		for (local x: defs) {
+			if (x is ImmediateString) {
+				fp << x.text;
+				continue;
+			}
+			if (x is Constant) {
+				if (x.doc !is none)
+					print_doc_as_c_comment(fp, x.doc);
+				fp << "#define " << x.name << " " << x.value << "\n";
+				continue;
+			}
+			if (x is ErrorClass) {
+				File.Writer docwriter;
+				if (x.doc !is none)
+					docwriter << x.doc;
+				for (local m: x.members) {
+					if (m.doc !is none) {
+						for (local l: m.doc.splitlines())
+							docwriter << "\n\t@@" << l.rstrip();
+					}
+					docwriter << "\n\tmember " << m.name << ": " << m.typ << ";";
+				}
+				print_doc_as_c_comment(fp, docwriter.string.lstrip("\n"));
+				fp << "#define " << x.name << " " << "(";
+				if (x.base !is none)
+					fp << x.base.name << ",";
+				fp << x.code << ")\n";
+			}
+		}
+	});
+}
+
+
+function generate_error_def(
+	defs_filename: string,
+	header_filename: string | none = none,
+	base_decls = none): {(ErrorClass, Constant, ImmediateString)...} {
+	local result = load_error_def(defs_filename);
+	if (header_filename !is none)
+		generate_header(header_filename, result);
+	return result;
+}
+
+local kos_decls = generate_error_def(
+	"include/kos/except.def",
+	"include/kos/except.h",
+	);
+local arch_decls_generic = generate_error_def(
+	"include/kos/asm/except.def",
+	"include/kos/asm/except.h",
+	kos_decls);
+local arch_decls = [
+	("__i386__", generate_error_def(
+			"include/i386-kos/kos/asm/except.def",
+			"include/i386-kos/kos/asm/except.h",
+		kos_decls)),
+];
+
+
+/* Write the error class tree header file */
+write_hashed_file("include/kos/except-codes.def", [](fp){
+	fp << copyright << "\n\n";
+	fp << "#ifndef CLASS\n";
+	fp << "#define __ERROR_CODES_DEF_DEFINES_CLASS 1\n";
+	fp << "#define CLASS(name, message, errno, members) /* nothing */\n";
+	fp << "#endif\n";
+	fp << "#ifndef SUBCLASS\n";
+	fp << "#define __ERROR_CODES_DEF_DEFINES_SUBCLASS 1\n";
+	fp << "#define SUBCLASS(name, message, errno, members) /* nothing */\n";
+	fp << "#endif\n";
+	fp << "#ifndef END\n";
+	fp << "#define __ERROR_CODES_DEF_DEFINES_END 1\n";
+	fp << "#define END                /* nothing */\n";
+	fp << "#endif\n";
+	function print_class_arguments(fp, x: ErrorClass) {
+		fp << x.name
+			<< "," << (x.message !is none ? "MESSAGE({!r})".format({ x.message }) : "NO_MESSAGE")
+			<< "," << (x.errno_expr !is none ? "ERRNO({})".format({
+				x.errno_expr.format({
+					"ptr0" : "GET_EXCEPTION_POINTER(0)",
+					"ptr1" : "GET_EXCEPTION_POINTER(1)",
+					"ptr2" : "GET_EXCEPTION_POINTER(2)",
+					"ptr3" : "GET_EXCEPTION_POINTER(3)",
+					"ptr4" : "GET_EXCEPTION_POINTER(4)",
+					"ptr5" : "GET_EXCEPTION_POINTER(5)",
+					"ptr6" : "GET_EXCEPTION_POINTER(6)",
+					"ptr7" : "GET_EXCEPTION_POINTER(7)",
+				})
+			}) : "NO_ERRNO")
+			<< ",(";
+		local isfirst = true;
+		for (local m: x.members) {
+			if (!isfirst)
+				fp << " ";
+			isfirst = false;
+			fp << "MEMBER(";
+			fp << m.typ << "," << m.name;
+			fp << ")";
+		}
+		fp << ")";
+	}
+	function print_sub_classes_in(fp, master: ErrorClass, decls) {
+		for (local x: decls) {
+			if (x !is ErrorClass)
+				continue;
+			if (x.base !== master)
+				continue;
+			fp << "\tSUBCLASS(";
+			print_class_arguments(fp, x);
+			fp << ")\n";
+		}
+	}
+	function print_sub_classes(master: ErrorClass, current_arch) {
+		print_sub_classes_in(fp, master, kos_decls);
+		local isfirst = true;
+		for (local def, decls: arch_decls) {
+			File.Writer tempfp;
+			print_sub_classes_in(tempfp, master, decls);
+			tempfp = tempfp.string;
+			if (!tempfp)
+				continue;
+			if (current_arch is none || def != current_arch) {
+				if (isfirst) {
+					fp << "#if ";
+					isfirst = false;
+				} else {
+					fp << "#elif ";
+				}
+				fp << "defined(" << def << ")\n";
+			}
+			fp << tempfp;
+		}
+		File.Writer tempfp;
+		print_sub_classes_in(tempfp, master, arch_decls_generic);
+		tempfp = tempfp.string;
+		if (tempfp) {
+			if (!isfirst)
+				fp << "#else\n";
+			fp << tempfp;
+		}
+		if (!isfirst)
+			fp << "#endif\n";
+	}
+	function print_classes(decls, current_arch) {
+		for (local x: decls) {
+			if (x !is ErrorClass || x.base !is none)
+				continue;
+			fp << "CLASS(";
+			print_class_arguments(fp, x);
+			fp << ")\n";
+			print_sub_classes(x, current_arch);
+			fp << "END\n";
+		}
+	}
+	print_classes(kos_decls, none);
+	fp << "\n\n\n";
+	local isfirst = true;
+	for (local def, decls: arch_decls) {
+		if (isfirst) {
+			fp << "#if ";
+			isfirst = false;
+		} else {
+			fp << "#elif ";
+		}
+		fp << "defined(" << def << ")\n";
+		print_classes(decls, def);
+	}
+	if (!isfirst)
+		fp << "#else /* ARCH... */\n";
+	print_classes(arch_decls_generic, none);
+	if (!isfirst)
+		fp << "#endif /* !ARCH... */\n";
+
+	fp << "\n\n\n";
+	fp << "#ifdef __ERROR_CODES_DEF_DEFINES_CLASS\n";
+	fp << "#undef __ERROR_CODES_DEF_DEFINES_CLASS\n";
+	fp << "#undef CLASS\n";
+	fp << "#endif\n";
+	fp << "#ifdef __ERROR_CODES_DEF_DEFINES_SUBCLASS\n";
+	fp << "#undef __ERROR_CODES_DEF_DEFINES_SUBCLASS\n";
+	fp << "#undef SUBCLASS\n";
+	fp << "#endif\n";
+	fp << "#ifdef __ERROR_CODES_DEF_DEFINES_END\n";
+	fp << "#undef __ERROR_CODES_DEF_DEFINES_END\n";
+	fp << "#undef END\n";
+	fp << "#endif\n";
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

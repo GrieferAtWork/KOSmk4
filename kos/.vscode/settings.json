@@ -1,0 +1,9 @@
+{
+	"files.exclude": {
+		".vs": true,
+		".vscode": true,
+		"**.dec": true,
+		"**.latest": true,
+		"**/__ice__": true
+	}
+}

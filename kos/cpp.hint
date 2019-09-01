@@ -1,0 +1,498 @@
+#define __extension__
+#define attribute(x)
+#define __attribute(x)
+#define __attribute__(x)
+#define __volatile volatile
+#define __volatile__ volatile
+#define __const const
+#define __const__ const
+#define __label__
+#define typeof decltype
+#define __typeof decltype
+#define __typeof__ decltype
+#define _Atomic
+#define __thread
+#define __auto_type auto
+#define inline
+#define __inline
+#define __inline__
+#define _Noreturn
+#define _Thread_local
+#define __flash
+#define __flash1
+#define __flash2
+#define __flash3
+#define __flash4
+#define __flash5
+#define __memx
+#define __far
+#define __ea
+#define __seg_fs
+#define __seg_gs
+#define __signed signed
+#define __signed__ signed
+#define __unsigned unsigned
+#define __unsigned__ unsigned
+#define __restrict restrict
+#define __restrict__ restrict
+
+#define PHYS
+#define __PHYS
+#define VIRT
+#define __VIRT
+#define USER
+#define __USER
+#define KERNEL
+#define __KERNEL
+#define CHECKED
+#define __CHECKED
+#define UNCHECKED
+#define __UNCHECKED
+#define WEAK
+#define __WEAK
+#define REF
+#define REF_IF(x)
+#define __REF
+#define __REF_IF(x)
+#define FREE
+#define __FREE
+#define NOBLOCK
+#define __NOBLOCK
+#define NOCONNECT
+#define __NOCONNECT
+#define NOBLOCK_IF(x)
+#define __NOBLOCK_IF(x)
+#define THROWS(...)
+#define __THROWS(...)
+#define THROWS_INDIRECT(...)
+#define __THROWS_INDIRECT(...)
+#define KCALL
+#define __KCALL
+#define FCALL
+#define __FCALL
+#define VCALL
+#define LIBCCALL
+#define LIBDCALL
+#define VLIBCCALL
+#define VLIBDCALL
+#define __LIBCCALL
+#define __LIBDCALL
+#define __VLIBCCALL
+#define __VLIBDCALL
+#define __LIBC
+#define __FUNDEF
+#define CC
+
+#define NOTHROW(x) x
+#define __NOTHROW(x) x
+#define NOTHROW_NCX(x) x
+#define __NOTHROW_NCX(x) x
+#define NOTHROW_RPC(x) x
+#define __NOTHROW_RPC(x) x
+#define NOTHROW_RPC_KOS(x) x
+#define __NOTHROW_RPC_KOS(x) x
+#define NOTHROW_RPC_NOKOS(x) x
+#define __NOTHROW_RPC_NOKOS(x) x
+#define NOTHROW_RPC_PURE(x) x
+#define __NOTHROW_RPC_PURE(x) x
+
+#define DECL_BEGIN
+#define __DECL_BEGIN
+#define __SYSDECL_BEGIN
+#define DECL_END
+#define __DECL_END
+#define __SYSDECL_END
+
+#define __P(x) x
+
+#define ATTR_NOINLINE
+#define __ATTR_NOINLINE
+#define ATTR_NORETURN
+#define __ATTR_NORETURN
+#define ATTR_FASTCALL
+#define __ATTR_FASTCALL
+#define ATTR_STDCALL
+#define __ATTR_STDCALL
+#define ATTR_CDECL
+#define __ATTR_CDECL
+#define ATTR_SYSVABI
+#define __ATTR_SYSVABI
+#define ATTR_MSABI
+#define __ATTR_MSABI
+#define ATTR_PURE
+#define __ATTR_PURE
+#define ATTR_CONST
+#define __ATTR_CONST
+#define ATTR_LEAF
+#define __ATTR_LEAF
+#define ATTR_FLATTEN
+#define __ATTR_FLATTEN
+#define ATTR_MALLOC
+#define __ATTR_MALLOC
+#define ATTR_HOT
+#define __ATTR_HOT
+#define ATTR_COLD
+#define __ATTR_COLD
+#define ATTR_WEAK
+#define __ATTR_WEAK
+#define ATTR_ALLOC_SIZE(x)
+#define __ATTR_ALLOC_SIZE(x)
+#define ATTR_ASSUME_ALIGNED
+#define __ATTR_ASSUME_ALIGNED
+#define ATTR_ALLOC_ALIGN(x)
+#define __ATTR_ALLOC_ALIGN(x)
+#define ATTR_NOTHROW
+#define __ATTR_NOTHROW
+#define ATTR_DLLIMPORT
+#define __ATTR_DLLIMPORT
+#define ATTR_DLLEXPORT
+#define __ATTR_DLLEXPORT
+#define ATTR_NOCLONE
+#define __ATTR_NOCLONE
+#define ATTR_USED
+#define __ATTR_USED
+#define ATTR_UNUSED
+#define __ATTR_UNUSED
+#define ATTR_SENTINEL
+#define __ATTR_SENTINEL
+#define ATTR_SENTINEL_O(x)
+#define __ATTR_SENTINEL_O(x)
+#define ATTR_THREAD
+#define __ATTR_THREAD
+#define ATTR_DEPRECATED(x)
+#define __ATTR_DEPRECATED(x)
+#define ATTR_DEPRECATED_
+#define __ATTR_DEPRECATED_
+#define ATTR_WARNING(x)
+#define __ATTR_WARNING(x)
+#define ATTR_ERROR(x)
+#define __ATTR_ERROR(x)
+#define ATTR_SECTION(x)
+#define __ATTR_SECTION(x)
+#define ATTR_RETNONNULL
+#define __ATTR_RETNONNULL
+#define ATTR_ALIGNED(x)
+#define __ATTR_ALIGNED(x)
+#define ATTR_ALIAS(x)
+#define __ATTR_ALIAS(x)
+#define ATTR_INLINE
+#define __ATTR_INLINE
+#define ATTR_FORCEINLINE
+#define __ATTR_FORCEINLINE
+#define ATTR_PACKED
+#define __ATTR_PACKED
+#define ATTR_RETURNS_TWICE
+#define __ATTR_RETURNS_TWICE
+#define ATTR_EXTERNALLY_VISIBLE
+#define __ATTR_EXTERNALLY_VISIBLE
+
+#define __CXX_DEDUCE_TYPENAME typename
+#define __CXX_FORCEINLINE
+#define __CXX_INLINE_CONSTEXPR
+#define __CXX_DEFAULT_CTOR(T) T()
+#define __CXX_DEFAULT_DTOR(T) ~T()
+#define __CXX_DEFAULT_CTOR_NOEXCEPT(T) T()
+#define __CXX_DEFAULT_DTOR_NOEXCEPT(T) ~T()
+#define __CXX_STATIC_CONST(T,decl) static T decl
+#define __CXX_DELETE_CTOR(T) T()
+#define __CXX_DELETE_DTOR(T) ~T()
+#define __CXX_DELETE_COPY(T) T(T const&)
+#define __CXX_DELETE_COPY_ASSIGN(T) T &operator = (T const&)
+#define __CXX_DELETE_VOLATILE_COPY_ASSIGN(T) T &operator = (T const&) volatile
+#define __CXXDECL_BEGIN
+#define __CXXDECL_END
+#define __CXX_THROWS(...)
+
+#define NONNULL(x)
+#define __ATTR_NONNULL(x)
+#define WUNUSED
+#define __ATTR_WUNUSED
+#define UNUSED(x) x
+#define __UNUSED(x) x
+#define IMPDEF extern
+#define __IMPDEF extern
+#define EXPDEF extern
+#define __EXPDEF extern
+#define FUNDEF extern
+#define __PUBDEF extern
+#define DATDEF extern
+#define __PUBDEF extern
+#define PUBLIC
+#define __PUBLIC
+#define INTERN
+#define __INTERN
+#define PUBLIC_CONST
+#define __PUBLIC_CONST
+#define INTERN_CONST
+#define __INTERN_CONST
+#define INTDEF extern
+#define __INTDEF extern
+#define PRIVATE
+#define __PRIVATE
+#define FORCELOCAL
+#define __FORCELOCAL
+#define LOCAL
+#define __LOCAL
+#define DFL(x) = x
+#define __DFL(x) = x
+#define COMPILER_FLEXIBLE_ARRAY(T,n) T n[]
+#define __COMPILER_FLEXIBLE_ARRAY(T,n) T n[]
+#define ATTR_FREETEXT
+#define ATTR_FREERODATA
+#define ATTR_FREEDATA
+#define ATTR_FREEBSS
+#define ATTR_HOTTEXT
+#define ATTR_HOTRODATA
+#define ATTR_HOTDATA
+#define ATTR_HOTBSS
+#define ATTR_READMOSTLY
+#define ATTR_WRITEMOSTLY
+#define ATTR_COLDTEXT
+#define ATTR_COLDRODATA
+#define ATTR_COLDDATA
+#define ATTR_COLDBSS
+#define ATTR_TEXT
+#define ATTR_RODATA
+#define ATTR_DATA
+#define ATTR_BSS
+#define ATTR_PERCPU
+#define ATTR_PERVM
+#define ATTR_PERTASK
+
+#define __CXX_NOEXCEPT
+#define __CXX_NOEXCEPT_IF(expr)
+#define __CXX_NOEXCEPT_IS(expr)
+#define __CXX_NOEXCEPT_IFNX(expr)
+
+#define __CXX11_CONSTEXPR
+#define __CXX11_CONSTEXPR_OR_CONST
+#define __CXX14_CONSTEXPR
+#define __CXX14_CONSTEXPR_OR_CONST
+#define __CXX17_CONSTEXPR
+#define __CXX17_CONSTEXPR_OR_CONST
+
+#define __REDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args)                                       Treturn name param;
+#define __REDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args)                                             void name param;
+#define __VREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)    Treturn name param;
+#define __VREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)          void name param;
+#define __VFREDIRECT(decl,attr,Treturn,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) Treturn name paramf;
+#define __VFREDIRECT_VOID(decl,attr,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)       void name paramf;
+#define __XREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code)                                      Treturn name param;
+#define __XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code)                                            void name param;
+#define REDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args)                                         Treturn name param;
+#define REDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args)                                               void name param;
+#define VREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)      Treturn name param;
+#define VREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)            void name param;
+#define VFREDIRECT(decl,attr,Treturn,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)   Treturn name paramf;
+#define VFREDIRECT_VOID(decl,attr,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)         void name paramf;
+#define XREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code)                                        Treturn name param;
+#define XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code)                                              void name param;
+
+#define __NAMESPACE_STD_BEGIN    namespace std {
+#define __NAMESPACE_STD_END      }
+#define __NAMESPACE_STD_SYM      ::std::
+#define __NAMESPACE_STD_USING(x) using ::std::x;
+#define __NAMESPACE_GLB_USING(x) using ::x;
+
+#define __NAMESPACE_INT_BEGIN    namespace __intern {
+#define __NAMESPACE_INT_END      }
+#define __NAMESPACE_INT_SYM      ::__intern::
+#define __NAMESPACE_INT_LSYM       __intern::
+#define __NAMESPACE_INT_USING(x) using ::__intern::x;
+
+#define __NAMESPACE_FAST_BEGIN              namespace __optimized_imp {
+#define __NAMESPACE_FAST_END                }
+#define __NAMESPACE_FAST_SYM                ::__optimized_imp::
+#define __NAMESPACE_FAST_USING(x)           using ::__optimized_imp::x;
+#define __NAMESPACE_FAST_USING_OR_IMPL(x,i) using ::__optimized_imp::x;
+#define __LIBC_FAST_NAME(x)                 x
+
+#define __NAMESPACE_LOCAL_BEGIN              namespace __local_imp {
+#define __NAMESPACE_LOCAL_END                }
+#define __NAMESPACE_LOCAL_SYM                ::__local_imp::
+#define __NAMESPACE_LOCAL_USING(x)           using ::__local_imp::x;
+#define __NAMESPACE_LOCAL_USING_OR_IMPL(x,i) using ::__local_imp::x;
+#define __LIBC_LOCAL_NAME(x)                 x
+#define __LOCAL_LIBC(name)
+#define __LOCAL_LIBC_DATA(name)
+#define __LOCAL_LIBC_CONST_DATA(name)
+
+#define __ATTR_LIBC_PRINTF(a,b)
+#define __ATTR_LIBC_PRINTF_P(a,b)
+#define __ATTR_LIBC_SCANF(a,b)
+#define __ATTR_LIBC_WPRINTF(a,b)
+#define __ATTR_LIBC_WPRINTF_P(a,b)
+#define __ATTR_LIBC_WSCANF(a,b)
+#define __ATTR_MALL_DEFAULT_ALIGNED
+#define __ATTR_MALL_PAGEALIGNED
+
+#define ASMNAME(x)
+#define __ASMNAME(x)
+#define __CASMNAME(x)
+#define __CASMNAME_SAME(x)
+#define __CASMNAME_DOS(x)
+#define __CASMNAME_SAME_DOS(x)
+#define __CDECLARE(attr,Treturn,nothrow,name,param,args)                                                    Treturn name param;
+#define __CDECLARE_VOID(attr,nothrow,name,param,args)                                                       void name param;
+#define __CREDIRECT(attr,Treturn,nothrow,name,param,asmname,args)                                           Treturn name param;
+#define __CREDIRECT_VOID(attr,nothrow,name,param,asmname,args)                                              void name param;
+#define __CVREDIRECT(attr,Treturn,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes)        Treturn name param;
+#define __CVREDIRECT_VOID(attr,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes)           void name param;
+#define __CVFREDIRECT(attr,Treturn,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)     Treturn name paramf;
+#define __CVFREDIRECT_VOID(attr,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)        void name paramf;
+#define __CXREDIRECT(attr,Treturn,nothrow,name,param,asmname,code)                                          Treturn name param;
+#define __CXREDIRECT_VOID(attr,nothrow,name,param,asmname,code)                                             void name param;
+#define __CREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,args)                                       Treturn name param;
+#define __CREDIRECT_VOID_DOS(attr,nothrow,name,param,asmname,args)                                          void name param;
+#define __CVREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes)    Treturn name param;
+#define __CVREDIRECT_VOID_DOS(attr,nothrow,name,param,asmname,args,before_va_start,varcount,vartypes)       void name param;
+#define __CVFREDIRECT_DOS(attr,Treturn,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) Treturn name paramf;
+#define __CVFREDIRECT_VOID_DOS(attr,nothrow,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)    void name paramf;
+#define __CXREDIRECT_DOS(attr,Treturn,nothrow,name,param,asmname,code)                                      Treturn name param;
+#define __CXREDIRECT_VOID_DOS(attr,nothrow,name,param,asmname,code)                                         void name param;
+
+#define DEFINE_PRIVATE_ALIAS(new,old) int new() {}
+#define DEFINE_PUBLIC_ALIAS(new,old) int new() {}
+#define DEFINE_INTERN_ALIAS(new,old) int new() {}
+#define DEFINE_PRIVATE_WEAK_ALIAS(new,old) int new() {}
+#define DEFINE_PUBLIC_WEAK_ALIAS(new,old) int new() {}
+#define DEFINE_INTERN_WEAK_ALIAS(new,old) int new() {}
+#define __DEFINE_PRIVATE_ALIAS(new,old) int new() {}
+#define __DEFINE_PUBLIC_ALIAS(new,old) int new() {}
+#define __DEFINE_INTERN_ALIAS(new,old) int new() {}
+#define __DEFINE_PRIVATE_WEAK_ALIAS(new,old) int new() {}
+#define __DEFINE_PUBLIC_WEAK_ALIAS(new,old) int new() {}
+#define __DEFINE_INTERN_WEAK_ALIAS(new,old) int new() {}
+
+#define DEFINE_REFCOUNT_FUNCTIONS(...)
+#define DEFINE_REFCOUNT_FUNCTIONS_EX(...)
+#define DEFINE_WEAKREFCOUNT_FUNCTIONS(...)
+#define DEFINE_WEAKREFCOUNT_FUNCTIONS_EX(...)
+#define __DEFINE_SYNC_PROXY(...)
+#define __DEFINE_SYNC_RWLOCK(...)
+#define __DEFINE_SYNC_MUTEX(...)
+#define __DEFINE_SYNC_SEMAPHORE(...)
+
+#define ASMCALL
+
+#define DEFINE_SYSCALL0(return_type,name)                                     return_type sys_##name(void)
+#define DEFINE_SYSCALL1(return_type,name,T0,N0)                               return_type sys_##name(T0 N0)
+#define DEFINE_SYSCALL2(return_type,name,T0,N0,T1,N1)                         return_type sys_##name(T0 N0,T1 N1)
+#define DEFINE_SYSCALL3(return_type,name,T0,N0,T1,N1,T2,N2)                   return_type sys_##name(T0 N0,T1 N1,T2 N2)
+#define DEFINE_SYSCALL4(return_type,name,T0,N0,T1,N1,T2,N2,T3,N3)             return_type sys_##name(T0 N0,T1 N1,T2 N2,T3 N3)
+#define DEFINE_SYSCALL5(return_type,name,T0,N0,T1,N1,T2,N2,T3,N3,T4,N4)       return_type sys_##name(T0 N0,T1 N1,T2 N2,T3 N3,T4 N4)
+#define DEFINE_SYSCALL6(return_type,name,T0,N0,T1,N1,T2,N2,T3,N3,T4,N4,T5,N5) return_type sys_##name(T0 N0,T1 N1,T2 N2,T3 N3,T4 N4,T5 N5)
+
+#define __CDECLARE_SC(attr,Treturn,name,param,args)  Treturn sys_##name param;
+#define __CDECLARE_VOID_SC(attr,name,param,args)     void sys_##name param;
+#define __CDECLARE_XSC(attr,Treturn,name,param,args) Treturn sys_X##name param;
+#define __CDECLARE_VOID_XSC(attr,name,param,args)    void sys_X##name param;
+
+#define LLIST(T)                  T *
+#define LLIST_NODE(T)             struct { T *ln_next, **ln_pself;  }
+#define DLIST(T)                  struct { T *dl_head, *dl_tail; }
+#define DLIST_NODE(T)             struct { T **dn_pnext, **dn_pprev, *dn_next, *dn_prev; }
+#define SLIST(T)                  T *
+#define SLIST_NODE(T)             struct { T *sn_next; }
+#define ATREE_HEAD(T)             T *
+#define ATREE_NODE(T,Tkey)        struct { T *a_min, *a_max; Tkey a_vmin, a_vmax; }
+#define ATREE_NODE_SINGLE(T,Tkey) struct { T *a_min, *a_max; Tkey a_vaddr; }
+#define ATREE_XNODE(T)            struct { T *a_min, *a_max; }
+#define DEFINE_HANDLE_REFCNT_FUNCTIONS(name,T) refcnt_t handle_##name##_refcnt(T *self); void handle_##name##_incref(T *self); void handle_##name##_decref(T *self);
+#define DEFINE_ATOMIC_RWLOCK(name) struct atomic_rwlock name = ATOMIC_RWLOCK_INIT
+
+#define ATOMIC_REF(...)           atomic_ref< __VA_ARGS__ >
+#define XATOMIC_REF_STRUCT(...)   xatomic_ref_struct< __VA_ARGS__ >
+#define XATOMIC_REF(...)          xatomic_ref< __VA_ARGS__ >
+#define XATOMIC_WEAKLYREF(...)    xatomic_weaklyref< __VA_ARGS__ >
+#define CALLBACK_LIST(PROTOTYPE)  callback_list< PROTOTYPE >
+
+#define __HOP_PAD_POINTER(name) __uint32_t name;
+
+#define _GLIBCXX_PURE
+#define _GLIBCXX_CONST
+#define _GLIBCXX_NORETURN
+#define _GLIBCXX_NOTHROW
+#define _GLIBCXX_VISIBILITY(V)
+#define _GLIBCXX_DEPRECATED
+#define _GLIBCXX17_DEPRECATED
+#define _GLIBCXX_ABI_TAG_CXX11
+#define _GLIBCXX_NODISCARD
+#define _GLIBCXX_CONSTEXPR      constexpr
+#define _GLIBCXX_USE_CONSTEXPR  constexpr
+#define _GLIBCXX14_CONSTEXPR    constexpr
+#define _GLIBCXX17_CONSTEXPR    constexpr
+#define _GLIBCXX20_CONSTEXPR    constexpr
+#define _GLIBCXX17_INLINE
+#define _GLIBCXX_NOEXCEPT       noexcept
+#define _GLIBCXX_NOEXCEPT_IF(c) noexcept(c)
+#define _GLIBCXX_USE_NOEXCEPT   noexcept
+#define _GLIBCXX_THROW(x)
+#define _GLIBCXX_NAMESPACE_CXX11       __cxx11::
+#define _GLIBCXX_BEGIN_NAMESPACE_CXX11 namespace __cxx11 {
+#define _GLIBCXX_END_NAMESPACE_CXX11   }
+#define _GLIBCXX_DEFAULT_ABI_TAG
+#define _GLIBCXX_BEGIN_NAMESPACE_VERSION
+#define _GLIBCXX_END_NAMESPACE_VERSION
+#define _GLIBCXX_STD_C std
+#define _GLIBCXX_BEGIN_NAMESPACE_CONTAINER
+#define _GLIBCXX_END_NAMESPACE_CONTAINER
+#define _GLIBCXX_STD_A std
+#define _GLIBCXX_BEGIN_NAMESPACE_ALGO
+#define _GLIBCXX_END_NAMESPACE_ALGO
+#define _GLIBCXX_NAMESPACE_LDBL
+#define _GLIBCXX_BEGIN_NAMESPACE_LDBL
+#define _GLIBCXX_END_NAMESPACE_LDBL
+#define _GLIBCXX_NAMESPACE_LDBL_OR_CXX11 _GLIBCXX_NAMESPACE_CXX11
+#define _GLIBCXX_BEGIN_NAMESPACE_LDBL_OR_CXX11 _GLIBCXX_BEGIN_NAMESPACE_CXX11
+#define _GLIBCXX_END_NAMESPACE_LDBL_OR_CXX11 _GLIBCXX_END_NAMESPACE_CXX11
+#define _GLIBCXX_BEGIN_EXTERN_C extern "C" {
+#define _GLIBCXX_END_EXTERN_C }
+#define _GLIBCXX_TXN_SAFE
+#define _GLIBCXX_TXN_SAFE_DYN
+
+#define __HYBRID_FUNCPTR32(return, cc, name, args) return (cc *name)args
+#define __HYBRID_FUNCPTR64(return, cc, name, args) return (cc *name)args
+#define __HYBRID_PTR32(T) T *
+#define __HYBRID_PTR64(T) T *
+
+#define likely
+#define unlikely
+#define __likely
+#define __unlikely
+#define likely_untraced
+#define unlikely_untraced
+#define __likely_untraced
+#define __unlikely_untraced
+#define untraced
+#define __untraced
+
+#define TRY
+#define EXCEPT
+#define CATCH(code)
+
+
+#define __FS_TYPE(x)      __##x##_t
+#define __FS_ALTTYPE(x)   __##x##_t
+#define __FS_SIZEOF(x)    __SIZEOF_##x##_T__
+#define __FS_ALTSIZEOF(x) __SIZEOF_##x##_T__
+#define __TM_TYPE(x)      __##x##_t
+#define __TM_ALTTYPE(x)   __##x##_t
+#define __TM_SIZEOF(x)    __SIZEOF_##x##_T__
+#define __TM_ALTSIZEOF(x) __SIZEOF_##x##_T__
+
+
+#define DEFINE_CMDLINE_FLAG_VAR(flagname, parname) bool flagname;
+#define DEFINE_CMDLINE_PARAM_STRING_VAR(string_name, parname) char string_name[];
+#define DEFINE_CMDLINE_PARAM_INT8_VAR(varname, parname, defl) int8_t varname;
+#define DEFINE_CMDLINE_PARAM_INT16_VAR(varname, parname, defl) int16_t varname;
+#define DEFINE_CMDLINE_PARAM_INT32_VAR(varname, parname, defl) int32_t varname;
+#define DEFINE_CMDLINE_PARAM_INT64_VAR(varname, parname, defl) int64_t varname;
+#define DEFINE_CMDLINE_PARAM_UINT8_VAR(varname, parname, defl) uint8_t varname;
+#define DEFINE_CMDLINE_PARAM_UINT16_VAR(varname, parname, defl) uint16_t varname;
+#define DEFINE_CMDLINE_PARAM_UINT32_VAR(varname, parname, defl) uint32_t varname;
+#define DEFINE_CMDLINE_PARAM_UINT64_VAR(varname, parname, defl) uint64_t varname;
+#define DEFINE_CMDLINE_PARAM_INT_VAR(varname, parname, defl) int varname;
+#define DEFINE_CMDLINE_PARAM_UINT_VAR(varname, parname, defl) unsigned int varname;
+#define DEFINE_CMDLINE_PARAM_INTPTR_VAR(varname, parname, defl) intptr_t varname;
+#define DEFINE_CMDLINE_PARAM_UINTPTR_VAR(varname, parname, defl) uintptr_t varname;

@@ -1,0 +1,1015 @@
+/* Copyright (c) 2019 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. */
+
+/* NOTE: Changes to this file are applied by calling
+ *       $ deemon misc/generate_syscalls.dee
+ */
+
+/* TAGS:
+ *  - double_wide: -- For arguments
+ *     The argument takes up 2 adjacent registers
+ *     in 32-bit mode, but only 1 in 64-bit mode
+ *  - noreturn: -- For the function itself
+ *     The function doesn't return
+ */
+
+
+%[define_printf(char const *         = "%q",(validate_readable_opt({me},1),{me}))]
+%[define_printf(sighandler_t         = "%p",{me})]
+%[define_printf(except_handler_t     = "%p",{me})]
+%[define_printf(intptr_t             = "%Id",{me})]
+%[define_printf(uintptr_t            = "%p",{me})]
+%[define_printf(ssize_t              = "%Id",{me})]
+%[define_printf(size_t               = "%Iu",{me})]
+%[define_printf(int8_t               = "%I8d",{me})]
+%[define_printf(uint8_t              = "%I8u",{me})]
+%[define_printf(int16_t              = "%I16d",{me})]
+%[define_printf(uint16_t             = "%I16u",{me})]
+%[define_printf(int32_t              = "%I32d",{me})]
+%[define_printf(uint32_t             = "%I32u",{me})]
+%[define_printf(int64_t              = "%I64d",{me})]
+%[define_printf(uint64_t             = "%I64u",{me})]
+%[define_printf(idtype_t             = select(P_ALL,P_PID,P_PGID))]
+%[define_printf(id_t                 = "%Iu",(uintptr_t)({me}))]
+%[define_printf(syscall_slong_t      = "%Id",(intptr_t)({me}))]
+%[define_printf(syscall_ulong_t      = "%#Ix",(uintptr_t)({me}))]
+%[define_printf(pid_t                = "%Id",(intptr_t)({me}))]
+%[define_printf(gid_t                = "%I32u",(uint32_t)({me}))]
+%[define_printf(uid_t                = "%I32u",(uint32_t)({me}))]
+%[define_printf(fd_t                 = "%d",(int)({me}))]
+%[define_printf(errno_t              = "%d",(int)({me}))]
+%[define_printf(iomode_t             = flagset(IO_RDONLY:
+	IO_WRONLY,IO_RDWR,IO_CLOEXEC,IO_CLOFORK,
+	IO_APPEND,IO_NONBLOCK,IO_SYNC,IO_ASYNC,
+	IO_DIRECT))]
+%[define_printf(atflag_t             = "%#Ix",(uintptr_t)({me}))]
+%[define_printf(oflag_t              = flagset(O_RDONLY:
+	O_WRONLY,O_RDWR,O_CREAT,O_EXCL,O_NOCTTY,
+	O_TRUNC,O_APPEND,O_NONBLOCK,O_SYNC,O_DSYNC,
+	O_ASYNC,O_DIRECT,O_LARGEFILE,O_DIRECTORY,
+	O_NOFOLLOW,O_NOATIME,O_CLOEXEC,O_CLOFORK,
+	O_PATH,O_TMPFILE=0x0400000,O_SYMLINK,
+	O_DOSPATH))]
+%[define_printf(mode_t               = "%#Io",(uintptr_t)({me}))]
+%[define_printf(socklen_t            = "%Iu",(uintptr_t)({me}))]
+%[define_printf(dev_t                = "%.2x:%.2x",(unsigned int)MAJOR({me}),(unsigned int)MINOR({me}))]
+
+//Not needed by KOS:DEFINE {0x00000000,0x000000db} = restart_syscall(...): errno_t;
+[restart(must)] DEFINE {0x00000001,0x0000003c} = [noreturn] exit([printf("%Iu",(uintptr_t)({me}))] syscall_ulong_t status): void;
+[restart(must)] DEFINE {0x00000002,0x00000039} = fork(): pid_t;
+
+[cp] DEFINE {0x00000003,0x00000000} = read(fd_t fd, void *buf, size_t bufsize): ssize_t;
+[cp] DEFINE {0x80000003,0x80000000} = readf(fd_t fd, void *buf, size_t bufsize, iomode_t mode): ssize_t;
+[cp] DEFINE {0x00000004,0x00000001} = write(fd_t fd, void const *buf, size_t bufsize): ssize_t;
+[cp] DEFINE {0x80000004,0x80000001} = writef(fd_t fd, void const *buf, size_t bufsize, iomode_t mode): ssize_t;
+[cp] DEFINE {0x00000005,0x00000002} = open(char const *filename, oflag_t oflags, mode_t mode): fd_t;
+
+@@Close a given file descriptor/handle `FD'
+//[cp] /* Even though pthread allows this, I thing this would be a _really_ bad idea... */
+[restart(must)] DEFINE {0x00000006,0x00000003} = close(fd_t fd): errno_t;
+
+%(i386)@@Wait for a child process:
+%(i386)@@ - `pid < -1':  Wait for any child process whose process group ID is `-PID'
+%(i386)@@ - `pid == -1': Wait for any child process
+%(i386)@@ - `pid == 0':  Wait for any child process whose process group ID is that of the caller
+%(i386)@@ - `pid > 0':   Wait for the child whose process ID is equal to `PID'
+%(i386)@@@param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted)
+%(i386)[restart(dont)][cp] DEFINE 0x00000007 = waitpid(pid_t pid, int32_t *stat_loc, [printf(flagset(WNOHANG,WUNTRACED,WCONTINUED,WNOWAIT))] syscall_ulong_t options): pid_t;
+
+[cp] DEFINE {0x00000008,0x00000055} = creat(char const *filename, mode_t mode): fd_t;
+[cp] DEFINE {0x00000009,0x00000056} = link(char const *existing_file, char const *link_file): errno_t;
+[cp] DEFINE {0x0000000a,0x00000057} = unlink(char const *filename): errno_t;
+[cp] DEFINE {0x0000000b,0x0000003b} = execve(char const *path, char const *const *argv, char const *const *envp): errno_t;
+[cp] DEFINE {0x0000000c,0x00000050} = chdir(char const *path): errno_t;
+
+@@@param: flags: Set of `0|AT_DOSPATH'
+[cp] DEFINE {0x8000000c,0x80000050} = fchdirat(fd_t dirfd, char const *path, [printf(flagset(AT_DOSPATH))] atflag_t flags): errno_t;
+
+DEFINE {0x0000000d,0x000000c9} = time(time32_t *timer): time32_t;
+DEFINE {0x8000000d,0x800000c9} = time64(time64_t *timer): [double_wide] time64_t;
+
+[cp] DEFINE {0x0000000e,0x00000085} = mknod(char const *nodename, mode_t mode, dev_t dev): errno_t;
+[cp] DEFINE {0x0000000f,0x0000005a} = chmod(char const *filename, mode_t mode): errno_t;
+
+%(i386)[cp] DEFINE 0x00000010 = lchown(char const *filename, uint16_t owner, uint16_t group): errno_t;
+%(x86_64)[cp] DEFINE 0x0000005e = lchown(char const *filename, uint32_t owner, uint32_t group): errno_t;
+
+//Unimplemented by linux:%(i386)DEFINE 0x00000011 = break(...): errno_t;
+
+%(i386)[cp] DEFINE 0x00000012 = linux_oldstat(char const *filename, struct linux_oldstat *statbuf): errno_t;
+%(i386)[cp] DEFINE 0x00000013 = lseek(fd_t fd, int32_t offset, [printf(select(SEEK_SET,SEEK_CUR,SEEK_END,SEEK_DATA,SEEK_HOLE))] syscall_ulong_t whence): int32_t;
+[cp] DEFINE {0x80000013,0x00000008} = lseek64(fd_t fd, [double_wide] int64_t offset,
+	[printf(select(SEEK_SET,SEEK_CUR,SEEK_END,SEEK_DATA,SEEK_HOLE))]
+	syscall_ulong_t whence): [double_wide] int64_t;
+[restart(must)] DEFINE {0x00000014,0x00000027} = getpid(): pid_t;
+[cp] DEFINE {0x00000015,0x000000a5} = mount(char const *special_file, char const *dir, char const *fstype, syscall_ulong_t rwflag, void const *data): errno_t;
+%(i386)[cp] DEFINE 0x00000016 = umount(char const *special_file): errno_t;
+%(i386)[restart(must)] DEFINE 0x00000017 = setuid(uint16_t uid): errno_t;
+%(i386)[restart(must)] DEFINE 0x00000018 = getuid(): uint16_t;
+%(i386)DEFINE 0x00000019 = stime(time32_t const *t): errno_t;
+%(i386)DEFINE 0x80000019 = stime64(time64_t const *t): errno_t;
+DEFINE {0x0000001a,0x00000065} = ptrace(syscall_ulong_t request, pid_t pid, void *addr, void *data): syscall_slong_t;
+DEFINE {0x0000001b,0x00000025} = alarm(syscall_ulong_t seconds): syscall_ulong_t;
+%(i386)[cp] DEFINE 0x0000001c = linux_oldfstat(fd_t fd, struct linux_oldstat *statbuf): errno_t;
+[restart(dont)][cp] DEFINE {0x0000001d,0x00000022} = pause(): errno_t;
+[cp] DEFINE {0x0000001e,0x00000084} = utime(char const *filename, struct __utimbuf32 const *times): errno_t;
+[cp] DEFINE {0x8000001e,0x80000084} = utime64(char const *filename, struct utimbuf64 const *times): errno_t;
+//Unimplemented by linux:%(i386)DEFINE 0x0000001f = stty(...): errno_t;
+//Unimplemented by linux:%(i386)DEFINE 0x00000020 = gtty(...): errno_t;
+@@@param: type: Set of `R_OK|W_OK|X_OK' or `F_OK'
+[cp] DEFINE {0x00000021,0x00000015} = access(char const *filename, [printf(flagset(F_OK:R_OK,W_OK,X_OK))] syscall_ulong_t type): errno_t;
+%(i386)DEFINE 0x00000022 = nice(syscall_slong_t inc): errno_t;
+%(i386)DEFINE 0x00000023 = ftime(struct timeb *tp): errno_t;
+[cp] DEFINE {0x00000024,0x000000a2} = sync(): errno_t;
+@@@param: signo: One of `SIG*'
+DEFINE {0x00000025,0x0000003e} = kill(pid_t pid, syscall_ulong_t signo): errno_t;
+[cp] DEFINE {0x00000026,0x00000052} = rename(char const *oldname, char const *newname_or_path): errno_t;
+[cp] DEFINE {0x00000027,0x00000053} = mkdir(char const *pathname, mode_t mode): errno_t;
+DEFINE {0x00000028,0x00000054} = rmdir(char const *path): errno_t;
+DEFINE {0x00000029,0x00000020} = dup(fd_t fd): fd_t;
+DEFINE {0x0000002a,0x00000016} = pipe(/*[2]*/fd_t *pipedes): errno_t;
+DEFINE {0x0000002b,0x00000064} = times(struct tms *buf): clock_t;
+//Unimplemented by linux:%(i386)DEFINE 0x0000002c = prof(...): errno_t;
+DEFINE {0x0000002d,0x0000000c} = brk(void *addr): errno_t;
+%(i386)[restart(must)] DEFINE 0x0000002e = setgid(uint16_t gid): errno_t;
+%(i386)[restart(must)] DEFINE 0x0000002f = getgid(): uint16_t;
+%(i386)@@@param: signo: One of `SIG*'
+%(i386)DEFINE 0x00000030 = signal(syscall_ulong_t signo, sighandler_t handler): sighandler_t;
+%(i386)[restart(must)] DEFINE 0x00000031 = geteuid(): uint16_t;
+%(i386)[restart(must)] DEFINE 0x00000032 = getegid(): uint16_t;
+DEFINE {0x00000033,0x000000a3} = acct(char const *filename): errno_t;
+[cp][restart(must)] DEFINE {0x00000034,0x000000a6} = umount2(char const *special_file, syscall_ulong_t flags): errno_t;
+//TODO:%(i386)DEFINE 0x00000035 = lock(...): errno_t;
+[cp] DEFINE {0x00000036,0x00000010} = ioctl(fd_t fd, syscall_ulong_t request, void *arg): syscall_slong_t;
+[cp] DEFINE {0x80000036,0x80000010} = ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg): syscall_slong_t;
+[cp] DEFINE {0x00000037,0x00000048} = fcntl(fd_t fd, syscall_ulong_t cmd, void *arg): syscall_slong_t;
+
+//Unimplemented by linux:%(i386)DEFINE 0x00000038 = mpx(...): errno_t;
+[restart(must)] DEFINE {0x00000039,0x0000006d} = setpgid(pid_t pid, pid_t pgid): errno_t;
+//Unimplemented by linux:%(i386)DEFINE 0x0000003a = ulimit(...): errno_t;
+%(i386)DEFINE 0x0000003b = oldolduname(struct linux_oldolduname *name): errno_t;
+[restart(must)] DEFINE {0x0000003c,0x0000005f} = umask(mode_t mode): mode_t;
+[restart(must)] DEFINE {0x8000003c,0x8000005f} = fsmode([double_wide] uint64_t mode): [double_wide] uint64_t;
+DEFINE {0x0000003d,0x000000a1} = chroot(char const *path): errno_t;
+DEFINE {0x0000003e,0x00000088} = ustat(dev_t dev, struct ustat *ubuf): errno_t;
+DEFINE {0x0000003f,0x00000021} = dup2(fd_t oldfd, fd_t newfd): fd_t;
+[restart(must)] DEFINE {0x00000040,0x0000006e} = getppid(): pid_t;
+[restart(must)] DEFINE {0x00000041,0x0000006f} = getpgrp(): pid_t;
+[restart(must)] DEFINE {0x00000042,0x00000070} = setsid(): pid_t;
+%(i386)@@@param: signo: One of `SIG*'
+%(i386)DEFINE 0x00000043 = sigaction(syscall_ulong_t signo, struct sigaction const *act, struct sigaction *oact): errno_t;
+%(i386)DEFINE 0x00000044 = sgetmask(): syscall_ulong_t;
+%(i386)DEFINE 0x00000045 = ssetmask(syscall_ulong_t sigmask): syscall_ulong_t;
+%(i386)[restart(must)] DEFINE 0x00000046 = setreuid(uint16_t ruid, uint16_t euid): errno_t;
+%(i386)[restart(must)] DEFINE 0x00000047 = setregid(uint16_t rgid, uint16_t egid): errno_t;
+%(i386)[restart(dont)][cp] DEFINE 0x00000048 = sigsuspend(struct __sigset_struct const *set): errno_t;
+%(i386)DEFINE 0x00000049 = sigpending(struct __sigset_struct *set): errno_t;
+DEFINE {0x0000004a,0x000000aa} = sethostname(char const *name, size_t len): errno_t;
+DEFINE {0x0000004b,0x000000a0} = setrlimit(syscall_ulong_t resource, struct rlimit const *rlimits): errno_t;
+DEFINE {0x0000004c,0x00000061} = getrlimit(syscall_ulong_t resource, struct rlimit *rlimits): errno_t;
+DEFINE {0x0000004d,0x00000062} = getrusage(syscall_slong_t who, struct rusage *usage): errno_t;
+DEFINE {0x0000004e,0x00000060} = gettimeofday(struct __timeval32 *tv, struct timezone *tz): errno_t;
+DEFINE {0x8000004e,0x80000060} = gettimeofday64(struct __timeval64 *tv, struct timezone *tz): errno_t;
+DEFINE {0x0000004f,0x000000a4} = settimeofday(struct __timeval32 const *tv, struct timezone const *tz): errno_t;
+DEFINE {0x8000004f,0x800000a4} = settimeofday64(struct __timeval64 const *tv, struct timezone const *tz): errno_t;
+%(i386)DEFINE 0x00000050 = getgroups(size_t size, /*[]*/uint16_t *list): errno_t;
+%(i386)DEFINE 0x00000051 = setgroups(size_t count, uint16_t const *groups): errno_t;
+[restart(dont)][cp] DEFINE {0x00000052,0x00000017} = select(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timeval32 *timeout): ssize_t;
+[restart(dont)][cp] DEFINE {0x80000052,0x80000017} = select64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timeval64 *timeout): ssize_t;
+[cp] DEFINE {0x00000053,0x00000058} = symlink(char const *link_text, char const *target_path): errno_t;
+%(i386)[cp] DEFINE 0x00000054 = linux_oldlstat(char const *filename, struct linux_oldstat *statbuf): errno_t;
+[cp] DEFINE {0x00000055,0x00000059} = readlink(char const *path, char *buf, size_t buflen): ssize_t;
+//TODO:DEFINE {0x00000056,0x00000086} = uselib(...): errno_t;
+
+@@Map the segments of a given library into memory
+@@@param: addr:  Hint address (ignored unless `MAP_FIXED' is passed)
+@@@param: flags: Set of `MAP_FIXED|MAP_LOCKED|MAP_NONBLOCK|
+@@                      MAP_NORESERVE|MAP_POPULATE|MAP_SYNC|MAP_DONT_MAP|
+@@                      MAP_DONT_OVERRIDE'
+@@@param: fd:    A handle for the library file being mapped
+@@             (must be a file or vm_datablock/inode)
+@@@param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
+@@             (depending on the caller running in 32- or 64-bit mode)
+@@@param: hdrc:  The number of program headers
+DEFINE {0x80000056,0x80000086} = maplibrary(void *addr,
+	[printf(flagset(
+			MAP_FIXED,MAP_LOCKED,MAP_NONBLOCK,
+			MAP_NORESERVE,MAP_POPULATE,MAP_SYNC,MAP_DONT_MAP,
+			MAP_DONT_OVERRIDE))]
+		syscall_ulong_t flags,
+	fd_t fd, void *hdrv, size_t hdrc): void *;
+
+@@@param: swapflags: Set of `SWAP_FLAG_*'
+DEFINE {0x00000057,0x000000a7} = swapon(char const *pathname,
+	[printf(flagset(SWAP_FLAG_PREFER,SWAP_FLAG_DISCARD))] syscall_ulong_t swapflags): errno_t;
+
+@@@param: howto: One of the `RB_*' constants from <sys/reboot.h>
+DEFINE {0x00000058,0x000000a9} = reboot(syscall_ulong_t how): errno_t;
+
+%(i386)@@Returns `0' to indicate end-of-directory; 1 to to indicate success
+%(i386)DEFINE 0x00000059 = readdir(fd_t fd, struct old_linux_dirent *dirp, size_t count): errno_t;
+
+%(i386){
+@@@param: prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
+@@@param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
+@@              with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
+@@              MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
+@@              MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_DONT_OVERRIDE|MAP_OFFSET64_POINTER'
+DEFINE {0x0000005a,0x00000009} = mmap(void *addr, size_t len,
+	[printf(flagset(
+		PROT_NONE:
+			PROT_EXEC,PROT_WRITE,PROT_READ,
+			PROT_SEM,PROT_LOOSE,PROT_SHARED))]
+		syscall_ulong_t prot,
+	[printf(flagset(MAP_AUTOMATIC:
+		MAP_SHARED,MAP_PRIVATE,MAP_FIXED,
+		MAP_ANON,MAP_32BIT,MAP_GROWSDOWN,MAP_GROWSUP,
+		MAP_LOCKED,MAP_NORESERVE,MAP_POPULATE,MAP_NONBLOCK,
+		MAP_STACK,MAP_UNINITIALIZED,MAP_DONT_MAP,MAP_DONT_OVERRIDE,
+		MAP_OFFSET64_POINTER))]
+		syscall_ulong_t flags,
+		fd_t fd,
+		syscall_ulong_t offset): void *;
+}
+
+%(x86_64){
+@@@param: prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
+@@@param: flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
+@@              with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
+@@              MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
+@@              MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_DONT_OVERRIDE'
+DEFINE {0x0000005a,0x00000009} = mmap(void *addr, size_t len,
+	[printf(flagset(
+		PROT_NONE:
+			PROT_EXEC,PROT_WRITE,PROT_READ,
+			PROT_SEM,PROT_LOOSE,PROT_SHARED))]
+		syscall_ulong_t prot,
+	[printf(flagset(MAP_AUTOMATIC:
+		MAP_SHARED,MAP_PRIVATE,MAP_FIXED,
+		MAP_ANON,MAP_32BIT,MAP_GROWSDOWN,MAP_GROWSUP,
+		MAP_LOCKED,MAP_NORESERVE,MAP_POPULATE,MAP_NONBLOCK,
+		MAP_STACK,MAP_UNINITIALIZED,MAP_DONT_MAP,MAP_DONT_OVERRIDE))]
+		syscall_ulong_t flags,
+		fd_t fd,
+		syscall_ulong_t offset): void *;
+}
+
+[restart(must)] DEFINE {0x0000005b,0x0000000b} = munmap(void *addr, size_t len): errno_t;
+DEFINE {0x0000005c,0x0000004c} = truncate(char const *filename, syscall_ulong_t length): errno_t;
+DEFINE {0x0000005d,0x0000004d} = ftruncate(fd_t fd, syscall_ulong_t length): errno_t;
+[cp] DEFINE {0x0000005e,0x0000005b} = fchmod(fd_t fd, mode_t mode): errno_t;
+%(i386)[cp] DEFINE 0x0000005f = fchown(fd_t fd, uint16_t owner, uint16_t group): errno_t;
+%(x86_64)[cp] DEFINE 0x0000005d = fchown(fd_t fd, uint32_t owner, uint32_t group): errno_t;
+DEFINE {0x00000060,0x0000008c} = getpriority(syscall_ulong_t which, id_t who): syscall_slong_t;
+DEFINE {0x00000061,0x0000008d} = setpriority(syscall_ulong_t which, id_t who, syscall_ulong_t value): errno_t;
+%(i386)DEFINE 0x00000062 = profil(uint16_t *sample_buffer, size_t size, size_t offset, syscall_ulong_t scale): errno_t;
+DEFINE {0x00000063,0x00000089} = statfs(char const *file, struct __statfs32 *buf): errno_t;
+DEFINE {0x00000064,0x0000008a} = fstatfs(fd_t file, struct __statfs32 *buf): errno_t;
+DEFINE {0x00000065,0x000000ad} = ioperm(syscall_ulong_t from, syscall_ulong_t num, syscall_ulong_t turn_on): errno_t;
+%(i386)DEFINE {0x00000066} = socketcall(int call, unsigned long *args): errno_t;
+[restart(must)][cp] DEFINE {0x00000067,0x00000067} = syslog([printf("%Iu",(uintptr_t)({me}))] syscall_ulong_t level, [printf("%$q",len,(validate_readable({me},len),{me}))] char const *str, size_t len): ssize_t;
+DEFINE {0x00000068,0x00000026} = setitimer(syscall_ulong_t which, struct __itimerval32 const *newval, struct __itimerval32 *oldval): errno_t;
+DEFINE {0x80000068,0x80000026} = setitimer64(syscall_ulong_t which, struct __itimerval64 const *newval, struct __itimerval64 *oldval): errno_t;
+DEFINE {0x00000069,0x00000024} = getitimer(syscall_ulong_t which, struct __itimerval32 *curr_value): errno_t;
+DEFINE {0x80000069,0x80000024} = getitimer64(syscall_ulong_t which, struct __itimerval64 *curr_value): errno_t;
+%(i386)[cp] DEFINE 0x0000006a = linux_stat32(char const *filename, struct linux_stat32 *statbuf): errno_t;
+%(i386)[cp] DEFINE 0x0000006b = linux_lstat32(char const *filename, struct linux_stat32 *statbuf): errno_t;
+%(i386)[cp] DEFINE 0x0000006c = linux_fstat32(fd_t fd, struct linux_stat32 *statbuf): errno_t;
+%(i386)DEFINE 0x0000006d = olduname(struct linux_olduname *name): errno_t;
+DEFINE {0x0000006e,0x000000ac} = iopl(syscall_ulong_t level): errno_t;
+DEFINE {0x0000006f,0x00000099} = vhangup(): errno_t;
+//Unimplemented by linux (at least not anymore):%(i386)DEFINE 0x00000070 = idle(...): errno_t;
+//TODO:%(i386)DEFINE 0x00000071 = vm86old(...): errno_t;
+
+@@Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
+@@@param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted)
+[restart(dont)][cp]
+DEFINE {0x00000072,0x0000003d} = wait4(pid_t pid, int32_t *stat_loc,
+	[printf(flagset(WNOHANG,WUNTRACED,WCONTINUED,WNOWAIT))] syscall_ulong_t options,
+	struct rusage *usage): pid_t;
+
+DEFINE {0x00000073,0x000000a8} = swapoff(char const *pathname): errno_t;
+[cp] DEFINE {0x00000074,0x00000063} = sysinfo(struct sysinfo *info): errno_t;
+//TODO:DEFINE {0x00000075} = ipc(...): errno_t;
+[cp] DEFINE {0x00000076,0x0000004a} = fsync(fd_t fd): errno_t;
+
+%(i386){
+[restart(must)][noexcept]
+@@Restore the specified register state when returning from a signal handler
+@@Note that the order and locations of arguments taken by this system call
+@@are of great importance, as they must match what is encoded by the kernel
+@@within `sighand_raise_signal()'
+@@The order chosen is also important, as it is selected such that arguments
+@@are only passed through registers that are preserved by CDECL
+DEFINE 0x00000077 = sigreturn(struct fpustate const *restore_fpu, syscall_ulong_t unused1, syscall_ulong_t unused2, struct __sigset_struct const *restore_sigmask, struct rpc_syscall_info *sc_info, struct ucpustate const *restore_cpu): void;
+}
+
+%(i386)  DEFINE 0x00000078 = clone([printf(flagset(CLONE_VM,CLONE_FS,CLONE_FILES,CLONE_SIGHAND,CLONE_PTRACE,CLONE_VFORK,CLONE_PARENT,CLONE_THREAD,CLONE_NEWNS,CLONE_SYSVSEM,CLONE_SETTLS,CLONE_PARENT_SETTID,CLONE_CHILD_CLEARTID,CLONE_DETACHED,CLONE_UNTRACED,CLONE_CHILD_SETTID,CLONE_NEWUTS,CLONE_NEWIPC,CLONE_NEWUSER,CLONE_NEWPID,CLONE_NEWNET,CLONE_IO))] syscall_ulong_t flags, void *child_stack, pid_t *ptid, uintptr_t newtls, pid_t *ctid): pid_t;
+%(x86_64)DEFINE 0x00000038 = clone([printf(flagset(CLONE_VM,CLONE_FS,CLONE_FILES,CLONE_SIGHAND,CLONE_PTRACE,CLONE_VFORK,CLONE_PARENT,CLONE_THREAD,CLONE_NEWNS,CLONE_SYSVSEM,CLONE_SETTLS,CLONE_PARENT_SETTID,CLONE_CHILD_CLEARTID,CLONE_DETACHED,CLONE_UNTRACED,CLONE_CHILD_SETTID,CLONE_NEWUTS,CLONE_NEWIPC,CLONE_NEWUSER,CLONE_NEWPID,CLONE_NEWNET,CLONE_IO))] syscall_ulong_t flags, void *child_stack, pid_t *ptid, pid_t *ctid, uintptr_t newtls): pid_t;
+
+DEFINE {0x00000079,0x000000ab} = setdomainname(char const *name, size_t len): errno_t;
+DEFINE {0x0000007a,0x0000003f} = uname(struct utsname *name): errno_t;
+DEFINE {0x0000007b,0x0000009a} = modify_ldt(syscall_ulong_t func, void *ptr, syscall_ulong_t bytecount): syscall_slong_t;
+//TODO:DEFINE {0x0000007c,0x0000009f} = adjtimex(...): errno_t;
+
+@@@param: prot: Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
+[restart(must)]
+DEFINE {0x0000007d,0x0000000a} = mprotect(void *addr, size_t len,
+	[printf(flagset(
+		PROT_NONE:PROT_EXEC,PROT_WRITE,PROT_READ,PROT_SEM))]
+		syscall_ulong_t prot): errno_t;
+
+%(i386)@@@param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK'
+%(i386)DEFINE 0x0000007e = sigprocmask(syscall_ulong_t how, struct __sigset_struct const *set, struct __sigset_struct *oset): errno_t;
+
+//TODO:DEFINE {0x0000007f,0x000000ae} = create_module(...): errno_t;
+//TODO:DEFINE {0x00000080,0x000000af} = init_module(...): errno_t;
+//TODO:DEFINE {0x00000081,0x000000b0} = delete_module(...): errno_t;
+//TODO:DEFINE {0x00000082,0x000000b1} = get_kernel_syms(...): errno_t;
+//TODO:DEFINE {0x00000083,0x000000b3} = quotactl(...): errno_t;
+[restart(must)] DEFINE {0x00000084,0x00000079} = getpgid(pid_t pid): pid_t;
+[cp] DEFINE {0x00000085,0x00000051} = fchdir(fd_t fd): errno_t;
+//TODO:%(i386)DEFINE 0x00000086 = bdflush(...): errno_t;
+//TODO:DEFINE {0x00000087,0x0000008b} = sysfs(...): errno_t;
+//TODO:DEFINE {0x00000088,0x00000087} = personality(...): errno_t;
+//TODO:DEFINE {0x00000089,0x000000b7} = afs_syscall(...): errno_t;
+%(i386)[restart(must)] DEFINE 0x0000008a = setfsuid(uint16_t uid): errno_t;
+%(i386)[restart(must)] DEFINE 0x0000008b = setfsgid(uint16_t gid): errno_t;
+%(i386)[cp] DEFINE 0x0000008c = _llseek(fd_t fd, [double_wide] int64_t offset, uint64_t *result, [printf(select(SEEK_SET,SEEK_CUR,SEEK_END,SEEK_DATA,SEEK_HOLE))] syscall_ulong_t whence): errno_t;
+[cp] DEFINE {0x0000008d,0x0000004e} = getdents(fd_t fd, struct linux_dirent *dirp, size_t count): ssize_t;
+[cp] DEFINE {0x8000008d,0x8000004e} = kreaddir(
+	fd_t fd, struct dirent *buf, size_t bufsize,
+	[printf(flagset(READDIR_DEFAULT:
+		READDIR_CONTINUE,READDIR_PEEK,
+		READDIR_SKIPREL,READDIR_WANTEOF))]
+	syscall_ulong_t mode): ssize_t;
+//TODO:%(i386)DEFINE 0x0000008e = _newselect(...): errno_t;
+[cp] DEFINE {0x0000008f,0x00000049} = flock(fd_t fd, syscall_ulong_t operation): errno_t;
+[cp] DEFINE {0x00000090,0x0000001a} = msync(void *addr, size_t len, syscall_ulong_t flags): errno_t;
+[cp] DEFINE {0x00000091,0x00000013} = readv(fd_t fd, struct iovec const *iovec, size_t count): ssize_t;
+[cp] DEFINE {0x80000091,0x80000013} = readvf(fd_t fd, struct iovec const *iovec, size_t count, iomode_t mode): ssize_t;
+[cp] DEFINE {0x00000092,0x00000014} = writev(fd_t fd, struct iovec const *iovec, size_t count): ssize_t;
+[cp] DEFINE {0x80000092,0x80000014} = writevf(fd_t fd, struct iovec const *iovec, size_t count, iomode_t mode): ssize_t;
+[restart(must)] DEFINE {0x00000093,0x0000007c} = getsid(pid_t pid): pid_t;
+[cp] DEFINE {0x00000094,0x0000004b} = fdatasync(fd_t fd): errno_t;
+//TODO:DEFINE {0x00000095,0x0000009c} = _sysctl(...): errno_t;
+DEFINE {0x00000096,0x00000095} = mlock(void const *addr, size_t len): errno_t;
+DEFINE {0x00000097,0x00000096} = munlock(void const *addr, size_t len): errno_t;
+DEFINE {0x00000098,0x00000097} = mlockall(syscall_ulong_t flags): errno_t;
+DEFINE {0x00000099,0x00000098} = munlockall(): errno_t;
+DEFINE {0x0000009a,0x0000008e} = sched_setparam(pid_t pid, struct sched_param const *param): errno_t;
+DEFINE {0x0000009b,0x0000008f} = sched_getparam(pid_t pid, struct sched_param *param): errno_t;
+DEFINE {0x0000009c,0x00000090} = sched_setscheduler(pid_t pid, syscall_ulong_t policy, struct sched_param const *param): errno_t;
+DEFINE {0x0000009d,0x00000091} = sched_getscheduler(pid_t pid): syscall_slong_t;
+[restart(dont)] DEFINE {0x0000009e,0x00000018} = sched_yield(): errno_t;
+[restart(dont)][cp] DEFINE {0x8000009e,0x80000018} = rpc_service(): syscall_slong_t;
+DEFINE {0x0000009f,0x00000092} = sched_get_priority_max(syscall_ulong_t algorithm): syscall_slong_t;
+DEFINE {0x000000a0,0x00000093} = sched_get_priority_min(syscall_ulong_t algorithm): syscall_slong_t;
+DEFINE {0x000000a1,0x00000094} = sched_rr_get_interval(pid_t pid, struct __timespec32 *tms): errno_t;
+%(i386)DEFINE 0x800000a1 = sched_rr_get_interval64(pid_t pid, struct __timespec64 *tms): errno_t;
+[restart(dont)][cp] DEFINE {0x000000a2,0x00000023} = nanosleep(struct __timespec32 const *req, struct __timespec32 *rem): errno_t;
+%(i386)[restart(dont)][cp] DEFINE 0x800000a2 = nanosleep64(struct __timespec64 const *req, struct __timespec64 *rem): errno_t;
+
+@@@param: flags: Set of `MREMAP_MAYMOVE|MREMAP_FIXED'
+DEFINE {0x000000a3,0x00000019} = mremap(void *addr, size_t old_len, size_t new_len,
+	[printf(flagset(MREMAP_MAYMOVE,MREMAP_FIXED))]
+	syscall_ulong_t flags, void *new_address): void *;
+
+%(i386)[restart(must)] DEFINE 0x000000a4 = setresuid(uint16_t ruid, uint16_t euid, uint16_t suid): errno_t;
+%(i386)[restart(must)] DEFINE 0x000000a5 = getresuid(uint16_t *ruid, uint16_t *euid, uint16_t *suid): errno_t;
+//TODO:%(i386)DEFINE 0x000000a6 = vm86(...): errno_t;
+//TODO:DEFINE {0x000000a7,0x000000b2} = query_module(...): errno_t;
+[restart(dont)][cp] DEFINE {0x000000a8,0x00000007} = poll(struct pollfd *fds, size_t nfds, syscall_slong_t timeout): ssize_t;
+//TODO:DEFINE {0x000000a9,0x000000b4} = nfsservctl(...): errno_t;
+%(i386)[restart(must)] DEFINE 0x000000aa = setresgid(uint16_t rgid, uint16_t egid, uint16_t sgid): errno_t;
+%(i386)[restart(must)] DEFINE 0x000000ab = getresgid(uint16_t *rgid, uint16_t *egid, uint16_t *sgid): errno_t;
+//TODO:DEFINE {0x000000ac,0x0000009d} = prctl(...): errno_t;
+
+//TODO:%(i386)[restart(must)] DEFINE {0x000000ad,0x0000000f} = rt_sigreturn(): void;
+%(x86_64)[restart(must)] DEFINE {0x000000ad,0x0000000f} = rt_sigreturn(): void;
+
+@@@param: signo: One of `SIG*'
+DEFINE {0x000000ae,0x0000000d} = rt_sigaction(syscall_ulong_t signo, struct sigaction const *act, struct sigaction *oact, size_t sigsetsize): errno_t;
+@@@param: how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK'
+DEFINE {0x000000af,0x0000000e} = rt_sigprocmask(syscall_ulong_t how, struct __sigset_struct const *set, struct __sigset_struct *oset, size_t sigsetsize): errno_t;
+DEFINE {0x000000b0,0x0000007f} = rt_sigpending(struct __sigset_struct *set, size_t sigsetsize): errno_t;
+[restart(dont)][cp] DEFINE {0x000000b1,0x00000080} = rt_sigtimedwait(struct __sigset_struct const *set, struct __siginfo_struct *info, struct __timespec32 const *timeout, size_t sigsetsize): syscall_slong_t;
+%(i386)[restart(dont)][cp] DEFINE 0x800000b1 = rt_sigtimedwait64(struct __sigset_struct const *set, struct __siginfo_struct *info, struct __timespec64 const *timeout, size_t sigsetsize): syscall_slong_t;
+@@@param: signo: One of `SIG*'
+DEFINE {0x000000b2,0x00000081} = rt_sigqueueinfo(pid_t tgid, syscall_ulong_t signo, struct __siginfo_struct const *uinfo): errno_t;
+DEFINE {0x000000b3,0x00000082} = rt_sigsuspend(struct __sigset_struct const *set, size_t sigsetsize): errno_t;
+[cp] DEFINE {0x000000b4,0x00000011} = pread64(fd_t fd, void *buf, size_t bufsize, [double_wide] uint64_t offset): ssize_t;
+[cp] DEFINE {0x800000b4,0x80000011} = pread64f(fd_t fd, void *buf, size_t bufsize, [double_wide] uint64_t offset, iomode_t mode): ssize_t;
+[cp] DEFINE {0x000000b5,0x00000012} = pwrite64(fd_t fd, void const *buf, size_t bufsize, [double_wide] uint64_t offset): ssize_t;
+[cp] DEFINE {0x800000b5,0x80000012} = pwrite64f(fd_t fd, void const *buf, size_t bufsize, [double_wide] uint64_t offset, iomode_t mode): ssize_t;
+%(i386)[cp] DEFINE 0x000000b6 = chown(char const *filename, uint16_t owner, uint16_t group): errno_t;
+%(x86_64)[cp] DEFINE 0x0000005c = chown(char const *filename, uint32_t owner, uint32_t group): errno_t;
+[cp] DEFINE {0x000000b7,0x0000004f} = getcwd(char *buf, size_t size): ssize_t;
+//TODO:DEFINE {0x000000b8,0x0000007d} = capget(...): errno_t;
+//TODO:DEFINE {0x000000b9,0x0000007e} = capset(...): errno_t;
+DEFINE {0x000000ba,0x00000083} = sigaltstack(struct sigaltstack const *ss, struct sigaltstack *oss): errno_t;
+[restart(dont)][cp] DEFINE {0x000000bb,0x00000028} = sendfile(fd_t out_fd, fd_t in_fd, syscall_ulong_t *offset, size_t count): ssize_t;
+//TODO:[cp] DEFINE {0x000000bc,0x000000b5} = getpmsg(...): errno_t;
+//TODO:[cp] DEFINE {0x000000bd,0x000000b6} = putpmsg(...): errno_t;
+DEFINE {0x000000be,0x0000003a} = vfork(): pid_t;
+//TODO:%(i386)DEFINE 0x000000bf = ugetrlimit(...): errno_t;
+%(i386)DEFINE {0x000000c0} = mmap2(void *addr, size_t len, syscall_ulong_t prot, syscall_ulong_t flags, fd_t fd, syscall_ulong_t pgoffset): void *;
+%(i386)DEFINE {0x000000c1} = truncate64(char const *filename, [double_wide] uint64_t length): errno_t;
+%(i386)DEFINE {0x000000c2} = ftruncate64(fd_t fd, [double_wide] uint64_t length): errno_t;
+[cp] DEFINE {0x000000c3,0x00000004} = linux_stat64(char const *filename, struct linux_stat64 *statbuf): errno_t;
+[cp] DEFINE {0x800000c3,0x80000004} = kstat(char const *filename, struct stat *statbuf): errno_t;
+[cp] DEFINE {0x000000c4,0x00000006} = linux_lstat64(char const *filename, struct linux_stat64 *statbuf): errno_t;
+[cp] DEFINE {0x800000c4,0x80000006} = klstat(char const *filename, struct stat *statbuf): errno_t;
+[cp] DEFINE {0x000000c5,0x00000005} = linux_fstat64(fd_t fd, struct linux_stat64 *statbuf): errno_t;
+[cp] DEFINE {0x800000c5,0x80000005} = kfstat(fd_t fd, struct stat *statbuf): errno_t;
+
+%(i386)[cp] DEFINE 0x000000c6 = lchown32(char const *filename, uint32_t owner, uint32_t group): errno_t;
+[restart(must)] DEFINE {0x000000c7,0x00000066} = getuid32(): uint32_t;
+[restart(must)] DEFINE {0x000000c8,0x00000068} = getgid32(): uint32_t;
+[restart(must)] DEFINE {0x000000c9,0x0000006b} = geteuid32(): uint32_t;
+[restart(must)] DEFINE {0x000000ca,0x0000006c} = getegid32(): uint32_t;
+[restart(must)] DEFINE {0x000000cb,0x00000071} = setreuid32(uint32_t ruid, uint32_t euid): errno_t;
+[restart(must)] DEFINE {0x000000cc,0x00000072} = setregid32(uint32_t rgid, uint32_t egid): errno_t;
+[restart(must)] DEFINE {0x000000cd,0x00000073} = getgroups32(size_t size, /*[]*/uint32_t *list): errno_t;
+[restart(must)] DEFINE {0x000000ce,0x00000074} = setgroups32(size_t count, uint32_t const *groups): errno_t;
+%(i386)[cp] DEFINE 0x000000cf = fchown32(fd_t fd, uint32_t owner, uint32_t group): errno_t;
+[restart(must)] DEFINE {0x000000d0,0x00000075} = setresuid32(uint32_t ruid, uint32_t euid, uint32_t suid): errno_t;
+[restart(must)] DEFINE {0x000000d1,0x00000076} = getresuid32(uint32_t *ruid, uint32_t *euid, uint32_t *suid): errno_t;
+[restart(must)] DEFINE {0x000000d2,0x00000077} = setresgid32(uint32_t rgid, uint32_t egid, uint32_t sgid): errno_t;
+[restart(must)] DEFINE {0x000000d3,0x00000078} = getresgid32(uint32_t *rgid, uint32_t *egid, uint32_t *sgid): errno_t;
+%(i386)[cp] DEFINE 0x000000d4 = chown32(char const *filename, uint32_t owner, uint32_t group): errno_t;
+[restart(must)] DEFINE {0x000000d5,0x00000069} = setuid32(uint32_t uid): errno_t;
+[restart(must)] DEFINE {0x000000d6,0x0000006a} = setgid32(uint32_t gid): errno_t;
+[restart(must)] DEFINE {0x000000d7,0x0000007a} = setfsuid32(uint32_t uid): errno_t;
+[restart(must)] DEFINE {0x000000d8,0x0000007b} = setfsgid32(uint32_t gid): errno_t;
+//TODO:DEFINE {0x000000d9,0x0000009b} = pivot_root(...): errno_t;
+DEFINE {0x000000da,0x0000001b} = mincore(void *start, size_t len, uint8_t *vec): errno_t;
+DEFINE {0x000000db,0x0000001c} = madvise(void *addr, size_t len, syscall_ulong_t advice): errno_t;
+[cp] DEFINE {0x000000dc,0x000000d9} = getdents64(fd_t fd, struct linux_dirent64 *dirp, size_t count): ssize_t;
+[cp] DEFINE {0x800000dc,0x800000d9} = kreaddirf(
+	fd_t fd, struct dirent *buf, size_t bufsize,
+	[printf(flagset(READDIR_DEFAULT:
+		READDIR_CONTINUE,READDIR_PEEK,
+		READDIR_SKIPREL,READDIR_WANTEOF))]
+	syscall_ulong_t mode, iomode_t iomode): ssize_t;
+%(i386)[cp] DEFINE 0x000000dd = fcntl64(fd_t fd, syscall_ulong_t command, void *arg): syscall_slong_t;
+[restart(must)] DEFINE {0x000000e0,0x000000ba} = gettid(): pid_t;
+DEFINE {0x000000e1,0x000000bb} = readahead(fd_t fd, [double_wide] uint64_t offset, size_t count): ssize_t;
+
+[cp] DEFINE {0x000000e2,0x000000bc} = setxattr(char const *path, char const *name, void const *buf, size_t bufsize, syscall_ulong_t flags): errno_t;
+[cp] DEFINE {0x000000e3,0x000000bd} = lsetxattr(char const *path, char const *name, void const *buf, size_t bufsize, syscall_ulong_t flags): errno_t;
+[cp] DEFINE {0x000000e4,0x000000be} = fsetxattr(fd_t fd, char const *name, void const *buf, size_t bufsize, syscall_ulong_t flags): errno_t;
+[cp] DEFINE {0x000000e5,0x000000bf} = getxattr(char const *path, char const *name, void *buf, size_t bufsize): ssize_t;
+[cp] DEFINE {0x000000e6,0x000000c0} = lgetxattr(char const *path, char const *name, void *buf, size_t bufsize): ssize_t;
+[cp] DEFINE {0x000000e7,0x000000c1} = fgetxattr(fd_t fd, char const *name, void *buf, size_t bufsize): ssize_t;
+[cp] DEFINE {0x000000e8,0x000000c2} = listxattr(char const *path, char *listbuf, size_t listbufsize): ssize_t;
+[cp] DEFINE {0x000000e9,0x000000c3} = llistxattr(char const *path, char *listbuf, size_t listbufsize): ssize_t;
+[cp] DEFINE {0x000000ea,0x000000c4} = flistxattr(fd_t fd, char *listbuf, size_t listbufsize): ssize_t;
+[cp] DEFINE {0x000000eb,0x000000c5} = removexattr(char const *path, char const *name): errno_t;
+[cp] DEFINE {0x000000ec,0x000000c6} = lremovexattr(char const *path, char const *name): errno_t;
+[cp] DEFINE {0x000000ed,0x000000c7} = fremovexattr(int fd, char const *name): errno_t;
+
+@@@param: signo: One of `SIG*'
+DEFINE {0x000000ee,0x000000c8} = tkill(pid_t tid, syscall_ulong_t signo): errno_t;
+%(i386)DEFINE 0x000000ef = sendfile64(fd_t out_fd, fd_t in_fd, uint64_t *offset, size_t count): ssize_t;
+[cp] DEFINE {0x000000f0,0x000000ca} = futex(uint32_t *uaddr, syscall_ulong_t futex_op, uint32_t val, struct __timespec32 const *timeout_or_val2, uint32_t *uaddr2, uint32_t val3): syscall_slong_t;
+DEFINE {0x000000f1,0x000000cb} = sched_setaffinity(pid_t pid, size_t cpusetsize, struct __cpu_set_struct const *cpuset): errno_t;
+DEFINE {0x000000f2,0x000000cc} = sched_getaffinity(pid_t pid, size_t cpusetsize, struct __cpu_set_struct *cpuset): errno_t;
+//TODO:DEFINE {0x000000f3,0x000000cd} = set_thread_area(...): errno_t;
+//TODO:DEFINE {0x000000f4,0x000000d3} = get_thread_area(...): errno_t;
+//TODO:DEFINE {0x000000f5,0x000000ce} = io_setup(...): errno_t;
+//TODO:DEFINE {0x000000f6,0x000000cf} = io_destroy(...): errno_t;
+//[restart(dont)]
+//TODO:DEFINE {0x000000f7,0x000000d0} = io_getevents(...): errno_t;
+//TODO:DEFINE {0x000000f8,0x000000d1} = io_submit(...): errno_t;
+//TODO:DEFINE {0x000000f9,0x000000d2} = io_cancel(...): errno_t;
+//TODO:DEFINE {0x000000fa,0x000000dd} = fadvise64(...): errno_t;
+[restart(must)] DEFINE {0x000000fc,0x000000e7} = [noreturn] exit_group([printf("%Iu",(uintptr_t)({me}))] syscall_ulong_t exit_code): void;
+//TODO:DEFINE {0x000000fd,0x000000d4} = lookup_dcookie(...): errno_t;
+DEFINE {0x000000fe,0x000000d5} = epoll_create(syscall_ulong_t size): fd_t;
+DEFINE {0x000000ff,0x000000e9} = epoll_ctl(fd_t epfd,
+	[printf(select(EPOLL_CTL_ADD, EPOLL_CTL_DEL, EPOLL_CTL_MOD))] syscall_ulong_t op,
+	fd_t fd, struct epoll_event *event): errno_t;
+
+[restart(dont)][cp]
+DEFINE {0x00000100,0x000000e8} = epoll_wait(fd_t epfd, struct epoll_event *events, syscall_ulong_t maxevents, syscall_slong_t timeout): errno_t;
+
+DEFINE {0x00000101,0x000000d8} = remap_file_pages(void *start, size_t size, syscall_ulong_t prot, size_t pgoff, syscall_ulong_t flags): errno_t;
+DEFINE {0x00000102,0x000000da} = set_tid_address(pid_t *tidptr): pid_t;
+DEFINE {0x00000103,0x000000de} = timer_create(clockid_t clock_id, struct sigevent *evp, timer_t *timerid): errno_t;
+DEFINE {0x00000104,0x000000df} = timer_settime(timer_t timerid, syscall_ulong_t flags, struct __itimerspec32 const *value, struct __itimerspec32 *ovalue): errno_t;
+%(i386)DEFINE 0x80000104 = timer_settime64(timer_t timerid, syscall_ulong_t flags, struct __itimerspec64 const *value, struct __itimerspec64 *ovalue): errno_t;
+DEFINE {0x00000105,0x000000e0} = timer_gettime(timer_t timerid, struct __itimerspec32 *value): errno_t;
+%(i386)DEFINE 0x80000105 = timer_gettime64(timer_t timerid, struct __itimerspec64 *value): errno_t;
+DEFINE {0x00000106,0x000000e1} = timer_getoverrun(timer_t timerid): syscall_slong_t;
+DEFINE {0x00000107,0x000000e2} = timer_delete(timer_t timerid): errno_t;
+DEFINE {0x00000108,0x000000e3} = clock_settime(clockid_t clock_id, struct __timespec32 const *tp): errno_t;
+%(i386)DEFINE 0x80000108 = clock_settime64(clockid_t clock_id, struct __timespec64 const *tp): errno_t;
+DEFINE {0x00000109,0x000000e4} = clock_gettime(clockid_t clock_id, struct __timespec32 *tp): errno_t;
+%(i386)DEFINE 0x80000109 = clock_gettime64(clockid_t clock_id, struct __timespec64 *tp): errno_t;
+DEFINE {0x0000010a,0x000000e5} = clock_getres(clockid_t clock_id, struct __timespec32 *res): errno_t;
+%(i386)DEFINE 0x8000010a = clock_getres64(clockid_t clock_id, struct __timespec64 *res): errno_t;
+[restart(dont)][cp] DEFINE {0x0000010b,0x000000e6} = clock_nanosleep(clockid_t clock_id, syscall_ulong_t flags, struct __timespec32 const *requested_time, struct __timespec32 *remaining): errno_t;
+%(i386)[restart(dont)][cp] DEFINE 0x8000010b = clock_nanosleep64(clockid_t clock_id, syscall_ulong_t flags, struct __timespec64 const *requested_time, struct __timespec64 *remaining): errno_t;
+%(i386)DEFINE 0x0000010c = statfs64(char const *file, struct statfs64 *buf): errno_t;
+%(i386)DEFINE 0x0000010d = fstatfs64(fd_t file, struct statfs64 *buf): errno_t;
+@@@param: signo: One of `SIG*'
+DEFINE {0x0000010e,0x000000ea} = tgkill(pid_t tgid, pid_t tid, syscall_ulong_t signo): errno_t;
+[cp] DEFINE {0x0000010f,0x000000eb} = utimes(char const *filename, /*[2]*/struct __timeval32 const *times): errno_t;
+[cp] DEFINE {0x8000010f,0x800000eb} = utimes64(char const *filename, /*[2]*/struct __timeval64 const *times): errno_t;
+//TODO:DEFINE {0x00000110} = fadvise64_64(...): errno_t;
+//TODO:DEFINE {0x00000111,0x000000ec} = vserver(...): errno_t;
+//TODO:DEFINE {0x00000112,0x000000ed} = mbind(...): errno_t;
+//TODO:DEFINE {0x00000113,0x000000ef} = get_mempolicy(...): errno_t;
+//TODO:DEFINE {0x00000114,0x000000ee} = set_mempolicy(...): errno_t;
+//TODO:DEFINE {0x00000115,0x000000f0} = mq_open(...): errno_t;
+//TODO:DEFINE {0x00000116,0x000000f1} = mq_unlink(...): errno_t;
+//TODO:[cp] DEFINE {0x00000117,0x000000f2} = mq_timedsend(...): errno_t;
+//TODO:[cp] DEFINE {0x00000118,0x000000f3} = mq_timedreceive(...): errno_t;
+//TODO:DEFINE {0x00000119,0x000000f4} = mq_notify(...): errno_t;
+//TODO:DEFINE {0x0000011a,0x000000f5} = mq_getsetattr(...): errno_t;
+//TODO:DEFINE {0x0000011b,0x000000f6} = kexec_load(...): errno_t;
+@@@param: options: At least one of `WEXITED|WSTOPPED|WCONTINUED', optionally or'd with `WNOHANG|WNOWAIT'
+[restart(dont)][cp]
+DEFINE {0x0000011c,0x000000f7} = waitid(
+	idtype_t idtype, id_t id, struct __siginfo_struct *infop,
+	[printf(flagset(WEXITED,WSTOPPED,WCONTINUED,WNOHANG,WNOWAIT))] syscall_ulong_t options,
+	struct rusage *ru): errno_t;
+//TODO:DEFINE {0x0000011e,0x000000f8} = add_key(...): errno_t;
+//TODO:DEFINE {0x0000011f,0x000000f9} = request_key(...): errno_t;
+//TODO:DEFINE {0x00000120,0x000000fa} = keyctl(...): errno_t;
+DEFINE {0x00000121,0x000000fb} = ioprio_set(syscall_ulong_t which, syscall_ulong_t who, syscall_ulong_t ioprio): errno_t;
+DEFINE {0x00000122,0x000000fc} = ioprio_get(syscall_ulong_t which, syscall_ulong_t who): errno_t;
+//TODO:DEFINE {0x00000123,0x000000fd} = inotify_init(...): errno_t;
+//TODO:DEFINE {0x00000124,0x000000fe} = inotify_add_watch(...): errno_t;
+//TODO:DEFINE {0x00000125,0x000000ff} = inotify_rm_watch(...): errno_t;
+//TODO:DEFINE {0x00000126,0x00000100} = migrate_pages(...): errno_t;
+[cp] DEFINE {0x00000127,0x00000101} = openat(fd_t dirfd, char const *filename, oflag_t oflags, mode_t mode): fd_t;
+[cp] DEFINE {0x00000128,0x00000102} = mkdirat(fd_t dirfd, char const *pathname, mode_t mode): errno_t;
+@@@param: flags: Set of `0|AT_DOSPATH'
+[cp] DEFINE {0x80000128,0x80000102} = fmkdirat(fd_t dirfd, char const *pathname, mode_t mode, [printf(flagset(AT_DOSPATH))] atflag_t flags): errno_t;
+[cp] DEFINE {0x00000129,0x00000103} = mknodat(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev): errno_t;
+@@@param: flags: Set of `0|AT_DOSPATH'
+[cp] DEFINE {0x80000129,0x80000103} = fmknodat(fd_t dirfd, char const *nodename, mode_t mode, dev_t dev, [printf(flagset(AT_DOSPATH))] atflag_t flags): errno_t;
+@@@param: flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_DOSPATH'
+[cp] DEFINE {0x0000012a,0x00000104} = fchownat(
+	fd_t dirfd, char const *filename, uint32_t owner, uint32_t group,
+	[printf(flagset(AT_SYMLINK_NOFOLLOW,AT_DOSPATH))] atflag_t flags): errno_t;
+[cp] DEFINE {0x0000012b,0x00000105} = futimesat(fd_t dirfd, const char *filename, /*[2]*/struct __timeval32 const *times): errno_t;
+@@@param: flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH'
+[cp] DEFINE {0x8000012b,0x80000105} = futimesat64(fd_t dirfd, const char *filename, /*[2-3]*/struct __timeval64 const *times): errno_t;
+%(i386)@@@param: flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_DOSPATH'
+%(i386)[cp] DEFINE 0x0000012c = linux_fstatat64(fd_t dirfd, char const *filename, struct linux_stat64 *statbuf, [printf(flagset(AT_SYMLINK_NOFOLLOW,AT_DOSPATH))] atflag_t flags): errno_t;
+@@@param: flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_DOSPATH'
+[cp] DEFINE {0x8000012c,0x80000106} = kfstatat(fd_t dirfd, char const *filename, struct stat *statbuf,
+	[printf(flagset(AT_SYMLINK_NOFOLLOW,AT_DOSPATH))] atflag_t flags): errno_t;
+@@@param: flags: Set of `0|AT_REMOVEDIR|AT_REMOVEREG|AT_DOSPATH'
+[cp] DEFINE {0x0000012d,0x00000107} = unlinkat(fd_t dirfd, char const *name,
+	[printf(flagset(AT_REMOVEDIR,AT_REMOVEREG,AT_DOSPATH))] atflag_t flags): errno_t;
+[cp] DEFINE {0x0000012e,0x00000108} = renameat(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path): errno_t;
+@@@param: flags: Set of `0|AT_DOSPATH'
+[cp] DEFINE {0x8000012e,0x80000108} = frenameat(fd_t oldfd, char const *oldname, fd_t newfd, char const *newname_or_path, [printf(flagset(AT_DOSPATH))] atflag_t flags): errno_t;
+@@@param: flags: Set of `0|AT_EMPTY_PATH|AT_SYMLINK_FOLLOW|AT_DOSPATH'
+[cp] DEFINE {0x0000012f,0x00000109} = linkat(fd_t fromfd, char const *existing_file, fd_t tofd, char const *target_path,
+	[printf(flagset(AT_EMPTY_PATH,AT_SYMLINK_FOLLOW,AT_DOSPATH))] atflag_t flags): errno_t;
+[cp] DEFINE {0x00000130,0x0000010a} = symlinkat(char const *link_text, fd_t tofd, char const *target_path): errno_t;
+@@@param: flags: Set of `0|AT_DOSPATH'
+[cp] DEFINE {0x80000130,0x8000010a} = fsymlinkat(char const *link_text, fd_t tofd, char const *target_path,
+	[printf(flagset(AT_DOSPATH))] atflag_t flags): errno_t;
+[cp] DEFINE {0x00000131,0x0000010b} = readlinkat(fd_t dirfd, char const *path, char *buf, size_t buflen): ssize_t;
+@@@param: flags: Set of `0|AT_READLINK_REQSIZE|AT_DOSPATH'
+[cp] DEFINE {0x80000131,0x8000010b} = freadlinkat(fd_t dirfd, char const *path, char *buf, size_t buflen,
+	[printf(flagset(AT_READLINK_REQSIZE,AT_DOSPATH))] atflag_t flags): ssize_t;
+@@@param: flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_DOSPATH'
+[cp] DEFINE {0x00000132,0x0000010c} = fchmodat(
+	fd_t dirfd, char const *filename, mode_t mode,
+	[printf(flagset(AT_SYMLINK_NOFOLLOW,AT_DOSPATH))] atflag_t flags): errno_t;
+@@@param: type: Set of `R_OK|W_OK|X_OK' or `F_OK'
+@@@param: flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_EACCESS|AT_DOSPATH'
+[cp] DEFINE {0x00000133,0x0000010d} = faccessat(fd_t dirfd, char const *filename,
+	[printf(flagset(F_OK:R_OK,W_OK,X_OK))] syscall_ulong_t type,
+	[printf(flagset(AT_SYMLINK_NOFOLLOW,AT_EACCESS,AT_DOSPATH))] atflag_t flags): errno_t;
+[restart(dont)][cp] DEFINE {0x00000134,0x0000010e} = pselect6(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timespec32 const *timeout, void const *sigmask_sigset_and_len): ssize_t;
+%(i386)[restart(dont)][cp] DEFINE {0x80000134,0x8000010e} = pselect6_64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timespec64 const *timeout, void const *sigmask_sigset_and_len): ssize_t;
+[restart(dont)][cp] DEFINE {0x00000135,0x0000010f} = ppoll(struct pollfd *fds, size_t nfds, struct __timespec32 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize): ssize_t;
+%(i386)[restart(dont)][cp] DEFINE {0x80000135,0x8000010f} = ppoll64(struct pollfd *fds, size_t nfds, struct __timespec64 const *timeout_ts, struct __sigset_struct const *sigmask, size_t sigsetsize): ssize_t;
+@@param flags: Set of `CLONE_*'
+DEFINE {0x00000136,0x00000110} = unshare([printf(flagset(CLONE_VM,CLONE_FS,CLONE_FILES,CLONE_SIGHAND,CLONE_PTRACE,CLONE_VFORK,CLONE_PARENT,CLONE_THREAD,CLONE_NEWNS,CLONE_SYSVSEM,CLONE_SETTLS,CLONE_PARENT_SETTID,CLONE_CHILD_CLEARTID,CLONE_DETACHED,CLONE_UNTRACED,CLONE_CHILD_SETTID,CLONE_NEWUTS,CLONE_NEWIPC,CLONE_NEWUSER,CLONE_NEWPID,CLONE_NEWNET,CLONE_IO))] syscall_ulong_t flags): errno_t;
+//TODO:DEFINE {0x00000137,0x00000111} = set_robust_list(...): errno_t;
+//TODO:DEFINE {0x00000138,0x00000112} = get_robust_list(...): errno_t;
+[cp] DEFINE {0x00000139,0x00000113} = splice(fd_t fdin, uint64_t *offin, fd_t fdout, uint64_t *offout, size_t length, syscall_ulong_t flags): ssize_t;
+[cp] DEFINE {0x0000013a,0x00000115} = sync_file_range(fd_t fd, [double_wide] uint64_t offset, [double_wide] uint64_t count, syscall_ulong_t flags): errno_t;
+[cp] DEFINE {0x0000013b,0x00000114} = tee(fd_t fdin, fd_t fdout, size_t length, syscall_ulong_t flags): ssize_t;
+[cp] DEFINE {0x0000013c,0x00000116} = vmsplice(fd_t fdout, struct iovec const *iov, size_t count, syscall_ulong_t flags): ssize_t;
+//TODO:DEFINE {0x0000013d,0x00000117} = move_pages(...): errno_t;
+DEFINE {0x0000013e,0x00000135} = getcpu(uint32_t *cpu, uint32_t *node, struct getcpu_cache *tcache): errno_t;
+
+[restart(dont)][cp]
+DEFINE {0x0000013f,0x00000119} = epoll_pwait(
+	fd_t epfd, struct epoll_event *events, syscall_ulong_t maxevents,
+	syscall_slong_t timeout, struct __sigset_struct const *ss): errno_t;
+
+@@@param: flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH'
+[cp] DEFINE {0x00000140,0x00000118} = utimensat(fd_t dirfd, char const *filename, /*[2-3]*/struct __timespec32 const *times,
+	[printf(flagset(AT_SYMLINK_NOFOLLOW,AT_CHANGE_CTIME,AT_DOSPATH))] atflag_t flags): errno_t;
+%(i386)@@@param: flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH'
+%(i386)[cp] DEFINE {0x80000140,0x80000118} = utimensat64(fd_t dirfd, char const *filename, /*[2-3]*/struct __timespec64 const *times, [printf(flagset(AT_SYMLINK_NOFOLLOW,AT_CHANGE_CTIME,AT_DOSPATH))] atflag_t flags): errno_t;
+//TODO:DEFINE {0x00000141,0x0000011a} = signalfd(...): errno_t;
+
+@@Return file descriptor for new interval timer source
+DEFINE {0x00000142,0x0000011b} = timerfd_create(clockid_t clock_id, syscall_ulong_t flags): fd_t;
+
+DEFINE {0x00000143,0x0000011c} = eventfd(syscall_ulong_t initval): errno_t;
+DEFINE {0x00000144,0x0000011d} = fallocate(fd_t fd, syscall_ulong_t mode, uint32_t offset, uint32_t length): errno_t;
+DEFINE {0x80000144,0x8000011d} = fallocate64(fd_t fd, syscall_ulong_t mode, [double_wide] uint64_t offset, [double_wide] uint64_t length): errno_t;
+
+@@Set next expiration time of interval timer source UFD to UTMR.
+@@If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout value
+@@is absolute. Optionally return the old expiration time in OTMR
+DEFINE {0x00000145,0x0000011e} = timerfd_settime(fd_t ufd, syscall_ulong_t flags, struct __itimerspec32 const *utmr, struct __itimerspec32 *otmr): errno_t;
+%(i386)@@Set next expiration time of interval timer source UFD to UTMR.
+%(i386)@@If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout value
+%(i386)@@is absolute. Optionally return the old expiration time in OTMR
+%(i386)DEFINE {0x80000145,0x8000011e} = timerfd_settime64(fd_t ufd, syscall_ulong_t flags, struct __itimerspec64 const *utmr, struct __itimerspec64 *otmr): errno_t;
+
+@@Return the next expiration time of UFD
+DEFINE {0x00000146,0x0000011f} = timerfd_gettime(fd_t ufd, struct __itimerspec32 *otmr): errno_t;
+%(i386)@@Return the next expiration time of UFD
+%(i386)DEFINE {0x80000146,0x8000011f} = timerfd_gettime64(fd_t ufd, struct __itimerspec64 *otmr): errno_t;
+
+//TODO:DEFINE {0x00000147,0x00000121} = signalfd4(...): errno_t;
+
+DEFINE {0x00000148,0x00000122} = eventfd2(syscall_ulong_t initval,
+	[printf(flagset(EFD_SEMAPHORE, EFD_NONBLOCK, EFD_CLOEXEC))] syscall_ulong_t flags): errno_t;
+
+DEFINE {0x00000149,0x00000123} = epoll_create1(syscall_ulong_t flags): fd_t;
+
+@@@param: flags:  Set of `O_CLOEXEC|O_CLOFORK'
+DEFINE {0x0000014a,0x00000124} = dup3(fd_t oldfd, fd_t newfd, oflag_t flags): fd_t;
+DEFINE {0x0000014b,0x00000125} = pipe2(/*[2]*/fd_t *pipedes,
+	[printf(flagset(O_CLOEXEC,O_CLOFORK,O_NONBLOCK,O_DIRECT))] oflag_t flags): errno_t;
+//TODO:DEFINE {0x0000014c,0x00000126} = inotify_init1(...): errno_t;
+[cp] DEFINE {0x0000014d,0x00000127} = preadv(fd_t fd, struct iovec const *iovec, size_t count, [double_wide] uint64_t offset): ssize_t;
+[cp] DEFINE {0x8000014d,0x80000127} = preadvf(fd_t fd, struct iovec const *iovec, size_t count, [double_wide] uint64_t offset, iomode_t mode): ssize_t;
+[cp] DEFINE {0x0000014e,0x00000128} = pwritev(fd_t fd, struct iovec const *iovec, size_t count, [double_wide] uint64_t offset): ssize_t;
+[cp] DEFINE {0x8000014e,0x80000128} = pwritevf(fd_t fd, struct iovec const *iovec, size_t count, [double_wide] uint64_t offset, iomode_t mode): ssize_t;
+@@@param: signo: One of `SIG*'
+DEFINE {0x0000014f,0x00000129} = rt_tgsigqueueinfo(pid_t tgid, pid_t tid, syscall_ulong_t signo, struct __siginfo_struct const *uinfo): errno_t;
+//TODO:DEFINE {0x00000150,0x0000012a} = perf_event_open(...): errno_t;
+[restart(dont)][cp] DEFINE {0x00000151,0x0000012b} = recvmmsg(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t flags, struct __timespec32 *tmo): ssize_t;
+%(i386)[restart(dont)][cp] DEFINE {0x80000151,0x8000012b} = recvmmsg64(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t flags, struct __timespec64 *tmo): ssize_t;
+//TODO:DEFINE {0x00000152,0x0000012c} = fanotify_init(...): errno_t;
+//TODO:DEFINE {0x00000153,0x0000012d} = fanotify_mark(...): errno_t;
+@@@param: resource: One of `RLIMIT_*' from <bits/resource.h>
+DEFINE {0x00000154,0x0000012e} = prlimit64(pid_t pid, syscall_ulong_t resource, struct rlimit64 const *new_limit, struct rlimit64 *old_limit): errno_t;
+[cp] DEFINE {0x00000155,0x0000012f} = name_to_handle_at(fd_t dirfd, char const *name, struct file_handle *handle, int32_t *mnt_id, syscall_ulong_t flags): errno_t;
+[cp] DEFINE {0x00000156,0x00000130} = open_by_handle_at(fd_t mountdirfd, struct file_handle *handle, syscall_ulong_t flags): fd_t;
+//TODO:DEFINE {0x00000157,0x00000131} = clock_adjtime(...): errno_t;
+[cp] DEFINE {0x00000158,0x00000132} = syncfs(fd_t fd): errno_t;
+[restart(dont)][cp] DEFINE {0x00000159,0x00000133} = sendmmsg(fd_t sockfd, struct mmsghdr *vmessages, size_t vlen, syscall_ulong_t flags): ssize_t;
+DEFINE {0x0000015a,0x00000134} = setns(fd_t fd, syscall_ulong_t nstype): errno_t;
+DEFINE {0x0000015b,0x00000136} = process_vm_readv(pid_t pid, struct iovec const *lvec, size_t liovcnt, struct iovec const *rvec, size_t riovcnt, syscall_ulong_t flags): ssize_t;
+DEFINE {0x0000015c,0x00000137} = process_vm_writev(pid_t pid, struct iovec const *lvec, size_t liovcnt, struct iovec const *rvec, size_t riovcnt, syscall_ulong_t flags): ssize_t;
+DEFINE {0x0000015d,0x00000138} = kcmp(pid_t pid1, pid_t pid2, syscall_ulong_t type, syscall_ulong_t idx1, syscall_ulong_t idx2): syscall_slong_t;
+//TODO:DEFINE {0x0000015e,0x00000139} = finit_module(...): errno_t;
+//TODO:DEFINE {0x0000015f,0x0000013a} = sched_setattr(...): errno_t;
+//TODO:DEFINE {0x00000160,0x0000013b} = sched_getattr(...): errno_t;
+@@@param: flags: Set of `RENAME_EXCHANGE,RENAME_NOREPLACE,RENAME_WHITEOUT'
+[cp] DEFINE {0x00000161,0x0000013c} = renameat2(fd_t olddirfd, char const *oldpath, fd_t newdirfd, char const *newpath, syscall_ulong_t flags): errno_t;
+//TODO:DEFINE {0x00000162,0x0000013d} = seccomp(...): errno_t;
+//TODO:DEFINE {0x00000163,0x0000013e} = getrandom(...): errno_t;
+//TODO:DEFINE {0x00000164,0x0000013f} = memfd_create(...): errno_t;
+//TODO:DEFINE {0x00000165,0x00000141} = bpf(...): errno_t;
+@@@param: flags: Set of `0|AT_EMPTY_PATH|AT_SYMLINK_NOFOLLOW|AT_DOSPATH'
+[cp] DEFINE {0x00000166,0x00000142} = execveat(fd_t dirfd, char const *pathname, char const *const *argv, char const *const *envp,
+	[printf(flagset(AT_EMPTY_PATH,AT_SYMLINK_NOFOLLOW,AT_DOSPATH))] atflag_t flags): errno_t;
+DEFINE {0x00000167,0x00000029} = socket(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol): fd_t;
+DEFINE {0x00000168,0x00000035} = socketpair(syscall_ulong_t domain, syscall_ulong_t type, syscall_ulong_t protocol, /*[2]*/fd_t *fds): errno_t;
+DEFINE {0x00000169,0x00000031} = bind(fd_t sockfd, struct sockaddr const *addr, socklen_t addr_len): errno_t;
+[restart(dont)][cp] DEFINE {0x0000016a,0x0000002a} = connect(fd_t sockfd, struct sockaddr const *addr, socklen_t addr_len): errno_t;
+DEFINE {0x0000016b,0x00000032} = listen(fd_t sockfd, syscall_ulong_t max_backlog): errno_t;
+[restart(dont)][cp] DEFINE {0x0000016c,0x00000120} = accept4(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len,
+	[printf(flagset(SOCK_NONBLOCK,SOCK_CLOEXEC,SOCK_CLOFORK))] syscall_ulong_t flags): fd_t;
+@@@param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
+@@@param: optname: Dependent on `level'
+DEFINE {0x0000016d,0x00000037} = getsockopt(fd_t sockfd,
+	[printf(select(SOL_SOCKET))] syscall_ulong_t level,
+	syscall_ulong_t optname,
+	void *optval, socklen_t *optlen): errno_t;
+@@@param: level:   One of `SOL_*' (e.g.: `SOL_SOCKET')
+@@@param: optname: Dependent on `level'
+[restart(dont)] DEFINE {0x0000016e,0x00000036} = setsockopt(fd_t sockfd,
+	[printf(select(SOL_SOCKET))] syscall_ulong_t level,
+	syscall_ulong_t optname,
+	void const *optval, socklen_t optlen): errno_t;
+DEFINE {0x0000016f,0x00000033} = getsockname(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len): errno_t;
+DEFINE {0x00000170,0x00000034} = getpeername(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len): errno_t;
+@@param flags: Set of `MSG_CONFIRM|MSG_DONTROUTE|MSG_DONTWAIT|MSG_EOR|MSG_MORE|MSG_NOSIGNAL|MSG_OOB'
+[restart(dont)][cp] DEFINE {0x00000171,0x0000002c} = sendto(fd_t sockfd, void const *buf, size_t bufsize,
+	[printf(flagset(MSG_CONFIRM,MSG_DONTROUTE,MSG_DONTWAIT,MSG_EOR,MSG_MORE,MSG_NOSIGNAL,MSG_OOB))] syscall_ulong_t flags,
+	struct sockaddr const *addr, socklen_t addr_len): ssize_t;
+[restart(dont)][cp] DEFINE {0x00000172,0x0000002e} = sendmsg(fd_t sockfd, struct msghdr const *message,
+	[printf(flagset(MSG_CONFIRM,MSG_DONTROUTE,MSG_DONTWAIT,MSG_EOR,MSG_MORE,MSG_NOSIGNAL,MSG_OOB))] syscall_ulong_t flags): ssize_t;
+[restart(dont)][cp] DEFINE {0x00000173,0x0000002d} = recvfrom(fd_t sockfd, void *buf, size_t bufsize,
+	[printf(flagset(MSG_DONTWAIT,MSG_ERRQUEUE,MSG_OOB,MSG_PEEK,MSG_TRUNC,MSG_WAITALL))] syscall_ulong_t flags,
+	struct sockaddr *addr, socklen_t *addr_len): ssize_t;
+[restart(dont)][cp] DEFINE {0x00000174,0x0000002f} = recvmsg(fd_t sockfd, struct msghdr *message,
+	[printf(flagset(MSG_CMSG_CLOEXEC,MSG_CMSG_CLOFORK,MSG_DONTWAIT,MSG_ERRQUEUE,MSG_OOB,MSG_PEEK,MSG_TRUNC,MSG_WAITALL))] syscall_ulong_t flags): ssize_t;
+@@@param: how: One of `SHUT_RD', `SHUT_WR' or `SHUT_RDWR'
+DEFINE {0x00000175,0x00000030} = shutdown(fd_t sockfd,
+	[printf(select(SHUT_RD,SHUT_WR,SHUT_RDWR))] syscall_ulong_t how): errno_t;
+//TODO:DEFINE {0x00000176,0x00000143} = userfaultfd(...): errno_t;
+//TODO:DEFINE {0x00000177,0x00000144} = membarrier(...): errno_t;
+//TODO:DEFINE {0x00000178,0x00000145} = mlock2(...): errno_t;
+
+
+
+[cp] DEFINE {0x80000001,0x80000002} = hop(fd_t fd, syscall_ulong_t command, void *arg): syscall_slong_t;
+[cp] DEFINE {0x80000002,0x80000003} = hopf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg): syscall_slong_t;
+
+@@>> detach(2)
+@@Detach the descriptor of `PID' from the thread that
+@@would have received a signal when it changes state,
+@@as well as prevent the thread from turning into a
+@@zombie once it dies.
+@@For simplicity, think of it like this:
+@@  - pthread_create()  -->  clone()
+@@  - pthread_join()    -->  wait()
+@@  - pthread_detach()  -->  detach()  // Linux's missing link, now implemented
+@@A total of 4 special cases exists to alter the behavior of this function:
+@@  - PID == 0 || PID == gettid():
+@@    Detach the calling thread from the set of running children within
+@@    its own process. Note however that when this is done by the main
+@@    thread of the process, gettid() will equal getpid(), and the behavior
+@@    will be different.
+@@  - PID == getpid():
+@@    Detach the calling process from its parent, essentially daemonizing
+@@    the calling process the same way a double-fork would:
+@@    >> if (fork() == 0) {
+@@    >> 	if (fork() == 0) {
+@@    >> 		// This is a daemonized process
+@@    >> 		// aka. the parent process no longer knows
+@@    >> 		// about us, and also can't wait(2) on us.
+@@    >> 		...
+@@    >> 	}
+@@    >> 	exit(0);
+@@    >> }
+@@    Same as:
+@@    >> if (fork() == 0) {
+@@    >> 	detach(0); // or `detach(getpid())', since 0 --> gettid() and gettid() == getpid()
+@@    >> 	// This is a daemonized process
+@@    >> 	// aka. the parent process no longer knows
+@@    >> 	// about us, and also can't wait(2) on us.
+@@    >> 	...
+@@    >> }
+@@  - PID == -1:
+@@    Detach all child processes/threads of the calling process, essentially
+@@    turning its chain of children into a clean slate that no longer contains
+@@    any wait(2)able child threads or processes.
+@@    If no waitable children existed, `ECHILD' is set; else `0' is returned.
+@@Before any of this is done, the thread referred to by `PID' is one of the following:
+@@  - The leader of the process that called `fork()' or `clone()' without
+@@   `CLONE_PARENT' to create the thread referred to by `PID'
+@@  - The creator of the process containing a thread that called
+@@   `clone()' with `CLONE_PARENT', which then created the thread
+@@    referred to by `PID'.
+@@  - Even if the thread doesn't deliver a signal upon it terminating,
+@@    the process that would have received such a signal is still relevant.
+@@  -> In other words: The thread `PID' must be one of your children,
+@@                     or you had to have been assigned as its child.
+@@If the calling thread isn't part of that process that will receive
+@@the signal if the thread dies without being detached first, then
+@@the call fails by throwing an `E_ILLEGAL_OPERATION'.
+@@If the thread had already been detached, then the call fails by
+@@throwing an `E_ILLEGAL_OPERATION' as well.
+@@Upon success, the thread referred to by `PID' will clean up its own
+@@PID descriptor without the need of anyone to wait() for it, a behavior
+@@that linux implements using `CLONE_THREAD' (which you shouldn't use,
+@@because it's flawed by design)
+@@Once detached, any further use of PID results in a race condition
+@@(which linux neglects to mention for `CLONE_THREAD'), because there
+@@is no way of ensuring that PID still refers to the original thread,
+@@as another thread may have been created using the same PID, after
+@@the detached thread exited.
+@@NOTE: If a thread is crated using clone() with `CLONE_DETACHED' set,
+@@      it will behave effectively as though this function had already
+@@      be called.
+@@NOTE: If the thread already has terminated, detaching it will kill
+@@      its zombie the same way wait() would.
+@@NOTE: Passing ZERO(0) for `PID' will detach the calling thread.
+@@      However, this operation fails if the calling thread isn't
+@@      part of the same process as the parent process of the thread.
+@@      In other words, the child of a fork() can't do this, and
+@@      neither can the spawnee of clone(CLONE_THREAD|CLONE_PARENT),
+@@      clone(0) or clone(CLONE_PARENT).
+@@@return: -EPERM:             The calling process isn't the recipient of signals
+@@                             delivered when `PID' changes state. This can either
+@@                             be because `PID' has already been detached, or because
+@@                             YOU CAN'T DETACH SOMEONE ELSE'S THREAD!
+@@                             Another possibility is that the thread was already
+@@                             detached, then exited, following which a new thread
+@@                             got created and had been assigned the PID of your
+@@                             ancient, no longer existent thread.
+@@@return: -ECHILD:           `PID' was equal to `-1', but no waitable children existed
+@@@throw: E_PROCESS_EXITED:    The process referred to by `PID' doesn't exist.
+@@                             This could mean that it had already been detached
+@@                             and exited, or that the `PID' is just invalid (which
+@@                             would also be the case if it was valid at some point)
+[restart(must)] DEFINE {0x80000005,0x80000007} = detach(pid_t pid): errno_t;
+
+@@Returns a bitset of all of the currently mounted dos-drives
+[restart(must)] DEFINE {0x80000006,0x80000008} = getdrives(): syscall_slong_t;
+
+@@You may pass `AT_READLINK_REQSIZE' to always have the function return
+@@the required buffer size, rather than the used size.
+@@@param: flags: Set of `0|AT_ALTPATH|AT_READLINK_REQSIZE|AT_DOSPATH'
+[cp] DEFINE {0x80000007,0x80000009} = frealpath4(fd_t fd, char *buf, size_t buflen,
+	[printf(flagset(AT_ALTPATH,AT_READLINK_REQSIZE,AT_DOSPATH))] atflag_t flags): ssize_t;
+
+@@Returns the absolute filesystem path for the specified file
+@@When `AT_SYMLINK_NOFOLLOW' is given, a final symlink is dereferenced,
+@@causing the pointed-to file location to be retrieved. - Otherwise, the
+@@location of the link is printed instead.
+@@You may pass `AT_READLINK_REQSIZE' to always have the function return
+@@the required buffer size, rather than the used size.
+@@@param: flags: Set of `0|AT_ALTPATH|AT_SYMLINK_NOFOLLOW|AT_READLINK_REQSIZE|AT_DOSPATH'
+[cp] DEFINE {0x80000008,0x8000000a} = frealpathat(fd_t dirfd, char const *filename, char *buf, size_t buflen,
+	[printf(flagset(AT_ALTPATH,AT_SYMLINK_NOFOLLOW,AT_READLINK_REQSIZE,AT_DOSPATH))] atflag_t flags): ssize_t;
+
+@@Schedule an RPC for execution on the specified `target' thread.
+@@@param: target:    The targeted thread.
+@@@param: flags:     RPC flags (one of `RPC_SCHEDULE_*', or'd with a set of `RPC_SCHEDULE_FLAG_*')
+@@@param: program:   An RPC loader program (vector of `RPC_PROGRAM_OP_*')
+@@@param: arguments: Arguments for the RPC loader program.
+@@@return: 1:  The specified `target' thread has already terminated.
+@@@return: 0:  Success.
+@@@return: -1: Error (s.a. `errno')
+@@@throws: E_PROCESS_EXITED:  `target' does not reference a valid process
+@@@throws: E_INVALID_ARGUMENT: The given `flag' is invalid.
+DEFINE {0x80000009,0x8000000b} = rpc_schedule(pid_t target,
+	[printf(flagset(RPC_SCHEDULE_SYNC:
+		RPC_SCHEDULE_ASYNC,
+		RPC_SCHEDULE_FLAG_NONSYSCALL,
+		RPC_SCHEDULE_FLAG_WAITFORSTART,
+		RPC_SCHEDULE_FLAG_STATUSFUTEX,
+		RPC_SCHEDULE_FLAG_SYSRESTART,
+		RPC_SCHEDULE_FLAG_NOSYSRESTART,
+		RPC_SCHEDULE_FLAG_WAITSMPACK,
+		RPC_SCHEDULE_FLAG_DONTWAKE,
+		RPC_SCHEDULE_FLAG_HIGHPRIO,
+		RPC_SCHEDULE_FLAG_LOWPRIO))]
+		syscall_ulong_t flags,
+	uint8_t const *program, void **arguments): syscall_slong_t;
+[cp] DEFINE {0x8000000a,0x8000000c} = sysctl(syscall_ulong_t command, void *arg): syscall_slong_t;
+@@Create a new pseudo-terminal driver and store handles to both the master and slave ends of the connection in the given pointers.
+DEFINE {0x8000000b,0x8000000d} = openpty(fd_t *amaster, fd_t *aslave, char *name, struct termios const *termp, struct winsize const *winp): errno_t;
+
+@@Set the exception handler mode for the calling thread.
+@@Examples:
+@@  Set mode #3 from you `main()': `set_exception_handler(EXCEPT_HANDLER_MODE_SIGHAND,NULL,NULL)'
+@@  Configure mode #2 in libc:     `set_exception_handler(EXCEPT_HANDLER_MODE_ENABLED | EXCEPT_HANDLER_FLAG_SETHANDLER,&kernel_except_handler,NULL)'
+@@@param: MODE:       One of `EXCEPT_HANDLER_MODE_*', optionally or'd with `EXCEPT_HANDLER_FLAG_*'
+@@@param: HANDLER:    When `EXCEPT_HANDLER_FLAG_SETHANDLER' is set, the address of the exception handler to use
+@@@param: HANDLER_SP: When `EXCEPT_HANDLER_FLAG_SETSTACK' is set, the address of the exception handler stack
+@@@return: 0 :        Success.
+@@@return: -1:EINVAL: The given MODE is invalid
+[restart(must)]
+DEFINE {0x8000000e,0x8000000e} = set_exception_handler(syscall_ulong_t mode, except_handler_t handler, void *handler_sp): errno_t;
+
+@@Get the current exception handler mode for the calling thread.
+@@@param: PMODE:       When non-NULL, store the current mode, which is encoded as:
+@@                      - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
+@@                      - Or'd with a set of `EXCEPT_HANDLER_FLAG_(ONESHOT|SETHANDLER|SETSTACK)'
+@@@param: PHANDLER:    The address of the user-space exception handler.
+@@                     Note that when no handler has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETHANDLER)'),
+@@                     then this pointer is set to `NULL'.
+@@@param: PHANDLER_SP: The starting address of the user-space exception handler stack.
+@@                     Note that when no stack has been set (`!(*PMODE & EXCEPT_HANDLER_FLAG_SETSTACK)'),
+@@                     or when the stack was defined to re-use the previous stack,
+@@                     then this pointer is set to `EXCEPT_HANDLER_SP_CURRENT'.
+@@@return: 0 :         Success.
+@@@return: -1:EFAULT:  One of the given pointers is non-NULL and faulty
+[restart(must)]
+DEFINE {0x8000000f,0x8000000f} = get_exception_handler(syscall_ulong_t *pmode, except_handler_t *phandler, void **phandler_sp): errno_t;
+
+@@Set per-vm meta-data for allowing the kernel to enumerate loaded code modules
+[restart(must)]
+DEFINE {0x80000010,0x80000015} = set_library_listdef(struct library_listdef const *listdef): errno_t;
+
+@@Trigger a debugger trap `trapno', optionally extended with `regs'
+@@at either the system call return location, or at the given `state'
+@@In the later case, this system call will by default return to the
+@@given `state', though given the purpose of this system call being
+@@to inform a connected debugger of some breakable event, allowing
+@@it to do whatever it wishes before execution is resumed.
+@@@param: trapno:   One of `SIG*' (e.g. `SIGTRAP')
+@@@param: regs:     When non-NULL, additional trap register data
+@@@param: state:    When non-NULL, the CPU state where the trap should return to by default
+@@@return: -EOK:    `state' was NULL and the trap returned successfully
+@@@return: -ENOENT: No debugger is connected to the calling process/process-group/system
+DEFINE {0x80000011,0x80000016} = debugtrap(struct ucpustate const *state, syscall_ulong_t trapno, struct debug_trap_register const *regs): errno_t;
+
+[restart(dont)][cp] DEFINE {0x80000012,0x80000019} = lfutex(
+	uintptr_t *uaddr,
+	syscall_ulong_t futex_op, uintptr_t val,
+	struct __timespec64 const *timeout, uintptr_t val2): syscall_slong_t;
+[restart(dont)][cp] DEFINE {0x80000014,0x8000001a} = lfutexlock(
+	uintptr_t *ulockaddr, uintptr_t *uaddr,
+	syscall_ulong_t futex_op, uintptr_t val,
+	struct __timespec64 const *timeout, uintptr_t val2): syscall_slong_t;
+[restart(dont)][cp] DEFINE {0x80000015,0x8000001b} = lfutexexpr(
+	uintptr_t *uaddr, void *base,
+	struct lfutexexpr const *exprv, size_t exprc,
+	struct __timespec64 const *timeout, syscall_ulong_t timeout_flags): errno_t;
+[restart(dont)][cp] DEFINE {0x80000016,0x8000001c} = lfutexlockexpr(
+	uintptr_t *ulockaddr, void *base,
+	struct lfutexexpr const *exprv, size_t exprc,
+	struct __timespec64 const *timeout, syscall_ulong_t timeout_flags): errno_t;
+
+
+@@Create and return a new tty terminal controller connected to the given keyboard and display
+@@The newly created device automatically gets assigned an arbitrary device number, before
+@@being made available under a file `/dev/${name}' (or rather: as ${name} within the devfs)
+@@@param: reserved: Reserved set of flags (Must pass `0'; for future expansion)
+DEFINE {0x80000017,0x8000001d} = mktty(fd_t keyboard, fd_t display, char const *name, syscall_ulong_t rsvd): fd_t;
+
+@@Raise a signal within the calling thread alongside the given CPU state
+@@This system call is used when translating exceptions into POSIX signal in error mode #4
+@@@param: state: The state state at which to raise the signal, or `NULL' if the signal should
+@@               be raised for the caller's source location. Note that only in the later case
+@@               will this function return to its caller. - When `state' is non-NULL, it will
+@@               return to the text location described by it.
+@@TODO: Add a flags argument to control if the current signal mask
+@@      should be ignored (currently, it's always being ignored)
+[restart(must)] DEFINE {0x80000018,0x8000001e} = raiseat(
+	struct ucpustate const *state,
+	struct __siginfo_struct const *si): errno_t;
+
+@@Trigger a coredump of the calling process.
+@@@param: curr_state:       The state as is still valid after any possible unwinding has already been done
+@@                          Note that this state does not necessarily point to the location that originally
+@@                          caused the problem that escalated into a coredump, but is the last valid stack-
+@@                          unwind location at which unwinding could no longer continue.
+@@                          When `NULL', `orig_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
+@@@param: orig_state:       The original CPU state at where the associated `exception' got triggered
+@@                          When `NULL', `curr_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
+@@                          When `curr_state' is also `NULL', then the current CPU state is used instead.
+@@@param: traceback_vector: (potentially incomplete) vector of additional program pointers that were
+@@                          travered when the stack was walked from `orig_state' to `curr_state'
+@@                          Note that earlier entires within this vector are further up the call-stack, with
+@@                          traceback_vector[0] being meant to be the call-site of the function of `orig_state'.
+@@                          Note that when `traceback_length != 0 && traceback_vector[traceback_length-1] == UCPUSTATE_PC(*curr_state)',
+@@                          it can be assumed that the traceback is complete and contains all travered instruction locations.
+@@                          In this case, a traceback displayed to a human should not include the text location at
+@@                          `traceback_vector[traceback_length-1]', since that location would also be printed when
+@@                          unwinding is completed for the purposes of displaying a traceback.
+@@@param: traceback_length: The number of program counters stored within `traceback_vector'
+@@@param: exception:        The exception that resulted in the coredump (or `NULL' to get the same behavior as `E_OK')
+@@                          Note that when `unwind_error == UNWIND_SUCCESS', this argument is interpreted as `siginfo_t *',
+@@                          allowing coredumps to also be triggerred for unhandled signals.
+@@@param: unwind_error:     The unwind error that caused the coredump, or `UNWIND_NOTHROW' if unwinding
+@@                          was never actually performed, and `exception' is actually a `siginfo_t *'
+[restart(must)] DEFINE {0x8000001a,0x8000001f} = coredump(
+	struct ucpustate const *curr_state, struct ucpustate const *orig_state,
+	void const *const *traceback_vector, size_t traceback_length,
+	struct exception_data const *exception, syscall_ulong_t unwind_error): errno_t;
+
+
+//%(x86_64)DEFINE 0x0000001d = shmget
+//%(x86_64)DEFINE 0x0000001e = shmat
+//%(x86_64)DEFINE 0x0000001f = shmctl
+//%(x86_64)[restart(dont)][cp] DEFINE 0x0000002b = accept
+//%(x86_64)DEFINE 0x00000040 = semget
+//%(x86_64)[restart(dont)] DEFINE 0x00000041 = semop
+//%(x86_64)DEFINE 0x00000042 = semctl
+//%(x86_64)DEFINE 0x00000043 = shmdt
+//%(x86_64)DEFINE 0x00000044 = msgget
+//%(x86_64)[restart(dont)][cp] DEFINE 0x00000045 = msgsnd
+//%(x86_64)[restart(dont)][cp] DEFINE 0x00000046 = msgrcv
+//%(x86_64)DEFINE 0x00000047 = msgctl
+//%(x86_64)DEFINE 0x0000009e = arch_prctl
+//%(x86_64)DEFINE 0x000000b8 = tuxcall
+//%(x86_64)DEFINE 0x000000b9 = security
+
+%(x86_64)DEFINE 0x000000d6 = epoll_ctl_old(fd_t epfd, [printf(select(EPOLL_CTL_ADD, EPOLL_CTL_DEL, EPOLL_CTL_MOD))] syscall_ulong_t op, fd_t fd, struct epoll_event *event): errno_t;
+%(x86_64)[restart(dont)][cp] DEFINE 0x000000d7 = epoll_wait_old(fd_t epfd, struct epoll_event *events, syscall_ulong_t maxevents, syscall_slong_t timeout): errno_t;
+
+//%(x86_64)[restart(dont)] DEFINE 0x000000dc = semtimedop
+//%(x86_64)DEFINE 0x00000140 = kexec_file_load
+%(x86_64)[cp] DEFINE 0x00000106 = fstatat(fd_t dirfd, char const *filename, struct linux64_stat32 *statbuf, [printf(flagset(AT_SYMLINK_NOFOLLOW,AT_DOSPATH))] atflag_t flags): errno_t;
+

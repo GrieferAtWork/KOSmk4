@@ -1,0 +1,318 @@
+/* Copyright (c) 2018 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+import fs;
+import util;
+import * from deemon;
+
+/* Automatically generate enum wrappers */
+
+function printReflowedComment(fp: File, indent: string, doc: string) {
+	if ("\n" !in doc) {
+		fp << doc;
+		return;
+	}
+	if (doc.startswith("/*") && doc.endswith("*/")) {
+		doc = doc[2:-2];
+		local isFirst = true;
+		fp << "/*";
+		for (local l: doc.splitlines(false)) {
+			if (!isFirst) {
+				fp << "\n";
+				l = l.lstrip();
+				fp << indent << " ";
+			}
+			isFirst = false;
+			fp << l.rstrip();
+		}
+		fp << " */";
+	} else {
+		fp << doc;
+	}
+}
+
+function autoFormatEnumsInFile(filename: string) {
+	local data = File.open(filename, "r").read().decode("utf-8");
+	File.Writer fp;
+	local i = 0, len = #data;
+	while (i < len) {
+		local pos = data.find("/*[[[enum]]]*/", i);
+		local temp = data.find("//[[[enum]]]\n", i);
+		if (pos < 0 || (temp >= 0 && temp < pos))
+			pos = temp;
+		if (pos < 0)
+			break;
+		pos = data.find("\n", pos);
+		function err(message: string, offset: int = 0) {
+			print filename,;
+			print "(",;
+			local abs_pos = offset + pos;
+			print data.count("\n", 0, abs_pos) + 1,;
+			local line_start = data.rfind("\n", 0, abs_pos);
+			if (line_start < 0)
+				line_start = 0;
+			print ",",;
+			print abs_pos - line_start,;
+			print ") : Error : ",;
+			print message;
+			throw Error(message);
+		}
+		if (pos < 0)
+			err("Missing /*[[[end]]]*/ tag");
+		local end = data.find("/*[[[end]]]*/", pos);
+		local temp = data.find("//[[[end]]]\n", pos);
+		if (end < 0 || (temp >= 0 && temp < end))
+			end = temp;
+		if (end < 0)
+			err("Missing /*[[[end]]]*/ tag");
+		fp.write(data[i:pos]);
+		local input = data[pos:end];
+		if ("/*[[[AUTO]]]*/" in input)
+			input = input[:input.index("/*[[[AUTO]]]*/")];
+		fp.write(input);
+		if (!input.endswith("\n"))
+			fp.write("\n");
+		@@List of (Name, Value, Prefix, Doc)
+		local knownEnums: {(string, string, string, string)...} = List();
+		local iter = input.find("enum");
+		if (iter < 0)
+			err("Missing `enum' keyword in " + repr(input));
+		iter = input.find("{", iter);
+		if (iter < 0)
+			err("Missing `{' after `enum' in " + repr(input));
+		++iter;
+		local input_len = #input;
+		while (iter < input_len && input.isspace(iter))
+			++iter;
+		local prefixStart = iter;
+		local previousEnumValue = none;
+		while (iter < input_len) {
+			while (iter < input_len && input.isspace(iter))
+				++iter;
+			if (input.issymstrt(iter)) {
+				/* New enum value */
+				while (prefixStart > 0 && !input.islf(prefixStart - 1))
+					--prefixStart;
+				local prefix = input[prefixStart:iter].rstrip();
+				if (prefix)
+					prefix = prefix + "\n";
+				local nameEnd = iter + 1;
+				while (nameEnd < input_len && input.issymcont(nameEnd))
+					++nameEnd;
+				local enumName = input[iter:nameEnd];
+				iter = nameEnd;
+				while (iter < input_len && input.isspace(iter))
+					++iter;
+				local enumValue = none;
+				if (iter < input_len && input[iter] == "=") {
+					++iter;
+					while (iter < input_len && input.isspace(iter))
+						++iter;
+					local enumValueStart = iter;
+					local parenRecursion = 0;
+					while (iter < input_len) {
+						local ch = input[iter];
+						if (ch == "(")
+							++parenRecursion;
+						else if (ch == ")")
+							--parenRecursion;
+						else if (!parenRecursion && (ch.isspace() || ch in [","]))
+							break;
+						++iter;
+					}
+					enumValue = input[enumValueStart:iter];
+					while (iter < input_len && input.isspace(iter))
+						++iter;
+				}
+				if (enumValue is none) {
+					if (previousEnumValue is none)
+						enumValue = "0";
+					else {
+						local newEnumValue =
+							try int(previousEnumValue) + 1 catch (...) none;
+						if (newEnumValue is none) {
+							while (
+								previousEnumValue.startswith("(") &&
+								previousEnumValue.endswith("(") &&
+								previousEnumValue.findmatch("(", ")", 1) == #previousEnumValue - 1)
+								previousEnumValue = previousEnumValue[1:-1].strip();
+							local temp = previousEnumValue.rfind("+");
+							if (temp >= 0) {
+								local addendStr = previousEnumValue[temp:].lstrip();
+								local addend = try
+									int(previousEnumValue[temp:].lstrip())
+								catch (...) none;
+								if (addend !is none) {
+									addend = addend + 1;
+									addend = ("0x" in addendStr || "0X" in addendStr)
+										? addend.hex() : str(addend);
+									enumValue = "({} + {})".format({
+										previousEnumValue[:temp], addend });
+								}
+							}
+							if (enumValue is none)
+								enumValue = "({} + 1)".format({ previousEnumValue });
+						} else if ("0x" in previousEnumValue ||
+						           "0X" in previousEnumValue) {
+							enumValue = newEnumValue.hex();
+						} else {
+							enumValue = str(newEnumValue);
+						}
+					}
+				}
+				if (iter < input_len && input[iter] == ",")
+					++iter;
+				while (iter < input_len && input.isspace(iter))
+					++iter;
+				local enumDoc = "";
+				if (iter + 1 < input_len) {
+					local ch = input[iter];
+					if (ch == "/") {
+						ch = input[iter + 1];
+						if (ch == "*") {
+							local doc_end = input.find("*/", iter+2);
+							if (doc_end < 0)
+								doc_end = input_len;
+							else {
+								doc_end += 2;
+							}
+							enumDoc = input[iter:doc_end];
+							iter = doc_end;
+						} else if (ch == "/") {
+							local doc_end = input.find("\n", iter+2);
+							if (doc_end < 0)
+								doc_end = input_len;
+							enumDoc = input[iter:doc_end];
+							iter = doc_end;
+							/* XXX: Multi-line comments? */
+						}
+					}
+				}
+				knownEnums.append((enumName, enumValue, prefix, enumDoc));
+				previousEnumValue = enumValue;
+				while (iter < input_len && input.isspace(iter))
+					++iter;
+				prefixStart = iter;
+			} else {
+				local ch = input[iter];
+				if (ch == "#") {
+					iter = input.find("\n", iter + 1);
+					if (iter < 0)
+						break;
+				} else if (ch == "/" && iter + 1 < input_len) {
+					ch = input[iter + 1];
+					if (ch == "/") {
+						iter = input.find("\n", iter + 2);
+						if (iter < 0)
+							break;
+						++iter;
+					} else if (ch == "*") {
+						iter = input.find("*/", iter + 2);
+						if (iter < 0)
+							break;
+						iter += 2;
+					} else {
+						err("Unexpected character after `/' " + repr(ch), iter + 1);
+					}
+				} else if (ch == "}") {
+					break;
+				} else {
+					err("Unexpected character " + repr(ch), iter);
+				}
+			}
+		}
+		local suffixEnd = input.findmatch("{", "}", iter);
+		if (suffixEnd < 0)
+			suffixEnd = #input;
+		local suffix = input[prefixStart:suffixEnd].rstrip();
+		if (suffix)
+			suffix = suffix + "\n";
+		local longestEnumName = 0;
+		local longestEnumValue = 0;
+		for (local name, value, none, none: knownEnums) {
+			local temp = #name;
+			if (longestEnumName < temp)
+				longestEnumName = temp;
+			local temp = #value;
+			if (longestEnumValue < temp)
+				longestEnumValue = temp;
+		}
+		fp << "/*[[[AUTO]]]*/\n";
+		fp << "#ifdef __COMPILER_PREFERR_ENUMS\n";
+		for (local name, none, prefix, doc: knownEnums) {
+			local name_uniform = name.ljust(longestEnumName);
+			fp << prefix;
+			fp << "#define " << name_uniform << " ";
+			if (doc) {
+				fp << name_uniform << " ";
+				local indent = " " * ((longestEnumName * 2) + 10);
+				printReflowedComment(fp, indent, doc);
+			} else {
+				fp << name;
+			}
+			fp << "\n";
+		}
+		fp << suffix;
+		fp << "#else /* __COMPILER_PREFERR_ENUMS */\n";
+		for (local name, value, prefix, doc: knownEnums) {
+			name = name.ljust(longestEnumName);
+			fp << prefix;
+			fp << "#define " << name << " ";
+			if (doc) {
+				fp << value.ljust(longestEnumValue) << " ";
+				local indent = " " * (longestEnumValue + 10 + longestEnumName);
+				printReflowedComment(fp, indent, doc);
+			} else {
+				fp << value;
+			}
+			fp << "\n";
+		}
+		fp << suffix;
+		fp << "#endif /* !__COMPILER_PREFERR_ENUMS */\n";
+		i = end;
+	}
+	fp.write(data[i:]);
+	local newData = fp.string.encode("utf-8");
+	if (data != newData) {
+		with (local o = File.open(filename, "w"))
+			o.write(newData);
+	}
+}
+
+
+
+#ifdef __MAIN__
+for (local x: [...][1:]) {
+	print "Begin:",x;
+	autoFormatEnumsInFile(x);
+	print "Done:",x;
+}
+#endif
+
+
+
+
+
+
+
+
+
+
+
+
+

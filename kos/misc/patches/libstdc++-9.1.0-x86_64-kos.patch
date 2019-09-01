@@ -1,0 +1,81 @@
+diff -Naur x86_64-kos-orig/bits/c++locale.h x86_64-kos/bits/c++locale.h
+--- x86_64-kos-orig/bits/c++locale.h	2019-07-16 14:21:20.654509100 +0200
++++ x86_64-kos/bits/c++locale.h	2019-07-16 16:19:54.867771000 +0200
+@@ -53,7 +53,7 @@
+   // fall back to the unsafe vsprintf which, in general, can be dangerous
+   // and should be avoided.
+   inline int
+-  __convert_from_v(const __c_locale&, char* __out,
++  __convert_from_v(const __c_locale&, char* __outarg,
+ 		   const int __size __attribute__((__unused__)),
+ 		   const char* __fmt, ...)
+   {
+@@ -71,9 +71,9 @@
+     __builtin_va_start(__args, __fmt);
+ 
+ #if _GLIBCXX_USE_C99_STDIO && !_GLIBCXX_HAVE_BROKEN_VSNPRINTF
+-    const int __ret = __builtin_vsnprintf(__out, __size, __fmt, __args);
++    const int __ret = __builtin_vsnprintf(__outarg, __size, __fmt, __args);
+ #else
+-    const int __ret = __builtin_vsprintf(__out, __fmt, __args);
++    const int __ret = __builtin_vsprintf(__outarg, __fmt, __args);
+ #endif
+ 
+     __builtin_va_end(__args);
+diff -Naur x86_64-kos-orig/bits/ctype_inline.h x86_64-kos/bits/ctype_inline.h
+--- x86_64-kos-orig/bits/ctype_inline.h	2019-07-16 14:21:20.253843200 +0200
++++ x86_64-kos/bits/ctype_inline.h	2019-07-16 16:19:54.879838300 +0200
+@@ -65,41 +65,41 @@
+ 		switch (__bit)
+ 		  {
+ 		  case space:
+-		    __testis = isspace(__c);
++		    __testis = (isspace)(__c);
+ 		    break;
+ 		  case print:
+-		    __testis = isprint(__c);
++		    __testis = (isprint)(__c);
+ 		    break;
+ 		  case cntrl:
+-		    __testis = iscntrl(__c);
++		    __testis = (iscntrl)(__c);
+ 		    break;
+ 		  case upper:
+-		    __testis = isupper(__c);
++		    __testis = (isupper)(__c);
+ 		    break;
+ 		  case lower:
+-		    __testis = islower(__c);
++		    __testis = (islower)(__c);
+ 		    break;
+ 		  case alpha:
+-		    __testis = isalpha(__c);
++		    __testis = (isalpha)(__c);
+ 		    break;
+ 		  case digit:
+-		    __testis = isdigit(__c);
++		    __testis = (isdigit)(__c);
+ 		    break;
+ 		  case punct:
+-		    __testis = ispunct(__c);
++		    __testis = (ispunct)(__c);
+ 		    break;
+ 		  case xdigit:
+-		    __testis = isxdigit(__c);
++		    __testis = (isxdigit)(__c);
+ 		    break;
+ 		  case alnum:
+-		    __testis = isalnum(__c);
++		    __testis = (isalnum)(__c);
+ 		    break;
+ 		  case graph:
+-		    __testis = isgraph(__c);
++		    __testis = (isgraph)(__c);
+ 		    break;
+ #ifdef _GLIBCXX_USE_C99_CTYPE_TR1
+ 		  case blank:
+-		    __testis = isblank(__c);
++		    __testis = (isblank)(__c);
+ 		    break;
+ #endif
+ 		  default:

@@ -1,0 +1,236 @@
+/* Copyright (c) 2018 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+/* Group compilation steps for working with MTOOLS */
+
+import ipc;
+import fs;
+import * from deemon;
+import OPT_LINK_OUTPUT from .c;
+import * from ..libmagic;
+
+@@Toolchain configuratino: string
+@@The filename of the MTOOLS base executable (`mtools.exe')
+global final TOOLCHAIN_MTOOLS_EXE  = "MTOOLS.exe";
+@@Toolchain configuratino: string
+@@The filename of the MTOOLS disk
+global final TOOLCHAIN_MTOOLS_DISK = "MTOOLS.disk";
+
+/* MFORMAT options */
+global final OPT_MFORMAT_TOTAL_SECTORS    = "MFORMAT.total_sectors";      /* int */
+global final OPT_MFORMAT_HEADS            = "MFORMAT.heads";              /* int */
+global final OPT_MFORMAT_SECTORS_PER_HEAD = "MFORMAT.sectors_per_head";   /* int */
+global final OPT_MFORMAT_VOLUME_LABEL     = "MFORMAT.volume_label";       /* string */
+
+
+@@Option: string
+@@On-disk output filename for MCOPY
+global final OPT_MCOPY_OUTPUT = "MCOPY.output";
+
+@@Option: string
+@@Input file for MCOPY (when unset, use `OPT_LINK_OUTPUT' instead)
+global final OPT_MCOPY_INPUT = "MCOPY.input";
+
+
+local final function mtools_invoke(
+		self: BoundStep, cmd: string, args: {string...}): Waitable {
+	local toolchain_options = self.toolchain.options;
+	local proc = ipc.Process(
+		toolchain_options[TOOLCHAIN_MTOOLS_EXE],
+		["-c", cmd, "-i", toolchain_options[TOOLCHAIN_MTOOLS_DISK], args...]);
+	if (self.toolchain.config.VERBOSE)
+		print "Exec", repr proc.cmdline;
+	proc.start();
+	return WaitableJoin(proc);
+}
+
+local final function MTOOLS_getModifiedOutputFiles(self: BoundStep): {string...} {
+	yield self.toolchain.options[TOOLCHAIN_MTOOLS_DISK];
+}
+local final function MFORMAT_run(self: BoundStep): {Waitable...} {
+	local options = self.group.options;
+	local disk = self.toolchain.options[TOOLCHAIN_MTOOLS_DISK];
+	local num_sectors = options[OPT_MFORMAT_TOTAL_SECTORS];
+	local fp = File.open(disk, "w,nobuf");
+	fp.seek((num_sectors * 512) - 1);
+	fp.write("\0");
+	fp.close();
+	local args = [
+		"-T", str(num_sectors),
+		"-h", str(options[OPT_MFORMAT_HEADS]),
+		"-s", str(options[OPT_MFORMAT_SECTORS_PER_HEAD]),
+	];
+	local label = options.get(OPT_MFORMAT_VOLUME_LABEL);
+	if (label !is none) {
+		args.append("-v");
+		args.append(label);
+	}
+	yield mtools_invoke(self, "mformat", args);
+}
+local final function MFORMAT_tostr(self: BoundStep): string {
+	return "[{}] Mformat {!r}".format({
+		self.group.name,
+		self.toolchain.options[TOOLCHAIN_MTOOLS_DISK],
+	});
+}
+
+
+local final function MMD(self: BoundStep, cache: HashSet with string, path: string) {
+	path = path.replace("\\", "/").strip("/").strip();
+	local head, none, tail = path.rpartition("/")...;
+	if (tail)
+		MMD(self, cache, head);
+	if (path !in cache) {
+		cache.insert(path);
+		try {
+			mtools_invoke(self, "mmd", { "-D", "s", "::/" + path }).waitfor();
+		} catch (...) {
+		}
+	}
+}
+
+final local function MCOPY_split(self: BoundStep): {BoundStep...} {
+	local group = self.group;
+	local options = group.options;
+	local input = options.get(OPT_MCOPY_INPUT);
+	if (input is none)
+		input = options[OPT_LINK_OUTPUT];
+	for (local f: group.enumerateWildcardFiles(input))
+		yield self.createChildStep(f);
+}
+local final function MCOPY_getOutputFilename(
+		options: {string: Object}, input: string): string {
+	local result = options[OPT_MCOPY_OUTPUT].replace("\\", "/").lstrip("/");
+	if (result.endswith("/"))
+		result = result + fs.tailof(input);
+	return result;
+}
+
+local final function MCOPY_run(self: BoundStep): {Waitable...} {
+	local th = Thread([](self: BoundStep) {
+		local group: Group = self.group;
+		local options: {string: Object} = group.options;
+		local input: string = self.userData;
+		final local DISK_MMD_CACHE: string = "MTOOLS.disk_mmd_cache";
+		local toolchain_options: {string: Object} = self.toolchain.options;
+		local mmd_cache: {string: {string...}} = toolchain_options.get(DISK_MMD_CACHE);
+		if (mmd_cache is none)
+			toolchain_options[DISK_MMD_CACHE] = mmd_cache = Dict();
+		local diskname: string = toolchain_options[TOOLCHAIN_MTOOLS_DISK];
+		local known_dirs: HashSet with string = mmd_cache.get(diskname);
+		if (known_dirs is none)
+			mmd_cache[diskname] = known_dirs = HashSet();
+		local output: string = MCOPY_getOutputFilename(options, input);
+		/* Make sure that all directories leading up
+		 * to the file to-be created created exist */
+		MMD(self, known_dirs, output.rpartition("/")[0]);
+		/* Copy the actual file onto the disk. */
+		mtools_invoke(self, "mcopy", {
+			"-D", "o", input, "::/" + output
+		}).waitfor();
+	}, (self, ));
+	th.start();
+	yield WaitableJoin(th);
+}
+local final function MCOPY_getRequiredFiles(self: BoundStep): {string...} {
+	yield self.userData;
+}
+local final function MCOPY_tostr(self: BoundStep): string {
+	local group = self.group;
+	local options = group.options;
+	return "[{}] Mcopy {}:{}".format({
+		group.name,
+		self.toolchain.options[TOOLCHAIN_MTOOLS_DISK],
+		group.options[OPT_MCOPY_OUTPUT],
+	});
+}
+
+
+@@MFORMAT
+@@Create a new disk
+global final MFORMAT = Step(
+	name: "MFORMAT",
+	options: {
+		OPT_MFORMAT_TOTAL_SECTORS,
+		OPT_MFORMAT_HEADS,
+		OPT_MFORMAT_SECTORS_PER_HEAD,
+		OPT_MFORMAT_VOLUME_LABEL,
+	},
+	run: MFORMAT_run,
+	tostr: MFORMAT_tostr,
+	getProducedFiles: MTOOLS_getModifiedOutputFiles,
+);
+
+@@MCOPY
+@@A step used to copy `OPT_MCOPY_INPUT' to the mtools disk `OPT_MCOPY_OUTPUT'
+global final MCOPY = Step(
+	name: "MCOPY",
+	options: {
+		OPT_MCOPY_OUTPUT,
+		OPT_MCOPY_INPUT,
+		OPT_LINK_OUTPUT,
+	},
+	split: MCOPY_split,
+	run: MCOPY_run,
+	tostr: MCOPY_tostr,
+	getRequiredFiles: MCOPY_getRequiredFiles,
+	getModifiedOutputFiles: MTOOLS_getModifiedOutputFiles,
+);
+
+
+
+
+
+@@Find the originating filename (within the host fs) of a given @diskFile filename
+@@If no such filename could be found, return @none instead
+function findDiskFileOrigin(groups: {Group...}, diskFile: string): string | none {
+	diskFile = diskFile.lstrip("/").strip().replace("\\", "/");
+	for (local g: groups) {
+		for (local s: g.steps) {
+			if (s.run !== MCOPY_run)
+				continue;
+			local input: string = g.options.get(OPT_MCOPY_INPUT);
+			if (input is none)
+				input = g.options[OPT_LINK_OUTPUT];
+			local output = MCOPY_getOutputFilename(g.options, input);
+			if (output == diskFile) {
+				/* Found it! */
+				if ("*" in input)
+					input = fs.headof(input) + fs.tailof(output);
+				return g.fixFilename(input);
+			}
+		}
+	}
+	return none;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,11 @@
+{
+	"BuildIncremental": {
+		"Enabled": false
+	},
+	"ExcludedItems": [
+		"__ice__"
+	],
+	"Indexing": {
+		"Enabled": true
+	}
+}

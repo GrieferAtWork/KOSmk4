@@ -1,0 +1,50 @@
+Add a library `libcmdline' for encoding/decoding   char *cmdline <---> char *argv[]
+
+Add support for *_chk variants (using __builtin_object_size())
+
+argp.c
+argz.c
+envz.c
+err.c
+error.c
+langinfo.c
+libgen.c
+locale.c
+nl_types.c
+
+rpc.auth.c
+rpc.auth_des.c
+rpc.auth_unix.c
+rpc.clnt.c
+rpc.des_crypt.c
+rpc.pmap_clnt.c
+rpc.pmap_prot.c
+rpc.pmap_rmt.c
+rpc.rpc.c
+rpc.rpc_des.c
+rpc.rpc_msg.c
+rpc.svc.c
+rpc.svc_auth.c
+rpc.types.c
+rpc.xdr.c
+
+sys.capability.c  (found in /usr/include/sys/capability.h; aka not in arch-headers!)
+sys.fanotify.c
+sys.gmon.c
+sys.gmon_out.c  (Only some macros, and structs)
+sys.inotify.c
+sys.mtio.c  (Only some macros, and structs. - Mainly interesting for ioctl() & the kernel)
+sys.perm.c  (i386-only header)
+sys.prctl.c
+sys.procfs.c  (i386-only header)
+sys.profil.c
+sys.queue.c (It's just like our <hybrid/sequence/list.h>)
+sys.quota.c
+sys.raw.c  (Only some macros, and structs. - Mainly interesting for ioctl() & the kernel)
+sys.reg.c  (It only contains some macros, but those interact with sys/ucontext.h)
+sys.signalfd.c
+sys.sysctl.c (also: rename kos/sysctl.h; and sysctl(2) -- linux also has a function of that same name)
+sys.vtimes.c
+
+gnu.libc-version.c
+

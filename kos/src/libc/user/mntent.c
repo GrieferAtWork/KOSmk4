@@ -1,0 +1,120 @@
+/* Copyright (c) 2019 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef GUARD_LIBC_USER_MNTENT_C
+#define GUARD_LIBC_USER_MNTENT_C 1
+
+#include "../api.h"
+#include "mntent.h"
+
+DECL_BEGIN
+
+
+
+
+
+/*[[[start:implementation]]]*/
+
+/*[[[head:setmntent,hash:0xb7ff44ee]]]*/
+/* Prepare to begin reading and/or writing mount table
+ * entries from the beginning of FILE.  MODE is as for `fopen' */
+INTERN NONNULL((1, 2))
+ATTR_WEAK ATTR_SECTION(".text.crt.database.mntent.setmntent") FILE *
+NOTHROW_RPC(LIBCCALL libc_setmntent)(char const *file,
+                                     char const *mode)
+/*[[[body:setmntent]]]*/
+{
+	CRT_UNIMPLEMENTED("setmntent"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return NULL;
+}
+/*[[[end:setmntent]]]*/
+
+/*[[[head:getmntent,hash:0x243a738c]]]*/
+/* Read one mount table entry from STREAM.  Returns a pointer to storage
+ * reused on the next call, or null for EOF or error (use feof/ferror to check) */
+INTERN NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.database.mntent.getmntent") struct mntent *
+NOTHROW_RPC(LIBCCALL libc_getmntent)(FILE *stream)
+/*[[[body:getmntent]]]*/
+{
+	CRT_UNIMPLEMENTED("getmntent"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return NULL;
+}
+/*[[[end:getmntent]]]*/
+
+/*[[[head:getmntent_r,hash:0x8b32bf41]]]*/
+/* Reentrant version of the above function */
+INTERN NONNULL((1, 2, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.database.mntent.getmntent_r") struct mntent *
+NOTHROW_RPC(LIBCCALL libc_getmntent_r)(FILE *__restrict stream,
+                                       struct mntent *__restrict result,
+                                       char *__restrict buffer,
+                                       __STDC_INT_AS_SIZE_T bufsize)
+/*[[[body:getmntent_r]]]*/
+{
+	CRT_UNIMPLEMENTED("getmntent_r"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return NULL;
+}
+/*[[[end:getmntent_r]]]*/
+
+/*[[[head:addmntent,hash:0x2246ccbc]]]*/
+/* Write the mount table entry described by MNT to STREAM.
+ * Return zero on success, nonzero on failure */
+INTERN NONNULL((1, 2))
+ATTR_WEAK ATTR_SECTION(".text.crt.database.mntent.addmntent") int
+NOTHROW_RPC(LIBCCALL libc_addmntent)(FILE *__restrict stream,
+                                     struct mntent const *__restrict mnt)
+/*[[[body:addmntent]]]*/
+{
+	CRT_UNIMPLEMENTED("addmntent"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return -1;
+}
+/*[[[end:addmntent]]]*/
+
+/*[[[head:endmntent,hash:0xa14d920f]]]*/
+/* Close a stream opened with `setmntent' */
+INTERN NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.database.mntent.endmntent") int
+NOTHROW_RPC_NOKOS(LIBCCALL libc_endmntent)(FILE *stream)
+/*[[[body:endmntent]]]*/
+{
+	CRT_UNIMPLEMENTED("endmntent"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return -1;
+}
+/*[[[end:endmntent]]]*/
+
+/*[[[end:implementation]]]*/
+
+
+
+/*[[[start:exports,hash:0xeafc4b0f]]]*/
+DEFINE_PUBLIC_WEAK_ALIAS(setmntent, libc_setmntent);
+DEFINE_PUBLIC_WEAK_ALIAS(getmntent, libc_getmntent);
+DEFINE_PUBLIC_WEAK_ALIAS(getmntent_r, libc_getmntent_r);
+DEFINE_PUBLIC_WEAK_ALIAS(addmntent, libc_addmntent);
+DEFINE_PUBLIC_WEAK_ALIAS(endmntent, libc_endmntent);
+/*[[[end:exports]]]*/
+
+DECL_END
+
+#endif /* !GUARD_LIBC_USER_MNTENT_C */

@@ -1,0 +1,163 @@
+/* Copyright (c) 2019 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+
+BEGIN
+
+	/* Symbols to keep marked as WEAK in the final library. */
+	final local MANDATORY_WEAK_SYMBOLS = {
+		"__gxx_personality_v0",
+		"__cxa_rethrow",
+		"__cxa_begin_catch",
+		"__cxa_end_catch",
+	};
+
+	SET_NOSTDLIB()
+	SET_SHARED()
+	USELIB("libdl")
+	STATIC_USELIBGCC()
+	GCC_FLAGS({
+		"-ffreestanding",
+	})
+
+	/* Bind DT_INIT / DT_FINI */
+	LD_FLAGS({
+		"-init=libc_init",
+		"-fini=libc_fini",
+	})
+
+	DEFINE("__BUILDING_LIBC")
+
+
+	BEGIN GROUP("libs.libc") { COMPILE };
+		SOURCE({
+			"hybrid/arch/" + TARGET_XARCH + "/*.c",
+			"libc/arch/" + TARGET_XARCH + "/*.c",
+			"libc/*.c",
+			"hybrid/*.c",
+			"auto/*.c",
+			"user/*.c",
+		})
+	END
+	BEGIN GROUP("libs.libc") { COMPILE };
+		SET_LANGUAGE("assembler-with-cpp")
+		SOURCE({
+			"hybrid/arch/" + TARGET_XARCH + "/*" + TARGET_BITS_PER_POINTER + ".S",
+			"libc/arch/" + TARGET_XARCH + "/*" + TARGET_BITS_PER_POINTER + ".S",
+		})
+	END
+
+	final local LIBC_FEATURES_HEADER = "/kos/include/" + TARGET_XARCH + "-kos/crt-features/crt-kos" + CONFIG_FEATURE_FILE_SUFFIX + ".h";
+	final local LIBC_LIB_BINARY = "/" + BINPATH + "/lib/libc.so";
+	BEGIN GROUP("libs.libc") { LINK, ARCHIVE, MCOPY,
+			enumerateSymbolsStep(
+				elfBinary: LIBC_LIB_BINARY,
+				callback: [](self: BoundStep, symbols: {(string,string,string,string,string)...}) {
+					local symbols_set: {string...} = HashSet();
+					for (local symbolName,none,symbolBind,symbolVisi,none,symbolSect: symbols) {
+						if (symbolVisi != "DEFAULT")
+							continue;
+						if (symbolBind != "GLOBAL" && symbolBind != "WEAK")
+							continue;
+						if (symbolName.startswith("kernel_") && (symbolName.endswith("_start") ||
+							symbolName.endswith("_end") || symbolName.endswith("_size")))
+							print "WARNING: Potentially unwanted kernel export:",repr symbolName;
+						if (symbolSect == "UND") {
+							if (symbolName !in {
+								/* Don't warn about stuff that's defined by `libdl.so' */
+								"dlopen", "dlfopen", "dlclose", "dlsym", "dlerror", "dlgethandle",
+								"dlgetmodule", "dladdr", "dlmodulefd", "dlmodulename", "dlexceptaware",
+								"dlmodulebase", "dllocksection", "dlunlocksection", "dlsectionname",
+								"dlsectionindex", "dlsectionmodule", "dlclearcaches", "___tls_get_addr",
+								"__tls_get_addr", "dltlsallocseg", "dltlsfreeseg", "dltlsalloc",
+								"dltlsfree", "dltlsaddr", "__peb", "environ", "_environ",
+								"__environ", "__argc", "__argv", "_pgmptr", "dlauxinfo"
+							}) print "WARNING: Unresolved symbol in libc:",repr symbolName;
+						} else if (symbolName.startswith("libc_"))
+							print "WARNING: Potentially unwanted libc export:",repr symbolName;
+						symbols_set.insert(symbolName);
+					}
+					updateFileContents(self.group.fixFilename(LIBC_FEATURES_HEADER),[](fp: File){
+						fp << COPYRIGHT << "\n\n\n";
+						for (local x: symbols_set.sorted())
+							fp << "#define __CRT_HAVE_" << x << " 1\n";
+					});
+				}
+			).withMaybeModifiedOutputFiles({
+				LIBC_FEATURES_HEADER,
+			}),
+		};
+		SET_OUTPUT(LIBC_LIB_BINARY)
+		LD_FLAGS({ "--gc-sections" })
+		SET_DISKFILE("/lib/libc.so")
+		LINKER_SCRIPT("libc/arch/" + TARGET_XARCH + "/_libc.ld")
+
+		/* `libc' as a static library (link as `OBJECT("$OUTPATH/lib/libc.a")')
+		 * NOTE: Don't forget to turn on `L_FLAGS("-Wl,--gc-sections")', to prevent
+		 *       any function that you didn't use from clobbering your binary */
+		SET_STATIC_OUTPUT("/" + BINPATH + "/lib/libc.a")
+		/* WARNING: Because `AR' is shitty and doesn't understand weak symbols,
+		 *          the order of SOURCE files here is important in that all files
+		 *          containing weak declarations must come _AFTER_ files which may
+		 *          contain the strong declarations of those same symbols.
+		 *          In our case this is quite simple, as all it really means is
+		 *          placing the auto-implementations last. However this is just
+		 *          once again another example of how inconsistent and outdated
+		 *          of a toolchain the GCC backend truely is... (not hating on
+		 *          GCC itself, just on its backing toolchain)
+		 *     -> The error here lies in:
+		 *        - AR, for creating archives with duplicate symbols without
+		 *          taking a closer look at those symbols and selecting the
+		 *          ones that aren't declared as WEAK, and neither displaying
+		 *          an error when more than one symbol is declared as non-WEAK
+		 *        - LD, for blindly trusting AR archives and always choosing
+		 *          the first matching symbol, without looking further to notice
+		 *          that there is more than one option for how that symbol should
+		 *          be bound.
+		 * (Good thing our libc sources don't really feature files containing both
+		 *  weak and strong symbols, so we can just order them from strong to weak)
+		 * REF: https://stackoverflow.com/questions/23079997/override-weak-symbols-in-static-library
+		 */
+		SOURCE({
+			"hybrid/arch/" + TARGET_XARCH + "/*.c",
+			"hybrid/arch/" + TARGET_XARCH + "/*" + TARGET_BITS_PER_POINTER + ".S",
+			"hybrid/*.c",
+			"libc/arch/" + TARGET_XARCH + "/*.c",
+			"libc/arch/" + TARGET_XARCH + "/*" + TARGET_BITS_PER_POINTER + ".S",
+			"libc/*.c",
+			"user/*.c",
+			"auto/*.c",
+		})
+	END
+
+	/* TODO: After linking, edit libc.so to turn all weak symbol declarations into full symbols.
+	 *       Their weakness only stems from the fact that they were used to define auto implementations. */
+
+END
+
+
+
+
+
+
+
+
+
+
+

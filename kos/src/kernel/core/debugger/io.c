@@ -1,0 +1,520 @@
+/*[[[magic
+local gcc_opt = options.setdefault("GCC.options", []);
+if (gcc_opt.remove("-O3"))
+	gcc_opt.append("-Os");
+]]]*/
+/* Copyright (c) 2019 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef GUARD_KERNEL_SRC_DEBUGGER_IO_C
+#define GUARD_KERNEL_SRC_DEBUGGER_IO_C 1
+#define _KOS_SOURCE 1 /* fuzzy_strcasecmp() */
+
+#include <kernel/compiler.h>
+
+#include <kernel/debugger.h>
+#ifndef CONFIG_NO_DEBUGGER
+#include <kernel/vm.h>
+#include <kernel/paging.h>
+#include <sched/task.h>
+
+#include <hybrid/align.h>
+
+#include <sys/io.h>
+
+#include <stdio.h>
+#include <string.h>
+
+#include <libdisasm/disassembler.h>
+#include <libinstrlen/instrlen.h>
+#include <libunwind/unwind.h>
+
+DECL_BEGIN
+
+DEFINE_DEBUG_FUNCTION(
+		"freeze",
+		"freeze\n"
+		"\tFree the debugger in an infinite loop (used to test the F12-reset function)\n",
+		argc, argv) {
+	for (;;)
+		PREEMPTION_WAIT();
+	return 0;
+}
+
+DEFINE_DEBUG_FUNCTION(
+		"apply",
+		"apply\n"
+		"\tApply modifications made to the currently viewed register\n"
+		"\tstate onto the return state (loaded when `exit' is typed)\n"
+		, argc, argv) {
+	if (argc != 1)
+		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	if (THIS_TASK != debug_original_thread) {
+		dbg_printf(DBGSTR("Cannot apply state modifications made to another thread\n"));
+		return 1;
+	}
+	memcpy(&dbg_exitstate,
+	       &dbg_viewstate,
+	       sizeof(dbg_exitstate));
+	return 0;
+}
+
+DEFINE_DEBUG_FUNCTION(
+		"undo",
+		"undo\n"
+		"\tUndo all unapplied changes to the return register state\n"
+		, argc, argv) {
+	if (argc != 1)
+		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	if (THIS_TASK != debug_original_thread)
+		dbg_impersonate_thread(debug_original_thread);
+	memcpy(&dbg_viewstate, &dbg_exitstate, sizeof(dbg_exitstate));
+	return 0;
+}
+
+
+#define LOG_STACK_REMAINDER 1
+
+DEFINE_DEBUG_FUNCTION(
+		"inb",
+		"inb PORT\n"
+		"\tRead from PORT and display the read value on-screen\n",
+		argc, argv) {
+	u16 port;
+	u8 val;
+	if (argc != 2)
+		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	if (sscanf(argv[1], DBGSTR("%I16U"), &port) != 1)
+		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	val = inb((port_t)port);
+	dbg_printf(DBGSTR("inb 0x%.4I16x: 0x%.2I8x (%I8u)\n"), port, val, val);
+	return (uintptr_t)val;
+}
+DEFINE_DEBUG_FUNCTION(
+		"inw",
+		"inw PORT\n"
+		"\tRead from PORT and display the read value on-screen\n",
+		argc, argv) {
+	u16 port;
+	u16 val;
+	if (argc != 2)
+		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	if (sscanf(argv[1], DBGSTR("%I16U"), &port) != 1)
+		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	val = inw((port_t)port);
+	dbg_printf(DBGSTR("inw 0x%.4I16x: 0x%.4I16x (%I16u)\n"), port, val, val);
+	return (uintptr_t)val;
+}
+
+DEFINE_DEBUG_FUNCTION(
+		"inl",
+		"inl PORT\n"
+		"\tRead from PORT and display the read value on-screen\n",
+		argc, argv) {
+	u16 port;
+	u32 val;
+	if (argc != 2)
+		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	if (sscanf(argv[1], DBGSTR("%I16U"), &port) != 1)
+		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	val = inl((port_t)port);
+	dbg_printf(DBGSTR("inl 0x%.4I16x: 0x%.8I32x (%I32u)\n"), port, val, val);
+	return (uintptr_t)val;
+}
+
+DEFINE_DEBUG_FUNCTION(
+		"outb",
+		"outb PORT VAL\n"
+		"\tOutput a given VAL to PORT\n",
+		argc, argv) {
+	u16 port;
+	u8 val;
+	if (argc != 3)
+		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	if (sscanf(argv[1], DBGSTR("%I16U"), &port) != 1 ||
+	    sscanf(argv[2], DBGSTR("%I8U"), &val) != 1)
+		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	dbg_printf(DBGSTR("outb 0x%.4I16x, 0x%.2I8x (%I8u)\n"), port, val, val);
+	outb((port_t)port, val);
+	return (uintptr_t)val;
+}
+
+DEFINE_DEBUG_FUNCTION(
+		"outw",
+		"outw PORT VAL\n"
+		"\tOutput a given VAL to PORT\n",
+		argc, argv) {
+	u16 port;
+	u16 val;
+	if (argc != 3)
+		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	if (sscanf(argv[1], DBGSTR("%I16U"), &port) != 1 ||
+	    sscanf(argv[2], DBGSTR("%I16U"), &val) != 1)
+		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	dbg_printf(DBGSTR("outw 0x%.4I16x, 0x%.4I16x (%I16u)\n"), port, val, val);
+	outw((port_t)port, val);
+	return (uintptr_t)val;
+}
+
+DEFINE_DEBUG_FUNCTION(
+		"outl",
+		"outl PORT VAL\n"
+		"\tOutput a given VAL to PORT\n",
+		argc, argv) {
+	u16 port;
+	u32 val;
+	if (argc != 3)
+		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	if (sscanf(argv[1], DBGSTR("%I16U"), &port) != 1 ||
+	    sscanf(argv[2], DBGSTR("%I32U"), &val) != 1)
+		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	dbg_printf(DBGSTR("outl 0x%.4I16x, 0x%.4I32x (%I32u)\n"), port, val, val);
+	outl((port_t)port, val);
+	return (uintptr_t)val;
+}
+
+
+DEFINE_DEBUG_FUNCTION(
+		"m",
+		"m [-bwlqp] ADDR [COUNT=16|page]\n"
+		"\tPrint a hexdump of COUNT bytes of memory, starting at ADDR\n",
+		argc, argv) {
+	unsigned long count, addr;
+	unsigned int size = 1;
+	while (argc > 2 && argv[1][0] == '-') {
+		/**/ if (!strcmp(argv[1], DBGSTR("-p")))
+			size = sizeof(void *);
+		else if (!strcmp(argv[1], DBGSTR("-b")))
+			size = 1;
+		else if (!strcmp(argv[1], DBGSTR("-w")))
+			size = 2;
+		else if (!strcmp(argv[1], DBGSTR("-l")))
+			size = 4;
+		else if (!strcmp(argv[1], DBGSTR("-q")))
+			size = 8;
+		else
+			return DBG_FUNCTION_INVALID_ARGUMENTS;
+		--argc;
+		++argv;
+	}
+
+	if (argc <= 2)
+		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	count = 16;
+	/**/ if (!strcmp(argv[1], DBGSTR("sp")))
+		addr = FCPUSTATE_SP(dbg_viewstate);
+	else if (sscanf(argv[1], DBGSTR("sp+%lU"), &addr) == 1)
+		addr = FCPUSTATE_SP(dbg_viewstate) + addr;
+	else if (sscanf(argv[1], DBGSTR("sp-%lU"), &addr) == 1)
+		addr = FCPUSTATE_SP(dbg_viewstate) - addr;
+#ifdef __x86_64__
+	else if (!strcmp(argv[1], DBGSTR("bp")))
+		addr = dbg_viewstate.fcs_gpregs.gp_rbp;
+	else if (sscanf(argv[1], DBGSTR("bp+%lU"), &addr) == 1)
+		addr = dbg_viewstate.fcs_gpregs.gp_rbp + addr;
+	else if (sscanf(argv[1], DBGSTR("bp-%lU"), &addr) == 1)
+		addr = dbg_viewstate.fcs_gpregs.gp_rbp - addr;
+#elif defined(__i386__)
+	else if (!strcmp(argv[1], DBGSTR("bp")))
+		addr = dbg_viewstate.fcs_gpregs.gp_ebp;
+	else if (sscanf(argv[1], DBGSTR("bp+%lU"), &addr) == 1)
+		addr = dbg_viewstate.fcs_gpregs.gp_ebp + addr;
+	else if (sscanf(argv[1], DBGSTR("bp-%lU"), &addr) == 1)
+		addr = dbg_viewstate.fcs_gpregs.gp_ebp - addr;
+#endif
+	else if (sscanf(argv[1], DBGSTR("%lx"), &addr) != 1)
+		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	if (argc >= 3) {
+		if (sscanf(argv[2], DBGSTR("%lU"), &count) == 1)
+			;
+		else if (!strcmp(argv[2], DBGSTR("page")))
+			count = pagedir_pagesize() - (addr & (pagedir_pagesize() - 1));
+		else
+			return DBG_FUNCTION_INVALID_ARGUMENTS;
+	}
+	switch (size) {
+	case 1: dbg_printf(DBGSTR("%$[hex]\n"), (size_t)count, (uintptr_t)addr); break;
+	case 2: dbg_printf(DBGSTR("%$I16[hex]\n"), (size_t)count, (uintptr_t)addr); break;
+	case 4: dbg_printf(DBGSTR("%$I32[hex]\n"), (size_t)count, (uintptr_t)addr); break;
+	case 8: dbg_printf(DBGSTR("%$I64[hex]\n"), (size_t)count, (uintptr_t)addr); break;
+	default: break;
+	}
+	return 0;
+}
+
+DEFINE_DEBUG_FUNCTION(
+		"mp",
+		"mp ADDR [COUNT=16|page]\n"
+		"\tAlias for " DF_WHITE("m -p ...") "\n",
+		argc, argv) {
+	unsigned long count, addr;
+	if (argc <= 2)
+		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	count = 16;
+	/**/ if (!strcmp(argv[1], DBGSTR("sp")))
+		addr = FCPUSTATE_SP(dbg_viewstate);
+	else if (sscanf(argv[1], DBGSTR("sp+%lU"), &addr) == 1)
+		addr = FCPUSTATE_SP(dbg_viewstate) + addr;
+	else if (sscanf(argv[1], DBGSTR("sp-%lU"), &addr) == 1)
+		addr = FCPUSTATE_SP(dbg_viewstate) - addr;
+#ifdef __x86_64__
+	else if (!strcmp(argv[1], DBGSTR("bp")))
+		addr = dbg_viewstate.fcs_gpregs.gp_rbp;
+	else if (sscanf(argv[1], DBGSTR("bp+%lU"), &addr) == 1)
+		addr = dbg_viewstate.fcs_gpregs.gp_rbp + addr;
+	else if (sscanf(argv[1], DBGSTR("bp-%lU"), &addr) == 1)
+		addr = dbg_viewstate.fcs_gpregs.gp_rbp - addr;
+#elif defined(__i386__)
+	else if (!strcmp(argv[1], DBGSTR("bp")))
+		addr = dbg_viewstate.fcs_gpregs.gp_ebp;
+	else if (sscanf(argv[1], DBGSTR("bp+%lU"), &addr) == 1)
+		addr = dbg_viewstate.fcs_gpregs.gp_ebp + addr;
+	else if (sscanf(argv[1], DBGSTR("bp-%lU"), &addr) == 1)
+		addr = dbg_viewstate.fcs_gpregs.gp_ebp - addr;
+#endif
+	else if (sscanf(argv[1], DBGSTR("%lx"), &addr) != 1)
+		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	if (argc >= 3) {
+		if (sscanf(argv[2], DBGSTR("%lU"), &count) == 1)
+			;
+		else if (!strcmp(argv[2], DBGSTR("page")))
+			count = pagedir_pagesize() - (addr & (pagedir_pagesize() - 1));
+		else
+			return DBG_FUNCTION_INVALID_ARGUMENTS;
+	}
+	dbg_printf(DBGSTR("%$I[hex]\n"), (size_t)count, (uintptr_t)addr);
+	return 0;
+}
+
+
+PRIVATE ATTR_DBGTEXT NOBLOCK bool
+NOTHROW(KCALL is_pc)(uintptr_t pc) {
+	struct vm_node *node;
+	if (pc < KERNEL_BASE)
+		return false;
+	node = vm_getnodeof(&vm_kernel, VM_ADDR2PAGE((vm_virt_t)pc));
+	if (!node)
+		return false;
+	return (node->vn_prot & VM_PROT_EXEC) != 0;
+}
+
+PRIVATE ATTR_DBGTEXT NONNULL((1)) ssize_t __LIBCCALL
+debug_da_formater(struct disassembler *__restrict self,
+                  unsigned int format_option) {
+	char const *string;
+	if (DISASSEMBLER_FORMAT_ISSUFFIX(format_option))
+		string = DF_RESETATTR;
+	else {
+		switch (format_option) {
+		case DISASSEMBLER_FORMAT_REGISTER_PREFIX: string = DF_SETCOLOR(DBG_COLOR_BLACK, DBG_COLOR_LIGHT_GRAY); break;
+		case DISASSEMBLER_FORMAT_IMMEDIATE_PREFIX:
+		case DISASSEMBLER_FORMAT_OFFSET_PREFIX:
+		case DISASSEMBLER_FORMAT_SCALE_PREFIX: string = DF_SETFGCOLOR(DBG_COLOR_RED); break;
+		case DISASSEMBLER_FORMAT_SYMBOL_PREFIX: string = DF_SETWHITE; break;
+		case DISASSEMBLER_FORMAT_PSEUDOOP_PREFIX: string = DF_SETFGCOLOR(DBG_COLOR_DARK_GRAY); break;
+		case DISASSEMBLER_FORMAT_MNEMONIC_PREFIX: string = DF_SETFGCOLOR(DBG_COLOR_PURPLE); break;
+		default: return 0;
+		}
+	}
+	dbg_print(string);
+	return 0;
+}
+
+
+
+DEFINE_DEBUG_FUNCTION(
+		"disasm",
+		"disasm [PC=registers.PC] [COUNT=<1 instruction>]\n"
+		"\tPrint the disassembly of the given address range\n",
+		argc, argv) {
+	uintptr_t addr, current_pc, count;
+	struct disassembler da;
+	current_pc = FCPUSTATE_PC(dbg_viewstate);
+	current_pc = (uintptr_t)instruction_trypred((void const *)current_pc);
+	addr = current_pc;
+	if (argc >= 2) {
+		if (!strcmp(argv[1], DBGSTR(".")))
+			;
+		else if (sscanf(argv[1], DBGSTR(".+%lU"), &addr) == 1)
+			addr = current_pc + addr;
+		else if (sscanf(argv[1], DBGSTR(".-%lU"), &addr) == 1)
+			addr = current_pc - addr;
+		else if (sscanf(argv[1], DBGSTR("%lx"), &addr) != 1)
+			return DBG_FUNCTION_INVALID_ARGUMENTS;
+	}
+	disasm_init(&da, &dbg_printer, NULL, (void *)addr,
+	            DISASSEMBLER_TARGET_CURRENT,
+	            DISASSEMBLER_FNORMAL, 0);
+	da.d_format = &debug_da_formater;
+	if (argc >= 3) {
+		if (sscanf(argv[2], DBGSTR("%lU"), &count) != 1)
+			return DBG_FUNCTION_INVALID_ARGUMENTS;
+		disasm_print_until(&da, (byte_t *)addr + (size_t)count);
+	} else {
+		disasm_print_instruction(&da);
+		dbg_putc('\n');
+	}
+	return 0;
+}
+
+DEFINE_DEBUG_FUNCTION(
+		"instrlen",
+		"instrlen [PC=registers.PC]\n"
+		"\tPrint the length of the specified instruction\n",
+		argc, argv) {
+	uintptr_t addr, current_pc, length;
+	current_pc = FCPUSTATE_PC(dbg_viewstate);
+	current_pc = (uintptr_t)instruction_trypred((void const *)current_pc);
+	addr = current_pc;
+	if (argc >= 2) {
+		if (!strcmp(argv[1], DBGSTR(".")))
+			;
+		else if (sscanf(argv[1], DBGSTR(".+%lU"), &addr) == 1)
+			addr = current_pc + addr;
+		else if (sscanf(argv[1], DBGSTR(".-%lU"), &addr) == 1)
+			addr = current_pc - addr;
+		else if (sscanf(argv[1], DBGSTR("%lx"), &addr) != 1)
+			return DBG_FUNCTION_INVALID_ARGUMENTS;
+	}
+	length = instruction_length((void *)addr);
+	dbg_printf(DBGSTR("%Iu\n"), length);
+	return 0;
+}
+
+DEFINE_DEBUG_FUNCTION(
+		"trace",
+		"\tDisplay a traceback for the current source location\n"
+		"\tInlined functions are displayed in blue\n"
+		"\tPC       IS   Name           Off   File    Line  Info\n"
+		"\tC01936B0+5   [dwarf_fde_find+245] [dwarf.c:262] [...]\n"
+		"\tPC:   Program counter position\n"
+		"\tIS:   Instriction/inline size\n"
+		"\tName: Name of the surrounding function\n"
+		"\tOff:  Offset of PC from the surrounding function's start\n"
+		"\tFile: Last component of the associated source's filename\n"
+		"\tLine: Line number within File of the associated source code\n"
+		"\tInfo: Additional information\n",
+		argc, argv) {
+	struct ucpustate state;
+	unsigned int error;
+#ifdef LOG_STACK_REMAINDER
+	uintptr_t last_good_sp;
+#endif
+	if (argc != 1)
+		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	FCPUSTATE_TO_UCPUSTATE(state, dbg_viewstate);
+#ifdef LOG_STACK_REMAINDER
+	last_good_sp = UCPUSTATE_SP(state);
+#endif
+	dbg_addr2line_printf((uintptr_t)instruction_trypred((void const *)UCPUSTATE_PC(state)),
+	                     (uintptr_t)UCPUSTATE_PC(state),
+	                     DBGSTR("sp=%p"), (void *)UCPUSTATE_SP(state));
+	for (;;) {
+		struct ucpustate old_state;
+		memcpy(&old_state, &state, sizeof(old_state));
+		error = unwind((void *)UCPUSTATE_PC(old_state),
+		               &unwind_getreg_ucpustate, &old_state,
+		               &unwind_setreg_ucpustate, &state);
+		if (error != UNWIND_SUCCESS)
+			break;
+		dbg_addr2line_printf((uintptr_t)instruction_trypred((void const *)UCPUSTATE_PC(state)),
+		                     (uintptr_t)UCPUSTATE_PC(state), DBGSTR("sp=%p"),
+		                     (void *)UCPUSTATE_SP(state));
+#ifdef LOG_STACK_REMAINDER
+		last_good_sp = UCPUSTATE_SP(state);
+#endif
+	}
+	if (error != UNWIND_NO_FRAME)
+		dbg_printf(DBGSTR("Unwind failure: %u\n"), error);
+#ifdef LOG_STACK_REMAINDER
+	{
+		struct vm_node const *stack = stack_current();
+		if ((vm_virt_t)last_good_sp >= VM_NODE_MINADDR(stack) &&
+		    (vm_virt_t)last_good_sp <= VM_NODE_MAXADDR(stack)) {
+			bool is_first = true;
+#ifdef __ARCH_STACK_GROWS_DOWNWARDS
+			uintptr_t iter, end;
+			end  = (uintptr_t)VM_NODE_ENDADDR(stack);
+			iter = CEIL_ALIGN(last_good_sp, sizeof(void *));
+			for (; iter < end; iter += sizeof(void *))
+#else
+			uintptr_t iter, begin;
+			iter  = CEIL_ALIGN(last_good_sp, sizeof(void *));
+			begin = (uintptr_t)VM_NODE_MINADDR(stack);
+			while (iter > begin)
+#endif
+			{
+				void *pc;
+#ifndef __ARCH_STACK_GROWS_DOWNWARDS
+				iter -= sizeof(void *);
+#endif
+				pc = *(void **)iter;
+				if (!is_pc((uintptr_t)pc))
+					continue;
+				if (is_first) {
+					dbg_printf(DBGSTR("Analyzing remainder of stack:\n"));
+					is_first = false;
+				}
+				dbg_addr2line_printf((uintptr_t)instruction_trypred(pc),
+				                     (uintptr_t)pc, DBGSTR("pc@%p"), iter
+#ifdef __ARCH_STACK_GROWS_DOWNWARDS
+				                                             - sizeof(void *)
+#endif
+				                     );
+			}
+		}
+	}
+#endif
+	return 0;
+}
+
+DEFINE_DEBUG_FUNCTION(
+		"a2l",
+		"a2l [ADDR=PC] [ADDR...]\n"
+		"\tPrint the source location name for the given ADDR\n",
+		argc, argv) {
+	uintptr_t addr, current_pc;
+again:
+	--argc;
+	++argv;
+	current_pc = FCPUSTATE_PC(dbg_viewstate);
+	current_pc = (uintptr_t)instruction_trypred((void const *)current_pc);
+	addr = current_pc;
+	if (argc >= 1) {
+		if (!strcmp(argv[0], DBGSTR(".")))
+			;
+		else if (sscanf(argv[0], DBGSTR(".+%lU"), &addr) == 1)
+			addr = current_pc + addr;
+		else if (sscanf(argv[0], DBGSTR(".-%lU"), &addr) == 1)
+			addr = current_pc - addr;
+		else if (sscanf(argv[0], DBGSTR("%lx"), &addr) != 1) {
+			return DBG_FUNCTION_INVALID_ARGUMENTS;
+		}
+		current_pc = (uintptr_t)instruction_trysucc((void const *)addr);
+	}
+	dbg_addr2line_printf((uintptr_t)addr, (uintptr_t)current_pc, NULL);
+	if (argc > 1)
+		goto again;
+	return 0;
+}
+
+
+DECL_END
+#endif /* !CONFIG_NO_DEBUGGER */
+
+#endif /* !GUARD_KERNEL_SRC_DEBUGGER_IO_C */

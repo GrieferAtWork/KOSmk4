@@ -1,0 +1,51 @@
+/* Copyright (c) 2019 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef _CXX_NEW
+#define _CXX_NEW 1
+
+#include <__stdcxx.h>
+#include <bits/types.h>
+#include <bits/c++/operator_new.h>
+#include <bits/c++/bad_alloc.h>
+#ifdef __USE_ISOCXX11
+#include <bits/c++/bad_array_new_length.h>
+#endif /* __USE_ISOCXX11 */
+
+__CXXDECL_BEGIN
+__NAMESPACE_STD_BEGIN
+
+#ifndef __std_nothrow_defined
+#define __std_nothrow_defined 1
+#if defined(__KOS__) && defined(__KERNEL__)
+__LOCAL_LIBC_CONST_DATA(nothrow) nothrow_t const nothrow = nothrow_t();
+#else /* __KOS__ && __KERNEL__ */
+extern nothrow_t const nothrow; /* _ZSt7nothrow */
+#endif /* !__KOS__ || !__KERNEL__ */
+#endif /* !__std_nothrow_defined */
+
+typedef void (__LIBCCALL *new_handler)();
+extern new_handler __LIBCCALL set_new_handler(new_handler __new_handler) __CXX_NOEXCEPT;
+#ifdef __USE_ISOCXX11
+extern new_handler __LIBCCALL get_new_handler() __CXX_NOEXCEPT;
+#endif /* __USE_ISOCXX11 */
+
+__NAMESPACE_STD_END
+__CXXDECL_END
+
+#endif /* !_CXX_NEW */

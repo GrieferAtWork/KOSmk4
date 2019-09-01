@@ -1,0 +1,119 @@
+/* Copyright (c) 2018 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+/* General purpose build steps, such as copying updated files */
+
+import fs;
+import * from deemon;
+import * from ..libmagic;
+
+@@Option: string
+@@Copy source filename
+global final OPT_COPYFILE_SRC = "COPYFILE.src";
+@@Option: string
+@@Copy target filename
+global final OPT_COPYFILE_DST = "COPYFILE.dst";
+
+final local function COPYFILE_run(self: BoundStep): {Waitable...} {
+	local th = Thread([](self: BoundStep) {
+		local group = self.group;
+		local dst = group.fixFilename(group.options[OPT_COPYFILE_DST]);
+		try fs.unlink(dst); catch (...);
+		fs.copyfile(group.fixFilename(group.options[OPT_COPYFILE_SRC]), dst);
+	}, (self, ));
+	th.start();
+	yield WaitableJoin(th);
+}
+final local function COPYFILE_tostr(self: BoundStep): string {
+	local group = self.group;
+	return "[{}] Copy {!r} to {!r}".format({
+		self.group.name,
+		group.fixFilename(group.options[OPT_COPYFILE_SRC]),
+		group.fixFilename(group.options[OPT_COPYFILE_DST]),
+	});
+}
+final local function COPYFILE_getRequiredFiles(self: BoundStep): {string...} {
+	local group = self.group;
+	yield group.fixFilename(group.options[OPT_COPYFILE_SRC]);
+}
+final local function COPYFILE_getProducedFiles(self: BoundStep): {string...} {
+	local group = self.group;
+	yield group.fixFilename(group.options[OPT_COPYFILE_DST]);
+}
+
+
+@@COPYFILE
+@@A step used to copy `OPT_COPYFILE_SRC' to `OPT_COPYFILE_DST'
+global final COPYFILE = Step(
+	name: "COPYFILE",
+	options: {
+		OPT_COPYFILE_SRC,
+		OPT_COPYFILE_DST,
+	},
+	run: COPYFILE_run,
+	tostr: COPYFILE_tostr,
+	getRequiredFiles: COPYFILE_getRequiredFiles,
+	getProducedFiles: COPYFILE_getProducedFiles,
+);
+
+
+@@Invoke @callback(fp: file) Update the contents of @filename if the
+@@file didn't exist, or its contents differed from what @callback writes
+@@@return @true  The file was updated
+@@@return @false The file didn't need to be updated
+function updateFileContents(filename: string, callback: Callable): bool {
+	local fp = try File.open(filename, "r") catch (...) none;
+	if (fp is none) {
+		fp = File.open(filename, "w");
+		callback(fp);
+		return true;
+	}
+	File.Writer tempfp;
+	callback(tempfp);
+	tempfp = tempfp.string.encode("utf-8");
+	if (fp.size() != #tempfp) {
+		fp.close();
+	} else {
+		local oldData = fp.read();
+		fp.close();
+		if (oldData == tempfp)
+			return false;
+	}
+	with (fp = File.open(filename, "w"))
+		fp.write(tempfp);
+	return true;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

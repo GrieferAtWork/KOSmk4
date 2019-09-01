@@ -1,0 +1,285 @@
+/* Copyright (c) 2018 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifdef __WINDOWS__
+#define HOST_EXE(x)  x ".exe"
+#else
+#define HOST_EXE(x)  x
+#endif
+
+/* Build steps designed specifically for working with ELF files */
+import fs;
+import ipc;
+import * from deemon;
+import * from errors;
+import * from ..libmagic;
+import OPT_LINK_OUTPUT from .c;
+
+local function file_getcu(fp: File): int {
+	local result = fp.getc();
+	if (result < 0)
+		result = 256 + result;
+	return result;
+}
+local function file_read2le(fp: File): int {
+	local result = file_getcu(fp);
+	result = result | file_getcu(fp) << 8;
+	return result;
+}
+local function file_read4le(fp: File): int {
+	local result = file_getcu(fp);
+	result = result | file_getcu(fp) << 8;
+	result = result | file_getcu(fp) << 16;
+	result = result | file_getcu(fp) << 24;
+	return result;
+}
+
+
+function ElfSymbolHash(name) {
+	local h = 0, g;
+	for (local c: name) {
+		h = ((h << 4) + c.ord()) & 0xffffffff;
+		g = h & 0xf0000000;
+		if (g) h ^= g >> 24;
+		h &= ~g;
+	}
+	return h;
+}
+
+
+
+@@Option: string
+@@The input file (When not set, use `OPT_LINK_OUTPUT' instead)
+global final OPT_ELF_FLATTEN_INPUT: string = "ELF_FLATTEN.input";
+@@Option: string
+global final OPT_ELF_FLATTEN_OUTPUT: string = "ELF_FLATTEN.output";
+global final OPT_ELF_FLATTEN_PHYS_BASE: string = "ELF_FLATTEN.phys_base"; /* int = 0 */
+global final OPT_ELF_FLATTEN_VIRT_BASE: string = "ELF_FLATTEN.virt_base"; /* int = 0 */
+global final OPT_ELF_FLATTEN_KEEP_BSS: string = "ELF_FLATTEN.keep_bss";   /* bool = false */
+global final OPT_ELF_FLATTEN_OVERRIDE_ENTRY: string = "ELF_FLATTEN.override_entry"; /* bool = false */
+global final OPT_ELF_FLATTEN_ALLOWED_HEADERS: string = "ELF_FLATTEN.allowed_headers"; /* {int...} = none */
+global final OPT_ELF_FLATTEN_REQUIRE_NO_RELOCATIONS: string = "ELF_FLATTEN.require_no_relocations"; /* bool = true */
+
+
+@@Flatten an ELF binary into a raw memory image
+@@@param inputFile:            Filename of the input ELF binary
+@@@param outputFile:           Filename of the output flat binary
+@@@param physBase:             When non-ZERO, the physical base address (used to adjust load addresses).
+@@@param virtBase:             When non-ZERO, the vitual base address (used to adjust pointers).
+@@@param keepBss:              When true, explicitly fill trailing BSS memory with zeroes
+@@@param overrideEntry:        When true, override the first couple of bytes of the
+@@                             output binary with an arch-specific jump instruction
+@@                             to start execution at the entry point defined in the
+@@                             ELF header
+@@@param allowedHeaders:       List of program headers indices that should be kept
+@@                             When @none, all headers are kept
+@@@param requireNoRelocations: When true, assert that no piece of code that is being
+@@                             kept would be affected by relocations.
+@@                             If this isn't the case, print+throw an error
+function flattenElfBinary(
+		inputFile: string, outputFile: string,
+		physBase: int = 0, virtBase: int = 0,
+		keepBss: bool = false, overrideEntry: bool = false,
+		allowedHeaders: {int...} = none,
+		requireNoRelocations: bool = true) {
+	with (local o = File.open(outputFile, "wb,nobuf")) {
+		local e_entry;
+		with (local i = File.open(inputFile, "rb")) {
+			/* TODO: Support for Elf64_Ehdr */
+			i.seek(24); /* offsetof(Elf32_Ehdr, e_entry); */
+			e_entry = file_read4le(i);
+			//i.seek(28); /* offsetof(Elf32_Ehdr, e_phoff); */
+			local e_phoff = file_read4le(i);
+			i.seek(42); /* offsetof(Elf32_Ehdr, e_phentsize); */
+			local e_phentsize = file_read2le(i);
+			local e_phnum = file_read2le(i);
+			for (local phi = 0; phi < e_phnum; ++phi) {
+				i.seek(e_phoff + (phi * e_phentsize));
+				local p_type = file_read4le(i);
+				if (p_type == 1 ||                          /* PT_LOAD */
+				   (requireNoRelocations && p_type == 2)) { /* PT_DYNAMIC */
+					if (p_type == 1 && allowedHeaders !is none && phi !in allowedHeaders)
+						continue; /* Ignore this header! */
+					local p_offset = file_read4le(i);
+					local p_vaddr  = file_read4le(i);
+					local p_paddr  = file_read4le(i);
+					local p_filesz = file_read4le(i);
+					local p_memsz  = file_read4le(i);
+					local p_flags  = file_read4le(i);
+					local p_align  = file_read4le(i);
+					if (p_type == 2) { /* PT_DYNAMIC */
+						assert requireNoRelocations;
+						/* TODO */
+						continue;
+					}
+					if (p_paddr < physBase) {
+						print "Error: {!r}.PHDR[{}].p_paddr({}) < {}"
+							.format({ inputFile, phi, p_paddr.hex(), physBase.hex() });
+						throw Error("Program header physical address is out of bounds");
+					}
+					i.seek(p_offset);
+					o.seek(p_paddr - physBase);
+					local data = i.read(p_filesz);
+					o.write(data);
+					if (keepBss && p_memsz > p_filesz) {
+						o.seek((p_paddr - physBase) + p_memsz - 1);
+						o.write("\0");
+					}
+				}
+			}
+		}
+		if (overrideEntry) {
+			o.seek(0);
+			o.putc(0xe9);               /* jmp rel32 */
+			local off = (e_entry - virtBase) - 5;
+			o.putc(off & 0xff);
+			o.putc((off >> 8) & 0xff);
+			o.putc((off >> 16) & 0xff);
+			o.putc((off >> 24) & 0xff);
+		}
+	}
+}
+
+
+local final function ELF_FLATTEN_run(self: BoundStep): {Waitable...} {
+	local th = Thread([](self: BoundStep) {
+		local group = self.group;
+		local options = group.options;
+		local input = options.get(OPT_ELF_FLATTEN_INPUT);
+		if (input is none)
+			input = options[OPT_LINK_OUTPUT];
+		flattenElfBinary(
+			inputFile:            group.fixFilename(input),
+			outputFile:           group.fixFilename(options[OPT_ELF_FLATTEN_OUTPUT]),
+			physBase:             options.get(OPT_ELF_FLATTEN_PHYS_BASE, 0),
+			virtBase:             options.get(OPT_ELF_FLATTEN_VIRT_BASE, 0),
+			keepBss:              options.get(OPT_ELF_FLATTEN_KEEP_BSS, false),
+			overrideEntry:        options.get(OPT_ELF_FLATTEN_OVERRIDE_ENTRY, false),
+			allowedHeaders:       options.get(OPT_ELF_FLATTEN_ALLOWED_HEADERS),
+			requireNoRelocations: options.get(OPT_ELF_FLATTEN_REQUIRE_NO_RELOCATIONS, true),
+		);
+	}, (self, ));
+	th.start();
+	yield WaitableJoin(th);
+}
+local final function ELF_FLATTEN_tostr(self: BoundStep): string {
+	local group = self.group;
+	local options = group.options;
+	local input = options.get(OPT_ELF_FLATTEN_INPUT);
+	if (input is none)
+		input = options[OPT_LINK_OUTPUT];
+	return "[{}] Flatten {!r} to {!r}".format({
+		self.group.name,
+		group.fixFilename(input),
+		group.fixFilename(options[OPT_ELF_FLATTEN_OUTPUT]),
+	});
+}
+local final function ELF_FLATTEN_getRequiredFiles(self: BoundStep): {string...} {
+	local group = self.group;
+	local options = group.options;
+	local input = options.get(OPT_ELF_FLATTEN_INPUT);
+	if (input is none)
+		input = options[OPT_LINK_OUTPUT];
+	yield group.fixFilename(input);
+}
+local final function ELF_FLATTEN_getProducedFiles(self: BoundStep): {string...} {
+	local group = self.group;
+	yield group.fixFilename(group.options[OPT_ELF_FLATTEN_OUTPUT]);
+}
+
+global final ELF_FLATTEN: Step = Step(
+	name: "ELF_FLATTEN",
+	options: {
+		OPT_ELF_FLATTEN_INPUT,
+		OPT_ELF_FLATTEN_OUTPUT,
+		OPT_ELF_FLATTEN_PHYS_BASE,
+		OPT_ELF_FLATTEN_VIRT_BASE,
+		OPT_ELF_FLATTEN_KEEP_BSS,
+		OPT_ELF_FLATTEN_OVERRIDE_ENTRY,
+		OPT_ELF_FLATTEN_ALLOWED_HEADERS,
+		OPT_ELF_FLATTEN_REQUIRE_NO_RELOCATIONS,
+	},
+	run: ELF_FLATTEN_run,
+	tostr: ELF_FLATTEN_tostr,
+	getRequiredFiles: ELF_FLATTEN_getRequiredFiles,
+	getProducedFiles: ELF_FLATTEN_getProducedFiles,
+);
+
+
+
+
+@@@param callback: Callable as callback(self: BoundStep, symbols: {(string, string, string, string, string, string)...})
+@@                 The strings are (symbolName, symbolType, symbolBind, symbolVisi, symbolSect, symbolSize)
+function enumerateSymbolsStep(elfBinary: string, callback: Callable): Step {
+	local result = Step();
+	result.name = "ENUM_SYMBOLS";
+	result.options = {};
+	result.tostr = [](self: BoundStep): string {
+		return "[{}] Enum symbols of {!r}".format({
+			self.group.name,
+			self.group.fixFilename(elfBinary),
+		});
+	};
+	result.run = [](self: BoundStep): {Waitable...} {
+		local readelf_bin = HOST_EXE(self.toolchain.config.CROSS_PREFIX + "readelf");
+		local readelf = ipc.Process(readelf_bin, { "-s", "-W", self.group.fixFilename(elfBinary) });
+		local r, w = ipc.Pipe.new()...;
+		r = File.Buffer(r, "ro,c,none"); /* line-buffered */
+		readelf.stdout = w;
+		readelf.start();
+		w.close();
+		try {
+			callback(self, []{
+				for (local l: r) {
+					local symbolName, symbolType, symbolBind, symbolVisi, symbolSize, symbolSect;
+					try {
+						none, none, symbolSize, symbolType,
+						symbolBind, symbolVisi, symbolSect, symbolName =
+							l.scanf(" %[0-9]: %[0-9a-fA-F] %[0-9xXa-fA-F] %[^ ] %[^ ] %[^ ] %[^ ] %[^]")...;
+					} catch (...) {
+						continue;
+					}
+					yield (
+						symbolName.rstrip(),
+						symbolType,
+						symbolBind,
+						symbolVisi,
+						symbolSize,
+						symbolSect
+					);
+				}
+			}());
+		} catch (...) {
+			try readelf.terminate(); catch (...);
+			throw;
+		}
+		r.close();
+		joinProcess(readelf);
+	};
+	return result.withRequiredFiles({ elfBinary });
+}
+
+
+
+
+
+
+
+
+
+

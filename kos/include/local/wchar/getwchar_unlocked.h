@@ -1,0 +1,47 @@
+/* HASH 0xb24d11c5 */
+/* Copyright (c) 2019 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef __local_getwchar_unlocked_defined
+#include <features.h>
+#if (defined(__CRT_HAVE_getwc_unlocked) || defined(__CRT_HAVE_fgetwc_unlocked) || defined(__CRT_HAVE__fgetwc_nolock)) && !defined(__NO_STDSTREAMS)
+#define __local_getwchar_unlocked_defined 1
+#include <kos/anno.h>
+/* Dependency: "getwc_unlocked" */
+#ifndef ____localdep_getwc_unlocked_defined
+#define ____localdep_getwc_unlocked_defined 1
+#if defined(__CRT_HAVE_getwc_unlocked)
+__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,,__localdep_getwc_unlocked,(__FILE *__restrict __stream),getwc_unlocked,(__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE_fgetwc_unlocked)
+__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,,__localdep_getwc_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream)) __THROWS(...)
+#elif defined(__CRT_HAVE__fgetwc_nolock)
+__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,,__localdep_getwc_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream)) __THROWS(...)
+#else /* LIBC: getwc_unlocked */
+#undef ____localdep_getwc_unlocked_defined
+#endif /* getwc_unlocked... */
+#endif /* !____localdep_getwc_unlocked_defined */
+
+__NAMESPACE_LOCAL_BEGIN
+__LOCAL_LIBC(getwchar_unlocked) __WINT_TYPE__
+(__LIBCCALL __LIBC_LOCAL_NAME(getwchar_unlocked))(void) __THROWS(...) {
+#line 833 "kos/src/libc/magic/wchar.c"
+	return __localdep_getwc_unlocked(__LOCAL_stdin);
+}
+__NAMESPACE_LOCAL_END
+#endif /* (defined(__CRT_HAVE_getwc_unlocked) || defined(__CRT_HAVE_fgetwc_unlocked) || defined(__CRT_HAVE__fgetwc_nolock)) && !defined(__NO_STDSTREAMS) */
+#endif /* !__local_getwchar_unlocked_defined */

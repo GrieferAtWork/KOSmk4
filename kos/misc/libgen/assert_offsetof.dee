@@ -1,0 +1,271 @@
+/* Copyright (c) 2018 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+import fs;
+import * from deemon;
+
+
+final local SIZEOF_MACRO_PATTERNS = {
+	"SIZEOF_{typ}",
+	"__SIZEOF_{typ}",
+	"{typ}_SIZE",
+	"__{typ}_SIZE",
+	"__SIZEOF_{typ}__",
+	"__SIZEOF_{typ}_T__",
+};
+
+final local ALIGNOF_MACRO_PATTERNS = {
+	"ALIGNOF_{typ}",
+	"__ALIGNOF_{typ}",
+	"{typ}_ALIGN",
+	"__{typ}_ALIGN",
+	"__ALIGNOF_{typ}__",
+	"__ALIGNOF_{typ}_T__",
+};
+
+final local OFFSET_MACRO_PATTERNS = {
+	"OFFSET_{typ}_",
+	"__OFFSET_{typ}_",
+	"OFFSETOF_{typ}_",
+	"__OFFSETOF_{typ}_",
+	"{typ}_OFFSET_",
+	"__{typ}_OFFSET_",
+	"{typ}_OFFSETOF_",
+	"__{typ}_OFFSETOF_",
+};
+
+
+function enumerateCommentSpecs(comment: string): {string...} {
+	local i = 0;
+	while (i < #comment) {
+		local spec = comment.find("[", i);
+		if (spec < 0)
+			break;
+		local spec_end = comment.findmatch("[", "]", spec + 1);
+		if (spec_end < 0)
+			break;
+		yield comment[spec + 1:spec_end].strip();
+		i = spec_end + 1;
+	}
+}
+
+
+function generateAssertions(
+		structFile: string, structTypes: {string...} = none,
+		assertOffsetMacro: string = "STATIC_ASSERT(offsetof({typ}, {field}) == {value});\n",
+		assertSizeofMacro: string = "STATIC_ASSERT(sizeof({typ}) == {value});\n",
+		assertAlignofMacro: string = "STATIC_ASSERT(alignof({typ}) == {value});\n") {
+	local knownMacros: {string: string | none} = Dict();
+	local knownStructs: {(string,string)...} = List();
+	local knownStructPrefixes: {string: string} = Dict();
+	local callerFile = Traceback()[1].file;
+	structFile = fs.abspath(structFile, fs.headof(callerFile));
+	
+	for (local l: File.open(structFile)) {
+		l = l.strip().decode("utf-8");
+		if (l.startswith("#")) {
+			l = l[1:].lstrip();
+			if (l.startswith("define ")) {
+				l = l[#"define ":];
+				local nameEnd = 0;
+				while (nameEnd < #l && l.issymcont(nameEnd))
+					++nameEnd;
+				if (nameEnd < #l && l[nameEnd] == "(")
+					continue; /* Don't include function-type macros. */
+				local name = l[:nameEnd];
+				local field = none;
+				if (name !in knownMacros) {
+					if ("/*" in l) {
+						local comment = l[l.index("/*")+2:].lstrip();
+						if ("*/" in comment)
+							comment = comment[:comment.index("*/")];
+						for (local spec_str: enumerateCommentSpecs(comment)) {
+							if (spec_str.startswith("FIELD") ||
+							    spec_str.startswith("field")) {
+								spec_str = spec_str[#"FIELD":].lstrip();
+								if (spec_str.startswith("(") &&
+								    spec_str.findmatch("(", ")", 1) == #spec_str - 1) {
+									field = spec_str[1:-1].strip();
+									goto got_field;
+								}
+							}
+						}
+					}
+got_field:
+					knownMacros[name] = field.split(",");
+				}
+				continue;
+			}
+			continue;
+		}
+		local struct_pos = l.find("struct");
+		if (struct_pos >= 0) {
+			l = l[struct_pos + #"struct":].lstrip();
+			for (;;) {
+				local new_l = l;
+				for (local attr: { "__ATTR_PACKED", "ATTR_PACKED" })
+					new_l = new_l.lsstrip(attr).lstrip();
+				for (local attr: { "__ATTR_ALIGNED", "ATTR_ALIGNED" }) {
+					if (new_l.startswith(attr)) {
+						new_l = new_l[#attr:].lstrip();
+						if (new_l.startswith("(")) {
+							local end = new_l.findmatch("(", ")", 1);
+							if (end >= 0)
+								new_l = new_l[end + 1:].lstrip();
+						}
+					}
+				}
+				if (l == new_l)
+					break;
+				l = new_l;
+			}
+			if (!l)
+				continue;
+			if (l.issymstrt(0)) {
+				local nameEnd = 0;
+				while (nameEnd < #l && l.issymcont(nameEnd))
+					++nameEnd;
+				local name = l[:nameEnd];
+				local macro_name = name;
+				l = l[nameEnd:].lstrip();
+				if (l.startswith("/*")) {
+					local comment = l[2:];
+					if ("*/" in comment) {
+						local idx = comment.index("*/");
+						l = comment[idx+2:].lstrip();
+						comment = comment[:idx];
+					}
+					for (local spec_str: enumerateCommentSpecs(comment)) {
+						if (spec_str.startswith("NAME") ||
+						    spec_str.startswith("name")) {
+							spec_str = spec_str[#"NAME":].lstrip();
+							if (spec_str.startswith("(") &&
+							    spec_str.findmatch("(", ")", 1) == #spec_str - 1) {
+								macro_name = spec_str[1:-1].strip();
+							}
+						}
+						if (spec_str.startswith("PREFIX") ||
+						    spec_str.startswith("prefix")) {
+							spec_str = spec_str[#"PREFIX":].lstrip();
+							if (spec_str.startswith("(") &&
+							    spec_str.findmatch("(", ")", 1) == #spec_str - 1) {
+								knownStructPrefixes[name] = spec_str[1:-1].strip();
+							}
+						}
+					}
+				}
+				if (l.startswith("{")) {
+					name = (name,macro_name);
+					if (name !in knownStructs)
+						knownStructs.append(name);
+				} else {
+//					print File.stderr: repr(name), repr(l);
+				}
+				continue;
+			}
+			continue;
+		}
+	}
+	/* Generate assertions for all structures. */
+	for (local typ, macro_typ: knownStructs) {
+		print;
+		print "/* struct", typ, "*/";
+		@@Mapping from UPPERCASE_FIELD_NAME -> MACRO
+		local knownFields: {string: string} = Dict();
+		for (local pat: OFFSET_MACRO_PATTERNS) {
+			local fieldPrefix = pat.format({ .typ = macro_typ.upper() });
+			for (local mac, none: knownMacros) {
+				if (mac.startswith(fieldPrefix)) {
+					local field_name = mac[#fieldPrefix:];
+					if (field_name in knownFields)
+						continue;
+					knownFields[field_name] = mac;
+				}
+			}
+		}
+		local fields = knownFields.keys.sorted();
+		for (local field: fields) {
+			local macro = knownFields[field];
+			local fieldOverride = knownMacros[macro];
+			if (fieldOverride !is none)
+				field = fieldOverride;
+			else {
+				local prefix = knownStructPrefixes.get(typ);
+				if (prefix is none) {
+					prefix = typ;
+					if ("_" in prefix)
+						prefix = prefix[:prefix.index("_")];
+					if (prefix.endswith("32") || prefix.endswith("64"))
+						prefix = prefix[:-2];
+					if (prefix.endswith("regs"))
+						prefix = prefix[:-#"regs"];
+					else if (prefix.endswith("cpustate"))
+						prefix = prefix[:-#"cpustate"] + "cs";
+					else if (prefix.endswith("context"))
+						prefix = prefix[:-#"context"] + "c";
+					else {
+						/* ... */
+					}
+					prefix = prefix + "_";
+					knownStructPrefixes[typ] = prefix;
+				}
+				field = { prefix + field.lower() };
+			}
+			for (local f: field) {
+				if (f in ["tv_64_nsec", "tv_64_sec", "tv_64_usec"])
+					continue; /* HACK */
+				print assertOffsetMacro.format({
+					.typ   = "struct " + typ,
+					.field = f.strip(),
+					.value = macro,
+				}),;
+			}
+		}
+		local didSomething = !!knownFields;
+		for (local pat: SIZEOF_MACRO_PATTERNS) {
+			local macro_name = pat.format({ .typ = typ.upper() });
+			if (macro_name in knownMacros) {
+				print assertSizeofMacro.format({
+					.typ   = "struct " + typ,
+					.value = macro_name,
+				}),;
+				didSomething = true;
+				break;
+			}
+		}
+		for (local pat: ALIGNOF_MACRO_PATTERNS) {
+			local macro_name = pat.format({ .typ = typ.upper() });
+			if (macro_name in knownMacros) {
+				print assertAlignofMacro.format({
+					.typ   = "struct " + typ,
+					.value = macro_name,
+				}),;
+				didSomething = true;
+				break;
+			}
+		}
+		if (!didSomething)
+			print "/* ... */";
+	}
+}
+
+
+
+
+
+

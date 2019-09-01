@@ -1,0 +1,144 @@
+/* Copyright (c) 2019 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef _I386_KOS_KOS_KERNEL_FPU_SSTATE_H
+#define _I386_KOS_KOS_KERNEL_FPU_SSTATE_H 1
+
+#include <__stdinc.h>
+
+#include <bits/types.h>
+
+#include <ieee754.h>
+
+__SYSDECL_BEGIN
+
+#define OFFSET_SFPUENV_FCW      0
+#define OFFSET_SFPUENV_FSW      4
+#define OFFSET_SFPUENV_FTW      8
+#define OFFSET_SFPUENV_FPUIP    12
+#define OFFSET_SFPUENV_FPUCS    16
+#define OFFSET_SFPUENV_FOP      18
+#define OFFSET_SFPUENV_FPUDP    20
+#define OFFSET_SFPUENV_FPUDS    24
+#define SIZEOF_SFPUENV          28
+#define ALIGNOF_SFPUENV         4
+#ifdef __CC__
+struct __ATTR_ALIGNED(ALIGNOF_SFPUENV) __ATTR_PACKED sfpuenv /*[PREFIX(fe_)]*/ {
+	/* FPU environment structure, as described here:
+	 *   - https://www.intel.com/content/dam/www/public/us/en/documents/manuals/64-ia-32-architectures-software-developer-vol-1-manual.pdf
+	 *   - https://c9x.me/x86/html/file_module_x86_id_112.html */
+	__uint16_t            fe_fcw;       /* Floating point control word. (Set of `FCW_*')
+	                                     * Get using `__fstcw()'/`__fnstcw()'; Set using `__fldcw()' */
+	__uint16_t          __fe_pad1;      /* ... */
+	__uint16_t            fe_fsw;       /* Floating point status word. (Set of `FSW_*')
+	                                     * Get using `__fstsw()'/`__fnstsw()'; Set using `TODO' */
+	__uint16_t          __fe_pad2;      /* ... */
+	__uint16_t            fe_ftw;       /* Floating point tag word. (Indicates the contents of `fs_regs' with 2 bits per register; set of `FTW_*') */
+	__uint16_t          __fe_pad3;      /* ... */
+	__uint32_t            fe_fpuip;     /* FPU instruction pointer. */
+	__uint16_t            fe_fpucs;     /* FPU code segment selector. */
+	__uint16_t            fe_fop;       /* Lower 11-bit f.p. opcode (bits 0:10). */
+	__uint32_t            fe_fpudp;     /* FPU data pointer. */
+	__uint16_t            fe_fpuds;     /* FPU data segment selector. */
+	__uint16_t          __fe_pad4;      /* ... */
+};
+#endif /* __CC__ */
+
+#define OFFSET_SFPUSTATE_FCW      0
+#define OFFSET_SFPUSTATE_FSW      4
+#define OFFSET_SFPUSTATE_FTW      8
+#define OFFSET_SFPUSTATE_FPUIP    12
+#define OFFSET_SFPUSTATE_FPUCS    16
+#define OFFSET_SFPUSTATE_FOP      18
+#define OFFSET_SFPUSTATE_FPUDP    20
+#define OFFSET_SFPUSTATE_FPUDS    24
+#define OFFSET_SFPUSTATE_ST(i)   (28 + (i) * 10)
+#define OFFSET_SFPUSTATE_MM(i)   (28 + (i) * 10)
+#define SIZEOF_SFPUSTATE          108
+#define ALIGNOF_SFPUSTATE         4
+#ifdef __CC__
+struct __ATTR_ALIGNED(ALIGNOF_SFPUSTATE) __ATTR_PACKED sfpustate /*[PREFIX(fs_)]*/ {
+	/* FPU context structure, as described here:
+	 *   - https://www.intel.com/content/dam/www/public/us/en/documents/manuals/64-ia-32-architectures-software-developer-vol-1-manual.pdf
+	 *   - https://c9x.me/x86/html/file_module_x86_id_112.html */
+	union __ATTR_PACKED {
+		struct sfpuenv            fs_env;     /* FPU environment */
+		struct __ATTR_PACKED {
+			__uint16_t            fs_fcw;     /* Floating point control word. (Set of `FCW_*')
+			                                   * Get using `__fstcw()'/`__fnstcw()'; Set using `__fldcw()' */
+			__uint16_t          __fs_pad1;    /* ... */
+			__uint16_t            fs_fsw;     /* Floating point status word. (Set of `FSW_*')
+			                                   * Get using `__fstsw()'/`__fnstsw()'; Set using `TODO' */
+			__uint16_t          __fs_pad2;    /* ... */
+			__uint16_t            fs_ftw;     /* Floating point tag word. (Indicates the contents of `fs_regs' with 2 bits per register; set of `FTW_*') */
+			__uint16_t          __fs_pad3;    /* ... */
+			__uint32_t            fs_fpuip;   /* FPU instruction pointer. */
+			__uint16_t            fs_fpucs;   /* FPU code segment selector. */
+			__uint16_t            fs_fop;     /* Lower 11-bit f.p. opcode (bits 0:10). */
+			__uint32_t            fs_fpudp;   /* FPU data pointer. */
+			__uint16_t            fs_fpuds;   /* FPU data segment selector. */
+			__uint16_t          __fs_pad4;    /* ... */
+		}
+#ifndef __COMPILER_HAVE_TRANSPARENT_STRUCT
+		_fs_env_struct
+#endif /* !__COMPILER_HAVE_TRANSPARENT_STRUCT */
+		;
+	}
+#ifndef __COMPILER_HAVE_TRANSPARENT_UNION
+	_fs_env_union
+#endif /* !__COMPILER_HAVE_TRANSPARENT_UNION */
+	;
+	union ieee854_float80         fs_regs[8]; /* ST(i) / STi / MMi */
+};
+
+#if !defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) && !defined(__COMPILER_HAVE_TRANSPARENT_UNION)
+#define fs_env   _fs_env_union.fs_env
+#define fs_fcw   _fs_env_union._fs_env_struct.fs_fcw
+#define fs_fsw   _fs_env_union._fs_env_struct.fs_fsw
+#define fs_ftw   _fs_env_union._fs_env_struct.fs_ftw
+#define fs_fpuip _fs_env_union._fs_env_struct.fs_fpuip
+#define fs_fpucs _fs_env_union._fs_env_struct.fs_fpucs
+#define fs_fop   _fs_env_union._fs_env_struct.fs_fop
+#define fs_fpudp _fs_env_union._fs_env_struct.fs_fpudp
+#define fs_fpuds _fs_env_union._fs_env_struct.fs_fpuds
+#elif !defined(__COMPILER_HAVE_TRANSPARENT_UNION)
+#define fs_env   _fs_env_union.fs_env
+#define fs_fcw   _fs_env_union.fs_fcw
+#define fs_fsw   _fs_env_union.fs_fsw
+#define fs_ftw   _fs_env_union.fs_ftw
+#define fs_fpuip _fs_env_union.fs_fpuip
+#define fs_fpucs _fs_env_union.fs_fpucs
+#define fs_fop   _fs_env_union.fs_fop
+#define fs_fpudp _fs_env_union.fs_fpudp
+#define fs_fpuds _fs_env_union.fs_fpuds
+#elif !defined(__COMPILER_HAVE_TRANSPARENT_STRUCT)
+#define fs_fcw   _fs_env_struct.fs_fcw
+#define fs_fsw   _fs_env_struct.fs_fsw
+#define fs_ftw   _fs_env_struct.fs_ftw
+#define fs_fpuip _fs_env_struct.fs_fpuip
+#define fs_fpucs _fs_env_struct.fs_fpucs
+#define fs_fop   _fs_env_struct.fs_fop
+#define fs_fpudp _fs_env_struct.fs_fpudp
+#define fs_fpuds _fs_env_struct.fs_fpuds
+#endif
+
+#endif /* __CC__ */
+
+__SYSDECL_END
+
+#endif /* !_I386_KOS_KOS_KERNEL_FPU_SSTATE_H */

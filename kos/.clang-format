@@ -1,0 +1,145 @@
+
+# Find stuff that this format defines incorrectly:
+#  REPLACE:  "\n[ \t]+(?=(?!default|public|private|protected)[a-zA-Z0-9_]+:[ \t]*\n)"  --> "\n"
+#             - Lables that aren't aligned to the left-most column
+#  REPLACE:  "}[ \t]*\n[ \t]+(?=CATCH *\(|EXCEPT *\()" --> "} "
+#             - CATCH/EXCEPT on a new line
+#  REPLACE:  "}\n[ \t]*else" --> "} else"
+#             - Else on a new line (happens after `if (un)likely')
+#  FIND:     "\n\t*((__|)(un)likely(_untraced|))"
+#             - if-(un)likely pairs that were split onto multiple lines
+#  FIND:     "\t/\*[^\n]*\n [ ]+\*"
+#             - Block-comments that need to be re-aligned
+
+AccessModifierOffset: -4
+AlignAfterOpenBracket: Align
+AlignConsecutiveAssignments: true
+AlignConsecutiveDeclarations: false
+AlignEscapedNewlines: false
+AlignOperands: true
+AlignTrailingComments: true
+AllowAllArgumentsOnNextLine: false
+AllowAllConstructorInitializersOnNextLine: false
+AllowAllParametersOfDeclarationOnNextLine: false
+AllowShortBlocksOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLambdasOnASingleLine: All
+AllowShortLoopsOnASingleLine: false
+AlwaysBreakAfterReturnType: None
+AlwaysBreakBeforeMultilineStrings: false
+AlwaysBreakTemplateDeclarations: No
+BinPackArguments: true
+BinPackParameters: true
+ExperimentalAutoDetectBinPacking: true
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterCaseLabel: false
+  AfterClass: false
+  AfterControlStatement: false
+  AfterEnum: false
+  AfterFunction: false
+  AfterNamespace: false
+  AfterObjCDeclaration: false
+  AfterStruct: false
+  AfterUnion: false
+  AfterExternBlock: false
+  BeforeCatch: false
+  BeforeElse: false
+  IndentBraces: false
+  SplitEmptyFunction: false
+  SplitEmptyRecord: false
+  SplitEmptyNamespace: false
+BreakAfterJavaFieldAnnotations: true
+BreakBeforeBinaryOperators: None
+BreakBeforeTernaryOperators: true
+BreakConstructorInitializers: BeforeComma
+BreakInheritanceList: BeforeComma
+BreakStringLiterals: false
+ColumnLimit: 0
+CommentPragmas: '^\[\[\['
+CompactNamespaces: false
+ConstructorInitializerAllOnOneLineOrOnePerLine: false
+ConstructorInitializerIndentWidth: 4
+ContinuationIndentWidth: 0
+Cpp11BracedListStyle: false
+DerivePointerAlignment: false
+DisableFormat: false
+ExperimentalAutoDetectBinPacking: false
+FixNamespaceComments: false
+IncludeBlocks: Regroup
+IncludeCategories:
+  - Regex:           '\"api.h\"'
+    Priority:        1
+  - Regex:           '<(.*/compiler|__stdinc|__stdcxx|__crt|features)[.]h>'
+    Priority:        2
+  - Regex:           '<(kernel|dev|drivers|fs|misc|sched)/.*>'
+    Priority:        3
+  - Regex:           '<hybrid/.*[.]h>'
+    Priority:        4
+  - Regex:           '<lib.*>'
+    Priority:        7
+  - Regex:           '<.*/.*>'
+    Priority:        5
+  - Regex:           '<.*>'
+    Priority:        6
+  - Regex:           '\".*\"'
+    Priority:        9
+  - Regex:           '.*'
+    Priority:        8
+IncludeIsMainRegex: '$'
+IndentCaseLabels: false
+IndentPPDirectives: None
+IndentWidth: 4
+IndentWrappedFunctionNames: false
+JavaScriptQuotes: Leave
+JavaScriptWrapImports: true
+KeepEmptyLinesAtTheStartOfBlocks: true
+Language: Cpp
+MaxEmptyLinesToKeep: 8
+NamespaceIndentation: None
+ObjCBinPackProtocolList: Auto
+ObjCBlockIndentWidth: 1
+ObjCSpaceAfterProperty: false
+ObjCSpaceBeforeProtocolList: false
+PenaltyBreakAssignment: 1
+PenaltyBreakBeforeFirstCallParameter: 1
+PenaltyBreakComment: 1
+PenaltyBreakFirstLessLess: 1
+PenaltyBreakString: 0
+PenaltyBreakTemplateDeclaration: 1
+PenaltyExcessCharacter: 1
+PenaltyReturnTypeOnItsOwnLine: 1
+PointerAlignment: Right
+ReflowComments: true
+SortIncludes: true
+SortUsingDeclarations: true
+SpaceAfterCStyleCast: false
+SpaceAfterLogicalNot: false
+SpaceAfterTemplateKeyword: false
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeCpp11BracedList: true
+SpaceBeforeCtorInitializerColon: false
+SpaceBeforeInheritanceColon: false
+SpaceBeforeParens: ControlStatements
+SpaceBeforeRangeBasedForLoopColon: false
+SpaceInEmptyParentheses: false
+SpacesBeforeTrailingComments: 1
+SpacesInAngles: false
+SpacesInCStyleCastParentheses: false
+SpacesInContainerLiterals: false
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+StatementMacros:
+  - likely
+  - unlikely
+  - likely_untraced
+  - unlikely_untraced
+  - __likely
+  - __unlikely
+  - __likely_untraced
+  - __unlikely_untraced
+Standard: Cpp03
+TabWidth: 4
+UseTab: ForIndentation

@@ -1,0 +1,111 @@
+/* Copyright (c) 2019 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef GUARD_LIBKEYMAP_KEYMAP_CTEST
+#define GUARD_LIBKEYMAP_KEYMAP_CTEST 1
+#define _KOS_SOURCE 1
+
+#include <hybrid/compiler.h>
+
+#include <kos/keyboard.h>
+#include <kos/types.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+
+#include <assert.h>
+#include <dlfcn.h>
+#include <fcntl.h>
+#include <string.h>
+#include <unistd.h>
+
+#include <libkeymap/keymap.h>
+#include <system-test/ctest.h>
+
+
+DECL_BEGIN
+
+PRIVATE void *mapfile(char const *filename, size_t *psize) {
+	struct stat st;
+	fd_t fd;
+	void *result;
+	fd = open(filename, O_RDONLY);
+	assert(fd >= 0);
+	assert(fstat(fd, &st) == 0);
+	result = mmap(NULL, (size_t)st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
+	assert(result != MAP_FAILED);
+	if (psize)
+		*psize = (size_t)st.st_size;
+	assert(close(fd) == 0);
+	return result;
+}
+
+
+DEFINE_TEST(keymap_translations) {
+	void *km;
+	PKEYMAP_OPENBLOB keymap_openblob;
+	PKEYMAP_CODESIZE keymap_codesize;
+	PKEYMAP_TRANSLATE_BUF keymap_translate_buf;
+	struct keymap mymap;
+	void *filedata; size_t filesize;
+	char buf[64]; size_t buflen;
+	km = dlopen(LIBKEYMAP_LIBRARY_NAME, RTLD_LOCAL);
+	assert(km);
+
+	*(void **)&keymap_openblob      = dlsym(km, "keymap_openblob");
+	*(void **)&keymap_codesize      = dlsym(km, "keymap_codesize");
+	*(void **)&keymap_translate_buf = dlsym(km, "keymap_translate_buf");
+	assert(keymap_openblob);
+	assert(keymap_translate_buf);
+
+	filedata = mapfile("/lib/keymap/de_DE", &filesize);
+	assert(keymap_openblob(&mymap, filedata, filesize) == true);
+	{
+		ssize_t len;
+		uint8_t enc = mymap.km_defencoding;
+		len = keymap_codesize(mymap.km_ext, &enc, enc);
+		assertf(len > 0, "len = %Id", len);
+	}
+#define ASSERT_TRANSLATION(key, keymod, str)                                   \
+	do {                                                                       \
+		buflen = keymap_translate_buf(&mymap, key, keymod, buf, sizeof(buf));  \
+		assertf(buflen == COMPILER_STRLEN(str), "buflen = %Iu", buflen);       \
+		assertf(memcmp(buf, str, buflen) == 0, "%$q != %q", buflen, buf, str); \
+	} __WHILE0
+	ASSERT_TRANSLATION(KEY_Q, KEYMOD_RALT, "@");
+	ASSERT_TRANSLATION(KEY_W, 0, "w");
+	ASSERT_TRANSLATION(KEY_W, KEYMOD_LSHIFT, "W");
+	ASSERT_TRANSLATION(KEY_W, KEYMOD_RSHIFT, "W");
+	ASSERT_TRANSLATION(KEY_W, KEYMOD_LSHIFT | KEYMOD_RSHIFT, "W");
+	ASSERT_TRANSLATION(KEY_W, KEYMOD_LSHIFT | KEYMOD_LGUI, ""); /* Not mapped */
+	ASSERT_TRANSLATION(KEY_W, KEYMOD_LSHIFT | KEYMOD_RSHIFT | KEYMOD_LGUI, ""); /* Not mapped */
+	ASSERT_TRANSLATION(KEY_8, 0, "8");
+	ASSERT_TRANSLATION(KEY_8, KEYMOD_LSHIFT, "(");
+	ASSERT_TRANSLATION(KEY_8, KEYMOD_RALT, "[");
+	ASSERT_TRANSLATION(KEY_8, KEYMOD_LCTRL | KEYMOD_LALT, "[");
+	ASSERT_TRANSLATION(KEY_8, KEYMOD_LCTRL | KEYMOD_RALT, "[");
+	ASSERT_TRANSLATION(KEY_8, KEYMOD_RCTRL | KEYMOD_LALT, "[");
+	ASSERT_TRANSLATION(KEY_8, KEYMOD_RCTRL | KEYMOD_RALT, "[");
+#undef ASSERT_TRANSLATION
+
+	assert(munmap(filedata, filesize) == 0);
+	assert(dlclose(km) == 0);
+}
+
+DECL_END
+
+#endif /* !GUARD_LIBKEYMAP_KEYMAP_CTEST */

@@ -1,0 +1,1582 @@
+/* Copyright (c) 2018 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+#pragma warning("-Wno-comment")
+
+#undef CACHE_ALL_MODIFIED_OUTPUT_FILES
+#if 0
+#define CACHE_ALL_MODIFIED_OUTPUT_FILES 1
+#endif
+
+#undef ASYNC_FILE_ENUMERATION
+#if 0 /* ASYNC is ~10% slower */
+#define ASYNC_FILE_ENUMERATION 1
+#endif
+
+
+/* Generic library for automatic dependency tracing between files for the
+ * purpose of automating source code compilation, mainly when it comes to
+ * doing so in C or C++.
+ * >> import fs;
+ * >> import * from libmagic.libmagic;
+ * >> import * from libmagic.steps.c;
+ * >> import * from libmagic.toolchain.gcc;
+ * >>
+ * >> // Should always work from the same directory as the primary deemon script
+ * >> fs.chdir(ROOTDIR);
+ * >>
+ * >> buildGroups(
+ * >> 	toolchain: GCCToolchain(
+ * >> 		config: Config(
+ * >> 			BUILD_PATH: "build",
+ * >> 		)
+ * >> 	),
+ * >> 	groups: {
+ * >> 		Group(
+ * >> 			name: "MyProject",  // Only for logs; `name' doesn't have syntactical meaning
+ * >> 			steps: { COMPILE, LINK },
+ * >> 			options: {
+ * >> 				OPT_COMPILE_SOURCES  : ["src/*.cc"],
+ * >> 				OPT_COMPILE_LANGUAGE : "c++",
+ * >> 				OPT_LINK_OUTPUT      : "./MyProject",
+ * >> 			},
+ * >> 		),
+ * >> 	}
+ * >> );
+ * Building groups where some source files need special options:
+ * >> buildGroups(
+ * >> 	toolchain: GCCToolchain(
+ * >> 		config: Config(
+ * >> 			BUILD_PATH: "build",
+ * >> 		)
+ * >> 	),
+ * >> 	groups: {
+ * >> 		Group(
+ * >> 			name: "MyProject",
+ * >> 			steps: { LINK },
+ * >> 			options: {
+ * >> 				OPT_COMPILE_SOURCES : ["src/a.cc", "src/b.cc"],
+ * >> 				OPT_LINK_OUTPUT     : "out$EXE",
+ * >> 			},
+ * >> 		),
+ * >> 		Group(
+ * >> 			name: "MyProject",
+ * >> 			steps: { COMPILE },
+ * >> 			options: {
+ * >> 				OPT_COMPILE_SOURCES : ["src/a.cc"],
+ * >> 				OPT_COMPILE_MACROS  : { "MACRO_FOR_A_CC" : 1" },
+ * >> 			},
+ * >> 		),
+ * >> 		Group(
+ * >> 			name: "MyProject",
+ * >> 			steps: { COMPILE },
+ * >> 			options: {
+ * >> 				OPT_COMPILE_SOURCES : ["src/b.cc"],
+ * >> 				OPT_COMPILE_MACROS  : { "MACRO_FOR_B_CC" : 1" },
+ * >> 			},
+ * >> 		),
+ * >> 	}
+ * >> );
+ * I know this doesn't look that straight forward, but remember that you can
+ * easily further automate this case by dynamically creating the Group objects.
+ */
+
+
+import ipc, fs, time;
+import * from deemon;
+import * from errors;
+
+/* TODO: Use collections.UniqueSet instead of HashSet! */
+
+
+@@Option: bool
+@@An option that may be used for any group to
+@@cause it to ignore the effects of @Config.FORCE
+global final OPT_NOFORCE = "noforce";
+
+local final LOG_START_MARKER  = ">";
+local final LOG_END_MARKER    = "<";
+local final LOG_UPDATE_MARKER = "~";
+
+
+local final JOIN_WAIT_DELAY = 100000;
+
+@@The absolute path of the directory containing the primary deemon script
+global final ROOTDIR: string =
+	fs.expand(fs.headof((argv from rt)[0]), "pac")
+#ifdef __WINDOWS__
+	.replace("\\", "/").lower()
+#endif
+	.rstrip("/") + "/";
+
+function joinpath(paths...: string): string {
+	return fs.expand(fs.joinpath(paths...), "p")
+#ifdef __WINDOWS__
+		.replace("\\", "/")
+#endif
+		.lsstrip("./")
+	;
+}
+
+@@Returns the .latest-name of `filename':
+@@> getLatestFilenameOf("/foo/bar.c"); // "/foo/.bar.c.latest"
+function getLatestFilenameOf(filename: string): string {
+	return "{}.{}.latest".format({
+		fs.headof(filename),
+		fs.tailof(filename),
+	});
+}
+
+
+
+#ifdef __WINDOWS__
+local final _cygwinReadlinkCache: {string: string | bool | none} = Dict();
+function cygwinReadLink(path: string): string | bool | none {
+	local result = _cygwinReadlinkCache.get(path, true);
+	if (result !== true)
+		return result;
+	local fp;
+	fp = try File.open(path, "r") catch (...) none;
+	if (fp is none)
+		result = none;
+	else try {
+		with(fp) {
+			local data = fp.read(#"!<symlink>");
+			if (!data.startswith("!<symlink>"))
+				result = none;
+			else {
+				result = fp.readall()[2:-2].decode("utf-16");
+			}
+		}
+	} catch (...) {
+		result = false;
+	}
+	_cygwinReadlinkCache[path] = result;
+	return result;
+}
+local final _cygwinRalpathCache: {string: string} = Dict();
+function cygwinRealpath(path: string): string {
+	local orig_path = path;
+again:
+	local result = _cygwinRalpathCache.get(path);
+	if (result !is none)
+		return result;
+	if ("/" !in path)
+		result = path;
+	else {
+		local link = cygwinReadLink(path);
+		if (link is string) {
+			path = joinpath(fs.headof(path), link);
+			goto again;
+		}
+		if (link !== false) {
+			local head, none, tail = path.rpartition("/")...;
+			result = joinpath(cygwinRealpath(head), tail);
+		} else {
+			result = path;
+		}
+	}
+	_cygwinRalpathCache[orig_path] = result;
+	return result;
+}
+#endif
+
+
+@@Normalize a given file path
+function normalizePath(path: string, expand_symlinks: bool = true): string {
+#ifdef __WINDOWS__
+	final local CYG_PREFIX = "/cygdrive/";
+	if (path.startswith(CYG_PREFIX)) {
+		path = path[#CYG_PREFIX:];
+		path = path.partition("/");
+		path = "{}:/{}".format({ path[0], path[2] });
+	}
+	if (!fs.isabs(path))
+		path = fs.abspath(path, ROOTDIR);
+	path = fs.expand(path, "p").replace("\\", "/");
+	if (expand_symlinks)
+		path = cygwinRealpath(path);
+	if (path.lower().startswith(ROOTDIR))
+		path = path[#ROOTDIR:];
+	return path;
+#else
+	return fs.expand(fs.abspath(path, ROOTDIR), "p").lsstrip(ROOTDIR);
+#endif
+}
+
+@@Cache of already created directories.
+final local _createdDirectoriesCache: {string...} = HashSet();
+
+@@Create a full tree of directories. (For build artifacts)
+final local function createDirectoryTree(path: string) {
+	path = path.rstrip("/");
+	if (path in _createdDirectoriesCache)
+		return;
+	if (!fs.stat.isdir(path)) {
+		createDirectoryTree(fs.headof(path));
+		fs.mkdir(path);
+	}
+	_createdDirectoriesCache.insert(path);
+}
+
+
+
+local final _lastModfiedTimeCache: {string: time.Time} = Dict();
+local final libwin32 = try import("win32") catch (...) none;
+
+@@Get the last-modified timestamp for the given @filename
+@@NOTE: This function keeps an internal cache that is volatime
+@@      to changes to the current working directory.
+function getLastModfiedTime(filename: string): time.Time | none {
+	local result = _lastModfiedTimeCache.get(filename);
+	if (result is none) {
+		try {
+			if (libwin32 is none) {
+				/* FIXME: fs.stat() isn't as precise as win32.GetFileTime() is.
+				 *        In a perfect world, time.Time() would be able to hold
+				 *        timestamps of infinite precision... */
+				result = fs.stat(filename).st_mtime;
+			} else {
+				/* Hack around a bit to get UNC paths working properly... */
+				local handle = libwin32.CreateFile(
+					lpFileName: filename,
+					dwDesiredAccess: libwin32.FILE_GENERIC_READ,
+					dwCreationDisposition: libwin32.OPEN_EXISTING);
+				if (handle is none) {
+					handle = libwin32.CreateFile(
+						lpFileName: fs.abspath(filename),
+						dwDesiredAccess: libwin32.FILE_GENERIC_READ,
+						dwCreationDisposition: libwin32.OPEN_EXISTING);
+					if (handle is none) {
+						handle = libwin32.CreateFile(
+							lpFileName: r"\\.\" + fs.abspath(filename),
+							dwDesiredAccess: libwin32.FILE_GENERIC_READ,
+							dwCreationDisposition: libwin32.OPEN_EXISTING);
+					}
+				}
+				if (handle is none)
+					result = none;
+				else {
+					try {
+						/* GetFileTime() has a precision of 100 nanoseconds (or 0.1 microseconds)
+						 * However, time.Time() only has microsecond-precision (so this method
+						 * is 10x more precise) */
+						result = libwin32.GetFileTime(handle)[2];
+					} finally {
+						libwin32.CloseHandle(handle);
+					}
+				}
+			}
+		} catch (...) {
+			result = none;
+		}
+		_lastModfiedTimeCache[filename] = result;
+	}
+	return result;
+}
+
+@@Assume that a given file has changed by settings its last-changed field to now()
+function addForceChanged(file: string): bool {
+	local now;
+	if (libwin32 is none) {
+		now = import("time").now();
+	} else {
+		now = (int)import("time").now() * 10;
+	}
+	_lastModfiedTimeCache[normalizePath(file, false)] = now;
+}
+
+
+@@Remove a given @filename from the cache of
+@@known last-modified timestamps of files.
+function fileMayHaveChanged(filename: string) {
+	_lastModfiedTimeCache.pop(filename, none);
+}
+
+
+@@Selection for @Step.getRequiredFiles that refers to one file of many
+class FirstFileOf {
+	this = default;
+	public final member files: {string...};
+}
+
+
+global BoundStep;
+global Toolchain;
+
+@@Vtable descriptor for a custom build Step
+class Step {
+	this = default;
+	operator str() -> name;
+	operator repr() -> name;
+
+	@@The name of this step (Only for logs; no syntactical meaning)
+	final member name: string;
+
+	@@> run(step: BoundStep): {Waitable...}
+	@@Execute the step and produce waitables
+	final member run: Callable;
+
+	@@> tostr(step: BoundStep): string
+	@@Return a suitable, human-readable description for what this step does
+	final member tostr: Callable = none;
+
+	@@Set of group options used by this step
+	final member options: {string...} = none;
+
+	@@> split(step: BoundStep): {BoundStep...}
+	@@Split this step into multiple, smaller steps
+	final member split: Callable = none;
+
+	@@> getRequiredFiles(step: BoundStep): {string | FirstFileOf...}
+	@@Returns a List of required files
+	final member getRequiredFiles: Callable = none; /* in */
+
+	@@> getProducedFiles(step: BoundStep): {string...}
+	@@Returns a List of produced files
+	final member getProducedFiles: Callable = none; /* out */
+
+	@@> getProducedOutputFiles(step: BoundStep): {string...}
+	@@Returns the filenames of the primary output files, that is
+	@@the files who's timestamps should be considered as the ones
+	@@used to determine if changes in input files have occurred.
+	@@When this callback is defined, all other files which may
+	@@also be produced by this build step are considered secondary
+	@@build artifacts who's timestamp will be ignored, except when
+	@@explicitly used as dependencies of other steps.
+	final member getProducedOutputFiles: Callable = none; /* out */
+
+	@@> getModifiedOutputFiles(step: BoundStep): {string...}
+	@@Returns the names of output files that (may) be modified or
+	@@created by this step. - This differs from @getProducedFiles,
+	@@in that modified output files may overlap with build steps,
+	@@however, during execution, care will be taken that no 2 steps
+	@@are executed that may modify the same output file.
+	@@Also: In case another build step exists that may create such an
+	@@      output file, that step is always executed first, allowing
+	@@      it to create the output file before steps that may modify
+	@@      it are then executed one by one.
+	final member getModifiedOutputFiles: Callable = none; /* in|out */
+
+	@@> getMaybeModifiedOutputFiles(step: BoundStep): {string...}
+	@@Same as `getModifiedOutputFiles()', but the enumerated files may
+	@@not necessarily get modified when the step is run. - Instead of using
+	@@the timestamp of the file itself, use a different file `.<name>.latest'
+	@@to keep track of the timestamp when such a file was last updated.
+	final member getMaybeModifiedOutputFiles: Callable = none; /* in|out */
+
+
+	final function withRequiredFiles(files: {string...}): Step {
+		getRequiredFiles = [](self: BoundStep) -> self.group.fixFilenames(files);
+		return this;
+	}
+	final function withModifiedOutputFiles(files: {string...}): Step {
+		getModifiedOutputFiles = [](self: BoundStep) -> self.group.fixFilenames(files);
+		return this;
+	}
+	final function withMaybeModifiedOutputFiles(files: {string...}): Step {
+		getMaybeModifiedOutputFiles = [](self: BoundStep) -> self.group.fixFilenames(files);
+		return this;
+	}
+
+}
+
+class Group {
+	this = default;
+	@@The name of this group (Only for logs; no syntactical meaning)
+	public final member name: string;
+	@@List of compilation steps, which are functions invoked
+	@@as Callable(group: Group, changed: bool): {Waitable...}
+	@@The given parameter `changed' is set to true for the first
+	@@step, as well as any step performed after a previous step
+	@@returned at least 1 Waitable Object
+	public final member steps: {Step...} = [];
+	@@Group-specific options (for use by step callbacks)
+	public final member options: {string: Object} = Dict();
+	@@The path in which this group is defined
+	public final member defPath: string = "";
+
+	public final function getDependencies(toolchain: Toolchain): {string | FirstFileOf...} {
+		for (local s: steps) {
+			local bss = BoundStep(this, s, toolchain);
+			if (s.split !is none) {
+				bss = s.split(bss);
+			} else {
+				bss = { bss };
+			}
+			for (local bs: bss)
+				yield bs.required_files...;
+		}
+	}
+
+
+	private member _wildcardEnumerationCache: {string: {string...}} = Dict();
+	function fixFilename(filename: string): string {
+		if (filename.startswith("/"))
+			return filename.lstrip("/");
+		return joinpath(defPath, filename);
+	}
+	function fixFilenames(filenames: {string...}): {string...} {
+		for (local x: filenames)
+			yield fixFilename(x);
+	}
+	function enumerateWildcardFiles(pattern: string | {string...}): {string...} {
+		if (pattern !is string) {
+			for (local x: pattern)
+				yield enumerateWildcardFiles(x)...;
+			return;
+		}
+		local r = _wildcardEnumerationCache.get(pattern);
+		if (r !is none) {
+			yield r...;
+			return;
+		}
+		local head: string = fs.headof(pattern);
+		local tail: string = fs.tailof(pattern);
+		if (head.startswith("/"))
+			head = head.lstrip("/");
+		else {
+			head = joinpath(defPath, head);
+		}
+		local files: {string...};
+		if ("*" in tail || "?" in tail) {
+			files = [];
+			for (local f: fs.dir(head)) {
+				if (!f.wmatch(tail))
+					continue;
+				f = joinpath(head, f);
+				files.append(f);
+				yield f;
+			}
+		} else {
+			files = { joinpath(head, tail) };
+			yield files...;
+		}
+		_wildcardEnumerationCache[pattern] = files;
+	}
+}
+
+@@Build configuration controller
+class Config {
+	this = default;
+
+	@@The prefix that should be used by a cross-compiler (needs
+	@@to be used in conjunction with the implementing toolchain)
+	public final member CROSS_PREFIX: string = "";
+
+	@@Set to the location of where build artifacts should be placed
+	public final member BUILD_PATH: string = "build";
+
+	@@The default file extension for produced libraries
+#ifdef __WINDOWS__
+	public final member LIBRARY_SUFFIX: string = ".dll";
+#else
+	public final member LIBRARY_SUFFIX: string = ".so";
+#endif
+
+	@@Set to true if a re-build of all steps should be forced
+	public final member FORCE: bool = false;
+
+	@@Set to true if error messages printed by build-tools
+	@@should be formatted into a singular, common format.
+	public final member FORMAT_ERRORS: bool = false;
+
+	@@Enable verbose mode (print executed commands)
+	public final member VERBOSE: bool = false;
+
+	@@Return the location of a some build artifact
+	private final function getBuildArtifact(group: Group, srcFile: string, ext: string): string {
+		return joinpath(BUILD_PATH, group.name, srcFile.replace("/", ".") + ext);
+	}
+
+	@@Returns the location of disassembly
+	final function getAssembledFilename(group: Group, srcFile: string): string    -> getBuildArtifact(group, srcFile, ".S");
+	final function getPreprocessedFilename(group: Group, srcFile: string): string -> getBuildArtifact(group, srcFile, ".E");
+	final function getDependencyFilename(group: Group, srcFile: string): string   -> getBuildArtifact(group, srcFile, ".MF");
+	final function getObjectFilename(group: Group, srcFile: string): string       -> getBuildArtifact(group, srcFile, ".o");
+}
+
+
+class Waitable {
+	this = default;
+	//function waitfor();
+	//function trywaitfor();
+}
+function joinProcess(p: ipc.Process) {
+	local error = p.join();
+	if (error != 0) {
+		throw Error("Process {!r} exited with {}"
+			.format({ p.cmdline, error }));
+	}
+}
+function tryJoinProcess(p: ipc.Process): bool {
+	local error = p.tryjoin();
+	if (error is none)
+		return false;
+	if (error != 0)
+		throw Error("Process {!r} exited with {}"
+			.format({ p.cmdline, error }));
+	return true;
+}
+
+class WaitableJoin: Waitable {
+	private member obj: ipc.Process | Thread | Object;
+	this(obj) { this.obj = obj; }
+	function waitfor() {
+		return obj is ipc.Process
+			? joinProcess(obj)
+			: obj.join()
+			;
+	}
+	function trywaitfor(): bool {
+		return obj is ipc.Process
+			? tryJoinProcess(obj)
+			: obj is Thread
+			? obj.tryjoin()[0]
+			: obj.tryjoin()
+			;
+	}
+}
+
+
+
+class Toolchain {
+	member config: Config;
+	this = default;
+	@@Storage for toolchain extension configurations (e.g. mtools)
+	member options: { string: Object } = Dict();
+
+	/* C/C++ toolchain implementation prototypes */
+	//function parseDependencyFile(text: string): {string...};
+	//function createProcessorProcess(srcFile: string, ppFlags: {string...}): Waitable;
+	//function createCompilerProcess(srcFile: string, ccFlags: {string...} = none, ppFlags: {string...} = none, asFlags: {string...} = none, depFile: string = none, objFile: string = none, language: string | none = none): Waitable;
+	//function createArchiveProcess(exeFile: string, objFiles: {string...}, ldFlags: {string...} = none): Waitable;
+	//function createLinkerProcess(exeFile: string, objFiles: {string...}, ldFlags: {string...} = none, language: string | none = none): Waitable;
+}
+
+
+
+
+class BoundStep {
+	this = default;
+	operator str(): string {
+		if (step.tostr !is none)
+			return step.tostr(this);
+		return "[{}] {}".format({ group.name, step.name });
+	}
+
+	@@Create a new child-step of @this with @userData
+	public final function createChildStep(userData: Object): BoundStep {
+		local result = BoundStep();
+		result.group = group;
+		result.step = step;
+		result.toolchain = toolchain;
+		result.userData = userData;
+		return result;
+	}
+	@@The bound group
+	public final member group: Group;
+	@@The bound step
+	public final member step: Step;
+	@@The used toolchain
+	public final member toolchain: Toolchain;
+	@@Step-specific data
+	public final member userData: Object;
+
+	@@List of required input files
+	public final property required_files: {string | FirstFileOf...} = {
+		get(): {string | FirstFileOf...} {
+#ifdef ASYNC_FILE_ENUMERATION
+			if (_required_files !is bound) {
+				_required_files = HashSet();
+				for (local x: step.getRequiredFiles(this)) {
+					_required_files.insert(x);
+					yield x;
+				}
+			} else {
+				yield _required_files...;
+			}
+#else /* ASYNC_FILE_ENUMERATION */
+			if (_required_files !is bound)
+				_required_files = HashSet(step.getRequiredFiles(this));
+			return _required_files;
+#endif /* !ASYNC_FILE_ENUMERATION */
+		}
+	}
+
+	@@List of produced build artifacts
+	public final property produced_files: {string...} = {
+		get(): {string...} {
+#ifdef ASYNC_FILE_ENUMERATION
+			if (_produced_files !is bound) {
+				_produced_files = HashSet();
+				for (local x: step.getProducedFiles(this)) {
+					if (_produced_files.insert(x))
+						yield x;
+				}
+			} else {
+				yield _produced_files...;
+			}
+#else /* ASYNC_FILE_ENUMERATION */
+			if (_produced_files !is bound)
+				_produced_files = HashSet(step.getProducedFiles(this));
+			return _produced_files;
+#endif /* !ASYNC_FILE_ENUMERATION */
+		}
+	}
+
+	@@List of intended build outputs
+	public final property produced_output_files: {string...} = {
+		get(): {string...} {
+#ifdef ASYNC_FILE_ENUMERATION
+			if (_produced_output_files !is bound) {
+				local fun = step.getProducedOutputFiles;
+				if (fun is none) {
+					if (_produced_files is bound) {
+						_produced_output_files = _produced_files;
+						yield _produced_output_files...;
+					} else {
+						yield produced_files...;
+					}
+				} else {
+					_produced_output_files = HashSet();
+					for (local x: fun(this)) {
+						if (_produced_output_files.insert(x))
+							yield x;
+					}
+				}
+			} else {
+				yield _produced_output_files...;
+			}
+#else /* ASYNC_FILE_ENUMERATION */
+			if (_produced_output_files !is bound) {
+				local fun = step.getProducedOutputFiles;
+				if (fun is none)
+					_produced_output_files = produced_files;
+				else {
+					_produced_output_files = HashSet(fun(this));
+				}
+			}
+			return _produced_output_files;
+#endif /* !ASYNC_FILE_ENUMERATION */
+		}
+	}
+
+	@@List of files that may be modified by this step
+	@@NOTE: The second tuple element is the original last-modified
+	@@      timestamp of the file (or @none if it didn't exist)
+	@@      This is needed to ensure that timestamps of outputs
+	@@      created by other steps are properly compared against
+	@@      that timestamp at last point in time when the modified
+	@@      output file was last known to be ~whole~
+	@@Consider these 4 steps:
+	@@       - IN: ...; OUT: a.txt
+	@@       - IN: a.txt; MODIFY: log.txt
+	@@       - IN: ...; OUT: b.txt
+	@@       - IN: b.txt; MODIFY: log.txt
+	@@These steps can be executed in the same order, and nothing
+	@@would go wrong, however, the system is also allowed to execute
+	@@them like this:
+	@@       - IN: ...; OUT: a.txt
+	@@       - IN: ...; OUT: b.txt
+	@@       - IN: a.txt; MODIFY: log.txt
+	@@       - IN: b.txt; MODIFY: log.txt
+	@@In this case, the 4th step would be skipped because TIME(log.txt) > TIME(b.txt),
+	@@since log.txt was already modified by `a.txt'
+	@@Because of this, we need to make a compare TIME_AT_BUILD_START(log.txt) > TIME(b.txt),
+	public final property modified_output_files: {(string, int | none)...} = {
+		get(): {string...} {
+#ifdef ASYNC_FILE_ENUMERATION
+			if (_modified_output_files !is bound) {
+				local fun = step.getModifiedOutputFiles;
+				if (fun is none)
+					_modified_output_files = {};
+				else {
+					_modified_output_files = HashSet();
+					for (local f: fun(this)) {
+						local pair = (f, getLastModfiedTime(f));
+						if (_modified_output_files.insert(pair))
+							yield pair;
+					}
+				}
+			} else {
+				yield _modified_output_files...;
+			}
+#else /* ASYNC_FILE_ENUMERATION */
+			if (_modified_output_files !is bound) {
+				local fun = step.getModifiedOutputFiles;
+				if (fun is none)
+					_modified_output_files = {};
+				else {
+					_modified_output_files = HashSet(
+						for (local f: fun(this))
+							(f, getLastModfiedTime(f)));
+				}
+			}
+			return _modified_output_files;
+#endif /* !ASYNC_FILE_ENUMERATION */
+		}
+	}
+
+	public function updateModifiedOutputTimes() {
+		if (_modified_output_files is bound) {
+			local new = HashSet();
+			for (local f, none: _modified_output_files)
+				new.insert((f, getLastModfiedTime(f)));
+			_modified_output_files = new;
+		}
+		if (_maybe_modified_output_files is bound) {
+			local new = HashSet();
+			for (local f, none: _maybe_modified_output_files)
+				new.insert((f, getLastModfiedTime(getLatestFilenameOf(f))));
+			_maybe_modified_output_files = new;
+		}
+#ifdef CACHE_ALL_MODIFIED_OUTPUT_FILES
+		try {
+			del _all_modified_output_files;
+		} catch (...) {
+		}
+#endif /* CACHE_ALL_MODIFIED_OUTPUT_FILES */
+	}
+
+#ifdef CACHE_ALL_MODIFIED_OUTPUT_FILES
+	private final member _all_modified_output_files: {(string, int | none)...};
+	public final property all_modified_output_files: {(string, int | none)...} = {
+		get(): {(string, int | none)...} {
+			if (_all_modified_output_files !is bound) {
+				_all_modified_output_files = HashSet();
+				_all_modified_output_files.update(modified_output_files);
+				_all_modified_output_files.update(maybe_modified_output_files);
+			}
+			return _all_modified_output_files;
+		}
+	}
+#else /* CACHE_ALL_MODIFIED_OUTPUT_FILES */
+	public final property all_modified_output_files: {(string, int | none)...} = {
+		get(): {(string, int | none)...} {
+			yield modified_output_files...;
+			yield maybe_modified_output_files...;
+		}
+	}
+#endif /* !CACHE_ALL_MODIFIED_OUTPUT_FILES */
+
+	public final property maybe_modified_output_files: {(string, int | none)...} = {
+		get(): {string...} {
+#ifdef ASYNC_FILE_ENUMERATION
+			if (_maybe_modified_output_files !is bound) {
+				local fun = step.getMaybeModifiedOutputFiles;
+				if (fun is none)
+					_maybe_modified_output_files = {};
+				else {
+					_maybe_modified_output_files = HashSet();
+					for (local f: fun(this)) {
+						local pair = (f, getLastModfiedTime(getLatestFilenameOf(f)));
+						if (_maybe_modified_output_files.insert(pair))
+							yield pair;
+					}
+				}
+			} else {
+				yield _maybe_modified_output_files...;
+			}
+#else /* ASYNC_FILE_ENUMERATION */
+			if (_maybe_modified_output_files !is bound) {
+				local fun = step.getMaybeModifiedOutputFiles;
+				if (fun is none)
+					_maybe_modified_output_files = {};
+				else {
+					_maybe_modified_output_files = HashSet(
+						for (local f: fun(this))
+							(f, getLastModfiedTime(getLatestFilenameOf(f))));
+				}
+			}
+			return _maybe_modified_output_files;
+#endif /* !ASYNC_FILE_ENUMERATION */
+		}
+	}
+
+	@@Check if this step has been completed
+	final function complete(): bool {
+		return _step_waitables is bound && !_step_waitables;
+	}
+
+	@@Mark this step as being skipped (presumably because none of its inputs have changed)
+	final function skip() {
+		_step_waitables = [];
+	}
+
+	@@Reset this step
+	final function reset() {
+		try {
+			del _step_waitables;
+		} catch (...) {
+		}
+	}
+
+	@@Begin execution of this step
+	@@If the step was already started or has already finished,
+	@@return immediately.
+	final function begin() {
+		if (_step_waitables is bound)
+			return;
+		_step_waitables = List(step.run(this));
+	}
+
+	@@Wait for all waitables of this step to complete
+	@@If this step had already been finished in the past,
+	@@return immediately.
+	@@If the step hadn't been started yet, start it now
+	final function waitfor() {
+		begin();
+		while (_step_waitables)
+			_step_waitables.pop().waitfor();
+		onCompleted();
+	}
+
+	@@Try to wait for this step to have completed
+	final function trywaitfor(): bool {
+		begin();
+		while (_step_waitables) {
+			if (!_step_waitables[0].trywaitfor())
+				return false;
+			_step_waitables.pop(0);
+		}
+		onCompleted();
+		return true;
+	}
+
+	final function onCompleted() {
+		/* Save that all (possibly) output files may have changed */
+		for (local x: produced_files)
+			fileMayHaveChanged(x);
+		for (local x, none: modified_output_files)
+			fileMayHaveChanged(x);
+		for (local x, none: maybe_modified_output_files) {
+			fileMayHaveChanged(x);
+			x = getLatestFilenameOf(x);
+			File.open(x, "wb").close(); /* touch */
+			fileMayHaveChanged(x);
+		}
+	}
+
+
+	@@Waitables that need to complete before this step can be finished
+	private final member _step_waitables: {Waitable...};
+
+	@@Cache for @this.required_files
+	private final member _required_files: {string | FirstFileOf...};
+
+	@@Cache for @this.produced_files
+	private final member _produced_files: {string...};
+
+	@@Cache for @this.produced_output_files
+	private final member _produced_output_files: {string...};
+
+	@@Cache for @this.modified_output_files
+	private final member _modified_output_files: {(string, int | none)...};
+
+	@@Cache for @this.maybe_modified_output_files
+	private final member _maybe_modified_output_files: {(string, int | none)...};
+
+	operator == (other) -> this === other;
+	operator != (other) -> this !== other;
+	operator hash() -> Object.id(this);
+
+	@@Dependent steps
+	public final member dependencies: {BoundStep...} = HashSet();
+
+	@@Recursively check if @this step has a dependency on @s
+	function has_recursive_dependency(s: BoundStep): bool {
+		if (s === this)
+			return true;
+		if (s in dependencies)
+			return true;
+		for (local i: dependencies) {
+			if (i.has_recursive_dependency(s))
+				return true;
+		}
+		return false;
+	}
+
+	@@Enumerate the full path of dependencies
+	@@to reach a given recursive dependency @s
+	function walk_recursive_dependency(s: BoundStep): {BoundStep...} {
+		yield this;
+		if (s !in dependencies) {
+			for (local i: dependencies) {
+				if (!i.has_recursive_dependency(s))
+					continue;
+				yield i.walk_recursive_dependency(s)...;
+			}
+		} else {
+			yield s;
+		}
+	}
+
+	@@Create folders for output of this step
+	function createOutputFolders() {
+		for (local o: produced_files)
+			createDirectoryTree(fs.headof(o));
+		for (local o, none: modified_output_files)
+			createDirectoryTree(fs.headof(o));
+		for (local o, none: maybe_modified_output_files)
+			createDirectoryTree(fs.headof(o));
+	}
+}
+
+@@Combine the given steps into a single step
+function combineSteps(steps...: Step): Step {
+	if (#steps == 1)
+		return steps[0];
+	return Step(
+		/* Just use the split mechanism to expand this step. */
+		split: [](self: BoundStep): {BoundStep...} {
+			for (local s: steps) {
+				local bs = self.createChildStep(none);
+				bs.step = s;
+				if (s.split !is none) {
+					yield s.split(bs)...;
+				} else {
+					yield bs;
+				}
+			}
+		}
+	);
+}
+
+
+
+@@Order build steps and return all steps that need to be performed to build all of the given groups.
+@@The second set of steps are steps that depend on MaybeModified steps forming a dependency loop.
+@@When non-empty, the input files of these steps must be re-checked for changes.
+function orderGroups(toolchain: Toolchain, groups: {Group...}): ({BoundStep...}, {BoundStep...}) {
+	local loop_recheck: {BoundStep...} = HashSet();
+	local allsteps: {BoundStep...} = HashSet();
+	for (local p: groups) {
+		for (local s: p.steps) {
+			local bs = BoundStep(p, s, toolchain);
+			if (s.split !is none)
+				allsteps.update(s.split(bs));
+			else {
+				allsteps.insert(bs);
+			}
+		}
+	}
+	local file_producers: {string: BoundStep} = Dict();
+	local file_modifiers: {string: {BoundStep...}} = Dict();
+	for (local s: allsteps) {
+		for (local f: s.produced_files) {
+			if (!file_producers.setnew(f, s)) {
+				local o = file_producers[f];
+				throw Error("File {!r} is produced by multiple steps {}.{} and {}.{}"
+					.format({ f,
+						s.group.name, s.step.name,
+						o.group.name, o.step.name,
+					}));
+			}
+		}
+		for (local f, none: s.all_modified_output_files) {
+			local stps = file_modifiers.get(f);
+			if (stps is none)
+				file_modifiers[f] = stps = HashSet();
+			stps.insert(s);
+		}
+	}
+	local weak_dependency_pairs: {(BoundStep, BoundStep)...} = HashSet();
+	/* Determine step dependencies. */
+	for (local s: allsteps) {
+		for (local f: s.required_files) {
+			local dep;
+			if (f is FirstFileOf) {
+				dep = none;
+				for (local x: f.files) {
+					dep = file_producers.get(x);
+					if (dep !is none)
+						break;
+				}
+			} else {
+				dep = file_producers.get(f);
+			}
+			if (dep is none)
+				continue;
+			if (dep.has_recursive_dependency(s)) {
+				local chain = List(dep.walk_recursive_dependency(s));
+				for (local i = 0; i < #chain - 1; ++i) {
+					local pair = (chain[i], chain[i+1]);
+					if (pair in weak_dependency_pairs) {
+						weak_dependency_pairs.remove(pair);
+						pair[0].dependencies.remove(pair[1]);
+						loop_recheck.insert(pair[0]);
+						goto did_resolve;
+					}
+				}
+				print "ERROR: Recursive dependency:";
+				print "\t          ", s;
+				for (local e: chain)
+					print "\tdepends on", e;
+				throw Error("Recursive dependency");
+			}
+did_resolve:
+			s.dependencies.insert(dep);
+		}
+		/* Go through required input files one more time and check if
+		 * steps exist that may try to modify those files. - If adding
+		 * those steps as dependencies won't create a loop, do so */
+		for (local f: s.required_files) {
+			local mods = file_modifiers.get(f);
+			for (local m: mods) {
+				if (!m.has_recursive_dependency(s)) {
+					s.dependencies.insert(m);
+					weak_dependency_pairs.insert((s, m));
+				} else {
+					loop_recheck.insert(s);
+				}
+			}
+		}
+		for (local f, none: s.all_modified_output_files) {
+			/* Check if modified output files are created by some
+			 * other step. - If so, that step becomes a dependency
+			 * of `s' */
+			local dep = file_producers.get(f);
+			if (dep !is none) {
+				/* Don't create the dependency if it would cause a loop. */
+				if (!dep.has_recursive_dependency(s)) {
+					s.dependencies.insert(dep);
+					weak_dependency_pairs.insert((s, dep));
+				} else {
+					loop_recheck.insert(dep);
+				}
+			}
+		}
+	}
+	return (allsteps, loop_recheck);
+}
+function executeBuildSteps(steps: {BoundStep...}, recheck: {BoundStep...}, maxParallelSteps: int = 8) {
+	local missing_steps: {BoundStep...} = HashSet(steps);
+	local finished_steps: {BoundStep...} = HashSet();
+	local running_steps: {BoundStep...} = HashSet();
+	function print_status(marker: string, message: string) {
+		local num_missing = #missing_steps;
+		local num_finished = #finished_steps;
+		local num_running = #running_steps;
+		local avg_missing  = (float)num_missing + (float)num_running / 2;
+		local avg_finished = (float)num_finished + (float)num_running / 2;
+		local progress = try ((avg_finished / (avg_missing + avg_finished))) catch(...) 1.0;
+		print "["+marker+num_running+":" + str(int(progress * 100.0)).rjust(3) + "%",;
+		if (!message.startswith("["))
+			print "] ",;
+		else {
+			print " ",;
+			message = message[1:];
+		}
+		print message;
+	}
+	function waitfor_any_step() {
+		assert !running_steps.empty(),
+			"missing_steps: {!r}\n"
+			"finished_steps: {!r}\n"
+			.format({
+				for (local x: missing_steps) str(x),
+				for (local x: finished_steps) str(x),
+			})
+		;
+		local unchanged_iterations = 0;
+again:
+		if (#running_steps == 1) {
+			local s = running_steps.first;
+			s.waitfor();
+			print_status(LOG_END_MARKER, "{} (done)".format({ s }));
+			running_steps.clear();
+			finished_steps.insert(s);
+		} else if (running_steps) {
+			for (local s: running_steps) {
+				if (!s.trywaitfor())
+					continue;
+				print_status(LOG_END_MARKER, "{} (done)".format({ s }));
+				running_steps.remove(s);
+				finished_steps.insert(s);
+				unchanged_iterations = 0;
+				return; /* Got one! */
+			}
+			if ((unchanged_iterations % 10) == 9) {
+				print_status(LOG_UPDATE_MARKER, "Still waiting on:");
+				for (local x: running_steps)
+					print "\t" + x;
+			}
+			Thread.sleep(JOIN_WAIT_DELAY);
+			++unchanged_iterations;
+			goto again;
+		}
+	}
+	function start_step(s: BoundStep, reason: string) {
+		local unchanged_iterations = 0;
+again:
+		if (running_steps) {
+			/* Make sure that no other steps are already running that
+			 * may also be trying to modify any of our in-out files. */
+			local mod = s.all_modified_output_files;
+			if (mod) {
+				local io_files = HashSet(mod.each[0]);
+				local colliding_steps = HashSet();
+				for (local run: running_steps) {
+					for (local o, none: run.all_modified_output_files) {
+						if (o in io_files) {
+							colliding_steps.insert(run);
+							break;
+						}
+					}
+				}
+				/* Wait for all colliding steps to complete. */
+				while (colliding_steps) {
+					local st = colliding_steps.popitem();
+					st.waitfor();
+					print_status(LOG_END_MARKER, "{} (done)".format({ st }));
+					running_steps.remove(st);
+					finished_steps.insert(st);
+				}
+			}
+		}
+		if (s.complete()) {
+			missing_steps.remove(s);
+			finished_steps.insert(s);
+			return;
+		}
+		/* If there are too many running steps, wait for one of them to finish */
+		if (#running_steps >= maxParallelSteps) {
+			for (local x: running_steps) {
+				if (x.trywaitfor()) {
+					print_status(LOG_END_MARKER, "{} (done)".format({ x }));
+					running_steps.remove(x);
+					finished_steps.insert(x);
+					goto do_start_step;
+				}
+			}
+			if ((unchanged_iterations % 10) == 9) {
+				print_status(LOG_UPDATE_MARKER, "Still waiting on:");
+				for (local x: running_steps)
+					print "\t" + x;
+			}
+			Thread.sleep(JOIN_WAIT_DELAY);
+			++unchanged_iterations;
+			goto again;
+		}
+do_start_step:
+		missing_steps.remove(s);
+		running_steps.insert(s);
+		print_status(LOG_START_MARKER, "{} (begin: {})".format({ s, reason }));
+		s.begin();
+	}
+search_next_step:
+	while (missing_steps) {
+		local blockers: {BoundStep...} = HashSet();
+		for (local s: missing_steps) {
+			for (local x: s.dependencies) {
+				if (x !in finished_steps) {
+					blockers.insert(s);
+					goto try_next_step;
+				}
+			}
+			/* Check if this step _must_ be rebuild */
+			if (s.toolchain.config.FORCE) {
+				/* Allow the use of OPT_NOFORCE to ignore config.FORCE */
+				if (!s.group.options.get(OPT_NOFORCE, false)) {
+					s.createOutputFolders();
+					start_step(s, "FORCE");
+					goto search_next_step;
+				}
+			}
+			/* Check if this step needs to be executed.
+			 * This is the case if any of the step's output files
+			 * are missing, or if any of its input files are newer
+			 * that the newest output file. */
+			local lmod = none;
+			for (local o: s.produced_output_files) {
+				assert o in s.produced_files;
+				local temp = getLastModfiedTime(o);
+				if (temp is none) {
+					/* Create missing folders leading up to all output files. */
+					s.createOutputFolders();
+					start_step(s, "output {!r} is missing".format({ o }));
+					goto search_next_step;
+				}
+				if (lmod is none || temp > lmod)
+					lmod = temp;
+			}
+			for (local o, temp: s.modified_output_files) {
+				if (temp is none) {
+					/* The modified file didn't exist when dependencies were ordered */
+					s.createOutputFolders();
+					start_step(s, "file {!r} didn't exist".format({ o }));
+					goto search_next_step;
+				}
+				if (lmod is none || temp > lmod)
+					lmod = temp;
+			}
+			for (local o, temp: s.maybe_modified_output_files) {
+				if (temp is none) {
+					s.createOutputFolders();
+					start_step(s, "file {!r} was never updated".format({ o }));
+					goto search_next_step;
+				}
+				if (lmod is none || temp > lmod)
+					lmod = temp;
+			}
+			if (lmod !is none) {
+				/* Check if any of the step's input files were modified after its output. */
+				for (local i: s.required_files) {
+					local temp;
+					local filename = i;
+					if (i is FirstFileOf) {
+						temp = none;
+						for (local x: i.files) {
+							temp = getLastModfiedTime(x);
+							if (temp !is none) {
+								filename = x;
+								break;
+							}
+						}
+					} else {
+						temp = getLastModfiedTime(filename);
+					}
+					if (temp is none) {
+						start_step(s, "{!r} was deleted".format({ filename }));
+						goto search_next_step;
+					}
+					if (temp > lmod) {
+						start_step(s, "{!r} has changed".format({ filename }));
+						goto search_next_step;
+					}
+				}
+			}
+			/* This step can be skipped! */
+			s.skip();
+			missing_steps.remove(s);
+			finished_steps.insert(s);
+			goto search_next_step;
+try_next_step:
+			;
+		}
+		if (blockers) {
+			local common_deps = none;
+			/* Search `blockers' for common dependencies and do a blocking wait on those */
+			for (local x: blockers) {
+				if (common_deps is none) {
+					common_deps = x.dependencies;
+					continue;
+				}
+				local new_common = HashSet();
+				for (local y: x.dependencies) {
+					if (y !in common_deps)
+						continue;
+					new_common.insert(y);
+				}
+				common_deps = new_common;
+				if (!common_deps)
+					break;
+			}
+			local did_wait_any = false;
+			/* Wait until all blockers have finished
+			 * Doing it this way is more efficient, since we don't have to keep
+			 * on polling dependencies, and can instead blocking-waitfor all of
+			 * them to finish.
+			 */
+			for (local block: common_deps) {
+				if (block !in running_steps)
+					continue; /* Hasn't started, yet */
+				block.waitfor();
+				print_status(LOG_END_MARKER, "{} (done)".format({ block }));
+				running_steps.remove(block);
+				finished_steps.insert(block);
+				did_wait_any = true;
+			}
+			if (did_wait_any)
+				goto search_next_step;
+		}
+		/* If no step was started, wait for one of the running steps to finish */
+		waitfor_any_step();
+	}
+	/* Wait for all steps that are still running */
+	while (running_steps) {
+		local st = running_steps.first;
+		st.waitfor();
+		print_status(LOG_END_MARKER, "{} (done)".format({ st }));
+		running_steps.remove(st);
+		finished_steps.insert(st);
+	}
+	if (recheck) {
+		local recheck_reason;
+		for (local s: recheck) {
+			local lmod = none;
+			s.updateModifiedOutputTimes();
+			for (local o: s.produced_output_files) {
+				assert o in s.produced_files;
+				local temp = getLastModfiedTime(o);
+				if (temp is none) {
+					recheck_reason = "output {!r} is missing".format({ o });
+					goto do_reset_step;
+				}
+				if (lmod is none || temp > lmod)
+					lmod = temp;
+			}
+			for (local o, temp: s.modified_output_files) {
+				if (temp is none) {
+					recheck_reason = "file {!r} didn't exist".format({ o });
+					goto do_reset_step;
+				}
+				if (lmod is none || temp > lmod)
+					lmod = temp;
+			}
+			for (local o, temp: s.maybe_modified_output_files) {
+				if (temp is none) {
+					recheck_reason = "file {!r} was never updated".format({ o });
+					goto do_reset_step;
+				}
+				if (lmod is none || temp > lmod)
+					lmod = temp;
+			}
+			if (lmod !is none) {
+				/* Check if any of the step's input files were modified after its output. */
+				for (local i: s.required_files) {
+					local temp;
+					local filename = i;
+					if (i is FirstFileOf) {
+						temp = none;
+						for (local x: i.files) {
+							temp = getLastModfiedTime(x);
+							if (temp !is none) {
+								filename = x;
+								break;
+							}
+						}
+					} else {
+						temp = getLastModfiedTime(filename);
+					}
+					if (temp is none) {
+						recheck_reason = "{!r} was deleted".format({ filename });
+						goto do_reset_step;
+					}
+					if (temp > lmod) {
+						recheck_reason = "{!r} has changed".format({ filename });
+						goto do_reset_step;
+					}
+				}
+			}
+			continue;
+do_reset_step:
+			print_status(LOG_UPDATE_MARKER, "{} (Restarting: {})"
+				.format({ s, recheck_reason }));
+			missing_steps.insert(s);
+			finished_steps.remove(s);
+			s.reset();
+		}
+		if (missing_steps) {
+			/* Must also restart all steps that have
+			 * dependencies on on restarted steps. */
+again_search_fin_steps:
+			for (local fin: finished_steps) {
+				local has_restart_dep = false;
+				for (local dep: fin.dependencies) {
+					if (dep in missing_steps) {
+						has_restart_dep = true;
+						break;
+					}
+				}
+				if (has_restart_dep) {
+					fin.reset();
+					fin.updateModifiedOutputTimes();
+					finished_steps.remove(fin);
+					missing_steps.insert(fin);
+					goto again_search_fin_steps;
+				}
+			}
+			print "Restarting the following steps:";
+			for (local s: missing_steps) {
+				print "\t",;
+				print s;
+			}
+			goto search_next_step;
+		}
+	}
+}
+
+
+
+#if 0
+class Timed {
+	this = default;
+	public member name: string = "Unnamed";
+	private member start;
+	operator enter() {
+		import tick from time;
+		start = tick();
+	}
+	operator leave() {
+		import tick from time;
+		local end = tick();
+		print "Timed:", name, "took", (end - start);
+	}
+}
+#endif
+
+
+@@Helper function for combining @orderGroups and @executeBuildSteps
+@@in order to perform a parallel build of all of the specified groups
+function buildGroups(toolchain: Toolchain, groups: {Group...}, maxParallelSteps: int = 8) {
+#if 1
+	local steps, recheck = orderGroups(toolchain, groups)...;
+	executeBuildSteps(steps, recheck, maxParallelSteps);
+#else
+	local steps, recheck = (
+		with(Timed("orderGroups"))
+			orderGroups(toolchain, groups))...;
+	with(Timed("executeBuildSteps"))
+		executeBuildSteps(steps, recheck, maxParallelSteps);
+#endif
+}
+
+function filterStepsWithCallback(
+		steps: {BoundStep...},
+		filterStep: Callable with BoundStep): {BoundStep...} {
+	for (local s: steps) {
+		if (filterStep(s))
+			yield s;
+	}
+}
+
+@@Same as @filterStepsWithCallback(), but also enumerate dependencies
+function filterStepsWithCallbackWithDepdendencies(
+		steps: {BoundStep...}, filterStep: Callable with BoundStep): {BoundStep...} {
+	local result = HashSet();
+	local recheckSteps = HashSet();
+	for (local s: filterStepsWithCallback(steps, filterStep)) {
+		if (s in result)
+			continue;
+		result.insert(s);
+		local deps = s.dependencies;
+		recheckSteps.update(deps);
+	}
+again_recheck_deps:
+	local myRecheckSteps = recheckSteps;
+	recheckSteps = HashSet();
+	for (local s: myRecheckSteps) {
+		if (s in result)
+			continue;
+		result.insert(s);
+		local deps = s.dependencies;
+		recheckSteps.update(deps);
+	}
+	if (recheckSteps)
+		goto again_recheck_deps;
+	return result;
+}
+
+
+@@Same as @buildGroups(), however only perform steps
+@@for which the given @filterStep() returns true
+function buildGroupsWithStepFilter(
+		toolchain: Toolchain, groups: {Group...},
+		filterStep: {(bool,string)...} = none, maxParallelSteps: int = 8) {
+	local steps, recheck = orderGroups(toolchain, groups)...;
+	if (filterStep !is none)
+		steps = filterStepsWithCallbackWithDepdendencies(steps, filterStep);
+	executeBuildSteps(steps, recheck, maxParallelSteps);
+}
+
+
+
+function enumerateBoundStepOutputFilesForWhitelistChecking(step: BoundStep): {string...} {
+	yield step.produced_output_files...;
+	for (local o, none: step.modified_output_files)
+		yield o;
+	for (local o, none: step.maybe_modified_output_files)
+		yield o;
+}
+
+@@Same as @buildGroups(), however only perform steps that are required by other steps,
+@@as well as steps that produce output files that are apart of @outputWhiteList
+@@@param outputWhiteList: Set of (is_regex, pattern_or_filename)
+function buildGroupsWithOutputWhitelist(
+		toolchain: Toolchain, groups: {Group...},
+		outputWhiteList: {(bool,string)...} = none, maxParallelSteps: int = 8) {
+	if (outputWhiteList is none)
+		return buildGroups(toolchain, groups, maxParallelSteps);
+	return buildGroupsWithStepFilter(toolchain, groups, [](step: BoundStep) {
+		/* `outputWhiteList' must contain a regex pattern for
+		 * any of the step's following output file categories:
+		 *   - produced_output_files
+		 *   - modified_output_files
+		 *   - maybe_modified_output_files
+		 */
+		for (local f: enumerateBoundStepOutputFilesForWhitelistChecking(step)) {
+			for (local is_regex, pattern: outputWhiteList) {
+				if (is_regex ? f.rematches(pattern) : f == pattern)
+					return true; /* Got a match! */
+			}
+		}
+		return false;
+	}, maxParallelSteps);
+}
+
+
+@@Same as @buildGroups(), however only perform steps that are required by other steps,
+@@as well as steps that are apart of one of the given groups
+@@@param groupWhiteList: Set of List of whitelisted group names
+function buildGroupsWithGroupWhitelist(
+		toolchain: Toolchain, groups: {Group...},
+		groupWhiteList: {string...} = none, maxParallelSteps: int = 8) {
+	if (groupWhiteList is none)
+		return buildGroups(toolchain, groups, maxParallelSteps);
+	return buildGroupsWithStepFilter(toolchain, groups,
+		[](step: BoundStep) {
+		return step.group.name in groupWhiteList;
+	}, maxParallelSteps);
+}
+
+
+@@Same as @buildGroups(), however only perform steps that are required by other steps,
+@@as well as steps that are apart of identically-named groups containing at least a
+@@single step that requires one of the given @inputFileWhitelist as input
+@@Using this, you can implement something like BUILD_PROJECT_OF(SOURCE_FILE)
+@@@param inputFileWhitelist: Set of filenames normalized using `normalizePath(NAME, false)'
+function buildGroupsWithGroupOfInputFileWhitelist(
+		toolchain: Toolchain, groups: {Group...},
+		inputFileWhitelist: {string...} = none, maxParallelSteps: int = 8) {
+	if (inputFileWhitelist is none)
+		return buildGroups(toolchain, groups, maxParallelSteps);
+	local steps, recheck = orderGroups(toolchain, groups)...;
+	local whiteListGroupNames = HashSet();
+	for (local bs: steps) {
+		for (local rf: bs.required_files) {
+			if (rf in inputFileWhitelist) {
+				whiteListGroupNames.insert(bs.group.name);
+				goto next_step;
+			}
+		}
+next_step:
+		;
+	}
+	/* Apply a filter to only run steps apart of the whitelisted groups. */
+	steps = filterStepsWithCallbackWithDepdendencies(steps,
+		[](step: BoundStep) -> step.group.name in whiteListGroupNames);
+	executeBuildSteps(steps, recheck, maxParallelSteps);
+}
+
+
+
+
+

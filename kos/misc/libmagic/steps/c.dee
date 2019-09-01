@@ -1,0 +1,642 @@
+/* Copyright (c) 2018 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+/* Group compilation steps for working with C source files */
+
+import * from deemon;
+import * from errors;
+import * from ..libmagic;
+
+@@Option: string | {string...}
+@@List of wildcard-enabled filenames, relative to
+@@@ROOTDIR, or to the associated @Group.defPath
+final global OPT_COMPILE_SOURCES: string = "COMPILE.sources";
+@@Option: bool
+@@Set to @true to enable in-source compiler flag overrides
+@@When a COMPILE.sources file has changed and has to be re-compiled,
+@@it's content is scanned to check if it the file's start matches
+@@one o the following patterns:
+@@  - `<START_OF_FILE>/*<CONTENT>*/'
+@@  - `<START_OF_FILE>//<CONTENT>\n//<CONTENT>\n//<CONTENT>\n...'
+@@  - `<START_OF_FILE>#<CONTENT>\n#<CONTENT>\n#<CONTENT>\n...'
+@@If this applies, the sum of all given <CONTENT> is taken (line-feeds
+@@from single-line comments are re-added) and further analyzed to check
+@@if that content matches the following pattern:
+@@  - @r"\[\[\[magic\s.*\]\]\]"
+@@If this is the case, the content matched by the @r".*" is then taken
+@@again and executed as a piece of deemon code, providing 2 global variables:
+@@  - @(options: {string: Object}), which is a modifiable copy of the @Dict used
+@@     to hold compiler options. - Any changed made to this dict will apply only
+@@     to the annotated file, and will be applied to the commandline of that file.
+@@  - @(step: Step), which is the associated build step
+final global OPT_COMPILE_INLINE_SOURCE_FLAGS: string = "COMPILE.inline_source_flags";
+@@Option: {string...}
+@@List of additional flags passed to the C compiler
+final global OPT_COMPILE_CCFLAGS: string = "COMPILE.cflags";
+@@Option: {string...}
+@@List of additional flags passed to the preprocessor
+final global OPT_COMPILE_PPFLAGS: string = "COMPILE.pflags";
+@@Option: {string...}
+@@List of additional flags passed to the assembler
+final global OPT_COMPILE_ASFLAGS: string = "COMPILE.aflags";
+@@Option: {string...}
+@@List of additional include paths passed to the preprocessor
+final global OPT_COMPILE_INCPATH: string = "COMPILE.incpath";
+@@Option: {string: string | none}
+@@Mapping of additional, predefined macros
+final global OPT_COMPILE_MACROS: string = "COMPILE.macros";
+@@Option: string
+@@Override for the output location of the object file
+@@NOTE: When set, only a single object file may be created by COMPILE
+@@      Otherwise, you will get a multiple-producers error.
+final global OPT_COMPILE_OBJFILE: string = "COMPILE.objfile";
+@@Option: {string...}
+@@List of ["E", "S"] (E: PREPROCESS; S: ASSEMBLE)
+@@additional actions to perform with COMPILE
+final global OPT_COMPILE_SECONDARY: string = "COMPILE.secondary";
+@@Option: string
+@@Language name to-be build:
+@@    All toolchains must accept "c"
+@@    Any toolchains providing a c++ compiler must accept "c++"
+@@Other values are  toolchain-specific
+final global OPT_COMPILE_LANGUAGE: string = "COMPILE.language";
+@@Option: string
+@@Name of the executable to-be produced by the linker
+final global OPT_LINK_OUTPUT: string = "LINK.output";
+@@Option: {string...}
+@@List of additional object files to input in a link
+final global OPT_LINK_OBJECTS: string = "LINK.objects";
+@@Option: {string...}
+@@List of additional flags to pass to a linker  (-Wl...)
+final global OPT_LINK_LDFLAGS: string = "LINK.ldflags";
+@@Option: string
+@@Filename of an LD linker script (gets put through the C preprocessor)  (-Wl, -T, ...)
+final global OPT_LINK_SCRIPT: string = "LINK.script";
+@@Option: {string...}
+@@List of additional library paths  (-L ...)
+final global OPT_LINK_LIBPATH: string = "LINK.libpath";
+@@Option: {string...}
+@@List of additional libraries to link against  (-l...)
+final global OPT_LINK_LIBRARIES: string = "LINK.libraries";
+@@Option: bool
+@@Disable standard library inclusion  (-nostdlib)
+final global OPT_LINK_NOSTDLIB: string = "LINK.nostdlib";
+@@Option: string
+@@Output filename of the static library archiver
+final global OPT_ARCHIVE_OUTPUT: string = "ARCHIVE.output";
+
+
+final local function readFileUntil(fp: File, end_pattern: string): string | none {
+	File.Writer result;
+	for (;;) {
+		local temp = fp.read(512);
+		if (!temp)
+			return none;
+		local pos = temp.find(end_pattern);
+		if (pos < 0) {
+			result << temp;
+			continue;
+		}
+		result << temp[:pos];
+		temp = result.string.find(end_pattern);
+		if (temp >= 0)
+			return result.string[:temp];
+		break;
+	}
+	return result.string;
+}
+
+final local function getCompileOptions(self: BoundStep, srcFile: string): {string: Object} {
+	local result = self.group.options;
+	if (result.get(OPT_COMPILE_INLINE_SOURCE_FLAGS)) {
+		local fp = try File.open(srcFile, "r,nobuf") catch (...) none;
+		if (fp !is none) {
+			local header = fp.read(11);
+			local content;
+			if (#header == 11) {
+				if (header.startswith("/*[[[magic")) {
+					if (header.isspace(10) || header.islf(10)) {
+						content = readFileUntil(fp, "]]]*/");
+						if (content is none)
+							goto err_bad_magic_tag;
+exec_content:
+						result = deepcopy result; /* Make sure that only 1 file is affected! */
+						exec(content, globals: { "options" : result, "step": self });
+					}
+				} else if (header.startswith("//[[[magic")) {
+					if (header.isspace(10) || header.islf(10)) {
+						content = readFileUntil(fp, "]]]");
+						if (content is none)
+							goto err_bad_magic_tag;
+						File.Writer fixfp;
+						for (local l: content.splitlines(true)) {
+							if (l.startswith("//"))
+								l = l[2:];
+							else {
+								l = l.lstrip();
+								if (l.startswith("//"))
+									l = l[2:];
+								else {
+									goto err_bad_magic_tag;
+								}
+							}
+							fixfp << l;
+						}
+						content = fixfp.string;
+						goto exec_content;
+					}
+				} else if (header.startswith("#[[[magic")) {
+					if (header.isspace(9) || header.islf(9)) {
+						content = readFileUntil(fp, "]]]");
+						if (content is none)
+							goto err_bad_magic_tag;
+						content = header[10:] + content;
+						File.Writer fixfp;
+						for (local l: content.splitlines(true)) {
+							if (l.startswith("#"))
+								l = l[1:];
+							else {
+								l = l.lstrip();
+								if (l.startswith("#"))
+									l = l[1:];
+								else {
+									print "HERE", repr content;
+									goto err_bad_magic_tag;
+								}
+							}
+							fixfp << l;
+						}
+						content = fixfp.string;
+						goto exec_content;
+					}
+				}
+			}
+		}
+	}
+	return result;
+err_bad_magic_tag:
+	throw Error("Bad magic tag in {!r}".format({ srcFile }));
+}
+
+
+final local function PREPROCESS_run(self: BoundStep): {Waitable...} {
+	local toolchain = self.toolchain;
+	local config = toolchain.config;
+	local group = self.group;
+	local srcFile = group.fixFilename(self.userData);
+	local options = getCompileOptions(self, srcFile);
+	yield toolchain.createPreprocessorProcess(
+		step:     self,
+		options:  options,
+		srcFile:  srcFile,
+		outFile:  config.getPreprocessedFilename(group, srcFile),
+		depFile:  config.getDependencyFilename(group, srcFile),
+		ppFlags:  options.get(OPT_COMPILE_PPFLAGS),
+		language: options.get(OPT_COMPILE_LANGUAGE),
+		incPath:  group.fixFilenames(options.get(OPT_COMPILE_INCPATH)),
+		macros:   options.get(OPT_COMPILE_MACROS),
+	);
+}
+final local function PREPROCESS_getProducedFiles(self: BoundStep): {string...} {
+	local config = self.toolchain.config;
+	local group = self.group;
+	local srcFile = group.fixFilename(self.userData);
+	yield config.getDependencyFilename(group, srcFile);
+	yield config.getPreprocessedFilename(group, srcFile);
+}
+final local function PREPROCESS_getProducedOutputFiles(self: BoundStep): {string...} {
+	local group = self.group;
+	local srcFile = group.fixFilename(self.userData);
+	yield self.toolchain.config.getPreprocessedFilename(group, srcFile);
+}
+final local function PREPROCESS_tostr(self: BoundStep): string {
+	local group = self.group;
+	return "[{}] Preprocess {!r}".format({
+		group.name,
+		group.fixFilename(self.userData),
+	});
+}
+
+final local function ASSEMBLE_run(self: BoundStep): {Waitable...} {
+	local toolchain = self.toolchain;
+	local config = toolchain.config;
+	local group = self.group;
+	local srcFile = group.fixFilename(self.userData);
+	local options = getCompileOptions(self, srcFile);
+	yield toolchain.createAssemblerProcess(
+		step:     self,
+		options:  options,
+		srcFile:  srcFile,
+		asmFile:  config.getAssembledFilename(group, srcFile),
+		depFile:  config.getDependencyFilename(group, srcFile),
+		ccFlags:  options.get(OPT_COMPILE_CCFLAGS),
+		ppFlags:  options.get(OPT_COMPILE_PPFLAGS),
+		language: options.get(OPT_COMPILE_LANGUAGE),
+		incPath:  group.fixFilenames(options.get(OPT_COMPILE_INCPATH)),
+		macros:   options.get(OPT_COMPILE_MACROS)
+	);
+}
+final local function ASSEMBLE_getProducedFiles(self: BoundStep): {string...} {
+	local config = self.toolchain.config;
+	local group = self.group;
+	local srcFile = group.fixFilename(self.userData);
+	yield config.getDependencyFilename(group, srcFile);
+	yield config.getAssembledFilename(group, srcFile);
+}
+final local function ASSEMBLE_getProducedOutputFiles(self: BoundStep): {string...} {
+	local group = self.group;
+	local srcFile = group.fixFilename(self.userData);
+	yield self.toolchain.config.getAssembledFilename(group, srcFile);
+}
+final local function ASSEMBLE_tostr(self: BoundStep): string {
+	local group = self.group;
+	return "[{}] Assemble {!r}".format({
+		group.name,
+		group.fixFilename(self.userData),
+	});
+}
+
+
+final local function COMPILE_split(self: BoundStep): {BoundStep...} {
+	local group = self.group;
+	for (local f: group.enumerateWildcardFiles(group.options.get(OPT_COMPILE_SOURCES)))
+		yield self.createChildStep(f);
+}
+
+final local function COMPILE_run(self: BoundStep): {Waitable...} {
+	local toolchain = self.toolchain;
+	local config = toolchain.config;
+	local group = self.group;
+	local srcFile = self.userData;
+	local options = getCompileOptions(self, srcFile);
+	local objFile = options.get(OPT_COMPILE_OBJFILE);
+	objFile = objFile is none
+		? config.getObjectFilename(group, srcFile)
+		: group.fixFilename(objFile)
+		;
+	local secondary = options.get(OPT_COMPILE_SECONDARY);
+	if (!secondary) {
+		yield toolchain.createCompilerProcess(
+			step:     self,
+			options:  options,
+			srcFile:  srcFile,
+			ccFlags:  options.get(OPT_COMPILE_CCFLAGS),
+			ppFlags:  options.get(OPT_COMPILE_PPFLAGS),
+			asFlags:  options.get(OPT_COMPILE_ASFLAGS),
+			depFile:  config.getDependencyFilename(group, srcFile),
+			objFile:  objFile,
+			language: options.get(OPT_COMPILE_LANGUAGE),
+			incPath:  group.fixFilenames(options.get(OPT_COMPILE_INCPATH)),
+			macros:   options.get(OPT_COMPILE_MACROS)
+		);
+	} else for (local x: secondary) {
+		if (x == "E") {
+			yield toolchain.createPreprocessorProcess(
+				step:     self,
+				options:  options,
+				srcFile:  srcFile,
+				outFile:  config.getPreprocessedFilename(group, srcFile),
+				depFile:  config.getDependencyFilename(group, srcFile),
+				ppFlags:  options.get(OPT_COMPILE_PPFLAGS),
+				language: options.get(OPT_COMPILE_LANGUAGE),
+				incPath:  group.fixFilenames(options.get(OPT_COMPILE_INCPATH)),
+				macros:   options.get(OPT_COMPILE_MACROS),
+			);
+		}
+		if (x == "S") {
+			yield toolchain.createAssemblerProcess(
+				step:     self,
+				options:  options,
+				srcFile:  srcFile,
+				asmFile:  config.getAssembledFilename(group, srcFile),
+				depFile:  config.getDependencyFilename(group, srcFile),
+				ccFlags:  options.get(OPT_COMPILE_CCFLAGS),
+				ppFlags:  options.get(OPT_COMPILE_PPFLAGS),
+				language: options.get(OPT_COMPILE_LANGUAGE),
+				incPath:  group.fixFilenames(options.get(OPT_COMPILE_INCPATH)),
+				macros:   options.get(OPT_COMPILE_MACROS)
+			);
+		}
+	}
+}
+final local function COMPILE_getRequiredFiles(self: BoundStep): {string...} {
+	local srcFile = self.userData;
+	local toolchain = self.toolchain;
+	local dep = toolchain.config.getDependencyFilename(self.group, srcFile);
+	local fp = try File.open(dep, "r") catch (...) none;
+	if (fp !is none) {
+		local text = with(fp) fp.read().decode("utf-8");
+		for (local x: toolchain.parseDependencyFile(text))
+			yield x;
+	}
+	yield srcFile;
+}
+final local function COMPILE_WRAP_getRequiredFiles(self: BoundStep): {string...} {
+	local group = self.group;
+	local toolchain = self.toolchain;
+	local srcFile = group.fixFilename(self.userData);
+	local dep = toolchain.config.getDependencyFilename(group, srcFile);
+	local fp = try File.open(dep, "r") catch (...) none;
+	if (fp !is none) {
+		local text = with(fp) fp.read().decode("utf-8");
+		for (local x: toolchain.parseDependencyFile(text))
+			yield x;
+	}
+	yield srcFile;
+}
+final local function COMPILE_getProducedFiles(self: BoundStep): {string...} {
+	local config = self.toolchain.config;
+	local group = self.group;
+	local srcFile = self.userData;
+	local options = group.options;
+	yield config.getDependencyFilename(group, srcFile);
+	local secondary = options.get(OPT_COMPILE_SECONDARY);
+	if (!secondary) {
+		local objFile = options.get(OPT_COMPILE_OBJFILE);
+		yield objFile is none
+			? config.getObjectFilename(group, srcFile)
+			: group.fixFilename(objFile)
+			;
+	} else for (local x: options.get(OPT_COMPILE_SECONDARY)) {
+		if (x == "E")
+			yield config.getPreprocessedFilename(group, srcFile);
+		if (x == "S")
+			yield config.getAssembledFilename(group, srcFile);
+	}
+}
+final local function COMPILE_getProducedOutputFiles(self: BoundStep): {string...} {
+	local group = self.group;
+	local config = self.toolchain.config;
+	local srcFile = self.userData;
+	local options = group.options;
+	local objFile = options.get(OPT_COMPILE_OBJFILE);
+	local secondary = options.get(OPT_COMPILE_SECONDARY);
+	if (!secondary) {
+		yield objFile is none
+			? config.getObjectFilename(group, srcFile)
+			: group.fixFilename(objFile)
+			;
+	} else for (local x: options.get(OPT_COMPILE_SECONDARY)) {
+		if (x == "E")
+			yield config.getPreprocessedFilename(group, srcFile);
+		if (x == "S")
+			yield config.getAssembledFilename(group, srcFile);
+	}
+}
+final local function COMPILE_tostr(self: BoundStep): string {
+	return "[{}] Compile {!r}".format({
+		self.group.name,
+		self.userData,
+	});
+}
+
+
+
+global PREPROCESS;
+final local function LINK_split(self: BoundStep): {BoundStep...} {
+	local script = self.group.options.get(OPT_LINK_SCRIPT);
+	if (script !is none) {
+		/* Generate the linker script in its own step */
+		local sc = self.createChildStep(script);
+		sc.step = PREPROCESS;
+		sc.group = copy sc.group;
+		local opt = deepcopy sc.group.options;
+		sc.group.options = opt;
+		/* Allow the detection of a linker script with `__LINKER__' */
+		opt.setdefault(OPT_COMPILE_MACROS, Dict()).setdefault("__LINKER__", "1");
+		/* Disable generation of #line directives (the linker doesn't like those) */
+		opt.setdefault(OPT_COMPILE_PPFLAGS, []).append("-P"); /* TODO: Not portable */
+		yield sc;
+	}
+	yield self;
+}
+final local function LINK_enumerate_objects(self: BoundStep): {string...} {
+	local config = self.toolchain.config;
+	local group = self.group;
+	local options = group.options;
+	for (local f: group.enumerateWildcardFiles(options.get(OPT_COMPILE_SOURCES)))
+		yield config.getObjectFilename(group, f);
+	yield group.fixFilenames(options.get(OPT_LINK_OBJECTS))...;
+}
+final local function LINK_run(self: BoundStep): string {
+	local toolchain = self.toolchain;
+	local config = toolchain.config;
+	local group = self.group;
+	local options = group.options;
+	local script = options.get(OPT_LINK_SCRIPT);
+	yield toolchain.createLinkerProcess(
+		step:     self,
+		exeFile:  group.fixFilename(options[OPT_LINK_OUTPUT]),
+		objFiles: LINK_enumerate_objects(self),
+		ldFlags:  options.get(OPT_LINK_LDFLAGS),
+		language: options.get(OPT_COMPILE_LANGUAGE),
+		linkerScript: \
+			if (script !is none)
+				config.getPreprocessedFilename(group, group.fixFilename(script)),
+		libPath: group.fixFilenames(options.get(OPT_LINK_LIBPATH)),
+		libraries: options.get(OPT_LINK_LIBRARIES),
+		noStdLib: options.get(OPT_LINK_NOSTDLIB, false),
+	);
+}
+final local function LINK_getRequiredFiles(self: BoundStep): string {
+	local toolchain = self.toolchain;
+	local config = toolchain.config;
+	local group = self.group;
+	local options = group.options;
+	for (local f: group.enumerateWildcardFiles(options.get(OPT_COMPILE_SOURCES)))
+		yield config.getObjectFilename(group, f);
+	for (local f: options.get(OPT_LINK_OBJECTS))
+		yield group.fixFilename(f);
+	local script = options.get(OPT_LINK_SCRIPT);
+	if (script !is none)
+		yield config.getPreprocessedFilename(group, group.fixFilename(script));
+	yield toolchain.enumerateLinkerDependencies(
+		step:      self,
+		language:  options.get(OPT_COMPILE_LANGUAGE),
+		libPath:   group.fixFilenames(options.get(OPT_LINK_LIBPATH)),
+		libraries: options.get(OPT_LINK_LIBRARIES),
+		noStdLib:  options.get(OPT_LINK_NOSTDLIB, false),
+	)...;
+}
+final local function LINK_getProducedFiles(self: BoundStep): string {
+	local group = self.group;
+	yield group.fixFilename(group.options[OPT_LINK_OUTPUT]);
+}
+final local function LINK_tostr(self: BoundStep): string {
+	local group = self.group;
+	return "[{}] Link {!r}".format({
+		group.name,
+		group.fixFilename(group.options[OPT_LINK_OUTPUT]),
+	});
+}
+
+
+
+
+final local function ARCHIVE_run(self: BoundStep): string {
+	local toolchain = self.toolchain;
+	local config = toolchain.config;
+	local group = self.group;
+	local options = group.options;
+	yield toolchain.createArchiveProcess(
+		step:     self,
+		arcFile:  group.fixFilename(options[OPT_ARCHIVE_OUTPUT]),
+		objFiles: (
+			(for (local f: group.enumerateWildcardFiles(options.get(OPT_COMPILE_SOURCES)))
+				config.getObjectFilename(group, f)) +
+			group.fixFilenames(options.get(OPT_LINK_OBJECTS))
+		),
+	);
+}
+final local function ARCHIVE_getRequiredFiles(self: BoundStep): string {
+	local config = self.toolchain.config;
+	local group = self.group;
+	local options = group.options;
+	for (local f: group.enumerateWildcardFiles(options.get(OPT_COMPILE_SOURCES)))
+		yield config.getObjectFilename(group, f);
+	for (local f: options.get(OPT_LINK_OBJECTS))
+		yield group.fixFilename(f);
+}
+final local function ARCHIVE_getProducedFiles(self: BoundStep): string {
+	local group = self.group;
+	yield group.fixFilename(group.options[OPT_ARCHIVE_OUTPUT]);
+}
+final local function ARCHIVE_tostr(self: BoundStep): string {
+	local group = self.group;
+	return "[{}] Archive {!r}".format({
+		group.name,
+		group.fixFilename(group.options[OPT_ARCHIVE_OUTPUT]),
+	});
+}
+
+
+
+
+
+@@COMPILE
+@@This compiler step reads C source files from @OPT_COMPILE_SOURCES group options,
+@@at which point it will interpret those strings as group-relative wildcard
+@@strings that will be passed to the toolchain in order to compile C/C++
+@@source files.
+@@Additional compiler commandline flags may be specified through with OPT_COMPILE_*FLAGS
+global COMPILE: Step = Step(
+	name: "COMPILE",
+	options: {
+		OPT_COMPILE_SOURCES,
+		OPT_COMPILE_CCFLAGS,
+		OPT_COMPILE_PPFLAGS,
+		OPT_COMPILE_ASFLAGS,
+		OPT_COMPILE_LANGUAGE,
+		OPT_COMPILE_INCPATH,
+		OPT_COMPILE_MACROS,
+		OPT_COMPILE_OBJFILE
+	},
+	split: COMPILE_split,
+	run: COMPILE_run,
+	getRequiredFiles: COMPILE_getRequiredFiles,
+	getProducedFiles: COMPILE_getProducedFiles,
+	getProducedOutputFiles: COMPILE_getProducedOutputFiles,
+	tostr: COMPILE_tostr,
+);
+
+
+@@PREPROCESS
+@@Simply preprocess a given file
+global PREPROCESS: Step = Step(
+	name: "PREPROCESS",
+	options: {
+		OPT_COMPILE_SOURCES,
+		OPT_COMPILE_PPFLAGS,
+		OPT_COMPILE_LANGUAGE,
+		OPT_COMPILE_INCPATH,
+		OPT_COMPILE_MACROS
+	},
+	split: COMPILE_split,
+	run: PREPROCESS_run,
+	getRequiredFiles: COMPILE_WRAP_getRequiredFiles,
+	getProducedFiles: PREPROCESS_getProducedFiles,
+	getProducedOutputFiles: PREPROCESS_getProducedOutputFiles,
+	tostr: PREPROCESS_tostr,
+);
+
+
+@@ASSEMBLE
+@@Simply assembly a given file
+global ASSEMBLE: Step = Step(
+	name: "ASSEMBLE",
+	options: {
+		OPT_COMPILE_SOURCES,
+		OPT_COMPILE_CCFLAGS,
+		OPT_COMPILE_PPFLAGS,
+		OPT_COMPILE_LANGUAGE,
+		OPT_COMPILE_INCPATH,
+		OPT_COMPILE_MACROS
+	},
+	split: COMPILE_split,
+	run: ASSEMBLE_run,
+	getRequiredFiles: COMPILE_WRAP_getRequiredFiles,
+	getProducedFiles: ASSEMBLE_getProducedFiles,
+	getProducedOutputFiles: ASSEMBLE_getProducedOutputFiles,
+	tostr: ASSEMBLE_tostr,
+);
+
+@@LINK
+@@Link multiple object files together
+global LINK: Step = Step(
+	name: "LINK",
+	options: {
+		OPT_COMPILE_SOURCES,
+		OPT_LINK_OBJECTS,
+		OPT_LINK_LDFLAGS,
+		OPT_LINK_SCRIPT,
+		OPT_LINK_OUTPUT,
+		OPT_LINK_LIBPATH,
+		OPT_LINK_LIBRARIES,
+		OPT_LINK_NOSTDLIB,
+		/* Only for `OPT_LINK_SCRIPT' */
+		OPT_COMPILE_PPFLAGS,
+		OPT_COMPILE_LANGUAGE,
+		OPT_COMPILE_INCPATH,
+		OPT_COMPILE_MACROS
+	},
+	split: LINK_split,
+	run: LINK_run,
+	getRequiredFiles: LINK_getRequiredFiles,
+	getProducedFiles: LINK_getProducedFiles,
+	tostr: LINK_tostr,
+);
+
+
+@@ARCHIVE
+@@Package object files into a static archive
+global ARCHIVE: Step = Step(
+	name: "ARCHIVE",
+	options: {
+		OPT_COMPILE_SOURCES,
+		OPT_LINK_OBJECTS,
+		OPT_ARCHIVE_OUTPUT,
+	},
+	run: ARCHIVE_run,
+	getRequiredFiles: ARCHIVE_getRequiredFiles,
+	getProducedFiles: ARCHIVE_getProducedFiles,
+	tostr: ARCHIVE_tostr,
+);
+
+
+

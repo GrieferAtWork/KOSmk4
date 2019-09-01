@@ -1,0 +1,152 @@
+/* Copyright (c) 2019 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+#include <hybrid/compiler.h>
+#include <bits/sigaction.h>
+#include <bits/sigset.h>
+#include <asm/cfi.h>
+#include <setjmp.h>
+
+#undef setjmp
+#undef longjmp
+
+
+#define OFFSET_JMPBUF_RBX    0
+#define OFFSET_JMPBUF_RBP    8
+#define OFFSET_JMPBUF_R12    16
+#define OFFSET_JMPBUF_R13    24
+#define OFFSET_JMPBUF_R14    32
+#define OFFSET_JMPBUF_R15    40
+#define OFFSET_JMPBUF_RSP    48
+#define OFFSET_JMPBUF_RIP    56
+#define OFFSET_JMPBUF_HASSIG 64
+#define OFFSET_JMPBUF_SIG    72
+
+.section .text.crt.utility.setjmp.setjmp
+INTERN_FUNCTION(libc_setjmp)
+	.cfi_startproc
+	movq   %rbx, OFFSET_JMPBUF_RBX(%rdi)
+	movq   %rbp, OFFSET_JMPBUF_RBP(%rdi)
+	movq   %r12, OFFSET_JMPBUF_R12(%rdi)
+	movq   %r13, OFFSET_JMPBUF_R13(%rdi)
+	movq   %r14, OFFSET_JMPBUF_R14(%rdi)
+	movq   %r15, OFFSET_JMPBUF_R15(%rdi)
+	leaq   8(%rsp), %rax
+	movq   %rax, OFFSET_JMPBUF_RSP(%rdi)
+	popq_cfi %rcx
+	.cfi_register %rip, %rcx
+	movq   %rcx, OFFSET_JMPBUF_RIP(%rdi)
+	xorq   %rax, %rax
+	jmp    *%rcx
+	.cfi_endproc
+END(libc_setjmp)
+DEFINE_PUBLIC_ALIAS(setjmp, libc_setjmp)
+DEFINE_PUBLIC_ALIAS(_setjmp, libc_setjmp)
+
+
+.section .text.crt.utility.setjmp.longjmp
+INTERN_FUNCTION(libc_longjmp)
+	.cfi_startproc
+	.cfi_signal_frame
+	testq  %rsi, %rsi
+	jnz    libc___fast_longjmp
+	incq   %rsi
+INTERN_FUNCTION(libc___fast_longjmp)
+	movq   OFFSET_JMPBUF_RSP(%rdi), %rsp
+	.cfi_same_value %rsp
+	movq   OFFSET_JMPBUF_R15(%rdi), %r15
+	movq   OFFSET_JMPBUF_R14(%rdi), %r14
+	movq   OFFSET_JMPBUF_R13(%rdi), %r13
+	movq   OFFSET_JMPBUF_R12(%rdi), %r12
+	movq   OFFSET_JMPBUF_RBP(%rdi), %rbp
+	movq   OFFSET_JMPBUF_RBX(%rdi), %rbx
+	movq   %rsi, %rax
+	jmp    *OFFSET_JMPBUF_RIP(%rdi)
+	.cfi_endproc
+END(libc___fast_longjmp)
+END(libc_longjmp)
+DEFINE_PUBLIC_ALIAS(longjmp, libc_longjmp)
+DEFINE_PUBLIC_ALIAS(__fast_longjmp, libc___fast_longjmp)
+
+
+
+.section .text.crt.utility.setjmp.sigsetjmp
+INTERN_FUNCTION(libc__setjmpex)
+	.cfi_startproc
+	movq   $1, %rsi
+INTERN_FUNCTION(libc_sigsetjmp)
+	movq   %rbx, OFFSET_JMPBUF_RBX(%rdi)
+	movq   %rbp, OFFSET_JMPBUF_RBP(%rdi)
+	movq   %r12, OFFSET_JMPBUF_R12(%rdi)
+	movq   %r13, OFFSET_JMPBUF_R13(%rdi)
+	movq   %r14, OFFSET_JMPBUF_R14(%rdi)
+	movq   %r15, OFFSET_JMPBUF_R15(%rdi)
+	leaq   8(%rsp), %rax
+	movq   %rax, OFFSET_JMPBUF_RSP(%rdi)
+	movq   %rsi, OFFSET_JMPBUF_HASSIG(%rdi)
+	testq  %rsi, %rsi
+	jz     1f
+	movq   0(%rsp), %rcx
+	movq   %rcx, OFFSET_JMPBUF_RIP(%rdi)
+	leaq   OFFSET_JMPBUF_SIG(%rdi), %rdi /* sigset_t *oset */
+	xorq   %rsi, %rsi                    /* sigset_t const *set */
+	movq   $(SIG_SETMASK), %rdx          /* syscall_ulong_t how */
+	movq   $(__SIZEOF_SIGSET_T__), %rcx  /* size_t sigsetsize */
+#if defined(NDEBUG) || defined(__OPTIMIZE_SIZE__)
+	jmp    libc_sys_rt_sigprocmask /* call + ret */
+#else
+	call   libc_sys_rt_sigprocmask
+	ret
+#endif
+1:	popq_cfi %rcx
+	.cfi_register %rip, %rcx
+	movq   %rcx, OFFSET_JMPBUF_RIP(%rdi)
+	xorq   %rax, %rax
+	jmp    *%rcx
+	ret
+	.cfi_endproc
+END(libc_sigsetjmp)
+END(libc__setjmpex)
+
+DEFINE_PUBLIC_ALIAS(_setjmpex, libc__setjmpex)
+DEFINE_PUBLIC_ALIAS(sigsetjmp, libc_sigsetjmp)
+
+.section .text.crt.utility.setjmp.siglongjmp
+INTERN_FUNCTION(libc_siglongjmp)
+	.cfi_startproc
+	.cfi_signal_frame
+	cmpq   $0, OFFSET_JMPBUF_HASSIG(%rdi)
+	je     libc_longjmp
+	/* Restore signal mask. */
+	pushq_cfi %rdi
+	pushq_cfi %rsi
+	movq   $(__SIZEOF_SIGSET_T__), %rcx  /* size_t sigsetsize */
+	movq   $(SIG_SETMASK), %rdx          /* syscall_ulong_t how */
+	leaq   OFFSET_JMPBUF_SIG(%rdi), %rsi /* sigset_t *set */
+	xorq   %rdi, %rdi                    /* sigset_t *oset */
+	call   libc_sys_rt_sigprocmask
+	popq_cfi %rsi
+	popq_cfi %rdi
+	jmp    libc_longjmp
+	.cfi_endproc
+END(libc_siglongjmp)
+
+DEFINE_PUBLIC_ALIAS(siglongjmp, libc_siglongjmp)
+
+

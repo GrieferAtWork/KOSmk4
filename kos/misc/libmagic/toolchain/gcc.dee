@@ -1,0 +1,736 @@
+/* Copyright (c) 2018 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import fs;
+import ipc;
+import * from ..libmagic;
+import * from deemon;
+import * from errors;
+
+@@Special set of options that is always passed when gcc or g++ is invoked
+final global OPT_GCC_OPTIONS: string = "GCC.options";
+
+final local GCC_SYSTEM_LIBRARY_UNRELATED_FLAGS = {
+	"-fPIC", "-fno-PIC",
+	"-fPIE", "-fno-PIE",
+	"-fpic", "-fno-pic",
+	"-fpie", "-fno-pie",
+	"-shared",
+	"-static",
+	"-shared-libgcc",
+	"-static-libgcc",
+	"-frtti",
+	"-fno-rtti",
+	"-ffreestanding",
+	"-pipe",
+	"-fomit-frame-pointer",
+	"-fno-omit-frame-pointer",
+};
+
+
+#ifdef __WINDOWS__
+final global EXE_FORMAT = "{}{}.exe";
+#else
+final global EXE_FORMAT = "{}{}";
+#endif
+
+@@Join sub-process arguments for gcc or g++
+local function joinGccArguments(args: {string...}, Wx: string, Xxxx: string): {string...} {
+	local temp = "";
+	for (local x: args) {
+		if ("," in x) {
+			if (temp) {
+				yield Wx + temp;
+				temp = "";
+			}
+			yield Xxxx;
+			yield x;
+			continue;
+		}
+		temp += ",";
+		temp += x;
+	}
+	if (temp)
+		yield Wx + temp;
+}
+
+local function getCCForLanguage(language: string): (string, {string...}) {
+	local cc = {
+		"c"                  : ("gcc", { "-x", "c" }),
+		"assembler"          : ("gcc", { "-x", "assembler" }),
+		"assembler-with-cpp" : ("gcc", { "-x", "assembler-with-cpp" }),
+		"c++"                : ("g++", { "-x", "c++" }),
+		"objective-c"        : ("gcc", { "-x", "objective-c" }),
+		"objective-c++"      : ("g++", { "-x", "objective-c++" }),
+		"ada"                : ("g++", { "-x", "ada" }),
+		"d"                  : ("g++", { "-x", "d" }),
+		"f77"                : ("g++", { "-x", "f77" }),
+		"go"                 : ("g++", { "-x", "go" }),
+		"brig"               : ("g++", { "-x", "brig" }),
+	}.get(language);
+	if (cc is none)
+		throw Error("Unknown language {}".format({ language }));
+	return cc;
+}
+local function getLanguageFromExtension(fileExt: string): string {
+	return {
+		"s"   : "assembler",
+		"S"   : "assembler-with-cpp",
+		"h"   : "c",
+		"cc"  : "c++",
+		"cxx" : "c++",
+	}.get(fileExt, fileExt);
+}
+
+local function getCCForLanguageAndSrcFile(
+	srcFile: string, language: string | none): (string, {string...}) {
+	if (language is none)
+		language = getLanguageFromExtension(fs.extof(srcFile));
+	local cc = getCCForLanguage(language);
+	switch (cc[1][1]) {
+	case "c":
+		if (fs.extof(srcFile) in ["c"])
+			goto return_simple_cc;
+		break;
+	case "c++":
+		if (fs.extof(srcFile) in ["cc", "cxx"])
+			goto return_simple_cc;
+		break;
+	case "assembler":
+		if (fs.extof(srcFile) in ["s"])
+			goto return_simple_cc;
+		break;
+	case "assembler-with-cpp":
+		if (fs.extof(srcFile) in ["S"])
+			goto return_simple_cc;
+		break;
+	default:
+		break;
+	}
+	return cc;
+return_simple_cc:
+	return (cc[0], {});
+}
+
+local function splitCommandline(cmdline: string): {string...} {
+	local i = 0;
+	local len = #cmdline;
+	local cmd_start = 0;
+	while (i < len) {
+		local ch = cmdline[i];
+		if (ch == "\\") {
+			i += 2;
+			continue;
+		}
+		if (ch in ["\"", "\'"]) {
+			cmdline = cmdline[:i] + cmdline[i + 1:];
+			--len;
+			while (i < len) {
+				local ch2 = cmdline[i];
+				if (ch2 == "\\") {
+					i += 2;
+					continue;
+				}
+				if (ch2 == ch) {
+					cmdline = cmdline[:i] + cmdline[i + 1:];
+					--len;
+					break;
+				}
+				++i;
+			}
+			continue;
+		}
+		if (ch.isspace()) {
+			if (cmd_start < i)
+				yield cmdline[cmd_start:i];
+			cmd_start = i + 1;
+		}
+		++i;
+	}
+	if (cmd_start < len)
+		yield cmdline[cmd_start:];
+}
+
+local function constructMacroDefinitions(macros: {string: string | none}): {string...} {
+	for (local name, val: macros) {
+		if (val !is none && val != "1")
+			yield "-D{}={}".format({ name, val });
+		else {
+			yield "-D" + name;
+		}
+	}
+}
+
+local function normalizeFilenameForLog(filename: string) {
+	return fs.abspath(normalizePath(filename.strip(), false), ROOTDIR)
+#ifdef __WINDOWS__
+		.replace("\\", "/")
+#endif
+		;
+}
+
+global class GCCToolchain: Toolchain {
+	this(config: Config)
+		: super(config)
+	{}
+
+	@@options Set to @none to lazily load from @(step.group.options)
+	private function createWaitableProcess(
+			step: BoundStep,
+			options: {string: Object} | none,
+			kind: string,
+			p: ipc.Process): Waitable {
+		if (this.config.VERBOSE)
+			print "Exec", repr p.cmdline;
+		if (!this.config.FORMAT_ERRORS) {
+			p.start();
+			return WaitableJoin(p);
+		}
+		local t = Thread([](p) {
+			local r, w = ipc.Pipe.new()...;
+			p.stdout = w;
+			p.stderr = w;
+			p.start();
+			try {
+				w.close();
+				r = File.Buffer(r, "ro,c,none");
+				if (kind in ["ld"]) {
+					@@Pair (object_filename, function_name)
+					local current_in_function: (string, string) = none;
+					for (local l: r) {
+						local col = l.find(":");
+						/* Capture: <LD_PATH>:<SCRIPT_PATH>:<LINENO> <MESSAGE> */
+						if (col >= 0) {
+							local col2 = l.find(":", col + 1);
+							if (col2 >= 0) {
+								/* SCRIPT_PATH mustn't contain spaces */
+								if (!l.isanyspace(col + 1, col2)) {
+									local lineno_end = col2 + 1;
+									/* Make sure that LINENO starts with a digit */
+									if (lineno_end < #l && l.isdigit(lineno_end))
+									{
+										do ++lineno_end;
+										while (lineno_end < #l && l.isdigit(lineno_end));
+										local ld_path = normalizeFilenameForLog(
+											l[:col].decode("utf-8"));
+										local script_path = normalizeFilenameForLog(
+											l[col + 1:col2].decode("utf-8"));
+										local lineno = l[col2+1:lineno_end];
+										local message = l[lineno_end:].strip();
+										print script_path,;
+										print "(",;
+										print lineno,;
+										print "): error: ",;
+										print message,;
+										print " (from ",;
+										print repr(ld_path),;
+										print ")";
+										continue;
+									}
+								}
+								/* Capture: <LD_PATH>: <OBJECT_FILE>: in function `<FUNCTION_NAME>': */
+								local tail = l[col2:];
+								final local IN_FUNCTION_PREFIX = ": in function `";
+								if (tail.startswith(IN_FUNCTION_PREFIX)) {
+									local end = tail.find("\'", #IN_FUNCTION_PREFIX);
+									if (end >= 0) {
+										current_in_function = (
+											normalizeFilenameForLog(l[col + 1:col2].strip().decode("utf-8")),
+											tail[#IN_FUNCTION_PREFIX:end].decode("utf-8")
+										);
+										continue;
+									}
+								}
+								function printSourceMessage(
+										source_file: string, lineno: string, message: string,
+										current_in_function: (string, string) | none) {
+									print source_file,;
+									print "(",;
+									print lineno,;
+									print "): error: ",;
+									print message,;
+									if (current_in_function !is none) {
+										print " (in ",;
+										print repr(current_in_function[1]),;
+										print " defined by ",;
+										print repr(current_in_function[0]),;
+										print ")",;
+									}
+									print;
+								}
+								/* Capture: <SOURCE_FILE>:<LINENO>: <MESSAGE> */
+								if (l.isdigit(col + 1, col2)) {
+									printSourceMessage(
+										normalizeFilenameForLog(l[:col].decode("utf-8")),
+										l[col + 1:col2].decode("utf-8"),
+										l[col2 + 1:].strip().decode("utf-8"),
+										current_in_function);
+									continue;
+								}
+								/* Capture: <LD_PATH>: <SOURCE_FILE>:<LINENO>: <MESSAGE> */
+								if (l[col + 1] == " ".ord()) {
+									local col3 = l.find(":", col2 + 1);
+									if (col3 >= 0) {
+										if (l.isdigit(col2 + 1, col3)) {
+											printSourceMessage(
+												normalizeFilenameForLog(l[col+2:col2].decode("utf-8")),
+												l[col2 + 1:col3].decode("utf-8"),
+												l[col3 + 1:].strip().decode("utf-8"),
+												current_in_function);
+											continue;
+										}
+									}
+								}
+
+							}
+						}
+						print l.rstrip();
+					}
+				} else for (local l: r) {
+					/* Format errors */
+					if (l.startswith("In file included from ")) {
+						try {
+							local filename, line = l.scanf("In file included from %[^:]:%[^,:]")...;
+							print normalizeFilenameForLog(filename.decode("utf-8")),;
+							print "(",;
+							print line.strip().rstrip(","),;
+							print "): In file included from here...";
+							continue;
+						} catch (...) {
+						}
+					} else if (l.startswith("                 from")) {
+						try {
+							local filename, line = l.scanf(" from %[^:]:%[^:]")...;
+							print normalizeFilenameForLog(filename.decode("utf-8")),;
+							print "(",;
+							print line.rstrip().rstrip(",").rstrip(),;
+							print "): ... Which was included here";
+							continue;
+						} catch (...) {
+						}
+					}
+					local col = l.find(":");
+					if (col >= 0 && !l.isanyspace(0, col)) {
+						local filename = l[:col];
+						local line, column = none;
+						local col2 = l.find(":", col + 1);
+						if (col2 >= 0) {
+							line = l[col + 1:col2];
+							if (line.isdigit()) {
+								local col3 = l.find(":", col2 + 1);
+								if (col3 >= 0) {
+									column = l[col2 + 1:col3];
+									if (column.isdigit()) {
+										col2 = col3;
+									} else {
+										column = none;
+									}
+								}
+							} else {
+								col2 = col;
+								line = none;
+							}
+						} else {
+							line = none;
+							col2 = col;
+						}
+						print normalizeFilenameForLog(filename.decode("utf-8")),;
+						if (line !is none) {
+							print "(",;
+							print line,;
+							if (column !is none) {
+								print ",",;
+								print column,;
+							}
+							print ")",;
+						}
+						print l[col2:].rstrip();
+						continue;
+					}
+					print l.rstrip();
+				}
+				r.close();
+			} catch (...) {
+				p.terminate(1);
+				throw;
+			}
+			return joinProcess(p);
+		}, (p, ));
+		t.start();
+		return WaitableJoin(t);
+	}
+
+	function parseDependencyFile(text: string): {string...} {
+		text = text.replace("\\\n", "");
+		local start = text.find(":");
+		if (start >= 0) {
+			for (local filename: text[start + 1:].split(" ")) {
+				filename = filename.strip();
+				if (filename)
+					yield normalizePath(filename, false);
+			}
+		}
+	}
+
+	@@Create a preprocessor process
+	function createPreprocessorProcess(step: BoundStep,
+	                                   options: {string: Object},
+	                                   srcFile: string,
+	                                   outFile: string = none,
+	                                   depFile: string = none,
+	                                   ppFlags: {string...} = none,
+	                                   incPath: {string...} = none,
+	                                   macros: {string: string | none} = none,
+	                                   language: string | none = none): Waitable {
+		if (depFile is none)
+			depFile = this.config.getDependencyFilename(this, srcFile);
+		if (outFile is none)
+			outFile = this.config.getPreprocessedFilename(this, srcFile);
+		local cc, lang_flags = getCCForLanguageAndSrcFile(srcFile, language)...;
+		local cc = EXE_FORMAT.format({ this.config.CROSS_PREFIX, cc });
+		local arguments = [
+			"-E", "-o", outFile, "-MMD", "-MF", depFile,
+			options.get(OPT_GCC_OPTIONS)...];
+		if (lang_flags)
+			arguments.extend(lang_flags);
+		if (incPath) {
+			local len = #arguments;
+			for (local x: incPath)
+				arguments.insert(len, "-I" + x);
+		}
+		if (macros)
+			arguments.extend(constructMacroDefinitions(macros));
+		if (ppFlags)
+			arguments.extend(joinGccArguments(ppFlags, "-Wp", "-Xpreprocessor"));
+		arguments.append(srcFile);
+		return createWaitableProcess(step, options, "gcc", ipc.Process(cc, arguments));
+	}
+
+	@@Create an assembler process
+	function createAssemblerProcess(step: BoundStep,
+	                                options: {string: Object},
+	                                srcFile: string,
+	                                asmFile: string = none,
+	                                depFile: string = none,
+	                                ccFlags: {string...} = none,
+	                                ppFlags: {string...} = none,
+	                                incPath: {string...} = none,
+	                                macros: {string: string | none} = none,
+	                                language: string | none = none): Waitable {
+		if (depFile is none)
+			depFile = this.config.getDependencyFilename(this, srcFile);
+		if (asmFile is none)
+			asmFile = this.config.getAssembledFilename(this, srcFile);
+		if (language is none)
+			language = getLanguageFromExtension(fs.extof(srcFile));
+		if (language == "assembler") {
+			/* Special case: The user's file already is the raw assembly file.
+			 *               In this case, simply copy the user's file to the target. */
+			local th = Thread([](src, dst, dep) {
+				with (local fp = File.open(dep, "w"))
+					fp.write("{}: {}\n".format({ dst, src }));
+				try fs.unlink(dst); catch (...);
+				fs.copyfile(src, dst);
+			}, (srcFile, asmFile, depFile));
+			th.start();
+			return WaitableJoin(th);
+		}
+		local cc, lang_flags = getCCForLanguageAndSrcFile(srcFile, language)...;
+		local cc = EXE_FORMAT.format({ this.config.CROSS_PREFIX, cc });
+		local arguments = [
+			language == "assembler-with-cpp"
+				? "-E"   /* The disassembly of a user-defined assembly
+				          * source is simply its preprocessed content. */
+				: "-S"
+				,
+			"-o", asmFile, "-MMD", "-MF", depFile,
+			options.get(OPT_GCC_OPTIONS)...];
+		if (lang_flags)
+			arguments.extend(lang_flags);
+		if (incPath) {
+			local len = #arguments;
+			for (local x: incPath)
+				arguments.insert(len, "-I" + x);
+		}
+		if (macros)
+			arguments.extend(constructMacroDefinitions(macros));
+		if (ccFlags)
+			arguments.extend(ccFlags);
+		if (ppFlags)
+			arguments.extend(joinGccArguments(ppFlags, "-Wp", "-Xpreprocessor"));
+		arguments.append(srcFile);
+		return createWaitableProcess(step, options, "gcc", ipc.Process(cc, arguments));
+	}
+
+	@@Create a compiler process for the purpose of testing compiler features.
+	@@The process has yet to be started, and will read source code from stdin,
+	@@which the caller can then provide using a pipe
+	function createFeatureTestCompilerProcess(language: string,
+	                                          options: {string: Object} = none,
+	                                          ccFlags: {string...} = none,
+	                                          ppFlags: {string...} = none,
+	                                          incPath: {string...} = none,
+	                                          macros: {string: string | none} = none,
+	                                          asFlags: {string...} = none): ipc.Process {
+		local cc, lang_flags = getCCForLanguage(language)...;
+		local cc = EXE_FORMAT.format({ this.config.CROSS_PREFIX, cc });
+		local arguments = ["-c", "-o", "/dev/stdout", "-Wall", "-Werror", options.get(OPT_GCC_OPTIONS)...];
+		if (lang_flags)
+			arguments.extend(lang_flags);
+		if (incPath) {
+			local len = #arguments;
+			for (local x: incPath)
+				arguments.insert(len, "-I" + x);
+		}
+		if (macros)
+			arguments.extend(constructMacroDefinitions(macros));
+		if (ccFlags)
+			arguments.extend(ccFlags);
+		if (ppFlags)
+			arguments.extend(joinGccArguments(ppFlags, "-Wp", "-Xpreprocessor"));
+		if (asFlags)
+			arguments.extend(joinGccArguments(asFlags, "-Wa", "-Xassembler"));
+		arguments.append("-");
+		return ipc.Process(cc, arguments);
+	}
+
+
+	@@Create a compiler process
+	function createCompilerProcess(step: BoundStep,
+	                               options: {string: Object},
+	                               srcFile: string,
+	                               objFile: string = none,
+	                               depFile: string = none,
+	                               ccFlags: {string...} = none,
+	                               ppFlags: {string...} = none,
+	                               incPath: {string...} = none,
+	                               macros: {string: string | none} = none,
+	                               asFlags: {string...} = none,
+	                               language: string | none = none) : Waitable {
+		if (depFile is none)
+			depFile = this.config.getDependencyFilename(srcFile);
+		if (objFile is none)
+			objFile = this.config.getObjectFilename(srcFile);
+		local cc, lang_flags = getCCForLanguageAndSrcFile(srcFile, language)...;
+		local cc = EXE_FORMAT.format({ this.config.CROSS_PREFIX, cc });
+		local arguments = [
+			"-c", "-o", objFile, "-MMD", "-MF", depFile,
+			options.get(OPT_GCC_OPTIONS)...];
+		if (lang_flags)
+			arguments.extend(lang_flags);
+		if (incPath) {
+			local len = #arguments;
+			for (local x: incPath)
+				arguments.insert(len, "-I" + x);
+		}
+		if (macros)
+			arguments.extend(constructMacroDefinitions(macros));
+		if (ccFlags)
+			arguments.extend(ccFlags);
+		if (ppFlags)
+			arguments.extend(joinGccArguments(ppFlags, "-Wp", "-Xpreprocessor"));
+		if (asFlags)
+			arguments.extend(joinGccArguments(asFlags, "-Wa", "-Xassembler"));
+		arguments.append(srcFile);
+		return createWaitableProcess(step, options, "gcc", ipc.Process(cc, arguments));
+	}
+
+	function getDefaultLinkerLanguage(step: BoundStep) {
+		/* TODO: Search through source files for c++ file extensions */
+		return "c";
+	}
+
+	function provideStdlibCache(
+			key: (string, none | {string...}),
+			cache: ({string...}, {string...}, {string...})) {
+		_stdlibCache.setdefault(key, cache);
+	}
+	final member _stdlibCache: {(string, none | {string...}):
+		({string...}, {string...}, {string...})} = Dict();
+	function enumerateSystemLibraryPathsAndStandardLibraries(
+			gcc_opt: {string...} | none, language: string)
+			: ({string...}, {string...}, {string...}) {
+		local gcc_opt = Tuple(gcc_opt);
+		local result = _stdlibCache.get((language, gcc_opt));
+		if (result !is none)
+			return result;
+		local simple_gcc_opt = List();
+		for (local x: gcc_opt) {
+			if (!x.startswith("-O") && !x.startswith("-g") &&
+				x !in GCC_SYSTEM_LIBRARY_UNRELATED_FLAGS)
+				simple_gcc_opt.append(x);
+		}
+		local cacheKey = (language, Tuple(simple_gcc_opt));
+		local result = _stdlibCache.get(cacheKey);
+		if (result !is none) {
+			_stdlibCache[(language, gcc_opt)] = result;
+			return result;
+		}
+		local cc = EXE_FORMAT.format({ this.config.CROSS_PREFIX, getCCForLanguage(language)[0] });
+		local arguments = ["-###", "-o", "testOutputFilename", simple_gcc_opt...];
+		local testObjectFile = joinpath(this.config.BUILD_PATH, "testObjectFile.o");
+		if (!fs.stat.isreg(testObjectFile)) {
+			local testSourceFile = joinpath(this.config.BUILD_PATH, "testObjectFile.c");
+			if (!fs.stat.isreg(testSourceFile)) {
+				with (local fp = File.open(testSourceFile, "w"))
+					fp.write("int placeholder = 1;\n");
+			}
+			local proc = ipc.Process("gcc", { "-c", "-o", testObjectFile, testSourceFile });
+			proc.start();
+			joinProcess(proc);
+		}
+		arguments.append(testObjectFile);
+		local r, w = ipc.Pipe.new()...;
+		local proc = ipc.Process(cc, arguments);
+		proc.stdout = w;
+		proc.stderr = w;
+		proc.start();
+		w.close();
+		local output = r.readall();
+		joinProcess(proc);
+		local collect2_cmdline = none;
+		output = output.decode("utf-8");
+		for (local l: output.splitlines()) {
+			if ("collect2" !in l)
+				continue;
+			if (("-o testOutputFilename") !in l)
+				continue;
+			if (collect2_cmdline !is none)
+				throw Error("Multiple collect2 commandlines:\n1:{}\n2:{}"
+					.format({ collect2_cmdline, l }));
+			collect2_cmdline = l;
+		}
+		if (collect2_cmdline is none)
+			throw Error("No collect2 commandlines in:\n{}".format({ output }));
+		collect2_cmdline = collect2_cmdline.partition("-o testOutputFilename")[2].strip();
+		collect2_cmdline = Tuple(splitCommandline(collect2_cmdline));
+		local result = (
+			Tuple(for (local x: collect2_cmdline)
+				if (x.startswith("-L"))
+					normalizePath(x[2:])),
+			Tuple(for (local x: collect2_cmdline)
+				if (x.startswith("-l"))
+					x[2:]),
+			Tuple(for (local x: collect2_cmdline)
+				if (!x.startswith("-L") && !x.startswith("-l") && x != testObjectFile)
+					normalizePath(x)),
+		);
+		print "Warning: Missing toolchain cache:";
+		print "toolchain.provideStdlibCache(";
+		print "\t",;
+		print repr cacheKey,;
+		print ",";
+		print "\t",;
+		print repr result;
+		print ");";
+		_stdlibCache[cacheKey] = result;
+		_stdlibCache[(language, gcc_opt)] = result;
+		return result;
+	}
+
+	@@Enumerate all (possible) input dependencies of the linker
+	function enumerateLinkerDependencies(step: BoundStep,
+	                                     language: string | none = none,
+	                                     libPath: {string...} = none,
+	                                     libraries: {string...} = none,
+	                                     noStdLib: bool = false): {string...} {
+		local systemLibraryPaths, systemLibraries, systemObjects;
+		if (language is none)
+			language = getDefaultLinkerLanguage(step);
+		local gcc_opt = step.group.options.get(OPT_GCC_OPTIONS);
+		systemLibraryPaths, systemLibraries, systemObjects =
+			enumerateSystemLibraryPathsAndStandardLibraries(gcc_opt, language)...;
+		if (!noStdLib)
+			yield systemObjects...;
+		local allLibPaths = (!libPath
+			? systemLibraryPaths
+			: (systemLibraryPaths as Sequence) + libPath
+		).reversed();
+		local allLibs = noStdLib
+			? libraries
+			: !libraries
+			? systemLibraries
+			: (systemLibraries as Sequence) + libraries
+			;
+		local libext = none;
+		local do_static = none;
+		for (local lib: allLibs) {
+			local locations = List();
+			for (local path: allLibPaths) {
+				if (lib.startswith(":"))
+					locations.append(joinpath(path, lib[1:]));
+				else {
+					if (libext is none)
+						libext = step.toolchain.config.LIBRARY_SUFFIX;
+					if (do_static is none)
+						do_static = "-static" in gcc_opt;
+					if (do_static) {
+						locations.append(joinpath(path, "lib{}.a".format({ lib })));
+						locations.append(joinpath(path, "lib{}{}".format({ lib, libext })));
+					} else {
+						locations.append(joinpath(path, "lib{}{}".format({ lib, libext })));
+						locations.append(joinpath(path, "lib{}.a".format({ lib })));
+					}
+				}
+			}
+			assert locations;
+			yield FirstFileOf(locations);
+		}
+	}
+
+	@@Create a linker process
+	function createLinkerProcess(step: BoundStep,
+	                             exeFile: string,
+	                             objFiles: {string...},
+	                             ldFlags: {string...} = none,
+	                             language: string | none = none,
+	                             linkerScript: string = none,
+	                             libPath: {string...} = none,
+	                             libraries: {string...} = none,
+	                             noStdLib: bool = false): Waitable {
+		if (language is none)
+			language = getDefaultLinkerLanguage(step);
+		local cc = EXE_FORMAT.format({ this.config.CROSS_PREFIX, getCCForLanguage(language)[0] });
+		local arguments = ["-o", exeFile, step.group.options.get(OPT_GCC_OPTIONS)...];
+		if (noStdLib)
+			arguments.append("-nostdlib");
+		if (libPath) {
+			local len = #arguments;
+			for (local p: libPath)
+				arguments.insert(len, "-L" + p);
+		}
+		if (linkerScript !is none)
+			arguments.extend(joinGccArguments({ "-T", linkerScript }, "-Wl", "-Xlinker"));
+		if (ldFlags)
+			arguments.extend(joinGccArguments(ldFlags, "-Wl", "-Xlinker"));
+		arguments.extend(objFiles);
+		for (local l: libraries)
+			arguments.append("-l" + l);
+		return createWaitableProcess(step, none, "ld", ipc.Process(cc, arguments));
+	}
+
+	@@Create an archiver process
+	function createArchiveProcess(step: BoundStep,
+	                              arcFile: string,
+	                              objFiles: {string...}): Waitable {
+		local ar = EXE_FORMAT.format({ this.config.CROSS_PREFIX, "ar" });
+		return createWaitableProcess(step, none, "ar", ipc.Process(ar, { "rcs", arcFile, objFiles... }));
+	}
+}
+

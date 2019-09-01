@@ -1,0 +1,85 @@
+/* Copyright (c) 2019 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef GUARD_LIBC_LIBC_EXCEPT_CTEST
+#define GUARD_LIBC_LIBC_EXCEPT_CTEST 1
+#define _KOS_SOURCE 1
+
+#include <hybrid/compiler.h>
+#include <system-test/ctest.h>
+#include <kos/except.h>
+#include <assert.h>
+
+DECL_BEGIN
+
+
+static int volatile x = 77;
+static int volatile *p = (int volatile *)0x1234;
+
+PRIVATE ATTR_NOINLINE void cause_segfault() {
+	*p = x;
+}
+
+DEFINE_TEST(kernel_exceptions_function_correctly_with_cxx_handlers) {
+	bool volatile reached_before = false;
+	bool volatile reached_after = false;
+	bool volatile reached_inner = false;
+	bool volatile reached_outer = false;
+	assert(error_code() == ERROR_CODEOF(E_OK)); /* No exception thrown */
+	try {
+		try {
+			reached_before = true;
+			cause_segfault();
+			reached_after = true;  /* NOT REACHABLE! (asserted below) */
+		} catch (...) {
+			reached_inner = true;
+			ASSERT_EQUAL(error_code(), ERROR_CODEOF(E_SEGFAULT_UNMAPPED));
+			throw; /* Rethrow the exception */
+		}
+	} catch (...) {
+		reached_outer = true;
+		ASSERT_EQUAL(error_code(), ERROR_CODEOF(E_SEGFAULT_UNMAPPED));
+		ASSERT_EQUAL((void *)error_data()->e_pointers[0], (void *)p);
+#ifdef E_SEGFAULT_CONTEXT_FAULT
+		assert(error_data()->e_pointers[1] & E_SEGFAULT_CONTEXT_FAULT);
+#endif /* E_SEGFAULT_CONTEXT_FAULT */
+#ifdef E_SEGFAULT_CONTEXT_WRITING
+		assert(error_data()->e_pointers[1] & E_SEGFAULT_CONTEXT_WRITING);
+#endif /* E_SEGFAULT_CONTEXT_WRITING */
+#ifdef E_SEGFAULT_CONTEXT_USERCODE
+		assert(error_data()->e_pointers[1] & E_SEGFAULT_CONTEXT_USERCODE);
+#endif /* E_SEGFAULT_CONTEXT_USERCODE */
+#ifdef E_SEGFAULT_CONTEXT_NONCANON
+		assert(!(error_data()->e_pointers[1] & E_SEGFAULT_CONTEXT_NONCANON));
+#endif /* E_SEGFAULT_CONTEXT_NONCANON */
+#ifdef E_SEGFAULT_CONTEXT_UNMAP
+		assert(!(error_data()->e_pointers[1] & E_SEGFAULT_CONTEXT_UNMAP));
+#endif /* E_SEGFAULT_CONTEXT_UNMAP */
+		/* HINT: This is where the SEGFAULT exception gets cleaned up. */
+	}
+	assert(error_code() == ERROR_CODEOF(E_OK)); /* No exception thrown (any more) */
+	assert(reached_before);
+	assert(!reached_after);
+	assert(reached_inner);
+	assert(reached_outer);
+}
+
+
+DECL_END
+
+#endif /* !GUARD_LIBC_LIBC_EXCEPT_CTEST */

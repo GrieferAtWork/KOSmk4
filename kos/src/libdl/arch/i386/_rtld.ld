@@ -1,0 +1,130 @@
+/* Copyright (c) 2019 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+#include <hybrid/compiler.h>
+#include <hybrid/limits.h>
+
+#if 0
+#define PHDR(x) 
+#else
+PHDRS {
+	text    PT_LOAD;
+	data    PT_LOAD;
+	rel     PT_LOAD;
+	dynamic PT_DYNAMIC;
+}
+#define PHDR(x) :x
+#endif
+
+
+
+ENTRY(linker_entry)
+SECTIONS {
+
+	. = 0;
+
+	.text BLOCK(1) : {
+		PROVIDE_HIDDEN(__rtld_start = .);
+		PROVIDE_HIDDEN(__rtld_text_start = .);
+		*(.text.linker_entry)
+		*(.text.__x86.* .text .text.crt.*)
+		PROVIDE_HIDDEN(__rtld_text_end = .);
+	} PHDR(text)
+
+	.rodata BLOCK(1) : {
+		PROVIDE_HIDDEN(__rtld_rodata_start = .);
+		*(.rodata .rodata.str* .rodata.cst* .rodata.*.str* .rodata.*.cst* .rodata.crt.* .rodata.dos.*)
+		PROVIDE_HIDDEN(__rtld_rodata_end = .);
+	} PHDR(text)
+
+	.eh_frame : {
+		PROVIDE_HIDDEN(__rtld_eh_frame_start = .);
+		KEEP(*(.eh_frame))
+		PROVIDE_HIDDEN(__rtld_eh_frame_end = .);
+	} PHDR(text)
+
+	.gcc_except_table BLOCK(1) : {
+		PROVIDE_HIDDEN(__rtld_gcc_except_table_start = .);
+		KEEP(*(.gcc_except_table))
+		PROVIDE_HIDDEN(__rtld_gcc_except_table_end = .);
+	} PHDR(text)
+
+	. = ALIGN(PAGESIZE);
+
+	.data BLOCK(1) : {
+		PROVIDE_HIDDEN(__rtld_data_start = .);
+		*(.data .data.crt.* .data.dos.*)
+		PROVIDE_HIDDEN(__rtld_data_end = .);
+	} PHDR(data)
+
+	.bss BLOCK(1) : {
+		PROVIDE_HIDDEN(__rtld_bss_start = .);
+		*(.bss .bss.crt.* .bss.dos.*)
+		PROVIDE_HIDDEN(__rtld_bss_end = .);
+		PROVIDE_HIDDEN(__rtld_end = .);
+	} PHDR(data)
+
+	. = ALIGN(PAGESIZE);
+	.dynamic BLOCK(1) : {
+		*(.dynamic)
+	} PHDR(rel) PHDR(dynamic)
+
+	.got BLOCK(1) : {
+		*(.got)
+	} PHDR(rel)
+
+	.got.plt BLOCK(1) : {
+		*(.got.plt)
+	} PHDR(rel)
+
+	.rel.dyn BLOCK(1) : {
+		*(.rel.init)
+		*(.rel.text .rel.text.*)
+		*(.rel.fini)
+		*(.rel.rodata .rel.rodata.*)
+		*(.rel.data.rel.ro .rel.data.rel.ro.*)
+		*(.rel.data .rel.data.*)
+		*(.rel.tdata .rel.tdata.*)
+		*(.rel.tbss .rel.tbss.*)
+		*(.rel.ctors)
+		*(.rel.dtors)
+		*(.rel.got)
+		*(.rel.bss .rel.bss.*)
+		*(.rel.ifunc)
+	} PHDR(rel)
+
+	.rel.plt BLOCK(1) : {
+		*(.rel.plt)
+		PROVIDE_HIDDEN(__rel_iplt_start = .);
+		*(.rel.iplt)
+		PROVIDE_HIDDEN(__rel_iplt_end = .);
+	} PHDR(rel)
+
+	.fakedata BLOCK(1) : {
+		*(.fakedata)
+	} PHDR(rel)
+
+	/DISCARD/ : {
+		*(.discard)
+		*(.comment)
+		*(.note.gnu.build-id)
+		*(.data.DW.ref.*)
+		*(.data.rel.local.DW.ref.__gxx_personality_v0)
+	}
+}

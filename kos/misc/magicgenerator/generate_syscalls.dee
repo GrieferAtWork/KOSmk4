@@ -1,0 +1,2730 @@
+local copyright =
+"/* Copyright (c) 2019 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */";
+
+/* Auto-create the system call interface from the following files:
+ *   - /include/i386-kos/asm/syscalls.def
+ * This in turn creates the following files:
+ *   - /include/kos/syscalls.h
+ *   - /include/i386-kos/bits/syscall.h
+ *   - /include/i386-kos/asm/syscalls32.inl
+ *   - /include/i386-kos/asm/syscalls64.inl
+ *   - /include/i386-kos/asm/syscalls32_d.inl
+ *   - /include/i386-kos/asm/syscalls64_d.inl
+ *   - /src/libc/libc/arch/i386/syscalls32.S
+ *   - /src/libc/libc/arch/i386/syscalls64.S
+ *   - /src/kernel/core/arch/i386/syscall_wrappers32.S
+ *   - /src/kernel/core/arch/i386/syscall_wrappers64.S
+ *   - /src/kernel/core/arch/i386/syscall_router32.S
+ *   - /src/kernel/core/arch/i386/syscall_router64.S
+ *   - /src/kernel/core/arch/i386/syscall_unimplemented32.c.inl
+ *   - /src/kernel/core/arch/i386/syscall_unimplemented64.c.inl
+ */
+
+import fs;
+import * from deemon;
+
+#define SYSNO_EXTENDED_START 0x80000000
+
+fs.chdir(fs.joinpath(fs.headof(__FILE__), "../.."));
+
+function getFilenameForLog(filename: string): string {
+	return fs.abspath(filename);
+}
+
+function inline_comments(x) {
+	return x.replace("/*", "").replace("*/", "");
+}
+function key_public_syscall(x, enable_except) {
+	if (enable_except)
+		return "sys_X" + x;
+	return "sys_" + x;
+}
+function key_libc_syscall(x, enable_except) {
+	if (enable_except)
+		return "libc_sys_X" + x;
+	return "libc_sys_" + x;
+}
+function key_escape_argument(x) {
+	if (x in ["argv", "envp"])
+		return "___" + x;
+	return "__" + x;
+}
+
+
+#define SYSCALL_RESTART_AUTO 0
+#define SYSCALL_RESTART_DONT 1
+#define SYSCALL_RESTART_MUST 2
+
+class Syscall {
+	@@The system call number of this syscall
+	public member sysno: int;
+	@@The name of the system call
+	public member name: string;
+	@@Arguments taken by the system call (Tuple of <<tag_name, tag_value>, name, type>)
+	public member argv: {({string: string}, string, string)...};
+	@@The return type of this system call
+	public member return_type: string;
+	@@Tags applied to the system call itself (Tuple of <tag_name, tag_value>)
+	public member tags: {string: string};
+
+	public function same_declaration_as(other: Syscall): bool {
+		if (name != other.name)
+			return false;
+		if (argv != other.argv)
+			return false;
+		if (return_type != other.return_type)
+			return false;
+		if (tags != other.tags)
+			return false;
+		return true;
+	}
+
+	@@System call restart mode (one of `SYSCALL_RESTART_*')
+	public property restart_mode: int = {
+		get(): int {
+			local result = SYSCALL_RESTART_AUTO;
+			for (local n, v: tags) {
+				if (n != "restart")
+					continue;
+				result = {
+					"auto" : SYSCALL_RESTART_AUTO,
+					"dont" : SYSCALL_RESTART_DONT,
+					"must" : SYSCALL_RESTART_MUST,
+				}.get(v);
+				if (result is none)
+					throw Error("Invalid restart mode: " + repr(v));
+				break;
+			}
+			return result;
+		}
+	}
+	@@Set to true if this system call is a cancellation point
+	public property is_cancellation_point: bool = {
+		get(): bool {
+			for (local n, none: tags)
+				if (n in ["cp", "cancellation_point"])
+					return true;
+			return false;
+		}
+	}
+
+	public property sysno_str: string = {
+		get(): string {
+			if (sysno >= SYSNO_EXTENDED_START)
+				return sysno.hex();
+			return str(sysno);
+		}
+	}
+
+	public property doc: string = {
+		get(): string {
+			local result = "";
+			for (local n, v: tags) {
+				if (n != "doc")
+					continue;
+				if (result)
+					result += "\n";
+				result += v;
+			}
+			return result;
+		}
+	}
+
+	public function print_doc(fp: File) {
+		local lines = List(doc.splitlines());
+		if (!lines)
+			return;
+		fp << "/* " << lines[0].rstrip();
+		if (#lines == 1) {
+			fp << " */\n";
+		} else {
+			for (local l: lines[1:])
+				fp << "\n * " << l.rstrip();
+			fp << " */\n";
+		}
+	}
+
+	public property has_except_variant: bool = {
+		get(): bool {
+			return !has_function_tag("noexcept");
+		}
+	}
+
+	public function has_function_tag(name: string): bool {
+		for (local n, none: tags) {
+			if (n == name)
+				return true;
+		}
+		return false;
+	}
+	public function enum_function_attributes(): {string...} {
+		for (local name, args: tags) {
+			if (name == "noreturn")
+				yield "ATTR_NORETURN";
+			if (name.startswith("ATTR_"))
+				yield name;
+		}
+	}
+	public function is_function_noreturn(): bool {
+		for (local name, args: tags) {
+			if (name in ["noreturn", "ATTR_NORETURN"])
+				return true;
+		}
+		return false;
+	}
+	public property i386_adjusted_argc: int = {
+		get(): int {
+			local result = #argv;
+			for (local tags, none, none: argv) {
+				for (local n, none: tags) {
+					if (n == "double_wide") {
+						++result;
+						break;
+					}
+				}
+			}
+			return result;
+		}
+	}
+
+	public function print_prototype_as_multiline_comment(fp: File, base_prefix: string = "") {
+		local prefix = "/* " + inline_comments(return_type);
+		if (!prefix.endswith("*"))
+			prefix += " ";
+		prefix += inline_comments(name);
+		prefix += "(";
+		fp << inline_comments(base_prefix) << prefix;
+		if (!argv)
+			fp << "void); */\n";
+		else {
+			fp << (",\n" + inline_comments(base_prefix) + " *" + (" " * (#prefix - 2))).join(
+				for (local none, name, typ: argv)
+					inline_comments(typ + (typ.endswith("*") ? "" : " ") + name));
+			fp << ") */\n";
+		}
+	}
+
+	public function print_prototype(fp: File) {
+		fp << inline_comments(return_type) << " " << inline_comments(name) << "(";
+		if (!argv)
+			fp << "void";
+		else {
+			fp << ", ".join(
+				for (local none, name, typ: argv)
+					inline_comments(typ + (typ.endswith("*") ? "" : " ") + name));
+		}
+		fp << ")";
+	}
+
+	operator repr(): string {
+		return "Syscall(sysno: {!r}, name: {!r}, argv: {!r}, return_type: {!r}, tags: {!r})".
+			format({ sysno_str, name, argv, return_type, tags });
+	}
+}
+
+function split_tags(text: string): {(string, string)...} {
+	local i = 0, end = #text;
+	local name_start = 0;
+	while (i < end) {
+		local ch = text[i];
+		if (ch == "(") {
+			local name = text.substr(name_start, i).strip();
+			++i;
+			local args_end = text.indexmatch("(", ")", i);
+			yield (name, text.substr(i, args_end));
+			i = args_end + 1;
+			while (i < end && text.isspace(i)) ++i;
+			if (i >= end)
+				break;
+			if (text[i] != ",") {
+				throw Error("Expected `,' after tag with parameter List, but got {!r}".
+					format({ text[i] }));
+			}
+			++i;
+			name_start = i;
+			continue;
+		}
+		if (ch == ",") {
+			yield (text.substr(name_start, i).strip(), "");
+			++i;
+			name_start = i;
+			continue;
+		}
+		++i;
+	}
+	if (name_start < i)
+		yield (text.substr(name_start, i).strip(), "");
+}
+
+function split_argument_list(text: string): {({(string, string)...}, string, string)...} {
+	text = text.strip();
+	if (!text || text == "void")
+		return;
+	local i = 0, end = #text;
+	local active_tags = [];
+	while (i < end) {
+		local ch = text[i];
+		if (ch.isspace()) { ++i; continue; }
+		if (ch == "[") {
+			++i;
+			local tag_end = text.indexmatch("[","]", i);
+			active_tags.extend(split_tags(text.substr(i, tag_end)));
+			i = tag_end + 1;
+			continue;
+		}
+		local type_start = i;
+		i = text.find(",", i);
+		if (i < 0)
+			i = end;
+		local type_and_name = text.substr(type_start, i).strip();
+		local name_start = #type_and_name;
+		while (name_start > 0 && type_and_name.issymcont(name_start - 1))
+			--name_start;
+		yield (active_tags,
+			type_and_name.substr(name_start).strip(),
+			type_and_name.substr(0, name_start).strip());
+		++i;
+		active_tags = [];
+	}
+}
+local replacement_db: {(string, string)...} = Dict();
+
+
+function load_syscalls(syscalls_def: string, options: {string...}, variant_index: int): {Syscall...} {
+	local text = File.open(syscalls_def).read().decode("utf-8").unifylines();
+	local i = 0, end = #text;
+	local active_tags = [];
+	local num_active_blocks = 0;
+	while (i < end) {
+		local ch = text[i];
+		if (ch.isspace()) { ++i; continue; }
+		if (ch == "}") {
+			if (!num_active_blocks) {
+				throw Error("{}({}) : Unmatched `}' character".format({
+					syscalls_def,
+					text.count("\n", 0, i) + 1
+				}));
+			}
+			--num_active_blocks;
+			++i;
+			continue;
+		}
+		if (ch == "%") {
+			++i;
+			while (i < end && text.isspace(i)) ++i;
+			if (i < end && text[i] == "[") {
+				local tag_end = text.findmatch("[", "]", i + 1);
+				if (tag_end < 0) {
+					throw Error("{}({}) : Unmatched `['".format({
+						syscalls_def,
+						text.count("\n", 0, i) + 1
+					}));
+				}
+				local tag_content = text[i+1:tag_end].strip();
+				if (tag_content.startswith("define_printf")) {
+					tag_content = tag_content[#"define_printf":].lstrip();
+					if (!tag_content.startswith("(") ||
+					    !tag_content.endswith(")")) {
+						throw Error("{}({}) : Missing parenthesis after `define_printf' in {!r}".format({
+							syscalls_def,
+							text.count("\n", 0, i) + 1,
+							tag_content
+						}));
+					}
+					tag_content = tag_content[1:-1].strip();
+					if ("=" !in tag_content) {
+						throw Error("{}({}) : Missing `=' in {!r}".format({
+							syscalls_def,
+							text.count("\n", 0, i) + 1,
+							tag_content
+						}));
+					}
+					local name, none, def = tag_content.partition("=")...;
+					name = name.strip();
+					def = def.strip();
+					if (name in replacement_db && replacement_db[name] != def) {
+						throw Error("{}({}) : Format for {!r} already defined as {!r} (different from {!r})".format({
+							syscalls_def,
+							text.count("\n", 0, i) + 1,
+							name,
+							replacement_db[name],
+							def
+						}));
+					}
+					replacement_db[name] = def;
+				} else {
+					throw Error("{}({}) : Unknown directive {!r}".format({
+						syscalls_def,
+						text.count("\n", 0, i) + 1,
+						tag_content
+					}));
+				}
+				i = tag_end + 1;
+				continue;
+			}
+			if (i >= end || text[i] != "(") {
+				throw Error("{}({}) : Expected `(' or `[' after `%'".format({
+					syscalls_def,
+					text.count("\n", 0, i) + 1
+				}));
+			}
+			++i;
+			while (i < end && text.isspace(i)) ++i;
+			if (i >= end || !text.issymstrt(i)) {
+				throw Error("{}({}) : Expected identifier after `%('".format({
+					syscalls_def,
+					text.count("\n", 0, i) + 1
+				}));
+			}
+			local option_start = i;
+			do ++i;
+			while (i < end && text.issymcont(i));
+			local option = text.substr(option_start, i);
+			while (i < end && text.isspace(i)) ++i;
+			if (i >= end || text[i] != ")") {
+				throw Error("{}({}) : Expected `)' `%(<NAME>'".format({
+					syscalls_def,
+					text.count("\n", 0, i) + 1
+				}));
+			}
+			++i;
+			while (i < end && text.isspace(i)) ++i;
+			local has_option = option in options;
+			if (i < end && text[i] == "{") {
+				if (!has_option) {
+					i = text.indexmatch("{", "}", i + 1) + 1;
+					continue;
+				}
+				++num_active_blocks;
+				++i;
+				continue;
+			}
+			if (!has_option) {
+				i = text.find("\n", i);
+				if (i < 0)
+					break;
+				++i;
+				continue;
+			}
+			continue;
+		}
+		if (ch == "/" && i < end) {
+			if (text[i + 1] == "*") {
+				i = text.find("*/", i + 2);
+				if (i < 0)
+					break;
+				i += 2;
+				continue;
+			}
+			if (text[i + 1] == "/") {
+				i = text.find("\n", i + 2);
+				if (i < 0)
+					break;
+				++i;
+				continue;
+			}
+		}
+		if (ch == "@" && i < end && text[i + 1] == "@") {
+			local line_end = text.find("\n", i + 2);
+			if (i < 0)
+				line_end = end;
+			active_tags.append(
+				("doc", text.substr(i + 2, line_end).rstrip()));
+			i = line_end + 1;
+			continue;
+		}
+		if (ch == "[") {
+			++i;
+			local tag_end = text.indexmatch("[", "]", i);
+			active_tags.extend(split_tags(text.substr(i, tag_end)));
+			i = tag_end + 1;
+			continue;
+		}
+		if (ch.issymstrt()) {
+			local kwd_start = i;
+			while (i < end) {
+				++i;
+				if (!text.issymcont(i))
+					break;
+			}
+			local kwd = text.substr(kwd_start, i);
+			while (i < end && text.isspace(i)) ++i;
+			switch (kwd) {
+
+			case "DEFINE": {
+				local id_text;
+				if (i < end && text[i] == "{") {
+					/* DEFINE {10, 20} =  (Select between i386 and x86_64) */
+					local variants = [];
+					++i;
+					for (;;) {
+						while (i < end && text.isspace(i))
+							++i;
+						if (i < end && text[i] == "}") {
+							++i;
+							break;
+						}
+						local variant_start = i;
+						if (i >= end || !text.isdigit(i)) {
+							throw Error("{}({}) : Expected number after `DEFINE {'".
+								format({ syscalls_def, text.count("\n", 0, i) + 1 }));
+						}
+						do ++i;
+						while (i < end && text.issymcont(i));
+						variants.append(text[variant_start:i]);
+						while (i < end && text.isspace(i))
+							++i;
+						if (i >= end && text[i] !in [",", "}"]) {
+							throw Error("{}({}) : Expected `,' or `}' after `DEFINE {...'".
+								format({ syscalls_def, text.count("\n", 0, i) + 1 }));
+						}
+						if (text[i] == ",")
+							++i;
+					}
+					local vi = variant_index;
+					if (vi >= #variants)
+						vi = #variants - 1;
+					id_text = variants[vi];
+				} else {
+					local id_start = i;
+					if (i < end && text.isdigit(i)) {
+						do ++i;
+						while (i < end && text.issymcont(i));
+					}
+					if (id_start >= i) {
+						throw Error("{}({}) : Expected number after `DEFINE'".
+							format({ syscalls_def, text.count("\n", 0, i) + 1 }));
+					}
+					id_text = text.substr(id_start, i);
+				}
+				local result = Syscall();
+				result.sysno = int(id_text);
+				result.return_type = "void";
+				while (i < end && text.isspace(i)) ++i;
+				if (i >= end || text[i] != "=") {
+					throw Error("{}({}) : Expected `=' after `DEFINE <ID>'".
+						format({ syscalls_def, text.count("\n", 0, i) + 1 }));
+				}
+				++i;
+				while (i < end && text.isspace(i)) ++i;
+				if (i < end && text[i] == "[") {
+					++i;
+					local tag_end = text.indexmatch("[", "]", i);
+					active_tags.extend(split_tags(text.substr(i, tag_end)));
+					i = tag_end + 1;
+					while (i < end && text.isspace(i)) ++i;
+				}
+				if (i >= end || !text.issymstrt(i)) {
+					throw Error("{}({}) : Expected identifier after `DEFINE <ID> ='".
+						format({ syscalls_def, text.count("\n", 0, i) + 1 }));
+				}
+				local name_start = i;
+				while (i < end && text.issymcont(i)) ++i;
+				result.name = text.substr(name_start, i);
+				while (i < end && text.isspace(i)) ++i;
+				if (i >= end || text[i] != "(") {
+					throw Error("{}({}) : Expected `(' after `DEFINE <ID> = <NAME>'".
+						format({ syscalls_def, text.count("\n", 0, i) + 1 }));
+				}
+				++i;
+				local args_end = text.indexmatch("(", ")", i);
+				result.argv = List(split_argument_list(text.substr(i, args_end)));
+				i = args_end + 1;
+				while (i < end && text.isspace(i)) ++i;
+				if (i < end && text[i] == ":") {
+					++i;
+					/* Return type */
+					while (i < end && text.isspace(i)) ++i;
+					if (i < end && text[i] == "[") {
+						++i;
+						local tag_end = text.indexmatch("[", "]", i);
+						active_tags.extend(split_tags(text.substr(i, tag_end)));
+						i = tag_end + 1;
+						while (i < end && text.isspace(i)) ++i;
+					}
+					local rt_end = text.index(";", i);
+					result.return_type = text.substr(i, rt_end).strip();
+					i = rt_end;
+				}
+				if (i >= end || text[i] != ";") {
+					throw Error("{}({}) : Expected `;' after `DEFINE <ID> = <NAME>(...): ...'".
+						format({ syscalls_def, text.count("\n", 0, i) + 1 }));
+				}
+				++i;
+				result.tags = active_tags;
+				active_tags = [];
+				print repr result;
+				yield result;
+			}	break;
+
+			default:
+				throw Error("{}({}) : Unexpected keyword {!r}".format({
+					syscalls_def,
+					text.count("\n", 0, i) + 1,
+					kwd
+				}));
+				break;
+			}
+			continue;
+		}
+		throw Error("{}({}) : Expected identifer, but got {!r}".format({
+			syscalls_def,
+			text.count("\n", 0, i) + 1,
+			ch
+		}));
+	}
+}
+
+
+@@Safely re-write a hashed File @filename, by calling ${fp_writer(File fp)}
+function write_hashed_file(filename: string, fp_writer: Callable) {
+	local old_text = none;
+	try {
+		local firstline;
+		with (local old_fp = File.open(filename, "r")) {
+			firstline = old_fp.readline();
+			old_text = old_fp.read();
+		}
+		if (!firstline)
+			goto do_overwrite_file;
+		local old_hash = firstline.scanf(" /* HASH %[^ *]")...;
+		old_hash = old_hash.strip();
+		local expected_old_hash = old_text.operator hash().hex();
+		if (old_hash != expected_old_hash) {
+			print "\n\n",;
+			print getFilenameForLog(filename),;
+			print " : Error : File", repr filename, "has been modified";
+			print "\tStored hash:  ", old_hash;
+			print "\tExpected hash:", expected_old_hash;
+			throw "Don't overwrite modified File";
+		}
+	} catch (Error.SystemError.FSError.FileNotFound) {
+		/* Fallthough -- Re-write the File. */
+	} catch (Error.ValueError.UnpackError) {
+		print "\n\n",;
+		print getFilenameForLog(filename),;
+		print " : Error : File", repr filename, "has been modified";
+		print "\tNo hash information tag found within the File";
+		throw "Don't overwrite modified File";
+	}
+do_overwrite_file:
+	File.Writer contents;
+	fp_writer(contents);
+	contents = contents.string.encode("utf-8").bytes();
+	if (old_text is none || old_text != contents) {
+		with (local fp = File.open(filename, "w")) {
+			local new_hash = contents.operator hash().hex();
+			fp << "/* HASH " << new_hash << " */\n";
+			fp.write(contents);
+		}
+	}
+}
+
+function unpack_trace(tags: {(string, string)...}, typ: string): (string, string) {
+	local x = Dict(tags).get("printf");
+	if (x is none)
+		x = replacement_db.get(typ);
+	if (x is none) {
+		if (typ.endswith("*"))
+			return ("\"%p\"", ",{me}");
+		return none;
+	}
+	if (x.startswith("select")) {
+		local basevalue = "?";
+		x = x[#"select":].lstrip();
+		assert x.startswith("(");
+		assert x.endswith(")");
+		x = x[1:-1].strip();
+		if (":" in x) {
+			basevalue, none, x = x.partition(":")...;
+			assert "," !in basevalue;
+			basevalue = basevalue.strip();
+			x = x.strip();
+		}
+		File.Writer args_writer;
+		args_writer << ",({me}),";
+		for (local f: x.split(",")) {
+			f = f.strip();
+			local fval = f;
+			if ("=" in f) {
+				f, none, fval = f.partition("=")...;
+				f = f.strip();
+				fval = fval.strip();
+			}
+			args_writer
+				<< "({me}) == " << fval
+				<< " ? " << repr(f)
+				<< " : ";
+		}
+		args_writer << repr(basevalue);
+		return ("\"%#Ix=%s\"", args_writer.string);
+	}
+	if (x.startswith("flagset")) {
+		local baseflag = none;
+		x = x[#"flagset":].lstrip();
+		assert "|" !in x, "x = " + repr(x);
+		assert x.startswith("(");
+		assert x.endswith(")");
+		x = x[1:-1].strip();
+		if (":" in x) {
+			baseflag, none, x = x.partition(":")...;
+			assert "," !in baseflag;
+			baseflag = baseflag.strip();
+			x = x.strip();
+		}
+		local flags = List(for (local f: x.split(",")) f.strip());
+		assert flags;
+		local format_string = "%s" * ((#flags * 2) - 1);
+		format_string = "%#Ix=" + format_string;
+		File.Writer args_writer;
+		args_writer << ",(uintptr_t)({me})";
+		for (local i = 0; i < #flags; ++i) {
+			local f = flags[i];
+			local fval = f;
+			if ("=" in f) {
+				f, none, fval = f.partition("=")...;
+				f = f.strip();
+				fval = fval.strip();
+			}
+			if (i) {
+				args_writer
+					<< ",(({me}) & " << fval << ") && (({me}) & ("
+					<< "|".join(
+						for (local r: flags[:i])
+							"=" in r
+								? r.partition("=")[2].lstrip()
+								: r)
+					<< ")) ? \"|\" : \"\"";
+			}
+			if (i == 0 && baseflag) {
+				args_writer << ",({me}) & " << fval << " ? " << repr(f) << " : ({me}) ? \"\" : " << repr(baseflag) << "\n";
+			} else {
+				args_writer << ",({me}) & " << fval << " ? " << repr(f) << " : \"\"\n";
+			}
+		}
+		return (repr(format_string), args_writer.string.rstrip());
+	}
+	assert x.startswith("\"");
+	local i = 1;
+	while (i < #x && (x[i] != "\"" || x[i-1] == "\\"))
+		++i;
+	if (i < #x)
+		++i;
+	local format_string = x[:i];
+	x = x[i:].lstrip();
+	assert x.startswith(",");
+	x = x[1:].lstrip();
+	return (format_string, "," + x);
+}
+
+global escape_typename;
+function generate_syscalls_inl(
+		filename: string, syscalls: {Syscall...},
+		include_i386_adjustments: bool = false,
+		nr_prefix: string = "__NR") {
+	write_hashed_file(filename, [](fp: File) {
+		fp << copyright << "\n\n";
+		local longest_name_len = 0;
+		local greatest_id = 0;
+		for (local sc: syscalls) {
+			local temp = #sc.name;
+			if (longest_name_len < temp)
+				longest_name_len = temp;
+			local temp = #sc.sysno_str;
+			if (greatest_id < temp)
+				greatest_id = temp;
+		}
+		longest_name_len += 3;
+		local id_min = 0xffffffff;
+		local id_max = 0;
+		local id_extended_min = 0xffffffff;
+		local id_extended_max = 0;
+		for (local sc: syscalls) {
+			local no = sc.sysno;
+			if (no >= SYSNO_EXTENDED_START) {
+				if (id_extended_min > no)
+					id_extended_min = no;
+				if (id_extended_max < no)
+					id_extended_max = no;
+			} else {
+				if (id_min > no)
+					id_min = no;
+				if (id_max < no)
+					id_max = no;
+			}
+			local id_dec = sc.sysno_str;
+			sc.print_doc(fp);
+			fp << "#define " << nr_prefix << "_"
+				<< sc.name
+				<< (" " * (longest_name_len - #sc.name))
+				<< " "
+				<< id_dec
+				<< (" " * (greatest_id - #id_dec))
+				<< " /* ";
+			sc.print_prototype(fp);
+			fp << " */\n";
+		}
+		fp << "\n";
+		fp << "#define " << nr_prefix << "_syscall_min   " << id_min << "\n";
+		fp << "#define " << nr_prefix << "_syscall_max   " << id_max << "\n";
+		fp << "#define " << nr_prefix << "_exsyscall_min " << id_extended_min.hex() << "\n";
+		fp << "#define " << nr_prefix << "_exsyscall_max " << id_extended_max.hex() << "\n";
+		fp << "\n";
+		fp << "#ifdef __WANT_SYSCALL_RESTART_MODES\n";
+		fp << "/* Restart modes:\n";
+		fp << " * " << SYSCALL_RESTART_AUTO << " (auto):\n";
+		fp << " *   - Always restart after an `E_INTERRUPT_USER_RPC'\n";
+		fp << " *   - Restart from sigreturn() if the signal handler had the `SA_RESTART' flag set\n";
+		fp << " * " << SYSCALL_RESTART_DONT << " (dont):\n";
+		fp << " *   - Never restart. - Always propagate `E_INTERRUPT_USER_RPC'\n";
+		fp << " *   - The only case when the system call should still be restarted,\n";
+		fp << " *     is when an RPC with `RPC_SCHEDULE_FLAG_SYSRESTART' was used\n";
+		fp << " * " << SYSCALL_RESTART_MUST << " (must):\n";
+		fp << " *   - Always restart, even from `sigreturn()' when the\n";
+		fp << " *     handler didn't have the `SA_RESTART' flag set\n";
+		fp << " *   - The only case when the system call shouldn't be restarted,\n";
+		fp << " *     is when an RPC with `RPC_SCHEDULE_FLAG_NOSYSRESTART' was used\n";
+		fp << " * Interaction with `SA_RESTART':\n";
+		fp << " *  - auto + ~SA_RESTART:      No\n";
+		fp << " *  - auto + SA_RESTART:       Yes\n";
+		fp << " *  - dont + ~SA_RESTART:      No\n";
+		fp << " *  - dont + SA_RESTART:       No\n";
+		fp << " *  - must + ~SA_RESTART:      Yes\n";
+		fp << " *  - must + SA_RESTART:       Yes\n";
+		fp << " * Interaction with RPC flags:\n";
+		fp << " *  - auto + <no flags>:                     Yes\n";
+		fp << " *  - auto + RPC_SCHEDULE_FLAG_SYSRESTART:   Yes\n";
+		fp << " *  - auto + RPC_SCHEDULE_FLAG_NOSYSRESTART: No\n";
+		fp << " *  - dont + <no flags>:                     No\n";
+		fp << " *  - dont + RPC_SCHEDULE_FLAG_SYSRESTART:   Yes\n";
+		fp << " *  - dont + RPC_SCHEDULE_FLAG_NOSYSRESTART: No\n";
+		fp << " *  - must + <no flags>:                     Yes\n";
+		fp << " *  - must + RPC_SCHEDULE_FLAG_SYSRESTART:   Yes\n";
+		fp << " *  - must + RPC_SCHEDULE_FLAG_NOSYSRESTART: No\n";
+		fp << " */\n";
+		for (local sc: syscalls) {
+			fp << "#define " << nr_prefix << "RM_"
+				<< sc.name
+				<< (" " * (longest_name_len - #sc.name))
+				<< " "
+				<< sc.restart_mode
+				<< "\n";
+		}
+		fp << "#endif /* __WANT_SYSCALL_RESTART_MODES */\n";
+		fp << "\n";
+		fp << "#ifdef __WANT_SYSCALL_CANCELLATION_POINTS\n";
+		for (local sc: syscalls) {
+			fp << "#define " << nr_prefix << "CP_"
+				<< sc.name
+				<< (" " * (longest_name_len - #sc.name))
+				<< " " << (int)sc.is_cancellation_point << "\n";
+		}
+		fp << "#endif /* __WANT_SYSCALL_CANCELLATION_POINTS */\n";
+		fp << "\n";
+		fp << "#ifdef __WANT_SYSCALL_RETURN_TYPES\n";
+		for (local sc: syscalls) {
+			fp << "#define " << nr_prefix << "RT_"
+				<< sc.name
+				<< (" " * (longest_name_len - #sc.name))
+				<< " "
+				<< sc.return_type
+				<< "\n";
+		}
+		fp << "#endif /* __WANT_SYSCALL_RETURN_TYPES */\n";
+		fp << "\n";
+		fp << "#ifdef __WANT_SYSCALL_ARGUMENT_TYPES\n";
+		for (local sc: syscalls) {
+			local i = 0;
+			for (local none, none, typ: sc.argv) {
+				fp << "#define " << nr_prefix << "AT" << i << "_"
+					<< sc.name
+					<< (" " * (longest_name_len - #sc.name))
+					<< " "
+					<< typ
+					<< "\n";
+				++i;
+			}
+		}
+		fp << "#endif /* __WANT_SYSCALL_ARGUMENT_TYPES */\n";
+		fp << "\n";
+		fp << "#ifdef __WANT_SYSCALL_ARGUMENT_NAMES\n";
+		for (local sc: syscalls) {
+			local i = 0;
+			for (local none, argname, none: sc.argv) {
+				fp << "#define " << nr_prefix << "AN" << i << "_"
+					<< sc.name
+					<< (" " * (longest_name_len - #sc.name))
+					<< " "
+					<< repr(argname)
+					<< "\n";
+				++i;
+			}
+		}
+		fp << "#endif /* __WANT_SYSCALL_ARGUMENT_NAMES */\n";
+		fp << "\n";
+		fp << "#ifdef __WANT_SYSCALL_ARGUMENT_FORMAT\n";
+		for (local sc: syscalls) {
+			local i = 0;
+			local args = ", ".join(for (local none, n, none: sc.argv) n);
+			local spc = "";
+			local indent = #sc.name + 2 + #args;
+			if (indent < longest_name_len)
+				spc = " " * (longest_name_len - indent);
+			for (local tags, argname, typ: sc.argv) {
+				local fmt, arg = unpack_trace(tags, typ)...;
+				if (fmt is none)
+					fmt = "\"?\"";
+				if (arg is none)
+					arg = "/* nothing */";
+				fp << "#define " << nr_prefix << "ATRF" << i << "_"
+					<< sc.name
+					<< (" " * (longest_name_len - #sc.name))
+					<< " "
+					<< fmt
+					<< "\n";
+				arg = arg.format({ "me" : argname });
+				if ("\n" in arg) {
+					File.Writer prefix;
+					prefix << "#define " << nr_prefix << "ATRA" << i << "_"
+						<< sc.name
+						<< "("
+						<< args
+						<< ") "
+						<< spc;
+					prefix = prefix.string;
+					local lines = List(arg.splitlines(false));
+					for (local i = 0; i < #lines; ++i) {
+						fp << prefix << lines[i];
+						if (i != #lines - 1)
+							fp << " \\";
+						fp << "\n";
+						prefix = " " * #prefix;
+					}
+				} else {
+					fp << "#define " << nr_prefix << "ATRA" << i << "_"
+						<< sc.name
+						<< "("
+						<< args
+						<< ") "
+						<< spc
+						<< arg
+						<< "\n";
+				}
+				++i;
+			}
+		}
+		fp << "#endif /* __WANT_SYSCALL_ARGUMENT_FORMAT */\n";
+		fp << "\n";
+		fp << "#ifdef __WANT_SYSCALL_ARGUMENT_COUNT\n";
+		for (local sc: syscalls) {
+			fp << "#define " << nr_prefix << "AC_"
+				<< sc.name
+				<< (" " * (longest_name_len - #sc.name))
+				<< " "
+				<< #sc.argv
+				<< "\n";
+		}
+		fp << "#endif /* __WANT_SYSCALL_ARGUMENT_COUNT */\n";
+		fp << "\n";
+		fp << "#ifdef __WANT_SYSCALL_ARGUMENT_LIST_MAKER\n";
+		for (local sc: syscalls) {
+			local args = ["abcdef"...];
+			fp << "#define " << nr_prefix << "AM_"
+				<< sc.name
+				<< "(" << ", ".join(args) << ")"
+				<< (" " * (longest_name_len - #sc.name))
+				<< " ";
+			local is_first = true;
+			for (local tags, none, typ: sc.argv) {
+				if (!is_first)
+					fp << ", ";
+				is_first = false;
+				fp << "(" << escape_typename(typ) << ")";
+				if (include_i386_adjustments && "double_wide" in Dict(tags)) {
+					local a = args.pop(0);
+					local b = args.pop(0);
+					fp << "((__uint64_t)" << a << " | (__uint64_t)" << b << " << 32)";
+				} else {
+					fp << args.pop(0);
+				}
+			}
+			if (is_first)
+				fp << "/* nothing */";
+			fp << "\n";
+		}
+		fp << "#endif /* __WANT_SYSCALL_ARGUMENT_LIST_MAKER */\n";
+		fp << "\n";
+		fp << "#ifdef __WANT_SYSCALL_ARGUMENT_LIST_PACKER\n";
+		for (local sc: syscalls) {
+			local args = ["abcdef"...];
+			fp << "#define " << nr_prefix << "AP_"
+				<< sc.name
+				<< "(" << ", ".join(args[:#sc.argv]) << ")"
+				<< (" " * (longest_name_len - #sc.name))
+				<< " ";
+			fp << "   " * (#args - #sc.argv);
+			local is_first = true;
+			for (local tags, none, typ: sc.argv) {
+				if (!is_first)
+					fp << ", ";
+				is_first = false;
+				fp << "(__syscall_ulong_t)";
+				if (include_i386_adjustments && "double_wide" in Dict(tags)) {
+					local arg = args.pop(0);
+					fp << arg << ", ";
+					fp << "(__syscall_ulong_t)((__uint64_t)" << arg << " >> 32)";
+				} else {
+					fp << args.pop(0);
+				}
+			}
+			if (is_first)
+				fp << "/* nothing */";
+			fp << "\n";
+		}
+		fp << "#endif /* __WANT_SYSCALL_ARGUMENT_LIST_PACKER */\n";
+		fp << "\n";
+		fp << "#ifdef __WANT_SYSCALL_ATTR_NORETURN\n";
+		for (local sc: syscalls) {
+			if (!sc.is_function_noreturn())
+				continue;
+			fp << "#define " << nr_prefix << "NT_"
+				<< sc.name
+				<< (" " * (longest_name_len - #sc.name))
+				<< " 1\n";
+		}
+		fp << "#endif /* __WANT_SYSCALL_ATTR_NORETURN */\n";
+		fp << "\n";
+		if (include_i386_adjustments) {
+			fp << "#ifdef __WANT_SYSCALL_DOUBLE_WIDE_RETURN_386\n";
+			for (local sc: syscalls) {
+				if (sc.has_function_tag("double_wide")) {
+					fp << "#define " << nr_prefix << "DW386_"
+						<< sc.name
+						<< (" " * (longest_name_len - #sc.name))
+						<< " 1\n";
+				}
+			}
+			fp << "#endif /* __WANT_SYSCALL_DOUBLE_WIDE_RETURN_386 */\n";
+			fp << "\n";
+			fp << "#ifdef __WANT_SYSCALL_ARGUMENT_COUNT_386\n";
+			for (local sc: syscalls) {
+				fp << "#define " << nr_prefix << "AC386_"
+					<< sc.name
+					<< (" " * (longest_name_len - #sc.name))
+					<< " "
+					<< sc.i386_adjusted_argc
+					<< "\n";
+			}
+			fp << "#endif /* __WANT_SYSCALL_ARGUMENT_COUNT_386 */\n";
+			fp << "\n";
+		}
+	});
+}
+
+function guardof(filename: string, for_system_header: bool = false) {
+	local base = filename.upper().replace("/", "_").replace("-", "_").replace(".", "_");
+	if (base.startswith("SRC_"))
+		base = base[#"SRC_":];
+	else if (base.startswith("INCLUDE_"))
+		base = base[#"INCLUDE_":];
+	return for_system_header ? "_" + base : "GUARD_" + base;
+}
+
+function print_syscall_decls(
+		fp: File, syscalls: {Syscall...}, decl: string, cc: string,
+		include_except: bool, is_noexcept: bool, exclude_asm: bool,
+		redirect_libc: bool) {
+	local struct_types = HashSet();
+	for (local sc: syscalls) {
+		for (local none, none, typ: sc.argv) {
+			if (typ.startswith("struct ")) {
+				local st_name = typ[#"struct ":].lstrip();
+				local i = 0, end = #st_name;
+				while (i < end && st_name.issymcont(i)) ++i;
+				struct_types.insert(st_name[:i]);
+			}
+		}
+	}
+	struct_types = List(struct_types);
+	struct_types.sort();
+	for (local st: struct_types)
+		fp << "struct " << st << ";\n";
+	for (local enable_except: [false, true]) {
+		if (enable_except && !include_except)
+			continue;
+		for (local sc: syscalls) {
+			if (enable_except && !sc.has_except_variant)
+				continue;
+			if (exclude_asm && sc.has_function_tag("asm"))
+				continue;
+			sc.print_doc(fp);
+			fp << decl << " ";
+			for (local x: sc.enum_function_attributes())
+				fp << x << " ";
+			fp << sc.return_type;
+			if (!sc.return_type.endswith("*"))
+				fp << " ";
+			if (!enable_except && is_noexcept)
+				fp << "NOTHROW";
+			fp << "(" << cc << " ";
+			if (enable_except) fp << "X";
+			fp << "sys_" << sc.name << ")(";
+			fp << ", ".join(
+				for (local none, name, typ: sc.argv)
+					typ + (typ.endswith("*") ? "" : " ") + name);
+			if (!sc.argv)
+				fp << "void";
+			fp << ")";
+			if (enable_except || !is_noexcept)
+				fp << " THROWS(...)";
+			if (redirect_libc)
+				fp << "ASMNAME(" << repr(key_libc_syscall(sc.name, enable_except)) << ")";
+			fp << ";\n";
+		}
+	}
+}
+
+function generate_syscalls_features(
+		filename: string,
+		syscalls: {Syscall...}) {
+	write_hashed_file(filename, [](fp: File) {
+		fp << copyright << "\n\n";
+		for (local enable_except: [false, true]) {
+			fp << "\n#ifndef CONFIG_SYSCALL_EXCLUDE_WITH";
+			if (!enable_except) fp << "OUT";
+			fp << "EXCEPT\n";
+			for (local sc: syscalls) {
+				if (enable_except && !sc.has_except_variant)
+					continue;
+				fp << "#define __CRT_HAVE_" << key_public_syscall(sc.name, enable_except) << " 1\n";
+			}
+			fp << "#endif /* !CONFIG_SYSCALL_EXCLUDE_WITH";
+			if (!enable_except) fp << "OUT";
+			fp << "EXCEPT */\n";
+		}
+	});
+}
+
+function generate(options: {string...},
+                  variant_index: int,
+                  syscalls_def: string = none,
+                  syscalls_inl: string = none,
+                  syscall_crt_features: string  = none,
+                  include_i386_adjustments: bool = false,
+                  syscall_cc: string = "") {
+	local syscalls = List(load_syscalls(syscalls_def, options, variant_index));
+	syscalls.sort([](x: Syscall) -> x.sysno);
+	if (syscalls_inl !is none)
+		generate_syscalls_inl(syscalls_inl, syscalls, include_i386_adjustments);
+	if (syscall_crt_features !is none)
+		generate_syscalls_features(syscall_crt_features, syscalls);
+	return syscalls;
+}
+
+function generate_syscalls_listing(
+		filename: string, syscalls: {Syscall...}) {
+	write_hashed_file(filename, [](fp: File) {
+		local guard_name = guardof(filename);
+		fp << copyright << "\n\n";
+		local id_min = 0xffffffff;
+		local id_max = 0;
+		local id_extended_min = 0xffffffff;
+		local id_extended_max = 0;
+		local normal_syscalls = [];
+		local extended_syscalls = [];
+		for (local sc: syscalls) {
+			local no = sc.sysno;
+			if (no >= SYSNO_EXTENDED_START) {
+				if (id_extended_min > no)
+					id_extended_min = no;
+				if (id_extended_max < no)
+					id_extended_max = no;
+				no -= SYSNO_EXTENDED_START;
+				if (no >= #extended_syscalls)
+					extended_syscalls.resize(no + 1);
+				extended_syscalls[no] = sc;
+			} else {
+				if (id_min > no)
+					id_min = no;
+				if (id_max < no)
+					id_max = no;
+				if (no >= #normal_syscalls)
+					normal_syscalls.resize(no + 1);
+				normal_syscalls[no] = sc;
+			}
+		}
+		fp << "#ifndef __SYSCALL_UNUSED_LEADING\n";
+		fp << "#define __LS_SYSCALL_DEFINES_SYSCALL_UNUSED_LEADING 1\n";
+		fp << "#define __SYSCALL_UNUSED_LEADING(sysno, index)\n";
+		fp << "#endif /* !__SYSCALL_UNUSED_LEADING */\n";
+		fp << "#ifndef __SYSCALL_UNUSED\n";
+		fp << "#define __LS_SYSCALL_DEFINES_SYSCALL_UNUSED 1\n";
+		fp << "#define __SYSCALL_UNUSED(sysno, index, index_without_leading)\n";
+		fp << "#endif /* !__SYSCALL_UNUSED */\n";
+		fp << "\n";
+		fp << "#ifndef __SYSCALL_EXTENDED\n";
+		fp << "#define __LS_SYSCALL_DEFINES_SYSCALL_EXTENDED 1\n";
+		fp << "#define __SYSCALL_EXTENDED(name) __SYSCALL(name)\n";
+		fp << "#endif /* !__SYSCALL_EXTENDED */\n";
+		fp << "#ifndef __SYSCALL_EXTENDED_UNUSED_LEADING\n";
+		fp << "#define __LS_SYSCALL_DEFINES_SYSCALL_EXTENDED_UNUSED_LEADING 1\n";
+		fp << "#define __SYSCALL_EXTENDED_UNUSED_LEADING(sysno, index) __SYSCALL_UNUSED_LEADING(sysno, index)\n";
+		fp << "#endif /* !__SYSCALL_EXTENDED_UNUSED_LEADING */\n";
+		fp << "#ifndef __SYSCALL_EXTENDED_UNUSED\n";
+		fp << "#define __LS_SYSCALL_DEFINES_SYSCALL_EXTENDED_UNUSED 1\n";
+		fp << "#define __SYSCALL_EXTENDED_UNUSED(sysno, index, index_without_leading) __SYSCALL_UNUSED(sysno, index, index_without_leading)\n";
+		fp << "#endif /* !__SYSCALL_EXTENDED_UNUSED */\n";
+		fp << "\n";
+		fp << "\n";
+		fp << "#ifdef __BEGIN_SYSCALLS\n";
+		fp << "__BEGIN_SYSCALLS(" << id_min << ", " << id_max << ", " << ((id_max - id_min) + 1) << ")\n";
+		fp << "#endif /* __BEGIN_SYSCALLS */\n";
+		import enumerate from util;
+		for (local i, sc: enumerate(normal_syscalls)) {
+			if (sc is none) {
+				if (i < id_min) {
+					fp << "__SYSCALL_UNUSED_LEADING(" << i << ", " << i << ")\n";
+				} else {
+					fp << "__SYSCALL_UNUSED(" << i << ", " << i << ", " << (i - id_min) << ")\n";
+				}
+			} else {
+				fp << "__SYSCALL(" << sc.name << ")\n";
+			}
+		}
+		fp << "#ifdef __BEGIN_SYSCALLS\n";
+		fp << "#ifdef __END_SYSCALLS\n";
+		fp << "__END_SYSCALLS(" << id_min << ", " << id_max << ", " << ((id_max - id_min) + 1) << ")\n";
+		fp << "#endif /* __END_SYSCALLS */\n";
+		fp << "#endif /* __BEGIN_SYSCALLS */\n";
+		fp << "\n";
+		fp << "\n";
+		fp << "#ifdef __BEGIN_SYSCALLS_EXTENDED\n";
+		fp << "__BEGIN_SYSCALLS_EXTENDED("
+			<< id_extended_min.hex() << ", "
+			<< id_extended_max.hex() << ", "
+			<< ((id_extended_max - id_extended_min) + 1) << ")\n";
+		fp << "#elif defined(__BEGIN_SYSCALLS)\n";
+		fp << "__BEGIN_SYSCALLS("
+			<< id_extended_min.hex() << ", "
+			<< id_extended_max.hex() << ", "
+			<< ((id_extended_max - id_extended_min) + 1) << ")\n";
+		fp << "#endif\n";
+		for (local i, sc: enumerate(extended_syscalls)) {
+			if (sc is none) {
+				local no = i + SYSNO_EXTENDED_START;
+				if (no < id_extended_min) {
+					fp << "__SYSCALL_EXTENDED_UNUSED_LEADING(" << no.hex() << ", " << i << ")\n";
+				} else {
+					fp << "__SYSCALL_EXTENDED_UNUSED(" << no.hex() << ", " << i << ", " << (no - id_extended_min) << ")\n";
+				}
+			} else {
+				fp << "__SYSCALL_EXTENDED(" << sc.name << ")\n";
+			}
+		}
+		fp << "#ifdef __BEGIN_SYSCALLS_EXTENDED\n";
+		fp << "#ifdef __END_SYSCALLS_EXTENDED\n";
+		fp << "__END_SYSCALLS_EXTENDED("
+			<< id_extended_min.hex() << ", "
+			<< id_extended_max.hex() << ", "
+			<< ((id_extended_max - id_extended_min) + 1) << ")\n";
+		fp << "#endif /* __END_SYSCALLS_EXTENDED */\n";
+		fp << "#elif defined(__BEGIN_SYSCALLS)\n";
+		fp << "#ifdef __END_SYSCALLS\n";
+		fp << "__END_SYSCALLS("
+			<< id_extended_min.hex() << ", "
+			<< id_extended_max.hex() << ", "
+			<< ((id_extended_max - id_extended_min) + 1) << ")\n";
+		fp << "#endif /* __END_SYSCALLS */\n";
+		fp << "#endif\n";
+		fp << "\n";
+		fp << "\n";
+		fp << "#ifdef __LS_SYSCALL_DEFINES_SYSCALL_EXTENDED_UNUSED\n";
+		fp << "#undef __LS_SYSCALL_DEFINES_SYSCALL_EXTENDED_UNUSED\n";
+		fp << "#undef __SYSCALL_EXTENDED_UNUSED\n";
+		fp << "#endif /* __LS_SYSCALL_DEFINES_SYSCALL_EXTENDED_UNUSED */\n";
+		fp << "#ifdef __LS_SYSCALL_DEFINES_SYSCALL_EXTENDED_UNUSED_LEADING\n";
+		fp << "#undef __LS_SYSCALL_DEFINES_SYSCALL_EXTENDED_UNUSED_LEADING\n";
+		fp << "#undef __SYSCALL_EXTENDED_UNUSED_LEADING\n";
+		fp << "#endif /* __LS_SYSCALL_DEFINES_SYSCALL_EXTENDED_UNUSED_LEADING */\n";
+		fp << "#ifdef __LS_SYSCALL_DEFINES_SYSCALL_EXTENDED\n";
+		fp << "#undef __LS_SYSCALL_DEFINES_SYSCALL_EXTENDED\n";
+		fp << "#undef __SYSCALL_EXTENDED\n";
+		fp << "#endif /* __LS_SYSCALL_DEFINES_SYSCALL_EXTENDED */\n";
+		fp << "#ifdef __LS_SYSCALL_DEFINES_SYSCALL_UNUSED\n";
+		fp << "#undef __LS_SYSCALL_DEFINES_SYSCALL_UNUSED\n";
+		fp << "#undef __SYSCALL_UNUSED\n";
+		fp << "#endif /* __LS_SYSCALL_DEFINES_SYSCALL_UNUSED */\n";
+		fp << "#ifdef __LS_SYSCALL_DEFINES_SYSCALL_UNUSED_LEADING\n";
+		fp << "#undef __LS_SYSCALL_DEFINES_SYSCALL_UNUSED_LEADING\n";
+		fp << "#undef __SYSCALL_UNUSED_LEADING\n";
+		fp << "#endif /* __LS_SYSCALL_DEFINES_SYSCALL_UNUSED_LEADING */\n";
+	});
+}
+
+function generate_x86_syscalls_libc_impl(
+		filename: string, syscalls: {Syscall...}, x64: bool) {
+	write_hashed_file(filename, [](fp: File) {
+		local i386_arg_regs = { "%ebx", "%ecx", "%edx", "%esi", "%edi", "%ebp" };
+		function print_enable_except(enable_except: bool) {
+			if (enable_except) {
+				fp << "\tstc\n";
+			} else {
+				fp << "\tclc\n";
+			}
+		}
+		function print_i386_int80_syscall_invocation(adjusted_argc: int, enable_except: bool) {
+			local preserved_register = [];
+			if (adjusted_argc > 0) preserved_register.append("%ebx");
+			if (adjusted_argc > 3) preserved_register.append("%esi");
+			if (adjusted_argc > 4) preserved_register.append("%edi");
+			if (adjusted_argc > 5) preserved_register.append("%ebp");
+			local sp_offset = 4 * (1 + #preserved_register);
+			for (local x: preserved_register)
+				fp << "\t" << "pushl_cfi_r " << x << "\n";
+			for (local i: [:adjusted_argc])
+				fp << "\t" << "movl   " << (sp_offset + i * 4) << "(%esp), " << i386_arg_regs[i] << "\n";
+			print_enable_except(enable_except);
+			fp << "\tint    $0x80\n";
+			for (local x: preserved_register.reversed())
+				fp << "\t" << "popl_cfi_r " << x << "\n";
+		}
+		function print_i386_sysenter_syscall_invocation(adjusted_argc: int, enable_except: bool) {
+			local preserved_register = ["%edi", "%ebp"];
+			if (adjusted_argc > 0) preserved_register.append("%ebx");
+			if (adjusted_argc > 3) preserved_register.append("%esi");
+			local sp_offset = 4 * (1 + #preserved_register);
+			for (local x: preserved_register)
+				fp << "\t" << "pushl_cfi_r " << x << "\n";
+			if (adjusted_argc > 0) fp << "\t" << "movl   " << (sp_offset + 0) << "(%esp), %ebx\n";
+			if (adjusted_argc > 1) fp << "\t" << "movl   " << (sp_offset + 4) << "(%esp), %ecx\n";
+			if (adjusted_argc > 2) fp << "\t" << "movl   " << (sp_offset + 8) << "(%esp), %edx\n";
+			if (adjusted_argc > 3) fp << "\t" << "movl   " << (sp_offset + 12) << "(%esp), %esi\n";
+			if (adjusted_argc > 5) {
+				fp << "\t" << "pushl_cfi " << (sp_offset + 20) << "(%esp)\n";
+				fp << "\t" << "pushl_cfi " << (sp_offset + 20) << "(%esp)\n";
+			} else if (adjusted_argc > 4) {
+				fp << "\t" << "pushl_cfi " << (sp_offset + 16) << "(%esp)\n";
+			}
+			fp << "\tcall   libc_x86_sysenter_";
+			if (enable_except) fp << "X";
+			fp << "common\n";
+			if (adjusted_argc > 4) {
+				local off = 4 * (adjusted_argc - 4);
+				fp << "\t" << "addl   $" << off << ", %esp\n";
+				fp << "\t.cfi_adjust_cfa_offset -" << off << "\n";
+			}
+			for (local x: preserved_register.reversed())
+				fp << "\t" << "popl_cfi_r " << x << "\n";
+		}
+		fp << copyright << "\n\n";
+		fp << "#include <hybrid/compiler.h>\n";
+		fp << "#include <asm/cfi.h>\n";
+		fp << "#include <asm/unistd.h>\n";
+		fp << "#include <sys/syscall.h>\n\n\n";
+		if (!x64) {
+			fp << "#if !defined(CONFIG_SYSCALL_USING_SYS" << (x64 ? "CALL" : "ENTER") << ") && \\\n";
+			fp << "    !defined(CONFIG_SYSCALL_USING_INT80) && \\\n";
+			fp << "    !defined(CONFIG_SYSCALL_OPTIMIZE_SIZE)\n";
+			fp << "#include \"syscall_selector32.S.inl\"\n";
+			fp << "#endif /* ... */\n";
+		}
+		fp << "\n\n";
+		if (!x64) {
+			fp << "#if defined(CONFIG_SYSCALL_USING_SYSENTER) || \\\n";
+			fp << "  (!defined(CONFIG_SYSCALL_USING_INT80) && \\\n";
+			fp << "   !defined(CONFIG_SYSCALL_OPTIMIZE_SIZE))\n";
+			for (local enable_except: [false, true]) {
+				fp << "#ifndef CONFIG_SYSCALL_EXCLUDE_WITH";
+				if (!enable_except) fp << "OUT";
+				fp << "EXCEPT\n";
+				fp << ".section .text.crt.syscall.x86_sysenter_";
+				if (enable_except) fp << "X";
+				fp << "common\n";
+				fp << "INTERN_FUNCTION(libc_x86_sysenter_";
+				if (enable_except) fp << "X";
+				fp << "common)\n";
+				fp << "\t.cfi_startproc\n";
+				fp << "\tpopl_cfi %edi     /* EDI = RETURN_PC */\n";
+				fp << "\t.cfi_register %eip, %edi\n";
+				fp << "\tmovl   %esp, %ebp /* EBP = RETURN_SP */\n";
+				print_enable_except(enable_except);
+				fp << "\tsysenter\n";
+				fp << "\t.cfi_endproc\n";
+				fp << "END(libc_x86_sysenter_";
+				if (enable_except) fp << "X";
+				fp << "common)\n";
+				fp << "#endif /* !CONFIG_SYSCALL_EXCLUDE_WITH";
+				if (!enable_except) fp << "OUT";
+				fp << "EXCEPT */\n";
+			}
+			fp << "#endif /* CONFIG_SYSCALL_USING_SYSENTER */\n\n";
+		}
+		if (!x64) {
+			fp << "#if !defined(CONFIG_SYSCALL_USING_INT80) && \\\n";
+			fp << "    !defined(CONFIG_SYSCALL_USING_SYSENTER)\n";
+			local used_argc_counts = HashSet();
+			for (local sc: syscalls) {
+				local argc = #sc.argv;
+				if (!x64)
+					argc = sc.i386_adjusted_argc;
+				used_argc_counts.insert(argc);
+			}
+			used_argc_counts = List(used_argc_counts);
+			if (used_argc_counts) {
+				used_argc_counts.sort();
+				for (local enable_except: [false, true]) {
+					fp << "#ifndef CONFIG_SYSCALL_EXCLUDE_WITH";
+					if (!enable_except) fp << "OUT";
+					fp << "EXCEPT\n";
+					for (local adjusted_argc: used_argc_counts) {
+						fp << "#ifdef CONFIG_SYSCALL_OPTIMIZE_SIZE\n";
+						fp << ".section .text.crt.syscall.x86_exec_";
+						if (enable_except) fp << "X";
+						fp << "syscall" << adjusted_argc << ", \"ax\"\n";
+						fp << "#else /* CONFIG_SYSCALL_OPTIMIZE_SIZE */\n";
+						fp << ".section .xdata.crt.syscall.x86_exec_";
+						if (enable_except) fp << "X";
+						fp << "syscall" << adjusted_argc << ", \"awx\"\n";
+						fp << "#endif /* !CONFIG_SYSCALL_OPTIMIZE_SIZE */\n";
+						fp << "INTERN_FUNCTION(libc_x86_exec_";
+						if (enable_except) fp << "X";
+						fp << "syscall" << adjusted_argc << ")\n";
+						fp << "\t.cfi_startproc\n";
+						fp << "#ifndef CONFIG_SYSCALL_OPTIMIZE_SIZE\n";
+						fp << "\t/* Check if host supports the `sysenter' instruction, \n";
+						fp << "\t * and re-write this code during the first invocation. */\n";
+						fp << "\tcall   libc_x86_syscall_check_sysenter\n";
+						fp << "\t.byte  0x74\n";
+						fp << "\t.reloc ., R_386_PC8, 1f\n";
+						fp << "\t.byte  0xff /* jz 1f */\n";
+						print_i386_sysenter_syscall_invocation(adjusted_argc, enable_except);
+						fp << "\tret\n";
+						fp << "1:\n";
+						fp << "#endif /* !CONFIG_SYSCALL_OPTIMIZE_SIZE */\n";
+						print_i386_int80_syscall_invocation(adjusted_argc, enable_except);
+						fp << "\tret\n";
+						fp << "\t.cfi_endproc\n";
+						fp << "END(libc_x86_exec_";
+						if (enable_except) fp << "X";
+						fp << "syscall" << adjusted_argc << ")\n";
+					}
+					fp << "#endif /* !CONFIG_SYSCALL_EXCLUDE_WITH";
+					if (!enable_except) fp << "OUT";
+					fp << "EXCEPT */\n";
+				}
+			}
+			fp << "#endif /* !CONFIG_SYSCALL_USING_INT80 && !CONFIG_SYSCALL_USING_SYSENTER */\n\n\n\n\n\n";
+		}
+		for (local enable_except: [false, true]) {
+			fp << "#ifndef CONFIG_SYSCALL_EXCLUDE_WITH";
+			if (!enable_except) fp << "OUT";
+			fp << "EXCEPT\n";
+			for (local sc: syscalls) {
+				if (enable_except && !sc.has_except_variant)
+					continue;
+				local argc = #sc.argv;
+				local adjusted_argc = argc;
+				if (!x64)
+					adjusted_argc = sc.i386_adjusted_argc;
+				sc.print_doc(fp);
+				fp << ".section .text.crt.syscall.";
+				if (enable_except) fp << "X";
+				fp << sc.name << "\n";
+				sc.print_prototype_as_multiline_comment(fp);
+				fp << "INTERN_FUNCTION(";
+				fp << key_libc_syscall(sc.name, enable_except) << ")\n";
+				fp << "\t" << "/* Argument count: " << argc;
+				if (adjusted_argc != argc)
+					fp << " (adjusted to " << adjusted_argc << ")";
+				fp << " */\n";
+				fp << "\t.cfi_startproc\n";
+				if (x64) {
+					fp << "\t" << "movq   $SYS_" << sc.name << ", %rax" << "\n";
+					if (adjusted_argc >= 4)
+						fp << "\tmovq   %rcx, %r10\n";
+					print_enable_except(enable_except);
+					fp << "\tsyscall\n";
+					fp << "\tret\n";
+				} else {
+					fp << "\t" << "movl   $SYS_" << sc.name << ", %eax" << "\n";
+					fp << "#ifdef CONFIG_SYSCALL_USING_INT80\n";
+					print_i386_int80_syscall_invocation(adjusted_argc, enable_except);
+					fp << "\tret\n";
+					fp << "#elif defined(CONFIG_SYSCALL_USING_SYSENTER)\n";
+					print_i386_sysenter_syscall_invocation(adjusted_argc, enable_except);
+					fp << "\tret\n";
+					fp << "#else\n";
+					fp << "\tjmp    libc_x86_exec_";
+					if (enable_except) fp << "X";
+					fp << "syscall" << adjusted_argc << "\n";
+					fp << "#endif\n";
+				}
+				fp << "\t.cfi_endproc\n";
+				fp << "END(";
+				fp << key_libc_syscall(sc.name, enable_except) << ")\n\n";
+			}
+			fp << "#endif /* !CONFIG_SYSCALL_EXCLUDE_WITH";
+			if (!enable_except) fp << "OUT";
+			fp << "EXCEPT */\n\n\n\n\n\n\n";
+		}
+		fp << "#ifndef CONFIG_SYSCALL_NO_EXPORTS\n";
+		for (local enable_except: [false, true]) {
+			fp << "#ifndef CONFIG_SYSCALL_EXCLUDE_WITH";
+			if (!enable_except) fp << "OUT";
+			fp << "EXCEPT\n";
+			for (local sc: syscalls) {
+				if (enable_except && !sc.has_except_variant)
+					continue;
+				fp << "DEFINE_PUBLIC_WEAK_ALIAS(";
+				fp << key_public_syscall(sc.name, enable_except) << ", ";
+				fp << key_libc_syscall(sc.name, enable_except) << ")\n";
+			}
+			fp << "#endif /* !CONFIG_SYSCALL_EXCLUDE_WITH";
+			if (!enable_except) fp << "OUT";
+			fp << "EXCEPT */\n";
+		}
+		fp << "#endif /* !CONFIG_SYSCALL_NO_EXPORTS */\n\n";
+		fp << "#include \"syscalls-ammend.S.inl\"\n\n";
+	});
+}
+
+
+function generate_x86_bits_syscall_h(
+		filename: string, scs32_names: {string...},
+		scs64_names: {string...}, scs_map: {(string, {Syscall...})...}) {
+	write_hashed_file(filename, [](fp: File) {
+		local guard_name = guardof(filename, true);
+		fp << copyright << "\n";
+		fp << "#ifndef " << guard_name << "\n";
+		fp << "#define " << guard_name << " 1\n\n";
+		fp << "#include <hybrid/host.h>\n";
+		fp << "#include <asm/unistd.h>\n";
+		fp << "\n";
+		local longest_name_len = 0;
+		for (local l: [scs32_names, scs64_names]) {
+			for (local x: l) {
+				local temp = #x;
+				if (longest_name_len < temp)
+					longest_name_len = temp;
+			}
+		}
+		function print_syscall_alias(name) {
+			local scs = scs_map.get(name, {});
+			local doc_strings = [];
+			for (local s: scs) {
+				File.Writer tempfp;
+				s.print_doc(tempfp);
+				tempfp = tempfp.string;
+				if (tempfp !in doc_strings)
+					doc_strings.append(tempfp);
+			}
+			for (local x: doc_strings)
+				fp << x;
+			fp << "#define SYS_" << name << (" " * (longest_name_len - #name));
+			fp << " __NR_" << name;
+			if (scs) {
+				fp << (" " * (longest_name_len - #name));
+				fp << " /* ";
+				fp << " || ".join(HashSet([]{
+					for (local x: scs) {
+						File.Writer temp;
+						x.print_prototype(temp);
+						yield temp.string;
+					}
+				}()));
+				fp << " */";
+			}
+			fp << "\n";
+		}
+		function print_syscall_aliass(names) {
+			for (local name: names)
+				print_syscall_alias(name);
+		}
+		local x32_only_names = [];
+		local x64_only_names = [];
+		for (local x: scs32_names) {
+			if (x in scs64_names) {
+				print_syscall_alias(x);
+			} else {
+				x32_only_names.append(x);
+			}
+		}
+		for (local x: scs64_names) {
+			if (x !in scs32_names)
+				x64_only_names.append(x);
+		}
+		if (x32_only_names && x64_only_names) {
+			fp << "#ifdef __x86_64__\n";
+			print_syscall_aliass(x64_only_names);
+			fp << "#else /* __x86_64__ */\n";
+			print_syscall_aliass(x32_only_names);
+			fp << "#endif /* !__x86_64__ */\n";
+		} else if (x64_only_names) {
+			fp << "#ifdef __x86_64__\n";
+			print_syscall_aliass(x64_only_names);
+			fp << "#endif /* __x86_64__ */\n";
+		} else if (x32_only_names) {
+			fp << "#ifndef __x86_64__\n";
+			print_syscall_aliass(x32_only_names);
+			fp << "#endif /* !__x86_64__ */\n";
+		}
+		fp << "\n#endif /* !" << guard_name << " */\n";
+	});
+}
+
+function generate_386_kernel_syscall_wrappers(
+		filename: string, syscalls: {Syscall...}) {
+	write_hashed_file(filename, [](fp: File) {
+		fp << copyright << "\n\n";
+		fp << "#include <hybrid/compiler.h>\n";
+		fp << "#include <kernel/paging.h>\n";
+		fp << "#include <kernel/syscall.h>\n";
+		fp << "#include <asm/cfi.h>\n";
+		fp << "#include <asm/cpu-flags.h>\n";
+		fp << "#include <sys/syscall.h>\n";
+		fp << "#include <kos/kernel/cpu-state.h>\n\n\n";
+		for (local sc: syscalls)
+			fp << "EXTERN(sys_" << sc.name << ")\n";
+		fp << "\n\n\n";
+		fp << "INTERN(__asm32_bad_sysenter_extension)\n";
+		fp << "INTERN(x86_syscall_personality)\n";
+		fp << "\n\n\n";
+		function do_restore_registers(restore_registers, sc: Syscall) {
+			function is_none_reg(x) {
+				return x is none || x.startswith("!");
+			}
+			while (restore_registers) {
+				local reg = restore_registers.pop();
+				if (reg.startswith("!")) {
+					if (restore_registers && is_none_reg(restore_registers[#restore_registers - 1]))
+						reg = none;
+					else {
+						reg = reg[1:];
+					}
+				}
+				if (reg is none) {
+					local count = 1;
+					while (restore_registers && is_none_reg(restore_registers[#restore_registers - 1])) {
+						restore_registers.pop();
+						++count;
+					}
+					if (count == 1 && restore_registers) {
+						local reg = restore_registers.first;
+						fp << "\tpopl_cfi " << reg << " /* addl $4, %esp */\n";
+					} else {
+						fp << "\taddl   $" << (count * 4) << ", %esp\n";
+						fp << "\t.cfi_adjust_cfa_offset -" << (count * 4) << "\n";
+					}
+				} else {
+					fp << "\tpopl_cfi_r " << reg << "\n";
+				}
+			}
+		}
+		function print_386_int80_wrapper(sc: Syscall) {
+			local adjusted_argc = sc.i386_adjusted_argc;
+			fp << "\t.cfi_def_cfa %esp, 0\n";
+			fp << "\tpushl_cfi %ds\n";
+			fp << "\t.cfi_restore_iret_ds_or_offset -4\n";
+			fp << "\tpushl_cfi %es\n";
+			fp << "\t.cfi_restore_iret_es_or_offset -8\n";
+			fp << "\tpushl_cfi %fs\n";
+			fp << "\t.cfi_restore_iret_fs_or_offset -12\n";
+			fp << "\tmovw   $(SEGMENT_USER_DATA_RPL), %ax\n";
+			fp << "\tmovw   %ax, %ds\n";
+			fp << "\tmovw   %ax, %es\n";
+			fp << "\tmovw   $(SEGMENT_KERNEL_FSBASE), %ax\n";
+			fp << "\tmovw   %ax, %fs\n";
+			local restore_registers = [];
+			local is_noreturn = sc.has_function_tag("noreturn");
+			switch (adjusted_argc) {
+			case 0:
+			case 1:
+				if (!is_noreturn) {
+					fp << "\tpushl_cfi_r %ecx\n";
+					restore_registers.append("%ecx");
+					if (!sc.has_function_tag("double_wide")) {
+						fp << "\tpushl_cfi_r %edx\n";
+						restore_registers.append("%edx");
+					}
+				}
+				if (adjusted_argc == 1) {
+					fp << "\tpushl_cfi_r %ebx  /* Arg #0 */\n";
+					restore_registers.append("!%ebx");
+				}
+				break;
+			case 2:
+				if (!sc.has_function_tag("double_wide")) {
+					fp << "\tpushl_cfi_r %edx\n";
+					restore_registers.append("%edx");
+				}
+				fp << "\tpushl_cfi_r %ecx  /* Arg #1 */\n";
+				restore_registers.append("%ecx");
+				fp << "\tpushl_cfi_r %ebx  /* Arg #0 */\n";
+				restore_registers.append("!%ebx");
+				break;
+			case 6:
+				fp << "\tpushl_cfi_r %ebp  /* Arg #5 */\n";
+				restore_registers.append("!%ebp");
+				/* FALLTHRU */
+			case 5:
+				fp << "\tpushl_cfi_r %edi  /* Arg #4 */\n";
+				restore_registers.append("!%edi");
+				/* FALLTHRU */
+			case 4:
+				fp << "\tpushl_cfi_r %esi  /* Arg #3 */\n";
+				restore_registers.append("!%esi");
+				/* FALLTHRU */
+			case 3:
+				fp << "\tpushl_cfi_r %edx  /* Arg #2 */\n";
+				restore_registers.append(sc.has_function_tag("double_wide") ? none : "%edx");
+				fp << "\tpushl_cfi_r %ecx  /* Arg #1 */\n";
+				restore_registers.append("%ecx");
+				fp << "\tpushl_cfi_r %ebx  /* Arg #0 */\n";
+				restore_registers.append("!%ebx");
+				break;
+			default:
+				break;
+			}
+			fp << "\tcall   sys_" << sc.name << "\n";
+			if (!is_noreturn) {
+				do_restore_registers(restore_registers, sc);
+				fp << "\tpopl_cfi %fs\n";
+				fp << "\t.cfi_restore_iret_fs\n";
+				fp << "\tpopl_cfi %es\n";
+				fp << "\t.cfi_restore_iret_es\n";
+				fp << "\tpopl_cfi %ds\n";
+				fp << "\t.cfi_restore_iret_ds\n";
+				fp << "\tiret\n";
+			}
+		}
+		function print_386_sysenter_wrapper(sc: Syscall) {
+			local adjusted_argc = sc.i386_adjusted_argc;
+			fp << "\t.cfi_def_cfa %esp, 0\n";
+			fp << "\tpushl_cfi %ds\n";
+			fp << "\t.cfi_restore_iret_ds_or_offset -4\n";
+			fp << "\tpushl_cfi %es\n";
+			fp << "\t.cfi_restore_iret_es_or_offset -8\n";
+			fp << "\tpushl_cfi %fs\n";
+			fp << "\t.cfi_restore_iret_fs_or_offset -12\n";
+			fp << "\tmovw   $(SEGMENT_USER_DATA_RPL), %ax\n";
+			fp << "\tmovw   %ax, %ds\n";
+			fp << "\tmovw   %ax, %es\n";
+			fp << "\tmovw   $(SEGMENT_KERNEL_FSBASE), %ax\n";
+			fp << "\tmovw   %ax, %fs\n";
+			local restore_registers = [];
+			local is_noreturn = sc.has_function_tag("noreturn");
+			switch (adjusted_argc) {
+			case 0:
+			case 1:
+				if (!is_noreturn) {
+					fp << "\tpushl_cfi_r %ecx\n";
+					restore_registers.append("%ecx");
+					if (!sc.has_function_tag("double_wide")) {
+						fp << "\tpushl_cfi_r %edx\n";
+						restore_registers.append("%edx");
+					}
+				}
+				if (adjusted_argc == 1) {
+					fp << "\tpushl_cfi_r %ebx  /* Arg #0 */\n";
+					restore_registers.append("!%ebx");
+				}
+				break;
+			case 2:
+				if (!sc.has_function_tag("double_wide")) {
+					fp << "\tpushl_cfi_r %edx\n";
+					restore_registers.append("%edx");
+				}
+				fp << "\tpushl_cfi_r %ecx  /* Arg #1 */\n";
+				restore_registers.append("%ecx");
+				fp << "\tpushl_cfi_r %ebx  /* Arg #0 */\n";
+				restore_registers.append("!%ebx");
+				break;
+			case 6:
+			case 5:
+				fp << "\tcmpl   $KERNEL_BASE, %ebp\n";
+				fp << "\tjae    __asm32_bad_sysenter_extension\n";
+				if (adjusted_argc == 6) {
+					fp << "\tpushl_cfi   4(%ebp)  /* Arg #5 (WARNING: SEGFAULT!) */\n";
+					restore_registers.append(none);
+				}
+				/* FALLTHRU */
+				fp << "\tpushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */\n";
+				restore_registers.append(none);
+				/* FALLTHRU */
+			case 4:
+				fp << "\tpushl_cfi_r %esi  /* Arg #3 */\n";
+				restore_registers.append("!%esi");
+				/* FALLTHRU */
+			case 3:
+				fp << "\tpushl_cfi_r %edx  /* Arg #2 */\n";
+				restore_registers.append(sc.has_function_tag("double_wide") ? none : "%edx");
+				fp << "\tpushl_cfi_r %ecx  /* Arg #1 */\n";
+				restore_registers.append("%ecx");
+				fp << "\tpushl_cfi_r %ebx  /* Arg #0 */\n";
+				restore_registers.append("!%ebx");
+				break;
+			default:
+				break;
+			}
+			fp << "\tcall   sys_" << sc.name << "\n";
+			if (!is_noreturn) {
+				do_restore_registers(restore_registers, sc);
+				fp << "\tpopl_cfi %fs\n";
+				fp << "\t.cfi_restore_iret_fs\n";
+				fp << "\tpopl_cfi %es\n";
+				fp << "\t.cfi_restore_iret_es\n";
+				fp << "\tpopl_cfi %ds\n";
+				fp << "\t.cfi_restore_iret_ds\n";
+				/* Can only use sysexit if not double-wide!
+				 * Double-wide system calls return via EDX,
+				 * which gets clobbered if we use sysexit. */
+				if (!sc.has_function_tag("double_wide")) {
+					fp << "\tX86_IRET_BUT_PREFER_SYSEXIT\n";
+				} else {
+					fp << "\tiret\n";
+				}
+			}
+		}
+		for (local sc: syscalls) {
+			sc.print_doc(fp);
+			fp << ".section .text.x86.asm32_syscall_int80." << sc.name << "\n";
+			sc.print_prototype_as_multiline_comment(fp, "\t");
+			fp << "\t.weak __asm32_int80_" << sc.name << "\n";
+			fp << "INTERN_FUNCTION(__asm32_int80_" << sc.name << ")\n";
+			fp << "\t.cfi_startproc simple\n";
+			fp << "\t.cfi_personality 0, x86_syscall_personality\n";
+			fp << "\t.cfi_lsda 0, " << sc.sysno.hex() << "\n";
+			fp << "\t.cfi_iret_signal_frame\n";
+			print_386_int80_wrapper(sc);
+			fp << "\t.cfi_endproc\n";
+			fp << "END(__asm32_int80_" << sc.name << ")\n\n";
+		}
+		for (local sc: syscalls) {
+			sc.print_doc(fp);
+			fp << ".section .text.x86.asm32_syscall_sysenter." << sc.name << "\n";
+			sc.print_prototype_as_multiline_comment(fp, "\t");
+			fp << "\t.weak __asm32_sysenter_" << sc.name << "\n";
+			fp << "INTERN_FUNCTION(__asm32_sysenter_" << sc.name << ")\n";
+			fp << "\t.cfi_startproc simple\n";
+			fp << "\t.cfi_personality 0, x86_syscall_personality\n";
+			/* NOTE: 0x40000000 == X86_SYSCALL_PERSONALITY_LSDA_SYSENTER_FLAG */
+			fp << "\t.cfi_lsda 0, " << (sc.sysno | 0x40000000).hex() << "\n";
+			fp << "\t.cfi_iret_signal_frame\n";
+			print_386_sysenter_wrapper(sc);
+			fp << "\t.cfi_endproc\n";
+			fp << "END(__asm32_sysenter_" << sc.name << ")\n\n";
+		}
+	});
+}
+
+function generate_x86_64_kernel_syscall_wrappers(
+		filename: string,
+		syscalls32: {Syscall...},
+		syscalls64: {Syscall...}) {
+	write_hashed_file(filename, [](fp: File) {
+		fp << copyright << "\n\n";
+		fp << "#include <hybrid/compiler.h>\n";
+		fp << "#include <kernel/paging.h>\n";
+		fp << "#include <kernel/syscall.h>\n";
+		fp << "#include <asm/cfi.h>\n";
+		fp << "#include <asm/cpu-flags.h>\n";
+		fp << "#include <asm/instr/interrupt.h>\n";
+		fp << "#include <sys/syscall.h>\n";
+		fp << "#include <kos/kernel/cpu-state.h>\n\n\n";
+		for (local sc: syscalls64)
+			fp << "EXTERN(sys_" << sc.name << ")\n";
+		fp << "\n\n\n";
+		for (local sc: syscalls32)
+			fp << "EXTERN(sys32_" << sc.name << ")\n";
+		fp << "\n\n\n";
+		fp << "/* Weakly alias implementations of compatibility-mode system calls to their long-mode variants */\n";
+		for (local sc: syscalls32) {
+			local has_sys64_variant = false;
+			local name = sc.name;
+			for (local sc64: syscalls64) {
+				if (sc64.name == name) {
+					has_sys64_variant = true;
+					break;
+				}
+			}
+			if (has_sys64_variant) {
+				fp << ".weak sys32_" << name << "; ";
+				fp << ".set sys32_" << name << ", " << "sys_" << name << "\n";
+			}
+		}
+		fp << "\n\n\n";
+		fp << "INTERN(__asm32_bad_sysenter_extension)\n";
+		fp << "INTERN(x86_syscall_personality)\n";
+		fp << "\n\n\n";
+		function print_x64_wrapper(sc: Syscall) {
+			fp << "\tpushq_cfi_r %rcx\n";
+			fp << "\tpushq_cfi_r %rdx\n";
+			fp << "\tpushq_cfi_r %rsi\n";
+			fp << "\tpushq_cfi_r %rdi\n";
+			fp << "\tpushq_cfi_r %r8\n";
+			fp << "\tpushq_cfi_r %r9\n";
+			fp << "\tpushq_cfi_r %r10\n";
+			fp << "\tpushq_cfi_r %r11\n";
+			if (#sc.argv >= 4)
+				fp << "\tmovq   %r10, %rcx\n";
+			fp << "\tcall   sys_" << sc.name << "\n";
+			fp << "\tpushq_cfi_r %r11\n";
+			fp << "\tpushq_cfi_r %r10\n";
+			fp << "\tpushq_cfi_r %r9\n";
+			fp << "\tpushq_cfi_r %r8\n";
+			fp << "\tpushq_cfi_r %rdi\n";
+			fp << "\tpushq_cfi_r %rsi\n";
+			fp << "\tpushq_cfi_r %rdx\n";
+			fp << "\tpushq_cfi_r %rcx\n";
+			fp << "\tintr_exit_sysret\n";
+		}
+		function print_x64_386int80_wrapper(sc: Syscall) {
+			fp << "\tpushq_cfi_r %rcx\n";
+			fp << "\tpushq_cfi_r %rdx\n";
+			fp << "\tpushq_cfi_r %rsi\n";
+			fp << "\tpushq_cfi_r %rdi\n";
+			local adjusted_argc = sc.i386_adjusted_argc;
+			switch (adjusted_argc) {
+			/* NOTE: 32-bit moves fill the upper half of a 64-bit register with all zeros
+			 *       i.e.: movl %eax, %ecx --> movzlq %eax, %rcx */
+			case 6:
+				fp << "\tmovl   %ebp, %r9d\n";
+			case 5:
+				fp << "\tmovl   %edi, %r8d\n";
+			case 4:
+				fp << "\tmovl   %esi, %r10d\n";
+			case 3:
+//				fp << "\tmovl   %edx, %edx\n";
+			case 2:
+				fp << "\tmovl   %ecx, %esi\n";
+			case 1:
+				fp << "\tmovl   %ebx, %edi\n";
+				break;
+			default: break;
+			}
+			fp << "\tcall   sys32_" << sc.name << "\n";
+			fp << "\tpopq_cfi_r %rdi\n";
+			fp << "\tpopq_cfi_r %rsi\n";
+			if (sc.has_function_tag("double_wide")) {
+				fp << "\tpopq_cfi %rcx /* addq $8, %rsp */\n";
+			} else {
+				fp << "\tpopq_cfi_r %rdx\n";
+			}
+			fp << "\tpopq_cfi_r %rcx\n";
+			fp << "\tiretq\n";
+		}
+		function print_x64_386sysenter_wrapper(sc: Syscall) {
+			fp << "\t/* TODO: print_x64_386sysenter_wrapper() */\n";
+		}
+		for (local sc: syscalls64) {
+			sc.print_doc(fp);
+			fp << ".section .text.x86.asm64_syscall." << sc.name << "\n";
+			sc.print_prototype_as_multiline_comment(fp, "\t");
+			fp << "\t.weak __asm64_syscall_" << sc.name << "\n";
+			fp << "INTERN_FUNCTION(__asm64_syscall_" << sc.name << ")\n";
+			fp << "\t.cfi_startproc simple\n";
+			fp << "\t.cfi_personality 0, x86_syscall_personality\n";
+			fp << "\t.cfi_lsda 0, " << sc.sysno.hex() << "\n";
+			fp << "\t.cfi_iret_signal_frame\n";
+			print_x64_wrapper(sc);
+			fp << "\t.cfi_endproc\n";
+			fp << "END(__asm64_syscall_" << sc.name << ")\n\n";
+		}
+		fp << "\n\n\n";
+		for (local sc: syscalls32) {
+			sc.print_doc(fp);
+			fp << ".section .text.x86.asm32_syscall_int80." << sc.name << "\n";
+			sc.print_prototype_as_multiline_comment(fp, "\t");
+			fp << "\t.weak __asm32_int80_" << sc.name << "\n";
+			fp << "INTERN_FUNCTION(__asm32_int80_" << sc.name << ")\n";
+			fp << "\t.cfi_startproc simple\n";
+			fp << "\t.cfi_personality 0, x86_syscall_personality\n";
+			fp << "\t.cfi_lsda 0, " << sc.sysno.hex() << "\n";
+			fp << "\t.cfi_iret_signal_frame\n";
+			print_x64_386int80_wrapper(sc);
+			fp << "\t.cfi_endproc\n";
+			fp << "END(__asm32_int80_" << sc.name << ")\n\n";
+		}
+		for (local sc: syscalls32) {
+			sc.print_doc(fp);
+			fp << ".section .text.x86.asm32_syscall_sysenter." << sc.name << "\n";
+			sc.print_prototype_as_multiline_comment(fp, "\t");
+			fp << "\t.weak __asm32_sysenter_" << sc.name << "\n";
+			fp << "INTERN_FUNCTION(__asm32_sysenter_" << sc.name << ")\n";
+			fp << "\t.cfi_startproc simple\n";
+			fp << "\t.cfi_personality 0, x86_syscall_personality\n";
+			/* NOTE: 0x40000000 == X86_SYSCALL_PERSONALITY_LSDA_SYSENTER_FLAG */
+			fp << "\t.cfi_lsda 0, " << (sc.sysno | 0x40000000).hex() << "\n";
+			fp << "\t.cfi_iret_signal_frame\n";
+			print_x64_386sysenter_wrapper(sc);
+			fp << "\t.cfi_endproc\n";
+			fp << "END(__asm32_sysenter_" << sc.name << ")\n\n";
+		}
+	});
+}
+
+function generate_i386_kernel_syscall_router(
+		filename: string, syscalls: {Syscall...}) {
+	write_hashed_file(filename, [](fp: File) {
+		fp << copyright << "\n\n";
+		fp << "#include <hybrid/compiler.h>\n";
+		fp << "#include <asm/cfi.h>\n";
+		fp << "#include <asm/cpu-flags.h>\n";
+		fp << "#include <sys/syscall.h>\n";
+		fp << "#include <kos/kernel/cpu-state.h>\n";
+		fp << "#include <errno.h>\n\n\n";
+		fp << "INTERN(__asm32_int80_invalid)\n";
+		fp << "INTERN(__asm32_sysenter_invalid)\n";
+		fp << "\n\n\n";
+		local max_id = 0;
+		local min_extended_id = 0xffffffff;
+		local max_extended_id = SYSNO_EXTENDED_START;
+		for (local sc: syscalls) {
+			local no = sc.sysno;
+			if (no >= SYSNO_EXTENDED_START) {
+				if (max_extended_id < sc.sysno)
+					max_extended_id = sc.sysno;
+				if (min_extended_id > sc.sysno)
+					min_extended_id = sc.sysno;
+			} else {
+				if (max_id < sc.sysno)
+					max_id = sc.sysno;
+			}
+			fp << "EXTERN(sys_" << sc.name << ")\n";
+		}
+		fp << "\n\n\n";
+		for (local sc: syscalls)
+			fp << "INTERN(__asm32_int80_" << sc.name << ")\n";
+		fp << "\n\n\n";
+		for (local sc: syscalls)
+			fp << "INTERN(__asm32_sysenter_" << sc.name << ")\n";
+		fp << "\n\n\n";
+		local syscall_table = List(max_id + 1, none);
+		local syscall_extended_table = List((max_extended_id - min_extended_id) + 1, none);
+		local longest_name_len = 0;
+		local longest_extended_name_len = 0;
+		for (local sc: syscalls) {
+			local no = sc.sysno;
+			local temp = #sc.name;
+			if (no >= SYSNO_EXTENDED_START) {
+				syscall_extended_table[no - min_extended_id] = sc;
+				if (longest_extended_name_len < temp)
+					longest_extended_name_len = temp;
+			} else {
+				syscall_table[no] = sc;
+				if (longest_name_len < temp)
+					longest_name_len = temp;
+			}
+		}
+		function print_router(table: List, prefix: string, invalid_entry: string) {
+			local len = table === syscall_table ? longest_name_len : longest_extended_name_len;
+			for (local sc: table) {
+				if (sc is none) {
+					fp << "\t.long " << invalid_entry << "\n";
+				} else {
+					fp << "\t.long " << prefix << sc.name;
+					fp << " " * (len - #sc.name);
+					fp << " /* " << sc.sysno_str << " */\n";
+				}
+			}
+		}
+		fp << "/****************************************************************************/\n";
+		fp << "/* 32-bit System call router for <int 80h>                                  */\n";
+		fp << "/****************************************************************************/\n";
+		fp << ".section .rodata.x86.syscall32.router_int80\n";
+		fp << "PUBLIC_OBJECT(__asm32_syscallrouter_int80)\n";
+		print_router(syscall_table, "__asm32_int80_", "__asm32_int80_invalid");
+		fp << "END(__asm32_syscallrouter_int80)\n\n\n";
+		fp << "PUBLIC_OBJECT(__asm32_exsyscallrouter_int80)\n";
+		print_router(syscall_extended_table, "__asm32_int80_", "__asm32_int80_invalid");
+		fp << "END(__asm32_exsyscallrouter_int80)\n\n\n";
+
+		fp << "/****************************************************************************/\n";
+		fp << "/* 32-bit System call router for <sysenter>                                 */\n";
+		fp << "/****************************************************************************/\n";
+		fp << ".section .rodata.x86.syscall32.router_sysenter\n";
+		fp << "PUBLIC_OBJECT(__asm32_syscallrouter_sysenter)\n";
+		print_router(syscall_table, "__asm32_sysenter_", "__asm32_sysenter_invalid");
+		fp << "END(__asm32_syscallrouter_sysenter)\n\n\n";
+		fp << "PUBLIC_OBJECT(__asm32_exsyscallrouter_sysenter)\n";
+		print_router(syscall_extended_table, "__asm32_sysenter_", "__asm32_sysenter_invalid");
+		fp << "END(__asm32_exsyscallrouter_sysenter)\n\n\n";
+
+		fp << "/****************************************************************************/\n";
+		fp << "/* 32-bit System call router for high-level C-implementations               */\n";
+		fp << "/****************************************************************************/\n";
+		fp << ".section .rodata.x86.syscall32.c_router\n";
+		fp << "PUBLIC_OBJECT(__c32_syscallrouter)\n";
+		print_router(syscall_table, "sys_", "sys_invalid0");
+		fp << "END(__c32_syscallrouter)\n\n\n";
+		fp << "PUBLIC_OBJECT(__c32_exsyscallrouter)\n";
+		print_router(syscall_extended_table, "sys_", "sys_invalid0");
+		fp << "END(__c32_exsyscallrouter)\n\n\n";
+
+	});
+}
+
+function generate_x86_64_kernel_syscall_router(
+		filename: string,
+		syscalls32: {Syscall...},
+		syscalls64: {Syscall...}) {
+	write_hashed_file(filename, [](fp: File) {
+		fp << copyright << "\n\n";
+		fp << "#include <hybrid/compiler.h>\n";
+		fp << "#include <asm/cfi.h>\n";
+		fp << "#include <asm/cpu-flags.h>\n";
+		fp << "#include <sys/syscall.h>\n";
+		fp << "#include <kos/kernel/cpu-state.h>\n";
+		fp << "#include <errno.h>\n\n\n";
+		fp << "INTERN(__asm32_int80_invalid)\n";
+		fp << "INTERN(__asm32_sysenter_invalid)\n";
+		fp << "INTERN(__asm64_syscall_invalid)\n";
+		fp << "\n\n\n";
+		local max_id32 = 0;
+		local min_extended_id32 = 0xffffffff;
+		local max_extended_id32 = SYSNO_EXTENDED_START;
+		for (local sc: syscalls32) {
+			local no = sc.sysno;
+			if (no >= SYSNO_EXTENDED_START) {
+				if (max_extended_id32 < sc.sysno)
+					max_extended_id32 = sc.sysno;
+				if (min_extended_id32 > sc.sysno)
+					min_extended_id32 = sc.sysno;
+			} else {
+				if (max_id32 < sc.sysno)
+					max_id32 = sc.sysno;
+			}
+			fp << "EXTERN(sys32_" << sc.name << ")\n";
+		}
+		fp << "\n\n\n";
+		local max_id64 = 0;
+		local min_extended_id64 = 0xffffffff;
+		local max_extended_id64 = SYSNO_EXTENDED_START;
+		for (local sc: syscalls64) {
+			local no = sc.sysno;
+			if (no >= SYSNO_EXTENDED_START) {
+				if (max_extended_id64 < sc.sysno)
+					max_extended_id64 = sc.sysno;
+				if (min_extended_id64 > sc.sysno)
+					min_extended_id64 = sc.sysno;
+			} else {
+				if (max_id64 < sc.sysno)
+					max_id64 = sc.sysno;
+			}
+			fp << "EXTERN(sys_" << sc.name << ")\n";
+		}
+		fp << "\n\n\n";
+		for (local sc: syscalls64)
+			fp << "INTERN(__asm64_syscall_" << sc.name << ")\n";
+		fp << "\n\n\n";
+		for (local sc: syscalls32)
+			fp << "INTERN(__asm32_int80_" << sc.name << ")\n";
+		fp << "\n\n\n";
+		for (local sc: syscalls32)
+			fp << "INTERN(__asm32_sysenter_" << sc.name << ")\n";
+		fp << "\n\n\n";
+
+		local syscall_table32 = List(max_id32 + 1, none);
+		local syscall_extended_table32 = List((max_extended_id32 - min_extended_id32) + 1, none);
+		local longest_name_len32 = 0;
+		local longest_extended_name_len32 = 0;
+		local syscall_table64 = List(max_id64 + 1, none);
+		local syscall_extended_table64 = List((max_extended_id64 - min_extended_id64) + 1, none);
+		local longest_name_len64 = 0;
+		local longest_extended_name_len64 = 0;
+		for (local sc: syscalls32) {
+			local no = sc.sysno;
+			local temp = #sc.name;
+			if (no >= SYSNO_EXTENDED_START) {
+				syscall_extended_table32[no - min_extended_id32] = sc;
+				if (longest_extended_name_len32 < temp)
+					longest_extended_name_len32 = temp;
+			} else {
+				syscall_table32[no] = sc;
+				if (longest_name_len32 < temp)
+					longest_name_len32 = temp;
+			}
+		}
+		for (local sc: syscalls64) {
+			local no = sc.sysno;
+			local temp = #sc.name;
+			if (no >= SYSNO_EXTENDED_START) {
+				syscall_extended_table64[no - min_extended_id64] = sc;
+				if (longest_extended_name_len64 < temp)
+					longest_extended_name_len64 = temp;
+			} else {
+				syscall_table64[no] = sc;
+				if (longest_name_len64 < temp)
+					longest_name_len64 = temp;
+			}
+		}
+		function print_router(table: List, prefix: string, invalid_entry: string) {
+			local len = table === syscall_table32 ? longest_name_len32 :
+			            table === syscall_table64 ? longest_name_len64 : 
+			            table === syscall_extended_table32 ? longest_extended_name_len32 :
+			            longest_extended_name_len64;
+			for (local sc: table) {
+				if (sc is none) {
+					fp << "\t.quad " << invalid_entry << "\n";
+				} else {
+					fp << "\t.quad " << prefix << sc.name;
+					fp << " " * (len - #sc.name);
+					fp << " /* " << sc.sysno_str << " */\n";
+				}
+			}
+		}
+
+		fp << "/****************************************************************************/\n";
+		fp << "/* 64-bit System call router for <syscall> and <int 80h>                    */\n";
+		fp << "/****************************************************************************/\n";
+		fp << ".section .rodata.x86.syscall64.router\n";
+		fp << "PUBLIC_OBJECT(__asm64_syscallrouter)\n";
+		print_router(syscall_table64, "__asm64_syscall_", "__asm64_syscall_invalid");
+		fp << "END(__asm64_syscallrouter)\n\n\n";
+		fp << "PUBLIC_OBJECT(__asm64_exsyscallrouter)\n";
+		print_router(syscall_extended_table64, "__asm64_syscall_", "__asm64_syscall_invalid");
+		fp << "END(__asm64_exsyscallrouter)\n\n\n";
+
+		fp << "/****************************************************************************/\n";
+		fp << "/* 64-bit System call router for high-level C-implementations               */\n";
+		fp << "/****************************************************************************/\n";
+		fp << ".section .rodata.x86.syscall64.c_router\n";
+		fp << "PUBLIC_OBJECT(__c64_syscallrouter)\n";
+		print_router(syscall_table64, "sys_", "sys_invalid0");
+		fp << "END(__c64_syscallrouter)\n\n\n";
+		fp << "PUBLIC_OBJECT(__c64_exsyscallrouter)\n";
+		print_router(syscall_extended_table64, "sys_", "sys_invalid0");
+		fp << "END(__c64_exsyscallrouter)\n\n\n";
+
+		fp << "/****************************************************************************/\n";
+		fp << "/* 32-bit System call router for <int 80h>                                  */\n";
+		fp << "/****************************************************************************/\n";
+		fp << ".section .rodata.x86.syscall32.router_int80\n";
+		fp << "PUBLIC_OBJECT(__asm32_syscallrouter_int80)\n";
+		print_router(syscall_table32, "__asm32_int80_", "__asm32_int80_invalid");
+		fp << "END(__asm32_syscallrouter_int80)\n\n\n";
+		fp << "PUBLIC_OBJECT(__asm32_exsyscallrouter_int80)\n";
+		print_router(syscall_extended_table32, "__asm32_int80_", "__asm32_int80_invalid");
+		fp << "END(__asm32_exsyscallrouter_int80)\n\n\n";
+
+		fp << "/****************************************************************************/\n";
+		fp << "/* 32-bit System call router for <sysenter>                                 */\n";
+		fp << "/****************************************************************************/\n";
+		fp << ".section .rodata.x86.syscall32.router_sysenter\n";
+		fp << "PUBLIC_OBJECT(__asm32_syscallrouter_sysenter)\n";
+		print_router(syscall_table32, "__asm32_sysenter_", "__asm32_sysenter_invalid");
+		fp << "END(__asm32_syscallrouter_sysenter)\n\n\n";
+		fp << "PUBLIC_OBJECT(__asm32_exsyscallrouter_sysenter)\n";
+		print_router(syscall_extended_table32, "__asm32_sysenter_", "__asm32_sysenter_invalid");
+		fp << "END(__asm32_exsyscallrouter_sysenter)\n\n\n";
+
+		fp << "/****************************************************************************/\n";
+		fp << "/* 32-bit System call router for high-level C-implementations               */\n";
+		fp << "/****************************************************************************/\n";
+		fp << ".section .rodata.x86.syscall32.c_router\n";
+		fp << "PUBLIC_OBJECT(__c32_syscallrouter)\n";
+		print_router(syscall_table32, "sys32_", "sys32_invalid0");
+		fp << "END(__c32_syscallrouter)\n\n\n";
+		fp << "PUBLIC_OBJECT(__c32_exsyscallrouter)\n";
+		print_router(syscall_extended_table32, "sys32_", "sys32_invalid0");
+		fp << "END(__c32_exsyscallrouter)\n\n\n";
+	});
+}
+
+function generate_x86_kernel_syscall_unimplemented(
+		filename: string, syscalls: {Syscall...},
+		x64: bool, prefix: string = "sys_") {
+	write_hashed_file(filename, [](fp: File) {
+		local longest_name_len = 0;
+		for (local sc: syscalls) {
+			local temp = #sc.name;
+			if (longest_name_len < temp)
+				longest_name_len = temp;
+		}
+		for (local sc: syscalls) {
+			fp << "DEFINE_PUBLIC_WEAK_ALIAS(" << prefix << sc.name << ", ";
+			fp << prefix << "invalid";
+			fp << (x64 ? #sc.argv : sc.i386_adjusted_argc);
+			fp << "); " << (" " * (longest_name_len - #sc.name));
+			fp << "/* " << sc.sysno_str << " */\n";
+		}
+	});
+}
+
+
+final local typename_underscope_set = {
+	"atflag_t",
+	"blkaddr32_t",
+	"blkaddr64_t",
+	"blkcnt32_t",
+	"blkcnt64_t",
+	"blksize_t",
+	"byte_t",
+	"caddr_t",
+	"clock_t",
+	"clockid_t",
+	"cpuid_t",
+	"daddr_t",
+	"fd_t",
+	"fsblkcnt32_t",
+	"fsblkcnt64_t",
+	"fsfilcnt32_t",
+	"fsfilcnt64_t",
+	"fsid_t",
+	"fsint32_t",
+	"fsint64_t",
+	"fsmode_t",
+	"fsuint32_t",
+	"fsuint64_t",
+	"fsword32_t",
+	"fsword64_t",
+	"gid_t",
+	"id_t",
+	"ino32_t",
+	"ino64_t",
+	"int16_t",
+	"int32_t",
+	"int64_t",
+	"int8_t",
+	"intptr_t",
+	"jtime_t",
+	"key_t",
+	"loff_t",
+	"lpos_t",
+	"nlink_t",
+	"off32_t",
+	"off64_t",
+	"off_t",
+	"oflag_t",
+	"pid_t",
+	"pos32_t",
+	"pos64_t",
+	"pos_t",
+	"ptrdiff_t",
+	"qaddr_t",
+	"quad_t",
+	"register_t",
+	"rlim32_t",
+	"rlim64_t",
+	"rlim_t",
+	"size_t",
+	"socklen_t",
+	"sregister_t",
+	"ssize_t",
+	"ssocklen_t",
+	"suseconds_t",
+	"syscall_slong_t",
+	"syscall_ulong_t",
+	"timer_t",
+	"time32_t",
+	"time64_t",
+	"timespec32",
+	"timespec64",
+	"timeval32",
+	"timeval64",
+	"uid_t",
+	"uint16_t",
+	"uint32_t",
+	"uint64_t",
+	"uint8_t",
+	"uintptr_t",
+	"upid_t",
+	"useconds_t",
+	"blkaddr_t",
+	"blkcnt_t",
+	"dev_t",
+	"errno_t",
+	"fsblkcnt_t",
+	"fsfilcnt_t",
+	"fsint_t",
+	"fsuint_t",
+	"fsword_t",
+	"ino_t",
+	"major_t",
+	"minor_t",
+	"quantum_diff_t",
+	"sysno_t",
+	"time_t",
+	"mode_t",
+	"iomode_t",
+	"sighandler_t",
+	"except_handler_t",
+	"idtype_t",
+};
+
+function escape_typename(t: string): string {
+	local tail = "";
+	local head = "";
+	t = t.strip();
+	while (t) {
+		if (t[#t-1] in [" ", "*"]) {
+			tail = t[#t-1] + tail;
+			t = t[:-1];
+		} else if (t.endswith("const")) {
+			tail = "const" + tail;
+			t = t[:-#"const"];
+		} else if (t.endswith("volatile")) {
+			tail = "volatile" + tail;
+			t = t[:-#"volatile"];
+		} else if (t.startswith("struct")) {
+			head += "struct";
+			t = t[#"struct":];
+		} else if (t.startswith("/*")) {
+			local o = t.index("*/")+2;
+			head += t[:o];
+			t = t[o:];
+		} else if (t.isspace(0)) {
+			head += t[0];
+			t = t[1:];
+		} else {
+			break;
+		}
+	}
+	if (t in typename_underscope_set)
+		return head + "__" + t + tail;
+	return head + t + tail;
+}
+
+function print_syscall_for_kos_syscalls(fp: File, sc: Syscall, enable_except: bool) {
+	sc.print_doc(fp);
+	fp << "__CDECLARE";
+	if (sc.return_type == "void")
+		fp << "_VOID";
+	fp << "_";
+	if (enable_except)
+		fp << "X";
+	fp << "SC(";
+	local is_first = true;
+	for (local x: sc.enum_function_attributes()) {
+		if (!is_first)
+			fp << " ";
+		is_first = false;
+		fp << "__" << x;
+	}
+	fp << ",";
+	if (sc.return_type != "void")
+		fp << escape_typename(sc.return_type) << ",";
+	fp << sc.name;
+	fp << ",(";
+	fp << ", ".join(
+		for (local none, name, typ: sc.argv)
+			escape_typename(typ) + (typ.endswith("*") ? "" : " ") + key_escape_argument(name));
+	if (!sc.argv)
+		fp << "void";
+	fp << "),(";
+	fp << ",".join(
+		for (local none, name, typ: sc.argv)
+			key_escape_argument(name));
+	fp << "))\n";
+}
+
+function generate_syscalls_header(
+		filename: string,
+		variants: {(string, (string, Syscall))...}) {
+	write_hashed_file(filename, [](fp: File) {
+		final local saved_macros = {
+			"dirent",
+			"stat",
+			"timeb",
+			"timezone",
+		};
+		fp << copyright << "\n";
+		fp << "#ifndef _KOS_SYSCALLS_H\n";
+		fp << "#define _KOS_SYSCALLS_H 1\n";
+		fp << "\n";
+		fp << "#include <__stdinc.h>\n";
+		fp << "#include <__crt.h>\n";
+		fp << "#include <bits/types.h>\n";
+		fp << "#include <bits/timespec.h>\n";
+		fp << "#include <bits/timeval.h>\n";
+		fp << "#include <bits/utimebuf.h>\n";
+		fp << "#include <bits/sigaction.h>\n";
+		fp << "#include <bits/itimerval.h>\n";
+		fp << "#include <kos/bits/except-handler.h>\n";
+		fp << "#include <kos/asm/syscalls.h>\n";
+		fp << "#include <hybrid/host.h>\n";
+		fp << "\n";
+		fp << "#ifdef __CC__\n";
+		fp << "__DECL_BEGIN\n";
+		fp << "\n";
+		if (saved_macros) {
+			fp << "#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO\n";
+			for (local x: saved_macros)
+				fp << "#pragma push_macro(" << repr(x) << ")\n";
+			fp << "#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */\n";
+			for (local x: saved_macros)
+				fp << "#undef " << x << "\n";
+			fp << "\n";
+		}
+		fp << "#ifndef ____idtype_t_defined\n";
+		fp << "#define ____idtype_t_defined 1\n";
+		fp << "typedef int __idtype_t;\n";
+		fp << "#endif /* !____idtype_t_defined */\n";
+		fp << "\n";
+		fp << "#ifndef __CDECLARE_SC\n";
+		fp << "#if 1 /* TODO: cancellation_point-system calls aren't nothrow! - All others are. */\n";
+		fp << "#define __CDECLARE_SC(attr, Treturn, name, param, args)  __CDECLARE(attr, Treturn, , sys_##name, param, args)\n";
+		fp << "#define __CDECLARE_VOID_SC(attr, name, param, args)      __CDECLARE_VOID(attr, , sys_##name, param, args)\n";
+		fp << "#else\n";
+		fp << "#define __CDECLARE_SC(attr, Treturn, name, param, args)  __CDECLARE(attr, Treturn, __NOTHROW, sys_##name, param, args)\n";
+		fp << "#define __CDECLARE_VOID_SC(attr, name, param, args)      __CDECLARE_VOID(attr, __NOTHROW, sys_##name, param, args)\n";
+		fp << "#endif\n";
+		fp << "#define __CDECLARE_XSC(attr, Treturn, name, param, args) __CDECLARE(attr, Treturn, , sys_X##name, param, args)\n";
+		fp << "#define __CDECLARE_VOID_XSC(attr, name, param, args)     __CDECLARE_VOID(attr, , sys_X##name, param, args)\n";
+		fp << "#define __PRIVATE_CRT_HAVE_PLACEHOLDER_1    ,\n";
+		fp << "#define __PRIVATE_CRT_HAVE_ARG_IMPL(x,val,...) val\n";
+		fp << "#define __PRIVATE_CRT_HAVE_ARG(x)  __PRIVATE_CRT_HAVE_ARG_IMPL x\n";
+		fp << "#define __PRIVATE_CRT_HAVE3(x)     __PRIVATE_CRT_HAVE_ARG((x 1,0))\n";
+		fp << "#define __PRIVATE_CRT_HAVE2(x)     __PRIVATE_CRT_HAVE3(__PRIVATE_CRT_HAVE_PLACEHOLDER_##x)\n";
+		fp << "#define __PRIVATE_CRT_ISDEFINED(x) __PRIVATE_CRT_HAVE2(x)\n";
+		fp << "#define __CRT_HAVE_SC(name)        __PRIVATE_CRT_ISDEFINED(__CRT_HAVE_sys_##name)\n";
+		fp << "#define __CRT_HAVE_XSC(name)       __PRIVATE_CRT_ISDEFINED(__CRT_HAVE_sys_X##name)\n";
+		fp << "#endif /* !__CDECLARE_SC */\n";
+		fp << "\n";
+		local struct_types = HashSet();
+		for (local none, scs: variants) {
+			for (local none, sc: scs) {
+				for (local none, none, typ: sc.argv) {
+					if (typ.startswith("struct ")) {
+						local st_name = typ[#"struct ":].lstrip();
+						local i = 0, end = #st_name;
+						while (i < end && st_name.issymcont(i)) ++i;
+						struct_types.insert(escape_typename(st_name[:i]));
+					}
+				}
+			}
+		}
+		struct_types = List(struct_types);
+		struct_types.sort();
+		if (struct_types)
+			fp << "/* Forward-declare structure types */\n";
+		for (local st: struct_types)
+			fp << "struct " << st << ";\n";
+		local names = List(variants.keys);
+		names.sort();
+		local max_known_variants = 0;
+		for (local none, v: variants) {
+			local temp = #v;
+			if (max_known_variants < temp)
+				max_known_variants = temp;
+		}
+		fp << "\n\n\n";
+		for (local enable_except: [false, true]) {
+			for (local n: names) {
+				local scs = List(variants[n]);
+				assert #scs;
+				if (enable_except) {
+					local i = 0;
+					while (i < #scs) {
+						if (!scs[i][1].has_except_variant)
+							scs.erase(i);
+						else {
+							++i;
+						}
+					}
+				}
+				local i = 0;
+				while (i < #scs) {
+					if (scs[i][1].has_function_tag("asm"))
+						scs.erase(i);
+					else {
+						++i;
+					}
+				}
+				if (!scs)
+					continue;
+				local differing_calls = true;
+				if (#scs == max_known_variants) {
+					differing_calls = false;
+					local first_sc = scs[0][1];
+					for (local none, x: scs) {
+						if (!first_sc.same_declaration_as(x)) {
+							differing_calls = true;
+							break;
+						}
+					}
+				}
+				fp << "#if __CRT_HAVE_";
+				if (enable_except)
+					fp << "X";
+				fp << "SC(" << n << ")\n";
+				fp << "#ifndef __" << key_public_syscall(n, enable_except) << "_defined\n";
+				fp << "#define __" << key_public_syscall(n, enable_except) << "_defined 1\n";
+				if (!differing_calls) {
+					print_syscall_for_kos_syscalls(fp, scs[0][1], enable_except);
+				} else {
+					local done_conditions = HashSet();
+					for (local i = 0; i < #scs; ++i) {
+						local cond, sc = scs[i]...;
+						if (i == 0) {
+							if (cond == "__i386__" && "__x86_64__" !in done_conditions) {
+								fp << "#if defined(__i386__) && !defined(__x86_64__)\n";
+							} else {
+								fp << "#ifdef " << cond << "\n";
+							}
+						} else if (i == #scs - 1 && #scs == max_known_variants) {
+							fp << "#else /* #elif defined(" << cond << ") */\n";
+						} else {
+							fp << "#elif defined(" << cond << ")\n";
+						}
+						print_syscall_for_kos_syscalls(fp, sc, enable_except);
+						done_conditions.insert(cond);
+					}
+					if (#scs < max_known_variants) {
+						fp << "#else /* ... */\n";
+						fp << "#undef __" << key_public_syscall(n, enable_except) << "_defined\n";
+						fp << "#endif /* !... */\n";
+					} else {
+						fp << "#endif /* ... */\n";
+					}
+				}
+				fp << "#endif /* !__" << key_public_syscall(n, enable_except) << "_defined */\n";
+				fp << "#endif /* " << key_public_syscall(n, enable_except) << "... */\n";
+			}
+			fp << "\n\n\n";
+		}
+		if (saved_macros) {
+			fp << "#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO\n";
+			for (local x: saved_macros.reversed())
+				fp << "#pragma pop_macro(" << repr(x) << ")\n";
+			fp << "#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */\n";
+			fp << "\n";
+		}
+		fp << "__DECL_END\n";
+		fp << "#endif /* __CC__ */\n";
+		fp << "\n";
+		fp << "#endif /* !_KOS_SYSCALLS_H */\n";
+	});
+}
+
+
+
+
+
+
+global syscall_variants = Dict();
+
+function add_syscall_variants(cond: string, syscalls: {Syscall...}) {
+	for (local sc: syscalls) {
+		local old = syscall_variants.get(sc.name);
+		if (old is none)
+			syscall_variants[sc.name] = old = [];
+		old.append((cond, sc));
+	}
+}
+
+function generate_x86() {
+	local scs32 = generate(["i386"], 0
+		, syscalls_def:         "include/i386-kos/asm/syscalls.def"
+		, syscalls_inl:         "include/i386-kos/asm/syscalls32_d.inl"
+		, syscall_crt_features: "include/i386-kos/crt-features/crt-kos-syscalls32.h"
+		, syscall_cc:           "ATTR_CDECL"
+		, include_i386_adjustments: true);
+	local scs64 = generate(["x86_64"], 1
+		, syscalls_def:         "include/i386-kos/asm/syscalls.def"
+		, syscalls_inl:         "include/i386-kos/asm/syscalls64_d.inl"
+		, syscall_crt_features: "include/i386-kos/crt-features/crt-kos-syscalls64.h"
+		, syscall_cc:           "ATTR_SYSVABI"
+		);
+	/* Generate the system call numbers header for x86_64 compatibility mode.
+	 * This header is identical to `include/i386-kos/asm/syscalls32_d.inl', however
+	 * all macros are prefixed by `__NR32' instead of `__NR' */
+	generate_syscalls_inl(
+		"include/i386-kos/asm/syscalls32.inl",
+		syscalls: scs32,
+		include_i386_adjustments: true,
+		nr_prefix: "__NR32");
+	generate_syscalls_inl(
+		"include/i386-kos/asm/syscalls64.inl",
+		syscalls: scs64,
+		include_i386_adjustments: false,
+		nr_prefix: "__NR64");
+
+	generate_syscalls_listing(
+		"include/i386-kos/asm/ls_syscalls32.inl", scs32);
+	generate_syscalls_listing(
+		"include/i386-kos/asm/ls_syscalls64.inl", scs64);
+	generate_x86_syscalls_libc_impl(
+		"src/libc/libc/arch/i386/syscalls32.S", scs32
+		, x64: false);
+	generate_x86_syscalls_libc_impl(
+		"src/libc/libc/arch/i386/syscalls64.S", scs64
+		, x64: true);
+	generate_386_kernel_syscall_wrappers(
+		"src/kernel/core/arch/i386/syscall_wrappers32.S", scs32);
+	generate_x86_64_kernel_syscall_wrappers(
+		"src/kernel/core/arch/i386/syscall_wrappers64.S", scs32, scs64);
+	generate_i386_kernel_syscall_router(
+		"src/kernel/core/arch/i386/syscall_router32.S", scs32);
+	generate_x86_64_kernel_syscall_router(
+		"src/kernel/core/arch/i386/syscall_router64.S", scs32, scs64);
+	generate_x86_kernel_syscall_unimplemented(
+		"src/kernel/core/arch/i386/syscall_unimplemented32.c.inl", scs32
+		, x64: false);
+	generate_x86_kernel_syscall_unimplemented(
+		"src/kernel/core/arch/i386/syscall_unimplemented64.c.inl", scs64
+		, x64: true);
+	local scs32_without_64 = [];
+	for (local sc: scs32) {
+		local name = sc.name;
+		local has_sys64_variant = false;
+		for (local sc64: scs64) {
+			if (sc64.name == name) {
+				has_sys64_variant = true;
+				break;
+			}
+		}
+		if (!has_sys64_variant)
+			scs32_without_64.append(sc);
+	}
+	generate_x86_kernel_syscall_unimplemented(
+		"src/kernel/core/arch/i386/syscall_unimplemented64_32.c.inl", scs32_without_64
+		, x64: false, prefix: "sys32_");
+	local scs_map = Dict();
+	for (local x: scs32) scs_map[x.name] = [x];
+	for (local x: scs64) {
+		local s = scs_map.get(x.name);
+		if (s is none)
+			scs_map[x.name] = s = [];
+		s.append(x);
+	}
+
+	local scs32_names = List(for (local x: scs32) x.name);
+	local scs64_names = List(for (local x: scs64) x.name);
+	generate_x86_bits_syscall_h(
+		"include/i386-kos/bits/syscall.h",
+		scs32_names: scs32_names,
+		scs64_names: scs64_names,
+		scs_map: scs_map);
+
+	add_syscall_variants("__i386__", scs32);
+	add_syscall_variants("__x86_64__", scs64);
+}
+
+
+#ifdef __MAIN__
+generate_x86();
+generate_syscalls_header("include/kos/syscalls.h", syscall_variants);
+#endif /* __MAIN__ */
+
+
+
+
+

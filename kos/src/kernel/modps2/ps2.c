@@ -1,0 +1,348 @@
+/* Copyright (c) 2019 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef GUARD_MODPS2_PS2_C
+#define GUARD_MODPS2_PS2_C 1
+#define _KOS_SOURCE 1
+
+#include "ps2.h"
+
+#include <kernel/compiler.h>
+
+#include <kernel/driver-param.h>
+#include <kernel/interrupt.h>
+#include <kernel/printk.h>
+
+#include <hybrid/atomic.h>
+
+#include <string.h>
+
+#include "keyboard.h"
+#include "mouse.h"
+
+DECL_BEGIN
+
+/* Refs:
+ *   - http://www.scs.stanford.edu/14wi-cs140/pintos/specs/kbd/scancodes-9.html#ss9.1
+ *   - http://www.scs.stanford.edu/14wi-cs140/pintos/specs/kbd/scancodes.html#toc11
+ *   - https://wiki.osdev.org/PS/2_Keyboard
+ *   - http://www.vetra.com/scancodes.html
+ *   - https://www.win.tue.nl/~aeb/linux/kbd/scancodes-13.html
+ */
+
+DEFINE_CMDLINE_PARAM_UINT_VAR(ps2_infull_timeout, "timeout_infull", HZ / 2);
+DEFINE_CMDLINE_PARAM_UINT_VAR(ps2_outfull_timeout, "timeout_outfull", HZ / 2);
+DEFINE_CMDLINE_PARAM_UINT_VAR(ps2_command_timeout, "timeout_command", HZ / 2);
+DEFINE_CMDLINE_PARAM_UINT_VAR(ps2_command_attempts, "attempts_command", 3);
+
+
+/* Probing code from here on... */
+PRIVATE NOBLOCK void
+NOTHROW(FCALL ps2_probe_process_data)(struct ps2_probe_data *__restrict probe_data,
+                                      ps2_portid_t portno, u8 data) {
+	struct ps2_probe_data &port = probe_data[portno];
+/*	printk(KERN_DEBUG "[ps2##%I8u] Received %#.2I8x\n", portno + 1, data); */
+	switch (port.pd_state) {
+
+	case PS2_PROBE_STATE_UNCONFIGURED:
+		if (data == 0xfa) {
+			port.pd_status |= PS2_PROBE_STATUS_FACK;
+		} else {
+handle_resend_or_other:
+			if (data == 0xfe) {
+				port.pd_status |= PS2_PROBE_STATUS_FRESEND;
+			} else {
+				printk(KERN_WARNING "[ps2##%I8u] Unexpected byte during probe %#.2I8x\n", portno + 1, data);
+			}
+		}
+		break;
+
+	case PS2_PROBE_STATE_ID_ACK:
+		if (data == 0xfa) {
+			port.pd_state = PS2_PROBE_STATE_ID_0;
+		} else {
+			goto handle_resend_or_other;
+		}
+		break;
+
+	case PS2_PROBE_STATE_ID_0:
+		port.pd_data.pd_id[0] = data;
+		port.pd_state = PS2_PROBE_STATE_ID_1;
+		break;
+
+	case PS2_PROBE_STATE_ID_1:
+		port.pd_data.pd_id[1] = data;
+		port.pd_state = PS2_PROBE_STATE_UNCONFIGURED;
+		break;
+
+	case PS2_PROBE_STATE_DATA_ACK:
+		if (data == 0xfa) {
+			port.pd_state = PS2_PROBE_STATE_DATA_0;
+		} else {
+			goto handle_resend_or_other;
+		}
+		break;
+
+	case PS2_PROBE_STATE_DATA_0:
+		port.pd_data.pd_dat[0] = data;
+		port.pd_state = PS2_PROBE_STATE_UNCONFIGURED;
+		break;
+
+	default:
+		break;
+	}
+	sig_broadcast(&port.pd_avail);
+}
+
+
+PRIVATE NOBLOCK bool
+NOTHROW(FCALL ps2_probe_handle_interrupt)(void *arg) {
+	u8 data, status = inb(PS2_STATUS);
+	struct ps2_probe_data *probe = (struct ps2_probe_data *)arg;
+	if (status & PS2_STATUS_OUTFULL2) {
+		data = inb(PS2_DATA);
+		ps2_probe_process_data(probe, PS2_PORT2, data);
+	} else if (status & PS2_STATUS_OUTFULL) {
+		data = inb(PS2_DATA);
+		ps2_probe_process_data(probe, PS2_PORT1, data);
+	} else {
+		return false;
+	}
+	return true;
+}
+
+
+INTERN void KCALL
+ps2_probe_run_simple_ack_command(struct ps2_probe_data *__restrict probe_data,
+                                 ps2_portid_t portno, u8 command) THROWS(E_IOERROR) {
+	unsigned int attempt = 0;
+	u8 status;
+again:
+	probe_data[portno].pd_status = 0;
+	probe_data[portno].pd_state  = PS2_PROBE_STATE_UNCONFIGURED;
+	COMPILER_WRITE_BARRIER();
+	ps2_write_data(portno, command);
+	for (;;) {
+		qtime_t tmo;
+		status = ATOMIC_READ(probe_data[portno].pd_status);
+		if (status != 0)
+			break;
+		task_connect(&probe_data[portno].pd_avail);
+		status = ATOMIC_READ(probe_data[portno].pd_status);
+		if (status != 0) {
+			task_disconnectall();
+			break;
+		}
+		tmo = quantum_time();
+		tmo.q_jtime += ps2_command_timeout;
+		if (!task_waitfor(&tmo))
+			THROW(E_IOERROR_TIMEOUT, E_IOERROR_SUBSYSTEM_HID);
+	}
+	if (status & PS2_PROBE_STATUS_FACK)
+		return;
+	if unlikely(attempt >= ps2_command_attempts)
+		THROW(E_IOERROR_ERRORBIT, E_IOERROR_SUBSYSTEM_HID);
+	++attempt;
+	goto again;
+}
+
+INTERN u8 KCALL
+ps2_probe_run_ack_plus_data_command(struct ps2_probe_data *__restrict probe_data,
+                                    ps2_portid_t portno, u8 command) THROWS(E_IOERROR) {
+	unsigned int attempt = 0;
+	u8 state, status;
+again:
+	probe_data[portno].pd_status = 0;
+	probe_data[portno].pd_state  = PS2_PROBE_STATE_DATA_ACK;
+	COMPILER_WRITE_BARRIER();
+	ps2_write_data(portno, command);
+	for (;;) {
+		qtime_t tmo;
+		state  = ATOMIC_READ(probe_data[portno].pd_state);
+		status = ATOMIC_READ(probe_data[portno].pd_status);
+		if (state == PS2_PROBE_STATE_UNCONFIGURED || (status & PS2_PROBE_STATUS_FRESEND))
+			break;
+		task_connect(&probe_data[portno].pd_avail);
+		state  = ATOMIC_READ(probe_data[portno].pd_state);
+		status = ATOMIC_READ(probe_data[portno].pd_status);
+		if (state == PS2_PROBE_STATE_UNCONFIGURED || (status & PS2_PROBE_STATUS_FRESEND)) {
+			task_disconnectall();
+			break;
+		}
+		tmo = quantum_time();
+		tmo.q_jtime += ps2_command_timeout;
+		if (!task_waitfor(&tmo)) {
+			state  = ATOMIC_READ(probe_data[portno].pd_state);
+			status = ATOMIC_READ(probe_data[portno].pd_status);
+			if (status & PS2_PROBE_STATUS_FRESEND)
+				goto try_resend;
+			THROW(E_IOERROR_TIMEOUT, E_IOERROR_SUBSYSTEM_HID);
+		}
+	}
+	if (state == PS2_PROBE_STATE_UNCONFIGURED)
+		return probe_data[portno].pd_data.pd_dat[0];
+try_resend:
+	if unlikely(attempt >= ps2_command_attempts)
+		THROW(E_IOERROR_ERRORBIT, E_IOERROR_SUBSYSTEM_HID);
+	++attempt;
+	goto again;
+}
+
+
+INTERN u8 KCALL
+ps2_run_identify_command(struct ps2_probe_data *__restrict probe_data,
+                         ps2_portid_t portno, u8 id[2]) THROWS(E_IOERROR) {
+	unsigned int attempt = 0;
+	u8 state, status;
+again:
+	probe_data[portno].pd_status = 0;
+	probe_data[portno].pd_state  = PS2_PROBE_STATE_ID_ACK;
+	COMPILER_WRITE_BARRIER();
+	ps2_write_data(portno, PS2_KEYBOARD_CMD_IDENTIFY);
+	for (;;) {
+		qtime_t tmo;
+		state  = ATOMIC_READ(probe_data[portno].pd_state);
+		status = ATOMIC_READ(probe_data[portno].pd_status);
+		if (state == PS2_PROBE_STATE_UNCONFIGURED || (status & PS2_PROBE_STATUS_FRESEND))
+			break;
+		task_connect(&probe_data[portno].pd_avail);
+		state  = ATOMIC_READ(probe_data[portno].pd_state);
+		status = ATOMIC_READ(probe_data[portno].pd_status);
+		if (state == PS2_PROBE_STATE_UNCONFIGURED || (status & PS2_PROBE_STATUS_FRESEND)) {
+			task_disconnectall();
+			break;
+		}
+		tmo = quantum_time();
+		tmo.q_jtime += ps2_command_timeout;
+		if (!task_waitfor(&tmo)) {
+			state  = ATOMIC_READ(probe_data[portno].pd_state);
+			status = ATOMIC_READ(probe_data[portno].pd_status);
+			if (status & PS2_PROBE_STATUS_FRESEND)
+				goto try_resend;
+			if (state == PS2_PROBE_STATE_ID_0)
+				return 0; /* 0 identify bytes. */
+			if (state == PS2_PROBE_STATE_ID_1) {
+				id[0] = probe_data[portno].pd_data.pd_id[0];
+				return 1; /* 1 identify byte. */
+			}
+			THROW(E_IOERROR_TIMEOUT, E_IOERROR_SUBSYSTEM_HID);
+		}
+	}
+	if (state == PS2_PROBE_STATE_UNCONFIGURED) {
+		id[0] = probe_data[portno].pd_data.pd_id[0];
+		id[1] = probe_data[portno].pd_data.pd_id[1];
+		return 2; /* 2 identify bytes. */
+	}
+try_resend:
+	if unlikely(attempt >= ps2_command_attempts)
+		THROW(E_IOERROR_ERRORBIT, E_IOERROR_SUBSYSTEM_HID);
+	++attempt;
+	goto again;
+}
+
+
+
+
+PRIVATE void KCALL
+ps2_probe_port(struct ps2_probe_data *__restrict probe_data,
+               ps2_portid_t portno) {
+	u8 nid_port, id_port[2];
+	TRY {
+		ps2_probe_run_simple_ack_command(probe_data, portno, PS2_KEYBOARD_CMD_DISABLE_SCANNING);
+	} EXCEPT {
+		if (!was_thrown(E_IOERROR))
+			RETHROW();
+		error_printf("disabling scanning on ps2 port #%u", portno + 1);
+	}
+	nid_port = ps2_run_identify_command(probe_data, portno, id_port);
+	if (nid_port == 0) {
+init_keyboard:
+		ps2_keyboard_create(probe_data, portno);
+	} else if (nid_port == 2 && id_port[0] == 0xab) {
+		/* Assume that any 2-byte sequence that starts with `0xab' is a keyboard */
+		goto init_keyboard;
+	} else if (nid_port == 1 && id_port[0] == 0x00) {
+init_mouse:
+		ps2_mouse_create(probe_data, portno);
+	} else {
+		printk(KERN_WARNING "[ps2] Failed to detect device on port #%u [id=[", portno + 1);
+		if (nid_port >= 1)
+			printk(KERN_WARNING "0x%.2I8x", id_port[0]);
+		if (nid_port >= 2)
+			printk(KERN_WARNING ",0x%.2I8x", id_port[1]);
+		printk(KERN_WARNING "]] assume it's a %s\n",
+		       portno == PS2_PORT1 ? "keyboard" : "mouse");
+		if (portno == PS2_PORT1)
+			goto init_keyboard;
+		goto init_mouse;
+	}
+}
+
+PRIVATE void KCALL ps2_probe_install_handlers(struct ps2_probe_data *__restrict probe_data) {
+	isr_register_at(X86_INTNO_PIC1_KBD, &ps2_probe_handle_interrupt, probe_data);
+	isr_register_at(X86_INTNO_PIC2_PS2M, &ps2_probe_handle_interrupt, probe_data);
+}
+PRIVATE void KCALL ps2_probe_delete_handlers(struct ps2_probe_data *__restrict probe_data) {
+	isr_unregister_at(X86_INTNO_PIC1_KBD, &ps2_probe_handle_interrupt, probe_data);
+	isr_unregister_at(X86_INTNO_PIC2_PS2M, &ps2_probe_handle_interrupt, probe_data);
+}
+
+
+PRIVATE struct ps2_probe_data ps2_probe_data_buffer[PS2_PORTCOUNT];
+PRIVATE DRIVER_INIT void KCALL ps2_init(void) {
+	u8 data;
+	ps2_portid_t portno;
+	memset(ps2_probe_data_buffer, 0, sizeof(ps2_probe_data_buffer));
+	ps2_probe_install_handlers(ps2_probe_data_buffer);
+	TRY {
+		/* Configure the PS/2 controller. */
+		ps2_write_cmd(PS2_CONTROLLER_DISABLE_PORT1);
+		ps2_write_cmd(PS2_CONTROLLER_DISABLE_PORT2);
+		ps2_write_cmd(PS2_CONTROLLER_RRAM(0));
+		data = ps2_read_cmddata();
+		/* Set up the PS/2 device configuration. */
+		data |= (PS2_CONTROLLER_CFG_PORT1_IRQ |
+		         PS2_CONTROLLER_CFG_PORT2_IRQ |
+		         PS2_CONTROLLER_CFG_SYSTEMFLAG);
+		data &= ~(PS2_CONTROLLER_CFG_PORT1_TRANSLATE);
+		ps2_write_cmd(PS2_CONTROLLER_WRAM(0));
+		ps2_write_cmddata((u8)data);
+		ps2_write_cmd(PS2_CONTROLLER_ENABLE_PORT2);
+		ps2_write_cmd(PS2_CONTROLLER_ENABLE_PORT1);
+
+		/* Try to probe PS/2 ports. */
+		for (portno = 0; portno < PS2_PORTCOUNT; ++portno) {
+			TRY {
+				ps2_probe_port(ps2_probe_data_buffer, portno);
+			} EXCEPT {
+				if (!was_thrown(E_IOERROR))
+					RETHROW();
+				error_printf("probing ps/2 port #%u", portno + 1);
+			}
+		}
+	} EXCEPT {
+		ps2_probe_delete_handlers(ps2_probe_data_buffer);
+		RETHROW();
+	}
+	ps2_probe_delete_handlers(ps2_probe_data_buffer);
+}
+
+
+DECL_END
+
+#endif /* !GUARD_MODPS2_PS2_C */

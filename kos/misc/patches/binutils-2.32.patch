@@ -1,0 +1,211 @@
+diff -Naur binutils-2.32-orig/bfd/config.bfd binutils-2.32/bfd/config.bfd
+--- binutils-2.32-orig/bfd/config.bfd	2019-01-19 17:01:32.000000000 +0100
++++ binutils-2.32/bfd/config.bfd	2019-07-13 15:24:45.845003900 +0200
+@@ -560,7 +560,7 @@
+     targ_selvecs=hppa_elf32_vec
+     ;;
+ 
+-  i[3-7]86-*-elf* | i[3-7]86-*-rtems*)
++  i[3-7]86-*-elf* | i[3-7]86-*-rtems* | i[3-7]86-*-kos*)
+     targ_defvec=i386_elf32_vec
+     targ_selvecs="iamcu_elf32_vec i386_coff_vec"
+     ;;
+@@ -668,7 +668,7 @@
+     targ_selvecs="i386_elf32_vec iamcu_elf32_vec l1om_elf64_vec k1om_elf64_vec"
+     want64=true
+     ;;
+-  x86_64-*-elf* | x86_64-*-rtems* | x86_64-*-fuchsia)
++  x86_64-*-elf* | x86_64-*-rtems* | x86_64-*-fuchsia | x86_64-*-kos*)
+     targ_defvec=x86_64_elf64_vec
+     targ_selvecs="i386_elf32_vec iamcu_elf32_vec x86_64_elf32_vec l1om_elf64_vec k1om_elf64_vec"
+     case "${targ}" in
+diff -Naur binutils-2.32-orig/bfd/elf64-x86-64.c binutils-2.32/bfd/elf64-x86-64.c
+--- binutils-2.32-orig/bfd/elf64-x86-64.c	2019-01-19 17:01:33.000000000 +0100
++++ binutils-2.32/bfd/elf64-x86-64.c	2019-08-08 12:53:44.236980500 +0200
+@@ -3072,6 +3072,13 @@
+ 	  if ((input_section->flags & SEC_ALLOC) != 0
+ 	      && (input_section->flags & SEC_READONLY) != 0
+ 	      && h != NULL
++	      /* PATCH for KOS: Allow non-64-bit PC-relative relocation in shared objects
++	       *                when `-Wl,-z,noreloc-overflow' is passed.
++	       *                Why this isn't standard behavior, I don't know, but if
++	       *                you understand what's happening here, you should conclude
++	       *                that this makes sense. (after all: disallowing it is done
++	       *                to prevent a potential overflow at runtime) */
++	      && !info->no_reloc_overflow_check
+ 	      && ((bfd_link_executable (info)
+ 		   && ((h->root.type == bfd_link_hash_undefweak
+ 			&& !resolved_to_zero)
+diff -Naur binutils-2.32-orig/config.sub binutils-2.32/config.sub
+--- binutils-2.32-orig/config.sub	2019-01-19 17:01:33.000000000 +0100
++++ binutils-2.32/config.sub	2019-03-17 10:50:26.187357500 +0100
+@@ -1363,7 +1363,7 @@
+ 	     | powermax* | dnix* | nx6 | nx7 | sei* | dragonfly* \
+ 	     | skyos* | haiku* | rdos* | toppers* | drops* | es* \
+ 	     | onefs* | tirtos* | phoenix* | fuchsia* | redox* | bme* \
+-	     | midnightbsd* | amdhsa* | unleashed* | emscripten*)
++	     | midnightbsd* | amdhsa* | unleashed* | emscripten* | kos*)
+ 	# Remember, each alternative MUST END IN *, to match a version number.
+ 		;;
+ 	qnx*)
+diff -Naur binutils-2.32-orig/gas/configure.tgt binutils-2.32/gas/configure.tgt
+--- binutils-2.32-orig/gas/configure.tgt	2019-01-19 17:01:33.000000000 +0100
++++ binutils-2.32/gas/configure.tgt	2019-03-17 10:51:36.829505700 +0100
+@@ -121,6 +121,7 @@
+ generic_target=${cpu_type}-$vendor-$os
+ # Note: This table is alpha-sorted, please try to keep it that way.
+ case ${generic_target} in
++  i386-*-kos*)			fmt=elf em=linux ;;
+   aarch64*-*-elf*)			fmt=elf;;
+   aarch64*-*-fuchsia*)			fmt=elf;;
+   aarch64*-*-linux*)			fmt=elf em=linux
+diff -Naur binutils-2.32-orig/ld/Makefile.am binutils-2.32/ld/Makefile.am
+--- binutils-2.32-orig/ld/Makefile.am	2019-01-19 17:01:33.000000000 +0100
++++ binutils-2.32/ld/Makefile.am	2019-03-17 11:30:22.015644800 +0100
+@@ -283,6 +283,7 @@
+ 	eelf32xstormy16.c \
+ 	eelf32xtensa.c \
+ 	eelf_i386.c \
++	eelf_i386_kos.c \
+ 	eelf_i386_be.c \
+ 	eelf_i386_chaos.c \
+ 	eelf_i386_fbsd.c \
+@@ -454,6 +455,7 @@
+ 	eelf_k1om.c \
+ 	eelf_k1om_fbsd.c \
+ 	eelf_x86_64.c \
++	eelf_x86_64_kos.c \
+ 	eelf_x86_64_cloudabi.c \
+ 	eelf_x86_64_fbsd.c \
+ 	eelf_x86_64_nacl.c \
+@@ -1289,6 +1291,9 @@
+ eelf_i386.c: $(srcdir)/emulparams/elf_i386.sh \
+   $(ELF_X86_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
+ 
++eelf_i386_kos.c: $(srcdir)/emulparams/elf_i386_kos.sh \
++  $(ELF_X86_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
++
+ eelf_i386_be.c: $(srcdir)/emulparams/elf_i386_be.sh \
+   $(ELF_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
+ 
+@@ -1849,6 +1854,9 @@
+ eelf_x86_64.c: $(srcdir)/emulparams/elf_x86_64.sh \
+   $(ELF_X86_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
+ 
++eelf_x86_64_kos.c: $(srcdir)/emulparams/elf_x86_64_kos.sh \
++  $(ELF_X86_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
++
+ eelf_x86_64_cloudabi.c: $(srcdir)/emulparams/elf_x86_64_cloudabi.sh \
+   $(srcdir)/emulparams/elf_x86_64.sh \
+   $(ELF_X86_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
+diff -Naur binutils-2.32-orig/ld/Makefile.in binutils-2.32/ld/Makefile.in
+--- binutils-2.32-orig/ld/Makefile.in	2019-02-02 16:54:43.000000000 +0100
++++ binutils-2.32/ld/Makefile.in	2019-03-17 11:30:49.548147300 +0100
+@@ -769,6 +769,7 @@
+ 	eelf32xstormy16.c \
+ 	eelf32xtensa.c \
+ 	eelf_i386.c \
++	eelf_i386_kos.c \
+ 	eelf_i386_be.c \
+ 	eelf_i386_chaos.c \
+ 	eelf_i386_fbsd.c \
+@@ -939,6 +940,7 @@
+ 	eelf_k1om.c \
+ 	eelf_k1om_fbsd.c \
+ 	eelf_x86_64.c \
++	eelf_x86_64_kos.c \
+ 	eelf_x86_64_cloudabi.c \
+ 	eelf_x86_64_fbsd.c \
+ 	eelf_x86_64_nacl.c \
+@@ -1386,6 +1388,7 @@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_be.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_chaos.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_fbsd.Po@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_kos.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_ldso.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_nacl.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_i386_sol2.Po@am__quote@
+@@ -1399,6 +1402,7 @@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_cloudabi.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_fbsd.Po@am__quote@
++@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_kos.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_nacl.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eelf_x86_64_sol2.Po@am__quote@
+ @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/eh8300elf.Po@am__quote@
+@@ -2893,6 +2897,9 @@
+ eelf_i386.c: $(srcdir)/emulparams/elf_i386.sh \
+   $(ELF_X86_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
+ 
++eelf_i386_kos.c: $(srcdir)/emulparams/elf_i386_kos.sh \
++  $(ELF_X86_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
++
+ eelf_i386_be.c: $(srcdir)/emulparams/elf_i386_be.sh \
+   $(ELF_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
+ 
+@@ -3453,6 +3460,9 @@
+ eelf_x86_64.c: $(srcdir)/emulparams/elf_x86_64.sh \
+   $(ELF_X86_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
+ 
++eelf_x86_64_kos.c: $(srcdir)/emulparams/elf_x86_64_kos.sh \
++  $(ELF_X86_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
++
+ eelf_x86_64_cloudabi.c: $(srcdir)/emulparams/elf_x86_64_cloudabi.sh \
+   $(srcdir)/emulparams/elf_x86_64.sh \
+   $(ELF_X86_DEPS) $(srcdir)/scripttempl/elf.sc ${GEN_DEPENDS}
+diff -Naur binutils-2.32-orig/ld/configure.tgt binutils-2.32/ld/configure.tgt
+--- binutils-2.32-orig/ld/configure.tgt	2019-01-19 17:01:33.000000000 +0100
++++ binutils-2.32/ld/configure.tgt	2019-07-13 15:30:28.060727700 +0200
+@@ -45,6 +45,13 @@
+ # architecture variants should be kept together even if their names
+ # break the alpha sorting.
+ case "${targ}" in
++i[3-7]86-*-kos*)
++			targ_emul=elf_i386_kos
++			targ_extra_emuls=elf_i386
++			targ64_extra_emuls="elf_x86_64_kos elf_x86_64" ;;
++x86_64-*-kos*)
++			targ_emul=elf_x86_64_kos
++			targ_extra_emuls="elf_i386_kos elf_x86_64 elf_i386" ;;
+ aarch64_be-*-elf)	targ_emul=aarch64elfb
+ 			targ_extra_emuls="aarch64elf aarch64elf32 aarch64elf32b armelfb armelf" ;;
+ aarch64-*-elf | aarch64-*-rtems*)
+diff -Naur binutils-2.32-orig/ld/emulparams/elf_i386_kos.sh binutils-2.32/ld/emulparams/elf_i386_kos.sh
+--- binutils-2.32-orig/ld/emulparams/elf_i386_kos.sh	1970-01-01 01:00:00.000000000 +0100
++++ binutils-2.32/ld/emulparams/elf_i386_kos.sh	2019-07-13 15:48:52.461639200 +0200
+@@ -0,0 +1,4 @@
++. ${srcdir}/emulparams/elf_i386.sh
++GENERATE_SHLIB_SCRIPT=yes
++GENERATE_PIE_SCRIPT=yes
++XDATA_NAME=.xdata
+diff -Naur binutils-2.32-orig/ld/emulparams/elf_x86_64_kos.sh binutils-2.32/ld/emulparams/elf_x86_64_kos.sh
+--- binutils-2.32-orig/ld/emulparams/elf_x86_64_kos.sh	1970-01-01 01:00:00.000000000 +0100
++++ binutils-2.32/ld/emulparams/elf_x86_64_kos.sh	2019-07-13 15:49:36.688839000 +0200
+@@ -0,0 +1,4 @@
++. ${srcdir}/emulparams/elf_x86_64.sh
++GENERATE_SHLIB_SCRIPT=yes
++GENERATE_PIE_SCRIPT=yes
++XDATA_NAME=.xdata
+diff -Naur binutils-2.32-orig/ld/scripttempl/elf.sc binutils-2.32/ld/scripttempl/elf.sc
+--- binutils-2.32-orig/ld/scripttempl/elf.sc	2019-01-19 17:01:33.000000000 +0100
++++ binutils-2.32/ld/scripttempl/elf.sc	2019-07-13 15:47:26.499923100 +0200
+@@ -530,6 +530,19 @@
+   ${RELOCATING+${TEXT_SEGMENT_ALIGN}}
+ EOF
+ 
++if test -n "$XDATA_NAME"; then
++cat <<EOF
++  ${XDATA_NAME} :
++  {
++    ${RELOCATING+*(.xdata.unlikely .xdata.*_unlikely .xdata.unlikely.*)}
++    ${RELOCATING+*(.xdata.exit .xdata.exit.*)}
++    ${RELOCATING+*(.xdata.startup .xdata.startup.*)}
++    ${RELOCATING+*(.xdata.hot .xdata.hot.*)}
++    *(.xdata ${RELOCATING+ .xdata.*})
++  } ${FILL}
++EOF
++fi
++
+ if test -n "${SEPARATE_CODE}${SEPARATE_TEXT}"; then
+   if test -n "${RODATA_ADDR}"; then
+     RODATA_ADDR="\

@@ -1,0 +1,109 @@
+{
+	"version": "0.2.1",
+	"tasks": [
+		{
+			"taskName": "build everything",
+			"appliesTo": "src",
+			"type": "launch",
+			"contextType": "build",
+			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
+			"workingDirectory": "${workspaceRoot}\\..",
+			"command": "deemon",
+			"args": [
+				"magic.dee",
+				"--format-error-messages",
+				"--build-only",
+				"--target=${env.TARGET}",
+				"--config=${env.CONFIG}"
+			]
+		},
+		{
+			"taskName": "rebuild everything",
+			"appliesTo": "src",
+			"type": "launch",
+			"contextType": "rebuild",
+			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
+			"workingDirectory": "${workspaceRoot}\\..",
+			"command": "deemon",
+			"args": [
+				"magic.dee",
+				"--format-error-messages",
+				"--build-only",
+				"--target=${env.TARGET}",
+				"--config=${env.CONFIG}",
+				"-f"
+			]
+		},
+
+		{
+			"taskName": "build Project",
+			"appliesTo": "*",
+			"type": "launch",
+			"contextType": "build",
+			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
+			"workingDirectory": "${workspaceRoot}\\..",
+			"command": "deemon",
+			"args": [
+				"magic.dee",
+				"--target=${env.TARGET}",
+				"--config=${env.CONFIG}",
+				"--vsgengroup-of=${file}"
+			]
+		},
+		{
+			"taskName": "rebuild Project",
+			"appliesTo": "*",
+			"type": "launch",
+			"contextType": "rebuild",
+			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
+			"workingDirectory": "${workspaceRoot}\\..",
+			"command": "deemon",
+			"args": [
+				"magic.dee",
+				"--target=${env.TARGET}",
+				"--config=${env.CONFIG}",
+				"--vsgengroup-of=${file}",
+				"-f"
+			]
+		},
+
+		{
+			"taskName": "rebuild single",
+			"appliesTo": "*",
+			"type": "launch",
+			"contextType": "custom",
+			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
+			"workingDirectory": "${workspaceRoot}\\..",
+			"command": "deemon",
+			"args": [
+				"magic.dee",
+				"--target=${env.TARGET}",
+				"--config=${env.CONFIG}",
+				"--vsgengroup-of=${file}",
+				"--changed=${file}"
+			]
+		},
+
+		{
+			"taskName": "run deemon script",
+			"appliesTo": "*.dee",
+			"type": "launch",
+			"contextType": "custom",
+			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
+			"workingDirectory": "${fileDirname}",
+			"command": "deemon",
+			"args": [ "${file}" ]
+		},
+
+		{
+			"taskName": "autoformat enums",
+			"appliesTo": "*.h",
+			"type": "launch",
+			"contextType": "custom",
+			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
+			"workingDirectory": "${fileDirname}",
+			"command": "deemon",
+			"args": [ "${workspaceRoot}\\misc\\libgen\\autoenum.dee", "${file}" ]
+		}
+	]
+}

@@ -1,0 +1,568 @@
+/* Copyright (c) 2019 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+%[default_impl_section(.text.crt.net.db)]
+
+%[define_replacement(fd_t = __fd_t)]
+%[define_replacement(time32_t = __time32_t)]
+%[define_replacement(time64_t = __time64_t)]
+
+%{
+#include <features.h>
+#include <bits/netdb.h>
+#include <bits/types.h>
+#include <netinet/in.h>
+#include <stdint.h>
+
+#ifdef __USE_MISC
+#include <rpc/netdb.h>
+#endif /* __USE_MISC */
+
+#ifdef __USE_GNU
+#include <bits/sigevent.h>
+#include <bits/timespec.h>
+#endif /* __USE_GNU */
+
+__SYSDECL_BEGIN
+
+/* Disclaimer: Documentation is taken from Glibc /usr/include/netdb.h */
+  /* Copyright (C) 1996-2016 Free Software Foundation, Inc.
+   This file is part of the GNU C Library.
+
+   The GNU C Library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
+
+   The GNU C Library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
+
+/* All data returned by the network data base library are supplied in
+   host order and returned in network order (suitable for use in
+   system calls). */
+
+/* Absolute file name for network data base files. */
+#define _PATH_HEQUIV        "/etc/hosts.equiv"
+#define _PATH_HOSTS         "/etc/hosts"
+#define _PATH_NETWORKS      "/etc/networks"
+#define _PATH_NSSWITCH_CONF "/etc/nsswitch.conf"
+#define _PATH_PROTOCOLS     "/etc/protocols"
+#define _PATH_SERVICES      "/etc/services"
+
+
+#if defined(__USE_MISC) || !defined(__USE_XOPEN2K8)
+/* Possible values left in `h_errno'. */
+#define HOST_NOT_FOUND  1 /* Authoritative Answer Host not found. */
+#define TRY_AGAIN       2 /* Non-Authoritative Host not found, or SERVERFAIL. */
+#define NO_RECOVERY     3 /* Non recoverable errors, FORMERR, REFUSED, NOTIMP. */
+#define NO_DATA         4 /* Valid name, no data record of requested type. */
+#endif /* __USE_MISC || !__USE_XOPEN2K8 */
+
+#ifdef __USE_MISC
+#define NETDB_INTERNAL  (-1)       /* See errno. */
+#define NETDB_SUCCESS     0        /* No problem. */
+#define NO_ADDRESS        NO_DATA  /* No address, look for MX record. */
+#endif /* __USE_MISC */
+
+#if defined(__USE_XOPEN2K) || defined(__USE_XOPEN_EXTENDED)
+#define IPPORT_RESERVED  1024 /* Highest reserved Internet port number. */
+#endif /* __USE_XOPEN2K || __USE_XOPEN_EXTENDED */
+
+#ifdef __USE_GNU
+#define SCOPE_DELIMITER  '%' /* Scope delimiter for getaddrinfo(), getnameinfo(). */
+#endif /* __USE_GNU */
+
+
+/* Extension from POSIX.1:2001. */
+#ifdef __USE_XOPEN2K
+#ifdef __USE_GNU
+/* Lookup mode. */
+#define GAI_WAIT   0
+#define GAI_NOWAIT 1
+#endif /* __USE_GNU */
+/* Flags for `addrinfo::ai_flags' */
+#define AI_PASSIVE                  0x0001 /* Socket address is intended for `bind'. */
+#define AI_CANONNAME                0x0002 /* Request for canonical name. */
+#define AI_NUMERICHOST              0x0004 /* Don't use name resolution. */
+#define AI_V4MAPPED                 0x0008 /* IPv4 mapped addresses are acceptable. */
+#define AI_ALL                      0x0010 /* Return IPv4 mapped and IPv6 addresses. */
+#define AI_ADDRCONFIG               0x0020 /* Use configuration of this host to choose returned address type. */
+#ifdef __USE_GNU
+#define AI_IDN                      0x0040 /* IDN encode input (assuming it is encoded in the current locale's character set) before looking it up. */
+#define AI_CANONIDN                 0x0080 /* Translate canonical name from IDN format. */
+#define AI_IDN_ALLOW_UNASSIGNED     0x0100 /* Don't reject unassigned Unicode code points. */
+#define AI_IDN_USE_STD3_ASCII_RULES 0x0200 /* Validate strings according to STD3 rules. */
+#endif /* __USE_GNU */
+#define AI_NUMERICSERV              0x0400 /* Don't use name resolution. */
+
+/* Error values for `getaddrinfo' function. */
+#define EAI_BADFLAGS     (-1)   /* Invalid value for `ai_flags' field. */
+#define EAI_NONAME       (-2)   /* NAME or SERVICE is unknown. */
+#define EAI_AGAIN        (-3)   /* Temporary failure in name resolution. */
+#define EAI_FAIL         (-4)   /* Non-recoverable failure in name res. */
+#define EAI_FAMILY       (-6)   /* `ai_family' not supported. */
+#define EAI_SOCKTYPE     (-7)   /* `ai_socktype' not supported. */
+#define EAI_SERVICE      (-8)   /* SERVICE not supported for `ai_socktype'. */
+#define EAI_MEMORY       (-10)  /* Memory allocation failure. */
+#define EAI_SYSTEM       (-11)  /* System error returned in `errno'. */
+#define EAI_OVERFLOW     (-12)  /* Argument buffer overflow. */
+#ifdef __USE_GNU
+#define EAI_NODATA       (-5)   /* No address associated with NAME. */
+#define EAI_ADDRFAMILY   (-9)   /* Address family for NAME not supported. */
+#define EAI_INPROGRESS   (-100) /* Processing request in progress. */
+#define EAI_CANCELED     (-101) /* Request canceled. */
+#define EAI_NOTCANCELED  (-102) /* Request not canceled. */
+#define EAI_ALLDONE      (-103) /* All requests done. */
+#define EAI_INTR         (-104) /* Interrupted by a signal. */
+#define EAI_IDN_ENCODE   (-105) /* IDN encoding failed. */
+#endif /* __USE_GNU */
+
+#ifdef __USE_MISC
+#define NI_MAXHOST      1025
+#define NI_MAXSERV      32
+#endif
+#define NI_NUMERICHOST              0x0001 /* Don't try to look up hostname. */
+#define NI_NUMERICSERV              0x0002 /* Don't convert port number to name. */
+#define NI_NOFQDN                   0x0004 /* Only return nodename portion. */
+#define NI_NAMEREQD                 0x0008 /* Don't return numeric addresses. */
+#define NI_DGRAM                    0x0010 /* Look up UDP service rather than TCP. */
+#ifdef __USE_GNU
+#define NI_IDN                      0x0020 /* Convert name from IDN format. */
+#define NI_IDN_ALLOW_UNASSIGNED     0x0040 /* Don't reject unassigned Unicode code points. */
+#define NI_IDN_USE_STD3_ASCII_RULES 0x0080 /* Validate strings according to STD3 rules. */
+#endif /* __USE_GNU */
+#endif /* __USE_XOPEN2K */
+
+
+
+#ifdef __CC__
+
+/* Description of data base entry for a single host. */
+struct hostent {
+	/* XXX: It's unclear if h_name can be NULL! */
+	char                   *h_name;      /* [0..1] Official name of host. */
+	/* XXX: It's unclear if h_aliases can be NULL! (or is {NULL} when empty) */
+	char                  **h_aliases;   /* [0..1][0..n] Alias list. (List is terminated by a NULL-entry) */
+	__STDC_INT32_AS_SSIZE_T h_addrtype;  /* Host address type (One of `AF_*'; e.g. AF_INET or AF_INET6). */
+	__STDC_INT32_AS_SIZE_T  h_length;    /* Length of the address (in bytes). */
+#ifdef __USE_MISC
+#ifdef __INTELLISENSE__ /* Better syntax highlighting */
+	union {
+	char                  **h_addr_list; /* [0..1][1..n] List of addresses from name server. (List is terminated by a NULL-entry) */
+	char                   *h_addr;      /* [1..1] Address, for backward compatibility. */
+	};
+#else /* __INTELLISENSE__ */
+	char                  **h_addr_list; /* [0..1][1..n] List of addresses from name server. (List is terminated by a NULL-entry) */
+#define                     h_addr       h_addr_list[0] /* [1..1] Address, for backward compatibility. */
+#endif /* !__INTELLISENSE__ */
+#else /* __USE_MISC */
+	char                  **h_addr_list; /* [0..1][1..n] List of addresses from name server. (List is terminated by a NULL-entry) */
+#endif /* !__USE_MISC */
+};
+
+
+/* Description of data base entry for a single service. */
+struct servent {
+	/* XXX: It's unclear if s_name can be NULL! */
+	char                  *s_name;    /* [0..1] Official service name. */
+	/* XXX: It's unclear if s_aliases can be NULL! (or is {NULL} when empty) */
+	char                 **s_aliases; /* [0..1][0..n] Alias list. (List is terminated by a NULL-entry) */
+	__STDC_INT32_AS_SIZE_T s_port;    /* Port number. */
+	/* XXX: It's unclear if s_proto can be NULL! */
+	char                  *s_proto;   /* [0..1] Protocol to use. */
+};
+
+
+/* Description of data base entry for a single service. */
+struct protoent {
+	/* XXX: It's unclear if p_name can be NULL! */
+	char                   *p_name;    /* [0..1] Official protocol name. */
+	/* XXX: It's unclear if p_aliases can be NULL! (or is {NULL} when empty) */
+	char                  **p_aliases; /* [0..1][0..n] Alias list. */
+	__STDC_INT32_AS_SSIZE_T p_proto;   /* Protocol number. */
+};
+
+
+
+/* Extension from POSIX.1:2001. */
+#ifdef __USE_XOPEN2K
+/* Structure to contain information about address of a service provider. */
+struct addrinfo {
+	__STDC_INT32_AS_SIZE_T  ai_flags;     /* Input flags. */
+	__STDC_INT32_AS_SSIZE_T ai_family;    /* Protocol family for socket. */
+	__STDC_INT32_AS_SSIZE_T ai_socktype;  /* Socket type. */
+	__STDC_INT32_AS_SSIZE_T ai_protocol;  /* Protocol for socket. */
+	socklen_t               ai_addrlen;   /* Length of socket address. */
+	struct sockaddr        *ai_addr;      /* [0..ai_addrlen] Socket address for socket. */
+	char                   *ai_canonname; /* [0..1] Canonical name for service location (or NULL if not requested; s.a. `AI_CANONNAME'). */
+	struct addrinfo        *ai_next;      /* [0..1] Pointer to next in list. (or NULL for the last entry) */
+};
+
+#ifdef __USE_GNU
+/* Structure used as control block for asynchronous lookup. */
+struct gaicb {
+	/* XXX: It's unclear if ar_name can be NULL! */
+	char const            *ar_name;    /* [0..1] Name to look up. */
+	/* XXX: It's unclear if ar_service can be NULL! */
+	char const            *ar_service; /* [0..1] Service name. */
+	/* XXX: It's unclear if ar_request can be NULL! */
+	struct addrinfo const *ar_request; /* [0..1] Additional request specification. */
+	/* XXX: It's unclear if ar_result can be NULL! */
+	struct addrinfo       *ar_result;  /* [0..1] Pointer to result. */
+	/* The following are internal elements. */
+	__STDC_INT32_AS_SIZE_T __return;
+	__STDC_INT32_AS_SIZE_T __glibc_reserved[5];
+};
+#endif /* __USE_GNU */
+#endif /* __USE_XOPEN2K */
+
+
+}
+
+%
+%#if defined(__USE_MISC) || !defined(__USE_XOPEN2K8)
+%/* Error status for non-reentrant lookup functions.
+% * We use a macro to access always the thread-specific `h_errno' variable. */
+%#define h_errno   (*__h_errno_location())
+
+@@Function to get address of global `h_errno' variable
+[ATTR_CONST][ATTR_WUNUSED] __h_errno_location:() -> int *;
+%#endif /* __USE_MISC || !__USE_XOPEN2K8 */
+
+%
+%#ifdef __USE_MISC
+@@Print error indicated by `h_errno' variable on standard error.
+@@STR, if non-null, is printed before the error string
+[cp] herror:(char const *str);
+
+@@Return string associated with error ERR_NUM
+[ATTR_CONST][ATTR_WUNUSED] hstrerror:(int err_num) -> char const *;
+%#endif /* __USE_MISC */
+
+
+@@Open host data base files and mark them as staying
+@@open even after a later search if STAY_OPEN is non-zero
+[cp] sethostent:(int stay_open);
+
+@@Close host data base files and clear `stay open' flag
+/*[cp]*/ endhostent:();
+
+@@Get next entry from host data base file. Open data base if necessary
+[cp] gethostent:() -> struct hostent *;
+
+@@Return entry from host data base which address match ADDR with length LEN and type TYPE
+[cp] gethostbyaddr:(void const *addr, socklen_t len, int type) -> struct hostent *;
+
+@@Return entry from host data base for host with NAME
+[cp] gethostbyname:(char const *name) -> struct hostent *;
+
+%#ifdef __USE_MISC
+@@Return entry from host data base for host with NAME. AF must be
+@@set to the address type which is `AF_INET' for IPv4 or `AF_INET6'
+@@for IPv6.
+@@This function is not part of POSIX and therefore no official
+@@cancellation point
+[cp] gethostbyname2:(char const *name, int af) -> struct hostent *;
+
+@@Reentrant versions of the functions above. The additional arguments
+@@specify a buffer of BUFLEN starting at BUF. The last argument is a
+@@pointer to a variable which gets the value which would be stored in
+@@the global variable `herrno' by the non-reentrant functions.
+@@These functions are not part of POSIX and therefore no official cancellation point
+[cp] gethostent_r:(struct hostent *__restrict result_buf, char *__restrict buf, size_t buflen, struct hostent **__restrict result, int *__restrict h_errnop) -> int;
+[doc_alias(gethostent_r)][cp] gethostbyaddr_r:(void const *__restrict addr, socklen_t len, int type, struct hostent *__restrict result_buf, char *__restrict buf, size_t buflen, struct hostent **__restrict result, int *__restrict h_errnop) -> int;
+[doc_alias(gethostent_r)][cp] gethostbyname_r:(char const *__restrict name, struct hostent *__restrict result_buf, char *__restrict buf, size_t buflen, struct hostent **__restrict result, int *__restrict h_errnop) -> int;
+[doc_alias(gethostent_r)][cp] gethostbyname2_r:(char const *__restrict name, int af, struct hostent *__restrict result_buf, char *__restrict buf, size_t buflen, struct hostent **__restrict result, int *__restrict h_errnop) -> int;
+%#endif /* __USE_MISC */
+
+
+@@Open network data base files and mark them as staying
+@@open even after a later search if STAY_OPEN is non-zero
+[cp] setnetent:(int stay_open);
+
+@@Close network data base files and clear `stay open' flag
+[cp_nokos] endnetent:();
+
+@@Get next entry from network data base file. Open data base if necessary
+[cp] getnetent:() -> struct netent *;
+
+@@Return entry from network data base which address match NET and type TYPE
+[cp] getnetbyaddr:(uint32_t net, int type) -> struct netent *;
+
+@@Return entry from network data base for network with NAME
+[cp] getnetbyname:(char const *name) -> struct netent *;
+
+%
+%#ifdef __USE_MISC
+@@Reentrant versions of the functions above. The additional
+@@arguments specify a buffer of BUFLEN starting at BUF. The last
+@@argument is a pointer to a variable which gets the value which
+@@would be stored in the global variable `herrno' by the
+@@non-reentrant functions.
+@@These functions are not part of POSIX and therefore no official
+@@cancellation point
+[cp] getnetent_r:(struct netent *__restrict result_buf, char *__restrict buf, size_t buflen, struct netent **__restrict result, int *__restrict h_errnop) -> int;
+[doc_alias(getnetent_r)][cp] getnetbyaddr_r:(uint32_t net, int type, struct netent *__restrict result_buf, char *__restrict buf, size_t buflen, struct netent **__restrict result, int *__restrict h_errnop) -> int;
+[doc_alias(getnetent_r)][cp] getnetbyname_r:(char const *__restrict name, struct netent *__restrict result_buf, char *__restrict buf, size_t buflen, struct netent **__restrict result, int *__restrict h_errnop) -> int;
+%#endif /* __USE_MISC */
+
+
+@@Open service data base files and mark them as staying open even
+@@after a later search if STAY_OPEN is non-zero
+[cp] setservent:(int stay_open);
+
+@@Close service data base files and clear `stay open' flag
+[cp_nokos] endservent:();
+
+@@Get next entry from service data base file. Open data base if necessary
+[cp] getservent:() -> struct servent *;
+
+@@Return entry from network data base for network with NAME and protocol PROTO
+[cp] getservbyname:(char const *name, char const *proto) -> struct servent *;
+
+@@Return entry from service data base which matches port PORT and protocol PROTO
+[cp] getservbyport:(int port, char const *proto) -> struct servent *;
+
+%
+%#ifdef __USE_MISC
+@@Reentrant versions of the functions above. The additional
+@@arguments specify a buffer of BUFLEN starting at BUF.
+@@These functions are not part of POSIX and therefore no official
+@@cancellation point
+[cp] getservent_r:(struct servent *__restrict result_buf, char *__restrict buf, size_t buflen, struct servent **__restrict result) -> int;
+[doc_alias(getservent_r)][cp] getservbyname_r:(char const *__restrict name, char const *__restrict __proto, struct servent *__restrict result_buf, char *__restrict buf, size_t buflen, struct servent **__restrict result) -> int;
+[doc_alias(getservent_r)][cp] getservbyport_r:(int __port, char const *__restrict __proto, struct servent *__restrict result_buf, char *__restrict buf, size_t buflen, struct servent **__restrict result) -> int;
+%#endif /* __USE_MISC */
+
+
+@@Open protocol data base files and mark them as staying open even
+@@after a later search if STAY_OPEN is non-zero
+[cp] setprotoent:(int stay_open);
+
+@@Close protocol data base files and clear `stay open' flag
+[cp_nokos] endprotoent:();
+
+@@Get next entry from protocol data base file. Open data base if necessary
+[cp] getprotoent:() -> struct protoent *;
+
+@@Return entry from protocol data base for network with NAME
+[cp] getprotobyname:(char const *name) -> struct protoent *;
+
+@@Return entry from protocol data base which number is PROTO
+[cp] getprotobynumber:(int proto) -> struct protoent *;
+
+%
+%#ifdef __USE_MISC
+@@Reentrant versions of the functions above. The additional
+@@arguments specify a buffer of BUFLEN starting at BUF.
+@@These functions are not part of POSIX and therefore no official
+@@cancellation point
+[cp] getprotoent_r:(struct protoent *__restrict result_buf, char *__restrict buf, size_t buflen, struct protoent **__restrict result) -> int;
+[doc_alias(getprotoent_r)][cp] getprotobyname_r:(char const *__restrict name, struct protoent *__restrict result_buf, char *__restrict buf, size_t buflen, struct protoent **__restrict result) -> int;
+[doc_alias(getprotoent_r)][cp] getprotobynumber_r:(int __proto, struct protoent *__restrict result_buf, char *__restrict buf, size_t buflen, struct protoent **__restrict result) -> int;
+
+@@Establish network group NETGROUP for enumeration.
+@@This function is not part of POSIX and therefore no official
+@@cancellation point
+[cp] setnetgrent:(char const *netgroup) -> int;
+
+@@Free all space allocated by previous `setnetgrent' call.
+@@This function is not part of POSIX and therefore no official
+@@cancellation point
+[cp_nokos] endnetgrent:();
+
+@@Get next member of netgroup established by last `setnetgrent' call
+@@and return pointers to elements in HOSTP, USERP, and DOMAINP.
+@@This function is not part of POSIX and therefore no official
+@@cancellation point
+[cp] getnetgrent:(char **__restrict hostp, char **__restrict userp, char **__restrict domainp) -> int;
+
+@@Test whether NETGROUP contains the triple (HOST, USER, DOMAIN).
+@@This function is not part of POSIX and therefore no official
+@@cancellation point
+[cp] innetgr:(char const *netgroup, char const *host, char const *user, char const *domain) -> int;
+
+@@Reentrant version of `getnetgrent' where result is placed in BUFFER.
+@@This function is not part of POSIX and therefore no official
+@@cancellation point
+[cp] getnetgrent_r:(char **__restrict hostp, char **__restrict userp, char **__restrict domainp, char *__restrict buf, size_t buflen) -> int;
+%#endif /* __USE_MISC */
+
+%
+%#ifdef __USE_MISC
+@@Call `rshd' at port RPORT on remote machine *AHOST to execute CMD.
+@@The local user is LOCUSER, on the remote machine the command is
+@@executed as REMUSER. In *FD2P the descriptor to the socket for the
+@@connection is returned. The caller must have the right to use a
+@@reserved port. When the function returns *AHOST contains the
+@@official host name.
+@@This function is not part of POSIX and therefore no official
+@@cancellation point
+[cp] rcmd:(char **__restrict ahost, $uint16_t rport, char const *__restrict locuser, char const *__restrict remuser, char const *__restrict cmd, int *__restrict fd2p) -> int;
+
+@@This is the equivalent function where the protocol can be selected
+@@and which therefore can be used for IPv6.
+@@This function is not part of POSIX and therefore no official
+@@cancellation point
+[cp] rcmd_af:(char **__restrict ahost, $uint16_t rport, char const *__restrict locuser, char const *__restrict remuser, char const *__restrict cmd, int *__restrict fd2p, sa_family_t af) -> int;
+
+@@Call `rexecd' at port RPORT on remote machine *AHOST to execute
+@@CMD. The process runs at the remote machine using the ID of user
+@@NAME whose cleartext password is PASSWD. In *FD2P the descriptor
+@@to the socket for the connection is returned. When the function
+@@returns *AHOST contains the official host name.
+@@This function is not part of POSIX and therefore no official
+@@cancellation point
+[cp] rexec:(char **__restrict ahost, int rport, char const *__restrict name, char const *__restrict pass, char const *__restrict cmd, int *__restrict fd2p) -> int;
+
+@@This is the equivalent function where the protocol can be selected
+@@and which therefore can be used for IPv6.
+@@This function is not part of POSIX and therefore no official
+@@cancellation point
+[cp] rexec_af:(char **__restrict ahost, int rport, char const *__restrict name, char const *__restrict pass, char const *__restrict cmd, int *__restrict fd2p, sa_family_t af) -> int;
+
+@@Check whether user REMUSER on system RHOST is allowed to login as LOCUSER.
+@@If SUSER is not zero the user tries to become superuser. Return 0 if
+@@it is possible.
+@@This function is not part of POSIX and therefore no official
+@@cancellation point
+[cp] ruserok:(char const *rhost, int suser, char const *remuser, char const *locuser) -> int;
+
+@@This is the equivalent function where the protocol can be selected
+@@and which therefore can be used for IPv6.
+@@This function is not part of POSIX and therefore no official
+@@cancellation point
+[cp] ruserok_af:(char const *rhost, int suser, char const *remuser, char const *locuser, sa_family_t af) -> int;
+
+@@Check whether user REMUSER on system indicated by IPv4 address
+@@RADDR is allowed to login as LOCUSER. Non-IPv4 (e.g., IPv6) are
+@@not supported. If SUSER is not zero the user tries to become
+@@superuser. Return 0 if it is possible.
+@@This function is not part of POSIX and therefore no official
+@@cancellation point
+[cp] iruserok:(uint32_t raddr, int suser, char const *remuser, char const *locuser) -> int;
+
+@@This is the equivalent function where the pfamiliy if the address
+@@pointed to by RADDR is determined by the value of AF. It therefore
+@@can be used for IPv6
+@@This function is not part of POSIX and therefore no official
+@@cancellation point
+[cp] iruserok_af:(void const *raddr, int suser, char const *remuser, char const *locuser, sa_family_t af) -> int;
+
+@@Try to allocate reserved port, returning a descriptor for a socket opened
+@@at this port or -1 if unsuccessful. The search for an available port
+@@will start at ALPORT and continues with lower numbers.
+@@This function is not part of POSIX and therefore no official
+@@cancellation point
+[cp] rresvport:(int *alport) -> int;
+
+@@This is the equivalent function where the protocol can be selected
+@@and which therefore can be used for IPv6.
+@@This function is not part of POSIX and therefore no official
+@@cancellation point
+[cp] rresvport_af:(int *alport, sa_family_t af) -> int;
+%#endif /* __USE_MISC */
+
+
+%
+%/* Extension from POSIX.1:2001. */
+%#ifdef __USE_XOPEN2K
+@@Translate name of a service location and/or a service name to set of socket addresses
+[cp] getaddrinfo:(char const *__restrict name, char const *__restrict service, const struct addrinfo *__restrict req, struct addrinfo **__restrict pai) -> int;
+
+@@Free `addrinfo' structure AI including associated storage
+freeaddrinfo:(struct addrinfo *ai);
+
+@@Convert error return from getaddrinfo() to a string
+[ATTR_CONST][ATTR_WUNUSED] gai_strerror:(int ecode) -> char const *;
+
+@@Translate a socket address to a location and service name
+[cp] getnameinfo:(struct sockaddr const *__restrict sa, socklen_t salen, char *__restrict host, socklen_t hostlen, char *__restrict serv, socklen_t servlen, int flags) -> int;
+%#endif /* __USE_XOPEN2K */
+
+%
+%#ifdef __USE_GNU
+@@Enqueue ENT requests from the LIST. If MODE is GAI_WAIT wait until all
+@@requests are handled. If WAIT is GAI_NOWAIT return immediately after
+@@queueing the requests and signal completion according to SIG.
+@@This function is not part of POSIX and therefore no official
+@@cancellation point
+[cp] getaddrinfo_a:(int mode, struct gaicb *list[__restrict_arr], int ent, struct sigevent *__restrict sig) -> int;
+
+@@Suspend execution of the thread until at least one of the ENT requests
+@@in LIST is handled. If TIMEOUT is not a null pointer it specifies the
+@@longest time the function keeps waiting before returning with an error.
+@@This function is not part of POSIX and therefore no official
+@@cancellation point
+[cp][requires(defined(__CRT_HAVE_gai_suspend64) || defined(__CRT_HAVE_gai_suspend))]
+[if(defined(__USE_TIME_BITS64)), preferred_alias(gai_suspend64)]
+[if(!defined(__USE_TIME_BITS64)), preferred_alias(gai_suspend)]
+gai_suspend:(struct gaicb const *const list[], int ent, struct timespec const *timeout) -> int {
+#ifdef __CRT_HAVE_gai_suspend
+	struct __timespec32 tmo32;
+	if (!timeout)
+		return crt_gai_suspend(list, ent, NULL);
+	tmo32.@tv_sec@  = (time32_t)timeout->@tv_sec@;
+	tmo32.@tv_nsec@ = timeout->@tv_nsec@;
+	return crt_gai_suspend(list, ent, &tmo32);
+#else
+	struct __timespec64 tmo64;
+	if (!timeout)
+		return gai_suspend64(list, ent, NULL);
+	tmo64.@tv_sec@  = (time64_t)timeout->@tv_sec@;
+	tmo64.@tv_nsec@ = timeout->@tv_nsec@;
+	return gai_suspend64(list, ent, &tmo64);
+#endif
+}
+
+%
+%#ifdef __USE_TIME64
+[ignore][cp][doc_alias(gai_suspend)]
+crt_gai_suspend:(struct gaicb const *const list[], int ent, struct __timespec32 const *timeout) -> int = gai_suspend?;
+[cp][requires(defined(__CRT_HAVE_gai_suspend))][time64_variant_of(gai_suspend)]
+gai_suspend64:(struct gaicb const *const list[], int ent, struct timespec64 const *timeout) -> int {
+	struct __timespec32 tmo32;
+	if (!timeout)
+		return crt_gai_suspend(list, ent, NULL);
+	tmo32.@tv_sec@  = (time32_t)timeout->@tv_sec@;
+	tmo32.@tv_nsec@ = timeout->@tv_nsec@;
+	return crt_gai_suspend(list, ent, &tmo32);
+}
+%#endif /* __USE_TIME64 */
+
+@@Get the error status of the request REQ
+gai_error:(struct gaicb *req) -> int;
+
+@@Cancel the requests associated with GAICBP
+gai_cancel:(struct gaicb *gaicbp) -> int;
+%#endif /* __USE_GNU */
+
+
+
+%{
+#endif /* __CC__ */
+
+__SYSDECL_END
+
+}

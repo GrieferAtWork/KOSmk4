@@ -1,0 +1,145 @@
+/* Copyright (c) 2019 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef GUARD_LIBJSON_JSON_CTEST
+#define GUARD_LIBJSON_JSON_CTEST 1
+#define _KOS_SOURCE 1
+
+#include <hybrid/compiler.h>
+#include <kos/types.h>
+
+#include <system-test/ctest.h>
+
+#include <string.h>
+#include <dlfcn.h>
+#include <format-printer.h>
+#include <libjson/generator.h>
+#include <libjson/parser.h>
+#include <libjson/writer.h>
+
+
+DECL_BEGIN
+
+struct my_struct {
+	int   ms_alpha;
+	int   ms_beta;
+	char *ms_name;
+	int   ms_values[8];
+};
+
+PRIVATE byte_t const my_struct_codec[] = {
+	JGEN_BEGINOBJECT,
+		JGEN_FIELD, 'a', 'l', 'p', 'h', 'a', 0, JGEN_INTO, JSON_OFFSETOF(struct my_struct, ms_alpha), JSON_TYPE_INT,
+		JGEN_FIELD, 'b', 'e', 't', 'a',      0, JGEN_INTO, JSON_OFFSETOF(struct my_struct, ms_beta), JSON_TYPE_INT,
+		JGEN_FIELD, 'n', 'a', 'm', 'e',      0, JGEN_INTO, JSON_OFFSETOF(struct my_struct, ms_name), JSON_TYPE_STRING_OR_NULL,
+		JGEN_FIELD, 'v', 'a', 'l', 'u', 'e', 's', 0, JGEN_BEGINARRAY,
+			JGEN_INDEX_REP(8, sizeof(int)), JGEN_INTO, JSON_OFFSETOF(struct my_struct, ms_values), JSON_TYPE_INT,
+		JGEN_END,
+	JGEN_END,
+	JGEN_TERM
+};
+
+DEFINE_TEST(json_codecs) {
+	char json_input[] = "{"
+	                    "\"beta\":20,"
+	                    "\"alpha\":10,"
+	                    "\"name\":\"This is\\n my name\","
+	                    "\"values\":[1,2,4,8,16,32,64,128]"
+	                    "}";
+	struct json_parser parser;
+	void *libjson;
+	int error;
+	PJSON_PARSER_INIT json_parser_init;
+	PJSON_DECODE json_decode;
+	PJSON_ENCODE json_encode;
+	struct my_struct foo;
+	libjson = dlopen(LIBJSON_LIBRARY_NAME, RTLD_LOCAL);
+	assertf(libjson, "dlerror(): %s", dlerror());
+	*(void **)&json_parser_init = dlsym(libjson, "json_parser_init");
+	assertf(json_parser_init, "dlerror(): %s", dlerror());
+	*(void **)&json_decode = dlsym(libjson, "json_decode");
+	assertf(json_decode, "dlerror(): %s", dlerror());
+	*(void **)&json_encode = dlsym(libjson, "json_encode");
+	assertf(json_encode, "dlerror(): %s", dlerror());
+
+	/* Decode json input by use of the codec defined above, and
+	 * store the results in an associated `struct my_struct' */
+	json_parser_init(&parser, json_input, COMPILER_STREND(json_input));
+	error = json_decode(&parser, my_struct_codec, &foo);
+	ASSERT_EQUAL(error, JSON_ERROR_OK);
+	ASSERT_EQUAL(foo.ms_alpha, 10);
+	ASSERT_EQUAL(foo.ms_beta, 20);
+	ASSERT_EQUAL(foo.ms_values[0], 1);
+	ASSERT_EQUAL(foo.ms_values[1], 2);
+	ASSERT_EQUAL(foo.ms_values[2], 4);
+	ASSERT_EQUAL(foo.ms_values[3], 8);
+	ASSERT_EQUAL(foo.ms_values[4], 16);
+	ASSERT_EQUAL(foo.ms_values[5], 32);
+	ASSERT_EQUAL(foo.ms_values[6], 64);
+	ASSERT_EQUAL(foo.ms_values[7], 128);
+	ASSERT_STREQUAL(foo.ms_name, "This is\n my name");
+
+	/* Also assert the opposite: converting a C-structure to json (using both compact and pretty formats) */
+	{
+		struct json_writer writer;
+		PRIVATE char const foo_pretty_expected[] = "{\n"
+		                                           "\t\"alpha\": 10,\n"
+		                                           "\t\"beta\": 20,\n"
+		                                           "\t\"name\": \"This is\\n my name\",\n"
+		                                           "\t\"values\": [\n"
+		                                           "\t\t1,\n"
+		                                           "\t\t2,\n"
+		                                           "\t\t4,\n"
+		                                           "\t\t8,\n"
+		                                           "\t\t16,\n"
+		                                           "\t\t32,\n"
+		                                           "\t\t64,\n"
+		                                           "\t\t128\n"
+		                                           "\t]\n"
+		                                           "}";
+		PRIVATE char const foo_compact_expected[] =
+			"{\"alpha\":10,\"beta\":20,\"name\":\"This is\\n my name\",\"values\":[1,2,4,8,16,32,64,128]}";
+		char foo_generated[512], *ptr;
+		ptr = foo_generated;
+		json_writer_init(&writer, &format_sprintf_printer, &ptr, JSON_WRITER_FORMAT_PRETTY);
+		error = json_encode(&writer, my_struct_codec, &foo);
+		ASSERT_EQUAL(error, JSON_ERROR_OK);
+		assertf(ptr == foo_generated + COMPILER_STRLEN(foo_pretty_expected) &&
+		        memcmp(foo_generated, foo_pretty_expected, sizeof(foo_pretty_expected) - sizeof(char)) == 0,
+		        "Expected: %$q\n"
+		        "Parsed  : %$q\n",
+		        COMPILER_STRLEN(foo_pretty_expected), foo_pretty_expected,
+		        (size_t)(ptr - foo_generated), foo_generated);
+		ptr = foo_generated;
+		json_writer_init(&writer, &format_sprintf_printer, &ptr, JSON_WRITER_FORMAT_COMPACT);
+		error = json_encode(&writer, my_struct_codec, &foo);
+		ASSERT_EQUAL(error, JSON_ERROR_OK);
+		assertf(ptr == foo_generated + COMPILER_STRLEN(foo_compact_expected) &&
+		        memcmp(foo_generated, foo_compact_expected, sizeof(foo_compact_expected) - sizeof(char)) == 0,
+		        "Expected: %$q\n"
+		        "Parsed  : %$q\n",
+		        COMPILER_STRLEN(foo_compact_expected), foo_compact_expected,
+		        (size_t)(ptr - foo_generated), foo_generated);
+	}
+	dlclose(libjson);
+}
+
+
+DECL_END
+
+#endif /* !GUARD_LIBJSON_JSON_CTEST */

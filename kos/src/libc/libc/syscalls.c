@@ -1,0 +1,77 @@
+/* Copyright (c) 2019 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef GUARD_LIBC_LIBC_SYSCALLS_C
+#define GUARD_LIBC_LIBC_SYSCALLS_C 1
+
+/* Keep this one the first */
+#include "../api.h"
+/**/
+
+#include <kos/syscalls.h>
+
+#include <errno.h>
+#include <stdarg.h>
+
+DECL_BEGIN
+
+INTERN ATTR_SECTION(".text.crt.syscall.hop") syscall_slong_t
+NOTHROW_NCX(VLIBCCALL libc_hop)(fd_t fd, syscall_ulong_t cmd,
+                                ... /*, void *arg*/) {
+	syscall_slong_t result;
+	va_list args;
+	va_start(args, cmd);
+	result = sys_hop(fd, cmd, va_arg(args, void *));
+	va_end(args);
+	if (E_ISERR(result))
+		result = libc_seterrno((errno_t)-result);
+	return result;
+}
+
+INTERN ATTR_SECTION(".text.crt.syscall.hopf") syscall_slong_t
+NOTHROW_NCX(VLIBCCALL libc_hopf)(fd_t fd, syscall_ulong_t cmd,
+                                 iomode_t mode, ... /*, void *arg*/) {
+	syscall_slong_t result;
+	va_list args;
+	va_start(args, mode);
+	result = sys_hopf(fd, cmd, mode, va_arg(args, void *));
+	va_end(args);
+	if (E_ISERR(result))
+		result = libc_seterrno((errno_t)-result);
+	return result;
+}
+
+INTERN ATTR_SECTION(".text.crt.syscall.sysctl") syscall_slong_t
+NOTHROW_NCX(VLIBCCALL libc_sysctl)(syscall_ulong_t cmd, ... /*, void *arg*/) {
+	syscall_slong_t result;
+	va_list args;
+	va_start(args, cmd);
+	result = sys_sysctl(cmd, va_arg(args, void *));
+	va_end(args);
+	if (E_ISERR(result))
+		result = libc_seterrno((errno_t)-result);
+	return result;
+}
+
+DEFINE_PUBLIC_ALIAS(hop, libc_hop);
+DEFINE_PUBLIC_ALIAS(hopf, libc_hopf);
+DEFINE_PUBLIC_ALIAS(sysctl, libc_sysctl);
+
+DECL_END
+
+#endif /* !GUARD_LIBC_LIBC_SYSCALLS_C */

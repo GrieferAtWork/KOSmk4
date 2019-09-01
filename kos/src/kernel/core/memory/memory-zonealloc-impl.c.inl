@@ -1,0 +1,276 @@
+/* Copyright (c) 2019 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifdef __INTELLISENSE__
+#include "memory.c"
+//#define ALLOC_SINGLE  1
+//#define ALLOC_BETWEEN 1
+#define ALLOC_MINMAX  1
+#endif
+
+DECL_BEGIN
+
+#ifdef ALLOC_BETWEEN
+#ifdef ALLOC_SINGLE
+PRIVATE NOBLOCK WUNUSED NONNULL((1)) pageptr_t
+NOTHROW(KCALL zone_mallocone_between)(struct pmemzone *__restrict self,
+                                      pageptr_t zone_relative_min,
+                                      pageptr_t zone_relative_max,
+                                      bool out_of_bounds_is_ok)
+#elif defined(ALLOC_MINMAX)
+PRIVATE NOBLOCK WUNUSED NONNULL((1, 6)) pageptr_t
+NOTHROW(KCALL zone_malloc_part_between)(struct pmemzone *__restrict self,
+                                        pageptr_t zone_relative_min,
+                                        pageptr_t zone_relative_max,
+                                        pagecnt_t min_pages,
+                                        pagecnt_t max_pages,
+                                        pagecnt_t *__restrict res_pages,
+                                        bool out_of_bounds_is_ok)
+#else
+PRIVATE NOBLOCK WUNUSED NONNULL((1)) pageptr_t
+NOTHROW(KCALL zone_malloc_between)(struct pmemzone *__restrict self,
+                                   pageptr_t zone_relative_min,
+                                   pageptr_t zone_relative_max,
+                                   pagecnt_t num_pages,
+                                   bool out_of_bounds_is_ok)
+#endif
+#else
+#ifdef ALLOC_SINGLE
+PRIVATE NOBLOCK WUNUSED NONNULL((1)) pageptr_t
+NOTHROW(KCALL zone_mallocone_before)(struct pmemzone *__restrict self,
+                                     pageptr_t zone_relative_max)
+#elif defined(ALLOC_MINMAX)
+PRIVATE NOBLOCK WUNUSED NONNULL((1, 5)) pageptr_t
+NOTHROW(KCALL zone_malloc_part_before)(struct pmemzone *__restrict self,
+                                       pageptr_t zone_relative_max,
+                                       pagecnt_t min_pages,
+                                       pagecnt_t max_pages,
+                                       pagecnt_t *__restrict res_pages)
+#else
+PRIVATE NOBLOCK WUNUSED NONNULL((1)) pageptr_t
+NOTHROW(KCALL zone_malloc_before)(struct pmemzone *__restrict self,
+                                  pageptr_t zone_relative_max,
+                                  pagecnt_t num_pages)
+#endif
+#endif
+{
+	uintptr_t word;
+	size_t i;
+#ifdef ALLOC_BETWEEN
+	size_t min_i;
+#endif
+	unsigned int missalignment;
+	pageptr_t result;
+#ifdef ALLOC_BETWEEN
+	assert(zone_relative_max >= zone_relative_min);
+#endif
+	assert(zone_relative_max <= self->mz_rmax);
+#ifdef ALLOC_BETWEEN
+	min_i = (size_t)(zone_relative_min / PAGES_PER_WORD);
+#endif
+	i             = (size_t)(zone_relative_max / PAGES_PER_WORD);
+	missalignment = (unsigned int)(zone_relative_max % PAGES_PER_WORD);
+#ifdef ALLOC_MINMAX
+	if (max_pages <= 1)
+#elif !defined(ALLOC_SINGLE)
+	if (num_pages <= 1)
+#endif
+	{
+		/* Non-transient allocation. */
+		for (;;) {
+			uintptr_t page_mask;
+again_word_i:
+			word      = ATOMIC_READ(self->mz_free[i]);
+			page_mask = (uintptr_t)PMEMZONE_ISFREEMASK << (missalignment * PMEMZONE_BITSPERPAGE);
+			for (;;) {
+				if (word & page_mask) {
+					/* Got it! (allocate the remainder!) */
+					assert(page_mask);
+					result = (pageptr_t)i * PAGES_PER_WORD + (CTZ(page_mask) / PMEMZONE_BITSPERPAGE);
+#ifdef ALLOC_BETWEEN
+					if unlikely(result < zone_relative_min && !out_of_bounds_is_ok)
+						goto nope;
+#endif
+#ifdef ALLOC_MINMAX
+					if likely(max_pages)
+#elif !defined(ALLOC_SINGLE)
+					if likely(num_pages)
+#endif
+					{
+						if (!ATOMIC_CMPXCH_WEAK(self->mz_free[i], word, word & ~page_mask))
+							goto again_word_i;
+						ATOMIC_FETCHDEC(self->mz_cfree);
+						if (word & (page_mask << (PMEMZONE_ISUNDFBIT - PMEMZONE_ISFREEBIT)))
+							ATOMIC_FETCHDEC(self->mz_zfree);
+					}
+#ifdef ALLOC_MINMAX
+					*res_pages = 1;
+#endif
+					return result;
+				}
+				if (page_mask <= PMEMZONE_ISFREEMASK)
+					break;
+				page_mask >>= PMEMZONE_BITSPERPAGE;
+			}
+#ifdef ALLOC_BETWEEN
+			if unlikely(i <= min_i)
+				goto nope;
+#else
+			if unlikely(!i)
+				goto nope;
+#endif
+			--i;
+			missalignment = PAGES_PER_WORD - 1;
+		}
+	}
+#ifndef ALLOC_SINGLE
+	else {
+		pagecnt_t alloc_count;
+		unsigned int zcount;
+		/* Transient allocation. */
+		alloc_count = 0;
+		for (;;) {
+			uintptr_t page_mask;
+			uintptr_t alloc_mask;
+			size_t new_alloc_count;
+again_word_i_trans:
+			alloc_mask      = 0;
+			new_alloc_count = alloc_count;
+			word            = ATOMIC_READ(self->mz_free[i]);
+			page_mask       = (uintptr_t)PMEMZONE_ISFREEMASK << (missalignment * PMEMZONE_BITSPERPAGE);
+			for (;;) {
+				if (word & page_mask) {
+					alloc_mask |= page_mask;
+					++new_alloc_count;
+#ifdef ALLOC_MINMAX
+					if (new_alloc_count >= max_pages)
+#else
+					if (new_alloc_count >= num_pages)
+#endif
+					{
+						/* Got it! (allocate the remainder!) */
+						assert(alloc_mask);
+						result = (pageptr_t)i * PAGES_PER_WORD + (CTZ(alloc_mask) / PMEMZONE_BITSPERPAGE);
+#ifdef ALLOC_BETWEEN
+						if unlikely(result < zone_relative_min && !out_of_bounds_is_ok) {
+							if (alloc_count)
+								zone_free_keepz(self, (pageptr_t)((i + 1) * PAGES_PER_WORD), alloc_count);
+							goto nope;
+						}
+#endif
+#ifdef ALLOC_MINMAX
+min_max_allocate_current_alloc_mask:
+#endif
+						if (!ATOMIC_CMPXCH_WEAK(self->mz_free[i], word, word & ~alloc_mask))
+							goto again_word_i_trans;
+						ATOMIC_FETCHSUB(self->mz_cfree, new_alloc_count - alloc_count);
+						zcount = POPCOUNT(word & (alloc_mask << (PMEMZONE_ISUNDFBIT - PMEMZONE_ISFREEBIT)));
+						if (zcount)
+							ATOMIC_FETCHSUB(self->mz_zfree, zcount);
+#ifdef ALLOC_MINMAX
+						*res_pages = new_alloc_count;
+#endif
+						return result;
+					}
+				} else {
+#ifdef ALLOC_MINMAX
+					if (new_alloc_count >= min_pages) {
+						result = (pageptr_t)i * PAGES_PER_WORD;
+						result += alloc_mask ? (CTZ(alloc_mask) / PMEMZONE_BITSPERPAGE) : PAGES_PER_WORD;
+#ifdef ALLOC_BETWEEN
+						if unlikely(out_of_bounds_is_ok || result >= zone_relative_min)
+#endif
+						{
+#if 1
+							goto min_max_allocate_current_alloc_mask;
+#else
+							if (!ATOMIC_CMPXCH_WEAK(self->mz_free[i], word, word & ~alloc_mask))
+								goto again_word_i_trans;
+							ATOMIC_FETCHSUB(self->mz_cfree, new_alloc_count - alloc_count);
+							zcount = POPCOUNT(word & (alloc_mask << (PMEMZONE_ISUNDFBIT - PMEMZONE_ISFREEBIT)));
+							if (zcount)
+								ATOMIC_FETCHSUB(self->mz_zfree, zcount);
+							*res_pages = new_alloc_count;
+							return result;
+#endif
+						}
+					}
+#endif /* ALLOC_MINMAX */
+					if (alloc_count) {
+						zone_free_keepz(self,
+						                (pageptr_t)((i + 1) * PAGES_PER_WORD),
+						                alloc_count);
+						alloc_count = 0;
+					}
+					new_alloc_count = 0;
+					alloc_mask      = 0;
+				}
+				if (page_mask <= PMEMZONE_ISFREEMASK)
+					break;
+				page_mask >>= PMEMZONE_BITSPERPAGE;
+			}
+			/* Allocate the current mask. */
+			if (alloc_mask) {
+				assert(alloc_mask & PMEMZONE_ISFREEMASK);
+				assert(new_alloc_count > alloc_count);
+				if (!ATOMIC_CMPXCH_WEAK(self->mz_free[i], word, word & ~alloc_mask))
+					goto again_word_i_trans;
+				ATOMIC_FETCHSUB(self->mz_cfree, new_alloc_count - alloc_count);
+				zcount = POPCOUNT(word & (alloc_mask << (PMEMZONE_ISUNDFBIT - PMEMZONE_ISFREEBIT)));
+				if (zcount)
+					ATOMIC_FETCHSUB(self->mz_zfree, zcount);
+			} else {
+				assert(new_alloc_count == alloc_count);
+			}
+			alloc_count = new_alloc_count;
+#ifdef ALLOC_BETWEEN
+			if unlikely(i <= min_i)
+#else
+			if unlikely(!i)
+#endif
+			{
+#ifdef ALLOC_MINMAX
+#ifdef ALLOC_BETWEEN
+				if (alloc_count >= min_pages && out_of_bounds_is_ok)
+#else
+				if (alloc_count >= min_pages)
+#endif
+				{
+					*res_pages = alloc_count;
+					return (pageptr_t)(i * PAGES_PER_WORD);
+				}
+#endif /* ALLOC_MINMAX */
+				if (alloc_count)
+					zone_free_keepz(self, (pageptr_t)(i * PAGES_PER_WORD), alloc_count);
+				goto nope;
+			}
+			--i;
+			missalignment = PAGES_PER_WORD - 1;
+		}
+	}
+#endif /* !ALLOC_SINGLE */
+nope:
+	return PAGEPTR_INVALID;
+}
+
+DECL_END
+
+#undef ALLOC_MINMAX
+#undef ALLOC_BETWEEN
+#undef ALLOC_SINGLE
+

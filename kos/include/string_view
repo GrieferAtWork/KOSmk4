@@ -1,0 +1,285 @@
+/* Copyright (c) 2019 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef _CXX_STRING_VIEW
+#define _CXX_STRING_VIEW 1
+
+#include <__stdcxx.h>
+#include <hybrid/typecore.h>
+#include <hybrid/__assert.h>
+#include <hybrid/__minmax.h>
+#include <bits/c++/char_traits.h>
+#include <bits/c++/stl_iterator.h>
+
+__NAMESPACE_STD_BEGIN
+
+#ifdef __COMPILER_HAVE_CXX17_CONSTEXPR
+#define __CXX17_CONSTEXPR_ASSERT(expr) /* nothing */
+#else
+#define __CXX17_CONSTEXPR_ASSERT(expr) __hybrid_assertf(expr)
+#endif
+
+#if 0
+#define __cpp_lib_string_view 201603
+template<typename __CharT,
+         typename __Traits = ::std::char_traits<__CharT> >
+class basic_string_view
+{
+public:
+    /* types */
+    typedef __Traits                              traits_type;
+    typedef __CharT                               value_type;
+    typedef __CharT const                        *pointer;
+    typedef __CharT const                        *const_pointer;
+    typedef __CharT const                        &reference;
+    typedef __CharT const                        &const_reference;
+    typedef __CharT const                        *iterator;
+    typedef iterator                              const_iterator;
+    typedef std::reverse_iterator<const_iterator> reverse_iterator;
+    typedef reverse_iterator                      const_reverse_iterator;
+    typedef __SIZE_TYPE__                         size_type;
+    typedef __PTRDIFF_TYPE__                      difference_type;
+    __CXX_STATIC_CONST(__SIZE_TYPE__,npos = (__SIZE_TYPE__)-1);
+private:
+    __CharT const *__m_str;
+    size_t         __m_len;
+public:
+    __CXX17_CONSTEXPR basic_string_view() __CXX_NOEXCEPT: __m_len(0), __m_str(__NULLPTR) {}
+#ifdef __CXX_HAVE_DEFAULT_FUNCTIONS
+    __CXX17_CONSTEXPR basic_string_view(basic_string_view const &) __CXX_NOEXCEPT = default;
+    __CXX17_CONSTEXPR basic_string_view &operator = (basic_string_view const &) __CXX_NOEXCEPT = default;
+#else
+    __CXX17_CONSTEXPR basic_string_view(basic_string_view const &__other) __CXX_NOEXCEPT
+        : __m_str(__other.__m_str)
+        , __m_len(__other.__m_len)
+    {}
+    __CXX17_CONSTEXPR basic_string_view &
+    operator = (basic_string_view const &__other) __CXX_NOEXCEPT {
+        this->__m_str = __other.__m_str;
+        this->__m_len = __other.__m_len;
+        return *this;
+    }
+#endif
+    __CXX17_CONSTEXPR basic_string_view(__CharT const *__str) __CXX_NOEXCEPT
+        : __m_str(__str)
+        , __m_len(__str ? traits_type::length(__str) : 0)
+    {}
+    __CXX17_CONSTEXPR basic_string_view(__CharT const *__str, size_type __len) __CXX_NOEXCEPT
+         : __m_str(__str)
+         , __m_len(__len)
+    {}
+    __ATTR_WUNUSED __CXX17_CONSTEXPR const_iterator begin() const __CXX_NOEXCEPT { return this->__m_str; }
+    __ATTR_WUNUSED __CXX17_CONSTEXPR const_iterator end() const __CXX_NOEXCEPT { return this->__m_str + this->__m_len; }
+    __ATTR_WUNUSED __CXX17_CONSTEXPR const_iterator cbegin() const __CXX_NOEXCEPT { return this->__m_str; }
+    __ATTR_WUNUSED __CXX17_CONSTEXPR const_iterator cend() const __CXX_NOEXCEPT { return this->__m_str + this->__m_len; }
+    __ATTR_WUNUSED __CXX17_CONSTEXPR const_reverse_iterator rbegin() const __CXX_NOEXCEPT { return const_reverse_iterator(this->end()); }
+    __ATTR_WUNUSED __CXX17_CONSTEXPR const_reverse_iterator rend() const __CXX_NOEXCEPT { return const_reverse_iterator(this->begin()); }
+    __ATTR_WUNUSED __CXX17_CONSTEXPR const_reverse_iterator crbegin() const __CXX_NOEXCEPT { return const_reverse_iterator(this->end()); }
+    __ATTR_WUNUSED __CXX17_CONSTEXPR const_reverse_iterator crend() const __CXX_NOEXCEPT { return const_reverse_iterator(this->begin()); }
+    __ATTR_WUNUSED __CXX17_CONSTEXPR size_type size() const __CXX_NOEXCEPT { return this->__m_len; }
+    __ATTR_WUNUSED __CXX17_CONSTEXPR size_type length() const __CXX_NOEXCEPT { return this->__m_len; }
+    __ATTR_WUNUSED __CXX17_CONSTEXPR size_type max_size() const __CXX_NOEXCEPT { return (((size_type)-1) - (sizeof(size_type) + sizeof(void*))) / sizeof(value_type); }
+    __ATTR_WUNUSED __CXX17_CONSTEXPR bool empty() const __CXX_NOEXCEPT { return this->__m_len == 0; }
+    __ATTR_WUNUSED __CXX17_CONSTEXPR __CharT const &operator [] (size_type __pos) const __CXX_NOEXCEPT { __hybrid_assertf(__pos < this->__m_len,"%Iu >= %Iu",(__SIZE_TYPE__)__pos,(__SIZE_TYPE__)this->__m_len); return *(this->__m_str + __pos); }
+    __ATTR_WUNUSED __CXX17_CONSTEXPR __CharT const &at(size_type __pos) const {
+     if __unlikely(__pos >= this->__m_len)
+        __throw_out_of_range_fmt("basic_string_view::at: pos (%Iu) >= this->size() (%Iu)",__pos,this->__m_len);
+     return *(this->__m_str + __pos);
+    }
+    __CXX17_CONSTEXPR __CharT const &front() const __CXX_NOEXCEPT { __CXX17_CONSTEXPR_ASSERT(this->__m_len != 0); return *this->__m_str; }
+    __CXX17_CONSTEXPR __CharT const &back() const __CXX_NOEXCEPT { __CXX17_CONSTEXPR_ASSERT(this->__m_len != 0); return *(this->__m_str + this->__m_len - 1); }
+    __CXX17_CONSTEXPR __CharT const *data() const __CXX_NOEXCEPT { return this->__m_str; }
+    __CXX17_CONSTEXPR void remove_prefix(size_type __num_chars) __CXX_NOEXCEPT { __hybrid_assert(this->__m_len >= __num_chars); this->__m_str += __num_chars; this->__m_len -= __num_chars; }
+    __CXX17_CONSTEXPR void remove_suffix(size_type __num_chars) __CXX_NOEXCEPT { __hybrid_assert(this->__m_len >= __num_chars); this->__m_len -= __num_chars; }
+    __CXX17_CONSTEXPR void swap(basic_string_view &__other) __CXX_NOEXCEPT { basic_string_view __temp = *this; *this = __other; __other = __temp; }
+    size_type copy(__CharT *__dst, size_type __num_chars, size_type __offset = 0) const {
+     size_type const __rlen = __hybrid_min(__num_chars,this->__m_len - __offset);
+     __hybrid_assert(__dst || !__num_chars);
+     if (__offset + __rlen > this->__m_len)
+         __throw_out_of_range_fmt("basic_string_view::copy: pos (%Iu) >= this->size() (%Iu)",__offset,this->__m_len);
+     traits_type::copy(__dst,this->__m_str + __offset,__rlen);
+     return __rlen;
+    }
+    __CXX17_CONSTEXPR basic_string_view
+      substr(size_type __pos = 0, size_type __n = npos) const __CXX_NOEXCEPT(false)
+      {
+	__pos = _M_check(__pos, "basic_string_view::substr");
+	const size_type __rlen = std::min(__n, __m_len - __pos);
+	return basic_string_view{__m_str + __pos, __rlen};
+      }
+
+      __CXX17_CONSTEXPR int
+      compare(basic_string_view __str) const __CXX_NOEXCEPT
+      {
+	const size_type __rlen = std::min(this->__m_len, __str.__m_len);
+	int __ret = traits_type::compare(this->__m_str, __str.__m_str, __rlen);
+	if (__ret == 0)
+	  __ret = _S_compare(this->__m_len, __str.__m_len);
+	return __ret;
+      }
+
+      __CXX17_CONSTEXPR int
+      compare(size_type __pos1, size_type __n1, basic_string_view __str) const
+      { return this->substr(__pos1, __n1).compare(__str); }
+
+      __CXX17_CONSTEXPR int
+      compare(size_type __pos1, size_type __n1,
+	      basic_string_view __str, size_type __pos2, size_type __n2) const
+      {
+	return this->substr(__pos1, __n1).compare(__str.substr(__pos2, __n2));
+      }
+
+      __CXX17_CONSTEXPR int
+      compare(const __CharT* __str) const __CXX_NOEXCEPT
+      { return this->compare(basic_string_view{__str}); }
+
+      __CXX17_CONSTEXPR int
+      compare(size_type __pos1, size_type __n1, const __CharT* __str) const
+      { return this->substr(__pos1, __n1).compare(basic_string_view{__str}); }
+
+      __CXX17_CONSTEXPR int
+      compare(size_type __pos1, size_type __n1,
+	      const __CharT* __str, size_type __n2) const __CXX_NOEXCEPT(false)
+      {
+	return this->substr(__pos1, __n1)
+		   .compare(basic_string_view(__str, __n2));
+      }
+
+      __CXX17_CONSTEXPR size_type
+      find(basic_string_view __str, size_type __pos = 0) const __CXX_NOEXCEPT
+      { return this->find(__str.__m_str, __pos, __str.__m_len); }
+
+      __CXX17_CONSTEXPR size_type
+      find(__CharT __c, size_type __pos = 0) const __CXX_NOEXCEPT;
+
+      __CXX17_CONSTEXPR size_type
+      find(const __CharT* __str, size_type __pos, size_type __n) const __CXX_NOEXCEPT;
+
+      __CXX17_CONSTEXPR size_type
+      find(const __CharT* __str, size_type __pos = 0) const __CXX_NOEXCEPT
+      { return this->find(__str, __pos, traits_type::length(__str)); }
+
+      __CXX17_CONSTEXPR size_type
+      rfind(basic_string_view __str, size_type __pos = npos) const __CXX_NOEXCEPT
+      { return this->rfind(__str.__m_str, __pos, __str.__m_len); }
+
+      __CXX17_CONSTEXPR size_type
+      rfind(__CharT __c, size_type __pos = npos) const __CXX_NOEXCEPT;
+
+      __CXX17_CONSTEXPR size_type
+      rfind(const __CharT* __str, size_type __pos, size_type __n) const __CXX_NOEXCEPT;
+
+      __CXX17_CONSTEXPR size_type
+      rfind(const __CharT* __str, size_type __pos = npos) const __CXX_NOEXCEPT
+      { return this->rfind(__str, __pos, traits_type::length(__str)); }
+
+      __CXX17_CONSTEXPR size_type
+      find_first_of(basic_string_view __str, size_type __pos = 0) const __CXX_NOEXCEPT
+      { return this->find_first_of(__str.__m_str, __pos, __str.__m_len); }
+
+      __CXX17_CONSTEXPR size_type
+      find_first_of(__CharT __c, size_type __pos = 0) const __CXX_NOEXCEPT
+      { return this->find(__c, __pos); }
+
+      __CXX17_CONSTEXPR size_type
+      find_first_of(const __CharT* __str, size_type __pos, size_type __n) const __CXX_NOEXCEPT;
+
+      __CXX17_CONSTEXPR size_type
+      find_first_of(const __CharT* __str, size_type __pos = 0) const __CXX_NOEXCEPT
+      { return this->find_first_of(__str, __pos, traits_type::length(__str)); }
+
+      __CXX17_CONSTEXPR size_type
+      find_last_of(basic_string_view __str,
+		   size_type __pos = npos) const __CXX_NOEXCEPT
+      { return this->find_last_of(__str.__m_str, __pos, __str.__m_len); }
+
+      __CXX17_CONSTEXPR size_type
+      find_last_of(__CharT __c, size_type __pos=npos) const __CXX_NOEXCEPT
+      { return this->rfind(__c, __pos); }
+
+      __CXX17_CONSTEXPR size_type
+      find_last_of(const __CharT* __str, size_type __pos,
+		   size_type __n) const __CXX_NOEXCEPT;
+
+      __CXX17_CONSTEXPR size_type
+      find_last_of(const __CharT* __str, size_type __pos = npos) const __CXX_NOEXCEPT
+      { return this->find_last_of(__str, __pos, traits_type::length(__str)); }
+
+      __CXX17_CONSTEXPR size_type
+      find_first_not_of(basic_string_view __str,
+			size_type __pos = 0) const __CXX_NOEXCEPT
+      { return this->find_first_not_of(__str.__m_str, __pos, __str.__m_len); }
+
+      __CXX17_CONSTEXPR size_type
+      find_first_not_of(__CharT __c, size_type __pos = 0) const __CXX_NOEXCEPT;
+
+      __CXX17_CONSTEXPR size_type
+      find_first_not_of(const __CharT* __str,
+			size_type __pos, size_type __n) const __CXX_NOEXCEPT;
+
+      __CXX17_CONSTEXPR size_type
+      find_first_not_of(const __CharT* __str, size_type __pos = 0) const __CXX_NOEXCEPT
+      {
+	return this->find_first_not_of(__str, __pos,
+				       traits_type::length(__str));
+      }
+
+      __CXX17_CONSTEXPR size_type
+      find_last_not_of(basic_string_view __str,
+		       size_type __pos = npos) const __CXX_NOEXCEPT
+      { return this->find_last_not_of(__str.__m_str, __pos, __str.__m_len); }
+
+      __CXX17_CONSTEXPR size_type
+      find_last_not_of(__CharT __c, size_type __pos = npos) const __CXX_NOEXCEPT;
+
+      __CXX17_CONSTEXPR size_type
+      find_last_not_of(const __CharT* __str,
+		       size_type __pos, size_type __n) const __CXX_NOEXCEPT;
+
+      __CXX17_CONSTEXPR size_type
+      find_last_not_of(const __CharT* __str,
+		       size_type __pos = npos) const __CXX_NOEXCEPT
+      {
+	return this->find_last_not_of(__str, __pos,
+				      traits_type::length(__str));
+      }
+
+      __CXX17_CONSTEXPR size_type
+      _M_check(size_type __pos, const char* __s) const __CXX_NOEXCEPT(false)
+      {
+	if (__pos > this->size())
+	  __throw_out_of_range_fmt(__N("%s: __pos (which is %zu) > "
+				       "this->size() (which is %zu)"),
+				   __s, __pos, this->size());
+	return __pos;
+      }
+
+      // NB: _M_limit doesn't check for a bad __pos value.
+      __CXX17_CONSTEXPR size_type
+      _M_limit(size_type __pos, size_type __off) const __CXX_NOEXCEPT
+      {
+	const bool __testoff =  __off < this->size() - __pos;
+	return __testoff ? __off : this->size() - __pos;
+      }
+
+};
+#endif
+
+__NAMESPACE_STD_END
+
+#endif /* !_CXX_STRING_VIEW */

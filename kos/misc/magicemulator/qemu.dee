@@ -1,0 +1,449 @@
+/* Copyright (c) 2019 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifdef __WINDOWS__
+#define HOST_EXE(x)  x ".exe"
+#else
+#define HOST_EXE(x)  x
+#endif
+
+
+import * from deemon;
+import * from errors;
+import * from ..libmagic.libmagic;
+import * from ..libmagic.steps.mtools;
+import opt = .options;
+import fs;
+import ipc;
+
+function normalizeFilenameForLog(filename: string | Bytes): string {
+	if (filename !is string)
+		filename = filename.decode("utf-8");
+#ifdef __WINDOWS__
+	filename = fs.abspath(normalizePath(filename, false), ROOTDIR)
+		.replace("/", "\\");
+	if (filename && filename.islower(0)) {
+		local drive_pos = filename.find(":");
+		if (drive_pos >= 0) {
+			filename =
+				filename[:drive_pos].upper() +
+				filename[drive_pos:];
+		}
+	}
+	return filename;
+#else
+	return fs.abspath(normalizePath(filename, false), ROOTDIR);
+#endif
+}
+
+function enumerateQEmuInstallationLocations(): {string...} {
+#ifdef __WINDOWS__
+	yield "D:\\qemu";
+	yield "D:\\apps\\qemu";
+#endif
+	yield fs.environ["PATH"].split(fs.DELIM)...;
+}
+
+
+class Addr2line {
+
+	private final member proc: ipc.Process;
+	private final member reader: File;
+	private final member writer: File;
+
+	this(config: Config, hostFile: string) {
+		proc = ipc.Process(
+			HOST_EXE(config.CROSS_PREFIX + "addr2line"),
+			{ "-ife", hostFile });
+		local proc_stdin, proc_stdout;
+		/* Create pipes for communicating with addr2line */
+		proc_stdin, writer = ipc.Pipe.new()...;
+		reader, proc_stdout = ipc.Pipe.new()...;
+		reader = File.Buffer(reader, "ro,c,none"); /* line-buffered */
+		proc.stdin = proc_stdin;
+		proc.stdout = proc_stdout;
+		proc.start();
+		proc_stdin.close();
+		proc_stdout.close();
+	}
+
+	@@Convert a given address to a (filename, line, function) triple
+	function addr2line(addr: int | string): {(string, string, string)...} {
+		writer.write("{}\n".format({
+			addr is string
+				? addr
+				: addr.hex()
+		}));
+		local text = reader.read();
+		while (text) {
+			local func,data;
+			func, none, text = text.partition("\n")...;
+			data, none, text = text.partition("\n")...;
+			local filename, line = data.scanf("%[^:]:%[A-Fa-f0-9]")...;
+			filename = filename.strip();
+			line = line.strip();
+			filename = normalizeFilenameForLog(filename);
+			yield (filename, line, func.strip());
+		}
+	}
+	function close() {
+		try writer.close(); catch (...);
+		try reader.close(); catch (...);
+		try proc.terminate(); catch (...);
+	}
+	~this() {
+		close();
+	}
+}
+
+function printFormattedAddr2line(
+		outFile: File, format: string,
+		file: string, line: string,
+		func: string, addr: string) {
+	for (local i = 0; i < #format; ++i) {
+		local ch = format[i];
+		if (ch != "%" || i == #format-1)
+			outFile.write(ch);
+		else {
+			++i;
+			ch = format[i];
+			if (ch == "f") {
+				outFile.write(file);
+			} else if (ch == "l") {
+				outFile.write(str line);
+			} else if (ch == "c") {
+				outFile.write("0");
+			} else if (ch == "n") {
+				outFile.write(func);
+			} else if (ch == "<") {
+				outFile.write("0");
+			} else if (ch == ">") {
+				outFile.write("0");
+			} else if (ch == "p") {
+				outFile.write(addr.upper().lsstrip("0X"));
+			} else {
+				outFile.write("%"+ch);
+			}
+		}
+	}
+}
+
+#define FINAL_FORMAT_RAW_DATA(x)  x
+
+function start(
+		groups: {Group...},
+		config: Config,
+		binPath: string,
+		kernelFile: string,
+		targetArch: string,
+		targetCpu: string,
+		diskFile: string,
+		options: {string: Object}) {
+	local qemu = options.get(opt.QEMU_EXE)
+#ifdef __WINDOWS__
+		.replace("\\","/")
+#endif
+		;
+	if (qemu is none) {
+		qemu = "qemu-system-" + targetArch
+#ifdef __WINDOWS__
+			+ ".exe"
+#endif
+		;
+	}
+	if ("/" !in qemu) {
+		for (local x: enumerateQEmuInstallationLocations()) {
+			local fullPath = fs.joinpath(x,qemu);
+			if (fs.stat.isreg(fullPath)) {
+				qemu = fullPath;
+				goto got_exe;
+			}
+		}
+		print "Failed to locate:", repr qemu;
+		throw Error("Cannot locate qemu binary");
+	}
+got_exe:
+	local qemu_arguments = [];
+	qemu_arguments.extend({ "-serial", "stdio" });
+	if (options.get(opt.QEMU_HOSTED, true))
+		qemu_arguments.extend({ "-no-reboot", "-no-shutdown" });
+	local gdb_mode = options.get(opt.QEMU_GDB);
+	if (gdb_mode !is none) {
+		if (gdb_mode == "stub") {
+			/* Make use of out GDB-stub driver */
+			qemu_arguments.extend({
+				"-serial", "tcp::1234,server",
+				"-initrd", binPath + "/os/drivers/gdbstub transport=serial:0x2f8:0xf3",
+			});
+		} else if (gdb_mode == "qemu") {
+			/* Use qemu's builtin GDB support */
+			/* Make use of out GDB-stub driver */
+//			qemu_arguments.extend({
+//				"-serial", "tcp::1235,server",
+//				"-initrd", binPath + "/os/drivers/gdbstub transport=serial:0x2f8:0xf3",
+//			});
+			qemu_arguments.extend({ "-s", "-S" });
+		} else {
+			throw Error("Invalid GDB mode: " + repr gdb_mode);
+		}
+	}
+	if (targetArch == "x86_64") {
+		/* TODO: Must create+use a custom kernel binary with e_machine = EM_386 */
+	}
+	qemu_arguments.extend({
+		"-kernel", kernelFile,
+//		"-initrd", "bin/i386-kos/drivers/ext2fs e f g h",
+		"-drive", "file=" + diskFile + ",format=raw,index=0,media=disk",
+#if 0
+		"-drive", "file=bin/Postal2.iso,format=raw,index=1,media=disk",
+		"-drive", "file=bin/ext2.img,format=raw,index=2,media=disk",
+#endif
+		"-smp", "2",
+		"-display", "gtk",
+		"-device", "isa-debug-exit,iobase=0xf4,iosize=0x04",
+//		"-d", "int",
+//		"-netdev", tap ? "tap,ifname=tap0,id=u1" : "user,id=u1",
+//		"-device", "ne2k_pci,netdev=u1",
+//		"-object", "filter-dump,id=f1,netdev=u1,file=dump.dat",
+//		"-net", "nic,model=rtl8139", "-net", "user",
+//		"-net", "nic,model=ne2k_pci", "-net", "user",
+		"-vga", "std",
+	});
+	local cmdline = options.get(opt.QEMU_CMDLINE);
+	if (cmdline) {
+		print "QEMU_CMDLINE",repr(cmdline);
+		qemu_arguments.append("-append");
+		qemu_arguments.append(cmdline);
+	}
+	local proc = ipc.Process(qemu, qemu_arguments);
+	local r, w = ipc.Pipe.new()...;
+	proc.stdout = w;
+	proc.stderr = w;
+	proc.start();
+	w.close();
+#undef CONFIG_POSTPROCESS_QEMU_SERIAL_OUTPUT
+#define CONFIG_POSTPROCESS_QEMU_SERIAL_OUTPUT 1
+#ifndef CONFIG_POSTPROCESS_QEMU_SERIAL_OUTPUT
+	while (local text = r.read(1)) {
+		File.stdout << text;
+		File.stdout.sync();
+	}
+#else /* !CONFIG_POSTPROCESS_QEMU_SERIAL_OUTPUT */
+	local outFile = File.stddbg;
+	final local MAX_COMMAND_LENGTH = 512;
+	local running_addr2line: {string: Addr2line} = Dict();
+	local stored_data = Cell();
+	function writeData(data: Bytes) {
+		if (stored_data.value is bound) {
+			data = stored_data.value + data;
+			del stored_data.value;
+		}
+		local flushStart = 0;
+		local i = 0;
+		for (;;) {
+			local pos = data.find(") :", i);
+			if (pos < 0)
+				break;
+			local lineStart = data.rfind("\n", flushStart, pos);
+			if (lineStart >= 0) {
+				++lineStart;
+do_format_line:
+				local line = data[lineStart:pos];
+				if (line.isanyspace() || "(" !in line) {
+					i = pos + 3;
+					continue;
+				}
+				/* Clickable line directive (must normalize the path) */
+				outFile.write(FINAL_FORMAT_RAW_DATA(data[flushStart:lineStart]));
+				local filename, none, line = line.partition("(")...;
+				filename = normalizeFilenameForLog(filename);
+				outFile.write(filename);
+				outFile.write("(");
+				outFile.write(line);
+				flushStart = pos;
+			} else if (flushStart == 0) {
+				lineStart = 0;
+				goto do_format_line;
+			}
+			i = pos + 3;
+		}
+		local lineEnd = data.rfind("\n", flushStart);
+		local savedData;
+		if (lineEnd < 0) {
+			savedData = data[flushStart:];
+		} else {
+			++lineEnd;
+			outFile.write(FINAL_FORMAT_RAW_DATA(data[flushStart:lineEnd]));
+			savedData = data[lineEnd:];
+		}
+		if (savedData)
+			stored_data.value = savedData;
+	}
+	while (local text = r.read()) {
+		local flushStart = 0;
+		local len = #text;
+		for (;;) {
+			local i = text.find("%", flushStart);
+			if (i < 0)
+				break;
+			writeData(text[flushStart:i]);
+			++i;
+			flushStart = i;
+			if (i >= len) {
+				flushStart = i = 0;
+				text = r.read();
+				if (!text) {
+					writeData("%");
+					goto done_join;
+				}
+				len = #text;
+			}
+			if (text.substr(i, i + 1) != "{") {
+				writeData("%");
+				continue;
+			} else {
+				++i;
+				if (i >= len) {
+					flushStart = i = 0;
+					text = r.read();
+					if (!text) {
+						writeData("%{");
+						goto done_join;
+					}
+					len = #text;
+				}
+again_find_match:
+				local end = text.findmatch("{", "}", i, i + MAX_COMMAND_LENGTH);
+				if (end < 0) {
+					if (len >= i + MAX_COMMAND_LENGTH) {
+						flushStart = i - 2;
+						goto do_flush_text;
+					}
+					local temp = r.read();
+					if (!temp) {
+						flushStart = i - 2;
+						goto do_flush_text;
+					}
+					text = text + temp;
+					len = #text;
+					goto again_find_match;
+				}
+				local command = text[i:end];
+				local argument = "";
+				if (":" in command)
+					command, none, argument = command.partition(":")...;
+				switch (command.strip()) {
+				case "artifact": {
+					local outfile, filesize = argument.scanf("%[^:]:%[^:]")...;
+					filesize = int(filesize);
+					with (local fp = File.open(
+							fs.joinpath(fs.headof(kernelFile), outfile), "w")) {
+						local temp = text[end + 1:];
+						local written = #temp;
+						if (written >= filesize) {
+							fp.write(temp[:filesize]);
+							flushStart = i = end + 1 + filesize;
+						} else {
+							fp.write(temp);
+							flushStart = i = len;
+						}
+						while (filesize > written) {
+							temp = r.read(filesize - written);
+							fp.write(temp);
+							written += #temp;
+						}
+					}
+				}	break;
+				case "vinfo": {
+					local binary, address, req_address;
+					binary, address, req_address, argument =
+						argument.scanf("%[^:]:%[^:]:%[^:]:%[^]")...;
+					binary = binary.replace("\\", "/").lstrip("/");
+					local a2l = running_addr2line.get(binary);
+					if (a2l is none) {
+						local host_binary = findDiskFileOrigin(groups, binary);
+						a2l = host_binary is none ? none : Addr2line(config, host_binary);
+						running_addr2line[binary] = a2l;
+					}
+					local is_first = true;
+					for (local file, line, func: a2l.addr2line(address)) {
+						if (!is_first)
+							writeData("\n");
+						printFormattedAddr2line(
+							outFile: outFile,
+							format: argument,
+							file: file,
+							line: line,
+							func: func,
+							addr: req_address);
+						is_first = false;
+					}
+				}	break;
+				case "vload":
+					argument = argument.replace("\\", "/").lstrip("/");
+					if (argument !in running_addr2line) {
+						local host_binary = findDiskFileOrigin(groups, argument);
+						local a2l = host_binary is none ? none : Addr2line(config, host_binary);
+						running_addr2line[argument] = a2l;
+					}
+					break;
+				default:
+					flushStart = i - 2;
+					goto do_flush_text;
+				}
+				flushStart = i = end + 1;
+			}
+		}
+do_flush_text:
+		writeData(text[flushStart:]);
+	}
+done_join:
+	if (stored_data.value is bound)
+		outFile.write(FINAL_FORMAT_RAW_DATA(stored_data.value));
+	for (local none, x: running_addr2line)
+		x.close();
+#endif /* CONFIG_POSTPROCESS_QEMU_SERIAL_OUTPUT */
+	joinProcess(proc);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

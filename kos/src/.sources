@@ -1,0 +1,174 @@
+/* Copyright (c) 2019 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+#define USELIB(x)          LIB(":" x ".so")
+#define USELIBGCC()        LIB("gcc") GCC_FLAGS({ "-static-libgcc" })
+#define STATIC_USELIB(x)   OBJECT({ "/" + BINPATH + "/lib/" x ".a" })
+#define STATIC_USELIBGCC() LIB("gcc") GCC_FLAGS({ "-static-libgcc" })
+
+#include "apps/.sources"
+
+/* Crt0 */
+BEGIN GROUP("libs.crt0") { COMPILE };
+	options[OPT_COMPILE_OBJFILE] = "/" + BINPATH + "/lib/crt0.o";
+	SOURCE({ "crt0/" + TARGET_XARCH + "/crt0_" + TARGET_BITS_PER_POINTER + ".S" })
+	SET_LANGUAGE("assembler-with-cpp")
+END
+BEGIN GROUP("libs.crt0") { COMPILE };
+	options[OPT_COMPILE_OBJFILE] = "/" + BINPATH + "/lib/crt0S.o";
+	SOURCE({ "crt0/" + TARGET_XARCH + "/crt0S_" + TARGET_BITS_PER_POINTER + ".S" })
+	SET_LANGUAGE("assembler-with-cpp")
+END
+
+/* kernel */
+#include "kernel/.sources"
+
+/* libdl */
+#include "libdl/.sources"
+
+/* libc */
+#include "libc/.sources"
+
+
+BEGIN GROUP("userspace._verify") { COMPILE };
+	SOURCE({
+		"_verify/arch/" + TARGET_XARCH + "/*.c",
+		"_verify/*.c",
+	})
+END
+
+
+/* Simple utility libraries */
+BEGIN
+	SET_SHARED()
+	SET_NOSTDLIB()
+	USELIB("libc")
+	STATIC_USELIBGCC()
+	STATIC_USELIB("libssp")
+#define DEFINE_SIMPLE_LIBRARY(name, ...) \
+	BEGIN GROUP("libs." name) { COMPILE, LINK, ARCHIVE, MCOPY }; \
+		SET_OUTPUT_DLL("/" + BINPATH + "/lib/" name)             \
+		SET_STATIC_OUTPUT("/" + BINPATH + "/lib/" name ".a")     \
+		SET_DISKFILE("/lib/" name ".so")                         \
+		SOURCE({ name "/" "*.c" })                               \
+		__VA_ARGS__                                              \
+	END
+#define DEFINE_SIMPLE_ARCH_LIBRARY(name, ...) \
+	BEGIN GROUP("libs." name) { COMPILE };                                                   \
+		SET_LANGUAGE("assembler-with-cpp")                                                   \
+		SOURCE({ name "/arch/" + TARGET_XARCH + "/" "*" + TARGET_BITS_PER_POINTER + ".S", }) \
+	END                                                                                      \
+	BEGIN GROUP("libs." name) { COMPILE };                                                   \
+		SOURCE({ name "/arch/" + TARGET_XARCH + "/" "*.c", name "/" "*.c" })                 \
+	END                                                                                      \
+	BEGIN GROUP("libs." name) { LINK, ARCHIVE, MCOPY };                                      \
+		SET_OUTPUT_DLL("/" + BINPATH + "/lib/" name)                                         \
+		SET_STATIC_OUTPUT("/" + BINPATH + "/lib/" name ".a")                                 \
+		SET_DISKFILE("/lib/" name ".so")                                                     \
+		SOURCE({                                                                             \
+			name "/arch/" + TARGET_XARCH + "/" "*" + TARGET_BITS_PER_POINTER + ".S",         \
+			name "/arch/" + TARGET_XARCH + "/" "*.c",                                        \
+			name "/" "*.c",                                                                  \
+		})                                                                                   \
+		__VA_ARGS__                                                                          \
+	END
+	DEFINE_SIMPLE_LIBRARY("libcmdline")
+	DEFINE_SIMPLE_LIBRARY("libdebuginfo")
+	DEFINE_SIMPLE_LIBRARY("libdemangle")
+	DEFINE_SIMPLE_LIBRARY("libdisasm")
+	DEFINE_SIMPLE_LIBRARY("libinstrlen")
+	DEFINE_SIMPLE_LIBRARY("libjson")
+	DEFINE_SIMPLE_LIBRARY("libm")
+	DEFINE_SIMPLE_LIBRARY("libansitty")
+	DEFINE_SIMPLE_LIBRARY("libbuffer", USELIB("libdl"))
+	DEFINE_SIMPLE_LIBRARY("libterm", USELIB("libbuffer"))
+	DEFINE_SIMPLE_LIBRARY("libkeymap")
+	DEFINE_SIMPLE_LIBRARY("libregex")
+
+//	DEFINE_SIMPLE_ARCH_LIBRARY("libstdc++")
+	DEFINE_SIMPLE_ARCH_LIBRARY("libunwind", USELIB("libdl"))
+	DEFINE_SIMPLE_ARCH_LIBRARY("librpc")
+	DEFINE_SIMPLE_ARCH_LIBRARY("libregdump", USELIB("libdl"))
+	DEFINE_SIMPLE_ARCH_LIBRARY("libcpustate")
+
+	if (TARGET_ARCH in ["i386", "x86_64"]) {
+		DEFINE_SIMPLE_LIBRARY("libvm86")
+	}
+
+	BEGIN GROUP("libs.libvideo-codec") { COMPILE, LINK, ARCHIVE, MCOPY };
+		SET_OUTPUT_DLL("/" + BINPATH + "/lib/libvideo-codec")
+		SET_STATIC_OUTPUT("/" + BINPATH + "/lib/libvideo-codec.a")
+		SET_DISKFILE("/lib/libvideo-codec.so")
+		SOURCE({ "libvideo/codec/*.c" })
+	END
+
+	BEGIN GROUP("libs.libvideo-gfx") { COMPILE, LINK, ARCHIVE, MCOPY };
+		SET_OUTPUT_DLL("/" + BINPATH + "/lib/libvideo-gfx")
+		SET_STATIC_OUTPUT("/" + BINPATH + "/lib/libvideo-gfx.a")
+		SET_DISKFILE("/lib/libvideo-gfx.so")
+		USELIB("libvideo-codec")
+		SOURCE({ "libvideo/gfx/*.c" })
+	END
+END
+
+
+/* libdlmalloc */
+BEGIN GROUP("libs.libdlmalloc") { COMPILE, LINK, ARCHIVE, MCOPY };
+	/* Use the C compiler, so we don't have to deal with c++ meta data... */
+	SET_LANGUAGE("c")
+	/* dlmalloc() has been heavily tested. - no need to turn on stack-smash protection! */
+	REMOVE_GCC_FLAGS("-fstack-protector-strong")
+	SET_OUTPUT_DLL("/" + BINPATH + "/lib/libdlmalloc")
+	SET_DISKFILE("/lib/libdlmalloc.so")
+	SET_STATIC_OUTPUT("/" + BINPATH + "/lib/libdlmalloc.a")
+	SET_SHARED()
+	SET_NOSTDLIB()
+	USELIB("libc")
+	STATIC_USELIBGCC()
+	SOURCE({ "libdlmalloc/*.c" })
+END
+
+
+/* Libssp */
+BEGIN GROUP("libs.libssp") { COPYFILE };
+	/* GCC expects a library `ssp_nonshared' in its library path... */
+	options[OPT_COPYFILE_SRC] = "/" + BINPATH + "/lib/libssp.a";
+	options[OPT_COPYFILE_DST] = "/" + BINPATH + "/lib/libssp_nonshared.a";
+END
+BEGIN GROUP("libs.libssp") { COMPILE, LINK, ARCHIVE, MCOPY };
+	/* Use the C compiler, so we don't have to deal with c++ meta data... */
+	SET_LANGUAGE("c")
+	/* Libssp is the one responsible for stack-smash-protection, so prevent
+	 * a dependency loop by getting rid of SSP within the library itself. */
+	REMOVE_GCC_FLAGS("-fstack-protector-strong")
+	SET_OUTPUT_DLL("/" + BINPATH + "/lib/libssp")
+	SET_DISKFILE("/lib/libssp.so")
+	SET_STATIC_OUTPUT("/" + BINPATH + "/lib/libssp.a")
+	SET_SHARED()
+	SET_NOSTDLIB()
+	USELIB("libc")
+	STATIC_USELIBGCC()
+	SOURCE({ "libssp/*.c" })
+END
+
+
+#include "misc/.sources"
+
+
+

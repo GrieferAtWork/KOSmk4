@@ -1,0 +1,86 @@
+/* Copyright (c) 2018 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+/* General purpose build steps, such as copying updated files */
+
+import fs;
+import * from deemon;
+import * from ..libmagic;
+import OPT_LINK_OUTPUT from .c;
+import ...libkeymap.compiler as libkeymap_compiler;
+
+@@Option: string
+@@Keymap definitions source filename
+global final OPT_KEYMAP_SRC = "KEYMAP.src";
+
+
+final local function KEYMAP_getOutputFilename(self: BoundStep): string {
+	local group = self.group;
+	local result = group.fixFilename(group.options[OPT_LINK_OUTPUT]);
+	if (result.endswith("/"))
+		result = result + fs.tailof(self.userData);
+	return result;
+}
+final local function KEYMAP_split(self: BoundStep): {BoundStep...} {
+	local group = self.group;
+	for (local f: group.enumerateWildcardFiles(group.options.get(OPT_KEYMAP_SRC))) {
+		yield self.createChildStep(f);
+	}
+}
+final local function KEYMAP_run(self: BoundStep): {Waitable...} {
+	local th = Thread([](self: BoundStep) {
+		libkeymap_compiler.compileKeymap(
+			self.userData,
+			KEYMAP_getOutputFilename(self));
+	}, (self, ));
+	th.start();
+	yield WaitableJoin(th);
+}
+final local function KEYMAP_tostr(self: BoundStep): string {
+	return "[{}] Link keymap file {!r} to {!r}".format({
+		self.group.name,
+		self.userData,
+		KEYMAP_getOutputFilename(self),
+	});
+}
+final local function KEYMAP_getRequiredFiles(self: BoundStep): {string...} {
+	yield self.userData;
+}
+final local function KEYMAP_getProducedFiles(self: BoundStep): {string...} {
+	yield KEYMAP_getOutputFilename(self);
+}
+
+
+@@KEYMAP
+@@A step used to compile a keymap definitions file into a KMP file
+global final KEYMAP = Step(
+	name: "KEYMAP",
+	options: {
+		OPT_KEYMAP_SRC,
+		OPT_LINK_OUTPUT,
+	},
+	split: KEYMAP_split,
+	run: KEYMAP_run,
+	tostr: KEYMAP_tostr,
+	getRequiredFiles: KEYMAP_getRequiredFiles,
+	getProducedFiles: KEYMAP_getProducedFiles,
+);
+
+
+

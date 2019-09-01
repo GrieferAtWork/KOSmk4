@@ -1,0 +1,83 @@
+/* Copyright (c) 2019 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef GUARD_LIBC_USER_BITS_SIGTHREAD_C
+#define GUARD_LIBC_USER_BITS_SIGTHREAD_C 1
+
+#include "../api.h"
+#include "bits.sigthread.h"
+
+DECL_BEGIN
+
+
+
+
+
+/*[[[start:implementation]]]*/
+
+/*[[[head:pthread_sigmask,hash:0x73fe30ac]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_sigmask") int
+NOTHROW_NCX(LIBCCALL libc_pthread_sigmask)(int how,
+                                           sigset_t const *__restrict newmask,
+                                           sigset_t *__restrict oldmask)
+/*[[[body:pthread_sigmask]]]*/
+{
+	CRT_UNIMPLEMENTED("pthread_sigmask"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return -1;
+}
+/*[[[end:pthread_sigmask]]]*/
+
+/*[[[head:pthread_kill,hash:0xc4c4c93c]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_kill") int
+NOTHROW_NCX(LIBCCALL libc_pthread_kill)(pthread_t threadid,
+                                        int signo)
+/*[[[body:pthread_kill]]]*/
+{
+	CRT_UNIMPLEMENTED("pthread_kill"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return -1;
+}
+/*[[[end:pthread_kill]]]*/
+
+/*[[[head:pthread_sigqueue,hash:0xd8d01490]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_sigqueue") int
+NOTHROW_NCX(LIBCCALL libc_pthread_sigqueue)(pthread_t threadid,
+                                            int signo,
+                                            union sigval const value)
+/*[[[body:pthread_sigqueue]]]*/
+{
+	CRT_UNIMPLEMENTED("pthread_sigqueue"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return -1;
+}
+/*[[[end:pthread_sigqueue]]]*/
+
+/*[[[end:implementation]]]*/
+
+
+
+/*[[[start:exports,hash:0x66a17911]]]*/
+DEFINE_PUBLIC_WEAK_ALIAS(pthread_sigmask, libc_pthread_sigmask);
+DEFINE_PUBLIC_WEAK_ALIAS(pthread_kill, libc_pthread_kill);
+DEFINE_PUBLIC_WEAK_ALIAS(pthread_sigqueue, libc_pthread_sigqueue);
+/*[[[end:exports]]]*/
+
+DECL_END
+
+#endif /* !GUARD_LIBC_USER_BITS_SIGTHREAD_C */

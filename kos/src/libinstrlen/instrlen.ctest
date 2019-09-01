@@ -1,0 +1,69 @@
+/* Copyright (c) 2019 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef GUARD_LIBINSTRLEN_INSTRLEN_CTEST
+#define GUARD_LIBINSTRLEN_INSTRLEN_CTEST 1
+#define _KOS_SOURCE 1
+
+#include <hybrid/compiler.h>
+#include <system-test/ctest.h>
+#include <kos/types.h>
+#include <kos/except.h>
+#include <stdlib.h>
+#include <dlfcn.h>
+#include <assert.h>
+#include <libinstrlen/instrlen.h>
+
+DECL_BEGIN
+
+DEFINE_TEST(instrlen_x86_prevent_jcc_regression) {
+	PRIVATE byte_t const code[] = {
+		0x74, 0x01,       /* je    . + 1 */
+		0xa4,             /* movsb */
+		0x5e,             /* popl  %esi */
+		0x5f,             /* popl  %edi */
+		0xc2, 0x0c, 0x00, /* ret   $0xc */
+	};
+	void *libinstrlen;
+	PINSTRUCTION_SUCC instruction_succ;
+	libinstrlen = dlopen(LIBINSTRLEN_LIBRARY_NAME, RTLD_LOCAL);
+	assertf(libinstrlen, "dlerror(): %s", dlerror());
+	*(void **)&instruction_succ = dlsym(libinstrlen, "instruction_succ");
+	assertf(instruction_succ, "dlerror(): %s", dlerror());
+
+#define ASSERT_EQ(a, b)                           \
+	do {                                          \
+		void const *_a = (a), *_b = (b);          \
+		assertf(_a == _b, "%p(+%Iu) == %p(+%Iu)", \
+		        _a, (byte_t *)_a - code,          \
+		        _b, (byte_t *)_b - code);         \
+	} __WHILE0
+	ASSERT_EQ(instruction_succ(code + 0), code + 2); /* je    . + 1 */
+	ASSERT_EQ(instruction_succ(code + 2), code + 3); /* movsb */
+	ASSERT_EQ(instruction_succ(code + 3), code + 4); /* popl  %esi */
+	ASSERT_EQ(instruction_succ(code + 4), code + 5); /* popl  %edi */
+	ASSERT_EQ(instruction_succ(code + 5), code + 8); /* ret   $0xc */
+#undef ASSERT_EQ
+
+	dlclose(libinstrlen);
+}
+
+
+DECL_END
+
+#endif /* !GUARD_LIBINSTRLEN_INSTRLEN_CTEST */

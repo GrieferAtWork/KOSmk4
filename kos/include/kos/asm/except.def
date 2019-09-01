@@ -1,0 +1,243 @@
+%{
+/* Copyright (c) 2019 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef _KOS_ASM_EXCEPT_H
+#define _KOS_ASM_EXCEPT_H 1
+
+#include <__stdinc.h>
+#include <hybrid/typecore.h>
+
+/* System (Hardware-generated) exception classes. */
+}
+
+
+[errno(EFAULT)][message("Segmentation fault")]
+@@Segmentation fault (invalid memory access)
+class E_SEGFAULT = 0xff00 {
+}
+
+[message("Attempted to access a faulty memory location")]
+class E_SEGFAULT_UNMAPPED     : E_SEGFAULT = 0x0001 {
+	@@The virtual memory address where the fault happened
+	member addr: void *;
+	@@Fault context (Set of `E_SEGFAULT_CONTEXT_*')
+	[tostr(flagset("E_SEGFAULT_CONTEXT_*"))]
+	member context: uintptr_t;
+}
+
+[message("Attempted to write to a read-only memory location")]
+class E_SEGFAULT_READONLY     : E_SEGFAULT = 0x0002 {
+	@@The virtual memory address where the fault happened
+	member addr: void *;
+	@@Fault context (Set of `E_SEGFAULT_CONTEXT_*')
+	[tostr(flagset("E_SEGFAULT_CONTEXT_*"))]
+	member context: uintptr_t;
+}
+[message("Attempted to read from a memory location that is not readable")]
+class E_SEGFAULT_NOTREADABLE  : E_SEGFAULT = 0x0003 {
+	@@The virtual memory address where the fault happened
+	member addr: void *;
+	@@Fault context (Set of `E_SEGFAULT_CONTEXT_*')
+	[tostr(flagset("E_SEGFAULT_CONTEXT_*"))]
+	member context: uintptr_t;
+}
+[message("Attempted to execute a non-executable memory location")]
+class E_SEGFAULT_NOTEXECUTABLE: E_SEGFAULT = 0x0004 {
+	@@The virtual memory address where the fault happened
+	member addr: void *;
+	@@Fault context (Set of `E_SEGFAULT_CONTEXT_*')
+	[tostr(flagset("E_SEGFAULT_CONTEXT_*"))]
+	member context: uintptr_t;
+}
+
+@@Faulty address
+const E_SEGFAULT_CONTEXT_FAULT    = 0x0001;
+@@FLAG: The fault happened during a write operation
+const E_SEGFAULT_CONTEXT_WRITING  = 0x0002;
+@@FLAG: The access was performed for user-space
+const E_SEGFAULT_CONTEXT_USERCODE = 0x0004;
+@@Non-canonical address
+const E_SEGFAULT_CONTEXT_NONCANON = 0x0008;
+@@Attempted to unmap an undefined memory address
+const E_SEGFAULT_CONTEXT_UNMAP    = 0x0010;
+
+
+%
+%
+%
+%
+
+[errno(EINVAL)][message("Breakpoint")]
+class E_BREAKPOINT = 0xff01 {}
+
+%
+%
+%
+%
+
+[errno(EINVAL)][message("Divide by zero")]
+class E_DIVIDE_BY_ZERO = 0xff02 {}
+
+%
+%
+%
+%
+
+[errno(EOVERFLOW)][message("Overflow")]
+class E_OVERFLOW = 0xff03 {}
+
+%
+%
+%
+%
+
+[errno(EPERM)][message("Illegal instruction")]
+@@Illegal/privileged/restricted instruction/register/operand/addressing mode or trap encountered
+class E_ILLEGAL_INSTRUCTION = 0xff04 {}
+
+[message("Unknown instruction")]
+@@The instruction opcode was not recognized
+class E_ILLEGAL_INSTRUCTION_BAD_OPCODE: E_ILLEGAL_INSTRUCTION = 0x0001 {
+	@@The opcode that caused the exception
+	member opcode: uintptr_t;
+}
+
+[message("Unsupported instruction")]
+@@The instruction's opcode is not supported by the host (not thrown if the instruction was emulated)
+class E_ILLEGAL_INSTRUCTION_UNSUPPORTED_OPCODE: E_ILLEGAL_INSTRUCTION = 0x0002 {
+	@@The opcode that caused the exception
+	member opcode: uintptr_t;
+}
+
+[message("Privileged instruction")]
+@@The calling code does not have the necessary privilege to invoke the instruction `opcode'
+class E_ILLEGAL_INSTRUCTION_PRIVILEGED_OPCODE: E_ILLEGAL_INSTRUCTION = 0x0003 {
+	@@The opcode that caused the exception
+	member opcode: uintptr_t;
+}
+
+[message("Invalid instruction operand")]
+@@An operand of the instruction is invalid
+class E_ILLEGAL_INSTRUCTION_BAD_OPERAND: E_ILLEGAL_INSTRUCTION = 0x0010 {
+	@@The opcode that caused the exception
+	member opcode: uintptr_t;
+	@@For what reason was the operand invalid (One of `E_ILLEGAL_INSTRUCTION_BAD_OPERAND_*')
+	[tostr(select("E_ILLEGAL_INSTRUCTION_BAD_OPERAND_*"))]
+	member what: uintptr_t;
+}
+@@Invalid addressing mode used with the instruction
+const E_ILLEGAL_INSTRUCTION_BAD_OPERAND_ADDRMODE = 0x0001;
+
+[message("Invalid register")]
+@@Attempted to access an invalid register `regno' (one of `<ARCH>_REGISTER_*')
+class E_ILLEGAL_INSTRUCTION_REGISTER: E_ILLEGAL_INSTRUCTION = 0x0011 {
+	@@The opcode that caused the exception
+	member opcode: uintptr_t;
+	@@How was the register accessed (One of `E_ILLEGAL_INSTRUCTION_REGISTER_*')
+	[tostr(select("E_ILLEGAL_INSTRUCTION_REGISTER_*"))]
+	member how: uintptr_t;
+	@@The accessed register index
+	member regno: uintptr_t;
+	@@The associated register value (or 0 for read operations)
+	member regval: uintptr_t;
+}
+@@Read from invalid register
+const E_ILLEGAL_INSTRUCTION_REGISTER_RDINV = 0x0001;
+@@Read from privileged register
+const E_ILLEGAL_INSTRUCTION_REGISTER_RDPRV = 0x0002;
+@@Write to invalid register
+const E_ILLEGAL_INSTRUCTION_REGISTER_WRINV = 0x0011;
+@@Write to privileged register
+const E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV = 0x0012;
+@@Bad value written to register
+const E_ILLEGAL_INSTRUCTION_REGISTER_WRBAD = 0x0013;
+
+@@The memory-accessing instruction was is not recognized for use in VIO
+class E_ILLEGAL_INSTRUCTION_VIO_UNRECOGNIZED     : E_ILLEGAL_INSTRUCTION = 0x1001 {
+	@@The opcode that caused the exception
+	member opcode: uintptr_t;
+	@@The virtual memory address that was accessed (or `NULL' if unknown)
+	member addr: void *;
+}
+@@The memory location addressed by a lock-prefixed instruction cannot operation as a `size'-wide atomic operation
+class E_ILLEGAL_INSTRUCTION_VIO_NONATOMIC_OPERAND: E_ILLEGAL_INSTRUCTION = 0x1002 {
+	@@The opcode that caused the exception
+	member opcode: uintptr_t;
+	@@The virtual memory address that was accessed
+	member addr: void *;
+	@@The number of bytes that were accessed atomically (usually one of 1,2,4 or 8)
+	member size: size_t;
+}
+@@Attempted to set a kernel-space ESP to an invalid value during a VIO operation (can only be thrown when the kernel accesses VIO memory)
+class E_ILLEGAL_INSTRUCTION_VIO_INVALID_KERNEL_SP: E_ILLEGAL_INSTRUCTION = 0x1011 {
+	@@The opcode that caused the exception
+	member opcode: uintptr_t;
+	@@The kernel SP value that was attempted to be assigned
+	member value: uintptr_t;
+}
+
+%
+%
+%
+%
+
+[errno(EFAULT)][message("Stack overflow")]
+@@Thrown in kernel space when: #PF->#DF with ESP/RSP below stack_base
+@@Thrown in user space when:   #PF ontop of a guard page with no remaining funds
+class E_STACK_OVERFLOW = 0xff05 {
+}
+
+%
+%
+%
+%
+
+[errno(ERANGE)]
+@@The BOUND instruction was executed with an out-of-bounds index
+class E_INDEX_ERROR = 0xff06 {}
+
+@@An index was outside of the min/max bounds
+class E_INDEX_ERROR_OUT_OF_BOUNDS: E_INDEX_ERROR = 0x0001 {
+	@@The addressed index
+	member index: intptr_t;
+	@@The low bound of valid indices
+	member min: intptr_t;
+	@@The high bound of valid indices
+	member max: intptr_t;
+}
+
+%
+%
+%
+%
+
+[errno(EFAULT)]
+@@The alignment of an operand was not valid
+class E_INVALID_ALIGNMENT = 0xff07 {}
+class E_INVALID_ALIGNMENT_POINTER: E_INVALID_ALIGNMENT = 0x0001 {
+	member addr: void *;
+	member req_alignment: size_t;
+}
+
+
+
+%{
+
+#endif /* !_KOS_ASM_EXCEPT_H */
+}

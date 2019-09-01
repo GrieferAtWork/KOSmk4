@@ -1,0 +1,268 @@
+/* Copyright (c) 2019 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+
+BEGIN
+	DEFINE("CONFIG_BUILDING_KERNEL_CORE")
+	SET_NOSTDLIB()
+
+	local KENREL_LIBDL_BINARY_SOURCE =
+		"arch/" + TARGET_XARCH + "/libdl-binary.S";
+	local KERNEL_ASM_SOURCES = [
+		"arch/" + TARGET_XARCH + "/*" + TARGET_BITS_PER_POINTER + ".S",
+		"arch/" + TARGET_XARCH + "/debugger/*" + TARGET_BITS_PER_POINTER + ".S",
+		"../../libc/hybrid/arch/" + TARGET_XARCH + "/*" + TARGET_BITS_PER_POINTER + ".S",
+		"../../libunwind/arch/" + TARGET_XARCH + "/*" + TARGET_BITS_PER_POINTER + ".S",
+		"../../libcpustate/arch/" + TARGET_XARCH + "/*" + TARGET_BITS_PER_POINTER + ".S",
+	];
+	local KERNEL_C_SOURCES = [
+		/* Include libc auto- and hybrid-sources */
+		"../../libc/auto/*.c",
+		"../../libc/hybrid/arch/" + TARGET_XARCH + "/*.c",
+		"../../libc/hybrid/*.c",
+
+		/* Compile a couple of user-space libraries as part of the kernel core */
+
+		/* Required for: Disasm integration within the debugger, and %[disasm] */
+		"../../libdisasm/*.c",
+
+		/* Required for: Addr2line support, and %[vinfo] */
+		"../../libdebuginfo/*.c",
+
+		/* Required for: Exception handlers to unify PC positions
+		 * (exceptions always point _after_ the faulting instruction) */
+		"../../libinstrlen/*.c",
+
+		/* Required for: Exception handling, as well as tracebacks */
+		"../../libunwind/arch/" + TARGET_XARCH + "/*.c",
+		"../../libunwind/*.c",
+
+		/* Required for: Kernel panic error logging */
+		"../../libregdump/arch/" + TARGET_XARCH + "/*.c",
+		"../../libregdump/*.c",
+
+		/* Required for: General purpose cpu state operations */
+		"../../libcpustate/arch/" + TARGET_XARCH + "/*.c",
+		"../../libcpustate/*.c",
+
+		/* Required for: High-level ANSI TTY escape codes (`\e[0m') */
+		"../../libansitty/*.c",
+
+		/* Required for: Low-level TTY support (`struct termios') */
+		"../../libterm/*.c",
+
+		/* Required for: Canonical line buffers and ring buffers (pipe(), readline(), etc.) */
+		"../../libbuffer/*.c",
+
+		/* Required for: Commandline decoding/encoding */
+		"../../libcmdline/*.c",
+
+		/* Required for: Config files/commandline decoding */
+		"../../libjson/*.c",
+
+		/* Required for: Keyboard key->character mappings */
+		"../../libkeymap/*.c",
+
+		/* Pull in the actual kernel sources */
+		"arch/" + TARGET_XARCH + "/*.c",
+		"arch/" + TARGET_XARCH + "/debugger/*.c",
+		"debugger/*.c",
+		"memory/*.c",
+		"memory/vm/*.c",
+		"dev/*.c",
+		"fs/*.c",
+		"misc/*.c",
+		"sched/*.c",
+		"drivers/*.c",
+		"user/*.c",
+	];
+
+	if (TARGET_ARCH in ["i386", "x86_64"]) {
+		/* Required for: Emulation of BIOS functions (especially on x86_64, where EFLAGS_VM doesn't work) */
+		KERNEL_C_SOURCES.append("../../libvm86/*.c");
+	}
+
+	/* This flag disables alignment that
+	 * would unnecessarily bloat the kernel. */
+	LD_FLAGS({
+		"--nmagic",
+		"--eh-frame-hdr",
+		"--gc-sections",
+
+		/* This following flag allows us to overlay sections,
+		 * which is required for PERXXX templates and offsets. */
+		"--no-check-sections",
+	})
+
+	BEGIN GROUP("kernel") { COMPILE };
+		SET_LANGUAGE("assembler-with-cpp")
+		SOURCE(KERNEL_ASM_SOURCES)
+	END
+	BEGIN GROUP("kernel") { COMPILE };
+		SOURCE(KERNEL_C_SOURCES)
+	END
+
+	/* Special case: Include the rtld-flat.bin binary blob within the kernel core.
+	 *               We do this by using a .incbin assembler directive, however in
+	 *               order to do so safely, the associated assembler source file
+	 *               needs to have an artificial dependency on rtld-flat.bin */
+	BEGIN GROUP("kernel") {
+			stepWithDependencies(COMPILE,
+				{ "/" + BINPATH + "/lib/libdl.rtld-flat.bin" }) };
+		SET_LANGUAGE("assembler-with-cpp")
+		SOURCE({ KENREL_LIBDL_BINARY_SOURCE })
+	END
+
+	final local KERNEL_FEATURES_HEADER =
+		"/kos/include/" + TARGET_XARCH + "-kos/crt-features/crt-kos-kernel" + CONFIG_FEATURE_FILE_SUFFIX + ".h";
+	final local KERNEL_EXPORTS_SOURCE =
+		"/kos/src/kernel/include/" + TARGET_XARCH + "-kos/kernel/arch/core-symbols" + CONFIG_FEATURE_FILE_SUFFIX + ".h";
+
+	BEGIN GROUP("kernel") { LINK, MCOPY, /* ELF_FLATTEN, */
+			enumerateSymbolsStep(
+				elfBinary: KERNEL_BINARY,
+				callback: [](self: BoundStep, symbols: {(string,string,string,string,string)...}) {
+					local symbols_map: {string: int} = Dict();
+					for (local symbolName,symbolType,symbolBind,
+					           symbolVisi,symbolSize,none: symbols) {
+						if (symbolVisi != "DEFAULT")
+							continue;
+						if (symbolBind != "GLOBAL" && symbolBind != "WEAK")
+							continue;
+						if (symbolType == "NOTYPE")
+							continue;
+						if (symbolName.startswith("kernel_") && (symbolName.endswith("_start") ||
+							symbolName.endswith("_end") || symbolName.endswith("_size")))
+							print "WARNING: Potentially unwanted kernel export:",repr symbolName;
+						symbols_map[symbolName] = int(symbolSize);
+					}
+					if ("kernel_symbol_table" !in symbols_map) {
+						/* Ensure that we're always exporting the kernel symbol table itself! */
+						symbols_map["kernel_symbol_table"] = 0; /* Filled later */
+					}
+					updateFileContents(self.group.fixFilename(KERNEL_FEATURES_HEADER),[](fp: File) {
+						fp << COPYRIGHT << "\n\n\n";
+						for (local x: symbols_map.keys.sorted())
+							fp << "#define __CRT_HAVE_" << x << " 1\n";
+					});
+					updateFileContents(self.group.fixFilename(KERNEL_EXPORTS_SOURCE),[](fp: File) {
+						/* Generate the hash-vector */
+						local R_SIZE32;
+						local PTR, U32;
+						if (TARGET_ARCH == "i386") {
+							PTR = U32 = ".long";
+							R_SIZE32 = "R_386_SIZE32";
+						} else if (TARGET_ARCH == "x86_64") {
+							PTR = ".quad";
+							U32 = ".int";
+							R_SIZE32 = "R_X86_64_SIZE32";
+						} else {
+							PTR = ".pointer";
+							U32 = ".uint32";
+							R_SIZE32 = none;
+						}
+						local hash_mask = 1;
+						while (hash_mask <= #symbols_map) {
+							hash_mask = (hash_mask << 1) | 1;
+						}
+						if ((hash_mask - #symbols_map) < 64)
+							hash_mask = (hash_mask << 1) | 1;
+						symbols_map["kernel_symbol_table"] =
+							TARGET_POINTER_SIZE + ((hash_mask + 1) * (8 + (2 * TARGET_POINTER_SIZE)));
+						@@Hash-vector of (name,size,hash)
+						local hash_vector: {(string,int,int) | none...} = [none] * (hash_mask + 1);
+						for (local name: symbols_map.keys) {
+							local hash = ElfSymbolHash(name);
+							local perturb,j;
+							perturb = j = hash & hash_mask;
+							for (;;) {
+								local index = j & hash_mask;
+								if (hash_vector[index] is none) {
+									hash_vector[index] = pack(name,symbols_map[name],hash);
+									break;
+								}
+								j = ((j << 2) + j + perturb + 1);
+								perturb = perturb >> 5;
+							}
+						}
+						fp << ".section .rodata.kernel_symtab\n"
+							"PUBLIC_OBJECT(kernel_symbol_table)\n"
+							"\t" << PTR << " " << hash_mask.hex() << "\n"
+							"\t/* Symbol table */\n";
+						for (local i: [:#hash_vector]) {
+							local data = hash_vector[i];
+							if (data is none) {
+								fp << "\t" << PTR << " 0 /* index: " << i << " */\n"
+								      "\t" << PTR << " 0\n"
+								      "\t" << U32 << " 0\n"
+								      "\t" << U32 << " 0\n";
+							} else {
+								local symbol_name = data[0];
+								/* Mark symbols as weak, so-as to allow them to-be removed without
+								 * causing a linker error during the first re-link pass. */
+								fp << "\t" << PTR << " .Lname" << i << " /* index: " << i << " */\n"
+								      "\t.weak " << symbol_name << "; " << PTR << " " << symbol_name << "\n";
+								if (R_SIZE32 !is none) {
+									fp << "\t.reloc ., " << R_SIZE32 << ", " << symbol_name << "; " << U32 << " 0\n";
+								} else {
+									fp << "\t" << U32 << " " << data[1].hex() << "\n";
+								}
+								fp << "\t" << U32 << " " << data[2].hex() << "\n";
+							}
+						}
+						fp << "END(kernel_symbol_table)\n"
+						      ".section .rodata.kernel_strtab\n";
+						for (local i: [:#hash_vector]) {
+							local data = hash_vector[i];
+							if (data is none) continue;
+							fp << ".Lname" << i << ":\n\t.string " << repr data[0] << "\n";
+						}
+					});
+				}
+			).withMaybeModifiedOutputFiles({
+				KERNEL_FEATURES_HEADER,
+				KERNEL_EXPORTS_SOURCE,
+			}),
+		};
+
+//		options[OPT_ELF_FLATTEN_OUTPUT] = KERNEL_FLAT_BINARY;
+//		if (TARGET_ARCH == "i386") {
+//			options[OPT_ELF_FLATTEN_PHYS_BASE] = 0x00100000; /* 1M */
+//			options[OPT_ELF_FLATTEN_VIRT_BASE] = 0xc0100000; /* 3G + 1M */
+//		} else if (TARGET_ARCH == "x86_64") {
+//			options[OPT_ELF_FLATTEN_PHYS_BASE] = 0;  /* TODO */
+//			options[OPT_ELF_FLATTEN_VIRT_BASE] = 0;  /* TODO */
+//		} else {
+//			options[OPT_ELF_FLATTEN_PHYS_BASE] = 0;
+//			options[OPT_ELF_FLATTEN_VIRT_BASE] = 0;
+//		}
+//		options[OPT_ELF_FLATTEN_KEEP_BSS] = true;
+//		options[OPT_ELF_FLATTEN_OVERRIDE_ENTRY] = true;
+
+		LINKER_SCRIPT("arch/" + TARGET_XARCH + "/_kernel.ld")
+		SET_OUTPUT(KERNEL_BINARY)
+		SET_DISKFILE("/os/kernel.bin")
+		STATIC_USELIBGCC()
+		SOURCE(KERNEL_ASM_SOURCES)
+		SOURCE(KERNEL_C_SOURCES)
+		SOURCE({ KENREL_LIBDL_BINARY_SOURCE })
+	END
+
+END
+

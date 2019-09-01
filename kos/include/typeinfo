@@ -1,0 +1,72 @@
+/* Copyright (c) 2019 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef _CXX_TYPEINFO
+#define _CXX_TYPEINFO 1
+
+#include <__stdcxx.h>
+#include <features.h>
+
+#include <bits/types.h>
+#include <bits/c++/bad_cast.h>
+#include <bits/c++/bad_typeid.h>
+
+#include <libc/string.h>
+
+__CXXDECL_BEGIN
+namespace __cxxabiv1 {
+class __class_type_info;
+}
+
+__NAMESPACE_STD_BEGIN
+class type_info {
+public:
+	virtual __LIBCCALL ~type_info();
+	__CXX_CLASSMEMBER char const *__LIBCCALL name() const __CXX_NOEXCEPT {
+		return __name[0] == '*' ? __name + 1 : __name;
+	}
+	/* In old abi, or when weak symbols are not supported, there can
+	 * be multiple instances of a type_info object for one
+	 * type. Uniqueness must use the _name value, not object address. */
+	bool __LIBCCALL before(type_info const &__other) const __CXX_NOEXCEPT;
+	bool __LIBCCALL operator==(type_info const &__other) const __CXX_NOEXCEPT;
+	__CXX_CLASSMEMBER bool __LIBCCALL operator!=(const type_info &__other) const __CXX_NOEXCEPT {
+		return !this->operator==(__other);
+	}
+#if defined(__USE_ISOCXX11) && 0 /* TODO */
+	__size_t __LIBCCALL hash_code() const __CXX_NOEXCEPT {
+		return _Hash_bytes(name(), __libc_strlen(name()), static_cast<__size_t>(0xc70f6907UL));
+	}
+#endif
+	/* Return true if this is a pointer type of some kind */
+	virtual bool __LIBCCALL __is_pointer_p() const;
+	/* Return true if this is a function type */
+	virtual bool __LIBCCALL __is_function_p() const;
+	virtual bool __LIBCCALL __do_catch(type_info const *__thr_type, void **__thr_obj, unsigned int __outer) const;
+	virtual bool __LIBCCALL __do_upcast(__cxxabiv1::__class_type_info const *__target, void **__obj_ptr) const;
+	__CXX_DELETE_COPY(type_info);
+	__CXX_DELETE_COPY_ASSIGN(type_info);
+protected:
+	char const *__name;
+	explicit __LIBCCALL type_info(char const *__n) __CXX_NOEXCEPT: __name(__n) {}
+};
+
+__NAMESPACE_STD_END
+__CXXDECL_END
+
+#endif /* !_CXX_TYPEINFO */

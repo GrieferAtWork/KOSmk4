@@ -1,0 +1,98 @@
+/* Copyright (c) 2019 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+%[default_impl_section(.text.crt.string.encrypt)]
+
+%{
+#include <features.h>
+
+/* Derived from GLibc: /usr/include/crypt.h */
+/*
+ * UFC-crypt: ultra fast crypt(3) implementation
+ *
+ * Copyright (C) 1991-2016 Free Software Foundation, Inc.
+ *
+ * The GNU C Library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * The GNU C Library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with the GNU C Library; if not, see
+ * <http://www.gnu.org/licenses/>.
+ *
+ * @(#)crypt.h	1.5 12/20/96
+ *
+ */
+
+__SYSDECL_BEGIN
+
+#ifdef __CC__
+}
+
+@@Setup DES tables according KEY
+setkey:([nonnull] char const *key);
+
+@@Encrypt at most 8 characters from KEY using salt to perturb DES
+[guard] crypt:([nonnull] char const *key, [nonnull] char const *salt) -> char *;
+
+@@Encrypt data in BLOCK in place if EDFLAG is zero; otherwise decrypt block in place
+[guard] encrypt:([nonnull] char *glibc_block, int edflag);
+
+%
+%#ifdef __USE_GNU
+%/* Reentrant versions of the functions above.
+% * The additional argument points to a structure where the results are placed in.  */
+%[push_macro @undef { keysched sb0 sb1 sb2 sb3 crypt_3_buf current_salt current_saltbits direction initialized }]%{
+struct crypt_data {
+	char             keysched[16 * 8];
+	char             sb0[32768];
+	char             sb1[32768];
+	char             sb2[32768];
+	char             sb3[32768];
+	/* end-of-aligment-critical-data */
+	char             crypt_3_buf[14];
+	char             current_salt[2];
+	__LONGPTR_TYPE__ current_saltbits;
+	__INT32_TYPE__   direction;
+	__INT32_TYPE__   initialized;
+};
+}%[pop_macro]
+%
+
+[doc_alias(crypt)]
+crypt_r:([nonnull] char const *key, [nonnull] char const *salt, [nonnull] struct crypt_data *__restrict data) -> char *;
+[doc_alias(setkey)]
+setkey_r:([nonnull] char const *key, [nonnull] struct crypt_data *__restrict data);
+[doc_alias(encrypt)]
+encrypt_r:([nonnull] char *glibc_block, int edflag, [nonnull] struct crypt_data *__restrict data);
+%#endif /* __USE_GNU */
+
+%{
+
+#endif /* __CC__ */
+
+__SYSDECL_END
+
+}

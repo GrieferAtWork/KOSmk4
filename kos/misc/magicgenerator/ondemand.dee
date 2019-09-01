@@ -1,0 +1,115 @@
+/* Copyright (c) 2019 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import fs;
+import ipc;
+import * from deemon;
+import * from ..libmagic.libmagic;
+
+
+function doRunDeemonScript(filename: string): ipc.Process {
+	/* TODO: generate_header.dee crashes deemon with other optimization levels...
+	 *       -> Fix whatever it is that is breaking the deemon core. */
+	local proc = ipc.Process("deemon", ["-O0", filename]);
+	proc.start();
+	return proc;
+}
+
+
+
+function doRunDeemonScriptIfFilesAreOutOfDate(
+		script: string, inputs: {string...}): (string, ipc.Process) | none {
+	assert inputs;
+	local latest = normalizePath(getLatestFilenameOf(script), false);
+	local oldestOutput = getLastModfiedTime(latest);
+	if (oldestOutput is none) {
+		print "[PRE] Running script", repr script, "because it hasn't been run, yet";
+		return (latest, doRunDeemonScript(script));
+	}
+	for (local x: inputs) {
+		x = normalizePath(x, false);
+		local tm = getLastModfiedTime(x);
+		if (tm > oldestOutput) {
+			print "[PRE] Running script", repr script, "because", repr x, "was changed";
+			return (latest, doRunDeemonScript(script));
+		}
+	}
+}
+
+function listQueryFiles(query: string): {string...} {
+	local head = fs.headof(query);
+	for (local x: fs.query(query)) {
+		yield "{}/{}".format({ head, x });
+	}
+}
+
+function runGenerateErrors(xarch_path: string): (string, ipc.Process) | none {
+	return doRunDeemonScriptIfFilesAreOutOfDate(
+		script: "kos/misc/magicgenerator/generate_error.dee",
+		inputs: {
+			"kos/include/kos/except.def",
+			"kos/include/kos/asm/except.def",
+			xarch_path + "/kos/asm/except.def",
+		}
+	);
+}
+
+function runGenerateSyscalls(xarch_path: string): (string, ipc.Process) | none {
+	return doRunDeemonScriptIfFilesAreOutOfDate(
+		script: "kos/misc/magicgenerator/generate_syscalls.dee",
+		inputs: {
+			xarch_path + "/asm/syscalls.def",
+		}
+	);
+}
+
+function runGenerateHeaders(): (string, ipc.Process) | none {
+	return doRunDeemonScriptIfFilesAreOutOfDate(
+		script: "kos/misc/magicgenerator/generate_headers.dee",
+		inputs: listQueryFiles("kos/src/libc/magic/*.c")
+	);
+}
+
+function updateAutomaticSourcesOnDemand(TARGET_XARCH: string, TARGET_ARCH: string, TARGET_POINTER_SIZE: int) {
+	local autoScripts: {(string, ipc.Process)...} = [];
+	function collect(x: (string, ipc.Process) | none) {
+		if (x !is none)
+			autoScripts.append(x);
+	}
+	local xarch_path = "kos/include/{}-kos".format({ TARGET_XARCH });
+
+	collect(runGenerateErrors(xarch_path));
+	collect(runGenerateSyscalls(xarch_path));
+	collect(runGenerateHeaders());
+
+	while (autoScripts) {
+		local latest, proc = autoScripts.pop()...;
+		joinProcess(proc);
+		File.open(latest, "wb").close();
+	}
+}
+
+
+
+
+
+
+
+
+

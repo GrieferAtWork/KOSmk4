@@ -1,0 +1,107 @@
+/* Copyright (c) 2019 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+#include <kernel/compiler.h>
+#include <asm/cfi.h>
+#include <kernel/paging.h>
+#include <asm/cpu-flags.h>
+#include <asm/instr/jccN.h>
+
+.section .text
+
+#define RELOAD_WITH_CR3_TEXTSIZE 7  /* == sizeof(x86_pagedir_syncall_cr3_text) */
+#define RELOAD_WITH_CR4_TEXTSIZE 16 /* == sizeof(x86_pagedir_syncall_cr4_text) */
+
+#define PAD_FOR(start, size) \
+	.if size > (.- start);   \
+	.skip size - (.- start); \
+	.endif;
+
+
+
+/* Same as `pagedir_syncall()', but also ensures that
+ * all of kernel-space is synced. */
+/* FUNDEF NOBLOCK void NOTHROW(FCALL pagedir_syncall)(void); */
+PUBLIC_FUNCTION(pagedir_syncall)
+	.cfi_startproc
+	movl   $2, %eax
+	invpcid 1f, %eax
+	ret
+1:	.long 0x00000000, 0x00000000
+	PAD_FOR(pagedir_syncall, RELOAD_WITH_CR3_TEXTSIZE)
+	PAD_FOR(pagedir_syncall, RELOAD_WITH_CR4_TEXTSIZE)
+	.cfi_endproc
+END(pagedir_syncall)
+
+/* Hybrid of `pagedir_syncall()' and `pagedir_syncall_user()': When the given range
+ * overlaps with kernel-space, behave the same as `pagedir_syncall()', otherwise,
+ * behave the same as `pagedir_syncall_user()' */
+/* FUNDEF NOBLOCK void NOTHROW(FCALL x86_pagedir_syncall_maybe_global)(VIRT vm_virt_t virt_addr, size_t num_pages); */
+PUBLIC_FUNCTION(x86_pagedir_syncall_maybe_global)
+	.cfi_startproc
+	shll   $12, %edx
+	addl   %edx, %ecx
+	jo8    pagedir_syncall /* sync up until, or past the end of the address space. */
+	cmpl   $(KERNEL_BASE), %ecx
+	ja8    pagedir_syncall
+	/* Only invalidate user-space. */
+	movl   %cr3, %eax
+	movl   %eax, %cr3
+	ret
+	PAD_FOR(x86_pagedir_syncall_maybe_global, RELOAD_WITH_CR3_TEXTSIZE)
+	.cfi_endproc
+END(x86_pagedir_syncall_maybe_global)
+
+
+/* X86-specific implementation for invalidating the TLB of a single page. */
+/* FUNDEF NOBLOCK void NOTHROW(FCALL x86_pagedir_syncone)(VIRT vm_virt_t virt_addr); */
+PUBLIC_FUNCTION(x86_pagedir_syncone)
+	.cfi_startproc
+	invlpg (%ecx)
+	ret
+	PAD_FOR(x86_pagedir_syncone, RELOAD_WITH_CR3_TEXTSIZE)
+	PAD_FOR(x86_pagedir_syncone, RELOAD_WITH_CR4_TEXTSIZE)
+	.cfi_endproc
+END(x86_pagedir_syncone)
+
+
+/* X86-specific implementation for invalidating every TLB over a given range. */
+/* FUNDEF NOBLOCK void NOTHROW(FCALL x86_pagedir_sync)(VIRT vm_virt_t virt_addr, size_t num_pages); */
+PUBLIC_FUNCTION(x86_pagedir_sync)
+	.cfi_startproc
+	cmpl   $(CONFIG_PAGEDIR_LARGESYNC_THRESHOLD), %edx
+	jae8   x86_pagedir_syncall_maybe_global
+	movl   %ecx, %eax
+	movl   %edx, %ecx
+	testl  %ecx, %ecx
+	jz8    2f
+1:	invlpg (%eax)
+	addl   $4096, %eax
+	loop   1b
+2:	ret
+	PAD_FOR(x86_pagedir_sync, RELOAD_WITH_CR3_TEXTSIZE)
+	PAD_FOR(x86_pagedir_sync, RELOAD_WITH_CR4_TEXTSIZE)
+	.cfi_endproc
+END(x86_pagedir_sync)
+
+
+
+
+
+

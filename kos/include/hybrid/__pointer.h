@@ -1,0 +1,115 @@
+/* Copyright (c) 2019 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef __GUARD_HYBRID___POINTER_H
+#define __GUARD_HYBRID___POINTER_H 1
+
+#include "../__stdinc.h"
+
+#ifdef _MSC_VER
+/* MSVC already has this kind of functionality built into the compiler. */
+#define __HYBRID_FUNCPTR32(return, cc, name, args) return (CC * __ptr32 name)args
+#define __HYBRID_FUNCPTR64(return, cc, name, args) return (CC * __ptr64 name)args
+#define __HYBRID_PTR32(T) T *__ptr32
+#define __HYBRID_PTR64(T) T *__ptr64
+#elif defined(__cplusplus)
+/* Use C++ features to implement fixed-length pointer types. */
+
+#include "typecore.h"
+#include "../__stdcxx.h"
+
+#undef __POINTER_CXX_CV_QUAL
+#undef __POINTER_CXX_IS_VOID
+
+#define __POINTER_CXX_CV_QUAL /* nothing */
+#include "__pointer-cxx-impl.h"
+#define __POINTER_CXX_CV_QUAL const
+#define __POINTER_CXX_CV_QUAL_IS_CONST 1
+#include "__pointer-cxx-impl.h"
+#define __POINTER_CXX_CV_QUAL volatile
+#define __POINTER_CXX_CV_QUAL_IS_VOLATILE 1
+#include "__pointer-cxx-impl.h"
+#define __POINTER_CXX_CV_QUAL const volatile
+#define __POINTER_CXX_CV_QUAL_IS_CONST 1
+#define __POINTER_CXX_CV_QUAL_IS_VOLATILE 1
+#include "__pointer-cxx-impl.h"
+
+#define __POINTER_CXX_IS_VOID 1
+#define __POINTER_CXX_CV_QUAL /* nothing */
+#include "__pointer-cxx-impl.h"
+
+/* Implement pointer difference operators for cases where the first operand is a regular pointer */
+extern "C++" {
+template<class __T, class __I> __CXX_CLASSMEMBER __PTRDIFF_TYPE__ operator-(__T *__lhs, __NAMESPACE_INT_SYM __hybrid_ptr<__T, __I> const &__rhs) __CXX_NOEXCEPT { return __lhs - (__T *)__rhs; }
+template<class __T, class __I> __CXX_CLASSMEMBER __PTRDIFF_TYPE__ operator-(__T *__lhs, __NAMESPACE_INT_SYM __hybrid_ptr<__T, __I> volatile const &__rhs) __CXX_NOEXCEPT { return __lhs - (__T *)__rhs; }
+template<class __T, class __I> __CXX_CLASSMEMBER __PTRDIFF_TYPE__ operator-(__T *__lhs, __NAMESPACE_INT_SYM __hybrid_ptr<__T const, __I> const &__rhs) __CXX_NOEXCEPT { return __lhs - (__T *)__rhs; }
+template<class __T, class __I> __CXX_CLASSMEMBER __PTRDIFF_TYPE__ operator-(__T *__lhs, __NAMESPACE_INT_SYM __hybrid_ptr<__T const, __I> volatile const &__rhs) __CXX_NOEXCEPT { return __lhs - (__T *)__rhs; }
+template<class __T, class __I> __CXX_CLASSMEMBER __PTRDIFF_TYPE__ operator-(__T *__lhs, __NAMESPACE_INT_SYM __hybrid_ptr<__T volatile, __I> const &__rhs) __CXX_NOEXCEPT { return __lhs - (__T *)__rhs; }
+template<class __T, class __I> __CXX_CLASSMEMBER __PTRDIFF_TYPE__ operator-(__T *__lhs, __NAMESPACE_INT_SYM __hybrid_ptr<__T volatile, __I> volatile const &__rhs) __CXX_NOEXCEPT { return __lhs - (__T *)__rhs; }
+template<class __T, class __I> __CXX_CLASSMEMBER __PTRDIFF_TYPE__ operator-(__T *__lhs, __NAMESPACE_INT_SYM __hybrid_ptr<__T const volatile, __I> const &__rhs) __CXX_NOEXCEPT { return __lhs - (__T *)__rhs; }
+template<class __T, class __I> __CXX_CLASSMEMBER __PTRDIFF_TYPE__ operator-(__T *__lhs, __NAMESPACE_INT_SYM __hybrid_ptr<__T const volatile, __I> volatile const &__rhs) __CXX_NOEXCEPT { return __lhs - (__T *)__rhs; }
+template<class __T, class __I> __CXX_CLASSMEMBER __PTRDIFF_TYPE__ operator-(__T const *__lhs, __NAMESPACE_INT_SYM __hybrid_ptr<__T, __I> const &__rhs) __CXX_NOEXCEPT { return __lhs - (__T *)__rhs; }
+template<class __T, class __I> __CXX_CLASSMEMBER __PTRDIFF_TYPE__ operator-(__T const *__lhs, __NAMESPACE_INT_SYM __hybrid_ptr<__T, __I> volatile const &__rhs) __CXX_NOEXCEPT { return __lhs - (__T *)__rhs; }
+template<class __T, class __I> __CXX_CLASSMEMBER __PTRDIFF_TYPE__ operator-(__T volatile *__lhs, __NAMESPACE_INT_SYM __hybrid_ptr<__T, __I> const &__rhs) __CXX_NOEXCEPT { return __lhs - (__T *)__rhs; }
+template<class __T, class __I> __CXX_CLASSMEMBER __PTRDIFF_TYPE__ operator-(__T volatile *__lhs, __NAMESPACE_INT_SYM __hybrid_ptr<__T, __I> volatile const &__rhs) __CXX_NOEXCEPT { return __lhs - (__T *)__rhs; }
+template<class __T, class __I> __CXX_CLASSMEMBER __PTRDIFF_TYPE__ operator-(__T const volatile *__lhs, __NAMESPACE_INT_SYM __hybrid_ptr<__T, __I> const &__rhs) __CXX_NOEXCEPT { return __lhs - (__T *)__rhs; }
+template<class __T, class __I> __CXX_CLASSMEMBER __PTRDIFF_TYPE__ operator-(__T const volatile *__lhs, __NAMESPACE_INT_SYM __hybrid_ptr<__T, __I> volatile const &__rhs) __CXX_NOEXCEPT { return __lhs - (__T *)__rhs; }
+}
+
+#if __SIZEOF_POINTER__ != 4
+#define __HYBRID_FUNCPTR32(return, cc, name, args) __HYBRID_PTR32(return (cc *)args) name
+#define __HYBRID_PTR32(T) __NAMESPACE_INT_SYM __hybrid_ptr< T, __ULONG32_TYPE__ >
+#else /* __SIZEOF_POINTER__ != 4 */
+#define __HYBRID_FUNCPTR32(return, cc, name, args) return (cc *name)args
+#define __HYBRID_PTR32(T) T *
+#endif /* __SIZEOF_POINTER__ == 4 */
+
+#if __SIZEOF_POINTER__ != 8
+#define __HYBRID_FUNCPTR64(return, cc, name, args) __HYBRID_PTR64(return (cc *)args) name
+#define __HYBRID_PTR64(T) __NAMESPACE_INT_SYM __hybrid_ptr< T, __ULONG64_TYPE__ >
+#else /* __SIZEOF_POINTER__ != 8 */
+#define __HYBRID_FUNCPTR64(return, cc, name, args) return (cc *name)args
+#define __HYBRID_PTR64(T) T *
+#endif /* __SIZEOF_POINTER__ == 8 */
+
+#else
+
+/* Fallback: Just replace references to pointer with sizes
+ *           that aren't matching the host with integer types. */
+#include "typecore.h"
+
+#if __SIZEOF_POINTER__ == 4
+#define __HYBRID_FUNCPTR32(return, cc, name, args) return (cc *name)args
+#define __HYBRID_FUNCPTR64(return, cc, name, args) __ULONG64_TYPE__ name
+#define __HYBRID_PTR32(T) T *
+#define __HYBRID_PTR64(T) __ULONG64_TYPE__
+#elif __SIZEOF_POINTER__ == 8
+#define __HYBRID_FUNCPTR32(return, cc, name, args) __ULONG32_TYPE__ name
+#define __HYBRID_FUNCPTR64(return, cc, name, args) return (cc *name)args
+#define __HYBRID_PTR32(T) __ULONG32_TYPE__
+#define __HYBRID_PTR64(T) T *
+#else
+#define __HYBRID_FUNCPTR32(return, cc, name, args) __ULONG32_TYPE__ name
+#define __HYBRID_FUNCPTR32(return, cc, name, args) __ULONG64_TYPE__ name
+#define __HYBRID_PTR32(T) __ULONG32_TYPE__
+#define __HYBRID_PTR64(T) __ULONG64_TYPE__
+#endif
+#endif
+
+
+#endif /* !__GUARD_HYBRID___POINTER_H */

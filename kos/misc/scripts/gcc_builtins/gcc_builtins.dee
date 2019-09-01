@@ -1,0 +1,454 @@
+global final COPYRIGHT =
+"/* Copyright (c) 2019 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */";
+import fs;
+import ipc;
+import * from deemon;
+import * from errors;
+
+final global ROOT = fs.headof(__FILE__);
+final global GCC = "E:\\home\\src\\git-gcc\\gcc";
+
+
+class GCCBuiltin {
+	this = default;
+	@@Name of the builtin
+	public member name: string;
+	@@Preprocessor expression that must be fulfilled for this builtin to be provided
+	public member cond: string | none = none;
+	public member usesLibc: bool = true;
+	public property mapByName: (string, GCCBuiltin) = {
+		get(): (string, GCCBuiltin) {
+			return (name, this);
+		}
+	}
+}
+
+
+function getGCCVersion(): string {
+	local a,b,c = File.open(
+		fs.joinpath(GCC, "gcc/BASE-VER"),
+		"r"
+	).read().decode("utf-8").strip().scanf("%d.%d.%d")...;
+	return (a,b,c);
+}
+
+function unescapeName(name: string): string {
+	return name.replace("\" \"","").decode("c-escape");
+}
+
+function replaceAll(s: string, f: string, r: string): string {
+	for (;;) {
+		local n = s.replace(f,r);
+		if (n == s)
+			return n;
+		s = n;
+	}
+}
+
+function getPreprocessorChecksFor(name: string, cond: string, version: (int,int,int)): string | none {
+	switch (cond) {
+
+	case "true":
+	case "1":
+		return "";
+
+	case "false":
+	case "0":
+		/* A couple of these aren't actually defined (for me...)
+		 * Maybe figure out when they actually get defined... */
+		if (name.startswith("__builtin__ITM_"))
+			break;
+		if (name.startswith("__builtin___hsail_"))
+			break;
+		if (name.startswith("__builtin_hsa_"))
+			break;
+		if (name in ["__builtin_cxa_end_cleanup"])
+			break;
+		return "";
+
+	case "flag_openacc":
+	case "flag_openacc || flag_offload_abi != OFFLOAD_ABI_UNSET":
+		return "defined(_OPENACC)";
+
+	case "flag_openmp || flag_openacc":
+	case "flag_openacc || flag_openmp":
+	case "flag_openacc || flag_openmp || flag_tree_parallelize_loops > 1 || flag_offload_abi != OFFLOAD_ABI_UNSET":
+		return "defined(_OPENACC) || defined(_OPENMP)";
+
+	case "flag_tm":
+		return "defined(__cpp_transactional_memory)";
+
+	default:
+		break;
+	}
+}
+
+function removeSurroundingParens(s: string): string {
+	while (s.startswith("(") && s.endswith(")") && s.findmatch("(",")",1) == #s - 1)
+		s = s[1:-1].strip();
+	return s;
+}
+
+
+
+function getGCCBuiltins(version: (int,int,int)): {string...} {
+	local proc = ipc.Process("cmd", { "/c",
+		"deemon -E " + fs.joinpath(GCC, "gcc/builtins.def")
+	});
+	local r,w = ipc.Pipe.new()...;
+	proc.stdout = w;
+	proc.start();
+	w.close();
+	local data = r.read();
+	r.close();
+	local error = proc.join();
+	if (error != 0)
+		throw Error("Process " + repr(proc) + " failed with " + error);
+	local i = 0;
+	local len = #data;
+	while (i < len) {
+		final local DEF = "DEF_BUILTIN";
+		i = data.find(DEF, i);
+		if (i < 0)
+			break;
+		i += #DEF;
+		i = data.find("(", i);
+		if (i < 0)
+			break;
+		++i;
+		local content_end = data.findmatch("(", ")", i);
+		if (content_end < 0)
+			break;
+		local content = data[i:content_end];
+		local parts = List(content.split(","));
+		if (#parts == 11) {
+			/* ENUM, NAME, CLASS, TYPE, LIBTYPE, BOTH_P, FALLBACK_P, NONANSI_P, ATTRS, IMPLICIT, COND */
+			local name = parts[1].strip();
+			if (!name.startswith("\""))
+				continue;
+			local usesLibc = removeSurroundingParens(parts[6].strip());
+			local usesLibc = usesLibc !in ["false", "0"];
+			name = unescapeName(name);
+			local c = parts[10].strip().replace("\t"," ");
+			c = replaceAll(c,"  ", " ");
+			c = removeSurroundingParens(c);
+			yield GCCBuiltin(name: name, cond: "?" + c, usesLibc: usesLibc);
+		} else {
+			print "Unknown argument count",#parts,"in",repr parts;
+		}
+	}
+}
+
+class GCCFeatureSet {
+	this = default;
+	public member version: (int,int,int);
+	public member builtins: {GCCBuiltin...};
+	
+	public property usableBuiltins: {GCCBuiltin...} = {
+		get(): {GCCBuiltin...} {
+			for (local b: builtins) {
+				if (b.cond is none || !b.cond.startswith("?"))
+					yield b;
+				else {
+					local c = getPreprocessorChecksFor(b.name, b.cond[1:], version);
+					if (c !is none)
+						yield GCCBuiltin(b.name, c ? c : none, b.usesLibc);
+				}
+			}
+		}
+	}
+}
+
+function getFeatureSet(): GCCFeatureSet {
+	local version = getGCCVersion();
+	return GCCFeatureSet(
+		version: version,
+		builtins: getGCCBuiltins(version),
+	);
+}
+
+function getFeatureSetFilename(version: (int,int,int)) {
+	return "gcc_features/gcc.features." + ".".join(version) + ".h";
+}
+
+function createFeatureSetFile(feat: GCCFeatureSet) {
+	if (!fs.stat.isdir("gcc_features"))
+		fs.mkdir("gcc_features");
+	with (local fp = File.open(getFeatureSetFilename(feat.version), "w")) {
+		for (local b: feat.builtins) {
+			print fp: b.name,;
+			print fp: ":",;
+			print fp: b.usesLibc,;
+			print fp: ",",;
+			if (b.cond !is none) {
+				print fp: " ",;
+				print fp: repr(b.cond),;
+			}
+			print fp:;
+		}
+	}
+}
+
+function gitCheckout(commit: string) {
+	fs.chdir(GCC);
+	local proc = ipc.Process("git", { "checkout", commit });
+	proc.start();
+	local error = proc.join();
+	fs.chdir(ROOT);
+	if (error != 0)
+		throw Error("Process " + repr(proc) + " failed with " + error);
+}
+
+function loadVersionFeatures(commit: (string, (int,int,int))) {
+	print "Loading features for:", repr commit;
+	local ver = try getGCCVersion() catch (...) none;
+	if (ver is none || ver != commit[1])
+		gitCheckout(commit[0]);
+	local features = getFeatureSet();
+	assert features.version == commit[1], "Incorrect version";
+	createFeatureSetFile(features);
+}
+
+
+
+/* NOTE: Generate this list using `git log --follow -- gcc/BASE-VER' */
+local gccReleaseCommits: {(string, (int,int,int))...} = {
+	("70f448fa5347ba24e0916201dd8549bc16783ff0", (10, 0, 0)),
+	("feb90a0dd6fc4e12786dce8338f716253d50b545", (9, 0, 1)),
+	("949bc65ce4d0d7dd036ccfb279bffe63d02feee6", (9, 0, 0)),
+	("bd3a898090e445d324faf7390adc7fc0af10c17d", (8, 0, 1)),
+	("498621e8159c1f494a9b8a5f2c3e5225c74ed242", (8, 0, 0)),
+	("9f7481c9b5313a6e15a1b7e8a9c1410328e60076", (7, 0, 1)),
+	("72709ee77118abb12560a4aa7aecffd1b1262fe4", (7, 0, 0)),
+	("2d444913351f6386df286eef76e5b67e56fecf74", (6, 0, 0)),
+	("21f0203c9247d32365d3b87142629712f109262a", (5, 0, 0)),
+	("0be1362fd7481bfed545c517e4d889c3a32566f9", (4, 10, 0)),
+	("67f9d82180a9c46600a51dea0bfbefcc4602d692", (4, 9, 0)),
+	("f5c0f43306fffaa52aaed2805f819faf57baedcb", (4, 8, 0)),
+	("caec3e6702a2de35f632d0f1bd39af02182df0f2", (4, 7, 0)),
+	("2fb69c7ac1a474c30db3d9e3a3806cb623179203", (4, 6, 0)),
+	("08da3d21a203aaf9698c982fc8fc25f9788d9049", (4, 5, 0)),
+	("8d705311c5c80046444afea85585cb94d307aecd", (4, 4, 0)),
+	("782f6c8b1609769f2f94a74e5409bc91993c1cda", (4, 3, 0)),
+	("bb23e61120082b6643da44eb85ee331060bf8e42", (4, 2, 0)),
+};
+
+for (local x: gccReleaseCommits) {
+	if (!fs.stat.exists(getFeatureSetFilename(x[1])))
+		loadVersionFeatures(x);
+}
+
+
+function getFeatureSetFromFile(version: (int,int,int)): GCCFeatureSet {
+	local builtins = [];
+	with (local fp = File.open(getFeatureSetFilename(version), "r")) {
+		for (local l: fp) {
+			local name,none,cond = l.partition(":")...;
+			name = name.strip();
+			cond = cond.strip();
+			local usesLibc = false;
+			if (cond.startswith("false, ")) {
+				cond = cond[#"false, ":];
+			} else if (cond.startswith("true, ")) {
+				cond = cond[#"true, ":];
+				usesLibc = true;
+			}
+			if (cond)
+				cond = cond.decode("c-escape");
+			if (!cond)
+				cond = none;
+			builtins.append(GCCBuiltin(
+				name: name,
+				cond: cond,
+				usesLibc: usesLibc
+			));
+		}
+	}
+	return GCCFeatureSet(
+		version: version,
+		builtins: builtins);
+}
+
+function equal(a, b): bool {
+	return type(a) === type(b) && (a == b);
+}
+
+function printFeatureSetDiff(out: File, hasBuiltinKey: Callable, old: GCCFeatureSet, new: GCCFeatureSet) {
+	local oldBuiltins = old.usableBuiltins;
+	local newBuiltins = new.usableBuiltins;
+	local removed: {GCCBuiltin...} = [];
+	local changed: {(GCCBuiltin,GCCBuiltin)...} = [];
+	local added: {GCCBuiltin...} = [];
+	local oldMap = Dict(oldBuiltins.each.mapByName);
+	local newMap = Dict(newBuiltins.each.mapByName);
+	for (local x: oldBuiltins) {
+		if (x.name !in newMap)
+			removed.append(x);
+		else {
+			local n = newMap[x.name];
+			if (!equal(n.cond, x.cond)) {
+				changed.append((x, n));
+			}
+		}
+	}
+	for (local x: newBuiltins) {
+		if (x.name !in oldMap)
+			added.append(x);
+	}
+	local prevCond = Cell(none);
+	function isDefinedCondition(c: string): bool {
+		assert c !is none;
+		return c.startswith("defined(") && c.endswith(")") &&
+		       c.findmatch("(",")", #"defined(") == #c - 1;
+	}
+	function getDefinedCondition(c: string): string {
+		return c[#"defined(":-1];
+	}
+	function maybeGetDefinedCondition(c: string): string {
+		return isDefinedCondition(c) ? getDefinedCondition(c) : c;
+	}
+	function setCond(c: string | none) {
+		if (c is none) {
+			if (prevCond.value is none)
+				return;
+			out << "#endif /* " << maybeGetDefinedCondition(prevCond.value) << " */\n";
+		} else if (prevCond.value is none) {
+			goto set_new_condition;
+		} else {
+			if (prevCond.value == c)
+				return;
+			out << "#endif /* " << maybeGetDefinedCondition(prevCond.value) << " */\n";
+set_new_condition:
+			if (isDefinedCondition(c)) {
+				out << "#ifdef " << getDefinedCondition(c) << "\n";
+			} else {
+				out << "#if " << c << "\n";
+			}
+		}
+		prevCond.value = c;
+	}
+	for (local x: removed) {
+		out << "#undef " << hasBuiltinKey(x.name) << "\n";
+	}
+	for (local old,none: changed) {
+		out << "#undef " << hasBuiltinKey(old.name) << "\n";
+	}
+	for (local x: added) {
+		setCond(x.cond);
+		out << "#define " << hasBuiltinKey(x.name) << "\n";
+	}
+	for (local none,new: changed) {
+		setCond(new.cond);
+		out << "#define " << hasBuiltinKey(new.name) << "\n";
+	}
+	if (prevCond.value !is none)
+		out << "#endif /* " << maybeGetDefinedCondition(prevCond.value) << " */\n";
+}
+
+
+function generateAllVersionsFeatureHistory(out: File): {GCCBuiltin...} {
+	local result = Dict();
+	out << COPYRIGHT << "\n\n";
+	out << "#ifndef __has_builtin\n";
+	out << "#define __has_builtin(x) __GCC_PRIVATE_IS_DEFINED(__GCC_HAS_BUILTIN_##x)\n";
+	out << "#ifndef __GCC_PRIVATE_IS_DEFINED\n";
+	out << "#define __GCC_PRIVATE_ARG_PLACEHOLDER_  ,\n";
+	out << "#define __GCC_PRIVATE_TAKE_SECOND_ARG_IMPL(x,val,...) val\n";
+	out << "#define __GCC_PRIVATE_TAKE_SECOND_ARG(x) __GCC_PRIVATE_TAKE_SECOND_ARG_IMPL x\n";
+	out << "#define __GCC_PRIVATE_IS_DEFINED3(x) __GCC_PRIVATE_TAKE_SECOND_ARG((x 1,0))\n";
+	out << "#define __GCC_PRIVATE_IS_DEFINED2(x) __GCC_PRIVATE_IS_DEFINED3(__GCC_PRIVATE_ARG_PLACEHOLDER_##x)\n";
+	out << "#define __GCC_PRIVATE_IS_DEFINED(x) __GCC_PRIVATE_IS_DEFINED2(x)\n";
+	out << "#endif /* !__GCC_PRIVATE_IS_DEFINED */\n";
+	out << "#ifndef __GNUC_MINOR__\n";
+	out << "#   define __GNUC_MINOR__ 0\n";
+	out << "#endif /* !__GNUC_MINOR__ */\n";
+	out << "#ifndef __GNUC_PATCH__\n";
+	out << "#ifdef __GNUC_PATCHLEVEL__\n";
+	out << "#   define __GNUC_PATCH__ __GNUC_PATCHLEVEL__\n";
+	out << "#else /* __GNUC_PATCHLEVEL__ */\n";
+	out << "#   define __GNUC_PATCH__ 0\n";
+	out << "#endif /* !__GNUC_PATCHLEVEL__ */\n";
+	out << "#endif /* !__GNUC_PATCH__ */\n";
+	out << "#define __GCC_VERSION_NUM    (__GNUC__*10000+__GNUC_MINOR__*100+__GNUC_PATCH__)\n";
+	local prevFeatureSet: GCCFeatureSet =
+		GCCFeatureSet(version: (0,0,0), builtins: {});
+	function myHasBuiltinKey(name: string): string {
+		return "__GCC_HAS_BUILTIN_" + name;
+	}
+	local versions = List(gccReleaseCommits.each[1]);
+	versions.sort();
+	for (local ver: versions) {
+		local feat = getFeatureSetFromFile(ver);
+		for (local x: feat.builtins) {
+			local c = result.get(x.name);
+			if (c is none || (!c.usesLibc && x.usesLibc))
+				result[x.name] = x;
+		}
+		local vernum = ver[0] * 10000 + ver[1] * 100 + ver[2];
+		File.Writer tempfp;
+		printFeatureSetDiff(tempfp, myHasBuiltinKey, prevFeatureSet, feat);
+		tempfp = tempfp.string;
+		if (tempfp) {
+			out << "\n";
+			out << "#if __GCC_VERSION_NUM >= " << vernum << "\n";
+			out << tempfp;
+			out << "#endif /* __GCC_VERSION_NUM >= " << vernum << " */\n";
+		}
+		prevFeatureSet = feat;
+	}
+	out << "#endif /* !__has_builtin */\n";
+	return result.values;
+}
+
+
+local knownBuiltins;
+with (local res = File.open("../../../include/compiler/gcc-builtins.h", "w"))
+	knownBuiltins = generateAllVersionsFeatureHistory(res);
+knownBuiltins = List(knownBuiltins);
+knownBuiltins.sort(GCCBuiltin.name);
+with (local res = File.open("gcc_builtins_known", "w")) {
+	for (local x: knownBuiltins) {
+		res << x.name << ":" << x.usesLibc << "\n";
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

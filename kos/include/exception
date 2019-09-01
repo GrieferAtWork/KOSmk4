@@ -1,0 +1,48 @@
+/* Copyright (c) 2019 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef _CXX_EXCEPTION
+#define _CXX_EXCEPTION 1
+
+#include <__stdcxx.h>
+
+#include <bits/c++/exception.h>
+
+
+__CXXDECL_BEGIN
+__NAMESPACE_STD_BEGIN
+
+typedef void (__LIBCCALL *terminate_handler)();
+typedef void (__LIBCCALL *unexpected_handler)();
+
+#ifndef __KERNEL__
+__IMPDEF terminate_handler __LIBCCALL set_terminate(terminate_handler __handler) __CXX_NOEXCEPT;
+__IMPDEF __ATTR_NORETURN void __LIBCCALL terminate() __CXX_NOEXCEPT;
+__IMPDEF unexpected_handler __LIBCCALL set_unexpected(unexpected_handler) __CXX_NOEXCEPT;
+__IMPDEF __ATTR_NORETURN void __LIBCCALL unexpected();
+__IMPDEF __ATTR_PURE bool __LIBCCALL uncaught_exception() __CXX_NOEXCEPT;
+#ifdef __USE_ISOCXX11
+__IMPDEF terminate_handler __LIBCCALL get_terminate() __CXX_NOEXCEPT;
+__IMPDEF unexpected_handler __LIBCCALL get_unexpected() noexcept;
+#endif /* __USE_ISOCXX11 */
+#endif /* !__KERNEL__ */
+
+__NAMESPACE_STD_END
+__CXXDECL_END
+
+#endif /* !_CXX_EXCEPTION */

@@ -1,0 +1,59 @@
+/* Copyright (c) 2019 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef _CXX_MEMORY
+#define _CXX_MEMORY 1
+
+#include <__stdcxx.h>
+#include <bits/types.h>
+#include <bits/c++/addressof.h>
+#include <bits/c++/allocator.h>
+#include <bits/c++/unique_ptr.h>
+
+/* TODO: Incomplete */
+__CXXDECL_BEGIN
+__NAMESPACE_STD_BEGIN
+
+__CXX_CLASSMEMBER void *__LIBCCALL
+align(__size_t __align, __size_t __size, void *&__ptr, __size_t &__space) __CXX_NOEXCEPT {
+    __uintptr_t __intptr = (__uintptr_t)__ptr;
+    __uintptr_t __aligned = (__intptr + __align - 1) & ~(__align - 1);
+    __uintptr_t __offset = __aligned - __intptr;
+    if __unlikely((__size + __offset) > __space)
+       return __NULLPTR;
+    __space -= __offset;
+    __ptr = (void *)__aligned;
+    return __ptr;
+}
+
+#ifdef __COMPILER_HAVE_CXX_ENUM_CLASSES
+enum class pointer_safety { relaxed, preferred, strict };
+__CXX_FORCEINLINE __ATTR_CONST pointer_safety __LIBCCALL
+get_pointer_safety() __CXX_NOEXCEPT {
+    return pointer_safety::relaxed;
+}
+#endif /* __COMPILER_HAVE_CXX_ENUM_CLASSES */
+__CXX_FORCEINLINE void __LIBCCALL declare_reachable(void *__ptr) { }
+template<class T> __ATTR_CONST __CXX_FORCEINLINE T *__LIBCCALL undeclare_reachable(T *__p) { return __p; }
+__CXX_FORCEINLINE void __LIBCCALL declare_no_pointers(char *__UNUSED(__base), __size_t __UNUSED(__num_bytes)) { }
+__CXX_FORCEINLINE void __LIBCCALL undeclare_no_pointers(char *__UNUSED(__base), __size_t __UNUSED(__num_bytes)) { }
+
+__NAMESPACE_STD_END
+__CXXDECL_END
+
+#endif /* !_CXX_MEMORY */

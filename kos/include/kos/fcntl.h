@@ -1,0 +1,149 @@
+/* HASH 0xc64a2a30 */
+/* Copyright (c) 2019 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifndef _KOS_FCNTL_H
+#define _KOS_FCNTL_H 1
+
+#include <__stdinc.h>
+#include <__crt.h>
+#include <kos/anno.h>
+
+#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
+#pragma GCC system_header
+#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
+
+#include <features.h>
+#include <fcntl.h>
+
+__SYSDECL_BEGIN
+
+#ifdef __CC__
+
+#ifndef __Fcntl_defined
+#define __Fcntl_defined 1
+#if defined(__CRT_HAVE_Fcntl)
+__LIBC __STDC_INT_AS_SSIZE_T (__VLIBCCALL Fcntl)(__fd_t __fd, int __cmd, ...) __THROWS(...) __CASMNAME_SAME("Fcntl");
+#else /* LIBC: Fcntl */
+#undef __Fcntl_defined
+#endif /* Fcntl... */
+#endif /* !__Fcntl_defined */
+#ifndef __Open_defined
+#define __Open_defined 1
+#if defined(__CRT_HAVE_Open64) && (defined(__USE_FILE_OFFSET64))
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,,Open,(char const *__filename, __oflag_t __oflags),Open64,(__filename,__oflags),__oflags,1,(__mode_t)) __THROWS(...)
+#elif defined(__CRT_HAVE_Open) && (!defined(__USE_FILE_OFFSET64))
+__LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t (__VLIBCCALL Open)(char const *__filename, __oflag_t __oflags, ...) __THROWS(...) __CASMNAME_SAME("Open");
+#elif (defined(__CRT_HAVE_Open64) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_OpenAt) || defined(__CRT_HAVE_OpenAt64))))
+#include <local/kos.fcntl/Open.h>
+#ifdef __cplusplus
+__NAMESPACE_LOCAL_USING(Open)
+#else /* __cplusplus */
+#define Open (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Open))
+#endif /* !__cplusplus */
+#else /* CUSTOM: Open */
+#undef __Open_defined
+#endif /* Open... */
+#endif /* !__Open_defined */
+#ifndef __Creat_defined
+#define __Creat_defined 1
+#if defined(__CRT_HAVE_Creat64) && (defined(__USE_FILE_OFFSET64))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,,Creat,(char const *__filename, __mode_t __mode),Creat64,(__filename,__mode)) __THROWS(...)
+#elif defined(__CRT_HAVE_Creat) && (!defined(__USE_FILE_OFFSET64))
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,,Creat,(char const *__filename, __mode_t __mode),(__filename,__mode)) __THROWS(...)
+#elif (defined(__CRT_HAVE_Open64) || defined(__CRT_HAVE_Open))
+#include <local/kos.fcntl/Creat.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(Creat, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t (__LIBCCALL Creat)(char const *__filename, __mode_t __mode) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Creat))(__filename, __mode); })
+#else /* CUSTOM: Creat */
+#undef __Creat_defined
+#endif /* Creat... */
+#endif /* !__Creat_defined */
+
+#ifdef __USE_LARGEFILE64
+#if defined(__CRT_HAVE_Open64)
+__LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t (__VLIBCCALL Open64)(char const *__filename, __oflag_t __oflags, ...) __THROWS(...) __CASMNAME_SAME("Open64");
+#elif defined(__CRT_HAVE_Open) && (!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0)
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,,Open64,(char const *__filename, __oflag_t __oflags),Open,(__filename,__oflags),__oflags,1,(__mode_t)) __THROWS(...)
+#elif defined(__CRT_HAVE_Open)
+#include <local/kos.fcntl/Open64.h>
+#ifdef __cplusplus
+__NAMESPACE_LOCAL_USING(Open64)
+#else /* __cplusplus */
+#define Open64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Open64))
+#endif /* !__cplusplus */
+#endif /* Open64... */
+#ifndef __Creat64_defined
+#define __Creat64_defined 1
+#if defined(__CRT_HAVE_Creat64)
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,,Creat64,(char const *__filename, __mode_t __mode),(__filename,__mode)) __THROWS(...)
+#elif defined(__CRT_HAVE_Creat) && (!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,,Creat64,(char const *__filename, __mode_t __mode),Creat,(__filename,__mode)) __THROWS(...)
+#elif (defined(__CRT_HAVE_Open64) || defined(__CRT_HAVE_Open))
+#include <local/kos.fcntl/Creat64.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(Creat64, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t (__LIBCCALL Creat64)(char const *__filename, __mode_t __mode) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Creat64))(__filename, __mode); })
+#else /* CUSTOM: Creat64 */
+#undef __Creat64_defined
+#endif /* Creat64... */
+#endif /* !__Creat64_defined */
+#endif /* __USE_LARGEFILE64 */
+
+#ifdef __USE_ATFILE
+#ifndef __OpenAt_defined
+#define __OpenAt_defined 1
+#if defined(__CRT_HAVE_Openat64) && (defined(__USE_FILE_OFFSET64))
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,,OpenAt,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),Openat64,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t)) __THROWS(...)
+#elif defined(__CRT_HAVE_OpenAt) && (!defined(__USE_FILE_OFFSET64))
+__LIBC __ATTR_WUNUSED __ATTR_NONNULL((2)) __fd_t (__VLIBCCALL OpenAt)(__fd_t __dirfd, char const *__filename, __oflag_t __oflags, ...) __THROWS(...) __CASMNAME_SAME("OpenAt");
+#elif defined(__CRT_HAVE_OpenAt64)
+#include <local/kos.fcntl/OpenAt.h>
+#ifdef __cplusplus
+__NAMESPACE_LOCAL_USING(OpenAt)
+#else /* __cplusplus */
+#define OpenAt (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(OpenAt))
+#endif /* !__cplusplus */
+#else /* CUSTOM: OpenAt */
+#undef __OpenAt_defined
+#endif /* OpenAt... */
+#endif /* !__OpenAt_defined */
+#ifdef __USE_LARGEFILE64
+#ifndef __OpenAt64_defined
+#define __OpenAt64_defined 1
+#if defined(__CRT_HAVE_OpenAt64)
+__LIBC __ATTR_WUNUSED __ATTR_NONNULL((2)) __fd_t (__VLIBCCALL OpenAt64)(__fd_t __dirfd, char const *__filename, __oflag_t __oflags, ...) __THROWS(...) __CASMNAME_SAME("OpenAt64");
+#elif defined(__CRT_HAVE_OpenAt) && (!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0)
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,,OpenAt64,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),OpenAt,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t)) __THROWS(...)
+#elif defined(__CRT_HAVE_OpenAt)
+#include <local/kos.fcntl/OpenAt64.h>
+#ifdef __cplusplus
+__NAMESPACE_LOCAL_USING(OpenAt64)
+#else /* __cplusplus */
+#define OpenAt64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(OpenAt64))
+#endif /* !__cplusplus */
+#else /* CUSTOM: OpenAt64 */
+#undef __OpenAt64_defined
+#endif /* OpenAt64... */
+#endif /* !__OpenAt64_defined */
+#endif /* __USE_LARGEFILE64 */
+#endif /* __USE_ATFILE */
+
+
+#endif /* __CC__ */
+
+__SYSDECL_END
+
+#endif /* !_KOS_FCNTL_H */

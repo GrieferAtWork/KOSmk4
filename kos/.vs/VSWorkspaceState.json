@@ -1,0 +1,13 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\include",
+    "\\include\\i386-kos",
+    "\\include\\i386-kos\\asm",
+    "\\src",
+    "\\src\\libc",
+    "\\src\\libc\\libc"
+  ],
+  "SelectedNode": "\\include\\i386-kos\\asm\\syscalls64_d.inl",
+  "PreviewInSolutionExplorer": false
+}

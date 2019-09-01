@@ -1,0 +1,108 @@
+/* Copyright (c) 2019 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import fs;
+import * from deemon;
+
+/* In order to get a simple way of quickly building the project accociated
+ * with the currently selected source file in Visual Studio, we have to go
+ * through a bunch of hoops.
+ * In a perfect world, we could simply assign a keyboard shortcut to:
+ *     Solution Explorer -> Currently Selected File -> Right Click -> Build
+ * That entry is set up to do exactly that (thanks to magic.dee)
+ * However, sadly I was unable to do that, and this file is part of the work-around:
+ *
+ *  - Define an External Tool (Tools -> External Tools...):
+ *    Title:             `Build Current KOS Project'
+ *    Command:           `cmd.exe'
+ *    Arguments:         `/c "deemon magic.dee --vcautotargetconfig=$(SolutionDir).vs\ProjectSettings.json --vsgengroup-of=$(ItemPath)"'
+ *    Initial directory: `$(SolutionDir)..'
+ *    Use Output window:       TRUE
+ *    Treat output as Unicode: TRUE
+ *
+ * Now you can assign a keyboard shortcut to this external tool under
+ *     Tools -> Options -> Environment -> Keyboard -> Tools.ExternalCommand[NN]
+ * Where [NN] is the 1-byted index of the external tool you defined before,
+ * which can can figure out by counting how many other external tools are defined
+ * ahead of the KOS-specific one (you can also move around tools to change this index)
+ *
+ * All of what's said so far works neatly for getting the filename of your current
+ * source file, but in order to build something, we also need --target and --config
+ * To get those, we parse the `ProjectSettings.json' file passed to `vcautotargetconfig'
+ * Using that file, we can figure out the name of the configuration currently selected
+ * in visual studio (which is called e.g. `i386-kos (DEBUG)')
+ *
+ * The only bad part is that visual studio doesn't accept output of this custom command
+ * as build output, meaning that errors won't show up in the Error List, and you'll have
+ * to manually browse the output window for errors. (Which doesn't even have colors, ugh...)
+ *
+ */
+
+@@Parse `ProjectSettings.json' and return a tuple (target, config)
+function parseCurrentVsConfiguration(filename: string): (string,string) {
+	final local OPTION_PREFIX = r'"CurrentProjectSetting"';
+	for (local l: File.open(filename)) {
+		local name;
+		try {
+			name = l.scanf(r' "CurrentProjectSetting" : "%[^"]')...;
+		} catch (...) {
+			continue;
+		}
+		name = name.decode("c-escape");
+		local target, config = name.scanf("%[^(](%[^)])")...;
+		target = target.strip().rsstrip("-kos");
+		config = config.strip();
+		local debug = none;
+		local optimize = false;
+		for (local opt: config.split(",")) {
+			opt = opt.strip();
+			switch (opt.upper()) {
+			case "DEBUG":
+				debug = true;
+				break;
+			case "NDEBUG":
+				debug = false;
+				break;
+			case "OPTIMIZE":
+				optimize = true;
+				break;
+			default:
+				throw Error("Unrecgonized config option " + repr(opt) + " in " + repr(name));
+			}
+		}
+		config = "{}{}".format({
+			optimize ? "O" : "nO",
+			debug ? "D" : "nD",
+		});
+		return (target, config);
+	}
+	throw Error("Failed to parse current configuration from " + repr(filename));
+}
+
+
+
+
+
+
+
+
+
+
+
+
