@@ -306,14 +306,14 @@ KOSmk4 no longer is a small kernel. I'd say it has reached the point of really b
 
 - Any libc function exposed by KOS-headers under `/kos/include/*` must check if `__CRT_HAVE_{name}` is defined
 - Any function defined by a library other than libc should be located in a folder `<libmylibrary/...>` and must always contain a file `<libmylibrary/api.h>` that defines the common calling convention, as well as the `dlopen(3)` name for the library, as well as a configuration option `LIBMYLIBRARY_WANT_PROTOTYPES`
-	- Each function exported by such a library should appear 2 times:
-		- `typedef RETURN_TYPE (LIBMYLIBRARY_CC *PNAME_OF_EXPORTED_FUNCTION)(int x, int y)`
-		- ```
-		#ifdef LIBMYLIBRARY_WANT_PROTOTYPES
-		LIBMYLIBRARY_DECL RETURN_TYPE LIBMYLIBRARY_CC name_of_exported_function(int x, int y);
-		#endif /* LIBMYLIBRARY_WANT_PROTOTYPES */
-		```
-- As much a possible from `/kos/include/*` should be generated automatically using `/kos/misc/magicgenerator/generate_headers.dee`
+	- Each function exported by such a library should be exposed as:
+	```c
+	typedef int (LIBMYLIBRARY_CC *PNAME_OF_EXPORTED_FUNCTION)(int x, int y);
+	#ifdef LIBMYLIBRARY_WANT_PROTOTYPES
+	LIBMYLIBRARY_DECL int LIBMYLIBRARY_CC name_of_exported_function(int x, int y);
+	#endif /* LIBMYLIBRARY_WANT_PROTOTYPES */
+	```
+- As much as possible from `/kos/include/*` should be generated automatically using `/kos/misc/magicgenerator/generate_headers.dee`
 - `/kos/include/hybrid/*` must not have any cross-dependencies to files other `/kos/include/__std(cxx|inc).h` and `/kos/include/compiler/*`
 	- The hybrid API should not be bound to only work under KOS and/or GCC
 - The provided `/kos/.clang-format` file is not perfect:
@@ -365,7 +365,7 @@ Just like its predecessors, KOS mk4 uses [busybox](https://www.busybox.net/) to 
 
 However, I made it as simple as ever for you to get going with an installation of busybox onto your KOS disk image:
 
-```
+```sh
 # Make sure that you've already set up the KOS toolchain
 bash $PROJPATH/kos/misc/make_toolchain.sh i386-kos
 
@@ -556,7 +556,7 @@ First, you must patch the Bochs source to fix a bug that normally breaks the unm
 To use bochs, download and extract version 2.6.9 to `$PROJPATH/binutils/src/bochs-2.6.9`
 
 Bochs source fixup (in `$PROJPATH/binutils/src/bochs-2.6.9/load32bitOShack.cc`):
-```
+```patch
 +    unsigned long copysize = size;
 +    if (copysize > 0x1000)
 +      copysize = 0x1000;
@@ -565,16 +565,17 @@ Bochs source fixup (in `$PROJPATH/binutils/src/bochs-2.6.9/load32bitOShack.cc`):
 ```
 
 Then, you must build Bochs:
-
-`$ mkdir $PROJPATH/binutils/build-bochs-2.6.9`
-`$ cd $PROJPATH/binutils/build-bochs-2.6.9`
-`$ bash ../src/bochs-2.6.9/configure --enable-disasm --enable-debugger --enable-debugger-gui --enable-pci --enable-smp --enable-3dnow --enable-x86-64 --enable-svm --enable-avx --enable-x86-debugger --enable-monitor-mwait --enable-sb16 --enable-es1370 --enable-gameport --enable-voodoo --enable-usb --enable-usb-ohci --enable-usb-ehci --enable-usb-xhci`
+```sh
+mkdir $PROJPATH/binutils/build-bochs-2.6.9
+cd $PROJPATH/binutils/build-bochs-2.6.9
+bash ../src/bochs-2.6.9/configure --enable-disasm --enable-debugger --enable-debugger-gui --enable-pci --enable-smp --enable-3dnow --enable-x86-64 --enable-svm --enable-avx --enable-x86-debugger --enable-monitor-mwait --enable-sb16 --enable-es1370 --enable-gameport --enable-voodoo --enable-usb --enable-usb-ohci --enable-usb-ehci --enable-usb-xhci
+```
 
 Now, copy the file `$PROJPATH/kos/misc/config/kos.bxrc` to `$PROJPATH/bin/i386-kos-$CONFIG/kos.bxrc` and open it in a text editor
 
 Download a pre-built version of `bochs-2.6.9` to get the files `BIOS-bochs-latest` and `VGABIOS-lgpl-latest`. Afterwards, update the following 2 lines in `$PROJPATH/bin/i386-kos-$CONFIG/kos.bxrc` to point to the location of the 2 BIOS files:
 
-```
+```patch
 + romimage: file="<YOUR_PATH_TO_BOCHS-2.6.8-HERE>/BIOS-bochs-latest"
 + vgaromimage: file="<YOUR_PATH_TO_BOCHS-2.6.8-HERE>/VGABIOS-lgpl-latest"
 - romimage: file="D:\Bochs-2.6.8/BIOS-bochs-latest"
@@ -583,11 +584,15 @@ Download a pre-built version of `bochs-2.6.9` to get the files `BIOS-bochs-lates
 
 Now, you can start bochs directly using:
 
-	`$ binutils/build-bochs-2.6.9/bochs -q -f bin/i386-kos-$CONFIG/kos.bxrc`
+```sh
+binutils/build-bochs-2.6.9/bochs -q -f bin/i386-kos-$CONFIG/kos.bxrc
+```
 	
 Or you can directly build+run KOS with:
 
-	`$ deemon magic.dee --emulator=bochs ...more.options.here...`
+```sh
+deemon magic.dee --emulator=bochs ...more.options.here...
+```
 
 
 
@@ -611,7 +616,7 @@ In the end, thanks to the feature definition files (which basically just needs t
 Another useful feature of this lies in the fact that it allows any source file to force the use of local definitions of certain functions, preventing that source file from becoming dependent on being linked against libc (being able to do this is required to build a dynamic linker, which couldn't very well do its job of linking if it had to link itself first...).
 For example, an application could force the headers to provide a local implementation of `sprintf()`:
 
-```
+```c
 /* Load CRT features so we can modify them to our likeing */
 #include <__crt.h>
 
