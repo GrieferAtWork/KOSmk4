@@ -1348,7 +1348,9 @@ pidns_prepare_for_insert(struct pidns *__restrict self)
 		TRY {
 			new_list = (struct pidns_entry *)kmalloc((new_mask + 1) * sizeof(struct pidns_entry),
 			                                         GFP_NORMAL | GFP_CALLOC);
-		} CATCH(E_BADALLOC) {
+		} EXCEPT {
+			if (!was_thrown(E_BADALLOC))
+				RETHROW();
 			if ((self->pn_size + 1) >= self->pn_mask)
 				return; /* Still enough space... */
 			RETHROW();

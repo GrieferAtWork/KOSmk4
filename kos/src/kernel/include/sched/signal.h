@@ -272,7 +272,7 @@ FUNDEF NOBLOCK struct sig *NOTHROW(KCALL task_trywait)(void);
 struct __qtime;
 
 FUNDEF struct sig *KCALL
-task_waitfor(struct __qtime const *abs_timeout DFL(__NULLPTR)) THROWS(E_WOULDBLOCK,...);
+task_waitfor(struct __qtime const *abs_timeout DFL(__NULLPTR)) THROWS(E_WOULDBLOCK, ...);
 
 /* Same as `task_waitfor', but don't serve RPC functions. */
 FUNDEF struct sig *KCALL

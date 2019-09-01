@@ -384,7 +384,10 @@ NOTHROW(KCALL cpu_quantum_end)(void) {
  * >>     // where the condition is signaled between it being
  * >>     // changed and interrupts being disabled.
  * >>     COMPILER_READ_BARRIER();
- * >>     if (!SHOULD_WAIT()) { PREEMPTION_ENABLE(); break; }
+ * >>     if (!SHOULD_WAIT()) {
+ * >>         PREEMPTION_ENABLE();
+ * >>         break;
+ * >>     }
  * >>     // Serve RPC functions (when TRUE is returned, preemption was re-enabled)
  * >>     if (task_serve()) continue;
  * >>     // Do the actual sleep.

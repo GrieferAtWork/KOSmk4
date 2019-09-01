@@ -96,7 +96,9 @@ NOTHROW(FCALL x86_debug_cirq_0e)(struct icpustate *__restrict state, uintptr_t e
 			goto not_a_badcall;
 		TRY {
 			old_eip = *(uintptr_t *)sp;
-		} CATCH(E_SEGFAULT) {
+		} EXCEPT {
+			if (!was_thrown(E_SEGFAULT))
+				RETHROW();
 			goto not_a_badcall;
 		}
 #ifdef __x86_64__

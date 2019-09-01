@@ -38,6 +38,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "api.h"
 #include "emulator.h"
 #include "x86.h"
 
@@ -141,20 +142,19 @@ LOCAL int CC
 libvm86_read_pcbyte(vm86_state_t *__restrict self,
                     uint8_t *__restrict presult) {
 	uint8_t *pc, value;
-	COMPILER_IGNORE_UNINITIALIZED(*presult);
 	pc = (uint8_t *)vm86_state_ip(self);
 	if (self->vr_trans)
 		pc = (uint8_t *)self->vr_trans(self, pc);
 	TRY {
 		value = *pc;
-	} CATCH(E_SEGFAULT) {
-		goto err_segfault;
+	} EXCEPT {
+		if (!WAS_SEGFAULT_THROWN())
+			RETHROW();
+		return VM86_SEGFAULT;
 	}
 	self->vr_regs.vr_ip += 1;
 	*presult = value;
 	return VM86_SUCCESS;
-err_segfault:
-	return VM86_SEGFAULT;
 }
 LOCAL int CC
 libvm86_read_pcword(vm86_state_t *__restrict self,
@@ -165,15 +165,14 @@ libvm86_read_pcword(vm86_state_t *__restrict self,
 		pc = (uint16_t *)self->vr_trans(self, pc);
 	TRY {
 		value = UNALIGNED_GET16(pc);
-	} CATCH(E_SEGFAULT) {
-		goto err_segfault;
+	} EXCEPT {
+		if (!WAS_SEGFAULT_THROWN())
+			RETHROW();
+		return VM86_SEGFAULT;
 	}
 	self->vr_regs.vr_ip += 2;
 	*presult = value;
 	return VM86_SUCCESS;
-err_segfault:
-	COMPILER_IGNORE_UNINITIALIZED(*presult);
-	return VM86_SEGFAULT;
 }
 LOCAL int CC
 libvm86_read_pcdword(vm86_state_t *__restrict self,
@@ -184,15 +183,14 @@ libvm86_read_pcdword(vm86_state_t *__restrict self,
 		pc = (uint32_t *)self->vr_trans(self, pc);
 	TRY {
 		value = UNALIGNED_GET32(pc);
-	} CATCH(E_SEGFAULT) {
-		goto err_segfault;
+	} EXCEPT {
+		if (!WAS_SEGFAULT_THROWN())
+			RETHROW();
+		return VM86_SEGFAULT;
 	}
 	self->vr_regs.vr_ip += 4;
 	*presult = value;
 	return VM86_SUCCESS;
-err_segfault:
-	COMPILER_IGNORE_UNINITIALIZED(*presult);
-	return VM86_SEGFAULT;
 }
 
 LOCAL int CC
@@ -204,8 +202,10 @@ libvm86_store_string_byte(vm86_state_t *__restrict self,
 		addr = (uint8_t *)self->vr_trans(self, addr);
 	TRY {
 		*addr = value;
-	} CATCH(E_SEGFAULT) {
-		goto err_segfault;
+	} EXCEPT {
+		if (!WAS_SEGFAULT_THROWN())
+			RETHROW();
+		return VM86_SEGFAULT;
 	}
 	if (self->vr_regs.vr_flags & DF) {
 		self->vr_regs.vr_edi -= 1;
@@ -214,8 +214,6 @@ libvm86_store_string_byte(vm86_state_t *__restrict self,
 	}
 	self->vr_regs.vr_edi &= 0xffff;
 	return VM86_SUCCESS;
-err_segfault:
-	return VM86_SEGFAULT;
 }
 
 LOCAL int CC
@@ -227,8 +225,10 @@ libvm86_store_string_word(vm86_state_t *__restrict self,
 		addr = (uint16_t *)self->vr_trans(self, addr);
 	TRY {
 		UNALIGNED_SET16(addr, value);
-	} CATCH(E_SEGFAULT) {
-		goto err_segfault;
+	} EXCEPT {
+		if (!WAS_SEGFAULT_THROWN())
+			RETHROW();
+		return VM86_SEGFAULT;
 	}
 	if (self->vr_regs.vr_flags & DF) {
 		self->vr_regs.vr_edi -= 2;
@@ -237,8 +237,6 @@ libvm86_store_string_word(vm86_state_t *__restrict self,
 	}
 	self->vr_regs.vr_edi &= 0xffff;
 	return VM86_SUCCESS;
-err_segfault:
-	return VM86_SEGFAULT;
 }
 
 LOCAL int CC
@@ -250,8 +248,10 @@ libvm86_store_string_dword(vm86_state_t *__restrict self,
 		addr = (uint32_t *)self->vr_trans(self, addr);
 	TRY {
 		UNALIGNED_SET32(addr, value);
-	} CATCH(E_SEGFAULT) {
-		goto err_segfault;
+	} EXCEPT {
+		if (!WAS_SEGFAULT_THROWN())
+			RETHROW();
+		return VM86_SEGFAULT;
 	}
 	if (self->vr_regs.vr_flags & DF) {
 		self->vr_regs.vr_edi -= 4;
@@ -260,8 +260,6 @@ libvm86_store_string_dword(vm86_state_t *__restrict self,
 	}
 	self->vr_regs.vr_edi &= 0xffff;
 	return VM86_SUCCESS;
-err_segfault:
-	return VM86_SEGFAULT;
 }
 
 LOCAL int CC
@@ -273,8 +271,10 @@ libvm86_load_string_byte(vm86_state_t *__restrict self,
 		addr = (uint8_t *)self->vr_trans(self, addr);
 	TRY {
 		value = *addr;
-	} CATCH(E_SEGFAULT) {
-		goto err_segfault;
+	} EXCEPT {
+		if (!WAS_SEGFAULT_THROWN())
+			RETHROW();
+		return VM86_SEGFAULT;
 	}
 	*presult = value;
 	if (self->vr_regs.vr_flags & DF) {
@@ -284,9 +284,6 @@ libvm86_load_string_byte(vm86_state_t *__restrict self,
 	}
 	self->vr_regs.vr_esi &= 0xffff;
 	return VM86_SUCCESS;
-err_segfault:
-	COMPILER_IGNORE_UNINITIALIZED(*presult);
-	return VM86_SEGFAULT;
 }
 
 LOCAL int CC
@@ -298,8 +295,10 @@ libvm86_load_string_word(vm86_state_t *__restrict self,
 		addr = (uint16_t *)self->vr_trans(self, addr);
 	TRY {
 		value = UNALIGNED_GET16(addr);
-	} CATCH(E_SEGFAULT) {
-		goto err_segfault;
+	} EXCEPT {
+		if (!WAS_SEGFAULT_THROWN())
+			RETHROW();
+		return VM86_SEGFAULT;
 	}
 	*presult = value;
 	if (self->vr_regs.vr_flags & DF) {
@@ -309,9 +308,6 @@ libvm86_load_string_word(vm86_state_t *__restrict self,
 	}
 	self->vr_regs.vr_esi &= 0xffff;
 	return VM86_SUCCESS;
-err_segfault:
-	COMPILER_IGNORE_UNINITIALIZED(*presult);
-	return VM86_SEGFAULT;
 }
 
 LOCAL int CC
@@ -323,8 +319,10 @@ libvm86_load_string_dword(vm86_state_t *__restrict self,
 		addr = (uint32_t *)self->vr_trans(self, addr);
 	TRY {
 		value = UNALIGNED_GET32(addr);
-	} CATCH(E_SEGFAULT) {
-		goto err_segfault;
+	} EXCEPT {
+		if (!WAS_SEGFAULT_THROWN())
+			RETHROW();
+		return VM86_SEGFAULT;
 	}
 	*presult = value;
 	if (self->vr_regs.vr_flags & DF) {
@@ -334,9 +332,6 @@ libvm86_load_string_dword(vm86_state_t *__restrict self,
 	}
 	self->vr_regs.vr_esi &= 0xffff;
 	return VM86_SUCCESS;
-err_segfault:
-	COMPILER_IGNORE_UNINITIALIZED(*presult);
-	return VM86_SEGFAULT;
 }
 
 
@@ -349,8 +344,10 @@ libvm86_load_string_dst_byte(vm86_state_t *__restrict self,
 		addr = (uint8_t *)self->vr_trans(self, addr);
 	TRY {
 		value = *addr;
-	} CATCH(E_SEGFAULT) {
-		goto err_segfault;
+	} EXCEPT {
+		if (!WAS_SEGFAULT_THROWN())
+			RETHROW();
+		return VM86_SEGFAULT;
 	}
 	*presult = value;
 	if (self->vr_regs.vr_flags & DF) {
@@ -360,9 +357,6 @@ libvm86_load_string_dst_byte(vm86_state_t *__restrict self,
 	}
 	self->vr_regs.vr_edi &= 0xffff;
 	return VM86_SUCCESS;
-err_segfault:
-	COMPILER_IGNORE_UNINITIALIZED(*presult);
-	return VM86_SEGFAULT;
 }
 
 LOCAL int CC
@@ -374,8 +368,10 @@ libvm86_load_string_dst_word(vm86_state_t *__restrict self,
 		addr = (uint16_t *)self->vr_trans(self, addr);
 	TRY {
 		value = UNALIGNED_GET16(addr);
-	} CATCH(E_SEGFAULT) {
-		goto err_segfault;
+	} EXCEPT {
+		if (!WAS_SEGFAULT_THROWN())
+			RETHROW();
+		return VM86_SEGFAULT;
 	}
 	*presult = value;
 	if (self->vr_regs.vr_flags & DF) {
@@ -385,9 +381,6 @@ libvm86_load_string_dst_word(vm86_state_t *__restrict self,
 	}
 	self->vr_regs.vr_edi &= 0xffff;
 	return VM86_SUCCESS;
-err_segfault:
-	COMPILER_IGNORE_UNINITIALIZED(*presult);
-	return VM86_SEGFAULT;
 }
 
 LOCAL int CC
@@ -399,8 +392,10 @@ libvm86_load_string_dst_dword(vm86_state_t *__restrict self,
 		addr = (uint32_t *)self->vr_trans(self, addr);
 	TRY {
 		value = UNALIGNED_GET32(addr);
-	} CATCH(E_SEGFAULT) {
-		goto err_segfault;
+	} EXCEPT {
+		if (!WAS_SEGFAULT_THROWN())
+			RETHROW();
+		return VM86_SEGFAULT;
 	}
 	*presult = value;
 	if (self->vr_regs.vr_flags & DF) {
@@ -410,9 +405,6 @@ libvm86_load_string_dst_dword(vm86_state_t *__restrict self,
 	}
 	self->vr_regs.vr_edi &= 0xffff;
 	return VM86_SUCCESS;
-err_segfault:
-	COMPILER_IGNORE_UNINITIALIZED(*presult);
-	return VM86_SEGFAULT;
 }
 
 LOCAL int CC
@@ -426,13 +418,13 @@ libvm86_pushw(vm86_state_t *__restrict self,
 		addr = (uint16_t *)self->vr_trans(self, addr);
 	TRY {
 		UNALIGNED_SET16(addr, value);
-	} CATCH(E_SEGFAULT) {
-		goto err_segfault;
+	} EXCEPT {
+		if (!WAS_SEGFAULT_THROWN())
+			RETHROW();
+		return VM86_SEGFAULT;
 	}
 	self->vr_regs.vr_esp -= 2;
 	return VM86_SUCCESS;
-err_segfault:
-	return VM86_SEGFAULT;
 }
 
 LOCAL int CC
@@ -446,13 +438,13 @@ libvm86_pushl(vm86_state_t *__restrict self,
 		addr = (uint32_t *)self->vr_trans(self, addr);
 	TRY {
 		UNALIGNED_SET32(addr, value);
-	} CATCH(E_SEGFAULT) {
-		goto err_segfault;
+	} EXCEPT {
+		if (!WAS_SEGFAULT_THROWN())
+			RETHROW();
+		return VM86_SEGFAULT;
 	}
 	self->vr_regs.vr_esp -= 4;
 	return VM86_SUCCESS;
-err_segfault:
-	return VM86_SEGFAULT;
 }
 
 LOCAL int CC
@@ -466,15 +458,14 @@ libvm86_popw(vm86_state_t *__restrict self,
 		addr = (uint16_t *)self->vr_trans(self, addr);
 	TRY {
 		value = UNALIGNED_GET16(addr);
-	} CATCH(E_SEGFAULT) {
-		goto err_segfault;
+	} EXCEPT {
+		if (!WAS_SEGFAULT_THROWN())
+			RETHROW();
+		return VM86_SEGFAULT;
 	}
 	*presult = value;
 	self->vr_regs.vr_esp += 2;
 	return VM86_SUCCESS;
-err_segfault:
-	COMPILER_IGNORE_UNINITIALIZED(*presult);
-	return VM86_SEGFAULT;
 }
 
 LOCAL int CC
@@ -488,15 +479,14 @@ libvm86_popl(vm86_state_t *__restrict self,
 		addr = (uint32_t *)self->vr_trans(self, addr);
 	TRY {
 		value = UNALIGNED_GET32(addr);
-	} CATCH(E_SEGFAULT) {
-		goto err_segfault;
+	} EXCEPT {
+		if (!WAS_SEGFAULT_THROWN())
+			RETHROW();
+		return VM86_SEGFAULT;
 	}
 	*presult = value;
 	self->vr_regs.vr_esp += 4;
 	return VM86_SUCCESS;
-err_segfault:
-	COMPILER_IGNORE_UNINITIALIZED(*presult);
-	return VM86_SEGFAULT;
 }
 
 LOCAL int CC
@@ -670,7 +660,7 @@ parse_sib_byte:
 			default: __builtin_unreachable();
 			}
 			if ((rmbyte & MODRM_MOD_MASK) == (0x1 << MODRM_MOD_SHIFT)) {
-				uint8_t COMPILER_IGNORE_UNINITIALIZED(temp);
+				uint8_t temp;
 				/* [... + disp8] */
 				error = libvm86_read_pcbyte(self, &temp);
 				if unlikely(error != VM86_SUCCESS)
@@ -678,7 +668,7 @@ parse_sib_byte:
 				info->mi_offset = (uint32_t)(int32_t)(int8_t)temp;
 			} else if ((rmbyte & MODRM_MOD_MASK) == (0x2 << MODRM_MOD_SHIFT)) {
 				/* [... + disp16] */
-				uint16_t COMPILER_IGNORE_UNINITIALIZED(temp);
+				uint16_t temp;
 				error = libvm86_read_pcword(self, &temp);
 				if unlikely(error != VM86_SUCCESS)
 					goto err;
@@ -722,14 +712,14 @@ libvm86_modrm_readb(vm86_state_t *__restrict self,
 		addr = (uint8_t *)libvm86_modrm_getaddr(self, info, op_flags);
 		TRY {
 			value = *addr;
-		} CATCH(E_SEGFAULT) {
-			goto err_segfault;
+		} EXCEPT {
+			if (!WAS_SEGFAULT_THROWN())
+				RETHROW();
+			return VM86_SEGFAULT;
 		}
 		*presult = value;
 	}
 	return VM86_SUCCESS;
-err_segfault:
-	return VM86_SEGFAULT;
 }
 
 LOCAL int CC
@@ -741,13 +731,13 @@ libvm86_modrm_readw(vm86_state_t *__restrict self,
 	addr = (uint16_t *)libvm86_modrm_getaddr(self, info, op_flags);
 	TRY {
 		value = UNALIGNED_GET16(addr);
-	} CATCH(E_SEGFAULT) {
-		goto err_segfault;
+	} EXCEPT {
+		if (!WAS_SEGFAULT_THROWN())
+			RETHROW();
+		return VM86_SEGFAULT;
 	}
 	*presult = value;
 	return VM86_SUCCESS;
-err_segfault:
-	return VM86_SEGFAULT;
 }
 
 LOCAL int CC
@@ -759,13 +749,13 @@ libvm86_modrm_readl(vm86_state_t *__restrict self,
 	addr = (uint32_t *)libvm86_modrm_getaddr(self, info, op_flags);
 	TRY {
 		value = UNALIGNED_GET32(addr);
-	} CATCH(E_SEGFAULT) {
-		goto err_segfault;
+	} EXCEPT {
+		if (!WAS_SEGFAULT_THROWN())
+			RETHROW();
+		return VM86_SEGFAULT;
 	}
 	*presult = value;
 	return VM86_SUCCESS;
-err_segfault:
-	return VM86_SEGFAULT;
 }
 
 LOCAL int CC
@@ -775,18 +765,17 @@ libvm86_modrm_writeb(vm86_state_t *__restrict self,
 	uint8_t *addr;
 	if (info->mi_type == MODRM_REGISTER) {
 		REG8(info->mi_rm) = value;
-		return VM86_SUCCESS;
 	} else {
 		addr = (uint8_t *)libvm86_modrm_getaddr(self, info, op_flags);
 		TRY {
 			*addr = value;
-		} CATCH(E_SEGFAULT) {
-			goto err_segfault;
+		} EXCEPT {
+			if (!WAS_SEGFAULT_THROWN())
+				RETHROW();
+			return VM86_SEGFAULT;
 		}
 	}
 	return VM86_SUCCESS;
-err_segfault:
-	return VM86_SEGFAULT;
 }
 
 LOCAL int CC
@@ -796,18 +785,17 @@ libvm86_modrm_writew(vm86_state_t *__restrict self,
 	uint16_t *addr;
 	if (info->mi_type == MODRM_REGISTER) {
 		REG32(info->mi_rm) = value;
-		return VM86_SUCCESS;
 	} else {
 		addr = (uint16_t *)libvm86_modrm_getaddr(self, info, op_flags);
 		TRY {
 			UNALIGNED_SET16(addr, value);
-		} CATCH(E_SEGFAULT) {
-			goto err_segfault;
+		} EXCEPT {
+			if (!WAS_SEGFAULT_THROWN())
+				RETHROW();
+			return VM86_SEGFAULT;
 		}
 	}
 	return VM86_SUCCESS;
-err_segfault:
-	return VM86_SEGFAULT;
 }
 
 LOCAL int CC
@@ -818,12 +806,12 @@ libvm86_modrm_writel(vm86_state_t *__restrict self,
 	addr = (uint32_t *)libvm86_modrm_getaddr(self, info, op_flags);
 	TRY {
 		UNALIGNED_SET32(addr, value);
-	} CATCH(E_SEGFAULT) {
-		goto err_segfault;
+	} EXCEPT {
+		if (!WAS_SEGFAULT_THROWN())
+			RETHROW();
+		return VM86_SEGFAULT;
 	}
 	return VM86_SUCCESS;
-err_segfault:
-	return VM86_SEGFAULT;
 }
 
 #endif
@@ -1755,12 +1743,21 @@ read_opcode:
 		error = libvm86_read_pcbyte(self, &opcode);
 		if unlikely(error != VM86_SUCCESS)
 			goto err;
+#ifdef E_DIVIDE_BY_ZERO
 		TRY {
 			self->vr_regs.vr_ah = self->vr_regs.vr_al / opcode;
 			self->vr_regs.vr_al = self->vr_regs.vr_al % opcode;
-		} CATCH(E_DIVIDE_BY_ZERO) {
+		} EXCEPT {
+			if (!was_thrown(E_DIVIDE_BY_ZERO))
+				RETHROW();
 			goto err_ilop;
 		}
+#else /* E_DIVIDE_BY_ZERO */
+		if unlikely(!opcode)
+			goto err_ilop;
+		self->vr_regs.vr_ah = self->vr_regs.vr_al / opcode;
+		self->vr_regs.vr_al = self->vr_regs.vr_al % opcode;
+#endif /* !E_DIVIDE_BY_ZERO */
 		break;
 
 
@@ -4813,7 +4810,9 @@ do_c1h_switch_reg:
 				self->vr_regs.vr_ah = (uint8_t)(ax % opcode);
 			}
 #ifdef E_DIVIDE_BY_ZERO
-			CATCH(E_DIVIDE_BY_ZERO) {
+			EXCEPT {
+				if (!was_thrown(E_DIVIDE_BY_ZERO))
+					RETHROW();
 				return libvm86_sw_intr(self, 0x0); /* Divide by zero */
 			}
 #endif /* E_DIVIDE_BY_ZERO */
@@ -4836,7 +4835,9 @@ do_c1h_switch_reg:
 				self->vr_regs.vr_ah = (uint8_t)(int8_t)((int16_t)ax % (int8_t)opcode);
 			}
 #ifdef E_DIVIDE_BY_ZERO
-			CATCH(E_DIVIDE_BY_ZERO) {
+			EXCEPT {
+				if (!was_thrown(E_DIVIDE_BY_ZERO))
+					RETHROW();
 				return libvm86_sw_intr(self, 0x0); /* Divide by zero */
 			}
 #endif /* E_DIVIDE_BY_ZERO */
@@ -5051,7 +5052,9 @@ do_c1h_switch_reg:
 					self->vr_regs.vr_edx = (uint32_t)(edxeax % temp);
 				}
 #ifdef E_DIVIDE_BY_ZERO
-				CATCH(E_DIVIDE_BY_ZERO) {
+				EXCEPT {
+					if (!was_thrown(E_DIVIDE_BY_ZERO))
+						RETHROW();
 					return libvm86_sw_intr(self, 0x0); /* Divide by zero */
 				}
 #endif
@@ -5074,7 +5077,9 @@ do_c1h_switch_reg:
 					self->vr_regs.vr_edx = (uint16_t)(dxax % temp);
 				}
 #ifdef E_DIVIDE_BY_ZERO
-				CATCH(E_DIVIDE_BY_ZERO) {
+				EXCEPT {
+					if (!was_thrown(E_DIVIDE_BY_ZERO))
+						RETHROW();
 					return libvm86_sw_intr(self, 0x0); /* Divide by zero */
 				}
 #endif
@@ -5103,7 +5108,9 @@ do_c1h_switch_reg:
 					self->vr_regs.vr_edx = (uint32_t)(int32_t)((int64_t)edxeax % (int32_t)temp);
 				}
 #ifdef E_DIVIDE_BY_ZERO
-				CATCH(E_DIVIDE_BY_ZERO) {
+				EXCEPT {
+					if (!was_thrown(E_DIVIDE_BY_ZERO))
+						RETHROW();
 					return libvm86_sw_intr(self, 0x0); /* Divide by zero */
 				}
 #endif
@@ -5126,7 +5133,9 @@ do_c1h_switch_reg:
 					self->vr_regs.vr_edx = (uint16_t)(int16_t)((int32_t)dxax % (int16_t)temp);
 				}
 #ifdef E_DIVIDE_BY_ZERO
-				CATCH(E_DIVIDE_BY_ZERO) {
+				EXCEPT {
+					if (!was_thrown(E_DIVIDE_BY_ZERO))
+						RETHROW();
 					return libvm86_sw_intr(self, 0x0); /* Divide by zero */
 				}
 #endif

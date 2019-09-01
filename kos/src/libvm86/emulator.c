@@ -33,6 +33,7 @@
 #include <assert.h>
 #include <stddef.h>
 
+#include "api.h"
 #include "x86.h"
 
 #ifdef __KERNEL__
@@ -124,7 +125,9 @@ libvm86_sw_intr(vm86_state_t *__restrict self, uint8_t intno) {
 		TRY {
 			ip = base[(intno * 2) + 0];
 			cs = base[(intno * 2) + 1];
-		} CATCH(E_SEGFAULT) {
+		} EXCEPT {
+			if (!WAS_SEGFAULT_THROWN())
+				RETHROW();
 			return VM86_SEGFAULT;
 		}
 		if (!vm86_state_hasstack(self, 6))

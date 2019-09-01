@@ -35,6 +35,7 @@
 
 #include <bits/confname.h>
 
+#include <assert.h>
 #include <string.h>
 
 DECL_BEGIN
@@ -156,6 +157,7 @@ Ext2_ReadINodeDiskDescriptor(Ext2Superblock *__restrict self, ext2_ino_t ino,
 	addr = Ext2_InoAddr(self, ino);
 	block_device_read(self->s_device, buf, 128, addr);
 }
+
 /* Write the descriptor for the given `ino' to disk */
 INTERN void KCALL
 Ext2_WriteINodeDiskDescriptor(Ext2Superblock *__restrict self, ext2_ino_t ino,
@@ -200,7 +202,7 @@ ExtINode_LoadAttr(struct inode *__restrict self) {
 	node->i_diblock_addr = LESWAP32(data.i_diblock);
 	node->i_tiblock_addr = LESWAP32(data.i_tiblock);
 	/* Read general-purpose INode attributes. */
-	self->i_filenlink = LESWAP16(data.i_nlink);
+	self->i_filenlink = (nlink_t)LESWAP16(data.i_nlink);
 	real_mode         = LESWAP16(data.i_mode);
 	/* Race condition: The file got deleted and another node with the
 	 *                 same ID, but of a different type may have been
@@ -218,8 +220,8 @@ ExtINode_LoadAttr(struct inode *__restrict self) {
 	if ((self->i_filemode & S_IFMT) != (real_mode & S_IFMT))
 		THROW(E_FSERROR_FILE_NOT_FOUND);
 	self->i_filemode          = real_mode;
-	self->i_fileuid           = LESWAP16(data.i_uid);
-	self->i_filegid           = LESWAP16(data.i_gid);
+	self->i_fileuid           = (uid_t)LESWAP16(data.i_uid);
+	self->i_filegid           = (gid_t)LESWAP16(data.i_gid);
 	self->i_filesize          = (pos_t)LESWAP32(data.i_size_low);
 	self->i_fileatime.tv_sec  = LESWAP32(data.i_atime);
 	self->i_fileatime.tv_nsec = 0;
@@ -461,7 +463,8 @@ Ext2_ReadSymLink(struct symlink_node *__restrict self) {
        *        symlink data that was small enough within the INode itself.             \
        *        Although sources state that prior to this data was written in actual    \
        *        blocks, what isn't stated is anything about how to differentiate        \
-       *        these two cases other than the link size. */
+       *        these two cases other than the link size (which is ambiguous for small
+       *        links). */
 		    && node->i_dblock[0] >= ((Ext2Superblock *)self->i_super)->sd_total_blocks
 #endif
 			) {
@@ -693,7 +696,7 @@ NOTHROW(KCALL Ext2_FinalizeSuperblock)(Ext2Superblock *__restrict self) {
 	}
 }
 
-INTDEF void KCALL
+INTERN void KCALL
 Ext2_OpenINode(Ext2Superblock *__restrict self,
                struct inode *__restrict node,
                struct directory_node *__restrict parent_directory,
@@ -724,15 +727,15 @@ Ext2_OpenINode(Ext2Superblock *__restrict self,
 	}
 }
 
-INTERN NONNULL((1)) void
-(KCALL Ext2_StatSuperblock)(Ext2Superblock *__restrict self,
-							USER CHECKED struct statfs *result)
+INTERN NONNULL((1)) void KCALL
+Ext2_StatSuperblock(Ext2Superblock *__restrict self,
+                    USER CHECKED struct statfs *result)
 		THROWS(E_IOERROR, E_SEGFAULT, ...) {
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
 
-INTERN void
-(KCALL Ext2_SynchronizeSuperblock)(Ext2Superblock *__restrict self)
+INTERN void KCALL
+Ext2_SynchronizeSuperblock(Ext2Superblock *__restrict self)
 		THROWS(E_IOERROR, ...) {
 	/* TODO */
 	(void)self;
@@ -764,7 +767,7 @@ PRIVATE DRIVER_FINI void fini(void) {
 }
 
 
-#if 1
+#if 0
 PRIVATE DRIVER_INIT void init2(void) {
 	printk(KERN_DEBUG "ext2fs-- constructor\n");
 	printk(KERN_DEBUG "drv_self          = %p\n", &drv_self);

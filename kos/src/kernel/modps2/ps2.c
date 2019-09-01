@@ -297,6 +297,7 @@ PRIVATE void KCALL ps2_probe_install_handlers(struct ps2_probe_data *__restrict 
 	isr_register_at(X86_INTNO_PIC1_KBD, &ps2_probe_handle_interrupt, probe_data);
 	isr_register_at(X86_INTNO_PIC2_PS2M, &ps2_probe_handle_interrupt, probe_data);
 }
+
 PRIVATE void KCALL ps2_probe_delete_handlers(struct ps2_probe_data *__restrict probe_data) {
 	isr_unregister_at(X86_INTNO_PIC1_KBD, &ps2_probe_handle_interrupt, probe_data);
 	isr_unregister_at(X86_INTNO_PIC2_PS2M, &ps2_probe_handle_interrupt, probe_data);

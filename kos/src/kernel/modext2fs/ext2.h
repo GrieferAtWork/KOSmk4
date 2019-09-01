@@ -173,28 +173,28 @@ typedef struct ATTR_PACKED {
 	union ATTR_PACKED
 #endif
 	{
-	    struct ATTR_PACKED {
-	        u8     l_fragno;        /* Fragment number??? */
-	        u8     l_fragsz;        /* Fragment size??? */
-	        le16 __l_pad;           /* ... */
-	        le16   l_uid_high;      /* High 16 bits of `i_uid' */
-	        le16   l_gid_high;      /* High 16 bits of `i_gid' */
-	        le32 __l_pad2;          /* ... */
-	    }          i_os_linux;      /* [valid_if(:sd_os == EXT2_OS_FLINUX)] */
-	    struct ATTR_PACKED {
-	        u8     h_fragno;        /* Fragment number??? */
-	        u8     h_fragsz;        /* Fragment size??? */
-	        le16   h_mode_high;     /* High 16 bits of `i_mode' */
-	        le16   h_uid_high;      /* High 16 bits of `i_uid' */
-	        le16   h_gid_high;      /* High 16 bits of `i_gid' */
-	        le32   h_uid_author;    /* User ID of author (if == 0xFFFFFFFF, the normal User ID will be used) */
-	    }          i_os_hurd;       /* [valid_if(:sd_os == EXT2_OS_FGNU_HURD)] */
-	    struct ATTR_PACKED {
-	        u8     m_fragno;        /* Fragment number??? */
-	        u8     m_fragsz;        /* Fragment size??? */
-	        u8   __m_pad[10];       /* ... */
-	    }          i_masix;         /* [valid_if(:sd_os == EXT2_OS_FMASIX)] */
-	    le32       i_os2[3];        /* Operating System Specific Value #2 */
+		struct ATTR_PACKED {
+			u8     l_fragno;        /* Fragment number??? */
+			u8     l_fragsz;        /* Fragment size??? */
+			le16 __l_pad;           /* ... */
+			le16   l_uid_high;      /* High 16 bits of `i_uid' */
+			le16   l_gid_high;      /* High 16 bits of `i_gid' */
+			le32 __l_pad2;          /* ... */
+		}          i_os_linux;      /* [valid_if(:sd_os == EXT2_OS_FLINUX)] */
+		struct ATTR_PACKED {
+			u8     h_fragno;        /* Fragment number??? */
+			u8     h_fragsz;        /* Fragment size??? */
+			le16   h_mode_high;     /* High 16 bits of `i_mode' */
+			le16   h_uid_high;      /* High 16 bits of `i_uid' */
+			le16   h_gid_high;      /* High 16 bits of `i_gid' */
+			le32   h_uid_author;    /* User ID of author (if == 0xFFFFFFFF, the normal User ID will be used) */
+		}          i_os_hurd;       /* [valid_if(:sd_os == EXT2_OS_FGNU_HURD)] */
+		struct ATTR_PACKED {
+			u8     m_fragno;        /* Fragment number??? */
+			u8     m_fragsz;        /* Fragment size??? */
+			u8   __m_pad[10];       /* ... */
+		}          i_masix;         /* [valid_if(:sd_os == EXT2_OS_FMASIX)] */
+		le32       i_os2[3];        /* Operating System Specific Value #2 */
 	};
 } Ext2DiskINode;
 
@@ -209,12 +209,12 @@ typedef struct ATTR_PACKED {
 	union ATTR_PACKED
 #endif
 	{
-	    le16    d_namlen;        /* [valid_if(!(:->sd_feat_required & EXT2_FEAT_REQ_FDIRENT_TYPE))]
-	                              * length of the name (in characters; excluding \0) */
-	    struct ATTR_PACKED {
-	        u8  d_namlen_low;    /* Low 8 bits of the name length. */
-	        u8  d_type;          /* Entry type (One of `DT_*'). */
-	    };
+		le16    d_namlen;        /* [valid_if(!(:->sd_feat_required & EXT2_FEAT_REQ_FDIRENT_TYPE))]
+									* length of the name (in characters; excluding \0) */
+		struct ATTR_PACKED {
+			u8  d_namlen_low;    /* Low 8 bits of the name length. */
+			u8  d_type;          /* Entry type (One of `DT_*'). */
+		};
 	};
 //  char        d_name[1];       /* The directory entry name. */
 } Ext2DiskDirent;
@@ -441,15 +441,16 @@ Ext2_OpenSuperblock(Ext2Superblock *__restrict self, UNCHECKED USER char *args)
 INTDEF NOBLOCK void
 NOTHROW(KCALL Ext2_FinalizeSuperblock)(Ext2Superblock *__restrict self);
 
-INTDEF void
-(KCALL Ext2_OpenINode)(Ext2Superblock *__restrict self,
-                       struct inode *__restrict node,
-                       struct directory_node *__restrict parent_directory,
-                       struct directory_entry *__restrict parent_directory_entry)
+INTDEF void KCALL
+Ext2_OpenINode(Ext2Superblock *__restrict self,
+               struct inode *__restrict node,
+               struct directory_node *__restrict parent_directory,
+               struct directory_entry *__restrict parent_directory_entry)
 		THROWS(E_IOERROR, E_BADALLOC, ...);
 
-INTDEF void
-(KCALL Ext2_SynchronizeSuperblock)(Ext2Superblock *__restrict self) THROWS(E_IOERROR,...);
+INTDEF void KCALL
+Ext2_SynchronizeSuperblock(Ext2Superblock *__restrict self)
+		THROWS(E_IOERROR, ...);
 
 INTDEF struct superblock_type Ext2_SuperblockType;
 

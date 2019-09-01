@@ -83,7 +83,9 @@ NOTHROW(KCALL generate_traceback)(void **__restrict buffer, size_t buflen,
 			if (!--buflen)
 				return;
 		}
-	} CATCH(E_SEGFAULT) {
+	} EXCEPT {
+		if (!was_thrown(E_SEGFAULT) && !was_thrown(E_WOULDBLOCK))
+			RETHROW(); /* This causes panic because we're NOTHROW */
 	}
 #endif
 	if (buflen)

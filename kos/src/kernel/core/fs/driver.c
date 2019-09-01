@@ -1193,8 +1193,10 @@ driver_getfile(struct driver *__restrict self)
 		                            &lastseg_len,
 		                            FS_MODE_FNORMAL,
 		                            NULL);
-	} CATCH(E_FSERROR) {
-		if (E_FSERROR_IS_FILE_NOT_FOUND(error_code()))
+	} EXCEPT {
+		error_code_t code = error_code();
+		if (ERROR_CLASS(code) == E_FSERROR &&
+		    E_FSERROR_IS_FILE_NOT_FOUND(code))
 			return NULL; /* File not found */
 		RETHROW();
 	}
@@ -4097,8 +4099,9 @@ driver_insmod_loadlib(struct driver_library_path_string *__restrict libpath,
 			                                  pnew_driver_loaded,
 			                                  flags,
 			                                  second_phase);
-		} CATCH(E_FSERROR) {
-			if (!E_FSERROR_IS_FILE_NOT_FOUND(error_code()))
+		} EXCEPT {
+			error_code_t code = error_code();
+			if (ERROR_CLASS(code) != E_FSERROR || !E_FSERROR_IS_FILE_NOT_FOUND(code))
 				RETHROW(); /* Something other than file-not-found */
 			if (second_phase && !*sep)
 				RETHROW(); /* This is the last possible path to search in the second phase. */

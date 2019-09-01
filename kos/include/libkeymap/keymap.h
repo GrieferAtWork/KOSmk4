@@ -86,11 +86,11 @@ typedef struct __ATTR_PACKED {
 /*      KMP_OP_           0x19  * ... */
 #define KMP_OP_SETKEYMOD2 0x1a /* OPCODE: mask = UNALIGNED_GETLE16(%pc); %pc += 2;
                                 *         kchr = READ_CHARACTER(%pc, %enc);
-                                *         if (CURRENT_KEYMOD  == mask)
+                                *         if (CURRENT_KEYMOD == mask)
                                 *             return kchr; */
 #define KMP_OP_SETKEYMOD  0x1b /* OPCODE: mask = *(u8 *)%pc; %pc += 1;
                                 *         kchr = READ_CHARACTER(%pc, %enc);
-                                *         if (CURRENT_KEYMOD  == mask)
+                                *         if (CURRENT_KEYMOD == mask)
                                 *             return kchr; */
 #define KMP_OP_SETPRESS   0x1c /* OPCODE: kchr = READ_CHARACTER(%pc, %enc);
                                 *         if (CURRENT_KEY == %key && KEYMOD_ISNORMAL(CURRENT_KEYMOD))

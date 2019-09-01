@@ -65,4 +65,13 @@
 #define CASE(x)         case x:
 #endif
 
+/* In kernel-space, memory accesses can also cause E_WOULDBLOCK to be thrown
+ * when preemption is disabled. - Handle that error like we do SEGFAULTS. */
+#ifdef __KERNEL__
+#define WAS_SEGFAULT_THROWN() (was_thrown(E_SEGFAULT) || was_thrown(E_WOULDBLOCK))
+#else /* __KERNEL__ */
+#define WAS_SEGFAULT_THROWN()  was_thrown(E_SEGFAULT)
+#endif /* !__KERNEL__ */
+
+
 #endif /* !GUARD_LIBVM86_API_H */

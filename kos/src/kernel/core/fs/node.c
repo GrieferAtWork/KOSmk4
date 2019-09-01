@@ -1355,6 +1355,7 @@ directory_readnext_p(struct directory_node *__restrict self)
 		return NULL;
 	/* Make sure that we've got a readdir() operator to work with. */
 	if unlikely(!self->i_type->it_directory.d_readdir) {
+set_unimplemented:
 		ATOMIC_FETCHOR(self->i_flags, INODE_FDIRLOADED);
 		return NULL;
 	}
@@ -1366,8 +1367,17 @@ continue_reading:
 #endif
 	TRY {
 		result = (*self->i_type->it_directory.d_readdir)(self, &last_directory_position);
-	} CATCH(E_IOERROR_BADBOUNDS) {
-		result = NULL;
+	} EXCEPT {
+		error_code_t code = error_code();
+		if (code == ERROR_CODEOF(E_IOERROR_BADBOUNDS)) {
+			/* Catch E_IOERROR_BADBOUNDS and handle it as end-of-directory. */
+			result = NULL;
+		} else if (code == E_FSERROR_UNSUPPORTED_OPERATION &&
+		           error_data()->e_pointers[0] == E_FILESYSTEM_OPERATION_READDIR) {
+			goto set_unimplemented;
+		} else {
+			RETHROW();
+		}
 	}
 	if (!result) {
 		/* End of directory. (Set the flag for that) */
@@ -1475,6 +1485,7 @@ directory_readnext(struct directory_node *__restrict self)
 		return NULL;
 	/* Make sure that we've got a readdir() operator to work with. */
 	if unlikely(!self->i_type->it_directory.d_readdir) {
+set_unimplemented:
 		ATOMIC_FETCHOR(self->i_flags, INODE_FDIRLOADED);
 		return NULL;
 	}
@@ -1486,9 +1497,17 @@ continue_reading:
 #endif
 	TRY {
 		result = (*self->i_type->it_directory.d_readdir)(self, &last_directory_position);
-	} CATCH(E_IOERROR_BADBOUNDS) {
-		/* Catch E_IOERROR_BADBOUNDS and handle it as end-of-directory. */
-		result = NULL;
+	} EXCEPT {
+		error_code_t code = error_code();
+		if (code == ERROR_CODEOF(E_IOERROR_BADBOUNDS)) {
+			/* Catch E_IOERROR_BADBOUNDS and handle it as end-of-directory. */
+			result = NULL;
+		} else if (code == E_FSERROR_UNSUPPORTED_OPERATION &&
+		           error_data()->e_pointers[0] == E_FILESYSTEM_OPERATION_READDIR) {
+			goto set_unimplemented;
+		} else {
+			RETHROW();
+		}
 	}
 	if (!result) {
 		/* End of directory. (Set the flag for that) */
@@ -1603,8 +1622,13 @@ directory_getentry(struct directory_node *__restrict self,
 			                                                        namelen,
 			                                                        hash,
 			                                                        FS_MODE_FNORMAL);
-		} CATCH(E_FSERROR_FILE_NOT_FOUND) {
-			return NULL;
+		} EXCEPT {
+			error_code_t code = error_code();
+			if (code == ERROR_CODEOF(E_FSERROR_FILE_NOT_FOUND))
+				return NULL;
+			if (code != ERROR_CODEOF(E_FSERROR_UNSUPPORTED_OPERATION) ||
+			    error_data()->e_pointers[0] != E_FILESYSTEM_OPERATION_READDIR)
+				RETHROW();
 		}
 	}
 	if unlikely(!self->d_size)
@@ -1659,8 +1683,13 @@ directory_getcaseentry(struct directory_node *__restrict self,
 			                                                        namelen,
 			                                                        hash,
 			                                                        FS_MODE_FDOSPATH);
-		} CATCH(E_FSERROR_FILE_NOT_FOUND) {
-			return NULL;
+		} EXCEPT {
+			error_code_t code = error_code();
+			if (code == ERROR_CODEOF(E_FSERROR_FILE_NOT_FOUND))
+				return NULL;
+			if (code != ERROR_CODEOF(E_FSERROR_UNSUPPORTED_OPERATION) ||
+			    error_data()->e_pointers[0] != E_FILESYSTEM_OPERATION_READDIR)
+				RETHROW();
 		}
 	}
 	if unlikely(!self->d_size)
@@ -1740,8 +1769,13 @@ directory_getentry_p(struct directory_node *__restrict self,
 			                                                          namelen,
 			                                                          hash,
 			                                                          FS_MODE_FNORMAL);
-		} CATCH(E_FSERROR_FILE_NOT_FOUND) {
-			return NULL;
+		} EXCEPT {
+			error_code_t code = error_code();
+			if (code == ERROR_CODEOF(E_FSERROR_FILE_NOT_FOUND))
+				return NULL;
+			if (code != ERROR_CODEOF(E_FSERROR_UNSUPPORTED_OPERATION) ||
+			    error_data()->e_pointers[0] != E_FILESYSTEM_OPERATION_READDIR)
+				RETHROW();
 		}
 		if (!result)
 			return NULL;
@@ -1799,8 +1833,13 @@ directory_getcaseentry_p(struct directory_node *__restrict self,
 			                                                          namelen,
 			                                                          hash,
 			                                                          FS_MODE_FDOSPATH);
-		} CATCH(E_FSERROR_FILE_NOT_FOUND) {
-			return NULL;
+		} EXCEPT {
+			error_code_t code = error_code();
+			if (code == ERROR_CODEOF(E_FSERROR_FILE_NOT_FOUND))
+				return NULL;
+			if (code != ERROR_CODEOF(E_FSERROR_UNSUPPORTED_OPERATION) ||
+			    error_data()->e_pointers[0] != E_FILESYSTEM_OPERATION_READDIR)
+				RETHROW();
 		}
 		if (!result)
 			return NULL;

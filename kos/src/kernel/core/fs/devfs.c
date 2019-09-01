@@ -30,6 +30,7 @@
 
 #include <hybrid/atomic.h>
 
+#include <assert.h>
 #include <string.h>
 
 DECL_BEGIN
@@ -123,11 +124,11 @@ PUBLIC struct superblock devfs = {
  * @return: false: A file matching `name' already exists.
  *                 In this case, both `*pdevfs_node' and `*pdevfs_entry'
  *                 (if given) will have been set to `NULL'. */
-PUBLIC bool
-(KCALL devfs_insert)(USER CHECKED char const *name,
-                     mode_t kind, dev_t devno,
-                     REF struct inode **pdevfs_node,
-                     REF struct directory_entry **pdevfs_entry)
+PUBLIC bool KCALL
+devfs_insert(USER CHECKED char const *name,
+             mode_t kind, dev_t devno,
+             REF struct inode **pdevfs_node,
+             REF struct directory_entry **pdevfs_entry)
        THROWS(E_WOULDBLOCK, E_BADALLOC,E_SEGFAULT) {
 	REF struct inode *node;
 	assert(kind == S_IFCHR || kind == S_IFBLK);
@@ -142,7 +143,9 @@ PUBLIC bool
 		                       devno,
 		                       DIRECTORY_MKNOD_FNORMAL,
 		                       pdevfs_entry);
-	} CATCH(E_FSERROR_FILE_ALREADY_EXISTS) {
+	} EXCEPT {
+		if (!was_thrown(E_FSERROR_FILE_ALREADY_EXISTS))
+			RETHROW();
 		if (pdevfs_node)
 			*pdevfs_node = NULL;
 		if (pdevfs_entry)

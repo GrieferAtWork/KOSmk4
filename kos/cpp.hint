@@ -469,7 +469,6 @@
 
 #define TRY
 #define EXCEPT
-#define CATCH(code)
 
 
 #define __FS_TYPE(x)      __##x##_t

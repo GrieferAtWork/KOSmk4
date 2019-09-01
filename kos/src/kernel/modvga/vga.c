@@ -343,7 +343,7 @@ VGA_SetMode(VGA *__restrict self,
 	if (mode->vm_seq_clock_mode & VGA_SR01_FRESERVED)
 		goto invalid_mode;
 
-	atomic_rwlock_write(&self->v_lock);
+	sync_write(&self->v_lock);
 	qr1 = vga_rseq(VGA_SEQ_CLOCK_MODE);
 
 	/* Turn off the screen. */
@@ -428,7 +428,7 @@ VGA_SetMode(VGA *__restrict self,
 			vga_wseq(VGA_SEQ_RESET, 0x3);
 		}
 	}
-	atomic_rwlock_endwrite(&self->v_lock);
+	sync_endwrite(&self->v_lock);
 	return;
 invalid_mode:
 	THROW(E_INVALID_ARGUMENT);
@@ -437,8 +437,9 @@ invalid_mode:
 
 INTERN void KCALL
 VGA_GetMode(VGA *__restrict self,
-            struct vga_mode *__restrict mode) {
-	atomic_rwlock_write(&self->v_lock);
+            struct vga_mode *__restrict mode)
+		THROWS(E_WOULDBLOCK) {
+	sync_write(&self->v_lock);
 	vga_r(VGA_IS1_RC), vga_w(VGA_ATT_W, 0x00);
 	vga_r(VGA_IS1_RC), mode->vm_att_mode         = vga_rattr(VGA_ATC_MODE) & ~VGA_AT10_FRESERVED;
 	vga_r(VGA_IS1_RC), mode->vm_att_overscan     = vga_rattr(VGA_ATC_OVERSCAN);
@@ -479,15 +480,16 @@ VGA_GetMode(VGA *__restrict self,
 	mode->vm_seq_character_map = vga_rseq(VGA_SEQ_CHARACTER_MAP) & ~VGA_SR03_FRESERVED;
 	mode->vm_seq_memory_mode   = vga_rseq(VGA_SEQ_MEMORY_MODE) & ~VGA_SR04_FRESERVED;
 	mode->vm_seq_clock_mode    = vga_rseq(VGA_SEQ_CLOCK_MODE) & ~VGA_SR01_FRESERVED;
-	atomic_rwlock_endwrite(&self->v_lock);
+	sync_endwrite(&self->v_lock);
 }
 
 
 INTERN void KCALL
 VGA_SetPalette(VGA *__restrict self,
-               USER CHECKED struct vga_palette const *__restrict pal) {
+               USER CHECKED struct vga_palette const *__restrict pal)
+		THROWS(E_WOULDBLOCK) {
 	unsigned int i = 0;
-	atomic_rwlock_write(&self->v_lock);
+	sync_write(&self->v_lock);
 	TRY {
 		vga_w(VGA_PEL_MSK, 0xff);
 		vga_w(VGA_PEL_IW, 0x00);
@@ -497,17 +499,18 @@ VGA_SetPalette(VGA *__restrict self,
 		/* Must complete the operation. - VGA wouldn't understand otherwise. */
 		for (; i < 768; ++i)
 			vga_w(VGA_PEL_D, 0);
-		atomic_rwlock_endwrite(&self->v_lock);
+		sync_endwrite(&self->v_lock);
 		RETHROW();
 	}
-	atomic_rwlock_endwrite(&self->v_lock);
+	sync_endwrite(&self->v_lock);
 }
 
 INTERN void KCALL
 VGA_GetPalette(VGA *__restrict self,
-               USER CHECKED struct vga_palette *__restrict pal) {
+               USER CHECKED struct vga_palette *__restrict pal)
+		THROWS(E_WOULDBLOCK) {
 	unsigned int i = 0;
-	atomic_rwlock_write(&self->v_lock);
+	sync_write(&self->v_lock);
 	TRY {
 		vga_w(VGA_PEL_MSK, 0xff);
 		vga_w(VGA_PEL_IR, 0x00);
@@ -517,42 +520,44 @@ VGA_GetPalette(VGA *__restrict self,
 		/* Must complete the operation. - VGA wouldn't understand otherwise. */
 		for (; i < 768; ++i)
 			vga_r(VGA_PEL_D);
-		atomic_rwlock_endwrite(&self->v_lock);
+		sync_endwrite(&self->v_lock);
 		RETHROW();
 	}
-	atomic_rwlock_endwrite(&self->v_lock);
+	sync_endwrite(&self->v_lock);
 }
 
 INTERN void KCALL
-VGA_ScreenOn(VGA *__restrict self) {
+VGA_ScreenOn(VGA *__restrict self)
+		THROWS(E_WOULDBLOCK) {
 	u8 qr1;
-	atomic_rwlock_write(&self->v_lock);
+	sync_write(&self->v_lock);
 	qr1 = vga_rseq(VGA_SEQ_CLOCK_MODE);
 	qr1 &= ~VGA_SR01_FSCREEN_OFF;
 	vga_wseq(VGA_SEQ_RESET, 0x1);
 	vga_wseq(VGA_SEQ_CLOCK_MODE, qr1);
 	vga_wseq(VGA_SEQ_RESET, 0x3);
 	self->v_state &= ~VGA_STATE_FSCREENOFF;
-	atomic_rwlock_endwrite(&self->v_lock);
+	sync_endwrite(&self->v_lock);
 }
 
 INTERN void KCALL
-VGA_ScreenOff(VGA *__restrict self) {
+VGA_ScreenOff(VGA *__restrict self)
+		THROWS(E_WOULDBLOCK) {
 	u8 qr1;
-	atomic_rwlock_write(&self->v_lock);
+	sync_write(&self->v_lock);
 	qr1 = vga_rseq(VGA_SEQ_CLOCK_MODE);
 	qr1 |= VGA_SR01_FSCREEN_OFF;
 	vga_wseq(VGA_SEQ_RESET, 0x1);
 	vga_wseq(VGA_SEQ_CLOCK_MODE, qr1);
 	vga_wseq(VGA_SEQ_RESET, 0x3);
 	self->v_state |= VGA_STATE_FSCREENOFF;
-	atomic_rwlock_endwrite(&self->v_lock);
+	sync_endwrite(&self->v_lock);
 }
 
 
 
-PRIVATE ATTR_FREETEXT void KCALL
-vga_disable_annoying_blinking(void) {
+PRIVATE NOBLOCK ATTR_FREETEXT void
+NOTHROW(KCALL vga_disable_annoying_blinking)(void) {
 	u8 qr1;
 	qr1 = vga_rseq(VGA_SEQ_CLOCK_MODE);
 	vga_wseq(VGA_SEQ_RESET, 0x1);
@@ -894,7 +899,8 @@ LOCAL u8 NOTHROW(KCALL cp437_encode)(/*utf-32*/u32 ch) {
 
 
 
-LOCAL void KCALL vga_enable_cursor(VGA *__restrict vga) {
+LOCAL void KCALL vga_enable_cursor(VGA *__restrict vga)
+		THROWS(E_WOULDBLOCK) {
 	if (!(vga->v_state & VGA_STATE_FCURSOR)) {
 		sync_write(&vga->v_lock);
 		COMPILER_READ_BARRIER();
@@ -906,7 +912,8 @@ LOCAL void KCALL vga_enable_cursor(VGA *__restrict vga) {
 	}
 }
 
-LOCAL void KCALL vga_disable_cursor(VGA *__restrict vga) {
+LOCAL void KCALL vga_disable_cursor(VGA *__restrict vga)
+		THROWS(E_WOULDBLOCK) {
 	if (vga->v_state & VGA_STATE_FCURSOR) {
 		sync_write(&vga->v_lock);
 		COMPILER_READ_BARRIER();
@@ -920,7 +927,8 @@ LOCAL void KCALL vga_disable_cursor(VGA *__restrict vga) {
 
 
 PRIVATE void KCALL
-vga_update_cursor_pos(VGA *__restrict vga) {
+vga_update_cursor_pos(VGA *__restrict vga)
+		THROWS(E_WOULDBLOCK) {
 	if (vga->v_textptr >= vga->v_textend) {
 		vga_disable_cursor(vga);
 	} else {
@@ -946,8 +954,8 @@ vga_update_cursor_pos(VGA *__restrict vga) {
 #define UNENCODABLE_END    "]"
 #define UNENCODABLE(x)     UNENCODABLE_START x UNENCODABLE_END
 
-PRIVATE NONNULL((1)) void LIBANSITTY_CC
-vga_putcp437(VGA *__restrict vga, u8 ch) {
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(LIBANSITTY_CC vga_putcp437)(VGA *__restrict vga, u8 ch) {
 	u16 *oldptr;
 	/* VGA terminal output */
 	for (;;) {
@@ -974,7 +982,8 @@ do_increment_oldptr:
 	}
 }
 
-PRIVATE void KCALL invert_current_line_colors(VGA *__restrict self) {
+PRIVATE NOBLOCK void
+NOTHROW(KCALL invert_current_line_colors)(VGA *__restrict self) {
 	unsigned int cur_x;
 	u16 *line_start, *line_end;
 	line_start  = ATOMIC_READ(self->v_textptr);
@@ -985,15 +994,14 @@ PRIVATE void KCALL invert_current_line_colors(VGA *__restrict self) {
 		*line_start ^= 0xff00;
 }
 
-PRIVATE void KCALL do_flash_screen_pause(void) {
+PRIVATE void KCALL do_flash_screen_pause(void) THROWS(E_WOULDBLOCK, ...) {
 	qtime_t tmo = quantum_time();
 	tmo.add_milliseconds(70);
 	task_waitfor(&tmo);
 }
 
 
-PRIVATE void KCALL flash_current_line_pause(void) {
-	/* TODO: Proper timeout */
+PRIVATE void KCALL flash_current_line_pause(void) THROWS(E_WOULDBLOCK, ...) {
 	if unlikely(task_isconnected()) {
 		struct task_connections con;
 		task_pushconnections(&con);
@@ -1012,14 +1020,15 @@ PRIVATE void KCALL flash_current_line_pause(void) {
 	}
 }
 
-PRIVATE void KCALL flash_current_line(VGA *__restrict self) {
+PRIVATE void KCALL flash_current_line(VGA *__restrict self) THROWS(E_WOULDBLOCK, ...) {
 	invert_current_line_colors(self);
 	flash_current_line_pause();
 	invert_current_line_colors(self);
 }
 
 PRIVATE NONNULL((1)) void LIBANSITTY_CC
-VGA_Putc(struct ansitty *__restrict self, char32_t ch) {
+VGA_Putc(struct ansitty *__restrict self, char32_t ch)
+		THROWS(E_WOULDBLOCK, ...) {
 	VGA *vga = container_of(self, VGA, at_ansi);
 	u8 cp_ch;
 	cp_ch = cp437_encode(ch);
@@ -1135,7 +1144,8 @@ VGA_Putc(struct ansitty *__restrict self, char32_t ch) {
 
 PRIVATE NONNULL((1)) void LIBANSITTY_CC
 VGA_SetTTYMode(struct ansitty *__restrict self,
-	           uint16_t new_ttymode) {
+	           uint16_t new_ttymode)
+		THROWS(E_WOULDBLOCK) {
 	VGA *vga = container_of(self, VGA, at_ansi);
 	if (new_ttymode & ANSITTY_MODE_HIDECURSOR) {
 		vga_disable_cursor(vga);
@@ -1148,7 +1158,8 @@ VGA_SetTTYMode(struct ansitty *__restrict self,
 /* Get/Set the current on-screen cursor position. */
 PRIVATE NONNULL((1)) void LIBANSITTY_CC
 VGA_SetCursor(struct ansitty *__restrict self,
-              ansitty_coord_t x, ansitty_coord_t y) {
+              ansitty_coord_t x, ansitty_coord_t y)
+		THROWS(E_WOULDBLOCK) {
 	VGA *vga;
 	unsigned int pos;
 	vga = container_of(self, VGA, at_ansi);
@@ -1168,9 +1179,9 @@ VGA_SetCursor(struct ansitty *__restrict self,
 		vga_update_cursor_pos(vga);
 }
 
-PRIVATE NONNULL((1)) void LIBANSITTY_CC
-VGA_GetCursor(struct ansitty *__restrict self,
-              ansitty_coord_t ppos[2]) {
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(LIBANSITTY_CC VGA_GetCursor)(struct ansitty *__restrict self,
+                                     ansitty_coord_t ppos[2]) {
 	VGA *vga = container_of(self, VGA, at_ansi);
 	u16 *ptr = ATOMIC_READ(vga->v_textptr);
 	size_t offset = (size_t)(ptr - ATOMIC_READ(vga->v_textbase));

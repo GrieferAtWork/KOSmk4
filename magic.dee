@@ -41,7 +41,7 @@ import AppExit from errors;
 File.stdout.setbuf("line");
 File.stderr.setbuf("line");
 
-global CONFIG_MAX_COMPILERS: int = 12;
+global CONFIG_MAX_COMPILERS: int = 12; /* TODO: Don't hardcode 12! - Calculate dynamically as the number of cores on our host machine */
 global CONFIG_OPTIMIZE: bool = none;
 global CONFIG_DEBUG: bool = none;
 global TARGET_XARCH: string = none; /* Target cross-arch directory /include/$TARGET_XARCH-kos/... */

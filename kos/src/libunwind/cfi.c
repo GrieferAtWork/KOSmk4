@@ -57,75 +57,84 @@
 #endif /* !__KERNEL__ */
 
 
+/* In kernel-space, memory accesses can also cause E_WOULDBLOCK to be thrown
+ * when preemption is disabled. - Handle that error like we do SEGFAULTS. */
+#ifdef __KERNEL__
+#define WAS_SEGFAULT_THROWN() (was_thrown(E_SEGFAULT) || was_thrown(E_WOULDBLOCK))
+#else /* __KERNEL__ */
+#define WAS_SEGFAULT_THROWN()  was_thrown(E_SEGFAULT)
+#endif /* !__KERNEL__ */
+
+
 DECL_BEGIN
 
 LOCAL bool
 NOTHROW(CC guarded_readb)(uint8_t *ptr, uintptr_t *__restrict result) {
 	uint8_t value;
-	struct exception_data old_data;
-	old_data = *error_data();
+	struct exception_data old_except;
+	memcpy(&old_except, error_data(), sizeof(struct exception_data));
 	TRY {
 		value = *ptr;
-	} CATCH(E_SEGFAULT) {
-		goto handle_segfault;
+	} EXCEPT {
+		if (!WAS_SEGFAULT_THROWN())
+			RETHROW(); /* This will panic() because we're NOTHROW */
+		memcpy(error_data(), &old_except, sizeof(struct exception_data));
+		return false;
 	}
 	*result = (uintptr_t)value;
 	return true;
-handle_segfault:
-	*error_data() = old_data;
-	return false;
 }
 
 LOCAL bool
 NOTHROW(CC guarded_readw)(uint16_t *ptr, uintptr_t *__restrict result) {
 	uint16_t value;
-	struct exception_data old_data;
-	old_data = *error_data();
+	struct exception_data old_except;
+	memcpy(&old_except, error_data(), sizeof(struct exception_data));
 	TRY {
 		value = UNALIGNED_GET16(ptr);
-	} CATCH(E_SEGFAULT) {
-		goto handle_segfault;
+	} EXCEPT {
+		if (!WAS_SEGFAULT_THROWN())
+			RETHROW(); /* This will panic() because we're NOTHROW */
+		memcpy(error_data(), &old_except, sizeof(struct exception_data));
+		return false;
 	}
 	*result = (uintptr_t)value;
 	return true;
-handle_segfault:
-	*error_data() = old_data;
-	return false;
 }
 
 LOCAL bool
 NOTHROW(CC guarded_readl)(uint32_t *ptr, uintptr_t *__restrict result) {
 	uint32_t value;
-	struct exception_data old_data;
-	old_data = *error_data();
+	struct exception_data old_except;
+	memcpy(&old_except, error_data(), sizeof(struct exception_data));
 	TRY {
 		value = UNALIGNED_GET32(ptr);
-	} CATCH(E_SEGFAULT) {
-		goto handle_segfault;
+	} EXCEPT {
+		if (!WAS_SEGFAULT_THROWN())
+			RETHROW(); /* This will panic() because we're NOTHROW */
+		memcpy(error_data(), &old_except, sizeof(struct exception_data));
+		return false;
 	}
 	*result = (uintptr_t)value;
 	return true;
-handle_segfault:
-	*error_data() = old_data;
-	return false;
 }
 
 #if __SIZEOF_POINTER__ > 4
 LOCAL bool
 NOTHROW(CC guarded_readq)(uint64_t *ptr, uintptr_t *__restrict result) {
 	uint64_t value;
-	struct exception_data old_data;
-	old_data = *error_data();
+	struct exception_data old_except;
+	memcpy(&old_except, error_data(), sizeof(struct exception_data));
 	TRY {
 		value = UNALIGNED_GET64(ptr);
-	} CATCH(E_SEGFAULT) {
-		goto handle_segfault;
+	} EXCEPT {
+		if (!WAS_SEGFAULT_THROWN())
+			RETHROW(); /* This will panic() because we're NOTHROW */
+		memcpy(error_data(), &old_except, sizeof(struct exception_data));
+		return false;
 	}
 	*result = (uintptr_t)value;
 	return true;
-handle_segfault:
-	*error_data() = old_data;
-	return false;
 }
 #define guarded_readptr guarded_readq
 #else
@@ -136,41 +145,17 @@ INTERN bool
 NOTHROW(CC guarded_memcpy)(void *__restrict dst,
                            void const *__restrict src,
                            size_t num_bytes) {
-	uintptr_t temp;
-	while (num_bytes >= sizeof(uintptr_t)) {
-		if unlikely(!guarded_readptr((uintptr_t *)src, &temp))
-			goto err;
-		UNALIGNED_SET((uintptr_t *)dst, temp);
-		src = (byte_t *)src + sizeof(uintptr_t);
-		dst = (byte_t *)dst + sizeof(uintptr_t);
-		num_bytes -= sizeof(uintptr_t);
-	}
-#if __SIZEOF_POINTER__ > 4
-	if (num_bytes & 4) {
-		if (!guarded_readl((uint32_t *)src, &temp))
-			goto err;
-		UNALIGNED_SET32((uint32_t *)dst, (uint32_t)temp);
-		src = (byte_t *)src + 4;
-		dst = (byte_t *)dst + 4;
-	}
-#endif
-	if (num_bytes & 2) {
-		if unlikely(!guarded_readw((uint16_t *)src, &temp))
-			goto err;
-		UNALIGNED_SET16((uint16_t *)dst, (uint16_t)temp);
-		src = (byte_t *)src + 2;
-		dst = (byte_t *)dst + 2;
-	}
-	if (num_bytes & 1) {
-		if unlikely(!guarded_readb((uint8_t *)src, &temp))
-			goto err;
-		*(uint8_t *)dst = (uint8_t)temp;
-//		src = (byte_t *)src + 1;
-//		dst = (byte_t *)dst + 1;
+	struct exception_data old_except;
+	memcpy(&old_except, error_data(), sizeof(struct exception_data));
+	TRY {
+		memcpy(dst, src, num_bytes);
+	} EXCEPT {
+		if (!WAS_SEGFAULT_THROWN())
+			RETHROW(); /* This will panic() because we're NOTHROW */
+		memcpy(error_data(), &old_except, sizeof(struct exception_data));
+		return false;
 	}
 	return true;
-err:
-	return false;
 }
 
 
@@ -466,7 +451,9 @@ libuw_unwind_emulator_write_to_piece(unwind_emulator_t *__restrict self,
 			          self->ue_piecebuf,
 			          self->ue_piecebits,
 			          num_bits);
-		} CATCH(E_SEGFAULT) {
+		} EXCEPT {
+			if (!WAS_SEGFAULT_THROWN())
+				RETHROW();
 			ERROR(err_segfault);
 		}
 	}

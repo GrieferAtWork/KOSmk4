@@ -67,11 +67,11 @@ NOTHROW(KCALL devfs_remove)(struct inode *__restrict node,
  * @return: false: A file matching `name' already exists.
  *                 In this case, both `*pdevfs_node' and `*pdevfs_entry'
  *                 (if given) will have been set to `NULL'. */
-FUNDEF bool
-(KCALL devfs_insert)(USER CHECKED char const *name,
-                     mode_t kind, dev_t devno,
-                     REF struct inode **pdevfs_node,
-                     REF struct directory_entry **pdevfs_entry)
+FUNDEF bool KCALL
+devfs_insert(USER CHECKED char const *name,
+             mode_t kind, dev_t devno,
+             REF struct inode **pdevfs_node,
+             REF struct directory_entry **pdevfs_entry)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT);
 
 

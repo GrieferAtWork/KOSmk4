@@ -135,10 +135,10 @@ STATIC_ASSERT(SIZEOF_MFREE == offsetof(struct mfree,mf_data));
 #define HINT_GETMODE(x) HINT_MODE x
 
 #ifdef CONFIG_DEBUG_HEAP
-PRIVATE void KCALL
-debug_pat_loadpart(struct vm_datablock *__restrict UNUSED(self),
-                   vm_dpage_t UNUSED(start),
-                   vm_phys_t buffer, size_t num_data_pages) {
+PRIVATE void
+NOTHROW(KCALL debug_pat_loadpart)(struct vm_datablock *__restrict UNUSED(self),
+                                  vm_dpage_t UNUSED(start),
+                                  vm_phys_t buffer, size_t num_data_pages) {
 	uintptr_t backup;
 	vm_vpage_t tramp;
 	vm_ppage_t phys = VM_ADDR2PAGE(buffer);
@@ -204,8 +204,8 @@ PUBLIC struct heap kernel_heaps[__GFP_HEAPCOUNT] = {
 
 
 #ifdef CONFIG_DEBUG_HEAP
-INTERN byte_t *KCALL
-find_modified_address(byte_t *start, u32 pattern, size_t num_bytes) {
+INTERN WUNUSED byte_t *
+NOTHROW(KCALL find_modified_address)(byte_t *start, u32 pattern, size_t num_bytes) {
 	while ((uintptr_t)start & 3) {
 		if __untraced(!num_bytes)
 			return NULL;
@@ -255,8 +255,8 @@ find_modified_address(byte_t *start, u32 pattern, size_t num_bytes) {
 	return NULL;
 }
 
-PRIVATE u8 KCALL
-mfree_get_checksum(struct mfree *__restrict self) {
+PRIVATE u8
+NOTHROW(KCALL mfree_get_checksum)(struct mfree *__restrict self) {
 	u8 sum = 0, *iter, *end;
 	end = (iter = (u8 *)&self->mf_size) + sizeof(self->mf_size);
 	for (; iter < end; ++iter)
@@ -264,13 +264,13 @@ mfree_get_checksum(struct mfree *__restrict self) {
 	return 0 - sum;
 }
 
-PRIVATE void KCALL
-mfree_set_checksum(struct mfree *__restrict self) {
+PRIVATE void
+NOTHROW(KCALL mfree_set_checksum)(struct mfree *__restrict self) {
 	self->mf_szchk = mfree_get_checksum(self);
 }
 
-PRIVATE bool KCALL
-quick_verify_mfree(struct mfree *__restrict self) {
+PRIVATE bool
+NOTHROW(KCALL quick_verify_mfree)(struct mfree *__restrict self) {
 	TRY {
 		if __untraced(!IS_ALIGNED((uintptr_t)self, HEAP_ALIGNMENT))
 			return false;
@@ -279,7 +279,9 @@ quick_verify_mfree(struct mfree *__restrict self) {
 		if __untraced(*self->mf_lsize.ln_pself != self)
 			return false;
 		return true;
-	} CATCH(E_SEGFAULT) {
+	} EXCEPT {
+		if (!was_thrown(E_SEGFAULT) && !was_thrown(E_WOULDBLOCK))
+			RETHROW(); /* This causes panic because we're NOTHROW */
 	}
 	return false;
 }
@@ -290,7 +292,7 @@ INTDEF struct heap *const __kernel_validatable_heaps_end[];
 
 /* Validate the memory of the given heap for
  * consistency, checking for invalid use-after-free. */
-PUBLIC ATTR_NOINLINE void
+PUBLIC NOBLOCK ATTR_NOINLINE void
 NOTHROW(KCALL heap_validate_all)(void) {
 	struct heap *const *iter;
 	for (iter = __kernel_validatable_heaps_start;
@@ -298,13 +300,13 @@ NOTHROW(KCALL heap_validate_all)(void) {
 		(heap_validate)(*iter);
 }
 
-PUBLIC ATTR_NOINLINE void
+PUBLIC NOBLOCK ATTR_NOINLINE void
 NOTHROW(KCALL heap_validate)(struct heap *__restrict self) {
 	unsigned int i;
 #ifdef CONFIG_HAVE_HEAP_NOVALIDATE
 	if (PERTASK_GET(heap_novalidate))
 		return;
-#endif
+#endif /* CONFIG_HAVE_HEAP_NOVALIDATE */
 #if 1
 	if (!sync_tryread(&self->h_lock))
 		return;
@@ -401,17 +403,17 @@ NOTHROW(KCALL heap_validate)(struct heap *__restrict self) {
 }
 #else /* CONFIG_DEBUG_HEAP */
 #define mfree_set_checksum(self) (void)0
-PUBLIC void
+PUBLIC NOBLOCK void
 NOTHROW(KCALL heap_validate)(struct heap *__restrict UNUSED(self)) {
 }
-PUBLIC void
+PUBLIC NOBLOCK void
 NOTHROW(KCALL heap_validate_all)(void) {
 }
 #endif /* !CONFIG_DEBUG_HEAP */
 
 
-INTERN void KCALL
-reset_heap_data(byte_t *ptr, u32 pattern, size_t num_bytes) {
+INTERN NOBLOCK void
+NOTHROW(KCALL reset_heap_data)(byte_t *ptr, u32 pattern, size_t num_bytes) {
 	if (num_bytes < pagedir_pagesize())
 		goto do_remainder;
 	/* Only write pages that have been allocated. */
@@ -465,7 +467,7 @@ NOTHROW(KCALL heap_insert_node_unlocked)(struct heap *__restrict self,
 /* Acquire a lock to the heap, while also serving any pending free operations.
  * @return: true:  Successfully acquired a lock. (Always returned by `heap_acquirelock' when `GFP_ATOMIC' isn't set)
  * @return: false: Failed to acquire a lock (`GFP_ATOMIC' was set, and the operation would have blocked) */
-LOCAL bool (KCALL heap_acquirelock)(struct heap *__restrict self, gfp_t flags);
+LOCAL bool KCALL heap_acquirelock(struct heap *__restrict self, gfp_t flags);
 LOCAL WUNUSED bool NOTHROW(KCALL heap_acquirelock_nx)(struct heap *__restrict self, gfp_t flags);
 LOCAL NOBLOCK bool NOTHROW(KCALL heap_acquirelock_atomic)(struct heap *__restrict self);
 
@@ -1273,9 +1275,9 @@ NOTHROW(KCALL heap_free_underallocation)(struct heap *__restrict self,
 #else
 /* Without debug initialization, this isn't a problem! */
 #define heap_free_overallocation(self, overallocation_base, num_free_bytes, flags) \
-        heap_free_raw(self, overallocation_base, num_free_bytes, flags)
+	heap_free_raw(self, overallocation_base, num_free_bytes, flags)
 #define heap_free_underallocation(self, underallocation_base, num_free_bytes, flags) \
-        heap_free_raw(self, underallocation_base, num_free_bytes, flags)
+	heap_free_raw(self, underallocation_base, num_free_bytes, flags)
 #endif
 
 

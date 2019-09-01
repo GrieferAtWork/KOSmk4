@@ -2,8 +2,8 @@
 # Find stuff that this format defines incorrectly:
 #  REPLACE:  "\n[ \t]+(?=(?!default|public|private|protected)[a-zA-Z0-9_]+:[ \t]*\n)"  --> "\n"
 #             - Lables that aren't aligned to the left-most column
-#  REPLACE:  "}[ \t]*\n[ \t]+(?=CATCH *\(|EXCEPT *\()" --> "} "
-#             - CATCH/EXCEPT on a new line
+#  REPLACE:  "}[ \t]*\n[ \t]+(?=\bEXCEPT\b)" --> "} "
+#             - EXCEPT on a new line
 #  REPLACE:  "}\n[ \t]*else" --> "} else"
 #             - Else on a new line (happens after `if (un)likely')
 #  FIND:     "\n\t*((__|)(un)likely(_untraced|))"

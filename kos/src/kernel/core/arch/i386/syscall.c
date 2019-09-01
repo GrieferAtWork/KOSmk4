@@ -687,7 +687,13 @@ NOTHROW(FCALL x86_handle_except_before_userspace)(struct ucpustate *__restrict u
 								info.rsi_args[5] = ATOMIC_READ(argv[1]);
 								info.rsi_flags |= RPC_SYSCALL_INFO_FARGVALID(5);
 							}
-						} CATCH(E_SEGFAULT) {
+						} EXCEPT {
+							if (!was_thrown(E_SEGFAULT))
+								RETHROW();
+							goto restore_old_except;
+						}
+						__IF0 {
+restore_old_except:
 							memcpy(&THIS_EXCEPTION_INFO.ei_data, &old_except, sizeof(old_except));
 						}
 					}
@@ -966,7 +972,13 @@ NOTHROW(KCALL x86_syscall_emulate_callback_personality)(struct unwind_fde_struct
 					info.rsi_args[i] = ATOMIC_READ(argv[i]);
 					info.rsi_flags |= RPC_SYSCALL_INFO_FARGVALID(i);
 				}
-			} CATCH(E_SEGFAULT) {
+			} EXCEPT {
+				if (!was_thrown(E_SEGFAULT))
+					RETHROW();
+				goto restore_old_except;
+			}
+			__IF0 {
+restore_old_except:
 				memcpy(&THIS_EXCEPTION_INFO.ei_data, &old_except, sizeof(old_except));
 			}
 		}

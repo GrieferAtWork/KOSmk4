@@ -219,7 +219,9 @@ again_lookup_node_already_locked:
 								goto do_normal_vio; /* Validate the stack-pointer for user-space. */
 							TRY {
 								callsite_eip = *(uintptr_t *)sp;
-							} CATCH(E_SEGFAULT) {
+							} EXCEPT {
+								if (!was_thrown(E_SEGFAULT))
+									RETHROW();
 								goto do_normal_vio;
 							}
 							/* Unwind the stack, and remember the call-site instruction pointer. */
@@ -727,7 +729,9 @@ throw_segfault:
 			goto not_a_badcall;
 		TRY {
 			old_eip = *(uintptr_t *)sp;
-		} CATCH(E_SEGFAULT) {
+		} EXCEPT {
+			if (!was_thrown(E_SEGFAULT))
+				RETHROW();
 			goto not_a_badcall;
 		}
 #ifdef __x86_64__

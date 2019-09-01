@@ -1,4 +1,4 @@
-/* HASH 0x87d75980 */
+/* HASH 0x345c2b3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1194,9 +1194,6 @@ __LIBC __ATTR_NORETURN __ATTR_COLD void (__LIBCCALL error_thrown)(error_code_t _
 #define __PRIVATE_CATCH_UNIQUE   __PRIVATE_CATCH_UNIQUE2(__catch_do_handle_,__LINE__)
 #define TRY         try
 #define EXCEPT      catch(...)
-#define CATCH(code) \
-   EXCEPT{if (!was_thrown(code))RETHROW(); goto __PRIVATE_CATCH_UNIQUE;} \
-   __IF1;else __PRIVATE_CATCH_UNIQUE:
 #endif /* __cplusplus */
 
 #endif /* __KOS__ */

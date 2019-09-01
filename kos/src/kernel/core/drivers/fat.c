@@ -374,7 +374,13 @@ preallocate_cluster_vector_entries(struct inode *__restrict node,
 		data->i_clusterv = (FatClusterIndex *)krealloc(data->i_clusterv,
 		                                               new_alloc * sizeof(FatClusterIndex),
 		                                               FS_GFP);
-	} CATCH (E_BADALLOC) {
+	} EXCEPT {
+		if (!was_thrown(E_BADALLOC))
+			RETHROW();
+		goto allocate_smallest_possible;
+	}
+	__IF0 {
+allocate_smallest_possible:
 		/* Try to allocate the minimum increment. */
 		if (min_num_clusters <= data->i_clustera)
 			return;
@@ -396,7 +402,6 @@ zero_initialize_cluster(FatSuperblock *__restrict fat,
 
 /* Lookup (and potentially allocate the associated
  * chain for) the `nth_cluster' of the given `node' */
-#if 1
 INTERN FatClusterIndex KCALL
 Fat_GetFileCluster(struct inode *__restrict node,
                    size_t nth_cluster, unsigned int mode) {
@@ -551,129 +556,6 @@ create_more_clusters_already_locked:
 	sync_endwrite(node);
 	return result;
 }
-#else
-INTERN FatClusterIndex KCALL
-Fat_GetFileCluster(struct inode *__restrict node,
-                   size_t nth_cluster, unsigned int mode) {
-	FatClusterIndex result;
-	FatNode *data;
-	FatSuperblock *fat;
-	bool has_write_lock;
-	assert(sync_reading(node));
-	data = node->i_fsdata;
-	fat  = (FatSuperblock *)node->i_super;
-	if unlikely(!data->i_clusterc) {
-		/* Load the initial file cluster. */
-		inode_loadattr(node);
-		assert(data->i_clusterc != 0);
-	}
-	/* TODO: This function is completely broken. - Rewrite everything below! */
-	has_write_lock = false;
-	TRY {
-		if (nth_cluster < data->i_clusterc) {
-			result = data->i_clusterv[nth_cluster];
-			if unlikely(result >= fat->f_cluster_eof) {
-				/* Deal with EOF clusters (check if we're supposed to create new ones) */
-				result = fat->f_cluster_eof_marker;
-				goto create_cluster;
-			}
-			return result;
-		}
-		result = fat->f_cluster_eof_marker;
-		for (;;) {
-			FatClusterIndex next_index;
-			assertf(nth_cluster >= data->i_clusterc,
-			        "nth_cluster      = %Iu\n"
-			        "data->i_clusterc = %Iu\n",
-			        nth_cluster, data->i_clusterc);
-			if (data->i_clusterv[data->i_clusterc - 1] >= fat->f_cluster_eof) {
-create_cluster:
-				/* Last cluster points into the void.
-				 * Check if we're supposed to create more. */
-				if (!(mode & FAT_GETCLUSTER_MODE_FCREATE))
-					break;
-				if (!has_write_lock) {
-					sync_write(node);
-					has_write_lock = true;
-				}
-				rwlock_write(&fat->f_fat_lock);
-				TRY {
-					/* Allocate a new, free cluster. */
-					next_index = Fat_FindFreeCluster(fat);
-					if (mode & FAT_GETCLUSTER_MODE_FNOZERO) {
-						/* XXX: ZERO-initialize new memory? */
-					}
-					/* Mark the cluster as an EOF cluster. */
-					Fat_SetFatIndirection(fat, next_index,
-					                      fat->f_cluster_eof_marker);
-					data->i_clusterv[data->i_clusterc - 1] = next_index;
-					if (data->i_clusterc == 1) {
-						/* The pointer to the first cluster is stored in the INode.
-						 * Since we've just written that pointer, mark the node as changed. */
-						if (!(mode & FAT_GETCLUSTER_MODE_FNCHNGE))
-							inode_changedattr(node);
-					} else {
-						/* Link the previous cluster onto the new one */
-						Fat_SetFatIndirection(fat,
-						                      data->i_clusterv[data->i_clusterc - 2],
-						                      next_index);
-					}
-				} EXCEPT {
-					rwlock_endwrite(&fat->f_fat_lock);
-					RETHROW();
-				}
-				rwlock_endwrite(&fat->f_fat_lock);
-				if (nth_cluster == data->i_clusterc - 1) {
-					result = next_index;
-					break;
-				}
-				assert(data->i_clusterv[data->i_clusterc - 1] < fat->f_cluster_eof);
-			}
-			/* Dereference the FAT table at the previous index. */
-			next_index = data->i_clusterv[data->i_clusterc - 1];
-			next_index = Fat_GetFatIndirection(fat, next_index);
-			assert(data->i_clusterc <= data->i_clustera);
-			if (!has_write_lock) {
-				sync_write(node);
-				has_write_lock = true;
-			}
-			if (data->i_clusterc == data->i_clustera) {
-				/* Allocate what should be a sufficient number of clusters. */
-				size_t new_alloc;
-				new_alloc = CEILDIV((size_t)node->i_filesize, fat->f_clustersize) + 1;
-				if unlikely(new_alloc < data->i_clustera)
-					new_alloc = data->i_clustera * 2;
-				if unlikely(!new_alloc)
-					new_alloc = 2;
-				TRY {
-					data->i_clusterv = (FatClusterIndex *)krealloc(data->i_clusterv, new_alloc * sizeof(FatClusterIndex),
-					                                               FS_GFP);
-				} CATCH(E_BADALLOC) {
-					/* Try to allocate the minimum increment. */
-					new_alloc        = data->i_clusterc + 1;
-					data->i_clusterv = (FatClusterIndex *)krealloc(data->i_clusterv, new_alloc * sizeof(FatClusterIndex),
-					                                               FS_GFP);
-				}
-				data->i_clustera = new_alloc;
-			}
-			assert(data->i_clusterc < data->i_clustera);
-			/* Add the new cluster information to the node. */
-			data->i_clusterv[data->i_clusterc++] = next_index;
-			if (nth_cluster == data->i_clusterc - 1) {
-				result = next_index;
-				break;
-			}
-		}
-	} EXCEPT {
-		if (has_write_lock)
-			sync_endwrite(node);
-		RETHROW();
-	}
-	if (has_write_lock)
-		sync_endwrite(node);
-	return result;
-}
-#endif
 
 
 

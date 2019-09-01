@@ -58,6 +58,7 @@ Iso9660_ReadFromINode(struct inode *__restrict self,
 	                   INODE_GETADDR(self,pos),
 	                   aio_multihandle_allochandle(aio));
 }
+
 INTERN void KCALL
 Iso9660_ReadFromINodePhys(struct inode *__restrict self,
                           vm_phys_t dst, size_t bufsize,
@@ -68,6 +69,7 @@ Iso9660_ReadFromINodePhys(struct inode *__restrict self,
 	                        INODE_GETADDR(self,pos),
 	                        aio_multihandle_allochandle(aio));
 }
+
 INTERN void KCALL
 Iso9660_ReadFromINodeVector(struct inode *__restrict self,
                             struct aio_buffer *__restrict buf,
@@ -79,6 +81,7 @@ Iso9660_ReadFromINodeVector(struct inode *__restrict self,
 	                    INODE_GETADDR(self,pos),
 	                    aio_multihandle_allochandle(aio));
 }
+
 INTERN void KCALL
 Iso9660_ReadFromINodeVectorPhys(struct inode *__restrict self,
                                 struct aio_pbuffer *__restrict buf,
@@ -165,8 +168,8 @@ Iso9660_OpenINode(Iso9660Superblock *__restrict self,
                   struct directory_entry *__restrict parent_directory_entry)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
 	/* Load INode attributes from fs-specific directory entry data. */
-	node->i_filesize  = (pos_t) * (u32 *)&parent_directory_entry->de_fsdata.de_data[4];
-	node->i_fsdata    = (struct inode_data *)(uintptr_t) * (u32 *)&parent_directory_entry->de_fsdata.de_data[0];
+	node->i_filesize  = (pos_t)*(u32 *)&parent_directory_entry->de_fsdata.de_data[4];
+	node->i_fsdata    = (struct inode_data *)(uintptr_t)*(u32 *)&parent_directory_entry->de_fsdata.de_data[0];
 	node->i_filenlink = (nlink_t)1;
 	node->i_fileuid   = self->i_fileuid;
 	node->i_filegid   = self->i_filegid;
