@@ -10,6 +10,7 @@ KOSmk4 no longer is a small kernel. I'd say it has reached the point of really b
 - [Building KOS](#building)
 	- [Getting a Shell](#shell)
 	- [Recommended Build Environment](#build-env)
+	- [`deemon magic.dee`](#magic)
 - [Programming KOS with an IDE](#programming)
 - [Notes on building KOS](#building-notes)
 - [Building & using Bochs to run KOS](#bochs)
@@ -365,14 +366,14 @@ Just like its predecessors, KOS mk4 uses [busybox](https://www.busybox.net/) to 
 However, I made it as simple as ever for you to get going with an installation of busybox onto your KOS disk image:
 
 ```
-$ # Make sure that you've already set up the KOS toolchain
-$ bash $PROJPATH/kos/misc/make_toolchain.sh i386-kos
-$
-$ # Make sure that you've built the entirety of KOS at least once (here: in no-optimize-debug mode)
-$ deemon $PROJPATH/magic.dee --target=i386 --config=nOD
-$
-$ # Do the actual work of downloading, configuring & building busybox
-$ bash $PROJPATH/kos/misc/make_utility.sh i386 busybox
+# Make sure that you've already set up the KOS toolchain
+bash $PROJPATH/kos/misc/make_toolchain.sh i386-kos
+
+# Make sure that you've built the entirety of KOS at least once (here: in no-optimize-debug mode)
+deemon $PROJPATH/magic.dee --target=i386 --config=nOD
+
+# Do the actual work of downloading, configuring & building busybox
+bash $PROJPATH/kos/misc/make_utility.sh i386 busybox
 ```
 
 That's it. That last command will download, build & install busybox into every KOS disk image that it can find under `$PROJPATH/bin/...`, also meaning that if you choose to clear out `$PROJPATH/bin` (or have just build KOS for a specific configuration for the first time), you will have to ensure that `magic.dee` was run at least once for your intended configuration, followed by re-executing the `make_utility.sh` command
@@ -382,10 +383,12 @@ The plan is to add more software to `make_utility.sh` in the future, so that you
 If you have any suggestions for software (or even better: code snippets for use in `make_utility.sh` alongside any required patch files), feel free to send them to me and I might add them so that everyone can use them.
 
 
+
+
 <a name="build-env"></a>
 ## Recommended Build Environment
 
-I neither have the time nor will too make sure that any kind of build environment works.
+I neither have the time nor will to make sure that any kind of build environment works.
 
 So with that in mind, I can only recommend you'd use the same one I'm using:
 
@@ -396,6 +399,99 @@ So with that in mind, I can only recommend you'd use the same one I'm using:
 
 
 
+
+<a name="magic"></a>
+## deemon magic.dee
+
+The `magic.dee` file found in `$PROJROOT` is the primary controller for doing anything with KOS (you can just think of it as my version of `make`)
+
+If the file extension (and the use of [`deemon`](#building) for starting) wasn't enough, it's a deemon script.
+
+To help you understand how this script works to do what it does, here is a documentation about its options
+
+- `-1`, `--single`
+	- Compile in single-core mode (don't run more than one build step at the same time)
+- `-v`, `--verbose`
+	- Print the full commandlines of processes as they are executed
+- `-E`, `-S`
+	- Alongside object files, also generate...
+		- `-E` preprocessor output files
+		- `-S` assembler input files
+- `--run-only`
+	- Skip the build step and only run KOS
+- `--build-only`, `--no-emulator`
+	- Skip running KOS and only build its source
+	- Passed by default when building was started by pressing CTRL+SHIFT+B in Visual Studio
+- `-f`, `--force`
+	- Force a full re-build of everything (except for re-formatting the KOS disk image)
+	- Passed by default when selecting `Rebuild kernel` in Visual Studio
+- `--format-error-messages`
+	- Format GCS's and LD's error messages in forms such as `file:line[:column]:...` into the uniform file-and-line format accepted by Visual Studio's `file(line[,column]) : ...` format (allowing you to click such lines within build output)
+	- Passed by default when building was started by pressing CTRL+SHIFT+B in Visual Studio
+- `--`
+	- Join the remainder of the argument into a single string seperated by 1-wide space characters and pass that string into the emulator for use as the kernel commandline
+		- e.g. `deemon magic.dee -- init=/bin/system-test` will run `system-test` after boot instead of `/bin/init`
+- `-n=N`, `--compilers=N` (Defaults to `-n=<number-of-cores-on-your-machine>`)
+	- Set the max number of parallel processes to run during building to `N`
+- `--emulator=NAME` (Defaults to `--emulator=qemu`)
+	- Select which emulator to use, where `NAME` must be one of `qemu`, `bochs`
+- `--changed=FILENAME`
+	- Force the build system to act as though the file referred to by `FILENAME` has changed
+	- The given `FILE` is interpreted relative to the PWD set when `magic.dee` got invoked
+- `--gdb=MODE` (Defaults to not-given)
+	- Enable GDB debugging support, where `MODE` must be one of
+		- `stub`: Use the builtin GDB driver
+		- `qemu`: Use QEMU's builtin GDB stub
+	- Note that the GDB stub is always created as a server socket `tcp:localhost:1234` on your machine
+- `--emulator-started-pattern=TEXT`
+	- Print the given `TEXT` to `stdout` when the emulator is started (needed for syncing with Visual Studio)
+- `--target=TARGET` (Defaults to automatic detection; see below)
+	- Set the target architecture to `TARGET` (which must be one of `i386`, `x86_64`, ...)
+- `--config=CONFIG` (Defaults to automatic detection; see below)
+	- Set the build configuration, which must be one of
+		- `OD`: Optimizations enabled (`__OPTIMIZE__` is defined), Debug enabled
+		- `nOD`: Optimizations disabled, Debug enabled
+		- `OnD`: Optimizations enabled (`__OPTIMIZE__` is defined), Debug disabled (`NDEBUG` is defined)
+		- `nOnD`: Optimizations disabled, Debug disabled (`NDEBUG` is defined)
+	- Warning: I usually only build KOS in `OD` and `nOD`, so there is a high chance that the other two configurations won't even build...
+- `--gen=FILE`
+	- Only execute build steps that lead up to the creation of `FILE` instead of executing everything
+	- This option is used to only build `libc.so` and `libm.so` as part of `make_toolchain.sh`
+	- The given `FILE` is interpreted relative to the PWD set when `magic.dee` got invoked
+- `--gengroup=NAME`
+	- Only execute build steps apart of a group `NAME`, as well as steps for dependencies of a group `NAME`
+	- Can be used to only build certain sub-components of KOS instead of everything (e.g. `deemon magic.dee --gengroup=libc`)
+- `--gengroup-of=FILE`
+	- Same as `--gengroup=...`, but instead of specifying the name of some group, only a source file is given
+	- This is implemented by taking all build steps with a dependency on `FILE`, then forming a set of all of the groups of those files, before finally running all steps and dependencies of those groups
+	- The given `FILE` is interpreted relative to the PWD set when `magic.dee` got invoked
+	- This option is intended to be mapped to a key combination within your IDE, where `FILE` should be passed as the file that is currently opened, allowing you to quickly build (only) the part of the system that you currently have opened.
+		- On how to do this in Visual Studio, see `$PROJPATH/kos/misc/scripts/vsautoconfig.dee`
+- `--regen=PATTERN`
+	- Same as `--gen=...`, but select files using a regular expression pattern
+	- The given `PATTERN` doesn't get formatted according to the PWD set when `magic.dee` got invoked
+
+##### Target/Config-specific paths
+
+- Before magic starts building, it will ensure that a symlink `$PROJPATH/$TARGET-kos` expands to `$TARGET-kos-$CONFIG`.
+	- Note that when GCC is configured, `$PROJPATH/$TARGET-kos/lib` is set up as part of the library path used by things such as `-lc` flags.
+	- As such, when using the GCC from the KOS toolchain, it will always link against the versions of KOS system library created for the configuration set the last time magic was invoked
+- The following paths are selected by `--target=$TARGET` and `--config=$CONFIG`
+	- `$PROJPATH/bin/$TARGET-kos/...`
+	- `$PROJPATH/bin/$TARGET-kos-$CONFIG/...`
+	- `$PROJPATH/kos/include/$TARGET_XARCH-kos/...`
+	- `$PROJPATH/kos/src/.../$TARGET_XARCH/...`
+	- Note that for the last two, `TARGET_XARCH = $TARGET == "x86_64" ? "i386" : $TARGET`
+
+##### Automatic target/configuration detection
+
+- The intended target/configuration is set automatically when not defined explicitly via the `--target=...` and `--config=...` options
+- This works by parsing the file `$PROJPATH/kos/.vs/ProjectSettings.json` (which is automatically created and updated by Visual Studio to always reflect the currently selected build configuration)
+
+
+
+
+
 <a name="programming"></a>
 ## Programming KOS with an IDE
 
@@ -403,7 +499,7 @@ I personally use Visual Studio 2017 Community Edition for this, as it actually h
 
 I mean seriously: Even when you scoure the osdev wiki you'll come across references to [VisualGDB and VisualKernel](https://wiki.osdev.org/Kernel_Debugging), so I really don't understand who wrote that recommendataion. - I don't think any of us bare-metal, kernel-development enthusiats (especially newcomers who could use a real, and simple to use integrated debugging experience the most) would be willing to pay that much...
 
-Anyways. - Even though practically no documentation on this feature of Visual Studio (which you can get the Community Edition for free by the way), I managed to get it working through trial an error.
+Anyways. - Even though practically no documentation on this feature of Visual Studio (which you can get the Community Edition of for free by the way), I managed to get it working through trial an error.
 
 And if you don't like Visual Studio (or aren't using Windows) I do know for a fact that Visual Studio Code also includes functionality for connecting to a GDB client/stub when you start diving into extensions
 
@@ -420,12 +516,19 @@ So here are your options:
 	- Start a new instance of `gdb` built for a generic `i386` target and type `target remote localhost:1234`
 	- Screw around with Visual Studio Code until you get it to connect to that same port, and have it be your debugging experience (I know for a fact that this is possible since I managed to get it to work before figuring out how to get Visual Studio's Open-Folder method to do my bidding)
 
+Notes:
+
+- When opening KOS using Visual Studio, do _not_ just `$PROJPATH`, but open `$PROJPATH/kos` instead. - Opening the former will not work properly and Visual Studio may even crash after a while since (at least for me) it seem unable to coax with the thousands of source files apart of binutils and gcc, and despite all of the methods that (supposedly) exist to have Visual Studio ignore certain paths within your source tree, all them only function to hide folders from the Solution Explorer (despite their documentation claiming to also hide them from the source code scanners). So my solution was to move everything that's actually interesting to me into the `$PROJPATH/kos` sub-folder and always open that one when programming.
+- Before debugging with Visual Studio for the first time, you (currently) have to open `$PROJPATH/.vs/launch.vs.json` and edit all of the `"sourceFileMap"` entires to reflect the cygwin representation of the absolute variant of our `$PROJPATH` (my `$PROJPATH` is set to `E:\c\kls\kos` (such that I Open Folder on `E:\c\kls\kos\kos`), so the cygwin variant of that path is `/cygdrive/e/c/kls/kos`)
+	- In the future I plan on automating this step to make it part of `make_toolchain.sh`, however for now you will have to adjust it manually, else Visual Studio won't know how to translate file paths generated by GDB such that you can simply click them to view the source code, and/or set breakpoints directly from within the IDE
+
+
 
 
 <a name="building-notes"></a>
 ## Notes on building KOS
 
-The KOS build system is quite complex, as KOS system headers depend on CRT feature definition files which it will automatically generate/update as features are added to the kernel or libc.
+The KOS build system is quite complex, as KOS system headers depend on CRT feature definition files which it will automatically generate/update as features are added to, or removed from the kernel or libc.
 
 Some parts of the system headers and libraries automatically get generated. This normally happens automatically as part of invoking `deemon magic.dee`, which will check if changes happened to the sources of automatically generated files.
 
@@ -544,10 +647,6 @@ int main() {
 Note however, that some functions can't easily be substituted (e.g. `open(2)`). As such, if a function appears in a header, but isn't provided by libc, nor has a local implementation, the function will simply not be defined. (giving you a compile-time error, rather than having to wait for link-time)
 
 Lastly, if there ever ends up being some gaping flaw in how KOS defines functions in headers, the fix will always be as simple as making a limited number of changes to the code generator scripts, instead of requiring millions of code locations to be updated, only to forget a hand full of them and have them lingering as dormant bugs to re-surface years in the future.
-
-
-
-
 
 
 
