@@ -324,9 +324,7 @@ Requirements:
 - binutils: `$PROJPATH/binutils/i386-kos/bin/i686-kos-*[.exe]`
 	- Can be easily be downloaded + configured + build by:
 		`$ bash $PROJPATH/kos/misc/make_toolchain.sh i386-kos`
-- mtools: `$PROJPATH/binutils/build-mtools/mtools[.exe]`
-	- TODO: This should be built as part of `make_toolchain.sh`
-- qemu: qemu-system-i386[.exe] (preferrably in $PATH. otherwise, add the location to the `"QEMU"` key in `$PROJPATH/magic.dee`)
+- qemu: qemu-system-i386[.exe] (preferrably in $PATH. otherwise, add the location to the `enumerateQEmuInstallationLocations()` function in `$PROJPATH/kos/misc/magicemulator/qemu.dee`)
 - On windows: Cygwin
 - On linux: \*shrugs\* - You'll figure it out (Because I couldn't be bothered, to)
 	
