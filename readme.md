@@ -339,22 +339,28 @@ Requirements:
 - Working installation of [deemon 200](https://github.com/GrieferAtWork/deemon)
 - binutils: `$PROJPATH/binutils/i386-kos/bin/i686-kos-*[.exe]`
 	- Can be easily be downloaded + configured + build by:
-		`$ bash $PROJPATH/kos/misc/make_toolchain.sh i386-kos`
+		`bash $PROJPATH/kos/misc/make_toolchain.sh i386-kos`
 - qemu: qemu-system-i386[.exe] (preferrably in $PATH. otherwise, add the location to the `enumerateQEmuInstallationLocations()` function in `$PROJPATH/kos/misc/magicemulator/qemu.dee`)
 - On windows: Cygwin
 - On linux: \*shrugs\* - You'll figure it out (Because I couldn't be bothered, to)
 	
 Building KOS (from $PROJPATH):
 
-	`$ deemon magic.dee --build-only --target=i386 --config=OD`
+```sh
+deemon magic.dee --build-only --target=i386 --config=OD
+```
 	
 Running KOS (from $PROJPATH):
 
-	`$ deemon magic.dee --run-only --target=i386 --config=OD`
+```sh
+deemon magic.dee --run-only --target=i386 --config=OD
+```
 	
 Building+Running KOS (from $PROJPATH):
 
-	`$ deemon magic.dee --target=i386 --config=OD`
+```sh
+deemon magic.dee --target=i386 --config=OD
+```
 
 
 
@@ -370,7 +376,7 @@ However, I made it as simple as ever for you to get going with an installation o
 bash $PROJPATH/kos/misc/make_toolchain.sh i386-kos
 
 # Make sure that you've built the entirety of KOS at least once (here: in no-optimize-debug mode)
-deemon $PROJPATH/magic.dee --target=i386 --config=nOD
+deemon $PROJPATH/magic.dee --target=i386 --config=nOD --build-only
 
 # Do the actual work of downloading, configuring & building busybox
 bash $PROJPATH/kos/misc/make_utility.sh i386 busybox
@@ -426,10 +432,10 @@ To help you understand how this script works to do what it does, here is a docum
 	- Force a full re-build of everything (except for re-formatting the KOS disk image)
 	- Passed by default when selecting `Rebuild kernel` in Visual Studio
 - `--format-error-messages`
-	- Format GCS's and LD's error messages in forms such as `file:line[:column]:...` into the uniform file-and-line format accepted by Visual Studio's `file(line[,column]) : ...` format (allowing you to click such lines within build output)
+	- Format GCC's and LD's error messages in forms such as `file:line[:column]:...` into what is accepted by Visual Studio's `file(line[,column]) : ...` format (allowing you to click such lines within build output)
 	- Passed by default when building was started by pressing CTRL+SHIFT+B in Visual Studio
 - `--`
-	- Join the remainder of the argument into a single string seperated by 1-wide space characters and pass that string into the emulator for use as the kernel commandline
+	- Join the remainder of the argument list into a single string seperated by 1-wide space characters and pass that string into the emulator for use as the kernel commandline
 		- e.g. `deemon magic.dee -- init=/bin/system-test` will run `system-test` after boot instead of `/bin/init`
 - `-n=N`, `--compilers=N` (Defaults to `-n=<number-of-cores-on-your-machine>`)
 	- Set the max number of parallel processes to run during building to `N`
@@ -460,7 +466,7 @@ To help you understand how this script works to do what it does, here is a docum
 	- The given `FILE` is interpreted relative to the PWD set when `magic.dee` got invoked
 - `--gengroup=NAME`
 	- Only execute build steps apart of a group `NAME`, as well as steps for dependencies of a group `NAME`
-	- Can be used to only build certain sub-components of KOS instead of everything (e.g. `deemon magic.dee --gengroup=libc`)
+	- Can be used to only build certain sub-components of KOS instead of everything (e.g. `deemon magic.dee --gengroup=libs.libc`)
 - `--gengroup-of=FILE`
 	- Same as `--gengroup=...`, but instead of specifying the name of some group, only a source file is given
 	- This is implemented by taking all build steps with a dependency on `FILE`, then forming a set of all of the groups of those files, before finally running all steps and dependencies of those groups
@@ -475,7 +481,7 @@ To help you understand how this script works to do what it does, here is a docum
 
 - Before magic starts building, it will ensure that a symlink `$PROJPATH/$TARGET-kos` expands to `$TARGET-kos-$CONFIG`.
 	- Note that when GCC is configured, `$PROJPATH/$TARGET-kos/lib` is set up as part of the library path used by things such as `-lc` flags.
-	- As such, when using the GCC from the KOS toolchain, it will always link against the versions of KOS system library created for the configuration set the last time magic was invoked
+	- As such, when using the GCC from the KOS toolchain, it will always link against the versions of KOS system libraries created for the configuration set the last time magic was invoked
 - The following paths are selected by `--target=$TARGET` and `--config=$CONFIG`
 	- `$PROJPATH/bin/$TARGET-kos/...`
 	- `$PROJPATH/bin/$TARGET-kos-$CONFIG/...`
@@ -499,7 +505,7 @@ I personally use Visual Studio 2017 Community Edition for this, as it actually h
 
 I mean seriously: Even when you scoure the osdev wiki you'll come across references to [VisualGDB and VisualKernel](https://wiki.osdev.org/Kernel_Debugging), so I really don't understand who wrote that recommendataion. - I don't think any of us bare-metal, kernel-development enthusiats (especially newcomers who could use a real, and simple to use integrated debugging experience the most) would be willing to pay that much...
 
-Anyways. - Even though practically no documentation on this feature of Visual Studio (which you can get the Community Edition of for free by the way), I managed to get it working through trial an error.
+Anyways. - Even though practically no documentation on this feature of Visual Studio (which you can get the Community Edition of for free by the way) exists, I managed to get it working through trial an error.
 
 And if you don't like Visual Studio (or aren't using Windows) I do know for a fact that Visual Studio Code also includes functionality for connecting to a GDB client/stub when you start diving into extensions
 
@@ -518,7 +524,7 @@ So here are your options:
 
 Notes:
 
-- When opening KOS using Visual Studio, do _not_ just `$PROJPATH`, but open `$PROJPATH/kos` instead. - Opening the former will not work properly and Visual Studio may even crash after a while since (at least for me) it seem unable to coax with the thousands of source files apart of binutils and gcc, and despite all of the methods that (supposedly) exist to have Visual Studio ignore certain paths within your source tree, all them only function to hide folders from the Solution Explorer (despite their documentation claiming to also hide them from the source code scanners). So my solution was to move everything that's actually interesting to me into the `$PROJPATH/kos` sub-folder and always open that one when programming.
+- When opening KOS using Visual Studio, do _not_ just open `$PROJPATH`, but open `$PROJPATH/kos` instead. - Opening the former will not work properly and Visual Studio may even crash after a while since (at least for me) it seem unable to coax with the thousands of source files apart of binutils and gcc, and despite all of the methods that (supposedly) exist to have Visual Studio ignore certain paths within your source tree, all them only function to hide folders from the Solution Explorer (despite their documentation claiming to also hide them from the source code scanners). So my solution was to move everything that's actually interesting to me into the `$PROJPATH/kos` sub-folder and always open that one when programming.
 - Before debugging with Visual Studio for the first time, you (currently) have to open `$PROJPATH/.vs/launch.vs.json` and edit all of the `"sourceFileMap"` entires to reflect the cygwin representation of the absolute variant of our `$PROJPATH` (my `$PROJPATH` is set to `E:\c\kls\kos` (such that I Open Folder on `E:\c\kls\kos\kos`), so the cygwin variant of that path is `/cygdrive/e/c/kls/kos`)
 	- In the future I plan on automating this step to make it part of `make_toolchain.sh`, however for now you will have to adjust it manually, else Visual Studio won't know how to translate file paths generated by GDB such that you can simply click them to view the source code, and/or set breakpoints directly from within the IDE
 
