@@ -31,7 +31,11 @@
  *  - https://vt100.net/docs/vt100-ug/chapter3.html
  *  - https://vt100.net/docs/vt100-ug/table3-9.html
  *  - http://www.ecma-international.org/publications/files/ECMA-ST/Ecma-048.pdf
- * */
+ *  - https://espterm.github.io/docs/VT100%20escape%20codes.html
+ *  - https://www.climagic.org/mirrors/VT100_Escape_Codes.html
+ *  - http://real-world-systems.com/docs/ANSIcode.html
+ *  - http://man7.org/linux/man-pages/man1/screen.1.html
+ */
 
 
 #define ANSITTY_COLORS       16
@@ -80,9 +84,8 @@
 #define ANSITTY_MODE_MOUSEON_MASK       0x0003 /* Mask for the MOUSEON mode. */
 #define ANSITTY_MODE_NOLINEWRAP         0x0004 /* FLAG: Writing past the end of a line will not wrap to the next line.
                                                 *       When set, characters written past line-endings are discarded. */
-#define ANSITTY_MODE_AUXPORT            0x0008 /* FLAG: Auxiliary port enabled. */
-#define ANSITTY_MODE_HIDECURSOR         0x0010 /* FLAG: Don't show the cursor. */
-#define ANSITTY_MODE_NEWLINE_CLRFREE    0x0020 /* FLAG: CR and LF should fill trailing cells with space characters. */
+#define ANSITTY_MODE_HIDECURSOR         0x0008 /* FLAG: Don't show the cursor. */
+#define ANSITTY_MODE_NEWLINE_CLRFREE    0x0010 /* FLAG: CR and LF should fill trailing cells with space characters. */
 
 
 /* Display flags (text attributes) */
@@ -95,6 +98,11 @@
 #define ANSITTY_ATTRIB_FRAMED    0x0020 /* FLAG: Surround text with a frame. */
 #define ANSITTY_ATTRIB_CIRCLED   0x0040 /* FLAG: Surround text with a frame (with rounded corners).
                                          * NOTE: This flag always appears in conjunction with `ANSITTY_ATTRIB_FRAMED' */
+#define ANSITTY_ATTRIB_LET_SWSH  0x0000 /* Letter mode: Single-Width, Single-Height */
+#define ANSITTY_ATTRIB_LET_DWSH  0x0100 /* Letter mode: Double-Width, Single-Height */
+#define ANSITTY_ATTRIB_LET_DHTP  0x0200 /* Letter mode: Single-Width, Double-Height (top-half) */
+#define ANSITTY_ATTRIB_LET_DHBP  0x0300 /* Letter mode: Single-Width, Double-Height (bottom-half) */
+#define ANSITTY_ATTRIB_LET_MASK  0x0300 /* Mask for letter mode. */
 #define ANSITTY_ATTRIB_FONTMASK  0xf000 /* MASK: Alternate font selection */
 #define ANSITTY_ATTRIB_FONTSHFT      24 /* SHFT: Alternate font selection */
 
@@ -106,9 +114,12 @@ typedef __uint32_t ansitty_coord_t;
 typedef __int32_t ansitty_offset_t;
 
 struct ansitty;
+struct termios;
+
 struct ansitty_operators {
 	/* [1..1] Output a single unicode character.
-	 * This also includes the control control characters `BEL,LF,CR,TAB,BS' */
+	 * This also includes the control control characters `BEL,LF,CR,TAB,BS'
+	 * Note that LF should be interpreted as next-line + carriage-return */
 	__ATTR_NONNULL((1))
 	void (LIBANSITTY_CC *ato_putc)(struct ansitty *__restrict self,
 	                               __CHAR32_TYPE__ ch);
@@ -152,12 +163,13 @@ struct ansitty_operators {
 	__ATTR_NONNULL((1))
 	void (LIBANSITTY_CC *ato_el)(struct ansitty *__restrict self, unsigned int mode);
 	/* [0..1] Shift terminal lines by offset, where a negative value shifts
-	 *        lines downwards, and a positive value shifts them up.
+	 *        lines downwards/left, and a positive value shifts them up/right.
 	 * E.g.: When the end of the terminal is reached, the driver may
 	 *       implement this as `(*to_scroll)(...,1);' */
 	__ATTR_NONNULL((1))
 	void (LIBANSITTY_CC *ato_scroll)(struct ansitty *__restrict self,
-	                                 ansitty_offset_t offset);
+	                                 ansitty_offset_t hoffset,
+	                                 ansitty_offset_t voffset);
 	/* [0..1] Set the window title of the terminal. */
 	__ATTR_NONNULL((1, 2))
 	void (LIBANSITTY_CC *ato_settitle)(struct ansitty *__restrict self,
@@ -170,7 +182,35 @@ struct ansitty_operators {
 	__ATTR_NONNULL((1))
 	void (LIBANSITTY_CC *ato_scrollregion)(struct ansitty *__restrict self,
 	                                       ansitty_coord_t start_line,
-	                                       ansitty_coord_t end_line);
+	                                       ansitty_coord_t start_column,
+	                                       ansitty_coord_t end_line,
+	                                       ansitty_coord_t end_column);
+	/* [0..1] Turn LEDs on/off, such that NEW_LEDS = (OLD_LEDS & mask) | flag.
+	 * For this purpose, both mask and flag are bitsets of LEDs enumerated
+	 * from 0 to 3 (yes: that's 4 leds, and I don't know what that 4'th led
+	 * is all about...)
+	 * However, linux defines them like this:
+	 *   0x01: KEYBOARD_LED_SCROLLLOCK
+	 *   0x02: KEYBOARD_LED_NUMLOCK
+	 *   0x04: KEYBOARD_LED_CAPSLOCK
+	 *   0x08: Undefined (ignore if it wouldn't have any meaning) */
+	__ATTR_NONNULL((1))
+	void (LIBANSITTY_CC *ato_setled)(struct ansitty *__restrict self,
+	                                 __uint8_t mask, __uint8_t flag);
+	/* [0..1] Try to get/set the terminal IOS descriptor of the associated terminal.
+	 * This function can be used in 2 different modes:
+	 *  - newios == NULL:
+	 *      Copy the current IOS state into `oldios'.
+	 *      The return value for this case doesn't matter and is ignored.
+	 *  - newios != NULL:
+	 *      Compare the current IOS state with `oldios'
+	 *      If they differ, leave `oldios' undefined, and return `false'
+	 *      If they match, set `newios' as the new IOS state and return `true'
+	 */
+	__ATTR_NONNULL((1, 2))
+	__BOOL (LIBANSITTY_CC *ato_termios)(struct ansitty *__restrict self,
+	                                    struct termios *__restrict oldios,
+	                                    struct termios const *newios);
 };
 
 struct ansitty {
@@ -182,6 +222,10 @@ struct ansitty {
 	__uint16_t                at_ttymode;     /* TTY mode (Set of `ANSITTY_MODE_*') */
 	__uint16_t                at_attrib;      /* Text mode attributes (set of `ANSITTY_ATTRIB_*'). */
 	ansitty_coord_t           at_savecur[2];  /* Saved cursor position */
+	ansitty_coord_t           at_scroll_sl;   /* Scroll region starting line */
+	ansitty_coord_t           at_scroll_sc;   /* Scroll region starting column */
+	ansitty_coord_t           at_scroll_el;   /* Scroll region end line */
+	ansitty_coord_t           at_scroll_ec;   /* Scroll region end column */
 	__uintptr_t               at_state;       /* Current state-machine state. (not exposed) */
 	union {
 		__UINTPTR_TYPE__      at_esclen;      /* Number of written, escaped bytes. */

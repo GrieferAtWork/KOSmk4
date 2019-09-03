@@ -24,9 +24,12 @@
 
 #include <kernel/except.h>
 #include <kernel/types.h>
+#include <kos/kernel/handle.h>
 #include <stddef.h>
+#include <string.h>
 #include <assert.h>
 #include <dev/ansitty.h>
+#include <dev/keyboard.h>
 #include <libansitty/ansitty.h>
 
 DECL_BEGIN
@@ -81,6 +84,59 @@ ansitty_device_output(struct ansitty *__restrict self,
 }
 
 
+PRIVATE NONNULL((1)) void LIBANSITTY_CC
+ansitty_device_setled(struct ansitty *__restrict self,
+                      uint8_t mask, uint8_t flag) {
+	REF struct tty_device *output;
+	struct ansitty_device *me;
+	me = container_of(self, struct ansitty_device, at_ansi);
+	output = me->at_tty.get();
+	if (output) {
+		FINALLY_DECREF_UNLIKELY(output);
+		if (output->t_ihandle_typ == HANDLE_TYPE_CHARACTERDEVICE &&
+		    character_device_isakeyboard((struct character_device *)output->t_ihandle_ptr)) {
+			struct keyboard_device *kbd;
+			uintptr_t new_leds;
+			kbd = (struct keyboard_device *)output->t_ihandle_ptr;
+			sync_write(&kbd->kd_leds_lock);
+			new_leds = (kbd->kd_leds & (mask | ~0xf)) | (flag & 0xf);
+			if (kbd->kd_leds != new_leds) {
+				if (kbd->kd_ops.ko_setleds) {
+					TRY {
+						(*kbd->kd_ops.ko_setleds)(kbd, new_leds);
+					} EXCEPT {
+						sync_endwrite(&kbd->kd_leds_lock);
+						RETHROW();
+					}
+				}
+				kbd->kd_leds = new_leds;
+			}
+			sync_endwrite(&kbd->kd_leds_lock);
+		}
+	}
+}
+
+
+PRIVATE NONNULL((1, 2)) bool LIBANSITTY_CC
+ansitty_device_termios(struct ansitty *__restrict self,
+                       struct termios *__restrict oldios,
+                       struct termios const *newios) {
+	REF struct tty_device *output;
+	struct ansitty_device *me;
+	me = container_of(self, struct ansitty_device, at_ansi);
+	output = me->at_tty.get();
+	if (!output) {
+		memset(oldios, 0, sizeof(*oldios));
+	} else {
+		FINALLY_DECREF_UNLIKELY(output);
+		memcpy(oldios, &output->t_term.t_ios, sizeof(*oldios));
+		if (newios)
+			terminal_setios(&output->t_term, newios, NULL);
+	}
+	return true;
+}
+
+
 
 /* Initialize a given ansitty device.
  * NOTE: `ops->ato_output' must be set to NULL when calling this function.
@@ -97,12 +153,16 @@ NOTHROW(KCALL ansitty_device_cinit)(struct ansitty_device *__restrict self,
 	assert(self);
 	assert(ops);
 	assertf(!ops->ato_output, "Don't provided operator `ato_output'!");
+	assertf(!ops->ato_setled, "Don't provided operator `ato_setled'!");
+	assertf(!ops->ato_termios, "Don't provided operator `ato_termios'!");
 	ansitty_init(&self->at_ansi, ops);
 	/* Provide standard operators. */
 	self->cd_type.ct_write = &ansitty_device_write;
 	self->cd_type.ct_ioctl = &ansitty_device_ioctl;
 	/* Override the TTY output operator to try to inject responses into the keyboard queue. */
-	self->at_ansi.at_ops.ato_output = &ansitty_device_output;
+	self->at_ansi.at_ops.ato_output  = &ansitty_device_output;
+	self->at_ansi.at_ops.ato_setled  = &ansitty_device_setled;
+	self->at_ansi.at_ops.ato_termios = &ansitty_device_termios;
 }
 
 
