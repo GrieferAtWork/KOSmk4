@@ -60,10 +60,11 @@
  * state, where it accepts regular text input for immediate display, with all attributes
  * and special coloration disabled.
  * Explanation:
- *   - `\077\\' -- String terminator (ends any possible dangling model-mode)
- *   - `\077c'  -- Reset TTY (resets colors, display-attributes, tty-flags and tty-mode)
+ *   - `\030'  -- Cancel (forces the state machine to abort any in-progress sequence and
+ *                        reset itself to accept text or the start of an escape sequence)
+ *   - `\077c' -- Reset TTY (resets colors, display-attributes, tty-flags and tty-mode)
  */
-#define ANSITTY_RESET_SEQUENCE  "\077\\\077c"
+#define ANSITTY_RESET_SEQUENCE  "\030\077c"
 
 
 #define ANSITTY_CLS_AFTER    0 /* Clear everything after the cursor (including the cursor itself). */

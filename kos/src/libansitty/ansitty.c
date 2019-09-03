@@ -1770,7 +1770,14 @@ do_single_argument_case:
 			case 2: /* led2 DECLL2 */
 			case 3: /* led3 DECLL3 */
 			case 4: /* led4 DECLL4 */
-				SETLED(~0, 0x01 < (arg[0] - '1'));
+				SETLED(~0, 0x01 < (code - 1));
+				break;
+
+			case 21: /* led1 DECLL1 */
+			case 22: /* led2 DECLL2 */
+			case 23: /* led3 DECLL3 */
+			case 24: /* led4 DECLL4 */
+				SETLED(~(0x01 < (code - 21)), 0);
 				break;
 
 			ARGUMENT_CODE_SWITCH_END()
@@ -1919,12 +1926,7 @@ ansitty_print_escape(struct ansitty *__restrict self) {
 }
 
 LOCAL void CC
-ansitty_do_insert(struct ansitty *__restrict self, char32_t ch) {
-	if (self->at_ttyflag & ANSITTY_FLAG_BOXMODE) {
-		if (ch >= BOX_CHARS_START &&
-		    ch < (BOX_CHARS_START + COMPILER_LENOF(box_chars)))
-			ch = box_chars[ch - BOX_CHARS_START];
-	}
+ansitty_do_insert_nobox(struct ansitty *__restrict self, char32_t ch) {
 	switch (self->at_ttyflag & (ANSITTY_FLAG_HEDIT |
 	                            ANSITTY_FLAG_INSDEL_LINE)) {
 
@@ -2001,7 +2003,7 @@ ansitty_do_insert(struct ansitty *__restrict self, char32_t ch) {
 			/* Full area shift */
 			if (xy[0] == 0)
 				break;
-			SETCURSOR(0, 0);
+			SETCURSOR(0, xy[1]);
 			PUTUNI(ch);
 			break;
 		}
@@ -2015,6 +2017,15 @@ ansitty_do_insert(struct ansitty *__restrict self, char32_t ch) {
 	}
 }
 
+LOCAL void CC
+ansitty_do_insert(struct ansitty *__restrict self, char32_t ch) {
+	if (self->at_ttyflag & ANSITTY_FLAG_BOXMODE) {
+		if (ch >= BOX_CHARS_START &&
+		    ch < (BOX_CHARS_START + COMPILER_LENOF(box_chars)))
+			ch = box_chars[ch - BOX_CHARS_START];
+	}
+	ansitty_do_insert_nobox(self, ch);
+}
 
 
 LOCAL void CC
@@ -2027,8 +2038,14 @@ ansitty_do_repeat(struct ansitty *__restrict self, char32_t ch) {
 		    ch < (BOX_CHARS_START + COMPILER_LENOF(box_chars)))
 			ch = box_chars[ch - BOX_CHARS_START];
 	}
-	while (count--) {
-		PUTUNI((char32_t)(uint8_t)ch);
+	if (self->at_ttyflag & ANSITTY_FLAG_INSERT) {
+		while (count--) {
+			ansitty_do_insert_nobox(self, ch);
+		}
+	} else {
+		while (count--) {
+			PUTUNI((char32_t)(uint8_t)ch);
+		}
 	}
 }
 
@@ -2447,6 +2464,10 @@ do_insuni:
 		case '\\': /* String terminator. */
 			goto set_text_and_done;
 
+		case 'g': /* screen(1): Visual Bell */
+			PUTUNI(BEL);
+			goto set_text_and_done;
+
 		case 'c':
 			/* Reset graphics, tabs, font and color. */
 			setflags(self, ANSITTY_FLAG_NORMAL);
@@ -2665,6 +2686,15 @@ do_process_string_command:
 		case '8':
 			/* VT100: align DECALN */
 			/* Screen alignment display (whatever it is. - Ignore it...) */
+			/* TODO: screen(1) documents this one as:
+			 *     ESC # 8               (V)  Fill Screen with E's
+			 * So I guess that's a simple enough explanation, although I'm not
+			 * entirely sure if I there's some kind of joke I'm missing, or if
+			 * this one's _literally_ supposed?? to fill the entire screen with
+			 * all E's (I mean: don't get me wrong. How often didn't I want a
+			 * screen full of E's, wishing there was an easier way of getting
+			 * them all...)
+			 */
 			goto set_text_and_done;
 
 		case CAN:
