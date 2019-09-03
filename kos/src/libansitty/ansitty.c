@@ -73,23 +73,24 @@ DECL_BEGIN
 #define WARN_UNKNOWN_SEQUENCE4(firstch, ptr, len, before_lastch, lastch) \
 	UNKNOWN_SEQUENCE_WARN("[ansitty] Unrecognized escape sequence \"\\e%#Q%#$q%#Q%#Q\"\n", firstch, (size_t)(len), ptr, before_lastch, lastch)
 
-#define PUTUNI(uni)              (*self->at_ops.ato_putc)(self, uni)
-#define GETCURSOR(pxy)           ((*self->at_ops.ato_getcursor)(self, pxy), TRACE_OPERATION("getcur:{%u,%u}\n", (pxy)[0], (pxy)[1]))
-#define SETCURSOR(x, y)          (TRACE_OPERATION("setcur(%u,%u)\n", x, y), (*self->at_ops.ato_setcursor)(self, x, y))
-#define SETCOLOR(color)          (TRACE_OPERATION("setcolor(%#x)\n", color), (*self->at_ops.ato_setcolor)(self, color))
-#define SETTTYMODE(ttymode)      (TRACE_OPERATION("setttymode(%#x)\n", ttymode), self->at_ops.ato_setttymode ? (*self->at_ops.ato_setttymode)(self, ttymode) : (void)0)
-#define SETATTRIB(attrib)        (TRACE_OPERATION("setattrib(%#x)\n", attrib), self->at_ops.ato_setattrib ? (*self->at_ops.ato_setattrib)(self, attrib) : (void)0)
-#define SETTITLE(title)          (TRACE_OPERATION("settitle(%q)\n", title), (self->at_ops.ato_settitle ? (*self->at_ops.ato_settitle)(self, title) : (void)0))
-#define DOOUTPUT(text, len)      (TRACE_OPERATION("output(%$q)\n", len, text), (*self->at_ops.ato_output)(self, text, len))
-#define OUTPUT(text)             (TRACE_OPERATION("output(%q)\n", text), self->at_ops.ato_output ? (*self->at_ops.ato_output)(self, text, COMPILER_STRLEN(text)) : (void)0)
-#define SCROLL(hoffset, voffset) (TRACE_OPERATION("scroll(%d,%d)\n", (int)(hoffset), (int)(voffset)), (*self->at_ops.ato_scroll)(self, hoffset, voffset))
-#define CLS(mode)                (TRACE_OPERATION("cls(%u)\n", mode), (*self->at_ops.ato_cls)(self, mode))
-#define EL(mode)                 (TRACE_OPERATION("el(%u)\n", mode), (*self->at_ops.ato_el)(self, mode))
-#define SETLED(mask, flag)       (TRACE_OPERATION("setled(%#x,%#x)\n", mask, flag), self->at_ops.ato_setled ? (*self->at_ops.ato_setled)(self, mask, flag) : (void)0)
-#define SCROLLREGION(sl, sc, el, ec)                                      \
-	(TRACE_OPERATION("scrollregion({%u,%u}, {%u,%u})\n", sl, sc, el, ec), \
-	 self->at_ops.ato_scrollregion                                        \
-	 ? (*self->at_ops.ato_scrollregion)(self, sl, sc, el, ec)             \
+#define PUTUNI(uni)                 (*self->at_ops.ato_putc)(self, uni)
+#define GETCURSOR(pxy)              ((*self->at_ops.ato_getcursor)(self, pxy), TRACE_OPERATION("getcur:{%u,%u}\n", (pxy)[0], (pxy)[1]))
+#define SETCURSOR(x, y)             (TRACE_OPERATION("setcur(%u,%u)\n", x, y), (*self->at_ops.ato_setcursor)(self, x, y))
+#define SETCOLOR(color)             (TRACE_OPERATION("setcolor(%#x)\n", color), (*self->at_ops.ato_setcolor)(self, color))
+#define SETTTYMODE(ttymode)         (TRACE_OPERATION("setttymode(%#x)\n", ttymode), self->at_ops.ato_setttymode ? (*self->at_ops.ato_setttymode)(self, ttymode) : (void)0)
+#define SETATTRIB(attrib)           (TRACE_OPERATION("setattrib(%#x)\n", attrib), self->at_ops.ato_setattrib ? (*self->at_ops.ato_setattrib)(self, attrib) : (void)0)
+#define SETTITLE(title)             (TRACE_OPERATION("settitle(%q)\n", title), (self->at_ops.ato_settitle ? (*self->at_ops.ato_settitle)(self, title) : (void)0))
+#define DOOUTPUT(text, len)         (TRACE_OPERATION("output(%$q)\n", len, text), (*self->at_ops.ato_output)(self, text, len))
+#define OUTPUT(text)                (TRACE_OPERATION("output(%q)\n", text), self->at_ops.ato_output ? (*self->at_ops.ato_output)(self, text, COMPILER_STRLEN(text)) : (void)0)
+#define SCROLL(offset)              (TRACE_OPERATION("scroll(%d)\n", (int)(offset)), (*self->at_ops.ato_scroll)(self, offset))
+#define COPYCELL(dst_offset, count) (TRACE_OPERATION("copycell(%d,%u)\n", (int)(dst_offset), (unsigned int)(count)), (*self->at_ops.ato_copycell)(self, dst_offset, count))
+#define CLS(mode)                   (TRACE_OPERATION("cls(%u)\n", mode), (*self->at_ops.ato_cls)(self, mode))
+#define EL(mode)                    (TRACE_OPERATION("el(%u)\n", mode), (*self->at_ops.ato_el)(self, mode))
+#define SETLED(mask, flag)          (TRACE_OPERATION("setled(%#x,%#x)\n", mask, flag), self->at_ops.ato_setled ? (*self->at_ops.ato_setled)(self, mask, flag) : (void)0)
+#define SCROLLREGION(sl, el)                           \
+	(TRACE_OPERATION("scrollregion(%u,%u)\n", sl, el), \
+	 self->at_ops.ato_scrollregion                     \
+	 ? (*self->at_ops.ato_scrollregion)(self, sl, el)  \
 	 : (void)0)
 
 #define MAXCOORD        ((ansitty_coord_t)-1)
@@ -100,6 +101,9 @@ DECL_BEGIN
 #define ANSITTY_FLAG_BOXMODE      0x0002 /* FLAG: Box mode enabled. */
 #define ANSITTY_FLAG_VT52         0x0004 /* FLAG: VT52 compatibility mode. */
 #define ANSITTY_FLAG_NOLFCR       0x0008 /* FLAG: \n characters should not imply CR. */
+#define ANSITTY_FLAG_HEDIT        0x0010 /* FLAG: Horizontal Editing mode (ICH/DCH/IRM go backwards). */
+#define ANSITTY_FLAG_INSERT       0x0020 /* FLAG: Enable insertion mode. */
+#define ANSITTY_FLAG_INSDEL_LINE  0x0040 /* FLAG: Insert/Delete only affects the current line. */
 #define ANSITTY_FLAG_RENDERMASK  (ANSITTY_FLAG_CONCEIL) /* Mask for flags that affect rendering */
 
 
@@ -129,6 +133,8 @@ DECL_BEGIN
 #define STATE_REPEAT     20 /* Repeat the next character `STATE_REPEAT_COUNT(self)' times */
 #define STATE_REPEAT_MBS 21 /* Repeat the next character `STATE_REPEAT_COUNT(self)' times (character is incomplete) */
 #define STATE_REPEAT_COUNT(self) (*(unsigned int *)(COMPILER_ENDOF((self)->at_escape) - sizeof(unsigned int)))
+#define STATE_INSERT     22 /* Insertion-mode */
+#define STATE_INSERT_MBS 23 /* Insertion-mode with pending multi-byte character */
 
 #define STATE_OSC_ADD_ESC(x) ((x)+5)
 #define STATE_OSC_DEL_ESC(x) ((x)-5)
@@ -235,15 +241,75 @@ stub_el(struct ansitty *__restrict self,
 }
 
 PRIVATE NONNULL((1)) void CC
-stub_scroll(struct ansitty *__restrict self,
-            ansitty_offset_t UNUSED(hoffset), /* hoffset cannot be emulated. */
-            ansitty_offset_t voffset) {
-	if (voffset <= 0)
+stub_copycell(struct ansitty *__restrict UNUSED(self),
+              ansitty_offset_t UNUSED(dst_offset),
+              ansitty_coord_t UNUSED(count)) {
+	/* Cannot be emulated. */
+}
+
+PRIVATE NONNULL((1)) void CC
+stub_scroll_with_copycell(struct ansitty *__restrict self,
+                          ansitty_offset_t offset) {
+	ansitty_coord_t xy[2];
+	ansitty_coord_t sxy[2];
+	ansitty_coord_t y, y_start, y_end, y_size;
+	if unlikely(!offset)
 		return;
-	while (voffset--) {
-		SETCURSOR(MAXCOORD, MAXCOORD);
-		PUTUNI('\n');
+	y_start = self->at_scroll_sl;
+	y_end   = self->at_scroll_el;
+	if unlikely(y_start >= y_end)
+		return;
+	GETCURSOR(xy);
+	SETCURSOR(MAXCOORD, MAXCOORD);
+	GETCURSOR(sxy);
+	++sxy[0];
+	++sxy[1];
+	if (y_end > sxy[1]) {
+		y_end = sxy[1];
+		if unlikely(y_start >= y_end)
+			goto done;
 	}
+	y_size = y_end - y_start;
+	if unlikely(y_size == 1)
+		return;
+	--y_size;
+	assert(y_size != 0);
+	if (offset < 0) {
+		offset = -offset;
+		if ((ansitty_coord_t)offset >= y_size)
+			goto done;
+		/* Move terminal contents upwards */
+		for (y = y_start + 1; y < y_end; ++y) {
+			SETCURSOR(0, y);
+			COPYCELL(-(ansitty_offset_t)sxy[0], sxy[0]);
+		}
+	} else {
+		if ((ansitty_coord_t)offset >= y_size)
+			goto done;
+		/* Move terminal contents downwards */
+		y = y_end - 1;
+		while (y >= y_start) {
+			SETCURSOR(0, y);
+			COPYCELL((ansitty_offset_t)sxy[0], sxy[0]);
+			--y;
+		}
+	}
+done:
+	SETCURSOR(xy[0], xy[1]);
+}
+
+
+PRIVATE NONNULL((1)) void CC
+stub_scroll(struct ansitty *__restrict self,
+            ansitty_offset_t offset) {
+	ansitty_coord_t xy[2];
+	if (offset >= 0)
+		return;
+	GETCURSOR(xy);
+	SETCURSOR(MAXCOORD, MAXCOORD);
+	while (offset++)
+		PUTUNI('\n');
+	SETCURSOR(xy[0], xy[1]);
 }
 
 
@@ -268,8 +334,13 @@ libansitty_init(struct ansitty *__restrict self,
 		self->at_ops.ato_cls = &stub_cls;
 	if (!self->at_ops.ato_el)
 		self->at_ops.ato_el = &stub_el;
-	if (!self->at_ops.ato_scroll)
+	if (!self->at_ops.ato_scroll) {
 		self->at_ops.ato_scroll = &stub_scroll;
+		if (self->at_ops.ato_copycell)
+			self->at_ops.ato_scroll = &stub_scroll_with_copycell;
+	}
+	if (!self->at_ops.ato_copycell)
+		self->at_ops.ato_copycell = &stub_copycell;
 	self->at_color      = ANSITTY_CL_DEFAULT;
 	self->at_defcolor   = ANSITTY_CL_DEFAULT;
 	self->at_ttyflag    = ANSITTY_FLAG_NORMAL;
@@ -423,18 +494,19 @@ PRIVATE void CC loadcursor(struct ansitty *__restrict self) {
 }
 
 PRIVATE void CC setscrollregion(struct ansitty *__restrict self,
-                                ansitty_coord_t sl, ansitty_coord_t sc,
-                                ansitty_coord_t el, ansitty_coord_t ec) {
+                                ansitty_coord_t sl, ansitty_coord_t el) {
 	if (sl == self->at_scroll_sl &&
-	    sc == self->at_scroll_sc &&
-	    el == self->at_scroll_el &&
-	    ec == self->at_scroll_ec)
+	    el == self->at_scroll_el)
 		return;
 	self->at_scroll_sl = sl;
-	self->at_scroll_sc = sc;
 	self->at_scroll_el = el;
+	SCROLLREGION(sl, el);
+}
+
+PRIVATE void CC setscrollmargin(struct ansitty *__restrict self,
+                                ansitty_coord_t sc, ansitty_coord_t ec) {
+	self->at_scroll_sc = sc;
 	self->at_scroll_ec = ec;
-	SCROLLREGION(sl, sc, el, ec);
 }
 
 
@@ -610,6 +682,50 @@ do_ident_DA(struct ansitty *__restrict self) {
 	}
 
 
+PRIVATE void CC
+ansitty_do_hscroll(struct ansitty *__restrict self, int offset) {
+	ansitty_coord_t xy[2];
+	ansitty_coord_t y, x_size;
+	ansitty_coord_t y_start, y_end;
+	ansitty_coord_t x_start, x_end;
+	x_start = self->at_scroll_sc;
+	x_end   = self->at_scroll_ec;
+	y_start = self->at_scroll_sl;
+	y_end   = self->at_scroll_el;
+	if (x_start >= x_end)
+		return;
+	if (y_start >= y_end)
+		return;
+	x_size = x_end - x_start;
+	if (offset >= 0) {
+		unsigned int cells_per_row;
+		if ((unsigned int)offset >= x_size)
+			return;
+		GETCURSOR(xy);
+		cells_per_row = x_size - (unsigned int)offset;
+		/* Copy cells to the right */
+		for (y = y_start; y < y_end; ++y) {
+			SETCURSOR(x_start, y);
+			COPYCELL(offset, cells_per_row);
+		}
+	} else {
+		ansitty_coord_t x;
+		unsigned int cells_per_row;
+		/* Copy cells to the left */
+		offset = -offset;
+		if ((unsigned int)offset >= x_size)
+			return;
+		GETCURSOR(xy);
+		x = x_start + (unsigned int)offset;
+		cells_per_row = x_size - (unsigned int)offset;
+		for (y = y_start; y < y_end; ++y) {
+			SETCURSOR(x, y);
+			COPYCELL(-offset, cells_per_row);
+		}
+	}
+	SETCURSOR(xy[0], xy[1]);
+}
+
 /* "\e[{arg[arglen]:%s}{lastch}" */
 PRIVATE bool CC
 ansi_CSI(struct ansitty *__restrict self,
@@ -629,7 +745,7 @@ ansi_CSI(struct ansitty *__restrict self,
 				if unlikely(end != arg + arglen - 1)
 					goto nope;
 			}
-			SCROLL(n, 0);
+			ansitty_do_hscroll(self, n);
 			break;
 		}
 		goto do_single_argument_case;
@@ -646,7 +762,7 @@ ansi_CSI(struct ansitty *__restrict self,
 				if unlikely(end != arg + arglen - 1)
 					goto nope;
 			}
-			SCROLL(-n, 0);
+			ansitty_do_hscroll(self, -n);
 			break;
 		}
 		goto do_single_argument_case;
@@ -667,6 +783,7 @@ ansi_CSI(struct ansitty *__restrict self,
 	case 'M': /* DL -- \e[2M   Delete 2 lines if currently in scrolling region */
 	case 'b': /* REP -- \e[80b   Repeat character 80 times */
 	case '|': /* DECTTC -- Transmit Termination Character */
+	case 'P': /* DCH -- Delete Character, from current position to end of field */
 	{
 		int n;
 do_single_argument_case:
@@ -741,32 +858,196 @@ do_single_argument_case:
 			SETCURSOR((ansitty_coord_t)n, xy[1]);
 		}	break;
 
-		case 'S': /* ANSI: SU */
+		case 'T': /* ANSI: SD */
 			n = -n;
 			ATTR_FALLTHROUGH
-		case 'T': /* ANSI: SD */
-			SCROLL(0, (ansitty_offset_t)n);
+		case 'S': /* ANSI: SU */
+			SCROLL((ansitty_offset_t)n);
 			break;
 
-		case '@': {
+		case '@':
 			/* ICH -- [10@  Make room for 10 characters at current position */
-			ansitty_coord_t xy[2];
 			if (n <= 0)
 				break;
-			GETCURSOR(xy);
-			if (n > 1024) {
-				ansitty_coord_t size[2];
-				unsigned int max_n;
+			switch (self->at_ttyflag & (ANSITTY_FLAG_HEDIT |
+			                            ANSITTY_FLAG_INSDEL_LINE)) {
+
+			case 0:
+				/* 123456789      123456789
+				 * ABCDEFGHI  --> ABCD...EF
+				 * abcdefghi      GHIabcdef */
+				COPYCELL(n, MAXCOORD);
+				break;
+
+			case ANSITTY_FLAG_INSDEL_LINE: {
+				/* 123456789      123456789
+				 * ABCDEFGHI  --> ABCD...EF
+				 * abcdefghi      abcdefghi */
+				ansitty_coord_t xy[2];
+				ansitty_coord_t sxy[2];
+				ansitty_coord_t cells_in_line;
+				GETCURSOR(xy);
 				SETCURSOR(MAXCOORD, MAXCOORD);
-				GETCURSOR(size);
-				max_n = (size[0] + 1) * (size[1] + 1);
-				if ((unsigned int)n > max_n)
-					n = (int)max_n;
+				GETCURSOR(sxy);
+				SETCURSOR(xy[0], xy[1]);
+				++sxy[0];
+				if unlikely(xy[0] >= sxy[0])
+					break;
+				cells_in_line = sxy[0] - xy[0];
+				if ((unsigned int)n >= cells_in_line)
+					break;
+				COPYCELL(n, cells_in_line - (unsigned int)n);
+			}	break;
+
+			case ANSITTY_FLAG_HEDIT: {
+				ansitty_coord_t xy[2];
+				ansitty_coord_t xy2[2];
+				unsigned int copy_count;
+				/* 123456789      456789ABC
+				 * ABCDEFGHI  --> D...EFGHI
+				 * abcdefghi      abcdefghi */
+				GETCURSOR(xy);
+				if (xy[1] == 0) {
+					if (xy[0] < (unsigned int)n)
+						break;
+					copy_count = xy[0];
+					SETCURSOR((unsigned int)n, 0);
+				} else {
+					SETCURSOR((unsigned int)n, 0);
+					GETCURSOR(xy2);
+					if (xy2[0] < (unsigned int)n) {
+						/* n >= SCREEN_SIZE.X, where xy2[0] == SCREEN_SIZE.X - 1 */
+						ansitty_coord_t column, row;
+						++xy2[0];
+						column = n % xy2[0];
+						row    = n / xy2[0];
+						if (row > xy[1] ||
+						    (row == xy[1] && column > xy[0])) {
+							SETCURSOR(xy[0], xy[1]);
+							break; /* Full area shift */
+						}
+						SETCURSOR(column, row);
+					} else {
+						/* We still need to know the display width */
+						SETCURSOR(MAXCOORD, 0);
+						GETCURSOR(xy2);
+						SETCURSOR((unsigned int)n, 0);
+						++xy2[0];
+					}
+					copy_count = xy[0] + xy[1] * xy2[0];
+				}
+				COPYCELL(-n, copy_count);
+				SETCURSOR(xy[0], xy[1]);
+			}	break;
+
+			case ANSITTY_FLAG_HEDIT | ANSITTY_FLAG_INSDEL_LINE: {
+				ansitty_coord_t xy[2];
+				/* 123456789      123456789
+				 * ABCDEFGHI  --> D...EFGHI
+				 * abcdefghi      abcdefghi */
+				GETCURSOR(xy);
+				if ((unsigned int)n >= xy[0])
+					break; /* Full area shift */
+				SETCURSOR((ansitty_coord_t)n, xy[1]);
+				COPYCELL(-n, xy[0] - (unsigned int)n);
+				SETCURSOR(xy[0], xy[1]);
+			}	break;
+
+			default: __builtin_unreachable();
 			}
-			while ((unsigned int)(n--))
-				PUTUNI(' ');
-			SETCURSOR(xy[0], xy[1]);
-		}	break;
+			break;
+
+		case 'P':
+			/* DCH -- Delete Character, from current position to end of field */
+			if (n <= 0)
+				break;
+			switch (self->at_ttyflag & (ANSITTY_FLAG_HEDIT |
+			                            ANSITTY_FLAG_INSDEL_LINE)) {
+
+			case 0: {
+				/* 123456789      123456789
+				 * ABCDEFGHI  --> ABCDHIabc
+				 * abcdefghi      defghi... */
+				ansitty_coord_t xy[2];
+				ansitty_coord_t xy2[2];
+				ansitty_coord_t new_x;
+				GETCURSOR(xy);
+				new_x = xy[0] + (unsigned int)n;
+				SETCURSOR(new_x, xy[1]);
+				GETCURSOR(xy2);
+				if (xy2[0] < new_x) {
+					ansitty_coord_t new_y;
+					++xy2[0];
+					new_y = xy[1] + (unsigned int)n / xy2[0];
+					new_x = xy[0] + (unsigned int)n % xy2[0];
+					SETCURSOR(new_x, new_y);
+				}
+				COPYCELL(-n, MAXCOORD);
+				SETCURSOR(xy[0], xy[1]);
+			}	break;
+
+			case ANSITTY_FLAG_INSDEL_LINE: {
+				/* 123456789      123456789
+				 * ABCDEFGHI  --> ABCDHI...
+				 * abcdefghi      abcdefghi */
+				ansitty_coord_t xy[2];
+				ansitty_coord_t sxy[2];
+				ansitty_coord_t cells_in_line;
+				GETCURSOR(xy);
+				SETCURSOR(MAXCOORD, MAXCOORD);
+				GETCURSOR(sxy);
+				++sxy[0];
+				if unlikely(xy[0] >= sxy[0]) {
+					SETCURSOR(xy[0], xy[1]);
+					break;
+				}
+				cells_in_line = sxy[0] - xy[0];
+				if ((unsigned int)n >= cells_in_line) {
+					SETCURSOR(xy[0], xy[1]);
+					break;
+				}
+				cells_in_line -= (unsigned int)n;
+				SETCURSOR(xy[0] + cells_in_line, xy[1]);
+				COPYCELL(-n, cells_in_line);
+				SETCURSOR(xy[0], xy[1]);
+			}	break;
+
+			case ANSITTY_FLAG_HEDIT: {
+				ansitty_coord_t xy[2];
+				unsigned int copy_count;
+				/* 123456789      ...123456
+				 * ABCDEFGHI  --> 789AEFGHI
+				 * abcdefghi      abcdefghi */
+				GETCURSOR(xy);
+				copy_count = xy[0];
+				if (xy[1] != 0) {
+					ansitty_coord_t sxy[2];
+					SETCURSOR(MAXCOORD, 0);
+					GETCURSOR(sxy);
+					++sxy[0];
+					copy_count += xy[1] * sxy[0];
+				}
+				SETCURSOR(0, 0);
+				COPYCELL(n, copy_count);
+				SETCURSOR(xy[0], xy[1]);
+			}	break;
+
+			case ANSITTY_FLAG_HEDIT | ANSITTY_FLAG_INSDEL_LINE: {
+				ansitty_coord_t xy[2];
+				/* 123456789      123456789
+				 * ABCDEFGHI  --> ...AEFGHI
+				 * abcdefghi      abcdefghi */
+				GETCURSOR(xy);
+				if ((unsigned int)n >= xy[0])
+					break; /* Full area shift */
+				SETCURSOR(0, xy[1]);
+				COPYCELL(n, xy[0] - (unsigned int)n);
+				SETCURSOR(xy[0], xy[1]);
+			}	break;
+
+			default: __builtin_unreachable();
+			}
+			break;
 
 		case 'M': /* DL -- \e[2M   Delete 2 lines if currently in scrolling region */
 			n = -n;
@@ -774,12 +1055,20 @@ do_single_argument_case:
 		case 'L': /* IL -- \e[3L   Insert 3 lines if currently in scrolling region */
 		{
 			ansitty_coord_t xy[2];
+			ansitty_coord_t old_sl, old_el;
+			old_sl = self->at_scroll_sl;
+			old_el = self->at_scroll_el;
 			GETCURSOR(xy);
-			if (xy[1] >= self->at_scroll_sl &&
-			    xy[1] <  self->at_scroll_el &&
-			    xy[0] >= self->at_scroll_sc &&
-			    xy[0] <  self->at_scroll_ec)
-				SCROLL(0, n); /* Scroll if inside of scroll region */
+			if (xy[1] >= old_sl && xy[1] < old_el) {
+				/* Scroll if inside of scroll region */
+				if (n < 0) {
+					setscrollregion(self, old_sl, xy[1]);
+				} else {
+					setscrollregion(self, xy[1], old_el);
+				}
+				SCROLL(n);
+				setscrollregion(self, old_sl, old_el);
+			}
 		}	break;
 
 		case 'b': /* REP -- \e[80b   Repeat character 80 times */
@@ -875,6 +1164,26 @@ do_single_argument_case:
 		}
 		break;
 
+
+	case 'Q': /* SEM Set Editing extent Mode (limits ICH & DCH) */
+		if (!arglen)
+			self->at_ttyflag &= ~(ANSITTY_FLAG_INSDEL_LINE);
+		else {
+			ARGUMENT_CODE_SWITCH_BEGIN()
+
+			case 0: /* \e[0Q   [Q = Insert/delete character affects rest of display */
+				self->at_ttyflag &= ~(ANSITTY_FLAG_INSDEL_LINE);
+				break;
+
+			case 1: /* \e[1Q   ICH/DCH affect the current line only */
+				self->at_ttyflag |= ANSITTY_FLAG_INSDEL_LINE;
+				break;
+			/* TODO: \e[2Q   ICH/DCH affect current field (between tab stops) only */
+			/* TODO: \e[3Q   ICH/DCH affect qualified area (between protected fields) */
+
+			ARGUMENT_CODE_SWITCH_END()
+		}
+		break;
 
 	case 'c':
 		if (!arglen) {
@@ -1024,16 +1333,35 @@ do_single_argument_case:
 //			         /* \e[2l         Enable input from keyboard KAM */
 //			case 3:  /* \e[3h   CRM   Control Representation Mode, show all control chars */
 //			         /* \e[3l         Control characters are not displayable characters CRM */
-//			case 4:  /* \e[4h   IRM   Insertion/Replacement Mode, set insert mode (VT102) */
-//			         /* \e[4l         Reset to replacement mode (VT102) IRM */
+
+			case 4:  /* \e[4h   IRM   Insertion/Replacement Mode, set insert mode (VT102) */
+			         /* \e[4l         Reset to replacement mode (VT102) IRM */
+				if (lastch == 'h') {
+					self->at_ttyflag |= ANSITTY_FLAG_INSERT;
+					self->at_state = STATE_INSERT;
+				} else {
+					self->at_ttyflag &= ~ANSITTY_FLAG_INSERT;
+					self->at_state = STATE_TEXT;
+					if (self->at_ttyflag & ANSITTY_FLAG_BOXMODE)
+						self->at_state = STATE_BOX;
+				}
+				break;
+
 //			case 5:  /* \e[5h   SRTM  Status Report Transfer Mode, report after DCS */
 //			         /* \e[5l         Report only on command (DSR) SRTM */
 //			case 6:  /* \e[6h   ERM   ERasure Mode, erase protected and unprotected */
 //			         /* \e[6l         erase only unprotected fields ERM */
 //			case 7:  /* \e[7h   VEM   Vertical Editing Mode, IL/DL affect previous lines */
 //			         /* \e[7l         IL/DL affect lines after current line VEM */
-//			case 10: /* \e[10h   HEM  Horizontal Editing mode, ICH/DCH/IRM go backwards */
-//			         /* \e[10l        ICH and IRM shove characters forward, DCH pulls HEM */
+
+			case 10: /* \e[10h   HEM  Horizontal Editing mode, ICH/DCH/IRM go backwards */
+			         /* \e[10l        ICH and IRM shove characters forward, DCH pulls HEM */
+				if (lastch == 'h') {
+					self->at_ttyflag |= ANSITTY_FLAG_HEDIT;
+				} else {
+					self->at_ttyflag &= ~ANSITTY_FLAG_HEDIT;
+				}
+				break;
 
 			case 11: /* \e[11h   PUM  Positioning Unit Mode, use decipoints for HVP/etc */
 			         /* \e[11l        Use character positions for HPA/HPR/VPA/VPR/HVP PUM */
@@ -1326,7 +1654,7 @@ do_single_argument_case:
 
 			case 52:
 				setattrib(self, self->at_attrib | (ANSITTY_ATTRIB_FRAMED |
-												   ANSITTY_ATTRIB_CIRCLED));
+			                                       ANSITTY_ATTRIB_CIRCLED));
 				break;
 
 			case 53:
@@ -1335,7 +1663,7 @@ do_single_argument_case:
 
 			case 54:
 				setattrib(self, self->at_attrib & ~(ANSITTY_ATTRIB_FRAMED |
-													ANSITTY_ATTRIB_CIRCLED));
+			                                        ANSITTY_ATTRIB_CIRCLED));
 				break;
 
 			case 55:
@@ -1484,9 +1812,9 @@ do_single_argument_case:
 					endcolumn = temp;
 				}
 			}
-			setscrollregion(self,
-			                self->at_scroll_sl, startcolumn,
-			                self->at_scroll_el, endcolumn);
+			setscrollmargin(self,
+			                startcolumn,
+			                endcolumn);
 		}
 		break;
 
@@ -1529,8 +1857,8 @@ do_single_argument_case:
 			}
 		}
 		setscrollregion(self,
-		                startline, self->at_scroll_sc,
-		                endline, self->at_scroll_ec);
+		                startline,
+		                endline);
 	}	break;
 
 
@@ -1555,6 +1883,8 @@ ansitty_setstate_text(struct ansitty *__restrict self) {
 	self->at_state = STATE_TEXT;
 	if (self->at_ttyflag & ANSITTY_FLAG_BOXMODE)
 		self->at_state = STATE_BOX;
+	if (self->at_ttyflag & ANSITTY_FLAG_INSERT)
+		self->at_state = STATE_INSERT;
 }
 
 PRIVATE void CC
@@ -1562,6 +1892,8 @@ ansitty_setstate_mbs(struct ansitty *__restrict self) {
 	self->at_state = STATE_MBS;
 	if (self->at_ttyflag & ANSITTY_FLAG_BOXMODE)
 		self->at_state = STATE_BOX_MBS;
+	if (self->at_ttyflag & ANSITTY_FLAG_INSERT)
+		self->at_state = STATE_INSERT_MBS;
 }
 
 PRIVATE void CC
@@ -1586,6 +1918,103 @@ ansitty_print_escape(struct ansitty *__restrict self) {
 	}
 }
 
+LOCAL void CC
+ansitty_do_insert(struct ansitty *__restrict self, char32_t ch) {
+	if (self->at_ttyflag & ANSITTY_FLAG_BOXMODE) {
+		if (ch >= BOX_CHARS_START &&
+		    ch < (BOX_CHARS_START + COMPILER_LENOF(box_chars)))
+			ch = box_chars[ch - BOX_CHARS_START];
+	}
+	switch (self->at_ttyflag & (ANSITTY_FLAG_HEDIT |
+	                            ANSITTY_FLAG_INSDEL_LINE)) {
+
+	case 0:
+		/* 123456789      123456789
+		 * ABCDEFGHI  --> ABCD...EF
+		 * abcdefghi      GHIabcdef */
+		COPYCELL(1, MAXCOORD);
+		PUTUNI(ch);
+		break;
+
+	case ANSITTY_FLAG_INSDEL_LINE: {
+		/* 123456789      123456789
+		 * ABCDEFGHI  --> ABCD...EF
+		 * abcdefghi      abcdefghi */
+		ansitty_coord_t xy[2];
+		ansitty_coord_t sxy[2];
+		ansitty_coord_t cells_in_line;
+		GETCURSOR(xy);
+		SETCURSOR(MAXCOORD, MAXCOORD);
+		GETCURSOR(sxy);
+		SETCURSOR(xy[0], xy[1]);
+		++sxy[0];
+		if unlikely(xy[0] >= sxy[0])
+			break;
+		cells_in_line = sxy[0] - xy[0];
+		if (1 >= cells_in_line)
+			break;
+		COPYCELL(1, cells_in_line - 1);
+		PUTUNI(ch);
+	}	break;
+
+	case ANSITTY_FLAG_HEDIT: {
+		ansitty_coord_t xy[2];
+		ansitty_coord_t xy2[2];
+		unsigned int copy_count;
+		/* 123456789      456789ABC
+		 * ABCDEFGHI  --> D...EFGHI
+		 * abcdefghi      abcdefghi */
+		GETCURSOR(xy);
+		if (xy[1] == 0) {
+			if (xy[0] <= 1) {
+				if (xy[0] == 0)
+					break;
+				SETCURSOR(0, 0);
+				PUTUNI(ch);
+				break;
+			}
+			copy_count = xy[0];
+		} else {
+			SETCURSOR(MAXCOORD, 0);
+			GETCURSOR(xy2);
+			copy_count = xy[0] + xy[1] * (xy2[0] + 1);
+		}
+		SETCURSOR(1, 0);
+		COPYCELL(-1, copy_count);
+		if (!xy[0]) {
+			--xy[1];
+			xy[0] = MAXCOORD;
+		} else {
+			--xy[0];
+		}
+		SETCURSOR(xy[0], xy[1]);
+		PUTUNI(ch);
+	}	break;
+
+	case ANSITTY_FLAG_HEDIT | ANSITTY_FLAG_INSDEL_LINE: {
+		ansitty_coord_t xy[2];
+		/* 123456789      123456789
+		 * ABCDEFGHI  --> D...EFGHI
+		 * abcdefghi      abcdefghi */
+		GETCURSOR(xy);
+		if (xy[0] <= 1) {
+			/* Full area shift */
+			if (xy[0] == 0)
+				break;
+			SETCURSOR(0, 0);
+			PUTUNI(ch);
+			break;
+		}
+		SETCURSOR(1, xy[1]);
+		COPYCELL(-1, xy[0] - 1);
+		SETCURSOR(xy[0] - 1, xy[1]);
+		PUTUNI(ch);
+	}	break;
+
+	default: __builtin_unreachable();
+	}
+}
+
 
 
 LOCAL void CC
@@ -1596,12 +2025,13 @@ ansitty_do_repeat(struct ansitty *__restrict self, char32_t ch) {
 	if (self->at_ttyflag & ANSITTY_FLAG_BOXMODE) {
 		if (ch >= BOX_CHARS_START &&
 		    ch < (BOX_CHARS_START + COMPILER_LENOF(box_chars)))
-			ch = (box_chars[ch - BOX_CHARS_START]);
+			ch = box_chars[ch - BOX_CHARS_START];
 	}
 	while (count--) {
 		PUTUNI((char32_t)(uint8_t)ch);
 	}
 }
+
 
 LOCAL void CC
 ansitty_putmbs(struct ansitty *__restrict self, char ch) {
@@ -1629,6 +2059,9 @@ ansitty_putmbs(struct ansitty *__restrict self, char ch) {
 		} else if (self->at_state == STATE_REPEAT_MBS) {
 			ansitty_do_repeat(self, unich);
 			ansitty_setstate_text(self);
+		} else if (self->at_state == STATE_INSERT_MBS) {
+			ansitty_do_insert(self, unich);
+			self->at_state = STATE_INSERT;
 		} else {
 			PUTUNI(unich);
 			self->at_state = STATE_TEXT;
@@ -1809,9 +2242,32 @@ do_repuni:
 		self->at_state     = STATE_REPEAT_MBS;
 		break;
 
+	case STATE_INSERT:
+		/* Check for the escape character */
+		if ((uint8_t)ch == ESC)
+			goto set_esc_state;
+		if ((uint8_t)ch == CAN)
+			break; /* Ignore */
+		if ((uint8_t)ch <= 0x7f) {
+			/* Output a regular, old ASCII character. */
+do_insuni:
+			ansitty_do_insert(self, (char32_t)(uint8_t)ch);
+			goto set_text_and_done;
+		}
+		/* Begin a new multi-byte character sequence. */
+		self->at_escwrd[0] = unicode_utf8seqlen[(byte_t)ch];
+		if unlikely(!self->at_escwrd[0])
+			goto do_insuni; /* Invalid utf-8 byte... (simply re-output, thus ignoring the error) */
+		assert(self->at_escwrd[0] != 1);
+		self->at_escwrd[1] = 1;
+		self->at_escape[0] = (byte_t)ch;
+		self->at_state     = STATE_INSERT_MBS;
+		break;
+
 	case STATE_MBS:
 	case STATE_BOX_MBS:
 	case STATE_REPEAT_MBS:
+	case STATE_INSERT_MBS:
 		ansitty_putmbs(self, ch);
 		break;
 
@@ -1860,7 +2316,7 @@ do_repuni:
 			} else {
 				/* IND */
 				/* Move/scroll window up one line */
-				SCROLL(0, -1);
+				SCROLL(-1);
 				ansitty_setstate_text(self);
 			}
 			goto unknown_character_after_esc;
@@ -1901,7 +2357,7 @@ do_repuni:
 			if (self->at_ttyflag & ANSITTY_FLAG_VT52) {
 				/* VT52: revindex */
 				/* Generate a reverse line-feed (XXX: Is this correct?) */
-				SCROLL(0, 1);
+				SCROLL(1);
 				goto set_text_and_done;
 			}
 			goto unknown_character_after_esc;
@@ -1931,7 +2387,7 @@ do_repuni:
 
 		case 'M': /* RI */
 			/* Move/scroll window down one line */
-			SCROLL(0, 1);
+			SCROLL(1);
 			goto set_text_and_done;
 
 		case 'E': /* NEL */
@@ -1997,7 +2453,9 @@ do_repuni:
 			setattrib(self, ANSITTY_ATTRIB_DEFAULT);
 			setttymode(self, ANSITTY_MODE_DEFAULT);
 			setcolor(self, self->at_defcolor);
-			setscrollregion(self, 0, 0, MAXCOORD, MAXCOORD);
+			setscrollregion(self, 0, MAXCOORD);
+			self->at_scroll_sc = 0;
+			self->at_scroll_ec = MAXCOORD;
 			goto set_text_and_done;
 
 		case '[':
@@ -2036,6 +2494,8 @@ enable_box_mode:
 disable_box_mode:
 			self->at_ttyflag &= ~ANSITTY_FLAG_BOXMODE;
 			self->at_state = STATE_TEXT;
+			if (self->at_ttyflag & ANSITTY_FLAG_INSERT)
+				self->at_state = STATE_INSERT;
 			break;
 
 		case CAN: /* Cancel */
@@ -2055,9 +2515,7 @@ disable_box_mode:
 			/* Process escape argument. */
 do_process_csi:
 			self->at_escape[self->at_esclen] = 0;
-			self->at_state = STATE_TEXT;
-			if (self->at_ttyflag & ANSITTY_FLAG_BOXMODE)
-				self->at_state = STATE_BOX;
+			ansitty_setstate_text(self);
 			if (!ansi_CSI(self, (char *)self->at_escape, self->at_esclen, ch)) {
 				WARN_UNKNOWN_SEQUENCE3('[', self->at_esclen, self->at_escape, ch);
 				PUTUNI(ESC);
@@ -2091,7 +2549,9 @@ print_escape_and_reset_state:
 				PUTUNI(ESC);
 				do_print_string_command_control_character(self);
 				ansitty_print_escape(self);
-				if (self->at_state == STATE_TEXT || self->at_state == STATE_BOX)
+				if (self->at_state == STATE_TEXT ||
+				    self->at_state == STATE_BOX ||
+				    self->at_state == STATE_INSERT)
 					self->at_state = STATE_ESC;
 				else {
 					ansitty_putmbs(self, ESC);

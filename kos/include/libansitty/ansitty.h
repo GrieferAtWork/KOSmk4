@@ -123,6 +123,45 @@ struct ansitty_operators {
 	__ATTR_NONNULL((1))
 	void (LIBANSITTY_CC *ato_putc)(struct ansitty *__restrict self,
 	                               __CHAR32_TYPE__ ch);
+	/* [0..1] Set the position of the cursor.
+	 * NOTE: The given `x' and `y' must be clamped to COLUMNS-1/ROWS-1, meaning
+	 *       that `(*ato_setcursor)(tty, (ansitty_coord_t)-1, (ansitty_coord_t)-1)'
+	 *       places the cursor at its greatest possible position in both X and Y. */
+	__ATTR_NONNULL((1))
+	void (LIBANSITTY_CC *ato_setcursor)(struct ansitty *__restrict self,
+	                                    ansitty_coord_t x, ansitty_coord_t y);
+	/* [0..1] Returns the position of the cursor.
+	 * @param: ppos[0]: Store X-position here.
+	 * @param: ppos[1]: Store Y-position here. */
+	__ATTR_NONNULL((1))
+	void (LIBANSITTY_CC *ato_getcursor)(struct ansitty *__restrict self,
+	                                    ansitty_coord_t ppos[2]);
+	/* [0..1] Copy the contents of cells starting at CURSOR into cells at
+	 *        CURSOR+dst_offset (added together such that values beyond
+	 *        the left/right border of the screen will wrap around to the
+	 *        end/start of the prev/next line).
+	 *        The number of cells to-be copied is given by `count'
+	 *        When `count' is would overflow past the end of the display,
+	 *        it is clamped before being used. */
+	__ATTR_NONNULL((1))
+	void (LIBANSITTY_CC *ato_copycell)(struct ansitty *__restrict self,
+	                                   ansitty_offset_t dst_offset,
+	                                   ansitty_coord_t count);
+	/* [0..1] Shift terminal lines by offset, where a negative value
+	 *        shifts lines up, and a positive value shifts them downwards.
+	 * E.g.: When the end of the terminal is reached, the driver may
+	 *       implement this as `(*to_scroll)(..., -1);' */
+	__ATTR_NONNULL((1))
+	void (LIBANSITTY_CC *ato_scroll)(struct ansitty *__restrict self,
+	                                 ansitty_offset_t offset);
+	/* [0..1] Clear text from the screen.
+	 * @param: mode: One of `ANSITTY_CLS_*' */
+	__ATTR_NONNULL((1))
+	void (LIBANSITTY_CC *ato_cls)(struct ansitty *__restrict self, unsigned int mode);
+	/* [0..1] Clear text from the current line.
+	 * @param: mode: One of `ANSITTY_EL_*' */
+	__ATTR_NONNULL((1))
+	void (LIBANSITTY_CC *ato_el)(struct ansitty *__restrict self, unsigned int mode);
 	/* [0..1] Set the current text color.
 	 * Called whenever a different color is selected.
 	 * @param: color: ==  */
@@ -141,50 +180,21 @@ struct ansitty_operators {
 	__ATTR_NONNULL((1))
 	void (LIBANSITTY_CC *ato_setttymode)(struct ansitty *__restrict self,
 	                                     __uint16_t new_ttymode);
-	/* [0..1] Set the position of the cursor.
-	 * NOTE: The given `x' and `y' must be clamped to COLUMNS-1/ROWS-1, meaning
-	 *       that `(*ato_setcursor)(tty, (ansitty_coord_t)-1, (ansitty_coord_t)-1)'
-	 *       places the cursor at its greatest possible position in both X and Y. */
-	__ATTR_NONNULL((1))
-	void (LIBANSITTY_CC *ato_setcursor)(struct ansitty *__restrict self,
-	                                    ansitty_coord_t x, ansitty_coord_t y);
-	/* [0..1] Returns the position of the cursor.
-	 * @param: ppos[0]: Store X-position here.
-	 * @param: ppos[1]: Store Y-position here. */
-	__ATTR_NONNULL((1))
-	void (LIBANSITTY_CC *ato_getcursor)(struct ansitty *__restrict self,
-	                                    ansitty_coord_t ppos[2]);
-	/* [0..1] Clear text from the screen.
-	 * @param: mode: One of `ANSITTY_CLS_*' */
-	__ATTR_NONNULL((1))
-	void (LIBANSITTY_CC *ato_cls)(struct ansitty *__restrict self, unsigned int mode);
-	/* [0..1] Clear text from the current line.
-	 * @param: mode: One of `ANSITTY_EL_*' */
-	__ATTR_NONNULL((1))
-	void (LIBANSITTY_CC *ato_el)(struct ansitty *__restrict self, unsigned int mode);
-	/* [0..1] Shift terminal lines by offset, where a negative value shifts
-	 *        lines downwards/left, and a positive value shifts them up/right.
-	 * E.g.: When the end of the terminal is reached, the driver may
-	 *       implement this as `(*to_scroll)(...,1);' */
-	__ATTR_NONNULL((1))
-	void (LIBANSITTY_CC *ato_scroll)(struct ansitty *__restrict self,
-	                                 ansitty_offset_t hoffset,
-	                                 ansitty_offset_t voffset);
-	/* [0..1] Set the window title of the terminal. */
-	__ATTR_NONNULL((1, 2))
-	void (LIBANSITTY_CC *ato_settitle)(struct ansitty *__restrict self,
-	                                   /*utf-8*/char const *__restrict text);
-	/* [0..1] Output `text' to the slave process (`write(amaster, text, textlen)'; amaster from <pty.h>:openpty) */
-	__ATTR_NONNULL((1))
-	void (LIBANSITTY_CC *ato_output)(struct ansitty *__restrict self,
-	                                 void const *data, __size_t datalen);
 	/* [0..1] Set the scroll region */
 	__ATTR_NONNULL((1))
 	void (LIBANSITTY_CC *ato_scrollregion)(struct ansitty *__restrict self,
 	                                       ansitty_coord_t start_line,
-	                                       ansitty_coord_t start_column,
-	                                       ansitty_coord_t end_line,
-	                                       ansitty_coord_t end_column);
+	                                       ansitty_coord_t start_column);
+	/* [0..1] Set the window title of the terminal. */
+	__ATTR_NONNULL((1, 2))
+	void (LIBANSITTY_CC *ato_settitle)(struct ansitty *__restrict self,
+	                                   /*utf-8*/char const *__restrict text);
+	/* [0..1] Output `text' to the slave process (`write(amaster, text, textlen)';
+	 *        amaster from <pty.h>:openpty, or alternatively identical to keyboard
+	 *        input) */
+	__ATTR_NONNULL((1))
+	void (LIBANSITTY_CC *ato_output)(struct ansitty *__restrict self,
+	                                 void const *data, __size_t datalen);
 	/* [0..1] Turn LEDs on/off, such that NEW_LEDS = (OLD_LEDS & mask) | flag.
 	 * For this purpose, both mask and flag are bitsets of LEDs enumerated
 	 * from 0 to 3 (yes: that's 4 leds, and I don't know what that 4'th led
@@ -223,9 +233,9 @@ struct ansitty {
 	__uint16_t                at_attrib;      /* Text mode attributes (set of `ANSITTY_ATTRIB_*'). */
 	ansitty_coord_t           at_savecur[2];  /* Saved cursor position */
 	ansitty_coord_t           at_scroll_sl;   /* Scroll region starting line */
-	ansitty_coord_t           at_scroll_sc;   /* Scroll region starting column */
 	ansitty_coord_t           at_scroll_el;   /* Scroll region end line */
-	ansitty_coord_t           at_scroll_ec;   /* Scroll region end column */
+	ansitty_coord_t           at_scroll_sc;   /* Scroll region starting column (only used internally!) */
+	ansitty_coord_t           at_scroll_ec;   /* Scroll region end column (only used internally!) */
 	__uintptr_t               at_state;       /* Current state-machine state. (not exposed) */
 	union {
 		__UINTPTR_TYPE__      at_esclen;      /* Number of written, escaped bytes. */
