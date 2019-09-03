@@ -29,6 +29,11 @@ final global FIX_EXTENSIONS = {
 	"dee",
 	"txt",
 	"json",
+	"clang-format",
+	"sources",
+	"",
+	"bxrc",
+	"ld",
 };
 
 function fixFile(filename: string) {
