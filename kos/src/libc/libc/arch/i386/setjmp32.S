@@ -71,15 +71,15 @@ INTERN_FUNCTION(libc___fast_longjmp)
 	movl   8(%esp), %eax
 1:	movl   4(%esp), %ecx
 	movl   OFFSET_JMPBUF_EBX(%ecx), %ebx
-//	.cfi_same_value %ebx
+/*	.cfi_same_value %ebx */
 	movl   OFFSET_JMPBUF_ESP(%ecx), %esp
 	.cfi_same_value %esp
 	movl   OFFSET_JMPBUF_EBP(%ecx), %ebp
-//	.cfi_same_value %ebp
+/*	.cfi_same_value %ebp */
 	movl   OFFSET_JMPBUF_ESI(%ecx), %esi
-//	.cfi_same_value %esi
+/*	.cfi_same_value %esi */
 	movl   OFFSET_JMPBUF_EDI(%ecx), %edi
-//	.cfi_same_value %edi
+/*	.cfi_same_value %edi */
 	jmp    *OFFSET_JMPBUF_EIP(%ecx)
 	.cfi_endproc
 END(libc___fast_longjmp)

@@ -6,8 +6,8 @@
     "\\include\\i386-kos\\asm",
     "\\src",
     "\\src\\libc",
-    "\\src\\libc\\libc"
+    "\\src\\libc\\magic"
   ],
-  "SelectedNode": "\\include\\i386-kos\\asm\\syscalls64_d.inl",
+  "SelectedNode": "\\include\\i386-kos\\asm\\syscalls.def",
   "PreviewInSolutionExplorer": false
 }

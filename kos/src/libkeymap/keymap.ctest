@@ -25,13 +25,13 @@
 #include <kos/keyboard.h>
 #include <kos/types.h>
 #include <sys/mman.h>
-#include <sys/stat.h>
 
 #include <assert.h>
 #include <dlfcn.h>
-#include <fcntl.h>
 #include <string.h>
-#include <unistd.h>
+#include <kos/fcntl.h>
+#include <kos/unistd.h>
+#include <kos/sys/stat.h>
 
 #include <libkeymap/keymap.h>
 #include <system-test/ctest.h>
@@ -39,18 +39,17 @@
 
 DECL_BEGIN
 
-PRIVATE void *mapfile(char const *filename, size_t *psize) {
+PRIVATE void *MapFile(char const *filename, size_t *psize) {
 	struct stat st;
 	fd_t fd;
 	void *result;
-	fd = open(filename, O_RDONLY);
-	assert(fd >= 0);
-	assert(fstat(fd, &st) == 0);
+	fd = Open(filename, O_RDONLY);
+	FStat(fd, &st);
 	result = mmap(NULL, (size_t)st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
 	assert(result != MAP_FAILED);
 	if (psize)
 		*psize = (size_t)st.st_size;
-	assert(close(fd) == 0);
+	close(fd);
 	return result;
 }
 
@@ -72,7 +71,7 @@ DEFINE_TEST(keymap_translations) {
 	assert(keymap_openblob);
 	assert(keymap_translate_buf);
 
-	filedata = mapfile("/lib/keymap/de_DE", &filesize);
+	filedata = MapFile("/lib/keymap/de_DE", &filesize);
 	assert(keymap_openblob(&mymap, filedata, filesize) == true);
 	{
 		ssize_t len;

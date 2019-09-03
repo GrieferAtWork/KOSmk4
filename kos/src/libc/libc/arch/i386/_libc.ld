@@ -50,12 +50,12 @@ PHDRS {
 
 #define ENUMERATE_CRT_SECTIONS(PREFIX) \
 	__CRT_LINKORDER_SECTIONS(*,PREFIX.crt)
-#define ENUMERATE_SECTIONS(PREFIX) \
-	*(PREFIX.hot PREFIX.likely PREFIX.hot.* PREFIX.likely.*) \
-	*(PREFIX) \
-	ENUMERATE_CRT_SECTIONS(PREFIX) \
+#define ENUMERATE_SECTIONS(PREFIX)                                 \
+	*(PREFIX.hot PREFIX.likely PREFIX.hot.* PREFIX.likely.*)       \
+	*(PREFIX)                                                      \
+	ENUMERATE_CRT_SECTIONS(PREFIX)                                 \
 	*(PREFIX.cold PREFIX.unlikely PREFIX.cold.* PREFIX.unlikely.*) \
-	*(PREFIX.*) \
+	*(PREFIX.*)                                                    \
 /**/
 
 

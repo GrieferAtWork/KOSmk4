@@ -25,11 +25,11 @@
 
 /* When writing self-modifying code, it is often very important to already
  * know the size of the generated code at assembly-time, rather than link-time,
- * as once often has to ensure sufficient padding space for being able to inject
+ * as one often has to ensure sufficient padding space for being able to inject
  * instruction overrides.
- * However, on x86, the conditional jump instruction (jcc) pose a problem for this,
- * since they can be assembled in one of a couple of ways (each of which results
- * in different instruction lengths):
+ * However, on x86, the conditional jump instructions (jcc) pose a problem for this,
+ * since they can be assembled in one of a couple of ways (each of which results in
+ * different instruction lengths):
  * >>  jz    1f
  * Can be assembled as:
  * #1: >>  jz8   1f  // 8-bit displacement
@@ -42,8 +42,8 @@
  * exact size of a instruction is yet to be known.
  *
  * To fix this problem, the programmer can make use of the macros in this file to explicitly
- * make use of 8-bit or 32-bit displacements with their lengths already known early on during
- * assembly
+ * select between 8-bit or 32-bit displacements, such that the instruction length is already
+ * known early on during assembly
  */
 
 #ifdef __x86_64__

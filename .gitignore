@@ -3,9 +3,11 @@
 /binutils
 /build
 /kos/.vs/slnx.sqlite
+/kos/.vs/slnx.sqlite-journal
 /kos/.vs/kos
 /kos/.vs/config
 /kos/.vs/ProjectSettings.json
+/kos/.vs/VSWorkspaceState.json
 /asm.S
 /kos/include/i386-kos/c++
 __ice__

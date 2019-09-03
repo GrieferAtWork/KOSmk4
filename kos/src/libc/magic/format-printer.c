@@ -1036,39 +1036,39 @@ format_aprintf_pack:([nonnull] struct format_aprintf_data *__restrict self,
                      [nullable] $size_t *pstrlen) -> char * {
 	/* Free unused buffer memory. */
 	char *result;
-	if (self->ap_avail != 0) {
+	if (self->@ap_avail@ != 0) {
 		char *newbuf;
-		newbuf = (char *)realloc(self->ap_base,
-		                         (self->ap_used + 1) * sizeof(char));
+		newbuf = (char *)realloc(self->@ap_base@,
+		                         (self->@ap_used@ + 1) * sizeof(char));
 		if likely(newbuf)
-			self->ap_base = newbuf;
+			self->@ap_base@ = newbuf;
 	} else {
-		if unlikely(!self->ap_used) {
+		if unlikely(!self->@ap_used@) {
 			/* Special case: Nothing was printed. */
-			__hybrid_assert(!self->ap_base);
+			__hybrid_assert(!self->@ap_base@);
 #ifdef __CRT_HAVE_malloc
-			self->ap_base = (char *)malloc(1 * sizeof(char));
+			self->@ap_base@ = (char *)malloc(1 * sizeof(char));
 #else /* __CRT_HAVE_malloc */
-			self->ap_base = (char *)realloc(NULL, 1 * sizeof(char));
+			self->@ap_base@ = (char *)realloc(NULL, 1 * sizeof(char));
 #endif /* !__CRT_HAVE_malloc */
-			if unlikely(!self->ap_base)
+			if unlikely(!self->@ap_base@)
 				return NULL;
 		}
 	}
-	result = self->ap_base;
+	result = self->@ap_base@;
 	__hybrid_assert(result);
-	result[self->ap_used] = '\0'; /* NUL-terminate */
+	result[self->@ap_used@] = '\0'; /* NUL-terminate */
 	if (pstrlen)
-		*pstrlen = self->ap_used;
+		*pstrlen = self->@ap_used@;
 #ifndef NDEBUG
 #if __SIZEOF_POINTER__ == 4
-	self->ap_base  = (char *)__UINT32_C(0xcccccccc);
-	self->ap_avail = __UINT32_C(0xcccccccc);
-	self->ap_used  = __UINT32_C(0xcccccccc);
+	self->@ap_base@  = (char *)__UINT32_C(0xcccccccc);
+	self->@ap_avail@ = __UINT32_C(0xcccccccc);
+	self->@ap_used@  = __UINT32_C(0xcccccccc);
 #elif __SIZEOF_POINTER__ == 8
-	self->ap_base  = (char *)__UINT64_C(0xcccccccccccccccc);
-	self->ap_avail = __UINT64_C(0xcccccccccccccccc);
-	self->ap_used  = __UINT64_C(0xcccccccccccccccc);
+	self->@ap_base@  = (char *)__UINT64_C(0xcccccccccccccccc);
+	self->@ap_avail@ = __UINT64_C(0xcccccccccccccccc);
+	self->@ap_used@  = __UINT64_C(0xcccccccccccccccc);
 #endif /* __SIZEOF_POINTER__ == ... */
 #endif /* !NDEBUG */
 	return result;

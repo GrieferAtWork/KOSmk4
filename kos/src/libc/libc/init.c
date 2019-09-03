@@ -25,9 +25,9 @@
 
 #include <kos/syscalls.h>
 
-#include "except.h"
+#include "except.h" /* EXCEPT_INITIALIZER_KERNEL_EXCEPTION_HANDLER() */
 
-#include <stdio.h>
+#include <stdio.h> /* flushall() */
 
 
 DECL_BEGIN

@@ -1,4 +1,4 @@
-/* HASH 0x77f768f1 */
+/* HASH 0x6b411b75 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,9 +27,9 @@
 #ifndef __format_aprintf_data_defined
 #define __format_aprintf_data_defined 1
 struct format_aprintf_data {
-	char         *__ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owend] Buffer */
-	__SIZE_TYPE__ __ap_avail; /* Unused buffer size */
-	__SIZE_TYPE__ __ap_used;  /* Used buffer size */
+	char         *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owend] Buffer */
+	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
+	__SIZE_TYPE__ ap_used;  /* Used buffer size */
 };
 #endif /* !__format_aprintf_data_defined */
 /* Dependency: "realloc" */
@@ -90,39 +90,39 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_aprintf_pack))(struct format_a
 #line 1037 "kos/src/libc/magic/format-printer.c"
 	/* Free unused buffer memory. */
 	char *__result;
-	if (__self->__ap_avail != 0) {
+	if (__self->ap_avail != 0) {
 		char *__newbuf;
-		__newbuf = (char *)__localdep_realloc(__self->__ap_base,
-		                         (__self->__ap_used + 1) * sizeof(char));
+		__newbuf = (char *)__localdep_realloc(__self->ap_base,
+		                         (__self->ap_used + 1) * sizeof(char));
 		if __likely(__newbuf)
-			__self->__ap_base = __newbuf;
+			__self->ap_base = __newbuf;
 	} else {
-		if __unlikely(!__self->__ap_used) {
+		if __unlikely(!__self->ap_used) {
 			/* Special case: Nothing was printed. */
-			__hybrid_assert(!__self->__ap_base);
+			__hybrid_assert(!__self->ap_base);
 #ifdef __CRT_HAVE_malloc
-			__self->__ap_base = (char *)__localdep_malloc(1 * sizeof(char));
+			__self->ap_base = (char *)__localdep_malloc(1 * sizeof(char));
 #else /* __CRT_HAVE_malloc */
-			__self->__ap_base = (char *)__localdep_realloc(__NULLPTR, 1 * sizeof(char));
+			__self->ap_base = (char *)__localdep_realloc(__NULLPTR, 1 * sizeof(char));
 #endif /* !__CRT_HAVE_malloc */
-			if __unlikely(!__self->__ap_base)
+			if __unlikely(!__self->ap_base)
 				return __NULLPTR;
 		}
 	}
-	__result = __self->__ap_base;
+	__result = __self->ap_base;
 	__hybrid_assert(__result);
-	__result[__self->__ap_used] = '\0'; /* NUL-terminate */
+	__result[__self->ap_used] = '\0'; /* NUL-terminate */
 	if (__pstrlen)
-		*__pstrlen = __self->__ap_used;
+		*__pstrlen = __self->ap_used;
 #ifndef __NDEBUG
 #if __SIZEOF_POINTER__ == 4
-	__self->__ap_base  = (char *)__UINT32_C(0xcccccccc);
-	__self->__ap_avail = __UINT32_C(0xcccccccc);
-	__self->__ap_used  = __UINT32_C(0xcccccccc);
+	__self->ap_base  = (char *)__UINT32_C(0xcccccccc);
+	__self->ap_avail = __UINT32_C(0xcccccccc);
+	__self->ap_used  = __UINT32_C(0xcccccccc);
 #elif __SIZEOF_POINTER__ == 8
-	__self->__ap_base  = (char *)__UINT64_C(0xcccccccccccccccc);
-	__self->__ap_avail = __UINT64_C(0xcccccccccccccccc);
-	__self->__ap_used  = __UINT64_C(0xcccccccccccccccc);
+	__self->ap_base  = (char *)__UINT64_C(0xcccccccccccccccc);
+	__self->ap_avail = __UINT64_C(0xcccccccccccccccc);
+	__self->ap_used  = __UINT64_C(0xcccccccccccccccc);
 #endif /* __SIZEOF_POINTER__ == ... */
 #endif /* !NDEBUG */
 	return __result;

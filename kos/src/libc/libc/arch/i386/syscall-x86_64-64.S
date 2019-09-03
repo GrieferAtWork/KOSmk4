@@ -33,6 +33,7 @@ INTERN_FUNCTION(libc_syscall)
 	movq   %r8,     %r10 /* arg #3 */
 	movq   %r9,     %r8  /* arg #4 */
 	movq   8(%rsp), %r9  /* arg #5 */
+	clc
 	syscall
 	cmpq   $-4096, %rax /* Check for error. */
 	ja     1f
@@ -44,5 +45,26 @@ INTERN_FUNCTION(libc_syscall)
 	ret
 	.cfi_endproc
 END(libc_syscall)
+DEFINE_INTERN_ALIAS(libc_syscall64, libc_syscall)
 DEFINE_PUBLIC_ALIAS(syscall, libc_syscall)
+DEFINE_PUBLIC_ALIAS(syscall64, libc_syscall64)
+
+.section .text.crt.except.system.utility.Syscall
+INTERN_FUNCTION(libc_Syscall)
+	.cfi_startproc
+	movq   %rdi,    %rax /* sysno */
+	movq   %rsi,    %rdi /* arg #0 */
+	movq   %rdx,    %rsi /* arg #1 */
+	movq   %rcx,    %rdx /* arg #2 */
+	movq   %r8,     %r10 /* arg #3 */
+	movq   %r9,     %r8  /* arg #4 */
+	movq   8(%rsp), %r9  /* arg #5 */
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_Syscall)
+DEFINE_INTERN_ALIAS(libc_Syscall64, libc_Syscall)
+DEFINE_PUBLIC_ALIAS(Syscall, libc_Syscall)
+DEFINE_PUBLIC_ALIAS(Syscall64, libc_Syscall64)
 

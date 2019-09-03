@@ -1,4 +1,4 @@
-/* HASH 0xa0d059e2 */
+/* HASH 0xd5c5d79d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,10 +25,10 @@
 
 #ifndef __format_aprintf_data_defined
 #define __format_aprintf_data_defined 1
-struct __format_aprintf_data {
-	char         *__ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owend] Buffer */
-	__SIZE_TYPE__ __ap_avail; /* Unused buffer size */
-	__SIZE_TYPE__ __ap_used;  /* Used buffer size */
+struct format_aprintf_data {
+	char         *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owend] Buffer */
+	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
+	__SIZE_TYPE__ ap_used;  /* Used buffer size */
 };
 #endif /* !__format_aprintf_data_defined */
 /* Dependency: "format_vprintf" from "format-printer" */
@@ -205,14 +205,14 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vasprintf))(char **__restrict __pstr,
 #line 1533 "kos/src/libc/magic/stdio.c"
 	char *__result;
 	__SSIZE_TYPE__ __error;
-	struct __format_aprintf_data __data;
+	struct format_aprintf_data __data;
 	__hybrid_assert(__pstr != __NULLPTR);
-	__data.__ap_avail = 0;
-	__data.__ap_used  = 0;
-	__data.__ap_base  = __NULLPTR;
+	__data.ap_avail = 0;
+	__data.ap_used  = 0;
+	__data.ap_base  = __NULLPTR;
 	__error = __localdep_format_vprintf(&__localdep_format_aprintf_printer, &__data, __format, __args);
 	if __unlikely(__error < 0) {
-		__localdep_free(__data.__ap_base);
+		__localdep_free(__data.ap_base);
 		return -1;
 	}
 	__result = __localdep_format_aprintf_pack(&__data, __NULLPTR);

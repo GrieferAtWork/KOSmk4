@@ -149,7 +149,7 @@ futexlock_wake:([nonnull] lfutex_t *ulockaddr, $size_t max_wake) -> $ssize_t {
 [doc_alias(futexlock_wake)]
 [requires($has_function(futexlock_wake))]
 futexlock_wakeall:([nonnull] lfutex_t *ulockaddr) -> $ssize_t {
-	return futexlock_wake(uaddr, ($size_t)-1);
+	return futexlock_wake(ulockaddr, ($size_t)-1);
 }
 
 [cp][requires($has_function(lfutexlock64))][doc_alias(futex_waitwhile)]

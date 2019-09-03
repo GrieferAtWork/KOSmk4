@@ -1532,14 +1532,14 @@ struct format_aprintf_data {
 vasprintf:([nonnull] char **__restrict pstr, [nonnull] char const *__restrict format, $va_list args) -> __STDC_INT_AS_SSIZE_T {
 	char *result;
 	ssize_t error;
-	struct format_aprintf_data data;
+	struct @format_aprintf_data@ data;
 	__hybrid_assert(pstr != NULL);
-	data.ap_avail = 0;
-	data.ap_used  = 0;
-	data.ap_base  = NULL;
+	data.@ap_avail@ = 0;
+	data.@ap_used@  = 0;
+	data.@ap_base@  = NULL;
 	error = format_vprintf(&format_aprintf_printer, &data, format, args);
 	if unlikely(error < 0) {
-		free(data.ap_base);
+		free(data.@ap_base@);
 		return -1;
 	}
 	result = format_aprintf_pack(&data, NULL);
