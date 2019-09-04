@@ -1892,7 +1892,6 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.write.write.puts_unlocked") __ST
 /*[[[end:puts_unlocked]]]*/
 
 
-
 /*[[[head:feof,hash:0x1ced5676]]]*/
 /* Check if end-of-file has been reached in `STREAM' */
 INTERN WUNUSED NONNULL((1))
@@ -3836,6 +3835,10 @@ NOTHROW_RPC(LIBCCALL libc_freopen_unlocked)(char const *__restrict filename,
 DEFINE_INTERN_ALIAS(libc_freopen64, libc_freopen);
 DEFINE_INTERN_ALIAS(libc_freopen64_unlocked, libc_freopen_unlocked);
 DEFINE_INTERN_ALIAS(libc_fopen64, libc_fopen);
+
+
+DEFINE_INTERN_ALIAS(libc_feof_unlocked, libc_feof);
+DEFINE_INTERN_ALIAS(libc_ferror_unlocked, libc_ferror);
 
 /*[[[end:implementation]]]*/
 
