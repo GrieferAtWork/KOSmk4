@@ -112,39 +112,34 @@ struct iofile_data {
 
 
 PRIVATE ATTR_SECTION(".data.crt.FILE.locked.read.read.io_stdin") struct iofile_data io_stdin = {
-	/* .io_zero = */0,
-	/* .io_lock = */ATOMIC_OWNER_RWLOCK_INIT,
-	/* .io_pos  = */0,
-	/* .io_read = */0,
-	/* .io_link = */LLIST_INITNODE,
-	/* .io_lnch = */LLIST_INITNODE,
+	/* .io_zero = */ 0,
+	/* .io_lock = */ ATOMIC_OWNER_RWLOCK_INIT,
+	/* .io_pos  = */ 0,
+	/* .io_read = */ 0,
+	/* .io_link = */ LLIST_INITNODE,
+	/* .io_lnch = */ LLIST_INITNODE,
 };
 PRIVATE ATTR_SECTION(".data.crt.FILE.locked.write.write.io_stdout") struct iofile_data io_stdout = {
-	/* .io_zero = */0,
-	/* .io_lock = */ATOMIC_OWNER_RWLOCK_INIT,
-	/* .io_pos  = */0,
-	/* .io_read = */0,
-	/* .io_link = */LLIST_INITNODE,
-	/* .io_lnch = */LLIST_INITNODE,
+	/* .io_zero = */ 0,
+	/* .io_lock = */ ATOMIC_OWNER_RWLOCK_INIT,
+	/* .io_pos  = */ 0,
+	/* .io_read = */ 0,
+	/* .io_link = */ LLIST_INITNODE,
+	/* .io_lnch = */ LLIST_INITNODE,
 };
 PRIVATE ATTR_SECTION(".data.crt.FILE.locked.write.write.io_stderr") struct iofile_data io_stderr = {
-	/* .io_zero = */0,
-	/* .io_lock = */ATOMIC_OWNER_RWLOCK_INIT,
-	/* .io_pos  = */0,
-	/* .io_read = */0,
-	/* .io_link = */LLIST_INITNODE,
-	/* .io_lnch = */LLIST_INITNODE,
+	/* .io_zero = */ 0,
+	/* .io_lock = */ ATOMIC_OWNER_RWLOCK_INIT,
+	/* .io_pos  = */ 0,
+	/* .io_read = */ 0,
+	/* .io_link = */ LLIST_INITNODE,
+	/* .io_lnch = */ LLIST_INITNODE,
 };
 
 INTERN ATTR_SECTION(".data.crt.FILE.locked.utility.std_files") FILE libc_std_files[3] = {
-	/* [0] = */__IO_FILE_INIT(NULL,0,NULL,IO_LNBUF,STDIN_FILENO,{0},0,&io_stdin),
-#if 0
-	/* [1] = */__IO_FILE_INIT(NULL,0,NULL,IO_USERBUF,STDIN_FILENO,{0},0,&io_stdout),
-	/* [2] = */__IO_FILE_INIT(NULL,0,NULL,IO_USERBUF,STDIN_FILENO,{0},0,&io_stderr),
-#else
-	/* [1] = */__IO_FILE_INIT(NULL,0,NULL,IO_LNIFTYY,STDIN_FILENO,{0},0,&io_stdout),
-	/* [2] = */__IO_FILE_INIT(NULL,0,NULL,IO_LNIFTYY,STDIN_FILENO,{0},0,&io_stderr),
-#endif
+	/* [0] = */ __IO_FILE_INIT(NULL, 0, NULL, IO_LNBUF, STDIN_FILENO, { 0 }, 0, &io_stdin),
+	/* [1] = */ __IO_FILE_INIT(NULL, 0, NULL, IO_LNIFTYY, STDOUT_FILENO, { 0 }, 0, &io_stdout),
+	/* [2] = */ __IO_FILE_INIT(NULL, 0, NULL, IO_LNIFTYY, STDERR_FILENO, { 0 }, 0, &io_stderr),
 };
 
 #undef stdin

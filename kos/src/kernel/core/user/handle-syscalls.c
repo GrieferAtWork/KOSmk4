@@ -398,7 +398,8 @@ DEFINE_SYSCALL4(errno_t, _llseek, fd_t, fd, int64_t, offset,
 }
 #endif /* __NR__llseek */
 
-DEFINE_SYSCALL3(ssize_t, read, fd_t, fd, USER UNCHECKED void *, buf, size_t, bufsize) {
+DEFINE_SYSCALL3(ssize_t, read, fd_t, fd,
+                USER UNCHECKED void *, buf, size_t, bufsize) {
 	size_t result;
 	struct handle hand;
 	validate_writable(buf, bufsize);
@@ -415,7 +416,8 @@ DEFINE_SYSCALL3(ssize_t, read, fd_t, fd, USER UNCHECKED void *, buf, size_t, buf
 	return (ssize_t)result;
 }
 
-DEFINE_SYSCALL3(ssize_t, write, fd_t, fd, USER UNCHECKED void const *, buf, size_t, bufsize) {
+DEFINE_SYSCALL3(ssize_t, write, fd_t, fd,
+                USER UNCHECKED void const *, buf, size_t, bufsize) {
 	size_t result;
 	struct handle hand;
 	validate_readable(buf, bufsize);
@@ -432,7 +434,9 @@ DEFINE_SYSCALL3(ssize_t, write, fd_t, fd, USER UNCHECKED void const *, buf, size
 	return (ssize_t)result;
 }
 
-DEFINE_SYSCALL4(ssize_t, pread64, fd_t, fd, USER UNCHECKED void *, buf, size_t, bufsize, uint64_t, offset) {
+DEFINE_SYSCALL4(ssize_t, pread64, fd_t, fd,
+                USER UNCHECKED void *, buf,
+                size_t, bufsize, uint64_t, offset) {
 	size_t result;
 	struct handle hand;
 	validate_writable(buf, bufsize);
@@ -452,7 +456,9 @@ DEFINE_SYSCALL4(ssize_t, pread64, fd_t, fd, USER UNCHECKED void *, buf, size_t, 
 	return (ssize_t)result;
 }
 
-DEFINE_SYSCALL4(ssize_t, pwrite64, fd_t, fd, USER UNCHECKED void const *, buf, size_t, bufsize, uint64_t, offset) {
+DEFINE_SYSCALL4(ssize_t, pwrite64, fd_t, fd,
+                USER UNCHECKED void const *, buf,
+                size_t, bufsize, uint64_t, offset) {
 	size_t result;
 	struct handle hand;
 	validate_readable(buf, bufsize);

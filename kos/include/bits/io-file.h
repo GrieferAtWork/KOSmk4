@@ -62,29 +62,29 @@ __NAMESPACE_STD_BEGIN
 struct __IO_FILE {
 #ifdef __BUILDING_LIBC
 #if __SIZEOF_POINTER__ >= 8
-#define __IO_FILE_INIT(if_ptr_,if_cnt_,if_base_,if_flag_,if_fd_,if_charbuf_,if_bufsize_,if_exdata_) \
-	{ \
-		/* .if_ptr     = */if_ptr_, \
-		/* .if_cnt     = */if_cnt_, \
-		/* .__if_pad0  = */0, \
-		/* .if_base    = */if_base_, \
-		/* .if_flag    = */if_flag_, \
-		/* .if_fd      = */if_fd_, \
-		/* .if_charbuf = */if_charbuf_, \
-		/* .if_bufsize = */if_bufsize_, \
-		/* .if_exdata  = */if_exdata_ \
+#define __IO_FILE_INIT(if_ptr_, if_cnt_, if_base_, if_flag_, if_fd_, if_charbuf_, if_bufsize_, if_exdata_) \
+	{                                                                                                      \
+		/* .if_ptr     = */ if_ptr_,                                                                       \
+		/* .if_cnt     = */ if_cnt_,                                                                       \
+		/* .__if_pad0  = */ 0,                                                                             \
+		/* .if_base    = */ if_base_,                                                                      \
+		/* .if_flag    = */ if_flag_,                                                                      \
+		/* .if_fd      = */ if_fd_,                                                                        \
+		/* .if_charbuf = */ if_charbuf_,                                                                   \
+		/* .if_bufsiz  = */ if_bufsize_,                                                                   \
+		/* .if_exdata  = */ if_exdata_                                                                     \
 	}
 #else
-#define __IO_FILE_INIT(if_ptr_,if_cnt_,if_base_,if_flag_,if_fd_,if_charbuf_,if_bufsize_,if_exdata_) \
-	{ \
-		/* .if_ptr     = */if_ptr_, \
-		/* .if_cnt     = */if_cnt_, \
-		/* .if_base    = */if_base_, \
-		/* .if_flag    = */if_flag_, \
-		/* .if_fd      = */if_fd_, \
-		/* .if_charbuf = */if_charbuf_, \
-		/* .if_bufsize = */if_bufsize_, \
-		/* .if_exdata  = */if_exdata_ \
+#define __IO_FILE_INIT(if_ptr_, if_cnt_, if_base_, if_flag_, if_fd_, if_charbuf_, if_bufsize_, if_exdata_) \
+	{                                                                                                      \
+		/* .if_ptr     = */ if_ptr_,                                                                       \
+		/* .if_cnt     = */ if_cnt_,                                                                       \
+		/* .if_base    = */ if_base_,                                                                      \
+		/* .if_flag    = */ if_flag_,                                                                      \
+		/* .if_fd      = */ if_fd_,                                                                        \
+		/* .if_charbuf = */ if_charbuf_,                                                                   \
+		/* .if_bufsiz  = */ if_bufsize_,                                                                   \
+		/* .if_exdata  = */ if_exdata_                                                                     \
 	}
 #endif
 	__BYTE_TYPE__      *if_ptr;        /* [0..1] Pointer to the next character to-be read. */
