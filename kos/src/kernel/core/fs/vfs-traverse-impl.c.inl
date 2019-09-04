@@ -72,55 +72,55 @@ DECL_BEGIN
  *                                            Attempted to traverse something other than a directory, or symbolic link
  * @throw: E_FSERROR_PATH_NOT_FOUND:          An addressed path could not be found.
  * @throw: E_FSERROR_ILLEGAL_PATH:            The final path segment is longer than `0xffff'
- * @throw: E_SEGFAULT:                        Failed to access the given `path'
+ * @throw: E_SEGFAULT:                        Failed to access the given `upath'
  * @throw: E_FSERROR_ACCESS_DENIED:           Attempted to traverse a directory without privilege.
  * @throw: E_FSERROR_TOO_MANY_SYMBOLIC_LINKS: Too many symbolic links were encountered.
  * @throw: E_IOERROR:                         [...] */
 #ifdef TRAVERSE_N
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) REF struct path *
-(KCALL path_traversen_ex)(struct fs *__restrict filesystem,
-                          struct path *cwd,
-                          struct path *root,
-                          USER CHECKED /*utf-8*/char const *path, size_t max_pathlen,
-                          USER CHECKED /*utf-8*/char const **plastseg,
-                          u16 *plastlen, fsmode_t mode,
-                          u32 *premaining_symlinks)
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) REF struct path *KCALL
+path_traversen_ex(struct fs *__restrict filesystem,
+                  struct path *cwd,
+                  struct path *root,
+                  USER CHECKED /*utf-8*/ char const *upath, size_t max_pathlen,
+                  USER CHECKED /*utf-8*/ char const **plastseg,
+                  u16 *plastlen, fsmode_t mode,
+                  u32 *premaining_symlinks)
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT, E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_ACCESS_DENIED,
 		       E_FSERROR_TOO_MANY_SYMBOLIC_LINKS, E_IOERROR, E_BADALLOC, E_FSERROR_PATH_NOT_FOUND,
 		       E_FSERROR_ILLEGAL_PATH, ...)
-#else
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) REF struct path *
-(KCALL path_traverse_ex)(struct fs *__restrict filesystem,
-                         struct path *cwd,
-                         struct path *root,
-                         USER CHECKED /*utf-8*/char const *path,
-                         USER CHECKED /*utf-8*/char const **plastseg,
-                         u16 *plastlen, fsmode_t mode,
-                         u32 *premaining_symlinks)
+#else /* TRAVERSE_N */
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) REF struct path *KCALL
+path_traverse_ex(struct fs *__restrict filesystem,
+                 struct path *cwd,
+                 struct path *root,
+                 USER CHECKED /*utf-8*/ char const *upath,
+                 USER CHECKED /*utf-8*/ char const **plastseg,
+                 u16 *plastlen, fsmode_t mode,
+                 u32 *premaining_symlinks)
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT, E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_ACCESS_DENIED,
 		       E_FSERROR_TOO_MANY_SYMBOLIC_LINKS, E_IOERROR, E_BADALLOC, E_FSERROR_PATH_NOT_FOUND,
 		       E_FSERROR_ILLEGAL_PATH, ...)
-#endif
+#endif /* !TRAVERSE_N */
 {
 	char32_t ch;
 	u32 remaining_links;
 #ifdef TRAVERSE_N
 	char const *path_end;
-#endif
-	char const *segment_start = path;
+#endif /* TRAVERSE_N */
+	char const *segment_start = upath;
 	char const *segment_end;
 	struct vfs *v   = filesystem->f_vfs;
 	remaining_links = premaining_symlinks
 	                  ? *premaining_symlinks
 	                  : ATOMIC_READ(filesystem->f_lnkmax);
 #ifdef TRAVERSE_N
-	path_end = path + max_pathlen;
-	if unlikely(path_end < path)
+	path_end = upath + max_pathlen;
+	if unlikely(path_end < upath)
 		path_end = (char *)(uintptr_t)-1;
-#define READCH() unicode_readutf8_n(&path, path_end)
-#else
-#define READCH() unicode_readutf8(&path)
-#endif
+#define READCH() unicode_readutf8_n(&upath, path_end)
+#else /* TRAVERSE_N */
+#define READCH() unicode_readutf8(&upath)
+#endif /* !TRAVERSE_N */
 	/* Deal with leading slashes. */
 	ch = READCH();
 	if unlikely(!ch) {
@@ -143,7 +143,7 @@ return_cwd:
 				cwd = cwd->p_parent;
 			/* XXX: `\\samba\share' */
 			do {
-				segment_start = path;
+				segment_start = upath;
 				ch            = READCH();
 			} while (ch == '/' || ch == '\\');
 			if (!ch) /* Reference to the drive root. */
@@ -167,7 +167,7 @@ return_cwd:
 				sync_endread(&v->v_drives_lock);
 				TRY {
 					do {
-						segment_start = path;
+						segment_start = upath;
 						ch            = READCH();
 					}  while (ch == '/' || ch == '\\');
 				} EXCEPT {
@@ -185,7 +185,7 @@ return_cwd:
 			incref(cwd);
 		}
 		for (;;) {
-			segment_end = path;
+			segment_end = upath;
 			TRY {
 				ch = READCH();
 			} EXCEPT {
@@ -200,11 +200,11 @@ dos_at_segment_seperator:
 				/* Load the child segment. */
 				if ((size_t)(segment_end - segment_start) > 0xffff)
 					THROW(E_FSERROR_ILLEGAL_PATH);
-				next_segment_start = path;
+				next_segment_start = upath;
 				if (ch) {
 					TRY {
 						do {
-							next_segment_start = path;
+							next_segment_start = upath;
 							ch                 = READCH();
 						} while (ch == '/' || ch == '\\');
 					} EXCEPT {
@@ -216,24 +216,37 @@ dos_at_segment_seperator:
 				}
 				segment_length = (u16)(segment_end - segment_start);
 				switch (segment_length) {
+
 				case 0:
 					if (!(mode & FS_MODE_FEMPTY_PATH))
 						THROW(E_FSERROR_ILLEGAL_PATH);
 					break;
+
 				case 2:
-					if (segment_start[0] != '.')
-						goto dos_generic_directory_child;
-					if (segment_start[1] != '.')
-						goto dos_generic_directory_child;
+					TRY {
+						if (segment_start[0] != '.')
+							goto dos_generic_directory_child;
+						if (segment_start[1] != '.')
+							goto dos_generic_directory_child;
+					} EXCEPT {
+						decref(cwd);
+						RETHROW();
+					}
 					/* Parent directory reference. */
 					next_path = cwd->p_parent;
 					if (cwd == root || !next_path)
 						next_path = cwd;
 					incref(next_path);
 					goto dos_set_next_path;
+
 				case 1:
-					if (segment_start[0] == '.')
-						break; /* Current directory reference. */
+					TRY {
+						if (segment_start[0] == '.')
+							break; /* Current directory reference. */
+					} EXCEPT {
+						decref(cwd);
+						RETHROW();
+					}
 					ATTR_FALLTHROUGH
 				default:
 dos_generic_directory_child:
@@ -267,118 +280,169 @@ dos_at_segment_end:
 						remaining_links = 0; /* Don't allow any further symlinks */
 					goto dos_at_segment_seperator;
 				}
+				goto common_at_segment_end;
+			}
+		}
+	} else {
+		if (ch == '/') {
+			/* Start at the root directory. */
+			cwd = root;
+			do {
+				segment_start = upath;
+				ch            = READCH();
+			} while (ch == '/');
+			if (!ch) /* Reference to the filesystem root. */
+				goto return_cwd;
+		}
+		incref(cwd);
+		for (;;) {
+			segment_end = upath;
+			TRY {
+				ch = READCH();
+			} EXCEPT {
+				decref(cwd);
+				RETHROW();
+			}
+			if (ch == '/') {
+				u16 segment_length;
+				char const *next_segment_start;
+				REF struct path *next_path;
+at_segment_seperator:
+				/* Load the child segment. */
 				if ((size_t)(segment_end - segment_start) > 0xffff)
 					THROW(E_FSERROR_ILLEGAL_PATH);
-				*plastlen = (u16)(segment_end - segment_start);
-				*plastseg = segment_start;
-				break;
-			}
-		}
-		if (premaining_symlinks)
-			*premaining_symlinks = remaining_links;
-		return cwd;
-	}
-	if (ch == '/') {
-		/* Start at the root directory. */
-		cwd = root;
-		do {
-			segment_start = path;
-			ch            = READCH();
-		} while (ch == '/');
-		if (!ch) /* Reference to the filesystem root. */
-			goto return_cwd;
-	}
-	incref(cwd);
-	for (;;) {
-		segment_end = path;
-		TRY {
-			ch = READCH();
-		} EXCEPT {
-			decref(cwd);
-			RETHROW();
-		}
-		if (ch == '/') {
-			u16 segment_length;
-			char const *next_segment_start;
-			REF struct path *next_path;
-at_segment_seperator:
-			/* Load the child segment. */
-			if ((size_t)(segment_end - segment_start) > 0xffff)
-				THROW(E_FSERROR_ILLEGAL_PATH);
-			next_segment_start = path;
-			if (ch) {
-				TRY {
-					do {
-						next_segment_start = path;
-						ch                 = READCH();
-					} while (ch == '/');
-				} EXCEPT {
-					decref(cwd);
-					RETHROW();
+				next_segment_start = upath;
+				if (ch) {
+					TRY {
+						do {
+							next_segment_start = upath;
+							ch                 = READCH();
+						} while (ch == '/');
+					} EXCEPT {
+						decref(cwd);
+						RETHROW();
+					}
+					if (!ch && (mode & FS_MODE_FIGNORE_TRAILING_SLASHES))
+						goto at_segment_end;
 				}
-				if (!ch && (mode & FS_MODE_FIGNORE_TRAILING_SLASHES))
-					goto at_segment_end;
-			}
-			segment_length = (u16)(segment_end - segment_start);
-			switch (segment_length) {
-			case 0:
-				if (!(mode & FS_MODE_FEMPTY_PATH))
-					THROW(E_FSERROR_ILLEGAL_PATH);
-				break;
-			case 2:
-				if (segment_start[0] != '.')
-					goto generic_directory_child;
-				if (segment_start[1] != '.')
-					goto generic_directory_child;
-				/* Parent directory reference. */
-				next_path = cwd->p_parent;
-				if (cwd == root || !next_path)
-					next_path = cwd;
-				incref(next_path);
-				goto set_next_path;
-			case 1:
-				if (segment_start[0] == '.')
-					break; /* Current directory reference. */
-				ATTR_FALLTHROUGH
-			default:
+				segment_length = (u16)(segment_end - segment_start);
+				switch (segment_length) {
+				case 0:
+					if (!(mode & FS_MODE_FEMPTY_PATH))
+						THROW(E_FSERROR_ILLEGAL_PATH);
+					break;
+				case 2:
+					TRY {
+						if (segment_start[0] != '.')
+							goto generic_directory_child;
+						if (segment_start[1] != '.')
+							goto generic_directory_child;
+					} EXCEPT {
+						decref(cwd);
+						RETHROW();
+					}
+					/* Parent directory reference. */
+					next_path = cwd->p_parent;
+					if (cwd == root || !next_path)
+						next_path = cwd;
+					incref(next_path);
+					goto set_next_path;
+				case 1:
+					TRY {
+						if (segment_start[0] == '.')
+							break; /* Current directory reference. */
+					} EXCEPT {
+						decref(cwd);
+						RETHROW();
+					}
+					ATTR_FALLTHROUGH
+				default:
 generic_directory_child:
-				TRY {
-					next_path = path_walkchild(cwd,
-					                           root,
-					                           segment_start,
-					                           segment_length,
-					                           &remaining_links);
-				} EXCEPT {
-					decref(cwd);
-					RETHROW();
-				}
+					TRY {
+						next_path = path_walkchild(cwd,
+						                           root,
+						                           segment_start,
+						                           segment_length,
+						                           &remaining_links);
+					} EXCEPT {
+						decref(cwd);
+						RETHROW();
+					}
 set_next_path:
-				decref(cwd);
-				cwd = next_path;
-				break;
+					decref(cwd);
+					cwd = next_path;
+					break;
+				}
+				if (!ch) {
+					if (plastlen)
+						*plastlen = 0;
+					break;
+				}
+				segment_start = next_segment_start;
+				continue;
 			}
 			if (!ch) {
-				if (plastlen)
-					*plastlen = 0;
-				break;
-			}
-			segment_start = next_segment_start;
-			continue;
-		}
-		if (!ch) {
+				u16 segment_length;
 at_segment_end:
-			if (!plastlen) {
-				if (mode & FS_MODE_FSYMLINK_NOFOLLOW)
-					remaining_links = 0; /* Don't allow any further symlinks */
-				goto at_segment_seperator;
+				if (!plastlen) {
+					if (mode & FS_MODE_FSYMLINK_NOFOLLOW)
+						remaining_links = 0; /* Don't allow any further symlinks */
+					goto at_segment_seperator;
+				}
+common_at_segment_end:
+				if ((size_t)(segment_end - segment_start) > 0xffff)
+					THROW(E_FSERROR_ILLEGAL_PATH);
+				segment_length = (u16)(segment_end - segment_start);
+				assert(segment_length != 0);
+				/* Check for special case: The path ends with a trailing `.' or `..' */
+				switch (segment_length) {
+
+				case 1:
+					TRY {
+						if (segment_start[0] != '.')
+							break;
+					} EXCEPT {
+						decref(cwd);
+						RETHROW();
+					}
+					/* Current directory */
+					*plastlen = 0;
+					goto done;
+
+				case 2:
+					TRY {
+						if (segment_start[0] != '.')
+							break;
+						if (segment_start[1] != '.')
+							break;
+					} EXCEPT {
+						decref(cwd);
+						RETHROW();
+					}
+					/* Parent directory */
+					*plastlen = 0;
+					/* Parent directory reference. */
+					{
+						REF struct path *next_path;
+						next_path = cwd->p_parent;
+						if (cwd == root || !next_path)
+							next_path = cwd;
+						incref(next_path);
+						decref(cwd);
+						cwd = next_path;
+					}
+					goto done;
+
+				default:
+					break;
+				}
+				*plastlen = segment_length;
+				*plastseg = segment_start;
+				goto done;
 			}
-			if ((size_t)(segment_end - segment_start) > 0xffff)
-				THROW(E_FSERROR_ILLEGAL_PATH);
-			*plastlen = (u16)(segment_end - segment_start);
-			*plastseg = segment_start;
-			break;
 		}
 	}
+done:
 	if (premaining_symlinks)
 		*premaining_symlinks = remaining_links;
 	return cwd;
@@ -386,20 +450,20 @@ at_segment_end:
 }
 
 #ifdef TRAVERSE_N
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct path *
-(KCALL path_traversen)(struct fs *__restrict filesystem,
-                       USER CHECKED /*utf-8*/char const *path, size_t max_pathlen,
-                       USER CHECKED /*utf-8*/char const **plastseg,
-                       u16 *plastlen, fsmode_t mode,
-                       u32 *premaining_symlinks)
-#else
-PUBLIC ATTR_RETNONNULL WUNUSED REF struct path *
-(KCALL path_traverse)(struct fs *__restrict filesystem,
-                      USER CHECKED /*utf-8*/char const *path,
-                      USER CHECKED /*utf-8*/char const **plastseg,
-                      u16 *plastlen, fsmode_t mode,
-                      u32 *premaining_symlinks)
-#endif
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct path *KCALL
+path_traversen(struct fs *__restrict filesystem,
+               USER CHECKED /*utf-8*/ char const *upath, size_t max_pathlen,
+               USER CHECKED /*utf-8*/ char const **plastseg,
+               u16 *plastlen, fsmode_t mode,
+               u32 *premaining_symlinks)
+#else /* TRAVERSE_N */
+PUBLIC ATTR_RETNONNULL WUNUSED REF struct path *KCALL
+path_traverse(struct fs *__restrict filesystem,
+              USER CHECKED /*utf-8*/ char const *upath,
+              USER CHECKED /*utf-8*/ char const **plastseg,
+              u16 *plastlen, fsmode_t mode,
+              u32 *premaining_symlinks)
+#endif /* !TRAVERSE_N */
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT, E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_ACCESS_DENIED,
 		       E_FSERROR_TOO_MANY_SYMBOLIC_LINKS, E_IOERROR, E_BADALLOC, E_FSERROR_PATH_NOT_FOUND,
 		       E_FSERROR_ILLEGAL_PATH, E_FSERROR_NOT_A_DIRECTORY, ...) {
@@ -413,22 +477,22 @@ PUBLIC ATTR_RETNONNULL WUNUSED REF struct path *
 		result = path_traversen_ex(filesystem,
 		                           cwd,
 		                           root,
-		                           path,
+		                           upath,
 		                           max_pathlen,
 		                           plastseg,
 		                           plastlen,
 		                           mode,
 		                           premaining_symlinks);
-#else
+#else /* TRAVERSE_N */
 		result = path_traverse_ex(filesystem,
 		                          cwd,
 		                          root,
-		                          path,
+		                          upath,
 		                          plastseg,
 		                          plastlen,
 		                          mode,
 		                          premaining_symlinks);
-#endif
+#endif /* !TRAVERSE_N */
 	} EXCEPT {
 		decref(cwd);
 		decref(root);
@@ -442,18 +506,18 @@ PUBLIC ATTR_RETNONNULL WUNUSED REF struct path *
 
 
 #ifdef TRAVERSE_N
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct path *
-(KCALL path_traversen_at)(struct fs *__restrict filesystem, unsigned int dirfd,
-                          USER CHECKED /*utf-8*/char const *path, size_t max_pathlen,
-                          USER CHECKED /*utf-8*/char const **plastseg,
-                          u16 *plastlen, fsmode_t mode, u32 *premaining_symlinks)
-#else
-PUBLIC ATTR_RETNONNULL WUNUSED REF struct path *
-(KCALL path_traverse_at)(struct fs *__restrict filesystem, unsigned int dirfd,
-                         USER CHECKED /*utf-8*/char const *path,
-                         USER CHECKED /*utf-8*/char const **plastseg,
-                         u16 *plastlen, fsmode_t mode, u32 *premaining_symlinks)
-#endif
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct path *KCALL
+path_traversen_at(struct fs *__restrict filesystem, unsigned int dirfd,
+                  USER CHECKED /*utf-8*/ char const *upath, size_t max_pathlen,
+                  USER CHECKED /*utf-8*/ char const **plastseg,
+                  u16 *plastlen, fsmode_t mode, u32 *premaining_symlinks)
+#else /* TRAVERSE_N */
+PUBLIC ATTR_RETNONNULL WUNUSED REF struct path *KCALL
+path_traverse_at(struct fs *__restrict filesystem, unsigned int dirfd,
+                 USER CHECKED /*utf-8*/ char const *upath,
+                 USER CHECKED /*utf-8*/ char const **plastseg,
+                 u16 *plastlen, fsmode_t mode, u32 *premaining_symlinks)
+#endif /* !TRAVERSE_N */
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT, E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_ACCESS_DENIED,
 		       E_FSERROR_TOO_MANY_SYMBOLIC_LINKS, E_IOERROR, E_BADALLOC, E_FSERROR_PATH_NOT_FOUND,
 		       E_FSERROR_ILLEGAL_PATH, E_FSERROR_NOT_A_DIRECTORY, ...) {
@@ -480,22 +544,22 @@ PUBLIC ATTR_RETNONNULL WUNUSED REF struct path *
 		result = path_traversen_ex(filesystem,
 		                           cwd,
 		                           root,
-		                           path,
+		                           upath,
 		                           max_pathlen,
 		                           plastseg,
 		                           plastlen,
 		                           mode,
 		                           premaining_symlinks);
-#else
+#else /* TRAVERSE_N */
 		result = path_traverse_ex(filesystem,
 		                          cwd,
 		                          root,
-		                          path,
+		                          upath,
 		                          plastseg,
 		                          plastlen,
 		                          mode,
 		                          premaining_symlinks);
-#endif
+#endif /* !TRAVERSE_N */
 	} EXCEPT {
 		decref(cwd);
 		decref(root);
@@ -508,31 +572,31 @@ PUBLIC ATTR_RETNONNULL WUNUSED REF struct path *
 
 
 
-/* Traverse the entirety of a given `path', returning the point-to node,
+/* Traverse the entirety of a given `upath', returning the point-to node,
  * as well as optionally related components. */
 #ifdef TRAVERSE_N
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) REF struct inode *
-(KCALL path_traversenfull_ex)(struct fs *__restrict filesystem,
-                              struct path *cwd,
-                              struct path *root,
-                              USER CHECKED /*utf-8*/char const *path, size_t max_pathlen,
-                              bool follow_final_link, fsmode_t mode,
-                              u32 *premaining_symlinks,
-                              REF struct path **pcontaining_path,
-                              REF struct directory_node **pcontaining_directory,
-                              REF struct directory_entry **pcontaining_dirent)
-#else
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) REF struct inode *
-(KCALL path_traversefull_ex)(struct fs *__restrict filesystem,
-                             struct path *cwd,
-                             struct path *root,
-                             USER CHECKED /*utf-8*/char const *path,
-                             bool follow_final_link, fsmode_t mode,
-                             u32 *premaining_symlinks,
-                             REF struct path **pcontaining_path,
-                             REF struct directory_node **pcontaining_directory,
-                             REF struct directory_entry **pcontaining_dirent)
-#endif
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) REF struct inode *KCALL
+path_traversenfull_ex(struct fs *__restrict filesystem,
+                      struct path *cwd,
+                      struct path *root,
+                      USER CHECKED /*utf-8*/ char const *upath, size_t max_pathlen,
+                      bool follow_final_link, fsmode_t mode,
+                      u32 *premaining_symlinks,
+                      REF struct path **pcontaining_path,
+                      REF struct directory_node **pcontaining_directory,
+                      REF struct directory_entry **pcontaining_dirent)
+#else /* TRAVERSE_N */
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) REF struct inode *KCALL
+path_traversefull_ex(struct fs *__restrict filesystem,
+                     struct path *cwd,
+                     struct path *root,
+                     USER CHECKED /*utf-8*/ char const *upath,
+                     bool follow_final_link, fsmode_t mode,
+                     u32 *premaining_symlinks,
+                     REF struct path **pcontaining_path,
+                     REF struct directory_node **pcontaining_directory,
+                     REF struct directory_entry **pcontaining_dirent)
+#endif /* !TRAVERSE_N */
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT, E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_ACCESS_DENIED,
 		       E_FSERROR_TOO_MANY_SYMBOLIC_LINKS, E_IOERROR, E_BADALLOC, E_FSERROR_PATH_NOT_FOUND,
 		       E_FSERROR_ILLEGAL_PATH, E_FSERROR_NOT_A_DIRECTORY, ...) {
@@ -549,22 +613,22 @@ PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) REF struct inode *
 	containing_path = path_traversen_ex_recent(filesystem,
 	                                           cwd,
 	                                           root,
-	                                           path,
+	                                           upath,
 	                                           max_pathlen,
 	                                           &last_seg,
 	                                           &last_seglen,
 	                                           mode,
 	                                           &remaining_symlinks);
-#else
+#else /* TRAVERSE_N */
 	containing_path = path_traverse_ex_recent(filesystem,
 	                                          cwd,
 	                                          root,
-	                                          path,
+	                                          upath,
 	                                          &last_seg,
 	                                          &last_seglen,
 	                                          mode,
 	                                          &remaining_symlinks);
-#endif
+#endif /* !TRAVERSE_N */
 	TRY {
 		/* Check if the given filename refers to a path (must be done explicitly since
 		 * that path may in turn refer to a mounting point which we must dereference) */
@@ -705,24 +769,24 @@ done_after_containing_directory:
 
 
 #ifdef TRAVERSE_N
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct inode *
-(KCALL path_traversenfull_at)(struct fs *__restrict filesystem, unsigned int dirfd,
-                              USER CHECKED /*utf-8*/char const *path, size_t max_pathlen,
-                              bool follow_final_link, fsmode_t mode,
-                              u32 *premaining_symlinks,
-                              REF struct path **pcontaining_path,
-                              REF struct directory_node **pcontaining_directory,
-                              REF struct directory_entry **pcontaining_dirent)
-#else
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct inode *
-(KCALL path_traversefull_at)(struct fs *__restrict filesystem, unsigned int dirfd,
-                             USER CHECKED /*utf-8*/char const *path,
-                             bool follow_final_link, fsmode_t mode,
-                             u32 *premaining_symlinks,
-                             REF struct path **pcontaining_path,
-                             REF struct directory_node **pcontaining_directory,
-                             REF struct directory_entry **pcontaining_dirent)
-#endif
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct inode *KCALL
+path_traversenfull_at(struct fs *__restrict filesystem, unsigned int dirfd,
+                      USER CHECKED /*utf-8*/ char const *upath, size_t max_pathlen,
+                      bool follow_final_link, fsmode_t mode,
+                      u32 *premaining_symlinks,
+                      REF struct path **pcontaining_path,
+                      REF struct directory_node **pcontaining_directory,
+                      REF struct directory_entry **pcontaining_dirent)
+#else /* TRAVERSE_N */
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct inode *KCALL
+path_traversefull_at(struct fs *__restrict filesystem, unsigned int dirfd,
+                     USER CHECKED /*utf-8*/ char const *upath,
+                     bool follow_final_link, fsmode_t mode,
+                     u32 *premaining_symlinks,
+                     REF struct path **pcontaining_path,
+                     REF struct directory_node **pcontaining_directory,
+                     REF struct directory_entry **pcontaining_dirent)
+#endif /* !TRAVERSE_N */
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT, E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_ACCESS_DENIED,
 		       E_FSERROR_TOO_MANY_SYMBOLIC_LINKS, E_IOERROR, E_BADALLOC, E_FSERROR_PATH_NOT_FOUND,
 		       E_FSERROR_ILLEGAL_PATH, E_FSERROR_NOT_A_DIRECTORY, ...) {
@@ -750,7 +814,7 @@ PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct inode *
 		result = path_traversenfull_ex(filesystem,
 		                               cwd,
 		                               root,
-		                               path,
+		                               upath,
 		                               max_pathlen,
 		                               follow_final_link,
 		                               mode,
@@ -758,18 +822,18 @@ PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct inode *
 		                               pcontaining_path,
 		                               pcontaining_directory,
 		                               pcontaining_dirent);
-#else
+#else /* TRAVERSE_N */
 		result = path_traversefull_ex(filesystem,
 		                              cwd,
 		                              root,
-		                              path,
+		                              upath,
 		                              follow_final_link,
 		                              mode,
 		                              premaining_symlinks,
 		                              pcontaining_path,
 		                              pcontaining_directory,
 		                              pcontaining_dirent);
-#endif
+#endif /* !TRAVERSE_N */
 	} EXCEPT {
 		decref(cwd);
 		decref(root);
@@ -783,24 +847,24 @@ PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct inode *
 
 
 #ifdef TRAVERSE_N
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct inode *
-(KCALL path_traversenfull)(struct fs *__restrict filesystem,
-                           USER CHECKED /*utf-8*/char const *path, size_t max_pathlen,
-                           bool follow_final_link, fsmode_t mode,
-                           u32 *premaining_symlinks,
-                           REF struct path **pcontaining_path,
-                           REF struct directory_node **pcontaining_directory,
-                           REF struct directory_entry **pcontaining_dirent)
-#else
-PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct inode *
-(KCALL path_traversefull)(struct fs *__restrict filesystem,
-                          USER CHECKED /*utf-8*/char const *path,
-                          bool follow_final_link, fsmode_t mode,
-                          u32 *premaining_symlinks,
-                          REF struct path **pcontaining_path,
-                          REF struct directory_node **pcontaining_directory,
-                          REF struct directory_entry **pcontaining_dirent)
-#endif
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct inode *KCALL
+path_traversenfull(struct fs *__restrict filesystem,
+                   USER CHECKED /*utf-8*/ char const *upath, size_t max_pathlen,
+                   bool follow_final_link, fsmode_t mode,
+                   u32 *premaining_symlinks,
+                   REF struct path **pcontaining_path,
+                   REF struct directory_node **pcontaining_directory,
+                   REF struct directory_entry **pcontaining_dirent)
+#else /* TRAVERSE_N */
+PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct inode *KCALL
+path_traversefull(struct fs *__restrict filesystem,
+                  USER CHECKED /*utf-8*/ char const *upath,
+                  bool follow_final_link, fsmode_t mode,
+                  u32 *premaining_symlinks,
+                  REF struct path **pcontaining_path,
+                  REF struct directory_node **pcontaining_directory,
+                  REF struct directory_entry **pcontaining_dirent)
+#endif /* !TRAVERSE_N */
 		THROWS(E_FSERROR_DELETED, E_SEGFAULT, E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_ACCESS_DENIED,
 		       E_FSERROR_TOO_MANY_SYMBOLIC_LINKS, E_IOERROR, E_BADALLOC, E_FSERROR_PATH_NOT_FOUND,
 		       E_FSERROR_ILLEGAL_PATH, E_FSERROR_NOT_A_DIRECTORY, ...) {
@@ -815,7 +879,7 @@ PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct inode *
 		result = path_traversenfull_ex(filesystem,
 		                               cwd,
 		                               root,
-		                               path,
+		                               upath,
 		                               max_pathlen,
 		                               follow_final_link,
 		                               mode,
@@ -823,18 +887,18 @@ PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct inode *
 		                               pcontaining_path,
 		                               pcontaining_directory,
 		                               pcontaining_dirent);
-#else
+#else /* TRAVERSE_N */
 		result = path_traversefull_ex(filesystem,
 		                              cwd,
 		                              root,
-		                              path,
+		                              upath,
 		                              follow_final_link,
 		                              mode,
 		                              premaining_symlinks,
 		                              pcontaining_path,
 		                              pcontaining_directory,
 		                              pcontaining_dirent);
-#endif
+#endif /* !TRAVERSE_N */
 	} EXCEPT {
 		decref(cwd);
 		decref(root);

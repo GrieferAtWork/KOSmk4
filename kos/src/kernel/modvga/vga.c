@@ -1127,7 +1127,7 @@ VGA_Putc(struct ansitty *__restrict self, char32_t ch)
 		default: {
 			size_t i, len;
 			char buf[32];
-			if (ch <= 0x1f || ch == 0x7f) {
+			if (ch <= 0x1f) {
 				len = sprintf(buf, "^%c", ch + '@');
 			} else {
 				len = sprintf(buf, UNENCODABLE_START "U+%I32X" UNENCODABLE_END, ch);

@@ -102,7 +102,7 @@ ansitty_device_output(struct ansitty *__restrict self,
 	if (output) {
 		FINALLY_DECREF_UNLIKELY(output);
 #if 1
-		/* Directory write to the input buffer, bypassing terminal
+		/* Directly write to the input buffer, bypassing terminal
 		 * keyboard input processing functionality that might do
 		 * strange stuff to our output data.
 		 * Even though it would make sense to do this, I'm not entirely

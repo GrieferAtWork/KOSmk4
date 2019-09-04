@@ -29,6 +29,7 @@
 #include <kernel/printk.h>
 #include <kernel/types.h>
 
+#include <assert.h>
 #include <string.h>
 #include <unicode.h>
 

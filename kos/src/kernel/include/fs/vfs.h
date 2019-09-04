@@ -510,7 +510,7 @@ path_rename(struct path *__restrict source_path,
  *                                            Attempted to traverse something other than a directory, or symbolic link
  * @throw: E_FSERROR_PATH_NOT_FOUND:          An addressed path could not be found.
  * @throw: E_FSERROR_ILLEGAL_PATH:            The final path segment is longer than `0xffff'
- * @throw: E_SEGFAULT:                        Failed to access the given `path'
+ * @throw: E_SEGFAULT:                        Failed to access the given `upath'
  * @throw: E_FSERROR_ACCESS_DENIED:           Attempted to traverse a directory without privilege.
  * @throw: E_FSERROR_TOO_MANY_SYMBOLIC_LINKS: Too many symbolic links were encountered.
  * @throw: E_IOERROR:                         [...] */
@@ -518,7 +518,7 @@ FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) REF struct path *KCALL
 path_traverse_ex(struct fs *__restrict filesystem,
                  struct path *cwd,
                  struct path *root,
-                 USER CHECKED /*utf-8*/ char const *path,
+                 USER CHECKED /*utf-8*/ char const *upath,
                  USER CHECKED /*utf-8*/ char const **plastseg DFL(__NULLPTR),
                  u16 *plastlen DFL(__NULLPTR),
                  fsmode_t mode DFL(FS_MODE_FNORMAL),
@@ -528,7 +528,7 @@ path_traverse_ex(struct fs *__restrict filesystem,
 		       E_FSERROR_ILLEGAL_PATH, E_FSERROR_NOT_A_DIRECTORY, ...);
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct path *KCALL
 path_traverse(struct fs *__restrict filesystem,
-              USER CHECKED /*utf-8*/ char const *path,
+              USER CHECKED /*utf-8*/ char const *upath,
               USER CHECKED /*utf-8*/ char const **plastseg DFL(__NULLPTR),
               u16 *plastlen DFL(__NULLPTR),
               fsmode_t mode DFL(FS_MODE_FNORMAL),
@@ -540,7 +540,7 @@ FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) REF struct path *KCALL
 path_traversen_ex(struct fs *__restrict filesystem,
                   struct path *cwd,
                   struct path *root,
-                  USER CHECKED /*utf-8*/ char const *path, size_t max_pathlen,
+                  USER CHECKED /*utf-8*/ char const *upath, size_t max_pathlen,
                   USER CHECKED /*utf-8*/ char const **plastseg DFL(__NULLPTR),
                   u16 *plastlen DFL(__NULLPTR),
                   fsmode_t mode DFL(FS_MODE_FNORMAL),
@@ -550,7 +550,7 @@ path_traversen_ex(struct fs *__restrict filesystem,
 		       E_FSERROR_ILLEGAL_PATH, E_FSERROR_NOT_A_DIRECTORY, ...);
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct path *KCALL
 path_traversen(struct fs *__restrict filesystem,
-               USER CHECKED /*utf-8*/ char const *path, size_t max_pathlen,
+               USER CHECKED /*utf-8*/ char const *upath, size_t max_pathlen,
                USER CHECKED /*utf-8*/ char const **plastseg DFL(__NULLPTR),
                u16 *plastlen DFL(__NULLPTR),
                fsmode_t mode DFL(FS_MODE_FNORMAL),
@@ -560,7 +560,7 @@ path_traversen(struct fs *__restrict filesystem,
 		       E_FSERROR_ILLEGAL_PATH, E_FSERROR_NOT_A_DIRECTORY, ...);
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct path *KCALL
 path_traverse_at(struct fs *__restrict filesystem, unsigned int dirfd,
-                 USER CHECKED /*utf-8*/ char const *path,
+                 USER CHECKED /*utf-8*/ char const *upath,
                  USER CHECKED /*utf-8*/ char const **plastseg DFL(__NULLPTR),
                  u16 *plastlen DFL(__NULLPTR),
                  fsmode_t mode DFL(FS_MODE_FNORMAL),
@@ -570,7 +570,7 @@ path_traverse_at(struct fs *__restrict filesystem, unsigned int dirfd,
 		       E_FSERROR_ILLEGAL_PATH, E_FSERROR_NOT_A_DIRECTORY, ...);
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct path *KCALL
 path_traversen_at(struct fs *__restrict filesystem, unsigned int dirfd,
-                  USER CHECKED /*utf-8*/ char const *path, size_t max_pathlen,
+                  USER CHECKED /*utf-8*/ char const *upath, size_t max_pathlen,
                   USER CHECKED /*utf-8*/ char const **plastseg DFL(__NULLPTR),
                   u16 *plastlen DFL(__NULLPTR),
                   fsmode_t mode DFL(FS_MODE_FNORMAL),
@@ -580,14 +580,14 @@ path_traversen_at(struct fs *__restrict filesystem, unsigned int dirfd,
 		       E_FSERROR_ILLEGAL_PATH, E_FSERROR_NOT_A_DIRECTORY, ...);
 
 
-/* Traverse the entirety of a given `path', returning the point-to node,
+/* Traverse the entirety of a given `upath', returning the point-to node,
  * as well as optionally related components.
  * @param: follow_final_link: When true, follow symbolic links contained within the final path component. */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) REF struct inode *KCALL
 path_traversefull_ex(struct fs *__restrict filesystem,
                      struct path *cwd,
                      struct path *root,
-                     USER CHECKED /*utf-8*/ char const *path,
+                     USER CHECKED /*utf-8*/ char const *upath,
                      bool follow_final_link DFL(true),
                      fsmode_t mode DFL(FS_MODE_FNORMAL),
                      u32 *premaining_symlinks DFL(__NULLPTR),
@@ -599,7 +599,7 @@ path_traversefull_ex(struct fs *__restrict filesystem,
 		       E_FSERROR_ILLEGAL_PATH, E_FSERROR_NOT_A_DIRECTORY, ...);
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct inode *KCALL
 path_traversefull_at(struct fs *__restrict filesystem, unsigned int dirfd,
-                     USER CHECKED /*utf-8*/ char const *path,
+                     USER CHECKED /*utf-8*/ char const *upath,
                      bool follow_final_link DFL(true),
                      fsmode_t mode DFL(FS_MODE_FNORMAL),
                      u32 *premaining_symlinks DFL(__NULLPTR),
@@ -611,7 +611,7 @@ path_traversefull_at(struct fs *__restrict filesystem, unsigned int dirfd,
 		       E_FSERROR_ILLEGAL_PATH, E_FSERROR_NOT_A_DIRECTORY, ...);
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct inode *KCALL
 path_traversefull(struct fs *__restrict filesystem,
-                  USER CHECKED /*utf-8*/ char const *path,
+                  USER CHECKED /*utf-8*/ char const *upath,
                   bool follow_final_link DFL(true),
                   fsmode_t mode DFL(FS_MODE_FNORMAL),
                   u32 *premaining_symlinks DFL(__NULLPTR),
@@ -625,7 +625,7 @@ FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) REF struct inode *KCALL
 path_traversenfull_ex(struct fs *__restrict filesystem,
                       struct path *cwd,
                       struct path *root,
-                      USER CHECKED /*utf-8*/ char const *path, size_t max_pathlen,
+                      USER CHECKED /*utf-8*/ char const *upath, size_t max_pathlen,
                       bool follow_final_link DFL(true),
                       fsmode_t mode DFL(FS_MODE_FNORMAL),
                       u32 *premaining_symlinks DFL(__NULLPTR),
@@ -637,7 +637,7 @@ path_traversenfull_ex(struct fs *__restrict filesystem,
 		       E_FSERROR_ILLEGAL_PATH, E_FSERROR_NOT_A_DIRECTORY, ...);
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct inode *KCALL
 path_traversenfull_at(struct fs *__restrict filesystem, unsigned int dirfd,
-                      USER CHECKED /*utf-8*/ char const *path, size_t max_pathlen,
+                      USER CHECKED /*utf-8*/ char const *upath, size_t max_pathlen,
                       bool follow_final_link DFL(true),
                       fsmode_t mode DFL(FS_MODE_FNORMAL),
                       u32 *premaining_symlinks DFL(__NULLPTR),
@@ -649,7 +649,7 @@ path_traversenfull_at(struct fs *__restrict filesystem, unsigned int dirfd,
 		       E_FSERROR_ILLEGAL_PATH, E_FSERROR_NOT_A_DIRECTORY, ...);
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct inode *KCALL
 path_traversenfull(struct fs *__restrict filesystem,
-                   USER CHECKED /*utf-8*/ char const *path, size_t max_pathlen,
+                   USER CHECKED /*utf-8*/ char const *upath, size_t max_pathlen,
                    bool follow_final_link DFL(true),
                    fsmode_t mode DFL(FS_MODE_FNORMAL),
                    u32 *premaining_symlinks DFL(__NULLPTR),
@@ -668,7 +668,7 @@ FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) REF struct path *KCALL
 path_traverse_ex_recent(struct fs *__restrict filesystem,
                         struct path *cwd,
                         struct path *root,
-                        USER CHECKED /*utf-8*/ char const *path,
+                        USER CHECKED /*utf-8*/ char const *upath,
                         USER CHECKED /*utf-8*/ char const **plastseg DFL(__NULLPTR),
                         u16 *plastlen DFL(__NULLPTR),
                         fsmode_t mode DFL(FS_MODE_FNORMAL),
@@ -678,7 +678,7 @@ path_traverse_ex_recent(struct fs *__restrict filesystem,
 		       E_FSERROR_ILLEGAL_PATH, E_FSERROR_NOT_A_DIRECTORY, ...);
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct path *KCALL
 path_traverse_recent(struct fs *__restrict filesystem,
-                     USER CHECKED /*utf-8*/ char const *path,
+                     USER CHECKED /*utf-8*/ char const *upath,
                      USER CHECKED /*utf-8*/ char const **plastseg DFL(__NULLPTR),
                      u16 *plastlen DFL(__NULLPTR),
                      fsmode_t mode DFL(FS_MODE_FNORMAL),
@@ -690,7 +690,7 @@ FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3)) REF struct path *KCALL
 path_traversen_ex_recent(struct fs *__restrict filesystem,
                          struct path *cwd,
                          struct path *root,
-                         USER CHECKED /*utf-8*/ char const *path, size_t max_pathlen,
+                         USER CHECKED /*utf-8*/ char const *upath, size_t max_pathlen,
                          USER CHECKED /*utf-8*/ char const **plastseg DFL(__NULLPTR),
                          u16 *plastlen DFL(__NULLPTR),
                          fsmode_t mode DFL(FS_MODE_FNORMAL),
@@ -700,7 +700,7 @@ path_traversen_ex_recent(struct fs *__restrict filesystem,
 		       E_FSERROR_ILLEGAL_PATH, E_FSERROR_NOT_A_DIRECTORY, ...);
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct path *KCALL
 path_traversen_recent(struct fs *__restrict filesystem,
-                      USER CHECKED /*utf-8*/ char const *path, size_t max_pathlen,
+                      USER CHECKED /*utf-8*/ char const *upath, size_t max_pathlen,
                       USER CHECKED /*utf-8*/ char const **plastseg DFL(__NULLPTR),
                       u16 *plastlen DFL(__NULLPTR),
                       fsmode_t mode DFL(FS_MODE_FNORMAL),
@@ -710,7 +710,7 @@ path_traversen_recent(struct fs *__restrict filesystem,
 		       E_FSERROR_ILLEGAL_PATH, E_FSERROR_NOT_A_DIRECTORY, ...);
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct path *KCALL
 path_traverse_at_recent(struct fs *__restrict filesystem, unsigned int dirfd,
-                        USER CHECKED /*utf-8*/ char const *path,
+                        USER CHECKED /*utf-8*/ char const *upath,
                         USER CHECKED /*utf-8*/ char const **plastseg DFL(__NULLPTR),
                         u16 *plastlen DFL(__NULLPTR),
                         fsmode_t mode DFL(FS_MODE_FNORMAL),
@@ -720,7 +720,7 @@ path_traverse_at_recent(struct fs *__restrict filesystem, unsigned int dirfd,
 		       E_FSERROR_ILLEGAL_PATH, E_FSERROR_NOT_A_DIRECTORY, ...);
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct path *KCALL
 path_traversen_at_recent(struct fs *__restrict filesystem, unsigned int dirfd,
-                         USER CHECKED /*utf-8*/ char const *path, size_t max_pathlen,
+                         USER CHECKED /*utf-8*/ char const *upath, size_t max_pathlen,
                          USER CHECKED /*utf-8*/ char const **plastseg DFL(__NULLPTR),
                          u16 *plastlen DFL(__NULLPTR),
                          fsmode_t mode DFL(FS_MODE_FNORMAL),
