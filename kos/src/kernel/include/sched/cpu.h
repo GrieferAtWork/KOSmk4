@@ -26,6 +26,7 @@
 #include <hybrid/__bit.h>
 #include <hybrid/typecore.h>
 
+#include <stdbool.h>
 #include <kos/jiffies.h>
 #include <kos/kernel/types.h>
 
@@ -115,6 +116,12 @@ struct cpu {
 };
 
 
+#ifndef NDEBUG
+FUNDEF NOBLOCK void NOTHROW(FCALL cpu_assert_integrity)(bool need_caller DFL(true));
+#else /* !NDEBUG */
+#define cpu_assert_integrity(need_caller) (void)0
+#endif /* NDEBUG */
+
 /* The per-cpu / global jiffies counters. */
 DATDEF ATTR_PERCPU jtime_t volatile cpu_jiffies;
 
@@ -144,7 +151,7 @@ FUNDEF NOBLOCK WUNUSED qtime_t NOTHROW(KCALL cpu_quantum_time)(void);
 /* Returns the global quantum time, adjusted for the calling CPU. */
 FUNDEF NOBLOCK WUNUSED qtime_t NOTHROW(KCALL quantum_time)(void);
 
-/* Convert to/from quantime time and regular timespecs */
+/* Convert to/from quantum time and regular timespecs */
 FUNDEF NOBLOCK WUNUSED struct timespec NOTHROW(FCALL qtime_to_timespec)(qtime_t const *__restrict qtime);
 FUNDEF NOBLOCK WUNUSED qtime_t NOTHROW(FCALL timespec_to_qtime)(struct timespec const *__restrict tms);
 

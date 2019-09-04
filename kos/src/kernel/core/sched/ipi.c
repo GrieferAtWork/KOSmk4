@@ -102,11 +102,13 @@ NOTHROW(FCALL cpu_addrunningtask)(/*in*/REF struct task *__restrict thread) {
 	assert(!PREEMPTION_ENABLED());
 	assert(me == THIS_CPU);
 	assert(thread->t_flags & TASK_FRUNNING);
+	cpu_assert_integrity(/*need_caller:*/thread != THIS_TASK);
 	/* Schedule for execution after the current thread. */
 	thread->t_sched.s_running.sr_runprv                              = me->c_current;
 	thread->t_sched.s_running.sr_runnxt                              = me->c_current->t_sched.s_running.sr_runnxt;
 	thread->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv = thread;
 	me->c_current->t_sched.s_running.sr_runnxt                       = thread;
+	cpu_assert_integrity();
 }
 
 PUBLIC NOBLOCK NONNULL((1)) void
@@ -116,6 +118,7 @@ NOTHROW(FCALL cpu_addsleepingtask)(/*in*/REF struct task *__restrict thread) {
 	assert(!PREEMPTION_ENABLED());
 	assert(me == THIS_CPU);
 	assert(!(thread->t_flags & TASK_FRUNNING));
+	cpu_assert_integrity(/*need_caller:*/thread != THIS_TASK);
 	/* Schedule for execution after the current thread. */
 	pnext = &me->c_sleeping;
 	while ((next = *pnext) != NULL) {
@@ -128,6 +131,7 @@ NOTHROW(FCALL cpu_addsleepingtask)(/*in*/REF struct task *__restrict thread) {
 	thread->t_sched.s_asleep.ss_pself = pnext;
 	if ((thread->t_sched.s_asleep.ss_tmonxt = next) != NULL)
 		next->t_sched.s_asleep.ss_pself = &thread->t_sched.s_asleep.ss_tmonxt;
+	cpu_assert_integrity();
 }
 
 
@@ -143,6 +147,7 @@ NOTHROW(FCALL cpu_delrunningtask)(/*out*/REF struct task *__restrict thread) {
 	        "Cannot remove the IDLE thread from a CPU");
 	assert(thread->t_sched.s_running.sr_runnxt != NULL);
 	assert(thread->t_sched.s_running.sr_runprv != NULL);
+	cpu_assert_integrity();
 	if (thread == me->c_current) {
 		me->c_current = thread->t_sched.s_running.sr_runnxt;
 		if unlikely(thread == me->c_current) {
@@ -171,6 +176,7 @@ done:
 	/* Clear the scheduling pointers to indicate the thread no longer has a designated role */
 	thread->t_sched.s_running.sr_runprv = NULL;
 	thread->t_sched.s_running.sr_runnxt = NULL;
+	cpu_assert_integrity(/*need_caller:*/thread != THIS_TASK);
 }
 
 PUBLIC NOBLOCK NONNULL((1)) void
@@ -179,11 +185,13 @@ NOTHROW(FCALL cpu_delsleepingtask)(/*out*/REF struct task *__restrict thread) {
 	assert(!PREEMPTION_ENABLED());
 	assert(me == THIS_CPU);
 	assert(thread->t_sched.s_asleep.ss_pself != NULL);
+	cpu_assert_integrity();
 	if ((*thread->t_sched.s_asleep.ss_pself = thread->t_sched.s_asleep.ss_tmonxt) != NULL)
 		thread->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = thread->t_sched.s_asleep.ss_pself;
 	/* Clear the scheduling pointers to indicate the thread no longer has a designated role */
 	thread->t_sched.s_asleep.ss_pself  = NULL;
 	thread->t_sched.s_asleep.ss_tmonxt = NULL;
+	cpu_assert_integrity(/*need_caller:*/thread != THIS_TASK);
 }
 
 
@@ -204,6 +212,7 @@ NOTHROW(FCALL cpu_addpendingtask)(struct cpu *__restrict target,
 		assert(next != NULL);
 		ATOMIC_WRITE(thread->t_sched.s_pending.ss_pennxt, next);
 	}
+	cpu_assert_integrity();
 	return true;
 }
 #endif /* !CONFIG_NO_SMP */
@@ -221,6 +230,7 @@ NOTHROW(FCALL cpu_loadpending_chain)(struct cpu *__restrict me,
 	struct task *first_new, *last_new;
 	struct task *first_before, *first_after;
 	assert(!PREEMPTION_ENABLED());
+	cpu_assert_integrity();
 	first_new = last_new = chain;
 	next = chain->t_sched.s_pending.ss_pennxt;
 	for (;;) {
@@ -257,6 +267,7 @@ NOTHROW(FCALL cpu_loadpending_chain)(struct cpu *__restrict me,
 	first_before->t_sched.s_running.sr_runnxt = first_new;
 	last_new->t_sched.s_running.sr_runnxt     = first_after;
 	first_after->t_sched.s_running.sr_runprv  = last_new;
+	cpu_assert_integrity();
 }
 
 PUBLIC NOBLOCK bool NOTHROW(KCALL cpu_loadpending)(void) {
@@ -291,6 +302,7 @@ NOTHROW(FCALL task_wake_ipi)(struct icpustate *__restrict state,
 		IPI_DEBUG("task_wake_ipi:%#Ix\n", state);
 		if (flags & TASK_FTERMINATED)
 			return state;
+		cpu_assert_integrity();
 		caller = THIS_TASK;
 		next   = caller->t_sched.s_running.sr_runnxt;
 		if (flags & TASK_FRUNNING) {
@@ -312,6 +324,7 @@ NOTHROW(FCALL task_wake_ipi)(struct icpustate *__restrict state,
 		next->t_sched.s_running.sr_runprv   = thread;
 unset_waking:
 		ATOMIC_FETCHAND(thread->t_flags, ~TASK_FWAKING);
+		cpu_assert_integrity();
 		/* Indicate that we wish to switch tasks. */
 		if ((unsigned int)(uintptr_t)args[1] & TASK_WAKE_FHIGHPRIO)
 			return CPU_IPI_MODE_SWITCH_TASKS;
@@ -409,6 +422,7 @@ NOTHROW(FCALL task_wake)(struct task *__restrict thread,
 			PREEMPTION_POP(was);
 			return true;
 		}
+		cpu_assert_integrity();
 		caller = THIS_TASK;
 		next   = caller->t_sched.s_running.sr_runnxt;
 		if (thread_flags & TASK_FRUNNING) {
@@ -437,6 +451,7 @@ NOTHROW(FCALL task_wake)(struct task *__restrict thread,
 		       thread->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt == thread);
 unset_waking:
 		ATOMIC_FETCHAND(thread->t_flags, ~TASK_FWAKING);
+		cpu_assert_integrity();
 		if (PREEMPTION_WASENABLED(was)) {
 			if (flags & TASK_WAKE_FHIGHPRIO) {
 				/* End the current quantum prematurely. */
@@ -471,6 +486,7 @@ again:
 	PREEMPTION_DISABLE();
 again_already_disabled:
 	ATOMIC_WRITE(me->c_state, CPU_STATE_FALLING_ASLEEP);
+	cpu_assert_integrity();
 #ifndef CONFIG_NO_SMP
 	assert(!PREEMPTION_ENABLED());
 	if (cpu_loadpending())
@@ -509,7 +525,10 @@ again_already_disabled:
 	{
 		struct task *iter;
 		iter = me->c_sleeping;
-		for (; iter; iter = iter->t_sched.s_asleep.ss_tmonxt) {
+		for (; iter; iter = iter->t_sched.s_asleep.ss_tmonxt,
+		             assert(iter != me->c_sleeping)) {
+			assert(iter->t_sched.s_asleep.ss_pself);
+			assert(*iter->t_sched.s_asleep.ss_pself == iter);
 			if (!(iter->t_flags & TASK_FKEEPCORE))
 				continue;
 			/* There are sleeping threads with the KEEPCORE flag set... */
@@ -561,6 +580,7 @@ again_already_disabled:
 			/* Wake the target CPU, so it can continue working on our sleeping tasks. */
 			cpu_wake(transfer_target);
 		}
+		cpu_assert_integrity();
 		/* Enter deep-sleep mode. */
 		printk(KERN_INFO "[sched:cpu#%u][+] Enter deep-sleep\n", (unsigned int)me->c_id);
 		cpu_enter_deepsleep(me);
@@ -578,7 +598,10 @@ again_already_disabled:
 	{
 		struct task *iter;
 		iter = me->c_sleeping;
-		for (; iter; iter = iter->t_sched.s_asleep.ss_tmonxt) {
+		for (; iter; iter = iter->t_sched.s_asleep.ss_tmonxt,
+		             assert(iter != me->c_sleeping)) {
+			assert(iter->t_sched.s_asleep.ss_pself);
+			assert(*iter->t_sched.s_asleep.ss_pself == iter);
 			if (iter->t_sched.s_asleep.ss_timeout.q_jtime == (jtime_t)-1)
 				continue;
 			/* Must keep jiffies running so-as to be able to service timeouts. */
@@ -611,6 +634,7 @@ yield_and_return:
 	/* End the current quantum prematurely. */
 	cpu_quantum_end();
 	/* Remove the IDLE thread from the running-ring. */
+	cpu_assert_integrity();
 	me->c_current = FORCPU(me, _this_idle).t_sched.s_running.sr_runnxt;
 	assert(FORCPU(me, _this_idle).t_flags & TASK_FRUNNING);
 	ATOMIC_FETCHAND(FORCPU(me, _this_idle).t_flags, ~TASK_FRUNNING);
@@ -619,6 +643,7 @@ yield_and_return:
 	FORCPU(me, _this_idle).t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt = FORCPU(me, _this_idle).t_sched.s_running.sr_runnxt;
 	FORCPU(me, _this_idle).t_sched.s_running.sr_runnxt = NULL;
 	FORCPU(me, _this_idle).t_sched.s_running.sr_runprv = NULL;
+	cpu_assert_integrity(/*need_caller:*/false);
 	/* Switch context to the next task. */
 	cpu_run_current_and_remember(&FORCPU(me, _this_idle));
 	assert(FORCPU(me, _this_idle).t_flags & TASK_FRUNNING);
@@ -674,12 +699,14 @@ NOTHROW(FCALL task_start)(struct task *__restrict thread, unsigned int flags) {
 		struct task *caller, *next;
 		/* Schedule on the current CPU. */
 		ATOMIC_FETCHOR(thread->t_flags, TASK_FRUNNING);
+		cpu_assert_integrity();
 		caller = THIS_TASK;
 		next   = caller->t_sched.s_running.sr_runnxt;
 		caller->t_sched.s_running.sr_runnxt = thread;
 		thread->t_sched.s_running.sr_runprv = caller;
 		thread->t_sched.s_running.sr_runnxt = next;
 		next->t_sched.s_running.sr_runprv   = thread;
+		cpu_assert_integrity();
 		if (PREEMPTION_WASENABLED(was)) {
 			if (flags & TASK_START_FHIGHPRIO) {
 				/* End the current quantum prematurely. */

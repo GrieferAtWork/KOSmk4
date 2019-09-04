@@ -46,6 +46,152 @@
 DECL_BEGIN
 
 
+#ifndef NDEBUG
+PRIVATE NOBLOCK bool
+NOTHROW(KCALL cpu_validate_pointer)(struct cpu *__restrict self) {
+	cpuid_t i;
+	for (i = 0; i < cpu_count; ++i) {
+		if (cpu_vector[i] == self)
+			return true;
+	}
+	return false;
+}
+
+PUBLIC NOBLOCK void
+NOTHROW(FCALL cpu_assert_integrity)(bool need_caller) {
+	pflag_t was;
+	struct task *iter;
+	struct task *caller;
+	struct cpu *me;
+	bool found_caller = false;
+	caller = THIS_TASK;
+	was    = PREEMPTION_PUSHOFF();
+	me     = caller->t_cpu;
+	assertf(cpu_validate_pointer(me),
+	        "Invalid cpu pointer: %p", me);
+	iter = me->c_current;
+	do {
+		struct task **pother, *other;
+		if (iter == caller)
+			found_caller = true;
+		/* Verify that no running thread appears as part of the sleepers chain. */
+		for (pother = &me->c_sleeping; (other = *pother) != NULL;
+		     pother = &other->t_sched.s_asleep.ss_tmonxt) {
+			assertf(other->t_sched.s_asleep.ss_pself == pother,
+			        "Broken list of sleeping thread\n"
+			        "me                               = %p\n"
+			        "caller                           = %p\n"
+			        "other                            = %p\n"
+			        "other->t_sched.s_asleep.ss_pself = %p\n"
+			        "pother                           = %p\n"
+			        "PREV_SLEEPER(other)              = %p\n"
+			        "NEXT_SLEEPER(other)              = %p\n",
+			        me, caller, other,
+			        other->t_sched.s_asleep.ss_pself,
+			        pother,
+			        pother == &me->c_sleeping ? NULL
+			                                  : container_of(pother, struct task, t_sched.s_asleep.ss_tmonxt),
+			        other->t_sched.s_asleep.ss_tmonxt);
+			assertf(other != iter,
+			        "Running thread also appears as sleeper\n"
+			        "me                  = %p\n"
+			        "caller              = %p\n"
+			        "iter                = %p\n"
+			        "other               = %p\n"
+			        "PREV_SLEEPER(other) = %p\n"
+			        "NEXT_SLEEPER(other) = %p\n",
+			        me, caller, iter, other,
+			        pother == &me->c_sleeping ? NULL
+			                                  : container_of(pother, struct task, t_sched.s_asleep.ss_tmonxt),
+			        other->t_sched.s_asleep.ss_tmonxt);
+			if (other == caller)
+				found_caller = true;
+		}
+#ifndef CONFIG_NO_SMP
+		/* Verify that no running thread appears as part of the pending chain. */
+		for (pother = &me->c_pending; (other = *pother) != CPU_PENDING_ENDOFCHAIN;
+		     pother = &other->t_sched.s_pending.ss_pennxt) {
+			assert(other);
+			assertf(other != iter,
+			        "Running thread also appears as pending\n"
+			        "me                  = %p\n"
+			        "caller              = %p\n"
+			        "iter                = %p\n"
+			        "other               = %p\n"
+			        "PREV_PENDING(other) = %p\n"
+			        "NEXT_PENDING(other) = %p\n",
+			        me, caller, iter, other,
+			        pother == &me->c_pending ? NULL
+			                                 : container_of(pother, struct task, t_sched.s_pending.ss_pennxt),
+			        other->t_sched.s_pending.ss_pennxt);
+			assertf((other->t_flags & (TASK_FPENDING | TASK_FRUNNING)) == TASK_FPENDING,
+			        "Pending thread has incorrect flags\n"
+			        "me                  = %p\n"
+			        "caller              = %p\n"
+			        "other               = %p\n"
+			        "other->t_flags      = %#Ix\n"
+			        "PREV_PENDING(other) = %p\n"
+			        "NEXT_PENDING(other) = %p\n",
+			        me, caller, other, other->t_flags,
+			        pother == &me->c_pending ? NULL
+			                                 : container_of(pother, struct task, t_sched.s_pending.ss_pennxt),
+			        other->t_sched.s_pending.ss_pennxt);
+			if (other == caller)
+				found_caller = true;
+		}
+#endif /* !CONFIG_NO_SMP */
+		assertf(iter->t_sched.s_running.sr_runnxt &&
+		        iter->t_sched.s_running.sr_runprv &&
+		        /* Ensure that the prev/next ring is complete */
+		        iter->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv == iter &&
+		        iter->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt == iter &&
+		        /* Ensure that in the case of a single-element ring, its pointers are consistent. */
+		        (iter->t_sched.s_running.sr_runnxt == iter)
+		        ? (iter->t_sched.s_running.sr_runprv == iter) && (me->c_current == iter)
+		        : 1,
+		        "me               = %p\n"
+		        "caller           = %p\n"
+		        "me->c_current    = %p\n"
+		        "iter             = %p\n"
+		        "iter->PREV       = %p\n"
+		        "iter->PREV->NEXT = %p\n"
+		        "iter->NEXT       = %p\n"
+		        "iter->NEXT->PREV = %p\n",
+		        me, caller, me->c_current, iter,
+		        iter->t_sched.s_running.sr_runprv,
+		        iter->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt,
+		        iter->t_sched.s_running.sr_runnxt,
+		        iter->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv);
+		assertf(iter->t_flags & TASK_FRUNNING,
+		        "Task apart of the ring of running threads is lacking the TASK_FRUNNING flag\n"
+		        "me            = %p\n"
+		        "caller        = %p\n"
+		        "iter          = %p\n"
+		        "iter->PREV    = %p\n"
+		        "iter->NEXT    = %p\n"
+		        "iter->t_flags = %#Ix\n",
+		        me, caller, iter,
+		        iter->t_sched.s_running.sr_runprv,
+		        iter->t_sched.s_running.sr_runnxt,
+		        iter->t_flags);
+	} while ((iter = iter->t_sched.s_running.sr_runnxt) != me->c_current);
+	assertf(found_caller || !need_caller,
+	        "failed to find calling thread\n"
+	        "me            = %p\n"
+	        "caller        = %p\n"
+	        "me->c_current = %p\n",
+	        me, caller, me->c_current);
+	PREEMPTION_POP(was);
+}
+#else /* !NDEBUG */
+PUBLIC NOBLOCK void
+NOTHROW(FCALL cpu_assert_integrity)(bool UNUSED(need_caller)) {
+	/* no-op */
+}
+#endif /* NDEBUG */
+
+
+
 #ifdef __HAVE_CPUSET_FULL_MASK
 PUBLIC cpuset_t ___cpuset_full_mask ASMNAME("__cpuset_full_mask") = 1;
 #endif
@@ -401,6 +547,7 @@ NOTHROW(KCALL cpu_quantum_end)(void) {
 PUBLIC bool NOTHROW(FCALL task_sleep)(qtime_t const *abs_timeout) {
 	struct task *me = THIS_TASK;
 	struct cpu *mycpu;
+	cpu_assert_integrity();
 	if (abs_timeout) {
 		qtime_t now;
 		/* Immediately time out. */
@@ -429,6 +576,7 @@ PUBLIC bool NOTHROW(FCALL task_sleep)(qtime_t const *abs_timeout) {
 	cpu_quantum_end();
 
 	mycpu = me->t_cpu;
+	cpu_assert_integrity();
 	/* The caller is the only thread hosted by this cpu. */
 	if likely(me->t_sched.s_running.sr_runnxt == me) {
 		/* Special case: blocking call made by the IDLE thread. */
@@ -507,7 +655,14 @@ NOTHROW(FCALL cpu_scheduler_interrupt)(struct cpu *__restrict caller,
                                        struct task *__restrict thread) {
 	/* NOTE: Preemption is disabled while we're in here! */
 	struct task *sleeper, *last_sleeper, *next;
-	assert(thread == caller->c_current);
+	assertf(thread == caller->c_current,
+	        "thread            = %p\n"
+	        "caller            = %p\n"
+	        "caller->c_id      = %u\n"
+	        "caller->c_current = %p\n",
+	        thread, caller,
+	        (unsigned int)caller->c_id,
+	        caller->c_current);
 	/* Keep track of the cpu-local time, as well
 	 * as the previous thread's active-time. */
 	++FORCPU(caller, cpu_jiffies);
@@ -596,7 +751,7 @@ NOTHROW(FCALL task_exit)(int w_status) {
 	if (!(ATOMIC_FETCHOR(caller->t_flags, TASK_FTERMINATING) & TASK_FTERMINATING)) {
 		/* Invoke cleanup callbacks. */
 		pertask_onexit_t *iter = __kernel_pertask_onexit_start;
-		printk(KERN_TRACE "[sched] Exiting thread %p[pid=%u]\n",
+		printk(KERN_TRACE "[sched][1] Exiting thread %p [pid=%u]\n",
 		       caller, task_getroottid_of_s(caller));
 		for (; iter < __kernel_pertask_onexit_end; ++iter)
 			(**iter)();
@@ -615,22 +770,11 @@ NOTHROW(FCALL task_exit)(int w_status) {
 
 	PREEMPTION_DISABLE();
 	mycpu = caller->t_cpu;
+	printk(KERN_TRACE "[sched][2] Exiting thread %p [pid=%u]\n",
+	       caller, task_getroottid_of_s(caller));
 	assertf(mycpu->c_current == caller, "Inconsistent scheduler state");
 	assertf(caller != &FORCPU(mycpu, _this_idle), "The IDLE task cannot be terminated");
-	assertf(caller->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv == caller &&
-	        caller->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt == caller &&
-	        (caller->t_sched.s_running.sr_runnxt == caller) ==
-	        (caller->t_sched.s_running.sr_runprv == caller),
-	        "caller             = %p\n"
-	        "caller->PREV       = %p\n"
-	        "caller->PREV->NEXT = %p\n"
-	        "caller->NEXT       = %p\n"
-	        "caller->NEXT->PREV = %p\n",
-	        caller,
-	        caller->t_sched.s_running.sr_runprv,
-	        caller->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt,
-	        caller->t_sched.s_running.sr_runnxt,
-	        caller->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv);
+	cpu_assert_integrity();
 
 	/* Indicate the end of the current quantum. */
 	cpu_quantum_end();
@@ -651,6 +795,7 @@ NOTHROW(FCALL task_exit)(int w_status) {
 	caller->t_sched.s_running.sr_runnxt = NULL;
 	assert(mycpu->c_current != caller);
 	assert(next->t_sched.s_state);
+	cpu_assert_integrity(/*need_caller:*/false);
 
 	/* Hi-jack the execution stack of the next thread to have it do the decref()
 	 * of our own thread, thus preventing the undefined behavior that would be
@@ -659,13 +804,14 @@ NOTHROW(FCALL task_exit)(int w_status) {
 	                                                    (task_srpc_t)&task_decref_for_exit,
 	                                                    caller,
 	                                                    NULL);
+
 	/* Good bye... */
 	cpu_run_current();
 }
 
 
 
-/* Convert to/from quantime time and regular timespecs */
+/* Convert to/from quantum time and regular timespecs */
 PUBLIC NOBLOCK WUNUSED struct timespec
 NOTHROW(FCALL qtime_to_timespec)(qtime_t const *__restrict qtime) {
 	struct timespec result;

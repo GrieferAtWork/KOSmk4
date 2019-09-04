@@ -205,6 +205,7 @@
 #define __CRT_HAVE_cpu_apply_scpustate 1
 #define __CRT_HAVE_cpu_apply_scpustate_esp 1
 #define __CRT_HAVE_cpu_apply_ucpustate 1
+#define __CRT_HAVE_cpu_assert_integrity 1
 #define __CRT_HAVE_cpu_broadcastipi 1
 #define __CRT_HAVE_cpu_broadcastipi_notthis 1
 #define __CRT_HAVE_cpu_count 1

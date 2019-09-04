@@ -2751,9 +2751,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname687 /* index: 687 */
-	.weak vm_onfini_callbacks; .long vm_onfini_callbacks
-	.reloc ., R_386_SIZE32, vm_onfini_callbacks; .long 0
-	.long 0x25145f3
+	.weak vm_mapres; .long vm_mapres
+	.reloc ., R_386_SIZE32, vm_mapres; .long 0
+	.long 0x63805f3
 	.long .Lname688 /* index: 688 */
 	.weak pagedir_unprepare_mapone_p; .long pagedir_unprepare_mapone_p
 	.reloc ., R_386_SIZE32, pagedir_unprepare_mapone_p; .long 0
@@ -3791,9 +3791,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname947 /* index: 947 */
-	.weak vm_mapres; .long vm_mapres
-	.reloc ., R_386_SIZE32, vm_mapres; .long 0
-	.long 0x63805f3
+	.weak vm86_exec; .long vm86_exec
+	.reloc ., R_386_SIZE32, vm86_exec; .long 0
+	.long 0xbc5b3b3
 	.long .Lname948 /* index: 948 */
 	.weak rwlock_endread; .long rwlock_endread
 	.reloc ., R_386_SIZE32, rwlock_endread; .long 0
@@ -6351,9 +6351,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, sys_socketpair; .long 0
 	.long 0x15dc632
 	.long .Lname1587 /* index: 1587 */
-	.weak vm86_exec; .long vm86_exec
-	.reloc ., R_386_SIZE32, vm86_exec; .long 0
-	.long 0xbc5b3b3
+	.weak pmembank_type_names; .long pmembank_type_names
+	.reloc ., R_386_SIZE32, pmembank_type_names; .long 0
+	.long 0xf2efbb3
 	.long .Lname1588 /* index: 1588 */
 	.weak vm_datablock_findchanged; .long vm_datablock_findchanged
 	.reloc ., R_386_SIZE32, vm_datablock_findchanged; .long 0
@@ -13406,10 +13406,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 3351 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname3351 /* index: 3351 */
+	.weak cpu_assert_integrity; .long cpu_assert_integrity
+	.reloc ., R_386_SIZE32, cpu_assert_integrity; .long 0
+	.long 0x19364d9
 	.long .Lname3352 /* index: 3352 */
 	.weak vm_kernel_treelock_read_nx; .long vm_kernel_treelock_read_nx
 	.reloc ., R_386_SIZE32, vm_kernel_treelock_read_nx; .long 0
@@ -15734,10 +15734,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak vio_cmpxch_or_writel; .long vio_cmpxch_or_writel
 	.reloc ., R_386_SIZE32, vio_cmpxch_or_writel; .long 0
 	.long 0x8230f5c
-	.long .Lname3933 /* index: 3933 */
-	.weak pmembank_type_names; .long pmembank_type_names
-	.reloc ., R_386_SIZE32, pmembank_type_names; .long 0
-	.long 0xf2efbb3
+	.long 0 /* index: 3933 */
+	.long 0
+	.long 0
+	.long 0
 	.long 0 /* index: 3934 */
 	.long 0
 	.long 0
@@ -16046,10 +16046,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 4011 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname4011 /* index: 4011 */
+	.weak vm_onfini_callbacks; .long vm_onfini_callbacks
+	.reloc ., R_386_SIZE32, vm_onfini_callbacks; .long 0
+	.long 0x25145f3
 	.long 0 /* index: 4012 */
 	.long 0
 	.long 0
@@ -17087,7 +17087,7 @@ END(kernel_symbol_table)
 .Lname683:
 	.string "handle_get_superblock"
 .Lname687:
-	.string "vm_onfini_callbacks"
+	.string "vm_mapres"
 .Lname688:
 	.string "pagedir_unprepare_mapone_p"
 .Lname690:
@@ -17343,7 +17343,7 @@ END(kernel_symbol_table)
 .Lname944:
 	.string "json_parser_leave"
 .Lname947:
-	.string "vm_mapres"
+	.string "vm86_exec"
 .Lname948:
 	.string "rwlock_endread"
 .Lname949:
@@ -17979,7 +17979,7 @@ END(kernel_symbol_table)
 .Lname1586:
 	.string "sys_socketpair"
 .Lname1587:
-	.string "vm86_exec"
+	.string "pmembank_type_names"
 .Lname1588:
 	.string "vm_datablock_findchanged"
 .Lname1589:
@@ -19704,6 +19704,8 @@ END(kernel_symbol_table)
 	.string "tty_device_stopfwd"
 .Lname3349:
 	.string "debuginfo_print_typename"
+.Lname3351:
+	.string "cpu_assert_integrity"
 .Lname3352:
 	.string "vm_kernel_treelock_read_nx"
 .Lname3355:
@@ -20320,8 +20322,6 @@ END(kernel_symbol_table)
 	.string "blocking_cleanup_prioritize"
 .Lname3932:
 	.string "vio_cmpxch_or_writel"
-.Lname3933:
-	.string "pmembank_type_names"
 .Lname3935:
 	.string "sys_mincore"
 .Lname3936:
@@ -20390,6 +20390,8 @@ END(kernel_symbol_table)
 	.string "x86_cputss_df"
 .Lname4008:
 	.string "vm_datapart_split_nx"
+.Lname4011:
+	.string "vm_onfini_callbacks"
 .Lname4016:
 	.string "block_device_awritev_phys"
 .Lname4017:

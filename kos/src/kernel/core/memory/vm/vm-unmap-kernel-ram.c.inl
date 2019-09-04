@@ -889,7 +889,9 @@ NOTHROW(KCALL vm_kernel_treelock_service)(gfp_t flags) {
 		pend = ATOMIC_XCH(vm_pending_destroy_tasks, NULL);
 		while (pend) {
 			next = pend->t_sched.s_running.sr_runnxt;
+			cpu_assert_integrity();
 			task_destroy_raw_impl(pend);
+			cpu_assert_integrity();
 			pend = next;
 		}
 	}

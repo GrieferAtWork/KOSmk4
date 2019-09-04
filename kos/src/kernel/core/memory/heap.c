@@ -315,10 +315,8 @@ NOTHROW(KCALL heap_validate)(struct heap *__restrict self) {
 	if (PERTASK_GET(heap_novalidate))
 		return;
 #endif /* CONFIG_HAVE_HEAP_NOVALIDATE */
-#if 1
 	if (!sync_tryread(&self->h_lock))
 		return;
-#endif
 	for (i = 0; i < COMPILER_LENOF(self->h_size); ++i) {
 		struct mfree **piter, *iter;
 		piter = &self->h_size[i];
@@ -405,9 +403,7 @@ NOTHROW(KCALL heap_validate)(struct heap *__restrict self) {
 			}
 		}
 	}
-#if 1
 	sync_endread(&self->h_lock);
-#endif
 }
 #else /* CONFIG_DEBUG_HEAP */
 #define mfree_set_checksum(self) (void)0

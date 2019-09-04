@@ -97,7 +97,7 @@ kernel_terminal_check_sigttou(struct terminal *__restrict self) {
 	FINALLY_DECREF_UNLIKELY(my_leader);
 	if unlikely(FORTASK(my_leader, _this_taskpid) != ATOMIC_READ(term->t_fproc.m_pointer)) {
 		if (term->t_fproc.cmpxch(NULL, FORTASK(my_leader, _this_taskpid)))
-			return 0; /* Lazily set the caller as the initial foreground process */
+			goto done; /* Lazily set the caller as the initial foreground process */
 		task_raisesignalprocessgroup(my_leader, SIGTTOU);
 		/* We might get here if the calling process changed its process group
 		 * in the mean time. - In this case, just re-raise `SIGTTOU' within the
@@ -105,6 +105,7 @@ kernel_terminal_check_sigttou(struct terminal *__restrict self) {
 		task_raisesignalprocess(task_getprocess(), SIGTTOU);
 		/* We really shouldn't get here */
 	}
+done:
 	return 0;
 }
 

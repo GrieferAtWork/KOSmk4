@@ -229,8 +229,12 @@ INTDEF struct kernel_debugtraps GDB_DebugTraps;
 #endif /* !__assertion_checkf */
 
 
-/* Saved error information of the currently active GDB thread. */
+/* Saved error information of the host thread. */
 PRIVATE struct exception_info GDB_OldErrorInfo;
+
+/* Saved connections information of the host thread. */
+PRIVATE struct task_connections GDB_OldConnections;
+
 
 /* High-level function called from `GDB_TrapWithState' */
 INTERN WUNUSED ATTR_RETNONNULL NONNULL((1)) void *
@@ -286,6 +290,7 @@ NOTHROW(FCALL GDB_TrapWithStateImpl)(void *__restrict state, syscall_ulong_t tra
 	 * loop may clobber the currently active exceptions.
 	 * For this reason, save+restore error_info() while inside. */
 	memcpy(&GDB_OldErrorInfo, error_info(), sizeof(struct exception_info));
+	task_pushconnections(&GDB_OldConnections);
 	COMPILER_BARRIER();
 
 	COMPILER_BARRIER();
@@ -330,9 +335,14 @@ NOTHROW(FCALL GDB_TrapWithStateImpl)(void *__restrict state, syscall_ulong_t tra
 		ATOMIC_FETCHAND(THIS_TASK->t_flags, ~TASK_FKEEPCORE);
 	COMPILER_BARRIER();
 
+	/* Make sure that we're no longer connected to anything! */
+	COMPILER_BARRIER();
+	task_disconnectall();
+	COMPILER_BARRIER();
 
 	COMPILER_BARRIER();
 	/* Restore the currently active exceptions saved before. */
+	task_popconnections(&GDB_OldConnections);
 	memcpy(error_info(), &GDB_OldErrorInfo, sizeof(struct exception_info));
 	state = GDB_ReturnStateAddress;
 	GDBReason_Registers    = NULL;

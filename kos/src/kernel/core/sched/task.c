@@ -41,6 +41,7 @@
 #include <sys/wait.h>
 
 #include <stddef.h>
+#include <assert.h>
 #include <string.h>
 
 #ifndef CONFIG_NO_DEBUGGER
@@ -51,14 +52,14 @@ DECL_BEGIN
 
 INTDEF byte_t __kernel_pertask_start[];
 INTDEF byte_t __kernel_pertask_size[];
-STATIC_ASSERT(offsetof(struct task,t_self)          == OFFSET_TASK_SELF);
-STATIC_ASSERT(offsetof(struct task,t_refcnt)        == OFFSET_TASK_REFCNT);
-STATIC_ASSERT(offsetof(struct task,t_flags)         == OFFSET_TASK_FLAGS);
-STATIC_ASSERT(offsetof(struct task,t_cpu)           == OFFSET_TASK_CPU);
-STATIC_ASSERT(offsetof(struct task,t_vm)            == OFFSET_TASK_VM);
-STATIC_ASSERT(offsetof(struct task,t_vm_tasks)      == OFFSET_TASK_VM_TASKS);
-STATIC_ASSERT(offsetof(struct task,t_heapsz)        == OFFSET_TASK_HEAPSZ);
-STATIC_ASSERT(offsetof(struct task,t_sched.s_state) == OFFSET_TASK_SCHED_STATE);
+STATIC_ASSERT(offsetof(struct task, t_self) == OFFSET_TASK_SELF);
+STATIC_ASSERT(offsetof(struct task, t_refcnt) == OFFSET_TASK_REFCNT);
+STATIC_ASSERT(offsetof(struct task, t_flags) == OFFSET_TASK_FLAGS);
+STATIC_ASSERT(offsetof(struct task, t_cpu) == OFFSET_TASK_CPU);
+STATIC_ASSERT(offsetof(struct task, t_vm) == OFFSET_TASK_VM);
+STATIC_ASSERT(offsetof(struct task, t_vm_tasks) == OFFSET_TASK_VM_TASKS);
+STATIC_ASSERT(offsetof(struct task, t_heapsz) == OFFSET_TASK_HEAPSZ);
+STATIC_ASSERT(offsetof(struct task, t_sched.s_state) == OFFSET_TASK_SCHED_STATE);
 
 
 #define HINT_ADDR(x,y) x
@@ -380,9 +381,12 @@ NOTHROW(KCALL task_destroy_raw_impl)(struct task *__restrict self) {
 			/* Schedule our task for pending removal within its associated VM.
 			 * The next time someone acquires a lock to the VM's task-chain,
 			 * we will be removed automatically, and finally freed. */
-			do
-				self->t_sched.s_running.sr_runnxt = next = ATOMIC_READ(myvm->v_deltasks);
-			while (!ATOMIC_CMPXCH_WEAK(myvm->v_deltasks, next, self));
+			cpu_assert_integrity();
+			do {
+				next = ATOMIC_READ(myvm->v_deltasks);
+				self->t_sched.s_running.sr_runnxt = next;
+			} while (!ATOMIC_CMPXCH_WEAK(myvm->v_deltasks, next, self));
+			cpu_assert_integrity();
 			vm_tasklock_tryservice(myvm);
 		} else {
 do_free_self:
@@ -414,9 +418,12 @@ NOTHROW(KCALL task_destroy)(struct task *__restrict self) {
 	} else {
 		struct task *next;
 		/* Schedule the task to-be destroyed later. */
-		do
-			self->t_sched.s_running.sr_runnxt = next = ATOMIC_READ(vm_pending_destroy_tasks);
-		while (!ATOMIC_CMPXCH_WEAK(vm_pending_destroy_tasks, next, self));
+		cpu_assert_integrity();
+		do {
+			next = ATOMIC_READ(vm_pending_destroy_tasks);
+			self->t_sched.s_running.sr_runnxt = next;
+		} while (!ATOMIC_CMPXCH_WEAK(vm_pending_destroy_tasks, next, self));
+		cpu_assert_integrity();
 		vm_kernel_treelock_tryservice();
 	}
 }
