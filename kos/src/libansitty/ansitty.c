@@ -70,6 +70,8 @@ DECL_BEGIN
 	UNKNOWN_SEQUENCE_WARN("[ansitty] Unrecognized escape sequence \"\\e%#Q%#Q%#Q\"\n", firstch, secondch, lastch)
 #define WARN_UNKNOWN_SEQUENCE3(firstch, ptr, len, lastch) \
 	UNKNOWN_SEQUENCE_WARN("[ansitty] Unrecognized escape sequence \"\\e%#Q%#$q%#Q\"\n", firstch, (size_t)(len), ptr, lastch)
+#define WARN_UNKNOWN_SEQUENCE4C(firstch, secondch, thirdch, lastch) \
+	UNKNOWN_SEQUENCE_WARN("[ansitty] Unrecognized escape sequence \"\\e%#Q%#Q%#Q%#Q\"\n", firstch, secondch, thirdch, lastch)
 #define WARN_UNKNOWN_SEQUENCE4(firstch, ptr, len, before_lastch, lastch) \
 	UNKNOWN_SEQUENCE_WARN("[ansitty] Unrecognized escape sequence \"\\e%#Q%#$q%#Q%#Q\"\n", firstch, (size_t)(len), ptr, before_lastch, lastch)
 
@@ -135,6 +137,9 @@ DECL_BEGIN
 #define STATE_REPEAT_COUNT(self) (*(unsigned int *)(COMPILER_ENDOF((self)->at_escape) - sizeof(unsigned int)))
 #define STATE_INSERT     22 /* Insertion-mode */
 #define STATE_INSERT_MBS 23 /* Insertion-mode with pending multi-byte character */
+#define STATE_ESC_Y1     24 /* After `ESCY' */
+#define STATE_ESC_Y1_VAL(self) (*(uint8_t *)(COMPILER_ENDOF((self)->at_escape) - sizeof(uint8_t)))
+#define STATE_ESC_Y2     25 /* After `ESCY<ORD>' */
 
 #define STATE_OSC_ADD_ESC(x) ((x)+5)
 #define STATE_OSC_DEL_ESC(x) ((x)-5)
@@ -237,7 +242,8 @@ stub_el(struct ansitty *__restrict self,
 	}
 	while (i--)
 		PUTUNI(' ');
-	SETCURSOR(xy[0], xy[1]);
+	if (mode != ANSITTY_EL_BEFORE)
+		SETCURSOR(xy[0], xy[1]);
 }
 
 PRIVATE NONNULL((1)) void CC
@@ -336,9 +342,11 @@ libansitty_init(struct ansitty *__restrict self,
 		self->at_ops.ato_el = &stub_el;
 	if (!self->at_ops.ato_scroll) {
 		self->at_ops.ato_scroll = &stub_scroll;
+		/* With copycell(), we can do 100% accurate emulation of scroll() */
 		if (self->at_ops.ato_copycell)
 			self->at_ops.ato_scroll = &stub_scroll_with_copycell;
 	}
+	/* copycell cannot be emulated, but still replace it with a no-op */
 	if (!self->at_ops.ato_copycell)
 		self->at_ops.ato_copycell = &stub_copycell;
 	self->at_color      = ANSITTY_CL_DEFAULT;
@@ -1770,14 +1778,14 @@ do_single_argument_case:
 			case 2: /* led2 DECLL2 */
 			case 3: /* led3 DECLL3 */
 			case 4: /* led4 DECLL4 */
-				SETLED(~0, 0x01 < (code - 1));
+				SETLED(~0, 0x01 << (code - 1));
 				break;
 
 			case 21: /* led1 DECLL1 */
 			case 22: /* led2 DECLL2 */
 			case 23: /* led3 DECLL3 */
 			case 24: /* led4 DECLL4 */
-				SETLED(~(0x01 < (code - 21)), 0);
+				SETLED(~(0x01 << (code - 21)), 0);
 				break;
 
 			ARGUMENT_CODE_SWITCH_END()
@@ -1887,20 +1895,24 @@ nope:
 
 PRIVATE void CC
 ansitty_setstate_text(struct ansitty *__restrict self) {
-	self->at_state = STATE_TEXT;
-	if (self->at_ttyflag & ANSITTY_FLAG_BOXMODE)
-		self->at_state = STATE_BOX;
 	if (self->at_ttyflag & ANSITTY_FLAG_INSERT)
 		self->at_state = STATE_INSERT;
+	else if (self->at_ttyflag & ANSITTY_FLAG_BOXMODE)
+		self->at_state = STATE_BOX;
+	else {
+		self->at_state = STATE_TEXT;
+	}
 }
 
 PRIVATE void CC
 ansitty_setstate_mbs(struct ansitty *__restrict self) {
-	self->at_state = STATE_MBS;
-	if (self->at_ttyflag & ANSITTY_FLAG_BOXMODE)
-		self->at_state = STATE_BOX_MBS;
 	if (self->at_ttyflag & ANSITTY_FLAG_INSERT)
 		self->at_state = STATE_INSERT_MBS;
+	else if (self->at_ttyflag & ANSITTY_FLAG_BOXMODE)
+		self->at_state = STATE_BOX_MBS;
+	else {
+		self->at_state = STATE_MBS;
+	}
 }
 
 PRIVATE void CC
@@ -2468,6 +2480,10 @@ do_insuni:
 			PUTUNI(BEL);
 			goto set_text_and_done;
 
+		case 'Y':
+			self->at_state = STATE_ESC_Y1;
+			break;
+
 		case 'c':
 			/* Reset graphics, tabs, font and color. */
 			setflags(self, ANSITTY_FLAG_NORMAL);
@@ -2689,7 +2705,7 @@ do_process_string_command:
 			/* TODO: screen(1) documents this one as:
 			 *     ESC # 8               (V)  Fill Screen with E's
 			 * So I guess that's a simple enough explanation, although I'm not
-			 * entirely sure if I there's some kind of joke I'm missing, or if
+			 * entirely sure if there's some kind of joke I'm missing, or if
 			 * this one's _literally_ supposed?? to fill the entire screen with
 			 * all E's (I mean: don't get me wrong. How often didn't I want a
 			 * screen full of E's, wishing there was an easier way of getting
@@ -2707,6 +2723,38 @@ do_process_string_command:
 		PUTUNI(ESC);
 		PUTUNI('#');
 		goto reset_state;
+
+	case STATE_ESC_Y1:
+		if ((byte_t)ch < 32) {
+			if (ch == CAN)
+				goto set_text_and_done;
+			WARN_UNKNOWN_SEQUENCE3C(ESC, 'Y', ch);
+			PUTUNI(ESC);
+			PUTUNI('Y');
+			goto reset_state;
+		}
+		STATE_ESC_Y1_VAL(self) = (uint8_t)ch - 32;
+		self->at_state = STATE_ESC_Y2;
+		break;
+
+	case STATE_ESC_Y2:
+		/* ESC Y Ps Ps    Move the cursor to given row and column.
+		 * Parameters for cursor movement are at the end of the ESC Y  escape
+		 * sequence.  Each ordinate is encoded in a single character as value+32.
+		 * For example, !  is 1.  The screen coordinate system is 0-based. */
+		if ((byte_t)ch < 32) {
+			if (ch == CAN)
+				goto set_text_and_done;
+			WARN_UNKNOWN_SEQUENCE4C(ESC, 'Y', 32 + STATE_ESC_Y1_VAL(self), ch);
+			PUTUNI(ESC);
+			PUTUNI('Y');
+			PUTUNI(32 + STATE_ESC_Y1_VAL(self));
+			goto reset_state;
+		}
+		/* Set the cursor position. */
+		SETCURSOR((byte_t)ch - 32, STATE_ESC_Y1_VAL(self));
+		goto set_text_and_done;
+
 
 	default:
 reset_state:

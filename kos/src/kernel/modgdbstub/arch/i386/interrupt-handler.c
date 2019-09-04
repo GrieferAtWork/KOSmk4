@@ -69,7 +69,7 @@ GDBX86Interrupt_Int1Handler(struct icpustate *__restrict state) {
 			uintptr_t pc = irregs_rdip(&state->ics_irregs);
 			if (pc >= GDB_SingleStep_IngoreStart &&
 			    pc <= GDB_SingleStep_IngoreEnd) {
-				printk(KERN_TRACE "[gdb][pc:%p] Skip single-step hit\n", pc);
+				GDB_DEBUG("[gdb][pc:%p] Skip single-step hit\n", pc);
 				return state;
 			}
 		}
