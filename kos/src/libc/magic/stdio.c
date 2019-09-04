@@ -465,30 +465,73 @@ putchar:(int ch) -> int {
 }
 
 %[default_impl_section(.text.crt.FILE.locked.read.read)]
-@@Read up to `BUFSIZE - 1' bytes of data from `STREAM', storing them into `BUF'
-@@stopped when the buffer is full or a line-feed was read (in this case, the
-@@line-feed is also written to `BUF')
-@@Afterwards, append a trailing NUL-character and re-return `BUF', or return
-@@`NULL' if an error occurred.
+
+@@Read up to `BUFSIZE - 1' bytes of data from `STREAM', storing them into `BUF' stopped when
+@@the buffer is full or a line-feed was read (in this case, the line-feed is also written to `BUF')
+@@Afterwards, append a trailing NUL-character and re-return `BUF', or return `NULL' if an error occurred.
 [cp_stdio][std][ATTR_WUNUSED][alias(fgets_unlocked)]
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(fgets_unlocked)]
+[dependency_include(<parts/errno.h>)][same_impl]
+[requires($has_function(fgetc) && $has_function(ferror))]
 fgets:([outp(min(strlen(return),bufsize))] char *__restrict buf,
        __STDC_INT_AS_SIZE_T bufsize,
-       [nonnull] FILE *__restrict stream) -> char *;
+       [nonnull] FILE *__restrict stream) -> char * {
+	size_t n;
+	if unlikely(!buf || !bufsize) {
+		/* The buffer cannot be empty! */
+#ifdef @__ERANGE@
+		__libc_seterrno(@__ERANGE@);
+#endif /* __ERANGE */
+		return NULL;
+	}
+	for (n = 0; n < bufsize - 1; ++n) {
+		int ch = fgetc(stream);
+		if (ch == EOF) {
+			if (ferror(stream))
+				return NULL;
+			break;
+		}
+		if (ch == '\r') {
+			/* Special handling to convert both `\r' and `\r\n' into `\n' */
+			buf[n++] = '\n';
+			ch = fgetc(stream);
+			if (ch == EOF) {
+				if (ferror(stream))
+					return NULL;
+				break;
+			}
+			if (ch == '\r')
+				continue;
+		}
+		buf[n] = (char)ch;
+		if (ch == '\n')
+			break;
+	}
+	buf[n] = '\0';
+	return buf;
+}
 
 %[default_impl_section(.text.crt.FILE.locked.write.write)]
 @@Print a given string `STR' to `STREAM'. This is identical to:
 @@>> fwrite(str, sizeof(char), strlen(str), stream);
-[cp_stdio][std]
+[cp_stdio][std][requires($has_function(fwrite))]
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(fputs_unlocked)]
-[alias(fputs_unlocked)][crtbuiltin]
-fputs:([nonnull] char const *__restrict str, [nonnull] FILE *__restrict stream) -> __STDC_INT_AS_SSIZE_T;
+[alias(fputs_unlocked)][crtbuiltin][same_impl]
+fputs:([nonnull] char const *__restrict str,
+       [nonnull] FILE *__restrict stream) -> __STDC_INT_AS_SSIZE_T {
+	__STDC_INT_AS_SIZE_T result;
+	result = fwrite(str,
+	                sizeof(char),
+	                strlen(str),
+	                stream);
+	return result;
+}
 
 @@Print a given string `STR', followed by a line-feed to `STDOUT'
-[cp_stdio][std][noexport]
+[cp_stdio][std][noexport][same_impl]
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(puts_unlocked)]
 [requires(!defined(__NO_STDSTREAMS) && $has_function(fputs))]
-[requires_include(<__crt.h>)][same_impl][export_alias(_IO_puts)]
+[requires_include(<__crt.h>)][export_alias(_IO_puts)]
 [dependency_include(<local/stdstreams.h>)][crtbuiltin]
 puts:([nonnull] char const *__restrict str) -> __STDC_INT_AS_SSIZE_T {
 	__STDC_INT_AS_SSIZE_T result, temp;
@@ -729,8 +772,7 @@ fsetpos:([nonnull] FILE *__restrict stream, [nonnull] fpos_t const *__restrict p
 @@Return the number of successfully printed bytes
 [cp_stdio][std][ATTR_LIBC_PRINTF(2, 0)]
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(vfprintf_unlocked)]
-[same_impl][requires($has_function(file_printer))]
-[alias(vfprintf_s)]
+[same_impl][requires($has_function(file_printer))][alias(vfprintf_s)]
 [section(.text.crt.FILE.locked.write.printf)][crtbuiltin]
 vfprintf:([nonnull] FILE *__restrict stream,
           [nonnull] char const *__restrict format, $va_list args) -> __STDC_INT_AS_SSIZE_T {
@@ -1017,7 +1059,10 @@ tmpnam_r:([nonnull] char *buf) -> char * {
 [requires($has_function(setvbuf))][same_impl]
 [section(.text.crt.FILE.locked.read.utility)]
 setbuffer:([nonnull] $FILE *__restrict stream, [nullable] char *buf, size_t bufsize) {
-	setvbuf(stream, buf, buf ? _IOFBF : _IONBF, buf ? bufsize : (size_t)0);
+	setvbuf(stream,
+	        buf,
+	        buf ? _IOFBF : _IONBF,
+	        buf ? bufsize : (size_t)0);
 }
 
 @@Change the given `STREAM' to become line-buffered
@@ -1168,15 +1213,63 @@ __getdelim:([nonnull] char **__restrict lineptr,
             [nonnull] size_t *__restrict pcount, int delimiter,
             [nonnull] $FILE *__restrict stream) -> $ssize_t = getdelim;
 
-[cp_stdio][ATTR_WUNUSED]
+[cp_stdio][ATTR_WUNUSED][alias(getdelim_unlocked)][same_impl]
+[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(getdelim_unlocked)]
+[requires($has_function(realloc) && $has_function(fgetc) && $has_function(ungetc))]
 getdelim:([nonnull] char **__restrict lineptr,
           [nonnull] size_t *__restrict pcount, int delimiter,
-          [nonnull] $FILE *__restrict stream) -> $ssize_t;
+          [nonnull] $FILE *__restrict stream) -> $ssize_t {
+	int ch;
+	char *buffer;
+	size_t bufsize, result = 0;
+	buffer  = *lineptr;
+	bufsize = buffer ? *pcount : 0;
+	for (;;) {
+		if (result + 1 >= bufsize) {
+			/* Allocate more memory. */
+			size_t new_bufsize = bufsize * 2;
+			if (new_bufsize <= result + 1)
+				new_bufsize = 16;
+			assert(new_bufsize > result + 1);
+			buffer = (char *)realloc(buffer,
+			                         new_bufsize *
+			                         sizeof(char));
+			if unlikely(!buffer)
+				return -1;
+			*lineptr = buffer;
+			*pcount  = bufsize;
+		}
+		ch = fgetc(stream);
+		if (ch == EOF)
+			break; /* EOF */
+		buffer[result++] = (char)ch;
+		if (ch == delimiter)
+			break; /* Delimiter reached */
+		/* Special case for line-delimiter. */
+		if (delimiter == '\n' && ch == '\r') {
+			/* Deal with '\r\n', as well as '\r' */
+			ch = fgetc(stream);
+			if (ch != EOF && ch != '\n')
+				ungetc(ch, stream);
+			/* Unify linefeeds (to use POSIX notation) */
+			buffer[result - 1] = '\n';
+			break;
+		}
+	}
+	/* NUL-Terminate the buffer. */
+	buffer[result] = '\0';
+	return result;
+}
 
-[cp_stdio][ATTR_WUNUSED]
+[cp_stdio][ATTR_WUNUSED][requires($has_function(getdelim))]
+[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(getline_unlocked)]
+[alias(getline_unlocked)][same_impl]
 getline:([nonnull] char **__restrict lineptr,
          [nonnull] size_t *__restrict pcount,
-         [nonnull] $FILE *__restrict stream) -> $ssize_t;
+         [nonnull] $FILE *__restrict stream) -> $ssize_t {
+	return getdelim(lineptr, pcount, '\n', stream);
+}
+
 %#endif /* __USE_XOPEN2K8 */
 
 
@@ -1291,23 +1384,65 @@ putw:(int w, [nonnull] $FILE *__restrict stream) -> int {
 %
 %#ifdef __USE_GNU
 
-%[default_impl_section(.text.crt.FILE.locked.access)]
-[ATTR_WUNUSED]
+[ATTR_WUNUSED][section(.text.crt.FILE.locked.access)]
 fopencookie:(void *__restrict magic_cookie,
              [nonnull] char const *__restrict modes,
              $cookie_io_functions_t io_funcs) -> $FILE *;
 
 %[default_impl_section(.text.crt.FILE.unlocked.read.read)]
 @@Same as `fgets()', but performs I/O without acquiring a lock to `($FILE *)ARG'
-[cp_stdio][alias(fgets)][ATTR_WUNUSED]
-fgets_unlocked:([outp(min(strlen(return),bufsize))] char *__restrict buf, __STDC_INT_AS_SIZE_T bufsize,
-                [nonnull] $FILE *__restrict stream) -> char *;
+[cp_stdio][alias(fgets)][ATTR_WUNUSED][dependency_include(<parts/errno.h>)]
+[requires($has_function(fgetc_unlocked) && $has_function(ferror_unlocked))][same_impl]
+fgets_unlocked:([outp(min(strlen(return),bufsize))] char *__restrict buf,
+                __STDC_INT_AS_SIZE_T bufsize,
+                [nonnull] $FILE *__restrict stream) -> char * {
+	size_t n;
+	if unlikely(!buf || !bufsize) {
+		/* The buffer cannot be empty! */
+#ifdef @__ERANGE@
+		__libc_seterrno(@__ERANGE@);
+#endif /* __ERANGE */
+		return NULL;
+	}
+	for (n = 0; n < bufsize - 1; ++n) {
+		int ch = fgetc_unlocked(stream);
+		if (ch == EOF) {
+			if (ferror_unlocked(stream))
+				return NULL;
+			break;
+		}
+		if (ch == '\r') {
+			/* Special handling to convert both `\r' and `\r\n' into `\n' */
+			buf[n++] = '\n';
+			ch = fgetc_unlocked(stream);
+			if (ch == EOF) {
+				if (ferror_unlocked(stream))
+					return NULL;
+				break;
+			}
+			if (ch == '\r')
+				continue;
+		}
+		buf[n] = (char)ch;
+		if (ch == '\n')
+			break;
+	}
+	buf[n] = '\0';
+	return buf;
+}
 
 %[default_impl_section(.text.crt.FILE.unlocked.write.write)]
 @@Same as `fputs()', but performs I/O without acquiring a lock to `($FILE *)ARG'
-[cp_stdio][alias(fputs)][crtbuiltin]
+[cp_stdio][alias(fputs)][crtbuiltin][same_impl][requires($has_function(fwrite_unlocked))]
 fputs_unlocked:([nonnull] char const *__restrict str,
-                [nonnull] $FILE *__restrict stream) -> __STDC_INT_AS_SIZE_T;
+                [nonnull] $FILE *__restrict stream) -> __STDC_INT_AS_SIZE_T {
+	__STDC_INT_AS_SIZE_T result;
+	result = fwrite_unlocked(str,
+	                         sizeof(char),
+	                         strlen(str),
+	                         stream);
+	return result;
+}
 
 %
 %struct obstack;
@@ -1629,10 +1764,60 @@ setvbuf_unlocked:([nonnull] $FILE *__restrict stream, char *__restrict buf, int 
 ungetc_unlocked:(int ch, [nonnull] $FILE *__restrict stream) -> int = ungetc;
 
 [cp_stdio][ATTR_WUNUSED][user][section(.text.crt.FILE.unlocked.read.read)]
-getdelim_unlocked:([nonnull] char **__restrict lineptr, [nonnull] size_t *__restrict pcount, int delimiter, [nonnull] $FILE *__restrict stream) -> $ssize_t = getdelim;
+[requires($has_function(realloc) && $has_function(fgetc_unlocked) && $has_function(ungetc_unlocked))]
+[alias(getdelim)][doc_alias(getdelim)][same_impl]
+getdelim_unlocked:([nonnull] char **__restrict lineptr,
+                   [nonnull] size_t *__restrict pcount, int delimiter,
+                   [nonnull] $FILE *__restrict stream) -> $ssize_t {
+	int ch;
+	char *buffer;
+	size_t bufsize, result = 0;
+	buffer  = *lineptr;
+	bufsize = buffer ? *pcount : 0;
+	for (;;) {
+		if (result + 1 >= bufsize) {
+			/* Allocate more memory. */
+			size_t new_bufsize = bufsize * 2;
+			if (new_bufsize <= result + 1)
+				new_bufsize = 16;
+			assert(new_bufsize > result + 1);
+			buffer = (char *)realloc(buffer,
+			                         new_bufsize *
+			                         sizeof(char));
+			if unlikely(!buffer)
+				return -1;
+			*lineptr = buffer;
+			*pcount  = bufsize;
+		}
+		ch = fgetc_unlocked(stream);
+		if (ch == EOF)
+			break; /* EOF */
+		buffer[result++] = (char)ch;
+		if (ch == delimiter)
+			break; /* Delimiter reached */
+		/* Special case for line-delimiter. */
+		if (delimiter == '\n' && ch == '\r') {
+			/* Deal with '\r\n', as well as '\r' */
+			ch = fgetc_unlocked(stream);
+			if (ch != EOF && ch != '\n')
+				ungetc_unlocked(ch, stream);
+			/* Unify linefeeds (to use POSIX notation) */
+			buffer[result - 1] = '\n';
+			break;
+		}
+	}
+	/* NUL-Terminate the buffer. */
+	buffer[result] = '\0';
+	return result;
+}
 
 [cp_stdio][ATTR_WUNUSED][user][section(.text.crt.FILE.unlocked.read.read)]
-getline_unlocked:([nonnull] char **__restrict lineptr, [nonnull] size_t *__restrict pcount, [nonnull] $FILE *__restrict stream) -> $ssize_t = getline;
+[requires($has_function(getdelim_unlocked))][alias(getline)][same_impl]
+getline_unlocked:([nonnull] char **__restrict lineptr,
+                  [nonnull] size_t *__restrict pcount,
+                  [nonnull] $FILE *__restrict stream) -> $ssize_t {
+	return getdelim_unlocked(lineptr, pcount, '\n', stream);
+}
 
 [stdio_throws][user][section(.text.crt.FILE.unlocked.seek.utility)]
 rewind_unlocked:([nonnull] $FILE *__restrict stream) = rewind;
@@ -1644,7 +1829,20 @@ fisatty:([nonnull] $FILE *__restrict stream) -> int {
 }
 
 [cp_stdio][user][crtbuiltin][section(.text.crt.FILE.unlocked.write.write)]
-puts_unlocked:([nonnull] char const *__restrict str) -> __STDC_INT_AS_SSIZE_T = puts;
+[same_impl][alias(puts)][dependency_include(<local/stdstreams.h>)]
+[requires(!defined(__NO_STDSTREAMS) && $has_function(fputs_unlocked))]
+puts_unlocked:([nonnull] char const *__restrict str) -> __STDC_INT_AS_SSIZE_T {
+	__STDC_INT_AS_SSIZE_T result, temp;
+	result = fputs_unlocked(str, stdout);
+	if (result >= 0) {
+		temp = fputc_unlocked('\n', stdout);
+		if (temp <= 0)
+			result = temp;
+		else
+			result += temp;
+	}
+	return result;
+}
 
 %
 %#ifdef __USE_LARGEFILE64
@@ -1669,8 +1867,13 @@ fsetpos64_unlocked:([nonnull] $FILE *__restrict stream, [nonnull] fpos64_t const
 
 
 %[default_impl_section(.text.crt.FILE.unlocked.write.printf)]
-[cp_stdio][ATTR_LIBC_PRINTF(2, 0)][alias(vfprintf_s)][user]
-vfprintf_unlocked:([nonnull] $FILE *__restrict stream, [nonnull] char const *__restrict format, $va_list args) -> __STDC_INT_AS_SSIZE_T = vfprintf;
+[cp_stdio][ATTR_LIBC_PRINTF(2, 0)][same_impl]
+[alias(vfprintf, vfprintf_s)][user][requires($has_function(file_printer_unlocked))]
+vfprintf_unlocked:([nonnull] $FILE *__restrict stream,
+                   [nonnull] char const *__restrict format,
+                   $va_list args) -> __STDC_INT_AS_SSIZE_T {
+	return (__STDC_INT_AS_SSIZE_T)format_vprintf(&file_printer_unlocked, stream, format, args);
+}
 
 [cp_stdio][ATTR_LIBC_PRINTF(2, 3)][alias(fprintf_s)][user][crtbuiltin]
 fprintf_unlocked:([nonnull] $FILE *__restrict stream, [nonnull] char const *__restrict format, ...) -> __STDC_INT_AS_SSIZE_T = fprintf;
@@ -2294,8 +2497,8 @@ gets_s:([outp(min(strlen(return),bufsize))] char *__restrict buf, rsize_t bufsiz
 %
 %#ifndef _CRT_WPERROR_DEFINED
 %#define _CRT_WPERROR_DEFINED 1
-%[default_impl_section(.text.crt.dos.errno)]
-[cp_stdio][wchar][ATTR_COLD] _wperror:($wchar_t const *__restrict errmsg);
+%[default_impl_section(.text.crt.dos.errno.utility)]
+[cp_stdio][wchar][ATTR_COLD] _wperror:($wchar_t const *__restrict message);
 %#endif /* !_CRT_WPERROR_DEFINED */
 %
 %#endif /* _STDIO_DEFINED */

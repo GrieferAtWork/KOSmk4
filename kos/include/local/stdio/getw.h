@@ -1,4 +1,4 @@
-/* HASH 0x16b0cc48 */
+/* HASH 0xb10968f6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -78,7 +78,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Similar to `getc()', but read 2 bytes */
 __LOCAL_LIBC(getw) __ATTR_NONNULL((1)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(getw))(__FILE *__restrict __stream) __THROWS(...) {
-#line 1254 "kos/src/libc/magic/stdio.c"
+#line 1347 "kos/src/libc/magic/stdio.c"
 	char __bytes[2]; int __ch;
 	__ch = __localdep_fgetc(__self);
 	if __unlikely(__ch == __EOF)

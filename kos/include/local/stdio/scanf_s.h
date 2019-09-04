@@ -1,4 +1,4 @@
-/* HASH 0xdb2dc13f */
+/* HASH 0x11886d2e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(scanf_s) __ATTR_LIBC_PRINTF(1, 2) __ATTR_NONNULL((1)) __STDC_INT_AS_SIZE_T
 (__VLIBCCALL __LIBC_LOCAL_NAME(scanf_s))(char const *__restrict __format,
                                          ...) __THROWS(...) {
-#line 2286 "kos/src/libc/magic/stdio.c"
+#line 2489 "kos/src/libc/magic/stdio.c"
 	__STDC_INT_AS_SIZE_T __result;
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __format);

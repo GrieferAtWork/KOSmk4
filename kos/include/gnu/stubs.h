@@ -1,4 +1,4 @@
-/* HASH 0x1d2220e0 */
+/* HASH 0xe52da9e7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,7 +64,6 @@
 #define __stub__dupenv_s 1
 #define __stub__endthread 1
 #define __stub__endthreadex 1
-#define __stub__filbuf 1
 #define __stub__findclose 1
 #define __stub__findfirst32 1
 #define __stub__findfirst32i64 1
@@ -72,7 +71,6 @@
 #define __stub__findnext32 1
 #define __stub__findnext32i64 1
 #define __stub__findnext64 1
-#define __stub__flsbuf 1
 #define __stub__fpclass 1
 #define __stub__ftime32_s 1
 #define __stub__ftime64_s 1
@@ -176,22 +174,16 @@
 #define __stub_exp2 1
 #define __stub_expm1 1
 #define __stub_fattach 1
-#define __stub_fcloseall 1
 #define __stub_fdetach 1
-#define __stub_fdreopen 1
-#define __stub_fdreopen_unlocked 1
 #define __stub_fgetgrent 1
 #define __stub_fgetgrent_r 1
 #define __stub_fgetpwent 1
 #define __stub_fgetpwent_r 1
-#define __stub_fgets 1
-#define __stub_fgets_unlocked 1
 #define __stub_fgetspent 1
 #define __stub_fgetspent_r 1
 #define __stub_fgetwc 1
 #define __stub_fgetws 1
 #define __stub_fgetws_unlocked 1
-#define __stub_flushall_unlocked 1
 #define __stub_fmemopen 1
 #define __stub_fmod 1
 #define __stub_fopencookie 1
@@ -204,9 +196,6 @@
 #define __stub_freeaddrinfo 1
 #define __stub_freeifaddrs 1
 #define __stub_freelocale 1
-#define __stub_freopen 1
-#define __stub_freopen64_unlocked 1
-#define __stub_freopen_unlocked 1
 #define __stub_frexp 1
 #define __stub_ftime 1
 #define __stub_ftime64 1
@@ -225,8 +214,6 @@
 #define __stub_getcontext 1
 #define __stub_getdate 1
 #define __stub_getdate_r 1
-#define __stub_getdelim 1
-#define __stub_getdelim_unlocked 1
 #define __stub_getenv 1
 #define __stub_getenv_s 1
 #define __stub_getgrent 1
@@ -247,8 +234,6 @@
 #define __stub_gethostid 1
 #define __stub_getifaddrs 1
 #define __stub_getipv4sourcefilter 1
-#define __stub_getline 1
-#define __stub_getline_unlocked 1
 #define __stub_getloadavg 1
 #define __stub_getlogin 1
 #define __stub_getlogin_r 1

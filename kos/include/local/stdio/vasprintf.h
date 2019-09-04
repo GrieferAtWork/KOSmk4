@@ -1,4 +1,4 @@
-/* HASH 0xa64a24ee */
+/* HASH 0xc5628d69 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -202,7 +202,7 @@ __LOCAL_LIBC(vasprintf) __ATTR_LIBC_PRINTF(2, 3) __ATTR_WUNUSED __ATTR_NONNULL((
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(vasprintf))(char **__restrict __pstr,
                                                        char const *__restrict __format,
                                                        __builtin_va_list __args) {
-#line 1537 "kos/src/libc/magic/stdio.c"
+#line 1672 "kos/src/libc/magic/stdio.c"
 	char *__result;
 	__SSIZE_TYPE__ __error;
 	struct format_aprintf_data __data;

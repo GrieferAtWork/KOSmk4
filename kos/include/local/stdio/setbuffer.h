@@ -1,4 +1,4 @@
-/* HASH 0x70c8acbb */
+/* HASH 0xc589cedb */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,8 +38,11 @@ __LOCAL_LIBC(setbuffer) __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(setbuffer))(__FILE *__restrict __stream,
                                                        char *__buf,
                                                        __SIZE_TYPE__ __bufsize) {
-#line 1020 "kos/src/libc/magic/stdio.c"
-	__localdep_setvbuf(__stream, __buf, __buf ? ___IOFBF : ___IONBF, __buf ? __bufsize : (__SIZE_TYPE__)0);
+#line 1062 "kos/src/libc/magic/stdio.c"
+	__localdep_setvbuf(__stream,
+	        __buf,
+	        __buf ? ___IOFBF : ___IONBF,
+	        __buf ? __bufsize : (__SIZE_TYPE__)0);
 }
 __NAMESPACE_LOCAL_END
 #endif /* defined(__CRT_HAVE_setvbuf) */

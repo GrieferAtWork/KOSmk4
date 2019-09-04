@@ -1,4 +1,4 @@
-/* HASH 0xd39043ca */
+/* HASH 0xd100da16 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -444,6 +444,7 @@
 #define __CRT_HAVE___gamma 1
 #define __CRT_HAVE___gammaf 1
 #define __CRT_HAVE___gammal 1
+#define __CRT_HAVE___getdelim 1
 #define __CRT_HAVE___h_errno_location 1
 #define __CRT_HAVE___hypot 1
 #define __CRT_HAVE___hypotf 1

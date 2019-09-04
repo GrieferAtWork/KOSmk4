@@ -1,4 +1,4 @@
-/* HASH 0x415c7af5 */
+/* HASH 0xd5005b33 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,7 +64,6 @@
 #define __CRT_STUB__dupenv_s 1
 #define __CRT_STUB__endthread 1
 #define __CRT_STUB__endthreadex 1
-#define __CRT_STUB__filbuf 1
 #define __CRT_STUB__findclose 1
 #define __CRT_STUB__findfirst32 1
 #define __CRT_STUB__findfirst32i64 1
@@ -72,7 +71,6 @@
 #define __CRT_STUB__findnext32 1
 #define __CRT_STUB__findnext32i64 1
 #define __CRT_STUB__findnext64 1
-#define __CRT_STUB__flsbuf 1
 #define __CRT_STUB__fpclass 1
 #define __CRT_STUB__ftime32_s 1
 #define __CRT_STUB__ftime64_s 1
@@ -176,22 +174,16 @@
 #define __CRT_STUB_exp2 1
 #define __CRT_STUB_expm1 1
 #define __CRT_STUB_fattach 1
-#define __CRT_STUB_fcloseall 1
 #define __CRT_STUB_fdetach 1
-#define __CRT_STUB_fdreopen 1
-#define __CRT_STUB_fdreopen_unlocked 1
 #define __CRT_STUB_fgetgrent 1
 #define __CRT_STUB_fgetgrent_r 1
 #define __CRT_STUB_fgetpwent 1
 #define __CRT_STUB_fgetpwent_r 1
-#define __CRT_STUB_fgets 1
-#define __CRT_STUB_fgets_unlocked 1
 #define __CRT_STUB_fgetspent 1
 #define __CRT_STUB_fgetspent_r 1
 #define __CRT_STUB_fgetwc 1
 #define __CRT_STUB_fgetws 1
 #define __CRT_STUB_fgetws_unlocked 1
-#define __CRT_STUB_flushall_unlocked 1
 #define __CRT_STUB_fmemopen 1
 #define __CRT_STUB_fmod 1
 #define __CRT_STUB_fopencookie 1
@@ -204,9 +196,6 @@
 #define __CRT_STUB_freeaddrinfo 1
 #define __CRT_STUB_freeifaddrs 1
 #define __CRT_STUB_freelocale 1
-#define __CRT_STUB_freopen 1
-#define __CRT_STUB_freopen64_unlocked 1
-#define __CRT_STUB_freopen_unlocked 1
 #define __CRT_STUB_frexp 1
 #define __CRT_STUB_ftime 1
 #define __CRT_STUB_ftime64 1
@@ -225,8 +214,6 @@
 #define __CRT_STUB_getcontext 1
 #define __CRT_STUB_getdate 1
 #define __CRT_STUB_getdate_r 1
-#define __CRT_STUB_getdelim 1
-#define __CRT_STUB_getdelim_unlocked 1
 #define __CRT_STUB_getenv 1
 #define __CRT_STUB_getenv_s 1
 #define __CRT_STUB_getgrent 1
@@ -247,8 +234,6 @@
 #define __CRT_STUB_gethostid 1
 #define __CRT_STUB_getifaddrs 1
 #define __CRT_STUB_getipv4sourcefilter 1
-#define __CRT_STUB_getline 1
-#define __CRT_STUB_getline_unlocked 1
 #define __CRT_STUB_getloadavg 1
 #define __CRT_STUB_getlogin 1
 #define __CRT_STUB_getlogin_r 1

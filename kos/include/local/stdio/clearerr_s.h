@@ -1,4 +1,4 @@
-/* HASH 0xf899740f */
+/* HASH 0x760494f1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__localdep_clearerr,(__FILE *
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(clearerr_s) __ATTR_NONNULL((1)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(clearerr_s))(__FILE *__restrict __stream) {
-#line 2235 "kos/src/libc/magic/stdio.c"
+#line 2438 "kos/src/libc/magic/stdio.c"
 	if (!__stream)
 		return __EINVAL;
 	__localdep_clearerr(__stream);

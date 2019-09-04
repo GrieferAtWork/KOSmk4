@@ -1,4 +1,4 @@
-/* HASH 0x35472f3e */
+/* HASH 0xb3d7789a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,7 +64,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(vscanf) __ATTR_LIBC_SCANF(1, 0) __ATTR_WUNUSED __ATTR_NONNULL((1)) __STDC_INT_AS_SIZE_T
 (__LIBCCALL __LIBC_LOCAL_NAME(vscanf))(char const *__restrict __format,
                                        __builtin_va_list __args) __THROWS(...) {
-#line 804 "kos/src/libc/magic/stdio.c"
+#line 846 "kos/src/libc/magic/stdio.c"
 	return __localdep_vfscanf(__stdin, __format, __args);
 }
 __NAMESPACE_LOCAL_END

@@ -1,4 +1,4 @@
-/* HASH 0x81b530da */
+/* HASH 0xa5f0c52 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,11 +54,9 @@ INTDEF int (LIBCCALL libc_getchar)(void) __THROWS(...);
 INTDEF NONNULL((2)) int (LIBCCALL libc_fputc)(int ch, FILE *__restrict stream) __THROWS(...);
 /* Alias for `fputc(CH, stdout)' */
 INTDEF int (LIBCCALL libc_putchar)(int ch) __THROWS(...);
-/* Read up to `BUFSIZE - 1' bytes of data from `STREAM', storing them into `BUF'
- * stopped when the buffer is full or a line-feed was read (in this case, the
- * line-feed is also written to `BUF')
- * Afterwards, append a trailing NUL-character and re-return `BUF', or return
- * `NULL' if an error occurred. */
+/* Read up to `BUFSIZE - 1' bytes of data from `STREAM', storing them into `BUF' stopped when
+ * the buffer is full or a line-feed was read (in this case, the line-feed is also written to `BUF')
+ * Afterwards, append a trailing NUL-character and re-return `BUF', or return `NULL' if an error occurred. */
 INTDEF WUNUSED NONNULL((1, 3)) char *(LIBCCALL libc_fgets)(char *__restrict buf, __STDC_INT_AS_SIZE_T bufsize, FILE *__restrict stream) __THROWS(...);
 /* Print a given string `STR' to `STREAM'. This is identical to:
  * >> fwrite(str, sizeof(char), strlen(str), stream); */
@@ -250,7 +248,6 @@ INTDEF WUNUSED NONNULL((1, 2, 3)) ssize_t (LIBCCALL libc_getline_unlocked)(char 
 /* Rewind the current in-file position of `STREAM' to its starting position */
 INTDEF NONNULL((1)) void (LIBCCALL libc_rewind_unlocked)(FILE *__restrict stream) __THROWS(...);
 INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_fisatty)(FILE *__restrict stream);
-/* Print a given string `STR', followed by a line-feed to `STDOUT' */
 INTDEF NONNULL((1)) __STDC_INT_AS_SSIZE_T (LIBCCALL libc_puts_unlocked)(char const *__restrict str) __THROWS(...);
 /* 64-bit variant of `fseeko' */
 INTDEF NONNULL((1)) int (LIBCCALL libc_fseeko64_unlocked)(FILE *__restrict stream, off64_t off, int whence) __THROWS(...);
@@ -260,8 +257,6 @@ INTDEF WUNUSED NONNULL((1)) off64_t (LIBCCALL libc_ftello64_unlocked)(FILE *__re
 INTDEF NONNULL((1, 2)) int (LIBCCALL libc_fgetpos64_unlocked)(FILE *__restrict stream, fpos64_t *__restrict pos) __THROWS(...);
 /* 64-bit variant of `fsetpos' */
 INTDEF NONNULL((1, 2)) int (LIBCCALL libc_fsetpos64_unlocked)(FILE *__restrict stream, fpos64_t const *__restrict pos) __THROWS(...);
-/* Print data to `STREAM', following `FORMAT'
- * Return the number of successfully printed bytes */
 INTDEF ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (LIBCCALL libc_vfprintf_unlocked)(FILE *__restrict stream, char const *__restrict format, va_list args) __THROWS(...);
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */
@@ -326,8 +321,8 @@ INTDEF ATTR_LIBC_PRINTF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T (LIBCCALL libc_v
 INTDEF ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBCCALL libc_sscanf_s)(char const *__restrict input, char const *__restrict format, ...);
 INTDEF ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_vsscanf_s)(char const *__restrict input, char const *__restrict format, va_list args);
 INTDEF ATTR_LIBC_PRINTF(4, 0) NONNULL((4)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc_vsnprintf_s)(char *__restrict buf, size_t bufsize, size_t buflen, char const *__restrict format, va_list args);
-INTDEF ATTR_COLD void (LIBCCALL libc__wperror)(char32_t const *__restrict errmsg) __THROWS(...);
-INTDEF ATTR_COLD void (LIBDCALL libd__wperror)(char16_t const *__restrict errmsg) __THROWS(...);
+INTDEF ATTR_COLD void (LIBCCALL libc__wperror)(char32_t const *__restrict message) __THROWS(...);
+INTDEF ATTR_COLD void (LIBDCALL libd__wperror)(char16_t const *__restrict message) __THROWS(...);
 INTDEF WUNUSED NONNULL((1, 5)) size_t (LIBCCALL libc__fread_nolock_s)(void *__restrict buf, size_t bufsize, size_t elemsize, size_t elemcount, FILE *__restrict stream) __THROWS(...);
 
 DECL_END

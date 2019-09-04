@@ -1,4 +1,4 @@
-/* HASH 0x37ad19ff */
+/* HASH 0x2c4d3546 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(_sprintf_s_l))(char *__restrict __bu
                                                            char const *__restrict __format,
                                                            __locale_t __locale,
                                                            ...) {
-#line 2005 "kos/src/libc/magic/stdio.c"
+#line 2208 "kos/src/libc/magic/stdio.c"
 	__STDC_INT_AS_SIZE_T __result;
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __locale);

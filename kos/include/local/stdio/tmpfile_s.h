@@ -1,4 +1,4 @@
-/* HASH 0x9ac2a896 */
+/* HASH 0x89786eea */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ __CREDIRECT(__ATTR_WUNUSED,__FILE *,__NOTHROW_RPC,__localdep_tmpfile,(void),tmpf
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(tmpfile_s) __ATTR_NONNULL((1)) __errno_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(tmpfile_s))(__FILE **__pstream) {
-#line 2245 "kos/src/libc/magic/stdio.c"
+#line 2448 "kos/src/libc/magic/stdio.c"
 	if (!__pstream)
 		return __EINVAL;
 	*__pstream = __localdep_tmpfile();

@@ -1,4 +1,4 @@
-/* HASH 0xa0d6e0ad */
+/* HASH 0xfc4222a2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,11 @@
  */
 #ifndef __local_puts_defined
 #include <__crt.h>
-#if !defined(__NO_STDSTREAMS) && ((__has_builtin(__builtin_fputs) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fputs)) || defined(__CRT_HAVE_fputs) || defined(__CRT_HAVE_fputs_unlocked))
+#if !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)|| defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked))) || (__has_builtin(__builtin_fputs) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fputs)) || defined(__CRT_HAVE_fputs) || defined(__CRT_HAVE_fputs_unlocked))
 #define __local_puts_defined 1
 #include <kos/anno.h>
 #include <local/stdstreams.h>
-/* Dependency: "fputs" */
+/* Dependency: "fputs" from "stdio" */
 #ifndef ____localdep_fputs_defined
 #define ____localdep_fputs_defined 1
 #if __has_builtin(__builtin_fputs) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fputs)
@@ -42,7 +42,12 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,,__localdep_fputs,(char
 /* Print a given string `STR' to `STREAM'. This is identical to:
  * >> fwrite(str, sizeof(char), strlen(str), stream); */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,,__localdep_fputs,(char const *__restrict __str, __FILE *__restrict __stream),fputs_unlocked,(__str,__stream)) __THROWS(...)
-#else /* LIBC: fputs */
+#elif defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)|| defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked)))
+#include <local/stdio/fputs.h>
+/* Print a given string `STR' to `STREAM'. This is identical to:
+ * >> fwrite(str, sizeof(char), strlen(str), stream); */
+#define __localdep_fputs (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fputs))
+#else /* CUSTOM: fputs */
 #undef ____localdep_fputs_defined
 #endif /* fputs... */
 #endif /* !____localdep_fputs_defined */
@@ -81,7 +86,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Print a given string `STR', followed by a line-feed to `STDOUT' */
 __LOCAL_LIBC(puts) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T
 (__LIBCCALL __LIBC_LOCAL_NAME(puts))(char const *__restrict __str) __THROWS(...) {
-#line 494 "kos/src/libc/magic/stdio.c"
+#line 537 "kos/src/libc/magic/stdio.c"
 	__STDC_INT_AS_SSIZE_T __result, __temp;
 	__result = __localdep_fputs(__str, __stdout);
 	if (__result >= 0) {
@@ -94,5 +99,5 @@ __LOCAL_LIBC(puts) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* !defined(__NO_STDSTREAMS) && ((__has_builtin(__builtin_fputs) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fputs)) || defined(__CRT_HAVE_fputs) || defined(__CRT_HAVE_fputs_unlocked)) */
+#endif /* !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)|| defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked))) || (__has_builtin(__builtin_fputs) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fputs)) || defined(__CRT_HAVE_fputs) || defined(__CRT_HAVE_fputs_unlocked)) */
 #endif /* !__local_puts_defined */

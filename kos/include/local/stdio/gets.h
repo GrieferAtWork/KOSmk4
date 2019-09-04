@@ -1,4 +1,4 @@
-/* HASH 0x1f952c47 */
+/* HASH 0xa8bb5ae3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,37 +19,37 @@
  */
 #ifndef __local_gets_defined
 #include <__crt.h>
-#if !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fgets) || defined(__CRT_HAVE_fgets_unlocked))
+#if !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fread) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock))) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE_ferror_unlocked)) || defined(__CRT_HAVE_fgets) || defined(__CRT_HAVE_fgets_unlocked))
 #define __local_gets_defined 1
 #include <kos/anno.h>
 #include <local/stdstreams.h>
 
 #include <hybrid/typecore.h>
-/* Dependency: "fgets" */
+/* Dependency: "fgets" from "stdio" */
 #ifndef ____localdep_fgets_defined
 #define ____localdep_fgets_defined 1
 #if defined(__CRT_HAVE_fgets_unlocked) && (defined(__USE_STDIO_UNLOCKED))
-/* Read up to `BUFSIZE - 1' bytes of data from `STREAM', storing them into `BUF'
- * stopped when the buffer is full or a line-feed was read (in this case, the
- * line-feed is also written to `BUF')
- * Afterwards, append a trailing NUL-character and re-return `BUF', or return
- * `NULL' if an error occurred. */
+/* Read up to `BUFSIZE - 1' bytes of data from `STREAM', storing them into `BUF' stopped when
+ * the buffer is full or a line-feed was read (in this case, the line-feed is also written to `BUF')
+ * Afterwards, append a trailing NUL-character and re-return `BUF', or return `NULL' if an error occurred. */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char *,,__localdep_fgets,(char *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgets_unlocked,(__buf,__bufsize,__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE_fgets)
-/* Read up to `BUFSIZE - 1' bytes of data from `STREAM', storing them into `BUF'
- * stopped when the buffer is full or a line-feed was read (in this case, the
- * line-feed is also written to `BUF')
- * Afterwards, append a trailing NUL-character and re-return `BUF', or return
- * `NULL' if an error occurred. */
+/* Read up to `BUFSIZE - 1' bytes of data from `STREAM', storing them into `BUF' stopped when
+ * the buffer is full or a line-feed was read (in this case, the line-feed is also written to `BUF')
+ * Afterwards, append a trailing NUL-character and re-return `BUF', or return `NULL' if an error occurred. */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char *,,__localdep_fgets,(char *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgets,(__buf,__bufsize,__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE_fgets_unlocked)
-/* Read up to `BUFSIZE - 1' bytes of data from `STREAM', storing them into `BUF'
- * stopped when the buffer is full or a line-feed was read (in this case, the
- * line-feed is also written to `BUF')
- * Afterwards, append a trailing NUL-character and re-return `BUF', or return
- * `NULL' if an error occurred. */
+/* Read up to `BUFSIZE - 1' bytes of data from `STREAM', storing them into `BUF' stopped when
+ * the buffer is full or a line-feed was read (in this case, the line-feed is also written to `BUF')
+ * Afterwards, append a trailing NUL-character and re-return `BUF', or return `NULL' if an error occurred. */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char *,,__localdep_fgets,(char *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgets_unlocked,(__buf,__bufsize,__stream)) __THROWS(...)
-#else /* LIBC: fgets */
+#elif defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fread) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock))) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE_ferror_unlocked))
+#include <local/stdio/fgets.h>
+/* Read up to `BUFSIZE - 1' bytes of data from `STREAM', storing them into `BUF' stopped when
+ * the buffer is full or a line-feed was read (in this case, the line-feed is also written to `BUF')
+ * Afterwards, append a trailing NUL-character and re-return `BUF', or return `NULL' if an error occurred. */
+#define __localdep_fgets (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fgets))
+#else /* CUSTOM: fgets */
 #undef ____localdep_fgets_defined
 #endif /* fgets... */
 #endif /* !____localdep_fgets_defined */
@@ -57,9 +57,9 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char *,,__localdep_fgets,(char
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(gets) __ATTR_WUNUSED __ATTR_DEPRECATED("No buffer size checks (use `fgets' instead)") __ATTR_NONNULL((1)) char *
 (__LIBCCALL __LIBC_LOCAL_NAME(gets))(char *__restrict __buf) __THROWS(...) {
-#line 842 "kos/src/libc/magic/stdio.c"
+#line 884 "kos/src/libc/magic/stdio.c"
 	return __localdep_fgets(__buf, __INT_MAX__, __LOCAL_stdin);
 }
 __NAMESPACE_LOCAL_END
-#endif /* !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fgets) || defined(__CRT_HAVE_fgets_unlocked)) */
+#endif /* !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fread) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock))) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE_ferror_unlocked)) || defined(__CRT_HAVE_fgets) || defined(__CRT_HAVE_fgets_unlocked)) */
 #endif /* !__local_gets_defined */

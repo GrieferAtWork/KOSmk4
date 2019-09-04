@@ -1,4 +1,4 @@
-/* HASH 0xe4596e20 */
+/* HASH 0x3c68ed76 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -63,7 +63,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,__localdep_f
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fisatty) __ATTR_WUNUSED __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fisatty))(__FILE *__restrict __stream) {
-#line 1643 "kos/src/libc/magic/stdio.c"
+#line 1828 "kos/src/libc/magic/stdio.c"
 	return __localdep_isatty(__localdep_fileno(__stream));
 }
 __NAMESPACE_LOCAL_END
