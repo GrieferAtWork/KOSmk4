@@ -50,65 +50,65 @@ __DECL_BEGIN
 
 /* From: https://elixir.bootlin.com/linux/latest/source/arch/x86/include/uapi/asm/stat.h#L117 */
 struct linux_oldstat {
-    __uint16_t st_dev;
-    __uint16_t st_ino;
-    __uint16_t st_mode;
-    __uint16_t st_nlink;
-    __uint16_t st_uid;
-    __uint16_t st_gid;
-    __uint16_t st_rdev;
-    __uint16_t __pad;    /* Hidden padding made visible */
-    __uint32_t st_size;
-    __uint32_t st_atime;
-    __uint32_t st_mtime;
-    __uint32_t st_ctime;
+	__uint16_t st_dev;
+	__uint16_t st_ino;
+	__uint16_t st_mode;
+	__uint16_t st_nlink;
+	__uint16_t st_uid;
+	__uint16_t st_gid;
+	__uint16_t st_rdev;
+	__uint16_t __pad;    /* Hidden padding made visible */
+	__uint32_t st_size;
+	__uint32_t st_atime;
+	__uint32_t st_mtime;
+	__uint32_t st_ctime;
 };
 
 /* From: https://elixir.bootlin.com/linux/latest/source/arch/x86/include/uapi/asm/stat.h#L10 */
 struct linux_stat32 {
-    __uint32_t st_dev;
-    __uint32_t st_ino;
-    __uint16_t st_mode;
-    __uint16_t st_nlink;
-    __uint16_t st_uid;
-    __uint16_t st_gid;
-    __uint32_t st_rdev;
-    __uint32_t st_size;
-    __uint32_t st_blksize;
-    __uint32_t st_blocks;
-    __uint32_t st_atime;
-    __uint32_t st_atime_nsec;
-    __uint32_t st_mtime;
-    __uint32_t st_mtime_nsec;
-    __uint32_t st_ctime;
-    __uint32_t st_ctime_nsec;
-    __uint32_t __unused4;
-    __uint32_t __unused5;
+	__uint32_t st_dev;
+	__uint32_t st_ino;
+	__uint16_t st_mode;
+	__uint16_t st_nlink;
+	__uint16_t st_uid;
+	__uint16_t st_gid;
+	__uint32_t st_rdev;
+	__uint32_t st_size;
+	__uint32_t st_blksize;
+	__uint32_t st_blocks;
+	__uint32_t st_atime;
+	__uint32_t st_atime_nsec;
+	__uint32_t st_mtime;
+	__uint32_t st_mtime_nsec;
+	__uint32_t st_ctime;
+	__uint32_t st_ctime_nsec;
+	__uint32_t __unused4;
+	__uint32_t __unused5;
 };
 
 /* From: https://elixir.bootlin.com/linux/latest/source/arch/x86/include/uapi/asm/stat.h#L42 */
 struct linux_stat64 {
-    __uint64_t st_dev;
-    __uint8_t  __pad0[4];
-    __uint32_t __st_ino;
-    __uint32_t st_mode;
-    __uint32_t st_nlink;
-    __uint32_t st_uid;
-    __uint32_t st_gid;
-    __uint64_t st_rdev;
-    __uint8_t  __pad3[4];
-    __uint8_t  __pad4[4]; /* Hidden padding made visible */
-    __int64_t  st_size;
-    __uint32_t st_blksize;
-    __uint8_t  __pad5[4]; /* Hidden padding made visible */
-    __uint64_t st_blocks;
-    __uint32_t st_atime;
-    __uint32_t st_atime_nsec;
-    __uint32_t st_mtime;
-    __uint32_t st_mtime_nsec;
-    __uint32_t st_ctime;
-    __uint32_t st_ctime_nsec;
-    __uint64_t st_ino;
+	__uint64_t st_dev;
+	__uint8_t  __pad0[4];
+	__uint32_t __st_ino;
+	__uint32_t st_mode;
+	__uint32_t st_nlink;
+	__uint32_t st_uid;
+	__uint32_t st_gid;
+	__uint64_t st_rdev;
+	__uint8_t  __pad3[4];
+	__uint8_t  __pad4[4]; /* Hidden padding made visible */
+	__int64_t  st_size;
+	__uint32_t st_blksize;
+	__uint8_t  __pad5[4]; /* Hidden padding made visible */
+	__uint64_t st_blocks;
+	__uint32_t st_atime;
+	__uint32_t st_atime_nsec;
+	__uint32_t st_mtime;
+	__uint32_t st_mtime_nsec;
+	__uint32_t st_ctime;
+	__uint32_t st_ctime_nsec;
+	__uint64_t st_ino;
 };
 
 

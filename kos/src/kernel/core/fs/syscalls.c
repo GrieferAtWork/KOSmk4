@@ -44,18 +44,20 @@
 #include <hybrid/minmax.h>
 
 #include <kos/compat/linux-stat.h>
+#include <kos/debugtrap.h>
 #include <kos/kernel/handle.h>
 #include <sys/mount.h>
 #include <sys/statfs.h>
 
-#include <errno.h>
-#include <kos/debugtrap.h>
-#include <fcntl.h>
-#include <signal.h>
-#include <format-printer.h>
 #include <assert.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <format-printer.h>
+#include <signal.h>
 #include <stddef.h>
 #include <string.h>
+
+#include <librpc/rpc.h>
 
 
 DECL_BEGIN
@@ -739,8 +741,7 @@ have_paths:
 			decref(linknode);
 			RETHROW();
 		}
-	}
-	EXCEPT {
+	} EXCEPT {
 		decref(root);
 		decref(newpath_cwd);
 		RETHROW();
@@ -2272,8 +2273,7 @@ DEFINE_SYSCALL2(errno_t, linux_oldfstat, fd_t, fd,
 	hnd = handle_lookup((unsigned int)fd);
 	TRY {
 		handle_stat(hnd, &kbuf);
-	}
-	EXCEPT {
+	} EXCEPT {
 		decref(hnd);
 		RETHROW();
 	}
@@ -2401,8 +2401,7 @@ DEFINE_SYSCALL2(errno_t, linux_fstat32, fd_t, fd,
 	hnd = handle_lookup((unsigned int)fd);
 	TRY {
 		handle_stat(hnd, &kbuf);
-	}
-	EXCEPT {
+	} EXCEPT {
 		decref(hnd);
 		RETHROW();
 	}
@@ -2494,8 +2493,7 @@ DEFINE_SYSCALL2(errno_t, linux_fstat64, fd_t, fd,
 	hnd = handle_lookup((unsigned int)fd);
 	TRY {
 		handle_stat(hnd, &kbuf);
-	}
-	EXCEPT {
+	} EXCEPT {
 		decref(hnd);
 		RETHROW();
 	}
@@ -2615,7 +2613,7 @@ DEFINE_SYSCALL5(ssize_t, freadlinkat,
 	link_node = (REF struct symlink_node *)path_traversefull_at(f,
 	                                                            (unsigned int)dirfd,
 	                                                            filename,
-	                                                            false,
+	                                                            false, /* follow_final_link */
 	                                                            fs_getmode_for(f, flags),
 	                                                            NULL,
 	                                                            NULL,
@@ -2953,44 +2951,19 @@ kernel_execveat(struct icpustate *__restrict state,
 }
 
 
-DEFINE_SYSCALL0(syscall_slong_t, getdrives) {
-	unsigned int i;
-	syscall_ulong_t mask, result = 0;
-	struct vfs *v = THIS_FS->f_vfs;
-	for (i = 0, mask = 1; i < VFS_DRIVECOUNT; ++i, mask <<= 1) {
-		if (ATOMIC_READ(v->v_drives[i]) != NULL)
-			result |= mask;
-	}
-	return result;
-}
-
-struct syscall_execvat_data {
-	fd_t sed_dirfd;
-	USER UNCHECKED char const *sed_filename;
-	USER UNCHECKED char const *USER UNCHECKED const *sed_argv;
-	USER UNCHECKED char const *USER UNCHECKED const *sed_envp;
-	atflag_t sed_flags;
-};
-
 PRIVATE struct icpustate *FCALL
-syscall_execvat_rpc(void *arg,
+syscall_execvat_rpc(void *UNUSED(arg),
                     struct icpustate *__restrict state,
                     unsigned int reason,
-                    struct rpc_syscall_info const *UNUSED(sc_info)) {
-	struct syscall_execvat_data data;
-	memcpy(&data, arg, sizeof(data));
-	kfree(arg);
-	assert(reason == TASK_RPC_REASON_ASYNCUSER ||
-	       reason == TASK_RPC_REASON_SYSCALL ||
-	       reason == TASK_RPC_REASON_SHUTDOWN);
-	if (reason != TASK_RPC_REASON_SHUTDOWN) {
+                    struct rpc_syscall_info const *sc_info) {
+	if (reason == TASK_RPC_REASON_SYSCALL) {
 		/* Actually service the exec() system call. */
 		state = kernel_execveat(state,
-		                        data.sed_dirfd,
-		                        data.sed_filename,
-		                        data.sed_argv,
-		                        data.sed_envp,
-		                        data.sed_flags);
+		                        (fd_t)sc_info->rsi_args[0],
+		                        (USER UNCHECKED char const *)sc_info->rsi_args[1],
+		                        (USER UNCHECKED char const *USER UNCHECKED const *)sc_info->rsi_args[2],
+		                        (USER UNCHECKED char const *USER UNCHECKED const *)sc_info->rsi_args[3],
+		                        (atflag_t)sc_info->rsi_args[4]);
 	}
 	return state;
 }
@@ -3001,32 +2974,19 @@ DEFINE_SYSCALL5(errno_t, execveat, fd_t, dirfd,
                 USER UNCHECKED char const *USER UNCHECKED const *, argv,
                 USER UNCHECKED char const *USER UNCHECKED const *, envp,
                 atflag_t, flags) {
-	struct syscall_execvat_data *args_packet;
-	/* TODO: Instead of passing argument packets, we could just make use of `sc_info' */
-
-	/* Copy the user-given arguments onto the heap, so we can pass them to the RPC */
-	args_packet = (struct syscall_execvat_data *)kmalloc(sizeof(struct syscall_execvat_data),
-	                                                     GFP_NORMAL);
-	args_packet->sed_dirfd    = dirfd;
-	args_packet->sed_filename = filename;
-	args_packet->sed_argv     = argv;
-	args_packet->sed_envp     = envp;
-	args_packet->sed_flags    = flags;
-	TRY {
-		/* Send an RPC to ourself, so we can gain access to the user-space register state. */
-		task_schedule_user_rpc(THIS_TASK,
-		                       &syscall_execvat_rpc,
-		                       args_packet,
-		                       TASK_RPC_FHIGHPRIO |
-		                       TASK_USER_RPC_FINTR,
-		                       NULL,
-		                       GFP_NORMAL);
-	} EXCEPT {
-		/* The argument packet is only inherited when `E_INTERRUPT_USER_RPC' was thrown! */
-		if (!was_thrown(E_INTERRUPT_USER_RPC))
-			kfree(args_packet);
-		RETHROW();
-	}
+	(void)dirfd;
+	(void)filename;
+	(void)argv;
+	(void)envp;
+	(void)flags;
+	/* Send an RPC to ourself, so we can gain access to the user-space register state. */
+	task_schedule_user_rpc(THIS_TASK,
+	                       &syscall_execvat_rpc,
+	                       NULL,
+	                       TASK_RPC_FHIGHPRIO |
+	                       TASK_USER_RPC_FINTR,
+	                       NULL,
+	                       GFP_NORMAL);
 	/* Shouldn't get here... */
 	return -EOK;
 }
@@ -3036,6 +2996,17 @@ DEFINE_SYSCALL3(errno_t, execve,
                 USER UNCHECKED char const *USER UNCHECKED const *, argv,
                 USER UNCHECKED char const *USER UNCHECKED const *, envp) {
 	return sys_execveat(AT_FDCWD, filename, argv, envp, 0);
+}
+
+DEFINE_SYSCALL0(syscall_slong_t, getdrives) {
+	unsigned int i;
+	syscall_ulong_t mask, result = 0;
+	struct vfs *v = THIS_FS->f_vfs;
+	for (i = 0, mask = 1; i < VFS_DRIVECOUNT; ++i, mask <<= 1) {
+		if (ATOMIC_READ(v->v_drives[i]) != NULL)
+			result |= mask;
+	}
+	return result;
 }
 
 LOCAL void KCALL

@@ -312,7 +312,7 @@ again_lock_vm:
 			/* TODO: `set_tid_address(child_tidptr)' (we're just not implementing that system call, yet...) */
 		}
 
-#if 1 /* XXX: Remove me (only here to force & verify use of IPI mechanisms in multi-core situations)
+#if 0 /* XXX: Remove me (only here to force & verify use of IPI mechanisms in multi-core situations)
        *      Basically: Only here to test a whole bunch of stuff... */
 		if (cpu_count > 1)
 			result->t_cpu = cpu_vector[1];

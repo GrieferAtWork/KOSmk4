@@ -71,8 +71,8 @@ struct userkern /*[PREFIX(uk_)]*/ {
 	 *    >> POPEN pfun = (POPEN)((byte_t *)t + USERKERN_SYSCALL_ENCODE(SYS_open));
 	 *    >> PCLOSE pclose = (PCLOSE)((byte_t *)t + USERKERN_SYSCALL_ENCODE(SYS_close));
 	 *    >>
-	 *    >> int fd = (*pfun)("/bin/init",O_RDONLY);
-	 *    >> printf("fd = %d\n",fd);
+	 *    >> int fd = (*pfun)("/bin/init", O_RDONLY);
+	 *    >> printf("fd = %d\n", fd);
 	 *    >> (*pclose)(fd);
 	 *  - Attempting to invoke a non-existent system call via this method will not
 	 *    cause an E_SEGFAULT

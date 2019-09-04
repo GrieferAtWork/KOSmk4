@@ -472,7 +472,7 @@ path_rename(struct path *__restrict source_path,
  * This function will automatically deal with `.' and `..' segments, always
  * accepting `/' between directories, and `\\' when `FS_MODE_FDOSPATH' is set.
  * Additionally, symbolic links are followed, with the final path segment stored
- * in the provided output arguments, which are set to NULL/0 when the final
+ * in the provided output arguments, with `*plastlen' set to 0 when the final
  * segment was empty and `FS_MODE_FIGNORE_TRAILING_SLASHES' wasn't set, or
  * when the entire input path is empty and `FS_MODE_FEMPTY_PATH' was set, or
  * if the last segment of the input path was one of `.' or `..', or if the

@@ -85,8 +85,8 @@ struct userkern64 /*[PREFIX(uk_)]*/ {
 	 *    >> POPEN pfun = (POPEN)((byte_t *)t + USERKERN_SYSCALL_ENCODE(SYS_open));
 	 *    >> PCLOSE pclose = (PCLOSE)((byte_t *)t + USERKERN_SYSCALL_ENCODE(SYS_close));
 	 *    >>
-	 *    >> int fd = (*pfun)("/bin/init",O_RDONLY);
-	 *    >> printf("fd = %d\n",fd);
+	 *    >> int fd = (*pfun)("/bin/init", O_RDONLY);
+	 *    >> printf("fd = %d\n", fd);
 	 *    >> (*pclose)(fd);
 	 *  - Attempting to invoke a non-existent system call via this method will not
 	 *    cause an E_SEGFAULT
@@ -128,7 +128,7 @@ struct userkern64 /*[PREFIX(uk_)]*/ {
 	__uint64_t volatile         uk_sgid;  /* Access to saved gid of the calling process */
 	struct ucpustate64 volatile uk_regs;  /* Your current register state. (essentially, this is can be
 	                                       * used as a memory-mapped copy of your current register state) */
-	struct sfpustate volatile   uk_sfpu;  /* Single FPU register map */
+	struct sfpustate volatile   uk_sfpu;  /* Simple FPU register map */
 	__uint8_t                 __uk_pad[4]; /* Pad to have `uk_xfpu' be aligned by 16 bytes */
 	struct xfpustate64 volatile uk_xfpu;  /* Extended FPU register map */
 };
