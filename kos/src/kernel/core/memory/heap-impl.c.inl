@@ -492,7 +492,7 @@ again_tryhard_mapping_target:
 		 *     will automatically get created once the node gets accessed. */
 		vm_node_insert(corepair.cp_node);
 		vm_kernel_treelock_endwrite();
-		heap_validate_all();
+		heap_validate_all_pedantic();
 		return mapping_target;
 	}
 #ifndef HEAP_NX
@@ -576,7 +576,7 @@ NOTHROW_NX(KCALL FUNC(heap_alloc_untraced))(struct heap *__restrict self,
 	struct heapptr result;
 	struct mfree **iter, **end;
 	TRACE("heap_alloc_untraced(%p,%Iu,%#x)\n", self, num_bytes, flags);
-	if unlikely(OVERFLOW_UADD(num_bytes, HEAP_ALIGNMENT - 1, &result.hp_siz))
+	if unlikely(OVERFLOW_UADD(num_bytes, (size_t)(HEAP_ALIGNMENT - 1), &result.hp_siz))
 		IFELSE_NX(goto err, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, num_bytes));
 	result.hp_siz &= ~(HEAP_ALIGNMENT - 1);
 	if unlikely(result.hp_siz < HEAP_MINSIZE)
@@ -699,7 +699,7 @@ search_heap:
 		HEAP_ASSERT(IS_ALIGNED((uintptr_t)result.hp_ptr, HEAP_ALIGNMENT));
 		HEAP_ASSERT(IS_ALIGNED((uintptr_t)result.hp_siz, HEAP_ALIGNMENT));
 		HEAP_ASSERT(result.hp_siz >= HEAP_MINSIZE);
-		heap_validate_all();
+		heap_validate_all_pedantic();
 		return result;
 	}
 #ifdef CONFIG_HEAP_TRACE_DANGLE
@@ -824,7 +824,7 @@ allocate_without_overalloc:
 	HEAP_ASSERT(IS_ALIGNED((uintptr_t)result.hp_ptr, HEAP_ALIGNMENT));
 	HEAP_ASSERT(IS_ALIGNED((uintptr_t)result.hp_siz, HEAP_ALIGNMENT));
 	HEAP_ASSERT(result.hp_siz >= HEAP_MINSIZE);
-	heap_validate_all();
+	heap_validate_all_pedantic();
 	return result;
 #ifdef HEAP_NX
 err:
@@ -1007,7 +1007,7 @@ again:
 	if ((flags & GFP_CALLOC) && !(slot_flags & GFP_CALLOC))
 		memset(ptr, 0, result);
 	HEAP_ASSERT(result >= HEAP_MINSIZE);
-	heap_validate_all();
+	heap_validate_all_pedantic();
 	return result;
 }
 
@@ -1021,7 +1021,7 @@ NOTHROW_NX(KCALL FUNC(heap_allat_untraced))(struct heap *__restrict self,
 	TRACE("heap_allat_untraced(%p,%p,%Iu,%#x)\n", self, ptr, num_bytes, flags);
 	if unlikely(!IS_ALIGNED((uintptr_t)ptr, HEAP_ALIGNMENT))
 		goto err; /* Badly aligned pointer (can't allocate anything here...) */
-	if unlikely(OVERFLOW_UADD(num_bytes, HEAP_ALIGNMENT - 1, &alloc_size))
+	if unlikely(OVERFLOW_UADD(num_bytes, (size_t)(HEAP_ALIGNMENT - 1), &alloc_size))
 		IFELSE_NX(goto err, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, num_bytes));
 	alloc_size &= ~(HEAP_ALIGNMENT - 1);
 	if unlikely(alloc_size < HEAP_MINSIZE)
@@ -1082,7 +1082,7 @@ NOTHROW_NX(KCALL FUNC(heap_align_untraced))(struct heap *__restrict self,
 	/* Forward to the regular allocator when the constraints allow it. */
 	if (min_alignment <= HEAP_ALIGNMENT && !offset)
 		return FUNC(heap_alloc_untraced)(self, num_bytes, flags);
-	if unlikely(OVERFLOW_UADD(num_bytes, HEAP_ALIGNMENT - 1, &alloc_bytes))
+	if unlikely(OVERFLOW_UADD(num_bytes, (size_t)(HEAP_ALIGNMENT - 1), &alloc_bytes))
 		IFELSE_NX(goto err, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, num_bytes));
 	alloc_bytes &= ~(HEAP_ALIGNMENT - 1);
 	if unlikely(alloc_bytes < HEAP_MINSIZE)
@@ -1237,7 +1237,7 @@ NOTHROW_NX(KCALL FUNC(heap_align_untraced))(struct heap *__restrict self,
 			             (uintptr_t)result.hp_ptr, (uintptr_t)result.hp_ptr + offset, (uintptr_t)offset, (uintptr_t)min_alignment);
 			HEAP_ASSERT(IS_ALIGNED((uintptr_t)result.hp_siz, HEAP_ALIGNMENT));
 			HEAP_ASSERT(result.hp_siz >= HEAP_MINSIZE);
-			heap_validate_all();
+			heap_validate_all_pedantic();
 			return result;
 		}
 		sync_endwrite(&self->h_lock);
@@ -1286,7 +1286,7 @@ NOTHROW_NX(KCALL FUNC(heap_align_untraced))(struct heap *__restrict self,
 	result.hp_siz = result_base.hp_siz;
 	HEAP_ASSERT(IS_ALIGNED((uintptr_t)result.hp_siz, HEAP_ALIGNMENT));
 	HEAP_ASSERT(result.hp_siz >= HEAP_MINSIZE);
-	heap_validate_all();
+	heap_validate_all_pedantic();
 	return result;
 #ifdef HEAP_NX
 err:
@@ -1313,7 +1313,7 @@ NOTHROW_NX(KCALL FUNC(heap_realloc_untraced))(struct heap *__restrict self,
 		/* Special case: initial allocation */
 		return FUNC(heap_alloc_untraced)(self, new_bytes, alloc_flags);
 	}
-	if unlikely(OVERFLOW_UADD(new_bytes, HEAP_ALIGNMENT - 1, &new_bytes))
+	if unlikely(OVERFLOW_UADD(new_bytes, (size_t)(HEAP_ALIGNMENT - 1), &new_bytes))
 		IFELSE_NX(goto err, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, new_bytes - (HEAP_ALIGNMENT - 1)));
 	new_bytes &= ~(HEAP_ALIGNMENT - 1);
 	if unlikely(new_bytes < HEAP_MINSIZE)
@@ -1386,7 +1386,7 @@ NOTHROW_NX(KCALL FUNC(heap_realign_untraced))(struct heap *__restrict self,
 		/* Special case: initial allocation */
 		return FUNC(heap_align_untraced)(self, min_alignment, offset, new_bytes, alloc_flags);
 	}
-	if unlikely(OVERFLOW_UADD(new_bytes, HEAP_ALIGNMENT - 1, &new_bytes))
+	if unlikely(OVERFLOW_UADD(new_bytes, (size_t)(HEAP_ALIGNMENT - 1), &new_bytes))
 		IFELSE_NX(goto err, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, new_bytes - (HEAP_ALIGNMENT - 1)));
 	new_bytes &= ~(HEAP_ALIGNMENT - 1);
 	result.hp_ptr = old_ptr;
