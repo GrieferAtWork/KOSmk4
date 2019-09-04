@@ -2654,21 +2654,6 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.FILE.locked.write.write._flsbuf") int
 }
 /*[[[end:_flsbuf]]]*/
 
-/*[[[head:freopen,hash:0xba7d0a77]]]*/
-/* Re-open the given `STREAM' as a file-stream for accessing `FILENAME' */
-INTERN WUNUSED NONNULL((1, 2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.access.freopen") FILE *
-NOTHROW_RPC(LIBCCALL libc_freopen)(char const *__restrict filename,
-                                   char const *__restrict modes,
-                                   FILE *__restrict stream)
-/*[[[body:freopen]]]*/
-{
-	CRT_UNIMPLEMENTED("freopen"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:freopen]]]*/
-
 /*[[[head:open_memstream,hash:0xcbee42d7]]]*/
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.access.open_memstream") FILE *
@@ -2708,10 +2693,6 @@ NOTHROW_NCX(LIBCCALL libc_tempnam)(char const *dir,
 }
 /*[[[end:tempnam]]]*/
 
-/*[[[impl:freopen64]]]*/
-/*[[[impl:fopen64]]]*/
-DEFINE_INTERN_ALIAS(libc_freopen64, libc_freopen);
-DEFINE_INTERN_ALIAS(libc_fopen64, libc_fopen);
 
 
 
@@ -3686,23 +3667,121 @@ NOTHROW_NCX(LIBCCALL libc_cuserid)(char *s)
 }
 /*[[[end:cuserid]]]*/
 
-/*[[[head:flushall_unlocked,hash:0x6a089dbc]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.seek.seek.flushall_unlocked") int
-(LIBCCALL libc_flushall_unlocked)(void)
-		__THROWS(...)
-/*[[[body:flushall_unlocked]]]*/
+/*[[[head:fdreopen,hash:0xd2bb34b]]]*/
+/* Re-open the given `STREAM' as a file-stream for accessing `FD' */
+INTERN NONNULL((2, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.access.fdreopen") FILE *
+NOTHROW_RPC(LIBCCALL libc_fdreopen)(fd_t fd,
+                                    char const *__restrict modes,
+                                    FILE *__restrict stream)
+/*[[[body:fdreopen]]]*/
 {
-	CRT_UNIMPLEMENTED("flushall_unlocked"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	fd_t oldfd;
+	(void)modes;
+	if unlikely(!stream) {
+		libc_seterrno(EINVAL);
+		goto done;
+	}
+	file_write(stream);
+	oldfd = stream->if_fd;
+	if unlikely(fd == oldfd) {
+		file_endwrite(stream);
+		libc_seterrno(EBADF);
+		stream = NULL;
+		goto done;
+	}
+	stream->if_fd   = fd;
+	stream->if_flag = IO_LNIFTYY;
+	file_endwrite(stream);
+	sys_close(oldfd);
+done:
+	return stream;
 }
-/*[[[end:flushall_unlocked]]]*/
+/*[[[end:fdreopen]]]*/
+
+/*[[[head:fdreopen_unlocked,hash:0x1b12f468]]]*/
+/* Re-open the given `STREAM' as a file-stream for accessing `FD' */
+INTERN NONNULL((2, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.access.fdreopen_unlocked") FILE *
+NOTHROW_RPC(LIBCCALL libc_fdreopen_unlocked)(fd_t fd,
+                                             char const *__restrict modes,
+                                             FILE *__restrict stream)
+/*[[[body:fdreopen_unlocked]]]*/
+{
+	fd_t oldfd;
+	(void)modes;
+	if unlikely(!stream) {
+		libc_seterrno(EINVAL);
+		goto done;
+	}
+	oldfd = stream->if_fd;
+	if unlikely(fd == oldfd) {
+		libc_seterrno(EBADF);
+		stream = NULL;
+		goto done;
+	}
+	stream->if_fd   = fd;
+	stream->if_flag = IO_LNIFTYY;
+	sys_close(oldfd);
+done:
+	return stream;
+}
+/*[[[end:fdreopen_unlocked]]]*/
+
+/*[[[head:freopen,hash:0x1af30efd]]]*/
+/* Re-open the given `STREAM' as a file-stream for accessing `FILENAME' */
+INTERN NONNULL((1, 2, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.access.freopen") FILE *
+NOTHROW_RPC(LIBCCALL libc_freopen)(char const *__restrict filename,
+                                   char const *__restrict modes,
+                                   FILE *__restrict stream)
+/*[[[body:freopen]]]*/
+{
+	fd_t fd;
+	FILE *result;
+	fd = open(filename, parse_open_modes(modes), 0644);
+	if unlikely(fd < 0)
+		return NULL;
+	result = fdreopen(fd, modes, stream);
+	if unlikely(!result)
+		sys_close(fd);
+	return result;
+}
+/*[[[end:freopen]]]*/
+
+/*[[[head:freopen_unlocked,hash:0x1e12fcfe]]]*/
+/* Re-open the given `STREAM' as a file-stream for accessing `FILENAME' */
+INTERN NONNULL((1, 2, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.access.freopen_unlocked") FILE *
+NOTHROW_RPC(LIBCCALL libc_freopen_unlocked)(char const *__restrict filename,
+                                            char const *__restrict modes,
+                                            FILE *__restrict stream)
+/*[[[body:freopen_unlocked]]]*/
+{
+	fd_t fd;
+	FILE *result;
+	fd = open(filename, parse_open_modes(modes), 0644);
+	if unlikely(fd < 0)
+		return NULL;
+	result = fdreopen_unlocked(fd, modes, stream);
+	if unlikely(!result)
+		sys_close(fd);
+	return result;
+}
+/*[[[end:freopen_unlocked]]]*/
+
+/*[[[impl:fopen64]]]*/
+/*[[[impl:freopen64]]]*/
+/*[[[impl:freopen64_unlocked]]]*/
+DEFINE_INTERN_ALIAS(libc_freopen64, libc_freopen);
+DEFINE_INTERN_ALIAS(libc_freopen64_unlocked, libc_freopen_unlocked);
+DEFINE_INTERN_ALIAS(libc_fopen64, libc_fopen);
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:0x94abac47]]]*/
+/*[[[start:exports,hash:0xc341667d]]]*/
 #undef fprintf
 #undef fprintf_unlocked
 #undef fprintf_s
@@ -3785,7 +3864,10 @@ DEFINE_PUBLIC_WEAK_ALIAS(ferror_unlocked, libc_ferror);
 DEFINE_PUBLIC_WEAK_ALIAS(perror, libc_perror);
 DEFINE_PUBLIC_WEAK_ALIAS(tmpfile, libc_tmpfile);
 DEFINE_PUBLIC_WEAK_ALIAS(fopen, libc_fopen);
+DEFINE_PUBLIC_WEAK_ALIAS(fopen64, libc_fopen);
 DEFINE_PUBLIC_WEAK_ALIAS(freopen, libc_freopen);
+DEFINE_PUBLIC_WEAK_ALIAS(freopen64, libc_freopen);
+DEFINE_PUBLIC_WEAK_ALIAS(freopen_unlocked, libc_freopen);
 DEFINE_PUBLIC_WEAK_ALIAS(fgetpos, libc_fgetpos);
 DEFINE_PUBLIC_WEAK_ALIAS(fgetpos_unlocked, libc_fgetpos);
 DEFINE_PUBLIC_WEAK_ALIAS(fsetpos, libc_fsetpos);
@@ -3881,6 +3963,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(_ftelli64, libc_ftello64);
 DEFINE_PUBLIC_WEAK_ALIAS(_ftelli64_nolock, libc_ftello64);
 DEFINE_PUBLIC_WEAK_ALIAS(fopen64, libc_fopen64);
 DEFINE_PUBLIC_WEAK_ALIAS(freopen64, libc_freopen64);
+DEFINE_PUBLIC_WEAK_ALIAS(freopen64_unlocked, libc_freopen64);
 DEFINE_PUBLIC_WEAK_ALIAS(fgetpos64, libc_fgetpos64);
 DEFINE_PUBLIC_WEAK_ALIAS(fgetpos64_unlocked, libc_fgetpos64);
 DEFINE_PUBLIC_WEAK_ALIAS(fsetpos64, libc_fsetpos64);
@@ -3890,6 +3973,11 @@ DEFINE_PUBLIC_WEAK_ALIAS(file_printer_unlocked, libc_file_printer_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(vasprintf, libc_vasprintf);
 DEFINE_PUBLIC_WEAK_ALIAS(asprintf, libc_asprintf);
 DEFINE_PUBLIC_WEAK_ALIAS(__asprintf, libc_asprintf);
+DEFINE_PUBLIC_WEAK_ALIAS(fdreopen, libc_fdreopen);
+DEFINE_PUBLIC_WEAK_ALIAS(fdreopen_unlocked, libc_fdreopen);
+DEFINE_PUBLIC_WEAK_ALIAS(fdreopen_unlocked, libc_fdreopen_unlocked);
+DEFINE_PUBLIC_WEAK_ALIAS(freopen_unlocked, libc_freopen_unlocked);
+DEFINE_PUBLIC_WEAK_ALIAS(freopen64_unlocked, libc_freopen64_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(fseek_unlocked, libc_fseek_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(fseeko_unlocked, libc_fseeko_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(ftell_unlocked, libc_ftell_unlocked);

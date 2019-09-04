@@ -505,6 +505,7 @@ puts:([nonnull] char const *__restrict str) -> __STDC_INT_AS_SSIZE_T {
 
 %[default_impl_section(.text.crt.FILE.locked.read.getc)]
 @@Unget a single character byte of data previously returned by `getc()'
+[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(ungetc_unlocked)]
 [std] ungetc:(int ch, [nonnull] FILE *__restrict stream) -> int;
 
 %[default_impl_section(.text.crt.FILE.locked.read.read)]
@@ -641,8 +642,8 @@ ferror:([nonnull] FILE *__restrict stream) -> int;
 %[default_impl_section(.text.crt.errno.utility)]
 [cp][std][std_guard] perror:([nullable] char const *message);
 
-@@Create and return a new file-stream for accessing a temporary file for reading/writing
 %[default_impl_section(.text.crt.FILE.locked.access)]
+@@Create and return a new file-stream for accessing a temporary file for reading/writing
 [cp][if(defined(__USE_FILE_OFFSET64)), preferred_alias(tmpfile64)]
 [alias(tmpfile64)][std][ATTR_WUNUSED]
 tmpfile:() -> FILE *;
@@ -654,8 +655,11 @@ fopen:([nonnull] char const *__restrict filename,
        [nonnull] char const *__restrict modes) -> FILE *;
 
 @@Re-open the given `STREAM' as a file-stream for accessing `FILENAME'
-[cp][std][ATTR_WUNUSED]
-[if(defined(__USE_FILE_OFFSET64)), preferred_alias(freopen64)][alias(freopen64)]
+[cp][std]
+[if(defined(__USE_STDIO_UNLOCKED) && defined(__USE_FILE_OFFSET64)), preferred_alias(freopen64_unlocked)]
+[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(freopen_unlocked)]
+[if(defined(__USE_FILE_OFFSET64)), preferred_alias(freopen64)]
+[alias(freopen64, freopen_unlocked, freopen64_unlocked)]
 freopen:([nonnull] char const *__restrict filename,
          [nonnull] char const *__restrict modes,
          [nonnull] FILE *__restrict stream) -> FILE *;
@@ -1435,17 +1439,17 @@ ftello64:([nonnull] $FILE *__restrict stream) -> $off64_t {
 %[default_impl_section(.text.crt.FILE.locked.access)]
 
 @@64-bit variant of `fopen'
-[cp][alias(fopen)][ATTR_WUNUSED]
-[largefile64_variant_of(fopen)]
+[cp][alias(fopen)][ATTR_WUNUSED][user][largefile64_variant_of(fopen)]
 fopen64:([nonnull] char const *__restrict filename,
-         [nonnull] char const *__restrict modes) -> $FILE *;
+         [nonnull] char const *__restrict modes) -> $FILE * = fopen;
 
 @@64-bit variant of `freopen'
-[cp][alias(freopen)][ATTR_WUNUSED]
-[largefile64_variant_of(freopen)]
+[cp][user][largefile64_variant_of(freopen)]
+[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(freopen64_unlocked)]
+[alias(freopen, freopen_unlocked, freopen64_unlocked)]
 freopen64:([nonnull] char const *__restrict filename,
            [nonnull] char const *__restrict modes,
-           [nonnull] $FILE *__restrict stream) -> $FILE *;
+           [nonnull] $FILE *__restrict stream) -> $FILE * = freopen;
 
 %[default_impl_section(.text.crt.FILE.locked.seek.pos)]
 
@@ -1566,6 +1570,34 @@ __asprintf:([nonnull] char **__restrict pstr, [nonnull] char const *__restrict f
 #ifdef __USE_KOS
 }
 
+%[default_impl_section(.text.crt.FILE.locked.access)]
+
+@@Re-open the given `STREAM' as a file-stream for accessing `FD'
+[if(defined(__USE_STDIO_UNLOCKED) && defined(__USE_FILE_OFFSET64)), preferred_alias(fdreopen64_unlocked)]
+[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(fdreopen_unlocked)]
+[if(defined(__USE_FILE_OFFSET64)), preferred_alias(fdreopen64)]
+[cp][alias(fdreopen64, fdreopen_unlocked, fdreopen64_unlocked)]
+fdreopen:($fd_t fd, [nonnull] char const *__restrict modes,
+          [nonnull] FILE *__restrict stream) -> FILE *;
+
+
+%[default_impl_section(.text.crt.FILE.unlocked.access)]
+[cp][user][alias(fdreopen)][doc_alias(fdreopen)]
+fdreopen_unlocked:($fd_t fd, [nonnull] char const *__restrict modes,
+                   [nonnull] FILE *__restrict stream) -> FILE * = fdreopen;
+
+[cp][user][if(defined(__USE_FILE_OFFSET64)), preferred_alias(freopen64_unlocked)]
+[alias(freopen64_unlocked, freopen, freopen64)][doc_alias(freopen)]
+freopen_unlocked:([nonnull] char const *__restrict filename,
+                  [nonnull] char const *__restrict modes,
+                  [nonnull] FILE *__restrict stream) -> FILE * = freopen;
+
+[cp][user][alias(freopen64, freopen_unlocked, freopen)][doc_alias(freopen)]
+freopen64_unlocked:([nonnull] char const *__restrict filename,
+                    [nonnull] char const *__restrict modes,
+                    [nonnull] FILE *__restrict stream) -> FILE * = freopen64;
+
+
 %[default_impl_section(.text.crt.FILE.unlocked.seek.seek)]
 [stdio_throws][user] fseek_unlocked:([nonnull] $FILE *__restrict stream, long int off, int whence) -> int = fseek;
 [stdio_throws][user] fseeko_unlocked:([nonnull] $FILE *__restrict stream, $off_t off, int whence) -> int = fseeko;
@@ -1616,6 +1648,7 @@ puts_unlocked:([nonnull] char const *__restrict str) -> __STDC_INT_AS_SSIZE_T = 
 
 %
 %#ifdef __USE_LARGEFILE64
+
 [off64_variant_of(fseeko_unlocked)]
 [stdio_throws][user][section(.text.crt.FILE.unlocked.seek.seek)]
 fseeko64_unlocked:([nonnull] $FILE *__restrict stream, $off64_t off, int whence) -> int = fseeko64;

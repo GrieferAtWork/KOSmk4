@@ -1,4 +1,4 @@
-/* HASH 0x18f0aeb5 */
+/* HASH 0x6b49f201 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vsnprintf_s))(char *__restrict __buf
                                                           __SIZE_TYPE__ __buflen,
                                                           char const *__restrict __format,
                                                           __builtin_va_list __args) {
-#line 2055 "kos/src/libc/magic/stdio.c"
+#line 2088 "kos/src/libc/magic/stdio.c"
 	(void)__buflen;
 	return __localdep__vsnprintf(__buf, __bufsize, __format, __args);
 }

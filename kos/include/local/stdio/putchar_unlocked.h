@@ -1,4 +1,4 @@
-/* HASH 0x9156abb0 */
+/* HASH 0x4240bd51 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,7 +54,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Same as `putchar()', but performs I/O without acquiring a lock to `stdout' */
 __LOCAL_LIBC(putchar_unlocked) int
 (__LIBCCALL __LIBC_LOCAL_NAME(putchar_unlocked))(int __ch) __THROWS(...) {
-#line 1206 "kos/src/libc/magic/stdio.c"
+#line 1210 "kos/src/libc/magic/stdio.c"
 	return __localdep_fputc_unlocked(__ch, __stdout);
 }
 __NAMESPACE_LOCAL_END

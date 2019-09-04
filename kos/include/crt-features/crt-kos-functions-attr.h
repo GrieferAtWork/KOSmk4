@@ -1,4 +1,4 @@
-/* HASH 0xcd0935ad */
+/* HASH 0x4780bd75 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2953,6 +2953,8 @@
 #define __CRT_ATTR_NOTHROW_RPC_fchown 1
 #define __CRT_ATTR_NOTHROW_RPC_fchownat 1
 #define __CRT_ATTR_NOTHROW_RPC_fdatasync 1
+#define __CRT_ATTR_NOTHROW_RPC_fdreopen 1
+#define __CRT_ATTR_NOTHROW_RPC_fdreopen_unlocked 1
 #define __CRT_ATTR_NOTHROW_RPC_fexecve 1
 #define __CRT_ATTR_NOTHROW_RPC_fgetgrent 1
 #define __CRT_ATTR_NOTHROW_RPC_fgetgrent_r 1
@@ -2980,7 +2982,9 @@
 #define __CRT_ATTR_NOTHROW_RPC_frenameat 1
 #define __CRT_ATTR_NOTHROW_RPC_freopen 1
 #define __CRT_ATTR_NOTHROW_RPC_freopen64 1
+#define __CRT_ATTR_NOTHROW_RPC_freopen64_unlocked 1
 #define __CRT_ATTR_NOTHROW_RPC_freopen_s 1
+#define __CRT_ATTR_NOTHROW_RPC_freopen_unlocked 1
 #define __CRT_ATTR_NOTHROW_RPC_fsetxattr 1
 #define __CRT_ATTR_NOTHROW_RPC_fsync 1
 #define __CRT_ATTR_NOTHROW_RPC_ftok 1

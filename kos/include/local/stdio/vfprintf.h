@@ -1,4 +1,4 @@
-/* HASH 0x1ad9be39 */
+/* HASH 0xabfa9ab1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -131,7 +131,7 @@ __LOCAL_LIBC(vfprintf) __ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)) __STDC_IN
 (__LIBCCALL __LIBC_LOCAL_NAME(vfprintf))(__FILE *__restrict __stream,
                                          char const *__restrict __format,
                                          __builtin_va_list __args) __THROWS(...) {
-#line 733 "kos/src/libc/magic/stdio.c"
+#line 737 "kos/src/libc/magic/stdio.c"
 	return (__STDC_INT_AS_SSIZE_T)__localdep_format_vprintf(&__localdep_file_printer, __stream, __format, __args);
 }
 __NAMESPACE_LOCAL_END

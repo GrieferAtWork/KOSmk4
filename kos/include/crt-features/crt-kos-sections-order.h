@@ -197,6 +197,7 @@
 	CB(PREFIX.FILE.locked.write.utility.* PREFIX.FILE.locked.write.putc.*) \
 	CB(PREFIX.FILE.locked.seek.utility.* PREFIX.FILE.locked.seek.pos.* PREFIX.FILE.locked.seek.seek.*) \
 	CB(PREFIX.FILE.locked.utility.*) \
+	CB(PREFIX.FILE.unlocked.access.*) \
 	CB(PREFIX.FILE.unlocked.read.read.*) \
 	CB(PREFIX.FILE.unlocked.read.scanf.*) \
 	CB(PREFIX.FILE.unlocked.read.getc.* PREFIX.FILE.unlocked.read.utility.*) \

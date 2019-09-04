@@ -1,4 +1,4 @@
-/* HASH 0xa59bfec5 */
+/* HASH 0x4401a9c7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vsprintf_p))(char *__restrict __buf,
                                                          __SIZE_TYPE__ __bufsize,
                                                          char const *__restrict __format,
                                                          __builtin_va_list __args) {
-#line 1952 "kos/src/libc/magic/stdio.c"
+#line 1985 "kos/src/libc/magic/stdio.c"
 	(void)__buf;
 	(void)__bufsize;
 	(void)__format;

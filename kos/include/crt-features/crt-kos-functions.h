@@ -1,4 +1,4 @@
-/* HASH 0x429751a1 */
+/* HASH 0xb9fe818c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -592,6 +592,8 @@ __CRT_FUNCTION(fdimf,0,(),2,(float,x,float,y),float)
 __CRT_FUNCTION(fdiml,0,(),2,(long double,x,long double,y),long double)
 __CRT_FUNCTION(fdopen,0,(),2,(fd_t,fd,char const *__restrict,modes),FILE *)
 __CRT_FUNCTION(fdopendir,0,(),1,(fd_t,fd),DIR *)
+__CRT_FUNCTION(fdreopen,0,(),3,(fd_t,fd,char const *__restrict,modes,FILE *__restrict,stream),FILE *)
+__CRT_FUNCTION(fdreopen_unlocked,0,(),3,(fd_t,fd,char const *__restrict,modes,FILE *__restrict,stream),FILE *)
 __CRT_FUNCTION(feof,0,(),1,(FILE *__restrict,stream),int)
 __CRT_FUNCTION(ferror,0,(),1,(FILE *__restrict,stream),int)
 __CRT_FUNCTION(fexecve,0,(),3,(fd_t,fd,__TARGV,,__TENVP,),int)
@@ -695,7 +697,9 @@ __CRT_FUNCTION(fremovexattr,0,(),2,(fd_t,fd,char const *,name),int)
 __CRT_FUNCTION(frenameat,0,(),5,(fd_t,oldfd,char const *,oldname,fd_t,newfd,char const *,newname_or_path,atflag_t,flags),int)
 __CRT_FUNCTION(freopen,0,(),3,(char const *__restrict,filename,char const *__restrict,modes,FILE *__restrict,stream),FILE *)
 __CRT_FUNCTION(freopen64,1,(!IS_DEFINED(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0,freopen),3,(char const *__restrict,filename,char const *__restrict,modes,FILE *__restrict,stream),FILE *)
+__CRT_FUNCTION(freopen64_unlocked,0,(),3,(char const *__restrict,filename,char const *__restrict,modes,FILE *__restrict,stream),FILE *)
 __CRT_FUNCTION(freopen_s,0,(),4,(FILE **,pstream,char const *,filename,char const *,modes,FILE *,oldstream),errno_t)
+__CRT_FUNCTION(freopen_unlocked,0,(),3,(char const *__restrict,filename,char const *__restrict,modes,FILE *__restrict,stream),FILE *)
 __CRT_FUNCTION(frexp,0,(),2,(double,x,int *,pexponent),double)
 __CRT_FUNCTION(frexpf,0,(),2,(float,x,int *,pexponent),float)
 __CRT_FUNCTION(frexpl,0,(),2,(long double,x,int *,pexponent),long double)

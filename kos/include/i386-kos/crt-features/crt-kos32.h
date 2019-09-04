@@ -1380,6 +1380,8 @@
 #define __CRT_HAVE_fdiml 1
 #define __CRT_HAVE_fdopen 1
 #define __CRT_HAVE_fdopendir 1
+#define __CRT_HAVE_fdreopen 1
+#define __CRT_HAVE_fdreopen_unlocked 1
 #define __CRT_HAVE_feof 1
 #define __CRT_HAVE_feof_unlocked 1
 #define __CRT_HAVE_ferror 1
@@ -1505,7 +1507,9 @@
 #define __CRT_HAVE_frenameat 1
 #define __CRT_HAVE_freopen 1
 #define __CRT_HAVE_freopen64 1
+#define __CRT_HAVE_freopen64_unlocked 1
 #define __CRT_HAVE_freopen_s 1
+#define __CRT_HAVE_freopen_unlocked 1
 #define __CRT_HAVE_frexp 1
 #define __CRT_HAVE_frexpf 1
 #define __CRT_HAVE_frexpl 1

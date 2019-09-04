@@ -1,4 +1,4 @@
-/* HASH 0xb22ac47f */
+/* HASH 0x1d2220e0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -178,6 +178,8 @@
 #define __stub_fattach 1
 #define __stub_fcloseall 1
 #define __stub_fdetach 1
+#define __stub_fdreopen 1
+#define __stub_fdreopen_unlocked 1
 #define __stub_fgetgrent 1
 #define __stub_fgetgrent_r 1
 #define __stub_fgetpwent 1
@@ -203,6 +205,8 @@
 #define __stub_freeifaddrs 1
 #define __stub_freelocale 1
 #define __stub_freopen 1
+#define __stub_freopen64_unlocked 1
+#define __stub_freopen_unlocked 1
 #define __stub_frexp 1
 #define __stub_ftime 1
 #define __stub_ftime64 1

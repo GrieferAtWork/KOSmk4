@@ -1,4 +1,4 @@
-/* HASH 0xd00f5c8f */
+/* HASH 0x415c7af5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -178,6 +178,8 @@
 #define __CRT_STUB_fattach 1
 #define __CRT_STUB_fcloseall 1
 #define __CRT_STUB_fdetach 1
+#define __CRT_STUB_fdreopen 1
+#define __CRT_STUB_fdreopen_unlocked 1
 #define __CRT_STUB_fgetgrent 1
 #define __CRT_STUB_fgetgrent_r 1
 #define __CRT_STUB_fgetpwent 1
@@ -203,6 +205,8 @@
 #define __CRT_STUB_freeifaddrs 1
 #define __CRT_STUB_freelocale 1
 #define __CRT_STUB_freopen 1
+#define __CRT_STUB_freopen64_unlocked 1
+#define __CRT_STUB_freopen_unlocked 1
 #define __CRT_STUB_frexp 1
 #define __CRT_STUB_ftime 1
 #define __CRT_STUB_ftime64 1
