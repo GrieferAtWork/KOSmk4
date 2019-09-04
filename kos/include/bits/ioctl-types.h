@@ -47,10 +47,10 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 struct winsize {
-	__UINT16_TYPE__ ws_row;
-	__UINT16_TYPE__ ws_col;
-	__UINT16_TYPE__ ws_xpixel;
-	__UINT16_TYPE__ ws_ypixel;
+	__UINT16_TYPE__ ws_row;    /* Vertical (Y) number of cells */
+	__UINT16_TYPE__ ws_col;    /* Horizontal (X) number of cells */
+	__UINT16_TYPE__ ws_xpixel; /* Total display width (X-size) in pixels (usually `ws_col * X' (e.g. X == 8)) */
+	__UINT16_TYPE__ ws_ypixel; /* Total display height (Y-size) in pixels (usually `ws_row * X' (e.g. X == 16)) */
 };
 #endif /* __CC__ */
 

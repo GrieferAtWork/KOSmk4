@@ -24,6 +24,7 @@
 
 #include <kernel/except.h>
 #include <kernel/types.h>
+#include <kernel/user.h>
 #include <kos/kernel/handle.h>
 #include <stddef.h>
 #include <string.h>
@@ -46,14 +47,49 @@ PUBLIC NONNULL((1)) syscall_slong_t KCALL
 ansitty_device_ioctl(struct character_device *__restrict self, syscall_ulong_t cmd,
                      USER UNCHECKED void *arg, iomode_t mode) THROWS(...) {
 	struct ansitty_device *me = (struct ansitty_device *)self;
-	(void)me;
-	(void)cmd;
-	(void)arg;
-	(void)mode;
-	/* TODO: Add ANSI configuration ioctl()s here (I'm certain there are at least some...) */
-	THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
-	      E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND,
-	      cmd);
+	switch (cmd) {
+
+	case TIOCGWINSZ:
+	case _IOR(_IOC_TYPE(TIOCGWINSZ), _IOC_NR(TIOCGWINSZ), struct winsize): {
+		struct winsize ws;
+		ansitty_coord_t xy[2], sxy[2];
+		validate_writable(arg, sizeof(struct winsize));
+		/* These 2 operators are emulated by libansitty and should _always_ be present. */
+		assert(me->at_ansi.at_ops.ato_getcursor);
+		assert(me->at_ansi.at_ops.ato_setcursor);
+		/* Make use of the fact that the cursor position is clamped to the display bounds.
+		 * Note that libansitty makes use of the same fact to determine the window size
+		 * whenever it needs to know that value. */
+		(*me->at_ansi.at_ops.ato_getcursor)(&me->at_ansi, xy);
+		(*me->at_ansi.at_ops.ato_setcursor)(&me->at_ansi, (ansitty_coord_t)-1, (ansitty_coord_t)-1);
+		(*me->at_ansi.at_ops.ato_getcursor)(&me->at_ansi, sxy);
+		(*me->at_ansi.at_ops.ato_setcursor)(&me->at_ansi, xy[0], xy[1]);
+		/* Because the cursor coords are clamped to the max valid values, the
+		 * actual display size is described by the max valid coords +1 each. */
+		++sxy[0];
+		++sxy[1];
+		if (sxy[0] == 1 && sxy[1] == 1) {
+			/* If we couldn't get anything useful, default to some sane values. */
+			sxy[0] = 80;
+			sxy[1] = 25;
+		}
+		ws.ws_col = sxy[0]; /* X */
+		ws.ws_row = sxy[1]; /* Y */
+		/* Set some sane values for pixel sizes. */
+		ws.ws_xpixel = ws.ws_col * 8;
+		ws.ws_ypixel = ws.ws_row * 16;
+		COMPILER_WRITE_BARRIER();
+		/* Copy collected data into user-space. */
+		memcpy(arg, &ws, sizeof(struct winsize));
+	}	break;
+
+	default:
+		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,
+		      E_INVALID_ARGUMENT_CONTEXT_IOCTL_COMMAND,
+		      cmd);
+		break;
+	}
+	return 0;
 }
 
 PRIVATE NONNULL((1)) void LIBANSITTY_CC
