@@ -1284,6 +1284,7 @@ no_old_handler:
 				mask->sm_refcnt  = 1;
 				mask->sm_share   = 1;
 				nhandler.sa_mask = mask;
+				break;
 			}
 		}
 		COMPILER_BARRIER();
