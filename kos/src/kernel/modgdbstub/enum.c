@@ -20,6 +20,7 @@
 #define GUARD_MODGDB_ENUM_C 1
 
 #include <kernel/compiler.h>
+#include <kernel/vm.h>
 #include <sched/cpu.h>
 #include <sched/task.h>
 #include <sched/pid.h>
@@ -29,20 +30,127 @@
 
 DECL_BEGIN
 
-#define ENUM_THREADS_ST_INITIAL 0
-#define ENUM_THREADS_ST_SIBLING 1
+#define ENUM_THREADS_ST_INITIAL  0
+#define ENUM_THREADS_ST_SIBLING  1
+#define ENUM_THREADS_ST_IDLES    2
+#define ENUM_THREADS_ST_RUNNING  3
+#define ENUM_THREADS_ST_SLEEPING 4
+#define ENUM_THREADS_ST_PENDING  5
+
+#if 1
+#define SHOULD_ENUMERATE_ALL_THREADS  (!(GDB_RemoteFeatures & GDB_REMOTEFEATURE_MULTIPROCESS))
+#else
+#define SHOULD_ENUMERATE_ALL_THREADS  0
+#endif
+
 
 /* Initialize a thread/process enumerator. */
 INTERN NONNULL((1)) void
 NOTHROW(FCALL GDBEnumThreads_Init)(GDBEnumThreadsIterator *__restrict self) {
 	self->eti_state = ENUM_THREADS_ST_INITIAL;
-	self->eti_next  = incref(GDB_GetCurrentProcess());
+	if (SHOULD_ENUMERATE_ALL_THREADS) {
+		self->eti_next = incref(&_bootidle);
+	} else {
+		self->eti_next = incref(GDB_GetCurrentProcess());
+	}
 }
 
 INTERN NONNULL((1)) void
 NOTHROW(FCALL GDBEnumThreads_Fini)(GDBEnumThreadsIterator *__restrict self) {
-	xdecref(self->eti_next);
+	if (self->eti_next)
+		decref(self->eti_next);
 }
+
+PRIVATE void
+NOTHROW(FCALL enumend)(GDBEnumThreadsIterator *__restrict self) {
+	self->eti_next = NULL;
+}
+
+#ifndef CONFIG_NO_SMP
+PRIVATE void
+NOTHROW(FCALL enumbegin_pending)(GDBEnumThreadsIterator *__restrict self) {
+	struct task *thread;
+	self->eti_state2 = 0;
+	GDB_SuspendAllOtherCPUsNow(); /* XXX: This is kind-of hacky... */
+again:
+	thread = cpu_vector[self->eti_state2]->c_pending;
+	if (thread == &FORCPU(cpu_vector[self->eti_state2], _this_idle))
+		thread = thread->t_sched.s_pending.ss_pennxt;
+	assert(thread != &FORCPU(cpu_vector[self->eti_state2], _this_idle));
+	if (!thread || thread == CPU_PENDING_ENDOFCHAIN) {
+		if (++self->eti_state2 < cpu_count)
+			goto again;
+		enumend(self);
+		return;
+	}
+	self->eti_next  = incref(thread);
+	self->eti_state = ENUM_THREADS_ST_PENDING;
+}
+#else /* !CONFIG_NO_SMP */
+#define enumbegin_pending(self) enumend(self)
+#endif /* CONFIG_NO_SMP */
+
+PRIVATE void
+NOTHROW(FCALL enumbegin_sleeping)(GDBEnumThreadsIterator *__restrict self) {
+	struct task *thread;
+	self->eti_state2 = 0;
+	GDB_SuspendAllOtherCPUsNow(); /* XXX: This is kind-of hacky... */
+again:
+	thread = cpu_vector[self->eti_state2]->c_sleeping;
+	if (thread == &FORCPU(cpu_vector[self->eti_state2], _this_idle))
+		thread = thread->t_sched.s_asleep.ss_tmonxt;
+	assert(thread != &FORCPU(cpu_vector[self->eti_state2], _this_idle));
+	if (!thread) {
+		if (++self->eti_state2 < cpu_count)
+			goto again;
+		enumbegin_pending(self);
+		return;
+	}
+	self->eti_next  = incref(thread);
+	self->eti_state = ENUM_THREADS_ST_SLEEPING;
+}
+
+PRIVATE void
+NOTHROW(FCALL enumbegin_running)(GDBEnumThreadsIterator *__restrict self) {
+	struct task *thread;
+	self->eti_state2 = 0;
+	GDB_SuspendAllOtherCPUsNow(); /* XXX: This is kind-of hacky... */
+again:
+	thread = cpu_vector[self->eti_state2]->c_current;
+	if (thread == &FORCPU(cpu_vector[self->eti_state2], _this_idle)) {
+		thread = thread->t_sched.s_running.sr_runnxt;
+		if (thread == cpu_vector[self->eti_state2]->c_current) {
+			if (++self->eti_state2 < cpu_count)
+				goto again;
+			enumbegin_sleeping(self);
+			return;
+		}
+	}
+	self->eti_next  = incref(thread);
+	self->eti_state = ENUM_THREADS_ST_RUNNING;
+}
+
+PRIVATE void
+NOTHROW(FCALL enumbegin_idles)(GDBEnumThreadsIterator *__restrict self) {
+	if (cpu_count < 2)
+		enumbegin_running(self);
+	else {
+		self->eti_next   = incref(&FORCPU(cpu_vector[1], _this_idle));
+		self->eti_state  = ENUM_THREADS_ST_IDLES;
+		self->eti_state2 = 2;
+	}
+}
+
+PRIVATE WUNUSED bool
+NOTHROW(FCALL isakernthread)(struct task *__restrict self) {
+	if (self->t_flags & TASK_FKERNTHREAD)
+		return true;
+	if (self->t_vm == &vm_kernel)
+		return true;
+	return false;
+}
+
+
 
 /* Yield the next thread/process from a given thread/process enumerator.
  * NOTE: In the case of `GDBEnumProcess_Next()', only processes leaders are enumerated,
@@ -54,12 +162,13 @@ NOTHROW(FCALL GDBEnumThreads_Next)(GDBEnumThreadsIterator *__restrict self) {
 	REF struct task *result;
 	result = self->eti_next;
 	if (result) {
+again_switch:
 		switch (self->eti_state) {
 
 		case ENUM_THREADS_ST_INITIAL:
 			if (result == &_bootidle) {
-				/* TODO: Enumerate kernel threads. */
-				self->eti_next = NULL;
+				/* Enumerate kernel threads. */
+				enumbegin_idles(self);
 			} else {
 				struct taskpid *threads;
 				assert(result == task_getprocess_of(result));
@@ -76,7 +185,7 @@ NOTHROW(FCALL GDBEnumThreads_Next)(GDBEnumThreadsIterator *__restrict self) {
 					sync_endread(&FORTASK(result, _this_taskgroup).tg_proc_threads_lock);
 				self->eti_state = ENUM_THREADS_ST_SIBLING;
 			}
-			break;
+			goto done;
 
 		case ENUM_THREADS_ST_SIBLING: {
 			struct taskpid *threads;
@@ -96,13 +205,90 @@ NOTHROW(FCALL GDBEnumThreads_Next)(GDBEnumThreadsIterator *__restrict self) {
 				if (!GDB_DidSuspendOtherCPUs)
 					sync_endread(&FORTASK(task_getprocess_of(result), _this_taskgroup).tg_proc_threads_lock);
 			}
+			goto done;
 		}	break;
+
+		case ENUM_THREADS_ST_IDLES:
+			if (self->eti_state2 < cpu_count) {
+				self->eti_next = incref(&FORCPU(cpu_vector[self->eti_state2], _this_idle));
+				++self->eti_state2;
+				break;
+			}
+			enumbegin_running(self);
+			break;
+
+		case ENUM_THREADS_ST_RUNNING:
+			do {
+				assert(self->eti_next->t_cpu == cpu_vector[self->eti_state2]);
+				self->eti_next = self->eti_next->t_sched.s_running.sr_runnxt;
+				if (self->eti_next == cpu_vector[self->eti_state2]->c_current) {
+					if (++self->eti_state2 < cpu_count) {
+						self->eti_next = cpu_vector[self->eti_state2]->c_current;
+						goto again_running;
+					}
+					enumbegin_sleeping(self);
+					goto done;
+				}
+again_running:
+				;
+			} while (self->eti_next == &FORCPU(cpu_vector[self->eti_state2], _this_idle));
+			incref(self->eti_next);
+			break;
+
+		case ENUM_THREADS_ST_SLEEPING:
+			do {
+				assert(self->eti_next->t_cpu == cpu_vector[self->eti_state2]);
+				self->eti_next = self->eti_next->t_sched.s_asleep.ss_tmonxt;
+				if (self->eti_next == NULL) {
+					while (++self->eti_state2 < cpu_count) {
+						self->eti_next = cpu_vector[self->eti_state2]->c_sleeping;
+						if (self->eti_next != NULL)
+							goto again_sleeping;
+					}
+					enumbegin_pending(self);
+					goto done;
+				}
+again_sleeping:
+				;
+			} while (self->eti_next == &FORCPU(cpu_vector[self->eti_state2], _this_idle));
+			incref(self->eti_next);
+			break;
+
+#ifndef CONFIG_NO_SMP
+		case ENUM_THREADS_ST_PENDING:
+			do {
+				assert(self->eti_next->t_cpu == cpu_vector[self->eti_state2]);
+				self->eti_next = self->eti_next->t_sched.s_pending.ss_pennxt;
+				if (self->eti_next == NULL) {
+					while (++self->eti_state2 < cpu_count) {
+						self->eti_next = cpu_vector[self->eti_state2]->c_pending;
+						if (self->eti_next != NULL &&
+						    self->eti_next != CPU_PENDING_ENDOFCHAIN)
+							goto again_pending;
+					}
+					self->eti_state = 0;
+					self->eti_next  = NULL;
+					goto done;
+				}
+again_pending:
+				;
+			} while (self->eti_next == &FORCPU(cpu_vector[self->eti_state2], _this_idle));
+			incref(self->eti_next);
+			break;
+#endif /* !CONFIG_NO_SMP */
 
 		default:
 			self->eti_next = NULL;
 			break;
 		}
+		/* Check if the thread is a kernel-thread */
+		if (!SHOULD_ENUMERATE_ALL_THREADS &&
+		    !isakernthread(result)) {
+			decref_unlikely(result);
+			goto again_switch;
+		}
 	}
+done:
 	return result;
 }
 

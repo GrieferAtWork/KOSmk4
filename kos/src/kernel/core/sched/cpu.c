@@ -472,8 +472,23 @@ PUBLIC bool NOTHROW(FCALL task_sleep)(qtime_t const *abs_timeout) {
 	 *       thread is probably waiting some sort of signal. */
 #ifndef NDEBUG
 	PREEMPTION_DISABLE();
-	assert(THIS_TASK->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv == THIS_TASK);
-	assert(THIS_TASK->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt == THIS_TASK);
+	assertf(THIS_CPU->c_current == THIS_TASK,
+	        "THIS_TASK           = %p\n"
+	        "THIS_CPU            = %p\n"
+	        "THIS_CPU->c_current = %p\n",
+	        THIS_TASK, THIS_CPU, THIS_CPU->c_current);
+	assertf(THIS_TASK->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv == THIS_TASK &&
+	        THIS_TASK->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt == THIS_TASK,
+	        "THIS_TASK                                                           = %p\n"
+	        "THIS_TASK->t_sched.s_running.sr_runnxt                              = %p\n"
+	        "THIS_TASK->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv = %p\n"
+	        "THIS_TASK->t_sched.s_running.sr_runprv                              = %p\n"
+	        "THIS_TASK->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt = %p\n",
+	        THIS_TASK,
+	        THIS_TASK->t_sched.s_running.sr_runnxt,
+	        THIS_TASK->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv,
+	        THIS_TASK->t_sched.s_running.sr_runprv,
+	        THIS_TASK->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt);
 	PREEMPTION_ENABLE();
 #endif /* !NDEBUG */
 

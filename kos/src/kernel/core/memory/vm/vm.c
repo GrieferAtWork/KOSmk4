@@ -33,6 +33,7 @@
 #include <kernel/swap.h>
 #include <kernel/vm.h>
 #include <sched/cpu.h>
+#include <sched/pid.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
@@ -43,7 +44,6 @@
 #include <string.h>
 
 #include "../corebase.h"
-
 #include "vm-nodeapi.h"
 
 #define POINTER_SET_BUFSIZE 4
@@ -3067,22 +3067,11 @@ NOTHROW(KCALL partnode_pair_vector_fini)(struct partnode_pair_vector *__restrict
 		kfree(self->pv_vec);
 }
 
-#if 1
-#include <sched/pid.h>
-#include <kernel/gdt.h>
-LOCAL void KCALL log_updating_access_rights(struct vm_node *__restrict self) {
-	printk(KERN_DEBUG "[vm] Update access rights of %p...%p [pid:%u,fs:%p,gs:%p]\n",
-	       VM_NODE_MINADDR(self), VM_NODE_MAXADDR(self),
-	       task_getroottid_s(), get_user_fsbase(), get_user_gsbase());
-}
-#else
-#include <sched/pid.h>
 LOCAL void KCALL log_updating_access_rights(struct vm_node *__restrict self) {
 	printk(KERN_DEBUG "[vm] Update access rights of %p...%p [pid:%u]\n",
 	       VM_NODE_MINADDR(self), VM_NODE_MAXADDR(self),
 	       task_getroottid_s());
 }
-#endif
 
 
 /* Delete the mapping `self' for the purpose of re-loading

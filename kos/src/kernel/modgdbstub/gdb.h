@@ -52,7 +52,7 @@
  */
 
 #undef HAVE_GDB_DEBUG
-#if 0
+#if 1
 #include <kernel/printk.h>
 #define HAVE_GDB_DEBUG 1
 #define GDB_DEBUG(...) printk(KERN_DEBUG __VA_ARGS__)
@@ -64,8 +64,9 @@
 DECL_BEGIN
 
 typedef struct {
-	uintptr_t        eti_state; /* Enumeration state (internal) */
-	REF struct task *eti_next;  /* [0..1] Enumeration task (internal) */
+	uintptr_t        eti_state;  /* Enumeration state (internal) */
+	REF struct task *eti_next;   /* [0..1] Enumeration task (internal) */
+	uintptr_t        eti_state2; /* Enumeration state (internal) */
 } GDBEnumThreadsIterator;
 
 typedef struct {

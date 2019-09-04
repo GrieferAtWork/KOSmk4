@@ -72,12 +72,15 @@ LOCAL void NOTHROW(FCALL GDBRemote_SetAttached)(void) {
 		}
 	}
 }
+
 LOCAL void NOTHROW(FCALL GDBRemote_SetDetached)(void) {
 	if (ATOMIC_FETCHAND(GDB_RemoteFeatures,
 	                    ~GDB_REMOTEFEATURE_ATTACHED) &
 	    GDB_REMOTEFEATURE_ATTACHED) {
 		GDB_DEBUG("[gdb] Mark as detached\n");
 		sig_broadcast(&GDBRemote_AttachedChanged);
+		/* Remove all breakpoints after detaching. */
+		GDB_RemoveAllBreakpoints();
 	}
 }
 
