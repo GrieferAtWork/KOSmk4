@@ -60,29 +60,12 @@
 
 DECL_BEGIN
 
-struct buffered_printer_data {
-	char  *pd_buf; /* Next buffer pointer. */
-	size_t pd_siz; /* Remaining buffer size. */
-};
-
-PRIVATE ssize_t KCALL
-buffered_printer_func(struct buffered_printer_data *__restrict self,
-                      char const *__restrict data, size_t num_bytes) {
-	size_t cpy = MIN(num_bytes, self->pd_siz);
-	memcpy(self->pd_buf, data, cpy);
-	self->pd_buf += num_bytes;
-	self->pd_siz -= cpy;
-	return num_bytes;
-}
-
-
-
 DEFINE_SYSCALL2(ssize_t, getcwd,
                 USER UNCHECKED char *, buf, size_t, bufsize) {
 	struct fs *f = THIS_FS;
 	REF struct path *cwd, *root;
 	unsigned int mode;
-	struct buffered_printer_data data;
+	size_t reqlen;
 	validate_writable(buf, bufsize);
 	sync_read(&f->f_pathlock);
 	cwd  = incref(f->f_cwd);
@@ -98,11 +81,11 @@ DEFINE_SYSCALL2(ssize_t, getcwd,
 	{
 		FINALLY_DECREF_UNLIKELY(cwd);
 		FINALLY_DECREF_UNLIKELY(root);
-		data.pd_buf = buf;
-		data.pd_siz = bufsize;
-		path_printex(cwd, (pformatprinter)&buffered_printer_func, &data, mode, root);
+		reqlen = path_sprintex(buf, bufsize, cwd, mode, root);
 	}
-	return (size_t)(data.pd_buf - buf);
+	if unlikely(reqlen > bufsize) /* return -ERANGE; */
+		THROW(E_BUFFER_TOO_SMALL, reqlen, bufsize);
+	return reqlen;
 }
 
 

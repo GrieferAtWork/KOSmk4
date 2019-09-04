@@ -468,6 +468,8 @@ PUBLIC bool NOTHROW(FCALL task_sleep)(qtime_t const *abs_timeout) {
 	/* Continue execution in the next thread. */
 	cpu_run_current_and_remember(me);
 
+	/* HINT: If your debugger break here, it means that your
+	 *       thread is probably waiting some sort of signal. */
 #ifndef NDEBUG
 	PREEMPTION_DISABLE();
 	assert(THIS_TASK->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv == THIS_TASK);

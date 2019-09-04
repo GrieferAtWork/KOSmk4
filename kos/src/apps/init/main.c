@@ -104,7 +104,7 @@ done_devfs:
 	{
 		struct termios tio;
 		Ioctl(STDIN_FILENO, TCGETA, &tio);
-		tio.c_lflag &= ~(ICANON|ECHO);
+		tio.c_lflag &= ~(ICANON | ECHO);
 		Ioctl(STDIN_FILENO, TCSETA, &tio);
 	}
 	dprintf(STDOUT_FILENO, "\033[4h");  /* Enable insert mode */
