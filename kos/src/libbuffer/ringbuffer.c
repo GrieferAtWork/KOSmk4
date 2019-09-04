@@ -599,8 +599,8 @@ again:
 			}
 			/* Install the new buffer (if it is larger than the current
 			 * one, but smaller than the (now) effective limit) */
-			if (new_buffer.hp_siz >= self->rb_size &&
-			    new_buffer.hp_siz < ATOMIC_READ(self->rb_limit)) {
+			if (new_buffer.hp_siz > self->rb_size &&
+			    new_buffer.hp_siz <= ATOMIC_READ(self->rb_limit)) {
 				size_t lo, hi;
 				byte_t *old_buffer_base;
 				size_t old_buffer_size;
