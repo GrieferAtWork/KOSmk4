@@ -49,6 +49,7 @@ DECL_BEGIN
 #define TASK_FPENDING     0x0100 /* [lock(WRITE_ONCE(OLD_CPU_OR_CREATOR),CLEAR(THIS_CPU))]
                                   * The task is currently pending execution on its associated CPU. */
 #endif /* !CONFIG_NO_SMP */
+#define TASK_FSTARTED     0x0800 /* [lock(WRITE_ONCE)] The thread has been started. */
 #define TASK_FSUSPENDED   0x4000 /* Used internally to implement of SIGSTOP/SIGCONT */
 #define TASK_FTIMEOUT     0x8000 /* Set by the scheduler when waking a task due to a timeout. */
 

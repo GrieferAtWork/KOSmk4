@@ -117,9 +117,13 @@ struct cpu {
 
 
 #ifndef NDEBUG
-FUNDEF NOBLOCK void NOTHROW(FCALL cpu_assert_integrity)(bool need_caller DFL(true));
+FUNDEF NOBLOCK void NOTHROW(FCALL cpu_assert_integrity)(struct task *ignored_thread DFL(__NULLPTR));
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL cpu_assert_running)(struct task *__restrict thread);
+FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(FCALL cpu_assert_sleeping)(struct task *__restrict thread);
 #else /* !NDEBUG */
-#define cpu_assert_integrity(need_caller) (void)0
+#define cpu_assert_integrity(ignored_thread) (void)0
+#define cpu_assert_running(thread)           (void)0
+#define cpu_assert_sleeping(thread)          (void)0
 #endif /* NDEBUG */
 
 /* The per-cpu / global jiffies counters. */

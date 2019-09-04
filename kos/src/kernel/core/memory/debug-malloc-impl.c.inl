@@ -340,10 +340,9 @@ NOTHROW_NX(KCALL FUNC(kmalloc))(size_t n_bytes, gfp_t flags) {
 	                                   context))
 #else
 	TRY {
-		FUNC(mall_trace_impl)
-		(result.hp_ptr, result.hp_siz,
-		 flags & (__GFP_HEAPMASK | GFP_NOLEAK | GFP_NOWALK | GFP_INHERIT),
-		 context);
+		FUNC(mall_trace_impl)(result.hp_ptr, result.hp_siz,
+		                      flags & (__GFP_HEAPMASK | GFP_NOLEAK | GFP_NOWALK | GFP_INHERIT),
+		                      context);
 	}
 	EXCEPT
 #endif

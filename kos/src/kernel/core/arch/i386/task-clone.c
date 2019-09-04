@@ -116,14 +116,15 @@ x86_task_clone(struct ucpustate const *__restrict init_state,
 	REF struct task *result;
 	struct heapptr resptr;
 	REF struct vm *result_vm;
+	struct task *caller = THIS_TASK;
 	if (clone_flags & CLONE_PARENT_SETTID)
 		validate_writable(parent_tidptr, sizeof(*parent_tidptr));
 	if (clone_flags & (CLONE_CHILD_CLEARTID | CLONE_CHILD_SETTID))
 		validate_writable(child_tidptr, sizeof(*child_tidptr));
 	if (clone_flags & CLONE_VM) {
-		result_vm = incref(THIS_VM);
+		result_vm = incref(caller->t_vm);
 	} else {
-		result_vm = vm_clone(THIS_VM, false);
+		result_vm = vm_clone(caller->t_vm, false);
 	}
 	TRY {
 		/* Allocate a new task structure. */

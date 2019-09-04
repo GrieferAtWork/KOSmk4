@@ -127,7 +127,7 @@ NOTHROW(FCALL ipi_schedule_asynchronous_rpc_lp)(struct icpustate *__restrict sta
 	if (!(target_flags & (TASK_FRUNNING | TASK_FPENDING))) {
 		struct task *caller, *next;
 		/* Wake up a sleeping thread by using a sporadic wake-up. */
-		cpu_assert_integrity();
+		cpu_assert_sleeping(target);
 		ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
 		if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
 			target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
@@ -138,7 +138,7 @@ NOTHROW(FCALL ipi_schedule_asynchronous_rpc_lp)(struct icpustate *__restrict sta
 		caller->t_sched.s_running.sr_runnxt = target;
 		next->t_sched.s_running.sr_runprv   = target;
 		ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
-		cpu_assert_integrity();
+		cpu_assert_running(target);
 	}
 	return state;
 }
@@ -178,29 +178,32 @@ NOTHROW(FCALL ipi_schedule_asynchronous_rpc)(struct icpustate *__restrict state,
 	}
 	target->t_sched.s_state = task_push_asynchronous_rpc(target->t_sched.s_state,
 	                                                     func, arg, completed);
-	cpu_assert_integrity();
 	if (target_flags & TASK_FRUNNING) {
 		/* Running thread */
-		struct task *caller, *next;
-		/* Re-schedule the thread to execute as soon as possible. */
-		target->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt = target->t_sched.s_running.sr_runnxt;
-		target->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv = target->t_sched.s_running.sr_runprv;
+		cpu_assert_running(target);
+		if (target != THIS_TASK) {
+			struct task *caller, *next;
+			/* Re-schedule the thread to execute as soon as possible. */
+			target->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt = target->t_sched.s_running.sr_runnxt;
+			target->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv = target->t_sched.s_running.sr_runprv;
 insert_target_after_caller:
-		caller                              = THIS_TASK;
-		next                                = caller->t_sched.s_running.sr_runnxt;
-		target->t_sched.s_running.sr_runprv = caller;
-		target->t_sched.s_running.sr_runnxt = next;
-		caller->t_sched.s_running.sr_runnxt = target;
-		next->t_sched.s_running.sr_runprv   = target;
-		ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
+			caller                              = THIS_TASK;
+			next                                = caller->t_sched.s_running.sr_runnxt;
+			target->t_sched.s_running.sr_runprv = caller;
+			target->t_sched.s_running.sr_runnxt = next;
+			caller->t_sched.s_running.sr_runnxt = target;
+			next->t_sched.s_running.sr_runprv   = target;
+			ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
+			cpu_assert_running(target);
+		}
 	} else if (!(target_flags & TASK_FPENDING)) {
 		/* Wake up a sleeping thread by using a sporadic wake-up. */
+		cpu_assert_sleeping(target);
 		ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
 		if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
 			target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
 		goto insert_target_after_caller;
 	}
-	cpu_assert_integrity();
 	return state;
 }
 
@@ -239,31 +242,33 @@ NOTHROW(FCALL ipi_schedule_asynchronous_rpc_hp)(struct icpustate *__restrict sta
 	}
 	target->t_sched.s_state = task_push_asynchronous_rpc(target->t_sched.s_state,
 	                                                     func, arg, completed);
-	cpu_assert_integrity();
 	if (target_flags & TASK_FRUNNING) {
 		/* Running thread */
-		struct task *caller, *next;
-		/* Re-schedule the thread to execute as soon as possible. */
-		target->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt = target->t_sched.s_running.sr_runnxt;
-		target->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv = target->t_sched.s_running.sr_runprv;
+		cpu_assert_running(target);
+		if (target != THIS_TASK) {
+			struct task *caller, *next;
+			/* Re-schedule the thread to execute as soon as possible. */
+			target->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt = target->t_sched.s_running.sr_runnxt;
+			target->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv = target->t_sched.s_running.sr_runprv;
 insert_target_after_caller:
-		caller                              = THIS_TASK;
-		next                                = caller->t_sched.s_running.sr_runnxt;
-		target->t_sched.s_running.sr_runprv = caller;
-		target->t_sched.s_running.sr_runnxt = next;
-		caller->t_sched.s_running.sr_runnxt = target;
-		next->t_sched.s_running.sr_runprv   = target;
-		ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
-		cpu_assert_integrity();
-		return CPU_IPI_MODE_SWITCH_TASKS;
+			caller                              = THIS_TASK;
+			next                                = caller->t_sched.s_running.sr_runnxt;
+			target->t_sched.s_running.sr_runprv = caller;
+			target->t_sched.s_running.sr_runnxt = next;
+			caller->t_sched.s_running.sr_runnxt = target;
+			next->t_sched.s_running.sr_runprv   = target;
+			ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
+			cpu_assert_running(target);
+			return CPU_IPI_MODE_SWITCH_TASKS;
+		}
 	} else if (!(target_flags & TASK_FPENDING)) {
 		/* Wake up a sleeping thread by using a sporadic wake-up. */
+		cpu_assert_sleeping(target);
 		ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
 		if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
 			target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
 		goto insert_target_after_caller;
 	}
-	cpu_assert_integrity();
 	return state;
 }
 
@@ -312,7 +317,7 @@ NOTHROW(FCALL ipi_redirect_usercode_rpc_lp)(struct icpustate *__restrict state,
 	if (!(target_flags & (TASK_FRUNNING | TASK_FPENDING))) {
 		struct task *caller, *next;
 		/* Wake up a sleeping thread by using a sporadic wake-up. */
-		cpu_assert_integrity();
+		cpu_assert_sleeping(target);
 		ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
 		if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
 			target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
@@ -323,7 +328,7 @@ NOTHROW(FCALL ipi_redirect_usercode_rpc_lp)(struct icpustate *__restrict state,
 		caller->t_sched.s_running.sr_runnxt = target;
 		next->t_sched.s_running.sr_runprv   = target;
 		ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
-		cpu_assert_integrity();
+		cpu_assert_running(target);
 	}
 	return state;
 }
@@ -345,31 +350,33 @@ NOTHROW(FCALL ipi_redirect_usercode_rpc_hp)(struct icpustate *__restrict state,
 	if unlikely(target_flags & TASK_FTERMINATED)
 		return state;
 	task_enable_redirect_usercode_rpc(target);
-	cpu_assert_integrity();
 	if (target_flags & TASK_FRUNNING) {
 		/* Running thread */
-		struct task *caller, *next;
-		/* Re-schedule the thread to execute as soon as possible. */
-		target->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt = target->t_sched.s_running.sr_runnxt;
-		target->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv = target->t_sched.s_running.sr_runprv;
+		cpu_assert_running(target);
+		if (target != THIS_TASK) {
+			struct task *caller, *next;
+			/* Re-schedule the thread to execute as soon as possible. */
+			target->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt = target->t_sched.s_running.sr_runnxt;
+			target->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv = target->t_sched.s_running.sr_runprv;
 insert_target_after_caller:
-		caller                              = THIS_TASK;
-		next                                = caller->t_sched.s_running.sr_runnxt;
-		target->t_sched.s_running.sr_runprv = caller;
-		target->t_sched.s_running.sr_runnxt = next;
-		caller->t_sched.s_running.sr_runnxt = target;
-		next->t_sched.s_running.sr_runprv   = target;
-		ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
-		cpu_assert_integrity();
-		return CPU_IPI_MODE_SWITCH_TASKS;
+			caller                              = THIS_TASK;
+			next                                = caller->t_sched.s_running.sr_runnxt;
+			target->t_sched.s_running.sr_runprv = caller;
+			target->t_sched.s_running.sr_runnxt = next;
+			caller->t_sched.s_running.sr_runnxt = target;
+			next->t_sched.s_running.sr_runprv   = target;
+			ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
+			cpu_assert_running(target);
+			return CPU_IPI_MODE_SWITCH_TASKS;
+		}
 	} else if (!(target_flags & TASK_FPENDING)) {
 		/* Wake up a sleeping thread by using a sporadic wake-up. */
+		cpu_assert_sleeping(target);
 		ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
 		if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
 			target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
 		goto insert_target_after_caller;
 	}
-	cpu_assert_integrity();
 	return state;
 }
 
@@ -391,31 +398,33 @@ NOTHROW(FCALL ipi_redirect_usercode_rpc)(struct icpustate *__restrict state,
 		return state;
 	task_enable_redirect_usercode_rpc(target);
 	/* Wake the task, so-as to allow an interrupting user-code RPC to  */
-	cpu_assert_integrity();
 	if (target_flags & TASK_FRUNNING) {
 		/* Running thread */
-		struct task *caller, *next;
-		/* Re-schedule the thread to execute as soon as possible. */
-		target->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt = target->t_sched.s_running.sr_runnxt;
-		target->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv = target->t_sched.s_running.sr_runprv;
+		cpu_assert_running(target);
+		if (target != THIS_TASK) {
+			struct task *caller, *next;
+			/* Re-schedule the thread to execute as soon as possible. */
+			target->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt = target->t_sched.s_running.sr_runnxt;
+			target->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv = target->t_sched.s_running.sr_runprv;
 insert_target_after_caller:
-		caller                              = THIS_TASK;
-		next                                = caller->t_sched.s_running.sr_runnxt;
-		target->t_sched.s_running.sr_runprv = caller;
-		target->t_sched.s_running.sr_runnxt = next;
-		caller->t_sched.s_running.sr_runnxt = target;
-		next->t_sched.s_running.sr_runprv   = target;
-		ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
-		cpu_assert_integrity();
-		return CPU_IPI_MODE_SWITCH_TASKS;
+			caller                              = THIS_TASK;
+			next                                = caller->t_sched.s_running.sr_runnxt;
+			target->t_sched.s_running.sr_runprv = caller;
+			target->t_sched.s_running.sr_runnxt = next;
+			caller->t_sched.s_running.sr_runnxt = target;
+			next->t_sched.s_running.sr_runprv   = target;
+			ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
+			cpu_assert_running(target);
+			return CPU_IPI_MODE_SWITCH_TASKS;
+		}
 	} else if (!(target_flags & TASK_FPENDING)) {
 		/* Wake up a sleeping thread by using a sporadic wake-up. */
+		cpu_assert_sleeping(target);
 		ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
 		if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
 			target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
 		goto insert_target_after_caller;
 	}
-	cpu_assert_integrity();
 	return state;
 }
 #endif
@@ -465,21 +474,21 @@ NOTHROW(KCALL task_redirect_usercode_rpc)(struct task *__restrict target, uintpt
 			goto done_success;
 		if (target_flags & TASK_FRUNNING) {
 			/* Running thread */
-			if (!(mode & TASK_RPC_FLOWPRIO)) {
+			cpu_assert_running(target);
+			if (!(mode & TASK_RPC_FLOWPRIO) && target != THIS_TASK) {
 				struct task *caller, *next;
 				/* Re-schedule the thread to execute as soon as possible. */
-				cpu_assert_integrity();
 				target->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt = target->t_sched.s_running.sr_runnxt;
 				target->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv = target->t_sched.s_running.sr_runprv;
 insert_target_after_caller:
-				caller                              = THIS_TASK;
-				next                                = caller->t_sched.s_running.sr_runnxt;
+				caller = THIS_TASK;
+				next   = caller->t_sched.s_running.sr_runnxt;
 				target->t_sched.s_running.sr_runprv = caller;
 				target->t_sched.s_running.sr_runnxt = next;
 				caller->t_sched.s_running.sr_runnxt = target;
 				next->t_sched.s_running.sr_runprv   = target;
 				ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
-				cpu_assert_integrity();
+				cpu_assert_running(target);
 				if (PREEMPTION_WASENABLED(was)) {
 					if (mode & TASK_RPC_FHIGHPRIO) {
 						/* End the current quantum prematurely. */
@@ -504,7 +513,8 @@ insert_target_after_caller:
 #endif /* CONFIG_NO_SMP */
 		{
 			/* Wake up a sleeping thread by using a sporadic wake-up. */
-			cpu_assert_integrity();
+			assert(target != THIS_TASK);
+			cpu_assert_sleeping(target);
 			ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
 			if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
 				target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
@@ -574,10 +584,10 @@ NOTHROW(KCALL task_schedule_asynchronous_rpc)(struct task *__restrict target, ta
 			goto done_success;
 		if (target_flags & TASK_FRUNNING) {
 			/* Running thread */
-			if (!(mode & TASK_RPC_FLOWPRIO)) {
+			cpu_assert_running(target);
+			if (!(mode & TASK_RPC_FLOWPRIO) && target != THIS_TASK) {
 				struct task *caller, *next;
 				/* Re-schedule the thread to execute as soon as possible. */
-				cpu_assert_integrity();
 				target->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt = target->t_sched.s_running.sr_runnxt;
 				target->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv = target->t_sched.s_running.sr_runprv;
 insert_target_after_caller:
@@ -588,7 +598,7 @@ insert_target_after_caller:
 				caller->t_sched.s_running.sr_runnxt = target;
 				next->t_sched.s_running.sr_runprv   = target;
 				ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
-				cpu_assert_integrity();
+				cpu_assert_running(target);
 				if (PREEMPTION_WASENABLED(was)) {
 					if (mode & TASK_RPC_FHIGHPRIO) {
 						/* End the current quantum prematurely. */
@@ -613,7 +623,8 @@ insert_target_after_caller:
 #endif /* CONFIG_NO_SMP */
 		{
 			/* Wake up a sleeping thread by using a sporadic wake-up. */
-			cpu_assert_integrity();
+			assert(target != THIS_TASK);
+			cpu_assert_sleeping(target);
 			ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
 			if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
 				target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
@@ -695,7 +706,7 @@ NOTHROW(FCALL ipi_schedule_asynchronous_srpc_lp)(struct icpustate *__restrict st
 	if (!(target_flags & (TASK_FRUNNING | TASK_FPENDING))) {
 		struct task *caller, *next;
 		/* Wake up a sleeping thread by using a sporadic wake-up. */
-		cpu_assert_integrity();
+		cpu_assert_sleeping(target);
 		ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
 		if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
 			target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
@@ -706,7 +717,7 @@ NOTHROW(FCALL ipi_schedule_asynchronous_srpc_lp)(struct icpustate *__restrict st
 		caller->t_sched.s_running.sr_runnxt = target;
 		next->t_sched.s_running.sr_runprv   = target;
 		ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
-		cpu_assert_integrity();
+		cpu_assert_running(target);
 	}
 	return state;
 }
@@ -741,29 +752,32 @@ NOTHROW(FCALL ipi_schedule_asynchronous_srpc)(struct icpustate *__restrict state
 	}
 	target->t_sched.s_state = task_push_asynchronous_srpc(target->t_sched.s_state,
 	                                                      func, arg, completed);
-	cpu_assert_integrity();
 	if (target_flags & TASK_FRUNNING) {
 		/* Running thread */
-		struct task *caller, *next;
-		/* Re-schedule the thread to execute as soon as possible. */
-		target->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt = target->t_sched.s_running.sr_runnxt;
-		target->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv = target->t_sched.s_running.sr_runprv;
+		cpu_assert_running(target);
+		if (target != THIS_TASK) {
+			struct task *caller, *next;
+			/* Re-schedule the thread to execute as soon as possible. */
+			target->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt = target->t_sched.s_running.sr_runnxt;
+			target->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv = target->t_sched.s_running.sr_runprv;
 insert_target_after_caller:
-		caller                              = THIS_TASK;
-		next                                = caller->t_sched.s_running.sr_runnxt;
-		target->t_sched.s_running.sr_runprv = caller;
-		target->t_sched.s_running.sr_runnxt = next;
-		caller->t_sched.s_running.sr_runnxt = target;
-		next->t_sched.s_running.sr_runprv   = target;
-		ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
+			caller                              = THIS_TASK;
+			next                                = caller->t_sched.s_running.sr_runnxt;
+			target->t_sched.s_running.sr_runprv = caller;
+			target->t_sched.s_running.sr_runnxt = next;
+			caller->t_sched.s_running.sr_runnxt = target;
+			next->t_sched.s_running.sr_runprv   = target;
+			ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
+			cpu_assert_running(target);
+		}
 	} else if (!(target_flags & TASK_FPENDING)) {
 		/* Wake up a sleeping thread by using a sporadic wake-up. */
+		cpu_assert_sleeping(target);
 		ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
 		if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
 			target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
 		goto insert_target_after_caller;
 	}
-	cpu_assert_integrity();
 	return state;
 }
 
@@ -800,31 +814,33 @@ NOTHROW(FCALL ipi_schedule_asynchronous_srpc_hp)(struct icpustate *__restrict st
 	}
 	target->t_sched.s_state = task_push_asynchronous_srpc(target->t_sched.s_state,
 	                                                      func, arg, completed);
-	cpu_assert_integrity();
 	if (target_flags & TASK_FRUNNING) {
 		/* Running thread */
-		struct task *caller, *next;
-		/* Re-schedule the thread to execute as soon as possible. */
-		target->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt = target->t_sched.s_running.sr_runnxt;
-		target->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv = target->t_sched.s_running.sr_runprv;
+		cpu_assert_running(target);
+		if (target != THIS_TASK) {
+			struct task *caller, *next;
+			/* Re-schedule the thread to execute as soon as possible. */
+			target->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt = target->t_sched.s_running.sr_runnxt;
+			target->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv = target->t_sched.s_running.sr_runprv;
 insert_target_after_caller:
-		caller                              = THIS_TASK;
-		next                                = caller->t_sched.s_running.sr_runnxt;
-		target->t_sched.s_running.sr_runprv = caller;
-		target->t_sched.s_running.sr_runnxt = next;
-		caller->t_sched.s_running.sr_runnxt = target;
-		next->t_sched.s_running.sr_runprv   = target;
-		ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
-		cpu_assert_integrity();
-		return CPU_IPI_MODE_SWITCH_TASKS;
+			caller                              = THIS_TASK;
+			next                                = caller->t_sched.s_running.sr_runnxt;
+			target->t_sched.s_running.sr_runprv = caller;
+			target->t_sched.s_running.sr_runnxt = next;
+			caller->t_sched.s_running.sr_runnxt = target;
+			next->t_sched.s_running.sr_runprv   = target;
+			ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
+			cpu_assert_running(target);
+			return CPU_IPI_MODE_SWITCH_TASKS;
+		}
 	} else if (!(target_flags & TASK_FPENDING)) {
 		/* Wake up a sleeping thread by using a sporadic wake-up. */
+		cpu_assert_sleeping(target);
 		ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
 		if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
 			target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
 		goto insert_target_after_caller;
 	}
-	cpu_assert_integrity();
 	return state;
 }
 #endif
@@ -885,10 +901,10 @@ NOTHROW(KCALL task_schedule_asynchronous_srpc)(struct task *__restrict target, t
 			goto done_success;
 		if (target_flags & TASK_FRUNNING) {
 			/* Running thread */
-			if (!(mode & TASK_RPC_FLOWPRIO)) {
+			cpu_assert_running(target);
+			if (!(mode & TASK_RPC_FLOWPRIO) && target != THIS_TASK) {
 				struct task *caller, *next;
 				/* Re-schedule the thread to execute as soon as possible. */
-				cpu_assert_integrity();
 				target->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt = target->t_sched.s_running.sr_runnxt;
 				target->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv = target->t_sched.s_running.sr_runprv;
 insert_target_after_caller:
@@ -899,7 +915,7 @@ insert_target_after_caller:
 				caller->t_sched.s_running.sr_runnxt = target;
 				next->t_sched.s_running.sr_runprv   = target;
 				ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
-				cpu_assert_integrity();
+				cpu_assert_running(target);
 				if (PREEMPTION_WASENABLED(was)) {
 					if (mode & TASK_RPC_FHIGHPRIO) {
 						/* End the current quantum prematurely. */
@@ -924,7 +940,8 @@ insert_target_after_caller:
 #endif /* CONFIG_NO_SMP */
 		{
 			/* Wake up a sleeping thread by using a sporadic wake-up. */
-			cpu_assert_integrity();
+			assert(target != THIS_TASK);
+			cpu_assert_sleeping(target);
 			ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
 			if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
 				target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
@@ -996,10 +1013,10 @@ NOTHROW(FCALL ipi_exec_asynchronous_rpc)(struct icpustate *__restrict state,
 		goto done_success;
 	if (target_flags & TASK_FRUNNING) {
 		/* Running thread */
-		if (!(data->ar_mode & TASK_RPC_FLOWPRIO)) {
+		cpu_assert_running(target);
+		if (!(data->ar_mode & TASK_RPC_FLOWPRIO) && target != THIS_TASK) {
 			struct task *caller, *next;
 			/* Re-schedule the thread to execute as soon as possible. */
-			cpu_assert_integrity();
 			target->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt = target->t_sched.s_running.sr_runnxt;
 			target->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv = target->t_sched.s_running.sr_runprv;
 insert_target_after_caller:
@@ -1010,7 +1027,7 @@ insert_target_after_caller:
 			caller->t_sched.s_running.sr_runnxt = target;
 			next->t_sched.s_running.sr_runprv   = target;
 			ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
-			cpu_assert_integrity();
+			cpu_assert_running(target);
 			if (data->ar_mode & TASK_RPC_FHIGHPRIO) {
 				COMPILER_BARRIER();
 				ATOMIC_WRITE(data->ar_status, EXEC_ASYNC_STATUS_CONFIRMED);
@@ -1020,7 +1037,7 @@ insert_target_after_caller:
 		}
 	} else if (!(target_flags & TASK_FPENDING)) {
 		/* Wake up a sleeping thread by using a sporadic wake-up. */
-		cpu_assert_integrity();
+		cpu_assert_sleeping(target);
 		ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
 		if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
 			target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
@@ -1092,10 +1109,10 @@ again:
 			goto done_success;
 		if (target_flags & TASK_FRUNNING) {
 			/* Running thread */
-			if (!(mode & TASK_RPC_FLOWPRIO)) {
+			cpu_assert_running(target);
+			if (!(mode & TASK_RPC_FLOWPRIO) && target != THIS_TASK) {
 				struct task *caller, *next;
 				/* Re-schedule the thread to execute as soon as possible. */
-				cpu_assert_integrity();
 				target->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt = target->t_sched.s_running.sr_runnxt;
 				target->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv = target->t_sched.s_running.sr_runprv;
 insert_target_after_caller:
@@ -1106,7 +1123,7 @@ insert_target_after_caller:
 				caller->t_sched.s_running.sr_runnxt = target;
 				next->t_sched.s_running.sr_runprv   = target;
 				ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
-				cpu_assert_integrity();
+				cpu_assert_running(target);
 				if (PREEMPTION_WASENABLED(was)) {
 					if (mode & TASK_RPC_FHIGHPRIO) {
 						/* End the current quantum prematurely. */
@@ -1121,7 +1138,8 @@ insert_target_after_caller:
 			}
 		} else if (!(target_flags & TASK_FPENDING)) {
 			/* Wake up a sleeping thread by using a sporadic wake-up. */
-			cpu_assert_integrity();
+			assert(target != THIS_TASK);
+			cpu_assert_sleeping(target);
 			ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
 			assert(target->t_sched.s_asleep.ss_pself);
 			if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
@@ -1183,10 +1201,10 @@ NOTHROW(FCALL ipi_exec_asynchronous_srpc)(struct icpustate *__restrict state,
 		goto done_success;
 	if (target_flags & TASK_FRUNNING) {
 		/* Running thread */
-		if (!(data->ar_mode & TASK_RPC_FLOWPRIO)) {
+		cpu_assert_running(target);
+		if (!(data->ar_mode & TASK_RPC_FLOWPRIO) && target != THIS_TASK) {
 			struct task *caller, *next;
 			/* Re-schedule the thread to execute as soon as possible. */
-			cpu_assert_integrity();
 			target->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt = target->t_sched.s_running.sr_runnxt;
 			target->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv = target->t_sched.s_running.sr_runprv;
 insert_target_after_caller:
@@ -1197,7 +1215,7 @@ insert_target_after_caller:
 			caller->t_sched.s_running.sr_runnxt = target;
 			next->t_sched.s_running.sr_runprv   = target;
 			ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
-			cpu_assert_integrity();
+			cpu_assert_running(target);
 			if (data->ar_mode & TASK_RPC_FHIGHPRIO) {
 				COMPILER_BARRIER();
 				ATOMIC_WRITE(data->ar_status, EXEC_ASYNC_STATUS_CONFIRMED);
@@ -1207,7 +1225,7 @@ insert_target_after_caller:
 		}
 	} else if (!(target_flags & TASK_FPENDING)) {
 		/* Wake up a sleeping thread by using a sporadic wake-up. */
-		cpu_assert_integrity();
+		cpu_assert_sleeping(target);
 		ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
 		if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
 			target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
@@ -1281,10 +1299,10 @@ again:
 			goto done_success;
 		if (target_flags & TASK_FRUNNING) {
 			/* Running thread */
-			if (!(mode & TASK_RPC_FLOWPRIO)) {
+			cpu_assert_running(target);
+			if (!(mode & TASK_RPC_FLOWPRIO) && target != THIS_TASK) {
 				struct task *caller, *next;
 				/* Re-schedule the thread to execute as soon as possible. */
-				cpu_assert_integrity();
 				target->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt = target->t_sched.s_running.sr_runnxt;
 				target->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv = target->t_sched.s_running.sr_runprv;
 insert_target_after_caller:
@@ -1295,7 +1313,7 @@ insert_target_after_caller:
 				caller->t_sched.s_running.sr_runnxt = target;
 				next->t_sched.s_running.sr_runprv   = target;
 				ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
-				cpu_assert_integrity();
+				cpu_assert_running(target);
 				if (PREEMPTION_WASENABLED(was)) {
 					if (mode & TASK_RPC_FHIGHPRIO) {
 						/* End the current quantum prematurely. */
@@ -1310,7 +1328,8 @@ insert_target_after_caller:
 			}
 		} else if (!(target_flags & TASK_FPENDING)) {
 			/* Wake up a sleeping thread by using a sporadic wake-up. */
-			cpu_assert_integrity();
+			assert(target != THIS_TASK);
+			cpu_assert_sleeping(target);
 			ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
 			if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
 				target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
@@ -1383,10 +1402,10 @@ NOTHROW(FCALL ipi_exec_asynchronous_rpc_v)(struct icpustate *__restrict state,
 		goto done_success;
 	if (target_flags & TASK_FRUNNING) {
 		/* Running thread */
-		if (!(data->ar_mode & TASK_RPC_FLOWPRIO)) {
+		cpu_assert_running(target);
+		if (!(data->ar_mode & TASK_RPC_FLOWPRIO) && target != THIS_TASK) {
 			struct task *caller, *next;
 			/* Re-schedule the thread to execute as soon as possible. */
-			cpu_assert_integrity();
 			target->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt = target->t_sched.s_running.sr_runnxt;
 			target->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv = target->t_sched.s_running.sr_runprv;
 insert_target_after_caller:
@@ -1397,7 +1416,7 @@ insert_target_after_caller:
 			caller->t_sched.s_running.sr_runnxt = target;
 			next->t_sched.s_running.sr_runprv   = target;
 			ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
-			cpu_assert_integrity();
+			cpu_assert_running(target);
 			if (data->ar_mode & TASK_RPC_FHIGHPRIO) {
 				COMPILER_BARRIER();
 				ATOMIC_WRITE(data->ar_status, EXEC_ASYNC_STATUS_CONFIRMED);
@@ -1407,7 +1426,7 @@ insert_target_after_caller:
 		}
 	} else if (!(target_flags & TASK_FPENDING)) {
 		/* Wake up a sleeping thread by using a sporadic wake-up. */
-		cpu_assert_integrity();
+		cpu_assert_sleeping(target);
 		ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
 		if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
 			target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
@@ -1488,10 +1507,10 @@ again:
 		                                                       func, buf, bufsize, completed);
 		if (target_flags & TASK_FRUNNING) {
 			/* Running thread */
-			if (!(mode & TASK_RPC_FLOWPRIO)) {
+			cpu_assert_running(target);
+			if (!(mode & TASK_RPC_FLOWPRIO) && target != THIS_TASK) {
 				struct task *caller, *next;
 				/* Re-schedule the thread to execute as soon as possible. */
-				cpu_assert_integrity();
 				target->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt = target->t_sched.s_running.sr_runnxt;
 				target->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv = target->t_sched.s_running.sr_runprv;
 insert_target_after_caller:
@@ -1502,7 +1521,7 @@ insert_target_after_caller:
 				caller->t_sched.s_running.sr_runnxt = target;
 				next->t_sched.s_running.sr_runprv   = target;
 				ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
-				cpu_assert_integrity();
+				cpu_assert_running(target);
 				if (PREEMPTION_WASENABLED(was)) {
 					if (mode & TASK_RPC_FHIGHPRIO) {
 						/* End the current quantum prematurely. */
@@ -1527,7 +1546,8 @@ insert_target_after_caller:
 #endif /* CONFIG_NO_SMP */
 		{
 			/* Wake up a sleeping thread by using a sporadic wake-up. */
-			cpu_assert_integrity();
+			assert(target != THIS_TASK);
+			cpu_assert_sleeping(target);
 			ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
 			if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
 				target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;

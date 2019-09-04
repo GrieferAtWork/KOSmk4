@@ -484,6 +484,32 @@ DEFINE_DEBUG_FUNCTION(
 }
 
 DEFINE_DEBUG_FUNCTION(
+		"u",
+		"u\n"
+		"\tUnwind the current source location to its call-site\n"
+		, argc, argv) {
+	struct fcpustate newstate;
+	unsigned int error;
+	if (argc != 1)
+		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	memcpy(&newstate, &dbg_viewstate, sizeof(struct fcpustate));
+	error = unwind((void *)FCPUSTATE_PC(dbg_viewstate),
+	               &unwind_getreg_fcpustate, &dbg_viewstate,
+	               &unwind_setreg_fcpustate, &newstate);
+	if (error != UNWIND_SUCCESS) {
+		dbg_printf(DBGSTR("Unwind failure: %u\n"), error);
+	} else {
+		memcpy(&dbg_viewstate, &newstate, sizeof(struct fcpustate));
+	}
+	dbg_addr2line_printf((uintptr_t)instruction_trypred((void const *)FCPUSTATE_PC(dbg_viewstate)),
+	                     (uintptr_t)FCPUSTATE_PC(dbg_viewstate),
+	                     DBGSTR("sp=%p"), (void *)FCPUSTATE_SP(dbg_viewstate));
+	return 0;
+}
+
+
+
+DEFINE_DEBUG_FUNCTION(
 		"a2l",
 		"a2l [ADDR=PC] [ADDR...]\n"
 		"\tPrint the source location name for the given ADDR\n",

@@ -2207,9 +2207,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname551 /* index: 551 */
-	.weak unwind_setreg_ucpustate; .long unwind_setreg_ucpustate
-	.reloc ., R_386_SIZE32, unwind_setreg_ucpustate; .long 0
-	.long 0xb8d01b5
+	.weak cpu_assert_sleeping; .long cpu_assert_sleeping
+	.reloc ., R_386_SIZE32, cpu_assert_sleeping; .long 0
+	.long 0x10eb227
 	.long .Lname552 /* index: 552 */
 	.weak vm_datapart_lock_write_nx; .long vm_datapart_lock_write_nx
 	.reloc ., R_386_SIZE32, vm_datapart_lock_write_nx; .long 0
@@ -3742,10 +3742,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak sys_pwritev; .long sys_pwritev
 	.reloc ., R_386_SIZE32, sys_pwritev; .long 0
 	.long 0x79403a6
-	.long 0 /* index: 935 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname935 /* index: 935 */
+	.weak cpu_assert_running; .long cpu_assert_running
+	.reloc ., R_386_SIZE32, cpu_assert_running; .long 0
+	.long 0x5a063a7
 	.long 0 /* index: 936 */
 	.long 0
 	.long 0
@@ -13482,10 +13482,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak keyboard_device_fini; .long keyboard_device_fini
 	.reloc ., R_386_SIZE32, keyboard_device_fini; .long 0
 	.long 0xf165d29
-	.long 0 /* index: 3370 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname3370 /* index: 3370 */
+	.weak unwind_setreg_ucpustate; .long unwind_setreg_ucpustate
+	.reloc ., R_386_SIZE32, unwind_setreg_ucpustate; .long 0
+	.long 0xb8d01b5
 	.long 0 /* index: 3371 */
 	.long 0
 	.long 0
@@ -15526,10 +15526,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 3881 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname3881 /* index: 3881 */
+	.weak cpu_do_assert_integrity; .long cpu_do_assert_integrity
+	.reloc ., R_386_SIZE32, cpu_do_assert_integrity; .long 0
+	.long 0xd193f29
 	.long 0 /* index: 3882 */
 	.long 0
 	.long 0
@@ -16945,7 +16945,7 @@ END(kernel_symbol_table)
 .Lname549:
 	.string "debuginfo_location_setvalue"
 .Lname551:
-	.string "unwind_setreg_ucpustate"
+	.string "cpu_assert_sleeping"
 .Lname552:
 	.string "vm_datapart_lock_write_nx"
 .Lname553:
@@ -17334,6 +17334,8 @@ END(kernel_symbol_table)
 	.string "vm_tasklock_tryservice"
 .Lname934:
 	.string "sys_pwritev"
+.Lname935:
+	.string "cpu_assert_running"
 .Lname939:
 	.string "_this_kernel_stack"
 .Lname941:
@@ -19724,6 +19726,8 @@ END(kernel_symbol_table)
 	.string "swap_write"
 .Lname3369:
 	.string "keyboard_device_fini"
+.Lname3370:
+	.string "unwind_setreg_ucpustate"
 .Lname3373:
 	.string "x86_debug_gdt"
 .Lname3377:
@@ -20264,6 +20268,8 @@ END(kernel_symbol_table)
 	.string "pidns_read"
 .Lname3879:
 	.string "inode_read_phys_blocking"
+.Lname3881:
+	.string "cpu_do_assert_integrity"
 .Lname3883:
 	.string "dbg"
 .Lname3884:

@@ -206,6 +206,8 @@
 #define __CRT_HAVE_cpu_apply_scpustate_esp 1
 #define __CRT_HAVE_cpu_apply_ucpustate 1
 #define __CRT_HAVE_cpu_assert_integrity 1
+#define __CRT_HAVE_cpu_assert_running 1
+#define __CRT_HAVE_cpu_assert_sleeping 1
 #define __CRT_HAVE_cpu_broadcastipi 1
 #define __CRT_HAVE_cpu_broadcastipi_notthis 1
 #define __CRT_HAVE_cpu_count 1
@@ -215,6 +217,7 @@
 #define __CRT_HAVE_cpu_delsleepingtask 1
 #define __CRT_HAVE_cpu_disable_preemptive_interrupts 1
 #define __CRT_HAVE_cpu_disable_preemptive_interrupts_nopr 1
+#define __CRT_HAVE_cpu_do_assert_integrity 1
 #define __CRT_HAVE_cpu_enable_preemptive_interrupts 1
 #define __CRT_HAVE_cpu_enable_preemptive_interrupts_nopr 1
 #define __CRT_HAVE_cpu_enter_deepsleep 1

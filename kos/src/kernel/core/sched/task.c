@@ -283,8 +283,8 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 	_boottask.t_refcnt            = 2; /* +1: scheduler chain, +1: public symbol `_boottask' */
 	_bootidle.t_refcnt            = 2; /* +1: scheduler chain, +1: public symbol `_bootidle' */
 
-	_boottask.t_flags                     = TASK_FRUNNING;
-	_bootidle.t_flags                     = TASK_FKEEPCORE;
+	_boottask.t_flags                     = TASK_FSTARTED | TASK_FRUNNING;
+	_bootidle.t_flags                     = TASK_FSTARTED | TASK_FKEEPCORE;
 	_boottask.t_sched.s_running.sr_runnxt = &_boottask;
 	_boottask.t_sched.s_running.sr_runprv = &_boottask;
 	_boottask.t_self                      = &_boottask;
