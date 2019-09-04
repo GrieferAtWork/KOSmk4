@@ -69,9 +69,9 @@
 
 DECL_BEGIN
 
-PRIVATE void
-NOTHROW(KCALL generate_traceback)(void **__restrict buffer, size_t buflen,
-                                  struct lcpustate *__restrict state) {
+INTERN void
+NOTHROW(KCALL debug_malloc_generate_traceback)(void **__restrict buffer, size_t buflen,
+                                               struct lcpustate *__restrict state) {
 #if 1
 	TRY {
 		struct lcpustate oldstate;
@@ -98,7 +98,7 @@ DECL_END
 	struct lcpustate context[1]; \
 	lcpustate_cur(context);
 #define FILL_NODE_TRACE_WITH_CALLER_TRACEBACK(node) \
-	generate_traceback((node)->m_trace, MALLNODE_TRACESZ(node), (struct lcpustate *)context)
+	debug_malloc_generate_traceback((node)->m_trace, MALLNODE_TRACESZ(node), (struct lcpustate *)context)
 #define PANIC_HERE(...) kernel_panic(__VA_ARGS__)
 #define PANIC_CALL(...) kernel_panic(__VA_ARGS__) /* XXX: Panic at __builtin_return_address() */
 

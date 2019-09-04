@@ -286,29 +286,35 @@ err:
 
 #if CONFIG_MALL_HEAD_SIZE != 0
 #if (CONFIG_MALL_HEAD_SIZE & 3) == 0
-#define INITIALIZE_USER_POINTER_HEAD(base, size) \
-	memsetl((byte_t *)(base) + CONFIG_MALL_PREFIX_SIZE, CONFIG_MALL_HEAD_PATTERN, CONFIG_MALL_HEAD_SIZE / 4)
+#define INITIALIZE_USER_POINTER_HEAD(base, size)        \
+	memsetl((byte_t *)(base) + CONFIG_MALL_PREFIX_SIZE, \
+	        CONFIG_MALL_HEAD_PATTERN, CONFIG_MALL_HEAD_SIZE / 4)
 #else
-#define INITIALIZE_USER_POINTER_HEAD(base, size) \
-	mempatl((byte_t *)(base) + CONFIG_MALL_PREFIX_SIZE, CONFIG_MALL_HEAD_PATTERN, CONFIG_MALL_HEAD_SIZE)
+#define INITIALIZE_USER_POINTER_HEAD(base, size)        \
+	mempatl((byte_t *)(base) + CONFIG_MALL_PREFIX_SIZE, \
+	        CONFIG_MALL_HEAD_PATTERN, CONFIG_MALL_HEAD_SIZE)
 #endif
 #else
 #define INITIALIZE_USER_POINTER_HEAD(base, size) (void)0
 #endif
 #if CONFIG_MALL_TAIL_SIZE != 0
 #if (CONFIG_MALL_TAIL_SIZE & 3) == 0
-#define INITIALIZE_USER_POINTER_TAIL(base, size) \
-	memsetl((byte_t *)(base) + (size) - CONFIG_MALL_TAIL_SIZE, CONFIG_MALL_TAIL_PATTERN, CONFIG_MALL_TAIL_SIZE / 4)
+#define INITIALIZE_USER_POINTER_TAIL(base, size)             \
+	memsetl((byte_t *)(base) + (size)-CONFIG_MALL_TAIL_SIZE, \
+	        CONFIG_MALL_TAIL_PATTERN, CONFIG_MALL_TAIL_SIZE / 4)
 #else
-#define INITIALIZE_USER_POINTER_TAIL(base, size) \
-	mempatl((byte_t *)(base) + (size) - CONFIG_MALL_TAIL_SIZE, CONFIG_MALL_TAIL_PATTERN, CONFIG_MALL_TAIL_SIZE)
+#define INITIALIZE_USER_POINTER_TAIL(base, size)             \
+	mempatl((byte_t *)(base) + (size)-CONFIG_MALL_TAIL_SIZE, \
+	        CONFIG_MALL_TAIL_PATTERN, CONFIG_MALL_TAIL_SIZE)
 #endif
 #else
 #define INITIALIZE_USER_POINTER_TAIL(base, size) (void)0
 #endif
-#define INITIALIZE_USER_POINTER_PREFIX(base, size) \
-	(*(size_t *)(base) = (size) - (CONFIG_MALL_PREFIX_SIZE + CONFIG_MALL_HEAD_SIZE + CONFIG_MALL_TAIL_SIZE))
-#define INITIALIZE_USER_POINTER(base, size) \
+#define INITIALIZE_USER_POINTER_PREFIX(base, size)           \
+	(*(size_t *)(base) = (size) - (CONFIG_MALL_PREFIX_SIZE + \
+	                               CONFIG_MALL_HEAD_SIZE +   \
+	                               CONFIG_MALL_TAIL_SIZE))
+#define INITIALIZE_USER_POINTER(base, size)      \
 	(INITIALIZE_USER_POINTER_PREFIX(base, size), \
 	 INITIALIZE_USER_POINTER_HEAD(base, size),   \
 	 INITIALIZE_USER_POINTER_TAIL(base, size))

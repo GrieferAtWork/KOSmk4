@@ -204,7 +204,7 @@ PUBLIC struct heap kernel_heaps[__GFP_HEAPCOUNT] = {
 
 
 #ifdef CONFIG_DEBUG_HEAP
-INTERN WUNUSED byte_t *
+PRIVATE WUNUSED byte_t *
 NOTHROW(KCALL find_modified_address)(byte_t *start, u32 pattern, size_t num_bytes) {
 	while ((uintptr_t)start & 3) {
 		if __untraced(!num_bytes)
@@ -412,7 +412,7 @@ NOTHROW(KCALL heap_validate_all)(void) {
 #endif /* !CONFIG_DEBUG_HEAP */
 
 
-INTERN NOBLOCK void
+PRIVATE NOBLOCK void
 NOTHROW(KCALL reset_heap_data)(byte_t *ptr, u32 pattern, size_t num_bytes) {
 	if (num_bytes < pagedir_pagesize())
 		goto do_remainder;
@@ -1307,7 +1307,7 @@ NOTHROW(KCALL vpage_ffree_untraced)(VIRT /*page-aligned*/void *base,
 
 
 /* Weakly alias the TRACED-versions of heap functions.
- * When DEBUG_MALLOC is enabled, `mall.c' will override these. */
+ * When DEBUG_MALLOC is enabled, `debug-malloc.c' will override these. */
 DEFINE_PUBLIC_WEAK_ALIAS(heap_alloc, heap_alloc_untraced);
 DEFINE_PUBLIC_WEAK_ALIAS(heap_align, heap_align_untraced);
 DEFINE_PUBLIC_WEAK_ALIAS(heap_allat, heap_allat_untraced);
