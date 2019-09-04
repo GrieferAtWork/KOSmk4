@@ -928,20 +928,6 @@ INTERN int LIBCCALL libc_doflushall(void) {
 	return 0;
 }
 
-#undef flushall_unlocked
-#undef libc_flushall_unlocked
-DEFINE_PUBLIC_ALIAS(flushall_unlocked, libc_doflushall_unlocked);
-DEFINE_INTERN_ALIAS(libc_flushall_unlocked, libc_doflushall_unlocked);
-INTERN int LIBCCALL libc_doflushall_unlocked(void) {
-	libc_flushstdstream_unlocked(stdin);
-	libc_flushstdstream_unlocked(stdout);
-	libc_flushstdstream_unlocked(stderr);
-	/* Finally, flush all non-standard streams. */
-	libc_flushall_nostd_unlocked();
-	return 0;
-}
-
-
 
 
 
@@ -952,6 +938,20 @@ INTERN int LIBCCALL libc_doflushall_unlocked(void) {
 
 
 /*[[[start:implementation]]]*/
+
+
+/*[[[impl:flushall_unlocked]]]*/
+#undef libc_flushall_unlocked
+DEFINE_INTERN_ALIAS(libc_flushall_unlocked, libc_doflushall_unlocked);
+INTERN int LIBCCALL libc_doflushall_unlocked(void) {
+	libc_flushstdstream_unlocked(stdin);
+	libc_flushstdstream_unlocked(stdout);
+	libc_flushstdstream_unlocked(stderr);
+	/* Finally, flush all non-standard streams. */
+	libc_flushall_nostd_unlocked();
+	return 0;
+}
+
 
 /*[[[head:removeat,hash:0x656f9e94]]]*/
 /* Remove a file or directory `FILENAME' relative to a given base directory `DIRFD' */
@@ -1990,10 +1990,10 @@ NOTHROW_RPC(LIBCCALL libc_fopen)(char const *__restrict filename,
 	fd_t fd;
 	FILE *result;
 	fd = open(filename, parse_open_modes(modes), 0644);
-	if (fd < 0)
+	if unlikely(fd < 0)
 		return NULL;
 	result = fdopen(fd, modes);
-	if (!result)
+	if unlikely(!result)
 		sys_close(fd);
 	return result;
 }
@@ -2349,9 +2349,37 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.read.read.fgets") char *
 		__THROWS(...)
 /*[[[body:fgets]]]*/
 {
-	CRT_UNIMPLEMENTED("fgets"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
+	size_t n;
+	if unlikely(!buf || !bufsize) {
+		/* The buffer cannot be empty! */
+		libc_seterrno(ERANGE);
+		return NULL;
+	}
+	for (n = 0; n < bufsize - 1; ++n) {
+		int ch = fgetc(stream);
+		if (ch == EOF) {
+			if (ferror(stream))
+				return NULL;
+			break;
+		}
+		if (ch == '\r') {
+			/* Special handling to convert both `\r' and `\r\n' into `\n' */
+			buf[n++] = '\n';
+			ch = fgetc(stream);
+			if (ch == EOF) {
+				if (ferror(stream))
+					return NULL;
+				break;
+			}
+			if (ch == '\r')
+				continue;
+		}
+		buf[n] = (char)ch;
+		if (ch == '\n')
+			break;
+	}
+	buf[n] = '\0';
+	return buf;
 }
 /*[[[end:fgets]]]*/
 
@@ -2365,9 +2393,37 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.read.read.fgets_unlocked") char 
 		__THROWS(...)
 /*[[[body:fgets_unlocked]]]*/
 {
-	CRT_UNIMPLEMENTED("fgets_unlocked"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
+	size_t n;
+	if unlikely(!buf || !bufsize) {
+		/* The buffer cannot be empty! */
+		libc_seterrno(ERANGE);
+		return NULL;
+	}
+	for (n = 0; n < bufsize - 1; ++n) {
+		int ch = fgetc_unlocked(stream);
+		if (ch == EOF) {
+			if (ferror_unlocked(stream))
+				return NULL;
+			break;
+		}
+		if (ch == '\r') {
+			/* Special handling to convert both `\r' and `\r\n' into `\n' */
+			buf[n++] = '\n';
+			ch = fgetc_unlocked(stream);
+			if (ch == EOF) {
+				if (ferror_unlocked(stream))
+					return NULL;
+				break;
+			}
+			if (ch == '\r')
+				continue;
+		}
+		buf[n] = (char)ch;
+		if (ch == '\n')
+			break;
+	}
+	buf[n] = '\0';
+	return buf;
 }
 /*[[[end:fgets_unlocked]]]*/
 
@@ -3653,9 +3709,13 @@ NOTHROW_NCX(LIBCCALL libc_cuserid)(char *s)
 /*[[[body:cuserid]]]*/
 {
 	char buf[NSS_BUFLEN_PASSWD];
-	struct passwd pwent;
-	struct passwd *pwptr;
-	if (getpwuid_r(geteuid(), &pwent, buf, sizeof(buf), &pwptr) || pwptr == NULL) {
+	struct passwd pwent, *pwptr;
+	if (getpwuid_r(geteuid(),
+	               &pwent,
+	               buf,
+	               sizeof(buf),
+	               &pwptr) ||
+	    pwptr == NULL) {
 		if (s != NULL)
 			s[0] = '\0';
 		return s;
