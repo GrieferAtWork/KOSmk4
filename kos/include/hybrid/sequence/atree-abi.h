@@ -19,7 +19,7 @@
 
 #ifndef ATREE_NULL
 #include <stddef.h>
-#endif
+#endif /* !ATREE_NULL */
 #include <hybrid/compiler.h>
 #include <hybrid/sequence/atree.h>
 #if !defined(ATREE_ASSERT) || \
@@ -43,52 +43,52 @@ struct my_node {
 	int                              bar;
 };
 
-#endif
-#endif
+#endif /* __INTELLISENSE__ */
+#endif /* !ATREE */
 
 #ifndef ATREE_DEBUG
-#ifdef __USE_DEBUG
-#   define ATREE_DEBUG 1
-#else
-#   define ATREE_DEBUG 0
-#endif
-#endif
+#ifndef NDEBUG
+#define ATREE_DEBUG 1
+#else /* !NDEBUG */
+#define ATREE_DEBUG 0
+#endif /* NDEBUG */
+#endif /* !ATREE_DEBUG */
 #ifndef ATREE_CALL
 #define ATREE_CALL /* nothing */
-#endif
+#endif /* !ATREE_CALL */
 #ifndef ATREE_NULL
 #define ATREE_NULL NULL
-#endif
+#endif /* !ATREE_NULL */
 #ifndef ATREE_FUN
 #define ATREE_FUN  PRIVATE
-#endif
+#endif /* !ATREE_FUN */
 #ifndef ATREE_IMP
 #define ATREE_IMP  PRIVATE
-#endif
+#endif /* !ATREE_IMP */
 #ifndef ATREE_ASSERT
 #define ATREE_ASSERT __hybrid_assert
-#endif
+#endif /* !ATREE_ASSERT */
 #ifndef ATREE_ASSERTF
 #define ATREE_ASSERTF __hybrid_assertf
-#endif
+#endif /* !ATREE_ASSERTF */
 #ifdef ATREE_SINGLE
 #ifndef ATREE_NODE_ADDR
 #define ATREE_NODE_ADDR(x) ((x)->N_NODEPATH.a_vaddr)
-#endif
-#else
+#endif /* !ATREE_NODE_ADDR */
+#else /* ATREE_SINGLE */
 #ifndef ATREE_NODE_MIN
 #define ATREE_NODE_MIN(x) ((x)->N_NODEPATH.a_vmin)
-#endif
+#endif /* !ATREE_NODE_MIN */
 #ifndef ATREE_NODE_MAX
 #define ATREE_NODE_MAX(x) ((x)->N_NODEPATH.a_vmax)
-#endif
-#endif
+#endif /* !ATREE_NODE_MAX */
+#endif /* !ATREE_SINGLE */
 #ifndef ATREE_LOCAL_SEMI0
 #define ATREE_LOCAL_SEMI0(Tkey)  ATREE_SEMI0(Tkey)
-#endif
+#endif /* !ATREE_LOCAL_SEMI0 */
 #ifndef ATREE_LOCAL_LEVEL0
 #define ATREE_LOCAL_LEVEL0(Tkey) ATREE_LEVEL0(Tkey)
-#endif
+#endif /* !ATREE_LOCAL_LEVEL0 */
 
 
 
@@ -163,10 +163,10 @@ typedef struct {
 #ifdef ATREE_SINGLE
 	Tkey  mm_min_min; /* == ATREE_NODE_ADDR(ni_min). */
 	Tkey  mm_max_max; /* == ATREE_NODE_ADDR(ni_max). */
-#else
+#else /* ATREE_SINGLE */
 	Tkey  mm_min_min; /* == ATREE_NODE_MIN(ni_min). */
 	Tkey  mm_max_max; /* == ATREE_NODE_MAX(ni_max). */
-#endif
+#endif /* !ATREE_SINGLE */
 } ATREE(minmax_t);
 
 /* Load the lowest and greatest nodes that are overlapping with the given key-range. */
@@ -226,11 +226,11 @@ __NOTHROW(ATREE_CALL ATREE(tryinsert_at))(T **__restrict proot, T *__restrict ne
 	newleaf_addr = ATREE_NODE_ADDR(newleaf);
 #define newleaf_min   newleaf_addr
 #define newleaf_max   newleaf_addr
-#else
+#else /* ATREE_SINGLE */
 	ATREE_SEMI_T(Tkey) newleaf_min, newleaf_max;
 	newleaf_min = ATREE_NODE_MIN(newleaf);
 	newleaf_max = ATREE_NODE_MAX(newleaf);
-#endif
+#endif /* !ATREE_SINGLE */
 again:
 	/* Make sure that the given entry can truly be inserted somewhere within this branch. */
 #ifndef ATREE_SINGLE
@@ -263,10 +263,10 @@ got_it:
 	/* Special case: Check if the given branch overlaps with our current. */
 #ifdef ATREE_SINGLE
 	if (unlikely(newleaf_addr == ATREE_NODE_ADDR(iter)))
-#else
+#else /* ATREE_SINGLE */
 	if (unlikely(newleaf_min <= ATREE_NODE_MAX(iter) &&
 	             newleaf_max >= ATREE_NODE_MIN(iter)))
-#endif
+#endif /* !ATREE_SINGLE */
 	{
 		/* ERROR: Requested key range is already covered. */
 		return 0;
@@ -275,16 +275,32 @@ got_it:
 	 * --> Must move the existing leaf and replace '*proot' */
 #ifdef ATREE_SINGLE
 	if (newleaf_addr == addr_semi)
-#else
+#else /* ATREE_SINGLE */
 	if (newleaf_min <= addr_semi &&
 	    newleaf_max >= addr_semi)
-#endif
+#endif /* !ATREE_SINGLE */
 	{
+		/* Check if there exists some overlapping leaf and return `0' if so. */
+		T *overlap;
+#ifdef ATREE_SINGLE
+		overlap = ATREE(locate_at)(iter,
+		                           newleaf_addr,
+		                           addr_semi,
+		                           addr_level);
+#else /* ATREE_SINGLE */
+		overlap = ATREE(rlocate_at)(iter,
+		                            newleaf_min,
+		                            newleaf_max,
+		                            addr_semi,
+		                            addr_level);
+#endif /* !ATREE_SINGLE */
+		if (overlap)
+			return 0;
 #ifndef ATREE_SINGLE
 		ATREE_ASSERTF(ATREE_NODE_MAX(iter) <= addr_semi ||
 		              ATREE_NODE_MIN(iter) >= addr_semi,
 		              "But that would mean we are overlapping...");
-#endif
+#endif /* !ATREE_SINGLE */
 		/* Override a given branch with a new node.
 		 * This is a pretty complicated process, because we
 		 * can't simply shift the entire tree down one level.
@@ -330,15 +346,15 @@ __NOTHROW(ATREE_CALL ATREE(insert_at))(T **__restrict proot, T *__restrict newle
 	ATREE_SEMI_T(Tkey) newleaf_addr;
 #define newleaf_min newleaf_addr
 #define newleaf_max newleaf_addr
-#else
+#else /* ATREE_SINGLE */
 	ATREE_SEMI_T(Tkey) newleaf_min, newleaf_max;
-#endif
+#endif /* !ATREE_SINGLE */
 #ifdef ATREE_SINGLE
 	newleaf_addr = ATREE_NODE_ADDR(newleaf);
-#else
+#else /* ATREE_SINGLE */
 	newleaf_min = ATREE_NODE_MIN(newleaf);
 	newleaf_max = ATREE_NODE_MAX(newleaf);
-#endif
+#endif /* !ATREE_SINGLE */
 again:
 	/* Make sure that the given entry can truly be inserted somewhere within this branch. */
 #ifndef ATREE_SINGLE
@@ -377,21 +393,21 @@ got_it:
 	              ATREE_PTR(newleaf_max),
 	              ATREE_PTR(ATREE_NODE_MIN(iter)),
 	              ATREE_PTR(ATREE_NODE_MAX(iter)));
-#endif
+#endif /* !ATREE_SINGLE */
 	/* Special case: Our new leaf covers this exact branch.
 	 * --> Must move the existing leaf and replace '*proot' */
 #ifdef ATREE_SINGLE
 	if (newleaf_addr == addr_semi)
-#else
+#else /* ATREE_SINGLE */
 	if (newleaf_min <= addr_semi &&
 	    newleaf_max >= addr_semi)
-#endif
+#endif /* !ATREE_SINGLE */
 	{
 #ifndef ATREE_SINGLE
 		ATREE_ASSERTF(ATREE_NODE_MAX(iter) <= addr_semi ||
 		              ATREE_NODE_MIN(iter) >= addr_semi,
 		              "But that would mean we are overlapping...");
-#endif
+#endif /* !ATREE_SINGLE */
 		/* Override a given branch with a new node.
 		 * This is a pretty complicated process, because we
 		 * can't simply shift the entire tree down one level.
@@ -437,15 +453,15 @@ __NOTHROW(ATREE_CALL ATREE(pinsert_at))(T **__restrict proot, T *__restrict newl
 	ATREE_SEMI_T(Tkey) newleaf_addr;
 #define newleaf_min newleaf_addr
 #define newleaf_max newleaf_addr
-#else
+#else /* ATREE_SINGLE */
 	ATREE_SEMI_T(Tkey) newleaf_min, newleaf_max;
-#endif
+#endif /* !ATREE_SINGLE */
 #ifdef ATREE_SINGLE
 	newleaf_addr = ATREE_NODE_ADDR(newleaf);
-#else
+#else /* ATREE_SINGLE */
 	newleaf_min = ATREE_NODE_MIN(newleaf);
 	newleaf_max = ATREE_NODE_MAX(newleaf);
-#endif
+#endif /* !ATREE_SINGLE */
 again:
 	/* Make sure that the given entry can truly be inserted somewhere within this branch. */
 #ifndef ATREE_SINGLE
@@ -486,7 +502,7 @@ got_it:
 	              ATREE_PTR(newleaf_max),
 	              ATREE_PTR(ATREE_NODE_MIN(iter)),
 	              ATREE_PTR(ATREE_NODE_MAX(iter)));
-#endif
+#endif /* !ATREE_SINGLE */
 	/* Special case: Our new leaf covers this exact branch.
 	 * --> Must move the existing leaf and replace '*proot' */
 #ifdef ATREE_SINGLE
@@ -500,7 +516,7 @@ got_it:
 		ATREE_ASSERTF(ATREE_NODE_MAX(iter) <= *paddr_semi ||
 		              ATREE_NODE_MIN(iter) >= *paddr_semi,
 		              "But that would mean we are overlapping...");
-#endif
+#endif /* !ATREE_SINGLE */
 		/* Override a given branch with a new node.
 		 * This is a pretty complicated process, because we
 		 * can't simply shift the entire tree down one level.
@@ -599,7 +615,7 @@ __NOTHROW(ATREE_CALL ATREE(locate_at))(T *root, Tkey key,
 			              ATREE_PTR(ATREE_NODE_ADDR(root)), ATREE_PTR(addr_max),
 			              ATREE_PTR(ATREE_NODE_ADDR(root)), ATREE_PTR(key),
 			              ATREE_PTR(addr_semi), addr_level);
-#else
+#else /* ATREE_SINGLE */
 			ATREE_ASSERTF(ATREE_NODE_MIN(root) <= ATREE_NODE_MAX(root),
 			              "Branch has invalid min/max configuration (min(%p) > max(%p)) (semi %p; level %u)",
 			              ATREE_PTR(ATREE_NODE_MIN(root)),
@@ -615,18 +631,18 @@ __NOTHROW(ATREE_CALL ATREE(locate_at))(T *root, Tkey key,
 			              ATREE_PTR(ATREE_NODE_MAX(root)), ATREE_PTR(addr_max),
 			              ATREE_PTR(ATREE_NODE_MIN(root)), ATREE_PTR(key),
 			              ATREE_PTR(addr_semi), addr_level);
-#endif
+#endif /* !ATREE_SINGLE */
 		}
-#endif
+#endif /* ATREE_DEBUG */
 		/* Check if the given key lies within this branch. */
 #ifdef ATREE_SINGLE
 		if (key == ATREE_NODE_ADDR(root))
 			break;
-#else
+#else /* ATREE_SINGLE */
 		if (key >= ATREE_NODE_MIN(root) &&
 		    key <= ATREE_NODE_MAX(root))
 			break;
-#endif
+#endif /* !ATREE_SINGLE */
 		ATREE_ASSERT(addr_level != (ATREE_LEVEL_T)-1);
 		if (key < addr_semi) {
 			/* Continue with min-branch */
@@ -666,7 +682,7 @@ __NOTHROW(ATREE_CALL ATREE(plocate_at))(T **__restrict proot, Tkey key,
 			              ATREE_PTR(ATREE_NODE_ADDR(root)), ATREE_PTR(addr_max),
 			              ATREE_PTR(ATREE_NODE_ADDR(root)), ATREE_PTR(key),
 			              ATREE_PTR(addr_semi), addr_level);
-#else
+#else /* ATREE_SINGLE */
 			ATREE_ASSERTF(ATREE_NODE_MIN(root) <= ATREE_NODE_MAX(root),
 			              "Branch has invalid min/max configuration (min(%p) > max(%p)) (semi %p; level %u)",
 			              ATREE_PTR(ATREE_NODE_MIN(root)),
@@ -682,16 +698,16 @@ __NOTHROW(ATREE_CALL ATREE(plocate_at))(T **__restrict proot, Tkey key,
 			              ATREE_PTR(ATREE_NODE_MAX(root)), ATREE_PTR(addr_max),
 			              ATREE_PTR(ATREE_NODE_MIN(root)), ATREE_PTR(key),
 			              ATREE_PTR(addr_semi), addr_level);
-#endif
+#endif /* !ATREE_SINGLE */
 		}
-#endif
+#endif /* ATREE_DEBUG */
 		/* Check if the given key lies within this branch. */
 #ifdef ATREE_SINGLE
 		if (key == ATREE_NODE_ADDR(root))
-#else
+#else /* ATREE_SINGLE */
 		if (key >= ATREE_NODE_MIN(root) &&
 		    key <= ATREE_NODE_MAX(root))
-#endif
+#endif /* !ATREE_SINGLE */
 		{
 			*paddr_semi  = addr_semi;
 			*paddr_level = addr_level;
@@ -740,7 +756,7 @@ __NOTHROW(ATREE_CALL ATREE(rlocate_at))(T *root, Tkey key_min, Tkey key_max,
 			              ATREE_PTR(ATREE_NODE_ADDR(root)), ATREE_PTR(addr_max),
 			              ATREE_PTR(ATREE_NODE_ADDR(root)), ATREE_PTR(key_min), ATREE_PTR(key_max),
 			              ATREE_PTR(addr_semi), addr_level);
-#else
+#else /* ATREE_SINGLE */
 			ATREE_ASSERTF(ATREE_NODE_MIN(root) <= ATREE_NODE_MAX(root),
 			              "Branch has invalid min/max configuration (min(%p) > max(%p)) (semi %p; level %u)",
 			              ATREE_PTR(ATREE_NODE_MIN(root)),
@@ -749,26 +765,26 @@ __NOTHROW(ATREE_CALL ATREE(rlocate_at))(T *root, Tkey key_min, Tkey key_max,
 			ATREE_ASSERTF(ATREE_NODE_MIN(root) >= addr_min,
 			              "Unexpected branch min key (%p < %p; max: %p; looking for %p...%p; semi %p; level %u)",
 			              ATREE_PTR(ATREE_NODE_MIN(root)), ATREE_PTR(addr_min),
-			              ATREE_PTR(ATREE_NODE_MAX(root)), AATREE_PTR(key_min), ATREE_PTR(key_max),
+			              ATREE_PTR(ATREE_NODE_MAX(root)), ATREE_PTR(key_min), ATREE_PTR(key_max),
 			              ATREE_PTR(addr_semi), addr_level);
 			ATREE_ASSERTF(ATREE_NODE_MAX(root) <= addr_max,
 			              "Unexpected branch max key (%p > %p; min: %p; looking for %p...%p; semi %p; level %u)",
 			              ATREE_PTR(ATREE_NODE_MAX(root)), ATREE_PTR(addr_max),
 			              ATREE_PTR(ATREE_NODE_MIN(root)), ATREE_PTR(key_min), ATREE_PTR(key_max),
 			              ATREE_PTR(addr_semi), addr_level);
-#endif
+#endif /* !ATREE_SINGLE */
 		}
-#endif
+#endif /* ATREE_DEBUG */
 		/* Check if the given range lies within this branch. */
 #ifdef ATREE_SINGLE
 		if (key_min <= ATREE_NODE_ADDR(root) &&
 		    key_max >= ATREE_NODE_ADDR(root))
 			break;
-#else
+#else /* ATREE_SINGLE */
 		if (key_max >= ATREE_NODE_MIN(root) &&
 		    key_min <= ATREE_NODE_MAX(root))
 			break;
-#endif
+#endif /* !ATREE_SINGLE */
 		ATREE_ASSERT(addr_level != (ATREE_LEVEL_T)-1);
 		if (key_min < addr_semi) {
 			if (key_max >= addr_semi) {
@@ -818,7 +834,7 @@ __NOTHROW(ATREE_CALL ATREE(prlocate_at))(T **__restrict proot, Tkey key_min, Tke
 			              ATREE_PTR(ATREE_NODE_ADDR(root)), ATREE_PTR(addr_max),
 			              ATREE_PTR(ATREE_NODE_ADDR(root)), ATREE_PTR(key_min), ATREE_PTR(key_max),
 			              ATREE_PTR(addr_semi), addr_level);
-#else
+#else /* ATREE_SINGLE */
 			ATREE_ASSERTF(ATREE_NODE_MIN(root) <= ATREE_NODE_MAX(root),
 			              "Branch has invalid min/max configuration (min(%p) > max(%p)) (semi %p; level %u)",
 			              ATREE_PTR(ATREE_NODE_MIN(root)),
@@ -834,17 +850,17 @@ __NOTHROW(ATREE_CALL ATREE(prlocate_at))(T **__restrict proot, Tkey key_min, Tke
 			              ATREE_PTR(ATREE_NODE_MAX(root)), ATREE_PTR(addr_max),
 			              ATREE_PTR(ATREE_NODE_MIN(root)), ATREE_PTR(key_min), ATREE_PTR(key_max),
 			              ATREE_PTR(addr_semi), addr_level);
-#endif
+#endif /* !ATREE_SINGLE */
 		}
-#endif
+#endif /* ATREE_DEBUG */
 		/* Check if the given key lies within this branch. */
 #ifdef ATREE_SINGLE
 		if (key_min <= ATREE_NODE_ADDR(root) &&
 		    key_max >= ATREE_NODE_ADDR(root))
-#else
+#else /* ATREE_SINGLE */
 		if (key_max >= ATREE_NODE_MIN(root) &&
 		    key_min <= ATREE_NODE_MAX(root))
-#endif
+#endif /* !ATREE_SINGLE */
 		{
 			*paddr_semi  = addr_semi;
 			*paddr_level = addr_level;
@@ -897,10 +913,10 @@ again:
 #ifdef ATREE_SINGLE
 	if (key_min <= ATREE_NODE_ADDR(root) &&
 	    key_max >= ATREE_NODE_ADDR(root))
-#else
+#else /* ATREE_SINGLE */
 	if (key_min <= ATREE_NODE_MAX(root) &&
 	    key_max >= ATREE_NODE_MIN(root))
-#endif
+#endif /* !ATREE_SINGLE */
 	{
 		/* Found a matching entry!
 		 * NOTE: Since the caller already split branches
@@ -915,7 +931,7 @@ again:
 			result->mm_max     = root;
 			result->mm_max_max = ATREE_NODE_ADDR(root);
 		}
-#else
+#else /* ATREE_SINGLE */
 		if ((result->mm_min == ATREE_NULL) || ATREE_NODE_MIN(root) < result->mm_min_min) {
 			result->mm_min     = root;
 			result->mm_min_min = ATREE_NODE_MIN(root);
@@ -924,7 +940,7 @@ again:
 			result->mm_max     = root;
 			result->mm_max_max = ATREE_NODE_MAX(root);
 		}
-#endif
+#endif /* !ATREE_SINGLE */
 	}
 	if (key_min < addr_semi && root->N_NODEPATH.a_min) {
 		/* Recursively continue searching left. */

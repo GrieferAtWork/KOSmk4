@@ -31,8 +31,12 @@ DECL_BEGIN
 
 /* Heap debug initialization DWORDs */
 #ifdef CONFIG_DEBUG_HEAP
+#ifndef DEBUGHEAP_NO_MANS_LAND
 #define DEBUGHEAP_NO_MANS_LAND  0xdeadbeef /* Debug initialization of unallocated memory. */
+#endif /* !DEBUGHEAP_NO_MANS_LAND */
+#ifndef DEBUGHEAP_FRESH_MEMORY
 #define DEBUGHEAP_FRESH_MEMORY  0xaaaaaaaa /* Debug initialization of freshly allocated memory. */
+#endif /* !DEBUGHEAP_FRESH_MEMORY */
 #endif /* CONFIG_DEBUG_HEAP */
 
 
@@ -53,7 +57,7 @@ struct mfree {
 	u8                        mf_flags;   /* Set of `MFREE_F*' */
 #ifdef CONFIG_DEBUG_HEAP
 	u8                        mf_szchk;   /* Checksum for `mf_size' */
-#endif
+#endif /* CONFIG_DEBUG_HEAP */
 	COMPILER_FLEXIBLE_ARRAY(byte_t,mf_data); /* Block data. */
 };
 #define MFREE_MIN(self)   ((vm_virt_t)(self))
@@ -222,6 +226,7 @@ heap_alloc(struct heap *__restrict self, size_t num_bytes, gfp_t flags) {
 		                       flags);
 	return __os_heap_alloc(self, num_bytes, flags);
 }
+
 FORCELOCAL WUNUSED NONNULL((1)) struct heapptr KCALL
 heap_align(struct heap *__restrict self, size_t min_alignment,
            ptrdiff_t offset, size_t num_bytes, gfp_t flags) {
@@ -234,6 +239,7 @@ heap_align(struct heap *__restrict self, size_t min_alignment,
 		                       flags);
 	return __os_heap_align(self, min_alignment, offset, num_bytes, flags);
 }
+
 FORCELOCAL WUNUSED NONNULL((1)) struct heapptr
 NOTHROW(KCALL heap_alloc_nx)(struct heap *__restrict self, size_t num_bytes, gfp_t flags) {
 	if (__builtin_constant_p(num_bytes))
@@ -242,6 +248,7 @@ NOTHROW(KCALL heap_alloc_nx)(struct heap *__restrict self, size_t num_bytes, gfp
 		                          flags);
 	return __os_heap_alloc_nx(self, num_bytes, flags);
 }
+
 FORCELOCAL WUNUSED NONNULL((1)) struct heapptr
 NOTHROW(KCALL heap_align_nx)(struct heap *__restrict self,
                               size_t min_alignment, ptrdiff_t offset,
@@ -256,6 +263,7 @@ NOTHROW(KCALL heap_align_nx)(struct heap *__restrict self,
 	return __os_heap_align_nx(self, min_alignment, offset, num_bytes, flags);
 }
 #endif /* !__OMIT_HEAP_TRACED_CONSTANT_P_WRAPPERS */
+
 FORCELOCAL WUNUSED NONNULL((1)) struct heapptr KCALL
 heap_alloc_untraced(struct heap *__restrict self, size_t num_bytes, gfp_t flags) {
 	if (__builtin_constant_p(num_bytes))
@@ -264,6 +272,7 @@ heap_alloc_untraced(struct heap *__restrict self, size_t num_bytes, gfp_t flags)
 		                                flags);
 	return __os_heap_alloc_untraced(self, num_bytes, flags);
 }
+
 FORCELOCAL WUNUSED NONNULL((1)) struct heapptr KCALL
 heap_align_untraced(struct heap *__restrict self, size_t min_alignment,
                     ptrdiff_t offset, size_t num_bytes, gfp_t flags) {
@@ -286,6 +295,7 @@ NOTHROW(KCALL heap_alloc_untraced_nx)(struct heap *__restrict self,
 		                                   flags);
 	return __os_heap_alloc_untraced_nx(self, num_bytes, flags);
 }
+
 FORCELOCAL WUNUSED NONNULL((1)) struct heapptr
 NOTHROW(KCALL heap_align_untraced_nx)(struct heap *__restrict self,
                                       size_t min_alignment, ptrdiff_t offset,
@@ -327,6 +337,7 @@ heap_allat(struct heap *__restrict self,
 		                       flags);
 	return __os_heap_allat(self, ptr, num_bytes, flags);
 }
+
 FORCELOCAL WUNUSED NONNULL((1)) size_t
 NOTHROW(KCALL heap_allat_nx)(struct heap *__restrict self, VIRT void *__restrict ptr,
                              size_t num_bytes, gfp_t flags) {
@@ -337,6 +348,7 @@ NOTHROW(KCALL heap_allat_nx)(struct heap *__restrict self, VIRT void *__restrict
 	return __os_heap_allat_nx(self, ptr, num_bytes, flags);
 }
 #endif /* !__OMIT_HEAP_TRACED_CONSTANT_P_WRAPPERS */
+
 FORCELOCAL WUNUSED NONNULL((1)) size_t KCALL
 heap_allat_untraced(struct heap *__restrict self,
                     VIRT void *__restrict ptr,
@@ -347,6 +359,7 @@ heap_allat_untraced(struct heap *__restrict self,
 		                                flags);
 	return __os_heap_allat_untraced(self, ptr, num_bytes, flags);
 }
+
 FORCELOCAL WUNUSED NONNULL((1)) size_t
 NOTHROW(KCALL heap_allat_untraced_nx)(struct heap *__restrict self,
                                       VIRT void *__restrict ptr,
@@ -411,6 +424,7 @@ heap_realloc(struct heap *__restrict self,
 	return __os_heap_realloc(self, old_ptr, old_bytes, new_bytes,
 	                         alloc_flags, free_flags);
 }
+
 FORCELOCAL WUNUSED NONNULL((1)) struct heapptr KCALL
 heap_realign(struct heap *__restrict self,
              VIRT void *old_ptr, size_t old_bytes,
@@ -430,6 +444,7 @@ heap_realign(struct heap *__restrict self,
 	return __os_heap_realign(self, old_ptr, old_bytes, min_alignment,
 	                         offset, new_bytes, alloc_flags, free_flags);
 }
+
 FORCELOCAL WUNUSED NONNULL((1)) struct heapptr
 NOTHROW(KCALL heap_realloc_nx)(struct heap *__restrict self,
                                 VIRT void *old_ptr, size_t old_bytes,
@@ -446,6 +461,7 @@ NOTHROW(KCALL heap_realloc_nx)(struct heap *__restrict self,
 	return __os_heap_realloc_nx(self, old_ptr, old_bytes, new_bytes,
 	                            alloc_flags, free_flags);
 }
+
 FORCELOCAL WUNUSED NONNULL((1)) struct heapptr
 NOTHROW(KCALL heap_realign_nx)(struct heap *__restrict self,
                                 VIRT void *old_ptr, size_t old_bytes,
@@ -467,6 +483,7 @@ NOTHROW(KCALL heap_realign_nx)(struct heap *__restrict self,
 	                            offset, new_bytes, alloc_flags, free_flags);
 }
 #endif /* !__OMIT_HEAP_TRACED_CONSTANT_P_WRAPPERS */
+
 FORCELOCAL WUNUSED NONNULL((1)) struct heapptr KCALL
 heap_realloc_untraced(struct heap *__restrict self,
                       VIRT void *old_ptr, size_t old_bytes,
@@ -482,6 +499,7 @@ heap_realloc_untraced(struct heap *__restrict self,
 	return __os_heap_realloc_untraced(self, old_ptr, old_bytes, new_bytes,
 	                                  alloc_flags, free_flags);
 }
+
 FORCELOCAL WUNUSED NONNULL((1)) struct heapptr KCALL
 heap_realign_untraced(struct heap *__restrict self,
                       VIRT void *old_ptr, size_t old_bytes,
@@ -501,6 +519,7 @@ heap_realign_untraced(struct heap *__restrict self,
 	return __os_heap_realign_untraced(self, old_ptr, old_bytes, min_alignment,
 	                                  offset, new_bytes, alloc_flags, free_flags);
 }
+
 FORCELOCAL WUNUSED NONNULL((1)) struct heapptr
 NOTHROW(KCALL heap_realloc_untraced_nx)(struct heap *__restrict self,
                                         VIRT void *old_ptr, size_t old_bytes,
@@ -517,6 +536,7 @@ NOTHROW(KCALL heap_realloc_untraced_nx)(struct heap *__restrict self,
 	return __os_heap_realloc_untraced_nx(self, old_ptr, old_bytes, new_bytes,
 	                                     alloc_flags, free_flags);
 }
+
 FORCELOCAL WUNUSED NONNULL((1)) struct heapptr
 NOTHROW(KCALL heap_realign_untraced_nx)(struct heap *__restrict self,
                                         VIRT void *old_ptr, size_t old_bytes,
@@ -586,13 +606,13 @@ FUNDEF NONNULL((1)) size_t NOTHROW(KCALL heap_trim)(struct heap *__restrict self
 FUNDEF NOBLOCK void NOTHROW(KCALL heap_validate)(struct heap *__restrict self);
 FUNDEF NOBLOCK void NOTHROW(KCALL heap_validate_all)(void);
 #define DEFINE_VALIDATABLE_HEAP(x) DEFINE_CALLBACK(".rodata.heaps.validatable", x)
-#else
+#else /* CONFIG_DEBUG_HEAP */
 #define heap_validate(self)        (void)0
 #define heap_validate_all()        (void)0
 #define DEFINE_VALIDATABLE_HEAP(x) /* nothing */
-#endif
+#endif /* !CONFIG_DEBUG_HEAP */
 
-#endif
+#endif /* __CC__ */
 
 DECL_END
 
