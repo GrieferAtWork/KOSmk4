@@ -67,6 +67,7 @@ pipe_reader_create(struct pipe *__restrict self) THROWS(E_BADALLOC) {
 	ATOMIC_FETCHINC(self->p_rdcnt);
 	return result;
 }
+
 PUBLIC ATTR_RETNONNULL ATTR_MALLOC WUNUSED REF struct pipe_writer *KCALL
 pipe_writer_create(struct pipe *__restrict self) THROWS(E_BADALLOC) {
 	REF struct pipe_writer *result;
@@ -87,31 +88,36 @@ NOTHROW(KCALL pipe_destroy)(struct pipe *__restrict self) {
 	/* Free the pipe object. */
 	kfree(self);
 }
+
 PUBLIC NOBLOCK void
 NOTHROW(KCALL pipe_reader_destroy)(struct pipe_reader *__restrict self) {
-	if (ATOMIC_DECFETCH(self->pr_pipe->p_rdcnt) == 0)
-		ringbuffer_close(&self->pr_pipe->p_buffer);
-	/* Decref() the associated pipe. */
-	decref(self->pr_pipe);
+	REF struct pipe *p = self->pr_pipe;
 	/* Free the pipe wrapper. */
 	kfree(self);
+	/* Close the pipe if all readers go away */
+	if (ATOMIC_DECFETCH(p->p_rdcnt) == 0)
+		ringbuffer_close(&p->p_buffer);
+	/* Decref() the associated pipe. */
+	decref(p);
 }
 
 PUBLIC NOBLOCK void
 NOTHROW(KCALL pipe_writer_destroy)(struct pipe_writer *__restrict self) {
-	if (ATOMIC_DECFETCH(self->pw_pipe->p_wrcnt) == 0)
-		ringbuffer_close(&self->pw_pipe->p_buffer);
-	/* Decref() the associated pipe. */
-	decref(self->pw_pipe);
+	REF struct pipe *p = self->pw_pipe;
 	/* Free the pipe wrapper. */
 	kfree(self);
+	/* Close the pipe if all writers go away */
+	if (ATOMIC_DECFETCH(p->p_wrcnt) == 0)
+		ringbuffer_close(&p->p_buffer);
+	/* Decref() the associated pipe. */
+	decref(p);
 }
 
 
 /* Define reference control handler operators. */
-DEFINE_HANDLE_REFCNT_FUNCTIONS(pipe,struct pipe);
-DEFINE_HANDLE_REFCNT_FUNCTIONS(pipe_reader,struct pipe_reader);
-DEFINE_HANDLE_REFCNT_FUNCTIONS(pipe_writer,struct pipe_writer);
+DEFINE_HANDLE_REFCNT_FUNCTIONS(pipe, struct pipe);
+DEFINE_HANDLE_REFCNT_FUNCTIONS(pipe_reader, struct pipe_reader);
+DEFINE_HANDLE_REFCNT_FUNCTIONS(pipe_writer, struct pipe_writer);
 
 
 PRIVATE size_t KCALL
@@ -128,11 +134,11 @@ user_set_pipe_limit(struct pipe *__restrict self,
 	return result;
 }
 
-INTERN syscall_slong_t
-(KCALL handle_pipe_hop)(struct pipe *__restrict self,
-                        syscall_ulong_t cmd,
-                        USER UNCHECKED void *arg,
-                        iomode_t mode) {
+INTERN syscall_slong_t KCALL
+handle_pipe_hop(struct pipe *__restrict self,
+                syscall_ulong_t cmd,
+                USER UNCHECKED void *arg,
+                iomode_t mode) {
 	syscall_ulong_t used_cmd;
 	used_cmd = cmd;
 again:
@@ -367,28 +373,28 @@ again:
 
 
 
-INTERN size_t
-(KCALL handle_pipe_read)(struct pipe *__restrict self,
-                         USER CHECKED void *dst,
-                         size_t num_bytes, iomode_t mode) {
+INTERN size_t KCALL
+handle_pipe_read(struct pipe *__restrict self,
+                 USER CHECKED void *dst,
+                 size_t num_bytes, iomode_t mode) {
 	return mode & IO_NONBLOCK
 	       ? ringbuffer_read_nonblock(&self->p_buffer, dst, num_bytes)
 	       : ringbuffer_read(&self->p_buffer, dst, num_bytes);
 }
 
-INTERN size_t
-(KCALL handle_pipe_write)(struct pipe *__restrict self,
-                          USER CHECKED void const *src,
-                          size_t num_bytes, iomode_t mode) {
+INTERN size_t KCALL
+handle_pipe_write(struct pipe *__restrict self,
+                  USER CHECKED void const *src,
+                  size_t num_bytes, iomode_t mode) {
 	return mode & IO_NONBLOCK
 	       ? ringbuffer_write_nonblock(&self->p_buffer, src, num_bytes)
 	       : ringbuffer_write(&self->p_buffer, src, num_bytes);
 }
 
-INTERN size_t
-(KCALL handle_pipe_readv)(struct pipe *__restrict self,
-                          struct aio_buffer *__restrict dst,
-                          size_t num_bytes, iomode_t mode) {
+INTERN size_t KCALL
+handle_pipe_readv(struct pipe *__restrict self,
+                  struct aio_buffer *__restrict dst,
+                  size_t num_bytes, iomode_t mode) {
 	size_t temp, result = 0;
 	struct aio_buffer_entry ent;
 	(void)num_bytes;
@@ -405,10 +411,10 @@ INTERN size_t
 	return result;
 }
 
-INTERN size_t
-(KCALL handle_pipe_writev)(struct pipe *__restrict self,
-                           struct aio_buffer *__restrict src,
-                           size_t num_bytes, iomode_t mode) {
+INTERN size_t KCALL
+handle_pipe_writev(struct pipe *__restrict self,
+                   struct aio_buffer *__restrict src,
+                   size_t num_bytes, iomode_t mode) {
 	size_t temp, result = 0;
 	struct aio_buffer_entry ent;
 	(void)num_bytes;
@@ -426,16 +432,16 @@ INTERN size_t
 }
 
 
-INTERN void
-(KCALL handle_pipe_truncate)(struct pipe *__restrict self,
-                             pos_t new_size) {
+INTERN void KCALL
+handle_pipe_truncate(struct pipe *__restrict self,
+                     pos_t new_size) {
 	ringbuffer_setwritten(&self->p_buffer,
 	                      (size_t)new_size);
 }
 
-INTERN void
-(KCALL handle_pipe_stat)(struct pipe *__restrict self,
-                         USER CHECKED struct stat *result) {
+INTERN void KCALL
+handle_pipe_stat(struct pipe *__restrict self,
+                 USER CHECKED struct stat *result) {
 	size_t size;
 	size = ATOMIC_READ(self->p_buffer.rb_avail);
 	result->st_dev            = 0;
@@ -462,8 +468,8 @@ INTERN void
 	result->st_ctim64.tv_nsec = 0;
 }
 
-INTERN poll_mode_t
-(KCALL handle_pipe_poll)(struct pipe *__restrict self, poll_mode_t what) {
+INTERN poll_mode_t KCALL
+handle_pipe_poll(struct pipe *__restrict self, poll_mode_t what) {
 	return ringbuffer_poll(&self->p_buffer, what);
 }
 
@@ -618,21 +624,21 @@ handle_pipe_writer_awritev(struct pipe_writer *__restrict self,
 }
 
 #if 0
-INTERN syscall_slong_t
-(KCALL handle_pipe_ioctl)(struct pipe *__restrict self,
-                          syscall_ulong_t cmd,
-                          USER UNCHECKED void *arg,
-                          iomode_t mode) {
+INTERN syscall_slong_t KCALL
+handle_pipe_ioctl(struct pipe *__restrict self,
+                  syscall_ulong_t cmd,
+                  USER UNCHECKED void *arg,
+                  iomode_t mode) {
 	return 0;
 }
-INTERN syscall_slong_t
-(KCALL handle_pipe_reader_ioctl)(struct pipe_reader *__restrict self,
-                                 syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) {
+INTERN syscall_slong_t KCALL
+handle_pipe_reader_ioctl(struct pipe_reader *__restrict self,
+                         syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) {
 	return handle_pipe_ioctl(self->pr_pipe, cmd, arg, (mode & ~IO_ACCMODE) | IO_RDONLY);
 }
-INTERN syscall_slong_t
-(KCALL handle_pipe_writer_ioctl)(struct pipe_writer *__restrict self,
-                                 syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) {
+INTERN syscall_slong_t KCALL
+handle_pipe_writer_ioctl(struct pipe_writer *__restrict self,
+                         syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode) {
 	return handle_pipe_ioctl(self->pw_pipe, cmd, arg, (mode & ~IO_ACCMODE) | IO_WRONLY);
 }
 #endif

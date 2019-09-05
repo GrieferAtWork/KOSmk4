@@ -142,6 +142,10 @@ NOTHROW(KCALL task_propagate_exit_status_to_worker_thread)(struct task *__restri
 	 *       that caused the task associated with `origin_pid' to exit. */
 }
 
+#undef CONFIG_TERMINATE_PROCESS_GROUP_WHEN_GROUP_LEADER_DIES
+//#define CONFIG_TERMINATE_PROCESS_GROUP_WHEN_GROUP_LEADER_DIES 1 /* This would not be posix behavior */
+
+#ifdef CONFIG_TERMINATE_PROCESS_GROUP_WHEN_GROUP_LEADER_DIES
 PRIVATE NOBLOCK void
 NOTHROW(KCALL task_propagate_exit_status_to_group_process)(struct task *__restrict process,
                                                            struct task *__restrict origin,
@@ -149,6 +153,7 @@ NOTHROW(KCALL task_propagate_exit_status_to_group_process)(struct task *__restri
 	/* TODO: Same as `task_propagate_exit_status_to_worker_thread()', but used
 	 *       to propagate an exit status to the members of a process group. */
 }
+#endif /* CONFIG_TERMINATE_PROCESS_GROUP_WHEN_GROUP_LEADER_DIES */
 
 PRIVATE NOBLOCK void
 NOTHROW(KCALL task_send_sigcld_to_parent_process)(struct task *__restrict parent,
@@ -261,6 +266,7 @@ NOTHROW(KCALL this_taskgroup_cleanup)(void) {
 			decref(threads);
 			threads = next;
 		}
+#ifdef CONFIG_TERMINATE_PROCESS_GROUP_WHEN_GROUP_LEADER_DIES
 		if (mygroup.tg_proc_group == proc) {
 			/* Propagate the exit status to all of the other processes without this group. */
 			while (ATOMIC_READ(mygroup.tg_pgrp_processes)) {
@@ -289,6 +295,7 @@ NOTHROW(KCALL this_taskgroup_cleanup)(void) {
 					sync_endwrite(&mygroup.tg_pgrp_processes_lock);
 					decref_unlikely(group_proc);
 					decref_unlikely(my_session);
+					task_tryyield_or_pause();
 					continue;
 				}
 				assert(FORTASK(group_proc, _this_taskgroup).tg_proc_group == proc);
@@ -311,6 +318,7 @@ NOTHROW(KCALL this_taskgroup_cleanup)(void) {
 				decref(group_proc);
 			}
 		}
+#endif /* CONFIG_TERMINATE_PROCESS_GROUP_WHEN_GROUP_LEADER_DIES */
 		/* Load the parent of the process */
 		{
 			REF struct task *parent;

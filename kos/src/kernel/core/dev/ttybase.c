@@ -99,8 +99,9 @@ kernel_terminal_check_sigttou(struct terminal *__restrict self) {
 	if unlikely(FORTASK(my_leader, _this_taskpid) != ATOMIC_READ(term->t_fproc.m_pointer)) {
 		if (term->t_fproc.cmpxch(NULL, FORTASK(my_leader, _this_taskpid)))
 			goto done; /* Lazily set the caller as the initial foreground process */
-		printk(KERN_INFO "[tty:%q] Stop background process %p [tid=%u]\n",
-		       term->cd_name, my_leader, (unsigned int)task_getrootpid_of_s(my_leader));
+		printk(KERN_INFO "[tty:%q] Stop background process group %p [tid=%u] upon thread %p [tid=%u] trying to write\n",
+		       term->cd_name, my_leader, (unsigned int)task_getrootpid_of_s(my_leader),
+		       THIS_TASK, task_getroottid_s());
 		task_raisesignalprocessgroup(my_leader, SIGTTOU);
 		/* We might get here if the calling process changed its process group
 		 * in the mean time. - In this case, just re-raise `SIGTTOU' within the
