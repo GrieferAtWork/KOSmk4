@@ -70,7 +70,7 @@ struct ttybase_device
 	                                            * `FORTASK(taskpid_gettask(t_cproc), _this_taskgroup).tg_ctty == self'
 	                                            * is the case. */
 	XATOMIC_REF(struct taskpid)       t_fproc; /* [0..1] PID of the foreground process group leader.
-	                                            * This process is usually apart of the same session as `pm_cproc' */
+	                                            * This process is usually apart of the same session as `t_cproc' */
 };
 DEFINE_REFCOUNT_TYPE_SUBCLASS(ttybase_device, character_device);
 

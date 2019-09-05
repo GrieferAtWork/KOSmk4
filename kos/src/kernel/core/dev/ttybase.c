@@ -87,6 +87,7 @@ NOTHROW(KCALL ttybase_device_cinit)(struct ttybase_device *__restrict self,
 
 
 
+
 PUBLIC ssize_t LIBTERM_CC
 kernel_terminal_check_sigttou(struct terminal *__restrict self) {
 	struct ttybase_device *term;
@@ -98,6 +99,8 @@ kernel_terminal_check_sigttou(struct terminal *__restrict self) {
 	if unlikely(FORTASK(my_leader, _this_taskpid) != ATOMIC_READ(term->t_fproc.m_pointer)) {
 		if (term->t_fproc.cmpxch(NULL, FORTASK(my_leader, _this_taskpid)))
 			goto done; /* Lazily set the caller as the initial foreground process */
+		printk(KERN_INFO "[tty:%q] Stop background process %p [tid=%u]\n",
+		       term->cd_name, my_leader, (unsigned int)task_getrootpid_of_s(my_leader));
 		task_raisesignalprocessgroup(my_leader, SIGTTOU);
 		/* We might get here if the calling process changed its process group
 		 * in the mean time. - In this case, just re-raise `SIGTTOU' within the
@@ -408,9 +411,10 @@ do_TCSETA: {
 		}
 		newpid = incref(FORTASK(newgroup, _this_taskpid));
 		decref_unlikely(newgroup);
+		printk(KERN_INFO "[tty:%q] Set foreground process group to %p [tid=%u]\n",
+		       me->cd_name, newgroup, (unsigned int)taskpid_getrootpid(newpid));
 		oldpid = me->t_fproc.exchange_inherit_new(newpid);
 		xdecref(oldpid);
-		printk(KERN_INFO "[tty:%q] Set foreground process group to %I32d\n", me->cd_name, pid);
 	}	break;
 
 	case TIOCGPGRP:

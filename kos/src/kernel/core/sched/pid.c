@@ -1582,7 +1582,7 @@ handle_error:
 			group = pidns_lookup_task(THIS_PIDNS, (upid_t)pgid);
 			{
 				FINALLY_DECREF_UNLIKELY(group);
-				error = task_setprocessgroupleader(thread, thread);
+				error = task_setprocessgroupleader(thread, group);
 			}
 			goto handle_error;
 		}
