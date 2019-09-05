@@ -433,19 +433,15 @@ err:
 
 INTERN int LIBCCALL
 libc_fdoflush(FILE *__restrict self) {
-	size_t flushsize;
 	ssize_t temp;
 	unsigned char *write_pointer;
 	size_t write_size;
 	/* Don't do anything if the buffer hasn't changed, or doesn't have a handle. */
 	if (!(self->if_flag & IO_W) || (self->if_flag & IO_NOFD))
 		return 0;
-	flushsize = (size_t)(self->if_ptr - self->if_base);
-	assertf(flushsize <= self->if_bufsiz, "Invalid file layout (ptr: %p; buf: %p...%p)",
-	        self->if_ptr, self->if_base, self->if_base + self->if_bufsiz - 1);
 	/* If the input buffer was read before, we must seek
 	 * backwards to get back to where it was read from. */
-	if (self->if_flag & IO_R && self->if_exdata->io_read) {
+	if ((self->if_flag & IO_R) && self->if_exdata->io_read) {
 		off64_t pos = lseek64(self->if_fd,
 		                      -(ssize_t)self->if_exdata->io_read,
 		                      SEEK_CUR);
@@ -457,19 +453,19 @@ libc_fdoflush(FILE *__restrict self) {
 	write_pointer = self->if_base;
 	write_size = (size_t)((uintptr_t)self->if_ptr -
 	                      (uintptr_t)write_pointer);
+	assertf(write_size <= self->if_bufsiz, "Invalid file layout (ptr: %p; buf: %p...%p)",
+	        self->if_ptr, self->if_base, self->if_base + self->if_bufsiz - 1);
 	while (write_size) {
 		temp = write(self->if_fd, write_pointer, write_size);
 		if (temp < 0)
 			goto err;
 		if (!temp) {
 			self->if_flag |= IO_EOF;
-#ifdef CONFIG_FILE_DATASYNC_DURING_FLUSH
-			if (libc_fdatasync(self->if_fd))
-				goto err;
-#endif
+			self->if_exdata->io_pos = (size_t)(write_pointer - self->if_base);
+			self->if_ptr            = write_pointer;
+			self->if_cnt            = 0;
 			return 0; /* XXX: Is this correct? */
 		}
-		self->if_exdata->io_pos += temp;
 		write_pointer += temp;
 		write_size -= temp;
 	}
@@ -479,18 +475,12 @@ libc_fdoflush(FILE *__restrict self) {
 			LLIST_UNLINK(self, if_exdata->io_lnch);
 		atomic_rwlock_endwrite(&libc_flnchg_lock);
 	}
-
 	/* Delete the changed and EOF flags. */
 	self->if_flag &= ~(IO_EOF | IO_W | IO_R);
 	/* Mark the buffer as empty. */
 	self->if_exdata->io_read = 0;
 	self->if_ptr             = self->if_base;
 	self->if_cnt             = 0;
-#ifdef CONFIG_FILE_DATASYNC_DURING_FLUSH
-	/* Do a disk sync. */
-	if (libc_fdatasync(self->if_fd))
-		goto err;
-#endif
 	return 0;
 err:
 	self->if_flag |= IO_ERR;
@@ -564,37 +554,42 @@ libc_fmarkchanged(FILE *__restrict self) {
 
 INTERN size_t LIBCCALL
 libc_fdowrite(void const *__restrict buf, size_t size, FILE *__restrict self) {
-	size_t result, part, minsize;
+	/* TODO: This function barely holds together!
+	 *       Get rid of it and port `deemon200:buffer_write_nolock()' */
+	size_t result = 0, part, minsize;
 	unsigned char *buffer;
 	ssize_t temp;
-buffer_write_more:
-	/* Write data to buffer (including to the overflow area). */
-	result = MIN((size_t)((self->if_base + self->if_bufsiz) - self->if_ptr), size);
+	if unlikely(!size)
+		goto end;
 	libc_fchecktty(self);
-	if (result) {
-		memcpy(self->if_ptr, buf, result);
+buffer_write_more:
+	/* Write data to buffer. */
+	assert(self->if_ptr >= self->if_base);
+	assert(self->if_ptr <= self->if_base + self->if_bufsiz);
+	part = MIN((size_t)((self->if_base + self->if_bufsiz) - self->if_ptr), size);
+	if (part) {
+		memcpy(self->if_ptr, buf, part);
+		self->if_ptr += part;
 		libc_fmarkchanged(self);
-		self->if_ptr += result;
-		if (result >= self->if_cnt)
+		if (OVERFLOW_USUB(self->if_cnt, part, &self->if_cnt))
 			self->if_cnt = 0;
-		else {
-			self->if_cnt -= result;
-		}
-		size -= result;
+		result += part;
+		size -= part;
 		/* Flush the buffer if it is line-buffered. */
 		if (self->if_flag & IO_LNBUF &&
-		    memchr(buf, '\n', result)) {
+		    memchr(buf, '\n', part)) {
 			if (libc_fdoflush(self))
 				return 0;
 			/* With the buffer now empty, we must write more data to it. */
+			if (!size)
+				goto end;
+			buf = (byte_t *)buf + part;
 			goto buffer_write_more;
 		}
 		if (!size)
 			goto end;
-		*(uintptr_t *)&buf += result;
+		buf = (byte_t *)buf + part;
 	}
-	if (!size)
-		goto end;
 	assert(!self->if_cnt);
 	assert(self->if_ptr == self->if_base + self->if_bufsiz);
 
@@ -618,16 +613,18 @@ part_again:
 		/* Flush the buffer before performing direct I/O to preserve write order. */
 		if (libc_fdoflush(self))
 			return 0;
+		assert(part <= size);
 		temp = write(self->if_fd, buf, part);
-		if (temp < 0)
-			goto err;
-		self->if_exdata->io_pos += temp;
-		result += temp;
-		size -= temp;
+		if (temp <= 0)
+			goto err_or_eof;
+		assert((size_t)temp <= part);
+		self->if_exdata->io_pos += (size_t)temp;
+		result += (size_t)temp;
+		size -= (size_t)temp;
 		if (!size)
 			goto end;
-		*(uintptr_t *)&buf += part;
-		if ((size_t)temp != part)
+		buf = (byte_t *)buf + temp;
+		if ((size_t)temp < part)
 			goto part_again;
 	}
 	/* Write the remainder to the buffer.
@@ -636,6 +633,8 @@ part_again:
 	assert(!(self->if_flag & IO_LNBUF) || !memchr(buf, '\n', size));
 	buffer = self->if_base;
 	if (!(self->if_flag & IO_USERBUF)) {
+		if (libc_fdoflush(self))
+			return 0;
 		/* Make sure the buffer is of sufficient size. */
 		minsize = CEIL_ALIGN(size, IOBUF_MIN);
 		if (minsize > self->if_bufsiz) {
@@ -659,8 +658,9 @@ part_again:
 		}
 	}
 fill_buffer:
-	assert(size);
+	assert(size != 0);
 	assert(size <= self->if_bufsiz);
+	assert(buffer == self->if_base);
 	memcpy(buffer, buf, size);
 	self->if_ptr = buffer + size;
 	assert(!self->if_cnt);
@@ -672,12 +672,21 @@ direct_io:
 	/* Read the remainder using direct I/O. */
 	temp = write(self->if_fd, buf, size);
 	if (temp <= 0)
-		goto err;
-	result += temp;
+		goto err_or_eof;
+	result                  += temp;
 	self->if_exdata->io_pos += temp;
+	if ((size_t)temp < size) {
+		size -= (size_t)temp;
+		buf = (byte_t *)buf + (size_t)temp;
+		goto direct_io;
+	}
 	goto end;
-err:
-	self->if_flag |= IO_ERR;
+err_or_eof:
+	if (temp == 0) {
+		self->if_flag |= IO_EOF;
+	} else {
+		self->if_flag |= IO_ERR;
+	}
 	return 0;
 }
 
@@ -1157,6 +1166,9 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.write.write.fwrite") size_t
 	}
 	file_write(stream);
 	result = libc_fdowrite(buf, total, stream);
+#if 0
+	libc_fdoflush(stream);
+#endif
 	file_endwrite(stream);
 	return result / elemsize;
 }
