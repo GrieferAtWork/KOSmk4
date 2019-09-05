@@ -22,9 +22,9 @@
 #include "../../__stdinc.h"
 #include "../typecore.h"
 #include "../__atomic.h"
+#include "../__assert.h"
 #ifndef __INTELLISENSE__
 #include "../sched/__yield.h"
-#include "../__assert.h"
 #endif /* !__INTELLISENSE__ */
 
 __DECL_BEGIN
@@ -114,11 +114,12 @@ __LOCAL void __NOTHROW(atomic_rwlock_endwrite)(struct atomic_rwlock *__restrict 
 	} while (!__hybrid_atomic_cmpxch_weak(__self->arw_lock,__f,0,__ATOMIC_RELEASE,__ATOMIC_RELAXED));
 #endif
 }
+
 __LOCAL __BOOL __NOTHROW(atomic_rwlock_endread)(struct atomic_rwlock *__restrict __self) {
 	__COMPILER_READ_BARRIER();
 #ifdef NDEBUG
 	return __hybrid_atomic_decfetch(__self->arw_lock,__ATOMIC_RELEASE) == 0;
-#else
+#else /* NDEBUG */
 	__UINTPTR_TYPE__ __f;
 	do {
 		__f = __hybrid_atomic_load(__self->arw_lock,__ATOMIC_ACQUIRE);
@@ -126,8 +127,9 @@ __LOCAL __BOOL __NOTHROW(atomic_rwlock_endread)(struct atomic_rwlock *__restrict
 		__hybrid_assertf(__f != 0,"Lock isn't held by anyone");
 	} while (!__hybrid_atomic_cmpxch_weak(__self->arw_lock,__f,__f-1,__ATOMIC_RELEASE,__ATOMIC_RELAXED));
 	return __f == 1;
-#endif
+#endif /* !NDEBUG */
 }
+
 __LOCAL __BOOL __NOTHROW(atomic_rwlock_end)(struct atomic_rwlock *__restrict __self) {
 	__UINTPTR_TYPE__ __temp,__newval;
 	__COMPILER_BARRIER();
@@ -143,6 +145,7 @@ __LOCAL __BOOL __NOTHROW(atomic_rwlock_end)(struct atomic_rwlock *__restrict __s
 	} while (!__hybrid_atomic_cmpxch_weak(__self->arw_lock,__temp,__newval,__ATOMIC_RELEASE,__ATOMIC_RELAXED));
 	return __newval == 0;
 }
+
 __LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_rwlock_tryread)(struct atomic_rwlock *__restrict __self) {
 	__UINTPTR_TYPE__ __temp;
 	do {
@@ -154,22 +157,26 @@ __LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_rwlock_tryread)(struct atomic_rwl
 	__COMPILER_READ_BARRIER();
 	return 1;
 }
+
 __LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_rwlock_trywrite)(struct atomic_rwlock *__restrict __self) {
 	if __untraced(!__hybrid_atomic_cmpxch(__self->arw_lock,0,__ATOMIC_RWLOCK_WFLAG,__ATOMIC_SEQ_CST,__ATOMIC_RELAXED))
 		return 0;
 	__COMPILER_BARRIER();
 	return 1;
 }
+
 __LOCAL void (atomic_rwlock_read)(struct atomic_rwlock *__restrict __self) {
 	while (!atomic_rwlock_tryread(__self))
 		__hybrid_yield();
 	__COMPILER_READ_BARRIER();
 }
+
 __LOCAL void (atomic_rwlock_write)(struct atomic_rwlock *__restrict __self) {
 	while (!atomic_rwlock_trywrite(__self))
 		__hybrid_yield();
 	__COMPILER_BARRIER();
 }
+
 #if defined(__KERNEL__) && defined(__KOS_VERSION__) && __KOS_VERSION__ >= 400
 __LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_rwlock_read_nx)(struct atomic_rwlock *__restrict __self) {
 	while (!atomic_rwlock_tryread(__self)) {
@@ -179,6 +186,7 @@ __LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_rwlock_read_nx)(struct atomic_rwl
 	__COMPILER_READ_BARRIER();
 	return 1;
 }
+
 __LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_rwlock_write_nx)(struct atomic_rwlock *__restrict __self) {
 	while (!atomic_rwlock_trywrite(__self)) {
 		if __unlikely(!__hybrid_yield_nx())
@@ -188,6 +196,7 @@ __LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_rwlock_write_nx)(struct atomic_rw
 	return 1;
 }
 #endif
+
 __LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_rwlock_tryupgrade)(struct atomic_rwlock *__restrict __self) {
 	__UINTPTR_TYPE__ __temp;
 	do {
@@ -199,6 +208,7 @@ __LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_rwlock_tryupgrade)(struct atomic_
 	__COMPILER_WRITE_BARRIER();
 	return 1;
 }
+
 __LOCAL __ATTR_WUNUSED __BOOL (atomic_rwlock_upgrade)(struct atomic_rwlock *__restrict __self) {
 	if __untraced(atomic_rwlock_tryupgrade(__self))
 		return 1;
@@ -206,6 +216,7 @@ __LOCAL __ATTR_WUNUSED __BOOL (atomic_rwlock_upgrade)(struct atomic_rwlock *__re
 	atomic_rwlock_write(__self);
 	return 0;
 }
+
 #if defined(__KERNEL__) && defined(__KOS_VERSION__) && __KOS_VERSION__ >= 400
 __LOCAL __ATTR_WUNUSED unsigned int
 __NOTHROW(atomic_rwlock_upgrade_nx)(struct atomic_rwlock *__restrict __self) {
@@ -222,7 +233,7 @@ __LOCAL void __NOTHROW(atomic_rwlock_downgrade)(struct atomic_rwlock *__restrict
 #ifdef NDEBUG
 	__COMPILER_WRITE_BARRIER();
 	__hybrid_atomic_store(__self->arw_lock,1,__ATOMIC_ACQ_REL);
-#else
+#else /* NDEBUG */
 	__UINTPTR_TYPE__ __f;
 	__COMPILER_WRITE_BARRIER();
 	do {
@@ -230,16 +241,89 @@ __LOCAL void __NOTHROW(atomic_rwlock_downgrade)(struct atomic_rwlock *__restrict
 		__hybrid_assertf(__f == __ATOMIC_RWLOCK_WFLAG,"Lock not in write-mode (%x)",__f);
 	} while (!__hybrid_atomic_cmpxch_weak(__self->arw_lock,__f,1,
 	                                      __ATOMIC_SEQ_CST,__ATOMIC_RELAXED));
-#endif
+#endif /* !NDEBUG */
 }
 #endif /* !__INTELLISENSE__ */
 #endif /* __CC__ */
 
 #ifdef __ASSEMBLER__
-#if defined(__i386__) || defined(__x86_64__)
+#if defined(__x86_64__)
+
+#ifndef LOCK_PREFIX
+#define LOCK_PREFIX lock;
+#endif /* !LOCK_PREFIX */
+
+/* Clobber: \clobber, %rax
+ * @return: true:  ZF=1
+ * @return: false: ZF=0 */
+.macro atomic_rwlock_trywrite __self, clobber=%rcx, rax_is_zero=0
+.if \rax_is_zero == 0
+	xorq  %rax, %rax
+.endif
+	movq  $(__ATOMIC_RWLOCK_WFLAG), \clobber
+	LOCK_PREFIX cmpxchgq \clobber, \__self
+.endm
+
+/* WARNING: Clobber: \clobber, %rax
+ * @return: true:  ZF=1
+ * @return: false: ZF=0 */
+.macro atomic_rwlock_tryread __self, clobber=%rcx
+995:
+	movq  \__self, %rax
+	testq $(__ATOMIC_RWLOCK_WFLAG), %rax
+	jnz   994f
+	leaq  1(%rax), \clobber
+	LOCK_PREFIX cmpxchgq \clobber, \__self
+	jnz   995b
+994:
+.endm
+
+
+/* WARNING: Clobber: \clobber, %eax */
+.macro atomic_rwlock_write __self, clobber=%rcx, rax_is_zero=0, yield=''
+996:
+	atomic_rwlock_trywrite \__self, \clobber, \rax_is_zero
+.ifc \yield,''
+	jnz    996b
+.else
+	jz     997f
+	call   \yield
+	jmp    996b
+997:
+.endif
+.endm
+
+/* WARNING: Clobber: \clobber, %rax */
+.macro atomic_rwlock_read __self, clobber=%rcx, yield=''
+996:
+	atomic_rwlock_tryread \__self, \clobber
+.ifc \yield,''
+	jnz    996b
+.else
+	jz     997f
+	call   \yield
+	jmp    996b
+997:
+.endif
+.endm
+
+.macro atomic_rwlock_endread __self
+	LOCK_PREFIX decq \__self
+.endm
+.macro atomic_rwlock_endwrite __self
+	movq   $0, \__self
+.endm
+
+#elif defined(__i386__)
+
+#ifndef LOCK_PREFIX
+#define LOCK_PREFIX lock;
+#endif /* !LOCK_PREFIX */
+
+
 /* Clobber: \clobber, %eax
- * @return: 1:  ZF=1
- * @return: 0: ZF=0 */
+ * @return: true:  ZF=1
+ * @return: false: ZF=0 */
 .macro atomic_rwlock_trywrite __self, clobber=%ecx, eax_is_zero=0
 .if \eax_is_zero == 0
 	xorl  %eax, %eax
@@ -249,8 +333,8 @@ __LOCAL void __NOTHROW(atomic_rwlock_downgrade)(struct atomic_rwlock *__restrict
 .endm
 
 /* WARNING: Clobber: \clobber, %eax
- * @return: 1:  ZF=1
- * @return: 0: ZF=0 */
+ * @return: true:  ZF=1
+ * @return: false: ZF=0 */
 .macro atomic_rwlock_tryread __self, clobber=%ecx
 995:
 	movl  \__self, %eax
@@ -298,7 +382,7 @@ __LOCAL void __NOTHROW(atomic_rwlock_downgrade)(struct atomic_rwlock *__restrict
 	movl   $0, \__self
 .endm
 #endif
-#endif
+#endif /* __ASSEMBLER__ */
 
 #if !defined(__INTELLISENSE__) && !defined(__NO_builtin_expect)
 #define atomic_rwlock_tryread(__self)    __builtin_expect(atomic_rwlock_tryread(__self),1)
