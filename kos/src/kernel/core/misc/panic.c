@@ -370,9 +370,9 @@ libc_stack_failure_core(struct kcpustate *__restrict state) {
 	/* Enter the debugger */
 	dbg_enter(state, &panic_genfail_dbg_main,
 	          (void *)"Stack check failure (corrupted cookie)\n");
-#else
+#else /* !CONFIG_NO_DEBUGGER */
 	PREEMPTION_HALT();
-#endif
+#endif /* CONFIG_NO_DEBUGGER */
 }
 
 INTERN ATTR_COLDTEXT ATTR_COLD ATTR_NORETURN void FCALL
@@ -390,9 +390,9 @@ libc_abort_failure_core(struct kcpustate *__restrict state) {
 	/* Enter the debugger */
 	dbg_enter(state, &panic_genfail_dbg_main,
 	          (void *)"Kernel called abort()\n");
-#else
+#else /* !CONFIG_NO_DEBUGGER */
 	PREEMPTION_HALT();
-#endif
+#endif /* CONFIG_NO_DEBUGGER */
 }
 
 
@@ -423,7 +423,7 @@ panic_kernel_dbg_main(void *arg) {
 	           prev_pc, (size_t)(FCPUSTATE_PC(dbg_exitstate) - prev_pc));
 	dbg_main(0);
 }
-#endif
+#endif /* !CONFIG_NO_DEBUGGER */
 
 FUNDEF ATTR_NORETURN ATTR_COLD void FCALL
 kernel_vpanic_ucpustate(struct ucpustate *__restrict state,
@@ -452,9 +452,9 @@ kernel_vpanic_ucpustate(struct ucpustate *__restrict state,
 		pargs.format = format;
 		dbg_enter(state, &panic_kernel_dbg_main, &pargs);
 	}
-#else
+#else /* !CONFIG_NO_DEBUGGER */
 	PREEMPTION_HALT();
-#endif
+#endif /* CONFIG_NO_DEBUGGER */
 }
 
 FUNDEF ATTR_NORETURN ATTR_COLD void FCALL

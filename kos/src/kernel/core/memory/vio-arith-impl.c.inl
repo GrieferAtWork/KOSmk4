@@ -45,6 +45,7 @@ FUNC(b)(struct vio_args *__restrict args, vm_daddr_t addr, u8 value, bool atomic
 		result = new_result;
 	return new_result;
 }
+
 PUBLIC NONNULL((1)) u16 KCALL
 FUNC(w)(struct vio_args *__restrict args, vm_daddr_t addr, u16 value, bool atomic) {
 	struct vm_datablock_type_vio const *type = args->va_type;
@@ -56,6 +57,7 @@ FUNC(w)(struct vio_args *__restrict args, vm_daddr_t addr, u16 value, bool atomi
 		result = new_result;
 	return new_result;
 }
+
 PUBLIC NONNULL((1)) u32 KCALL
 FUNC(l)(struct vio_args *__restrict args, vm_daddr_t addr, u32 value, bool atomic) {
 	struct vm_datablock_type_vio const *type = args->va_type;

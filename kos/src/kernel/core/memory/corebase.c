@@ -33,6 +33,7 @@
 
 #include <hybrid/atomic.h>
 
+#include <assert.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -56,9 +57,12 @@ PRIVATE ATTR_READMOSTLY struct pending_free_part *pending_free = NULL;
 
 /* The mask of the last word of the is-used bitset that must be
  * matched for that word to be considered to only represent FREE parts. */
-#define LAST_ALL_USED_MASK \
-	(((uintptr_t)1 << (BITSOF(uintptr_t) - \
-	  ((COMPILER_LENOF(((struct vm_corepage_controller *)0)->cpc_used) * BITSOF(uintptr_t)) - VM_COREPAIRS_PER_PAGE))) - 1)
+#define LAST_ALL_USED_MASK                                                                \
+	(((uintptr_t)1 << (BITSOF(uintptr_t) -                                                \
+	                   ((COMPILER_LENOF(((struct vm_corepage_controller *)0)->cpc_used) * \
+	                     BITSOF(uintptr_t)) -                                             \
+	                    VM_COREPAIRS_PER_PAGE))) -                                        \
+	 1)
 
 
 PRIVATE bool
@@ -82,8 +86,8 @@ NOTHROW(KCALL corepage_hasused)(struct vm_corepage *__restrict self) {
 }
 
 
-
-PRIVATE void NOTHROW(KCALL do_free_part)(void *__restrict part) {
+PRIVATE void
+NOTHROW(KCALL do_free_part)(void *__restrict part) {
 	struct vm_corepage *page;
 	unsigned int index, i;
 	uintptr_t mask;
@@ -358,9 +362,16 @@ NOTHROW(KCALL vm_corepage_freepart)(void *__restrict part) {
 		 * to `SCHED_YIELD()', which may be illegal if preemption
 		 * is currently disabled. */
 		pend = (struct pending_free_part *)part;
-		do
-			pend->next = next = ATOMIC_READ(pending_free);
-		while (!ATOMIC_CMPXCH_WEAK(pending_free, next, pend));
+		do {
+			next = ATOMIC_READ(pending_free);
+			pend->next = next;
+			COMPILER_WRITE_BARRIER();
+		} while (!ATOMIC_CMPXCH_WEAK(pending_free, next, pend));
+		COMPILER_BARRIER();
+		if (sync_trywrite(&vm_corepage_lock)) {
+			free_pending_parts();
+			sync_endwrite(&vm_corepage_lock);
+		}
 		return;
 	}
 	free_pending_parts();

@@ -42,8 +42,8 @@
 
 #include <kos/hop.h>
 
-#include <sched.h>
 #include <assert.h>
+#include <sched.h>
 #include <stddef.h>
 #include <string.h>
 

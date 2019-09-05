@@ -41,15 +41,15 @@
 
 DECL_BEGIN
 
-FUNDEF WUNUSED ATTR_CONST ATTR_RETNONNULL NONNULL((1)) struct vm_futex_controller *
-(FCALL vm_datapart_futexctl)(struct vm_datapart *__restrict self) THROWS(E_BADALLOC,E_WOULDBLOCK);
+FUNDEF WUNUSED ATTR_CONST ATTR_RETNONNULL NONNULL((1)) struct vm_futex_controller *FCALL
+vm_datapart_futexctl(struct vm_datapart *__restrict self) THROWS(E_BADALLOC,E_WOULDBLOCK);
 FUNDEF WUNUSED ATTR_CONST NONNULL((1)) struct vm_futex_controller *
 NOTHROW(FCALL vm_datapart_futexctl_nx)(struct vm_datapart *__restrict self);
 
 /* Broadcast to all thread waiting for a futex at `futex_address' within the current VM */
-PUBLIC void
-(FCALL vm_futex_broadcast)(void *futex_address)
-       THROWS(E_WOULDBLOCK,E_SEGFAULT) {
+PUBLIC void FCALL
+vm_futex_broadcast(void *futex_address)
+		THROWS(E_WOULDBLOCK, E_SEGFAULT) {
 	/* TODO */
 	(void)futex_address;
 }

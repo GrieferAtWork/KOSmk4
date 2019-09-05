@@ -93,17 +93,17 @@ STATIC_ASSERT(SIZEOF_MFREE == offsetof(struct mfree,mf_data));
 
 
 #if defined(NDEBUG) || 0
-#define HEAP_ASSERT(expr)      (void)0
-#define HEAP_ASSERTE(expr)     (expr)
-#define HEAP_ASSERTF(expr,...) (void)0
+#define HEAP_ASSERT(expr)       (void)0
+#define HEAP_ASSERTE(expr)      (expr)
+#define HEAP_ASSERTF(expr, ...) (void)0
 #else
 #ifdef NDEBUG
-#define HEAP_ASSERTE(expr)     (expr)
-#else
-#define HEAP_ASSERTE(expr)     assert(expr)
-#endif
-#define HEAP_ASSERT(expr)      assert(expr)
-#define HEAP_ASSERTF(expr,...) assertf(expr,__VA_ARGS__)
+#define HEAP_ASSERTE /* nothing */
+#else /* NDEBUG */
+#define HEAP_ASSERTE assert
+#endif /* !NDEBUG */
+#define HEAP_ASSERT  assert
+#define HEAP_ASSERTF assertf
 #endif
 
 
@@ -176,6 +176,7 @@ PUBLIC struct vm_datablock_type vm_datablock_debugheap_type = {
 	/* .dt_loadpart = */&debug_pat_loadpart,
 	/* .dt_savepart = */NULL,
 };
+
 PUBLIC struct vm_datablock vm_datablock_debugheap = {
 	/* .db_refcnt = */((refcnt_t)-1)/2,
 	/* .db_lock   = */RWLOCK_INIT,
@@ -186,8 +187,9 @@ PUBLIC struct vm_datablock vm_datablock_debugheap = {
 	/* .db_parts  = */VM_DATABLOCK_ANONPARTS_INIT,
 	VM_DATABLOCK_INIT_PAGEINFO(0)
 };
+
 DEFINE_DBG_BZERO_OBJECT(vm_datablock_debugheap.db_lock);
-#endif
+#endif /* CONFIG_DEBUG_HEAP */
 
 
 /* Unlock the kernel heaps while inside of the debugger. */
@@ -415,9 +417,11 @@ NOTHROW(KCALL heap_validate)(struct heap *__restrict self) {
 }
 #else /* CONFIG_DEBUG_HEAP */
 #define mfree_set_checksum(self) (void)0
+
 PUBLIC NOBLOCK void
 NOTHROW(KCALL heap_validate)(struct heap *__restrict UNUSED(self)) {
 }
+
 PUBLIC NOBLOCK void
 NOTHROW(KCALL heap_validate_all)(void) {
 }
@@ -869,8 +873,8 @@ load_new_slot:
 #ifdef CONFIG_HEAP_TRACE_DANGLE
 	/* Untrack danging heap data. */
 	HEAP_SUB_DANGLE(self, dandle_size);
-#endif
-#endif
+#endif /* CONFIG_HEAP_TRACE_DANGLE */
+#endif /* CONFIG_DEBUG_HEAP */
 	if (!(flags & GFP_NOMMAP) &&
 	    new_slot->mf_size >= self->h_freethresh) {
 		/*  When a slot grows larger than `self->h_freethresh' and
@@ -1284,13 +1288,16 @@ NOTHROW(KCALL heap_free_underallocation)(struct heap *__restrict self,
 	heap_free_raw(self, underallocation_base,
 	              num_free_bytes, flags);
 }
-#else
+
+#else /* CONFIG_DEBUG_HEAP */
+
 /* Without debug initialization, this isn't a problem! */
 #define heap_free_overallocation(self, overallocation_base, num_free_bytes, flags) \
 	heap_free_raw(self, overallocation_base, num_free_bytes, flags)
 #define heap_free_underallocation(self, underallocation_base, num_free_bytes, flags) \
 	heap_free_raw(self, underallocation_base, num_free_bytes, flags)
-#endif
+
+#endif /* !CONFIG_DEBUG_HEAP */
 
 
 DECL_END
@@ -1309,6 +1316,7 @@ NOTHROW(KCALL vpage_free_untraced)(VIRT /*page-aligned*/void *base,
 	assertf(IS_ALIGNED((uintptr_t)base, pagedir_pagesize()), "base = %p", base);
 	vm_unmap_kernel_ram(VM_ADDR2PAGE((vm_virt_t)base), num_pages, false);
 }
+
 PUBLIC NOBLOCK void
 NOTHROW(KCALL vpage_ffree_untraced)(VIRT /*page-aligned*/void *base,
                                     size_t num_pages, gfp_t flags) {

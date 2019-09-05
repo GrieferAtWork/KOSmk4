@@ -598,7 +598,7 @@ again_lock_datapart:
 //	}
 
 	/* +----------------------------------------------------------+
-	 * | This is the point of no return, where nothing can go     |
+	 * | This is the point of no return, where nothing may go     |
 	 * | wrong anymore, and we start modifying the original       |
 	 * | datapart to only represent the lower half of the mapping |
 	 * +----------------------------------------------------------+ */

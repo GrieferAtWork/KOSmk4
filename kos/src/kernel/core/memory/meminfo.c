@@ -259,10 +259,10 @@ NOTHROW(KCALL pmemzone_init_bits)(struct pmemzone *__restrict self,
 #if __SIZEOF_POINTER__ == 4
 	memsetl(&self->mz_free[(uintptr_t)(start / PAGES_PER_WORD)],
 	        mask, num_pages / PAGES_PER_WORD);
-#else
+#else /* __SIZEOF_POINTER__ == 4 */
 	memsetq(&self->mz_free[(uintptr_t)(start / PAGES_PER_WORD)],
 	        mask, num_pages / PAGES_PER_WORD);
-#endif
+#endif /* __SIZEOF_POINTER__ != 4 */
 	start += num_pages & ~(PAGES_PER_WORD - 1);
 	num_pages %= PAGES_PER_WORD;
 	while (num_pages) {
@@ -568,7 +568,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL minfo_makezones)(void) {
 			}
 			assert(startpage <= endpage);
 			if (prev_init_end < startpage) {
-				/* Initialize intermitten pages as undefined. */
+				/* Initialize intermittent pages as undefined. */
 				pmemzone_init_bits(zone,
 				                   prev_init_end,
 				                   (pagecnt_t)(startpage - prev_init_end),
@@ -658,13 +658,13 @@ NOTHROW(KCALL minfo_relocate_appropriate)(void) {
 	/* Pop the node concerning the memory information, so we can modify it. */
 #ifdef NDEBUG
 	vm_node_remove(&vm_kernel, kernel_vm_node_pagedata.vn_node.a_vmin);
-#else
+#else /* NDEBUG */
 	{
 		struct vm_node *node;
 		node = vm_node_remove(&vm_kernel, kernel_vm_node_pagedata.vn_node.a_vmin);
 		assert(node == &kernel_vm_node_pagedata);
 	}
-#endif
+#endif /* !NDEBUG */
 	old_page = kernel_vm_node_pagedata.vn_node.a_vmin;
 	relocation_offset = (ptrdiff_t)(dest - old_page) * PAGESIZE;
 	kernel_vm_node_pagedata.vn_node.a_vmin = dest;

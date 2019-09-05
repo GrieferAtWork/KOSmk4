@@ -42,22 +42,22 @@ DECL_BEGIN
  *       TRACKCHANGES bit is set)
  * NOTE: The caller must be holding a read-lock to `self', as well as ensure
  *       that `self' is either INCORE or LOCKED */
-PUBLIC NONNULL((1)) void
-(KCALL FUNC0(vm_datapart_do_))(struct vm_datapart *__restrict self,
+PUBLIC NONNULL((1)) void KCALL
+FUNC0(vm_datapart_do_)(struct vm_datapart *__restrict self,
 #ifdef IO_PHYS
-                               vm_phys_t buf,
+                       vm_phys_t buf,
 #elif defined(IO_READ)
-                               USER CHECKED void *buf,
+                       USER CHECKED void *buf,
 #else
-                               USER CHECKED void const *buf,
+                       USER CHECKED void const *buf,
 #endif
-                               size_t num_bytes,
-                               vm_daddr_t offset)
+                       size_t num_bytes,
+                       vm_daddr_t offset)
 #ifdef IO_PHYS
 		THROWS(...)
-#else
+#else /* IO_PHYS */
 		THROWS(E_SEGFAULT, ...)
-#endif
+#endif /* !IO_PHYS */
 {
 	size_t data_pagesize;
 	assert(sync_reading(self) || !isshared(self) ||
@@ -77,9 +77,9 @@ PUBLIC NONNULL((1)) void
 			                                     (vm_dpage_t)(offset >> VM_DATABLOCK_ADDRSHIFT(self->dp_block)),
 #ifdef IO_READ
 			                                     false
-#else
+#else /* IO_READ */
 			                                     true
-#endif
+#endif /* !IO_READ */
 			                                     );
 			/* Copy data to/from the data part memory back-end */
 #ifdef IO_PHYS
@@ -101,9 +101,9 @@ PUBLIC NONNULL((1)) void
 			offset += max_io;
 #ifdef IO_PHYS
 			buf += max_io;
-#else
+#else /* IO_PHYS */
 			buf = (byte_t *)buf + max_io;
-#endif
+#endif /* !IO_PHYS */
 		}
 	}
 }
@@ -111,31 +111,31 @@ PUBLIC NONNULL((1)) void
 
 
 #ifdef IO_PHYS
-PUBLIC NONNULL((1)) size_t
-(KCALL FUNC0(vm_datapart_))(struct vm_datapart *__restrict self,
-                            vm_phys_t buf,
-                            size_t num_bytes,
+PUBLIC NONNULL((1)) size_t KCALL
+FUNC0(vm_datapart_)(struct vm_datapart *__restrict self,
+                    vm_phys_t buf,
+                    size_t num_bytes,
 #ifdef IO_WRITE
-                            size_t split_bytes,
+                    size_t split_bytes,
 #endif /* IO_WRITE */
-                            vm_daddr_t offset)
+                    vm_daddr_t offset)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...)
 #else /* IO_PHYS */
 /* Same as the `vm_datapart_(read|write)', however make the assumption that the
  * memory backing is `safe' (i.e. access could never cause a #PF attempting to
  * acquire a lock to `self' when doing so is impossible) */
-PUBLIC NONNULL((1, 2)) size_t
+PUBLIC NONNULL((1, 2)) size_t KCALL
 #ifdef IO_READ
-(KCALL vm_datapart_read_unsafe)(struct vm_datapart *__restrict self,
-                                void *__restrict buf,
-                                size_t num_bytes,
-                                vm_daddr_t offset)
+vm_datapart_read_unsafe(struct vm_datapart *__restrict self,
+                        void *__restrict buf,
+                        size_t num_bytes,
+                        vm_daddr_t offset)
 #else /* IO_READ */
-(KCALL vm_datapart_write_unsafe)(struct vm_datapart *__restrict self,
-                                 void const *__restrict buf,
-                                 size_t num_bytes,
-                                 size_t split_bytes,
-                                 vm_daddr_t offset)
+vm_datapart_write_unsafe(struct vm_datapart *__restrict self,
+                         void const *__restrict buf,
+                         size_t num_bytes,
+                         size_t split_bytes,
+                         vm_daddr_t offset)
 #endif /* !IO_READ */
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...)
 #endif /* !IO_PHYS */

@@ -21,9 +21,9 @@
 #define SEGMENT_SIZE 4
 #endif
 
-#define FUNC3(x,y) x ## y
-#define FUNC2(x,y) FUNC3(x,y)
-#define FUNC(x) FUNC2(x,SEGMENT_SIZE)
+#define FUNC3(x, y) x##y
+#define FUNC2(x, y) FUNC3(x, y)
+#define FUNC(x) FUNC2(x, SEGMENT_SIZE)
 
 #define SEGMENT_OFFSET   SLAB_SEGMENT_OFFSET(SEGMENT_SIZE)
 #define SEGMENT_COUNT    SLAB_SEGMENT_COUNT(SEGMENT_SIZE)

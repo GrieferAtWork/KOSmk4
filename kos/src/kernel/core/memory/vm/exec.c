@@ -23,8 +23,8 @@
 #include <kernel/compiler.h>
 
 #include <fs/node.h>
-#include <kernel/except.h>
 #include <kernel/driver-param.h>
+#include <kernel/except.h>
 #include <kernel/vm.h>
 #include <kernel/vm/builder.h>
 #include <kernel/vm/library.h>
@@ -34,10 +34,10 @@
 #include <kos/library-listdef.h>
 #include <kos/process.h>
 
+#include <assert.h>
 #include <elf.h>
 #include <malloca.h>
 #include <string.h>
-#include <assert.h>
 
 #include "vm-nodeapi.h"
 
@@ -62,7 +62,6 @@ INTERN struct vm_ramfile kernel_ld_elf_ramfile =
 PUBLIC CALLBACK_LIST(void KCALL(void)) vm_onexec_callbacks = CALLBACK_LIST_INIT;
 
 /* Library listing definition, using a process's PEB as data source.
- * For this, we set up the loaded-library list as a single library
  * For this we set up the list definition to later load the filename
  * from using an expression equal to `PEB.pp_argv[0]', allowing the
  * name to be overwritten as one of:

@@ -30,10 +30,10 @@ DECL_BEGIN
 PRIVATE NONNULL((1)) unsigned int
 #ifdef EXLOCK_NX
 NOTHROW(FCALL vm_datapart_do_setcore_nx)(struct vm_datapart *__restrict self)
-#else
+#else /* EXLOCK_NX */
 FCALL vm_datapart_do_setcore(struct vm_datapart *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC)
-#endif
+#endif /* !EXLOCK_NX */
 {
 	unsigned int result;
 	struct vm_ramblock block0;
@@ -64,7 +64,7 @@ do_load_swap:
 				vm_do_ccfreeram(&block0, blocks);
 				return VM_DATAPART_DO_SETCORE_FAILED;
 			}
-#else
+#else /* EXLOCK_NX */
 			blocks = vm_do_allocram(&block0,
 			                        num_pages,
 			                        GFP_LOCKED | GFP_PREFLT | GFP_VCBASE);
@@ -74,7 +74,7 @@ do_load_swap:
 				vm_do_ccfreeram(&block0, blocks);
 				RETHROW();
 			}
-#endif
+#endif /* !EXLOCK_NX */
 			COMPILER_READ_BARRIER();
 			if unlikely(self->dp_state != VM_DATAPART_STATE_INSWAP) {
 				if (self->dp_state == VM_DATAPART_STATE_ABSENT) {
@@ -125,7 +125,7 @@ do_load_absent_hasblocks:
 				vm_do_ccfreeram(&block0, blocks);
 				return VM_DATAPART_DO_SETCORE_FAILED;
 			}
-#else
+#else /* EXLOCK_NX */
 			blocks = vm_do_allocram(&block0,
 			                        num_pages,
 			                        GFP_LOCKED | GFP_PREFLT | GFP_VCBASE);
@@ -135,7 +135,7 @@ do_load_absent_hasblocks:
 				vm_do_ccfreeram(&block0, blocks);
 				RETHROW();
 			}
-#endif
+#endif /* !EXLOCK_NX */
 			COMPILER_READ_BARRIER();
 			if unlikely(self->dp_state != VM_DATAPART_STATE_ABSENT) {
 #ifndef CONFIG_NO_SWAP
@@ -145,7 +145,7 @@ do_load_absent_hasblocks:
 					vm_do_ccfreeram(&block0, blocks);
 					goto do_load_swap;
 				}
-#endif
+#endif /* !CONFIG_NO_SWAP */
 				vm_do_ccfreeram(&block0, blocks);
 				assert(self->dp_state == VM_DATAPART_STATE_INCORE ||
 				       self->dp_state == VM_DATAPART_STATE_LOCKED);
@@ -170,10 +170,10 @@ do_load_absent_hasblocks:
 PRIVATE NONNULL((1)) unsigned int
 #ifdef EXLOCK_NX
 NOTHROW(FCALL vm_datapart_do_unshare_cow_nx)(struct vm_datapart *__restrict self)
-#else
-(FCALL vm_datapart_do_unshare_cow)(struct vm_datapart *__restrict self)
+#else /* EXLOCK_NX */
+FCALL vm_datapart_do_unshare_cow(struct vm_datapart *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC)
-#endif
+#endif /* !EXLOCK_NX */
 {
 	struct vm_datapart *copy;
 	unsigned int result;
@@ -190,7 +190,7 @@ NOTHROW(FCALL vm_datapart_do_unshare_cow_nx)(struct vm_datapart *__restrict self
 	                                        GFP_PREFLT | GFP_VCBASE);
 #ifndef EXLOCK_NX
 	TRY
-#endif
+#endif /* !EXLOCK_NX */
 	{
 		num_dpages = vm_datapart_numdpages(self);
 		num_pages  = num_dpages >> VM_DATABLOCK_PAGESHIFT(self->dp_block);
@@ -202,11 +202,11 @@ NOTHROW(FCALL vm_datapart_do_unshare_cow_nx)(struct vm_datapart *__restrict self
 			                                        GFP_VCBASE);
 			if unlikely(!copy)
 				goto err_vms;
-#else
+#else /* EXLOCK_NX */
 			copy = (struct vm_datapart *)kmalloc(sizeof(struct vm_datapart),
 			                                     GFP_LOCKED | GFP_PREFLT |
 			                                     GFP_VCBASE);
-#endif
+#endif /* !EXLOCK_NX */
 alloc_part_copy_ramdata:
 #ifdef EXLOCK_NX
 			copy->dp_ramdata.rd_blockv = vm_do_allocram_nx(&copy->dp_ramdata.rd_block0,
@@ -215,7 +215,7 @@ alloc_part_copy_ramdata:
 			                                               GFP_VCBASE);
 			if unlikely(!copy->dp_ramdata.rd_blockv)
 				goto err_vms_copy;
-#else
+#else /* EXLOCK_NX */
 			TRY {
 				copy->dp_ramdata.rd_blockv = vm_do_allocram(&copy->dp_ramdata.rd_block0,
 				                                            num_pages,
@@ -225,7 +225,7 @@ alloc_part_copy_ramdata:
 				kfree(copy);
 				RETHROW();
 			}
-#endif
+#endif /* !EXLOCK_NX */
 alloc_part_copy_ppp:
 			copy->dp_flags = VM_DATAPART_FLAG_NORMAL;
 			if (num_dpages <= BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS) {
@@ -240,7 +240,7 @@ alloc_part_copy_ppp:
 				                                           GFP_PREFLT | GFP_VCBASE);
 				if unlikely(!copy->dp_pprop_p)
 					goto err_vms_copy_ramdata;
-#else
+#else /* EXLOCK_NX */
 				TRY {
 					copy->dp_pprop_p = (uintptr_t *)kmalloc(ppp_size,
 					                                        GFP_CALLOC | GFP_LOCKED |
@@ -251,12 +251,12 @@ alloc_part_copy_ppp:
 					kfree(copy);
 					RETHROW();
 				}
-#endif
+#endif /* !EXLOCK_NX */
 			}
 #ifdef EXLOCK_NX
 			if unlikely(!sync_write_nx(self))
 				goto err_vms_copy_ramdata_ppp;
-#else
+#else /* EXLOCK_NX */
 			TRY {
 				sync_write(self);
 			} EXCEPT {
@@ -267,7 +267,7 @@ alloc_part_copy_ppp:
 				kfree(copy);
 				RETHROW();
 			}
-#endif
+#endif /* !EXLOCK_NX */
 			COMPILER_READ_BARRIER();
 			result = VM_DATAPART_DO_UNSHARE_COW_SUCCESS_RELOCKED;
 			if unlikely(self->dp_state != VM_DATAPART_STATE_INCORE &&
@@ -318,7 +318,7 @@ return_direct_locked:
 		}
 #ifndef EXLOCK_NX
 		TRY
-#endif
+#endif /* !EXLOCK_NX */
 		{
 			struct vm *v;
 			struct vm_node *node;
@@ -341,14 +341,14 @@ again_scan_nodes:
 					decref(v);
 					goto err_vms_copy_ramdata_ppp;
 				}
-#else
+#else /* EXLOCK_NX */
 				TRY {
 					sync_write(v);
 				} EXCEPT {
 					decref(v);
 					RETHROW();
 				}
-#endif
+#endif /* !EXLOCK_NX */
 				sync_endwrite(v);
 				decref(v);
 				goto again_lock_datapart;
@@ -361,7 +361,7 @@ again_scan_nodes:
 #ifndef NDEBUG
 			memset(&copy->dp_tree.a_min, 0xcc, sizeof(copy->dp_tree.a_min));
 			memset(&copy->dp_tree.a_max, 0xcc, sizeof(copy->dp_tree.a_max));
-#endif
+#endif /* !NDEBUG */
 			copy->dp_crefs = node = self->dp_crefs;
 			copy->dp_srefs = NULL;
 			copy->dp_stale = NULL;
@@ -412,9 +412,9 @@ again_scan_nodes:
 					vm_set_lockendwrite_all(&vms);
 #ifdef EXLOCK_NX
 					goto err_vms_copy_ramdata_ppp;
-#else
+#else /* EXLOCK_NX */
 					THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
-#endif
+#endif /* !EXLOCK_NX */
 				}
 			} while ((node = node->vn_link.ln_next) != NULL);
 			node                   = self->dp_crefs;
@@ -478,7 +478,7 @@ err_vms_copy_ramdata:
 		                copy->dp_ramdata.rd_blockv);
 err_vms_copy:
 		kfree(copy);
-#else
+#else /* EXLOCK_NX */
 		EXCEPT {
 			if (copy->dp_flags & VM_DATAPART_FLAG_HEAPPPP)
 				kfree(copy->dp_pprop_p);
@@ -487,18 +487,18 @@ err_vms_copy:
 			kfree(copy);
 			RETHROW();
 		}
-#endif
+#endif /* !EXLOCK_NX */
 	}
 #ifdef EXLOCK_NX
 err_vms:
 	pointer_set_fini(&vms);
 	return VM_DATAPART_DO_UNSHARE_COW_FAILED;
-#else
+#else /* EXLOCK_NX */
 	EXCEPT {
 		pointer_set_fini(&vms);
 		RETHROW();
 	}
-#endif
+#endif /* !EXLOCK_NX */
 }
 
 

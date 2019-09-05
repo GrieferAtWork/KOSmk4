@@ -32,6 +32,7 @@
 #include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 
+#include <assert.h>
 #include <string.h>
 
 DECL_BEGIN
@@ -46,33 +47,33 @@ DECL_BEGIN
  * NOTE: The caller must _NOT_ be holding any lock to `self', the associated
  *       block, or any VM-tree when calling this function.
  * @return: * : The number of written bytes. */
-PUBLIC NONNULL((1)) size_t
-(KCALL vm_datapart_read)(struct vm_datapart *__restrict self,
-                         USER CHECKED void *dst,
-                         size_t num_bytes,
-                         vm_daddr_t src_offset)
-       THROWS(E_WOULDBLOCK, E_BADALLOC,E_SEGFAULT,...) {
+PUBLIC NONNULL((1)) size_t KCALL
+vm_datapart_read(struct vm_datapart *__restrict self,
+                 USER CHECKED void *dst,
+                 size_t num_bytes,
+                 vm_daddr_t src_offset)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
 	/* TODO: Check of `dst' overlaps with `self'. - If they don't, directly copy memory! */
 	return vm_datapart_read_buffered(self, dst, num_bytes, src_offset);
 }
 
-PUBLIC NONNULL((1)) size_t
-(KCALL vm_datapart_write)(struct vm_datapart *__restrict self,
-                          USER CHECKED void const *src,
-                          size_t num_bytes,
-                          size_t split_bytes,
-                          vm_daddr_t dst_offset)
-       THROWS(E_WOULDBLOCK, E_BADALLOC,E_SEGFAULT,...) {
+PUBLIC NONNULL((1)) size_t KCALL
+vm_datapart_write(struct vm_datapart *__restrict self,
+                  USER CHECKED void const *src,
+                  size_t num_bytes,
+                  size_t split_bytes,
+                  vm_daddr_t dst_offset)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
 	/* TODO: Check of `src' overlaps with `self'. - If they don't, directly copy memory! */
 	return vm_datapart_write_buffered(self, src, num_bytes, split_bytes, dst_offset);
 }
 
 
-PUBLIC NONNULL((1, 2)) size_t
-(KCALL vm_datapart_readv)(struct vm_datapart *__restrict self,
-                          struct aio_buffer const *__restrict buf,
-                          vm_daddr_t src_offset)
-		THROWS(E_WOULDBLOCK, E_BADALLOC,E_SEGFAULT,...) {
+PUBLIC NONNULL((1, 2)) size_t KCALL
+vm_datapart_readv(struct vm_datapart *__restrict self,
+                  struct aio_buffer const *__restrict buf,
+                  vm_daddr_t src_offset)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
 	struct aio_buffer_entry ent;
 	size_t temp, result = 0;
 	AIO_BUFFER_FOREACH(ent, buf) {
@@ -88,11 +89,11 @@ PUBLIC NONNULL((1, 2)) size_t
 	return result;
 }
 
-PUBLIC NONNULL((1, 2)) size_t
-(KCALL vm_datapart_writev)(struct vm_datapart *__restrict self,
-                           struct aio_buffer const *__restrict buf,
-                           size_t split_bytes,
-                           vm_daddr_t dst_offset)
+PUBLIC NONNULL((1, 2)) size_t KCALL
+vm_datapart_writev(struct vm_datapart *__restrict self,
+                   struct aio_buffer const *__restrict buf,
+                   size_t split_bytes,
+                   vm_daddr_t dst_offset)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
 	struct aio_buffer_entry ent;
 	size_t temp, result = 0;
@@ -112,10 +113,10 @@ PUBLIC NONNULL((1, 2)) size_t
 	return result;
 }
 
-PUBLIC NONNULL((1, 2)) size_t
-(KCALL vm_datapart_readv_phys)(struct vm_datapart *__restrict self,
-                               struct aio_pbuffer const *__restrict buf,
-                               vm_daddr_t src_offset)
+PUBLIC NONNULL((1, 2)) size_t KCALL
+vm_datapart_readv_phys(struct vm_datapart *__restrict self,
+                       struct aio_pbuffer const *__restrict buf,
+                       vm_daddr_t src_offset)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
 	struct aio_pbuffer_entry ent;
 	size_t temp, result = 0;
@@ -132,11 +133,11 @@ PUBLIC NONNULL((1, 2)) size_t
 	return result;
 }
 
-PUBLIC NONNULL((1, 2)) size_t
-(KCALL vm_datapart_writev_phys)(struct vm_datapart *__restrict self,
-                                struct aio_pbuffer const *__restrict buf,
-                                size_t split_bytes,
-                                vm_daddr_t dst_offset)
+PUBLIC NONNULL((1, 2)) size_t KCALL
+vm_datapart_writev_phys(struct vm_datapart *__restrict self,
+                        struct aio_pbuffer const *__restrict buf,
+                        size_t split_bytes,
+                        vm_daddr_t dst_offset)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...) {
 	struct aio_pbuffer_entry ent;
 	size_t temp, result = 0;
@@ -161,11 +162,11 @@ PUBLIC NONNULL((1, 2)) size_t
 
 
 
-FUNDEF NONNULL((1)) size_t
-(KCALL vm_datapart_read_buffered)(struct vm_datapart *__restrict self,
-                                  USER CHECKED void *dst,
-                                  size_t num_bytes,
-                                  vm_daddr_t src_offset)
+FUNDEF NONNULL((1)) size_t KCALL
+vm_datapart_read_buffered(struct vm_datapart *__restrict self,
+                          USER CHECKED void *dst,
+                          size_t num_bytes,
+                          vm_daddr_t src_offset)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
 	size_t temp, bufsize = stack_avail();
 	byte_t *buf;
@@ -200,12 +201,12 @@ FUNDEF NONNULL((1)) size_t
 	return result;
 }
 
-FUNDEF NONNULL((1)) size_t
-(KCALL vm_datapart_write_buffered)(struct vm_datapart *__restrict self,
-                                   USER CHECKED void const *src,
-                                   size_t num_bytes,
-                                   size_t split_bytes,
-                                   vm_daddr_t dst_offset)
+FUNDEF NONNULL((1)) size_t KCALL
+vm_datapart_write_buffered(struct vm_datapart *__restrict self,
+                           USER CHECKED void const *src,
+                           size_t num_bytes,
+                           size_t split_bytes,
+                           vm_daddr_t dst_offset)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
 	size_t temp, bufsize = stack_avail();
 	byte_t *buf;

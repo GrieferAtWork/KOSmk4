@@ -25,11 +25,11 @@
 #include <kernel/addr2line.h>
 #include <kernel/types.h>
 
+#include <stddef.h>
+
 #include <libdebuginfo/debug_aranges.h>
 #include <libdebuginfo/debug_info.h>
 #include <libdebuginfo/debug_line.h>
-
-#include <stddef.h>
 
 DECL_BEGIN
 
@@ -86,38 +86,38 @@ struct ATTR_PACKED debug_range_clutch {
 
 PRIVATE ATTR_USED ATTR_ALIGNED(1) ATTR_SECTION(".rodata.debug_abbrev.clutch")
 struct debug_abbrev_clutch const __kernel_debug_abbrev_clutch = {
-	/* .da_code = */0
+	/* .da_code = */ 0
 };
 
 PRIVATE ATTR_USED ATTR_ALIGNED(1) ATTR_SECTION(".rodata.debug_info.clutch")
 struct debug_info_clutch const __kernel_debug_info_clutch = {
-	/* .di_length      = */sizeof(struct debug_info_clutch) - 4,
-	/* .di_version     = */2,
-	/* .di_abbrev      = */(u32)(uintptr_t)(void *)&__kernel_debug_abbrev_clutch,
-	/* .di_addrsize    = */sizeof(void *),
-	/* .di_abbrev_code = */0
+	/* .di_length      = */ sizeof(struct debug_info_clutch) - 4,
+	/* .di_version     = */ 2,
+	/* .di_abbrev      = */ (u32)(uintptr_t)(void *)&__kernel_debug_abbrev_clutch,
+	/* .di_addrsize    = */ sizeof(void *),
+	/* .di_abbrev_code = */ 0
 };
 
 PRIVATE ATTR_USED ATTR_ALIGNED(1) ATTR_SECTION(".rodata.debug_loc.clutch")
 struct debug_loc_clutch const __kernel_debug_loc_clutch = {
-	/* .dl_start = */0,
-	/* .dl_end   = */0
+	/* .dl_start = */ 0,
+	/* .dl_end   = */ 0
 };
 
 PRIVATE ATTR_USED ATTR_ALIGNED(1) ATTR_SECTION(".rodata.debug_line.clutch")
 struct debug_line_clutch const __kernel_debug_line_clutch = {
-	/* .dl_length           = */sizeof(struct debug_line_clutch) - 4,
-	/* .dl_version          = */4,
-	/* .dl_toffset          = */(offsetof(struct debug_line_clutch,dl_text) -
-	                             offsetafter(struct debug_line_clutch,dl_toffset)),
-	/* .dl_min_insn_length  = */1,
-	/* .dl_max_ops_per_insn = */1,
-	/* .dl_default_isstmt   = */1,
-	/* .dl_line_base        = */1,
-	/* .dl_line_range       = */1,
-	/* .dl_opcode_base      = */0,
-	/* .dl_file_table       = */{ '\0' },
-	/* .dl_text             = */{
+	/* .dl_length           = */ sizeof(struct debug_line_clutch) - 4,
+	/* .dl_version          = */ 4,
+	/* .dl_toffset          = */ (offsetof(struct debug_line_clutch, dl_text) -
+	                              offsetafter(struct debug_line_clutch, dl_toffset)),
+	/* .dl_min_insn_length  = */ 1,
+	/* .dl_max_ops_per_insn = */ 1,
+	/* .dl_default_isstmt   = */ 1,
+	/* .dl_line_base        = */ 1,
+	/* .dl_line_range       = */ 1,
+	/* .dl_opcode_base      = */ 0,
+	/* .dl_file_table       = */ { '\0' },
+	/* .dl_text             = */ {
 		DW_LNS_extended_op,
 		DW_LNE_end_sequence
 	}
@@ -125,24 +125,24 @@ struct debug_line_clutch const __kernel_debug_line_clutch = {
 
 PRIVATE ATTR_USED ATTR_ALIGNED(1) ATTR_SECTION(".rodata.debug_aranges.clutch")
 struct debug_arange_clutch const __kernel_debug_aranges_clutch = {
-	/* .da_length     = */sizeof(struct debug_arange_clutch) - 4,
-	/* .da_version    = */2,
-	/* .da_debug_info = */(u32)(uintptr_t)(void *)&__kernel_debug_info_clutch,
-	/* .da_addrsize   = */sizeof(void *),
-	/* .da_segsize    = */0,
-	/* .da_start      = */0,
-	/* .da_end        = */0
+	/* .da_length     = */ sizeof(struct debug_arange_clutch) - 4,
+	/* .da_version    = */ 2,
+	/* .da_debug_info = */ (u32)(uintptr_t)(void *)&__kernel_debug_info_clutch,
+	/* .da_addrsize   = */ sizeof(void *),
+	/* .da_segsize    = */ 0,
+	/* .da_start      = */ 0,
+	/* .da_end        = */ 0
 };
 
 PRIVATE ATTR_USED ATTR_ALIGNED(1) ATTR_SECTION(".rodata.debug_str.clutch")
 struct debug_str_clutch const __kernel_debug_str_clutch = {
-	/* .ds_string */{ '\0' }
+	/* .ds_string */ { '\0' }
 };
 
 PRIVATE ATTR_USED ATTR_ALIGNED(1) ATTR_SECTION(".rodata.debug_ranges.clutch")
 struct debug_range_clutch const __kernel_debug_ranges_clutch = {
-	/* .da_start = */0,
-	/* .da_end   = */0
+	/* .da_start = */ 0,
+	/* .da_end   = */ 0
 };
 
 

@@ -86,19 +86,19 @@ syscall_printtrace(pformatprinter printer, void *arg,
 
 		__NR_raiseat;
 
-#define __SYSCALL(name) \
-	case SYS_##name: \
-		temp = format_printf(printer, \
-		                     arg, \
+#define __SYSCALL(name)                                                        \
+	case SYS_##name:                                                           \
+		temp = format_printf(printer,                                          \
+		                     arg,                                              \
 		                     #name "(" SYSCALL_TRACE_ARGS_FORMAT_L(name) ")\n" \
-		                     SYSCALL_TRACE_ARGS_ARGS(name, \
-		                         (__NRAM_##name(args->ta_arg0, \
-		                                        args->ta_arg1, \
-		                                        args->ta_arg2, \
-		                                        args->ta_arg3, \
-		                                        args->ta_arg4, \
-		                                        args->ta_arg5)) \
-		                     )); \
+		                     SYSCALL_TRACE_ARGS_ARGS(name,                     \
+		                         (__NRAM_##name(args->ta_arg0,                 \
+		                                        args->ta_arg1,                 \
+		                                        args->ta_arg2,                 \
+		                                        args->ta_arg3,                 \
+		                                        args->ta_arg4,                 \
+		                                        args->ta_arg5))                \
+		                     ));                                               \
 		break;
 
 #include <asm/ls_syscalls.h>

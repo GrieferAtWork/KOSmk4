@@ -111,10 +111,10 @@
 #if VM_PAGE_UNUSED_BITS == 0
 #define VM_DATAPART_SEMI0         ATREE_SEMI0(VIRT vm_dpage_t)
 #define VM_DATAPART_LEVEL0        ATREE_LEVEL0(VIRT vm_dpage_t)
-#else
+#else /* VM_PAGE_UNUSED_BITS == 0 */
 #define VM_DATAPART_SEMI0         ATREE_SEMI0_BITS(VIRT vm_dpage_t,VM_PARTPAGE_BITS)
 #define VM_DATAPART_LEVEL0        ATREE_LEVEL0_BITS(VIRT vm_dpage_t,VM_PARTPAGE_BITS)
-#endif
+#endif /* VM_PAGE_UNUSED_BITS != 0 */
 
 
 /* Define the ABI for the address tree used by vm. */

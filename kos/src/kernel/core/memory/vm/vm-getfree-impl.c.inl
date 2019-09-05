@@ -25,9 +25,9 @@
 
 #ifdef VM_GETFREE_VMB
 #include "builder.c"
-#else
+#else /* VM_GETFREE_VMB */
 #include "vm.c"
-#endif
+#endif /* !VM_GETFREE_VMB */
 #endif
 
 #include <kernel/driver-param.h>
@@ -158,13 +158,13 @@ NOTHROW(KCALL vmb_getfree)(struct vmb *__restrict self,
                            vm_vpage_t hint, size_t num_pages,
                            size_t min_alignment_in_pages,
                            unsigned int mode)
-#else
+#else /* VM_GETFREE_VMB */
 PUBLIC NOBLOCK WUNUSED vm_vpage_t
 NOTHROW(KCALL vm_getfree)(struct vm *__restrict self,
                           vm_vpage_t hint, size_t num_pages,
                           size_t min_alignment_in_pages,
                           unsigned int mode)
-#endif
+#endif /* !VM_GETFREE_VMB */
 {
 	bool ignore_guard = false;
 	bool was_strict   = mode & VM_GETFREE_STRICT;
@@ -218,9 +218,9 @@ again:
 #ifdef HIGH_MEMORY_KERNEL
 					maxpage = (vm_vpage_t)KERNEL_BASE_PAGE - 1;
 					goto set_new_minpage_below;
-#else
+#else /* HIGH_MEMORY_KERNEL */
 					break; /* Mapping can't go below here! */
-#endif
+#endif /* !HIGH_MEMORY_KERNEL */
 				}
 #endif /* VM_GETFREE_VMB */
 				if (ignore_guard) {
@@ -231,7 +231,7 @@ again:
 #ifdef LOW_MEMORY_KERNEL
 						if (prev_end < (vm_vpage_t)KERNEL_CEILING_PAGE)
 							prev_end = (vm_vpage_t)KERNEL_CEILING_PAGE;
-#endif
+#endif /* LOW_MEMORY_KERNEL */
 #endif /* VM_GETFREE_VMB */
 						rand_size = (size_t)(minpage - prev_end);
 						if (rand_size > 1) {
@@ -281,7 +281,7 @@ again:
 #ifdef LOW_MEMORY_KERNEL
 					if (guard_limit < (vm_vpage_t)KERNEL_CEILING_PAGE)
 						guard_limit = (vm_vpage_t)KERNEL_CEILING_PAGE;
-#endif
+#endif /* LOW_MEMORY_KERNEL */
 #endif /* VM_GETFREE_VMB */
 					if (OVERFLOW_USUB(guard_minpage, next_above->vn_guard, &guard_minpage))
 						guard_minpage = 0;
@@ -298,7 +298,7 @@ again:
 #ifdef LOW_MEMORY_KERNEL
 					if (prev_end < (vm_vpage_t)KERNEL_CEILING_PAGE)
 						prev_end = (vm_vpage_t)KERNEL_CEILING_PAGE;
-#endif
+#endif /* LOW_MEMORY_KERNEL */
 #endif /* VM_GETFREE_VMB */
 					rand_size = (size_t)(minpage - prev_end);
 					if (rand_size > 1) {
@@ -354,9 +354,9 @@ set_new_minpage_below:
 #ifdef LOW_MEMORY_KERNEL
 					minpage = ((vm_vpage_t)KERNEL_CEILING_PAGE - 1 + min_alignment_in_pages) & ~(min_alignment_in_pages - 1);
 					goto set_new_maxpage_above;
-#else
+#else /* LOW_MEMORY_KERNEL */
 					break; /* Mapping can't go above here! */
-#endif
+#endif /* !LOW_MEMORY_KERNEL */
 				}
 #endif /* VM_GETFREE_VMB */
 				if (ignore_guard) {
@@ -367,7 +367,7 @@ set_new_minpage_below:
 #ifdef HIGH_MEMORY_KERNEL
 						if (next_start > (vm_vpage_t)KERNEL_BASE_PAGE)
 							next_start = (vm_vpage_t)KERNEL_BASE_PAGE;
-#endif
+#endif /* HIGH_MEMORY_KERNEL */
 #endif /* VM_GETFREE_VMB */
 						rand_size = (size_t)(next_start - maxpage);
 						if (rand_size > 1) {
@@ -401,7 +401,7 @@ set_new_minpage_below:
 #ifdef HIGH_MEMORY_KERNEL
 					if (guard_limit > (vm_vpage_t)KERNEL_BASE_PAGE)
 						guard_limit = (vm_vpage_t)KERNEL_BASE_PAGE;
-#endif
+#endif /* HIGH_MEMORY_KERNEL */
 #endif /* VM_GETFREE_VMB */
 					if (OVERFLOW_UADD(guard_maxpage, next_below->vn_guard, &guard_maxpage))
 						guard_maxpage = (vm_vpage_t)-1;
@@ -418,7 +418,7 @@ set_new_minpage_below:
 #ifdef HIGH_MEMORY_KERNEL
 					if (next_start > (vm_vpage_t)KERNEL_BASE_PAGE)
 						next_start = (vm_vpage_t)KERNEL_BASE_PAGE;
-#endif
+#endif /* HIGH_MEMORY_KERNEL */
 #endif /* VM_GETFREE_VMB */
 					rand_size = (size_t)(next_start - maxpage);
 					if (rand_size > 1) {

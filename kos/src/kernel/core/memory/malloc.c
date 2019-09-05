@@ -49,11 +49,11 @@ STATIC_ASSERT(sizeof(struct mptr) == HEAP_ALIGNMENT);
 #define MPTR_SIZE_MASK     (((uintptr_t)1 << MPTR_HEAP_SHIFT)-1)
 #define MPTR_IS_SINGLE_WORD  1
 
-#define mptr_init(x,size,heap) ((x)->mp_data = (size) | ((uintptr_t)(heap) << MPTR_HEAP_SHIFT))
-#define mptr_size(x)           ((x)->mp_data & MPTR_SIZE_MASK)
-#define mptr_setsize(x,size)   ((x)->mp_data = (size) | ((uintptr_t)(x)->mp_data & MPTR_HEAP_MASK))
-#define mptr_heap(x)           (gfp_t)((x)->mp_data >> MPTR_HEAP_SHIFT)
-#define mptr_assert(x) \
+#define mptr_init(x, size, heap) ((x)->mp_data = (size) | ((uintptr_t)(heap) << MPTR_HEAP_SHIFT))
+#define mptr_size(x)             ((x)->mp_data & MPTR_SIZE_MASK)
+#define mptr_setsize(x, size)    ((x)->mp_data = (size) | ((uintptr_t)(x)->mp_data & MPTR_HEAP_MASK))
+#define mptr_heap(x)             (gfp_t)((x)->mp_data >> MPTR_HEAP_SHIFT)
+#define mptr_assert(x)                                 \
 	(assert(mptr_heap(x) < __GFP_HEAPCOUNT),           \
 	 assert(IS_ALIGNED(mptr_size(x), HEAP_ALIGNMENT)), \
 	 assert(mptr_size(x) >= HEAP_MINSIZE))
@@ -70,11 +70,11 @@ struct ATTR_PACKED mptr {
 };
 STATIC_ASSERT(sizeof(struct mptr) == HEAP_ALIGNMENT);
 
-#define mptr_init(x,size,heap) ((x)->mp_size = (size),(x)->mp_heap = (heap))
-#define mptr_size(x)            (x)->mp_size
-#define mptr_setsize(x,size)   ((x)->mp_size = (size))
-#define mptr_heap(x)            (x)->mp_heap
-#define mptr_assert(x) \
+#define mptr_init(x, size, heap) ((x)->mp_size = (size), (x)->mp_heap = (heap))
+#define mptr_size(x)              (x)->mp_size
+#define mptr_setsize(x, size)    ((x)->mp_size = (size))
+#define mptr_heap(x)              (x)->mp_heap
+#define mptr_assert(x)                                 \
 	(assert(mptr_heap(x) < __GFP_HEAPCOUNT),           \
 	 assert(IS_ALIGNED(mptr_size(x), HEAP_ALIGNMENT)), \
 	 assert(mptr_size(x) >= HEAP_MINSIZE))
@@ -93,7 +93,7 @@ NOTHROW(KCALL kmalloc_usable_size)(VIRT void *ptr) {
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
 	if (KERNEL_SLAB_CHECKPTR(ptr))
 		return SLAB_GET(ptr)->s_size;
-#endif
+#endif /* CONFIG_USE_SLAB_ALLOCATORS */
 	mblock = mptr_get(ptr);
 	mptr_assert(mblock);
 	return mptr_size(mblock) - sizeof(struct mptr);
@@ -111,7 +111,7 @@ NOTHROW(KCALL kfree)(VIRT void *ptr) {
 		slab_free(ptr);
 		return;
 	}
-#endif
+#endif /* CONFIG_USE_SLAB_ALLOCATORS */
 	mblock = mptr_get(ptr);
 	mptr_assert(mblock);
 	heap = mptr_heap(mblock);
@@ -132,7 +132,7 @@ NOTHROW(KCALL kffree)(VIRT void *ptr, gfp_t flags) {
 		slab_ffree(ptr, flags);
 		return;
 	}
-#endif
+#endif /* CONFIG_USE_SLAB_ALLOCATORS */
 	mblock = mptr_get(ptr);
 	mptr_assert(mblock);
 	heap = mptr_heap(mblock);
@@ -158,10 +158,12 @@ NOTHROW(KCALL mall_trace_nx)(void *base,
                              gfp_t UNUSED(flags)) {
 	return base;
 }
+
 PUBLIC ATTR_WEAK NOBLOCK_IF(flags &GFP_ATOMIC) void
 NOTHROW(KCALL mall_untrace)(void *UNUSED(ptr),
                             gfp_t UNUSED(flags)) {
 }
+
 PUBLIC ATTR_WEAK NOBLOCK_IF(flags &GFP_ATOMIC) void
 NOTHROW(KCALL mall_untrace_n)(void *UNUSED(ptr),
                               size_t UNUSED(num_bytes),
@@ -170,6 +172,7 @@ NOTHROW(KCALL mall_untrace_n)(void *UNUSED(ptr),
 
 DEFINE_PUBLIC_WEAK_ALIAS(mall_trace, mall_trace_nx);
 DEFINE_PUBLIC_WEAK_ALIAS(mall_print_traceback, mall_untrace);
+
 #ifndef CONFIG_USE_SLAB_ALLOCATORS
 DEFINE_PUBLIC_WEAK_ALIAS(kmalloc_noslab, kmalloc);
 DEFINE_PUBLIC_WEAK_ALIAS(kmalloc_noslab_nx, kmalloc_nx);

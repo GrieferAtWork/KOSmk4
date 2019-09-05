@@ -27,6 +27,7 @@
 #include <kernel/handle.h>
 #include <kernel/types.h>
 #include <kernel/vm.h>
+#include <assert.h>
 
 #include <kos/kernel/handle.h>
 

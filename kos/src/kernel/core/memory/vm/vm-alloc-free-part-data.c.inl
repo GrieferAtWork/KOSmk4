@@ -40,7 +40,7 @@ DECL_BEGIN
 #define PART_PAGE_CCFREE       page_ccfree
 #define PART_STRUCT_VM_BLOCK   struct vm_ramblock
 #define IE(ram,swap)           ram
-#else
+#else /* PART_RAM */
 #define PART_DP_DATA           dp_swpdata
 #define PART_RD_BLOCKV         sd_blockv
 #define PART_RD_BLOCK0         sd_block0
@@ -52,7 +52,7 @@ DECL_BEGIN
 #define PART_PAGE_CCFREE       swap_free
 #define PART_STRUCT_VM_BLOCK   struct vm_swpblock
 #define IE(ram,swap)           swap
-#endif
+#endif /* !PART_RAM */
 
 
 
@@ -62,9 +62,9 @@ PUBLIC NONNULL((1)) struct vm_ramblock *
 NOTHROW(KCALL vm_do_allocram_nx)(struct vm_ramblock *__restrict pblock0,
                                  pagecnt_t num_pages, gfp_t flags)
 #else /* ALLOC_NX */
-PUBLIC NONNULL((1)) ATTR_RETNONNULL struct vm_ramblock *
-(KCALL vm_do_allocram)(struct vm_ramblock *__restrict pblock0,
-                       pagecnt_t num_pages, gfp_t flags)
+PUBLIC NONNULL((1)) ATTR_RETNONNULL struct vm_ramblock *KCALL
+vm_do_allocram(struct vm_ramblock *__restrict pblock0,
+               pagecnt_t num_pages, gfp_t flags)
 		THROWS(E_WOULDBLOCK, E_BADALLOC)
 #endif /* !ALLOC_NX */
 {
@@ -94,7 +94,7 @@ PUBLIC NONNULL((1)) ATTR_RETNONNULL struct vm_ramblock *
 		            block0_size);
 		return NULL;
 	}
-#else
+#else /* ALLOC_NX */
 	TRY {
 		blocks = (struct vm_ramblock *)kmalloc(2 * sizeof(struct vm_ramblock), flags);
 	} EXCEPT {
@@ -103,7 +103,7 @@ PUBLIC NONNULL((1)) ATTR_RETNONNULL struct vm_ramblock *
 		RETHROW();
 	}
 	TRY
-#endif
+#endif /* !ALLOC_NX */
 	{
 		blocks[0].rb_start = block0_addr;
 		blocks[0].rb_size  = block0_size;
@@ -121,11 +121,11 @@ PUBLIC NONNULL((1)) ATTR_RETNONNULL struct vm_ramblock *
 					                                               flags);
 					if unlikely(!new_blocks)
 						goto err_blocks;
-#else
+#else /* ALLOC_NX */
 					new_blocks = (struct vm_ramblock *)krealloc(blocks,
 					                                            (blockc + 1) * sizeof(struct vm_ramblock),
 					                                            flags);
-#endif
+#endif /* !ALLOC_NX */
 				}
 				blocks = new_blocks;
 			}
@@ -136,10 +136,10 @@ PUBLIC NONNULL((1)) ATTR_RETNONNULL struct vm_ramblock *
 			if unlikely(block0_addr == PAGEPTR_INVALID) {
 #ifdef ALLOC_NX
 				goto err_blocks;
-#else
+#else /* ALLOC_NX */
 				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY,
 				      num_pages - block0_size);
-#endif
+#endif /* !ALLOC_NX */
 			}
 			/* Insert new blocks in the front, thus optimizing to better allocate
 			 * memory in its proper order, following the assumption that page_malloc()
@@ -196,16 +196,16 @@ PUBLIC NONNULL((1)) unsigned int
 #ifdef ALLOC_NX
 #ifdef PART_RAM
 NOTHROW(KCALL vm_datapart_allocram_nx)(struct vm_datapart *__restrict self, gfp_t flags)
-#else
+#else /* PART_RAM */
 NOTHROW(KCALL vm_datapart_allocswap_nx)(struct vm_datapart *__restrict self, gfp_t flags)
-#endif
+#endif /* !PART_RAM */
 #define INHERITED_FLAGS   (flags & GFP_INHERIT)
 #else /* ALLOC_NX */
 #ifdef PART_RAM
-(KCALL vm_datapart_allocram)(struct vm_datapart *__restrict self)
-#else
-(KCALL vm_datapart_allocswap)(struct vm_datapart *__restrict self)
-#endif
+KCALL vm_datapart_allocram(struct vm_datapart *__restrict self)
+#else /* PART_RAM */
+KCALL vm_datapart_allocswap(struct vm_datapart *__restrict self)
+#endif /* !PART_RAM */
 #define INHERITED_FLAGS    0
 		THROWS(E_WOULDBLOCK, E_BADALLOC)
 #endif /* !ALLOC_NX */
@@ -260,7 +260,7 @@ NOTHROW(KCALL vm_datapart_allocswap_nx)(struct vm_datapart *__restrict self, gfp
 realloc_without_locks:
 #ifndef ALLOC_NX
 			TRY
-#endif
+#endif /* !ALLOC_NX */
 			{
 				/* Allocate more blocks and populate the block-vector. */
 				while (block0_size < num_pages) {
@@ -276,11 +276,11 @@ realloc_without_locks:
 							                                                 INHERITED_FLAGS);
 							if unlikely(!new_blocks)
 								goto err_blocks;
-#else
+#else /* ALLOC_NX */
 						new_blocks = (PART_STRUCT_VM_BLOCK *)krealloc(blocks, (blockc + 1) * sizeof(PART_STRUCT_VM_BLOCK),
 						                                              GFP_LOCKED | GFP_PREFLT | GFP_VCBASE |
 						                                              INHERITED_FLAGS);
-#endif
+#endif /* !ALLOC_NX */
 						}
 						blocks = new_blocks;
 					}
@@ -291,11 +291,11 @@ realloc_without_locks:
 					if unlikely(block0_addr == PAGEPTR_INVALID) {
 #ifdef ALLOC_NX
 						goto err_blocks;
-#else
+#else /* ALLOC_NX */
 					THROW(IE(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY,
 					         E_BADALLOC_INSUFFICIENT_SWAP_SPACE),
 					      num_pages - block0_size);
-#endif
+#endif /* !ALLOC_NX */
 					}
 					/* Insert new blocks in the front, thus optimizing to better allocate
 					 * memory in its proper order, following the assumption that page_malloc()
@@ -380,7 +380,7 @@ err_blocks:
 					sync_endwrite(self);
 #ifdef ALLOC_NX
 					goto err_blocks;
-#else
+#else /* ALLOC_NX */
 					while (blockc--) {
 						PART_PAGE_CCFREE(blocks[blockc].PART_RB_START,
 						                 blocks[blockc].PART_RB_SIZE);
@@ -389,7 +389,7 @@ err_blocks:
 					THROW(IE(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY,
 					         E_BADALLOC_INSUFFICIENT_SWAP_SPACE),
 					      num_pages - block0_size);
-#endif
+#endif /* !ALLOC_NX */
 				}
 				/* Insert new blocks in the front, thus optimizing to better allocate
 				 * memory in its proper order, following the assumption that page_malloc()
@@ -431,15 +431,15 @@ err_blocks:
 PUBLIC NOBLOCK NONNULL((1)) void
 #ifdef PART_RAM
 NOTHROW(KCALL vm_datapart_freeram)(struct vm_datapart *__restrict self, bool is_zero)
-#else
+#else /* PART_RAM */
 NOTHROW(KCALL vm_datapart_freeswap)(struct vm_datapart *__restrict self)
-#endif
+#endif /* !PART_RAM */
 {
 #ifdef PART_RAM
 #define FREE_PART(base, num_pages) page_ffree(base, num_pages, is_zero)
-#else
+#else /* PART_RAM */
 #define FREE_PART(base, num_pages) swap_free(base, num_pages)
-#endif
+#endif /* !PART_RAM */
 	if (self->PART_DP_DATA.PART_RD_BLOCKV == &self->PART_DP_DATA.PART_RD_BLOCK0) {
 		FREE_PART(self->PART_DP_DATA.PART_RD_BLOCK0.PART_RB_START,
 		          self->PART_DP_DATA.PART_RD_BLOCK0.PART_RB_SIZE);

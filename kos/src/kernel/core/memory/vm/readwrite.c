@@ -122,7 +122,7 @@ NOTHROW(KCALL memeq_ku_nopf)(KERNEL void const *kernel_buffer,
 
 
 #if defined(__INTELLISENSE__)
-#define DEFINE_PAGEDIR_P_BEGIN(pagedir_phys) if (((pagedir_phys),0)); else do
+#define DEFINE_PAGEDIR_P_BEGIN(pagedir_phys) if (((pagedir_phys), 0)); else do
 #define DEFINE_PAGEDIR_P_END                 __WHILE0
 #else
 
@@ -155,6 +155,7 @@ NOTHROW(KCALL copy_kernelspace_from_vm_nopf)(KERNEL CHECKED void *dst,
                                              size_t num_bytes) {
 	size_t result;
 	/* Temporarily switch to the foreign VM */
+	/* XXX: What about TLB shootdowns happening while we do this? */
 	DEFINE_PAGEDIR_P_BEGIN(src_vm->v_pdir_phys_ptr) {
 		result = memcpy_nopf(dst, src_addr, num_bytes);
 	}
@@ -169,6 +170,7 @@ NOTHROW(KCALL copy_kernelspace_into_vm_nopf)(struct vm *__restrict dst_vm,
                                              size_t num_bytes) {
 	size_t result;
 	/* Temporarily switch to the foreign VM */
+	/* XXX: What about TLB shootdowns happening while we do this? */
 	DEFINE_PAGEDIR_P_BEGIN(dst_vm->v_pdir_phys_ptr) {
 		result = memcpy_nopf(dst_addr, src, num_bytes);
 	}
@@ -183,6 +185,7 @@ NOTHROW(KCALL memset_into_vm_nopf)(struct vm *__restrict dst_vm,
                                    size_t num_bytes) {
 	size_t result;
 	/* Temporarily switch to the foreign VM */
+	/* XXX: What about TLB shootdowns happening while we do this? */
 	DEFINE_PAGEDIR_P_BEGIN(dst_vm->v_pdir_phys_ptr) {
 		result = memset_nopf(dst_addr, byte, num_bytes);
 	}
@@ -371,7 +374,6 @@ DECL_END
 DECL_BEGIN
 #else
 
-
 LOCAL void KCALL
 copy_kernelspace_from_vm(KERNEL CHECKED void *dst,
                          struct vm *__restrict effective_vm,
@@ -393,7 +395,6 @@ memset_into_vm(struct vm *__restrict effective_vm,
                size_t num_bytes,
                bool force_accessible)
 		THROWS(E_SEGFAULT, E_WOULDBLOCK);
-
 
 #endif
 

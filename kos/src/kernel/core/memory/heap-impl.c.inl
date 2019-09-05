@@ -31,11 +31,11 @@
 #define IFELSE_NX(if_nx,if_x)    if_nx
 #define FUNC(x)                  x##_nx
 #define NOTHROW_NX               NOTHROW
-#else
+#else /* HEAP_NX */
 #define IFELSE_NX(if_nx,if_x)    if_x
 #define FUNC(x)                  x
 #define NOTHROW_NX(x)            x
-#endif
+#endif /* HEAP_NX */
 
 
 DECL_BEGIN
@@ -60,17 +60,17 @@ PRIVATE VIRT vm_vpage_t
 NOTHROW_NX(KCALL FUNC(core_page_alloc))(struct heap *__restrict self,
                                         vm_vpage_t mapping_target, size_t num_pages,
                                         size_t alignment_in_pages, gfp_t flags) {
-#define CORE_ALLOC_FLAGS (GFP_LOCKED | \
-                          GFP_PREFLT | \
-                          /* Instruct the heap to only consider allocating from VCbase, \
-                           * thus preventing an infinite loop. */ \
-                          GFP_VCBASE | \
-                          /* Don't overallocate to prevent infinite recursion! \
-                           * -> This flag guaranties that upon recursion, at most 1 \
-                           *    page will get allocated, in which case the \
-                           *   `block0_size >= num_pages' check above will be \
-                           *   `1 >= 1', meaning we'll never get here! */ \
-                          GFP_NOOVER)
+#define CORE_ALLOC_FLAGS                                                        \
+	(GFP_LOCKED |                                                               \
+	 GFP_PREFLT |                                                               \
+	 GFP_VCBASE | /* Instruct the heap to only consider allocating from VCbase, \
+	               * thus preventing an infinite loop. */                       \
+	 GFP_NOOVER   /* Don't overallocate to prevent infinite recursion!          \
+	               * -> This flag guaranties that upon recursion, at most 1     \
+	               *    page will get allocated, in which case the              \
+	               *   `block0_size >= num_pages' check above will be           \
+	               *   `1 >= 1', meaning we'll never get here! */               \
+	)
 	TRACE("core_page_alloc(%p,%p,%Iu,%Iu,%#x)\n", self, mapping_target, num_pages, alignment_in_pages, flags);
 	struct vm_corepair_ptr corepair;
 	HEAP_ASSERT(num_pages != 0);
@@ -87,9 +87,9 @@ NOTHROW_NX(KCALL FUNC(core_page_alloc))(struct heap *__restrict self,
 		corepair = vm_corepair_alloc(flags, true);
 		if (!corepair.cp_node)
 			goto err;
-#else
+#else /* HEAP_NX */
 		corepair = vm_corepair_alloc(flags, false);
-#endif
+#endif /* !HEAP_NX */
 	} else {
 #ifdef HEAP_NX
 		corepair.cp_node = (VIRT struct vm_node *)kmalloc_nx(sizeof(struct vm_node),
@@ -104,7 +104,7 @@ NOTHROW_NX(KCALL FUNC(core_page_alloc))(struct heap *__restrict self,
 			kffree(corepair.cp_node, GFP_CALLOC);
 			goto err;
 		}
-#else
+#else /* HEAP_NX */
 		corepair.cp_node = (VIRT struct vm_node *)kmalloc(sizeof(struct vm_node),
 		                                                  CORE_ALLOC_FLAGS | GFP_CALLOC |
 		                                                  (flags & GFP_INHERIT));
@@ -116,7 +116,7 @@ NOTHROW_NX(KCALL FUNC(core_page_alloc))(struct heap *__restrict self,
 			kfree(corepair.cp_node);
 			RETHROW();
 		}
-#endif
+#endif /* !HEAP_NX */
 	}
 	/* Setup the corepair. */
 	corepair.cp_part->dp_refcnt = 1; /* corepair.cp_node */
@@ -126,9 +126,9 @@ NOTHROW_NX(KCALL FUNC(core_page_alloc))(struct heap *__restrict self,
 	                             ? &vm_datablock_anonymous_zero
 #ifdef CONFIG_DEBUG_HEAP
 	                             : &vm_datablock_debugheap
-#else
+#else /* CONFIG_DEBUG_HEAP */
 	                             : &vm_datablock_anonymous
-#endif
+#endif /* !CONFIG_DEBUG_HEAP */
 	                             ;
 	incref(corepair.cp_part->dp_block);
 	corepair.cp_node->vn_block = incref(corepair.cp_part->dp_block);
@@ -159,7 +159,7 @@ NOTHROW_NX(KCALL FUNC(core_page_alloc))(struct heap *__restrict self,
 			                                                       (flags & GFP_INHERIT));
 			if unlikely(!corepair.cp_part->dp_pprop_p)
 				goto err_corepair_without_didinit;
-#else
+#else /* HEAP_NX */
 			TRY {
 				corepair.cp_part->dp_pprop_p = (uintptr_t *)kmalloc(bitset_size,
 				                                                    CORE_ALLOC_FLAGS | GFP_CALLOC |
@@ -171,7 +171,7 @@ NOTHROW_NX(KCALL FUNC(core_page_alloc))(struct heap *__restrict self,
 				vm_datapart_free(corepair.cp_part);
 				RETHROW();
 			}
-#endif
+#endif /* !HEAP_NX */
 			corepair.cp_part->dp_flags |= VM_DATAPART_FLAG_HEAPPPP;
 		}
 		block0_addr = page_malloc_part(1, num_pages, &block0_size);
@@ -179,7 +179,7 @@ NOTHROW_NX(KCALL FUNC(core_page_alloc))(struct heap *__restrict self,
 			/* Allocation failed. */
 #ifdef HEAP_NX
 			goto err_corepair;
-#else
+#else /* HEAP_NX */
 			if (corepair.cp_part->dp_flags & VM_DATAPART_FLAG_HEAPPPP)
 				kfree(corepair.cp_part->dp_pprop_p);
 			decref_nokill(corepair.cp_node->vn_block);
@@ -187,7 +187,7 @@ NOTHROW_NX(KCALL FUNC(core_page_alloc))(struct heap *__restrict self,
 			vm_node_free(corepair.cp_node);
 			vm_datapart_free(corepair.cp_part);
 			THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, num_pages);
-#endif
+#endif /* !HEAP_NX */
 		}
 		HEAP_ASSERTF(block0_size >= 1, "num_pages = %Iu", num_pages);
 		HEAP_ASSERT(block0_size <= num_pages);
@@ -253,7 +253,7 @@ err_blocks:
 				HEAP_ASSERT(block0_size <= num_pages);
 				++blockc;
 			}
-#else
+#else /* HEAP_NX */
 			TRY {
 				TRY {
 					blocks = (struct vm_ramblock *)kmalloc(2 * sizeof(struct vm_ramblock),
@@ -313,7 +313,7 @@ err_blocks:
 				vm_datapart_free(corepair.cp_part);
 				RETHROW();
 			}
-#endif
+#endif /* !HEAP_NX */
 			/* Release unused memory. */
 			krealloc_in_place_nx(blocks, blockc * sizeof(struct vm_ramblock),
 			                     CORE_ALLOC_FLAGS | (flags & GFP_INHERIT));
@@ -325,7 +325,7 @@ err_blocks:
 
 #ifndef HEAP_NX
 	TRY
-#endif
+#endif /* !HEAP_NX */
 	{
 		/* Acquire a lock to the kernel VM, so we can search for a
 		 * location at which we can map the requested memory block at. */
@@ -333,10 +333,10 @@ again_lock_vm:
 #ifdef HEAP_NX
 		if unlikely(!vm_kernel_treelock_writef_nx(flags))
 			goto err_corepair_content;
-#else
+#else /* HEAP_NX */
 		if unlikely(!vm_kernel_treelock_writef(flags))
 			THROW(E_WOULDBLOCK_PREEMPTED);
-#endif
+#endif /* !HEAP_NX */
 		if (mapping_target == CORE_PAGE_MALLOC_AUTO) {
 			/* search for a suitable location. */
 			vm_vpage_t mapping_hint;
@@ -433,7 +433,7 @@ again_tryhard_mapping_target:
 					          THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1));
 				}
 			}
-#endif
+#endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 			if (flags & GFP_PREFLT) {
 				/* Map all pre-allocated pages. */
 				for (i = 0; i < blockc; ++i) {
@@ -550,10 +550,10 @@ NOTHROW_NX(KCALL FUNC(core_page_alloc_check_hint))(struct heap *__restrict self,
 #ifdef HEAP_NX
 	if unlikely(!vm_kernel_treelock_writef_nx(flags)) /* TODO: A read-lock is sufficient for us! */
 		return CORE_PAGE_MALLOC_ERROR;
-#else
+#else /* HEAP_NX */
 	if unlikely(!vm_kernel_treelock_writef(flags)) /* TODO: A read-lock is sufficient for us! */
 		THROW(E_WOULDBLOCK_PREEMPTED);
-#endif
+#endif /* !HEAP_NX */
 	/* Check if the given address range is already in use! */
 	is_used = vm_isused(&vm_kernel,
 	                    mapping_target,
@@ -622,9 +622,9 @@ search_heap:
 		chain_flags   = chain->mf_flags;
 #ifdef CONFIG_HEAP_TRACE_DANGLE
 		unused_size = dangle_size;
-#else
+#else /* CONFIG_HEAP_TRACE_DANGLE */
 		unused_size = MFREE_SIZE(chain) - result.hp_siz;
-#endif
+#endif /* !CONFIG_HEAP_TRACE_DANGLE */
 		if (unused_size < HEAP_MINSIZE) {
 			/* Remainder is too small. - Allocate it as well. */
 			result.hp_siz += unused_size;
@@ -650,7 +650,7 @@ search_heap:
 				else {
 					mempatl(chain, DEBUGHEAP_NO_MANS_LAND, SIZEOF_MFREE);
 				}
-#endif
+#endif /* CONFIG_DEBUG_HEAP */
 				/* Free unused low memory. */
 				heap_free_underallocation(self,
 				                          chain,
@@ -695,7 +695,7 @@ search_heap:
 			                DEBUGHEAP_FRESH_MEMORY,
 			                result.hp_siz);
 		}
-#endif
+#endif /* CONFIG_DEBUG_HEAP */
 		HEAP_ASSERT(IS_ALIGNED((uintptr_t)result.hp_ptr, HEAP_ALIGNMENT));
 		HEAP_ASSERT(IS_ALIGNED((uintptr_t)result.hp_siz, HEAP_ALIGNMENT));
 		HEAP_ASSERT(result.hp_siz >= HEAP_MINSIZE);
@@ -808,7 +808,7 @@ allocate_without_overalloc:
 					mempatl(unused_begin, DEBUGHEAP_NO_MANS_LAND, page_remainder);
 				}
 			}
-#endif
+#endif /* CONFIG_DEBUG_HEAP */
 			/* Release the unused memory. */
 			heap_free_raw(self, unused_begin, unused_size, flags);
 		}
@@ -831,7 +831,7 @@ err:
 	result.hp_ptr = NULL;
 	result.hp_siz = 0;
 	return result;
-#endif
+#endif /* HEAP_NX */
 }
 
 
@@ -873,7 +873,7 @@ again:
 #ifdef CONFIG_DEBUG_HEAP
 		memsetl((void *)VM_PAGE2ADDR(ptr_page),
 		        DEBUGHEAP_NO_MANS_LAND, pagedir_pagesize() / 4);
-#endif
+#endif /* CONFIG_DEBUG_HEAP */
 		/* Release the page to the heap and allocate again.
 		 * NOTE: Set the `GFP_NOTRIM' to prevent the memory
 		 *       from be unmapped immediately. */
@@ -901,13 +901,13 @@ again:
 #ifndef CONFIG_DEBUG_HEAP
 		if ((slot_flags & GFP_CALLOC) && (flags & GFP_CALLOC))
 			memset(slot, 0, SIZEOF_MFREE);
-#else
+#else /* !CONFIG_DEBUG_HEAP */
 		if (flags & GFP_CALLOC)
 			memset(slot, 0, SIZEOF_MFREE);
 		else {
 			mempatl(slot, DEBUGHEAP_NO_MANS_LAND, SIZEOF_MFREE);
 		}
-#endif
+#endif /* CONFIG_DEBUG_HEAP */
 	} else {
 		size_t free_offset = (uintptr_t)ptr - MFREE_BEGIN(slot);
 		HEAP_ASSERT(IS_ALIGNED(free_offset, HEAP_ALIGNMENT));
@@ -940,7 +940,7 @@ again:
 #ifdef CONFIG_DEBUG_HEAP
 			memsetl((void *)VM_PAGE2ADDR(slot_page),
 			        DEBUGHEAP_NO_MANS_LAND, pagedir_pagesize() / 4);
-#endif
+#endif /* CONFIG_DEBUG_HEAP */
 			heap_free_raw(self, (void *)VM_PAGE2ADDR(slot_page),
 			              pagedir_pagesize(),
 			              (flags & (__GFP_HEAPMASK | GFP_INHERIT)) | GFP_NOTRIM);
@@ -970,7 +970,7 @@ again:
 				return 0; /* Failed to allocate the associated core-page. */
 #ifdef CONFIG_DEBUG_HEAP
 			memsetl((void *)slot_end, DEBUGHEAP_NO_MANS_LAND, pagedir_pagesize() / 4);
-#endif
+#endif /* CONFIG_DEBUG_HEAP */
 			heap_free_raw(self, (void *)slot_end, pagedir_pagesize(),
 			              (flags & (__GFP_HEAPMASK | GFP_INHERIT)) |
 			              GFP_NOTRIM);
@@ -991,7 +991,7 @@ again:
 			mempatl(slot, DEBUGHEAP_NO_MANS_LAND,
 			        MIN(free_offset, SIZEOF_MFREE));
 		}
-#endif
+#endif /* CONFIG_DEBUG_HEAP */
 		/* Release unused memory below the requested address. */
 		heap_free_raw(self, (void *)MFREE_BEGIN(slot),
 		              free_offset, slot_flags);
@@ -1003,7 +1003,7 @@ again:
 #ifdef CONFIG_DEBUG_HEAP
 	if (!(flags & GFP_CALLOC))
 		reset_heap_data((byte_t *)ptr, DEBUGHEAP_FRESH_MEMORY, result);
-#endif
+#endif /* CONFIG_DEBUG_HEAP */
 	if ((flags & GFP_CALLOC) && !(slot_flags & GFP_CALLOC))
 		memset(ptr, 0, result);
 	HEAP_ASSERT(result >= HEAP_MINSIZE);
@@ -1243,7 +1243,7 @@ NOTHROW_NX(KCALL FUNC(heap_align_untraced))(struct heap *__restrict self,
 		sync_endwrite(&self->h_lock);
 	}
 #endif
-	/* Fallback: Use overallocation to HEAP_ASSERT alignment. */
+	/* Fallback: Use overallocation to assert alignment. */
 
 	/* Must overallocate by at least `HEAP_MINSIZE',
 	 * so we can _always_ free unused lower memory. */
@@ -1293,7 +1293,7 @@ err:
 	result.hp_ptr = NULL;
 	result.hp_siz = 0;
 	return result;
-#endif
+#endif /* HEAP_NX */
 }
 
 

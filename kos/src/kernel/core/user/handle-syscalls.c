@@ -46,16 +46,16 @@
 #include <sys/mount.h>
 #include <sys/poll.h>
 #include <sys/stat.h>
+#include <sys/time.h> /* TIMEVAL_TO_TIMESPEC */
 #include <sys/uio.h>
 
+#include <assert.h>
 #include <dirent.h>
 #include <errno.h>
 #include <malloca.h>
-#include <stdint.h>
-#include <assert.h>
-#include <string.h>
-#include <sys/time.h> /* TIMEVAL_TO_TIMESPEC */
 #include <signal.h>
+#include <stdint.h>
+#include <string.h>
 
 DECL_BEGIN
 

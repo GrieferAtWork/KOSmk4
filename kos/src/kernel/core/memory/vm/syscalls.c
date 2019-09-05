@@ -34,14 +34,15 @@
 
 #include <sys/mman.h>
 
+#include <assert.h>
 #include <elf.h>
 #include <errno.h>
 #include <string.h>
 
 DECL_BEGIN
 
-#define HINT_ADDR(x,y) x
-#define HINT_MODE(x,y) y
+#define HINT_ADDR(x, y) x
+#define HINT_MODE(x, y) y
 #define HINT_GETADDR(x) HINT_ADDR x
 #define HINT_GETMODE(x) HINT_MODE x
 
@@ -730,7 +731,7 @@ again_mapat:
 			unsigned int getfree_mode;
 #if __SIZEOF_POINTER__ > 4
 			/* TODO: MAP_32BIT */
-#endif
+#endif /* __SIZEOF_POINTER__ > 4 */
 			if (!addr) {
 				/* Choose the hints for automatic mmap() target selection. */
 				if (flags & MAP_STACK) {

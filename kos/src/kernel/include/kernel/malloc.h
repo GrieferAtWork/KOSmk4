@@ -52,7 +52,7 @@ SLAB_FOREACH_SIZE(DEFINE_SLAB_ALLOCATOR_FUNCTIONS)
 /* Slab allocators for dynamic sizes.
  * NOTE: The caller is required to ensure that `num_bytes < HEAP_MINSIZE' */
 FUNDEF NOBLOCK ATTR_MALLOC WUNUSED VIRT void *NOTHROW(KCALL __os_slab_malloc)(size_t num_bytes, gfp_t flags) ASMNAME("slab_malloc");
-FUNDEF ATTR_MALLOC WUNUSED ATTR_RETNONNULL VIRT void *(KCALL __os_slab_kmalloc)(size_t num_bytes, gfp_t flags) ASMNAME("slab_kmalloc");
+FUNDEF ATTR_MALLOC WUNUSED ATTR_RETNONNULL VIRT void *KCALL __os_slab_kmalloc(size_t num_bytes, gfp_t flags) ASMNAME("slab_kmalloc");
 FUNDEF ATTR_MALLOC WUNUSED VIRT void *NOTHROW(KCALL __os_slab_kmalloc_nx)(size_t num_bytes, gfp_t flags) ASMNAME("slab_kmalloc_nx");
 
 #ifndef __OMIT_SLAB_MALLOC_CONSTANT_P_WRAPPERS
@@ -70,6 +70,7 @@ NOTHROW(KCALL slab_malloc)(size_t num_bytes, gfp_t flags) {
 	}
 	return __os_slab_malloc(num_bytes, flags);
 }
+
 FORCELOCAL ATTR_MALLOC WUNUSED ATTR_RETNONNULL VIRT void *KCALL
 slab_kmalloc(size_t num_bytes, gfp_t flags) {
 	if (__builtin_constant_p(num_bytes)) {
@@ -82,6 +83,7 @@ slab_kmalloc(size_t num_bytes, gfp_t flags) {
 	}
 	return __os_slab_kmalloc(num_bytes, flags);
 }
+
 FORCELOCAL ATTR_MALLOC WUNUSED VIRT void *
 NOTHROW(KCALL slab_kmalloc_nx)(size_t num_bytes, gfp_t flags) {
 	if (__builtin_constant_p(num_bytes)) {
@@ -124,9 +126,9 @@ FUNDEF NOBLOCK void NOTHROW(KCALL vpage_ffree_untraced)(VIRT /*page-aligned*/voi
 FUNDEF WUNUSED ATTR_MALLOC ATTR_RETNONNULL VIRT void *KCALL __os_malloc(size_t n_bytes, gfp_t flags) ASMNAME("kmalloc") THROWS(E_BADALLOC,E_WOULDBLOCK);
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
 FUNDEF WUNUSED ATTR_MALLOC ATTR_RETNONNULL VIRT void *KCALL __os_malloc_noslab(size_t n_bytes, gfp_t flags) ASMNAME("kmalloc_noslab") THROWS(E_BADALLOC,E_WOULDBLOCK);
-#else
+#else /* CONFIG_USE_SLAB_ALLOCATORS */
 FUNDEF WUNUSED ATTR_MALLOC ATTR_RETNONNULL VIRT void *KCALL __os_malloc_noslab(size_t n_bytes, gfp_t flags) ASMNAME("kmalloc") THROWS(E_BADALLOC,E_WOULDBLOCK);
-#endif
+#endif /* !CONFIG_USE_SLAB_ALLOCATORS */
 FUNDEF WUNUSED ATTR_MALLOC ATTR_RETNONNULL VIRT void *KCALL __os_memalign(size_t min_alignment, size_t n_bytes, gfp_t flags) ASMNAME("kmemalign") THROWS(E_BADALLOC,E_WOULDBLOCK);
 FUNDEF WUNUSED ATTR_MALLOC ATTR_RETNONNULL VIRT void *KCALL __os_memalign_offset(size_t min_alignment, ptrdiff_t offset, size_t n_bytes, gfp_t flags) ASMNAME("kmemalign_offset") THROWS(E_BADALLOC,E_WOULDBLOCK);
 FUNDEF WUNUSED ATTR_RETNONNULL VIRT void *KCALL __os_realloc(VIRT void *ptr, size_t n_bytes, gfp_t flags) ASMNAME("krealloc") THROWS(E_BADALLOC,E_WOULDBLOCK);
@@ -141,9 +143,9 @@ FUNDEF NOBLOCK void NOTHROW(KCALL __os_ffree)(VIRT void *ptr, gfp_t flags) ASMNA
 FUNDEF WUNUSED ATTR_MALLOC VIRT void *NOTHROW(KCALL __os_malloc_nx)(size_t n_bytes, gfp_t flags) ASMNAME("kmalloc_nx");
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
 FUNDEF WUNUSED ATTR_MALLOC VIRT void *NOTHROW(KCALL __os_malloc_noslab_nx)(size_t n_bytes, gfp_t flags) ASMNAME("kmalloc_noslab_nx");
-#else
+#else /* CONFIG_USE_SLAB_ALLOCATORS */
 FUNDEF WUNUSED ATTR_MALLOC VIRT void *NOTHROW(KCALL __os_malloc_noslab_nx)(size_t n_bytes, gfp_t flags) ASMNAME("kmalloc_nx");
-#endif
+#endif /* !CONFIG_USE_SLAB_ALLOCATORS */
 FUNDEF WUNUSED ATTR_MALLOC VIRT void *NOTHROW(KCALL __os_memalign_nx)(size_t min_alignment, size_t n_bytes, gfp_t flags) ASMNAME("kmemalign_nx");
 FUNDEF WUNUSED ATTR_MALLOC VIRT void *NOTHROW(KCALL __os_memalign_offset_nx)(size_t min_alignment, ptrdiff_t offset, size_t n_bytes, gfp_t flags) ASMNAME("kmemalign_offset_nx");
 FUNDEF WUNUSED VIRT void *NOTHROW(KCALL __os_realloc_nx)(VIRT void *ptr, size_t n_bytes, gfp_t flags) ASMNAME("krealloc_nx");
@@ -163,16 +165,16 @@ FORCELOCAL WUNUSED ATTR_MALLOC VIRT void *NOTHROW(KCALL kcalloc_nx)(size_t n_byt
 FORCELOCAL WUNUSED VIRT void *NOTHROW(KCALL krecalign_nx)(VIRT void *ptr, size_t min_alignment, size_t n_bytes, gfp_t flags);
 FORCELOCAL WUNUSED VIRT void *NOTHROW(KCALL krecalloc_nx)(VIRT void *ptr, size_t n_bytes, gfp_t flags);
 FORCELOCAL VIRT void *NOTHROW(KCALL krecalloc_in_place_nx)(VIRT void *ptr, size_t n_bytes, gfp_t flags);
-#else
-#define kcalloc(n_bytes, flags)                          kmalloc(n_bytes, (flags)|GFP_CALLOC)
-#define krecalign(ptr, min_alignment, n_bytes, flags)    krealign(ptr, min_alignment, n_bytes, (flags)|GFP_CALLOC)
-#define krecalloc(ptr, n_bytes, flags)                   krealloc(ptr, n_bytes, (flags)|GFP_CALLOC)
-#define krecalloc_in_place(ptr, n_bytes, flags)          krealloc_in_place(ptr, n_bytes, (flags)|GFP_CALLOC)
-#define kcalloc_nx(n_bytes, flags)                       kmalloc_nx(n_bytes, (flags)|GFP_CALLOC)
-#define krecalign_nx(ptr, min_alignment, n_bytes, flags) krealign_nx(ptr, min_alignment, n_bytes, (flags)|GFP_CALLOC)
-#define krecalloc_nx(ptr, n_bytes, flags)                krealloc_nx(ptr, n_bytes, (flags)|GFP_CALLOC)
-#define krecalloc_in_place_nx(ptr, n_bytes, flags)       krealloc_in_place_nx(ptr, n_bytes, (flags)|GFP_CALLOC)
-#endif
+#else /* __INTELLISENSE__ */
+#define kcalloc(n_bytes, flags)                          kmalloc(n_bytes, (flags) | GFP_CALLOC)
+#define krecalign(ptr, min_alignment, n_bytes, flags)    krealign(ptr, min_alignment, n_bytes, (flags) | GFP_CALLOC)
+#define krecalloc(ptr, n_bytes, flags)                   krealloc(ptr, n_bytes, (flags) | GFP_CALLOC)
+#define krecalloc_in_place(ptr, n_bytes, flags)          krealloc_in_place(ptr, n_bytes, (flags) | GFP_CALLOC)
+#define kcalloc_nx(n_bytes, flags)                       kmalloc_nx(n_bytes, (flags) | GFP_CALLOC)
+#define krecalign_nx(ptr, min_alignment, n_bytes, flags) krealign_nx(ptr, min_alignment, n_bytes, (flags) | GFP_CALLOC)
+#define krecalloc_nx(ptr, n_bytes, flags)                krealloc_nx(ptr, n_bytes, (flags) | GFP_CALLOC)
+#define krecalloc_in_place_nx(ptr, n_bytes, flags)       krealloc_in_place_nx(ptr, n_bytes, (flags) | GFP_CALLOC)
+#endif /* !__INTELLISENSE__ */
 
 FORCELOCAL WUNUSED ATTR_MALLOC ATTR_RETNONNULL VIRT void *KCALL
 kmalloc(size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC, E_WOULDBLOCK) {
@@ -181,11 +183,11 @@ kmalloc(size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC, E_WOULDBLOCK) {
 		if (n_bytes < HEAP_MINSIZE) {
 #ifdef __OMIT_SLAB_MALLOC_CONSTANT_P_WRAPPERS
 			return __os_slab_kmalloc(n_bytes, flags);
-#else
+#else /* __OMIT_SLAB_MALLOC_CONSTANT_P_WRAPPERS */
 			return slab_kmalloc(n_bytes, flags);
-#endif
+#endif /* !__OMIT_SLAB_MALLOC_CONSTANT_P_WRAPPERS */
 		}
-#endif
+#endif /* CONFIG_USE_SLAB_ALLOCATORS */
 		/* Pre-align `n_bytes' so that heap functions don't need to. */
 		return __os_malloc((n_bytes + HEAP_ALIGNMENT - 1) & ~(HEAP_ALIGNMENT - 1), flags);
 	}
@@ -308,11 +310,11 @@ NOTHROW(KCALL kmalloc_nx)(size_t n_bytes, gfp_t flags) {
 		if (n_bytes < HEAP_MINSIZE) {
 #ifdef __OMIT_SLAB_MALLOC_CONSTANT_P_WRAPPERS
 			return __os_slab_kmalloc_nx(n_bytes, flags);
-#else
+#else /* __OMIT_SLAB_MALLOC_CONSTANT_P_WRAPPERS */
 			return slab_kmalloc_nx(n_bytes, flags);
-#endif
+#endif /* !__OMIT_SLAB_MALLOC_CONSTANT_P_WRAPPERS */
 		}
-#endif
+#endif /* CONFIG_USE_SLAB_ALLOCATORS */
 		/* Pre-align `n_bytes' so that heap functions don't need to. */
 		return __os_malloc_nx((n_bytes + HEAP_ALIGNMENT - 1) & ~(HEAP_ALIGNMENT - 1), flags);
 	}
@@ -482,9 +484,9 @@ FUNDEF NOBLOCK_IF(flags & GFP_ATOMIC) void NOTHROW(KCALL mall_print_traceback)(v
 FUNDEF NOBLOCK_IF(flags & GFP_ATOMIC) void NOTHROW(KCALL mall_untrace)(void *ptr, gfp_t flags);
 FUNDEF NOBLOCK_IF(flags & GFP_ATOMIC) void NOTHROW(KCALL mall_untrace_n)(void *ptr, size_t num_bytes, gfp_t flags);
 
-#endif
+#endif /* __CC__ */
 #define ATTR_MALL_UNTRACKED  ATTR_SECTION(".bss.mall.untracked")
-#else
+#else /* CONFIG_DEBUG_MALLOC */
 #ifdef __CC__
 #define mall_dump_leaks(flags)                    0
 #define mall_validate_padding()             (void)0
@@ -492,9 +494,9 @@ FUNDEF NOBLOCK_IF(flags & GFP_ATOMIC) void NOTHROW(KCALL mall_untrace_n)(void *p
 #define mall_print_traceback(ptr, flags)    (void)0
 #define mall_untrace(ptr, flags)            (void)0
 #define mall_untrace_n(ptr, n_bytes, flags) (void)0
-#endif
+#endif /* __CC__ */
 #define ATTR_MALL_UNTRACKED  ATTR_SECTION(".bss")
-#endif
+#endif /* !CONFIG_DEBUG_MALLOC */
 
 
 #ifdef __cplusplus

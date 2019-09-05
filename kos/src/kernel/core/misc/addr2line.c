@@ -25,14 +25,14 @@
 #include <kernel/addr2line.h>
 #include <kernel/types.h>
 
-#include <libdebuginfo/debug_aranges.h>
-#include <libdebuginfo/debug_info.h>
-#include <libdebuginfo/debug_line.h>
-
 #include <elf.h>
 #include <format-printer.h>
 #include <stdarg.h>
 #include <string.h>
+
+#include <libdebuginfo/debug_aranges.h>
+#include <libdebuginfo/debug_info.h>
+#include <libdebuginfo/debug_line.h>
 
 DECL_BEGIN
 
@@ -117,9 +117,9 @@ NOTHROW(KCALL addr2line)(uintptr_t abs_pc,
  * Where `instr_start' and `instr_length' refer to the inlined function for levels > 0
  * Additionally, when no addr2line information is available, the following is printed:
  * >> start_pc+end_pc_minus_start_pc[ : message] */
-PUBLIC ssize_t
-(VCALL addr2line_printf)(pformatprinter printer, void *arg, uintptr_t start_pc,
-                         uintptr_t end_pc, char const *message_format, ...) {
+PUBLIC ssize_t VCALL
+addr2line_printf(pformatprinter printer, void *arg, uintptr_t start_pc,
+                 uintptr_t end_pc, char const *message_format, ...) {
 	va_list args;
 	ssize_t result;
 	va_start(args, message_format);
@@ -133,10 +133,10 @@ PUBLIC ssize_t
 	return result;
 }
 
-PUBLIC ssize_t
-(KCALL addr2line_vprintf)(pformatprinter printer, void *arg, uintptr_t start_pc,
-                          uintptr_t end_pc, char const *message_format,
-                          va_list args) {
+PUBLIC ssize_t KCALL
+addr2line_vprintf(pformatprinter printer, void *arg, uintptr_t start_pc,
+                  uintptr_t end_pc, char const *message_format,
+                  va_list args) {
 	ssize_t result, temp;
 	di_debug_addr2line_t info;
 	addr2line_errno_t error;

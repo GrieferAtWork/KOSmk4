@@ -63,10 +63,10 @@
 #if VM_PAGE_UNUSED_BITS == 0
 #define VM_SEMI0         ATREE_SEMI0(VIRT vm_vpage_t)
 #define VM_LEVEL0        ATREE_LEVEL0(VIRT vm_vpage_t)
-#else
+#else /* VM_PAGE_UNUSED_BITS == 0 */
 #define VM_SEMI0         ATREE_SEMI0_BITS(VIRT vm_vpage_t,VM_PAGE_BITS)
 #define VM_LEVEL0        ATREE_LEVEL0_BITS(VIRT vm_vpage_t,VM_PAGE_BITS)
-#endif
+#endif /* VM_PAGE_UNUSED_BITS != 0 */
 
 
 /* Define the ABI for the address tree used by vm. */

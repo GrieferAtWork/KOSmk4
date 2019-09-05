@@ -70,7 +70,7 @@ vm_protect(struct vm *__restrict effective_vm,
 	                  (VM_UNMAP_NORMAL | VM_UNMAP_GUARD | VM_UNMAP_RESERVE);
 	bool update_all_nokern = (how & (VM_UNMAP_NORMAL | VM_UNMAP_GUARD | VM_UNMAP_RESERVE | VM_UNMAP_NOKERNPART)) ==
 	                         (VM_UNMAP_NORMAL | VM_UNMAP_GUARD | VM_UNMAP_RESERVE | VM_UNMAP_NOKERNPART);
-#define SHOULD_UPDATE(node) \
+#define SHOULD_UPDATE(node)                                                                                                     \
 	(update_all || ((!((node)->vn_flags & VM_NODE_FLAG_KERNPRT) || !(how & VM_UNMAP_NOKERNPART)) &&                             \
 	                (update_all_nokern || (node)->vn_part                                                                       \
 	                 ? ((node)->vn_guard ? (how & VM_UNMAP_GUARD) : (how & VM_UNMAP_NORMAL))                                    \
@@ -180,11 +180,11 @@ do_throw_first_unmapped:
 				kernel_panic("Attempted to mprotect() a kernel part at %p...%p",
 				             VM_NODE_MINADDR(minmax.mm_min),
 				             VM_NODE_MAXADDR(minmax.mm_min));
-#else
+#else /* VM_DEFINE_PROTECT */
 				kernel_panic("Attempted to munmap a kernel part at %p...%p",
 				             VM_NODE_MINADDR(minmax.mm_min),
 				             VM_NODE_MAXADDR(minmax.mm_min));
-#endif
+#endif /* !VM_DEFINE_PROTECT */
 #ifdef VM_DEFINE_UNMAP
 			} else if (!minmax.mm_min->vn_part) {
 				/* No part. -> The node can just be modified directly. */
@@ -289,11 +289,11 @@ do_throw_first_unmapped:
 				kernel_panic("Attempted to mprotect() a kernel part at %p...%p",
 				             VM_NODE_MINADDR(minmax.mm_max),
 				             VM_NODE_MAXADDR(minmax.mm_max));
-#else
+#else /* VM_DEFINE_PROTECT */
 				kernel_panic("Attempted to munmap() a kernel part at %p...%p",
 				             VM_NODE_MINADDR(minmax.mm_max),
 				             VM_NODE_MAXADDR(minmax.mm_max));
-#endif
+#endif /* !VM_DEFINE_PROTECT */
 #ifdef VM_DEFINE_UNMAP
 			} else if (!minmax.mm_max->vn_part) {
 				/* No part. -> The node can just be modified directly. */
@@ -349,7 +349,7 @@ do_throw_first_unmapped:
 #ifdef VM_DEFINE_PROTECT
 					uintptr_half_t old_prot;
 					uintptr_half_t new_prot;
-#endif
+#endif /* VM_DEFINE_PROTECT */
 					assert(VM_NODE_MIN(node) >= base);
 					assert(VM_NODE_MAX(node) <= maxpage);
 					/* Update this node! */
@@ -357,10 +357,10 @@ do_throw_first_unmapped:
 #ifdef VM_DEFINE_PROTECT
 						kernel_panic("Attempted to mprotect() a kernel part at %p...%p",
 						             VM_NODE_MINADDR(node), VM_NODE_MAXADDR(node));
-#else
+#else /* VM_DEFINE_PROTECT */
 						kernel_panic("Attempted to munmap() a kernel part at %p...%p",
 						             VM_NODE_MINADDR(node), VM_NODE_MAXADDR(node));
-#endif
+#endif /* !VM_DEFINE_PROTECT */
 					}
 #ifdef VM_DEFINE_UNMAP
 					printk(KERN_DEBUG "Unmap node at %p...%p\n",

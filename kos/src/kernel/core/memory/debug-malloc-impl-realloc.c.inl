@@ -71,9 +71,9 @@ NOTHROW_NX(KCALL FUNC(krealign_offset))(VIRT void *ptr, size_t min_alignment,
 {
 #ifdef HAVE_OFFSET
 #define MY_MALLOC_OFFSET offset
-#else
+#else /* HAVE_OFFSET */
 #define MY_MALLOC_OFFSET 0
-#endif
+#endif /* !HAVE_OFFSET */
 	struct heapptr result;
 	struct mallnode *node;
 	size_t old_user_size;
@@ -81,7 +81,7 @@ NOTHROW_NX(KCALL FUNC(krealign_offset))(VIRT void *ptr, size_t min_alignment,
 	if (!ptr) {
 #ifdef IS_INPLACE
 		goto err;
-#else
+#else /* IS_INPLACE */
 		LOAD_CALLER_CONTEXT
 		/* realloc(NULL) --> malloc() */
 		assert(!(flags & MALLNODE_FUSERNODE));
@@ -91,35 +91,35 @@ NOTHROW_NX(KCALL FUNC(krealign_offset))(VIRT void *ptr, size_t min_alignment,
 		                                   CONFIG_MALL_PREFIX_SIZE + CONFIG_MALL_HEAD_SIZE + num_bytes +
 		                                   CONFIG_MALL_TAIL_SIZE,
 		                                   flags);
-#else
+#else /* HAVE_MIN_ALIGNMENT */
 		result = FUNC(heap_alloc_untraced)(&kernel_heaps[flags & __GFP_HEAPMASK],
 		                                   CONFIG_MALL_PREFIX_SIZE + CONFIG_MALL_HEAD_SIZE + num_bytes +
 		                                   CONFIG_MALL_TAIL_SIZE,
 		                                   flags);
-#endif
+#endif /* !HAVE_MIN_ALIGNMENT */
 		IFELSE_NX(if (result.hp_ptr == NULL) goto err;, )
 		INITIALIZE_USER_POINTER(result.hp_ptr, result.hp_siz);
 #ifdef MALLOC_NX
 		if (!FUNC(mall_trace_impl)(result.hp_ptr, result.hp_siz,
 		                           flags & (__GFP_HEAPMASK | GFP_NOLEAK | GFP_NOWALK | GFP_INHERIT),
 		                           context))
-#else
+#else /* MALLOC_NX */
 		TRY {
 			FUNC(mall_trace_impl)
 			(result.hp_ptr, result.hp_siz,
 			 flags & (__GFP_HEAPMASK | GFP_NOLEAK | GFP_NOWALK | GFP_INHERIT),
 			 context);
 		} EXCEPT
-#endif
+#endif /* !MALLOC_NX */
 		{
 			heap_free_untraced(&kernel_heaps[flags & __GFP_HEAPMASK],
 			                   result.hp_ptr, result.hp_siz, flags);
 			IFELSE_NX(goto err, RETHROW());
 		}
 		return (byte_t *)result.hp_ptr + CONFIG_MALL_PREFIX_SIZE + CONFIG_MALL_HEAD_SIZE;
-#endif
+#endif /* !IS_INPLACE */
 	}
-	if unlikely(OVERFLOW_UADD(num_bytes, HEAP_ALIGNMENT - 1, &result.hp_siz))
+	if unlikely(OVERFLOW_UADD(num_bytes, (size_t)(HEAP_ALIGNMENT - 1), &result.hp_siz))
 		IFELSE_NX(goto err, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, num_bytes));
 	result.hp_siz &= ~(HEAP_ALIGNMENT - 1);
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
@@ -132,7 +132,7 @@ NOTHROW_NX(KCALL FUNC(krealign_offset))(VIRT void *ptr, size_t min_alignment,
 		if (old_user_size >= result.hp_siz)
 			return ptr; /* The slab is still large enough */
 		goto err;
-#else
+#else /* IS_INPLACE */
 		LOAD_CALLER_CONTEXT
 		/* realloc(NULL) --> malloc() */
 		assert(!(flags & MALLNODE_FUSERNODE));
@@ -142,25 +142,25 @@ NOTHROW_NX(KCALL FUNC(krealign_offset))(VIRT void *ptr, size_t min_alignment,
 		                                   CONFIG_MALL_PREFIX_SIZE + CONFIG_MALL_HEAD_SIZE + num_bytes +
 		                                   CONFIG_MALL_TAIL_SIZE,
 		                                   flags);
-#else
+#else /* HAVE_MIN_ALIGNMENT */
 		result = FUNC(heap_alloc_untraced)(&kernel_heaps[flags & __GFP_HEAPMASK],
 		                                   CONFIG_MALL_PREFIX_SIZE + CONFIG_MALL_HEAD_SIZE + num_bytes +
 		                                   CONFIG_MALL_TAIL_SIZE,
 		                                   flags);
-#endif
+#endif /* !HAVE_MIN_ALIGNMENT */
 		IFELSE_NX(if (result.hp_ptr == NULL) goto err;, )
 		INITIALIZE_USER_POINTER(result.hp_ptr, result.hp_siz);
 #ifdef MALLOC_NX
 		if (!FUNC(mall_trace_impl)(result.hp_ptr, result.hp_siz,
 		                           flags & (__GFP_HEAPMASK | GFP_NOLEAK | GFP_NOWALK | GFP_INHERIT),
 		                           context))
-#else
+#else /* MALLOC_NX */
 		TRY {
 			FUNC(mall_trace_impl)(result.hp_ptr, result.hp_siz,
 			                      flags & (__GFP_HEAPMASK | GFP_NOLEAK | GFP_NOWALK | GFP_INHERIT),
 			                      context);
 		} EXCEPT
-#endif
+#endif /* !MALLOC_NX */
 		{
 			heap_free_untraced(&kernel_heaps[flags & __GFP_HEAPMASK],
 			                   result.hp_ptr, result.hp_siz, flags);
@@ -170,7 +170,7 @@ NOTHROW_NX(KCALL FUNC(krealign_offset))(VIRT void *ptr, size_t min_alignment,
 		memcpy(result.hp_ptr, ptr, old_user_size);
 		slab_free(ptr);
 		return result.hp_ptr;
-#endif
+#endif /* !IS_INPLACE */
 	}
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
 	if (!mall_acquire(flags))
@@ -208,10 +208,10 @@ again_check_node:
 #if CONFIG_MALL_TAIL_SIZE != 0
 #if (CONFIG_MALL_TAIL_SIZE & 3) == 0
 			memsetl((byte_t *)ptr + new_user_size, CONFIG_MALL_TAIL_PATTERN, CONFIG_MALL_TAIL_SIZE / 4);
-#else
+#else /* (CONFIG_MALL_TAIL_SIZE & 3) == 0 */
 			mempatl((byte_t *)ptr + new_user_size, CONFIG_MALL_TAIL_PATTERN, CONFIG_MALL_TAIL_SIZE);
-#endif
-#endif
+#endif /* (CONFIG_MALL_TAIL_SIZE & 3) != 0 */
+#endif /* CONFIG_MALL_TAIL_SIZE != 0 */
 
 			/* Re-insert the node, so-as to continue tracking it. */
 			mallnode_tree_insert(&mall_tree, node);
@@ -253,7 +253,7 @@ again_check_node:
 #ifdef IS_INPLACE
 				/* Only inplace-realloc is allowed, so don't try to allocate a new block! */
 				goto err;
-#else
+#else /* IS_INPLACE */
 				/* Must allocate a new block */
 #ifdef HAVE_MIN_ALIGNMENT
 				result = FUNC(heap_align_untraced)(&kernel_heaps[flags & __GFP_HEAPMASK], min_alignment,
@@ -261,12 +261,12 @@ again_check_node:
 				                                   CONFIG_MALL_PREFIX_SIZE + CONFIG_MALL_HEAD_SIZE + num_bytes +
 				                                   CONFIG_MALL_TAIL_SIZE,
 				                                   flags);
-#else
+#else /* HAVE_MIN_ALIGNMENT */
 				result = FUNC(heap_alloc_untraced)(&kernel_heaps[flags & __GFP_HEAPMASK],
 				                                   CONFIG_MALL_PREFIX_SIZE + CONFIG_MALL_HEAD_SIZE + num_bytes +
 				                                   CONFIG_MALL_TAIL_SIZE,
 				                                   flags);
-#endif
+#endif /* !HAVE_MIN_ALIGNMENT */
 				IFELSE_NX(if (result.hp_ptr == NULL) goto err;, )
 				/* Re-lock the MALL sub-system, and pop the node associated with the original pointer. */
 				if (!mall_acquire(flags))
@@ -308,7 +308,7 @@ again_check_node:
 				                   extension_base, num_allocated, extension_flags);
 				/* Return the base address of the new block. */
 				return result.hp_ptr;
-#endif
+#endif /* !IS_INPLACE */
 			}
 
 			/* Re-acquire a lock to the MALL subsystem, and access the node again. */
@@ -341,10 +341,10 @@ again_check_node:
 #if CONFIG_MALL_TAIL_SIZE != 0
 #if (CONFIG_MALL_TAIL_SIZE & 3) == 0
 		memsetl((byte_t *)ptr + new_user_size, CONFIG_MALL_TAIL_PATTERN, CONFIG_MALL_TAIL_SIZE / 4);
-#else
+#else /* (CONFIG_MALL_TAIL_SIZE & 3) == 0 */
 		mempatl((byte_t *)ptr + new_user_size, CONFIG_MALL_TAIL_PATTERN, CONFIG_MALL_TAIL_SIZE);
-#endif
-#endif
+#endif /* (CONFIG_MALL_TAIL_SIZE & 3) != 0 */
+#endif /* CONFIG_MALL_TAIL_SIZE != 0 */
 		/* Re-insert the node, so-as to continue tracking it. */
 		mall_insert_tree(node);
 		sync_endwrite(&mall_lock);
@@ -356,14 +356,14 @@ again_check_node:
 				num_clear = CONFIG_MALL_TAIL_SIZE;
 			memset((byte_t *)ptr + old_user_size, 0, num_clear);
 		}
-#endif
+#endif /* CONFIG_MALL_TAIL_SIZE != 0 */
 		/* Re-return the old pointer, because we were able to extend it! */
 		return ptr;
 	}
 #if defined(IS_INPLACE) || defined(MALLOC_NX)
 err:
 	return NULL;
-#endif
+#endif /* IS_INPLACE || MALLOC_NX */
 }
 
 

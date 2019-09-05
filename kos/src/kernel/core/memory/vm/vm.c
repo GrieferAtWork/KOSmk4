@@ -2423,9 +2423,9 @@ vm_datablock_do_createpart(struct vm_datablock *__restrict self,
 		assert(result->dp_pprop == 0);
 #if VM_DATAPART_FLAG_NORMAL != 0
 		result->dp_flags = VM_DATAPART_FLAG_NORMAL;
-#else
+#else /* VM_DATAPART_FLAG_NORMAL != 0 */
 		assert(result->dp_flags == VM_DATAPART_FLAG_NORMAL);
-#endif
+#endif /* VM_DATAPART_FLAG_NORMAL == 0 */
 	} else {
 		/* Need to allocate a page property bitset as part of the heap! */
 		uintptr_t *ppp;
@@ -2453,9 +2453,9 @@ vm_datablock_do_createpart(struct vm_datablock *__restrict self,
 	assert(result->dp_futex == NULL);
 #if VM_DATAPART_STATE_ABSENT != 0
 	result->dp_state = VM_DATAPART_STATE_ABSENT;
-#else
+#else /* VM_DATAPART_STATE_ABSENT != 0 */
 	assert(result->dp_state == VM_DATAPART_STATE_ABSENT);
-#endif
+#endif /* VM_DATAPART_STATE_ABSENT == 0 */
 #ifdef CONFIG_VIO
 	if (self->db_vio)
 		result->dp_state = VM_DATAPART_STATE_VIOPRT;
@@ -2587,9 +2587,9 @@ vm_datablock_do_locatepart(struct vm_datablock *__restrict self,
 	shared_rwlock_cinit(&result->dp_lock);
 #if VM_DATAPART_FLAG_NORMAL != 0
 	result->dp_flags = VM_DATAPART_FLAG_NORMAL;
-#else
+#else /* VM_DATAPART_FLAG_NORMAL != 0 */
 	assert(result->dp_flags == VM_DATAPART_FLAG_NORMAL);
-#endif
+#endif /* VM_DATAPART_FLAG_NORMAL == 0 */
 	if (num_dpages <= BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS) {
 set_inline_ppp:
 		assert(result->dp_pprop == 0);
@@ -2675,9 +2675,9 @@ set_inline_ppp:
 	result->dp_block = incref(self);
 #if VM_DATAPART_STATE_ABSENT != 0
 	result->dp_state = VM_DATAPART_STATE_ABSENT;
-#else
+#else /* VM_DATAPART_FLAG_NORMAL != 0 */
 	assert(result->dp_state == VM_DATAPART_STATE_ABSENT);
-#endif
+#endif /* VM_DATAPART_FLAG_NORMAL == 0 */
 #ifdef CONFIG_VIO
 	if (self->db_vio)
 		result->dp_state = VM_DATAPART_STATE_VIOPRT;
@@ -2989,8 +2989,8 @@ NOTHROW(KCALL partnode_pair_vector_endwrite_parts)(struct partnode_pair_vector *
 }
 
 /* Same as `partnode_pair_vector_reserve1_nx()', but allow for exceptions, as well as blocking */
-PRIVATE void
-(KCALL partnode_pair_vector_reserve1)(struct partnode_pair_vector *__restrict self)
+PRIVATE void KCALL
+partnode_pair_vector_reserve1(struct partnode_pair_vector *__restrict self)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	assert(self->pv_cnt <= self->pv_alc);
 	if (self->pv_cnt >= self->pv_alc) {
@@ -3020,9 +3020,9 @@ PRIVATE void
 }
 
 /* Add the given `part' to the part vector, as well as allocate an associated node. */
-PRIVATE void
-(KCALL partnode_pair_vector_addpart)(struct partnode_pair_vector *__restrict self,
-                                     /*inherit(on_success)*/REF struct vm_datapart *__restrict part)
+PRIVATE void KCALL
+partnode_pair_vector_addpart(struct partnode_pair_vector *__restrict self,
+                             /*inherit(on_success)*/ REF struct vm_datapart *__restrict part)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	struct vm_node *new_node;
 	partnode_pair_vector_reserve1(self);
@@ -3033,9 +3033,9 @@ PRIVATE void
 	++self->pv_cnt;
 }
 
-PRIVATE void
-(KCALL partnode_pair_vector_insertpart)(struct partnode_pair_vector *__restrict self, size_t index,
-                                        /*inherit(on_success)*/REF struct vm_datapart *__restrict part)
+PRIVATE void KCALL
+partnode_pair_vector_insertpart(struct partnode_pair_vector *__restrict self, size_t index,
+                                /*inherit(on_success)*/ REF struct vm_datapart *__restrict part)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	struct vm_node *new_node;
 	assert(index <= self->pv_cnt);
@@ -3281,9 +3281,9 @@ vm_collect_and_lock_parts_and_vm(struct partnode_pair_vector *__restrict info,
 			vm_datapart_decref_and_merge(part);
 			RETHROW();
 		}
-#define vm_datapart_numvpages_atomic(self) \
-		((size_t)((ATOMIC_READ((self)->dp_tree.a_vmax) - (self)->dp_tree.a_vmin) + 1) >> \
-		 VM_DATABLOCK_PAGESHIFT(data))
+#define vm_datapart_numvpages_atomic(self)                                           \
+	((size_t)((ATOMIC_READ((self)->dp_tree.a_vmax) - (self)->dp_tree.a_vmin) + 1) >> \
+	 VM_DATABLOCK_PAGESHIFT(data))
 		/* Load additional parts which may span the specified range. */
 		total_pages = vm_datapart_numvpages_atomic(part);
 		while (total_pages < num_pages) {
@@ -4179,15 +4179,15 @@ DECL_BEGIN
 
 /* A data part used to describe a single, reserved page. */
 INTERN ATTR_PERTASK struct vm_node _this_trampoline_node = {
-	/* .vn_node   = */{ NULL, NULL, 0, 0 },
-	/* .vn_byaddr = */LLIST_INITNODE,
-	/* .vn_prot   = */VM_PROT_PRIVATE,
-	/* .vn_flags  = */VM_NODE_FLAG_NOMERGE | VM_NODE_FLAG_PREPARED,
-	/* .vn_vm     = */&vm_kernel,
-	/* .vn_part   = */NULL,
-	/* .vn_block  = */NULL,
-	/* .vn_link   = */{ NULL, NULL },
-	/* .vn_guard  = */0
+	/* .vn_node   = */ { NULL, NULL, 0, 0 },
+	/* .vn_byaddr = */ LLIST_INITNODE,
+	/* .vn_prot   = */ VM_PROT_PRIVATE,
+	/* .vn_flags  = */ VM_NODE_FLAG_NOMERGE | VM_NODE_FLAG_PREPARED,
+	/* .vn_vm     = */ &vm_kernel,
+	/* .vn_part   = */ NULL,
+	/* .vn_block  = */ NULL,
+	/* .vn_link   = */ { NULL, NULL },
+	/* .vn_guard  = */ 0
 };
 
 
@@ -4606,9 +4606,9 @@ NOTHROW(FCALL vm_kernel_sync)(vm_vpage_t page_index, size_t num_pages) {
 		args[1] = (void *)(uintptr_t)num_pages;
 		cpu_broadcastipi(&ipi_invtlb, args, CPU_IPI_FWAITFOR);
 	}
-#else
+#else /* !CONFIG_NO_SMP */
 	pagedir_sync(page_index, num_pages);
-#endif
+#endif /* CONFIG_NO_SMP */
 }
 
 PUBLIC NOBLOCK void
@@ -4619,9 +4619,9 @@ NOTHROW(FCALL vm_kernel_syncone)(vm_vpage_t page_index) {
 		args[0] = (void *)(uintptr_t)page_index;
 		cpu_broadcastipi(&ipi_invtlb_one, args, CPU_IPI_FWAITFOR);
 	}
-#else
+#else /* !CONFIG_NO_SMP */
 	pagedir_syncone(page_index);
-#endif
+#endif /* CONFIG_NO_SMP */
 }
 
 PUBLIC NOBLOCK void
@@ -4631,9 +4631,9 @@ NOTHROW(FCALL vm_kernel_syncall)(void) {
 		void *args[CPU_IPI_ARGCOUNT];
 		cpu_broadcastipi(&ipi_invtlb_all, args, CPU_IPI_FWAITFOR);
 	}
-#else
+#else /* !CONFIG_NO_SMP */
 	pagedir_syncall();
-#endif
+#endif /* CONFIG_NO_SMP */
 }
 
 

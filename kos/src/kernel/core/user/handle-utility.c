@@ -34,13 +34,14 @@
 #include <fs/node.h>
 #include <fs/pipe.h>
 #include <fs/vfs.h>
-#include <sys/stat.h>
 #include <kernel/driver.h>
 #include <kernel/handle.h>
 #include <kernel/types.h>
 #include <sched/pid.h>
 
 #include <hybrid/atomic.h>
+
+#include <sys/stat.h>
 
 DECL_BEGIN
 

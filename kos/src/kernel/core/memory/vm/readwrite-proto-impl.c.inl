@@ -35,34 +35,34 @@
 DECL_BEGIN
 
 
-#if defined(COPY_USER2KERNEL)
+#ifdef COPY_USER2KERNEL
 #define IS_READING 1
-LOCAL void
-(KCALL copy_kernelspace_from_vm)(KERNEL CHECKED void *dst,
-                                 struct vm *__restrict effective_vm,
-                                 UNCHECKED void const *src,
-                                 size_t num_bytes,
-                                 bool force_accessible)
+LOCAL void KCALL
+copy_kernelspace_from_vm(KERNEL CHECKED void *dst,
+                         struct vm *__restrict effective_vm,
+                         UNCHECKED void const *src,
+                         size_t num_bytes,
+                         bool force_accessible)
 #define USERSPACE_VM_ADDRESS     src
-#else
+#else /* COPY_USER2KERNEL */
 #define IS_WRITING 1
 #ifdef VM_MEMSET_IMPL
-LOCAL void
-(KCALL memset_into_vm)(struct vm *__restrict effective_vm,
-                       UNCHECKED void *dst,
-                       int byte,
-                       size_t num_bytes,
-                       bool force_accessible)
-#else
-LOCAL void
-(KCALL copy_kernelspace_into_vm)(struct vm *__restrict effective_vm,
-                                 UNCHECKED void *dst,
-                                 KERNEL CHECKED void const *src,
-                                 size_t num_bytes,
-                                 bool force_accessible)
-#endif
+LOCAL void KCALL
+memset_into_vm(struct vm *__restrict effective_vm,
+               UNCHECKED void *dst,
+               int byte,
+               size_t num_bytes,
+               bool force_accessible)
+#else /* VM_MEMSET_IMPL */
+LOCAL void KCALL
+copy_kernelspace_into_vm(struct vm *__restrict effective_vm,
+                         UNCHECKED void *dst,
+                         KERNEL CHECKED void const *src,
+                         size_t num_bytes,
+                         bool force_accessible)
+#endif /* !VM_MEMSET_IMPL */
 #define USERSPACE_VM_ADDRESS     dst
-#endif
+#endif /* !COPY_USER2KERNEL */
 		THROWS(E_SEGFAULT, E_WOULDBLOCK)
 {
 	size_t error;
@@ -109,10 +109,10 @@ throw_segfault:
 #ifdef IS_WRITING
 			THROW(E_SEGFAULT_UNMAPPED, USERSPACE_VM_ADDRESS,
 			      E_SEGFAULT_CONTEXT_FAULT | E_SEGFAULT_CONTEXT_WRITING);
-#else
+#else /* IS_WRITING */
 			THROW(E_SEGFAULT_UNMAPPED, USERSPACE_VM_ADDRESS,
 			      E_SEGFAULT_CONTEXT_FAULT);
-#endif
+#endif /* !IS_WRITING */
 		}
 		if (node->vn_guard) {
 			/* TODO: Map a new guard above/below this node! */

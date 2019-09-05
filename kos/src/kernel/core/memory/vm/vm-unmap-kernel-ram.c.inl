@@ -60,7 +60,8 @@ INTDEF NOBLOCK void NOTHROW(KCALL task_destroy_raw_impl)(struct task *__restrict
 
 
 #define vm_kernel_treelock_mustservice() \
-       (ATOMIC_READ(vm_pending_destroy_tasks) || ATOMIC_READ(vm_pending_unmap_kernel_ram))
+	(ATOMIC_READ(vm_pending_destroy_tasks) || ATOMIC_READ(vm_pending_unmap_kernel_ram))
+
 PRIVATE NOBLOCK_IF(flags & GFP_ATOMIC) void
 NOTHROW(KCALL vm_kernel_treelock_service)(gfp_t flags);
 
@@ -76,7 +77,7 @@ NOTHROW(KCALL vm_do_pdir_unmap)(vm_vpage_t page_index, size_t num_pages) {
 	 *       be allocated again, and become corrupt while other cores are still
 	 *       believing them to contain paging data. */
 	pagedir_unprepare_map(page_index, num_pages);
-#endif
+#endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 }
 
 
@@ -133,6 +134,7 @@ NOTHROW(KCALL vm_datapart_truncate_leading)(struct vm_datapart *__restrict self,
 		                           new_total_pages);
 	}
 	switch (self->dp_state) {
+
 	case VM_DATAPART_STATE_INCORE:
 	case VM_DATAPART_STATE_LOCKED:
 		if (self->dp_ramdata.rd_blockv == &self->dp_ramdata.rd_block0) {
@@ -601,6 +603,7 @@ page_properties_updated:
 
 			/* Split the part's actual RAM / SWAP data. */
 			switch (part->dp_state) {
+
 			case VM_DATAPART_STATE_INCORE:
 			case VM_DATAPART_STATE_LOCKED:
 				if (part->dp_ramdata.rd_blockv == &part->dp_ramdata.rd_block0) {
@@ -935,8 +938,8 @@ NOTHROW(FCALL vm_unmap_kernel_ram)(vm_vpage_t page_index,
 
 /* Acquire a write-lock to the kernel VM, automatically serving any pending
  * requests for unmapping kernel memory, as scheduled by `vm_unmap_kernel_ram()' */
-PUBLIC NOBLOCK_IF(flags & GFP_ATOMIC) bool
-(KCALL vm_kernel_treelock_writef)(gfp_t flags) THROWS(E_WOULDBLOCK) {
+PUBLIC NOBLOCK_IF(flags & GFP_ATOMIC) bool KCALL
+vm_kernel_treelock_writef(gfp_t flags) THROWS(E_WOULDBLOCK) {
 	if (!sync_trywrite(&vm_kernel.v_treelock)) {
 		if (flags & GFP_ATOMIC)
 			return false;
@@ -1022,7 +1025,7 @@ PUBLIC WUNUSED bool NOTHROW(KCALL vm_kernel_treelock_read_nx)(void) {
 	return true;
 }
 
-PUBLIC void (KCALL vm_kernel_treelock_read)(void) THROWS(E_WOULDBLOCK) {
+PUBLIC void KCALL vm_kernel_treelock_read(void) THROWS(E_WOULDBLOCK) {
 	sync_read(&vm_kernel.v_treelock);
 	while unlikely(vm_kernel_treelock_mustservice()) {
 		sync_upgrade(&vm_kernel.v_treelock);
@@ -1089,7 +1092,8 @@ NOTHROW(KCALL vm_kernel_treelock_upgrade_nx)(void) {
 	return result;
 }
 
-PUBLIC bool (KCALL vm_kernel_treelock_upgrade)(void) THROWS(E_WOULDBLOCK) {
+PUBLIC bool KCALL
+vm_kernel_treelock_upgrade(void) THROWS(E_WOULDBLOCK) {
 	bool result;
 	result = sync_upgrade(&vm_kernel.v_treelock);
 	if (result)

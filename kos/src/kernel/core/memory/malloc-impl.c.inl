@@ -71,7 +71,7 @@ NOTHROW_NX(KCALL FUNC(kmalloc))(size_t n_bytes, gfp_t flags) {
 		if (slab_ptr)
 			return slab_ptr;
 	}
-#endif
+#endif /* CONFIG_USE_SLAB_ALLOCATORS */
 	hptr = FUNC(heap_alloc_untraced)(&kernel_heaps[flags & __GFP_HEAPMASK],
 	                                 alloc_size, flags);
 	IFELSE_NX(if unlikely(!hptr.hp_siz) goto err;, )
@@ -124,7 +124,7 @@ IFELSE_NX(err:, err_overflow:)
 FORCELOCAL size_t
 NOTHROW_NX(KCALL FUNC(get_realloc_size))(size_t n_bytes) {
 	size_t result;
-	if unlikely(OVERFLOW_UADD(n_bytes, HEAP_ALIGNMENT - 1, &result))
+	if unlikely(OVERFLOW_UADD(n_bytes, (size_t)(HEAP_ALIGNMENT - 1), &result))
 		goto err_overflow;
 	result &= ~(HEAP_ALIGNMENT - 1);
 	if unlikely(OVERFLOW_UADD(result, sizeof(struct mptr), &result))
@@ -150,7 +150,7 @@ NOTHROW_NX(KCALL FUNC(krealloc_in_place))(VIRT void *ptr,
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
 	if (KERNEL_SLAB_CHECKPTR(ptr))
 		return n_bytes <= SLAB_GET(ptr)->s_size ? ptr : NULL;
-#endif
+#endif /* CONFIG_USE_SLAB_ALLOCATORS */
 	/* Align the given n_bytes and add the overhead caused by the mptr. */
 	n_bytes = FUNC(get_realloc_size)(n_bytes);
 	IFELSE_NX(if unlikely(n_bytes == (size_t)-1) goto err;, )
@@ -208,12 +208,12 @@ NOTHROW_NX(KCALL FUNC(krealloc))(VIRT void *ptr,
 #ifdef MALLOC_NX
 		if unlikely(!resptr)
 			return NULL;
-#endif
+#endif /* MALLOC_NX */
 		memcpy(resptr, ptr, old_size);
 		slab_free(ptr);
 		return resptr;
 	}
-#endif
+#endif /* CONFIG_USE_SLAB_ALLOCATORS */
 	assert(IS_ALIGNED((uintptr_t)ptr, HEAP_ALIGNMENT));
 	/* Align the given n_bytes and add the overhead caused by the mptr. */
 	n_bytes = FUNC(get_realloc_size)(n_bytes);
@@ -259,7 +259,7 @@ NOTHROW_NX(KCALL FUNC(krealloc))(VIRT void *ptr,
 #ifdef MALLOC_NX
 err:
 	return NULL;
-#endif
+#endif /* MALLOC_NX */
 }
 
 PUBLIC ATTR_WEAK VIRT void *
@@ -276,7 +276,7 @@ NOTHROW_NX(KCALL FUNC(krealign_in_place))(VIRT void *ptr, size_t min_alignment,
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
 	if (KERNEL_SLAB_CHECKPTR(ptr))
 		return n_bytes <= SLAB_GET(ptr)->s_size ? ptr : NULL;
-#endif
+#endif /* CONFIG_USE_SLAB_ALLOCATORS */
 	/* Align the given n_bytes and add the overhead caused by the mptr. */
 	n_bytes = FUNC(get_realloc_size)(n_bytes);
 	IFELSE_NX(if unlikely(n_bytes == (size_t)-1) goto err;, )
@@ -335,12 +335,12 @@ NOTHROW_NX(KCALL FUNC(krealign))(VIRT void *ptr, size_t min_alignment,
 #ifdef MALLOC_NX
 		if unlikely(!resptr)
 			return NULL;
-#endif
+#endif /* MALLOC_NX */
 		memcpy(resptr, ptr, old_size);
 		slab_free(ptr);
 		return resptr;
 	}
-#endif
+#endif /* CONFIG_USE_SLAB_ALLOCATORS */
 	/* Align the given n_bytes and add the overhead caused by the mptr. */
 	n_bytes = FUNC(get_realloc_size)(n_bytes);
 	IFELSE_NX(if unlikely(n_bytes == (size_t)-1) goto err;, )
@@ -390,7 +390,7 @@ NOTHROW_NX(KCALL FUNC(krealign))(VIRT void *ptr, size_t min_alignment,
 #ifdef MALLOC_NX
 err:
 	return NULL;
-#endif
+#endif /* MALLOC_NX */
 }
 
 PUBLIC ATTR_WEAK VIRT void *
@@ -408,7 +408,7 @@ NOTHROW_NX(KCALL FUNC(krealign_in_place_offset))(VIRT void *ptr, size_t min_alig
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
 	if (KERNEL_SLAB_CHECKPTR(ptr))
 		return n_bytes <= SLAB_GET(ptr)->s_size ? ptr : NULL;
-#endif
+#endif /* CONFIG_USE_SLAB_ALLOCATORS */
 	/* Align the given n_bytes and add the overhead caused by the mptr. */
 	n_bytes = FUNC(get_realloc_size)(n_bytes);
 	IFELSE_NX(if unlikely(n_bytes == (size_t)-1) goto err;, )
@@ -468,12 +468,12 @@ NOTHROW_NX(KCALL FUNC(krealign_offset))(VIRT void *ptr, size_t min_alignment,
 #ifdef MALLOC_NX
 		if unlikely(!resptr)
 			return NULL;
-#endif
+#endif /* MALLOC_NX */
 		memcpy(resptr, ptr, old_size);
 		slab_free(ptr);
 		return resptr;
 	}
-#endif
+#endif /* CONFIG_USE_SLAB_ALLOCATORS */
 	/* Align the given n_bytes and add the overhead caused by the mptr. */
 	n_bytes = FUNC(get_realloc_size)(n_bytes);
 	IFELSE_NX(if unlikely(n_bytes == (size_t)-1) goto err;, )
@@ -525,7 +525,7 @@ NOTHROW_NX(KCALL FUNC(krealign_offset))(VIRT void *ptr, size_t min_alignment,
 #ifdef MALLOC_NX
 err:
 	return NULL;
-#endif
+#endif /* MALLOC_NX */
 }
 
 DECL_END

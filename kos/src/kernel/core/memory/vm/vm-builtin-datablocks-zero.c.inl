@@ -27,6 +27,7 @@
 
 #include <hybrid/limits.h>
 
+#include <assert.h>
 #include <string.h>
 
 DECL_BEGIN
@@ -46,10 +47,10 @@ DECL_BEGIN
 
 
 PRIVATE NONNULL((1)) void KCALL
-PP_CAT2(anon_zero_loadpart,DATAPAGE_SHIFT)(struct vm_datablock *__restrict UNUSED(self),
-                                           vm_dpage_t UNUSED(start),
-                                           vm_phys_t buffer,
-                                           size_t num_pages) {
+PP_CAT2(anon_zero_loadpart, DATAPAGE_SHIFT)(struct vm_datablock *__restrict UNUSED(self),
+                                            vm_dpage_t UNUSED(start),
+                                            vm_phys_t buffer,
+                                            size_t num_pages) {
 	uintptr_t backup;
 	vm_vpage_t tramp;
 	vm_ppage_t phys = VM_ADDR2PAGE(buffer);
@@ -61,11 +62,11 @@ PP_CAT2(anon_zero_loadpart,DATAPAGE_SHIFT)(struct vm_datablock *__restrict UNUSE
 			if (!num_pages)
 				break;
 			--num_pages;
-#else
+#else /* DATA_PAGES_PER_V_PAGE == 1 */
 			if (num_pages <= DATA_PAGES_PER_V_PAGE)
 				break;
 			num_pages -= DATA_PAGES_PER_V_PAGE;
-#endif
+#endif /* DATA_PAGES_PER_V_PAGE != 1 */
 			++phys;
 			continue;
 		}
@@ -83,7 +84,7 @@ PP_CAT2(anon_zero_loadpart,DATAPAGE_SHIFT)(struct vm_datablock *__restrict UNUSE
 					goto done;
 				++phys;
 			} while (page_iszero(phys));
-#else
+#else /* DATA_PAGES_PER_V_PAGE == 1 */
 			{
 				size_t off_pages, max_pages;
 				off_pages = (size_t)(((uintptr_t)buffer >> DATA_PAGESHIFT) & (DATA_PAGESIZE - 1));
@@ -106,7 +107,7 @@ PP_CAT2(anon_zero_loadpart,DATAPAGE_SHIFT)(struct vm_datablock *__restrict UNUSE
 				num_pages -= DATA_PAGES_PER_V_PAGE;
 				++phys;
 			}
-#endif
+#endif /* DATA_PAGES_PER_V_PAGE != 1 */
 			pagedir_mapone(tramp, phys,
 			               PAGEDIR_MAP_FREAD |
 			               PAGEDIR_MAP_FWRITE);

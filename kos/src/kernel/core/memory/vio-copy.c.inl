@@ -35,7 +35,7 @@ PUBLIC NONNULL((1)) void KCALL
 vio_copyfromvio_to_phys(struct vio_args *__restrict args,
                         vm_phys_t dst, vm_daddr_t src,
                         size_t num_bytes)
-#else
+#elif defined(IO_WRITE)
 PUBLIC NONNULL((1)) void KCALL
 vio_copytovio_from_phys(struct vio_args *__restrict args,
                         vm_daddr_t dst, vm_phys_t src,
@@ -52,7 +52,7 @@ vio_copytovio_from_phys(struct vio_args *__restrict args,
 	TRY {
 #ifdef IO_READ
 #define PHYS_BUF   dst
-#else
+#elif defined(IO_WRITE)
 #define PHYS_BUF   src
 #endif
 		for (;;) {
@@ -70,7 +70,7 @@ vio_copytovio_from_phys(struct vio_args *__restrict args,
 				pagedir_mapone(tramp, pageaddr,
 				               PAGEDIR_MAP_FWRITE);
 			}
-#else
+#elif defined(IO_WRITE)
 			if (is_first) {
 				backup = pagedir_push_mapone(tramp, pageaddr,
 				                             PAGEDIR_MAP_FREAD);
@@ -86,7 +86,7 @@ vio_copytovio_from_phys(struct vio_args *__restrict args,
 			                (byte_t *)(VM_PAGE2ADDR(tramp) + (ptrdiff_t)(PHYS_BUF & (PAGESIZE - 1))),
 			                src,
 			                page_bytes);
-#else
+#elif defined(IO_WRITE)
 			vio_copytovio(args,
 			              dst,
 			              (byte_t *)(VM_PAGE2ADDR(tramp) + (ptrdiff_t)(PHYS_BUF & (PAGESIZE - 1))),
@@ -98,7 +98,7 @@ vio_copytovio_from_phys(struct vio_args *__restrict args,
 			PHYS_BUF += page_bytes;
 #ifdef IO_READ
 			src += page_bytes;
-#else
+#elif defined(IO_WRITE)
 			dst += page_bytes;
 #endif
 		}

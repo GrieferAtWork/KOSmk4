@@ -54,8 +54,8 @@ NOTHROW(KCALL vm_tasklock_trywrite)(struct vm *__restrict self) {
 	return true;
 }
 
-PUBLIC NONNULL((1)) void
-(KCALL vm_tasklock_read)(struct vm *__restrict self) THROWS(E_WOULDBLOCK) {
+PUBLIC NONNULL((1)) void KCALL
+vm_tasklock_read(struct vm *__restrict self) THROWS(E_WOULDBLOCK) {
 	sync_read(&self->v_tasklock);
 	if unlikely(vm_has_pending_deltasks(self)) {
 		if (sync_tryupgrade(&self->v_tasklock)) {
@@ -65,16 +65,16 @@ PUBLIC NONNULL((1)) void
 	}
 }
 
-PUBLIC NONNULL((1)) bool
-(KCALL vm_tasklock_upgrade)(struct vm *__restrict self) THROWS(E_WOULDBLOCK) {
+PUBLIC NONNULL((1)) bool KCALL
+vm_tasklock_upgrade(struct vm *__restrict self) THROWS(E_WOULDBLOCK) {
 	bool result;
 	result = sync_upgrade(&self->v_tasklock);
 	vm_clear_pending_deltasks(self);
 	return result;
 }
 
-PUBLIC NONNULL((1)) void
-(KCALL vm_tasklock_write)(struct vm *__restrict self) THROWS(E_WOULDBLOCK) {
+PUBLIC NONNULL((1)) void KCALL
+vm_tasklock_write(struct vm *__restrict self) THROWS(E_WOULDBLOCK) {
 	sync_write(&self->v_tasklock);
 	vm_clear_pending_deltasks(self);
 }

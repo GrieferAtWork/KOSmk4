@@ -68,19 +68,19 @@ NOTHROW(KCALL swap_free)(swapptr_t start, pagecnt_t num_pages) {
  * NOTE: By default, swap reads/writes are performed using DMA, which
  *       is why operations must be followed by a call to `swap_sync()'
  *       in order to ensure completion. */
-PUBLIC void
-(KCALL swap_read)(swapptr_t start,
-                  vm_ppage_t buffer,
-                  pagecnt_t num_pages) {
+PUBLIC void KCALL
+swap_read(swapptr_t start,
+          vm_ppage_t buffer,
+          pagecnt_t num_pages) {
 	(void)start;
 	(void)buffer;
 	(void)num_pages;
 }
 
-PUBLIC void
-(KCALL swap_write)(swapptr_t start,
-                   vm_ppage_t buffer,
-                   pagecnt_t num_pages) {
+PUBLIC void KCALL
+swap_write(swapptr_t start,
+           vm_ppage_t buffer,
+           pagecnt_t num_pages) {
 	(void)start;
 	(void)buffer;
 	(void)num_pages;
@@ -88,7 +88,7 @@ PUBLIC void
 
 /* Wait for all out-standing swap reads/writes to be completed.
  * @throw: E_IOERROR: The swap back-end has issued an I/O error. */
-PUBLIC void (KCALL swap_sync)(void) THROWS(E_IOERROR) {
+PUBLIC void KCALL swap_sync(void) THROWS(E_IOERROR) {
 	THROW(E_NOT_IMPLEMENTED_TODO, "Swap <--> disk DMA implementation");
 }
 

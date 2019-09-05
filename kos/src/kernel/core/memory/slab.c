@@ -37,6 +37,7 @@
 #include <hybrid/overflow.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
+#include <assert.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -67,7 +68,7 @@ PRIVATE struct slab_pool slab_freepool[2] = {
 		.sp_count = 0,
 		.sp_limit = SLAB_POOL_DEFAULT_LIMIT,
 		.sp_pend  = NULL
-	},{ /* SLAB_FLOCKED / GFP_LOCKED */
+	}, { /* SLAB_FLOCKED / GFP_LOCKED */
 		.sp_lock  = ATOMIC_RWLOCK_INIT,
 		.sp_free  = NULL,
 		.sp_count = 0,
@@ -153,17 +154,18 @@ NOTHROW(KCALL slab_freepage)(struct slab *__restrict self) {
 }
 
 
-#define CORE_ALLOC_FLAGS (GFP_LOCKED | \
-                          GFP_PREFLT | \
-                          /* Instruct the heap to only consider allocating from VCbase, \
-                           * thus preventing an infinite loop. */ \
-                          GFP_VCBASE | \
-                          /* Don't overallocate to prevent infinite recursion! \
-                           * -> This flag guaranties that upon recursion, at most 1 \
-                           *    page will get allocated, in which case the \
-                           *   `block0_size >= num_pages' check above will be \
-                           *   `1 >= 1', meaning we'll never get here! */ \
-                          GFP_NOOVER)
+#define CORE_ALLOC_FLAGS                                                        \
+	(GFP_LOCKED |                                                               \
+	 GFP_PREFLT |                                                               \
+	 GFP_VCBASE | /* Instruct the heap to only consider allocating from VCbase, \
+	               * thus preventing an infinite loop. */                       \
+	 GFP_NOOVER   /* Don't overallocate to prevent infinite recursion!          \
+	               * -> This flag guaranties that upon recursion, at most 1     \
+	               *    page will get allocated, in which case the              \
+	               *   `block0_size >= num_pages' check above will be           \
+	               *   `1 >= 1', meaning we'll never get here! */               \
+	)
+
 
 /* [lock(vm_kernel)]
  * The pointer to either the lowest (CONFIG_SLAB_GROWS_DOWNWARDS), or
@@ -194,9 +196,9 @@ NOTHROW(KCALL slab_alloc_page)(gfp_t flags) {
 	struct slab *result;
 #if GFP_LOCKED == 1
 	pool = &slab_freepool[flags & GFP_LOCKED];
-#else
+#else /* GFP_LOCKED == 1 */
 	pool = &slab_freepool[(flags & GFP_LOCKED) ? 1 : 0];
-#endif
+#endif /* GFP_LOCKED != 1 */
 again:
 	if unlikely(!pool_lock_trywrite(pool)) {
 		if (flags & GFP_ATOMIC)
@@ -216,9 +218,9 @@ again:
 #ifdef CONFIG_DEBUG_HEAP
 #if GFP_CALLOC == SLAB_FCALLOC
 		if ((flags & GFP_CALLOC) != (result->s_flags & SLAB_FCALLOC))
-#else
+#else /* GFP_CALLOC == SLAB_FCALLOC */
 		if (!!(flags & GFP_CALLOC) != !!(result->s_flags & SLAB_FCALLOC))
-#endif
+#endif /* GFP_CALLOC != SLAB_FCALLOC */
 		{
 			if (flags & GFP_CALLOC) {
 				memset(result, 0, PAGESIZE);
@@ -226,10 +228,10 @@ again:
 				mempatl(result, DEBUGHEAP_NO_MANS_LAND, PAGESIZE);
 			}
 		}
-#else
+#else /* CONFIG_DEBUG_HEAP */
 		if ((flags & GFP_CALLOC) && !(result->s_flags & SLAB_FCALLOC))
 			memset(result, 0, PAGESIZE);
-#endif
+#endif /* !CONFIG_DEBUG_HEAP */
 		return result;
 	}
 	pool_lock_endwrite(pool);
@@ -263,9 +265,9 @@ again:
 		                             ? &vm_datablock_anonymous_zero
 #ifdef CONFIG_DEBUG_HEAP
 		                             : &vm_datablock_debugheap
-#else
+#else /* CONFIG_DEBUG_HEAP */
 		                             : &vm_datablock_anonymous
-#endif
+#endif /* !CONFIG_DEBUG_HEAP */
 		                             ;
 		incref(corepair.cp_part->dp_block);
 		corepair.cp_node->vn_block = incref(corepair.cp_part->dp_block);
@@ -300,10 +302,10 @@ again_lock_vm:
 #ifdef CONFIG_SLAB_GROWS_DOWNWARDS
 			if (next_slab_page == VM_GETFREE_ERROR ||
 			    next_slab_page < slab_end_page - 1)
-#else
+#else /* CONFIG_SLAB_GROWS_DOWNWARDS */
 			if (next_slab_page == VM_GETFREE_ERROR ||
 			    next_slab_page > slab_end_page)
-#endif
+#endif /* !CONFIG_SLAB_GROWS_DOWNWARDS */
 			{
 				uintptr_t version;
 				vm_kernel_treelock_endwrite();
@@ -323,11 +325,11 @@ again_next_slab_page_tryhard:
 				if (next_slab_page != VM_GETFREE_ERROR &&
 				    next_slab_page >= slab_end_page - 1)
 					goto again_lock_vm;
-#else
+#else /* CONFIG_SLAB_GROWS_DOWNWARDS */
 				if (next_slab_page != VM_GETFREE_ERROR &&
 				    next_slab_page <= slab_end_page)
 					goto again_lock_vm;
-#endif
+#endif /* !CONFIG_SLAB_GROWS_DOWNWARDS */
 				if (system_clearcaches_s(&version))
 					goto again_next_slab_page_tryhard;
 				goto err_corepair_content;
@@ -677,9 +679,9 @@ NOTHROW(KCALL slab_free)(void *__restrict ptr) {
 #ifndef NDEBUG
 		kernel_panic("Corrupted SLAB page at %p has an invalid size of %I8u",
 		             self, self->s_size);
-#else
+#else /* !NDEBUG */
 		__builtin_unreachable();
-#endif
+#endif /* NDEBUG */
 	}
 }
 
@@ -702,9 +704,9 @@ NOTHROW(KCALL slab_ffree)(void *__restrict ptr, gfp_t flags) {
 #ifndef NDEBUG
 		kernel_panic("Corrupted SLAB page at %p has an invalid size of %I8u",
 		             self, self->s_size);
-#else
+#else /* !NDEBUG */
 		__builtin_unreachable();
-#endif
+#endif /* NDEBUG */
 	}
 }
 
@@ -720,9 +722,9 @@ NOTHROW(KCALL __os_slab_malloc)(size_t num_bytes, gfp_t flags) {
 #endif
 #ifndef NDEBUG
 	kernel_panic("Invalid slab size %Iu", num_bytes);
-#else
+#else /* !NDEBUG */
 	__builtin_unreachable();
-#endif
+#endif /* NDEBUG */
 }
 
 PUBLIC ATTR_MALLOC WUNUSED ATTR_RETNONNULL VIRT void *KCALL
@@ -736,9 +738,9 @@ __os_slab_kmalloc(size_t num_bytes, gfp_t flags) {
 #endif
 #ifndef NDEBUG
 	kernel_panic("Invalid slab size %Iu", num_bytes);
-#else
+#else /* !NDEBUG */
 	__builtin_unreachable();
-#endif
+#endif /* NDEBUG */
 }
 
 PUBLIC ATTR_MALLOC WUNUSED VIRT void *
@@ -752,9 +754,9 @@ NOTHROW(KCALL __os_slab_kmalloc_nx)(size_t num_bytes, gfp_t flags) {
 #endif
 #ifndef NDEBUG
 	kernel_panic("Invalid slab size %Iu", num_bytes);
-#else
+#else /* !NDEBUG */
 	__builtin_unreachable();
-#endif
+#endif /* NDEBUG */
 }
 
 

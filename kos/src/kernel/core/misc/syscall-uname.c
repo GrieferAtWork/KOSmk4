@@ -68,14 +68,14 @@ PUBLIC_CONST u32 const kernel_version = KOS_VERSION_CODE;
 
 /* UNAME information about the KOS kernel. */
 PUBLIC struct utsname kernel_uname = {
-	/* .sysname    = */"KOS",
-	/* .nodename   = */"insert-hostname-here",
-	/* .release    = */"KOS Mk" PP_STR(KOS_VERSION_MAJOR) " - " KOS_VERSION_NAME,
-	/* .version    = */PP_STR(KOS_VERSION_MAJOR) "."
-	                   PP_STR(KOS_VERSION_MINOR) "."
-	                   PP_STR(KOS_VERSION_PATCH),
-	/* .machine    = */MACHINE_NAME,
-	/* .domainname = */"insert-domainname-here"
+	/* .sysname    = */ "KOS",
+	/* .nodename   = */ "insert-hostname-here",
+	/* .release    = */ "KOS Mk" PP_STR(KOS_VERSION_MAJOR) " - " KOS_VERSION_NAME,
+	/* .version    = */ PP_STR(KOS_VERSION_MAJOR) "."
+	                    PP_STR(KOS_VERSION_MINOR) "."
+	                    PP_STR(KOS_VERSION_PATCH),
+	/* .machine    = */ MACHINE_NAME,
+	/* .domainname = */ "insert-domainname-here"
 };
 
 #ifdef __NR_oldolduname

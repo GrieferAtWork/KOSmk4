@@ -84,10 +84,10 @@ vm_alloc(void) THROWS(E_BADALLOC) {
 #ifdef HIGH_MEMORY_KERNEL
 	result->v_kernreserve.vn_node.a_vmin = (vm_vpage_t)KERNEL_BASE_PAGE;
 	result->v_kernreserve.vn_node.a_vmax = (vm_vpage_t)VM_VPAGE_MAX;
-#else
+#else /* HIGH_MEMORY_KERNEL */
 	result->v_kernreserve.vn_node.a_vmin = (vm_vpage_t)0;
 	result->v_kernreserve.vn_node.a_vmax = (vm_vpage_t)KERNEL_MAX_PAGE;
-#endif
+#endif /* !HIGH_MEMORY_KERNEL */
 	result->v_kernreserve.vn_byaddr.ln_pself = &result->v_byaddr;
 	result->v_kernreserve.vn_byaddr.ln_next  = NULL;
 	result->v_kernreserve.vn_prot = (VM_PROT_NONE | VM_PROT_PRIVATE

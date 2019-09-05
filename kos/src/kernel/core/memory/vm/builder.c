@@ -83,10 +83,10 @@ NOTHROW(KCALL vmb_fini)(struct vmb *__restrict self) {
 	}
 #ifndef NDEBUG
 	memset(self, 0xcc, sizeof(*self));
-#endif
+#endif /* !NDEBUG */
 }
 
-#define vm_datapart_numvpages_atomic(self) \
+#define vm_datapart_numvpages_atomic(self)                                           \
 	((size_t)((ATOMIC_READ((self)->dp_tree.a_vmax) - (self)->dp_tree.a_vmin) + 1) >> \
 	 VM_DATABLOCK_PAGESHIFT(data))
 
@@ -578,9 +578,9 @@ again_lock_parts:
 					        "node = %p\n",
 					        n, node);
 				}
-#else
+#else /* !NDEBUG */
 				vm_nodetree_remove(&self->v_tree, node->vn_node.a_vmin);
-#endif
+#endif /* NDEBUG */
 				/* Update the already mapped node. */
 				node->vn_node.a_vmax -= num_missing_vpages;
 				{
@@ -618,9 +618,9 @@ again_lock_parts:
 							        "node = %p\n",
 							        n, node);
 						}
-#else
+#else /* !NDEBUG */
 						vm_nodetree_remove(&self->v_tree, node->vn_node.a_vmin);
-#endif
+#endif /* NDEBUG */
 						node->vn_node.a_vmax += num_missing_vpages;
 						node->vn_guard = node_guard;
 						node->vn_flags |= node_flags;
@@ -838,9 +838,9 @@ handle_remove_write_error:
 #ifndef NDEBUG
 #ifdef HIGH_MEMORY_KERNEL
 		node = vm_nodetree_remove(&target->v_tree, (vm_vpage_t)KERNEL_BASE_PAGE);
-#else
+#else /* HIGH_MEMORY_KERNEL */
 		node = vm_nodetree_remove(&target->v_tree, (vm_vpage_t)0);
-#endif
+#endif /* !HIGH_MEMORY_KERNEL */
 		assertf(node == &target->v_kernreserve,
 		        "node                   = %p\n"
 		        "&target->v_kernreserve = %p\n",
@@ -848,9 +848,9 @@ handle_remove_write_error:
 #else /* !NDEBUG */
 #ifdef HIGH_MEMORY_KERNEL
 		vm_nodetree_remove(&target->v_tree, (vm_vpage_t)KERNEL_BASE_PAGE);
-#else
+#else /* HIGH_MEMORY_KERNEL */
 		vm_nodetree_remove(&target->v_tree, (vm_vpage_t)0);
-#endif
+#endif /* !HIGH_MEMORY_KERNEL */
 #endif /* NDEBUG */
 		LLIST_REMOVE(&target->v_kernreserve, vn_byaddr);
 
@@ -933,7 +933,7 @@ handle_remove_write_error:
 #ifndef NDEBUG
 	/* Undefined state... */
 	memset(self, 0xcc, sizeof(*self));
-#endif
+#endif /* !NDEBUG */
 }
 
 

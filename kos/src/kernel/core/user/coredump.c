@@ -25,11 +25,12 @@
 #include <kernel/debugtrap.h>
 #include <kernel/except.h>
 #include <kernel/printk.h>
-#include <signal.h>
+
 #include <assert.h>
+#include <format-printer.h>
+#include <signal.h>
 #include <stddef.h>
 #include <string.h>
-#include <format-printer.h>
 
 DECL_BEGIN
 

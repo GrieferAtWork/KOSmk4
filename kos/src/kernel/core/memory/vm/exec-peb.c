@@ -34,11 +34,12 @@
 
 #include <kos/process.h>
 
+#include <assert.h>
 #include <stddef.h>
 #include <string.h>
 
-#define HINT_ADDR(x,y) x
-#define HINT_MODE(x,y) y
+#define HINT_ADDR(x, y) x
+#define HINT_MODE(x, y) y
 #define HINT_GETADDR(x) HINT_ADDR x
 #define HINT_GETMODE(x) HINT_MODE x
 
@@ -261,7 +262,7 @@ string_size_changed:
 #ifndef NDEBUG
 	memset(&stolen_node->vn_vm, 0xcc, sizeof(stolen_node->vn_vm));
 	memset(&stolen_node->vn_link, 0xcc, sizeof(stolen_node->vn_link));
-#endif
+#endif /* !NDEBUG */
 
 	/* Update the mapping location of the PEB memory node */
 	stolen_node->vn_node.a_vmin = result;

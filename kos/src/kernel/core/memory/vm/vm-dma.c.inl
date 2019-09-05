@@ -181,9 +181,9 @@ again:
 #ifdef DMA_NX
 	if unlikely(!sync_read_nx(effective_vm))
 		return 0;
-#else
+#else /* DMA_NX */
 	sync_read(effective_vm);
-#endif
+#endif /* !DMA_NX */
 	AIO_BUFFER_FOREACH(ent, buf)
 #else /* DMA_VECTOR */
 #ifndef DMA_ENUM
@@ -196,9 +196,9 @@ again:
 #ifdef DMA_NX
 	if unlikely(!sync_read_nx(effective_vm))
 		return 0;
-#else
+#else /* DMA_NX */
 	sync_read(effective_vm);
-#endif
+#endif /* !DMA_NX */
 #endif /* !DMA_VECTOR */
 	if likely(num_bytes) {
 		vm_nodetree_minmax_t minmax;
@@ -247,14 +247,14 @@ wait_for_part_and_try_again:
 					decref(part);
 					return 0;
 				}
-#else
+#else /* DMA_NX */
 				TRY {
 					sync_read(part);
 				} EXCEPT {
 					decref(part);
 					RETHROW();
 				}
-#endif
+#endif /* !DMA_NX */
 				sync_endread(part);
 				decref(part);
 				goto again_reset;
@@ -280,14 +280,14 @@ loadcore_part_and_try_again:
 					decref(part);
 					return 0;
 				}
-#else
+#else /* DMA_NX */
 				TRY {
 					vm_datapart_lockread_setcore(part);
 				} EXCEPT {
 					decref(part);
 					RETHROW();
 				}
-#endif
+#endif /* !DMA_NX */
 				sync_endread(part);
 				decref(part);
 				goto again_reset;
@@ -318,7 +318,7 @@ split_part_and_try_again:
 						decref(part);
 					}
 					goto again_reset;
-#else
+#else /* DMA_NX */
 					TRY {
 						xdecref(vm_datapart_split(part, vpage_offset));
 					} EXCEPT {
@@ -327,7 +327,7 @@ split_part_and_try_again:
 					}
 					decref(part);
 					goto again_reset;
-#endif
+#endif /* !DMA_NX */
 				}
 				if (maxpage < minmax.mm_max_max) {
 					vpage_offset = (size_t)(maxpage - minmax.mm_min_min) + 1;
@@ -347,14 +347,14 @@ unshare_copy_on_write_for_part:
 					vm_datapart_decref_and_merge(part);
 					return 0;
 				}
-#else
+#else /* DMA_NX */
 				TRY {
 					vm_datapart_lockread_setcore_unsharecow(part);
 				} EXCEPT {
 					vm_datapart_decref_and_merge(part);
 					RETHROW();
 				}
-#endif
+#endif /* !DMA_NX */
 				sync_endread(part);
 				decref(part);
 				goto again_reset;

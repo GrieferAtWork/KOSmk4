@@ -35,10 +35,10 @@ DECL_BEGIN
 #ifdef IO_READ
 #define FUNC_RW(x)     vm_datablock_read##x
 #define FUNC_VIO_RW(x) vm_datablock_vio_read##x
-#else
+#else /* IO_READ */
 #define FUNC_RW(x)     vm_datablock_write##x
 #define FUNC_VIO_RW(x) vm_datablock_vio_write##x
-#endif
+#endif /* !IO_READ */
 
 
 #ifdef IO_READ
@@ -84,7 +84,7 @@ DECL_BEGIN
 #else
 #define DO_VIO_ACCESS  vm_datablock_vio_read
 #endif
-#else
+#else /* IO_READ */
 #if defined(IO_PHYS) && defined(IO_VECTOR)
 #define DO_VIO_ACCESS  vm_datablock_vio_writev_phys
 #elif defined(IO_VECTOR)
@@ -94,7 +94,7 @@ DECL_BEGIN
 #else
 #define DO_VIO_ACCESS  vm_datablock_vio_write
 #endif
-#endif
+#endif /* !IO_READ */
 #endif /* !CONFIG_NO_VIO */
 
 
@@ -102,29 +102,29 @@ DECL_BEGIN
 PUBLIC
 #ifdef IO_VECTOR
 	NONNULL((1, 2))
-#else
+#else /* IO_VECTOR */
 	NONNULL((1))
-#endif
+#endif /* !IO_VECTOR */
 void
 #if defined(IO_VECTOR) && defined(IO_PHYS)
-(KCALL FUNC_RW(vp))
+KCALL FUNC_RW(vp)
 #elif defined(IO_VECTOR)
-(KCALL FUNC_RW(v))
+KCALL FUNC_RW(v)
 #elif defined(IO_PHYS)
-(KCALL FUNC_RW(p))
+KCALL FUNC_RW(p)
 #elif defined(IO_UNSAFE)
 /* Same as the `vm_datablock_(read|write)', however make the assumption that the
  * memory backing is `safe' (i.e. access could never cause a #PF attempting to
  * acquire a lock to `self' when doing so is impossible) */
-(KCALL FUNC_RW(_unsafe))
+KCALL FUNC_RW(_unsafe)
 #elif defined(IO_BUFFERED)
 /* Perform I/O using an intermediate buffer, thus solving the deadlock
  * scenario possible when using `vm_datablock_(read|write)_unsafe' */
-(KCALL FUNC_RW(_buffered))
+KCALL FUNC_RW(_buffered)
 #elif defined(IO_READ)
-(KCALL vm_datablock_read)
+KCALL vm_datablock_read
 #else
-(KCALL vm_datablock_write)
+KCALL vm_datablock_write
 #endif
                           (struct vm_datablock *__restrict self,
 #if defined(IO_VECTOR) && defined(IO_PHYS)
@@ -146,18 +146,18 @@ void
                            vm_daddr_t src_offset)
 #ifdef IO_PHYS
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...)
-#else
+#else /* IO_PHYS */
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...)
-#endif
+#endif /* !IO_PHYS */
 {
 	REF struct vm_datapart *part;
 #ifdef IO_VECTOR
 #ifdef IO_PHYS
 	struct aio_pbuffer view,view2;
-#else
+#else /* IO_PHYS */
 	struct aio_buffer view,view2;
-#endif
-#endif
+#endif /* !IO_PHYS */
+#endif /* IO_VECTOR */
 #ifndef CONFIG_NO_VIO
 	if (self->db_vio) {
 		/* Perform I/O through VIO functionality. */
@@ -165,7 +165,7 @@ void
 		              buf,
 #ifndef IO_VECTOR
 		              num_bytes,
-#endif
+#endif /* !IO_VECTOR */
 		              src_offset);
 		return;
 	}
@@ -173,7 +173,7 @@ void
 	for (;;) {
 		size_t temp;
 		part = vm_datablock_locatepart(self,
-		                               (vm_vpage_t)(src_offset >> VM_DATABLOCK_ADDRSHIFT(self)),
+		                               (vm_vpage64_t)(src_offset >> VM_DATABLOCK_ADDRSHIFT(self)),
 		                               CEILDIV(num_bytes + (src_offset & (VM_DATABLOCK_PAGESIZE(self) - 1)),
 		                                       PAGESIZE));
 		TRY {
@@ -181,13 +181,12 @@ void
 			                  buf,
 #ifndef IO_VECTOR
 			                  num_bytes,
-#endif
+#endif /* !IO_VECTOR */
 #ifdef IO_WRITE
 			                  num_bytes,
-#endif
+#endif /* !IO_WRITE */
 			                  src_offset - vm_datapart_startbyte(part));
-		}
-		EXCEPT {
+		} EXCEPT {
 			decref(part);
 			RETHROW();
 		}
@@ -229,20 +228,20 @@ void
 PUBLIC
 #ifdef IO_VECTOR
 	NONNULL((1, 2))
-#else
+#else /* IO_VECTOR */
 	NONNULL((1))
-#endif
+#endif /* !IO_VECTOR */
 	void
 #if defined(IO_VECTOR) && defined(IO_PHYS)
-(KCALL FUNC_VIO_RW(v_phys))
+KCALL FUNC_VIO_RW(v_phys)
 #elif defined(IO_VECTOR)
-(KCALL FUNC_VIO_RW(v))
+KCALL FUNC_VIO_RW(v)
 #elif defined(IO_PHYS)
-(KCALL FUNC_VIO_RW(_phys))
+KCALL FUNC_VIO_RW(_phys)
 #elif defined(IO_READ)
-(KCALL vm_datablock_vio_read)
+KCALL vm_datablock_vio_read
 #else
-(KCALL vm_datablock_vio_write)
+KCALL vm_datablock_vio_write
 #endif
                               (struct vm_datablock *__restrict self,
 #if defined(IO_VECTOR) && defined(IO_PHYS)
@@ -262,9 +261,9 @@ PUBLIC
                                vm_daddr_t src_offset)
 #ifdef IO_PHYS
        THROWS(...)
-#else
+#else /* IO_PHYS */
        THROWS(E_SEGFAULT,...)
-#endif
+#endif /* !IO_PHYS */
 {
 #if defined(IO_PHYS) && defined(IO_VECTOR)
 	struct aio_pbuffer_entry ent;
@@ -280,9 +279,9 @@ PUBLIC
 	AIO_BUFFER_FOREACH(ent,buf) {
 #ifdef IO_READ
 		vm_datablock_vio_read
-#else
+#else /* IO_READ */
 		vm_datablock_vio_write
-#endif
+#endif /* !IO_READ */
 		                      (self,
 		                       ent.ab_base,
 		                       ent.ab_size,
@@ -311,7 +310,7 @@ PUBLIC
 				pagedir_mapone(tramp, pageaddr,
 				               PAGEDIR_MAP_FWRITE);
 			}
-#else
+#else /* IO_READ */
 			if (is_first) {
 				backup = pagedir_push_mapone(tramp, pageaddr,
 				                             PAGEDIR_MAP_FREAD);
@@ -319,14 +318,14 @@ PUBLIC
 				pagedir_mapone(tramp, pageaddr,
 				               PAGEDIR_MAP_FREAD);
 			}
-#endif
+#endif /* !IO_READ */
 			pagedir_syncone(tramp);
 			/* Perform VIO memory access. */
 #ifdef IO_READ
 			vm_datablock_vio_read
-#else
+#else /* IO_READ */
 			vm_datablock_vio_write
-#endif
+#endif /* !IO_READ */
 			                      (self,
 			                       (byte_t *)VM_PAGE2ADDR(tramp) + (ptrdiff_t)(buf & (PAGESIZE - 1)),
 			                       page_bytes,
@@ -355,25 +354,25 @@ PUBLIC
 #ifdef CONFIG_VIO_HAS_QWORD
 #define VIO_LARGEBLOCK_SIZE 8
 #define VIO_LARGEBLOCK_TYPE u64
-#else
+#else /* CONFIG_VIO_HAS_QWORD */
 #define VIO_LARGEBLOCK_SIZE 4
 #define VIO_LARGEBLOCK_TYPE u32
-#endif
+#endif /* !CONFIG_VIO_HAS_QWORD */
 
 #ifdef IO_READ
 #define DO_VIO(T, w, n) UNALIGNED_SET##n((T *)buf, vio_read##w(&args, src_offset))
-#else
+#else /* IO_READ */
 #define DO_VIO(T, w, n) vio_write##w(&args, src_offset, UNALIGNED_GET##n((T *)buf))
-#endif
+#endif /* !IO_READ */
 	for (; num_bytes >= VIO_LARGEBLOCK_SIZE;
 	     src_offset += VIO_LARGEBLOCK_SIZE,
 	     num_bytes -= VIO_LARGEBLOCK_SIZE,
 	     buf = (byte_t *)buf + VIO_LARGEBLOCK_SIZE) {
 #ifdef CONFIG_VIO_HAS_QWORD
 		DO_VIO(u64, q, 64);
-#else
+#else /* CONFIG_VIO_HAS_QWORD */
 		DO_VIO(u32, l, 32);
-#endif
+#endif /* !CONFIG_VIO_HAS_QWORD */
 	}
 	/* Access unaligned memory. */
 #ifdef CONFIG_VIO_HAS_QWORD
@@ -382,7 +381,7 @@ PUBLIC
 		buf = (byte_t *)buf + 4;
 		src_offset += 4;
 	}
-#endif
+#endif /* CONFIG_VIO_HAS_QWORD */
 	if (num_bytes & 2) {
 		DO_VIO(u32, w, 16);
 		buf = (byte_t *)buf + 2;
@@ -392,9 +391,9 @@ PUBLIC
 	if (num_bytes & 1) {
 #ifdef IO_READ
 		*(u8 *)buf = vio_readb(&args, src_offset);
-#else
+#else /* IO_READ */
 		vio_writeb(&args, src_offset, *(u8 *)buf);
-#endif
+#endif /* !IO_READ */
 	}
 #undef VIO_LARGEBLOCK_TYPE
 #undef VIO_LARGEBLOCK_SIZE

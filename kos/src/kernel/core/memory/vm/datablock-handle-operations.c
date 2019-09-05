@@ -1196,9 +1196,9 @@ again:
 	return result;
 }
 
-INTERN void
-(KCALL handle_datablock_stat)(struct vm_datablock *__restrict self,
-                              USER CHECKED struct stat *result) {
+INTERN void KCALL
+handle_datablock_stat(struct vm_datablock *__restrict self,
+                      USER CHECKED struct stat *result) {
 	if (!vm_datablock_isinode(self)) {
 		/* INode stat! */
 		inode_stat((struct inode *)self, result);

@@ -24,14 +24,14 @@
 #include <kernel/types.h>
 #include <kernel/uname.h>
 
-#define KERNEL_VERSION(maj,min,pat) ((maj) << 20 | (min) << 10 | (pat))
+#define KERNEL_VERSION(maj, min, pat) ((maj) << 20 | (min) << 10 | (pat))
 
 /* Expanded kernel version numbers. */
 #define KOS_VERSION_MAJOR 4 /* KOS Mk4 */
 #define KOS_VERSION_MINOR 0
 #define KOS_VERSION_PATCH 0
 
-#define KOS_VERSION_CODE  KERNEL_VERSION(KOS_VERSION_MAJOR,KOS_VERSION_MINOR,KOS_VERSION_PATCH)
+#define KOS_VERSION_CODE  KERNEL_VERSION(KOS_VERSION_MAJOR, KOS_VERSION_MINOR, KOS_VERSION_PATCH)
 #define KOS_VERSION_NAME  "yakal"
 
 #ifdef __CC__

@@ -49,7 +49,7 @@ NOTHROW(KCALL zone_malloc_between)(struct pmemzone *__restrict self,
                                    pagecnt_t num_pages,
                                    bool out_of_bounds_is_ok)
 #endif
-#else
+#else /* ALLOC_BETWEEN */
 #ifdef ALLOC_SINGLE
 PRIVATE NOBLOCK WUNUSED NONNULL((1)) pageptr_t
 NOTHROW(KCALL zone_mallocone_before)(struct pmemzone *__restrict self,
@@ -67,22 +67,22 @@ NOTHROW(KCALL zone_malloc_before)(struct pmemzone *__restrict self,
                                   pageptr_t zone_relative_max,
                                   pagecnt_t num_pages)
 #endif
-#endif
+#endif /* !ALLOC_BETWEEN */
 {
 	uintptr_t word;
 	size_t i;
 #ifdef ALLOC_BETWEEN
 	size_t min_i;
-#endif
+#endif /* ALLOC_BETWEEN */
 	unsigned int missalignment;
 	pageptr_t result;
 #ifdef ALLOC_BETWEEN
 	assert(zone_relative_max >= zone_relative_min);
-#endif
+#endif /* ALLOC_BETWEEN */
 	assert(zone_relative_max <= self->mz_rmax);
 #ifdef ALLOC_BETWEEN
 	min_i = (size_t)(zone_relative_min / PAGES_PER_WORD);
-#endif
+#endif /* ALLOC_BETWEEN */
 	i             = (size_t)(zone_relative_max / PAGES_PER_WORD);
 	missalignment = (unsigned int)(zone_relative_max % PAGES_PER_WORD);
 #ifdef ALLOC_MINMAX
@@ -105,7 +105,7 @@ again_word_i:
 #ifdef ALLOC_BETWEEN
 					if unlikely(result < zone_relative_min && !out_of_bounds_is_ok)
 						goto nope;
-#endif
+#endif /* ALLOC_BETWEEN */
 #ifdef ALLOC_MINMAX
 					if likely(max_pages)
 #elif !defined(ALLOC_SINGLE)
@@ -120,7 +120,7 @@ again_word_i:
 					}
 #ifdef ALLOC_MINMAX
 					*res_pages = 1;
-#endif
+#endif /* ALLOC_MINMAX */
 					return result;
 				}
 				if (page_mask <= PMEMZONE_ISFREEMASK)
@@ -130,10 +130,10 @@ again_word_i:
 #ifdef ALLOC_BETWEEN
 			if unlikely(i <= min_i)
 				goto nope;
-#else
+#else /* ALLOC_BETWEEN */
 			if unlikely(!i)
 				goto nope;
-#endif
+#endif /* !ALLOC_BETWEEN */
 			--i;
 			missalignment = PAGES_PER_WORD - 1;
 		}
@@ -159,9 +159,9 @@ again_word_i_trans:
 					++new_alloc_count;
 #ifdef ALLOC_MINMAX
 					if (new_alloc_count >= max_pages)
-#else
+#else /* ALLOC_MINMAX */
 					if (new_alloc_count >= num_pages)
-#endif
+#endif /* !ALLOC_MINMAX */
 					{
 						/* Got it! (allocate the remainder!) */
 						assert(alloc_mask);
@@ -172,10 +172,10 @@ again_word_i_trans:
 								zone_free_keepz(self, (pageptr_t)((i + 1) * PAGES_PER_WORD), alloc_count);
 							goto nope;
 						}
-#endif
+#endif /* ALLOC_BETWEEN */
 #ifdef ALLOC_MINMAX
 min_max_allocate_current_alloc_mask:
-#endif
+#endif /* ALLOC_MINMAX */
 						if (!ATOMIC_CMPXCH_WEAK(self->mz_free[i], word, word & ~alloc_mask))
 							goto again_word_i_trans;
 						ATOMIC_FETCHSUB(self->mz_cfree, new_alloc_count - alloc_count);
@@ -184,7 +184,7 @@ min_max_allocate_current_alloc_mask:
 							ATOMIC_FETCHSUB(self->mz_zfree, zcount);
 #ifdef ALLOC_MINMAX
 						*res_pages = new_alloc_count;
-#endif
+#endif /* ALLOC_MINMAX */
 						return result;
 					}
 				} else {
@@ -194,7 +194,7 @@ min_max_allocate_current_alloc_mask:
 						result += alloc_mask ? (CTZ(alloc_mask) / PMEMZONE_BITSPERPAGE) : PAGES_PER_WORD;
 #ifdef ALLOC_BETWEEN
 						if unlikely(out_of_bounds_is_ok || result >= zone_relative_min)
-#endif
+#endif /* ALLOC_BETWEEN */
 						{
 #if 1
 							goto min_max_allocate_current_alloc_mask;
@@ -240,16 +240,16 @@ min_max_allocate_current_alloc_mask:
 			alloc_count = new_alloc_count;
 #ifdef ALLOC_BETWEEN
 			if unlikely(i <= min_i)
-#else
+#else /* ALLOC_BETWEEN */
 			if unlikely(!i)
-#endif
+#endif /* !ALLOC_BETWEEN */
 			{
 #ifdef ALLOC_MINMAX
 #ifdef ALLOC_BETWEEN
 				if (alloc_count >= min_pages && out_of_bounds_is_ok)
-#else
+#else /* ALLOC_BETWEEN */
 				if (alloc_count >= min_pages)
-#endif
+#endif /* !ALLOC_BETWEEN */
 				{
 					*res_pages = alloc_count;
 					return (pageptr_t)(i * PAGES_PER_WORD);

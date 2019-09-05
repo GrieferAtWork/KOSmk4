@@ -50,9 +50,9 @@
 #include <hybrid/minmax.h>
 #include <hybrid/overflow.h>
 
+#include <assert.h>
 #include <format-printer.h>
 #include <stdint.h>
-#include <assert.h>
 #include <string.h>
 
 #include <libinstrlen/instrlen.h>
@@ -165,26 +165,26 @@ DECL_BEGIN
 
 #ifndef CONFIG_MALL_HEAD_PATTERN
 #define CONFIG_MALL_HEAD_PATTERN   0x33333333
-#endif
+#endif /* !CONFIG_MALL_HEAD_PATTERN */
 #ifndef CONFIG_MALL_TAIL_PATTERN
 #define CONFIG_MALL_TAIL_PATTERN   0x77777777
-#endif
+#endif /* !CONFIG_MALL_TAIL_PATTERN */
 #ifndef CONFIG_MALL_PREFIX_SIZE
 #define CONFIG_MALL_PREFIX_SIZE   (__SIZEOF_SIZE_T__)
-#endif
+#endif /* !CONFIG_MALL_PREFIX_SIZE */
 #ifndef CONFIG_MALL_HEAD_SIZE
-#define CONFIG_MALL_HEAD_SIZE     (HEAP_ALIGNMENT-__SIZEOF_SIZE_T__)
-#endif
+#define CONFIG_MALL_HEAD_SIZE     (HEAP_ALIGNMENT - __SIZEOF_SIZE_T__)
+#endif /* !CONFIG_MALL_HEAD_SIZE */
 #ifndef CONFIG_MALL_TAIL_SIZE
 #define CONFIG_MALL_TAIL_SIZE      HEAP_ALIGNMENT
-#endif
+#endif /* !CONFIG_MALL_TAIL_SIZE */
 
 /* The minimum amount of traceback entries that MALL
  * should attempt to include in debug information of
  * allocated pointers. */
 #ifndef CONFIG_MALL_TRACEMIN
 #define CONFIG_MALL_TRACEMIN       4
-#endif
+#endif /* !CONFIG_MALL_TRACEMIN */
 
 #define HINT_ADDR(x,y) x
 #define HINT_MODE(x,y) y
@@ -235,7 +235,7 @@ struct mallnode {
 	                                                   * interactions such as reading its size.
 	                                                   * Note that this only applies to nodes with the `MALLNODE_FUSERNODE' flag set! */
 #if 1
-	u32                                   pad;        /* ... */
+	u32                                   m_pad;      /* ... */
 #else
 	upid_t                                m_tracepid; /* Traceback process id (in the root namespace). */
 #endif
@@ -310,7 +310,7 @@ NOTHROW(KCALL mall_pending_untrace_overflow)(void *__restrict ptr, size_t num_by
 
 
 #define mall_add_pending_untrace(ptr) \
-        mall_add_pending_untrace_n(ptr,0)
+	mall_add_pending_untrace_n(ptr, 0)
 PRIVATE NOBLOCK void
 NOTHROW(KCALL mall_add_pending_untrace_n)(void *ptr, size_t num_bytes) {
 	/* Keep track of pending untrace operations
@@ -362,7 +362,7 @@ struct pending_malloc_free {
 PRIVATE WEAK ATTR_MALL_UNTRACKED size_t mall_inconsistent_head_exist = 0;
 PRIVATE WEAK ATTR_MALL_UNTRACKED struct pending_malloc_free *mall_pending_mallocfree = NULL;
 
-#define MALL_HAS_PENDING_COMMANDS() \
+#define MALL_HAS_PENDING_COMMANDS()                  \
 	(ATOMIC_READ(mall_pending_newnodes) != NULL ||   \
 	 ATOMIC_READ(mall_pending_mallocfree) != NULL || \
 	 ATOMIC_READ(mall_pending_untrace_count) != 0)
@@ -561,12 +561,12 @@ NOTHROW(KCALL mall_serve_pending_commands)(gfp_t flags) {
 			memsetl((byte_t *)pend + CONFIG_MALL_PREFIX_SIZE,
 			        CONFIG_MALL_HEAD_PATTERN,
 			        CONFIG_MALL_HEAD_SIZE / 4);
-#else
+#else /* (CONFIG_MALL_HEAD_SIZE & 3) == 0 */
 			mempatl((byte_t *)pend + CONFIG_MALL_PREFIX_SIZE,
 			        CONFIG_MALL_HEAD_PATTERN,
 			        CONFIG_MALL_HEAD_SIZE);
-#endif
-#endif
+#endif /* (CONFIG_MALL_HEAD_SIZE & 3) != 0 */
+#endif /* CONFIG_MALL_HEAD_SIZE != 0 */
 #define REMAIN_RESET ((__SIZEOF_POINTER__ + __SIZEOF_GFP_T__) - (PREFIX_OVERFLOW + CONFIG_MALL_HEAD_SIZE))
 			{
 				size_t block_size;
@@ -577,6 +577,7 @@ NOTHROW(KCALL mall_serve_pending_commands)(gfp_t flags) {
 					        CONFIG_MALL_TAIL_PATTERN, REMAIN_RESET - block_size);
 				}
 			}
+#undef REMAIN_RESET
 #endif /* Header + block + (optionally) tail */
 #undef PREFIX_OVERFLOW
 			ATOMIC_FETCHDEC(mall_inconsistent_head_exist);
@@ -750,7 +751,7 @@ NOTHROW(KCALL kffree)(VIRT void *ptr, gfp_t flags) {
 		slab_ffree(ptr, flags);
 		return;
 	}
-#endif
+#endif /* CONFIG_USE_SLAB_ALLOCATORS */
 	if (!mall_acquire_atomic()) {
 		/* Use a pending chain to ensure that kfree() is atomic for all cases. */
 		mall_add_pending_free(ptr, flags);
@@ -768,7 +769,7 @@ NOTHROW(KCALL kfree)(VIRT void *ptr) {
 		slab_free(ptr);
 		return;
 	}
-#endif
+#endif /* CONFIG_USE_SLAB_ALLOCATORS */
 	if (!mall_acquire_atomic()) {
 		/* Use a pending chain to ensure that kfree() is atomic for all cases. */
 		mall_add_pending_free(ptr, GFP_NORMAL);
@@ -796,7 +797,7 @@ NOTHROW(KCALL mall_reachable_pointer)(void *ptr) {
 #ifdef X86_PAGING_ISNONCANON
 	if (X86_PAGING_ISNONCANON((uintptr_t)ptr))
 		return 0;
-#endif
+#endif /* X86_PAGING_ISNONCANON */
 	if (((uintptr_t)ptr & (sizeof(void *) - 1)) != 0)
 		return 0; /* Unaligned pointer -> not a heap pointer */
 #ifdef HIGH_MEMORY_KERNEL
@@ -812,10 +813,10 @@ NOTHROW(KCALL mall_reachable_pointer)(void *ptr) {
 		return 0; /* Optimization: No mans land */
 	if ((uintptr_t)ptr == DEBUGHEAP_FRESH_MEMORY)
 		return 0; /* Optimization: Fresh memory. */
-#endif            /* CONFIG_DEBUG_HEAP */
+#endif /* CONFIG_DEBUG_HEAP */
 	if ((uintptr_t)ptr == 0xcccccccc)
 		return 0; /* Optimization: Stack pre-initialization. */
-#endif
+#endif /* __SIZEOF_POINTER__ == 4 */
 	node = mallnode_tree_locate(mall_tree, (uintptr_t)ptr);
 	if (!node)
 		return 0;
@@ -1603,7 +1604,7 @@ NOTHROW(KCALL kmalloc_usable_size)(VIRT void *ptr) {
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
 	if (KERNEL_SLAB_CHECKPTR(ptr))
 		return SLAB_GET(ptr)->s_size;
-#endif
+#endif /* CONFIG_USE_SLAB_ALLOCATORS */
 	if unlikely(!sync_tryread(&mall_lock)) {
 		/* We can't validate the pointer, so all we can do is return its saved size field. */
 		return *(size_t *)((byte_t *)ptr - (CONFIG_MALL_PREFIX_SIZE + CONFIG_MALL_HEAD_SIZE));

@@ -25,6 +25,7 @@
 #include <kernel/types.h>
 #include <kernel/vio.h>
 
+#include <assert.h>
 #include <hybrid/unaligned.h>
 
 DECL_BEGIN
@@ -38,6 +39,7 @@ vio_illegal_read(struct vio_args *__restrict args, vm_daddr_t addr) {
 	THROW(E_SEGFAULT_NOTREADABLE, (uintptr_t)addr,
 	      E_SEGFAULT_CONTEXT_FAULT);
 }
+
 PRIVATE ATTR_NORETURN void KCALL
 vio_illegal_write(struct vio_args *__restrict args, vm_daddr_t addr) {
 	addr -= (vm_daddr_t)args->va_access_partoff;
@@ -45,6 +47,7 @@ vio_illegal_write(struct vio_args *__restrict args, vm_daddr_t addr) {
 	THROW(E_SEGFAULT_READONLY, (uintptr_t)addr,
 	      E_SEGFAULT_CONTEXT_FAULT | E_SEGFAULT_CONTEXT_WRITING);
 }
+
 PRIVATE ATTR_NORETURN void KCALL
 vio_nonatomic_operation(struct vio_args *__restrict args, vm_daddr_t addr, size_t size) {
 	addr -= (vm_daddr_t)args->va_access_partoff;
@@ -315,7 +318,7 @@ PUBLIC NONNULL((1)) u16 KCALL vio_readw(struct vio_args *__restrict args, vm_dad
 		if (type->dtv_xor.f_qword) { qword x = { (*type->dtv_xor.f_qword)(args, AQ, 0, true) }; return W7; }
 	}
 #endif /* CONFIG_VIO_HAS_QWORD */
-#define READ_2X_READB(func, ...) \
+#define READ_2X_READB(func, ...)                                      \
 	if (type->func.f_byte) {                                          \
 		word x;                                                       \
 		x.b[0] = (*type->func.f_byte)(args, addr, ##__VA_ARGS__);     \
@@ -330,7 +333,7 @@ PUBLIC NONNULL((1)) u16 KCALL vio_readw(struct vio_args *__restrict args, vm_dad
 	READ_2X_READB(dtv_or, 0, true)
 	READ_2X_READB(dtv_xor, 0, true)
 #undef READ_2X_READB
-#define READ_2X_READW(func, ...) \
+#define READ_2X_READW(func, ...)                                      \
 	if (type->func.f_word) {                                          \
 		dword x;                                                      \
 		x.w[0] = (*type->func.f_word)(args, addr - 1, ##__VA_ARGS__); \
@@ -348,7 +351,7 @@ PUBLIC NONNULL((1)) u16 KCALL vio_readw(struct vio_args *__restrict args, vm_dad
 	}
 #undef READ_2X_READW
 	if (((uintptr_t)addr & 3) == 3) {
-#define READ_2X_READL(func, ...) \
+#define READ_2X_READL(func, ...)                                           \
 		if (type->func.f_dword) {                                          \
 			qword x;                                                       \
 			x.l[0] = (*type->func.f_dword)(args, addr - 3, ##__VA_ARGS__); \
@@ -366,7 +369,7 @@ PUBLIC NONNULL((1)) u16 KCALL vio_readw(struct vio_args *__restrict args, vm_dad
 #undef READ_2X_READL
 #ifdef CONFIG_VIO_HAS_QWORD
 	if (((uintptr_t)addr & 7) == 7) {
-#define READ_2X_READQ(func, ...) \
+#define READ_2X_READQ(func, ...)                                           \
 		if (type->func.f_qword) {                                          \
 			xword x;                                                       \
 			x.q[0] = (*type->func.f_qword)(args, addr - 3, ##__VA_ARGS__); \
@@ -408,7 +411,7 @@ PUBLIC NONNULL((1)) u32 KCALL vio_readl(struct vio_args *__restrict args, vm_dad
 		if (type->dtv_xor.f_qword) { qword x = { (*type->dtv_xor.f_qword)(args, AQ, 0, true) }; return L7; }
 	}
 #endif /* CONFIG_VIO_HAS_QWORD */
-#define READ_2X_READW(func, ...) \
+#define READ_2X_READW(func, ...)                                    \
 	if (type->func.f_word) {                                        \
 		dword x;                                                    \
 		x.w[0] = (*type->func.f_word)(args, AW, ##__VA_ARGS__);     \
@@ -425,7 +428,7 @@ PUBLIC NONNULL((1)) u32 KCALL vio_readl(struct vio_args *__restrict args, vm_dad
 		READ_2X_READW(dtv_xor, 0, true)
 	}
 #undef READ_2X_READW
-#define READ_2X_READL(func, ...) \
+#define READ_2X_READL(func, ...)                                     \
 	if (type->func.f_dword) {                                        \
 		qword x;                                                     \
 		x.l[0] = (*type->func.f_dword)(args, AL, ##__VA_ARGS__);     \
@@ -441,7 +444,7 @@ PUBLIC NONNULL((1)) u32 KCALL vio_readl(struct vio_args *__restrict args, vm_dad
 	READ_2X_READL(dtv_xor, 0, true)
 #undef READ_2X_READL
 #ifdef CONFIG_VIO_HAS_QWORD
-#define READ_2X_READQ(func, ...) \
+#define READ_2X_READQ(func, ...)                                     \
 	if (type->func.f_qword) {                                        \
 		xword x;                                                     \
 		x.q[0] = (*type->func.f_qword)(args, AQ, ##__VA_ARGS__);     \
@@ -457,7 +460,7 @@ PUBLIC NONNULL((1)) u32 KCALL vio_readl(struct vio_args *__restrict args, vm_dad
 	READ_2X_READQ(dtv_xor, 0, true)
 #undef READ_2X_READQ
 #endif /* CONFIG_VIO_HAS_QWORD */
-#define READ_3X_READW(func, ...) \
+#define READ_3X_READW(func, ...)                                      \
 	if (type->func.f_word) {                                          \
 		qword x;                                                      \
 		x.w[0] = (*type->func.f_word)(args, addr - 1, ##__VA_ARGS__); \
@@ -473,7 +476,7 @@ PUBLIC NONNULL((1)) u32 KCALL vio_readl(struct vio_args *__restrict args, vm_dad
 	READ_3X_READW(dtv_or, 0, true)
 	READ_3X_READW(dtv_xor, 0, true)
 #undef READ_3X_READW
-#define READ_4X_READB(func, ...) \
+#define READ_4X_READB(func, ...)                                      \
 	if (type->func.f_byte) {                                          \
 		dword x;                                                      \
 		x.b[0] = (*type->func.f_byte)(args, addr + 0, ##__VA_ARGS__); \
@@ -519,7 +522,7 @@ PUBLIC NONNULL((1)) u16 KCALL vio_readw_aligned(struct vio_args *__restrict args
 	if (type->dtv_or.f_qword) { qword x = { (*type->dtv_or.f_qword)(args, AQ, 0, true) }; return W6; }
 	if (type->dtv_xor.f_qword) { qword x = { (*type->dtv_xor.f_qword)(args, AQ, 0, true) }; return W6; }
 #endif /* CONFIG_VIO_HAS_QWORD */
-#define READ_2X_READB(func, ...) \
+#define READ_2X_READB(func, ...)                                      \
 	if (type->func.f_byte) {                                          \
 		word x;                                                       \
 		x.b[0] = (*type->func.f_byte)(args, addr, ##__VA_ARGS__);     \
@@ -556,7 +559,7 @@ PUBLIC NONNULL((1)) u32 KCALL vio_readl_aligned(struct vio_args *__restrict args
 	if (type->dtv_or.f_qword) { qword x = { (*type->dtv_or.f_qword)(args, AQ, 0, true) }; return L4; }
 	if (type->dtv_xor.f_qword) { qword x = { (*type->dtv_xor.f_qword)(args, AQ, 0, true) }; return L4; }
 #endif /* CONFIG_VIO_HAS_QWORD */
-#define READ_2X_READW(func, ...) \
+#define READ_2X_READW(func, ...)                                      \
 	if (type->func.f_word) {                                          \
 		dword x;                                                      \
 		x.w[0] = (*type->func.f_word)(args, addr + 0, ##__VA_ARGS__); \
@@ -571,7 +574,7 @@ PUBLIC NONNULL((1)) u32 KCALL vio_readl_aligned(struct vio_args *__restrict args
 	READ_2X_READW(dtv_or, 0, true)
 	READ_2X_READW(dtv_xor, 0, true)
 #undef READ_2X_READW
-#define READ_4X_READB(func, ...) \
+#define READ_4X_READB(func, ...)                                      \
 	if (type->func.f_byte) {                                          \
 		dword x;                                                      \
 		x.b[0] = (*type->func.f_byte)(args, addr + 0, ##__VA_ARGS__); \
@@ -604,7 +607,7 @@ PUBLIC NONNULL((1)) u64 KCALL vio_readq(struct vio_args *__restrict args, vm_dad
 		if (type->dtv_or.f_qword) return (*type->dtv_or.f_qword)(args, addr, 0, true);
 		if (type->dtv_xor.f_qword) return (*type->dtv_xor.f_qword)(args, addr, 0, true);
 	}
-#define READ_2X_READL(func, ...) \
+#define READ_2X_READL(func, ...)                                       \
 	if (type->func.f_dword) {                                          \
 		qword x;                                                       \
 		x.l[0] = (*type->func.f_dword)(args, addr, ##__VA_ARGS__);     \
@@ -621,7 +624,7 @@ PUBLIC NONNULL((1)) u64 KCALL vio_readq(struct vio_args *__restrict args, vm_dad
 		READ_2X_READL(dtv_xor, 0, true)
 	}
 #undef READ_2X_READL
-#define READ_2X_READQ(func, ...) \
+#define READ_2X_READQ(func, ...)                                     \
 	if (type->func.f_qword) {                                        \
 		xword x;                                                     \
 		x.q[0] = (*type->func.f_qword)(args, AQ, ##__VA_ARGS__);     \
@@ -636,7 +639,7 @@ PUBLIC NONNULL((1)) u64 KCALL vio_readq(struct vio_args *__restrict args, vm_dad
 	READ_2X_READQ(dtv_or, 0, true)
 	READ_2X_READQ(dtv_xor, 0, true)
 #undef READ_2X_READQ
-#define READ_3X_READL(func, ...) \
+#define READ_3X_READL(func, ...)                                     \
 	if (type->func.f_dword) {                                        \
 		xword x;                                                     \
 		x.l[0] = (*type->func.f_dword)(args, AL, ##__VA_ARGS__);     \
@@ -652,7 +655,7 @@ PUBLIC NONNULL((1)) u64 KCALL vio_readq(struct vio_args *__restrict args, vm_dad
 	READ_3X_READL(dtv_or, 0, true)
 	READ_3X_READL(dtv_xor, 0, true)
 #undef READ_3X_READL
-#define READ_4X_READW(func, ...) \
+#define READ_4X_READW(func, ...)                                      \
 	if (type->func.f_word) {                                          \
 		qword x;                                                      \
 		x.w[0] = (*type->func.f_word)(args, addr, ##__VA_ARGS__);     \
@@ -671,7 +674,7 @@ PUBLIC NONNULL((1)) u64 KCALL vio_readq(struct vio_args *__restrict args, vm_dad
 		READ_4X_READW(dtv_xor, 0, true)
 	}
 #undef READ_4X_READW
-#define READ_5X_READW(func, ...) \
+#define READ_5X_READW(func, ...)                                      \
 	if (type->func.f_word) {                                          \
 		xword x;                                                      \
 		x.w[0] = (*type->func.f_word)(args, addr - 1, ##__VA_ARGS__); \
@@ -689,7 +692,7 @@ PUBLIC NONNULL((1)) u64 KCALL vio_readq(struct vio_args *__restrict args, vm_dad
 	READ_5X_READW(dtv_or, 0, true)
 	READ_5X_READW(dtv_xor, 0, true)
 #undef READ_5X_READW
-#define READ_8X_READB(func, ...) \
+#define READ_8X_READB(func, ...)                                      \
 	if (type->func.f_byte) {                                          \
 		qword x;                                                      \
 		x.b[0] = (*type->func.f_byte)(args, addr + 0, ##__VA_ARGS__); \
@@ -722,7 +725,7 @@ PUBLIC NONNULL((1)) u64 KCALL vio_readq_aligned(struct vio_args *__restrict args
 	if (type->dtv_and.f_qword) return (*type->dtv_and.f_qword)(args, addr, (u64)~0, true);
 	if (type->dtv_or.f_qword) return (*type->dtv_or.f_qword)(args, addr, 0, true);
 	if (type->dtv_xor.f_qword) return (*type->dtv_xor.f_qword)(args, addr, 0, true);
-#define READ_2X_READL(func, ...) \
+#define READ_2X_READL(func, ...)                                       \
 	if (type->func.f_dword) {                                          \
 		qword x;                                                       \
 		x.l[0] = (*type->func.f_dword)(args, addr, ##__VA_ARGS__);     \
@@ -737,7 +740,7 @@ PUBLIC NONNULL((1)) u64 KCALL vio_readq_aligned(struct vio_args *__restrict args
 	READ_2X_READL(dtv_or, 0, true)
 	READ_2X_READL(dtv_xor, 0, true)
 #undef READ_2X_READL
-#define READ_4X_READW(func, ...) \
+#define READ_4X_READW(func, ...)                                      \
 	if (type->func.f_word) {                                          \
 		qword x;                                                      \
 		x.w[0] = (*type->func.f_word)(args, addr, ##__VA_ARGS__);     \
@@ -754,7 +757,7 @@ PUBLIC NONNULL((1)) u64 KCALL vio_readq_aligned(struct vio_args *__restrict args
 	READ_4X_READW(dtv_or, 0, true)
 	READ_4X_READW(dtv_xor, 0, true)
 #undef READ_4X_READW
-#define READ_8X_READB(func, ...) \
+#define READ_8X_READB(func, ...)                                      \
 	if (type->func.f_byte) {                                          \
 		qword x;                                                      \
 		x.b[0] = (*type->func.f_byte)(args, addr + 0, ##__VA_ARGS__); \
@@ -1422,10 +1425,10 @@ vio_cmpxchw(struct vio_args *__restrict args,
 		qword oldval, oldval2, newval;
 #ifdef CONFIG_VIO_HAS_QWORD
 		oldval.q = vio_readq(args, addr & ~7);
-#else
+#else /* CONFIG_VIO_HAS_QWORD */
 		oldval.l[0] = vio_readl(args, (addr & ~7));
 		oldval.l[1] = vio_readl(args, (addr & ~7) + 4);
-#endif
+#endif /* !CONFIG_VIO_HAS_QWORD */
 		(*(u16 *)((u8 *)&oldval + ((uintptr_t)addr & 7))) = oldvalue;
 		newval                                            = oldval;
 		(*(u16 *)((u8 *)&newval + ((uintptr_t)addr & 7))) = newvalue;
@@ -1460,10 +1463,10 @@ vio_cmpxchl(struct vio_args *__restrict args,
 		qword oldval, oldval2, newval;
 #ifdef CONFIG_VIO_HAS_QWORD
 		oldval.q = vio_readq(args, addr & ~7);
-#else
+#else /* CONFIG_VIO_HAS_QWORD */
 		oldval.l[0] = vio_readl(args, (addr & ~7));
 		oldval.l[1] = vio_readl(args, (addr & ~7) + 4);
-#endif
+#endif /* !CONFIG_VIO_HAS_QWORD */
 		(*(u32 *)((u8 *)&oldval + ((uintptr_t)addr & 7))) = oldvalue;
 		newval                                            = oldval;
 		(*(u32 *)((u8 *)&newval + ((uintptr_t)addr & 7))) = newvalue;
@@ -1555,10 +1558,10 @@ vio_cmpxch_or_writeb(struct vio_args *__restrict args,
 		qword oldval, oldval2, newval;
 #ifdef CONFIG_VIO_HAS_QWORD
 		oldval.q = vio_readq(args, addr & ~7);
-#else
+#else /* CONFIG_VIO_HAS_QWORD */
 		oldval.l[0] = vio_readl(args, (addr & ~7));
 		oldval.l[1] = vio_readl(args, (addr & ~7) + 4);
-#endif
+#endif /* !CONFIG_VIO_HAS_QWORD */
 		oldval.b[(uintptr_t)addr & 7] = oldvalue;
 		newval                        = oldval;
 		newval.b[(uintptr_t)addr & 7] = newvalue;
@@ -1603,10 +1606,10 @@ vio_cmpxch_or_writew(struct vio_args *__restrict args,
 		qword oldval, oldval2, newval;
 #ifdef CONFIG_VIO_HAS_QWORD
 		oldval.q = vio_readq(args, addr & ~7);
-#else
+#else /* CONFIG_VIO_HAS_QWORD */
 		oldval.l[0] = vio_readl(args, (addr & ~7));
 		oldval.l[1] = vio_readl(args, (addr & ~7) + 4);
-#endif
+#endif /* !CONFIG_VIO_HAS_QWORD */
 		(*(u16 *)((u8 *)&oldval + ((uintptr_t)addr & 7))) = oldvalue;
 		newval                                            = oldval;
 		(*(u16 *)((u8 *)&newval + ((uintptr_t)addr & 7))) = newvalue;
@@ -1638,10 +1641,10 @@ vio_cmpxch_or_writel(struct vio_args *__restrict args,
 		qword oldval, oldval2, newval;
 #ifdef CONFIG_VIO_HAS_QWORD
 		oldval.q = vio_readq(args, addr & ~7);
-#else
+#else /* CONFIG_VIO_HAS_QWORD */
 		oldval.l[0] = vio_readl(args, (addr & ~7));
 		oldval.l[1] = vio_readl(args, (addr & ~7) + 4);
-#endif
+#endif /* !CONFIG_VIO_HAS_QWORD */
 		(*(u32 *)((u8 *)&oldval + ((uintptr_t)addr & 7))) = oldvalue;
 		newval                                            = oldval;
 		(*(u32 *)((u8 *)&newval + ((uintptr_t)addr & 7))) = newvalue;
@@ -1889,27 +1892,27 @@ DECL_END
 #ifndef __INTELLISENSE__
 #ifdef CONFIG_VIO
 
-#define NAME             xch
+#define NAME              xch
 #define OP(oldval, value) value
 #include "vio-arith-impl.c.inl"
 
-#define NAME             add
+#define NAME              add
 #define OP(oldval, value) oldval + value
 #include "vio-arith-impl.c.inl"
 
-#define NAME             sub
+#define NAME              sub
 #define OP(oldval, value) oldval - value
 #include "vio-arith-impl.c.inl"
 
-#define NAME             and
+#define NAME              and
 #define OP(oldval, value) oldval & value
 #include "vio-arith-impl.c.inl"
 
-#define NAME             or
+#define NAME              or
 #define OP(oldval, value) oldval | value
 #include "vio-arith-impl.c.inl"
 
-#define NAME             xor
+#define NAME              xor
 #define OP(oldval, value) oldval ^ value
 #include "vio-arith-impl.c.inl"
 
