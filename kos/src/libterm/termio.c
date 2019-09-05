@@ -55,7 +55,11 @@ linebuffer_writef(struct linebuffer *__restrict self,
 	result = mode & IO_NONBLOCK
 	       ? linebuffer_write_nonblock(self, src, num_bytes)
 	       : linebuffer_write(self, src, num_bytes);
+#ifdef __KERNEL__
 	assert((size_t)result <= num_bytes);
+#else /* __KERNEL__ */
+	assert(result < 0 || (size_t)result <= num_bytes);
+#endif /* !__KERNEL__ */
 	return result;
 }
 
@@ -267,7 +271,7 @@ libterminal_do_owrite_nostop_nobuf(struct terminal *__restrict self,
 		}
 	}
 done:
-	assert((size_t)result <= num_bytes);
+	assert(result < 0 || (size_t)result <= num_bytes);
 	return result;
 err_or_done:
 	if (temp >= 0)
@@ -557,7 +561,7 @@ libterminal_do_iwrite_controlled(struct terminal *__restrict self,
 			    ch == self->t_ios.c_cc[VEOL] ||
 			    ch == self->t_ios.c_cc[VEOL2]) {
 				size_t count;
-				/* NOTE: +1, because the COMMIT character should be incuded within the flush. */
+				/* NOTE: +1, because the COMMIT character should be included within the flush. */
 				count = (size_t)((iter + 1) - flush_start);
 				temp  = libterminal_do_iwrite_canon(self, flush_start, count, mode, iflag, lflag);
 				if unlikely(temp < 0)
@@ -565,7 +569,6 @@ libterminal_do_iwrite_controlled(struct terminal *__restrict self,
 				result += temp;
 				if unlikely((size_t)temp < count)
 					goto done;
-				++result; /* Account for the control character */
 				flush_start = iter + 1;
 				/* Flush the current canon */
 				IF_NOT_KERNEL(temp =) libterminal_flush_icanon(self, mode);
@@ -799,7 +802,7 @@ libterminal_do_iwrite_controlled(struct terminal *__restrict self,
 			goto err;
 	}
 done:
-	assert((size_t)result <= num_bytes);
+	assert(result < 0 || (size_t)result <= num_bytes);
 	return result;
 err_capture:
 	linecapture_fini(&capture);
