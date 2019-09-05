@@ -47,11 +47,11 @@ DECL_BEGIN
 
 
 #ifdef CONFIG_NO_SMP
-#define DO_FLAGS_INDICATE_RUNNING(f)  (((f) & (TASK_FSTARTED|TASK_FRUNNING)) == (TASK_FSTARTED|TASK_FRUNNING))
-#define DO_FLAGS_INDICATE_SLEEPING(f) (((f) & (TASK_FSTARTED|TASK_FRUNNING)) == (TASK_FSTARTED))
+#define DO_FLAGS_INDICATE_RUNNING(f)  (((f) & (TASK_FSTARTED|TASK_FRUNNING|TASK_FTERMINATED)) == (TASK_FSTARTED|TASK_FRUNNING))
+#define DO_FLAGS_INDICATE_SLEEPING(f) (((f) & (TASK_FSTARTED|TASK_FRUNNING|TASK_FTERMINATED)) == (TASK_FSTARTED))
 #else /* CONFIG_NO_SMP */
-#define DO_FLAGS_INDICATE_RUNNING(f)  (((f) & (TASK_FSTARTED|TASK_FRUNNING|TASK_FPENDING)) == (TASK_FSTARTED|TASK_FRUNNING))
-#define DO_FLAGS_INDICATE_SLEEPING(f) (((f) & (TASK_FSTARTED|TASK_FRUNNING|TASK_FPENDING)) == (TASK_FSTARTED))
+#define DO_FLAGS_INDICATE_RUNNING(f)  (((f) & (TASK_FSTARTED|TASK_FRUNNING|TASK_FTERMINATED|TASK_FPENDING)) == (TASK_FSTARTED|TASK_FRUNNING))
+#define DO_FLAGS_INDICATE_SLEEPING(f) (((f) & (TASK_FSTARTED|TASK_FRUNNING|TASK_FTERMINATED|TASK_FPENDING)) == (TASK_FSTARTED))
 #endif /* !CONFIG_NO_SMP */
 
 
@@ -151,13 +151,16 @@ NOTHROW(FCALL cpu_assert_rootpidns_integrity)(struct task *ignored_thread) {
 			continue;
 		if (thread->t_cpu == me && thread != ignored_thread) {
 			bool was_ok;
-			if (thread->t_flags & TASK_FRUNNING) {
+			uintptr_t flags = thread->t_flags;
+			if (flags & TASK_FRUNNING) {
 				was_ok = cpu_do_assert_running(thread, me);
-			} else if (!(thread->t_flags & TASK_FSTARTED)) {
+			} else if (!(flags & TASK_FSTARTED)) {
+				was_ok = true;
+			} else if (flags & TASK_FTERMINATED) {
 				was_ok = true;
 			} else
 #ifndef CONFIG_NO_SMP
-			if (thread->t_flags & TASK_FPENDING) {
+			if (flags & TASK_FPENDING) {
 				was_ok = true;
 			} else
 #endif /* !CONFIG_NO_SMP */
@@ -952,7 +955,6 @@ NOTHROW(FCALL task_exit)(int w_status) {
 		for (; iter < __kernel_pertask_onexit_end; ++iter)
 			(**iter)();
 	}
-
 	{
 		struct taskpid *pid = THIS_TASKPID;
 		if (pid) {
@@ -998,6 +1000,15 @@ NOTHROW(FCALL task_exit)(int w_status) {
 	                                                    (task_srpc_t)&task_decref_for_exit,
 	                                                    caller,
 	                                                    NULL);
+
+	/* Set the flag to indicate that we've been fully terminated.
+	 * NOTE: Also ensure that a couple of other flags are set/cleared correctly. */
+	ATOMIC_FETCHOR(caller->t_flags, TASK_FTERMINATING | TASK_FTERMINATED | TASK_FSTARTED);
+#ifndef CONFIG_NO_SMP
+	ATOMIC_FETCHAND(caller->t_flags, ~(TASK_FRUNNING | TASK_FWAKING | TASK_FTIMEOUT | TASK_FSUSPENDED | TASK_FPENDING));
+#else /* !CONFIG_NO_SMP */
+	ATOMIC_FETCHAND(caller->t_flags, ~(TASK_FRUNNING | TASK_FWAKING | TASK_FTIMEOUT | TASK_FSUSPENDED));
+#endif /* CONFIG_NO_SMP */
 
 	/* Good bye... */
 	cpu_run_current();

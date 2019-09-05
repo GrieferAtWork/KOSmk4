@@ -34,7 +34,18 @@
 
 DECL_BEGIN
 
-
+/* Task flags <--> scheduler state mapping:
+ *
+ *   thread in thread->t_cpu->c_current:
+ *      (thread->t_flags & (TASK_FSTARTED|TASK_FRUNNING|TASK_FTERMINATED|TASK_FPENDING)) == (TASK_FSTARTED|TASK_FRUNNING)
+ *   thread in thread->t_cpu->c_sleeping:
+ *      (thread->t_flags & (TASK_FSTARTED|TASK_FRUNNING|TASK_FTERMINATED|TASK_FPENDING)) == (TASK_FSTARTED)
+ *   thread in thread->t_cpu->c_pending:
+ *      (thread->t_flags & (TASK_FSTARTED|TASK_FRUNNING|TASK_FTERMINATED|TASK_FPENDING)) == (TASK_FSTARTED|TASK_FPENDING)
+ *
+ * Note that any code is allowed to assume that these mappings between thread flags,
+ * and scheduler association always hold true. - As a matter of fact: These relations
+ * are asserted by `cpu_assert_integrity()' */
 #define TASK_FNORMAL      0x0000 /* Normal task flags. */
 #define TASK_FKEEPCORE    0x0001 /* [lock(PRIVATE(THIS_TASK))] Don't allow this task's core to change randomly. */
 #define TASK_FKERNTHREAD  0x0002 /* [const] The thread is running exclusively in kernel-space, and can never return to user-space. */
@@ -42,7 +53,8 @@ DECL_BEGIN
                                   *                  - No further synchronous RPCs may be scheduled for execution
                                   *                  - Implies `TASK_FKEEPCORE' (the task may no longer change its hosting CPU) */
 #define TASK_FTERMINATED  0x0020 /* [lock(WRITE_ONCE)] The task has been fully terminated.
-                                  *                  - No further RPCs of any kind may be scheduled for execution */
+                                  *                  - No further RPCs of any kind may be scheduled for execution
+                                  *                  - The thread must no longer appear in the CURRENT/SLEEPING or PENDING chain of any CPU. */
 #define TASK_FWAKING      0x0040 /* [lock(WAKE_OWNER)] The task is currently being re-awoken (may not be set once `TASK_FTERMINATING' has been set). */
 #define TASK_FRUNNING     0x0080 /* [lock(PRIVATE(THIS_CPU))] The task is currently running (`s_running' is valid). */
 #ifndef CONFIG_NO_SMP
