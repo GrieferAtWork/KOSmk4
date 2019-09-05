@@ -1022,16 +1022,19 @@ NOTHROW(FCALL qtime_to_timespec)(qtime_t const *__restrict qtime) {
 	struct timespec result;
 	result.tv_sec = qtime->q_jtime / HZ;
 	result.tv_nsec = ((qtime->q_jtime % HZ) * (__NSECS_PER_SEC / HZ)) +
-	                 ((qtime->q_qtime * (__NSECS_PER_SEC / HZ)) / qtime->q_qsize);
+	                 (syscall_ulong_t)((u64)((u64)qtime->q_qtime *
+	                                         (__NSECS_PER_SEC / HZ)) /
+	                                   qtime->q_qsize);
 	return result;
 }
 
 PUBLIC NOBLOCK WUNUSED qtime_t
 NOTHROW(FCALL timespec_to_qtime)(struct timespec const *__restrict tms) {
 	qtime_t result;
-	result.q_jtime = tms->tv_sec * HZ;
-	result.q_qtime = tms->tv_nsec;
-	result.q_qsize = __NSECS_PER_SEC;
+	result.q_jtime  = tms->tv_sec * HZ;
+	result.q_jtime += tms->tv_nsec / (__NSECS_PER_SEC / HZ);
+	result.q_qtime  = tms->tv_nsec % (__NSECS_PER_SEC / HZ);
+	result.q_qsize  = __NSECS_PER_SEC / HZ;
 	return result;
 }
 
