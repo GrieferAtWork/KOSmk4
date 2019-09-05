@@ -327,6 +327,7 @@ again:
 			alloc_mask = 1, j = 0;
 			while (word & alloc_mask)
 				alloc_mask <<= 1, ++j;
+			assert(alloc_mask);
 			/* Atomically allocate the entry we decided on acquiring. */
 			if (!ATOMIC_CMPXCH_WEAK(mall_pending_inuse[i], word, word | alloc_mask))
 				goto again;
@@ -612,7 +613,7 @@ NOTHROW(KCALL mall_serve_pending_commands)(gfp_t flags) {
 		for (i = 0; i < COMPILER_LENOF(mall_pending_isval); ++i) {
 			unsigned int j;
 			uintptr_t mask;
-			uintptr_t word = ATOMIC_XCH(mall_pending_isval[i], 0);
+			uintptr_t word = ATOMIC_READ(mall_pending_isval[i]);
 			if unlikely(!word)
 				continue;
 			for (j = 0, mask = 1; j < BITSOF(uintptr_t); ++j, mask <<= 1) {
