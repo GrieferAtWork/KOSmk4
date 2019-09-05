@@ -284,6 +284,7 @@ do_mkdir "$PREFIX/bin"
 do_mkdir "$PREFIX/usr"
 do_mkdir "$PREFIX/share"
 do_mkdir "$PREFIX/lib"
+do_mkdir "$PREFIX/opt"
 do_mkdir "$PREFIX/$TARGET/usr"
 
 # Make sure that our bin/lib paths were created, else GCC won't detect them...
@@ -636,4 +637,47 @@ apply_libstdcxx_header_patch \
 # Configure and build mtools
 configure_mtools
 build_mtools
+
+
+# Create symbolic links for binutils programs
+symlink_binutil() {
+	if ! [ -f "$PREFIX/bin/$1" ] && ! [ -f "$PREFIX/bin/$1.exe" ]; then
+		echo "Creating binutils utility link '$PREFIX/bin/$1'"
+		if [ -f "$PREFIX/bin/${TARGET}-$1" ]; then
+			cmd ln -s "${TARGET}-$1" "$PREFIX/bin/$1"
+		elif [ -f "$PREFIX/bin/${TARGET}-$1.exe" ]; then
+			cmd ln -s "${TARGET}-$1.exe" "$PREFIX/bin/$1.exe"
+		else
+			echo "WARNING: Missing binutils utility: '$PREFIX/bin/${TARGET}-$1'"
+		fi
+	fi
+}
+symlink_binutil addr2line
+symlink_binutil ar
+symlink_binutil as
+symlink_binutil c++
+symlink_binutil c++filt
+symlink_binutil cpp
+symlink_binutil elfedit
+symlink_binutil g++
+symlink_binutil gcc
+symlink_binutil gcc-$GCC_VERSION_NUMBER
+symlink_binutil gcc-ar
+symlink_binutil gcc-nm
+symlink_binutil gcc-ranlib
+symlink_binutil gcov
+symlink_binutil gcov-dump
+symlink_binutil gcov-tool
+symlink_binutil gprof
+symlink_binutil ld.bfd
+symlink_binutil ld
+symlink_binutil nm
+symlink_binutil objcopy
+symlink_binutil objdump
+symlink_binutil ranlib
+symlink_binutil readelf
+symlink_binutil size
+symlink_binutil strings
+symlink_binutil strip
+
 

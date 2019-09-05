@@ -120,6 +120,13 @@ apply_patch() {
 	fi
 }
 
+# Set $PATH to include target toolchain utilities.
+set_archpath() {
+	export PATH="${BINUTILS_SYSROOT}/bin:${PATH}"
+	export CC="${CROSS_PREFIX}gcc"
+	export AR="${CROSS_PREFIX}ar"
+}
+
 
 # Configure some utilities for general-purpose cross-compiling
 export CROSS_TARGET="$TARGET_NAME-elf"
@@ -133,28 +140,28 @@ case $UTILITY_NAME in
 	busybox)
 		BUSYBOX_VERISON="1.31.0"
 		## Check final output binary
-		if ! [ -f "$BINUTILS_SYSROOT/busybox-$BUSYBOX_VERISON/busybox_unstripped" ]; then
+		if ! [ -f "$BINUTILS_SYSROOT/opt/busybox-$BUSYBOX_VERISON/busybox_unstripped" ]; then
 			## Check arch makefile
-			if ! [ -f "$BINUTILS_SYSROOT/busybox-$BUSYBOX_VERISON/Makefile" ]; then
+			if ! [ -f "$BINUTILS_SYSROOT/opt/busybox-$BUSYBOX_VERISON/Makefile" ]; then
 				## Check shared (original) makefile
 				if ! [ -f "$KOS_ROOT/binutils/src/busybox-$BUSYBOX_VERISON/Makefile" ]; then
 					cmd cd "$KOS_ROOT/binutils/src"
 					download_file \
 						"busybox-$BUSYBOX_VERISON.tar.bz2" \
 						https://www.busybox.net/downloads/busybox-$BUSYBOX_VERISON.tar.bz2
-					cmd tar jxvf busybox-$BUSYBOX_VERISON.tar.bz2
+					cmd tar jxvf "busybox-$BUSYBOX_VERISON.tar.bz2"
 				fi
-				if [ -d "$BINUTILS_SYSROOT/busybox-$BUSYBOX_VERISON" ]; then
-					cmd rm -rf "$BINUTILS_SYSROOT/busybox-$BUSYBOX_VERISON"
+				if [ -d "$BINUTILS_SYSROOT/opt/busybox-$BUSYBOX_VERISON" ]; then
+					cmd rm -rf "$BINUTILS_SYSROOT/opt/busybox-$BUSYBOX_VERISON"
 				fi
 				cmd cp -R \
 					"$KOS_ROOT/binutils/src/busybox-$BUSYBOX_VERISON" \
-					"$BINUTILS_SYSROOT/"
+					"$BINUTILS_SYSROOT/opt/"
 			fi
 			apply_patch \
-				"$BINUTILS_SYSROOT/busybox-$BUSYBOX_VERISON" \
+				"$BINUTILS_SYSROOT/opt/busybox-$BUSYBOX_VERISON" \
 				"$KOS_ROOT/kos/misc/patches/busybox-$BUSYBOX_VERISON.patch"
-			cmd cd "$BINUTILS_SYSROOT/busybox-$BUSYBOX_VERISON"
+			cmd cd "$BINUTILS_SYSROOT/opt/busybox-$BUSYBOX_VERISON"
 			PATCH_CONFIG="$KOS_ROOT/kos/misc/patches/busybox.config"
 			if ! [ -f ".config" ] || [ ".config" -ot "$PATCH_CONFIG" ]; then
 				unlink ".config" > /dev/null 2>&1
@@ -164,10 +171,40 @@ case $UTILITY_NAME in
 		fi
 		# Install busybox in KOS
 		install_file /bin/busybox  \
-			"$BINUTILS_SYSROOT/busybox-$BUSYBOX_VERISON/busybox_unstripped"
+			"$BINUTILS_SYSROOT/opt/busybox-$BUSYBOX_VERISON/busybox_unstripped"
 		;;
 ##############################################################################
 
+
+##############################################################################
+	vitetris)
+		VITETRIS_VERISON="0.58.0"
+		SRCPATH="$KOS_ROOT/binutils/src/vitetris-$VITETRIS_VERISON"
+		OPTPATH="$BINUTILS_SYSROOT/opt/vitetris-$VITETRIS_VERISON"
+		if ! [ -f "$OPTPATH/tetris" ]; then
+			set_archpath
+			if ! [ -f "$OPTPATH/configure" ]; then
+				if ! [ -f "$SRCPATH/configure" ]; then
+					cmd cd "$KOS_ROOT/binutils/src"
+					if ! [ -f "vitetris-$VITETRIS_VERISON.tar.gz" ]; then
+						download_file \
+							"v$VITETRIS_VERISON.tar.gz" \
+							https://github.com/vicgeralds/vitetris/archive/v$VITETRIS_VERISON.tar.gz
+						mv "v$VITETRIS_VERISON.tar.gz" "vitetris-$VITETRIS_VERISON.tar.gz"
+					fi
+					cmd tar xvf "vitetris-$VITETRIS_VERISON.tar.gz"
+				fi
+				cmd cp -R "$SRCPATH" "$BINUTILS_SYSROOT/opt/"
+			fi
+			cmd cd "$OPTPATH"
+			cmd bash configure CC="$CC"
+			cmd make -j $MAKE_PARALLEL_COUNT
+		fi
+		install_file /bin/tetris  \
+			"$OPTPATH/tetris"
+		;;
+
+##############################################################################
 
 
 	*)
