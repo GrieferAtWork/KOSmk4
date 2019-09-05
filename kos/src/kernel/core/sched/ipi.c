@@ -429,6 +429,21 @@ NOTHROW(FCALL task_wake)(struct task *__restrict thread,
 			cpu_assert_running(thread);
 			if (flags & TASK_WAKE_FLOWPRIO)
 				goto unset_waking; /* Don't re-prioritize the target thread. */
+			if unlikely(caller == thread) {
+				/* Special (and _very_ unlikely) case: The calling thread is trying to wake itself.
+				 * This could? happen under very rare circumstances, and is actually allowed behavior,
+				 * so handle it by operating as a no-op, other than unsetting our own `TASK_FWAKING'
+				 * flag. */
+#ifdef NDEBUG
+				PREEMPTION_POP(was);
+				ATOMIC_FETCHAND(thread->t_flags, ~TASK_FWAKING);
+#else /* NDEBUG */
+				ATOMIC_FETCHAND(thread->t_flags, ~TASK_FWAKING);
+				cpu_assert_running(thread);
+				PREEMPTION_POP(was);
+#endif /* !NDEBUG */
+				return true;
+			}
 			/* The thread is already running.
 			 * In this case, re-schedule the thread to-be executed next. */
 			thread->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt = thread->t_sched.s_running.sr_runnxt;
@@ -437,6 +452,7 @@ NOTHROW(FCALL task_wake)(struct task *__restrict thread,
 			 * (in case `thread' was already the successor of `caller') */
 			next = caller->t_sched.s_running.sr_runnxt;
 		} else {
+			assert(caller != thread);
 			cpu_assert_sleeping(thread);
 			ATOMIC_FETCHOR(thread->t_flags, TASK_FRUNNING);
 			/* The thread was sleeping. - Wake it up */
