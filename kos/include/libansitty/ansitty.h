@@ -134,9 +134,19 @@ struct ansitty_operators {
 	/* [0..1] Returns the position of the cursor.
 	 * @param: ppos[0]: Store X-position here.
 	 * @param: ppos[1]: Store Y-position here. */
-	__ATTR_NONNULL((1))
+	__ATTR_NONNULL((1, 2))
 	void (LIBANSITTY_CC *ato_getcursor)(struct ansitty *__restrict self,
 	                                    ansitty_coord_t ppos[2]);
+	/* [0..1] Returns the size of the terminal.
+	 * NOTE: When implementing this function, you are _required_ never to fill
+	 *       in either psize[0] or psize[1] with ZERO(0). Doing so will cause
+	 *       undefined behavior (such as `DIVIDE_BY_ZERO') errors in places
+	 *       where it may be impossible to handle them.
+	 * @param: psize[0]: Number of cells in X (width/columns).
+	 * @param: psize[1]: Number of cells in Y (height/rows). */
+	__ATTR_NONNULL((1, 2))
+	void (LIBANSITTY_CC *ato_getsize)(struct ansitty *__restrict self,
+	                                  ansitty_coord_t psize[2]);
 	/* [0..1] Copy the contents of cells starting at CURSOR into cells at
 	 *        CURSOR+dst_offset (added together such that values beyond
 	 *        the left/right border of the screen will wrap around to the

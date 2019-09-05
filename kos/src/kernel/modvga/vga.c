@@ -1179,7 +1179,7 @@ VGA_SetCursor(struct ansitty *__restrict self,
 		vga_update_cursor_pos(vga);
 }
 
-PRIVATE NOBLOCK NONNULL((1)) void
+PRIVATE NOBLOCK NONNULL((1, 2)) void
 NOTHROW(LIBANSITTY_CC VGA_GetCursor)(struct ansitty *__restrict self,
                                      ansitty_coord_t ppos[2]) {
 	VGA *vga = container_of(self, VGA, at_ansi);
@@ -1188,6 +1188,14 @@ NOTHROW(LIBANSITTY_CC VGA_GetCursor)(struct ansitty *__restrict self,
 	size_t sizex = ATOMIC_READ(vga->v_textsizex);
 	ppos[0] = (ansitty_coord_t)(offset % sizex);
 	ppos[1] = (ansitty_coord_t)(offset / sizex);
+}
+
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(LIBANSITTY_CC VGA_GetSize)(struct ansitty *__restrict self,
+                                   ansitty_coord_t psize[2]) {
+	VGA *vga = container_of(self, VGA, at_ansi);
+	psize[0] = ATOMIC_READ(vga->v_textsizex);
+	psize[1] = ATOMIC_READ(vga->v_textsizey);
 }
 
 PRIVATE NOBLOCK NONNULL((1)) void
@@ -1227,6 +1235,7 @@ PRIVATE struct ansitty_operators const vga_ansi_operators = {
 	/* .ato_putc         = */&VGA_Putc,
 	/* .ato_setcursor    = */&VGA_SetCursor,
 	/* .ato_getcursor    = */&VGA_GetCursor,
+	/* .ato_getsize      = */&VGA_GetSize,
 	/* .ato_copycell     = */&VGA_CopyCell,
 	/* .ato_scroll       = */NULL, /* TODO */
 	/* .ato_cls          = */NULL, /* TODO */

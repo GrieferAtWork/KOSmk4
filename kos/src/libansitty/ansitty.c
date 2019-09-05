@@ -44,6 +44,12 @@
 #endif /* !__KERNEL__ */
 
 
+#undef CONFIG_HIDE_CURSOR_DURING_NAVIGATION
+/* Hide the terminal cursor while navigating to gather information
+ * about the terminal, or moving it to perform some specific operation. */
+#define CONFIG_HIDE_CURSOR_DURING_NAVIGATION 1
+
+
 DECL_BEGIN
 
 #define CAN  '\030' /* Cancel */
@@ -77,6 +83,7 @@ DECL_BEGIN
 
 #define PUTUNI(uni)                 (*self->at_ops.ato_putc)(self, uni)
 #define GETCURSOR(pxy)              ((*self->at_ops.ato_getcursor)(self, pxy), TRACE_OPERATION("getcur:{%u,%u}\n", (pxy)[0], (pxy)[1]))
+#define GETSIZE(pxy)                ((*self->at_ops.ato_getsize)(self, pxy), TRACE_OPERATION("getsiz:{%u,%u}\n", (pxy)[0], (pxy)[1]))
 #define SETCURSOR(x, y)             (TRACE_OPERATION("setcur(%u,%u)\n", x, y), (*self->at_ops.ato_setcursor)(self, x, y))
 #define SETCOLOR(color)             (TRACE_OPERATION("setcolor(%#x)\n", color), (*self->at_ops.ato_setcolor)(self, color))
 #define SETTTYMODE(ttymode)         (TRACE_OPERATION("setttymode(%#x)\n", ttymode), self->at_ops.ato_setttymode ? (*self->at_ops.ato_setttymode)(self, ttymode) : (void)0)
@@ -151,6 +158,32 @@ DECL_BEGIN
 
 
 
+#ifdef __INTELLISENSE__
+#define HIDECURSOR_BEGIN() do
+#define HIDECURSOR_END()   __WHILE0
+#elif defined(CONFIG_HIDE_CURSOR_DURING_NAVIGATION)
+#define HIDECURSOR_BEGIN()                                                   \
+	do {                                                                     \
+		uint16_t _old_ttymode = self->at_ttymode;                            \
+		if (!(_old_ttymode & ANSITTY_MODE_HIDECURSOR)) {                     \
+			uint16_t _new_ttymode = _old_ttymode & ~ANSITTY_MODE_HIDECURSOR; \
+			self->at_ttymode      = _new_ttymode;                            \
+			SETTTYMODE(_new_ttymode);                                        \
+		}                                                                    \
+		do
+#define HIDECURSOR_END()                                 \
+		__WHILE0;                                        \
+		if (!(_old_ttymode & ANSITTY_MODE_HIDECURSOR)) { \
+			self->at_ttymode = _old_ttymode;             \
+			SETTTYMODE(_old_ttymode);                    \
+		}                                                \
+	} __WHILE0
+#else /* CONFIG_HIDE_CURSOR_DURING_NAVIGATION */
+#define HIDECURSOR_BEGIN() do
+#define HIDECURSOR_END()   __WHILE0
+#endif /* !CONFIG_HIDE_CURSOR_DURING_NAVIGATION */
+
+
 
 
 PRIVATE NONNULL((1)) void CC
@@ -164,6 +197,28 @@ stub_setcursor(struct ansitty *__restrict UNUSED(self),
                ansitty_coord_t UNUSED(x),
                ansitty_coord_t UNUSED(y)) {
 	/* no-op */
+}
+
+PRIVATE NONNULL((1)) void CC
+stub_getsize_from_cursor(struct ansitty *__restrict self,
+                         ansitty_coord_t psize[2]) {
+	ansitty_coord_t xy[2];
+	HIDECURSOR_BEGIN() {
+		GETCURSOR(xy);
+		SETCURSOR(MAXCOORD, MAXCOORD);
+		GETCURSOR(psize);
+		SETCURSOR(xy[0], xy[1]);
+	}
+	HIDECURSOR_END();
+	++psize[0];
+	++psize[1];
+}
+
+PRIVATE NONNULL((1)) void CC
+stub_getsize(struct ansitty *__restrict UNUSED(self),
+             ansitty_coord_t ppos[2]) {
+	ppos[0] = 80;
+	ppos[1] = 25;
 }
 
 PRIVATE NONNULL((1)) void CC
@@ -181,33 +236,73 @@ stub_cls(struct ansitty *__restrict self,
 	ansitty_coord_t &x = xy[0];
 	ansitty_coord_t &y = xy[1];
 	size_t i;
-	GETCURSOR(xy);
-	switch (mode) {
+	HIDECURSOR_BEGIN() {
+		GETCURSOR(xy);
+		switch (mode) {
 
-	case ANSITTY_CLS_AFTER:
-		SETCURSOR(MAXCOORD, MAXCOORD);
-		GETCURSOR(sxsy);
-		SETCURSOR(x, y);
-		i = (((sy + 1) - y) * (sx + 1)) - x;
-		break;
+		case ANSITTY_CLS_AFTER:
+			SETCURSOR(MAXCOORD, MAXCOORD);
+			GETCURSOR(sxsy);
+			SETCURSOR(x, y);
+			i = (((sy + 1) - y) * (sx + 1)) - x;
+			break;
 
-	case ANSITTY_CLS_BEFORE:
-		SETCURSOR(MAXCOORD, MAXCOORD);
-		GETCURSOR(sxsy);
-		SETCURSOR(0, 0);
-		i = (y * (sx + 1)) + x;
-		break;
+		case ANSITTY_CLS_BEFORE:
+			SETCURSOR(MAXCOORD, MAXCOORD);
+			GETCURSOR(sxsy);
+			SETCURSOR(0, 0);
+			i = (y * (sx + 1)) + x;
+			break;
 
-	default:
-		SETCURSOR(MAXCOORD, MAXCOORD);
-		GETCURSOR(sxsy);
-		SETCURSOR(0, 0);
-		i = (sx + 1) * (sy + 1);
-		break;
+		default:
+			SETCURSOR(MAXCOORD, MAXCOORD);
+			GETCURSOR(sxsy);
+			SETCURSOR(0, 0);
+			i = (sx + 1) * (sy + 1);
+			break;
+		}
+		while (i--)
+			PUTUNI(' ');
+		SETCURSOR(xy[0], xy[1]);
 	}
-	while (i--)
-		PUTUNI(' ');
-	SETCURSOR(xy[0], xy[1]);
+	HIDECURSOR_END();
+}
+
+PRIVATE NONNULL((1)) void CC
+stub_cls_size(struct ansitty *__restrict self,
+              unsigned int mode) {
+	ansitty_coord_t sxsy[2], xy[2];
+	ansitty_coord_t &sx = sxsy[0];
+	ansitty_coord_t &sy = sxsy[1];
+	ansitty_coord_t &x = xy[0];
+	ansitty_coord_t &y = xy[1];
+	size_t i;
+	HIDECURSOR_BEGIN() {
+		GETCURSOR(xy);
+		switch (mode) {
+
+		case ANSITTY_CLS_AFTER:
+			GETSIZE(sxsy);
+			i = ((sy - y) * sx) - x;
+			break;
+
+		case ANSITTY_CLS_BEFORE:
+			GETSIZE(sxsy);
+			SETCURSOR(0, 0);
+			i = (y * sx) + x;
+			break;
+
+		default:
+			GETSIZE(sxsy);
+			SETCURSOR(0, 0);
+			i = sx * sy;
+			break;
+		}
+		while (i--)
+			PUTUNI(' ');
+		SETCURSOR(xy[0], xy[1]);
+	}
+	HIDECURSOR_END();
 }
 
 PRIVATE NONNULL((1)) void CC
@@ -218,32 +313,73 @@ stub_el(struct ansitty *__restrict self,
 	ansitty_coord_t &x = xy[0];
 	ansitty_coord_t &y = xy[1];
 	ansitty_coord_t &sx = sxy[0];
-	size_t i;
-	GETCURSOR(xy);
-	SETCURSOR(MAXCOORD, y);
-	GETCURSOR(sxy);
-	y = sxy[1];
-	switch (mode) {
+	ansitty_coord_t i;
+	HIDECURSOR_BEGIN() {
+		GETCURSOR(xy);
+		switch (mode) {
 
-	case ANSITTY_EL_AFTER:
-		SETCURSOR(x, y);
-		i = (sx + 1) - x;
-		break;
+		case ANSITTY_EL_AFTER:
+			SETCURSOR(MAXCOORD, y);
+			GETCURSOR(sxy);
+			SETCURSOR(x, y);
+			i = (sx + 1) - x;
+			break;
 
-	case ANSITTY_EL_BEFORE:
-		SETCURSOR(0, y);
-		i = x;
-		break;
+		case ANSITTY_EL_BEFORE:
+			SETCURSOR(0, y);
+			i = x;
+			break;
 
-	default:
-		SETCURSOR(0, y);
-		i = sx + 1;
-		break;
+		default:
+			SETCURSOR(MAXCOORD, y);
+			GETCURSOR(sxy);
+			SETCURSOR(0, y);
+			i = sx + 1;
+			break;
+		}
+		while (i--)
+			PUTUNI(' ');
+		if (mode != ANSITTY_EL_BEFORE)
+			SETCURSOR(xy[0], xy[1]);
 	}
-	while (i--)
-		PUTUNI(' ');
-	if (mode != ANSITTY_EL_BEFORE)
-		SETCURSOR(xy[0], xy[1]);
+	HIDECURSOR_END();
+}
+
+PRIVATE NONNULL((1)) void CC
+stub_el_size(struct ansitty *__restrict self,
+             unsigned int mode) {
+	ansitty_coord_t xy[2];
+	ansitty_coord_t sxy[2];
+	ansitty_coord_t &x = xy[0];
+	ansitty_coord_t &y = xy[1];
+	ansitty_coord_t &sx = sxy[0];
+	ansitty_coord_t i;
+	HIDECURSOR_BEGIN() {
+		GETCURSOR(xy);
+		switch (mode) {
+
+		case ANSITTY_EL_AFTER:
+			GETSIZE(sxy);
+			i = sx - x;
+			break;
+
+		case ANSITTY_EL_BEFORE:
+			SETCURSOR(0, y);
+			i = x;
+			break;
+
+		default:
+			SETCURSOR(0, y);
+			GETSIZE(sxy);
+			i = sx;
+			break;
+		}
+		while (i--)
+			PUTUNI(' ');
+		if (mode != ANSITTY_EL_BEFORE)
+			SETCURSOR(xy[0], xy[1]);
+	}
+	HIDECURSOR_END();
 }
 
 PRIVATE NONNULL((1)) void CC
@@ -265,43 +401,97 @@ stub_scroll_with_copycell(struct ansitty *__restrict self,
 	y_end   = self->at_scroll_el;
 	if unlikely(y_start >= y_end)
 		return;
-	GETCURSOR(xy);
-	SETCURSOR(MAXCOORD, MAXCOORD);
-	GETCURSOR(sxy);
-	++sxy[0];
-	++sxy[1];
-	if (y_end > sxy[1]) {
-		y_end = sxy[1];
-		if unlikely(y_start >= y_end)
-			goto done;
-	}
-	y_size = y_end - y_start;
-	if unlikely(y_size == 1)
-		return;
-	--y_size;
-	assert(y_size != 0);
-	if (offset < 0) {
-		offset = -offset;
-		if ((ansitty_coord_t)offset >= y_size)
-			goto done;
-		/* Move terminal contents upwards */
-		for (y = y_start + 1; y < y_end; ++y) {
-			SETCURSOR(0, y);
-			COPYCELL(-(ansitty_offset_t)sxy[0], sxy[0]);
+	HIDECURSOR_BEGIN() {
+		GETCURSOR(xy);
+		SETCURSOR(MAXCOORD, MAXCOORD);
+		GETCURSOR(sxy);
+		++sxy[0];
+		++sxy[1];
+		if (y_end > sxy[1]) {
+			y_end = sxy[1];
+			if unlikely(y_start >= y_end)
+				goto done;
 		}
-	} else {
-		if ((ansitty_coord_t)offset >= y_size)
+		y_size = y_end - y_start;
+		if unlikely(y_size == 1)
 			goto done;
-		/* Move terminal contents downwards */
-		y = y_end - 1;
-		while (y >= y_start) {
-			SETCURSOR(0, y);
-			COPYCELL((ansitty_offset_t)sxy[0], sxy[0]);
-			--y;
+		--y_size;
+		assert(y_size != 0);
+		if (offset < 0) {
+			offset = -offset;
+			if ((ansitty_coord_t)offset >= y_size)
+				goto done;
+			/* Move terminal contents upwards */
+			for (y = y_start + 1; y < y_end; ++y) {
+				SETCURSOR(0, y);
+				COPYCELL(-(ansitty_offset_t)sxy[0], sxy[0]);
+			}
+		} else {
+			if ((ansitty_coord_t)offset >= y_size)
+				goto done;
+			/* Move terminal contents downwards */
+			y = y_end - 1;
+			while (y >= y_start) {
+				SETCURSOR(0, y);
+				COPYCELL((ansitty_offset_t)sxy[0], sxy[0]);
+				--y;
+			}
 		}
-	}
 done:
-	SETCURSOR(xy[0], xy[1]);
+		SETCURSOR(xy[0], xy[1]);
+	}
+	HIDECURSOR_END();
+}
+
+PRIVATE NONNULL((1)) void CC
+stub_scroll_with_copycell_size(struct ansitty *__restrict self,
+                               ansitty_offset_t offset) {
+	ansitty_coord_t xy[2];
+	ansitty_coord_t sxy[2];
+	ansitty_coord_t y, y_start, y_end, y_size;
+	if unlikely(!offset)
+		return;
+	y_start = self->at_scroll_sl;
+	y_end   = self->at_scroll_el;
+	if unlikely(y_start >= y_end)
+		return;
+	HIDECURSOR_BEGIN() {
+		GETCURSOR(xy);
+		GETSIZE(sxy);
+		if (y_end > sxy[1]) {
+			y_end = sxy[1];
+			if unlikely(y_start >= y_end)
+				goto done;
+		}
+		y_size = y_end - y_start;
+		if unlikely(y_size == 1)
+			goto done;
+		--y_size;
+		assert(y_size != 0);
+		if (offset < 0) {
+			offset = -offset;
+			if ((ansitty_coord_t)offset >= y_size)
+				goto done;
+			/* Move terminal contents upwards */
+			for (y = y_start + 1; y < y_end; ++y) {
+				SETCURSOR(0, y);
+				COPYCELL(-(ansitty_offset_t)sxy[0], sxy[0]);
+			}
+		} else {
+			if ((ansitty_coord_t)offset >= y_size)
+				goto done;
+			/* Move terminal contents downwards */
+			y = y_end - 1;
+			while (y >= y_start) {
+				SETCURSOR(0, y);
+				COPYCELL((ansitty_offset_t)sxy[0], sxy[0]);
+				--y;
+			}
+		}
+done:
+		SETCURSOR(xy[0], xy[1]);
+	}
+	HIDECURSOR_END();
 }
 
 
@@ -311,11 +501,14 @@ stub_scroll(struct ansitty *__restrict self,
 	ansitty_coord_t xy[2];
 	if (offset >= 0)
 		return;
-	GETCURSOR(xy);
-	SETCURSOR(MAXCOORD, MAXCOORD);
-	while (offset++)
-		PUTUNI('\n');
-	SETCURSOR(xy[0], xy[1]);
+	HIDECURSOR_BEGIN() {
+		GETCURSOR(xy);
+		SETCURSOR(MAXCOORD, MAXCOORD);
+		while (offset++)
+			PUTUNI('\n');
+		SETCURSOR(xy[0], xy[1]);
+	}
+	HIDECURSOR_END();
 }
 
 
@@ -337,15 +530,20 @@ libansitty_init(struct ansitty *__restrict self,
 	if (!self->at_ops.ato_getcursor)
 		self->at_ops.ato_getcursor = &stub_getcursor;
 	if (!self->at_ops.ato_cls)
-		self->at_ops.ato_cls = &stub_cls;
+		self->at_ops.ato_cls = self->at_ops.ato_getsize ? &stub_cls_size : &stub_cls;
 	if (!self->at_ops.ato_el)
-		self->at_ops.ato_el = &stub_el;
+		self->at_ops.ato_el = self->at_ops.ato_getsize ? &stub_el_size : &stub_el;
 	if (!self->at_ops.ato_scroll) {
 		self->at_ops.ato_scroll = &stub_scroll;
 		/* With copycell(), we can do 100% accurate emulation of scroll() */
-		if (self->at_ops.ato_copycell)
-			self->at_ops.ato_scroll = &stub_scroll_with_copycell;
+		if (self->at_ops.ato_copycell) {
+			self->at_ops.ato_scroll = self->at_ops.ato_getsize
+			                          ? &stub_scroll_with_copycell_size
+			                          : &stub_scroll_with_copycell;
+		}
 	}
+	if (!self->at_ops.ato_getsize)
+		self->at_ops.ato_getsize = self->at_ops.ato_getcursor ? &stub_getsize_from_cursor : &stub_getsize;
 	/* copycell cannot be emulated, but still replace it with a no-op */
 	if (!self->at_ops.ato_copycell)
 		self->at_ops.ato_copycell = &stub_copycell;
@@ -705,33 +903,36 @@ ansitty_do_hscroll(struct ansitty *__restrict self, int offset) {
 	if (y_start >= y_end)
 		return;
 	x_size = x_end - x_start;
-	if (offset >= 0) {
-		unsigned int cells_per_row;
-		if ((unsigned int)offset >= x_size)
-			return;
-		GETCURSOR(xy);
-		cells_per_row = x_size - (unsigned int)offset;
-		/* Copy cells to the right */
-		for (y = y_start; y < y_end; ++y) {
-			SETCURSOR(x_start, y);
-			COPYCELL(offset, cells_per_row);
+	HIDECURSOR_BEGIN() {
+		if (offset >= 0) {
+			unsigned int cells_per_row;
+			if ((unsigned int)offset >= x_size)
+				return;
+			GETCURSOR(xy);
+			cells_per_row = x_size - (unsigned int)offset;
+			/* Copy cells to the right */
+			for (y = y_start; y < y_end; ++y) {
+				SETCURSOR(x_start, y);
+				COPYCELL(offset, cells_per_row);
+			}
+		} else {
+			ansitty_coord_t x;
+			unsigned int cells_per_row;
+			/* Copy cells to the left */
+			offset = -offset;
+			if ((unsigned int)offset >= x_size)
+				return;
+			GETCURSOR(xy);
+			x = x_start + (unsigned int)offset;
+			cells_per_row = x_size - (unsigned int)offset;
+			for (y = y_start; y < y_end; ++y) {
+				SETCURSOR(x, y);
+				COPYCELL(-offset, cells_per_row);
+			}
 		}
-	} else {
-		ansitty_coord_t x;
-		unsigned int cells_per_row;
-		/* Copy cells to the left */
-		offset = -offset;
-		if ((unsigned int)offset >= x_size)
-			return;
-		GETCURSOR(xy);
-		x = x_start + (unsigned int)offset;
-		cells_per_row = x_size - (unsigned int)offset;
-		for (y = y_start; y < y_end; ++y) {
-			SETCURSOR(x, y);
-			COPYCELL(-offset, cells_per_row);
-		}
+		SETCURSOR(xy[0], xy[1]);
 	}
-	SETCURSOR(xy[0], xy[1]);
+	HIDECURSOR_END();
 }
 
 /* "\e[{arg[arglen]:%s}{lastch}" */
@@ -895,10 +1096,7 @@ do_single_argument_case:
 				ansitty_coord_t sxy[2];
 				ansitty_coord_t cells_in_line;
 				GETCURSOR(xy);
-				SETCURSOR(MAXCOORD, MAXCOORD);
-				GETCURSOR(sxy);
-				SETCURSOR(xy[0], xy[1]);
-				++sxy[0];
+				GETSIZE(sxy);
 				if unlikely(xy[0] >= sxy[0])
 					break;
 				cells_in_line = sxy[0] - xy[0];
@@ -918,34 +1116,38 @@ do_single_argument_case:
 				if (xy[1] == 0) {
 					if (xy[0] < (unsigned int)n)
 						break;
-					copy_count = xy[0];
-					SETCURSOR((unsigned int)n, 0);
-				} else {
-					SETCURSOR((unsigned int)n, 0);
-					GETCURSOR(xy2);
-					if (xy2[0] < (unsigned int)n) {
-						/* n >= SCREEN_SIZE.X, where xy2[0] == SCREEN_SIZE.X - 1 */
-						ansitty_coord_t column, row;
-						++xy2[0];
-						column = n % xy2[0];
-						row    = n / xy2[0];
-						if (row > xy[1] ||
-						    (row == xy[1] && column > xy[0])) {
-							SETCURSOR(xy[0], xy[1]);
-							break; /* Full area shift */
-						}
-						SETCURSOR(column, row);
-					} else {
-						/* We still need to know the display width */
-						SETCURSOR(MAXCOORD, 0);
-						GETCURSOR(xy2);
-						SETCURSOR((unsigned int)n, 0);
-						++xy2[0];
-					}
-					copy_count = xy[0] + xy[1] * xy2[0];
 				}
-				COPYCELL(-n, copy_count);
-				SETCURSOR(xy[0], xy[1]);
+				HIDECURSOR_BEGIN() {
+					if (xy[1] == 0) {
+						copy_count = xy[0];
+						SETCURSOR((unsigned int)n, 0);
+					} else {
+						SETCURSOR((unsigned int)n, 0);
+						GETCURSOR(xy2);
+						if (xy2[0] < (unsigned int)n) {
+							/* n >= SCREEN_SIZE.X, where xy2[0] == SCREEN_SIZE.X - 1 */
+							ansitty_coord_t column, row;
+							++xy2[0];
+							column = n % xy2[0];
+							row    = n / xy2[0];
+							if (row > xy[1] ||
+								(row == xy[1] && column > xy[0])) {
+								SETCURSOR(xy[0], xy[1]);
+								goto done_insert_ansitty_flag_hedit; /* Full area shift */
+							}
+							SETCURSOR(column, row);
+						} else {
+							/* We still need to know the display width */
+							GETSIZE(xy2);
+						}
+						copy_count = xy[0] + xy[1] * xy2[0];
+					}
+					COPYCELL(-n, copy_count);
+					SETCURSOR(xy[0], xy[1]);
+done_insert_ansitty_flag_hedit:
+					;
+				}
+				HIDECURSOR_END();
 			}	break;
 
 			case ANSITTY_FLAG_HEDIT | ANSITTY_FLAG_INSDEL_LINE: {
@@ -954,11 +1156,16 @@ do_single_argument_case:
 				 * ABCDEFGHI  --> D...EFGHI
 				 * abcdefghi      abcdefghi */
 				GETCURSOR(xy);
-				if ((unsigned int)n >= xy[0])
-					break; /* Full area shift */
-				SETCURSOR((ansitty_coord_t)n, xy[1]);
-				COPYCELL(-n, xy[0] - (unsigned int)n);
-				SETCURSOR(xy[0], xy[1]);
+				if ((unsigned int)n >= xy[0]) {
+					/* Full area shift */
+				} else {
+					HIDECURSOR_BEGIN() {
+						SETCURSOR((ansitty_coord_t)n, xy[1]);
+						COPYCELL(-n, xy[0] - (unsigned int)n);
+						SETCURSOR(xy[0], xy[1]);
+					}
+					HIDECURSOR_END();
+				}
 			}	break;
 
 			default: __builtin_unreachable();
@@ -979,19 +1186,22 @@ do_single_argument_case:
 				ansitty_coord_t xy[2];
 				ansitty_coord_t xy2[2];
 				ansitty_coord_t new_x;
-				GETCURSOR(xy);
-				new_x = xy[0] + (unsigned int)n;
-				SETCURSOR(new_x, xy[1]);
-				GETCURSOR(xy2);
-				if (xy2[0] < new_x) {
-					ansitty_coord_t new_y;
-					++xy2[0];
-					new_y = xy[1] + (unsigned int)n / xy2[0];
-					new_x = xy[0] + (unsigned int)n % xy2[0];
-					SETCURSOR(new_x, new_y);
+				HIDECURSOR_BEGIN() {
+					GETCURSOR(xy);
+					new_x = xy[0] + (unsigned int)n;
+					SETCURSOR(new_x, xy[1]);
+					GETCURSOR(xy2);
+					if (xy2[0] < new_x) {
+						ansitty_coord_t new_y;
+						++xy2[0];
+						new_y = xy[1] + (unsigned int)n / xy2[0];
+						new_x = xy[0] + (unsigned int)n % xy2[0];
+						SETCURSOR(new_x, new_y);
+					}
+					COPYCELL(-n, MAXCOORD);
+					SETCURSOR(xy[0], xy[1]);
 				}
-				COPYCELL(-n, MAXCOORD);
-				SETCURSOR(xy[0], xy[1]);
+				HIDECURSOR_END();
 			}	break;
 
 			case ANSITTY_FLAG_INSDEL_LINE: {
@@ -1001,23 +1211,24 @@ do_single_argument_case:
 				ansitty_coord_t xy[2];
 				ansitty_coord_t sxy[2];
 				ansitty_coord_t cells_in_line;
-				GETCURSOR(xy);
-				SETCURSOR(MAXCOORD, MAXCOORD);
-				GETCURSOR(sxy);
-				++sxy[0];
-				if unlikely(xy[0] >= sxy[0]) {
-					SETCURSOR(xy[0], xy[1]);
-					break;
+				HIDECURSOR_BEGIN() {
+					GETCURSOR(xy);
+					GETSIZE(sxy);
+					if unlikely(xy[0] >= sxy[0]) {
+						/* Full area shift */
+					} else {
+						cells_in_line = sxy[0] - xy[0];
+						if ((unsigned int)n >= cells_in_line) {
+							/* Full area shift */
+						} else {
+							cells_in_line -= (unsigned int)n;
+							SETCURSOR(xy[0] + cells_in_line, xy[1]);
+							COPYCELL(-n, cells_in_line);
+							SETCURSOR(xy[0], xy[1]);
+						}
+					}
 				}
-				cells_in_line = sxy[0] - xy[0];
-				if ((unsigned int)n >= cells_in_line) {
-					SETCURSOR(xy[0], xy[1]);
-					break;
-				}
-				cells_in_line -= (unsigned int)n;
-				SETCURSOR(xy[0] + cells_in_line, xy[1]);
-				COPYCELL(-n, cells_in_line);
-				SETCURSOR(xy[0], xy[1]);
+				HIDECURSOR_END();
 			}	break;
 
 			case ANSITTY_FLAG_HEDIT: {
@@ -1026,18 +1237,19 @@ do_single_argument_case:
 				/* 123456789      ...123456
 				 * ABCDEFGHI  --> 789AEFGHI
 				 * abcdefghi      abcdefghi */
-				GETCURSOR(xy);
-				copy_count = xy[0];
-				if (xy[1] != 0) {
-					ansitty_coord_t sxy[2];
-					SETCURSOR(MAXCOORD, 0);
-					GETCURSOR(sxy);
-					++sxy[0];
-					copy_count += xy[1] * sxy[0];
+				HIDECURSOR_BEGIN() {
+					GETCURSOR(xy);
+					copy_count = xy[0];
+					if (xy[1] != 0) {
+						ansitty_coord_t sxy[2];
+						GETSIZE(sxy);
+						copy_count += xy[1] * sxy[0];
+					}
+					SETCURSOR(0, 0);
+					COPYCELL(n, copy_count);
+					SETCURSOR(xy[0], xy[1]);
 				}
-				SETCURSOR(0, 0);
-				COPYCELL(n, copy_count);
-				SETCURSOR(xy[0], xy[1]);
+				HIDECURSOR_END();
 			}	break;
 
 			case ANSITTY_FLAG_HEDIT | ANSITTY_FLAG_INSDEL_LINE: {
@@ -1045,12 +1257,18 @@ do_single_argument_case:
 				/* 123456789      123456789
 				 * ABCDEFGHI  --> ...AEFGHI
 				 * abcdefghi      abcdefghi */
-				GETCURSOR(xy);
-				if ((unsigned int)n >= xy[0])
-					break; /* Full area shift */
-				SETCURSOR(0, xy[1]);
-				COPYCELL(n, xy[0] - (unsigned int)n);
-				SETCURSOR(xy[0], xy[1]);
+				HIDECURSOR_BEGIN() {
+					GETCURSOR(xy);
+					if ((unsigned int)n >= xy[0]) {
+						/* Full area shift */
+					} else {
+						if (xy[0] != 0)
+							SETCURSOR(0, xy[1]);
+						COPYCELL(n, xy[0] - (unsigned int)n);
+						SETCURSOR(xy[0], xy[1]);
+					}
+				}
+				HIDECURSOR_END();
 			}	break;
 
 			default: __builtin_unreachable();
@@ -1958,10 +2176,7 @@ ansitty_do_insert_nobox(struct ansitty *__restrict self, char32_t ch) {
 		ansitty_coord_t sxy[2];
 		ansitty_coord_t cells_in_line;
 		GETCURSOR(xy);
-		SETCURSOR(MAXCOORD, MAXCOORD);
-		GETCURSOR(sxy);
-		SETCURSOR(xy[0], xy[1]);
-		++sxy[0];
+		GETSIZE(sxy);
 		if unlikely(xy[0] >= sxy[0])
 			break;
 		cells_in_line = sxy[0] - xy[0];
@@ -1973,7 +2188,6 @@ ansitty_do_insert_nobox(struct ansitty *__restrict self, char32_t ch) {
 
 	case ANSITTY_FLAG_HEDIT: {
 		ansitty_coord_t xy[2];
-		ansitty_coord_t xy2[2];
 		unsigned int copy_count;
 		/* 123456789      456789ABC
 		 * ABCDEFGHI  --> D...EFGHI
@@ -1989,20 +2203,23 @@ ansitty_do_insert_nobox(struct ansitty *__restrict self, char32_t ch) {
 			}
 			copy_count = xy[0];
 		} else {
-			SETCURSOR(MAXCOORD, 0);
-			GETCURSOR(xy2);
-			copy_count = xy[0] + xy[1] * (xy2[0] + 1);
+			ansitty_coord_t xy2[2];
+			GETSIZE(xy2);
+			copy_count = xy[0] + xy[1] * xy2[0];
 		}
-		SETCURSOR(1, 0);
-		COPYCELL(-1, copy_count);
-		if (!xy[0]) {
-			--xy[1];
-			xy[0] = MAXCOORD;
-		} else {
-			--xy[0];
+		HIDECURSOR_BEGIN() {
+			SETCURSOR(1, 0);
+			COPYCELL(-1, copy_count);
+			if (!xy[0]) {
+				--xy[1];
+				xy[0] = MAXCOORD;
+			} else {
+				--xy[0];
+			}
+			SETCURSOR(xy[0], xy[1]);
+			PUTUNI(ch);
 		}
-		SETCURSOR(xy[0], xy[1]);
-		PUTUNI(ch);
+		HIDECURSOR_END();
 	}	break;
 
 	case ANSITTY_FLAG_HEDIT | ANSITTY_FLAG_INSDEL_LINE: {
@@ -2019,10 +2236,13 @@ ansitty_do_insert_nobox(struct ansitty *__restrict self, char32_t ch) {
 			PUTUNI(ch);
 			break;
 		}
-		SETCURSOR(1, xy[1]);
-		COPYCELL(-1, xy[0] - 1);
-		SETCURSOR(xy[0] - 1, xy[1]);
-		PUTUNI(ch);
+		HIDECURSOR_BEGIN() {
+			SETCURSOR(1, xy[1]);
+			COPYCELL(-1, xy[0] - 1);
+			SETCURSOR(xy[0] - 1, xy[1]);
+			PUTUNI(ch);
+		}
+		HIDECURSOR_END();
 	}	break;
 
 	default: __builtin_unreachable();
@@ -2210,13 +2430,16 @@ set_esc_state:
 				ansitty_coord_t xy[2];
 				GETCURSOR(xy);
 				if (xy[0] != 0) {
-					/* Current column is non-zero, so we must take special
-					 * action to ensure that the cursor is placed correctly. */
-					PUTUNI('\n');
-					/* Reset the cursor position to the middle of the following line.
-					 * Note that in the case of the previous line being the bottom-most one,
-					 * SETCURSOR() will clamp that coord into the valid display range. */
-					SETCURSOR(xy[0], xy[1] + 1);
+					HIDECURSOR_BEGIN() {
+						/* Current column is non-zero, so we must take special
+						 * action to ensure that the cursor is placed correctly. */
+						PUTUNI('\n');
+						/* Reset the cursor position to the middle of the following line.
+						 * Note that in the case of the previous line being the bottom-most one,
+						 * SETCURSOR() will clamp that coord into the valid display range. */
+						SETCURSOR(xy[0], xy[1] + 1);
+					}
+					HIDECURSOR_END();
 					break;
 				}
 			}
