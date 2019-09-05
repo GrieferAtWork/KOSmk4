@@ -21,7 +21,6 @@ BEGIN
 	GROUP("apps.init") { COMPILE, LINK, MCOPY };
 	SET_OUTPUT("/" + BINPATH + "/bin/init")
 	SET_DISKFILE("/bin/init")
-//	USELIB("libdl")
 	SOURCE({ "init/*.c" })
 END
 
