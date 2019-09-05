@@ -433,10 +433,11 @@ generic_handle_node:
 			mallnode_tree_insert(&mall_tree, node);
 			return true;
 		}
-		if ((end_addr - 1) >= node->m_tree.a_vmax) {
+		if (end_addr > node->m_tree.a_vmax) {
 			/* Only a trailing part of the node is being untraced. */
 			num_bytes = (size_t)((end_addr - 1) - node->m_tree.a_vmax);
-			node->m_tree.a_vmax = (uintptr_t)ptr;
+			node->m_tree.a_vmax = (uintptr_t)ptr - 1;
+			assert(node->m_tree.a_vmax >= node->m_tree.a_vmin);
 			ptr = (void *)(end_addr - num_bytes);
 			/* Re-insert the node */
 			mallnode_tree_insert(&mall_tree, node);
@@ -1352,6 +1353,8 @@ NOTHROW(KCALL mall_insert_tree)(struct mallnode *__restrict node) {
 		existing_node = *p_existing_node;
 		assert(existing_node);
 		if (MALLNODE_ISVALID(existing_node)) {
+			printk(KERN_CRIT "Traceback of existing node:\n");
+			mallnode_print_traceback(existing_node, &kprinter, (void *)KERN_CRIT);
 			kernel_panic("Attempted to trace memory at %p...%p, which "
 			             "overlaps with an existing tracing of %p...%p",
 			             node->m_tree.a_vmin,
