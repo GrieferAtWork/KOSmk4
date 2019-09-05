@@ -42,6 +42,7 @@
 #include <sched/cpu.h>
 #include <sched/except-handler.h>
 #include <sched/mutex.h>
+#include <sched/pid.h>
 #include <sched/posix-signal.h>
 #include <sched/rpc.h>
 #include <sched/task.h>
@@ -180,7 +181,8 @@ NOTHROW(FCALL translate_exception_errno)(struct icpustate *__restrict state,
 			}
 			printk(KERN_TRACE "]");
 		}
-		printk(KERN_TRACE " into errno=%d\n", errval);
+		printk(KERN_TRACE " into errno=%d [tid=%u]\n",
+		       errval, task_getroottid_s());
 	}
 #endif
 #ifdef __x86_64__

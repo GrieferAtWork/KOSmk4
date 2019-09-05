@@ -61,38 +61,13 @@ FUNDEF ssize_t NOTHROW(KCALL error_print_into)(__pformatprinter printer, void *a
 typedef __errno_t errno_t;
 #endif /* !errno_t_defined */
 
-#if 0 /* This would technically work, however the jump across `__rethrow'
-       * causes a compiler error (and I don't want to turn off `-fpermissive')
-       * NOTE: and `#pragma GCC diagnostic ignored "-fpermissive"' doesn't
-       *       work (any more), because the GCC developers don't care that
-       *       allowing it to be disabled at a source-level was a really
-       *       neat feature:
-       *       https://gcc.gnu.org/bugzilla/show_bug.cgi?id=81787
-       */
-#define __PRIVATE_FINALLY_UNIQUE __PRIVATE_CATCH_UNIQUE2(__finally_do_handle_,__LINE__)
-#define __PRIVATE_FINALLY_ENTRY  __PRIVATE_CATCH_UNIQUE2(__finally_do_enter_,__LINE__)
-#define FINALLY     \
-	EXCEPT{goto __PRIVATE_FINALLY_UNIQUE;} \
-	for(register int __rethrow=0;!__rethrow;__rethrow?RETHROW():(void)(__rethrow=1)) \
-	__IF0{__PRIVATE_FINALLY_UNIQUE:__rethrow=1;goto __PRIVATE_FINALLY_ENTRY;} \
-	else __PRIVATE_FINALLY_ENTRY:
-#endif
-
-#if 1
-#define FINALLY(...) EXCEPT { do __VA_ARGS__ __WHILE0; RETHROW(); } __VA_ARGS__
-#endif
-
-
-
-
 /* Ensure that the 1-bits of `input' can entirely be masked by `allowed'
  * If this isn't the case, throw an `E_INVALID_ARGUMENT_UNKNOWN_FLAG' exception.
  * @param: context: One of `E_INVALID_ARGUMENT_CONTEXT_*' */
-#define VALIDATE_FLAGSET(input,allowed,context) \
-	(unlikely((input) & ~(allowed)) ? \
-	 THROW(E_INVALID_ARGUMENT_UNKNOWN_FLAG,context,input,~(allowed)/*,0*/) : (void)0)
-
-
+#define VALIDATE_FLAGSET(input, allowed, context)                                \
+	(unlikely((input) & ~(allowed))                                              \
+	 ? THROW(E_INVALID_ARGUMENT_UNKNOWN_FLAG, context, input, ~(allowed) /*,0*/) \
+	 : (void)0)
 
 /* Enable nested exception handling, such that the
  * original exception is always restored, even when

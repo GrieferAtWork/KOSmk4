@@ -1251,7 +1251,7 @@ no_old_handler:
 		VALIDATE_FLAGSET(nhandler.sa_flags,
 		                 SA_NOCLDSTOP | SA_NOCLDWAIT | SA_SIGINFO |
 		                 SA_RESTORER | SA_ONSTACK | SA_RESTART |
-		                 SA_NODEFER | SA_RESETHAND,
+		                 SA_NODEFER | SA_RESETHAND | SA_INTERRUPT,
 		                 E_INVALID_ARGUMENT_CONTEXT_SIGACTION_ACT_FLAGS);
 		COMPILER_BARRIER();
 		nhandler.sa_restore = NULL;
