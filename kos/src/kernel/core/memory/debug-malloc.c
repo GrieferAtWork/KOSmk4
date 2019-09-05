@@ -434,9 +434,9 @@ generic_handle_node:
 		}
 		if ((end_addr - 1) >= node->m_tree.a_vmax) {
 			/* Only a trailing part of the node is being untraced. */
-			num_bytes           = (size_t)(end_addr - node->m_tree.a_vmax);
+			num_bytes = (size_t)((end_addr - 1) - node->m_tree.a_vmax);
 			node->m_tree.a_vmax = (uintptr_t)ptr;
-			ptr                 = (void *)(end_addr - num_bytes);
+			ptr = (void *)(end_addr - num_bytes);
 			/* Re-insert the node */
 			mallnode_tree_insert(&mall_tree, node);
 			continue;
@@ -478,7 +478,7 @@ generic_handle_node:
 		 * now we can use it to split the old one in 2 */
 		hinode->m_tree.a_vmax = node->m_tree.a_vmax;
 		hinode->m_tree.a_vmin = end_addr;
-		node->m_tree.a_vmax   = (uintptr_t)ptr;
+		node->m_tree.a_vmax   = (uintptr_t)ptr - 1;
 		hinode->m_flags       = node->m_flags;
 #if __SIZEOF_POINTER__ == 4
 		memcpyl(hinode->m_trace, node->m_trace,
