@@ -1,4 +1,4 @@
-/* HASH 0x51ed88d8 */
+/* HASH 0xca40887d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,15 +24,15 @@
 #ifndef ____localdep_select32_defined
 #define ____localdep_select32_defined 1
 #if defined(__CRT_HAVE_select)
-__CREDIRECT(,int,__NOTHROW_RPC,__localdep_select32,(int __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct __timeval32 *__restrict __timeout),select,(__nfds,__readfds,__writefds,__exceptfds,__timeout))
+__CREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_select32,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct __timeval32 *__restrict __timeout),select,(__nfds,__readfds,__writefds,__exceptfds,__timeout))
 #else /* LIBC: select */
 #undef ____localdep_select32_defined
 #endif /* select32... */
 #endif /* !____localdep_select32_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(select64) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(select64))(int __nfds,
+__LOCAL_LIBC(select64) __STDC_INT_AS_SSIZE_T
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(select64))(__STDC_INT_AS_SIZE_T __nfds,
                                                       fd_set *__restrict __readfds,
                                                       fd_set *__restrict __writefds,
                                                       fd_set *__restrict __exceptfds,

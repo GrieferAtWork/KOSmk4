@@ -1,4 +1,4 @@
-/* HASH 0xaaa121be */
+/* HASH 0xf11dd492 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,9 +24,9 @@
 #ifndef ____localdep_select64_defined
 #define ____localdep_select64_defined 1
 #if defined(__CRT_HAVE_select64)
-__CREDIRECT(,int,__NOTHROW_RPC,__localdep_select64,(int __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct __timeval64 *__restrict __timeout),select64,(__nfds,__readfds,__writefds,__exceptfds,__timeout))
+__CREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_select64,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct __timeval64 *__restrict __timeout),select64,(__nfds,__readfds,__writefds,__exceptfds,__timeout))
 #elif defined(__CRT_HAVE_select) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-__CREDIRECT(,int,__NOTHROW_RPC,__localdep_select64,(int __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct __timeval64 *__restrict __timeout),select,(__nfds,__readfds,__writefds,__exceptfds,__timeout))
+__CREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_select64,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct __timeval64 *__restrict __timeout),select,(__nfds,__readfds,__writefds,__exceptfds,__timeout))
 #elif defined(__CRT_HAVE_select)
 #include <local/sys.select/select64.h>
 #define __localdep_select64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(select64))
@@ -39,15 +39,15 @@ __CREDIRECT(,int,__NOTHROW_RPC,__localdep_select64,(int __nfds, fd_set *__restri
 #ifndef ____localdep_select32_defined
 #define ____localdep_select32_defined 1
 #if defined(__CRT_HAVE_select)
-__CREDIRECT(,int,__NOTHROW_RPC,__localdep_select32,(int __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct __timeval32 *__restrict __timeout),select,(__nfds,__readfds,__writefds,__exceptfds,__timeout))
+__CREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_select32,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct __timeval32 *__restrict __timeout),select,(__nfds,__readfds,__writefds,__exceptfds,__timeout))
 #else /* LIBC: select */
 #undef ____localdep_select32_defined
 #endif /* select32... */
 #endif /* !____localdep_select32_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(select) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(select))(int __nfds,
+__LOCAL_LIBC(select) __STDC_INT_AS_SSIZE_T
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(select))(__STDC_INT_AS_SIZE_T __nfds,
                                                     fd_set *__restrict __readfds,
                                                     fd_set *__restrict __writefds,
                                                     fd_set *__restrict __exceptfds,

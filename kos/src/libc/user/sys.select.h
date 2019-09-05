@@ -1,4 +1,4 @@
-/* HASH 0x47402fd */
+/* HASH 0xec6dc3a1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,10 +36,10 @@ DECL_BEGIN
 typedef __sighandler_t sighandler_t;
 #endif /* !__sighandler_t_defined */
 
-INTDEF int NOTHROW_RPC(LIBCCALL libc_select)(int nfds, fd_set *__restrict readfds, fd_set *__restrict writefds, fd_set *__restrict exceptfds, struct timeval *__restrict timeout);
-INTDEF int NOTHROW_RPC(LIBCCALL libc_pselect)(int nfds, fd_set *__restrict readfds, fd_set *__restrict writefds, fd_set *__restrict exceptfds, struct timespec const *__restrict timeout, sigset_t const *__restrict sigmask);
-INTDEF int NOTHROW_RPC(LIBCCALL libc_select64)(int nfds, fd_set *__restrict readfds, fd_set *__restrict writefds, fd_set *__restrict exceptfds, struct timeval64 *__restrict timeout);
-INTDEF int NOTHROW_RPC(LIBCCALL libc_pselect64)(int nfds, fd_set *__restrict readfds, fd_set *__restrict writefds, fd_set *__restrict exceptfds, struct timespec64 const *__restrict timeout, sigset_t const *__restrict sigmask);
+INTDEF __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBCCALL libc_select)(__STDC_INT_AS_SIZE_T nfds, fd_set *__restrict readfds, fd_set *__restrict writefds, fd_set *__restrict exceptfds, struct timeval *__restrict timeout);
+INTDEF __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBCCALL libc_pselect)(__STDC_INT_AS_SIZE_T nfds, fd_set *__restrict readfds, fd_set *__restrict writefds, fd_set *__restrict exceptfds, struct timespec const *__restrict timeout, sigset_t const *__restrict sigmask);
+INTDEF __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBCCALL libc_select64)(__STDC_INT_AS_SIZE_T nfds, fd_set *__restrict readfds, fd_set *__restrict writefds, fd_set *__restrict exceptfds, struct timeval64 *__restrict timeout);
+INTDEF __STDC_INT_AS_SSIZE_T NOTHROW_RPC(LIBCCALL libc_pselect64)(__STDC_INT_AS_SIZE_T nfds, fd_set *__restrict readfds, fd_set *__restrict writefds, fd_set *__restrict exceptfds, struct timespec64 const *__restrict timeout, sigset_t const *__restrict sigmask);
 
 DECL_END
 

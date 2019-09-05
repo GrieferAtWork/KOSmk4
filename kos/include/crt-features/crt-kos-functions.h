@@ -1,4 +1,4 @@
-/* HASH 0xb9fe818c */
+/* HASH 0x222470b7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1447,8 +1447,8 @@ __CRT_FUNCTION(prlimit64,1,(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__,prlimit),4,
 __CRT_FUNCTION(process_vm_readv,0,(),6,(pid_t,pid,struct iovec const *,llocal_iov,unsigned long int,liovcnt,struct iovec const *,remote_iov,unsigned long int,riovcnt,unsigned long int,flags),ssize_t)
 __CRT_FUNCTION(process_vm_writev,0,(),6,(pid_t,pid,struct iovec const *,local_iov,unsigned long int,liovcnt,struct iovec const *,remote_iov,unsigned long int,riovcnt,unsigned long int,flags),ssize_t)
 __CRT_FUNCTION(profil,0,(),4,(unsigned short int *,sample_buffer,size_t,size,size_t,offset,unsigned int,scale),int)
-__CRT_FUNCTION(pselect,0,(),6,(int,nfds,fd_set *__restrict,readfds,fd_set *__restrict,writefds,fd_set *__restrict,exceptfds,struct timespec const *__restrict,timeout,sigset_t const *__restrict,sigmask),int)
-__CRT_FUNCTION(pselect64,1,(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__,pselect),6,(int,nfds,fd_set *__restrict,readfds,fd_set *__restrict,writefds,fd_set *__restrict,exceptfds,struct timespec64 const *__restrict,timeout,sigset_t const *__restrict,sigmask),int)
+__CRT_FUNCTION(pselect,0,(),6,(__STDC_INT_AS_SIZE_T,nfds,fd_set *__restrict,readfds,fd_set *__restrict,writefds,fd_set *__restrict,exceptfds,struct timespec const *__restrict,timeout,sigset_t const *__restrict,sigmask),__STDC_INT_AS_SSIZE_T)
+__CRT_FUNCTION(pselect64,1,(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__,pselect),6,(__STDC_INT_AS_SIZE_T,nfds,fd_set *__restrict,readfds,fd_set *__restrict,writefds,fd_set *__restrict,exceptfds,struct timespec64 const *__restrict,timeout,sigset_t const *__restrict,sigmask),__STDC_INT_AS_SSIZE_T)
 __CRT_FUNCTION(psiginfo,0,(),2,(siginfo_t const *,pinfo,char const *,s),void)
 __CRT_FUNCTION(psignal,0,(),2,(int,signo,char const *,s),void)
 __CRT_FUNCTION(pthread_atfork,0,(),3,(__pthread_atfork_func_t,prepare,__pthread_atfork_func_t,parent,__pthread_atfork_func_t,child),int)
@@ -1737,8 +1737,8 @@ __CRT_FUNCTION(secure_getenv,0,(),1,(char const *,varname),char *)
 __CRT_FUNCTION(seed48,0,(),1,(unsigned short[3],seed16v),unsigned short *)
 __CRT_FUNCTION(seed48_r,0,(),2,(unsigned short[3],seed16v,struct drand48_data *,buffer),int)
 __CRT_FUNCTION(seekdir,0,(),2,(DIR *__restrict,dirp,long int,pos),void)
-__CRT_FUNCTION(select,0,(),5,(int,nfds,fd_set *__restrict,readfds,fd_set *__restrict,writefds,fd_set *__restrict,exceptfds,struct timeval *__restrict,timeout),int)
-__CRT_FUNCTION(select64,1,(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__,select),5,(int,nfds,fd_set *__restrict,readfds,fd_set *__restrict,writefds,fd_set *__restrict,exceptfds,struct timeval64 *__restrict,timeout),int)
+__CRT_FUNCTION(select,0,(),5,(__STDC_INT_AS_SIZE_T,nfds,fd_set *__restrict,readfds,fd_set *__restrict,writefds,fd_set *__restrict,exceptfds,struct timeval *__restrict,timeout),__STDC_INT_AS_SSIZE_T)
+__CRT_FUNCTION(select64,1,(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__,select),5,(__STDC_INT_AS_SIZE_T,nfds,fd_set *__restrict,readfds,fd_set *__restrict,writefds,fd_set *__restrict,exceptfds,struct timeval64 *__restrict,timeout),__STDC_INT_AS_SSIZE_T)
 __CRT_FUNCTION(sem_close,0,(),1,(sem_t *,sem),int)
 __CRT_FUNCTION(sem_destroy,0,(),1,(sem_t *,sem),int)
 __CRT_FUNCTION(sem_getvalue,0,(),2,(sem_t *__restrict,sem,int *__restrict,sval),int)

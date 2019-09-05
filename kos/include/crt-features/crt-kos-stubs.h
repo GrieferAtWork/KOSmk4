@@ -1,4 +1,4 @@
-/* HASH 0xd5005b33 */
+/* HASH 0x29a49052 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -449,8 +449,6 @@
 #define __CRT_STUB_prlimit64 1
 #define __CRT_STUB_process_vm_readv 1
 #define __CRT_STUB_process_vm_writev 1
-#define __CRT_STUB_pselect 1
-#define __CRT_STUB_pselect64 1
 #define __CRT_STUB_psiginfo 1
 #define __CRT_STUB_psignal 1
 #define __CRT_STUB_pthread_atfork 1
@@ -619,8 +617,6 @@
 #define __CRT_STUB_secure_getenv 1
 #define __CRT_STUB_seed48 1
 #define __CRT_STUB_seed48_r 1
-#define __CRT_STUB_select 1
-#define __CRT_STUB_select64 1
 #define __CRT_STUB_sem_close 1
 #define __CRT_STUB_sem_destroy 1
 #define __CRT_STUB_sem_getvalue 1

@@ -1497,8 +1497,8 @@ DEFINE_SYSCALL5(ssize_t, select64, size_t, nfds,
 #endif /* __NR_select64 */
 
 struct sigset_and_len {
-	sigset_t *ss_ptr;
-	size_t    ss_len;
+	sigset_t const *ss_ptr;
+	size_t          ss_len;
 };
 
 

@@ -1,4 +1,4 @@
-/* HASH 0x9e33eaa4 */
+/* HASH 0x4006f17f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,15 +24,15 @@
 #ifndef ____localdep_pselect32_defined
 #define ____localdep_pselect32_defined 1
 #if defined(__CRT_HAVE_pselect)
-__CREDIRECT(,int,__NOTHROW_RPC,__localdep_pselect32,(int __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct __timespec32 const *__restrict __timeout, struct __sigset_struct const *__restrict __sigmask),pselect,(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask))
+__CREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_pselect32,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct __timespec32 const *__restrict __timeout, struct __sigset_struct const *__restrict __sigmask),pselect,(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask))
 #else /* LIBC: pselect */
 #undef ____localdep_pselect32_defined
 #endif /* pselect32... */
 #endif /* !____localdep_pselect32_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(pselect64) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pselect64))(int __nfds,
+__LOCAL_LIBC(pselect64) __STDC_INT_AS_SSIZE_T
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pselect64))(__STDC_INT_AS_SIZE_T __nfds,
                                                        fd_set *__restrict __readfds,
                                                        fd_set *__restrict __writefds,
                                                        fd_set *__restrict __exceptfds,

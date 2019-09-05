@@ -1,4 +1,4 @@
-/* HASH 0x4f4ff4ef */
+/* HASH 0x6c2183c6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,9 +24,9 @@
 #ifndef ____localdep_pselect64_defined
 #define ____localdep_pselect64_defined 1
 #if defined(__CRT_HAVE_pselect64)
-__CREDIRECT(,int,__NOTHROW_RPC,__localdep_pselect64,(int __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct __timespec64 const *__restrict __timeout, struct __sigset_struct const *__restrict __sigmask),pselect64,(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask))
+__CREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_pselect64,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct __timespec64 const *__restrict __timeout, struct __sigset_struct const *__restrict __sigmask),pselect64,(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask))
 #elif defined(__CRT_HAVE_pselect) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-__CREDIRECT(,int,__NOTHROW_RPC,__localdep_pselect64,(int __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct __timespec64 const *__restrict __timeout, struct __sigset_struct const *__restrict __sigmask),pselect,(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask))
+__CREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_pselect64,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct __timespec64 const *__restrict __timeout, struct __sigset_struct const *__restrict __sigmask),pselect,(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask))
 #elif defined(__CRT_HAVE_pselect)
 #include <local/sys.select/pselect64.h>
 #define __localdep_pselect64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pselect64))
@@ -39,15 +39,15 @@ __CREDIRECT(,int,__NOTHROW_RPC,__localdep_pselect64,(int __nfds, fd_set *__restr
 #ifndef ____localdep_pselect32_defined
 #define ____localdep_pselect32_defined 1
 #if defined(__CRT_HAVE_pselect)
-__CREDIRECT(,int,__NOTHROW_RPC,__localdep_pselect32,(int __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct __timespec32 const *__restrict __timeout, struct __sigset_struct const *__restrict __sigmask),pselect,(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask))
+__CREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_pselect32,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct __timespec32 const *__restrict __timeout, struct __sigset_struct const *__restrict __sigmask),pselect,(__nfds,__readfds,__writefds,__exceptfds,__timeout,__sigmask))
 #else /* LIBC: pselect */
 #undef ____localdep_pselect32_defined
 #endif /* pselect32... */
 #endif /* !____localdep_pselect32_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(pselect) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pselect))(int __nfds,
+__LOCAL_LIBC(pselect) __STDC_INT_AS_SSIZE_T
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pselect))(__STDC_INT_AS_SIZE_T __nfds,
                                                      fd_set *__restrict __readfds,
                                                      fd_set *__restrict __writefds,
                                                      fd_set *__restrict __exceptfds,

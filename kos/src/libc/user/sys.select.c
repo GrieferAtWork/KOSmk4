@@ -21,6 +21,7 @@
 
 #include "../api.h"
 #include "sys.select.h"
+#include <kos/syscalls.h>
 
 DECL_BEGIN
 
@@ -30,24 +31,30 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:select,hash:0x5421679c]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.poll.select") int
-NOTHROW_RPC(LIBCCALL libc_select)(int nfds,
+/*[[[head:select,hash:0xe84aefcd]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.poll.select") __STDC_INT_AS_SSIZE_T
+NOTHROW_RPC(LIBCCALL libc_select)(__STDC_INT_AS_SIZE_T nfds,
                                   fd_set *__restrict readfds,
                                   fd_set *__restrict writefds,
                                   fd_set *__restrict exceptfds,
                                   struct timeval *__restrict timeout)
 /*[[[body:select]]]*/
 {
-	CRT_UNIMPLEMENTED("select"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	ssize_t result;
+	result = sys_select(nfds, readfds, writefds, exceptfds, timeout);
+	return libc_seterrno_syserr(result);
 }
 /*[[[end:select]]]*/
 
-/*[[[head:pselect,hash:0x1a16c04e]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.poll.pselect") int
-NOTHROW_RPC(LIBCCALL libc_pselect)(int nfds,
+struct sigset_and_len {
+	sigset_t const *ss_ptr;
+	size_t          ss_len;
+};
+
+
+/*[[[head:pselect,hash:0x58bf6424]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.poll.pselect") __STDC_INT_AS_SSIZE_T
+NOTHROW_RPC(LIBCCALL libc_pselect)(__STDC_INT_AS_SIZE_T nfds,
                                    fd_set *__restrict readfds,
                                    fd_set *__restrict writefds,
                                    fd_set *__restrict exceptfds,
@@ -55,37 +62,40 @@ NOTHROW_RPC(LIBCCALL libc_pselect)(int nfds,
                                    sigset_t const *__restrict sigmask)
 /*[[[body:pselect]]]*/
 {
-	CRT_UNIMPLEMENTED("pselect"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	ssize_t result;
+	struct sigset_and_len ss;
+	ss.ss_ptr = sigmask;
+	ss.ss_len = sizeof(sigset_t);
+	result = sys_pselect6(nfds, readfds, writefds, exceptfds, timeout, &ss);
+	return libc_seterrno_syserr(result);
 }
 /*[[[end:pselect]]]*/
 
-/*[[[head:select64,hash:0x79d5277]]]*/
+/*[[[head:select64,hash:0x6e30dbe]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_select64, libc_select);
 #else
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.poll.select64") int
-NOTHROW_RPC(LIBCCALL libc_select64)(int nfds,
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.poll.select64") __STDC_INT_AS_SSIZE_T
+NOTHROW_RPC(LIBCCALL libc_select64)(__STDC_INT_AS_SIZE_T nfds,
                                     fd_set *__restrict readfds,
                                     fd_set *__restrict writefds,
                                     fd_set *__restrict exceptfds,
                                     struct timeval64 *__restrict timeout)
 /*[[[body:select64]]]*/
 {
-	CRT_UNIMPLEMENTED("select64"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	ssize_t result;
+	result = sys_select64(nfds, readfds, writefds, exceptfds, timeout);
+	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */
 /*[[[end:select64]]]*/
 
-/*[[[head:pselect64,hash:0x8ae0c101]]]*/
+/*[[[head:pselect64,hash:0xe98d9929]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_pselect64, libc_pselect);
 #else
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.poll.pselect64") int
-NOTHROW_RPC(LIBCCALL libc_pselect64)(int nfds,
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.poll.pselect64") __STDC_INT_AS_SSIZE_T
+NOTHROW_RPC(LIBCCALL libc_pselect64)(__STDC_INT_AS_SIZE_T nfds,
                                      fd_set *__restrict readfds,
                                      fd_set *__restrict writefds,
                                      fd_set *__restrict exceptfds,
@@ -93,9 +103,12 @@ NOTHROW_RPC(LIBCCALL libc_pselect64)(int nfds,
                                      sigset_t const *__restrict sigmask)
 /*[[[body:pselect64]]]*/
 {
-	CRT_UNIMPLEMENTED("pselect64"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	ssize_t result;
+	struct sigset_and_len ss;
+	ss.ss_ptr = sigmask;
+	ss.ss_len = sizeof(sigset_t);
+	result = sys_pselect6_64(nfds, readfds, writefds, exceptfds, timeout, &ss);
+	return libc_seterrno_syserr(result);
 }
 #endif /* MAGIC:alias */
 /*[[[end:pselect64]]]*/

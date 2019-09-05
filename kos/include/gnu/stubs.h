@@ -1,4 +1,4 @@
-/* HASH 0xe52da9e7 */
+/* HASH 0x8f6412d1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -449,8 +449,6 @@
 #define __stub_prlimit64 1
 #define __stub_process_vm_readv 1
 #define __stub_process_vm_writev 1
-#define __stub_pselect 1
-#define __stub_pselect64 1
 #define __stub_psiginfo 1
 #define __stub_psignal 1
 #define __stub_pthread_atfork 1
@@ -619,8 +617,6 @@
 #define __stub_secure_getenv 1
 #define __stub_seed48 1
 #define __stub_seed48_r 1
-#define __stub_select 1
-#define __stub_select64 1
 #define __stub_sem_close 1
 #define __stub_sem_destroy 1
 #define __stub_sem_getvalue 1
