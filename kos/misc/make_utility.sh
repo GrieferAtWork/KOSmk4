@@ -203,7 +203,6 @@ case $UTILITY_NAME in
 		install_file /bin/tetris  \
 			"$OPTPATH/tetris"
 		;;
-
 ##############################################################################
 
 

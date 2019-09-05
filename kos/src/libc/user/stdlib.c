@@ -22,12 +22,16 @@
 #include "../api.h"
 #include "stdlib.h"
 
+#include <dlfcn.h>
+#include <assert.h>
 #include <fcntl.h>
 #include <kos/syscalls.h>
 #include <limits.h>
 #include <unistd.h>
 
 #include <parts/errno.h>
+#include <kos/process.h>
+#include <hybrid/sync/atomic-once.h>
 
 DECL_BEGIN
 
@@ -1002,17 +1006,77 @@ NOTHROW_NCX(LIBCCALL libc__putenv_s)(char const *varname,
 }
 /*[[[end:_putenv_s]]]*/
 
+/*[[[head:__p___argc,hash:0xc22beea3]]]*/
+INTERN ATTR_RETNONNULL ATTR_CONST
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p___argc") int *
+NOTHROW_NCX(LIBCCALL libc___p___argc)(void)
+/*[[[body:__p___argc]]]*/
+{
+	int *result;
+	result = (int *)dlsym(RTLD_DEFAULT, "__argc");
+	assert(result);
+	return result;
+}
+/*[[[end:__p___argc]]]*/
+
 /*[[[head:__p___argv,hash:0xf082217c]]]*/
 INTERN ATTR_RETNONNULL ATTR_CONST
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p___argv") char ***
 NOTHROW_NCX(LIBCCALL libc___p___argv)(void)
 /*[[[body:__p___argv]]]*/
 {
-	CRT_UNIMPLEMENTED("__p___argv"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
+	char ***result;
+	result = (char ***)dlsym(RTLD_DEFAULT, "__argv");
+	assert(result);
+	return result;
 }
 /*[[[end:__p___argv]]]*/
+
+/*[[[head:__p__pgmptr,hash:0x718aa545]]]*/
+INTERN ATTR_RETNONNULL ATTR_CONST
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p__pgmptr") char **
+NOTHROW_NCX(LIBCCALL libc___p__pgmptr)(void)
+/*[[[body:__p__pgmptr]]]*/
+{
+	char **result;
+	result = (char **)dlsym(RTLD_DEFAULT, "_pgmptr");
+	assert(result);
+	return result;
+}
+/*[[[end:__p__pgmptr]]]*/
+
+PRIVATE ATTR_CONST WUNUSED
+ATTR_SECTION(".text.crt.dos.application.init.__p___initenv.get_initenv")
+char **NOTHROW(libc_get_initenv)(void) {
+	struct process_peb *peb;
+	char **result;
+	peb    = (struct process_peb *)dlsym(RTLD_DEFAULT, "__peb");
+	/* Construct a pointer to what (presumably) is `pp_envp_vector'
+	 * NOTE: If the hosted application modified `pp_argc' (who's address
+	 *       by the way is aliased by `__argc' and `*__p___argc()'), then
+	 *       this calculation may not necessarily be correct! */
+	result = (char **)(peb + 1) + peb->pp_argc + 1;
+	return result;
+}
+
+PRIVATE ATTR_SECTION(".bss.crt.dos.application.init.__p___initenv.pointer")
+char **libc___p___initenv_pointer = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.dos.application.init.__p___initenv.initialized")
+struct atomic_once libc___p___initenv_initialized = ATOMIC_ONCE_INIT;
+
+/*[[[head:__p___initenv,hash:0x1450f43c]]]*/
+/* Access to the initial environment block */
+INTERN ATTR_CONST
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p___initenv") char ***
+NOTHROW_NCX(LIBCCALL libc___p___initenv)(void)
+/*[[[body:__p___initenv]]]*/
+{
+	ATOMIC_ONCE_RUN(&libc___p___initenv_initialized, {
+		libc___p___initenv_pointer = libc_get_initenv();
+	});
+	return &libc___p___initenv_pointer;
+}
+/*[[[end:__p___initenv]]]*/
 
 /*[[[head:_aligned_malloc,hash:0xb16d473b]]]*/
 INTERN WUNUSED ATTR_ALLOC_ALIGN(2) ATTR_ALLOC_SIZE((1)) ATTR_MALLOC
@@ -1064,19 +1128,6 @@ NOTHROW_NCX(LIBCCALL libc__dupenv_s)(char **__restrict pbuf,
 	return 0;
 }
 /*[[[end:_dupenv_s]]]*/
-
-/*[[[head:__p___initenv,hash:0x1450f43c]]]*/
-/* Access to the initial environment block */
-INTERN ATTR_CONST
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p___initenv") char ***
-NOTHROW_NCX(LIBCCALL libc___p___initenv)(void)
-/*[[[body:__p___initenv]]]*/
-{
-	CRT_UNIMPLEMENTED("__p___initenv"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:__p___initenv]]]*/
 
 /*[[[head:_fullpath,hash:0x56b2f4cd]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.utility._fullpath") char *
@@ -1141,18 +1192,6 @@ NOTHROW_NCX(LIBCCALL libc___doserrno)(void)
 }
 /*[[[end:__doserrno]]]*/
 
-/*[[[head:__p___argc,hash:0xc22beea3]]]*/
-INTERN ATTR_RETNONNULL ATTR_CONST
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p___argc") int *
-NOTHROW_NCX(LIBCCALL libc___p___argc)(void)
-/*[[[body:__p___argc]]]*/
-{
-	CRT_UNIMPLEMENTED("__p___argc"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:__p___argc]]]*/
-
 /*[[[head:__p___wargv,hash:0xec1d3872]]]*/
 INTERN ATTR_RETNONNULL ATTR_CONST
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p___wargv") char32_t ***
@@ -1204,18 +1243,6 @@ NOTHROW_NCX(LIBCCALL libc_getenv_s)(size_t *psize,
 	return 0;
 }
 /*[[[end:getenv_s]]]*/
-
-/*[[[head:__p__pgmptr,hash:0x718aa545]]]*/
-INTERN ATTR_RETNONNULL ATTR_CONST
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p__pgmptr") char **
-NOTHROW_NCX(LIBCCALL libc___p__pgmptr)(void)
-/*[[[body:__p__pgmptr]]]*/
-{
-	CRT_UNIMPLEMENTED("__p__pgmptr"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:__p__pgmptr]]]*/
 
 /*[[[head:_aligned_offset_realloc,hash:0x68a149c5]]]*/
 INTERN WUNUSED ATTR_ALLOC_SIZE((2))
