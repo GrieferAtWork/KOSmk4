@@ -160,16 +160,38 @@ coredump_create_for_signal(struct icpustate *__restrict state,
 LOCAL ATTR_RETNONNULL struct icpustate *
 NOTHROW(FCALL translate_exception_errno)(struct icpustate *__restrict state,
                                          unsigned int UNUSED(reason)) {
+	errno_t errval;
+	struct exception_data *data;
+	data   = error_data();
+	errval = -error_as_errno(data);
+#if 1
+	{
+		unsigned int pointer_count = EXCEPTION_DATA_POINTERS;
+		while (pointer_count != 0 &&
+		       data->e_pointers[pointer_count - 1] == 0)
+			--pointer_count;
+		printk(KERN_TRACE "[except] Translate exception %#x:%#x",data->e_class, data->e_subclass);
+		if (pointer_count != 0) {
+			unsigned int i;
+			for (i = 0; i < pointer_count; ++i) {
+				printk(KERN_TRACE "%c%#Ix",
+				       i == 0 ? '[' : ',',
+				       data->e_pointers[i]);
+			}
+			printk(KERN_TRACE "]");
+		}
+		printk(KERN_TRACE " into errno=%d\n", errval);
+	}
+#endif
 #ifdef __x86_64__
-	state->ics_gpregs.gp_rax = -error_as_errno(error_data());
+	state->ics_gpregs.gp_rax = errval;
 	if (SYSCALL32_DOUBLE_WIDE(state->ics_gpregs.gp_rax) &&
 	    irregs_iscompat(&state->ics_irregs))
 		state->ics_gpregs.gp_rdx = (u64)-1; /* sign-extend */
 #else /* __x86_64__ */
-
 	if (SYSCALL32_DOUBLE_WIDE(state->ics_gpregs.gp_eax))
 		state->ics_gpregs.gp_edx = (u32)-1; /* sign-extend */
-	state->ics_gpregs.gp_eax = -error_as_errno(error_data());
+	state->ics_gpregs.gp_eax = errval;
 #endif /* !__x86_64__ */
 	//error_printf("Propagate to user-space\n");
 	return state;
