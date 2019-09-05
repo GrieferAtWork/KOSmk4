@@ -125,7 +125,7 @@ coredump_create(struct ucpustate const *curr_ustate,
 	       : 1);
 	assert(orig_kstate == NULL
 	       ? (ktraceback_vector == NULL && ktraceback_length == 0)
-	       : 0);
+	       : 1);
 	printk(KERN_ERR "[coredump] Creating coredump...\n");
 	if (reason_error) {
 		unsigned int i;
