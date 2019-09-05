@@ -1202,10 +1202,10 @@ PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(LIBANSITTY_CC VGA_CopyCell)(struct ansitty *__restrict self,
                                     ansitty_offset_t dst_offset,
                                     ansitty_coord_t count) {
-	VGA *vga = container_of(self, VGA, at_ansi);
+	VGA *vga  = container_of(self, VGA, at_ansi);
 	u16 *base = ATOMIC_READ(vga->v_textbase);
-	u16 *src = ATOMIC_READ(vga->v_textptr);
-	u16 *end = ATOMIC_READ(vga->v_textend);
+	u16 *src  = ATOMIC_READ(vga->v_textptr);
+	u16 *end  = ATOMIC_READ(vga->v_textend);
 	u16 *ptr, *copyend;
 	ptr = src + dst_offset;
 	if (ptr < base) {

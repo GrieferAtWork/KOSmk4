@@ -1325,30 +1325,30 @@ done_insert_ansitty_flag_hedit:
 
 	case 'H':   /* ANSI/VT100: CUP */
 	case 'f': { /* ANSI/VT100: HVP */
-		int x, y;
+		int y, x;
 		if (!arglen)
-			x = y = 1; /* \e[f */
+			y = x = 1; /* \e[f */
 		else {
 			char *end;
 			if (arg[0] == ';') {
-				x = 1; /* \e[;10f  --or-- \e[;f */
-				y = (int)strtol(arg + 1, &end, 10);
+				y = 1; /* \e[;10f  --or-- \e[;f */
+				x = (int)strtol(arg + 1, &end, 10);
 			} else {
-				x = (int)strtol(arg, &end, 10);
+				y = (int)strtol(arg, &end, 10);
 				if (end >= arg + arglen) {
-					y = 1; /* \e[10f */
+					x = 1; /* \e[10f */
 				} else {
 					if (end[0] != ';')
 						goto nope;  /* \e[10;20f --or-- \e[10;f */
-					y = (int)strtol(end + 1, &end, 10);
+					x = (int)strtol(end + 1, &end, 10);
 				}
-				if unlikely(x < 1)
-					x = 1;
+				if unlikely(y < 1)
+					y = 1;
 			}
 			if unlikely(end != arg + arglen)
 				goto nope;
-			if unlikely(y < 1)
-				y = 1;
+			if unlikely(x < 1)
+				x = 1;
 		}
 		SETCURSOR((ansitty_coord_t)(x - 1),
 		          (ansitty_coord_t)(y - 1));
@@ -1949,8 +1949,8 @@ done_insert_ansitty_flag_hedit:
 					ansitty_coord_t xy[2];
 					GETCURSOR(xy);
 					len = sprintf(buf, SESC "[%u;%uR",
-					              (unsigned int)(xy[0] + 1),
-					              (unsigned int)(xy[1] + 1));
+					              (unsigned int)(xy[1] + 1),
+					              (unsigned int)(xy[0] + 1));
 					DOOUTPUT(buf, len);
 				}
 				break;
@@ -2887,8 +2887,8 @@ do_process_string_command:
 			/* Response: cursor is at v,h */
 			GETCURSOR(xy);
 			len = sprintf(buf, SESC "%u;%uR",
-			              (unsigned int)(xy[0] + 1),
-			              (unsigned int)(xy[1] + 1));
+			              (unsigned int)(xy[1] + 1),
+			              (unsigned int)(xy[0] + 1));
 			DOOUTPUT(buf, len);
 			goto set_text_and_done;
 		} else if (ch == CAN) {
