@@ -177,6 +177,7 @@ libterminal_do_owrite_nostop_nobuf(struct terminal *__restrict self,
 					temp = libterminal_do_owrite_direct(self, &ch, 1, mode);
 					if unlikely(temp <= 0)
 						goto err_or_done;
+					++result; /* Account for the control character */
 					flush_start = iter + 1;
 				}
 				break;
@@ -213,12 +214,12 @@ libterminal_do_owrite_nostop_nobuf(struct terminal *__restrict self,
 						if unlikely((size_t)temp < count)
 							goto done;
 					}
-					flush_start = iter + 1;
 					/* Output NL characters as CRNL */
 					temp = libterminal_do_owrite_direct(self, crlf, COMPILER_LENOF(crlf), mode);
 					if unlikely(temp < (ssize_t)COMPILER_LENOF(crlf))
 						goto err_or_done;
-					++result;
+					++result; /* Account for the control character */
+					flush_start = iter + 1;
 				}
 				break;
 
@@ -234,22 +235,23 @@ libterminal_do_owrite_nostop_nobuf(struct terminal *__restrict self,
 						if unlikely((size_t)temp < count)
 							goto done;
 					}
-					flush_start = iter + 1;
 					if (oflag & ONLRET) {
 						/* Don't output CR characters */
 					} else if (oflag & OCRNL) {
-						/* Output CR characters as NL */
 						if (oflag & ONLCR) {
+							/* Output CR characters as CRNL */
 							temp = libterminal_do_owrite_direct(self, crlf, COMPILER_LENOF(crlf), mode);
 							if unlikely(temp < (ssize_t)COMPILER_LENOF(crlf))
 								goto err_or_done;
 						} else {
+							/* Output CR characters as NL */
 							temp = libterminal_do_owrite_direct(self, lf, COMPILER_LENOF(lf), mode);
 							if unlikely(temp < (ssize_t)COMPILER_LENOF(lf))
 								goto err_or_done;
 						}
 					}
-					++result;
+					++result; /* Account for the control character */
+					flush_start = iter + 1;
 				}
 				break;
 
@@ -329,7 +331,7 @@ libterminal_do_owrite_force_echo(struct terminal *__restrict self,
                                  __USER __CHECKED void const *src,
                                  size_t num_bytes, iomode_t mode,
                                  tcflag_t lflag) {
-	size_t result;
+	ssize_t result, temp;
 	if (!(lflag & ECHOCTL)) {
 		/* Don't escape control characters (directly forward input text) */
 		result = libterminal_do_owrite_nostop_nobuf(self,
@@ -339,7 +341,6 @@ libterminal_do_owrite_force_echo(struct terminal *__restrict self,
 		                                            lflag);
 	} else {
 		/* Must escape ASCII control characters (0x00 ... 0x1f) using the ^X notation */
-		size_t temp;
 		byte_t *iter, *end, *flush_start;
 		result      = 0;
 		end         = (iter = (byte_t *)src) + num_bytes;
@@ -347,6 +348,7 @@ libterminal_do_owrite_force_echo(struct terminal *__restrict self,
 		for (; iter < end; ++iter) {
 			byte_t buf[2];
 			byte_t ch = *iter;
+			assert((size_t)result == (size_t)(flush_start - (byte_t *)src));
 			if (ch >= 0x20)
 				continue;
 			if (ch == '\t' || ch == '\r' || ch == '\n')
@@ -359,16 +361,21 @@ libterminal_do_owrite_force_echo(struct terminal *__restrict self,
 				                                          count,
 				                                          mode,
 				                                          lflag);
+				if unlikely(temp < 0)
+					goto err;
 				result += temp;
-				if unlikely(temp < count)
+				if unlikely((size_t)temp < count)
 					goto done;
 			}
 			buf[0] = '^';
 			buf[1] = '@' + ch;
 			temp   = libterminal_do_owrite_nostop_nobuf(self, buf, 2, mode, lflag);
-			result += temp;
-			if unlikely(temp < 2)
+			if unlikely(temp < 2) {
+				if unlikely(temp < 0)
+					goto err;
 				goto done;
+			}
+			++result; /* Account for the control character */
 			flush_start = iter + 1;
 		}
 		if (flush_start < end) {
@@ -377,11 +384,15 @@ libterminal_do_owrite_force_echo(struct terminal *__restrict self,
 			                                          (size_t)(end - flush_start),
 			                                          mode,
 			                                          lflag);
+			if unlikely(temp < 0)
+				goto err;
 			result += temp;
 		}
 	}
 done:
-	return result;
+	return (ssize_t)result;
+err:
+	return temp;
 }
 
 PRIVATE NONNULL((1)) ssize_t CC
@@ -554,6 +565,7 @@ libterminal_do_iwrite_controlled(struct terminal *__restrict self,
 				result += temp;
 				if unlikely((size_t)temp < count)
 					goto done;
+				++result; /* Account for the control character */
 				flush_start = iter + 1;
 				/* Flush the current canon */
 				IF_NOT_KERNEL(temp =) libterminal_flush_icanon(self, mode);
@@ -577,6 +589,7 @@ libterminal_do_iwrite_controlled(struct terminal *__restrict self,
 					goto err;
 #endif /* !__KERNEL__ */
 				libterminal_do_iwrite_set_eofing(self);
+				++result; /* Account for the control character */
 				flush_start = iter + 1;
 			} else if (ch == self->t_ios.c_cc[VERASE] && (lflag & ECHOE)) {
 				size_t count;
@@ -626,6 +639,7 @@ libterminal_do_iwrite_controlled(struct terminal *__restrict self,
 					if unlikely(temp < 0)
 						goto err;
 				}
+				++result; /* Account for the control character */
 				flush_start = iter + 1;
 			} else if (ch == self->t_ios.c_cc[VKILL] && (lflag & ECHOK)) {
 				size_t count;
@@ -654,6 +668,7 @@ libterminal_do_iwrite_controlled(struct terminal *__restrict self,
 						goto err_capture;
 				}
 				linecapture_fini(&capture);
+				++result; /* Account for the control character */
 				flush_start = iter + 1;
 			} else if (ch == self->t_ios.c_cc[VWERASE] && (lflag & (ECHOE | IEXTEN))) {
 				size_t count;
@@ -723,6 +738,7 @@ libterminal_do_iwrite_controlled(struct terminal *__restrict self,
 					linecapture_fini(&capture);
 					RETHROW();
 				}
+				++result; /* Account for the control character */
 				flush_start = iter + 1;
 			} else if (ch == self->t_ios.c_cc[VREPRINT] && (lflag & IEXTEN)) {
 				size_t count;
@@ -734,6 +750,7 @@ libterminal_do_iwrite_controlled(struct terminal *__restrict self,
 				result += temp;
 				if unlikely((size_t)temp < count)
 					goto done;
+				++result; /* Account for the control character */
 				flush_start = iter + 1;
 				/* Clear the entire input */
 				linebuffer_capture(&self->t_canon, &capture);
@@ -869,6 +886,7 @@ libterminal_do_iwrite_formatted(struct terminal *__restrict self,
 					if unlikely(temp < 0)
 						goto err;
 				}
+				++result; /* Account for the control character */
 				flush_start = iter + 1;
 			} else if (ch == self->t_ios.c_cc[VQUIT] && (lflag & ISIG)) {
 				size_t count;
@@ -886,6 +904,7 @@ libterminal_do_iwrite_formatted(struct terminal *__restrict self,
 					if unlikely(temp < 0)
 						goto err;
 				}
+				++result; /* Account for the control character */
 				flush_start = iter + 1;
 			} else if (ch == self->t_ios.c_cc[VSUSP] && (lflag & ISIG)) {
 				size_t count;
@@ -903,6 +922,7 @@ libterminal_do_iwrite_formatted(struct terminal *__restrict self,
 					if unlikely(temp < 0)
 						goto err;
 				}
+				++result; /* Account for the control character */
 				flush_start = iter + 1;
 			} else if (ch == self->t_ios.c_cc[VLNEXT]) {
 				/* Escape the next character from being matched against any `c_cc[*]' items. */
@@ -918,6 +938,7 @@ libterminal_do_iwrite_formatted(struct terminal *__restrict self,
 						goto done;
 					}
 				}
+				++result; /* Account for the control character */
 				flush_start = iter + 1;
 				if (iter == end - 1) {
 					ATOMIC_FETCHOR(self->t_ios.c_lflag, __IESCAPING);
@@ -926,8 +947,9 @@ libterminal_do_iwrite_formatted(struct terminal *__restrict self,
 					/* Directly escape the next character */
 					if (lflag & ICANON) {
 						temp = libterminal_do_iwrite_canon(self, &ch, 1, mode, iflag, lflag);
-						if unlikely(temp <= 0)
+						if unlikely(temp < 1)
 							goto err_or_done;
+						assert(temp == 1);
 						result += temp;
 					} else {
 #ifdef __KERNEL__
@@ -936,8 +958,9 @@ libterminal_do_iwrite_formatted(struct terminal *__restrict self,
 						++result;
 #else /* __KERNEL__ */
 						temp = libterminal_do_iwrite_direct(self, &ch, 1, mode);
-						if unlikely(temp <= 0)
+						if unlikely(temp < 1)
 							goto err_or_done;
+						assert(temp == 1);
 						result += temp;
 #endif /* !__KERNEL__ */
 						/* Try to echo data into the S2M ring */
@@ -945,6 +968,8 @@ libterminal_do_iwrite_formatted(struct terminal *__restrict self,
 						if unlikely(temp < 0)
 							goto err;
 					}
+					/* Continue flushing after the escaped character. */
+					flush_start = iter + 1;
 				}
 			} else if (ch == self->t_ios.c_cc[VSTOP] && (iflag & IXON)) {
 				size_t count;
@@ -962,6 +987,7 @@ libterminal_do_iwrite_formatted(struct terminal *__restrict self,
 				 * can disable XOFF-mode then disable output processing. */
 				if (iter == end - 1 || !(iflag & IXANY))
 					ATOMIC_FETCHOR(self->t_ios.c_iflag, IXOFF);
+				++result; /* Account for the control character */
 				flush_start = iter + 1;
 			} else if (ch == self->t_ios.c_cc[VSTART] && (iflag & IXON)) {
 				size_t count;
@@ -978,6 +1004,7 @@ libterminal_do_iwrite_formatted(struct terminal *__restrict self,
 					if unlikely(temp < 0)
 						goto err;
 				}
+				++result; /* Account for the control character */
 				flush_start = iter + 1;
 			}
 		}
@@ -1047,6 +1074,7 @@ libterminal_do_iwrite(struct terminal *__restrict self,
 			for (; iter < end; ++iter) {
 				ch = *iter;
 switch_ch:
+				assert((size_t)result == (size_t)(flush_start - (byte_t *)src));
 				switch (ch) {
 
 				case 255:
@@ -1065,9 +1093,8 @@ switch_ch:
 							flush_start = iter; /* Re-print a second \377 during the next flush */
 						}
 						temp = libterminal_do_iwrite_formatted(self, &ch, 1, mode, iflag, lflag);
-						if unlikely(temp <= 0)
+						if unlikely(temp < 1)
 							goto err_or_done;
-						result += temp;
 						break;
 					}
 					ATTR_FALLTHROUGH
@@ -1087,9 +1114,9 @@ switch_ch:
 						}
 						ch &= 0x7f;
 						temp = libterminal_do_iwrite_formatted(self, &ch, 1, mode, iflag, lflag);
-						if unlikely(temp <= 0)
+						if unlikely(temp < 1)
 							goto err_or_done;
-						result += temp;
+						++result; /* Account for the control character */
 						flush_start = iter + 1;
 					}
 					break;
@@ -1097,13 +1124,15 @@ switch_ch:
 				case 'A' ... 'Z':
 					if ((lflag & (ICANON | XCASE)) == (ICANON | XCASE)) {
 						if (lflag & __IXCASEING) {
-							assert(flush_start == iter);
+							assert(flush_start == iter - 1 || iter == (byte_t *)src);
 							ch += ('a' - 'A');
 							temp = libterminal_do_iwrite_formatted(self, &ch, 1,
 							                                       mode, iflag, lflag);
-							if unlikely(temp <= 0)
+							if unlikely(temp < 1)
 								goto err_or_done;
-							result += temp;
+							if (iter != (byte_t *)src)
+								++result; /* Account for the \-character */
+							++result; /* Account for the uppercase character */
 							flush_start = iter + 1;
 						}
 					} else if ((iflag & IUCLC) && (lflag & IEXTEN)) {
@@ -1121,9 +1150,9 @@ switch_ch:
 						ch += ('a' - 'A');
 						temp = libterminal_do_iwrite_formatted(self, &ch, 1,
 						                                       mode, iflag, lflag);
-						if unlikely(temp <= 0)
+						if unlikely(temp < 1)
 							goto err_or_done;
-						result += temp;
+						++result; /* Account for the control character */
 						flush_start = iter + 1;
 					}
 					break;
@@ -1140,10 +1169,12 @@ switch_ch:
 							result += temp;
 							if unlikely((size_t)temp < count)
 								goto done;
-							flush_start = iter;
 						}
-						if (iter == end - 1)
+						flush_start = iter;
+						if (iter == end - 1) {
+							++result; /* Account for the control character */
 							flush_start = end;
+						}
 						lflag |= __IXCASEING;
 					}
 					continue;
@@ -1164,10 +1195,10 @@ switch_ch:
 						if (!(iflag & IGNCR)) {
 							temp = libterminal_do_iwrite_formatted(self, "\r", 1,
 							                                       mode, iflag, lflag);
-							if unlikely(temp <= 0)
+							if unlikely(temp < 1)
 								goto err_or_done;
-							result += temp;
 						}
+						++result; /* Account for the control character */
 						flush_start = iter + 1;
 					}
 					break;
@@ -1189,10 +1220,10 @@ switch_ch:
 							/* Translate to LN */
 							temp = libterminal_do_iwrite_formatted(self, "\n", 1,
 							                                       mode, iflag, lflag);
-							if unlikely(temp <= 0)
+							if unlikely(temp < 1)
 								goto err_or_done;
-							result += temp;
 						}
+						++result; /* Account for the control character */
 						flush_start = iter + 1;
 					}
 					break;
