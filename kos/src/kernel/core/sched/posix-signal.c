@@ -1945,8 +1945,12 @@ DEFINE_SYSCALL2(errno_t, rt_sigsuspend,
 		sigmask_ensure_unmasked_mandatory(mymask);
 		/* Wait forever until something happens. */
 		for (;;) {
-			while (task_serve()); /* Service RPC callbacks (which include the handling of signals) */
-			task_sleep(NULL);     /* Sleep until the next sporadic wakeup */
+			PREEMPTION_DISABLE();
+			/* Service RPC callbacks (which include the handling of signals) */
+			if (task_serve())
+				continue;
+			/* Sleep until the next sporadic wakeup */
+			task_sleep();
 		}
 	} EXCEPT {
 		/* Restore the old mask. */

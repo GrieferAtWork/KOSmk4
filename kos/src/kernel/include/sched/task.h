@@ -120,6 +120,7 @@ struct task {
 #endif /* !CONFIG_NO_SMP */
 		};
 	}               t_sched;
+	WEAK qtime_t    t_ctime;                 /* [const] `quantum_time()' timestamp of when the thread was started. */
 	WEAK qtime_t    t_atime;                 /* [lock(PRIVATE(THIS_TASK))] Amount of time that this task has spent running. */
 	/* per-task data goes here. */
 };
@@ -129,8 +130,8 @@ struct task {
 /* Allocate + initialize a new task.
  * TODO: Re-design this function so we don't leak uninitialized tasks through the VM
  * @param: task_vm: The vm inside of which the start will start initially. */
-FUNDEF WUNUSED ATTR_MALLOC ATTR_RETNONNULL REF struct task *
-(KCALL task_alloc)(struct vm *__restrict task_vm)
+FUNDEF WUNUSED ATTR_MALLOC ATTR_RETNONNULL REF struct task *KCALL
+task_alloc(struct vm *__restrict task_vm)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 FUNDEF NOBLOCK NONNULL((1)) void
@@ -247,6 +248,8 @@ struct vm_node const *NOTHROW(KCALL stack_current)(void);
  * >> SET_SHOULD_WAIT(false);
  * >> task_wake(waiting_thread); */
 FUNDEF __BOOL NOTHROW(FCALL task_sleep)(qtime_t const *abs_timeout DFL(__NULLPTR));
+/* Same as `task_sleep()', but `abs_timeout' exists on the `cpu_quantum_time()' timeline */
+FUNDEF __BOOL NOTHROW(FCALL task_sleep_cputime)(qtime_t const *abs_timeout DFL(__NULLPTR));
 
 /* Terminate the calling thread immediately.
  * WARNING: Do not call this function to terminate a thread.

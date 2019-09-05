@@ -1624,6 +1624,7 @@
 #define __CRT_HAVE_task_sigcont 1
 #define __CRT_HAVE_task_sigstop 1
 #define __CRT_HAVE_task_sleep 1
+#define __CRT_HAVE_task_sleep_cputime 1
 #define __CRT_HAVE_task_start 1
 #define __CRT_HAVE_task_trywait 1
 #define __CRT_HAVE_task_tryyield 1

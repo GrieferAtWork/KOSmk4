@@ -692,6 +692,7 @@ NOTHROW(FCALL task_start)(struct task *__restrict thread, unsigned int flags) {
 #ifndef CONFIG_NO_SMP
 	mycpu      = THIS_CPU;
 	target_cpu = ATOMIC_READ(thread->t_cpu);
+	thread->t_ctime = quantum_time();
 	printk(KERN_INFO "[sched:cpu#%u] Starting thread %p [tid=%u]\n",
 	       (unsigned int)target_cpu->c_id, thread,
 	       (unsigned int)task_getroottid_of_s(thread));
