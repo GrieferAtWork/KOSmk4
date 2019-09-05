@@ -759,76 +759,46 @@ END(__asm32_sysenter_invalid)
 
 
 .section .text.cold
+#define SYS_INVALID_ENCODE_COUNT(count) (count+1)
+
 /* Called when a system call is recognized, but hasn't been implemented yet */
 INTERN_FUNCTION(sys_invalid0)
 	.cfi_startproc
+	movl   $(SYS_INVALID_ENCODE_COUNT(0)), %ecx
+.Lsys_invalid_common:
 	xchgl  0(%esp), %eax
 	.cfi_register %eip, %eax
-	pushl_cfi $1
+	pushl_cfi %ecx
 	pushl_cfi $ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)
 	call   error_thrown
 	.cfi_endproc
 END(sys_invalid0)
+.cfi_startproc
 INTERN_FUNCTION(sys_invalid1)
-	.cfi_startproc
-	xchgl  0(%esp), %eax
-	.cfi_register %eip, %eax
-	pushl_cfi %eax
-	pushl_cfi $2
-	pushl_cfi $ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)
-	call   error_thrown
-	.cfi_endproc
+	movl   $(SYS_INVALID_ENCODE_COUNT(1)), %ecx
+	jmp .Lsys_invalid_common
 END(sys_invalid1)
 INTERN_FUNCTION(sys_invalid2)
-	.cfi_startproc
-	xchgl  0(%esp), %eax
-	.cfi_register %eip, %eax
-	pushl_cfi %eax
-	pushl_cfi $3
-	pushl_cfi $ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)
-	call   error_thrown
-	.cfi_endproc
+	movl   $(SYS_INVALID_ENCODE_COUNT(2)), %ecx
+	jmp .Lsys_invalid_common
 END(sys_invalid2)
 INTERN_FUNCTION(sys_invalid3)
-	.cfi_startproc
-	xchgl  0(%esp), %eax
-	.cfi_register %eip, %eax
-	pushl_cfi %eax
-	pushl_cfi $4
-	pushl_cfi $ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)
-	call   error_thrown
-	.cfi_endproc
+	movl   $(SYS_INVALID_ENCODE_COUNT(3)), %ecx
+	jmp .Lsys_invalid_common
 END(sys_invalid3)
 INTERN_FUNCTION(sys_invalid4)
-	.cfi_startproc
-	xchgl  0(%esp), %eax
-	.cfi_register %eip, %eax
-	pushl_cfi %eax
-	pushl_cfi $5
-	pushl_cfi $ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)
-	call   error_thrown
-	.cfi_endproc
+	movl   $(SYS_INVALID_ENCODE_COUNT(4)), %ecx
+	jmp .Lsys_invalid_common
 END(sys_invalid4)
 INTERN_FUNCTION(sys_invalid5)
-	.cfi_startproc
-	xchgl  0(%esp), %eax
-	.cfi_register %eip, %eax
-	pushl_cfi %eax
-	pushl_cfi $6
-	pushl_cfi $ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)
-	call   error_thrown
-	.cfi_endproc
+	movl   $(SYS_INVALID_ENCODE_COUNT(5)), %ecx
+	jmp .Lsys_invalid_common
 END(sys_invalid5)
 INTERN_FUNCTION(sys_invalid6)
-	.cfi_startproc
-	xchgl  0(%esp), %eax
-	.cfi_register %eip, %eax
-	pushl_cfi %eax
-	pushl_cfi $7
-	pushl_cfi $ERROR_CODEOF(E_UNKNOWN_SYSTEMCALL)
-	call   error_thrown
-	.cfi_endproc
+	movl   $(SYS_INVALID_ENCODE_COUNT(6)), %ecx
+	jmp .Lsys_invalid_common
 END(sys_invalid6)
+.cfi_endproc
 
 #include "syscall_unimplemented32.c.inl"
 
