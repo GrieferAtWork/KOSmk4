@@ -559,14 +559,6 @@ done:
 }
 
 
-DEFINE_SYSCALL1(time32_t, time, time32_t *,ptm) {
-	validate_writable(ptm, sizeof(time32_t));
-	if (ptm)
-		*ptm = 0;
-	return 0;
-}
-
-
 DEFINE_SYSCALL6(void *, mmap,
                 void *, addr, size_t, length, syscall_ulong_t, prot,
                 syscall_ulong_t, flags, fd_t, fd, syscall_ulong_t, offset) {

@@ -101,6 +101,35 @@ DEFINE_SYSCALL2(errno_t, gettimeofday64,
 }
 #endif /* __NR_gettimeofday64 */
 
+#ifdef __NR_time
+DEFINE_SYSCALL1(time32_t, time,
+                USER UNCHECKED time32_t *, tmp) {
+	time32_t now;
+	now = (time32_t)realtime_now().tv_sec;
+	if (tmp) {
+		validate_writable(tmp, sizeof(*tmp));
+		COMPILER_WRITE_BARRIER();
+		*tmp = now;
+		COMPILER_WRITE_BARRIER();
+	}
+	return now;
+}
+#endif /* __NR_time */
+
+#ifdef __NR_time64
+DEFINE_SYSCALL1(time64_t, time64,
+                USER UNCHECKED time64_t *, tmp) {
+	time64_t now;
+	now = (time64_t)realtime_now().tv_sec;
+	if (tmp) {
+		validate_writable(tmp, sizeof(*tmp));
+		COMPILER_WRITE_BARRIER();
+		*tmp = now;
+		COMPILER_WRITE_BARRIER();
+	}
+	return now;
+}
+#endif /* __NR_time64 */
 
 DEFINE_SYSCALL2(errno_t, nanosleep,
                 USER UNCHECKED struct __timespec32 const *, req,
