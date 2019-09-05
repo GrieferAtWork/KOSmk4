@@ -1,4 +1,4 @@
-/* HASH 0xf144d8a0 */
+/* HASH 0xc7ac55ec */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -78,7 +78,7 @@ __LOCAL_LIBC(fgets_unlocked) __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) char *
 	for (__n = 0; __n < __bufsize - 1; ++__n) {
 		int __ch = __localdep_fgetc_unlocked(__stream);
 		if (__ch == __EOF) {
-			if (__localdep_ferror_unlocked(__stream))
+			if (__n == 0 || __localdep_ferror_unlocked(__stream))
 				return __NULLPTR;
 			break;
 		}
@@ -87,7 +87,7 @@ __LOCAL_LIBC(fgets_unlocked) __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) char *
 			__buf[__n++] = '\n';
 			__ch = __localdep_fgetc_unlocked(__stream);
 			if (__ch == __EOF) {
-				if (__localdep_ferror_unlocked(__stream))
+				if (__n == 0 || __localdep_ferror_unlocked(__stream))
 					return __NULLPTR;
 				break;
 			}

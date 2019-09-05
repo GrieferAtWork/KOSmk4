@@ -487,7 +487,7 @@ fgets:([outp(min(strlen(return),bufsize))] char *__restrict buf,
 	for (n = 0; n < bufsize - 1; ++n) {
 		int ch = fgetc(stream);
 		if (ch == EOF) {
-			if (ferror(stream))
+			if (n == 0 || ferror(stream))
 				return NULL;
 			break;
 		}
@@ -496,7 +496,7 @@ fgets:([outp(min(strlen(return),bufsize))] char *__restrict buf,
 			buf[n++] = '\n';
 			ch = fgetc(stream);
 			if (ch == EOF) {
-				if (ferror(stream))
+				if (n == 0 || ferror(stream))
 					return NULL;
 				break;
 			}
@@ -1407,7 +1407,7 @@ fgets_unlocked:([outp(min(strlen(return),bufsize))] char *__restrict buf,
 	for (n = 0; n < bufsize - 1; ++n) {
 		int ch = fgetc_unlocked(stream);
 		if (ch == EOF) {
-			if (ferror_unlocked(stream))
+			if (n == 0 || ferror_unlocked(stream))
 				return NULL;
 			break;
 		}
@@ -1416,7 +1416,7 @@ fgets_unlocked:([outp(min(strlen(return),bufsize))] char *__restrict buf,
 			buf[n++] = '\n';
 			ch = fgetc_unlocked(stream);
 			if (ch == EOF) {
-				if (ferror_unlocked(stream))
+				if (n == 0 || ferror_unlocked(stream))
 					return NULL;
 				break;
 			}

@@ -1,4 +1,4 @@
-/* HASH 0x1a2d9e29 */
+/* HASH 0xe6924e4b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -98,7 +98,7 @@ __LOCAL_LIBC(fgets) __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) char *
 	for (__n = 0; __n < __bufsize - 1; ++__n) {
 		int __ch = __localdep_fgetc(__stream);
 		if (__ch == __EOF) {
-			if (__localdep_ferror(__stream))
+			if (__n == 0 || __localdep_ferror(__stream))
 				return __NULLPTR;
 			break;
 		}
@@ -107,7 +107,7 @@ __LOCAL_LIBC(fgets) __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) char *
 			__buf[__n++] = '\n';
 			__ch = __localdep_fgetc(__stream);
 			if (__ch == __EOF) {
-				if (__localdep_ferror(__stream))
+				if (__n == 0 || __localdep_ferror(__stream))
 					return __NULLPTR;
 				break;
 			}

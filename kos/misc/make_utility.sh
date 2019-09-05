@@ -197,7 +197,7 @@ case $UTILITY_NAME in
 				cmd cp -R "$SRCPATH" "$BINUTILS_SYSROOT/opt/"
 			fi
 			cmd cd "$OPTPATH"
-			cmd bash configure CC="$CC"
+			cmd bash configure CC="$CC" CFLAGS="-ggdb"
 			cmd make -j $MAKE_PARALLEL_COUNT
 		fi
 		install_file /bin/tetris  \

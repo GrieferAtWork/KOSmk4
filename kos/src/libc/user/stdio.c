@@ -2375,7 +2375,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.read.read.fgets") char *
 	for (n = 0; n < bufsize - 1; ++n) {
 		int ch = libc_fgetc(stream);
 		if (ch == EOF) {
-			if (libc_ferror(stream))
+			if (n == 0 || libc_ferror(stream))
 				return NULL;
 			break;
 		}
@@ -2384,7 +2384,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.read.read.fgets") char *
 			buf[n++] = '\n';
 			ch = libc_fgetc(stream);
 			if (ch == EOF) {
-				if (libc_ferror(stream))
+				if (n == 0 || libc_ferror(stream))
 					return NULL;
 				break;
 			}
@@ -2421,7 +2421,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.read.read.fgets_unlocked") char 
 	for (n = 0; n < bufsize - 1; ++n) {
 		int ch = libc_fgetc_unlocked(stream);
 		if (ch == EOF) {
-			if (libc_ferror_unlocked(stream))
+			if (n == 0 || libc_ferror_unlocked(stream))
 				return NULL;
 			break;
 		}
@@ -2430,7 +2430,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.read.read.fgets_unlocked") char 
 			buf[n++] = '\n';
 			ch = libc_fgetc_unlocked(stream);
 			if (ch == EOF) {
-				if (libc_ferror_unlocked(stream))
+				if (n == 0 || libc_ferror_unlocked(stream))
 					return NULL;
 				break;
 			}
