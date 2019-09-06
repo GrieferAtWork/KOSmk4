@@ -303,17 +303,25 @@ NOTHROW(FCALL av_lock_sections)(uintptr_t symbol_addr) {
 
 
 PRIVATE ATTR_DBGTEXT bool
-NOTHROW(FCALL av_do_lookup_symbol)(struct av_symbol *__restrict info,
-                                   uintptr_t symbol_addr) {
-	di_debug_addr2line_t a2l_info;
+NOTHROW(FCALL av_addr2line)(di_debug_addr2line_t *__restrict info,
+                            uintptr_t symbol_addr) {
 	struct av_sections_lock *sections;
 	sections = av_lock_sections(symbol_addr);
 	if (!sections)
 		return false;
-	if (debug_sections_addr2line(&sections->sl_dbsect, &a2l_info,
+	if (debug_sections_addr2line(&sections->sl_dbsect, info,
 	                             (uintptr_t)symbol_addr - (uintptr_t)sections->sl_driver->d_loadaddr,
 	                             DEBUG_ADDR2LINE_LEVEL_SOURCE,
 	                             DEBUG_ADDR2LINE_FNORMAL) != DEBUG_INFO_ERROR_SUCCESS)
+		return false;
+	return true;
+}
+
+PRIVATE ATTR_DBGTEXT bool
+NOTHROW(FCALL av_do_lookup_symbol)(struct av_symbol *__restrict info,
+                                   uintptr_t symbol_addr) {
+	di_debug_addr2line_t a2l_info;
+	if (!av_addr2line(&a2l_info, symbol_addr))
 		return false;
 	if (!a2l_info.al_rawname)
 		a2l_info.al_rawname = a2l_info.al_name;
@@ -366,6 +374,11 @@ PRIVATE ATTR_DBGTEXT NONNULL((1)) ssize_t
 NOTHROW(LIBDISASM_CC av_symbol_printer)(struct disassembler *__restrict self,
                                         void *symbol_addr) {
 	struct av_symbol *sym;
+	/* Semantically speaking, this function behaves identical to the default
+	 * symbol printer, in that it will try to lookup debug information and
+	 * use those to display the names of symbols.
+	 * However, since KOS's addr2line function really is quite slow, we extend
+	 * on that default functionality by making use of an intermediate cache. */
 	sym = av_lookup_symbol((uintptr_t)symbol_addr);
 	if (sym) {
 		uintptr_t symbol_offset;
@@ -389,7 +402,8 @@ NOTHROW(LIBDISASM_CC av_symbol_printer)(struct disassembler *__restrict self,
 
 
 PRIVATE ATTR_DBGTEXT void *
-NOTHROW(FCALL av_printscreen)(void *start_addr, void **psel_addr) {
+NOTHROW(FCALL av_printscreen)(void *start_addr, void **psel_addr,
+                              bool display_addr2line) {
 	struct disassembler da;
 	unsigned int line;
 	byte_t *current_line_base = NULL;
@@ -403,7 +417,10 @@ NOTHROW(FCALL av_printscreen)(void *start_addr, void **psel_addr) {
 	da.d_format = &av_format;
 	da.d_symbol = &av_symbol_printer;
 	dbg_setcur_visible(DBG_SETCUR_VISIBLE_HIDE);
-	for (line = 0; line < dbg_screen_height - 1; ++line) {
+	line = 0;
+	if (display_addr2line)
+		line = 1;
+	for (; line < dbg_screen_height - 1; ++line) {
 		void *line_endaddr;
 		size_t i, ilen;
 		bool is_current_line;
@@ -480,6 +497,25 @@ NOTHROW(FCALL av_printscreen)(void *start_addr, void **psel_addr) {
 			}
 		}
 	}
+	if (display_addr2line) {
+		di_debug_addr2line_t a2l;
+		if (av_addr2line(&a2l, (uintptr_t)sel_addr)) {
+			dbg_hline(0, 0, dbg_screen_width, ' ');
+			dbg_setcur(0, 0);
+			dbg_print(a2l.al_srcfile ? a2l.al_srcfile : DBGSTR("?"));
+			if (a2l.al_srcline) {
+				dbg_printf(DBGSTR(":%3Iu"), a2l.al_srcline);
+				if (a2l.al_srccol)
+					dbg_printf(DBGSTR(":%2Iu"), a2l.al_srccol);
+			}
+			if (!a2l.al_name)
+				a2l.al_name = a2l.al_rawname;
+			if (a2l.al_name) {
+				dbg_putc(':');
+				dbg_print(a2l.al_name);
+			}
+		}
+	}
 	return da.d_pc;
 }
 
@@ -491,28 +527,31 @@ NOTHROW(FCALL dbg_hd_addrdiag)(uintptr_t *paddr);
 
 
 PRIVATE ATTR_DBGRODATA char const av_help[] =
-"Esc:        Exit        F1:           Help\n"
-"Arrow Keys: Navigate    Pg-Up/Down:   Navigate\n"
-"Ctrl+Pg-Up: Go to top   Ctrl+Pg-Down: Go to bottom\n"
-"Esc/F1:     Close Help  F2:           Go to address\n"
-"E:          Open Hexedit"
+"Esc:        Exit              F1:           Help\n"
+"Arrow Keys: Navigate          Pg-Up/Down:   Navigate\n"
+"Ctrl+Pg-Up: Go to top         Ctrl+Pg-Down: Go to bottom\n"
+"Esc/F1:     Close Help        F2:           Go to address\n"
+"A:          Toggle Addr2Line  E:            Open HexEdit"
 ;
 
 PRIVATE ATTR_DBGTEXT void *
 NOTHROW(FCALL av_main)(void *addr) {
 	void *start_addr, *end_addr = (void *)-1;
+	bool display_addr2line = false;
 	start_addr = av_instr_pred_n(addr, (dbg_screen_height - 1) / 2);
 	for (;;) {
 		unsigned int key;
 		if (start_addr > addr)
 			start_addr = addr;
-		end_addr = av_printscreen(start_addr, &addr);
+		end_addr = av_printscreen(start_addr, &addr, display_addr2line);
 		if (addr >= end_addr) {
 			unsigned int n = dbg_screen_height;
+			if (display_addr2line)
+				--n;
 			while (n) {
 				/* Slowly move the screen upwards until the start-address is displayed on-screen. */
 				start_addr = av_instr_pred_n(addr, n);
-				end_addr   = av_printscreen(start_addr, &addr);
+				end_addr   = av_printscreen(start_addr, &addr, display_addr2line);
 				if (addr < end_addr)
 					break;
 				--n;
@@ -521,7 +560,18 @@ NOTHROW(FCALL av_main)(void *addr) {
 		do {
 			key = dbg_getkey();
 		} while (key & KEY_FRELEASED);
+		/* TODO: When pressing ENTER, the user should be able to immediately
+		 *       go the target location of a JMP or CALL instruction.
+		 *       When this is done, the previous address should be saved on
+		 *       a stack of already-visited locations, which can be returned
+		 *       to by pressing BACKSPACE.
+		 *       Additionally, there should be a menu to display the current
+		 *       contents of said stack. */
 		switch (key) {
+
+		case KEY_A:
+			display_addr2line = !display_addr2line;
+			continue;
 
 		case KEY_E:
 			/* Edit the current address in the hex editor.
@@ -530,7 +580,7 @@ NOTHROW(FCALL av_main)(void *addr) {
 			 *       the generated assembly (in case they choose to use
 			 *       this mechanism to re-write assembly code) */
 			addr = dbg_hexedit(addr, false);
-			break;
+			continue;
 
 		case KEY_ESC:
 			goto done;
@@ -561,6 +611,8 @@ NOTHROW(FCALL av_main)(void *addr) {
 			} else {
 				unsigned int n, start_addr_offset;
 				n = dbg_screen_height - 1;
+				if (display_addr2line)
+					--n;
 				start_addr_offset = 0;
 				while (n) {
 					if (addr > start_addr)
@@ -580,6 +632,8 @@ NOTHROW(FCALL av_main)(void *addr) {
 			} else {
 				unsigned int n;
 				n = dbg_screen_height - 1;
+				if (display_addr2line)
+					--n;
 				while (n--) {
 					start_addr = av_instr_succ(start_addr);
 					addr       = av_instr_succ(addr);
