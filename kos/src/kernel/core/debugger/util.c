@@ -23,6 +23,7 @@ if (gcc_opt.remove("-O3"))
  */
 #ifndef GUARD_KERNEL_SRC_DEBUGGER_UTIL_C
 #define GUARD_KERNEL_SRC_DEBUGGER_UTIL_C 1
+#define _GNU_SOURCE 1 /* strchrnul() */
 #define _KOS_SOURCE 1 /* fuzzy_strcasecmp() */
 
 #include <kernel/compiler.h>
@@ -293,6 +294,60 @@ NOTHROW(KCALL dbg_vmenuf)(char const *__restrict title,
 	va_end(data.pmf_args);
 	return result;
 }
+
+
+/* Print a messagebox centered on-screen. */
+PUBLIC void
+NOTHROW(KCALL dbg_messagebox)(char const *__restrict title,
+                              char const *__restrict text) {
+	unsigned int box_x, box_y, box_sx, box_sy, y;
+	size_t num_lines = 0, longest_line, title_length;
+	char const *iter = text;
+	if (!title)
+		title = DBGSTR("");
+	longest_line = title_length = strlen(title);
+	for (;;) {
+		char const *end = strchrnul(iter, '\n');
+		size_t temp;
+		++num_lines;
+		temp = (size_t)(end - iter);
+		if (longest_line < temp)
+			longest_line = temp;
+		if (!*end)
+			break;
+		iter = end + 1;
+	}
+	box_sx = longest_line + 4;
+	box_sy = num_lines + 4;
+	if unlikely(box_sx >= dbg_screen_width)
+		box_x = 0;
+	else {
+		box_x = (dbg_screen_width - box_sx) / 2;
+	}
+	if unlikely(box_sy >= dbg_screen_height)
+		box_y = 0;
+	else {
+		box_y = (dbg_screen_height - box_sy) / 2;
+	}
+	dbg_fillrect_singlestroke(box_x, box_y, box_sx, box_sy);
+	dbg_fillbox(box_x + 1, box_y + 1, box_sx - 2, box_sy - 2, ' ');
+	for (iter = text, y = box_y + 2;; ++y) {
+		char const *end = strchrnul(iter, '\n');
+		++num_lines;
+		dbg_pprintf(box_x + 2, y, DBGSTR("%$s"), (size_t)(end - iter), iter);
+		if (!*end)
+			break;
+		iter = end + 1;
+	}
+	if unlikely(title_length >= dbg_screen_width)
+		box_x = 0;
+	else {
+		box_x = (dbg_screen_width - title_length) / 2;
+	}
+	dbg_pprint(box_x, box_y, title);
+}
+
+
 
 DECL_END
 #endif /* !CONFIG_NO_DEBUGGER */

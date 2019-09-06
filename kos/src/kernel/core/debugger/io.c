@@ -64,13 +64,7 @@ DEFINE_DEBUG_FUNCTION(
 		, argc, argv) {
 	if (argc != 1)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
-	if (THIS_TASK != debug_original_thread) {
-		dbg_printf(DBGSTR("Cannot apply state modifications made to another thread\n"));
-		return 1;
-	}
-	memcpy(&dbg_exitstate,
-	       &dbg_viewstate,
-	       sizeof(dbg_exitstate));
+	dbg_applyreg();
 	return 0;
 }
 
@@ -95,14 +89,14 @@ DEFINE_DEBUG_FUNCTION(
 		"inb PORT\n"
 		"\tRead from PORT and display the read value on-screen\n",
 		argc, argv) {
-	u16 port;
+	uintptr_t port;
 	u8 val;
 	if (argc != 2)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
-	if (sscanf(argv[1], DBGSTR("%I16U"), &port) != 1)
+	if (!dbg_evaladdr(argv[1], &port))
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
 	val = inb((port_t)port);
-	dbg_printf(DBGSTR("inb 0x%.4I16x: 0x%.2I8x (%I8u)\n"), port, val, val);
+	dbg_printf(DBGSTR("inb 0x%.4I16x: 0x%.2I8x (%I8u)\n"), (u16)port, val, val);
 	return (uintptr_t)val;
 }
 DEFINE_DEBUG_FUNCTION(
@@ -110,14 +104,14 @@ DEFINE_DEBUG_FUNCTION(
 		"inw PORT\n"
 		"\tRead from PORT and display the read value on-screen\n",
 		argc, argv) {
-	u16 port;
+	uintptr_t port;
 	u16 val;
 	if (argc != 2)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
-	if (sscanf(argv[1], DBGSTR("%I16U"), &port) != 1)
+	if (!dbg_evaladdr(argv[1], &port))
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
 	val = inw((port_t)port);
-	dbg_printf(DBGSTR("inw 0x%.4I16x: 0x%.4I16x (%I16u)\n"), port, val, val);
+	dbg_printf(DBGSTR("inw 0x%.4I16x: 0x%.4I16x (%I16u)\n"), (u16)port, val, val);
 	return (uintptr_t)val;
 }
 
@@ -126,14 +120,14 @@ DEFINE_DEBUG_FUNCTION(
 		"inl PORT\n"
 		"\tRead from PORT and display the read value on-screen\n",
 		argc, argv) {
-	u16 port;
+	uintptr_t port;
 	u32 val;
 	if (argc != 2)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
-	if (sscanf(argv[1], DBGSTR("%I16U"), &port) != 1)
+	if (!dbg_evaladdr(argv[1], &port))
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
 	val = inl((port_t)port);
-	dbg_printf(DBGSTR("inl 0x%.4I16x: 0x%.8I32x (%I32u)\n"), port, val, val);
+	dbg_printf(DBGSTR("inl 0x%.4I16x: 0x%.8I32x (%I32u)\n"), (u16)port, val, val);
 	return (uintptr_t)val;
 }
 
@@ -142,16 +136,14 @@ DEFINE_DEBUG_FUNCTION(
 		"outb PORT VAL\n"
 		"\tOutput a given VAL to PORT\n",
 		argc, argv) {
-	u16 port;
-	u8 val;
+	uintptr_t port, val;
 	if (argc != 3)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
-	if (sscanf(argv[1], DBGSTR("%I16U"), &port) != 1 ||
-	    sscanf(argv[2], DBGSTR("%I8U"), &val) != 1)
+	if (!dbg_evaladdr(argv[1], &port) || !dbg_evalexpr(argv[2], &val))
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
-	dbg_printf(DBGSTR("outb 0x%.4I16x, 0x%.2I8x (%I8u)\n"), port, val, val);
-	outb((port_t)port, val);
-	return (uintptr_t)val;
+	dbg_printf(DBGSTR("outb 0x%.4I16x, 0x%.2I8x (%I8u)\n"), (u16)port, (u8)val, (u8)val);
+	outb((port_t)port, (u8)val);
+	return val;
 }
 
 DEFINE_DEBUG_FUNCTION(
@@ -159,16 +151,14 @@ DEFINE_DEBUG_FUNCTION(
 		"outw PORT VAL\n"
 		"\tOutput a given VAL to PORT\n",
 		argc, argv) {
-	u16 port;
-	u16 val;
+	uintptr_t port, val;
 	if (argc != 3)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
-	if (sscanf(argv[1], DBGSTR("%I16U"), &port) != 1 ||
-	    sscanf(argv[2], DBGSTR("%I16U"), &val) != 1)
+	if (!dbg_evaladdr(argv[1], &port) || !dbg_evalexpr(argv[2], &val))
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
-	dbg_printf(DBGSTR("outw 0x%.4I16x, 0x%.4I16x (%I16u)\n"), port, val, val);
-	outw((port_t)port, val);
-	return (uintptr_t)val;
+	dbg_printf(DBGSTR("outw 0x%.4I16x, 0x%.4I16x (%I16u)\n"), (u16)port, (u16)val, (u16)val);
+	outw((port_t)port, (u16)val);
+	return val;
 }
 
 DEFINE_DEBUG_FUNCTION(
@@ -176,16 +166,14 @@ DEFINE_DEBUG_FUNCTION(
 		"outl PORT VAL\n"
 		"\tOutput a given VAL to PORT\n",
 		argc, argv) {
-	u16 port;
-	u32 val;
+	uintptr_t port, val;
 	if (argc != 3)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
-	if (sscanf(argv[1], DBGSTR("%I16U"), &port) != 1 ||
-	    sscanf(argv[2], DBGSTR("%I32U"), &val) != 1)
+	if (!dbg_evaladdr(argv[1], &port) || !dbg_evalexpr(argv[2], &val))
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
-	dbg_printf(DBGSTR("outl 0x%.4I16x, 0x%.4I32x (%I32u)\n"), port, val, val);
-	outl((port_t)port, val);
-	return (uintptr_t)val;
+	dbg_printf(DBGSTR("outl 0x%.4I16x, 0x%.8I32x (%I32u)\n"), (u16)port, (u32)val, (u32)val);
+	outl((port_t)port, (u32)val);
+	return val;
 }
 
 
@@ -194,7 +182,7 @@ DEFINE_DEBUG_FUNCTION(
 		"m [-bwlqp] ADDR [COUNT=16|page]\n"
 		"\tPrint a hexdump of COUNT bytes of memory, starting at ADDR\n",
 		argc, argv) {
-	unsigned long count, addr;
+	uintptr_t count, addr;
 	unsigned int size = 1;
 	while (argc > 2 && argv[1][0] == '-') {
 		/**/ if (!strcmp(argv[1], DBGSTR("-p")))
@@ -212,40 +200,17 @@ DEFINE_DEBUG_FUNCTION(
 		--argc;
 		++argv;
 	}
-
 	if (argc <= 2)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
 	count = 16;
-	/**/ if (!strcmp(argv[1], DBGSTR("sp")))
-		addr = FCPUSTATE_SP(dbg_viewstate);
-	else if (sscanf(argv[1], DBGSTR("sp+%lU"), &addr) == 1)
-		addr = FCPUSTATE_SP(dbg_viewstate) + addr;
-	else if (sscanf(argv[1], DBGSTR("sp-%lU"), &addr) == 1)
-		addr = FCPUSTATE_SP(dbg_viewstate) - addr;
-#ifdef __x86_64__
-	else if (!strcmp(argv[1], DBGSTR("bp")))
-		addr = dbg_viewstate.fcs_gpregs.gp_rbp;
-	else if (sscanf(argv[1], DBGSTR("bp+%lU"), &addr) == 1)
-		addr = dbg_viewstate.fcs_gpregs.gp_rbp + addr;
-	else if (sscanf(argv[1], DBGSTR("bp-%lU"), &addr) == 1)
-		addr = dbg_viewstate.fcs_gpregs.gp_rbp - addr;
-#elif defined(__i386__)
-	else if (!strcmp(argv[1], DBGSTR("bp")))
-		addr = dbg_viewstate.fcs_gpregs.gp_ebp;
-	else if (sscanf(argv[1], DBGSTR("bp+%lU"), &addr) == 1)
-		addr = dbg_viewstate.fcs_gpregs.gp_ebp + addr;
-	else if (sscanf(argv[1], DBGSTR("bp-%lU"), &addr) == 1)
-		addr = dbg_viewstate.fcs_gpregs.gp_ebp - addr;
-#endif
-	else if (sscanf(argv[1], DBGSTR("%lx"), &addr) != 1)
+	if (!dbg_evaladdr(argv[1], &addr))
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
 	if (argc >= 3) {
-		if (sscanf(argv[2], DBGSTR("%lU"), &count) == 1)
-			;
-		else if (!strcmp(argv[2], DBGSTR("page")))
+		if (!strcmp(argv[2], DBGSTR("page")))
 			count = pagedir_pagesize() - (addr & (pagedir_pagesize() - 1));
-		else
+		else if (!dbg_evalexpr(argv[2], &count)) {
 			return DBG_FUNCTION_INVALID_ARGUMENTS;
+		}
 	}
 	switch (size) {
 	case 1: dbg_printf(DBGSTR("%$[hex]\n"), (size_t)count, (uintptr_t)addr); break;
@@ -262,40 +227,18 @@ DEFINE_DEBUG_FUNCTION(
 		"mp ADDR [COUNT=16|page]\n"
 		"\tAlias for " DF_WHITE("m -p ...") "\n",
 		argc, argv) {
-	unsigned long count, addr;
+	uintptr_t count, addr;
 	if (argc <= 2)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
 	count = 16;
-	/**/ if (!strcmp(argv[1], DBGSTR("sp")))
-		addr = FCPUSTATE_SP(dbg_viewstate);
-	else if (sscanf(argv[1], DBGSTR("sp+%lU"), &addr) == 1)
-		addr = FCPUSTATE_SP(dbg_viewstate) + addr;
-	else if (sscanf(argv[1], DBGSTR("sp-%lU"), &addr) == 1)
-		addr = FCPUSTATE_SP(dbg_viewstate) - addr;
-#ifdef __x86_64__
-	else if (!strcmp(argv[1], DBGSTR("bp")))
-		addr = dbg_viewstate.fcs_gpregs.gp_rbp;
-	else if (sscanf(argv[1], DBGSTR("bp+%lU"), &addr) == 1)
-		addr = dbg_viewstate.fcs_gpregs.gp_rbp + addr;
-	else if (sscanf(argv[1], DBGSTR("bp-%lU"), &addr) == 1)
-		addr = dbg_viewstate.fcs_gpregs.gp_rbp - addr;
-#elif defined(__i386__)
-	else if (!strcmp(argv[1], DBGSTR("bp")))
-		addr = dbg_viewstate.fcs_gpregs.gp_ebp;
-	else if (sscanf(argv[1], DBGSTR("bp+%lU"), &addr) == 1)
-		addr = dbg_viewstate.fcs_gpregs.gp_ebp + addr;
-	else if (sscanf(argv[1], DBGSTR("bp-%lU"), &addr) == 1)
-		addr = dbg_viewstate.fcs_gpregs.gp_ebp - addr;
-#endif
-	else if (sscanf(argv[1], DBGSTR("%lx"), &addr) != 1)
+	if (!dbg_evaladdr(argv[1], &addr))
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
 	if (argc >= 3) {
-		if (sscanf(argv[2], DBGSTR("%lU"), &count) == 1)
-			;
-		else if (!strcmp(argv[2], DBGSTR("page")))
+		if (!strcmp(argv[2], DBGSTR("page")))
 			count = pagedir_pagesize() - (addr & (pagedir_pagesize() - 1));
-		else
+		else if (!dbg_evalexpr(argv[2], &count)) {
 			return DBG_FUNCTION_INVALID_ARGUMENTS;
+		}
 	}
 	dbg_printf(DBGSTR("%$I[hex]\n"), (size_t)count, (uintptr_t)addr);
 	return 0;
@@ -348,13 +291,7 @@ DEFINE_DEBUG_FUNCTION(
 	current_pc = (uintptr_t)instruction_trypred((void const *)current_pc);
 	addr = current_pc;
 	if (argc >= 2) {
-		if (!strcmp(argv[1], DBGSTR(".")))
-			;
-		else if (sscanf(argv[1], DBGSTR(".+%lU"), &addr) == 1)
-			addr = current_pc + addr;
-		else if (sscanf(argv[1], DBGSTR(".-%lU"), &addr) == 1)
-			addr = current_pc - addr;
-		else if (sscanf(argv[1], DBGSTR("%lx"), &addr) != 1)
+		if (!dbg_evaladdr(argv[1], &addr))
 			return DBG_FUNCTION_INVALID_ARGUMENTS;
 	}
 	disasm_init(&da, &dbg_printer, NULL, (void *)addr,
@@ -382,13 +319,7 @@ DEFINE_DEBUG_FUNCTION(
 	current_pc = (uintptr_t)instruction_trypred((void const *)current_pc);
 	addr = current_pc;
 	if (argc >= 2) {
-		if (!strcmp(argv[1], DBGSTR(".")))
-			;
-		else if (sscanf(argv[1], DBGSTR(".+%lU"), &addr) == 1)
-			addr = current_pc + addr;
-		else if (sscanf(argv[1], DBGSTR(".-%lU"), &addr) == 1)
-			addr = current_pc - addr;
-		else if (sscanf(argv[1], DBGSTR("%lx"), &addr) != 1)
+		if (!dbg_evaladdr(argv[1], &addr))
 			return DBG_FUNCTION_INVALID_ARGUMENTS;
 	}
 	length = instruction_length((void *)addr);
@@ -522,20 +453,31 @@ again:
 	current_pc = (uintptr_t)instruction_trypred((void const *)current_pc);
 	addr = current_pc;
 	if (argc >= 1) {
-		if (!strcmp(argv[0], DBGSTR(".")))
-			;
-		else if (sscanf(argv[0], DBGSTR(".+%lU"), &addr) == 1)
-			addr = current_pc + addr;
-		else if (sscanf(argv[0], DBGSTR(".-%lU"), &addr) == 1)
-			addr = current_pc - addr;
-		else if (sscanf(argv[0], DBGSTR("%lx"), &addr) != 1) {
+		if (!dbg_evaladdr(argv[0], &addr))
 			return DBG_FUNCTION_INVALID_ARGUMENTS;
-		}
 		current_pc = (uintptr_t)instruction_trysucc((void const *)addr);
 	}
 	dbg_addr2line_printf((uintptr_t)addr, (uintptr_t)current_pc, NULL);
 	if (argc > 1)
 		goto again;
+	return 0;
+}
+
+DEFINE_DEBUG_FUNCTION(
+		"eval",
+		"eval EXPR...\n"
+		"\tEvaluate the given expression and print the result\n",
+		argc, argv) {
+	--argc;
+	++argv;
+	for (; argc; --argc, ++argv) {
+		uintptr_t result;
+		char *expr = argv[0];
+		if (!dbg_evalexpr(expr, &result))
+			return 1;
+		dbg_printf("%q: " DF_WHITE("%#Ix") " (" DF_WHITE("%Iu") ")\n",
+		           expr, result, result);
+	}
 	return 0;
 }
 

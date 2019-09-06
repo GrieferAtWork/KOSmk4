@@ -433,7 +433,7 @@ again:
 						goto nokey;
 					}
 					if (byte == 0x37) {
-						result = KEY_FPRESSED | KEY_PRINTSCREEN;
+						result = KEY_PRINTSCREEN;
 					} else {
 						/* Unwind. */
 						ps2_keyboard_ungetbyte(byte);
@@ -507,7 +507,7 @@ again:
 								goto nokey;
 							}
 							if (byte == 0x9d) {
-								result = KEY_FPRESSED | KEY_PAUSE;
+								result = KEY_PAUSE;
 							} else {
 								result = KEYMAP_GET_PS2_SCANSET1(0xe1);
 								ps2_keyboard_ungetbyte(byte);
@@ -620,7 +620,7 @@ again:
 						goto nokey;
 					}
 					if (byte == 0x7c) {
-						result = KEY_FPRESSED | KEY_PRINTSCREEN;
+						result = KEY_PRINTSCREEN;
 					} else {
 						result = keymap_ps2_scanset_2_e0[0x12];
 						ps2_keyboard_ungetbyte(byte);
@@ -690,7 +690,7 @@ again:
 										goto nokey;
 									}
 									if (byte == 0x12) {
-										result = KEY_FPRESSED | KEY_PAUSE;
+										result = KEY_PAUSE;
 									} else {
 										result = keymap_ps2_scanset_2[0xe1];
 										ps2_keyboard_ungetbyte(byte);
@@ -963,6 +963,14 @@ PUBLIC ATTR_DBGTEXT NOBLOCK bool NOTHROW(KCALL dbg_ungetuni)(/*utf-32*/ u32 ch) 
 	return true;
 }
 
+PUBLIC ATTR_DBGTEXT NOBLOCK bool NOTHROW(KCALL dbg_hasuni)(void) {
+	return dbg_getuni_pending_cnt != 0;
+}
+
+PUBLIC ATTR_DBGTEXT NOBLOCK void NOTHROW(KCALL dbg_purgeuni)(void) {
+	dbg_getuni_pending_cnt = 0;
+}
+
 /* Wait for the user to press a key and return the pressed character.
  * NOTE: Modifier keys aren't returned by this function. */
 PUBLIC ATTR_DBGTEXT /*utf-32*/u32 KCALL dbg_getuni(void) {
@@ -1063,6 +1071,22 @@ again_getkey:
 		}
 	}
 	return result;
+}
+
+PUBLIC ATTR_DBGTEXT NOBLOCK bool NOTHROW(KCALL dbg_isholding_ctrl)(void) {
+	return HOLDING_CTRL();
+}
+PUBLIC ATTR_DBGTEXT NOBLOCK bool NOTHROW(KCALL dbg_isholding_shift)(void) {
+	return ((ps2_keyboard_modifiers & PS2_KEYBOARD_MODIFIER_SHIFT) != 0) !=
+	       ((ps2_keyboard_modifiers & PS2_KEYBOARD_MODIFIER_CAPS) != 0);
+}
+PUBLIC ATTR_DBGTEXT NOBLOCK bool NOTHROW(KCALL dbg_isholding_alt)(void) {
+	return ps2_keyboard_modifiers & PS2_KEYBOARD_MODIFIER_ALT;
+}
+PUBLIC ATTR_DBGTEXT NOBLOCK bool NOTHROW(KCALL dbg_isholding_altgr)(void) {
+	return (ps2_keyboard_modifiers & PS2_KEYBOARD_MODIFIER_ALTGR) ||
+	       (ps2_keyboard_modifiers & (PS2_KEYBOARD_MODIFIER_CTRL | PS2_KEYBOARD_MODIFIER_ALT)) ==
+	       (PS2_KEYBOARD_MODIFIER_CTRL | PS2_KEYBOARD_MODIFIER_ALT);
 }
 
 PUBLIC ATTR_DBGTEXT /*utf-32*/u32 KCALL dbg_trygetuni(void) {

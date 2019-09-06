@@ -781,6 +781,10 @@ dbg_utf8_pending_ch32(u8 seqlen) {
 
 /* I/O within the debugger. */
 PUBLIC ATTR_DBGTEXT void
+NOTHROW(KCALL dbg_bell)(void) {
+	/* TODO: Visual bell */
+}
+PUBLIC ATTR_DBGTEXT void
 NOTHROW(KCALL dbg_putc)(/*utf-8*/char ch) {
 	if (dbg_utf8_curlen) {
 		/* Continue a utf-8 sequence. */

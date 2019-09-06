@@ -23,6 +23,7 @@
 
 #include <kernel/arch/debugger.h>
 #include <kernel/types.h>
+#include <stdbool.h>
 
 #ifndef CONFIG_NO_DEBUGGER
 
@@ -138,6 +139,16 @@ FUNDEF NOBLOCK /*utf-32*/u32 KCALL dbg_trygetuni(void);
 FUNDEF NOBLOCK bool NOTHROW(KCALL dbg_ungetc)(/*utf-8*/char ch);
 FUNDEF NOBLOCK bool NOTHROW(KCALL dbg_ungetuni)(/*utf-32*/u32 ch);
 
+/* Check if there are pending unicode characters. */
+FUNDEF NOBLOCK bool NOTHROW(KCALL dbg_hasuni)(void);
+/* Purge pending unicode characters. */
+FUNDEF NOBLOCK void NOTHROW(KCALL dbg_purgeuni)(void);
+
+FUNDEF NOBLOCK bool NOTHROW(KCALL dbg_isholding_ctrl)(void);
+FUNDEF NOBLOCK bool NOTHROW(KCALL dbg_isholding_shift)(void);
+FUNDEF NOBLOCK bool NOTHROW(KCALL dbg_isholding_alt)(void);
+FUNDEF NOBLOCK bool NOTHROW(KCALL dbg_isholding_altgr)(void);
+
 
 /* Try to auto-complete whatever was written at `line+num_written',
  * returning the number of additional bytes written by the Autocomplete
@@ -163,6 +174,7 @@ FUNDEF size_t KCALL dbg_readline(/*utf-8*/char *__restrict buf, size_t bufsize,
 #define DBG_MAXLINE 256 /* Default max length of a line (aka. intended size for `dbg_readline:buf') */
 
 /* I/O within the debugger. */
+FUNDEF void NOTHROW(KCALL dbg_bell)(void);
 FUNDEF void NOTHROW(KCALL dbg_putc)(/*utf-8*/char ch);
 FUNDEF void NOTHROW(KCALL dbg_putuni)(/*utf-32*/u32 ch);
 FUNDEF void NOTHROW(KCALL dbg_fillscreen)(/*utf-32*/u32 ch); /* Fill the entire screen with `ch' */
@@ -224,7 +236,62 @@ NOTHROW(KCALL dbg_vmenuf)(char const *__restrict title,
                           __builtin_va_list args);
 #define DBG_MENU_SELECTION_CANCEL  ((unsigned int)-1) /* The user pressed ESC */
 
+/* Print a messagebox centered on-screen. */
+FUNDEF void NOTHROW(KCALL dbg_messagebox)(char const *__restrict title,
+                                          char const *__restrict text);
 
+/* Open an interactive hex editor at `addr'
+ * @param: is_readonly: When true, enable read-only mode by default
+ * @return: * : The final selected address when the editor was closed. */
+FUNDEF void *NOTHROW(FCALL dbg_hexedit)(void *addr, bool is_readonly DFL(true));
+
+/* Process input for an edit field at the given position, allowing
+ * the user to type in input text, with that text then being written
+ * to the given `buf'.
+ * Note that if `buf' is non-empty (buf[0] != '\0') upon entry,
+ * editing will resume with the current contents of `buf'
+ * @return: * : One of `DBG_EDITFIELD_RETURN_*' */
+FUNDEF unsigned int
+NOTHROW(FCALL dbg_editfield)(int x, int y, unsigned int field_width,
+                             char *buf, size_t buflen);
+#define DBG_EDITFIELD_RETURN_ENTER     0 /* Enter (confirm) */
+#define DBG_EDITFIELD_RETURN_TAB       1 /* Tab (go to next field?) */
+#define DBG_EDITFIELD_RETURN_SHIFT_TAB 2 /* Shift+Tab (go to next field?) */
+#define DBG_EDITFIELD_RETURN_ESC       3
+#define DBG_EDITFIELD_RETURN_F(n)     (16+((n)-1)) /* Fn key was pressed */
+
+/* Same as `dbg_editfield()', but only draw the edit field. */
+FUNDEF void
+NOTHROW(FCALL dbg_draweditfield)(int x, int y, unsigned int field_width,
+                                 char *buf, size_t buflen);
+
+
+/* Evaluate an address expression
+ * @param: flags:  Set of `DBG_EVALADDR_FLAG_*'
+ * @return: true:  Evaluation failed. (when `DBG_EVALADDR_FLAG_NO_ERROR' wasn't set,
+ *                                     an error was already displayed to the user)
+ * @return: false: Evaluation failed. */
+FUNDEF bool NOTHROW(FCALL dbg_evaladdr)(char const *__restrict expr,
+                                        uintptr_t *__restrict presult,
+                                        unsigned int flags DFL(0));
+#define dbg_evalexpr(expr, presult) dbg_evaladdr(expr, presult, DBG_EVALADDR_FLAG_NO_HEX)
+#define DBG_EVALADDR_FLAG_NO_ERROR  0x0001 /* Don't show an error message describing what's wrong with the syntax. */
+#define DBG_EVALADDR_FLAG_NO_HEX    0x0002 /* When not set, `512' is `0x512', else it is decimal. Regardless of this,
+                                            * `5C2' is always hex, and `+512' or `(512)' are always decimal.
+                                            * This flag only affects top-level integral constants. */
+
+
+/* Try to get/set the value of a given register from `dbg_viewstate', given its name.
+ * Note that registers with values larger than pointer-size are usually split up into
+ * two or more different registers.
+ * @return: true:  Success.
+ * @return: false: Invalid register name. */
+FUNDEF bool NOTHROW(FCALL dbg_getreg)(char const *__restrict name, size_t namelen, uintptr_t *__restrict presult);
+FUNDEF bool NOTHROW(FCALL dbg_setreg)(char const *__restrict name, size_t namelen, uintptr_t value);
+
+/* Apply changes made to the viewed register state
+ * to the current thread's return location. */
+FUNDEF void NOTHROW(FCALL dbg_applyreg)(void);
 
 /* Scroll the DBG output display to the given position.
  * Scroll positions increment upwards, meaning that `pos=0'
@@ -402,7 +469,6 @@ FUNDEF void NOTHROW(VCALL dbg_addr2line_printf)(uintptr_t start_pc, uintptr_t en
                                                 char const *message_format, ...);
 FUNDEF void NOTHROW(KCALL dbg_addr2line_vprintf)(uintptr_t start_pc, uintptr_t end_pc,
                                                  char const *message_format, __builtin_va_list args);
-
 
 
 #define DEBUG_CALL VCALL

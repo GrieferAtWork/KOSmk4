@@ -40,6 +40,7 @@ if (gcc_opt.remove("-O3"))
 #include <asm/intrin.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <assert.h>
 
 DECL_BEGIN
@@ -50,6 +51,7 @@ DECL_BEGIN
 #ifndef CONFIG_NO_SMP
 #define THREAD_STATE_PENDING  3
 #endif /* !CONFIG_NO_SMP */
+#define THREAD_STATE_OTHER    4
 
 PRIVATE ATTR_DBGTEXT NONNULL((1)) void KCALL
 enum_thread(struct task *__restrict thread, unsigned int state) {
@@ -64,6 +66,8 @@ enum_thread(struct task *__restrict thread, unsigned int state) {
 	           ? DBGSTR("running")
 	           : state == THREAD_STATE_SLEEPING
 	           ? DBGSTR("sleeping")
+	           : state == THREAD_STATE_OTHER
+	           ? DBGSTR("other")
 #ifndef CONFIG_NO_SMP
 	           : state == THREAD_STATE_IDLING
 	             ? DBGSTR("idling")
@@ -86,6 +90,61 @@ enum_thread(struct task *__restrict thread, unsigned int state) {
 		dbg_printf(DBGSTR("\t_idle[%u]"), (unsigned int)thread->t_cpu->c_id);
 	}
 	dbg_putc('\n');
+}
+
+
+
+LOCAL bool KCALL verify_thread_address_nopid(struct task *p) {
+	cpuid_t cpuid;
+	for (cpuid = 0; cpuid < cpu_count; ++cpuid) {
+		struct task *iter;
+		struct cpu *c = cpu_vector[cpuid];
+		if (p == &FORCPU(c, _this_idle))
+			return true;
+		iter = c->c_current;
+		do {
+			assert(iter->t_cpu == c);
+			assert(iter->t_flags & TASK_FRUNNING);
+			if (iter == p)
+				return true;
+		} while ((iter = iter->t_sched.s_running.sr_runnxt) != c->c_current);
+		for (iter = c->c_sleeping; iter; iter = iter->t_sched.s_asleep.ss_tmonxt) {
+			assert(iter->t_cpu == c);
+			assert(!(iter->t_flags & TASK_FRUNNING));
+			if (iter == p)
+				return true;
+		}
+#ifndef CONFIG_NO_SMP
+		for (iter = c->c_pending; iter != CPU_PENDING_ENDOFCHAIN;
+		     iter = iter->t_sched.s_pending.ss_pennxt) {
+			assert(iter->t_cpu == c);
+			assert(iter->t_flags & TASK_FPENDING);
+			assert(!(iter->t_flags & TASK_FRUNNING));
+			if (iter == p)
+				return true;
+		}
+#endif /* !CONFIG_NO_SMP */
+	}
+	return false;
+}
+
+
+LOCAL bool KCALL verify_thread_address(struct task *p) {
+	size_t i;
+	if (verify_thread_address_nopid(p))
+		return true;
+	for (i = 0; i <= pidns_root.pn_mask; ++i) {
+		struct taskpid *pid;
+		pid = pidns_root.pn_list[i].pe_pid;
+		if (pid == NULL ||
+		    pid == PIDNS_ENTRY_DELETED)
+			continue;
+		if (wasdestroyed(pid))
+			continue;
+		if (pid->tp_thread.m_pointer == p)
+			return !wasdestroyed(p);
+	}
+	return false;
 }
 
 
@@ -127,65 +186,114 @@ DEFINE_DEBUG_FUNCTION(
 #endif /* !CONFIG_NO_SMP */
 		if (!did_idle)
 			enum_thread(&FORCPU(c, _this_idle), THREAD_STATE_IDLING);
-
+	}
+	/* Also enumerate threads found in PID namespaces. */
+	{
+		size_t i;
+		for (i = 0; i <= pidns_root.pn_mask; ++i) {
+			struct taskpid *pid;
+			pid = pidns_root.pn_list[i].pe_pid;
+			if (pid == NULL ||
+				pid == PIDNS_ENTRY_DELETED)
+				continue;
+			if (wasdestroyed(pid))
+				continue;
+			if (!pid->tp_thread.m_pointer ||
+			    wasdestroyed(pid->tp_thread.m_pointer))
+				continue;
+			if (verify_thread_address_nopid(pid->tp_thread.m_pointer))
+				continue; /* Already enumerated. */
+			enum_thread(pid->tp_thread.m_pointer, THREAD_STATE_OTHER);
+		}
 	}
 	return 0;
 }
 
-LOCAL bool KCALL verify_thread_address(struct task *p) {
-	cpuid_t cpuid;
-	for (cpuid = 0; cpuid < cpu_count; ++cpuid) {
-		struct task *iter;
-		struct cpu *c = cpu_vector[cpuid];
-		iter = c->c_current;
-		if (iter == &FORCPU(c, _this_idle))
-			return true;
-		do {
-			assert(iter->t_cpu == c);
-			assert(iter->t_flags & TASK_FRUNNING);
-			if (iter == p)
-				return true;
-		} while ((iter = iter->t_sched.s_running.sr_runnxt) != c->c_current);
-		for (iter = c->c_sleeping; iter; iter = iter->t_sched.s_asleep.ss_tmonxt) {
-			assert(iter->t_cpu == c);
-			assert(!(iter->t_flags & TASK_FRUNNING));
-			if (iter == p)
-				return true;
-		}
-#ifndef CONFIG_NO_SMP
-		for (iter = c->c_pending; iter != CPU_PENDING_ENDOFCHAIN;
-		     iter = iter->t_sched.s_pending.ss_pennxt) {
-			assert(iter->t_cpu == c);
-			assert(iter->t_flags & TASK_FPENDING);
-			assert(!(iter->t_flags & TASK_FRUNNING));
-			if (iter == p)
-				return true;
-		}
-#endif /* !CONFIG_NO_SMP */
+
+
+PUBLIC ATTR_DBGTEXT struct taskpid *
+NOTHROW(KCALL lookup_taskpid)(upid_t pid) {
+	REF struct taskpid *result;
+	uintptr_t i, perturb;
+	i = perturb = pid & pidns_root.pn_mask;
+	for (;; PIDNS_HASHNXT(i, perturb)) {
+		result = pidns_root.pn_list[i & pidns_root.pn_mask].pe_pid;
+		if (result == PIDNS_ENTRY_DELETED)
+			continue;
+		if unlikely(!result)
+			break;
+		if (result->tp_pids[pidns_root.pn_indirection] != pid)
+			continue;
+		/* Found it! (check if it's dead...) */
+		if (wasdestroyed(result))
+			continue;
+		break;
 	}
-	return false;
+	return result;
+}
+
+
+PRIVATE ATTR_DBGTEXT bool FCALL
+evalthreadexpr(char *expr, struct task **presult) {
+	char *p = expr;
+	switch (*p++) {
+
+	case 'p': {
+		/* Allow selecting by PID */
+		unsigned long pidno;
+		struct taskpid *pid;
+		pidno = strtoul(p, &p, 0);
+		if (*p != 0)
+			break;
+		pid = lookup_taskpid(pidno);
+		if (!pid || !pid->tp_thread.m_pointer ||
+		    wasdestroyed(pid->tp_thread.m_pointer)) {
+			dbg_printf(DBGSTR("Error: Invalid PID %u\n"), pidno);
+			break;
+		}
+		*presult = pid->tp_thread.m_pointer;
+	}	return true;
+
+	/* TODO: Allow selecting by path:
+	 *    `c0i'  cpu[0].idle
+	 *    `c0c'  cpu[0].current
+	 *    `c0s'  cpu[0].sleeping
+	 *    `c0s2' cpu[0].sleeping->next
+	 *    `bc'   _bootcpu.current
+	 *    `bs'   _bootcpu.sleeping
+	 *    `bs2'  _bootcpu.sleeping->next */
+	/* TODO: Allow selecting by name:
+	 *    `b'    _boottask
+	 *    `bi'   _bootidle */
+
+	default:
+		break;
+	}
+	return dbg_evaladdr(expr, (uintptr_t *)presult);
 }
 
 
 DEFINE_DEBUG_FUNCTION(
 		"thread",
 		"thread ADDR\n"
-		"\tSet the thread that is being debuged\n",
+		"\tSet the thread that is being debuged\n"
+		"\tWarning: Setting an invalid thread address may triple-fault the kernel\n"
+		"\t         Use " DF_WHITE("thread ADDR force") " to override security checks\n",
 		argc, argv) {
 	struct task *thread;
 	if (argc < 2)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
-	if (sscanf(argv[1], DBGSTR("%lx"), &thread) != 1)
+	if (!evalthreadexpr(argv[1], &thread))
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
-	if (!verify_thread_address(thread) &&
-	    (argc < 3 || strcmp(argv[2], DBGSTR("force")) != 0)) {
+	if (argc >= 3 && strcmp(argv[2], DBGSTR("force")) == 0) {
+		/* Accept any thread as valid. */
+	} else if (!verify_thread_address(thread)) {
 		dbg_printf(DBGSTR("Invalid thread %p (use `thread %p force' to override)\n"), thread, thread);
 		return 1;
 	}
 	dbg_impersonate_thread(thread);
 	return 0;
 }
-
 
 DECL_END
 #endif /* !CONFIG_NO_DEBUGGER */

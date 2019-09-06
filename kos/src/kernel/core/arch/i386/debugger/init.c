@@ -57,10 +57,14 @@ if (gcc_opt.remove("-O3"))
 DECL_BEGIN
 
 
+/* Saved backup of the original debugger exit state. */
+PRIVATE ATTR_COLDBSS struct fcpustate dbg_orig_exitstate = {};
 
 /* Impersonate the given `thread' for the purpose of debugging. */
 PUBLIC ATTR_DBGTEXT NONNULL((1)) void KCALL
 dbg_impersonate_thread(struct task *__restrict thread) {
+	if (thread == THIS_TASK)
+		return;
 #ifdef __x86_64__
 	__wrgsbase((uintptr_t)thread);
 #else /* __x86_64__ */
@@ -73,7 +77,8 @@ dbg_impersonate_thread(struct task *__restrict thread) {
 	pagedir_set(thread->t_vm->v_pdir_phys_ptr);
 #endif
 	if (thread == debug_original_thread) {
-		memcpy(&dbg_viewstate, &dbg_exitstate, sizeof(struct fcpustate));
+		memcpy(&dbg_exitstate, &dbg_orig_exitstate, sizeof(struct fcpustate));
+		memcpy(&dbg_viewstate, &dbg_orig_exitstate, sizeof(struct fcpustate));
 	} else {
 		struct scpustate *state;
 		state = thread->t_sched.s_state;
@@ -85,7 +90,7 @@ dbg_impersonate_thread(struct task *__restrict thread) {
 		dbg_viewstate.fcs_eflags        = state->scs_irregs_k.ir_eflags;
 		dbg_viewstate.fcs_sgregs.sg_cs  = state->scs_irregs_k.ir_cs;
 		dbg_viewstate.fcs_coregs.co_cr3 = (u32)thread->t_vm->v_pdir_phys_ptr;
-		if (SCPUSTATE32_ISVM86(*state)) {
+		if (SCPUSTATE_ISVM86(*state)) {
 			dbg_viewstate.fcs_gpregs.gp_esp = state->scs_irregs_v.ir_esp;
 			dbg_viewstate.fcs_sgregs.sg_ss  = state->scs_irregs_v.ir_ss;
 			dbg_viewstate.fcs_sgregs.sg_ds  = state->scs_irregs_v.ir_ds;
@@ -98,14 +103,16 @@ dbg_impersonate_thread(struct task *__restrict thread) {
 			dbg_viewstate.fcs_sgregs.sg_fs = state->scs_sgregs.sg_fs;
 			dbg_viewstate.fcs_sgregs.sg_gs = state->scs_sgregs.sg_gs;
 			if (state->scs_irregs_k.ir_cs & 3) {
-				dbg_viewstate.fcs_sgregs.sg_ss  = SCPUSTATE32_USER_SS(*state);
-				dbg_viewstate.fcs_gpregs.gp_esp = SCPUSTATE32_USER_ESP(*state);
+				dbg_viewstate.fcs_sgregs.sg_ss  = SCPUSTATE_USER_SS(*state);
+				dbg_viewstate.fcs_gpregs.gp_esp = SCPUSTATE_USER_ESP(*state);
 			} else {
-				dbg_viewstate.fcs_sgregs.sg_ss  = SCPUSTATE32_KERNEL_SS(*state);
-				dbg_viewstate.fcs_gpregs.gp_esp = SCPUSTATE32_KERNEL_ESP(*state);
+				dbg_viewstate.fcs_sgregs.sg_ss  = SCPUSTATE_KERNEL_SS(*state);
+				dbg_viewstate.fcs_gpregs.gp_esp = SCPUSTATE_KERNEL_ESP(*state);
 			}
 		}
 #endif /* !__x86_64__ */
+		memcpy(&dbg_orig_exitstate, &dbg_exitstate, sizeof(struct fcpustate));
+		memcpy(&dbg_exitstate, &dbg_viewstate, sizeof(struct fcpustate));
 	}
 }
 
@@ -349,6 +356,11 @@ INTERN ATTR_DBGTEXT void KCALL dbg_reset(void) {
 }
 
 INTERN ATTR_DBGTEXT void KCALL dbg_fini(void) {
+	/* If we're still impersonating a thread, we must fix-up our exit CPU state,
+	 * such that we'll be returning to our original interrupt location.
+	 * This does the same as `dbg_impersonate_thread(debug_original_thread)' */
+	if (THIS_TASK != debug_original_thread)
+		memcpy(&dbg_exitstate, &dbg_orig_exitstate, sizeof(struct fcpustate));
 	/* Fix kernel segment bases. */
 	dbg_fix_segments();
 

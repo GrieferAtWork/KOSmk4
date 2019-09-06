@@ -394,6 +394,10 @@ struct pidns {
 	                                      * NOTE: Chained via `tp_siblings.ln_next' */
 };
 
+#define PIDNS_HASHNXT(i, perturb) \
+	((i) = (((i) << 2) + (i) + (perturb) + 1), (perturb) >>= 5)
+
+
 /* The root PID namespace. */
 DATDEF struct pidns pidns_root;
 

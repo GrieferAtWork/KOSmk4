@@ -256,9 +256,13 @@
 #define __CRT_HAVE_dbg 1
 #define __CRT_HAVE_dbg_addr2line_printf 1
 #define __CRT_HAVE_dbg_addr2line_vprintf 1
+#define __CRT_HAVE_dbg_applyreg 1
 #define __CRT_HAVE_dbg_attr 1
 #define __CRT_HAVE_dbg_autocomplete_command 1
+#define __CRT_HAVE_dbg_bell 1
 #define __CRT_HAVE_dbg_default_attr 1
+#define __CRT_HAVE_dbg_draweditfield 1
+#define __CRT_HAVE_dbg_editfield 1
 #define __CRT_HAVE_dbg_enter_fcpustate 1
 #define __CRT_HAVE_dbg_enter_here 1
 #define __CRT_HAVE_dbg_enter_icpustate 1
@@ -266,6 +270,7 @@
 #define __CRT_HAVE_dbg_enter_lcpustate 1
 #define __CRT_HAVE_dbg_enter_scpustate 1
 #define __CRT_HAVE_dbg_enter_ucpustate 1
+#define __CRT_HAVE_dbg_evaladdr 1
 #define __CRT_HAVE_dbg_exit 1
 #define __CRT_HAVE_dbg_exitstate 1
 #define __CRT_HAVE_dbg_fillbox 1
@@ -278,13 +283,21 @@
 #define __CRT_HAVE_dbg_getfunc_fuzzy 1
 #define __CRT_HAVE_dbg_getfunc_start 1
 #define __CRT_HAVE_dbg_getkey 1
+#define __CRT_HAVE_dbg_getreg 1
 #define __CRT_HAVE_dbg_getscreendata 1
 #define __CRT_HAVE_dbg_getuni 1
+#define __CRT_HAVE_dbg_hasuni 1
+#define __CRT_HAVE_dbg_hexedit 1
 #define __CRT_HAVE_dbg_hline 1
 #define __CRT_HAVE_dbg_impersonate_thread 1
 #define __CRT_HAVE_dbg_indent 1
+#define __CRT_HAVE_dbg_isholding_alt 1
+#define __CRT_HAVE_dbg_isholding_altgr 1
+#define __CRT_HAVE_dbg_isholding_ctrl 1
+#define __CRT_HAVE_dbg_isholding_shift 1
 #define __CRT_HAVE_dbg_menuex 1
 #define __CRT_HAVE_dbg_menuf 1
+#define __CRT_HAVE_dbg_messagebox 1
 #define __CRT_HAVE_dbg_newline_mode 1
 #define __CRT_HAVE_dbg_pprint 1
 #define __CRT_HAVE_dbg_pprinter 1
@@ -293,6 +306,7 @@
 #define __CRT_HAVE_dbg_print 1
 #define __CRT_HAVE_dbg_printer 1
 #define __CRT_HAVE_dbg_printf 1
+#define __CRT_HAVE_dbg_purgeuni 1
 #define __CRT_HAVE_dbg_putc 1
 #define __CRT_HAVE_dbg_putuni 1
 #define __CRT_HAVE_dbg_readline 1
@@ -303,6 +317,7 @@
 #define __CRT_HAVE_dbg_scroll_maxline 1
 #define __CRT_HAVE_dbg_setcur 1
 #define __CRT_HAVE_dbg_setcur_visible 1
+#define __CRT_HAVE_dbg_setreg 1
 #define __CRT_HAVE_dbg_setscreendata 1
 #define __CRT_HAVE_dbg_tabsize 1
 #define __CRT_HAVE_dbg_trygetc 1
@@ -761,6 +776,7 @@
 #define __CRT_HAVE_linebuffer_writesome 1
 #define __CRT_HAVE_lookup_filesystem_type 1
 #define __CRT_HAVE_lookup_pci_device 1
+#define __CRT_HAVE_lookup_taskpid 1
 #define __CRT_HAVE_mall_dump_leaks 1
 #define __CRT_HAVE_mall_print_traceback 1
 #define __CRT_HAVE_mall_trace 1

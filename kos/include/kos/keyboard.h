@@ -74,7 +74,6 @@
 
 
 
-#define KEY_FPRESSED     0x0000 /* FLAG: The key was pressed. */
 #define KEY_FREPEAT      0x4000 /* FLAG: The key is being repeated periodically,
                                  *       because the user is holding down the button. */
 #define KEY_FRELEASED    0x8000 /* FLAG: The key was released. */

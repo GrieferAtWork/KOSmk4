@@ -930,9 +930,6 @@ PUBLIC struct pidns pidns_root = {
 	/* .pn_dead        = */NULL
 };
 
-#define PIDNS_HASHNXT(i, perturb) \
-	((i) = (((i) << 2) + (i) + (perturb) + 1), (perturb) >>= 5)
-
 
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL pidns_service_dead)(struct pidns *__restrict self);
