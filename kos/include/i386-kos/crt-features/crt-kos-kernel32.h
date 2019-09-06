@@ -257,6 +257,7 @@
 #define __CRT_HAVE_dbg_addr2line_printf 1
 #define __CRT_HAVE_dbg_addr2line_vprintf 1
 #define __CRT_HAVE_dbg_applyreg 1
+#define __CRT_HAVE_dbg_asmview 1
 #define __CRT_HAVE_dbg_attr 1
 #define __CRT_HAVE_dbg_autocomplete_command 1
 #define __CRT_HAVE_dbg_bell 1

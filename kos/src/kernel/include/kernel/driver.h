@@ -356,9 +356,9 @@ struct driver {
 	Elf_Phdr     DRIVER_CONST d_phdr[];     /* [const][valid_if(!DRIVER_FLAG_FINALIZED)][d_phnum] Vector of program headers. */
 };
 
-#define driver_isfinalizing(self) \
-       (__hybrid_atomic_load(self->d_flags,__ATOMIC_ACQUIRE) & \
-       (DRIVER_FLAG_FINALIZING|DRIVER_FLAG_FINALIZED|DRIVER_FLAG_FINALIZED_C))
+#define driver_isfinalizing(self)                            \
+	(__hybrid_atomic_load(self->d_flags, __ATOMIC_ACQUIRE) & \
+	 (DRIVER_FLAG_FINALIZING | DRIVER_FLAG_FINALIZED | DRIVER_FLAG_FINALIZED_C))
 
 /* A driver descriptor for the kernel core */
 DATDEF struct driver kernel_driver;

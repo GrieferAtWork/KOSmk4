@@ -211,6 +211,10 @@ NOTHROW(FCALL dbg_editfield)(int x, int y, unsigned int field_width,
 				pos = endptr;
 				continue;
 
+			case KEY_UP:
+			case KEY_DOWN:
+				continue;
+
 			default:
 				break;
 			}

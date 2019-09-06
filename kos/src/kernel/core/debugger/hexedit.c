@@ -35,7 +35,6 @@ if (gcc_opt.remove("-O3"))
 #include <kernel/vm.h>
 #include <alloca.h>
 #include <ctype.h>
-#include <stdio.h>
 #include <string.h>
 #include <hybrid/align.h>
 #include <kos/kernel/cpu-state.h>
@@ -51,8 +50,8 @@ DECL_BEGIN
 #define HD_MAXLINESIZE 64
 
 
-PRIVATE ATTR_DBGTEXT bool FCALL
-hd_setbyte(void *addr, byte_t value) {
+PRIVATE ATTR_DBGTEXT bool
+NOTHROW(FCALL hd_setbyte)(void *addr, byte_t value) {
 	TRY {
 		*(byte_t *)addr = value;
 		return true;
@@ -74,8 +73,8 @@ hd_setbyte(void *addr, byte_t value) {
 }
 
 
-PRIVATE ATTR_DBGTEXT bool FCALL
-hd_getbyte(void *addr, byte_t *pvalue) {
+PRIVATE ATTR_DBGTEXT bool
+NOTHROW(FCALL hd_getbyte)(void *addr, byte_t *pvalue) {
 	TRY {
 		*pvalue = *(byte_t *)addr;
 		return true;
@@ -443,21 +442,8 @@ hd_printscreen(void *start_addr, void *sel_addr,
 	}
 }
 
-PRIVATE ATTR_DBGRODATA char const hd_help[] =
-"Esc:         Exit            F1:                  Help\n"
-"Tab:         Next column     Shift+Tab:           Prev column\n"
-"Arrow Keys:  Navigate        Home/End/Pg-Up/Down: Navigate\n"
-"Ctrl+Pg-Up:  Go to top       Ctrl+Pg-Down:        Go to bottom\n"
-"0-9,a-f,A-F: Set Hex Nibble  Any ascii key:       Set character\n"
-"Esc/F1:      Close Help      F12:                 Toggle readonly\n"
-"CTRL+S       Save changes    CTRL+Z/Y             Discard changes\n"
-"F2:          Go to address"
-;
-
-#define ADDRSPACE_HALFSIZE ((((size_t)-1)/2)+1)
-
-PRIVATE ATTR_DBGTEXT bool
-NOTHROW(FCALL hd_addrdiag)(uintptr_t *paddr) {
+INTERN ATTR_DBGTEXT bool
+NOTHROW(FCALL dbg_hd_addrdiag)(uintptr_t *paddr) {
 	PRIVATE ATTR_DBGRODATA char const diag_title[] = "Go to address";
 	unsigned int edit_width = dbg_screen_width / 3;
 	unsigned int edit_x = (dbg_screen_width - edit_width) / 2;
@@ -482,6 +468,19 @@ NOTHROW(FCALL hd_addrdiag)(uintptr_t *paddr) {
 	return dbg_evaladdr(exprbuf, paddr);
 }
 
+
+PRIVATE ATTR_DBGRODATA char const hd_help[] =
+"Esc:         Exit            F1:                  Help\n"
+"Tab:         Next column     Shift+Tab:           Prev column\n"
+"Arrow Keys:  Navigate        Home/End/Pg-Up/Down: Navigate\n"
+"Ctrl+Pg-Up:  Go to top       Ctrl+Pg-Down:        Go to bottom\n"
+"0-9,a-f,A-F: Set Hex Nibble  Any ascii key:       Set character\n"
+"Esc/F1:      Close Help      F12:                 Toggle readonly\n"
+"CTRL+S       Save changes    CTRL+Z/Y             Discard changes\n"
+"F2:          Go to address"
+;
+
+#define ADDRSPACE_HALFSIZE ((((size_t)-1)/2)+1)
 
 PRIVATE ATTR_DBGTEXT void *
 NOTHROW(FCALL hd_main)(void *addr, bool is_readonly) {
@@ -651,7 +650,7 @@ NOTHROW(FCALL hd_main)(void *addr, bool is_readonly) {
 
 		case KEY_F2: {
 			uintptr_t newaddr;
-			if (hd_addrdiag(&newaddr))
+			if (dbg_hd_addrdiag(&newaddr))
 				addr = (void *)newaddr;
 		}	continue;
 
@@ -800,15 +799,12 @@ DEFINE_DEBUG_FUNCTION(
 		argc, argv) {
 	void *addr = (void *)FCPUSTATE_PC(dbg_viewstate);
 	if (argc >= 2) {
-		if (sscanf(argv[1], DBGSTR("%lx"), &addr) != 1)
+		if (!dbg_evaladdr(argv[1], (uintptr_t *)&addr))
 			return DBG_FUNCTION_INVALID_ARGUMENTS;
 	}
 	dbg_hexedit(addr, true);
 	return 0;
 }
-
-
-/* TODO: Add another editor for interactively viewing (and scrolling) assembly. */
 
 
 DECL_END

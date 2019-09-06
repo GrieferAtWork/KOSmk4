@@ -2654,10 +2654,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 663 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname663 /* index: 663 */
+	.weak dbg_asmview; .long dbg_asmview
+	.reloc ., R_386_SIZE32, dbg_asmview; .long 0
+	.long 0x90e4297
 	.long 0 /* index: 664 */
 	.long 0
 	.long 0
@@ -17060,6 +17060,8 @@ END(kernel_symbol_table)
 	.string "slab_kmalloc8"
 .Lname661:
 	.string "fs_filesystems_lock_upgrade"
+.Lname663:
+	.string "dbg_asmview"
 .Lname665:
 	.string "isr_vector_state_destroy"
 .Lname666:

@@ -294,8 +294,8 @@ next_byte:
 	return (void const *)reader;
 }
 
-INTERN ATTR_PURE WUNUSED void const *
-(CC libil_instruction_pred)(void const *pc) {
+PRIVATE ATTR_PURE WUNUSED void const *
+(CC libil_instruction_pred_impl)(void const *pc) {
 	byte_t *result;
 	unsigned int i = 15; /* 15 is the max instruction length on X86 */
 	do {
@@ -306,6 +306,40 @@ INTERN ATTR_PURE WUNUSED void const *
 	result = NULL;
 done:
 	return (void const *)result;
+}
+
+/* # of instructions to unwind for the purpose of
+ * verifying the program counter when walking backwards. */
+#define LIBIL_PRED_VERIFY_DISTANCE 8
+
+
+INTERN ATTR_PURE WUNUSED void const *
+(CC libil_instruction_pred)(void const *pc) {
+	void const *baseline, *result;
+	unsigned int i;
+	baseline = libil_instruction_pred_impl(pc);
+	if unlikely(!baseline)
+		return NULL;
+	/* Go backwards up to `LIBIL_PRED_VERIFY_DISTANCE' by guessing the length of the instructions.
+	 * Then, move forward until the given `pc' has once again been reached. */
+	for (i = 1; i < LIBIL_PRED_VERIFY_DISTANCE; ++i) {
+		void const *next;
+		next = libil_instruction_pred_impl(baseline);
+		if (!next)
+			break;
+		baseline = next;
+	}
+	for (;;) {
+		void const *next;
+		result = baseline;
+		next = libil_instruction_succ(baseline);
+		if (!next)
+			next = (byte_t *)baseline + 1;
+		if (next >= pc)
+			break;
+		baseline = next;
+	}
+	return result;
 }
 #else
 #warning "Unsupported architecture"

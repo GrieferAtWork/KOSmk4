@@ -245,6 +245,10 @@ FUNDEF void NOTHROW(KCALL dbg_messagebox)(char const *__restrict title,
  * @return: * : The final selected address when the editor was closed. */
 FUNDEF void *NOTHROW(FCALL dbg_hexedit)(void *addr, bool is_readonly DFL(true));
 
+/* Open an interactive assembly viewer at `addr'
+ * @return: * : The final selected address when the viewer was closed. */
+FUNDEF void *NOTHROW(FCALL dbg_asmview)(void *addr);
+
 /* Process input for an edit field at the given position, allowing
  * the user to type in input text, with that text then being written
  * to the given `buf'.

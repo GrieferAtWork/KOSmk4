@@ -30,6 +30,7 @@
 
 #include <format-printer.h>
 #include <stddef.h>
+#include <string.h>
 
 #include <libdebuginfo/addr2line.h>
 #include <kos/hybrid/library.h>
@@ -370,14 +371,16 @@ generic_print_symbol_addr:
 
 
 
-PRIVATE ssize_t __LIBCCALL
-stub_printer(void *arg, /*utf-8*/char const *__restrict data, size_t datalen) {
+PRIVATE ssize_t
+NOTHROW(__LIBCCALL stub_printer)(void *UNUSED(arg),
+                                 /*utf-8*/ char const *__restrict UNUSED(data),
+                                 size_t UNUSED(datalen)) {
 	return 0;
 }
 
-PRIVATE ssize_t LIBDISASM_CC
-stub_symbol_printer(struct disassembler *__restrict self,
-                    void *symbol_addr) {
+PRIVATE ssize_t
+NOTHROW(LIBDISASM_CC stub_symbol_printer)(struct disassembler *__restrict UNUSED(self),
+                                          void *UNUSED(symbol_addr)) {
 	return 0;
 }
 
@@ -390,6 +393,13 @@ libda_disasm_instrlen(struct disassembler *__restrict self) {
 	ssize_t oldresult;
 	pformatprinter old_printer;
 	diasm_symbol_printer_t old_symbol_printer;
+	byte_t padbuf[sizeof(self->d_pad0) + sizeof(self->d_pad1)];
+	__STATIC_IF (offsetafter(struct disassembler, d_pad0) == offsetof(struct disassembler, d_pad1)) {
+		memcpy(padbuf, &self->d_pad0, sizeof(padbuf));
+	} __STATIC_ELSE (offsetafter(struct disassembler, d_pad0) == offsetof(struct disassembler, d_pad1)) {
+		memcpy(padbuf, &self->d_pad0, sizeof(self->d_pad0));
+		memcpy(padbuf + sizeof(self->d_pad0), self->d_pad1, sizeof(self->d_pad1));
+	}
 	old_printer        = self->d_printer;
 	oldpc              = self->d_pc;
 	oldresult          = self->d_result;
@@ -403,6 +413,12 @@ libda_disasm_instrlen(struct disassembler *__restrict self) {
 	self->d_printer = old_printer;
 	self->d_result  = oldresult;
 	self->d_pc      = oldpc;
+	__STATIC_IF (offsetafter(struct disassembler, d_pad0) == offsetof(struct disassembler, d_pad1)) {
+		memcpy(&self->d_pad0, padbuf, sizeof(padbuf));
+	} __STATIC_ELSE (offsetafter(struct disassembler, d_pad0) == offsetof(struct disassembler, d_pad1)) {
+		memcpy(&self->d_pad0, padbuf, sizeof(self->d_pad0));
+		memcpy(self->d_pad1, padbuf + sizeof(self->d_pad0), sizeof(self->d_pad1));
+	}
 	return result;
 }
 
