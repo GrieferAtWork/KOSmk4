@@ -90,6 +90,7 @@ do_parse_as_hex:
 			char *iter;
 	case '1' ... '9':
 			iter = p;
+			--p;
 			while (*iter >= '0' && *iter <= '9')
 				++iter;
 			if ((*iter >= 'a' && *iter <= 'f') ||
@@ -101,8 +102,12 @@ do_parse_as_hex:
 				/* Only parse as hex, if a hex number is everything that was given! */
 				if (!*iter)
 					goto do_parse_as_hex;
+			} else if (*p == '0') {
+				/* Parse as octal */
+				value = STRTOPTR(p, &p, 8);
+			} else {
+				value = STRTOPTR(p, &p, 10);
 			}
-			value = STRTOPTR(p, &p, 10);
 			if (isalnum(*p))
 				return ev_errorf(flags, DBGSTR("Invalid alnum %Q after decimal constant"), *p);
 		}
@@ -111,14 +116,18 @@ do_parse_as_hex:
 	case 'a' ... 'f':
 	case 'A' ... 'F':
 		/* Check if there are any non-hex characters.
-			* If so, this has to be a register name. */
+		 * If so, this has to be a register name.
+		 * Otherwise, it's a hex number without prefix */
 		{
 			char *iter = p;
-			while ((*iter >= 'a' && *iter <= 'f') ||
+			while ((*iter >= '0' && *iter <= '9') ||
+			       (*iter >= 'a' && *iter <= 'f') ||
 			       (*iter >= 'A' && *iter <= 'F'))
 				++iter;
-			if (!*iter || isspace(*iter))
+			if (!*iter || isspace(*iter)) {
+				--p;
 				goto do_parse_as_hex;
+			}
 		}
 		ATTR_FALLTHROUGH
 	case 'g' ... 'z':
