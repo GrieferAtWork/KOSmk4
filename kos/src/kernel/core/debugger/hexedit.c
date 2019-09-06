@@ -23,6 +23,7 @@ if (gcc_opt.remove("-O3"))
  */
 #ifndef GUARD_KERNEL_SRC_DEBUGGER_HEXEDIT_C
 #define GUARD_KERNEL_SRC_DEBUGGER_HEXEDIT_C 1
+#define DISABLE_BRANCH_PROFILING 1
 
 #include <kernel/compiler.h>
 

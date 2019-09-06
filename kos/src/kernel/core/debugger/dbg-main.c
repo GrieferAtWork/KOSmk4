@@ -24,6 +24,7 @@ if (gcc_opt.remove("-O3"))
 #ifndef GUARD_KERNEL_SRC_DEBUGGER_DBG_MAIN_C
 #define GUARD_KERNEL_SRC_DEBUGGER_DBG_MAIN_C 1
 #define _KOS_SOURCE 1 /* fuzzy_strcasecmp() */
+#define DISABLE_BRANCH_PROFILING 1
 
 #include <kernel/compiler.h>
 
