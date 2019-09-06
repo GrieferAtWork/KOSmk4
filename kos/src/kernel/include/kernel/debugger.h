@@ -243,7 +243,7 @@ FUNDEF void NOTHROW(KCALL dbg_messagebox)(char const *__restrict title,
 /* Open an interactive hex editor at `addr'
  * @param: is_readonly: When true, enable read-only mode by default
  * @return: * : The final selected address when the editor was closed. */
-FUNDEF void *NOTHROW(FCALL dbg_hexedit)(void *addr, bool is_readonly DFL(true));
+FUNDEF void *NOTHROW(FCALL dbg_hexedit)(void *addr, bool is_readonly DFL(false));
 
 /* Open an interactive assembly viewer at `addr'
  * @return: * : The final selected address when the viewer was closed. */

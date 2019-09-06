@@ -418,22 +418,22 @@ hd_printscreen(void *start_addr, void *sel_addr,
 	}
 	dbg_setcolor(DBG_COLOR_BLACK, DBG_COLOR_LIGHT_GRAY);
 	dbg_hline(0, dbg_screen_height - 1, dbg_screen_width, ' ');
-	if (is_readonly) {
-		dbg_pprint(dbg_screen_width - (3 + (sizeof(void *) * 2) + 5),
-		           dbg_screen_height - 1, DBGSTR("[ro]"));
-	}
-	dbg_pprintf(dbg_screen_width - (3 + (sizeof(void *) * 2)),
-	            dbg_screen_height - 1,
-	            DBGSTR("%p:"), sel_addr);
+	dbg_setcur(0, dbg_screen_height - 1);
+	dbg_printf(DBGSTR("%p:"), sel_addr);
 	if (sel_byte_is_valid) {
-		dbg_pprintf(dbg_screen_width - 2, dbg_screen_height - 1,
-		            DBGSTR("%.2I8x"), sel_byte);
+		dbg_printf(DBGSTR("%.2I8x"), sel_byte);
 	} else {
-		dbg_pprint(dbg_screen_width - 2, dbg_screen_height - 1, DBGSTR("??"));
+		dbg_print(DBGSTR("??"));
 	}
+	if (is_readonly)
+		dbg_print(DBGSTR(" [ro]"));
 	if (!status)
 		status = DBGSTR("F1:help");
-	dbg_pprint(0, dbg_screen_height - 1, status);
+	{
+		size_t status_len = strlen(status);
+		dbg_pprint(dbg_screen_width - status_len,
+		           dbg_screen_height - 1, status);
+	}
 	if (dst_cursor_pos != (u32)-1) {
 		/* Display the cursor at a custom location */
 		dbg_setcur(DBG_GETCUR_X(dst_cursor_pos),

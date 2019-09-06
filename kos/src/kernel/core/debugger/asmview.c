@@ -494,7 +494,8 @@ PRIVATE ATTR_DBGRODATA char const av_help[] =
 "Esc:        Exit        F1:           Help\n"
 "Arrow Keys: Navigate    Pg-Up/Down:   Navigate\n"
 "Ctrl+Pg-Up: Go to top   Ctrl+Pg-Down: Go to bottom\n"
-"Esc/F1:     Close Help  F2:           Go to address"
+"Esc/F1:     Close Help  F2:           Go to address\n"
+"E:          Open Hexedit"
 ;
 
 PRIVATE ATTR_DBGTEXT void *
@@ -521,6 +522,15 @@ NOTHROW(FCALL av_main)(void *addr) {
 			key = dbg_getkey();
 		} while (key & KEY_FRELEASED);
 		switch (key) {
+
+		case KEY_E:
+			/* Edit the current address in the hex editor.
+			 * NOTE: Disable read-only by default, since the user may
+			 *       with to keep switching back and forth to look at
+			 *       the generated assembly (in case they choose to use
+			 *       this mechanism to re-write assembly code) */
+			addr = dbg_hexedit(addr, false);
+			break;
 
 		case KEY_ESC:
 			goto done;

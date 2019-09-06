@@ -72,7 +72,10 @@ dbg_impersonate_thread(struct task *__restrict thread) {
 	                (uintptr_t)thread);
 	__wrfs(SEGMENT_KERNEL_FSBASE);
 #endif /* !__x86_64__ */
-#if 0 /* The debugger always uses the kernel page directory... */
+#if 0 /* The debugger always uses the kernel page directory...
+       * FIXME: This is currently required because of the address of the VGA
+       *        display buffer, but also prevents inspection of user-space
+       *        memory by utilities such as the hex editor. */
 	/* Also change page directories (if necessary). */
 	pagedir_set(thread->t_vm->v_pdir_phys_ptr);
 #endif
