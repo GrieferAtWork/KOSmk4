@@ -1,6 +1,6 @@
 diff -Naur tcc-0.9.27-orig/libtcc.c tcc-0.9.27/libtcc.c
 --- tcc-0.9.27-orig/libtcc.c	2017-12-17 09:27:05.000000000 +0100
-+++ tcc-0.9.27/libtcc.c	2019-09-07 18:30:40.936201200 +0200
++++ tcc-0.9.27/libtcc.c	2019-09-07 18:41:05.123021900 +0200
 @@ -974,9 +974,17 @@
      /* add libc crt1/crti objects */
      if ((output_type == TCC_OUTPUT_EXE || output_type == TCC_OUTPUT_DLL) &&
@@ -21,8 +21,18 @@ diff -Naur tcc-0.9.27-orig/libtcc.c tcc-0.9.27/libtcc.c
      return 0;
 diff -Naur tcc-0.9.27-orig/tccelf.c tcc-0.9.27/tccelf.c
 --- tcc-0.9.27-orig/tccelf.c	2017-12-17 09:27:05.000000000 +0100
-+++ tcc-0.9.27/tccelf.c	2019-09-07 18:28:53.047134200 +0200
-@@ -1201,9 +1201,11 @@
++++ tcc-0.9.27/tccelf.c	2019-09-07 19:25:58.575456000 +0200
+@@ -1192,6 +1192,9 @@
+     /* add libc */
+     if (!s1->nostdlib) {
+         tcc_add_library_err(s1, "c");
++#ifdef TCC_TARGET_KOS
++        tcc_add_library_err(s1, "dl");
++#endif /* TCC_TARGET_KOS */
+ #ifdef TCC_LIBGCC
+         if (!s1->static_link) {
+             if (TCC_LIBGCC[0] == '/')
+@@ -1201,9 +1204,11 @@
          }
  #endif
          tcc_add_support(s1, TCC_LIBTCC1);
