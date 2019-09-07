@@ -1,4 +1,4 @@
-/* HASH 0x29a49052 */
+/* HASH 0xc2723c67 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,9 +20,6 @@
 #define __CRT_STUB_FPathConf 1
 #define __CRT_STUB_PathConf 1
 #define __CRT_STUB___control87_2 1
-#define __CRT_STUB___ctype_b_loc 1
-#define __CRT_STUB___ctype_tolower_loc 1
-#define __CRT_STUB___ctype_toupper_loc 1
 #define __CRT_STUB___doserrno 1
 #define __CRT_STUB___fpclassify 1
 #define __CRT_STUB___fpecode 1
@@ -30,12 +27,8 @@
 #define __CRT_STUB___issignaling 1
 #define __CRT_STUB___locale_ctype_ptr 1
 #define __CRT_STUB___locale_ctype_ptr_l 1
-#define __CRT_STUB___p___argc 1
-#define __CRT_STUB___p___argv 1
-#define __CRT_STUB___p___initenv 1
 #define __CRT_STUB___p___wargv 1
 #define __CRT_STUB___p___winitenv 1
-#define __CRT_STUB___p__pgmptr 1
 #define __CRT_STUB___p__wenviron 1
 #define __CRT_STUB___p__wpgmptr 1
 #define __CRT_STUB___pthread_unregister_cancel 1

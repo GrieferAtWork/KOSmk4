@@ -86,6 +86,7 @@ if (n == 0)
 	print r"__CRT_FUNCTION_IF_NOT_NORETURN(name,                                            \";
 	print r"	__CRT_FUNCTION_BEGIN_INTERN_ALIAS(name, num_intern_aliases, intern_aliases) \";
 	print r"	.section .text.crt.dos.compat.name;                                         \";
+	print r"	.weak libd_##name;                                                          \";
 	print r"	INTERN_FUNCTION(libd_##name);                                               \";
 	print r"		.cfi_startproc;                                                         \";
 	print r"		pushq_cfi_r %rdi;                                                       \";
@@ -137,6 +138,7 @@ if (stack_cleanup != 0) {
 __CRT_FUNCTION_IF_NOT_NORETURN(name,                                            \
 	__CRT_FUNCTION_BEGIN_INTERN_ALIAS(name, num_intern_aliases, intern_aliases) \
 	.section .text.crt.dos.compat.name;                                         \
+	.weak libd_##name;                                                          \
 	INTERN_FUNCTION(libd_##name);                                               \
 		.cfi_startproc;                                                         \
 		pushq_cfi_r %rdi;                                                       \
@@ -153,6 +155,7 @@ __CRT_FUNCTION_IF_NOT_NORETURN(name,                                            
 #define __CRT_FUNCTION_SELECT_ARGC_1(name, num_intern_aliases, intern_aliases)  \
 	__CRT_FUNCTION_BEGIN_INTERN_ALIAS(name, num_intern_aliases, intern_aliases) \
 	.section .text.crt.dos.compat.name;                                         \
+	.weak libd_##name;                                                          \
 	INTERN_FUNCTION(libd_##name);                                               \
 		.cfi_startproc;                                                         \
 		pushq_cfi_r %rdi;                                                       \
@@ -171,6 +174,7 @@ __CRT_FUNCTION_IF_NOT_NORETURN(name,                                            
 #define __CRT_FUNCTION_SELECT_ARGC_2(name, num_intern_aliases, intern_aliases)  \
 	__CRT_FUNCTION_BEGIN_INTERN_ALIAS(name, num_intern_aliases, intern_aliases) \
 	.section .text.crt.dos.compat.name;                                         \
+	.weak libd_##name;                                                          \
 	INTERN_FUNCTION(libd_##name);                                               \
 		.cfi_startproc;                                                         \
 		pushq_cfi_r %rdi;                                                       \
@@ -190,6 +194,7 @@ __CRT_FUNCTION_IF_NOT_NORETURN(name,                                            
 #define __CRT_FUNCTION_SELECT_ARGC_3(name, num_intern_aliases, intern_aliases)  \
 	__CRT_FUNCTION_BEGIN_INTERN_ALIAS(name, num_intern_aliases, intern_aliases) \
 	.section .text.crt.dos.compat.name;                                         \
+	.weak libd_##name;                                                          \
 	INTERN_FUNCTION(libd_##name);                                               \
 		.cfi_startproc;                                                         \
 		pushq_cfi_r %rdi;                                                       \
@@ -210,6 +215,7 @@ __CRT_FUNCTION_IF_NOT_NORETURN(name,                                            
 #define __CRT_FUNCTION_SELECT_ARGC_4(name, num_intern_aliases, intern_aliases)  \
 	__CRT_FUNCTION_BEGIN_INTERN_ALIAS(name, num_intern_aliases, intern_aliases) \
 	.section .text.crt.dos.compat.name;                                         \
+	.weak libd_##name;                                                          \
 	INTERN_FUNCTION(libd_##name);                                               \
 		.cfi_startproc;                                                         \
 		pushq_cfi_r %rdi;                                                       \
@@ -231,6 +237,7 @@ __CRT_FUNCTION_IF_NOT_NORETURN(name,                                            
 #define __CRT_FUNCTION_SELECT_ARGC_5(name, num_intern_aliases, intern_aliases)  \
 	__CRT_FUNCTION_BEGIN_INTERN_ALIAS(name, num_intern_aliases, intern_aliases) \
 	.section .text.crt.dos.compat.name;                                         \
+	.weak libd_##name;                                                          \
 	INTERN_FUNCTION(libd_##name);                                               \
 		.cfi_startproc;                                                         \
 		pushq_cfi_r %rdi;                                                       \
@@ -253,6 +260,7 @@ __CRT_FUNCTION_IF_NOT_NORETURN(name,                                            
 #define __CRT_FUNCTION_SELECT_ARGC_6(name, num_intern_aliases, intern_aliases)  \
 	__CRT_FUNCTION_BEGIN_INTERN_ALIAS(name, num_intern_aliases, intern_aliases) \
 	.section .text.crt.dos.compat.name;                                         \
+	.weak libd_##name;                                                          \
 	INTERN_FUNCTION(libd_##name);                                               \
 		.cfi_startproc;                                                         \
 		pushq_cfi_r %rdi;                                                       \
@@ -276,6 +284,7 @@ __CRT_FUNCTION_IF_NOT_NORETURN(name,                                            
 #define __CRT_FUNCTION_SELECT_ARGC_7(name, num_intern_aliases, intern_aliases)  \
 	__CRT_FUNCTION_BEGIN_INTERN_ALIAS(name, num_intern_aliases, intern_aliases) \
 	.section .text.crt.dos.compat.name;                                         \
+	.weak libd_##name;                                                          \
 	INTERN_FUNCTION(libd_##name);                                               \
 		.cfi_startproc;                                                         \
 		pushq_cfi_r %rdi;                                                       \
@@ -301,6 +310,7 @@ __CRT_FUNCTION_IF_NOT_NORETURN(name,                                            
 #define __CRT_FUNCTION_SELECT_ARGC_8(name, num_intern_aliases, intern_aliases)  \
 	__CRT_FUNCTION_BEGIN_INTERN_ALIAS(name, num_intern_aliases, intern_aliases) \
 	.section .text.crt.dos.compat.name;                                         \
+	.weak libd_##name;                                                          \
 	INTERN_FUNCTION(libd_##name);                                               \
 		.cfi_startproc;                                                         \
 		pushq_cfi_r %rdi;                                                       \
@@ -328,6 +338,7 @@ __CRT_FUNCTION_IF_NOT_NORETURN(name,                                            
 #define __CRT_FUNCTION_SELECT_ARGC_9(name, num_intern_aliases, intern_aliases)  \
 	__CRT_FUNCTION_BEGIN_INTERN_ALIAS(name, num_intern_aliases, intern_aliases) \
 	.section .text.crt.dos.compat.name;                                         \
+	.weak libd_##name;                                                          \
 	INTERN_FUNCTION(libd_##name);                                               \
 		.cfi_startproc;                                                         \
 		pushq_cfi_r %rdi;                                                       \
@@ -356,6 +367,7 @@ __CRT_FUNCTION_IF_NOT_NORETURN(name,                                            
 #define __CRT_FUNCTION_SELECT_ARGC_10(name, num_intern_aliases, intern_aliases) \
 	__CRT_FUNCTION_BEGIN_INTERN_ALIAS(name, num_intern_aliases, intern_aliases) \
 	.section .text.crt.dos.compat.name;                                         \
+	.weak libd_##name;                                                          \
 	INTERN_FUNCTION(libd_##name);                                               \
 		.cfi_startproc;                                                         \
 		pushq_cfi_r %rdi;                                                       \
@@ -385,6 +397,7 @@ __CRT_FUNCTION_IF_NOT_NORETURN(name,                                            
 #define __CRT_FUNCTION_SELECT_ARGC_11(name, num_intern_aliases, intern_aliases) \
 	__CRT_FUNCTION_BEGIN_INTERN_ALIAS(name, num_intern_aliases, intern_aliases) \
 	.section .text.crt.dos.compat.name;                                         \
+	.weak libd_##name;                                                          \
 	INTERN_FUNCTION(libd_##name);                                               \
 		.cfi_startproc;                                                         \
 		pushq_cfi_r %rdi;                                                       \
@@ -415,6 +428,7 @@ __CRT_FUNCTION_IF_NOT_NORETURN(name,                                            
 #define __CRT_FUNCTION_SELECT_ARGC_12(name, num_intern_aliases, intern_aliases) \
 	__CRT_FUNCTION_BEGIN_INTERN_ALIAS(name, num_intern_aliases, intern_aliases) \
 	.section .text.crt.dos.compat.name;                                         \
+	.weak libd_##name;                                                          \
 	INTERN_FUNCTION(libd_##name);                                               \
 		.cfi_startproc;                                                         \
 		pushq_cfi_r %rdi;                                                       \
@@ -446,6 +460,7 @@ __CRT_FUNCTION_IF_NOT_NORETURN(name,                                            
 #define __CRT_FUNCTION_SELECT_ARGC_13(name, num_intern_aliases, intern_aliases) \
 	__CRT_FUNCTION_BEGIN_INTERN_ALIAS(name, num_intern_aliases, intern_aliases) \
 	.section .text.crt.dos.compat.name;                                         \
+	.weak libd_##name;                                                          \
 	INTERN_FUNCTION(libd_##name);                                               \
 		.cfi_startproc;                                                         \
 		pushq_cfi_r %rdi;                                                       \
@@ -478,6 +493,7 @@ __CRT_FUNCTION_IF_NOT_NORETURN(name,                                            
 #define __CRT_FUNCTION_SELECT_ARGC_14(name, num_intern_aliases, intern_aliases) \
 	__CRT_FUNCTION_BEGIN_INTERN_ALIAS(name, num_intern_aliases, intern_aliases) \
 	.section .text.crt.dos.compat.name;                                         \
+	.weak libd_##name;                                                          \
 	INTERN_FUNCTION(libd_##name);                                               \
 		.cfi_startproc;                                                         \
 		pushq_cfi_r %rdi;                                                       \
@@ -511,6 +527,7 @@ __CRT_FUNCTION_IF_NOT_NORETURN(name,                                            
 #define __CRT_FUNCTION_SELECT_ARGC_15(name, num_intern_aliases, intern_aliases) \
 	__CRT_FUNCTION_BEGIN_INTERN_ALIAS(name, num_intern_aliases, intern_aliases) \
 	.section .text.crt.dos.compat.name;                                         \
+	.weak libd_##name;                                                          \
 	INTERN_FUNCTION(libd_##name);                                               \
 		.cfi_startproc;                                                         \
 		pushq_cfi_r %rdi;                                                       \

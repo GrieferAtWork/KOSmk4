@@ -22,14 +22,16 @@
 
 #ifndef _READ_WRITE_RETURN_TYPE
 #define _READ_WRITE_RETURN_TYPE  int
-#endif
+#endif /* !_READ_WRITE_RETURN_TYPE */
 #ifndef _READ_WRITE_BUFSIZE_TYPE
 #define _READ_WRITE_BUFSIZE_TYPE int
-#endif
+#endif /* !_READ_WRITE_BUFSIZE_TYPE */
 
 #ifndef __size_t_defined
 #define __size_t_defined 1
+__DECL_BEGIN
 typedef __SIZE_TYPE__ size_t;
+__DECL_END
 #endif /* !__size_t_defined */
 
 #endif /* !_SYS_CONFIG_H_ */

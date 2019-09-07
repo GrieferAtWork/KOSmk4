@@ -22,11 +22,88 @@
 #include "../api.h"
 #include "fcntl.h"
 
+#include <sys/stat.h>
 #include <kos/syscalls.h>
 #include <stdarg.h>
 
 DECL_BEGIN
 
+
+PRIVATE ATTR_SECTION(".text.crt.dos.io.access.oflag_dos2kos")
+oflag_t NOTHROW(LIBCCALL oflag_dos2kos)(oflag_t dos_oflags) {
+	oflag_t result;
+	result = dos_oflags & (O_ACCMODE | O_TRUNC);
+	if (dos_oflags & __DOS_O_APPEND)
+		result |= O_APPEND;
+	if (dos_oflags & __DOS_O_TEMPORARY)
+		result |= O_TMPFILE;
+	if (dos_oflags & __DOS_O_NOINHERIT)
+		result |= O_CLOEXEC;
+	if (dos_oflags & __DOS_O_CREAT)
+		result |= O_CREAT;
+	if (dos_oflags & __DOS_O_TRUNC)
+		result |= O_TRUNC;
+	if (dos_oflags & __DOS_O_EXCL)
+		result |= O_EXCL;
+#if 0 /* This flag ~allows~ the named file to be a directory.
+       * With this in mind, it still isn't required to be one,
+       * so for full compatibility, we'll have to ensure that
+       * we _didn't_ open a directory when this flag _isn't_
+       * given.  */
+	if (dos_oflags & __DOS_O_OBTAIN_DIR)
+		result |= O_DIRECTORY;
+#endif
+	return result;
+}
+
+
+DEFINE_PUBLIC_ALIAS(DOS$open, libd_open);
+DEFINE_PUBLIC_ALIAS(DOS$_open, libd_open);
+INTERN WUNUSED NONNULL((1))
+ATTR_SECTION(".text.crt.dos.io.access.open") fd_t
+NOTHROW_RPC(VLIBDCALL libd_open)(char const *filename, oflag_t oflags, ...) {
+	fd_t result;
+	oflag_t kos_oflags;
+	va_list args;
+	kos_oflags = oflag_dos2kos(oflags);
+	va_start(args, oflags);
+#ifdef __NR_open
+	result = sys_open(filename,
+	                  kos_oflags,
+	                  va_arg(args, mode_t));
+#else /* __NR_open */
+	result = sys_openat(AT_FDCWD,
+	                    filename,
+	                    kos_oflags,
+	                    va_arg(args, mode_t));
+#endif /* !__NR_open */
+	va_end(args);
+	if unlikely(E_ISERR(result)) {
+		libc_seterrno(-result);
+		return -1;
+	}
+	if (!(oflags & __DOS_O_OBTAIN_DIR)) {
+		/* Make sure that the opened file isn't a directory. */
+		struct stat st;
+		if (E_ISOK(sys_kfstat(result, &st)) && S_ISDIR(st.st_mode)) {
+			sys_close(result);
+			libc_seterrno(EISDIR);
+			return -1;
+		}
+	}
+	return result;
+}
+
+
+DEFINE_PUBLIC_ALIAS(DOS$creat, libd_creat);
+DEFINE_PUBLIC_ALIAS(DOS$_creat, libd_creat);
+INTERN WUNUSED NONNULL((1))
+ATTR_SECTION(".text.crt.dos.io.access.creat") fd_t
+NOTHROW_RPC(LIBDCALL libd_creat)(char const *filename, mode_t mode){
+	return libd_open(filename,
+	                 __DOS_O_CREAT | O_WRONLY | __DOS_O_TRUNC,
+	                 mode);
+}
 
 
 

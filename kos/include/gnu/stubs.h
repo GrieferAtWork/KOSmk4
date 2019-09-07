@@ -1,4 +1,4 @@
-/* HASH 0x8f6412d1 */
+/* HASH 0x3657f7a8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,9 +20,6 @@
 #define __stub_FPathConf 1
 #define __stub_PathConf 1
 #define __stub___control87_2 1
-#define __stub___ctype_b_loc 1
-#define __stub___ctype_tolower_loc 1
-#define __stub___ctype_toupper_loc 1
 #define __stub___doserrno 1
 #define __stub___fpclassify 1
 #define __stub___fpecode 1
@@ -30,12 +27,8 @@
 #define __stub___issignaling 1
 #define __stub___locale_ctype_ptr 1
 #define __stub___locale_ctype_ptr_l 1
-#define __stub___p___argc 1
-#define __stub___p___argv 1
-#define __stub___p___initenv 1
 #define __stub___p___wargv 1
 #define __stub___p___winitenv 1
-#define __stub___p__pgmptr 1
 #define __stub___p__wenviron 1
 #define __stub___p__wpgmptr 1
 #define __stub___pthread_unregister_cancel 1

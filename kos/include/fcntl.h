@@ -1,4 +1,4 @@
-/* HASH 0xa5efcdf6 */
+/* HASH 0x2d403ad2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,9 +39,9 @@ __SYSDECL_BEGIN
 
 #ifdef __O_TMPFILE
 #   define __OPEN_NEEDS_MODE(oflags) (((oflags)&O_CREAT) || ((oflags)&__O_TMPFILE) == __O_TMPFILE)
-#else
+#else /* __O_TMPFILE */
 #   define __OPEN_NEEDS_MODE(oflags)  ((oflags)&O_CREAT)
-#endif
+#endif /* !__O_TMPFILE */
 
 /* For XPG all symbols from <sys/stat.h> should also be available. */
 #if !defined(S_IFMT) && (defined(__USE_XOPEN) || defined(__USE_XOPEN2K8))
@@ -85,7 +85,7 @@ __SYSDECL_BEGIN
 #define W_OK 2 /* Test for write permission. */
 #define X_OK 1 /* Test for execute permission. */
 #define F_OK 0 /* Test for existence. */
-#endif
+#endif /* !R_OK */
 #endif /* __USE_MISC */
 
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)

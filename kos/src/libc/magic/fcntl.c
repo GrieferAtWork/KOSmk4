@@ -41,9 +41,9 @@ __SYSDECL_BEGIN
 
 #ifdef __O_TMPFILE
 #   define __OPEN_NEEDS_MODE(oflags) (((oflags)&O_CREAT) || ((oflags)&__O_TMPFILE) == __O_TMPFILE)
-#else
+#else /* __O_TMPFILE */
 #   define __OPEN_NEEDS_MODE(oflags)  ((oflags)&O_CREAT)
-#endif
+#endif /* !__O_TMPFILE */
 
 /* For XPG all symbols from <sys/stat.h> should also be available. */
 #if !defined(S_IFMT) && (defined(__USE_XOPEN) || defined(__USE_XOPEN2K8))
@@ -87,7 +87,7 @@ __SYSDECL_BEGIN
 #define W_OK 2 /* Test for write permission. */
 #define X_OK 1 /* Test for execute permission. */
 #define F_OK 0 /* Test for existence. */
-#endif
+#endif /* !R_OK */
 #endif /* __USE_MISC */
 
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)
@@ -218,7 +218,7 @@ creat:([nonnull] char const *filename, $mode_t mode) -> $fd_t {
 %#ifdef __USE_LARGEFILE64
 [cp][noexport][vartypes($mode_t)]
 [ATTR_WUNUSED][largefile64_variant_of(open)]
-[if(!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0),alias(_open)]
+[if(!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0), alias(_open)]
 [requires(defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open))]
 [dependency_include(<bits/fcntl.h>)]
 [decl_include(<bits/types.h>)]
@@ -237,7 +237,7 @@ open64:([nonnull] char const *filename, $oflag_t oflags, ...) -> $fd_t {
 
 [cp][noexport][guard]
 [ATTR_WUNUSED][largefile64_variant_of(creat)]
-[if(!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0),alias(_creat)]
+[if(!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0), alias(_creat)]
 [requires(defined(__CRT_HAVE_open64) || defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open))]
 [dependency_include(<bits/fcntl.h>)]
 [decl_include(<bits/types.h>)]

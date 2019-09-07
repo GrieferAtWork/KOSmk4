@@ -26,6 +26,7 @@
 #define __CRT_HAVE_Creat 1
 #define __CRT_HAVE_Creat64 1
 #define __CRT_HAVE_DOS$__daylight 1
+#define __CRT_HAVE_DOS$__errno 1
 #define __CRT_HAVE_DOS$__p___wargv 1
 #define __CRT_HAVE_DOS$__p___winitenv 1
 #define __CRT_HAVE_DOS$__p__wenviron 1
@@ -34,10 +35,13 @@
 #define __CRT_HAVE_DOS$__tzname 1
 #define __CRT_HAVE_DOS$__wcserror 1
 #define __CRT_HAVE_DOS$__wcserror_s 1
+#define __CRT_HAVE_DOS$_creat 1
+#define __CRT_HAVE_DOS$_errno 1
 #define __CRT_HAVE_DOS$_mbstowcs_l 1
 #define __CRT_HAVE_DOS$_mbstowcs_s 1
 #define __CRT_HAVE_DOS$_mbstowcs_s_l 1
 #define __CRT_HAVE_DOS$_mbtowc_l 1
+#define __CRT_HAVE_DOS$_open 1
 #define __CRT_HAVE_DOS$_strerror_s 1
 #define __CRT_HAVE_DOS$_wchdir 1
 #define __CRT_HAVE_DOS$_wcserror 1
@@ -73,6 +77,7 @@
 #define __CRT_HAVE_DOS$_wsystem 1
 #define __CRT_HAVE_DOS$_wunlink 1
 #define __CRT_HAVE_DOS$_wutime32 1
+#define __CRT_HAVE_DOS$creat 1
 #define __CRT_HAVE_DOS$fgetwc 1
 #define __CRT_HAVE_DOS$fgetws 1
 #define __CRT_HAVE_DOS$fgetws_unlocked 1
@@ -113,6 +118,7 @@
 #define __CRT_HAVE_DOS$mbsrtowcs 1
 #define __CRT_HAVE_DOS$mbstowcs 1
 #define __CRT_HAVE_DOS$mbtowc 1
+#define __CRT_HAVE_DOS$open 1
 #define __CRT_HAVE_DOS$putwc_unlocked 1
 #define __CRT_HAVE_DOS$putwchar 1
 #define __CRT_HAVE_DOS$putwchar_unlocked 1
@@ -120,6 +126,8 @@
 #define __CRT_HAVE_DOS$signal 1
 #define __CRT_HAVE_DOS$stat 1
 #define __CRT_HAVE_DOS$stat64 1
+#define __CRT_HAVE_DOS$strerror_s 1
+#define __CRT_HAVE_DOS$strerrorname_s 1
 #define __CRT_HAVE_DOS$swprintf 1
 #define __CRT_HAVE_DOS$swscanf 1
 #define __CRT_HAVE_DOS$ungetwc 1
@@ -524,6 +532,11 @@
 #define __CRT_HAVE___gamma 1
 #define __CRT_HAVE___gammaf 1
 #define __CRT_HAVE___gammal 1
+#define __CRT_HAVE___get_cygerrno 1
+#define __CRT_HAVE___get_doserrno 1
+#define __CRT_HAVE___get_errno 1
+#define __CRT_HAVE___get_errno_fast 1
+#define __CRT_HAVE___get_nterrno 1
 #define __CRT_HAVE___gxx_personality_v0 1
 #define __CRT_HAVE___h_errno_location 1
 #define __CRT_HAVE___hypot 1
@@ -657,6 +670,11 @@
 #define __CRT_HAVE___scalbn 1
 #define __CRT_HAVE___scalbnf 1
 #define __CRT_HAVE___scalbnl 1
+#define __CRT_HAVE___set_cygerrno 1
+#define __CRT_HAVE___set_doserrno 1
+#define __CRT_HAVE___set_errno 1
+#define __CRT_HAVE___set_errno_f 1
+#define __CRT_HAVE___set_nterrno 1
 #define __CRT_HAVE___signbit 1
 #define __CRT_HAVE___signbitf 1
 #define __CRT_HAVE___signbitl 1
@@ -760,6 +778,7 @@
 #define __CRT_HAVE__copysign 1
 #define __CRT_HAVE__creat 1
 #define __CRT_HAVE__cwait 1
+#define __CRT_HAVE__dosmaperr 1
 #define __CRT_HAVE__dup 1
 #define __CRT_HAVE__dup2 1
 #define __CRT_HAVE__dupenv_s 1
@@ -834,6 +853,7 @@
 #define __CRT_HAVE__gcvt 1
 #define __CRT_HAVE__gcvt_s 1
 #define __CRT_HAVE__get_doserrno 1
+#define __CRT_HAVE__get_errno 1
 #define __CRT_HAVE__get_osfhandle 1
 #define __CRT_HAVE__get_output_format 1
 #define __CRT_HAVE__get_printf_count_output 1
@@ -930,6 +950,7 @@
 #define __CRT_HAVE__searchenv_s 1
 #define __CRT_HAVE__set_controlfp 1
 #define __CRT_HAVE__set_doserrno 1
+#define __CRT_HAVE__set_errno 1
 #define __CRT_HAVE__set_error_mode 1
 #define __CRT_HAVE__set_output_format 1
 #define __CRT_HAVE__set_printf_count_output 1
@@ -1307,6 +1328,18 @@
 #define __CRT_HAVE_erfcl 1
 #define __CRT_HAVE_erff 1
 #define __CRT_HAVE_erfl 1
+#define __CRT_HAVE_errno_cyg2dos 1
+#define __CRT_HAVE_errno_cyg2kos 1
+#define __CRT_HAVE_errno_cyg2nt 1
+#define __CRT_HAVE_errno_dos2cyg 1
+#define __CRT_HAVE_errno_dos2kos 1
+#define __CRT_HAVE_errno_dos2nt 1
+#define __CRT_HAVE_errno_kos2cyg 1
+#define __CRT_HAVE_errno_kos2dos 1
+#define __CRT_HAVE_errno_kos2nt 1
+#define __CRT_HAVE_errno_nt2cyg 1
+#define __CRT_HAVE_errno_nt2dos 1
+#define __CRT_HAVE_errno_nt2kos 1
 #define __CRT_HAVE_error_active 1
 #define __CRT_HAVE_error_as_errno 1
 #define __CRT_HAVE_error_as_signal 1
