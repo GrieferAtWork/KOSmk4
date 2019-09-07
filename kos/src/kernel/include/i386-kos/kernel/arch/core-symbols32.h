@@ -6514,10 +6514,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 1628 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname1628 /* index: 1628 */
+	.weak terminal_owrite; .long terminal_owrite
+	.reloc ., R_386_SIZE32, terminal_owrite; .long 0
+	.long 0xd2ece45
 	.long 0 /* index: 1629 */
 	.long 0
 	.long 0
@@ -12059,9 +12059,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname3014 /* index: 3014 */
-	.weak terminal_owrite; .long terminal_owrite
-	.reloc ., R_386_SIZE32, terminal_owrite; .long 0
-	.long 0xd2ece45
+	.weak dbg_origstate; .long dbg_origstate
+	.reloc ., R_386_SIZE32, dbg_origstate; .long 0
+	.long 0x567ce45
 	.long 0 /* index: 3015 */
 	.long 0
 	.long 0
@@ -18036,6 +18036,8 @@ END(kernel_symbol_table)
 	.string "sys_getpid"
 .Lname1626:
 	.string "dbg_getfunc"
+.Lname1628:
+	.string "terminal_owrite"
 .Lname1633:
 	.string "cpu_deepsleep"
 .Lname1634:
@@ -19381,7 +19383,7 @@ END(kernel_symbol_table)
 .Lname3012:
 	.string "sys_linux_stat64"
 .Lname3014:
-	.string "terminal_owrite"
+	.string "dbg_origstate"
 .Lname3017:
 	.string "pipe_reader_destroy"
 .Lname3021:

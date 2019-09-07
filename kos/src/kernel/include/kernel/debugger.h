@@ -103,7 +103,8 @@ FUNDEF ATTR_NORETURN void KCALL dbg_exit(void);
 
 /* Non-zero if the debugger is currently active. */
 DATDEF unsigned int dbg_active;
-DATDEF struct fcpustate dbg_exitstate; /* The CPU state to which the debugger will return. */
+DATDEF struct fcpustate dbg_exitstate; /* The CPU state to which the debugger will return. (Don't directly modify this one, unless you know what you're doing) */
+DATDEF struct fcpustate dbg_origstate; /* The CPU state originally loaded by the current thread. */
 DATDEF struct fcpustate dbg_viewstate; /* The CPU state currently being viewed by the debugger (for walking the stack...). */
 
 /* [1..1] The original thread that entered debugger mode */
@@ -115,13 +116,13 @@ DATDEF struct task *const debug_original_thread;
  * You may switch back to the original thread by using:
  *     `dbg_impersonate_thread(debug_original_thread)'
  * HINT: This is done as part of the `undo' command */
-FUNDEF void KCALL dbg_impersonate_thread(struct task *__restrict thread);
+FUNDEF void NOTHROW(KCALL dbg_impersonate_thread)(struct task *__restrict thread);
 
 
 /* Wait for the user to press a key and return its keycode.
  * @return: * : One of `KEY_*' (from <kos/keyboard.h>) */
-FUNDEF unsigned int KCALL dbg_getkey(void);
-FUNDEF NOBLOCK unsigned int KCALL dbg_trygetkey(void); /* @return: 0: No keys available. */
+FUNDEF unsigned int NOTHROW(KCALL dbg_getkey)(void);
+FUNDEF NOBLOCK unsigned int NOTHROW(KCALL dbg_trygetkey)(void); /* @return: 0: No keys available. */
 
 /* Unget a key to be re-returned by `dbg_(try)getkey'
  * When ungetting multiple keys, the key last unget'ed will be returned last. */
@@ -160,8 +161,9 @@ typedef NONNULL((1)) size_t (KCALL *dbg_autocomplete_t)(char *__restrict line,
                                                         size_t bufsize, size_t num_written);
 
 /* Default auto completion function for the debug command line. */
-FUNDEF NONNULL((1)) size_t KCALL dbg_autocomplete_command(char *__restrict line,
-                                                          size_t bufsize, size_t num_written);
+FUNDEF NONNULL((1)) size_t
+NOTHROW(KCALL dbg_autocomplete_command)(char *__restrict line,
+                                        size_t bufsize, size_t num_written);
 
 /* Read a single line of user-input from the debug terminal, and fill `buf'
  * NOTE: This function also performs tab-completion, as well as keep an input

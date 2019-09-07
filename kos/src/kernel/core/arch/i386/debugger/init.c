@@ -51,18 +51,26 @@ if (gcc_opt.remove("-O3"))
 
 #include <assert.h>
 #include <string.h>
+#include <hybrid/align.h>
 
 #include "../../../sched/rwlock.h" /* struct read_locks */
 
 DECL_BEGIN
 
-
-/* Saved backup of the original debugger exit state. */
-PRIVATE ATTR_COLDBSS struct fcpustate dbg_orig_exitstate = {};
+LOCAL ATTR_DBGTEXT NOBLOCK bool
+NOTHROW(FCALL dbg_isavalidpagedir)(PHYS pagedir_t *ptr) {
+	if (!IS_ALIGNED((uintptr_t)ptr, PAGESIZE)) {
+		printk(DBGSTR(KERN_WARNING "[dbg][pdir:%p] Corrupt: Missaligned pointer\n"), ptr);
+		return false;
+	}
+	/* TODO: Check against meminfo if `ptr' resides in GPRAM */
+	/* TODO: use vm_copyfromphys() to check if the kernel-share portion of `ptr' is intact */
+	return true;
+}
 
 /* Impersonate the given `thread' for the purpose of debugging. */
-PUBLIC ATTR_DBGTEXT NONNULL((1)) void KCALL
-dbg_impersonate_thread(struct task *__restrict thread) {
+PUBLIC ATTR_DBGTEXT NONNULL((1)) void
+NOTHROW(KCALL dbg_impersonate_thread)(struct task *__restrict thread) {
 	if (thread == THIS_TASK)
 		return;
 #ifdef __x86_64__
@@ -72,16 +80,12 @@ dbg_impersonate_thread(struct task *__restrict thread) {
 	                (uintptr_t)thread);
 	__wrfs(SEGMENT_KERNEL_FSBASE);
 #endif /* !__x86_64__ */
-#if 0 /* The debugger always uses the kernel page directory...
-       * FIXME: This is currently required because of the address of the VGA
-       *        display buffer, but also prevents inspection of user-space
-       *        memory by utilities such as the hex editor. */
-	/* Also change page directories (if necessary). */
-	pagedir_set(thread->t_vm->v_pdir_phys_ptr);
-#endif
+	/* Also change page directories (if possible). */
+	if (dbg_isavalidpagedir(thread->t_vm->v_pdir_phys_ptr))
+		pagedir_set(thread->t_vm->v_pdir_phys_ptr);
 	if (thread == debug_original_thread) {
-		memcpy(&dbg_exitstate, &dbg_orig_exitstate, sizeof(struct fcpustate));
-		memcpy(&dbg_viewstate, &dbg_orig_exitstate, sizeof(struct fcpustate));
+		memcpy(&dbg_origstate, &dbg_exitstate, sizeof(struct fcpustate));
+		memcpy(&dbg_viewstate, &dbg_exitstate, sizeof(struct fcpustate));
 	} else {
 		struct scpustate *state;
 		state = thread->t_sched.s_state;
@@ -114,8 +118,7 @@ dbg_impersonate_thread(struct task *__restrict thread) {
 			}
 		}
 #endif /* !__x86_64__ */
-		memcpy(&dbg_orig_exitstate, &dbg_exitstate, sizeof(struct fcpustate));
-		memcpy(&dbg_exitstate, &dbg_viewstate, sizeof(struct fcpustate));
+		memcpy(&dbg_origstate, &dbg_viewstate, sizeof(struct fcpustate));
 	}
 }
 
@@ -163,6 +166,7 @@ PUBLIC ATTR_COLDBSS struct task *debug_original_thread_ ASMNAME("debug_original_
 
 PUBLIC ATTR_COLDBSS unsigned int dbg_active = 0;
 PUBLIC ATTR_COLDBSS struct fcpustate dbg_exitstate = {};
+PUBLIC ATTR_COLDBSS struct fcpustate dbg_origstate = {};
 PUBLIC ATTR_COLDBSS struct fcpustate dbg_viewstate = {};
 
 typedef void (KCALL *dbg_callback_t)(void);
@@ -274,6 +278,11 @@ INTERN ATTR_DBGTEXT void KCALL dbg_fix_segments(void) {
 	__wrfs(SEGMENT_KERNEL_FSBASE);
 	__wrgs(SEGMENT_USER_GSBASE_RPL);
 #endif /* !__x86_64__ */
+	{
+		PHYS pagedir_t *pptr = THIS_VM->v_pdir_phys_ptr;
+		if (dbg_isavalidpagedir(pptr))
+			pagedir_set(pptr);
+	}
 }
 
 INTERN ATTR_DBGTEXT void KCALL dbg_init(void) {
@@ -333,9 +342,8 @@ INTERN ATTR_DBGTEXT void KCALL dbg_init(void) {
 	dbg_ensure_initialized_pertask(&_bootidle);
 
 	/* Set the currently viewed state to be the exit state. */
-	memcpy(&dbg_viewstate,
-	       &dbg_exitstate,
-	       sizeof(dbg_exitstate));
+	memcpy(&dbg_viewstate, &dbg_exitstate, sizeof(struct fcpustate));
+	memcpy(&dbg_origstate, &dbg_exitstate, sizeof(struct fcpustate));
 
 	/* Make sure that the PIC is initialized properly, as the debugger's
 	 * PS/2 keyboard driver requires interrupts to be mapped properly. */
@@ -359,11 +367,6 @@ INTERN ATTR_DBGTEXT void KCALL dbg_reset(void) {
 }
 
 INTERN ATTR_DBGTEXT void KCALL dbg_fini(void) {
-	/* If we're still impersonating a thread, we must fix-up our exit CPU state,
-	 * such that we'll be returning to our original interrupt location.
-	 * This does the same as `dbg_impersonate_thread(debug_original_thread)' */
-	if (THIS_TASK != debug_original_thread)
-		memcpy(&dbg_exitstate, &dbg_orig_exitstate, sizeof(struct fcpustate));
 	/* Fix kernel segment bases. */
 	dbg_fix_segments();
 

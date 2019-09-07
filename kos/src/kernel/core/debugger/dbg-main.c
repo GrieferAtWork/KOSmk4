@@ -113,10 +113,10 @@ dbg_getfunc_start(char const *__restrict name) {
 }
 
 
-PUBLIC ATTR_DBGTEXT NONNULL((1)) size_t KCALL
-dbg_autocomplete_command(char *__restrict line,
-                         size_t bufsize,
-                         size_t num_written) {
+PUBLIC ATTR_DBGTEXT NONNULL((1)) size_t
+NOTHROW(KCALL dbg_autocomplete_command)(char *__restrict line,
+                                        size_t bufsize,
+                                        size_t num_written) {
 	char *word_start;
 	struct debug_function const *func;
 	size_t namelen, maxbuf;
@@ -345,7 +345,7 @@ dbg_main(uintptr_t show_welcome) {
 		/* Add a visual indicator for when the exit state doesn't match the currently
 		 * viewed state (thus informing the user that they need to type `apply' before
 		 * exit if they wish to return to the modified state) */
-		if (memcmp(&dbg_exitstate, &dbg_viewstate, sizeof(dbg_exitstate)) != 0)
+		if (memcmp(&dbg_origstate, &dbg_viewstate, sizeof(dbg_origstate)) != 0)
 			dbg_print(DBGSTR(DF_COLOR(DBG_COLOR_LIME, DBG_COLOR_DARK_GRAY, "!")));
 		dbg_print(DBGSTR("> "));
 		attr = dbg_attr;

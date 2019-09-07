@@ -77,7 +77,7 @@ DEFINE_DEBUG_FUNCTION(
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
 	if (THIS_TASK != debug_original_thread)
 		dbg_impersonate_thread(debug_original_thread);
-	memcpy(&dbg_viewstate, &dbg_exitstate, sizeof(dbg_exitstate));
+	memcpy(&dbg_viewstate, &dbg_origstate, sizeof(dbg_origstate));
 	return 0;
 }
 

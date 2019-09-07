@@ -392,7 +392,8 @@ PUBLIC ATTR_DBGTEXT NOBLOCK bool NOTHROW(KCALL dbg_ungetkey)(unsigned int key) {
 
 /* Wait for the user to press a key and return its keycode.
  * @return: * : One of `KEY_*' (from <kos/keyboard.h>) */
-LOCAL ATTR_DBGTEXT unsigned int KCALL dbg_getkey_impl(bool blocking) {
+LOCAL ATTR_DBGTEXT unsigned int
+NOTHROW(KCALL dbg_getkey_impl)(bool blocking) {
 	unsigned int result;
 	u8 byte;
 	if (dbg_getkey_pending_cnt) {
@@ -772,13 +773,15 @@ nokey:
 
 
 /* @return: 0: No keys available. */
-PUBLIC ATTR_DBGTEXT unsigned int KCALL dbg_trygetkey(void) {
+PUBLIC ATTR_DBGTEXT unsigned int
+NOTHROW(KCALL dbg_trygetkey)(void) {
 	return dbg_getkey_impl(false);
 }
 
 /* Wait for the user to press a key and return its keycode.
  * @return: * : One of `KEY_*' (from <kos/keyboard.h>) */
-PUBLIC ATTR_DBGTEXT unsigned int KCALL dbg_getkey(void) {
+PUBLIC ATTR_DBGTEXT unsigned int
+NOTHROW(KCALL dbg_getkey)(void) {
 	return dbg_getkey_impl(true);
 }
 

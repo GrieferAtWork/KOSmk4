@@ -127,6 +127,9 @@ PUBLIC void NOTHROW(FCALL dbg_applyreg)(void) {
 		/* The original thread is being used.
 		 * In this case, copying the view-state into
 		 * the exit-state is already sufficient. */
+		memcpy(&dbg_exitstate,
+		       &dbg_viewstate,
+		       sizeof(dbg_exitstate));
 	} else {
 		struct scpustate *state;
 		/* Some foreign thread.
@@ -175,9 +178,9 @@ set_user_specific_registers:
 		me->t_sched.s_state = state;
 #endif /* !__x86_64__ */
 	}
-	memcpy(&dbg_exitstate,
+	memcpy(&dbg_origstate,
 	       &dbg_viewstate,
-	       sizeof(dbg_exitstate));
+	       sizeof(dbg_origstate));
 }
 
 

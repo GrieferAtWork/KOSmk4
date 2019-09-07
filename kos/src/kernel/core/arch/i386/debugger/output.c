@@ -1927,22 +1927,39 @@ dbg_vpprintf(int x, int y, /*utf-8*/char const *__restrict format, va_list args)
 PRIVATE ATTR_DBGBSS struct vga_mode debug_oldvgamode;
 PRIVATE ATTR_DBGBSS struct vga_palette debug_oldvgapal;
 PRIVATE ATTR_DBGBSS byte_t debug_oldvgadat[VGA_VRAM_SIZE];
-INTERN ATTR_DBGTEXT void KCALL x86_debug_initialize_vga_terminal(void) {
-	/* TODO: Check if this location is already in use! */
-	vga_terminal_start = (u16 *)VGA_VRAM_ADDR;
-	if (!pagedir_prepare_map(VM_ADDR2PAGE((vm_virt_t)vga_terminal_start), VGA_VRAM_SIZE / PAGESIZE)) {
-		if (pagedir_ismapped(VM_ADDR2PAGE((vm_virt_t)(KERNEL_BASE + VGA_VRAM_ADDR))) &&
-		    pagedir_iswritable(VM_ADDR2PAGE((vm_virt_t)(KERNEL_BASE + VGA_VRAM_ADDR))) &&
-		    pagedir_translate((vm_virt_t)(KERNEL_BASE + VGA_VRAM_ADDR)) == (vm_phys_t)VGA_VRAM_ADDR) {
-			vga_terminal_start = (u16 *)(KERNEL_BASE + VGA_VRAM_ADDR);
-		} else {
-			kernel_panic("Failed to initialize debug terminal");
-		}
+
+PRIVATE ATTR_DBGBSS uintptr_t debug_oldvga_paging[VGA_VRAM_SIZE / PAGESIZE];
+PRIVATE ATTR_DBGTEXT void KCALL x86_debug_map_terminal(void) {
+	unsigned int i;
+	vga_terminal_start = (u16 *)(KERNEL_BASE + VGA_VRAM_ADDR);
+	/* TODO: We might get here so early during booting that the page frame allocator
+	 *       has yet to be initialized, at which point prepare would fail. - However,
+	 *       at that point we'd still have access to the physical identity map, so we
+	 *       should instead also support its use instead of only hacking around to
+	 *       place a temporary mapping of the VGA display just before the kernel. */
+#ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
+	pagedir_prepare_map(VM_ADDR2PAGE((vm_virt_t)vga_terminal_start), VGA_VRAM_SIZE / PAGESIZE);
+#endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
+	for (i = 0; i < COMPILER_LENOF(debug_oldvga_paging); ++i) {
+		uintptr_t oldword;
+		vm_vpage_t vp = VM_ADDR2PAGE((vm_virt_t)vga_terminal_start) + i;
+		oldword = pagedir_push_mapone(vp, VM_ADDR2PAGE((vm_phys_t)VGA_VRAM_ADDR) + i,
+		                              PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
+		debug_oldvga_paging[i] = oldword;
 	}
-	pagedir_map(VM_ADDR2PAGE((vm_virt_t)vga_terminal_start),
-	            VGA_VRAM_SIZE / PAGESIZE,
-	            VM_ADDR2PAGE((vm_phys_t)VGA_VRAM_ADDR),
-	            PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
+}
+
+PRIVATE ATTR_DBGTEXT void KCALL x86_debug_unmap_terminal(void) {
+	unsigned int i;
+	for (i = 0; i < COMPILER_LENOF(debug_oldvga_paging); ++i) {
+		vm_vpage_t vp = VM_ADDR2PAGE((vm_virt_t)vga_terminal_start) + i;
+		pagedir_pop_mapone(vp, debug_oldvga_paging[i]);
+	}
+}
+
+
+INTERN ATTR_DBGTEXT void KCALL x86_debug_initialize_vga_terminal(void) {
+	x86_debug_map_terminal();
 	VGA_GetMode(&debug_oldvgamode);
 	VGA_SetMode(&vga_debugmode);
 	VGA_GetPalette(&debug_oldvgapal);
@@ -1977,8 +1994,7 @@ x86_debug_finalize_vga_terminal(void) {
 	memcpy(vga_terminal_start, debug_oldvgadat, VGA_VRAM_SIZE);
 	VGA_SetPalette(&debug_oldvgapal);
 	VGA_SetMode(&debug_oldvgamode);
-	pagedir_unmap(VM_ADDR2PAGE((vm_virt_t)vga_terminal_start), VGA_VRAM_SIZE / PAGESIZE);
-	pagedir_unprepare_map(VM_ADDR2PAGE((vm_virt_t)vga_terminal_start), VGA_VRAM_SIZE / PAGESIZE);
+	x86_debug_unmap_terminal();
 }
 
 

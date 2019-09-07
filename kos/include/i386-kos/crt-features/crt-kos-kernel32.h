@@ -300,6 +300,7 @@
 #define __CRT_HAVE_dbg_menuf 1
 #define __CRT_HAVE_dbg_messagebox 1
 #define __CRT_HAVE_dbg_newline_mode 1
+#define __CRT_HAVE_dbg_origstate 1
 #define __CRT_HAVE_dbg_pprint 1
 #define __CRT_HAVE_dbg_pprinter 1
 #define __CRT_HAVE_dbg_pprintf 1
