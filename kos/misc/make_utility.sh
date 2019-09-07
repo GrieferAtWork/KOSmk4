@@ -55,18 +55,18 @@ fi
 
 ## mtools_makedir <DISKIMAGE> <ABSOLUTE_DISK_PATH>
 mtools_makedir() {
-	if ! "$MTOOLS" -c mmd -i "$1" -D s "::/$2"; then
+	if ! "$MTOOLS" -c mmd -i "$1" -D s "::/$2" > /dev/null 2>&1; then
 		local PARENT="$(dirname "$2")"
 		if [ "$PARENT" != "$2" ]; then
 			mtools_makedir "$1" "$PARENT"
 		fi
-		"$MTOOLS" -c mmd -i "$1" -D s "::/$2"
+		"$MTOOLS" -c mmd -i "$1" -D s "::/$2" > /dev/null 2>&1
 	fi
 }
 
 ## mtools_install_file <DISKIMAGE> <ABSOLUTE_DISK_PATH> <SOURCE>
 mtools_install_file() {
-	if ! "$MTOOLS" -c mcopy -i "$1" -D o "$3" "::/$2"; then
+	if ! "$MTOOLS" -c mcopy -i "$1" -D o "$3" "::/$2" > /dev/null 2>&1; then
 		mtools_makedir "$1" "$(dirname "/$2")"
 		cmd "$MTOOLS" -c mcopy -i "$1" -D o "$3" "::/$2"
 	fi
@@ -137,7 +137,7 @@ MAKE_PARALLEL_COUNT=$(grep -c ^processor /proc/cpuinfo)
 case $UTILITY_NAME in
 
 ##############################################################################
-	busybox)
+	busybox | busybox-1.31.0)
 		BUSYBOX_VERISON="1.31.0"
 		## Check final output binary
 		if ! [ -f "$BINUTILS_SYSROOT/opt/busybox-$BUSYBOX_VERISON/busybox_unstripped" ]; then
@@ -177,7 +177,7 @@ case $UTILITY_NAME in
 
 
 ##############################################################################
-	vitetris)
+	vitetris | vitetris-0.58.0)
 		VITETRIS_VERISON="0.58.0"
 		SRCPATH="$KOS_ROOT/binutils/src/vitetris-$VITETRIS_VERISON"
 		OPTPATH="$BINUTILS_SYSROOT/opt/vitetris-$VITETRIS_VERISON"
@@ -202,6 +202,64 @@ case $UTILITY_NAME in
 		fi
 		install_file /bin/tetris  \
 			"$OPTPATH/tetris"
+		;;
+##############################################################################
+
+
+##############################################################################
+	tcc | tcc-0.9.27)
+		TCC_VERISON="0.9.27"
+		SRCPATH="$KOS_ROOT/binutils/src/tcc-$TCC_VERISON"
+		OPTPATH="$BINUTILS_SYSROOT/opt/tcc-$TCC_VERISON"
+		if ! [ -f "$OPTPATH/$TARGET_NAME-tcc" ]; then
+			set_archpath
+			if ! [ -f "$SRCPATH/configure" ]; then
+				cmd cd "$KOS_ROOT/binutils/src"
+				download_file \
+					"tcc-$TCC_VERISON.tar.bz2" \
+					http://download.savannah.gnu.org/releases/tinycc/tcc-0.9.27.tar.bz2
+				cmd tar jxvf "tcc-$TCC_VERISON.tar.bz2"
+			fi
+			rm -rf "$OPTPATH" > /dev/null 2>&1
+			cmd cp -R "$SRCPATH" "$BINUTILS_SYSROOT/opt/"
+			cmd cd "$OPTPATH"
+			apply_patch "$OPTPATH" "$KOS_ROOT/kos/misc/patches/tcc-$TCC_VERISON.patch"
+			cmd bash configure \
+				--with-libgcc \
+				--with-selinux \
+				--cpu="$TARGET_NAME" \
+				--enable-cross \
+				--cross-prefix="$CROSS_PREFIX" \
+				--bindir="/bin" \
+				--includedir="/usr/include" \
+				--sysincludepaths="/usr/include/${TARGET_NAME}-kos:/usr/include" \
+				--libpaths="/usr/lib:/lib" \
+				--crtprefix="/usr/lib" \
+				--elfinterp="/lib/libdl.so" \
+				--config-mingw32=no
+			echo 'NATIVE_DEFINES+=-DTCC_TARGET_KOS="1"' >> config.mak
+			echo 'NATIVE_DEFINES+=-DCONFIG_TCCDIR="\"/usr/lib\""' >> config.mak
+			cmd make cross-$TARGET_NAME $TARGET_NAME-libtcc1-usegcc=yes
+			cat > "$OPTPATH/hello-world.c" <<EOF
+/* A simple hello-world example which you can compile & run from inside of KOS:
+ * $ cd /usr/src
+ * $ tcc hello-world.c
+ * $ ./a.out
+ * >> Hello World
+ */
+extern int printf(char const *format, ...);
+
+int main() {
+	printf("Hello %s\n", "World");
+	return 0;
+}
+EOF
+		fi
+		install_file /bin/tcc "$OPTPATH/$TARGET_NAME-tcc"
+		install_file /usr/lib/$TARGET_NAME-libtcc1.a "$OPTPATH/$TARGET_NAME-libtcc1.a"
+		install_file /usr/lib/crt0S.o "${KOS_ROOT}/bin/${TARGET_NAME}-kos/lib/crt0S.o"
+		install_file /usr/lib/crt0.o "${KOS_ROOT}/bin/${TARGET_NAME}-kos/lib/crt0.o"
+		install_file /usr/src/hello-world.c "$OPTPATH/hello-world.c"
 		;;
 ##############################################################################
 

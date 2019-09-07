@@ -132,26 +132,11 @@ END
 
 /* Copy libgcc.so.1 and libstdc++.so.1 to the disk */
 BEGIN_ANONYMOUS GROUP("libs.libgcc") { MCOPY };
-	options[OPT_MCOPY_OUTPUT] = "/lib/libgcc.so.1";
-	options[OPT_MCOPY_INPUT]  = "/binutils/" + TARGET_ARCH + "-kos/" + TARGET_CPU + "-kos/lib/libgcc_s.so.1";
+	options[OPT_MCOPY_OUTPUT] = "/lib/libgcc_s.so.1";
+	options[OPT_MCOPY_INPUT]  = "/bin/" + TARGET_ARCH + "-kos-common/lib/libgcc_s.so.1";
 END
 
 BEGIN_ANONYMOUS GROUP("libs.libstdc++") { MCOPY };
 	options[OPT_MCOPY_OUTPUT] = "/lib/libstdc++.so.6";
-	options[OPT_MCOPY_INPUT]  = "/binutils/" + TARGET_ARCH + "-kos/" + TARGET_CPU + "-kos/lib/libstdc++.so.6.0.26";
+	options[OPT_MCOPY_INPUT]  = "/bin/" + TARGET_ARCH + "-kos-common/lib/libstdc++.so.6";
 END
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

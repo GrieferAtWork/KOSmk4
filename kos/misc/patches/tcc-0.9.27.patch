@@ -1,0 +1,36 @@
+diff -Naur tcc-0.9.27-orig/libtcc.c tcc-0.9.27/libtcc.c
+--- tcc-0.9.27-orig/libtcc.c	2017-12-17 09:27:05.000000000 +0100
++++ tcc-0.9.27/libtcc.c	2019-09-07 18:30:40.936201200 +0200
+@@ -974,9 +974,17 @@
+     /* add libc crt1/crti objects */
+     if ((output_type == TCC_OUTPUT_EXE || output_type == TCC_OUTPUT_DLL) &&
+         !s->nostdlib) {
++#ifdef TCC_TARGET_KOS
++        if (output_type == TCC_OUTPUT_DLL)
++            tcc_add_crt(s, "crt0S.o");
++        else {
++            tcc_add_crt(s, "crt0.o");
++        }
++#else
+         if (output_type != TCC_OUTPUT_DLL)
+             tcc_add_crt(s, "crt1.o");
+         tcc_add_crt(s, "crti.o");
++#endif
+     }
+ #endif
+     return 0;
+diff -Naur tcc-0.9.27-orig/tccelf.c tcc-0.9.27/tccelf.c
+--- tcc-0.9.27-orig/tccelf.c	2017-12-17 09:27:05.000000000 +0100
++++ tcc-0.9.27/tccelf.c	2019-09-07 18:28:53.047134200 +0200
+@@ -1201,9 +1201,11 @@
+         }
+ #endif
+         tcc_add_support(s1, TCC_LIBTCC1);
++#ifndef TCC_TARGET_KOS
+         /* add crt end if not memory output */
+         if (s1->output_type != TCC_OUTPUT_MEMORY)
+             tcc_add_crt(s1, "crtn.o");
++#endif /* !TCC_TARGET_KOS */
+     }
+ }
+ 
