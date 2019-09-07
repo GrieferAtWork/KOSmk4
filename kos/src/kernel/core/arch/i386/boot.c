@@ -113,7 +113,7 @@ DEFINE_VERY_EARLY_KERNEL_COMMANDLINE_OPTION(x86_force_detect_moreram,
 
 
 #ifndef CONFIG_NO_DEBUGGER
-/* Define hooks for entering debugger mode, rather than booting normally. */
+/* Define options for entering debugger mode at various stages, rather than booting normally. */
 DEFINE_VERY_EARLY_KERNEL_COMMANDLINE_OPTION(dbg, KERNEL_COMMANDLINE_OPTION_TYPE_PRESENT, "dbg-very-early");
 /**/ DEFINE_EARLY_KERNEL_COMMANDLINE_OPTION(dbg, KERNEL_COMMANDLINE_OPTION_TYPE_PRESENT, "dbg-early");
 /*      */ DEFINE_KERNEL_COMMANDLINE_OPTION(dbg, KERNEL_COMMANDLINE_OPTION_TYPE_PRESENT, "dbg");
@@ -252,7 +252,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 			boot_seed <<= (32 / COMPILER_LENOF(cmos_registers));
 			boot_seed ^= entropy[i];
 		}
-		boot_seed = 0xAB091919;
+		/*boot_seed = 0xAB091919;*/
 
 		/* Set the boot seed for our pseudo-random number generator. */
 		krand_seed = boot_seed;

@@ -108,25 +108,32 @@ struct flock64 {
 
 #ifdef __USE_XOPEN2K8
 #ifdef __O_DIRECTORY
-#define O_DIRECTORY  __O_DIRECTORY
+#define O_DIRECTORY  __O_DIRECTORY /* Throw an `E_FSERROR_NOT_A_DIRECTORY:E_FILESYSTEM_NOT_A_DIRECTORY_OPEN' exception when the final
+                                    * path component of an open() system call turns out to be something other than a directory. */
 #endif /* __O_DIRECTORY */
 #ifdef __O_NOFOLLOW
-#define O_NOFOLLOW   __O_NOFOLLOW
+#define O_NOFOLLOW   __O_NOFOLLOW /* Throw an `E_FSERROR_IS_A_SYMBOLIC_LINK:E_FILESYSTEM_IS_A_SYMBOLIC_LINK_OPEN' exception when the
+                                   * final path component of an open() system call turns out to be a symbolic link, unless `O_SYMLINK'
+                                   * is given, in which case the link itself is opened. */
 #endif /* __O_NOFOLLOW */
 #ifdef __O_CLOEXEC
-#define O_CLOEXEC    __O_CLOEXEC
+#define O_CLOEXEC    __O_CLOEXEC /* Close the file during exec() */
 #endif /* __O_CLOEXEC */
 #endif /* __USE_XOPEN2K8 */
 
 #ifdef __USE_KOS
 #ifdef __O_CLOFORK
-#define O_CLOFORK    __O_CLOFORK
+#define O_CLOFORK    __O_CLOFORK /* Close the handle when the file descriptors are unshared (s.a. `CLONE_FILES') */
 #endif /* __O_CLOFORK */
 #ifdef __O_DOSPATH
-#define O_DOSPATH    __O_DOSPATH
+#define O_DOSPATH    __O_DOSPATH /* Interpret '\\' as '/', and ignore casing during path resolution.
+                                  * Additionally, recognize DOS mounting points, and interpret leading
+                                  * slashes as relative to the closest DOS mounting point. (s.a.: `AT_DOSPATH') */
 #endif /* __O_DOSPATH */
 #ifdef __O_SYMLINK
-#define O_SYMLINK    __O_SYMLINK
+#define O_SYMLINK    __O_SYMLINK /* Open a symlink itself, rather than dereferencing it. (This flag implies `O_NOFOLLOW')
+                                  * NOTE: When combined with `O_EXCL', throw an `E_FSERROR_NOT_A_SYMBOLIC_LINK:
+                                  *       E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_OPEN' if the file isn't a symbolic link. */
 #endif /* __O_SYMLINK */
 #endif /* __USE_KOS */
 

@@ -29,8 +29,8 @@ DECL_BEGIN
 /* Minimum amount of ram to detect during early boot.
  * If less than this amount is detected, keep trying to find ways of
  * locating more (using different BIOS functions, or by simply guessing) */
-#define X86_BOOT_MINIMUM_AVAILABLE_RAM  \
-        VM_ADDR2PAGE(0x100000) /* 1MB */
+#define X86_BOOT_MINIMUM_AVAILABLE_RAM \
+	VM_ADDR2PAGE(0x100000) /* 1MB */
 
 
 #ifdef __CC__

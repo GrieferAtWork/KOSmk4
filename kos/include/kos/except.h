@@ -1,4 +1,4 @@
-/* HASH 0x345c2b3 */
+/* HASH 0x21a519d5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -232,7 +232,8 @@ __DECL_BEGIN
 #define E_INVALID_ARGUMENT_CONTEXT_MOUNT_FLAGS 0x000d
 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The mode argument passed to `chmod()' cannot be masked by `07777'. */
 #define E_INVALID_ARGUMENT_CONTEXT_CHMOD_MODE 0x000e
-/* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `O_*' flag passed to `open()' */
+/* E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION: [mask == O_ACCMODE]: The given `oflags' used `__O_ACCMODE_INVALID' as access mode
+ * E_INVALID_ARGUMENT_UNKNOWN_FLAG:         Unknown `O_*' flag passed to `open()' */
 #define E_INVALID_ARGUMENT_CONTEXT_OPEN_OFLAG 0x000f
 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The mode argument passed to `open()' cannot be masked by `07777'. */
 #define E_INVALID_ARGUMENT_CONTEXT_OPEN_MODE 0x0010
@@ -567,7 +568,7 @@ __DECL_BEGIN
 #define E_FSERROR_NOT_A_DIRECTORY (E_FSERROR,0x0005)
 /* Thrown as the result of attempting to traverse a non-directory item as though it was one (e.g. `open("/opt/readme.txt/foobar")') */
 #define E_FILESYSTEM_NOT_A_DIRECTORY_WALK 0x0001
-/* Thrown as the result of `open(path,O_DIRECTORY)', where `path' isn't a directory */
+/* Thrown as the result of `open(path, O_DIRECTORY)', where `path' isn't a directory */
 #define E_FILESYSTEM_NOT_A_DIRECTORY_OPEN 0x0002
 /* Thrown as the result of `rmdir(path)', where `path' isn't a directory */
 #define E_FILESYSTEM_NOT_A_DIRECTORY_RMDIR 0x0003
@@ -601,7 +602,7 @@ __DECL_BEGIN
  * 	@@The context in which a filesystem component was required to be a symlink, but was one (One of `E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_*')
  * 	member action_context: uintptr_t; */
 #define E_FSERROR_NOT_A_SYMBOLIC_LINK (E_FSERROR,0x000c)
-/* Thrown as the result of `open(path,O_SYMLINK|O_EXCL)', where `path' isn't a symbolic link */
+/* Thrown as the result of `open(path, O_SYMLINK | O_EXCL)', where `path' isn't a symbolic link */
 #define E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_OPEN 0x0001
 /* Thrown as the result of using `readlink(path)', where `path' isn't a symbolic link */
 #define E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_READLINK 0x0002

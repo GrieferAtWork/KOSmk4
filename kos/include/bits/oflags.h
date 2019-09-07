@@ -22,29 +22,34 @@
 #include <__stdinc.h>
 
 #ifndef __O_ACCMODE
-#define __O_ACCMODE     0x003
-#define __O_RDONLY      0x000
-#define __O_WRONLY      0x001
-#define __O_RDWR        0x002
-/*      __O_RDWR        0x003 */
+#define __O_ACCMODE         0x003 /* Mask for access modes (O_RDONLY, O_WRONLY, O_RDWR) */
+#define __O_RDONLY          0x000 /* Read-only file access */
+#define __O_WRONLY          0x001 /* Write-only file access */
+#define __O_RDWR            0x002 /* Read/Write file access */
+#define __O_ACCMODE_INVALID 0x003 /* Invalid ACCMODE value. */
+/*      __O_RDWR            0x003 */
 #endif
 
 #ifndef __O_TRUNC
-#define __O_TRUNC       0x200
-#endif
+#define __O_TRUNC       0x200 /* Truncate (clear) the named file if it already exists,
+                               * and `O_WRONLY' or `O_RDWR' access is specified. */
+#endif /* !__O_TRUNC */
 
 
 /* DOS open flag values. */
-#define __DOS_O_APPEND       0x00008
-#define __DOS_O_RANDOM       0x00010
+#define __DOS_O_APPEND       0x00008 /* Same as `O_APPEND' */
+#define __DOS_O_RANDOM       0x00010 /* Ignored */
 #define __DOS_O_SEQUENTIAL   0x00020 /* Ignored */
-#define __DOS_O_TEMPORARY    0x00040 /* Same as O_TMPFILE */
-#define __DOS_O_NOINHERIT    0x00080 /* Same as O_CLOEXEC */
-#define __DOS_O_CREAT        0x00100
-#define __DOS_O_TRUNC        0x00200
-#define __DOS_O_EXCL         0x00400
+#define __DOS_O_TEMPORARY    0x00040 /* Same as `O_TMPFILE' */
+#define __DOS_O_NOINHERIT    0x00080 /* Same as `O_CLOEXEC' */
+#define __DOS_O_CREAT        0x00100 /* Same as `O_CREAT' */
+#define __DOS_O_TRUNC        0x00200 /* Same as `O_TRUNC' */
+#define __DOS_O_EXCL         0x00400 /* Same as `O_EXCL' */
 #define __DOS_O_SHORT_LIVED  0x01000 /* Ignored */
-#define __DOS_O_OBTAIN_DIR   0x02000 /* Same as O_DIRECTORY (Not quite, but effectively the same...) */
+#define __DOS_O_OBTAIN_DIR   0x02000 /* Similar to `O_DIRECTORY' (while `O_DIRECTORY' requires that the
+                                      * named file be a directory, this flag will _allow_ it to be one)
+                                      * However, when it comes to the use-cases, this flag usually ends up
+                                      * being used in the same places. */
 #define __DOS_O_TEXT         0x04000 /* Ignored */
 #define __DOS_O_BINARY       0x08000 /* Ignored */
 #define __DOS_O_WTEXT        0x10000 /* Ignored */
@@ -70,13 +75,13 @@
 #undef __O_LARGEFILE
 #undef __O_NOFOLLOW
 #undef __O_NOATIME
-#   define __O_DIRECTORY   __DOS_O_OBTAIN_DIR
-#   define __O_APPEND      __DOS_O_APPEND
-#   define __O_CREAT       __DOS_O_CREAT
-#   define __O_EXCL        __DOS_O_EXCL
-#   define __O_CLOEXEC     __DOS_O_NOINHERIT
-#   define __O_TMPFILE     __DOS_O_TEMPORARY
-#   define __O_NOFOLLOW    0
+#define __O_DIRECTORY   __DOS_O_OBTAIN_DIR
+#define __O_APPEND      __DOS_O_APPEND
+#define __O_CREAT       __DOS_O_CREAT
+#define __O_EXCL        __DOS_O_EXCL
+#define __O_CLOEXEC     __DOS_O_NOINHERIT
+#define __O_TMPFILE     __DOS_O_TEMPORARY
+#define __O_NOFOLLOW    0
 #else /* __CRT_DOS_PRIMARY */
 
 #ifndef __O_CREAT
@@ -118,9 +123,8 @@
 #endif /* !__O_DIRECTORY */
 #ifndef __O_NOFOLLOW
 #define __O_NOFOLLOW   0x0020000 /* Throw an `E_FSERROR_IS_A_SYMBOLIC_LINK:E_FILESYSTEM_IS_A_SYMBOLIC_LINK_OPEN' exception when the
-                                  * final path component of an open() system call turns out to be a symbolic link. Otherwise, when
-                                  * one of two things will happen: When `O_SYMLINK' is set, open the link itself, else walk
-                                  * the link and open the file that it is pointing to instead. */
+                                  * final path component of an open() system call turns out to be a symbolic link, unless `O_SYMLINK'
+                                  * is given, in which case the link itself is opened. */
 #endif /* !__O_NOFOLLOW */
 #ifndef __O_NOATIME
 #define __O_NOATIME    0x0040000 /* Don't update last-accessed time stamps. */
@@ -132,7 +136,7 @@
 #define __O_PATH       0x0200000 /* Open a path for *at system calls. */
 #endif /* !__O_PATH */
 #ifndef __O_TMPFILE
-#define __O_TMPFILE   (0x400000|__O_DIRECTORY)
+#define __O_TMPFILE   (0x0400000 | __O_DIRECTORY)
 #endif /* !__O_TMPFILE */
 
 #ifdef __CRT_KOS_PRIMARY
@@ -140,10 +144,9 @@
 #define __O_CLOFORK    0x0100000 /* Close the handle when the file descriptors are unshared (s.a. `CLONE_FILES') */
 #endif /* !__O_CLOFORK */
 #ifndef __O_SYMLINK
-#define __O_SYMLINK    0x2000000 /* Open a symlink itself, rather than dereferencing it.
+#define __O_SYMLINK    0x2000000 /* Open a symlink itself, rather than dereferencing it. (This flag implies `O_NOFOLLOW')
                                   * NOTE: When combined with `O_EXCL', throw an `E_FSERROR_NOT_A_SYMBOLIC_LINK:
-                                  *       E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_OPEN' if the file isn't a symbolic link.
-                                  * NOTE: When used alongside `O_NOFOLLOW', throw an `E_INVALID_ARGUMENT' */
+                                  *       E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_OPEN' if the file isn't a symbolic link. */
 #endif /* !__O_SYMLINK */
 #ifndef __O_DOSPATH
 #define __O_DOSPATH    0x4000000 /* Interpret '\\' as '/', and ignore casing during path resolution.
@@ -163,28 +166,28 @@
 #define __O_NOCTTY 0 /* If the calling process does not have a controlling terminal assigned,
                       * do not attempt to assign the newly opened file as terminal, even when
                       * `isatty(open(...))' would be true. */
-#endif
+#endif /* !__O_NOCTTY */
 #ifndef __O_SYNC
 #define __O_SYNC   0 /* ??? */
-#endif
+#endif /* !__O_SYNC */
 #ifndef __O_ASYNC
 #define __O_ASYNC  0 /* ??? */
-#endif
+#endif /* !__O_ASYNC */
 #ifndef __O_PATH
 #define __O_PATH   0 /* Open a path for *at system calls. */
-#endif
+#endif /* !__O_PATH */
 #ifndef __O_DSYNC
 #define __O_DSYNC  0 /* ??? */
-#endif
+#endif /* !__O_DSYNC */
 #ifndef __O_DIRECT
 #define __O_DIRECT 0 /* ??? */
-#endif
+#endif /* !__O_DIRECT */
 #ifndef __O_LARGEFILE
 #define __O_LARGEFILE 0 /* Enable 64-bit file support */
-#endif
+#endif /* !__O_LARGEFILE */
 #ifndef __O_NOATIME
 #define __O_NOATIME 0 /* Don't update last-accessed time stamps. */
-#endif
+#endif /* !__O_NOATIME */
 
 
 /* Open anything directly (as best as possible). (file, directory or symlink)

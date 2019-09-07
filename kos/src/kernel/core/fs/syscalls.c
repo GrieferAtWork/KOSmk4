@@ -1599,17 +1599,24 @@ DEFINE_SYSCALL4(fd_t, openat, fd_t, dirfd,
 	if (oflags & O_CREAT)
 		VALIDATE_FLAGSET(mode, 07777, E_INVALID_ARGUMENT_CONTEXT_OPEN_MODE);
 	fsmode = (fsmode_t)0;
-	if (oflags & O_NOFOLLOW)
+	if (oflags & (O_NOFOLLOW | O_SYMLINK))
 		fsmode |= (fsmode_t)AT_SYMLINK_NOFOLLOW;
 	if (oflags & O_DOSPATH)
 		fsmode |= (fsmode_t)AT_DOSPATH;
 	fsmode = fs_getmode_for(f, (atflag_t)fsmode);
+#ifdef __O_ACCMODE_INVALID
+	if ((oflags & O_ACCMODE) == __O_ACCMODE_INVALID) {
+		THROW(E_INVALID_ARGUMENT_BAD_FLAG_COMBINATION,
+		      E_INVALID_ARGUMENT_CONTEXT_OPEN_OFLAG,
+		      oflags, O_ACCMODE, __O_ACCMODE_INVALID);
+	}
+#endif /* __O_ACCMODE_INVALID */
 	if (oflags & O_PATH) {
 		/* Only need to lookup the resulting path object. */
 		if (oflags & ~(O_ACCMODE | O_APPEND | O_NONBLOCK | O_SYNC |
 		               O_DSYNC | O_ASYNC | O_DIRECT | O_LARGEFILE |
 		               O_DIRECTORY | O_NOFOLLOW | O_NOATIME | O_CLOEXEC |
-					   O_CLOFORK | O_PATH | O_SYMLINK | O_DOSPATH)) {
+		               O_CLOFORK | O_PATH | O_SYMLINK | O_DOSPATH)) {
 			THROW(E_INVALID_ARGUMENT_UNKNOWN_FLAG,
 			      E_INVALID_ARGUMENT_CONTEXT_OPEN_OFLAG,
 			      oflags,
@@ -1658,12 +1665,24 @@ DEFINE_SYSCALL4(fd_t, openat, fd_t, dirfd,
 			result_inode = path_traversefull_at(f,
 			                                    (unsigned int)dirfd,
 			                                    filename,
-			                                    !(oflags & O_NOFOLLOW),
+			                                    !(oflags & (O_NOFOLLOW | O_SYMLINK)),
 			                                    fsmode,
 			                                    NULL,
 			                                    &result_containing_path,
 			                                    &result_containing_directory,
 			                                    &result_containing_dirent);
+			/* Clear the file if O_TRUNC was given. */
+			if ((oflags & O_TRUNC) && (oflags & O_ACCMODE) != O_RDONLY) {
+				TRY {
+					inode_truncate(result_inode, 0);
+				} EXCEPT {
+					decref(result_inode);
+					decref(result_containing_path);
+					decref(result_containing_directory);
+					decref(result_containing_dirent);
+					RETHROW();
+				}
+			}
 		} else {
 			/* (Potentially) create a new file. */
 			char const *last_seg;
@@ -1718,7 +1737,7 @@ DEFINE_SYSCALL4(fd_t, openat, fd_t, dirfd,
 						                                   &was_newly_created);
 						TRY {
 check_result_inode_for_symlink:
-							if (INODE_ISLNK(result_inode) && !(oflags & O_NOFOLLOW)) {
+							if (INODE_ISLNK(result_inode) && !(oflags & (O_NOFOLLOW | O_SYMLINK))) {
 								/* No new file was created, and the accessed file turned out to be a symbolic
 								 * link. - In this case, we must continue following that file's link for at
 								 * most `max_remaining_links' additional links and open/create the file at its
@@ -1776,8 +1795,13 @@ check_result_inode_for_symlink:
 							 *       as it wouldn't allow for the special handling of SMYLINK+!O_NOFOLLOW
 							 *       which we do above (which allows open() to create/open files pointed to
 							 *       by symbolic links directly) */
-							if (!was_newly_created && (oflags & O_EXCL))
-								THROW(E_FSERROR_FILE_ALREADY_EXISTS);
+							if (!was_newly_created) {
+								if (oflags & O_EXCL)
+									THROW(E_FSERROR_FILE_ALREADY_EXISTS);
+								/* Clear the file if O_TRUNC was given. */
+								if ((oflags & O_TRUNC) && (oflags & O_ACCMODE) != O_RDONLY)
+									inode_truncate(result_inode, 0);
+							}
 						} EXCEPT {
 							decref(result_containing_dirent);
 							decref(result_inode);
@@ -1802,13 +1826,17 @@ check_result_inode_for_symlink:
 				 *   - When `O_SYMLINK' is given, then the symbolic link is opened
 				 *     as a regular file.
 				 *   - When `O_SYMLINK' isn't given, throw an `E_FSERROR_IS_A_SYMBOLIC_LINK'
-				 *     exception with `E_FILESYSTEM_IS_A_SYMBOLIC_LINK_OPEN' context.
-				 */
+				 *     exception with `E_FILESYSTEM_IS_A_SYMBOLIC_LINK_OPEN' context. */
 				if (!(oflags & O_SYMLINK)) {
 					THROW(E_FSERROR_IS_A_SYMBOLIC_LINK,
 					      E_FILESYSTEM_IS_A_SYMBOLIC_LINK_OPEN);
 				}
+			} else {
+				if ((oflags & (O_CREAT | O_SYMLINK | O_EXCL)) == (O_SYMLINK | O_EXCL))
+					THROW(E_FSERROR_NOT_A_SYMBOLIC_LINK,
+					      E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_OPEN);
 			}
+
 			/* Implement support for the `O_DIRECTORY' flag by throwing
 			 * an error if the accessed file isn't a directory. */
 			if (!INODE_ISDIR(result_inode) && (oflags & O_DIRECTORY))
