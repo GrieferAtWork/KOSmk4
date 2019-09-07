@@ -40,6 +40,9 @@ DECL_BEGIN
  * of the .debug_info section), as well as the start & end of the .debug_abbrev
  * section, initialize the given debuginfo CU parser structure `result', and
  * advance `*pdebug_info_reader' to the start of the next unit.
+ * NOTE: Upon success (return == DEBUG_INFO_ERROR_SUCCESS), the caller is responsible for
+ *       finalizing the given `abbrev' through use of `debuginfo_cu_abbrev_fini(abbrev)',
+ *       once the associated parser `result' is no longer being used.
  * @param: first_component_pointer: A pointer to the first component to load, or `NULL'
  *                                  to simply load the first component following the
  *                                  start of the associated CU descriptor.
@@ -51,8 +54,13 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadunit)(byte_t **__restrict pdebug_in
                                                    byte_t *__restrict debug_info_end,
                                                    di_debuginfo_cu_parser_sections_t const *__restrict sectinfo,
                                                    di_debuginfo_cu_parser_t *__restrict result,
+                                                   di_debuginfo_cu_abbrev_t *__restrict abbrev,
                                                    byte_t *first_component_pointer);
 
+
+/* Finalize the given abbreviation code controller. */
+INTDEF NONNULL((1)) void
+NOTHROW_NCX(CC libdi_debuginfo_cu_abbrev_fini)(di_debuginfo_cu_abbrev_t *__restrict self);
 
 
 /* Skip data associated with the given attribute form.

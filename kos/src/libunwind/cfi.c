@@ -162,9 +162,11 @@ NOTHROW(CC guarded_memcpy)(void *__restrict dst,
 
 #ifndef __KERNEL__
 PRIVATE void *libdebuginfo                                              = NULL;
+PRIVATE PDEBUGINFO_CU_ABBREV_FINI     pdyn_debuginfo_cu_abbrev_fini     = NULL;
 PRIVATE PDEBUGINFO_CU_PARSER_LOADUNIT pdyn_debuginfo_cu_parser_loadunit = NULL;
 PRIVATE PDEBUGINFO_CU_PARSER_SKIPFORM pdyn_debuginfo_cu_parser_skipform = NULL;
 PRIVATE PDEBUGINFO_CU_PARSER_GETEXPR  pdyn_debuginfo_cu_parser_getexpr  = NULL;
+#define debuginfo_cu_abbrev_fini      (*pdyn_debuginfo_cu_abbrev_fini)
 #define debuginfo_cu_parser_loadunit  (*pdyn_debuginfo_cu_parser_loadunit)
 #define debuginfo_cu_parser_skipform  (*pdyn_debuginfo_cu_parser_skipform)
 #define debuginfo_cu_parser_getexpr   (*pdyn_debuginfo_cu_parser_getexpr)
@@ -185,21 +187,28 @@ again:
 	libdebuginfo = dlopen(LIBDEBUGINFO_LIBRARY_NAME, RTLD_LOCAL);
 	if (!libdebuginfo)
 		goto err;
-	*(void **)&pdyn_debuginfo_cu_parser_loadunit = dlsym(libdebuginfo, "debuginfo_cu_parser_loadunit");
-	*(void **)&pdyn_debuginfo_cu_parser_skipform = dlsym(libdebuginfo, "debuginfo_cu_parser_skipform");
 	*(void **)&pdyn_debuginfo_cu_parser_getexpr  = dlsym(libdebuginfo, "debuginfo_cu_parser_getexpr");
-	if unlikely(!pdyn_debuginfo_cu_parser_loadunit ||
-	            !pdyn_debuginfo_cu_parser_skipform ||
-	            !pdyn_debuginfo_cu_parser_getexpr) {
-		dlclose(libdebuginfo);
-		goto err;
-	}
+	if unlikely(!pdyn_debuginfo_cu_parser_getexpr)
+		goto err_close;
+	*(void **)&pdyn_debuginfo_cu_parser_skipform = dlsym(libdebuginfo, "debuginfo_cu_parser_skipform");
+	if unlikely(!pdyn_debuginfo_cu_parser_skipform)
+		goto err_close;
+	*(void **)&pdyn_debuginfo_cu_parser_loadunit = dlsym(libdebuginfo, "debuginfo_cu_parser_loadunit");
+	if unlikely(!pdyn_debuginfo_cu_parser_loadunit)
+		goto err_close;
+	COMPILER_WRITE_BARRIER(); /* This one has to be loaded last, since it's
+	                           * used as the fast-pass for already-loaded */
+	*(void **)&pdyn_debuginfo_cu_abbrev_fini = dlsym(libdebuginfo, "debuginfo_cu_abbrev_fini");
+	if unlikely(!pdyn_debuginfo_cu_abbrev_fini)
+		goto err_close;
 	if (!ATOMIC_CMPXCH(libdebuginfo, NULL, libdebuginfo)) {
 		dlclose(libdebuginfo);
 		if (ATOMIC_READ(libdebuginfo) == (void *)-1)
 			return false;
 	}
 	return true;
+err_close:
+	dlclose(libdebuginfo);
 err:
 	if (!ATOMIC_CMPXCH(libdebuginfo, NULL, (void *)-1))
 		goto again;
@@ -265,6 +274,7 @@ INTERN ATTR_NOINLINE unsigned int CC
 libuw_unwind_call_function(unwind_emulator_t *__restrict self,
                            byte_t *__restrict component_pointer) {
 	di_debuginfo_cu_parser_t parser;
+	di_debuginfo_cu_abbrev_t abbrev;
 	byte_t *di_reader;
 	unsigned int di_error;
 	di_debuginfo_component_attrib_t attr;
@@ -273,8 +283,7 @@ libuw_unwind_call_function(unwind_emulator_t *__restrict self,
 		ERROR(err_invalid_function);
 #ifndef __KERNEL__
 	/* Lazily load libdebuginfo.so, so we can parser the .debug_info section */
-	if (!pdyn_debuginfo_cu_parser_loadunit &&
-	    unlikely(libuw_load_libdebuginfo()))
+	if (!pdyn_debuginfo_cu_abbrev_fini && unlikely(libuw_load_libdebuginfo()))
 		ERROR(err_invalid_function);
 	COMPILER_READ_BARRIER();
 #endif /* !__KERNEL__ */
@@ -285,11 +294,8 @@ libuw_unwind_call_function(unwind_emulator_t *__restrict self,
 	sect.cps_debug_str_end      = NULL;
 	sect.cps_debug_loc_start    = self->ue_sectinfo->ues_debug_loc_start;
 	sect.cps_debug_loc_end      = self->ue_sectinfo->ues_debug_loc_end;
-	di_error = debuginfo_cu_parser_loadunit(&di_reader,
-	                                        self->ue_sectinfo->ues_debug_info_end,
-	                                        &sect,
-	                                        &parser,
-	                                        component_pointer);
+	di_error = debuginfo_cu_parser_loadunit(&di_reader, self->ue_sectinfo->ues_debug_info_end,
+	                                        &sect, &parser, &abbrev, component_pointer);
 	if unlikely(di_error != DEBUG_INFO_ERROR_SUCCESS)
 		ERROR(err_invalid_function);
 	/* Load attributes of the component, and look for `DW_AT_location'.
@@ -304,7 +310,7 @@ libuw_unwind_call_function(unwind_emulator_t *__restrict self,
 			continue;
 		/* Found it! */
 		if unlikely(!debuginfo_cu_parser_getexpr(&parser, attr.dica_form, &expr))
-			ERROR(err_invalid_function);
+			ERROR(err_invalid_function_abbrev);
 		/* Select the appropriate function. */
 		self->ue_pc = libuw_debuginfo_location_select(&expr,
 		                                              self->ue_module_base,
@@ -312,7 +318,7 @@ libuw_unwind_call_function(unwind_emulator_t *__restrict self,
 		                                              self->ue_addrsize,
 		                                              &length);
 		if unlikely(!self->ue_pc)
-			ERROR(err_invalid_function);
+			ERROR(err_invalid_function_abbrev);
 		old_pc_start      = self->ue_pc_start;
 		old_pc_end        = self->ue_pc_end;
 		self->ue_pc_start = self->ue_pc;
@@ -323,7 +329,10 @@ libuw_unwind_call_function(unwind_emulator_t *__restrict self,
 		self->ue_pc_end   = old_pc_end;
 		return result;
 	}
+	debuginfo_cu_abbrev_fini(&abbrev);
 	return UNWIND_SUCCESS;
+err_invalid_function_abbrev:
+	debuginfo_cu_abbrev_fini(&abbrev);
 err_invalid_function:
 	return UNWIND_EMULATOR_INVALID_FUNCTION;
 }

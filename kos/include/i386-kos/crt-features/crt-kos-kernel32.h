@@ -339,6 +339,7 @@
 #define __CRT_HAVE_debug_print_filename 1
 #define __CRT_HAVE_debug_sections_addr2line 1
 #define __CRT_HAVE_debugaranges_locate 1
+#define __CRT_HAVE_debuginfo_cu_abbrev_fini 1
 #define __CRT_HAVE_debuginfo_cu_parser_getaddr 1
 #define __CRT_HAVE_debuginfo_cu_parser_getconst 1
 #define __CRT_HAVE_debuginfo_cu_parser_getexpr 1

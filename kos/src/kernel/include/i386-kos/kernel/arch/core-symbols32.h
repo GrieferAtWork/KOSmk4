@@ -7855,9 +7855,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname1963 /* index: 1963 */
-	.weak vmb_overlay; .long vmb_overlay
-	.reloc ., R_386_SIZE32, vmb_overlay; .long 0
-	.long 0x6b1cae9
+	.weak vm_sync_end; .long vm_sync_end
+	.reloc ., R_386_SIZE32, vm_sync_end; .long 0
+	.long 0x366ef4
 	.long 0 /* index: 1964 */
 	.long 0
 	.long 0
@@ -9959,9 +9959,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, krealign_offset_nx; .long 0
 	.long 0x49079b8
 	.long .Lname2489 /* index: 2489 */
-	.weak vio_readw_aligned; .long vio_readw_aligned
-	.reloc ., R_386_SIZE32, vio_readw_aligned; .long 0
-	.long 0xe57ef4
+	.weak debuginfo_cu_abbrev_fini; .long debuginfo_cu_abbrev_fini
+	.reloc ., R_386_SIZE32, debuginfo_cu_abbrev_fini; .long 0
+	.long 0xd1aa9b9
 	.long 0 /* index: 2490 */
 	.long 0
 	.long 0
@@ -11403,9 +11403,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname2850 /* index: 2850 */
-	.weak vm_sync_end; .long vm_sync_end
-	.reloc ., R_386_SIZE32, vm_sync_end; .long 0
-	.long 0x366ef4
+	.weak vio_readw_aligned; .long vio_readw_aligned
+	.reloc ., R_386_SIZE32, vio_readw_aligned; .long 0
+	.long 0xe57ef4
 	.long .Lname2851 /* index: 2851 */
 	.weak block_device_writev_phys; .long block_device_writev_phys
 	.reloc ., R_386_SIZE32, block_device_writev_phys; .long 0
@@ -15170,10 +15170,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 3792 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname3792 /* index: 3792 */
+	.weak vmb_overlay; .long vmb_overlay
+	.reloc ., R_386_SIZE32, vmb_overlay; .long 0
+	.long 0x6b1cae9
 	.long 0 /* index: 3793 */
 	.long 0
 	.long 0
@@ -18331,7 +18331,7 @@ END(kernel_symbol_table)
 .Lname1961:
 	.string "_this_x86_dr3"
 .Lname1963:
-	.string "vmb_overlay"
+	.string "vm_sync_end"
 .Lname1966:
 	.string "sighand_default_action"
 .Lname1970:
@@ -18835,7 +18835,7 @@ END(kernel_symbol_table)
 .Lname2488:
 	.string "krealign_offset_nx"
 .Lname2489:
-	.string "vio_readw_aligned"
+	.string "debuginfo_cu_abbrev_fini"
 .Lname2493:
 	.string "heap_validate_all"
 .Lname2494:
@@ -19207,7 +19207,7 @@ END(kernel_symbol_table)
 .Lname2844:
 	.string "ttybase_device_ioctl"
 .Lname2850:
-	.string "vm_sync_end"
+	.string "vio_readw_aligned"
 .Lname2851:
 	.string "block_device_writev_phys"
 .Lname2852:
@@ -20198,6 +20198,8 @@ END(kernel_symbol_table)
 	.string "driver_getshstrtab"
 .Lname3790:
 	.string "mouse_device_motion"
+.Lname3792:
+	.string "vmb_overlay"
 .Lname3794:
 	.string "cpu_vector"
 .Lname3796:

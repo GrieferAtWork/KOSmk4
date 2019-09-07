@@ -131,6 +131,33 @@
 			"serverLaunchTimeout": 120000,
 			"filterStdout": true,
 			"filterStderr": true
+		},
+		{
+			"type": "cppdbg",
+			"name": "kernel (--gdb=qemu) (external)",
+			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
+			"project": "src",
+			"sourceFileMap": {
+				"/cygdrive/e/c/kls/kos/kos": "${workspaceRoot}",
+				"/cygdrive/e/c/kls/kos": "${workspaceRoot}\\.."
+			},
+			"program": "${workspaceRoot}\\..\\bin\\${env.TARGET}-kos-${env.CONFIG}\\os\\kernel.bin",
+			"MIMode": "gdb",
+			"miDebuggerPath": "gdb.exe",
+			"targetArchitecture": "x86",
+			"debugType": "native",
+			"launchCompleteCommand": "None",
+			"miDebuggerServerAddress": "localhost:1234",
+			"setupCommands": [
+				{ "text": "-enable-pretty-printing", "ignoreFailures": true },
+				{ "text": "set print pretty on", "ignoreFailures": true },
+				{ "text": "set print object on", "ignoreFailures": true },
+				{ "text": "set print static-members on", "ignoreFailures": true },
+				{ "text": "set print vtbl on", "ignoreFailures": true },
+				{ "text": "set print demangle on", "ignoreFailures": true },
+				{ "text": "set demangle-style gnu-v3", "ignoreFailures": true },
+				{ "text": "set print sevenbit-strings off", "ignoreFailures": true }
+			]
 		}
 	]
 }

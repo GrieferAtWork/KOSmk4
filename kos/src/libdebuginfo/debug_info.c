@@ -1,3 +1,8 @@
+/*[[[magic
+local opt = options.setdefault("GCC.options",[]);
+opt.removeif([](e) -> e.startswith("-O"));
+opt.append("-O3");
+]]]*/
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,13 +47,314 @@
 
 #include "debug_aranges.h"
 
+#ifdef __KERNEL__
+#include <hybrid/atomic.h>
+#include <kernel/heap.h>
+#include <kernel/debugger.h>
+#else /* __KERNEL__ */
+#include <malloc.h>
+#endif /* !__KERNEL__ */
+
 
 DECL_BEGIN
+
+#ifdef __KERNEL__
+
+#ifndef CONFIG_NO_DEBUGGER
+/* Lock to keep track of attempts to allocate memory for the
+ * purposes of abbreviation code caches. Because libdebuginfo
+ * is heavily used by the kernel's builtin debugger, we have
+ * to be as robust as possible against problems occurring in
+ * critical places, such as the heap (which we're using here)
+ *
+ * Because of this, we use a lock to prevent the debugger
+ * accidentally allocating temporary heap memory if the fault
+ * happening while we were already trying to allocate some memory.
+ *
+ * For this, acquire a write-lock while debugging (which fails if
+ * any other thread is already holding some other kind of lock),
+ * and acquire a read-lock (to keep track of the recursion when
+ * calling of these functions) otherwise.
+ *
+ * With this, we can prevent the debugging from recursively faulting
+ * if there is a problem with the heap sub-system. */
+PRIVATE struct atomic_rwlock kernel_debug_info_inside_malloc = ATOMIC_RWLOCK_INIT;
+#define MY_KMALLOC_ACQUIRE_LOCK()                                                    \
+	do {                                                                             \
+		if (!(dbg_active ? atomic_rwlock_trywrite(&kernel_debug_info_inside_malloc)  \
+		                 : atomic_rwlock_tryread(&kernel_debug_info_inside_malloc))) \
+			return NULL;                                                             \
+	} __WHILE0
+#define MY_KMALLOC_RELEASE_LOCK() \
+	atomic_rwlock_end(&kernel_debug_info_inside_malloc)
+
+#else /* !CONFIG_NO_DEBUGGER */
+#define MY_KMALLOC_ACQUIRE_LOCK() (void)0
+#define MY_KMALLOC_RELEASE_LOCK() (void)0
+#endif /* CONFIG_NO_DEBUGGER */
+
+/* The debugger overrides the #PF handler to disable any form of lazy initialization
+ * of memory, meaning that if we're being called from there, the only way we can
+ * safely allocate memory is by allocating from the LOCKED heap with the PREFAULT
+ * flag set (thus preventing any possibility of triggering a pagefault in case new
+ * memory had to be allocated) */
+#ifdef CONFIG_NO_DEBUGGER
+#define MY_KMALLOC_HEAP (&kernel_locked_heap)
+#define MY_KMALLOC_GFP  (GFP_LOCKED | GFP_PREFLT)
+#else /* CONFIG_NO_DEBUGGER */
+#define MY_KMALLOC_HEAP (&kernel_default_heap)
+#define MY_KMALLOC_GFP  (GFP_NORMAL)
+#endif /* !CONFIG_NO_DEBUGGER */
+
+
+PRIVATE NOBLOCK void *
+NOTHROW(CC my_kmalloc_untraced_nx)(size_t num_bytes, gfp_t flags) {
+	struct heapptr ptr;
+	MY_KMALLOC_ACQUIRE_LOCK();
+	ptr = heap_alloc_untraced_nx(MY_KMALLOC_HEAP,
+	                             num_bytes + sizeof(size_t),
+	                             flags | MY_KMALLOC_GFP);
+	MY_KMALLOC_RELEASE_LOCK();
+	if (!ptr.hp_siz)
+		return NULL;
+	*(size_t *)ptr.hp_ptr = ptr.hp_siz;
+	return (size_t *)ptr.hp_ptr + 1;
+}
+
+PRIVATE NOBLOCK void *
+NOTHROW(CC my_krealloc_untraced_nx)(void *oldptr, size_t num_bytes, gfp_t flags) {
+	struct heapptr ptr;
+	MY_KMALLOC_ACQUIRE_LOCK();
+	ptr = heap_realloc_untraced_nx(MY_KMALLOC_HEAP,
+	                               (size_t *)oldptr - 1,
+	                               ((size_t *)oldptr)[-1],
+	                               num_bytes + sizeof(size_t),
+	                               flags | MY_KMALLOC_GFP,
+	                               flags | MY_KMALLOC_GFP);
+	MY_KMALLOC_RELEASE_LOCK();
+	if (!ptr.hp_siz)
+		return NULL;
+	*(size_t *)ptr.hp_ptr = ptr.hp_siz;
+	return (size_t *)ptr.hp_ptr + 1;
+}
+
+PRIVATE NOBLOCK void
+NOTHROW(CC my_kfree_untraced)(void *ptr) {
+	if (!ptr)
+		return;
+	heap_free_untraced(MY_KMALLOC_HEAP,
+	                   (size_t *)ptr - 1,
+	                   ((size_t *)ptr)[-1],
+	                   GFP_ATOMIC | MY_KMALLOC_GFP);
+}
+
+#undef MY_KMALLOC_HEAP
+#undef MY_KMALLOC_GFP
+#endif /* __KERNEL__ */
+
+
+#ifdef __KERNEL__
+#define CACHE_CALLOC(item_count, item_size) my_kmalloc_untraced_nx((item_count) * (item_size), GFP_CALLOC | GFP_ATOMIC)
+#define CACHE_RECALLOC(ptr, num_bytes)      my_krealloc_untraced_nx(ptr, num_bytes, GFP_CALLOC | GFP_ATOMIC)
+#define CACHE_FREE(ptr)                     my_kfree_untraced(ptr)
+#else /* __KERNEL__ */
+#define CACHE_CALLOC(item_count, item_size) calloc(item_count, item_size)
+#define CACHE_RECALLOC(ptr, num_bytes)      realloc(ptr, num_bytes)
+#define CACHE_FREE(ptr)                     free(ptr)
+#define CACHE_RECALLOC_DOES_NOT_CLEAR 1
+#endif /* !__KERNEL__ */
+
+
+
+
+
+/* Finalize the given abbreviation code controller. */
+INTERN NONNULL((1)) void
+NOTHROW_NCX(CC libdi_debuginfo_cu_abbrev_fini)(di_debuginfo_cu_abbrev_t *__restrict self) {
+	if (self->dua_cache_list != self->dua_stcache &&
+	    self->dua_cache_list != (di_debuginfo_cu_abbrev_cache_entry_t *)-1) {
+		CACHE_FREE(self->dua_cache_list);
+	}
+#ifndef NDEBUG
+	memset(self, 0xcc, offsetof(di_debuginfo_cu_abbrev_t, dua_stcache));
+#endif /* !NDEBUG */
+}
+
+INTERN NONNULL((1, 2)) bool
+NOTHROW_NCX(CC libdi_debuginfo_cu_abbrev_do_lookup)(byte_t *__restrict reader,
+                                                    byte_t *__restrict abbrev_end,
+                                                    di_debuginfo_component_t *__restrict result,
+                                                    uintptr_t abbrev_code) {
+	while (reader < abbrev_end) {
+		uintptr_t code, tag;
+		uint8_t has_children;
+		byte_t *attrib_pointer;
+		uintptr_t attr_name, attr_form;
+		code = dwarf_decode_uleb128((byte_t **)&reader);
+		if (!code)
+			break;
+		tag = dwarf_decode_uleb128((byte_t **)&reader);
+		has_children = *(uint8_t *)reader;
+		reader += 1;
+		attrib_pointer = reader;
+		while (reader < abbrev_end) {
+			attr_name = dwarf_decode_uleb128((byte_t **)&reader);
+			attr_form = dwarf_decode_uleb128((byte_t **)&reader);
+			if (!attr_name && !attr_form)
+				break;
+		}
+		if (code == abbrev_code) {
+			result->dic_tag          = (uintptr_half_t)tag;
+			result->dic_haschildren  = has_children;
+			result->dic_attrib_start = (di_debuginfo_component_attrib_t *)attrib_pointer;
+			result->dic_attrib_end   = (di_debuginfo_component_attrib_t *)reader;
+			return true;
+		}
+	}
+	return false;
+}
+
+
+
+INTERN NONNULL((1, 2)) bool
+NOTHROW_NCX(CC libdi_debuginfo_cu_abbrev_lookup)(di_debuginfo_cu_abbrev_t *__restrict self,
+                                                 di_debuginfo_component_t *__restrict result,
+                                                 uintptr_t abbrev_code) {
+#if 0
+	return libdi_debuginfo_cu_abbrev_do_lookup(self->dua_abbrev_start,
+	                                           self->dua_abbrev_end,
+	                                           result, abbrev_code);
+#else
+	size_t i;
+	di_debuginfo_cu_abbrev_cache_entry_t *list;
+	list = self->dua_cache_list;
+	if (list == self->dua_stcache ||
+	    list == (di_debuginfo_cu_abbrev_cache_entry_t *)-1) {
+		i = self->dua_cache_next;
+		while (i) {
+			--i;
+			if (self->dua_stcache[i].ace_code == abbrev_code) {
+				/* Found it! */
+				memcpy(result, &self->dua_stcache[i].ace_comp,
+				       sizeof(di_debuginfo_component_t));
+				return true;
+			}
+		}
+		i = self->dua_cache_size;
+		while (i > self->dua_cache_next) {
+			--i;
+			if (self->dua_stcache[i].ace_code == abbrev_code) {
+				/* Found it! */
+				memcpy(result, &self->dua_stcache[i].ace_comp,
+				       sizeof(di_debuginfo_component_t));
+				return true;
+			}
+		}
+		if (!libdi_debuginfo_cu_abbrev_do_lookup(self->dua_abbrev_start,
+		                                         self->dua_abbrev_end,
+		                                         result, abbrev_code))
+			return false;
+		if (self->dua_cache_next >= COMPILER_LENOF(self->dua_stcache)) {
+			if (self->dua_cache_size >= COMPILER_LENOF(self->dua_stcache)) {
+				if (list != (di_debuginfo_cu_abbrev_cache_entry_t *)-1) {
+					/* Try to move into the territory of dynamically allocated caches. */
+					size_t initial_cache_size;
+					initial_cache_size = MIN(COMPILER_LENOF(self->dua_stcache) * 2,
+					                         CONFIG_DEBUGINFO_ABBREV_CACHE_MAXSIZE);
+					list = (di_debuginfo_cu_abbrev_cache_entry_t *)CACHE_CALLOC(initial_cache_size,
+					                                                            sizeof(di_debuginfo_cu_abbrev_cache_entry_t));
+					if (list) {
+						memcpy(list, self->dua_stcache, sizeof(self->dua_stcache));
+						self->dua_cache_list = list;
+						self->dua_cache_size = initial_cache_size;
+						self->dua_cache_next = COMPILER_LENOF(self->dua_stcache);
+						self->dua_stcache[0].ace_code = 0; /* Allow further re-sizing */
+						goto do_fill_dynamic_cache;
+					}
+					self->dua_cache_list = (di_debuginfo_cu_abbrev_cache_entry_t *)-1;
+				}
+			} else {
+				/* Increase the used buffer size. */
+				++self->dua_cache_size;
+			}
+			self->dua_cache_next = 0;
+		}
+		self->dua_stcache[self->dua_cache_next].ace_code = abbrev_code;
+		memcpy(&self->dua_stcache[self->dua_cache_next].ace_comp,
+		       result, sizeof(di_debuginfo_component_t));
+		++self->dua_cache_next;
+		if (self->dua_cache_size < self->dua_cache_next)
+			self->dua_cache_size = self->dua_cache_next;
+	} else {
+		i = self->dua_cache_next;
+		while (i) {
+			--i;
+			if (list[i].ace_code == abbrev_code) {
+				/* Found it! */
+				memcpy(result, &list[i].ace_comp,
+				       sizeof(di_debuginfo_component_t));
+				return true;
+			}
+		}
+		i = self->dua_cache_size;
+		while (i > self->dua_cache_next) {
+			--i;
+			if (list[i].ace_code == abbrev_code) {
+				/* Found it! */
+				memcpy(result, &list[i].ace_comp,
+				       sizeof(di_debuginfo_component_t));
+				return true;
+			}
+		}
+		if (self->dua_cache_next >= self->dua_cache_size) {
+			if (self->dua_cache_size < CONFIG_DEBUGINFO_ABBREV_CACHE_MAXSIZE &&
+			    self->dua_stcache[0].ace_code == 0) {
+				size_t new_cache_size;
+				/* Increase the cache size. */
+				new_cache_size = MIN(self->dua_cache_size * 2, CONFIG_DEBUGINFO_ABBREV_CACHE_MAXSIZE);
+				list = (di_debuginfo_cu_abbrev_cache_entry_t *)CACHE_RECALLOC(list,
+				                                                              new_cache_size *
+				                                                              sizeof(di_debuginfo_cu_abbrev_cache_entry_t));
+				if likely(list) {
+#ifdef CACHE_RECALLOC_DOES_NOT_CLEAR
+					memset(list + self->dua_cache_size, 0,
+					       (new_cache_size - self->dua_cache_size) *
+					       sizeof(di_debuginfo_cu_abbrev_cache_entry_t));
+#endif /* CACHE_RECALLOC_DOES_NOT_CLEAR */
+					self->dua_cache_list = list;
+					self->dua_cache_next = self->dua_cache_size;
+					self->dua_cache_size = new_cache_size;
+					goto do_lookup_for_dynamic_cache;
+				} else {
+					list = self->dua_cache_list;
+					self->dua_stcache[0].ace_code = 1; /* Disable further re-sizing */
+				}
+			}
+			self->dua_cache_next = 0;
+		}
+do_lookup_for_dynamic_cache:
+		if (!libdi_debuginfo_cu_abbrev_do_lookup(self->dua_abbrev_start,
+		                                         self->dua_abbrev_end,
+		                                         result, abbrev_code))
+			return false;
+do_fill_dynamic_cache:
+		list[self->dua_cache_next].ace_code = abbrev_code;
+		memcpy(&list[self->dua_cache_next].ace_comp,
+		       result, sizeof(di_debuginfo_component_t));
+		++self->dua_cache_next;
+	}
+	return true;
+#endif
+}
+
 
 /* Given a pointer to the start of a debug_info CU (or a pointer to the start
  * of the .debug_info section), as well as the start & end of the .debug_abbrev
  * section, initialize the given debuginfo CU parser structure `result', and
  * advance `*pdebug_info_reader' to the start of the next unit.
+ * NOTE: Upon success (return == DEBUG_INFO_ERROR_SUCCESS), the caller is responsible for
+ *       finalizing the given `abbrev' through use of `debuginfo_cu_abbrev_fini(abbrev)',
+ *       once the associated parser `result' is no longer being used.
  * @param: first_component_pointer: A pointer to the first component to load, or `NULL'
  *                                  to simply load the first component following the
  *                                  start of the associated CU descriptor.
@@ -60,6 +366,7 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadunit)(byte_t **__restrict pdebug_in
                                                    byte_t *__restrict debug_info_end,
                                                    di_debuginfo_cu_parser_sections_t const *__restrict sectinfo,
                                                    di_debuginfo_cu_parser_t *__restrict result,
+                                                   di_debuginfo_cu_abbrev_t *__restrict abbrev,
                                                    byte_t *first_component_pointer) {
 	uint32_t temp;
 	byte_t *reader;
@@ -83,11 +390,11 @@ again:
 	temp = UNALIGNED_GET32((uint32_t *)reader);
 	reader += 4;
 	if unlikely(OVERFLOW_UADD((uintptr_t)sectinfo->cps_debug_abbrev_start, temp,
-	                          (uintptr_t *)&result->dup_cu_abbrev_start) ||
-	            result->dup_cu_abbrev_start >= sectinfo->cps_debug_abbrev_end)
+	                          (uintptr_t *)&abbrev->dua_abbrev_start) ||
+	            abbrev->dua_abbrev_start >= sectinfo->cps_debug_abbrev_end)
 		return DEBUG_INFO_ERROR_CORRUPT;
-	result->dup_cu_abbrev_end = sectinfo->cps_debug_abbrev_end;
-	result->dup_addrsize      = *(uint8_t *)reader;
+	abbrev->dua_abbrev_end = sectinfo->cps_debug_abbrev_end;
+	result->dup_addrsize   = *(uint8_t *)reader;
 	reader += 1;
 #if __SIZEOF_POINTER__ > 4
 	if unlikely(result->dup_addrsize != 1 &&
@@ -95,12 +402,12 @@ again:
 	            result->dup_addrsize != 4 &&
 	            result->dup_addrsize != 8)
 		return DEBUG_INFO_ERROR_CORRUPT;
-#else
+#else /* __SIZEOF_POINTER__ > 4 */
 	if unlikely(result->dup_addrsize != 1 &&
 	            result->dup_addrsize != 2 &&
 	            result->dup_addrsize != 4)
 		return DEBUG_INFO_ERROR_CORRUPT;
-#endif
+#endif /* __SIZEOF_POINTER__ <= 4 */
 	result->dup_cu_info_pos = reader;
 	if (first_component_pointer) {
 		/* Check if the given pointer is apart of this CU.
@@ -111,11 +418,17 @@ again:
 			return DEBUG_INFO_ERROR_NOFRAME;
 		result->dup_cu_info_pos = first_component_pointer;
 	}
-	reader               = result->dup_cu_info_end;
-	result->dup_sections = sectinfo;
+	reader                 = result->dup_cu_info_end;
+	result->dup_sections   = sectinfo;
+	result->dup_cu_abbrev  = abbrev;
+	abbrev->dua_cache_list = abbrev->dua_stcache;
+	abbrev->dua_cache_size = 0;
+	abbrev->dua_cache_next = 0;
 	/* Load the first component of the compilation unit. */
-	if (!libdi_debuginfo_cu_parser_next(result))
+	if (!libdi_debuginfo_cu_parser_next(result)) {
+		libdi_debuginfo_cu_abbrev_fini(abbrev);
 		goto again;
+	}
 	*pdebug_info_reader     = reader;
 	result->dup_child_depth = 0;
 	return DEBUG_INFO_ERROR_SUCCESS;
@@ -229,7 +542,6 @@ decode_form:
 INTERN TEXTSECTION bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_next)(di_debuginfo_cu_parser_t *__restrict self) {
 	uintptr_t abbrev_code;
-	byte_t *reader;
 	if (self->dup_comp.dic_haschildren != DW_CHILDREN_no)
 		++self->dup_child_depth;
 again:
@@ -243,34 +555,10 @@ again:
 			--self->dup_child_depth;
 		goto again; /* Ignored */
 	}
-	reader = self->dup_cu_abbrev_start;
-	while (reader < self->dup_cu_abbrev_end) {
-		uintptr_t code, tag;
-		uint8_t has_children;
-		byte_t *attrib_pointer;
-		uintptr_t attr_name, attr_form;
-		code = dwarf_decode_uleb128((byte_t **)&reader);
-		if (!code)
-			break;
-		tag          = dwarf_decode_uleb128((byte_t **)&reader);
-		has_children = *(uint8_t *)reader;
-		reader += 1;
-		attrib_pointer = reader;
-		while (reader < self->dup_cu_abbrev_end) {
-			attr_name = dwarf_decode_uleb128((byte_t **)&reader);
-			attr_form = dwarf_decode_uleb128((byte_t **)&reader);
-			if (!attr_name && !attr_form)
-				break;
-		}
-		if (code == abbrev_code) {
-			self->dup_comp.dic_tag          = tag;
-			self->dup_comp.dic_haschildren  = has_children;
-			self->dup_comp.dic_attrib_start = (di_debuginfo_component_attrib_t *)attrib_pointer;
-			self->dup_comp.dic_attrib_end   = (di_debuginfo_component_attrib_t *)reader;
-			return true;
-		}
-	}
-	return false;
+	/* Lookup the associated abbreviation code. */
+	return libdi_debuginfo_cu_abbrev_lookup(self->dup_cu_abbrev,
+	                                        &self->dup_comp,
+	                                        abbrev_code);
 }
 
 INTERN TEXTSECTION bool
@@ -2533,6 +2821,7 @@ libdi_debuginfo_enum_locals(di_enum_locals_sections_t const *__restrict sectinfo
                             debuginfo_enum_locals_callback_t callback, void *arg) {
 	ssize_t result = 0;
 	di_debuginfo_cu_parser_t parser;
+	di_debuginfo_cu_abbrev_t abbrev;
 	byte_t *debug_info_reader;
 	uint32_t cu_offset;
 	/* Try to make use of `.debug_aranges' to quickly locate the CU. */
@@ -2546,13 +2835,16 @@ libdi_debuginfo_enum_locals(di_enum_locals_sections_t const *__restrict sectinfo
 		if (libdi_debuginfo_cu_parser_loadunit(&debug_info_reader,
 		                                       sectinfo->el_debug_info_end,
 		                                       di_enum_locals_sections_as_di_debuginfo_cu_parser_sections(sectinfo),
-		                                       &parser,
-		                                       NULL) == DEBUG_INFO_ERROR_SUCCESS) {
+		                                       &parser, &abbrev, NULL) == DEBUG_INFO_ERROR_SUCCESS) {
 #if 1
 			libdi_debuginfo_enum_locals_in_cu(sectinfo, &parser, module_relative_pc, callback, arg, &result, true);
+			libdi_debuginfo_cu_abbrev_fini(&abbrev);
 			goto done;
 #else
-			if (libdi_debuginfo_enum_locals_in_cu(sectinfo, &parser, module_relative_pc, callback, arg, &result, true))
+			bool was_ok;
+			was_ok = libdi_debuginfo_enum_locals_in_cu(sectinfo, &parser, module_relative_pc, callback, arg, &result, true);
+			libdi_debuginfo_cu_abbrev_fini(&abbrev);
+			if (was_ok)
 				goto done;
 #endif
 		}
@@ -2561,9 +2853,11 @@ libdi_debuginfo_enum_locals(di_enum_locals_sections_t const *__restrict sectinfo
 	while (libdi_debuginfo_cu_parser_loadunit(&debug_info_reader,
 	                                          sectinfo->el_debug_info_end,
 	                                          di_enum_locals_sections_as_di_debuginfo_cu_parser_sections(sectinfo),
-	                                          &parser,
-	                                          NULL) == DEBUG_INFO_ERROR_SUCCESS) {
-		if (libdi_debuginfo_enum_locals_in_cu(sectinfo, &parser, module_relative_pc, callback, arg, &result, false))
+	                                          &parser, &abbrev, NULL) == DEBUG_INFO_ERROR_SUCCESS) {
+		bool was_ok;
+		was_ok = libdi_debuginfo_enum_locals_in_cu(sectinfo, &parser, module_relative_pc, callback, arg, &result, false);
+		libdi_debuginfo_cu_abbrev_fini(&abbrev);
+		if (was_ok)
 			goto done;
 	}
 done:
@@ -2573,6 +2867,7 @@ done:
 
 
 #undef debuginfo_cu_parser_skipform
+DEFINE_PUBLIC_ALIAS(debuginfo_cu_abbrev_fini, libdi_debuginfo_cu_abbrev_fini);
 DEFINE_PUBLIC_ALIAS(debuginfo_cu_parser_loadunit, libdi_debuginfo_cu_parser_loadunit);
 DEFINE_PUBLIC_ALIAS(debuginfo_cu_parser_skipform, libdi_debuginfo_cu_parser_skipform);
 DEFINE_PUBLIC_ALIAS(debuginfo_cu_parser_next, libdi_debuginfo_cu_parser_next);

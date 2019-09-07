@@ -192,11 +192,16 @@ DEFINE_DBG_BZERO_OBJECT(vm_datablock_debugheap.db_lock);
 #endif /* CONFIG_DEBUG_HEAP */
 
 
+#if 0 /* Don't do this. - The debugger may try to use the heap for optional caches (s.a. `debug_info.c'),
+       * in which case some suspended thread already holding a lock to the heap must prevent the debugger
+       * from being able to allocate memory!
+       * NOTE: The same also goes for the FDE cache found in `driver.c' */
 /* Unlock the kernel heaps while inside of the debugger. */
 DEFINE_DBG_BZERO_VECTOR(&kernel_heaps[0].h_lock,
                          __GFP_HEAPCOUNT,
                          sizeof(kernel_heaps[0].h_lock),
                          sizeof(kernel_heaps[0]));
+#endif
 
 DEFINE_VALIDATABLE_HEAP(kernel_default_heap);
 DEFINE_VALIDATABLE_HEAP(kernel_locked_heap);

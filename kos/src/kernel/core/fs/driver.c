@@ -148,7 +148,11 @@ NOTHROW(KCALL driver_fde_find)(struct driver *__restrict self, void *absolute_pc
 
 	/* Try to cache the FDE descriptor.
 	 * Emphasis on the _try_. - Only do an atomic+NX allocation here, so
-	 * there is no chance of an exception, nor any chance of blocking. */
+	 * there is no chance of an exception, nor any chance of blocking.
+	 * Also: PREFAULT is required since we may be getting called from within
+	 *       the builtin debugger, in which case we have to make sure that
+	 *       any memory allocated will not cause a #PF (since lazy initialization
+	 *       would be disabled in this case) */
 	nodeptr = heap_alloc_untraced_nx(&kernel_locked_heap,
 	                                 sizeof(struct driver_fde_cache_node),
 	                                 GFP_ATOMIC | GFP_LOCKED | GFP_PREFLT);

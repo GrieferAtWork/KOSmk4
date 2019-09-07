@@ -1,3 +1,8 @@
+/*[[[magic
+local opt = options.setdefault("GCC.options",[]);
+opt.removeif([](e) -> e.startswith("-O"));
+opt.append("-O3");
+]]]*/
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -494,7 +499,7 @@ fill_result_sp_any_cu:
 
 			default:
 				libdi_debuginfo_cu_parser_skipattr(self);
-				/*next_cu_component:*/
+/*next_cu_component:*/
 				if (!libdi_debuginfo_cu_parser_next(self))
 					goto done_scan_cu_stmt_list;
 				break;
@@ -581,6 +586,7 @@ NOTHROW_NCX(CC libdi_debug_sections_addr2line)(di_debug_sections_t const *__rest
 	if (sections->ds_debug_info_start < sections->ds_debug_info_end &&
 	    sections->ds_debug_abbrev_start < sections->ds_debug_abbrev_end) {
 		di_debuginfo_cu_parser_t cu;
+		di_debuginfo_cu_abbrev_t abbrev;
 		di_debuginfo_cu_parser_sections_t cu_sections;
 		uint32_t debuginfo_cu_offset;
 		byte_t *cu_start;
@@ -601,14 +607,12 @@ NOTHROW_NCX(CC libdi_debug_sections_addr2line)(di_debug_sections_t const *__rest
 			if (error == DEBUG_INFO_ERROR_SUCCESS) {
 				if (debuginfo_cu_offset < (size_t)(sections->ds_debug_info_end - sections->ds_debug_info_start)) {
 					cu_start = sections->ds_debug_info_start + debuginfo_cu_offset;
-					error = libdi_debuginfo_cu_parser_loadunit(&cu_start,
-					                                           sections->ds_debug_info_end,
-					                                           &cu_sections,
-					                                           &cu,
-					                                           NULL);
+					error = libdi_debuginfo_cu_parser_loadunit(&cu_start, sections->ds_debug_info_end,
+					                                           &cu_sections, &cu, &abbrev, NULL);
 					if (error == DEBUG_INFO_ERROR_SUCCESS) {
 						/* Search the specified CU */
 						error = search_cu(&cu, sections, result, module_relative_pc, level, true);
+						libdi_debuginfo_cu_abbrev_fini(&abbrev);
 						if (error == DEBUG_INFO_ERROR_SUCCESS)
 							goto done_success;
 						if (error == DEBUG_INFO_ERROR_NOLEVEL)
@@ -631,15 +635,13 @@ NOTHROW_NCX(CC libdi_debug_sections_addr2line)(di_debug_sections_t const *__rest
 		has_corruptions = false;
 		cu_start        = sections->ds_debug_info_start;
 		for (;;) {
-			error = libdi_debuginfo_cu_parser_loadunit(&cu_start,
-			                                           sections->ds_debug_info_end,
-			                                           &cu_sections,
-			                                           &cu,
-			                                           NULL);
+			error = libdi_debuginfo_cu_parser_loadunit(&cu_start, sections->ds_debug_info_end,
+			                                           &cu_sections, &cu, &abbrev, NULL);
 			if (error != DEBUG_INFO_ERROR_SUCCESS)
 				break;
 			/* Search the CU */
 			error = search_cu(&cu, sections, result, module_relative_pc, level, false);
+			libdi_debuginfo_cu_abbrev_fini(&abbrev);
 			if (error == DEBUG_INFO_ERROR_SUCCESS)
 				goto done_success;
 			if (error == DEBUG_INFO_ERROR_NOLEVEL)

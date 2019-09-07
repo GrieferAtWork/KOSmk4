@@ -105,10 +105,13 @@ typedef struct di_debuginfo_component_attrib_struct {
 } di_debuginfo_component_attrib_t;
 
 typedef struct di_debuginfo_component_struct {
-	__uintptr_t                      dic_tag;          /* Component tag (one of `DW_TAG_*'; e.g. `DW_TAG_compile_unit') */
+	__UINTPTR_HALF_TYPE__            dic_tag;          /* Component tag (one of `DW_TAG_*'; e.g. `DW_TAG_compile_unit') */
+	__uint8_t                        dic_haschildren;  /* `DW_CHILDREN_yes' if follow-up on this entry is a child */
+#if __SIZEOF_POINTER__ >= 4
+	__uint8_t                      __dic_pad[(sizeof(void *) / 2) - 1]; /* ... */
+#endif /* __SIZEOF_POINTER__ >= 4 */
 	di_debuginfo_component_attrib_t *dic_attrib_start; /* [1..1] Pointer to the list of (attr_name,attr_form) ULEB pairs of this entry */
 	di_debuginfo_component_attrib_t *dic_attrib_end;   /* [1..1] End of attributes. */
-	__uint8_t                        dic_haschildren;  /* `DW_CHILDREN_yes' if follow-up on this entry is a child */
 } di_debuginfo_component_t;
 
 typedef struct di_debuginfo_cu_parser_sections_struct {
@@ -125,18 +128,38 @@ typedef struct di_debuginfo_cu_parser_sections_struct {
 	__byte_t                *cps_debug_str_end;      /* [0..1][const] End address of `.debug_str' */
 } di_debuginfo_cu_parser_sections_t;
 
+typedef struct di_debuginfo_cu_abbrev_cache_entry_struct {
+	__uintptr_t              ace_code; /* The abbreviation code (or 0 if this cache entry is unused) */
+	di_debuginfo_component_t ace_comp; /* The cached component. */
+} di_debuginfo_cu_abbrev_cache_entry_t;
+
+#ifndef CONFIG_DEBUGINFO_ABBREV_CACHE_MINSIZE
+#define CONFIG_DEBUGINFO_ABBREV_CACHE_MINSIZE 32 /* This equates to ~512 (on 32-bit) bytes allocated for the cache. */
+#endif /* !CONFIG_DEBUGINFO_ABBREV_CACHE_MINSIZE */
+#ifndef CONFIG_DEBUGINFO_ABBREV_CACHE_MAXSIZE
+#define CONFIG_DEBUGINFO_ABBREV_CACHE_MAXSIZE 256
+#endif /* !CONFIG_DEBUGINFO_ABBREV_CACHE_MAXSIZE */
+
+typedef struct di_debuginfo_cu_abbrev_struct {
+	__byte_t                             *dua_abbrev_start; /* [1..1][const] Starting address of debug abbreviations (in .debug_abbrev). */
+	__byte_t                             *dua_abbrev_end;   /* [1..1][const] End address of debug abbreviations (in .debug_abbrev). */
+	di_debuginfo_cu_abbrev_cache_entry_t *dua_cache_list;   /* [1..dua_cache_size][owned_if(!= dua_stcache)] Cache vector, or (di_debuginfo_cu_abbrev_cache_entry_t *)-1 if unused. */
+	__size_t                              dua_cache_size;   /* Allocated (dua_cache_list != dua_stcache) or initialiezd (dua_cache_list == dua_stcache) cache size. */
+	__size_t                              dua_cache_next;   /* Index to the cache entry that should be overwritten next. */
+	di_debuginfo_cu_abbrev_cache_entry_t  dua_stcache[CONFIG_DEBUGINFO_ABBREV_CACHE_MINSIZE]; /* Statically allocated cache. */
+} di_debuginfo_cu_abbrev_t;
+
 typedef struct di_debuginfo_cu_parser_struct {
 	di_debuginfo_cu_parser_sections_t const
-	                        *dup_sections;        /* [0..1][const] Section information. */
-	__byte_t                *dup_cu_abbrev_start; /* [1..1][const] Starting address of debug abbreviations (in .debug_abbrev). */
-	__byte_t                *dup_cu_abbrev_end;   /* [1..1][const] End address of debug abbreviations (in .debug_abbrev). */
-	__byte_t                *dup_cu_info_hdr;     /* [1..1][const] Address of the debug information header (in .debug_info). */
-	__byte_t                *dup_cu_info_end;     /* [1..1][const] End address of debug information data (in .debug_info). */
-	__byte_t                *dup_cu_info_pos;     /* [1..1][>= dup_cu_info_hdr && <= dup_cu_info_pos] Current position in debug information data (in .debug_info). */
-	__uintptr_t              dup_child_depth;     /* The child-recursion-depth of `dp_comp' */
-	di_debuginfo_component_t dup_comp;            /* The component currently being parsed. */
-	__uint8_t                dup_addrsize;        /* Address size */
-	__uint16_t               dup_version;         /* DWARF version */
+	                         *dup_sections;    /* [0..1][const] Section information. */
+	di_debuginfo_cu_abbrev_t *dup_cu_abbrev;   /* [1..1][const] Abbreviation code controller. */
+	__byte_t                 *dup_cu_info_hdr; /* [1..1][const] Address of the debug information header (in .debug_info). */
+	__byte_t                 *dup_cu_info_end; /* [1..1][const] End address of debug information data (in .debug_info). */
+	__byte_t                 *dup_cu_info_pos; /* [1..1][>= dup_cu_info_hdr && <= dup_cu_info_pos] Current position in debug information data (in .debug_info). */
+	__uintptr_t               dup_child_depth; /* The child-recursion-depth of `dp_comp' */
+	di_debuginfo_component_t  dup_comp;        /* The component currently being parsed. */
+	__uint8_t                 dup_addrsize;    /* Address size */
+	__uint16_t                dup_version;     /* DWARF version */
 } di_debuginfo_cu_parser_t;
 
 #ifndef __di_debuginfo_location_t_defined
@@ -176,6 +199,9 @@ typedef struct di_debuginfo_location_struct {
  * of the .debug_info section), as well as the start & end of the .debug_abbrev
  * section, initialize the given debuginfo CU parser structure `result', and
  * advance `*pdebug_info_reader' to the start of the next unit.
+ * NOTE: Upon success (return == DEBUG_INFO_ERROR_SUCCESS), the caller is responsible for
+ *       finalizing the given `abbrev' through use of `debuginfo_cu_abbrev_fini(abbrev)',
+ *       once the associated parser `result' is no longer being used.
  * @param: first_component_pointer: A pointer to the first component to load, or `NULL'
  *                                  to simply load the first component following the
  *                                  start of the associated CU descriptor.
@@ -187,6 +213,7 @@ typedef unsigned int
                                                  __byte_t *__restrict debug_info_end,
                                                  di_debuginfo_cu_parser_sections_t const *__restrict sectinfo,
                                                  di_debuginfo_cu_parser_t *__restrict result,
+                                                 di_debuginfo_cu_abbrev_t *__restrict abbrev,
                                                  __byte_t *first_component_pointer);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
 LIBDEBUGINFO_DECL unsigned int
@@ -194,7 +221,18 @@ __NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_parser_loadunit)(__byte_t **__restric
                                                             __byte_t *__restrict debug_info_end,
                                                             di_debuginfo_cu_parser_sections_t const *__restrict sectinfo,
                                                             di_debuginfo_cu_parser_t *__restrict result,
+                                                            di_debuginfo_cu_abbrev_t *__restrict abbrev,
                                                             __byte_t *first_component_pointer);
+#endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
+
+
+
+/* Finalize the given abbreviation code controller. */
+typedef __ATTR_NONNULL((1)) void
+(LIBDEBUGINFO_CC *PDEBUGINFO_CU_ABBREV_FINI)(di_debuginfo_cu_abbrev_t *__restrict self);
+#ifdef LIBDEBUGINFO_WANT_PROTOTYPES
+LIBDEBUGINFO_DECL __ATTR_NONNULL((1)) void
+__NOTHROW_NCX(LIBDEBUGINFO_CC debuginfo_cu_abbrev_fini)(di_debuginfo_cu_abbrev_t *__restrict self);
 #endif /* LIBDEBUGINFO_WANT_PROTOTYPES */
 
 
