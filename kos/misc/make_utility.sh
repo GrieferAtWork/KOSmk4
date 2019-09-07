@@ -25,8 +25,7 @@ if (($# != 2)); then
 	echo "    TARGET_NAME should be one of:"
 	echo "        i386"
 	echo "        x86_64"
-	echo "    UTILITY_NAME should be one of:"
-	echo "        busybox"
+	echo "    For a list of valid UTILITY_NAME, review the switch at the bottom of this file"
 	exit 1
 fi
 
@@ -72,11 +71,19 @@ mtools_install_file() {
 	fi
 }
 
+## mtools_install_path <DISKIMAGE> <ABSOLUTE_DISK_PATH> <SOURCE>
+mtools_install_path() {
+	if ! "$MTOOLS" -c mcopy -i "$1" -s -n -D o "$3" "::/$2" > /dev/null 2>&1; then
+		mtools_makedir "$1" "$(dirname "/$2")"
+		cmd "$MTOOLS" -c mcopy -i "$1" -s -n -D o "$3" "::/$2"
+	fi
+}
+
 ## install_file <ABSOLUTE_DISK_PATH> <SOURCE>
 install_file() {
 	DISPATH="${1#/}"
 	unlink "$TARGET_SYSROOT/$DISPATH" > /dev/null 2>&1
-	echo "Installing bin/${TARGET_NAME}-kos-common/$DISPATH"
+	echo "Installing ${TARGET_NAME}-kos:/$DISPATH"
 	if ! cp "$2" "$TARGET_SYSROOT/$DISPATH" > /dev/null 2>&1; then
 		cmd mkdir -p "$(dirname "$TARGET_SYSROOT/$DISPATH")"
 		cmd cp "$2" "$TARGET_SYSROOT/$DISPATH"
@@ -90,7 +97,31 @@ install_file() {
 			cmd ln -s "$RELPATH" "$CONFIG_SYSROOT/$DISPATH"
 		fi
 		if [ -f "$CONFIG_SYSROOT/disk.img" ]; then
+			echo "    Disk: '$CONFIG_SYSROOT/disk.img'"
 			mtools_install_file "$CONFIG_SYSROOT/disk.img" "$DISPATH" "$2"
+		fi
+	done
+}
+
+## install_path <ABSOLUTE_DISK_PATH> <SOURCE>
+install_path() {
+	DISPATH="${1#/}"
+	echo "Installing ${TARGET_NAME}-kos:/$DISPATH/*"
+	cmd mkdir -p "$(dirname "$TARGET_SYSROOT/$DISPATH")"
+	local RELPATH=$(python -c "import os.path; print os.path.relpath('$2', '$TARGET_SYSROOT/$(dirname "$DISPATH")')")
+	unlink "$TARGET_SYSROOT/$DISPATH" > /dev/null 2>&1
+	cmd ln -s "$RELPATH" "$TARGET_SYSROOT/$DISPATH"
+	local RELPATH=$(python -c "import os.path; print os.path.relpath('/${TARGET_NAME}-kos-common/$1', '/foo/$(dirname "/$1")')")
+	for BUILD_CONFIG in $(echo $KOS_VALID_BUILD_CONFIGS); do
+		local CONFIG_SYSROOT="${KOS_ROOT}/bin/${TARGET_NAME}-kos-${BUILD_CONFIG}"
+		unlink "$CONFIG_SYSROOT/$DISPATH" > /dev/null 2>&1
+		if ! ln -s "$RELPATH" "$CONFIG_SYSROOT/$DISPATH" > /dev/null 2>&1; then
+			cmd mkdir -p "$(dirname "$CONFIG_SYSROOT/$DISPATH")"
+			cmd ln -s "$RELPATH" "$CONFIG_SYSROOT/$DISPATH"
+		fi
+		if [ -f "$CONFIG_SYSROOT/disk.img" ]; then
+			echo "    Disk: '$CONFIG_SYSROOT/disk.img'"
+			mtools_install_path "$CONFIG_SYSROOT/disk.img" "$DISPATH" "$2"
 		fi
 	done
 }
@@ -260,6 +291,24 @@ EOF
 		install_file /usr/lib/crt0S.o "${KOS_ROOT}/bin/${TARGET_NAME}-kos/lib/crt0S.o"
 		install_file /usr/lib/crt0.o "${KOS_ROOT}/bin/${TARGET_NAME}-kos/lib/crt0.o"
 		install_file /usr/src/hello-world.c "$OPTPATH/hello-world.c"
+		;;
+##############################################################################
+
+
+##############################################################################
+	kos-headers)
+		install_path /usr/include "${KOS_ROOT}/kos/include"
+		cmd mkdir -p "$BINUTILS_SYSROOT/opt"
+		cat > "$BINUTILS_SYSROOT/opt/hello-header-temp.c" <<EOF
+#include <stdio.h>
+
+int main() {
+	printf("Hello %s\n", "Header");
+	return 0;
+}
+EOF
+		install_file /usr/src/hello-header.c "$BINUTILS_SYSROOT/opt/hello-header-temp.c"
+		unlink "$BINUTILS_SYSROOT/opt/hello-header-temp.c" > /dev/null 2>&1
 		;;
 ##############################################################################
 
