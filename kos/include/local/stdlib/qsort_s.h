@@ -1,4 +1,4 @@
-/* HASH 0xae21f6b8 */
+/* HASH 0x59b7b888 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,7 +55,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(qsort_s))(void *__base,
                                                      __SIZE_TYPE__ __size,
                                                      __dos_compar_d_fn_t __compar,
                                                      void *__arg) {
-#line 1798 "kos/src/libc/magic/stdlib.c"
+#line 1799 "kos/src/libc/magic/stdlib.c"
 	struct __invoke_compare_helper_s_data __data;
 	__data.__fun = __compar;
 	__data.__arg = __arg;

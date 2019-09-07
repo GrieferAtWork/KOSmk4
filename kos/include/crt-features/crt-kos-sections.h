@@ -1,4 +1,4 @@
-/* HASH 0x538a61fa */
+/* HASH 0xfd65a6b5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -909,6 +909,7 @@
 
 /* .text.crt.dos.random.* */
 #define __CRT_SECTION_rand_s                                __CRT_SECTINFO_dos_random                               /* .text.crt.dos.random.rand_s */
+#define __CRT_DOS_SECTION_rand_s                            __CRT_SECTINFO_dos_random                               /* .text.crt.dos.random.rand_s */
 
 /* .text.crt.dos.sched.signal.* */
 #define __CRT_DOS_SECTION_signal                            __CRT_SECTINFO_dos_sched_signal                         /* .text.crt.dos.sched.signal.signal */

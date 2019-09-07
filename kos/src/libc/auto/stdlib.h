@@ -1,4 +1,4 @@
-/* HASH 0xf640e51c */
+/* HASH 0xfeaa70c0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -128,6 +128,7 @@ INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__mbstowcs_s)(size_t *presult, char16_t 
 INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__mbstowcs_s_l)(size_t *presult, char32_t *buf, size_t buflen, char const *src, size_t maxlen, locale_t locale);
 INTDEF errno_t NOTHROW_NCX(LIBDCALL libd__mbstowcs_s_l)(size_t *presult, char16_t *buf, size_t buflen, char const *src, size_t maxlen, locale_t locale);
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_rand_s)(unsigned int *__restrict randval);
+INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd_rand_s)(unsigned int *__restrict randval);
 #define libc__strtol_l libc_strtol_l
 #define libc__strtoul_l libc_strtoul_l
 #define libc__strtoll_l libc_strtoll_l

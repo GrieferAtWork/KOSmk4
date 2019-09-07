@@ -629,12 +629,13 @@ system:(char const *__restrict command) -> int;
 %[insert:extern(free)]
 
 %[default_impl_section(.text.crt.random)]
-[nothrow][std]
+[nothrow][std][user][same_impl]
 [if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias(srandom)]
 srand:(long seed) -> void {
 	/* ... */
 }
-[nothrow][std]
+
+[nothrow][std][user][same_impl]
 [if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias(random)]
 rand:(void) -> int {
 	/* https://xkcd.com/221/ */
@@ -1094,7 +1095,7 @@ mkstemps64:(char *template_, int suffixlen) -> int;
 %
 %
 %#ifdef __USE_POSIX
-[ATTR_NONNULL((1))]
+[ATTR_NONNULL((1))][user]
 rand_r:(unsigned int *__restrict seed) -> int {
 	/* https://xkcd.com/221/ */
 	return 4;
@@ -1176,12 +1177,12 @@ srand48:(long seedval);
 %#endif /* __USE_MISC || __USE_XOPEN || __USE_DOS */
 
 %#if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
-%[default_impl_section(.text.crt.random)]
+%[default_impl_section(.text.crt.random)][user][same_impl]
 [if(__SIZEOF_LONG__ == __SIZEOF_INT__), alias(rand)]
 random:() -> long {
 	return (long)rand();
 }
-[if(__SIZEOF_LONG__ == __SIZEOF_INT__), alias(srand)]
+[if(__SIZEOF_LONG__ == __SIZEOF_INT__), alias(srand)][user][same_impl]
 srandom:(unsigned int seed) {
 	srand((long)seed);
 }
@@ -2076,9 +2077,10 @@ _mbstowcs_s_l:(size_t *presult, wchar_t *buf, size_t buflen, char const *src, si
 
 %[default_impl_section(.text.crt.dos.random)]
 [dependency_include(<parts/errno.h>)][ATTR_NONNULL((1))]
+[user][same_impl][dos_variant]
 rand_s:(unsigned int *__restrict randval) -> errno_t{
 	if (!randval)
-		return __EINVAL;
+		return @__EINVAL@;
 	*randval = rand();
 	return 0;
 }

@@ -1,4 +1,4 @@
-/* HASH 0x4549cbb3 */
+/* HASH 0xd7502e8b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ __CREDIRECT_VOID(,__NOTHROW,__localdep_srand,(long __seed),srandom,(__seed))
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(srandom) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(srandom))(unsigned int __seed) {
-#line 1186 "kos/src/libc/magic/stdlib.c"
+#line 1187 "kos/src/libc/magic/stdlib.c"
 	__localdep_srand((long)__seed);
 }
 __NAMESPACE_LOCAL_END

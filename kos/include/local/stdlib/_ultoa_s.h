@@ -1,4 +1,4 @@
-/* HASH 0xa3dfbfa4 */
+/* HASH 0x7cb14bbd */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ultoa_s))(unsigned long __val,
                                                       char *__buf,
                                                       __SIZE_TYPE__ __bufsize,
                                                       int __radix) {
-#line 1893 "kos/src/libc/magic/stdlib.c"
+#line 1894 "kos/src/libc/magic/stdlib.c"
 	char *__p;
 	unsigned long __temp;
 	if (__radix < 2)

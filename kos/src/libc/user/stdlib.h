@@ -1,4 +1,4 @@
-/* HASH 0x8fce7d13 */
+/* HASH 0x13b7ed16 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,6 +37,8 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_atexit)(__atexit_func_t func);
 INTDEF ATTR_NORETURN void (LIBCCALL libc_quick_exit)(int status) __THROWS(...);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_at_quick_exit)(__atexit_func_t func);
 INTDEF ATTR_NORETURN void (LIBCCALL libc__Exit)(int status);
+INTDEF void NOTHROW(LIBCCALL libc_srand)(long seed);
+INTDEF int NOTHROW(LIBCCALL libc_rand)(void);
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_drand48_r)(struct drand48_data *__restrict buffer, double *__restrict result);
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_erand48_r)(unsigned short xsubi[3], struct drand48_data *__restrict buffer, double *__restrict result);
 INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_lrand48_r)(struct drand48_data *__restrict buffer, long *__restrict result);
@@ -55,6 +57,7 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_clearenv)(void);
 INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_mkstemps)(char *template_, int suffixlen);
 INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_rpmatch)(char const *response);
 INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_mkstemps64)(char *template_, int suffixlen);
+INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_rand_r)(unsigned int *__restrict seed);
 INTDEF int NOTHROW_RPC(LIBCCALL libc_getloadavg)(double loadavg[], int nelem);
 INTDEF double NOTHROW_NCX(LIBCCALL libc_drand48)(void);
 INTDEF long NOTHROW_NCX(LIBCCALL libc_lrand48)(void);
@@ -66,6 +69,8 @@ INTDEF void NOTHROW_NCX(LIBCCALL libc_srand48)(long seedval);
 INTDEF NONNULL((1)) unsigned short *NOTHROW_NCX(LIBCCALL libc_seed48)(unsigned short seed16v[3]);
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_lcong48)(unsigned short param[7]);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_putenv)(char *string);
+INTDEF long NOTHROW_NCX(LIBCCALL libc_random)(void);
+INTDEF void NOTHROW_NCX(LIBCCALL libc_srandom)(unsigned int seed);
 INTDEF NONNULL((2)) char *NOTHROW_NCX(LIBCCALL libc_initstate)(unsigned int seed, char *statebuf, size_t statelen);
 INTDEF NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_setstate)(char *statebuf);
 INTDEF WUNUSED char *NOTHROW_NCX(LIBCCALL libc_l64a)(long n);
@@ -140,6 +145,8 @@ INTDEF ATTR_CONST char32_t ***NOTHROW_NCX(LIBCCALL libc___p___winitenv)(void);
 INTDEF ATTR_CONST char16_t ***NOTHROW_NCX(LIBDCALL libd___p___winitenv)(void);
 INTDEF NONNULL((1, 2, 4)) errno_t NOTHROW_NCX(LIBCCALL libc_getenv_s)(size_t *psize, char *buf, rsize_t bufsize, char const *varname);
 INTDEF NONNULL((1, 2, 3)) errno_t NOTHROW_NCX(LIBCCALL libc__dupenv_s)(char **__restrict pbuf, size_t *pbuflen, char const *varname);
+INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_rand_s)(unsigned int *__restrict randval);
+INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd_rand_s)(unsigned int *__restrict randval);
 INTDEF WUNUSED ATTR_MALL_DEFAULT_ALIGNED ATTR_ALLOC_SIZE((2, 3)) void *NOTHROW_NCX(LIBCCALL libc__recalloc)(void *mptr, size_t count, size_t num_bytes);
 INTDEF WUNUSED ATTR_ALLOC_ALIGN(2) ATTR_ALLOC_SIZE((1)) ATTR_MALLOC void *NOTHROW_NCX(LIBCCALL libc__aligned_malloc)(size_t num_bytes, size_t min_alignment);
 INTDEF WUNUSED ATTR_ALLOC_ALIGN(1) ATTR_MALLOC void *NOTHROW_NCX(LIBCCALL libc__aligned_offset_malloc)(size_t num_bytes, size_t min_alignment, size_t offset);

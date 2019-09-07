@@ -1,4 +1,4 @@
-/* HASH 0x9ffd714f */
+/* HASH 0x11703fee */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ __LOCAL_LIBC(strto32) __ATTR_LEAF __ATTR_NONNULL((1)) __INT32_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strto32))(char const *__restrict __nptr,
                                                      char **__endptr,
                                                      int __base) {
-#line 837 "kos/src/libc/magic/stdlib.c"
+#line 838 "kos/src/libc/magic/stdlib.c"
 	__UINT32_TYPE__ __result;
 	__BOOL __neg = 0;
 	while (*__nptr == '-') {

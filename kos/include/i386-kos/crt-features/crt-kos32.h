@@ -123,6 +123,7 @@
 #define __CRT_HAVE_DOS$putwchar 1
 #define __CRT_HAVE_DOS$putwchar_unlocked 1
 #define __CRT_HAVE_DOS$raise 1
+#define __CRT_HAVE_DOS$rand_s 1
 #define __CRT_HAVE_DOS$signal 1
 #define __CRT_HAVE_DOS$stat 1
 #define __CRT_HAVE_DOS$stat64 1

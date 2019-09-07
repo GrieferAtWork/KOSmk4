@@ -1,4 +1,4 @@
-/* HASH 0x4b68d650 */
+/* HASH 0x42b99804 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_atoll_l) __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) __LONGLONG
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_atoll_l))(char const *__restrict __nptr,
                                                       __locale_t __locale) {
-#line 1703 "kos/src/libc/magic/stdlib.c"
+#line 1704 "kos/src/libc/magic/stdlib.c"
 	return __localdep_strtoll_l(__nptr, __NULLPTR, 10, __locale);
 }
 __NAMESPACE_LOCAL_END

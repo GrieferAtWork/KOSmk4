@@ -30,8 +30,11 @@
 #include <unistd.h>
 
 #include <parts/errno.h>
+#include <parts/dos/errno.h>
 #include <kos/process.h>
+#include <hybrid/atomic.h>
 #include <hybrid/sync/atomic-once.h>
+#include <hybrid/align.h>
 
 DECL_BEGIN
 
@@ -41,7 +44,7 @@ DECL_BEGIN
 
 
 DEFINE_PUBLIC_ALIAS(__cxa_atexit, libc___cxa_atexit);
-INTERN int
+INTERN ATTR_SECTION(".text.crt.sched.process.__cxa_atexit") int
 NOTHROW_NCX(LIBCCALL libc___cxa_atexit)(void (LIBCCALL *func)(void *arg),
                                         void *arg, void *dso_handle) {
 	/* NOTE: I don't really understand why this function is even necessary...
@@ -63,6 +66,114 @@ NOTHROW_NCX(LIBCCALL libc___cxa_atexit)(void (LIBCCALL *func)(void *arg),
 
 /*[[[start:implementation]]]*/
 
+
+PRIVATE ATTR_SECTION(".rodata.crt.random.rand_map") u32 const rand_map[] = {
+	0x11e0ebcc, 0xa914eba6, 0xe400e438, 0xa6c4a4df,
+	0x0da46171, 0x4b9a27d1, 0x201910ae, 0x95e213cb,
+	0xd5ce0943, 0x00005fdc, 0x0319257d, 0x09280b06,
+	0x1148c0a6, 0x07a24139, 0x021214a6, 0x03221af8
+};
+PRIVATE ATTR_SECTION(".bss.crt.random.seed") u32 libc_seed = 0;
+PRIVATE ATTR_SECTION(".text.crt.random.seed") unsigned int
+NOTHROW(LIBCCALL libc_do_random)(unsigned int *pseed) {
+	unsigned int old_seed, new_seed;
+	do {
+		new_seed = old_seed = ATOMIC_READ(*pseed);
+		new_seed = (((new_seed + 7) << 1) / 3);
+		new_seed ^= rand_map[(new_seed >> (new_seed & 7)) % COMPILER_LENOF(rand_map)];
+	} while (!ATOMIC_CMPXCH_WEAK(*pseed, old_seed, new_seed));
+	return old_seed;
+}
+
+/*[[[head:srand,hash:0xead28f05]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.random.srand") void
+NOTHROW(LIBCCALL libc_srand)(long seed)
+/*[[[body:srand]]]*/
+{
+	libc_seed = (u32)(unsigned long)seed;
+}
+/*[[[end:srand]]]*/
+
+/*[[[head:rand,hash:0x6e81972d]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.random.rand") int
+NOTHROW(LIBCCALL libc_rand)(void)
+/*[[[body:rand]]]*/
+{
+	unsigned int result;
+	result = libc_do_random(&libc_seed);
+#if IS_POWER_OF_TWO(RAND_MAX + 1)
+	return (int)(result & RAND_MAX);
+#else
+	return (int)(result % (RAND_MAX + 1));
+#endif
+}
+/*[[[end:rand]]]*/
+
+/*[[[head:rand_r,hash:0xa94f649b]]]*/
+INTERN NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.random.rand_r") int
+NOTHROW_NCX(LIBCCALL libc_rand_r)(unsigned int *__restrict seed)
+/*[[[body:rand_r]]]*/
+{
+	unsigned int result;
+	result = libc_do_random(seed);
+#if IS_POWER_OF_TWO(RAND_MAX + 1)
+	return (int)(result & RAND_MAX);
+#else
+	return (int)(result % (RAND_MAX + 1));
+#endif
+}
+/*[[[end:rand_r]]]*/
+
+/*[[[impl:random]]]*/
+/*[[[impl:srandom]]]*/
+#if __SIZEOF_LONG__ == __SIZEOF_INT__
+DEFINE_INTERN_ALIAS(libc_random, libc_rand);
+DEFINE_INTERN_ALIAS(libc_srandom, libc_srand);
+#else
+INTERN ATTR_SECTION(".text.crt.random.random") long
+NOTHROW_NCX(LIBCCALL libc_random)(void) {
+#if __SIZEOF_LONG__ == __SIZEOF_INT__ * 2
+	unsigned long result;
+	result = (unsigned long)libc_do_random(&libc_seed) |
+	         (unsigned long)libc_do_random(&libc_seed) << 31;
+	return result & LONG_MAX;
+#else
+	return (long)libc_rand();
+#endif
+}
+INTERN ATTR_SECTION(".text.crt.random.srandom") void
+NOTHROW_NCX(LIBCCALL libc_srandom)(unsigned int seed) {
+	libc_srand((long)seed);
+}
+#endif
+
+
+/*[[[head:rand_s,hash:0x2b627550]]]*/
+INTERN NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.random.rand_s") errno_t
+NOTHROW_NCX(LIBCCALL libc_rand_s)(unsigned int *__restrict randval)
+/*[[[body:rand_s]]]*/
+/*AUTO*/{
+	if (!randval)
+		return __EINVAL;
+	*randval = libc_rand();
+	return 0;
+}
+/*[[[end:rand_s]]]*/
+
+/*[[[head:DOS$rand_s,hash:0x68d9bf44]]]*/
+INTERN NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.random.rand_s") errno_t
+NOTHROW_NCX(LIBDCALL libd_rand_s)(unsigned int *__restrict randval)
+/*[[[body:DOS$rand_s]]]*/
+{
+	if (!randval)
+		return __DOS_EINVAL;
+	*randval = libc_rand();
+	return 0;
+}
+/*[[[end:DOS$rand_s]]]*/
 
 
 
@@ -1459,7 +1570,7 @@ NOTHROW_NCX(LIBCCALL libc__beep)(unsigned int freq,
 
 
 
-/*[[[start:exports,hash:0x921d191d]]]*/
+/*[[[start:exports,hash:0x91add85b]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(getenv, libc_getenv);
 DEFINE_PUBLIC_WEAK_ALIAS(system, libc_system);
 DEFINE_PUBLIC_WEAK_ALIAS(abort, libc_abort);
@@ -1469,6 +1580,8 @@ DEFINE_PUBLIC_WEAK_ALIAS(quick_exit, libc_quick_exit);
 DEFINE_PUBLIC_WEAK_ALIAS(at_quick_exit, libc_at_quick_exit);
 DEFINE_PUBLIC_WEAK_ALIAS(_Exit, libc__Exit);
 DEFINE_PUBLIC_WEAK_ALIAS(_exit, libc__Exit);
+DEFINE_PUBLIC_WEAK_ALIAS(srand, libc_srand);
+DEFINE_PUBLIC_WEAK_ALIAS(rand, libc_rand);
 DEFINE_PUBLIC_WEAK_ALIAS(drand48_r, libc_drand48_r);
 DEFINE_PUBLIC_WEAK_ALIAS(erand48_r, libc_erand48_r);
 DEFINE_PUBLIC_WEAK_ALIAS(lrand48_r, libc_lrand48_r);
@@ -1487,6 +1600,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(clearenv, libc_clearenv);
 DEFINE_PUBLIC_WEAK_ALIAS(mkstemps, libc_mkstemps);
 DEFINE_PUBLIC_WEAK_ALIAS(rpmatch, libc_rpmatch);
 DEFINE_PUBLIC_WEAK_ALIAS(mkstemps64, libc_mkstemps64);
+DEFINE_PUBLIC_WEAK_ALIAS(rand_r, libc_rand_r);
 DEFINE_PUBLIC_WEAK_ALIAS(getloadavg, libc_getloadavg);
 DEFINE_PUBLIC_WEAK_ALIAS(drand48, libc_drand48);
 DEFINE_PUBLIC_WEAK_ALIAS(lrand48, libc_lrand48);
@@ -1499,6 +1613,8 @@ DEFINE_PUBLIC_WEAK_ALIAS(seed48, libc_seed48);
 DEFINE_PUBLIC_WEAK_ALIAS(lcong48, libc_lcong48);
 DEFINE_PUBLIC_WEAK_ALIAS(putenv, libc_putenv);
 DEFINE_PUBLIC_WEAK_ALIAS(_putenv, libc_putenv);
+DEFINE_PUBLIC_WEAK_ALIAS(random, libc_random);
+DEFINE_PUBLIC_WEAK_ALIAS(srandom, libc_srandom);
 DEFINE_PUBLIC_WEAK_ALIAS(initstate, libc_initstate);
 DEFINE_PUBLIC_WEAK_ALIAS(setstate, libc_setstate);
 DEFINE_PUBLIC_WEAK_ALIAS(l64a, libc_l64a);
@@ -1542,6 +1658,8 @@ DEFINE_PUBLIC_WEAK_ALIAS(__p___winitenv, libc___p___winitenv);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$__p___winitenv, libd___p___winitenv);
 DEFINE_PUBLIC_WEAK_ALIAS(getenv_s, libc_getenv_s);
 DEFINE_PUBLIC_WEAK_ALIAS(_dupenv_s, libc__dupenv_s);
+DEFINE_PUBLIC_WEAK_ALIAS(rand_s, libc_rand_s);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$rand_s, libd_rand_s);
 DEFINE_PUBLIC_WEAK_ALIAS(_recalloc, libc__recalloc);
 DEFINE_PUBLIC_WEAK_ALIAS(_aligned_malloc, libc__aligned_malloc);
 DEFINE_PUBLIC_WEAK_ALIAS(_aligned_offset_malloc, libc__aligned_offset_malloc);

@@ -1,4 +1,4 @@
-/* HASH 0xa2b2b4ef */
+/* HASH 0xfcf4cf42 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ecvt_s))(char *__buf,
                                                      int __ndigit,
                                                      int *__restrict __decptr,
                                                      int *__restrict __sign) {
-#line 2296 "kos/src/libc/magic/stdlib.c"
+#line 2298 "kos/src/libc/magic/stdlib.c"
 	if (!__buf || !__decptr || !__sign)
 		return __EINVAL;
 	__localdep_ecvt_r(__val, __ndigit, __decptr, __sign, __buf, __buflen);

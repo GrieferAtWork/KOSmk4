@@ -1,4 +1,4 @@
-/* HASH 0x222470b7 */
+/* HASH 0xb8bb5530 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1604,7 +1604,6 @@ __CRT_FUNCTION(qsort_s,0,(),5,(void *,base,size_t,nmemb,size_t,size,__dos_compar
 __CRT_FUNCTION(quick_exit,0,(),1,(int,status),void)
 __CRT_FUNCTION(rand,0,(),0,(),int)
 __CRT_FUNCTION(rand_r,0,(),1,(unsigned int *__restrict,seed),int)
-__CRT_FUNCTION(rand_s,0,(),1,(unsigned int *__restrict,randval),errno_t)
 __CRT_FUNCTION(random,0,(),0,(),long)
 __CRT_FUNCTION(random_r,0,(),2,(struct random_data *__restrict,buf,int32_t *__restrict,result),int)
 __CRT_FUNCTION(rawmemchr,0,(),2,(void const *__restrict,haystack,int,needle),void *)
@@ -3150,6 +3149,7 @@ __CRT_KOS_WCHAR_FUNCTION(putwc_unlocked,0,(),2,(char32_t,wc,FILE *__restrict,str
 __CRT_KOS_WCHAR_FUNCTION(putwchar,0,(),1,(char32_t,wc),wint_t)
 __CRT_KOS_WCHAR_FUNCTION(putwchar_unlocked,0,(),1,(char32_t,wc),wint_t)
 __CRT_KOS_WCHAR_FUNCTION(raise,0,(),1,(int,signo),int)
+__CRT_KOS_WCHAR_FUNCTION(rand_s,0,(),1,(unsigned int *__restrict,randval),errno_t)
 __CRT_KOS_WCHAR_FUNCTION(signal,0,(),2,(int,signo,sighandler_t,handler),sighandler_t)
 __CRT_KOS_WCHAR_FUNCTION(swprintf,0,(),VA(3),(char32_t *__restrict,buf,size_t,buflen,char32_t const *__restrict,format),__STDC_INT_AS_SIZE_T)
 __CRT_KOS_WCHAR_FUNCTION(swscanf,0,(),VA(2),(char32_t const *__restrict,src,char32_t const *__restrict,format),__STDC_INT_AS_SIZE_T)
@@ -3392,6 +3392,7 @@ __CRT_DOS_WCHAR_FUNCTION(putwc_unlocked,0,(),2,(char16_t,wc,FILE *__restrict,str
 __CRT_DOS_WCHAR_FUNCTION(putwchar,0,(),1,(char16_t,wc),wint_t)
 __CRT_DOS_WCHAR_FUNCTION(putwchar_unlocked,0,(),1,(char16_t,wc),wint_t)
 __CRT_DOS_WCHAR_FUNCTION(raise,0,(),1,(int,signo),int)
+__CRT_DOS_WCHAR_FUNCTION(rand_s,0,(),1,(unsigned int *__restrict,randval),errno_t)
 __CRT_DOS_WCHAR_FUNCTION(signal,0,(),2,(int,signo,sighandler_t,handler),sighandler_t)
 __CRT_DOS_WCHAR_FUNCTION(swprintf,0,(),VA(3),(char16_t *__restrict,buf,size_t,buflen,char16_t const *__restrict,format),__STDC_INT_AS_SIZE_T)
 __CRT_DOS_WCHAR_FUNCTION(swscanf,0,(),VA(2),(char16_t const *__restrict,src,char16_t const *__restrict,format),__STDC_INT_AS_SIZE_T)

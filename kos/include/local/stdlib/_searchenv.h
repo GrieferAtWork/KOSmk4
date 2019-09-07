@@ -1,4 +1,4 @@
-/* HASH 0x99198dbe */
+/* HASH 0x8d76485f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ __LOCAL_LIBC(_searchenv) __ATTR_NONNULL((1, 2, 3)) void
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_searchenv))(char const *__file,
                                                         char const *__envvar,
                                                         char *__restrict __resultpath) {
-#line 2448 "kos/src/libc/magic/stdlib.c"
+#line 2450 "kos/src/libc/magic/stdlib.c"
 	__localdep__searchenv_s(__file, __envvar, __resultpath, (__SIZE_TYPE__)-1);
 }
 __NAMESPACE_LOCAL_END
