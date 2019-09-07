@@ -168,6 +168,16 @@ MAKE_PARALLEL_COUNT=$(grep -c ^processor /proc/cpuinfo)
 case $UTILITY_NAME in
 
 ##############################################################################
+	all)
+		cmd bash "$KOS_MISC/make_utility.sh" "$TARGET_NAME" busybox
+		cmd bash "$KOS_MISC/make_utility.sh" "$TARGET_NAME" vitetris
+		cmd bash "$KOS_MISC/make_utility.sh" "$TARGET_NAME" tcc
+		cmd bash "$KOS_MISC/make_utility.sh" "$TARGET_NAME" kos-headers
+		;;
+##############################################################################
+
+
+##############################################################################
 	busybox | busybox-1.31.0)
 		BUSYBOX_VERISON="1.31.0"
 		## Check final output binary
