@@ -1039,7 +1039,12 @@ struct instruction {
 #endif
 
 
+/* clang-format off */
 PRIVATE struct instruction const ops[] = {
+/*[[[start:ops]]]*/
+	/* REMINDER: After adding/removing instructions from this table, you must run:
+	 *           $ deemon -F kos/src/libdisasm/x86.c */
+
 	{ 0x00, IF_MODRM,        "addb\t" OP_RM8  OP_R8 },
 	{ 0x01, IF_66|IF_MODRM,  "addw\t" OP_RM16 OP_R16 },
 	{ 0x01, IF_MODRM,        "addl\t" OP_RM32 OP_R32 },
@@ -1989,10 +1994,10 @@ PRIVATE struct instruction const ops[] = {
 	{ 0xe9, IF_66|IF_X32,     "jmpw\t" OP_DISP16 },
 	{ 0xe9, 0,                "jmp\t" OP_DISP32 },
 #else
-	{ 0xe8, IF_66,            "callw\t" OP_DISP16 },
-	{ 0xe8, 0,                "call\t" OP_DISP32 },
-	{ 0xe9, IF_66,            "jmpw\t" OP_DISP16 },
-	{ 0xe9, 0,                "jmp\t" OP_DISP32 },
+/*	{ 0xe8, IF_66,            "callw\t" OP_DISP16 }, */
+/*	{ 0xe8, 0,                "call\t" OP_DISP32 }, */
+/*	{ 0xe9, IF_66,            "jmpw\t" OP_DISP16 }, */
+/*	{ 0xe9, 0,                "jmp\t" OP_DISP32 }, */
 #endif
 	{ 0xea, IF_67,            "ljmpw\t" OP_LJMP },
 	{ 0xea, 0,                "ljmpl\t" OP_LJMP },
@@ -2082,9 +2087,16 @@ PRIVATE struct instruction const ops[] = {
 	{ 0xff, IF_REXW|IF_MODRM|IF_REG6, "pushq\t" OP_RM64 },
 
 	{ 0, 0, { 0 } }
+/*[[[end:ops]]]*/
 };
+/* clang-format on */
 
+
+/* clang-format off */
 PRIVATE struct instruction const ops_0f[] = {
+/*[[[start:ops_0f]]]*/
+	/* REMINDER: After adding/removing instructions from this table, you must run:
+	 *           $ deemon -F kos/src/libdisasm/x86.c */
 	{ 0x00, IF_MODRM|IF_REG0, "sldt\t" OP_RM16 },
 	{ 0x00, IF_MODRM|IF_REG1, "str\t"  OP_RM16 },
 	{ 0x00, IF_MODRM|IF_REG2, "lldt\t" OP_RM16 },
@@ -2430,9 +2442,9 @@ PRIVATE struct instruction const ops_0f[] = {
 	{ 0xbd, IF_66|IF_MODRM,  "bsrw\t" OP_RM16 OP_R16 },
 	{ 0xbd, IF_MODRM,        "bsrl\t" OP_RM32 OP_R32 },
 	{ 0xbd, IF_REXW|IF_MODRM,"bsrq\t" OP_RM64 OP_R64 },
-	{ 0xbc, IF_F3|IF_66|IF_MODRM,  "lzcntw\t" OP_RM16 OP_R16 },
-	{ 0xbc, IF_F3|IF_MODRM,        "lzcntl\t" OP_RM32 OP_R32 },
-	{ 0xbc, IF_F3|IF_REXW|IF_MODRM,"lzcntq\t" OP_RM64 OP_R64 },
+	{ 0xbd, IF_F3|IF_66|IF_MODRM,  "lzcntw\t" OP_RM16 OP_R16 },
+	{ 0xbd, IF_F3|IF_MODRM,        "lzcntl\t" OP_RM32 OP_R32 },
+	{ 0xbd, IF_F3|IF_REXW|IF_MODRM,"lzcntq\t" OP_RM64 OP_R64 },
 
 	{ 0xbe, IF_66|IF_MODRM,  "movsbw\t" OP_RM8 OP_R32 },
 	{ 0xbe, IF_MODRM,        "movsbl\t" OP_RM8 OP_R32 },
@@ -2493,12 +2505,18 @@ PRIVATE struct instruction const ops_0f[] = {
 	{ 0xff, IF_MODRM,        "ud0\t" OP_RM32 OP_R32 },
 
 	{ 0, 0, { 0 } }
+/*[[[end:ops_0f]]]*/
 };
+/* clang-format on */
 
 
+/* clang-format off */
 PRIVATE struct instruction const ops_0f38[] = {
-	/* 0x0f38XX */
+/*[[[start:ops_0f38]]]*/
+	/* REMINDER: After adding/removing instructions from this table, you must run:
+	 *           $ deemon -F kos/src/libdisasm/x86.c */
 
+	/* 0x0f38XX */
 	{ 0xf0, IF_66|IF_MODRM/*|IF_RMM*/,   "movbew\t" OP_RM16 OP_R16 }, /* KOS Emulates the register variant */
 	{ 0xf0, IF_MODRM/*|IF_RMM*/,         "movbel\t" OP_RM32 OP_R32 },
 	{ 0xf0, IF_REXW|IF_MODRM/*|IF_RMM*/, "movbeq\t" OP_RM64 OP_R64 },
@@ -2545,17 +2563,179 @@ PRIVATE struct instruction const ops_0f38[] = {
 	{ 0xf7, IF_F2|IF_VEXW1|IF_MODRM, "shrxq\t" OP_VR64 OP_RM64 OP_R64 },
 
 	{ 0, 0, { 0 } }
+/*[[[end:ops_0f38]]]*/
 };
-PRIVATE struct instruction const ops_0f3a[] = {
-	/* 0x0f3aXX */
+/* clang-format on */
 
+/* clang-format off */
+PRIVATE struct instruction const ops_0f3a[] = {
+/*[[[start:ops_0f3a]]]*/
+	/* REMINDER: After adding/removing instructions from this table, you must run:
+	 *           $ deemon -F kos/src/libdisasm/x86.c */
+
+	/* 0x0f3aXX */
 	{ 0xf0, IF_F2|IF_VEXW0|IF_MODRM, "rorxl\t" OP_U8 OP_RM32 OP_R32 },
 	{ 0xf0, IF_F2|IF_VEXW1|IF_MODRM, "rorxq\t" OP_U8 OP_RM64 OP_R64 },
 
 
 	{ 0, 0, { 0 } }
+/*[[[end:ops_0f3a]]]*/
+};
+/* clang-format on */
+
+
+/*[[[deemon
+import * from deemon;
+local mytext = File.open(__FILE__, "r").read().decode("utf-8");
+
+@@Calculate the offsets of opcodes and return a 256-element vector of offset indices
+@@The return value is (OffsetTable, OpcodeCount)
+function calculateOpcodeOffsets(start: string, end: string): ({int...}, int) {
+	local data = mytext[mytext.index(start)+#start:mytext.index(end)].strip();
+	local result = [none] * 256;
+	local prev_opcode = -1;
+	local curr_offset = 0;
+	for (local l: data.splitlines(false)) {
+		l = l.lstrip();
+		if (!l.startswith("{"))
+			continue;
+		local line_opcode;
+		try {
+			line_opcode = l.scanf("{ %[xX0-9a-fA-F]")...;
+		} catch (...) {
+			print File.stderr: "ERROR: Failed to parse line:", repr l;
+			throw;
+		}
+		if (line_opcode == "0")
+			continue;
+		line_opcode = int(line_opcode);
+		if (line_opcode < prev_opcode) {
+			print File.stderr: "ERROR: Invalid opcode ordering";
+			print File.stderr: "Line for opcode", line_opcode.hex(), ":", repr l;
+			print File.stderr: "Should come before line for opcode", prev_opcode.hex();
+			throw Error("Invalid opcode ordering");
+		}
+		if (result[line_opcode] is none)
+			result[line_opcode] = curr_offset;
+		prev_opcode = line_opcode;
+		++curr_offset;
+	}
+	for (local i: [:256]) {
+		// All undefined opcodes should point at the end of the tables.
+		if (result[i] is none)
+			result[i] = curr_offset;
+	}
+	return (result, curr_offset + 1);
+}
+
+function generateOffsetTable(name: string) {
+	final local START_MARKER_PATTERN = "/" "*[[[start:{}]]]*" "/";
+	final local END_MARKER_PATTERN = "/" "*[[[end:{}]]]*" "/";
+	local offsets, count = calculateOpcodeOffsets(
+		START_MARKER_PATTERN.format({ name }),
+		END_MARKER_PATTERN.format({ name }))...;
+	local maxOffset = offsets[0xff];
+	local offsetType = "u8";
+	if (maxOffset > 0xff)
+		offsetType = "u16";
+	if (maxOffset > 0xffff)
+		offsetType = "u32";
+	print "#define HAVE_",;
+	print name.upper(),;
+	print "_OFFSETS 1";
+	print "STATIC_ASSERT(COMPILER_LENOF(",;
+	print name,;
+	print ") == ",;
+	print count,;
+	print ");";
+	print "PRIVATE ",;
+	print offsetType,;
+	print " const ",;
+	print name,;
+	print "_offsets[256] = {";
+	for (local i: [:256]) {
+		if ((i % 16) == 0)
+			print "\t",;
+		else {
+			print " ",;
+		}
+		print offsets[i],;
+		if (i != 255)
+			print ",",;
+		if ((i % 16) == 15)
+			print "\n",;
+	}
+	print "};";
+	print;
+}
+generateOffsetTable("ops");
+generateOffsetTable("ops_0f");
+generateOffsetTable("ops_0f38");
+//generateOffsetTable("ops_0f3a"); // Not needed (yet)
+]]]*/
+#define HAVE_OPS_OFFSETS 1
+STATIC_ASSERT(COMPILER_LENOF(ops) == 924);
+PRIVATE u16 const ops_offsets[256] = {
+	0, 1, 4, 5, 8, 9, 12, 14, 16, 17, 20, 21, 24, 25, 28, 923,
+	30, 31, 34, 35, 38, 39, 42, 44, 46, 47, 50, 51, 54, 55, 58, 60,
+	62, 63, 66, 67, 70, 71, 923, 74, 75, 76, 79, 80, 83, 84, 923, 87,
+	88, 89, 92, 93, 96, 97, 923, 100, 101, 102, 105, 106, 109, 110, 923, 113,
+	114, 116, 118, 120, 122, 124, 126, 128, 130, 132, 134, 136, 138, 140, 142, 144,
+	146, 150, 154, 158, 162, 166, 170, 174, 178, 182, 186, 190, 194, 198, 202, 206,
+	210, 212, 214, 216, 923, 923, 923, 923, 217, 220, 223, 224, 227, 229, 233, 235,
+	239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254,
+	255, 263, 287, 295, 303, 304, 307, 308, 311, 312, 315, 316, 319, 321, 324, 326,
+	332, 338, 344, 350, 356, 362, 368, 374, 380, 381, 383, 385, 387, 389, 391, 392,
+	393, 395, 399, 401, 405, 407, 413, 416, 425, 426, 429, 431, 437, 439, 445, 448,
+	457, 459, 461, 463, 465, 467, 469, 471, 473, 479, 485, 491, 497, 503, 509, 515,
+	521, 529, 545, 547, 549, 551, 553, 555, 560, 561, 562, 563, 564, 565, 566, 567,
+	571, 579, 603, 611, 635, 636, 637, 638, 639, 655, 708, 721, 745, 759, 794, 809,
+	834, 835, 836, 837, 840, 841, 843, 844, 846, 848, 850, 852, 853, 854, 856, 857,
+	923, 859, 923, 923, 860, 861, 862, 870, 894, 895, 896, 897, 898, 899, 900, 902
 };
 
+#define HAVE_OPS_0F_OFFSETS 1
+STATIC_ASSERT(COMPILER_LENOF(ops_0f) == 348);
+PRIVATE u16 const ops_0f_offsets[256] = {
+	0, 6, 36, 38, 347, 40, 42, 43, 45, 46, 47, 48, 347, 49, 347, 347,
+	347, 347, 347, 347, 347, 347, 347, 347, 50, 347, 54, 60, 65, 347, 347, 66,
+	68, 70, 72, 74, 76, 347, 77, 347, 347, 347, 347, 347, 347, 347, 347, 347,
+	78, 79, 80, 81, 82, 83, 84, 85, 347, 347, 347, 347, 347, 347, 347, 86,
+	87, 90, 93, 96, 99, 102, 105, 108, 111, 114, 117, 120, 123, 126, 129, 132,
+	347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347,
+	347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347,
+	347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347,
+	135, 137, 139, 141, 143, 145, 147, 149, 151, 153, 155, 157, 159, 161, 163, 165,
+	167, 168, 169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182,
+	183, 186, 189, 190, 193, 196, 347, 347, 199, 202, 205, 206, 209, 212, 215, 239,
+	242, 243, 246, 249, 252, 255, 258, 261, 263, 266, 267, 279, 282, 288, 294, 297,
+	299, 300, 347, 347, 347, 347, 347, 303, 314, 318, 322, 326, 330, 334, 338, 342,
+	347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347,
+	347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347,
+	347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 347, 346
+};
+
+#define HAVE_OPS_0F38_OFFSETS 1
+STATIC_ASSERT(COMPILER_LENOF(ops_0f38) == 40);
+PRIVATE u8 const ops_0f38_offsets[256] = {
+	39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39,
+	39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39,
+	39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39,
+	39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39,
+	39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39,
+	39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39,
+	39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39,
+	39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39,
+	39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39,
+	39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39,
+	39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39,
+	39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39,
+	39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39,
+	39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39,
+	39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39, 39,
+	0, 5, 11, 13, 39, 19, 25, 31, 39, 39, 39, 39, 39, 39, 39, 39
+};
+//[[[end]]]
 
 
 #ifdef CONFIG_AUTOSELECT_JCC
@@ -2731,16 +2911,45 @@ print_byte:
 	/* Print the instruction. */
 	if (opcode <= 0xff) {
 		chain = ops;
+#ifdef HAVE_OPS_OFFSETS
+		chain += ops_offsets[opcode];
+#endif /* HAVE_OPS_OFFSETS */
 	} else if ((opcode & 0xff00) == 0x0f00) {
 		/* Multi-byte opcodes. */
-		chain = (opcode & 0xffff00) == 0x0f3800 ? ops_0f38 : (opcode & 0xffff00) == 0x0f3a00 ? ops_0f3a : ops_0f;
-		opcode &= 0xff;
+		if ((opcode & 0xffff00) == 0x0f3800) {
+			chain = ops_0f38;
+			opcode &= 0xff;
+#ifdef HAVE_OPS_0F38_OFFSETS
+			chain += ops_0f38_offsets[opcode];
+#endif /* HAVE_OPS_0F38_OFFSETS */
+		} else if ((opcode & 0xffff00) == 0x0f3a00) {
+			chain = ops_0f3a;
+			opcode &= 0xff;
+#ifdef HAVE_OPS_0F3A_OFFSETS
+			chain += ops_0f3a_offsets[opcode];
+#endif /* HAVE_OPS_0F3A_OFFSETS */
+		} else {
+			chain = ops_0f;
+			opcode &= 0xff;
+#ifdef HAVE_OPS_0F_OFFSETS
+			chain += ops_0f_offsets[opcode];
+#endif /* HAVE_OPS_0F_OFFSETS */
+		}
 	} else {
 		goto unknown_opcode;
 	}
+
+
 	for (; chain->i_repr[0]; ++chain) {
-		if (chain->i_opcode != opcode)
+		if (chain->i_opcode != opcode) {
+			if (chain->i_opcode > opcode) {
+				/* Opcodes are always sorted ascendingly, so if the encountered
+				 * code is greater than ours, then we know that we've already went
+				 * past what we were looking for. */
+				break;
+			}
 			continue;
+		}
 		if (((chain->i_flags & IF_REXW) != 0) !=
 		    ((flags & F_REX_W) != 0))
 			continue;
