@@ -21,6 +21,33 @@
 #define __option(x) 0
 #endif
 
+#ifndef __has_builtin
+#define __NO_has_builtin 1
+#define __has_builtin(x) 0
+#endif
+#ifndef __has_feature
+#define __NO_has_builtin 1
+#define __has_feature(x) 0
+#endif
+#ifndef __has_attribute
+#define __NO_has_attribute 1
+#define __has_attribute(x) 0
+#endif
+#ifndef __has_extension
+#ifndef __NO_has_feature
+#define __NO_has_extension 1
+#endif
+#define __has_extension  __has_feature
+#endif
+#ifndef __has_declspec_attribute
+#define __NO_has_declspec_attribute 1
+#define __has_declspec_attribute(x) 0
+#endif
+#ifndef __has_cpp_attribute
+#define __NO_has_cpp_attribute 1
+#define __has_cpp_attribute(x) 0
+#endif
+
 #if __has_builtin(__builtin_expect) || \
    (defined(__INTEL_VERSION__) && __INTEL_VERSION__ >= 800)
 #   define __likely(x)   (__builtin_expect(!!(x),1))
