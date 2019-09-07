@@ -85,7 +85,7 @@ PRIVATE struct basic_key const basic_keys_en_US[0xe0] = {
 	DEF(KEY_J, 'j', 'J'),
 	DEF(KEY_K, 'k', 'K'),
 	DEF(KEY_L, 'l', 'L'),
-	DEF(KEY_SEMICOLON, ';', ','),
+	DEF(KEY_SEMICOLON, ';', ':'),
 	DEF(KEY_SINGLEQUOTE, '\'', '\"'),
 
 	DEF(KEY_Z, 'z', 'Z'),
