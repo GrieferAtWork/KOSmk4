@@ -1,4 +1,4 @@
-/* HASH 0x21a519d5 */
+/* HASH 0xc80a1da */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -394,6 +394,10 @@ __DECL_BEGIN
 #define E_INVALID_ARGUMENT_CONTEXT_MKTTY_FLAGS 0x0059
 /* E_INVALID_ARGUMENT_BAD_VALUE: The `name' argument passed to `mktty()' is too long */
 #define E_INVALID_ARGUMENT_CONTEXT_MKTTY_NAME 0x005a
+/* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `type' argument passed to `faccessat()' isn't a set of `F_OK|R_OK|W_OK|X_OK' */
+#define E_INVALID_ARGUMENT_CONTEXT_FACCESSAT_TYPE 0x005b
+/* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `faccessat()' isn't a set of `0|AT_SYMLINK_NOFOLLOW|AT_EACCESS|AT_DOSPATH' */
+#define E_INVALID_ARGUMENT_CONTEXT_FACCESSAT_FLAGS 0x005c
 
 
 

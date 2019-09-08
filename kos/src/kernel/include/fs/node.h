@@ -1103,6 +1103,16 @@ inode_loadattr(struct inode *__restrict self)
 		THROWS(E_IOERROR, ...);
 
 
+/* Assert that the calling thread is allowed to access the given
+ * the specified file, throwing an `E_FSERROR_ACCESS_DENIED' if not.
+ * @param: type: Set of `R_OK | W_OK | X_OK' */
+FUNDEF NONNULL((1)) void KCALL
+inode_access(struct inode *__restrict self, unsigned int type)
+		THROWS(E_FSERROR_ACCESS_DENIED, E_IOERROR, ...);
+FUNDEF NONNULL((1)) bool KCALL
+inode_tryaccess(struct inode *__restrict self, unsigned int type)
+		THROWS(E_IOERROR, ...);
+
 
 struct stat;
 

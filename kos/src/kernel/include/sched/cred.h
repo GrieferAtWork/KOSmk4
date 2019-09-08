@@ -43,6 +43,9 @@ DECL_BEGIN
 #define cred_setsuid(v) (void)0
 #define cred_setsgid(v) (void)0
 
+#define cred_isgroupmember(gid) 1
+
+
 /* Credential assertion (throw an error if the caller doesn't have the required credential) */
 struct vm;
 

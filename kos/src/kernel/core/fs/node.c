@@ -25,7 +25,6 @@
 
 #include <fs/node.h>
 #include <fs/vfs.h>
-#include <bits/dirent.h>
 #include <kernel/aio.h>
 #include <kernel/cache.h>
 #include <kernel/debugger.h>
@@ -42,6 +41,7 @@
 #include <sched/cpu.h>
 #include <sched/rpc.h>
 #include <sched/signal.h>
+#include <sched/cred.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
@@ -49,8 +49,8 @@
 #include <hybrid/overflow.h>
 
 #include <bits/confname.h>
+#include <bits/dirent.h>
 #include <linux/limits.h>
-#include <sys/stat.h>
 #include <sys/stat.h>
 #include <sys/statfs.h>
 #include <sys/statvfs.h>
@@ -59,6 +59,7 @@
 #include <limits.h>
 #include <stddef.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "../memory/vm/vm-partapi.h"
 
@@ -643,6 +644,46 @@ inode_loadattr(struct inode *__restrict self)
 		/* Set the attributes-loaded flag. */
 		ATOMIC_FETCHOR(self->i_flags, INODE_FATTRLOADED);
 	}
+}
+
+
+
+/* Assert that the calling thread is allowed to access the given
+ * the specified file, throwing an `E_FSERROR_ACCESS_DENIED' if not.
+ * @param: type: Set of `R_OK | W_OK | X_OK' */
+PUBLIC NONNULL((1)) void KCALL
+inode_access(struct inode *__restrict self, unsigned int type)
+		THROWS(E_FSERROR_ACCESS_DENIED, E_IOERROR, ...) {
+	if unlikely(!inode_tryaccess(self, type))
+		THROW(E_FSERROR_ACCESS_DENIED);
+}
+
+PUBLIC NONNULL((1)) bool KCALL
+inode_tryaccess(struct inode *__restrict self, unsigned int type)
+		THROWS(E_IOERROR, ...) {
+	mode_t mode;
+	unsigned int how;
+	if unlikely(!type)
+		return true;
+	inode_loadattr(self);
+	COMPILER_READ_BARRIER();
+	mode = self->i_filemode;
+	for (how = 1; how <= 4; how <<= 1) {
+		if (!(type & how))
+			continue; /* Access not checked. */
+		if (mode & how)
+			continue; /* Access is allowed for everyone. */
+		if (mode & (how << 3)) {
+			if (cred_isgroupmember(self->i_filegid))
+				continue; /* The calling thread's user is part of the file owner's group */
+		}
+		if (mode & (how << 6)) {
+			if (self->i_fileuid == cred_getsuid())
+				continue; /* The calling thread's user is the file's owner */
+		}
+		return false;
+	}
+	return true;
 }
 
 
@@ -2449,10 +2490,9 @@ again:
 				inode_loadattr(node);
 				assert(node->i_filenlink != 0);
 				assert(node->i_super == self->i_super);
-				if (mode & DIRECTORY_REMOVE_FCHKACCESS) {
-					/* TODO: Check the file for being deleted by the calling thread. */
-					//THROW(E_FSERROR_ACCESS_DENIED);
-				}
+				/* Check the file for being deleted by the calling thread. */
+				if (mode & DIRECTORY_REMOVE_FCHKACCESS)
+					inode_access(node, W_OK);
 				if (INODE_ISDIR(node)) {
 					struct directory_node *dir;
 					if (!(mode & DIRECTORY_REMOVE_FDIRECTORY))
@@ -2774,11 +2814,9 @@ acquire_sourcedir_writelock:
 					REF struct directory_entry *existing_entry;
 					/* Check if the source node has been deleted. */
 					inode_check_deleted(source_inode);
-					if (mode & DIRECTORY_RENAME_FCHKACCESS) {
-						/* TODO: Check the file for being deleted by the calling thread. */
-						//THROW(E_FSERROR_ACCESS_DENIED);
-					}
-
+					/* Check the file for being deleted by the calling thread. */
+					if (mode & DIRECTORY_RENAME_FCHKACCESS)
+						inode_access(source_inode, W_OK);
 					/* Check if the target directory already contains a file with the given name. */
 					existing_entry = directory_getentry(target_directory,
 					                                    target_entry->de_name,

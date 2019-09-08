@@ -202,10 +202,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak dbg_fillrect; .long dbg_fillrect
 	.reloc ., R_386_SIZE32, dbg_fillrect; .long 0
 	.long 0xa9b5e64
-	.long 0 /* index: 50 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname50 /* index: 50 */
+	.weak inode_access; .long inode_access
+	.reloc ., R_386_SIZE32, inode_access; .long 0
+	.long 0x27cc613
 	.long .Lname51 /* index: 51 */
 	.weak kernel_panic; .long kernel_panic
 	.reloc ., R_386_SIZE32, kernel_panic; .long 0
@@ -1367,9 +1367,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, sys_socket; .long 0
 	.long 0x6a23154
 	.long .Lname341 /* index: 341 */
-	.weak inode_areadallv_phys; .long inode_areadallv_phys
-	.reloc ., R_386_SIZE32, inode_areadallv_phys; .long 0
-	.long 0xe6b7ab3
+	.weak task_alloc_user_rpc; .long task_alloc_user_rpc
+	.reloc ., R_386_SIZE32, task_alloc_user_rpc; .long 0
+	.long 0x79cab3
 	.long .Lname342 /* index: 342 */
 	.weak mouse_device_hwheel; .long mouse_device_hwheel
 	.reloc ., R_386_SIZE32, mouse_device_hwheel; .long 0
@@ -4747,9 +4747,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname1186 /* index: 1186 */
-	.weak dbg_isholding_ctrl; .long dbg_isholding_ctrl
-	.reloc ., R_386_SIZE32, dbg_isholding_ctrl; .long 0
-	.long 0xbab568c
+	.weak sys_fchown32; .long sys_fchown32
+	.reloc ., R_386_SIZE32, sys_fchown32; .long 0
+	.long 0xe6654a2
 	.long .Lname1187 /* index: 1187 */
 	.weak cpu_jiffies; .long cpu_jiffies
 	.reloc ., R_386_SIZE32, cpu_jiffies; .long 0
@@ -5775,9 +5775,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, json_writer_putnumber; .long 0
 	.long 0x7dac5a2
 	.long .Lname1443 /* index: 1443 */
-	.weak sys_umask; .long sys_umask
-	.reloc ., R_386_SIZE32, sys_umask; .long 0
-	.long 0x96c439b
+	.weak dbg_ungetc; .long dbg_ungetc
+	.reloc ., R_386_SIZE32, dbg_ungetc; .long 0
+	.long 0x6c27473
 	.long .Lname1444 /* index: 1444 */
 	.weak json_parser_yield; .long json_parser_yield
 	.reloc ., R_386_SIZE32, json_parser_yield; .long 0
@@ -6835,9 +6835,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, symlink_node_readlink; .long 0
 	.long 0xa11d6ab
 	.long .Lname1708 /* index: 1708 */
-	.weak task_alloc_user_rpc; .long task_alloc_user_rpc
-	.reloc ., R_386_SIZE32, task_alloc_user_rpc; .long 0
-	.long 0x79cab3
+	.weak inode_areadall; .long inode_areadall
+	.reloc ., R_386_SIZE32, inode_areadall; .long 0
+	.long 0xded16ac
 	.long 0 /* index: 1709 */
 	.long 0
 	.long 0
@@ -7346,10 +7346,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak vm_delhwbreak; .long vm_delhwbreak
 	.reloc ., R_386_SIZE32, vm_delhwbreak; .long 0
 	.long 0x2ec272b
-	.long 0 /* index: 1836 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname1836 /* index: 1836 */
+	.weak dbg_isholding_ctrl; .long dbg_isholding_ctrl
+	.reloc ., R_386_SIZE32, dbg_isholding_ctrl; .long 0
+	.long 0xbab568c
 	.long 0 /* index: 1837 */
 	.long 0
 	.long 0
@@ -7567,9 +7567,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, superblock_opennode; .long 0
 	.long 0xf25a8c5
 	.long .Lname1891 /* index: 1891 */
-	.weak task_waitfor_norpc; .long task_waitfor_norpc
-	.reloc ., R_386_SIZE32, task_waitfor_norpc; .long 0
-	.long 0xecd6763
+	.weak inode_tryaccess; .long inode_tryaccess
+	.reloc ., R_386_SIZE32, inode_tryaccess; .long 0
+	.long 0xad28763
 	.long .Lname1892 /* index: 1892 */
 	.weak vm_tasklock_end; .long vm_tasklock_end
 	.reloc ., R_386_SIZE32, vm_tasklock_end; .long 0
@@ -8230,10 +8230,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long .Lname2057 /* index: 2057 */
-	.weak inode_areadall; .long inode_areadall
-	.reloc ., R_386_SIZE32, inode_areadall; .long 0
-	.long 0xded16ac
+	.long 0 /* index: 2057 */
+	.long 0
+	.long 0
+	.long 0
 	.long 0 /* index: 2058 */
 	.long 0
 	.long 0
@@ -10959,9 +10959,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname2739 /* index: 2739 */
-	.weak dbg_ungetc; .long dbg_ungetc
-	.reloc ., R_386_SIZE32, dbg_ungetc; .long 0
-	.long 0x6c27473
+	.weak inode_areadallv_phys; .long inode_areadallv_phys
+	.reloc ., R_386_SIZE32, inode_areadallv_phys; .long 0
+	.long 0xe6b7ab3
 	.long .Lname2740 /* index: 2740 */
 	.weak x86_fpu_current; .long x86_fpu_current
 	.reloc ., R_386_SIZE32, x86_fpu_current; .long 0
@@ -12086,10 +12086,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long .Lname3021 /* index: 3021 */
-	.weak sys_fchown32; .long sys_fchown32
-	.reloc ., R_386_SIZE32, sys_fchown32; .long 0
-	.long 0xe6654a2
+	.long 0 /* index: 3021 */
+	.long 0
+	.long 0
+	.long 0
 	.long 0 /* index: 3022 */
 	.long 0
 	.long 0
@@ -12595,9 +12595,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname3148 /* index: 3148 */
-	.weak unwind_setreg_xfpustate; .long unwind_setreg_xfpustate
-	.reloc ., R_386_SIZE32, unwind_setreg_xfpustate; .long 0
-	.long 0xb8d04c5
+	.weak sys_umask; .long sys_umask
+	.reloc ., R_386_SIZE32, sys_umask; .long 0
+	.long 0x96c439b
 	.long .Lname3149 /* index: 3149 */
 	.weak sys_swapoff; .long sys_swapoff
 	.reloc ., R_386_SIZE32, sys_swapoff; .long 0
@@ -12622,10 +12622,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak vio_subb; .long vio_subb
 	.reloc ., R_386_SIZE32, vio_subb; .long 0
 	.long 0x56ac52
-	.long 0 /* index: 3155 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname3155 /* index: 3155 */
+	.weak task_waitfor_norpc; .long task_waitfor_norpc
+	.reloc ., R_386_SIZE32, task_waitfor_norpc; .long 0
+	.long 0xecd6763
 	.long 0 /* index: 3156 */
 	.long 0
 	.long 0
@@ -13814,10 +13814,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak memrlenl; .long memrlenl
 	.reloc ., R_386_SIZE32, memrlenl; .long 0
 	.long 0xc492d7c
-	.long 0 /* index: 3453 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname3453 /* index: 3453 */
+	.weak unwind_setreg_xfpustate; .long unwind_setreg_xfpustate
+	.reloc ., R_386_SIZE32, unwind_setreg_xfpustate; .long 0
+	.long 0xb8d04c5
 	.long .Lname3454 /* index: 3454 */
 	.weak unicode_readutf8_n; .long unicode_readutf8_n
 	.reloc ., R_386_SIZE32, unicode_readutf8_n; .long 0
@@ -16430,6 +16430,8 @@ END(kernel_symbol_table)
 	.string "cpu_apply_scpustate_esp"
 .Lname49:
 	.string "dbg_fillrect"
+.Lname50:
+	.string "inode_access"
 .Lname51:
 	.string "kernel_panic"
 .Lname52:
@@ -16707,7 +16709,7 @@ END(kernel_symbol_table)
 .Lname340:
 	.string "sys_socket"
 .Lname341:
-	.string "inode_areadallv_phys"
+	.string "task_alloc_user_rpc"
 .Lname342:
 	.string "mouse_device_hwheel"
 .Lname343:
@@ -17571,7 +17573,7 @@ END(kernel_symbol_table)
 .Lname1183:
 	.string "vm_free"
 .Lname1186:
-	.string "dbg_isholding_ctrl"
+	.string "sys_fchown32"
 .Lname1187:
 	.string "cpu_jiffies"
 .Lname1188:
@@ -17841,7 +17843,7 @@ END(kernel_symbol_table)
 .Lname1442:
 	.string "json_writer_putnumber"
 .Lname1443:
-	.string "sys_umask"
+	.string "dbg_ungetc"
 .Lname1444:
 	.string "json_parser_yield"
 .Lname1445:
@@ -18097,7 +18099,7 @@ END(kernel_symbol_table)
 .Lname1707:
 	.string "symlink_node_readlink"
 .Lname1708:
-	.string "task_alloc_user_rpc"
+	.string "inode_areadall"
 .Lname1711:
 	.string "mouse_device_vwheel"
 .Lname1712:
@@ -18216,6 +18218,8 @@ END(kernel_symbol_table)
 	.string "dbg_pputuni"
 .Lname1835:
 	.string "vm_delhwbreak"
+.Lname1836:
+	.string "dbg_isholding_ctrl"
 .Lname1842:
 	.string "x86_fxrstor"
 .Lname1843:
@@ -18267,7 +18271,7 @@ END(kernel_symbol_table)
 .Lname1890:
 	.string "superblock_opennode"
 .Lname1891:
-	.string "task_waitfor_norpc"
+	.string "inode_tryaccess"
 .Lname1892:
 	.string "vm_tasklock_end"
 .Lname1896:
@@ -18414,8 +18418,6 @@ END(kernel_symbol_table)
 	.string "block_device_awrite"
 .Lname2054:
 	.string "vsnprintf"
-.Lname2057:
-	.string "inode_areadall"
 .Lname2060:
 	.string "x86_fpustate_variant"
 .Lname2068:
@@ -19107,7 +19109,7 @@ END(kernel_symbol_table)
 .Lname2737:
 	.string "driver_symbol_ex"
 .Lname2739:
-	.string "dbg_ungetc"
+	.string "inode_areadallv_phys"
 .Lname2740:
 	.string "x86_fpu_current"
 .Lname2741:
@@ -19388,8 +19390,6 @@ END(kernel_symbol_table)
 	.string "dbg_origstate"
 .Lname3017:
 	.string "pipe_reader_destroy"
-.Lname3021:
-	.string "sys_fchown32"
 .Lname3024:
 	.string "dbg_scroll_maxline"
 .Lname3027:
@@ -19525,7 +19525,7 @@ END(kernel_symbol_table)
 .Lname3145:
 	.string "__predict_update_dl"
 .Lname3148:
-	.string "unwind_setreg_xfpustate"
+	.string "sys_umask"
 .Lname3149:
 	.string "sys_swapoff"
 .Lname3150:
@@ -19534,6 +19534,8 @@ END(kernel_symbol_table)
 	.string "path_lock_endwrite"
 .Lname3154:
 	.string "vio_subb"
+.Lname3155:
+	.string "task_waitfor_norpc"
 .Lname3159:
 	.string "inode_readk_blocking"
 .Lname3160:
@@ -19842,6 +19844,8 @@ END(kernel_symbol_table)
 	.string "sys_sched_yield"
 .Lname3452:
 	.string "memrlenl"
+.Lname3453:
+	.string "unwind_setreg_xfpustate"
 .Lname3454:
 	.string "unicode_readutf8_n"
 .Lname3455:

@@ -62,6 +62,41 @@
 
 DECL_BEGIN
 
+DEFINE_SYSCALL4(errno_t, faccessat,
+                fd_t, dirfd, USER UNCHECKED char const *, filename,
+                syscall_ulong_t, type, atflag_t, flags) {
+	REF struct inode *accessed_inode;
+	struct fs *f = THIS_FS;
+	fsmode_t fsmode;
+	validate_readable(filename, 1);
+	VALIDATE_FLAGSET(type, F_OK | R_OK | W_OK | X_OK,
+	                 E_INVALID_ARGUMENT_CONTEXT_FACCESSAT_TYPE);
+	VALIDATE_FLAGSET(flags, AT_SYMLINK_NOFOLLOW | AT_EACCESS | AT_DOSPATH,
+	                 E_INVALID_ARGUMENT_CONTEXT_FACCESSAT_FLAGS);
+	fsmode = fs_getmode_for(f, flags);
+	accessed_inode = path_traversefull_at(f,
+	                                      (unsigned int)dirfd,
+	                                      filename,
+	                                      !(flags & AT_SYMLINK_NOFOLLOW),
+	                                      fsmode,
+	                                      NULL,
+	                                      NULL,
+	                                      NULL,
+	                                      NULL);
+	FINALLY_DECREF_UNLIKELY(accessed_inode);
+	inode_access(accessed_inode, type);
+	return -EOK;
+}
+
+
+#ifdef __NR_access
+DEFINE_SYSCALL2(errno_t, access,
+                USER UNCHECKED char const *, filename,
+                syscall_ulong_t, type) {
+	return sys_faccessat(AT_FDCWD, filename, type, 0);
+}
+#endif /* __NR_access */
+
 DEFINE_SYSCALL2(ssize_t, getcwd,
                 USER UNCHECKED char *, buf, size_t, bufsize) {
 	struct fs *f = THIS_FS;

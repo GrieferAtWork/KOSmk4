@@ -571,6 +571,7 @@
 #define __CRT_HAVE_heap_truncate_untraced 1
 #define __CRT_HAVE_heap_validate 1
 #define __CRT_HAVE_heap_validate_all 1
+#define __CRT_HAVE_inode_access 1
 #define __CRT_HAVE_inode_aread 1
 #define __CRT_HAVE_inode_aread_phys 1
 #define __CRT_HAVE_inode_areadall 1
@@ -619,6 +620,7 @@
 #define __CRT_HAVE_inode_stat 1
 #define __CRT_HAVE_inode_sync 1
 #define __CRT_HAVE_inode_truncate 1
+#define __CRT_HAVE_inode_tryaccess 1
 #define __CRT_HAVE_inode_write 1
 #define __CRT_HAVE_inode_write_phys 1
 #define __CRT_HAVE_inode_writek 1
