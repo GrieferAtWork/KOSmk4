@@ -27,6 +27,7 @@
 #include <fcntl.h>
 #include <kos/syscalls.h>
 #include <limits.h>
+#include <string.h>
 #include <unistd.h>
 
 #include <parts/errno.h>
@@ -183,6 +184,8 @@ ATTR_WEAK ATTR_SECTION(".text.crt.fs.environ.getenv") char *
 NOTHROW_NCX(LIBCCALL libc_getenv)(char const *varname)
 /*[[[body:getenv]]]*/
 {
+	if (!strcmp(varname, "TERM"))
+		return "vt100";
 	CRT_UNIMPLEMENTED("getenv"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
