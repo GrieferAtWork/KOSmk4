@@ -1,4 +1,4 @@
-/* HASH 0x4f874ff7 */
+/* HASH 0xe453ed5f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -191,10 +191,10 @@ typedef __WCHAR_TYPE__ wchar_t;
 
 #ifdef __USE_MISC
 #if defined(__GNUC__) && !defined(__cplusplus)
-#   define __WAIT_INT(status) (__extension__(((union{ __typeof__(status) __in; int __i; }) { .__in = (status) }).__i))
-#else
+#   define __WAIT_INT(status) (__extension__(((union{ __typeof__(status) __inval; int __ival; }) { .__inval = (status) }).__ival))
+#else /* __GNUC__ && !__cplusplus */
 #   define __WAIT_INT(status) (*(int *)&(status))
-#endif
+#endif /* !__GNUC__ || __cplusplus */
 #ifdef __NO_ATTR_TRANSPARENT_UNION
 #   define __WAIT_STATUS      void *
 #   define __WAIT_STATUS_DEFN void *

@@ -1,4 +1,4 @@
-/* HASH 0xb8bb5530 */
+/* HASH 0xcbbb1bfc */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1024,16 +1024,16 @@ __CRT_FUNCTION(inet6_rth_segments,0,(),1,(void const *,bp),int)
 __CRT_FUNCTION(inet6_rth_space,0,(),2,(int,type,int,segments),socklen_t)
 __CRT_FUNCTION(inet_addr,0,(),1,(char const *,cp),in_addr_t)
 __CRT_FUNCTION(inet_aton,0,(),2,(char const *,cp,struct in_addr *,inp),int)
-__CRT_FUNCTION(inet_lnaof,0,(),1,(struct in_addr,in),in_addr_t)
+__CRT_FUNCTION(inet_lnaof,0,(),1,(struct in_addr,inaddr),in_addr_t)
 __CRT_FUNCTION(inet_makeaddr,0,(),2,(in_addr_t,net,in_addr_t,host),struct in_addr)
 __CRT_FUNCTION(inet_net_ntop,0,(),5,(int,af,void const *,cp,int,bits,char *,buf,size_t,len),char *)
 __CRT_FUNCTION(inet_net_pton,0,(),4,(int,af,char const *,cp,void *,buf,size_t,len),int)
 __CRT_FUNCTION(inet_neta,0,(),3,(in_addr_t,net,char *,buf,size_t,len),char *)
-__CRT_FUNCTION(inet_netof,0,(),1,(struct in_addr,in),in_addr_t)
+__CRT_FUNCTION(inet_netof,0,(),1,(struct in_addr,inaddr),in_addr_t)
 __CRT_FUNCTION(inet_network,0,(),1,(char const *,cp),in_addr_t)
 __CRT_FUNCTION(inet_nsap_addr,0,(),3,(char const *,cp,unsigned char *,buf,int,len),unsigned int)
 __CRT_FUNCTION(inet_nsap_ntoa,0,(),3,(int,len,unsigned char const *,cp,char *,buf),char *)
-__CRT_FUNCTION(inet_ntoa,0,(),1,(struct in_addr,in),char *)
+__CRT_FUNCTION(inet_ntoa,0,(),1,(struct in_addr,inaddr),char *)
 __CRT_FUNCTION(inet_ntop,0,(),4,(int,af,void const *__restrict,cp,char *__restrict,buf,socklen_t,len),char const *)
 __CRT_FUNCTION(inet_pton,0,(),3,(int,af,char const *__restrict,cp,void *__restrict,buf),int)
 __CRT_FUNCTION(initgroups,0,(),2,(char const *,user,gid_t,group),int)

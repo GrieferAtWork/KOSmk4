@@ -220,6 +220,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.application.exit.exit") void
 {
 	/* TODO: Run at-exit */
 	/* TODO: Run library finalizers */
+	/* TODO: flush stdio */
 	_Exit(status);
 }
 /*[[[end:exit]]]*/

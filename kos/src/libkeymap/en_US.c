@@ -26,7 +26,6 @@ gcc_opt.append("-fexceptions");
  */
 #ifndef GUARD_LIBKEYMAP_EN_US_C
 #define GUARD_LIBKEYMAP_EN_US_C 1
-#define _ALL_SOURCE 1
 
 #include "api.h"
 

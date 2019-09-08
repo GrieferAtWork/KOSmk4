@@ -479,14 +479,14 @@ To help you understand how this script works to do what it does, here is a docum
 
 ##### Target/Config-specific paths
 
-- Before magic starts building, it will ensure that a symlink `$PROJPATH/$TARGET-kos` expands to `$TARGET-kos-$CONFIG`.
-	- Note that when GCC is configured, `$PROJPATH/$TARGET-kos/lib` is set up as part of the library path used by things such as `-lc` flags.
+- Before magic starts building, it will ensure that a symlink `$PROJPATH/bin/$TARGET-kos` expands to `$TARGET-kos-$CONFIG`.
+	- Note that when GCC is configured, `$PROJPATH/bin/$TARGET-kos/lib` is set up as part of the library path used by things such as `-lc` flags.
 	- As such, when using the GCC from the KOS toolchain, it will always link against the versions of KOS system libraries created for the configuration set the last time magic was invoked
 - The following paths are selected by `--target=$TARGET` and `--config=$CONFIG`
 	- `$PROJPATH/bin/$TARGET-kos/...`
 	- `$PROJPATH/bin/$TARGET-kos-$CONFIG/...`
 	- `$PROJPATH/kos/include/$TARGET_XARCH-kos/...`
-	- `$PROJPATH/kos/src/.../$TARGET_XARCH/...`
+	- `$PROJPATH/kos/src/[...]/$TARGET_XARCH/...`
 	- Note that for the last two, `TARGET_XARCH = $TARGET == "x86_64" ? "i386" : $TARGET`
 
 ##### Automatic target/configuration detection

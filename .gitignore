@@ -14,3 +14,11 @@ __ice__
 *.dec
 *.latest
 *.stackdump
+
+# These headers are installed by `make_utility.sh i386 ncurses`
+/kos/include/curses.h
+/kos/include/ncurses.h
+/kos/include/ncurses_dll.h
+/kos/include/term.h
+/kos/include/termcap.h
+/kos/include/unctrl.h

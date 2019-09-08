@@ -1,4 +1,4 @@
-/* HASH 0x8ea60d46 */
+/* HASH 0x287126bc */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,18 +31,18 @@ DECL_BEGIN
  * notation in CP into binary data in network byte order */
 INTDEF in_addr_t NOTHROW_RPC_KOS(LIBCCALL libc_inet_addr)(char const *cp);
 /* Return the local host address part of the Internet address in IN */
-INTDEF in_addr_t NOTHROW_RPC_KOS(LIBCCALL libc_inet_lnaof)(struct in_addr in);
+INTDEF in_addr_t NOTHROW_RPC_KOS(LIBCCALL libc_inet_lnaof)(struct in_addr inaddr);
 /* Make Internet host address in network byte order by
  * combining the network number NET with the local address HOST */
 INTDEF struct in_addr NOTHROW_RPC_KOS(LIBCCALL libc_inet_makeaddr)(in_addr_t net, in_addr_t host);
 /* Return network number part of the Internet address IN */
-INTDEF in_addr_t NOTHROW_RPC_KOS(LIBCCALL libc_inet_netof)(struct in_addr in);
+INTDEF in_addr_t NOTHROW_RPC_KOS(LIBCCALL libc_inet_netof)(struct in_addr inaddr);
 /* Extract the network number in network byte order from
  * the address in numbers-and-dots natation starting at CP */
 INTDEF in_addr_t NOTHROW_RPC_KOS(LIBCCALL libc_inet_network)(char const *cp);
 /* Convert Internet number in IN to ASCII representation. The return
  * value is a pointer to an internal array containing the string */
-INTDEF char *NOTHROW_RPC_KOS(LIBCCALL libc_inet_ntoa)(struct in_addr in);
+INTDEF char *NOTHROW_RPC_KOS(LIBCCALL libc_inet_ntoa)(struct in_addr inaddr);
 /* Convert from presentation format of an Internet number in buffer
  * starting at CP to the binary network format and store result for
  * interface type AF in buffer starting at BUF */

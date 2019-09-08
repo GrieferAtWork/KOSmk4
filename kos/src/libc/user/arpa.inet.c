@@ -43,10 +43,10 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_addr)(char const *cp)
 }
 /*[[[end:inet_addr]]]*/
 
-/*[[[head:inet_lnaof,hash:0xf6ebc585]]]*/
+/*[[[head:inet_lnaof,hash:0x85d1eb7d]]]*/
 /* Return the local host address part of the Internet address in IN */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.inet_lnaof") in_addr_t
-NOTHROW_RPC_KOS(LIBCCALL libc_inet_lnaof)(struct in_addr in)
+NOTHROW_RPC_KOS(LIBCCALL libc_inet_lnaof)(struct in_addr inaddr)
 /*[[[body:inet_lnaof]]]*/
 {
 	CRT_UNIMPLEMENTED("inet_lnaof"); /* TODO */
@@ -71,10 +71,10 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_makeaddr)(in_addr_t net,
 }
 /*[[[end:inet_makeaddr]]]*/
 
-/*[[[head:inet_netof,hash:0x21126dff]]]*/
+/*[[[head:inet_netof,hash:0xa4dbeac7]]]*/
 /* Return network number part of the Internet address IN */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.inet_netof") in_addr_t
-NOTHROW_RPC_KOS(LIBCCALL libc_inet_netof)(struct in_addr in)
+NOTHROW_RPC_KOS(LIBCCALL libc_inet_netof)(struct in_addr inaddr)
 /*[[[body:inet_netof]]]*/
 {
 	CRT_UNIMPLEMENTED("inet_netof"); /* TODO */
@@ -96,11 +96,11 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_network)(char const *cp)
 }
 /*[[[end:inet_network]]]*/
 
-/*[[[head:inet_ntoa,hash:0xb2672919]]]*/
+/*[[[head:inet_ntoa,hash:0x91f7b800]]]*/
 /* Convert Internet number in IN to ASCII representation. The return
  * value is a pointer to an internal array containing the string */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.inet_ntoa") char *
-NOTHROW_RPC_KOS(LIBCCALL libc_inet_ntoa)(struct in_addr in)
+NOTHROW_RPC_KOS(LIBCCALL libc_inet_ntoa)(struct in_addr inaddr)
 /*[[[body:inet_ntoa]]]*/
 {
 	CRT_UNIMPLEMENTED("inet_ntoa"); /* TODO */

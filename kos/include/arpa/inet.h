@@ -1,4 +1,4 @@
-/* HASH 0xed424d9e */
+/* HASH 0x1eadd347 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,7 +66,7 @@ __CDECLARE(,in_addr_t,__NOTHROW_RPC_KOS,inet_addr,(char const *__cp),(__cp))
 #endif /* inet_addr... */
 #if defined(__CRT_HAVE_inet_lnaof)
 /* Return the local host address part of the Internet address in IN */
-__CDECLARE(,in_addr_t,__NOTHROW_RPC_KOS,inet_lnaof,(struct in_addr __in),(__in))
+__CDECLARE(,in_addr_t,__NOTHROW_RPC_KOS,inet_lnaof,(struct in_addr __inaddr),(__inaddr))
 #endif /* inet_lnaof... */
 #if defined(__CRT_HAVE_inet_makeaddr)
 /* Make Internet host address in network byte order by
@@ -75,7 +75,7 @@ __CDECLARE(,struct in_addr,__NOTHROW_RPC_KOS,inet_makeaddr,(in_addr_t __net, in_
 #endif /* inet_makeaddr... */
 #if defined(__CRT_HAVE_inet_netof)
 /* Return network number part of the Internet address IN */
-__CDECLARE(,in_addr_t,__NOTHROW_RPC_KOS,inet_netof,(struct in_addr __in),(__in))
+__CDECLARE(,in_addr_t,__NOTHROW_RPC_KOS,inet_netof,(struct in_addr __inaddr),(__inaddr))
 #endif /* inet_netof... */
 #if defined(__CRT_HAVE_inet_network)
 /* Extract the network number in network byte order from
@@ -85,7 +85,7 @@ __CDECLARE(,in_addr_t,__NOTHROW_RPC_KOS,inet_network,(char const *__cp),(__cp))
 #if defined(__CRT_HAVE_inet_ntoa)
 /* Convert Internet number in IN to ASCII representation. The return
  * value is a pointer to an internal array containing the string */
-__CDECLARE(,char *,__NOTHROW_RPC_KOS,inet_ntoa,(struct in_addr __in),(__in))
+__CDECLARE(,char *,__NOTHROW_RPC_KOS,inet_ntoa,(struct in_addr __inaddr),(__inaddr))
 #endif /* inet_ntoa... */
 #if defined(__CRT_HAVE_inet_pton)
 /* Convert from presentation format of an Internet number in buffer

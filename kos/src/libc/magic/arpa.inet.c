@@ -61,14 +61,14 @@ typedef __socklen_t socklen_t;
 [cp_kos] inet_addr:(char const *cp) -> in_addr_t;
 
 @@Return the local host address part of the Internet address in IN
-[cp_kos] inet_lnaof:(struct in_addr in) -> in_addr_t;
+[cp_kos] inet_lnaof:(struct in_addr inaddr) -> in_addr_t;
 
 @@Make Internet host address in network byte order by
 @@combining the network number NET with the local address HOST
 [cp_kos] inet_makeaddr:(in_addr_t net, in_addr_t host) -> struct in_addr;
 
 @@Return network number part of the Internet address IN
-[cp_kos] inet_netof:(struct in_addr in) -> in_addr_t;
+[cp_kos] inet_netof:(struct in_addr inaddr) -> in_addr_t;
 
 @@Extract the network number in network byte order from
 @@the address in numbers-and-dots natation starting at CP
@@ -76,7 +76,7 @@ typedef __socklen_t socklen_t;
 
 @@Convert Internet number in IN to ASCII representation. The return
 @@value is a pointer to an internal array containing the string
-[cp_kos] inet_ntoa:(struct in_addr in) -> char *;
+[cp_kos] inet_ntoa:(struct in_addr inaddr) -> char *;
 
 @@Convert from presentation format of an Internet number in buffer
 @@starting at CP to the binary network format and store result for
