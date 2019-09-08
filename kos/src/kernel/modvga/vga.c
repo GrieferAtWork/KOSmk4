@@ -1104,14 +1104,13 @@ VGA_Putc(struct ansitty *__restrict self, char32_t ch)
 					 *               empty line and wasting what little screen space we only have. */
 				} else {
 					/* Clear the remainder of the old line */
-					u16 *lline = ATOMIC_READ(vga->v_textlline);
+					u16 *lline = ATOMIC_READ(vga->v_scrlllin);
 					if (oldptr >= lline) {
 						if (!ATOMIC_CMPXCH(vga->v_textptr, oldptr, lline))
 							continue;
 						/* Scroll down */
-						memmovew(vga->v_textbase, vga->v_text2line,
-						         (vga->v_textsizey - 1) * vga->v_textsizex);
-						memsetw(vga->v_textlline, VGA_CHR(vga, ' '), vga->v_textsizex);
+						memmovew(vga->v_scrlbase, vga->v_scrl2lin, vga->v_scrlsize);
+						memsetw(lline, VGA_CHR(vga, ' '), vga->v_textsizex);
 					} else {
 						size_t tail = (size_t)(vga->v_textsizex - cur_x);
 						if (!ATOMIC_CMPXCH(vga->v_textptr, oldptr, oldptr + tail))
@@ -1154,11 +1153,43 @@ VGA_SetTTYMode(struct ansitty *__restrict self,
 	}
 }
 
+PRIVATE NONNULL((1)) void LIBANSITTY_CC
+VGA_SetScrollRegion(struct ansitty *__restrict self,
+                    ansitty_coord_t start_line,
+                    ansitty_coord_t end_line) {
+	VGA *vga = container_of(self, VGA, at_ansi);
+	u16 *base = ATOMIC_READ(vga->v_textbase);
+	u16 *end  = ATOMIC_READ(vga->v_textend);
+	size_t sizex = ATOMIC_READ(vga->v_textsizex);
+	u16 *new_scrlbase, *new_scrlllin;
+	new_scrlbase = base + start_line * sizex;
+	new_scrlllin = base + end_line * sizex;
+	if (new_scrlbase > end)
+		new_scrlbase = end;
+	if (new_scrlbase < base)
+		new_scrlbase = base;
+	if (new_scrlllin > end)
+		new_scrlllin = end;
+	new_scrlllin -= sizex;
+	if (new_scrlllin < base)
+		new_scrlllin = base;
+	if (new_scrlllin < new_scrlbase)
+		new_scrlllin = new_scrlbase;
+	vga->v_scrlbase = new_scrlbase;
+	vga->v_scrl2lin = new_scrlbase + sizex;
+	vga->v_scrlllin = new_scrlllin;
+	vga->v_scrlend  = new_scrlllin + sizex;
+	vga->v_scrlsize = (size_t)(new_scrlllin - new_scrlbase);
+	vga->v_lastch   = 0; /* Prevent the hidden-newline feature from triggering. */
+}
+
+
 
 /* Get/Set the current on-screen cursor position. */
 PRIVATE NONNULL((1)) void LIBANSITTY_CC
 VGA_SetCursor(struct ansitty *__restrict self,
-              ansitty_coord_t x, ansitty_coord_t y)
+              ansitty_coord_t x, ansitty_coord_t y,
+              bool update_hw_cursor)
 		THROWS(E_WOULDBLOCK) {
 	VGA *vga;
 	unsigned int pos;
@@ -1175,7 +1206,7 @@ VGA_SetCursor(struct ansitty *__restrict self,
 	}
 	pos = (unsigned int)x + (unsigned int)y * vga->v_textsizex;
 	vga->v_textptr = vga->v_textbase + pos;
-	if (!(vga->at_ansi.at_ttymode & ANSITTY_MODE_HIDECURSOR))
+	if (update_hw_cursor && !(vga->at_ansi.at_ttymode & ANSITTY_MODE_HIDECURSOR))
 		vga_update_cursor_pos(vga);
 }
 
@@ -1229,6 +1260,28 @@ NOTHROW(LIBANSITTY_CC VGA_CopyCell)(struct ansitty *__restrict self,
 	memmovew(ptr, src, count);
 }
 
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(LIBANSITTY_CC VGA_FillCell)(struct ansitty *__restrict self,
+                                    char32_t ch,
+                                    ansitty_coord_t count) {
+	ansitty_coord_t used_count;
+	VGA *vga  = container_of(self, VGA, at_ansi);
+	u16 *ptr, *end, *copyend, cell;
+	char cpch = cp437_encode((u32)ch);
+	if unlikely(!cpch)
+		cpch = '?';
+	cell = VGA_CHR(vga, cpch);
+	do {
+		ptr = ATOMIC_READ(vga->v_textptr);
+		end = ATOMIC_READ(vga->v_textend);
+		used_count = count;
+		copyend = ptr + used_count;
+		if (copyend > end)
+			used_count = (size_t)(end - ptr);
+	} while (!ATOMIC_CMPXCH_WEAK(vga->v_textptr, ptr, ptr + used_count));
+	memsetw(ptr, cell, used_count);
+}
+
 
 
 PRIVATE struct ansitty_operators const vga_ansi_operators = {
@@ -1237,12 +1290,14 @@ PRIVATE struct ansitty_operators const vga_ansi_operators = {
 	/* .ato_getcursor    = */&VGA_GetCursor,
 	/* .ato_getsize      = */&VGA_GetSize,
 	/* .ato_copycell     = */&VGA_CopyCell,
+	/* .ato_fillcell     = */&VGA_FillCell,
 	/* .ato_scroll       = */NULL, /* TODO */
 	/* .ato_cls          = */NULL, /* TODO */
 	/* .ato_el           = */NULL, /* TODO */
 	/* .ato_setcolor     = */NULL,
 	/* .ato_setattrib    = */NULL,
 	/* .ato_setttymode   = */&VGA_SetTTYMode,
+	/* .ato_scrollregion = */&VGA_SetScrollRegion,
 };
 
 
@@ -1315,6 +1370,11 @@ PRIVATE DRIVER_INIT void init(void) {
 			vga->v_textlline = vga->v_textbase + ((vga->v_textsizey - 1) * vga->v_textsizex);
 			vga->v_textend   = vga->v_textbase + (vga->v_textsizey * vga->v_textsizex);
 			vga->v_textptr   = vga->v_textbase;
+			vga->v_scrlbase  = vga->v_textbase;
+			vga->v_scrl2lin  = vga->v_text2line;
+			vga->v_scrlllin  = vga->v_textlline;
+			vga->v_scrlend   = vga->v_textend;
+			vga->v_scrlsize  = ((vga->v_textsizey - 1) * vga->v_textsizex);
 
 			/* Register the VGA adapter device. */
 			character_device_register_auto(vga);

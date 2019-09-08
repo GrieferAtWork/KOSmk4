@@ -136,6 +136,11 @@ typedef struct
 	WEAK u16               *v_textlline; /* [1..1] Pointer to the start of the last text-mode line. */
 	WEAK u16               *v_textend;   /* [1..1] Pointer to the end of the VGA text-mode buffer. */
 	WEAK u16               *v_textptr;   /* [1..1] Pointer to the character that will be written next. */
+	WEAK u16               *v_scrlbase;  /* [1..1] Pointer to the start of the scroll region. */
+	WEAK u16               *v_scrl2lin;  /* [1..1] Pointer to the start of the second line of the scroll region. */
+	WEAK u16               *v_scrlllin;  /* [1..1] Pointer to the start of the last line of the scroll region. */
+	WEAK u16               *v_scrlend;   /* [1..1] Pointer to the end of the scroll region. */
+	WEAK size_t             v_scrlsize;  /* Number of characters that get moved during a 1-line scroll operation. */
 	WEAK size_t             v_textsizex; /* Text-mode screen size in X */
 	WEAK size_t             v_textsizey; /* Text-mode screen size in Y */
 	char32_t                v_lastch;    /* Last-written text-mode character. */

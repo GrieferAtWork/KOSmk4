@@ -35,11 +35,13 @@
 
 DECL_BEGIN
 
+#include <kernel/printk.h>
 PUBLIC NONNULL((1)) size_t KCALL
 ansitty_device_write(struct character_device *__restrict self,
                      USER CHECKED void const *src,
                      size_t num_bytes, iomode_t mode) THROWS(...) {
 	struct ansitty_device *me = (struct ansitty_device *)self;
+	printk(KERN_DEBUG "tty:%$q\n", num_bytes, src);
 	return (size_t)ansitty_printer(&me->at_ansi, (char const *)src, num_bytes);
 }
 
@@ -61,9 +63,9 @@ ansitty_device_ioctl(struct character_device *__restrict self, syscall_ulong_t c
 		 * Note that libansitty makes use of the same fact to determine the window size
 		 * whenever it needs to know that value. */
 		(*me->at_ansi.at_ops.ato_getcursor)(&me->at_ansi, xy);
-		(*me->at_ansi.at_ops.ato_setcursor)(&me->at_ansi, (ansitty_coord_t)-1, (ansitty_coord_t)-1);
+		(*me->at_ansi.at_ops.ato_setcursor)(&me->at_ansi, (ansitty_coord_t)-1, (ansitty_coord_t)-1, false);
 		(*me->at_ansi.at_ops.ato_getcursor)(&me->at_ansi, sxy);
-		(*me->at_ansi.at_ops.ato_setcursor)(&me->at_ansi, xy[0], xy[1]);
+		(*me->at_ansi.at_ops.ato_setcursor)(&me->at_ansi, xy[0], xy[1], false);
 		/* Because the cursor coords are clamped to the max valid values, the
 		 * actual display size is described by the max valid coords +1 each. */
 		++sxy[0];

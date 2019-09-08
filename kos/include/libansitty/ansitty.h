@@ -127,10 +127,14 @@ struct ansitty_operators {
 	/* [0..1] Set the position of the cursor.
 	 * NOTE: The given `x' and `y' must be clamped to COLUMNS-1/ROWS-1, meaning
 	 *       that `(*ato_setcursor)(tty, (ansitty_coord_t)-1, (ansitty_coord_t)-1)'
-	 *       places the cursor at its greatest possible position in both X and Y. */
+	 *       places the cursor at its greatest possible position in both X and Y.
+	 * @param: update_hw_cursor: When true, also update the hardware cursor.
+	 *                           Otherwise, the position of the hardware cursor
+	 *                           should be left unchanged. */
 	__ATTR_NONNULL((1))
 	void (LIBANSITTY_CC *ato_setcursor)(struct ansitty *__restrict self,
-	                                    ansitty_coord_t x, ansitty_coord_t y);
+	                                    ansitty_coord_t x, ansitty_coord_t y,
+	                                    __BOOL update_hw_cursor);
 	/* [0..1] Returns the position of the cursor.
 	 * @param: ppos[0]: Store X-position here.
 	 * @param: ppos[1]: Store Y-position here. */
@@ -158,10 +162,22 @@ struct ansitty_operators {
 	void (LIBANSITTY_CC *ato_copycell)(struct ansitty *__restrict self,
 	                                   ansitty_offset_t dst_offset,
 	                                   ansitty_coord_t count);
-	/* [0..1] Shift terminal lines by offset, where a negative value
-	 *        shifts lines up, and a positive value shifts them downwards.
+	/* [0..1] Print the given character `ch' (which is always a graphical
+	 *        character, rather than a control character) up to `count'
+	 *        times, without ever scrolling, and stopping if the end of
+	 *        the display is reached.
+	 *        The actual cursor position remains unchanged. */
+	__ATTR_NONNULL((1))
+	void (LIBANSITTY_CC *ato_fillcell)(struct ansitty *__restrict self,
+	                                   __CHAR32_TYPE__ ch,
+	                                   ansitty_coord_t count);
+	/* [0..1] Shift terminal lines by offset, where a positive value shifts
+	 *        lines up (like a \n at the bottom of the screen would), and a
+	 *        negative value shifts them downwards.
+	 *        New cells exposed by this operation should be filled with space
+	 *        characters.
 	 * E.g.: When the end of the terminal is reached, the driver may
-	 *       implement this as `(*to_scroll)(..., -1);' */
+	 *       implement this as `(*to_scroll)(..., 1);' */
 	__ATTR_NONNULL((1))
 	void (LIBANSITTY_CC *ato_scroll)(struct ansitty *__restrict self,
 	                                 ansitty_offset_t offset);
@@ -195,7 +211,7 @@ struct ansitty_operators {
 	__ATTR_NONNULL((1))
 	void (LIBANSITTY_CC *ato_scrollregion)(struct ansitty *__restrict self,
 	                                       ansitty_coord_t start_line,
-	                                       ansitty_coord_t start_column);
+	                                       ansitty_coord_t end_line);
 	/* [0..1] Set the window title of the terminal. */
 	__ATTR_NONNULL((1, 2))
 	void (LIBANSITTY_CC *ato_settitle)(struct ansitty *__restrict self,
