@@ -537,10 +537,10 @@ block_device_add_to_devfs(struct basic_block_device *__restrict self) {
 	}
 	if (block_device_ispartition(self) &&
 	    ((struct block_device_partition *)self)->bp_label[0]) {
-		printk(KERN_INFO "Register new block-device `/dev/%s' (labeled as %q)\n",
+		printk(KERN_INFO "[blk] Register new block-device `/dev/%s' (labeled as %q)\n",
 		       self->bd_name, ((struct block_device_partition *)self)->bp_label);
 	} else {
-		printk(KERN_INFO "Register new block-device `/dev/%s'\n", self->bd_name);
+		printk(KERN_INFO "[blk] Register new block-device `/dev/%s'\n", self->bd_name);
 	}
 	/* Add the device's node to `/dev'
 	 * NOTE: If the file already exists, ignore that fact, as
@@ -563,7 +563,7 @@ block_device_unregister(struct basic_block_device *__restrict self)
 		THROWS(E_WOULDBLOCK) {
 	bool result = false;
 	struct basic_block_device *pop_dev;
-	printk(KERN_INFO "Removing block-device `/dev/%s'\n", self->bd_name);
+	printk(KERN_INFO "[blk] Removing block-device `/dev/%s'\n", self->bd_name);
 	if likely(self->bd_devlink.a_vaddr != DEV_UNSET) {
 		sync_write(&block_device_lock);
 		COMPILER_READ_BARRIER();
@@ -944,7 +944,7 @@ DECL_BEGIN
 
 LOCAL NOBLOCK void
 NOTHROW(KCALL log_sync)(struct block_device *__restrict self, lba_t sector_id) {
-	printk(KERN_DEBUG "[sync][\"/dev/%#q\",devno=%u:%u] Syncing sector %#I64x (%#I64x-%#I64x)\n",
+	printk(KERN_INFO "[sync][\"/dev/%#q\",devno=%u:%u] Syncing sector %#I64x (%#I64x-%#I64x)\n",
 	       self->bd_name,
 	       (unsigned int)MAJOR(block_device_devno(self)),
 	       (unsigned int)MINOR(block_device_devno(self)),

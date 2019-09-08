@@ -84,6 +84,9 @@ PRIVATE NOBLOCK ssize_t KCALL
 kprinter_impl(void *level_id,
               char const *__restrict data,
               size_t datalen) {
+#if 0
+	return (ssize_t)datalen;
+#else
 	size_t print_len;
 	ssize_t result = (ssize_t)datalen;
 	/* TODO: Replace `__outsb()' with a portable, arch-specific API. */
@@ -107,6 +110,7 @@ kprinter_impl(void *level_id,
 		datalen -= print_len;
 	}
 	return result;
+#endif
 }
 
 

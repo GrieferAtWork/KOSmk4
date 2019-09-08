@@ -2583,7 +2583,7 @@ Fat_WriteFatIndirectionTableSegment(FatSuperblock *__restrict self,
 	sector_buffer = (void *)((uintptr_t)self->f_fat_table + (fat_sector_index * self->f_sectorsize));
 	sector_bytes  = (size_t)(num_sectors * self->f_sectorsize);
 	sector_start  = self->f_fat_start + fat_sector_index;
-	printk(KERN_DEBUG "[fat] Saving modified meta-sectors %I32u..%I32u of 0..%I32u (%I32u..%I32u)\n",
+	printk(KERN_INFO "[fat] Saving modified meta-sectors %I32u..%I32u of 0..%I32u (%I32u..%I32u)\n",
 	       fat_sector_index, fat_sector_index + num_sectors - 1, self->f_sec4fat - 1,
 	       sector_start, sector_start + num_sectors - 1);
 	/* Write to all redundant FAT copies. */
