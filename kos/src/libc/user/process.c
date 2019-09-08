@@ -21,6 +21,9 @@
 
 #include "../api.h"
 #include "process.h"
+#include <dlfcn.h>
+#include <stdlib.h>
+#include <sys/wait.h>
 
 DECL_BEGIN
 
@@ -101,15 +104,13 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.process._c_exit") void
 }
 /*[[[end:_c_exit]]]*/
 
-/*[[[head:_loaddll,hash:0xc60dd2ea]]]*/
+/*[[[head:_loaddll,hash:0xc3995ae6]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.dlfcn._loaddll") intptr_t
-(LIBCCALL libc__loaddll)(char *file)
+(LIBCCALL libc__loaddll)(char __KOS_FIXED_CONST *file)
 		__THROWS(...)
 /*[[[body:_loaddll]]]*/
 {
-	CRT_UNIMPLEMENTED("_loaddll"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	return (intptr_t)(uintptr_t)dlopen(file, RTLD_LOCAL);
 }
 /*[[[end:_loaddll]]]*/
 
@@ -119,9 +120,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.dlfcn._unloaddll") int
 		__THROWS(...)
 /*[[[body:_unloaddll]]]*/
 {
-	CRT_UNIMPLEMENTED("_unloaddll"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	return dlclose((void *)(uintptr_t)hnd);
 }
 /*[[[end:_unloaddll]]]*/
 
@@ -133,9 +132,8 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.dlfcn._getdllprocaddr") __procfu
 		__THROWS(...)
 /*[[[body:_getdllprocaddr]]]*/
 {
-	CRT_UNIMPLEMENTED("_getdllprocaddr"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	(void)ord;
+	return (__procfun)dlsym((void *)(uintptr_t)hnd, symname);
 }
 /*[[[end:_getdllprocaddr]]]*/
 
@@ -146,9 +144,11 @@ NOTHROW_RPC(LIBCCALL libc_cwait)(int *tstat,
                                  int action)
 /*[[[body:cwait]]]*/
 {
-	CRT_UNIMPLEMENTED("cwait"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	/* This one's pretty simple, because it's literally just a waitpid() system call...
+	 * (It even returns the same thing, that being the PID of the joined process...) */
+	/* NOTE: Apparently, the `action' argument is completely ignored... */
+	(void)action;
+	return waitpid(pid, tstat, WEXITED);
 }
 /*[[[end:cwait]]]*/
 
@@ -210,13 +210,13 @@ NOTHROW_RPC(LIBCCALL libc_spawnvpe)(int mode,
 }
 /*[[[end:spawnvpe]]]*/
 
-/*[[[head:spawnl,hash:0x5b7ec42e]]]*/
+/*[[[head:spawnl,hash:0xc056f59b]]]*/
 INTERN ATTR_SENTINEL NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.exec.spawn.spawnl") pid_t
 NOTHROW_RPC(VLIBCCALL libc_spawnl)(int mode,
                                    char const *__restrict path,
                                    char const *args,
-                                   ... /*, (wchar_t *)NULL*/)
+                                   ... /*, (char *)NULL*/)
 /*[[[body:spawnl]]]*/
 {
 	CRT_UNIMPLEMENTED("spawnl"); /* TODO */
@@ -225,13 +225,13 @@ NOTHROW_RPC(VLIBCCALL libc_spawnl)(int mode,
 }
 /*[[[end:spawnl]]]*/
 
-/*[[[head:spawnle,hash:0xe238a63e]]]*/
+/*[[[head:spawnle,hash:0x9a9d2e1b]]]*/
 INTERN ATTR_SENTINEL_O(1) NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.exec.spawn.spawnle") pid_t
 NOTHROW_RPC(VLIBCCALL libc_spawnle)(int mode,
                                     char const *__restrict path,
                                     char const *args,
-                                    ... /*, (wchar_t *)NULL, wchar_t **environ*/)
+                                    ... /*, (char *)NULL, char **environ*/)
 /*[[[body:spawnle]]]*/
 {
 	CRT_UNIMPLEMENTED("spawnle"); /* TODO */
@@ -240,13 +240,13 @@ NOTHROW_RPC(VLIBCCALL libc_spawnle)(int mode,
 }
 /*[[[end:spawnle]]]*/
 
-/*[[[head:spawnlp,hash:0x8683546d]]]*/
+/*[[[head:spawnlp,hash:0x24483bcc]]]*/
 INTERN ATTR_SENTINEL NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.exec.spawn.spawnlp") pid_t
 NOTHROW_RPC(VLIBCCALL libc_spawnlp)(int mode,
                                     char const *__restrict file,
                                     char const *args,
-                                    ... /*, (wchar_t *)NULL*/)
+                                    ... /*, (char *)NULL*/)
 /*[[[body:spawnlp]]]*/
 {
 	CRT_UNIMPLEMENTED("spawnlp"); /* TODO */
@@ -255,13 +255,13 @@ NOTHROW_RPC(VLIBCCALL libc_spawnlp)(int mode,
 }
 /*[[[end:spawnlp]]]*/
 
-/*[[[head:spawnlpe,hash:0xf819de4c]]]*/
+/*[[[head:spawnlpe,hash:0x68a72c4f]]]*/
 INTERN ATTR_SENTINEL_O(1) NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.exec.spawn.spawnlpe") pid_t
 NOTHROW_RPC(VLIBCCALL libc_spawnlpe)(int mode,
                                      char const *__restrict file,
                                      char const *args,
-                                     ... /*, (wchar_t *)NULL, wchar_t **environ*/)
+                                     ... /*, (char *)NULL, char **environ*/)
 /*[[[body:spawnlpe]]]*/
 {
 	CRT_UNIMPLEMENTED("spawnlpe"); /* TODO */

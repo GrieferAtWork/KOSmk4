@@ -1,4 +1,4 @@
-/* HASH 0x2f9238a9 */
+/* HASH 0x215e5b6b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,11 +72,9 @@
 #define __stub__get_output_format 1
 #define __stub__get_printf_count_output 1
 #define __stub__getdiskfree 1
-#define __stub__getdllprocaddr 1
 #define __stub__getmaxstdio 1
 #define __stub__isctype 1
 #define __stub__isctype_l 1
-#define __stub__loaddll 1
 #define __stub__mktemp_s 1
 #define __stub__recalloc 1
 #define __stub__rmtmp 1
@@ -90,7 +88,6 @@
 #define __stub__setmaxstdio 1
 #define __stub__statusfp 1
 #define __stub__statusfp2 1
-#define __stub__unloaddll 1
 #define __stub__wcserror 1
 #define __stub__wcserror_s 1
 #define __stub__wperror 1
@@ -126,7 +123,6 @@
 #define __stub_cosh 1
 #define __stub_crypt 1
 #define __stub_crypt_r 1
-#define __stub_cwait 1
 #define __stub_daemon 1
 #define __stub_drand48 1
 #define __stub_drand48_r 1

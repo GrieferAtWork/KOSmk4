@@ -1,4 +1,4 @@
-/* HASH 0xcbbb1bfc */
+/* HASH 0xa6a7f106 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -267,7 +267,7 @@ __CRT_FUNCTION(_isleadbyte_l,0,(),2,(int,wc,locale_t,locale),int)
 __CRT_FUNCTION(_iswcsym_l,0,(),2,(wint_t,wc,locale_t,locale),int)
 __CRT_FUNCTION(_iswcsymf_l,0,(),2,(wint_t,wc,locale_t,locale),int)
 __CRT_FUNCTION(_itoa_s,0,(),4,(int,val,char *,buf,size_t,bufsize,int,radix),errno_t)
-__CRT_FUNCTION(_loaddll,0,(),1,(char *,file),intptr_t)
+__CRT_FUNCTION(_loaddll,0,(),1,(char __KOS_FIXED_CONST *,file),intptr_t)
 __CRT_FUNCTION(_lrotl,0,(),2,(unsigned long,val,int,shift),unsigned long)
 __CRT_FUNCTION(_lrotr,0,(),2,(unsigned long,val,int,shift),unsigned long)
 __CRT_FUNCTION(_ltoa_s,0,(),4,(long,val,char *,buf,size_t,bufsize,int,radix),errno_t)
@@ -2647,10 +2647,10 @@ __CRT_FAKE_FUNCTION(_wspawnl,0,(),VA(3),(int,mode,char32_t const *__restrict,pat
 __CRT_FAKE_FUNCTION(_wspawnle,0,(),VA(3),(int,mode,char32_t const *__restrict,path,char32_t const *,args),intptr_t)
 __CRT_FAKE_FUNCTION(_wspawnlp,0,(),VA(3),(int,mode,char32_t const *__restrict,path,char32_t const *,args),intptr_t)
 __CRT_FAKE_FUNCTION(_wspawnlpe,0,(),VA(3),(int,mode,char32_t const *__restrict,path,char32_t const *,args),intptr_t)
-__CRT_FAKE_FUNCTION(_wspawnv,0,(),3,(int,mode,char32_t const *__restrict,path,__TARGV,),intptr_t)
-__CRT_FAKE_FUNCTION(_wspawnve,0,(),4,(int,mode,char32_t const *__restrict,path,__TARGV,,__TENVP,),intptr_t)
-__CRT_FAKE_FUNCTION(_wspawnvp,0,(),3,(int,mode,char32_t const *__restrict,path,__TARGV,),intptr_t)
-__CRT_FAKE_FUNCTION(_wspawnvpe,0,(),4,(int,mode,char32_t const *__restrict,path,__TARGV,,__TENVP,),intptr_t)
+__CRT_FAKE_FUNCTION(_wspawnv,0,(),3,(int,mode,char32_t const *__restrict,path,__TWARGV,),intptr_t)
+__CRT_FAKE_FUNCTION(_wspawnve,0,(),4,(int,mode,char32_t const *__restrict,path,__TWARGV,,__TWENVP,),intptr_t)
+__CRT_FAKE_FUNCTION(_wspawnvp,0,(),3,(int,mode,char32_t const *__restrict,path,__TWARGV,),intptr_t)
+__CRT_FAKE_FUNCTION(_wspawnvpe,0,(),4,(int,mode,char32_t const *__restrict,path,__TWARGV,,__TWENVP,),intptr_t)
 __CRT_FAKE_FUNCTION(_wsystem,0,(),1,(char32_t const *,cmd),int)
 __CRT_FAKE_FUNCTION(_wutime,0,(),2,(char32_t const *,filename,struct _utimbuf __KOS_FIXED_CONST *,file_times),int)
 __CRT_FAKE_FUNCTION(_wutime32,0,(),2,(char32_t const *,filename,struct __utimbuf32 __KOS_FIXED_CONST *,file_times),int)

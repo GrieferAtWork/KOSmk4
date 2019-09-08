@@ -22,7 +22,6 @@
 
 %{
 #include <features.h>
-#include <features.h>
 #include <bits/types.h>
 
 __SYSDECL_BEGIN
@@ -138,16 +137,13 @@ _endthreadex:($u32 exitcode);
 %
 
 %[default_impl_section(.text.crt.dos.fs.dlfcn)]
-[throws] _loaddll:(char *file) -> intptr_t;
-/* TODO: Emulate using dlopen() */
+[throws] _loaddll:(char __KOS_FIXED_CONST *file) -> intptr_t;
 
 [throws] _unloaddll:(intptr_t hnd) -> int;
-/* TODO: Emulate using dlclose() */
 
 %
 %typedef int (__LIBCCALL *__procfun)(void);
 [throws] _getdllprocaddr:(intptr_t hnd, char __KOS_FIXED_CONST *symname, intptr_t ord) -> __procfun;
-/* TODO: Emulate using dlsym() */
 
 
 %{
@@ -188,10 +184,10 @@ typedef __intptr_t intptr_t;
 [alias(*)][attribute(*)] _wexeclpe:(*) = wexeclpe;
 
 %[default_impl_section({.text.crt.wchar.fs.exec.spawn|.text.crt.dos.wchar.fs.exec.spawn})]
-[alias(*)][attribute(*)][argument_names(mode, path, ___argv)]         _wspawnv:(int mode, wchar_t const *__restrict path, @__TARGV@) -> intptr_t = wspawnv;
-[alias(*)][attribute(*)][argument_names(mode, path, ___argv, ___envp)] _wspawnve:(int mode, wchar_t const *__restrict path, @__TARGV@, @__TENVP@) -> intptr_t = wspawnve;
-[alias(*)][attribute(*)][argument_names(mode, path, ___argv)]         _wspawnvp:(int mode, wchar_t const *__restrict path, @__TARGV@) -> intptr_t = wspawnvp;
-[alias(*)][attribute(*)][argument_names(mode, path, ___argv, ___envp)] _wspawnvpe:(int mode, wchar_t const *__restrict path, @__TARGV@, @__TENVP@) -> intptr_t = wspawnvpe;
+[alias(*)][attribute(*)][argument_names(mode, path, ___argv)]          _wspawnv:(int mode, wchar_t const *__restrict path, @__TWARGV@) -> intptr_t = wspawnv;
+[alias(*)][attribute(*)][argument_names(mode, path, ___argv, ___envp)] _wspawnve:(int mode, wchar_t const *__restrict path, @__TWARGV@, @__TWENVP@) -> intptr_t = wspawnve;
+[alias(*)][attribute(*)][argument_names(mode, path, ___argv)]          _wspawnvp:(int mode, wchar_t const *__restrict path, @__TWARGV@) -> intptr_t = wspawnvp;
+[alias(*)][attribute(*)][argument_names(mode, path, ___argv, ___envp)] _wspawnvpe:(int mode, wchar_t const *__restrict path, @__TWARGV@, @__TWENVP@) -> intptr_t = wspawnvpe;
 [alias(*)][attribute(*)][allow_macros] _wspawnl:(int mode, wchar_t const *__restrict path, wchar_t const *args, ... /*, (wchar_t *)NULL*/) -> intptr_t = wspawnl;
 [alias(*)][attribute(*)][allow_macros] _wspawnle:(int mode, wchar_t const *__restrict path, wchar_t const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) -> intptr_t = wspawnle;
 [alias(*)][attribute(*)][allow_macros] _wspawnlp:(int mode, wchar_t const *__restrict path, wchar_t const *args, ... /*, (wchar_t *)NULL*/) -> intptr_t = wspawnlp;
@@ -239,22 +235,22 @@ spawnvpe:(int mode, [nonnull] char const *__restrict file, [nonnull] @__TARGV@, 
 
 [cp][guard][dependency_include(<parts/redirect-exec.h>)]
 [requires($has_function(spawnv))][ATTR_SENTINEL][alias(_spawnl)][allow_macros]
-spawnl:(int mode, [nonnull] char const *__restrict path, char const *args, ... /*, (wchar_t *)NULL*/) -> pid_t {
+spawnl:(int mode, [nonnull] char const *__restrict path, char const *args, ... /*, (char *)NULL*/) -> pid_t {
 	__REDIRECT_SPAWNL(char, spawnv, mode, path, args)
 }
 [cp][guard][dependency_include(<parts/redirect-exec.h>)]
 [requires($has_function(spawnve))][ATTR_SENTINEL_O(1)][alias(_spawnle)][allow_macros]
-spawnle:(int mode, [nonnull] char const *__restrict path, char const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) -> pid_t {
+spawnle:(int mode, [nonnull] char const *__restrict path, char const *args, ... /*, (char *)NULL, char **environ*/) -> pid_t {
 	__REDIRECT_SPAWNLE(char, spawnve, mode, path, args)
 }
 [cp][guard][dependency_include(<parts/redirect-exec.h>)]
 [requires($has_function(spawnvp))][ATTR_SENTINEL][alias(_spawnlp)][allow_macros]
-spawnlp:(int mode, [nonnull] char const *__restrict file, char const *args, ... /*, (wchar_t *)NULL*/) -> pid_t {
+spawnlp:(int mode, [nonnull] char const *__restrict file, char const *args, ... /*, (char *)NULL*/) -> pid_t {
 	__REDIRECT_SPAWNLP(char, spawnvp, mode, file, args)
 }
 [cp][guard][dependency_include(<parts/redirect-exec.h>)]
 [requires($has_function(spawnvpe))][ATTR_SENTINEL_O(1)][alias(_spawnle)][allow_macros]
-spawnlpe:(int mode, [nonnull] char const *__restrict file, char const *args, ... /*, (wchar_t *)NULL, wchar_t **environ*/) -> pid_t {
+spawnlpe:(int mode, [nonnull] char const *__restrict file, char const *args, ... /*, (char *)NULL, char **environ*/) -> pid_t {
 	__REDIRECT_SPAWNLPE(char, spawnvpe, mode, file, args)
 }
 

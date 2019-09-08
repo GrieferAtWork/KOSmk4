@@ -1,4 +1,4 @@
-/* HASH 0x5446f65c */
+/* HASH 0x87036928 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,8 +38,8 @@ __LOCAL_LIBC(spawnlpe) __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t
 __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(spawnlpe))(int __mode,
                                                        char const *__restrict __file,
                                                        char const *__args,
-                                                       ... /*, (wchar_t *)NULL, wchar_t **environ*/) {
-#line 258 "kos/src/libc/magic/process.c"
+                                                       ... /*, (char *)NULL, char **environ*/) {
+#line 254 "kos/src/libc/magic/process.c"
 	__REDIRECT_SPAWNLPE(char, __localdep_spawnvpe, __mode, __file, __args)
 }
 __NAMESPACE_LOCAL_END
