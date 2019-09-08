@@ -418,9 +418,9 @@ EOF
 			cmd make -j $MAKE_PARALLEL_COUNT
 		fi
 		install_ncurses_library() {
-			install_file /lib/${1}.so.$NCURSES_VERISON "$OPTPATH/lib/${1}.so.$NCURSES_VERISON"
-			install_symlink /lib/${1}.so.$NCURSES_VERISON_MAJOR ${1}.so.$NCURSES_VERISON
-			install_symlink /lib/${1}.so ${1}.so.$NCURSES_VERISON
+			install_file /lib/${1}.so.$NCURSES_VERISON_MAJOR "$OPTPATH/lib/${1}.so.$NCURSES_VERISON"
+			install_symlink /lib/${1}.so.$NCURSES_VERISON ${1}.so.$NCURSES_VERISON_MAJOR
+			install_symlink /lib/${1}.so ${1}.so.$NCURSES_VERISON_MAJOR
 			install_file_nodisk /lib/${1}.a "$OPTPATH/lib/${1}.a"
 			install_file_nodisk /lib/${1}_g.a "$OPTPATH/lib/${1}_g.a"
 		}
