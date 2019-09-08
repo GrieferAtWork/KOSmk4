@@ -386,6 +386,8 @@ EOF
 				export CC="${CROSS_PREFIX}gcc"
 				export CPP="${CROSS_PREFIX}cpp"
 				export CXX="${CROSS_PREFIX}g++"
+				export CFLAGS="-ggdb"
+				export CXXFLAGS="-ggdb"
 				cmd bash ../../../src/ncurses-$NCURSES_VERISON/configure \
 					--bindir="/bin" \
 					--datarootdir="/usr/share" \
@@ -409,7 +411,7 @@ EOF
 					--with-debug \
 					--disable-big-core \
 					--disable-database \
-					--with-fallbacks=vt100 \
+					--with-fallbacks=vt100,unknown \
 					--enable-const \
 					--enable-ext-mouse \
 					--disable-stripping
