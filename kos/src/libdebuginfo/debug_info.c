@@ -98,13 +98,13 @@ PRIVATE struct atomic_rwlock kernel_debug_info_inside_malloc = ATOMIC_RWLOCK_INI
  * safely allocate memory is by allocating from the LOCKED heap with the PREFAULT
  * flag set (thus preventing any possibility of triggering a pagefault in case new
  * memory had to be allocated) */
-#ifdef CONFIG_NO_DEBUGGER
+#ifndef CONFIG_NO_DEBUGGER
 #define MY_KMALLOC_HEAP (&kernel_locked_heap)
 #define MY_KMALLOC_GFP  (GFP_LOCKED | GFP_PREFLT)
-#else /* CONFIG_NO_DEBUGGER */
+#else /* !CONFIG_NO_DEBUGGER */
 #define MY_KMALLOC_HEAP (&kernel_default_heap)
 #define MY_KMALLOC_GFP  (GFP_NORMAL)
-#endif /* !CONFIG_NO_DEBUGGER */
+#endif /* CONFIG_NO_DEBUGGER */
 
 
 PRIVATE NOBLOCK void *
