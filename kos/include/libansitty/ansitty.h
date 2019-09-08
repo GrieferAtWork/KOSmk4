@@ -35,6 +35,7 @@
  *  - https://www.climagic.org/mirrors/VT100_Escape_Codes.html
  *  - http://real-world-systems.com/docs/ANSIcode.html
  *  - http://man7.org/linux/man-pages/man1/screen.1.html
+ *  - https://vt100.net/docs/vt102-ug/chapter5.html
  */
 
 

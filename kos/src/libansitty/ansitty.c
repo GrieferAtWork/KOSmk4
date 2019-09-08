@@ -122,7 +122,7 @@ DECL_BEGIN
 #define ANSITTY_FLAG_NOLFCR       0x0004 /* FLAG: \n characters should not imply CR. */
 #define ANSITTY_FLAG_HEDIT        0x0008 /* FLAG: Horizontal Editing mode (ICH/DCH/IRM go backwards). */
 #define ANSITTY_FLAG_INSERT       0x0010 /* FLAG: Enable insertion mode. */
-#define ANSITTY_FLAG_INSDEL_LINE  0x0020 /* FLAG: Insert/Delete only affects the current line. */
+#define ANSITTY_FLAG_INSDEL_SCRN  0x0020 /* FLAG: Insert/Delete affect the entire screen. */
 #define ANSITTY_FLAG_RENDERMASK  (ANSITTY_FLAG_CONCEIL) /* Mask for flags that affect rendering */
 
 
@@ -894,16 +894,9 @@ do_single_argument_case:
 			if (n <= 0)
 				break;
 			switch (self->at_ttyflag & (ANSITTY_FLAG_HEDIT |
-			                            ANSITTY_FLAG_INSDEL_LINE)) {
+			                            ANSITTY_FLAG_INSDEL_SCRN)) {
 
-			case 0:
-				/* 123456789      123456789
-				 * ABCDEFGHI  --> ABCD...EF
-				 * abcdefghi      GHIabcdef */
-				COPYCELL(n, MAXCOORD);
-				break;
-
-			case ANSITTY_FLAG_INSDEL_LINE: {
+			case 0: {
 				/* 123456789      123456789
 				 * ABCDEFGHI  --> ABCD...EF
 				 * abcdefghi      abcdefghi */
@@ -920,7 +913,29 @@ do_single_argument_case:
 				COPYCELL(n, cells_in_line - (unsigned int)n);
 			}	break;
 
+			case ANSITTY_FLAG_INSDEL_SCRN:
+				/* 123456789      123456789
+				 * ABCDEFGHI  --> ABCD...EF
+				 * abcdefghi      GHIabcdef */
+				COPYCELL(n, MAXCOORD);
+				break;
+
 			case ANSITTY_FLAG_HEDIT: {
+				ansitty_coord_t xy[2];
+				/* 123456789      123456789
+				 * ABCDEFGHI  --> D...EFGHI
+				 * abcdefghi      abcdefghi */
+				GETCURSOR(xy);
+				if ((unsigned int)n >= xy[0]) {
+					/* Full area shift */
+				} else {
+					SETCURSOR((ansitty_coord_t)n, xy[1], false);
+					COPYCELL(-n, xy[0] - (unsigned int)n);
+					SETCURSOR(xy[0], xy[1], false);
+				}
+			}	break;
+
+			case ANSITTY_FLAG_HEDIT | ANSITTY_FLAG_INSDEL_SCRN: {
 				ansitty_coord_t xy[2];
 				ansitty_coord_t xy2[2];
 				unsigned int copy_count;
@@ -962,21 +977,6 @@ done_insert_ansitty_flag_hedit:
 				;
 			}	break;
 
-			case ANSITTY_FLAG_HEDIT | ANSITTY_FLAG_INSDEL_LINE: {
-				ansitty_coord_t xy[2];
-				/* 123456789      123456789
-				 * ABCDEFGHI  --> D...EFGHI
-				 * abcdefghi      abcdefghi */
-				GETCURSOR(xy);
-				if ((unsigned int)n >= xy[0]) {
-					/* Full area shift */
-				} else {
-					SETCURSOR((ansitty_coord_t)n, xy[1], false);
-					COPYCELL(-n, xy[0] - (unsigned int)n);
-					SETCURSOR(xy[0], xy[1], false);
-				}
-			}	break;
-
 			default: __builtin_unreachable();
 			}
 			break;
@@ -986,9 +986,33 @@ done_insert_ansitty_flag_hedit:
 			if (n <= 0)
 				break;
 			switch (self->at_ttyflag & (ANSITTY_FLAG_HEDIT |
-			                            ANSITTY_FLAG_INSDEL_LINE)) {
+			                            ANSITTY_FLAG_INSDEL_SCRN)) {
 
 			case 0: {
+				/* 123456789      123456789
+				 * ABCDEFGHI  --> ABCDHI...
+				 * abcdefghi      abcdefghi */
+				/* TODO: Need to account for the right margin here! */
+				ansitty_coord_t xy[2];
+				ansitty_coord_t sxy[2];
+				ansitty_coord_t cells_in_line;
+				GETCURSOR(xy);
+				GETSIZE(sxy);
+				if unlikely(xy[0] >= sxy[0]) {
+					/* Full area shift */
+				} else {
+					cells_in_line = sxy[0] - xy[0];
+					if ((unsigned int)n >= cells_in_line) {
+						/* Full area shift */
+					} else {
+						SETCURSOR(xy[0] + (unsigned int)n, xy[1], false);
+						COPYCELL(-n, cells_in_line - (unsigned int)n);
+						SETCURSOR(xy[0], xy[1], false);
+					}
+				}
+			}	break;
+
+			case ANSITTY_FLAG_INSDEL_SCRN: {
 				/* 123456789      123456789
 				 * ABCDEFGHI  --> ABCDHIabc
 				 * abcdefghi      defghi... */
@@ -1010,31 +1034,23 @@ done_insert_ansitty_flag_hedit:
 				SETCURSOR(xy[0], xy[1], false);
 			}	break;
 
-			case ANSITTY_FLAG_INSDEL_LINE: {
-				/* 123456789      123456789
-				 * ABCDEFGHI  --> ABCDHI...
-				 * abcdefghi      abcdefghi */
+			case ANSITTY_FLAG_HEDIT: {
 				ansitty_coord_t xy[2];
-				ansitty_coord_t sxy[2];
-				ansitty_coord_t cells_in_line;
+				/* 123456789      123456789
+				 * ABCDEFGHI  --> ...AEFGHI
+				 * abcdefghi      abcdefghi */
 				GETCURSOR(xy);
-				GETSIZE(sxy);
-				if unlikely(xy[0] >= sxy[0]) {
+				if ((unsigned int)n >= xy[0]) {
 					/* Full area shift */
 				} else {
-					cells_in_line = sxy[0] - xy[0];
-					if ((unsigned int)n >= cells_in_line) {
-						/* Full area shift */
-					} else {
-						cells_in_line -= (unsigned int)n;
-						SETCURSOR(xy[0] + cells_in_line, xy[1], false);
-						COPYCELL(-n, cells_in_line);
-						SETCURSOR(xy[0], xy[1], false);
-					}
+					if (xy[0] != 0)
+						SETCURSOR(0, xy[1], false);
+					COPYCELL(n, xy[0] - (unsigned int)n);
+					SETCURSOR(xy[0], xy[1], false);
 				}
 			}	break;
 
-			case ANSITTY_FLAG_HEDIT: {
+			case ANSITTY_FLAG_HEDIT | ANSITTY_FLAG_INSDEL_SCRN: {
 				ansitty_coord_t xy[2];
 				unsigned int copy_count;
 				/* 123456789      ...123456
@@ -1050,22 +1066,6 @@ done_insert_ansitty_flag_hedit:
 				SETCURSOR(0, 0, false);
 				COPYCELL(n, copy_count);
 				SETCURSOR(xy[0], xy[1], false);
-			}	break;
-
-			case ANSITTY_FLAG_HEDIT | ANSITTY_FLAG_INSDEL_LINE: {
-				ansitty_coord_t xy[2];
-				/* 123456789      123456789
-				 * ABCDEFGHI  --> ...AEFGHI
-				 * abcdefghi      abcdefghi */
-				GETCURSOR(xy);
-				if ((unsigned int)n >= xy[0]) {
-					/* Full area shift */
-				} else {
-					if (xy[0] != 0)
-						SETCURSOR(0, xy[1], false);
-					COPYCELL(n, xy[0] - (unsigned int)n);
-					SETCURSOR(xy[0], xy[1], false);
-				}
 			}	break;
 
 			default: __builtin_unreachable();
@@ -1197,16 +1197,16 @@ done_insert_ansitty_flag_hedit:
 
 	case 'Q': /* SEM Set Editing extent Mode (limits ICH & DCH) */
 		if (!arglen)
-			self->at_ttyflag &= ~(ANSITTY_FLAG_INSDEL_LINE);
+			self->at_ttyflag |= ANSITTY_FLAG_INSDEL_SCRN;
 		else {
 			ARGUMENT_CODE_SWITCH_BEGIN()
 
 			case 0: /* \e[0Q   [Q = Insert/delete character affects rest of display */
-				self->at_ttyflag &= ~(ANSITTY_FLAG_INSDEL_LINE);
+				self->at_ttyflag |= ANSITTY_FLAG_INSDEL_SCRN;
 				break;
 
 			case 1: /* \e[1Q   ICH/DCH affect the current line only */
-				self->at_ttyflag |= ANSITTY_FLAG_INSDEL_LINE;
+				self->at_ttyflag &= ~(ANSITTY_FLAG_INSDEL_SCRN);
 				break;
 			/* TODO: \e[2Q   ICH/DCH affect current field (between tab stops) only */
 			/* TODO: \e[3Q   ICH/DCH affect qualified area (between protected fields) */
@@ -2045,17 +2045,9 @@ done:
 LOCAL void CC
 ansitty_do_insert_unicode(struct ansitty *__restrict self, char32_t ch) {
 	switch (self->at_ttyflag & (ANSITTY_FLAG_HEDIT |
-	                            ANSITTY_FLAG_INSDEL_LINE)) {
+	                            ANSITTY_FLAG_INSDEL_SCRN)) {
 
-	case 0:
-		/* 123456789      123456789
-		 * ABCDEFGHI  --> ABCD...EF
-		 * abcdefghi      GHIabcdef */
-		COPYCELL(1, MAXCOORD);
-		PUTUNI(ch);
-		break;
-
-	case ANSITTY_FLAG_INSDEL_LINE: {
+	case 0: {
 		/* 123456789      123456789
 		 * ABCDEFGHI  --> ABCD...EF
 		 * abcdefghi      abcdefghi */
@@ -2073,7 +2065,35 @@ ansitty_do_insert_unicode(struct ansitty *__restrict self, char32_t ch) {
 		PUTUNI(ch);
 	}	break;
 
+	case ANSITTY_FLAG_INSDEL_SCRN:
+		/* 123456789      123456789
+		 * ABCDEFGHI  --> ABCD...EF
+		 * abcdefghi      GHIabcdef */
+		COPYCELL(1, MAXCOORD);
+		PUTUNI(ch);
+		break;
+
 	case ANSITTY_FLAG_HEDIT: {
+		ansitty_coord_t xy[2];
+		/* 123456789      123456789
+		 * ABCDEFGHI  --> D...EFGHI
+		 * abcdefghi      abcdefghi */
+		GETCURSOR(xy);
+		if (xy[0] <= 1) {
+			/* Full area shift */
+			if (xy[0] == 0)
+				break;
+			SETCURSOR(0, xy[1], false);
+			PUTUNI(ch);
+			break;
+		}
+		SETCURSOR(1, xy[1], false);
+		COPYCELL(-1, xy[0] - 1);
+		SETCURSOR(xy[0] - 1, xy[1], false);
+		PUTUNI(ch);
+	}	break;
+
+	case ANSITTY_FLAG_HEDIT | ANSITTY_FLAG_INSDEL_SCRN: {
 		ansitty_coord_t xy[2];
 		unsigned int copy_count;
 		/* 123456789      456789ABC
@@ -2103,26 +2123,6 @@ ansitty_do_insert_unicode(struct ansitty *__restrict self, char32_t ch) {
 			--xy[0];
 		}
 		SETCURSOR(xy[0], xy[1], false);
-		PUTUNI(ch);
-	}	break;
-
-	case ANSITTY_FLAG_HEDIT | ANSITTY_FLAG_INSDEL_LINE: {
-		ansitty_coord_t xy[2];
-		/* 123456789      123456789
-		 * ABCDEFGHI  --> D...EFGHI
-		 * abcdefghi      abcdefghi */
-		GETCURSOR(xy);
-		if (xy[0] <= 1) {
-			/* Full area shift */
-			if (xy[0] == 0)
-				break;
-			SETCURSOR(0, xy[1], false);
-			PUTUNI(ch);
-			break;
-		}
-		SETCURSOR(1, xy[1], false);
-		COPYCELL(-1, xy[0] - 1);
-		SETCURSOR(xy[0] - 1, xy[1], false);
 		PUTUNI(ch);
 	}	break;
 
