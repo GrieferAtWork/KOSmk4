@@ -1,4 +1,4 @@
-/* HASH 0xc876aded */
+/* HASH 0x2f9238a9 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,7 +74,6 @@
 #define __stub__getdiskfree 1
 #define __stub__getdllprocaddr 1
 #define __stub__getmaxstdio 1
-#define __stub__heapmin 1
 #define __stub__isctype 1
 #define __stub__isctype_l 1
 #define __stub__loaddll 1
@@ -117,7 +116,6 @@
 #define __stub_backtrace_symbols_fd 1
 #define __stub_bindresvport 1
 #define __stub_bindresvport6 1
-#define __stub_calloc 1
 #define __stub_cbrt 1
 #define __stub_clearenv 1
 #define __stub_clock 1
@@ -185,7 +183,6 @@
 #define __stub_fputwc 1
 #define __stub_fputws 1
 #define __stub_fputws_unlocked 1
-#define __stub_free 1
 #define __stub_freeaddrinfo 1
 #define __stub_freeifaddrs 1
 #define __stub_freelocale 1
@@ -368,10 +365,7 @@
 #define __stub_lrand48_r 1
 #define __stub_lrint 1
 #define __stub_makecontext 1
-#define __stub_malloc 1
-#define __stub_malloc_usable_size 1
 #define __stub_mbsnrtowcs 1
-#define __stub_memalign 1
 #define __stub_mkdtemp 1
 #define __stub_mkostemp 1
 #define __stub_mkostemp64 1
@@ -410,7 +404,6 @@
 #define __stub_posix_fadvise64 1
 #define __stub_posix_fallocate64 1
 #define __stub_posix_madvise 1
-#define __stub_posix_memalign 1
 #define __stub_posix_openpt 1
 #define __stub_posix_spawn 1
 #define __stub_posix_spawn_file_actions_addclose 1
@@ -573,7 +566,6 @@
 #define __stub_pututline 1
 #define __stub_pututxline 1
 #define __stub_putwc_unlocked 1
-#define __stub_pvalloc 1
 #define __stub_pwritev 1
 #define __stub_pwritev64 1
 #define __stub_random_r 1
@@ -584,8 +576,6 @@
 #define __stub_readdir64_r 1
 #define __stub_readdir_r 1
 #define __stub_readv 1
-#define __stub_realloc 1
-#define __stub_realloc_in_place 1
 #define __stub_regcomp 1
 #define __stub_regerror 1
 #define __stub_regexec 1
@@ -701,7 +691,6 @@
 #define __stub_uselocale 1
 #define __stub_utmpname 1
 #define __stub_utmpxname 1
-#define __stub_valloc 1
 #define __stub_vfwprintf 1
 #define __stub_vfwscanf 1
 #define __stub_vhangup 1

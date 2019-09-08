@@ -174,6 +174,7 @@ DEFINE_DL_EXPORT_ALIAS(calloc, dlcalloc);
 DEFINE_DL_EXPORT_ALIAS(realloc, dlrealloc);
 DEFINE_DL_EXPORT_ALIAS(realloc_in_place, dlrealloc_in_place);
 DEFINE_DL_EXPORT_ALIAS(memalign, dlmemalign);
+DEFINE_DL_EXPORT_ALIAS(aligned_alloc, dlmemalign);
 DEFINE_DL_EXPORT_ALIAS(posix_memalign, dlposix_memalign);
 DEFINE_DL_EXPORT_ALIAS(valloc, dlvalloc);
 DEFINE_DL_EXPORT_ALIAS(mallopt, dlmallopt);

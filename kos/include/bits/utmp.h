@@ -20,10 +20,12 @@
 #define _BITS_UTMP_H 1
 
 #include <__stdinc.h>
-#include <paths.h>
+
+#include <bits/wordsize.h>
 #include <sys/time.h>
 #include <sys/types.h>
-#include <bits/wordsize.h>
+
+#include <paths.h>
 
 __SYSDECL_BEGIN
 
@@ -60,15 +62,15 @@ struct lastlog {
 /* The structure describing the status of a terminated process.
  * This type is used in `struct utmp' below. */
 struct exit_status {
-	short int e_termination; /* Process termination status. */
-	short int e_exit;        /* Process exit status. */
+	__INT16_TYPE__ e_termination; /* Process termination status. */
+	__INT16_TYPE__ e_exit;        /* Process exit status. */
 };
 
 /* The structure describing an entry in the user accounting database. */
 struct utmp {
 	__INT16_TYPE__     ut_type;               /* Type of login. */
 	pid_t              ut_pid;                /* Process ID of login process. */
-	char               ut_line[UT_LINESIZE];  /* Devicename. */
+	char               ut_line[UT_LINESIZE];  /* Device name. */
 	char               ut_id[4];              /* Inittab ID. */
 	union {
 		char           ut_name[UT_NAMESIZE];  /* Username. */

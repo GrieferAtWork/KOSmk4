@@ -1,4 +1,4 @@
-/* HASH 0x2dedc185 */
+/* HASH 0x10067de6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,7 +74,6 @@
 #define __CRT_STUB__getdiskfree 1
 #define __CRT_STUB__getdllprocaddr 1
 #define __CRT_STUB__getmaxstdio 1
-#define __CRT_STUB__heapmin 1
 #define __CRT_STUB__isctype 1
 #define __CRT_STUB__isctype_l 1
 #define __CRT_STUB__loaddll 1
@@ -117,7 +116,6 @@
 #define __CRT_STUB_backtrace_symbols_fd 1
 #define __CRT_STUB_bindresvport 1
 #define __CRT_STUB_bindresvport6 1
-#define __CRT_STUB_calloc 1
 #define __CRT_STUB_cbrt 1
 #define __CRT_STUB_clearenv 1
 #define __CRT_STUB_clock 1
@@ -185,7 +183,6 @@
 #define __CRT_STUB_fputwc 1
 #define __CRT_STUB_fputws 1
 #define __CRT_STUB_fputws_unlocked 1
-#define __CRT_STUB_free 1
 #define __CRT_STUB_freeaddrinfo 1
 #define __CRT_STUB_freeifaddrs 1
 #define __CRT_STUB_freelocale 1
@@ -368,10 +365,7 @@
 #define __CRT_STUB_lrand48_r 1
 #define __CRT_STUB_lrint 1
 #define __CRT_STUB_makecontext 1
-#define __CRT_STUB_malloc 1
-#define __CRT_STUB_malloc_usable_size 1
 #define __CRT_STUB_mbsnrtowcs 1
-#define __CRT_STUB_memalign 1
 #define __CRT_STUB_mkdtemp 1
 #define __CRT_STUB_mkostemp 1
 #define __CRT_STUB_mkostemp64 1
@@ -410,7 +404,6 @@
 #define __CRT_STUB_posix_fadvise64 1
 #define __CRT_STUB_posix_fallocate64 1
 #define __CRT_STUB_posix_madvise 1
-#define __CRT_STUB_posix_memalign 1
 #define __CRT_STUB_posix_openpt 1
 #define __CRT_STUB_posix_spawn 1
 #define __CRT_STUB_posix_spawn_file_actions_addclose 1
@@ -573,7 +566,6 @@
 #define __CRT_STUB_pututline 1
 #define __CRT_STUB_pututxline 1
 #define __CRT_STUB_putwc_unlocked 1
-#define __CRT_STUB_pvalloc 1
 #define __CRT_STUB_pwritev 1
 #define __CRT_STUB_pwritev64 1
 #define __CRT_STUB_random_r 1
@@ -584,8 +576,6 @@
 #define __CRT_STUB_readdir64_r 1
 #define __CRT_STUB_readdir_r 1
 #define __CRT_STUB_readv 1
-#define __CRT_STUB_realloc 1
-#define __CRT_STUB_realloc_in_place 1
 #define __CRT_STUB_regcomp 1
 #define __CRT_STUB_regerror 1
 #define __CRT_STUB_regexec 1
@@ -701,7 +691,6 @@
 #define __CRT_STUB_uselocale 1
 #define __CRT_STUB_utmpname 1
 #define __CRT_STUB_utmpxname 1
-#define __CRT_STUB_valloc 1
 #define __CRT_STUB_vfwprintf 1
 #define __CRT_STUB_vfwscanf 1
 #define __CRT_STUB_vhangup 1
