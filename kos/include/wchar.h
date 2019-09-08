@@ -1,4 +1,4 @@
-/* HASH 0x9b6c4311 */
+/* HASH 0x551c6ea */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1880,7 +1880,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wcstold_l, __FORCELOCAL __ATTR_PURE __ATTR_WUNUS
 __CDECLARE(,wint_t,,getwchar_unlocked,(void),()) __THROWS(...)
 #elif defined(__CRT_HAVE__getwchar_nolock)
 __CREDIRECT(,wint_t,,getwchar_unlocked,(void),_getwchar_nolock,()) __THROWS(...)
-#elif defined(__CRT_HAVE_getwc_unlocked) || defined(__CRT_HAVE_fgetwc_unlocked) || defined(__CRT_HAVE__fgetwc_nolock) && !defined(__NO_STDSTREAMS)
+#elif (defined(__CRT_HAVE_getwc_unlocked) || defined(__CRT_HAVE_fgetwc_unlocked) || defined(__CRT_HAVE__fgetwc_nolock)) && !defined(__NO_STDSTREAMS)
 #include <local/wchar/getwchar_unlocked.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(getwchar_unlocked, __FORCELOCAL wint_t (__LIBCCALL getwchar_unlocked)(void) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getwchar_unlocked))(); })
 #endif /* getwchar_unlocked... */
@@ -1888,7 +1888,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getwchar_unlocked, __FORCELOCAL wint_t (__LIBCCA
 __CDECLARE(,wint_t,,putwchar_unlocked,(wchar_t __wc),(__wc)) __THROWS(...)
 #elif defined(__CRT_HAVE__putwchar_nolock)
 __CREDIRECT(,wint_t,,putwchar_unlocked,(wchar_t __wc),_putwchar_nolock,(__wc)) __THROWS(...)
-#elif defined(__CRT_HAVE_putwc_unlocked) || defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE__fputwc_nolock) && !defined(__NO_STDSTREAMS)
+#elif (defined(__CRT_HAVE_putwc_unlocked) || defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE__fputwc_nolock)) && !defined(__NO_STDSTREAMS)
 #include <local/wchar/putwchar_unlocked.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(putwchar_unlocked, __FORCELOCAL wint_t (__LIBCCALL putwchar_unlocked)(wchar_t __wc) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(putwchar_unlocked))(__wc); })
 #endif /* putwchar_unlocked... */

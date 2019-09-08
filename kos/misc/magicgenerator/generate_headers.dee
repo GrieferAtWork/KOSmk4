@@ -2909,8 +2909,10 @@ function format_define_require_string(fp: File, text: string) {
 					throw "Unknown function " + repr name;
 				}
 				local old_string = fp.string.rstrip();
+				local new_string = text.substr(i).lstrip();
 				fp << add_paren_if_necessary(func.get_dependency_string(),
-					old_string && !old_string.endswith("||"));
+					(old_string && !old_string.endswith("||") && !old_string.endswith("(")) ||
+					(i < len && !new_string.startswith("||") && !new_string.startswith(")")));
 			}	break;
 			default:
 				throw "Unknown requires directive " + repr cmd + " in [requires(" + repr text + ")]";

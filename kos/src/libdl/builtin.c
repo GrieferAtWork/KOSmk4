@@ -138,6 +138,7 @@ elf_setdlerror_nomem(void) {
 	ATOMIC_WRITE(elf_dlerror_message,
 	             (char *)elf_dlerror_buffer);
 }
+
 INTERN ATTR_COLD int VCC
 elf_setdlerrorf(char const *__restrict format, ...) {
 	int result;
@@ -147,6 +148,7 @@ elf_setdlerrorf(char const *__restrict format, ...) {
 	va_end(args);
 	return result;
 }
+
 INTERN ATTR_COLD int CC
 elf_vsetdlerrorf(char const *__restrict format, va_list args) {
 	vsnprintf(elf_dlerror_buffer,
