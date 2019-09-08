@@ -37,7 +37,7 @@ KOSmk4 no longer is a small kernel. I'd say it has reached the point of really b
 	- GDB support
 		- QEMU features a builtin gdb stub, that is supported for debugging the core itself
 		- Seperately, KOS provides a custom GDB stub driver (s.a. `/kos/src/kernel/modgdbstub`) for emulator-independent and real-hardware debugging
-		- Fully integrated with Visual Studio (who know you could do this... I certainly didn't until I stumbled across some vague reports of GDB debugging support in VS2017, that later turned out to be true)
+		- Fully integrated with Visual Studio (who knew you could do this... I certainly didn't until I stumbled across some vague reports of GDB debugging support in VS2017, that later turned out to be true)
 - multiboot
 	- Full (but optional) support for multiboot- and multiboot2-compliant bootloaders
 	- Allow the bootloader to provide
@@ -167,11 +167,11 @@ KOSmk4 no longer is a small kernel. I'd say it has reached the point of really b
 	- Drivers are ELF binaries
 	- Drivers can also be provided by the bootloader (s.a. multiboot)
 - Misc. features
-	- The kernel has the notion of a `.free` section of memory within the core that contains everything that is only used during initialization (e.g. the kernel's bootloader initial entry point, or device initialization code)
+	- The kernel has the notion of a `.free` section of memory within the core that contains everything that is only used during initialization (e.g. the kernel's initial bootloader entry point, or device initialization code)
 		- Just before transitioning to user-space for the first time, this section is unmapped and made available to the page frame allocator
 	- Branch profiling support
-		- Using preprocessor maging, every `if`-statement and every use `likely` / `unlikely` within any kernel source file keeps track of which of its branches got taken what number of times
-		- Allows for easy detection of ~hot~ zones within the kernel, as well as `likely` / `unlikely` annotations that are just plainly wrong
+		- Using preprocessor magic, every `if`-statement and every use of `likely` / `unlikely` within any kernel source file keeps track of which of its branches got taken what number of times
+		- Allows for easy detection of ~hot~ zones within the kernel, as well as finding `likely` / `unlikely` annotations that are just plainly wrong
 - Drivers
 	- pci
 		- Required for detecting IDE ports
@@ -201,7 +201,7 @@ KOSmk4 no longer is a small kernel. I'd say it has reached the point of really b
 			- `pipe()`
 			- `fork()`, `exec()`
 			- `open()`, `openat()`
-			- `[p]read()`, `[p]write()`, `[p]lseek()`
+			- `[p]read()`, `[p]write()`, `lseek()`
 			- `[f]realpath[at]()`
 			- ... (many, __many__, __MANY__ more!)
 		- TTY support (with job control)
@@ -212,6 +212,7 @@ KOSmk4 no longer is a small kernel. I'd say it has reached the point of really b
 - Various custom libraries for different sub-systems
 	- <a name="libansitty"></a>libansitty (user/kernel)
 		- Implement [ANSI tty escape code](https://en.wikipedia.org/wiki/ANSI_escape_code) processing (`\e[0m`)
+		- Written to closely follow what is done by xterm, it is able to host `libcurses` in xterm-mode (s.a. `$PROJPATH/kos/misc/make_utility.sh i386 ncurses`)
 	- libbuffer (user/kernel)
 		- Implement line/ring buffers used for implementing `pipe()` and terminal canon buffers
 	- libc (user/kernel-limited)
