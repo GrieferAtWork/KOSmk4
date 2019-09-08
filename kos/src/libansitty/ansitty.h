@@ -50,6 +50,16 @@ libansitty_putuni(struct ansitty *__restrict self, char32_t ch);
 INTDEF NONNULL((1)) ssize_t __LIBCCALL
 libansitty_printer(void *arg, char const *data, size_t datalen);
 
+/* Translate a given unicode input character `ch' (which should originate form
+ * the keyboard) into the sequence of bytes mandated by the code page that is
+ * currently being used by the ansitty.
+ * @return: * : The number of produced bytes (<= ANSITTY_TRANSLATE_BUFSIZE)
+ * @return: 0 : The character cannot be represented in the current CP, and
+ *              should be discarded. */
+INTDEF NONNULL((1)) size_t CC
+libansitty_translate(struct ansitty *__restrict self,
+                     char *buf, char32_t ch);
+
 
 DECL_END
 

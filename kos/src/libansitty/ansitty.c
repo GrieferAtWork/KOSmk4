@@ -36,6 +36,7 @@
 #include <termios.h>
 
 #include "ansitty.h"
+#include "cp.h"
 
 #ifdef __KERNEL__
 #include <kernel/printk.h>
@@ -52,10 +53,19 @@
 
 DECL_BEGIN
 
-#define CAN  '\030' /* Cancel */
-#define BEL  '\7'
-#define ESC  '\033' /* '\e' */
-#define SESC "\033" /* "\e" */
+#define CC_ENQ    0x05
+#define CC_BEL    0x07
+#define CC_BS     0x08
+#define CC_TAB    0x09
+#define CC_LF     0x0a /* '\n' */
+#define CC_VT     0x0b
+#define CC_FF     0x0c
+#define CC_CR     0x0d /* '\r' */
+#define CC_SO     0x0e
+#define CC_SI     0x0f
+#define CC_CAN    0x18 /* Cancel */
+#define CC_ESC    0x1b /* '\e' */
+#define CC_SESC "\033" /* "\e" */
 
 #if 0
 #define TRACE_OPERATION DOTRACE
@@ -74,7 +84,7 @@ DECL_BEGIN
 	UNKNOWN_SEQUENCE_WARN("[ansitty] Unrecognized escape sequence \"\\e%#Q%#Q\"\n", firstch, lastch)
 #define WARN_UNKNOWN_SEQUENCE3C(firstch, secondch, lastch) \
 	UNKNOWN_SEQUENCE_WARN("[ansitty] Unrecognized escape sequence \"\\e%#Q%#Q%#Q\"\n", firstch, secondch, lastch)
-#define WARN_UNKNOWN_SEQUENCE3(firstch, ptr, len, lastch) \
+#define WARN_UNKNOWN_SEQUENCE3(firstch, len, ptr, lastch) \
 	UNKNOWN_SEQUENCE_WARN("[ansitty] Unrecognized escape sequence \"\\e%#Q%#$q%#Q\"\n", firstch, (size_t)(len), ptr, lastch)
 #define WARN_UNKNOWN_SEQUENCE4C(firstch, secondch, thirdch, lastch) \
 	UNKNOWN_SEQUENCE_WARN("[ansitty] Unrecognized escape sequence \"\\e%#Q%#Q%#Q%#Q\"\n", firstch, secondch, thirdch, lastch)
@@ -107,49 +117,69 @@ DECL_BEGIN
 /* Values for `at_ttyflag' */
 #define ANSITTY_FLAG_NORMAL       0x0000 /* Normal flags */
 #define ANSITTY_FLAG_CONCEIL      0x0001 /* FLAG: Use background color as foreground */
-#define ANSITTY_FLAG_BOXMODE      0x0002 /* FLAG: Box mode enabled. */
-#define ANSITTY_FLAG_VT52         0x0004 /* FLAG: VT52 compatibility mode. */
-#define ANSITTY_FLAG_NOLFCR       0x0008 /* FLAG: \n characters should not imply CR. */
-#define ANSITTY_FLAG_HEDIT        0x0010 /* FLAG: Horizontal Editing mode (ICH/DCH/IRM go backwards). */
-#define ANSITTY_FLAG_INSERT       0x0020 /* FLAG: Enable insertion mode. */
-#define ANSITTY_FLAG_INSDEL_LINE  0x0040 /* FLAG: Insert/Delete only affects the current line. */
+#define ANSITTY_FLAG_VT52         0x0002 /* FLAG: VT52 compatibility mode. */
+#define ANSITTY_FLAG_NOLFCR       0x0004 /* FLAG: \n characters should not imply CR. */
+#define ANSITTY_FLAG_HEDIT        0x0008 /* FLAG: Horizontal Editing mode (ICH/DCH/IRM go backwards). */
+#define ANSITTY_FLAG_INSERT       0x0010 /* FLAG: Enable insertion mode. */
+#define ANSITTY_FLAG_INSDEL_LINE  0x0020 /* FLAG: Insert/Delete only affects the current line. */
 #define ANSITTY_FLAG_RENDERMASK  (ANSITTY_FLAG_CONCEIL) /* Mask for flags that affect rendering */
 
 
 /* TTY states */
-#define STATE_TEXT        0 /* Default state: at the start of the next character. */
-#define STATE_MBS         1 /* Inside of a multi-byte-character-string (same as `STATE_TEXT', \
-                             * but `at_esclen' is non-NULL and refers to the number of UTF-8  \
-                             * characters already present within `at_escape') */
-#define STATE_ESC         2 /* State set immediately after a `\e' character was encountered */
-#define STATE_CSI         3 /* Process escape arguments. */
-#define STATE_OSC         4 /* Operating System Command reception mode. */
-#define STATE_DCS         5 /* Device control string reception mode. */
-#define STATE_SOS         6 /* Start of String reception mode. */
-#define STATE_PM          7 /* Privacy Message reception mode. */
-#define STATE_APC         8 /* Application Program Command reception mode. */
-#define STATE_OSC_ESC     9 /* `STATE_OSC', followed by ESC */
-#define STATE_DCS_ESC    10 /* `STATE_DCS', followed by ESC */
-#define STATE_SOS_ESC    11 /* `STATE_SOS', followed by ESC */
-#define STATE_PM_ESC     12 /* `STATE_PM', followed by ESC */
-#define STATE_APC_ESC    13 /* `STATE_APC', followed by ESC */
-#define STATE_LPAREN     14 /* After `ESC(' */
-#define STATE_BOX        15 /* Box rendering mode. */
-#define STATE_BOX_MBS    16 /* Box rendering mode (multi-byte string). */
-#define STATE_ESC_5      17 /* After `ESC5' */
-#define STATE_ESC_6      18 /* After `ESC6' */
-#define STATE_ESC_POUND  19 /* After `ESC#' */
-#define STATE_REPEAT     20 /* Repeat the next character `STATE_REPEAT_COUNT(self)' times */
-#define STATE_REPEAT_MBS 21 /* Repeat the next character `STATE_REPEAT_COUNT(self)' times (character is incomplete) */
+#define STATE_TEXT_UTF8        0 /* Default state: at the start of the next character. */
+#define STATE_TEXT_UTF8_MBS    1 /* Inside of a multi-byte-character-string (same as `STATE_TEXT_UTF8', \
+                                  * but `at_esclen' is non-NULL and refers to the number of UTF-8  \
+                                  * characters already present within `at_escape') */
+#define STATE_ESC              2 /* State set immediately after a `\e' character was encountered */
+#define STATE_CSI              3 /* Process escape arguments. */
+#define STATE_OSC              4 /* Operating System Command reception mode. */
+#define STATE_DCS              5 /* Device control string reception mode. */
+#define STATE_SOS              6 /* Start of String reception mode. */
+#define STATE_PM               7 /* Privacy Message reception mode. */
+#define STATE_APC              8 /* Application Program Command reception mode. */
+#define STATE_OSC_ESC          9 /* `STATE_OSC', followed by ESC */
+#define STATE_DCS_ESC         10 /* `STATE_DCS', followed by ESC */
+#define STATE_SOS_ESC         11 /* `STATE_SOS', followed by ESC */
+#define STATE_PM_ESC          12 /* `STATE_PM', followed by ESC */
+#define STATE_APC_ESC         13 /* `STATE_APC', followed by ESC */
+#define STATE_LPAREN          14 /* After `ESC(' */
+#define STATE_ESC_5           15 /* After `ESC5' */
+#define STATE_ESC_6           16 /* After `ESC6' */
+#define STATE_ESC_POUND       17 /* After `ESC#' */
+#define STATE_REPEAT          18 /* Repeat the next character `STATE_REPEAT_COUNT(self)' times */
+#define STATE_REPEAT_UTF8     19 /* Repeat the next character `STATE_REPEAT_COUNT(self)' times (in UTF-8 mode) */
+#define STATE_REPEAT_UTF8_MBS 20 /* Repeat the next character `STATE_REPEAT_COUNT(self)' times (in UTF-8 mode, with pending multi-byte character) */
 #define STATE_REPEAT_COUNT(self) (*(unsigned int *)(COMPILER_ENDOF((self)->at_escape) - sizeof(unsigned int)))
-#define STATE_INSERT     22 /* Insertion-mode */
-#define STATE_INSERT_MBS 23 /* Insertion-mode with pending multi-byte character */
-#define STATE_ESC_Y1     24 /* After `ESCY' */
+#define STATE_INSERT          21 /* Insertion-mode */
+#define STATE_INSERT_UTF8     22 /* Insertion-mode (in UTF-8 mode) */
+#define STATE_INSERT_UTF8_MBS 23 /* Insertion-mode (in UTF-8 mode, with pending multi-byte character) */
+#define STATE_ESC_Y1          24 /* After `ESCY' */
 #define STATE_ESC_Y1_VAL(self) (*(uint8_t *)(COMPILER_ENDOF((self)->at_escape) - sizeof(uint8_t)))
-#define STATE_ESC_Y2     25 /* After `ESCY<ORD>' */
+#define STATE_ESC_Y2          25 /* After `ESCY<ORD>' */
+#define STATE_LPAREN_PERCENT  26 /* After `ESC(%' */
+#define STATE_TEXT            27 /* DEC Special Character and Line Drawing Set, VT100. */
 
 #define STATE_OSC_ADD_ESC(x) ((x)+5)
 #define STATE_OSC_DEL_ESC(x) ((x)-5)
+
+
+/* Code page codes. */
+#define SET_CP(id) \
+	(self->at_codepage = id, self->at_state = STATE_TEXT)
+#define CP_UTF8             0 /* \e(B   -- UTF-8 (well, actually it's ASCII, but we extend it as utf-8) */
+#define CP_LDM              1 /* \e(0   -- DEC Special Character and Line Drawing Set, VT100. */
+#define CP_LATIN1           2 /* \e(A   -- United Kingdom (UK), VT100. */
+#define CP_DUTCH            3 /* \e(4   -- Dutch, VT200. */
+#define CP_FINNISH          4
+#define CP_FRENCH           5
+#define CP_FRENCH_CANADIAN  6
+#define CP_GERMAN           7
+#define CP_ITALIAN          8
+#define CP_NORWEGIAN        9
+#define CP_PORTUGUESE      10
+#define CP_SPANISH         11
+#define CP_SWEDISH         12
+#define CP_SWISS           13
 
 
 /* Anything in this range (should) exit escape mode. */
@@ -558,7 +588,8 @@ libansitty_init(struct ansitty *__restrict self,
 	self->at_scroll_sc  = 0;
 	self->at_scroll_el  = MAXCOORD;
 	self->at_scroll_ec  = MAXCOORD;
-	self->at_state      = 0;
+	self->at_state      = STATE_TEXT_UTF8;
+	self->at_codepage   = CP_UTF8;
 	self->at_zero       = 0;
 }
 
@@ -607,89 +638,6 @@ setflags(struct ansitty *__restrict self, uint16_t new_flags) {
 
 
 
-/* Ansi box character set (translate to their unicode character equivalents) */
-#define BOX_CHARS_START '_'
-PRIVATE char16_t const box_chars[] = {
-	/* s.a.: https://vt100.net/docs/vt100-ug/table3-9.html */
-#ifdef __INTELLISENSE__
-#define CHR(x) [x - BOX_CHARS_START] =
-#else
-#define CHR(x) /* nothing */
-#endif
-	CHR('_') ' ',    /* Blank */
-	CHR('`') 0x22c4, /* Diamond */
-	CHR('a') 0x2593, /* Checkerboard */
-	CHR('b') 0x0009, /* Horizontal tab */
-	CHR('c') 0x000c, /* Form Feed */
-	CHR('d') '\r',   /* Carriage return */
-	CHR('e') '\n',   /* Line feed */
-	CHR('f') 0x00b0, /* ° Degree symbol */
-	CHR('g') 0x00b1, /* ± Plus/minus */
-	CHR('h') '\n',   /* New line */
-	CHR('i') 0x000b, /* Vertical tab */
-	CHR('j') 0x2518, /* Lower-right corner */
-	CHR('k') 0x2510, /* Upper-right corner */
-	CHR('l') 0x250c, /* Upper-left corner*/
-	CHR('m') 0x2514, /* Lower-left corner */
-	CHR('n') 0x253c, /* Crossing lines */
-	CHR('o') 0x2500, /* Horizontal line - Scan 1 */
-	CHR('p') 0x2500, /* Horizontal line - Scan 3 */
-	CHR('q') 0x2500, /* Horizontal line - Scan 5 */
-	CHR('r') 0x2500, /* Horizontal line - Scan 7 */
-	CHR('s') 0x2500, /* Horizontal line - Scan 9 */
-	CHR('t') 0x251c, /* Left "T" */
-	CHR('u') 0x2524, /* Right "T" */
-	CHR('v') 0x2534, /* Bottom "T" */
-	CHR('w') 0x252c, /* Top "T" */
-	CHR('x') 0x2502, /* | Vertical bar */
-	CHR('y') 0x2264, /* Less than or equal to */
-	CHR('z') 0x2265, /* Greater than or equal to */
-	CHR('{') 0x03a0, /* Pi */
-	CHR('|') 0x2260, /* Not equal to */
-	CHR('}') 0x00a3, /* UK pound sign */
-	CHR('~') 0x2219, /* Centered dot */
-#undef CHR
-};
-
-
-PRIVATE void CC
-ansitty_putbox(struct ansitty *__restrict self, char32_t boxch) {
-	/* Translate box characters. */
-	if (boxch >= BOX_CHARS_START &&
-	    boxch < (BOX_CHARS_START + COMPILER_LENOF(box_chars)))
-		boxch = (box_chars[boxch - BOX_CHARS_START]);
-	PUTUNI(boxch);
-}
-
-PRIVATE size_t CC
-ansitty_printutf8(struct ansitty *__restrict self,
-                  /*utf-8*/ char const *__restrict text, size_t textlen) {
-	char const *end, *reader;
-	end = (reader = text) + textlen;
-	while (reader < end) {
-		char32_t ch;
-		if ((reader + unicode_utf8seqlen[(unsigned char)*reader]) > end)
-			return (size_t)(end - reader);
-		ch = unicode_readutf8_n(&reader, end);
-		PUTUNI(ch);
-	}
-	return 0;
-}
-
-PRIVATE size_t CC
-ansitty_printutf8_box(struct ansitty *__restrict self,
-                      /*utf-8*/ char const *__restrict text, size_t textlen) {
-	char const *end, *reader;
-	end = (reader = text) + textlen;
-	while (reader < end) {
-		char32_t ch;
-		if ((reader + unicode_utf8seqlen[(unsigned char)*reader]) > end)
-			return (size_t)(end - reader);
-		ch = unicode_readutf8_n(&reader, end);
-		ansitty_putbox(self, ch);
-	}
-	return 0;
-}
 
 PRIVATE void CC savecursor(struct ansitty *__restrict self) {
 	GETCURSOR(self->at_savecur);
@@ -714,6 +662,10 @@ PRIVATE void CC setscrollmargin(struct ansitty *__restrict self,
 	self->at_scroll_sc = sc;
 	self->at_scroll_ec = ec;
 }
+
+
+
+
 
 
 
@@ -834,7 +786,7 @@ get_index_for_color(uint8_t r, uint8_t g, uint8_t b) {
 PRIVATE void CC
 do_ident_DA(struct ansitty *__restrict self) {
 	/* Do what linux does: Report `\e[6c` */
-	OUTPUT(SESC "[6c");
+	OUTPUT(CC_SESC "[6c");
 }
 
 
@@ -1303,7 +1255,7 @@ done_insert_ansitty_flag_hedit:
 			if (n <= 0)
 				break;
 			STATE_REPEAT_COUNT(self) = (unsigned int)n;
-			self->at_state = STATE_REPEAT;
+			self->at_state = STATE_REPEAT_UTF8;
 			break;
 
 		case '|': { /* DECTTC -- Transmit Termination Character */
@@ -1564,12 +1516,12 @@ done_insert_ansitty_flag_hedit:
 			         /* \e[4l         Reset to replacement mode (VT102) IRM */
 				if (lastch == 'h') {
 					self->at_ttyflag |= ANSITTY_FLAG_INSERT;
-					self->at_state = STATE_INSERT;
+					self->at_state = STATE_INSERT_UTF8;
 				} else {
 					self->at_ttyflag &= ~ANSITTY_FLAG_INSERT;
-					self->at_state = STATE_TEXT;
-					if (self->at_ttyflag & ANSITTY_FLAG_BOXMODE)
-						self->at_state = STATE_BOX;
+					self->at_state = self->at_codepage == CP_UTF8
+				                     ? STATE_TEXT_UTF8
+				                     : STATE_TEXT;
 				}
 				break;
 
@@ -1926,7 +1878,7 @@ done_insert_ansitty_flag_hedit:
 				 *     \e[?10n = OK,
 				 *     \e[?11n = not OK,
 				 *     \e[?13n = no printer. */
-				OUTPUT(SESC "[?13n"); /* no printer */
+				OUTPUT(CC_SESC "[?13n"); /* no printer */
 				break;
 
 			ARGUMENT_CODE_QSWITCH_ELSE()
@@ -1938,7 +1890,7 @@ done_insert_ansitty_flag_hedit:
 				 *     \e[2n = Terminal is busy, it will send DSR when ready
 				 *     \e[3n = Malfunction, please try again
 				 *     \e[4n = Malfunction, terminal will send DSR when ready */
-				OUTPUT(SESC "[0n"); /* We are always ready! */
+				OUTPUT(CC_SESC "[0n"); /* We are always ready! */
 				break;
 
 			case 6:
@@ -1948,7 +1900,7 @@ done_insert_ansitty_flag_hedit:
 					size_t len;
 					ansitty_coord_t xy[2];
 					GETCURSOR(xy);
-					len = sprintf(buf, SESC "[%u;%uR",
+					len = sprintf(buf, CC_SESC "[%u;%uR",
 					              (unsigned int)(xy[1] + 1),
 					              (unsigned int)(xy[0] + 1));
 					DOOUTPUT(buf, len);
@@ -2110,53 +2062,136 @@ nope:
 /* ANSI escape gather parser implementation                                             */
 /* ==================================================================================== */
 
-
 PRIVATE void CC
 ansitty_setstate_text(struct ansitty *__restrict self) {
-	if (self->at_ttyflag & ANSITTY_FLAG_INSERT)
-		self->at_state = STATE_INSERT;
-	else if (self->at_ttyflag & ANSITTY_FLAG_BOXMODE)
-		self->at_state = STATE_BOX;
-	else {
-		self->at_state = STATE_TEXT;
-	}
+	self->at_state = (self->at_ttyflag & ANSITTY_FLAG_INSERT)
+	                 ? (self->at_codepage == CP_UTF8 ? STATE_INSERT_UTF8 : STATE_INSERT)
+	                 : (self->at_codepage == CP_UTF8 ? STATE_TEXT_UTF8 : STATE_TEXT);
 }
 
-PRIVATE void CC
-ansitty_setstate_mbs(struct ansitty *__restrict self) {
-	if (self->at_ttyflag & ANSITTY_FLAG_INSERT)
-		self->at_state = STATE_INSERT_MBS;
-	else if (self->at_ttyflag & ANSITTY_FLAG_BOXMODE)
-		self->at_state = STATE_BOX_MBS;
-	else {
-		self->at_state = STATE_MBS;
+PRIVATE char32_t FCALL
+cp_decode(uint8_t ch, struct ansitty *__restrict self) {
+	char32_t result;
+	switch (self->at_codepage) {
+
+	case CP_LDM:
+		result = libansitty_decode_cp_ldm((uint8_t)ch);
+		break;
+
+	case CP_DUTCH:
+		result = libansitty_decode_cp_dutch((uint8_t)ch);
+		break;
+
+	case CP_FINNISH:
+		result = libansitty_decode_cp_finnish((uint8_t)ch);
+		break;
+
+	case CP_FRENCH:
+		result = libansitty_decode_cp_french((uint8_t)ch);
+		break;
+
+	case CP_FRENCH_CANADIAN:
+		result = libansitty_decode_cp_french_canadian((uint8_t)ch);
+		break;
+
+	case CP_GERMAN:
+		result = libansitty_decode_cp_german((uint8_t)ch);
+		break;
+
+	case CP_ITALIAN:
+		result = libansitty_decode_cp_italian((uint8_t)ch);
+		break;
+
+	case CP_NORWEGIAN:
+		result = libansitty_decode_cp_norwegian((uint8_t)ch);
+		break;
+
+	case CP_PORTUGUESE:
+		result = libansitty_decode_cp_portuguese((uint8_t)ch);
+		break;
+
+	case CP_SPANISH:
+		result = libansitty_decode_cp_spanish((uint8_t)ch);
+		break;
+
+	case CP_SWEDISH:
+		result = libansitty_decode_cp_swedish((uint8_t)ch);
+		break;
+
+	case CP_SWISS:
+		result = libansitty_decode_cp_swiss((uint8_t)ch);
+		break;
+
+	case CP_LATIN1:
+	default:
+		result = (char32_t)(uint8_t)ch;
+		break;
 	}
+	return result;
 }
 
-PRIVATE void CC
-ansitty_print_escape(struct ansitty *__restrict self) {
-	size_t unused;
-	assert(self->at_esclen <= COMPILER_LENOF(self->at_escape));
-	unused = self->at_ttyflag & ANSITTY_FLAG_BOXMODE
-	         ? ansitty_printutf8_box(self, (char *)self->at_escape, self->at_esclen)
-	         : ansitty_printutf8(self, (char *)self->at_escape, self->at_esclen);
-	if likely(unused == 0) {
+LOCAL bool CC
+handle_control_character(struct ansitty *__restrict self, char32_t ch) {
+	switch (ch) {
+
+	case CC_ENQ:
+		/* Return Terminal Status (which defaults to an empty string) */
+		goto done;
+
+	case CC_BEL:
+	case CC_BS:
+	case CC_TAB:
+	case CC_CR:
+		break;
+
+	case CC_SO:
+	case CC_SI:
+		/* Standard/Alternate character set??? */
+		goto done;
+
+	case CC_CAN:
 		ansitty_setstate_text(self);
-	} else {
-		ansitty_setstate_mbs(self);
-		memmove(self->at_escape,
-		        self->at_escape + self->at_esclen - unused,
-		        unused * sizeof(char));
-		self->at_escwrd[0] = unicode_utf8seqlen[(byte_t)self->at_escape[0]];
-		self->at_escwrd[1] = (__UINTPTR_HALF_TYPE__)unused;
-		assert(self->at_escwrd[0] != 0);
-		assert(self->at_escwrd[0] != 1);
-		assert(self->at_escwrd[1] < self->at_escwrd[0]);
+		break;
+
+	case CC_ESC:
+		self->at_state = STATE_ESC;
+		break;
+
+	case CC_VT:
+	case CC_FF:
+		ch = CC_LF;
+		ATTR_FALLTHROUGH
+	case CC_LF:
+		if (self->at_ttyflag & ANSITTY_FLAG_NOLFCR) {
+			/* LF shouldn't set COLUMN=0 */
+			ansitty_coord_t xy[2];
+			GETCURSOR(xy);
+			if (xy[0] != 0) {
+				HIDECURSOR_BEGIN() {
+					/* Current column is non-zero, so we must take special
+					 * action to ensure that the cursor is placed correctly. */
+					PUTUNI('\n');
+					/* Reset the cursor position to the middle of the following line.
+					 * Note that in the case of the previous line being the bottom-most one,
+					 * SETCURSOR() will clamp that coord into the valid display range. */
+					SETCURSOR(xy[0], xy[1] + 1);
+				}
+				HIDECURSOR_END();
+				return true;
+			}
+		}
+		break;
+
+	default:
+		return false;
 	}
+	PUTUNI(ch);
+done:
+	return true;
 }
 
 LOCAL void CC
-ansitty_do_insert_nobox(struct ansitty *__restrict self, char32_t ch) {
+ansitty_do_insert_unicode(struct ansitty *__restrict self, char32_t ch) {
 	switch (self->at_ttyflag & (ANSITTY_FLAG_HEDIT |
 	                            ANSITTY_FLAG_INSDEL_LINE)) {
 
@@ -2250,29 +2285,12 @@ ansitty_do_insert_nobox(struct ansitty *__restrict self, char32_t ch) {
 }
 
 LOCAL void CC
-ansitty_do_insert(struct ansitty *__restrict self, char32_t ch) {
-	if (self->at_ttyflag & ANSITTY_FLAG_BOXMODE) {
-		if (ch >= BOX_CHARS_START &&
-		    ch < (BOX_CHARS_START + COMPILER_LENOF(box_chars)))
-			ch = box_chars[ch - BOX_CHARS_START];
-	}
-	ansitty_do_insert_nobox(self, ch);
-}
-
-
-LOCAL void CC
-ansitty_do_repeat(struct ansitty *__restrict self, char32_t ch) {
+ansitty_do_repeat_unicode(struct ansitty *__restrict self, char32_t ch) {
 	unsigned int count;
 	count = STATE_REPEAT_COUNT(self);
-	/* Translate box characters. */
-	if (self->at_ttyflag & ANSITTY_FLAG_BOXMODE) {
-		if (ch >= BOX_CHARS_START &&
-		    ch < (BOX_CHARS_START + COMPILER_LENOF(box_chars)))
-			ch = box_chars[ch - BOX_CHARS_START];
-	}
 	if (self->at_ttyflag & ANSITTY_FLAG_INSERT) {
 		while (count--) {
-			ansitty_do_insert_nobox(self, ch);
+			ansitty_do_insert_unicode(self, ch);
 		}
 	} else {
 		while (count--) {
@@ -2281,39 +2299,35 @@ ansitty_do_repeat(struct ansitty *__restrict self, char32_t ch) {
 	}
 }
 
-
 LOCAL void CC
-ansitty_putmbs(struct ansitty *__restrict self, char ch) {
-	assert(self->at_state == STATE_MBS ||
-	       self->at_state == STATE_BOX_MBS ||
-	       self->at_state == STATE_REPEAT_MBS);
+ansitty_pututf8_mbs(struct ansitty *__restrict self, char ch) {
+	char32_t unich;
+	assert(self->at_codepage == CP_UTF8);
 	assert(self->at_escwrd[1] < self->at_escwrd[0]);
+	if (((byte_t)ch & 0xc0) != 0x80) {
+		unich = (char32_t)ch;
+		goto do_handle_unich;
+	}
 	self->at_escape[self->at_escwrd[1]++] = (byte_t)ch;
 	if (self->at_escwrd[1] >= self->at_escwrd[0]) {
 		/* Unicode sequence has been completed. */
 		char const *text;
-		char32_t unich;
 		assert(self->at_escwrd[1] == self->at_escwrd[0]);
 		text  = (char *)self->at_escape;
 		unich = unicode_readutf8(&text);
 		assert(text == ((char *)self->at_escape + self->at_escwrd[0]));
+do_handle_unich:
 		/* Check for the escape character */
-		if unlikely(unich == ESC) {
-			self->at_state = STATE_ESC;
-		} else if unlikely(unich == CAN) {
-			ansitty_setstate_text(self);
-		} else if (self->at_state == STATE_BOX_MBS) {
-			ansitty_putbox(self, unich);
-			self->at_state = STATE_BOX;
-		} else if (self->at_state == STATE_REPEAT_MBS) {
-			ansitty_do_repeat(self, unich);
-			ansitty_setstate_text(self);
-		} else if (self->at_state == STATE_INSERT_MBS) {
-			ansitty_do_insert(self, unich);
-			self->at_state = STATE_INSERT;
-		} else {
-			PUTUNI(unich);
-			self->at_state = STATE_TEXT;
+		if (!handle_control_character(self, unich)) {
+			if (self->at_state == STATE_REPEAT_UTF8_MBS) {
+				ansitty_do_repeat_unicode(self, unich);
+				ansitty_setstate_text(self);
+			} else if (self->at_state == STATE_INSERT_UTF8_MBS) {
+				ansitty_do_insert_unicode(self, unich);
+				self->at_state = STATE_INSERT_UTF8;
+			} else {
+				self->at_state = STATE_TEXT_UTF8;
+			}
 		}
 	}
 }
@@ -2389,11 +2403,6 @@ get_string_command_start_character(uintptr_t state) {
 	return result;
 }
 
-PRIVATE void CC
-do_print_string_command_control_character(struct ansitty *__restrict self) {
-	PUTUNI(get_string_command_start_character(self->at_state));
-}
-
 
 /* Output a single utf-8 character to the given TTY */
 INTERN NONNULL((1)) void CC
@@ -2401,16 +2410,24 @@ libansitty_putc(struct ansitty *__restrict self, /*utf-8*/ char ch) {
 again:
 	switch (self->at_state) {
 
-	case STATE_TEXT:
+	case STATE_TEXT_UTF8:
 		/* Check for the escape character */
 		switch ((uint8_t)ch) {
 
-		case ESC:
-set_esc_state:
+		case CC_ESC:
 			self->at_state = STATE_ESC;
 			break;
 
-		case CAN:
+		case CC_ENQ:
+			/* Return Terminal Status (which defaults to an empty string) */
+			break;
+
+		case CC_SO:
+		case CC_SI:
+			/* Standard/Alternate character set??? */
+			break;
+
+		case CC_CAN:
 			break; /* Ignore... */
 
 		case 0x80 ... 0xff:
@@ -2421,9 +2438,13 @@ set_esc_state:
 			assert(self->at_escwrd[0] != 1);
 			self->at_escwrd[1] = 1;
 			self->at_escape[0] = (byte_t)ch;
-			self->at_state     = STATE_MBS;
+			self->at_state     = STATE_TEXT_UTF8_MBS;
 			break;
 
+		case CC_VT:
+		case CC_FF:
+			ch = CC_LF;
+			ATTR_FALLTHROUGH
 		case '\n':
 			if (self->at_ttyflag & ANSITTY_FLAG_NOLFCR) {
 				/* LF shouldn't set COLUMN=0 */
@@ -2452,36 +2473,14 @@ do_putuni:
 		}
 		break;
 
-	case STATE_BOX:
+	case STATE_REPEAT_UTF8:
 		/* Check for the escape character */
-		if ((uint8_t)ch == ESC)
-			goto set_esc_state;
-		if ((uint8_t)ch <= 0x7f) {
-			/* Output a regular, old ASCII character. */
-do_putuni_box:
-			ansitty_putbox(self, (char32_t)(uint8_t)ch);
-			return;
-		}
-		/* Begin a new multi-byte character sequence. */
-		self->at_escwrd[0] = unicode_utf8seqlen[(byte_t)ch];
-		if unlikely(!self->at_escwrd[0])
-			goto do_putuni_box; /* Invalid utf-8 byte... (simply re-output, thus ignoring the error) */
-		assert(self->at_escwrd[0] != 1);
-		self->at_escwrd[1] = 1;
-		self->at_escape[0] = (byte_t)ch;
-		self->at_state     = STATE_BOX_MBS;
-		break;
-
-	case STATE_REPEAT:
-		/* Check for the escape character */
-		if ((uint8_t)ch == ESC)
-			goto set_esc_state;
-		if ((uint8_t)ch == CAN)
-			goto set_text_and_done; /* Cancel the repeat. */
+		if (handle_control_character(self, (uint8_t)ch))
+			break;
 		if ((uint8_t)ch <= 0x7f) {
 			/* Output a regular, old ASCII character. */
 do_repuni:
-			ansitty_do_repeat(self, (char32_t)(uint8_t)ch);
+			ansitty_do_repeat_unicode(self, (char32_t)(uint8_t)ch);
 			goto set_text_and_done;
 		}
 		/* Begin a new multi-byte character sequence. */
@@ -2491,20 +2490,18 @@ do_repuni:
 		assert(self->at_escwrd[0] != 1);
 		self->at_escwrd[1] = 1;
 		self->at_escape[0] = (byte_t)ch;
-		self->at_state     = STATE_REPEAT_MBS;
+		self->at_state     = STATE_REPEAT_UTF8_MBS;
 		break;
 
-	case STATE_INSERT:
+	case STATE_INSERT_UTF8:
 		/* Check for the escape character */
-		if ((uint8_t)ch == ESC)
-			goto set_esc_state;
-		if ((uint8_t)ch == CAN)
-			break; /* Ignore */
+		if (handle_control_character(self, (uint8_t)ch))
+			break;
 		if ((uint8_t)ch <= 0x7f) {
 			/* Output a regular, old ASCII character. */
 do_insuni:
-			ansitty_do_insert(self, (char32_t)(uint8_t)ch);
-			goto set_text_and_done;
+			ansitty_do_insert_unicode(self, (char32_t)(uint8_t)ch);
+			break;
 		}
 		/* Begin a new multi-byte character sequence. */
 		self->at_escwrd[0] = unicode_utf8seqlen[(byte_t)ch];
@@ -2513,15 +2510,31 @@ do_insuni:
 		assert(self->at_escwrd[0] != 1);
 		self->at_escwrd[1] = 1;
 		self->at_escape[0] = (byte_t)ch;
-		self->at_state     = STATE_INSERT_MBS;
+		self->at_state     = STATE_INSERT_UTF8_MBS;
 		break;
 
-	case STATE_MBS:
-	case STATE_BOX_MBS:
-	case STATE_REPEAT_MBS:
-	case STATE_INSERT_MBS:
-		ansitty_putmbs(self, ch);
+	case STATE_TEXT_UTF8_MBS:
+	case STATE_REPEAT_UTF8_MBS:
+	case STATE_INSERT_UTF8_MBS:
+		ansitty_pututf8_mbs(self, ch);
 		break;
+
+	case STATE_REPEAT:
+		/* Check for the escape character */
+		ansitty_do_repeat_unicode(self, cp_decode((uint8_t)ch, self));
+		goto set_text_and_done;
+
+	case STATE_INSERT:
+		/* Check for the escape character */
+		ansitty_do_insert_unicode(self, cp_decode((uint8_t)ch, self));
+		break;
+
+	case STATE_TEXT: {
+		char32_t uni = cp_decode((uint8_t)ch, self);
+		if (handle_control_character(self, uni))
+			break;
+		PUTUNI(uni);
+	}	break;
 
 	case STATE_ESC:
 		switch (ch) {
@@ -2593,7 +2606,7 @@ do_insuni:
 			if (self->at_ttyflag & ANSITTY_FLAG_VT52) {
 				/* VT52: resetgr */
 				/* Use normal US/UK character set (XXX: Is this correct?) */
-				goto disable_box_mode;
+				goto setcp_USASCII;
 			}
 			goto unknown_character_after_esc;
 
@@ -2632,7 +2645,7 @@ do_insuni:
 
 		case 'Z':
 			if (self->at_ttyflag & ANSITTY_FLAG_VT52) {
-				OUTPUT(SESC "/Z");
+				OUTPUT(CC_SESC "/Z");
 				goto set_text_and_done;
 			}
 			goto unknown_character_after_esc;
@@ -2700,7 +2713,7 @@ do_insuni:
 			goto set_text_and_done;
 
 		case 'g': /* screen(1): Visual Bell */
-			PUTUNI(BEL);
+			PUTUNI(CC_BEL);
 			goto set_text_and_done;
 
 		case 'Y':
@@ -2723,7 +2736,7 @@ do_insuni:
 			self->at_state  = STATE_CSI;
 			break;
 
-		case CAN: /* Cancel */
+		case CC_CAN: /* Cancel */
 set_text_and_done:
 			ansitty_setstate_text(self);
 			break;
@@ -2731,43 +2744,104 @@ set_text_and_done:
 		default:
 unknown_character_after_esc:
 			WARN_UNKNOWN_SEQUENCE1(ch);
-			PUTUNI(ESC);
 			goto reset_state;
 		}
 		break;
 
 	case STATE_LPAREN:
 		switch (ch) {
-
-		case '0':
-		case '1': /* ??? */
-		case '2': /* ??? */
-			/* Enable BOX mode. */
+		case '0': /* DEC Special Character and Line Drawing Set, VT100. */
 enable_box_mode:
-			self->at_ttyflag |= ANSITTY_FLAG_BOXMODE;
-			self->at_state = STATE_BOX;
+			SET_CP(CP_LDM);
 			break;
 
-		case 'A': /* ??? */
-		case 'B':
-			/* Disable BOX mode. */
-disable_box_mode:
-			self->at_ttyflag &= ~ANSITTY_FLAG_BOXMODE;
-			self->at_state = STATE_TEXT;
+		case 'A': /* United Kingdom (UK), VT100. */
+			SET_CP(CP_LATIN1);
+			break;
+
+		case 'B': /* United States (USASCII), VT100. */
+setcp_USASCII:
+			self->at_codepage = CP_UTF8;
+			self->at_state    = STATE_TEXT_UTF8;
 			if (self->at_ttyflag & ANSITTY_FLAG_INSERT)
-				self->at_state = STATE_INSERT;
+				self->at_state = STATE_INSERT_UTF8;
 			break;
 
-		case CAN: /* Cancel */
+		case '4': /* Dutch, VT200. */
+			SET_CP(CP_DUTCH);
+			break;
+
+		case 'C': /* Finnish, VT200. */
+		case '5': /* Finnish, VT200. */
+			SET_CP(CP_FINNISH);
+			break;
+
+		case 'R': /* French, VT200. */
+		case 'f': /* French, VT200. */
+			SET_CP(CP_FRENCH);
+			break;
+
+		case 'Q': /* French Canadian, VT200. */
+		case '9': /* French Canadian, VT200. */
+			SET_CP(CP_FRENCH_CANADIAN);
+			break;
+
+		case 'K': /* German, VT200. */
+			SET_CP(CP_GERMAN);
+			break;
+
+		case 'Y': /* Italian, VT200. */
+			SET_CP(CP_ITALIAN);
+			break;
+
+		case '`': /* Norwegian, VT200. */
+		case 'E': /* Norwegian, VT200. */
+		case '6': /* Norwegian, VT200. */
+			SET_CP(CP_NORWEGIAN);
+			break;
+
+		case 'T': /* Spanish, VT200. */
+			SET_CP(CP_SPANISH);
+			break;
+
+		case 'H': /* Swedish, VT200. */
+		case '7': /* Swedish, VT200. */
+			SET_CP(CP_SWEDISH);
+			break;
+
+		case '=': /* Swiss, VT200. */
+			SET_CP(CP_SWISS);
+			break;
+
+		case '%':
+			self->at_state = STATE_LPAREN_PERCENT;
+			break;
+
+		case CC_CAN: /* Cancel */
 			goto set_text_and_done;
 
 		default:
 			WARN_UNKNOWN_SEQUENCE2('(', ch);
-			PUTUNI(ESC);
-			PUTUNI('(');
 			goto reset_state;
 		}
 		break;
+
+	case STATE_LPAREN_PERCENT:
+		switch (ch) {
+
+		case '6': /* Portuguese, VT300. */
+			SET_CP(CP_PORTUGUESE);
+			break;
+
+		case CC_CAN: /* Cancel */
+			goto set_text_and_done;
+
+		default:
+			WARN_UNKNOWN_SEQUENCE3C('(', '%', ch);
+			goto reset_state;
+		}
+		break;
+
 
 	case STATE_CSI:
 		assert(self->at_esclen < COMPILER_LENOF(self->at_escape));
@@ -2778,15 +2852,11 @@ do_process_csi:
 			ansitty_setstate_text(self);
 			if (!ansi_CSI(self, (char *)self->at_escape, self->at_esclen, ch)) {
 				WARN_UNKNOWN_SEQUENCE3('[', self->at_esclen, self->at_escape, ch);
-				PUTUNI(ESC);
-				PUTUNI('[');
-print_escape_and_reset_state:
-				ansitty_print_escape(self);
-				goto reset_state;
+				goto set_text_and_done;
 			}
 			break;
 		}
-		if (ch == CAN) /* Cancel */
+		if (ch == CC_CAN) /* Cancel */
 			goto set_text_and_done;
 		self->at_escape[self->at_esclen] = (byte_t)ch;
 		++self->at_esclen;
@@ -2805,24 +2875,14 @@ print_escape_and_reset_state:
 		if ((byte_t)ch == '\\') {
 			if (!ansitty_invoke_string_command(self)) {
 				WARN_UNKNOWN_SEQUENCE4(get_string_command_start_character(self->at_state),
-				                       self->at_esclen, self->at_escape, ESC, ch);
-				PUTUNI(ESC);
-				do_print_string_command_control_character(self);
-				ansitty_print_escape(self);
-				if (self->at_state == STATE_TEXT ||
-				    self->at_state == STATE_BOX ||
-				    self->at_state == STATE_INSERT)
-					self->at_state = STATE_ESC;
-				else {
-					ansitty_putmbs(self, ESC);
-				}
-				goto reset_state;
+				                       self->at_esclen, self->at_escape, CC_ESC, ch);
+				goto set_text_and_done;
 			}
 			goto set_text_and_done;
-		} else if (ch == CAN) { /* Cancel */
+		} else if (ch == CC_CAN) { /* Cancel */
 			goto set_text_and_done;
 		}
-		self->at_escape[self->at_esclen] = ESC;
+		self->at_escape[self->at_esclen] = CC_ESC;
 		++self->at_esclen;
 		if unlikely(self->at_esclen >= COMPILER_LENOF(self->at_escape))
 			goto do_process_string_command;
@@ -2839,21 +2899,17 @@ print_escape_and_reset_state:
 	case STATE_PM:
 	case STATE_APC:
 		assert(self->at_esclen < COMPILER_LENOF(self->at_escape));
-		if ((byte_t)ch == BEL) {
+		if ((byte_t)ch == CC_BEL) {
 do_process_string_command:
 			if (!ansitty_invoke_string_command(self)) {
 				WARN_UNKNOWN_SEQUENCE3(get_string_command_start_character(self->at_state),
-				                       self->at_esclen, self->at_escape, BEL);
-				PUTUNI(ESC);
-				do_print_string_command_control_character(self);
-				ansitty_setstate_text(self);
-				goto print_escape_and_reset_state;
+				                       self->at_esclen, self->at_escape, CC_BEL);
 			}
 			goto set_text_and_done;
-		} else if ((byte_t)ch == ESC) {
+		} else if ((byte_t)ch == CC_ESC) {
 			self->at_state = STATE_OSC_ADD_ESC(self->at_state);
 			break;
-		} else if (ch == CAN) { /* Cancel */
+		} else if (ch == CC_CAN) { /* Cancel */
 			goto set_text_and_done;
 		}
 		self->at_escape[self->at_esclen] = (byte_t)ch;
@@ -2868,14 +2924,12 @@ do_process_string_command:
 		if (ch == 'n') {
 			/* VT100: devstat DSR */
 			/* termok DSR  --- Response: terminal is OK */
-			OUTPUT(SESC "0n");
+			OUTPUT(CC_SESC "0n");
 			goto set_text_and_done;
-		} else if (ch == CAN) {
+		} else if (ch == CC_CAN) {
 			goto set_text_and_done;
 		}
-		WARN_UNKNOWN_SEQUENCE3C(ESC, '5', ch);
-		PUTUNI(ESC);
-		PUTUNI('5');
+		WARN_UNKNOWN_SEQUENCE2('5', ch);
 		goto reset_state;
 
 	case STATE_ESC_6:
@@ -2886,17 +2940,15 @@ do_process_string_command:
 			/* VT100: getcursor DSR */
 			/* Response: cursor is at v,h */
 			GETCURSOR(xy);
-			len = sprintf(buf, SESC "%u;%uR",
+			len = sprintf(buf, CC_SESC "%u;%uR",
 			              (unsigned int)(xy[1] + 1),
 			              (unsigned int)(xy[0] + 1));
 			DOOUTPUT(buf, len);
 			goto set_text_and_done;
-		} else if (ch == CAN) {
+		} else if (ch == CC_CAN) {
 			goto set_text_and_done;
 		}
-		WARN_UNKNOWN_SEQUENCE3C(ESC, '6', ch);
-		PUTUNI(ESC);
-		PUTUNI('6');
+		WARN_UNKNOWN_SEQUENCE2('6', ch);
 		goto reset_state;
 
 	case STATE_ESC_POUND:
@@ -2936,24 +2988,20 @@ do_process_string_command:
 			 */
 			goto set_text_and_done;
 
-		case CAN:
-			goto set_text_and_done;
+		case CC_CAN:
+			goto reset_state;
 
 		default:
 			break;
 		}
-		WARN_UNKNOWN_SEQUENCE3C(ESC, '#', ch);
-		PUTUNI(ESC);
-		PUTUNI('#');
-		goto reset_state;
+		WARN_UNKNOWN_SEQUENCE2('#', ch);
+		goto set_text_and_done;
 
 	case STATE_ESC_Y1:
 		if ((byte_t)ch < 32) {
-			if (ch == CAN)
+			if (ch == CC_CAN)
 				goto set_text_and_done;
-			WARN_UNKNOWN_SEQUENCE3C(ESC, 'Y', ch);
-			PUTUNI(ESC);
-			PUTUNI('Y');
+			WARN_UNKNOWN_SEQUENCE2('Y', ch);
 			goto reset_state;
 		}
 		STATE_ESC_Y1_VAL(self) = (uint8_t)ch - 32;
@@ -2966,12 +3014,9 @@ do_process_string_command:
 		 * sequence.  Each ordinate is encoded in a single character as value+32.
 		 * For example, !  is 1.  The screen coordinate system is 0-based. */
 		if ((byte_t)ch < 32) {
-			if (ch == CAN)
+			if (ch == CC_CAN)
 				goto set_text_and_done;
-			WARN_UNKNOWN_SEQUENCE4C(ESC, 'Y', 32 + STATE_ESC_Y1_VAL(self), ch);
-			PUTUNI(ESC);
-			PUTUNI('Y');
-			PUTUNI(32 + STATE_ESC_Y1_VAL(self));
+			WARN_UNKNOWN_SEQUENCE3C('Y', 32 + STATE_ESC_Y1_VAL(self), ch);
 			goto reset_state;
 		}
 		/* Set the cursor position. */
@@ -2992,12 +3037,9 @@ libansitty_putuni(struct ansitty *__restrict self, char32_t ch) {
 	char utf8_seq[UNICODE_UTF8_MAXLEN];
 	size_t i, utf8_len;
 	/* Simple case: Default state and non-escaping character */
-	if (self->at_state == STATE_TEXT) {
-		if unlikely(ch == ESC) {
-			self->at_state = STATE_ESC;
-		} else {
+	if (self->at_state == STATE_TEXT_UTF8) {
+		if (!handle_control_character(self, ch))
 			PUTUNI(ch);
-		}
 		return;
 	}
 	/* Encode as utf-8 and use `libansitty_putc()'. */
@@ -3021,11 +3063,91 @@ libansitty_printer(void *arg, char const *data, size_t datalen) {
 }
 
 
+
+/* Translate a given unicode input character `ch' (which should originate form
+ * the keyboard) into the sequence of bytes mandated by the code page that is
+ * currently being used by the ansitty.
+ * @return: * : The number of produced bytes (<= ANSITTY_TRANSLATE_BUFSIZE)
+ * @return: 0 : The character cannot be represented in the current CP, and
+ *              should be discarded. */
+INTERN NONNULL((1)) size_t CC
+libansitty_translate(struct ansitty *__restrict self,
+                     char *buf, char32_t ch) {
+	size_t result;
+	if (self->at_codepage == CP_UTF8) {
+do_encode_utf8:
+		/* Default: Encode a utf-8 character. */
+		result = (size_t)(unicode_writeutf8(buf, ch) - buf);
+	} else {
+		uint8_t cp_byte;
+		switch (self->at_codepage) {
+
+		case CP_LDM:
+			cp_byte = libansitty_decode_cp_ldm(ch);
+			break;
+
+		case CP_DUTCH:
+			cp_byte = libansitty_decode_cp_dutch(ch);
+			break;
+
+		case CP_FINNISH:
+			cp_byte = libansitty_decode_cp_finnish(ch);
+			break;
+
+		case CP_FRENCH:
+			cp_byte = libansitty_decode_cp_french(ch);
+			break;
+
+		case CP_FRENCH_CANADIAN:
+			cp_byte = libansitty_decode_cp_french_canadian(ch);
+			break;
+
+		case CP_GERMAN:
+			cp_byte = libansitty_decode_cp_german(ch);
+			break;
+
+		case CP_ITALIAN:
+			cp_byte = libansitty_decode_cp_italian(ch);
+			break;
+
+		case CP_NORWEGIAN:
+			cp_byte = libansitty_decode_cp_norwegian(ch);
+			break;
+
+		case CP_PORTUGUESE:
+			cp_byte = libansitty_decode_cp_portuguese(ch);
+			break;
+
+		case CP_SPANISH:
+			cp_byte = libansitty_decode_cp_spanish(ch);
+			break;
+
+		case CP_SWEDISH:
+			cp_byte = libansitty_decode_cp_swedish(ch);
+			break;
+
+		case CP_SWISS:
+			cp_byte = libansitty_decode_cp_swiss(ch);
+			break;
+
+		default:
+			goto do_encode_utf8;
+		}
+		if (!cp_byte)
+			return 0;
+		buf[0] = (char)cp_byte;
+		result = 1;
+	}
+	return result;
+}
+
+
+
 DEFINE_PUBLIC_ALIAS(ansitty_init, libansitty_init);
 DEFINE_PUBLIC_ALIAS(ansitty_putc, libansitty_putc);
 DEFINE_PUBLIC_ALIAS(ansitty_putuni, libansitty_putuni);
 DEFINE_PUBLIC_ALIAS(ansitty_printer, libansitty_printer);
-
+DEFINE_PUBLIC_ALIAS(ansitty_translate, libansitty_translate);
 
 DECL_END
 

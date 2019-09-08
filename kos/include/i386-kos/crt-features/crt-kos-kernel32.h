@@ -103,6 +103,7 @@
 #define __CRT_HAVE_ansitty_printer 1
 #define __CRT_HAVE_ansitty_putc 1
 #define __CRT_HAVE_ansitty_putuni 1
+#define __CRT_HAVE_ansitty_translate 1
 #define __CRT_HAVE_bcmp 1
 #define __CRT_HAVE_block_device_acquire_partlock_read 1
 #define __CRT_HAVE_block_device_acquire_partlock_tryread 1

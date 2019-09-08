@@ -411,7 +411,7 @@ EOF
 					--with-debug \
 					--disable-big-core \
 					--disable-database \
-					--with-fallbacks=vt100,unknown \
+					--with-fallbacks=xterm,unknown \
 					--enable-const \
 					--enable-ext-mouse \
 					--disable-stripping
@@ -483,13 +483,12 @@ EOF
 					--host="$TARGET_NAME-linux-gnu" \
 					--disable-threads \
 					--disable-nls \
-					--enable-debug \
 					--with-gnu-ld \
 					--without-libiconv-prefix \
 					--without-libintl-prefix
 			fi
 			cmd cd "$OPTPATH"
-			cmd make #-j $MAKE_PARALLEL_COUNT
+			cmd make -j $MAKE_PARALLEL_COUNT
 		fi
 		install_file /bin/nano "$OPTPATH/src/nano"
 		;;

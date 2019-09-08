@@ -247,7 +247,8 @@ struct ansitty {
 	ansitty_coord_t           at_scroll_el;   /* Scroll region end line */
 	ansitty_coord_t           at_scroll_sc;   /* Scroll region starting column (only used internally!) */
 	ansitty_coord_t           at_scroll_ec;   /* Scroll region end column (only used internally!) */
-	__uintptr_t               at_state;       /* Current state-machine state. (not exposed) */
+	__UINTPTR_HALF_TYPE__     at_state;       /* Current state-machine state. (not exposed) */
+	__UINTPTR_HALF_TYPE__     at_codepage;    /* Current code-page state. (not exposed) */
 	union {
 		__UINTPTR_TYPE__      at_esclen;      /* Number of written, escaped bytes. */
 		__UINTPTR_HALF_TYPE__ at_escwrd[2];   /* Double-word status (used by some values for `at_state') */
@@ -291,6 +292,25 @@ typedef __ATTR_NONNULL((1)) __ssize_t
 #ifdef LIBANSITTY_WANT_PROTOTYPES
 LIBANSITTY_DECL __ATTR_NONNULL((1)) __ssize_t __LIBCCALL
 ansitty_printer(void *arg, char const *data, __size_t datalen);
+#endif /* LIBANSITTY_WANT_PROTOTYPES */
+
+
+/* Max number of bytes ever produced by `ansitty_translate' */
+#define ANSITTY_TRANSLATE_BUFSIZE 8
+
+/* Translate a given unicode input character `ch' (which should originate form
+ * the keyboard) into the sequence of bytes mandated by the code page that is
+ * currently being used by the ansitty.
+ * @return: * : The number of produced bytes (<= ANSITTY_TRANSLATE_BUFSIZE)
+ * @return: 0 : The character cannot be represented in the current CP, and
+ *              should be discarded. */
+typedef __ATTR_NONNULL((1, 2)) __size_t
+(LIBANSITTY_CC *PANSITTY_TRANSLATE)(struct ansitty *__restrict self,
+                                    char *buf, __CHAR32_TYPE__ ch);
+#ifdef LIBANSITTY_WANT_PROTOTYPES
+LIBANSITTY_DECL __ATTR_NONNULL((1)) __size_t LIBANSITTY_CC
+ansitty_translate(struct ansitty *__restrict self,
+                  char *buf, __CHAR32_TYPE__ ch);
 #endif /* LIBANSITTY_WANT_PROTOTYPES */
 
 

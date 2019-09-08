@@ -185,7 +185,7 @@ NOTHROW_NCX(LIBCCALL libc_getenv)(char const *varname)
 /*[[[body:getenv]]]*/
 {
 	if (!strcmp(varname, "TERM"))
-		return "vt100";
+		return "xterm";
 	CRT_UNIMPLEMENTED("getenv"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;

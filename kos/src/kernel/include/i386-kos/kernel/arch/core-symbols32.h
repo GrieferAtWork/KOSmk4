@@ -6574,10 +6574,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 1643 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname1643 /* index: 1643 */
+	.weak ansitty_translate; .long ansitty_translate
+	.reloc ., R_386_SIZE32, ansitty_translate; .long 0
+	.long 0xd8f1925
 	.long 0 /* index: 1644 */
 	.long 0
 	.long 0
@@ -18046,6 +18046,8 @@ END(kernel_symbol_table)
 	.string "cpu_quantum_end"
 .Lname1639:
 	.string "rawmemrlenw"
+.Lname1643:
+	.string "ansitty_translate"
 .Lname1648:
 	.string "inode_awritev_phys"
 .Lname1651:

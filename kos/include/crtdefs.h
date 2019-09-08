@@ -32,21 +32,21 @@ __SYSDECL_BEGIN
 #define _CRT_PACKING 8
 
 #ifndef _MSC_VER
-/* Auto-configure _DEBUG from NDEBUG on compilers that collect the C-standard */
+/* Auto-configure _DEBUG from NDEBUG on compilers that follow the C-standard */
 #ifdef NDEBUG
 #undef _DEBUG
-#else
+#else /* NDEBUG */
 #define _DEBUG 1
-#endif
+#endif /* !NDEBUG */
 #endif /* !_MSC_VER */
 
 
 #ifndef _CRTIMP
 #ifdef _DLL
 #define _CRTIMP __ATTR_DLLIMPORT
-#else
+#else /* _DLL */
 #define _CRTIMP /* nothing */
-#endif
+#endif /* !_DLL */
 #endif /* !_CRTIMP */
 
 #ifndef _CRT_STRINGIZE
@@ -362,7 +362,7 @@ typedef __INT64_TYPE__ __time64_t;
 #undef _USE_32BIT_TIME_T
 #ifndef __USE_TIME_BITS64
 #define _USE_32BIT_TIME_T 1
-#endif
+#endif /* !__USE_TIME_BITS64 */
 
 #ifndef _TIME_T_DEFINED
 #define _TIME_T_DEFINED 1
@@ -406,9 +406,9 @@ typedef __time64_t time_t;
 #ifndef __CRTDECL
 #ifdef _M_CEE_PURE
 #define __CRTDECL   /* nothing */
-#else
+#else /* _M_CEE_PURE */
 #define __CRTDECL   __ATTR_CDECL
-#endif
+#endif /* !_M_CEE_PURE */
 #endif /* !__CRTDECL */
 
 #ifndef _STR2WSTR
@@ -425,30 +425,30 @@ typedef __time64_t time_t;
 #ifdef _DEBUG
 #ifdef __CRT_HAVE__invalid_parameter
 _CRTIMP void (__ATTR_CDECL _invalid_parameter)(__WCHAR16_TYPE__ const *,__WCHAR16_TYPE__ const *,__WCHAR16_TYPE__ const *,unsigned int,uintptr_t);
-#else
+#else /* __CRT_HAVE__invalid_parameter */
 __LOCAL void (__ATTR_CDECL _invalid_parameter)(__WCHAR16_TYPE__ const *__UNUSED(__a),__WCHAR16_TYPE__ const *__UNUSED(__b),__WCHAR16_TYPE__ const *__UNUSED(__c),unsigned int __UNUSED(__d),uintptr_t __UNUSED(__e)) { }
-#endif
+#endif /* !__CRT_HAVE__invalid_parameter */
 #else /* _DEBUG */
 #ifdef __CRT_HAVE__invalid_parameter_noinfo
 _CRTIMP void (__ATTR_CDECL _invalid_parameter_noinfo)(void);
-#else
+#else /* __CRT_HAVE__invalid_parameter_noinfo */
 __LOCAL void (__ATTR_CDECL _invalid_parameter_noinfo)(void) {}
-#endif
+#endif /* !__CRT_HAVE__invalid_parameter_noinfo */
 #ifdef __CRT_HAVE__invalid_parameter_noinfo_noreturn
 _CRTIMP __ATTR_NORETURN void (__ATTR_CDECL _invalid_parameter_noinfo_noreturn)(void);
 #elif defined(__CRT_HAVE__Exit)
-__CREDIRECT_VOID(__ATTR_NORETURN,_invalid_parameter_noinfo_noreturn,(void),_Exit,())
+__CREDIRECT_VOID(__ATTR_NORETURN,,_invalid_parameter_noinfo_noreturn,(void),_Exit,())
 #elif defined(__CRT_HAVE__exit)
-__CREDIRECT_VOID(__ATTR_NORETURN,_invalid_parameter_noinfo_noreturn,(void),_exit,())
+__CREDIRECT_VOID(__ATTR_NORETURN,,_invalid_parameter_noinfo_noreturn,(void),_exit,())
 #else
 __LOCAL __ATTR_NORETURN void (__ATTR_CDECL _invalid_parameter_noinfo_noreturn)(void) { for (;;) {} }
 #endif
 #endif  /* _DEBUG */
 #ifdef __CRT_HAVE__invoke_watson
 _CRTIMP __ATTR_NORETURN void (__ATTR_CDECL _invoke_watson)(__WCHAR16_TYPE__ const *,__WCHAR16_TYPE__ const *,__WCHAR16_TYPE__ const *,unsigned int,uintptr_t);
-#else
+#else /* __CRT_HAVE__invoke_watson */
 __LOCAL __ATTR_NORETURN void (__ATTR_CDECL _invoke_watson)(__WCHAR16_TYPE__ const *__UNUSED(__a),__WCHAR16_TYPE__ const *__UNUSED(__b),__WCHAR16_TYPE__ const *__UNUSED(__c),unsigned int __UNUSED(__d),uintptr_t __UNUSED(__e)) { for (;;) {} }
-#endif
+#endif /* !__CRT_HAVE__invoke_watson */
 
 #ifndef _CRT_SECURE_INVALID_PARAMETER
 #ifdef _DEBUG
@@ -810,7 +810,7 @@ typedef struct threadlocaleinfostruct {
 #ifndef _NO_INLINING
 #define _NO_INLINING 1
 #endif /* !_NO_INLINING */
-#endif
+#endif /* __midl */
 
 #ifndef _CRT_UNUSED
 #define _CRT_UNUSED(x) (void)x
