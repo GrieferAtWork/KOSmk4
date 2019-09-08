@@ -108,8 +108,8 @@ vm_alloc(void) THROWS(E_BADALLOC) {
 	result->v_kernreserve.vn_part  = &userkern_segment_part;
 	result->v_kernreserve.vn_block = &userkern_segment_block;
 #else /* !CONFIG_NO_USERKERN_SEGMENT */
-	result->v_kernreserve.vn_part        = NULL;
-	result->v_kernreserve.vn_block       = NULL;
+	result->v_kernreserve.vn_part  = NULL;
+	result->v_kernreserve.vn_block = NULL;
 #endif /* CONFIG_NO_USERKERN_SEGMENT */
 	result->v_kernreserve.vn_guard = 0;
 
@@ -154,8 +154,10 @@ NOTHROW(KCALL vm_destroy)(struct vm *__restrict self) {
 	struct vm_node *iter, *next;
 	/* Destroy all remaining nodes. */
 	assert(self != THIS_VM);
+	assert(self != &vm_kernel);
 	assert(!self->v_tasks);
 	assert(!self->v_deltasks);
+	assert(self->v_kernreserve.vn_vm == self);
 	/* Invoke per-VM finalizer callbacks. */
 	vm_onfini_callbacks(self);
 	{
@@ -167,6 +169,7 @@ NOTHROW(KCALL vm_destroy)(struct vm *__restrict self) {
 	iter = self->v_byaddr;
 	while (iter) {
 		next = iter->vn_byaddr.ln_next;
+		assert(next != iter);
 		assert(iter->vn_vm == self);
 		if (iter != &self->v_kernreserve)
 			vm_node_destroy(iter);

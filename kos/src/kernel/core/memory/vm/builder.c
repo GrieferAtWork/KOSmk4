@@ -855,22 +855,26 @@ handle_remove_write_error:
 		LLIST_REMOVE(&target->v_kernreserve, vn_byaddr);
 
 		/* Assign the new node tree */
-		old_node_list    = target->v_byaddr;
+		old_node_list = target->v_byaddr;
+		assert(!old_node_list || old_node_list->vn_byaddr.ln_pself == &target->v_byaddr);
 		target->v_tree   = self->v_tree;
-		target->v_byaddr = self->v_byaddr;
-		for (node = self->v_byaddr; node;
-		     node = node->vn_byaddr.ln_next) {
-			/* Assign the proper VM to this node. */
-			node->vn_vm = target;
-			/* Create the part link for this node. */
-			if (node->vn_prot & VM_PROT_SHARED) {
-				LLIST_INSERT(node->vn_part->dp_srefs, node, vn_link);
-			} else {
-				LLIST_INSERT(node->vn_part->dp_crefs, node, vn_link);
-			}
-			printk(KERN_DEBUG "Map %p...%p against 1 data part\n",
-			       VM_NODE_MINADDR(node),
-			       VM_NODE_MAXADDR(node));
+		target->v_byaddr = node = self->v_byaddr;
+		if (node) {
+			node->vn_byaddr.ln_pself = &target->v_byaddr;
+			do {
+				assert(*node->vn_byaddr.ln_pself == node);
+				/* Assign the proper VM to this node. */
+				node->vn_vm = target;
+				/* Create the part link for this node. */
+				if (node->vn_prot & VM_PROT_SHARED) {
+					LLIST_INSERT(node->vn_part->dp_srefs, node, vn_link);
+				} else {
+					LLIST_INSERT(node->vn_part->dp_crefs, node, vn_link);
+				}
+				printk(KERN_DEBUG "Map %p...%p against 1 data part\n",
+				       VM_NODE_MINADDR(node),
+				       VM_NODE_MAXADDR(node));
+			} while ((node = node->vn_byaddr.ln_next) != NULL);
 		}
 
 		/* Re-insert the kernel-reserve node. */
@@ -925,6 +929,7 @@ handle_remove_write_error:
 		 * of all of the nodes associated with some data part. */
 		while (old_node_list) {
 			node = old_node_list->vn_byaddr.ln_next;
+			assert(!node || node->vn_byaddr.ln_pself == &old_node_list->vn_byaddr.ln_next);
 			vm_node_destroy(old_node_list);
 			old_node_list = node;
 		}
