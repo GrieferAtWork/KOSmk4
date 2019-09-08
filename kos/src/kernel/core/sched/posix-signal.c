@@ -1877,12 +1877,20 @@ DEFINE_SYSCALL4(syscall_slong_t, rt_sigtimedwait,
 	validate_writable(uinfo, sizeof(siginfo_t));
 	if (uts) {
 		struct timespec tms;
-		qtime_t timeout;
+		qtime_t tmo;
 		validate_readable(uts, sizeof(*uts));
+		COMPILER_READ_BARRIER();
 		tms.tv_sec  = (time_t)uts->tv_sec;
 		tms.tv_nsec = uts->tv_nsec;
-		timeout = timespec_to_qtime(&tms);
-		result = (syscall_slong_t)signal_waitfor(uthese, uinfo, &timeout);
+		COMPILER_READ_BARRIER();
+		if (!tms.tv_sec && !tms.tv_nsec) {
+			tmo.q_jtime = 0;
+			tmo.q_qtime = 0;
+			tmo.q_qsize = 1;
+		} else {
+			tmo = quantum_time() + timespec_to_qtime(&tms);
+		}
+		result = (syscall_slong_t)signal_waitfor(uthese, uinfo, &tmo);
 	} else {
 		result = (syscall_slong_t)signal_waitfor(uthese, uinfo, NULL);
 	}
@@ -1903,12 +1911,18 @@ DEFINE_SYSCALL4(syscall_slong_t, rt_sigtimedwait64,
 	validate_writable(uinfo, sizeof(siginfo_t));
 	if (uts) {
 		struct timespec tms;
-		qtime_t timeout;
+		qtime_t tmo;
 		validate_readable(uts, sizeof(*uts));
 		tms.tv_sec  = (time_t)uts->tv_sec;
 		tms.tv_nsec = uts->tv_nsec;
-		timeout = timespec_to_qtime(&tms);
-		result = (syscall_slong_t)signal_waitfor(uthese, uinfo, &timeout);
+		if (!tms.tv_sec && !tms.tv_nsec) {
+			tmo.q_jtime = 0;
+			tmo.q_qtime = 0;
+			tmo.q_qsize = 1;
+		} else {
+			tmo = quantum_time() + timespec_to_qtime(&tms);
+		}
+		result = (syscall_slong_t)signal_waitfor(uthese, uinfo, &tmo);
 	} else {
 		result = (syscall_slong_t)signal_waitfor(uthese, uinfo, NULL);
 	}

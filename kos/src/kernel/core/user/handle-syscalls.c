@@ -1392,7 +1392,13 @@ DEFINE_SYSCALL5(ssize_t, ppoll,
 		tms.tv_sec  = (time_t)timeout_ts->tv_sec;
 		tms.tv_nsec = timeout_ts->tv_nsec;
 		COMPILER_READ_BARRIER();
-		tmo = quantum_time() + timespec_to_qtime(&tms);
+		if (!tms.tv_sec && !tms.tv_nsec) {
+			tmo.q_jtime = 0;
+			tmo.q_qtime = 0;
+			tmo.q_qsize = 1;
+		} else {
+			tmo = quantum_time() + timespec_to_qtime(&tms);
+		}
 		result = do_ppoll(fds, nfds, &tmo, sigmask);
 	}
 	return (ssize_t)result;
@@ -1421,7 +1427,13 @@ DEFINE_SYSCALL5(ssize_t, ppoll64,
 		tms.tv_sec  = (time_t)timeout_ts->tv_sec;
 		tms.tv_nsec = timeout_ts->tv_nsec;
 		COMPILER_READ_BARRIER();
-		tmo = quantum_time() + timespec_to_qtime(&tms);
+		if (!tms.tv_sec && !tms.tv_nsec) {
+			tmo.q_jtime = 0;
+			tmo.q_qtime = 0;
+			tmo.q_qsize = 1;
+		} else {
+			tmo = quantum_time() + timespec_to_qtime(&tms);
+		}
 		result = do_ppoll(fds, nfds, &tmo, sigmask);
 	}
 	return (ssize_t)result;
@@ -1445,7 +1457,13 @@ DEFINE_SYSCALL5(ssize_t, select, size_t, nfds,
 		COMPILER_READ_BARRIER();
 		TIMEVAL_TO_TIMESPEC(timeout, &tms);
 		COMPILER_READ_BARRIER();
-		tmo = quantum_time() + timespec_to_qtime(&tms);
+		if (!tms.tv_sec && !tms.tv_nsec) {
+			tmo.q_jtime = 0;
+			tmo.q_qtime = 0;
+			tmo.q_qsize = 1;
+		} else {
+			tmo = quantum_time() + timespec_to_qtime(&tms);
+		}
 		result = do_select(nfds,
 		                   readfds,
 		                   writefds,
@@ -1479,7 +1497,13 @@ DEFINE_SYSCALL5(ssize_t, select64, size_t, nfds,
 		COMPILER_READ_BARRIER();
 		TIMEVAL_TO_TIMESPEC(timeout, &tms);
 		COMPILER_READ_BARRIER();
-		tmo = quantum_time() + timespec_to_qtime(&tms);
+		if (!tms.tv_sec && !tms.tv_nsec) {
+			tmo.q_jtime = 0;
+			tmo.q_qtime = 0;
+			tmo.q_qsize = 1;
+		} else {
+			tmo = quantum_time() + timespec_to_qtime(&tms);
+		}
 		result = do_select(nfds,
 		                   readfds,
 		                   writefds,
@@ -1531,7 +1555,13 @@ DEFINE_SYSCALL6(ssize_t, pselect6, size_t, nfds,
 		tms.tv_sec  = (time_t)timeout->tv_sec;
 		tms.tv_nsec = timeout->tv_nsec;
 		COMPILER_READ_BARRIER();
-		tmo = quantum_time() + timespec_to_qtime(&tms);
+		if (!tms.tv_sec && !tms.tv_nsec) {
+			tmo.q_jtime = 0;
+			tmo.q_qtime = 0;
+			tmo.q_qsize = 1;
+		} else {
+			tmo = quantum_time() + timespec_to_qtime(&tms);
+		}
 		result = do_pselect(nfds,
 		                    readfds,
 		                    writefds,
@@ -1579,7 +1609,13 @@ DEFINE_SYSCALL6(ssize_t, pselect6_64, size_t, nfds,
 		tms.tv_sec  = (time_t)timeout->tv_sec;
 		tms.tv_nsec = timeout->tv_nsec;
 		COMPILER_READ_BARRIER();
-		tmo = quantum_time() + timespec_to_qtime(&tms);
+		if (!tms.tv_sec && !tms.tv_nsec) {
+			tmo.q_jtime = 0;
+			tmo.q_qtime = 0;
+			tmo.q_qsize = 1;
+		} else {
+			tmo = quantum_time() + timespec_to_qtime(&tms);
+		}
 		result = do_pselect(nfds,
 		                    readfds,
 		                    writefds,

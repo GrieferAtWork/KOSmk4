@@ -142,6 +142,8 @@ DEFINE_SYSCALL2(errno_t, nanosleep,
 	tms.tv_sec  = (time_t)req->tv_sec;
 	tms.tv_nsec = req->tv_nsec;
 	COMPILER_READ_BARRIER();
+	if unlikely(!tms.tv_sec && !tms.tv_nsec)
+		return -EOK;
 	tmo = quantum_time() + timespec_to_qtime(&tms);
 	TRY {
 		for (;;) {
@@ -185,6 +187,8 @@ DEFINE_SYSCALL2(errno_t, nanosleep64,
 	tms.tv_sec  = (time_t)req->tv_sec;
 	tms.tv_nsec = req->tv_nsec;
 	COMPILER_READ_BARRIER();
+	if unlikely(!tms.tv_sec && !tms.tv_nsec)
+		return -EOK;
 	tmo = quantum_time() + timespec_to_qtime(&tms);
 	TRY {
 		for (;;) {
