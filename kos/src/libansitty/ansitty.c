@@ -67,7 +67,7 @@ DECL_BEGIN
 #define CC_ESC    0x1b /* '\e' */
 #define CC_SESC "\033" /* "\e" */
 
-#if 1
+#if 0
 #define TRACE_OPERATION DOTRACE
 #else
 #define TRACE_OPERATION TRACE

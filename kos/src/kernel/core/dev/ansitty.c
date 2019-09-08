@@ -35,13 +35,11 @@
 
 DECL_BEGIN
 
-#include <kernel/printk.h>
 PUBLIC NONNULL((1)) size_t KCALL
 ansitty_device_write(struct character_device *__restrict self,
                      USER CHECKED void const *src,
                      size_t num_bytes, iomode_t mode) THROWS(...) {
 	struct ansitty_device *me = (struct ansitty_device *)self;
-	printk(KERN_DEBUG "tty:%$q\n", num_bytes, src);
 	return (size_t)ansitty_printer(&me->at_ansi, (char const *)src, num_bytes);
 }
 
