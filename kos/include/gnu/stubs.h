@@ -1,4 +1,4 @@
-/* HASH 0x3657f7a8 */
+/* HASH 0xc876aded */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -207,7 +207,6 @@
 #define __stub_getcontext 1
 #define __stub_getdate 1
 #define __stub_getdate_r 1
-#define __stub_getenv 1
 #define __stub_getenv_s 1
 #define __stub_getgrent 1
 #define __stub_getgrent_r 1

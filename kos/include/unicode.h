@@ -1,4 +1,4 @@
-/* HASH 0xfb0be03c */
+/* HASH 0xfbe907d8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,8 +38,8 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
-#ifdef __CRT_HAVE_utf8_seqlen
-__LIBC __uint8_t const unicode_utf8seqlen[256];
+#ifdef __CRT_HAVE_unicode_utf8seqlen
+__LIBC __uint8_t const unicode_utf8seqlen[256] __CASMNAME_SAME("unicode_utf8seqlen");
 #elif defined(__local_utf8_seqlen_defined)
 #ifdef __cplusplus
 __NAMESPACE_LOCAL_USING(unicode_utf8seqlen)

@@ -1702,6 +1702,7 @@
 #define __CRT_HAVE_unicode_readutf8_n 1
 #define __CRT_HAVE_unicode_readutf8_rev 1
 #define __CRT_HAVE_unicode_readutf8_rev_n 1
+#define __CRT_HAVE_unicode_utf8seqlen 1
 #define __CRT_HAVE_unicode_writeutf16 1
 #define __CRT_HAVE_unicode_writeutf8 1
 #define __CRT_HAVE_unregister_filesystem_type 1

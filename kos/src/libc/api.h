@@ -85,6 +85,7 @@
 #undef __CRT_HAVE___locale_ctype_ptr
 #undef __CRT_HAVE___locale_ctype_ptr_l
 #undef __CRT_HAVE__isctype
+#define __CRT_HAVE_unicode_utf8seqlen 1
 
 #ifdef __KERNEL__
 #include <kernel/compiler.h>

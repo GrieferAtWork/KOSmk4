@@ -2554,10 +2554,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 638 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname638 /* index: 638 */
+	.weak unicode_utf8seqlen; .long unicode_utf8seqlen
+	.reloc ., R_386_SIZE32, unicode_utf8seqlen; .long 0
+	.long 0x2ee527e
 	.long .Lname639 /* index: 639 */
 	.weak _this_fpustate; .long _this_fpustate
 	.reloc ., R_386_SIZE32, _this_fpustate; .long 0
@@ -17046,6 +17046,8 @@ END(kernel_symbol_table)
 	.string "debuginfo_cu_parser_next"
 .Lname634:
 	.string "dbg_putuni"
+.Lname638:
+	.string "unicode_utf8seqlen"
 .Lname639:
 	.string "_this_fpustate"
 .Lname640:

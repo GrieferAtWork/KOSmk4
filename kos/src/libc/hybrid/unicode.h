@@ -16,31 +16,15 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_utf8_seqlen_defined
-#define __local_utf8_seqlen_defined 1
-#include <__crt.h>
-#include <hybrid/typecore.h>
-__NAMESPACE_LOCAL_BEGIN
-#ifdef __utf8_seqlen_defined
-#ifdef __cplusplus
-using ::unicode_utf8seqlen;
-#else /* __cplusplus */
-#define __LOCAL_utf8_seqlen  unicode_utf8seqlen
-#endif /* !__cplusplus */
-#elif defined(__CRT_HAVE_unicode_utf8seqlen)
-#ifdef __cplusplus
-__LIBC __UINT8_TYPE__ const unicode_utf8seqlen[256] __CASMNAME_SAME("unicode_utf8seqlen");
-#elif !defined(__NO_ASMNAME)
-__LIBC __UINT8_TYPE__ const __LIBC_LOCAL_NAME(unicode_utf8seqlen)[256] __CASMNAME("unicode_utf8seqlen");
-#else
-#define __utf8_seqlen_defined 1
-__LIBC __UINT8_TYPE__ const unicode_utf8seqlen[256] __CASMNAME_SAME("unicode_utf8seqlen");
-#define __LOCAL_utf8_seqlen  unicode_utf8seqlen
-#endif
-#else
-__LOCAL_LIBC_CONST_DATA(unicode_utf8seqlen) __UINT8_TYPE__ const __LIBC_LOCAL_NAME(unicode_utf8seqlen)[256] =
-#include "utf8-seqlen.h"
-;
-#endif
-__NAMESPACE_LOCAL_END
-#endif /* !__local_utf8_seqlen_defined */
+#ifndef GUARD_LIBC_HYBRID_UNICODE_H
+#define GUARD_LIBC_HYBRID_UNICODE_H 1
+
+#include "../api.h"
+
+DECL_BEGIN
+
+INTDEF u8 const libc_unicode_utf8seqlen[256];
+
+DECL_END
+
+#endif /* !GUARD_LIBC_HYBRID_UNICODE_H */

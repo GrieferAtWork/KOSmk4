@@ -1,4 +1,4 @@
-/* HASH 0xc2723c67 */
+/* HASH 0x2dedc185 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -207,7 +207,6 @@
 #define __CRT_STUB_getcontext 1
 #define __CRT_STUB_getdate 1
 #define __CRT_STUB_getdate_r 1
-#define __CRT_STUB_getenv 1
 #define __CRT_STUB_getenv_s 1
 #define __CRT_STUB_getgrent 1
 #define __CRT_STUB_getgrent_r 1
