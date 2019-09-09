@@ -58,12 +58,12 @@ DECL_BEGIN
 	PRIVATE DEFINE_DIRECTORY_ENTRY(srd_dent_##parent_id##_ent_##id,                    \
 	                               PROCFS_INOMAKE_SINGLETON(PROCFS_SINGLETON_ID_##id), \
 	                               type, name);
-#define END /* nothing */
+#define F_END /* nothing */
 #include "singleton.h"
-#undef END
+#undef F_END
 #undef F
 
-#define MKDIR(id, mode, files)                                         \
+#define MKDIR(id, mode, files)                                       \
 	PRIVATE struct procfs_singleton_dir_data srd_fsdata_dir_##id = { \
 		/* .psd_atime = */ { 0, 0 },                                 \
 		/* .psd_mtime = */ { 0, 0 },                                 \
@@ -74,7 +74,7 @@ DECL_BEGIN
 		/* .pdd_ents  = */ { files },                                \
 	};
 #define F(parent_id, name, type, id) &srd_dent_##parent_id##_ent_##id,
-#define END NULL /* Sentinel */
+#define F_END NULL /* Sentinel */
 #define MKREG_RO(id, mode, printer)                                        \
 	PRIVATE struct procfs_singleton_reg_ro_data srd_fsdata_reg_ro_##id = { \
 		/* .psd_atime   = */ { 0, 0 },                                     \
@@ -85,12 +85,28 @@ DECL_BEGIN
 		/* .psd_gid     = */ 0,                                            \
 		/* .psr_printer = */ &printer,                                     \
 	};
+#define DYNAMIC_SYMLINK(id, mode, readlink)                                          \
+	PRIVATE struct procfs_singleton_dynamic_symlink_data srd_fsdata_symlink_##id = { \
+		/* .psd_atime    = */ { 0, 0 },                                              \
+		/* .psd_mtime    = */ { 0, 0 },                                              \
+		/* .psd_ctime    = */ { 0, 0 },                                              \
+		/* .psd_mode     = */ S_IFLNK | (mode),                                      \
+		/* .psd_uid      = */ 0,                                                     \
+		/* .psd_gid      = */ 0,                                                     \
+		/* .pss_readlink = */ &readlink,                                             \
+	};
 #include "singleton.h"
-#undef END
+#undef F_END
 #undef F
 
 
-INTERN_CONST struct procfs_singleton_data *const ProcFS_Singleton_FsData[PROCFS_SINGLETON_COUNT] = {
+#define CUSTOM(id, type) \
+	INTDEF ATTR_WEAK byte_t __##type##_fsdata[] ASMNAME(#type "_fsdata");
+#include "singleton.h"
+
+
+INTERN_CONST struct procfs_singleton_data *const
+ProcFS_Singleton_FsData[PROCFS_SINGLETON_COUNT] = {
 	[PROCFS_SINGLETON_ROOT] = (struct procfs_singleton_data *)&ProcFS_RootDirectory_FsData,
 #define MKDIR(id, mode, files) \
 	[PROCFS_SINGLETON_ID_##id] = (struct procfs_singleton_data *)&srd_fsdata_dir_##id,
@@ -98,11 +114,28 @@ INTERN_CONST struct procfs_singleton_data *const ProcFS_Singleton_FsData[PROCFS_
 #define MKREG_RO(id, mode, printer) \
 	[PROCFS_SINGLETON_ID_##id] = (struct procfs_singleton_data *)&srd_fsdata_reg_ro_##id,
 #include "singleton.h"
+#define DYNAMIC_SYMLINK(id, mode, readlink) \
+	[PROCFS_SINGLETON_ID_##id] = (struct procfs_singleton_data *)&srd_fsdata_symlink_##id,
+#include "singleton.h"
+#ifndef PROCFS_NO_CUSTOM
+#define CUSTOM(id, type) \
+	[PROCFS_SINGLETON_ID_##id] = (struct procfs_singleton_data *)__##type##_fsdata,
+#include "singleton.h"
+#endif /* !PROCFS_NO_CUSTOM */
 };
 
+#ifndef PROCFS_NO_CUSTOM
+INTERN_CONST struct inode_type *const
+ProcFS_Singleton_CustomTypes[PROCFS_SINGLETON_COUNT - PROCFS_SINGLETON_START_CUSTOM] = {
+#define CUSTOM(id, mode, type) \
+	[PROCFS_SINGLETON_ID_##id - PROCFS_SINGLETON_START_CUSTOM] = &type,
+#include "singleton.h"
+};
+#endif /* !PROCFS_NO_CUSTOM */
 
 
-PRIVATE NONNULL((1)) void KCALL
+
+INTERN NONNULL((1)) void KCALL
 ProcFS_Singleton_LoadAttr(struct inode *__restrict self) {
 	struct procfs_singleton_data *data;
 	data = (struct procfs_singleton_data *)self->i_fsdata;
@@ -119,7 +152,7 @@ ProcFS_Singleton_LoadAttr(struct inode *__restrict self) {
 	self->i_filesize  = (pos_t)4096;
 }
 
-PRIVATE NONNULL((1)) void KCALL
+INTERN NONNULL((1)) void KCALL
 ProcFS_Singleton_SaveAttr(struct inode *__restrict self) {
 	struct procfs_singleton_data *data;
 	data = (struct procfs_singleton_data *)self->i_fsdata;
@@ -134,7 +167,7 @@ ProcFS_Singleton_SaveAttr(struct inode *__restrict self) {
 	data->psd_gid  = self->i_filegid;
 }
 
-PRIVATE NONNULL((1, 2)) REF struct directory_entry *KCALL
+INTERN NONNULL((1, 2)) REF struct directory_entry *KCALL
 ProcFS_Singleton_Directory_Lookup(struct directory_node *__restrict self,
                                   CHECKED USER /*utf-8*/ char const *__restrict name,
                                   u16 namelen, uintptr_t hash, fsmode_t mode)
@@ -170,7 +203,7 @@ ProcFS_Singleton_Directory_Lookup(struct directory_node *__restrict self,
 	return NULL;
 }
 
-PRIVATE NONNULL((1, 2)) void KCALL
+INTERN NONNULL((1, 2)) void KCALL
 ProcFS_Singleton_Directory_Enum(struct directory_node *__restrict self,
                                 directory_enum_callback_t callback,
                                 void *arg)
@@ -245,6 +278,17 @@ ProcFS_Singleton_RegularRo_FlexRead(struct inode *__restrict self,
 	return (size_t)((USER CHECKED byte_t *)closure.ssp_buf - (USER CHECKED byte_t *)dst);
 }
 
+PRIVATE NONNULL((1)) size_t KCALL
+ProcFS_SingleTon_DynamicSymlink_Readlink(struct symlink_node *__restrict self,
+                                         USER CHECKED /*utf-8*/ char *buf,
+                                         size_t bufsize)
+		THROWS(E_SEGFAULT, E_IOERROR, ...) {
+	struct procfs_singleton_dynamic_symlink_data *data;
+	data = (struct procfs_singleton_dynamic_symlink_data *)self->i_fsdata;
+	return (*data->pss_readlink)(self, buf, bufsize);
+}
+
+
 
 
 
@@ -289,6 +333,24 @@ INTERN struct inode_type ProcFS_Singleton_RegularRo_Type = {
 };
 
 
+/* Type for general-purpose singleton dynamic symlink files */
+INTERN struct inode_type ProcFS_Singleton_DynamicSymlink_Type = {
+	/* .it_fini = */ NULL,
+	/* .it_attr = */ {
+		/* .a_loadattr = */ &ProcFS_Singleton_LoadAttr,
+		/* .a_saveattr = */ &ProcFS_Singleton_SaveAttr,
+	},
+	/* .it_file = */ {
+	},
+	{
+		.it_symlink = {
+			/* .sl_readlink = */ NULL,
+			/* .sl_readlink = */ &ProcFS_SingleTon_DynamicSymlink_Readlink,
+		}
+	}
+};
+
+
 
 
 /************************************************************************/
@@ -329,7 +391,7 @@ INTERN struct procfs_singleton_dir_data ProcFS_RootDirectory_FsData = {
 #define ROOT_DIRECTORY_ENTRY(name, type, id) &srd_rootent_##id,
 #include "singleton.h"
 		NULL
-	},
+	}
 };
 
 INTERN struct inode_type ProcFS_RootDirectory_Type = {

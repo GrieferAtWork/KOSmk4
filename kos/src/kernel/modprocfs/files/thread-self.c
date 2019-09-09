@@ -16,27 +16,30 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_MODPROCFS_FILES_KOS_MEMINFO_C
-#define GUARD_MODPROCFS_FILES_KOS_MEMINFO_C 1
+#ifndef GUARD_MODPROCFS_FILES_THREAD_SELF_C
+#define GUARD_MODPROCFS_FILES_THREAD_SELF_C 1
+#define _KOS_SOURCE 1 /* snprintf returns size_t */
 
 #include <kernel/compiler.h>
-#include <kernel/driver.h>
-#include <kernel/memory.h>
-#include <format-printer.h>
+#include <sched/pid.h>
+#include <stdio.h>
 
 #include "../procfs.h"
 
 DECL_BEGIN
 
-
-INTERN NONNULL((2)) ssize_t KCALL
-ProcFS_Kos_MemInfo_Printer(struct inode *__restrict self,
-                           pformatprinter printer, void *arg) {
-	(*printer)(arg, "Test", 4);
-	return 0;
+INTERN NONNULL((1)) size_t KCALL
+ProcFS_ThreadSelf_Printer(struct symlink_node *__restrict self,
+                          USER CHECKED /*utf-8*/ char *buf,
+                          size_t bufsize) {
+	upid_t mypid = task_getpid_s();
+	upid_t mytid = task_gettid_s();
+	return snprintf(buf, bufsize, "%u/task/%u",
+	                (unsigned int)mypid,
+	                (unsigned int)mytid);
 }
 
 
 DECL_END
 
-#endif /* !GUARD_MODPROCFS_FILES_KOS_MEMINFO_C */
+#endif /* !GUARD_MODPROCFS_FILES_THREAD_SELF_C */

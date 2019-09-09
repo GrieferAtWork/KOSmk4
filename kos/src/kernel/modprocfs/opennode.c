@@ -41,15 +41,24 @@ ProcFS_OpenNode(struct superblock *__restrict self,
 	case PROCFS_INOTYPE_SINGLETON: {
 		unsigned int id;
 		id = (unsigned int)((u64)ino & PROCFS_INOTYPE_SINGLETON_IDMASK);
-		if unlikely(id >= PROCFS_SINGLETON_COUNT)
+		if (id >= PROCFS_SINGLETON_COUNT)
 			goto badino;
+#ifndef PROCFS_NO_CUSTOM
+		if (id >= PROCFS_SINGLETON_START_CUSTOM) {
+			node->i_fsdata = (struct inode_data *)ProcFS_Singleton_FsData[id];
+			node->i_type   = ProcFS_Singleton_CustomTypes[id - PROCFS_SINGLETON_START_CUSTOM];
+			break;
+		}
+#endif /* !PROCFS_NO_CUSTOM */
 		node->i_fsdata = (struct inode_data *)ProcFS_Singleton_FsData[id];
 		node->db_parts = VM_DATABLOCK_ANONPARTS;
-		if (id >= PROCFS_SINGLETON_START_REG_RO)
+		if (id >= PROCFS_SINGLETON_START_LNK_DYN)
+			node->i_type = &ProcFS_Singleton_DynamicSymlink_Type;
+		else if (id >= PROCFS_SINGLETON_START_REG_RO)
 			node->i_type = &ProcFS_Singleton_RegularRo_Type;
-		else if (id > PROCFS_SINGLETON_ROOT) {
+		else if (id > PROCFS_SINGLETON_ROOT)
 			node->i_type = &ProcFS_Singleton_Directory_Type;
-		} else {
+		else {
 			node->i_type = &ProcFS_RootDirectory_Type;
 		}
 	}	break;

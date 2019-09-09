@@ -107,7 +107,7 @@ PRIVATE NOBLOCK void
 NOTHROW(KCALL zone_free_keepz)(struct pmemzone *__restrict self,
                                pageptr_t zone_relative_base,
                                pagecnt_t num_pages) {
-	size_t i, num_zpages;
+	size_t i, num_qpages;
 	uintptr_t mask;
 	uintptr_t oldval;
 	assert(num_pages);
@@ -116,14 +116,14 @@ NOTHROW(KCALL zone_free_keepz)(struct pmemzone *__restrict self,
 	ATOMIC_FETCHADD(self->mz_cfree, num_pages);
 	pmemzone_set_fmax(self, zone_relative_base + num_pages - 1);
 	i = (size_t)(zone_relative_base / PAGES_PER_WORD);
-	num_zpages = 0;
+	num_qpages = 0;
 	if (num_pages == 1) {
 		mask   = PMEMZONE_ISFREEMASK << (unsigned int)((zone_relative_base % PAGES_PER_WORD) * PMEMZONE_BITSPERPAGE);
 		oldval = ATOMIC_FETCHOR(self->mz_free[i], mask);
 		assertf(!(oldval & mask), "Double free at " FORMAT_PAGEPTR_T,
 		        (pageptr_t)(self->mz_start + zone_relative_base));
 		if (oldval & (mask << (PMEMZONE_ISUNDFBIT - PMEMZONE_ISFREEBIT)))
-			++num_zpages;
+			++num_qpages;
 	} else {
 		/* free partial pages. */
 		unsigned int missalignment, num_free;
@@ -144,7 +144,7 @@ NOTHROW(KCALL zone_free_keepz)(struct pmemzone *__restrict self,
 			        "mask          = %IX\n",
 			        (pageptr_t)(self->mz_start + zone_relative_base),
 			        oldval, oldval & PMEMBITSET_FREEMASK, mask);
-			num_zpages += POPCOUNT(oldval & (mask << (PMEMZONE_ISUNDFBIT - PMEMZONE_ISFREEBIT)));
+			num_qpages += POPCOUNT(oldval & (mask << (PMEMZONE_ISUNDFBIT - PMEMZONE_ISFREEBIT)));
 			num_pages -= num_free;
 			assert(!num_pages ||
 			       !((zone_relative_base + num_free) & (PAGES_PER_WORD - 1)));
@@ -159,7 +159,7 @@ NOTHROW(KCALL zone_free_keepz)(struct pmemzone *__restrict self,
 			        "mask_oldval = %IX\n",
 			        (pageptr_t)(self->mz_start + (i * PAGES_PER_WORD)),
 			        oldval, oldval & PMEMBITSET_FREEMASK);
-			num_zpages += POPCOUNT(oldval & PMEMBITSET_UNDFMASK);
+			num_qpages += POPCOUNT(oldval & PMEMBITSET_UNDFMASK);
 			num_pages -= PAGES_PER_WORD;
 			++i;
 		}
@@ -175,11 +175,11 @@ NOTHROW(KCALL zone_free_keepz)(struct pmemzone *__restrict self,
 			        "mask          = %IX\n",
 			        (pageptr_t)(self->mz_start + (i * PAGES_PER_WORD)),
 			        oldval, oldval & PMEMBITSET_FREEMASK, mask);
-			num_zpages += POPCOUNT(oldval & (mask << (PMEMZONE_ISUNDFBIT - PMEMZONE_ISFREEBIT)));
+			num_qpages += POPCOUNT(oldval & (mask << (PMEMZONE_ISUNDFBIT - PMEMZONE_ISFREEBIT)));
 		}
 	}
-	if (num_zpages)
-		ATOMIC_FETCHADD(self->mz_zfree, num_zpages);
+	if (num_qpages)
+		ATOMIC_FETCHADD(self->mz_qfree, num_qpages);
 }
 
 
@@ -202,6 +202,7 @@ NOTHROW(KCALL zone_free)(struct pmemzone *__restrict self,
 	assert(zone_relative_base + num_pages > zone_relative_base);
 	assert(zone_relative_base + num_pages - 1 <= self->mz_rmax);
 	ATOMIC_FETCHADD(self->mz_cfree, num_pages);
+	ATOMIC_FETCHADD(self->mz_qfree, num_pages);
 	pmemzone_set_fmax(self, zone_relative_base + num_pages - 1);
 	i = (size_t)(zone_relative_base / PAGES_PER_WORD);
 	if (num_pages == 1) {
@@ -312,13 +313,12 @@ NOTHROW(KCALL zone_cfree)(struct pmemzone *__restrict self,
 	assert(num_pages);
 	assert(zone_relative_base + num_pages > zone_relative_base);
 	assert(zone_relative_base + num_pages - 1 <= self->mz_rmax);
-	ATOMIC_FETCHADD(self->mz_zfree, num_pages);
 	ATOMIC_FETCHADD(self->mz_cfree, num_pages);
 	pmemzone_set_fmax(self, zone_relative_base + num_pages - 1);
 	i = (size_t)(zone_relative_base / PAGES_PER_WORD);
 	if (num_pages == 1) {
-		mask = (PMEMZONE_ISFREEMASK | PMEMZONE_ISUNDFBIT) << (unsigned int)((zone_relative_base % PAGES_PER_WORD) *
-		                                                                    PMEMZONE_BITSPERPAGE);
+		mask = PMEMZONE_ISFREEMASK << (unsigned int)((zone_relative_base % PAGES_PER_WORD) *
+		                                             PMEMZONE_BITSPERPAGE);
 		set_cfree_word(&self->mz_free[i], mask);
 	} else {
 		/* free partial pages. */
@@ -326,7 +326,7 @@ NOTHROW(KCALL zone_cfree)(struct pmemzone *__restrict self,
 		missalignment = (unsigned int)(zone_relative_base & (PAGES_PER_WORD - 1));
 		if (missalignment) {
 			num_free = (PAGES_PER_WORD - missalignment);
-			mask     = (PMEMBITSET_FREEMASK | PMEMBITSET_UNDFMASK);
+			mask     = PMEMBITSET_FREEMASK;
 			if ((pagecnt_t)num_free > num_pages) {
 				num_free = (unsigned int)num_pages;
 				mask &= (((uintptr_t)1 << (num_free * PMEMZONE_BITSPERPAGE)) - 1);
@@ -340,13 +340,13 @@ NOTHROW(KCALL zone_cfree)(struct pmemzone *__restrict self,
 		}
 		while (num_pages >= PAGES_PER_WORD) {
 			/* Free full words. */
-			set_cfree_word(&self->mz_free[i], (PMEMBITSET_FREEMASK | PMEMBITSET_UNDFMASK));
+			set_cfree_word(&self->mz_free[i], PMEMBITSET_FREEMASK);
 			num_pages -= PAGES_PER_WORD;
 			++i;
 		}
 		/* Mark trailing pages as free. */
 		if (num_pages) {
-			mask = (PMEMBITSET_FREEMASK | PMEMBITSET_UNDFMASK);
+			mask = PMEMBITSET_FREEMASK;
 			mask &= ((uintptr_t)1 << ((unsigned int)num_pages * PMEMZONE_BITSPERPAGE)) - 1;
 			set_cfree_word(&self->mz_free[i], mask);
 		}
@@ -804,7 +804,7 @@ again:
 				return PAGE_MALLOC_AT_NOTFREE; /* Page was already allocated */
 			ATOMIC_FETCHDEC(zone->mz_cfree);
 			if (oldval & (mask << (PMEMZONE_ISUNDFBIT - PMEMZONE_ISFREEBIT)))
-				ATOMIC_FETCHDEC(zone->mz_zfree);
+				ATOMIC_FETCHDEC(zone->mz_qfree);
 			return PAGE_MALLOC_AT_SUCCESS;
 		}
 	} while ((zone = zone->mz_prev) != NULL);
@@ -1013,16 +1013,16 @@ NOTHROW(KCALL page_isfree)(pageptr_t page) {
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL page_stat)(struct pmemstat *__restrict result) {
 	struct pmemzone *zone;
-	zone             = mzones.pm_last;
+	zone = mzones.pm_last;
 	result->ps_free  = 0;
 	result->ps_zfree = 0;
 	result->ps_used  = 0;
 	do {
 		pagecnt_t cfree = ATOMIC_READ(zone->mz_cfree);
-		pagecnt_t zfree = ATOMIC_READ(zone->mz_zfree);
+		pagecnt_t qfree = ATOMIC_READ(zone->mz_qfree);
 		result->ps_free += cfree;
 		result->ps_used += ((pagecnt_t)zone->mz_rmax + 1) - cfree;
-		result->ps_zfree += zfree;
+		result->ps_zfree += cfree - qfree;
 	} while ((zone = zone->mz_prev) != NULL);
 }
 

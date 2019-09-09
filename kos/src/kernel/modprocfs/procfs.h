@@ -71,6 +71,16 @@ struct procfs_singleton_reg_ro_data {
 	PROCFS_REG_PRINTER psr_printer; /* [1..1][const] Printer for generating the contents of the file. */
 };
 
+/* Prototype for printer functions defined by `SYMLINK()' */
+typedef NONNULL((2)) size_t (KCALL *PROCFS_SYMLINK_READLINK)(struct symlink_node *__restrict self,
+                                                             USER CHECKED /*utf-8*/ char *buf,
+                                                             size_t bufsize);
+
+struct procfs_singleton_dynamic_symlink_data {
+	PROCFS_SINGLETON_DATA_FIELDS
+	PROCFS_SYMLINK_READLINK pss_readlink; /* [1..1][const] Dynamically invoked readlink() function. */
+};
+
 /* Values for singleton Inodes (for use with `PROCFS_INOMAKE_SINGLETON(PROCFS_SINGLETON_*)'). */
 enum {
 	PROCFS_SINGLETON_ROOT = 0, /* /proc  (Must always remain `0') */
@@ -81,6 +91,16 @@ enum {
 	__PROCFS_SINGLETON_START_REG_RO = PROCFS_SINGLETON_START_REG_RO - 1,
 #define MKREG_RO(id, mode, printer) PROCFS_SINGLETON_ID_##id,
 #include "singleton.h"
+	PROCFS_SINGLETON_START_LNK_DYN,
+	__PROCFS_SINGLETON_START_LNK_DYN = PROCFS_SINGLETON_START_LNK_DYN - 1,
+#define DYNAMIC_SYMLINK(id, mode, readlink) PROCFS_SINGLETON_ID_##id,
+#include "singleton.h"
+#ifndef PROCFS_NO_CUSTOM
+	PROCFS_SINGLETON_START_CUSTOM,
+	__PROCFS_SINGLETON_START_CUSTOM = PROCFS_SINGLETON_START_CUSTOM - 1,
+#define CUSTOM(id, type) PROCFS_SINGLETON_ID_##id,
+#include "singleton.h"
+#endif /* !PROCFS_NO_CUSTOM */
 	PROCFS_SINGLETON_COUNT
 };
 
@@ -88,8 +108,30 @@ enum {
 /* [1..1][*] Fs-specific data pointers for singleton nodes.
  * The index to this array is one of `PROCFS_SINGLETON_*' */
 INTDEF struct procfs_singleton_data *const ProcFS_Singleton_FsData[PROCFS_SINGLETON_COUNT];
-INTDEF struct inode_type ProcFS_Singleton_Directory_Type; /* Type for general-purpose singleton directories */
-INTDEF struct inode_type ProcFS_Singleton_RegularRo_Type; /* Type for general-purpose singleton read-only files */
+#ifndef PROCFS_NO_CUSTOM
+INTDEF struct inode_type *const ProcFS_Singleton_CustomTypes[PROCFS_SINGLETON_COUNT - PROCFS_SINGLETON_START_CUSTOM];
+#endif /* !PROCFS_NO_CUSTOM */
+INTDEF struct inode_type ProcFS_Singleton_Directory_Type;      /* Type for general-purpose singleton directories */
+INTDEF struct inode_type ProcFS_Singleton_RegularRo_Type;      /* Type for general-purpose singleton read-only files */
+INTDEF struct inode_type ProcFS_Singleton_DynamicSymlink_Type; /* Type for general-purpose singleton dynamic symlink files */
+
+INTDEF NONNULL((1)) void KCALL ProcFS_Singleton_LoadAttr(struct inode *__restrict self);
+INTDEF NONNULL((1)) void KCALL ProcFS_Singleton_SaveAttr(struct inode *__restrict self);
+
+/* ProcFS_Singleton_Directory_Type.it_directory.d_oneshot.o_lookup */
+INTDEF NONNULL((1, 2)) REF struct directory_entry *KCALL
+ProcFS_Singleton_Directory_Lookup(struct directory_node *__restrict self,
+                                  CHECKED USER /*utf-8*/ char const *__restrict name,
+                                  u16 namelen, uintptr_t hash, fsmode_t mode)
+		THROWS(E_SEGFAULT, E_FSERROR_FILE_NOT_FOUND,
+		       E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...);
+
+/* ProcFS_Singleton_Directory_Type.it_directory.d_oneshot.o_enum */
+INTDEF NONNULL((1, 2)) void KCALL
+ProcFS_Singleton_Directory_Enum(struct directory_node *__restrict self,
+                                directory_enum_callback_t callback,
+                                void *arg)
+		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...);
 
 
 INTDEF struct procfs_singleton_dir_data ProcFS_RootDirectory_FsData;
@@ -106,9 +148,15 @@ ProcFS_OpenNode(struct superblock *__restrict self,
 
 
 /* Define printer functions used by singleton files */
-#define MKREG_RO(id, mode, printer)                                          \
-	INTDEF NONNULL((2)) ssize_t KCALL printer(struct inode *__restrict self, \
-	                                          pformatprinter printer_, void *arg);
+#define DYNAMIC_SYMLINK(id, mode, readlink)                                         \
+	INTDEF NONNULL((1)) size_t KCALL readlink(struct symlink_node *__restrict self, \
+	                                          USER CHECKED /*utf-8*/ char *buf,     \
+	                                          size_t bufsize);
+#define MKREG_RO(id, mode, printer)                                             \
+	INTDEF NONNULL((1, 2)) ssize_t KCALL printer(struct inode *__restrict self, \
+	                                             pformatprinter printer_, void *arg);
+#define CUSTOM(id, type) \
+	INTDEF struct inode_type type;
 #include "singleton.h"
 
 

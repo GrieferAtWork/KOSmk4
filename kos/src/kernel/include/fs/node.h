@@ -677,7 +677,7 @@ struct inode_type {
 			 *              NUL-character that can even be OMITTED)
 			 * @throw: E_SEGFAULT: The given user-buffer is faulty.
 			 * @throw: E_IOERROR:  Failed to read data from disk. */
-			NONNULL((1, 2))
+			NONNULL((1))
 			size_t (KCALL *sl_readlink_dynamic)(struct symlink_node *__restrict self,
 			                                    USER CHECKED /*utf-8*/char *buf,
 			                                    size_t bufsize)

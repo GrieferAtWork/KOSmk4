@@ -74,7 +74,7 @@ PRIVATE ATTR_FREERODATA struct pmemzone const empty_mzone = {
 	.mz_rmax  = 0,
 	.mz_fmax  = 0,
 	.mz_cfree = 0,
-	.mz_zfree = 0,
+	.mz_qfree = 0,
 	.mz_zero  = 0,
 	.mz_free  = { 0, 0 },
 };
@@ -534,7 +534,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL minfo_makezones)(void) {
 		zone->mz_rmax  = (bank_end_page - 1) - bank_start_page;
 		zone->mz_fmax  = zone->mz_rmax;
 		zone->mz_cfree = 0;
-		zone->mz_zfree = 0;
+		zone->mz_qfree = 0;
 		zone->mz_zero  = 0;
 		prev_init_end  = bank_start_page;
 		do {
@@ -600,6 +600,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL minfo_makezones)(void) {
 		       VM_PPAGE2ADDR(bank_end_page) - 1,
 		       (size_t)zone->mz_cfree,
 		       (size_t)zone->mz_rmax + 1);
+		zone->mz_qfree = zone->mz_cfree; /* Everything is undefined in the beginning */
 		zone->mz_free[PMEMZONE_LENGTHOF_BITSET((size_t)zone->mz_rmax + 1)] = 0; /* mz_zero2 */
 	}
 	assert(zone_count == mzones.pm_zonec);

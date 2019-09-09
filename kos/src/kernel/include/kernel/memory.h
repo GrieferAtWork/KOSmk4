@@ -153,7 +153,7 @@ struct pmemzone {
 	pageptr_t        mz_rmax;    /* [const][== (mz_max - mz_start)] Zone-relative index of the max page. */
 	WEAK pageptr_t   mz_fmax;    /* The zone-relative address of the greatest free page (used as hint to the allocator). */
 	WEAK pagecnt_t   mz_cfree;   /* The number of free pages within this zone. */
-	WEAK pagecnt_t   mz_zfree;   /* The number of free zero-pages within this zone. */
+	WEAK pagecnt_t   mz_qfree;   /* The number of free pages within this zone that aren't initialized. */
 	uintptr_t        mz_zero;    /* [const] Always 0 */
 	COMPILER_FLEXIBLE_ARRAY(uintptr_t, mz_free);
 	                             /* [((mz_rmax + 1) * PMEMZONE_BITSPERPAGE) / BITS_PER_POINTER] Bitset of free pages

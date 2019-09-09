@@ -116,7 +116,7 @@ again_word_i:
 							goto again_word_i;
 						ATOMIC_FETCHDEC(self->mz_cfree);
 						if (word & (page_mask << (PMEMZONE_ISUNDFBIT - PMEMZONE_ISFREEBIT)))
-							ATOMIC_FETCHDEC(self->mz_zfree);
+							ATOMIC_FETCHDEC(self->mz_qfree);
 					}
 #ifdef ALLOC_MINMAX
 					*res_pages = 1;
@@ -141,7 +141,7 @@ again_word_i:
 #ifndef ALLOC_SINGLE
 	else {
 		pagecnt_t alloc_count;
-		unsigned int zcount;
+		unsigned int qcount;
 		/* Transient allocation. */
 		alloc_count = 0;
 		for (;;) {
@@ -179,9 +179,9 @@ min_max_allocate_current_alloc_mask:
 						if (!ATOMIC_CMPXCH_WEAK(self->mz_free[i], word, word & ~alloc_mask))
 							goto again_word_i_trans;
 						ATOMIC_FETCHSUB(self->mz_cfree, new_alloc_count - alloc_count);
-						zcount = POPCOUNT(word & (alloc_mask << (PMEMZONE_ISUNDFBIT - PMEMZONE_ISFREEBIT)));
-						if (zcount)
-							ATOMIC_FETCHSUB(self->mz_zfree, zcount);
+						qcount = POPCOUNT(word & (alloc_mask << (PMEMZONE_ISUNDFBIT - PMEMZONE_ISFREEBIT)));
+						if (qcount)
+							ATOMIC_FETCHSUB(self->mz_qfree, qcount);
 #ifdef ALLOC_MINMAX
 						*res_pages = new_alloc_count;
 #endif /* ALLOC_MINMAX */
@@ -202,9 +202,9 @@ min_max_allocate_current_alloc_mask:
 							if (!ATOMIC_CMPXCH_WEAK(self->mz_free[i], word, word & ~alloc_mask))
 								goto again_word_i_trans;
 							ATOMIC_FETCHSUB(self->mz_cfree, new_alloc_count - alloc_count);
-							zcount = POPCOUNT(word & (alloc_mask << (PMEMZONE_ISUNDFBIT - PMEMZONE_ISFREEBIT)));
-							if (zcount)
-								ATOMIC_FETCHSUB(self->mz_zfree, zcount);
+							qcount = POPCOUNT(word & (alloc_mask << (PMEMZONE_ISUNDFBIT - PMEMZONE_ISFREEBIT)));
+							if (qcount)
+								ATOMIC_FETCHSUB(self->mz_qfree, qcount);
 							*res_pages = new_alloc_count;
 							return result;
 #endif
@@ -231,9 +231,9 @@ min_max_allocate_current_alloc_mask:
 				if (!ATOMIC_CMPXCH_WEAK(self->mz_free[i], word, word & ~alloc_mask))
 					goto again_word_i_trans;
 				ATOMIC_FETCHSUB(self->mz_cfree, new_alloc_count - alloc_count);
-				zcount = POPCOUNT(word & (alloc_mask << (PMEMZONE_ISUNDFBIT - PMEMZONE_ISFREEBIT)));
-				if (zcount)
-					ATOMIC_FETCHSUB(self->mz_zfree, zcount);
+				qcount = POPCOUNT(word & (alloc_mask << (PMEMZONE_ISUNDFBIT - PMEMZONE_ISFREEBIT)));
+				if (qcount)
+					ATOMIC_FETCHSUB(self->mz_qfree, qcount);
 			} else {
 				assert(new_alloc_count == alloc_count);
 			}
