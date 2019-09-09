@@ -41,7 +41,7 @@ DECL_BEGIN
  * encode an entire commandline at once.
  * @return: * : The sum of return values of `printer'
  * @return: <0: The propagation of the first negative return value of `printer' (if any) */
-INTDEF ssize_t CC
+INTDEF NONNULL((1, 3)) ssize_t CC
 libcmdline_encode_argument(pformatprinter printer, void *arg,
                            char const *arg_start, size_t arg_len);
 
@@ -49,7 +49,7 @@ libcmdline_encode_argument(pformatprinter printer, void *arg,
  * the given `argv' vector. (s.a. `cmdline_encode_argument()')
  * @return: * : The sum of return values of `printer'
  * @return: <0: The propagation of the first negative return value of `printer' (if any) */
-INTDEF ssize_t CC
+INTDEF NONNULL((1, 4)) ssize_t CC
 libcmdline_encode(pformatprinter printer, void *arg,
                   size_t argc, char const *const *argv);
 

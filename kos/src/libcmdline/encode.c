@@ -35,7 +35,7 @@
 
 DECL_BEGIN
 
-LOCAL ssize_t CC
+LOCAL NONNULL((1, 3, 4)) ssize_t CC
 encode_escape_backslash(pformatprinter printer, void *arg,
                         char const *arg_start,
                         char const *arg_end) {
@@ -66,7 +66,7 @@ err:
 	return temp;
 }
 
-LOCAL ssize_t CC
+LOCAL NONNULL((1, 3, 4)) ssize_t CC
 encode_escape_spc(pformatprinter printer, void *arg,
                   char const *arg_start,
                   char const *arg_end) {
@@ -97,7 +97,7 @@ err:
 	return temp;
 }
 
-LOCAL ssize_t CC
+LOCAL NONNULL((1, 3, 4)) ssize_t CC
 encode_escape_all(pformatprinter printer, void *arg,
                   char const *arg_start,
                   char const *arg_end) {
@@ -128,7 +128,7 @@ err:
 	return temp;
 }
 
-LOCAL ssize_t CC
+LOCAL NONNULL((1, 3, 4)) ssize_t CC
 encode_escape_q(pformatprinter printer, void *arg,
                 char const *arg_start,
                 char const *arg_end, char qchar) {
@@ -159,7 +159,7 @@ err:
 	return temp;
 }
 
-LOCAL ssize_t CC
+LOCAL NONNULL((1, 3)) ssize_t CC
 encode_quote(pformatprinter printer, void *arg,
              char const *arg_start,
              size_t arg_len, char qchar,
@@ -183,7 +183,7 @@ err:
 	return temp;
 }
 
-LOCAL ssize_t CC
+LOCAL NONNULL((1, 3, 4)) ssize_t CC
 encode_escape_quote(pformatprinter printer, void *arg,
                     char const *arg_start,
                     char const *arg_end,
@@ -215,7 +215,7 @@ err:
  * encode an entire commandline at once.
  * @return: * : The sum of return values of `printer'
  * @return: <0: The propagation of the first negative return value of `printer' (if any) */
-INTERN ssize_t CC
+INTERN NONNULL((1, 3)) ssize_t CC
 libcmdline_encode_argument(pformatprinter printer, void *arg,
                            char const *arg_start, size_t arg_len) {
 	ssize_t result;
@@ -305,7 +305,7 @@ escape_double_quote:
  * the given `argv' vector. (s.a. `cmdline_encode_argument()')
  * @return: * : The sum of return values of `printer'
  * @return: <0: The propagation of the first negative return value of `printer' (if any) */
-INTERN ssize_t CC
+INTERN NONNULL((1, 4)) ssize_t CC
 libcmdline_encode(pformatprinter printer, void *arg,
                   size_t argc, char const *const *argv) {
 	ssize_t temp, result = 0;

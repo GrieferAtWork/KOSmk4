@@ -40,7 +40,7 @@ struct argv_append_data {
 	size_t          aad_arga; /* Allocated argument count */
 };
 
-PRIVATE ssize_t __LIBCCALL
+PRIVATE NONNULL((1, 2)) ssize_t __LIBCCALL
 argv_append(void *__restrict arg,
             /*utf-8*/char const *__restrict data,
             size_t UNUSED(len)) {
@@ -282,7 +282,7 @@ err:
 
 
 
-PRIVATE ssize_t __LIBCCALL
+PRIVATE NONNULL((1, 2)) ssize_t __LIBCCALL
 cmdline_flatten_callback(void *arg,
                          char const *__restrict data,
                          size_t datalen) {
@@ -298,7 +298,7 @@ cmdline_flatten_callback(void *arg,
  * strings, and return the total number of strings.
  * NOTE: Obviously, this function will modify `cmdline'
  * >> char *iter, *my_cmdline = get_cmdline();
- * >> size_t i, argc = cmdline_split(my_cmdline);
+ * >> size_t i, argc = cmdline_split(my_cmdline, NULL);
  * >> for (iter = my_cmdline, i = 0; i < argc; ++i, iter = strend(iter) + 1) {
  * >>     printf("argv[%Iu] = %q\n", i, iter);
  * >> }

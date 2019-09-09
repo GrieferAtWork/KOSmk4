@@ -348,7 +348,7 @@ EOF
 
 
 ##############################################################################
-	kos-headers)
+	kos-headers | kos-headers-400)
 		install_path /usr/include "${KOS_ROOT}/kos/include"
 		cmd mkdir -p "$BINUTILS_SYSROOT/opt"
 		cat > "$BINUTILS_SYSROOT/opt/hello-header-temp.c" <<EOF
@@ -492,7 +492,6 @@ EOF
 		fi
 		install_file /bin/nano "$OPTPATH/src/nano"
 		;;
-
 ##############################################################################
 
 
