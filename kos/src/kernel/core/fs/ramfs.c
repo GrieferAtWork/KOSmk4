@@ -179,7 +179,7 @@ ramfs_mkdir(struct directory_node *__restrict UNUSED(target_directory),
 	target_dirent->de_pos              = (pos_t)(uintptr_t)target_dirent;
 	target_dirent->de_ino              = (ino_t)(uintptr_t)new_directory;
 	new_directory->i_fileino           = (ino_t)(uintptr_t)new_directory;
-	new_directory->i_type              = &ramfs_regular_type;
+	new_directory->i_type              = &ramfs_directory_type;
 	new_directory->i_filemode          = S_IFDIR | 0755;
 	new_directory->i_filenlink         = (nlink_t)1;
 	new_directory->i_fileuid           = 0;
@@ -202,7 +202,7 @@ ramfs_symlink(struct directory_node *__restrict UNUSED(target_directory),
 	target_dirent->de_pos          = (pos_t)(uintptr_t)target_dirent;
 	target_dirent->de_ino          = (ino_t)(uintptr_t)link_node;
 	link_node->i_fileino           = (ino_t)(uintptr_t)link_node;
-	link_node->i_type              = &ramfs_regular_type;
+	link_node->i_type              = &ramfs_symlink_type;
 	link_node->i_filemode          = S_IFLNK | 0777;
 	link_node->i_filenlink         = (nlink_t)1;
 	link_node->i_fileuid           = 0;
@@ -225,7 +225,7 @@ ramfs_mknod(struct directory_node *__restrict UNUSED(target_directory),
 	target_dirent->de_pos  = (pos_t)(uintptr_t)target_dirent;
 	target_dirent->de_ino  = (ino_t)(uintptr_t)device_node;
 	device_node->i_fileino = (ino_t)(uintptr_t)device_node;
-	device_node->i_type    = &ramfs_regular_type;
+	device_node->i_type    = &ramfs_dev_type;
 	device_node->i_filemode |= 0644;
 	device_node->i_filenlink         = (nlink_t)1;
 	device_node->i_fileuid           = 0;
