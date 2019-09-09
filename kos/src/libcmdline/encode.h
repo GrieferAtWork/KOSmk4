@@ -16,29 +16,45 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_MODPROCFS_FILES_CMDLINE_C
-#define GUARD_MODPROCFS_FILES_CMDLINE_C 1
-#define _KOS_SOURCE 1 /* snprintf returns size_t */
+#ifndef GUARD_LIBCMDLINE_ENCODE_H
+#define GUARD_LIBCMDLINE_ENCODE_H 1
 
-#include <kernel/compiler.h>
-#include <kernel/driver.h>
-#include <string.h>
+#include "api.h"
+
+#include <hybrid/compiler.h>
+
+#include <kos/types.h>
+
+#include <format-printer.h>
+
 #include <libcmdline/encode.h>
-
-#include "../procfs.h"
 
 DECL_BEGIN
 
-INTERN NONNULL((1, 2)) ssize_t KCALL
-ProcFS_Cmdline_Printer(struct inode *__restrict UNUSED(self),
-                       pformatprinter printer, void *arg) {
-	cmdline_encode(printer,
-	               arg,
-	               kernel_driver.d_argc,
-	               kernel_driver.d_argv);
-	return (*printer)(arg, "\n", 1);
-}
+
+/* Encode the given `arg_start' argument by escaping characters
+ * that would confuse the commandline decoder, and print the
+ * resulting string using the given `printer' with `arg'
+ * The caller is still responsible to insert space-separators with
+ * a width of at least 1 space-character (' ') between successive
+ * arguments. Alternatively, you may also use `cmdline_encode()' to
+ * encode an entire commandline at once.
+ * @return: * : The sum of return values of `printer'
+ * @return: <0: The propagation of the first negative return value of `printer' (if any) */
+INTDEF ssize_t CC
+libcmdline_encode_argument(pformatprinter printer, void *arg,
+                           char const *arg_start, size_t arg_len);
+
+/* Encode an entire commandline given by `argc' pointers found within
+ * the given `argv' vector. (s.a. `cmdline_encode_argument()')
+ * @return: * : The sum of return values of `printer'
+ * @return: <0: The propagation of the first negative return value of `printer' (if any) */
+INTDEF ssize_t CC
+libcmdline_encode(pformatprinter printer, void *arg,
+                  size_t argc, char const *const *argv);
+
+
 
 DECL_END
 
-#endif /* !GUARD_MODPROCFS_FILES_CMDLINE_C */
+#endif /* !GUARD_LIBCMDLINE_ENCODE_H */

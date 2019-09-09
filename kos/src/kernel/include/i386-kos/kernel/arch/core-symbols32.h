@@ -322,10 +322,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak block_device_read; .long block_device_read
 	.reloc ., R_386_SIZE32, block_device_read; .long 0
 	.long 0x8a57224
-	.long 0 /* index: 80 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname80 /* index: 80 */
+	.weak cmdline_encode_argument; .long cmdline_encode_argument
+	.reloc ., R_386_SIZE32, cmdline_encode_argument; .long 0
+	.long 0x291f0a4
 	.long 0 /* index: 81 */
 	.long 0
 	.long 0
@@ -1367,9 +1367,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, sys_socket; .long 0
 	.long 0x6a23154
 	.long .Lname341 /* index: 341 */
-	.weak inode_areadallv_phys; .long inode_areadallv_phys
-	.reloc ., R_386_SIZE32, inode_areadallv_phys; .long 0
-	.long 0xe6b7ab3
+	.weak task_alloc_user_rpc; .long task_alloc_user_rpc
+	.reloc ., R_386_SIZE32, task_alloc_user_rpc; .long 0
+	.long 0x79cab3
 	.long .Lname342 /* index: 342 */
 	.weak mouse_device_hwheel; .long mouse_device_hwheel
 	.reloc ., R_386_SIZE32, mouse_device_hwheel; .long 0
@@ -5502,10 +5502,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak path_traversen; .long path_traversen
 	.reloc ., R_386_SIZE32, path_traversen; .long 0
 	.long 0x62f55e
-	.long 0 /* index: 1375 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname1375 /* index: 1375 */
+	.weak cmdline_encode; .long cmdline_encode
+	.reloc ., R_386_SIZE32, cmdline_encode; .long 0
+	.long 0x617a7b5
 	.long .Lname1376 /* index: 1376 */
 	.weak unicode_readutf16_swap; .long unicode_readutf16_swap
 	.reloc ., R_386_SIZE32, unicode_readutf16_swap; .long 0
@@ -5775,9 +5775,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, json_writer_putnumber; .long 0
 	.long 0x7dac5a2
 	.long .Lname1443 /* index: 1443 */
-	.weak sys_umask; .long sys_umask
-	.reloc ., R_386_SIZE32, sys_umask; .long 0
-	.long 0x96c439b
+	.weak dbg_ungetc; .long dbg_ungetc
+	.reloc ., R_386_SIZE32, dbg_ungetc; .long 0
+	.long 0x6c27473
 	.long .Lname1444 /* index: 1444 */
 	.weak json_parser_yield; .long json_parser_yield
 	.reloc ., R_386_SIZE32, json_parser_yield; .long 0
@@ -6835,9 +6835,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, symlink_node_readlink; .long 0
 	.long 0xa11d6ab
 	.long .Lname1708 /* index: 1708 */
-	.weak task_alloc_user_rpc; .long task_alloc_user_rpc
-	.reloc ., R_386_SIZE32, task_alloc_user_rpc; .long 0
-	.long 0x79cab3
+	.weak inode_areadall; .long inode_areadall
+	.reloc ., R_386_SIZE32, inode_areadall; .long 0
+	.long 0xded16ac
 	.long 0 /* index: 1709 */
 	.long 0
 	.long 0
@@ -8230,10 +8230,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long .Lname2057 /* index: 2057 */
-	.weak inode_areadall; .long inode_areadall
-	.reloc ., R_386_SIZE32, inode_areadall; .long 0
-	.long 0xded16ac
+	.long 0 /* index: 2057 */
+	.long 0
+	.long 0
+	.long 0
 	.long 0 /* index: 2058 */
 	.long 0
 	.long 0
@@ -10959,9 +10959,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname2739 /* index: 2739 */
-	.weak dbg_ungetc; .long dbg_ungetc
-	.reloc ., R_386_SIZE32, dbg_ungetc; .long 0
-	.long 0x6c27473
+	.weak inode_areadallv_phys; .long inode_areadallv_phys
+	.reloc ., R_386_SIZE32, inode_areadallv_phys; .long 0
+	.long 0xe6b7ab3
 	.long .Lname2740 /* index: 2740 */
 	.weak x86_fpu_current; .long x86_fpu_current
 	.reloc ., R_386_SIZE32, x86_fpu_current; .long 0
@@ -12595,9 +12595,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname3148 /* index: 3148 */
-	.weak unwind_setreg_xfpustate; .long unwind_setreg_xfpustate
-	.reloc ., R_386_SIZE32, unwind_setreg_xfpustate; .long 0
-	.long 0xb8d04c5
+	.weak sys_umask; .long sys_umask
+	.reloc ., R_386_SIZE32, sys_umask; .long 0
+	.long 0x96c439b
 	.long .Lname3149 /* index: 3149 */
 	.weak sys_swapoff; .long sys_swapoff
 	.reloc ., R_386_SIZE32, sys_swapoff; .long 0
@@ -13814,10 +13814,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak memrlenl; .long memrlenl
 	.reloc ., R_386_SIZE32, memrlenl; .long 0
 	.long 0xc492d7c
-	.long 0 /* index: 3453 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname3453 /* index: 3453 */
+	.weak unwind_setreg_xfpustate; .long unwind_setreg_xfpustate
+	.reloc ., R_386_SIZE32, unwind_setreg_xfpustate; .long 0
+	.long 0xb8d04c5
 	.long .Lname3454 /* index: 3454 */
 	.weak unicode_readutf8_n; .long unicode_readutf8_n
 	.reloc ., R_386_SIZE32, unicode_readutf8_n; .long 0
@@ -16456,6 +16456,8 @@ END(kernel_symbol_table)
 	.string "task_detach_children"
 .Lname79:
 	.string "block_device_read"
+.Lname80:
+	.string "cmdline_encode_argument"
 .Lname83:
 	.string "fs_filesystems"
 .Lname84:
@@ -16707,7 +16709,7 @@ END(kernel_symbol_table)
 .Lname340:
 	.string "sys_socket"
 .Lname341:
-	.string "inode_areadallv_phys"
+	.string "task_alloc_user_rpc"
 .Lname342:
 	.string "mouse_device_hwheel"
 .Lname343:
@@ -17782,6 +17784,8 @@ END(kernel_symbol_table)
 	.string "kernel_debugtrap_scpustate"
 .Lname1374:
 	.string "path_traversen"
+.Lname1375:
+	.string "cmdline_encode"
 .Lname1376:
 	.string "unicode_readutf16_swap"
 .Lname1378:
@@ -17841,7 +17845,7 @@ END(kernel_symbol_table)
 .Lname1442:
 	.string "json_writer_putnumber"
 .Lname1443:
-	.string "sys_umask"
+	.string "dbg_ungetc"
 .Lname1444:
 	.string "json_parser_yield"
 .Lname1445:
@@ -18097,7 +18101,7 @@ END(kernel_symbol_table)
 .Lname1707:
 	.string "symlink_node_readlink"
 .Lname1708:
-	.string "task_alloc_user_rpc"
+	.string "inode_areadall"
 .Lname1711:
 	.string "mouse_device_vwheel"
 .Lname1712:
@@ -18416,8 +18420,6 @@ END(kernel_symbol_table)
 	.string "block_device_awrite"
 .Lname2054:
 	.string "vsnprintf"
-.Lname2057:
-	.string "inode_areadall"
 .Lname2060:
 	.string "x86_fpustate_variant"
 .Lname2068:
@@ -19107,7 +19109,7 @@ END(kernel_symbol_table)
 .Lname2737:
 	.string "driver_symbol_ex"
 .Lname2739:
-	.string "dbg_ungetc"
+	.string "inode_areadallv_phys"
 .Lname2740:
 	.string "x86_fpu_current"
 .Lname2741:
@@ -19523,7 +19525,7 @@ END(kernel_symbol_table)
 .Lname3145:
 	.string "__predict_update_dl"
 .Lname3148:
-	.string "unwind_setreg_xfpustate"
+	.string "sys_umask"
 .Lname3149:
 	.string "sys_swapoff"
 .Lname3150:
@@ -19840,6 +19842,8 @@ END(kernel_symbol_table)
 	.string "sys_sched_yield"
 .Lname3452:
 	.string "memrlenl"
+.Lname3453:
+	.string "unwind_setreg_xfpustate"
 .Lname3454:
 	.string "unicode_readutf8_n"
 .Lname3455:

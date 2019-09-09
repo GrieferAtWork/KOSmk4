@@ -21,11 +21,42 @@
 
 #include "api.h"
 #include <bits/types.h>
+#include <bits/format-printer.h>
 
 #ifdef __CC__
 __DECL_BEGIN
 
-/* TODO */
+
+/* Encode the given `arg_start' argument by escaping characters
+ * that would confuse the commandline decoder, and print the
+ * resulting string using the given `printer' with `arg'
+ * The caller is still responsible to insert space-separators with
+ * a width of at least 1 space-character (' ') between successive
+ * arguments. Alternatively, you may also use `cmdline_encode()' to
+ * encode an entire commandline at once.
+ * @return: * : The sum of return values of `printer'
+ * @return: <0: The propagation of the first negative return value of `printer' (if any) */
+typedef __ssize_t (LIBCMDLINE_CC *PCMDLINE_ENCODE_ARGUMENT)(__pformatprinter printer, void *arg,
+                                                            char const *arg_start, __size_t arg_len);
+#ifdef LIBCMDLINE_WANT_PROTOTYPES
+LIBCMDLINE_DECL __ssize_t LIBCMDLINE_CC
+cmdline_encode_argument(__pformatprinter printer, void *arg,
+                        char const *arg_start, __size_t arg_len);
+#endif /* LIBCMDLINE_WANT_PROTOTYPES */
+
+/* Encode an entire commandline given by `argc' pointers found within
+ * the given `argv' vector. (s.a. `cmdline_encode_argument()')
+ * @return: * : The sum of return values of `printer'
+ * @return: <0: The propagation of the first negative return value of `printer' (if any) */
+typedef __ssize_t (LIBCMDLINE_CC *PCMDLINE_ENCODE)(__pformatprinter printer, void *arg,
+                                                   __size_t argc, char const *const *argv);
+#ifdef LIBCMDLINE_WANT_PROTOTYPES
+LIBCMDLINE_DECL __ssize_t LIBCMDLINE_CC
+cmdline_encode(__pformatprinter printer, void *arg,
+               __size_t argc, char const *const *argv);
+#endif /* LIBCMDLINE_WANT_PROTOTYPES */
+
+
 
 __DECL_END
 #endif /* __CC__ */

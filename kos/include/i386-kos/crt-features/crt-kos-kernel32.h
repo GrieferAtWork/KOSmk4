@@ -190,6 +190,8 @@
 #define __CRT_HAVE_character_device_unregister 1
 #define __CRT_HAVE_character_device_write 1
 #define __CRT_HAVE_cmdline_decode 1
+#define __CRT_HAVE_cmdline_encode 1
+#define __CRT_HAVE_cmdline_encode_argument 1
 #define __CRT_HAVE_cmdline_split 1
 #define __CRT_HAVE_coredump_create 1
 #define __CRT_HAVE_coredump_create_for_exception 1
