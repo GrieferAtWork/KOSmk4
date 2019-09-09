@@ -76,16 +76,6 @@
 #include <hybrid/sequence/atree-abi.h>
 #undef ATREE_SINGLE
 
-/* TODO: Re-write this implementation to be more respectful of
- *       the restrictions present when atomic R/W-locks are
- *       being held.
- *       While what's happening here right now ~shouldn't~ be
- *       able to cause a dead-lock, there are a bunch of places
- *       where atomic locks are used incorrectly */
-/* TODO: the directory_creat(), directory_mknod(), etc. functions
- *       are similar enough to be implemented as multi-include
- *       .c.inl implementation file, thus reducing redundancy. */
-
 DECL_BEGIN
 
 DEFINE_HANDLE_REFCNT_FUNCTIONS(directoryentry, struct directory_entry)
@@ -1195,8 +1185,47 @@ inode_sync(struct inode *__restrict self, uintptr_t what)
 	assert(!(what & ~(INODE_FCHANGED | INODE_FATTRCHANGED)));
 again:
 	sync_write(self);
+	modified = ATOMIC_READ(self->i_flags);
+	/* Check if the node has been deleted. */
+	if unlikely(modified & INODE_FDELETED) {
+		struct superblock *super = self->i_super;
+		if (modified & (INODE_FCHANGED | INODE_FATTRCHANGED)) {
+			unsigned int error;
+again_do_remove_from_super_for_delete:
+			error = inode_try_remove_from_superblock_changed(self);
+			if unlikely(error == INODE_TRY_REMOVE_FROM_SUPERBLOCK_CHANGED_FAILED) {
+				sync_endwrite(self);
+				sync_write(&super->s_changed_lock);
+				sync_endwrite(&super->s_changed_lock);
+				sync_write(self);
+				if (ATOMIC_READ(self->i_flags) & (INODE_FCHANGED | INODE_FATTRCHANGED))
+					goto again_do_remove_from_super_for_delete;
+			}
+			if (error == INODE_TRY_REMOVE_FROM_SUPERBLOCK_CHANGED_REMOVED)
+				decref_nokill(self);
+		}
+		/* Actually unlink the INode. */
+		if (superblock_nodeslock_trywrite(super)) {
+			struct inode *delnode;
+			delnode = inode_tree_remove(&super->s_nodes, self->i_fileino);
+			if (unlikely(delnode != self) && delnode)
+				inode_tree_insert(&super->s_nodes, delnode);
+			superblock_nodeslock_endwrite(super);
+			if (delnode == self && self->i_flags & INODE_FPERSISTENT)
+				decref_nokill(self); /* The reference previously stored in the file tree. */
+		} else {
+			struct inode *next;
+			incref(self); /* The reference stored in the `s_unlinknodes' chain. */
+			do {
+				next = ATOMIC_READ(super->s_unlinknodes);
+				self->i_changed_next = next;
+			} while (!ATOMIC_CMPXCH_WEAK(super->s_unlinknodes, next, self));
+			superblock_nodeslock_tryservice(super);
+		}
+		goto done;
+	}
 	/* Check what has actually changed. */
-	modified = ATOMIC_READ(self->i_flags) & what;
+	modified = modified & what;
 	/* Check if this isn't simply a no-op */
 	if (!modified) {
 		sync_endwrite(self);
@@ -1242,6 +1271,7 @@ again_do_remove_from_super:
 		if (error == INODE_TRY_REMOVE_FROM_SUPERBLOCK_CHANGED_REMOVED)
 			decref_nokill(self);
 	}
+done:
 	sync_endwrite(self);
 	return modified;
 }
@@ -2124,254 +2154,31 @@ NOTHROW(KCALL directory_delentry)(struct directory_node *__restrict self,
 
 
 
-/* Create a new file within the given directory.
- * NOTE: When `open_mode & O_EXCL' is set, only `struct regular_node' are ever returned.
- * NOTE: When `open_mode & O_DOSPATH' is set, ignore casing when checking for existing files.
- * @param: open_mode: Set of `O_CREAT | O_EXCL | O_DOSPATH'
- * @param: pentry: When non-NULL, store a reference to the resulting node's directory entry here.
- * @param: pwas_newly_created: When non-NULL, write `true' if a new file was
- *                             created, or `false' when the file already existed.
- * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: [...] (`self' was deleted)
- * @throw: E_FSERROR_ILLEGAL_PATH:        [...]
- * @throw: E_FSERROR_ILLEGAL_PATH:        `namelen' was ZERO(0)
- * @throw: E_FSERROR_FILE_ALREADY_EXISTS: [...] (Only when `open_mode & O_EXCL' is set)
- * @throw: E_FSERROR_FILE_NOT_FOUND:      [...] (Only when `open_mode & O_CREAT' isn't set)
- * @throw: E_FSERROR_DISK_FULL:           [...]
- * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_CREAT:
- *                                        [...]
- * @throw: E_FSERROR_READONLY:            [...]
- * @throw: E_IOERROR:                     [...] */
-PUBLIC ATTR_RETNONNULL NONNULL((1, 2)) REF struct inode *KCALL
-directory_creatfile(struct directory_node *__restrict self,
-                    CHECKED USER /*utf-8*/ char const *__restrict name,
-                    u16 namelen, oflag_t open_mode,
-                    uid_t owner, gid_t group, mode_t mode,
-                    REF struct directory_entry **pentry,
-                    bool *pwas_newly_created)
-		THROWS(E_FSERROR_DELETED, E_FSERROR_ILLEGAL_PATH, E_FSERROR_FILE_ALREADY_EXISTS,
-		       E_FSERROR_FILE_NOT_FOUND, E_FSERROR_DISK_FULL, E_FSERROR_UNSUPPORTED_OPERATION,
-		       E_FSERROR_READONLY, E_IOERROR, E_SEGFAULT, ...) {
-	REF struct inode *result;
-	REF struct directory_entry *entry;
-again:
-	assert((mode & ~07777) == 0);
-	rwlock_read(&self->db_lock);
-	TRY {
-		inode_check_deleted(self, E_FILESYSTEM_DELETED_PATH);
-		if ((open_mode & (O_CREAT | O_EXCL)) != (O_CREAT | O_EXCL)) {
-			uintptr_t hash;
-			/* Check for existing files without creating a new directory entry. */
-			hash  = directory_entry_hash(name, namelen);
-			entry = open_mode & O_DOSPATH
-			        ? directory_getcaseentry(self, name, namelen, hash)
-			        : directory_getentry(self, name, namelen, hash);
-			/* File already exists! */
-			if (entry)
-				goto return_existing_entry;
-		}
-	} EXCEPT {
-		if (rwlock_endread(&self->db_lock))
-			goto again;
-		RETHROW();
-	}
-	/* When not in create-mode, throw a file-not-found exception. */
-	if (!(open_mode & O_CREAT)) {
-		sync_endread(self);
-		THROW(E_FSERROR_FILE_NOT_FOUND);
-	}
-	sync_upgrade(self);
-	TRY {
-		/* Must create a new entry. */
-		entry = directory_entry_alloc_s(name, namelen);
-		TRY {
-			/* Check if the file still doesn't exist:
-			 *  - If `sync_upgrade()' released the read-lock momentarily,
-			 *    the file may have appeared in the mean time.
-			 *  - Even otherwise, user-space may have modified the given
-			 *    input string after we checked for it, and before we got here.
-			 *  - We may not have even checked in case
-			 */
-			struct heapptr resptr;
-			REF struct directory_entry *existing_entry;
-			existing_entry = (open_mode & O_DOSPATH) && !(open_mode & O_EXCL)
-			                 ? directory_getcaseentry(self, entry->de_name, namelen, entry->de_hash)
-			                 : directory_getentry(self, entry->de_name, namelen, entry->de_hash);
-			if unlikely(existing_entry) {
-				if (open_mode & O_EXCL) {
-					decref_unlikely(existing_entry);
-					THROW(E_FSERROR_FILE_ALREADY_EXISTS);
-				}
-				sync_endwrite(self);
-				assert(!isshared(entry));
-				destroy(entry);
-				entry = existing_entry;
-				goto open_existing_entry;
-			}
-			/* Make sure the file-creation operator is provided. */
-			if unlikely(!self->i_type->it_directory.d_creat)
-				THROW(E_FSERROR_UNSUPPORTED_OPERATION, (uintptr_t)E_FILESYSTEM_OPERATION_CREAT);
-
-			/* All right! Move ahead and construct the new, resulting INode. */
-			resptr = heap_alloc(FS_HEAP, sizeof(struct regular_node), FS_GFP | GFP_CALLOC);
-			result = (struct inode *)resptr.hp_ptr;
-
-			/* Initialize the new INode */
-			result->db_refcnt = 1;
-			rwlock_cinit_write(&result->db_lock);
-			result->db_type      = &inode_datablock_type;
-			result->db_pageshift = self->db_pageshift;
-#ifndef CONFIG_VM_DATABLOCK_MIN_PAGEINFO
-			result->db_addrshift = self->db_addrshift;
-			result->db_pagealign = self->db_pagealign;
-			result->db_pagemask  = self->db_pagemask;
-			result->db_pagesize  = self->db_pagesize;
-#endif
-			result->i_super    = self->i_super; /* NOTE: Incref()'d below. */
-			result->i_heapsize = resptr.hp_siz;
-			result->i_flags    = INODE_FATTRLOADED;
-			result->i_fileuid  = owner;
-			result->i_filegid  = group;
-			result->i_filemode = S_IFREG | mode;
-			TRY {
-				//TODO:result->i_fileatime = wall_gettime(self->i_super->s_wall);
-			} EXCEPT {
-				heap_free(FS_HEAP, resptr.hp_ptr, resptr.hp_siz, FS_GFP);
-				RETHROW();
-			}
-			memcpy(&result->i_filemtime, &result->i_fileatime, sizeof(struct timespec));
-			memcpy(&result->i_filectime, &result->i_fileatime, sizeof(struct timespec));
-		} EXCEPT {
-			assert(!isshared(entry));
-			destroy(entry);
-			RETHROW();
-		}
-	} EXCEPT {
-		sync_endwrite(self);
-		RETHROW();
-	}
-
-	/* Acquire the secondary lock to the superblock's INode tree. */
-	if unlikely(!superblock_nodeslock_trywrite(self->i_super)) {
-again_endwrite_self:
-		sync_endwrite(self);
-		TRY {
-			superblock_nodeslock_write(self->i_super);
-			if unlikely(!sync_trywrite(self)) {
-				superblock_nodeslock_endwrite(self->i_super);
-				sync_write(self);
-				if unlikely(!superblock_nodeslock_trywrite(self->i_super))
-					goto again_endwrite_self;
-			}
-			/* Must re-check if the file has appeared in the mean time. */
-			TRY {
-				REF struct directory_entry *existing_entry;
-				existing_entry = (open_mode & O_DOSPATH) && !(open_mode & O_EXCL)
-				                 ? directory_getcaseentry(self, entry->de_name, namelen, entry->de_hash)
-				                 : directory_getentry(self, entry->de_name, namelen, entry->de_hash);
-				if unlikely(existing_entry != NULL) {
-					if (open_mode & O_EXCL) {
-						decref_unlikely(existing_entry);
-						THROW(E_FSERROR_FILE_ALREADY_EXISTS);
-					}
-					superblock_nodeslock_endwrite(self->i_super);
-					sync_endwrite(self);
-					assert(!isshared(result));
-					heap_free(FS_HEAP, result, result->i_heapsize, FS_GFP);
-					assert(!isshared(entry));
-					destroy(entry);
-					entry = existing_entry;
-					goto open_existing_entry;
-				}
-			} EXCEPT {
-				superblock_nodeslock_endwrite(self->i_super);
-				sync_endwrite(self);
-				RETHROW();
-			}
-		} EXCEPT {
-			assert(!isshared(result));
-			heap_free(FS_HEAP, result, result->i_heapsize, FS_GFP);
-			assert(!isshared(entry));
-			destroy(entry);
-			RETHROW();
-		}
-	}
-#ifndef NDEBUG
-	memset(&result->i_fileino, 0xcc, sizeof(ino_t));
-	memset(&entry->de_ino, 0xdd, sizeof(ino_t));
-#endif
-	entry->de_type = DT_REG;
-	assert(result->i_super == self->i_super);
-	incref(self->i_super); /* Create the reference for the assignment to `result->i_super' above. */
-	TRY {
-		inode_check_deleted(self, E_FILESYSTEM_DELETED_PATH);
-		/* Actually invoke the file-creation operator. */
-		(*self->i_type->it_directory.d_creat)(self,
-		                                      entry,
-		                                      (struct regular_node *)result);
-	} EXCEPT {
-		superblock_nodeslock_endwrite(self->i_super);
-		sync_endwrite(self);
-		decref_unlikely(self->i_super);
-		assert(sync_writing(result));
-		assert(!isshared(result));
-		heap_free(FS_HEAP, result, result->i_heapsize, FS_GFP);
-		assert(!isshared(entry));
-		destroy(entry);
-		RETHROW();
-	}
-	assert(sync_writing(result));
-	assert(result->i_type != NULL);
-	assert(result->i_filenlink >= (nlink_t)1);
-	assert(result->i_super == self->i_super);
-	assert(entry->de_ino == result->i_fileino);
-	assert(entry->de_type == DT_REG);
-	assert(entry->de_type == IFTODT(result->i_filemode));
-	result->db_vio = result->i_type->it_file.f_vio;
-	/* Insert the new INode into the file-tree of the superblock */
-	if (result->i_flags & INODE_FPERSISTENT)
-		incref(result); /* The reference kept for persistent INodes. */
-	sync_endwrite(result);
-	inode_tree_insert(&self->i_super->s_nodes, result);
-	superblock_nodeslock_endwrite(self->i_super);
-	/* Update our directory entry and add it to the directory node cache. */
-	entry->de_ino = result->i_fileino;
-	if (pentry)
-		*pentry = incref(entry);
-	directory_addentry(self, entry); /* Add the new entry to our directory (inherit reference). */
-	sync_endwrite(self);
-	/* Return the newly constructed node. */
-	if (pwas_newly_created)
-		*pwas_newly_created = true;
-	return result;
-return_existing_entry:
-	rwlock_endread(&self->db_lock);
-open_existing_entry:
-	TRY {
-		result = superblock_opennode(self->i_super,
-		                             self,
-		                             entry);
-	} EXCEPT {
-		decref(entry);
-		RETHROW();
-	}
-	if (pentry)
-		*pentry = entry;
-	else {
-		decref(entry);
-	}
-	if (pwas_newly_created)
-		*pwas_newly_created = false;
-	return result;
-}
-
-
 
 
 INTERN NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL superblock_delete_inode)(struct superblock *__restrict super,
                                        struct inode *__restrict self) {
-	assert(!(ATOMIC_READ(self->i_flags) & (INODE_FCHANGED | INODE_FATTRCHANGED)));
-	ATOMIC_FETCHOR(self->i_flags, INODE_FDELETED);
+	uintptr_t old_flags;
+	old_flags = ATOMIC_FETCHOR(self->i_flags, INODE_FDELETED);
+	if (old_flags & (INODE_FCHANGED | INODE_FATTRCHANGED)) {
+		/* The INode is still marked as having changed, so we must try to remove
+		 * it from the chain of changed INodes. If we fail to do this, it doesn't
+		 * matter:
+		 *  - Error:INODE_TRY_REMOVE_FROM_SUPERBLOCK_CHANGED_FAILED:
+		 *     - The couldn't acquire a lock to the superblock's `s_changed_lock' chain.
+		 *       In this case, whoever is holding that lock will see that the `INODE_FDELETED'
+		 *       flag has been set when they come around to syncing our now.
+		 *  - Error:INODE_TRY_REMOVE_FROM_SUPERBLOCK_CHANGED_NOTFOUND:
+		 *     - Same as the other error, only that in this case the other thread has already
+		 *       consumed the chain of changed INodes, and will see the `INODE_FDELETED' flag
+		 *       just as they would have in the other case.
+		 */
+		unsigned int error;
+		error = inode_try_remove_from_superblock_changed(self);
+		if (error != INODE_TRY_REMOVE_FROM_SUPERBLOCK_CHANGED_REMOVED)
+			return;
+	}
 	if (superblock_nodeslock_trywrite(super)) {
 		struct inode *delnode;
 		delnode = inode_tree_remove(&super->s_nodes, self->i_fileino);
@@ -2383,9 +2190,10 @@ NOTHROW(KCALL superblock_delete_inode)(struct superblock *__restrict super,
 	} else {
 		struct inode *next;
 		incref(self); /* The reference stored in the `s_unlinknodes' chain. */
-		do
-			self->i_changed_next = next = ATOMIC_READ(super->s_unlinknodes);
-		while (!ATOMIC_CMPXCH_WEAK(super->s_unlinknodes, next, self));
+		do {
+			next = ATOMIC_READ(super->s_unlinknodes);
+			self->i_changed_next = next;
+		} while (!ATOMIC_CMPXCH_WEAK(super->s_unlinknodes, next, self));
 		superblock_nodeslock_tryservice(super);
 	}
 }
@@ -3287,571 +3095,23 @@ directory_link(struct directory_node *__restrict target_directory,
 
 
 
+#ifndef __INTELLISENSE__
+DECL_END
 
+#define DEFINE_DIRECTORY_CREATFILE 1
+#include "node-directory-creat.c.inl"
 
-/* Create a symbolic link and return its INode.
- * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_SYMLINK: [...]
- * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: [...] (`target_directory' was deleted)
- * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_UNMOUNTED: [...]
- * @throw: E_FSERROR_ILLEGAL_PATH:        [...]
- * @throw: E_FSERROR_ILLEGAL_PATH:        `target_namelen' was ZERO(0)
- * @throw: E_FSERROR_FILE_ALREADY_EXISTS: [...]
- * @throw: E_FSERROR_DISK_FULL:           [...]
- * @throw: E_FSERROR_READONLY:            [...]
- * @throw: E_IOERROR:                     [...] */
-PUBLIC WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 4)) REF struct symlink_node *KCALL
-directory_symlink(struct directory_node *__restrict target_directory,
-                  CHECKED USER /*utf-8*/ char const *target_name, u16 target_namelen,
-                  CHECKED USER /*utf-8*/ char const *link_text, size_t link_text_size,
-                  uid_t owner, gid_t group, mode_t mode, unsigned int symlink_mode,
-                  /*out*/ REF struct directory_entry **ptarget_dirent)
-		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_DELETED,
-		       E_FSERROR_ILLEGAL_PATH, E_FSERROR_FILE_ALREADY_EXISTS,
-		       E_FSERROR_DISK_FULL, E_FSERROR_READONLY, E_IOERROR, E_SEGFAULT, ...) {
-	REF struct symlink_node *result;
-	REF struct directory_entry *target_entry;
-	assert((mode & ~07777) == 0);
-	if unlikely(!target_directory->i_type->it_directory.d_symlink)
-		THROW(E_FSERROR_UNSUPPORTED_OPERATION, (uintptr_t)E_FILESYSTEM_OPERATION_SYMLINK);
-	sync_write(target_directory);
-	TRY {
-		inode_check_deleted(target_directory, E_FILESYSTEM_DELETED_PATH);
-		/* Must create a new entry. */
-		target_entry = directory_entry_alloc_s(target_name, target_namelen);
-		TRY {
-			struct heapptr resptr;
-			REF struct directory_entry *existing_entry;
-			/* Check for an existing entry. */
-			existing_entry = symlink_mode & DIRECTORY_SYMLINK_FNOCASE
-			                 ? directory_getcaseentry(target_directory,
-			                                          target_entry->de_name,
-			                                          target_namelen,
-			                                          target_entry->de_hash)
-			                 : directory_getentry(target_directory,
-			                                      target_entry->de_name,
-			                                      target_namelen,
-			                                      target_entry->de_hash);
-			if unlikely(existing_entry) {
-				decref_unlikely(existing_entry);
-				THROW(E_FSERROR_FILE_ALREADY_EXISTS);
-			}
-			/* All right! Move ahead and construct the new, resulting INode. */
-			resptr = heap_alloc(FS_HEAP,
-			                    offsetof(struct symlink_node, sl_stext) +
-			                    link_text_size * sizeof(char),
-			                    FS_GFP | GFP_CALLOC);
-			result = (struct symlink_node *)resptr.hp_ptr;
-			TRY {
-				memcpy(result->sl_stext, link_text, link_text_size * sizeof(char));
-				//TODO:result->i_fileatime = wall_gettime(self->i_super->s_wall);
-			} EXCEPT {
-				heap_free(FS_HEAP, resptr.hp_ptr, resptr.hp_siz, FS_GFP);
-				RETHROW();
-			}
+#define DEFINE_DIRECTORY_SYMLINK 1
+#include "node-directory-creat.c.inl"
 
-			/* Initialize the new INode */
-			result->db_refcnt = 1;
-			rwlock_cinit_write(&result->db_lock);
-			result->db_type      = &inode_datablock_type;
-			result->db_pageshift = target_directory->db_pageshift;
-#ifndef CONFIG_VM_DATABLOCK_MIN_PAGEINFO
-			result->db_addrshift = target_directory->db_addrshift;
-			result->db_pagealign = target_directory->db_pagealign;
-			result->db_pagemask  = target_directory->db_pagemask;
-			result->db_pagesize  = target_directory->db_pagesize;
-#endif
-			result->i_super    = target_directory->i_super; /* NOTE: Incref()'d below. */
-			result->i_heapsize = resptr.hp_siz;
-			result->i_flags    = INODE_FATTRLOADED;
-			result->i_fileuid  = owner;
-			result->i_filegid  = group;
-			result->i_filemode = S_IFLNK | mode;
-			result->i_filesize = (pos_t)link_text_size;
-			memcpy(&result->i_filemtime, &result->i_fileatime, sizeof(struct timespec));
-			memcpy(&result->i_filectime, &result->i_fileatime, sizeof(struct timespec));
-			result->sl_text = result->sl_stext;
-		} EXCEPT {
-			assert(!isshared(target_entry));
-			destroy(target_entry);
-			RETHROW();
-		}
-	} EXCEPT {
-		sync_endwrite(target_directory);
-		RETHROW();
-	}
+#define DEFINE_DIRECTORY_MKNOD 1
+#include "node-directory-creat.c.inl"
 
-	/* Acquire the secondary lock to the superblock's INode tree. */
-	if unlikely(!superblock_nodeslock_trywrite(target_directory->i_super)) {
-again_endwrite_self:
-		sync_endwrite(target_directory);
-		TRY {
-			superblock_nodeslock_write(target_directory->i_super);
-			if unlikely(!sync_trywrite(target_directory)) {
-				superblock_nodeslock_endwrite(target_directory->i_super);
-				sync_write(target_directory);
-				if unlikely(!superblock_nodeslock_trywrite(target_directory->i_super))
-					goto again_endwrite_self;
-			}
-		} EXCEPT {
-			assert(!isshared(result));
-			heap_free(FS_HEAP, result, result->i_heapsize, FS_GFP);
-			assert(!isshared(target_entry));
-			destroy(target_entry);
-			RETHROW();
-		}
-		/* Must re-check if the file has appeared in the mean time. */
-		TRY {
-			REF struct directory_entry *existing_entry;
-			existing_entry = symlink_mode & DIRECTORY_SYMLINK_FNOCASE
-			                 ? directory_getcaseentry(target_directory,
-			                                          target_entry->de_name,
-			                                          target_namelen,
-			                                          target_entry->de_hash)
-			                 : directory_getentry(target_directory,
-			                                      target_entry->de_name,
-			                                      target_namelen,
-			                                      target_entry->de_hash);
-			if unlikely(existing_entry != NULL) {
-				decref_unlikely(existing_entry);
-				THROW(E_FSERROR_FILE_ALREADY_EXISTS);
-			}
-		} EXCEPT {
-			superblock_nodeslock_endwrite(target_directory->i_super);
-			sync_endwrite(target_directory);
-			RETHROW();
-		}
-	}
-#ifndef NDEBUG
-	memset(&result->i_fileino, 0xcc, sizeof(ino_t));
-	memset(&target_entry->de_ino, 0xdd, sizeof(ino_t));
-#endif
-	target_entry->de_type = DT_LNK;
-	assert(result->i_super == target_directory->i_super);
-	incref(target_directory->i_super); /* Create the reference for the assignment to `result->i_super' above. */
-	TRY {
-		inode_check_deleted(target_directory, E_FILESYSTEM_DELETED_PATH);
-		/* Actually invoke the file-creation operator. */
-		(*target_directory->i_type->it_directory.d_symlink)(target_directory,
-		                                                    target_entry,
-		                                                    result);
-	} EXCEPT {
-		superblock_nodeslock_endwrite(target_directory->i_super);
-		sync_endwrite(target_directory);
-		decref_unlikely(target_directory->i_super);
-		assert(sync_writing(result));
-		assert(!isshared(result));
-		heap_free(FS_HEAP, result, result->i_heapsize, FS_GFP);
-		assert(!isshared(target_entry));
-		destroy(target_entry);
-		RETHROW();
-	}
-	assert(sync_writing(result));
-	assert(result->i_type != NULL);
-	assert(result->i_filenlink >= (nlink_t)1);
-	assert(result->i_super == target_directory->i_super);
-	assert(target_entry->de_ino == result->i_fileino);
-	assert(target_entry->de_type == DT_LNK);
-	assert(target_entry->de_type == IFTODT(result->i_filemode));
+#define DEFINE_DIRECTORY_MKDIR 1
+#include "node-directory-creat.c.inl"
 
-	/* Insert the new INode into the file-tree of the superblock */
-	if (result->i_flags & INODE_FPERSISTENT)
-		incref(result); /* The reference kept for persistent INodes. */
-	sync_endwrite(result);
-	inode_tree_insert(&target_directory->i_super->s_nodes, result);
-	superblock_nodeslock_endwrite(target_directory->i_super);
-	/* Update our directory entry and add it to the directory node cache. */
-	target_entry->de_ino = result->i_fileino;
-	if (ptarget_dirent)
-		*ptarget_dirent = incref(target_entry);
-	directory_addentry(target_directory, target_entry); /* Add the new entry to our directory (inherit reference). */
-	sync_endwrite(target_directory);
-	return result;
-}
-
-
-
-/* Create a file / device node.
- * @assume(S_ISREG(mode) || S_ISBLK(mode) || S_ISCHR(mode));
- * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_MKNOD: [...]
- * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: [...] (`target_directory' was deleted)
- * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_UNMOUNTED: [...]
- * @throw: E_FSERROR_ILLEGAL_PATH:        [...]
- * @throw: E_FSERROR_ILLEGAL_PATH:        `target_namelen' was ZERO(0)
- * @throw: E_FSERROR_FILE_ALREADY_EXISTS: [...]
- * @throw: E_FSERROR_DISK_FULL:           [...]
- * @throw: E_FSERROR_READONLY:            [...]
- * @throw: E_IOERROR:                     [...] */
-PUBLIC WUNUSED ATTR_RETNONNULL NONNULL((1, 2)) REF struct inode *KCALL
-directory_mknod(struct directory_node *__restrict target_directory,
-                CHECKED USER /*utf-8*/ char const *__restrict target_name,
-                u16 target_namelen, mode_t mode, uid_t owner,
-                gid_t group, dev_t referenced_device, unsigned int mknod_mode,
-                /*out*/ REF struct directory_entry **ptarget_dirent)
-		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_DELETED,
-		       E_FSERROR_ILLEGAL_PATH, E_FSERROR_FILE_ALREADY_EXISTS,
-		       E_FSERROR_DISK_FULL, E_FSERROR_READONLY, E_IOERROR, E_SEGFAULT, ...) {
-	REF struct inode *result;
-	REF struct directory_entry *target_entry;
-	assert(S_ISREG(mode) || S_ISBLK(mode) || S_ISCHR(mode));
-	if (S_ISREG(mode)) {
-		return directory_creatfile(target_directory,
-		                           target_name,
-		                           target_namelen,
-		                           (mknod_mode & DIRECTORY_MKNOD_FNOCASE) ? (O_CREAT | O_EXCL | O_DOSPATH)
-		                                                                  : (O_CREAT | O_EXCL),
-		                           owner,
-		                           group,
-		                           mode & 07777,
-		                           ptarget_dirent,
-		                           NULL);
-	}
-	if unlikely(!target_directory->i_type->it_directory.d_mknod)
-		THROW(E_FSERROR_UNSUPPORTED_OPERATION, (uintptr_t)E_FILESYSTEM_OPERATION_MKNOD);
-	sync_write(target_directory);
-	TRY {
-		inode_check_deleted(target_directory, E_FILESYSTEM_DELETED_PATH);
-		/* Must create a new entry. */
-		target_entry = directory_entry_alloc_s(target_name, target_namelen);
-		TRY {
-			struct heapptr resptr;
-			REF struct directory_entry *existing_entry;
-			/* Check for an existing entry. */
-			existing_entry = mknod_mode & DIRECTORY_MKNOD_FNOCASE
-			                 ? directory_getcaseentry(target_directory,
-			                                          target_entry->de_name,
-			                                          target_namelen,
-			                                          target_entry->de_hash)
-			                 : directory_getentry(target_directory,
-			                                      target_entry->de_name,
-			                                      target_namelen,
-			                                      target_entry->de_hash);
-			if unlikely(existing_entry) {
-				decref_unlikely(existing_entry);
-				THROW(E_FSERROR_FILE_ALREADY_EXISTS);
-			}
-
-			/* All right! Move ahead and construct the new, resulting INode. */
-			resptr = heap_alloc(FS_HEAP,
-			                    sizeof(struct inode),
-			                    FS_GFP | GFP_CALLOC);
-			result = (struct inode *)resptr.hp_ptr;
-
-			/* Initialize the new INode */
-			result->db_refcnt = 1;
-			rwlock_cinit_write(&result->db_lock);
-			result->db_type      = &inode_datablock_type;
-			result->db_pageshift = target_directory->db_pageshift;
-#ifndef CONFIG_VM_DATABLOCK_MIN_PAGEINFO
-			result->db_addrshift = target_directory->db_addrshift;
-			result->db_pagealign = target_directory->db_pagealign;
-			result->db_pagemask  = target_directory->db_pagemask;
-			result->db_pagesize  = target_directory->db_pagesize;
-#endif
-			result->i_super    = target_directory->i_super; /* NOTE: Incref()'d below. */
-			result->i_heapsize = resptr.hp_siz;
-			result->i_flags    = INODE_FATTRLOADED;
-			result->i_fileuid  = owner;
-			result->i_filegid  = group;
-			result->i_filemode = mode;
-			result->i_filerdev = referenced_device;
-			TRY {
-				//TODO:result->i_fileatime = wall_gettime(self->i_super->s_wall);
-			} EXCEPT {
-				heap_free(FS_HEAP, resptr.hp_ptr, resptr.hp_siz, FS_GFP);
-				RETHROW();
-			}
-			memcpy(&result->i_filemtime, &result->i_fileatime, sizeof(struct timespec));
-			memcpy(&result->i_filectime, &result->i_fileatime, sizeof(struct timespec));
-		} EXCEPT {
-			assert(!isshared(target_entry));
-			destroy(target_entry);
-			RETHROW();
-		}
-	} EXCEPT {
-		sync_endwrite(target_directory);
-		RETHROW();
-	}
-
-	/* Acquire the secondary lock to the superblock's INode tree. */
-	if unlikely(!superblock_nodeslock_trywrite(target_directory->i_super)) {
-again_endwrite_self:
-		sync_endwrite(target_directory);
-		TRY {
-			superblock_nodeslock_write(target_directory->i_super);
-			if unlikely(!sync_trywrite(target_directory)) {
-				superblock_nodeslock_endwrite(target_directory->i_super);
-				sync_write(target_directory);
-				if unlikely(!superblock_nodeslock_trywrite(target_directory->i_super))
-					goto again_endwrite_self;
-			}
-			/* Must re-check if the file has appeared in the mean time. */
-			TRY {
-				REF struct directory_entry *existing_entry;
-				existing_entry = mknod_mode & DIRECTORY_MKNOD_FNOCASE
-				                 ? directory_getcaseentry(target_directory,
-				                                          target_entry->de_name,
-				                                          target_namelen,
-				                                          target_entry->de_hash)
-				                 : directory_getentry(target_directory,
-				                                      target_entry->de_name,
-				                                      target_namelen,
-				                                      target_entry->de_hash);
-				if unlikely(existing_entry != NULL) {
-					decref_unlikely(existing_entry);
-					THROW(E_FSERROR_FILE_ALREADY_EXISTS);
-				}
-			} EXCEPT {
-				superblock_nodeslock_endwrite(target_directory->i_super);
-				sync_endwrite(target_directory);
-				RETHROW();
-			}
-		} EXCEPT {
-			assert(!isshared(result));
-			heap_free(FS_HEAP, result, result->i_heapsize, FS_GFP);
-			assert(!isshared(target_entry));
-			destroy(target_entry);
-			RETHROW();
-		}
-	}
-#ifndef NDEBUG
-	memset(&result->i_fileino, 0xcc, sizeof(ino_t));
-	memset(&target_entry->de_ino, 0xdd, sizeof(ino_t));
-#endif
-	target_entry->de_type = IFTODT(mode);
-	assert(result->i_super == target_directory->i_super);
-	incref(target_directory->i_super); /* Create the reference for the assignment to `result->i_super' above. */
-	TRY {
-		inode_check_deleted(target_directory, E_FILESYSTEM_DELETED_PATH);
-		/* Actually invoke the file-creation operator. */
-		(*target_directory->i_type->it_directory.d_mknod)(target_directory,
-		                                                  target_entry,
-		                                                  result);
-	} EXCEPT {
-		superblock_nodeslock_endwrite(target_directory->i_super);
-		sync_endwrite(target_directory);
-		decref_unlikely(target_directory->i_super);
-		assert(sync_writing(result));
-		assert(!isshared(result));
-		heap_free(FS_HEAP, result, result->i_heapsize, FS_GFP);
-		assert(!isshared(target_entry));
-		destroy(target_entry);
-		RETHROW();
-	}
-	assert(sync_writing(result));
-	assert(result->i_type != NULL);
-	assert(result->i_filenlink >= (nlink_t)1);
-	assert(result->i_super == target_directory->i_super);
-	assert(target_entry->de_ino == result->i_fileino);
-	assert(target_entry->de_type == IFTODT(mode));
-	assert(target_entry->de_type == IFTODT(result->i_filemode));
-
-	/* Insert the new INode into the file-tree of the superblock */
-	if (result->i_flags & INODE_FPERSISTENT)
-		incref(result); /* The reference kept for persistent INodes. */
-	sync_endwrite(result);
-	inode_tree_insert(&target_directory->i_super->s_nodes, result);
-	superblock_nodeslock_endwrite(target_directory->i_super);
-	/* Update our directory entry and add it to the directory node cache. */
-	/*target_entry->de_ino = result->i_fileino;*/
-	if (ptarget_dirent)
-		*ptarget_dirent = incref(target_entry);
-	directory_addentry(target_directory, target_entry); /* Add the new entry to our directory (inherit reference). */
-	sync_endwrite(target_directory);
-	return result;
-}
-
-
-
-
-
-
-/* Create a new directory node.
- * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_MKNOD: [...]
- * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: [...] (`target_directory' was deleted)
- * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_UNMOUNTED: [...]
- * @throw: E_FSERROR_ILLEGAL_PATH:        [...]
- * @throw: E_FSERROR_ILLEGAL_PATH:        `target_namelen' was ZERO(0)
- * @throw: E_FSERROR_FILE_ALREADY_EXISTS: [...]
- * @throw: E_FSERROR_DISK_FULL:           [...]
- * @throw: E_FSERROR_READONLY:            [...]
- * @throw: E_IOERROR:                     [...] */
-PUBLIC WUNUSED ATTR_RETNONNULL NONNULL((1, 2)) REF struct directory_node *KCALL
-directory_mkdir(struct directory_node *__restrict target_directory,
-                CHECKED USER /*utf-8*/ char const *__restrict target_name,
-                u16 target_namelen, mode_t mode, uid_t owner, gid_t group,
-                unsigned int mkdir_mode,
-                /*out*/ REF struct directory_entry **ptarget_dirent)
-		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_FSERROR_DELETED,
-		       E_FSERROR_ILLEGAL_PATH, E_FSERROR_FILE_ALREADY_EXISTS,
-		       E_FSERROR_DISK_FULL, E_FSERROR_READONLY, E_IOERROR, E_SEGFAULT, ...) {
-	REF struct directory_node *result;
-	REF struct directory_entry *target_entry;
-	assert((mode & ~07777) == 0);
-	if unlikely(!target_directory->i_type->it_directory.d_mkdir)
-		THROW(E_FSERROR_UNSUPPORTED_OPERATION, (uintptr_t)E_FILESYSTEM_OPERATION_MKDIR);
-	sync_write(target_directory);
-	TRY {
-		inode_check_deleted(target_directory, E_FILESYSTEM_DELETED_PATH);
-		/* Must create a new entry. */
-		target_entry = directory_entry_alloc_s(target_name, target_namelen);
-		TRY {
-			struct heapptr resptr;
-			REF struct directory_entry *existing_entry;
-			/* Check for an existing entry. */
-			existing_entry = mkdir_mode & DIRECTORY_MKDIR_FNOCASE
-			                 ? directory_getcaseentry(target_directory,
-			                                          target_entry->de_name,
-			                                          target_namelen,
-			                                          target_entry->de_hash)
-			                 : directory_getentry(target_directory,
-			                                      target_entry->de_name,
-			                                      target_namelen,
-			                                      target_entry->de_hash);
-			if unlikely(existing_entry) {
-				decref_unlikely(existing_entry);
-				THROW(E_FSERROR_FILE_ALREADY_EXISTS);
-			}
-
-			/* All right! Move ahead and construct the new, resulting INode. */
-			resptr = heap_alloc(FS_HEAP,
-			                    sizeof(struct directory_node),
-			                    FS_GFP | GFP_CALLOC);
-			result = (struct directory_node *)resptr.hp_ptr;
-
-			/* Initialize the new INode */
-			result->db_refcnt = 1;
-			rwlock_cinit_write(&result->db_lock);
-			result->db_type      = &inode_datablock_type;
-			result->db_pageshift = target_directory->db_pageshift;
-#ifndef CONFIG_VM_DATABLOCK_MIN_PAGEINFO
-			result->db_addrshift = target_directory->db_addrshift;
-			result->db_pagealign = target_directory->db_pagealign;
-			result->db_pagemask  = target_directory->db_pagemask;
-			result->db_pagesize  = target_directory->db_pagesize;
-#endif
-			result->i_super    = target_directory->i_super; /* NOTE: Incref()'d below. */
-			result->i_heapsize = resptr.hp_siz;
-			result->i_flags    = INODE_FATTRLOADED;
-			result->i_fileuid  = owner;
-			result->i_filegid  = group;
-			result->i_filemode = S_IFDIR | mode;
-			result->d_parent   = target_directory; /* NOTE: Incref()'d below. */
-			result->d_mask     = DIRECTORY_DEFAULT_MASK;
-			TRY {
-				//TODO:result->i_fileatime = wall_gettime(self->i_super->s_wall);
-				result->d_map = (REF struct directory_entry **)kmalloc((DIRECTORY_DEFAULT_MASK + 1) *
-				                                                       sizeof(REF struct directory_entry *),
-				                                                       FS_GFP | GFP_CALLOC);
-			} EXCEPT {
-				heap_free(FS_HEAP, resptr.hp_ptr, resptr.hp_siz, FS_GFP);
-				RETHROW();
-			}
-			memcpy(&result->i_filemtime, &result->i_fileatime, sizeof(struct timespec));
-			memcpy(&result->i_filectime, &result->i_fileatime, sizeof(struct timespec));
-		} EXCEPT {
-			assert(!isshared(target_entry));
-			destroy(target_entry);
-			RETHROW();
-		}
-	} EXCEPT {
-		sync_endwrite(target_directory);
-		RETHROW();
-	}
-
-	/* Acquire the secondary lock to the superblock's INode tree. */
-	if unlikely(!superblock_nodeslock_trywrite(target_directory->i_super)) {
-again_endwrite_self:
-		sync_endwrite(target_directory);
-		TRY {
-			superblock_nodeslock_write(target_directory->i_super);
-			if unlikely(!sync_trywrite(target_directory)) {
-				superblock_nodeslock_endwrite(target_directory->i_super);
-				sync_write(target_directory);
-				if unlikely(!superblock_nodeslock_trywrite(target_directory->i_super))
-					goto again_endwrite_self;
-			}
-			/* Must re-check if the file has appeared in the mean time. */
-			TRY {
-				REF struct directory_entry *existing_entry;
-				existing_entry = mkdir_mode & DIRECTORY_MKDIR_FNOCASE
-				                 ? directory_getcaseentry(target_directory,
-				                                          target_entry->de_name,
-				                                          target_namelen,
-				                                          target_entry->de_hash)
-				                 : directory_getentry(target_directory,
-				                                      target_entry->de_name,
-				                                      target_namelen,
-				                                      target_entry->de_hash);
-				if unlikely(existing_entry != NULL) {
-					decref_unlikely(existing_entry);
-					THROW(E_FSERROR_FILE_ALREADY_EXISTS);
-				}
-			} EXCEPT {
-				superblock_nodeslock_endwrite(target_directory->i_super);
-				sync_endwrite(target_directory);
-				RETHROW();
-			}
-		} EXCEPT {
-			assert(!isshared(result));
-			kffree(result->d_map, GFP_CALLOC);
-			heap_free(FS_HEAP, result, result->i_heapsize, FS_GFP);
-			assert(!isshared(target_entry));
-			destroy(target_entry);
-			RETHROW();
-		}
-	}
-#ifndef NDEBUG
-	memset(&result->i_fileino, 0xcc, sizeof(ino_t));
-	memset(&target_entry->de_ino, 0xdd, sizeof(ino_t));
-#endif
-	target_entry->de_type = DT_DIR;
-	assert(sync_writing(result));
-	assert(result->i_super == target_directory->i_super);
-	assert(result->d_parent == target_directory);
-	incref(target_directory->i_super); /* Create the reference for the assignment to `result->i_super' above. */
-	incref(target_directory);          /* Create the reference for the assignment to `result->d_parent' above. */
-	TRY {
-		inode_check_deleted(target_directory, E_FILESYSTEM_DELETED_PATH);
-		/* Actually invoke the file-creation operator. */
-		(*target_directory->i_type->it_directory.d_mkdir)(target_directory,
-		                                                  target_entry,
-		                                                  result);
-	} EXCEPT {
-		superblock_nodeslock_endwrite(target_directory->i_super);
-		sync_endwrite(target_directory);
-		decref_unlikely(target_directory->i_super);
-		decref_unlikely(target_directory);
-		assert(sync_writing(result));
-		assert(!isshared(result));
-		kfree(result->d_map);
-		heap_free(FS_HEAP, result, result->i_heapsize, FS_GFP);
-		assert(!isshared(target_entry));
-		destroy(target_entry);
-	}
-	assert(sync_writing(result));
-	assert(result->i_type != NULL);
-	assert(result->i_filenlink >= (nlink_t)1);
-	assert(result->i_super == target_directory->i_super);
-	assert(result->d_parent == target_directory);
-	assert(target_entry->de_ino == result->i_fileino);
-	assert(target_entry->de_type == DT_DIR);
-	assert(target_entry->de_type == IFTODT(result->i_filemode));
-
-	/* Insert the new INode into the file-tree of the superblock */
-	if (result->i_flags & INODE_FPERSISTENT)
-		incref(result); /* The reference kept for persistent INodes. */
-	sync_endwrite(result);
-	inode_tree_insert(&target_directory->i_super->s_nodes, result);
-	superblock_nodeslock_endwrite(target_directory->i_super);
-	/* Update our directory entry and add it to the directory node cache. */
-	target_entry->de_ino = result->i_fileino;
-	if (ptarget_dirent)
-		*ptarget_dirent = incref(target_entry);
-	directory_addentry(target_directory, target_entry); /* Add the new entry to our directory (inherit reference). */
-	sync_endwrite(target_directory);
-	return result;
-}
-
+DECL_BEGIN
+#endif /* !__INTELLISENSE__ */
 
 
 

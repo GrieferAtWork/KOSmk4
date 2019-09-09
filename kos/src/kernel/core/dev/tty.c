@@ -97,7 +97,6 @@ tty_device_iread(struct character_device *__restrict self,
                  size_t num_bytes, iomode_t mode) THROWS(...) {
 	struct tty_device *me;
 	size_t result;
-	STATIC_ASSERT(IO_NONBLOCK != 0);
 	me = (struct tty_device *)self;
 	result = terminal_iread(&me->t_term,
 	                        (byte_t *)dst,
@@ -165,7 +164,7 @@ again:
 			break; /* Stop */
 		/* Try to read some data.
 		 * NOTE: Do this without blocking, so we call poll for more
-		 *       data while still checking if we're supposed to terminate. */
+		 *       data while still checking if we're supposed to stop. */
 		TRY {
 again_read:
 			count = (*tty->t_ihandle_read)(tty->t_ihandle_ptr, buf, sizeof(buf),
@@ -173,7 +172,10 @@ again_read:
 			if (count) {
 				/* NOTE: Data also gets written with the `IO_NONBLOCK' flag set.
 				 *       This has to be done because control characters still have
-				 *       to be processed, even when canon buffers have filled up */
+				 *       to be processed, even when canon buffers have filled up.
+				 *       Otherwise, you would no longer be able to CTRL+C a hung
+				 *       application after hammering away at your keyboard for a
+				 *       couple of minutes. */
 				terminal_iwrite(&tty->t_term, buf, count, IO_WRONLY | IO_NONBLOCK);
 				goto again_read;
 			}

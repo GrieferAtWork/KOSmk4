@@ -1823,14 +1823,14 @@ check_result_inode_for_symlink:
 									THROW(E_NOT_IMPLEMENTED_TODO);
 								}
 							}
-							/* If the O_EXCL flag was given, make sure that the file was newly created.
-							 * Otherwise, throw an exception.
-							 * NOTE: Even though `directory_creatfile()' has builtin support for this type
-							 *       of check when passed the O_EXCL flag, we don't use that functionality,
-							 *       as it wouldn't allow for the special handling of SMYLINK+!O_NOFOLLOW
-							 *       which we do above (which allows open() to create/open files pointed to
-							 *       by symbolic links directly) */
 							if (!was_newly_created) {
+								/* If the O_EXCL flag was given, make sure that the file was newly created.
+								 * Otherwise, throw an exception.
+								 * NOTE: Even though `directory_creatfile()' has builtin support for this type
+								 *       of check when passed the O_EXCL flag, we don't use that functionality,
+								 *       as it wouldn't allow for the special handling of SMYLINK+!O_NOFOLLOW
+								 *       which we do above (which allows open() to create/open files pointed to
+								 *       by symbolic links directly) */
 								if (oflags & O_EXCL)
 									THROW(E_FSERROR_FILE_ALREADY_EXISTS);
 								/* Clear the file if O_TRUNC was given. */

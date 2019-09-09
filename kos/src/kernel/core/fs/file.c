@@ -37,6 +37,7 @@
 #include <kos/hop.h>
 
 #include <dirent.h>
+#include <assert.h>
 #include <string.h>
 #include <unistd.h>
 
@@ -735,9 +736,9 @@ struct oneshot_generator_data {
 };
 
 PRIVATE void KCALL
-oneshot_enum_callback(char const *__restrict name, u16 namelen,
-                      unsigned char type, ino_t ino,
-                      struct oneshot_generator_data *__restrict data) {
+oneshot_enum_callback(struct oneshot_generator_data *__restrict data,
+                      char const *__restrict name, u16 namelen,
+                      unsigned char type, ino_t ino) {
 	size_t size_avail, req_size;
 	struct oneshot_directory_buffer *buf = data->current_buffer;
 	struct dirent *new_entry;

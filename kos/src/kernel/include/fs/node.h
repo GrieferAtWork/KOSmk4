@@ -56,9 +56,8 @@ typedef uintptr_t fsmode_t; /* Set of `FS_MODE_F*' */
 
 /* The callback invoked by directory enumerators. */
 typedef NONNULL((1)) void
-(KCALL *directory_enum_callback_t)(/*utf-8*/char const *__restrict name,
-                                   u16 namelen, unsigned char type,
-                                   ino_t ino, void *arg);
+(KCALL *directory_enum_callback_t)(void *arg, /*utf-8*/ char const *__restrict name,
+                                   u16 namelen, unsigned char type, ino_t ino);
 
 
 struct inode_type {
@@ -307,9 +306,9 @@ struct inode_type {
 						       E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...);
 				/* [0..1][locked(READ(self))]
 				 * Enumerate all entries of a dynamic directory `node':
-				 * >> (*callback)("foo",DT_REG,42,arg);
-				 * >> (*callback)("bar",DT_REG,43,arg);
-				 * >> (*callback)("baz",DT_REG,44,arg);
+				 * >> (*callback)(arg, "foo", DT_REG, 42);
+				 * >> (*callback)(arg, "bar", DT_REG, 43);
+				 * >> (*callback)(arg, "baz", DT_REG, 44);
 				 * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_READDIR:
 				 *                        [...] (Same as not implementing)
 				 * @throw: E_IOERROR:     Failed to read data from disk. */
@@ -1524,12 +1523,12 @@ directory_getcasenode(struct directory_node *__restrict self,
  * NOTE: When `open_mode & O_EXCL' is set, only `struct regular_node' are ever returned.
  * NOTE: When `open_mode & O_DOSPATH' is set, ignore casing when checking for existing files.
  * @param: open_mode: Set of `O_CREAT|O_EXCL|O_DOSPATH'
- * @param: pentry: When non-NULL, store a reference to the resulting node's directory entry here.
+ * @param: ptarget_dirent: When non-NULL, store a reference to the resulting node's directory entry here.
  * @param: pwas_newly_created: When non-NULL, write `true' if a new file was
  *                             created, or `false' when the file already existed.
- * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: [...] (`self' was deleted)
+ * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: [...] (`target_directory' was deleted)
  * @throw: E_FSERROR_ILLEGAL_PATH:        [...]
- * @throw: E_FSERROR_ILLEGAL_PATH:        `namelen' was ZERO(0)
+ * @throw: E_FSERROR_ILLEGAL_PATH:        `target_namelen' was ZERO(0)
  * @throw: E_FSERROR_FILE_ALREADY_EXISTS: [...] (Only when `open_mode & O_EXCL' is set)
  * @throw: E_FSERROR_FILE_NOT_FOUND:      [...] (Only when `open_mode & O_CREAT' isn't set)
  * @throw: E_FSERROR_DISK_FULL:           [...]
@@ -1538,11 +1537,10 @@ directory_getcasenode(struct directory_node *__restrict self,
  * @throw: E_FSERROR_READONLY:            [...]
  * @throw: E_IOERROR:                     [...] */
 FUNDEF ATTR_RETNONNULL NONNULL((1, 2)) REF struct inode *KCALL
-directory_creatfile(struct directory_node *__restrict self,
-                    CHECKED USER /*utf-8*/ char const *__restrict name,
-                    u16 namelen, oflag_t open_mode,
-                    uid_t owner, gid_t group, mode_t mode,
-                    REF struct directory_entry **pentry DFL(__NULLPTR),
+directory_creatfile(struct directory_node *__restrict target_directory,
+                    CHECKED USER /*utf-8*/ char const *__restrict target_name, u16 target_namelen,
+                    oflag_t open_mode, uid_t owner, gid_t group, mode_t mode,
+                    REF struct directory_entry **ptarget_dirent DFL(__NULLPTR),
                     bool *pwas_newly_created DFL(__NULLPTR))
 		THROWS(E_FSERROR_DELETED, E_FSERROR_ILLEGAL_PATH, E_FSERROR_FILE_ALREADY_EXISTS,
 		       E_FSERROR_FILE_NOT_FOUND, E_FSERROR_DISK_FULL, E_FSERROR_UNSUPPORTED_OPERATION,
@@ -2058,7 +2056,6 @@ struct filesystem_types {
 	SLIST(struct superblock_type) ft_types;    /* [lock(ft_typelock)][CHAIN(->st_chain)] Chain of known filesystem types. */
 };
 struct filesystems {
-	/* TODO: Replace with a reference counted vector using `ATOMIC_REF()' */
 	struct rwlock               f_superlock;   /* Lock for the chain of known superblocks. */
 	SLIST(struct superblock)    f_superblocks; /* [lock(f_superlock)][CHAIN(->s_filesystems)][0..1] Chain of known filesystems. */
 };
