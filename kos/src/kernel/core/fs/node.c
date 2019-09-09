@@ -4080,8 +4080,9 @@ superblock_statfs(struct superblock *__restrict self,
 	syscall_ulong_t fsflags;
 	assert(self);
 	assert(self->s_type);
-	assert(self->s_type->st_functions.f_statfs);
-	(*self->s_type->st_functions.f_statfs)(self, result);
+	memset(result, 0, sizeof(*result));
+	if likely(self->s_type->st_functions.f_statfs)
+		(*self->s_type->st_functions.f_statfs)(self, result);
 	fsflags = 0;
 	if (!(self->s_flags & SUPERBLOCK_FDOATIME))
 		fsflags |= (ST_NOATIME | ST_NODIRATIME);

@@ -1856,7 +1856,7 @@ struct superblock_type {
 		                         struct directory_entry *__restrict parent_directory_entry)
 				THROWS(E_IOERROR, E_BADALLOC, ...);
 
-		/* [1..1][const]
+		/* [0..1][const]
 		 * Gather information about the filesystem and store that information in `*result' */
 		NONNULL((1))
 		void (KCALL *f_statfs)(struct superblock *__restrict self,
