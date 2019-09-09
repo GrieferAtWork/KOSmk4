@@ -33,6 +33,7 @@
 
 #include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
+#include <hybrid/align.h>
 
 #include <kos/hop.h>
 
@@ -40,6 +41,7 @@
 #include <assert.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdalign.h>
 
 DECL_BEGIN
 
@@ -704,13 +706,14 @@ handle_file_hop(struct file *__restrict self,
 
 
 
+#define ONESHOT_DIRENT_ALIGNMENT   alignof(ino_t)
 
 #define ONESHOT_NEXT_ENTRY(p)                                            \
 	((struct dirent *)(((uintptr_t)((p)->d_name + ((p)->d_namlen + 1)) + \
-	                    (sizeof(ino_t) - 1)) &                           \
-	                   ~(sizeof(ino_t) - 1)))
+	                    (ONESHOT_DIRENT_ALIGNMENT - 1)) &                \
+	                   ~(ONESHOT_DIRENT_ALIGNMENT - 1)))
 
-struct oneshot_directory_buffer {
+struct alignas(ONESHOT_DIRENT_ALIGNMENT) oneshot_directory_buffer {
 	struct oneshot_directory_buffer *odb_next;   /* [0..1][const][owned] Next buffer. */
 	struct dirent                   *odb_end;    /* [1..1][const] Pointer past the end of the last buffer. */
 	struct dirent                    odb_buf[1];
@@ -750,7 +753,8 @@ oneshot_enum_callback(struct oneshot_generator_data *__restrict data,
 		/* Free unused memory. */
 		struct oneshot_directory_buffer *truncated_buffer;
 		struct oneshot_directory_buffer *new_buffer;
-		truncated_buffer = (struct oneshot_directory_buffer *)krealloc_nx(buf,
+		truncated_buffer = (struct oneshot_directory_buffer *)krealign_nx(buf,
+		                                                                  ONESHOT_DIRENT_ALIGNMENT,
 		                                                                  (uintptr_t)data->current_ent -
 		                                                                  (uintptr_t)buf->odb_buf,
 		                                                                  GFP_NORMAL);
@@ -762,7 +766,8 @@ oneshot_enum_callback(struct oneshot_generator_data *__restrict data,
 		              ONESHOT_INITIAL_BUFFER_SIZE);
 		if unlikely(size_avail < offsetof(struct oneshot_directory_buffer, odb_buf) + req_size)
 			size_avail = offsetof(struct oneshot_directory_buffer, odb_buf) + req_size;
-		new_buffer = (struct oneshot_directory_buffer *)kmalloc(size_avail, GFP_NORMAL);
+		new_buffer = (struct oneshot_directory_buffer *)kmemalign(ONESHOT_DIRENT_ALIGNMENT,
+		                                                          size_avail, GFP_NORMAL);
 		buf->odb_next        = new_buffer;
 		data->current_buffer = new_buffer;
 		/* Initialize the new buffer. */
@@ -773,8 +778,8 @@ oneshot_enum_callback(struct oneshot_generator_data *__restrict data,
 	}
 	/* Figure out where new data will go. */
 	new_entry = data->current_ent;
-	req_size += sizeof(ino_t) - 1;
-	req_size &= ~(sizeof(ino_t) - 1);
+	req_size += ONESHOT_DIRENT_ALIGNMENT - 1;
+	req_size &= ~(ONESHOT_DIRENT_ALIGNMENT - 1);
 	data->current_ent = (struct dirent *)((uintptr_t)new_entry + req_size);
 	/* Write the new directory entry. */
 	new_entry->d_ino    = (__ino64_t)ino;
@@ -788,8 +793,10 @@ PRIVATE ATTR_RETNONNULL struct oneshot_directory_buffer *KCALL
 oneshot_getentries(struct directory_node *__restrict node) {
 	struct oneshot_directory_buffer *result;
 	assert(node->i_type->it_directory.d_oneshot.o_enum);
-	result = (struct oneshot_directory_buffer *)kmalloc(offsetof(struct oneshot_directory_buffer, odb_buf) +
-	                                                    ONESHOT_INITIAL_BUFFER_SIZE, GFP_NORMAL);
+	result = (struct oneshot_directory_buffer *)kmemalign(ONESHOT_DIRENT_ALIGNMENT,
+		                                                  offsetof(struct oneshot_directory_buffer, odb_buf) +
+	                                                      ONESHOT_INITIAL_BUFFER_SIZE, GFP_NORMAL);
+	assert(IS_ALIGNED((uintptr_t)result, ONESHOT_DIRENT_ALIGNMENT));
 	result->odb_next = NULL;
 	result->odb_end  = (struct dirent *)((byte_t *)result->odb_buf + ONESHOT_INITIAL_BUFFER_SIZE);
 	TRY {
@@ -807,7 +814,8 @@ oneshot_getentries(struct directory_node *__restrict node) {
 			/* Set the final buffer end. */
 			data.current_buffer->odb_end = data.current_ent;
 			/* Free unused memory. */
-			truncated_buffer = (struct oneshot_directory_buffer *)krealloc_nx(data.current_buffer,
+			truncated_buffer = (struct oneshot_directory_buffer *)krealign_nx(data.current_buffer,
+			                                                                  ONESHOT_DIRENT_ALIGNMENT,
 			                                                                  offsetof(struct oneshot_directory_buffer, odb_buf) +
 			                                                                  (uintptr_t)data.current_ent -
 			                                                                  (uintptr_t)data.current_buffer->odb_buf,
@@ -938,7 +946,7 @@ again:
 		entry  = old_entry;
 		assert((buffer == NULL) == (entry == NULL));
 		if (!buffer) {
-		read_entry_pos_0:
+read_entry_pos_0:
 			assert(entry_pos == 0);
 			buffer = self->d_buf;
 			entry  = buffer->odb_buf;
@@ -949,7 +957,7 @@ again:
 			assert(entry);
 			assert(buffer->odb_end > buffer->odb_buf);
 			assert(entry >= buffer->odb_buf);
-			assert((uintptr_t)entry <= (uintptr_t)buffer->odb_end + sizeof(ino_t));
+			assert((uintptr_t)entry <= (uintptr_t)buffer->odb_end + ONESHOT_DIRENT_ALIGNMENT);
 			if unlikely(entry >= buffer->odb_end) {
 				buffer = buffer->odb_next;
 				if unlikely(!buffer)

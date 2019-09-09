@@ -57,7 +57,7 @@ struct dirent {
 #if defined(__DIRENT_TEXTSIZE)
 	char               d_name[__DIRENT_TEXTSIZE];
 #elif defined(__USE_KOS_KERNEL)
-	__COMPILER_FLEXIBLE_ARRAY(char,d_name); /* Allocated as required. */
+	__COMPILER_FLEXIBLE_ARRAY(char, d_name); /* Allocated as required. */
 #else
 	char               d_name[256];
 #endif
