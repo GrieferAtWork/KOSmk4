@@ -281,6 +281,7 @@ again:
 			result->sl_text    = result->sl_stext;
 #elif defined(DEFINE_DIRECTORY_MKNOD)
 			result->i_filemode = mode;
+			result->i_filerdev = referenced_device;
 #elif defined(DEFINE_DIRECTORY_MKDIR)
 			result->i_filemode = S_IFDIR | mode;
 			result->d_parent   = target_directory; /* NOTE: Incref()'d below. */
