@@ -20,9 +20,7 @@
 #include "debug-malloc-impl.c.inl"
 //#define DO_KREALLOC_IN_PLACE 1
 #define DO_KREALLOC 1
-//#define DO_KREALIGN_IN_PLACE 1
 //#define DO_KREALIGN 1
-//#define DO_KREALIGN_IN_PLACE_OFFSET 1
 //#define DO_KREALIGN_OFFSET 1
 #endif
 
@@ -41,25 +39,11 @@ NOTHROW_NX(KCALL FUNC(krealloc_in_place))(VIRT void *ptr,
 PUBLIC VIRT void *
 NOTHROW_NX(KCALL FUNC(krealloc))(VIRT void *ptr,
                                  size_t num_bytes, gfp_t flags)
-#elif defined(DO_KREALIGN_IN_PLACE)
-#define IS_INPLACE 1
-#define HAVE_MIN_ALIGNMENT 1
-PUBLIC VIRT void *
-NOTHROW_NX(KCALL FUNC(krealign_in_place))(VIRT void *ptr, size_t min_alignment,
-                                          size_t num_bytes, gfp_t flags)
 #elif defined(DO_KREALIGN)
 #define HAVE_MIN_ALIGNMENT 1
 PUBLIC VIRT void *
 NOTHROW_NX(KCALL FUNC(krealign))(VIRT void *ptr, size_t min_alignment,
                                  size_t num_bytes, gfp_t flags)
-#elif defined(DO_KREALIGN_IN_PLACE_OFFSET)
-#define IS_INPLACE 1
-#define HAVE_MIN_ALIGNMENT 1
-#define HAVE_OFFSET 1
-PUBLIC VIRT void *
-NOTHROW_NX(KCALL FUNC(krealign_in_place_offset))(VIRT void *ptr, size_t min_alignment,
-                                                 ptrdiff_t offset, size_t num_bytes,
-                                                 gfp_t flags)
 #else
 #define HAVE_MIN_ALIGNMENT 1
 #define HAVE_OFFSET 1
@@ -377,8 +361,6 @@ DECL_END
 
 #undef DO_KREALLOC_IN_PLACE
 #undef DO_KREALLOC
-#undef DO_KREALIGN_IN_PLACE
 #undef DO_KREALIGN
-#undef DO_KREALIGN_IN_PLACE_OFFSET
 #undef DO_KREALIGN_OFFSET
 

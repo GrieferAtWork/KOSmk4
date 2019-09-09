@@ -97,6 +97,7 @@ NOTHROW_NX(KCALL FUNC(kmemalign))(size_t min_alignment,
 	IFELSE_NX(if unlikely(!hptr.hp_siz) goto err;, )
 	result = (struct mptr *)hptr.hp_ptr;
 	mptr_init(result, hptr.hp_siz, flags & __GFP_HEAPMASK);
+	assert(IS_ALIGNED((uintptr_t)mptr_user(result), min_alignment));
 	return mptr_user(result);
 IFELSE_NX(err:, err_overflow:)
 	IFELSE_NX(return NULL, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, n_bytes));
@@ -116,6 +117,7 @@ NOTHROW_NX(KCALL FUNC(kmemalign_offset))(size_t min_alignment, ptrdiff_t offset,
 	IFELSE_NX(if unlikely(!hptr.hp_siz) goto err;, )
 	result = (struct mptr *)hptr.hp_ptr;
 	mptr_init(result, hptr.hp_siz, flags & __GFP_HEAPMASK);
+	assert(IS_ALIGNED((uintptr_t)mptr_user(result) + offset, min_alignment));
 	return mptr_user(result);
 IFELSE_NX(err:, err_overflow:)
 	IFELSE_NX(return NULL, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, n_bytes));
@@ -263,58 +265,6 @@ err:
 }
 
 PUBLIC ATTR_WEAK VIRT void *
-NOTHROW_NX(KCALL FUNC(krealign_in_place))(VIRT void *ptr, size_t min_alignment,
-                                          size_t n_bytes, gfp_t flags) {
-	struct heapptr hptr;
-	struct mptr *result;
-	struct heap *heap;
-	size_t more_size;
-	assert(!(flags & GFP_NOMOVE));
-	if (!ptr)
-		goto err;
-	assert(IS_ALIGNED((uintptr_t)ptr, HEAP_ALIGNMENT));
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
-	if (KERNEL_SLAB_CHECKPTR(ptr))
-		return n_bytes <= SLAB_GET(ptr)->s_size ? ptr : NULL;
-#endif /* CONFIG_USE_SLAB_ALLOCATORS */
-	/* Align the given n_bytes and add the overhead caused by the mptr. */
-	n_bytes = FUNC(get_realloc_size)(n_bytes);
-	IFELSE_NX(if unlikely(n_bytes == (size_t)-1) goto err;, )
-	result = mptr_get(ptr);
-	mptr_assert(result);
-	if (n_bytes <= mptr_size(result)) {
-		/* Truncate the pointer. */
-		hptr.hp_siz = mptr_size(result) - n_bytes;
-		if (hptr.hp_siz >= HEAP_MINSIZE) {
-			/* Only do the truncation if the memory
-			 * that gets freed by this is large enough. */
-			hptr.hp_ptr = (VIRT void *)((uintptr_t)result + n_bytes);
-			heap_free_untraced(&kernel_heaps[mptr_heap(result)],
-			                   hptr.hp_ptr,
-			                   hptr.hp_siz,
-			                   GFP_NORMAL);
-			mptr_setsize(result, n_bytes);
-		}
-		return ptr;
-	}
-	/* Increase the pointer (try to do so in-place at first) */
-	flags &= ~__GFP_HEAPMASK;
-	flags |= mptr_heap(result);
-	heap      = &kernel_heaps[mptr_heap(result)];
-	more_size = FUNC(heap_allat_untraced)(heap,
-	                                      (void *)((uintptr_t)result + mptr_size(result)),
-	                                      (size_t)(n_bytes - mptr_size(result)), flags);
-	if (more_size != 0) {
-		/* Allocation was OK. Update the mptr. */
-		mptr_setsize(result, mptr_size(result) + more_size);
-		assert(mptr_size(result) >= n_bytes);
-		return ptr;
-	}
-err:
-	return NULL;
-}
-
-PUBLIC ATTR_WEAK VIRT void *
 NOTHROW_NX(KCALL FUNC(krealign))(VIRT void *ptr, size_t min_alignment,
                                  size_t n_bytes, gfp_t flags) {
 	struct heapptr hptr;
@@ -391,59 +341,6 @@ NOTHROW_NX(KCALL FUNC(krealign))(VIRT void *ptr, size_t min_alignment,
 err:
 	return NULL;
 #endif /* MALLOC_NX */
-}
-
-PUBLIC ATTR_WEAK VIRT void *
-NOTHROW_NX(KCALL FUNC(krealign_in_place_offset))(VIRT void *ptr, size_t min_alignment,
-                                                 ptrdiff_t offset, size_t n_bytes,
-                                                 gfp_t flags) {
-	struct heapptr hptr;
-	struct mptr *result;
-	struct heap *heap;
-	size_t more_size;
-	assert(!(flags & GFP_NOMOVE));
-	if unlikely(!ptr)
-		return NULL;
-	assert(IS_ALIGNED((uintptr_t)ptr, HEAP_ALIGNMENT));
-#ifdef CONFIG_USE_SLAB_ALLOCATORS
-	if (KERNEL_SLAB_CHECKPTR(ptr))
-		return n_bytes <= SLAB_GET(ptr)->s_size ? ptr : NULL;
-#endif /* CONFIG_USE_SLAB_ALLOCATORS */
-	/* Align the given n_bytes and add the overhead caused by the mptr. */
-	n_bytes = FUNC(get_realloc_size)(n_bytes);
-	IFELSE_NX(if unlikely(n_bytes == (size_t)-1) goto err;, )
-	result = mptr_get(ptr);
-	mptr_assert(result);
-	if (n_bytes <= mptr_size(result)) {
-		/* Truncate the pointer. */
-		hptr.hp_siz = mptr_size(result) - n_bytes;
-		if (hptr.hp_siz >= HEAP_MINSIZE) {
-			/* Only do the truncation if the memory
-			 * that gets freed by this is large enough. */
-			hptr.hp_ptr = (VIRT void *)((uintptr_t)result + n_bytes);
-			heap_free_untraced(&kernel_heaps[mptr_heap(result)],
-			                   hptr.hp_ptr,
-			                   hptr.hp_siz,
-			                   GFP_NORMAL);
-			mptr_setsize(result, n_bytes);
-		}
-		return ptr;
-	}
-	/* Increase the pointer (try to do so in-place at first) */
-	flags &= ~__GFP_HEAPMASK;
-	flags |= mptr_heap(result);
-	heap      = &kernel_heaps[mptr_heap(result)];
-	more_size = FUNC(heap_allat_untraced)(heap,
-	                                      (void *)((uintptr_t)result + mptr_size(result)),
-	                                      (size_t)(n_bytes - mptr_size(result)), flags);
-	if (more_size != 0) {
-		/* Allocation was OK. Update the mptr. */
-		mptr_setsize(result, mptr_size(result) + more_size);
-		assert(mptr_size(result) >= n_bytes);
-		return ptr;
-	}
-IFELSE_NX(err:, )
-	return NULL;
 }
 
 PUBLIC ATTR_WEAK VIRT void *

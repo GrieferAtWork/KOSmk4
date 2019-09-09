@@ -435,11 +435,7 @@ DECL_END
 #include "debug-malloc-impl-realloc.c.inl"
 #define DO_KREALLOC 1
 #include "debug-malloc-impl-realloc.c.inl"
-#define DO_KREALIGN_IN_PLACE 1
-#include "debug-malloc-impl-realloc.c.inl"
 #define DO_KREALIGN 1
-#include "debug-malloc-impl-realloc.c.inl"
-#define DO_KREALIGN_IN_PLACE_OFFSET 1
 #include "debug-malloc-impl-realloc.c.inl"
 #define DO_KREALIGN_OFFSET 1
 #include "debug-malloc-impl-realloc.c.inl"

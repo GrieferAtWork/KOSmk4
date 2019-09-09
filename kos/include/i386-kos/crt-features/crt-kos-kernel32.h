@@ -765,10 +765,6 @@
 #define __CRT_HAVE_krand_r 1
 #define __CRT_HAVE_krand_seed 1
 #define __CRT_HAVE_krealign 1
-#define __CRT_HAVE_krealign_in_place 1
-#define __CRT_HAVE_krealign_in_place_nx 1
-#define __CRT_HAVE_krealign_in_place_offset 1
-#define __CRT_HAVE_krealign_in_place_offset_nx 1
 #define __CRT_HAVE_krealign_nx 1
 #define __CRT_HAVE_krealign_offset 1
 #define __CRT_HAVE_krealign_offset_nx 1

@@ -135,8 +135,6 @@ FUNDEF WUNUSED ATTR_RETNONNULL VIRT void *KCALL __os_realloc(VIRT void *ptr, siz
 FUNDEF WUNUSED ATTR_RETNONNULL VIRT void *KCALL __os_realign(VIRT void *ptr, size_t min_alignment, size_t n_bytes, gfp_t flags) ASMNAME("krealign") THROWS(E_BADALLOC,E_WOULDBLOCK);
 FUNDEF WUNUSED ATTR_RETNONNULL VIRT void *KCALL __os_realign_offset(VIRT void *ptr, size_t min_alignment, ptrdiff_t offset, size_t n_bytes, gfp_t flags) ASMNAME("krealign_offset") THROWS(E_BADALLOC,E_WOULDBLOCK);
 FUNDEF VIRT void *KCALL __os_realloc_in_place(VIRT void *ptr, size_t n_bytes, gfp_t flags) ASMNAME("krealloc_in_place") THROWS(E_BADALLOC,E_WOULDBLOCK);
-FUNDEF VIRT void *KCALL __os_realign_in_place(VIRT void *ptr, size_t min_alignment, size_t n_bytes, gfp_t flags) ASMNAME("krealign_in_place") THROWS(E_BADALLOC,E_WOULDBLOCK);
-FUNDEF VIRT void *KCALL __os_realign_in_place_offset(VIRT void *ptr, size_t min_alignment, ptrdiff_t offset, size_t n_bytes, gfp_t flags) ASMNAME("krealign_in_place_offset") THROWS(E_BADALLOC,E_WOULDBLOCK);
 FUNDEF NOBLOCK WUNUSED size_t NOTHROW(KCALL __os_malloc_usable_size)(VIRT void *ptr) ASMNAME("kmalloc_usable_size");
 FUNDEF NOBLOCK void NOTHROW(KCALL __os_free)(VIRT void *ptr) ASMNAME("kfree");
 FUNDEF NOBLOCK void NOTHROW(KCALL __os_ffree)(VIRT void *ptr, gfp_t flags) ASMNAME("kffree");
@@ -152,8 +150,6 @@ FUNDEF WUNUSED VIRT void *NOTHROW(KCALL __os_realloc_nx)(VIRT void *ptr, size_t 
 FUNDEF WUNUSED VIRT void *NOTHROW(KCALL __os_realign_nx)(VIRT void *ptr, size_t min_alignment, size_t n_bytes, gfp_t flags) ASMNAME("krealign_nx");
 FUNDEF WUNUSED VIRT void *NOTHROW(KCALL __os_realign_offset_nx)(VIRT void *ptr, size_t min_alignment, ptrdiff_t offset, size_t n_bytes, gfp_t flags) ASMNAME("krealign_offset_nx");
 FUNDEF VIRT void *NOTHROW(KCALL __os_realloc_in_place_nx)(VIRT void *ptr, size_t n_bytes, gfp_t flags) ASMNAME("krealloc_in_place_nx");
-FUNDEF VIRT void *NOTHROW(KCALL __os_realign_in_place_nx)(VIRT void *ptr, size_t min_alignment, size_t n_bytes, gfp_t flags) ASMNAME("krealign_in_place_nx");
-FUNDEF VIRT void *NOTHROW(KCALL __os_realign_in_place_offset_nx)(VIRT void *ptr, size_t min_alignment, ptrdiff_t offset, size_t n_bytes, gfp_t flags) ASMNAME("krealign_in_place_offset_nx");
 
 #ifndef __OMIT_KMALLOC_CONSTANT_P_WRAPPERS
 #ifdef __INTELLISENSE__
@@ -254,32 +250,6 @@ krealloc_in_place(VIRT void *ptr, size_t n_bytes, gfp_t flags)
 	return __os_realloc_in_place(ptr, n_bytes, flags);
 }
 
-FORCELOCAL VIRT void *KCALL
-krealign_in_place(VIRT void *ptr, size_t min_alignment,
-                  size_t n_bytes, gfp_t flags)
-		THROWS(E_BADALLOC, E_WOULDBLOCK) {
-	if (__builtin_constant_p(min_alignment) && min_alignment <= HEAP_ALIGNMENT)
-		return krealloc(ptr, n_bytes, flags);
-	if (__builtin_constant_p(ptr) && ptr == __NULLPTR)
-		return kmemalign(min_alignment, n_bytes, flags);
-	if (__builtin_constant_p(n_bytes))
-		return __os_realign(ptr, min_alignment, (n_bytes + HEAP_ALIGNMENT - 1) & ~(HEAP_ALIGNMENT - 1), flags);
-	return __os_realign(ptr, min_alignment, n_bytes, flags);
-}
-
-FORCELOCAL VIRT void *KCALL
-krealign_in_place_offset(VIRT void *ptr, size_t min_alignment,
-                         ptrdiff_t offset, size_t n_bytes, gfp_t flags)
-		THROWS(E_BADALLOC, E_WOULDBLOCK) {
-	if (__builtin_constant_p(offset) && offset == 0)
-		return krealign_in_place(ptr, min_alignment, n_bytes, flags);
-	if (__builtin_constant_p(ptr) && ptr == __NULLPTR)
-		return kmemalign_offset(min_alignment, offset, n_bytes, flags);
-	if (__builtin_constant_p(n_bytes))
-		return __os_realign_in_place_offset(ptr, min_alignment, offset, (n_bytes + HEAP_ALIGNMENT - 1) & ~(HEAP_ALIGNMENT - 1), flags);
-	return __os_realign_in_place_offset(ptr, min_alignment, offset, n_bytes, flags);
-}
-
 FORCELOCAL NOBLOCK WUNUSED size_t
 NOTHROW(KCALL kmalloc_usable_size)(VIRT void *ptr) {
 	if (__builtin_constant_p(ptr) && ptr == __NULLPTR)
@@ -377,30 +347,6 @@ NOTHROW(KCALL krealloc_in_place_nx)(VIRT void *ptr, size_t n_bytes, gfp_t flags)
 	if (__builtin_constant_p(n_bytes))
 		return __os_realloc_in_place_nx(ptr, (n_bytes + HEAP_ALIGNMENT - 1) & ~(HEAP_ALIGNMENT - 1), flags);
 	return __os_realloc_in_place_nx(ptr, n_bytes, flags);
-}
-
-FORCELOCAL VIRT void *
-NOTHROW(KCALL krealign_in_place_nx)(VIRT void *ptr, size_t min_alignment,
-                                    size_t n_bytes, gfp_t flags) {
-	if (__builtin_constant_p(min_alignment) && min_alignment <= HEAP_ALIGNMENT)
-		return krealloc_nx(ptr, n_bytes, flags);
-	if (__builtin_constant_p(ptr) && ptr == __NULLPTR)
-		return kmemalign_nx(min_alignment, n_bytes, flags);
-	if (__builtin_constant_p(n_bytes))
-		return __os_realign_nx(ptr, min_alignment, (n_bytes + HEAP_ALIGNMENT - 1) & ~(HEAP_ALIGNMENT - 1), flags);
-	return __os_realign_nx(ptr, min_alignment, n_bytes, flags);
-}
-
-FORCELOCAL VIRT void *
-NOTHROW(KCALL krealign_in_place_offset_nx)(VIRT void *ptr, size_t min_alignment,
-                                           ptrdiff_t offset, size_t n_bytes, gfp_t flags) {
-	if (__builtin_constant_p(offset) && offset == 0)
-		return krealign_in_place_nx(ptr, min_alignment, n_bytes, flags);
-	if (__builtin_constant_p(ptr) && ptr == __NULLPTR)
-		return kmemalign_offset_nx(min_alignment, offset, n_bytes, flags);
-	if (__builtin_constant_p(n_bytes))
-		return __os_realign_in_place_offset_nx(ptr, min_alignment, offset, (n_bytes + HEAP_ALIGNMENT - 1) & ~(HEAP_ALIGNMENT - 1), flags);
-	return __os_realign_in_place_offset_nx(ptr, min_alignment, offset, n_bytes, flags);
 }
 
 #endif /* !__OMIT_KMALLOC_CONSTANT_P_WRAPPERS */
