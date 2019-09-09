@@ -52,7 +52,7 @@
  *   - '\n' (from keyboard):
  *     - INLCR: Convert into '\r'  (Cleared by ansitty:"\ec" and "\e[20l"; Set by ansitty:"\e[20h")
  *       - I don't really know why this flag exists, since it seems like it would imply
- *         that may be some keyboard/tty combinations where the return-key sends a '\n'
+ *         there may be some keyboard/tty combinations where the return-key sends a '\n'
  *         character, however even despite this, using CTRL+J will always trigger this
  *         flag, since that key combination will also send a '\n' character
  *       - Note that it was this flag which always confused me into thinking that '\n'
@@ -63,7 +63,7 @@
  *            accepted.
  *          - However other programs (like the `busybox' commandline) will work just fine
  *            regardless of the keyboard sending '\r' or '\n' (although it may also just
- *            be using either `INLCR' or `ICRNL' to unify output into either behavior)
+ *            be using either `INLCR' or `ICRNL' to unify input for either behavior)
  *   - '\r' (from application / for ansitty):
  *     - ONLRET:      Ignore '\r' characters
  *     - ONOCR:       Ignore '\r' characters at column 0 (ignored on KOS)

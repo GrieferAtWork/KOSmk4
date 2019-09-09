@@ -88,9 +88,7 @@ DECL_BEGIN
 	UNKNOWN_SEQUENCE_WARN("[ansitty] Unrecognized escape sequence \"\\e%#Q%#Q%#Q\"\n", firstch, secondch, lastch)
 #define WARN_UNKNOWN_SEQUENCE3(firstch, len, ptr, lastch) \
 	UNKNOWN_SEQUENCE_WARN("[ansitty] Unrecognized escape sequence \"\\e%#Q%#$q%#Q\"\n", firstch, (size_t)(len), ptr, lastch)
-#define WARN_UNKNOWN_SEQUENCE4C(firstch, secondch, thirdch, lastch) \
-	UNKNOWN_SEQUENCE_WARN("[ansitty] Unrecognized escape sequence \"\\e%#Q%#Q%#Q%#Q\"\n", firstch, secondch, thirdch, lastch)
-#define WARN_UNKNOWN_SEQUENCE4(firstch, ptr, len, before_lastch, lastch) \
+#define WARN_UNKNOWN_SEQUENCE4(firstch, len, ptr, before_lastch, lastch) \
 	UNKNOWN_SEQUENCE_WARN("[ansitty] Unrecognized escape sequence \"\\e%#Q%#$q%#Q%#Q\"\n", firstch, (size_t)(len), ptr, before_lastch, lastch)
 
 #define PUTUNI(uni)                 (*self->at_ops.ato_putc)(self, uni)
