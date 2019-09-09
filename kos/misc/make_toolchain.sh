@@ -232,25 +232,29 @@ require_program() {
 	}
 }
 
-# Make sure that we have required programs in $PATH
-require_program make
-require_program deemon
-
-
-
-
 KOS_MISC="$(dirname $(readlink -f "$0"))"
 KOS_PATCHES="${KOS_MISC}/patches"
 cd "$KOS_MISC/../../"
 KOS_ROOT="$(pwd)"
+
+if [ -f "${KOS_ROOT}/kos/misc/config/launch.vs.json" ]; then
+	if [ "${KOS_ROOT}/kos/misc/config/launch.vs.json" -nt "${KOS_ROOT}/kos/.vs/launch.vs.json" ]; then
+		unlink "${KOS_ROOT}/kos/.vs/launch.vs.json" > /dev/null 2>&1
+		cmd cp "${KOS_ROOT}/kos/misc/config/launch.vs.json" "${KOS_ROOT}/kos/.vs/launch.vs.json"
+		cmd sed -i -e "s:ABSOLUTE_KOS_PROJECT_ROOT:${KOS_ROOT}:g" "${KOS_ROOT}/kos/.vs/launch.vs.json"
+	fi
+fi
+
 cmd mkdir -p "binutils"
 cd "binutils"
 KOS_BINUTILS="$(pwd)"
 
-
 cmd mkdir -p "$NAME"
 cmd mkdir -p "src"
 
+# Make sure that we have required programs in $PATH
+require_program make
+require_program deemon
 
 # Download sources
 download_binutils
