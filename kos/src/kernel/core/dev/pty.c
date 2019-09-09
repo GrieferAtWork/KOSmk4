@@ -339,7 +339,7 @@ DEFINE_SYSCALL5(errno_t,openpty,
 		master->t_term.t_ios.c_iflag = (ICRNL | BRKINT | IXON | IMAXBEL | IUTF8);
 		master->t_term.t_ios.c_oflag = (OPOST);
 		master->t_term.t_ios.c_lflag = (ISIG | ICANON | ECHO | ECHOE | ECHOK |
-		                          TOSTOP | ECHOCTL | ECHOKE | IEXTEN);
+		                                TOSTOP | ECHOCTL | ECHOKE | IEXTEN);
 		master->t_term.t_ios.c_cflag = (CREAD);
 #define CTRL_CODE(x) ((x)-64)                            /* ^x */
 		master->t_term.t_ios.c_cc[VMIN]     = 1;               /*  */

@@ -53,6 +53,7 @@
 
 DECL_BEGIN
 
+/* CC = ControlCharacter */
 #define CC_ENQ    0x05
 #define CC_BEL    0x07
 #define CC_BS     0x08
@@ -65,6 +66,7 @@ DECL_BEGIN
 #define CC_SI     0x0f
 #define CC_CAN    0x18 /* Cancel */
 #define CC_ESC    0x1b /* '\e' */
+#define CC_SPC    ' '
 #define CC_SESC "\033" /* "\e" */
 
 #if 0
@@ -285,7 +287,7 @@ stub_cls(struct ansitty *__restrict self,
 		count = sx * sy;
 		break;
 	}
-	FILLCELL(' ', count);
+	FILLCELL(CC_SPC, count);
 	SETCURSOR(xy[0], xy[1], false);
 }
 
@@ -317,7 +319,7 @@ stub_el(struct ansitty *__restrict self,
 		count = sx;
 		break;
 	}
-	FILLCELL(' ', count);
+	FILLCELL(CC_SPC, count);
 	SETCURSOR(xy[0], xy[1], false);
 }
 
@@ -388,7 +390,7 @@ stub_scroll_with_copycell(struct ansitty *__restrict self,
 		COPYCELL(-(ansitty_offset_t)sxy[0] * offset, (y_size - offset) * sxy[0]);
 		SETCURSOR(0, y_end - offset, false);
 	}
-	FILLCELL(' ', (ansitty_offset_t)sxy[0] * offset);
+	FILLCELL(CC_SPC, (ansitty_offset_t)sxy[0] * offset);
 	SETCURSOR(xy[0], xy[1], false);
 done:
 	return;
@@ -406,7 +408,7 @@ stub_scroll(struct ansitty *__restrict self,
 	GETCURSOR(xy);
 	SETCURSOR(MAXCOORD, MAXCOORD, false);
 	while (offset--)
-		PUTUNI('\n');
+		PUTUNI(CC_LF);
 	SETCURSOR(xy[0], xy[1], false);
 }
 
@@ -1300,7 +1302,7 @@ done_insert_ansitty_flag_hedit:
 				if (self->at_ops.ato_termios) {
 					struct termios oldios, newios;
 					for (;;) {
-					    (*self->at_ops.ato_termios)(self, &oldios, NULL);
+						(*self->at_ops.ato_termios)(self, &oldios, NULL);
 						memcpy(&newios, &oldios, sizeof(struct termios));
 						if (lastch == 'h') {
 							/* Enable ECHOPRT */
@@ -1404,7 +1406,7 @@ done_insert_ansitty_flag_hedit:
 				if (self->at_ops.ato_termios) {
 					struct termios oldios, newios;
 					for (;;) {
-					    (*self->at_ops.ato_termios)(self, &oldios, NULL);
+						(*self->at_ops.ato_termios)(self, &oldios, NULL);
 						memcpy(&newios, &oldios, sizeof(struct termios));
 						if (lastch == 'h') {
 							/* Disable ECHO */
@@ -1446,6 +1448,24 @@ done_insert_ansitty_flag_hedit:
 				} else {
 					/* LF == LF */
 					self->at_ttyflag |= ANSITTY_FLAG_NOLFCR;
+				}
+				if (self->at_ops.ato_termios) {
+					struct termios oldios, newios;
+					for (;;) {
+						(*self->at_ops.ato_termios)(self, &oldios, NULL);
+						memcpy(&newios, &oldios, sizeof(struct termios));
+						if (lastch == 'h') {
+							newios.c_iflag |= INLCR | ICRNL;
+							newios.c_iflag &= ~IGNCR;
+						} else {
+							newios.c_iflag |= INLCR;
+							newios.c_iflag &= ~(IGNCR | ICRNL);
+						}
+						if (newios.c_iflag == oldios.c_iflag)
+							break;
+						if ((*self->at_ops.ato_termios)(self, &oldios, &newios))
+							break;
+					}
 				}
 				break;
 
@@ -2022,7 +2042,7 @@ handle_control_character(struct ansitty *__restrict self, char32_t ch) {
 				HIDECURSOR_BEGIN() {
 					/* Current column is non-zero, so we must take special
 					 * action to ensure that the cursor is placed correctly. */
-					PUTUNI('\n');
+					PUTUNI(CC_LF);
 					/* Reset the cursor position to the middle of the following line.
 					 * Note that in the case of the previous line being the bottom-most one,
 					 * SETCURSOR() will clamp that coord into the valid display range. */
@@ -2291,7 +2311,7 @@ again:
 		case CC_FF:
 			ch = CC_LF;
 			ATTR_FALLTHROUGH
-		case '\n':
+		case CC_LF:
 			if (self->at_ttyflag & ANSITTY_FLAG_NOLFCR) {
 				/* LF shouldn't set COLUMN=0 */
 				ansitty_coord_t xy[2];
@@ -2300,7 +2320,7 @@ again:
 					HIDECURSOR_BEGIN() {
 						/* Current column is non-zero, so we must take special
 						 * action to ensure that the cursor is placed correctly. */
-						PUTUNI('\n');
+						PUTUNI(CC_LF);
 						/* Reset the cursor position to the middle of the following line.
 						 * Note that in the case of the previous line being the bottom-most one,
 						 * SETCURSOR() will clamp that coord into the valid display range. */
@@ -2503,7 +2523,7 @@ do_insuni:
 
 		case 'E': /* NEL */
 			/* Move to next line */
-			PUTUNI('\n');
+			PUTUNI(CC_LF);
 			goto set_text_and_done;
 
 		case '(':
@@ -2575,6 +2595,27 @@ do_insuni:
 			setscrollregion(self, 0, MAXCOORD);
 			self->at_scroll_sc = 0;
 			self->at_scroll_ec = MAXCOORD;
+			if (self->at_ops.ato_termios) {
+				struct termios oldios, newios;
+				for (;;) {
+					(*self->at_ops.ato_termios)(self, &oldios, NULL);
+					memcpy(&newios, &oldios, sizeof(struct termios));
+					/* Reset the termios flags which may have been changed by `\e[20h' or `\e[20l'
+					 * to their default state after the terminal was originally created. */
+					newios.c_iflag |= ICRNL;
+					newios.c_iflag &= ~(IGNCR | INLCR);
+					/* After a reset (or power-on), a terminal is supposed to clear the
+					 * XOFF flag in order to indicate that it has once again gained power.
+					 * We emulate this behavior by clearing the XOFF status flag within
+					 * the IOS structure.
+					 * s.a. `https://vt100.net/docs/vt102-ug/chapter5.html#S5.5.2.27' */
+					newios.c_iflag &= ~IXOFF;
+					if (newios.c_iflag == oldios.c_iflag)
+						break;
+					if ((*self->at_ops.ato_termios)(self, &oldios, &newios))
+						break;
+				}
+			}
 			goto set_text_and_done;
 
 		case '[':

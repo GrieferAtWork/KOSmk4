@@ -51,6 +51,7 @@ KEY_MINUS:altgr:'\\'
 KEY_EQUALS:'´'
 KEY_EQUALS:shift:'`'
 KEY_BACKSPACE:'\x8'
+KEY_BACKSPACE:shift:'\x8'
 
 KEY_TAB:'\t'
 KEY_Q:'q'
@@ -80,10 +81,8 @@ KEY_LBRACKET:shift:'Ü'
 KEY_RBRACKET:'+'
 KEY_RBRACKET:shift:'*'
 KEY_RBRACKET:altgr:'~'
-KEY_ENTER:'\n'
-
-# Form feed (New page)
-KEY_ENTER:shift:'\xc'
+KEY_ENTER:'\r'
+KEY_ENTER:shift:'\r'
 
 KEY_A:'a'
 KEY_A:shift:'A'

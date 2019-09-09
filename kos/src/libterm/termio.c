@@ -1290,6 +1290,7 @@ libterminal_flush_obuf(struct terminal *__restrict self,
 	linecapture_fini(&cap);
 	return result;
 }
+
 PRIVATE ssize_t CC
 libterminal_flush_ibuf(struct terminal *__restrict self,
                        iomode_t mode, tcflag_t iflag) {

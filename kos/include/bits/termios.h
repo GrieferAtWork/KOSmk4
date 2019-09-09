@@ -112,7 +112,7 @@ struct termios2 {
 #define IXON     0002000 /* Enable support for `VSTOP' to disable TTY output transmission. */
 #define IXANY    0004000 /* Any input character has the behavior of `VSTART' */
 #define IXOFF    0010000 /* Status bit for `VSTOP' / `VSTART': Don't transmit pending TTY output until this bit is cleared. */
-#define IMAXBEL  0020000 /* Ring bell when input queue is full (KOS-SPECIFIC: The bell also gets triggered when ) */
+#define IMAXBEL  0020000 /* Ring bell when input queue is full (KOS-SPECIFIC: The bell also gets triggered when is empty, and a delete character is received) */
 #define IUTF8    0040000 /* Input is UTF8 */
 #define __IIOFF 04000000 /* Status bit for `TCIOFF' / `TCION': When set, disable enqueuing of new input. */
 

@@ -38,6 +38,62 @@
  *  - https://vt100.net/docs/vt102-ug/chapter5.html
  */
 
+/* CR (\r) and LF (\n) behavior throughout the keyboard->termios->ansitty->display chain of sub-systems:
+ * keyboard:
+ *   - The keyboard always sends \r
+ *   - There doesn't seem to be a way to change this besides using custom key maps.
+ *     This behavior can also be observed on linux by analyzing keyboard data sent
+ *     after putting a terminal into cfmakeraw()-mode
+ * termios:
+ *   - '\r' (from keyboard):
+ *     - IGNCR: Ignore '\r' characters  (Cleared by ansitty:"\ec", "\e[20h" and "\e[20l")
+ *     - ICRNL: Convert into '\n'       (Default; Set by ansitty:"\ec" and "\e[20h")
+ *     - 0:     Forward '\r' characters unchanged (s.a. `cfmakeraw()')
+ *   - '\n' (from keyboard):
+ *     - INLCR: Convert into '\r'  (Cleared by ansitty:"\ec" and "\e[20l"; Set by ansitty:"\e[20h")
+ *       - I don't really know why this flag exists, since it seems like it would imply
+ *         that may be some keyboard/tty combinations where the return-key sends a '\n'
+ *         character, however even despite this, using CTRL+J will always trigger this
+ *         flag, since that key combination will also send a '\n' character
+ *       - Note that it was this flag which always confused me into thinking that '\n'
+ *         may be what a keyboard should send, but this causes problems with at least
+ *         a hand full of programs:
+ *          - The <Enter-File-Name> dialog of `nano' doesn't accept '\n' as confirmation
+ *            input and instead responds with a BELL, indicating that the input is not
+ *            accepted.
+ *          - However other programs (like the `busybox' commandline) will work just fine
+ *            regardless of the keyboard sending '\r' or '\n' (although it may also just
+ *            be using either `INLCR' or `ICRNL' to unify output into either behavior)
+ *   - '\r' (from application / for ansitty):
+ *     - ONLRET:      Ignore '\r' characters
+ *     - ONOCR:       Ignore '\r' characters at column 0 (ignored on KOS)
+ *     - OCRNL:       Convert into '\n'
+ *     - OCRNL|ONLCR: Convert into '\r\n'
+ *   - '\n' (from application / for ansitty):
+ *     - ONLCR:       Convert into '\r\n'
+ * ansitty:
+ *   - '\r' (from termios / for display):
+ *     - Always forwarded as unchanged
+ *   - '\n' (from termios / for display):
+ *     - After "\e[20h":
+ *       - Forwarded as unchanged (default)
+ *     - After "\e[20l":
+ *       - Emulated as same-column line-feed by using the SETCURSOR()
+ *         operation after posting a \n-character to the display driver.
+ *       - This mode really shouldn't be used, but exists for compatibility
+ * display:
+ *   - '\r' (from ansitty):
+ *     >> SET_COLUMN(0);
+ *   - '\n' (from ansitty):
+ *     >> if (AT_END_OF_SCROLL_REGION()) {
+ *     >>     SCROLL();
+ *     >>     SET_ROW(DISPLAY_HEIGHT - 1);
+ *     >> } else {
+ *     >>     SET_ROW(GET_ROW() + 1);
+ *     >> }
+ *     >> SET_COLUMN(0);
+ */
+
 
 #define ANSITTY_COLORS       16
 #define ANSITTY_CL_BLACK     0
