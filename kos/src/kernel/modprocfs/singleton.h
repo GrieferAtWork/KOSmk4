@@ -16,41 +16,33 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_MODPROCFS_ROOT_C
-#define GUARD_MODPROCFS_ROOT_C 1
-#define CONFIG_WANT_FS_AS_STRUCT 1
-
-#include <kernel/compiler.h>
-#include <kernel/driver.h>
-
-#include "procfs.h"
-
-DECL_BEGIN
 
 
-PRIVATE NONNULL((1, 2)) REF struct directory_entry *KCALL
-ProcFS_RootDirectory_Lookup(struct directory_node *__restrict self,
-                            CHECKED USER /*utf-8*/ char const *__restrict name,
-                            u16 namelen, uintptr_t hash, fsmode_t mode)
-		THROWS(E_SEGFAULT, E_FSERROR_FILE_NOT_FOUND,
-		       E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
-	return NULL;
-}
+/* @param: files: Space-seperated list of:
+ *                  `F(parent_id, name, type, id)'
+ *                Terminated by `END'
+ *                The specified `parent_id' must match the `id' argument
+ *                passed to the surrounding `MKDIR()' invocation. */
+#ifndef MKDIR
+#define MKDIR(id, mode, files)
+#endif /* !MKDIR */
 
-PRIVATE NONNULL((1, 2)) void KCALL
-ProcFS_RootDirectory_Enum(struct directory_node *__restrict node,
-                          directory_enum_callback_t callback,
-                          void *arg)
-		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
-	(*callback)(arg, "test", 4, DT_DIR, 0);
-}
+#ifndef MKREG_RO
+#define MKREG_RO(id, mode, printer)
+#endif /* !MKREG_RO */
+
+#ifndef ROOT_DIRECTORY_ENTRY
+#define ROOT_DIRECTORY_ENTRY(name, type, id)
+#endif /* !ROOT_DIRECTORY_ENTRY */
 
 
+ROOT_DIRECTORY_ENTRY("kos", DT_DIR, kos)
+MKDIR(kos, 0555,
+      F(kos, "meminfo", DT_REG, kos_meminfo)
+      END)
 
-INTERN struct inode_type ProcFS_RootDirectory_Type =
-INIT_DIRECTORY_TYPE(&ProcFS_RootDirectory_Lookup,
-                    &ProcFS_RootDirectory_Enum);
+MKREG_RO(kos_meminfo, 0444, ProcFS_Kos_MemInfo_Printer)
 
-DECL_END
-
-#endif /* !GUARD_MODPROCFS_ROOT_C */
+#undef ROOT_DIRECTORY_ENTRY
+#undef MKREG_RO
+#undef MKDIR

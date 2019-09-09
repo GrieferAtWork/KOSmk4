@@ -43,6 +43,7 @@ DECL_BEGIN
 #ifdef __CC__
 struct path;
 struct inode;
+struct inode_data;
 struct superblock;
 struct directory_entry;
 struct directory_node;
@@ -252,6 +253,18 @@ struct inode_type {
 				       E_IOERROR_BADBOUNDS, E_IOERROR_READONLY,
 				       E_IOERROR, ...);
 
+		/* [0..1] Flexible read operator.
+		 * This function can be used in place of the more low-level read operators
+		 * defined above, and allows the implementing filesystem to dynamically
+		 * control the behavior of the read(2) system call when invoked on this
+		 * INode. (mainly intended for configuration files found in places such
+		 * as the procfs) */
+		NONNULL((1))
+		size_t (KCALL *f_flexread)(struct inode *__restrict self,
+		                           USER CHECKED void *dst, size_t num_bytes,
+		                           pos_t file_position)
+				THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...);
+
 #ifdef CONFIG_VIO
 		/* [0..1][locked(READ(self) / WRITE(self))]
 		 * VIO file data access interface.
@@ -259,7 +272,7 @@ struct inode_type {
 		 * interface, with this pointer being usable as hook for implementing file I/O,
 		 * as well as memory mappings through virtual I/O callbacks. */
 		struct vm_datablock_type_vio *f_vio;
-#endif
+#endif /* CONFIG_VIO */
 	} it_file;
 
 	union {

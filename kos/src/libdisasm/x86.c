@@ -2607,7 +2607,7 @@ function calculateOpcodeOffsets(start: string, end: string): ({int...}, int) {
 			throw;
 		}
 		if (line_opcode == "0")
-			break; // Sentinal marker
+			break; // Sentinel marker
 		line_opcode = int(line_opcode);
 		if (line_opcode < prev_opcode) {
 			print File.stderr: "ERROR: Invalid opcode ordering";

@@ -177,16 +177,16 @@ NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 		SCOPED_WRITELOCK((struct vm_datablock *)self);
 #ifdef IO_PHYS
 		if unlikely(!self->i_type->it_file.f_pwritev)
-			THROW(E_FSERROR_UNSUPPORTED_OPERATION,(uintptr_t)E_FILESYSTEM_OPERATION_WRITE);
+			THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_WRITE);
 #elif defined(IO_VECTOR)
 		if unlikely(!self->i_type->it_file.f_writev)
-			THROW(E_FSERROR_UNSUPPORTED_OPERATION,(uintptr_t)E_FILESYSTEM_OPERATION_WRITE);
+			THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_WRITE);
 #elif defined(IO_PHYS)
 		if unlikely(!self->i_type->it_file.f_pwrite)
-			THROW(E_FSERROR_UNSUPPORTED_OPERATION,(uintptr_t)E_FILESYSTEM_OPERATION_WRITE);
+			THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_WRITE);
 #else
 		if unlikely(!self->i_type->it_file.f_write)
-			THROW(E_FSERROR_UNSUPPORTED_OPERATION,(uintptr_t)E_FILESYSTEM_OPERATION_WRITE);
+			THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_WRITE);
 #endif
 		inode_loadattr(self);
 		{
@@ -196,7 +196,7 @@ NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 			if (write_end > self->i_filesize) {
 				/* Extend the file's allocated size */
 				if (!self->i_type->it_file.f_truncate)
-					THROW(E_FSERROR_UNSUPPORTED_OPERATION, (uintptr_t)E_FILESYSTEM_OPERATION_TRUNC);
+					THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_TRUNC);
 				TRY {
 					(*self->i_type->it_file.f_truncate)(self, write_end);
 				} EXCEPT {
@@ -216,19 +216,19 @@ NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 #ifdef IO_READ
 #if defined(IO_VECTOR) && defined(IO_PHYS)
 			if (!self->i_type->it_file.f_preadv)
-				THROW(E_FSERROR_UNSUPPORTED_OPERATION, (uintptr_t)E_FILESYSTEM_OPERATION_READ);
+				THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READ);
 			(*self->i_type->it_file.f_preadv)(self, buf, num_bytes, file_position, aio);
 #elif defined(IO_VECTOR)
 			if (!self->i_type->it_file.f_readv)
-				THROW(E_FSERROR_UNSUPPORTED_OPERATION, (uintptr_t)E_FILESYSTEM_OPERATION_READ);
+				THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READ);
 			(*self->i_type->it_file.f_readv)(self, buf, num_bytes, file_position, aio);
 #elif defined(IO_PHYS)
 			if (!self->i_type->it_file.f_pread)
-				THROW(E_FSERROR_UNSUPPORTED_OPERATION, (uintptr_t)E_FILESYSTEM_OPERATION_READ);
+				THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READ);
 			(*self->i_type->it_file.f_pread)(self, buf, num_bytes, file_position, aio);
 #else
 			if (!self->i_type->it_file.f_read)
-				THROW(E_FSERROR_UNSUPPORTED_OPERATION, (uintptr_t)E_FILESYSTEM_OPERATION_READ);
+				THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READ);
 			(*self->i_type->it_file.f_read)(self, buf, num_bytes, file_position, aio);
 #endif
 #else
@@ -410,6 +410,64 @@ load_next_part:
 #define FUNC2_READ    FUNC1_READ
 #endif
 
+
+#ifdef IO_PHYS
+#ifndef INODE_FLEX_READ_PHYS_DEFINED
+#define INODE_FLEX_READ_PHYS_DEFINED 1
+PRIVATE size_t KCALL
+do_inode_flexread_phys(struct inode *__restrict self,
+                       vm_phys_t buf, size_t num_bytes,
+                       pos_t file_position) {
+	size_t temp, result = 0;
+	uintptr_t backup;
+	vm_vpage_t tramp;
+	bool is_first;
+	is_first = true;
+	tramp    = THIS_TRAMPOLINE_PAGE;
+	TRY {
+		for (;;) {
+			vm_ppage_t pageaddr;
+			size_t page_bytes;
+			pageaddr   = (vm_ppage_t)VM_ADDR2PAGE(buf);
+			page_bytes = PAGESIZE - (buf & (PAGESIZE - 1));
+			if (page_bytes > num_bytes)
+				page_bytes = num_bytes;
+			if (is_first) {
+				backup = pagedir_push_mapone(tramp, pageaddr,
+				                             PAGEDIR_MAP_FWRITE);
+			} else {
+				pagedir_mapone(tramp, pageaddr,
+				               PAGEDIR_MAP_FWRITE);
+			}
+			pagedir_syncone(tramp);
+			/* Copy memory. */
+			temp = (*self->i_type->it_file.f_flexread)(self,
+			                                           (void *)(VM_PAGE2ADDR(tramp) + (ptrdiff_t)(buf & (PAGESIZE - 1))),
+			                                           page_bytes, file_position);
+			result += temp;
+			if (temp < page_bytes)
+				break;
+			if (page_bytes >= num_bytes)
+				break;
+			num_bytes -= page_bytes;
+			buf += page_bytes;
+			file_position += page_bytes;
+		}
+	} EXCEPT {
+		/* Try-catch is required, because `src' may be a user-buffer,
+		 * in which case access may cause an exception to be thrown. */
+		pagedir_pop_mapone(tramp, backup);
+		RETHROW();
+	}
+	pagedir_pop_mapone(tramp, backup);
+	return result;
+}
+
+#endif /* !INODE_FLEX_READ_PHYS_DEFINED */
+
+#endif /* IO_PHYS */
+
+
 #ifdef IO_ASYNC
 #ifdef IO_VECTOR
     NONNULL((1, 2, 5))
@@ -466,6 +524,58 @@ NOTHROW(KCALL FUNC2_READ(inode_))(struct inode *__restrict self,
 #endif /* !IO_ASYNC */
 {
 	pos_t file_end;
+	/* Check for special case: The INode implements the flexible-read interface. */
+	if (self->i_type->it_file.f_flexread) {
+#if defined(IO_VECTOR)
+		size_t temp, result = 0;
+#ifdef IO_PHYS
+		struct aio_pbuffer_entry ent;
+		AIO_PBUFFER_FOREACH_N(ent, buf)
+#else /* IO_PHYS */
+		struct aio_buffer_entry ent;
+		AIO_BUFFER_FOREACH_N(ent, buf)
+#endif /* !IO_PHYS */
+		{
+#ifdef IO_PHYS
+			temp = do_inode_flexread_phys(self,
+			                              ent.ab_base,
+			                              ent.ab_size,
+			                              file_position);
+#else /* IO_PHYS */
+			temp = (*self->i_type->it_file.f_flexread)(self,
+			                                           ent.ab_base,
+			                                           ent.ab_size,
+			                                           file_position);
+#endif /* !IO_PHYS */
+			result += temp;
+			if (temp < ent.ab_size)
+				break;
+			file_position += temp;
+		}
+#ifdef IO_ASYNC
+		aio_multihandle_done(aio);
+#endif /* IO_ASYNC */
+		return result;
+#elif defined(IO_PHYS)
+#ifdef IO_ASYNC
+		size_t result;
+		result = do_inode_flexread_phys(self, buf, num_bytes, file_position);
+		aio_multihandle_done(aio);
+		return result;
+#else /* IO_ASYNC */
+		return do_inode_flexread_phys(self, buf, num_bytes, file_position);
+#endif /* !IO_ASYNC */
+#else
+#ifdef IO_ASYNC
+		size_t result;
+		result = (*self->i_type->it_file.f_flexread)(self, buf, num_bytes, file_position);
+		aio_multihandle_done(aio);
+		return result;
+#else /* IO_ASYNC */
+		return (*self->i_type->it_file.f_flexread)(self, buf, num_bytes, file_position);
+#endif /* !IO_ASYNC */
+#endif
+	}
 #ifdef IO_ASYNC
 	TRY
 #endif
@@ -539,6 +649,41 @@ again_check_size:
 #endif /* !IO_PHYS */
 {
 	pos_t file_end;
+	/* Check for special case: The INode implements the flexible-read interface. */
+	if (self->i_type->it_file.f_flexread) {
+#if defined(IO_VECTOR)
+		size_t temp, result = 0;
+#ifdef IO_PHYS
+		struct aio_pbuffer_entry ent;
+		AIO_PBUFFER_FOREACH_N(ent, buf)
+#else /* IO_PHYS */
+		struct aio_buffer_entry ent;
+		AIO_BUFFER_FOREACH_N(ent, buf)
+#endif /* !IO_PHYS */
+		{
+#ifdef IO_PHYS
+			temp = do_inode_flexread_phys(self,
+			                              ent.ab_base,
+			                              ent.ab_size,
+			                              file_position);
+#else /* IO_PHYS */
+			temp = (*self->i_type->it_file.f_flexread)(self,
+			                                           ent.ab_base,
+			                                           ent.ab_size,
+			                                           file_position);
+#endif /* !IO_PHYS */
+			result += temp;
+			if (temp < ent.ab_size)
+				break;
+			file_position += temp;
+		}
+		return result;
+#elif defined(IO_PHYS)
+		return do_inode_flexread_phys(self, buf, num_bytes, file_position);
+#else
+		return (*self->i_type->it_file.f_flexread)(self, buf, num_bytes, file_position);
+#endif
+	}
 	/* Check for overflow and truncate as needed. */
 	if unlikely(OVERFLOW_UADD(file_position, num_bytes, &file_end))
 		file_end = (pos_t)-1,num_bytes = (size_t)((pos_t)-1 - file_position);
