@@ -3366,6 +3366,7 @@ directory_symlink(struct directory_node *__restrict target_directory,
 			result->i_fileuid  = owner;
 			result->i_filegid  = group;
 			result->i_filemode = S_IFLNK | mode;
+			result->i_filesize = (pos_t)link_text_size;
 			memcpy(&result->i_filemtime, &result->i_fileatime, sizeof(struct timespec));
 			memcpy(&result->i_filectime, &result->i_fileatime, sizeof(struct timespec));
 			result->sl_text = result->sl_stext;
