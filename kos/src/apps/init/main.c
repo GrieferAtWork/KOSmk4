@@ -58,6 +58,22 @@ int main(int argc, char *argv[], char *envp[]) {
 	}
 done_devfs:
 
+	/* Mount the /proc filesystem (but do this optionally). */
+	if (sysctl_insmod("procfs") >= 0) {
+		if (mount(NULL, "/proc", "procfs", 0, NULL) < 0) {
+			if (errno == ENOENT) {
+				mkdir("/proc", 0755);
+				sync();
+				if (mount(NULL, "/proc", "procfs", 0, NULL) >= 0)
+					goto done_procfs;
+			}
+			syslog(LOG_ERR, "[init] Failed to mount procfs: %s\n",
+			       strerror(errno));
+			sysctl_delmod("procfs");
+		}
+	}
+done_procfs:
+
 	/* Make sure there aren't any memory leaks. */
 	Sysctl(SYSCTL_SYSTEM_MEMORY_DUMP_LEAKS);
 

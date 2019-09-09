@@ -37,13 +37,13 @@ DECL_BEGIN
 
 
 PRIVATE struct superblock_type devfs_type = {
-	/* .st_driver            = */&drv_self,
-	/* .st_name              = */"devfs",
-	/* .st_flags             = */(SUPERBLOCK_TYPE_FNODEV | SUPERBLOCK_TYPE_FSINGLE),
-	/* .st_sizeof_superblock = */sizeof(struct superblock),
+	/* .st_driver            = */ &drv_self,
+	/* .st_name              = */ "devfs",
+	/* .st_flags             = */ (SUPERBLOCK_TYPE_FNODEV | SUPERBLOCK_TYPE_FSINGLE),
+	/* .st_sizeof_superblock = */ sizeof(struct superblock),
 	{
 		.st_singleton = &devfs
-	},
+	}
 };
 
 #define DEVFS_INITIAL_ROOTDIR_MASK  15
