@@ -179,7 +179,14 @@ again_check_node:
 	old_user_size = (size_t)((node->m_tree.a_vmax - node->m_tree.a_vmin) + 1) -
 	                (CONFIG_MALL_PREFIX_SIZE + CONFIG_MALL_HEAD_SIZE + CONFIG_MALL_TAIL_SIZE);
 	if (result.hp_siz <= old_user_size) {
-		size_t num_free = old_user_size - result.hp_siz;
+		size_t num_free;
+		/* Make sure that the truncated block remains large enough! */
+		if unlikely(result.hp_siz < HEAP_MINSIZE) {
+			result.hp_siz = HEAP_MINSIZE;
+			if (result.hp_siz >= old_user_size)
+				goto realloc_unchanged;
+		}
+		num_free = old_user_size - result.hp_siz;
 		if (num_free >= HEAP_MINSIZE) {
 			gfp_t heap_flags = node->m_flags;
 			/* Reduce the effective size of the user-data-block. */
@@ -205,6 +212,7 @@ again_check_node:
 			heap_free_untraced(&kernel_heaps[flags & __GFP_HEAPMASK],
 			                   result.hp_ptr, num_free, flags);
 		} else {
+realloc_unchanged:
 			/* Don't change the allocated node size. */
 			mallnode_tree_insert(&mall_tree, node);
 			sync_endwrite(&mall_lock);

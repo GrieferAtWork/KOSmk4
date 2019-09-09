@@ -708,7 +708,10 @@ NOTHROW(KCALL mall_do_free)(void *__restrict ptr, gfp_t flags, bool should_unloc
 	/* Load heap-flag properties from the node itself. */
 	flags = (flags & ~__GFP_HEAPMASK) | (node->m_flags & __GFP_HEAPMASK);
 	mallnode_free(node);
-	assert(fullblock.hp_siz >= (CONFIG_MALL_PREFIX_SIZE + CONFIG_MALL_HEAD_SIZE + CONFIG_MALL_TAIL_SIZE));
+	assert(fullblock.hp_siz >=
+	       MAX(HEAP_MINSIZE, CONFIG_MALL_PREFIX_SIZE +
+	                         CONFIG_MALL_HEAD_SIZE +
+	                         CONFIG_MALL_TAIL_SIZE));
 	/* When freeing zero-initialized memory,
 	 * clean up the head & tail blocks first! */
 	if (flags & GFP_CALLOC) {
