@@ -955,7 +955,7 @@ read_entry_pos_0:
 		/* Load the effective directory entry. */
 		for (;;) {
 			assert(entry);
-			assert(buffer->odb_end > buffer->odb_buf);
+			assert(buffer->odb_end >= buffer->odb_buf);
 			assert(entry >= buffer->odb_buf);
 			assert((uintptr_t)entry <= (uintptr_t)buffer->odb_end + ONESHOT_DIRENT_ALIGNMENT);
 			if unlikely(entry >= buffer->odb_end) {
