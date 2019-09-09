@@ -1834,7 +1834,9 @@ check_result_inode_for_symlink:
 								if (oflags & O_EXCL)
 									THROW(E_FSERROR_FILE_ALREADY_EXISTS);
 								/* Clear the file if O_TRUNC was given. */
-								if ((oflags & O_TRUNC) && (oflags & O_ACCMODE) != O_RDONLY)
+								if ((oflags & O_TRUNC) &&
+								    (oflags & O_ACCMODE) != O_RDONLY &&
+								    INODE_ISREG(result_inode))
 									inode_truncate(result_inode, 0);
 							}
 						} EXCEPT {
