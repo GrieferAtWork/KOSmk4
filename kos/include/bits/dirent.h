@@ -53,6 +53,7 @@ struct dirent {
 #endif /* !__USE_FILE_OFFSET64 */
 #endif /* !__USE_KOS */
 	__UINT8_TYPE__     d_type;
+	__UINT8_TYPE__   __d_pad;
 	__UINT16_TYPE__    d_namlen; /* == strlen(d_name) */
 #if defined(__DIRENT_TEXTSIZE)
 	char               d_name[__DIRENT_TEXTSIZE];
@@ -86,6 +87,7 @@ struct dirent64 {
 	__ino64_t          d_ino;
 #endif /* !__USE_KOS */
 	__UINT8_TYPE__     d_type;
+	__UINT8_TYPE__   __d_pad;
 	__UINT16_TYPE__    d_namlen; /* == strlen(d_name) */
 #if defined(__DIRENT_TEXTSIZE)
 	char               d_name[__DIRENT_TEXTSIZE];
