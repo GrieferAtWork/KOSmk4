@@ -858,7 +858,7 @@ struct directory_entry {
 	uintptr_t                         de_hash;    /* [const] Hash of this directory entry. */
 	u16                               de_namelen; /* [const][!0] Length of the directory entry name (in characters). */
 	unsigned char                     de_type;    /* [const] Directory entry type (one of `DT_*') */
-	/*utf-8*/char                     de_name[1]; /* [const][de_namelen] Directory entry name. (NUL-terminated) */
+	COMPILER_FLEXIBLE_ARRAY(/*utf-8*/char, de_name); /* [const][de_namelen] Directory entry name. (NUL-terminated) */
 };
 
 DATDEF struct directory_entry empty_directory_entry;
@@ -1937,7 +1937,7 @@ struct superblock
 };
 
 #if !defined(__cplusplus) || defined(CONFIG_WANT_FS_AS_STRUCT)
-__DEFINE_SYNC_PROXY(struct superblock,s_rootdir.d_node)
+__DEFINE_SYNC_PROXY(struct superblock, s_rootdir.d_node)
 #endif
 
 
