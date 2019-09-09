@@ -32,6 +32,7 @@ INTERN NONNULL((1, 2)) ssize_t KCALL
 ProcFS_Cmdline_Printer(struct inode *__restrict UNUSED(self),
                        pformatprinter printer, void *arg) {
 	size_t i;
+	/* TODO: Use libcmdline:cmdline_encode() once that's been implemented. */
 	for (i = 0; i < kernel_driver.d_argc; ++i) {
 		char *cmdline_arg;
 		if (i != 0 && (*printer)(arg, " ", 1) < 0)

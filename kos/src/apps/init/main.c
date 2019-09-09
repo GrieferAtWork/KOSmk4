@@ -37,9 +37,6 @@
 #include <string.h> /* strerror() */
 #include <unistd.h> /* sync() */
 
-/*TODO: Remove me*/
-#include <termios.h>
-
 DECL_BEGIN
 
 int main(int argc, char *argv[], char *envp[]) {
@@ -115,26 +112,6 @@ done_procfs:
 	dprintf(STDOUT_FILENO,
 	        "\033[J" /* ED(0):    Clear screen */
 	        "\033[f" /* HVP(1,1): Place cursor at 0,0 */);
-
-#if 0
-	{
-		struct termios tio;
-		Ioctl(STDIN_FILENO, TCGETA, &tio);
-		tio.c_lflag &= ~(ICANON | ECHO);
-		Ioctl(STDIN_FILENO, TCSETA, &tio);
-	}
-	dprintf(STDOUT_FILENO, "\033[4h");  /* Enable insert mode */
-	dprintf(STDOUT_FILENO, "\033[10h"); /* Reverse text direction */
-	dprintf(STDOUT_FILENO, "\033[1Q");  /* Insertions only happen on the current line */
-	for (;;) {
-		char buf[64];
-		ssize_t len;
-		len = read(STDIN_FILENO, buf, sizeof(buf));
-		if (len <= 0)
-			break;
-		write(STDOUT_FILENO, buf, (size_t)len);
-	}
-#endif
 
 	Execl("/bin/busybox", "bash", (char *)NULL);
 
