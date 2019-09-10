@@ -38,8 +38,8 @@ DECL_BEGIN
  * @return: * :               Number of characters (not bytes) matched in `data'.
  * @return: 0 :               Pattern not found.
  * @return: REGEX_ISERROR(*): Error. */
-INTDEF size_t CC
-libregex_matches(/*utf-8*/char const *__restrict data, size_t datalen,
+INTDEF NONNULL((1, 3)) size_t CC
+libregex_matches(/*utf-8*/ char const *__restrict data, size_t datalen,
                  /*utf-8*/ char const *__restrict pattern, size_t patternlen,
                  uintptr_t flags);
 
@@ -55,8 +55,8 @@ libregex_matches(/*utf-8*/char const *__restrict data, size_t datalen,
  * @return: * :               Number of characters (not bytes) matched in `data'.
  * @return: 0 :               Pattern not found.
  * @return: REGEX_ISERROR(*): Error. */
-INTDEF size_t CC
-libregex_matchesptr(/*utf-8*/char const *__restrict data, size_t datalen,
+INTDEF NONNULL((1, 3, 5)) size_t CC
+libregex_matchesptr(/*utf-8*/ char const *__restrict data, size_t datalen,
                     /*utf-8*/ char const *__restrict pattern, size_t patternlen,
                     /*utf-8*/ char const **__restrict pdataend,
                     uintptr_t flags);
@@ -67,32 +67,32 @@ libregex_matchesptr(/*utf-8*/char const *__restrict data, size_t datalen,
  * @return: 1:                Pattern was found.
  * @return: 0:                Pattern not found.
  * @return: REGEX_ISERROR(*): Error. */
-INTDEF int CC
-libregex_find(/*utf-8*/char const *__restrict data, size_t datalen,
+INTDEF NONNULL((1, 3, 5)) int CC
+libregex_find(/*utf-8*/ char const *__restrict data, size_t datalen,
               /*utf-8*/ char const *__restrict pattern, size_t patternlen,
               struct regex_range *__restrict presult, uintptr_t flags);
-INTDEF int CC
+INTDEF NONNULL((1, 3, 5)) int CC
 libregex_rfind(/*utf-8*/ char const *__restrict data, size_t datalen,
                /*utf-8*/ char const *__restrict pattern, size_t patternlen,
                struct regex_range *__restrict presult, uintptr_t flags);
 
 /* Same as the functions above, but return character pointers, rather than indices. */
-INTDEF int CC
-libregex_findptr(/*utf-8*/char const *__restrict data, size_t datalen,
+INTDEF NONNULL((1, 3, 5)) int CC
+libregex_findptr(/*utf-8*/ char const *__restrict data, size_t datalen,
                  /*utf-8*/ char const *__restrict pattern, size_t patternlen,
                  struct regex_range_ptr *__restrict presult, uintptr_t flags);
-INTDEF int CC
-libregex_rfindptr(/*utf-8*/char const *__restrict data, size_t datalen,
+INTDEF NONNULL((1, 3, 5)) int CC
+libregex_rfindptr(/*utf-8*/ char const *__restrict data, size_t datalen,
                   /*utf-8*/ char const *__restrict pattern, size_t patternlen,
                   struct regex_range_ptr *__restrict presult, uintptr_t flags);
 
 /* Same as the functions above, but return both character indices _and_ pointers. */
-INTDEF int CC
-libregex_findex(/*utf-8*/char const *__restrict data, size_t datalen,
+INTDEF NONNULL((1, 3, 5)) int CC
+libregex_findex(/*utf-8*/ char const *__restrict data, size_t datalen,
                 /*utf-8*/ char const *__restrict pattern, size_t patternlen,
                 struct regex_range_ex *__restrict presult, uintptr_t flags);
-INTDEF int CC
-libregex_rfindex(/*utf-8*/char const *__restrict data, size_t datalen,
+INTDEF NONNULL((1, 3, 5)) int CC
+libregex_rfindex(/*utf-8*/ char const *__restrict data, size_t datalen,
                  /*utf-8*/ char const *__restrict pattern, size_t patternlen,
                  struct regex_range_ex *__restrict presult, uintptr_t flags);
 

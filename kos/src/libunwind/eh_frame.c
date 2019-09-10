@@ -77,8 +77,16 @@ DECL_END
 
 
 DECL_BEGIN
-#else
-PRIVATE unsigned int
+#else /* !__INTELLISENSE__ */
+PRIVATE
+#if CFI_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT != 0 && CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT != 0
+	NONNULL((1, 4, 5, 6, 7))
+#elif CFI_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT != 0 || CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT != 0
+	NONNULL((1, 3, 4, 5, 6))
+#else /* ... */
+	NONNULL((1, 2, 3, 4, 5))
+#endif /* !... */
+	unsigned int
 NOTHROW_NCX(CC libuw_unwind_fde_exec_until)(unwind_fde_t const *__restrict self,
 #if CFI_UNWIND_COMMON_REGISTER_COUNT != 0
                                             unwind_cfa_register_t *common_init_regs,
@@ -91,7 +99,15 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_until)(unwind_fde_t const *__restrict self,
                                             byte_t *__restrict end,
                                             unwind_cfa_state_t *__restrict result,
                                             void *absolute_pc);
-PRIVATE unsigned int
+PRIVATE
+#if CFI_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT != 0 && CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT != 0
+	NONNULL((1, 4, 5, 6, 7))
+#elif CFI_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT != 0 || CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT != 0
+	NONNULL((1, 3, 4, 5, 6))
+#else /* ... */
+	NONNULL((1, 2, 3, 4, 5))
+#endif /* !... */
+	unsigned int
 NOTHROW_NCX(CC libuw_unwind_sigframe_fde_exec_until)(unwind_fde_t const *__restrict self,
 #if CFI_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT != 0
                                                      unwind_cfa_register_t *common_init_regs,
@@ -105,20 +121,20 @@ NOTHROW_NCX(CC libuw_unwind_sigframe_fde_exec_until)(unwind_fde_t const *__restr
                                                      unwind_cfa_sigframe_state_t *__restrict result,
                                                      void *absolute_pc);
 
-PRIVATE unsigned int
+PRIVATE NONNULL((1, 2, 3, 4)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_fde_exec_cfa_until)(unwind_fde_t const *__restrict self,
                                                 byte_t *__restrict reader,
                                                 byte_t *__restrict end,
                                                 unwind_cfa_value_t *__restrict result,
                                                 void *absolute_pc);
-PRIVATE unsigned int
+PRIVATE NONNULL((1, 2, 3, 4)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_fde_exec_rule_until)(unwind_fde_t const *__restrict self,
                                                  byte_t *__restrict reader,
                                                  byte_t *__restrict end,
                                                  unwind_cfa_register_t *__restrict rule,
                                                  uintptr_half_t dw_regno,
                                                  void *absolute_pc);
-#endif
+#endif /* __INTELLISENSE__ */
 
 
 
@@ -136,7 +152,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_rule_until)(unwind_fde_t const *__restrict 
  * @return: UNWIND_CFA_UNKNOWN_INSTRUCTION: ...
  * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
  * @return: UNWIND_BADALLOC:                ... */
-INTERN unsigned int
+INTERN NONNULL((1, 2)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_fde_rule)(unwind_fde_t const *__restrict self,
                                       unwind_cfa_register_t *__restrict result,
                                       uintptr_half_t dw_regno,
@@ -173,7 +189,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_rule)(unwind_fde_t const *__restrict self,
  * @return: UNWIND_CFA_UNKNOWN_INSTRUCTION: ...
  * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
  * @return: UNWIND_BADALLOC:                ... */
-INTERN unsigned int
+INTERN NONNULL((1, 2)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_fde_exec_cfa)(unwind_fde_t const *__restrict self,
                                           unwind_cfa_value_t *__restrict result,
                                           void *absolute_pc) {
@@ -195,7 +211,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_cfa)(unwind_fde_t const *__restrict self,
 	return error;
 }
 
-PRIVATE unsigned int CC
+PRIVATE NONNULL((1, 2, 4)) unsigned int CC
 execute_eh_frame_expression(byte_t *__restrict expression_pointer,
                             unwind_getreg_t reg_getter,
                             void const *reg_callback_arg,
@@ -235,7 +251,7 @@ STATIC_ASSERT(CFI_REGISTER_SIZE(CFI_UNWIND_REGISTER_PC) == sizeof(void *));
  * @return: UNWIND_SEGFAULT:              ...
  * @return: UNWIND_EMULATOR_*:            ...
  * @return: UNWIND_APPLY_NOADDR_REGISTER: ... */
-INTERN unsigned int CC
+INTERN NONNULL((1, 2, 4)) unsigned int CC
 libuw_unwind_cfa_calculate_cfa(unwind_cfa_value_t const *__restrict self,
                                unwind_getreg_t reg_getter,
                                void const *reg_callback_arg,

@@ -59,8 +59,8 @@ typedef __ATTR_NONNULL((1)) __ssize_t
 
 
 struct regdump_printer {
-	__pformatprinter      rdp_printer;     /* [1..1] Output printer. */
-	void                 *rdp_printer_arg; /* [?..?] Argument for `rdp_printer'. */
+	__pformatprinter       rdp_printer;     /* [1..1] Output printer. */
+	void                  *rdp_printer_arg; /* [?..?] Argument for `rdp_printer'. */
 	regdump_print_format_t rdp_format;      /* [0..1] Custom printer for syntax highlighting. */
 };
 

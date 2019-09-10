@@ -40,21 +40,17 @@ __DECL_BEGIN
 
 /* Register accessor callbacks for a variety of known cpu context structures. */
 #ifndef __KERNEL__
-typedef __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_UCONTEXT)(/*struct ucontext*/void const *arg, __UINTPTR_HALF_TYPE__ regno, void *dst);
-typedef __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_UCONTEXT)(/*struct ucontext*/void *arg, __UINTPTR_HALF_TYPE__ regno, void const *src);
-typedef __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_MCONTEXT)(/*struct mcontext*/void const *arg, __UINTPTR_HALF_TYPE__ regno, void *dst);
-typedef __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_MCONTEXT)(/*struct mcontext*/void *arg, __UINTPTR_HALF_TYPE__ regno, void const *src);
-#endif /* !__KERNEL__ */
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_UCONTEXT)(/*struct ucontext*/void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_UCONTEXT)(/*struct ucontext*/void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_GETREG_MCONTEXT)(/*struct mcontext*/void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
+typedef __ATTR_NONNULL((1, 3)) __BOOL (LIBUNWIND_CC *PUNWIND_SETREG_MCONTEXT)(/*struct mcontext*/void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-#ifndef __KERNEL__
-LIBUNWIND_DECL __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_ucontext)(/*struct ucontext*/void const *arg, __UINTPTR_HALF_TYPE__ regno, void *dst);
-LIBUNWIND_DECL __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_ucontext)(/*struct ucontext*/void *arg, __UINTPTR_HALF_TYPE__ regno, void const *src);
-LIBUNWIND_DECL __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_mcontext)(/*struct mcontext*/void const *arg, __UINTPTR_HALF_TYPE__ regno, void *dst);
-LIBUNWIND_DECL __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_mcontext)(/*struct mcontext*/void *arg, __UINTPTR_HALF_TYPE__ regno, void const *src);
-#endif /* !__KERNEL__ */
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_ucontext)(/*struct ucontext*/void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_ucontext)(/*struct ucontext*/void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_getreg_mcontext)(/*struct mcontext*/void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3)) __BOOL __NOTHROW_NCX(LIBUNWIND_CC unwind_setreg_mcontext)(/*struct mcontext*/void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
-#ifndef __KERNEL__
 #ifndef LIBUNWIND_HAVE_ERROR_REGISTER_STATE_ACCESSORS
 #define LIBUNWIND_HAVE_ERROR_REGISTER_STATE_ACCESSORS 1
 typedef PUNWIND_GETREG_MCONTEXT PUNWIND_GETREG_ERROR_REGISTER_STATE;
@@ -76,11 +72,11 @@ typedef PUNWIND_SETREG_MCONTEXT PUNWIND_SETREG_ERROR_REGISTER_STATE;
  * address, as well as keep track of a lazily allocated address-tree of FDE
  * caches for quick (O(1)) repeated access to an FDE located within a known
  * function. */
-typedef unsigned int
+typedef __ATTR_NONNULL((2)) unsigned int
 (LIBUNWIND_CC *PUNWIND_FDE_FIND)(void *absolute_pc,
                                  unwind_fde_t *__restrict result);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL unsigned int
+LIBUNWIND_DECL __ATTR_NONNULL((2)) unsigned int
 __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_find)(void *absolute_pc,
                                             unwind_fde_t *__restrict result);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
@@ -90,12 +86,12 @@ __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_find)(void *absolute_pc,
  * locating the associated FDE entry, before using it to unwind the specified
  * register state.
  * @return: * : One of `UNWIND_*' (UNWIND_SUCCESS on success, other values on failure) */
-typedef unsigned int
+typedef __ATTR_NONNULL((2, 4)) unsigned int
 (LIBUNWIND_CC *PUNWIND)(void *absolute_pc,
                         unwind_getreg_t reg_getter, void const *reg_getter_arg,
                         unwind_setreg_t reg_setter, void *reg_setter_arg);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL unsigned int
+LIBUNWIND_DECL __ATTR_NONNULL((2, 4)) unsigned int
 __NOTHROW_NCX(LIBUNWIND_CC unwind)(void *absolute_pc,
                                    unwind_getreg_t reg_getter, void const *reg_getter_arg,
                                    unwind_setreg_t reg_setter, void *reg_setter_arg);

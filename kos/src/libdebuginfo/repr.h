@@ -59,8 +59,7 @@ INTDEF ATTR_CONST WUNUSED char const *NOTHROW(CC libdi_debug_repr_DW_EH_PE)(uint
  * >>   struct dl_section *debug_abbrev = dllocksection(dlgetmodule("c"), ".debug_abbrev");
  * >>   struct dl_section *debug_loc    = dllocksection(dlgetmodule("c"), ".debug_loc");
  * >>   struct dl_section *debug_str    = dllocksection(dlgetmodule("c"), ".debug_str");
- * >>   debug_repr_dump(&file_printer,
- * >>                    stdout,
+ * >>   debug_repr_dump(&file_printer, stdout,
  * >>                   (byte_t *)(debug_info ? debug_info->ds_data : NULL),
  * >>                   (byte_t *)(debug_info ? debug_info->ds_data + debug_info->ds_size : 0),
  * >>                   (byte_t *)(debug_abbrev ? debug_abbrev->ds_data : NULL),
@@ -71,7 +70,7 @@ INTDEF ATTR_CONST WUNUSED char const *NOTHROW(CC libdi_debug_repr_DW_EH_PE)(uint
  * >>                   (byte_t *)(debug_loc ? debug_loc->ds_data + debug_loc->ds_size : 0));
  * >>  }
 */
-INTDEF ssize_t CC
+INTDEF NONNULL((1)) ssize_t CC
 libdi_debug_repr_dump(pformatprinter printer, void *arg,
                       byte_t *debug_info_start, byte_t *debug_info_end,
                       byte_t *debug_abbrev_start, byte_t *debug_abbrev_end,

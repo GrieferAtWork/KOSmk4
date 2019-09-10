@@ -62,23 +62,22 @@ typedef __uint8_t unwind_order_index_t;
 
 
 typedef struct unwind_fde_struct {
-	void       *f_pcstart;     /* [<= f_pcend] PC (Program counter) starting address (absolute). */
-	void       *f_pcend;       /* [>= f_pcstart] PC (Program counter) end address (absolute). */
-	__uintptr_t f_codealign;   /* Code alignment. (Multiplied with the delta argument of an advance location instruction) */
-	__intptr_t  f_dataalign;   /* Data alignment. (Multiplied with the register offset argument of an offset instruction) */
-	void       *f_persofun;    /* [0..1] Address of a personality handler function. (absolute) */
-	void       *f_lsdaaddr;    /* [0..1] Address of a language-specific data block. (absolute) */
-	__byte_t   *f_inittext;    /* [0..1] Pointer to initial EH instructions (usually describing compiler-generated frames) (absolute) */
-	__byte_t   *f_inittextend; /* [0..1] End address of `f_inittext'. */
-	__byte_t   *f_evaltext;    /* [0..1] Pointer to FDE-specific EH instructions (This is the meat of it all) (absolute) */
-	__byte_t   *f_evaltextend; /* [0..1] End address of `f_evaltext'. */
-	__UINTPTR_HALF_TYPE__
-	            f_retreg;      /* Return-address register number (One of `CFI_[ARCH]_UNWIND_REGISTER_[NAME]'). */
-	__uint8_t   f_encptr;      /* Encoding used for pointers (One of `DW_EH_PE_*') */
-	__uint8_t   f_enclsda;     /* Encoding used for LSDA (One of `DW_EH_PE_*') */
-	__uint8_t   f_encperso;    /* Encoding used for personality function pointer (One of `DW_EH_PE_*') */
-	__uint8_t   f_sigframe;    /* Non-zero if this is a signal frame. */
-	__uint8_t   f_addrsize;    /* Size of an address. */
+	void                 *f_pcstart;     /* [<= f_pcend] PC (Program counter) starting address (absolute). */
+	void                 *f_pcend;       /* [>= f_pcstart] PC (Program counter) end address (absolute). */
+	__uintptr_t           f_codealign;   /* Code alignment. (Multiplied with the delta argument of an advance location instruction) */
+	__intptr_t            f_dataalign;   /* Data alignment. (Multiplied with the register offset argument of an offset instruction) */
+	void                 *f_persofun;    /* [0..1] Address of a personality handler function. (absolute) */
+	void                 *f_lsdaaddr;    /* [0..1] Address of a language-specific data block. (absolute) */
+	__byte_t             *f_inittext;    /* [0..1] Pointer to initial EH instructions (usually describing compiler-generated frames) (absolute) */
+	__byte_t             *f_inittextend; /* [0..1] End address of `f_inittext'. */
+	__byte_t             *f_evaltext;    /* [0..1] Pointer to FDE-specific EH instructions (This is the meat of it all) (absolute) */
+	__byte_t             *f_evaltextend; /* [0..1] End address of `f_evaltext'. */
+	__UINTPTR_HALF_TYPE__ f_retreg;      /* Return-address register number (One of `CFI_[ARCH]_UNWIND_REGISTER_[NAME]'). */
+	__uint8_t             f_encptr;      /* Encoding used for pointers (One of `DW_EH_PE_*') */
+	__uint8_t             f_enclsda;     /* Encoding used for LSDA (One of `DW_EH_PE_*') */
+	__uint8_t             f_encperso;    /* Encoding used for personality function pointer (One of `DW_EH_PE_*') */
+	__uint8_t             f_sigframe;    /* Non-zero if this is a signal frame. */
+	__uint8_t             f_addrsize;    /* Size of an address. */
 } unwind_fde_t;
 
 
@@ -87,13 +86,13 @@ typedef struct unwind_fde_struct {
  * value written back to `*peh_frame_reader' after a previous call to `unwind_fde_load()'.
  * @return: UNWIND_SUCCESS:  Successfully read the next FDE entry.
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
-typedef unsigned int
+typedef __ATTR_NONNULL((1, 2, 3)) unsigned int
 (LIBUNWIND_CC *PUNWIND_FDE_LOAD)(__byte_t **__restrict peh_frame_reader,
                                  __byte_t *__restrict eh_frame_end,
                                  unwind_fde_t *__restrict result,
                                  __uint8_t sizeof_address);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL unsigned int
+LIBUNWIND_DECL __ATTR_NONNULL((1, 2, 3)) unsigned int
 __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_load)(__byte_t **__restrict peh_frame_reader,
                                             __byte_t *__restrict eh_frame_end,
                                             unwind_fde_t *__restrict result,
@@ -106,14 +105,14 @@ __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_load)(__byte_t **__restrict peh_frame_read
  * @assume(!return || result->f_pcend > absolute_pc);
  * @return: UNWIND_SUCCESS:  Found the FDE entry associated with `ABSOLUTE_PC'.
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
-typedef unsigned int
+typedef __ATTR_NONNULL((1, 2, 4)) unsigned int
 (LIBUNWIND_CC *PUNWIND_FDE_SCAN)(__byte_t *__restrict eh_frame_start,
                                  __byte_t *__restrict eh_frame_end,
                                  void *absolute_pc,
                                  unwind_fde_t *__restrict result,
                                  __uint8_t sizeof_address);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL unsigned int
+LIBUNWIND_DECL __ATTR_NONNULL((1, 2, 4)) unsigned int
 __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_scan)(__byte_t *__restrict eh_frame_start,
                                             __byte_t *__restrict eh_frame_end,
                                             void *absolute_pc,
@@ -198,12 +197,12 @@ typedef struct unwind_cfa_sigframe_state_struct {
  * @return: UNWIND_CFA_UNKNOWN_INSTRUCTION: ...
  * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
  * @return: UNWIND_BADALLOC:                ... */
-typedef unsigned int
+typedef __ATTR_NONNULL((1, 2)) unsigned int
 (LIBUNWIND_CC *PUNWIND_FDE_EXEC)(unwind_fde_t const *__restrict self,
                                  unwind_cfa_state_t *__restrict result,
                                  void *absolute_pc);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL unsigned int
+LIBUNWIND_DECL __ATTR_NONNULL((1, 2)) unsigned int
 __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_exec)(unwind_fde_t const *__restrict self,
                                             unwind_cfa_state_t *__restrict result,
                                             void *absolute_pc);
@@ -224,12 +223,12 @@ __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_exec)(unwind_fde_t const *__restrict self,
  * @return: UNWIND_CFA_UNKNOWN_INSTRUCTION: ...
  * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
  * @return: UNWIND_BADALLOC:                ... */
-typedef unsigned int
+typedef __ATTR_NONNULL((1, 2)) unsigned int
 (LIBUNWIND_CC *PUNWIND_FDE_SIGFRAME_EXEC)(unwind_fde_t const *__restrict self,
                                           unwind_cfa_sigframe_state_t *__restrict result,
                                           void *absolute_pc);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL unsigned int
+LIBUNWIND_DECL __ATTR_NONNULL((1, 2)) unsigned int
 __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_sigframe_exec)(unwind_fde_t const *__restrict self,
                                                      unwind_cfa_sigframe_state_t *__restrict result,
                                                      void *absolute_pc);
@@ -250,13 +249,13 @@ __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_sigframe_exec)(unwind_fde_t const *__restr
  * @return: UNWIND_CFA_UNKNOWN_INSTRUCTION: ...
  * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
  * @return: UNWIND_BADALLOC:                ... */
-typedef unsigned int
+typedef __ATTR_NONNULL((1, 2)) unsigned int
 (LIBUNWIND_CC *PUNWIND_FDE_RULE)(unwind_fde_t const *__restrict self,
                                  unwind_cfa_register_t *__restrict result,
                                  __UINTPTR_HALF_TYPE__ dw_regno,
                                  void *absolute_pc);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL unsigned int
+LIBUNWIND_DECL __ATTR_NONNULL((1, 2)) unsigned int
 __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_rule)(unwind_fde_t const *__restrict self,
                                             unwind_cfa_register_t *__restrict result,
                                             __UINTPTR_HALF_TYPE__ dw_regno,
@@ -270,12 +269,12 @@ __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_rule)(unwind_fde_t const *__restrict self,
  * @return: UNWIND_CFA_UNKNOWN_INSTRUCTION: ...
  * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
  * @return: UNWIND_BADALLOC:                ... */
-typedef unsigned int
+typedef __ATTR_NONNULL((1, 2)) unsigned int
 (LIBUNWIND_CC *PUNWIND_FDE_EXEC_CFA)(unwind_fde_t const *__restrict self,
                                      unwind_cfa_value_t *__restrict result,
                                      void *absolute_pc);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL unsigned int
+LIBUNWIND_DECL __ATTR_NONNULL((1, 2)) unsigned int
 __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_exec_cfa)(unwind_fde_t const *__restrict self,
                                                 unwind_cfa_value_t *__restrict result,
                                                 void *absolute_pc);
@@ -284,18 +283,18 @@ __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_exec_cfa)(unwind_fde_t const *__restrict s
 
 /* Similar to `unwind_fde_exec()', but only decode `DW_CFA_GNU_args_size' instructions
  * in order to calculate the proper exception_handler landing-pad-stack-adjustment that
- * is required to properly re-align the stack before jumping to a local exception handler.
+ * is required to re-align the stack before jumping to a local exception handler.
  * @return: UNWIND_SUCCESS:                 ...
  * @return: UNWIND_INVALID_REGISTER:        ...
  * @return: UNWIND_CFA_UNKNOWN_INSTRUCTION: ...
  * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
  * @return: UNWIND_BADALLOC:                ... */
-typedef unsigned int
+typedef __ATTR_NONNULL((1, 2)) unsigned int
 (LIBUNWIND_CC *PUNWIND_FDE_EXEC_LANDING_PAD_ADJUSTMENT)(unwind_fde_t const *__restrict self,
                                                         __uintptr_t *__restrict result,
                                                         void *absolute_pc);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL unsigned int
+LIBUNWIND_DECL __ATTR_NONNULL((1, 2)) unsigned int
 __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_exec_landing_pad_adjustment)(unwind_fde_t const *__restrict self,
                                                                    __uintptr_t *__restrict psp_adjustment,
                                                                    void *absolute_pc);
@@ -315,13 +314,13 @@ __NOTHROW_NCX(LIBUNWIND_CC unwind_fde_exec_landing_pad_adjustment)(unwind_fde_t 
  * @return: UNWIND_SEGFAULT:              ...
  * @return: UNWIND_EMULATOR_*:            ...
  * @return: UNWIND_APPLY_NOADDR_REGISTER: ... */
-typedef unsigned int
+typedef __ATTR_NONNULL((1, 2, 4, 6)) unsigned int
 (LIBUNWIND_CC *PUNWIND_CFA_APPLY)(unwind_cfa_state_t *__restrict self,
                                   unwind_fde_t const *__restrict fde, void *absolute_pc,
                                   unwind_getreg_t reg_getter, void const *reg_getter_arg,
                                   unwind_setreg_t reg_setter, void *reg_setter_arg);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL unsigned int LIBUNWIND_CC
+LIBUNWIND_DECL __ATTR_NONNULL((1, 2, 4, 6)) unsigned int LIBUNWIND_CC
 unwind_cfa_apply(unwind_cfa_state_t *__restrict self,
                  unwind_fde_t const *__restrict fde, void *absolute_pc,
                  unwind_getreg_t reg_getter, void const *reg_getter_arg,
@@ -338,13 +337,13 @@ unwind_cfa_apply(unwind_cfa_state_t *__restrict self,
  * @return: UNWIND_SEGFAULT:              ...
  * @return: UNWIND_EMULATOR_*:            ...
  * @return: UNWIND_APPLY_NOADDR_REGISTER: ... */
-typedef unsigned int
+typedef __ATTR_NONNULL((1, 2, 4, 6)) unsigned int
 (LIBUNWIND_CC *PUNWIND_CFA_SIGFRAME_APPLY)(unwind_cfa_sigframe_state_t *__restrict self,
                                            unwind_fde_t const *__restrict fde, void *absolute_pc,
                                            unwind_getreg_t reg_getter, void const *reg_getter_arg,
                                            unwind_setreg_t reg_setter, void *reg_setter_arg);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL unsigned int LIBUNWIND_CC
+LIBUNWIND_DECL __ATTR_NONNULL((1, 2, 4, 6)) unsigned int LIBUNWIND_CC
 unwind_cfa_sigframe_apply(unwind_cfa_sigframe_state_t *__restrict self,
                           unwind_fde_t const *__restrict fde, void *absolute_pc,
                           unwind_getreg_t reg_getter, void const *reg_getter_arg,
@@ -360,13 +359,13 @@ unwind_cfa_sigframe_apply(unwind_cfa_sigframe_state_t *__restrict self,
  * @return: UNWIND_SEGFAULT:              ...
  * @return: UNWIND_EMULATOR_*:            ...
  * @return: UNWIND_APPLY_NOADDR_REGISTER: ... */
-typedef unsigned int
+typedef __ATTR_NONNULL((1, 2, 4)) unsigned int
 (LIBUNWIND_CC *PUNWIND_CFA_CALCULATE_CFA)(unwind_cfa_value_t const *__restrict self,
                                           unwind_getreg_t reg_getter,
                                           void const *reg_callback_arg,
                                           __uintptr_t *__restrict presult);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL unsigned int LIBUNWIND_CC
+LIBUNWIND_DECL __ATTR_NONNULL((1, 2, 4)) unsigned int LIBUNWIND_CC
 unwind_cfa_calculate_cfa(unwind_cfa_value_t const *__restrict self,
                          unwind_getreg_t reg_getter,
                          void const *reg_callback_arg,

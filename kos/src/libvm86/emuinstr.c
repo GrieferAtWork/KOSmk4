@@ -76,24 +76,24 @@ DECL_BEGIN
 #define F_REPNE F_f2
 #define F_REP   F_f3
 
-LOCAL int CC libvm86_read_pcbyte(vm86_state_t *__restrict self, uint8_t *__restrict result);
-LOCAL int CC libvm86_read_pcword(vm86_state_t *__restrict self, uint16_t *__restrict result);
-LOCAL int CC libvm86_read_pcdword(vm86_state_t *__restrict self, uint32_t *__restrict result);
-LOCAL int CC libvm86_store_string_byte(vm86_state_t *__restrict self, uint8_t value, uint16_t op_flags);
-LOCAL int CC libvm86_store_string_word(vm86_state_t *__restrict self, uint16_t value, uint16_t op_flags);
-LOCAL int CC libvm86_store_string_dword(vm86_state_t *__restrict self, uint32_t value, uint16_t op_flags);
-LOCAL int CC libvm86_load_string_byte(vm86_state_t *__restrict self, uint8_t *__restrict presult, uint16_t op_flags);
-LOCAL int CC libvm86_load_string_word(vm86_state_t *__restrict self, uint16_t *__restrict presult, uint16_t op_flags);
-LOCAL int CC libvm86_load_string_dword(vm86_state_t *__restrict self, uint32_t *__restrict presult, uint16_t op_flags);
-LOCAL int CC libvm86_load_string_dst_byte(vm86_state_t *__restrict self, uint8_t *__restrict presult, uint16_t op_flags);
-LOCAL int CC libvm86_load_string_dst_word(vm86_state_t *__restrict self, uint16_t *__restrict presult, uint16_t op_flags);
-LOCAL int CC libvm86_load_string_dst_dword(vm86_state_t *__restrict self, uint32_t *__restrict presult, uint16_t op_flags);
-LOCAL int CC libvm86_pushw(vm86_state_t *__restrict self, uint16_t value, uint16_t op_flags);
-LOCAL int CC libvm86_pushl(vm86_state_t *__restrict self, uint32_t value, uint16_t op_flags);
-LOCAL int CC libvm86_popw(vm86_state_t *__restrict self, uint16_t *__restrict presult, uint16_t op_flags);
-LOCAL int CC libvm86_popl(vm86_state_t *__restrict self, uint32_t *__restrict presult, uint16_t op_flags);
-LOCAL int CC libvm86_popw_void(vm86_state_t *__restrict self, uint16_t op_flags);
-LOCAL int CC libvm86_popl_void(vm86_state_t *__restrict self, uint16_t op_flags);
+LOCAL NONNULL((1, 2)) int CC libvm86_read_pcbyte(vm86_state_t *__restrict self, uint8_t *__restrict result);
+LOCAL NONNULL((1, 2)) int CC libvm86_read_pcword(vm86_state_t *__restrict self, uint16_t *__restrict result);
+LOCAL NONNULL((1, 2)) int CC libvm86_read_pcdword(vm86_state_t *__restrict self, uint32_t *__restrict result);
+LOCAL NONNULL((1)) int CC libvm86_store_string_byte(vm86_state_t *__restrict self, uint8_t value, uint16_t op_flags);
+LOCAL NONNULL((1)) int CC libvm86_store_string_word(vm86_state_t *__restrict self, uint16_t value, uint16_t op_flags);
+LOCAL NONNULL((1)) int CC libvm86_store_string_dword(vm86_state_t *__restrict self, uint32_t value, uint16_t op_flags);
+LOCAL NONNULL((1, 2)) int CC libvm86_load_string_byte(vm86_state_t *__restrict self, uint8_t *__restrict presult, uint16_t op_flags);
+LOCAL NONNULL((1, 2)) int CC libvm86_load_string_word(vm86_state_t *__restrict self, uint16_t *__restrict presult, uint16_t op_flags);
+LOCAL NONNULL((1, 2)) int CC libvm86_load_string_dword(vm86_state_t *__restrict self, uint32_t *__restrict presult, uint16_t op_flags);
+LOCAL NONNULL((1, 2)) int CC libvm86_load_string_dst_byte(vm86_state_t *__restrict self, uint8_t *__restrict presult, uint16_t op_flags);
+LOCAL NONNULL((1, 2)) int CC libvm86_load_string_dst_word(vm86_state_t *__restrict self, uint16_t *__restrict presult, uint16_t op_flags);
+LOCAL NONNULL((1, 2)) int CC libvm86_load_string_dst_dword(vm86_state_t *__restrict self, uint32_t *__restrict presult, uint16_t op_flags);
+LOCAL NONNULL((1)) int CC libvm86_pushw(vm86_state_t *__restrict self, uint16_t value, uint16_t op_flags);
+LOCAL NONNULL((1)) int CC libvm86_pushl(vm86_state_t *__restrict self, uint32_t value, uint16_t op_flags);
+LOCAL NONNULL((1, 2)) int CC libvm86_popw(vm86_state_t *__restrict self, uint16_t *__restrict presult, uint16_t op_flags);
+LOCAL NONNULL((1, 2)) int CC libvm86_popl(vm86_state_t *__restrict self, uint32_t *__restrict presult, uint16_t op_flags);
+LOCAL NONNULL((1)) int CC libvm86_popw_void(vm86_state_t *__restrict self, uint16_t op_flags);
+LOCAL NONNULL((1)) int CC libvm86_popl_void(vm86_state_t *__restrict self, uint16_t op_flags);
 
 #define REG8(id)  (*((id) >= 4 ? ((uint8_t *)(((uint32_t *)&(self)->vr_regs)+((id)-4)))+1 \
                                : ((uint8_t *)(((uint32_t *)&(self)->vr_regs)+(id)))))
@@ -126,19 +126,19 @@ struct modrm {
 	uint8_t   mi_shift;  /* Index shift (or 0). */
 };
 
-INTDEF int CC libvm86_modrm_decode(vm86_state_t *__restrict self, struct modrm *__restrict info, uint16_t op_flags);
-LOCAL void *CC libvm86_modrm_getaddr(vm86_state_t *__restrict self, struct modrm const *__restrict info, uint16_t op_flags);
-LOCAL int CC libvm86_modrm_readb(vm86_state_t *__restrict self, struct modrm const *__restrict info, uint8_t *__restrict presult, uint16_t op_flags);
-LOCAL int CC libvm86_modrm_readw(vm86_state_t *__restrict self, struct modrm const *__restrict info, uint16_t *__restrict presult, uint16_t op_flags);
-LOCAL int CC libvm86_modrm_readl(vm86_state_t *__restrict self, struct modrm const *__restrict info, uint32_t *__restrict presult, uint16_t op_flags);
-LOCAL int CC libvm86_modrm_writeb(vm86_state_t *__restrict self, struct modrm const *__restrict info, uint8_t value, uint16_t op_flags);
-LOCAL int CC libvm86_modrm_writew(vm86_state_t *__restrict self, struct modrm const *__restrict info, uint16_t value, uint16_t op_flags);
-LOCAL int CC libvm86_modrm_writel(vm86_state_t *__restrict self, struct modrm const *__restrict info, uint32_t value, uint16_t op_flags);
+INTDEF NONNULL((1, 2)) int CC libvm86_modrm_decode(vm86_state_t *__restrict self, struct modrm *__restrict info, uint16_t op_flags);
+LOCAL WUNUSED NONNULL((1, 2)) void *CC libvm86_modrm_getaddr(vm86_state_t *__restrict self, struct modrm const *__restrict info, uint16_t op_flags);
+LOCAL NONNULL((1, 2, 3)) int CC libvm86_modrm_readb(vm86_state_t *__restrict self, struct modrm const *__restrict info, uint8_t *__restrict presult, uint16_t op_flags);
+LOCAL NONNULL((1, 2, 3)) int CC libvm86_modrm_readw(vm86_state_t *__restrict self, struct modrm const *__restrict info, uint16_t *__restrict presult, uint16_t op_flags);
+LOCAL NONNULL((1, 2, 3)) int CC libvm86_modrm_readl(vm86_state_t *__restrict self, struct modrm const *__restrict info, uint32_t *__restrict presult, uint16_t op_flags);
+LOCAL NONNULL((1, 2)) int CC libvm86_modrm_writeb(vm86_state_t *__restrict self, struct modrm const *__restrict info, uint8_t value, uint16_t op_flags);
+LOCAL NONNULL((1, 2)) int CC libvm86_modrm_writew(vm86_state_t *__restrict self, struct modrm const *__restrict info, uint16_t value, uint16_t op_flags);
+LOCAL NONNULL((1, 2)) int CC libvm86_modrm_writel(vm86_state_t *__restrict self, struct modrm const *__restrict info, uint32_t value, uint16_t op_flags);
 
 
 
 #if !defined(__INTELLISENSE__) || 1
-LOCAL int CC
+LOCAL NONNULL((1, 2)) int CC
 libvm86_read_pcbyte(vm86_state_t *__restrict self,
                     uint8_t *__restrict presult) {
 	uint8_t *pc, value;
@@ -156,7 +156,8 @@ libvm86_read_pcbyte(vm86_state_t *__restrict self,
 	*presult = value;
 	return VM86_SUCCESS;
 }
-LOCAL int CC
+
+LOCAL NONNULL((1, 2)) int CC
 libvm86_read_pcword(vm86_state_t *__restrict self,
                     uint16_t *__restrict presult) {
 	uint16_t *pc, value;
@@ -174,7 +175,8 @@ libvm86_read_pcword(vm86_state_t *__restrict self,
 	*presult = value;
 	return VM86_SUCCESS;
 }
-LOCAL int CC
+
+LOCAL NONNULL((1, 2)) int CC
 libvm86_read_pcdword(vm86_state_t *__restrict self,
                      uint32_t *__restrict presult) {
 	uint32_t *pc, value;
@@ -193,7 +195,7 @@ libvm86_read_pcdword(vm86_state_t *__restrict self,
 	return VM86_SUCCESS;
 }
 
-LOCAL int CC
+LOCAL NONNULL((1)) int CC
 libvm86_store_string_byte(vm86_state_t *__restrict self,
                           uint8_t value, uint16_t op_flags) {
 	uint8_t *addr;
@@ -216,7 +218,7 @@ libvm86_store_string_byte(vm86_state_t *__restrict self,
 	return VM86_SUCCESS;
 }
 
-LOCAL int CC
+LOCAL NONNULL((1)) int CC
 libvm86_store_string_word(vm86_state_t *__restrict self,
                           uint16_t value, uint16_t op_flags) {
 	uint16_t *addr;
@@ -239,7 +241,7 @@ libvm86_store_string_word(vm86_state_t *__restrict self,
 	return VM86_SUCCESS;
 }
 
-LOCAL int CC
+LOCAL NONNULL((1)) int CC
 libvm86_store_string_dword(vm86_state_t *__restrict self,
                            uint32_t value, uint16_t op_flags) {
 	uint32_t *addr;
@@ -262,9 +264,10 @@ libvm86_store_string_dword(vm86_state_t *__restrict self,
 	return VM86_SUCCESS;
 }
 
-LOCAL int CC
+LOCAL NONNULL((1, 2)) int CC
 libvm86_load_string_byte(vm86_state_t *__restrict self,
-                         uint8_t *__restrict presult, uint16_t op_flags) {
+                         uint8_t *__restrict presult,
+                         uint16_t op_flags) {
 	uint8_t *addr, value;
 	addr = (uint8_t *)vm86_state_si(self);
 	if (self->vr_trans)
@@ -286,9 +289,10 @@ libvm86_load_string_byte(vm86_state_t *__restrict self,
 	return VM86_SUCCESS;
 }
 
-LOCAL int CC
+LOCAL NONNULL((1, 2)) int CC
 libvm86_load_string_word(vm86_state_t *__restrict self,
-                         uint16_t *__restrict presult, uint16_t op_flags) {
+                         uint16_t *__restrict presult,
+                         uint16_t op_flags) {
 	uint16_t *addr, value;
 	addr = (uint16_t *)vm86_state_si(self);
 	if (self->vr_trans)
@@ -310,9 +314,10 @@ libvm86_load_string_word(vm86_state_t *__restrict self,
 	return VM86_SUCCESS;
 }
 
-LOCAL int CC
+LOCAL NONNULL((1, 2)) int CC
 libvm86_load_string_dword(vm86_state_t *__restrict self,
-                          uint32_t *__restrict presult, uint16_t op_flags) {
+                          uint32_t *__restrict presult,
+                          uint16_t op_flags) {
 	uint32_t *addr, value;
 	addr = (uint32_t *)vm86_state_si(self);
 	if (self->vr_trans)
@@ -335,9 +340,10 @@ libvm86_load_string_dword(vm86_state_t *__restrict self,
 }
 
 
-LOCAL int CC
+LOCAL NONNULL((1, 2)) int CC
 libvm86_load_string_dst_byte(vm86_state_t *__restrict self,
-                             uint8_t *__restrict presult, uint16_t op_flags) {
+                             uint8_t *__restrict presult,
+                             uint16_t op_flags) {
 	uint8_t *addr, value;
 	addr = (uint8_t *)vm86_state_di(self);
 	if (self->vr_trans)
@@ -359,9 +365,10 @@ libvm86_load_string_dst_byte(vm86_state_t *__restrict self,
 	return VM86_SUCCESS;
 }
 
-LOCAL int CC
+LOCAL NONNULL((1, 2)) int CC
 libvm86_load_string_dst_word(vm86_state_t *__restrict self,
-                             uint16_t *__restrict presult, uint16_t op_flags) {
+                             uint16_t *__restrict presult,
+                             uint16_t op_flags) {
 	uint16_t *addr, value;
 	addr = (uint16_t *)vm86_state_di(self);
 	if (self->vr_trans)
@@ -383,9 +390,10 @@ libvm86_load_string_dst_word(vm86_state_t *__restrict self,
 	return VM86_SUCCESS;
 }
 
-LOCAL int CC
+LOCAL NONNULL((1, 2)) int CC
 libvm86_load_string_dst_dword(vm86_state_t *__restrict self,
-                              uint32_t *__restrict presult, uint16_t op_flags) {
+                              uint32_t *__restrict presult,
+                              uint16_t op_flags) {
 	uint32_t *addr, value;
 	addr = (uint32_t *)vm86_state_di(self);
 	if (self->vr_trans)
@@ -407,7 +415,7 @@ libvm86_load_string_dst_dword(vm86_state_t *__restrict self,
 	return VM86_SUCCESS;
 }
 
-LOCAL int CC
+LOCAL NONNULL((1)) int CC
 libvm86_pushw(vm86_state_t *__restrict self,
               uint16_t value, uint16_t op_flags) {
 	uint16_t *addr;
@@ -427,7 +435,7 @@ libvm86_pushw(vm86_state_t *__restrict self,
 	return VM86_SUCCESS;
 }
 
-LOCAL int CC
+LOCAL NONNULL((1)) int CC
 libvm86_pushl(vm86_state_t *__restrict self,
               uint32_t value, uint16_t op_flags) {
 	uint32_t *addr;
@@ -447,9 +455,10 @@ libvm86_pushl(vm86_state_t *__restrict self,
 	return VM86_SUCCESS;
 }
 
-LOCAL int CC
+LOCAL NONNULL((1, 2)) int CC
 libvm86_popw(vm86_state_t *__restrict self,
-             uint16_t *__restrict presult, uint16_t op_flags) {
+             uint16_t *__restrict presult,
+             uint16_t op_flags) {
 	uint16_t *addr, value;
 	if unlikely(self->vr_regs.vr_sp < 2)
 		return VM86_DOUBLE_FAULT;
@@ -468,9 +477,10 @@ libvm86_popw(vm86_state_t *__restrict self,
 	return VM86_SUCCESS;
 }
 
-LOCAL int CC
+LOCAL NONNULL((1, 2)) int CC
 libvm86_popl(vm86_state_t *__restrict self,
-             uint32_t *__restrict presult, uint16_t op_flags) {
+             uint32_t *__restrict presult,
+             uint16_t op_flags) {
 	uint32_t *addr, value;
 	if unlikely(self->vr_regs.vr_sp < 4)
 		return VM86_DOUBLE_FAULT;
@@ -489,7 +499,7 @@ libvm86_popl(vm86_state_t *__restrict self,
 	return VM86_SUCCESS;
 }
 
-LOCAL int CC
+LOCAL NONNULL((1)) int CC
 libvm86_popw_void(vm86_state_t *__restrict self, uint16_t op_flags) {
 	if unlikely(self->vr_regs.vr_sp < 2)
 		return VM86_DOUBLE_FAULT;
@@ -497,7 +507,7 @@ libvm86_popw_void(vm86_state_t *__restrict self, uint16_t op_flags) {
 	return VM86_SUCCESS;
 }
 
-LOCAL int CC
+LOCAL NONNULL((1)) int CC
 libvm86_popl_void(vm86_state_t *__restrict self, uint16_t op_flags) {
 	if unlikely(self->vr_regs.vr_sp < 4)
 		return VM86_DOUBLE_FAULT;
@@ -515,7 +525,7 @@ libvm86_popl_void(vm86_state_t *__restrict self, uint16_t op_flags) {
 #define MODRM_GETREG(x) (((x)&MODRM_REG_MASK) >> MODRM_REG_SHIFT)
 #define MODRM_GETRM(x)  (((x)&MODRM_RM_MASK) >> MODRM_RM_SHIFT)
 
-INTERN int CC
+INTERN NONNULL((1, 2)) int CC
 libvm86_modrm_decode(vm86_state_t *__restrict self,
                      struct modrm *__restrict info,
                      uint16_t op_flags) {
@@ -681,7 +691,7 @@ err:
 	return error;
 }
 
-LOCAL void *CC
+LOCAL WUNUSED NONNULL((1, 2)) void *CC
 libvm86_modrm_getaddr(vm86_state_t *__restrict self,
                       struct modrm const *__restrict info,
                       uint16_t op_flags) {
@@ -699,7 +709,7 @@ libvm86_modrm_getaddr(vm86_state_t *__restrict self,
 	return (void *)addr;
 }
 
-LOCAL int CC
+LOCAL NONNULL((1, 2, 3)) int CC
 libvm86_modrm_readb(vm86_state_t *__restrict self,
                     struct modrm const *__restrict info,
                     uint8_t *__restrict presult,
@@ -722,7 +732,7 @@ libvm86_modrm_readb(vm86_state_t *__restrict self,
 	return VM86_SUCCESS;
 }
 
-LOCAL int CC
+LOCAL NONNULL((1, 2, 3)) int CC
 libvm86_modrm_readw(vm86_state_t *__restrict self,
                     struct modrm const *__restrict info,
                     uint16_t *__restrict presult,
@@ -740,7 +750,7 @@ libvm86_modrm_readw(vm86_state_t *__restrict self,
 	return VM86_SUCCESS;
 }
 
-LOCAL int CC
+LOCAL NONNULL((1, 2, 3)) int CC
 libvm86_modrm_readl(vm86_state_t *__restrict self,
                     struct modrm const *__restrict info,
                     uint32_t *__restrict presult,
@@ -758,7 +768,7 @@ libvm86_modrm_readl(vm86_state_t *__restrict self,
 	return VM86_SUCCESS;
 }
 
-LOCAL int CC
+LOCAL NONNULL((1, 2)) int CC
 libvm86_modrm_writeb(vm86_state_t *__restrict self,
                      struct modrm const *__restrict info,
                      uint8_t value, uint16_t op_flags) {
@@ -778,7 +788,7 @@ libvm86_modrm_writeb(vm86_state_t *__restrict self,
 	return VM86_SUCCESS;
 }
 
-LOCAL int CC
+LOCAL NONNULL((1, 2)) int CC
 libvm86_modrm_writew(vm86_state_t *__restrict self,
                      struct modrm const *__restrict info,
                      uint16_t value, uint16_t op_flags) {
@@ -798,7 +808,7 @@ libvm86_modrm_writew(vm86_state_t *__restrict self,
 	return VM86_SUCCESS;
 }
 
-LOCAL int CC
+LOCAL NONNULL((1, 2)) int CC
 libvm86_modrm_writel(vm86_state_t *__restrict self,
                      struct modrm const *__restrict info,
                      uint32_t value, uint16_t op_flags) {
@@ -843,7 +853,7 @@ char const cpuid_brand_string[48] = {
  * @return: VM86_SUCCESS: The single instruction was successfully executed.
  * @return: VM86_STOPPED: The program counter was already placed at 0xffff:0xffff, or has jumped to that location.
  * @return: * :           One of `VM86_*' */
-INTERN int CC libvm86_step(vm86_state_t *__restrict self) {
+INTERN NONNULL((1)) int CC libvm86_step(vm86_state_t *__restrict self) {
 	int error;
 	uint8_t opcode;
 	uint16_t op_flags = F_SEGDS;

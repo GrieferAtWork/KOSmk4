@@ -70,7 +70,7 @@ DECL_BEGIN
  * @return: UNWIND_CFA_UNKNOWN_INSTRUCTION: ...
  * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
  * @return: UNWIND_BADALLOC:                ... */
-INTERN unsigned int
+INTERN NONNULL((1, 2)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_fde_sigframe_exec)(unwind_fde_t const *__restrict self,
                                                unwind_cfa_sigframe_state_t *__restrict result,
                                                void *absolute_pc)
@@ -90,7 +90,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_sigframe_exec)(unwind_fde_t const *__restrict se
  * @return: UNWIND_CFA_UNKNOWN_INSTRUCTION: ...
  * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
  * @return: UNWIND_BADALLOC:                ... */
-INTERN unsigned int
+INTERN NONNULL((1, 2)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_fde_exec)(unwind_fde_t const *__restrict self,
                                       unwind_cfa_state_t *__restrict result,
                                       void *absolute_pc)
@@ -147,10 +147,8 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec)(unwind_fde_t const *__restrict self,
 
 #ifndef GUARDED_MEMCPY_DEFINED
 #define GUARDED_MEMCPY_DEFINED 1
-INTDEF bool
-NOTHROW(CC guarded_memcpy)(void *__restrict dst,
-                           void const *__restrict src,
-                           size_t num_bytes);
+INTDEF WUNUSED bool
+NOTHROW(CC guarded_memcpy)(void *dst, void const *src, size_t num_bytes);
 #endif /* !GUARDED_MEMCPY_DEFINED */
 
 
@@ -165,7 +163,7 @@ NOTHROW(CC guarded_memcpy)(void *__restrict dst,
  * @return: UNWIND_SEGFAULT:              ...
  * @return: UNWIND_EMULATOR_*:            ...
  * @return: UNWIND_APPLY_NOADDR_REGISTER: ... */
-INTERN unsigned int CC
+INTERN NONNULL((1, 2, 4, 6)) unsigned int CC
 libuw_unwind_cfa_sigframe_apply(unwind_cfa_sigframe_state_t *__restrict self,
                                 unwind_fde_t const *__restrict fde, void *absolute_pc,
                                 unwind_getreg_t reg_getter, void const *reg_getter_arg,
@@ -184,7 +182,7 @@ libuw_unwind_cfa_sigframe_apply(unwind_cfa_sigframe_state_t *__restrict self,
  * @return: UNWIND_SEGFAULT:              ...
  * @return: UNWIND_EMULATOR_*:            ...
  * @return: UNWIND_APPLY_NOADDR_REGISTER: ... */
-INTERN unsigned int CC
+INTERN NONNULL((1, 2, 4, 6)) unsigned int CC
 libuw_unwind_cfa_apply(unwind_cfa_state_t *__restrict self,
                        unwind_fde_t const *__restrict fde, void *absolute_pc,
                        unwind_getreg_t reg_getter, void const *reg_getter_arg,
@@ -223,7 +221,7 @@ libuw_unwind_cfa_apply(unwind_cfa_state_t *__restrict self,
 #if CFI_UNWIND_LOCAL_COMMON_REGISTER_COUNT != 0 && \
     CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_COUNT != 0
 		bool max_order_is_common = true;
-#endif
+#endif /* CFI_UNWIND_LOCAL_COMMON_REGISTER_COUNT != 0 && CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_COUNT != 0 */
 		unwind_order_index_t max_order = 0;
 		uintptr_half_t i, max_index = 0;
 		uintptr_half_t dw_regno;
@@ -256,7 +254,7 @@ libuw_unwind_cfa_apply(unwind_cfa_state_t *__restrict self,
 #if CFI_UNWIND_LOCAL_COMMON_REGISTER_COUNT != 0 && \
     CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_COUNT != 0
 		if (max_order_is_common)
-#endif
+#endif /* CFI_UNWIND_LOCAL_COMMON_REGISTER_COUNT != 0 && CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_COUNT != 0 */
 #if CFI_UNWIND_LOCAL_COMMON_REGISTER_COUNT != 0
 		{
 			dw_regno = cfi_unwind_local_register_common2dw(max_index);
@@ -267,7 +265,7 @@ libuw_unwind_cfa_apply(unwind_cfa_state_t *__restrict self,
 #if CFI_UNWIND_LOCAL_COMMON_REGISTER_COUNT != 0 && \
     CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_COUNT != 0
 		else
-#endif
+#endif /* CFI_UNWIND_LOCAL_COMMON_REGISTER_COUNT != 0 && CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_COUNT != 0 */
 #if CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_COUNT != 0
 		{
 			dw_regno = cfi_unwind_local_register_uncommon2dw(max_index);
@@ -379,7 +377,7 @@ libuw_unwind_cfa_apply(unwind_cfa_state_t *__restrict self,
 	    !has_sp_rule
 #elif defined(CFI_UNWIND_LOCAL_COMMON_REGISTER_SP)
 	    (self->cs_regs[CFI_UNWIND_LOCAL_COMMON_REGISTER_SP].cr_rule == DW_CFA_register_rule_undefined)
-#endif
+#endif /* ... */
 	    ) {
 		/* Check if we should apply signal frame transformations.
 		 * Note that we only do this if we have a CFA rule and do intend on applying it.

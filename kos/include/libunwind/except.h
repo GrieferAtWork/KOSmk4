@@ -142,7 +142,7 @@ struct _Unwind_Context /* Opaque structure */
 
 
 /* NOTE: `__gcc_personality_v0' has the prototype `_Unwind_Personality_Fn' */
-typedef __ATTR_NONNULL((4,5)) _Unwind_Reason_Code
+typedef __ATTR_NONNULL((4, 5)) _Unwind_Reason_Code
 (__LIBCCALL *_Unwind_Personality_Fn)(int version /* = 1 */,
                                      _Unwind_Action actions,
                                      _Unwind_Exception_Class exception_class,

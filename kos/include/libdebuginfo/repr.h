@@ -63,8 +63,7 @@ LIBDEBUGINFO_DECL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW(LIBDEBUGINFO
  * >>  	struct dl_section *debug_abbrev = dllocksection(dlgetmodule("c"), ".debug_abbrev");
  * >>  	struct dl_section *debug_str    = dllocksection(dlgetmodule("c"), ".debug_str");
  * >>  	struct dl_section *debug_loc    = dllocksection(dlgetmodule("c"), ".debug_loc");
- * >>  	debug_repr_dump(&file_printer,
- * >>  	                 stdout,
+ * >>  	debug_repr_dump(&file_printer, stdout,
  * >>  	                (byte_t *)(debug_info ? debug_info->ds_data : NULL),
  * >>  	                (byte_t *)(debug_info ? debug_info->ds_data + debug_info->ds_size : 0),
  * >>  	                (byte_t *)(debug_abbrev ? debug_abbrev->ds_data : NULL),
@@ -75,13 +74,14 @@ LIBDEBUGINFO_DECL __ATTR_CONST __ATTR_WUNUSED char const *__NOTHROW(LIBDEBUGINFO
  * >>  	                (byte_t *)(debug_str ? debug_str->ds_data + debug_str->ds_size : 0));
  * >>  }
 */
-typedef __ssize_t (LIBDEBUGINFO_CC *PDEBUG_REPR_DUMP)(__pformatprinter printer, void *arg,
-                                                      __byte_t *debug_info_start, __byte_t *debug_info_end,
-                                                      __byte_t *debug_abbrev_start, __byte_t *debug_abbrev_end,
-                                                      __byte_t *debug_loc_start, __byte_t *debug_loc_end,
-                                                      __byte_t *debug_str_start, __byte_t *debug_str_end);
+typedef __ATTR_NONNULL((1)) __ssize_t
+(LIBDEBUGINFO_CC *PDEBUG_REPR_DUMP)(__pformatprinter printer, void *arg,
+                                    __byte_t *debug_info_start, __byte_t *debug_info_end,
+                                    __byte_t *debug_abbrev_start, __byte_t *debug_abbrev_end,
+                                    __byte_t *debug_loc_start, __byte_t *debug_loc_end,
+                                    __byte_t *debug_str_start, __byte_t *debug_str_end);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
-LIBDEBUGINFO_DECL __ssize_t
+LIBDEBUGINFO_DECL __ATTR_NONNULL((1)) __ssize_t
 (LIBDEBUGINFO_CC debug_repr_dump)(__pformatprinter printer, void *arg,
                                   __byte_t *debug_info_start, __byte_t *debug_info_end,
                                   __byte_t *debug_abbrev_start, __byte_t *debug_abbrev_end,

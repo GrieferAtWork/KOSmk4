@@ -35,7 +35,7 @@
 
 DECL_BEGIN
 
-LOCAL char tohex(unsigned int x) {
+LOCAL WUNUSED char tohex(unsigned int x) {
 	return x >= 10
 	       ? ('a' + (x - 10))
 	       : ('0' + (x));
@@ -48,7 +48,7 @@ LOCAL char tohex(unsigned int x) {
  * @return: -1: Error: An invocation of the `self->jw_printer' returned a negative value.
  * @return: -2: Error: Invalid usage during this, or during an earlier call. */
 
-#define CHK_STATE() \
+#define CHK_STATE()                                       \
 	do {                                                  \
 		if (self->jw_result < 0)                          \
 			goto err;                                     \
@@ -57,7 +57,7 @@ LOCAL char tohex(unsigned int x) {
 	} __WHILE0
 
 
-LOCAL int CC
+LOCAL NONNULL((1, 2)) int CC
 json_print(struct json_writer *__restrict self,
            char const *__restrict data, size_t len) {
 	ssize_t error;
@@ -70,7 +70,7 @@ json_print(struct json_writer *__restrict self,
 	return 0;
 }
 
-LOCAL int CC
+LOCAL NONNULL((1, 2)) int CC
 json_vprintf(struct json_writer *__restrict self,
              char const *__restrict format,
              va_list args) {
@@ -87,7 +87,7 @@ json_vprintf(struct json_writer *__restrict self,
 	return 0;
 }
 
-LOCAL int
+LOCAL NONNULL((1, 2)) int
 json_printf(struct json_writer *__restrict self,
             char const *__restrict format,
             ...) {
@@ -99,7 +99,7 @@ json_printf(struct json_writer *__restrict self,
 	return result;
 }
 
-LOCAL int CC
+LOCAL NONNULL((1)) int CC
 json_linefeed_and_indent(struct json_writer *__restrict self) {
 	if (self->jw_format == JSON_WRITER_FORMAT_PRETTY) {
 		char buf[16];
@@ -130,7 +130,7 @@ err:
 	return -1;
 }
 
-LOCAL int CC
+LOCAL NONNULL((1)) int CC
 json_print_prefixes(struct json_writer *__restrict self) {
 	if (self->jw_state == JSON_WRITER_STATE_SIBLING) {
 		if unlikely(json_print(self, ",", 1))
@@ -148,7 +148,7 @@ err:
 }
 
 
-LOCAL int CC
+LOCAL NONNULL((1, 2)) int CC
 json_begincomponent(struct json_writer *__restrict self,
                     char const *__restrict data, size_t len) {
 	CHK_STATE();
@@ -165,7 +165,7 @@ err:
 	return -1;
 }
 
-LOCAL int CC
+LOCAL NONNULL((1, 2)) int CC
 json_endcomponent(struct json_writer *__restrict self,
                   char const *__restrict data, size_t len) {
 	CHK_STATE();
@@ -187,31 +187,31 @@ err:
 	return -1;
 }
 
-INTERN int CC
+INTERN NONNULL((1)) int CC
 libjson_writer_beginobject(struct json_writer *__restrict self) {
 	return json_begincomponent(self, "{", 1);
 }
 
-INTERN int CC
+INTERN NONNULL((1)) int CC
 libjson_writer_beginarray(struct json_writer *__restrict self) {
 	return json_begincomponent(self, "[", 1);
 }
 
-INTERN int CC
+INTERN NONNULL((1)) int CC
 libjson_writer_endobject(struct json_writer *__restrict self) {
 	return json_endcomponent(self, "}", 1);
 }
-INTERN int CC
+INTERN NONNULL((1)) int CC
 libjson_writer_endarray(struct json_writer *__restrict self) {
 	return json_endcomponent(self, "]", 1);
 }
 
-LOCAL int CC
+LOCAL NONNULL((1)) int CC
 json_print_quote(struct json_writer *__restrict self) {
 	return json_print(self, "\"", 1);
 }
 
-LOCAL int CC
+LOCAL NONNULL((1, 2)) int CC
 json_print_string(struct json_writer *__restrict self,
                   /*utf-8*/char const *__restrict str,
                   size_t len) {
@@ -287,7 +287,7 @@ err:
 }
 
 
-INTERN int CC
+INTERN NONNULL((1, 2)) int CC
 libjson_writer_addfield(struct json_writer *__restrict self,
                         /*utf-8*/char const *__restrict key,
                         size_t keylen) {
@@ -312,7 +312,7 @@ err:
 	return -1;
 }
 
-INTERN int CC
+INTERN NONNULL((1, 2)) int CC
 libjson_writer_putstring(struct json_writer *__restrict self,
                          /*utf-8*/char const *__restrict str,
                          size_t len) {
@@ -328,7 +328,7 @@ err:
 }
 
 
-INTERN int CC
+INTERN NONNULL((1)) int CC
 libjson_writer_putnumber(struct json_writer *__restrict self, intptr_t value) {
 	CHK_STATE();
 	if unlikely(json_print_prefixes(self))
@@ -343,8 +343,8 @@ err:
 
 #if __SIZEOF_POINTER__ == 8
 DEFINE_INTERN_ALIAS(libjson_writer_putint64, libjson_writer_putnumber);
-#else
-INTERN int CC
+#else /* __SIZEOF_POINTER__ == 8 */
+INTERN NONNULL((1)) int CC
 libjson_writer_putint64(struct json_writer *__restrict self, int64_t value) {
 	CHK_STATE();
 	if unlikely(json_print_prefixes(self))
@@ -356,9 +356,9 @@ libjson_writer_putint64(struct json_writer *__restrict self, int64_t value) {
 err:
 	return -1;
 }
-#endif
+#endif /* __SIZEOF_POINTER__ != 8 */
 
-INTERN int CC
+INTERN NONNULL((1)) int CC
 libjson_writer_putuint64(struct json_writer *__restrict self, uint64_t value) {
 	CHK_STATE();
 	if unlikely(json_print_prefixes(self))
@@ -372,7 +372,7 @@ err:
 }
 
 
-INTERN int CC
+INTERN NONNULL((1)) int CC
 libjson_writer_putfloat(struct json_writer *__restrict self,
                         double value) {
 	CHK_STATE();
@@ -386,7 +386,7 @@ err:
 	return -1;
 }
 
-LOCAL int CC
+LOCAL NONNULL((1)) int CC
 json_putkeyword(struct json_writer *__restrict self,
                 char const *__restrict kwd, size_t len) {
 	CHK_STATE();
@@ -400,7 +400,7 @@ err:
 	return -1;
 }
 
-INTERN int CC
+INTERN NONNULL((1)) int CC
 libjson_writer_putbool(struct json_writer *__restrict self,
                        bool value) {
 	int result;
@@ -412,7 +412,7 @@ libjson_writer_putbool(struct json_writer *__restrict self,
 	return result;
 }
 
-INTERN int CC
+INTERN NONNULL((1)) int CC
 libjson_writer_putnull(struct json_writer *__restrict self) {
 	return json_putkeyword(self, "null", 4);
 }

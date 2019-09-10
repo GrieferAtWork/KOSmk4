@@ -46,11 +46,11 @@ DECL_BEGIN
  * @return: NULL: The pointed-to instruction wasn't recognized. */
 #ifdef LIBINSTRLEN_FIXED_INSTRUCTION_LENGTH
 INTERN ATTR_PURE WUNUSED void const *
-(CC libil_instruction_succ)(void const *pc) {
+NOTHROW_NCX(CC libil_instruction_succ)(void const *pc) {
 	return (byte_t *)pc + LIBINSTRLEN_FIXED_INSTRUCTION_LENGTH;
 }
 INTERN ATTR_PURE WUNUSED void const *
-(CC libil_instruction_pred)(void const *pc) {
+NOTHROW_NCX(CC libil_instruction_pred)(void const *pc) {
 	return (byte_t *)pc - LIBINSTRLEN_FIXED_INSTRUCTION_LENGTH;
 }
 #elif defined(__i386__) || defined(__x86_64__)
@@ -91,8 +91,8 @@ INTERN ATTR_PURE WUNUSED void const *
 #define R_ESI     6 /* Source pointer. */
 #define R_EDI     7 /* Destination pointer. */
 
-LOCAL NONNULL((1))
-byte_t (CC skip_modrm)(byte_t **__restrict ppc) {
+LOCAL NONNULL((1)) byte_t
+NOTHROW_NCX(CC skip_modrm)(byte_t **__restrict ppc) {
 	byte_t op = *((*ppc)++);
 	switch (op & MODRM_MOD_MASK) {
 
@@ -125,7 +125,7 @@ byte_t (CC skip_modrm)(byte_t **__restrict ppc) {
 }
 
 INTERN ATTR_PURE WUNUSED void const *
-(CC libil_instruction_succ)(void const *pc) {
+NOTHROW_NCX(CC libil_instruction_succ)(void const *pc) {
 	uint8_t const *my_itab;
 	uint8_t op, *reader      = (uint8_t *)pc;
 	uint8_t action, op_flags = 0;
@@ -295,7 +295,7 @@ next_byte:
 }
 
 PRIVATE ATTR_PURE WUNUSED void const *
-(CC libil_instruction_pred_impl)(void const *pc) {
+NOTHROW_NCX(CC libil_instruction_pred_impl)(void const *pc) {
 	byte_t *result;
 	unsigned int i = 15; /* 15 is the max instruction length on X86 */
 	do {
@@ -314,7 +314,7 @@ done:
 
 
 INTERN ATTR_PURE WUNUSED void const *
-(CC libil_instruction_pred)(void const *pc) {
+NOTHROW_NCX(CC libil_instruction_pred)(void const *pc) {
 	void const *baseline, *result;
 	unsigned int i;
 	baseline = libil_instruction_pred_impl(pc);
@@ -343,13 +343,15 @@ INTERN ATTR_PURE WUNUSED void const *
 }
 #else
 #warning "Unsupported architecture"
+
 INTERN ATTR_PURE WUNUSED void const *
-(CC libil_instruction_succ)(void const *pc) {
+NOTHROW_NCX(CC libil_instruction_succ)(void const *pc) {
 	(void)pc;
 	return NULL;
 }
+
 INTERN ATTR_PURE WUNUSED void const *
-(CC libil_instruction_pred)(void const *pc) {
+NOTHROW_NCX(CC libil_instruction_pred)(void const *pc) {
 	(void)pc;
 	return NULL;
 }
@@ -435,7 +437,7 @@ err_segfault:
  * WARNING: This function may trigger a segmentation fault when `pc' is an invalid pointer.
  * @return: 0 : The pointed-to instruction wasn't recognized. */
 INTERN ATTR_PURE WUNUSED size_t
-(CC libil_instruction_length)(void const *pc) {
+NOTHROW_NCX(CC libil_instruction_length)(void const *pc) {
 #ifdef LIBINSTRLEN_FIXED_INSTRUCTION_LENGTH
 	(void)pc;
 	return LIBINSTRLEN_FIXED_INSTRUCTION_LENGTH;

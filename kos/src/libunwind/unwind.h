@@ -37,7 +37,7 @@ DECL_BEGIN
  * address, as well as keep track of a lazily allocated address-tree of FDE
  * caches for quick (O(1)) repeated access to an FDE located within a known
  * function. */
-INTDEF unsigned int
+INTDEF NONNULL((2)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_fde_find)(void *absolute_pc,
                                       unwind_fde_t *__restrict result);
 
@@ -46,7 +46,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_find)(void *absolute_pc,
  * locating the associated FDE entry, before using it to unwind the specified
  * register state.
  * @return: * : One of `UNWIND_*' (UNWIND_SUCCESS on success, other values on failure) */
-INTDEF unsigned int
+INTDEF NONNULL((2, 4)) unsigned int
 NOTHROW_NCX(CC linuw_unwind)(void *absolute_pc,
                              unwind_getreg_t reg_getter, void const *reg_getter_arg,
                              unwind_setreg_t reg_setter, void *reg_setter_arg);

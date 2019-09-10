@@ -34,7 +34,7 @@ DECL_BEGIN
  * value written back to `*peh_frame_reader' after a previous call to `unwind_fde_load()'.
  * @return: UNWIND_SUCCESS:  Successfully read the next FDE entry.
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
-INTERN unsigned int
+INTERN NONNULL((1, 2, 3)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_fde_load)(byte_t **__restrict peh_frame_reader,
                                       byte_t *__restrict eh_frame_end,
                                       unwind_fde_t *__restrict result,
@@ -44,7 +44,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_load)(byte_t **__restrict peh_frame_reader,
  * FDE descriptor containing the given `absolute_pc' text address.
  * @return: UNWIND_SUCCESS:  Found the FDE entry associated with `ABSOLUTE_PC'.
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
-INTERN unsigned int
+INTERN NONNULL((1, 2, 4)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_fde_scan)(byte_t *__restrict reader,
                                       byte_t *__restrict eh_frame_end,
                                       void *absolute_pc,
@@ -73,9 +73,9 @@ again:
 #if __SIZEOF_POINTER__ > 4
 		length = (size_t) * (u64 *)reader;
 		reader += 8;
-#else
+#else /* __SIZEOF_POINTER__ > 4 */
 		ERROR(err_noframe); /* Too large. Impossible to represent. */
-#endif
+#endif /* __SIZEOF_POINTER__ <= 4 */
 	}
 	if unlikely(!length)
 		ERROR(err_noframe);
@@ -94,9 +94,9 @@ again:
 	if (UNALIGNED_GET(&((uint32_t *)cie_reader)[-1]) == (uint32_t)-1) {
 #if __SIZEOF_POINTER__ > 4
 		cie_reader += 8; /* c_length64 */
-#else
+#else /* __SIZEOF_POINTER__ > 4 */
 		goto do_next_chunk;
-#endif
+#endif /* __SIZEOF_POINTER__ <= 4 */
 	}
 	cie_reader += 4; /* c_cieid */
 	cie_reader += 1; /* c_version */
@@ -178,7 +178,7 @@ again:
 		length = (size_t) * (u64 *)reader;
 		reader += 8;
 	}
-#endif
+#endif /* __SIZEOF_POINTER__ > 4 */
 	cie_reader += length;
 	result->f_inittextend = cie_reader;
 	/* Parse augmentation data of the FDE. */
@@ -208,7 +208,7 @@ again:
 	result->f_addrsize    = sizeof_address;
 #ifndef FIND_SPECIFIC_ADDRESS
 	*peh_frame_reader = next_chunk;
-#endif
+#endif /* FIND_SPECIFIC_ADDRESS */
 	return UNWIND_SUCCESS;
 do_next_chunk:
 	if unlikely(next_chunk < reader)

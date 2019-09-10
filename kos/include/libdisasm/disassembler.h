@@ -135,16 +135,16 @@ __NOTHROW_NCX(LIBDISASM_CC disasm_init)(struct disassembler *__restrict self,
 	self->d_flags      = flags;
 	self->d_maxbytes   = 0;
 	self->d_pad0       = 0;
-	__libc_memset(self->d_pad1,0,sizeof(self->d_pad1));
+	__libc_memset(self->d_pad1, 0, sizeof(self->d_pad1));
 }
 
 /* Helper functions to safely print using a given disassembler. */
-__LOCAL void LIBDISASM_CC
+__LOCAL __ATTR_NONNULL((1, 2)) void LIBDISASM_CC
 disasm_print(struct disassembler *__restrict self,
              char const *__restrict text, __size_t len) {
 	if (self->d_result >= 0) {
 		__ssize_t temp;
-		temp = (*self->d_printer)(self->d_arg,text,len);
+		temp = (*self->d_printer)(self->d_arg, text, len);
 		if __unlikely(temp < 0)
 			self->d_result = temp;
 		else {
@@ -156,7 +156,7 @@ disasm_print(struct disassembler *__restrict self,
 __LOCAL __ATTR_NONNULL((1, 2)) void LIBDISASM_CC
 disasm_puts(struct disassembler *__restrict self,
             char const *__restrict text) {
-	disasm_print(self,text,__libc_strlen(text));
+	disasm_print(self, text, __libc_strlen(text));
 }
 
 __LOCAL __ATTR_NONNULL((1)) void LIBDISASM_CC
@@ -174,8 +174,8 @@ __LOCAL __ATTR_NONNULL((1, 2)) void LIBDISASM_CC
 disasm_printf(struct disassembler *__restrict self,
               char const *__restrict format, ...) {
 	__builtin_va_list args;
-	__builtin_va_start(args,format);
-	disasm_vprintf(self,format,args);
+	__builtin_va_start(args, format);
+	disasm_vprintf(self, format, args);
 	__builtin_va_end(args);
 }
 
@@ -184,7 +184,7 @@ disasm_print_format(struct disassembler *__restrict self,
                     unsigned int format_code) {
 	if (self->d_format && self->d_result >= 0) {
 		__ssize_t temp;
-		temp = (*self->d_format)(self,format_code);
+		temp = (*self->d_format)(self, format_code);
 		if __unlikely(temp < 0)
 			self->d_result = temp;
 		else {
@@ -321,7 +321,7 @@ disasm_default_maxbytes(__UINTPTR_HALF_TYPE__ target __DFL(DISASSEMBLER_TARGET_C
  * includes this header in order to provide support for `%[disasm]' */
 #ifdef __local_format_vprintf_defined
 __NAMESPACE_LOCAL_BEGIN /* Forward-definition. */
-__LOCAL_LIBC(format_vprintf) __ATTR_LIBC_PRINTF(3,0) __ATTR_NONNULL((1,3,4)) __SSIZE_TYPE__
+__LOCAL_LIBC(format_vprintf) __ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1, 3, 4)) __SSIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(format_vprintf))(__pformatprinter __printer,
                                                void *__arg,
                                                char const *__restrict __format,
@@ -342,12 +342,12 @@ disasm_vprintf(struct disassembler *__restrict self,
 		                                                               self->d_arg,
 		                                                               format,
 		                                                               args);
-#else
+#else /* __local_format_vprintf_defined */
 		temp = format_vprintf(self->d_printer,
 		                      self->d_arg,
 		                      format,
 		                      args);
-#endif
+#endif /* !__local_format_vprintf_defined */
 		if __unlikely(temp < 0)
 			self->d_result = temp;
 		else {

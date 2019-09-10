@@ -49,7 +49,7 @@ DECL_BEGIN
  * @return: DEBUG_INFO_ERROR_SUCCESS: ...
  * @return: DEBUG_INFO_ERROR_NOFRAME: All units have been loaded.
  * @return: DEBUG_INFO_ERROR_CORRUPT: ... */
-INTDEF unsigned int
+INTDEF NONNULL((1, 2, 3, 4, 5)) unsigned int
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadunit)(byte_t **__restrict pdebug_info_reader,
                                                    byte_t *__restrict debug_info_end,
                                                    di_debuginfo_cu_parser_sections_t const *__restrict sectinfo,
@@ -65,7 +65,7 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_abbrev_fini)(di_debuginfo_cu_abbrev_t *__restr
 
 /* Skip data associated with the given attribute form.
  * @param: form: One of `DW_FORM_*' */
-INTDEF void
+INTDEF NONNULL((1)) void
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_skipform)(di_debuginfo_cu_parser_t *__restrict self,
                                                    dwarf_uleb128_t form);
 
@@ -73,14 +73,14 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_skipform)(di_debuginfo_cu_parser_t *__r
  * @return: true:  ...
  * @return: false: [debuginfo_cu_parser_next] All components have been parsed.
  * @return: false: [*] The next component doesn't exist, or isn't a child/sibling/parent. */
-INTDEF bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_next)(di_debuginfo_cu_parser_t *__restrict self);
-INTDEF bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_nextchild)(di_debuginfo_cu_parser_t *__restrict self);
-INTDEF bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_nextsibling)(di_debuginfo_cu_parser_t *__restrict self);
-INTDEF bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_nextparent)(di_debuginfo_cu_parser_t *__restrict self);
+INTDEF NONNULL((1)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_next)(di_debuginfo_cu_parser_t *__restrict self);
+INTDEF NONNULL((1)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_nextchild)(di_debuginfo_cu_parser_t *__restrict self);
+INTDEF NONNULL((1)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_nextsibling)(di_debuginfo_cu_parser_t *__restrict self);
+INTDEF NONNULL((1)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_nextparent)(di_debuginfo_cu_parser_t *__restrict self);
 
 /* Skip the attributes of the current component (must be called if not
  * parsed explicitly prior to the next call to `debuginfo_cu_parser_next*') */
-INTDEF void NOTHROW_NCX(CC libdi_debuginfo_cu_parser_skipattr)(di_debuginfo_cu_parser_t *__restrict self);
+INTDEF NONNULL((1)) void NOTHROW_NCX(CC libdi_debuginfo_cu_parser_skipattr)(di_debuginfo_cu_parser_t *__restrict self);
 
 /* Load the current debug information as an attribute encoded as
  * `form' into a storage class matching the given result-operand.
@@ -90,12 +90,12 @@ INTDEF void NOTHROW_NCX(CC libdi_debuginfo_cu_parser_skipattr)(di_debuginfo_cu_p
  *  - debuginfo_cu_parser_getflag():   DW_FORM_flag, DW_FORM_flag_present
  *  - debuginfo_cu_parser_getref():    DW_FORM_ref_addr, DW_FORM_ref1, DW_FORM_ref2, DW_FORM_ref4, DW_FORM_ref8, DW_FORM_ref_sig8, DW_FORM_ref_udata
  *  - debuginfo_cu_parser_getexpr():   DW_FORM_exprloc */
-INTDEF bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getstring)(di_debuginfo_cu_parser_t const *__restrict self, uintptr_t form, char **__restrict presult);
-INTDEF bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getaddr)(di_debuginfo_cu_parser_t const *__restrict self, uintptr_t form, uintptr_t *__restrict presult);
-INTDEF bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getconst)(di_debuginfo_cu_parser_t const *__restrict self, uintptr_t form, uintptr_t *__restrict presult);
-INTDEF bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getflag)(di_debuginfo_cu_parser_t const *__restrict self, uintptr_t form, bool *__restrict presult);
-INTDEF bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getref)(di_debuginfo_cu_parser_t const *__restrict self, uintptr_t form, byte_t **__restrict presult);
-INTDEF bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getexpr)(di_debuginfo_cu_parser_t const *__restrict self, uintptr_t form, di_debuginfo_location_t *__restrict result);
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getstring)(di_debuginfo_cu_parser_t const *__restrict self, uintptr_t form, char **__restrict presult);
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getaddr)(di_debuginfo_cu_parser_t const *__restrict self, uintptr_t form, uintptr_t *__restrict presult);
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getconst)(di_debuginfo_cu_parser_t const *__restrict self, uintptr_t form, uintptr_t *__restrict presult);
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getflag)(di_debuginfo_cu_parser_t const *__restrict self, uintptr_t form, bool *__restrict presult);
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getref)(di_debuginfo_cu_parser_t const *__restrict self, uintptr_t form, byte_t **__restrict presult);
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getexpr)(di_debuginfo_cu_parser_t const *__restrict self, uintptr_t form, di_debuginfo_location_t *__restrict result);
 
 
 /* Load attributes specific to a certain component:
@@ -108,13 +108,13 @@ INTDEF bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getexpr)(di_debuginfo_cu_pa
  *   - debuginfo_cu_parser_loadattr_variable():           DW_TAG_variable, DW_TAG_formal_parameter
  * @return: true:  Successfully loaded the component attributes.
  * @return: false: Corrupted/incomplete attributes. */
-INTDEF bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_compile_unit)(di_debuginfo_cu_parser_t *__restrict self, di_debuginfo_compile_unit_t *__restrict result);
-INTDEF bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_subprogram)(di_debuginfo_cu_parser_t *__restrict self, di_debuginfo_subprogram_t *__restrict result);
-INTDEF bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_inlined_subroutine)(di_debuginfo_cu_parser_t *__restrict self, di_debuginfo_inlined_subroutine_t *__restrict result);
-INTDEF bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_lexical_block)(di_debuginfo_cu_parser_t *__restrict self, di_debuginfo_lexical_block_t *__restrict result);
-INTDEF bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_type)(di_debuginfo_cu_parser_t *__restrict self, di_debuginfo_type_t *__restrict result);
-INTDEF bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_member)(di_debuginfo_cu_parser_t *__restrict self, di_debuginfo_member_t *__restrict result);
-INTDEF bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_variable)(di_debuginfo_cu_parser_t *__restrict self, di_debuginfo_variable_t *__restrict result);
+INTDEF NONNULL((1, 2)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_compile_unit)(di_debuginfo_cu_parser_t *__restrict self, di_debuginfo_compile_unit_t *__restrict result);
+INTDEF NONNULL((1, 2)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_subprogram)(di_debuginfo_cu_parser_t *__restrict self, di_debuginfo_subprogram_t *__restrict result);
+INTDEF NONNULL((1, 2)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_inlined_subroutine)(di_debuginfo_cu_parser_t *__restrict self, di_debuginfo_inlined_subroutine_t *__restrict result);
+INTDEF NONNULL((1, 2)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_lexical_block)(di_debuginfo_cu_parser_t *__restrict self, di_debuginfo_lexical_block_t *__restrict result);
+INTDEF NONNULL((1, 2)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_type)(di_debuginfo_cu_parser_t *__restrict self, di_debuginfo_type_t *__restrict result);
+INTDEF NONNULL((1, 2)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_member)(di_debuginfo_cu_parser_t *__restrict self, di_debuginfo_member_t *__restrict result);
+INTDEF NONNULL((1, 2)) bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_variable)(di_debuginfo_cu_parser_t *__restrict self, di_debuginfo_variable_t *__restrict result);
 
 
 /* Print the C/C++-like representation of a given value, given DWARF debug information
@@ -142,7 +142,7 @@ INTDEF bool NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_variable)(di_debug
  *                  otherwise, print as an declaration)
  * @param: flags:   Set of `DEBUGINFO_PRINT_VALUE_F*'
  */
-INTDEF ssize_t CC
+INTDEF NONNULL((1, 3, 4, 6)) ssize_t CC
 libdi_debuginfo_print_value(pformatprinter printer, void *arg,
                             di_debuginfo_cu_parser_t const *__restrict parser,
                             di_debuginfo_type_t const *__restrict type,
@@ -150,7 +150,7 @@ libdi_debuginfo_print_value(pformatprinter printer, void *arg,
                             size_t datasize, size_t newline_indentation,
                             debuginfo_print_format_t format_printer,
                             void *format_arg, unsigned int flags);
-INTDEF ssize_t CC
+INTDEF NONNULL((1, 3, 4)) ssize_t CC
 libdi_debuginfo_print_typename(pformatprinter printer, void *arg,
                                di_debuginfo_cu_parser_t const *__restrict parser,
                                di_debuginfo_type_t const *__restrict type,
@@ -162,7 +162,7 @@ libdi_debuginfo_print_typename(pformatprinter printer, void *arg,
 /* Enumerate all local variables visible at a given source location
  * @return: >= 0: The sum of all invocations of `*callback'.
  * @return: <  0: The first negative return value of `*callback'. */
-INTDEF ssize_t CC
+INTDEF NONNULL((1, 3)) ssize_t CC
 libdi_debuginfo_enum_locals(di_enum_locals_sections_t const *__restrict sectinfo,
                             uintptr_t module_relative_pc,
                             debuginfo_enum_locals_callback_t callback, void *arg);

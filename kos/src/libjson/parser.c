@@ -40,8 +40,8 @@ DECL_BEGIN
 #define isradixch(ch) ((ch) == 'x' || (ch) == 'X' || (ch) == 'b' || (ch) == 'B')
 
 
-LOCAL char32_t CC
-json_getc(struct json_parser *__restrict self) {
+LOCAL NONNULL((1)) char32_t
+NOTHROW_NCX(CC json_getc)(struct json_parser *__restrict self) {
 	char32_t result;
 	switch (__builtin_expect(self->jp_encoding, JSON_ENCODING_UTF8)) {
 	case JSON_ENCODING_UTF8:
@@ -69,8 +69,8 @@ json_getc(struct json_parser *__restrict self) {
 	return result;
 }
 
-LOCAL char32_t CC
-json_ungetc(struct json_parser *__restrict self) {
+LOCAL NONNULL((1)) char32_t
+NOTHROW_NCX(CC json_ungetc)(struct json_parser *__restrict self) {
 	char32_t result;
 	switch (__builtin_expect(self->jp_encoding, JSON_ENCODING_UTF8)) {
 	case JSON_ENCODING_UTF8:
@@ -103,9 +103,9 @@ json_ungetc(struct json_parser *__restrict self) {
  * NOTE: This function automatically detects the encoding (one of `JSON_ENCODING_*')
  *       of the given input, as specified by the Json specs, meaning you don't have
  *       to concern yourself with the details on how to supply input to this function. */
-INTERN void CC
-libjson_parser_init(struct json_parser *__restrict self,
-                    void const *start, void const *end) {
+INTERN NONNULL((1, 2, 3)) void
+NOTHROW_NCX(CC libjson_parser_init)(struct json_parser *__restrict self,
+                                    void const *start, void const *end) {
 	self->jp_start    = (char *)start;
 	self->jp_pos      = (char *)start;
 	self->jp_end      = (char *)end;
@@ -144,9 +144,9 @@ libjson_parser_init(struct json_parser *__restrict self,
 	}
 }
 
-INTERN void CC
-json_skip_utf8string_trailing_nuls(struct json_parser *__restrict self,
-                                   char const *__restrict new_pointer) {
+INTERN NONNULL((1, 2)) void
+NOTHROW_NCX(CC json_skip_utf8string_trailing_nuls)(struct json_parser *__restrict self,
+                                                   char const *__restrict new_pointer) {
 	switch (self->jp_encoding) {
 	case JSON_ENCODING_UTF8:
 		new_pointer = (char const *)memxendb(new_pointer, 0, (size_t)(self->jp_end - new_pointer));
@@ -170,9 +170,9 @@ json_skip_utf8string_trailing_nuls(struct json_parser *__restrict self,
 	self->jp_pos = new_pointer;
 }
 
-INTERN void CC
-json_truncate_pos_for_alignment(struct json_parser *__restrict self,
-                                char const *__restrict new_pointer) {
+INTERN NONNULL((1, 2)) void
+NOTHROW_NCX(CC json_truncate_pos_for_alignment)(struct json_parser *__restrict self,
+                                                char const *__restrict new_pointer) {
 	switch (self->jp_encoding) {
 	case JSON_ENCODING_UTF8:
 		break;
@@ -195,8 +195,8 @@ json_truncate_pos_for_alignment(struct json_parser *__restrict self,
  * @return: JSON_PARSER_*:     The previously selected token (the parser now points at its end)
  * @return: JSON_ERROR_EOF:    The end of the input file has been reached.
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
-INTERN int CC
-libjson_parser_yield(struct json_parser *__restrict self) {
+INTERN NONNULL((1)) int
+NOTHROW_NCX(CC libjson_parser_yield)(struct json_parser *__restrict self) {
 	char const *prev;
 	char32_t ch;
 	int result;
@@ -214,6 +214,7 @@ again:
 		json_skip_utf8string_trailing_nuls(self, strend(self->jp_pos));
 		result = JSON_PARSER_STRING;
 		break;
+
 	case 1:
 		prev = (char *)memxendb(self->jp_pos, 1, (size_t)(self->jp_end - self->jp_pos));
 		json_truncate_pos_for_alignment(self, (char *)prev);
@@ -343,7 +344,8 @@ syn:
  * @return: JSON_PARSER_*:     The now selected token (The parser is now located at the previous token)
  * @return: JSON_ERROR_EOF:    The start of the input file had already been reached.
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
-INTERN int CC libjson_parser_unyield(struct json_parser *__restrict self) {
+INTERN NONNULL((1)) int
+NOTHROW_NCX(CC libjson_parser_unyield)(struct json_parser *__restrict self) {
 	char const *next;
 	char32_t ch;
 	int result;
@@ -377,16 +379,14 @@ again:
 		}
 		break;
 
-	case 1:
-		{
-			uint8_t const *string_end;
-			string_end = memrxchrb(self->jp_start, 1, (size_t)(self->jp_pos - self->jp_start));
-			if unlikely(!string_end)
-				goto syn;
-			json_truncate_pos_for_alignment(self, (char *)string_end);
-			result = JSON_PARSER_STRING;
-		}
-		break;
+	case 1: {
+		uint8_t const *string_end;
+		string_end = memrxchrb(self->jp_start, 1, (size_t)(self->jp_pos - self->jp_start));
+		if unlikely(!string_end)
+		    goto syn;
+		json_truncate_pos_for_alignment(self, (char *)string_end);
+		result = JSON_PARSER_STRING;
+	}	break;
 
 	case '\"': /* String */
 		for (;;) {
@@ -503,8 +503,8 @@ syn:
  * @return: JSON_PARSER_ARRAY:  The parser now points at the first token following the initial `['.
  * @return: JSON_PARSER_OBJECT: The parser now points at the first token following the initial `{'.
  * @return: JSON_ERROR_SYNTAX:  Syntax error. */
-INTERN int CC
-libjson_parser_rewind(struct json_parser *__restrict self) {
+INTERN NONNULL((1)) int
+NOTHROW_NCX(CC libjson_parser_rewind)(struct json_parser *__restrict self) {
 	unsigned int recursion = 0;
 	for (;;) {
 		char const *temp = self->jp_pos;
@@ -532,7 +532,8 @@ libjson_parser_rewind(struct json_parser *__restrict self) {
  * @return: JSON_ERROR_NOOBJ: The end of the current object/array was reached.
  *                            The parser now points at the `}' or `]' following the object/array
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
-INTERN int CC libjson_parser_next(struct json_parser *__restrict self) {
+INTERN NONNULL((1)) int
+NOTHROW_NCX(CC libjson_parser_next)(struct json_parser *__restrict self) {
 	unsigned int recursion = 0;
 	for (;;) {
 		char const *temp = self->jp_pos;
@@ -584,8 +585,9 @@ INTERN int CC libjson_parser_next(struct json_parser *__restrict self) {
  *                            leave_object == false: The parser still points at the start of
  *                                                   the first member of the inner object/array.
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
-INTERN int CC libjson_parser_prev(struct json_parser *__restrict self,
-                                  bool leave_object) {
+INTERN NONNULL((1)) int
+NOTHROW_NCX(CC libjson_parser_prev)(struct json_parser *__restrict self,
+                                    bool leave_object) {
 	char const *temp = self->jp_pos;
 	int tok = libjson_parser_unyield(self);
 	if (tok == ',') {
@@ -654,10 +656,10 @@ check_field_label:
  * @return: JSON_ERROR_OK:    The parser now points at first member/index of the inner object/array.
  * @return: JSON_ERROR_NOOBJ: The parser didn't point at `{' or `[' (its position remains unchanged).
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
-LOCAL int CC
-libjson_parser_enter_something(struct json_parser *__restrict self,
-                               bool allow_object,
-                               bool allow_array) {
+LOCAL NONNULL((1)) int
+NOTHROW_NCX(CC libjson_parser_enter_something)(struct json_parser *__restrict self,
+                                               bool allow_object,
+                                               bool allow_array) {
 	char const *temp = self->jp_pos;
 	int tok = libjson_parser_yield(self);
 	if ((tok == '{' && allow_object) ||
@@ -668,13 +670,19 @@ libjson_parser_enter_something(struct json_parser *__restrict self,
 	self->jp_pos = temp;
 	return JSON_ERROR_NOOBJ;
 }
-INTERN int CC libjson_parser_enter(struct json_parser *__restrict self) {
+
+INTERN NONNULL((1)) int
+NOTHROW_NCX(CC libjson_parser_enter)(struct json_parser *__restrict self) {
 	return libjson_parser_enter_something(self, true, true);
 }
-INTERN int CC libjson_parser_enterobject(struct json_parser *__restrict self) {
+
+INTERN NONNULL((1)) int
+NOTHROW_NCX(CC libjson_parser_enterobject)(struct json_parser *__restrict self) {
 	return libjson_parser_enter_something(self, true, false);
 }
-INTERN int CC libjson_parser_enterarray(struct json_parser *__restrict self) {
+
+INTERN NONNULL((1)) int
+NOTHROW_NCX(CC libjson_parser_enterarray)(struct json_parser *__restrict self) {
 	return libjson_parser_enter_something(self, false, true);
 }
 
@@ -686,10 +694,10 @@ INTERN int CC libjson_parser_enterarray(struct json_parser *__restrict self) {
  *                          the parser exists at the `}' or `]' that is taking its place.
  * @return: JSON_ERROR_EOF: The end of the input file has been reached.
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
-LOCAL int CC
-libjson_parser_leave_something(struct json_parser *__restrict self,
-                               bool allow_object,
-                               bool allow_array) {
+LOCAL NONNULL((1)) int
+NOTHROW_NCX(CC libjson_parser_leave_something)(struct json_parser *__restrict self,
+                                               bool allow_object,
+                                               bool allow_array) {
 	unsigned int recursion = 0;
 	for (;;) {
 		int tok = libjson_parser_yield(self);
@@ -725,13 +733,19 @@ libjson_parser_leave_something(struct json_parser *__restrict self,
 		}
 	}
 }
-INTERN int CC libjson_parser_leave(struct json_parser *__restrict self) {
+
+INTERN NONNULL((1)) int
+NOTHROW_NCX(CC libjson_parser_leave)(struct json_parser *__restrict self) {
 	return libjson_parser_leave_something(self, true, true);
 }
-INTERN int CC libjson_parser_leaveobject(struct json_parser *__restrict self) {
+
+INTERN NONNULL((1)) int
+NOTHROW_NCX(CC libjson_parser_leaveobject)(struct json_parser *__restrict self) {
 	return libjson_parser_leave_something(self, true, false);
 }
-INTERN int CC libjson_parser_leavearray(struct json_parser *__restrict self) {
+
+INTERN NONNULL((1)) int
+NOTHROW_NCX(CC libjson_parser_leavearray)(struct json_parser *__restrict self) {
 	return libjson_parser_leave_something(self, false, true);
 }
 
@@ -739,7 +753,8 @@ INTERN int CC libjson_parser_leavearray(struct json_parser *__restrict self) {
 /* Returns the current parser state / token type.
  * @return: JSON_PARSER_*: The current parser state.
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
-INTERN int CC libjson_parser_state(struct json_parser *__restrict self) {
+INTERN NONNULL((1)) int
+NOTHROW_NCX(CC libjson_parser_state)(struct json_parser *__restrict self) {
 	char const *temp = self->jp_pos;
 	int result = libjson_parser_yield(self);
 	self->jp_pos = temp;
@@ -753,10 +768,10 @@ INTERN int CC libjson_parser_state(struct json_parser *__restrict self) {
  * @return: JSON_ERROR_OK:     The parser now points after the `:' following the matching key's name.
  * @return: JSON_ERROR_NOOBJ:  The given `key' wasn't found (The position of `self' remains unchanged)
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
-INTERN int CC
-libjson_parser_findkey(struct json_parser *__restrict self,
-                       /*utf-8*/char const *__restrict key,
-                       size_t keylen) {
+INTERN NONNULL((1, 2)) int
+NOTHROW_NCX(CC libjson_parser_findkey)(struct json_parser *__restrict self,
+                                       /*utf-8*/ char const *__restrict key,
+                                       size_t keylen) {
 	char const *start;
 	int result, tok;
 again:
@@ -828,9 +843,9 @@ again:
  * @return: JSON_ERROR_NOOBJ: The end of the array has been reached before, or when `index'
  *                            elements had been skipped. (The position of `self' remains unchanged)
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
-INTERN int CC
-libjson_parser_findindex(struct json_parser *__restrict self,
-                         uintptr_t index) {
+INTERN NONNULL((1)) int
+NOTHROW_NCX(CC libjson_parser_findindex)(struct json_parser *__restrict self,
+                                         uintptr_t index) {
 	char const *start = self->jp_pos;
 	int result = libjson_parser_rewind(self);
 	if unlikely(result != JSON_PARSER_ARRAY) {
@@ -854,7 +869,7 @@ struct format_compare_data {
 	size_t               len;
 };
 
-PRIVATE ssize_t __LIBCCALL
+PRIVATE NONNULL((1, 2)) ssize_t __LIBCCALL
 format_compare_string(void *arg,
                       /*utf-8*/char const *__restrict data,
                       size_t datalen) {
@@ -879,10 +894,10 @@ format_compare_string(void *arg,
  *                             In this case the parser now points at the first token after the string.
  * @return: JSON_ERROR_NOOBJ:  The parser didn't point at a string. (The position of `self' remains unchanged)
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
-INTERN int CC
-libjson_parser_eqstring(struct json_parser *__restrict self,
-                        /*utf-8*/char const *__restrict str,
-                        size_t len) {
+INTERN NONNULL((1, 2)) int
+NOTHROW_NCX(CC libjson_parser_eqstring)(struct json_parser *__restrict self,
+                                        /*utf-8*/ char const *__restrict str,
+                                        size_t len) {
 	int error;
 	ssize_t compare_result;
 	struct format_compare_data compare_data;
@@ -908,11 +923,11 @@ libjson_parser_eqstring(struct json_parser *__restrict self,
  * @return: JSON_ERROR_SYSERR: An invocation of `printer' returned a negative value (stored in `*pprinter_result').
  *                             In this case the position of the parser is revered to the start of the string.
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
-INTERN int CC
-libjson_parser_printstring(struct json_parser *__restrict self,
-                           pformatprinter printer, void *arg,
-                           ssize_t *__restrict pprinter_result) {
-	/*utf-8*/char buf[128],*bufend;
+INTERN NONNULL((1, 2, 4)) int
+NOTHROW_NCX(CC libjson_parser_printstring)(struct json_parser *__restrict self,
+                                           pformatprinter printer, void *arg,
+                                           ssize_t *__restrict pprinter_result) {
+	/*utf-8*/ char buf[128], *bufend;
 	char const *start = self->jp_pos;
 	char32_t ch = json_getc(self);
 	ssize_t printer_result, temp;
@@ -1038,7 +1053,7 @@ done:
 
 
 
-PRIVATE ssize_t __LIBCCALL
+PRIVATE NONNULL((1, 2)) ssize_t __LIBCCALL
 json_inline_convert_string(void *arg,
                            /*utf-8*/char const *__restrict data,
                            size_t datalen) {
@@ -1072,9 +1087,9 @@ INTERN_CONST char const libjson_empty_string[1] = { 0 };
  * @return: NULL:   An error occurred; when `perror` is non-NULL, that error is stored there:
  *                   - JSON_ERROR_NOOBJ:  Parser didn't point at a string object.
  *                   - JSON_ERROR_SYNTAX: Syntax error */
-INTERN /*utf-8*/char *CC
-libjson_parser_getstring(struct json_parser *__restrict self,
-                         size_t *plength, int *perror) {
+INTERN WUNUSED NONNULL((1)) /*utf-8*/ char *
+NOTHROW_NCX(CC libjson_parser_getstring)(struct json_parser *__restrict self,
+                                         size_t *plength, int *perror) {
 	char *dst, *dst_writer; int error;
 	char const *start = self->jp_pos;
 	char32_t ch = json_getc(self);
@@ -1136,9 +1151,9 @@ do_return_empty_string:
  * @return: JSON_ERROR_NOOBJ:  The parser didn't point at a number token.
  *                             In this case the parser didn't change position.
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
-INTERN int CC
-libjson_parser_getnumber(struct json_parser *__restrict self,
-                         intptr_t *__restrict presult) {
+INTERN NONNULL((1, 2)) int
+NOTHROW_NCX(CC libjson_parser_getnumber)(struct json_parser *__restrict self,
+                                         intptr_t *__restrict presult) {
 	char const *start = self->jp_pos;
 	char32_t ch = json_getc(self);
 	bool negative = false;
@@ -1192,10 +1207,10 @@ libjson_parser_getnumber(struct json_parser *__restrict self,
 
 #if __SIZEOF_POINTER__ == 8
 DEFINE_INTERN_ALIAS(libjson_parser_getint64, libjson_parser_getnumber);
-#else
-INTERN int CC
-libjson_parser_getint64(struct json_parser *__restrict self,
-                        int64_t *__restrict presult) {
+#else /* __SIZEOF_POINTER__ == 8 */
+INTERN NONNULL((1, 2)) int
+NOTHROW_NCX(CC libjson_parser_getint64)(struct json_parser *__restrict self,
+                                        int64_t *__restrict presult) {
 	char const *start = self->jp_pos;
 	char32_t ch = json_getc(self);
 	bool negative = false;
@@ -1246,12 +1261,12 @@ libjson_parser_getint64(struct json_parser *__restrict self,
 	*presult = result;
 	return JSON_ERROR_OK;
 }
-#endif
+#endif /* __SIZEOF_POINTER__ != 8 */
 DEFINE_INTERN_ALIAS(libjson_parser_getuint64, libjson_parser_getint64);
 
-INTERN int CC
-libjson_parser_getfloat(struct json_parser *__restrict self,
-                        double *__restrict presult) {
+INTERN NONNULL((1, 2)) int
+NOTHROW_NCX(CC libjson_parser_getfloat)(struct json_parser *__restrict self,
+                                        double *__restrict presult) {
 	char const *start = self->jp_pos;
 	char32_t ch = json_getc(self);
 	bool negative = false;
@@ -1308,13 +1323,13 @@ libjson_parser_getfloat(struct json_parser *__restrict self,
 		} while (unicode_isdecimal(ch));
 #ifdef __KERNEL__
 		exp = exp; /* TODO */
-#else
+#else /* __KERNEL__ */
 #ifdef __USE_GNU
 		exp = pow10(exp);
 #else /* __USE_GNU */
 		exp = pow(10.0, exp);
 #endif /* !__USE_GNU */
-#endif
+#endif /* !__KERNEL__ */
 		if (exp_negative) {
 			result /= exp;
 		} else {
@@ -1342,9 +1357,9 @@ libjson_parser_getfloat(struct json_parser *__restrict self,
  * @return: JSON_ERROR_NOOBJ:  The parser didn't point at a true/false token.
  *                             In this case the parser didn't change position.
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
-INTERN int CC
-libjson_parser_getbool(struct json_parser *__restrict self,
-                       bool *__restrict presult) {
+INTERN NONNULL((1, 2)) int
+NOTHROW_NCX(CC libjson_parser_getbool)(struct json_parser *__restrict self,
+                                       bool *__restrict presult) {
 	char const *initial = self->jp_pos;
 	int tok = libjson_parser_yield(self);
 	if (tok == JSON_PARSER_TRUE)
@@ -1366,8 +1381,8 @@ libjson_parser_getbool(struct json_parser *__restrict self,
  * @return: JSON_ERROR_NOOBJ:  The parser didn't point at a `null' token.
  *                             In this case the parser didn't change position.
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
-INTERN int CC
-libjson_parser_getnull(struct json_parser *__restrict self) {
+INTERN NONNULL((1)) int
+NOTHROW_NCX(CC libjson_parser_getnull)(struct json_parser *__restrict self) {
 	char const *initial = self->jp_pos;
 	int tok = libjson_parser_yield(self);
 	if (tok == JSON_PARSER_NULL)

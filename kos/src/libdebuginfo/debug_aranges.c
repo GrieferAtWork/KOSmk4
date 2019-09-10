@@ -51,7 +51,7 @@ DECL_BEGIN
  * @return: DEBUG_INFO_ERROR_SUCCESS: ...
  * @return: DEBUG_INFO_ERROR_NOFRAME: ...
  * @return: DEBUG_INFO_ERROR_CORRUPT: ... */
-INTERN TEXTSECTION unsigned int
+INTERN TEXTSECTION NONNULL((1, 2, 3)) unsigned int
 NOTHROW_NCX(CC libdi_debugaranges_locate)(byte_t *__restrict debug_aranges_start,
                                           byte_t *__restrict debug_aranges_end,
                                           uint32_t *__restrict pdebug_info_cu_offset,

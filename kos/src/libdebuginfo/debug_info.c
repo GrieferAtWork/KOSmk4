@@ -107,7 +107,7 @@ PRIVATE struct atomic_rwlock kernel_debug_info_inside_malloc = ATOMIC_RWLOCK_INI
 #endif /* CONFIG_NO_DEBUGGER */
 
 
-PRIVATE NOBLOCK void *
+PRIVATE NOBLOCK WUNUSED ATTR_MALLOC void *
 NOTHROW(CC my_kmalloc_untraced_nx)(size_t num_bytes, gfp_t flags) {
 	struct heapptr ptr;
 	MY_KMALLOC_ACQUIRE_LOCK();
@@ -121,7 +121,7 @@ NOTHROW(CC my_kmalloc_untraced_nx)(size_t num_bytes, gfp_t flags) {
 	return (size_t *)ptr.hp_ptr + 1;
 }
 
-PRIVATE NOBLOCK void *
+PRIVATE NOBLOCK WUNUSED void *
 NOTHROW(CC my_krealloc_untraced_nx)(void *oldptr, size_t num_bytes, gfp_t flags) {
 	struct heapptr ptr;
 	MY_KMALLOC_ACQUIRE_LOCK();
@@ -361,7 +361,7 @@ do_fill_dynamic_cache:
  * @return: DEBUG_INFO_ERROR_SUCCESS: ...
  * @return: DEBUG_INFO_ERROR_NOFRAME: All units have been loaded.
  * @return: DEBUG_INFO_ERROR_CORRUPT: ... */
-INTERN TEXTSECTION unsigned int
+INTERN TEXTSECTION NONNULL((1, 2, 3, 4, 5)) unsigned int
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadunit)(byte_t **__restrict pdebug_info_reader,
                                                    byte_t *__restrict debug_info_end,
                                                    di_debuginfo_cu_parser_sections_t const *__restrict sectinfo,
@@ -438,7 +438,7 @@ again:
 
 /* Skip data associated with the given attribute form.
  * @param: form: One of `DW_FORM_*' */
-INTERN TEXTSECTION void
+INTERN TEXTSECTION NONNULL((1)) void
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_skipform)(di_debuginfo_cu_parser_t *__restrict self,
                                                    dwarf_uleb128_t form) {
 decode_form:
@@ -539,7 +539,7 @@ decode_form:
  * @return: true:  ...
  * @return: false: [debuginfo_cu_parser_next] All components have been parsed.
  * @return: false: [*] The next component doesn't exist, or isn't a child/sibling/parent. */
-INTERN TEXTSECTION bool
+INTERN TEXTSECTION NONNULL((1)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_next)(di_debuginfo_cu_parser_t *__restrict self) {
 	uintptr_t abbrev_code;
 	if (self->dup_comp.dic_haschildren != DW_CHILDREN_no)
@@ -561,14 +561,14 @@ again:
 	                                        abbrev_code);
 }
 
-INTERN TEXTSECTION bool
+INTERN TEXTSECTION NONNULL((1)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_nextchild)(di_debuginfo_cu_parser_t *__restrict self) {
 	if (!self->dup_comp.dic_haschildren)
 		return false;
 	return libdi_debuginfo_cu_parser_next(self);
 }
 
-INTERN TEXTSECTION bool
+INTERN TEXTSECTION NONNULL((1)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_nextsibling)(di_debuginfo_cu_parser_t *__restrict self) {
 	byte_t *reader;
 	if (self->dup_comp.dic_haschildren)
@@ -580,7 +580,7 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_nextsibling)(di_debuginfo_cu_parser_t *
 	return libdi_debuginfo_cu_parser_next(self);
 }
 
-INTERN TEXTSECTION bool
+INTERN TEXTSECTION NONNULL((1)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_nextparent)(di_debuginfo_cu_parser_t *__restrict self) {
 	byte_t *reader;
 	if (self->dup_comp.dic_haschildren)
@@ -597,7 +597,7 @@ NOTHROW_NCX(CC libdi_debuginfo_cu_parser_nextparent)(di_debuginfo_cu_parser_t *_
  * parsed explicitly prior to the next call to `debuginfo_cu_parser_next*')
  * @return: DEBUG_INFO_ERROR_SUCCESS: ...
  * @return: DEBUG_INFO_ERROR_CORRUPT: ... */
-INTERN TEXTSECTION void
+INTERN TEXTSECTION NONNULL((1)) void
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_skipattr)(di_debuginfo_cu_parser_t *__restrict self) {
 	di_debuginfo_component_attrib_t attr;
 	DI_DEBUGINFO_CU_PARSER_EACHATTR(attr, self) {
@@ -616,7 +616,7 @@ INTERN_CONST STRINGSECTION char const unknown_string[] = "??" "?";
  *  - debuginfo_cu_parser_getflag():   DW_FORM_flag, DW_FORM_flag_present
  *  - debuginfo_cu_parser_getref():    DW_FORM_ref_addr, DW_FORM_ref1, DW_FORM_ref2, DW_FORM_ref4, DW_FORM_ref8, DW_FORM_ref_sig8, DW_FORM_ref_udata
  *  - debuginfo_cu_parser_getexpr():   DW_FORM_exprloc */
-INTERN TEXTSECTION bool
+INTERN TEXTSECTION NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getstring)(di_debuginfo_cu_parser_t const *__restrict self,
                                                     uintptr_t form, char **__restrict presult) {
 	byte_t *reader;
@@ -664,7 +664,7 @@ err:
 	return false;
 }
 
-INTERN TEXTSECTION bool
+INTERN TEXTSECTION NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getaddr)(di_debuginfo_cu_parser_t const *__restrict self,
                                                   uintptr_t form, uintptr_t *__restrict presult) {
 	byte_t *reader;
@@ -695,7 +695,7 @@ decode_form:
 	return false;
 }
 
-INTERN TEXTSECTION bool
+INTERN TEXTSECTION NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getconst)(di_debuginfo_cu_parser_t const *__restrict self,
                                                    uintptr_t form, uintptr_t *__restrict presult) {
 	byte_t *reader;
@@ -757,7 +757,7 @@ decode_form:
 	return false;
 }
 
-INTERN TEXTSECTION bool
+INTERN TEXTSECTION NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getflag)(di_debuginfo_cu_parser_t const *__restrict self,
                                                   uintptr_t form, bool *__restrict presult) {
 	byte_t *reader;
@@ -784,7 +784,7 @@ decode_form:
 	return false;
 }
 
-INTERN TEXTSECTION bool
+INTERN TEXTSECTION NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getref)(di_debuginfo_cu_parser_t const *__restrict self,
                                                  uintptr_t form, byte_t **__restrict presult) {
 	byte_t *reader;
@@ -852,7 +852,7 @@ err:
 }
 
 
-INTERN TEXTSECTION bool
+INTERN TEXTSECTION NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_getexpr)(di_debuginfo_cu_parser_t const *__restrict self,
                                                   uintptr_t form,
                                                   di_debuginfo_location_t *__restrict result) {
@@ -921,7 +921,7 @@ err:
  *   - debuginfo_cu_parser_loadattr_variable():           DW_TAG_variable, DW_TAG_formal_parameter
  * @return: true:  Successfully loaded the component attributes.
  * @return: false: Corrupted/incomplete attributes. */
-INTERN TEXTSECTION bool
+INTERN TEXTSECTION NONNULL((1, 2)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_compile_unit)(di_debuginfo_cu_parser_t *__restrict self,
                                                                 di_debuginfo_compile_unit_t *__restrict result) {
 	di_debuginfo_component_attrib_t attr;
@@ -978,7 +978,7 @@ err:
 	return false;
 }
 
-INTERN TEXTSECTION bool
+INTERN TEXTSECTION NONNULL((1, 2)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_subprogram)(di_debuginfo_cu_parser_t *__restrict self,
                                                               di_debuginfo_subprogram_t *__restrict result) {
 	di_debuginfo_component_attrib_t attr;
@@ -1074,7 +1074,7 @@ err:
 	return false;
 }
 
-INTERN TEXTSECTION bool
+INTERN TEXTSECTION NONNULL((1, 2)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_inlined_subroutine)(di_debuginfo_cu_parser_t *__restrict self,
                                                                       di_debuginfo_inlined_subroutine_t *__restrict result) {
 	di_debuginfo_component_attrib_t attr;
@@ -1137,7 +1137,7 @@ err:
 	return false;
 }
 
-INTERN TEXTSECTION bool
+INTERN TEXTSECTION NONNULL((1, 2)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_lexical_block)(di_debuginfo_cu_parser_t *__restrict self,
                                                                  di_debuginfo_lexical_block_t *__restrict result) {
 	di_debuginfo_component_attrib_t attr;
@@ -1176,7 +1176,7 @@ err:
 	return false;
 }
 
-PRIVATE ATTR_NOINLINE TEXTSECTION bool
+PRIVATE ATTR_NOINLINE TEXTSECTION NONNULL((1, 2, 3)) bool
 NOTHROW_NCX(CC ao_loadattr_type)(di_debuginfo_cu_parser_t *__restrict self,
                                  di_debuginfo_type_t *__restrict result,
                                  byte_t *__restrict abstract_origin) {
@@ -1187,7 +1187,7 @@ NOTHROW_NCX(CC ao_loadattr_type)(di_debuginfo_cu_parser_t *__restrict self,
 	       (likely(libdi_debuginfo_cu_parser_loadattr_type(&pp, result)));
 }
 
-PRIVATE ATTR_NOINLINE TEXTSECTION void
+PRIVATE ATTR_NOINLINE TEXTSECTION NONNULL((1, 2)) void
 NOTHROW_NCX(CC load_array_size_size)(di_debuginfo_cu_parser_t *__restrict self,
                                      di_debuginfo_type_t *__restrict result) {
 	di_debuginfo_cu_parser_t pp;
@@ -1220,7 +1220,7 @@ got_elem_count:
 		result->t_sizeof = elem_count * elem_type.t_sizeof;
 }
 
-PRIVATE ATTR_NOINLINE TEXTSECTION void
+PRIVATE ATTR_NOINLINE TEXTSECTION NONNULL((1, 2)) void
 NOTHROW_NCX(CC load_pointed_to_size)(di_debuginfo_cu_parser_t *__restrict self,
                                      di_debuginfo_type_t *__restrict result) {
 	di_debuginfo_cu_parser_t pp;
@@ -1233,7 +1233,7 @@ NOTHROW_NCX(CC load_pointed_to_size)(di_debuginfo_cu_parser_t *__restrict self,
 }
 
 
-INTERN TEXTSECTION bool
+INTERN TEXTSECTION NONNULL((1, 2)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_type)(di_debuginfo_cu_parser_t *__restrict self,
                                                         di_debuginfo_type_t *__restrict result) {
 	di_debuginfo_component_attrib_t attr;
@@ -1329,7 +1329,7 @@ err:
 	return false;
 }
 
-PRIVATE ATTR_NOINLINE TEXTSECTION bool
+PRIVATE ATTR_NOINLINE TEXTSECTION NONNULL((1, 2)) bool
 NOTHROW_NCX(CC ao_loadattr_member)(di_debuginfo_cu_parser_t *__restrict self,
                                    di_debuginfo_member_t *__restrict result,
                                    byte_t *__restrict abstract_origin) {
@@ -1340,7 +1340,7 @@ NOTHROW_NCX(CC ao_loadattr_member)(di_debuginfo_cu_parser_t *__restrict self,
 	       (likely(libdi_debuginfo_cu_parser_loadattr_member(&pp, result)));
 }
 
-INTERN TEXTSECTION bool
+INTERN TEXTSECTION NONNULL((1, 2)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_member)(di_debuginfo_cu_parser_t *__restrict self,
                                                           di_debuginfo_member_t *__restrict result) {
 	di_debuginfo_component_attrib_t attr;
@@ -1412,7 +1412,7 @@ err:
 	return false;
 }
 
-PRIVATE ATTR_NOINLINE TEXTSECTION bool
+PRIVATE ATTR_NOINLINE TEXTSECTION NONNULL((1, 2, 3)) bool
 NOTHROW_NCX(CC ao_loadattr_variable)(di_debuginfo_cu_parser_t *__restrict self,
                                      di_debuginfo_variable_t *__restrict result,
                                      byte_t *__restrict abstract_origin) {
@@ -1423,7 +1423,7 @@ NOTHROW_NCX(CC ao_loadattr_variable)(di_debuginfo_cu_parser_t *__restrict self,
 	       (likely(libdi_debuginfo_cu_parser_loadattr_variable(&pp, result)));
 }
 
-INTERN TEXTSECTION bool
+INTERN TEXTSECTION NONNULL((1, 2)) bool
 NOTHROW_NCX(CC libdi_debuginfo_cu_parser_loadattr_variable)(di_debuginfo_cu_parser_t *__restrict self,
                                                             di_debuginfo_variable_t *__restrict result) {
 	di_debuginfo_component_attrib_t attr;
@@ -1507,7 +1507,7 @@ LOCAL bool CC need_space(char a, char b) {
 #define DO(x)          do{if unlikely((temp = (x)) < 0)goto err;result+=temp;}__WHILE0
 #define FORMAT(option) do{if(format_printer){if unlikely((temp = (*format_printer)(format_arg,printer,arg,option)) < 0)goto err;result+=temp;}}__WHILE0
 
-PRIVATE TEXTSECTION ssize_t CC
+PRIVATE TEXTSECTION NONNULL((1)) ssize_t CC
 libdi_debuginfo_print_typename_and_varname(pformatprinter printer, void *arg,
                                            char const *type_name,
                                            struct varname_prefix *vn_prefix,
@@ -1547,7 +1547,7 @@ err:
 	return temp;
 }
 
-PRIVATE TEXTSECTION ssize_t CC
+PRIVATE TEXTSECTION NONNULL((1, 3, 4)) ssize_t CC
 libdi_debuginfo_do_print_typename(pformatprinter printer, void *arg,
                                   di_debuginfo_cu_parser_t const *__restrict parser,
                                   di_debuginfo_type_t const *__restrict type,
@@ -1642,7 +1642,6 @@ do_varname_prefix3:
 		                                           format_printer,
 		                                           format_arg);
 		break;
-
 
 	case DW_TAG_class_type:
 	case DW_TAG_interface_type:
@@ -1890,7 +1889,7 @@ err:
 	return temp;
 }
 
-INTERN TEXTSECTION ssize_t CC
+INTERN TEXTSECTION NONNULL((1, 3, 4)) ssize_t CC
 libdi_debuginfo_print_typename(pformatprinter printer, void *arg,
                                di_debuginfo_cu_parser_t const *__restrict parser,
                                di_debuginfo_type_t const *__restrict type,
@@ -1907,7 +1906,7 @@ libdi_debuginfo_print_typename(pformatprinter printer, void *arg,
 	                                         format_arg);
 }
 
-PRIVATE TEXTSECTION ssize_t CC
+PRIVATE TEXTSECTION NONNULL((1, 3)) ssize_t CC
 libdi_debuginfo_do_print_unknown_data(pformatprinter printer, void *arg,
                                       void const *__restrict data, size_t datasize) {
 	size_t i;
@@ -1987,7 +1986,7 @@ err:
 	return temp;
 }
 
-PRIVATE TEXTSECTION ssize_t CC
+PRIVATE TEXTSECTION NONNULL((1)) ssize_t CC
 print_character(pformatprinter printer, void *arg, uint64_t value) {
 	ssize_t result;
 	if (value <= UINT32_C(0xffffffff) && unicode_isprint((char32_t)value)) {
@@ -2031,7 +2030,7 @@ do_ctrl:
 	return result;
 }
 
-PRIVATE TEXTSECTION ssize_t CC
+PRIVATE TEXTSECTION NONNULL((1, 3, 4, 5)) ssize_t CC
 libdi_debuginfo_do_print_value(pformatprinter printer, void *arg,
                                di_debuginfo_cu_parser_t const *__restrict parser,
                                di_debuginfo_type_t const *__restrict type,
@@ -2599,7 +2598,7 @@ err:
 }
 
 
-INTERN TEXTSECTION ssize_t CC
+INTERN TEXTSECTION NONNULL((1, 3, 4, 6)) ssize_t CC
 libdi_debuginfo_print_value(pformatprinter printer, void *arg,
                             di_debuginfo_cu_parser_t const *__restrict parser,
                             di_debuginfo_type_t const *__restrict type,
@@ -2654,7 +2653,7 @@ err:
 	return temp;
 }
 
-INTERN TEXTSECTION bool CC
+PRIVATE TEXTSECTION NONNULL((1, 2, 4, 6)) bool CC
 libdi_debuginfo_enum_locals_in_cu(di_enum_locals_sections_t const *__restrict sectinfo,
                                   di_debuginfo_cu_parser_t *__restrict self,
                                   uintptr_t module_relative_pc,
@@ -2815,7 +2814,7 @@ err:
 /* Enumerate all local variables visible at a given source location
  * @return: >= 0: The sum of all invocations of `*callback'.
  * @return: <  0: The first negative return value of `*callback'. */
-INTERN TEXTSECTION ssize_t CC
+INTERN TEXTSECTION NONNULL((1, 3)) ssize_t CC
 libdi_debuginfo_enum_locals(di_enum_locals_sections_t const *__restrict sectinfo,
                             uintptr_t module_relative_pc,
                             debuginfo_enum_locals_callback_t callback, void *arg) {

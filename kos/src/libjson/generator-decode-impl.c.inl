@@ -53,13 +53,16 @@ INTDEF char const libjson_empty_string[1];
 
 
 
-INTERN int CC
-FUNC(libjson_decode_INTO)(IF_DECODE(struct json_parser *__restrict parser, )
-                          byte_t **__restrict preader,
-                          void *__restrict dst_base,
-                          void *__restrict dst,
-                          uint8_t type
-                          IF_DECODE(, unsigned int gen_flags)) {
+INTERN
+	IF_DECODE(NONNULL((1, 2, 3, 4)))
+	IF_ZERO  (NONNULL((1, 2, 3)))
+	int
+NOTHROW_NCX(CC FUNC(libjson_decode_INTO))(IF_DECODE(struct json_parser *__restrict parser, )
+                                          byte_t **__restrict preader,
+                                          void *__restrict dst_base,
+                                          void *__restrict dst,
+                                          uint8_t type
+                                          IF_DECODE(, unsigned int gen_flags)) {
 	IF_DECODE(int result;)
 	switch (type) {
 
@@ -280,35 +283,41 @@ done:
 
 
 /* Process until _after_ the correct `JGEN_END' opcode is reached. */
-INTDEF int CC
-FUNC(libjson_decode_OBJECT)(IF_DECODE(struct json_parser *__restrict parser, )
-                            byte_t **__restrict preader,
-                            void *__restrict dst,
-                            unsigned int gen_flags);
+INTDEF
+	IF_DECODE(NONNULL((1, 2)))
+	IF_ZERO  (NONNULL((1)))
+	int
+NOTHROW_NCX(CC FUNC(libjson_decode_OBJECT))(IF_DECODE(struct json_parser *__restrict parser, )
+                                            byte_t **__restrict preader,
+                                            void *__restrict dst,
+                                            unsigned int gen_flags);
 
 /* Process until _after_ the correct `JGEN_END' opcode is reached. */
-INTDEF int CC
-FUNC(libjson_decode_ARRAY)(IF_DECODE(struct json_parser *__restrict parser, )
-                           byte_t **__restrict preader,
-                           void *__restrict dst,
-                           unsigned int gen_flags);
+INTDEF
+	IF_DECODE(NONNULL((1, 2, 3)))
+	IF_ZERO  (NONNULL((1, 2)))
+	int
+NOTHROW_NCX(CC FUNC(libjson_decode_ARRAY))(IF_DECODE(struct json_parser *__restrict parser, )
+                                           byte_t **__restrict preader,
+                                           void *__restrict dst,
+                                           unsigned int gen_flags);
 
 
 #ifndef LIBJSON_DECODE_OBJECT_ZERO_DEFINED
 #define LIBJSON_DECODE_OBJECT_ZERO_DEFINED 1
 #ifdef MODE_DECODE
-INTERN int CC
-libjson_decode_designator_zero(byte_t **__restrict preader,
-                               void *__restrict dst,
-                               unsigned int gen_flags);
-INTDEF int CC
-libjson_decode_OBJECT_zero(byte_t **__restrict preader,
-                           void *__restrict dst,
-                           unsigned int gen_flags);
-INTDEF int CC
-libjson_decode_ARRAY_zero(byte_t **__restrict preader,
-                          void *__restrict dst,
-                          unsigned int gen_flags);
+INTERN NONNULL((1, 2)) int
+NOTHROW_NCX(CC libjson_decode_designator_zero)(byte_t **__restrict preader,
+                                               void *__restrict dst,
+                                               unsigned int gen_flags);
+INTDEF NONNULL((1, 2)) int
+NOTHROW_NCX(CC libjson_decode_OBJECT_zero)(byte_t **__restrict preader,
+                                           void *__restrict dst,
+                                           unsigned int gen_flags);
+INTDEF NONNULL((1, 2)) int
+NOTHROW_NCX(CC libjson_decode_ARRAY_zero)(byte_t **__restrict preader,
+                                          void *__restrict dst,
+                                          unsigned int gen_flags);
 #endif /* MODE_DECODE */
 #endif /* !LIBJSON_DECODE_OBJECT_ZERO_DEFINED */
 
@@ -324,11 +333,14 @@ libjson_decode_ARRAY_zero(byte_t **__restrict preader,
  *   - JGEN_BEGINARRAY
  *   - JGEN_INTO
  */
-INTERN int CC
-FUNC(libjson_decode_designator)(IF_DECODE(struct json_parser *__restrict parser, )
-                                byte_t **__restrict preader,
-                                void *__restrict dst,
-                                unsigned int gen_flags) {
+INTERN
+	IF_DECODE(NONNULL((1, 2, 3)))
+	IF_ZERO  (NONNULL((1, 2)))
+	int
+NOTHROW_NCX(CC FUNC(libjson_decode_designator))(IF_DECODE(struct json_parser *__restrict parser, )
+                                                byte_t **__restrict preader,
+                                                void *__restrict dst,
+                                                unsigned int gen_flags) {
 	int result;
 	byte_t op, *reader = *preader;
 	op = *reader++;
@@ -364,11 +376,14 @@ FUNC(libjson_decode_designator)(IF_DECODE(struct json_parser *__restrict parser,
 
 
 /* Process until _after_ the correct `JGEN_END' opcode is reached. */
-INTDEF int CC
-FUNC(libjson_decode_OBJECT)(IF_DECODE(struct json_parser *__restrict parser, )
-                            byte_t **__restrict preader,
-                            void *__restrict dst,
-                            unsigned int gen_flags) {
+INTERN
+	IF_DECODE(NONNULL((1, 2, 3)))
+	IF_ZERO  (NONNULL((1, 2)))
+	int
+NOTHROW_NCX(CC FUNC(libjson_decode_OBJECT))(IF_DECODE(struct json_parser *__restrict parser, )
+                                            byte_t **__restrict preader,
+                                            void *__restrict dst,
+                                            unsigned int gen_flags) {
 	int result;
 	byte_t op, *reader;
 #ifdef MODE_DECODE
@@ -446,11 +461,14 @@ done:
 
 
 /* Process until _after_ the correct `JGEN_END' opcode is reached. */
-INTDEF int CC
-FUNC(libjson_decode_ARRAY)(IF_DECODE(struct json_parser *__restrict parser, )
-                           byte_t **__restrict preader,
-                           void *__restrict dst,
-                           unsigned int gen_flags) {
+INTERN
+	IF_DECODE(NONNULL((1, 2, 3)))
+	IF_ZERO  (NONNULL((1, 2)))
+	int
+NOTHROW_NCX(CC FUNC(libjson_decode_ARRAY))(IF_DECODE(struct json_parser *__restrict parser, )
+                                           byte_t **__restrict preader,
+                                           void *__restrict dst,
+                                           unsigned int gen_flags) {
 	int result;
 	byte_t op, *reader;
 	IF_DECODE(bool is_first = true;)

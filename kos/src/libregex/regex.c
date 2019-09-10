@@ -55,7 +55,7 @@ struct regex_data {
 
 /* @return: * : New pattern pointer
  * @return: REGEX_ISERROR(*): Error */
-PRIVATE char *CC
+PRIVATE WUNUSED NONNULL((1, 2, 3, 4)) char *CC
 parse_match_count(char *__restrict pattern_iter,
                   char *__restrict pattern_end,
                   struct match_count_struct *__restrict result,
@@ -294,7 +294,7 @@ handle_interval_error:
 /* @return: 0:  Not trait
  * @return: 1:  Is trait
  * @return: <0: Error */
-LOCAL int CC
+LOCAL WUNUSED NONNULL((1)) int CC
 is_character_trait(char **__restrict piter, uint32_t data_ch,
                    bool isngore_casing) {
 	char *iter = *piter;
@@ -404,7 +404,7 @@ unknown:
 /* @return: 0:  Not in range
  * @return: 1:  Is in range
  * @return: <0: Error */
-LOCAL int CC
+LOCAL WUNUSED NONNULL((1, 2, 4)) int CC
 is_in_range(char *range_start, char *range_end,
             uint32_t data_ch, struct regex_data *__restrict data) {
 	int error;
@@ -587,7 +587,7 @@ ok:
 }
 
 
-PRIVATE ATTR_RETNONNULL char *CC
+PRIVATE WUNUSED ATTR_RETNONNULL NONNULL((1, 2)) char *CC
 find_rparen(char *pattern_iter, char *pattern_end) {
 	unsigned int paren_recursion = 0;
 	while (pattern_iter < pattern_end) {
@@ -613,7 +613,7 @@ find_rparen(char *pattern_iter, char *pattern_end) {
 	return pattern_iter;
 }
 
-PRIVATE ATTR_RETNONNULL char *CC
+PRIVATE WUNUSED ATTR_RETNONNULL NONNULL((1, 2)) char *CC
 find_rparen_escaped(char *pattern_iter, char *pattern_end) {
 	unsigned int paren_recursion = 0;
 	while (pattern_iter < pattern_end) {
@@ -642,8 +642,9 @@ find_rparen_escaped(char *pattern_iter, char *pattern_end) {
 
 /* @return: *: A pointer to the pipe-character
  * @return: NULL: No pipe */
-PRIVATE char *CC find_pipe(char *pattern_iter, char *pattern_end,
-                           struct regex_data *__restrict data) {
+PRIVATE WUNUSED NONNULL((1, 2, 3)) char *CC
+find_pipe(char *pattern_iter, char *pattern_end,
+          struct regex_data *__restrict data) {
 	unsigned int paren_recursion = 0;
 	if unlikely((data->flags & (REGEX_FLAG_ESCAPED_PIPE |
 	                            REGEX_FLAG_LIMITED_OPERATORS)) == REGEX_FLAG_LIMITED_OPERATORS)
@@ -692,14 +693,14 @@ handle_pipe:
 #define REGEX_CONTEXT_FEMPTYOK  0x0002 /* Empty matchesare OK */
 #define regex_match(pdata_iter, data_end, ppattern_iter, pattern_end, data) \
 	regex_match_impl(pdata_iter, data_end, ppattern_iter, pattern_end, data, REGEX_CONTEXT_FNORMAL)
-PRIVATE int CC
-regex_match_impl(char **pdata_iter, char *data_end,
-                 char **ppattern_iter, char *pattern_end,
+PRIVATE NONNULL((1, 2, 3, 4, 5)) int CC
+regex_match_impl(char **__restrict pdata_iter, char *data_end,
+                 char **__restrict ppattern_iter, char *pattern_end,
                  struct regex_data *__restrict data,
                  unsigned int context);
 
-PRIVATE int CC
-regex_match_or(char **pdata_iter, char *data_end,
+PRIVATE NONNULL((1, 2, 3, 4, 5)) int CC
+regex_match_or(char **__restrict pdata_iter, char *data_end,
                char *content_start,
                char *content_end,
                struct regex_data *__restrict data,
@@ -722,8 +723,8 @@ regex_match_or(char **pdata_iter, char *data_end,
 
 /* @return: 0:                Success
  * @return: REGEX_ISERROR(*): Error */
-PRIVATE int CC
-parse_u8(char **ppattern_iter, char *pattern_end,
+PRIVATE NONNULL((1, 2, 3)) int CC
+parse_u8(char **__restrict ppattern_iter, char *pattern_end,
          uint8_t *__restrict result) {
 	bool is_first = true;
 	*result       = 0;
@@ -748,7 +749,7 @@ parse_u8(char **ppattern_iter, char *pattern_end,
 
 /* @return: 0:                Success
  * @return: REGEX_ISERROR(*): Error */
-PRIVATE int CC
+PRIVATE NONNULL((1, 2, 3, 4, 5)) int CC
 parse_digit_range(char *pattern_iter, char *pattern_end,
                   uint8_t *__restrict plow,
                   uint8_t *__restrict phigh,
@@ -823,9 +824,9 @@ err:
  * @return:  1:               A match was found (success; `data->matlen' is filled in)
  * @return:  0:               No match was made (failure)
  * @return: REGEX_ISERROR(*): Error. */
-PRIVATE int CC
-regex_match_impl(char **pdata_iter, char *data_end,
-                 char **ppattern_iter, char *pattern_end,
+PRIVATE NONNULL((1, 3, 5)) int CC
+regex_match_impl(char **__restrict pdata_iter, char *data_end,
+                 char **__restrict ppattern_iter, char *pattern_end,
                  struct regex_data *__restrict data,
                  unsigned int context) {
 	char *new_data_iter;
@@ -1713,7 +1714,7 @@ forward_error:
  * @return: * :               Number of characters (not bytes) matched in `data'.
  * @return: 0 :               Pattern not found.
  * @return: REGEX_ISERROR(*): Error. */
-INTERN size_t CC
+INTERN NONNULL((1, 3)) size_t CC
 libregex_matches(/*utf-8*/ char const *__restrict data, size_t datalen,
                  /*utf-8*/ char const *__restrict pattern, size_t patternlen,
                  uintptr_t flags) {
@@ -1746,7 +1747,7 @@ libregex_matches(/*utf-8*/ char const *__restrict data, size_t datalen,
  * @return: * :               Number of characters (not bytes) matched in `data'.
  * @return: 0 :               Pattern not found.
  * @return: REGEX_ISERROR(*): Error. */
-INTERN size_t CC
+INTERN NONNULL((1, 3, 5)) size_t CC
 libregex_matchesptr(/*utf-8*/ char const *__restrict data, size_t datalen,
                     /*utf-8*/ char const *__restrict pattern, size_t patternlen,
                     /*utf-8*/ char const **__restrict pdataend,
@@ -1770,7 +1771,7 @@ libregex_matchesptr(/*utf-8*/ char const *__restrict data, size_t datalen,
 
 
 
-LOCAL bool CC is_regex_special(char ch, uintptr_t flags) {
+LOCAL WUNUSED ATTR_CONST bool CC is_regex_special(char ch, uintptr_t flags) {
 	switch (ch) {
 
 	case '{':
@@ -1822,7 +1823,7 @@ LOCAL bool CC is_regex_special(char ch, uintptr_t flags) {
 	return false;
 }
 
-LOCAL bool CC is_regex_suffix(char ch, uintptr_t flags) {
+LOCAL WUNUSED ATTR_CONST bool CC is_regex_suffix(char ch, uintptr_t flags) {
 	switch (ch) {
 
 	case '{':
@@ -1852,7 +1853,7 @@ LOCAL bool CC is_regex_suffix(char ch, uintptr_t flags) {
  * @return: 1:                Pattern was found.
  * @return: 0:                Pattern not found.
  * @return: REGEX_ISERROR(*): Error. */
-INTERN int CC
+INTERN NONNULL((1, 3, 5)) int CC
 lilbregex_find(/*utf-8*/ char const *__restrict data, size_t datalen,
                /*utf-8*/ char const *__restrict pattern, size_t patternlen,
                struct regex_range *__restrict presult, uintptr_t flags) {
@@ -1924,7 +1925,7 @@ err:
 	return error;
 }
 
-LOCAL size_t CC
+LOCAL WUNUSED NONNULL((1, 2)) size_t CC
 count_utf8_characters(char *start,
                       char *end) {
 	size_t result = 0;
@@ -1935,7 +1936,7 @@ count_utf8_characters(char *start,
 	return result;
 }
 
-INTERN int CC
+INTERN NONNULL((1, 3, 5)) int CC
 libregex_rfind(/*utf-8*/ char const *__restrict data, size_t datalen,
                /*utf-8*/ char const *__restrict pattern, size_t patternlen,
                struct regex_range *__restrict presult, uintptr_t flags) {
@@ -2008,7 +2009,7 @@ err:
 }
 
 /* Same as the functions above, but return both character indices _and_ pointers. */
-INTERN int CC
+INTERN NONNULL((1, 3, 5)) int CC
 libregex_findex(/*utf-8*/ char const *__restrict data, size_t datalen,
                 /*utf-8*/ char const *__restrict pattern, size_t patternlen,
                 struct regex_range_ex *__restrict presult, uintptr_t flags) {
@@ -2087,7 +2088,7 @@ err:
 	return error;
 }
 
-INTERN int CC
+INTERN NONNULL((1, 3, 5)) int CC
 libregex_rfindex(/*utf-8*/ char const *__restrict data, size_t datalen,
                  /*utf-8*/ char const *__restrict pattern, size_t patternlen,
                  struct regex_range_ex *__restrict presult, uintptr_t flags) {
@@ -2164,7 +2165,7 @@ err:
 	return error;
 }
 
-INTERN int CC
+INTERN NONNULL((1, 3, 5)) int CC
 libregex_findptr(/*utf-8*/ char const *__restrict data, size_t datalen,
                  /*utf-8*/ char const *__restrict pattern, size_t patternlen,
                  struct regex_range_ptr *__restrict presult, uintptr_t flags) {
@@ -2236,7 +2237,7 @@ err:
 	return error;
 }
 
-INTERN int CC
+INTERN NONNULL((1, 3, 5)) int CC
 libregex_rfindptr(/*utf-8*/ char const *__restrict data, size_t datalen,
                   /*utf-8*/ char const *__restrict pattern, size_t patternlen,
                   struct regex_range_ptr *__restrict presult, uintptr_t flags) {

@@ -45,33 +45,33 @@ __LOCAL __ATTR_CONST __uint16_t LIBVM86_CC f_addl(__uint32_t x, __uint32_t y);
 __LOCAL __ATTR_CONST __uint16_t LIBVM86_CC f_cmpb(__uint8_t x, __uint8_t y);
 __LOCAL __ATTR_CONST __uint16_t LIBVM86_CC f_cmpw(__uint16_t x, __uint16_t y);
 __LOCAL __ATTR_CONST __uint16_t LIBVM86_CC f_cmpl(__uint32_t x, __uint32_t y);
-__LOCAL __uint8_t LIBVM86_CC f_adcb(__uint8_t  x, __uint8_t y, /*in|out*/__uint16_t *__restrict pflags);
-__LOCAL __uint16_t LIBVM86_CC f_adcw(__uint16_t x, __uint16_t y, /*in|out*/__uint16_t *__restrict pflags);
-__LOCAL __uint32_t LIBVM86_CC f_adcl(__uint32_t x, __uint32_t y, /*in|out*/__uint16_t *__restrict pflags);
-__LOCAL __uint8_t LIBVM86_CC f_sbbb(__uint8_t  x, __uint8_t y, /*in|out*/__uint16_t *__restrict pflags);
-__LOCAL __uint16_t LIBVM86_CC f_sbbw(__uint16_t x, __uint16_t y, /*in|out*/__uint16_t *__restrict pflags);
-__LOCAL __uint32_t LIBVM86_CC f_sbbl(__uint32_t x, __uint32_t y, /*in|out*/__uint16_t *__restrict pflags);
-__LOCAL __uint8_t LIBVM86_CC f_rclb(__uint8_t  x, __uint8_t y, /*in|out*/__uint16_t *__restrict pflags);
-__LOCAL __uint16_t LIBVM86_CC f_rclw(__uint16_t x, __uint16_t y, /*in|out*/__uint16_t *__restrict pflags);
-__LOCAL __uint32_t LIBVM86_CC f_rcll(__uint32_t x, __uint32_t y, /*in|out*/__uint16_t *__restrict pflags);
-__LOCAL __uint8_t LIBVM86_CC f_rcrb(__uint8_t  x, __uint8_t y, /*in|out*/__uint16_t *__restrict pflags);
-__LOCAL __uint16_t LIBVM86_CC f_rcrw(__uint16_t x, __uint16_t y, /*in|out*/__uint16_t *__restrict pflags);
-__LOCAL __uint32_t LIBVM86_CC f_rcrl(__uint32_t x, __uint32_t y, /*in|out*/__uint16_t *__restrict pflags);
-__LOCAL __uint8_t LIBVM86_CC f_rolb(__uint8_t  x, __uint8_t y, /*in|out*/__uint16_t *__restrict pflags);
-__LOCAL __uint16_t LIBVM86_CC f_rolw(__uint16_t x, __uint16_t y, /*in|out*/__uint16_t *__restrict pflags);
-__LOCAL __uint32_t LIBVM86_CC f_roll(__uint32_t x, __uint32_t y, /*in|out*/__uint16_t *__restrict pflags);
-__LOCAL __uint8_t LIBVM86_CC f_rorb(__uint8_t  x, __uint8_t y, /*in|out*/__uint16_t *__restrict pflags);
-__LOCAL __uint16_t LIBVM86_CC f_rorw(__uint16_t x, __uint16_t y, /*in|out*/__uint16_t *__restrict pflags);
-__LOCAL __uint32_t LIBVM86_CC f_rorl(__uint32_t x, __uint32_t y, /*in|out*/__uint16_t *__restrict pflags);
-__LOCAL __uint8_t LIBVM86_CC f_shlb(__uint8_t  x, __uint8_t y, /*in|out*/__uint16_t *__restrict pflags);
-__LOCAL __uint16_t LIBVM86_CC f_shlw(__uint16_t x, __uint16_t y, /*in|out*/__uint16_t *__restrict pflags);
-__LOCAL __uint32_t LIBVM86_CC f_shll(__uint32_t x, __uint32_t y, /*in|out*/__uint16_t *__restrict pflags);
-__LOCAL __uint8_t LIBVM86_CC f_shrb(__uint8_t  x, __uint8_t y, /*in|out*/__uint16_t *__restrict pflags);
-__LOCAL __uint16_t LIBVM86_CC f_shrw(__uint16_t x, __uint16_t y, /*in|out*/__uint16_t *__restrict pflags);
-__LOCAL __uint32_t LIBVM86_CC f_shrl(__uint32_t x, __uint32_t y, /*in|out*/__uint16_t *__restrict pflags);
-__LOCAL __uint8_t LIBVM86_CC f_sarb(__uint8_t  x, __uint8_t y, /*in|out*/__uint16_t *__restrict pflags);
-__LOCAL __uint16_t LIBVM86_CC f_sarw(__uint16_t x, __uint16_t y, /*in|out*/__uint16_t *__restrict pflags);
-__LOCAL __uint32_t LIBVM86_CC f_sarl(__uint32_t x, __uint32_t y, /*in|out*/__uint16_t *__restrict pflags);
+__LOCAL __ATTR_NONNULL((3)) __uint8_t LIBVM86_CC f_adcb(__uint8_t  x, __uint8_t y, /*in|out*/__uint16_t *__restrict pflags);
+__LOCAL __ATTR_NONNULL((3)) __uint16_t LIBVM86_CC f_adcw(__uint16_t x, __uint16_t y, /*in|out*/__uint16_t *__restrict pflags);
+__LOCAL __ATTR_NONNULL((3)) __uint32_t LIBVM86_CC f_adcl(__uint32_t x, __uint32_t y, /*in|out*/__uint16_t *__restrict pflags);
+__LOCAL __ATTR_NONNULL((3)) __uint8_t LIBVM86_CC f_sbbb(__uint8_t  x, __uint8_t y, /*in|out*/__uint16_t *__restrict pflags);
+__LOCAL __ATTR_NONNULL((3)) __uint16_t LIBVM86_CC f_sbbw(__uint16_t x, __uint16_t y, /*in|out*/__uint16_t *__restrict pflags);
+__LOCAL __ATTR_NONNULL((3)) __uint32_t LIBVM86_CC f_sbbl(__uint32_t x, __uint32_t y, /*in|out*/__uint16_t *__restrict pflags);
+__LOCAL __ATTR_NONNULL((3)) __uint8_t LIBVM86_CC f_rclb(__uint8_t  x, __uint8_t y, /*in|out*/__uint16_t *__restrict pflags);
+__LOCAL __ATTR_NONNULL((3)) __uint16_t LIBVM86_CC f_rclw(__uint16_t x, __uint16_t y, /*in|out*/__uint16_t *__restrict pflags);
+__LOCAL __ATTR_NONNULL((3)) __uint32_t LIBVM86_CC f_rcll(__uint32_t x, __uint32_t y, /*in|out*/__uint16_t *__restrict pflags);
+__LOCAL __ATTR_NONNULL((3)) __uint8_t LIBVM86_CC f_rcrb(__uint8_t  x, __uint8_t y, /*in|out*/__uint16_t *__restrict pflags);
+__LOCAL __ATTR_NONNULL((3)) __uint16_t LIBVM86_CC f_rcrw(__uint16_t x, __uint16_t y, /*in|out*/__uint16_t *__restrict pflags);
+__LOCAL __ATTR_NONNULL((3)) __uint32_t LIBVM86_CC f_rcrl(__uint32_t x, __uint32_t y, /*in|out*/__uint16_t *__restrict pflags);
+__LOCAL __ATTR_NONNULL((3)) __uint8_t LIBVM86_CC f_rolb(__uint8_t  x, __uint8_t y, /*in|out*/__uint16_t *__restrict pflags);
+__LOCAL __ATTR_NONNULL((3)) __uint16_t LIBVM86_CC f_rolw(__uint16_t x, __uint16_t y, /*in|out*/__uint16_t *__restrict pflags);
+__LOCAL __ATTR_NONNULL((3)) __uint32_t LIBVM86_CC f_roll(__uint32_t x, __uint32_t y, /*in|out*/__uint16_t *__restrict pflags);
+__LOCAL __ATTR_NONNULL((3)) __uint8_t LIBVM86_CC f_rorb(__uint8_t  x, __uint8_t y, /*in|out*/__uint16_t *__restrict pflags);
+__LOCAL __ATTR_NONNULL((3)) __uint16_t LIBVM86_CC f_rorw(__uint16_t x, __uint16_t y, /*in|out*/__uint16_t *__restrict pflags);
+__LOCAL __ATTR_NONNULL((3)) __uint32_t LIBVM86_CC f_rorl(__uint32_t x, __uint32_t y, /*in|out*/__uint16_t *__restrict pflags);
+__LOCAL __ATTR_NONNULL((3)) __uint8_t LIBVM86_CC f_shlb(__uint8_t  x, __uint8_t y, /*in|out*/__uint16_t *__restrict pflags);
+__LOCAL __ATTR_NONNULL((3)) __uint16_t LIBVM86_CC f_shlw(__uint16_t x, __uint16_t y, /*in|out*/__uint16_t *__restrict pflags);
+__LOCAL __ATTR_NONNULL((3)) __uint32_t LIBVM86_CC f_shll(__uint32_t x, __uint32_t y, /*in|out*/__uint16_t *__restrict pflags);
+__LOCAL __ATTR_NONNULL((3)) __uint8_t LIBVM86_CC f_shrb(__uint8_t  x, __uint8_t y, /*in|out*/__uint16_t *__restrict pflags);
+__LOCAL __ATTR_NONNULL((3)) __uint16_t LIBVM86_CC f_shrw(__uint16_t x, __uint16_t y, /*in|out*/__uint16_t *__restrict pflags);
+__LOCAL __ATTR_NONNULL((3)) __uint32_t LIBVM86_CC f_shrl(__uint32_t x, __uint32_t y, /*in|out*/__uint16_t *__restrict pflags);
+__LOCAL __ATTR_NONNULL((3)) __uint8_t LIBVM86_CC f_sarb(__uint8_t  x, __uint8_t y, /*in|out*/__uint16_t *__restrict pflags);
+__LOCAL __ATTR_NONNULL((3)) __uint16_t LIBVM86_CC f_sarw(__uint16_t x, __uint16_t y, /*in|out*/__uint16_t *__restrict pflags);
+__LOCAL __ATTR_NONNULL((3)) __uint32_t LIBVM86_CC f_sarl(__uint32_t x, __uint32_t y, /*in|out*/__uint16_t *__restrict pflags);
 #elif (defined(__i386__) || defined(__x86_64__)) && 1
 #define f_testb(x)   ((__uint16_t)__testb(x, x))
 #define f_testw(x)   ((__uint16_t)__testw(x, x))
@@ -83,8 +83,8 @@ __LOCAL __uint32_t LIBVM86_CC f_sarl(__uint32_t x, __uint32_t y, /*in|out*/__uin
 #define f_cmpw(x, y) ((__uint16_t)__cmpw(x, y))
 #define f_cmpl(x, y) ((__uint16_t)__cmpl(x, y))
 
-#define LIBVM86_DEFINE_FLAG_PROXY(T, name, cc_mask) \
-	__LOCAL T LIBVM86_CC                                \
+#define LIBVM86_DEFINE_FLAG_PROXY(T, name, cc_mask)     \
+	__LOCAL __ATTR_NONNULL((3)) T LIBVM86_CC            \
 	f_##name(T x, T y, __uint16_t *__restrict pflags) { \
 		T result;                                       \
 		__REGISTER_TYPE__ real_flags;                   \
@@ -95,8 +95,8 @@ __LOCAL __uint32_t LIBVM86_CC f_sarl(__uint32_t x, __uint32_t y, /*in|out*/__uin
 		*pflags |= real_flags & (cc_mask);              \
 		return result;                                  \
 	}
-#define LIBVM86_DEFINE_FLAG_PROXY_ROT(T, name, cc_mask) \
-	__LOCAL T LIBVM86_CC                                               \
+#define LIBVM86_DEFINE_FLAG_PROXY_ROT(T, name, cc_mask)                \
+	__LOCAL __ATTR_NONNULL((3)) T LIBVM86_CC                           \
 	f_##name(T x, unsigned int shift, __uint16_t *__restrict pflags) { \
 		T result;                                                      \
 		__REGISTER_TYPE__ real_flags;                                  \
@@ -109,8 +109,8 @@ __LOCAL __uint32_t LIBVM86_CC f_sarl(__uint32_t x, __uint32_t y, /*in|out*/__uin
 		*pflags |= real_flags & (cc_mask);                             \
 		return result;                                                 \
 	}
-#define LIBVM86_DEFINE_FLAG_PROXY_ROT_F(T, name, cc_mask) \
-	__LOCAL T LIBVM86_CC                                               \
+#define LIBVM86_DEFINE_FLAG_PROXY_ROT_F(T, name, cc_mask)              \
+	__LOCAL __ATTR_NONNULL((3)) T LIBVM86_CC                           \
 	f_##name(T x, unsigned int shift, __uint16_t *__restrict pflags) { \
 		T result;                                                      \
 		__REGISTER_TYPE__ real_flags;                                  \
@@ -154,6 +154,7 @@ LIBVM86_DEFINE_FLAG_PROXY_ROT_F(__uint32_t,sarl,EFLAGS_OF|EFLAGS_CF|EFLAGS_SF|EF
 #undef LIBVM86_DEFINE_FLAG_PROXY
 
 #else
+
 __LOCAL __ATTR_CONST __uint16_t LIBVM86_CC f_testb(__uint8_t value) {
 	__uint16_t result = 0;
 	if (!value)
@@ -166,6 +167,7 @@ __LOCAL __ATTR_CONST __uint16_t LIBVM86_CC f_testb(__uint8_t value) {
 	}
 	return result;
 }
+
 __LOCAL __ATTR_CONST __uint16_t LIBVM86_CC f_testw(__uint16_t value) {
 	__uint16_t result = 0;
 	if (!value)
@@ -178,6 +180,7 @@ __LOCAL __ATTR_CONST __uint16_t LIBVM86_CC f_testw(__uint16_t value) {
 	}
 	return result;
 }
+
 __LOCAL __ATTR_CONST __uint16_t LIBVM86_CC f_testl(__uint32_t value) {
 	__uint16_t result = 0;
 	if (!value)
@@ -190,6 +193,7 @@ __LOCAL __ATTR_CONST __uint16_t LIBVM86_CC f_testl(__uint32_t value) {
 	}
 	return result;
 }
+
 #error "Generic version is not fully implemented (also: why do you need vm86 on this arch?)"
 //__LOCAL __ATTR_CONST __uint16_t LIBVM86_CC f_addb(__uint8_t x, __uint8_t y);
 //__LOCAL __ATTR_CONST __uint16_t LIBVM86_CC f_addw(__uint16_t x, __uint16_t y);

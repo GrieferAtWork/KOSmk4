@@ -35,13 +35,13 @@ __DECL_BEGIN
  * @return: NULL: All defined symbols have an address > module_relative_pc
  * @return: NULL: The given symbol table is empty, too small, or corrupted.
  * @return: NULL: The given `symtab_entsize' is neither `sizeof(Elf32_Sym)', nor `sizeof(Elf64_Sym)' */
-typedef __ATTR_WUNUSED __byte_t *
+typedef __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __byte_t *
 (LIBDEBUGINFO_CC *PSYMTAB_SCANTABLE)(__byte_t *__restrict symtab_start,
                                      __byte_t *__restrict symtab_end,
                                      __size_t symtab_entsize,
                                      __uintptr_t module_relative_pc);
 #ifdef LIBDEBUGINFO_WANT_PROTOTYPES
-LIBDEBUGINFO_DECL __ATTR_WUNUSED __byte_t *
+LIBDEBUGINFO_DECL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __byte_t *
 __NOTHROW_NCX(LIBDEBUGINFO_CC symtab_scantable)(__byte_t *__restrict symtab_start,
                                                 __byte_t *__restrict symtab_end,
                                                 __size_t symtab_entsize,

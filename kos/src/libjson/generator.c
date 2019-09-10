@@ -44,7 +44,7 @@ DECL_BEGIN
 #define CONFIG_JSON_GENERATOR_PRINTS_WARNINGS 1
 
 
-#define DO(x) \
+#define DO(x)                           \
 	do {                                \
 		if unlikely((result = (x)) < 0) \
 			goto done;                  \
@@ -54,7 +54,7 @@ DECL_BEGIN
 
 #ifdef CONFIG_JSON_GENERATOR_PRINTS_WARNINGS
 #define MESSAGE(...) libjson_output_message(writer, __VA_ARGS__)
-INTERN int CC
+INTERN NONNULL((1, 2)) int CC
 libjson_output_message(struct json_writer *__restrict writer,
                        char const *__restrict format, ...) {
 	ssize_t temp;
@@ -90,7 +90,7 @@ err_printer:
 #define GENFLAG_OPTIONAL 0x0001
 
 
-INTERN int CC
+INTERN NONNULL((1, 2, 3, 4)) int CC
 libjson_encode_INTO(struct json_writer *__restrict writer,
                     byte_t **__restrict preader,
                     void const *__restrict src_base,
@@ -110,24 +110,31 @@ libjson_encode_INTO(struct json_writer *__restrict writer,
 	case JSON_TYPE_INT8:
 		result = libjson_writer_putnumber(writer, *(int8_t *)src);
 		break;
+
 	case JSON_TYPE_INT16:
 		result = libjson_writer_putnumber(writer, (int16_t)UNALIGNED_GET16((uint16_t *)src));
 		break;
+
 	case JSON_TYPE_INT32:
 		result = libjson_writer_putnumber(writer, (int32_t)UNALIGNED_GET32((uint32_t *)src));
 		break;
+
 	case JSON_TYPE_INT64:
 		result = libjson_writer_putint64(writer, (int64_t)UNALIGNED_GET64((uint64_t *)src));
 		break;
+
 	case JSON_TYPE_UINT8:
 		result = libjson_writer_putnumber(writer, (intptr_t)(uintptr_t)*(uint8_t *)src);
 		break;
+
 	case JSON_TYPE_UINT16:
 		result = libjson_writer_putnumber(writer, (intptr_t)(uintptr_t)UNALIGNED_GET16((uint16_t *)src));
 		break;
+
 	case JSON_TYPE_UINT32:
 		result = libjson_writer_putuint64(writer, UNALIGNED_GET32((uint32_t *)src));
 		break;
+
 	case JSON_TYPE_UINT64:
 		result = libjson_writer_putuint64(writer, UNALIGNED_GET64((uint64_t *)src));
 		break;
@@ -194,14 +201,14 @@ libjson_encode_INTO(struct json_writer *__restrict writer,
 
 
 /* Process until _after_ the correct `JGEN_END' opcode is reached. */
-INTDEF int CC
+INTDEF NONNULL((1, 2, 3)) int CC
 libjson_encode_OBJECT(struct json_writer *__restrict writer,
                       byte_t **__restrict preader,
                       void const *__restrict src,
                       unsigned int gen_flags);
 
 /* Process until _after_ the correct `JGEN_END' opcode is reached. */
-INTDEF int CC
+INTDEF NONNULL((1, 2, 3)) int CC
 libjson_encode_ARRAY(struct json_writer *__restrict writer,
                      byte_t **__restrict preader,
                      void const *__restrict src,
@@ -217,7 +224,7 @@ libjson_encode_ARRAY(struct json_writer *__restrict writer,
  *   - JGEN_BEGINARRAY
  *   - JGEN_INTO
  */
-INTERN int CC
+INTERN NONNULL((1, 2, 3)) int CC
 libjson_encode_designator(struct json_writer *__restrict writer,
                           byte_t **__restrict preader,
                           void const *__restrict src,
@@ -256,7 +263,7 @@ libjson_encode_designator(struct json_writer *__restrict writer,
 }
 
 
-INTERN int CC
+INTERN NONNULL((1, 2, 3)) int CC
 libjson_encode_OBJECT(struct json_writer *__restrict writer,
                       byte_t **__restrict preader,
                       void const *__restrict src,
@@ -307,7 +314,7 @@ done:
 }
 
 
-INTERN int CC
+INTERN NONNULL((1, 2, 3)) int CC
 libjson_encode_ARRAY(struct json_writer *__restrict writer,
                      byte_t **__restrict preader,
                      void const *__restrict src,
@@ -381,7 +388,7 @@ done:
  * @return: -1: Error: `writer->jw_result' has a negative value when the function was called.
  * @return: -1: Error: An invocation of the `writer->jw_printer' returned a negative value.
  * @return: -2: Error: Invalid usage during this, or during an earlier call. */
-INTERN int CC
+INTERN NONNULL((1, 2, 3)) int CC
 libjson_encode(struct json_writer *__restrict writer,
                void const *__restrict codec,
                void const *__restrict src) {
@@ -459,27 +466,27 @@ DECL_BEGIN
 
 
 
-INTDEF int CC
-libjson_decode_INTO(struct json_parser *__restrict parser,
-                    byte_t **__restrict preader,
-                    void *__restrict dst_base,
-                    void *__restrict dst,
-                    uint8_t type,
-                    unsigned int gen_flags);
+INTDEF NONNULL((1, 2, 3, 4)) int
+NOTHROW_NCX(CC libjson_decode_INTO)(struct json_parser *__restrict parser,
+                                    byte_t **__restrict preader,
+                                    void *__restrict dst_base,
+                                    void *__restrict dst,
+                                    uint8_t type,
+                                    unsigned int gen_flags);
 
 /* Process until _after_ the correct `JGEN_END' opcode is reached. */
-INTDEF int CC
-libjson_decode_OBJECT(struct json_parser *__restrict parser,
-                      byte_t **__restrict preader,
-                      void *__restrict dst,
-                      unsigned int gen_flags);
+INTDEF NONNULL((1, 2, 3)) int
+NOTHROW_NCX(CC libjson_decode_OBJECT)(struct json_parser *__restrict parser,
+                                      byte_t **__restrict preader,
+                                      void *__restrict dst,
+                                      unsigned int gen_flags);
 
 /* Process until _after_ the correct `JGEN_END' opcode is reached. */
-INTDEF int CC
-libjson_decode_ARRAY(struct json_parser *__restrict parser,
-                     byte_t **__restrict preader,
-                     void *__restrict dst,
-                     unsigned int gen_flags);
+INTDEF NONNULL((1, 2, 3)) int
+NOTHROW_NCX(CC libjson_decode_ARRAY)(struct json_parser *__restrict parser,
+                                     byte_t **__restrict preader,
+                                     void *__restrict dst,
+                                     unsigned int gen_flags);
 
 
 
@@ -489,10 +496,10 @@ libjson_decode_ARRAY(struct json_parser *__restrict parser,
  * @return: JSON_ERROR_SYNTAX: Syntax error.
  * @return: JSON_ERROR_NOOBJ:  A required field doesn't exist or has wrong typing.
  * @return: JSON_ERROR_SYSERR: Malformed codec. */
-INTERN int CC
-libjson_decode(struct json_parser *__restrict parser,
-               void const *__restrict codec,
-               void *__restrict dst) {
+INTERN NONNULL((1, 2, 3)) int
+NOTHROW_NCX(CC libjson_decode)(struct json_parser *__restrict parser,
+                               void const *__restrict codec,
+                               void *__restrict dst) {
 	int result;
 	byte_t op, *reader = (byte_t *)codec;
 	unsigned int gen_flags = GENFLAG_NORMAL;

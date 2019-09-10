@@ -33,19 +33,19 @@
 DECL_BEGIN
 
 /* Dump the contents of the given cpu-state / context. */
-INTDEF ssize_t CC libregdump_ucpustate(struct regdump_printer *__restrict self, struct ucpustate const *__restrict data);
-INTDEF ssize_t CC libregdump_lcpustate(struct regdump_printer *__restrict self, struct lcpustate const *__restrict data);
-INTDEF ssize_t CC libregdump_kcpustate(struct regdump_printer *__restrict self, struct kcpustate const *__restrict data);
-INTDEF ssize_t CC libregdump_fcpustate(struct regdump_printer *__restrict self, struct fcpustate const *__restrict data);
+INTDEF NONNULL((1, 2)) ssize_t CC libregdump_ucpustate(struct regdump_printer *__restrict self, struct ucpustate const *__restrict data);
+INTDEF NONNULL((1, 2)) ssize_t CC libregdump_lcpustate(struct regdump_printer *__restrict self, struct lcpustate const *__restrict data);
+INTDEF NONNULL((1, 2)) ssize_t CC libregdump_kcpustate(struct regdump_printer *__restrict self, struct kcpustate const *__restrict data);
+INTDEF NONNULL((1, 2)) ssize_t CC libregdump_fcpustate(struct regdump_printer *__restrict self, struct fcpustate const *__restrict data);
 
 #ifdef __KERNEL__
-INTDEF ssize_t CC libregdump_icpustate(struct regdump_printer *__restrict self, struct icpustate const *__restrict data);
-INTDEF ssize_t CC libregdump_scpustate(struct regdump_printer *__restrict self, struct scpustate const *__restrict data);
+INTDEF NONNULL((1, 2)) ssize_t CC libregdump_icpustate(struct regdump_printer *__restrict self, struct icpustate const *__restrict data);
+INTDEF NONNULL((1, 2)) ssize_t CC libregdump_scpustate(struct regdump_printer *__restrict self, struct scpustate const *__restrict data);
 #endif /* __KERNEL__ */
 
 #ifndef __KERNEL__
-INTDEF ssize_t CC libregdump_ucontext(struct regdump_printer *__restrict self, struct ucontext const *__restrict data);
-INTDEF ssize_t CC libregdump_mcontext(struct regdump_printer *__restrict self, struct mcontext const *__restrict data);
+INTDEF NONNULL((1, 2)) ssize_t CC libregdump_ucontext(struct regdump_printer *__restrict self, struct ucontext const *__restrict data);
+INTDEF NONNULL((1, 2)) ssize_t CC libregdump_mcontext(struct regdump_printer *__restrict self, struct mcontext const *__restrict data);
 #endif /* !__KERNEL__ */
 
 DECL_END

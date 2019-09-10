@@ -109,7 +109,7 @@ libda_disasm_instrlen(struct disassembler *__restrict self);
 INTDEF ATTR_CONST uintptr_half_t CC
 libda_disasm_default_maxbytes(uintptr_half_t target DFL(DISASSEMBLER_TARGET_CURRENT));
 
-INTDEF void CC libda_single_generic(struct disassembler *__restrict self);
+INTDEF NONNULL((1)) void CC libda_single_generic(struct disassembler *__restrict self);
 
 
 DECL_END

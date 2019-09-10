@@ -75,7 +75,7 @@ err:               \
 
 
 /* Dump the contents of the given cpu-state / context. */
-INTERN ssize_t CC
+INTERN NONNULL((1, 2)) ssize_t CC
 libregdump_ucpustate(struct regdump_printer *__restrict self,
                      struct ucpustate const *__restrict data) {
 	BEGIN;
@@ -88,7 +88,7 @@ libregdump_ucpustate(struct regdump_printer *__restrict self,
 	END;
 }
 
-INTERN ssize_t CC
+INTERN NONNULL((1, 2)) ssize_t CC
 libregdump_lcpustate(struct regdump_printer *__restrict self,
                      struct lcpustate const *__restrict data) {
 	BEGIN;
@@ -127,7 +127,7 @@ libregdump_lcpustate(struct regdump_printer *__restrict self,
 	END;
 }
 
-INTERN ssize_t CC
+INTERN NONNULL((1, 2)) ssize_t CC
 libregdump_kcpustate(struct regdump_printer *__restrict self,
                      struct kcpustate const *__restrict data) {
 	BEGIN;
@@ -141,7 +141,7 @@ libregdump_kcpustate(struct regdump_printer *__restrict self,
 }
 
 #if defined(__KERNEL__) || defined(__INTELLISENSE__)
-INTERN ssize_t CC
+INTERN NONNULL((1, 2)) ssize_t CC
 libregdump_icpustate(struct regdump_printer *__restrict self,
                      struct icpustate const *__restrict data) {
 	struct sgregs sg;
@@ -198,7 +198,7 @@ libregdump_icpustate(struct regdump_printer *__restrict self,
 	END;
 }
 
-INTERN ssize_t CC
+INTERN NONNULL((1, 2)) ssize_t CC
 libregdump_scpustate(struct regdump_printer *__restrict self,
                      struct scpustate const *__restrict data) {
 #ifndef __x86_64__
@@ -232,7 +232,7 @@ libregdump_scpustate(struct regdump_printer *__restrict self,
 }
 #endif /* __KERNEL__ */
 
-INTERN ssize_t CC
+INTERN NONNULL((1, 2)) ssize_t CC
 libregdump_fcpustate(struct regdump_printer *__restrict self,
                      struct fcpustate const *__restrict data) {
 	struct sgregs sg;
@@ -264,7 +264,7 @@ libregdump_fcpustate(struct regdump_printer *__restrict self,
 }
 
 #ifndef __KERNEL__
-INTERN ssize_t CC
+INTERN NONNULL((1, 2)) ssize_t CC
 libregdump_ucontext(struct regdump_printer *__restrict self,
                     struct ucontext const *__restrict data) {
 	/* XXX: Dump the sigmask? */
@@ -272,7 +272,7 @@ libregdump_ucontext(struct regdump_printer *__restrict self,
 	return libregdump_mcontext(self, &data->uc_mcontext);
 }
 
-INTERN ssize_t CC
+INTERN NONNULL((1, 2)) ssize_t CC
 libregdump_mcontext(struct regdump_printer *__restrict self,
                     struct mcontext const *__restrict data) {
 	/* XXX: Dump the FPU state? */

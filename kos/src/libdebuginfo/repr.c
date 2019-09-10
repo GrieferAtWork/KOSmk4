@@ -574,8 +574,7 @@ INTDEF char const unknown_string[];
  * >>   struct dl_section *debug_abbrev = dllocksection(dlgetmodule("c"), ".debug_abbrev");
  * >>   struct dl_section *debug_str    = dllocksection(dlgetmodule("c"), ".debug_str");
  * >>   struct dl_section *debug_loc    = dllocksection(dlgetmodule("c"), ".debug_loc");
- * >>   debug_repr_dump(&file_printer,
- * >>                    stdout,
+ * >>   debug_repr_dump(&file_printer, stdout,
  * >>                   (byte_t *)(debug_info ? debug_info->ds_data : NULL),
  * >>                   (byte_t *)(debug_info ? debug_info->ds_data + debug_info->ds_size : 0),
  * >>                   (byte_t *)(debug_abbrev ? debug_abbrev->ds_data : NULL),
@@ -586,7 +585,7 @@ INTDEF char const unknown_string[];
  * >>                   (byte_t *)(debug_loc ? debug_loc->ds_data + debug_loc->ds_size : 0));
  * >>  }
 */
-INTERN REPR_TEXTSECTION ssize_t CC
+INTERN REPR_TEXTSECTION NONNULL((1)) ssize_t CC
 libdi_debug_repr_dump(pformatprinter printer, void *arg,
                       byte_t *debug_info_start, byte_t *debug_info_end,
                       byte_t *debug_abbrev_start, byte_t *debug_abbrev_end,
@@ -603,7 +602,7 @@ libdi_debug_repr_dump(pformatprinter printer, void *arg,
 	cu_sections.cps_debug_loc_end      = debug_loc_end;
 	cu_sections.cps_debug_str_start    = debug_str_start;
 	cu_sections.cps_debug_str_end      = debug_str_end;
-#define DO(expr) \
+#define DO(expr)                         \
 	do {                                 \
 		if unlikely((temp = (expr)) < 0) \
 			goto err;                    \

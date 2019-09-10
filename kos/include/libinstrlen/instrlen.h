@@ -37,7 +37,7 @@ __DECL_BEGIN
  * @return: 0 : The pointed-to instruction wasn't recognized. */
 typedef /*__ATTR_PURE*/ __ATTR_WUNUSED __size_t (LIBINSTRLEN_CC *PINSTRUCTION_LENGTH)(void const *pc);
 #ifdef LIBINSTRLEN_WANT_PROTOTYPES
-LIBINSTRLEN_DECL __ATTR_PURE __ATTR_WUNUSED __size_t (LIBINSTRLEN_CC instruction_length)(void const *pc);
+LIBINSTRLEN_DECL __ATTR_PURE __ATTR_WUNUSED __size_t __NOTHROW_NCX(LIBINSTRLEN_CC instruction_length)(void const *pc);
 #endif /* LIBINSTRLEN_WANT_PROTOTYPES */
 
 /* Return a pointer to the successor/predecessor instruction of `pc',
@@ -47,8 +47,8 @@ LIBINSTRLEN_DECL __ATTR_PURE __ATTR_WUNUSED __size_t (LIBINSTRLEN_CC instruction
 typedef /*__ATTR_PURE*/ __ATTR_WUNUSED void const *(LIBINSTRLEN_CC *PINSTRUCTION_SUCC)(void const *pc);
 typedef /*__ATTR_PURE*/ __ATTR_WUNUSED void const *(LIBINSTRLEN_CC *PINSTRUCTION_PRED)(void const *pc);
 #ifdef LIBINSTRLEN_WANT_PROTOTYPES
-LIBINSTRLEN_DECL __ATTR_PURE __ATTR_WUNUSED void const *(LIBINSTRLEN_CC instruction_succ)(void const *pc);
-LIBINSTRLEN_DECL __ATTR_PURE __ATTR_WUNUSED void const *(LIBINSTRLEN_CC instruction_pred)(void const *pc);
+LIBINSTRLEN_DECL __ATTR_PURE __ATTR_WUNUSED void const *__NOTHROW_NCX(LIBINSTRLEN_CC instruction_succ)(void const *pc);
+LIBINSTRLEN_DECL __ATTR_PURE __ATTR_WUNUSED void const *__NOTHROW_NCX(LIBINSTRLEN_CC instruction_pred)(void const *pc);
 #endif /* LIBINSTRLEN_WANT_PROTOTYPES */
 
 /* Same as above, but return pc +/- 1, and discard a SEGFAULT and restore any old

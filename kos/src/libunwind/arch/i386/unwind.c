@@ -38,18 +38,18 @@
 #include <kos/types.h>
 #include <sys/ucontext.h>
 
-#include <libunwind/cfi.h>
-#include <libunwind/unwind.h>
-
 #include <stdbool.h>
 #include <stddef.h>
 #include <string.h>
+
+#include <libunwind/cfi.h>
+#include <libunwind/unwind.h>
 
 #include "../../api.h"
 
 #ifdef __KERNEL__
 #include <kernel/paging.h>
-#endif
+#endif /* __KERNEL__ */
 
 
 DECL_BEGIN
@@ -67,23 +67,23 @@ struct mcontext;
 #endif /* !__KERNEL__ */
 
 /* Register accessor callbacks for a variety of known cpu context structures. */
-INTDEF bool NOTHROW_NCX(CC libuw_unwind_getreg_lcpustate)(struct lcpustate const *__restrict self, uintptr_half_t regno, void *dst);
-INTDEF bool NOTHROW_NCX(CC libuw_unwind_setreg_lcpustate)(struct lcpustate *__restrict self, uintptr_half_t regno, void const *src);
-INTDEF bool NOTHROW_NCX(CC libuw_unwind_getreg_ucpustate)(struct ucpustate const *__restrict self, uintptr_half_t regno, void *dst);
-INTDEF bool NOTHROW_NCX(CC libuw_unwind_setreg_ucpustate)(struct ucpustate *__restrict self, uintptr_half_t regno, void const *src);
-INTDEF bool NOTHROW_NCX(CC libuw_unwind_getreg_kcpustate)(struct kcpustate const *__restrict self, uintptr_half_t regno, void *dst);
-INTDEF bool NOTHROW_NCX(CC libuw_unwind_setreg_kcpustate)(struct kcpustate *__restrict self, uintptr_half_t regno, void const *src);
-INTDEF bool NOTHROW_NCX(CC libuw_unwind_getreg_scpustate)(struct scpustate const *__restrict self, uintptr_half_t regno, void *dst);
-INTDEF bool NOTHROW_NCX(CC libuw_unwind_setreg_scpustate)(struct scpustate *__restrict self, uintptr_half_t regno, void const *src);
-INTDEF bool NOTHROW_NCX(CC libuw_unwind_getreg_icpustate)(struct icpustate const *__restrict self, uintptr_half_t regno, void *dst);
-INTDEF bool NOTHROW_NCX(CC libuw_unwind_setreg_icpustate)(struct icpustate *__restrict self, uintptr_half_t regno, void const *src);
-INTDEF bool NOTHROW_NCX(CC libuw_unwind_getreg_fcpustate)(struct fcpustate const *__restrict self, uintptr_half_t regno, void *dst);
-INTDEF bool NOTHROW_NCX(CC libuw_unwind_setreg_fcpustate)(struct fcpustate *__restrict self, uintptr_half_t regno, void const *src);
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libuw_unwind_getreg_lcpustate)(struct lcpustate const *__restrict self, uintptr_half_t regno, void *__restrict dst);
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libuw_unwind_setreg_lcpustate)(struct lcpustate *__restrict self, uintptr_half_t regno, void const *__restrict src);
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libuw_unwind_getreg_ucpustate)(struct ucpustate const *__restrict self, uintptr_half_t regno, void *__restrict dst);
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libuw_unwind_setreg_ucpustate)(struct ucpustate *__restrict self, uintptr_half_t regno, void const *__restrict src);
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libuw_unwind_getreg_kcpustate)(struct kcpustate const *__restrict self, uintptr_half_t regno, void *__restrict dst);
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libuw_unwind_setreg_kcpustate)(struct kcpustate *__restrict self, uintptr_half_t regno, void const *__restrict src);
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libuw_unwind_getreg_scpustate)(struct scpustate const *__restrict self, uintptr_half_t regno, void *__restrict dst);
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libuw_unwind_setreg_scpustate)(struct scpustate *__restrict self, uintptr_half_t regno, void const *__restrict src);
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libuw_unwind_getreg_icpustate)(struct icpustate const *__restrict self, uintptr_half_t regno, void *__restrict dst);
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libuw_unwind_setreg_icpustate)(struct icpustate *__restrict self, uintptr_half_t regno, void const *__restrict src);
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libuw_unwind_getreg_fcpustate)(struct fcpustate const *__restrict self, uintptr_half_t regno, void *__restrict dst);
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libuw_unwind_setreg_fcpustate)(struct fcpustate *__restrict self, uintptr_half_t regno, void const *__restrict src);
 #ifndef __KERNEL__
-INTDEF bool NOTHROW_NCX(CC libuw_unwind_getreg_ucontext)(struct ucontext const *__restrict self, uintptr_half_t regno, void *dst);
-INTDEF bool NOTHROW_NCX(CC libuw_unwind_setreg_ucontext)(struct ucontext *__restrict self, uintptr_half_t regno, void const *src);
-INTDEF bool NOTHROW_NCX(CC libuw_unwind_getreg_mcontext)(struct mcontext const *__restrict self, uintptr_half_t regno, void *dst);
-INTDEF bool NOTHROW_NCX(CC libuw_unwind_setreg_mcontext)(struct mcontext *__restrict self, uintptr_half_t regno, void const *src);
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libuw_unwind_getreg_ucontext)(struct ucontext const *__restrict self, uintptr_half_t regno, void *__restrict dst);
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libuw_unwind_setreg_ucontext)(struct ucontext *__restrict self, uintptr_half_t regno, void const *__restrict src);
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libuw_unwind_getreg_mcontext)(struct mcontext const *__restrict self, uintptr_half_t regno, void *__restrict dst);
+INTDEF NONNULL((1, 3)) bool NOTHROW_NCX(CC libuw_unwind_setreg_mcontext)(struct mcontext *__restrict self, uintptr_half_t regno, void const *__restrict src);
 #endif /* !__KERNEL__ */
 
 
@@ -91,10 +91,10 @@ INTDEF bool NOTHROW_NCX(CC libuw_unwind_setreg_mcontext)(struct mcontext *__rest
 
 #ifdef __x86_64__
 
-INTERN bool
+INTERN NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libuw_unwind_getreg_lcpustate)(struct lcpustate const *__restrict self,
                                               uintptr_half_t regno,
-                                              void *dst) {
+                                              void *__restrict dst) {
 	switch (regno) {
 	case CFI_X86_64_UNWIND_REGISTER_R15: *(u64 *)dst = self->lcs_r15; break;
 	case CFI_X86_64_UNWIND_REGISTER_R14: *(u64 *)dst = self->lcs_r14; break;
@@ -110,10 +110,10 @@ NOTHROW_NCX(CC libuw_unwind_getreg_lcpustate)(struct lcpustate const *__restrict
 	return true;
 }
 
-INTERN bool
+INTERN NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libuw_unwind_setreg_lcpustate)(struct lcpustate *__restrict self,
                                               uintptr_half_t regno,
-                                              void const *src) {
+                                              void const *__restrict src) {
 	switch (regno) {
 	case CFI_X86_64_UNWIND_REGISTER_R15: self->lcs_r15 = *(u64 const *)src; break;
 	case CFI_X86_64_UNWIND_REGISTER_R14: self->lcs_r14 = *(u64 const *)src; break;
@@ -129,10 +129,10 @@ NOTHROW_NCX(CC libuw_unwind_setreg_lcpustate)(struct lcpustate *__restrict self,
 	return true;
 }
 
-INTERN bool
+INTERN NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libuw_unwind_getreg_ucpustate)(struct ucpustate const *__restrict self,
                                               uintptr_half_t regno,
-                                              void *dst) {
+                                              void *__restrict dst) {
 	switch (regno) {
 	case CFI_X86_64_UNWIND_REGISTER_RAX:    *(u64 *)dst = self->ucs_gpregs.gp_rax; break;
 	case CFI_X86_64_UNWIND_REGISTER_RDX:    *(u64 *)dst = self->ucs_gpregs.gp_rdx; break;
@@ -166,10 +166,10 @@ NOTHROW_NCX(CC libuw_unwind_getreg_ucpustate)(struct ucpustate const *__restrict
 	return true;
 }
 
-INTERN bool
+INTERN NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libuw_unwind_setreg_ucpustate)(struct ucpustate *__restrict self,
                                               uintptr_half_t regno,
-                                              void const *src) {
+                                              void const *__restrict src) {
 	switch (regno) {
 	case CFI_X86_64_UNWIND_REGISTER_RAX:    self->ucs_gpregs.gp_rax = *(u64 const *)src; break;
 	case CFI_X86_64_UNWIND_REGISTER_RDX:    self->ucs_gpregs.gp_rdx = *(u64 const *)src; break;
@@ -203,10 +203,10 @@ NOTHROW_NCX(CC libuw_unwind_setreg_ucpustate)(struct ucpustate *__restrict self,
 	return true;
 }
 
-INTERN bool
+INTERN NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libuw_unwind_getreg_kcpustate)(struct kcpustate const *__restrict self,
                                               uintptr_half_t regno,
-                                              void *dst) {
+                                              void *__restrict dst) {
 	switch (regno) {
 	case CFI_X86_64_UNWIND_REGISTER_RAX:    *(u64 *)dst = self->kcs_gpregs.gp_rax; break;
 	case CFI_X86_64_UNWIND_REGISTER_RDX:    *(u64 *)dst = self->kcs_gpregs.gp_rdx; break;
@@ -232,10 +232,10 @@ NOTHROW_NCX(CC libuw_unwind_getreg_kcpustate)(struct kcpustate const *__restrict
 	return true;
 }
 
-INTERN bool
+INTERN NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libuw_unwind_setreg_kcpustate)(struct kcpustate *__restrict self,
                                               uintptr_half_t regno,
-                                              void const *src) {
+                                              void const *__restrict src) {
 	switch (regno) {
 	case CFI_X86_64_UNWIND_REGISTER_RAX:    self->kcs_gpregs.gp_rax = *(u64 const *)src; break;
 	case CFI_X86_64_UNWIND_REGISTER_RDX:    self->kcs_gpregs.gp_rdx = *(u64 const *)src; break;
@@ -262,10 +262,10 @@ NOTHROW_NCX(CC libuw_unwind_setreg_kcpustate)(struct kcpustate *__restrict self,
 }
 
 #ifdef __KERNEL__
-INTERN bool
+INTERN NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libuw_unwind_getreg_scpustate)(struct scpustate const *__restrict self,
                                               uintptr_half_t regno,
-                                              void *dst) {
+                                              void *__restrict dst) {
 	switch (regno) {
 	case CFI_X86_64_UNWIND_REGISTER_RAX:    *(u64 *)dst = self->scs_gpregs.gp_rax; break;
 	case CFI_X86_64_UNWIND_REGISTER_RDX:    *(u64 *)dst = self->scs_gpregs.gp_rdx; break;
@@ -299,10 +299,10 @@ NOTHROW_NCX(CC libuw_unwind_getreg_scpustate)(struct scpustate const *__restrict
 	return true;
 }
 
-INTERN bool
+INTERN NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libuw_unwind_setreg_scpustate)(struct scpustate *__restrict self,
                                               uintptr_half_t regno,
-                                              void const *src) {
+                                              void const *__restrict src) {
 	switch (regno) {
 	case CFI_X86_64_UNWIND_REGISTER_RAX:    self->scs_gpregs.gp_rax = *(u64 const *)src; break;
 	case CFI_X86_64_UNWIND_REGISTER_RDX:    self->scs_gpregs.gp_rdx = *(u64 const *)src; break;
@@ -336,10 +336,10 @@ NOTHROW_NCX(CC libuw_unwind_setreg_scpustate)(struct scpustate *__restrict self,
 	return true;
 }
 
-INTERN bool
+INTERN NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libuw_unwind_getreg_icpustate)(struct icpustate const *__restrict self,
                                               uintptr_half_t regno,
-                                              void *dst) {
+                                              void *__restrict dst) {
 	switch (regno) {
 	case CFI_X86_64_UNWIND_REGISTER_RAX:    *(u64 *)dst = self->ics_gpregs.gp_rax; break;
 	case CFI_X86_64_UNWIND_REGISTER_RDX:    *(u64 *)dst = self->ics_gpregs.gp_rdx; break;
@@ -367,10 +367,10 @@ NOTHROW_NCX(CC libuw_unwind_getreg_icpustate)(struct icpustate const *__restrict
 	return true;
 }
 
-INTERN bool
+INTERN NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libuw_unwind_setreg_icpustate)(struct icpustate *__restrict self,
                                               uintptr_half_t regno,
-                                              void const *src) {
+                                              void const *__restrict src) {
 	switch (regno) {
 	case CFI_X86_64_UNWIND_REGISTER_RAX:    self->ics_gpregs.gp_rax = *(u64 const *)src; break;
 	case CFI_X86_64_UNWIND_REGISTER_RDX:    self->ics_gpregs.gp_rdx = *(u64 const *)src; break;
@@ -399,10 +399,10 @@ NOTHROW_NCX(CC libuw_unwind_setreg_icpustate)(struct icpustate *__restrict self,
 }
 #endif /* __KERNEL__ */
 
-INTERN bool
+INTERN NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libuw_unwind_getreg_fcpustate)(struct fcpustate const *__restrict self,
                                               uintptr_half_t regno,
-                                              void *dst) {
+                                              void *__restrict dst) {
 	switch (regno) {
 	case CFI_X86_64_UNWIND_REGISTER_RAX:    *(u64 *)dst = self->fcs_gpregs.gp_rax; break;
 	case CFI_X86_64_UNWIND_REGISTER_RDX:    *(u64 *)dst = self->fcs_gpregs.gp_rdx; break;
@@ -438,10 +438,10 @@ NOTHROW_NCX(CC libuw_unwind_getreg_fcpustate)(struct fcpustate const *__restrict
 	return true;
 }
 
-INTERN bool
+INTERN NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libuw_unwind_setreg_fcpustate)(struct fcpustate *__restrict self,
                                               uintptr_half_t regno,
-                                              void const *src) {
+                                              void const *__restrict src) {
 	switch (regno) {
 	case CFI_X86_64_UNWIND_REGISTER_RAX:    self->fcs_gpregs.gp_rax = *(u64 const *)src; break;
 	case CFI_X86_64_UNWIND_REGISTER_RDX:    self->fcs_gpregs.gp_rdx = *(u64 const *)src; break;
@@ -480,10 +480,10 @@ NOTHROW_NCX(CC libuw_unwind_setreg_fcpustate)(struct fcpustate *__restrict self,
 #ifndef __KERNEL__
 DEFINE_INTERN_ALIAS(libuw_unwind_getreg_ucontext, libuw_unwind_getreg_mcontext);
 DEFINE_INTERN_ALIAS(libuw_unwind_setreg_ucontext, libuw_unwind_setreg_mcontext);
-INTERN bool
+INTERN NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libuw_unwind_getreg_mcontext)(struct mcontext const *__restrict self,
                                              uintptr_half_t regno,
-                                             void *dst) {
+                                             void *__restrict dst) {
 	switch (regno) {
 
 	case CFI_X86_64_UNWIND_REGISTER_MM0 ... CFI_X86_64_UNWIND_REGISTER_MM7:
@@ -546,10 +546,11 @@ nope:
 	}
 	return true;
 }
-INTERN bool
+
+INTERN NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libuw_unwind_setreg_mcontext)(struct mcontext *__restrict self,
                                              uintptr_half_t regno,
-                                             void const *src) {
+                                             void const *__restrict src) {
 	switch (regno) {
 
 	case CFI_X86_64_UNWIND_REGISTER_MM0 ... CFI_X86_64_UNWIND_REGISTER_MM7:
@@ -672,20 +673,20 @@ STATIC_ASSERT(offsetof(struct irregs_vm86, ir_gs)       == OFFSET_IRREGS_GS);
 #define MY_SS  SEGMENT_KERNEL_DATA
 #define MY_FS  SEGMENT_KERNEL_FSBASE
 #define MY_GS  __rdgs()
-#else
+#else /* __KERNEL__ */
 #define MY_CS  SEGMENT_USER_CODE_RPL
 #define MY_SS  SEGMENT_USER_DATA_RPL
 #define MY_FS  __rdfs()
 #define MY_GS  __rdgs()
-#endif
+#endif /* !__KERNEL__ */
 #define MY_DS  SEGMENT_USER_DATA_RPL
 #define MY_ES  SEGMENT_USER_DATA_RPL
 
 
-INTERN bool
+INTERN NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libuw_unwind_getreg_lcpustate)(struct lcpustate const *__restrict self,
                                               uintptr_half_t regno,
-                                              void *dst) {
+                                              void *__restrict dst) {
 	switch (regno) {
 	case CFI_386_UNWIND_REGISTER_EDI:    *(u32 *)dst = self->lcs_edi; break;
 	case CFI_386_UNWIND_REGISTER_ESI:    *(u32 *)dst = self->lcs_esi; break;
@@ -706,10 +707,10 @@ NOTHROW_NCX(CC libuw_unwind_getreg_lcpustate)(struct lcpustate const *__restrict
 	return true;
 }
 
-INTERN bool
+INTERN NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libuw_unwind_setreg_lcpustate)(struct lcpustate *__restrict self,
                                               uintptr_half_t regno,
-                                              void const *src) {
+                                              void const *__restrict src) {
 	switch (regno) {
 	case CFI_386_UNWIND_REGISTER_EDI:    self->lcs_edi = *(u32 const *)src; break;
 	case CFI_386_UNWIND_REGISTER_ESI:    self->lcs_esi = *(u32 const *)src; break;
@@ -730,10 +731,10 @@ NOTHROW_NCX(CC libuw_unwind_setreg_lcpustate)(struct lcpustate *__restrict self,
 	return true;
 }
 
-INTERN bool
+INTERN NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libuw_unwind_getreg_ucpustate)(struct ucpustate const *__restrict self,
                                               uintptr_half_t regno,
-                                              void *dst) {
+                                              void *__restrict dst) {
 	switch (regno) {
 	case CFI_386_UNWIND_REGISTER_EDI:    *(u32 *)dst = self->ucs_gpregs.gp_edi; break;
 	case CFI_386_UNWIND_REGISTER_ESI:    *(u32 *)dst = self->ucs_gpregs.gp_esi; break;
@@ -757,10 +758,10 @@ NOTHROW_NCX(CC libuw_unwind_getreg_ucpustate)(struct ucpustate const *__restrict
 	return true;
 }
 
-INTERN bool
+INTERN NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libuw_unwind_setreg_ucpustate)(struct ucpustate *__restrict self,
                                               uintptr_half_t regno,
-                                              void const *src) {
+                                              void const *__restrict src) {
 	switch (regno) {
 	case CFI_386_UNWIND_REGISTER_EDI:    self->ucs_gpregs.gp_edi = *(u32 const *)src; break;
 	case CFI_386_UNWIND_REGISTER_ESI:    self->ucs_gpregs.gp_esi = *(u32 const *)src; break;
@@ -784,10 +785,10 @@ NOTHROW_NCX(CC libuw_unwind_setreg_ucpustate)(struct ucpustate *__restrict self,
 	return true;
 }
 
-INTERN bool
+INTERN NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libuw_unwind_getreg_kcpustate)(struct kcpustate const *__restrict self,
                                               uintptr_half_t regno,
-                                              void *dst) {
+                                              void *__restrict dst) {
 	switch (regno) {
 	case CFI_386_UNWIND_REGISTER_EDI:    *(u32 *)dst = self->kcs_gpregs.gp_edi; break;
 	case CFI_386_UNWIND_REGISTER_ESI:    *(u32 *)dst = self->kcs_gpregs.gp_esi; break;
@@ -811,10 +812,10 @@ NOTHROW_NCX(CC libuw_unwind_getreg_kcpustate)(struct kcpustate const *__restrict
 	return true;
 }
 
-INTERN bool
+INTERN NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libuw_unwind_setreg_kcpustate)(struct kcpustate *__restrict self,
                                               uintptr_half_t regno,
-                                              void const *src) {
+                                              void const *__restrict src) {
 	switch (regno) {
 	case CFI_386_UNWIND_REGISTER_EDI:    self->kcs_gpregs.gp_edi = *(u32 const *)src; break;
 	case CFI_386_UNWIND_REGISTER_ESI:    self->kcs_gpregs.gp_esi = *(u32 const *)src; break;
@@ -840,10 +841,10 @@ NOTHROW_NCX(CC libuw_unwind_setreg_kcpustate)(struct kcpustate *__restrict self,
 
 
 #ifdef __KERNEL__
-INTERN bool
+INTERN NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libuw_unwind_getreg_scpustate)(struct scpustate const *__restrict self,
                                               uintptr_half_t regno,
-                                              void *dst) {
+                                              void *__restrict dst) {
 	switch (regno) {
 	case CFI_386_UNWIND_REGISTER_EDI:    *(u32 *)dst = self->scs_gpregs.gp_edi; break;
 	case CFI_386_UNWIND_REGISTER_ESI:    *(u32 *)dst = self->scs_gpregs.gp_esi; break;
@@ -867,10 +868,10 @@ NOTHROW_NCX(CC libuw_unwind_getreg_scpustate)(struct scpustate const *__restrict
 	return true;
 }
 
-INTERN bool
+INTERN NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libuw_unwind_setreg_scpustate)(struct scpustate *__restrict self,
                                               uintptr_half_t regno,
-                                              void const *src) {
+                                              void const *__restrict src) {
 	switch (regno) {
 	case CFI_386_UNWIND_REGISTER_EDI:    self->scs_gpregs.gp_edi = *(u32 const *)src; break;
 	case CFI_386_UNWIND_REGISTER_ESI:    self->scs_gpregs.gp_esi = *(u32 const *)src; break;
@@ -913,10 +914,10 @@ NOTHROW_NCX(CC libuw_unwind_setreg_scpustate)(struct scpustate *__restrict self,
 	return true;
 }
 
-INTERN bool
+INTERN NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libuw_unwind_getreg_icpustate)(struct icpustate const *__restrict self,
                                               uintptr_half_t regno,
-                                              void *dst) {
+                                              void *__restrict dst) {
 	switch (regno) {
 	case CFI_386_UNWIND_REGISTER_EDI:    *(u32 *)dst = self->ics_gpregs.gp_edi; break;
 	case CFI_386_UNWIND_REGISTER_ESI:    *(u32 *)dst = self->ics_gpregs.gp_esi; break;
@@ -939,10 +940,11 @@ NOTHROW_NCX(CC libuw_unwind_getreg_icpustate)(struct icpustate const *__restrict
 	}
 	return true;
 }
-INTERN bool
+
+INTERN NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libuw_unwind_setreg_icpustate)(struct icpustate *__restrict self,
                                               uintptr_half_t regno,
-                                              void const *src) {
+                                              void const *__restrict src) {
 	switch (regno) {
 	case CFI_386_UNWIND_REGISTER_EDI:    self->ics_gpregs.gp_edi = *(u32 const *)src; break;
 	case CFI_386_UNWIND_REGISTER_ESI:    self->ics_gpregs.gp_esi = *(u32 const *)src; break;
@@ -986,10 +988,10 @@ NOTHROW_NCX(CC libuw_unwind_setreg_icpustate)(struct icpustate *__restrict self,
 }
 #endif /* __KERNEL__ */
 
-INTERN bool
+INTERN NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libuw_unwind_getreg_fcpustate)(struct fcpustate const *__restrict self,
                                               uintptr_half_t regno,
-                                              void *dst) {
+                                              void *__restrict dst) {
 	switch (regno) {
 	case CFI_386_UNWIND_REGISTER_EDI:    *(u32 *)dst = self->fcs_gpregs.gp_edi; break;
 	case CFI_386_UNWIND_REGISTER_ESI:    *(u32 *)dst = self->fcs_gpregs.gp_esi; break;
@@ -1014,10 +1016,11 @@ NOTHROW_NCX(CC libuw_unwind_getreg_fcpustate)(struct fcpustate const *__restrict
 	}
 	return true;
 }
-INTERN bool
+
+INTERN NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libuw_unwind_setreg_fcpustate)(struct fcpustate *__restrict self,
                                               uintptr_half_t regno,
-                                              void const *src) {
+                                              void const *__restrict src) {
 	switch (regno) {
 	case CFI_386_UNWIND_REGISTER_EDI:    self->fcs_gpregs.gp_edi = *(u32 const *)src; break;
 	case CFI_386_UNWIND_REGISTER_ESI:    self->fcs_gpregs.gp_esi = *(u32 const *)src; break;
@@ -1046,10 +1049,11 @@ NOTHROW_NCX(CC libuw_unwind_setreg_fcpustate)(struct fcpustate *__restrict self,
 #ifndef __KERNEL__
 DEFINE_INTERN_ALIAS(libuw_unwind_getreg_ucontext, libuw_unwind_getreg_mcontext);
 DEFINE_INTERN_ALIAS(libuw_unwind_setreg_ucontext, libuw_unwind_setreg_mcontext);
-INTERN bool
+
+INTERN NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libuw_unwind_getreg_mcontext)(struct mcontext const *__restrict self,
                                              uintptr_half_t regno,
-                                             void *dst) {
+                                             void *__restrict dst) {
 	switch (regno) {
 
 	case CFI_386_UNWIND_REGISTER_EDI:    *(u32 *)dst = self->mc_context.ucs_gpregs.gp_edi; break;
@@ -1129,10 +1133,10 @@ nope:
 	return true;
 }
 
-INTERN bool
+INTERN NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libuw_unwind_setreg_mcontext)(struct mcontext *__restrict self,
                                              uintptr_half_t regno,
-                                             void const *src) {
+                                             void const *__restrict src) {
 	switch (regno) {
 
 	case CFI_386_UNWIND_REGISTER_EDI:    self->mc_context.ucs_gpregs.gp_edi = *(u32 const *)src; break;
@@ -1284,9 +1288,10 @@ nope:
 
 
 
-INTERN bool
+INTERN NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libuw_unwind_getreg_sfpustate)(struct sfpustate const *__restrict self,
-                                              uintptr_half_t regno, void *dst) {
+                                              uintptr_half_t regno,
+                                              void *__restrict dst) {
 	switch (regno) {
 
 	case CFI_UNWIND_REGISTER_MM0 ... CFI_UNWIND_REGISTER_MM7:
@@ -1313,9 +1318,10 @@ do_fpreg:
 	return true;
 }
 
-INTERN bool
+INTERN NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libuw_unwind_setreg_sfpustate)(struct sfpustate *__restrict self,
-                                              uintptr_half_t regno, void const *src) {
+                                              uintptr_half_t regno,
+                                              void const *__restrict src) {
 	switch (regno) {
 
 	case CFI_UNWIND_REGISTER_MM0 ... CFI_UNWIND_REGISTER_MM7:
@@ -1341,9 +1347,10 @@ do_fpreg:
 	return true;
 }
 
-INTERN bool
+INTERN NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libuw_unwind_getreg_xfpustate)(struct xfpustate const *__restrict self,
-                                              uintptr_half_t regno, void *dst) {
+                                              uintptr_half_t regno,
+                                              void *__restrict dst) {
 	switch (regno) {
 
 	case CFI_UNWIND_REGISTER_MM0 ... CFI_UNWIND_REGISTER_MM7:
@@ -1381,9 +1388,10 @@ do_fpreg:
 	return true;
 }
 
-INTERN bool
+INTERN NONNULL((1, 3)) bool
 NOTHROW_NCX(CC libuw_unwind_setreg_xfpustate)(struct xfpustate *__restrict self,
-                                              uintptr_half_t regno, void const *src) {
+                                              uintptr_half_t regno,
+                                              void const *__restrict src) {
 	switch (regno) {
 
 	case CFI_UNWIND_REGISTER_MM0 ... CFI_UNWIND_REGISTER_MM7:

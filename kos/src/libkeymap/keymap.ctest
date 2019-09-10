@@ -45,7 +45,7 @@ PRIVATE void *MapFile(char const *filename, size_t *psize) {
 	void *result;
 	fd = Open(filename, O_RDONLY);
 	FStat(fd, &st);
-	result = mmap(NULL, (size_t)st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
+	result = mmap(NULL, (size_t)st.st_size, PROT_READ, MAP_PRIVATE, fd, 0); /* TODO: MMap() */
 	assert(result != MAP_FAILED);
 	if (psize)
 		*psize = (size_t)st.st_size;
@@ -69,6 +69,7 @@ DEFINE_TEST(keymap_translations) {
 	*(void **)&keymap_codesize      = dlsym(km, "keymap_codesize");
 	*(void **)&keymap_translate_buf = dlsym(km, "keymap_translate_buf");
 	assert(keymap_openblob);
+	assert(keymap_codesize);
 	assert(keymap_translate_buf);
 
 	filedata = MapFile("/lib/keymap/de_DE", &filesize);

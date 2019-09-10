@@ -50,7 +50,7 @@ DECL_BEGIN
  * @return: DEBUG_INFO_ERROR_SUCCESS: ...
  * @return: DEBUG_INFO_ERROR_NOFRAME: All units have been loaded.
  * @return: DEBUG_INFO_ERROR_CORRUPT: ... */
-INTERN TEXTSECTION unsigned int
+INTERN TEXTSECTION NONNULL((1, 2, 3)) unsigned int
 NOTHROW_NCX(CC libdi_debugline_loadunit)(byte_t **__restrict preader,
                                          byte_t *__restrict text_end,
                                          di_debugline_unit_t *__restrict result) {
@@ -160,16 +160,16 @@ typedef struct {
  * @return: DEBUG_INFO_ERROR_SUCCESS: ...
  * @return: DEBUG_INFO_ERROR_NOFRAME: ...
  * @return: DEBUG_INFO_ERROR_CORRUPT: ... */
-INTERN TEXTSECTION unsigned int
+INTERN TEXTSECTION NONNULL((1, 2)) unsigned int
 NOTHROW_NCX(CC libdi_debugline_scanunit)(di_debugline_unit_t const *__restrict self,
                                          di_debugline_info_t *__restrict result,
                                          uintptr_t module_relative_pc) {
 	byte_t *reader = self->dlu_textbase;
 	dl_registers_t old_state, state;
-#define RESET_STATE() \
-	(memset(&state, 0, sizeof(state)),                                               \
-	 state.file = 1, state.line = 1,                                                 \
-	 state.flags = self->dlu_default_isstmt                                          \
+#define RESET_STATE()                                                        \
+	(memset(&state, 0, sizeof(state)),                                       \
+	 state.file = 1, state.line = 1,                                         \
+	 state.flags = self->dlu_default_isstmt                                  \
 	               ? (DI_DEBUGLINE_INFO_FPROLOG | DI_DEBUGLINE_INFO_FISSTMT) \
 	               : (DI_DEBUGLINE_INFO_FPROLOG))
 
@@ -191,11 +191,11 @@ NOTHROW_NCX(CC libdi_debugline_scanunit)(di_debugline_unit_t const *__restrict s
 				state.op_index = (state.op_index + temp) % self->dlu_max_ops_per_insn;
 			}
 			state.line += (intptr_t)(opcode % self->dlu_line_range) + self->dlu_line_base;
-#define TEST_MATCH() \
-			{ /*debug_printf("state.address = %p\n",state.address);*/ \
-				if (old_state.address <= module_relative_pc &&        \
-				    state.address > module_relative_pc)               \
-					goto found_state;                                 \
+#define TEST_MATCH()                                           \
+			{                                                  \
+				if (old_state.address <= module_relative_pc && \
+				    state.address > module_relative_pc)        \
+					goto found_state;                          \
 			}
 			if (old_state.address <= module_relative_pc &&
 			    state.address > module_relative_pc) {

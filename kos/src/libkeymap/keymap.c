@@ -59,13 +59,15 @@ DECL_BEGIN
 /* Return the size (in bytes) of the keyboard translation code block, that
  * is the number of bytes until after the terminating `KMP_OP_STOP' opcode.
  * @return: <0: The code contains unrecognized/invalid instructions. */
-INTERN ssize_t
+INTERN NONNULL((1, 2)) ssize_t
 NOTHROW_NCX(CC libkeymap_codesize)(byte_t const *__restrict code,
                                    uint8_t *__restrict preg_enc,
                                    uint8_t def_enc) {
 	ssize_t temp, result = 1; /* +1 for the trailing KMP_OP_STOP */
 	for (;;) {
-		temp = libkeymap_instrlen(code, preg_enc, def_enc);
+		temp = libkeymap_instrlen(code,
+		                          preg_enc,
+		                          def_enc);
 		if unlikely(temp < 0)
 			goto err;
 		if (!temp)
@@ -81,7 +83,7 @@ err:
 /* Same as `keymap_codesize()', but only return the length of a single instruction.
  * @return: 0:  The next instruction is `KMP_OP_STOP'
  * @return: <0: The code contains unrecognized/invalid instructions. */
-INTERN ssize_t
+INTERN NONNULL((1, 2)) ssize_t
 NOTHROW_NCX(CC libkeymap_instrlen)(byte_t const *__restrict code,
                                    uint8_t *__restrict preg_enc,
                                    uint8_t def_enc) {
@@ -216,7 +218,7 @@ error:
  * @return: 0  : Either `printer' always returned 0, or the key doesn't have a mapping.
  * @return: *  : Sum of all calls to `printer'
  * @return: <0 : A call to `printer' returned this same negative value  */
-INTERN ssize_t
+INTERN NONNULL((1, 4)) ssize_t
 NOTHROW_NCX(CC libkeymap_translate)(struct keymap *__restrict self,
                                     uint16_t const key, /* `const' so we don't accidentally write this one instead of `reg_key' */
                                     uint16_t const mod, /* Make this one `const' as well. Just for good measure... */
@@ -536,7 +538,7 @@ done:
  * @param: buflen: The given buffer size.
  * @return: 0 :    The given `key' cannot be translated with `mod'
  * @return: * :    The required number of buffer bytes. (excluding a trailing NUL-character)  */
-INTERN size_t
+INTERN NONNULL((1, 4)) size_t
 NOTHROW_NCX(CC libkeymap_translate_buf)(struct keymap *__restrict self,
                                         uint16_t key, uint16_t mod,
                                         /*utf-8*/ char *buffer, size_t buflen) {
@@ -562,7 +564,7 @@ NOTHROW_NCX(CC libkeymap_translate_buf)(struct keymap *__restrict self,
  *       memory region and free it themself during finalization
  * @return: true:  Successfully loaded the given blob and initialized `self'
  * @return: false: Failed to open the blob (not a valid KMP file) */
-INTERN bool
+INTERN NONNULL((1, 2)) bool
 NOTHROW_NCX(CC libkeymap_openblob)(struct keymap *__restrict self,
                                    void const *blob_base,
                                    size_t blob_size) {

@@ -30,14 +30,18 @@ DECL_BEGIN
 /* Return the size (in bytes) of the keyboard translation code block, that
  * is the number of bytes until after the terminating `KMP_OP_STOP' opcode.
  * @return: <0: The code contains unrecognized/invalid instructions. */
-INTDEF ssize_t NOTHROW_NCX(CC libkeymap_codesize)(byte_t const *__restrict code,
-                                                  uint8_t *__restrict preg_enc, uint8_t def_enc);
+INTDEF NONNULL((1, 2)) ssize_t
+NOTHROW_NCX(CC libkeymap_codesize)(byte_t const *__restrict code,
+                                   uint8_t *__restrict preg_enc,
+                                   uint8_t def_enc);
 
 /* Same as `keymap_codesize()', but only return the length of a single instruction.
  * @return: 0:  The next instruction is `KMP_OP_STOP'
  * @return: <0: The code contains unrecognized/invalid instructions. */
-INTDEF ssize_t NOTHROW_NCX(CC libkeymap_instrlen)(byte_t const *__restrict code,
-                                                  uint8_t *__restrict preg_enc, uint8_t def_enc);
+INTDEF NONNULL((1, 2)) ssize_t
+NOTHROW_NCX(CC libkeymap_instrlen)(byte_t const *__restrict code,
+                                   uint8_t *__restrict preg_enc,
+                                   uint8_t def_enc);
 
 /* Translate a given key `key' when modifiers `mod' are applied into a unicode character.
  * @return: 0  : Either `printer' always returned 0, or the key doesn't have a mapping.

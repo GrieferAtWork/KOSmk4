@@ -1019,7 +1019,7 @@ struct instruction {
 #define NAME_jcd "[d]" /* "[ge|nl]" */
 #define NAME_jce "[e]" /* "[le|ng]" */
 #define NAME_jcf "[f]" /* "[g|nle]" */
-#else
+#else /* CONFIG_AUTOSELECT_JCC */
 #define NAME_jc0 "o"
 #define NAME_jc1 "no"
 #define NAME_jc2 "b"
@@ -1036,7 +1036,7 @@ struct instruction {
 #define NAME_jcd "ge"
 #define NAME_jce "le"
 #define NAME_jcf "g"
-#endif
+#endif /* !CONFIG_AUTOSELECT_JCC */
 
 
 /* clang-format off */
@@ -2591,7 +2591,7 @@ local mytext = File.open(__FILE__, "r").read().decode("utf-8");
 @@Calculate the offsets of opcodes and return a 256-element vector of offset indices
 @@The return value is (OffsetTable, OpcodeCount)
 function calculateOpcodeOffsets(start: string, end: string): ({int...}, int) {
-	local data = mytext[mytext.index(start)+#start:mytext.index(end)].strip();
+	local data = mytext[mytext.index(start) + #start:mytext.index(end)].strip();
 	local result = [none] * 256;
 	local prev_opcode = -1;
 	local curr_offset = 0;
@@ -2797,6 +2797,7 @@ is_carry_instruction(u32 opcode, u8 reg) {
 	}
 	return false;
 }
+
 PRIVATE ATTR_CONST bool CC
 is_compare_instruction(u32 opcode, u8 reg) {
 	switch (opcode) {
@@ -2823,7 +2824,7 @@ is_compare_instruction(u32 opcode, u8 reg) {
 	return false;
 }
 
-INTERN void CC
+INTERN NONNULL((1)) void CC
 libda_select_jcc(struct disassembler *__restrict self,
                  unsigned int which) {
 	char const *repr;
@@ -2885,7 +2886,7 @@ libda_select_jcc(struct disassembler *__restrict self,
 #endif /* CONFIG_AUTOSELECT_JCC */
 
 
-INTERN void CC
+INTERN NONNULL((1)) void CC
 libda_single_x86(struct disassembler *__restrict self) {
 #ifdef CONFIG_AUTOSELECT_JCC
 	u32 whole_opcode;
@@ -2938,7 +2939,6 @@ print_byte:
 	} else {
 		goto unknown_opcode;
 	}
-
 
 	for (; chain->i_repr[0]; ++chain) {
 		if (chain->i_opcode != opcode) {

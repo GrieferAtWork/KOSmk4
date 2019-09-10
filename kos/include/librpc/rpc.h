@@ -315,12 +315,12 @@ LIBRPC_DECL int LIBRPC_CC rpc_service(void);
  * @throws: E_PROCESS_EXITED:  `target' does not reference a valid process
  * @throws: E_INVALID_ARGUMENT: The given `flag' is invalid.
  * NOTE: The system call of this function is called `sys_rpc_schedule()' */
-typedef int
+typedef __ATTR_NONNULL((3)) int
 (LIBRPC_CC *PRPC_SCHEDULE_EX)(__pid_t target, __syscall_ulong_t flags,
                               __uint8_t const *__restrict program,
                               void **arguments);
 #ifdef LIBRPC_WANT_PROTOTYPES
-LIBRPC_DECL int LIBRPC_CC
+LIBRPC_DECL __ATTR_NONNULL((3)) int LIBRPC_CC
 rpc_schedule_ex(__pid_t target, __syscall_ulong_t flags,
                 __uint8_t const *__restrict program,
                 void **arguments);
@@ -388,11 +388,11 @@ rpc_schedule_ex(__pid_t target, __syscall_ulong_t flags,
  * @return: -1: Error (s.a. `errno')
  * @throws: E_PROCESS_EXITED:  `target' does not reference a valid process
  * @throws: E_INVALID_ARGUMENT: The given `flag' is invalid. */
-typedef int
+typedef __ATTR_NONNULL((3)) int
 (LIBRPC_VCC *PRPC_SCHEDULE)(__pid_t target, __syscall_ulong_t flags, void (*callback)(),
                             __size_t argc, /* uintptr_t *status_futex */ /* uintptr_t ...args */...);
 #ifdef LIBRPC_WANT_PROTOTYPES
-LIBRPC_DECL int LIBRPC_VCC
+LIBRPC_DECL __ATTR_NONNULL((3)) int LIBRPC_VCC
 rpc_schedule(__pid_t target, __syscall_ulong_t flags, void (*callback)(),
              __size_t argc, /* uintptr_t *status_futex */ /* uintptr_t ...args */...);
 #endif /* LIBRPC_WANT_PROTOTYPES */

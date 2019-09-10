@@ -64,7 +64,7 @@ DECL_BEGIN
  *                                    known at all, or whatever the total number of information
  *                                    levels know is. (all other fields of `*result' are NULL-initialized)
  * @return: DEBUG_INFO_ERROR_CORRUPT: Debug information is corrupted (`*result' was NULL-initialized). */
-INTDEF unsigned int
+INTDEF __ATTR_NONNULL((1, 2)) unsigned int
 NOTHROW_NCX(CC libdi_debug_sections_addr2line)(di_debug_sections_t const *__restrict sections,
                                                di_debug_addr2line_t *__restrict result,
                                                uintptr_t module_relative_pc,
@@ -76,7 +76,7 @@ NOTHROW_NCX(CC libdi_debug_sections_addr2line)(di_debug_sections_t const *__rest
  *   - debug_print_filename(...,info.al_cubase,info.al_srcpath,info.al_srcfile); // /home/me/project/c/foo/src/bar.c
  *   - debug_print_filename(...,info.al_cubase,info.al_dclpath,info.al_dclfile); // /home/me/project/c/foo/include/bar.h
  * NOTE: When `filename' is NULL, print `???' (3 question marks) instead. */
-INTDEF ssize_t CC
+INTDEF __ATTR_NONNULL((1)) ssize_t CC
 libdi_debug_print_filename(pformatprinter printer, void *arg,
                            char const *cubase, char const *pathname,
                            char const *filename);
@@ -86,11 +86,11 @@ libdi_debug_print_filename(pformatprinter printer, void *arg,
  * >> These functions are simply light-weight wrappers around `dllocksection()',
  *    taking the job of locking debug information sections into memory off of
  *    the user. */
-INTDEF unsigned int
+INTDEF __ATTR_NONNULL((2, 3)) unsigned int
 NOTHROW_NCX(CC libdi_debug_dllocksections)(void *dl_handle,
                                            di_debug_sections_t *__restrict sections,
                                            di_dl_debug_sections_t *__restrict dl_sections);
-INTDEF void
+INTDEF __ATTR_NONNULL((1)) void
 NOTHROW_NCX(CC libdi_debug_dlunlocksections)(di_dl_debug_sections_t *__restrict dl_sections);
 
 

@@ -42,7 +42,7 @@
 
 DECL_BEGIN
 
-LOCAL int CC
+LOCAL NONNULL((1)) int CC
 libvm86_check_interrupts(vm86_state_t *__restrict self) {
 	unsigned int i;
 	for (i = 0; i < COMPILER_LENOF(self->vr_intr_pending); ++i) {
@@ -62,7 +62,8 @@ libvm86_check_interrupts(vm86_state_t *__restrict self) {
 }
 
 /* Same as `vm86_step()', but also check for pending interrupts beforehand. */
-INTERN int CC libvm86_fullstep(vm86_state_t *__restrict self) {
+INTERN NONNULL((1)) int CC
+libvm86_fullstep(vm86_state_t *__restrict self) {
 	if ((self->vr_regs.vr_flags & IF) &&
 	    (self->vr_stateflags & VM86_STATE_FINTR)) {
 		int error;
@@ -74,7 +75,8 @@ INTERN int CC libvm86_fullstep(vm86_state_t *__restrict self) {
 }
 
 /* Execute VM86 emulator code until that code finishes execution. */
-INTERN int CC libvm86_exec(vm86_state_t *__restrict self) {
+INTERN NONNULL((1)) int CC
+libvm86_exec(vm86_state_t *__restrict self) {
 	int result;
 	for (;;) {
 		result = libvm86_fullstep(self);
@@ -110,7 +112,7 @@ check_result:
  * @return: VM86_SUCCESS:      Success.
  * @return: VM86_DOUBLE_FAULT: Stack overflow.
  * @return: VM86_SEGFAULT:     Segmentation fault. */
-INTERN int CC
+INTERN NONNULL((1)) int CC
 libvm86_sw_intr(vm86_state_t *__restrict self, uint8_t intno) {
 	if (self->vr_intr) {
 		(*self->vr_intr)(self, intno);
@@ -144,7 +146,7 @@ libvm86_sw_intr(vm86_state_t *__restrict self, uint8_t intno) {
 	return VM86_SUCCESS;
 }
 
-INTERN int CC
+INTERN NONNULL((1)) int CC
 libvm86_hw_intr(vm86_state_t *__restrict self, uint8_t intno) {
 	if (!(self->vr_regs.vr_flags & IF)) {
 		self->vr_intr_pending[intno / (sizeof(uintptr_t) * 8)] |=
@@ -154,7 +156,7 @@ libvm86_hw_intr(vm86_state_t *__restrict self, uint8_t intno) {
 	return libvm86_sw_intr(self, intno);
 }
 
-INTERN int CC
+INTERN NONNULL((1)) int CC
 libvm86_pic_intr(vm86_state_t *__restrict self, uint8_t pic_intno) {
 	uint8_t mask;
 	assert(pic_intno <= 15);
@@ -192,7 +194,7 @@ libvm86_pic_intr(vm86_state_t *__restrict self, uint8_t pic_intno) {
 }
 
 
-LOCAL int CC
+LOCAL NONNULL((1)) int CC
 libvm86_pic1_check_interrupts(vm86_state_t *__restrict self) {
 	if (self->vr_pic1_mask) {
 		unsigned int shift;
@@ -205,7 +207,7 @@ libvm86_pic1_check_interrupts(vm86_state_t *__restrict self) {
 	return VM86_SUCCESS;
 }
 
-LOCAL int CC
+LOCAL NONNULL((1)) int CC
 libvm86_pic2_check_interrupts(vm86_state_t *__restrict self) {
 	if (self->vr_pic2_mask) {
 		unsigned int shift;
@@ -219,7 +221,7 @@ libvm86_pic2_check_interrupts(vm86_state_t *__restrict self) {
 }
 
 
-PRIVATE int CC
+PRIVATE NONNULL((1, 4)) int CC
 libvm86_portio(vm86_state_t *__restrict self,
                uint16_t port,
                unsigned int action,
@@ -349,40 +351,40 @@ libvm86_portio(vm86_state_t *__restrict self,
 /* Read/Write values to/from an emulated VIO port.
  * @return: VM86_SUCCESS: Success.
  * @return: VM86_BADPORT: Bad port. */
-INTERN int CC
+INTERN NONNULL((1, 3)) int CC
 libvm86_inb(vm86_state_t *__restrict self,
             uint16_t port, uint8_t *__restrict presult) {
 	*presult = 0;
 	return libvm86_portio(self, port, VM86_HANDLE_IO_INB, presult);
 }
 
-INTERN int CC
+INTERN NONNULL((1, 3)) int CC
 libvm86_inw(vm86_state_t *__restrict self,
             uint16_t port, uint16_t *__restrict presult) {
 	*presult = 0;
 	return libvm86_portio(self, port, VM86_HANDLE_IO_INW, presult);
 }
 
-INTERN int CC
+INTERN NONNULL((1, 3)) int CC
 libvm86_inl(vm86_state_t *__restrict self,
             uint16_t port, uint32_t *__restrict presult) {
 	*presult = 0;
 	return libvm86_portio(self, port, VM86_HANDLE_IO_INL, presult);
 }
 
-INTERN int CC
+INTERN NONNULL((1)) int CC
 libvm86_outb(vm86_state_t *__restrict self,
              uint16_t port, uint8_t value) {
 	return libvm86_portio(self, port, VM86_HANDLE_IO_OUTB, &value);
 }
 
-INTERN int CC
+INTERN NONNULL((1)) int CC
 libvm86_outw(vm86_state_t *__restrict self,
              uint16_t port, uint16_t value) {
 	return libvm86_portio(self, port, VM86_HANDLE_IO_OUTW, &value);
 }
 
-INTERN int CC
+INTERN NONNULL((1)) int CC
 libvm86_outl(vm86_state_t *__restrict self,
              uint16_t port, uint32_t value) {
 	return libvm86_portio(self, port, VM86_HANDLE_IO_OUTL, &value);

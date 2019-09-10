@@ -57,7 +57,7 @@ opt.append("-O3");
 
 DECL_BEGIN
 
-LOCAL TEXTSECTION void
+LOCAL TEXTSECTION NONNULL((1)) void
 NOTHROW_NCX(CC fill_error_state)(di_debug_addr2line_t *__restrict result,
                                  uintptr_t module_relative_pc) {
 	memset(result, 0, sizeof(*result));
@@ -77,7 +77,7 @@ INTDEF byte_t __kernel_debug_line_start[];
  *   - result->al_symstart  (only if `fill_symstart_symend' is true)
  *   - result->al_symend    (only if `fill_symstart_symend' is true)
  */
-PRIVATE TEXTSECTION void
+PRIVATE TEXTSECTION NONNULL((1, 2)) void
 NOTHROW_NCX(CC search_symtab)(di_debug_sections_t const *__restrict sections,
                               di_debug_addr2line_t *__restrict result,
                               uintptr_t module_relative_pc,
@@ -129,7 +129,7 @@ NOTHROW_NCX(CC search_symtab)(di_debug_sections_t const *__restrict sections,
 
 #define DEBUG_INFO_ERROR_NOLEVEL 3 /* No information is associated with the given level. */
 
-PRIVATE TEXTSECTION unsigned int
+PRIVATE TEXTSECTION NONNULL((1, 2, 3)) unsigned int
 NOTHROW_NCX(CC scan_cu_stmt_list)(di_debuginfo_compile_unit_t const *__restrict cu,
                                   di_debug_sections_t const *__restrict sections,
                                   di_debug_addr2line_t *__restrict result,
@@ -183,7 +183,7 @@ NOTHROW_NCX(CC scan_cu_stmt_list)(di_debuginfo_compile_unit_t const *__restrict 
 }
 
 
-PRIVATE ATTR_NOINLINE TEXTSECTION unsigned int
+PRIVATE ATTR_NOINLINE TEXTSECTION NONNULL((1, 2, 3)) unsigned int
 NOTHROW_NCX(CC search_cu)(di_debuginfo_cu_parser_t *__restrict self,
                           di_debug_sections_t const *__restrict sections,
                           di_debug_addr2line_t *__restrict result,
@@ -566,7 +566,7 @@ err_corrupt:
  *                                    known at all, or whatever the total number of information
  *                                    levels know is.
  * @return: DEBUG_INFO_ERROR_CORRUPT: Debug information is corrupted. */
-INTERN TEXTSECTION unsigned int
+INTERN TEXTSECTION NONNULL((1, 2)) unsigned int
 NOTHROW_NCX(CC libdi_debug_sections_addr2line)(di_debug_sections_t const *__restrict sections,
                                                di_debug_addr2line_t *__restrict result,
                                                uintptr_t module_relative_pc,
@@ -718,7 +718,7 @@ PRIVATE STRINGSECTION char const str_forward_slash[] = { '/' };
 PRIVATE STRINGSECTION char const str_backward_slash[] = { '\\' };
 INTDEF STRINGSECTION char const unknown_string[]; /* "???" */
 
-INTERN TEXTSECTION ssize_t CC
+INTERN TEXTSECTION NONNULL((1)) ssize_t CC
 libdi_debug_print_filename(pformatprinter printer, void *arg,
                            char const *cubase, char const *pathname,
                            char const *filename) {
@@ -793,7 +793,7 @@ PRIVATE STRINGSECTION char const secname_dynstr[]        = ".dynstr";
  * >> These functions are simply light-weight wrappers around `library_locksection()',
  *    taking the job of locking debug information sections into memory off of
  *    the user. */
-INTERN TEXTSECTION unsigned int
+INTERN TEXTSECTION NONNULL((2, 3)) unsigned int
 NOTHROW_NCX(CC libdi_debug_dllocksections)(void *dl_handle,
                                            di_debug_sections_t *__restrict sections,
                                            di_dl_debug_sections_t *__restrict dl_sections) {
@@ -895,7 +895,7 @@ err_no_data:
 	return DEBUG_INFO_ERROR_SUCCESS;
 }
 
-INTERN TEXTSECTION void
+INTERN TEXTSECTION NONNULL((1)) void
 NOTHROW_NCX(CC libdi_debug_dlunlocksections)(di_dl_debug_sections_t *__restrict dl_sections) {
 	if (dl_sections->dl_strtab)
 		library_unlocksection(dl_sections->dl_strtab);

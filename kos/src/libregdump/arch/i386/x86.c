@@ -117,12 +117,12 @@ PRIVATE char const gpregs_names[GPREGS_COUNT][2] = {
 #endif /* !__x86_64__ */
 
 #ifdef __x86_64__
-INTERN ssize_t CC
+INTERN NONNULL((1, 2)) ssize_t CC
 libregdump_gpregs_with_sp(struct regdump_printer *__restrict self,
                           struct gpregsnsp const *__restrict data,
                           uintptr_t sp)
 #else /* __x86_64__ */
-INTERN ssize_t CC
+INTERN NONNULL((1, 2)) ssize_t CC
 libregdump_gpregs_with_sp(struct regdump_printer *__restrict self,
                           struct gpregs const *__restrict data,
                           uintptr_t sp)
@@ -166,7 +166,7 @@ libregdump_gpregs_with_sp(struct regdump_printer *__restrict self,
 
 /* Print a general-purpose register (id is one of { a, c, d, b, S, D, B, P } (same as gcc inline assembly register constraints, with B for %ebp and P for %esp))
  * On x86_64, use `0-7' to indicate extended registers `r8-r15' */
-INTERN ssize_t CC
+INTERN NONNULL((1)) ssize_t CC
 libregdump_gpreg(struct regdump_printer *__restrict self,
                  char id, uintptr_t value) {
 	char name[4];
@@ -209,7 +209,7 @@ libregdump_gpreg(struct regdump_printer *__restrict self,
 	END;
 }
 
-INTERN ssize_t CC
+INTERN NONNULL((1, 2)) ssize_t CC
 libregdump_gpregs(struct regdump_printer *__restrict self,
                   struct gpregs const *__restrict data) {
 #ifdef __x86_64__
@@ -230,12 +230,13 @@ libregdump_gpregs(struct regdump_printer *__restrict self,
 	nsp.gp_rcx = data->gp_rcx;
 	nsp.gp_rax = data->gp_rax;
 	return libregdump_gpregs_with_sp(self, &nsp, data->gp_rsp);
-#else
+#else /* __x86_64__ */
 	return libregdump_gpregs_with_sp(self, data, data->gp_esp);
-#endif
+#endif /* !__x86_64__ */
 }
 
-PRIVATE char const *CC get_segment_value_name(uint16_t seg) {
+PRIVATE WUNUSED ATTR_CONST char const *CC
+get_segment_value_name(uint16_t seg) {
 	char const *result = NULL;
 	switch (seg & ~3) {
 #define CASE(x) \
@@ -265,7 +266,13 @@ PRIVATE char const *CC get_segment_value_name(uint16_t seg) {
 }
 
 
-PRIVATE ssize_t CC
+PRIVATE
+#ifdef __KERNEL__
+	NONNULL((1, 4, 5))
+#else /* __KERNEL__ */
+	NONNULL((1))
+#endif /* !__KERNEL__ */
+	ssize_t CC
 libregdump_do_segment(struct regdump_printer *__restrict self,
                       char name, uint16_t value
 #ifdef __KERNEL__
@@ -388,7 +395,7 @@ done:
 	END;
 }
 
-INTERN ssize_t CC
+INTERN NONNULL((1)) ssize_t CC
 libregdump_cr0(struct regdump_printer *__restrict self,
                uintptr_t cr0) {
 	BEGIN;
@@ -431,7 +438,7 @@ libregdump_cr0(struct regdump_printer *__restrict self,
 	END;
 }
 
-INTERN ssize_t CC
+INTERN NONNULL((1)) ssize_t CC
 libregdump_cr4(struct regdump_printer *__restrict self,
                uintptr_t cr4) {
 #ifndef CR4_FSGSBASE
@@ -489,7 +496,7 @@ libregdump_cr4(struct regdump_printer *__restrict self,
 	END;
 }
 
-INTERN ssize_t CC
+INTERN NONNULL((1)) ssize_t CC
 libregdump_dr6(struct regdump_printer *__restrict self,
                uintptr_t dr6) {
 	BEGIN;
@@ -529,7 +536,7 @@ libregdump_dr6(struct regdump_printer *__restrict self,
 	END;
 }
 
-INTERN ssize_t CC
+INTERN NONNULL((1)) ssize_t CC
 libregdump_dr7(struct regdump_printer *__restrict self,
                uintptr_t dr7) {
 	BEGIN;
@@ -678,7 +685,7 @@ libregdump_dr7(struct regdump_printer *__restrict self,
 #endif /* !__KERNEL__ */
 
 
-INTERN ssize_t CC
+INTERN NONNULL((1, 2)) ssize_t CC
 libregdump_sgregs(struct regdump_printer *__restrict self,
                   struct sgregs const *__restrict data) {
 	BEGIN;
@@ -699,7 +706,7 @@ libregdump_sgregs(struct regdump_printer *__restrict self,
 	END;
 }
 
-INTERN ssize_t CC
+INTERN NONNULL((1, 2)) ssize_t CC
 libregdump_sgregs_with_cs_ss(struct regdump_printer *__restrict self,
                              struct sgregs const *__restrict data,
                              uint16_t cs, uint16_t ss) {
@@ -731,7 +738,7 @@ libregdump_sgregs_with_cs_ss(struct regdump_printer *__restrict self,
 	END;
 }
 
-INTERN ssize_t CC
+INTERN NONNULL((1, 2)) ssize_t CC
 libregdump_sgregs_with_cs_ss_tr_ldt(struct regdump_printer *__restrict self,
                                     struct sgregs const *__restrict data,
                                     uint16_t cs, uint16_t ss,
@@ -772,7 +779,7 @@ libregdump_sgregs_with_cs_ss_tr_ldt(struct regdump_printer *__restrict self,
 
 
 /* Print a segment register (id is one of { d[s], e[s], f[s], g[s], c[s], s[s], t[r], l[dt] } (pass the character that doesn't appear in brackets)) */
-INTERN ssize_t CC
+INTERN NONNULL((1)) ssize_t CC
 libregdump_sreg(struct regdump_printer *__restrict self,
                 char id, uint16_t value) {
 	ssize_t result;
@@ -782,7 +789,7 @@ libregdump_sreg(struct regdump_printer *__restrict self,
 	return result;
 }
 
-INTERN ssize_t CC
+INTERN NONNULL((1, 2)) ssize_t CC
 libregdump_coregs(struct regdump_printer *__restrict self,
                   struct coregs const *__restrict data) {
 	BEGIN;
@@ -811,7 +818,7 @@ libregdump_coregs(struct regdump_printer *__restrict self,
 	END;
 }
 
-INTERN ssize_t CC
+INTERN NONNULL((1)) ssize_t CC
 libregdump_do_drx(struct regdump_printer *__restrict self,
                   unsigned int n, uintptr_t drx, uintptr_t dr7) {
 	unsigned int mode;
@@ -888,7 +895,7 @@ libregdump_do_drx(struct regdump_printer *__restrict self,
 	END;
 }
 
-INTERN ssize_t CC
+INTERN NONNULL((1, 2)) ssize_t CC
 libregdump_drregs(struct regdump_printer *__restrict self,
                   struct drregs const *__restrict data) {
 	BEGIN;
@@ -927,7 +934,7 @@ libregdump_drregs(struct regdump_printer *__restrict self,
 }
 
 /* Print the eflags/rflags register */
-INTERN ssize_t CC
+INTERN NONNULL((1)) ssize_t CC
 libregdump_flags(struct regdump_printer *__restrict self,
                  uintptr_t flags) {
 	char arith[5];
@@ -1091,7 +1098,7 @@ PRIVATE bool CC ensure_libdisasm(void) {
 #define ENSURE_LIBDISASM()    true
 #endif /* __KERNEL__ */
 
-PRIVATE ssize_t CC
+PRIVATE NONNULL((1, 2, 4)) ssize_t CC
 libregdump_do_ip_addr2line_info(struct regdump_printer *__restrict self,
                                 di_debug_addr2line_t const *__restrict info,
                                 uintptr_t relpc,
@@ -1137,7 +1144,7 @@ libregdump_do_ip_addr2line_info(struct regdump_printer *__restrict self,
 
 
 /* Print the InstructionPointer register. */
-INTERN ssize_t CC
+INTERN NONNULL((1)) ssize_t CC
 libregdump_ip(struct regdump_printer *__restrict self,
               uintptr_t ip) {
 	struct exception_info info;
@@ -1229,7 +1236,7 @@ restore_old_info_after_disasm:
 	END;
 }
 
-INTERN ssize_t CC
+INTERN NONNULL((1, 2)) ssize_t CC
 libregdump_gdt(struct regdump_printer *__restrict self,
                struct desctab const *__restrict gdt) {
 	BEGIN;
@@ -1249,7 +1256,7 @@ libregdump_gdt(struct regdump_printer *__restrict self,
 	END;
 }
 
-INTERN ssize_t CC
+INTERN NONNULL((1, 2)) ssize_t CC
 libregdump_idt(struct regdump_printer *__restrict self,
                struct desctab const *__restrict idt) {
 	BEGIN;

@@ -217,11 +217,12 @@ struct json_parser;
  * @return: -1: Error: `writer->jw_result' has a negative value when the function was called.
  * @return: -1: Error: An invocation of the `writer->jw_printer' returned a negative value.
  * @return: -2: Error: Invalid usage during this, or during an earlier call. */
-typedef int (LIBJSON_CC *PJSON_ENCODE)(struct json_writer *__restrict writer,
-                                       void const *__restrict codec,
-                                       void const *__restrict src);
+typedef __ATTR_NONNULL((1, 2, 3)) int
+(LIBJSON_CC *PJSON_ENCODE)(struct json_writer *__restrict writer,
+                           void const *__restrict codec,
+                           void const *__restrict src);
 #ifdef LIBJSON_WANT_PROTOTYPES
-LIBJSON_DECL int LIBJSON_CC
+LIBJSON_DECL __ATTR_NONNULL((1, 2, 3)) int LIBJSON_CC
 json_encode(struct json_writer *__restrict writer,
             void const *__restrict codec,
             void const *__restrict src);
@@ -232,14 +233,15 @@ json_encode(struct json_writer *__restrict writer,
  * @return: JSON_ERROR_SYNTAX: Syntax error.
  * @return: JSON_ERROR_NOOBJ:  A required field doesn't exist or has wrong typing.
  * @return: JSON_ERROR_SYSERR: Malformed codec. */
-typedef int (LIBJSON_CC *PJSON_DECODE)(struct json_parser *__restrict parser,
-                                       void const *__restrict codec,
-                                       void *__restrict dst);
+typedef __ATTR_NONNULL((1, 2, 3)) int
+(LIBJSON_CC *PJSON_DECODE)(struct json_parser *__restrict parser,
+                           void const *__restrict codec,
+                           void *__restrict dst);
 #ifdef LIBJSON_WANT_PROTOTYPES
-LIBJSON_DECL int LIBJSON_CC
-json_decode(struct json_parser *__restrict parser,
-            void const *__restrict codec,
-            void *__restrict dst);
+LIBJSON_DECL __ATTR_NONNULL((1, 2, 3)) int
+__NOTHROW_NCX(LIBJSON_CC json_decode)(struct json_parser *__restrict parser,
+                                      void const *__restrict codec,
+                                      void *__restrict dst);
 #endif /* LIBJSON_WANT_PROTOTYPES */
 
 

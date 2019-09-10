@@ -29,9 +29,9 @@
 #include "cfi/x86_64.h"
 #elif defined(__i386__)
 #include "cfi/i386.h"
-#else
+#else /* Arch... */
 #error "Unsupported architecture"
-#endif
+#endif /* !Arch... */
 
 
 #ifndef CFI_UNWIND_COMMON_REGISTER_COUNT
@@ -345,8 +345,8 @@ typedef struct {
  *                 to-be filled with the register value.
  * @return: true:  Processed as `UNWIND_SUCCESS'
  * @return: false: Processed as `UNWIND_INVALID_REGISTER' */
-typedef __BOOL (LIBUNWIND_CC *unwind_getreg_t)(void const *arg, __UINTPTR_HALF_TYPE__ regno, void *dst);
-typedef __BOOL (LIBUNWIND_CC *unwind_setreg_t)(void *arg, __UINTPTR_HALF_TYPE__ regno, void const *src);
+typedef __ATTR_NONNULL((3)) __BOOL (LIBUNWIND_CC *unwind_getreg_t)(void const *arg, __UINTPTR_HALF_TYPE__ regno, void *__restrict dst);
+typedef __ATTR_NONNULL((3)) __BOOL (LIBUNWIND_CC *unwind_setreg_t)(void *arg, __UINTPTR_HALF_TYPE__ regno, void const *__restrict src);
 
 typedef struct unwind_emulator_sections_struct {
 	__byte_t             *ues_eh_frame_start;     /* [0..1][const] Starting address of the .eh_frame section (used for the `DW_OP_call_frame_cfa' instruction).
@@ -394,7 +394,7 @@ typedef struct unwind_emulator_struct {
 	                                                * to this field. */
 #if __SIZEOF_POINTER__ > 4
 	__uint8_t               ue_pad[(sizeof(void *)/2) - 2];
-#endif
+#endif /* __SIZEOF_POINTER__ > 4 */
 	__uint8_t               ue_addrsize;           /* [const] Address size (one of 1,2,4 or 8) (operand size of `DW_OP_addr') */
 	__uint8_t               ue_piecewrite;         /* [const] Non-zero if data pieces should be written, rather than read. */
 	__byte_t               *ue_piecebuf;           /* [0..sm_piecesiz][const] Pointer to a buffer to receive data from `DW_OP_piece' */
@@ -428,15 +428,17 @@ typedef struct unwind_emulator_struct {
  * @return: UNWIND_SEGFAULT:         ...
  * @return: UNWIND_BADALLOC:         ...
  * @return: UNWIND_EMULATOR_*:       ... */
-typedef unsigned int (LIBUNWIND_CC *PUNWIND_EMULATOR_EXEC)(unwind_emulator_t *__restrict self);
-typedef unsigned int (LIBUNWIND_CC *PUNWIND_EMULATOR_EXEC_AUTOSTACK)(unwind_emulator_t *__restrict self,
-                                                                     unwind_ste_t const *pentry_stack_top,
-                                                                     unwind_ste_t *pexit_stack_top,
-                                                                     __uintptr_t *pexit_stack_top_const);
+typedef __ATTR_NONNULL((1)) unsigned int
+(LIBUNWIND_CC *PUNWIND_EMULATOR_EXEC)(unwind_emulator_t *__restrict self);
+typedef __ATTR_NONNULL((1)) unsigned int
+(LIBUNWIND_CC *PUNWIND_EMULATOR_EXEC_AUTOSTACK)(unwind_emulator_t *__restrict self,
+                                                unwind_ste_t const *pentry_stack_top,
+                                                unwind_ste_t *pexit_stack_top,
+                                                __uintptr_t *pexit_stack_top_const);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL unsigned int LIBUNWIND_CC
+LIBUNWIND_DECL __ATTR_NONNULL((1)) unsigned int LIBUNWIND_CC
 unwind_emulator_exec(unwind_emulator_t *__restrict self);
-LIBUNWIND_DECL unsigned int LIBUNWIND_CC
+LIBUNWIND_DECL __ATTR_NONNULL((1)) unsigned int LIBUNWIND_CC
 unwind_emulator_exec_autostack(unwind_emulator_t *__restrict self,
                                unwind_ste_t const *pentry_stack_top,
                                unwind_ste_t *pexit_stack_top,
@@ -449,23 +451,23 @@ unwind_emulator_exec_autostack(unwind_emulator_t *__restrict self,
  *    of handling all possible instruction (after all: CFI has a CISC
  *    instruction set with variable-length instructions)
  * @return: NULL: The instruction at `unwind_pc' wasn't recognized. */
-typedef /*__ATTR_PURE*/ __ATTR_WUNUSED __byte_t const *
-(LIBUNWIND_CC *PUNWIND_INSTRUCTION_SUCC)(__byte_t const *unwind_pc, __uint8_t addrsize);
+typedef /*__ATTR_PURE*/ __ATTR_WUNUSED __ATTR_NONNULL((1)) __byte_t const *
+(LIBUNWIND_CC *PUNWIND_INSTRUCTION_SUCC)(__byte_t const *__restrict unwind_pc, __uint8_t addrsize);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL __ATTR_PURE __ATTR_WUNUSED __byte_t const *
-__NOTHROW_NCX(LIBUNWIND_CC unwind_instruction_succ)(__byte_t const *unwind_pc, __uint8_t addrsize);
+LIBUNWIND_DECL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __byte_t const *
+__NOTHROW_NCX(LIBUNWIND_CC unwind_instruction_succ)(__byte_t const *__restrict unwind_pc, __uint8_t addrsize);
 #endif /* LIBUNWIND_WANT_PROTOTYPES */
 
 /* Return a pointer to a CFI expression that is applicable for `cu_base + module_relative_pc'
  * If no such expression exists, return `NULL' instead. */
-typedef /*__ATTR_PURE*/ __ATTR_WUNUSED __byte_t *
+typedef /*__ATTR_PURE*/ __ATTR_WUNUSED __ATTR_NONNULL((1, 5)) __byte_t *
 (LIBUNWIND_CC *PDEBUGINFO_LOCATION_SELECT)(di_debuginfo_location_t const *__restrict self,
                                            __uintptr_t cu_base,
                                            __uintptr_t module_relative_pc,
                                            __uint8_t addrsize,
                                            __size_t *__restrict pexpr_length);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL __ATTR_PURE __ATTR_WUNUSED __byte_t *
+LIBUNWIND_DECL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 5)) __byte_t *
 __NOTHROW_NCX(LIBUNWIND_CC debuginfo_location_select)(di_debuginfo_location_t const *__restrict self,
                                                       __uintptr_t cu_base,
                                                       __uintptr_t module_relative_pc,
@@ -503,7 +505,7 @@ __NOTHROW_NCX(LIBUNWIND_CC debuginfo_location_select)(di_debuginfo_location_t co
  * @return: UNWIND_EMULATOR_NOT_WRITABLE:     Attempted to write to a read-only location expression.
  * @return: UNWIND_EMULATOR_BUFFER_TOO_SMALL: The given `bufsize' is too small.
  * @return: UNWIND_EMULATOR_NO_FUNCTION:      The associated location list is undefined for `module_relative_pc' */
-typedef unsigned int
+typedef __ATTR_NONNULL((1, 3, 7, 9)) unsigned int
 (LIBUNWIND_CC *PDEBUGINFO_LOCATION_GETVALUE)(di_debuginfo_location_t const *__restrict self,
                                              unwind_emulator_sections_t const *sectinfo,
                                              unwind_getreg_t regget, void *regget_arg,
@@ -513,7 +515,7 @@ typedef unsigned int
                                              __size_t *__restrict pnum_written_bits,
                                              di_debuginfo_location_t const *frame_base_expression,
                                              void *objaddr, __uint8_t addrsize);
-typedef unsigned int
+typedef __ATTR_NONNULL((1, 3, 5, 9, 11)) unsigned int
 (LIBUNWIND_CC *PDEBUGINFO_LOCATION_SETVALUE)(di_debuginfo_location_t const *__restrict self,
                                              unwind_emulator_sections_t const *sectinfo,
                                              unwind_getreg_t regget, void *regget_arg,
@@ -525,7 +527,7 @@ typedef unsigned int
                                              di_debuginfo_location_t const *frame_base_expression,
                                              void *objaddr, __uint8_t addrsize);
 #ifdef LIBUNWIND_WANT_PROTOTYPES
-LIBUNWIND_DECL unsigned int LIBUNWIND_CC
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3, 7, 9)) unsigned int LIBUNWIND_CC
 debuginfo_location_getvalue(di_debuginfo_location_t const *__restrict self,
                             unwind_emulator_sections_t const *sectinfo,
                             unwind_getreg_t regget, void *regget_arg,
@@ -535,7 +537,7 @@ debuginfo_location_getvalue(di_debuginfo_location_t const *__restrict self,
                             __size_t *__restrict pnum_written_bits,
                             di_debuginfo_location_t const *frame_base_expression,
                             void *objaddr, __uint8_t addrsize);
-LIBUNWIND_DECL unsigned int LIBUNWIND_CC
+LIBUNWIND_DECL __ATTR_NONNULL((1, 3, 5, 9, 11)) unsigned int LIBUNWIND_CC
 debuginfo_location_setvalue(di_debuginfo_location_t const *__restrict self,
                             unwind_emulator_sections_t const *sectinfo,
                             unwind_getreg_t regget, void *regget_arg,

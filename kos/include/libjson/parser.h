@@ -19,12 +19,12 @@
 #ifndef _LIBJSON_PARSER_H
 #define _LIBJSON_PARSER_H 1
 
+#include "api.h"
+
 #include <__stdinc.h>
 
 #include <bits/format-printer.h>
 #include <bits/types.h>
-
-#include "api.h"
 
 /* Json parser example usage:
  * >> struct json_parser parser;
@@ -48,7 +48,7 @@ __DECL_BEGIN
 #define JSON_ERROR_NOOBJ  (-2) /* Entity does not exist */
 #define JSON_ERROR_SYSERR (-3) /* Other error (context-specific) */
 #define JSON_ERROR_NOTEQ  JSON_ERROR_SYSERR /* Strings are not equal */
-#define JSON_ERROR_EOF    JSON_ERROR_NOOBJ  /* End-of-file has been reachabed */
+#define JSON_ERROR_EOF    JSON_ERROR_NOOBJ  /* End-of-file has been reached */
 
 /* Json encoding values. */
 #define JSON_ENCODING_UTF8    0x0000 /* utf-8 */
@@ -102,39 +102,46 @@ struct json_parser {
  * NOTE: This function automatically detects the encoding (one of `JSON_ENCODING_*')
  *       of the given input, as specified by the Json specs, meaning you don't have
  *       to concern yourself with the details on how to supply input to this function. */
-typedef void (LIBJSON_CC *PJSON_PARSER_INIT)(struct json_parser *__restrict self,
-                                             void const *start, void const *end);
+typedef __ATTR_NONNULL((1, 2, 3)) void
+(LIBJSON_CC *PJSON_PARSER_INIT)(struct json_parser *__restrict self,
+                                void const *start, void const *end);
 #ifdef LIBJSON_WANT_PROTOTYPES
-LIBJSON_DECL void LIBJSON_CC
-json_parser_init(struct json_parser *__restrict self,
-                 void const *start, void const *end);
+LIBJSON_DECL __ATTR_NONNULL((1, 2, 3)) void
+__NOTHROW_NCX(LIBJSON_CC json_parser_init)(struct json_parser *__restrict self,
+                                           void const *start, void const *end);
 #endif /* LIBJSON_WANT_PROTOTYPES */
 
 /* Yield to the current token and advance to the next one
  * @return: JSON_PARSER_*:     The previously selected token (the parser now points at its end)
  * @return: JSON_ERROR_EOF:    The end of the input file has been reached.
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
-typedef int (LIBJSON_CC *PJSON_PARSER_YIELD)(struct json_parser *__restrict self);
+typedef __ATTR_NONNULL((1)) int
+(LIBJSON_CC *PJSON_PARSER_YIELD)(struct json_parser *__restrict self);
 #ifdef LIBJSON_WANT_PROTOTYPES
-LIBJSON_DECL int LIBJSON_CC json_parser_yield(struct json_parser *__restrict self);
+LIBJSON_DECL __ATTR_NONNULL((1)) int
+__NOTHROW_NCX(LIBJSON_CC json_parser_yield)(struct json_parser *__restrict self);
 #endif /* LIBJSON_WANT_PROTOTYPES */
 
 /* Yield to the previous token and return it
  * @return: JSON_PARSER_*:     The now selected token (The parser is now located at the previous token)
  * @return: JSON_ERROR_EOF:    The start of the input file had already been reached.
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
-typedef int (LIBJSON_CC *PJSON_PARSER_UNYIELD)(struct json_parser *__restrict self);
+typedef __ATTR_NONNULL((1)) int
+(LIBJSON_CC *PJSON_PARSER_UNYIELD)(struct json_parser *__restrict self);
 #ifdef LIBJSON_WANT_PROTOTYPES
-LIBJSON_DECL int LIBJSON_CC json_parser_unyield(struct json_parser *__restrict self);
+LIBJSON_DECL __ATTR_NONNULL((1)) int
+__NOTHROW_NCX(LIBJSON_CC json_parser_unyield)(struct json_parser *__restrict self);
 #endif /* LIBJSON_WANT_PROTOTYPES */
 
 /* Rewind to the start of the current object/array
  * @return: JSON_PARSER_ARRAY:  The parser now points at the first token following the initial `['.
  * @return: JSON_PARSER_OBJECT: The parser now points at the first token following the initial `{'.
  * @return: JSON_ERROR_SYNTAX:  Syntax error. */
-typedef int (LIBJSON_CC *PJSON_PARSER_REWIND)(struct json_parser *__restrict self);
+typedef __ATTR_NONNULL((1)) int
+(LIBJSON_CC *PJSON_PARSER_REWIND)(struct json_parser *__restrict self);
 #ifdef LIBJSON_WANT_PROTOTYPES
-LIBJSON_DECL int LIBJSON_CC json_parser_rewind(struct json_parser *__restrict self);
+LIBJSON_DECL __ATTR_NONNULL((1)) int
+__NOTHROW_NCX(LIBJSON_CC json_parser_rewind)(struct json_parser *__restrict self);
 #endif /* LIBJSON_WANT_PROTOTYPES */
 
 /* Advance the parser to the next object member or array index
@@ -145,9 +152,11 @@ LIBJSON_DECL int LIBJSON_CC json_parser_rewind(struct json_parser *__restrict se
  * @return: JSON_ERROR_NOOBJ: The end of the current object/array was reached.
  *                            The parser now points at the `}' or `]' following the object/array
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
-typedef int (LIBJSON_CC *PJSON_PARSER_NEXT)(struct json_parser *__restrict self);
+typedef __ATTR_NONNULL((1)) int
+(LIBJSON_CC *PJSON_PARSER_NEXT)(struct json_parser *__restrict self);
 #ifdef LIBJSON_WANT_PROTOTYPES
-LIBJSON_DECL int LIBJSON_CC json_parser_next(struct json_parser *__restrict self);
+LIBJSON_DECL __ATTR_NONNULL((1)) int
+__NOTHROW_NCX(LIBJSON_CC json_parser_next)(struct json_parser *__restrict self);
 #endif /* LIBJSON_WANT_PROTOTYPES */
 
 /* Rewind the parser to the previous object member or array index
@@ -161,24 +170,26 @@ LIBJSON_DECL int LIBJSON_CC json_parser_next(struct json_parser *__restrict self
  *                            leave_object == false: The parser still points at the start of
  *                                                   the first member of the inner object/array.
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
-typedef int (LIBJSON_CC *PJSON_PARSER_PREV)(struct json_parser *__restrict self,
+typedef __ATTR_NONNULL((1)) int
+(LIBJSON_CC *PJSON_PARSER_PREV)(json_parser *__restrict self,
                                             __BOOL leave_object);
 #ifdef LIBJSON_WANT_PROTOTYPES
-LIBJSON_DECL int LIBJSON_CC json_parser_prev(struct json_parser *__restrict self,
-                                             __BOOL leave_object);
+LIBJSON_DECL __ATTR_NONNULL((1)) int
+__NOTHROW_NCX(LIBJSON_CC json_parser_prev)(struct json_parser *__restrict self,
+                                           __BOOL leave_object);
 #endif /* LIBJSON_WANT_PROTOTYPES */
 
 /* Advance the parser to the first member/index of an object/array
  * @return: JSON_ERROR_OK:    The parser now points at first member/index of the inner object/array.
  * @return: JSON_ERROR_NOOBJ: The parser didn't point at `{' or `[' (its position remains unchanged).
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
-typedef int (LIBJSON_CC *PJSON_PARSER_ENTER)(struct json_parser *__restrict self);
-typedef int (LIBJSON_CC *PJSON_PARSER_ENTEROBJECT)(struct json_parser *__restrict self);
-typedef int (LIBJSON_CC *PJSON_PARSER_ENTERARRAY)(struct json_parser *__restrict self);
+typedef __ATTR_NONNULL((1)) int (LIBJSON_CC *PJSON_PARSER_ENTER)(struct json_parser *__restrict self);
+typedef __ATTR_NONNULL((1)) int (LIBJSON_CC *PJSON_PARSER_ENTEROBJECT)(struct json_parser *__restrict self);
+typedef __ATTR_NONNULL((1)) int (LIBJSON_CC *PJSON_PARSER_ENTERARRAY)(struct json_parser *__restrict self);
 #ifdef LIBJSON_WANT_PROTOTYPES
-LIBJSON_DECL int LIBJSON_CC json_parser_enter(struct json_parser *__restrict self);
-LIBJSON_DECL int LIBJSON_CC json_parser_enterobject(struct json_parser *__restrict self);
-LIBJSON_DECL int LIBJSON_CC json_parser_enterarray(struct json_parser *__restrict self);
+LIBJSON_DECL __ATTR_NONNULL((1)) int __NOTHROW_NCX(LIBJSON_CC json_parser_enter)(struct json_parser *__restrict self);
+LIBJSON_DECL __ATTR_NONNULL((1)) int __NOTHROW_NCX(LIBJSON_CC json_parser_enterobject)(struct json_parser *__restrict self);
+LIBJSON_DECL __ATTR_NONNULL((1)) int __NOTHROW_NCX(LIBJSON_CC json_parser_enterarray)(struct json_parser *__restrict self);
 #endif /* LIBJSON_WANT_PROTOTYPES */
 
 /* Skip the remainder of the current object/array and parse until after the following `,'
@@ -188,22 +199,24 @@ LIBJSON_DECL int LIBJSON_CC json_parser_enterarray(struct json_parser *__restric
  *                          the parser exists at the `}' or `]' that is taking its place.
  * @return: JSON_ERROR_EOF: The end of the input file has been reached.
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
-typedef int (LIBJSON_CC *PJSON_PARSER_LEAVE)(struct json_parser *__restrict self);
-typedef int (LIBJSON_CC *PJSON_PARSER_LEAVEOBJECT)(struct json_parser *__restrict self);
-typedef int (LIBJSON_CC *PJSON_PARSER_LEAVEARRAY)(struct json_parser *__restrict self);
+typedef __ATTR_NONNULL((1)) int (LIBJSON_CC *PJSON_PARSER_LEAVE)(struct json_parser *__restrict self);
+typedef __ATTR_NONNULL((1)) int (LIBJSON_CC *PJSON_PARSER_LEAVEOBJECT)(struct json_parser *__restrict self);
+typedef __ATTR_NONNULL((1)) int (LIBJSON_CC *PJSON_PARSER_LEAVEARRAY)(struct json_parser *__restrict self);
 #ifdef LIBJSON_WANT_PROTOTYPES
-LIBJSON_DECL int LIBJSON_CC json_parser_leave(struct json_parser *__restrict self);
-LIBJSON_DECL int LIBJSON_CC json_parser_leaveobject(struct json_parser *__restrict self);
-LIBJSON_DECL int LIBJSON_CC json_parser_leavearray(struct json_parser *__restrict self);
+LIBJSON_DECL __ATTR_NONNULL((1)) int __NOTHROW_NCX(LIBJSON_CC json_parser_leave)(struct json_parser *__restrict self);
+LIBJSON_DECL __ATTR_NONNULL((1)) int __NOTHROW_NCX(LIBJSON_CC json_parser_leaveobject)(struct json_parser *__restrict self);
+LIBJSON_DECL __ATTR_NONNULL((1)) int __NOTHROW_NCX(LIBJSON_CC json_parser_leavearray)(struct json_parser *__restrict self);
 #endif /* LIBJSON_WANT_PROTOTYPES */
 
 
 /* Returns the current parser state / token type.
  * @return: JSON_PARSER_*: The current parser state.
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
-typedef int (LIBJSON_CC *PJSON_PARSER_STATE)(struct json_parser *__restrict self);
+typedef __ATTR_NONNULL((1)) int
+(LIBJSON_CC *PJSON_PARSER_STATE)(struct json_parser *__restrict self);
 #ifdef LIBJSON_WANT_PROTOTYPES
-LIBJSON_DECL int LIBJSON_CC json_parser_state(struct json_parser *__restrict self);
+LIBJSON_DECL __ATTR_NONNULL((1)) int
+__NOTHROW_NCX(LIBJSON_CC json_parser_state)(struct json_parser *__restrict self);
 #endif /* LIBJSON_WANT_PROTOTYPES */
 
 
@@ -214,14 +227,15 @@ LIBJSON_DECL int LIBJSON_CC json_parser_state(struct json_parser *__restrict sel
  * @return: JSON_ERROR_OK:    The parser now points after the `:' following the matching key's name.
  * @return: JSON_ERROR_NOOBJ: The given `key' wasn't found (The position of `self' remains unchanged)
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
-typedef int (LIBJSON_CC *PJSON_PARSER_FINDKEY)(struct json_parser *__restrict self,
+typedef __ATTR_NONNULL((1, 2)) int
+(LIBJSON_CC *PJSON_PARSER_FINDKEY)(struct json_parser *__restrict self,
                                                /*utf-8*/ char const *__restrict key,
                                                size_t keylen);
 #ifdef LIBJSON_WANT_PROTOTYPES
-LIBJSON_DECL int LIBJSON_CC
-json_parser_findkey(struct json_parser *__restrict self,
-                    /*utf-8*/char const *__restrict key,
-                    size_t keylen);
+LIBJSON_DECL __ATTR_NONNULL((1, 2)) int
+__NOTHROW_NCX(LIBJSON_CC json_parser_findkey)(struct json_parser *__restrict self,
+                                              /*utf-8*/ char const *__restrict key,
+                                              size_t keylen);
 #endif /* LIBJSON_WANT_PROTOTYPES */
 
 /* Got the `index'th' array elements before returning `JSON_ERROR_OK'
@@ -234,12 +248,13 @@ json_parser_findkey(struct json_parser *__restrict self,
  * @return: JSON_ERROR_NOOBJ: The end of the array has been reached before, or when `index'
  *                            elements had been skipped. (The position of `self' remains unchanged)
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
-typedef int (LIBJSON_CC *PJSON_PARSER_FINDINDEX)(struct json_parser *__restrict self,
-                                                 __uintptr_t index);
+typedef __ATTR_NONNULL((1)) int
+(LIBJSON_CC *PJSON_PARSER_FINDINDEX)(struct json_parser *__restrict self,
+                                     __uintptr_t index);
 #ifdef LIBJSON_WANT_PROTOTYPES
-LIBJSON_DECL int LIBJSON_CC
-json_parser_findindex(struct json_parser *__restrict self,
-                      __uintptr_t index);
+LIBJSON_DECL __ATTR_NONNULL((1)) int
+__NOTHROW_NCX(LIBJSON_CC json_parser_findindex)(struct json_parser *__restrict self,
+                                                __uintptr_t index);
 #endif /* LIBJSON_WANT_PROTOTYPES */
 
 /* Check if the current parser token (which should be a string) is equal to `str'
@@ -249,14 +264,14 @@ json_parser_findindex(struct json_parser *__restrict self,
  *                             In this case the parser now points at the first token after the string.
  * @return: JSON_ERROR_NOOBJ:  The parser didn't point at a string. (The position of `self' remains unchanged)
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
-typedef int (LIBJSON_CC *PJSON_PARSER_EQSTRING)(struct json_parser *__restrict self,
-                                                /*utf-8*/ char const *__restrict str,
-                                                size_t len);
+typedef __ATTR_NONNULL((1, 2)) int
+(LIBJSON_CC *PJSON_PARSER_EQSTRING)(struct json_parser *__restrict self,
+                                    /*utf-8*/ char const *__restrict str, size_t len);
 #ifdef LIBJSON_WANT_PROTOTYPES
-LIBJSON_DECL int LIBJSON_CC
-json_parser_eqstring(struct json_parser *__restrict self,
-                     /*utf-8*/char const *__restrict str,
-                     size_t len);
+LIBJSON_DECL __ATTR_NONNULL((1, 2)) int
+__NOTHROW_NCX(LIBJSON_CC json_parser_eqstring)(struct json_parser *__restrict self,
+                                               /*utf-8*/ char const *__restrict str,
+                                               size_t len);
 #endif /* LIBJSON_WANT_PROTOTYPES */
 
 /* Parse a Json string and print its contents to `printer'
@@ -269,14 +284,15 @@ json_parser_eqstring(struct json_parser *__restrict self,
  * @return: JSON_ERROR_SYSERR: An invocation of `printer' returned a negative value (stored in `*pprinter_result').
  *                             In this case the position of the parser is revered to the start of the string.
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
-typedef int (LIBJSON_CC *PJSON_PARSER_PRINTSTRING)(struct json_parser *__restrict self,
-                                                   __pformatprinter printer, void *arg,
-                                                   __ssize_t *__restrict pprinter_result);
+typedef __ATTR_NONNULL((1, 2, 4)) int
+(LIBJSON_CC *PJSON_PARSER_PRINTSTRING)(struct json_parser *__restrict self,
+                                       __pformatprinter printer, void *arg,
+                                       __ssize_t *__restrict pprinter_result);
 #ifdef LIBJSON_WANT_PROTOTYPES
-LIBJSON_DECL int LIBJSON_CC
-json_parser_printstring(struct json_parser *__restrict self,
-                        __pformatprinter printer, void *arg,
-                        __ssize_t *__restrict pprinter_result);
+LIBJSON_DECL __ATTR_NONNULL((1, 2, 4)) int
+__NOTHROW_NCX(LIBJSON_CC json_parser_printstring)(struct json_parser *__restrict self,
+                                                  __pformatprinter printer, void *arg,
+                                                  __ssize_t *__restrict pprinter_result);
 #endif /* LIBJSON_WANT_PROTOTYPES */
 
 /* A somewhat hacky variant of `libjson_parser_printstring()', which replaces the source
@@ -295,12 +311,13 @@ json_parser_printstring(struct json_parser *__restrict self,
  * @return: NULL:   An error occurred; when `perror` is non-NULL, that error is stored there:
  *                   - JSON_ERROR_NOOBJ:  Parser didn't point at a string object.
  *                   - JSON_ERROR_SYNTAX: Syntax error */
-typedef /*utf-8*/char *(LIBJSON_CC *PJSON_PARSER_GETSTRING)(struct json_parser *__restrict self,
-                                                            __size_t *plength, int *perror);
+typedef __ATTR_WUNUSED __ATTR_NONNULL((1)) /*utf-8*/char *
+(LIBJSON_CC *PJSON_PARSER_GETSTRING)(struct json_parser *__restrict self,
+                                     __size_t *plength, int *perror);
 #ifdef LIBJSON_WANT_PROTOTYPES
-LIBJSON_DECL /*utf-8*/char *LIBJSON_CC
-json_parser_getstring(struct json_parser *__restrict self,
-                      __size_t *plength, int *perror);
+LIBJSON_DECL __ATTR_WUNUSED __ATTR_NONNULL((1)) /*utf-8*/char *
+__NOTHROW_NCX(LIBJSON_CC json_parser_getstring)(struct json_parser *__restrict self,
+                                                __size_t *plength, int *perror);
 #endif /* LIBJSON_WANT_PROTOTYPES */
 
 
@@ -310,27 +327,31 @@ json_parser_getstring(struct json_parser *__restrict self,
  * @return: JSON_ERROR_NOOBJ:  The parser didn't point at a number token.
  *                             In this case the parser didn't change position.
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
-typedef int (LIBJSON_CC *PJSON_PARSER_GETNUMBER)(struct json_parser *__restrict self,
-                                                 __intptr_t *__restrict presult);
-typedef int (LIBJSON_CC *PJSON_PARSER_GETINT64)(struct json_parser *__restrict self,
-                                                __int64_t *__restrict presult);
-typedef int (LIBJSON_CC *PJSON_PARSER_GETUINT64)(struct json_parser *__restrict self,
-                                                 __uint64_t *__restrict presult);
-typedef int (LIBJSON_CC *PJSON_PARSER_GETFLOAT)(struct json_parser *__restrict self,
-                                                double *__restrict presult);
+typedef __ATTR_NONNULL((1, 2)) int
+(LIBJSON_CC *PJSON_PARSER_GETNUMBER)(struct json_parser *__restrict self,
+                                     __intptr_t *__restrict presult);
+typedef __ATTR_NONNULL((1, 2)) int
+(LIBJSON_CC *PJSON_PARSER_GETINT64)(struct json_parser *__restrict self,
+                                    __int64_t *__restrict presult);
+typedef __ATTR_NONNULL((1, 2)) int
+(LIBJSON_CC *PJSON_PARSER_GETUINT64)(struct json_parser *__restrict self,
+                                     __uint64_t *__restrict presult);
+typedef __ATTR_NONNULL((1, 2)) int
+(LIBJSON_CC *PJSON_PARSER_GETFLOAT)(struct json_parser *__restrict self,
+                                    double *__restrict presult);
 #ifdef LIBJSON_WANT_PROTOTYPES
-LIBJSON_DECL int LIBJSON_CC
-json_parser_getnumber(struct json_parser *__restrict self,
-                      __intptr_t *__restrict presult);
-LIBJSON_DECL int LIBJSON_CC
-json_parser_getint64(struct json_parser *__restrict self,
-                     __int64_t *__restrict presult);
-LIBJSON_DECL int LIBJSON_CC
-json_parser_getuint64(struct json_parser *__restrict self,
-                      __uint64_t *__restrict presult);
-LIBJSON_DECL int LIBJSON_CC
-json_parser_getfloat(struct json_parser *__restrict self,
-                     double *__restrict presult);
+LIBJSON_DECL __ATTR_NONNULL((1, 2)) int
+__NOTHROW_NCX(LIBJSON_CC json_parser_getnumber)(struct json_parser *__restrict self,
+                                                __intptr_t *__restrict presult);
+LIBJSON_DECL __ATTR_NONNULL((1, 2)) int
+__NOTHROW_NCX(LIBJSON_CC json_parser_getint64)(struct json_parser *__restrict self,
+                                               __int64_t *__restrict presult);
+LIBJSON_DECL __ATTR_NONNULL((1, 2)) int
+__NOTHROW_NCX(LIBJSON_CC json_parser_getuint64)(struct json_parser *__restrict self,
+                                                __uint64_t *__restrict presult);
+LIBJSON_DECL __ATTR_NONNULL((1, 2)) int
+__NOTHROW_NCX(LIBJSON_CC json_parser_getfloat)(struct json_parser *__restrict self,
+                                               double *__restrict presult);
 #endif /* LIBJSON_WANT_PROTOTYPES */
 
 /* Decode a Json boolean and store its value in `*presult'
@@ -339,12 +360,13 @@ json_parser_getfloat(struct json_parser *__restrict self,
  * @return: JSON_ERROR_NOOBJ:  The parser didn't point at a true/false token.
  *                             In this case the parser didn't change position.
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
-typedef int (LIBJSON_CC *PJSON_PARSER_GETBOOL)(struct json_parser *__restrict self,
-                                               __BOOL *__restrict presult);
+typedef __ATTR_NONNULL((1, 2)) int
+(LIBJSON_CC *PJSON_PARSER_GETBOOL)(struct json_parser *__restrict self,
+                                   __BOOL *__restrict presult);
 #ifdef LIBJSON_WANT_PROTOTYPES
-LIBJSON_DECL int LIBJSON_CC
-json_parser_getbool(struct json_parser *__restrict self,
-                    __BOOL *__restrict presult);
+LIBJSON_DECL __ATTR_NONNULL((1, 2)) int
+__NOTHROW_NCX(LIBJSON_CC json_parser_getbool)(struct json_parser *__restrict self,
+                                              __BOOL *__restrict presult);
 #endif /* LIBJSON_WANT_PROTOTYPES */
 
 /* Decode a Json null-value
@@ -353,10 +375,11 @@ json_parser_getbool(struct json_parser *__restrict self,
  * @return: JSON_ERROR_NOOBJ:  The parser didn't point at a `null' token.
  *                             In this case the parser didn't change position.
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
-typedef int (LIBJSON_CC *PJSON_PARSER_GETNULL)(struct json_parser *__restrict self);
+typedef __ATTR_NONNULL((1)) int
+(LIBJSON_CC *PJSON_PARSER_GETNULL)(struct json_parser *__restrict self);
 #ifdef LIBJSON_WANT_PROTOTYPES
-LIBJSON_DECL int LIBJSON_CC
-json_parser_getnull(struct json_parser *__restrict self);
+LIBJSON_DECL __ATTR_NONNULL((1)) int
+__NOTHROW_NCX(LIBJSON_CC json_parser_getnull)(struct json_parser *__restrict self);
 #endif /* LIBJSON_WANT_PROTOTYPES */
 
 #endif /* __CC__ */

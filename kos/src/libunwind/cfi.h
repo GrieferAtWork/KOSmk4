@@ -47,9 +47,9 @@ DECL_BEGIN
  * @return: UNWIND_SEGFAULT:         ...
  * @return: UNWIND_BADALLOC:         ...
  * @return: UNWIND_EMULATOR_*:       ... */
-INTDEF unsigned int CC
+INTDEF NONNULL((1)) unsigned int CC
 libuw_unwind_emulator_exec(unwind_emulator_t *__restrict self);
-INTDEF unsigned int CC
+INTDEF NONNULL((1)) unsigned int CC
 libuw_unwind_emulator_exec_autostack(unwind_emulator_t *__restrict self,
                                      unwind_ste_t const *pentry_stack_top,
                                      unwind_ste_t *pexit_stack_top,
@@ -62,12 +62,12 @@ libuw_unwind_emulator_exec_autostack(unwind_emulator_t *__restrict self,
  *    of handling all possible instruction (after all: CFI has a CISC
  *    instruction set with variable-length instructions)
  * @return: NULL: The instruction at `unwind_pc' wasn't recognized. */
-INTDEF ATTR_PURE WUNUSED byte_t const *
-NOTHROW_NCX(CC libuw_unwind_instruction_succ)(byte_t const *unwind_pc, uint8_t addrsize);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) byte_t const *
+NOTHROW_NCX(CC libuw_unwind_instruction_succ)(byte_t const *__restrict unwind_pc, uint8_t addrsize);
 
 /* Return a pointer to a CFI expression that is applicable for `module_relative_pc'
  * If no such expression exists, return `NULL' instead. */
-INTDEF WUNUSED byte_t *
+INTDEF WUNUSED NONNULL((1, 5)) byte_t *
 NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *__restrict self,
                                                 uintptr_t cu_base,
                                                 uintptr_t module_relative_pc,
@@ -103,7 +103,7 @@ NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *_
  * @return: UNWIND_EMULATOR_NOT_WRITABLE:     Attempted to write to a read-only location expression.
  * @return: UNWIND_EMULATOR_BUFFER_TOO_SMALL: The given `bufsize' is too small.
  * @return: UNWIND_EMULATOR_NO_FUNCTION:      The associated location list is undefined for `module_relative_pc' */
-INTDEF unsigned int CC
+INTDEF NONNULL((1, 3, 7, 9)) unsigned int CC
 libuw_debuginfo_location_getvalue(di_debuginfo_location_t const *__restrict self,
                                   unwind_emulator_sections_t const *sectinfo,
                                   unwind_getreg_t regget, void *regget_arg,
@@ -112,7 +112,7 @@ libuw_debuginfo_location_getvalue(di_debuginfo_location_t const *__restrict self
                                   size_t *__restrict pnum_written_bits,
                                   di_debuginfo_location_t const *frame_base_expression,
                                   void *objaddr, uint8_t addrsize);
-INTDEF unsigned int CC
+INTDEF NONNULL((1, 3, 5, 9, 11)) unsigned int CC
 libuw_debuginfo_location_setvalue(di_debuginfo_location_t const *__restrict self,
                                   unwind_emulator_sections_t const *sectinfo,
                                   unwind_getreg_t regget, void *regget_arg,

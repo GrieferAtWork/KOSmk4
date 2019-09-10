@@ -27,7 +27,7 @@ DECL_BEGIN
 /* Initialize the given keymap to represent the map keys according to the en_US layout.
  * This function should be used as fallback when the caller is unable to initialize the
  * desired keyboard layout, as ~any~ mapping is still better than no mapping at all. */
-INTDEF void
+INTDEF NONNULL((1)) void
 NOTHROW_NCX(CC libkeymap_init_en_US)(struct keymap *__restrict self);
 
 

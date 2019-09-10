@@ -124,7 +124,7 @@ PRIVATE struct basic_key const basic_keys_en_US[0xe0] = {
 /* Initialize the given keymap to represent the map keys according to the en_US layout.
  * This function should be used as fallback when the caller is unable to initialize the
  * desired keyboard layout, as ~any~ mapping is still better than no mapping at all. */
-INTERN void
+INTERN NONNULL((1)) void
 NOTHROW_NCX(CC libkeymap_init_en_US)(struct keymap *__restrict self) {
 	memcpy(self->km_basic, basic_keys_en_US, sizeof(self->km_basic));
 	self->km_ext         = empty_extended_mapping;

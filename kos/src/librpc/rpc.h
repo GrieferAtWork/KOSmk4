@@ -51,7 +51,7 @@ INTDEF int CC librpc_service(void);
  * @throws: E_PROCESS_EXITED:  `target' does not reference a valid process
  * @throws: E_INVALID_ARGUMENT: The given `flag' is invalid.
  * NOTE: The system call of this function is called `sys_rpc_schedule()' */
-INTDEF int CC
+INTDEF NONNULL((3)) int CC
 librpc_schedule_ex(pid_t target, syscall_ulong_t flags,
                    uint8_t const *__restrict program,
                    void **arguments);
@@ -118,7 +118,7 @@ librpc_schedule_ex(pid_t target, syscall_ulong_t flags,
  * @return: -1: Error (s.a. `errno')
  * @throws: E_PROCESS_EXITED:  `target' does not reference a valid process
  * @throws: E_INVALID_ARGUMENT: The given `flag' is invalid. */
-INTDEF int VCC
+INTDEF NONNULL((3)) int VCC
 librpc_schedule(pid_t target, syscall_ulong_t flags, void (*callback)(),
                 size_t argc, /* uintptr_t *status_futex */ /* uintptr_t ...args */...);
 

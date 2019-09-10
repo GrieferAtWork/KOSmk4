@@ -34,8 +34,8 @@
 #define PRINT_TEXTSECTION    ATTR_COLDTEXT
 #define PRINT_STRINGSECTION  ATTR_COLDRODATA
 #else
-#define TEXTSECTION          /*ATTR_SECTION(".text")*/   /* noting */
-#define STRINGSECTION        /*ATTR_SECTION(".rodata")*/ /* noting */
+#define TEXTSECTION          /*ATTR_SECTION(".text")*/   /* nothing */
+#define STRINGSECTION        /*ATTR_SECTION(".rodata")*/ /* nothing */
 #define REPR_TEXTSECTION     ATTR_SECTION(".text.repr")
 #define REPR_STRINGSECTION   ATTR_SECTION(".rodata.repr")
 #define PRINT_TEXTSECTION    ATTR_SECTION(".text.print")

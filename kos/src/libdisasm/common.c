@@ -201,7 +201,7 @@ libda_disasm_print_instruction(struct disassembler *__restrict self) {
 	return self->d_result;
 }
 
-INTERN void CC
+INTERN NONNULL((1)) void CC
 libda_single_generic(struct disassembler *__restrict self) {
 	disasm_print_format(self, DISASSEMBLER_FORMAT_PSEUDOOP_PREFIX);
 	disasm_print(self, ".byte", 5);
@@ -216,7 +216,7 @@ libda_single_generic(struct disassembler *__restrict self) {
 #ifdef CONFIG_LOOKUP_SYMBOL_NAME
 #ifndef __KERNEL__
 PRIVATE void *libdebuginfo = NULL;
-PRIVATE ATTR_NOINLINE void *CC get_libdebuginfo(void) {
+PRIVATE ATTR_NOINLINE WUNUSED void *CC get_libdebuginfo(void) {
 	void *result;
 again:
 	result = ATOMIC_READ(libdebuginfo);
@@ -243,7 +243,7 @@ PRIVATE PDEBUG_SECTIONS_ADDR2LINE pdyn_debug_sections_addr2line = NULL;
 #define debug_dlunlocksections   (*pdyn_debug_dlunlocksections)
 #define debug_sections_addr2line (*pdyn_debug_sections_addr2line)
 
-PRIVATE ATTR_NOINLINE bool CC init_libdebuginfo(void) {
+PRIVATE ATTR_NOINLINE WUNUSED bool CC init_libdebuginfo(void) {
 	void *lib;
 	if (pdyn_debug_dllocksections)
 		return true;

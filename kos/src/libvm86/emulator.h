@@ -41,13 +41,13 @@ DECL_BEGIN
  * @return: VM86_SUCCESS: The single instruction was successfully executed.
  * @return: VM86_STOPPED: The program counter was already placed at 0xffff:0xffff, or has jumped to that location.
  * @return: * :           One of `VM86_*' */
-INTDEF int CC libvm86_step(vm86_state_t *__restrict self);
+INTDEF NONNULL((1)) int CC libvm86_step(vm86_state_t *__restrict self);
 
 /* Same as `vm86_step()', but also check for pending interrupts beforehand. */
-INTDEF int CC libvm86_fullstep(vm86_state_t *__restrict self);
+INTDEF NONNULL((1)) int CC libvm86_fullstep(vm86_state_t *__restrict self);
 
 /* Execute VM86 emulator code until that code finishes execution. */
-INTDEF int CC libvm86_exec(vm86_state_t *__restrict self);
+INTDEF NONNULL((1)) int CC libvm86_exec(vm86_state_t *__restrict self);
 
 /* Trigger an interrupt.
  * vm86_sw_intr:
@@ -69,19 +69,19 @@ INTDEF int CC libvm86_exec(vm86_state_t *__restrict self);
  * @return: VM86_SUCCESS:      Success.
  * @return: VM86_DOUBLE_FAULT: Stack overflow.
  * @return: VM86_SEGFAULT:     Segmentation fault. */
-INTDEF int CC libvm86_sw_intr(vm86_state_t *__restrict self, uint8_t intno);
-INTDEF int CC libvm86_hw_intr(vm86_state_t *__restrict self, uint8_t intno);
-INTDEF int CC libvm86_pic_intr(vm86_state_t *__restrict self, uint8_t pic_intno);
+INTDEF NONNULL((1)) int CC libvm86_sw_intr(vm86_state_t *__restrict self, uint8_t intno);
+INTDEF NONNULL((1)) int CC libvm86_hw_intr(vm86_state_t *__restrict self, uint8_t intno);
+INTDEF NONNULL((1)) int CC libvm86_pic_intr(vm86_state_t *__restrict self, uint8_t pic_intno);
 
 /* Read/Write values to/from an emulated VIO port.
  * @return: VM86_SUCCESS: Success.
  * @return: VM86_BADPORT: Bad port. */
-INTDEF int CC libvm86_inb(vm86_state_t *__restrict self, uint16_t port, uint8_t *__restrict presult);
-INTDEF int CC libvm86_inw(vm86_state_t *__restrict self, uint16_t port, uint16_t *__restrict presult);
-INTDEF int CC libvm86_inl(vm86_state_t *__restrict self, uint16_t port, uint32_t *__restrict presult);
-INTDEF int CC libvm86_outb(vm86_state_t *__restrict self, uint16_t port, uint8_t value);
-INTDEF int CC libvm86_outw(vm86_state_t *__restrict self, uint16_t port, uint16_t value);
-INTDEF int CC libvm86_outl(vm86_state_t *__restrict self, uint16_t port, uint32_t value);
+INTDEF NONNULL((1, 3)) int CC libvm86_inb(vm86_state_t *__restrict self, uint16_t port, uint8_t *__restrict presult);
+INTDEF NONNULL((1, 3)) int CC libvm86_inw(vm86_state_t *__restrict self, uint16_t port, uint16_t *__restrict presult);
+INTDEF NONNULL((1, 3)) int CC libvm86_inl(vm86_state_t *__restrict self, uint16_t port, uint32_t *__restrict presult);
+INTDEF NONNULL((1)) int CC libvm86_outb(vm86_state_t *__restrict self, uint16_t port, uint8_t value);
+INTDEF NONNULL((1)) int CC libvm86_outw(vm86_state_t *__restrict self, uint16_t port, uint16_t value);
+INTDEF NONNULL((1)) int CC libvm86_outl(vm86_state_t *__restrict self, uint16_t port, uint32_t value);
 
 
 DECL_END

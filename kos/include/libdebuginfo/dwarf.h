@@ -408,29 +408,35 @@ __NOTHROW_NCX(LIBDEBUGINFO_CC dwarf_decode_pointer)(__byte_t **__restrict preade
 	__byte_t *text = *preader;
 	/* Relative encoding formats. */
 	switch (encoding & 0x70) {
+
 	case DW_EH_PE_pcrel:
 		result = (__uintptr_t)text; /* Relative to here. */
 		break;
+
 	case DW_EH_PE_textrel:
 		result = textbase;
 		break;
+
 	case DW_EH_PE_datarel:
 		result = database;
 		break;
+
 	case DW_EH_PE_funcrel:
 		result = funcbase;
 		break;
+
 	case DW_EH_PE_aligned:
 		text   = (__byte_t *)(((__uintptr_t)text + (addrsize - 1)) & ~(addrsize - 1));
 		result = 0;
 		break;
-		/* ??? */
+
 	default:
 	case DW_EH_PE_absptr:
 		result = 0;
 		break;
 	}
 	switch (encoding & 0xf) {
+
 	case DW_EH_PE_absptr:
 		if __untraced(addrsize >= sizeof(__uintptr_t)) {
 			result += __hybrid_unaligned_get((__uintptr_t *)text);
@@ -445,14 +451,17 @@ __NOTHROW_NCX(LIBDEBUGINFO_CC dwarf_decode_pointer)(__byte_t **__restrict preade
 		}
 		text += addrsize;
 		break;
+
 	case DW_EH_PE_udata2:
 		result += __hybrid_unaligned_get16((__uint16_t *)text);
 		text += 2;
 		break;
+
 	case DW_EH_PE_udata4:
 		result += __hybrid_unaligned_get32((__uint32_t *)text);
 		text += 4;
 		break;
+
 	case DW_EH_PE_udata8:
 #if __SIZEOF_POINTER__ > 4
 		result += __hybrid_unaligned_get64((__uint64_t *)text);
@@ -463,14 +472,17 @@ __NOTHROW_NCX(LIBDEBUGINFO_CC dwarf_decode_pointer)(__byte_t **__restrict preade
 #endif
 		text += 8;
 		break;
+
 	case DW_EH_PE_sdata2:
 		result += (__int16_t)__hybrid_unaligned_get16((__uint16_t *)text);
 		text += 2;
 		break;
+
 	case DW_EH_PE_sdata4:
 		result += (__int32_t)__hybrid_unaligned_get32((__uint32_t *)text);
 		text += 4;
 		break;
+
 	case DW_EH_PE_sdata8:
 #if __SIZEOF_POINTER__ > 4
 		result += (__int64_t)__hybrid_unaligned_get64((__uint64_t *)text);
@@ -481,12 +493,15 @@ __NOTHROW_NCX(LIBDEBUGINFO_CC dwarf_decode_pointer)(__byte_t **__restrict preade
 #endif
 		text += 8;
 		break;
+
 	case DW_EH_PE_uleb128:
 		result += dwarf_decode_uleb128(&text);
 		break;
+
 	case DW_EH_PE_sleb128:
 		result += dwarf_decode_sleb128(&text);
 		break;
+
 	default:
 		text += 1; /* ??? */
 		break;

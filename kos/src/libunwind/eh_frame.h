@@ -33,7 +33,7 @@ DECL_BEGIN
  * value written back to `*peh_frame_reader' after a previous call to `unwind_fde_load()'.
  * @return: UNWIND_SUCCESS:  Successfully read the next FDE entry.
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
-INTDEF unsigned int
+INTDEF NONNULL((1, 2, 3)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_fde_load)(byte_t **__restrict peh_frame_reader,
                                       byte_t *__restrict eh_frame_end,
                                       unwind_fde_t *__restrict result,
@@ -43,7 +43,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_load)(byte_t **__restrict peh_frame_reader,
  * FDE descriptor containing the given `absolute_pc' text address.
  * @return: UNWIND_SUCCESS:  Found the FDE entry associated with `ABSOLUTE_PC'.
  * @return: UNWIND_NO_FRAME: Failed to read an FDE entry (Assume EOF) */
-INTDEF unsigned int
+INTDEF NONNULL((1, 2, 4)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_fde_scan)(byte_t *__restrict eh_frame_start,
                                       byte_t *__restrict eh_frame_end,
                                       void *absolute_pc,
@@ -66,7 +66,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_scan)(byte_t *__restrict eh_frame_start,
  * @return: UNWIND_CFA_UNKNOWN_INSTRUCTION: ...
  * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
  * @return: UNWIND_BADALLOC:                ... */
-INTDEF unsigned int
+INTDEF NONNULL((1, 2)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_fde_exec)(unwind_fde_t const *__restrict self,
                                       unwind_cfa_state_t *__restrict result,
                                       void *absolute_pc);
@@ -84,7 +84,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec)(unwind_fde_t const *__restrict self,
  * @return: UNWIND_CFA_UNKNOWN_INSTRUCTION: ...
  * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
  * @return: UNWIND_BADALLOC:                ... */
-INTDEF unsigned int
+INTDEF NONNULL((1, 2)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_fde_sigframe_exec)(unwind_fde_t const *__restrict self,
                                                unwind_cfa_sigframe_state_t *__restrict result,
                                                void *absolute_pc);
@@ -102,7 +102,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_sigframe_exec)(unwind_fde_t const *__restrict se
  * @return: UNWIND_CFA_UNKNOWN_INSTRUCTION: ...
  * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
  * @return: UNWIND_BADALLOC:                ... */
-INTDEF unsigned int
+INTDEF NONNULL((1, 2)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_fde_rule)(unwind_fde_t const *__restrict self,
                                       unwind_cfa_register_t *__restrict result,
                                       __UINTPTR_HALF_TYPE__ dw_regno,
@@ -114,7 +114,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_rule)(unwind_fde_t const *__restrict self,
  * @return: UNWIND_CFA_UNKNOWN_INSTRUCTION: ...
  * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
  * @return: UNWIND_BADALLOC:                ... */
-INTDEF unsigned int
+INTDEF NONNULL((1, 2)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_fde_exec_cfa)(unwind_fde_t const *__restrict self,
                                           unwind_cfa_value_t *__restrict result,
                                           void *absolute_pc);
@@ -122,13 +122,13 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_cfa)(unwind_fde_t const *__restrict self,
 
 /* Similar to `unwind_fde_exec()', but only decode `DW_CFA_GNU_args_size' instructions
  * in order to calculate the proper exception_handler landing-pad-stack-adjustment that
- * is required to properly re-align the stack before jumping to a local exception handler.
+ * is required to re-align the stack before jumping to a local exception handler.
  * @return: UNWIND_SUCCESS:                 ...
  * @return: UNWIND_INVALID_REGISTER:        ...
  * @return: UNWIND_CFA_UNKNOWN_INSTRUCTION: ...
  * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
  * @return: UNWIND_BADALLOC:                ... */
-INTDEF unsigned int
+INTDEF NONNULL((1, 2)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_fde_exec_landing_pad_adjustment)(unwind_fde_t const *__restrict self,
                                                              uintptr_t *__restrict psp_adjustment,
                                                              void *absolute_pc);
@@ -147,7 +147,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_landing_pad_adjustment)(unwind_fde_t const 
  * @return: UNWIND_SEGFAULT:              ...
  * @return: UNWIND_EMULATOR_*:            ...
  * @return: UNWIND_APPLY_NOADDR_REGISTER: ... */
-INTDEF unsigned int CC
+INTDEF NONNULL((1, 2, 4, 6)) unsigned int CC
 libuw_unwind_cfa_apply(unwind_cfa_state_t *__restrict self,
                        unwind_fde_t const *__restrict fde, void *absolute_pc,
                        unwind_getreg_t reg_getter, void const *reg_getter_arg,
@@ -161,7 +161,7 @@ libuw_unwind_cfa_apply(unwind_cfa_state_t *__restrict self,
  * @return: UNWIND_SEGFAULT:              ...
  * @return: UNWIND_EMULATOR_*:            ...
  * @return: UNWIND_APPLY_NOADDR_REGISTER: ... */
-INTDEF unsigned int CC
+INTDEF NONNULL((1, 2, 4, 6)) unsigned int CC
 libuw_unwind_cfa_sigframe_apply(unwind_cfa_sigframe_state_t *__restrict self,
                                 unwind_fde_t const *__restrict fde, void *absolute_pc,
                                 unwind_getreg_t reg_getter, void const *reg_getter_arg,
@@ -174,7 +174,7 @@ libuw_unwind_cfa_sigframe_apply(unwind_cfa_sigframe_state_t *__restrict self,
  * @return: UNWIND_SEGFAULT:              ...
  * @return: UNWIND_EMULATOR_*:            ...
  * @return: UNWIND_APPLY_NOADDR_REGISTER: ... */
-INTDEF unsigned int CC
+INTDEF NONNULL((1, 2, 4)) unsigned int CC
 libuw_unwind_cfa_calculate_cfa(unwind_cfa_value_t const *__restrict self,
                                unwind_getreg_t reg_getter,
                                void const *reg_callback_arg,

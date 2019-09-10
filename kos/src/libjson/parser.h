@@ -33,27 +33,30 @@ DECL_BEGIN
  * NOTE: This function automatically detects the encoding (one of `JSON_ENCODING_*')
  *       of the given input, as specified by the Json specs, meaning you don't have
  *       to concern yourself with the details on how to supply input to this function. */
-INTDEF void CC
-libjson_parser_init(struct json_parser *__restrict self,
-                    void const *start, void const *end);
+INTDEF NONNULL((1, 2, 3)) void
+NOTHROW_NCX(CC libjson_parser_init)(struct json_parser *__restrict self,
+                                    void const *start, void const *end);
 
 /* Yield to the next token
  * @return: JSON_PARSER_*:     The previously selected token (the parser now points at its end)
  * @return: JSON_ERROR_EOF:    The end of the input file has been reached.
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
-INTDEF int CC libjson_parser_yield(struct json_parser *__restrict self);
+INTDEF NONNULL((1)) int
+NOTHROW_NCX(CC libjson_parser_yield)(struct json_parser *__restrict self);
 
 /* Yield to the previous token
  * @return: JSON_PARSER_*:     The now selected token (The parser is now located at the previous token)
  * @return: JSON_ERROR_EOF:    The start of the input file had already been reached.
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
-INTDEF int CC libjson_parser_unyield(struct json_parser *__restrict self);
+INTDEF NONNULL((1)) int
+NOTHROW_NCX(CC libjson_parser_unyield)(struct json_parser *__restrict self);
 
 /* Rewind to the start of the current object/array
  * @return: JSON_PARSER_ARRAY:  The parser now points at the first token following the initial `['.
  * @return: JSON_PARSER_OBJECT: The parser now points at the first token following the initial `{'.
  * @return: JSON_ERROR_SYNTAX:  Syntax error. */
-INTDEF int CC libjson_parser_rewind(struct json_parser *__restrict self);
+INTDEF NONNULL((1)) int
+NOTHROW_NCX(CC libjson_parser_rewind)(struct json_parser *__restrict self);
 
 /* Advance the parser to the next object member or array index
  * @return: JSON_ERROR_OK:    The parser now points at the first token after the `,'
@@ -63,7 +66,8 @@ INTDEF int CC libjson_parser_rewind(struct json_parser *__restrict self);
  * @return: JSON_ERROR_NOOBJ: The end of the current object/array was reached.
  *                            The parser now points at the `}' or `]' following the object/array
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
-INTDEF int CC libjson_parser_next(struct json_parser *__restrict self);
+INTDEF NONNULL((1)) int
+NOTHROW_NCX(CC libjson_parser_next)(struct json_parser *__restrict self);
 
 /* Rewind the parser to the previous object member or array index
  * @return: JSON_ERROR_OK:    The parser now points at the start of the previous object member/array index.
@@ -76,16 +80,20 @@ INTDEF int CC libjson_parser_next(struct json_parser *__restrict self);
  *                            leave_object == false: The parser still points at the start of
  *                                                   the first member of the inner object/array.
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
-INTDEF int CC libjson_parser_prev(struct json_parser *__restrict self,
-                                  bool leave_object);
+INTDEF NONNULL((1)) int
+NOTHROW_NCX(CC libjson_parser_prev)(struct json_parser *__restrict self,
+                                    bool leave_object);
 
 /* Advance the parser to the next object sibling
  * @return: JSON_ERROR_OK:    The parser now points at first member/index of the inner object/array.
  * @return: JSON_ERROR_NOOBJ: The parser didn't point at `{' or `[' (its position remains unchanged).
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
-INTDEF int CC libjson_parser_enter(struct json_parser *__restrict self);
-INTDEF int CC libjson_parser_enterobject(struct json_parser *__restrict self);
-INTDEF int CC libjson_parser_enterarray(struct json_parser *__restrict self);
+INTDEF NONNULL((1)) int
+NOTHROW_NCX(CC libjson_parser_enter)(struct json_parser *__restrict self);
+INTDEF NONNULL((1)) int
+NOTHROW_NCX(CC libjson_parser_enterobject)(struct json_parser *__restrict self);
+INTDEF NONNULL((1)) int
+NOTHROW_NCX(CC libjson_parser_enterarray)(struct json_parser *__restrict self);
 
 /* Skip the remainder of the current object/array and parse until after the following `,'
  * If that token doesn't exist, or is followed by another closing token, stop parsing there.
@@ -94,15 +102,19 @@ INTDEF int CC libjson_parser_enterarray(struct json_parser *__restrict self);
  *                          the parser exists at the `}' or `]' that is taking its place.
  * @return: JSON_ERROR_EOF: The end of the input file has been reached.
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
-INTDEF int CC libjson_parser_leave(struct json_parser *__restrict self);
-INTDEF int CC libjson_parser_leaveobject(struct json_parser *__restrict self);
-INTDEF int CC libjson_parser_leavearray(struct json_parser *__restrict self);
+INTDEF NONNULL((1)) int
+NOTHROW_NCX(CC libjson_parser_leave)(struct json_parser *__restrict self);
+INTDEF NONNULL((1)) int
+NOTHROW_NCX(CC libjson_parser_leaveobject)(struct json_parser *__restrict self);
+INTDEF NONNULL((1)) int
+NOTHROW_NCX(CC libjson_parser_leavearray)(struct json_parser *__restrict self);
 
 
 /* Returns the current parser state / token type.
  * @return: JSON_PARSER_*: The current parser state.
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
-INTDEF int CC libjson_parser_state(struct json_parser *__restrict self);
+INTDEF NONNULL((1)) int
+NOTHROW_NCX(CC libjson_parser_state)(struct json_parser *__restrict self);
 
 /* Search for the given key within the current object.
  * The given key is searched in both forward, and backward direction, starting
@@ -111,10 +123,10 @@ INTDEF int CC libjson_parser_state(struct json_parser *__restrict self);
  * @return: JSON_ERROR_OK:    The parser now points after the `:' following the matching key's name.
  * @return: JSON_ERROR_NOOBJ: The given `key' wasn't found (The position of `self' remains unchanged)
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
-INTDEF int CC
-libjson_parser_findkey(struct json_parser *__restrict self,
-                       /*utf-8*/char const *__restrict key,
-                       size_t keylen);
+INTDEF NONNULL((1, 2)) int
+NOTHROW_NCX(CC libjson_parser_findkey)(struct json_parser *__restrict self,
+                                       /*utf-8*/ char const *__restrict key,
+                                       size_t keylen);
 
 /* Got the `index'th' array elements before returning `JSON_ERROR_OK'
  * the parser is rewound to the start of the current array before proceeding.
@@ -126,9 +138,9 @@ libjson_parser_findkey(struct json_parser *__restrict self,
  * @return: JSON_ERROR_NOOBJ: The end of the array has been reached before, or when `index'
  *                            elements had been skipped. (The position of `self' remains unchanged)
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
-INTDEF int CC
-libjson_parser_findindex(struct json_parser *__restrict self,
-                         uintptr_t index);
+INTDEF NONNULL((1)) int
+NOTHROW_NCX(CC libjson_parser_findindex)(struct json_parser *__restrict self,
+                                         uintptr_t index);
 
 /* Check if the current parser token (which should be a string) is equal to `str'
  * @return: JSON_ERROR_OK:     The previous token is was a string that was equal to `str'
@@ -137,10 +149,10 @@ libjson_parser_findindex(struct json_parser *__restrict self,
  *                             In this case the parser now points at the first token after the string.
  * @return: JSON_ERROR_NOOBJ:  The parser didn't point at a string. (The position of `self' remains unchanged)
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
-INTDEF int CC
-libjson_parser_eqstring(struct json_parser *__restrict self,
-                        /*utf-8*/char const *__restrict str,
-                        size_t len);
+INTDEF NONNULL((1, 2)) int
+NOTHROW_NCX(CC libjson_parser_eqstring)(struct json_parser *__restrict self,
+                                        /*utf-8*/ char const *__restrict str,
+                                        size_t len);
 
 /* Parse a Json string and print its contents to `printer'
  * @return: JSON_ERROR_OK:     Success. - The sum of all calls to `*printer' is stored in `*pprinter_result'
@@ -152,10 +164,10 @@ libjson_parser_eqstring(struct json_parser *__restrict self,
  * @return: JSON_ERROR_SYSERR: An invocation of `printer' returned a negative value (stored in `*pprinter_result').
  *                             In this case the position of the parser is revered to the start of the string.
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
-INTDEF int CC
-libjson_parser_printstring(struct json_parser *__restrict self,
-                           pformatprinter printer, void *arg,
-                           ssize_t *__restrict pprinter_result);
+INTDEF NONNULL((1, 2, 4)) int
+NOTHROW_NCX(CC libjson_parser_printstring)(struct json_parser *__restrict self,
+                                           pformatprinter printer, void *arg,
+                                           ssize_t *__restrict pprinter_result);
 
 /* A somewhat hacky variant of `libjson_parser_printstring()', which replaces the source
  * string in-line (thus modifying the source string) with its utf-8 encoded variant.
@@ -173,9 +185,9 @@ libjson_parser_printstring(struct json_parser *__restrict self,
  * @return: NULL:   An error occurred; when `perror` is non-NULL, that error is stored there:
  *                   - JSON_ERROR_NOOBJ:  Parser didn't point at a string object.
  *                   - JSON_ERROR_SYNTAX: Syntax error */
-INTDEF /*utf-8*/char *CC
-libjson_parser_getstring(struct json_parser *__restrict self,
-                         size_t *plength, int *perror);
+INTDEF WUNUSED NONNULL((1)) /*utf-8*/char *
+NOTHROW_NCX(CC libjson_parser_getstring)(struct json_parser *__restrict self,
+                                         size_t *plength, int *perror);
 
 
 /* Decode a Json number and store its value in `*presult'
@@ -184,18 +196,18 @@ libjson_parser_getstring(struct json_parser *__restrict self,
  * @return: JSON_ERROR_NOOBJ:  The parser didn't point at a number token.
  *                             In this case the parser didn't change position.
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
-INTDEF int CC
-libjson_parser_getnumber(struct json_parser *__restrict self,
-                         intptr_t *__restrict presult);
-INTDEF int CC
-libjson_parser_getint64(struct json_parser *__restrict self,
-                        int64_t *__restrict presult);
-INTDEF int CC
-libjson_parser_getuint64(struct json_parser *__restrict self,
-                         uint64_t *__restrict presult);
-INTDEF int CC
-libjson_parser_getfloat(struct json_parser *__restrict self,
-                        double *__restrict presult);
+INTDEF NONNULL((1, 2)) int
+NOTHROW_NCX(CC libjson_parser_getnumber)(struct json_parser *__restrict self,
+                                         intptr_t *__restrict presult);
+INTDEF NONNULL((1, 2)) int
+NOTHROW_NCX(CC libjson_parser_getint64)(struct json_parser *__restrict self,
+                                        int64_t *__restrict presult);
+INTDEF NONNULL((1, 2)) int
+NOTHROW_NCX(CC libjson_parser_getuint64)(struct json_parser *__restrict self,
+                                         uint64_t *__restrict presult);
+INTDEF NONNULL((1, 2)) int
+NOTHROW_NCX(CC libjson_parser_getfloat)(struct json_parser *__restrict self,
+                                        double *__restrict presult);
 
 /* Decode a Json boolean and store its value in `*presult'
  * @return: JSON_ERROR_OK:     Success. - The value is stored in `*presult'
@@ -203,9 +215,9 @@ libjson_parser_getfloat(struct json_parser *__restrict self,
  * @return: JSON_ERROR_NOOBJ:  The parser didn't point at a true/false token.
  *                             In this case the parser didn't change position.
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
-INTDEF int CC
-libjson_parser_getbool(struct json_parser *__restrict self,
-                       bool *__restrict presult);
+INTDEF NONNULL((1, 2)) int
+NOTHROW_NCX(CC libjson_parser_getbool)(struct json_parser *__restrict self,
+                                       bool *__restrict presult);
 
 /* Decode a Json null-value
  * @return: JSON_ERROR_OK:     Success.
@@ -213,8 +225,8 @@ libjson_parser_getbool(struct json_parser *__restrict self,
  * @return: JSON_ERROR_NOOBJ:  The parser didn't point at a `null' token.
  *                             In this case the parser didn't change position.
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
-INTDEF int CC
-libjson_parser_getnull(struct json_parser *__restrict self);
+INTDEF NONNULL((1)) int
+NOTHROW_NCX(CC libjson_parser_getnull)(struct json_parser *__restrict self);
 
 
 DECL_END

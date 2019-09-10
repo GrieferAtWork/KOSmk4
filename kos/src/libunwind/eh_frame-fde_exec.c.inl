@@ -56,7 +56,7 @@ DECL_BEGIN
 #define SYM(x) cfa_rule_##x
 #elif defined(EH_FRAME_FDE_EXEC_LANDING_PAD_ADJUSTMENT)
 #define SYM(x) landing_pad_##x
-#endif
+#endif /* ... */
 
 typedef struct SYM(unwind_cfa_backup_state_struct) SYM(unwind_cfa_backup_state_t);
 struct SYM(unwind_cfa_backup_state_struct) {
@@ -70,7 +70,7 @@ struct SYM(unwind_cfa_backup_state_struct) {
 	unwind_cfa_register_t           cbs_backup; /* Backup data. */
 #elif defined(EH_FRAME_FDE_EXEC_LANDING_PAD_ADJUSTMENT)
 	uintptr_t                       cbs_backup; /* Backup data. */
-#endif
+#endif /* ... */
 	SYM(unwind_cfa_backup_state_t) *cbs_prev;   /* [0..1] Previous backup */
 };
 
@@ -115,7 +115,7 @@ NOTHROW_NCX(CC SYM(unwind_cfa_backup_state_freechain))(SYM(unwind_cfa_backup_sta
 
 
 #if CFI_UNWIND_LOCAL_COMMON_REGISTER_COUNT != 0
-PRIVATE void
+PRIVATE NONNULL((1)) void
 NOTHROW_NCX(CC SYM(set_common_order_ffh))(CFI_UNWIND_LOCAL_CFA_STATE_T *__restrict self,
                                           uintptr_half_t com_regno) {
 	unwind_order_index_t base;
@@ -136,7 +136,7 @@ NOTHROW_NCX(CC SYM(set_common_order_ffh))(CFI_UNWIND_LOCAL_CFA_STATE_T *__restri
 #endif /* CFI_UNWIND_LOCAL_COMMON_REGISTER_COUNT != 0 */
 
 #if CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_COUNT != 0
-PRIVATE void
+PRIVATE NONNULL((1)) void
 NOTHROW_NCX(CC SYM(set_uncommon_order_ffh))(CFI_UNWIND_LOCAL_CFA_STATE_T *__restrict self,
                                             uintptr_half_t uncom_regno) {
 	unwind_order_index_t base;
@@ -155,7 +155,6 @@ NOTHROW_NCX(CC SYM(set_uncommon_order_ffh))(CFI_UNWIND_LOCAL_CFA_STATE_T *__rest
 	self->cs_uncorder[uncom_regno] = (unwind_order_index_t)-1;
 }
 #endif /* CFI_UNWIND_LOCAL_UNCOMMON_REGISTER_COUNT != 0 */
-
 
 #undef CFI_UNWIND_LOCAL_CFA_STATE_T
 #endif /* EH_FRAME_FDE_EXEC_CFA_STATE || EH_FRAME_FDE_EXEC_CFA_SIGFRAME_STATE */
@@ -177,7 +176,15 @@ NOTHROW_NCX(CC SYM(set_uncommon_order_ffh))(CFI_UNWIND_LOCAL_CFA_STATE_T *__rest
  * @return: UNWIND_CFA_UNKNOWN_INSTRUCTION: ...
  * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
  * @return: UNWIND_BADALLOC:                ... */
-PRIVATE unsigned int
+PRIVATE
+#if CFI_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT != 0 && CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT != 0
+	NONNULL((1, 4, 5, 6, 7))
+#elif CFI_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT != 0 || CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT != 0
+	NONNULL((1, 3, 4, 5, 6))
+#else /* ... */
+	NONNULL((1, 2, 3, 4, 5))
+#endif /* !... */
+	unsigned int
 NOTHROW_NCX(CC libuw_unwind_fde_exec_until)(unwind_fde_t const *__restrict self,
 #if CFI_UNWIND_COMMON_REGISTER_COUNT != 0
                                             unwind_cfa_register_t *common_init_regs,
@@ -204,7 +211,15 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_until)(unwind_fde_t const *__restrict self,
  * @return: UNWIND_CFA_UNKNOWN_INSTRUCTION: ...
  * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
  * @return: UNWIND_BADALLOC:                ... */
-PRIVATE unsigned int
+PRIVATE
+#if CFI_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT != 0 && CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT != 0
+	NONNULL((1, 4, 5, 6, 7))
+#elif CFI_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT != 0 || CFI_UNWIND_SIGFRAME_UNCOMMON_REGISTER_COUNT != 0
+	NONNULL((1, 3, 4, 5, 6))
+#else /* ... */
+	NONNULL((1, 2, 3, 4, 5))
+#endif /* !... */
+	unsigned int
 NOTHROW_NCX(CC libuw_unwind_sigframe_fde_exec_until)(unwind_fde_t const *__restrict self,
 #if CFI_UNWIND_SIGFRAME_COMMON_REGISTER_COUNT != 0
                                                      unwind_cfa_register_t *common_init_regs,
@@ -224,7 +239,7 @@ NOTHROW_NCX(CC libuw_unwind_sigframe_fde_exec_until)(unwind_fde_t const *__restr
  * @return: UNWIND_CFA_UNKNOWN_INSTRUCTION: ...
  * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
  * @return: UNWIND_BADALLOC:                ... */
-PRIVATE unsigned int
+PRIVATE NONNULL((1, 2, 3, 4)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_fde_exec_cfa_until)(unwind_fde_t const *__restrict self,
                                                 byte_t *__restrict reader,
                                                 byte_t *__restrict end,
@@ -244,7 +259,7 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_cfa_until)(unwind_fde_t const *__restrict s
  * @return: UNWIND_CFA_UNKNOWN_INSTRUCTION: ...
  * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
  * @return: UNWIND_BADALLOC:                ... */
-PRIVATE unsigned int
+PRIVATE NONNULL((1, 2, 3, 4)) unsigned int
 NOTHROW_NCX(CC libuw_unwind_fde_exec_rule_until)(unwind_fde_t const *__restrict self,
                                                  byte_t *__restrict reader,
                                                  byte_t *__restrict end,
@@ -254,26 +269,26 @@ NOTHROW_NCX(CC libuw_unwind_fde_exec_rule_until)(unwind_fde_t const *__restrict 
 #elif defined(EH_FRAME_FDE_EXEC_LANDING_PAD_ADJUSTMENT)
 /* Similar to `unwind_fde_exec()', but only decode `DW_CFA_GNU_args_size' instructions
  * in order to calculate the proper exception_handler landing-pad-stack-adjustment that
- * is required to properly re-align the stack before jumping to a local exception handler.
+ * is required to re-align the stack before jumping to a local exception handler.
  * @return: UNWIND_SUCCESS:                 ...
  * @return: UNWIND_INVALID_REGISTER:        ...
  * @return: UNWIND_CFA_UNKNOWN_INSTRUCTION: ...
  * @return: UNWIND_CFA_ILLEGAL_INSTRUCTION: ...
  * @return: UNWIND_BADALLOC:                ... */
-INTERN unsigned int
+INTERN NONNULL((1, 2)) unsigned int
 NOTHROW_NCX(LIBUNWIND_CC libuw_unwind_fde_exec_landing_pad_adjustment)(unwind_fde_t const *__restrict self,
                                                                        uintptr_t *__restrict psp_adjustment,
                                                                        void *absolute_pc)
-#endif
+#endif /* ... */
 {
 #ifdef EH_FRAME_FDE_EXEC_LANDING_PAD_ADJUSTMENT
 	byte_t *reader = self->f_evaltext;
 	byte_t *end    = self->f_evaltextend;
-#endif
+#endif /* EH_FRAME_FDE_EXEC_LANDING_PAD_ADJUSTMENT */
 	uintptr_t current_pc;
 #ifdef EH_FRAME_FDE_EXEC_LANDING_PAD_ADJUSTMENT
 	uintptr_t result = 0;
-#endif
+#endif /* EH_FRAME_FDE_EXEC_LANDING_PAD_ADJUSTMENT */
 	SYM(unwind_cfa_backup_state_t) *state_backup_list = NULL;
 	SYM(unwind_cfa_backup_state_t) *state_backup_free = NULL; /* Free list of state backups. */
 	assertf(((uintptr_t)absolute_pc >= (uintptr_t)self->f_pcstart &&
@@ -364,7 +379,7 @@ NOTHROW_NCX(LIBUNWIND_CC libuw_unwind_fde_exec_landing_pad_adjustment)(unwind_fd
 			__VA_ARGS__;              \
 		}                             \
 	}
-#endif
+#endif /* ... */
 	while (reader < end && current_pc <= (uintptr_t)absolute_pc) {
 		uint8_t opcode, operand;
 		opcode  = *reader++;
@@ -385,9 +400,9 @@ NOTHROW_NCX(LIBUNWIND_CC libuw_unwind_fde_exec_landing_pad_adjustment)(unwind_fd
 					rule->cr_rule  = DW_CFA_register_rule_offsetn;
 					rule->cr_value = value;
 				});
-#else
+#else /* ... */
 				dwarf_decode_uleb128((byte_t **)&reader);
-#endif
+#endif /* !... */
 			}
 		} else if (opcode == DW_CFA_restore) {
 			TRACE("DW_CFA_restore\n");
@@ -428,7 +443,7 @@ NOTHROW_NCX(LIBUNWIND_CC libuw_unwind_fde_exec_landing_pad_adjustment)(unwind_fd
 				 * to re-attempt the call using the init-body `self->f_inittext' */
 				rule->cr_rule = DW_CFA_register_rule_undefined;
 			}
-#endif
+#endif /* ... */
 		} else {
 			switch (operand) {
 
@@ -512,7 +527,7 @@ NOTHROW_NCX(LIBUNWIND_CC libuw_unwind_fde_exec_landing_pad_adjustment)(unwind_fd
 					 * to re-attempt the call using the init-body `self->f_inittext' */
 					rule->cr_rule = DW_CFA_register_rule_undefined;
 				}
-#endif
+#endif /* ... */
 			}	break;
 
 			CASE(DW_CFA_same_value)
@@ -623,19 +638,19 @@ NOTHROW_NCX(LIBUNWIND_CC libuw_unwind_fde_exec_landing_pad_adjustment)(unwind_fd
 					if (stack_avail() < ((256 * sizeof(void *)) + sizeof(SYM(unwind_cfa_backup_state_t))))
 						ERROR(err_nomem);
 					backup = (SYM(unwind_cfa_backup_state_t) *)alloca(sizeof(SYM(unwind_cfa_backup_state_t)));
-#else
+#else /* __KERNEL__ */
 					backup = (SYM(unwind_cfa_backup_state_t) *)malloc(sizeof(SYM(unwind_cfa_backup_state_t)));
 					if unlikely(!backup)
 						ERROR(err_nomem);
-#endif
+#endif /* !__KERNEL__ */
 				}
 #ifdef EH_FRAME_FDE_EXEC_LANDING_PAD_ADJUSTMENT
 				backup->cbs_backup = result;
 #elif defined(EH_FRAME_FDE_EXEC_CFA_RULE)
 				memcpy(&backup->cbs_backup, rule, sizeof(backup->cbs_backup));
-#else
+#else /* ... */
 				memcpy(&backup->cbs_backup, result, sizeof(backup->cbs_backup));
-#endif
+#endif /* !... */
 				backup->cbs_prev  = state_backup_list;
 				state_backup_list = backup;
 			}	break;
@@ -649,9 +664,9 @@ NOTHROW_NCX(LIBUNWIND_CC libuw_unwind_fde_exec_landing_pad_adjustment)(unwind_fd
 				result = backup->cbs_backup;
 #elif defined(EH_FRAME_FDE_EXEC_CFA_RULE)
 				memcpy(rule, &backup->cbs_backup, sizeof(backup->cbs_backup));
-#else
+#else /* ... */
 				memcpy(result, &backup->cbs_backup, sizeof(backup->cbs_backup));
-#endif
+#endif /* !... */
 				/* Delete the backup descriptor (and add it to the free-list) */
 				state_backup_list = backup->cbs_prev;
 				backup->cbs_prev  = state_backup_free;
@@ -691,9 +706,9 @@ skip_expression:
 #if defined(EH_FRAME_FDE_EXEC_CFA_STATE) || \
     defined(EH_FRAME_FDE_EXEC_CFA_SIGFRAME_STATE)
 #define RESULT_CFA result->cs_cfa
-#else
+#else /* ... */
 #define RESULT_CFA (*result)
-#endif
+#endif /* !... */
 
 			CASE(DW_CFA_def_cfa) {
 				uintptr_t reg;

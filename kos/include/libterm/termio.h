@@ -45,17 +45,19 @@ struct terminal;
 /* Print the given `src' data
  * @return: >= 0: The number of printed bytes (equal to `num_bytes', unless `IO_NONBLOCK', or EOF was reached)
  * @return: < 0:  An error status that should be propagated immediately. */
-typedef __ssize_t (LIBTERM_CC *pterminal_oprinter_t)(struct terminal *__restrict term,
-                                                     void const *__restrict src,
-                                                     __size_t num_bytes, iomode_t mode);
+typedef __ATTR_NONNULL((1, 2)) __ssize_t
+(LIBTERM_CC *pterminal_oprinter_t)(struct terminal *__restrict term,
+                                   void const *__restrict src,
+                                   __size_t num_bytes, iomode_t mode);
 
 /* Raise a given signal `signo' (one of `SIG*')
  * within the foreground process group associated with the terminal.
  * A negative return value of this function is propagated immediately.
  * s.a. `task_raisesignalprocess()'
  * @return: < 0:  An error status that should be propagated immediately. */
-typedef __ssize_t (LIBTERM_CC *pterminal_raise_t)(struct terminal *__restrict self,
-                                                  unsigned int signo);
+typedef __ATTR_NONNULL((1)) __ssize_t
+(LIBTERM_CC *pterminal_raise_t)(struct terminal *__restrict self,
+                                unsigned int signo);
 
 /* Check if the calling process's group leader is apart of the foreground process
  * group associated with the given terminal `self'. - If it is, return 0. Otherwise,
@@ -78,7 +80,8 @@ typedef __ssize_t (LIBTERM_CC *pterminal_raise_t)(struct terminal *__restrict se
  * >>	return 0;
  * >> }
  * @return: < 0:  An error status that should be propagated immediately. */
-typedef __ssize_t (LIBTERM_CC *pterminal_check_sigttou_t)(struct terminal *__restrict self);
+typedef __ATTR_NONNULL((1)) __ssize_t
+(LIBTERM_CC *pterminal_check_sigttou_t)(struct terminal *__restrict self);
 
 struct terminal {
 	/* Terminal controller, implementing input/output transformations and control characters. */
@@ -106,7 +109,7 @@ struct terminal {
 	 linebuffer_fini(&(self)->t_ipend))
 
 /* Initialize/Finalize the given terminal controller. */
-typedef __ATTR_NONNULL((1, 2)) void
+typedef __NOBLOCK __ATTR_NONNULL((1, 2)) void
 (LIBTERM_CC *PTERMINAL_INIT)(struct terminal *__restrict self,
                              pterminal_oprinter_t oprinter,
                              pterminal_raise_t raisefunc,
@@ -204,28 +207,22 @@ terminal_flush_icanon(struct terminal *__restrict self, iomode_t mode)
 #endif /* LIBTERM_WANT_PROTOTYPES */
 
 #ifdef __KERNEL__
+#define TERMINAL_POLL_NONBLOCK              1  /* The operation would not block */
+#define TERMINAL_POLL_MAYBLOCK              0  /* The operation would block */
+#define TERMINAL_POLL_MAYBLOCK_UNDERLYING (-1) /* The operation would block if operating on the underlying component blocks:
+                                                *  - terminal_poll_iread():  Whoever is responsible for providing data through `terminal_iwrite()'
+                                                *  - terminal_poll_iwrite(): Whoever is responsible for accepting data from `terminal_owrite()' (in case input is echoed)
+                                                *  - terminal_poll_owrite(): Whoever is responsible for accepting data from `terminal_owrite()' */
+
 /* Poll the given terminal for various operations being non-blocking.
  * @return: * : One of `TERMINAL_POLL_*' */
 typedef __ATTR_NONNULL((1)) int (LIBTERM_CC *PTERMINAL_POLL_IREAD)(struct terminal *__restrict self) __THROWS(E_WOULDBLOCK, E_BADALLOC);
 typedef __ATTR_NONNULL((1)) int (LIBTERM_CC *PTERMINAL_POLL_IWRITE)(struct terminal *__restrict self) __THROWS(E_WOULDBLOCK, E_BADALLOC);
 typedef __ATTR_NONNULL((1)) int (LIBTERM_CC *PTERMINAL_POLL_OWRITE)(struct terminal *__restrict self) __THROWS(E_WOULDBLOCK, E_BADALLOC);
-#define TERMINAL_POLL_NONBLOCK 1 /* The operation would not block */
-#define TERMINAL_POLL_MAYBLOCK 0 /* The operation would block */
-/* The operation would block if operating on the underlying component blocks:
- *  - terminal_poll_iread():  Whoever is responsible for providing data through `terminal_iwrite()'
- *  - terminal_poll_iwrite(): Whoever is responsible for accepting data from `terminal_owrite()' (in case input is echoed)
- *  - terminal_poll_owrite(): Whoever is responsible for accepting data from `terminal_owrite()' */
-#define TERMINAL_POLL_MAYBLOCK_UNDERLYING (-1)
 #ifdef LIBTERM_WANT_PROTOTYPES
-LIBTERM_DECL __ATTR_NONNULL((1)) int LIBTERM_CC
-terminal_poll_iread(struct terminal *__restrict self)
-		__THROWS(E_WOULDBLOCK, E_BADALLOC);
-LIBTERM_DECL __ATTR_NONNULL((1)) int LIBTERM_CC
-terminal_poll_iwrite(struct terminal *__restrict self)
-		__THROWS(E_WOULDBLOCK, E_BADALLOC);
-LIBTERM_DECL __ATTR_NONNULL((1)) int LIBTERM_CC
-terminal_poll_owrite(struct terminal *__restrict self)
-		__THROWS(E_WOULDBLOCK, E_BADALLOC);
+LIBTERM_DECL __ATTR_NONNULL((1)) int LIBTERM_CC terminal_poll_iread(struct terminal *__restrict self) __THROWS(E_WOULDBLOCK, E_BADALLOC);
+LIBTERM_DECL __ATTR_NONNULL((1)) int LIBTERM_CC terminal_poll_iwrite(struct terminal *__restrict self) __THROWS(E_WOULDBLOCK, E_BADALLOC);
+LIBTERM_DECL __ATTR_NONNULL((1)) int LIBTERM_CC terminal_poll_owrite(struct terminal *__restrict self) __THROWS(E_WOULDBLOCK, E_BADALLOC);
 #endif /* LIBTERM_WANT_PROTOTYPES */
 #endif /* __KERNEL__ */
 

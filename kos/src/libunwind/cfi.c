@@ -68,7 +68,7 @@
 
 DECL_BEGIN
 
-LOCAL bool
+LOCAL WUNUSED NONNULL((2)) bool
 NOTHROW(CC guarded_readb)(uint8_t *ptr, uintptr_t *__restrict result) {
 	uint8_t value;
 	struct exception_data old_except;
@@ -85,7 +85,7 @@ NOTHROW(CC guarded_readb)(uint8_t *ptr, uintptr_t *__restrict result) {
 	return true;
 }
 
-LOCAL bool
+LOCAL WUNUSED NONNULL((2)) bool
 NOTHROW(CC guarded_readw)(uint16_t *ptr, uintptr_t *__restrict result) {
 	uint16_t value;
 	struct exception_data old_except;
@@ -102,7 +102,7 @@ NOTHROW(CC guarded_readw)(uint16_t *ptr, uintptr_t *__restrict result) {
 	return true;
 }
 
-LOCAL bool
+LOCAL WUNUSED NONNULL((2)) bool
 NOTHROW(CC guarded_readl)(uint32_t *ptr, uintptr_t *__restrict result) {
 	uint32_t value;
 	struct exception_data old_except;
@@ -120,7 +120,7 @@ NOTHROW(CC guarded_readl)(uint32_t *ptr, uintptr_t *__restrict result) {
 }
 
 #if __SIZEOF_POINTER__ > 4
-LOCAL bool
+LOCAL WUNUSED NONNULL((2)) bool
 NOTHROW(CC guarded_readq)(uint64_t *ptr, uintptr_t *__restrict result) {
 	uint64_t value;
 	struct exception_data old_except;
@@ -141,10 +141,8 @@ NOTHROW(CC guarded_readq)(uint64_t *ptr, uintptr_t *__restrict result) {
 #define guarded_readptr guarded_readl
 #endif
 
-INTERN bool
-NOTHROW(CC guarded_memcpy)(void *__restrict dst,
-                           void const *__restrict src,
-                           size_t num_bytes) {
+INTERN WUNUSED bool
+NOTHROW(CC guarded_memcpy)(void *dst, void const *src, size_t num_bytes) {
 	struct exception_data old_except;
 	memcpy(&old_except, error_data(), sizeof(struct exception_data));
 	TRY {
@@ -178,7 +176,7 @@ void libuw_unload_libdebuginfo(void) {
 		dlclose(libdebuginfo);
 }
 
-PRIVATE bool
+PRIVATE WUNUSED bool
 NOTHROW_NCX(CC libuw_load_libdebuginfo)(void) {
 	void *libdebuginfo;
 again:
@@ -216,7 +214,7 @@ err:
 }
 #endif /* !__KERNEL__ */
 
-PRIVATE unsigned int CC
+PRIVATE NONNULL((1, 2)) unsigned int CC
 libuw_unwind_emulator_make_const(unwind_emulator_t *__restrict self,
                                  unwind_ste_t *__restrict ste) {
 	if (ste->s_type != UNWIND_STE_CONSTANT) {
@@ -262,7 +260,7 @@ err_segfault:
 	return UNWIND_SEGFAULT;
 }
 
-PRIVATE unsigned int CC
+PRIVATE NONNULL((1)) unsigned int CC
 libuw_unwind_emulator_make_top_const(unwind_emulator_t *__restrict self) {
 	unwind_ste_t *ste;
 	assert(self->ue_stacksz >= 1);
@@ -270,7 +268,7 @@ libuw_unwind_emulator_make_top_const(unwind_emulator_t *__restrict self) {
 	return libuw_unwind_emulator_make_const(self, ste);
 }
 
-INTERN ATTR_NOINLINE unsigned int CC
+INTERN ATTR_NOINLINE NONNULL((1, 2)) unsigned int CC
 libuw_unwind_call_function(unwind_emulator_t *__restrict self,
                            byte_t *__restrict component_pointer) {
 	di_debuginfo_cu_parser_t parser;
@@ -338,7 +336,7 @@ err_invalid_function:
 }
 
 
-PRIVATE ATTR_NOINLINE unsigned int CC
+PRIVATE ATTR_NOINLINE NONNULL((1)) unsigned int CC
 libuw_unwind_emulator_calculate_cfa(unwind_emulator_t *__restrict self) {
 	unwind_fde_t fde;
 	unwind_cfa_value_t cfa;
@@ -381,7 +379,7 @@ err_no_cfa:
 	return UNWIND_EMULATOR_NO_CFA;
 }
 
-PRIVATE void CC
+PRIVATE NONNULL((1, 3)) void CC
 copy_bits(byte_t *__restrict dst_base, unsigned int dst_bit_offset,
           byte_t const *__restrict src_base, unsigned int src_bit_offset,
           size_t num_bits) {
@@ -416,7 +414,7 @@ copy_bits(byte_t *__restrict dst_base, unsigned int dst_bit_offset,
 	}
 }
 
-PRIVATE ATTR_NOINLINE unsigned int CC
+PRIVATE ATTR_NOINLINE NONNULL((1, 2)) unsigned int CC
 libuw_unwind_emulator_write_to_piece(unwind_emulator_t *__restrict self,
                                      unwind_ste_t const *__restrict ste,
                                      uintptr_t num_bits,
@@ -479,7 +477,7 @@ err_not_writable:
 	return UNWIND_EMULATOR_NOT_WRITABLE;
 }
 
-PRIVATE ATTR_NOINLINE unsigned int CC
+PRIVATE ATTR_NOINLINE NONNULL((1, 2)) unsigned int CC
 libuw_unwind_emulator_read_from_piece(unwind_emulator_t *__restrict self,
                                       unwind_ste_t const *__restrict ste,
                                       uintptr_t num_bits,
@@ -585,7 +583,7 @@ err_illegal_instruction:
  * @return: UNWIND_SEGFAULT:         ...
  * @return: UNWIND_BADALLOC:         ...
  * @return: UNWIND_EMULATOR_*:       ... */
-INTERN ATTR_NOINLINE unsigned int CC
+INTERN ATTR_NOINLINE NONNULL((1)) unsigned int CC
 libuw_unwind_emulator_exec(unwind_emulator_t *__restrict self) {
 	byte_t *pc     = self->ue_pc;
 	size_t stacksz = self->ue_stacksz;
@@ -610,7 +608,7 @@ again_switch_opcode:
 #if __SIZEOF_POINTER__ > 4
 			} else if (self->ue_addrsize >= 4) {
 				value = (uintptr_t)UNALIGNED_GET32((uint32_t *)pc);
-#endif
+#endif /* __SIZEOF_POINTER__ > 4 */
 			} else if (self->ue_addrsize >= 2) {
 				value = (uintptr_t)UNALIGNED_GET16((uint16_t *)pc);
 			} else {
@@ -644,7 +642,7 @@ do_make_top_const:
 					} else if (self->ue_addrsize >= 4) {
 						if unlikely(!guarded_readl((uint32_t *)TOP.s_lvalue, &TOP.s_uconst))
 							ERROR(err_segfault);
-#endif
+#endif /* __SIZEOF_POINTER__ > 4 */
 					} else if (self->ue_addrsize >= 2) {
 						if unlikely(!guarded_readw((uint16_t *)TOP.s_lvalue, &TOP.s_uconst))
 							ERROR(err_segfault);
@@ -1442,7 +1440,7 @@ err_invalid_function_direct:
 #define STACK_SIZE_INCREMENTS  16
 #define STACK_SIZE_LIMIT       512
 
-PRIVATE ATTR_NOINLINE unsigned int CC
+PRIVATE ATTR_NOINLINE NONNULL((1)) unsigned int CC
 libuw_unwind_emulator_exec_alloca_stack(unwind_emulator_t *__restrict self,
                                         unwind_ste_t const *pentry_stack_top,
                                         unwind_ste_t *pexit_stack_top,
@@ -1465,9 +1463,9 @@ libuw_unwind_emulator_exec_alloca_stack(unwind_emulator_t *__restrict self,
 	self->ue_stacksz = 0;
 #ifdef __KERNEL__
 	self->ue_stackmax = stack_size;
-#else
+#else /* __KERNEL__ */
 	self->ue_stackmax = ALLOCA_STACK_SIZE;
-#endif
+#endif /* !__KERNEL__ */
 	if (pentry_stack_top) {
 		self->ue_stacksz = 1;
 		stack[0]         = *pentry_stack_top;
@@ -1497,7 +1495,7 @@ err_badalloc:
 #endif
 }
 
-INTERN unsigned int CC
+INTERN NONNULL((1)) unsigned int CC
 libuw_unwind_emulator_exec_autostack(unwind_emulator_t *__restrict self,
                                      unwind_ste_t const *pentry_stack_top,
                                      unwind_ste_t *pexit_stack_top,
@@ -1589,8 +1587,8 @@ err_no_return_value:
  *    of handling all possible instruction (after all: CFI has a CISC
  *    instruction set with variable-length instructions)
  * @return: NULL: The instruction at `unwind_pc' wasn't recognized. */
-INTERN ATTR_PURE WUNUSED byte_t const *
-NOTHROW_NCX(CC libuw_unwind_instruction_succ)(byte_t const *unwind_pc,
+INTERN ATTR_PURE WUNUSED NONNULL((1)) byte_t const *
+NOTHROW_NCX(CC libuw_unwind_instruction_succ)(byte_t const *__restrict unwind_pc,
                                               uint8_t addrsize) {
 	byte_t op = *unwind_pc++;
 	switch (op) {
@@ -1798,7 +1796,7 @@ NOTHROW_NCX(CC libuw_unwind_instruction_succ)(byte_t const *unwind_pc,
 
 /* Return a pointer to a CFI expression that is applicable for `cu_base + module_relative_pc'
  * If no such expression exists, return `NULL' instead. */
-INTERN WUNUSED byte_t *
+INTERN WUNUSED NONNULL((1, 5)) byte_t *
 NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *__restrict self,
                                                 uintptr_t cu_base,
                                                 uintptr_t module_relative_pc,
@@ -1905,7 +1903,7 @@ NOTHROW_NCX(CC libuw_debuginfo_location_select)(di_debuginfo_location_t const *_
  * @return: UNWIND_EMULATOR_NOT_WRITABLE:     Attempted to write to a read-only location expression.
  * @return: UNWIND_EMULATOR_BUFFER_TOO_SMALL: The given `bufsize' is too small.
  * @return: UNWIND_EMULATOR_NO_FUNCTION:      The associated location list is undefined for `module_relative_pc' */
-INTERN unsigned int CC
+INTERN NONNULL((1, 3, 7, 9)) unsigned int CC
 libuw_debuginfo_location_getvalue(di_debuginfo_location_t const *__restrict self,
                                   unwind_emulator_sections_t const *sectinfo,
                                   unwind_getreg_t regget, void *regget_arg,
@@ -1962,7 +1960,7 @@ err_no_function:
 }
 
 
-INTERN unsigned int CC
+INTERN NONNULL((1, 3, 5, 9, 11)) unsigned int CC
 libuw_debuginfo_location_setvalue(di_debuginfo_location_t const *__restrict self,
                                   unwind_emulator_sections_t const *sectinfo,
                                   unwind_getreg_t regget, void *regget_arg,

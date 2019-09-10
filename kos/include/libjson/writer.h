@@ -89,31 +89,31 @@ struct json_writer {
  * @return: -1: Error: An invocation of the `self->jw_printer' returned a negative value.
  * @return: -2: Error: Invalid usage during this, or during an earlier call. */
 
-typedef int (LIBJSON_CC *PJSON_WRITER_BEGINOBJECT)(struct json_writer *__restrict self);
-typedef int (LIBJSON_CC *PJSON_WRITER_BEGINARRAY)(struct json_writer *__restrict self);
-typedef int (LIBJSON_CC *PJSON_WRITER_ENDOBJECT)(struct json_writer *__restrict self);
-typedef int (LIBJSON_CC *PJSON_WRITER_ENDARRAY)(struct json_writer *__restrict self);
-typedef int (LIBJSON_CC *PJSON_WRITER_ADDFIELD)(struct json_writer *__restrict self, /*utf-8*/char const *__restrict key, __size_t keylen);
-typedef int (LIBJSON_CC *PJSON_WRITER_PUTSTRING)(struct json_writer *__restrict self, /*utf-8*/char const *__restrict str, __size_t len);
-typedef int (LIBJSON_CC *PJSON_WRITER_PUTNUMBER)(struct json_writer *__restrict self, __intptr_t value);
-typedef int (LIBJSON_CC *PJSON_WRITER_PUTINT64)(struct json_writer *__restrict self, __int64_t value);
-typedef int (LIBJSON_CC *PJSON_WRITER_PUTUINT64)(struct json_writer *__restrict self, __uint64_t value);
-typedef int (LIBJSON_CC *PJSON_WRITER_PUTFLOAT)(struct json_writer *__restrict self, double value);
-typedef int (LIBJSON_CC *PJSON_WRITER_PUTBOOL)(struct json_writer *__restrict self, __BOOL value);
-typedef int (LIBJSON_CC *PJSON_WRITER_PUTNULL)(struct json_writer *__restrict self);
+typedef __ATTR_NONNULL((1)) int (LIBJSON_CC *PJSON_WRITER_BEGINOBJECT)(struct json_writer *__restrict self);
+typedef __ATTR_NONNULL((1)) int (LIBJSON_CC *PJSON_WRITER_BEGINARRAY)(struct json_writer *__restrict self);
+typedef __ATTR_NONNULL((1)) int (LIBJSON_CC *PJSON_WRITER_ENDOBJECT)(struct json_writer *__restrict self);
+typedef __ATTR_NONNULL((1)) int (LIBJSON_CC *PJSON_WRITER_ENDARRAY)(struct json_writer *__restrict self);
+typedef __ATTR_NONNULL((1, 2)) int (LIBJSON_CC *PJSON_WRITER_ADDFIELD)(struct json_writer *__restrict self, /*utf-8*/char const *__restrict key, __size_t keylen);
+typedef __ATTR_NONNULL((1, 2)) int (LIBJSON_CC *PJSON_WRITER_PUTSTRING)(struct json_writer *__restrict self, /*utf-8*/char const *__restrict str, __size_t len);
+typedef __ATTR_NONNULL((1)) int (LIBJSON_CC *PJSON_WRITER_PUTNUMBER)(struct json_writer *__restrict self, __intptr_t value);
+typedef __ATTR_NONNULL((1)) int (LIBJSON_CC *PJSON_WRITER_PUTINT64)(struct json_writer *__restrict self, __int64_t value);
+typedef __ATTR_NONNULL((1)) int (LIBJSON_CC *PJSON_WRITER_PUTUINT64)(struct json_writer *__restrict self, __uint64_t value);
+typedef __ATTR_NONNULL((1)) int (LIBJSON_CC *PJSON_WRITER_PUTFLOAT)(struct json_writer *__restrict self, double value);
+typedef __ATTR_NONNULL((1)) int (LIBJSON_CC *PJSON_WRITER_PUTBOOL)(struct json_writer *__restrict self, __BOOL value);
+typedef __ATTR_NONNULL((1)) int (LIBJSON_CC *PJSON_WRITER_PUTNULL)(struct json_writer *__restrict self);
 #ifdef LIBJSON_WANT_PROTOTYPES
-LIBJSON_DECL int LIBJSON_CC json_writer_beginobject(struct json_writer *__restrict self);
-LIBJSON_DECL int LIBJSON_CC json_writer_beginarray(struct json_writer *__restrict self);
-LIBJSON_DECL int LIBJSON_CC json_writer_endobject(struct json_writer *__restrict self);
-LIBJSON_DECL int LIBJSON_CC json_writer_endarray(struct json_writer *__restrict self);
-LIBJSON_DECL int LIBJSON_CC json_writer_addfield(struct json_writer *__restrict self, /*utf-8*/char const *__restrict key, __size_t keylen);
-LIBJSON_DECL int LIBJSON_CC json_writer_putstring(struct json_writer *__restrict self, /*utf-8*/char const *__restrict str, __size_t len);
-LIBJSON_DECL int LIBJSON_CC json_writer_putnumber(struct json_writer *__restrict self, __intptr_t value);
-LIBJSON_DECL int LIBJSON_CC json_writer_putint64(struct json_writer *__restrict self, __int64_t value);
-LIBJSON_DECL int LIBJSON_CC json_writer_putuint64(struct json_writer *__restrict self, __uint64_t value);
-LIBJSON_DECL int LIBJSON_CC json_writer_putfloat(struct json_writer *__restrict self, double value);
-LIBJSON_DECL int LIBJSON_CC json_writer_putbool(struct json_writer *__restrict self, __BOOL value);
-LIBJSON_DECL int LIBJSON_CC json_writer_putnull(struct json_writer *__restrict self);
+LIBJSON_DECL __ATTR_NONNULL((1)) int LIBJSON_CC json_writer_beginobject(struct json_writer *__restrict self);
+LIBJSON_DECL __ATTR_NONNULL((1)) int LIBJSON_CC json_writer_beginarray(struct json_writer *__restrict self);
+LIBJSON_DECL __ATTR_NONNULL((1)) int LIBJSON_CC json_writer_endobject(struct json_writer *__restrict self);
+LIBJSON_DECL __ATTR_NONNULL((1)) int LIBJSON_CC json_writer_endarray(struct json_writer *__restrict self);
+LIBJSON_DECL __ATTR_NONNULL((1, 2)) int LIBJSON_CC json_writer_addfield(struct json_writer *__restrict self, /*utf-8*/char const *__restrict key, __size_t keylen);
+LIBJSON_DECL __ATTR_NONNULL((1, 2)) int LIBJSON_CC json_writer_putstring(struct json_writer *__restrict self, /*utf-8*/char const *__restrict str, __size_t len);
+LIBJSON_DECL __ATTR_NONNULL((1)) int LIBJSON_CC json_writer_putnumber(struct json_writer *__restrict self, __intptr_t value);
+LIBJSON_DECL __ATTR_NONNULL((1)) int LIBJSON_CC json_writer_putint64(struct json_writer *__restrict self, __int64_t value);
+LIBJSON_DECL __ATTR_NONNULL((1)) int LIBJSON_CC json_writer_putuint64(struct json_writer *__restrict self, __uint64_t value);
+LIBJSON_DECL __ATTR_NONNULL((1)) int LIBJSON_CC json_writer_putfloat(struct json_writer *__restrict self, double value);
+LIBJSON_DECL __ATTR_NONNULL((1)) int LIBJSON_CC json_writer_putbool(struct json_writer *__restrict self, __BOOL value);
+LIBJSON_DECL __ATTR_NONNULL((1)) int LIBJSON_CC json_writer_putnull(struct json_writer *__restrict self);
 #endif /* LIBJSON_WANT_PROTOTYPES */
 
 #endif /* __CC__ */

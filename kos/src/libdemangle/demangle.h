@@ -40,7 +40,7 @@ DECL_BEGIN
  * Other than that, this function behaves like any other format-printer
  * compatible API, returning the sum of all callbacks, or the first
  * negative return value upon error. */
-INTDEF ssize_t CC
+INTDEF NONNULL((1, 3)) ssize_t CC
 libdm_demangle(pformatprinter printer, void *arg,
                char const *__restrict mangled_name);
 
