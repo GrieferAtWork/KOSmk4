@@ -37,6 +37,7 @@
 #include <format-printer.h>
 #include <stddef.h>
 #include <string.h>
+#include <sched/pid.h>
 
 DECL_BEGIN
 
@@ -44,10 +45,18 @@ DECL_BEGIN
 #define PAGES_PER_WORD  (BITS_PER_POINTER / PMEMZONE_BITSPERPAGE)
 
 #if !defined(NDEBUG) && 0
-#define PRINT_ALLOCATION(...) (printk(KERN_DEBUG "%s(%d) : ",__FILE__,__LINE__),printk(KERN_DEBUG __VA_ARGS__))
+#define PRINT_ALLOCATION(...) (printk(KERN_DEBUG "[memory] " __VA_ARGS__))
 #else
 #define PRINT_ALLOCATION(...) (void)0
 #endif
+
+#define TRACE_ALLOC(min, max)                                                                \
+	(PRINT_ALLOCATION("Allocate physical ram " FORMAT_VM_PHYS_T "..." FORMAT_VM_PHYS_T " [tid=%u]\n", \
+	                  (vm_phys_t)(min)*PAGESIZE, (vm_phys_t)((max) + 1) * PAGESIZE - 1, task_getroottid_s()))
+#define TRACE_FREE(min, max)                                                             \
+	(PRINT_ALLOCATION("Free physical ram " FORMAT_VM_PHYS_T "..." FORMAT_VM_PHYS_T " [tid=%u]\n", \
+	                  (vm_phys_t)(min)*PAGESIZE, (vm_phys_t)((max) + 1) * PAGESIZE - 1, task_getroottid_s()))
+
 
 #undef IGNORE_FREE
 #undef ALLOCATE_MIN_PARTS
@@ -385,9 +394,7 @@ NOTHROW(KCALL page_freeone)(pageptr_t page) {
 #ifndef NDEBUG
 	uintptr_t oldval;
 #endif /* !NDEBUG */
-	PRINT_ALLOCATION("Free physical memory " FORMAT_VM_PHYS_T "..." FORMAT_VM_PHYS_T "\n",
-	                 (vm_phys_t)(page)*PAGESIZE,
-	                 (vm_phys_t)(page + 1) * PAGESIZE - 1);
+	TRACE_FREE(page, page);
 	for (zone = mzones.pm_last;; zone = zone->mz_prev) {
 		assertf(zone, "Untracked page " FORMAT_PAGEPTR_T, page);
 		if (page < zone->mz_start)
@@ -430,9 +437,7 @@ NOTHROW(KCALL page_free)(pageptr_t base, pagecnt_t num_pages) {
 	struct pmemzone *zone;
 	if unlikely(!num_pages)
 		return;
-	PRINT_ALLOCATION("Free physical memory " FORMAT_VM_PHYS_T "..." FORMAT_VM_PHYS_T "\n",
-	                 (vm_phys_t)(base)*PAGESIZE,
-	                 (vm_phys_t)(base + num_pages) * PAGESIZE - 1);
+	TRACE_FREE(base, base + num_pages - 1);
 	max_page = base + num_pages - 1;
 	zone     = mzones.pm_last;
 	for (;;) {
@@ -470,9 +475,7 @@ NOTHROW(KCALL page_cfree)(pageptr_t base, pagecnt_t num_pages) {
 	struct pmemzone *zone;
 	if (!num_pages)
 		return;
-	PRINT_ALLOCATION("Free physical memory " FORMAT_VM_PHYS_T "..." FORMAT_VM_PHYS_T "\n",
-	                 (vm_phys_t)(base)*PAGESIZE,
-	                 (vm_phys_t)(base + num_pages) * PAGESIZE - 1);
+	TRACE_FREE(base, base + num_pages - 1);
 	max_page = base + num_pages - 1;
 	zone     = mzones.pm_last;
 	for (;;) {
@@ -526,9 +529,7 @@ NOTHROW(KCALL page_ccfree)(pageptr_t base, pagecnt_t num_pages) {
 	struct pmemzone *zone;
 	if (!num_pages)
 		return;
-	PRINT_ALLOCATION("Free physical memory " FORMAT_VM_PHYS_T "..." FORMAT_VM_PHYS_T "\n",
-	                 (vm_phys_t)(base)*PAGESIZE,
-	                 (vm_phys_t)(base + num_pages) * PAGESIZE - 1);
+	TRACE_FREE(base, base + num_pages - 1);
 	max_page = base + num_pages - 1;
 	zone     = mzones.pm_last;
 	for (;;) {
@@ -628,10 +629,9 @@ again:
 		if ((pagecnt_t)free_max >= num_pages) {
 			result = zone_malloc_before(zone, free_max, num_pages);
 			if (result != PAGEPTR_INVALID) {
-				PRINT_ALLOCATION("Allocate physical memory " FORMAT_VM_PHYS_T "..." FORMAT_VM_PHYS_T "\n",
-				                 (vm_phys_t)(result + zone->mz_start) * PAGESIZE,
-				                 (vm_phys_t)(result + zone->mz_start + num_pages) * PAGESIZE - 1);
 				assert_allocation(result + zone->mz_start, num_pages);
+				TRACE_ALLOC(result + zone->mz_start,
+				            result + zone->mz_start + num_pages - 1);
 				ATOMIC_CMPXCH(zone->mz_fmax, free_max,
 				              result ? result - 1
 				                     : zone->mz_rmax);
@@ -642,10 +642,9 @@ again:
 			result = zone_malloc_before(zone, zone->mz_rmax, num_pages);
 		}
 		if (result != PAGEPTR_INVALID) {
-			PRINT_ALLOCATION("Allocate physical memory " FORMAT_VM_PHYS_T "..." FORMAT_VM_PHYS_T "\n",
-			                 (vm_phys_t)(result + zone->mz_start) * PAGESIZE,
-			                 (vm_phys_t)(result + zone->mz_start + num_pages) * PAGESIZE - 1);
 			assert_allocation(result + zone->mz_start, num_pages);
+			TRACE_ALLOC(result + zone->mz_start,
+			            result + zone->mz_start + num_pages - 1);
 			ATOMIC_CMPXCH(zone->mz_fmax, free_max,
 			              result ? result - 1
 			                     : zone->mz_rmax);
@@ -676,10 +675,9 @@ again:
 		if likely((pagecnt_t)free_max >= 1) {
 			result = zone_mallocone_before(zone, free_max);
 			if likely(result != PAGEPTR_INVALID) {
-				PRINT_ALLOCATION("Allocate physical memory " FORMAT_VM_PHYS_T "..." FORMAT_VM_PHYS_T "\n",
-				                 (vm_phys_t)(result + zone->mz_start) * PAGESIZE,
-				                 (vm_phys_t)(result + zone->mz_start + 1) * PAGESIZE - 1);
 				assert_allocation(result + zone->mz_start, 1);
+				TRACE_ALLOC(result + zone->mz_start,
+				            result + zone->mz_start);
 				ATOMIC_CMPXCH(zone->mz_fmax, free_max,
 				              result ? result - 1
 				                     : zone->mz_rmax);
@@ -690,10 +688,9 @@ again:
 			result = zone_mallocone_before(zone, zone->mz_rmax);
 		}
 		if (result != PAGEPTR_INVALID) {
-			PRINT_ALLOCATION("Allocate physical memory " FORMAT_VM_PHYS_T "..." FORMAT_VM_PHYS_T "\n",
-			                 (vm_phys_t)(result + zone->mz_start) * PAGESIZE,
-			                 (vm_phys_t)(result + zone->mz_start + 1) * PAGESIZE - 1);
 			assert_allocation(result + zone->mz_start, 1);
+			TRACE_ALLOC(result + zone->mz_start,
+			            result + zone->mz_start);
 			ATOMIC_CMPXCH(zone->mz_fmax, free_max,
 			              result ? result - 1
 			                     : zone->mz_rmax);
@@ -744,9 +741,8 @@ again:
 				        "Bad *res_pages value: " FORMAT_PAGEPTR_T "\n"
 				        "result = " FORMAT_PAGEPTR_T,
 				        *res_pages, result);
-				PRINT_ALLOCATION("Allocate physical memory " FORMAT_VM_PHYS_T "..." FORMAT_VM_PHYS_T "\n",
-				                 (vm_phys_t)(result + zone->mz_start) * PAGESIZE,
-				                 (vm_phys_t)(result + zone->mz_start + *res_pages) * PAGESIZE - 1);
+				TRACE_ALLOC(result + zone->mz_start,
+				            result + zone->mz_start + *res_pages - 1);
 				assert_allocation(result + zone->mz_start, *res_pages);
 				ATOMIC_CMPXCH(zone->mz_fmax, free_max,
 				              result ? result - 1
@@ -768,9 +764,8 @@ again:
 			        "Bad *res_pages value: " FORMAT_PAGEPTR_T "\n"
 			        "result = " FORMAT_PAGEPTR_T,
 			        *res_pages, result);
-			PRINT_ALLOCATION("Allocate physical memory " FORMAT_VM_PHYS_T "..." FORMAT_VM_PHYS_T "\n",
-			                 (vm_phys_t)(result + zone->mz_start) * PAGESIZE,
-			                 (vm_phys_t)(result + zone->mz_start + *res_pages) * PAGESIZE - 1);
+			TRACE_ALLOC(result + zone->mz_start,
+			            result + zone->mz_start + *res_pages - 1);
 			assert_allocation(result + zone->mz_start, *res_pages);
 			ATOMIC_CMPXCH(zone->mz_fmax, free_max,
 			              result ? result - 1
@@ -884,9 +879,8 @@ again:
 					        "Bad *res_pages value: " FORMAT_PAGEPTR_T "\n"
 					        "result = " FORMAT_PAGEPTR_T,
 					        *res_pages, result);
-					PRINT_ALLOCATION("Allocate physical memory " FORMAT_VM_PHYS_T "..." FORMAT_VM_PHYS_T "\n",
-					                 (vm_phys_t)(result + zone->mz_start) * PAGESIZE,
-					                 (vm_phys_t)(result + zone->mz_start + *res_pages) * PAGESIZE - 1);
+					TRACE_ALLOC(result + zone->mz_start,
+					            result + zone->mz_start + *res_pages - 1);
 					assert_allocation(result + zone->mz_start, *res_pages);
 					ATOMIC_CMPXCH(zone->mz_fmax, free_max,
 					              result ? result - 1
@@ -913,9 +907,8 @@ again:
 				        "Bad *res_pages value: " FORMAT_PAGEPTR_T "\n"
 				        "result = " FORMAT_PAGEPTR_T,
 				        *res_pages, result);
-				PRINT_ALLOCATION("Allocate physical memory " FORMAT_VM_PHYS_T "..." FORMAT_VM_PHYS_T "\n",
-				                 (vm_phys_t)(result + zone->mz_start) * PAGESIZE,
-				                 (vm_phys_t)(result + zone->mz_start + *res_pages) * PAGESIZE - 1);
+				TRACE_ALLOC(result + zone->mz_start,
+				            result + zone->mz_start + *res_pages - 1);
 				assert_allocation(result + zone->mz_start, *res_pages);
 				ATOMIC_CMPXCH(zone->mz_fmax, free_max,
 				              result ? result - 1
@@ -939,9 +932,8 @@ again:
 					        "Bad *res_pages value: " FORMAT_PAGEPTR_T "\n"
 					        "result = " FORMAT_PAGEPTR_T,
 					        *res_pages, result);
-					PRINT_ALLOCATION("Allocate physical memory " FORMAT_VM_PHYS_T "..." FORMAT_VM_PHYS_T "\n",
-					                 (vm_phys_t)(result + zone->mz_start) * PAGESIZE,
-					                 (vm_phys_t)(result + zone->mz_start + *res_pages) * PAGESIZE - 1);
+					TRACE_ALLOC(result + zone->mz_start,
+					            result + zone->mz_start + *res_pages - 1);
 					assert_allocation(result + zone->mz_start, *res_pages);
 					ATOMIC_CMPXCH(zone->mz_fmax, free_max,
 					              result ? result - 1
@@ -969,9 +961,8 @@ again:
 				        "Bad *res_pages value: " FORMAT_PAGEPTR_T "\n"
 				        "result = " FORMAT_PAGEPTR_T,
 				        *res_pages, result);
-				PRINT_ALLOCATION("Allocate physical memory " FORMAT_VM_PHYS_T "..." FORMAT_VM_PHYS_T "\n",
-				                 (vm_phys_t)(result + zone->mz_start) * PAGESIZE,
-				                 (vm_phys_t)(result + zone->mz_start + *res_pages) * PAGESIZE - 1);
+				TRACE_ALLOC(result + zone->mz_start,
+				            result + zone->mz_start + *res_pages - 1);
 				assert_allocation(result + zone->mz_start, *res_pages);
 				assert(result + zone->mz_start >= min_page);
 				assert(result + zone->mz_start + *res_pages - 1 <= max_page);

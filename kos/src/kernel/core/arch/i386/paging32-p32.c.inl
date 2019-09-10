@@ -887,7 +887,7 @@ again_read_word:
 		/* Delete this vector. */
 		if unlikely(!ATOMIC_CMPXCH_WEAK(P32_PDIR_E2_IDENTITY[vec2].p_word, e2.p_word, P32_PAGE_ABSENT))
 			goto again_read_word;
-		if unlikely(e2.p_word & P32_PAGE_FADDR_4MIB)
+		if unlikely(e2.p_word & P32_PAGE_F4MIB)
 			continue; /* 4MiB page. */
 		pageptr = e2.p_word >> P32_PAGE_SHIFT;
 		if unlikely(free_count >= COMPILER_LENOF(free_pages)) {
@@ -930,7 +930,7 @@ again_read_word:
 		/* Delete this vector. */
 		if unlikely(!ATOMIC_CMPXCH_WEAK(P32_PDIR_E2_IDENTITY[vec2].p_word, e2.p_word, P32_PAGE_ABSENT))
 			goto again_read_word;
-		if unlikely(e2.p_word & P32_PAGE_FADDR_4MIB)
+		if unlikely(e2.p_word & P32_PAGE_F4MIB)
 			continue; /* 4MiB page. */
 		pageptr = e2.p_word >> P32_PAGE_SHIFT;
 		if unlikely(free_count >= COMPILER_LENOF(free_pages)) {

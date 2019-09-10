@@ -1197,7 +1197,7 @@ again_read_word:
 			/* Delete this vector. */
 			if unlikely(!ATOMIC_CMPXCH_WEAK(PAE_PDIR_E2_IDENTITY[vec3][vec2].p_word, e2.p_word, PAE_PAGE_ABSENT))
 				goto again_read_word;
-			if unlikely(e2.p_word & PAE_PAGE_FADDR_2MIB)
+			if unlikely(e2.p_word & PAE_PAGE_F2MIB)
 				continue; /* 2MiB page. */
 			pageptr = e2.p_word >> PAE_PAGE_SHIFT;
 			if unlikely(free_count >= COMPILER_LENOF(free_pages)) {
@@ -1244,7 +1244,7 @@ again_read_word:
 			/* Delete this vector. */
 			if unlikely(!ATOMIC_CMPXCH_WEAK(PAE_PDIR_E2_IDENTITY[vec3][vec2].p_word, e2.p_word, PAE_PAGE_ABSENT))
 				goto again_read_word;
-			if unlikely(e2.p_word & PAE_PAGE_FADDR_2MIB)
+			if unlikely(e2.p_word & PAE_PAGE_F2MIB)
 				continue; /* 2MiB page. */
 			pageptr = e2.p_word >> PAE_PAGE_SHIFT;
 			if unlikely(free_count >= COMPILER_LENOF(free_pages)) {
