@@ -509,6 +509,8 @@ handle_manager_cloexec(struct handle_manager *__restrict self)
 	for (i = 0; i < self->hm_linear.hm_alloc; ++i) {
 		if (!(vec[i].h_mode & IO_CLOEXEC))
 			continue;
+		if (vec[i].h_type == HANDLE_TYPE_UNDEFINED)
+			continue;
 		if likely(delete_vector) {
 			assert(cloexec_count < self->hm_cloexec_count);
 			delete_vector[cloexec_count] = vec[i];

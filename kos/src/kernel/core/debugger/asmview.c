@@ -287,12 +287,10 @@ NOTHROW(FCALL av_lock_sections)(uintptr_t symbol_addr) {
 		return &av_sections_cache[i];
 	}
 	if (!resent) {
-		if (av_sections_cache[0].sl_driver) {
-			debug_dlunlocksections(&av_sections_cache[0].sl_dlsect);
-			decref_unlikely(av_sections_cache[0].sl_driver);
-			memmove(&av_sections_cache[0], &av_sections_cache[1],
-			        sizeof(av_sections_cache) - sizeof(av_sections_cache[0]));
-		}
+		debug_dlunlocksections(&av_sections_cache[0].sl_dlsect);
+		decref_unlikely(av_sections_cache[0].sl_driver);
+		memmove(&av_sections_cache[0], &av_sections_cache[1],
+		        sizeof(av_sections_cache) - sizeof(av_sections_cache[0]));
 		resent = COMPILER_ENDOF(av_sections_cache) - 1;
 	}
 	resent->sl_driver = NULL;
@@ -352,10 +350,8 @@ NOTHROW(FCALL av_lookup_symbol)(uintptr_t symbol_addr) {
 		return &av_symbol_cache[i];
 	}
 	if (!resent) {
-		if (av_symbol_cache[0].s_name) {
-			memmove(&av_symbol_cache[0], &av_symbol_cache[1],
-			        sizeof(av_symbol_cache) - sizeof(av_symbol_cache[0]));
-		}
+		memmove(&av_symbol_cache[0], &av_symbol_cache[1],
+		        sizeof(av_symbol_cache) - sizeof(av_symbol_cache[0]));
 		resent = COMPILER_ENDOF(av_symbol_cache) - 1;
 	}
 	resent->s_name = NULL;
