@@ -31,6 +31,7 @@ if (gcc_opt.remove("-O3"))
 #ifndef CONFIG_NO_DEBUGGER
 #include <kernel/vm.h>
 #include <kernel/paging.h>
+#include <kernel/printk.h>
 #include <sched/task.h>
 
 #include <hybrid/align.h>
@@ -478,6 +479,17 @@ DEFINE_DEBUG_FUNCTION(
 		dbg_printf("%q: " DF_WHITE("%#Ix") " (" DF_WHITE("%Iu") ")\n",
 		           expr, result, result);
 	}
+	return 0;
+}
+
+DEFINE_DEBUG_FUNCTION(
+		"rawmagic",
+		"rawmagic message\n"
+		"\tOutput a given " DF_WHITE("message") " to magic\n",
+		argc, argv) {
+	if (argc != 2)
+		return DBG_FUNCTION_INVALID_ARGUMENTS;
+	printk(KERN_RAW "%%{%s}", argv[1]);
 	return 0;
 }
 

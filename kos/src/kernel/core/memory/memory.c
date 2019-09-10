@@ -50,12 +50,31 @@ DECL_BEGIN
 #define PRINT_ALLOCATION(...) (void)0
 #endif
 
-#define TRACE_ALLOC(min, max)                                                                \
-	(PRINT_ALLOCATION("Allocate physical ram " FORMAT_VM_PHYS_T "..." FORMAT_VM_PHYS_T " [tid=%u]\n", \
-	                  (vm_phys_t)(min)*PAGESIZE, (vm_phys_t)((max) + 1) * PAGESIZE - 1, task_getroottid_s()))
-#define TRACE_FREE(min, max)                                                             \
-	(PRINT_ALLOCATION("Free physical ram " FORMAT_VM_PHYS_T "..." FORMAT_VM_PHYS_T " [tid=%u]\n", \
-	                  (vm_phys_t)(min)*PAGESIZE, (vm_phys_t)((max) + 1) * PAGESIZE - 1, task_getroottid_s()))
+
+#if !defined(NDEBUG) && 0
+LOCAL void KCALL do_trace_external(char const *method, pageptr_t min, pageptr_t max) {
+	pflag_t was;
+	was = PREEMPTION_PUSHOFF();
+	printk(KERN_RAW "%%{trace:%s:pmem:0x%p:0x%p}", method, min, max);
+	PREEMPTION_POP(was);
+}
+#define TRACE_EXTERNAL(method, min, max) \
+	do_trace_external(method, min, max)
+#else
+#define TRACE_EXTERNAL(method, min, max) (void)0
+#endif
+
+
+#define TRACE_ALLOC(zone, min, max)                                                                \
+	(TRACE_EXTERNAL("alloc", min, max), \
+	 PRINT_ALLOCATION("Allocate physical ram " FORMAT_VM_PHYS_T "..." FORMAT_VM_PHYS_T " [tid=%u][%Iu-%Iu=%Iu]\n", \
+	                  (vm_phys_t)(min)*PAGESIZE, (vm_phys_t)((max) + 1) * PAGESIZE - 1, task_getroottid_s(), \
+	                  (zone)->mz_cfree - (((max)-(min))+1), ((max)-(min))+1, (zone)->mz_cfree))
+#define TRACE_FREE(zone, min, max)                                                             \
+	(TRACE_EXTERNAL("free", min, max), \
+	 PRINT_ALLOCATION("Free physical ram " FORMAT_VM_PHYS_T "..." FORMAT_VM_PHYS_T " [tid=%u][%Iu+%Iu=%Iu]\n", \
+	                  (vm_phys_t)(min)*PAGESIZE, (vm_phys_t)((max) + 1) * PAGESIZE - 1, task_getroottid_s(), \
+	                  (zone)->mz_cfree, ((max)-(min))+1, (zone)->mz_cfree + (((max)-(min))+1)))
 
 
 #undef IGNORE_FREE
@@ -72,7 +91,7 @@ DECL_BEGIN
 /* In min-max allocations, randomize the the max-allocation to occasionally
  * allocate less than the maximum request in order to harden the less-traveled
  * paths used when allocating scattered memory. */
-#define ALLOCATE_MIN_PARTS_RANDOMIZE 1
+//#define ALLOCATE_MIN_PARTS_RANDOMIZE 1
 #define ALLOCATE_MIN_PARTS_RANDOMIZE_CHANCE()  (krand() < 0x55555555)
 #endif /* !NDEBUG */
 
@@ -394,16 +413,18 @@ NOTHROW(KCALL page_freeone)(pageptr_t page) {
 #ifndef NDEBUG
 	uintptr_t oldval;
 #endif /* !NDEBUG */
-	TRACE_FREE(page, page);
 	for (zone = mzones.pm_last;; zone = zone->mz_prev) {
 		assertf(zone, "Untracked page " FORMAT_PAGEPTR_T, page);
 		if (page < zone->mz_start)
 			continue;
 		if (page > zone->mz_max)
 			continue;
+		TRACE_FREE(zone, page, page);
 		page -= zone->mz_start;
 		i      = (size_t)(page / PAGES_PER_WORD);
 		j      = (unsigned int)(page % PAGES_PER_WORD);
+		ATOMIC_FETCHINC(zone->mz_cfree);
+		ATOMIC_FETCHINC(zone->mz_qfree);
 		mask   = (uintptr_t)(PMEMZONE_ISFREEMASK | PMEMZONE_ISUNDFMASK) << (j * PMEMZONE_BITSPERPAGE);
 #ifndef NDEBUG
 		oldval = ATOMIC_FETCHOR(zone->mz_free[i], mask);
@@ -437,12 +458,12 @@ NOTHROW(KCALL page_free)(pageptr_t base, pagecnt_t num_pages) {
 	struct pmemzone *zone;
 	if unlikely(!num_pages)
 		return;
-	TRACE_FREE(base, base + num_pages - 1);
 	max_page = base + num_pages - 1;
 	zone     = mzones.pm_last;
 	for (;;) {
 		if (base <= zone->mz_max) {
 			assert(max_page <= zone->mz_max);
+			TRACE_FREE(zone, base, base + num_pages - 1);
 			if (base >= zone->mz_start) {
 				/* The remainder of the section to-be freed is located within this zone */
 				zone_free(zone,
@@ -475,12 +496,12 @@ NOTHROW(KCALL page_cfree)(pageptr_t base, pagecnt_t num_pages) {
 	struct pmemzone *zone;
 	if (!num_pages)
 		return;
-	TRACE_FREE(base, base + num_pages - 1);
 	max_page = base + num_pages - 1;
 	zone     = mzones.pm_last;
 	for (;;) {
 		if (base <= zone->mz_max) {
 			assert(max_page <= zone->mz_max);
+			TRACE_FREE(zone, base, base + num_pages - 1);
 			if (base >= zone->mz_start) {
 				/* The remainder of the section to-be freed is located within this zone */
 				zone_cfree(zone,
@@ -529,12 +550,12 @@ NOTHROW(KCALL page_ccfree)(pageptr_t base, pagecnt_t num_pages) {
 	struct pmemzone *zone;
 	if (!num_pages)
 		return;
-	TRACE_FREE(base, base + num_pages - 1);
 	max_page = base + num_pages - 1;
 	zone     = mzones.pm_last;
 	for (;;) {
 		if (base <= zone->mz_max) {
 			assert(max_page <= zone->mz_max);
+			TRACE_FREE(zone, base, base + num_pages - 1);
 			if (base >= zone->mz_start) {
 				/* The remainder of the section to-be freed is located within this zone */
 				zone_free_keepz(zone,
@@ -630,7 +651,8 @@ again:
 			result = zone_malloc_before(zone, free_max, num_pages);
 			if (result != PAGEPTR_INVALID) {
 				assert_allocation(result + zone->mz_start, num_pages);
-				TRACE_ALLOC(result + zone->mz_start,
+				TRACE_ALLOC(zone,
+				            result + zone->mz_start,
 				            result + zone->mz_start + num_pages - 1);
 				ATOMIC_CMPXCH(zone->mz_fmax, free_max,
 				              result ? result - 1
@@ -643,7 +665,8 @@ again:
 		}
 		if (result != PAGEPTR_INVALID) {
 			assert_allocation(result + zone->mz_start, num_pages);
-			TRACE_ALLOC(result + zone->mz_start,
+			TRACE_ALLOC(zone,
+			            result + zone->mz_start,
 			            result + zone->mz_start + num_pages - 1);
 			ATOMIC_CMPXCH(zone->mz_fmax, free_max,
 			              result ? result - 1
@@ -676,7 +699,8 @@ again:
 			result = zone_mallocone_before(zone, free_max);
 			if likely(result != PAGEPTR_INVALID) {
 				assert_allocation(result + zone->mz_start, 1);
-				TRACE_ALLOC(result + zone->mz_start,
+				TRACE_ALLOC(zone,
+				            result + zone->mz_start,
 				            result + zone->mz_start);
 				ATOMIC_CMPXCH(zone->mz_fmax, free_max,
 				              result ? result - 1
@@ -689,7 +713,8 @@ again:
 		}
 		if (result != PAGEPTR_INVALID) {
 			assert_allocation(result + zone->mz_start, 1);
-			TRACE_ALLOC(result + zone->mz_start,
+			TRACE_ALLOC(zone,
+			            result + zone->mz_start,
 			            result + zone->mz_start);
 			ATOMIC_CMPXCH(zone->mz_fmax, free_max,
 			              result ? result - 1
@@ -741,7 +766,8 @@ again:
 				        "Bad *res_pages value: " FORMAT_PAGEPTR_T "\n"
 				        "result = " FORMAT_PAGEPTR_T,
 				        *res_pages, result);
-				TRACE_ALLOC(result + zone->mz_start,
+				TRACE_ALLOC(zone,
+				            result + zone->mz_start,
 				            result + zone->mz_start + *res_pages - 1);
 				assert_allocation(result + zone->mz_start, *res_pages);
 				ATOMIC_CMPXCH(zone->mz_fmax, free_max,
@@ -764,7 +790,8 @@ again:
 			        "Bad *res_pages value: " FORMAT_PAGEPTR_T "\n"
 			        "result = " FORMAT_PAGEPTR_T,
 			        *res_pages, result);
-			TRACE_ALLOC(result + zone->mz_start,
+			TRACE_ALLOC(zone,
+			            result + zone->mz_start,
 			            result + zone->mz_start + *res_pages - 1);
 			assert_allocation(result + zone->mz_start, *res_pages);
 			ATOMIC_CMPXCH(zone->mz_fmax, free_max,
@@ -797,6 +824,7 @@ again:
 			oldval = ATOMIC_FETCHAND(zone->mz_free[i], ~mask);
 			if (!(oldval & mask))
 				return PAGE_MALLOC_AT_NOTFREE; /* Page was already allocated */
+			TRACE_ALLOC(zone, ptr ,ptr);
 			ATOMIC_FETCHDEC(zone->mz_cfree);
 			if (oldval & (mask << (PMEMZONE_ISUNDFBIT - PMEMZONE_ISFREEBIT)))
 				ATOMIC_FETCHDEC(zone->mz_qfree);
@@ -879,7 +907,8 @@ again:
 					        "Bad *res_pages value: " FORMAT_PAGEPTR_T "\n"
 					        "result = " FORMAT_PAGEPTR_T,
 					        *res_pages, result);
-					TRACE_ALLOC(result + zone->mz_start,
+					TRACE_ALLOC(zone,
+					            result + zone->mz_start,
 					            result + zone->mz_start + *res_pages - 1);
 					assert_allocation(result + zone->mz_start, *res_pages);
 					ATOMIC_CMPXCH(zone->mz_fmax, free_max,
@@ -907,7 +936,8 @@ again:
 				        "Bad *res_pages value: " FORMAT_PAGEPTR_T "\n"
 				        "result = " FORMAT_PAGEPTR_T,
 				        *res_pages, result);
-				TRACE_ALLOC(result + zone->mz_start,
+				TRACE_ALLOC(zone,
+				            result + zone->mz_start,
 				            result + zone->mz_start + *res_pages - 1);
 				assert_allocation(result + zone->mz_start, *res_pages);
 				ATOMIC_CMPXCH(zone->mz_fmax, free_max,
@@ -932,7 +962,8 @@ again:
 					        "Bad *res_pages value: " FORMAT_PAGEPTR_T "\n"
 					        "result = " FORMAT_PAGEPTR_T,
 					        *res_pages, result);
-					TRACE_ALLOC(result + zone->mz_start,
+					TRACE_ALLOC(zone,
+					            result + zone->mz_start,
 					            result + zone->mz_start + *res_pages - 1);
 					assert_allocation(result + zone->mz_start, *res_pages);
 					ATOMIC_CMPXCH(zone->mz_fmax, free_max,
@@ -961,7 +992,8 @@ again:
 				        "Bad *res_pages value: " FORMAT_PAGEPTR_T "\n"
 				        "result = " FORMAT_PAGEPTR_T,
 				        *res_pages, result);
-				TRACE_ALLOC(result + zone->mz_start,
+				TRACE_ALLOC(zone,
+				            result + zone->mz_start,
 				            result + zone->mz_start + *res_pages - 1);
 				assert_allocation(result + zone->mz_start, *res_pages);
 				assert(result + zone->mz_start >= min_page);

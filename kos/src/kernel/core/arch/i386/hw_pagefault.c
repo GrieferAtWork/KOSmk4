@@ -337,6 +337,7 @@ do_unshare_cow:
 							/* No need to copy the part. - we're already the only ones actually using it! */
 						} else {
 							struct vm_datapart *new_part;
+							vm_ppage_t old_ppage, new_ppage;
 							/* Verify that the access being made is valid. */
 							if unlikely(!(node->vn_prot & VM_PROT_WRITE))
 								goto endread_and_decref_part_and_set_readonly;
@@ -421,6 +422,15 @@ upgrade_and_recheck_vm_for_node:
 								vm_datapart_lockwrite_setcore(part);
 							}
 
+							/* Allocate the physical memory used for backing the vm-local copy. */
+							new_ppage = page_malloc(1);
+							/* Check if the allocation failed. */
+							if unlikely(new_ppage == PAGEPTR_INVALID) {
+								sync_endwrite(part);
+								kfree(new_part);
+								THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
+							}
+
 							/* Initialize the new part. */
 							new_part->dp_refcnt = 2; /* +1 (CREF: `node'), +1 (part; assignment below) */
 							shared_rwlock_init(&new_part->dp_lock);
@@ -434,22 +444,16 @@ upgrade_and_recheck_vm_for_node:
 							new_part->dp_pprop = unlikely(part->dp_flags & VM_DATAPART_FLAG_HEAPPPP)
 							                     ? part->dp_pprop_p[0]
 							                     : part->dp_pprop;
-							new_part->dp_ramdata.rd_blockv         = &new_part->dp_ramdata.rd_block0;
-							new_part->dp_ramdata.rd_block0.rb_size = 1;
-							new_part->dp_futex                     = NULL;
+							new_part->dp_ramdata.rd_blockv          = &new_part->dp_ramdata.rd_block0;
+							new_part->dp_ramdata.rd_block0.rb_start = new_ppage;
+							new_part->dp_ramdata.rd_block0.rb_size  = 1;
+							new_part->dp_futex                      = NULL;
 							assert(new_part->dp_state == VM_DATAPART_STATE_INCORE ||
 							       new_part->dp_state == VM_DATAPART_STATE_LOCKED);
-							/* Allocate the physical memory used for backing the vm-local copy. */
-							new_part->dp_ramdata.rd_block0.rb_start = page_malloc(1);
-							/* Check if the allocation failed. */
-							if unlikely(new_part->dp_ramdata.rd_block0.rb_start == PAGEPTR_INVALID) {
-								sync_endwrite(part);
-								kfree(new_part);
-								THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
-							}
+
 							if (!sync_trywrite(effective_vm)) {
 								sync_endwrite(part);
-								page_free(new_part->dp_ramdata.rd_block0.rb_start, 1);
+								page_free(new_ppage, 1);
 								kfree(new_part);
 								sync_write(effective_vm);
 								sync_downgrade(effective_vm);
@@ -461,7 +465,7 @@ upgrade_and_recheck_vm_for_node:
 							            (node->vn_prot & VM_PROT_SHARED)) {
 								sync_downgrade(effective_vm);
 								sync_endwrite(part);
-								page_free(new_part->dp_ramdata.rd_block0.rb_start, 1);
+								page_free(new_ppage, 1);
 								kfree(new_part);
 								decref_unlikely(part);
 								printk(KERN_DEBUG "Race condition: Mapping target at %p has changed during unshare (#2)\n",
@@ -473,7 +477,7 @@ upgrade_and_recheck_vm_for_node:
 								if unlikely(!pagedir_prepare_mapone(page)) {
 									sync_endwrite(effective_vm);
 									sync_endwrite(part);
-									page_free(new_part->dp_ramdata.rd_block0.rb_start, 1);
+									page_free(new_ppage, 1);
 									kfree(new_part);
 									decref_unlikely(part);
 									THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
@@ -481,9 +485,10 @@ upgrade_and_recheck_vm_for_node:
 							}
 
 							/* Copy the contents of the page being unshared. */
+							old_ppage = part->dp_ramdata.rd_blockv[0].rb_start;
 							/* TODO: Special function for copying whole pages. */
-							vm_copyinphys(VM_PPAGE2ADDR(new_part->dp_ramdata.rd_block0.rb_start),
-							              VM_PPAGE2ADDR(part->dp_ramdata.rd_blockv[0].rb_start),
+							vm_copyinphys(VM_PPAGE2ADDR(new_ppage),
+							              VM_PPAGE2ADDR(old_ppage),
 							              PAGESIZE);
 
 							new_part->dp_block = incref(&vm_datablock_anonymous_zero_vec[VM_DATABLOCK_PAGESHIFT(part->dp_block)]);
@@ -503,7 +508,7 @@ upgrade_and_recheck_vm_for_node:
 							if unlikely(!vm_sync_begin_nx(effective_vm)) {
 								sync_endwrite(effective_vm);
 								sync_endwrite(part);
-								page_free(new_part->dp_ramdata.rd_block0.rb_start, 1);
+								page_free(new_ppage, 1);
 								kfree(new_part);
 								/* Block until the task lock becomes available, then try again. */
 								vm_tasklock_read(effective_vm);
@@ -516,7 +521,7 @@ upgrade_and_recheck_vm_for_node:
 #endif /* !CONFIG_NO_SMP */
 
 							/* Actually map the accessed page! */
-							pagedir_mapone(page, new_part->dp_ramdata.rd_block0.rb_start, prot);
+							pagedir_mapone(page, new_ppage, prot);
 							vm_sync_endone(effective_vm, page);
 
 							/* Unlink the given node from the old part's chain. */
@@ -542,7 +547,14 @@ upgrade_and_recheck_vm_for_node:
 							/* Try to merge `part' during the decref() below! */
 							vm_datapart_decref_and_merge(new_part);
 
-							printk(KERN_TRACE "Unshared page at %p\n", (uintptr_t)VM_PAGE2ADDR(page));
+#if 1
+							printk(KERN_TRACE "Unshared page at %p [tid=%u]\n",
+							       (uintptr_t)VM_PAGE2ADDR(page), task_getroottid_s());
+#else
+							printk(KERN_TRACE "Unshared page at %p [tid=%u,oldpage=" FORMAT_VM_PHYS_T ",newpage=" FORMAT_VM_PHYS_T "]\n",
+							       (uintptr_t)VM_PAGE2ADDR(page), task_getroottid_s(),
+							       VM_PPAGE2ADDR(old_ppage), VM_PPAGE2ADDR(new_ppage));
+#endif
 							goto done_before_pop_connections;
 						}
 					}

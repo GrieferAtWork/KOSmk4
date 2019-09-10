@@ -145,6 +145,90 @@ function printFormattedAddr2line(
 
 #define FINAL_FORMAT_RAW_DATA(x)  x
 
+
+class TraceController {
+	member m_name: string;
+	member m_addresses: {int...} = HashSet();
+	member m_addresses_stack: {{int...}...} = [];
+	this(name: string)
+		: m_name(name)
+	{}
+
+	function err(outFile: File, message: string) {
+		outFile << "{ERROR:trace(" << repr(m_name) <<  "): " << message << "}\n";
+	}
+	
+	function printDiff(outFile: File, addrFormat: string, oldSet: {int...}) {
+			local added = HashSet(), removed = HashSet();
+			for (local x: oldSet) {
+				if (x !in m_addresses)
+					removed.insert(x);
+			}
+			for (local x: m_addresses) {
+				if (x !in oldSet)
+					added.insert(x);
+			}
+			if (added || removed) {
+				err(outFile, "Missmatched address sets");
+				for (local x: added)
+					err(outFile, "Leaked {}".format({ addrFormat % x }));
+				for (local x: removed)
+					err(outFile, "Freed {}".format({ addrFormat % x }));
+			}
+	}
+
+	function doMethod(outFile: File, method: string, argument: string) {
+		switch (method) {
+		case "alloc":
+		case "free": {
+			local minaddr, maxaddr;
+			if (":" in argument) {
+				minaddr, none, maxaddr = argument.partition(":")...;
+				minaddr = int(minaddr);
+				maxaddr = int(maxaddr);
+			} else {
+				minaddr = int(argument);
+				maxaddr = minaddr;
+			}
+			if (method == "alloc") {
+				for (local x: [minaddr:maxaddr + 1])
+					m_addresses.insert(x);
+			} else {
+				for (local x: [minaddr:maxaddr + 1])
+					m_addresses.remove(x);
+			}
+		}	break;
+		case "push":
+			m_addresses_stack.append(copy m_addresses);
+			break;
+		case "diff":
+			if (!m_addresses_stack) {
+				err(outFile, "Stack is empty");
+				break;
+			}
+			if (!argument)
+				argument = "%.13I64X000";
+			printDiff(outFile, argument, m_addresses_stack.back);
+			break;
+		case "pop": {
+			if (!m_addresses_stack) {
+				err(outFile, "Stack is empty");
+				break;
+			}
+			local o = m_addresses_stack.popback();
+			if (!argument)
+				argument = "%.13I64X000";
+			printDiff(outFile, argument, o);
+			m_addresses = o;
+		}	break;
+		default:
+			err(outFile, "Unknown trace method " << repr(method));
+			break;
+		}
+	}
+}
+
+
 function start(
 		groups: {Group...},
 		config: Config,
@@ -294,6 +378,7 @@ do_format_line:
 		if (savedData)
 			stored_data.value = savedData;
 	}
+	local tracedControllers: {string: TraceController} = Dict();
 	while (local text = r.read()) {
 		local flushStart = 0;
 		local len = #text;
@@ -348,6 +433,21 @@ again_find_match:
 				if (":" in command)
 					command, none, argument = command.partition(":")...;
 				switch (command.strip()) {
+				case "trace": {
+					local method, name;
+					method, none, argument = argument.partition(":")...;
+					if (":" in argument) {
+						name, none, argument = argument.partition(":")...;
+					} else {
+						name = argument;
+						argument = "";
+					}
+					name = string(name);
+					local obj = tracedControllers.get(name);
+					if (obj is none)
+						tracedControllers[name] = obj = TraceController(name);
+					obj.doMethod(outFile, method, argument);
+				}	break;
 				case "artifact": {
 					local outfile, filesize = argument.scanf("%[^:]:%[^:]")...;
 					filesize = int(filesize);
