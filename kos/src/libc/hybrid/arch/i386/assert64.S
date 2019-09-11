@@ -465,6 +465,45 @@ INTERN_FUNCTION(libc___assert)
 	.cfi_endproc
 END(libc___assert)
 DEFINE_PUBLIC_ALIAS(__assert, libc___assert)
+
+
+.section ASSERTION_SECTION(_assert)
+INTERN_FUNCTION(libc__assert)
+	.cfi_startproc
+	/* %rdi: char const *expr
+	 * %rsi: char const *file
+	 * %rdx: unsigned int line */
+	pushq_cfi $0   /* aa_format */
+	pushq_cfi $0   /* aa_func */
+	pushq_cfi %rdx /* aa_line */
+	pushq_cfi %rsi /* aa_file */
+	pushq_cfi %rdi /* aa_expr */
+	pushq_cfi (6*8)(%rsp) /* aa_state.kcs_rip */
+	pushfq_cfi_r          /* aa_state.kcs_rflags */
+	pushq_cfi_r %rax    /* [C] Accumulator register */
+	pushq_cfi_r %rcx    /* [C] Count register */
+	pushq_cfi_r %rdx    /* [C] Data register */
+	pushq_cfi_r %rbx    /* [P] Base register */
+	leaq   (12*8)(%rsp), %rax
+	pushq_cfi   %rax    /* [P] Stack pointer */
+	pushq_cfi_r %rbp    /* [P] Frame base pointer */
+	pushq_cfi_r %rsi    /* [C] Source pointer */
+	pushq_cfi_r %rdi    /* [C] Destination pointer */
+	pushq_cfi_r %r8     /* [C] General purpose register #8 */
+	pushq_cfi_r %r9     /* [C] General purpose register #9 */
+	pushq_cfi_r %r10    /* [C] General purpose register #10 */
+	pushq_cfi_r %r11    /* [C] General purpose register #11 */
+	pushq_cfi_r %r12    /* [P] General purpose register #12 */
+	pushq_cfi_r %r13    /* [P] General purpose register #13 */
+	pushq_cfi_r %r14    /* [P] General purpose register #14 */
+	pushq_cfi_r %r15    /* [P] General purpose register #15 */
+	subq   $(SIZEOF_X86_64_VA_LIST_STRUCT), %rsp /* aa_args */
+	movq   %rsp, %rdi
+	INTERN(libc_assertion_failure_core)
+	call   libc_assertion_failure_core
+	.cfi_endproc
+END(libc__assert)
+DEFINE_PUBLIC_ALIAS(_assert, libc__assert)
 #endif /* !__KERNEL__ */
 
 

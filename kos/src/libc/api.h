@@ -87,6 +87,16 @@
 #undef __CRT_HAVE__isctype
 #define __CRT_HAVE_unicode_utf8seqlen 1
 
+/* Indicate that we have support for all of the different assert functions. */
+#define __CRT_HAVE___afail 1
+#define __CRT_HAVE___afailf 1
+#define __CRT_HAVE___assert 1
+#define __CRT_HAVE___assert_fail 1
+#define __CRT_HAVE___assert_func 1
+#define __CRT_HAVE___assertfail 1
+#define __CRT_HAVE__assert 1
+
+
 #ifdef __KERNEL__
 #include <kernel/compiler.h>
 #endif /* __KERNEL__ */

@@ -287,6 +287,39 @@ INTERN_FUNCTION(libc___assert)
 	.cfi_endproc
 END(libc___assert)
 DEFINE_PUBLIC_ALIAS(__assert, libc___assert)
+
+
+
+.section ASSERTION_SECTION(_assert)
+INTERN_FUNCTION(libc__assert)
+	.cfi_startproc
+	/* char const *expr, char const *file, unsigned int line */
+	pushl  0(%esp)  /* RETURN_PC */
+	.cfi_def_cfa %esp, 4
+	.cfi_rel_offset %eip, 0
+	pushl  0(%esp)  /* RETURN_PC */
+	.cfi_def_cfa %esp, 8
+	.cfi_rel_offset %eip, 0
+	pushfl_cfi_r
+	pushal_cfi_r
+	ADJUST_ESP(5*4)
+	/*                -,                -, char const  *expr, char const *file, unsigned int line */
+	/* char const *expr, char const *file, unsigned int line, char const *func, char const  *format */
+	movl   SIZEOF_KCPUSTATE+8(%esp), %eax  /* char const *expr */
+	movl   %eax, SIZEOF_KCPUSTATE+0(%esp)  /* aa_expr */
+	movl   SIZEOF_KCPUSTATE+12(%esp), %eax /* char const *file */
+	movl   %eax, SIZEOF_KCPUSTATE+4(%esp)  /* aa_file */
+	movl   SIZEOF_KCPUSTATE+16(%esp), %eax /* unsigned int line */
+	movl   %eax, SIZEOF_KCPUSTATE+8(%esp)  /* aa_line */
+	movl   $0, SIZEOF_KCPUSTATE+12(%esp)   /* aa_func */
+	movl   $0, SIZEOF_KCPUSTATE+16(%esp)   /* aa_format */
+	pushl_cfi $0                           /* aa_args */
+	movl   %esp, %ecx
+	INTERN(libc_assertion_failure_core)
+	call   libc_assertion_failure_core
+	.cfi_endproc
+END(libc__assert)
+DEFINE_PUBLIC_ALIAS(_assert, libc__assert)
 #endif /* !__KERNEL__ */
 
 

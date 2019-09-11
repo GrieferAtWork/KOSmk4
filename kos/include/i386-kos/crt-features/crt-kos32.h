@@ -744,6 +744,7 @@
 #define __CRT_HAVE__aligned_offset_recalloc 1
 #define __CRT_HAVE__aligned_realloc 1
 #define __CRT_HAVE__aligned_recalloc 1
+#define __CRT_HAVE__assert 1
 #define __CRT_HAVE__atodbl 1
 #define __CRT_HAVE__atodbl_l 1
 #define __CRT_HAVE__atof_l 1
