@@ -1,4 +1,4 @@
-/* HASH 0xb5d301ff */
+/* HASH 0x5b726c6d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -101,6 +101,8 @@
 #define __CRT_HAVE_DOS$file_wprinter 1
 #define __CRT_HAVE_DOS$file_wprinter_unlocked 1
 #define __CRT_HAVE_DOS$format_vwprintf 1
+#define __CRT_HAVE_DOS$format_waprintf_pack 1
+#define __CRT_HAVE_DOS$format_waprintf_printer 1
 #define __CRT_HAVE_DOS$format_wescape 1
 #define __CRT_HAVE_DOS$format_whexdump 1
 #define __CRT_HAVE_DOS$format_wprintf 1
@@ -1514,6 +1516,8 @@
 #define __CRT_HAVE_format_vprintf 1
 #define __CRT_HAVE_format_vscanf 1
 #define __CRT_HAVE_format_vwprintf 1
+#define __CRT_HAVE_format_waprintf_pack 1
+#define __CRT_HAVE_format_waprintf_printer 1
 #define __CRT_HAVE_format_wescape 1
 #define __CRT_HAVE_format_whexdump 1
 #define __CRT_HAVE_format_width 1

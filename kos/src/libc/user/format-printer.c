@@ -110,7 +110,7 @@ NOTHROW_NCX(LIBCCALL libc_format_aprintf_printer)(/*struct format_aprintf_data *
 /*[[[body:format_aprintf_printer]]]*/
 /*AUTO*/{
 	struct __format_aprintf_data {
-		char         *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owend] Buffer */
+		char         *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
 		__SIZE_TYPE__ ap_avail; /* Unused buffer size */
 		__SIZE_TYPE__ ap_used;  /* Used buffer size */
 	};

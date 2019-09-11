@@ -1,4 +1,4 @@
-/* HASH 0x730fe2a */
+/* HASH 0xe897f7b9 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,9 +17,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_format_aprintf_printer_defined
+#ifndef __local_format_c16aprintf_printer_defined
 #if ((__has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_realloc)) || defined(__CRT_HAVE_realloc))
-#define __local_format_aprintf_printer_defined 1
+#define __local_format_c16aprintf_printer_defined 1
 #ifdef __LIBC_BIND_OPTIMIZATIONS
 #include <optimized/string.h>
 #endif /* __LIBC_BIND_OPTIMIZATIONS */
@@ -56,30 +56,30 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__loca
 
 __NAMESPACE_LOCAL_BEGIN
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
-__LOCAL_LIBC(format_aprintf_printer) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_aprintf_printer))(/*struct format_aprintf_data **/void *__arg,
-                                                                    /*utf-8*/char const *__restrict __data,
-                                                                    __SIZE_TYPE__ __datalen) {
+__LOCAL_LIBC(format_c16aprintf_printer) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_c16aprintf_printer))(/*struct format_waprintf_data **/void *__arg,
+                                                                       __CHAR16_TYPE__ const *__restrict __data,
+                                                                       __SIZE_TYPE__ __datalen) {
 #line 1083 "kos/src/libc/magic/format-printer.c"
 	struct __format_aprintf_data {
-		char         *__ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
+		__CHAR16_TYPE__         *__ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
 		__SIZE_TYPE__ __ap_avail; /* Unused buffer size */
 		__SIZE_TYPE__ __ap_used;  /* Used buffer size */
 	};
 	struct __format_aprintf_data *__buf;
 	__buf = (struct __format_aprintf_data *)__arg;
 	if (__buf->__ap_avail < __datalen) {
-		char *__newbuf;
+		__CHAR16_TYPE__ *__newbuf;
 		__SIZE_TYPE__ __min_alloc = __buf->__ap_used + __datalen;
 		__SIZE_TYPE__ __new_alloc = __buf->__ap_used + __buf->__ap_avail;
 		if (!__new_alloc)
 			__new_alloc = 8;
 		while (__new_alloc < __min_alloc)
 			__new_alloc *= 2;
-		__newbuf = (char *)__localdep_realloc(__buf->__ap_base, (__new_alloc + 1) * sizeof(char));
+		__newbuf = (__CHAR16_TYPE__ *)__localdep_realloc(__buf->__ap_base, (__new_alloc + 1) * sizeof(__CHAR16_TYPE__));
 		if __unlikely(!__newbuf) {
 			__new_alloc = __min_alloc;
-			__newbuf    = (char *)__localdep_realloc(__buf->__ap_base, (__new_alloc + 1) * sizeof(char));
+			__newbuf    = (__CHAR16_TYPE__ *)__localdep_realloc(__buf->__ap_base, (__new_alloc + 1) * sizeof(__CHAR16_TYPE__));
 			if __unlikely(!__newbuf)
 				return -1;
 		}
@@ -87,11 +87,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_aprintf_printer))(/*struct for
 		__buf->__ap_base  = __newbuf;
 		__buf->__ap_avail = __new_alloc - __buf->__ap_used;
 	}
-	__localdep_memcpy(__buf->__ap_base + __buf->__ap_used, __data, __datalen * sizeof(char));
+	__localdep_memcpy(__buf->__ap_base + __buf->__ap_used, __data, __datalen * sizeof(__CHAR16_TYPE__));
 	__buf->__ap_avail -= __datalen;
 	__buf->__ap_used  += __datalen;
 	return (__SSIZE_TYPE__)__datalen;
 }
 __NAMESPACE_LOCAL_END
 #endif /* ((__has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_realloc)) || defined(__CRT_HAVE_realloc)) */
-#endif /* !__local_format_aprintf_printer_defined */
+#endif /* !__local_format_c16aprintf_printer_defined */

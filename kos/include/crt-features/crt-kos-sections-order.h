@@ -168,7 +168,7 @@
 
 ]]]*/
 #define __CRT_LINKORDER_SECTIONS(CB, PREFIX) \
-	CB(PREFIX.errno_access.* PREFIX.application.exit.*) \
+	CB(PREFIX.application.exit.* PREFIX.errno_access.*) \
 	CB(PREFIX.sched.access.* PREFIX.fs.exec.exec.*) \
 	CB(PREFIX.sched.thread.*) \
 	CB(PREFIX.sched.pthread.*) \
@@ -191,11 +191,11 @@
 	CB(PREFIX.FILE.locked.access.*) \
 	CB(PREFIX.FILE.locked.read.read.*) \
 	CB(PREFIX.FILE.locked.read.scanf.*) \
-	CB(PREFIX.FILE.locked.read.utility.* PREFIX.FILE.locked.read.getc.*) \
+	CB(PREFIX.FILE.locked.read.getc.* PREFIX.FILE.locked.read.utility.*) \
 	CB(PREFIX.FILE.locked.write.write.*) \
 	CB(PREFIX.FILE.locked.write.printf.*) \
 	CB(PREFIX.FILE.locked.write.utility.* PREFIX.FILE.locked.write.putc.*) \
-	CB(PREFIX.FILE.locked.seek.utility.* PREFIX.FILE.locked.seek.seek.* PREFIX.FILE.locked.seek.pos.*) \
+	CB(PREFIX.FILE.locked.seek.seek.* PREFIX.FILE.locked.seek.utility.* PREFIX.FILE.locked.seek.pos.*) \
 	CB(PREFIX.FILE.locked.utility.*) \
 	CB(PREFIX.FILE.unlocked.access.*) \
 	CB(PREFIX.FILE.unlocked.read.read.*) \
@@ -205,7 +205,7 @@
 	CB(PREFIX.FILE.unlocked.write.printf.*) \
 	CB(PREFIX.FILE.unlocked.write.utility.* PREFIX.FILE.unlocked.write.putc.*) \
 	CB(PREFIX.FILE.unlocked.seek.pos.* PREFIX.FILE.unlocked.seek.seek.* PREFIX.FILE.unlocked.seek.utility.*) \
-	CB(PREFIX.io.poll.* PREFIX.io.sync.* PREFIX.io.lock.* PREFIX.io.large.seek.* PREFIX.io.utility.* PREFIX.io.seek.* PREFIX.io.large.utility.* PREFIX.io.large.lock.*) \
+	CB(PREFIX.io.poll.* PREFIX.io.seek.* PREFIX.io.sync.* PREFIX.io.lock.* PREFIX.io.large.seek.* PREFIX.io.utility.* PREFIX.io.large.utility.* PREFIX.io.large.lock.*) \
 	CB(PREFIX.fs.property.* PREFIX.fs.basic_property.*) \
 	CB(PREFIX.fs.environ.*) \
 	CB(PREFIX.fs.exec.spawn.* PREFIX.fs.exec.posix_spawn.* PREFIX.fs.exec.system.*) \
@@ -250,7 +250,7 @@
 	CB(PREFIX.io.stropts.*) \
 	CB(PREFIX.obstack.*) \
 	CB(PREFIX.utility.shm.* PREFIX.utility.klog.* PREFIX.utility.regex.* PREFIX.utility.search.* PREFIX.utility.glob.* PREFIX.utility.stdlib.*) \
-	CB(PREFIX.system.utility.* PREFIX.system.ptrace.* PREFIX.system.configuration.* PREFIX.system.adjtime.* PREFIX.system.reboot.* PREFIX.system.syslog.* PREFIX.system.*) \
+	CB(PREFIX.system.utility.* PREFIX.system.ptrace.* PREFIX.system.configuration.* PREFIX.system.reboot.* PREFIX.system.syslog.* PREFIX.system.*) \
 	CB(PREFIX.sched.resource.*) \
 	CB(PREFIX.sched.msg.*) \
 	CB(PREFIX.string.encrypt.*) \
@@ -277,7 +277,7 @@
 	CB(PREFIX.wchar.unicode.static.memory.*) \
 	CB(PREFIX.wchar.unicode.static.ctype.*) \
 	CB(PREFIX.wchar.unicode.static.convert.*) \
-	CB(PREFIX.wchar.unicode.static.format.printf.*) \
+	CB(PREFIX.wchar.unicode.static.format.printf.* PREFIX.wchar.string.format.*) \
 	CB(PREFIX.wchar.unicode.static.format.scanf.*) \
 	CB(PREFIX.wchar.unicode.static.format.strftime.*) \
 	CB(PREFIX.wchar.unicode.locale.memory.*) \
@@ -340,7 +340,7 @@
 	CB(PREFIX.dos.wchar.string.memory.*) \
 	CB(PREFIX.dos.wchar.unicode.static.memory.*) \
 	CB(PREFIX.dos.wchar.unicode.static.convert.*) \
-	CB(PREFIX.dos.wchar.unicode.static.format.printf.*) \
+	CB(PREFIX.dos.wchar.unicode.static.format.printf.* PREFIX.dos.wchar.string.format.*) \
 	CB(PREFIX.dos.wchar.unicode.static.format.scanf.*) \
 	CB(PREFIX.dos.wchar.unicode.static.format.strftime.*) \
 	CB(PREFIX.dos.wchar.unicode.locale.memory.*) \
@@ -356,7 +356,7 @@
 	CB(PREFIX.except.sched.user.*) \
 	CB(PREFIX.except.heap.malloc.*) \
 	CB(PREFIX.except.heap.rare_helpers.*) \
-	CB(PREFIX.except.io.write.* PREFIX.except.io.large.write.* PREFIX.except.io.large.read.* PREFIX.except.io.read.*) \
+	CB(PREFIX.except.io.write.* PREFIX.except.io.large.read.* PREFIX.except.io.large.write.* PREFIX.except.io.read.*) \
 	CB(PREFIX.except.io.access.*) \
 	CB(PREFIX.except.io.seek.* PREFIX.except.io.large.seek.* PREFIX.except.io.sync.* PREFIX.except.io.utility.*) \
 	CB(PREFIX.except.fs.property.* PREFIX.except.fs.basic_property.*) \

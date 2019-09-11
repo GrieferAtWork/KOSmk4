@@ -1,4 +1,4 @@
-/* HASH 0x358e8b5f */
+/* HASH 0x1d6ca1b7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ DECL_BEGIN
  * The usual format-printer rules apply, and this function
  * is allowed to call `PRINTER' as often as it chooses */
 INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.format_wrepeat") ssize_t
+ATTR_WEAK ATTR_SECTION(".text.crt.wchar.string.format.format_wrepeat") ssize_t
 NOTHROW_NCX(LIBCCALL libc_format_wrepeat)(pc32formatprinter printer,
                                           void *arg,
                                           char32_t ch,
@@ -102,7 +102,7 @@ err:
  * The usual format-printer rules apply, and this function
  * is allowed to call `PRINTER' as often as it chooses */
 INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.format_wrepeat") ssize_t
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.string.format.format_wrepeat") ssize_t
 NOTHROW_NCX(LIBDCALL libd_format_wrepeat)(pc16formatprinter printer,
                                           void *arg,
                                           char16_t ch,
@@ -176,7 +176,7 @@ err:
  * @param: PRINTER: A function called for all quoted portions of the text
  * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
 INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.format_wescape") ssize_t
+ATTR_WEAK ATTR_SECTION(".text.crt.wchar.string.format.format_wescape") ssize_t
 NOTHROW_NCX(LIBCCALL libc_format_wescape)(pc32formatprinter printer,
                                           void *arg,
                                           /*utf-8*/char32_t const *__restrict text,
@@ -486,7 +486,7 @@ err:
  * @param: PRINTER: A function called for all quoted portions of the text
  * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
 INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.format_wescape") ssize_t
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.string.format.format_wescape") ssize_t
 NOTHROW_NCX(LIBDCALL libd_format_wescape)(pc16formatprinter printer,
                                           void *arg,
                                           /*utf-8*/char16_t const *__restrict text,
@@ -798,7 +798,7 @@ err:
  * @return: 0: The given data was successfully hex-dumped
  * @return: *: The first non-ZERO(0) return value of PRINTER */
 INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.format_whexdump") ssize_t
+ATTR_WEAK ATTR_SECTION(".text.crt.wchar.string.format.format_whexdump") ssize_t
 NOTHROW_NCX(LIBCCALL libc_format_whexdump)(pc32formatprinter printer,
                                            void *arg,
                                            void const *__restrict data,
@@ -1017,7 +1017,7 @@ err:
  * @return: 0: The given data was successfully hex-dumped
  * @return: *: The first non-ZERO(0) return value of PRINTER */
 INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.format_whexdump") ssize_t
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.string.format.format_whexdump") ssize_t
 NOTHROW_NCX(LIBDCALL libd_format_whexdump)(pc16formatprinter printer,
                                            void *arg,
                                            void const *__restrict data,
@@ -1293,7 +1293,7 @@ err:
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
 INTERN ATTR_LIBC_PRINTF(3, 0) NONNULL((1, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.format_vwprintf") ssize_t
+ATTR_WEAK ATTR_SECTION(".text.crt.wchar.string.format.format_vwprintf") ssize_t
 NOTHROW_NCX(LIBCCALL libc_format_vwprintf)(pc32formatprinter printer,
                                            void *arg,
                                            char32_t const *__restrict format,
@@ -1393,7 +1393,7 @@ NOTHROW_NCX(LIBCCALL libc_format_vwprintf)(pc32formatprinter printer,
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
 INTERN ATTR_LIBC_PRINTF(3, 0) NONNULL((1, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.format_vwprintf") ssize_t
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.string.format.format_vwprintf") ssize_t
 NOTHROW_NCX(LIBDCALL libd_format_vwprintf)(pc16formatprinter printer,
                                            void *arg,
                                            char16_t const *__restrict format,
@@ -1459,7 +1459,7 @@ NOTHROW_NCX(LIBDCALL libd_format_vwprintf)(pc16formatprinter printer,
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
 INTERN ATTR_LIBC_PRINTF(3, 4) NONNULL((1, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.format_wprintf") ssize_t
+ATTR_WEAK ATTR_SECTION(".text.crt.wchar.string.format.format_wprintf") ssize_t
 NOTHROW_NCX(VLIBCCALL libc_format_wprintf)(pc32formatprinter printer,
                                            void *arg,
                                            char32_t const *__restrict format,
@@ -1509,7 +1509,7 @@ NOTHROW_NCX(VLIBCCALL libc_format_wprintf)(pc32formatprinter printer,
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
 INTERN ATTR_LIBC_PRINTF(3, 4) NONNULL((1, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.format_wprintf") ssize_t
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.string.format.format_wprintf") ssize_t
 NOTHROW_NCX(VLIBDCALL libd_format_wprintf)(pc16formatprinter printer,
                                            void *arg,
                                            char16_t const *__restrict format,
@@ -1526,7 +1526,7 @@ NOTHROW_NCX(VLIBDCALL libd_format_wprintf)(pc16formatprinter printer,
 /* Format-printer implementation for printing to a string buffer like `wsprintf' would
  * WARNING: No trailing NUL-character is implicitly appended */
 INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.format_wsprintf_printer") ssize_t
+ATTR_WEAK ATTR_SECTION(".text.crt.wchar.string.format.format_wsprintf_printer") ssize_t
 NOTHROW_NCX(LIBCCALL libc_format_wsprintf_printer)(/*wchar_t ***/void *arg,
                                                    char32_t const *__restrict data,
                                                    size_t datalen) {
@@ -1541,7 +1541,7 @@ NOTHROW_NCX(LIBCCALL libc_format_wsprintf_printer)(/*wchar_t ***/void *arg,
 /* Format-printer implementation for printing to a string buffer like `wsprintf' would
  * WARNING: No trailing NUL-character is implicitly appended */
 INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.format_wsprintf_printer") ssize_t
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.string.format.format_wsprintf_printer") ssize_t
 NOTHROW_NCX(LIBDCALL libd_format_wsprintf_printer)(/*wchar_t ***/void *arg,
                                                    char16_t const *__restrict data,
                                                    size_t datalen) {
@@ -1560,7 +1560,7 @@ NOTHROW_NCX(LIBDCALL libd_format_wsprintf_printer)(/*wchar_t ***/void *arg,
  * NOTE: The number of written characters is `ORIG_BUFSIZE - ARG->sd_bufsiz'
  * NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively the sum of return values of all calls to `format_snprintf_printer()' */
 INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.format_wsnprintf_printer") ssize_t
+ATTR_WEAK ATTR_SECTION(".text.crt.wchar.string.format.format_wsnprintf_printer") ssize_t
 NOTHROW_NCX(LIBCCALL libc_format_wsnprintf_printer)(/*struct format_wsnprintf_data**/void *arg,
                                                     char32_t const *__restrict data,
                                                     size_t datalen) {
@@ -1589,7 +1589,7 @@ NOTHROW_NCX(LIBCCALL libc_format_wsnprintf_printer)(/*struct format_wsnprintf_da
  * NOTE: The number of written characters is `ORIG_BUFSIZE - ARG->sd_bufsiz'
  * NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively the sum of return values of all calls to `format_snprintf_printer()' */
 INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.format_wsnprintf_printer") ssize_t
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.string.format.format_wsnprintf_printer") ssize_t
 NOTHROW_NCX(LIBDCALL libd_format_wsnprintf_printer)(/*struct format_wsnprintf_data**/void *arg,
                                                     char16_t const *__restrict data,
                                                     size_t datalen) {
@@ -1615,11 +1615,11 @@ NOTHROW_NCX(LIBDCALL libd_format_wsnprintf_printer)(/*struct format_wsnprintf_da
 
 /* Returns the width (number of characters; not bytes) of the given unicode string */
 INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.format_wwidth") ssize_t
+ATTR_WEAK ATTR_SECTION(".text.crt.wchar.string.format.format_wwidth") ssize_t
 NOTHROW_NCX(LIBCCALL libc_format_wwidth)(void *arg,
                                          char32_t const *__restrict data,
                                          size_t datalen) {
-#line 120 "kos/src/libc/magic/parts.wchar.format-printer.c"
+#line 123 "kos/src/libc/magic/parts.wchar.format-printer.c"
 #if 4 == 2
 	size_t result = 0;
 	char32_t const *iter, *end;
@@ -1644,11 +1644,11 @@ NOTHROW_NCX(LIBCCALL libc_format_wwidth)(void *arg,
 }
 /* Returns the width (number of characters; not bytes) of the given unicode string */
 INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.format_wwidth") ssize_t
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.string.format.format_wwidth") ssize_t
 NOTHROW_NCX(LIBDCALL libd_format_wwidth)(void *arg,
                                          char16_t const *__restrict data,
                                          size_t datalen) {
-#line 120 "kos/src/libc/magic/parts.wchar.format-printer.c"
+#line 123 "kos/src/libc/magic/parts.wchar.format-printer.c"
 #if 2 == 2
 	size_t result = 0;
 	char16_t const *iter, *end;

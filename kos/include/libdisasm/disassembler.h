@@ -73,7 +73,7 @@ typedef __ATTR_NONNULL((1)) __ssize_t
 #ifndef __pformatprinter_defined
 #define __pformatprinter_defined 1
 /* Callback functions prototypes provided to format functions.
- * NOTE: '__pformatprinter' usually returns the number of characters printed, but isn't required to.
+ * NOTE: 'pformatprinter' usually returns the number of characters printed, but isn't required to.
  * @param: DATA:    The base address of a DATALEN bytes long character vector that should be printed.
  * @param: DATALEN: The amount of characters that should be printed, starting at `data'.
  *                  Note that this is an exact value, meaning that a NUL-character appearing
@@ -83,7 +83,7 @@ typedef __ATTR_NONNULL((1)) __ssize_t
  * @return: >= 0:   The print was successful.
  *                  Usually, the return value is added to a sum of values which is then
  *                  returned by the calling function upon success, also meaning that the
- *                  usual return value used to indicate success in 'DATALEN'. */
+ *                  usual return value used to indicate success is 'DATALEN'. */
 typedef __pformatprinter pformatprinter;
 
 /* Read and return one character.

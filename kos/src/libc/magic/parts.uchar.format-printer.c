@@ -19,6 +19,7 @@
 
 %[define_replacement(char16_t = __CHAR16_TYPE__)]
 %[define_replacement(char32_t = __CHAR32_TYPE__)]
+%[default_impl_section({.text.crt.wchar.string.format|.text.crt.dos.wchar.string.format})]
 
 %{
 #include <features.h>
@@ -47,7 +48,7 @@ __SYSDECL_BEGIN
  * @return: >= 0:   The print was successful.
  *                  Usually, the return value is added to a sum of values which is then
  *                  returned by the calling function upon success, also meaning that the
- *                  usual return value used to indicate success in 'DATALEN'. */
+ *                  usual return value used to indicate success is 'DATALEN'. */
 typedef __pc16formatprinter pc16formatprinter;
 typedef __pc32formatprinter pc32formatprinter;
 #endif /* !__pc16formatprinter_defined */
@@ -98,6 +99,7 @@ struct format_c32snprintf_data {
 	__SIZE_TYPE__ sd_bufsiz; /* Remaining buffer size. */
 };
 #endif /* !__format_c16snprintf_data_defined */
+
 #define FORMAT_C16SNPRINTF_INIT(buf,bufsize)       { buf, bufsize }
 #define FORMAT_C32SNPRINTF_INIT(buf,bufsize)       { buf, bufsize }
 #define format_c16snprintf_init(self,buf,bufsize) ((self)->sd_buffer = (buf),(self)->sd_bufsiz = (bufsize))
@@ -115,6 +117,74 @@ struct format_c32snprintf_data {
 format_c16length:(void *arg, char16_t const *__restrict data, $size_t datalen) -> $ssize_t = format_length;
 [noexport][nocrt][nouser]
 format_c32length:(void *arg, char32_t const *__restrict data, $size_t datalen) -> $ssize_t = format_length;
+
+
+
+%[define_wchar_replacement(__format_waprintf_data_defined = __format_c16aprintf_data_defined, __format_c32aprintf_data_defined)]
+%[define_wchar_replacement(format_waprintf_data = format_c16aprintf_data, format_c32aprintf_data)]
+%[define_wchar_replacement(FORMAT_WAPRINTF_DATA_INIT = FORMAT_C16APRINTF_DATA_INIT, FORMAT_C32APRINTF_DATA_INIT)]
+%[define_wchar_replacement(format_waprintf_data_init = format_c16aprintf_data_init, format_c32aprintf_data_init)]
+%[define_wchar_replacement(format_waprintf_data_cinit = format_c16aprintf_data_cinit, format_c32aprintf_data_cinit)]
+%[define_wchar_replacement(format_waprintf_data_fini = format_c16aprintf_data_fini, format_c32aprintf_data_fini)]
+
+%{
+
+#ifndef __format_c16aprintf_data_defined
+#define __format_c16aprintf_data_defined 1
+struct format_c16aprintf_data {
+	char16_t     *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
+	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
+	__SIZE_TYPE__ ap_used;  /* Used buffer size */
+};
+
+struct format_c32aprintf_data {
+	char32_t     *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
+	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
+	__SIZE_TYPE__ ap_used;  /* Used buffer size */
+};
+#endif /* !__format_c32aprintf_data_defined */
+
+#define FORMAT_C16APRINTF_DATA_INIT        { __NULLPTR, 0, 0 }
+#define FORMAT_C32APRINTF_DATA_INIT        { __NULLPTR, 0, 0 }
+#define format_c16aprintf_data_init(self)  ((self)->ap_base = __NULLPTR, (self)->ap_avail = (self)->ap_used = 0)
+#define format_c32aprintf_data_init(self)  ((self)->ap_base = __NULLPTR, (self)->ap_avail = (self)->ap_used = 0)
+#define format_c16aprintf_data_cinit(self)            \
+	(__hybrid_assert((self)->ap_base == __NULLPTR), \
+	 __hybrid_assert((self)->ap_avail == 0),        \
+	 __hybrid_assert((self)->ap_used == 0))
+#define format_c32aprintf_data_cinit(self)            \
+	(__hybrid_assert((self)->ap_base == __NULLPTR), \
+	 __hybrid_assert((self)->ap_avail == 0),        \
+	 __hybrid_assert((self)->ap_used == 0))
+#ifdef NDEBUG
+#define format_c16aprintf_data_fini(self)  (__libc_free((self)->ap_base))
+#else /* NDEBUG */
+#if __SIZEOF_POINTER__ == 4
+#define format_c16aprintf_data_fini(self)               \
+	(__libc_free((self)->ap_base),                      \
+	 (self)->ap_base  = (char *)__UINT32_C(0xcccccccc), \
+	 (self)->ap_avail = __UINT32_C(0xcccccccc),         \
+	 (self)->ap_used  = __UINT32_C(0xcccccccc))
+#elif __SIZEOF_POINTER__ == 8
+#define format_waprintf_data_fini(self)                         \
+	(__libc_free((self)->ap_base),                              \
+	 (self)->ap_base  = (char *)__UINT64_C(0xcccccccccccccccc), \
+	 (self)->ap_avail = __UINT64_C(0xcccccccccccccccc),         \
+	 (self)->ap_used  = __UINT64_C(0xcccccccccccccccc))
+#else /* __SIZEOF_POINTER__ == ... */
+#define format_waprintf_data_fini(self) (__libc_free((self)->ap_base))
+#endif /* __SIZEOF_POINTER__ != ... */
+#endif /* !NDEBUG */
+#define format_c32aprintf_data_fini(self)  format_c16aprintf_data_fini(self)
+
+}
+
+
+[alias(*)][attribute(*)] format_c16aprintf_pack:(*) %{uchar(format_waprintf_pack)}
+[alias(*)][attribute(*)] format_c32aprintf_pack:(*) %{uchar(format_waprintf_pack)}
+[alias(*)][attribute(*)] format_c16aprintf_printer:(*) %{uchar(format_waprintf_printer)}
+[alias(*)][attribute(*)] format_c32aprintf_printer:(*) %{uchar(format_waprintf_printer)}
+
 
 
 %{

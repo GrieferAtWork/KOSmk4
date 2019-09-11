@@ -27,6 +27,7 @@
 %[define_wchar_replacement(pwformatprinter = pc16formatprinter, pc32formatprinter)]
 %[define_wchar_replacement(__pwformatprinter = __pc16formatprinter, __pc32formatprinter)]
 %[define_wchar_replacement(format_wsnprintf_data = format_c16snprintf_data, format_c32snprintf_data)]
+%[default_impl_section({.text.crt.wchar.string.format|.text.crt.dos.wchar.string.format})]
 
 
 %(auto_header)#include <parts/uchar/format-printer.h>
@@ -40,6 +41,8 @@
 #include <wchar.h>
 #endif /* !_WCHAR_H */
 #include <bits/wformat-printer.h>
+#include <libc/malloc.h>
+#include <hybrid/__assert.h>
 
 __SYSDECL_BEGIN
 
@@ -58,7 +61,7 @@ __SYSDECL_BEGIN
  * @return: >= 0:   The print was successful.
  *                  Usually, the return value is added to a sum of values which is then
  *                  returned by the calling function upon success, also meaning that the
- *                  usual return value used to indicate success in 'DATALEN'. */
+ *                  usual return value used to indicate success is 'DATALEN'. */
 typedef __pwformatprinter pwformatprinter;
 #endif /* !__pwformatprinter_defined */
 
@@ -92,7 +95,7 @@ format_wsprintf_printer:([nonnull] /*wchar_t ***/void *arg,
 
 #ifndef __format_wsnprintf_data_defined
 #define __format_wsnprintf_data_defined 1
-/* Data structure for implementing wsnprintf() */
+/* Data structure for implementing waprintf() */
 struct format_wsnprintf_data {
 	wchar_t      *sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
 	__SIZE_TYPE__ sd_bufsiz; /* Remaining buffer size. */
@@ -142,6 +145,133 @@ format_wwidth:(void *arg, [nonnull] wchar_t const *__restrict data, $size_t data
 
 [noexport][nocrt][nouser]
 format_wlength:(void *arg, wchar_t const *__restrict data, $size_t datalen) -> $ssize_t = format_length;
+
+
+
+%{
+
+#ifndef __format_waprintf_data_defined
+#define __format_waprintf_data_defined 1
+struct format_waprintf_data {
+	wchar_t      *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
+	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
+	__SIZE_TYPE__ ap_used;  /* Used buffer size */
+};
+#endif /* !__format_waprintf_data_defined */
+
+#define FORMAT_WAPRINTF_DATA_INIT        { __NULLPTR, 0, 0 }
+#define format_waprintf_data_init(self)  ((self)->ap_base = __NULLPTR, (self)->ap_avail = (self)->ap_used = 0)
+#define format_waprintf_data_cinit(self)            \
+	(__hybrid_assert((self)->ap_base == __NULLPTR), \
+	 __hybrid_assert((self)->ap_avail == 0),        \
+	 __hybrid_assert((self)->ap_used == 0))
+#ifdef NDEBUG
+#define format_waprintf_data_fini(self)  (__libc_free((self)->ap_base))
+#else /* NDEBUG */
+#if __SIZEOF_POINTER__ == 4
+#define format_waprintf_data_fini(self)                 \
+	(__libc_free((self)->ap_base),                      \
+	 (self)->ap_base  = (char *)__UINT32_C(0xcccccccc), \
+	 (self)->ap_avail = __UINT32_C(0xcccccccc),         \
+	 (self)->ap_used  = __UINT32_C(0xcccccccc))
+#elif __SIZEOF_POINTER__ == 8
+#define format_waprintf_data_fini(self)                         \
+	(__libc_free((self)->ap_base),                              \
+	 (self)->ap_base  = (char *)__UINT64_C(0xcccccccccccccccc), \
+	 (self)->ap_avail = __UINT64_C(0xcccccccccccccccc),         \
+	 (self)->ap_used  = __UINT64_C(0xcccccccccccccccc))
+#else /* __SIZEOF_POINTER__ == ... */
+#define format_waprintf_data_fini(self) (__libc_free((self)->ap_base))
+#endif /* __SIZEOF_POINTER__ != ... */
+#endif /* !NDEBUG */
+
+}
+
+
+@@Pack and finalize a given aprintf format printer
+@@Together with `format_waprintf_printer()', the aprintf
+@@format printer sub-system should be used as follows:
+@@>> char *result; ssize_t error;
+@@>> struct format_aprintf_data p = FORMAT_WAPRINTF_DATA_INIT;
+@@>> error = format_wprintf(&format_waprintf_printer, &p, L"%s %s", "Hello", "World");
+@@>> if unlikely(error < 0) {
+@@>>     format_waprintf_data_fini(&p);
+@@>>     return NULL;
+@@>> }
+@@>> result = format_waprintf_pack(&p, NULL);
+@@>> return result;
+@@WARNING: Note that `format_waprintf_pack()' is able to return `NULL' as well,
+@@         but will finalize the given aprintf printer an all cases.
+@@NOTE:    The caller must destroy the returned string by passing it to `free()'
+@@@param: pstrlen: When non-NULL, store the length of the constructed string here
+@@                 Note that this is the actual length if the constructed string,
+@@                 but may differ from `wcslen(return)' when NUL characters were
+@@                 printed to the waprintf-printer at one point.
+@@                 (e.g. `format_waprintf_printer(&my_printer, L"\0", 1)')
+[requires($has_function(realloc))][same_impl][user]
+[dependency_include(<hybrid/__assert.h>)]
+[dependency_include(<hybrid/typecore.h>)][wchar]
+[ATTR_WUNUSED][ATTR_MALL_DEFAULT_ALIGNED][ATTR_MALLOC]
+[dependency_prefix(
+#ifndef __format_waprintf_data_defined
+#define __format_waprintf_data_defined 1
+struct format_waprintf_data {
+	wchar_t      *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
+	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
+	__SIZE_TYPE__ ap_used;  /* Used buffer size */
+};
+#endif /* !__format_waprintf_data_defined */
+)]
+format_waprintf_pack:([nonnull] struct format_waprintf_data *__restrict self,
+                      [nullable] $size_t *pstrlen) -> wchar_t * {
+	/* Free unused buffer memory. */
+	wchar_t *result;
+	if (self->@ap_avail@ != 0) {
+		wchar_t *newbuf;
+		newbuf = (wchar_t *)realloc(self->@ap_base@,
+		                         (self->@ap_used@ + 1) * sizeof(wchar_t));
+		if likely(newbuf)
+			self->@ap_base@ = newbuf;
+	} else {
+		if unlikely(!self->@ap_used@) {
+			/* Special case: Nothing was printed. */
+			__hybrid_assert(!self->@ap_base@);
+#ifdef __CRT_HAVE_malloc
+			self->@ap_base@ = (wchar_t *)malloc(1 * sizeof(wchar_t));
+#else /* __CRT_HAVE_malloc */
+			self->@ap_base@ = (wchar_t *)realloc(NULL, 1 * sizeof(wchar_t));
+#endif /* !__CRT_HAVE_malloc */
+			if unlikely(!self->@ap_base@)
+				return NULL;
+		}
+	}
+	result = self->@ap_base@;
+	__hybrid_assert(result);
+	result[self->@ap_used@] = '\0'; /* NUL-terminate */
+	if (pstrlen)
+		*pstrlen = self->@ap_used@;
+#ifndef NDEBUG
+#if __SIZEOF_POINTER__ == 4
+	self->@ap_base@  = (wchar_t *)__UINT32_C(0xcccccccc);
+	self->@ap_avail@ = __UINT32_C(0xcccccccc);
+	self->@ap_used@  = __UINT32_C(0xcccccccc);
+#elif __SIZEOF_POINTER__ == 8
+	self->@ap_base@  = (wchar_t *)__UINT64_C(0xcccccccccccccccc);
+	self->@ap_avail@ = __UINT64_C(0xcccccccccccccccc);
+	self->@ap_used@  = __UINT64_C(0xcccccccccccccccc);
+#endif /* __SIZEOF_POINTER__ == ... */
+#endif /* !NDEBUG */
+	return result;
+}
+
+
+@@Print data to a dynamically allocated heap buffer. On error, -1 is returned
+[requires($has_function(realloc))][same_impl][user][wchar]
+[dependency_include(<hybrid/__assert.h>)][ATTR_WUNUSED]
+format_waprintf_printer:([nonnull] /*struct format_waprintf_data **/void *arg,
+                         [nonnull] wchar_t const *__restrict data, $size_t datalen) -> $ssize_t
+	%{copy(format_aprintf_printer, str2wcs)}
+
 
 
 

@@ -85,6 +85,8 @@
 #define __CRT_HAVE_DOS$file_wprinter 1
 #define __CRT_HAVE_DOS$file_wprinter_unlocked 1
 #define __CRT_HAVE_DOS$format_vwprintf 1
+#define __CRT_HAVE_DOS$format_waprintf_pack 1
+#define __CRT_HAVE_DOS$format_waprintf_printer 1
 #define __CRT_HAVE_DOS$format_wescape 1
 #define __CRT_HAVE_DOS$format_whexdump 1
 #define __CRT_HAVE_DOS$format_wprintf 1
@@ -1529,6 +1531,8 @@
 #define __CRT_HAVE_format_vprintf 1
 #define __CRT_HAVE_format_vscanf 1
 #define __CRT_HAVE_format_vwprintf 1
+#define __CRT_HAVE_format_waprintf_pack 1
+#define __CRT_HAVE_format_waprintf_printer 1
 #define __CRT_HAVE_format_wescape 1
 #define __CRT_HAVE_format_whexdump 1
 #define __CRT_HAVE_format_width 1

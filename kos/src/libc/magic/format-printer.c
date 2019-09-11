@@ -71,7 +71,7 @@ __SYSDECL_BEGIN
  * @return: >= 0:   The print was successful.
  *                  Usually, the return value is added to a sum of values which is then
  *                  returned by the calling function upon success, also meaning that the
- *                  usual return value used to indicate success in 'DATALEN'. */
+ *                  usual return value used to indicate success is 'DATALEN'. */
 typedef __pformatprinter pformatprinter;
 
 /* Read and return one character.
@@ -964,7 +964,7 @@ format_length:(void *arg, /*utf-8*/char const *__restrict data, $size_t datalen)
 #ifndef __format_aprintf_data_defined
 #define __format_aprintf_data_defined 1
 struct format_aprintf_data {
-	char         *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owend] Buffer */
+	char         *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
 	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
 	__SIZE_TYPE__ ap_used;  /* Used buffer size */
 };
@@ -972,9 +972,10 @@ struct format_aprintf_data {
 
 #define FORMAT_APRINTF_DATA_INIT        { __NULLPTR, 0, 0 }
 #define format_aprintf_data_init(self)  ((self)->ap_base = __NULLPTR, (self)->ap_avail = (self)->ap_used = 0)
-#define format_aprintf_data_cinit(self) (__hybrid_assert((self)->ap_base == __NULLPTR), \
-	                                     __hybrid_assert((self)->ap_avail == 0),        \
-	                                     __hybrid_assert((self)->ap_used == 0))
+#define format_aprintf_data_cinit(self)             \
+	(__hybrid_assert((self)->ap_base == __NULLPTR), \
+	 __hybrid_assert((self)->ap_avail == 0),        \
+	 __hybrid_assert((self)->ap_used == 0))
 #ifdef NDEBUG
 #define format_aprintf_data_fini(self)  (__libc_free((self)->ap_base))
 #else /* NDEBUG */
@@ -1026,7 +1027,7 @@ struct format_aprintf_data {
 #ifndef __format_aprintf_data_defined
 #define __format_aprintf_data_defined 1
 struct format_aprintf_data {
-	char         *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owend] Buffer */
+	char         *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
 	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
 	__SIZE_TYPE__ ap_used;  /* Used buffer size */
 };
@@ -1080,7 +1081,7 @@ format_aprintf_pack:([nonnull] struct format_aprintf_data *__restrict self,
 format_aprintf_printer:([nonnull] /*struct format_aprintf_data **/void *arg,
                         [nonnull] /*utf-8*/char const *__restrict data, $size_t datalen) -> $ssize_t {
 	struct @__format_aprintf_data@ {
-		char         *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owend] Buffer */
+		char         *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
 		__SIZE_TYPE__ ap_avail; /* Unused buffer size */
 		__SIZE_TYPE__ ap_used;  /* Used buffer size */
 	};

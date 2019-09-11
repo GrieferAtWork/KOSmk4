@@ -1,4 +1,4 @@
-/* HASH 0xba74eb92 */
+/* HASH 0x5fa72acb */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -17,21 +17,21 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef __local_format_aprintf_pack_defined
+#ifndef __local_format_c32aprintf_pack_defined
 #if ((__has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_realloc)) || defined(__CRT_HAVE_realloc))
-#define __local_format_aprintf_pack_defined 1
+#define __local_format_c32aprintf_pack_defined 1
 #include <hybrid/__assert.h>
 
 #include <hybrid/typecore.h>
 
-#ifndef __format_aprintf_data_defined
-#define __format_aprintf_data_defined 1
-struct format_aprintf_data {
-	char         *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
+#ifndef __format_c32aprintf_data_defined
+#define __format_c32aprintf_data_defined 1
+struct format_c32aprintf_data {
+	__CHAR32_TYPE__      *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
 	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
 	__SIZE_TYPE__ ap_used;  /* Used buffer size */
 };
-#endif /* !__format_aprintf_data_defined */
+#endif /* !__format_waprintf_data_defined */
 /* Dependency: "realloc" */
 #ifndef ____localdep_realloc_defined
 #define ____localdep_realloc_defined 1
@@ -65,35 +65,35 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_MALLOC __ATTR_ALLO
 
 __NAMESPACE_LOCAL_BEGIN
 /* Pack and finalize a given aprintf format printer
- * Together with `format_aprintf_printer()', the aprintf
+ * Together with `format_c32aprintf_printer()', the aprintf
  * format printer sub-system should be used as follows:
  * >> char *result; ssize_t error;
- * >> struct format_aprintf_data p = FORMAT_APRINTF_DATA_INIT;
- * >> error = format_printf(&format_aprintf_printer, &p, "%s %s", "Hello", "World");
+ * >> struct format_aprintf_data p = FORMAT_WAPRINTF_DATA_INIT;
+ * >> error = format_c32printf(&format_c32aprintf_printer, &p, L"%s %s", "Hello", "World");
  * >> if unlikely(error < 0) {
- * >>     format_aprintf_data_fini(&p);
+ * >>     format_waprintf_data_fini(&p);
  * >>     return NULL;
  * >> }
- * >> result = format_aprintf_pack(&p, NULL);
+ * >> result = format_c32aprintf_pack(&p, NULL);
  * >> return result;
- * WARNING: Note that `format_aprintf_pack()' is able to return `NULL' as well,
+ * WARNING: Note that `format_c32aprintf_pack()' is able to return `NULL' as well,
  *          but will finalize the given aprintf printer an all cases.
  * NOTE:    The caller must destroy the returned string by passing it to `free()'
  * @param: pstrlen: When non-NULL, store the length of the constructed string here
  *                  Note that this is the actual length if the constructed string,
- *                  but may differ from `strlen(return)' when NUL characters were
- *                  printed to the aprintf-printer at one point.
- *                  (e.g. `format_aprintf_printer(&my_printer, "\0", 1)') */
-__LOCAL_LIBC(format_aprintf_pack) __ATTR_WUNUSED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_MALLOC __ATTR_NONNULL((1)) char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_aprintf_pack))(struct format_aprintf_data *__restrict __self,
-                                                                 __SIZE_TYPE__ *__pstrlen) {
-#line 1038 "kos/src/libc/magic/format-printer.c"
+ *                  but may differ from `c32len(return)' when NUL characters were
+ *                  printed to the waprintf-printer at one point.
+ *                  (e.g. `format_c32aprintf_printer(&my_printer, L"\0", 1)') */
+__LOCAL_LIBC(format_c32aprintf_pack) __ATTR_WUNUSED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_MALLOC __ATTR_NONNULL((1)) __CHAR32_TYPE__ *
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_c32aprintf_pack))(struct format_c32aprintf_data *__restrict __self,
+                                                                    __SIZE_TYPE__ *__pstrlen) {
+#line 227 "kos/src/libc/magic/parts.wchar.format-printer.c"
 	/* Free unused buffer memory. */
-	char *__result;
+	__CHAR32_TYPE__ *__result;
 	if (__self->ap_avail != 0) {
-		char *__newbuf;
-		__newbuf = (char *)__localdep_realloc(__self->ap_base,
-		                         (__self->ap_used + 1) * sizeof(char));
+		__CHAR32_TYPE__ *__newbuf;
+		__newbuf = (__CHAR32_TYPE__ *)__localdep_realloc(__self->ap_base,
+		                         (__self->ap_used + 1) * sizeof(__CHAR32_TYPE__));
 		if __likely(__newbuf)
 			__self->ap_base = __newbuf;
 	} else {
@@ -101,9 +101,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_aprintf_pack))(struct format_a
 			/* Special case: Nothing was printed. */
 			__hybrid_assert(!__self->ap_base);
 #ifdef __CRT_HAVE_malloc
-			__self->ap_base = (char *)__localdep_malloc(1 * sizeof(char));
+			__self->ap_base = (__CHAR32_TYPE__ *)__localdep_malloc(1 * sizeof(__CHAR32_TYPE__));
 #else /* __CRT_HAVE_malloc */
-			__self->ap_base = (char *)__localdep_realloc(__NULLPTR, 1 * sizeof(char));
+			__self->ap_base = (__CHAR32_TYPE__ *)__localdep_realloc(__NULLPTR, 1 * sizeof(__CHAR32_TYPE__));
 #endif /* !__CRT_HAVE_malloc */
 			if __unlikely(!__self->ap_base)
 				return __NULLPTR;
@@ -116,11 +116,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_aprintf_pack))(struct format_a
 		*__pstrlen = __self->ap_used;
 #ifndef __NDEBUG
 #if __SIZEOF_POINTER__ == 4
-	__self->ap_base  = (char *)__UINT32_C(0xcccccccc);
+	__self->ap_base  = (__CHAR32_TYPE__ *)__UINT32_C(0xcccccccc);
 	__self->ap_avail = __UINT32_C(0xcccccccc);
 	__self->ap_used  = __UINT32_C(0xcccccccc);
 #elif __SIZEOF_POINTER__ == 8
-	__self->ap_base  = (char *)__UINT64_C(0xcccccccccccccccc);
+	__self->ap_base  = (__CHAR32_TYPE__ *)__UINT64_C(0xcccccccccccccccc);
 	__self->ap_avail = __UINT64_C(0xcccccccccccccccc);
 	__self->ap_used  = __UINT64_C(0xcccccccccccccccc);
 #endif /* __SIZEOF_POINTER__ == ... */
@@ -129,4 +129,4 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_aprintf_pack))(struct format_a
 }
 __NAMESPACE_LOCAL_END
 #endif /* ((__has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_realloc)) || defined(__CRT_HAVE_realloc)) */
-#endif /* !__local_format_aprintf_pack_defined */
+#endif /* !__local_format_c32aprintf_pack_defined */

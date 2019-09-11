@@ -1,4 +1,4 @@
-/* HASH 0x470f2c7f */
+/* HASH 0x4cdbed66 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,6 +35,8 @@
 #include <wchar.h>
 #endif /* !_WCHAR_H */
 #include <bits/wformat-printer.h>
+#include <libc/malloc.h>
+#include <hybrid/__assert.h>
 
 __SYSDECL_BEGIN
 
@@ -53,7 +55,7 @@ __SYSDECL_BEGIN
  * @return: >= 0:   The print was successful.
  *                  Usually, the return value is added to a sum of values which is then
  *                  returned by the calling function upon success, also meaning that the
- *                  usual return value used to indicate success in 'DATALEN'. */
+ *                  usual return value used to indicate success is 'DATALEN'. */
 typedef __pwformatprinter pwformatprinter;
 #endif /* !__pwformatprinter_defined */
 
@@ -302,7 +304,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_wsprintf_printer, __FORCELOCAL __ATTR_NON
 
 #ifndef __format_wsnprintf_data_defined
 #define __format_wsnprintf_data_defined 1
-/* Data structure for implementing wsnprintf() */
+/* Data structure for implementing waprintf() */
 struct format_wsnprintf_data {
 	wchar_t      *sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
 	__SIZE_TYPE__ sd_bufsiz; /* Remaining buffer size. */
@@ -344,6 +346,96 @@ __CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,format_wlength,(void *__arg, wchar_t c
 /* Always re-return `datalen' and ignore all other arguments */
 __FORCELOCAL __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_wlength)(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_length))(__arg, (/*utf-8*/char const *)__data, __datalen); }
 #endif /* format_wlength... */
+
+#ifndef __format_waprintf_data_defined
+#define __format_waprintf_data_defined 1
+struct format_waprintf_data {
+	wchar_t      *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
+	__SIZE_TYPE__ ap_avail; /* Unused buffer size */
+	__SIZE_TYPE__ ap_used;  /* Used buffer size */
+};
+#endif /* !__format_waprintf_data_defined */
+
+#define FORMAT_WAPRINTF_DATA_INIT        { __NULLPTR, 0, 0 }
+#define format_waprintf_data_init(self)  ((self)->ap_base = __NULLPTR, (self)->ap_avail = (self)->ap_used = 0)
+#define format_waprintf_data_cinit(self)            \
+	(__hybrid_assert((self)->ap_base == __NULLPTR), \
+	 __hybrid_assert((self)->ap_avail == 0),        \
+	 __hybrid_assert((self)->ap_used == 0))
+#ifdef NDEBUG
+#define format_waprintf_data_fini(self)  (__libc_free((self)->ap_base))
+#else /* NDEBUG */
+#if __SIZEOF_POINTER__ == 4
+#define format_waprintf_data_fini(self)                 \
+	(__libc_free((self)->ap_base),                      \
+	 (self)->ap_base  = (char *)__UINT32_C(0xcccccccc), \
+	 (self)->ap_avail = __UINT32_C(0xcccccccc),         \
+	 (self)->ap_used  = __UINT32_C(0xcccccccc))
+#elif __SIZEOF_POINTER__ == 8
+#define format_waprintf_data_fini(self)                         \
+	(__libc_free((self)->ap_base),                              \
+	 (self)->ap_base  = (char *)__UINT64_C(0xcccccccccccccccc), \
+	 (self)->ap_avail = __UINT64_C(0xcccccccccccccccc),         \
+	 (self)->ap_used  = __UINT64_C(0xcccccccccccccccc))
+#else /* __SIZEOF_POINTER__ == ... */
+#define format_waprintf_data_fini(self) (__libc_free((self)->ap_base))
+#endif /* __SIZEOF_POINTER__ != ... */
+#endif /* !NDEBUG */
+
+#if defined(__CRT_HAVE_format_waprintf_pack)
+/* Pack and finalize a given aprintf format printer
+ * Together with `format_waprintf_printer()', the aprintf
+ * format printer sub-system should be used as follows:
+ * >> char *result; ssize_t error;
+ * >> struct format_aprintf_data p = FORMAT_WAPRINTF_DATA_INIT;
+ * >> error = format_wprintf(&format_waprintf_printer, &p, L"%s %s", "Hello", "World");
+ * >> if unlikely(error < 0) {
+ * >>     format_waprintf_data_fini(&p);
+ * >>     return NULL;
+ * >> }
+ * >> result = format_waprintf_pack(&p, NULL);
+ * >> return result;
+ * WARNING: Note that `format_waprintf_pack()' is able to return `NULL' as well,
+ *          but will finalize the given aprintf printer an all cases.
+ * NOTE:    The caller must destroy the returned string by passing it to `free()'
+ * @param: pstrlen: When non-NULL, store the length of the constructed string here
+ *                  Note that this is the actual length if the constructed string,
+ *                  but may differ from `wcslen(return)' when NUL characters were
+ *                  printed to the waprintf-printer at one point.
+ *                  (e.g. `format_waprintf_printer(&my_printer, L"\0", 1)') */
+__CDECLARE(__ATTR_WUNUSED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_MALLOC __ATTR_NONNULL((1)),wchar_t *,__NOTHROW_NCX,format_waprintf_pack,(struct format_waprintf_data *__restrict __self, __SIZE_TYPE__ *__pstrlen),(__self,__pstrlen))
+#elif (__has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_realloc)) || defined(__CRT_HAVE_realloc)
+#include <local/parts.wchar.format-printer/format_waprintf_pack.h>
+/* Pack and finalize a given aprintf format printer
+ * Together with `format_waprintf_printer()', the aprintf
+ * format printer sub-system should be used as follows:
+ * >> char *result; ssize_t error;
+ * >> struct format_aprintf_data p = FORMAT_WAPRINTF_DATA_INIT;
+ * >> error = format_wprintf(&format_waprintf_printer, &p, L"%s %s", "Hello", "World");
+ * >> if unlikely(error < 0) {
+ * >>     format_waprintf_data_fini(&p);
+ * >>     return NULL;
+ * >> }
+ * >> result = format_waprintf_pack(&p, NULL);
+ * >> return result;
+ * WARNING: Note that `format_waprintf_pack()' is able to return `NULL' as well,
+ *          but will finalize the given aprintf printer an all cases.
+ * NOTE:    The caller must destroy the returned string by passing it to `free()'
+ * @param: pstrlen: When non-NULL, store the length of the constructed string here
+ *                  Note that this is the actual length if the constructed string,
+ *                  but may differ from `wcslen(return)' when NUL characters were
+ *                  printed to the waprintf-printer at one point.
+ *                  (e.g. `format_waprintf_printer(&my_printer, L"\0", 1)') */
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_waprintf_pack, __FORCELOCAL __ATTR_WUNUSED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_MALLOC __ATTR_NONNULL((1)) wchar_t *__NOTHROW_NCX(__LIBCCALL format_waprintf_pack)(struct format_waprintf_data *__restrict __self, __SIZE_TYPE__ *__pstrlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_waprintf_pack))(__self, __pstrlen); })
+#endif /* format_waprintf_pack... */
+#if defined(__CRT_HAVE_format_waprintf_printer)
+/* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_waprintf_printer,(/*struct format_waprintf_data **/void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen),(__arg,__data,__datalen))
+#elif (__has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_realloc)) || defined(__CRT_HAVE_realloc)
+#include <local/parts.wchar.format-printer/format_waprintf_printer.h>
+/* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_waprintf_printer, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_waprintf_printer)(/*struct format_waprintf_data **/void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_waprintf_printer))(__arg, __data, __datalen); })
+#endif /* format_waprintf_printer... */
 
 #endif /* __CC__ */
 
