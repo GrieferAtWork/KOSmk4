@@ -2472,8 +2472,6 @@ again:
 					/* Unlink the entry from the parent directory. */
 					if (pentry != &oneshot_entry) {
 						*pentry = entry->de_next;
-						assert(self->d_size >= 1);
-						--self->d_size;
 						remove_dirent_from_directory(self, entry);
 					}
 				}
