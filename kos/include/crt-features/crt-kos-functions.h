@@ -1,4 +1,4 @@
-/* HASH 0xa6a7f106 */
+/* HASH 0x8b0efe3d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -180,7 +180,6 @@ __CRT_FUNCTION(__pthread_unwind_next,0,(),1,(__pthread_unwind_buf_t *,buf),void)
 __CRT_FUNCTION(__signbit,0,(),1,(double,val),int)
 __CRT_FUNCTION(__signbitf,0,(),1,(float,val),int)
 __CRT_FUNCTION(__signbitl,0,(),1,(long double,val),int)
-__CRT_FUNCTION(__sigsetjmp,0,(),2,(struct __jmp_buf_tag *,env,int,savemask),int)
 __CRT_FUNCTION(__xpg_basename,0,(),1,(char *,filename),char *)
 __CRT_FUNCTION(_abs64,0,(),1,(__INT64_TYPE__,x),__INT64_TYPE__)
 __CRT_FUNCTION(_access_s,0,(),2,(char const *,filename,int,type),errno_t)
@@ -2407,6 +2406,7 @@ __CRT_FAKE_FUNCTION(__scalbnl,0,(),2,(long double,x,int,n),long double)
 __CRT_FAKE_FUNCTION(__significand,0,(),1,(double,x),double)
 __CRT_FAKE_FUNCTION(__significandf,0,(),1,(float,x),float)
 __CRT_FAKE_FUNCTION(__significandl,0,(),1,(long double,x),long double)
+__CRT_FAKE_FUNCTION(__sigsetjmp,0,(),2,(struct __jmp_buf_tag *,env,int,savemask),int)
 __CRT_FAKE_FUNCTION(__sin,0,(),1,(double,x),double)
 __CRT_FAKE_FUNCTION(__sincos,0,(),3,(double,x,double *,psinx,double *,pcosx),void)
 __CRT_FAKE_FUNCTION(__sincosf,0,(),3,(float,x,float *,psinx,float *,pcosx),void)

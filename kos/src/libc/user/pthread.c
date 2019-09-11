@@ -745,18 +745,6 @@ NOTHROW_NCX(LIBCCALL libc___pthread_unwind_next)(__pthread_unwind_buf_t *buf)
 }
 /*[[[end:__pthread_unwind_next]]]*/
 
-/*[[[head:__sigsetjmp,hash:0xf62c3d92]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.__sigsetjmp") int
-NOTHROW_NCX(LIBCCALL libc___sigsetjmp)(struct __jmp_buf_tag *env,
-                                       int savemask)
-/*[[[body:__sigsetjmp]]]*/
-{
-	CRT_UNIMPLEMENTED("__sigsetjmp"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
-}
-/*[[[end:__sigsetjmp]]]*/
 
 /*[[[head:pthread_mutex_init,hash:0x7172f919]]]*/
 /* Initialize a mutex */
@@ -1719,7 +1707,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_atfork)(__pthread_atfork_func_t prepare,
 
 
 
-/*[[[start:exports,hash:0x44e86bbf]]]*/
+/*[[[start:exports,hash:0x7032d735]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_create, libc_pthread_create);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_exit, libc_pthread_exit);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_join, libc_pthread_join);
@@ -1770,7 +1758,6 @@ DEFINE_PUBLIC_WEAK_ALIAS(pthread_testcancel, libc_pthread_testcancel);
 DEFINE_PUBLIC_WEAK_ALIAS(__pthread_unregister_cancel, libc___pthread_unregister_cancel);
 DEFINE_PUBLIC_WEAK_ALIAS(__pthread_unregister_cancel_restore, libc___pthread_unregister_cancel_restore);
 DEFINE_PUBLIC_WEAK_ALIAS(__pthread_unwind_next, libc___pthread_unwind_next);
-DEFINE_PUBLIC_WEAK_ALIAS(__sigsetjmp, libc___sigsetjmp);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_mutex_init, libc_pthread_mutex_init);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_mutex_destroy, libc_pthread_mutex_destroy);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_mutex_trylock, libc_pthread_mutex_trylock);

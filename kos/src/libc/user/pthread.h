@@ -1,4 +1,4 @@
-/* HASH 0x905638a4 */
+/* HASH 0x4bd324ab */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -159,7 +159,6 @@ INTDEF __cleanup_fct_attribute NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc___pth
 INTDEF __cleanup_fct_attribute NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc___pthread_unregister_cancel_restore)(__pthread_unwind_buf_t *buf);
 /* Internal interface to initiate cleanup */
 INTDEF ATTR_WEAK __cleanup_fct_attribute ATTR_NORETURN NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc___pthread_unwind_next)(__pthread_unwind_buf_t *buf);
-INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc___sigsetjmp)(struct __jmp_buf_tag *env, int savemask);
 /* Initialize a mutex */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_pthread_mutex_init)(pthread_mutex_t *mutex, pthread_mutexattr_t const *mutexattr);
 /* Destroy a mutex */

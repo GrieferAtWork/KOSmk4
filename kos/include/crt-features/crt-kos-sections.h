@@ -1,4 +1,4 @@
-/* HASH 0xfd65a6b5 */
+/* HASH 0xc7e68f3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2417,7 +2417,6 @@
 #define __CRT_SECTION___pthread_unregister_cancel           __CRT_SECTINFO_sched_pthread                            /* .text.crt.sched.pthread.__pthread_unregister_cancel */
 #define __CRT_SECTION___pthread_unregister_cancel_restore   __CRT_SECTINFO_sched_pthread                            /* .text.crt.sched.pthread.__pthread_unregister_cancel_restore */
 #define __CRT_SECTION___pthread_unwind_next                 __CRT_SECTINFO_sched_pthread                            /* .text.crt.sched.pthread.__pthread_unwind_next */
-#define __CRT_SECTION___sigsetjmp                           __CRT_SECTINFO_sched_pthread                            /* .text.crt.sched.pthread.__sigsetjmp */
 #define __CRT_SECTION_pthread_atfork                        __CRT_SECTINFO_sched_pthread                            /* .text.crt.sched.pthread.pthread_atfork */
 #define __CRT_SECTION_pthread_attr_destroy                  __CRT_SECTINFO_sched_pthread                            /* .text.crt.sched.pthread.pthread_attr_destroy */
 #define __CRT_SECTION_pthread_attr_getaffinity_np           __CRT_SECTINFO_sched_pthread                            /* .text.crt.sched.pthread.pthread_attr_getaffinity_np */

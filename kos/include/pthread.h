@@ -1,4 +1,4 @@
-/* HASH 0xb3fe3e94 */
+/* HASH 0x47163391 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -626,18 +626,19 @@ do{	struct __pthread_cleanup_frame __clframe \
  * is executed with non-zero EXECUTE argument.
  * pthread_cleanup_push and pthread_cleanup_pop are macros and must always
  * be used in matching pairs at the same nesting level of braces. */
-#define pthread_cleanup_push(routine, arg) \
-do{	__pthread_unwind_buf_t __cancel_buf; \
-	void (*__cancel_routine) (void *) = (routine); \
-	void *__cancel_arg = (arg); \
-	int __not_first_call = __sigsetjmp((struct __jmp_buf_tag *)(void *)__cancel_buf.__cancel_jmp_buf, 0); \
-	if (__unlikely(__not_first_call)) { \
-		(*__cancel_routine)(__cancel_arg); \
-		__pthread_unwind_next(&__cancel_buf); \
-		__builtin_unreachable(); \
-	} \
-	__pthread_register_cancel(&__cancel_buf); \
-do{
+#define pthread_cleanup_push(routine, arg)                                                                    \
+	do {                                                                                                      \
+		__pthread_unwind_buf_t __cancel_buf;                                                                  \
+		void (*__cancel_routine)(void *) = (routine);                                                         \
+		void *__cancel_arg               = (arg);                                                             \
+		int __not_first_call = __sigsetjmp((struct __jmp_buf_tag *)(void *)__cancel_buf.__cancel_jmp_buf, 0); \
+		if __unlikely(__not_first_call) {                                                                     \
+			(*__cancel_routine)(__cancel_arg);                                                                \
+			__pthread_unwind_next(&__cancel_buf);                                                             \
+			__builtin_unreachable();                                                                          \
+		}                                                                                                     \
+		__pthread_register_cancel(&__cancel_buf);                                                             \
+		do {
 
 }
 [attribute(__cleanup_fct_attribute)]
@@ -645,13 +646,14 @@ __pthread_register_cancel:(__pthread_unwind_buf_t *buf);
 %{
 /* Remove a cleanup handler installed by the matching pthread_cleanup_push.
  * If EXECUTE is non-zero, the handler function is called. */
-#define pthread_cleanup_pop(execute) \
-		do; __WHILE0; /* Empty to allow label before pthread_cleanup_pop. */ \
-	}__WHILE0; \
-	__pthread_unregister_cancel(&__cancel_buf); \
-	if (execute) \
-		(*__cancel_routine)(__cancel_arg); \
-}__WHILE0
+#define pthread_cleanup_pop(execute)                                           \
+			do {                                                               \
+			} __WHILE0; /* Empty to allow label before pthread_cleanup_pop. */ \
+		} __WHILE0;                                                            \
+		__pthread_unregister_cancel(&__cancel_buf);                            \
+		if (execute)                                                           \
+			(*__cancel_routine)(__cancel_arg);                                 \
+	} __WHILE0
 
 #if defined(__CRT_HAVE___pthread_unregister_cancel)
 __CDECLARE_VOID(____cleanup_fct_attribute __ATTR_NONNULL((1)),__NOTHROW_NCX,__pthread_unregister_cancel,(__pthread_unwind_buf_t *__buf),(__buf))
@@ -660,18 +662,20 @@ __CDECLARE_VOID(____cleanup_fct_attribute __ATTR_NONNULL((1)),__NOTHROW_NCX,__pt
 /* Install a cleanup handler as pthread_cleanup_push does, but also
  * saves the current cancellation type and sets it to deferred
  * cancellation. */
-#define pthread_cleanup_push_defer_np(routine, arg) \
-do{ __pthread_unwind_buf_t __cancel_buf; \
-    void (*__cancel_routine) (void *) = (routine); \
-    void *__cancel_arg = (arg); \
-    int __not_first_call = __sigsetjmp((struct __jmp_buf_tag *)(void *)__cancel_buf.__cancel_jmp_buf, 0); \
-    if __unlikely(__not_first_call) { \
-        __cancel_routine(__cancel_arg); \
-        __pthread_unwind_next(&__cancel_buf); \
-        __builtin_unreachable(); \
-    } \
-    __pthread_register_cancel_defer(&__cancel_buf); \
-    do{
+#define pthread_cleanup_push_defer_np(routine, arg)                                                           \
+	do {                                                                                                      \
+		__pthread_unwind_buf_t __cancel_buf;                                                                  \
+		void (*__cancel_routine)(void *) = (routine);                                                         \
+		void *__cancel_arg               = (arg);                                                             \
+		int __not_first_call = __sigsetjmp((struct __jmp_buf_tag *)(void *)__cancel_buf.__cancel_jmp_buf, 0); \
+		if __unlikely(__not_first_call) {                                                                     \
+			__cancel_routine(__cancel_arg);                                                                   \
+			__pthread_unwind_next(&__cancel_buf);                                                             \
+			__builtin_unreachable();                                                                          \
+		}                                                                                                     \
+		__pthread_register_cancel_defer(&__cancel_buf);                                                       \
+		do {
+
 }
 [attribute(__cleanup_fct_attribute)]
 __pthread_register_cancel_defer:([nonnull] __pthread_unwind_buf_t *buf);
@@ -679,13 +683,15 @@ __pthread_register_cancel_defer:([nonnull] __pthread_unwind_buf_t *buf);
 /* Remove a cleanup handler as pthread_cleanup_pop does, but also
  * restores the cancellation type that was in effect when the matching
  * pthread_cleanup_push_defer was called. */
-#define pthread_cleanup_pop_restore_np(execute) \
-        do; __WHILE0; /* Empty to allow label before pthread_cleanup_pop. */ \
-    }__WHILE0; \
-    __pthread_unregister_cancel_restore(&__cancel_buf); \
-    if (execute) \
-        (*__cancel_routine)(__cancel_arg); \
-}__WHILE0
+#define pthread_cleanup_pop_restore_np(execute)                                \
+			do {                                                               \
+			} __WHILE0; /* Empty to allow label before pthread_cleanup_pop. */ \
+		} __WHILE0;                                                            \
+		__pthread_unregister_cancel_restore(&__cancel_buf);                    \
+		if (execute)                                                           \
+			(*__cancel_routine)(__cancel_arg);                                 \
+	} __WHILE0
+
 #if defined(__CRT_HAVE___pthread_unregister_cancel_restore)
 __CDECLARE_VOID(____cleanup_fct_attribute __ATTR_NONNULL((1)),__NOTHROW_NCX,__pthread_unregister_cancel_restore,(__pthread_unwind_buf_t *__buf),(__buf))
 #endif /* __pthread_unregister_cancel_restore... */
@@ -700,6 +706,8 @@ __CDECLARE_VOID(__ATTR_WEAK ____cleanup_fct_attribute __ATTR_NORETURN __ATTR_NON
 struct __jmp_buf_tag;
 #if defined(__CRT_HAVE___sigsetjmp)
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__sigsetjmp,(struct __jmp_buf_tag *__env, int __savemask),(__env,__savemask))
+#elif defined(__CRT_HAVE_sigsetjmp)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__sigsetjmp,(struct __jmp_buf_tag *__env, int __savemask),sigsetjmp,(__env,__savemask))
 #endif /* __sigsetjmp... */
 
 /* Mutex handling. */

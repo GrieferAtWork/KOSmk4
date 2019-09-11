@@ -58,6 +58,7 @@ INTERN_FUNCTION(libc_setjmp)
 END(libc_setjmp)
 DEFINE_PUBLIC_ALIAS(setjmp, libc_setjmp)
 DEFINE_PUBLIC_ALIAS(_setjmp, libc_setjmp)
+DEFINE_PUBLIC_ALIAS(__setjmp, libc_setjmp)
 
 
 .section .text.crt.utility.setjmp.longjmp
@@ -82,6 +83,7 @@ INTERN_FUNCTION(libc___fast_longjmp)
 END(libc___fast_longjmp)
 END(libc_longjmp)
 DEFINE_PUBLIC_ALIAS(longjmp, libc_longjmp)
+DEFINE_PUBLIC_ALIAS(__longjmp, libc_longjmp)
 DEFINE_PUBLIC_ALIAS(__fast_longjmp, libc___fast_longjmp)
 
 
@@ -126,6 +128,7 @@ END(libc__setjmpex)
 
 DEFINE_PUBLIC_ALIAS(_setjmpex, libc__setjmpex)
 DEFINE_PUBLIC_ALIAS(sigsetjmp, libc_sigsetjmp)
+DEFINE_PUBLIC_ALIAS(__sigsetjmp, libc_sigsetjmp)
 
 .section .text.crt.utility.setjmp.siglongjmp
 INTERN_FUNCTION(libc_siglongjmp)
@@ -148,5 +151,6 @@ INTERN_FUNCTION(libc_siglongjmp)
 END(libc_siglongjmp)
 
 DEFINE_PUBLIC_ALIAS(siglongjmp, libc_siglongjmp)
+DEFINE_PUBLIC_ALIAS(__siglongjmp, libc_siglongjmp)
 
 

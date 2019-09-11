@@ -108,27 +108,31 @@ __NAMESPACE_STD_USING(longjmp)
 #endif /* !__CXX_SYSTEM_HEADER */
 
 #ifdef __USE_POSIX
-#if defined(__CRT_HAVE__setjmpex) || defined(__CRT_HAVE_sigsetjmp)
+#if defined(__CRT_HAVE__setjmpex) || defined(__CRT_HAVE_sigsetjmp) || defined(__CRT_HAVE___sigsetjmp)
 typedef struct __sigjmp_buf sigjmp_buf[1];
 #ifdef __CRT_HAVE_sigsetjmp
 __CDECLARE(__ATTR_RETURNS_TWICE,int,__NOTHROW_NCX,sigsetjmp,(sigjmp_buf __buf, int __savemask),(__buf,__savemask))
-#else /* __CRT_HAVE_sigsetjmp */
+#elif defined(__CRT_HAVE___sigsetjmp)
+__CREDIRECT(__ATTR_RETURNS_TWICE,int,__NOTHROW_NCX,sigsetjmp,(sigjmp_buf __buf, int __savemask),__sigsetjmp,(__buf,__savemask))
+#else /* ... */
 __CDECLARE(__ATTR_RETURNS_TWICE,int,__NOTHROW_NCX,_setjmpex,(sigjmp_buf __buf),(__buf))
 #ifdef __cplusplus
 #define sigsetjmp(buf,safemask)   ((void)(safemask),::_setjmpex(buf))
 #else /* __cplusplus */
 #define sigsetjmp(buf,safemask)   ((void)(safemask),_setjmpex(buf))
 #endif /* !__cplusplus */
-#endif /* !__CRT_HAVE_sigsetjmp */
+#endif /* !... */
 #ifdef __CRT_HAVE_siglongjmp
 __CDECLARE_VOID(__ATTR_NORETURN,__NOTHROW_NCX,siglongjmp,(sigjmp_buf __buf, int __sig),(__buf,__sig))
-#else /* __CRT_HAVE_siglongjmp */
+#elif defined(__CRT_HAVE___siglongjmp)
+__CREDIRECT_VOID(__ATTR_NORETURN,__NOTHROW_NCX,siglongjmp,(sigjmp_buf __buf, int __sig),__siglongjmp,(__buf,__sig))
+#else /* ... */
 #ifdef __cplusplus
 #define siglongjmp(buf,sig) (__NAMESPACE_STD_SYM longjmp)((struct ::__jmp_buf *)(buf),sig)
 #else /* __cplusplus */
 #define siglongjmp(buf,sig) (__NAMESPACE_STD_SYM longjmp)((struct __jmp_buf *)(buf),sig)
 #endif /* !__cplusplus */
-#endif /* !__CRT_HAVE_siglongjmp */
+#endif /* !... */
 #else /* __CRT_HAVE__setjmpex || __CRT_HAVE_sigsetjmp */
 typedef struct __jmp_buf sigjmp_buf[1];
 #ifdef __std_setjmp_defined

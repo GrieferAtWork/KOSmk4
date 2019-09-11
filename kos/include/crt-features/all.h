@@ -1,4 +1,4 @@
-/* HASH 0xd100da16 */
+/* HASH 0x8a305183 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2773,6 +2773,7 @@
 #define __CRT_HAVE_sigrelse 1
 #define __CRT_HAVE_sigreturn 1
 #define __CRT_HAVE_sigset 1
+#define __CRT_HAVE_sigsetjmp 1
 #define __CRT_HAVE_sigsetmask 1
 #define __CRT_HAVE_sigstack 1
 #define __CRT_HAVE_sigsuspend 1

@@ -608,6 +608,7 @@
 #define __CRT_HAVE___logbl 1
 #define __CRT_HAVE___logf 1
 #define __CRT_HAVE___logl 1
+#define __CRT_HAVE___longjmp 1
 #define __CRT_HAVE___lrint 1
 #define __CRT_HAVE___lrintf 1
 #define __CRT_HAVE___lrintl 1
@@ -680,6 +681,8 @@
 #define __CRT_HAVE___set_errno 1
 #define __CRT_HAVE___set_errno_f 1
 #define __CRT_HAVE___set_nterrno 1
+#define __CRT_HAVE___setjmp 1
+#define __CRT_HAVE___siglongjmp 1
 #define __CRT_HAVE___signbit 1
 #define __CRT_HAVE___signbitf 1
 #define __CRT_HAVE___signbitl 1

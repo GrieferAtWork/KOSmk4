@@ -1,4 +1,4 @@
-/* HASH 0x215e5b6b */
+/* HASH 0x795f750e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,6 @@
 #define __stub___pthread_unregister_cancel_restore 1
 #define __stub___pthread_unwind_next 1
 #define __stub___signbit 1
-#define __stub___sigsetjmp 1
 #define __stub___wcserror 1
 #define __stub___wcserror_s 1
 #define __stub__aligned_free 1

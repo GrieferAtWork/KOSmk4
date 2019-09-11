@@ -1,4 +1,4 @@
-/* HASH 0xe9836bd0 */
+/* HASH 0x42aebd14 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,6 @@
 #define __CRT_STUB___pthread_unregister_cancel_restore 1
 #define __CRT_STUB___pthread_unwind_next 1
 #define __CRT_STUB___signbit 1
-#define __CRT_STUB___sigsetjmp 1
 #define __CRT_STUB___wcserror 1
 #define __CRT_STUB___wcserror_s 1
 #define __CRT_STUB__aligned_free 1
