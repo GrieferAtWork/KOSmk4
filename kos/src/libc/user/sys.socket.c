@@ -465,8 +465,8 @@ NOTHROW_RPC(LIBCCALL libc_recvmmsg64)(fd_t sockfd,
 #endif /* MAGIC:alias */
 /*[[[end:recvmmsg64]]]*/
 
-/*[[[head:sockatmark,hash:0x8e232a97]]]*/
-/* Determine wheter socket is at a out-of-band mark */
+/*[[[head:sockatmark,hash:0xeba96725]]]*/
+/* Determine whether socket is at a out-of-band mark */
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.net.socket.sockatmark") int
 NOTHROW_NCX(LIBCCALL libc_sockatmark)(fd_t sockfd)
@@ -488,9 +488,11 @@ NOTHROW_NCX(LIBCCALL libc_isfdtype)(fd_t fd,
 /*[[[body:isfdtype]]]*/
 {
 	struct stat st;
-    errno_t error = sys_kfstat(fd, &st);
-	if (E_ISERR(error))
+	errno_t error = sys_kfstat(fd, &st);
+	if unlikely(E_ISERR(error)) {
+		libc_seterrno(-error);
 		return -1;
+	}
 	return (st.st_mode & S_IFMT) == (mode_t)fdtype;
 }
 /*[[[end:isfdtype]]]*/

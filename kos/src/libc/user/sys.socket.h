@@ -1,4 +1,4 @@
-/* HASH 0x99b5cf45 */
+/* HASH 0xda9e2e35 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -103,7 +103,7 @@ INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_recvmmsg)(fd_t sockfd, struct 
 /* Receive up to VLEN messages as described by VMESSAGES from socket FD.
  * Returns the number of messages received or -1 for errors. */
 INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_recvmmsg64)(fd_t sockfd, struct mmsghdr *vmessages, unsigned int vlen, int flags, struct timespec64 *tmo);
-/* Determine wheter socket is at a out-of-band mark */
+/* Determine whether socket is at a out-of-band mark */
 INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc_sockatmark)(fd_t sockfd);
 /* FDTYPE is S_IFSOCK or another S_IF* macro defined in <sys/stat.h>;
  * returns 1 if FD is open on an object of the indicated

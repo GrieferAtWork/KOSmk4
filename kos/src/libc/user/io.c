@@ -20,6 +20,9 @@
 #define GUARD_LIBC_USER_IO_C 1
 
 #include "../api.h"
+/**/
+
+#include "../libc/errno.h"
 #include "io.h"
 
 #include <fcntl.h>
@@ -43,8 +46,10 @@ NOTHROW_RPC(LIBCCALL libc__access_s)(char const *filename,
                                      int type)
 /*[[[body:_access_s]]]*/
 {
-	return -sys_access(filename,
+	errno_t error;
+	error = sys_access(filename,
 	                   (syscall_ulong_t)(unsigned int)type);
+	return libd_errno_kos2dos(-error);
 }
 /*[[[end:_access_s]]]*/
 

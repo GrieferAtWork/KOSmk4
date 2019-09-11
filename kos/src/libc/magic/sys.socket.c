@@ -271,7 +271,7 @@ recvmmsg64:($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages, unsigned int vl
 
 %
 %#ifdef __USE_XOPEN2K
-@@Determine wheter socket is at a out-of-band mark
+@@Determine whether socket is at a out-of-band mark
 [ATTR_WUNUSED] sockatmark:($fd_t sockfd) -> int;
 %#endif /* __USE_XOPEN2K */
 

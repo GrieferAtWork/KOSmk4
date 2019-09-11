@@ -1,4 +1,4 @@
-/* HASH 0xb12dfbad */
+/* HASH 0x5c471cd8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -285,7 +285,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(recvmmsg64, __FORCELOCAL __ATTR_NONNULL((2)) int
 
 #ifdef __USE_XOPEN2K
 #if defined(__CRT_HAVE_sockatmark)
-/* Determine wheter socket is at a out-of-band mark */
+/* Determine whether socket is at a out-of-band mark */
 __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,sockatmark,(__fd_t __sockfd),(__sockfd))
 #endif /* sockatmark... */
 #endif /* __USE_XOPEN2K */
