@@ -20,6 +20,9 @@
 #define GUARD_LIBC_USER_SYS_STAT_C 1
 
 #include "../api.h"
+/**/
+
+#include "../libc/uchar.h"
 #include "sys.stat.h"
 
 #include <fcntl.h>
@@ -29,23 +32,23 @@
 DECL_BEGIN
 
 
-DEFINE_PUBLIC_WEAK_ALIAS(kstat,libc_kos_stat);
-DEFINE_PUBLIC_WEAK_ALIAS(kstat64,libc_kos_stat);
-DEFINE_PUBLIC_WEAK_ALIAS(klstat,libc_kos_lstat);
-DEFINE_PUBLIC_WEAK_ALIAS(klstat64,libc_kos_lstat);
-DEFINE_PUBLIC_WEAK_ALIAS(kfstat,libc_kos_fstat);
-DEFINE_PUBLIC_WEAK_ALIAS(kfstat64,libc_kos_fstat);
-DEFINE_PUBLIC_WEAK_ALIAS(kfstatat,libc_kos_fstatat);
-DEFINE_PUBLIC_WEAK_ALIAS(kfstatat64,libc_kos_fstatat);
+DEFINE_PUBLIC_WEAK_ALIAS(kstat, libc_kos_stat);
+DEFINE_PUBLIC_WEAK_ALIAS(kstat64, libc_kos_stat);
+DEFINE_PUBLIC_WEAK_ALIAS(klstat, libc_kos_lstat);
+DEFINE_PUBLIC_WEAK_ALIAS(klstat64, libc_kos_lstat);
+DEFINE_PUBLIC_WEAK_ALIAS(kfstat, libc_kos_fstat);
+DEFINE_PUBLIC_WEAK_ALIAS(kfstat64, libc_kos_fstat);
+DEFINE_PUBLIC_WEAK_ALIAS(kfstatat, libc_kos_fstatat);
+DEFINE_PUBLIC_WEAK_ALIAS(kfstatat64, libc_kos_fstatat);
 
-DEFINE_INTERN_ALIAS(libc_kstat,libc_kos_stat);
-DEFINE_INTERN_ALIAS(libc_kstat64,libc_kos_stat);
-DEFINE_INTERN_ALIAS(libc_klstat,libc_kos_lstat);
-DEFINE_INTERN_ALIAS(libc_klstat64,libc_kos_lstat);
-DEFINE_INTERN_ALIAS(libc_kfstat,libc_kos_fstat);
-DEFINE_INTERN_ALIAS(libc_kfstat64,libc_kos_fstat);
-DEFINE_INTERN_ALIAS(libc_kfstatat,libc_kos_fstatat);
-DEFINE_INTERN_ALIAS(libc_kfstatat64,libc_kos_fstatat);
+DEFINE_INTERN_ALIAS(libc_kstat, libc_kos_stat);
+DEFINE_INTERN_ALIAS(libc_kstat64, libc_kos_stat);
+DEFINE_INTERN_ALIAS(libc_klstat, libc_kos_lstat);
+DEFINE_INTERN_ALIAS(libc_klstat64, libc_kos_lstat);
+DEFINE_INTERN_ALIAS(libc_kfstat, libc_kos_fstat);
+DEFINE_INTERN_ALIAS(libc_kfstat64, libc_kos_fstat);
+DEFINE_INTERN_ALIAS(libc_kfstatat, libc_kos_fstatat);
+DEFINE_INTERN_ALIAS(libc_kfstatat64, libc_kos_fstatat);
 
 /* KOS Native stat() */
 INTERN NONNULL((2))
@@ -136,6 +139,7 @@ NOTHROW_RPC(LIBCCALL libc_cyg_fstat)(fd_t fd,
 		convstat_kos2cyg(buf, &st);
 	return result;
 }
+
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.stat.cyg_stat") int
 NOTHROW_RPC(LIBCCALL libc_cyg_stat)(char const *__restrict filename,
@@ -146,6 +150,7 @@ NOTHROW_RPC(LIBCCALL libc_cyg_stat)(char const *__restrict filename,
 		convstat_kos2cyg(buf, &st);
 	return result;
 }
+
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.stat.cyg_lstat") int
 NOTHROW_RPC(LIBCCALL libc_cyg_lstat)(char const *__restrict filename,
@@ -156,6 +161,7 @@ NOTHROW_RPC(LIBCCALL libc_cyg_lstat)(char const *__restrict filename,
 		convstat_kos2cyg(buf, &st);
 	return result;
 }
+
 INTERN NONNULL((2, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.stat.cyg_fstatat") int
 NOTHROW_RPC(LIBCCALL libc_cyg_fstatat)(fd_t dirfd,
@@ -206,6 +212,7 @@ convstat_kos2glc(struct __glc_stat *__restrict dst,
 	dst->st_mtim    = src->st_mtim32;
 	dst->st_ctim    = src->st_ctim32;
 }
+
 LOCAL NONNULL((1, 2)) void LIBCCALL
 convstat_kos2glc64(struct __glc_stat64 *__restrict dst,
                    struct __kos_stat const *__restrict src) {
@@ -761,18 +768,28 @@ NOTHROW_RPC(LIBCCALL libc_futimens64)(fd_t fd,
 #endif /* MAGIC:alias */
 /*[[[end:futimens64]]]*/
 
-/*[[[head:_wstat64i32,hash:0xda998397]]]*/
+/*[[[impl:_wstat64i32]]]*/
+/*[[[impl:DOS$_wstat64i32]]]*/
+DEFINE_INTERN_ALIAS(libc__wstat64i32, libc__wstat64);
+DEFINE_INTERN_ALIAS(libd__wstat64i32, libd__wstat64);
+
+/*[[[head:_wstat64,hash:0x92a75de0]]]*/
 INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.stat._wstat64i32") int
-NOTHROW_NCX(LIBCCALL libc__wstat64i32)(char32_t const *filename,
-                                       struct __dos_stat64i32 *buf)
-/*[[[body:_wstat64i32]]]*/
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.stat._wstat64") int
+NOTHROW_NCX(LIBCCALL libc__wstat64)(char32_t const *filename,
+                                    struct __dos_stat64 *buf)
+/*[[[body:_wstat64]]]*/
 {
-	CRT_UNIMPLEMENTED("_wstat64i32"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	int result = -1;
+	char *used_filename;
+	used_filename = libc_uchar_c32tombs(filename);
+	if likely(used_filename) {
+		result = libc_dos_stat64(used_filename, buf);
+		libc_uchar_free(used_filename);
+	}
+	return result;
 }
-/*[[[end:_wstat64i32]]]*/
+/*[[[end:_wstat64]]]*/
 
 /*[[[head:DOS$_wstat64,hash:0xcd556392]]]*/
 INTERN NONNULL((1, 2))
@@ -781,9 +798,14 @@ NOTHROW_NCX(LIBDCALL libd__wstat64)(char16_t const *filename,
                                     struct __dos_stat64 *buf)
 /*[[[body:DOS$_wstat64]]]*/
 {
-	CRT_UNIMPLEMENTED("_wstat64"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	int result = -1;
+	char *used_filename;
+	used_filename = libc_uchar_c16tombs(filename);
+	if likely(used_filename) {
+		result = libc_dos_stat64(used_filename, buf);
+		libc_uchar_free(used_filename);
+	}
+	return result;
 }
 /*[[[end:DOS$_wstat64]]]*/
 
@@ -794,24 +816,16 @@ NOTHROW_NCX(LIBCCALL libc__wstat32i64)(char32_t const *filename,
                                        struct __dos_stat32i64 *buf)
 /*[[[body:_wstat32i64]]]*/
 {
-	CRT_UNIMPLEMENTED("_wstat32i64"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	int result = -1;
+	char *used_filename;
+	used_filename = libc_uchar_c32tombs(filename);
+	if likely(used_filename) {
+		result = libc_dos_stat32i64(used_filename, buf);
+		libc_uchar_free(used_filename);
+	}
+	return result;
 }
 /*[[[end:_wstat32i64]]]*/
-
-/*[[[head:DOS$_wstat64i32,hash:0x159420cc]]]*/
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.stat._wstat64i32") int
-NOTHROW_NCX(LIBDCALL libd__wstat64i32)(char16_t const *filename,
-                                       struct __dos_stat64i32 *buf)
-/*[[[body:DOS$_wstat64i32]]]*/
-{
-	CRT_UNIMPLEMENTED("_wstat64i32"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
-}
-/*[[[end:DOS$_wstat64i32]]]*/
 
 /*[[[head:DOS$_wstat32i64,hash:0xc1168b35]]]*/
 INTERN NONNULL((1, 2))
@@ -820,9 +834,14 @@ NOTHROW_NCX(LIBDCALL libd__wstat32i64)(char16_t const *filename,
                                        struct __dos_stat32i64 *buf)
 /*[[[body:DOS$_wstat32i64]]]*/
 {
-	CRT_UNIMPLEMENTED("_wstat32i64"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	int result = -1;
+	char *used_filename;
+	used_filename = libc_uchar_c16tombs(filename);
+	if likely(used_filename) {
+		result = libc_dos_stat32i64(used_filename, buf);
+		libc_uchar_free(used_filename);
+	}
+	return result;
 }
 /*[[[end:DOS$_wstat32i64]]]*/
 
@@ -833,9 +852,14 @@ NOTHROW_NCX(LIBCCALL libc__wstat32)(char32_t const *filename,
                                     struct __dos_stat32 *buf)
 /*[[[body:_wstat32]]]*/
 {
-	CRT_UNIMPLEMENTED("_wstat32"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	int result = -1;
+	char *used_filename;
+	used_filename = libc_uchar_c32tombs(filename);
+	if likely(used_filename) {
+		result = libc_dos_stat32(used_filename, buf);
+		libc_uchar_free(used_filename);
+	}
+	return result;
 }
 /*[[[end:_wstat32]]]*/
 
@@ -846,24 +870,16 @@ NOTHROW_NCX(LIBDCALL libd__wstat32)(char16_t const *filename,
                                     struct __dos_stat32 *buf)
 /*[[[body:DOS$_wstat32]]]*/
 {
-	CRT_UNIMPLEMENTED("_wstat32"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	int result = -1;
+	char *used_filename;
+	used_filename = libc_uchar_c16tombs(filename);
+	if likely(used_filename) {
+		result = libc_dos_stat32(used_filename, buf);
+		libc_uchar_free(used_filename);
+	}
+	return result;
 }
 /*[[[end:DOS$_wstat32]]]*/
-
-/*[[[head:_wstat64,hash:0x92a75de0]]]*/
-INTERN NONNULL((1, 2))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.stat._wstat64") int
-NOTHROW_NCX(LIBCCALL libc__wstat64)(char32_t const *filename,
-                                    struct __dos_stat64 *buf)
-/*[[[body:_wstat64]]]*/
-{
-	CRT_UNIMPLEMENTED("_wstat64"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
-}
-/*[[[end:_wstat64]]]*/
 
 /*[[[end:implementation]]]*/
 

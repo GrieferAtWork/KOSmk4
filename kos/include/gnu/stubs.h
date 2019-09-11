@@ -1,4 +1,4 @@
-/* HASH 0xd222185 */
+/* HASH 0xa801842c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -90,10 +90,6 @@
 #define __stub__wcserror 1
 #define __stub__wcserror_s 1
 #define __stub__wperror 1
-#define __stub__wstat32 1
-#define __stub__wstat32i64 1
-#define __stub__wstat64 1
-#define __stub__wstat64i32 1
 #define __stub_a64l 1
 #define __stub_acos 1
 #define __stub_acosh 1

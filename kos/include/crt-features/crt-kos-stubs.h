@@ -1,4 +1,4 @@
-/* HASH 0x5ee7145 */
+/* HASH 0xf128f85d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -90,10 +90,6 @@
 #define __CRT_STUB__wcserror 1
 #define __CRT_STUB__wcserror_s 1
 #define __CRT_STUB__wperror 1
-#define __CRT_STUB__wstat32 1
-#define __CRT_STUB__wstat32i64 1
-#define __CRT_STUB__wstat64 1
-#define __CRT_STUB__wstat64i32 1
 #define __CRT_STUB_a64l 1
 #define __CRT_STUB_acos 1
 #define __CRT_STUB_acosh 1
