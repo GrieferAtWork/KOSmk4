@@ -56,7 +56,7 @@ int main(int argc, char *argv[], char *envp[]) {
 done_devfs:
 
 	/* Mount the /proc filesystem (but do this optionally). */
-	if (sysctl_insmod("procfs") >= 0) {
+	if (sysctl_insmod("procfs", NULL) >= 0) {
 		if (mount(NULL, "/proc", "procfs", 0, NULL) < 0) {
 			if (errno == ENOENT) {
 				mkdir("/proc", 0755);
@@ -75,8 +75,8 @@ done_procfs:
 	Sysctl(SYSCTL_SYSTEM_MEMORY_DUMP_LEAKS);
 
 	/* Load some additional drivers that we need for the I/O console. */
-	SysctlInsmod("ps2"); /* Keyboard */
-	SysctlInsmod("vga"); /* Display */
+	SysctlInsmod("ps2", NULL); /* Keyboard */
+	SysctlInsmod("vga", NULL); /* Display */
 
 	/* Construct /dev/console from the VGA display, and a PS/2 keyboard. */
 	{
