@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
 	}
 	map_filename = argv[optind];
 	keymap_fd = open(map_filename, O_RDONLY);
-	if (kbdev < 0) {
+	if (keymap_fd < 0) {
 		fprintf(stderr, "%s: Failed to open keymap file %s: %s\n",
 		        argv[0], map_filename, strerror(errno));
 		exit(EXIT_FAILURE);
