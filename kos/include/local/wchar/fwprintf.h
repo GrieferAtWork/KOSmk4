@@ -1,4 +1,4 @@
-/* HASH 0x74229c59 */
+/* HASH 0x5218af43 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,17 +18,20 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fwprintf_defined
-#if defined(__CRT_HAVE_vfwprintf)
+#if (defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_vfwprintf))
 #define __local_fwprintf_defined 1
 #include <kos/anno.h>
-/* Dependency: "vfwprintf" */
+/* Dependency: "vfwprintf" from "wchar" */
 #ifndef ____localdep_vfwprintf_defined
 #define ____localdep_vfwprintf_defined 1
 #ifdef __std___localdep_vfwprintf_defined
 __NAMESPACE_STD_USING(__localdep_vfwprintf)
 #elif defined(__CRT_HAVE_vfwprintf)
 __CREDIRECT(__ATTR_LIBC_WPRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,,__localdep_vfwprintf,(__FILE *__restrict __stream, __WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwprintf,(__stream,__format,__args)) __THROWS(...)
-#else /* LIBC: vfwprintf */
+#elif defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked)
+#include <local/wchar/vfwprintf.h>
+#define __localdep_vfwprintf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vfwprintf))
+#else /* CUSTOM: vfwprintf */
 #undef ____localdep_vfwprintf_defined
 #endif /* vfwprintf... */
 #endif /* !____localdep_vfwprintf_defined */
@@ -38,7 +41,7 @@ __LOCAL_LIBC(fwprintf) __ATTR_LIBC_WPRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_I
 (__VLIBCCALL __LIBC_LOCAL_NAME(fwprintf))(__FILE *__restrict __stream,
                                           __WCHAR_TYPE__ const *__restrict __format,
                                           ...) __THROWS(...) {
-#line 485 "kos/src/libc/magic/wchar.c"
+#line 543 "kos/src/libc/magic/wchar.c"
 	__STDC_INT_AS_SIZE_T __result;
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __format);
@@ -47,5 +50,5 @@ __LOCAL_LIBC(fwprintf) __ATTR_LIBC_WPRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_I
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_vfwprintf) */
+#endif /* (defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_vfwprintf)) */
 #endif /* !__local_fwprintf_defined */

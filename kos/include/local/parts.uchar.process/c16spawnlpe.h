@@ -1,4 +1,4 @@
-/* HASH 0xcdfb88c9 */
+/* HASH 0xf5b705b0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(c16spawnlpe))(int __mode,
                                                           __CHAR16_TYPE__ const *__restrict __file,
                                                           __CHAR16_TYPE__ const *__args,
                                                           ... /*, (char16_t *)NULL, char16_t **environ*/) {
-#line 248 "kos/src/libc/magic/parts.uchar.process.c"
+#line 251 "kos/src/libc/magic/parts.uchar.process.c"
 	__REDIRECT_SPAWNLE(__CHAR16_TYPE__, __localdep_c16spawnvpe, __mode, __file, __args)
 }
 __NAMESPACE_LOCAL_END

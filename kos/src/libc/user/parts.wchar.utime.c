@@ -20,7 +20,11 @@
 #define GUARD_LIBC_USER_PARTS_WCHAR_UTIME_C 1
 
 #include "../api.h"
+/**/
+
+#include "../libc/uchar.h"
 #include "parts.wchar.utime.h"
+#include <uchar.h>
 
 DECL_BEGIN
 
@@ -37,9 +41,14 @@ NOTHROW_RPC(LIBCCALL libc_wutime)(char32_t const *filename,
                                   struct utimbuf const *file_times)
 /*[[[body:wutime]]]*/
 {
-	CRT_UNIMPLEMENTED("wutime"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	int result = -1;
+	char *used_filename;
+	used_filename = libc_uchar_c32tombs(filename);
+	if likely(used_filename) {
+		result = utime(used_filename, file_times);
+		libc_uchar_free(used_filename);
+	}
+	return result;
 }
 /*[[[end:wutime]]]*/
 
@@ -50,9 +59,14 @@ NOTHROW_RPC(LIBDCALL libd_wutime)(char16_t const *filename,
                                   struct utimbuf const *file_times)
 /*[[[body:DOS$wutime]]]*/
 {
-	CRT_UNIMPLEMENTED("wutime"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	int result = -1;
+	char *used_filename;
+	used_filename = libc_uchar_c16tombs(filename);
+	if likely(used_filename) {
+		result = utime(used_filename, file_times);
+		libc_uchar_free(used_filename);
+	}
+	return result;
 }
 /*[[[end:DOS$wutime]]]*/
 
@@ -66,9 +80,14 @@ NOTHROW_RPC(LIBCCALL libc_wutime64)(char32_t const *filename,
                                     struct utimbuf64 const *file_times)
 /*[[[body:wutime64]]]*/
 {
-	CRT_UNIMPLEMENTED("wutime64"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	int result = -1;
+	char *used_filename;
+	used_filename = libc_uchar_c32tombs(filename);
+	if likely(used_filename) {
+		result = utime64(used_filename, file_times);
+		libc_uchar_free(used_filename);
+	}
+	return result;
 }
 #endif /* MAGIC:alias */
 /*[[[end:wutime64]]]*/
@@ -83,9 +102,14 @@ NOTHROW_RPC(LIBDCALL libd_wutime64)(char16_t const *filename,
                                     struct utimbuf64 const *file_times)
 /*[[[body:DOS$wutime64]]]*/
 {
-	CRT_UNIMPLEMENTED("wutime64"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	int result = -1;
+	char *used_filename;
+	used_filename = libc_uchar_c16tombs(filename);
+	if likely(used_filename) {
+		result = utime64(used_filename, file_times);
+		libc_uchar_free(used_filename);
+	}
+	return result;
 }
 #endif /* MAGIC:alias */
 /*[[[end:DOS$wutime64]]]*/

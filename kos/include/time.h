@@ -1,4 +1,4 @@
-/* HASH 0xdd43b4fb */
+/* HASH 0x3538638b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1187,6 +1187,12 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(asctime_r, __FORCELOCAL __ATTR_NONNULL((1, 2)) c
 #endif /* __CC__ */
 
 __SYSDECL_END
+
+#ifdef __USE_UTF
+#if defined(_UCHAR_H) && !defined(_PARTS_UCHAR_TIME_H)
+#include <parts/uchar/time.h>
+#endif
+#endif /* __USE_UTF */
 
 #endif /* !_CXX_CTIME || __CXX_SYSTEM_HEADER */
 #endif /* !_TIME_H */

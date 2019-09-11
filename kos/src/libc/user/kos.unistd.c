@@ -20,16 +20,21 @@
 #define GUARD_LIBC_USER_KOS_UNISTD_C 1
 
 #include "../api.h"
-#include "kos.unistd.h"
-#include <kos/syscalls.h>
-#include <string.h>
-#include <unistd.h>
-#include <limits.h>
-#include <fcntl.h>
-#include <stdlib.h>
+/**/
+
 #include <kos/except.h>
 #include <kos/malloc.h>
+#include <kos/syscalls.h>
 #include <sys/utsname.h>
+
+#include <fcntl.h>
+#include <limits.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+#include "../libc/capture-varargs.h"
+#include "kos.unistd.h"
 
 DECL_BEGIN
 
@@ -128,30 +133,6 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.Execvpe") void
 }
 /*[[[end:Execvpe]]]*/
 
-#define CAPTURE_VARARGS(vector, args)                                                        \
-	{                                                                                        \
-		size_t count = 0, alloc = 7;                                                         \
-		char *arg;                                                                           \
-		/* TODO: Can't use malloc(). - Might corrupt heap in vfork() scenario */             \
-		vector = (char **)Malloc(8 * sizeof(char *));                                        \
-		while ((arg = va_arg(args, char *)) != NULL) {                                       \
-			if (count >= alloc) {                                                            \
-				char **new_vector;                                                           \
-				size_t new_alloc;                                                            \
-				new_alloc  = ((alloc + 1) * 2) - 1;                                          \
-				new_vector = (char **)realloc(vector, (new_alloc + 1) * sizeof(char *));     \
-				if unlikely(!new_vector) {                                                   \
-					new_alloc  = count + 1;                                                  \
-					new_vector = (char **)Realloc(vector, (new_alloc + 1) * sizeof(char *)); \
-				}                                                                            \
-				vector = new_vector;                                                         \
-				alloc  = new_alloc;                                                          \
-			}                                                                                \
-			vector[count] = arg;                                                             \
-			++count;                                                                         \
-		}                                                                                    \
-		vector[count] = NULL;                                                                \
-	}
 
 
 /*[[[head:Execl,hash:0xd1cf0471]]]*/
@@ -173,7 +154,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.Execl") void
 	va_list vargs;
 	char **vector;
 	va_start(vargs, args);
-	CAPTURE_VARARGS(vector, vargs)
+	CAPTURE_VARARGS(char, vector, vargs);
 	va_end(vargs);
 	Execv(path,
 	      (char const *const *)vector);
@@ -205,7 +186,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.Execle") void
 	va_list vargs;
 	char **vector, **envp;
 	va_start(vargs, args);
-	CAPTURE_VARARGS(vector, vargs)
+	CAPTURE_VARARGS(char, vector, vargs);
 	envp = va_arg(vargs, char **);
 	va_end(vargs);
 	Execve(path,
@@ -235,7 +216,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.Execpl") void
 	va_list vargs;
 	char **vector;
 	va_start(vargs, args);
-	CAPTURE_VARARGS(vector, vargs)
+	CAPTURE_VARARGS(char, vector, vargs);
 	va_end(vargs);
 	Execvp(file,
 	       (char const *const *)vector);
@@ -267,7 +248,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.Execlpe") void
 	va_list vargs;
 	char **vector, **envp;
 	va_start(vargs, args);
-	CAPTURE_VARARGS(vector, vargs)
+	CAPTURE_VARARGS(char, vector, vargs);
 	envp = va_arg(vargs, char **);
 	va_end(vargs);
 	Execvpe(file,

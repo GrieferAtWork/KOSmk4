@@ -1,4 +1,4 @@
-/* HASH 0x3dca7c89 */
+/* HASH 0x33145eed */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbstowcs_s))(__SIZE_TYPE__ *__presul
                                                          __SIZE_TYPE__ __buflen,
                                                          char const *__src,
                                                          __SIZE_TYPE__ __maxlen) {
-#line 2068 "kos/src/libc/magic/stdlib.c"
+#line 2067 "kos/src/libc/magic/stdlib.c"
 	/* TODO */
 	return 0;
 }

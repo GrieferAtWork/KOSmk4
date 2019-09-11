@@ -1,4 +1,4 @@
-/* HASH 0x83ee10d1 */
+/* HASH 0xdaba4ad8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -170,6 +170,10 @@ __SYSDECL_END
 
 #if defined(_STDIO_H) && !defined(_PARTS_UCHAR_STDIO_H)
 #include <parts/uchar/stdio.h>
+#endif
+
+#if defined(_TIME_H) && !defined(_PARTS_UCHAR_TIME_H)
+#include <parts/uchar/time.h>
 #endif
 
 #if defined(_SYS_STAT_H) && !defined(_PARTS_UCHAR_SYS_STAT_H)

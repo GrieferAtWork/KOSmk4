@@ -1,4 +1,4 @@
-/* HASH 0xe88deefc */
+/* HASH 0xe9053f9b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_splitpath_s))(char const *__restrict
                                                           __SIZE_TYPE__ __filelen,
                                                           char *__ext,
                                                           __SIZE_TYPE__ __extlen) {
-#line 2470 "kos/src/libc/magic/stdlib.c"
+#line 2469 "kos/src/libc/magic/stdlib.c"
 	/* TODO */
 	return 0;
 }

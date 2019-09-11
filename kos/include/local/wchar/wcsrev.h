@@ -1,4 +1,4 @@
-/* HASH 0x63f572d3 */
+/* HASH 0x59ccddca */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -70,7 +70,7 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localde
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wcsrev) __ATTR_RETNONNULL __ATTR_NONNULL((1)) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsrev))(__WCHAR_TYPE__ *__restrict __str) {
-#line 1428 "kos/src/libc/magic/wchar.c"
+#line 1631 "kos/src/libc/magic/wchar.c"
 #if __SIZEOF_WCHAR_T__ == 2
 	return (__WCHAR_TYPE__ *)__localdep_memrevw(__str, __localdep_wcslen(__str));
 #elif __SIZEOF_WCHAR_T__ == 4

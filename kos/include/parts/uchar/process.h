@@ -1,4 +1,4 @@
-/* HASH 0xcfe0b5c4 */
+/* HASH 0x32af2794 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,19 +40,19 @@ __SYSDECL_BEGIN
 #ifdef __USE_DOS
 #   define __T16ARGV char16_t const *const *__restrict ___argv
 #   define __T16ENVP char16_t const *const *__restrict ___envp
-#else
+#else /* __USE_DOS */
 #   define __T16ARGV char16_t *const ___argv[__restrict_arr]
 #   define __T16ENVP char16_t *const ___envp[__restrict_arr]
-#endif
+#endif /* !__USE_DOS */
 #endif /* !__T16ARGV */
 #ifndef __T32ARGV
 #ifdef __USE_DOS
 #   define __T32ARGV char32_t const *const *__restrict ___argv
 #   define __T32ENVP char32_t const *const *__restrict ___envp
-#else
+#else /* __USE_DOS */
 #   define __T32ARGV char32_t *const ___argv[__restrict_arr]
 #   define __T32ENVP char32_t *const ___envp[__restrict_arr]
-#endif
+#endif /* !__USE_DOS */
 #endif /* !__T32ARGV */
 #if defined(__CRT_HAVE_wexecv) && (__SIZEOF_WCHAR_T__ == 2)
 __CREDIRECT(__ATTR_NONNULL((2)) __ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,c16execv,(char16_t const *__restrict __path, __T16ARGV),wexecv,(__path, ___argv))
@@ -375,18 +375,18 @@ __NAMESPACE_LOCAL_USING(c32spawnlpe)
 #endif /* !__cplusplus */
 #endif /* c32spawnlpe... */
 #if defined(__CRT_HAVE_wsystem) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16system,(char16_t const *__cmd),wsystem,(__cmd))
+__CREDIRECT(,int,__NOTHROW_RPC,c16system,(char16_t const *__cmd),wsystem,(__cmd))
 #elif defined(__CRT_HAVE__wsystem) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16system,(char16_t const *__cmd),_wsystem,(__cmd))
+__CREDIRECT(,int,__NOTHROW_RPC,c16system,(char16_t const *__cmd),_wsystem,(__cmd))
 #elif defined(__CRT_HAVE_DOS$_wsystem)
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16system,(char16_t const *__cmd),_wsystem,(__cmd))
+__CREDIRECT_DOS(,int,__NOTHROW_RPC,c16system,(char16_t const *__cmd),_wsystem,(__cmd))
 #elif defined(__CRT_HAVE_DOS$_wsystem)
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16system,(char16_t const *__cmd),_wsystem,(__cmd))
+__CREDIRECT_DOS(,int,__NOTHROW_RPC,c16system,(char16_t const *__cmd),_wsystem,(__cmd))
 #endif /* c16system... */
 #if defined(__CRT_HAVE_wsystem) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32system,(char32_t const *__cmd),wsystem,(__cmd))
+__CREDIRECT(,int,__NOTHROW_RPC,c32system,(char32_t const *__cmd),wsystem,(__cmd))
 #elif defined(__CRT_HAVE__wsystem) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32system,(char32_t const *__cmd),_wsystem,(__cmd))
+__CREDIRECT(,int,__NOTHROW_RPC,c32system,(char32_t const *__cmd),_wsystem,(__cmd))
 #endif /* c32system... */
 
 #endif /* __CC__ */

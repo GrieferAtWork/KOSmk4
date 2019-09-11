@@ -1,4 +1,4 @@
-/* HASH 0x9ac1bf31 */
+/* HASH 0xd615732c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __LOCAL_LIBC(swscanf) __ATTR_LIBC_WSCANF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT
 __NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(swscanf))(__WCHAR_TYPE__ const *__restrict __src,
                                                       __WCHAR_TYPE__ const *__restrict __format,
                                                       ...) {
-#line 518 "kos/src/libc/magic/wchar.c"
+#line 577 "kos/src/libc/magic/wchar.c"
 	__STDC_INT_AS_SIZE_T __result;
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __format);

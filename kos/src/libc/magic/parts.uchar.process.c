@@ -33,25 +33,28 @@ __SYSDECL_BEGIN
 
 }
 
-%#ifndef __T16ARGV
-%#ifdef __USE_DOS
-%#   define __T16ARGV char16_t const *const *__restrict ___argv
-%#   define __T16ENVP char16_t const *const *__restrict ___envp
-%#else
-%#   define __T16ARGV char16_t *const ___argv[__restrict_arr]
-%#   define __T16ENVP char16_t *const ___envp[__restrict_arr]
-%#endif
-%#endif /* !__T16ARGV */
-
-%#ifndef __T32ARGV
-%#ifdef __USE_DOS
-%#   define __T32ARGV char32_t const *const *__restrict ___argv
-%#   define __T32ENVP char32_t const *const *__restrict ___envp
-%#else
-%#   define __T32ARGV char32_t *const ___argv[__restrict_arr]
-%#   define __T32ENVP char32_t *const ___envp[__restrict_arr]
-%#endif
-%#endif /* !__T32ARGV */
+%[define_wchar_replacement(__TWARGV = __T16ARGV, __T32ARGV)]
+%[define_wchar_replacement(__TWENVP = __T16ENVP, __T32ENVP)]
+%{
+#ifndef __T16ARGV
+#ifdef __USE_DOS
+#   define __T16ARGV char16_t const *const *__restrict ___argv
+#   define __T16ENVP char16_t const *const *__restrict ___envp
+#else /* __USE_DOS */
+#   define __T16ARGV char16_t *const ___argv[__restrict_arr]
+#   define __T16ENVP char16_t *const ___envp[__restrict_arr]
+#endif /* !__USE_DOS */
+#endif /* !__T16ARGV */
+#ifndef __T32ARGV
+#ifdef __USE_DOS
+#   define __T32ARGV char32_t const *const *__restrict ___argv
+#   define __T32ENVP char32_t const *const *__restrict ___envp
+#else /* __USE_DOS */
+#   define __T32ARGV char32_t *const ___argv[__restrict_arr]
+#   define __T32ENVP char32_t *const ___envp[__restrict_arr]
+#endif /* !__USE_DOS */
+#endif /* !__T32ARGV */
+}
 
 [attribute(*)][argument_names(path, ___argv)]
 [if(__SIZEOF_WCHAR_T__ == 2), alias(_wexecv)][alias(DOS$_wexecv)]

@@ -212,9 +212,8 @@ NOTHROW_NCX(LIBCCALL libc_getenv)(char const *varname)
 }
 /*[[[end:getenv]]]*/
 
-/*[[[head:system,hash:0x61896818]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.exec.system.system") int
+/*[[[head:system,hash:0x193612ff]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.fs.exec.system.system") int
 NOTHROW_RPC(LIBCCALL libc_system)(char const *__restrict command)
 /*[[[body:system]]]*/
 {

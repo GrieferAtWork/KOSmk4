@@ -472,7 +472,7 @@ putchar:(int ch) -> int {
 [cp_stdio][std][ATTR_WUNUSED][alias(fgets_unlocked)]
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(fgets_unlocked)]
 [dependency_include(<parts/errno.h>)][same_impl]
-[requires($has_function(fgetc) && $has_function(ferror))]
+[requires($has_function(fgetc) && $has_function(ungetc) && $has_function(ferror))]
 fgets:([outp(min(strlen(return),bufsize))] char *__restrict buf,
        __STDC_INT_AS_SIZE_T bufsize,
        [nonnull] FILE *__restrict stream) -> char * {
@@ -502,6 +502,8 @@ fgets:([outp(min(strlen(return),bufsize))] char *__restrict buf,
 			}
 			if (ch == '\r')
 				continue;
+			ungetc(ch, stream);
+			break;
 		}
 		buf[n] = (char)ch;
 		if (ch == '\n')
@@ -533,9 +535,9 @@ fputs:([nonnull] char const *__restrict str,
 [requires(!defined(__NO_STDSTREAMS) && $has_function(fputs))]
 [requires_include(<__crt.h>)][export_alias(_IO_puts)]
 [dependency_include(<local/stdstreams.h>)][crtbuiltin]
-puts:([nonnull] char const *__restrict str) -> __STDC_INT_AS_SSIZE_T {
+puts:([nonnull] char const *__restrict string) -> __STDC_INT_AS_SSIZE_T {
 	__STDC_INT_AS_SSIZE_T result, temp;
-	result = fputs(str, stdout);
+	result = fputs(string, stdout);
 	if (result >= 0) {
 		temp = fputc('\n', stdout);
 		if (temp <= 0)
@@ -546,14 +548,13 @@ puts:([nonnull] char const *__restrict str) -> __STDC_INT_AS_SSIZE_T {
 	return result;
 }
 
-%[default_impl_section(.text.crt.FILE.locked.read.getc)]
 @@Unget a single character byte of data previously returned by `getc()'
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(ungetc_unlocked)]
+[section(.text.crt.FILE.locked.read.getc)]
 [std] ungetc:(int ch, [nonnull] FILE *__restrict stream) -> int;
 
-%[default_impl_section(.text.crt.FILE.locked.read.read)]
 @@Read up to `ELEMSIZE * ELEMCOUNT' bytes of data from `STREAM' into `BUF'
-[cp_stdio][std][ATTR_WUNUSED]
+[cp_stdio][std][ATTR_WUNUSED][section(.text.crt.FILE.locked.read.read)]
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(fread_unlocked, _fread_nolock)]
 [noexport][requires($has_function(fgetc))]
 [dependency_string(defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf)) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked))))]
@@ -576,9 +577,8 @@ done:
 }
 
 
-%[default_impl_section(.text.crt.FILE.locked.write.write)]
 @@Write up to `ELEMSIZE * ELEMCOUNT' bytes of data from `BUF' into `STREAM'
-[cp_stdio][std]
+[cp_stdio][std][section(.text.crt.FILE.locked.write.write)]
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(fwrite_unlocked, _fwrite_nolock)]
 [alias(fwrite_s)][noexport][requires($has_function(fputc))][crtbuiltin]
 [dependency_string(defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock)|| defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked))))]
@@ -1392,7 +1392,7 @@ fopencookie:(void *__restrict magic_cookie,
 %[default_impl_section(.text.crt.FILE.unlocked.read.read)]
 @@Same as `fgets()', but performs I/O without acquiring a lock to `($FILE *)ARG'
 [cp_stdio][alias(fgets)][ATTR_WUNUSED][dependency_include(<parts/errno.h>)]
-[requires($has_function(fgetc_unlocked) && $has_function(ferror_unlocked))][same_impl]
+[requires($has_function(fgetc_unlocked) && $has_function(ungetc_unlocked) && $has_function(ferror_unlocked))][same_impl]
 fgets_unlocked:([outp(min(strlen(return),bufsize))] char *__restrict buf,
                 __STDC_INT_AS_SIZE_T bufsize,
                 [nonnull] $FILE *__restrict stream) -> char * {
@@ -1422,6 +1422,8 @@ fgets_unlocked:([outp(min(strlen(return),bufsize))] char *__restrict buf,
 			}
 			if (ch == '\r')
 				continue;
+			ungetc_unlocked(ch, stream);
+			break;
 		}
 		buf[n] = (char)ch;
 		if (ch == '\n')
@@ -1434,12 +1436,12 @@ fgets_unlocked:([outp(min(strlen(return),bufsize))] char *__restrict buf,
 %[default_impl_section(.text.crt.FILE.unlocked.write.write)]
 @@Same as `fputs()', but performs I/O without acquiring a lock to `($FILE *)ARG'
 [cp_stdio][alias(fputs)][crtbuiltin][same_impl][requires($has_function(fwrite_unlocked))]
-fputs_unlocked:([nonnull] char const *__restrict str,
+fputs_unlocked:([nonnull] char const *__restrict string,
                 [nonnull] $FILE *__restrict stream) -> __STDC_INT_AS_SIZE_T {
 	__STDC_INT_AS_SIZE_T result;
-	result = fwrite_unlocked(str,
+	result = fwrite_unlocked(string,
 	                         sizeof(char),
-	                         strlen(str),
+	                         strlen(string),
 	                         stream);
 	return result;
 }
@@ -1831,9 +1833,9 @@ fisatty:([nonnull] $FILE *__restrict stream) -> int {
 [cp_stdio][user][crtbuiltin][section(.text.crt.FILE.unlocked.write.write)]
 [same_impl][alias(puts)][dependency_include(<local/stdstreams.h>)]
 [requires(!defined(__NO_STDSTREAMS) && $has_function(fputs_unlocked))]
-puts_unlocked:([nonnull] char const *__restrict str) -> __STDC_INT_AS_SSIZE_T {
+puts_unlocked:([nonnull] char const *__restrict string) -> __STDC_INT_AS_SSIZE_T {
 	__STDC_INT_AS_SSIZE_T result, temp;
-	result = fputs_unlocked(str, stdout);
+	result = fputs_unlocked(string, stdout);
 	if (result >= 0) {
 		temp = fputc_unlocked('\n', stdout);
 		if (temp <= 0)

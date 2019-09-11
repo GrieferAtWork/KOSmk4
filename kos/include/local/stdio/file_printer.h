@@ -1,4 +1,4 @@
-/* HASH 0x82d2aa82 */
+/* HASH 0xa48603fb */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,7 +54,7 @@ __LOCAL_LIBC(file_printer) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(file_printer))(void *__arg,
                                              char const *__restrict __data,
                                              __SIZE_TYPE__ __datalen) __THROWS(...) {
-#line 1639 "kos/src/libc/magic/stdio.c"
+#line 1641 "kos/src/libc/magic/stdio.c"
 	return (__SSIZE_TYPE__)__localdep_fwrite(__data, sizeof(char), __datalen, (__FILE *)__arg);
 }
 __NAMESPACE_LOCAL_END

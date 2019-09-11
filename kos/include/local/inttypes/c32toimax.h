@@ -1,4 +1,4 @@
-/* HASH 0x146d1e26 */
+/* HASH 0x9a733848 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,32 +20,32 @@
 #ifndef __local_c32toimax_defined
 #define __local_c32toimax_defined 1
 /* Dependency: "wcsto32" from "wchar" */
-#ifndef ____localdep_c32to32_defined
-#define ____localdep_c32to32_defined 1
+#ifndef ____localdep_c32sto32_defined
+#define ____localdep_c32sto32_defined 1
 #if defined(__CRT_HAVE_wcsto32) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__INT32_TYPE__,__NOTHROW_NCX,__localdep_c32to32,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base),wcsto32,(__nptr,__endptr,__base))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__INT32_TYPE__,__NOTHROW_NCX,__localdep_c32sto32,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base),wcsto32,(__nptr,__endptr,__base))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/wcsto32.h>
-#define __localdep_c32to32(nptr, endptr, base) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsto32))((__WCHAR_TYPE__ const *)(nptr), (__WCHAR_TYPE__ **)(endptr), base)
-#else /* LIBC: c32to32 */
-#include <local/wchar/c32to32.h>
-#define __localdep_c32to32 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32to32))
-#endif /* c32to32... */
-#endif /* !____localdep_c32to32_defined */
+#define __localdep_c32sto32(nptr, endptr, base) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsto32))((__WCHAR_TYPE__ const *)(nptr), (__WCHAR_TYPE__ **)(endptr), base)
+#else /* LIBC: c32sto32 */
+#include <local/wchar/c32sto32.h>
+#define __localdep_c32sto32 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32sto32))
+#endif /* c32sto32... */
+#endif /* !____localdep_c32sto32_defined */
 
 /* Dependency: "wcsto64" from "wchar" */
-#ifndef ____localdep_c32to64_defined
-#define ____localdep_c32to64_defined 1
+#ifndef ____localdep_c32sto64_defined
+#define ____localdep_c32sto64_defined 1
 #if defined(__CRT_HAVE_wcsto64) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,__localdep_c32to64,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base),wcsto64,(__nptr,__endptr,__base))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,__localdep_c32sto64,(__CHAR32_TYPE__ const *__restrict __nptr, __CHAR32_TYPE__ **__endptr, int __base),wcsto64,(__nptr,__endptr,__base))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/wcsto64.h>
-#define __localdep_c32to64(nptr, endptr, base) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsto64))((__WCHAR_TYPE__ const *)(nptr), (__WCHAR_TYPE__ **)(endptr), base)
-#else /* LIBC: c32to64 */
-#include <local/wchar/c32to64.h>
-#define __localdep_c32to64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32to64))
-#endif /* c32to64... */
-#endif /* !____localdep_c32to64_defined */
+#define __localdep_c32sto64(nptr, endptr, base) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsto64))((__WCHAR_TYPE__ const *)(nptr), (__WCHAR_TYPE__ **)(endptr), base)
+#else /* LIBC: c32sto64 */
+#include <local/wchar/c32sto64.h>
+#define __localdep_c32sto64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32sto64))
+#endif /* c32sto64... */
+#endif /* !____localdep_c32sto64_defined */
 
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c32toimax) __ATTR_PURE __ATTR_NONNULL((1)) __INTMAX_TYPE__
@@ -54,9 +54,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(c32toimax))(__CHAR32_TYPE__ const *__
                                                        int __base) {
 #line 262 "kos/src/libc/magic/inttypes.c"
 #if __SIZEOF_INTMAX_T__ <= 4
-	return (__INTMAX_TYPE__)__localdep_c32to32(__nptr, __endptr, __base);
+	return (__INTMAX_TYPE__)__localdep_c32sto32(__nptr, __endptr, __base);
 #else
-	return (__INTMAX_TYPE__)__localdep_c32to64(__nptr, __endptr, __base);
+	return (__INTMAX_TYPE__)__localdep_c32sto64(__nptr, __endptr, __base);
 #endif
 }
 __NAMESPACE_LOCAL_END

@@ -1,4 +1,4 @@
-/* HASH 0xd34cd2ab */
+/* HASH 0x42956af7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,7 +55,7 @@ __LOCAL_LIBC(fseeko64) __ATTR_NONNULL((1)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fseeko64))(__FILE *__restrict __stream,
                                          __off64_t __off,
                                          int __whence) __THROWS(...) {
-#line 1543 "kos/src/libc/magic/stdio.c"
+#line 1545 "kos/src/libc/magic/stdio.c"
 #if defined(__CRT_HAVE_fseeko) || (defined(__USE_STDIO_UNLOCKED) && defined(__CRT_HAVE_fseeko_unlocked))
 	return __localdep_crt_fseeko(__stream, (__off32_t)__off, __whence);
 #else

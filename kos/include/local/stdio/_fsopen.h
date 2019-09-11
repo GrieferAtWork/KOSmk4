@@ -1,4 +1,4 @@
-/* HASH 0xed7f6499 */
+/* HASH 0x47cb0f70 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __LOCAL_LIBC(_fsopen) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __FILE *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(_fsopen))(char const *__filename,
                                                      char const *__modes,
                                                      int __sflag) {
-#line 1978 "kos/src/libc/magic/stdio.c"
+#line 1980 "kos/src/libc/magic/stdio.c"
 	(void)__sflag;
 	return __localdep_fopen(__filename, __modes);
 }

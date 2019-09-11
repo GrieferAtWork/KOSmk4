@@ -191,11 +191,11 @@
 	CB(PREFIX.FILE.locked.access.*) \
 	CB(PREFIX.FILE.locked.read.read.*) \
 	CB(PREFIX.FILE.locked.read.scanf.*) \
-	CB(PREFIX.FILE.locked.read.getc.* PREFIX.FILE.locked.read.utility.*) \
+	CB(PREFIX.FILE.locked.read.utility.* PREFIX.FILE.locked.read.getc.*) \
 	CB(PREFIX.FILE.locked.write.write.*) \
 	CB(PREFIX.FILE.locked.write.printf.*) \
 	CB(PREFIX.FILE.locked.write.utility.* PREFIX.FILE.locked.write.putc.*) \
-	CB(PREFIX.FILE.locked.seek.utility.* PREFIX.FILE.locked.seek.pos.* PREFIX.FILE.locked.seek.seek.*) \
+	CB(PREFIX.FILE.locked.seek.utility.* PREFIX.FILE.locked.seek.seek.* PREFIX.FILE.locked.seek.pos.*) \
 	CB(PREFIX.FILE.locked.utility.*) \
 	CB(PREFIX.FILE.unlocked.access.*) \
 	CB(PREFIX.FILE.unlocked.read.read.*) \
@@ -204,11 +204,11 @@
 	CB(PREFIX.FILE.unlocked.write.write.*) \
 	CB(PREFIX.FILE.unlocked.write.printf.*) \
 	CB(PREFIX.FILE.unlocked.write.utility.* PREFIX.FILE.unlocked.write.putc.*) \
-	CB(PREFIX.FILE.unlocked.seek.seek.* PREFIX.FILE.unlocked.seek.pos.* PREFIX.FILE.unlocked.seek.utility.*) \
-	CB(PREFIX.io.seek.* PREFIX.io.sync.* PREFIX.io.lock.* PREFIX.io.poll.* PREFIX.io.large.seek.* PREFIX.io.utility.* PREFIX.io.large.utility.* PREFIX.io.large.lock.*) \
+	CB(PREFIX.FILE.unlocked.seek.pos.* PREFIX.FILE.unlocked.seek.seek.* PREFIX.FILE.unlocked.seek.utility.*) \
+	CB(PREFIX.io.poll.* PREFIX.io.sync.* PREFIX.io.lock.* PREFIX.io.large.seek.* PREFIX.io.utility.* PREFIX.io.seek.* PREFIX.io.large.utility.* PREFIX.io.large.lock.*) \
 	CB(PREFIX.fs.property.* PREFIX.fs.basic_property.*) \
 	CB(PREFIX.fs.environ.*) \
-	CB(PREFIX.fs.exec.system.* PREFIX.fs.exec.spawn.* PREFIX.fs.exec.posix_spawn.*) \
+	CB(PREFIX.fs.exec.spawn.* PREFIX.fs.exec.posix_spawn.* PREFIX.fs.exec.system.*) \
 	CB(PREFIX.fs.modify.*) \
 	CB(PREFIX.fs.dir.*) \
 	CB(PREFIX.fs.stat_glc.* PREFIX.fs.stat.*) \
@@ -218,14 +218,14 @@
 	CB(PREFIX.unicode.static.memory.*) \
 	CB(PREFIX.unicode.static.ctype.*) \
 	CB(PREFIX.unicode.static.convert.*) \
-	CB(PREFIX.string.format.* PREFIX.unicode.static.format.printf.*) \
+	CB(PREFIX.unicode.static.format.printf.* PREFIX.string.format.*) \
 	CB(PREFIX.unicode.static.format.scanf.*) \
 	CB(PREFIX.unicode.locale.memory.*) \
 	CB(PREFIX.unicode.locale.ctype.*) \
 	CB(PREFIX.unicode.locale.convert.*) \
 	CB(PREFIX.unicode.mbr.*) \
 	CB(PREFIX.net.socket.*) \
-	CB(PREFIX.net.inet.6.source_filter.* PREFIX.net.inet.6.ipv4_source_filter.* PREFIX.net.inet.6.bind_reserved.* PREFIX.net.inet.6.RFC_3542.* PREFIX.net.inet.*) \
+	CB(PREFIX.net.inet.6.bind_reserved.* PREFIX.net.inet.6.ipv4_source_filter.* PREFIX.net.inet.6.RFC_3542.* PREFIX.net.inet.6.source_filter.* PREFIX.net.inet.*) \
 	CB(PREFIX.net.ether.*) \
 	CB(PREFIX.net.rpc.*) \
 	CB(PREFIX.net.db.*) \
@@ -234,7 +234,7 @@
 	CB(PREFIX.application.options.*) \
 	CB(PREFIX.io.tty.*) \
 	CB(PREFIX.random.*) \
-	CB(PREFIX.math.math.* PREFIX.math.float.* PREFIX.math.utility.*) \
+	CB(PREFIX.math.utility.* PREFIX.math.math.* PREFIX.math.float.*) \
 	CB(PREFIX.fs.swap.* PREFIX.fs.modify_time.* PREFIX.fs.mount.*) \
 	CB(PREFIX.fs.statfs.statvfs.* PREFIX.fs.statfs.statfs.*) \
 	CB(PREFIX.timer.*) \
@@ -249,8 +249,8 @@
 	CB(PREFIX.database.utmpx.*) \
 	CB(PREFIX.io.stropts.*) \
 	CB(PREFIX.obstack.*) \
-	CB(PREFIX.utility.glob.* PREFIX.utility.shm.* PREFIX.utility.stdlib.* PREFIX.utility.klog.* PREFIX.utility.regex.* PREFIX.utility.search.*) \
-	CB(PREFIX.system.utility.* PREFIX.system.ptrace.* PREFIX.system.configuration.* PREFIX.system.*) \
+	CB(PREFIX.utility.shm.* PREFIX.utility.klog.* PREFIX.utility.regex.* PREFIX.utility.search.* PREFIX.utility.glob.* PREFIX.utility.stdlib.*) \
+	CB(PREFIX.system.utility.* PREFIX.system.ptrace.* PREFIX.system.configuration.* PREFIX.system.adjtime.* PREFIX.system.reboot.* PREFIX.system.syslog.* PREFIX.system.*) \
 	CB(PREFIX.sched.resource.*) \
 	CB(PREFIX.sched.msg.*) \
 	CB(PREFIX.string.encrypt.*) \
@@ -267,8 +267,10 @@
 	CB(PREFIX.wchar.FILE.locked.write.putc.*) \
 	CB(PREFIX.wchar.FILE.locked.utility.*) \
 	CB(PREFIX.wchar.FILE.unlocked.read.read.*) \
+	CB(PREFIX.wchar.FILE.unlocked.read.scanf.*) \
 	CB(PREFIX.wchar.FILE.unlocked.read.getc.*) \
 	CB(PREFIX.wchar.FILE.unlocked.write.write.*) \
+	CB(PREFIX.wchar.FILE.unlocked.write.printf.*) \
 	CB(PREFIX.wchar.FILE.unlocked.write.putc.*) \
 	CB(PREFIX.wchar.fs.exec.spawn.* PREFIX.wchar.fs.exec.system.*) \
 	CB(PREFIX.wchar.string.memory.*) \
@@ -284,6 +286,7 @@
 	CB(PREFIX.wchar.unicode.locale.format.strftime.*) \
 	CB(PREFIX.wchar.unicode.static.mbs.*) \
 	CB(PREFIX.wchar.unicode.locale.mbs.*) \
+	CB(PREFIX.wchar.unicode.convert.*) \
 	CB(PREFIX.wchar.fs.modify_time.*) \
 	CB(PREFIX.dos.application.init.*) \
 	CB(PREFIX.dos.sched.thread.*) \
@@ -301,7 +304,7 @@
 	CB(PREFIX.dos.fs.environ.*) \
 	CB(PREFIX.dos.fs.exec.spawn.*) \
 	CB(PREFIX.dos.fs.modify.*) \
-	CB(PREFIX.dos.fs.dlfcn.* PREFIX.dos.fs.utility.*) \
+	CB(PREFIX.dos.fs.utility.* PREFIX.dos.fs.dlfcn.*) \
 	CB(PREFIX.dos.string.memory.*) \
 	CB(PREFIX.dos.unicode.static.memory.*) \
 	CB(PREFIX.dos.unicode.static.convert.*) \
@@ -315,10 +318,11 @@
 	CB(PREFIX.dos.math.utility.*) \
 	CB(PREFIX.dos.errno.*) \
 	CB(PREFIX.dos.utility.*) \
-	CB(PREFIX.dos.system.utility.* PREFIX.dos.system.*) \
+	CB(PREFIX.dos.system.*) \
 	CB(PREFIX.dos.unsorted.*) \
 	CB(PREFIX.dos.wchar.fs.exec.exec.*) \
 	CB(PREFIX.dos.wchar.heap.strdup.*) \
+	CB(PREFIX.dos.wchar.FILE.locked.access.*) \
 	CB(PREFIX.dos.wchar.FILE.locked.read.read.*) \
 	CB(PREFIX.dos.wchar.FILE.locked.read.scanf.*) \
 	CB(PREFIX.dos.wchar.FILE.locked.read.getc.*) \
@@ -326,8 +330,10 @@
 	CB(PREFIX.dos.wchar.FILE.locked.write.printf.*) \
 	CB(PREFIX.dos.wchar.FILE.locked.write.putc.*) \
 	CB(PREFIX.dos.wchar.FILE.unlocked.read.read.*) \
+	CB(PREFIX.dos.wchar.FILE.unlocked.read.scanf.*) \
 	CB(PREFIX.dos.wchar.FILE.unlocked.read.getc.*) \
 	CB(PREFIX.dos.wchar.FILE.unlocked.write.write.*) \
+	CB(PREFIX.dos.wchar.FILE.unlocked.write.printf.*) \
 	CB(PREFIX.dos.wchar.FILE.unlocked.write.putc.*) \
 	CB(PREFIX.dos.wchar.fs.exec.system.* PREFIX.dos.wchar.fs.exec.spawn.*) \
 	CB(PREFIX.dos.wchar.fs.stat.*) \
@@ -341,6 +347,7 @@
 	CB(PREFIX.dos.wchar.unicode.locale.convert.*) \
 	CB(PREFIX.dos.wchar.unicode.locale.format.strftime.*) \
 	CB(PREFIX.dos.wchar.unicode.static.mbs.*) \
+	CB(PREFIX.dos.wchar.unicode.convert.*) \
 	CB(PREFIX.dos.wchar.fs.modify_time.*) \
 	CB(PREFIX.dos.wchar.errno.*) \
 	CB(PREFIX.except.sched.access.* PREFIX.except.fs.exec.exec.*) \
@@ -349,9 +356,9 @@
 	CB(PREFIX.except.sched.user.*) \
 	CB(PREFIX.except.heap.malloc.*) \
 	CB(PREFIX.except.heap.rare_helpers.*) \
-	CB(PREFIX.except.io.large.write.* PREFIX.except.io.read.* PREFIX.except.io.large.read.* PREFIX.except.io.write.*) \
+	CB(PREFIX.except.io.write.* PREFIX.except.io.large.write.* PREFIX.except.io.large.read.* PREFIX.except.io.read.*) \
 	CB(PREFIX.except.io.access.*) \
-	CB(PREFIX.except.io.seek.* PREFIX.except.io.utility.* PREFIX.except.io.large.seek.* PREFIX.except.io.sync.*) \
+	CB(PREFIX.except.io.seek.* PREFIX.except.io.large.seek.* PREFIX.except.io.sync.* PREFIX.except.io.utility.*) \
 	CB(PREFIX.except.fs.property.* PREFIX.except.fs.basic_property.*) \
 	CB(PREFIX.except.fs.modify.*) \
 	CB(PREFIX.except.fs.stat.*) \

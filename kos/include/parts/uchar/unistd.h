@@ -1,4 +1,4 @@
-/* HASH 0xfabf4c1f */
+/* HASH 0x9c9fbd68 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -252,7 +252,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16unlink,(char16_t const *__f
 /* >> c16unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16unlink,(char16_t const *__file),_wunlink,(__file))
-#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
+#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wunlinkat)
 #if __SIZEOF_WCHAR_T__ == 2
 #include <local/parts.wchar.unistd/wunlink.h>
 /* >> c16unlink(2)
@@ -269,7 +269,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c16unlink, __FORCELOCAL __ATTR_NONNULL((1)) int 
 /* >> c32unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32unlink,(char32_t const *__file),wunlink,(__file))
-#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
+#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wunlinkat)
 #if __SIZEOF_WCHAR_T__ == 4
 #include <local/parts.wchar.unistd/wunlink.h>
 /* >> c32unlink(2)
@@ -290,7 +290,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16rmdir,(char16_t const *__pa
 /* >> c16rmdir(2)
  * Remove a directory referred to by `PATH' */
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16rmdir,(char16_t const *__path),_wrmdir,(__path))
-#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
+#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wunlinkat)
 #if __SIZEOF_WCHAR_T__ == 2
 #include <local/parts.wchar.unistd/wrmdir.h>
 /* >> c16rmdir(2)
@@ -307,7 +307,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c16rmdir, __FORCELOCAL __ATTR_NONNULL((1)) int _
 /* >> c32rmdir(2)
  * Remove a directory referred to by `PATH' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32rmdir,(char32_t const *__path),wrmdir,(__path))
-#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
+#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wunlinkat)
 #if __SIZEOF_WCHAR_T__ == 4
 #include <local/parts.wchar.unistd/wrmdir.h>
 /* >> c32rmdir(2)
@@ -505,6 +505,20 @@ __CREDIRECT_DOS(__ATTR_NONNULL((2, 3)),ssize_t,__NOTHROW_RPC,c16freadlinkat,(__f
 __CREDIRECT(__ATTR_NONNULL((2, 3)),ssize_t,__NOTHROW_RPC,c32freadlinkat,(__fd_t __dfd, char32_t const *__restrict __path, char32_t *__restrict __buf, size_t __buflen, __atflag_t __flags),wfreadlinkat,(__dfd,__path,__buf,__buflen,__flags))
 #endif /* c32freadlinkat... */
 #endif /* __USE_KOS */
+#if defined(__CRT_HAVE_wunlinkat) && (__SIZEOF_WCHAR_T__ == 2)
+/* >> c16unlinkat(2)
+ * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,c16unlinkat,(__fd_t __dfd, char16_t const *__name, __atflag_t __flags),wunlinkat,(__dfd,__name,__flags))
+#elif defined(__CRT_HAVE_DOS$wunlinkat)
+/* >> c16unlinkat(2)
+ * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,c16unlinkat,(__fd_t __dfd, char16_t const *__name, __atflag_t __flags),wunlinkat,(__dfd,__name,__flags))
+#endif /* c16unlinkat... */
+#if defined(__CRT_HAVE_wunlinkat) && (__SIZEOF_WCHAR_T__ == 4)
+/* >> c32unlinkat(2)
+ * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,c32unlinkat,(__fd_t __dfd, char32_t const *__name, __atflag_t __flags),wunlinkat,(__dfd,__name,__flags))
+#endif /* c32unlinkat... */
 #endif /* __USE_ATFILE */
 #if defined(__CRT_HAVE_wlchown) && (__SIZEOF_WCHAR_T__ == 2)
 /* >> c16lchown(2)

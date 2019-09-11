@@ -1,4 +1,4 @@
-/* HASH 0x795f750e */
+/* HASH 0xd222185 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -168,16 +168,14 @@
 #define __stub_fgetspent 1
 #define __stub_fgetspent_r 1
 #define __stub_fgetwc 1
-#define __stub_fgetws 1
-#define __stub_fgetws_unlocked 1
+#define __stub_fgetwc_unlocked 1
 #define __stub_fmemopen 1
 #define __stub_fmod 1
 #define __stub_fopencookie 1
 #define __stub_fpathconf 1
 #define __stub_fpreset 1
 #define __stub_fputwc 1
-#define __stub_fputws 1
-#define __stub_fputws_unlocked 1
+#define __stub_fputwc_unlocked 1
 #define __stub_freeaddrinfo 1
 #define __stub_freeifaddrs 1
 #define __stub_freelocale 1
@@ -185,6 +183,7 @@
 #define __stub_ftime 1
 #define __stub_ftime64 1
 #define __stub_ftok 1
+#define __stub_fwscanf_unlocked 1
 #define __stub_gai_cancel 1
 #define __stub_gai_error 1
 #define __stub_gai_strerror 1
@@ -281,7 +280,6 @@
 #define __stub_getutxent 1
 #define __stub_getutxid 1
 #define __stub_getutxline 1
-#define __stub_getwc_unlocked 1
 #define __stub_grantpt 1
 #define __stub_gtty 1
 #define __stub_herror 1
@@ -560,7 +558,6 @@
 #define __stub_putspent 1
 #define __stub_pututline 1
 #define __stub_pututxline 1
-#define __stub_putwc_unlocked 1
 #define __stub_pwritev 1
 #define __stub_pwritev64 1
 #define __stub_random_r 1
@@ -679,6 +676,7 @@
 #define __stub_ualarm 1
 #define __stub_ulckpwdf 1
 #define __stub_ungetwc 1
+#define __stub_ungetwc_unlocked 1
 #define __stub_unlockpt 1
 #define __stub_unsetenv 1
 #define __stub_updwtmp 1
@@ -686,64 +684,23 @@
 #define __stub_uselocale 1
 #define __stub_utmpname 1
 #define __stub_utmpxname 1
-#define __stub_vfwprintf 1
 #define __stub_vfwscanf 1
 #define __stub_vhangup 1
-#define __stub_waccess 1
-#define __stub_wchdir 1
-#define __stub_wchown 1
-#define __stub_wchroot 1
+#define __stub_vwscanf_unlocked 1
 #define __stub_wcsnrtombs 1
 #define __stub_wcswidth 1
 #define __stub_wctermid 1
 #define __stub_wcwidth 1
-#define __stub_weuidaccess 1
-#define __stub_wexecl 1
-#define __stub_wexecle 1
-#define __stub_wexeclp 1
-#define __stub_wexeclpe 1
-#define __stub_wexecv 1
-#define __stub_wexecve 1
-#define __stub_wexecvp 1
-#define __stub_wexecvpe 1
-#define __stub_wfaccessat 1
-#define __stub_wfchownat 1
 #define __stub_wfreadlinkat 1
-#define __stub_wget_current_dir_name 1
 #define __stub_wgetcwd 1
 #define __stub_wgetdomainname 1
 #define __stub_wgethostname 1
 #define __stub_wgetlogin 1
 #define __stub_wgetlogin_r 1
-#define __stub_wlchown 1
-#define __stub_wlink 1
-#define __stub_wlinkat 1
-#define __stub_wpathconf 1
-#define __stub_wreadlink 1
-#define __stub_wreadlinkat 1
 #define __stub_writev 1
-#define __stub_wrmdir 1
-#define __stub_wsetdomainname 1
-#define __stub_wsethostname 1
-#define __stub_wsetlogin 1
-#define __stub_wspawnl 1
-#define __stub_wspawnle 1
-#define __stub_wspawnlp 1
-#define __stub_wspawnlpe 1
-#define __stub_wspawnv 1
-#define __stub_wspawnve 1
-#define __stub_wspawnvp 1
-#define __stub_wspawnvpe 1
-#define __stub_wsymlink 1
-#define __stub_wsymlinkat 1
-#define __stub_wsystem 1
-#define __stub_wtruncate 1
-#define __stub_wtruncate64 1
+#define __stub_wscanf_unlocked 1
 #define __stub_wttyname 1
 #define __stub_wttyname_r 1
-#define __stub_wunlink 1
-#define __stub_wutime 1
-#define __stub_wutime64 1
 #define __stub_y0 1
 #define __stub_y1 1
 #define __stub_yn 1

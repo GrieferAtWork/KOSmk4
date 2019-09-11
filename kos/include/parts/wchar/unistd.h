@@ -1,4 +1,4 @@
-/* HASH 0x75f748a2 */
+/* HASH 0xd1692e54 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -119,7 +119,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wunlink,(wchar_t const *__file)
 /* >> wunlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wunlink,(wchar_t const *__file),_wunlink,(__file))
-#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
+#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wunlinkat)
 #include <local/parts.wchar.unistd/wunlink.h>
 /* >> wunlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
@@ -133,7 +133,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wrmdir,(wchar_t const *__path),
 /* >> wrmdir(2)
  * Remove a directory referred to by `PATH' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wrmdir,(wchar_t const *__path),_wrmdir,(__path))
-#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
+#elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wunlinkat)
 #include <local/parts.wchar.unistd/wrmdir.h>
 /* >> wrmdir(2)
  * Remove a directory referred to by `PATH' */
@@ -218,6 +218,11 @@ __CDECLARE(__ATTR_NONNULL((2, 3)),ssize_t,__NOTHROW_RPC,wreadlinkat,(__fd_t __df
 __CDECLARE(__ATTR_NONNULL((2, 3)),ssize_t,__NOTHROW_RPC,wfreadlinkat,(__fd_t __dfd, wchar_t const *__restrict __path, wchar_t *__restrict __buf, size_t __buflen, __atflag_t __flags),(__dfd,__path,__buf,__buflen,__flags))
 #endif /* wfreadlinkat... */
 #endif /* __USE_KOS */
+#if defined(__CRT_HAVE_wunlinkat)
+/* >> wunlinkat(2)
+ * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
+__CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,wunlinkat,(__fd_t __dfd, wchar_t const *__name, __atflag_t __flags),(__dfd,__name,__flags))
+#endif /* wunlinkat... */
 #endif /* __USE_ATFILE */
 #if defined(__CRT_HAVE_wlchown)
 /* >> wlchown(2)

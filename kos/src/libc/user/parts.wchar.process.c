@@ -20,6 +20,14 @@
 #define GUARD_LIBC_USER_PARTS_WCHAR_PROCESS_C 1
 
 #include "../api.h"
+/**/
+
+#include <unistd.h>
+#include <process.h>
+#include <stdarg.h>
+#include <hybrid/host.h>
+#include "../libc/uchar.h"
+#include "../libc/capture-varargs.h"
 #include "parts.wchar.process.h"
 
 DECL_BEGIN
@@ -32,113 +40,240 @@ extern char **environ;
 DECLARE_NOREL_GLOBAL_META(char **, environ);
 #define environ  GET_NOREL_GLOBAL(environ)
 
+
+INTERN NONNULL((1, 2))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.exec.exec.do_c16exec") int
+NOTHROW_RPC(LIBCCALL libc_do_c16exec)(char16_t const *__restrict file_or_path,
+                                      char16_t const *const *__restrict argv,
+                                      char16_t const *const *envp,
+                                      bool search_path) {
+	int result = -1;
+	char *used_file, **used_argv, **used_envp;
+	used_file = libc_uchar_c16tombs(file_or_path);
+	if unlikely(!used_file)
+		goto done;
+	used_argv = libc_uchar_c16tombsv(argv);
+	if unlikely(!used_argv)
+		goto done_file;
+	if (envp) {
+		used_envp = libc_uchar_c16tombsv(envp);
+		if unlikely(!used_envp)
+			goto done_argv;
+		result = search_path
+		         ? execvpe(used_file, used_argv, used_envp)
+		         : execve(used_file, used_argv, used_envp);
+		libc_uchar_freev(used_envp);
+	} else {
+		result = search_path
+		         ? execvp(used_file, used_argv)
+		         : execv(used_file, used_argv);
+	}
+done_argv:
+	libc_uchar_freev(used_argv);
+done_file:
+	libc_uchar_free(used_file);
+done:
+	return result;
+}
+
+INTERN NONNULL((1, 2))
+ATTR_WEAK ATTR_SECTION(".text.crt.wchar.fs.exec.exec.do_c32exec") int
+NOTHROW_RPC(LIBCCALL libc_do_c32exec)(char32_t const *__restrict file_or_path,
+                                      char32_t const *const *__restrict argv,
+                                      char32_t const *const *envp,
+                                      bool search_path) {
+	int result = -1;
+	char *used_file, **used_argv, **used_envp;
+	used_file = libc_uchar_c32tombs(file_or_path);
+	if unlikely(!used_file)
+		goto done;
+	used_argv = libc_uchar_c32tombsv(argv);
+	if unlikely(!used_argv)
+		goto done_file;
+	if (envp) {
+		used_envp = libc_uchar_c32tombsv(envp);
+		if unlikely(!used_envp)
+			goto done_argv;
+		result = search_path
+		         ? execvpe(used_file, used_argv, used_envp)
+		         : execve(used_file, used_argv, used_envp);
+		libc_uchar_freev(used_envp);
+	} else {
+		result = search_path
+		         ? execvp(used_file, used_argv)
+		         : execv(used_file, used_argv);
+	}
+done_argv:
+	libc_uchar_freev(used_argv);
+done_file:
+	libc_uchar_free(used_file);
+done:
+	return result;
+}
+
+INTERN NONNULL((2, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.exec.exec.do_c16spawn") pid_t
+NOTHROW_RPC(LIBCCALL libc_do_c16spawn)(int mode,
+                                       char16_t const *__restrict file_or_path,
+                                       char16_t const *const *__restrict argv,
+                                       char16_t const *const *envp,
+                                       bool search_path) {
+	int result = -1;
+	char *used_file, **used_argv, **used_envp;
+	used_file = libc_uchar_c16tombs(file_or_path);
+	if unlikely(!used_file)
+		goto done;
+	used_argv = libc_uchar_c16tombsv(argv);
+	if unlikely(!used_argv)
+		goto done_file;
+	if (envp) {
+		used_envp = libc_uchar_c16tombsv(envp);
+		if unlikely(!used_envp)
+			goto done_argv;
+		result = search_path
+		         ? spawnvpe(mode, used_file, used_argv, used_envp)
+		         : spawnve(mode, used_file, used_argv, used_envp);
+		libc_uchar_freev(used_envp);
+	} else {
+		result = search_path
+		         ? spawnvp(mode, used_file, used_argv)
+		         : spawnv(mode, used_file, used_argv);
+	}
+done_argv:
+	libc_uchar_freev(used_argv);
+done_file:
+	libc_uchar_free(used_file);
+done:
+	return result;
+}
+
+INTERN NONNULL((2, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.wchar.fs.exec.exec.do_c32spawn") pid_t
+NOTHROW_RPC(LIBCCALL libc_do_c32spawn)(int mode,
+                                       char32_t const *__restrict file_or_path,
+                                       char32_t const *const *__restrict argv,
+                                       char32_t const *const *envp,
+                                       bool search_path) {
+	int result = -1;
+	char *used_file, **used_argv, **used_envp;
+	used_file = libc_uchar_c32tombs(file_or_path);
+	if unlikely(!used_file)
+		goto done;
+	used_argv = libc_uchar_c32tombsv(argv);
+	if unlikely(!used_argv)
+		goto done_file;
+	if (envp) {
+		used_envp = libc_uchar_c32tombsv(envp);
+		if unlikely(!used_envp)
+			goto done_argv;
+		result = search_path
+		         ? spawnvpe(mode, used_file, used_argv, used_envp)
+		         : spawnve(mode, used_file, used_argv, used_envp);
+		libc_uchar_freev(used_envp);
+	} else {
+		result = search_path
+		         ? spawnvp(mode, used_file, used_argv)
+		         : spawnv(mode, used_file, used_argv);
+	}
+done_argv:
+	libc_uchar_freev(used_argv);
+done_file:
+	libc_uchar_free(used_file);
+done:
+	return result;
+}
+
 /*[[[start:implementation]]]*/
 
-/*[[[head:wexecv,hash:0x561e0620]]]*/
+/*[[[head:wexecv,hash:0x28f8a7ab]]]*/
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.fs.exec.exec.wexecv") int
 NOTHROW_RPC(LIBCCALL libc_wexecv)(char32_t const *__restrict path,
-                                  __TWARGV)
+                                  __T32ARGV)
 /*[[[body:wexecv]]]*/
 {
-	CRT_UNIMPLEMENTED("wexecv"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	return libc_do_c32exec(path, ___argv, NULL, false);
 }
 /*[[[end:wexecv]]]*/
 
-/*[[[head:DOS$wexecv,hash:0x9238373c]]]*/
+/*[[[head:DOS$wexecv,hash:0xe837f6ef]]]*/
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.exec.exec.wexecv") int
 NOTHROW_RPC(LIBDCALL libd_wexecv)(char16_t const *__restrict path,
-                                  __TWARGV)
+                                  __T16ARGV)
 /*[[[body:DOS$wexecv]]]*/
 {
-	CRT_UNIMPLEMENTED("wexecv"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	return libc_do_c16exec(path, ___argv, NULL, false);
 }
 /*[[[end:DOS$wexecv]]]*/
 
-/*[[[head:wexecve,hash:0x6ea16938]]]*/
+/*[[[head:wexecve,hash:0x56a97e3a]]]*/
 INTERN NONNULL((1, 2, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.fs.exec.exec.wexecve") int
 NOTHROW_RPC(LIBCCALL libc_wexecve)(char32_t const *__restrict path,
-                                   __TWARGV,
-                                   __TWENVP)
+                                   __T32ARGV,
+                                   __T32ENVP)
 /*[[[body:wexecve]]]*/
 {
-	CRT_UNIMPLEMENTED("wexecve"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	return libc_do_c32exec(path, ___argv, ___envp, false);
 }
 /*[[[end:wexecve]]]*/
 
-/*[[[head:DOS$wexecve,hash:0x9fd51d7d]]]*/
+/*[[[head:DOS$wexecve,hash:0xe394080c]]]*/
 INTERN NONNULL((1, 2, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.exec.exec.wexecve") int
 NOTHROW_RPC(LIBDCALL libd_wexecve)(char16_t const *__restrict path,
-                                   __TWARGV,
-                                   __TWENVP)
+                                   __T16ARGV,
+                                   __T16ENVP)
 /*[[[body:DOS$wexecve]]]*/
 {
-	CRT_UNIMPLEMENTED("wexecve"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	return libc_do_c16exec(path, ___argv, ___envp, false);
 }
 /*[[[end:DOS$wexecve]]]*/
 
-/*[[[head:wexecvp,hash:0x34cd8e05]]]*/
+/*[[[head:wexecvp,hash:0x6687398d]]]*/
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.fs.exec.exec.wexecvp") int
 NOTHROW_RPC(LIBCCALL libc_wexecvp)(char32_t const *__restrict file,
-                                   __TWARGV)
+                                   __T32ARGV)
 /*[[[body:wexecvp]]]*/
 {
-	CRT_UNIMPLEMENTED("wexecvp"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	return libc_do_c32exec(file, ___argv, NULL, true);
 }
 /*[[[end:wexecvp]]]*/
 
-/*[[[head:DOS$wexecvp,hash:0xc47ae4d2]]]*/
+/*[[[head:DOS$wexecvp,hash:0x8c183ed8]]]*/
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.exec.exec.wexecvp") int
 NOTHROW_RPC(LIBDCALL libd_wexecvp)(char16_t const *__restrict file,
-                                   __TWARGV)
+                                   __T16ARGV)
 /*[[[body:DOS$wexecvp]]]*/
 {
-	CRT_UNIMPLEMENTED("wexecvp"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	return libc_do_c16exec(file, ___argv, NULL, true);
 }
 /*[[[end:DOS$wexecvp]]]*/
 
-/*[[[head:wexecvpe,hash:0x3fd7902b]]]*/
+/*[[[head:wexecvpe,hash:0xf53bccbf]]]*/
 INTERN NONNULL((1, 2, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.fs.exec.exec.wexecvpe") int
 NOTHROW_RPC(LIBCCALL libc_wexecvpe)(char32_t const *__restrict file,
-                                    __TWARGV,
-                                    __TWENVP)
+                                    __T32ARGV,
+                                    __T32ENVP)
 /*[[[body:wexecvpe]]]*/
 {
-	CRT_UNIMPLEMENTED("wexecvpe"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	return libc_do_c32exec(file, ___argv, ___envp, true);
 }
 /*[[[end:wexecvpe]]]*/
 
-/*[[[head:DOS$wexecvpe,hash:0x54e7a5b9]]]*/
+/*[[[head:DOS$wexecvpe,hash:0x6c595fbf]]]*/
 INTERN NONNULL((1, 2, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.exec.exec.wexecvpe") int
 NOTHROW_RPC(LIBDCALL libd_wexecvpe)(char16_t const *__restrict file,
-                                    __TWARGV,
-                                    __TWENVP)
+                                    __T16ARGV,
+                                    __T16ENVP)
 /*[[[body:DOS$wexecvpe]]]*/
 {
-	CRT_UNIMPLEMENTED("wexecvpe"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	return libc_do_c16exec(file, ___argv, ___envp, true);
 }
 /*[[[end:DOS$wexecvpe]]]*/
 
@@ -150,9 +285,16 @@ NOTHROW_RPC(VLIBCCALL libc_wexecl)(char32_t const *__restrict path,
                                    ... /*, (wchar_t *)NULL*/)
 /*[[[body:wexecl]]]*/
 {
-	CRT_UNIMPLEMENTED("wexecl"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+#if defined(__i386__) && !defined(__x86_64__)
+	return libc_do_c32exec(path, (char32_t const *const *)&args, NULL, false);
+#else
+	va_list vargs;
+	char32_t **vector;
+	va_start(vargs, args);
+	CAPTURE_VARARGS(char32_t, vector, vargs);
+	va_end(vargs);
+	return libc_do_c32exec(path, (char32_t const *const *)vector, NULL, false);
+#endif
 }
 /*[[[end:wexecl]]]*/
 
@@ -164,9 +306,16 @@ NOTHROW_RPC(VLIBDCALL libd_wexecl)(char16_t const *__restrict path,
                                    ... /*, (wchar_t *)NULL*/)
 /*[[[body:DOS$wexecl]]]*/
 {
-	CRT_UNIMPLEMENTED("wexecl"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+#if defined(__i386__) && !defined(__x86_64__)
+	return libc_do_c16exec(path, (char16_t const *const *)&args, NULL, false);
+#else
+	va_list vargs;
+	char16_t **vector;
+	va_start(vargs, args);
+	CAPTURE_VARARGS(char16_t, vector, vargs);
+	va_end(vargs);
+	return libc_do_c16exec(path, (char16_t const *const *)vector, NULL, false);
+#endif
 }
 /*[[[end:DOS$wexecl]]]*/
 
@@ -178,9 +327,26 @@ NOTHROW_RPC(VLIBCCALL libc_wexecle)(char32_t const *__restrict path,
                                     ... /*, (wchar_t *)NULL, wchar_t **environ*/)
 /*[[[body:wexecle]]]*/
 {
-	CRT_UNIMPLEMENTED("wexecle"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+#if defined(__i386__) && !defined(__x86_64__)
+	char32_t **envp = (char32_t **)&args;
+	while (*envp++)
+		; /* Envp is located 1 after the first NULL-entry */
+	return libc_do_c32exec(path,
+	                       (char32_t const *const *)&args,
+	                       (char32_t const *const *)envp,
+	                       false);
+#else
+	va_list vargs;
+	char32_t **vector, **envp;
+	va_start(vargs, args);
+	CAPTURE_VARARGS(char32_t, vector, vargs);
+	envp = va_arg(vargs, char32_t **);
+	va_end(vargs);
+	return libc_do_c32exec(path,
+	                       (char32_t const *const *)vector,
+	                       (char32_t const *const *)envp,
+	                       false);
+#endif
 }
 /*[[[end:wexecle]]]*/
 
@@ -192,9 +358,26 @@ NOTHROW_RPC(VLIBDCALL libd_wexecle)(char16_t const *__restrict path,
                                     ... /*, (wchar_t *)NULL, wchar_t **environ*/)
 /*[[[body:DOS$wexecle]]]*/
 {
-	CRT_UNIMPLEMENTED("wexecle"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+#if defined(__i386__) && !defined(__x86_64__)
+	char16_t **envp = (char16_t **)&args;
+	while (*envp++)
+		; /* Envp is located 1 after the first NULL-entry */
+	return libc_do_c16exec(path,
+	                       (char16_t const *const *)&args,
+	                       (char16_t const *const *)envp,
+	                       false);
+#else
+	va_list vargs;
+	char16_t **vector, **envp;
+	va_start(vargs, args);
+	CAPTURE_VARARGS(char16_t, vector, vargs);
+	envp = va_arg(vargs, char16_t **);
+	va_end(vargs);
+	return libc_do_c16exec(path,
+	                       (char16_t const *const *)vector,
+	                       (char16_t const *const *)envp,
+	                       false);
+#endif
 }
 /*[[[end:DOS$wexecle]]]*/
 
@@ -206,9 +389,16 @@ NOTHROW_RPC(VLIBCCALL libc_wexeclp)(char32_t const *__restrict file,
                                     ... /*, (wchar_t *)NULL*/)
 /*[[[body:wexeclp]]]*/
 {
-	CRT_UNIMPLEMENTED("wexeclp"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+#if defined(__i386__) && !defined(__x86_64__)
+	return libc_do_c32exec(file, (char32_t const *const *)&args, NULL, true);
+#else
+	va_list vargs;
+	char32_t **vector;
+	va_start(vargs, args);
+	CAPTURE_VARARGS(char32_t, vector, vargs);
+	va_end(vargs);
+	return libc_do_c32exec(file, (char32_t const *const *)vector, NULL, true);
+#endif
 }
 /*[[[end:wexeclp]]]*/
 
@@ -220,9 +410,16 @@ NOTHROW_RPC(VLIBDCALL libd_wexeclp)(char16_t const *__restrict file,
                                     ... /*, (wchar_t *)NULL*/)
 /*[[[body:DOS$wexeclp]]]*/
 {
-	CRT_UNIMPLEMENTED("wexeclp"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+#if defined(__i386__) && !defined(__x86_64__)
+	return libc_do_c16exec(file, (char16_t const *const *)&args, NULL, true);
+#else
+	va_list vargs;
+	char16_t **vector;
+	va_start(vargs, args);
+	CAPTURE_VARARGS(char16_t, vector, vargs);
+	va_end(vargs);
+	return libc_do_c16exec(file, (char16_t const *const *)vector, NULL, true);
+#endif
 }
 /*[[[end:DOS$wexeclp]]]*/
 
@@ -234,9 +431,26 @@ NOTHROW_RPC(VLIBCCALL libc_wexeclpe)(char32_t const *__restrict file,
                                      ... /*, (wchar_t *)NULL, wchar_t **environ*/)
 /*[[[body:wexeclpe]]]*/
 {
-	CRT_UNIMPLEMENTED("wexeclpe"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+#if defined(__i386__) && !defined(__x86_64__)
+	char32_t **envp = (char32_t **)&args;
+	while (*envp++)
+		; /* Envp is located 1 after the first NULL-entry */
+	return libc_do_c32exec(file,
+	                       (char32_t const *const *)&args,
+	                       (char32_t const *const *)envp,
+	                       true);
+#else
+	va_list vargs;
+	char32_t **vector, **envp;
+	va_start(vargs, args);
+	CAPTURE_VARARGS(char32_t, vector, vargs);
+	envp = va_arg(vargs, char32_t **);
+	va_end(vargs);
+	return libc_do_c32exec(file,
+	                       (char32_t const *const *)vector,
+	                       (char32_t const *const *)envp,
+	                       true);
+#endif
 }
 /*[[[end:wexeclpe]]]*/
 
@@ -248,125 +462,126 @@ NOTHROW_RPC(VLIBDCALL libd_wexeclpe)(char16_t const *__restrict file,
                                      ... /*, (wchar_t *)NULL, wchar_t **environ*/)
 /*[[[body:DOS$wexeclpe]]]*/
 {
-	CRT_UNIMPLEMENTED("wexeclpe"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+#if defined(__i386__) && !defined(__x86_64__)
+	char16_t **envp = (char16_t **)&args;
+	while (*envp++)
+		; /* Envp is located 1 after the first NULL-entry */
+	return libc_do_c16exec(file,
+	                       (char16_t const *const *)&args,
+	                       (char16_t const *const *)envp,
+	                       true);
+#else
+	va_list vargs;
+	char16_t **vector, **envp;
+	va_start(vargs, args);
+	CAPTURE_VARARGS(char16_t, vector, vargs);
+	envp = va_arg(vargs, char16_t **);
+	va_end(vargs);
+	return libc_do_c16exec(file,
+	                       (char16_t const *const *)vector,
+	                       (char16_t const *const *)envp,
+	                       true);
+#endif
 }
 /*[[[end:DOS$wexeclpe]]]*/
 
-/*[[[head:wspawnv,hash:0x8a0aa1de]]]*/
+/*[[[head:wspawnv,hash:0x5da4eb13]]]*/
 INTERN NONNULL((2, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.fs.exec.spawn.wspawnv") pid_t
 NOTHROW_RPC(LIBCCALL libc_wspawnv)(int mode,
                                    char32_t const *__restrict path,
-                                   __TWARGV)
+                                   __T32ARGV)
 /*[[[body:wspawnv]]]*/
 {
-	CRT_UNIMPLEMENTED("wspawnv"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	return libc_do_c32spawn(mode, path, ___argv, NULL, false);
 }
 /*[[[end:wspawnv]]]*/
 
-/*[[[head:DOS$wspawnv,hash:0xba8e46bf]]]*/
+/*[[[head:DOS$wspawnv,hash:0x2b3ac6]]]*/
 INTERN NONNULL((2, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.exec.spawn.wspawnv") pid_t
 NOTHROW_RPC(LIBDCALL libd_wspawnv)(int mode,
                                    char16_t const *__restrict path,
-                                   __TWARGV)
+                                   __T16ARGV)
 /*[[[body:DOS$wspawnv]]]*/
 {
-	CRT_UNIMPLEMENTED("wspawnv"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	return libc_do_c16spawn(mode, path, ___argv, NULL, false);
 }
 /*[[[end:DOS$wspawnv]]]*/
 
-/*[[[head:wspawnve,hash:0xc2a927b5]]]*/
+/*[[[head:wspawnve,hash:0xd67f9330]]]*/
 INTERN NONNULL((2, 3, 4))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.fs.exec.spawn.wspawnve") pid_t
 NOTHROW_RPC(LIBCCALL libc_wspawnve)(int mode,
                                     char32_t const *__restrict path,
-                                    __TWARGV,
-                                    __TWENVP)
+                                    __T32ARGV,
+                                    __T32ENVP)
 /*[[[body:wspawnve]]]*/
 {
-	CRT_UNIMPLEMENTED("wspawnve"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	return libc_do_c32spawn(mode, path, ___argv, ___envp, false);
 }
 /*[[[end:wspawnve]]]*/
 
-/*[[[head:DOS$wspawnve,hash:0x11373b81]]]*/
+/*[[[head:DOS$wspawnve,hash:0xd41784fc]]]*/
 INTERN NONNULL((2, 3, 4))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.exec.spawn.wspawnve") pid_t
 NOTHROW_RPC(LIBDCALL libd_wspawnve)(int mode,
                                     char16_t const *__restrict path,
-                                    __TWARGV,
-                                    __TWENVP)
+                                    __T16ARGV,
+                                    __T16ENVP)
 /*[[[body:DOS$wspawnve]]]*/
 {
-	CRT_UNIMPLEMENTED("wspawnve"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	return libc_do_c16spawn(mode, path, ___argv, ___envp, false);
 }
 /*[[[end:DOS$wspawnve]]]*/
 
-/*[[[head:wspawnvp,hash:0x9f848bf6]]]*/
+/*[[[head:wspawnvp,hash:0xaba888e3]]]*/
 INTERN NONNULL((2, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.fs.exec.spawn.wspawnvp") pid_t
 NOTHROW_RPC(LIBCCALL libc_wspawnvp)(int mode,
                                     char32_t const *__restrict file,
-                                    __TWARGV)
+                                    __T32ARGV)
 /*[[[body:wspawnvp]]]*/
 {
-	CRT_UNIMPLEMENTED("wspawnvp"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	return libc_do_c32spawn(mode, file, ___argv, NULL, true);
 }
 /*[[[end:wspawnvp]]]*/
 
-/*[[[head:DOS$wspawnvp,hash:0x33c039b4]]]*/
+/*[[[head:DOS$wspawnvp,hash:0x90bc7bf1]]]*/
 INTERN NONNULL((2, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.exec.spawn.wspawnvp") pid_t
 NOTHROW_RPC(LIBDCALL libd_wspawnvp)(int mode,
                                     char16_t const *__restrict file,
-                                    __TWARGV)
+                                    __T16ARGV)
 /*[[[body:DOS$wspawnvp]]]*/
 {
-	CRT_UNIMPLEMENTED("wspawnvp"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	return libc_do_c16spawn(mode, file, ___argv, NULL, true);
 }
 /*[[[end:DOS$wspawnvp]]]*/
 
-/*[[[head:wspawnvpe,hash:0x44da1f78]]]*/
+/*[[[head:wspawnvpe,hash:0xc828710e]]]*/
 INTERN NONNULL((2, 3, 4))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.fs.exec.spawn.wspawnvpe") pid_t
 NOTHROW_RPC(LIBCCALL libc_wspawnvpe)(int mode,
                                      char32_t const *__restrict file,
-                                     __TWARGV,
-                                     __TWENVP)
+                                     __T32ARGV,
+                                     __T32ENVP)
 /*[[[body:wspawnvpe]]]*/
 {
-	CRT_UNIMPLEMENTED("wspawnvpe"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	return libc_do_c32spawn(mode, file, ___argv, ___envp, true);
 }
 /*[[[end:wspawnvpe]]]*/
 
-/*[[[head:DOS$wspawnvpe,hash:0x874c4f93]]]*/
+/*[[[head:DOS$wspawnvpe,hash:0xcda15743]]]*/
 INTERN NONNULL((2, 3, 4))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.exec.spawn.wspawnvpe") pid_t
 NOTHROW_RPC(LIBDCALL libd_wspawnvpe)(int mode,
                                      char16_t const *__restrict file,
-                                     __TWARGV,
-                                     __TWENVP)
+                                     __T16ARGV,
+                                     __T16ENVP)
 /*[[[body:DOS$wspawnvpe]]]*/
 {
-	CRT_UNIMPLEMENTED("wspawnvpe"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	return libc_do_c16spawn(mode, file, ___argv, ___envp, true);
 }
 /*[[[end:DOS$wspawnvpe]]]*/
 
@@ -379,9 +594,16 @@ NOTHROW_RPC(VLIBCCALL libc_wspawnl)(int mode,
                                     ... /*, (wchar_t *)NULL*/)
 /*[[[body:wspawnl]]]*/
 {
-	CRT_UNIMPLEMENTED("wspawnl"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+#if defined(__i386__) && !defined(__x86_64__)
+	return libc_do_c32spawn(mode, path, (char32_t const *const *)&args, NULL, false);
+#else
+	va_list vargs;
+	char32_t **vector;
+	va_start(vargs, args);
+	CAPTURE_VARARGS(char32_t, vector, vargs);
+	va_end(vargs);
+	return libc_do_c32spawn(mode, path, (char32_t const *const *)vector, NULL, false);
+#endif
 }
 /*[[[end:wspawnl]]]*/
 
@@ -394,9 +616,16 @@ NOTHROW_RPC(VLIBDCALL libd_wspawnl)(int mode,
                                     ... /*, (wchar_t *)NULL*/)
 /*[[[body:DOS$wspawnl]]]*/
 {
-	CRT_UNIMPLEMENTED("wspawnl"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+#if defined(__i386__) && !defined(__x86_64__)
+	return libc_do_c16spawn(mode, path, (char16_t const *const *)&args, NULL, false);
+#else
+	va_list vargs;
+	char16_t **vector;
+	va_start(vargs, args);
+	CAPTURE_VARARGS(char16_t, vector, vargs);
+	va_end(vargs);
+	return libc_do_c16spawn(mode, path, (char16_t const *const *)vector, NULL, false);
+#endif
 }
 /*[[[end:DOS$wspawnl]]]*/
 
@@ -409,9 +638,26 @@ NOTHROW_RPC(VLIBCCALL libc_wspawnle)(int mode,
                                      ... /*, (wchar_t *)NULL, wchar_t **environ*/)
 /*[[[body:wspawnle]]]*/
 {
-	CRT_UNIMPLEMENTED("wspawnle"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+#if defined(__i386__) && !defined(__x86_64__)
+	char32_t **envp = (char32_t **)&args;
+	while (*envp++)
+		; /* Envp is located 1 after the first NULL-entry */
+	return libc_do_c32spawn(mode, path,
+	                        (char32_t const *const *)&args,
+	                        (char32_t const *const *)envp,
+	                        false);
+#else
+	va_list vargs;
+	char32_t **vector, **envp;
+	va_start(vargs, args);
+	CAPTURE_VARARGS(char32_t, vector, vargs);
+	envp = va_arg(vargs, char32_t **);
+	va_end(vargs);
+	return libc_do_c32spawn(mode, path,
+	                        (char32_t const *const *)vector,
+	                        (char32_t const *const *)envp,
+	                        false);
+#endif
 }
 /*[[[end:wspawnle]]]*/
 
@@ -424,9 +670,26 @@ NOTHROW_RPC(VLIBDCALL libd_wspawnle)(int mode,
                                      ... /*, (wchar_t *)NULL, wchar_t **environ*/)
 /*[[[body:DOS$wspawnle]]]*/
 {
-	CRT_UNIMPLEMENTED("wspawnle"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+#if defined(__i386__) && !defined(__x86_64__)
+	char16_t **envp = (char16_t **)&args;
+	while (*envp++)
+		; /* Envp is located 1 after the first NULL-entry */
+	return libc_do_c16spawn(mode, path,
+	                        (char16_t const *const *)&args,
+	                        (char16_t const *const *)envp,
+	                        false);
+#else
+	va_list vargs;
+	char16_t **vector, **envp;
+	va_start(vargs, args);
+	CAPTURE_VARARGS(char16_t, vector, vargs);
+	envp = va_arg(vargs, char16_t **);
+	va_end(vargs);
+	return libc_do_c16spawn(mode, path,
+	                        (char16_t const *const *)vector,
+	                        (char16_t const *const *)envp,
+	                        false);
+#endif
 }
 /*[[[end:DOS$wspawnle]]]*/
 
@@ -439,9 +702,16 @@ NOTHROW_RPC(VLIBCCALL libc_wspawnlp)(int mode,
                                      ... /*, (wchar_t *)NULL*/)
 /*[[[body:wspawnlp]]]*/
 {
-	CRT_UNIMPLEMENTED("wspawnlp"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+#if defined(__i386__) && !defined(__x86_64__)
+	return libc_do_c32spawn(mode, file, (char32_t const *const *)&args, NULL, true);
+#else
+	va_list vargs;
+	char32_t **vector;
+	va_start(vargs, args);
+	CAPTURE_VARARGS(char32_t, vector, vargs);
+	va_end(vargs);
+	return libc_do_c32spawn(mode, file, (char32_t const *const *)vector, NULL, true);
+#endif
 }
 /*[[[end:wspawnlp]]]*/
 
@@ -454,9 +724,16 @@ NOTHROW_RPC(VLIBDCALL libd_wspawnlp)(int mode,
                                      ... /*, (wchar_t *)NULL*/)
 /*[[[body:DOS$wspawnlp]]]*/
 {
-	CRT_UNIMPLEMENTED("wspawnlp"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+#if defined(__i386__) && !defined(__x86_64__)
+	return libc_do_c16spawn(mode, file, (char16_t const *const *)&args, NULL, true);
+#else
+	va_list vargs;
+	char16_t **vector;
+	va_start(vargs, args);
+	CAPTURE_VARARGS(char16_t, vector, vargs);
+	va_end(vargs);
+	return libc_do_c16spawn(mode, file, (char16_t const *const *)vector, NULL, true);
+#endif
 }
 /*[[[end:DOS$wspawnlp]]]*/
 
@@ -469,9 +746,26 @@ NOTHROW_RPC(VLIBCCALL libc_wspawnlpe)(int mode,
                                       ... /*, (wchar_t *)NULL, wchar_t **environ*/)
 /*[[[body:wspawnlpe]]]*/
 {
-	CRT_UNIMPLEMENTED("wspawnlpe"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+#if defined(__i386__) && !defined(__x86_64__)
+	char32_t **envp = (char32_t **)&args;
+	while (*envp++)
+		; /* Envp is located 1 after the first NULL-entry */
+	return libc_do_c32spawn(mode, file,
+	                        (char32_t const *const *)&args,
+	                        (char32_t const *const *)envp,
+	                        true);
+#else
+	va_list vargs;
+	char32_t **vector, **envp;
+	va_start(vargs, args);
+	CAPTURE_VARARGS(char32_t, vector, vargs);
+	envp = va_arg(vargs, char32_t **);
+	va_end(vargs);
+	return libc_do_c32spawn(mode, file,
+	                        (char32_t const *const *)vector,
+	                        (char32_t const *const *)envp,
+	                        true);
+#endif
 }
 /*[[[end:wspawnlpe]]]*/
 
@@ -484,33 +778,66 @@ NOTHROW_RPC(VLIBDCALL libd_wspawnlpe)(int mode,
                                       ... /*, (wchar_t *)NULL, wchar_t **environ*/)
 /*[[[body:DOS$wspawnlpe]]]*/
 {
-	CRT_UNIMPLEMENTED("wspawnlpe"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+#if defined(__i386__) && !defined(__x86_64__)
+	char16_t **envp = (char16_t **)&args;
+	while (*envp++)
+		; /* Envp is located 1 after the first NULL-entry */
+	return libc_do_c16spawn(mode, file,
+	                        (char16_t const *const *)&args,
+	                        (char16_t const *const *)envp,
+	                        true);
+#else
+	va_list vargs;
+	char16_t **vector, **envp;
+	va_start(vargs, args);
+	CAPTURE_VARARGS(char16_t, vector, vargs);
+	envp = va_arg(vargs, char16_t **);
+	va_end(vargs);
+	return libc_do_c16spawn(mode, file,
+	                        (char16_t const *const *)vector,
+	                        (char16_t const *const *)envp,
+	                        true);
+#endif
 }
 /*[[[end:DOS$wspawnlpe]]]*/
 
-/*[[[head:wsystem,hash:0x2c775b19]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.wchar.fs.exec.system.wsystem") int
+/*[[[head:wsystem,hash:0x87fc0a01]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.wchar.fs.exec.system.wsystem") int
 NOTHROW_RPC(LIBCCALL libc_wsystem)(char32_t const *cmd)
 /*[[[body:wsystem]]]*/
 {
-	CRT_UNIMPLEMENTED("wsystem"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	int result;
+	char *used_cmd;
+	if (!cmd) {
+		result = system(NULL);
+	} else {
+		used_cmd = libc_uchar_c32tombs(cmd);
+		if unlikely(!used_cmd)
+			return -1;
+		result = system(used_cmd);
+		libc_uchar_free(used_cmd);
+	}
+	return result;
 }
 /*[[[end:wsystem]]]*/
 
-/*[[[head:DOS$wsystem,hash:0x5cd8b1f3]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.exec.system.wsystem") int
+/*[[[head:DOS$wsystem,hash:0x5438b134]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.exec.system.wsystem") int
 NOTHROW_RPC(LIBDCALL libd_wsystem)(char16_t const *cmd)
 /*[[[body:DOS$wsystem]]]*/
 {
-	CRT_UNIMPLEMENTED("wsystem"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	int result;
+	char *used_cmd;
+	if (!cmd) {
+		result = system(NULL);
+	} else {
+		used_cmd = libc_uchar_c16tombs(cmd);
+		if unlikely(!used_cmd)
+			return -1;
+		result = system(used_cmd);
+		libc_uchar_free(used_cmd);
+	}
+	return result;
 }
 /*[[[end:DOS$wsystem]]]*/
 

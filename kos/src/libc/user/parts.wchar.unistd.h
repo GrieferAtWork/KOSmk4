@@ -1,4 +1,4 @@
-/* HASH 0x338c58b8 */
+/* HASH 0xe1d3080a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -157,6 +157,12 @@ INTDEF NONNULL((2, 3)) ssize_t NOTHROW_RPC(LIBCCALL libc_wfreadlinkat)(fd_t dfd,
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
  * @param flags: Set of `AT_DOSPATH|AT_READLINK_REQSIZE' */
 INTDEF NONNULL((2, 3)) ssize_t NOTHROW_RPC(LIBDCALL libd_wfreadlinkat)(fd_t dfd, char16_t const *__restrict path, char16_t *__restrict buf, size_t buflen, atflag_t flags);
+/* >> wunlinkat(2)
+ * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
+INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_wunlinkat)(fd_t dfd, char32_t const *name, atflag_t flags);
+/* >> wunlinkat(2)
+ * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
+INTDEF NONNULL((2)) int NOTHROW_RPC(LIBDCALL libd_wunlinkat)(fd_t dfd, char16_t const *name, atflag_t flags);
 /* >> wlchown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER',
  * but don't reference it if that file is a symbolic link */

@@ -37,8 +37,27 @@ __SYSDECL_BEGIN
 
 }
 
-%[define_wchar_replacement(@__TWARGV@ = char16_t const *const *__restrict argv, char32_t const *const *__restrict argv)]
-%[define_wchar_replacement(@__TWENVP@ = char16_t const *const *__restrict envp, char32_t const *const *__restrict envp)]
+%(user){
+#ifndef __T16ARGV
+#ifdef __USE_DOS
+#   define __T16ARGV char16_t const *const *__restrict ___argv
+#   define __T16ENVP char16_t const *const *__restrict ___envp
+#else /* __USE_DOS */
+#   define __T16ARGV char16_t *const ___argv[__restrict_arr]
+#   define __T16ENVP char16_t *const ___envp[__restrict_arr]
+#endif /* !__USE_DOS */
+#endif /* !__T16ARGV */
+#ifndef __T32ARGV
+#ifdef __USE_DOS
+#   define __T32ARGV char32_t const *const *__restrict ___argv
+#   define __T32ENVP char32_t const *const *__restrict ___envp
+#else /* __USE_DOS */
+#   define __T32ARGV char32_t *const ___argv[__restrict_arr]
+#   define __T32ENVP char32_t *const ___envp[__restrict_arr]
+#endif /* !__USE_DOS */
+#endif /* !__T32ARGV */
+}
+
 %#ifndef __TWARGV
 %#ifdef __USE_DOS
 %#   define __TWARGV wchar_t const *const *__restrict ___argv
@@ -51,13 +70,13 @@ __SYSDECL_BEGIN
 
 %[default_impl_section({.text.crt.wchar.fs.exec.exec|.text.crt.dos.wchar.fs.exec.exec})]
 [cp][wchar][guard][argument_names(path, ___argv)][dosname(_wexecv)]
-wexecv:([nonnull] wchar_t const *__restrict path, [nonnull] @__TWARGV@) -> int;
+wexecv:([nonnull] wchar_t const *__restrict path, [nonnull] __TWARGV) -> int;
 [cp][wchar][guard][argument_names(path, ___argv, ___envp)][dosname(_wexecve)]
-wexecve:([nonnull] wchar_t const *__restrict path, [nonnull] @__TWARGV@, [nonnull] @__TWENVP@) -> int;
+wexecve:([nonnull] wchar_t const *__restrict path, [nonnull] __TWARGV, [nonnull] __TWENVP) -> int;
 [cp][wchar][guard][argument_names(path, ___argv)][dosname(_wexecvp)]
-wexecvp:([nonnull] wchar_t const *__restrict file, [nonnull] @__TWARGV@) -> int;
+wexecvp:([nonnull] wchar_t const *__restrict file, [nonnull] __TWARGV) -> int;
 [cp][wchar][guard][argument_names(path, ___argv, ___envp)][dosname(_wexecvpe)]
-wexecvpe:([nonnull] wchar_t const *__restrict file, [nonnull] @__TWARGV@, [nonnull] @__TWENVP@) -> int;
+wexecvpe:([nonnull] wchar_t const *__restrict file, [nonnull] __TWARGV, [nonnull] __TWENVP) -> int;
 
 [cp][wchar][guard][dependency_include(<parts/redirect-exec.h>)]
 [requires($has_function(wexecv))][ATTR_SENTINEL][dosname(_wexecl)][allow_macros]
@@ -83,13 +102,13 @@ wexeclpe:([nonnull] wchar_t const *__restrict file, wchar_t const *args, ... /*,
 
 %[default_impl_section({.text.crt.wchar.fs.exec.spawn|.text.crt.dos.wchar.fs.exec.spawn})]
 [cp][wchar][guard][argument_names(mode, path, ___argv)][dosname(_wspawnv)]
-wspawnv:(int mode, [nonnull] wchar_t const *__restrict path, [nonnull] @__TWARGV@) -> $pid_t;
+wspawnv:(int mode, [nonnull] wchar_t const *__restrict path, [nonnull] __TWARGV) -> $pid_t;
 [cp][wchar][guard][argument_names(mode, path, ___argv, ___envp)][dosname(_wspawnve)]
-wspawnve:(int mode, [nonnull] wchar_t const *__restrict path, [nonnull] @__TWARGV@, [nonnull] @__TWENVP@) -> $pid_t;
+wspawnve:(int mode, [nonnull] wchar_t const *__restrict path, [nonnull] __TWARGV, [nonnull] __TWENVP) -> $pid_t;
 [cp][wchar][guard][argument_names(mode, file, ___argv)][dosname(_wspawnvp)]
-wspawnvp:(int mode, [nonnull] wchar_t const *__restrict file, [nonnull] @__TWARGV@) -> $pid_t;
+wspawnvp:(int mode, [nonnull] wchar_t const *__restrict file, [nonnull] __TWARGV) -> $pid_t;
 [cp][wchar][guard][argument_names(mode, file, ___argv, ___envp)][dosname(_wspawnvpe)]
-wspawnvpe:(int mode, [nonnull] wchar_t const *__restrict file, [nonnull] @__TWARGV@, [nonnull] @__TWENVP@) -> $pid_t;
+wspawnvpe:(int mode, [nonnull] wchar_t const *__restrict file, [nonnull] __TWARGV, [nonnull] __TWENVP) -> $pid_t;
 
 [cp][wchar][guard][dependency_include(<parts/redirect-exec.h>)]
 [requires($has_function(wspawnv))][ATTR_SENTINEL][dosname(_wspawnl)][allow_macros]
@@ -114,7 +133,7 @@ wspawnlpe:(int mode, [nonnull] wchar_t const *__restrict file, wchar_t const *ar
 
 [cp][wchar][guard][dosname(_wsystem)]
 [section({.text.crt.wchar.fs.exec.system|.text.crt.dos.wchar.fs.exec.system})]
-wsystem:([nonnull] wchar_t const *cmd) -> int;
+wsystem:([nullable] wchar_t const *cmd) -> int;
 
 
 %{

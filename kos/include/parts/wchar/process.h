@@ -1,4 +1,4 @@
-/* HASH 0xf6d66e6a */
+/* HASH 0xd8f3316a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,9 +52,9 @@ __SYSDECL_BEGIN
 #ifndef __wexecv_defined
 #define __wexecv_defined 1
 #if defined(__CRT_HAVE_wexecv)
-__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,wexecv,(wchar_t const *__restrict __path, __TWARGV),(__path, ___argv))
+__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,wexecv,(wchar_t const *__restrict __path, __TWARGV),(__path,____TWARGV))
 #elif defined(__CRT_HAVE__wexecv)
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,wexecv,(wchar_t const *__restrict __path, __TWARGV),_wexecv,(__path, ___argv))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,wexecv,(wchar_t const *__restrict __path, __TWARGV),_wexecv,(__path,____TWARGV))
 #else /* LIBC: wexecv */
 #undef __wexecv_defined
 #endif /* wexecv... */
@@ -62,9 +62,9 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,wexecv,(wchar_t const *__re
 #ifndef __wexecve_defined
 #define __wexecve_defined 1
 #if defined(__CRT_HAVE_wexecve)
-__CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,wexecve,(wchar_t const *__restrict __path, __TWARGV, __TWENVP),(__path, ___argv, ___envp))
+__CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,wexecve,(wchar_t const *__restrict __path, __TWARGV, __TWENVP),(__path,____TWARGV,____TWENVP))
 #elif defined(__CRT_HAVE__wexecve)
-__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,wexecve,(wchar_t const *__restrict __path, __TWARGV, __TWENVP),_wexecve,(__path, ___argv, ___envp))
+__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,wexecve,(wchar_t const *__restrict __path, __TWARGV, __TWENVP),_wexecve,(__path,____TWARGV,____TWENVP))
 #else /* LIBC: wexecve */
 #undef __wexecve_defined
 #endif /* wexecve... */
@@ -72,9 +72,9 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,wexecve,(wchar_t const *
 #ifndef __wexecvp_defined
 #define __wexecvp_defined 1
 #if defined(__CRT_HAVE_wexecvp)
-__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,wexecvp,(wchar_t const *__restrict __file, __TWARGV),(__file, ___argv))
+__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,wexecvp,(wchar_t const *__restrict __file, __TWARGV),(__file,____TWARGV))
 #elif defined(__CRT_HAVE__wexecvp)
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,wexecvp,(wchar_t const *__restrict __file, __TWARGV),_wexecvp,(__file, ___argv))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,wexecvp,(wchar_t const *__restrict __file, __TWARGV),_wexecvp,(__file,____TWARGV))
 #else /* LIBC: wexecvp */
 #undef __wexecvp_defined
 #endif /* wexecvp... */
@@ -82,9 +82,9 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,wexecvp,(wchar_t const *__r
 #ifndef __wexecvpe_defined
 #define __wexecvpe_defined 1
 #if defined(__CRT_HAVE_wexecvpe)
-__CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,wexecvpe,(wchar_t const *__restrict __file, __TWARGV, __TWENVP),(__file, ___argv, ___envp))
+__CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,wexecvpe,(wchar_t const *__restrict __file, __TWARGV, __TWENVP),(__file,____TWARGV,____TWENVP))
 #elif defined(__CRT_HAVE__wexecvpe)
-__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,wexecvpe,(wchar_t const *__restrict __file, __TWARGV, __TWENVP),_wexecvpe,(__file, ___argv, ___envp))
+__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,wexecvpe,(wchar_t const *__restrict __file, __TWARGV, __TWENVP),_wexecvpe,(__file,____TWARGV,____TWENVP))
 #else /* LIBC: wexecvpe */
 #undef __wexecvpe_defined
 #endif /* wexecvpe... */
@@ -160,9 +160,9 @@ __NAMESPACE_LOCAL_USING(wexeclpe)
 #ifndef __wspawnv_defined
 #define __wspawnv_defined 1
 #if defined(__CRT_HAVE_wspawnv)
-__CDECLARE(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,wspawnv,(int __mode, wchar_t const *__restrict __path, __TWARGV),(__mode,__path, ___argv))
+__CDECLARE(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,wspawnv,(int __mode, wchar_t const *__restrict __path, __TWARGV),(__mode,__path,____TWARGV))
 #elif defined(__CRT_HAVE__wspawnv)
-__CREDIRECT(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,wspawnv,(int __mode, wchar_t const *__restrict __path, __TWARGV),_wspawnv,(__mode,__path, ___argv))
+__CREDIRECT(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,wspawnv,(int __mode, wchar_t const *__restrict __path, __TWARGV),_wspawnv,(__mode,__path,____TWARGV))
 #else /* LIBC: wspawnv */
 #undef __wspawnv_defined
 #endif /* wspawnv... */
@@ -170,9 +170,9 @@ __CREDIRECT(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,wspawnv,(int __mode, wc
 #ifndef __wspawnve_defined
 #define __wspawnve_defined 1
 #if defined(__CRT_HAVE_wspawnve)
-__CDECLARE(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,wspawnve,(int __mode, wchar_t const *__restrict __path, __TWARGV, __TWENVP),(__mode,__path, ___argv, ___envp))
+__CDECLARE(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,wspawnve,(int __mode, wchar_t const *__restrict __path, __TWARGV, __TWENVP),(__mode,__path,____TWARGV,____TWENVP))
 #elif defined(__CRT_HAVE__wspawnve)
-__CREDIRECT(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,wspawnve,(int __mode, wchar_t const *__restrict __path, __TWARGV, __TWENVP),_wspawnve,(__mode,__path, ___argv, ___envp))
+__CREDIRECT(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,wspawnve,(int __mode, wchar_t const *__restrict __path, __TWARGV, __TWENVP),_wspawnve,(__mode,__path,____TWARGV,____TWENVP))
 #else /* LIBC: wspawnve */
 #undef __wspawnve_defined
 #endif /* wspawnve... */
@@ -180,9 +180,9 @@ __CREDIRECT(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,wspawnve,(int __mode
 #ifndef __wspawnvp_defined
 #define __wspawnvp_defined 1
 #if defined(__CRT_HAVE_wspawnvp)
-__CDECLARE(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,wspawnvp,(int __mode, wchar_t const *__restrict __file, __TWARGV),(__mode,__file, ___argv))
+__CDECLARE(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,wspawnvp,(int __mode, wchar_t const *__restrict __file, __TWARGV),(__mode,__file,____TWARGV))
 #elif defined(__CRT_HAVE__wspawnvp)
-__CREDIRECT(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,wspawnvp,(int __mode, wchar_t const *__restrict __file, __TWARGV),_wspawnvp,(__mode,__file, ___argv))
+__CREDIRECT(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,wspawnvp,(int __mode, wchar_t const *__restrict __file, __TWARGV),_wspawnvp,(__mode,__file,____TWARGV))
 #else /* LIBC: wspawnvp */
 #undef __wspawnvp_defined
 #endif /* wspawnvp... */
@@ -190,9 +190,9 @@ __CREDIRECT(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,wspawnvp,(int __mode, w
 #ifndef __wspawnvpe_defined
 #define __wspawnvpe_defined 1
 #if defined(__CRT_HAVE_wspawnvpe)
-__CDECLARE(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,wspawnvpe,(int __mode, wchar_t const *__restrict __file, __TWARGV, __TWENVP),(__mode,__file, ___argv, ___envp))
+__CDECLARE(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,wspawnvpe,(int __mode, wchar_t const *__restrict __file, __TWARGV, __TWENVP),(__mode,__file,____TWARGV,____TWENVP))
 #elif defined(__CRT_HAVE__wspawnvpe)
-__CREDIRECT(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,wspawnvpe,(int __mode, wchar_t const *__restrict __file, __TWARGV, __TWENVP),_wspawnvpe,(__mode,__file, ___argv, ___envp))
+__CREDIRECT(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,wspawnvpe,(int __mode, wchar_t const *__restrict __file, __TWARGV, __TWENVP),_wspawnvpe,(__mode,__file,____TWARGV,____TWENVP))
 #else /* LIBC: wspawnvpe */
 #undef __wspawnvpe_defined
 #endif /* wspawnvpe... */
@@ -268,9 +268,9 @@ __NAMESPACE_LOCAL_USING(wspawnlpe)
 #ifndef __wsystem_defined
 #define __wsystem_defined 1
 #if defined(__CRT_HAVE_wsystem)
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wsystem,(wchar_t const *__cmd),(__cmd))
+__CDECLARE(,int,__NOTHROW_RPC,wsystem,(wchar_t const *__cmd),(__cmd))
 #elif defined(__CRT_HAVE__wsystem)
-__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wsystem,(wchar_t const *__cmd),_wsystem,(__cmd))
+__CREDIRECT(,int,__NOTHROW_RPC,wsystem,(wchar_t const *__cmd),_wsystem,(__cmd))
 #else /* LIBC: wsystem */
 #undef __wsystem_defined
 #endif /* wsystem... */

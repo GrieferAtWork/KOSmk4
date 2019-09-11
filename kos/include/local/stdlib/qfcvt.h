@@ -1,4 +1,4 @@
-/* HASH 0x8f183aa9 */
+/* HASH 0x15274ae7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(qfcvt))(long double __val,
                                                    int __ndigit,
                                                    int *__restrict __decptr,
                                                    int *__restrict __sign) {
-#line 1028 "kos/src/libc/magic/stdlib.c"
+#line 1027 "kos/src/libc/magic/stdlib.c"
 	if (__localdep_qfcvt_r(__val, __ndigit, __decptr, __sign, __NAMESPACE_LOCAL_SYM __qcvt_buffer, sizeof(__NAMESPACE_LOCAL_SYM __qcvt_buffer)))
 		return __NULLPTR;
 	return __NAMESPACE_LOCAL_SYM __qcvt_buffer;

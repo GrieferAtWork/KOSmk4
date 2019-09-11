@@ -1852,12 +1852,16 @@ __NAMESPACE_LOCAL_END
 %#endif /* __USE_POSIX */
 
 
-
-
 %{
 
 #endif /* __CC__ */
 
 __SYSDECL_END
+
+#ifdef __USE_UTF
+#if defined(_UCHAR_H) && !defined(_PARTS_UCHAR_TIME_H)
+#include <parts/uchar/time.h>
+#endif
+#endif /* __USE_UTF */
 
 }

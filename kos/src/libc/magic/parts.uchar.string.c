@@ -124,8 +124,8 @@ __SYSDECL_BEGIN
 [attribute(*)] c16pbrk:(*) %{uchar(wcspbrk)}
 [attribute(*)] c32pbrk:(*) %{uchar(wcspbrk)}
 
-[attribute(*)] c16tok:(*) %{uchar(wcstok)}
-[attribute(*)] c32tok:(*) %{uchar(wcstok)}
+[guard][attribute(*)] c16tok:(*) %{uchar(wcstok)}
+[guard][attribute(*)] c32tok:(*) %{uchar(wcstok)}
 
 [attribute(*)] c16sep:(*) %{uchar(wcssep)}
 [attribute(*)] c32sep:(*) %{uchar(wcssep)}
@@ -329,16 +329,6 @@ __SYSDECL_BEGIN
 [attribute(*)] wildc32casecmp_l:(*) %{uchar(wildwcscasecmp_l)}
 
 %#endif /* __USE_XOPEN2K8 */
-
-
-[attribute(*)] c16to32:(*) %{uchar16(wcsto32)}
-[attribute(*)] c32to32:(*) %{uchar32(wcsto32)}
-[attribute(*)] c16tou32:(*) %{uchar16(wcstou32)}
-[attribute(*)] c32tou32:(*) %{uchar32(wcstou32)}
-[attribute(*)] c16to64:(*) %{uchar16(wcsto64)}
-[attribute(*)] c32to64:(*) %{uchar32(wcsto64)}
-[attribute(*)] c16tou64:(*) %{uchar16(wcstou64)}
-[attribute(*)] c32tou64:(*) %{uchar32(wcstou64)}
 
 
 %{

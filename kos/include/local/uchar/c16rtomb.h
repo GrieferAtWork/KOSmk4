@@ -1,4 +1,4 @@
-/* HASH 0x85d38a31 */
+/* HASH 0x50256bb8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ __LOCAL_LIBC(c16rtomb) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(c16rtomb))(char *__restrict __s,
                                                       __CHAR16_TYPE__ __c16,
                                                       __mbstate_t *__restrict __mbs) {
-#line 147 "kos/src/libc/magic/uchar.c"
+#line 151 "kos/src/libc/magic/uchar.c"
 	__CHAR32_TYPE__ __ch32;
 	if (!__s) {
 		if (__mbs)

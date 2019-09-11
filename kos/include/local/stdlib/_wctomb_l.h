@@ -1,4 +1,4 @@
-/* HASH 0x8c0be1dd */
+/* HASH 0xbc1c427f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ __LOCAL_LIBC(_wctomb_l) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wctomb_l))(char *__buf,
                                                        __WCHAR_TYPE__ __wc,
                                                        __locale_t __locale) {
-#line 2133 "kos/src/libc/magic/stdlib.c"
+#line 2132 "kos/src/libc/magic/stdlib.c"
 	(void)__locale;
 	return __localdep_wctomb(__buf, __wc);
 }

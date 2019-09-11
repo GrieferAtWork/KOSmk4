@@ -23,6 +23,7 @@
 
 #include "../api.h"
 /**/
+#include "../libc/capture-varargs.h"
 
 #include <hybrid/align.h>
 #include <hybrid/host.h>
@@ -124,35 +125,6 @@ NOTHROW_RPC(LIBCCALL libc_execvp)(char const *__restrict file,
 }
 /*[[[end:execvp]]]*/
 
-#define CAPTURE_VARARGS(vector, args, err, err_vector)                                       \
-	{                                                                                        \
-		size_t count = 0, alloc = 7;                                                         \
-		char *arg;                                                                           \
-		/* TODO: Can't use malloc(). - Might corrupt heap in vfork() scenario */             \
-		vector = (char **)malloc(8 * sizeof(char *));                                        \
-		if unlikely(!vector)                                                                 \
-			goto err;                                                                        \
-		while ((arg = va_arg(args, char *)) != NULL) {                                       \
-			if (count >= alloc) {                                                            \
-				char **new_vector;                                                           \
-				size_t new_alloc;                                                            \
-				new_alloc  = ((alloc + 1) * 2) - 1;                                          \
-				new_vector = (char **)realloc(vector, (new_alloc + 1) * sizeof(char *));     \
-				if unlikely(!new_vector) {                                                   \
-					new_alloc  = count + 1;                                                  \
-					new_vector = (char **)realloc(vector, (new_alloc + 1) * sizeof(char *)); \
-					if unlikely(!new_vector)                                                 \
-						goto err_vector;                                                     \
-				}                                                                            \
-				vector = new_vector;                                                         \
-				alloc  = new_alloc;                                                          \
-			}                                                                                \
-			vector[count] = arg;                                                             \
-			++count;                                                                         \
-		}                                                                                    \
-		vector[count] = NULL;                                                                \
-	}
-
 
 /*[[[head:execl,hash:0xec79d4b7]]]*/
 /* >> execl(3)
@@ -172,14 +144,10 @@ NOTHROW_RPC(VLIBCCALL libc_execl)(char const *__restrict path,
 	va_list vargs;
 	char **vector;
 	va_start(vargs, args);
-	CAPTURE_VARARGS(vector, vargs, err, err_vector)
+	CAPTURE_VARARGS(char, vector, vargs);
 	va_end(vargs);
-	execv(path,
-	      (char const *const *)vector);
-err_vector:
-	free(vector);
-err:
-	return -1;
+	return execv(path,
+	             (char const *const *)vector);
 #endif
 }
 /*[[[end:execl]]]*/
@@ -206,16 +174,12 @@ NOTHROW_RPC(VLIBCCALL libc_execle)(char const *__restrict path,
 	va_list vargs;
 	char **vector, **envp;
 	va_start(vargs, args);
-	CAPTURE_VARARGS(vector, vargs, err, err_vector)
+	CAPTURE_VARARGS(char, vector, vargs);
 	envp = va_arg(vargs, char **);
 	va_end(vargs);
-	execve(path,
-	       (char const *const *)vector,
-	       (char const *const *)envp);
-err_vector:
-	free(vector);
-err:
-	return -1;
+	return execve(path,
+	              (char const *const *)vector,
+	              (char const *const *)envp);
 #endif
 }
 /*[[[end:execle]]]*/
@@ -238,14 +202,10 @@ NOTHROW_RPC(VLIBCCALL libc_execlp)(char const *__restrict file,
 	va_list vargs;
 	char **vector;
 	va_start(vargs, args);
-	CAPTURE_VARARGS(vector, vargs, err, err_vector)
+	CAPTURE_VARARGS(char, vector, vargs);
 	va_end(vargs);
-	execvp(file,
-	       (char const *const *)vector);
-err_vector:
-	free(vector);
-err:
-	return -1;
+	return execvp(file,
+	              (char const *const *)vector);
 #endif
 }
 /*[[[end:execlp]]]*/
@@ -329,16 +289,12 @@ NOTHROW_RPC(VLIBCCALL libc_execlpe)(char const *__restrict file,
 	va_list vargs;
 	char **vector, **envp;
 	va_start(vargs, args);
-	CAPTURE_VARARGS(vector, vargs, err, err_vector)
+	CAPTURE_VARARGS(char, vector, vargs);
 	envp = va_arg(vargs, char **);
 	va_end(vargs);
-	execvpe(file,
-	        (char const *const *)vector,
-	        (char const *const *)envp);
-err_vector:
-	free(vector);
-err:
-	return -1;
+	return execvpe(file,
+	               (char const *const *)vector,
+	               (char const *const *)envp);
 #endif
 }
 /*[[[end:execlpe]]]*/
@@ -969,7 +925,11 @@ NOTHROW_RPC(LIBCCALL libc_unlink)(char const *file)
 /*[[[body:unlink]]]*/
 {
 	errno_t result;
+#ifdef __NR_unlink
 	result = sys_unlink(file);
+#else /* __NR_unlink */
+	result = sys_unlinkat(AT_FDCWD, file, 0);
+#endif /* !__NR_unlink */
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:unlink]]]*/
@@ -983,7 +943,11 @@ NOTHROW_RPC(LIBCCALL libc_rmdir)(char const *path)
 /*[[[body:rmdir]]]*/
 {
 	errno_t result;
+#ifdef __NR_rmdir
 	result = sys_rmdir(path);
+#else /* __NR_rmdir */
+	result = sys_unlinkat(AT_FDCWD, path, AT_REMOVEDIR);
+#endif /* !__NR_rmdir */
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:rmdir]]]*/

@@ -52,6 +52,7 @@ __SYSDECL_BEGIN
 [wchar][attribute(*)][dosname(_wrmdir)] wrmdir:(*) %{copy(rmdir, str2wcs)}
 
 
+
 %#ifdef __USE_GNU
 [wchar][attribute(*)] weuidaccess:(*) %{copy(euidaccess, str2wcs)}
 [wchar][attribute(*)] weaccess:(*) = weuidaccess;
@@ -67,6 +68,7 @@ __SYSDECL_BEGIN
 %#ifdef __USE_KOS
 [wchar][attribute(*)] wfreadlinkat:(*) %{copy(freadlinkat, str2wcs)}
 %#endif /* __USE_KOS */
+[wchar][attribute(*)] wunlinkat:(*) %{copy(unlinkat, str2wcs)}
 %#endif /* __USE_ATFILE */
 
 [wchar][attribute(*)] wlchown:(*) %{copy(lchown, str2wcs)}

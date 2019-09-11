@@ -1,4 +1,4 @@
-/* HASH 0x4977cea0 */
+/* HASH 0x1689f1fd */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,9 +25,9 @@
 #ifndef ____localdep_wspawnvp_defined
 #define ____localdep_wspawnvp_defined 1
 #if defined(__CRT_HAVE_wspawnvp)
-__CREDIRECT(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_wspawnvp,(int __mode, __WCHAR_TYPE__ const *__restrict __file, __TWARGV),wspawnvp,(__mode,__file, ___argv))
+__CREDIRECT(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_wspawnvp,(int __mode, __WCHAR_TYPE__ const *__restrict __file, __TWARGV),wspawnvp,(__mode,__file,____TWARGV))
 #elif defined(__CRT_HAVE__wspawnvp)
-__CREDIRECT(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_wspawnvp,(int __mode, __WCHAR_TYPE__ const *__restrict __file, __TWARGV),_wspawnvp,(__mode,__file, ___argv))
+__CREDIRECT(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_wspawnvp,(int __mode, __WCHAR_TYPE__ const *__restrict __file, __TWARGV),_wspawnvp,(__mode,__file,____TWARGV))
 #else /* LIBC: wspawnvp */
 #undef ____localdep_wspawnvp_defined
 #endif /* wspawnvp... */
@@ -39,7 +39,7 @@ __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(wspawnlp))(int __mode,
                                                        __WCHAR_TYPE__ const *__restrict __file,
                                                        __WCHAR_TYPE__ const *__args,
                                                        ... /*, (wchar_t *)NULL*/) {
-#line 107 "kos/src/libc/magic/parts.wchar.process.c"
+#line 126 "kos/src/libc/magic/parts.wchar.process.c"
 	__REDIRECT_SPAWNLP(__WCHAR_TYPE__, __localdep_wspawnvp, __mode, __file, __args)
 }
 __NAMESPACE_LOCAL_END

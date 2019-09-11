@@ -1,4 +1,4 @@
-/* HASH 0x14aad82b */
+/* HASH 0x97877ec0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,7 +44,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_vsprintf_l))(char *__restrict __buf,
                                                          char const *__restrict __format,
                                                          __locale_t __locale,
                                                          __builtin_va_list __args) {
-#line 2175 "kos/src/libc/magic/stdio.c"
+#line 2177 "kos/src/libc/magic/stdio.c"
 	(void)__locale;
 	return __localdep_vsprintf(__buf, __format, __args);
 }

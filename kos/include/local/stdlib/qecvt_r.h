@@ -1,4 +1,4 @@
-/* HASH 0xca492d69 */
+/* HASH 0x24b43c5c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(qecvt_r))(long double __val,
                                                      int *__restrict __sign,
                                                      char *__restrict __buf,
                                                      __SIZE_TYPE__ __len) {
-#line 988 "kos/src/libc/magic/stdlib.c"
+#line 987 "kos/src/libc/magic/stdlib.c"
 #if defined(__CRT_HAVE__ecvt_s) && !defined(__BUILDING_LIBC)
 	return __localdep_dos_ecvt_s(__buf, __len, (double)__val, __ndigit, __decptr, __sign) ? -1 : 0;
 #else

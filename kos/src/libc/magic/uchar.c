@@ -24,6 +24,10 @@
 %[define_replacement(char32_t = __CHAR32_TYPE__)]
 %[default_impl_section(.text.crt.unicode.mbr)]
 
+%[declare_known_section(.text.crt.wchar.unicode.convert)]
+%[declare_known_section(.text.crt.dos.wchar.unicode.convert)]
+
+
 %{
 #include <features.h>
 #include <hybrid/typecore.h>
@@ -242,6 +246,10 @@ __SYSDECL_END
 
 #if defined(_STDIO_H) && !defined(_PARTS_UCHAR_STDIO_H)
 #include <parts/uchar/stdio.h>
+#endif
+
+#if defined(_TIME_H) && !defined(_PARTS_UCHAR_TIME_H)
+#include <parts/uchar/time.h>
 #endif
 
 #if defined(_SYS_STAT_H) && !defined(_PARTS_UCHAR_SYS_STAT_H)

@@ -1,4 +1,4 @@
-/* HASH 0xe0666a90 */
+/* HASH 0x803b44f5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -574,7 +574,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wcstombs, __FORCELOCAL size_t __NOTHROW_NCX(__LI
 #ifdef __system_defined
 __NAMESPACE_GLB_USING(system)
 #elif defined(__CRT_HAVE_system)
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,system,(char const *__restrict __command),(__command))
+__CDECLARE(,int,__NOTHROW_RPC,system,(char const *__restrict __command),(__command))
 #else /* LIBC: system */
 #undef __std_system_defined
 #endif /* system... */

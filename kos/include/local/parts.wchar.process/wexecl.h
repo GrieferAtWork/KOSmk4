@@ -1,4 +1,4 @@
-/* HASH 0xf254640b */
+/* HASH 0xb96c8cc2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,9 +25,9 @@
 #ifndef ____localdep_wexecv_defined
 #define ____localdep_wexecv_defined 1
 #if defined(__CRT_HAVE_wexecv)
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_wexecv,(__WCHAR_TYPE__ const *__restrict __path, __TWARGV),wexecv,(__path, ___argv))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_wexecv,(__WCHAR_TYPE__ const *__restrict __path, __TWARGV),wexecv,(__path,____TWARGV))
 #elif defined(__CRT_HAVE__wexecv)
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_wexecv,(__WCHAR_TYPE__ const *__restrict __path, __TWARGV),_wexecv,(__path, ___argv))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_wexecv,(__WCHAR_TYPE__ const *__restrict __path, __TWARGV),_wexecv,(__path,____TWARGV))
 #else /* LIBC: wexecv */
 #undef ____localdep_wexecv_defined
 #endif /* wexecv... */
@@ -38,7 +38,7 @@ __LOCAL_LIBC(wexecl) __ATTR_SENTINEL __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(wexecl))(__WCHAR_TYPE__ const *__restrict __path,
                                                      __WCHAR_TYPE__ const *__args,
                                                      ... /*, (wchar_t *)NULL*/) {
-#line 65 "kos/src/libc/magic/parts.wchar.process.c"
+#line 84 "kos/src/libc/magic/parts.wchar.process.c"
 	__REDIRECT_EXECL(__WCHAR_TYPE__, __localdep_wexecv, __path, __args)
 }
 __NAMESPACE_LOCAL_END

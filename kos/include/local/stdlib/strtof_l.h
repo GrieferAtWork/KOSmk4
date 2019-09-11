@@ -1,4 +1,4 @@
-/* HASH 0x8bdf5e6 */
+/* HASH 0xf30480b7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ __LOCAL_LIBC(strtof_l) __ATTR_NONNULL((1)) float
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtof_l))(char const *__restrict __nptr,
                                                       char **__endptr,
                                                       __locale_t __locale) {
-#line 1422 "kos/src/libc/magic/stdlib.c"
+#line 1421 "kos/src/libc/magic/stdlib.c"
 	(void)__locale;
 	return __localdep_strtof(__nptr, __endptr);
 }

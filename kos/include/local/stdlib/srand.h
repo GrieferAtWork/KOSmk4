@@ -1,4 +1,4 @@
-/* HASH 0xd079a615 */
+/* HASH 0xc473931 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(srand) void
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(srand))(long __seed) {
-#line 635 "kos/src/libc/magic/stdlib.c"
+#line 634 "kos/src/libc/magic/stdlib.c"
 	/* ... */
 }
 __NAMESPACE_LOCAL_END

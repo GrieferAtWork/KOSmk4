@@ -1,4 +1,4 @@
-/* HASH 0xced56a48 */
+/* HASH 0xdea7d674 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@ __LOCAL_LIBC(strtou64) __ATTR_LEAF __ATTR_NONNULL((1)) __UINT64_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtou64))(char const *__restrict __nptr,
                                                       char **__endptr,
                                                       int __base) {
-#line 854 "kos/src/libc/magic/stdlib.c"
+#line 853 "kos/src/libc/magic/stdlib.c"
 	__UINT64_TYPE__ __result, __temp;
 	if (!__base) {
 		if (*__nptr == '0') {

@@ -1,4 +1,4 @@
-/* HASH 0xb447590b */
+/* HASH 0x51fdf28 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_atoflt) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_atoflt))(float *__restrict __result,
                                                      char const *__restrict __nptr) {
-#line 2330 "kos/src/libc/magic/stdlib.c"
+#line 2329 "kos/src/libc/magic/stdlib.c"
 	*__result = __localdep_strtof(__nptr, __NULLPTR);
 	return 0;
 }

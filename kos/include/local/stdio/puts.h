@@ -1,4 +1,4 @@
-/* HASH 0xfc4222a2 */
+/* HASH 0x863f3e9a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -85,10 +85,10 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,,__localdep_fputc,(int __ch, __FILE *__restr
 __NAMESPACE_LOCAL_BEGIN
 /* Print a given string `STR', followed by a line-feed to `STDOUT' */
 __LOCAL_LIBC(puts) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T
-(__LIBCCALL __LIBC_LOCAL_NAME(puts))(char const *__restrict __str) __THROWS(...) {
-#line 537 "kos/src/libc/magic/stdio.c"
+(__LIBCCALL __LIBC_LOCAL_NAME(puts))(char const *__restrict __string) __THROWS(...) {
+#line 539 "kos/src/libc/magic/stdio.c"
 	__STDC_INT_AS_SSIZE_T __result, __temp;
-	__result = __localdep_fputs(__str, __stdout);
+	__result = __localdep_fputs(__string, __stdout);
 	if (__result >= 0) {
 		__temp = __localdep_fputc('\n', __stdout);
 		if (__temp <= 0)

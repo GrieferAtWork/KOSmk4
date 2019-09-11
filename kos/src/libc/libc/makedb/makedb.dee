@@ -372,7 +372,7 @@ print out: "#define UNICODE_FOLD_DESCRIPTORS    ","0x%x" % (#fold_descriptors);
 print out: "PRIVATE ATTR_SECTION(\".rodata.crt.unicode.UTF.fold_descriptors\")";
 print out: "struct unifold const fold_descriptors[" + #fold_descriptors + "] = {";
 for (local x: fold_descriptors) {
-	print out: "\t{ {",", ".join(for (local y: x) "0x%x" % y),"} },";
+	print out: "\t{ {", ", ".join(for (local y: x) "0x%x" % y), "} },";
 }
 print out: "};";
 print out:;

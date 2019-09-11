@@ -1,4 +1,4 @@
-/* HASH 0x2e510417 */
+/* HASH 0x3bb3cf72 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,13 +27,13 @@
 #define ____localdep_fputs_unlocked_defined 1
 #if __has_builtin(__builtin_fputs_unlocked) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fputs_unlocked)
 /* Same as `fputs()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
-__FORCELOCAL __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (__LIBCCALL __localdep_fputs_unlocked)(char const *__restrict __str, __FILE *__restrict __stream) __THROWS(...) { return __builtin_fputs_unlocked(__str, __stream); }
+__FORCELOCAL __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (__LIBCCALL __localdep_fputs_unlocked)(char const *__restrict __string, __FILE *__restrict __stream) __THROWS(...) { return __builtin_fputs_unlocked(__string, __stream); }
 #elif defined(__CRT_HAVE_fputs_unlocked)
 /* Same as `fputs()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,,__localdep_fputs_unlocked,(char const *__restrict __str, __FILE *__restrict __stream),fputs_unlocked,(__str,__stream)) __THROWS(...)
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,,__localdep_fputs_unlocked,(char const *__restrict __string, __FILE *__restrict __stream),fputs_unlocked,(__string,__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE_fputs)
 /* Same as `fputs()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,,__localdep_fputs_unlocked,(char const *__restrict __str, __FILE *__restrict __stream),fputs,(__str,__stream)) __THROWS(...)
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,,__localdep_fputs_unlocked,(char const *__restrict __string, __FILE *__restrict __stream),fputs,(__string,__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc)
 #include <local/stdio/fputs_unlocked.h>
 /* Same as `fputs()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
@@ -72,10 +72,10 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,,__localdep_fputc_unlocked,(int __ch, __FILE
 
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(puts_unlocked) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T
-(__LIBCCALL __LIBC_LOCAL_NAME(puts_unlocked))(char const *__restrict __str) __THROWS(...) {
-#line 1835 "kos/src/libc/magic/stdio.c"
+(__LIBCCALL __LIBC_LOCAL_NAME(puts_unlocked))(char const *__restrict __string) __THROWS(...) {
+#line 1837 "kos/src/libc/magic/stdio.c"
 	__STDC_INT_AS_SSIZE_T __result, __temp;
-	__result = __localdep_fputs_unlocked(__str, __stdout);
+	__result = __localdep_fputs_unlocked(__string, __stdout);
 	if (__result >= 0) {
 		__temp = __localdep_fputc_unlocked('\n', __stdout);
 		if (__temp <= 0)

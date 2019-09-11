@@ -1,4 +1,4 @@
-/* HASH 0x63bf8d31 */
+/* HASH 0xa356be07 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_putenv_s) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_putenv_s))(char const *__varname,
                                                        char const *__val) {
-#line 2443 "kos/src/libc/magic/stdlib.c"
+#line 2442 "kos/src/libc/magic/stdlib.c"
 	return __localdep_setenv(__varname, __val, 1) ? __libc_geterrno_or(__EINVAL) : 0;
 }
 __NAMESPACE_LOCAL_END

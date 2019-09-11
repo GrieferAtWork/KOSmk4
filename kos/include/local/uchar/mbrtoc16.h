@@ -1,4 +1,4 @@
-/* HASH 0x87174fe6 */
+/* HASH 0x3f1b3eb6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mbrtoc16))(__CHAR16_TYPE__ *__restric
                                                       char const *__restrict __s,
                                                       __SIZE_TYPE__ __n,
                                                       __mbstate_t *__restrict __mbs) {
-#line 92 "kos/src/libc/magic/uchar.c"
+#line 96 "kos/src/libc/magic/uchar.c"
 	__CHAR16_TYPE__ __c16;
 	__SIZE_TYPE__ __result;
 	if (!__s) {

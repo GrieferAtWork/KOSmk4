@@ -1,4 +1,4 @@
-/* HASH 0x69e667f0 */
+/* HASH 0xd832e668 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ NOTHROW_NCX(LIBCCALL libc_mbrtoc16)(char16_t *__restrict pc16,
                                     char const *__restrict s,
                                     size_t n,
                                     __mbstate_t *__restrict mbs) {
-#line 92 "kos/src/libc/magic/uchar.c"
+#line 96 "kos/src/libc/magic/uchar.c"
 	char16_t c16;
 	size_t result;
 	if (!s) {
@@ -65,7 +65,7 @@ NOTHROW_NCX(LIBCCALL libc_mbrtoc32)(char32_t *__restrict pc32,
                                     char const *__restrict s,
                                     size_t n,
                                     __mbstate_t *__restrict mbs) {
-#line 121 "kos/src/libc/magic/uchar.c"
+#line 125 "kos/src/libc/magic/uchar.c"
 	char32_t c32;
 	size_t result;
 	if (!s) {
@@ -93,7 +93,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unicode.mbr.c16rtomb") size_t
 NOTHROW_NCX(LIBCCALL libc_c16rtomb)(char *__restrict s,
                                     char16_t c16,
                                     __mbstate_t *__restrict mbs) {
-#line 147 "kos/src/libc/magic/uchar.c"
+#line 151 "kos/src/libc/magic/uchar.c"
 	char32_t ch32;
 	if (!s) {
 		if (mbs)
@@ -137,7 +137,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unicode.mbr.c32rtomb") size_t
 NOTHROW_NCX(LIBCCALL libc_c32rtomb)(char *__restrict s,
                                     char32_t c32,
                                     __mbstate_t *__restrict mbs) {
-#line 187 "kos/src/libc/magic/uchar.c"
+#line 191 "kos/src/libc/magic/uchar.c"
 	if (!s) {
 		if (mbs)
 			mbs->__word = __MBSTATE_TYPE_EMPTY;

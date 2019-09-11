@@ -1,4 +1,4 @@
-/* HASH 0x90a17cff */
+/* HASH 0x164e643b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_rotl) __ATTR_CONST unsigned int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(_rotl))(unsigned int __val,
                                                int __shift) {
-#line 2379 "kos/src/libc/magic/stdlib.c"
+#line 2378 "kos/src/libc/magic/stdlib.c"
 	return __hybrid_rol(__val, __shift);
 }
 __NAMESPACE_LOCAL_END

@@ -20,7 +20,13 @@
 #define GUARD_LIBC_USER_PARTS_WCHAR_UNISTD_C 1
 
 #include "../api.h"
+/**/
+
+#include "../libc/uchar.h"
 #include "parts.wchar.unistd.h"
+#include <unistd.h>
+#include <uchar.h>
+#include <fcntl.h>
 
 DECL_BEGIN
 
@@ -124,9 +130,14 @@ NOTHROW_RPC(LIBCCALL libc_wpathconf)(char32_t const *path,
                                      int name)
 /*[[[body:wpathconf]]]*/
 {
-	CRT_UNIMPLEMENTED("wpathconf"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	long int result;
+	char *used_path;
+	used_path = libc_uchar_c32tombs(path);
+	if unlikely(!used_path)
+		return -1;
+	result = pathconf(used_path, name);
+	libc_uchar_free(used_path);
+	return result;
 }
 /*[[[end:wpathconf]]]*/
 
@@ -140,9 +151,14 @@ NOTHROW_RPC(LIBDCALL libd_wpathconf)(char16_t const *path,
                                      int name)
 /*[[[body:DOS$wpathconf]]]*/
 {
-	CRT_UNIMPLEMENTED("wpathconf"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	long int result;
+	char *used_path;
+	used_path = libc_uchar_c16tombs(path);
+	if unlikely(!used_path)
+		return -1;
+	result = pathconf(used_path, name);
+	libc_uchar_free(used_path);
+	return result;
 }
 /*[[[end:DOS$wpathconf]]]*/
 
@@ -158,9 +174,24 @@ NOTHROW_RPC(LIBCCALL libc_wlinkat)(fd_t fromfd,
                                    atflag_t flags)
 /*[[[body:wlinkat]]]*/
 {
-	CRT_UNIMPLEMENTED("wlinkat"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	int result = -1;
+	char *used_from = NULL, *used_to = NULL;
+	if (from) {
+		used_from = libc_uchar_c32tombs(from);
+		if unlikely(!used_from)
+			goto done;
+	}
+	if (to) {
+		used_to = libc_uchar_c32tombs(to);
+		if unlikely(!used_to)
+			goto done_from;
+	}
+	result = linkat(fromfd, used_from, tofd, used_to, flags);
+	libc_uchar_free(used_to);
+done_from:
+	libc_uchar_free(used_from);
+done:
+	return result;
 }
 /*[[[end:wlinkat]]]*/
 
@@ -176,9 +207,24 @@ NOTHROW_RPC(LIBDCALL libd_wlinkat)(fd_t fromfd,
                                    atflag_t flags)
 /*[[[body:DOS$wlinkat]]]*/
 {
-	CRT_UNIMPLEMENTED("wlinkat"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	int result = -1;
+	char *used_from = NULL, *used_to = NULL;
+	if (from) {
+		used_from = libc_uchar_c16tombs(from);
+		if unlikely(!used_from)
+			goto done;
+	}
+	if (to) {
+		used_to = libc_uchar_c16tombs(to);
+		if unlikely(!used_to)
+			goto done_from;
+	}
+	result = linkat(fromfd, used_from, tofd, used_to, flags);
+	libc_uchar_free(used_to);
+done_from:
+	libc_uchar_free(used_from);
+done:
+	return result;
 }
 /*[[[end:DOS$wlinkat]]]*/
 
@@ -190,9 +236,14 @@ ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wchdir") int
 NOTHROW_RPC(LIBCCALL libc_wchdir)(char32_t const *path)
 /*[[[body:wchdir]]]*/
 {
-	CRT_UNIMPLEMENTED("wchdir"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	int result = -1;
+	char *used_path;
+	used_path = libc_uchar_c32tombs(path);
+	if likely(used_path) {
+		result = chdir(used_path);
+		libc_uchar_free(used_path);
+	}
+	return result;
 }
 /*[[[end:wchdir]]]*/
 
@@ -204,9 +255,14 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wchdir") int
 NOTHROW_RPC(LIBDCALL libd_wchdir)(char16_t const *path)
 /*[[[body:DOS$wchdir]]]*/
 {
-	CRT_UNIMPLEMENTED("wchdir"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	int result = -1;
+	char *used_path;
+	used_path = libc_uchar_c16tombs(path);
+	if likely(used_path) {
+		result = chdir(used_path);
+		libc_uchar_free(used_path);
+	}
+	return result;
 }
 /*[[[end:DOS$wchdir]]]*/
 
@@ -250,9 +306,14 @@ NOTHROW_RPC(LIBCCALL libc_wfaccessat)(fd_t dfd,
                                       atflag_t flags)
 /*[[[body:wfaccessat]]]*/
 {
-	CRT_UNIMPLEMENTED("wfaccessat"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	int result = -1;
+	char *used_file;
+	used_file = libc_uchar_c32tombs(file);
+	if likely(used_file) {
+		result = faccessat(dfd, used_file, type, flags);
+		libc_uchar_free(used_file);
+	}
+	return result;
 }
 /*[[[end:wfaccessat]]]*/
 
@@ -268,9 +329,14 @@ NOTHROW_RPC(LIBDCALL libd_wfaccessat)(fd_t dfd,
                                       atflag_t flags)
 /*[[[body:DOS$wfaccessat]]]*/
 {
-	CRT_UNIMPLEMENTED("wfaccessat"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	int result = -1;
+	char *used_file;
+	used_file = libc_uchar_c16tombs(file);
+	if likely(used_file) {
+		result = faccessat(dfd, used_file, type, flags);
+		libc_uchar_free(used_file);
+	}
+	return result;
 }
 /*[[[end:DOS$wfaccessat]]]*/
 
@@ -286,9 +352,14 @@ NOTHROW_RPC(LIBCCALL libc_wfchownat)(fd_t dfd,
                                      atflag_t flags)
 /*[[[body:wfchownat]]]*/
 {
-	CRT_UNIMPLEMENTED("wfchownat"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	int result = -1;
+	char *used_file;
+	used_file = libc_uchar_c32tombs(file);
+	if likely(used_file) {
+		result = fchownat(dfd, used_file, owner, group, flags);
+		libc_uchar_free(used_file);
+	}
+	return result;
 }
 /*[[[end:wfchownat]]]*/
 
@@ -304,9 +375,14 @@ NOTHROW_RPC(LIBDCALL libd_wfchownat)(fd_t dfd,
                                      atflag_t flags)
 /*[[[body:DOS$wfchownat]]]*/
 {
-	CRT_UNIMPLEMENTED("wfchownat"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	int result = -1;
+	char *used_file;
+	used_file = libc_uchar_c16tombs(file);
+	if likely(used_file) {
+		result = fchownat(dfd, used_file, owner, group, flags);
+		libc_uchar_free(used_file);
+	}
+	return result;
 }
 /*[[[end:DOS$wfchownat]]]*/
 
@@ -321,9 +397,20 @@ NOTHROW_RPC(LIBCCALL libc_wsymlinkat)(char32_t const *from,
                                       char32_t const *to)
 /*[[[body:wsymlinkat]]]*/
 {
-	CRT_UNIMPLEMENTED("wsymlinkat"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	int result = -1;
+	char *used_from, *used_to;
+	used_from = libc_uchar_c32tombs(from);
+	if unlikely(!used_from)
+		goto done;
+	used_to = libc_uchar_c32tombs(to);
+	if unlikely(!used_to)
+		goto done_from;
+	result = symlinkat(used_from, tofd, used_to);
+	libc_uchar_free(used_to);
+done_from:
+	libc_uchar_free(used_from);
+done:
+	return result;
 }
 /*[[[end:wsymlinkat]]]*/
 
@@ -338,9 +425,20 @@ NOTHROW_RPC(LIBDCALL libd_wsymlinkat)(char16_t const *from,
                                       char16_t const *to)
 /*[[[body:DOS$wsymlinkat]]]*/
 {
-	CRT_UNIMPLEMENTED("wsymlinkat"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	int result = -1;
+	char *used_from, *used_to;
+	used_from = libc_uchar_c16tombs(from);
+	if unlikely(!used_from)
+		goto done;
+	used_to = libc_uchar_c16tombs(to);
+	if unlikely(!used_to)
+		goto done_from;
+	result = symlinkat(used_from, tofd, used_to);
+	libc_uchar_free(used_to);
+done_from:
+	libc_uchar_free(used_from);
+done:
+	return result;
 }
 /*[[[end:DOS$wsymlinkat]]]*/
 
@@ -361,9 +459,7 @@ NOTHROW_RPC(LIBCCALL libc_wreadlinkat)(fd_t dfd,
                                        size_t buflen)
 /*[[[body:wreadlinkat]]]*/
 {
-	CRT_UNIMPLEMENTED("wreadlinkat"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	return libc_wfreadlinkat(dfd, path, buf, buflen, 0);
 }
 /*[[[end:wreadlinkat]]]*/
 
@@ -384,9 +480,7 @@ NOTHROW_RPC(LIBDCALL libd_wreadlinkat)(fd_t dfd,
                                        size_t buflen)
 /*[[[body:DOS$wreadlinkat]]]*/
 {
-	CRT_UNIMPLEMENTED("wreadlinkat"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	return libd_wfreadlinkat(dfd, path, buf, buflen, 0);
 }
 /*[[[end:DOS$wreadlinkat]]]*/
 
@@ -427,6 +521,48 @@ NOTHROW_RPC(LIBDCALL libd_wfreadlinkat)(fd_t dfd,
 	return -1;
 }
 /*[[[end:DOS$wfreadlinkat]]]*/
+
+/*[[[head:wunlinkat,hash:0xc40f36f6]]]*/
+/* >> wunlinkat(2)
+ * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
+INTERN NONNULL((2))
+ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wunlinkat") int
+NOTHROW_RPC(LIBCCALL libc_wunlinkat)(fd_t dfd,
+                                     char32_t const *name,
+                                     atflag_t flags)
+/*[[[body:wunlinkat]]]*/
+{
+	int result = -1;
+	char *used_name;
+	used_name = libc_uchar_c32tombs(name);
+	if likely(used_name) {
+		result = unlinkat(dfd, used_name, flags);
+		libc_uchar_free(used_name);
+	}
+	return result;
+}
+/*[[[end:wunlinkat]]]*/
+
+/*[[[head:DOS$wunlinkat,hash:0x608225e9]]]*/
+/* >> wunlinkat(2)
+ * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
+INTERN NONNULL((2))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wunlinkat") int
+NOTHROW_RPC(LIBDCALL libd_wunlinkat)(fd_t dfd,
+                                     char16_t const *name,
+                                     atflag_t flags)
+/*[[[body:DOS$wunlinkat]]]*/
+{
+	int result = -1;
+	char *used_name;
+	used_name = libc_uchar_c16tombs(name);
+	if likely(used_name) {
+		result = unlinkat(dfd, used_name, flags);
+		libc_uchar_free(used_name);
+	}
+	return result;
+}
+/*[[[end:DOS$wunlinkat]]]*/
 
 /*[[[head:wgetlogin_r,hash:0xae70d3e0]]]*/
 INTERN NONNULL((1))
@@ -490,9 +626,14 @@ ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wsetlogin") int
 NOTHROW_NCX(LIBCCALL libc_wsetlogin)(char32_t const *name)
 /*[[[body:wsetlogin]]]*/
 {
-	CRT_UNIMPLEMENTED("wsetlogin"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	int result = -1;
+	char *used_name;
+	used_name = libc_uchar_c32tombs(name);
+	if likely(used_name) {
+		result = setlogin(used_name);
+		libc_uchar_free(used_name);
+	}
+	return result;
 }
 /*[[[end:wsetlogin]]]*/
 
@@ -502,9 +643,14 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wsetlogin") int
 NOTHROW_NCX(LIBDCALL libd_wsetlogin)(char16_t const *name)
 /*[[[body:DOS$wsetlogin]]]*/
 {
-	CRT_UNIMPLEMENTED("wsetlogin"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	int result = -1;
+	char *used_name;
+	used_name = libc_uchar_c16tombs(name);
+	if likely(used_name) {
+		result = setlogin(used_name);
+		libc_uchar_free(used_name);
+	}
+	return result;
 }
 /*[[[end:DOS$wsetlogin]]]*/
 
@@ -517,9 +663,15 @@ NOTHROW_NCX(LIBCCALL libc_wsethostname)(char32_t const *name,
                                         size_t len)
 /*[[[body:wsethostname]]]*/
 {
-	CRT_UNIMPLEMENTED("wsethostname"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	int result = -1;
+	char *used_name;
+	size_t used_len;
+	used_name = libc_uchar_c32tombsn(name, len, &used_len);
+	if likely(used_name) {
+		result = sethostname(used_name, used_len);
+		libc_uchar_freen(used_name, used_len);
+	}
+	return result;
 }
 /*[[[end:wsethostname]]]*/
 
@@ -532,9 +684,15 @@ NOTHROW_NCX(LIBDCALL libd_wsethostname)(char16_t const *name,
                                         size_t len)
 /*[[[body:DOS$wsethostname]]]*/
 {
-	CRT_UNIMPLEMENTED("wsethostname"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	int result = -1;
+	char *used_name;
+	size_t used_len;
+	used_name = libc_uchar_c16tombsn(name, len, &used_len);
+	if likely(used_name) {
+		result = sethostname(used_name, used_len);
+		libc_uchar_freen(used_name, used_len);
+	}
+	return result;
 }
 /*[[[end:DOS$wsethostname]]]*/
 
@@ -577,9 +735,15 @@ NOTHROW_NCX(LIBCCALL libc_wsetdomainname)(char32_t const *name,
                                           size_t len)
 /*[[[body:wsetdomainname]]]*/
 {
-	CRT_UNIMPLEMENTED("wsetdomainname"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	int result = -1;
+	char *used_name;
+	size_t used_len;
+	used_name = libc_uchar_c32tombsn(name, len, &used_len);
+	if likely(used_name) {
+		result = setdomainname(used_name, used_len);
+		libc_uchar_freen(used_name, used_len);
+	}
+	return result;
 }
 /*[[[end:wsetdomainname]]]*/
 
@@ -592,9 +756,15 @@ NOTHROW_NCX(LIBDCALL libd_wsetdomainname)(char16_t const *name,
                                           size_t len)
 /*[[[body:DOS$wsetdomainname]]]*/
 {
-	CRT_UNIMPLEMENTED("wsetdomainname"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	int result = -1;
+	char *used_name;
+	size_t used_len;
+	used_name = libc_uchar_c16tombsn(name, len, &used_len);
+	if likely(used_name) {
+		result = setdomainname(used_name, used_len);
+		libc_uchar_freen(used_name, used_len);
+	}
+	return result;
 }
 /*[[[end:DOS$wsetdomainname]]]*/
 
@@ -607,9 +777,14 @@ ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wchroot") int
 NOTHROW_RPC(LIBCCALL libc_wchroot)(char32_t const *__restrict path)
 /*[[[body:wchroot]]]*/
 {
-	CRT_UNIMPLEMENTED("wchroot"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	int result = -1;
+	char *used_path;
+	used_path = libc_uchar_c32tombs(path);
+	if likely(used_path) {
+		result = chroot(used_path);
+		libc_uchar_free(used_path);
+	}
+	return result;
 }
 /*[[[end:wchroot]]]*/
 
@@ -622,9 +797,14 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wchroot") int
 NOTHROW_RPC(LIBDCALL libd_wchroot)(char16_t const *__restrict path)
 /*[[[body:DOS$wchroot]]]*/
 {
-	CRT_UNIMPLEMENTED("wchroot"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	int result = -1;
+	char *used_path;
+	used_path = libc_uchar_c16tombs(path);
+	if likely(used_path) {
+		result = chroot(used_path);
+		libc_uchar_free(used_path);
+	}
+	return result;
 }
 /*[[[end:DOS$wchroot]]]*/
 
@@ -660,9 +840,14 @@ NOTHROW_RPC(LIBCCALL libc_wchown)(char32_t const *file,
                                   gid_t group)
 /*[[[body:wchown]]]*/
 {
-	CRT_UNIMPLEMENTED("wchown"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	int result = -1;
+	char *used_file;
+	used_file = libc_uchar_c32tombs(file);
+	if likely(used_file) {
+		result = chown(used_file, owner, group);
+		libc_uchar_free(used_file);
+	}
+	return result;
 }
 /*[[[end:wchown]]]*/
 
@@ -676,9 +861,14 @@ NOTHROW_RPC(LIBDCALL libd_wchown)(char16_t const *file,
                                   gid_t group)
 /*[[[body:DOS$wchown]]]*/
 {
-	CRT_UNIMPLEMENTED("wchown"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	int result = -1;
+	char *used_file;
+	used_file = libc_uchar_c16tombs(file);
+	if likely(used_file) {
+		result = chown(used_file, owner, group);
+		libc_uchar_free(used_file);
+	}
+	return result;
 }
 /*[[[end:DOS$wchown]]]*/
 
@@ -691,9 +881,7 @@ NOTHROW_RPC(LIBCCALL libc_wlink)(char32_t const *from,
                                  char32_t const *to)
 /*[[[body:wlink]]]*/
 {
-	CRT_UNIMPLEMENTED("wlink"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	return libc_wlinkat(AT_FDCWD, from, AT_FDCWD, to, 0);
 }
 /*[[[end:wlink]]]*/
 
@@ -706,9 +894,7 @@ NOTHROW_RPC(LIBDCALL libd_wlink)(char16_t const *from,
                                  char16_t const *to)
 /*[[[body:DOS$wlink]]]*/
 {
-	CRT_UNIMPLEMENTED("wlink"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	return libd_wlinkat(AT_FDCWD, from, AT_FDCWD, to, 0);
 }
 /*[[[end:DOS$wlink]]]*/
 
@@ -722,9 +908,7 @@ NOTHROW_RPC(LIBCCALL libc_waccess)(char32_t const *file,
                                    int type)
 /*[[[body:waccess]]]*/
 {
-	CRT_UNIMPLEMENTED("waccess"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	return libc_wfaccessat(AT_FDCWD, file, type, 0);
 }
 /*[[[end:waccess]]]*/
 
@@ -738,9 +922,7 @@ NOTHROW_RPC(LIBDCALL libd_waccess)(char16_t const *file,
                                    int type)
 /*[[[body:DOS$waccess]]]*/
 {
-	CRT_UNIMPLEMENTED("waccess"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	return libd_wfaccessat(AT_FDCWD, file, type, 0);
 }
 /*[[[end:DOS$waccess]]]*/
 
@@ -752,9 +934,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wunlink") int
 NOTHROW_RPC(LIBCCALL libc_wunlink)(char32_t const *file)
 /*[[[body:wunlink]]]*/
 {
-	CRT_UNIMPLEMENTED("wunlink"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	return libc_wunlinkat(AT_FDCWD, file, 0);
 }
 /*[[[end:wunlink]]]*/
 
@@ -766,9 +946,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wunlink") int
 NOTHROW_RPC(LIBDCALL libd_wunlink)(char16_t const *file)
 /*[[[body:DOS$wunlink]]]*/
 {
-	CRT_UNIMPLEMENTED("wunlink"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	return libd_wunlinkat(AT_FDCWD, file, 0);
 }
 /*[[[end:DOS$wunlink]]]*/
 
@@ -780,9 +958,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wrmdir") int
 NOTHROW_RPC(LIBCCALL libc_wrmdir)(char32_t const *path)
 /*[[[body:wrmdir]]]*/
 {
-	CRT_UNIMPLEMENTED("wrmdir"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	return libc_wunlinkat(AT_FDCWD, path, AT_REMOVEDIR);
 }
 /*[[[end:wrmdir]]]*/
 
@@ -794,9 +970,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wrmdir") int
 NOTHROW_RPC(LIBDCALL libd_wrmdir)(char16_t const *path)
 /*[[[body:DOS$wrmdir]]]*/
 {
-	CRT_UNIMPLEMENTED("wrmdir"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	return libd_wunlinkat(AT_FDCWD, path, AT_REMOVEDIR);
 }
 /*[[[end:DOS$wrmdir]]]*/
 
@@ -810,9 +984,7 @@ NOTHROW_RPC(LIBCCALL libc_weuidaccess)(char32_t const *file,
                                        int type)
 /*[[[body:weuidaccess]]]*/
 {
-	CRT_UNIMPLEMENTED("weuidaccess"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	return libc_wfaccessat(AT_FDCWD, file, type, AT_EACCESS);
 }
 /*[[[end:weuidaccess]]]*/
 
@@ -826,9 +998,7 @@ NOTHROW_RPC(LIBDCALL libd_weuidaccess)(char16_t const *file,
                                        int type)
 /*[[[body:DOS$weuidaccess]]]*/
 {
-	CRT_UNIMPLEMENTED("weuidaccess"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	return libd_wfaccessat(AT_FDCWD, file, type, AT_EACCESS);
 }
 /*[[[end:DOS$weuidaccess]]]*/
 
@@ -838,9 +1008,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wget_current_dir_name") char32_t *
 NOTHROW_RPC(LIBCCALL libc_wget_current_dir_name)(void)
 /*[[[body:wget_current_dir_name]]]*/
 {
-	CRT_UNIMPLEMENTED("wget_current_dir_name"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
+	return libc_wgetcwd(NULL, 0);
 }
 /*[[[end:wget_current_dir_name]]]*/
 
@@ -850,9 +1018,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wget_current_dir_name") char16_t 
 NOTHROW_RPC(LIBDCALL libd_wget_current_dir_name)(void)
 /*[[[body:DOS$wget_current_dir_name]]]*/
 {
-	CRT_UNIMPLEMENTED("wget_current_dir_name"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
+	return libd_wgetcwd(NULL, 0);
 }
 /*[[[end:DOS$wget_current_dir_name]]]*/
 
@@ -867,9 +1033,7 @@ NOTHROW_RPC(LIBCCALL libc_wlchown)(char32_t const *file,
                                    gid_t group)
 /*[[[body:wlchown]]]*/
 {
-	CRT_UNIMPLEMENTED("wlchown"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	return libc_wfchownat(AT_FDCWD, file, owner, group, AT_SYMLINK_NOFOLLOW);
 }
 /*[[[end:wlchown]]]*/
 
@@ -884,9 +1048,7 @@ NOTHROW_RPC(LIBDCALL libd_wlchown)(char16_t const *file,
                                    gid_t group)
 /*[[[body:DOS$wlchown]]]*/
 {
-	CRT_UNIMPLEMENTED("wlchown"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	return libd_wfchownat(AT_FDCWD, file, owner, group, AT_SYMLINK_NOFOLLOW);
 }
 /*[[[end:DOS$wlchown]]]*/
 
@@ -899,9 +1061,14 @@ NOTHROW_NCX(LIBCCALL libc_wtruncate)(char32_t const *file,
                                      __PIO_OFFSET length)
 /*[[[body:wtruncate]]]*/
 {
-	CRT_UNIMPLEMENTED("wtruncate"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	int result = -1;
+	char *used_file;
+	used_file = libc_uchar_c32tombs(file);
+	if likely(used_file) {
+		result = truncate(used_file, length);
+		libc_uchar_free(used_file);
+	}
+	return result;
 }
 /*[[[end:wtruncate]]]*/
 
@@ -914,9 +1081,14 @@ NOTHROW_NCX(LIBDCALL libd_wtruncate)(char16_t const *file,
                                      __PIO_OFFSET length)
 /*[[[body:DOS$wtruncate]]]*/
 {
-	CRT_UNIMPLEMENTED("wtruncate"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	int result = -1;
+	char *used_file;
+	used_file = libc_uchar_c16tombs(file);
+	if likely(used_file) {
+		result = truncate(used_file, length);
+		libc_uchar_free(used_file);
+	}
+	return result;
 }
 /*[[[end:DOS$wtruncate]]]*/
 
@@ -932,9 +1104,14 @@ NOTHROW_NCX(LIBCCALL libc_wtruncate64)(char32_t const *file,
                                        __PIO_OFFSET64 length)
 /*[[[body:wtruncate64]]]*/
 {
-	CRT_UNIMPLEMENTED("wtruncate64"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	int result = -1;
+	char *used_file;
+	used_file = libc_uchar_c32tombs(file);
+	if likely(used_file) {
+		result = truncate64(used_file, length);
+		libc_uchar_free(used_file);
+	}
+	return result;
 }
 #endif /* MAGIC:alias */
 /*[[[end:wtruncate64]]]*/
@@ -951,9 +1128,14 @@ NOTHROW_NCX(LIBDCALL libd_wtruncate64)(char16_t const *file,
                                        __PIO_OFFSET64 length)
 /*[[[body:DOS$wtruncate64]]]*/
 {
-	CRT_UNIMPLEMENTED("wtruncate64"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	int result = -1;
+	char *used_file;
+	used_file = libc_uchar_c16tombs(file);
+	if likely(used_file) {
+		result = truncate64(used_file, length);
+		libc_uchar_free(used_file);
+	}
+	return result;
 }
 #endif /* MAGIC:alias */
 /*[[[end:DOS$wtruncate64]]]*/
@@ -969,9 +1151,7 @@ NOTHROW_RPC(LIBCCALL libc_wsymlink)(char32_t const *from,
                                     char32_t const *to)
 /*[[[body:wsymlink]]]*/
 {
-	CRT_UNIMPLEMENTED("wsymlink"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	return libc_wsymlinkat(from, AT_FDCWD, to);
 }
 /*[[[end:wsymlink]]]*/
 
@@ -986,9 +1166,7 @@ NOTHROW_RPC(LIBDCALL libd_wsymlink)(char16_t const *from,
                                     char16_t const *to)
 /*[[[body:DOS$wsymlink]]]*/
 {
-	CRT_UNIMPLEMENTED("wsymlink"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	return libd_wsymlinkat(from, AT_FDCWD, to);
 }
 /*[[[end:DOS$wsymlink]]]*/
 
@@ -1009,9 +1187,7 @@ NOTHROW_RPC(LIBCCALL libc_wreadlink)(char32_t const *__restrict path,
                                      size_t buflen)
 /*[[[body:wreadlink]]]*/
 {
-	CRT_UNIMPLEMENTED("wreadlink"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	return libc_wfreadlinkat(AT_FDCWD, path, buf, buflen, 0);
 }
 /*[[[end:wreadlink]]]*/
 
@@ -1032,9 +1208,7 @@ NOTHROW_RPC(LIBDCALL libd_wreadlink)(char16_t const *__restrict path,
                                      size_t buflen)
 /*[[[body:DOS$wreadlink]]]*/
 {
-	CRT_UNIMPLEMENTED("wreadlink"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	return libd_wfreadlinkat(AT_FDCWD, path, buf, buflen, 0);
 }
 /*[[[end:DOS$wreadlink]]]*/
 
@@ -1042,7 +1216,7 @@ NOTHROW_RPC(LIBDCALL libd_wreadlink)(char16_t const *__restrict path,
 
 
 
-/*[[[start:exports,hash:0x14a7ff2c]]]*/
+/*[[[start:exports,hash:0xd98c0689]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(wttyname, libc_wttyname);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$wttyname, libd_wttyname);
 DEFINE_PUBLIC_WEAK_ALIAS(wttyname_r, libc_wttyname_r);
@@ -1082,6 +1256,8 @@ DEFINE_PUBLIC_WEAK_ALIAS(wreadlinkat, libc_wreadlinkat);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$wreadlinkat, libd_wreadlinkat);
 DEFINE_PUBLIC_WEAK_ALIAS(wfreadlinkat, libc_wfreadlinkat);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$wfreadlinkat, libd_wfreadlinkat);
+DEFINE_PUBLIC_WEAK_ALIAS(wunlinkat, libc_wunlinkat);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$wunlinkat, libd_wunlinkat);
 DEFINE_PUBLIC_WEAK_ALIAS(wlchown, libc_wlchown);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$wlchown, libd_wlchown);
 DEFINE_PUBLIC_WEAK_ALIAS(wtruncate, libc_wtruncate);

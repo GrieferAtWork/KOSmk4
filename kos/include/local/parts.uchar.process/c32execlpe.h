@@ -1,4 +1,4 @@
-/* HASH 0xc51018fb */
+/* HASH 0x777eaeb3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __LOCAL_LIBC(c32execlpe) __ATTR_SENTINEL __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(c32execlpe))(__CHAR32_TYPE__ const *__restrict __file,
                                                          __CHAR32_TYPE__ const *__args,
                                                          ... /*, (char32_t *)NULL, char32_t **environ*/) {
-#line 153 "kos/src/libc/magic/parts.uchar.process.c"
+#line 156 "kos/src/libc/magic/parts.uchar.process.c"
 	__REDIRECT_EXECLE(__CHAR32_TYPE__, __localdep_c32execvpe, __file, __args)
 }
 __NAMESPACE_LOCAL_END

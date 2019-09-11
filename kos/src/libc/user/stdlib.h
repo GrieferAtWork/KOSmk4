@@ -1,4 +1,4 @@
-/* HASH 0x13b7ed16 */
+/* HASH 0x36b0f668 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@
 DECL_BEGIN
 
 INTDEF WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_getenv)(char const *varname);
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_system)(char const *__restrict command);
+INTDEF int NOTHROW_RPC(LIBCCALL libc_system)(char const *__restrict command);
 INTDEF ATTR_NORETURN void (LIBCCALL libc_abort)(void);
 INTDEF ATTR_NORETURN void (LIBCCALL libc_exit)(int status) __THROWS(...);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_atexit)(__atexit_func_t func);

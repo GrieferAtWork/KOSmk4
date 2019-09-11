@@ -1,4 +1,4 @@
-/* HASH 0x2170a0d8 */
+/* HASH 0xf4a33371 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -76,7 +76,7 @@ __LOCAL_LIBC(wmempset) __ATTR_RETNONNULL __ATTR_NONNULL((1)) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wmempset))(__WCHAR_TYPE__ *__dst,
                                                       __WCHAR_TYPE__ __filler,
                                                       __SIZE_TYPE__ __num_chars) {
-#line 1027 "kos/src/libc/magic/wchar.c"
+#line 1230 "kos/src/libc/magic/wchar.c"
 #if __SIZEOF_WCHAR_T__ == 2
 	return (__WCHAR_TYPE__ *)__localdep_mempsetw(__dst, (__UINT16_TYPE__)__filler, __num_chars);
 #elif __SIZEOF_WCHAR_T__ == 4

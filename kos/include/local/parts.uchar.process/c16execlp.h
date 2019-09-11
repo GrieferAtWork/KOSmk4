@@ -1,4 +1,4 @@
-/* HASH 0x69bc485f */
+/* HASH 0xf9447655 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __LOCAL_LIBC(c16execlp) __ATTR_SENTINEL __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(c16execlp))(__CHAR16_TYPE__ const *__restrict __file,
                                                         __CHAR16_TYPE__ const *__args,
                                                         ... /*, (char16_t *)NULL*/) {
-#line 110 "kos/src/libc/magic/parts.uchar.process.c"
+#line 113 "kos/src/libc/magic/parts.uchar.process.c"
 	__REDIRECT_EXECL(__CHAR16_TYPE__, __localdep_c16execvp, __file, __args)
 }
 __NAMESPACE_LOCAL_END

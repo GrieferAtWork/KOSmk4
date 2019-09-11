@@ -86,6 +86,8 @@ __SYSDECL_BEGIN
 [attribute(*)] c16freadlinkat:(*) %{uchar(wfreadlinkat)}
 [attribute(*)] c32freadlinkat:(*) %{uchar(wfreadlinkat)}
 %#endif /* __USE_KOS */
+[attribute(*)] c16unlinkat:(*) %{uchar(wunlinkat)}
+[attribute(*)] c32unlinkat:(*) %{uchar(wunlinkat)}
 %#endif /* __USE_ATFILE */
 
 [attribute(*)] c16lchown:(*) %{uchar(wlchown)}

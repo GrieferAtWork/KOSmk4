@@ -1,4 +1,4 @@
-/* HASH 0xb24d11c5 */
+/* HASH 0x12898645 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,29 +19,27 @@
  */
 #ifndef __local_getwchar_unlocked_defined
 #include <features.h>
-#if (defined(__CRT_HAVE_getwc_unlocked) || defined(__CRT_HAVE_fgetwc_unlocked) || defined(__CRT_HAVE__fgetwc_nolock)) && !defined(__NO_STDSTREAMS)
+#if (defined(__CRT_HAVE_fgetwc_unlocked) || defined(__CRT_HAVE__fgetwc_nolock)) && !defined(__NO_STDSTREAMS)
 #define __local_getwchar_unlocked_defined 1
 #include <kos/anno.h>
-/* Dependency: "getwc_unlocked" */
-#ifndef ____localdep_getwc_unlocked_defined
-#define ____localdep_getwc_unlocked_defined 1
-#if defined(__CRT_HAVE_getwc_unlocked)
-__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,,__localdep_getwc_unlocked,(__FILE *__restrict __stream),getwc_unlocked,(__stream)) __THROWS(...)
-#elif defined(__CRT_HAVE_fgetwc_unlocked)
-__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,,__localdep_getwc_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream)) __THROWS(...)
+/* Dependency: "fgetwc_unlocked" */
+#ifndef ____localdep_fgetwc_unlocked_defined
+#define ____localdep_fgetwc_unlocked_defined 1
+#if defined(__CRT_HAVE_fgetwc_unlocked)
+__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,,__localdep_fgetwc_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE__fgetwc_nolock)
-__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,,__localdep_getwc_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream)) __THROWS(...)
-#else /* LIBC: getwc_unlocked */
-#undef ____localdep_getwc_unlocked_defined
-#endif /* getwc_unlocked... */
-#endif /* !____localdep_getwc_unlocked_defined */
+__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,,__localdep_fgetwc_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream)) __THROWS(...)
+#else /* LIBC: fgetwc_unlocked */
+#undef ____localdep_fgetwc_unlocked_defined
+#endif /* fgetwc_unlocked... */
+#endif /* !____localdep_fgetwc_unlocked_defined */
 
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(getwchar_unlocked) __WINT_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(getwchar_unlocked))(void) __THROWS(...) {
-#line 833 "kos/src/libc/magic/wchar.c"
-	return __localdep_getwc_unlocked(__LOCAL_stdin);
+#line 890 "kos/src/libc/magic/wchar.c"
+	return __localdep_fgetwc_unlocked(__LOCAL_stdin);
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_getwc_unlocked) || defined(__CRT_HAVE_fgetwc_unlocked) || defined(__CRT_HAVE__fgetwc_nolock)) && !defined(__NO_STDSTREAMS) */
+#endif /* (defined(__CRT_HAVE_fgetwc_unlocked) || defined(__CRT_HAVE__fgetwc_nolock)) && !defined(__NO_STDSTREAMS) */
 #endif /* !__local_getwchar_unlocked_defined */

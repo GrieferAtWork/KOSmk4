@@ -596,9 +596,8 @@ wcstombs:(char *__restrict s, wchar_t const *__restrict pwcs, size_t n) -> size_
 	return 0;
 }
 
-[section(.text.crt.fs.exec.system)]
-[cp][std][std_guard][ATTR_NONNULL((1))]
-system:(char const *__restrict command) -> int;
+[section(.text.crt.fs.exec.system)][cp][std][std_guard]
+system:([nullable] char const *__restrict command) -> int;
 
 
 %[default_impl_section(.text.crt.application.exit)]

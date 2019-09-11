@@ -1888,16 +1888,16 @@ NOTHROW_NCX(LIBCCALL libc_setlinebuf)(FILE *__restrict stream)
 }
 /*[[[end:setlinebuf]]]*/
 
-/*[[[head:puts,hash:0x286bbae]]]*/
+/*[[[head:puts,hash:0x7b5aabd7]]]*/
 /* Print a given string `STR', followed by a line-feed to `STDOUT' */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.write.write.puts") __STDC_INT_AS_SSIZE_T
-(LIBCCALL libc_puts)(char const *__restrict str)
+(LIBCCALL libc_puts)(char const *__restrict string)
 		__THROWS(...)
 /*[[[body:puts]]]*/
 /*AUTO*/{
 	__STDC_INT_AS_SSIZE_T result, temp;
-	result = libc_fputs(str, stdout);
+	result = libc_fputs(string, stdout);
 	if (result >= 0) {
 		temp = libc_fputc('\n', stdout);
 		if (temp <= 0)
@@ -1909,15 +1909,15 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.write.write.puts") __STDC_INT_AS_S
 }
 /*[[[end:puts]]]*/
 
-/*[[[head:puts_unlocked,hash:0xa7631d58]]]*/
+/*[[[head:puts_unlocked,hash:0xffdca2b8]]]*/
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.write.write.puts_unlocked") __STDC_INT_AS_SSIZE_T
-(LIBCCALL libc_puts_unlocked)(char const *__restrict str)
+(LIBCCALL libc_puts_unlocked)(char const *__restrict string)
 		__THROWS(...)
 /*[[[body:puts_unlocked]]]*/
 /*AUTO*/{
 	__STDC_INT_AS_SSIZE_T result, temp;
-	result = libc_fputs_unlocked(str, stdout);
+	result = libc_fputs_unlocked(string, stdout);
 	if (result >= 0) {
 		temp = libc_fputc_unlocked('\n', stdout);
 		if (temp <= 0)
@@ -2216,19 +2216,19 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.write.write.fputs") __STDC_INT_AS_
 }
 /*[[[end:fputs]]]*/
 
-/*[[[head:fputs_unlocked,hash:0x4e1ca02f]]]*/
+/*[[[head:fputs_unlocked,hash:0x74f8856f]]]*/
 /* Same as `fputs()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.write.write.fputs_unlocked") __STDC_INT_AS_SIZE_T
-(LIBCCALL libc_fputs_unlocked)(char const *__restrict str,
+(LIBCCALL libc_fputs_unlocked)(char const *__restrict string,
                                FILE *__restrict stream)
 		__THROWS(...)
 /*[[[body:fputs_unlocked]]]*/
 /*AUTO*/{
 	__STDC_INT_AS_SIZE_T result;
-	result = libc_fwrite_unlocked(str,
+	result = libc_fwrite_unlocked(string,
 	                         sizeof(char),
-	                         libc_strlen(str),
+	                         libc_strlen(string),
 	                         stream);
 	return result;
 }
@@ -2402,6 +2402,8 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.read.read.fgets") char *
 			}
 			if (ch == '\r')
 				continue;
+			libc_ungetc(ch, stream);
+			break;
 		}
 		buf[n] = (char)ch;
 		if (ch == '\n')
@@ -2448,6 +2450,8 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.read.read.fgets_unlocked") char 
 			}
 			if (ch == '\r')
 				continue;
+			libc_ungetc_unlocked(ch, stream);
+			break;
 		}
 		buf[n] = (char)ch;
 		if (ch == '\n')

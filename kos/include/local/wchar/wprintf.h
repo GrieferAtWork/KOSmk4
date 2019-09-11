@@ -1,4 +1,4 @@
-/* HASH 0x7355e9f3 */
+/* HASH 0x3b838aa1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_wprintf_defined
-#if (defined(__CRT_HAVE_vfwprintf) && !defined(__NO_STDSTREAMS) || defined(__CRT_HAVE_vwprintf))
+#if ((defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_vfwprintf)) && !defined(__NO_STDSTREAMS) || defined(__CRT_HAVE_vwprintf))
 #define __local_wprintf_defined 1
 #include <kos/anno.h>
 /* Dependency: "vwprintf" from "wchar" */
@@ -28,7 +28,7 @@
 __NAMESPACE_STD_USING(__localdep_vwprintf)
 #elif defined(__CRT_HAVE_vwprintf)
 __CREDIRECT(__ATTR_LIBC_WPRINTF(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,,__localdep_vwprintf,(__WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),vwprintf,(__format,__args)) __THROWS(...)
-#elif defined(__CRT_HAVE_vfwprintf) && !defined(__NO_STDSTREAMS)
+#elif (defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_vfwprintf)) && !defined(__NO_STDSTREAMS)
 #include <local/wchar/vwprintf.h>
 #define __localdep_vwprintf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vwprintf))
 #else /* CUSTOM: vwprintf */
@@ -40,7 +40,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wprintf) __ATTR_LIBC_WPRINTF(1, 2) __ATTR_NONNULL((1)) __STDC_INT_AS_SIZE_T
 (__VLIBCCALL __LIBC_LOCAL_NAME(wprintf))(__WCHAR_TYPE__ const *__restrict __format,
                                          ...) __THROWS(...) {
-#line 495 "kos/src/libc/magic/wchar.c"
+#line 554 "kos/src/libc/magic/wchar.c"
 	__STDC_INT_AS_SIZE_T __result;
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __format);
@@ -49,5 +49,5 @@ __LOCAL_LIBC(wprintf) __ATTR_LIBC_WPRINTF(1, 2) __ATTR_NONNULL((1)) __STDC_INT_A
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_vfwprintf) && !defined(__NO_STDSTREAMS) || defined(__CRT_HAVE_vwprintf)) */
+#endif /* ((defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_vfwprintf)) && !defined(__NO_STDSTREAMS) || defined(__CRT_HAVE_vwprintf)) */
 #endif /* !__local_wprintf_defined */

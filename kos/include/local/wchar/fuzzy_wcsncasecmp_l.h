@@ -1,4 +1,4 @@
-/* HASH 0x554f5f44 */
+/* HASH 0x39db1e22 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,7 +54,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fuzzy_wcsncasecmp_l))(__WCHAR_TYPE__ 
                                                                  __WCHAR_TYPE__ const *__s2,
                                                                  __SIZE_TYPE__ __s2_maxlen,
                                                                  __locale_t __locale) {
-#line 1249 "kos/src/libc/magic/wchar.c"
+#line 1452 "kos/src/libc/magic/wchar.c"
 	return __localdep_fuzzy_wmemcasecmp_l(__s1, __localdep_wcsnlen(__s1, __s1_maxlen), __s2, __localdep_wcsnlen(__s2, __s2_maxlen), __locale);
 }
 __NAMESPACE_LOCAL_END

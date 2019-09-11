@@ -1,4 +1,4 @@
-/* HASH 0x59142824 */
+/* HASH 0xab8b29a7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,7 +62,7 @@ __LOCAL_LIBC(_vfscanf_l) __ATTR_LIBC_SCANF(2, 4) __ATTR_WUNUSED __ATTR_NONNULL((
                                            char const *__restrict __format,
                                            __locale_t __locale,
                                            __builtin_va_list __args) __THROWS(...) {
-#line 2054 "kos/src/libc/magic/stdio.c"
+#line 2056 "kos/src/libc/magic/stdio.c"
 	(void)__locale;
 	return __localdep_vfscanf(__stream, __format, __args);
 }

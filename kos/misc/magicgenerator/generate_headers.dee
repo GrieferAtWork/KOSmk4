@@ -3530,22 +3530,30 @@ class Function {
 
 	function print_argument_list(
 			fp: File, args: {(string, string)...},
-		keyarg: Callable, args_prefix: string = "",
-		replace_type_words: int = REPLACE_TYPE_WORDS_LOCAL,
-		wchar_t_replacement: int = none) {
+			keyarg: Callable, args_prefix: string = "",
+			replace_type_words: int = REPLACE_TYPE_WORDS_LOCAL,
+			wchar_t_replacement: int = none) {
 		if (!args) {
 			fp << "void";
 			return;
 		}
 		for (local i = 0; i < #args; ++i) {
 			local tp, nm = args[i]...;
-			File.Writer tempfp;
-			for (local is_word, word: split_words(tp, env: this)) {
-				if (is_word)
-					word = replace_word(word, replace_type_words, wchar_t_replacement);
-				tempfp << word;
+			if (tp) {
+				File.Writer tempfp;
+				for (local is_word, word: split_words(tp, env: this)) {
+					if (is_word)
+						word = replace_word(word, replace_type_words, wchar_t_replacement);
+					tempfp << word;
+				}
+				fp << join_variable_name(tempfp.string, nm ? keyarg(nm) : "");
+			} else {
+				for (local is_word, word: split_words(nm, env: this)) {
+					if (is_word)
+						word = replace_word(word, replace_type_words, wchar_t_replacement);
+					fp << word;
+				}
 			}
-			fp << join_variable_name(tempfp.string, nm ? keyarg(nm) : "");
 			if (i < #args - 1) {
 				if (args_prefix) {
 					fp << ",\n" << args_prefix;

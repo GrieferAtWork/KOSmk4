@@ -1,4 +1,4 @@
-/* HASH 0xeb29ac3d */
+/* HASH 0x5d4047f6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wcstold) __ATTR_PURE __ATTR_NONNULL((1)) long double
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstold))(__WCHAR_TYPE__ const *__restrict __nptr,
                                                      __WCHAR_TYPE__ **__endptr) {
-#line 758 "kos/src/libc/magic/stdlib.c"
+#line 757 "kos/src/libc/magic/stdlib.c"
 	/* TODO */
 	return 0;
 }

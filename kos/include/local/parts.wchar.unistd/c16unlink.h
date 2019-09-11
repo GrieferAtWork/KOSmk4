@@ -1,4 +1,4 @@
-/* HASH 0x8af3e1a3 */
+/* HASH 0x4c890102 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,19 +18,23 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_c16unlink_defined
-#if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_unlinkat)
+#if defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wunlinkat)
 #define __local_c16unlink_defined 1
-/* Dependency: "unlinkat" */
-#ifndef ____localdep_unlinkat_defined
-#define ____localdep_unlinkat_defined 1
-#if defined(__CRT_HAVE_unlinkat)
-/* >> unlinkat(2)
+/* Dependency: "wunlinkat" from "parts.wchar.unistd" */
+#ifndef ____localdep_c16unlinkat_defined
+#define ____localdep_c16unlinkat_defined 1
+#if defined(__CRT_HAVE_wunlinkat) && (__SIZEOF_WCHAR_T__ == 2)
+/* >> c16unlinkat(2)
  * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_unlinkat,(__fd_t __dfd, char const *__name, __atflag_t __flags),unlinkat,(__dfd,__name,__flags))
-#else /* LIBC: unlinkat */
-#undef ____localdep_unlinkat_defined
-#endif /* unlinkat... */
-#endif /* !____localdep_unlinkat_defined */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_c16unlinkat,(__fd_t __dfd, __CHAR16_TYPE__ const *__name, __atflag_t __flags),wunlinkat,(__dfd,__name,__flags))
+#elif defined(__CRT_HAVE_DOS$wunlinkat)
+/* >> c16unlinkat(2)
+ * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_c16unlinkat,(__fd_t __dfd, __CHAR16_TYPE__ const *__name, __atflag_t __flags),wunlinkat,(__dfd,__name,__flags))
+#else /* LIBC: wunlinkat */
+#undef ____localdep_c16unlinkat_defined
+#endif /* c16unlinkat... */
+#endif /* !____localdep_c16unlinkat_defined */
 
 __NAMESPACE_LOCAL_BEGIN
 /* >> c16unlink(2)
@@ -38,8 +42,8 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c16unlink) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(c16unlink))(__CHAR16_TYPE__ const *__file) {
 #line 678 "kos/src/libc/magic/unistd.c"
-	return __localdep_unlinkat(__CRT_AT_FDCWD, __file, 0);
+	return __localdep_c16unlinkat(__CRT_AT_FDCWD, __file, 0);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_unlinkat) */
+#endif /* defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wunlinkat) */
 #endif /* !__local_c16unlink_defined */

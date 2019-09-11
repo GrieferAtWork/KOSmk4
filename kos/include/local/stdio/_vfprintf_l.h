@@ -1,4 +1,4 @@
-/* HASH 0x361384d0 */
+/* HASH 0x3568da07 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,7 +56,7 @@ __LOCAL_LIBC(_vfprintf_l) __ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)) __STDC
                                             char const *__restrict __format,
                                             __locale_t __locale,
                                             __builtin_va_list __args) __THROWS(...) {
-#line 2367 "kos/src/libc/magic/stdio.c"
+#line 2369 "kos/src/libc/magic/stdio.c"
 	(void)__locale;
 	return __localdep_vfprintf(__stream, __format, __args);
 }

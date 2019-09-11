@@ -1,4 +1,4 @@
-/* HASH 0xddc3c67a */
+/* HASH 0x76a6a022 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __LOCAL_LIBC(_fscanf_s_l) __ATTR_LIBC_SCANF(2, 4) __ATTR_NONNULL((1, 2)) __STDC_
                                              char const *__restrict __format,
                                              __locale_t __locale,
                                              ...) __THROWS(...) {
-#line 2159 "kos/src/libc/magic/stdio.c"
+#line 2161 "kos/src/libc/magic/stdio.c"
 	__STDC_INT_AS_SIZE_T __result;
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __locale);

@@ -1,4 +1,4 @@
-/* HASH 0x55ae9e87 */
+/* HASH 0x265d05ee */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,7 +64,7 @@ __LOCAL_LIBC(wcstoul) __ATTR_NONNULL((1)) unsigned long
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcstoul))(__WCHAR_TYPE__ const *__restrict __nptr,
                                                      __WCHAR_TYPE__ **__endptr,
                                                      int __base) {
-#line 688 "kos/src/libc/magic/stdlib.c"
+#line 687 "kos/src/libc/magic/stdlib.c"
 #if __SIZEOF_LONG__ <= 4
 	return (unsigned long)__localdep_wcstou32(__nptr, __endptr, __base);
 #else

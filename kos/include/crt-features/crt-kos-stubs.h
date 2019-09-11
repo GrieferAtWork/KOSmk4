@@ -1,4 +1,4 @@
-/* HASH 0x42aebd14 */
+/* HASH 0x5ee7145 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -168,16 +168,14 @@
 #define __CRT_STUB_fgetspent 1
 #define __CRT_STUB_fgetspent_r 1
 #define __CRT_STUB_fgetwc 1
-#define __CRT_STUB_fgetws 1
-#define __CRT_STUB_fgetws_unlocked 1
+#define __CRT_STUB_fgetwc_unlocked 1
 #define __CRT_STUB_fmemopen 1
 #define __CRT_STUB_fmod 1
 #define __CRT_STUB_fopencookie 1
 #define __CRT_STUB_fpathconf 1
 #define __CRT_STUB_fpreset 1
 #define __CRT_STUB_fputwc 1
-#define __CRT_STUB_fputws 1
-#define __CRT_STUB_fputws_unlocked 1
+#define __CRT_STUB_fputwc_unlocked 1
 #define __CRT_STUB_freeaddrinfo 1
 #define __CRT_STUB_freeifaddrs 1
 #define __CRT_STUB_freelocale 1
@@ -185,6 +183,7 @@
 #define __CRT_STUB_ftime 1
 #define __CRT_STUB_ftime64 1
 #define __CRT_STUB_ftok 1
+#define __CRT_STUB_fwscanf_unlocked 1
 #define __CRT_STUB_gai_cancel 1
 #define __CRT_STUB_gai_error 1
 #define __CRT_STUB_gai_strerror 1
@@ -281,7 +280,6 @@
 #define __CRT_STUB_getutxent 1
 #define __CRT_STUB_getutxid 1
 #define __CRT_STUB_getutxline 1
-#define __CRT_STUB_getwc_unlocked 1
 #define __CRT_STUB_grantpt 1
 #define __CRT_STUB_gtty 1
 #define __CRT_STUB_herror 1
@@ -560,7 +558,6 @@
 #define __CRT_STUB_putspent 1
 #define __CRT_STUB_pututline 1
 #define __CRT_STUB_pututxline 1
-#define __CRT_STUB_putwc_unlocked 1
 #define __CRT_STUB_pwritev 1
 #define __CRT_STUB_pwritev64 1
 #define __CRT_STUB_random_r 1
@@ -679,6 +676,7 @@
 #define __CRT_STUB_ualarm 1
 #define __CRT_STUB_ulckpwdf 1
 #define __CRT_STUB_ungetwc 1
+#define __CRT_STUB_ungetwc_unlocked 1
 #define __CRT_STUB_unlockpt 1
 #define __CRT_STUB_unsetenv 1
 #define __CRT_STUB_updwtmp 1
@@ -686,64 +684,23 @@
 #define __CRT_STUB_uselocale 1
 #define __CRT_STUB_utmpname 1
 #define __CRT_STUB_utmpxname 1
-#define __CRT_STUB_vfwprintf 1
 #define __CRT_STUB_vfwscanf 1
 #define __CRT_STUB_vhangup 1
-#define __CRT_STUB_waccess 1
-#define __CRT_STUB_wchdir 1
-#define __CRT_STUB_wchown 1
-#define __CRT_STUB_wchroot 1
+#define __CRT_STUB_vwscanf_unlocked 1
 #define __CRT_STUB_wcsnrtombs 1
 #define __CRT_STUB_wcswidth 1
 #define __CRT_STUB_wctermid 1
 #define __CRT_STUB_wcwidth 1
-#define __CRT_STUB_weuidaccess 1
-#define __CRT_STUB_wexecl 1
-#define __CRT_STUB_wexecle 1
-#define __CRT_STUB_wexeclp 1
-#define __CRT_STUB_wexeclpe 1
-#define __CRT_STUB_wexecv 1
-#define __CRT_STUB_wexecve 1
-#define __CRT_STUB_wexecvp 1
-#define __CRT_STUB_wexecvpe 1
-#define __CRT_STUB_wfaccessat 1
-#define __CRT_STUB_wfchownat 1
 #define __CRT_STUB_wfreadlinkat 1
-#define __CRT_STUB_wget_current_dir_name 1
 #define __CRT_STUB_wgetcwd 1
 #define __CRT_STUB_wgetdomainname 1
 #define __CRT_STUB_wgethostname 1
 #define __CRT_STUB_wgetlogin 1
 #define __CRT_STUB_wgetlogin_r 1
-#define __CRT_STUB_wlchown 1
-#define __CRT_STUB_wlink 1
-#define __CRT_STUB_wlinkat 1
-#define __CRT_STUB_wpathconf 1
-#define __CRT_STUB_wreadlink 1
-#define __CRT_STUB_wreadlinkat 1
 #define __CRT_STUB_writev 1
-#define __CRT_STUB_wrmdir 1
-#define __CRT_STUB_wsetdomainname 1
-#define __CRT_STUB_wsethostname 1
-#define __CRT_STUB_wsetlogin 1
-#define __CRT_STUB_wspawnl 1
-#define __CRT_STUB_wspawnle 1
-#define __CRT_STUB_wspawnlp 1
-#define __CRT_STUB_wspawnlpe 1
-#define __CRT_STUB_wspawnv 1
-#define __CRT_STUB_wspawnve 1
-#define __CRT_STUB_wspawnvp 1
-#define __CRT_STUB_wspawnvpe 1
-#define __CRT_STUB_wsymlink 1
-#define __CRT_STUB_wsymlinkat 1
-#define __CRT_STUB_wsystem 1
-#define __CRT_STUB_wtruncate 1
-#define __CRT_STUB_wtruncate64 1
+#define __CRT_STUB_wscanf_unlocked 1
 #define __CRT_STUB_wttyname 1
 #define __CRT_STUB_wttyname_r 1
-#define __CRT_STUB_wunlink 1
-#define __CRT_STUB_wutime 1
-#define __CRT_STUB_wutime64 1
 #define __CRT_STUB_y0 1
 #define __CRT_STUB_y1 1
 #define __CRT_STUB_yn 1
