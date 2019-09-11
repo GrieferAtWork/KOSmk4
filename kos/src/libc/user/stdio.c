@@ -145,7 +145,7 @@ INTERN ATTR_SECTION(".data.crt.FILE.locked.utility.std_files") FILE libc_std_fil
 #undef stdin
 #undef stdout
 #undef stderr
-PUBLIC ATTR_SECTION(".data.crt.FILE.locked.read.read.stdin") FILE *stdin  = &libc_std_files[0];
+PUBLIC ATTR_SECTION(".data.crt.FILE.locked.read.read.stdin")    FILE *stdin  = &libc_std_files[0];
 PUBLIC ATTR_SECTION(".data.crt.FILE.locked.write.write.stdout") FILE *stdout = &libc_std_files[1];
 PUBLIC ATTR_SECTION(".data.crt.FILE.locked.write.write.stderr") FILE *stderr = &libc_std_files[2];
 

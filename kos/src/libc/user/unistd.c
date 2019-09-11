@@ -55,15 +55,17 @@
 
 DECL_BEGIN
 
-
-DEFINE_PUBLIC_WEAK_ALIAS(__p__environ, libc_p_environ);
-
+#undef environ
 #ifndef __environ_defined
 #define __environ_defined 1
 extern char **environ;
-#endif
+#endif /* !__environ_defined */
+DEFINE_NOREL_GLOBAL_META(char **, environ, ".crt.fs.environ.environ");
+#define environ  GET_NOREL_GLOBAL(environ)
 
-INTERN WUNUSED ATTR_CONST ATTR_RETNONNULL char ***
+DEFINE_PUBLIC_WEAK_ALIAS(__p__environ, libc_p_environ);
+INTERN WUNUSED ATTR_CONST ATTR_RETNONNULL
+ATTR_SECTION(".text.crt.dos.fs.environ.__p__environ") char ***
 NOTHROW(LIBCCALL libc_p_environ)(void) {
 	return &environ;
 }

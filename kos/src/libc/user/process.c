@@ -27,8 +27,13 @@
 
 DECL_BEGIN
 
-
-
+#undef environ
+#ifndef __environ_defined
+#define __environ_defined 1
+extern char **environ;
+#endif /* !__environ_defined */
+DECLARE_NOREL_GLOBAL_META(char **, environ);
+#define environ  GET_NOREL_GLOBAL(environ)
 
 
 /*[[[start:implementation]]]*/

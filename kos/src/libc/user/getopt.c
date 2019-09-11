@@ -41,6 +41,8 @@ DECLARE_NOREL_GLOBAL_META(FILE *, stderr);
 
 
 
+
+
 /* DISCLAIMER: The implementation in this file is derived from that of glibc. */
 /* Getopt for GNU.
    Copyright (C) 1987-2017 Free Software Foundation, Inc.
@@ -75,10 +77,23 @@ DECLARE_NOREL_GLOBAL_META(FILE *, stderr);
 #define GETOPT_TEXT(name)   ATTR_SECTION(".text.crt.application.options." name) 
 #define GETOPT_RODATA(name) ATTR_SECTION(".rodata.crt.application.options." name) 
 
-PUBLIC GETOPT_BSS("optarg") char *optarg;
-PUBLIC GETOPT_DATA("optind") int   optind = 1;
-PUBLIC GETOPT_DATA("opterr") int   opterr = 1;
-PUBLIC GETOPT_DATA("optopt") int   optopt = '?';
+#undef optarg
+#undef optind
+#undef opterr
+#undef optopt
+PUBLIC GETOPT_BSS("optarg") char *optarg = NULL;
+PUBLIC GETOPT_DATA("optind") int  optind = 1;
+PUBLIC GETOPT_DATA("opterr") int  opterr = 1;
+PUBLIC GETOPT_DATA("optopt") int  optopt = '?';
+DEFINE_NOREL_GLOBAL_META(char *, optarg, ".crt.application.options");
+DEFINE_NOREL_GLOBAL_META(int, optind, ".crt.application.options");
+DEFINE_NOREL_GLOBAL_META(int, opterr, ".crt.application.options");
+DEFINE_NOREL_GLOBAL_META(int, optopt, ".crt.application.options");
+#define optarg GET_NOREL_GLOBAL(optarg)
+#define optind GET_NOREL_GLOBAL(optind)
+#define opterr GET_NOREL_GLOBAL(opterr)
+#define optopt GET_NOREL_GLOBAL(optopt)
+
 
 PRIVATE GETOPT_BSS("__nextchar")     char *__nextchar;
 PRIVATE GETOPT_BSS("__first_nonopt") int   __first_nonopt;
@@ -88,20 +103,20 @@ PRIVATE GETOPT_BSS("__initialized")  int   __initialized;
 
 
 
-#define DEFINE_STRING(name,str) \
-PRIVATE GETOPT_RODATA(#name) ATTR_ALIGNED(1) char const name[] = str
-DEFINE_STRING(message_ambiguous_option,"%s: option `%s%s' is ambiguous\n");
-DEFINE_STRING(message_ambiguous_option2,"%s: option `%s%s' is ambiguous; possibilities:");
-DEFINE_STRING(message_ambiguous_option_variant," `%s%s'");
-DEFINE_STRING(message_unrecognized_option,"%s: unrecognized option `%s%s'\n");
-DEFINE_STRING(message_option_takes_no_argument,"%s: option `%s%s' doesn't allow an argument\n");
-DEFINE_STRING(message_requires_argument,"%s: option `%s%s' requires an argument\n");
-DEFINE_STRING(message_requires_argument2,"%s: option requires an argument -- '%c'\n");
-DEFINE_STRING(message_dash,"-");
-DEFINE_STRING(message_dash_dash,"--");
-DEFINE_STRING(message_dash_W_spc,"-W ");
-DEFINE_STRING(message_invalid_option,"%s: invalid option -- '%c'\n");
-DEFINE_STRING(message_POSIXLY_CORRECT,"POSIXLY_CORRECT");
+#define DEFINE_STRING(name, str) \
+	PRIVATE GETOPT_RODATA(#name) ATTR_ALIGNED(1) char const name[] = str
+DEFINE_STRING(message_ambiguous_option, "%s: option `%s%s' is ambiguous\n");
+DEFINE_STRING(message_ambiguous_option2, "%s: option `%s%s' is ambiguous; possibilities:");
+DEFINE_STRING(message_ambiguous_option_variant, " `%s%s'");
+DEFINE_STRING(message_unrecognized_option, "%s: unrecognized option `%s%s'\n");
+DEFINE_STRING(message_option_takes_no_argument, "%s: option `%s%s' doesn't allow an argument\n");
+DEFINE_STRING(message_requires_argument, "%s: option `%s%s' requires an argument\n");
+DEFINE_STRING(message_requires_argument2, "%s: option requires an argument -- '%c'\n");
+DEFINE_STRING(message_dash, "-");
+DEFINE_STRING(message_dash_dash, "--");
+DEFINE_STRING(message_dash_W_spc, "-W ");
+DEFINE_STRING(message_invalid_option, "%s: invalid option -- '%c'\n");
+DEFINE_STRING(message_POSIXLY_CORRECT, "POSIXLY_CORRECT");
 #undef DEFINE_STRING
 
 

@@ -39,9 +39,29 @@
 
 DECL_BEGIN
 
-
 #undef __libc_geterrno_or
 #define __libc_geterrno_or(alt) libc_geterrno()
+
+#undef environ
+#ifndef __environ_defined
+#define __environ_defined 1
+extern char **environ;
+#endif /* !__environ_defined */
+DECLARE_NOREL_GLOBAL_META(char **, environ);
+#define environ  GET_NOREL_GLOBAL(environ)
+
+#undef __argc
+#undef __argv
+#undef _pgmptr
+DEFINE_NOREL_GLOBAL_META(int, __argc, ".crt.dos.application.init");
+DEFINE_NOREL_GLOBAL_META(char **, __argv, ".crt.dos.application.init");
+DEFINE_NOREL_GLOBAL_META(char *, _pgmptr, ".crt.dos.application.init");
+#define __argc  GET_NOREL_GLOBAL(__argc)
+#define __argv  GET_NOREL_GLOBAL(__argv)
+#define _pgmptr GET_NOREL_GLOBAL(_pgmptr)
+
+
+
 
 
 DEFINE_PUBLIC_ALIAS(__cxa_atexit, libc___cxa_atexit);
@@ -185,7 +205,7 @@ NOTHROW_NCX(LIBCCALL libc_getenv)(char const *varname)
 /*[[[body:getenv]]]*/
 {
 	if (!strcmp(varname, "TERM"))
-		return "xterm";
+		return (char *)"xterm";
 	CRT_UNIMPLEMENTED("getenv"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return NULL;
@@ -1127,10 +1147,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p___argc") int *
 NOTHROW_NCX(LIBCCALL libc___p___argc)(void)
 /*[[[body:__p___argc]]]*/
 {
-	int *result;
-	result = (int *)dlsym(RTLD_DEFAULT, "__argc");
-	assert(result);
-	return result;
+	return &__argc;
 }
 /*[[[end:__p___argc]]]*/
 
@@ -1140,10 +1157,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p___argv") char ***
 NOTHROW_NCX(LIBCCALL libc___p___argv)(void)
 /*[[[body:__p___argv]]]*/
 {
-	char ***result;
-	result = (char ***)dlsym(RTLD_DEFAULT, "__argv");
-	assert(result);
-	return result;
+	return &__argv;
 }
 /*[[[end:__p___argv]]]*/
 
@@ -1153,10 +1167,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p__pgmptr") char **
 NOTHROW_NCX(LIBCCALL libc___p__pgmptr)(void)
 /*[[[body:__p__pgmptr]]]*/
 {
-	char **result;
-	result = (char **)dlsym(RTLD_DEFAULT, "_pgmptr");
-	assert(result);
-	return result;
+	return &_pgmptr;
 }
 /*[[[end:__p__pgmptr]]]*/
 

@@ -93,6 +93,7 @@ BEGIN
 							print "WARNING: Potentially unwanted libc export:",repr symbolName;
 						symbols_set.insert(symbolName);
 					}
+					symbols_set.update({ "__peb", "environ", "_environ", "__environ", "__argc", "__argv", "_pgmptr" });
 					updateFileContents(self.group.fixFilename(LIBC_FEATURES_HEADER),[](fp: File){
 						fp << COPYRIGHT << "\n\n\n";
 						for (local x: symbols_set.sorted())

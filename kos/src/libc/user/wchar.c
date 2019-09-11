@@ -27,12 +27,25 @@
 #include <stdio.h>
 #include <string.h>
 
+DECL_BEGIN
+
+#undef stdin
+#undef stdout
+#undef stderr
+DECLARE_NOREL_GLOBAL_META(FILE *, stdin);
+DECLARE_NOREL_GLOBAL_META(FILE *, stdout);
+DECLARE_NOREL_GLOBAL_META(FILE *, stderr);
+#define stdin  GET_NOREL_GLOBAL(stdin)
+#define stdout GET_NOREL_GLOBAL(stdout)
+#define stderr GET_NOREL_GLOBAL(stderr)
+
+#undef __LOCAL_stdin
+#undef __LOCAL_stdout
+#undef __LOCAL_stderr
 #define __LOCAL_stdin   stdin
 #define __LOCAL_stdout  stdout
 #define __LOCAL_stderr  stderr
 
-
-DECL_BEGIN
 
 
 INTERN NONNULL((2, 3))

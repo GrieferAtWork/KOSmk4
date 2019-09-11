@@ -427,6 +427,8 @@
 #define __CRT_HAVE___adjtimex 1
 #define __CRT_HAVE___afail 1
 #define __CRT_HAVE___afailf 1
+#define __CRT_HAVE___argc 1
+#define __CRT_HAVE___argv 1
 #define __CRT_HAVE___asin 1
 #define __CRT_HAVE___asinf 1
 #define __CRT_HAVE___asinh 1
@@ -478,6 +480,7 @@
 #define __CRT_HAVE___drem 1
 #define __CRT_HAVE___dremf 1
 #define __CRT_HAVE___dreml 1
+#define __CRT_HAVE___environ 1
 #define __CRT_HAVE___erf 1
 #define __CRT_HAVE___erfc 1
 #define __CRT_HAVE___erfcf 1
@@ -638,6 +641,7 @@
 #define __CRT_HAVE___p__pgmptr 1
 #define __CRT_HAVE___p__wenviron 1
 #define __CRT_HAVE___p__wpgmptr 1
+#define __CRT_HAVE___peb 1
 #define __CRT_HAVE___posix_getopt 1
 #define __CRT_HAVE___pow 1
 #define __CRT_HAVE___pow10 1
@@ -788,6 +792,7 @@
 #define __CRT_HAVE__ecvt_s 1
 #define __CRT_HAVE__endthread 1
 #define __CRT_HAVE__endthreadex 1
+#define __CRT_HAVE__environ 1
 #define __CRT_HAVE__eof 1
 #define __CRT_HAVE__errno 1
 #define __CRT_HAVE__execl 1
@@ -923,6 +928,7 @@
 #define __CRT_HAVE__open 1
 #define __CRT_HAVE__open_osfhandle 1
 #define __CRT_HAVE__pclose 1
+#define __CRT_HAVE__pgmptr 1
 #define __CRT_HAVE__pipe 1
 #define __CRT_HAVE__popen 1
 #define __CRT_HAVE__printf_l 1
