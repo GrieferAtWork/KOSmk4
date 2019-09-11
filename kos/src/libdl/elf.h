@@ -313,9 +313,9 @@ INTDEF REF DlModule *CC DlModule_OpenLoadedProgramHeaders(/*inherit(on_success,H
                                                           uint16_t pnum, Elf_Phdr *__restrict phdr,
                                                           uintptr_t loadaddr, unsigned int mode);
 /* Try to find an already-loaded module. */
-INTDEF REF DlModule *CC DlModule_FindFilenameInPathFromGlobals(char const *__restrict path, size_t pathlen,
-                                                               char const *__restrict filename, size_t filenamelen);
-INTDEF REF DlModule *CC DlModule_FindFilenameInPathListFromGlobals(char const *__restrict filename);
+INTDEF REF DlModule *CC DlModule_FindFilenameInPathFromAll(char const *__restrict path, size_t pathlen,
+                                                           char const *__restrict filename, size_t filenamelen);
+INTDEF REF DlModule *CC DlModule_FindFilenameInPathListFromAll(char const *__restrict filename);
 
 /* Apply relocations & execute library initialized within `self'
  * @param: flags: Set of `DL_MODULE_INITIALIZE_F*' */

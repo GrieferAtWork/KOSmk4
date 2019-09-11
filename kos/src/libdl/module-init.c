@@ -39,6 +39,26 @@
 
 DECL_BEGIN
 
+LOCAL void CC try_add2global(DlModule *__restrict self) {
+	uintptr_t old_flags;
+again_old_flags:
+	old_flags = ATOMIC_READ(self->dm_flags);
+	if (!(old_flags & RTLD_GLOBAL)) {
+		/* Make the module global. */
+		atomic_rwlock_write(&DlModule_GlobalLock);
+		if (!ATOMIC_CMPXCH_WEAK(self->dm_flags, old_flags,
+		                        old_flags | RTLD_GLOBAL)) {
+			atomic_rwlock_endwrite(&DlModule_GlobalLock);
+			goto again_old_flags;
+		}
+		assert(!self->dm_globals.ln_pself);
+		DlModule_AddToGlobals(self);
+		assert(self->dm_globals.ln_pself);
+		atomic_rwlock_endwrite(&DlModule_GlobalLock);
+	}
+}
+
+
 /* [1..1][const] The library path set when the program was started */
 INTERN char *ld_library_path_env = NULL;
 
@@ -232,22 +252,26 @@ DlModule_Initialize(DlModule *__restrict self, unsigned int flags) {
 					/* Before doing more open() system calls, check to see if we've
 					 * already loaded a matching candidate of this library!
 					 * We can do this because `ld_library_path_env' never changes. */
-					dependency = DlModule_FindFilenameInPathListFromGlobals(filename);
+					dependency = DlModule_FindFilenameInPathListFromAll(filename);
 					if (!dependency) {
 						dependency = DlModule_OpenFilenameInPathList(ld_library_path_env,
 						                                             filename,
 						                                             dep_flags);
+					} else {
+						try_add2global(dependency);
 					}
 				}
 			} else {
 				/* Before doing more open() system calls, check to see if we've
 				 * already loaded a matching candidate of this library!
 				 * We can do this because `ld_library_path_env' never changes. */
-				dependency = DlModule_FindFilenameInPathListFromGlobals(filename);
+				dependency = DlModule_FindFilenameInPathListFromAll(filename);
 				if (!dependency) {
 					dependency = DlModule_OpenFilenameInPathList(ld_library_path_env,
 					                                             filename,
 					                                             dep_flags);
+				} else {
+					try_add2global(dependency);
 				}
 			}
 			if (!dependency) {

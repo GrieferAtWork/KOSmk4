@@ -209,7 +209,7 @@ again:
 			result = DlModule_FindFromFilename(filename);
 		} else {
 			ATOMIC_WRITE(elf_dlerror_message, NULL);
-			result = DlModule_FindFilenameInPathListFromGlobals(filename);
+			result = DlModule_FindFilenameInPathListFromAll(filename);
 		}
 		if likely(result)
 			update_module_flags(result, mode);
@@ -1664,7 +1664,7 @@ stringSwitch("name",
 #define IFNDEF_NO_DANGLING_DL_SECTIONS(...) /* nothing */
 #endif /* CONFIG_NO_DANGLING_DL_SECTIONS */
 
-#define INIT_RTLD_SECTION(index, link_name) \
+#define INIT_RTLD_SECTION(index, link_name)                                                                            \
 	{                                                                                                                  \
 		.ds_data        = NULL, /* Initialized later */                                                                \
 		.ds_size        = 0,    /* Initialized later (even though it could be here if ld/gcc weren't quite as dumb) */ \
@@ -1686,7 +1686,7 @@ INTERN struct elf_dlsection *FCALL
 dlsec_builtin_index(size_t sect_index) {
 	struct elf_dlsection *result;
 	switch (sect_index) {
-#define DEFINE_BUILTIN_SECTION(index, sect_name, link_name) \
+#define DEFINE_BUILTIN_SECTION(index, sect_name, link_name)                                       \
 	case index: {                                                                                 \
 		INTDEF byte_t __rtld_##link_name##_start[];                                               \
 		INTDEF byte_t __rtld_##link_name##_end[];                                                 \
@@ -1713,8 +1713,8 @@ dlsec_builtin_name(size_t sect_index) {
 	char const *result;
 	switch (sect_index) {
 #define DEFINE_BUILTIN_SECTION(index, sect_name, link_name) \
-	case index:             \
-		result = sect_name; \
+	case index:                                             \
+		result = sect_name;                                 \
 		break;
 	BUILTIN_SECTIONS_ENUMERATE(DEFINE_BUILTIN_SECTION)
 #undef DEFINE_BUILTIN_SECTION

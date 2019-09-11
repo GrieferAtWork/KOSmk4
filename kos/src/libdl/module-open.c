@@ -248,10 +248,10 @@ DlModule_OpenFilenameInPath(char const *__restrict path,
 }
 
 INTERN ATTR_NOINLINE REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC
-DlModule_FindFilenameInPathFromGlobals(char const *__restrict path,
-                                       size_t pathlen,
-                                       char const *__restrict filename,
-                                       size_t filenamelen) {
+DlModule_FindFilenameInPathFromAll(char const *__restrict path,
+                                   size_t pathlen,
+                                   char const *__restrict filename,
+                                   size_t filenamelen) {
 	char *buf;
 	REF DlModule *result;
 	while (pathlen && path[pathlen - 1] == '/')
@@ -272,17 +272,17 @@ DlModule_FindFilenameInPathFromGlobals(char const *__restrict path,
 }
 
 INTERN REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC
-DlModule_FindFilenameInPathListFromGlobals(char const *__restrict filename) {
+DlModule_FindFilenameInPathListFromAll(char const *__restrict filename) {
 	REF DlModule *result;
 	char const *sep;
 	char const *path   = ld_library_path_env;
 	size_t filenamelen = strlen(filename);
 	for (;;) {
 		sep    = strchrnul(path, ':');
-		result = DlModule_FindFilenameInPathFromGlobals(path,
-		                                                (size_t)(sep - path),
-		                                                filename,
-		                                                filenamelen);
+		result = DlModule_FindFilenameInPathFromAll(path,
+		                                            (size_t)(sep - path),
+		                                            filename,
+		                                            filenamelen);
 		if (result || elf_dlerror_message != NULL)
 			break;
 		if (!*sep)
