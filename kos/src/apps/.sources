@@ -44,6 +44,14 @@ BEGIN GROUP("apps.system-test") { COMPILE, LINK, MCOPY };
 	})
 END
 
+BEGIN
+	GROUP("apps.keymap") { COMPILE, LINK, MCOPY };
+	SET_OUTPUT("/" + BINPATH + "/bin/keymap")
+	SET_DISKFILE("/bin/keymap")
+	USELIB("libkeymap")
+	SOURCE({ "keymap/*.c" })
+END
+
 
 
 

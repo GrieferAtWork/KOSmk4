@@ -142,7 +142,7 @@ struct basic_key {
 struct keymap {
 	struct basic_key km_basic[128];  /* Basic keyboard mappings for key codes 0 ... 127.
 	                                  * NOTE: Fields in this array are lazily initialized if possible. */
-	__byte_t const  *km_ext;         /* [const][1..1] Key matching program (points to `Kmp_Data::d_code'). */
+	__byte_t const  *km_ext;         /* [const][0..1] Key matching program (points to `Kmp_Data::d_code'). */
 	__uint8_t        km_defencoding; /* [const] Default keymap encoding (One of `KMP_ENCODING_*'). */
 };
 

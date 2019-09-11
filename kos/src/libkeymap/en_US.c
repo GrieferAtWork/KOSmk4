@@ -39,8 +39,6 @@ gcc_opt.append("-fexceptions");
 
 DECL_BEGIN
 
-PRIVATE byte_t const empty_extended_mapping[] = { KMP_OP_STOP };
-
 PRIVATE struct basic_key const basic_keys_en_US[0xe0] = {
 #define DEF(key, lower, upper) [key] = { lower, upper }
 
@@ -127,7 +125,7 @@ PRIVATE struct basic_key const basic_keys_en_US[0xe0] = {
 INTERN NONNULL((1)) void
 NOTHROW_NCX(CC libkeymap_init_en_US)(struct keymap *__restrict self) {
 	memcpy(self->km_basic, basic_keys_en_US, sizeof(self->km_basic));
-	self->km_ext         = empty_extended_mapping;
+	self->km_ext         = NULL;
 	self->km_defencoding = KMP_ENCODING_ASCII;
 }
 

@@ -245,7 +245,9 @@ NOTHROW_NCX(CC libkeymap_translate)(struct keymap *__restrict self,
 		}
 	}
 	cachable_character = 0;
-	reader  = self->km_ext;
+	reader = self->km_ext;
+	if unlikely(!reader)
+		goto unknown;
 	reg_enc = self->km_defencoding;
 	reg_key = KEY(0, 0);
 	assert(reg_enc <= KMP_ENCODING_MAX);

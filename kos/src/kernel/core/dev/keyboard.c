@@ -1040,6 +1040,7 @@ restart_getkeymap_locked:
 		COMPILER_BARRIER();
 		mapsize          = me->kd_map_extsiz;
 		default_encoding = me->kd_map.km_defencoding;
+		assert(mapsize == 0 || me->kd_map.km_ext != NULL);
 		if (data.km_mapsize >= mapsize) {
 			/* Copy the key translation map into user-space.
 			 * Note that since we need to be holding an atomic lock while doing this,
