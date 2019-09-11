@@ -2501,7 +2501,7 @@ again:
 #ifndef NDEBUG
 		memset(&entry->de_bypos.ln_pself, 0xcc, sizeof(void *));
 		memset(&entry->de_bypos.ln_next, 0xcc, sizeof(void *));
-#endif
+#endif /* !NDEBUG */
 		*premoved_dirent = entry;
 	} else {
 		decref(entry);

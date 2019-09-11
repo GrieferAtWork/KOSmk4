@@ -57,7 +57,7 @@ STATIC_ASSERT(sizeof(struct mptr) == HEAP_ALIGNMENT);
 	(assert(mptr_heap(x) < __GFP_HEAPCOUNT),           \
 	 assert(IS_ALIGNED(mptr_size(x), HEAP_ALIGNMENT)), \
 	 assert(mptr_size(x) >= HEAP_MINSIZE))
-#else
+#else /* HEAP_ALIGNMENT < (__SIZEOF_SIZE_T__ + 1) */
 struct ATTR_PACKED mptr {
 	union ATTR_PACKED {
 		struct ATTR_PACKED {
@@ -78,7 +78,7 @@ STATIC_ASSERT(sizeof(struct mptr) == HEAP_ALIGNMENT);
 	(assert(mptr_heap(x) < __GFP_HEAPCOUNT),           \
 	 assert(IS_ALIGNED(mptr_size(x), HEAP_ALIGNMENT)), \
 	 assert(mptr_size(x) >= HEAP_MINSIZE))
-#endif
+#endif /* HEAP_ALIGNMENT >= (__SIZEOF_SIZE_T__ + 1) */
 
 #define mptr_get(x)  ((struct mptr *)(x)-1)
 #define mptr_user(x) ((struct mptr *)(x)+1)
@@ -89,11 +89,11 @@ NOTHROW(KCALL kmalloc_usable_size)(VIRT void *ptr) {
 	struct mptr *mblock;
 	if (!ptr)
 		return 0;
-	assert(IS_ALIGNED((uintptr_t)ptr, HEAP_ALIGNMENT));
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
 	if (KERNEL_SLAB_CHECKPTR(ptr))
 		return SLAB_GET(ptr)->s_size;
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
+	assert(IS_ALIGNED((uintptr_t)ptr, HEAP_ALIGNMENT));
 	mblock = mptr_get(ptr);
 	mptr_assert(mblock);
 	return mptr_size(mblock) - sizeof(struct mptr);
@@ -105,13 +105,13 @@ NOTHROW(KCALL kfree)(VIRT void *ptr) {
 	gfp_t heap;
 	if unlikely(!ptr)
 		return; /* Ignore NULL-pointers. */
-	assert(IS_ALIGNED((uintptr_t)ptr, HEAP_ALIGNMENT));
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
 	if (KERNEL_SLAB_CHECKPTR(ptr)) {
 		slab_free(ptr);
 		return;
 	}
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
+	assert(IS_ALIGNED((uintptr_t)ptr, HEAP_ALIGNMENT));
 	mblock = mptr_get(ptr);
 	mptr_assert(mblock);
 	heap = mptr_heap(mblock);
@@ -126,13 +126,13 @@ NOTHROW(KCALL kffree)(VIRT void *ptr, gfp_t flags) {
 	gfp_t heap;
 	if unlikely(!ptr)
 		return; /* Ignore NULL-pointers. */
-	assert(IS_ALIGNED((uintptr_t)ptr, HEAP_ALIGNMENT));
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
 	if (KERNEL_SLAB_CHECKPTR(ptr)) {
 		slab_ffree(ptr, flags);
 		return;
 	}
 #endif /* CONFIG_USE_SLAB_ALLOCATORS */
+	assert(IS_ALIGNED((uintptr_t)ptr, HEAP_ALIGNMENT));
 	mblock = mptr_get(ptr);
 	mptr_assert(mblock);
 	heap = mptr_heap(mblock);
