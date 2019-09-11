@@ -1,4 +1,4 @@
-/* HASH 0xf128f85d */
+/* HASH 0xaa8dc21d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,8 +64,6 @@
 #define __CRT_STUB__findnext32i64 1
 #define __CRT_STUB__findnext64 1
 #define __CRT_STUB__fpclass 1
-#define __CRT_STUB__ftime32_s 1
-#define __CRT_STUB__ftime64_s 1
 #define __CRT_STUB__fullpath 1
 #define __CRT_STUB__get_doserrno 1
 #define __CRT_STUB__get_output_format 1
@@ -176,8 +174,6 @@
 #define __CRT_STUB_freeifaddrs 1
 #define __CRT_STUB_freelocale 1
 #define __CRT_STUB_frexp 1
-#define __CRT_STUB_ftime 1
-#define __CRT_STUB_ftime64 1
 #define __CRT_STUB_ftok 1
 #define __CRT_STUB_fwscanf_unlocked 1
 #define __CRT_STUB_gai_cancel 1
@@ -685,12 +681,8 @@
 #define __CRT_STUB_vwscanf_unlocked 1
 #define __CRT_STUB_wcsnrtombs 1
 #define __CRT_STUB_wcswidth 1
-#define __CRT_STUB_wctermid 1
 #define __CRT_STUB_wcwidth 1
 #define __CRT_STUB_wfreadlinkat 1
-#define __CRT_STUB_wgetcwd 1
-#define __CRT_STUB_wgetdomainname 1
-#define __CRT_STUB_wgethostname 1
 #define __CRT_STUB_wgetlogin 1
 #define __CRT_STUB_wgetlogin_r 1
 #define __CRT_STUB_writev 1

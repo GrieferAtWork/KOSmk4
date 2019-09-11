@@ -42,11 +42,6 @@ DECL_BEGIN
 
 /* Helper functions for converting wide-character strings
  * into UTF-8, so they may be used by the kernel. */
-INTERN UCHAR_TEXT("uchar_free") void LIBCCALL
-libc_uchar_free(/*utf-8*/ char *ptr) {
-	free(ptr);
-}
-
 INTERN UCHAR_TEXT("uchar_freev") void LIBCCALL
 libc_uchar_freev(/*utf-8*/ char **ptr) {
 	char **iter, *temp;
@@ -100,7 +95,7 @@ libc_uchar_c16tombsn(char16_t const *__restrict str, size_t len, size_t *preslen
 	convert_data.fd_printer   = &format_aprintf_printer;
 	convert_data.fd_arg       = &printer_data;
 	convert_data.fd_surrogate = 0;
-	if (format_16to8(&convert_data, str, len) < 0) {
+	if unlikely(format_16to8(&convert_data, str, len) < 0) {
 		format_aprintf_data_fini(&printer_data);
 		return NULL;
 	}
@@ -114,7 +109,7 @@ libc_uchar_c32tombsn(char32_t const *__restrict str, size_t len, size_t *preslen
 	struct format_32to8_data convert_data;
 	convert_data.fd_printer = &format_aprintf_printer;
 	convert_data.fd_arg     = &printer_data;
-	if (format_32to8(&convert_data, str, len) < 0) {
+	if unlikely(format_32to8(&convert_data, str, len) < 0) {
 		format_aprintf_data_fini(&printer_data);
 		return NULL;
 	}
@@ -237,6 +232,56 @@ err:
 	free(result);
 	return NULL;
 }
+
+
+
+INTERN WUNUSED ATTR_MALLOC NONNULL((1))
+UCHAR16_TEXT("uchar_mbstoc16") char16_t *LIBDCALL
+libc_uchar_mbstoc16(/*utf-8*/ char const *__restrict str) {
+	size_t len = strlen(str);
+	return libc_uchar_mbstoc16n(str, len, NULL);
+}
+
+INTERN WUNUSED ATTR_MALLOC NONNULL((1))
+UCHAR32_TEXT("uchar_mbstoc32") char32_t *LIBCCALL
+libc_uchar_mbstoc32(/*utf-8*/ char const *__restrict str) {
+	size_t len = strlen(str);
+	return libc_uchar_mbstoc32n(str, len, NULL);
+}
+
+INTERN WUNUSED ATTR_MALLOC NONNULL((1))
+UCHAR16_TEXT("uchar_mbstoc16n") char16_t *LIBDCALL
+libc_uchar_mbstoc16n(/*utf-8*/ char const *__restrict str,
+                     size_t len, size_t *preslen) {
+	struct format_c16aprintf_data printer_data = FORMAT_C16APRINTF_DATA_INIT;
+	struct format_8to16_data convert_data;
+	convert_data.fd_printer    = &format_c16aprintf_printer;
+	convert_data.fd_arg        = &printer_data;
+	convert_data.fd_incomplete = 0;
+	if unlikely(format_8to16(&convert_data, str, len) < 0) {
+		format_c16aprintf_data_fini(&printer_data);
+		return NULL;
+	}
+	return format_c16aprintf_pack(&printer_data, preslen);
+}
+
+
+INTERN WUNUSED ATTR_MALLOC NONNULL((1))
+UCHAR32_TEXT("uchar_mbstoc32n") char32_t *LIBCCALL
+libc_uchar_mbstoc32n(/*utf-8*/ char const *__restrict str,
+                     size_t len, size_t *preslen) {
+	struct format_c32aprintf_data printer_data = FORMAT_C32APRINTF_DATA_INIT;
+	struct format_8to32_data convert_data;
+	convert_data.fd_printer    = &format_c32aprintf_printer;
+	convert_data.fd_arg        = &printer_data;
+	convert_data.fd_incomplete = 0;
+	if unlikely(format_8to32(&convert_data, str, len) < 0) {
+		format_c32aprintf_data_fini(&printer_data);
+		return NULL;
+	}
+	return format_c32aprintf_pack(&printer_data, preslen);
+}
+
 
 
 #endif /* __CC__ */

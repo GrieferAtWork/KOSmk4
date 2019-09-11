@@ -1,4 +1,4 @@
-/* HASH 0x6a28c130 */
+/* HASH 0xbb443dd6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -242,9 +242,7 @@ __CRT_FUNCTION(_fread_nolock_s,0,(),5,(void *__restrict,buf,size_t,bufsize,size_
 __CRT_FUNCTION(_fscanf_l,0,(),VA(3),(FILE *__restrict,stream,char const *__restrict,format,locale_t,locale),__STDC_INT_AS_SIZE_T)
 __CRT_FUNCTION(_fsopen,0,(),3,(char const *,filename,char const *,modes,int,sflag),FILE *)
 __CRT_FUNCTION(_ftime32,0,(),1,(struct __timeb32 *,timebuf),void)
-__CRT_FUNCTION(_ftime32_s,0,(),1,(struct __timeb32 *,timebuf),errno_t)
 __CRT_FUNCTION(_ftime64,1,(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__,_ftime32),1,(struct __timeb64 *,timebuf),void)
-__CRT_FUNCTION(_ftime64_s,1,(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__,_ftime32_s),1,(struct __timeb64 *,timebuf),errno_t)
 __CRT_FUNCTION(_fullpath,0,(),3,(char *,buf,char const *,path,size_t,buflen),char *)
 __CRT_FUNCTION(_gcvt_s,0,(),4,(char *,buf,size_t,buflen,double,val,int,ndigit),errno_t)
 __CRT_FUNCTION(_get_doserrno,0,(),1,(u32 *,perr),errno_t)
@@ -3216,6 +3214,8 @@ __CRT_KOS_WCHAR_FUNCTION(__p__wenviron,0,(),0,(),char32_t ***)
 __CRT_KOS_WCHAR_FUNCTION(__p__wpgmptr,0,(),0,(),char32_t **)
 __CRT_KOS_WCHAR_FUNCTION(__wcserror,0,(),1,(char32_t const *,message),char32_t *)
 __CRT_KOS_WCHAR_FUNCTION(__wcserror_s,0,(),3,(char32_t *,buf,size_t,bufsize,char32_t const *,message),errno_t)
+__CRT_KOS_WCHAR_FUNCTION(_ftime32_s,0,(),1,(struct __timeb32 *,timebuf),errno_t)
+__CRT_KOS_WCHAR_FUNCTION(_ftime64_s,1,(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__,_ftime32_s),1,(struct __timeb64 *,timebuf),errno_t)
 __CRT_KOS_WCHAR_FUNCTION(_mbstowcs_l,0,(),4,(char32_t *,buf,char const *,src,size_t,maxlen,locale_t,locale),size_t)
 __CRT_KOS_WCHAR_FUNCTION(_mbstowcs_s,0,(),5,(size_t *,presult,char32_t *,buf,size_t,buflen,char const *,src,size_t,maxlen),errno_t)
 __CRT_KOS_WCHAR_FUNCTION(_mbstowcs_s_l,0,(),6,(size_t *,presult,char32_t *,buf,size_t,buflen,char const *,src,size_t,maxlen,locale_t,locale),errno_t)
@@ -3473,6 +3473,8 @@ __CRT_DOS_WCHAR_FUNCTION(__p__wenviron,0,(),0,(),char16_t ***)
 __CRT_DOS_WCHAR_FUNCTION(__p__wpgmptr,0,(),0,(),char16_t **)
 __CRT_DOS_WCHAR_FUNCTION(__wcserror,0,(),1,(char16_t const *,message),char16_t *)
 __CRT_DOS_WCHAR_FUNCTION(__wcserror_s,0,(),3,(char16_t *,buf,size_t,bufsize,char16_t const *,message),errno_t)
+__CRT_DOS_WCHAR_FUNCTION(_ftime32_s,0,(),1,(struct __timeb32 *,timebuf),errno_t)
+__CRT_DOS_WCHAR_FUNCTION(_ftime64_s,1,(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__,_ftime32_s),1,(struct __timeb64 *,timebuf),errno_t)
 __CRT_DOS_WCHAR_FUNCTION(_mbstowcs_l,0,(),4,(char16_t *,buf,char const *,src,size_t,maxlen,locale_t,locale),size_t)
 __CRT_DOS_WCHAR_FUNCTION(_mbstowcs_s,0,(),5,(size_t *,presult,char16_t *,buf,size_t,buflen,char const *,src,size_t,maxlen),errno_t)
 __CRT_DOS_WCHAR_FUNCTION(_mbstowcs_s_l,0,(),6,(size_t *,presult,char16_t *,buf,size_t,buflen,char const *,src,size_t,maxlen,locale_t,locale),errno_t)

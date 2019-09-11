@@ -1,4 +1,4 @@
-/* HASH 0xa801842c */
+/* HASH 0x982a6a4d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,8 +64,6 @@
 #define __stub__findnext32i64 1
 #define __stub__findnext64 1
 #define __stub__fpclass 1
-#define __stub__ftime32_s 1
-#define __stub__ftime64_s 1
 #define __stub__fullpath 1
 #define __stub__get_doserrno 1
 #define __stub__get_output_format 1
@@ -176,8 +174,6 @@
 #define __stub_freeifaddrs 1
 #define __stub_freelocale 1
 #define __stub_frexp 1
-#define __stub_ftime 1
-#define __stub_ftime64 1
 #define __stub_ftok 1
 #define __stub_fwscanf_unlocked 1
 #define __stub_gai_cancel 1
@@ -685,12 +681,8 @@
 #define __stub_vwscanf_unlocked 1
 #define __stub_wcsnrtombs 1
 #define __stub_wcswidth 1
-#define __stub_wctermid 1
 #define __stub_wcwidth 1
 #define __stub_wfreadlinkat 1
-#define __stub_wgetcwd 1
-#define __stub_wgetdomainname 1
-#define __stub_wgethostname 1
 #define __stub_wgetlogin 1
 #define __stub_wgetlogin_r 1
 #define __stub_writev 1

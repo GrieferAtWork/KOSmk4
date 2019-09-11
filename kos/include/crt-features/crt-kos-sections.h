@@ -1,4 +1,4 @@
-/* HASH 0x549980fe */
+/* HASH 0xf23505d3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1039,6 +1039,8 @@
 #define __CRT_SECTION__strlwr_s                             __CRT_SECTINFO_dos_unicode_static_memory                /* .text.crt.dos.unicode.static.memory._strlwr_s */
 
 /* .text.crt.dos.unsorted.* */
+#define __CRT_DOS_SECTION__ftime32_s                        __CRT_SECTINFO_dos_unsorted                             /* .text.crt.dos.unsorted._ftime32_s */
+#define __CRT_DOS_SECTION__ftime64_s                        __CRT_SECTINFO_dos_unsorted                             /* .text.crt.dos.unsorted._ftime64_s */
 #define __CRT_DOS_SECTION_waccess                           __CRT_SECTINFO_dos_unsorted                             /* .text.crt.dos.unsorted.waccess */
 #define __CRT_DOS_SECTION_wchdir                            __CRT_SECTINFO_dos_unsorted                             /* .text.crt.dos.unsorted.wchdir */
 #define __CRT_DOS_SECTION_wchown                            __CRT_SECTINFO_dos_unsorted                             /* .text.crt.dos.unsorted.wchown */

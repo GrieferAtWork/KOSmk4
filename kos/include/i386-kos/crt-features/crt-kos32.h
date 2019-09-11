@@ -37,6 +37,8 @@
 #define __CRT_HAVE_DOS$__wcserror_s 1
 #define __CRT_HAVE_DOS$_creat 1
 #define __CRT_HAVE_DOS$_errno 1
+#define __CRT_HAVE_DOS$_ftime32_s 1
+#define __CRT_HAVE_DOS$_ftime64_s 1
 #define __CRT_HAVE_DOS$_mbstowcs_l 1
 #define __CRT_HAVE_DOS$_mbstowcs_s 1
 #define __CRT_HAVE_DOS$_mbstowcs_s_l 1

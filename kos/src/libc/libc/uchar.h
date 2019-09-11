@@ -31,8 +31,6 @@ DECL_BEGIN
 
 /* Helper functions for converting wide-character strings
  * into UTF-8, so they may be used by the kernel. */
-INTDEF void LIBCCALL libc_uchar_free(/*utf-8*/ char *ptr);
-#define libc_uchar_freen(ptr, len) libc_uchar_free(ptr)
 INTDEF void LIBCCALL libc_uchar_freev(/*utf-8*/ char **ptr);
 INTDEF void LIBCCALL libc_uchar_freevn(/*utf-8*/ char **ptr, size_t count);
 INTDEF WUNUSED ATTR_MALLOC NONNULL((1)) /*utf-8*/ char *LIBDCALL libc_uchar_c16tombs(char16_t const *__restrict str);
@@ -43,6 +41,11 @@ INTDEF WUNUSED ATTR_MALLOC NONNULL((1)) /*utf-8*/ char **LIBDCALL libc_uchar_c16
 INTDEF WUNUSED ATTR_MALLOC NONNULL((1)) /*utf-8*/ char **LIBCCALL libc_uchar_c32tombsv(char32_t const *const *__restrict vector); /* Terminated by a NULL-pointer */
 INTDEF WUNUSED ATTR_MALLOC NONNULL((1)) /*utf-8*/ char **LIBDCALL libc_uchar_c16tombsvn(char16_t const *const *__restrict vector, size_t count);
 INTDEF WUNUSED ATTR_MALLOC NONNULL((1)) /*utf-8*/ char **LIBCCALL libc_uchar_c32tombsvn(char32_t const *const *__restrict vector, size_t count);
+
+INTDEF WUNUSED ATTR_MALLOC NONNULL((1)) char16_t *LIBDCALL libc_uchar_mbstoc16(/*utf-8*/ char const *__restrict str);
+INTDEF WUNUSED ATTR_MALLOC NONNULL((1)) char32_t *LIBCCALL libc_uchar_mbstoc32(/*utf-8*/ char const *__restrict str);
+INTDEF WUNUSED ATTR_MALLOC NONNULL((1)) char16_t *LIBDCALL libc_uchar_mbstoc16n(/*utf-8*/ char const *__restrict str, size_t len, size_t *preslen);
+INTDEF WUNUSED ATTR_MALLOC NONNULL((1)) char32_t *LIBCCALL libc_uchar_mbstoc32n(/*utf-8*/ char const *__restrict str, size_t len, size_t *preslen);
 
 #endif /* __CC__ */
 

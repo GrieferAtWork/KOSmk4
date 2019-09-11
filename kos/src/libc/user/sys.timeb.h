@@ -1,4 +1,4 @@
-/* HASH 0xfbfb111c */
+/* HASH 0x2f0b48a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,11 @@ INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc__ftime64)(struct __timeb64 *t
 /* Fill in TIMEBUF with information about the current time */
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc__ftime32_s)(struct __timeb32 *timebuf);
 /* Fill in TIMEBUF with information about the current time */
+INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd__ftime32_s)(struct __timeb32 *timebuf);
+/* Fill in TIMEBUF with information about the current time */
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc__ftime64_s)(struct __timeb64 *timebuf);
+/* Fill in TIMEBUF with information about the current time */
+INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd__ftime64_s)(struct __timeb64 *timebuf);
 /* Fill in TIMEBUF with information about the current time */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_ftime)(struct timeb *timebuf);
 /* Fill in TIMEBUF with information about the current time */

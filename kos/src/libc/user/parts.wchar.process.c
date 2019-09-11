@@ -24,6 +24,7 @@
 
 #include <unistd.h>
 #include <process.h>
+#include <malloc.h>
 #include <stdarg.h>
 #include <hybrid/host.h>
 #include "../libc/uchar.h"
@@ -71,7 +72,7 @@ NOTHROW_RPC(LIBCCALL libc_do_c16exec)(char16_t const *__restrict file_or_path,
 done_argv:
 	libc_uchar_freev(used_argv);
 done_file:
-	libc_uchar_free(used_file);
+	free(used_file);
 done:
 	return result;
 }
@@ -106,7 +107,7 @@ NOTHROW_RPC(LIBCCALL libc_do_c32exec)(char32_t const *__restrict file_or_path,
 done_argv:
 	libc_uchar_freev(used_argv);
 done_file:
-	libc_uchar_free(used_file);
+	free(used_file);
 done:
 	return result;
 }
@@ -142,7 +143,7 @@ NOTHROW_RPC(LIBCCALL libc_do_c16spawn)(int mode,
 done_argv:
 	libc_uchar_freev(used_argv);
 done_file:
-	libc_uchar_free(used_file);
+	free(used_file);
 done:
 	return result;
 }
@@ -178,7 +179,7 @@ NOTHROW_RPC(LIBCCALL libc_do_c32spawn)(int mode,
 done_argv:
 	libc_uchar_freev(used_argv);
 done_file:
-	libc_uchar_free(used_file);
+	free(used_file);
 done:
 	return result;
 }
@@ -815,7 +816,7 @@ NOTHROW_RPC(LIBCCALL libc_wsystem)(char32_t const *cmd)
 		if unlikely(!used_cmd)
 			return -1;
 		result = system(used_cmd);
-		libc_uchar_free(used_cmd);
+		free(used_cmd);
 	}
 	return result;
 }
@@ -835,7 +836,7 @@ NOTHROW_RPC(LIBDCALL libd_wsystem)(char16_t const *cmd)
 		if unlikely(!used_cmd)
 			return -1;
 		result = system(used_cmd);
-		libc_uchar_free(used_cmd);
+		free(used_cmd);
 	}
 	return result;
 }

@@ -60,9 +60,9 @@ typedef __time64_t time64_t;
 }%[push_macro @undef { time millitm timezone dstflag }]%{
 struct timeb {
 #if __TM_SIZEOF(TIME) <= 4
-	__time64_t      time;     /* Seconds since epoch, as from `time'. */
-#else
 	__time32_t      time;     /* Seconds since epoch, as from `time'. */
+#else
+	__time64_t      time;     /* Seconds since epoch, as from `time'. */
 #endif
 	__UINT16_TYPE__ millitm;  /* Additional milliseconds. */
 	__INT16_TYPE__  timezone; /* Minutes west of GMT. */
@@ -77,9 +77,9 @@ struct timeb {
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 struct __timeb_alt {
 #if __TM_SIZEOF(TIME) <= 4
-	__time32_t      time;     /* Seconds since epoch, as from `time'. */
-#else
 	__time64_t      time;     /* Seconds since epoch, as from `time'. */
+#else
+	__time32_t      time;     /* Seconds since epoch, as from `time'. */
 #endif
 	__UINT16_TYPE__ millitm;  /* Additional milliseconds. */
 	__INT16_TYPE__  timezone; /* Minutes west of GMT. */
@@ -175,7 +175,7 @@ _ftime64:([nonnull] struct __timeb64 *timebuf) {
 
 [doc_alias(ftime)]
 [requires(defined(__CRT_HAVE__ftime64_s) || defined(__CRT_HAVE_ftime) || defined(__CRT_HAVE_ftime64) || defined(__CRT_HAVE__ftime32) || defined(__CRT_HAVE__ftime64))]
-[dependency_include(<parts/errno.h>)]
+[dependency_include(<parts/errno.h>)][dos_variant]
 _ftime32_s:([nonnull] struct __timeb32 *timebuf) -> errno_t {
 #ifdef __CRT_HAVE_ftime
 	return __crt_ftime32(timebuf) ? 0 : __libc_geterrno_or(@EPERM@);
@@ -208,7 +208,7 @@ _ftime32_s:([nonnull] struct __timeb32 *timebuf) -> errno_t {
 #endif
 }
 
-[doc_alias(ftime)][time64_variant_of(_ftime32_s)]
+[doc_alias(ftime)][time64_variant_of(_ftime32_s)][dos_variant]
 [requires(defined(__CRT_HAVE__ftime32_s) || defined(__CRT_HAVE_ftime) || defined(__CRT_HAVE_ftime64) || defined(__CRT_HAVE__ftime32) || defined(__CRT_HAVE__ftime64))]
 [dependency_include(<parts/errno.h>)]
 _ftime64_s:([nonnull] struct __timeb64 *timebuf) -> errno_t {

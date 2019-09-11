@@ -1,4 +1,4 @@
-/* HASH 0xe0751bf7 */
+/* HASH 0x793dc7d2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -73,9 +73,9 @@ typedef __time64_t time64_t;
 #undef dstflag
 struct timeb {
 #if __TM_SIZEOF(TIME) <= 4
-	__time64_t      time;     /* Seconds since epoch, as from `time'. */
-#else
 	__time32_t      time;     /* Seconds since epoch, as from `time'. */
+#else
+	__time64_t      time;     /* Seconds since epoch, as from `time'. */
 #endif
 	__UINT16_TYPE__ millitm;  /* Additional milliseconds. */
 	__INT16_TYPE__  timezone; /* Minutes west of GMT. */
@@ -90,9 +90,9 @@ struct timeb {
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 struct __timeb_alt {
 #if __TM_SIZEOF(TIME) <= 4
-	__time32_t      time;     /* Seconds since epoch, as from `time'. */
-#else
 	__time64_t      time;     /* Seconds since epoch, as from `time'. */
+#else
+	__time32_t      time;     /* Seconds since epoch, as from `time'. */
 #endif
 	__UINT16_TYPE__ millitm;  /* Additional milliseconds. */
 	__INT16_TYPE__  timezone; /* Minutes west of GMT. */

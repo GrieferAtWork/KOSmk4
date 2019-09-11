@@ -144,38 +144,49 @@ struct format_c32aprintf_data {
 };
 #endif /* !__format_c32aprintf_data_defined */
 
-#define FORMAT_C16APRINTF_DATA_INIT        { __NULLPTR, 0, 0 }
-#define FORMAT_C32APRINTF_DATA_INIT        { __NULLPTR, 0, 0 }
-#define format_c16aprintf_data_init(self)  ((self)->ap_base = __NULLPTR, (self)->ap_avail = (self)->ap_used = 0)
-#define format_c32aprintf_data_init(self)  ((self)->ap_base = __NULLPTR, (self)->ap_avail = (self)->ap_used = 0)
-#define format_c16aprintf_data_cinit(self)            \
-	(__hybrid_assert((self)->ap_base == __NULLPTR), \
-	 __hybrid_assert((self)->ap_avail == 0),        \
+#define FORMAT_C16APRINTF_DATA_INIT        { (char16_t *)__NULLPTR, 0, 0 }
+#define FORMAT_C32APRINTF_DATA_INIT        { (char32_t *)__NULLPTR, 0, 0 }
+#define format_c16aprintf_data_init(self)  ((self)->ap_base = (char16_t *)__NULLPTR, (self)->ap_avail = (self)->ap_used = 0)
+#define format_c32aprintf_data_init(self)  ((self)->ap_base = (char32_t *)__NULLPTR, (self)->ap_avail = (self)->ap_used = 0)
+#define format_c16aprintf_data_cinit(self)                      \
+	(__hybrid_assert((self)->ap_base == (char16_t *)__NULLPTR), \
+	 __hybrid_assert((self)->ap_avail == 0),                    \
 	 __hybrid_assert((self)->ap_used == 0))
-#define format_c32aprintf_data_cinit(self)            \
-	(__hybrid_assert((self)->ap_base == __NULLPTR), \
-	 __hybrid_assert((self)->ap_avail == 0),        \
+#define format_c32aprintf_data_cinit(self)                      \
+	(__hybrid_assert((self)->ap_base == (char32_t *)__NULLPTR), \
+	 __hybrid_assert((self)->ap_avail == 0),                    \
 	 __hybrid_assert((self)->ap_used == 0))
 #ifdef NDEBUG
 #define format_c16aprintf_data_fini(self)  (__libc_free((self)->ap_base))
+#define format_c32aprintf_data_fini(self)  (__libc_free((self)->ap_base))
 #else /* NDEBUG */
 #if __SIZEOF_POINTER__ == 4
-#define format_c16aprintf_data_fini(self)               \
-	(__libc_free((self)->ap_base),                      \
-	 (self)->ap_base  = (char *)__UINT32_C(0xcccccccc), \
-	 (self)->ap_avail = __UINT32_C(0xcccccccc),         \
+#define format_c16aprintf_data_fini(self)                   \
+	(__libc_free((self)->ap_base),                          \
+	 (self)->ap_base  = (char16_t *)__UINT32_C(0xcccccccc), \
+	 (self)->ap_avail = __UINT32_C(0xcccccccc),             \
+	 (self)->ap_used  = __UINT32_C(0xcccccccc))
+#define format_c32aprintf_data_fini(self)                   \
+	(__libc_free((self)->ap_base),                          \
+	 (self)->ap_base  = (char32_t *)__UINT32_C(0xcccccccc), \
+	 (self)->ap_avail = __UINT32_C(0xcccccccc),             \
 	 (self)->ap_used  = __UINT32_C(0xcccccccc))
 #elif __SIZEOF_POINTER__ == 8
-#define format_waprintf_data_fini(self)                         \
-	(__libc_free((self)->ap_base),                              \
-	 (self)->ap_base  = (char *)__UINT64_C(0xcccccccccccccccc), \
-	 (self)->ap_avail = __UINT64_C(0xcccccccccccccccc),         \
+#define format_c16aprintf_data_fini(self)                           \
+	(__libc_free((self)->ap_base),                                  \
+	 (self)->ap_base  = (char16_t *)__UINT64_C(0xcccccccccccccccc), \
+	 (self)->ap_avail = __UINT64_C(0xcccccccccccccccc),             \
+	 (self)->ap_used  = __UINT64_C(0xcccccccccccccccc))
+#define format_c32aprintf_data_fini(self)                           \
+	(__libc_free((self)->ap_base),                                  \
+	 (self)->ap_base  = (char32_t *)__UINT64_C(0xcccccccccccccccc), \
+	 (self)->ap_avail = __UINT64_C(0xcccccccccccccccc),             \
 	 (self)->ap_used  = __UINT64_C(0xcccccccccccccccc))
 #else /* __SIZEOF_POINTER__ == ... */
-#define format_waprintf_data_fini(self) (__libc_free((self)->ap_base))
+#define format_c16aprintf_data_fini(self) (__libc_free((self)->ap_base))
+#define format_c32aprintf_data_fini(self) (__libc_free((self)->ap_base))
 #endif /* __SIZEOF_POINTER__ != ... */
 #endif /* !NDEBUG */
-#define format_c32aprintf_data_fini(self)  format_c16aprintf_data_fini(self)
 
 }
 

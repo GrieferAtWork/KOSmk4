@@ -37,11 +37,10 @@
 
 #include <errno.h>
 #include <sys/time.h>
+#include <sys/timeb.h>
 
 DECL_BEGIN
 
-//DEFINE {0x0000004e,0x00000060} = gettimeofday(struct __timeval32 *tv, struct timezone *tz): errno_t;
-//DEFINE {0x8000004e,0x80000060} = gettimeofday64(struct __timeval64 *tv, struct timezone *tz): errno_t;
 
 PRIVATE struct timespec KCALL realtime_now(void) {
 	struct timespec result;
@@ -57,6 +56,26 @@ PRIVATE void KCALL get_timezone(USER CHECKED struct timezone *result) {
 	result->tz_dsttime     = 0;
 	result->tz_minuteswest = 0;
 }
+
+
+
+#ifdef __NR_ftime
+DEFINE_SYSCALL1(errno_t,ftime,
+                USER UNCHECKED struct timeb *, tp) {
+	struct timespec ts;
+	struct timezone tz;
+	USER struct __timeb32 *utp = (struct __timeb32 *)tp;
+	validate_writable(utp, sizeof(*utp));
+	ts = realtime_now();
+	get_timezone(&tz);
+	COMPILER_WRITE_BARRIER();
+	utp->dstflag  = (s16)tz.tz_dsttime;
+	utp->timezone = (s16)tz.tz_minuteswest;
+	utp->millitm  = (u16)(ts.tv_nsec / 1000000);
+	utp->time     = (time32_t)ts.tv_sec;
+	return -EOK;
+}
+#endif /* __NR_ftime */
 
 
 DEFINE_SYSCALL2(errno_t, gettimeofday,

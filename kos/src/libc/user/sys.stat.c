@@ -28,6 +28,7 @@
 #include <fcntl.h>
 #include <kos/syscalls.h>
 #include <unistd.h>
+#include <malloc.h>
 
 DECL_BEGIN
 
@@ -785,7 +786,7 @@ NOTHROW_NCX(LIBCCALL libc__wstat64)(char32_t const *filename,
 	used_filename = libc_uchar_c32tombs(filename);
 	if likely(used_filename) {
 		result = libc_dos_stat64(used_filename, buf);
-		libc_uchar_free(used_filename);
+		free(used_filename);
 	}
 	return result;
 }
@@ -803,7 +804,7 @@ NOTHROW_NCX(LIBDCALL libd__wstat64)(char16_t const *filename,
 	used_filename = libc_uchar_c16tombs(filename);
 	if likely(used_filename) {
 		result = libc_dos_stat64(used_filename, buf);
-		libc_uchar_free(used_filename);
+		free(used_filename);
 	}
 	return result;
 }
@@ -821,7 +822,7 @@ NOTHROW_NCX(LIBCCALL libc__wstat32i64)(char32_t const *filename,
 	used_filename = libc_uchar_c32tombs(filename);
 	if likely(used_filename) {
 		result = libc_dos_stat32i64(used_filename, buf);
-		libc_uchar_free(used_filename);
+		free(used_filename);
 	}
 	return result;
 }
@@ -839,7 +840,7 @@ NOTHROW_NCX(LIBDCALL libd__wstat32i64)(char16_t const *filename,
 	used_filename = libc_uchar_c16tombs(filename);
 	if likely(used_filename) {
 		result = libc_dos_stat32i64(used_filename, buf);
-		libc_uchar_free(used_filename);
+		free(used_filename);
 	}
 	return result;
 }
@@ -857,7 +858,7 @@ NOTHROW_NCX(LIBCCALL libc__wstat32)(char32_t const *filename,
 	used_filename = libc_uchar_c32tombs(filename);
 	if likely(used_filename) {
 		result = libc_dos_stat32(used_filename, buf);
-		libc_uchar_free(used_filename);
+		free(used_filename);
 	}
 	return result;
 }
@@ -875,7 +876,7 @@ NOTHROW_NCX(LIBDCALL libd__wstat32)(char16_t const *filename,
 	used_filename = libc_uchar_c16tombs(filename);
 	if likely(used_filename) {
 		result = libc_dos_stat32(used_filename, buf);
-		libc_uchar_free(used_filename);
+		free(used_filename);
 	}
 	return result;
 }

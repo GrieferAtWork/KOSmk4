@@ -18,6 +18,7 @@
  */
 #ifndef GUARD_LIBC_USER_PARTS_WCHAR_UNISTD_C
 #define GUARD_LIBC_USER_PARTS_WCHAR_UNISTD_C 1
+#define _UTF_SOURCE 1
 
 #include "../api.h"
 /**/
@@ -25,8 +26,14 @@
 #include "../libc/uchar.h"
 #include "parts.wchar.unistd.h"
 #include <unistd.h>
+#include <unicode.h>
+#include <format-printer.h>
+#include <malloc.h>
+#include <string.h>
 #include <uchar.h>
 #include <fcntl.h>
+#include <stdio.h> /* L_ctermid */
+#include <sys/utsname.h>
 
 DECL_BEGIN
 
@@ -136,7 +143,7 @@ NOTHROW_RPC(LIBCCALL libc_wpathconf)(char32_t const *path,
 	if unlikely(!used_path)
 		return -1;
 	result = pathconf(used_path, name);
-	libc_uchar_free(used_path);
+	free(used_path);
 	return result;
 }
 /*[[[end:wpathconf]]]*/
@@ -157,7 +164,7 @@ NOTHROW_RPC(LIBDCALL libd_wpathconf)(char16_t const *path,
 	if unlikely(!used_path)
 		return -1;
 	result = pathconf(used_path, name);
-	libc_uchar_free(used_path);
+	free(used_path);
 	return result;
 }
 /*[[[end:DOS$wpathconf]]]*/
@@ -187,9 +194,9 @@ NOTHROW_RPC(LIBCCALL libc_wlinkat)(fd_t fromfd,
 			goto done_from;
 	}
 	result = linkat(fromfd, used_from, tofd, used_to, flags);
-	libc_uchar_free(used_to);
+	free(used_to);
 done_from:
-	libc_uchar_free(used_from);
+	free(used_from);
 done:
 	return result;
 }
@@ -220,9 +227,9 @@ NOTHROW_RPC(LIBDCALL libd_wlinkat)(fd_t fromfd,
 			goto done_from;
 	}
 	result = linkat(fromfd, used_from, tofd, used_to, flags);
-	libc_uchar_free(used_to);
+	free(used_to);
 done_from:
-	libc_uchar_free(used_from);
+	free(used_from);
 done:
 	return result;
 }
@@ -241,7 +248,7 @@ NOTHROW_RPC(LIBCCALL libc_wchdir)(char32_t const *path)
 	used_path = libc_uchar_c32tombs(path);
 	if likely(used_path) {
 		result = chdir(used_path);
-		libc_uchar_free(used_path);
+		free(used_path);
 	}
 	return result;
 }
@@ -260,7 +267,7 @@ NOTHROW_RPC(LIBDCALL libd_wchdir)(char16_t const *path)
 	used_path = libc_uchar_c16tombs(path);
 	if likely(used_path) {
 		result = chdir(used_path);
-		libc_uchar_free(used_path);
+		free(used_path);
 	}
 	return result;
 }
@@ -274,9 +281,37 @@ NOTHROW_RPC(LIBCCALL libc_wgetcwd)(char32_t *buf,
                                    size_t bufsize)
 /*[[[body:wgetcwd]]]*/
 {
-	CRT_UNIMPLEMENTED("wgetcwd"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
+	char32_t *result;
+	size_t result_len;
+	result = libc_wget_current_dir_name();
+	if unlikely(!result)
+		return NULL;
+	if (!buf) {
+		char32_t *new_result;
+		if (!bufsize)
+			return result;
+		result_len = c32len(result);
+		if (bufsize <= result_len) {
+			libc_seterrno(ERANGE);
+			free(result);
+			return NULL;
+		}
+		new_result = (char32_t *)realloc(result, bufsize * 4);
+		if unlikely(!new_result) {
+			free(result);
+			return NULL;
+		}
+		return new_result;
+	}
+	result_len = c32len(result);
+	if (bufsize <= result_len) {
+		libc_seterrno(ERANGE);
+		free(result);
+		return NULL;
+	}
+	c32memcpy(buf, result, result_len + 1);
+	free(result);
+	return buf;
 }
 /*[[[end:wgetcwd]]]*/
 
@@ -288,9 +323,37 @@ NOTHROW_RPC(LIBDCALL libd_wgetcwd)(char16_t *buf,
                                    size_t bufsize)
 /*[[[body:DOS$wgetcwd]]]*/
 {
-	CRT_UNIMPLEMENTED("wgetcwd"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
+	char16_t *result;
+	size_t result_len;
+	result = libd_wget_current_dir_name();
+	if unlikely(!result)
+		return NULL;
+	if (!buf) {
+		char16_t *new_result;
+		if (!bufsize)
+			return result;
+		result_len = c16len(result);
+		if (bufsize <= result_len) {
+			libc_seterrno(ERANGE);
+			free(result);
+			return NULL;
+		}
+		new_result = (char16_t *)realloc(result, bufsize * 4);
+		if unlikely(!new_result) {
+			free(result);
+			return NULL;
+		}
+		return new_result;
+	}
+	result_len = c16len(result);
+	if (bufsize <= result_len) {
+		libc_seterrno(ERANGE);
+		free(result);
+		return NULL;
+	}
+	c16memcpy(buf, result, result_len + 1);
+	free(result);
+	return buf;
 }
 /*[[[end:DOS$wgetcwd]]]*/
 
@@ -311,7 +374,7 @@ NOTHROW_RPC(LIBCCALL libc_wfaccessat)(fd_t dfd,
 	used_file = libc_uchar_c32tombs(file);
 	if likely(used_file) {
 		result = faccessat(dfd, used_file, type, flags);
-		libc_uchar_free(used_file);
+		free(used_file);
 	}
 	return result;
 }
@@ -334,7 +397,7 @@ NOTHROW_RPC(LIBDCALL libd_wfaccessat)(fd_t dfd,
 	used_file = libc_uchar_c16tombs(file);
 	if likely(used_file) {
 		result = faccessat(dfd, used_file, type, flags);
-		libc_uchar_free(used_file);
+		free(used_file);
 	}
 	return result;
 }
@@ -357,7 +420,7 @@ NOTHROW_RPC(LIBCCALL libc_wfchownat)(fd_t dfd,
 	used_file = libc_uchar_c32tombs(file);
 	if likely(used_file) {
 		result = fchownat(dfd, used_file, owner, group, flags);
-		libc_uchar_free(used_file);
+		free(used_file);
 	}
 	return result;
 }
@@ -380,7 +443,7 @@ NOTHROW_RPC(LIBDCALL libd_wfchownat)(fd_t dfd,
 	used_file = libc_uchar_c16tombs(file);
 	if likely(used_file) {
 		result = fchownat(dfd, used_file, owner, group, flags);
-		libc_uchar_free(used_file);
+		free(used_file);
 	}
 	return result;
 }
@@ -406,9 +469,9 @@ NOTHROW_RPC(LIBCCALL libc_wsymlinkat)(char32_t const *from,
 	if unlikely(!used_to)
 		goto done_from;
 	result = symlinkat(used_from, tofd, used_to);
-	libc_uchar_free(used_to);
+	free(used_to);
 done_from:
-	libc_uchar_free(used_from);
+	free(used_from);
 done:
 	return result;
 }
@@ -434,9 +497,9 @@ NOTHROW_RPC(LIBDCALL libd_wsymlinkat)(char16_t const *from,
 	if unlikely(!used_to)
 		goto done_from;
 	result = symlinkat(used_from, tofd, used_to);
-	libc_uchar_free(used_to);
+	free(used_to);
 done_from:
-	libc_uchar_free(used_from);
+	free(used_from);
 done:
 	return result;
 }
@@ -537,7 +600,7 @@ NOTHROW_RPC(LIBCCALL libc_wunlinkat)(fd_t dfd,
 	used_name = libc_uchar_c32tombs(name);
 	if likely(used_name) {
 		result = unlinkat(dfd, used_name, flags);
-		libc_uchar_free(used_name);
+		free(used_name);
 	}
 	return result;
 }
@@ -558,7 +621,7 @@ NOTHROW_RPC(LIBDCALL libd_wunlinkat)(fd_t dfd,
 	used_name = libc_uchar_c16tombs(name);
 	if likely(used_name) {
 		result = unlinkat(dfd, used_name, flags);
-		libc_uchar_free(used_name);
+		free(used_name);
 	}
 	return result;
 }
@@ -599,9 +662,28 @@ NOTHROW_NCX(LIBCCALL libc_wgethostname)(char32_t *name,
                                         size_t buflen)
 /*[[[body:wgethostname]]]*/
 {
-	CRT_UNIMPLEMENTED("wgethostname"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	struct utsname uts;
+	int result = uname(&uts);
+	if likely(result == 0) {
+		struct format_c32snprintf_data printer_data;
+		struct format_8to32_data convert_data;
+		size_t len = strnlen(uts.nodename, _UTSNAME_NODENAME_LENGTH);
+		ssize_t width;
+		printer_data.sd_buffer     = name;
+		printer_data.sd_bufsiz     = buflen;
+		convert_data.fd_arg        = &printer_data;
+		convert_data.fd_printer    = format_c32snprintf_printer;
+		convert_data.fd_incomplete = 0;
+		width = format_8to32(&convert_data, uts.nodename, len);
+		if unlikely(width < 0)
+			return -1;
+		if ((size_t)width >= buflen) {
+			libc_seterrno(ERANGE);
+			return -1;
+		}
+		*printer_data.sd_buffer = '\0'; /* NUL-terminate */
+	}
+	return result;
 }
 /*[[[end:wgethostname]]]*/
 
@@ -614,9 +696,28 @@ NOTHROW_NCX(LIBDCALL libd_wgethostname)(char16_t *name,
                                         size_t buflen)
 /*[[[body:DOS$wgethostname]]]*/
 {
-	CRT_UNIMPLEMENTED("wgethostname"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	struct utsname uts;
+	int result = uname(&uts);
+	if likely(result == 0) {
+		struct format_c16snprintf_data printer_data;
+		struct format_8to16_data convert_data;
+		size_t len = strnlen(uts.nodename, _UTSNAME_NODENAME_LENGTH);
+		ssize_t width;
+		printer_data.sd_buffer     = name;
+		printer_data.sd_bufsiz     = buflen;
+		convert_data.fd_arg        = &printer_data;
+		convert_data.fd_printer    = format_c16snprintf_printer;
+		convert_data.fd_incomplete = 0;
+		width = format_8to16(&convert_data, uts.nodename, len);
+		if unlikely(width < 0)
+			return -1;
+		if ((size_t)width >= buflen) {
+			libc_seterrno(ERANGE);
+			return -1;
+		}
+		*printer_data.sd_buffer = '\0'; /* NUL-terminate */
+	}
+	return result;
 }
 /*[[[end:DOS$wgethostname]]]*/
 
@@ -631,7 +732,7 @@ NOTHROW_NCX(LIBCCALL libc_wsetlogin)(char32_t const *name)
 	used_name = libc_uchar_c32tombs(name);
 	if likely(used_name) {
 		result = setlogin(used_name);
-		libc_uchar_free(used_name);
+		free(used_name);
 	}
 	return result;
 }
@@ -648,7 +749,7 @@ NOTHROW_NCX(LIBDCALL libd_wsetlogin)(char16_t const *name)
 	used_name = libc_uchar_c16tombs(name);
 	if likely(used_name) {
 		result = setlogin(used_name);
-		libc_uchar_free(used_name);
+		free(used_name);
 	}
 	return result;
 }
@@ -669,7 +770,7 @@ NOTHROW_NCX(LIBCCALL libc_wsethostname)(char32_t const *name,
 	used_name = libc_uchar_c32tombsn(name, len, &used_len);
 	if likely(used_name) {
 		result = sethostname(used_name, used_len);
-		libc_uchar_freen(used_name, used_len);
+		free(used_name);
 	}
 	return result;
 }
@@ -690,7 +791,7 @@ NOTHROW_NCX(LIBDCALL libd_wsethostname)(char16_t const *name,
 	used_name = libc_uchar_c16tombsn(name, len, &used_len);
 	if likely(used_name) {
 		result = sethostname(used_name, used_len);
-		libc_uchar_freen(used_name, used_len);
+		free(used_name);
 	}
 	return result;
 }
@@ -705,9 +806,28 @@ NOTHROW_NCX(LIBCCALL libc_wgetdomainname)(char32_t *name,
                                           size_t buflen)
 /*[[[body:wgetdomainname]]]*/
 {
-	CRT_UNIMPLEMENTED("wgetdomainname"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	struct utsname uts;
+	int result = uname(&uts);
+	if likely(result == 0) {
+		struct format_c32snprintf_data printer_data;
+		struct format_8to32_data convert_data;
+		size_t len = strnlen(uts.domainname, _UTSNAME_DOMAIN_LENGTH);
+		ssize_t width;
+		printer_data.sd_buffer     = name;
+		printer_data.sd_bufsiz     = buflen;
+		convert_data.fd_arg        = &printer_data;
+		convert_data.fd_printer    = format_c32snprintf_printer;
+		convert_data.fd_incomplete = 0;
+		width = format_8to32(&convert_data, uts.domainname, len);
+		if unlikely(width < 0)
+			return -1;
+		if ((size_t)width >= buflen) {
+			libc_seterrno(ERANGE);
+			return -1;
+		}
+		*printer_data.sd_buffer = '\0'; /* NUL-terminate */
+	}
+	return result;
 }
 /*[[[end:wgetdomainname]]]*/
 
@@ -720,9 +840,28 @@ NOTHROW_NCX(LIBDCALL libd_wgetdomainname)(char16_t *name,
                                           size_t buflen)
 /*[[[body:DOS$wgetdomainname]]]*/
 {
-	CRT_UNIMPLEMENTED("wgetdomainname"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	struct utsname uts;
+	int result = uname(&uts);
+	if likely(result == 0) {
+		struct format_c16snprintf_data printer_data;
+		struct format_8to16_data convert_data;
+		size_t len = strnlen(uts.domainname, _UTSNAME_DOMAIN_LENGTH);
+		ssize_t width;
+		printer_data.sd_buffer     = name;
+		printer_data.sd_bufsiz     = buflen;
+		convert_data.fd_arg        = &printer_data;
+		convert_data.fd_printer    = format_c16snprintf_printer;
+		convert_data.fd_incomplete = 0;
+		width = format_8to16(&convert_data, uts.domainname, len);
+		if unlikely(width < 0)
+			return -1;
+		if ((size_t)width >= buflen) {
+			libc_seterrno(ERANGE);
+			return -1;
+		}
+		*printer_data.sd_buffer = '\0'; /* NUL-terminate */
+	}
+	return result;
 }
 /*[[[end:DOS$wgetdomainname]]]*/
 
@@ -741,7 +880,7 @@ NOTHROW_NCX(LIBCCALL libc_wsetdomainname)(char32_t const *name,
 	used_name = libc_uchar_c32tombsn(name, len, &used_len);
 	if likely(used_name) {
 		result = setdomainname(used_name, used_len);
-		libc_uchar_freen(used_name, used_len);
+		free(used_name);
 	}
 	return result;
 }
@@ -762,7 +901,7 @@ NOTHROW_NCX(LIBDCALL libd_wsetdomainname)(char16_t const *name,
 	used_name = libc_uchar_c16tombsn(name, len, &used_len);
 	if likely(used_name) {
 		result = setdomainname(used_name, used_len);
-		libc_uchar_freen(used_name, used_len);
+		free(used_name);
 	}
 	return result;
 }
@@ -782,7 +921,7 @@ NOTHROW_RPC(LIBCCALL libc_wchroot)(char32_t const *__restrict path)
 	used_path = libc_uchar_c32tombs(path);
 	if likely(used_path) {
 		result = chroot(used_path);
-		libc_uchar_free(used_path);
+		free(used_path);
 	}
 	return result;
 }
@@ -802,7 +941,7 @@ NOTHROW_RPC(LIBDCALL libd_wchroot)(char16_t const *__restrict path)
 	used_path = libc_uchar_c16tombs(path);
 	if likely(used_path) {
 		result = chroot(used_path);
-		libc_uchar_free(used_path);
+		free(used_path);
 	}
 	return result;
 }
@@ -813,9 +952,21 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wctermid") char32_t *
 NOTHROW_NCX(LIBCCALL libc_wctermid)(char32_t *s)
 /*[[[body:wctermid]]]*/
 {
-	CRT_UNIMPLEMENTED("wctermid"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
+	char32_t *printer_data = s;
+	struct format_8to32_data convert_data;
+	char buf[L_ctermid], *ptr;
+	size_t len;
+	ptr = ctermid(buf);
+	if unlikely(!ptr)
+		return NULL;
+	convert_data.fd_arg        = &printer_data;
+	convert_data.fd_incomplete = 0;
+	convert_data.fd_printer    = &format_c32sprintf_printer;
+	len = strlen(ptr);
+	if unlikely(format_8to32(&convert_data, ptr, len) < 0)
+		return NULL;
+	*printer_data = '\0'; /* NUL-terminate */
+	return s;
 }
 /*[[[end:wctermid]]]*/
 
@@ -824,9 +975,21 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wctermid") char16_t *
 NOTHROW_NCX(LIBDCALL libd_wctermid)(char16_t *s)
 /*[[[body:DOS$wctermid]]]*/
 {
-	CRT_UNIMPLEMENTED("wctermid"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
+	char16_t *printer_data = s;
+	struct format_8to16_data convert_data;
+	char buf[L_ctermid], *ptr;
+	size_t len;
+	ptr = ctermid(buf);
+	if unlikely(!ptr)
+		return NULL;
+	convert_data.fd_arg        = &printer_data;
+	convert_data.fd_incomplete = 0;
+	convert_data.fd_printer    = &format_c16sprintf_printer;
+	len = strlen(ptr);
+	if unlikely(format_8to16(&convert_data, ptr, len) < 0)
+		return NULL;
+	*printer_data = '\0'; /* NUL-terminate */
+	return s;
 }
 /*[[[end:DOS$wctermid]]]*/
 
@@ -845,7 +1008,7 @@ NOTHROW_RPC(LIBCCALL libc_wchown)(char32_t const *file,
 	used_file = libc_uchar_c32tombs(file);
 	if likely(used_file) {
 		result = chown(used_file, owner, group);
-		libc_uchar_free(used_file);
+		free(used_file);
 	}
 	return result;
 }
@@ -866,7 +1029,7 @@ NOTHROW_RPC(LIBDCALL libd_wchown)(char16_t const *file,
 	used_file = libc_uchar_c16tombs(file);
 	if likely(used_file) {
 		result = chown(used_file, owner, group);
-		libc_uchar_free(used_file);
+		free(used_file);
 	}
 	return result;
 }
@@ -1008,7 +1171,14 @@ ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wget_current_dir_name") char32_t *
 NOTHROW_RPC(LIBCCALL libc_wget_current_dir_name)(void)
 /*[[[body:wget_current_dir_name]]]*/
 {
-	return libc_wgetcwd(NULL, 0);
+	char *utf8_path;
+	char32_t *result;
+	utf8_path = get_current_dir_name();
+	if unlikely(!utf8_path)
+		return NULL;
+	result = libc_uchar_mbstoc32(utf8_path);
+	free(utf8_path);
+	return result;
 }
 /*[[[end:wget_current_dir_name]]]*/
 
@@ -1018,7 +1188,14 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wget_current_dir_name") char16_t 
 NOTHROW_RPC(LIBDCALL libd_wget_current_dir_name)(void)
 /*[[[body:DOS$wget_current_dir_name]]]*/
 {
-	return libd_wgetcwd(NULL, 0);
+	char *utf8_path;
+	char16_t *result;
+	utf8_path = get_current_dir_name();
+	if unlikely(!utf8_path)
+		return NULL;
+	result = libc_uchar_mbstoc16(utf8_path);
+	free(utf8_path);
+	return result;
 }
 /*[[[end:DOS$wget_current_dir_name]]]*/
 
@@ -1066,7 +1243,7 @@ NOTHROW_NCX(LIBCCALL libc_wtruncate)(char32_t const *file,
 	used_file = libc_uchar_c32tombs(file);
 	if likely(used_file) {
 		result = truncate(used_file, length);
-		libc_uchar_free(used_file);
+		free(used_file);
 	}
 	return result;
 }
@@ -1086,7 +1263,7 @@ NOTHROW_NCX(LIBDCALL libd_wtruncate)(char16_t const *file,
 	used_file = libc_uchar_c16tombs(file);
 	if likely(used_file) {
 		result = truncate(used_file, length);
-		libc_uchar_free(used_file);
+		free(used_file);
 	}
 	return result;
 }
@@ -1109,7 +1286,7 @@ NOTHROW_NCX(LIBCCALL libc_wtruncate64)(char32_t const *file,
 	used_file = libc_uchar_c32tombs(file);
 	if likely(used_file) {
 		result = truncate64(used_file, length);
-		libc_uchar_free(used_file);
+		free(used_file);
 	}
 	return result;
 }
@@ -1133,7 +1310,7 @@ NOTHROW_NCX(LIBDCALL libd_wtruncate64)(char16_t const *file,
 	used_file = libc_uchar_c16tombs(file);
 	if likely(used_file) {
 		result = truncate64(used_file, length);
-		libc_uchar_free(used_file);
+		free(used_file);
 	}
 	return result;
 }

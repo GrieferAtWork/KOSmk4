@@ -20,8 +20,13 @@
 #define GUARD_LIBC_USER_SYS_TIMEB_C 1
 
 #include "../api.h"
+/**/
+
+#include "../libc/errno.h"
 #include "sys.timeb.h"
 #include <string.h>
+#include <sys/time.h>
+#include <kos/syscalls.h>
 
 DECL_BEGIN
 
@@ -66,11 +71,24 @@ ATTR_WEAK ATTR_SECTION(".text.crt.unsorted._ftime32_s") errno_t
 NOTHROW_NCX(LIBCCALL libc__ftime32_s)(struct __timeb32 *timebuf)
 /*[[[body:_ftime32_s]]]*/
 {
-	CRT_UNIMPLEMENTED("_ftime32_s"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	if (ftime(timebuf) != 0)
+		return libc_geterrno();
+	return EOK;
 }
 /*[[[end:_ftime32_s]]]*/
+
+/*[[[head:DOS$_ftime32_s,hash:0x849397d3]]]*/
+/* Fill in TIMEBUF with information about the current time */
+INTERN NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted._ftime32_s") errno_t
+NOTHROW_NCX(LIBDCALL libd__ftime32_s)(struct __timeb32 *timebuf)
+/*[[[body:DOS$_ftime32_s]]]*/
+{
+	if (ftime(timebuf) != 0)
+		return libd_geterrno();
+	return EOK;
+}
+/*[[[end:DOS$_ftime32_s]]]*/
 
 /*[[[head:_ftime64_s,hash:0xdcbdd160]]]*/
 /* Fill in TIMEBUF with information about the current time */
@@ -82,12 +100,29 @@ ATTR_WEAK ATTR_SECTION(".text.crt.unsorted._ftime64_s") errno_t
 NOTHROW_NCX(LIBCCALL libc__ftime64_s)(struct __timeb64 *timebuf)
 /*[[[body:_ftime64_s]]]*/
 {
-	CRT_UNIMPLEMENTED("_ftime64_s"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	if (ftime64(timebuf) != 0)
+		return libc_geterrno();
+	return EOK;
 }
 #endif /* MAGIC:alias */
 /*[[[end:_ftime64_s]]]*/
+
+/*[[[head:DOS$_ftime64_s,hash:0xc313e046]]]*/
+/* Fill in TIMEBUF with information about the current time */
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libd__ftime64_s, libd__ftime32_s);
+#else
+INTERN NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted._ftime64_s") errno_t
+NOTHROW_NCX(LIBDCALL libd__ftime64_s)(struct __timeb64 *timebuf)
+/*[[[body:DOS$_ftime64_s]]]*/
+{
+	if (ftime64(timebuf) != 0)
+		return libd_geterrno();
+	return EOK;
+}
+#endif /* MAGIC:alias */
+/*[[[end:DOS$_ftime64_s]]]*/
 
 /*[[[head:ftime,hash:0x83b2f66c]]]*/
 /* Fill in TIMEBUF with information about the current time */
@@ -96,9 +131,23 @@ ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.ftime") int
 NOTHROW_NCX(LIBCCALL libc_ftime)(struct timeb *timebuf)
 /*[[[body:ftime]]]*/
 {
-	CRT_UNIMPLEMENTED("ftime"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+#ifdef __NR_ftime
+	errno_t error;
+	error = sys_ftime(timebuf);
+	return libc_seterrno_syserr(error);
+#else /* __NR_ftime */
+	struct timeval tv;
+	struct timezone tz;
+	int result;
+	result = gettimeofday(&tv, &tz);
+	if likely(result == 0) {
+		timebuf->dstflag  = tz.tz_dsttime;
+		timebuf->timezone = tz.tz_minuteswest;
+		timebuf->millitm  = tv.tv_usec / 1000;
+		timebuf->time     = tv.tv_sec;
+	}
+	return result;
+#endif /* !__NR_ftime */
 }
 /*[[[end:ftime]]]*/
 
@@ -112,9 +161,17 @@ ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.ftime64") int
 NOTHROW_NCX(LIBCCALL libc_ftime64)(struct timeb64 *timebuf)
 /*[[[body:ftime64]]]*/
 {
-	CRT_UNIMPLEMENTED("ftime64"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	struct timeval64 tv;
+	struct timezone tz;
+	int result;
+	result = gettimeofday64(&tv, &tz);
+	if likely(result == 0) {
+		timebuf->dstflag  = tz.tz_dsttime;
+		timebuf->timezone = tz.tz_minuteswest;
+		timebuf->millitm  = tv.tv_usec / 1000;
+		timebuf->time     = tv.tv_sec;
+	}
+	return result;
 }
 #endif /* MAGIC:alias */
 /*[[[end:ftime64]]]*/
@@ -123,11 +180,13 @@ NOTHROW_NCX(LIBCCALL libc_ftime64)(struct timeb64 *timebuf)
 
 
 
-/*[[[start:exports,hash:0xb0ac4777]]]*/
+/*[[[start:exports,hash:0xe3baf863]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(_ftime32, libc__ftime32);
 DEFINE_PUBLIC_WEAK_ALIAS(_ftime64, libc__ftime64);
 DEFINE_PUBLIC_WEAK_ALIAS(_ftime32_s, libc__ftime32_s);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_ftime32_s, libd__ftime32_s);
 DEFINE_PUBLIC_WEAK_ALIAS(_ftime64_s, libc__ftime64_s);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_ftime64_s, libd__ftime64_s);
 DEFINE_PUBLIC_WEAK_ALIAS(ftime, libc_ftime);
 DEFINE_PUBLIC_WEAK_ALIAS(ftime64, libc_ftime64);
 /*[[[end:exports]]]*/
