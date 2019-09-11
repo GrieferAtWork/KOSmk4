@@ -56,49 +56,10 @@
 
 DECL_BEGIN
 
-
-INTDEF byte_t __kernel_debug_line_start[];
-INTDEF byte_t __kernel_debug_line_end[];
-INTDEF byte_t __kernel_debug_line_size[];
-INTDEF byte_t __kernel_debug_info_start[];
-INTDEF byte_t __kernel_debug_info_end[];
-INTDEF byte_t __kernel_debug_info_size[];
-INTDEF byte_t __kernel_debug_aranges_start[];
-INTDEF byte_t __kernel_debug_aranges_end[];
-INTDEF byte_t __kernel_debug_aranges_size[];
-INTDEF byte_t __kernel_debug_abbrev_start[];
-INTDEF byte_t __kernel_debug_abbrev_end[];
-INTDEF byte_t __kernel_debug_abbrev_size[];
-INTDEF byte_t __kernel_debug_str_start[];
-INTDEF byte_t __kernel_debug_str_end[];
-INTDEF byte_t __kernel_debug_str_size[];
-INTDEF byte_t __kernel_debug_ranges_start[];
-INTDEF byte_t __kernel_debug_ranges_end[];
-INTDEF byte_t __kernel_debug_ranges_size[];
-INTDEF byte_t __kernel_debug_loc_start[];
-INTDEF byte_t __kernel_debug_loc_end[];
-INTDEF byte_t __kernel_debug_loc_size[];
-INTDEF byte_t __kernel_eh_frame_start[];
-INTDEF byte_t __kernel_eh_frame_end[];
-INTDEF byte_t __kernel_eh_frame_size[];
-
-
 PUBLIC ATTR_USED ATTR_SECTION(".bss")
 struct fcpustate32 boot_cpustate;
 PUBLIC ATTR_USED ATTR_SECTION(".data.cold")
 struct boot_device_info boot_device = { 0xff, 0xff, 0xff, 0xff };
-
-
-#if 0
-PRIVATE struct sig test_signal = SIG_INIT;
-PRIVATE struct sig test_signal2 = SIG_INIT;
-PRIVATE void KCALL test_thread(void *a, void *b) {
-	printk(KERN_DEBUG "In test_thread: %s, %s (%p, %p)\n", a, b, a, b);
-	sig_broadcast(&test_signal);
-	printk(KERN_DEBUG "After sig_broadcast()\n");
-}
-#endif
-
 
 INTDEF port_t debug_port;
 
@@ -134,12 +95,8 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	else if (__x86_bootcpu_idfeatures.ci_80000002a == MAKE_DWORD('B', 'O', 'C', 'H'))
 		debug_port = (port_t)0xe9;
 
-	printk(FREESTR(KERN_NOTICE "Begin kernel initialization\n"));
-	/* Load the kernel binary into the addr2line cache of `magic.dee' */
-	printk(FREESTR(KERN_RAW "%%{vload:" KERNEL_DRIVER_FILENAME "}"));
-
-	printk(FREESTR(KERN_INFO "CPU brand: %q\n"),
-	       __x86_bootcpu_idfeatures.ci_brand);
+	printk(FREESTR(KERN_NOTICE "[boot] Begin kernel initialization\n"));
+	printk(FREESTR(KERN_INFO "[boot] CPU brand: %q\n"), __x86_bootcpu_idfeatures.ci_brand);
 
 	/* Initialize the paging configuration */
 	x86_initialize_paging();
@@ -164,11 +121,11 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 		/* Multiboot support */
 		if (boot_eax == MB_BOOTLOADER_MAGIC) {
 			/* Multiboot Mk#1 */
-			printk(FREESTR(KERN_INFO "Booting via Multiboot-compliant bootloader\n"));
+			printk(FREESTR(KERN_INFO "[boot] Booting via Multiboot-compliant bootloader\n"));
 			x86_load_mb1info(boot_ebx);
 		} else if (boot_eax == MB2_BOOTLOADER_MAGIC) {
 			/* Multiboot Mk#2 */
-			printk(FREESTR(KERN_INFO "Booting via Multiboot2-compliant bootloader\n"));
+			printk(FREESTR(KERN_INFO "[boot] Booting via Multiboot2-compliant bootloader\n"));
 			x86_load_mb2info(boot_ebx);
 		}
 
@@ -181,7 +138,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 			x86_initialize_memory_via_bios();
 			total_pages = minfo_usable_ram_pages();
 		}
-		printk(FREESTR(KERN_INFO "Located %Iu (%#Ix) bytes (%Iu %s) of usable RAM\n"),
+		printk(FREESTR(KERN_INFO "[boot] Located %Iu (%#Ix) bytes (%Iu %s) of usable RAM\n"),
 		       VM_PAGE2ADDR(total_pages), VM_PAGE2ADDR(total_pages),
 		       total_pages >= VM_ADDR2PAGE(0x100000) ? (total_pages / VM_ADDR2PAGE(0x100000)) : (total_pages * PAGESIZE) / 0x400,
 		       total_pages >= VM_ADDR2PAGE(0x100000) ? FREESTR("MiB") : FREESTR("KiB"));
@@ -215,7 +172,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	{
 		size_t i;
 		for (i = 0; i < minfo.mb_bankc; ++i) {
-			printk(KERN_DEBUG "MEMORY: %I64p...%I64p (%s)\n",
+			printk(KERN_DEBUG "[boot] MEMORY: %I64p...%I64p (%s)\n",
 			       (u64)PMEMBANK_TYPE_MIN(minfo.mb_banks[i]),
 			       (u64)PMEMBANK_TYPE_MAX(minfo.mb_banks[i]),
 			       pmembank_type_names[minfo.mb_banks[i].mb_type]);
@@ -230,37 +187,15 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * need to generate just a tiny bit of entropy first.
 	 * So we're just going to read the CMOS RTC state and
 	 * use it to set the initial kernel seed. */
-	{
-		/* TODO: Move this stuff into a different file. */
-		PRIVATE ATTR_FREERODATA u8 const cmos_registers[] = {
-			0x00, /* CMOS_SECOND  */
-			0x02, /* CMOS_MINUTE  */
-			0x04, /* CMOS_HOUR    */
-			0x07, /* CMOS_DAY     */
-			0x08, /* CMOS_MONTH   */
-			0x09  /* CMOS_YEAR    */
-		};
-		unsigned int i;
-		u8 entropy[COMPILER_LENOF(cmos_registers)];
-		u32 boot_seed = 0;
-		for (i = 0; i < COMPILER_LENOF(cmos_registers); ++i) {
-			outb((port_t)0x70, cmos_registers[i]);
-			entropy[i] = inb((port_t)0x71);
-		}
-		/* Combine entropy to generate our boot seed. */
-		for (i = 0; i < COMPILER_LENOF(cmos_registers); ++i) {
-			boot_seed <<= (32 / COMPILER_LENOF(cmos_registers));
-			boot_seed ^= entropy[i];
-		}
-		/*boot_seed = 0xAB091919;*/
-
-		/* Set the boot seed for our pseudo-random number generator. */
-		krand_seed = boot_seed;
-		printk(FREESTR(KERN_DEBUG "Set pseudo RNG seed to 0x%I32p\n"), boot_seed);
-	}
+	x86_initialize_rand_entropy();
 
 	/* Evaluate commandline options defined as `DEFINE_EARLY_KERNEL_COMMANDLINE_OPTION()' */
 	kernel_initialize_commandline_options_early();
+
+	/* Since `kernel_initialize_commandline_options_early()' may have overwritten
+	 * the initial seed set by `x86_initialize_rand_entropy()', only log the actually
+	 * used seed now so that the system logs remain consistent with the user's expectation. */
+	printk(FREESTR(KERN_INFO "[rand] Set pseudo RNG seed to 0x%I32p\n"), krand_seed);
 
 	/* Initialize the kernel VM, and instigate strict memory protection,
 	 * unmapping virtual memory that isn't being used by the kernel, while
