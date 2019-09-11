@@ -193,9 +193,9 @@ got_result_slot:
 			goto again_locked;
 		if (how == HANDLE_MANAGE_SWITCH_TO_HASHMODE_FOR_HANDLE_CHANGED_LOCKED)
 			goto install_hash_handle;
-#else
+#else /* INSTALL_AT */
 		assert(dst_fd <= self->hm_linear.hm_alloc);
-#endif
+#endif /* !INSTALL_AT */
 		if (dst_fd >= self->hm_linear.hm_alloc) {
 			struct handle *new_vector;
 			unsigned int new_alloc;
@@ -220,8 +220,11 @@ got_result_slot:
 #if HANDLE_TYPE_UNDEFINED == 0
 			                                          |
 			                                          GFP_CALLOC
-#endif
+#endif /* HANDLE_TYPE_UNDEFINED == 0 */
 			                                          );
+#if HANDLE_TYPE_UNDEFINED == 0
+			assert(new_vector[new_alloc - 1].h_type == HANDLE_TYPE_UNDEFINED);
+#endif /* HANDLE_TYPE_UNDEFINED == 0 */
 			if unlikely(!new_vector) {
 				/* Try again with a smaller increment. */
 				new_vector = (struct handle *)krealloc_nx(self->hm_linear.hm_vector,
@@ -231,7 +234,7 @@ got_result_slot:
 #if HANDLE_TYPE_UNDEFINED == 0
 				                                          |
 				                                          GFP_CALLOC
-#endif
+#endif /* HANDLE_TYPE_UNDEFINED == 0 */
 				                                          );
 				if (new_vector)
 					new_alloc = dst_fd + 1;
@@ -245,7 +248,7 @@ got_result_slot:
 #if HANDLE_TYPE_UNDEFINED == 0
 					                                         |
 					                                         GFP_CALLOC
-#endif
+#endif /* HANDLE_TYPE_UNDEFINED == 0 */
 					                                         );
 					if unlikely(!new_vector) {
 						new_alloc  = dst_fd + 1;
@@ -254,7 +257,7 @@ got_result_slot:
 #if HANDLE_TYPE_UNDEFINED == 0
 						                                      |
 						                                      GFP_CALLOC
-#endif
+#endif /* HANDLE_TYPE_UNDEFINED == 0 */
 						                                      );
 					}
 					TRY {
@@ -271,7 +274,7 @@ got_result_slot:
 #if HANDLE_TYPE_UNDEFINED != 0
 						memset(new_vector + self->hm_linear.hm_alloc, HANDLE_TYPE_UNDEFINED & 0xff,
 						       (new_alloc - self->hm_linear.hm_alloc) * sizeof(struct handle));
-#endif
+#endif /* HANDLE_TYPE_UNDEFINED != 0 */
 						memcpy(new_vector,
 						       self->hm_linear.hm_vector,
 						       self->hm_linear.hm_alloc *
@@ -288,10 +291,14 @@ got_result_slot:
 #if HANDLE_TYPE_UNDEFINED != 0
 			memset(new_vector + self->hm_linear.hm_alloc, HANDLE_TYPE_UNDEFINED & 0xff,
 			       (new_alloc - self->hm_linear.hm_alloc) * sizeof(struct handle));
-#endif
+#endif /* HANDLE_TYPE_UNDEFINED != 0 */
+			assert(new_alloc != 0);
+			assert(new_vector[new_alloc - 1].h_type == HANDLE_TYPE_UNDEFINED);
+
 			/* Install the krealloc()-ated vector. */
 			self->hm_linear.hm_vector = new_vector;
 			self->hm_linear.hm_alloc  = new_alloc;
+			handle_manager_assert_integrity(self);
 		}
 		/* Store the given handle within its designated slot. */
 		self->hm_linear.hm_vector[dst_fd] = incref(hnd);
@@ -303,7 +310,7 @@ got_result_slot:
 		struct handle_hashent *ent;
 #ifdef INSTALL_AT
 install_hash_handle:
-#endif
+#endif /* INSTALL_AT */
 		/* Figure out where we want to put the new handle within the indirection handle-vector. */
 		vector_index = self->hm_hashvector.hm_vecfree;
 		assert(vector_index <= self->hm_count);
@@ -326,7 +333,7 @@ install_hash_handle:
 #if HANDLE_TYPE_UNDEFINED == 0
 			                                          |
 			                                          GFP_CALLOC
-#endif
+#endif /* HANDLE_TYPE_UNDEFINED == 0 */
 			                                          );
 			if (!new_vector) {
 				new_alloc  = vector_index + 1;
@@ -337,7 +344,7 @@ install_hash_handle:
 #if HANDLE_TYPE_UNDEFINED == 0
 				                                          |
 				                                          GFP_CALLOC
-#endif
+#endif /* HANDLE_TYPE_UNDEFINED == 0 */
 				                                          );
 				if unlikely(!new_vector) {
 					/* Unlock, then allocate with blocking */
@@ -349,7 +356,7 @@ install_hash_handle:
 #if HANDLE_TYPE_UNDEFINED == 0
 					                                         |
 					                                         GFP_CALLOC
-#endif
+#endif /* HANDLE_TYPE_UNDEFINED == 0 */
 					                                         );
 					if unlikely(!new_vector) {
 						new_alloc  = vector_index + 1;
@@ -358,7 +365,7 @@ install_hash_handle:
 #if HANDLE_TYPE_UNDEFINED == 0
 						                                      |
 						                                      GFP_CALLOC
-#endif
+#endif /* HANDLE_TYPE_UNDEFINED == 0 */
 						                                      );
 					}
 					TRY {
@@ -374,7 +381,7 @@ install_hash_handle:
 #if HANDLE_TYPE_UNDEFINED != 0
 						memset(new_vector + self->hm_hashvector.hm_alloc, HANDLE_TYPE_UNDEFINED & 0xff,
 						       (new_alloc - self->hm_hashvector.hm_alloc) * sizeof(struct handle));
-#endif
+#endif /* HANDLE_TYPE_UNDEFINED != 0 */
 						memcpy(new_vector,
 						       self->hm_hashvector.hm_vector,
 						       self->hm_hashvector.hm_alloc *
@@ -391,7 +398,7 @@ install_hash_handle:
 #if HANDLE_TYPE_UNDEFINED != 0
 			memset(new_vector + self->hm_hashvector.hm_alloc, HANDLE_TYPE_UNDEFINED & 0xff,
 			       (new_alloc - self->hm_hashvector.hm_alloc) * sizeof(struct handle));
-#endif
+#endif /* HANDLE_TYPE_UNDEFINED != 0 */
 			/* Install the krealloc()-ated vector. */
 			self->hm_hashvector.hm_vector = new_vector;
 			self->hm_hashvector.hm_alloc  = new_alloc;
@@ -400,10 +407,10 @@ install_hash_handle:
 
 #ifdef INSTALL_AT
 		j = perturb = dst_fd & self->hm_hashvector.hm_hashmsk;
-#else
+#else /* INSTALL_AT */
 		assert(dst_fd <= self->hm_hashvector.hm_hashmsk);
 		j = perturb = dst_fd;
-#endif
+#endif /* !INSTALL_AT */
 		for (;; handle_manager_hashnext(j, perturb)) {
 			ent = &self->hm_hashvector.hm_hashvec[j & self->hm_hashvector.hm_hashmsk];
 			if (ent->hh_handle_id == HANDLE_HASHENT_SENTINEL_ID) {

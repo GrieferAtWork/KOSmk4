@@ -231,7 +231,7 @@ realloc_unchanged:
 		/* Try to allocate the missing part.
 		 * NOTE: We try to do this atomically + NX first, because
 		 *       we're always still holding a lock to `&mall_lock' */
-		extension_flags = (flags & ~(__GFP_HEAPMASK | GFP_CALLOC)) | (node->m_flags & __GFP_HEAPMASK);
+		extension_flags = (flags & ~__GFP_HEAPMASK) | (node->m_flags & __GFP_HEAPMASK);
 		num_allocated = heap_allat_untraced_nx(&kernel_heaps[extension_flags & __GFP_HEAPMASK],
 		                                       extension_base, num_extend, extension_flags | GFP_ATOMIC);
 		if (!num_allocated) {
