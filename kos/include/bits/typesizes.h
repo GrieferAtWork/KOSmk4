@@ -20,6 +20,7 @@
 #define _BITS_TYPESIZES_H 1
 
 #include <__stdinc.h>
+
 #include <hybrid/typecore.h>
 
 #if 0 /* Available type size overrides */

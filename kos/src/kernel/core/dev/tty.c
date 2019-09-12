@@ -338,6 +338,23 @@ predict_output_device_command:
 }
 
 
+INTERN NONNULL((1)) REF struct vm_datablock *KCALL
+tty_device_mmap(struct character_device *__restrict self,
+                vm_vpage64_t *__restrict pminpage,
+                vm_vpage64_t *__restrict pmaxpage) THROWS(...) {
+	struct tty_device *me;
+	REF struct vm_datablock *result;
+	me = (struct tty_device *)self;
+	/* mmap() may be implemented by the display handle (e.g. for direct framebuffer access),
+	 * so forward any request for mapping data into memory to it, and it alone. */
+	result = (*handle_type_db.h_mmap[me->t_ohandle_typ])(me->t_ohandle_ptr,
+	                                                     pminpage,
+	                                                     pmaxpage);
+	return result;
+}
+
+
+
 
 /* Create (but don't register) a new TTY device that connects the two given
  * handles, such that character-based keyboard input is taken from `ihandle_ptr',
@@ -370,6 +387,7 @@ tty_device_alloc(uintptr_half_t ihandle_typ, void *ihandle_ptr,
 	result->cd_type.ct_write = &ttybase_device_owrite;
 	result->cd_type.ct_poll  = &tty_device_poll;
 	result->cd_type.ct_ioctl = &tty_device_ioctl;
+	result->cd_type.ct_mmap  = &tty_device_mmap;
 	result->t_ihandle_typ    = ihandle_typ;
 	result->t_ohandle_typ    = ohandle_typ;
 	result->t_ihandle_ptr    = ihandle_ptr;

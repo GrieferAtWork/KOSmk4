@@ -131,15 +131,20 @@ typedef struct
 #define VGA_STATE_FGRAPHICS  0x0002 /* Graphics mode enabled. */
 #define VGA_STATE_FCURSOR    0x0004 /* Cursor is being shown. */
 	u16                     v_state;     /* [lock(v_lock)] VGA state flags (Set of `VGA_STATE_F*'). */
-	WEAK u16               *v_textbase;  /* [1..1] Base pointer for the VGA text-mode buffer. */
-	WEAK u16               *v_text2line; /* [1..1] Pointer to the start of the second text-mode line. */
-	WEAK u16               *v_textlline; /* [1..1] Pointer to the start of the last text-mode line. */
-	WEAK u16               *v_textend;   /* [1..1] Pointer to the end of the VGA text-mode buffer. */
-	WEAK u16               *v_textptr;   /* [1..1] Pointer to the character that will be written next. */
-	WEAK u16               *v_scrlbase;  /* [1..1] Pointer to the start of the scroll region. */
-	WEAK u16               *v_scrl2lin;  /* [1..1] Pointer to the start of the second line of the scroll region. */
-	WEAK u16               *v_scrlllin;  /* [1..1] Pointer to the start of the last line of the scroll region. */
-	WEAK u16               *v_scrlend;   /* [1..1] Pointer to the end of the scroll region. */
+	struct vga_font        *v_savedfont; /* [0..1][owned][lock(v_lock)] Saved text-mode font while in graphics-mode */
+	struct atomic_rwlock    v_textlock;  /* Lock for accessing the text pointers. */
+	u16                    *v_textbase_real; /* [1..1][const] The real base pointer for the VGA text-mode buffer. */
+	WEAK u16               *v_textbase;  /* [1..1][owned_if(VGA_STATE_FGRAPHICS)][lock(v_textlock)] Base pointer for the VGA text-mode buffer.
+	                                      * When in graphics-mode, this is a heap-allocated memory block to still allow for
+	                                      * display rendering when that rendering should simply be invisible. */
+	WEAK u16               *v_text2line; /* [1..1][lock(v_textlock)] Pointer to the start of the second text-mode line. */
+	WEAK u16               *v_textlline; /* [1..1][lock(v_textlock)] Pointer to the start of the last text-mode line. */
+	WEAK u16               *v_textend;   /* [1..1][lock(v_textlock)] Pointer to the end of the VGA text-mode buffer. */
+	WEAK u16               *v_textptr;   /* [1..1][lock(v_textlock)] Pointer to the character that will be written next. */
+	WEAK u16               *v_scrlbase;  /* [1..1][lock(v_textlock)] Pointer to the start of the scroll region. */
+	WEAK u16               *v_scrl2lin;  /* [1..1][lock(v_textlock)] Pointer to the start of the second line of the scroll region. */
+	WEAK u16               *v_scrlllin;  /* [1..1][lock(v_textlock)] Pointer to the start of the last line of the scroll region. */
+	WEAK u16               *v_scrlend;   /* [1..1][lock(v_textlock)] Pointer to the end of the scroll region. */
 	WEAK size_t             v_scrlsize;  /* Number of characters that get moved during a 1-line scroll operation. */
 	WEAK size_t             v_textsizex; /* Text-mode screen size in X */
 	WEAK size_t             v_textsizey; /* Text-mode screen size in Y */
@@ -160,6 +165,8 @@ INTDEF void KCALL VGA_GetPalette(VGA *__restrict self, USER CHECKED struct vga_p
 INTDEF void KCALL VGA_ScreenOn(VGA *__restrict self);
 INTDEF void KCALL VGA_ScreenOff(VGA *__restrict self);
 
+INTDEF void KCALL VGA_SetFont(VGA *__restrict self, USER CHECKED struct vga_font const *__restrict font);
+INTDEF void KCALL VGA_GetFont(VGA *__restrict self, USER CHECKED struct vga_font *__restrict font);
 
 
 DECL_END

@@ -16,8 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _LINUX_FS_H
-#define _LINUX_FS_H 1
+#ifndef _LINUX_FD_H
+#define _LINUX_FD_H 1
 
 #include <__stdinc.h>
 
@@ -269,4 +269,4 @@ struct floppy_raw_cmd {
 
 __DECL_END
 
-#endif /* _LINUX_FS_H */
+#endif /* _LINUX_FD_H */

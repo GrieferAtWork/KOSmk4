@@ -53,6 +53,14 @@ BEGIN GROUP("apps.keymap") { COMPILE, LINK, MCOPY };
 END
 
 
+BEGIN GROUP("apps.gfx") { COMPILE, LINK, MCOPY };
+	SET_LANGUAGE("c")
+	SET_OUTPUT("/" + BINPATH + "/bin/gfx")
+	SET_DISKFILE("/bin/gfx")
+	SOURCE({ "gfx/*.c" })
+END
+
+
 
 
 

@@ -19,9 +19,11 @@
 #ifndef _BITS_TYPES_H
 #define _BITS_TYPES_H 1
 
-#include <__stdinc.h>
 #include <__crt.h>
+#include <__stdinc.h>
+
 #include <hybrid/typecore.h>
+
 #include <bits/typesizes.h>
 
 __SYSDECL_BEGIN
@@ -47,9 +49,9 @@ __SYSDECL_BEGIN
 #ifndef __SIZEOF_IOMODE_T__
 #if __SIZEOF_POINTER__ >= 8
 #define __SIZEOF_IOMODE_T__         4
-#else
+#else /* __SIZEOF_POINTER__ >= 8 */
 #define __SIZEOF_IOMODE_T__         2
-#endif
+#endif /* __SIZEOF_POINTER__ < 8 */
 #endif /* !__SIZEOF_IOMODE_T__ */
 #ifndef __SIZEOF_MAJOR_T__
 #define __SIZEOF_MAJOR_T__          4
@@ -516,30 +518,32 @@ typedef __CRT_PRIVATE_ULNG(__SIZEOF_TIMER_T__) __timer_t;
 typedef __CRT_PRIVATE_SLNG(__SIZEOF_FSWORD_T__) __fsword_t;
 #define __fsword_t   __fsword_t
 
-//#undef __CRT_PRIVATE_ULNG
-//#undef __CRT_PRIVATE_UINT
-//#undef __CRT_PRIVATE_SLNG
-//#undef __CRT_PRIVATE_SINT
-//#undef __CRT_PRIVATE_ULNG2
-//#undef __CRT_PRIVATE_UINT2
-//#undef __CRT_PRIVATE_SLNG2
-//#undef __CRT_PRIVATE_SINT2
-//#undef __CRT_PRIVATE_ULNG_8
-//#undef __CRT_PRIVATE_SLNG_8
-//#undef __CRT_PRIVATE_UINT_8
-//#undef __CRT_PRIVATE_SINT_8
-//#undef __CRT_PRIVATE_ULNG_4
-//#undef __CRT_PRIVATE_ULNG_2
-//#undef __CRT_PRIVATE_ULNG_1
-//#undef __CRT_PRIVATE_SLNG_4
-//#undef __CRT_PRIVATE_SLNG_2
-//#undef __CRT_PRIVATE_SLNG_1
-//#undef __CRT_PRIVATE_UINT_4
-//#undef __CRT_PRIVATE_UINT_2
-//#undef __CRT_PRIVATE_UINT_1
-//#undef __CRT_PRIVATE_SINT_4
-//#undef __CRT_PRIVATE_SINT_2
-//#undef __CRT_PRIVATE_SINT_1
+#if 0
+#undef __CRT_PRIVATE_ULNG
+#undef __CRT_PRIVATE_UINT
+#undef __CRT_PRIVATE_SLNG
+#undef __CRT_PRIVATE_SINT
+#undef __CRT_PRIVATE_ULNG2
+#undef __CRT_PRIVATE_UINT2
+#undef __CRT_PRIVATE_SLNG2
+#undef __CRT_PRIVATE_SINT2
+#undef __CRT_PRIVATE_ULNG_8
+#undef __CRT_PRIVATE_SLNG_8
+#undef __CRT_PRIVATE_UINT_8
+#undef __CRT_PRIVATE_SINT_8
+#undef __CRT_PRIVATE_ULNG_4
+#undef __CRT_PRIVATE_ULNG_2
+#undef __CRT_PRIVATE_ULNG_1
+#undef __CRT_PRIVATE_SLNG_4
+#undef __CRT_PRIVATE_SLNG_2
+#undef __CRT_PRIVATE_SLNG_1
+#undef __CRT_PRIVATE_UINT_4
+#undef __CRT_PRIVATE_UINT_2
+#undef __CRT_PRIVATE_UINT_1
+#undef __CRT_PRIVATE_SINT_4
+#undef __CRT_PRIVATE_SINT_2
+#undef __CRT_PRIVATE_SINT_1
+#endif
 
 #endif /* __CC__ */
 

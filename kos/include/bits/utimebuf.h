@@ -21,8 +21,10 @@
 
 #include <__stdinc.h>
 #include <features.h>
-#include <bits/types.h>
+
 #include <hybrid/typecore.h>
+
+#include <bits/types.h>
 
 #ifdef __CC__
 __SYSDECL_BEGIN

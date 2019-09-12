@@ -19,8 +19,9 @@
 #ifndef _BITS_UFORMAT_PRINTER_H
 #define _BITS_UFORMAT_PRINTER_H 1
 
-#include <__stdinc.h>
 #include <__crt.h>
+#include <__stdinc.h>
+
 #include <hybrid/typecore.h>
 
 #ifdef __CC__
