@@ -42,6 +42,9 @@
 #include <string.h>
 #include <stdio.h>
 
+/* TODO: Split all of the stuff that's required by both this driver, and the builtin debugger
+ *       into a seperate file that is then included by both components to reduce redundancy. */
+
 DECL_BEGIN
 
 
@@ -638,14 +641,14 @@ VGA_DoGetFont(VGA *__restrict self,
 INTERN void KCALL
 VGA_SetFont(VGA *__restrict self,
             USER CHECKED struct vga_font const *__restrict font) {
-	SCOPED_WRITELOCK(&self->v_lock);
+	SCOPED_WRITELOCK(&self->v_lock); /* XXX: atomic lock in except-szenario */
 	VGA_DoSetFont(self, font);
 }
 
 INTERN void KCALL
 VGA_GetFont(VGA *__restrict self,
             USER CHECKED struct vga_font *__restrict font) {
-	SCOPED_WRITELOCK(&self->v_lock);
+	SCOPED_WRITELOCK(&self->v_lock); /* XXX: atomic lock in except-szenario */
 	VGA_DoGetFont(self, font);
 }
 
@@ -1674,7 +1677,7 @@ VGA_MMap(struct character_device *__restrict self,
 
 PRIVATE REF VGA *vga_device = NULL;
 
-PRIVATE DRIVER_INIT void init(void) {
+PRIVATE DRIVER_INIT void KCALL init(void) {
 	vga_disable_annoying_blinking();
 	vga_device = CHARACTER_DEVICE_ALLOC(VGA);
 	TRY {
@@ -1737,7 +1740,7 @@ PRIVATE DRIVER_INIT void init(void) {
 	}
 }
 
-PRIVATE DRIVER_FINI void fini(void) {
+PRIVATE DRIVER_FINI void KCALL fini(void) {
 	if (vga_device) {
 		character_device_unregister(vga_device);
 		decref(vga_device);

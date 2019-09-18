@@ -64,15 +64,15 @@ __SYSDECL_BEGIN
 #define VGA_SEQ_D       __IOPORT(0x3c5) /* Sequencer Data Register. */
 #define VGA_MIS_R       __IOPORT(0x3cc) /* Misc Output Read Register. */
 #define VGA_MIS_W       __IOPORT(0x3c2) /* Misc Output Write Register. */
-#   define VGA_MIS_FRESERVED         0x10 /* Mask of reserved registers */
-#   define VGA_MIS_FCOLOR            0x01
-#   define VGA_MIS_FENB_MEM_ACCESS   0x02 /* Enable system access to the display buffer. */
-#   define VGA_MIS_FCLOCK_25175_640  0x00 /* 25 Mhz clock -- for 320/640 pixel wide modes */
-#   define VGA_MIS_FCLOCK_28322_720  0x04 /* 28 Mhz clock -- for 360/720 pixel wide modes */
-#   define VGA_MIS_FCLOCKMASK        0x0c /* Mask for the clock selection. */
-#   define VGA_MIS_FSEL_HIGH_PAGE    0x20 /* Select high memory when configured for even/odd mode */
-#   define VGA_MIS_FHSYNCPOL         0x40 /* HSYNC polarity (0 = positive horizontal retrace sync pulse) */
-#   define VGA_MIS_FVSYNCPOL         0x80 /* VSYNC polarity (0 = positive vertical retrace sync pulse) */
+#   define VGA_MIS_FRESERVED        0x10 /* Mask of reserved registers */
+#   define VGA_MIS_FCOLOR           0x01
+#   define VGA_MIS_FENB_MEM_ACCESS  0x02 /* Enable system access to the display buffer. */
+#   define VGA_MIS_FCLOCK_25175_640 0x00 /* 25 Mhz clock -- for 320/640 pixel wide modes */
+#   define VGA_MIS_FCLOCK_28322_720 0x04 /* 28 Mhz clock -- for 360/720 pixel wide modes */
+#   define VGA_MIS_FCLOCKMASK       0x0c /* Mask for the clock selection. */
+#   define VGA_MIS_FSEL_HIGH_PAGE   0x20 /* Select high memory when configured for even/odd mode */
+#   define VGA_MIS_FHSYNCPOL        0x40 /* HSYNC polarity (0 = positive horizontal retrace sync pulse) */
+#   define VGA_MIS_FVSYNCPOL        0x80 /* VSYNC polarity (0 = positive vertical retrace sync pulse) */
 #define VGA_FTC_R       __IOPORT(0x3ca) /* Feature Control Read Register. */
 #define VGA_IS1_RC      __IOPORT(0x3da) /* Input Status Register 1 - color emulation. */
 #define VGA_IS1_RM      __IOPORT(0x3ba) /* Input Status Register 1 - mono emulation. */
@@ -128,27 +128,27 @@ __SYSDECL_BEGIN
 #   define VGA_CR9_FV_LINECOMP_9    0x40 /* 9th bit for `VGA_CRTC_LINE_COMPARE' */
 #   define VGA_CR9_FSCANDOUBLE      0x80 /* Better don't set... (Don't really understand what this done) */
 #define VGA_CRTC_CURSOR_START  0x0a
-#   define VGA_CRA_FCURSOR_DISABLE 0x20 /* Disable the text-mode cursor */
-#   define VGA_CRA_FRESERVED       0xc0 /* Mask of reserved registers */
+#   define VGA_CRA_FCURSOR_DISABLE  0x20 /* Disable the text-mode cursor */
+#   define VGA_CRA_FRESERVED        0xc0 /* Mask of reserved registers */
 #define VGA_CRTC_CURSOR_END    0x0b
-#   define VGA_CRB_FRESERVED       0x80 /* Mask of reserved registers */
+#   define VGA_CRB_FRESERVED        0x80 /* Mask of reserved registers */
 #define VGA_CRTC_START_HI      0x0c
 #define VGA_CRTC_START_LO      0x0d
 #define VGA_CRTC_CURSOR_HI     0x0e
 #define VGA_CRTC_CURSOR_LO     0x0f
 #define VGA_CRTC_V_SYNC_START  0x10
 #define VGA_CRTC_V_SYNC_END    0x11
-#   define VGA_CR11_FRESERVED     0x30 /* Mask of reserved registers */
-#   define VGA_CR11_FMASK         0x0f /* Mask of bits used for vsync-end */
-#   define VGA_CR11_FLOCK_CR0_CR7 0x80 /* lock writes to CR0 - CR7. */
+#   define VGA_CR11_FRESERVED       0x30 /* Mask of reserved registers */
+#   define VGA_CR11_FMASK           0x0f /* Mask of bits used for vsync-end */
+#   define VGA_CR11_FLOCK_CR0_CR7   0x80 /* lock writes to CR0 - CR7. */
 #define VGA_CRTC_V_DISP_END    0x12
 #define VGA_CRTC_OFFSET        0x13
 #define VGA_CRTC_UNDERLINE     0x14
 #define VGA_CRTC_V_BLANK_START 0x15
 #define VGA_CRTC_V_BLANK_END   0x16
-#   define VGA_CR16_FRESERVED     0x80 /* Mask of reserved registers */
+#   define VGA_CR16_FRESERVED       0x80 /* Mask of reserved registers */
 #define VGA_CRTC_MODE          0x17
-#   define VGA_CR17_FRESERVED     0x10 /* Mask of reserved registers */
+#   define VGA_CR17_FRESERVED       0x10 /* Mask of reserved registers */
 #   define VGA_CR17_FH_V_SIGNALS_ENABLED 0x80
 #define VGA_CRTC_LINE_COMPARE  0x18
 #define VGA_CRTC_REGS          VGA_CRT_C
@@ -171,23 +171,23 @@ __SYSDECL_BEGIN
 #define VGA_ATC_PALETTEE       0x0e
 #define VGA_ATC_PALETTEF       0x0f
 #define VGA_ATC_MODE           0x10
-#   define VGA_AT10_FRESERVED      0x10 /* Mask of reserved registers */
-#   define VGA_AT10_FGRAPHICS      0x01 /* Enable graphics, rather than alphanumeric mode */
-#   define VGA_AT10_FDUP9          0x04 /* Duplicate the 8`th text dot into the 9`th when `VGA_SR01_CHAR_CLK_8DOTS' isn't set, instead of filling it with background */
-#   define VGA_AT10_FBLINK         0x08 /* Set to cause character attribute bit #7 to be used for blinking text;
-                                         * NEVER SET THIS! YOU'LL CAUSE SEIZURES IN PEOPLE
-                                         * WARNING: After boot, a BIOS mode switch, or a video card reset, this flag
-                                         *          is enabled and _MUST_ under all circumstances be disabled again! */
-#   define VGA_AT10_F8BITPAL       0x40 /* 8-bit palette index */
+#   define VGA_AT10_FRESERVED       0x10 /* Mask of reserved registers */
+#   define VGA_AT10_FGRAPHICS       0x01 /* Enable graphics, rather than alphanumeric mode */
+#   define VGA_AT10_FDUP9           0x04 /* Duplicate the 8`th text dot into the 9`th when `VGA_SR01_CHAR_CLK_8DOTS' isn't set, instead of filling it with background */
+#   define VGA_AT10_FBLINK          0x08 /* Set to cause character attribute bit #7 to be used for blinking text;
+                                          * NEVER SET THIS! YOU'LL CAUSE SEIZURES IN PEOPLE
+                                          * WARNING: After boot, a BIOS mode switch, or a video card reset, this flag
+                                          *          is enabled and _MUST_ under all circumstances be disabled again! */
+#   define VGA_AT10_F8BITPAL        0x40 /* 8-bit palette index */
 #define VGA_ATC_OVERSCAN       0x11
 #define VGA_ATC_PLANE_ENABLE   0x12
-#   define VGA_AT12_FMASK          0x0f /* Mask of planes */
-#   define VGA_AT12_FRESERVED      0xf0 /* Mask of reserved registers */
+#   define VGA_AT12_FMASK           0x0f /* Mask of planes */
+#   define VGA_AT12_FRESERVED       0xf0 /* Mask of reserved registers */
 #define VGA_ATC_PEL            0x13
-#   define VGA_AT13_FMASK          0x0f /* Mask for pixel panning */
-#   define VGA_AT13_FRESERVED      0xf0 /* Mask of reserved registers */
+#   define VGA_AT13_FMASK           0x0f /* Mask for pixel panning */
+#   define VGA_AT13_FRESERVED       0xf0 /* Mask of reserved registers */
 #define VGA_ATC_COLOR_PAGE     0x14
-#   define VGA_AT14_FRESERVED      0xf0 /* Mask of reserved registers */
+#   define VGA_AT14_FRESERVED       0xf0 /* Mask of reserved registers */
 
 #define VGA_AR_ENABLE_DISPLAY  0x20
 

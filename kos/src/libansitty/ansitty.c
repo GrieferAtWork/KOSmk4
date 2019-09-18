@@ -54,6 +54,7 @@
 DECL_BEGIN
 
 /* CC = ControlCharacter */
+#define CC_NUL    0x00
 #define CC_ENQ    0x05
 #define CC_BEL    0x07
 #define CC_BS     0x08
@@ -2004,6 +2005,10 @@ LOCAL bool CC
 handle_control_character(struct ansitty *__restrict self, char32_t ch) {
 	switch (ch) {
 
+	case CC_NUL:
+		/* NUL should be ignored by ansi ttys in all situations. */
+		goto done;
+
 	case CC_ENQ:
 		/* Return Terminal Status (which defaults to an empty string) */
 		goto done;
@@ -2278,6 +2283,10 @@ again:
 		/* Check for the escape character */
 		switch ((uint8_t)ch) {
 
+		case CC_NUL:
+			/* NUL should be ignored by ansi ttys in all situations. */
+			break;
+
 		case CC_ESC:
 			self->at_state = STATE_ESC;
 			break;
@@ -2383,15 +2392,19 @@ do_insuni:
 		ansitty_pututf8_mbs(self, ch);
 		break;
 
-	case STATE_REPEAT:
-		/* Check for the escape character */
-		ansitty_do_repeat_unicode(self, cp_decode((uint8_t)ch, self));
-		goto set_text_and_done;
+	case STATE_REPEAT: {
+		char32_t uni = cp_decode((uint8_t)ch, self);
+		if (handle_control_character(self, uni))
+			break;
+		ansitty_do_repeat_unicode(self, uni);
+	}	goto set_text_and_done;
 
-	case STATE_INSERT:
-		/* Check for the escape character */
-		ansitty_do_insert_unicode(self, cp_decode((uint8_t)ch, self));
-		break;
+	case STATE_INSERT: {
+		char32_t uni = cp_decode((uint8_t)ch, self);
+		if (handle_control_character(self, uni))
+			break;
+		ansitty_do_insert_unicode(self, uni);
+	}	break;
 
 	case STATE_TEXT: {
 		char32_t uni = cp_decode((uint8_t)ch, self);
@@ -2621,6 +2634,10 @@ do_insuni:
 			self->at_state  = STATE_CSI;
 			break;
 
+		case CC_NUL:
+			/* NUL should be ignored by ansi ttys in all situations. */
+			break;
+
 		case CC_CAN: /* Cancel */
 set_text_and_done:
 			ansitty_setstate_text(self);
@@ -2702,6 +2719,10 @@ setcp_USASCII:
 			self->at_state = STATE_LPAREN_PERCENT;
 			break;
 
+		case CC_NUL:
+			/* NUL should be ignored by ansi ttys in all situations. */
+			break;
+
 		case CC_CAN: /* Cancel */
 			goto set_text_and_done;
 
@@ -2716,6 +2737,10 @@ setcp_USASCII:
 
 		case '6': /* Portuguese, VT300. */
 			SET_CP(CP_PORTUGUESE);
+			break;
+
+		case CC_NUL:
+			/* NUL should be ignored by ansi ttys in all situations. */
 			break;
 
 		case CC_CAN: /* Cancel */
@@ -2743,6 +2768,8 @@ do_process_csi:
 		}
 		if (ch == CC_CAN) /* Cancel */
 			goto set_text_and_done;
+		if (ch == CC_NUL) /* Ignored */
+			break;
 		self->at_escape[self->at_esclen] = (byte_t)ch;
 		++self->at_esclen;
 		if unlikely(self->at_esclen >= COMPILER_LENOF(self->at_escape)) {
@@ -2766,6 +2793,8 @@ do_process_csi:
 			goto set_text_and_done;
 		} else if (ch == CC_CAN) { /* Cancel */
 			goto set_text_and_done;
+		} else if (ch == CC_NUL) { /* Ignored */
+			break;
 		}
 		self->at_escape[self->at_esclen] = CC_ESC;
 		++self->at_esclen;
@@ -2796,6 +2825,8 @@ do_process_string_command:
 			break;
 		} else if (ch == CC_CAN) { /* Cancel */
 			goto set_text_and_done;
+		} else if (ch == CC_NUL) { /* Ignored */
+			break;
 		}
 		self->at_escape[self->at_esclen] = (byte_t)ch;
 		++self->at_esclen;
@@ -2813,6 +2844,8 @@ do_process_string_command:
 			goto set_text_and_done;
 		} else if (ch == CC_CAN) {
 			goto set_text_and_done;
+		} else if (ch == CC_NUL) { /* Ignored */
+			break;
 		}
 		WARN_UNKNOWN_SEQUENCE2('5', ch);
 		goto reset_state;
@@ -2832,6 +2865,8 @@ do_process_string_command:
 			goto set_text_and_done;
 		} else if (ch == CC_CAN) {
 			goto set_text_and_done;
+		} else if (ch == CC_NUL) { /* Ignored */
+			break;
 		}
 		WARN_UNKNOWN_SEQUENCE2('6', ch);
 		goto reset_state;
@@ -2873,6 +2908,10 @@ do_process_string_command:
 			 */
 			goto set_text_and_done;
 
+		case CC_NUL:
+			/* NUL should be ignored by ansi ttys in all situations. */
+			break;
+
 		case CC_CAN:
 			goto reset_state;
 
@@ -2886,6 +2925,8 @@ do_process_string_command:
 		if ((byte_t)ch < 32) {
 			if (ch == CC_CAN)
 				goto set_text_and_done;
+			if (ch == CC_NUL) /* Ignored */
+				break;
 			WARN_UNKNOWN_SEQUENCE2('Y', ch);
 			goto reset_state;
 		}
@@ -2901,6 +2942,8 @@ do_process_string_command:
 		if ((byte_t)ch < 32) {
 			if (ch == CC_CAN)
 				goto set_text_and_done;
+			if (ch == CC_NUL) /* Ignored */
+				break;
 			WARN_UNKNOWN_SEQUENCE3C('Y', 32 + STATE_ESC_Y1_VAL(self), ch);
 			goto reset_state;
 		}
