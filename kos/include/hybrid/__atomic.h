@@ -77,7 +77,7 @@ __SYSDECL_BEGIN
 
 #if defined(__CC__) || defined(__DEEMON__)
 
-#if __GCC_VERSION(4,7,0) || defined(__INTELLISENSE__)
+#if __GCC_VERSION(4,7,0) || defined(____INTELLISENSE_STDINC_COMMON_H)
 #define __hybrid_atomic_load(x,order)                          __atomic_load_n(&(x),order)
 #define __hybrid_atomic_store(x,v,order)                       __atomic_store_n(&(x),v,order)
 #define __hybrid_atomic_xch(x,v,order)                         __atomic_exchange_n(&(x),v,order)
