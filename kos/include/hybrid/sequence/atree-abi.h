@@ -27,7 +27,7 @@
 #include <hybrid/__assert.h>
 #endif
 
-DECL_BEGIN
+__DECL_BEGIN
 
 #ifndef ATREE
 #ifdef __INTELLISENSE__
@@ -969,7 +969,7 @@ again:
 
 #endif /* !ATREE_HEADER_ONLY */
 
-DECL_END
+__DECL_END
 
 #undef ATREE_LOCAL_LEVEL0
 #undef ATREE_LOCAL_SEMI0

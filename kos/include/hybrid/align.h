@@ -19,9 +19,9 @@
 #ifndef __GUARD_HYBRID_ALIGN_H
 #define __GUARD_HYBRID_ALIGN_H 1
 
-#include "compiler.h"
+#include "../__stdinc.h"
 
-DECL_BEGIN
+__DECL_BEGIN
 
 #define IS_ALIGNED(x, align) (!((x) % (align)))
 #define IS_POWER_OF_TWO(x) (((x) & ((x)-1)) == 0)
@@ -30,6 +30,6 @@ DECL_BEGIN
 #define FLOORDIV(x, y) ((x) / (y))
 #define CEILDIV(x, y) (((x) + (y)-1) / (y))
 
-DECL_END
+__DECL_END
 
 #endif /* !__GUARD_HYBRID_ALIGN_H */

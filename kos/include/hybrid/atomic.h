@@ -23,7 +23,7 @@
 #include "__atomic.h"
 #include "host.h"
 
-DECL_BEGIN
+__DECL_BEGIN
 
 #ifdef __CC__
 
@@ -123,6 +123,6 @@ DECL_BEGIN
 
 #endif /* __CC__ */
 
-DECL_END
+__DECL_END
 
 #endif /* !__GUARD_HYBRID_ATOMIC_H */

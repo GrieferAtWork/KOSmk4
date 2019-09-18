@@ -19,10 +19,10 @@
 #ifndef __GUARD_HYBRID_STRUCT_H
 #define __GUARD_HYBRID_STRUCT_H 1
 
-#include <hybrid/compiler.h>
-#include <hybrid/__bit.h>
+#include "../__stdinc.h"
+#include "__bit.h"
 
-DECL_BEGIN
+__DECL_BEGIN
 
 #ifdef __CC__
 #define TYPEDEF(type, name)                               typedef type name;
@@ -45,6 +45,6 @@ DECL_BEGIN
 #define STRUCT_END                                        /* nothing */
 #endif /* !__CC__ */
 
-DECL_END
+__DECL_END
 
 #endif /* !__GUARD_HYBRID_STRUCT_H */

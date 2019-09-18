@@ -22,7 +22,7 @@
 #include "../__stdinc.h"
 #include "__byteswap.h"
 
-DECL_BEGIN
+__DECL_BEGIN
 
 #define BSWAP16_C(x)  __hybrid_bswap16_c(x)
 #define BSWAP32_C(x)  __hybrid_bswap32_c(x)
@@ -105,6 +105,6 @@ DECL_BEGIN
 #endif /* __UINT64_TYPE__ */
 #endif /* __GUARD_HYBRID_UNALIGNED_H */
 
-DECL_END
+__DECL_END
 
 #endif /* !__GUARD_HYBRID_BYTESWAP_H */
