@@ -1,4 +1,4 @@
-/* HASH 0xaa8dc21d */
+/* HASH 0xa48fb6f1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,6 +31,8 @@
 #define __CRT_STUB___p___winitenv 1
 #define __CRT_STUB___p__wenviron 1
 #define __CRT_STUB___p__wpgmptr 1
+#define __CRT_STUB___pthread_register_cancel 1
+#define __CRT_STUB___pthread_register_cancel_defer 1
 #define __CRT_STUB___pthread_unregister_cancel 1
 #define __CRT_STUB___pthread_unregister_cancel_restore 1
 #define __CRT_STUB___pthread_unwind_next 1

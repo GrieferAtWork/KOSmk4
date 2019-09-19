@@ -1,4 +1,4 @@
-/* HASH 0xf23505d3 */
+/* HASH 0xc637446b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2454,6 +2454,8 @@
 
 /* .text.crt.sched.pthread.* */
 #define __CRT_SECTION___pthread_cleanup_routine             __CRT_SECTINFO_sched_pthread                            /* .text.crt.sched.pthread.__pthread_cleanup_routine */
+#define __CRT_SECTION___pthread_register_cancel             __CRT_SECTINFO_sched_pthread                            /* .text.crt.sched.pthread.__pthread_register_cancel */
+#define __CRT_SECTION___pthread_register_cancel_defer       __CRT_SECTINFO_sched_pthread                            /* .text.crt.sched.pthread.__pthread_register_cancel_defer */
 #define __CRT_SECTION___pthread_unregister_cancel           __CRT_SECTINFO_sched_pthread                            /* .text.crt.sched.pthread.__pthread_unregister_cancel */
 #define __CRT_SECTION___pthread_unregister_cancel_restore   __CRT_SECTINFO_sched_pthread                            /* .text.crt.sched.pthread.__pthread_unregister_cancel_restore */
 #define __CRT_SECTION___pthread_unwind_next                 __CRT_SECTINFO_sched_pthread                            /* .text.crt.sched.pthread.__pthread_unwind_next */

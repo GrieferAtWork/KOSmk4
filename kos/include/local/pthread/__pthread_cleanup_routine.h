@@ -1,4 +1,4 @@
-/* HASH 0xa5151d01 */
+/* HASH 0x4591850b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
  * needed or fall back on the copy which must exist somewhere else */
 __LOCAL_LIBC(__pthread_cleanup_routine) __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__pthread_cleanup_routine))(struct __pthread_cleanup_frame *__frame) {
-#line 544 "kos/src/libc/magic/pthread.c"
+#line 549 "kos/src/libc/magic/pthread.c"
 	if (__frame->__do_it)
 		(*__frame->__cancel_routine)(__frame->__cancel_arg);
 }

@@ -1,4 +1,4 @@
-/* HASH 0x5b726c6d */
+/* HASH 0x8decf438 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -615,6 +615,8 @@
 #define __CRT_HAVE___powf 1
 #define __CRT_HAVE___powl 1
 #define __CRT_HAVE___pthread_cleanup_routine 1
+#define __CRT_HAVE___pthread_register_cancel 1
+#define __CRT_HAVE___pthread_register_cancel_defer 1
 #define __CRT_HAVE___pthread_unregister_cancel 1
 #define __CRT_HAVE___pthread_unregister_cancel_restore 1
 #define __CRT_HAVE___pthread_unwind_next 1

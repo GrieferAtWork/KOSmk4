@@ -1,4 +1,4 @@
-/* HASH 0x982a6a4d */
+/* HASH 0x187dccdd */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,6 +31,8 @@
 #define __stub___p___winitenv 1
 #define __stub___p__wenviron 1
 #define __stub___p__wpgmptr 1
+#define __stub___pthread_register_cancel 1
+#define __stub___pthread_register_cancel_defer 1
 #define __stub___pthread_unregister_cancel 1
 #define __stub___pthread_unregister_cancel_restore 1
 #define __stub___pthread_unwind_next 1

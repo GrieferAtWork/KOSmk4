@@ -667,6 +667,8 @@
 #define __CRT_HAVE___powf 1
 #define __CRT_HAVE___powl 1
 #define __CRT_HAVE___pthread_cleanup_routine 1
+#define __CRT_HAVE___pthread_register_cancel 1
+#define __CRT_HAVE___pthread_register_cancel_defer 1
 #define __CRT_HAVE___pthread_unregister_cancel 1
 #define __CRT_HAVE___pthread_unregister_cancel_restore 1
 #define __CRT_HAVE___pthread_unwind_next 1

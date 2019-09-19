@@ -1,4 +1,4 @@
-/* HASH 0x40f27a06 */
+/* HASH 0xeeba363 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -771,6 +771,8 @@
 #define __CRT_ATTR_NOTHROW_NCX___powf 1
 #define __CRT_ATTR_NOTHROW_NCX___powl 1
 #define __CRT_ATTR_NOTHROW_NCX___pthread_cleanup_routine 1
+#define __CRT_ATTR_NOTHROW_NCX___pthread_register_cancel 1
+#define __CRT_ATTR_NOTHROW_NCX___pthread_register_cancel_defer 1
 #define __CRT_ATTR_NOTHROW_NCX___pthread_unregister_cancel 1
 #define __CRT_ATTR_NOTHROW_NCX___pthread_unregister_cancel_restore 1
 #define __CRT_ATTR_NOTHROW_NCX___pthread_unwind_next 1

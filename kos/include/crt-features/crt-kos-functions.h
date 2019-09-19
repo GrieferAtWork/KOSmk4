@@ -1,4 +1,4 @@
-/* HASH 0xbb443dd6 */
+/* HASH 0x728883f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -174,6 +174,8 @@ __CRT_FUNCTION(__p___argv,0,(),0,(),char ***)
 __CRT_FUNCTION(__p___initenv,0,(),0,(),char ***)
 __CRT_FUNCTION(__p__pgmptr,0,(),0,(),char **)
 __CRT_FUNCTION(__pthread_cleanup_routine,0,(),1,(struct __pthread_cleanup_frame *,frame),void)
+__CRT_FUNCTION(__pthread_register_cancel,0,(),1,(__pthread_unwind_buf_t *,buf),void)
+__CRT_FUNCTION(__pthread_register_cancel_defer,0,(),1,(__pthread_unwind_buf_t *,buf),void)
 __CRT_FUNCTION(__pthread_unregister_cancel,0,(),1,(__pthread_unwind_buf_t *,buf),void)
 __CRT_FUNCTION(__pthread_unregister_cancel_restore,0,(),1,(__pthread_unwind_buf_t *,buf),void)
 __CRT_FUNCTION(__pthread_unwind_next,0,(),1,(__pthread_unwind_buf_t *,buf),void)

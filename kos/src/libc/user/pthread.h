@@ -1,4 +1,4 @@
-/* HASH 0x4bd324ab */
+/* HASH 0xedf5b7cb */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -155,7 +155,9 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_pthread_cancel)(pthread_t pthread);
  * the thread as per pthread_exit(PTHREAD_CANCELED) if it has been
  * cancelled */
 INTDEF void NOTHROW_RPC(LIBCCALL libc_pthread_testcancel)(void);
+INTDEF __cleanup_fct_attribute void NOTHROW_NCX(LIBCCALL libc___pthread_register_cancel)(__pthread_unwind_buf_t *buf);
 INTDEF __cleanup_fct_attribute NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc___pthread_unregister_cancel)(__pthread_unwind_buf_t *buf);
+INTDEF __cleanup_fct_attribute NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc___pthread_register_cancel_defer)(__pthread_unwind_buf_t *buf);
 INTDEF __cleanup_fct_attribute NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc___pthread_unregister_cancel_restore)(__pthread_unwind_buf_t *buf);
 /* Internal interface to initiate cleanup */
 INTDEF ATTR_WEAK __cleanup_fct_attribute ATTR_NORETURN NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc___pthread_unwind_next)(__pthread_unwind_buf_t *buf);

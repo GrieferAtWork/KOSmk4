@@ -1,4 +1,4 @@
-/* HASH 0x47163391 */
+/* HASH 0x96fd8132 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -509,7 +509,7 @@ typedef struct {
 /* No special attributes by default. */
 #ifndef __cleanup_fct_attribute
 #define __cleanup_fct_attribute /* nothing */
-#endif
+#endif /* !__cleanup_fct_attribute */
 
 /* Structure to hold the cleanup handler information. */
 struct __pthread_cleanup_frame {
@@ -550,27 +550,31 @@ public:
  * pthread_cleanup_push and pthread_cleanup_pop are macros and must always
  * be used in matching pairs at the same nesting level of braces. */
 #define pthread_cleanup_push(routine, arg) \
-do{	__pthread_cleanup_class __clframe(routine, arg)
+	do {                                   \
+		__pthread_cleanup_class __clframe(routine, arg)
+
 /* Remove a cleanup handler installed by the matching pthread_cleanup_push.
  * If EXECUTE is non-zero, the handler function is called. */
-#define pthread_cleanup_pop(execute) \
-	__clframe.__setdoit (execute); \
-}__WHILE0
+#define pthread_cleanup_pop(execute)  \
+		__clframe.__setdoit(execute); \
+	} __WHILE0
 
 #ifdef __USE_GNU
 /* Install a cleanup handler as pthread_cleanup_push does, but also
  * saves the current cancellation type and sets it to deferred
  * cancellation. */
-#define pthread_cleanup_push_defer_np(routine, arg) \
-do{	__pthread_cleanup_class __clframe (routine, arg); \
-	__clframe.__defer ()
+#define pthread_cleanup_push_defer_np(routine, arg)      \
+	do {                                                 \
+		__pthread_cleanup_class __clframe(routine, arg); \
+		__clframe.__defer()
+
 /* Remove a cleanup handler as pthread_cleanup_pop does, but also
  * restores the cancellation type that was in effect when the matching
  * pthread_cleanup_push_defer was called. */
 #define pthread_cleanup_pop_restore_np(execute) \
-	__clframe.__restore(); \
-	__clframe.__setdoit(execute); \
-}__WHILE0
+		__clframe.__restore();                  \
+		__clframe.__setdoit(execute);           \
+	} __WHILE0
 #endif /* __USE_GNU */
 #else /* __cplusplus */
 #if defined(__CRT_HAVE___pthread_cleanup_routine)
@@ -591,32 +595,43 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(__pthread_cleanup_routine, __FORCELOCAL __ATTR_N
  * is executed with non-zero EXECUTE argument.
  * pthread_cleanup_push and pthread_cleanup_pop are macros and must always
  * be used in matching pairs at the same nesting level of braces. */
-#define pthread_cleanup_push(routine, arg) \
-do{	struct __pthread_cleanup_frame __clframe \
-		__attribute__ ((__cleanup__ (__pthread_cleanup_routine))) \
-		= { .__cancel_routine = (routine), .__cancel_arg = (arg), .__do_it = 1 };
+#define pthread_cleanup_push(routine, arg)                          \
+	do {                                                            \
+		struct __pthread_cleanup_frame __clframe                    \
+		__attribute__((__cleanup__(__pthread_cleanup_routine))) = { \
+			.__cancel_routine = (routine),                          \
+			.__cancel_arg = (arg),                                  \
+			.__do_it = 1                                            \
+		};
+
 /* Remove a cleanup handler installed by the matching pthread_cleanup_push.
  * If EXECUTE is non-zero, the handler function is called. */
-#define pthread_cleanup_pop(execute) \
-	__clframe.__do_it = (execute); \
-}__WHILE0
+#define pthread_cleanup_pop(execute)   \
+		__clframe.__do_it = (execute); \
+	} __WHILE0
+
 #ifdef __USE_GNU
 /* Install a cleanup handler as pthread_cleanup_push does, but also
  * saves the current cancellation type and sets it to deferred
  * cancellation. */
-#define pthread_cleanup_push_defer_np(routine, arg) \
-do{	struct __pthread_cleanup_frame __clframe \
-		__attribute__ ((__cleanup__(__pthread_cleanup_routine))) \
-		= { .__cancel_routine = (routine), .__cancel_arg = (arg), .__do_it = 1 }; \
-	(void)pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, &__clframe.__cancel_type)
+#define pthread_cleanup_push_defer_np(routine, arg)                 \
+	do {                                                            \
+		struct __pthread_cleanup_frame __clframe                    \
+		__attribute__((__cleanup__(__pthread_cleanup_routine))) = { \
+			.__cancel_routine = (routine),                          \
+			.__cancel_arg = (arg),                                  \
+			.__do_it = 1                                            \
+		};                                                          \
+		(void)pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, &__clframe.__cancel_type)
 
 /* Remove a cleanup handler as pthread_cleanup_pop does, but also
  * restores the cancellation type that was in effect when the matching
  * pthread_cleanup_push_defer was called. */
-#define pthread_cleanup_pop_restore_np(execute) \
-	(void) pthread_setcanceltype(__clframe.__cancel_type, NULL); \
-	__clframe.__do_it = (execute); \
-}__WHILE0
+#define pthread_cleanup_pop_restore_np(execute)                     \
+		(void)pthread_setcanceltype(__clframe.__cancel_type, NULL); \
+		__clframe.__do_it = (execute);                              \
+	} __WHILE0
+
 #endif /* __USE_GNU */
 #endif /* !__cplusplus */
 #else /* __GNUC__ && __EXCEPTIONS */
@@ -640,10 +655,9 @@ do{	struct __pthread_cleanup_frame __clframe \
 		__pthread_register_cancel(&__cancel_buf);                                                             \
 		do {
 
-}
-[attribute(__cleanup_fct_attribute)]
-__pthread_register_cancel:(__pthread_unwind_buf_t *buf);
-%{
+#if defined(__CRT_HAVE___pthread_register_cancel)
+__CDECLARE_VOID(__cleanup_fct_attribute,__NOTHROW_NCX,__pthread_register_cancel,(__pthread_unwind_buf_t *__buf),(__buf))
+#endif /* __pthread_register_cancel... */
 /* Remove a cleanup handler installed by the matching pthread_cleanup_push.
  * If EXECUTE is non-zero, the handler function is called. */
 #define pthread_cleanup_pop(execute)                                           \
@@ -654,9 +668,8 @@ __pthread_register_cancel:(__pthread_unwind_buf_t *buf);
 		if (execute)                                                           \
 			(*__cancel_routine)(__cancel_arg);                                 \
 	} __WHILE0
-
 #if defined(__CRT_HAVE___pthread_unregister_cancel)
-__CDECLARE_VOID(____cleanup_fct_attribute __ATTR_NONNULL((1)),__NOTHROW_NCX,__pthread_unregister_cancel,(__pthread_unwind_buf_t *__buf),(__buf))
+__CDECLARE_VOID(__cleanup_fct_attribute __ATTR_NONNULL((1)),__NOTHROW_NCX,__pthread_unregister_cancel,(__pthread_unwind_buf_t *__buf),(__buf))
 #endif /* __pthread_unregister_cancel... */
 #ifdef __USE_GNU
 /* Install a cleanup handler as pthread_cleanup_push does, but also
@@ -675,11 +688,9 @@ __CDECLARE_VOID(____cleanup_fct_attribute __ATTR_NONNULL((1)),__NOTHROW_NCX,__pt
 		}                                                                                                     \
 		__pthread_register_cancel_defer(&__cancel_buf);                                                       \
 		do {
-
-}
-[attribute(__cleanup_fct_attribute)]
-__pthread_register_cancel_defer:([nonnull] __pthread_unwind_buf_t *buf);
-%{
+#if defined(__CRT_HAVE___pthread_register_cancel_defer)
+__CDECLARE_VOID(__cleanup_fct_attribute __ATTR_NONNULL((1)),__NOTHROW_NCX,__pthread_register_cancel_defer,(__pthread_unwind_buf_t *__buf),(__buf))
+#endif /* __pthread_register_cancel_defer... */
 /* Remove a cleanup handler as pthread_cleanup_pop does, but also
  * restores the cancellation type that was in effect when the matching
  * pthread_cleanup_push_defer was called. */
@@ -691,14 +702,13 @@ __pthread_register_cancel_defer:([nonnull] __pthread_unwind_buf_t *buf);
 		if (execute)                                                           \
 			(*__cancel_routine)(__cancel_arg);                                 \
 	} __WHILE0
-
 #if defined(__CRT_HAVE___pthread_unregister_cancel_restore)
-__CDECLARE_VOID(____cleanup_fct_attribute __ATTR_NONNULL((1)),__NOTHROW_NCX,__pthread_unregister_cancel_restore,(__pthread_unwind_buf_t *__buf),(__buf))
+__CDECLARE_VOID(__cleanup_fct_attribute __ATTR_NONNULL((1)),__NOTHROW_NCX,__pthread_unregister_cancel_restore,(__pthread_unwind_buf_t *__buf),(__buf))
 #endif /* __pthread_unregister_cancel_restore... */
 #endif /* __USE_GNU */
 #if defined(__CRT_HAVE___pthread_unwind_next)
 /* Internal interface to initiate cleanup */
-__CDECLARE_VOID(__ATTR_WEAK ____cleanup_fct_attribute __ATTR_NORETURN __ATTR_NONNULL((1)),__NOTHROW_NCX,__pthread_unwind_next,(__pthread_unwind_buf_t *__buf),(__buf))
+__CDECLARE_VOID(__ATTR_WEAK __cleanup_fct_attribute __ATTR_NORETURN __ATTR_NONNULL((1)),__NOTHROW_NCX,__pthread_unwind_next,(__pthread_unwind_buf_t *__buf),(__buf))
 #endif /* __pthread_unwind_next... */
 #endif /* !__GNUC__ || !__EXCEPTIONS */
 
@@ -928,7 +938,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,pthread_rwlockattr_getkind_n
 /* Set reader/write preference */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pthread_rwlockattr_setkind_np,(pthread_rwlockattr_t *__attr, int __pref),(__attr,__pref))
 #endif /* pthread_rwlockattr_setkind_np... */
-#endif
+#endif /* __USE_UNIX98 || __USE_XOPEN2K */
 
 /* Functions for handling conditional variables. */
 

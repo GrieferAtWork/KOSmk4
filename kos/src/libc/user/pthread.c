@@ -1703,11 +1703,33 @@ NOTHROW_NCX(LIBCCALL libc_pthread_atfork)(__pthread_atfork_func_t prepare,
 }
 /*[[[end:pthread_atfork]]]*/
 
+/*[[[head:__pthread_register_cancel,hash:0x71d78bcd]]]*/
+INTERN __cleanup_fct_attribute
+ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.__pthread_register_cancel") void
+NOTHROW_NCX(LIBCCALL libc___pthread_register_cancel)(__pthread_unwind_buf_t *buf)
+/*[[[body:__pthread_register_cancel]]]*/
+{
+	CRT_UNIMPLEMENTED("__pthread_register_cancel"); /* TODO */
+	libc_seterrno(ENOSYS);
+}
+/*[[[end:__pthread_register_cancel]]]*/
+
+/*[[[head:__pthread_register_cancel_defer,hash:0xcf712d5c]]]*/
+INTERN __cleanup_fct_attribute NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.__pthread_register_cancel_defer") void
+NOTHROW_NCX(LIBCCALL libc___pthread_register_cancel_defer)(__pthread_unwind_buf_t *buf)
+/*[[[body:__pthread_register_cancel_defer]]]*/
+{
+	CRT_UNIMPLEMENTED("__pthread_register_cancel_defer"); /* TODO */
+	libc_seterrno(ENOSYS);
+}
+/*[[[end:__pthread_register_cancel_defer]]]*/
+
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:0x7032d735]]]*/
+/*[[[start:exports,hash:0x1abfb6ce]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_create, libc_pthread_create);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_exit, libc_pthread_exit);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_join, libc_pthread_join);
@@ -1755,7 +1777,9 @@ DEFINE_PUBLIC_WEAK_ALIAS(pthread_setcancelstate, libc_pthread_setcancelstate);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_setcanceltype, libc_pthread_setcanceltype);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_cancel, libc_pthread_cancel);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_testcancel, libc_pthread_testcancel);
+DEFINE_PUBLIC_WEAK_ALIAS(__pthread_register_cancel, libc___pthread_register_cancel);
 DEFINE_PUBLIC_WEAK_ALIAS(__pthread_unregister_cancel, libc___pthread_unregister_cancel);
+DEFINE_PUBLIC_WEAK_ALIAS(__pthread_register_cancel_defer, libc___pthread_register_cancel_defer);
 DEFINE_PUBLIC_WEAK_ALIAS(__pthread_unregister_cancel_restore, libc___pthread_unregister_cancel_restore);
 DEFINE_PUBLIC_WEAK_ALIAS(__pthread_unwind_next, libc___pthread_unwind_next);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_mutex_init, libc_pthread_mutex_init);
