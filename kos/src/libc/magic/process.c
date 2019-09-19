@@ -43,6 +43,16 @@ __SYSDECL_BEGIN
 
 %{
 
+#ifndef __TARGV
+#ifdef __USE_DOS
+#   define __TARGV  char const *const *___argv
+#   define __TENVP  char const *const *___envp
+#else
+#   define __TARGV  char *const ___argv[__restrict_arr]
+#   define __TENVP  char *const ___envp[__restrict_arr]
+#endif
+#endif /* !__TARGV */
+
 /* DOS */
 #ifdef __USE_DOS
 #define _P_WAIT          P_WAIT
@@ -70,16 +80,6 @@ typedef __uintptr_t uintptr_t;
 #define __wchar_t_defined 1
 typedef __WCHAR_TYPE__ wchar_t;
 #endif /* !__wchar_t_defined */
-
-#ifndef __TARGV
-#ifdef __USE_DOS
-#   define __TARGV  char const *const *___argv
-#   define __TENVP  char const *const *___envp
-#else
-#   define __TARGV  char *const ___argv[__restrict_arr]
-#   define __TENVP  char *const ___envp[__restrict_arr]
-#endif
-#endif /* !__TARGV */
 
 }
 
