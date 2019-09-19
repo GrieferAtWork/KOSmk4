@@ -239,20 +239,48 @@
 #ifndef __DEFINE_PUBLIC_ALIAS
 #ifdef __COMPILER_HAVE_GCC_ASM
 #   define __DEFINE_ALIAS_STR(x) #x
-#   define __DEFINE_PRIVATE_ALIAS(new,old)      __asm__(".local " __DEFINE_ALIAS_STR(new) "\n.set " __DEFINE_ALIAS_STR(new) "," __DEFINE_ALIAS_STR(old) "\n")
-#   define __DEFINE_PUBLIC_ALIAS(new,old)       __asm__(".global " __DEFINE_ALIAS_STR(new) "\n.set " __DEFINE_ALIAS_STR(new) "," __DEFINE_ALIAS_STR(old) "\n")
-#   define __DEFINE_INTERN_ALIAS(new,old)       __asm__(".global " __DEFINE_ALIAS_STR(new) "\n.hidden " __DEFINE_ALIAS_STR(new) "\n.set " __DEFINE_ALIAS_STR(new) "," __DEFINE_ALIAS_STR(old) "\n")
-#   define __DEFINE_PRIVATE_WEAK_ALIAS(new,old) __asm__(".weak " __DEFINE_ALIAS_STR(new) "\n.local " __DEFINE_ALIAS_STR(new) "\n.set " __DEFINE_ALIAS_STR(new) "," __DEFINE_ALIAS_STR(old) "\n")
-#   define __DEFINE_PUBLIC_WEAK_ALIAS(new,old)  __asm__(".weak " __DEFINE_ALIAS_STR(new) "\n.global " __DEFINE_ALIAS_STR(new) "\n.set " __DEFINE_ALIAS_STR(new) "," __DEFINE_ALIAS_STR(old) "\n")
-#   define __DEFINE_INTERN_WEAK_ALIAS(new,old)  __asm__(".weak " __DEFINE_ALIAS_STR(new) "\n.global " __DEFINE_ALIAS_STR(new) "\n.hidden " __DEFINE_ALIAS_STR(new) "\n.set " __DEFINE_ALIAS_STR(new) "," __DEFINE_ALIAS_STR(old) "\n")
+#ifdef __PE__
+#if 1 /* PE doesn't have .pushsection, .popsection, or even .previous, however we'd need
+       * to change sections in order to write to the `.drectve' section that we want to
+       * export a certain symbol. - So while in theory we can define non-public aliases,
+       * defining public ones if something that we cannot do without assuming the caller's
+       * current section. */
+#   define __NO_DEFINE_ALIAS 1
+#   define __DEFINE_PRIVATE_ALIAS(new, old)      /* Nothing */
+#   define __DEFINE_PUBLIC_ALIAS(new, old)       /* Nothing */
+#   define __DEFINE_INTERN_ALIAS(new, old)       /* Nothing */
+#   define __DEFINE_PRIVATE_WEAK_ALIAS(new, old) /* Nothing */
+#   define __DEFINE_PUBLIC_WEAK_ALIAS(new, old)  /* Nothing */
+#   define __DEFINE_INTERN_WEAK_ALIAS(new, old)  /* Nothing */
+#else
+#   define __DEFINE_PE_DIRECTIVE_STR2(directive) ".pushsection .drectve\n.ascii " #directive "\n.popsection\n"
+#   define __DEFINE_PE_DIRECTIVE_STR(directive)  __DEFINE_PE_DIRECTIVE_STR2(directive)
+#   define __DEFINE_PE_EXPORT_STR3(name)         __DEFINE_PE_DIRECTIVE_STR(" -export:" #name)
+#   define __DEFINE_PE_EXPORT_STR2(name)         __DEFINE_PE_EXPORT_STR3(name)
+#   define __DEFINE_PE_EXPORT_STR(name)          __DEFINE_PE_EXPORT_STR2(#name)
+#   define __DEFINE_PRIVATE_ALIAS(new, old)      __asm__(".local " __DEFINE_ALIAS_STR(new) "\n.set " __DEFINE_ALIAS_STR(new) "," __DEFINE_ALIAS_STR(old) "\n")
+#   define __DEFINE_PUBLIC_ALIAS(new, old)       __asm__(__DEFINE_PE_EXPORT_STR(new) ".global " __DEFINE_ALIAS_STR(new) "\n.set " __DEFINE_ALIAS_STR(new) "," __DEFINE_ALIAS_STR(old) "\n")
+#   define __DEFINE_INTERN_ALIAS(new, old)       __asm__(".global " __DEFINE_ALIAS_STR(new) "\n.hidden " __DEFINE_ALIAS_STR(new) "\n.set " __DEFINE_ALIAS_STR(new) "," __DEFINE_ALIAS_STR(old) "\n")
+#   define __DEFINE_PRIVATE_WEAK_ALIAS(new, old) __asm__(".weak " __DEFINE_ALIAS_STR(new) "\n.local " __DEFINE_ALIAS_STR(new) "\n.set " __DEFINE_ALIAS_STR(new) "," __DEFINE_ALIAS_STR(old) "\n")
+#   define __DEFINE_PUBLIC_WEAK_ALIAS(new, old)  __asm__(__DEFINE_PE_EXPORT_STR(new) ".weak " __DEFINE_ALIAS_STR(new) "\n.global " __DEFINE_ALIAS_STR(new) "\n.set " __DEFINE_ALIAS_STR(new) "," __DEFINE_ALIAS_STR(old) "\n")
+#   define __DEFINE_INTERN_WEAK_ALIAS(new, old)  __asm__(".weak " __DEFINE_ALIAS_STR(new) "\n.global " __DEFINE_ALIAS_STR(new) "\n.hidden " __DEFINE_ALIAS_STR(new) "\n.set " __DEFINE_ALIAS_STR(new) "," __DEFINE_ALIAS_STR(old) "\n")
+#endif
+#else /* __PE__ */
+#   define __DEFINE_PRIVATE_ALIAS(new, old)      __asm__(".local " __DEFINE_ALIAS_STR(new) "\n.set " __DEFINE_ALIAS_STR(new) "," __DEFINE_ALIAS_STR(old) "\n")
+#   define __DEFINE_PUBLIC_ALIAS(new, old)       __asm__(".global " __DEFINE_ALIAS_STR(new) "\n.set " __DEFINE_ALIAS_STR(new) "," __DEFINE_ALIAS_STR(old) "\n")
+#   define __DEFINE_INTERN_ALIAS(new, old)       __asm__(".global " __DEFINE_ALIAS_STR(new) "\n.hidden " __DEFINE_ALIAS_STR(new) "\n.set " __DEFINE_ALIAS_STR(new) "," __DEFINE_ALIAS_STR(old) "\n")
+#   define __DEFINE_PRIVATE_WEAK_ALIAS(new, old) __asm__(".weak " __DEFINE_ALIAS_STR(new) "\n.local " __DEFINE_ALIAS_STR(new) "\n.set " __DEFINE_ALIAS_STR(new) "," __DEFINE_ALIAS_STR(old) "\n")
+#   define __DEFINE_PUBLIC_WEAK_ALIAS(new, old)  __asm__(".weak " __DEFINE_ALIAS_STR(new) "\n.global " __DEFINE_ALIAS_STR(new) "\n.set " __DEFINE_ALIAS_STR(new) "," __DEFINE_ALIAS_STR(old) "\n")
+#   define __DEFINE_INTERN_WEAK_ALIAS(new, old)  __asm__(".weak " __DEFINE_ALIAS_STR(new) "\n.global " __DEFINE_ALIAS_STR(new) "\n.hidden " __DEFINE_ALIAS_STR(new) "\n.set " __DEFINE_ALIAS_STR(new) "," __DEFINE_ALIAS_STR(old) "\n")
+#endif /* !__PE__ */
 #else /* __COMPILER_HAVE_GCC_ASM */
 #   define __NO_DEFINE_ALIAS 1
-#   define __DEFINE_PRIVATE_ALIAS(new,old)      /* Nothing */
-#   define __DEFINE_PUBLIC_ALIAS(new,old)       /* Nothing */
-#   define __DEFINE_INTERN_ALIAS(new,old)       /* Nothing */
-#   define __DEFINE_PRIVATE_WEAK_ALIAS(new,old) /* Nothing */
-#   define __DEFINE_PUBLIC_WEAK_ALIAS(new,old)  /* Nothing */
-#   define __DEFINE_INTERN_WEAK_ALIAS(new,old)  /* Nothing */
+#   define __DEFINE_PRIVATE_ALIAS(new, old)      /* Nothing */
+#   define __DEFINE_PUBLIC_ALIAS(new, old)       /* Nothing */
+#   define __DEFINE_INTERN_ALIAS(new, old)       /* Nothing */
+#   define __DEFINE_PRIVATE_WEAK_ALIAS(new, old) /* Nothing */
+#   define __DEFINE_PUBLIC_WEAK_ALIAS(new, old)  /* Nothing */
+#   define __DEFINE_INTERN_WEAK_ALIAS(new, old)  /* Nothing */
 #endif /* !__COMPILER_HAVE_GCC_ASM */
 #endif /* !__DEFINE_PUBLIC_ALIAS */
 
