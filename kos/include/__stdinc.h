@@ -29,7 +29,7 @@
 #define __KOS_SYSTEM_HEADERS__ 1
 #ifndef __KOS_VERSION__
 #define __KOS_VERSION__ 400
-#endif
+#endif /* !__KOS_VERSION__ */
 #endif /* !__NO_KOS_SYSTEM_HEADERS__ */
 
 /* ... */
@@ -42,6 +42,23 @@
 #define __CCAST(T) (T)
 #else
 #define __CCAST(T)  /* Nothing */
+#endif
+
+#if !defined(__PE__) && !defined(__ELF__)
+/* Try to determine current binary format using other platform
+ * identifiers. (When KOS headers are used on other systems) */
+#if defined(__CYGWIN__) || defined(__CYGWIN32__) || defined(__MINGW32__) || defined(__WINDOWS__) || \
+    defined(_WIN16) || defined(WIN16) || defined(_WIN32) || defined(WIN32) || \
+    defined(_WIN64) || defined(WIN64) || defined(__WIN32__) || defined(__TOS_WIN__) || \
+    defined(_WIN32_WCE) || defined(WIN32_WCE)
+#   define __PE__  1
+#elif defined(__linux__) || defined(__linux) || defined(linux) || \
+      defined(__unix__) || defined(__unix) || defined(unix)
+#   define __ELF__ 1
+#else
+#   warning "Target binary format not defined. - Assuming `__ELF__'"
+#   define __ELF__ 1
+#endif
 #endif
 
 #include "compiler/pp-generic.h"
@@ -64,45 +81,45 @@
 #endif
 #ifdef __cplusplus
 #   include "compiler/c++.h"
-#else
+#else /* __cplusplus */
 #   include "compiler/c.h"
-#endif
+#endif /* !__cplusplus */
 #endif /* __CC__ */
 
 #ifndef __has_builtin
 #define __NO_has_builtin 1
 #define __has_builtin(x) 0
-#endif
+#endif /* !__has_builtin */
 #ifndef __has_feature
 #define __NO_has_feature 1
 #define __has_feature(x) 0
-#endif
+#endif /* !__has_feature */
 #ifndef __has_extension
 #ifndef __NO_has_feature
 #define __NO_has_extension 1
-#endif
+#endif /* !__NO_has_feature */
 #define __has_extension  __has_feature
-#endif
+#endif /* !__has_extension */
 #ifndef __has_attribute
 #define __NO_has_attribute 1
 #define __has_attribute(x) 0
-#endif
+#endif /* !__has_attribute */
 #ifndef __has_declspec_attribute
 #define __NO_has_declspec_attribute 1
 #define __has_declspec_attribute(x) 0
-#endif
+#endif /* !__has_declspec_attribute */
 #ifndef __has_cpp_attribute
 #define __NO_has_cpp_attribute 1
 #define __has_cpp_attribute(x) 0
-#endif
+#endif /* !__has_cpp_attribute */
 #ifndef __has_include
 #define __NO_has_include 1
 #define __has_include(x) 0
-#endif
+#endif /* !__has_include */
 #ifndef __has_include_next
 #define __NO_has_include_next 1
 #define __has_include_next(x) 0
-#endif
+#endif /* !__has_include */
 
 #ifndef __SYSDECL_BEGIN
 #define __SYSDECL_BEGIN __DECL_BEGIN
@@ -117,10 +134,10 @@
 #elif defined(__NO_ATTR_NOTHROW)
 #ifdef __STDC__
 #   define __NOTHROW       /* Nothing */
-#else
+#else /* __STDC__ */
 #   define __PRIVATE_NOTHROW2(...) ()
 #   define __NOTHROW(...)  (__VA_ARGS__) __PRIVATE_NOTHROW2
-#endif
+#endif /* !__STDC__ */
 #else
 #   define __NOTHROW       __ATTR_NOTHROW
 #endif
@@ -145,7 +162,7 @@
 #   define __NOTHROW_NCX      /* Nothing */
 #ifdef __cplusplus
 #   define __CXX_NOEXCEPT_NCX /* Nothing */
-#endif
+#endif /* __cplusplus */
 #else
 #   undef __NO_NON_CALL_EXCEPTIONS
 #   undef __NON_CALL_EXCEPTIONS
@@ -153,7 +170,7 @@
 #   define __NOTHROW_NCX      __NOTHROW
 #ifdef __cplusplus
 #   define __CXX_NOEXCEPT_NCX __CXX_NOEXCEPT
-#endif
+#endif /* __cplusplus */
 #endif
 
 /* RPC-nothrow exceptions definition (used for functions that may only throw
@@ -179,7 +196,7 @@
 #define __CXX_NOEXCEPT_RPC_NOKOS /* nothing */
 #endif /* !__KOS__ */
 #endif /* __cplusplus */
-#else
+#else /* !__NON_CALL_EXCEPTIONS && __NO_RPC_EXCEPTIONS */
 #define __NOTHROW_RPC            /* Nothing */
 #define __NOTHROW_RPC_KOS        /* nothing */
 #define __NOTHROW_RPC_NOKOS      /* nothing */
@@ -187,7 +204,7 @@
 #define __CXX_NOEXCEPT_RPC       /* Nothing */
 #define __CXX_NOEXCEPT_RPC_NOKOS /* Nothing */
 #endif /* __cplusplus */
-#endif
+#endif /* __NON_CALL_EXCEPTIONS || !__NO_RPC_EXCEPTIONS */
 
 #define __untraced    /* Annotation for `if __untraced()' or `while __untraced()'
                        * Using this macro prevents the injection of meta-data profilers
@@ -200,12 +217,12 @@
 #ifdef __cplusplus
 #define __CXX_NOEXCEPT_RPC_PURE __CXX_NOEXCEPT
 #endif /* __cplusplus */
-#else
+#else /* __NO_RPC_EXCEPTIONS */
 #define __NOTHROW_RPC_PURE      /* Nothing */
 #ifdef __cplusplus
 #define __CXX_NOEXCEPT_RPC_PURE /* Nothing */
 #endif /* __cplusplus */
-#endif
+#endif /* !__NO_RPC_EXCEPTIONS */
 
 #if defined(__COMPILER_HAVE_AUTOTYPE) && !defined(__NO_XBLOCK)
 #   define __COMPILER_UNUSED(expr)  __XBLOCK({ __auto_type __expr = (expr); __expr; })
@@ -228,7 +245,7 @@
 #   define __DEFINE_PRIVATE_WEAK_ALIAS(new,old) __asm__(".weak " __DEFINE_ALIAS_STR(new) "\n.local " __DEFINE_ALIAS_STR(new) "\n.set " __DEFINE_ALIAS_STR(new) "," __DEFINE_ALIAS_STR(old) "\n")
 #   define __DEFINE_PUBLIC_WEAK_ALIAS(new,old)  __asm__(".weak " __DEFINE_ALIAS_STR(new) "\n.global " __DEFINE_ALIAS_STR(new) "\n.set " __DEFINE_ALIAS_STR(new) "," __DEFINE_ALIAS_STR(old) "\n")
 #   define __DEFINE_INTERN_WEAK_ALIAS(new,old)  __asm__(".weak " __DEFINE_ALIAS_STR(new) "\n.global " __DEFINE_ALIAS_STR(new) "\n.hidden " __DEFINE_ALIAS_STR(new) "\n.set " __DEFINE_ALIAS_STR(new) "," __DEFINE_ALIAS_STR(old) "\n")
-#else
+#else /* __COMPILER_HAVE_GCC_ASM */
 #   define __NO_DEFINE_ALIAS 1
 #   define __DEFINE_PRIVATE_ALIAS(new,old)      /* Nothing */
 #   define __DEFINE_PUBLIC_ALIAS(new,old)       /* Nothing */
@@ -236,25 +253,8 @@
 #   define __DEFINE_PRIVATE_WEAK_ALIAS(new,old) /* Nothing */
 #   define __DEFINE_PUBLIC_WEAK_ALIAS(new,old)  /* Nothing */
 #   define __DEFINE_INTERN_WEAK_ALIAS(new,old)  /* Nothing */
-#endif
+#endif /* !__COMPILER_HAVE_GCC_ASM */
 #endif /* !__DEFINE_PUBLIC_ALIAS */
-
-#if !defined(__PE__) && !defined(__ELF__)
-/* Try to determine current binary format using other platform
- * identifiers. (When KOS headers are used on other systems) */
-#if defined(__linux__) || defined(__linux) || defined(linux) || \
-    defined(__unix__) || defined(__unix) || defined(unix)
-#   define __ELF__ 1
-#elif defined(__CYGWIN__) || defined(__CYGWIN32__) || defined(__MINGW32__) || defined(__WINDOWS__) || \
-      defined(_WIN16) || defined(WIN16) || defined(_WIN32) || defined(WIN32) || \
-      defined(_WIN64) || defined(WIN64) || defined(__WIN32__) || defined(__TOS_WIN__) || \
-      defined(_WIN32_WCE) || defined(WIN32_WCE)
-#   define __PE__  1
-#else
-#   warning "Target binary format not defined. - Assuming `__ELF__'"
-#   define __ELF__ 1
-#endif
-#endif
 
 #if !defined(__CC__)
 #   define __IMPDEF        /* Nothing */
@@ -287,10 +287,10 @@
 #ifdef __cplusplus
 #   define __PUBLIC_CONST  extern __ATTR_DLLEXPORT
 #   define __INTERN_CONST  extern /* Nothing */
-#else
+#else /* __cplusplus */
 #   define __PUBLIC_CONST  __ATTR_DLLEXPORT
 #   define __INTERN_CONST  /* Nothing */
-#endif
+#endif /* !__cplusplus */
 #else
 #   define __IMPDEF        extern __ATTR_VISIBILITY("default")
 #   define __EXPDEF        extern __ATTR_VISIBILITY("default")
@@ -302,10 +302,10 @@
 #ifdef __cplusplus
 #   define __PUBLIC_CONST  extern __ATTR_VISIBILITY("default")
 #   define __INTERN_CONST  extern __ATTR_VISIBILITY("hidden")
-#else
+#else /* __cplusplus */
 #   define __PUBLIC_CONST         __ATTR_VISIBILITY("default")
 #   define __INTERN_CONST         __ATTR_VISIBILITY("hidden")
-#endif
+#endif /* !__cplusplus */
 #endif
 
 
