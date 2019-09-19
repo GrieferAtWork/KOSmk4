@@ -225,32 +225,32 @@ typedef __intptr_t intptr_t;
 
 %[default_impl_section(.text.crt.fs.exec.spawn)]
 [cp][guard][argument_names(mode, path, ___argv)][alias(_spawnv)]
-spawnv:(int mode, [nonnull] char const *__restrict path, [nonnull] @__TARGV@) -> pid_t;
+spawnv:(int mode, [nonnull] char const *__restrict path, [nonnull] @__TARGV@) -> $pid_t;
 [cp][guard][argument_names(mode, path, ___argv, ___envp)][alias(_spawnve)]
-spawnve:(int mode, [nonnull] char const *__restrict path, [nonnull] @__TARGV@, [nonnull] @__TENVP@) -> pid_t;
+spawnve:(int mode, [nonnull] char const *__restrict path, [nonnull] @__TARGV@, [nonnull] @__TENVP@) -> $pid_t;
 [cp][guard][argument_names(mode, file, ___argv)][alias(_spawnvp)]
-spawnvp:(int mode, [nonnull] char const *__restrict file, [nonnull] @__TARGV@) -> pid_t;
+spawnvp:(int mode, [nonnull] char const *__restrict file, [nonnull] @__TARGV@) -> $pid_t;
 [cp][guard][argument_names(mode, file, ___argv, ___envp)][alias(_spawnvpe)]
-spawnvpe:(int mode, [nonnull] char const *__restrict file, [nonnull] @__TARGV@, [nonnull] @__TENVP@) -> pid_t;
+spawnvpe:(int mode, [nonnull] char const *__restrict file, [nonnull] @__TARGV@, [nonnull] @__TENVP@) -> $pid_t;
 
 [cp][guard][dependency_include(<parts/redirect-exec.h>)]
 [requires($has_function(spawnv))][ATTR_SENTINEL][alias(_spawnl)][allow_macros]
-spawnl:(int mode, [nonnull] char const *__restrict path, char const *args, ... /*, (char *)NULL*/) -> pid_t {
+spawnl:(int mode, [nonnull] char const *__restrict path, char const *args, ... /*, (char *)NULL*/) -> $pid_t {
 	__REDIRECT_SPAWNL(char, spawnv, mode, path, args)
 }
 [cp][guard][dependency_include(<parts/redirect-exec.h>)]
 [requires($has_function(spawnve))][ATTR_SENTINEL_O(1)][alias(_spawnle)][allow_macros]
-spawnle:(int mode, [nonnull] char const *__restrict path, char const *args, ... /*, (char *)NULL, char **environ*/) -> pid_t {
+spawnle:(int mode, [nonnull] char const *__restrict path, char const *args, ... /*, (char *)NULL, char **environ*/) -> $pid_t {
 	__REDIRECT_SPAWNLE(char, spawnve, mode, path, args)
 }
 [cp][guard][dependency_include(<parts/redirect-exec.h>)]
 [requires($has_function(spawnvp))][ATTR_SENTINEL][alias(_spawnlp)][allow_macros]
-spawnlp:(int mode, [nonnull] char const *__restrict file, char const *args, ... /*, (char *)NULL*/) -> pid_t {
+spawnlp:(int mode, [nonnull] char const *__restrict file, char const *args, ... /*, (char *)NULL*/) -> $pid_t {
 	__REDIRECT_SPAWNLP(char, spawnvp, mode, file, args)
 }
 [cp][guard][dependency_include(<parts/redirect-exec.h>)]
 [requires($has_function(spawnvpe))][ATTR_SENTINEL_O(1)][alias(_spawnle)][allow_macros]
-spawnlpe:(int mode, [nonnull] char const *__restrict file, char const *args, ... /*, (char *)NULL, char **environ*/) -> pid_t {
+spawnlpe:(int mode, [nonnull] char const *__restrict file, char const *args, ... /*, (char *)NULL, char **environ*/) -> $pid_t {
 	__REDIRECT_SPAWNLPE(char, spawnvpe, mode, file, args)
 }
 

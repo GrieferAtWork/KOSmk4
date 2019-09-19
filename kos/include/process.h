@@ -1,4 +1,4 @@
-/* HASH 0xc31d8c1f */
+/* HASH 0xd3a49191 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -753,9 +753,9 @@ __CREDIRECT(,__pid_t,__NOTHROW_RPC,cwait,(int *__tstat, __pid_t __pid, int __act
 #ifndef __spawnv_defined
 #define __spawnv_defined 1
 #if defined(__CRT_HAVE_spawnv)
-__CDECLARE(__ATTR_NONNULL((2, 3)),pid_t,__NOTHROW_RPC,spawnv,(int __mode, char const *__restrict __path, __TARGV),(__mode,__path, ___argv))
+__CDECLARE(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,spawnv,(int __mode, char const *__restrict __path, __TARGV),(__mode,__path, ___argv))
 #elif defined(__CRT_HAVE__spawnv)
-__CREDIRECT(__ATTR_NONNULL((2, 3)),pid_t,__NOTHROW_RPC,spawnv,(int __mode, char const *__restrict __path, __TARGV),_spawnv,(__mode,__path, ___argv))
+__CREDIRECT(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,spawnv,(int __mode, char const *__restrict __path, __TARGV),_spawnv,(__mode,__path, ___argv))
 #else /* LIBC: spawnv */
 #undef __spawnv_defined
 #endif /* spawnv... */
@@ -763,9 +763,9 @@ __CREDIRECT(__ATTR_NONNULL((2, 3)),pid_t,__NOTHROW_RPC,spawnv,(int __mode, char 
 #ifndef __spawnve_defined
 #define __spawnve_defined 1
 #if defined(__CRT_HAVE_spawnve)
-__CDECLARE(__ATTR_NONNULL((2, 3, 4)),pid_t,__NOTHROW_RPC,spawnve,(int __mode, char const *__restrict __path, __TARGV, __TENVP),(__mode,__path, ___argv, ___envp))
+__CDECLARE(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,spawnve,(int __mode, char const *__restrict __path, __TARGV, __TENVP),(__mode,__path, ___argv, ___envp))
 #elif defined(__CRT_HAVE__spawnve)
-__CREDIRECT(__ATTR_NONNULL((2, 3, 4)),pid_t,__NOTHROW_RPC,spawnve,(int __mode, char const *__restrict __path, __TARGV, __TENVP),_spawnve,(__mode,__path, ___argv, ___envp))
+__CREDIRECT(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,spawnve,(int __mode, char const *__restrict __path, __TARGV, __TENVP),_spawnve,(__mode,__path, ___argv, ___envp))
 #else /* LIBC: spawnve */
 #undef __spawnve_defined
 #endif /* spawnve... */
@@ -773,9 +773,9 @@ __CREDIRECT(__ATTR_NONNULL((2, 3, 4)),pid_t,__NOTHROW_RPC,spawnve,(int __mode, c
 #ifndef __spawnvp_defined
 #define __spawnvp_defined 1
 #if defined(__CRT_HAVE_spawnvp)
-__CDECLARE(__ATTR_NONNULL((2, 3)),pid_t,__NOTHROW_RPC,spawnvp,(int __mode, char const *__restrict __file, __TARGV),(__mode,__file, ___argv))
+__CDECLARE(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,spawnvp,(int __mode, char const *__restrict __file, __TARGV),(__mode,__file, ___argv))
 #elif defined(__CRT_HAVE__spawnvp)
-__CREDIRECT(__ATTR_NONNULL((2, 3)),pid_t,__NOTHROW_RPC,spawnvp,(int __mode, char const *__restrict __file, __TARGV),_spawnvp,(__mode,__file, ___argv))
+__CREDIRECT(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,spawnvp,(int __mode, char const *__restrict __file, __TARGV),_spawnvp,(__mode,__file, ___argv))
 #else /* LIBC: spawnvp */
 #undef __spawnvp_defined
 #endif /* spawnvp... */
@@ -783,9 +783,9 @@ __CREDIRECT(__ATTR_NONNULL((2, 3)),pid_t,__NOTHROW_RPC,spawnvp,(int __mode, char
 #ifndef __spawnvpe_defined
 #define __spawnvpe_defined 1
 #if defined(__CRT_HAVE_spawnvpe)
-__CDECLARE(__ATTR_NONNULL((2, 3, 4)),pid_t,__NOTHROW_RPC,spawnvpe,(int __mode, char const *__restrict __file, __TARGV, __TENVP),(__mode,__file, ___argv, ___envp))
+__CDECLARE(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,spawnvpe,(int __mode, char const *__restrict __file, __TARGV, __TENVP),(__mode,__file, ___argv, ___envp))
 #elif defined(__CRT_HAVE__spawnvpe)
-__CREDIRECT(__ATTR_NONNULL((2, 3, 4)),pid_t,__NOTHROW_RPC,spawnvpe,(int __mode, char const *__restrict __file, __TARGV, __TENVP),_spawnvpe,(__mode,__file, ___argv, ___envp))
+__CREDIRECT(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,spawnvpe,(int __mode, char const *__restrict __file, __TARGV, __TENVP),_spawnvpe,(__mode,__file, ___argv, ___envp))
 #else /* LIBC: spawnvpe */
 #undef __spawnvpe_defined
 #endif /* spawnvpe... */
@@ -793,9 +793,9 @@ __CREDIRECT(__ATTR_NONNULL((2, 3, 4)),pid_t,__NOTHROW_RPC,spawnvpe,(int __mode, 
 #ifndef __spawnl_defined
 #define __spawnl_defined 1
 #if defined(__CRT_HAVE_spawnl)
-__LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) pid_t __NOTHROW_RPC(__VLIBCCALL spawnl)(int __mode, char const *__restrict __path, char const *__args, ... /*, (char *)NULL*/) __CASMNAME_SAME("spawnl");
+__LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL spawnl)(int __mode, char const *__restrict __path, char const *__args, ... /*, (char *)NULL*/) __CASMNAME_SAME("spawnl");
 #elif defined(__CRT_HAVE__spawnl) && !defined(__NO_ASMNAME)
-__LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) pid_t __NOTHROW_RPC(__VLIBCCALL spawnl)(int __mode, char const *__restrict __path, char const *__args, ... /*, (char *)NULL*/) __CASMNAME("_spawnl");
+__LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL spawnl)(int __mode, char const *__restrict __path, char const *__args, ... /*, (char *)NULL*/) __CASMNAME("_spawnl");
 #elif defined(__CRT_HAVE_spawnv) || defined(__CRT_HAVE__spawnv)
 #include <local/process/spawnl.h>
 #ifdef __cplusplus
@@ -810,9 +810,9 @@ __NAMESPACE_LOCAL_USING(spawnl)
 #ifndef __spawnle_defined
 #define __spawnle_defined 1
 #if defined(__CRT_HAVE_spawnle)
-__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) pid_t __NOTHROW_RPC(__VLIBCCALL spawnle)(int __mode, char const *__restrict __path, char const *__args, ... /*, (char *)NULL, char **environ*/) __CASMNAME_SAME("spawnle");
+__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL spawnle)(int __mode, char const *__restrict __path, char const *__args, ... /*, (char *)NULL, char **environ*/) __CASMNAME_SAME("spawnle");
 #elif defined(__CRT_HAVE__spawnle) && !defined(__NO_ASMNAME)
-__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) pid_t __NOTHROW_RPC(__VLIBCCALL spawnle)(int __mode, char const *__restrict __path, char const *__args, ... /*, (char *)NULL, char **environ*/) __CASMNAME("_spawnle");
+__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL spawnle)(int __mode, char const *__restrict __path, char const *__args, ... /*, (char *)NULL, char **environ*/) __CASMNAME("_spawnle");
 #elif defined(__CRT_HAVE_spawnve) || defined(__CRT_HAVE__spawnve)
 #include <local/process/spawnle.h>
 #ifdef __cplusplus
@@ -827,9 +827,9 @@ __NAMESPACE_LOCAL_USING(spawnle)
 #ifndef __spawnlp_defined
 #define __spawnlp_defined 1
 #if defined(__CRT_HAVE_spawnlp)
-__LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) pid_t __NOTHROW_RPC(__VLIBCCALL spawnlp)(int __mode, char const *__restrict __file, char const *__args, ... /*, (char *)NULL*/) __CASMNAME_SAME("spawnlp");
+__LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL spawnlp)(int __mode, char const *__restrict __file, char const *__args, ... /*, (char *)NULL*/) __CASMNAME_SAME("spawnlp");
 #elif defined(__CRT_HAVE__spawnlp) && !defined(__NO_ASMNAME)
-__LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) pid_t __NOTHROW_RPC(__VLIBCCALL spawnlp)(int __mode, char const *__restrict __file, char const *__args, ... /*, (char *)NULL*/) __CASMNAME("_spawnlp");
+__LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL spawnlp)(int __mode, char const *__restrict __file, char const *__args, ... /*, (char *)NULL*/) __CASMNAME("_spawnlp");
 #elif defined(__CRT_HAVE_spawnvp) || defined(__CRT_HAVE__spawnvp)
 #include <local/process/spawnlp.h>
 #ifdef __cplusplus
@@ -844,9 +844,9 @@ __NAMESPACE_LOCAL_USING(spawnlp)
 #ifndef __spawnlpe_defined
 #define __spawnlpe_defined 1
 #if defined(__CRT_HAVE_spawnlpe)
-__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) pid_t __NOTHROW_RPC(__VLIBCCALL spawnlpe)(int __mode, char const *__restrict __file, char const *__args, ... /*, (char *)NULL, char **environ*/) __CASMNAME_SAME("spawnlpe");
+__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL spawnlpe)(int __mode, char const *__restrict __file, char const *__args, ... /*, (char *)NULL, char **environ*/) __CASMNAME_SAME("spawnlpe");
 #elif defined(__CRT_HAVE__spawnle) && !defined(__NO_ASMNAME)
-__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) pid_t __NOTHROW_RPC(__VLIBCCALL spawnlpe)(int __mode, char const *__restrict __file, char const *__args, ... /*, (char *)NULL, char **environ*/) __CASMNAME("_spawnle");
+__LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL spawnlpe)(int __mode, char const *__restrict __file, char const *__args, ... /*, (char *)NULL, char **environ*/) __CASMNAME("_spawnle");
 #elif defined(__CRT_HAVE_spawnvpe) || defined(__CRT_HAVE__spawnvpe)
 #include <local/process/spawnlpe.h>
 #ifdef __cplusplus
