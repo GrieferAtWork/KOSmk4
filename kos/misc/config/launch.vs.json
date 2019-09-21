@@ -10,7 +10,12 @@
 			"project": "src",
 			"sourceFileMap": {
 				"ABSOLUTE_KOS_PROJECT_ROOT/kos": "${workspaceRoot}",
-				"ABSOLUTE_KOS_PROJECT_ROOT": "${workspaceRoot}\\.."
+				"ABSOLUTE_KOS_PROJECT_ROOT": "${workspaceRoot}\\..",
+				"/cygdrive/c": "C:\\",
+				"/cygdrive/d": "D:\\",
+				"/cygdrive/e": "E:\\",
+				"/cygdrive/f": "F:\\",
+				"/cygdrive/g": "G:\\"
 			},
 			"program": "${workspaceRoot}\\..\\bin\\${env.TARGET}-kos-${env.CONFIG}\\os\\kernel.bin",
 			"MIMode": "gdb",
@@ -51,7 +56,12 @@
 			"project": "src",
 			"sourceFileMap": {
 				"ABSOLUTE_KOS_PROJECT_ROOT/kos": "${workspaceRoot}",
-				"ABSOLUTE_KOS_PROJECT_ROOT": "${workspaceRoot}\\.."
+				"ABSOLUTE_KOS_PROJECT_ROOT": "${workspaceRoot}\\..",
+				"/cygdrive/c": "C:\\",
+				"/cygdrive/d": "D:\\",
+				"/cygdrive/e": "E:\\",
+				"/cygdrive/f": "F:\\",
+				"/cygdrive/g": "G:\\"
 			},
 			"program": "${workspaceRoot}\\..\\bin\\${env.TARGET}-kos-${env.CONFIG}\\os\\kernel.bin",
 			"MIMode": "gdb",
@@ -86,7 +96,12 @@
 			"project": "src",
 			"sourceFileMap": {
 				"ABSOLUTE_KOS_PROJECT_ROOT/kos": "${workspaceRoot}",
-				"ABSOLUTE_KOS_PROJECT_ROOT": "${workspaceRoot}\\.."
+				"ABSOLUTE_KOS_PROJECT_ROOT": "${workspaceRoot}\\..",
+				"/cygdrive/c": "C:\\",
+				"/cygdrive/d": "D:\\",
+				"/cygdrive/e": "E:\\",
+				"/cygdrive/f": "F:\\",
+				"/cygdrive/g": "G:\\"
 			},
 			"program": "${workspaceRoot}\\..\\bin\\${env.TARGET}-kos-${env.CONFIG}\\os\\kernel.bin",
 			"MIMode": "gdb",
@@ -139,7 +154,12 @@
 			"project": "src",
 			"sourceFileMap": {
 				"ABSOLUTE_KOS_PROJECT_ROOT/kos": "${workspaceRoot}",
-				"ABSOLUTE_KOS_PROJECT_ROOT": "${workspaceRoot}\\.."
+				"ABSOLUTE_KOS_PROJECT_ROOT": "${workspaceRoot}\\..",
+				"/cygdrive/c": "C:\\",
+				"/cygdrive/d": "D:\\",
+				"/cygdrive/e": "E:\\",
+				"/cygdrive/f": "F:\\",
+				"/cygdrive/g": "G:\\"
 			},
 			"program": "${workspaceRoot}\\..\\bin\\${env.TARGET}-kos-${env.CONFIG}\\os\\kernel.bin",
 			"MIMode": "gdb",

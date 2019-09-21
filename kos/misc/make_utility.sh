@@ -215,6 +215,7 @@ case $UTILITY_NAME in
 		cmd bash "$KOS_MISC/make_utility.sh" "$TARGET_NAME" ncurses
 		cmd bash "$KOS_MISC/make_utility.sh" "$TARGET_NAME" nano
 		cmd bash "$KOS_MISC/make_utility.sh" "$TARGET_NAME" kos-headers
+		cmd bash "$KOS_MISC/make_utility.sh" "$TARGET_NAME" deemon
 		;;
 ##############################################################################
 
@@ -491,6 +492,52 @@ EOF
 			cmd make -j $MAKE_PARALLEL_COUNT
 		fi
 		install_file /bin/nano "$OPTPATH/src/nano"
+		;;
+##############################################################################
+
+
+##############################################################################
+	deemon | deemon-latest)
+		SRCPATH="$KOS_ROOT/binutils/src/deemon-git/deemon"
+		if ! [ -f "$SRCPATH/configure" ]; then
+			rm -rf "$KOS_ROOT/binutils/src/deemon-git" > /dev/null 2>&1
+			cmd mkdir -p "$KOS_ROOT/binutils/src/deemon-git"
+			cmd cd "$KOS_ROOT/binutils/src/deemon-git"
+			cmd git clone "https://github.com/GrieferAtWork/deemon.git"
+		fi
+		cmd cd "$SRCPATH"
+		DEEMON_VERSION=$(git rev-parse HEAD)
+		OPTPATH="$BINUTILS_SYSROOT/opt/deemon-git-$DEEMON_VERSION"
+		if ! [ -f "$OPTPATH/Makefile" ]; then
+			rm -rf "$OPTPATH" > /dev/null 2>&1
+			mkdir -p "$OPTPATH"
+			cmd cd "$OPTPATH"
+			cmd bash "$SRCPATH/configure" \
+				--cross-prefix="$CROSS_PREFIX" \
+				--config-exe-extension="" \
+				--config-dll-extension=".so" \
+				--with-deemon-home="/usr/lib/deemon" \
+				--with-deemon-path="/usr/lib/deemon" \
+				--config-pthread=""
+		fi
+		if ! [ -f "$OPTPATH/deemon" ] || true; then
+			cmd cd "$OPTPATH"
+			cmd make -j $MAKE_PARALLEL_COUNT
+		fi
+		install_file /bin/deemon "$OPTPATH/deemon"
+		# install dex modules
+		for filename in $OPTPATH/lib/*.so; do
+			install_file "/usr/lib/deemon/$(basename -- "$filename")" "$filename"
+		done
+		# install user-code modules
+		for filename in $SRCPATH/lib/*.dee; do
+			install_file "/usr/lib/deemon/$(basename -- "$filename")" "$filename"
+		done
+		for folder in _codecs net python rt; do
+			for filename in $SRCPATH/lib/$folder/*.dee; do
+				install_file "/usr/lib/deemon/$folder/$(basename -- "$filename")" "$filename"
+			done
+		done
 		;;
 ##############################################################################
 
