@@ -215,10 +215,6 @@ PRIVATE ATTR_DBGTEXT NOBLOCK void
 NOTHROW(KCALL dbg_ensure_initialized_pertask)(struct task *__restrict self) {
 	if (!FORTASK(self, x86_this_kernel_sp0))
 		x86_init_this_kernel_sp(self);
-#ifndef __x86_64__
-	if (!FORTASK(self, x86_this_user_gsbase))
-		x86_this_userkern_init(self);
-#endif /* !__x86_64__ */
 	if (!FORTASK(self, _this_read_locks).rls_vec)
 		pertask_readlocks_init(self);
 	if (!FORTASK(self, _this_cons).tc_static_v ||

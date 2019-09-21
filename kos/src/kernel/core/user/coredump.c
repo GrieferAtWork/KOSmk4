@@ -151,7 +151,7 @@ coredump_create(struct ucpustate const *curr_ustate,
 		if (reason_signal->si_errno != 0)
 			printk(KERN_ERR "\terrno: %u\n", reason_signal->si_errno);
 	}
-#define VINFO_FORMAT  "%[vinfo:%p [%Rf:%l,%c:%n]"
+#define VINFO_FORMAT  "%[vinfo:%p [%Rf:%l,%c:%n]]"
 	if (orig_kstate)
 		printk(KERN_RAW VINFO_FORMAT " orig_kstate\n", KCPUSTATE_PC(*orig_kstate));
 	for (i = 0; i < ktraceback_length; ++i) {

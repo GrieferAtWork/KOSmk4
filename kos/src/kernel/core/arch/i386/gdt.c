@@ -125,7 +125,7 @@ NOTHROW(KCALL x86_this_userkern_init)(struct task *__restrict self)
 #ifdef __x86_64__
 	return offset;
 #else /* __x86_64__ */
-	FORTASK(self, x86_this_user_gsbase) = offset;
+	FORTASK(self, x86_this_user_fsbase) = offset;
 #endif /* !__x86_64__ */
 }
 
