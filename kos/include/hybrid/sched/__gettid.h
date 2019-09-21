@@ -58,10 +58,10 @@ __DECL_END
 __DECL_BEGIN
 typedef void *__hybrid_tid_t;
 #ifdef __x86_64__
-#define __hybrid_gettid()   __rdgsptr(0)
-#else /* __x86_64__ */
 #define __hybrid_gettid()   __rdfsptr(0)
-/* TODO: `__hybrid_gettid_iscaller(p) --> cmpl %fs:0, <p>' */
+#else /* __x86_64__ */
+#define __hybrid_gettid()   __rdgsptr(0)
+/* TODO: `__hybrid_gettid_iscaller(p) --> cmpl %gs:0, <p>' */
 #endif /* !__x86_64__ */
 __DECL_END
 #endif /* __CC__ */

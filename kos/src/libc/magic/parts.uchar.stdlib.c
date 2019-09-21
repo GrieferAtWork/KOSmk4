@@ -61,10 +61,10 @@ __SYSDECL_BEGIN
 
 %
 %#ifdef __USE_GNU
-[alias(*)][attribute(*)] c16stoq:(*) %{uchar(wcstoq)}
-[alias(*)][attribute(*)] c32stoq:(*) %{uchar(wcstoq)}
-[alias(*)][attribute(*)] c16stouq:(*) %{uchar(wcstouq)}
-[alias(*)][attribute(*)] c32stouq:(*) %{uchar(wcstouq)}
+//[alias(*)][attribute(*)] c16stoq:(*) = c16stoll;
+//[alias(*)][attribute(*)] c32stoq:(*) = c32stoll;
+//[alias(*)][attribute(*)] c16stouq:(*) = c16stoull;
+//[alias(*)][attribute(*)] c32stouq:(*) = c32stoull;
 [alias(*)][attribute(*)] c16stol_l:(*) %{uchar(wcstol_l)}
 [alias(*)][attribute(*)] c32stol_l:(*) %{uchar(wcstol_l)}
 [alias(*)][attribute(*)] c16stoul_l:(*) %{uchar(wcstoul_l)}

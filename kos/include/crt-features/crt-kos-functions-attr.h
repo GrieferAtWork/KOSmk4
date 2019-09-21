@@ -1,4 +1,4 @@
-/* HASH 0xeeba363 */
+/* HASH 0xca178fd3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1297,14 +1297,12 @@
 #define __CRT_ATTR_NOTHROW_NCX_c16stold_l 1
 #define __CRT_ATTR_NOTHROW_NCX_c16stoll 1
 #define __CRT_ATTR_NOTHROW_NCX_c16stoll_l 1
-#define __CRT_ATTR_NOTHROW_NCX_c16stoq 1
 #define __CRT_ATTR_NOTHROW_NCX_c16stou32 1
 #define __CRT_ATTR_NOTHROW_NCX_c16stou64 1
 #define __CRT_ATTR_NOTHROW_NCX_c16stoul 1
 #define __CRT_ATTR_NOTHROW_NCX_c16stoul_l 1
 #define __CRT_ATTR_NOTHROW_NCX_c16stoull 1
 #define __CRT_ATTR_NOTHROW_NCX_c16stoull_l 1
-#define __CRT_ATTR_NOTHROW_NCX_c16stouq 1
 #define __CRT_ATTR_NOTHROW_NCX_c16str 1
 #define __CRT_ATTR_NOTHROW_NCX_c16symlink 1
 #define __CRT_ATTR_NOTHROW_NCX_c16symlinkat 1
@@ -1437,14 +1435,12 @@
 #define __CRT_ATTR_NOTHROW_NCX_c32stold_l 1
 #define __CRT_ATTR_NOTHROW_NCX_c32stoll 1
 #define __CRT_ATTR_NOTHROW_NCX_c32stoll_l 1
-#define __CRT_ATTR_NOTHROW_NCX_c32stoq 1
 #define __CRT_ATTR_NOTHROW_NCX_c32stou32 1
 #define __CRT_ATTR_NOTHROW_NCX_c32stou64 1
 #define __CRT_ATTR_NOTHROW_NCX_c32stoul 1
 #define __CRT_ATTR_NOTHROW_NCX_c32stoul_l 1
 #define __CRT_ATTR_NOTHROW_NCX_c32stoull 1
 #define __CRT_ATTR_NOTHROW_NCX_c32stoull_l 1
-#define __CRT_ATTR_NOTHROW_NCX_c32stouq 1
 #define __CRT_ATTR_NOTHROW_NCX_c32str 1
 #define __CRT_ATTR_NOTHROW_NCX_c32symlink 1
 #define __CRT_ATTR_NOTHROW_NCX_c32symlinkat 1

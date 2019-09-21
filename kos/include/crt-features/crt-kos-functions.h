@@ -1,4 +1,4 @@
-/* HASH 0x728883f */
+/* HASH 0x342d0ddd */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2772,14 +2772,12 @@ __CRT_FAKE_FUNCTION(c16stold,0,(),2,(char16_t const *__restrict,nptr,char16_t **
 __CRT_FAKE_FUNCTION(c16stold_l,0,(),3,(char16_t const *__restrict,nptr,char16_t **,endptr,locale_t,locale),long double)
 __CRT_FAKE_FUNCTION(c16stoll,0,(),3,(char16_t const *__restrict,nptr,char16_t **,endptr,int,base),__LONGLONG)
 __CRT_FAKE_FUNCTION(c16stoll_l,0,(),4,(char16_t const *__restrict,nptr,char16_t **,endptr,int,base,locale_t,locale),__LONGLONG)
-__CRT_FAKE_FUNCTION(c16stoq,0,(),3,(char16_t const *__restrict,nptr,char16_t **,endptr,int,base),__LONGLONG)
 __CRT_FAKE_FUNCTION(c16stou32,0,(),3,(char16_t const *__restrict,nptr,char16_t **,endptr,int,base),uint32_t)
 __CRT_FAKE_FUNCTION(c16stou64,0,(),3,(char16_t const *__restrict,nptr,char16_t **,endptr,int,base),uint64_t)
 __CRT_FAKE_FUNCTION(c16stoul,0,(),3,(char16_t const *__restrict,nptr,char16_t **,endptr,int,base),unsigned long)
 __CRT_FAKE_FUNCTION(c16stoul_l,0,(),4,(char16_t const *__restrict,nptr,char16_t **__restrict,endptr,int,base,locale_t,locale),unsigned long)
 __CRT_FAKE_FUNCTION(c16stoull,0,(),3,(char16_t const *__restrict,nptr,char16_t **,endptr,int,base),__ULONGLONG)
 __CRT_FAKE_FUNCTION(c16stoull_l,0,(),4,(char16_t const *__restrict,nptr,char16_t **,endptr,int,base,locale_t,locale),__ULONGLONG)
-__CRT_FAKE_FUNCTION(c16stouq,0,(),3,(char16_t const *__restrict,nptr,char16_t **,endptr,int,base),__ULONGLONG)
 __CRT_FAKE_FUNCTION(c16str,0,(),2,(char16_t const *,haystack,char16_t const *,needle),char16_t *)
 __CRT_FAKE_FUNCTION(c16symlink,0,(),2,(char16_t const *,from,char16_t const *,to),int)
 __CRT_FAKE_FUNCTION(c16symlinkat,0,(),3,(char16_t const *,from,fd_t,tofd,char16_t const *,to),int)
@@ -2918,14 +2916,12 @@ __CRT_FAKE_FUNCTION(c32stold,0,(),2,(char32_t const *__restrict,nptr,char32_t **
 __CRT_FAKE_FUNCTION(c32stold_l,0,(),3,(char32_t const *__restrict,nptr,char32_t **,endptr,locale_t,locale),long double)
 __CRT_FAKE_FUNCTION(c32stoll,0,(),3,(char32_t const *__restrict,nptr,char32_t **,endptr,int,base),__LONGLONG)
 __CRT_FAKE_FUNCTION(c32stoll_l,0,(),4,(char32_t const *__restrict,nptr,char32_t **,endptr,int,base,locale_t,locale),__LONGLONG)
-__CRT_FAKE_FUNCTION(c32stoq,0,(),3,(char32_t const *__restrict,nptr,char32_t **,endptr,int,base),__LONGLONG)
 __CRT_FAKE_FUNCTION(c32stou32,0,(),3,(char32_t const *__restrict,nptr,char32_t **,endptr,int,base),uint32_t)
 __CRT_FAKE_FUNCTION(c32stou64,0,(),3,(char32_t const *__restrict,nptr,char32_t **,endptr,int,base),uint64_t)
 __CRT_FAKE_FUNCTION(c32stoul,0,(),3,(char32_t const *__restrict,nptr,char32_t **,endptr,int,base),unsigned long)
 __CRT_FAKE_FUNCTION(c32stoul_l,0,(),4,(char32_t const *__restrict,nptr,char32_t **__restrict,endptr,int,base,locale_t,locale),unsigned long)
 __CRT_FAKE_FUNCTION(c32stoull,0,(),3,(char32_t const *__restrict,nptr,char32_t **,endptr,int,base),__ULONGLONG)
 __CRT_FAKE_FUNCTION(c32stoull_l,0,(),4,(char32_t const *__restrict,nptr,char32_t **,endptr,int,base,locale_t,locale),__ULONGLONG)
-__CRT_FAKE_FUNCTION(c32stouq,0,(),3,(char32_t const *__restrict,nptr,char32_t **,endptr,int,base),__ULONGLONG)
 __CRT_FAKE_FUNCTION(c32str,0,(),2,(char32_t const *,haystack,char32_t const *,needle),char32_t *)
 __CRT_FAKE_FUNCTION(c32symlink,0,(),2,(char32_t const *,from,char32_t const *,to),int)
 __CRT_FAKE_FUNCTION(c32symlinkat,0,(),3,(char32_t const *,from,fd_t,tofd,char32_t const *,to),int)

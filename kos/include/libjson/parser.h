@@ -171,8 +171,8 @@ __NOTHROW_NCX(LIBJSON_CC json_parser_next)(struct json_parser *__restrict self);
  *                                                   the first member of the inner object/array.
  * @return: JSON_ERROR_SYNTAX: Syntax error. */
 typedef __ATTR_NONNULL((1)) int
-(LIBJSON_CC *PJSON_PARSER_PREV)(json_parser *__restrict self,
-                                            __BOOL leave_object);
+(LIBJSON_CC *PJSON_PARSER_PREV)(struct json_parser *__restrict self,
+                                __BOOL leave_object);
 #ifdef LIBJSON_WANT_PROTOTYPES
 LIBJSON_DECL __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(LIBJSON_CC json_parser_prev)(struct json_parser *__restrict self,
