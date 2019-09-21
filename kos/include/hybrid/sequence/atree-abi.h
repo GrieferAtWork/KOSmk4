@@ -927,7 +927,7 @@ again:
 			result->mm_min     = root;
 			result->mm_min_min = ATREE_NODE_ADDR(root);
 		}
-		if ((result->mm_max == ATREE_NULL) || ATREE_NODE_ADDR(root) < result->mm_max_max) {
+		if ((result->mm_max == ATREE_NULL) || ATREE_NODE_ADDR(root) > result->mm_max_max) {
 			result->mm_max     = root;
 			result->mm_max_max = ATREE_NODE_ADDR(root);
 		}
@@ -936,7 +936,7 @@ again:
 			result->mm_min     = root;
 			result->mm_min_min = ATREE_NODE_MIN(root);
 		}
-		if ((result->mm_max == ATREE_NULL) || ATREE_NODE_MAX(root) < result->mm_max_max) {
+		if ((result->mm_max == ATREE_NULL) || ATREE_NODE_MAX(root) > result->mm_max_max) {
 			result->mm_max     = root;
 			result->mm_max_max = ATREE_NODE_MAX(root);
 		}

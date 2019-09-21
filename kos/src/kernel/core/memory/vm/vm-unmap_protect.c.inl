@@ -275,7 +275,7 @@ do_throw_first_unmapped:
 				goto again_lock_vm;
 			}
 		}
-		if (minmax.mm_max_max > maxpage) {
+		if (maxpage < minmax.mm_max_max) {
 			/* Must split the last page. */
 			if (!SHOULD_UPDATE(minmax.mm_max) || (how & VM_UNMAP_NOSPLIT)) {
 				if (how & VM_UNMAP_SEGFAULTIFUNUSED)
@@ -370,6 +370,14 @@ do_throw_first_unmapped:
 #ifdef VM_DEFINE_PROTECT
 					old_prot = node->vn_prot;
 					new_prot = (old_prot & prot_mask) | prot_flags;
+					printk(KERN_DEBUG "Mprotect node at %p...%p [%c%c%c%c%c to %c%c%c%c%c]\n",
+					       VM_NODE_MINADDR(node), VM_NODE_MAXADDR(node),
+					       old_prot & VM_PROT_SHARED ? 's' : '-', old_prot & VM_PROT_LOOSE ? 'l' : '-',
+					       old_prot & VM_PROT_READ ? 'r' : '-', old_prot & VM_PROT_WRITE ? 'w' : '-',
+					       old_prot & VM_PROT_EXEC ? 'x' : '-',
+					       new_prot & VM_PROT_SHARED ? 's' : '-', new_prot & VM_PROT_LOOSE ? 'l' : '-',
+					       new_prot & VM_PROT_READ ? 'r' : '-', new_prot & VM_PROT_WRITE ? 'w' : '-',
+					       new_prot & VM_PROT_EXEC ? 'x' : '-');
 					if ((old_prot & VM_PROT_SHARED) != (new_prot & VM_PROT_SHARED)) {
 						/* PRIVATE <---> SHARED mapping change. */
 						if (node->vn_part != NULL) {
