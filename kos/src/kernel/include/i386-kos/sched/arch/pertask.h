@@ -36,6 +36,17 @@ DECL_BEGIN
 #define X86_PERTASK_SEGMENT_F "%%fs"
 #endif /* !__x86_64__ */
 
+#ifdef __cplusplus
+/* g++ will lie about support for alternative address spaces:
+ *   - In c++-mode, fs/gs segments are unavailable (because it's a c-extension; ugh...)
+ *   - Even under C, gcc will lie about support when gnu extensions aren't enabled.
+ *     https://gcc.gnu.org/bugzilla/show_bug.cgi?id=87626
+ *   - F%$king hell man... why???? And why lie about it?
+ */
+#undef __SEG_FS
+#undef __SEG_GS
+#endif /* __cplusplus */
+
 #ifdef __CC__
 struct task;
 
@@ -81,8 +92,8 @@ void *NOTHROW(KCALL __get_per_task)(void *__ptr) {
 
 extern ATTR_ERROR("Invalid per-task object size") void __invalid_pertask_object_size(void);
 #ifdef __X86_SEG_TASK
-#define PERTASK_GET(x)    (*((__X86_SEG_TASK __typeof__(x) const *)&(x)))
-#define PERTASK_SET(x, v) (*((__X86_SEG_TASK __typeof__(x) *)&(x)) = (v))
+#define PERTASK_GET(x)    (*((__X86_SEG_TASK __typeof__(x) const *)(__UINTPTR_TYPE__)&(x)))
+#define PERTASK_SET(x, v) (*((__X86_SEG_TASK __typeof__(x) *)(__UINTPTR_TYPE__)&(x)) = (v))
 #elif defined(__x86_64__)
 #define PERTASK_GET(x)                                                  \
 	XBLOCK({                                                            \
