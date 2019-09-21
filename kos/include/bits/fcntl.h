@@ -69,6 +69,9 @@ struct flock64 {
 #define _O_U16TEXT      __DOS_O_U16TEXT
 #define _O_U8TEXT       __DOS_O_U8TEXT
 #define _O_WTEXT        __DOS_O_WTEXT
+#define _O_OBTAIN_DIR   __DOS_O_OBTAIN_DIR
+#define O_TEMPORARY     __DOS_O_TEMPORARY
+#define _O_TEMPORARY    __DOS_O_TEMPORARY
 #else /* __CRT_DOS_PRIMARY */
 #define O_RAW           0
 #define O_TEXT          0
@@ -79,6 +82,7 @@ struct flock64 {
 #define _O_U16TEXT      0
 #define _O_U8TEXT       0
 #define _O_WTEXT        0
+#define _O_OBTAIN_DIR   0 /* Not the same as `O_DIRECTORY'! (quite the opposite actually) */
 #endif /* !__CRT_DOS_PRIMARY */
 #endif /* __USE_DOS */
 
@@ -593,11 +597,14 @@ struct file_handle {
 #define _O_SEQUENTIAL   O_SEQUENTIAL
 #define _O_TEXT         O_TEXT
 #define _O_TRUNC        O_TRUNC
-#define _O_NOINHERIT    __O_CLOEXEC
-#define _O_TEMPORARY    __O_TMPFILE
-#define _O_OBTAIN_DIR   __O_DIRECTORY
 #define O_NOINHERIT     __O_CLOEXEC
-#define O_TEMPORARY     __O_TMPFILE
+#define _O_NOINHERIT    __O_CLOEXEC
+#ifndef _O_TEMPORARY
+/* XXX: Figure out exactly what `O_TEMPORARY' does,
+ *      and check if it matches linux's `O_TMPFILE' */
+//#define _O_TEMPORARY    __O_TMPFILE
+//#define O_TEMPORARY     __O_TMPFILE
+#endif /* !_O_TEMPORARY */
 #endif /* __USE_DOS */
 
 
