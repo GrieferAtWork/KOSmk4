@@ -25,15 +25,15 @@
 #include <hybrid/typecore.h>
 
 #ifdef __x86_64__
-#define userkern_self()            ((struct userkern *)__rdfsbase())
-#define userkern_valid()           (__rdfsbasel() >= __UINT64_C(0xffff800000000000))
-#define userkern_getfield(field)   ((__typeof__(((struct userkern *)0)->field))__readfsptr(__builtin_offsetof(struct userkern,field)))
-#define userkern_setfield(field,v)   __writefsptr(__builtin_offsetof(struct userkern,field),(void *)(v))
+#define userkern_self()             ((struct userkern *)__rdgsbase())
+#define userkern_valid()            (__rdgsbasel() >= __UINT32_C(0xc0000000))
+#define userkern_getfield(field)    ((__typeof__(((struct userkern *)0)->field))__readgsptr(__builtin_ofgsetof(struct userkern, field)))
+#define userkern_setfield(field, v) __writegsptr(__builtin_ofgsetof(struct userkern, field), (void *)(v))
 #else /* __x86_64__ */
-#define userkern_self()            ((struct userkern *)__rdgsbase())
-#define userkern_valid()           (__rdgsbasel() >= __UINT32_C(0xc0000000))
-#define userkern_getfield(field)   ((__typeof__(((struct userkern *)0)->field))__readgsptr(__builtin_ofgsetof(struct userkern,field)))
-#define userkern_setfield(field,v)   __writegsptr(__builtin_ofgsetof(struct userkern,field),(void *)(v))
+#define userkern_self()             ((struct userkern *)__rdfsbase())
+#define userkern_valid()            (__rdfsbasel() >= __UINT64_C(0xffff800000000000))
+#define userkern_getfield(field)    ((__typeof__(((struct userkern *)0)->field))__readfsptr(__builtin_offsetof(struct userkern, field)))
+#define userkern_setfield(field, v) __writefsptr(__builtin_offsetof(struct userkern, field), (void *)(v))
 #endif /* !__x86_64__ */
 
 

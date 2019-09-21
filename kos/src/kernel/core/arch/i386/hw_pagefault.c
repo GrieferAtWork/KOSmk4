@@ -274,7 +274,7 @@ do_normal_vio:
 					if unlikely((ecode & PAGEFAULT_F_WRITING)
 						         ? !(nodeprot & VM_PROT_WRITE) /* Write to read-only VIO segment */
 						         : !(nodeprot & VM_PROT_READ)  /* Read from non-readable VIO segment */
-						) {
+						         ) {
 vio_failure_throw_segfault:
 						assert(args.ma_oldcons == &con);
 						assert(args.ma_args.va_part == part);

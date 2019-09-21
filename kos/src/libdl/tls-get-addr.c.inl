@@ -30,10 +30,10 @@ DECL_BEGIN
 #ifdef FAIL_ON_ERROR
 INTERN WUNUSED ATTR_RETNONNULL void *ATTR_FASTCALL
 libdl_dltlsbase(DlModule *__restrict self)
-#else
+#else /* FAIL_ON_ERROR */
 INTERN WUNUSED void *LIBCCALL
 libdl_dltlsaddr(DlModule *__restrict self)
-#endif
+#endif /* !FAIL_ON_ERROR */
 {
 	byte_t *result;
 	struct dtls_extension *extab;
@@ -64,10 +64,10 @@ libdl_dltlsaddr(DlModule *__restrict self)
 #if ELF_POINTER_SIZE >= 8
 			elf_setdlerrorf("Failed to read %Iu bytes of TLS template data from %I64u",
 			                self->dm_tlsfsize, (uint64_t)self->dm_tlsoff);
-#else
+#else /* ELF_POINTER_SIZE >= 8 */
 			elf_setdlerrorf("Failed to read %Iu bytes of TLS template data from %I32u",
 			                self->dm_tlsfsize, (uint32_t)self->dm_tlsoff);
-#endif
+#endif /* ELF_POINTER_SIZE < 8 */
 			goto err;
 		}
 		new_init = (byte_t *)ATOMIC_CMPXCH_VAL(self->dm_tlsinit,
@@ -136,9 +136,9 @@ err:
 	syslog(LOG_ERR, "[ld] Failed to allocate TLS segment for %q: %s\n",
 	       self->dm_filename, elf_dlerror_message);
 	sys_exit_group(EXIT_FAILURE);
-#else
+#else /* FAIL_ON_ERROR */
 	return NULL;
-#endif
+#endif /* !FAIL_ON_ERROR */
 }
 
 #undef FAIL_ON_ERROR

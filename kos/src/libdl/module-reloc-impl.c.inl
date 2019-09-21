@@ -332,8 +332,8 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 			                                 &tls_module))
 				goto err;
 			/* NOTE: `dm_tlsstoff' is negative, `sym.ds_symval' is positive.
-			 *        This relocation is applied to `movl %fs:symbol, %eax' (386)
-			 *        or `movq %gs:symbol, %rax' (x86_64), so we need to have
+			 *        This relocation is applied to `movl %gs:symbol, %eax' (386)
+			 *        or `movq %fs:symbol, %rax' (x86_64), so we need to have
 			 *       `symbol' evaluate to its position within the static TLS segment. */
 			if unlikely(tls_module->dm_tlsstoff == 0) {
 				/* Symbol points to a module that isn't apart of the static TLS segment.

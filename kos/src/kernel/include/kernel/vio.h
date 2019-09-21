@@ -51,8 +51,9 @@ struct vm_datablock_type_vio {
 		NONNULL((1)) u32 (KCALL *f_dword)(struct vio_args *__restrict args, vm_daddr_t addr);
 #ifdef CONFIG_VIO_HAS_QWORD
 		NONNULL((1)) u64 (KCALL *f_qword)(struct vio_args *__restrict args, vm_daddr_t addr);
-#endif
+#endif /* CONFIG_VIO_HAS_QWORD */
 	} dtv_read;
+
 #ifdef CONFIG_VIO_HAS_QWORD
 #define VIO_CALLBACK_INIT(b, w, l, q) { b, w, l, q }
 #else /* CONFIG_VIO_HAS_QWORD */
@@ -65,7 +66,7 @@ struct vm_datablock_type_vio {
 		NONNULL((1)) void (KCALL *f_dword)(struct vio_args *__restrict args, vm_daddr_t addr, u32 value);
 #ifdef CONFIG_VIO_HAS_QWORD
 		NONNULL((1)) void (KCALL *f_qword)(struct vio_args *__restrict args, vm_daddr_t addr, u64 value);
-#endif
+#endif /* CONFIG_VIO_HAS_QWORD */
 	} dtv_write;
 	struct {
 		/* Return the old value (regardless of the compare-exchange having been successful) */
@@ -74,7 +75,7 @@ struct vm_datablock_type_vio {
 		NONNULL((1)) u32 (KCALL *f_dword)(struct vio_args *__restrict args, vm_daddr_t addr, u32 oldvalue, u32 newvalue, bool atomic);
 #if defined(CONFIG_VIO_HAS_QWORD) || defined(CONFIG_VIO_HAS_QWORD_CMPXCH)
 		NONNULL((1)) u64 (KCALL *f_qword)(struct vio_args *__restrict args, vm_daddr_t addr, u64 oldvalue, u64 newvalue, bool atomic);
-#endif
+#endif /* CONFIG_VIO_HAS_QWORD || CONFIG_VIO_HAS_QWORD_CMPXCH */
 	} dtv_cmpxch;
 	struct {
 		/* Return the old value */
@@ -83,7 +84,7 @@ struct vm_datablock_type_vio {
 		NONNULL((1)) u32 (KCALL *f_dword)(struct vio_args *__restrict args, vm_daddr_t addr, u32 newvalue, bool atomic);
 #ifdef CONFIG_VIO_HAS_QWORD
 		NONNULL((1)) u64 (KCALL *f_qword)(struct vio_args *__restrict args, vm_daddr_t addr, u64 newvalue, bool atomic);
-#endif
+#endif /* CONFIG_VIO_HAS_QWORD */
 	} dtv_xch;
 	struct {
 		/* Return the old value (prior to be `value' being added) */
@@ -92,7 +93,7 @@ struct vm_datablock_type_vio {
 		NONNULL((1)) u32 (KCALL *f_dword)(struct vio_args *__restrict args, vm_daddr_t addr, u32 value, bool atomic);
 #ifdef CONFIG_VIO_HAS_QWORD
 		NONNULL((1)) u64 (KCALL *f_qword)(struct vio_args *__restrict args, vm_daddr_t addr, u64 value, bool atomic);
-#endif
+#endif /* CONFIG_VIO_HAS_QWORD */
 	} dtv_add;
 	struct {
 		/* Return the old value (prior to be `value' being subtracted) */
@@ -101,7 +102,7 @@ struct vm_datablock_type_vio {
 		NONNULL((1)) u32 (KCALL *f_dword)(struct vio_args *__restrict args, vm_daddr_t addr, u32 value, bool atomic);
 #ifdef CONFIG_VIO_HAS_QWORD
 		NONNULL((1)) u64 (KCALL *f_qword)(struct vio_args *__restrict args, vm_daddr_t addr, u64 value, bool atomic);
-#endif
+#endif /* CONFIG_VIO_HAS_QWORD */
 	} dtv_sub;
 	struct {
 		/* Return the old value (prior to be `mask' being anded) */
@@ -110,7 +111,7 @@ struct vm_datablock_type_vio {
 		NONNULL((1)) u32 (KCALL *f_dword)(struct vio_args *__restrict args, vm_daddr_t addr, u32 mask, bool atomic);
 #ifdef CONFIG_VIO_HAS_QWORD
 		NONNULL((1)) u64 (KCALL *f_qword)(struct vio_args *__restrict args, vm_daddr_t addr, u64 mask, bool atomic);
-#endif
+#endif /* CONFIG_VIO_HAS_QWORD */
 	} dtv_and;
 	struct {
 		/* Return the old value (prior to be `mask' being or'd) */
@@ -119,7 +120,7 @@ struct vm_datablock_type_vio {
 		NONNULL((1)) u32 (KCALL *f_dword)(struct vio_args *__restrict args, vm_daddr_t addr, u32 mask, bool atomic);
 #ifdef CONFIG_VIO_HAS_QWORD
 		NONNULL((1)) u64 (KCALL *f_qword)(struct vio_args *__restrict args, vm_daddr_t addr, u64 mask, bool atomic);
-#endif
+#endif /* CONFIG_VIO_HAS_QWORD */
 	} dtv_or;
 	struct {
 		/* Return the old value (prior to be `mask' being xor'd) */
@@ -128,7 +129,7 @@ struct vm_datablock_type_vio {
 		NONNULL((1)) u32 (KCALL *f_dword)(struct vio_args *__restrict args, vm_daddr_t addr, u32 mask, bool atomic);
 #ifdef CONFIG_VIO_HAS_QWORD
 		NONNULL((1)) u64 (KCALL *f_qword)(struct vio_args *__restrict args, vm_daddr_t addr, u64 mask, bool atomic);
-#endif
+#endif /* CONFIG_VIO_HAS_QWORD */
 	} dtv_xor;
 	/* TODO: Bindings for futex() operations */
 
@@ -138,20 +139,20 @@ struct vm_datablock_type_vio {
 	 * to execute VIO memory.
 	 * USER:
 	 * >> void *vio_base;
-	 * >> vio_base = mmap(NULL,0x1000,PROT_READ|PROT_EXEC,MAP_PRIVATE,vio_fd,0);
+	 * >> vio_base = mmap(NULL, 0x1000, PROT_READ | PROT_EXEC, MAP_PRIVATE, vio_fd, 0);
 	 * >>
-	 * >> kernel_function = (int(*)(int,int))((byte_t *)vio_base + 1234);
+	 * >> kernel_function = (int(*)(int, int))((byte_t *)vio_base + 1234);
 	 * >>
-	 * >> // This function will invoke `dtv_call(...,REGS,1234)'
+	 * >> // This function will invoke `dtv_call(..., REGS, 1234)'
 	 * >> // REGS: (user-space register state; assuming x86)
 	 * >> //    PC: ADDROF(printf)
 	 * >> //    SP: { int: 10, int: 20 }
 	 * >> // `dtv_call' can then assign the EAX register in `args' (again: assuming x86),
 	 * >> // which is the value that's going to be returned to user-space and be assigned
 	 * >> // to `x', before being printed.
-	 * >> int x = (*kernel_function)(10,20);
+	 * >> int x = (*kernel_function)(10, 20);
 	 * >>
-	 * >> printf("x = %d\n",x);
+	 * >> printf("x = %d\n", x);
 	 * >>
 	 * @return: * : A pointer to the new register state that should be restored.
 	 *              Usually, this is the same as `regs' */
@@ -204,7 +205,7 @@ FUNDEF NONNULL((1)) void KCALL vio_copytovio_from_phys(struct vio_args *__restri
 
 #if defined(CONFIG_VIO_HAS_QWORD) || defined(CONFIG_VIO_HAS_QWORD_CMPXCH)
 FUNDEF NONNULL((1)) u64 KCALL vio_cmpxchq(struct vio_args *__restrict args, vm_daddr_t addr, u64 oldvalue, u64 newvalue, bool atomic);
-#endif
+#endif /* CONFIG_VIO_HAS_QWORD || CONFIG_VIO_HAS_QWORD_CMPXCH */
 #ifdef CONFIG_VIO_HAS_QWORD
 FUNDEF NONNULL((1)) u64 KCALL vio_cmpxch_or_writeq(struct vio_args *__restrict args, vm_daddr_t addr, u64 oldvalue, u64 newvalue, bool atomic);
 FUNDEF NONNULL((1)) u64 KCALL vio_readq(struct vio_args *__restrict args, vm_daddr_t addr);

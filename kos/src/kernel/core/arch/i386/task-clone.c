@@ -274,8 +274,8 @@ again_lock_vm:
 
 #ifndef __x86_64__
 	/* Assign the used TLS segment bases. */
-	FORTASK(result, x86_this_user_gsbase) = get_user_gsbase();
-	FORTASK(result, x86_this_user_fsbase) = clone_flags & CLONE_SETTLS ? newtls : get_user_fsbase();
+	FORTASK(result, x86_this_user_gsbase) = clone_flags & CLONE_SETTLS ? newtls : get_user_gsbase();
+	FORTASK(result, x86_this_user_fsbase) = get_user_fsbase();
 #endif /* !__x86_64__ */
 
 	result->t_vm = result_vm; /* Inherit reference. */

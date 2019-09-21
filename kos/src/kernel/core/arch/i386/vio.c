@@ -4478,7 +4478,7 @@ undefined_instruction:
 		/* XXX: Emulate every x86 instruction as a one-on-one direct emulation here.
 		 *      If we did this, it would become possible to run VIO memory as code.
 		 *   -> This could be especially useful since it would allow us to implement
-		 *      general purpose support for int3-like breakpoints via VIO! */
+		 *      general purpose support for int3-like read/write breakpoints via VIO! */
 
 		{
 			uintptr_t fixed_pc;
@@ -4498,7 +4498,7 @@ undefined_instruction:
 #if EXCEPT_BACKTRACE_SIZE != 0
 			for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i)
 				PERTASK_SET(_this_exception_info.ei_trace[i], (void *)0);
-#endif
+#endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 			cleanup_and_unwind_interrupt(args, state);
 		}
 done:
