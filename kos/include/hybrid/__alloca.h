@@ -23,22 +23,31 @@
 
 #if defined(__GNUC__) || __has_builtin(__builtin_alloca)
 #define __hybrid_alloca(s)  __builtin_alloca(s)
-#else /* ... */
+#elif defined(_MSC_VER)
 #include "typecore.h"
-#ifdef _MSC_VER
 __SYSDECL_BEGIN
 __NAMESPACE_INT_BEGIN
 extern __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) void *(__cdecl _alloca)(__SIZE_TYPE__ __n_bytes);
 #pragma intrinsic(_alloca)
 __NAMESPACE_INT_END
 __SYSDECL_END
-#define __hybrid_alloca(s)  (__NAMESPACE_INT_SYM _alloca)(s)
-#else /* _MSC_VER */
+#define __hybrid_alloca(s) (__NAMESPACE_INT_SYM _alloca)(s)
+#else /* ... */
+#if !defined(__NO_has_include) && !defined(__KOS_SYSTEM_HEADERS__)
+#if __has_include(<alloca.h>)
+#include <alloca.h>
+#define __hybrid_alloca(s)  alloca(s)
+#endif
+#endif /* !__NO_has_include && !__KOS_SYSTEM_HEADERS__ */
+#ifndef __hybrid_alloca
+#if 0
+#include "typecore.h"
 __SYSDECL_BEGIN
 extern __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) void *(alloca)(__SIZE_TYPE__ __n_bytes);
 __SYSDECL_END
 #define __hybrid_alloca(s)  (alloca)(s)
-#endif /* !_MSC_VER */
+#endif
+#endif /* !__hybrid_alloca */
 #endif /* ... */
 
 #endif /* !__GUARD_HYBRID___ALLOCA_H */

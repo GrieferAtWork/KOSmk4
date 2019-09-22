@@ -25,7 +25,7 @@
 #ifdef __KERNEL__
 #ifndef __KOS_VERSION__
 #define __KOS_VERSION__ 200 /* Legacy model. */
-#endif
+#endif /* !__KOS_VERSION__ */
 
 #if __KOS_VERSION__ >= 400
 #include <sched/pertask.h>
@@ -35,11 +35,11 @@
 #include <sched/percpu.h>
 #endif
 
-#define __HYBRID_SIZEOF_TID__  __SIZEOF_POINTER__
+#define __HYBRID_SIZEOF_TID__           __SIZEOF_POINTER__
 #define __HYBRID_GETTID_INVALID_IS_ZERO 1
-#define __HYBRID_GETTID_INVALID    __NULLPTR
-#define __HYBRID_GETTID_PRINTF_FMT     "%p"
-#define __HYBRID_GETTID_PRINTF_ARG(x)    x
+#define __HYBRID_GETTID_INVALID         __NULLPTR
+#define __HYBRID_GETTID_PRINTF_FMT      "%p"
+#define __HYBRID_GETTID_PRINTF_ARG(x)   x
 #ifdef __CC__
 #define __hybrid_gettid()          THIS_TASK
 __DECL_BEGIN

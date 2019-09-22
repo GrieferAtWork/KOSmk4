@@ -25,18 +25,18 @@
 
 #ifdef __STDC__
 #   define __P(x) x
-#else
+#else /* __STDC__ */
 #   define __NO_PROTOTYPES 1
 #   define __P(x) ()
-#endif
+#endif /* !__STDC__ */
 
 #ifndef __INTEL_VERSION__
 #ifdef __INTEL_COMPILER
 #if __INTEL_COMPILER == 9999
 #   define __INTEL_VERSION__ 1200
-#else
+#else /* __INTEL_COMPILER == 9999 */
 #   define __INTEL_VERSION__ __INTEL_COMPILER
-#endif
+#endif /* __INTEL_COMPILER != 9999 */
 #elif defined(__ICL)
 #   define __INTEL_VERSION__ __ICL
 #elif defined(__ICC)
@@ -49,16 +49,20 @@
 
 #ifndef __GNUC_MINOR__
 #   define __GNUC_MINOR__ 0
-#endif
+#endif /* !__GNUC_MINOR__ */
 #ifndef __GNUC_PATCH__
 #ifdef __GNUC_PATCHLEVEL__
 #   define __GNUC_PATCH__ __GNUC_PATCHLEVEL__
-#else
+#else /* __GNUC_PATCHLEVEL__ */
 #   define __GNUC_PATCH__ 0
-#endif
-#endif
-#define __GCC_VERSION_NUM    (__GNUC__*10000+__GNUC_MINOR__*100+__GNUC_PATCH__)
-#define __GCC_VERSION(a,b,c) (__GCC_VERSION_NUM >= ((a)*10000+(b)*100+(c)))
+#endif /* !__GNUC_PATCHLEVEL__ */
+#endif /* !__GNUC_PATCH__ */
+#ifndef __GCC_VERSION_NUM
+#define __GCC_VERSION_NUM (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCH__)
+#endif /* !__GCC_VERSION_NUM */
+#ifndef __GCC_VERSION
+#define __GCC_VERSION(a, b, c) (__GCC_VERSION_NUM >= ((a)*10000 + (b)*100 + (c)))
+#endif /* !__GCC_VERSION */
 
 
 #ifndef __has_attribute
@@ -144,15 +148,15 @@
 #define __GCC_HAS_ATTRIBUTE___fallthrough__
 #endif
 #define __has_attribute(x) __GCC_PRIVATE_IS_DEFINED(__GCC_HAS_ATTRIBUTE_##x)
-#endif
+#endif /* !__has_attribute */
 #ifndef __has_cpp_attribute
 #define __NO_has_cpp_attribute 1
 #define __has_cpp_attribute(x) 0
-#endif
+#endif /* !__has_cpp_attribute */
 #ifndef __has_feature
 #define __NO_has_feature 1
 #define __has_feature(x) 0
-#endif
+#endif /* !__has_feature */
 #ifndef __has_builtin
 #include "gcc-builtins.h"
 #endif /* !__has_builtin */
@@ -174,23 +178,23 @@
 
 #if defined(__clang__) || !defined(__DARWIN_NO_LONG_LONG)
 #define __COMPILER_HAVE_LONGLONG 1
-#endif
+#endif /* __clang__ || !__DARWIN_NO_LONG_LONG */
 #define __COMPILER_HAVE_LONGDOUBLE 1
 #define __COMPILER_HAVE_PRAGMA_PUSHMACRO 1
 #if __has_feature(__tpp_pragma_deprecated__)
 #define __COMPILER_HAVE_PRAGMA_DEPRECATED 1
-#endif
+#endif /* __has_feature(__tpp_pragma_deprecated__) */
 #define __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER 1
 #ifdef __CC__
 #define __COMPILER_HAVE_PRAGMA_PACK 1
-#endif
+#endif /* __CC__ */
 #define __COMPILER_HAVE_GCC_ASM 1
 #define __COMPILER_HAVE_REGISTER_VARS 1
 #ifdef __cplusplus
 #define __COMPILER_ASM_BUFFER(T,s,p) (*(T(*)[s])(p))
-#else
+#else /* __cplusplus */
 #define __COMPILER_ASM_BUFFER(T,s,p) (*(struct { __extension__ T __d[s]; } *)(p))
-#endif
+#endif /* !__cplusplus */
 
 /* For whatever reason, g++ refuses to allow trivially
  * constructible+copyable+etc. classes within unnamed structs:
@@ -203,7 +207,7 @@
 
 #ifdef __CPROTO__
 #include "cproto.h"
-#endif
+#endif /* __CPROTO__ */
 
 #ifndef __cplusplus
 /* XXX: When was this added in C? */
@@ -291,16 +295,16 @@
 #   define __ATTR_CDECL            /* Nothing */
 #endif
 #if __has_attribute(__clrcall__)
-#   define __ATTR_CLRCALL        __attribute__((__clrcall__))
+#   define __ATTR_CLRCALL          __attribute__((__clrcall__))
 #else
-#   define __NO_ATTR_CLRCALL     1
-#   define __ATTR_CLRCALL        /* Nothing */
+#   define __NO_ATTR_CLRCALL       1
+#   define __ATTR_CLRCALL          /* Nothing */
 #endif
 #if __has_attribute(__thiscall__)
-#   define __ATTR_THISCALL       __attribute__((__thiscall__))
+#   define __ATTR_THISCALL         __attribute__((__thiscall__))
 #else
-#   define __NO_ATTR_THISCALL    1
-#   define __ATTR_THISCALL       /* Nothing */
+#   define __NO_ATTR_THISCALL      1
+#   define __ATTR_THISCALL         /* Nothing */
 #endif
 #if defined(__x86_64__) || defined(__x86_64)
 #   define __VA_LIST_IS_ARRAY      1
@@ -351,7 +355,7 @@
 #if __has_attribute(__alloc_size__)
 #   define __ATTR_ALLOC_SIZE(ppars) __attribute__((__alloc_size__ ppars))
 #else
-#   define __NO_ATTR_ALLOC_SIZE     1
+#   define __NO_ATTR_ALLOC_SIZE    1
 #   define __ATTR_ALLOC_SIZE(ppars) /* Nothing */
 #endif
 #if __has_attribute(__unused__)
@@ -428,16 +432,16 @@
 #   define __ATTR_ALLOC_ALIGN(pari) /* Nothing */
 #endif
 #if __has_attribute(__nothrow__)
-#   define __ATTR_NOTHROW        __attribute__((__nothrow__))
+#   define __ATTR_NOTHROW          __attribute__((__nothrow__))
 #else
-#   define __NO_ATTR_NOTHROW     1
-#   define __ATTR_NOTHROW        /* Nothing */
+#   define __NO_ATTR_NOTHROW       1
+#   define __ATTR_NOTHROW          /* Nothing */
 #endif
 #if __has_attribute(__optimize__)
-#   define __ATTR_OPTIMIZE(opt)  __attribute__((__optimize__(opt)))
+#   define __ATTR_OPTIMIZE(opt)    __attribute__((__optimize__(opt)))
 #else
-#   define __NO_ATTR_OPTIMIZE    1
-#   define __ATTR_OPTIMIZE(opt)  /* Nothing */
+#   define __NO_ATTR_OPTIMIZE      1
+#   define __ATTR_OPTIMIZE(opt)    /* Nothing */
 #endif
 #if __has_attribute(__transparent_union__) && !defined(__cplusplus)
 #   define __ATTR_TRANSPARENT_UNION __attribute__((__transparent_union__))
@@ -466,110 +470,110 @@
 #endif
 #if !defined(__ELF__) && \
     (defined(__PE__) || defined(_WIN32) || defined(__CYGWIN__))
-#   define __ATTR_DLLIMPORT      __attribute__((__dllimport__))
-#   define __ATTR_DLLEXPORT      __attribute__((__dllexport__))
+#   define __ATTR_DLLIMPORT        __attribute__((__dllimport__))
+#   define __ATTR_DLLEXPORT        __attribute__((__dllexport__))
 #else
-#   define __NO_ATTR_DLLIMPORT   1
-#   define __ATTR_DLLIMPORT      /* Nothing */
-#   define __NO_ATTR_DLLEXPORT   1
-#   define __ATTR_DLLEXPORT      /* Nothing */
+#   define __NO_ATTR_DLLIMPORT     1
+#   define __ATTR_DLLIMPORT        /* Nothing */
+#   define __NO_ATTR_DLLEXPORT     1
+#   define __ATTR_DLLEXPORT        /* Nothing */
 #endif
 #if __has_attribute(__nonnull__)
-#   define __ATTR_NONNULL(ppars) __attribute__((__nonnull__ ppars))
+#   define __ATTR_NONNULL(ppars)   __attribute__((__nonnull__ ppars))
 #else
-#   define __NO_ATTR_NONNULL     1
-#   define __ATTR_NONNULL(ppars) /* Nothing */
+#   define __NO_ATTR_NONNULL       1
+#   define __ATTR_NONNULL(ppars)   /* Nothing */
 #endif
 #if __has_attribute(__warn_unused_result__)
-#   define __ATTR_WUNUSED        __attribute__((__warn_unused_result__))
+#   define __ATTR_WUNUSED          __attribute__((__warn_unused_result__))
 #else
-#   define __NO_ATTR_WUNUSED     1
-#   define __ATTR_WUNUSED        /* Nothing */
+#   define __NO_ATTR_WUNUSED       1
+#   define __ATTR_WUNUSED          /* Nothing */
 #endif
 
-#define __ATTR_WARNING(text)     __attribute__((__warning__(text)))
-#define __ATTR_ERROR(text)       __attribute__((__error__(text)))
-#define __ATTR_SECTION(name)     __attribute__((__section__(name)))
-#define __ATTR_RETNONNULL        __attribute__((__returns_nonnull__))
-#define __ATTR_PACKED            __attribute__((__packed__))
-#define __ATTR_ALIAS(name)       __attribute__((__alias__(name)))
-#define __ATTR_ALIGNED(n)        __attribute__((__aligned__(n)))
-#define __ATTR_WEAK              __attribute__((__weak__))
-#define __ATTR_RETURNS_TWICE     __attribute__((__returns_twice__))
-#define __ATTR_EXTERNALLY_VISIBLE __attribute__((__externally_visible__))
-#define __ATTR_VISIBILITY(vis)   __attribute__((__visibility__(vis)))
+#define __ATTR_WARNING(text)       __attribute__((__warning__(text)))
+#define __ATTR_ERROR(text)         __attribute__((__error__(text)))
+#define __ATTR_SECTION(name)       __attribute__((__section__(name)))
+#define __ATTR_RETNONNULL          __attribute__((__returns_nonnull__))
+#define __ATTR_PACKED              __attribute__((__packed__))
+#define __ATTR_ALIAS(name)         __attribute__((__alias__(name)))
+#define __ATTR_ALIGNED(n)          __attribute__((__aligned__(n)))
+#define __ATTR_WEAK                __attribute__((__weak__))
+#define __ATTR_RETURNS_TWICE       __attribute__((__returns_twice__))
+#define __ATTR_EXTERNALLY_VISIBLE  __attribute__((__externally_visible__))
+#define __ATTR_VISIBILITY(vis)     __attribute__((__visibility__(vis)))
 
 #if __has_attribute(__selectany__)
-#   define __ATTR_SELECTANY      __attribute__((__selectany__))
+#   define __ATTR_SELECTANY        __attribute__((__selectany__))
 #else
-#   define __NO_ATTR_SELECTANY   1
-#   define __ATTR_SELECTANY      /* Nothing */
+#   define __NO_ATTR_SELECTANY     1
+#   define __ATTR_SELECTANY        /* Nothing */
 #endif
 
 #ifdef __INTELLISENSE_GCC__
-#   define __PRIVATE_PRAGMA(...) _Pragma(#__VA_ARGS__)
+#   define __PRIVATE_PRAGMA(...)   _Pragma(#__VA_ARGS__)
 #   define __pragma(...) __PRIVATE_PRAGMA(__VA_ARGS__)
-#   define __XBLOCK              /* nothing */
-#   define __XRETURN             /* nothing */
+#   define __XBLOCK                /* nothing */
+#   define __XRETURN               /* nothing */
 #   define __builtin_assume_has_sideeffects 1
-#   define __builtin_assume(x)  (!(x) ? __builtin_unreachable() : (void)0)
+#   define __builtin_assume(x)     (!(x) ? __builtin_unreachable() : (void)0)
 #elif defined(__INTELLISENSE__)
-#   define __XBLOCK(...)      (([&]__VA_ARGS__)())
-#   define __XRETURN             return
+#   define __XBLOCK(...)           (([&]__VA_ARGS__)())
+#   define __XRETURN               return
 #   define __builtin_assume_has_sideeffects 1
-#   define __builtin_assume(x)   __assume(x)
+#   define __builtin_assume(x)     __assume(x)
 #else
 #if __GCC_VERSION(4,4,0) || defined(__TPP_VERSION__)
-#   define __PRIVATE_PRAGMA(...) _Pragma(#__VA_ARGS__)
-#   define __pragma(...) __PRIVATE_PRAGMA(__VA_ARGS__)
+#   define __PRIVATE_PRAGMA(...)   _Pragma(#__VA_ARGS__)
+#   define __pragma(...)           __PRIVATE_PRAGMA(__VA_ARGS__)
 #else
-#   define __NO_pragma   1
-#   define __pragma(...) /* Nothing */
+#   define __NO_pragma             1
+#   define __pragma(...)           /* Nothing */
 #endif
-#   define __XBLOCK              __extension__
-#   define __XRETURN             /* Nothing */
+#   define __XBLOCK                __extension__
+#   define __XRETURN               /* Nothing */
 #if !__has_builtin(__builtin_assume)
 #if 1
 #   define __builtin_assume_has_sideeffects 1
-#   define __builtin_assume(x)  (!(x) ? __builtin_unreachable() : (void)0)
+#   define __builtin_assume(x)     (!(x) ? __builtin_unreachable() : (void)0)
 #else
 #   undef __builtin_assume_has_sideeffects
-#   define __NO_builtin_assume   1
-#   define __builtin_assume(x)  (void)0
+#   define __NO_builtin_assume     1
+#   define __builtin_assume(x)     (void)0
 #endif
 #endif
 #endif
 #if __GCC_VERSION(4,3,0) && (!defined(__GCCXML__) && \
    !defined(__clang__) && !defined(unix) && \
    !defined(__unix__)) || defined(__LP64__)
-#   define __COMPILER_ALIGNOF    __alignof__
+#   define __COMPILER_ALIGNOF      __alignof__
 #elif defined(__clang__)
-#   define __COMPILER_ALIGNOF    __alignof
+#   define __COMPILER_ALIGNOF      __alignof
 #elif defined(__cplusplus)
 extern "C++" { template<class T> struct __compiler_alignof { char __x; T __y; }; }
-#   define __COMPILER_ALIGNOF(T) (sizeof(__compiler_alignof< T >)-sizeof(T))
+#   define __COMPILER_ALIGNOF(T)   (sizeof(__compiler_alignof< T >)-sizeof(T))
 #else
-#   define __COMPILER_ALIGNOF(T) ((__SIZE_TYPE__)&((struct{ char __x; T __y; } *)0)->__y)
+#   define __COMPILER_ALIGNOF(T)   ((__SIZE_TYPE__)&((struct{ char __x; T __y; } *)0)->__y)
 #endif
 #if defined(__NO_INLINE__) && 0
-#   define __NO_ATTR_INLINE 1
-#   define __ATTR_INLINE    /* Nothing */
+#   define __NO_ATTR_INLINE        1
+#   define __ATTR_INLINE           /* Nothing */
 #elif defined(__STDC_VERSION__) && __STDC_VERSION__ > 199901L
-#   define __ATTR_INLINE    inline
+#   define __ATTR_INLINE           inline
 #elif __GCC_VERSION(2,7,0)
-#   define __ATTR_INLINE    __inline__
+#   define __ATTR_INLINE           __inline__
 #else
-#   define __NO_ATTR_INLINE 1
-#   define __ATTR_INLINE    /* Nothing */
+#   define __NO_ATTR_INLINE        1
+#   define __ATTR_INLINE           /* Nothing */
 #endif
 #if __GCC_VERSION(3,0,0)
-#   define __ATTR_FORCEINLINE __inline__ __attribute__((__always_inline__))
+#   define __ATTR_FORCEINLINE      __inline__ __attribute__((__always_inline__))
 #elif __GCC_VERSION(2,7,0)
-#   define __NO_ATTR_FORCEINLINE 1
-#   define __ATTR_FORCEINLINE __inline__
+#   define __NO_ATTR_FORCEINLINE   1
+#   define __ATTR_FORCEINLINE      __inline__
 #else
-#   define __NO_ATTR_FORCEINLINE 1
-#   define __ATTR_FORCEINLINE /* Nothing */
+#   define __NO_ATTR_FORCEINLINE   1
+#   define __ATTR_FORCEINLINE      /* Nothing */
 #endif
 #define __LOCAL       static __ATTR_INLINE
 #define __FORCELOCAL  static __ATTR_FORCEINLINE
@@ -579,7 +583,7 @@ __extension__ typedef long long __longlong_t;
 __extension__ typedef unsigned long long __ulonglong_t;
 #define __LONGLONG   __longlong_t
 #define __ULONGLONG  __ulonglong_t
-#endif
+#endif /* __CC__ */
 #endif /* !__LONGLONG */
 
 #if !__GCC_VERSION(2,92,0) /* !__GCC_VERSION(2,95,0) */
@@ -620,12 +624,12 @@ __extension__ typedef unsigned long long __ulonglong_t;
 #define __IF1     if(true)
 #define __WHILE0  while(false)
 #define __WHILE1  while(true)
-#else
+#else /* __cplusplus */
 #define __IF0     if(0)
 #define __IF1     if(1)
 #define __WHILE0  while(0)
 #define __WHILE1  while(1)
-#endif
+#endif /* !__cplusplus */
 
 #ifdef __cplusplus
 #if !defined(__INTEL_VERSION__) || __INTEL_VERSION__ >= 600 || \
@@ -633,25 +637,25 @@ __extension__ typedef unsigned long long __ulonglong_t;
 #define __native_wchar_t_defined 1
 #define __wchar_t_defined 1
 #endif
-#endif
+#endif /* __cplusplus */
 
 #ifndef __INTELLISENSE__
 #define __FUNCTION__   __extension__ __FUNCTION__
-#endif
+#endif /* !__INTELLISENSE__ */
 
 #if !__has_builtin(__builtin_LINE)
 #define __builtin_LINE()     __LINE__
 #define __builtin_FUNCTION() __FUNCTION__
 #define __builtin_FILE()     __FILE__
-#endif
+#endif /* !__has_builtin(__builtin_LINE) */
 
 #if !__has_builtin(__builtin_unreachable)
 #define __builtin_unreachable() __XBLOCK({ for (;;); (void)0; })
-#endif
+#endif /* !__has_builtin(__builtin_unreachable) */
 
 #if !__has_builtin(__builtin_object_size)
 #define __builtin_object_size(ptr,type) ((type) < 2 ? (__SIZE_TYPE__)-1 : 0)
-#endif
+#endif /* !__has_builtin(__builtin_object_size) */
 
 
 #if __GCC_VERSION(4,7,0)
@@ -675,25 +679,18 @@ __extension__ typedef unsigned long long __ulonglong_t;
 #ifdef __cplusplus
 #ifdef __INTELLISENSE__
 #   define __NULLPTR    nullptr
-#else
+#else /* __INTELLISENSE__ */
 #   define __NULLPTR          0
-#endif
-#else
+#endif /* !__INTELLISENSE__ */
+#else /* __cplusplus */
 #   define __NULLPTR ((void *)0)
-#endif
-
-#ifndef __INTELLISENSE__
-#define __COMPILER_DEPRECATED_EXPR(val) \
-   ({ __pragma(message("Warning: Deprecated value")) (val); })
-#define __COMPILER_DEPRECATED_EXPR_(msg,val) \
-   ({ __pragma(message("Warning: " msg)) (val); })
-#endif
+#endif /* !__cplusplus */
 
 #ifdef __cplusplus
 /* `__builtin_choose_expr()' is only available in C, but not in C++ */
 #undef __builtin_choose_expr
 #define __NO_builtin_choose_expr 1
-#define __builtin_choose_expr(c,tt,ff) ((c)?(tt):(ff))
+#define __builtin_choose_expr(c, tt, ff) ((c) ? (tt) : (ff))
 
 /* `__builtin_types_compatible_p()' isn't consistently defined by g++.
  * So to prevent problems with that, simply re-implement it using a
@@ -706,8 +703,8 @@ template<class __T> struct __gcc_types_compatible_remcv<__T const volatile>{type
 template<class __T1, class __T2> struct __gcc_types_compatible_impl{enum{__val=false};};
 template<class __T1> struct __gcc_types_compatible_impl<__T1,__T1>{enum{__val=true};};
 template<class __T1, class __T2> struct __gcc_types_compatible:
- __gcc_types_compatible_impl<typename __gcc_types_compatible_remcv<__T1>::__type,
-                             typename __gcc_types_compatible_remcv<__T2>::__type>{};
+	__gcc_types_compatible_impl<typename __gcc_types_compatible_remcv<__T1>::__type,
+	                            typename __gcc_types_compatible_remcv<__T2>::__type>{};
 }
 #undef __builtin_types_compatible_p
 #define __builtin_types_compatible_p(...) (::__intern::__gcc_types_compatible< __VA_ARGS__ >::__val)

@@ -523,7 +523,7 @@
 #define __VERSION__                       "6.2.0"
 
 enum {
-    __asm__
+	__asm__
 };
 //#define asm(...)           /* Nothing (Used for register variables) */
 #define asm                __asm__
@@ -553,20 +553,20 @@ typedef bool _Bool;
 // NOTE: Capable of detecting 0 arguments!
 // HINT: This implementation works for intellisense, vc and vc++
 #define ____INTELLISENSE_PP_FORCE_EXPAND(...) __VA_ARGS__
-#define ____INTELLISENSE_PP_PRIVATE_VA_NARGS_I(x,_1,_2,_3,_4,_5,_6,_7,N,...) N
-#define ____INTELLISENSE_PP_PRIVATE_VA_NARGS_X(...) (~,__VA_ARGS__,7,6,5,4,3,2,1,0)
+#define ____INTELLISENSE_PP_PRIVATE_VA_NARGS_I(x, _1, _2, _3, _4, _5, _6, _7, N, ...) N
+#define ____INTELLISENSE_PP_PRIVATE_VA_NARGS_X(...) (~, __VA_ARGS__, 7, 6, 5, 4, 3, 2, 1, 0)
 #define ____INTELLISENSE_PP_VA_NARGS(...) ____INTELLISENSE_PP_FORCE_EXPAND(____INTELLISENSE_PP_PRIVATE_VA_NARGS_I ____INTELLISENSE_PP_PRIVATE_VA_NARGS_X(__VA_ARGS__))
 
-#define ____INTELLISENSE_ATTR_1(a)  ____INTELLISENSE_attribute_##a
-#define ____INTELLISENSE_ATTR_2(a,b)  ____INTELLISENSE_attribute_##a ____INTELLISENSE_attribute_##b
-#define ____INTELLISENSE_ATTR_3(a,b,c)  ____INTELLISENSE_attribute_##a ____INTELLISENSE_attribute_##b ____INTELLISENSE_attribute_##c
-#define ____INTELLISENSE_ATTR_4(a,b,c,d)  ____INTELLISENSE_attribute_##a ____INTELLISENSE_attribute_##b ____INTELLISENSE_attribute_##c ____INTELLISENSE_attribute_##d
-#define ____INTELLISENSE_ATTR_5(a,b,c,d,e)  ____INTELLISENSE_attribute_##a ____INTELLISENSE_attribute_##b ____INTELLISENSE_attribute_##c ____INTELLISENSE_attribute_##d ____INTELLISENSE_attribute_##e
-#define ____INTELLISENSE_ATTR_6(a,b,c,d,e,f)  ____INTELLISENSE_attribute_##a ____INTELLISENSE_attribute_##b ____INTELLISENSE_attribute_##c ____INTELLISENSE_attribute_##d ____INTELLISENSE_attribute_##e ____INTELLISENSE_attribute_##f
-#define ____INTELLISENSE_ATTR_7(a,b,c,d,e,f,g)  ____INTELLISENSE_attribute_##a ____INTELLISENSE_attribute_##b ____INTELLISENSE_attribute_##c ____INTELLISENSE_attribute_##d ____INTELLISENSE_attribute_##e ____INTELLISENSE_attribute_##f ____INTELLISENSE_attribute_##g
-#define ____INTELLISENSE_ATTR_N2(n,p) ____INTELLISENSE_ATTR_##n p
-#define ____INTELLISENSE_ATTR_N(n,...)  ____INTELLISENSE_ATTR_N2(n,(__VA_ARGS__))
-#define ____INTELLISENSE_ATTR(...) ____INTELLISENSE_ATTR_N(____INTELLISENSE_PP_VA_NARGS(__VA_ARGS__),__VA_ARGS__)
+#define ____INTELLISENSE_ATTR_1(a) ____INTELLISENSE_attribute_##a
+#define ____INTELLISENSE_ATTR_2(a, b) ____INTELLISENSE_attribute_##a ____INTELLISENSE_attribute_##b
+#define ____INTELLISENSE_ATTR_3(a, b, c) ____INTELLISENSE_attribute_##a ____INTELLISENSE_attribute_##b ____INTELLISENSE_attribute_##c
+#define ____INTELLISENSE_ATTR_4(a, b, c, d) ____INTELLISENSE_attribute_##a ____INTELLISENSE_attribute_##b ____INTELLISENSE_attribute_##c ____INTELLISENSE_attribute_##d
+#define ____INTELLISENSE_ATTR_5(a, b, c, d, e) ____INTELLISENSE_attribute_##a ____INTELLISENSE_attribute_##b ____INTELLISENSE_attribute_##c ____INTELLISENSE_attribute_##d ____INTELLISENSE_attribute_##e
+#define ____INTELLISENSE_ATTR_6(a, b, c, d, e, f) ____INTELLISENSE_attribute_##a ____INTELLISENSE_attribute_##b ____INTELLISENSE_attribute_##c ____INTELLISENSE_attribute_##d ____INTELLISENSE_attribute_##e ____INTELLISENSE_attribute_##f
+#define ____INTELLISENSE_ATTR_7(a, b, c, d, e, f, g) ____INTELLISENSE_attribute_##a ____INTELLISENSE_attribute_##b ____INTELLISENSE_attribute_##c ____INTELLISENSE_attribute_##d ____INTELLISENSE_attribute_##e ____INTELLISENSE_attribute_##f ____INTELLISENSE_attribute_##g
+#define ____INTELLISENSE_ATTR_N2(n, p) ____INTELLISENSE_ATTR_##n p
+#define ____INTELLISENSE_ATTR_N(n, ...) ____INTELLISENSE_ATTR_N2(n, (__VA_ARGS__))
+#define ____INTELLISENSE_ATTR(...) ____INTELLISENSE_ATTR_N(____INTELLISENSE_PP_VA_NARGS(__VA_ARGS__), __VA_ARGS__)
 
 
 #define __thread    __declspec(thread)
@@ -585,7 +585,7 @@ typedef bool _Bool;
 #define ____INTELLISENSE_attribute___dllimport__              __declspec(dllimport)
 #define ____INTELLISENSE_attribute_dllexport                  __declspec(dllexport)
 #define ____INTELLISENSE_attribute___dllexport__              __declspec(dllexport)
-#endif
+#endif /* __CYGWIN__ */
 #define ____INTELLISENSE_attribute_aligned(x)                 __declspec(align(x))
 #define ____INTELLISENSE_attribute___aligned__(x)             __declspec(align(x))
 #define ____INTELLISENSE_attribute_alloc_align(...)           __declspec(restrict)
@@ -682,76 +682,76 @@ typedef bool _Bool;
 #define ____INTELLISENSE_attribute___ms_abi__                 __cdecl
 #define ____INTELLISENSE_attribute_sysv_abi                   __cdecl
 #define ____INTELLISENSE_attribute___sysv_abi__               __cdecl
-#else
+#else /* __x86_64__ */
 #define ____INTELLISENSE_attribute_cdecl                      __cdecl
 #define ____INTELLISENSE_attribute___cdecl__                  __cdecl
 #define ____INTELLISENSE_attribute_fastcall                   __fastcall
 #define ____INTELLISENSE_attribute___fastcall__               __fastcall
 #define ____INTELLISENSE_attribute_stdcall                    __stdcall
 #define ____INTELLISENSE_attribute___stdcall__                __stdcall
-#endif
+#endif /* !__x86_64__ */
 
 
 #if 1
 enum { /* Highlight attributes in a different color */
-    __alias__,              /* __attribute__((alias(target))); */
-    __aligned__,            /* __attribute__((aligned(x))); */
-    __alloc_align__,        /* __attribute__((alloc_align(...))); */
-    __alloc_size__,         /* __attribute__((alloc_size(...))); */
-    __always_inline__,      /* __attribute__((always_inline)); */
-    __assume_aligned__,     /* __attribute__((assume_aligned(...))); */
-    __cold__,               /* __attribute__((cold)); */
-    __const__,              /* __attribute__((const)); */
-    __constructor__,        /* __attribute__((constructor)); */
-    __deprecated__,         /* __attribute__((deprecated(reason))); */
-    __destructor__,         /* __attribute__((destructor)); */
-    __error__,              /* __attribute__((error)); */
-    __externally_visible__, /* __attribute__((externally_visible)); */
-    __format__,             /* __attribute__((format(...,1,2))); */
-    __format_arg__,         /* __attribute__((format_arg(2))); */
-    __hot__,                /* __attribute__((hot)); */
-    __leaf__,               /* __attribute__((leaf)); */
-    __malloc__,             /* __attribute__((malloc)); */
-    __noclone__,            /* __attribute__((noclone)); */
-    __noinline__,           /* __attribute__((noinline)); */
-    __nonnull__,            /* __attribute__((nonnull(...))); */
-    __noreturn__,           /* __attribute__((noreturn)); */
-    __nothrow__,            /* __attribute__((nothrow)); */
-    __optimize__,           /* __attribute__((optimize(...))); */
-    __packed__,             /* __attribute__((packed)); */
-    __pure__,               /* __attribute__((pure)); */
-    __regparm__,            /* __attribute__((regparm(n))); */
-    __returns_nonnull__,    /* __attribute__((returns_nonnull)); */
-    __returns_twice__,      /* __attribute__((returns_twice)); */
-    __section__,            /* __attribute__((section(name))); */
-    __sentinel__,           /* __attribute__((sentinel)); */
-    __transaction_pure__,   /* __attribute__((transaction_pure)); */
-    __unused__,             /* __attribute__((unused)); */
-    __used__,               /* __attribute__((used)); */
-    __visibility__,         /* __attribute__((visibility(v))); */
-    __warn_unused_result__, /* __attribute__((warn_unused_result)); */
-    __warning__,            /* __attribute__((warning)); */
-    __weak__,               /* __attribute__((weak)); */
+	__alias__,              /* __attribute__((alias(target))); */
+	__aligned__,            /* __attribute__((aligned(x))); */
+	__alloc_align__,        /* __attribute__((alloc_align(...))); */
+	__alloc_size__,         /* __attribute__((alloc_size(...))); */
+	__always_inline__,      /* __attribute__((always_inline)); */
+	__assume_aligned__,     /* __attribute__((assume_aligned(...))); */
+	__cold__,               /* __attribute__((cold)); */
+	__const__,              /* __attribute__((const)); */
+	__constructor__,        /* __attribute__((constructor)); */
+	__deprecated__,         /* __attribute__((deprecated(reason))); */
+	__destructor__,         /* __attribute__((destructor)); */
+	__error__,              /* __attribute__((error)); */
+	__externally_visible__, /* __attribute__((externally_visible)); */
+	__format__,             /* __attribute__((format(...,1,2))); */
+	__format_arg__,         /* __attribute__((format_arg(2))); */
+	__hot__,                /* __attribute__((hot)); */
+	__leaf__,               /* __attribute__((leaf)); */
+	__malloc__,             /* __attribute__((malloc)); */
+	__noclone__,            /* __attribute__((noclone)); */
+	__noinline__,           /* __attribute__((noinline)); */
+	__nonnull__,            /* __attribute__((nonnull(...))); */
+	__noreturn__,           /* __attribute__((noreturn)); */
+	__nothrow__,            /* __attribute__((nothrow)); */
+	__optimize__,           /* __attribute__((optimize(...))); */
+	__packed__,             /* __attribute__((packed)); */
+	__pure__,               /* __attribute__((pure)); */
+	__regparm__,            /* __attribute__((regparm(n))); */
+	__returns_nonnull__,    /* __attribute__((returns_nonnull)); */
+	__returns_twice__,      /* __attribute__((returns_twice)); */
+	__section__,            /* __attribute__((section(name))); */
+	__sentinel__,           /* __attribute__((sentinel)); */
+	__transaction_pure__,   /* __attribute__((transaction_pure)); */
+	__unused__,             /* __attribute__((unused)); */
+	__used__,               /* __attribute__((used)); */
+	__visibility__,         /* __attribute__((visibility(v))); */
+	__warn_unused_result__, /* __attribute__((warn_unused_result)); */
+	__warning__,            /* __attribute__((warning)); */
+	__weak__,               /* __attribute__((weak)); */
 #ifdef __x86_64__
-    __ms_abi__,             /* __attribute__((ms_abi)); */
-    __sysv_abi__,           /* __attribute__((sysv_abi)); */
-#else
-    __cdecl__,              /* __attribute__((cdecl)); */
-    __fastcall__,           /* __attribute__((fastcall)); */
-    __stdcall__,            /* __attribute__((stdcall)); */
-#endif
+	__ms_abi__,             /* __attribute__((ms_abi)); */
+	__sysv_abi__,           /* __attribute__((sysv_abi)); */
+#else /* __x86_64__ */
+	__cdecl__,              /* __attribute__((cdecl)); */
+	__fastcall__,           /* __attribute__((fastcall)); */
+	__stdcall__,            /* __attribute__((stdcall)); */
+#endif /* !__x86_64__ */
 #ifdef __CYGWIN__
-    __dllimport__,          /* __attribute__((dllimport)); */
-    __dllexport__,          /* __attribute__((dllexport)); */
-#endif
-    __printf__,             /* __attribute__((format(printf,1,2))); */
-    __scanf__,              /* __attribute__((format(scanf,1,2))); */
-    __strftime__,           /* __attribute__((format(strftime,1,1))); */
-    __strfmon__,            /* __attribute__((format(strfmon,1,2))); */
-    __asm_fprintf__,        /* __attribute__((format(asm_fprintf,1,2))); */
-    __gcc_diag__,           /* __attribute__((format(gcc_diag,1,2))); */
-    __gcc_cdiag__,          /* __attribute__((format(gcc_cdiag,1,2))); */
-    __gcc_cxxdiag__,        /* __attribute__((format(gcc_cxxdiag,1,2))); */
+	__dllimport__,          /* __attribute__((dllimport)); */
+	__dllexport__,          /* __attribute__((dllexport)); */
+#endif /* __CYGWIN__ */
+	__printf__,             /* __attribute__((format(printf,1,2))); */
+	__scanf__,              /* __attribute__((format(scanf,1,2))); */
+	__strftime__,           /* __attribute__((format(strftime,1,1))); */
+	__strfmon__,            /* __attribute__((format(strfmon,1,2))); */
+	__asm_fprintf__,        /* __attribute__((format(asm_fprintf,1,2))); */
+	__gcc_diag__,           /* __attribute__((format(gcc_diag,1,2))); */
+	__gcc_cdiag__,          /* __attribute__((format(gcc_cdiag,1,2))); */
+	__gcc_cxxdiag__,        /* __attribute__((format(gcc_cxxdiag,1,2))); */
 };
 #endif
 
@@ -760,9 +760,9 @@ enum { /* Highlight attributes in a different color */
 #define ____INTELLISENSE_PRIVATE_ARG_PLACEHOLDER_true ,
 #define ____INTELLISENSE_PRIVATE_ARG_PLACEHOLDER_yes  ,
 #define ____INTELLISENSE_PRIVATE_ARG_PLACEHOLDER_ok   ,
-#define ____INTELLISENSE_PRIVATE_TAKE_SECOND_ARG_IMPL(x,val,...) val
+#define ____INTELLISENSE_PRIVATE_TAKE_SECOND_ARG_IMPL(x, val, ...) val
 #define ____INTELLISENSE_PRIVATE_TAKE_SECOND_ARG(x) ____INTELLISENSE_PRIVATE_TAKE_SECOND_ARG_IMPL x
-#define ____INTELLISENSE_PRIVATE_IS_DEFINED2(x) ____INTELLISENSE_PRIVATE_TAKE_SECOND_ARG((x 1,0))
+#define ____INTELLISENSE_PRIVATE_IS_DEFINED2(x) ____INTELLISENSE_PRIVATE_TAKE_SECOND_ARG((x 1, 0))
 #define ____INTELLISENSE_PRIVATE_IS_DEFINED(x) ____INTELLISENSE_PRIVATE_IS_DEFINED2(____INTELLISENSE_PRIVATE_ARG_PLACEHOLDER_##x)
 #define ____INTELLISENSE_IS_DEFINED(x) ____INTELLISENSE_PRIVATE_IS_DEFINED(x)
 
@@ -848,18 +848,18 @@ enum { /* Highlight attributes in a different color */
 #define ____INTELLISENSE_HASATTR___ms_abi__             1
 #define ____INTELLISENSE_HASATTR_sysv_abi               1
 #define ____INTELLISENSE_HASATTR___sysv_abi__           1
-#else
+#else /* __x86_64__ */
 #define ____INTELLISENSE_HASATTR_cdecl                  1
 #define ____INTELLISENSE_HASATTR___cdecl__              1
 #define ____INTELLISENSE_HASATTR_fastcall               1
 #define ____INTELLISENSE_HASATTR___fastcall__           1
 #define ____INTELLISENSE_HASATTR_stdcall                1
 #define ____INTELLISENSE_HASATTR___stdcall__            1
-#endif
+#endif /* !__x86_64__ */
 #ifdef __CYGWIN__
 #define ____INTELLISENSE_HASATTR___dllimport__          1
 #define ____INTELLISENSE_HASATTR___dllexport__          1
-#endif
+#endif /* __CYGWIN__ */
 #define __has_attribute(x) ____INTELLISENSE_IS_DEFINED(____INTELLISENSE_HASATTR_##x)
 
 
@@ -877,12 +877,12 @@ template<class __T> typename ____INTELLISENSE_remlval<__T>::__type ____INTELLISE
 template<class __T> typename ____INTELLISENSE_remlval<__T>::__type const ____INTELLISENSE_typeof_helper(__T const &&);
 template<class __T, __SIZE_TYPE__ N> typename ____INTELLISENSE_remlval<__T[N]>::__type &____INTELLISENSE_typeof_helper(__T(&)[N]);
 template<class __T, __SIZE_TYPE__ N> typename ____INTELLISENSE_remlval<__T[N]>::__type const &____INTELLISENSE_typeof_helper(__T const (&)[N]);
-template<class __T,class ...Args> __T(__attribute__((__cdecl__)) &&____INTELLISENSE_typeof_helper(__T(__attribute__((__cdecl__)) &)(Args...)))(Args...);
-template<class __T,class ...Args> __T(__attribute__((__cdecl__)) &&____INTELLISENSE_typeof_helper(__T(__attribute__((__cdecl__)) &)(Args...,...)))(Args...,...);
-template<class __T,class ...Args> __T(__attribute__((__fastcall__)) &&____INTELLISENSE_typeof_helper(__T(__attribute__((__fastcall__)) &)(Args...)))(Args...);
-template<class __T,class ...Args> __T(__attribute__((__fastcall__)) &&____INTELLISENSE_typeof_helper(__T(__attribute__((__fastcall__)) &)(Args...,...)))(Args...,...);
-template<class __T,class ...Args> __T(__attribute__((__stdcall__)) &&____INTELLISENSE_typeof_helper(__T(__attribute__((__stdcall__)) &)(Args...)))(Args...);
-template<class __T,class ...Args> __T(__attribute__((__stdcall__)) &&____INTELLISENSE_typeof_helper(__T(__attribute__((__stdcall__)) &)(Args...,...)))(Args...,...);
+template<class __T, class ...Args> __T(__attribute__((__cdecl__)) &&____INTELLISENSE_typeof_helper(__T(__attribute__((__cdecl__)) &)(Args...)))(Args...);
+template<class __T, class ...Args> __T(__attribute__((__cdecl__)) &&____INTELLISENSE_typeof_helper(__T(__attribute__((__cdecl__)) &)(Args...,...)))(Args...,...);
+template<class __T, class ...Args> __T(__attribute__((__fastcall__)) &&____INTELLISENSE_typeof_helper(__T(__attribute__((__fastcall__)) &)(Args...)))(Args...);
+template<class __T, class ...Args> __T(__attribute__((__fastcall__)) &&____INTELLISENSE_typeof_helper(__T(__attribute__((__fastcall__)) &)(Args...,...)))(Args...,...);
+template<class __T, class ...Args> __T(__attribute__((__stdcall__)) &&____INTELLISENSE_typeof_helper(__T(__attribute__((__stdcall__)) &)(Args...)))(Args...);
+template<class __T, class ...Args> __T(__attribute__((__stdcall__)) &&____INTELLISENSE_typeof_helper(__T(__attribute__((__stdcall__)) &)(Args...,...)))(Args...,...);
 #define typeof(...)     decltype(::__intern::____INTELLISENSE_typeof_helper(((__VA_ARGS__),::__intern::____INTELLISENSE_void_helper())))
 #define __typeof(...)   decltype(::__intern::____INTELLISENSE_typeof_helper(((__VA_ARGS__),::__intern::____INTELLISENSE_void_helper())))
 #define __typeof__(...) decltype(::__intern::____INTELLISENSE_typeof_helper(((__VA_ARGS__),::__intern::____INTELLISENSE_void_helper())))
@@ -896,11 +896,11 @@ template<class __T> struct ____INTELLISENSE_remcv { typedef __T __type; };
 template<class __T> struct ____INTELLISENSE_remcv<__T const> { typedef __T __type; };
 template<class __T> struct ____INTELLISENSE_remcv<__T volatile> { typedef __T __type; };
 template<class __T> struct ____INTELLISENSE_remcv<__T const volatile> { typedef __T __type; };
-template<class T1,class T2> struct ____INTELLISENSE_sametype_impl { enum { __val = false }; };
+template<class T1, class T2> struct ____INTELLISENSE_sametype_impl { enum { __val = false }; };
 template<class T1> struct ____INTELLISENSE_sametype_impl<T1,T1> { enum { __val = true }; };
-template<class T1,class T2> struct ____INTELLISENSE_sametype:
-    ____INTELLISENSE_sametype_impl<typename ____INTELLISENSE_remcv<T1>::__type,
-    typename ____INTELLISENSE_remcv<T2>::__type> { };
+template<class T1, class T2> struct ____INTELLISENSE_sametype:
+	____INTELLISENSE_sametype_impl<typename ____INTELLISENSE_remcv<T1>::__type,
+	typename ____INTELLISENSE_remcv<T2>::__type> { };
 #define __builtin_types_compatible_p(...) (::__intern::____INTELLISENSE_sametype< __VA_ARGS__ >::__val)
 }
 
@@ -930,10 +930,10 @@ template<class __T, __SIZE_TYPE__ s> struct ____INTELLISENSE_classify<__T[s]> { 
 template<class __T> struct ____INTELLISENSE_classify<__T *> { enum { __val = 5 }; };
 template<class __T> struct ____INTELLISENSE_classify<__T &> { enum { __val = 6 }; };
 //template<class __T> struct ____INTELLISENSE_classify<__T::*> { enum { __val = 7 }; };
-template<class __T,class ...Args> struct ____INTELLISENSE_classify<__T(Args...)> { enum { __val = 10 }; };
-template<class __T,class ...Args> struct ____INTELLISENSE_classify<__T(Args...,...)> { enum { __val = 10 }; };
-template<class __T,class C,class ...Args> struct ____INTELLISENSE_classify<__T(C::*)(Args...)> { enum { __val = 11 }; };
-template<class __T,class C,class ...Args> struct ____INTELLISENSE_classify<__T(C::*)(Args...,...)> { enum { __val = 11 }; };
+template<class __T, class ...Args> struct ____INTELLISENSE_classify<__T(Args...)> { enum { __val = 10 }; };
+template<class __T, class ...Args> struct ____INTELLISENSE_classify<__T(Args...,...)> { enum { __val = 10 }; };
+template<class __T, class C, class ...Args> struct ____INTELLISENSE_classify<__T(C::*)(Args...)> { enum { __val = 11 }; };
+template<class __T, class C, class ...Args> struct ____INTELLISENSE_classify<__T(C::*)(Args...,...)> { enum { __val = 11 }; };
 #define __builtin_classify_type(...) (::__intern::____INTELLISENSE_classify<__typeof__(__VA_ARGS__)>::__val)
 }
 
@@ -998,9 +998,9 @@ namespace __intern {
 template<bool> struct ____INTELLISENSE_static_if_helper { };
 template<> struct ____INTELLISENSE_static_if_helper<true> { bool __is_true__(); };
 }
-#define __builtin_choose_expr(c,tt,ff) \
-     __if_exists(::__intern::____INTELLISENSE_static_if_helper<((c))>::__is_true__){tt} \
- __if_not_exists(::__intern::____INTELLISENSE_static_if_helper<((c))>::__is_true__){ff}
+#define __builtin_choose_expr(c,tt,ff)                                                 \
+	__if_exists(::__intern::____INTELLISENSE_static_if_helper<((c))>::__is_true__){tt} \
+	__if_not_exists(::__intern::____INTELLISENSE_static_if_helper<((c))>::__is_true__){ff}
 #endif
 #endif /* __cplusplus */
 
@@ -1010,32 +1010,32 @@ namespace __intern {
 template<class __T> __T ____INTELLISENSE_va_arg_heper(char *(&)[1]);
 template<class __T> __T ____INTELLISENSE_va_arg_heper(char **&);
 }
-#else
+#else /* __x86_64__ */
 typedef char *__builtin_va_list,*__gnuc_va_list;
 namespace __intern {
 template<class __T> __T ____INTELLISENSE_va_arg_heper(__builtin_va_list &);
 }
-#endif
+#endif /* !__x86_64__ */
 template<class __T> void __builtin_va_start(__builtin_va_list &ap, __T &before_start);
 void __builtin_va_end(__builtin_va_list &ap);
 void __builtin_va_copy(__builtin_va_list &dst_ap,__builtin_va_list &src_ap);
-#define __builtin_va_arg(ap, __T)   (::__intern::____INTELLISENSE_va_arg_heper< __T >(ap))
+#define __builtin_va_arg(ap, __T) (::__intern::____INTELLISENSE_va_arg_heper<__T>(ap))
 
-template<class __T,class __S> typename ::__intern::____INTELLISENSE_enableif_arith<__T,__T>::__type __sync_fetch_and_add(__T volatile *ptr, __S value,...);
-template<class __T,class __S> typename ::__intern::____INTELLISENSE_enableif_arith<__T,__T>::__type __sync_fetch_and_sub(__T volatile *ptr, __S value,...);
-template<class __T,class __S> typename ::__intern::____INTELLISENSE_enableif_arith<__T,__T>::__type __sync_fetch_and_or(__T volatile *ptr, __S value,...);
-template<class __T,class __S> typename ::__intern::____INTELLISENSE_enableif_arith<__T,__T>::__type __sync_fetch_and_and(__T volatile *ptr, __S value,...);
-template<class __T,class __S> typename ::__intern::____INTELLISENSE_enableif_arith<__T,__T>::__type __sync_fetch_and_xor(__T volatile *ptr, __S value,...);
-template<class __T,class __S> typename ::__intern::____INTELLISENSE_enableif_arith<__T,__T>::__type __sync_fetch_and_nand(__T volatile *ptr, __S value,...);
-template<class __T,class __S> typename ::__intern::____INTELLISENSE_enableif_arith<__T,__T>::__type __sync_add_and_fetch(__T volatile *ptr, __S value,...);
-template<class __T,class __S> typename ::__intern::____INTELLISENSE_enableif_arith<__T,__T>::__type __sync_sub_and_fetch(__T volatile *ptr, __S value,...);
-template<class __T,class __S> typename ::__intern::____INTELLISENSE_enableif_arith<__T,__T>::__type __sync_or_and_fetch(__T volatile *ptr, __S value,...);
-template<class __T,class __S> typename ::__intern::____INTELLISENSE_enableif_arith<__T,__T>::__type __sync_and_and_fetch(__T volatile *ptr, __S value,...);
-template<class __T,class __S> typename ::__intern::____INTELLISENSE_enableif_arith<__T,__T>::__type __sync_xor_and_fetch(__T volatile *ptr, __S value,...);
-template<class __T,class __S> typename ::__intern::____INTELLISENSE_enableif_arith<__T,__T>::__type __sync_nand_and_fetch(__T volatile *ptr, __S value,...);
-template<class __T,class __S,class N> typename ::__intern::____INTELLISENSE_enableif_arith<__T,bool>::__type __sync_bool_compare_and_swap(__T volatile *ptr, __S oldval,N newval,...);
-template<class __T,class __S,class N> typename ::__intern::____INTELLISENSE_enableif_arith<__T,__T>::__type __sync_val_compare_and_swap(__T volatile *ptr, __S oldval,N newval,...);
-template<class __T,class __S> typename ::__intern::____INTELLISENSE_enableif_arith<__T,__T>::__type __sync_lock_test_and_set(__T *ptr, __S value,...);
+template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif_arith<__T,__T>::__type __sync_fetch_and_add(__T volatile *ptr, __S value,...);
+template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif_arith<__T,__T>::__type __sync_fetch_and_sub(__T volatile *ptr, __S value,...);
+template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif_arith<__T,__T>::__type __sync_fetch_and_or(__T volatile *ptr, __S value,...);
+template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif_arith<__T,__T>::__type __sync_fetch_and_and(__T volatile *ptr, __S value,...);
+template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif_arith<__T,__T>::__type __sync_fetch_and_xor(__T volatile *ptr, __S value,...);
+template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif_arith<__T,__T>::__type __sync_fetch_and_nand(__T volatile *ptr, __S value,...);
+template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif_arith<__T,__T>::__type __sync_add_and_fetch(__T volatile *ptr, __S value,...);
+template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif_arith<__T,__T>::__type __sync_sub_and_fetch(__T volatile *ptr, __S value,...);
+template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif_arith<__T,__T>::__type __sync_or_and_fetch(__T volatile *ptr, __S value,...);
+template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif_arith<__T,__T>::__type __sync_and_and_fetch(__T volatile *ptr, __S value,...);
+template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif_arith<__T,__T>::__type __sync_xor_and_fetch(__T volatile *ptr, __S value,...);
+template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif_arith<__T,__T>::__type __sync_nand_and_fetch(__T volatile *ptr, __S value,...);
+template<class __T, class __S, class N> typename ::__intern::____INTELLISENSE_enableif_arith<__T,bool>::__type __sync_bool_compare_and_swap(__T volatile *ptr, __S oldval,N newval,...);
+template<class __T, class __S, class N> typename ::__intern::____INTELLISENSE_enableif_arith<__T,__T>::__type __sync_val_compare_and_swap(__T volatile *ptr, __S oldval,N newval,...);
+template<class __T, class __S> typename ::__intern::____INTELLISENSE_enableif_arith<__T,__T>::__type __sync_lock_test_and_set(__T *ptr, __S value,...);
 template<class __T> typename ::__intern::____INTELLISENSE_enableif_arith<__T,void>::__type __sync_lock_release(__T *ptr,...);
 void __sync_synchronize(...);
 
@@ -1101,24 +1101,24 @@ bool __atomic_is_lock_free(__SIZE_TYPE__ size, void const volatile *ptr);
 namespace __intern {
 #ifndef __CHAR16_TYPE__
 class ____INTELLISENSE_char16_t {
-    unsigned short __v;
+	unsigned short __v;
 public:
-    operator unsigned short & (void) throw();
-    operator unsigned short const & (void) const throw();
-    ____INTELLISENSE_char16_t();
-    ____INTELLISENSE_char16_t(char16_t const &);
-    ____INTELLISENSE_char16_t(unsigned short);
+	operator unsigned short & (void) throw();
+	operator unsigned short const & (void) const throw();
+	____INTELLISENSE_char16_t();
+	____INTELLISENSE_char16_t(char16_t const &);
+	____INTELLISENSE_char16_t(unsigned short);
 };
 #endif /* !__CHAR16_TYPE__ */
 #ifndef __CHAR32_TYPE__
 class ____INTELLISENSE_char32_t {
-    unsigned int __v;
+	unsigned int __v;
 public:
-    operator unsigned int & (void) throw();
-    operator unsigned int const & (void) const throw();
-    ____INTELLISENSE_char32_t();
-    ____INTELLISENSE_char32_t(char32_t const &);
-    ____INTELLISENSE_char32_t(unsigned int);
+	operator unsigned int & (void) throw();
+	operator unsigned int const & (void) const throw();
+	____INTELLISENSE_char32_t();
+	____INTELLISENSE_char32_t(char32_t const &);
+	____INTELLISENSE_char32_t(unsigned int);
 };
 #endif /* !__CHAR32_TYPE__ */
 

@@ -24,7 +24,7 @@
 
 #ifdef __NO_hybrid_dbg_alignment
 #define NO_DBG_ALIGNMENT 1
-#endif
+#endif /* __NO_hybrid_dbg_alignment */
 #define DBG_ALIGNMENT_ENABLE()  __hybrid_dbg_alignment_enable()
 #define DBG_ALIGNMENT_DISABLE() __hybrid_dbg_alignment_disable()
 

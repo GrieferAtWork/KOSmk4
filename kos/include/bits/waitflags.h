@@ -59,16 +59,9 @@ __SYSDECL_BEGIN
 #ifdef __USE_KOS
 #define WNOREAP     WNOWAIT    /* Don't reap, just poll status (doesn't this name make more sense than `WNOWAIT'?). */
 #endif /* __USE_KOS */
-
-#if defined(__KOS__) && __KOS_VERSION__ >= 300
-#define __WNOTHREAD __COMPILER_DEPRECATED_EXPR_("`__WNOTHREAD' is not supposed in KOS",0x20000000)
-#define __WALL      __COMPILER_DEPRECATED_EXPR_("`__WALL' is not supposed in KOS",     0x40000000)
-#define __WCLONE    __COMPILER_DEPRECATED_EXPR_("`__WCLONE' is not supposed in KOS",   0x80000000)
-#else
 #define __WNOTHREAD 0x20000000 /* Don't wait on children of other threads in this group */
 #define __WALL      0x40000000 /* Wait for any child. */
 #define __WCLONE    0x80000000 /* Wait for cloned process. */
-#endif
 
 /* The following values are used by the `waitid' function. */
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)

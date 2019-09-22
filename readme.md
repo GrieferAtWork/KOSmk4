@@ -345,6 +345,7 @@ All ported applications can be installed onto you KOS disk image by using `bash 
 		- `__builtin_prefetch(addr)`
 		- `__builtin_choose_expr(cond, tt, ff)`
 			- But don't assume that the false-branch doesn't get compiled. - Only assume that it doesn't get evaluated at runtime (this one may be emulated as `cond ? tt : ff`)
+		- `__builtin_offsetof(...)`
 		- `__builtin_expect(expr, expected)`
 		- `__builtin_unreachable()`
 		- `__builtin_assume(expr)`

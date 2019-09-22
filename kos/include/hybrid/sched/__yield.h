@@ -32,41 +32,11 @@
 
 #ifndef __KOS_VERSION__
 #define __KOS_VERSION__ 200 /* Legacy model. */
-#endif
+#endif /* !__KOS_VERSION__ */
 
 #ifndef __task_yield_defined
 #define __task_yield_defined 1
-#if __KOS_VERSION__ < 300
-/************************************************************************/
-/* KOS mk2                                                              */
-/************************************************************************/
-
-__DECL_BEGIN
-#ifndef __errno_t_defined
-#define __errno_t_defined 1
-typedef int errno_t;
-#endif /* !__errno_t_defined */
-/* Yield the remainder of the caller's quantum to the next
- * scheduled task (no-op if no task to switch to exists).
- * HINT: All registers but EAX are preserved across a call to this function.
- * @return: -EOK:       Another task was executed before this function returned.
- * @return: -EAGAIN:    There was no other task to switch to. */
-__PUBDEF errno_t (__KCALL task_yield)(void);
-
-#if !defined(__NO_XBLOCK) && defined(__COMPILER_HAVE_GCC_ASM) && \
-   (!defined(__x86_64__) || defined(CONFIG_BUILDING_KERNEL_CORE)) && \
-     defined(__i386__)
-/* Take advantage of the fact that `task_yield()' doesn't clobber anything. */
-#define task_yield() \
- __XBLOCK({ register errno_t __y_err; \
-            __asm__ __volatile__("call task_yield\n" : "=a" (__y_err)); \
-            __XRETURN __y_err; \
- })
-#endif
-#define __hybrid_yield() task_yield()
-__DECL_END
-
-#elif __KOS_VERSION__ >= 400
+#if __KOS_VERSION__ >= 400
 /************************************************************************/
 /* KOS mk4                                                              */
 /************************************************************************/
@@ -89,13 +59,45 @@ __DECL_END
 #undef __task_yield_defined
 #endif /* !__CRT_HAVE_task_yield */
 
-#else
+#elif __KOS_VERSION__ >= 300
 /************************************************************************/
 /* KOS mk3                                                              */
 /************************************************************************/
 
 __DECL_BEGIN
 __PUBDEF void (__KCALL task_yield)(void);
+#define __hybrid_yield() task_yield()
+__DECL_END
+
+#elif __KOS_VERSION__ >= 200
+/************************************************************************/
+/* KOS mk2                                                              */
+/************************************************************************/
+
+__DECL_BEGIN
+#ifndef __errno_t_defined
+#define __errno_t_defined 1
+typedef int errno_t;
+#endif /* !__errno_t_defined */
+/* Yield the remainder of the caller's quantum to the next
+ * scheduled task (no-op if no task to switch to exists).
+ * HINT: All registers but EAX are preserved across a call to this function.
+ * @return: -EOK:       Another task was executed before this function returned.
+ * @return: -EAGAIN:    There was no other task to switch to. */
+__PUBDEF errno_t (__KCALL task_yield)(void);
+
+#if !defined(__NO_XBLOCK) && defined(__COMPILER_HAVE_GCC_ASM) && \
+   (!defined(__x86_64__) || defined(CONFIG_BUILDING_KERNEL_CORE)) && \
+     defined(__i386__)
+/* Take advantage of the fact that `task_yield()' doesn't clobber anything. */
+#define task_yield()                             \
+	__XBLOCK({                                   \
+		register errno_t __y_err;                \
+		__asm__ __volatile__("call task_yield\n" \
+		                     : "=a"(__y_err));   \
+		__XRETURN __y_err;                       \
+	})
+#endif
 #define __hybrid_yield() task_yield()
 __DECL_END
 #endif
@@ -151,6 +153,7 @@ __NAMESPACE_INT_END __DECL_END
 #define __hybrid_yield()  sys_sched_yield()
 #endif /* __CRT_HAVE_SC(sched_yield) */
 #endif
+
 #elif (defined(__DOS_COMPAT__) && !defined(__CRT_KOS)) || \
       (defined(__CYGWIN__) || defined(__CYGWIN32__) || defined(__MINGW32__) || defined(__WINDOWS__) || \
        defined(_WIN16) || defined(WIN16) || defined(_WIN32) || defined(WIN32) || \
@@ -166,6 +169,7 @@ __IMPDEF __ULONG32_TYPE__ __ATTR_STDCALL SleepEx(__ULONG32_TYPE__ __msec, __INT3
 #define __hybrid_yield() ((__NAMESPACE_INT_SYM SleepEx)(20,0))
 __NAMESPACE_INT_END
 __DECL_END
+
 #elif defined(__linux__) || defined(__linux) || defined(linux) || \
       defined(__LINUX__) || defined(__LINUX) || defined(LINUX) || \
       __has_include(<sched.h>)
@@ -175,6 +179,7 @@ __DECL_END
 
 #include <sched.h>
 #define __hybrid_yield() sched_yield()
+
 #elif __has_include(<pthread.h>) || \
      (defined(__unix__) || defined(__unix) || defined(unix))
 /************************************************************************/
@@ -183,7 +188,7 @@ __DECL_END
 
 #include <pthread.h>
 #define __hybrid_yield() pthread_yield()
-#endif
+#endif /* Implementation... */
 
 #ifndef __hybrid_yield
 #define __NO_hybrid_yield 1
@@ -193,11 +198,11 @@ __DECL_END
 
 #ifndef __hybrid_yield_nx
 #ifndef __NO_hybrid_yield
-#define __hybrid_yield_nx() (__hybrid_yield(),1)
-#else
+#define __hybrid_yield_nx() (__hybrid_yield(), 1)
+#else /* !__NO_hybrid_yield */
 #define __NO_hybrid_yield_nx 1
 #define __hybrid_yield_nx() 1
-#endif
+#endif /* __NO_hybrid_yield */
 #endif /* !__hybrid_yield_nx */
 #endif /* __CC__ */
 

@@ -16,7 +16,9 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#define __GCC_VERSION(a,b,c) 0
+#ifndef __GCC_VERSION
+#define __GCC_VERSION(a, b, c) 0
+#endif /* !__GCC_VERSION */
 
 #define __builtin_expect(x,y) (x)
 #define __NO_builtin_expect    1
@@ -26,21 +28,21 @@
 
 #if defined(_MSC_EXTENSIONS) || _MSC_VER >= 1400
 #   define __COMPILER_HAVE_LONGLONG 1
-#endif
+#endif /* _MSC_EXTENSIONS || _MSC_VER >= 1400 */
 #define __COMPILER_HAVE_LONGDOUBLE 1
 #if defined(_MSC_EXTENSIONS)/* || _MSC_VER >= ???? */
 #define __COMPILER_HAVE_TRANSPARENT_STRUCT 1
-#endif
+#endif /* _MSC_EXTENSIONS */
 #define __COMPILER_HAVE_TRANSPARENT_UNION 1
 #define __COMPILER_HAVE_PRAGMA_PUSHMACRO 1
 #define __COMPILER_HAVE_PRAGMA_DEPRECATED 1
 #ifdef __CC__
 #define __COMPILER_HAVE_PRAGMA_PACK 1
-#endif
+#endif /* __CC__ */
 #ifndef __has_feature
 #define __NO_has_feature 1
 #define __has_feature(x) 0
-#endif
+#endif /* !__has_feature */
 
 
 #if __has_feature(cxx_auto_type) || \
@@ -76,27 +78,27 @@
 #define __ATTR_FALLTHROUGH       /* Nothing */
 #if !defined(__midl) && (defined(_X86_) || defined(_M_IX86))
 #define __ATTR_W64               __w64
-#else
+#else /* !__midl && (_X86_ || _M_IX86) */
 #define __NO_ATTR_W64            1
 #define __ATTR_W64               /* Nothing */
-#endif
+#endif /* __midl || (!_X86_ && !_M_IX86) */
 #define __ATTR_FASTCALL          __fastcall
 #define __ATTR_STDCALL           __stdcall
 #define __ATTR_CDECL             __cdecl
 #define __ATTR_THISCALL          __thiscall
 #ifdef _M_CEE_PURE
 #define __ATTR_CLRCALL           __clrcall
-#else
+#else /* _M_CEE_PURE */
 #define __NO_ATTR_CLRCALL        1
 #define __ATTR_CLRCALL           /* nothing */
-#endif
+#endif /* !_M_CEE_PURE */
 #if defined(__x86_64__) || defined(__amd64__) || defined(__amd64) || \
     defined(__x86_64) || defined(_M_X64) || defined(_M_AMD64)
 #define __ATTR_MSABI             /* Nothing (default) */
-#else
+#else /* X64 */
 #define __ATTR_MSABI             /* Nothing */
 #define __NO_ATTR_MSABI          1
-#endif
+#endif /* !X64 */
 #define __ATTR_SYSVABI           /* Nothing */
 #define __NO_ATTR_SYSVABI        1
 #define __ATTR_PURE              __declspec(noalias)
@@ -128,17 +130,17 @@
 #define __ATTR_SENTINEL_O(x)     /* Nothing */
 #if _MSC_VER >= 1700
 #   define __ATTR_THREAD         __declspec(thread)
-#else
+#else /* _MSC_VER >= 1700 */
 #   define __NO_ATTR_THREAD      1
 #   define __ATTR_THREAD         /* Nothing */
-#endif
+#endif /* _MSC_VER < 1700 */
 #if _MSC_VER >= 1200
-#   define __ATTR_DEPRECATED_    __declspec(deprecated)
+#   define __ATTR_DEPRECATED_      __declspec(deprecated)
 #   define __ATTR_DEPRECATED(text) __declspec(deprecated(text))
-#else
+#else /* _MSC_VER >= 1200 */
 #   define __NO_ATTR_DEPRECATED  1
 #   define __ATTR_DEPRECATED(text) /* Nothing */
-#endif
+#endif /* _MSC_VER < 1200 */
 #define __NO_ATTR_ERROR          1
 #define __ATTR_ERROR(text)       /* Nothing */
 #define __NO_ATTR_WARNING        1
@@ -147,10 +149,10 @@
 #define __ATTR_SECTION(name)     /* Nothing */
 #ifdef __cplusplus
 #define __ATTR_NOTHROW           __declspec(nothrow)
-#else
+#else /* __cplusplus */
 #define __NO_ATTR_NOTHROW        1
 #define __ATTR_NOTHROW           /* Nothing */
-#endif
+#endif /* !__cplusplus */
 #define __NO_ATTR_OPTIMIZE       1
 #define __ATTR_OPTIMIZE(opt)     /* Nothing */
 #define __NO_ATTR_NOTHROW_SUFFIX 1
@@ -162,10 +164,10 @@
 #define __ATTR_ALIAS(name)       /* Nothing */
 #if _MSC_VER >= 1300
 #   define __ATTR_ALIGNED(n)     __declspec(align(n))
-#else
+#else /* _MSC_VER >= 1300 */
 #   define __NO_ATTR_ALIGNED     1
 #   define __ATTR_ALIGNED(n)     /* Nothing */
-#endif
+#endif /* _MSC_VER < 1300 */
 #define __ATTR_WEAK_IS_SELECTANY 1
 #define __ATTR_WEAK              __declspec(selectany) /* For all that we care, it's basically the same. */
 #define __ATTR_SELECTANY         __declspec(selectany)
@@ -202,17 +204,17 @@ template<bool> struct __msvc_static_if {};
 template<> struct __msvc_static_if<true> { bool __is_true__(); };
 }
 #define __STATIC_IF(c) \
-     __if_exists(::__intern::__msvc_static_if<((c))>::__is_true__)
+	__if_exists(::__intern::__msvc_static_if<((c))>::__is_true__)
 #define __STATIC_ELSE(c) \
-     __if_not_exists(::__intern::__msvc_static_if<((c))>::__is_true__)
+	__if_not_exists(::__intern::__msvc_static_if<((c))>::__is_true__)
 /* Use our hacky `static_if' to emulate `__builtin_choose_expr' */
 #define __builtin_choose_expr(c,tt,ff) (__STATIC_IF(c){tt} __STATIC_ELSE(c){ff})
-#else
+#else /* __cplusplus */
 #define __STATIC_IF(x)           __pragma(warning(suppress: 4127)) if(x)
 #define __STATIC_ELSE(x)         __pragma(warning(suppress: 4127)) if(x)
 #define __NO_builtin_choose_expr 1
-#define __builtin_choose_expr(c,tt,ff) ((c)?(tt):(ff))
-#endif
+#define __builtin_choose_expr(c, tt, ff) ((c) ? (tt) : (ff))
+#endif /* !__cplusplus */
 #define __NO_builtin_types_compatible_p   1
 #define __builtin_types_compatible_p(...) 0
 #define __XBLOCK(...)            do __VA_ARGS__ __WHILE0
@@ -221,7 +223,7 @@ template<> struct __msvc_static_if<true> { bool __is_true__(); };
 #define __builtin_assume(x)      __assume(x)
 #define __builtin_unreachable()  __assume(0)
 #define __COMPILER_ALIGNOF       __alignof
-#define __builtin_offsetof(s,m) ((__SIZE_TYPE__)&((s *)0)->m)
+#define __builtin_offsetof(s,m)  ((__SIZE_TYPE__)&((s *)0)->m)
 #define __ATTR_INLINE            __inline
 #define __ATTR_FORCEINLINE       __forceinline
 #define __LOCAL                  static __inline
@@ -229,9 +231,9 @@ template<> struct __msvc_static_if<true> { bool __is_true__(); };
 #define __LONGLONG               long long
 #define __ULONGLONG              unsigned long long
 #define __NO_builtin_constant_p  1
-#define __builtin_constant_p(x) (__LINE__ == -1)
+#define __builtin_constant_p(x)  (__LINE__ == -1)
 #define __restrict_arr           __restrict
-#define __COMPILER_FLEXIBLE_ARRAY(T,x) T x[1024]
+#define __COMPILER_FLEXIBLE_ARRAY(T, x) T x[1024]
 #define __attribute__(x)         /* Nothing */
 #define __NO_COMPILER_IGNORE_UNINITIALIZED 1
 #define __COMPILER_IGNORE_UNINITIALIZED(var) var
@@ -249,13 +251,13 @@ template<> struct __msvc_static_if<true> { bool __is_true__(); };
 #if defined(__x86_64__) || defined(__amd64__) || defined(__amd64) || \
     defined(__x86_64) || defined(_M_X64) || defined(_M_AMD64) || \
     defined(_WIN64) || defined(WIN64)
-#define __USER_LABEL_PREFIX__           /* nothing */
+#define __USER_LABEL_PREFIX__    /* nothing */
 #else
-#define __USER_LABEL_PREFIX__           _
+#define __USER_LABEL_PREFIX__    _
 #endif
 #endif /* !__USER_LABEL_PREFIX__ */
 
-#define __DEFINE_ALIAS_STR(x)           #x
+#define __DEFINE_ALIAS_STR(x)    #x
 #define __DEFINE_PRIVATE_ALIAS(new, old) \
 	__pragma(comment(linker, "/alternatename:" __DEFINE_ALIAS_STR(new) "=" __DEFINE_ALIAS_STR(old)))
 #define __DEFINE_PUBLIC_ALIAS(new, old)                                                              \
@@ -279,15 +281,15 @@ template<> struct __msvc_static_if<true> { bool __is_true__(); };
 	__pragma(comment(linker, "/alternatename:" __REDIRECT_PP_STR(__USER_LABEL_PREFIX__) #x "=" __REDIRECT_PP_STR(__USER_LABEL_PREFIX__) #y))             \
 	__pragma(comment(linker, "/alternatename:__imp_" __REDIRECT_PP_STR(__USER_LABEL_PREFIX__) #x "=__imp_" __REDIRECT_PP_STR(__USER_LABEL_PREFIX__) #y)) \
 	__pragma(comment(linker, "/alternatename:__imp__" __REDIRECT_PP_STR(__USER_LABEL_PREFIX__) #x "=__imp__" __REDIRECT_PP_STR(__USER_LABEL_PREFIX__) #y))
-#define __REDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args)                                       decl attr Treturn nothrow(cc name) param; __REDIRECT_ASSEMBLY(name,asmname)
-#define __REDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args)                                          decl attr void nothrow(cc name) param; __REDIRECT_ASSEMBLY(name,asmname)
-#define __VREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)    decl attr Treturn nothrow(cc name) param; __REDIRECT_ASSEMBLY(name,asmname)
-#define __VREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)       decl attr void nothrow(cc name) param; __REDIRECT_ASSEMBLY(name,asmname)
-#define __VFREDIRECT(decl,attr,Treturn,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) decl attr Treturn nothrow(cc name) paramf; __REDIRECT_ASSEMBLY(name,asmnamef)
-#define __VFREDIRECT_VOID(decl,attr,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)    decl attr void nothrow(cc name) paramf; __REDIRECT_ASSEMBLY(name,asmnamef)
-#define __XREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code)                                      decl attr Treturn nothrow(cc name) param; __REDIRECT_ASSEMBLY(name,asmname)
-#define __XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code)                                         decl attr void nothrow(cc name) param; __REDIRECT_ASSEMBLY(name,asmname)
-#endif
+#define __COMPILER_REDIRECT(decl, attr, Treturn, nothrow, cc, name, param, asmname, args)                                          decl attr Treturn nothrow(cc name) param; __REDIRECT_ASSEMBLY(name, asmname)
+#define __COMPILER_REDIRECT_VOID(decl, attr, nothrow, cc, name, param, asmname, args)                                              decl attr void nothrow(cc name) param; __REDIRECT_ASSEMBLY(name, asmname)
+#define __COMPILER_VREDIRECT(decl, attr, Treturn, nothrow, cc, name, param, asmname, args, before_va_start, varcount, vartypes)    decl attr Treturn nothrow(cc name) param; __REDIRECT_ASSEMBLY(name, asmname)
+#define __COMPILER_VREDIRECT_VOID(decl, attr, nothrow, cc, name, param, asmname, args, before_va_start, varcount, vartypes)        decl attr void nothrow(cc name) param; __REDIRECT_ASSEMBLY(name, asmname)
+#define __COMPILER_VFREDIRECT(decl, attr, Treturn, nothrow, cc, name, paramf, asmnamef, vparamf, vasmnamef, args, before_va_start) decl attr Treturn nothrow(cc name) paramf; __REDIRECT_ASSEMBLY(name, asmnamef)
+#define __COMPILER_VFREDIRECT_VOID(decl, attr, nothrow, cc, name, paramf, asmnamef, vparamf, vasmnamef, args, before_va_start)     decl attr void nothrow(cc name) paramf; __REDIRECT_ASSEMBLY(name, asmnamef)
+#define __COMPILER_XREDIRECT(decl, attr, Treturn, nothrow, cc, name, param, asmname, code)                                         decl attr Treturn nothrow(cc name) param; __REDIRECT_ASSEMBLY(name, asmname)
+#define __COMPILER_XREDIRECT_VOID(decl, attr, nothrow, cc, name, param, asmname, code)                                             decl attr void nothrow(cc name) param; __REDIRECT_ASSEMBLY(name, asmname)
+#endif /* !__INTELLISENSE__ */
 
 
 
@@ -334,31 +336,31 @@ extern void (__cdecl _ReadWriteBarrier)(void);
 #ifdef __cplusplus
 #ifdef __INTELLISENSE__
 #   define __NULLPTR    nullptr
-#else
+#else /* __INTELLISENSE__ */
 #   define __NULLPTR          0
-#endif
-#else
+#endif /* !__INTELLISENSE__ */
+#else /* __cplusplus */
 #   define __NULLPTR ((void *)0)
-#endif
+#endif /* !__cplusplus */
 
 /* Emulate the `__OPTIMIZE__' predefined macro, used in various headers. */
 #if defined(RELEASE) || defined(_RELEASE)
 #ifndef _RELEASE
 #   define _RELEASE  RELEASE
-#endif
+#endif /* !_RELEASE */
 #if (_RELEASE+0) >= 1
 #   define __OPTIMIZE__ _RELEASE
-#else
+#else /* (_RELEASE+0) >= 1 */
 #   define __OPTIMIZE__ 3
-#endif
-#endif
+#endif /* (_RELEASE+0) < 1 */
+#endif /* RELEASE || _RELEASE */
 
 #ifdef _NATIVE_WCHAR_T_DEFINED
 #define __native_wchar_t_defined 1
-#endif
+#endif /* _NATIVE_WCHAR_T_DEFINED */
 #ifdef _WCHAR_T_DEFINED
 #define __wchar_t_defined 1
-#endif
+#endif /* _WCHAR_T_DEFINED */
 
 
 /* Define varargs macros expected by system headers. */
@@ -369,16 +371,16 @@ typedef System::ArgIterator __builtin_va_list;
 #endif  /* _M_CEE_PURE */
 #ifdef __cplusplus
 #define __MSVC_VA_ADDROF(v)   &reinterpret_cast<char const &>(v)
-#else
+#else /* __cplusplus */
 #define __MSVC_VA_ADDROF(v)   &(v)
-#endif
+#endif /* !__cplusplus */
 #if defined(__i386__) || defined(__i386) || defined(i386) || \
     defined(__I86__) || defined(_M_IX86) || defined(__X86__) || \
     defined(_X86_) || defined(__THW_INTEL__) || defined(__INTEL__)
-#define __VA_SIZEOF(n)                 ((sizeof(n)+3)&~3)
-#define __builtin_va_start(ap,last_arg) (void)((ap) = (__builtin_va_list)__MSVC_VA_ADDROF(last_arg)+__VA_SIZEOF(last_arg)
-#define __builtin_va_arg(ap,T)          (*(T *)(((ap) += __VA_SIZEOF(T)-__VA_SIZEOF(T)
-#define __builtin_va_end(ap)            (void)0
+#define __VA_SIZEOF(n)                   ((sizeof(n) + 3) & ~3)
+#define __builtin_va_start(ap, last_arg) (void)((ap) = (__builtin_va_list)__MSVC_VA_ADDROF(last_arg) + __VA_SIZEOF(last_arg))
+#define __builtin_va_arg(ap, T)          (*(T *)(((ap) += __VA_SIZEOF(T)) - __VA_SIZEOF(T)))
+#define __builtin_va_end(ap)             (void)0
 #elif defined(__x86_64__) || defined(__amd64__) || defined(__amd64) || \
       defined(__x86_64) || defined(_M_X64) || defined(_M_AMD64) || \
       defined(_WIN64) || defined(WIN64)
@@ -389,23 +391,25 @@ extern __declspec(dllimport) void (__cdecl _vacopy)(__builtin_va_list *, __built
 } }
 #define __builtin_va_start(ap,x) ::__intern::__va_start(&ap,x)
 #define __builtin_va_copy(dstap,srcap) ::__intern::_vacopy(&(dstap),srcap)
-#else
+#else /* __cplusplus */
 extern void (__cdecl __va_start)(__builtin_va_list *, ...);
 extern __declspec(dllimport) void (__cdecl _vacopy)(__builtin_va_list *, __builtin_va_list);
 #define __builtin_va_start(ap,x) __va_start(&ap,x)
 #define __builtin_va_copy(dstap,srcap) _vacopy(&(dstap),srcap)
-#endif
-#define __builtin_va_arg(ap,T) \
-    ((sizeof(T) > 8 || (sizeof(T)&(sizeof(T) - 1)) != 0) ? **(T **)((ap += 8)-8) : *(T *)((ap += 8)-8))
-#define __builtin_va_end(ap)    (void)0
+#endif /* !__cplusplus */
+#define __builtin_va_arg(ap, T)                            \
+	((sizeof(T) > 8 || (sizeof(T) & (sizeof(T) - 1)) != 0) \
+	 ? **(T **)((ap += 8) - 8)                             \
+	 : *(T *)((ap += 8) - 8))
+#define __builtin_va_end(ap) (void)0
 #else /* ... */
-#define __VA_SIZEOF(n)            ((sizeof(n)+3)&~3)
-#define __builtin_va_start(ap,v)  (ap = (__builtin_va_list)__MSVC_VA_ADDROF(v)+__VA_SIZEOF(v))
-#define __builtin_va_arg(ap,T)    (*(T *)((ap += __VA_SIZEOF(T))-__VA_SIZEOF(T)))
+#define __VA_SIZEOF(n)            ((sizeof(n) + 3) & ~3)
+#define __builtin_va_start(ap, v) (ap = (__builtin_va_list)__MSVC_VA_ADDROF(v) + __VA_SIZEOF(v)))
+#define __builtin_va_arg(ap, T)   (*(T *)((ap += __VA_SIZEOF(T)) - __VA_SIZEOF(T)))
 #define __builtin_va_end(ap)      (void)0
 #endif /* !... */
 #ifndef __builtin_va_copy
-#define __builtin_va_copy(dstap,srcap)  (void)((dstap) = (srcap))
+#define __builtin_va_copy(dstap, srcap) (void)((dstap) = (srcap))
 #endif /* !__builtin_va_copy */
 
 #if defined(__INTELLISENSE__) && defined(__cplusplus)
@@ -431,9 +435,9 @@ void __builtin_va_end(__builtin_va_list &__ap);
 /* Suppress warnings caused by C-mode redirections in system headers. */
 #define __SYSDECL_BEGIN __DECL_BEGIN __REDIRECT_WSUPPRESS_BEGIN
 #define __SYSDECL_END   __REDIRECT_WSUPPRESS_END __DECL_END
-#else
+#else /* !__cplusplus */
 /* Disable some warnings that are caused by function redirections in system headers. */
 /* Suppress warnings caused by C-mode redirections in system headers. */
 #define __SYSDECL_BEGIN __DECL_BEGIN __pragma(warning(push)) __pragma(warning(disable: /* Unnamed union */4201))
 #define __SYSDECL_END   __pragma(warning(pop)) __DECL_END
-#endif
+#endif /* __cplusplus */

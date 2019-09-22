@@ -23,12 +23,12 @@
 
 __DECL_BEGIN
 
-#define IS_ALIGNED(x, align) (!((x) % (align)))
-#define IS_POWER_OF_TWO(x) (((x) & ((x)-1)) == 0)
-#define CEIL_ALIGN(x, align) (((x) + ((align)-1)) & ~((align)-1))
+#define IS_ALIGNED(x, align)  (!((x) % (align)))
+#define IS_POWER_OF_TWO(x)    (((x) & ((x)-1)) == 0)
+#define CEIL_ALIGN(x, align)  (((x) + ((align)-1)) & ~((align)-1))
 #define FLOOR_ALIGN(x, align) ((x) & ~((align)-1))
-#define FLOORDIV(x, y) ((x) / (y))
-#define CEILDIV(x, y) (((x) + (y)-1) / (y))
+#define FLOORDIV(x, y)        ((x) / (y))
+#define CEILDIV(x, y)         (((x) + (y)-1) / (y))
 
 __DECL_END
 

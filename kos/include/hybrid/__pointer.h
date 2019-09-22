@@ -109,6 +109,7 @@ template<class __T, class __I> __CXX_CLASSMEMBER __PTRDIFF_TYPE__ operator-(__T 
 #define __HYBRID_PTR32(T) __ULONG32_TYPE__
 #define __HYBRID_PTR64(T) __ULONG64_TYPE__
 #endif
+
 #endif
 
 

@@ -22,28 +22,28 @@
 #include <__stdinc.h>
 #include "__unaligned.h"
 
-#define UNALIGNED_GET(ptr)              __hybrid_unaligned_get(ptr)
-#define UNALIGNED_GET_SWAP(ptr)         __hybrid_unaligned_get_swap(ptr)
-#define UNALIGNED_SET(ptr, v)           __hybrid_unaligned_set(ptr, v)
-#define UNALIGNED_SET_SWAP(ptr, v)      __hybrid_unaligned_set_swap(ptr, v)
-#define UNALIGNED_GET16(ptr)            __hybrid_unaligned_get16(ptr)
-#define UNALIGNED_GET16_SWAP(ptr)       __hybrid_unaligned_get16_swap(ptr)
-#define UNALIGNED_SET16(ptr, v)         __hybrid_unaligned_set16(ptr, v)
-#define UNALIGNED_SET16_SWAP(ptr, v)    __hybrid_unaligned_set16_swap(ptr, v)
-#define UNALIGNED_GET32(ptr)            __hybrid_unaligned_get32(ptr)
-#define UNALIGNED_GET32_SWAP(ptr)       __hybrid_unaligned_get32_swap(ptr)
-#define UNALIGNED_SET32(ptr, v)         __hybrid_unaligned_set32(ptr, v)
-#define UNALIGNED_SET32_SWAP(ptr, v)    __hybrid_unaligned_set32_swap(ptr, v)
+#define UNALIGNED_GET(ptr)            __hybrid_unaligned_get(ptr)
+#define UNALIGNED_GET_SWAP(ptr)       __hybrid_unaligned_get_swap(ptr)
+#define UNALIGNED_SET(ptr, v)         __hybrid_unaligned_set(ptr, v)
+#define UNALIGNED_SET_SWAP(ptr, v)    __hybrid_unaligned_set_swap(ptr, v)
+#define UNALIGNED_GET16(ptr)          __hybrid_unaligned_get16(ptr)
+#define UNALIGNED_GET16_SWAP(ptr)     __hybrid_unaligned_get16_swap(ptr)
+#define UNALIGNED_SET16(ptr, v)       __hybrid_unaligned_set16(ptr, v)
+#define UNALIGNED_SET16_SWAP(ptr, v)  __hybrid_unaligned_set16_swap(ptr, v)
+#define UNALIGNED_GET32(ptr)          __hybrid_unaligned_get32(ptr)
+#define UNALIGNED_GET32_SWAP(ptr)     __hybrid_unaligned_get32_swap(ptr)
+#define UNALIGNED_SET32(ptr, v)       __hybrid_unaligned_set32(ptr, v)
+#define UNALIGNED_SET32_SWAP(ptr, v)  __hybrid_unaligned_set32_swap(ptr, v)
 #ifdef __UINT64_TYPE__
-#define UNALIGNED_GET64(ptr)            __hybrid_unaligned_get64(ptr)
-#define UNALIGNED_GET64_SWAP(ptr)       __hybrid_unaligned_get64_swap(ptr)
-#define UNALIGNED_SET64(ptr, v)         __hybrid_unaligned_set64(ptr, v)
-#define UNALIGNED_SET64_SWAP(ptr, v)    __hybrid_unaligned_set64_swap(ptr, v)
+#define UNALIGNED_GET64(ptr)          __hybrid_unaligned_get64(ptr)
+#define UNALIGNED_GET64_SWAP(ptr)     __hybrid_unaligned_get64_swap(ptr)
+#define UNALIGNED_SET64(ptr, v)       __hybrid_unaligned_set64(ptr, v)
+#define UNALIGNED_SET64_SWAP(ptr, v)  __hybrid_unaligned_set64_swap(ptr, v)
 #ifdef __UINT128_TYPE__
-#define UNALIGNED_GET128(ptr)           __hybrid_unaligned_get128(ptr)
-#define UNALIGNED_GET128_SWAP(ptr)      __hybrid_unaligned_get128_swap(ptr)
-#define UNALIGNED_SET128(ptr, v)        __hybrid_unaligned_set128(ptr, v)
-#define UNALIGNED_SET128_SWAP(ptr, v)   __hybrid_unaligned_set128_swap(ptr, v)
+#define UNALIGNED_GET128(ptr)         __hybrid_unaligned_get128(ptr)
+#define UNALIGNED_GET128_SWAP(ptr)    __hybrid_unaligned_get128_swap(ptr)
+#define UNALIGNED_SET128(ptr, v)      __hybrid_unaligned_set128(ptr, v)
+#define UNALIGNED_SET128_SWAP(ptr, v) __hybrid_unaligned_set128_swap(ptr, v)
 #endif /* __UINT128_TYPE__ */
 #endif /* __UINT64_TYPE__ */
 

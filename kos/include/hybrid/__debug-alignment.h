@@ -80,7 +80,7 @@ __NAMESPACE_INT_END
 #include <string.h>
 #ifdef _MSC_VER
 #include <wchar.h>
-#endif
+#endif /* _MSC_VER */
 __NAMESPACE_INT_BEGIN
 __SYSDECL_BEGIN
 __LOCAL void *

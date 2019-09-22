@@ -67,7 +67,7 @@ __LOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) unsigned int __NOTHROW(atomic_once_en
 #define ATOMIC_ONCE_ENTER_NX_MUSTRUN    __ATOMIC_ONCE_PENDING /* Atomic-once successfully entered. */
 #define ATOMIC_ONCE_ENTER_NX_WOULDBLOCK __ATOMIC_ONCE_RUNNING /* The operation would have blocked. */
 #define ATOMIC_ONCE_ENTER_NX_ALREADY    __ATOMIC_ONCE_RUNDONE /* Atomic-once was already executed. */
-#endif
+#endif /* __KERNEL__ && __KOS_VERSION__ >= 400 */
 
 /* Try to enter the atomic-once block
  * @return: * : One of `ATOMIC_ONCE_TRYENTER_*' */
@@ -138,7 +138,7 @@ __NOTHROW(atomic_once_enter_nx)(struct atomic_once *__restrict __self) {
 	}
 	return ATOMIC_ONCE_ENTER_NX_ALREADY;
 }
-#endif
+#endif /* __KERNEL__ && __KOS_VERSION__ >= 400 */
 
 /* Try to enter the atomic-once block
  * @return: * : One of `ATOMIC_ONCE_TRYENTER_*' */

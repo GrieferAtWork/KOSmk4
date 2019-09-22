@@ -23,13 +23,13 @@
 
 #ifndef __ORDER_LITTLE_ENDIAN__
 #define __ORDER_LITTLE_ENDIAN__ 1234
-#endif
+#endif /* !__ORDER_LITTLE_ENDIAN__ */
 #ifndef __ORDER_BIG_ENDIAN__
 #define __ORDER_BIG_ENDIAN__    4321
-#endif
+#endif /* !__ORDER_BIG_ENDIAN__ */
 #ifndef __ORDER_PDP_ENDIAN__
 #define __ORDER_PDP_ENDIAN__    3412
-#endif
+#endif /* !__ORDER_PDP_ENDIAN__ */
 
 #ifndef __BYTE_ORDER__
 #ifdef __BYTEORDER__
@@ -58,9 +58,9 @@
 #ifndef __FLOAT_WORD_ORDER__
 #ifdef __FLOAT_WORD_ORDER
 #define __FLOAT_WORD_ORDER__ __FLOAT_WORD_ORDER
-#else
+#else /* __FLOAT_WORD_ORDER */
 #define __FLOAT_WORD_ORDER__ __BYTE_ORDER__
-#endif
+#endif /* !__FLOAT_WORD_ORDER */
 #endif /* !__FLOAT_WORD_ORDER__ */
 
 #endif /* !__GUARD_HYBRID___BYTEORDER_H */

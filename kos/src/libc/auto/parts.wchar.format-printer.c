@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b6e686c */
+/* HASH CRC-32:0x8c2d0b01 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,7 @@ NOTHROW_NCX(LIBCCALL libc_format_wrepeat)(pc32formatprinter printer,
 #define FORMAT_REPEAT_BUFSIZE 64
 #endif
 	ssize_t result, temp;
-#ifndef __NO_hybrid_alloca
+#ifdef __hybrid_alloca
 	char32_t *buffer;
 	if __likely(num_repetitions <= FORMAT_REPEAT_BUFSIZE) {
 		buffer = (char32_t *)__hybrid_alloca(num_repetitions);
@@ -61,7 +61,7 @@ NOTHROW_NCX(LIBCCALL libc_format_wrepeat)(pc32formatprinter printer,
 	}
 	buffer = (char32_t *)__hybrid_alloca(FORMAT_REPEAT_BUFSIZE);
 	memset(buffer, ch, FORMAT_REPEAT_BUFSIZE);
-#else
+#else /* __hybrid_alloca */
 	char32_t buffer[FORMAT_REPEAT_BUFSIZE];
 	if __likely(num_repetitions <= FORMAT_REPEAT_BUFSIZE) {
 
@@ -72,7 +72,7 @@ NOTHROW_NCX(LIBCCALL libc_format_wrepeat)(pc32formatprinter printer,
 		return (*printer)(arg, buffer, num_repetitions);
 	}
 	memset(buffer, ch, FORMAT_REPEAT_BUFSIZE);
-#endif
+#endif /* !__hybrid_alloca */
 	result = (*printer)(arg, buffer, FORMAT_REPEAT_BUFSIZE);
 	if __unlikely(result < 0)
 		goto done;
@@ -112,7 +112,7 @@ NOTHROW_NCX(LIBDCALL libd_format_wrepeat)(pc16formatprinter printer,
 #define FORMAT_REPEAT_BUFSIZE 64
 #endif
 	ssize_t result, temp;
-#ifndef __NO_hybrid_alloca
+#ifdef __hybrid_alloca
 	char16_t *buffer;
 	if __likely(num_repetitions <= FORMAT_REPEAT_BUFSIZE) {
 		buffer = (char16_t *)__hybrid_alloca(num_repetitions);
@@ -125,7 +125,7 @@ NOTHROW_NCX(LIBDCALL libd_format_wrepeat)(pc16formatprinter printer,
 	}
 	buffer = (char16_t *)__hybrid_alloca(FORMAT_REPEAT_BUFSIZE);
 	libc_memset(buffer, ch, FORMAT_REPEAT_BUFSIZE);
-#else
+#else /* __hybrid_alloca */
 	char16_t buffer[FORMAT_REPEAT_BUFSIZE];
 	if __likely(num_repetitions <= FORMAT_REPEAT_BUFSIZE) {
 
@@ -136,7 +136,7 @@ NOTHROW_NCX(LIBDCALL libd_format_wrepeat)(pc16formatprinter printer,
 		return (*printer)(arg, buffer, num_repetitions);
 	}
 	libc_memset(buffer, ch, FORMAT_REPEAT_BUFSIZE);
-#endif
+#endif /* !__hybrid_alloca */
 	result = (*printer)(arg, buffer, FORMAT_REPEAT_BUFSIZE);
 	if __unlikely(result < 0)
 		goto done;

@@ -20,20 +20,20 @@
 #undef __NO_PROTOTYPES
 #undef __P
 #define __P(x) x
-#endif
+#endif /* __NO_PROTOTYPES */
 
 /* TODO: Support for `#define ATTR_WUNUSED [[nodiscard]]' */
 
 #ifndef __has_feature
 #define __NO_has_feature 1
 #define __has_feature(x) 0
-#endif
+#endif /* !__has_feature */
 #ifndef __has_extension
 #ifndef __NO_has_feature
 #define __NO_has_extension 1
-#endif
+#endif /* !__NO_has_feature */
 #define __has_extension  __has_feature
-#endif
+#endif /* !__has_extension */
 
 #define __DECL_BEGIN extern "C" {
 #define __DECL_END   }
@@ -48,7 +48,7 @@
 /* Some stupid warning about adding `const' even though
  * we already differenciate with C++14 constexpr. */
 #   pragma warning(disable: 4814)
-#endif
+#endif /* _MSC_VER */
 #   define __COMPILER_HAVE_CXX11_CONSTEXPR 1
 #   define __CXX11_CONSTEXPR          constexpr
 #   define __CXX11_CONSTEXPR_OR_CONST constexpr
@@ -96,7 +96,7 @@
 
 #if !defined(__INTELLISENSE__) && !defined(__KERNEL__)
 #define __COMPILER_PREFERR_ENUMS 1
-#endif
+#endif /* !__INTELLISENSE__ && !__KERNEL__ */
 
 #ifndef __ELF__
 #   define __CXX_CLASSMEMBER inline
@@ -148,4 +148,4 @@ public:
 }
 __NAMESPACE_INT_END
 #define __COMPILER_UNIPOINTER(p) \
-        __NAMESPACE_INT_SYM __any_ptr((void *)(__UINTPTR_TYPE__)(p))
+	__NAMESPACE_INT_SYM __any_ptr((void *)(__UINTPTR_TYPE__)(p))

@@ -805,181 +805,181 @@ __NOTHROW_NCX(__hybrid_unaligned_set_swap)(__UFIFTHINT_TYPE__ *__restrict __ptr,
 }
 
 #ifdef __INTELLISENSE__
-#define __hybrid_unaligned_get16(ptr)         (*(__UINT16_TYPE__ *)(ptr))
-#define __hybrid_unaligned_get16_swap(ptr)    (*(__UINT16_TYPE__ *)(ptr))
-#define __hybrid_unaligned_set16(ptr,v)       (void)(*(__UINT16_TYPE__ *)(ptr)=(__UINT16_TYPE__)(v))
-#define __hybrid_unaligned_set16_swap(ptr,v)  (void)(*(__UINT16_TYPE__ *)(ptr)=(__UINT16_TYPE__)(v))
-#define __hybrid_unaligned_get32(ptr)         (*(__UINT32_TYPE__ *)(ptr))
-#define __hybrid_unaligned_get32_swap(ptr)    (*(__UINT32_TYPE__ *)(ptr))
-#define __hybrid_unaligned_set32(ptr,v)       (void)(*(__UINT32_TYPE__ *)(ptr)=(__UINT32_TYPE__)(v))
-#define __hybrid_unaligned_set32_swap(ptr,v)  (void)(*(__UINT32_TYPE__ *)(ptr)=(__UINT32_TYPE__)(v))
+#define __hybrid_unaligned_get16(ptr)          (*(__UINT16_TYPE__ *)(ptr))
+#define __hybrid_unaligned_get16_swap(ptr)     (*(__UINT16_TYPE__ *)(ptr))
+#define __hybrid_unaligned_set16(ptr, v)       (void)(*(__UINT16_TYPE__ *)(ptr)=(__UINT16_TYPE__)(v))
+#define __hybrid_unaligned_set16_swap(ptr, v)  (void)(*(__UINT16_TYPE__ *)(ptr)=(__UINT16_TYPE__)(v))
+#define __hybrid_unaligned_get32(ptr)          (*(__UINT32_TYPE__ *)(ptr))
+#define __hybrid_unaligned_get32_swap(ptr)     (*(__UINT32_TYPE__ *)(ptr))
+#define __hybrid_unaligned_set32(ptr, v)       (void)(*(__UINT32_TYPE__ *)(ptr)=(__UINT32_TYPE__)(v))
+#define __hybrid_unaligned_set32_swap(ptr, v)  (void)(*(__UINT32_TYPE__ *)(ptr)=(__UINT32_TYPE__)(v))
 #ifdef __UINT64_TYPE__
-#define __hybrid_unaligned_get64(ptr)         (*(__UINT64_TYPE__ *)(ptr))
-#define __hybrid_unaligned_get64_swap(ptr)    (*(__UINT64_TYPE__ *)(ptr))
-#define __hybrid_unaligned_set64(ptr,v)       (void)(*(__UINT64_TYPE__ *)(ptr)=(__UINT64_TYPE__)(v))
-#define __hybrid_unaligned_set64_swap(ptr,v)  (void)(*(__UINT64_TYPE__ *)(ptr)=(__UINT64_TYPE__)(v))
+#define __hybrid_unaligned_get64(ptr)          (*(__UINT64_TYPE__ *)(ptr))
+#define __hybrid_unaligned_get64_swap(ptr)     (*(__UINT64_TYPE__ *)(ptr))
+#define __hybrid_unaligned_set64(ptr, v)       (void)(*(__UINT64_TYPE__ *)(ptr)=(__UINT64_TYPE__)(v))
+#define __hybrid_unaligned_set64_swap(ptr, v)  (void)(*(__UINT64_TYPE__ *)(ptr)=(__UINT64_TYPE__)(v))
 #ifdef __UINT128_TYPE__
-#define __hybrid_unaligned_get128(ptr)        (*(__UINT128_TYPE__ *)(ptr))
-#define __hybrid_unaligned_get128_swap(ptr)   (*(__UINT128_TYPE__ *)(ptr))
-#define __hybrid_unaligned_set128(ptr,v)      (void)(*(__UINT128_TYPE__ *)(ptr)=(__UINT128_TYPE__)(v))
-#define __hybrid_unaligned_set128_swap(ptr,v) (void)(*(__UINT128_TYPE__ *)(ptr)=(__UINT128_TYPE__)(v))
+#define __hybrid_unaligned_get128(ptr)         (*(__UINT128_TYPE__ *)(ptr))
+#define __hybrid_unaligned_get128_swap(ptr)    (*(__UINT128_TYPE__ *)(ptr))
+#define __hybrid_unaligned_set128(ptr, v)      (void)(*(__UINT128_TYPE__ *)(ptr)=(__UINT128_TYPE__)(v))
+#define __hybrid_unaligned_set128_swap(ptr, v) (void)(*(__UINT128_TYPE__ *)(ptr)=(__UINT128_TYPE__)(v))
 #endif /* __UINT128_TYPE__ */
 #endif /* __UINT64_TYPE__ */
-#else
-#define __hybrid_unaligned_get16(ptr)         __hybrid_unaligned_get((__UINT16_TYPE__ *)(ptr))
-#define __hybrid_unaligned_set16(ptr,v)       __hybrid_unaligned_set((__UINT16_TYPE__ *)(ptr),v)
-#define __hybrid_unaligned_get16_swap(ptr)    __hybrid_unaligned_get_swap((__UINT16_TYPE__ *)(ptr))
-#define __hybrid_unaligned_set16_swap(ptr,v)  __hybrid_unaligned_set_swap((__UINT16_TYPE__ *)(ptr),v)
-#define __hybrid_unaligned_get32(ptr)         __hybrid_unaligned_get((__UINT32_TYPE__ *)(ptr))
-#define __hybrid_unaligned_set32(ptr,v)       __hybrid_unaligned_set((__UINT32_TYPE__ *)(ptr),v)
-#define __hybrid_unaligned_get32_swap(ptr)    __hybrid_unaligned_get_swap((__UINT32_TYPE__ *)(ptr))
-#define __hybrid_unaligned_set32_swap(ptr,v)  __hybrid_unaligned_set_swap((__UINT32_TYPE__ *)(ptr),v)
+#else /* __INTELLISENSE__ */
+#define __hybrid_unaligned_get16(ptr)          __hybrid_unaligned_get((__UINT16_TYPE__ *)(ptr))
+#define __hybrid_unaligned_set16(ptr, v)       __hybrid_unaligned_set((__UINT16_TYPE__ *)(ptr), v)
+#define __hybrid_unaligned_get16_swap(ptr)     __hybrid_unaligned_get_swap((__UINT16_TYPE__ *)(ptr))
+#define __hybrid_unaligned_set16_swap(ptr, v)  __hybrid_unaligned_set_swap((__UINT16_TYPE__ *)(ptr), v)
+#define __hybrid_unaligned_get32(ptr)          __hybrid_unaligned_get((__UINT32_TYPE__ *)(ptr))
+#define __hybrid_unaligned_set32(ptr, v)       __hybrid_unaligned_set((__UINT32_TYPE__ *)(ptr), v)
+#define __hybrid_unaligned_get32_swap(ptr)     __hybrid_unaligned_get_swap((__UINT32_TYPE__ *)(ptr))
+#define __hybrid_unaligned_set32_swap(ptr, v)  __hybrid_unaligned_set_swap((__UINT32_TYPE__ *)(ptr), v)
 #ifdef __UINT64_TYPE__
-#define __hybrid_unaligned_get64(ptr)         __hybrid_unaligned_get((__UINT64_TYPE__ *)(ptr))
-#define __hybrid_unaligned_set64(ptr,v)       __hybrid_unaligned_set((__UINT64_TYPE__ *)(ptr),v)
-#define __hybrid_unaligned_get64_swap(ptr)    __hybrid_unaligned_get_swap((__UINT64_TYPE__ *)(ptr))
-#define __hybrid_unaligned_set64_swap(ptr,v)  __hybrid_unaligned_set_swap((__UINT64_TYPE__ *)(ptr),v)
+#define __hybrid_unaligned_get64(ptr)          __hybrid_unaligned_get((__UINT64_TYPE__ *)(ptr))
+#define __hybrid_unaligned_set64(ptr, v)       __hybrid_unaligned_set((__UINT64_TYPE__ *)(ptr), v)
+#define __hybrid_unaligned_get64_swap(ptr)     __hybrid_unaligned_get_swap((__UINT64_TYPE__ *)(ptr))
+#define __hybrid_unaligned_set64_swap(ptr, v)  __hybrid_unaligned_set_swap((__UINT64_TYPE__ *)(ptr), v)
 #ifdef __UINT128_TYPE__
-#define __hybrid_unaligned_get128(ptr)        __hybrid_unaligned_get((__UINT128_TYPE__ *)(ptr))
-#define __hybrid_unaligned_set128(ptr,v)      __hybrid_unaligned_set((__UINT128_TYPE__ *)(ptr),v)
-#define __hybrid_unaligned_get128_swap(ptr)   __hybrid_unaligned_get_swap((__UINT128_TYPE__ *)(ptr))
-#define __hybrid_unaligned_set128_swap(ptr,v) __hybrid_unaligned_set_swap((__UINT128_TYPE__ *)(ptr),v)
+#define __hybrid_unaligned_get128(ptr)         __hybrid_unaligned_get((__UINT128_TYPE__ *)(ptr))
+#define __hybrid_unaligned_set128(ptr, v)      __hybrid_unaligned_set((__UINT128_TYPE__ *)(ptr), v)
+#define __hybrid_unaligned_get128_swap(ptr)    __hybrid_unaligned_get_swap((__UINT128_TYPE__ *)(ptr))
+#define __hybrid_unaligned_set128_swap(ptr, v) __hybrid_unaligned_set_swap((__UINT128_TYPE__ *)(ptr), v)
 #endif /* __UINT128_TYPE__ */
 #endif /* __UINT64_TYPE__ */
-#endif
+#endif /* !__INTELLISENSE__ */
 
 #endif /* __cplusplus */
 
 #ifndef __cplusplus
 #ifndef __NO_builtin_choose_expr
 #ifndef __UINT64_TYPE__
-#define __hybrid_unaligned_get(ptr) \
-	__builtin_choose_expr(sizeof(*(ptr)) == 1,*(__UINT8_TYPE__ *)(ptr), \
-	__builtin_choose_expr(sizeof(*(ptr)) == 2,__hybrid_unaligned_get16((__UINT16_TYPE__ *)(ptr)), \
-	                                          __hybrid_unaligned_get32((__UINT32_TYPE__ *)(ptr))))
-#define __hybrid_unaligned_set(ptr,v) \
-	__builtin_choose_expr(sizeof(*(ptr)) == 1,(void)(*(__UINT8_TYPE__ *)(ptr)=(__UINT8_TYPE__)(v)), \
-	__builtin_choose_expr(sizeof(*(ptr)) == 2,__hybrid_unaligned_set16((__UINT16_TYPE__ *)(ptr),(__UINT8_TYPE__)(v)), \
-	                                          __hybrid_unaligned_set32((__UINT32_TYPE__ *)(ptr),(__UINT16_TYPE__)(v))))
-#define __hybrid_unaligned_get_swap(ptr) \
-	__builtin_choose_expr(sizeof(*(ptr)) == 1,*(__UINT8_TYPE__ *)(ptr), \
-	__builtin_choose_expr(sizeof(*(ptr)) == 2,__hybrid_unaligned_get16_swap((__UINT16_TYPE__ *)(ptr)), \
-	                                          __hybrid_unaligned_get32_swap((__UINT32_TYPE__ *)(ptr))))
-#define __hybrid_unaligned_set_swap(ptr,v) \
-	__builtin_choose_expr(sizeof(*(ptr)) == 1,(void)(*(__UINT8_TYPE__ *)(ptr)=(__UINT8_TYPE__)(v)), \
-	__builtin_choose_expr(sizeof(*(ptr)) == 2,__hybrid_unaligned_set16_swap((__UINT16_TYPE__ *)(ptr),(__UINT8_TYPE__)(v)), \
-	                                          __hybrid_unaligned_set32_swap((__UINT32_TYPE__ *)(ptr),(__UINT16_TYPE__)(v))))
+#define __hybrid_unaligned_get(ptr)                                                                \
+	__builtin_choose_expr(sizeof(*(ptr)) == 1, *(__UINT8_TYPE__ *)(ptr),                           \
+	__builtin_choose_expr(sizeof(*(ptr)) == 2, __hybrid_unaligned_get16((__UINT16_TYPE__ *)(ptr)), \
+	                                           __hybrid_unaligned_get32((__UINT32_TYPE__ *)(ptr))))
+#define __hybrid_unaligned_set(ptr, v)                                                                                  \
+	__builtin_choose_expr(sizeof(*(ptr)) == 1, (void)(*(__UINT8_TYPE__ *)(ptr)=(__UINT8_TYPE__)(v)),                    \
+	__builtin_choose_expr(sizeof(*(ptr)) == 2, __hybrid_unaligned_set16((__UINT16_TYPE__ *)(ptr), (__UINT8_TYPE__)(v)), \
+	                                           __hybrid_unaligned_set32((__UINT32_TYPE__ *)(ptr), (__UINT16_TYPE__)(v))))
+#define __hybrid_unaligned_get_swap(ptr)                                                                \
+	__builtin_choose_expr(sizeof(*(ptr)) == 1, *(__UINT8_TYPE__ *)(ptr),                                \
+	__builtin_choose_expr(sizeof(*(ptr)) == 2, __hybrid_unaligned_get16_swap((__UINT16_TYPE__ *)(ptr)), \
+	                                           __hybrid_unaligned_get32_swap((__UINT32_TYPE__ *)(ptr))))
+#define __hybrid_unaligned_set_swap(ptr, v)                                                                                  \
+	__builtin_choose_expr(sizeof(*(ptr)) == 1, (void)(*(__UINT8_TYPE__ *)(ptr)=(__UINT8_TYPE__)(v)),                         \
+	__builtin_choose_expr(sizeof(*(ptr)) == 2, __hybrid_unaligned_set16_swap((__UINT16_TYPE__ *)(ptr), (__UINT8_TYPE__)(v)), \
+	                                           __hybrid_unaligned_set32_swap((__UINT32_TYPE__ *)(ptr), (__UINT16_TYPE__)(v))))
 #elif !defined(__UINT128_TYPE__) /* 64-bit integer type */
-#define __hybrid_unaligned_get(ptr) \
-	__builtin_choose_expr(sizeof(*(ptr)) == 1,*(__UINT8_TYPE__ *)(ptr), \
-	__builtin_choose_expr(sizeof(*(ptr)) == 2,__hybrid_unaligned_get16((__UINT16_TYPE__ *)(ptr)), \
-	__builtin_choose_expr(sizeof(*(ptr)) == 4,__hybrid_unaligned_get32((__UINT32_TYPE__ *)(ptr)), \
-	                                          __hybrid_unaligned_get64((__UINT64_TYPE__ *)(ptr)))))
-#define __hybrid_unaligned_set(ptr,v) \
-	__builtin_choose_expr(sizeof(*(ptr)) == 1,(void)(*(__UINT8_TYPE__ *)(ptr)=(__UINT8_TYPE__)(v)), \
-	__builtin_choose_expr(sizeof(*(ptr)) == 2,__hybrid_unaligned_set16((__UINT16_TYPE__ *)(ptr),(__UINT16_TYPE__)(v)), \
-	__builtin_choose_expr(sizeof(*(ptr)) == 4,__hybrid_unaligned_set32((__UINT32_TYPE__ *)(ptr),(__UINT32_TYPE__)(v)), \
-	                                          __hybrid_unaligned_set64((__UINT64_TYPE__ *)(ptr),(__UINT64_TYPE__)(v)))))
-#define __hybrid_unaligned_get_swap(ptr) \
-	__builtin_choose_expr(sizeof(*(ptr)) == 1,*(__UINT8_TYPE__ *)(ptr), \
-	__builtin_choose_expr(sizeof(*(ptr)) == 2,__hybrid_unaligned_get16_swap((__UINT16_TYPE__ *)(ptr)), \
-	__builtin_choose_expr(sizeof(*(ptr)) == 4,__hybrid_unaligned_get32_swap((__UINT32_TYPE__ *)(ptr)), \
-	                                          __hybrid_unaligned_get64_swap((__UINT64_TYPE__ *)(ptr)))))
-#define __hybrid_unaligned_set_swap(ptr,v) \
-	__builtin_choose_expr(sizeof(*(ptr)) == 1,(void)(*(__UINT8_TYPE__ *)(ptr)=(__UINT8_TYPE__)(v)), \
-	__builtin_choose_expr(sizeof(*(ptr)) == 2,__hybrid_unaligned_set16_swap((__UINT16_TYPE__ *)(ptr),(__UINT16_TYPE__)(v)), \
-	__builtin_choose_expr(sizeof(*(ptr)) == 4,__hybrid_unaligned_set32_swap((__UINT32_TYPE__ *)(ptr),(__UINT32_TYPE__)(v)), \
-	                                          __hybrid_unaligned_set64_swap((__UINT64_TYPE__ *)(ptr),(__UINT64_TYPE__)(v)))))
+#define __hybrid_unaligned_get(ptr)                                                                \
+	__builtin_choose_expr(sizeof(*(ptr)) == 1, *(__UINT8_TYPE__ *)(ptr),                           \
+	__builtin_choose_expr(sizeof(*(ptr)) == 2, __hybrid_unaligned_get16((__UINT16_TYPE__ *)(ptr)), \
+	__builtin_choose_expr(sizeof(*(ptr)) == 4, __hybrid_unaligned_get32((__UINT32_TYPE__ *)(ptr)), \
+	                                           __hybrid_unaligned_get64((__UINT64_TYPE__ *)(ptr)))))
+#define __hybrid_unaligned_set(ptr, v)                                                                                   \
+	__builtin_choose_expr(sizeof(*(ptr)) == 1, (void)(*(__UINT8_TYPE__ *)(ptr)=(__UINT8_TYPE__)(v)),                     \
+	__builtin_choose_expr(sizeof(*(ptr)) == 2, __hybrid_unaligned_set16((__UINT16_TYPE__ *)(ptr), (__UINT16_TYPE__)(v)), \
+	__builtin_choose_expr(sizeof(*(ptr)) == 4, __hybrid_unaligned_set32((__UINT32_TYPE__ *)(ptr), (__UINT32_TYPE__)(v)), \
+	                                           __hybrid_unaligned_set64((__UINT64_TYPE__ *)(ptr), (__UINT64_TYPE__)(v)))))
+#define __hybrid_unaligned_get_swap(ptr)                                                                \
+	__builtin_choose_expr(sizeof(*(ptr)) == 1, *(__UINT8_TYPE__ *)(ptr),                                \
+	__builtin_choose_expr(sizeof(*(ptr)) == 2, __hybrid_unaligned_get16_swap((__UINT16_TYPE__ *)(ptr)), \
+	__builtin_choose_expr(sizeof(*(ptr)) == 4, __hybrid_unaligned_get32_swap((__UINT32_TYPE__ *)(ptr)), \
+	                                           __hybrid_unaligned_get64_swap((__UINT64_TYPE__ *)(ptr)))))
+#define __hybrid_unaligned_set_swap(ptr, v)                                                                                   \
+	__builtin_choose_expr(sizeof(*(ptr)) == 1, (void)(*(__UINT8_TYPE__ *)(ptr)=(__UINT8_TYPE__)(v)),                          \
+	__builtin_choose_expr(sizeof(*(ptr)) == 2, __hybrid_unaligned_set16_swap((__UINT16_TYPE__ *)(ptr), (__UINT16_TYPE__)(v)), \
+	__builtin_choose_expr(sizeof(*(ptr)) == 4, __hybrid_unaligned_set32_swap((__UINT32_TYPE__ *)(ptr), (__UINT32_TYPE__)(v)), \
+	                                           __hybrid_unaligned_set64_swap((__UINT64_TYPE__ *)(ptr), (__UINT64_TYPE__)(v)))))
 #else /* 128-bit integer type */
-#define __hybrid_unaligned_get(ptr) \
-	__builtin_choose_expr(sizeof(*(ptr)) == 1,*(__UINT8_TYPE__ *)(ptr), \
-	__builtin_choose_expr(sizeof(*(ptr)) == 2,__hybrid_unaligned_get16((__UINT16_TYPE__ *)(ptr)), \
-	__builtin_choose_expr(sizeof(*(ptr)) == 4,__hybrid_unaligned_get32((__UINT32_TYPE__ *)(ptr)), \
-	__builtin_choose_expr(sizeof(*(ptr)) == 8,__hybrid_unaligned_get64((__UINT64_TYPE__ *)(ptr)), \
-	                                          __hybrid_unaligned_get128((__UINT128_TYPE__ *)(ptr))))))
-#define __hybrid_unaligned_set(ptr,v) \
-	__builtin_choose_expr(sizeof(*(ptr)) == 1,(void)(*(__UINT8_TYPE__ *)(ptr)=(__UINT8_TYPE__)(v)), \
-	__builtin_choose_expr(sizeof(*(ptr)) == 2,__hybrid_unaligned_set16((__UINT16_TYPE__ *)(ptr),(__UINT16_TYPE__)(v)), \
-	__builtin_choose_expr(sizeof(*(ptr)) == 4,__hybrid_unaligned_set32((__UINT32_TYPE__ *)(ptr),(__UINT32_TYPE__)(v)), \
-	__builtin_choose_expr(sizeof(*(ptr)) == 8,__hybrid_unaligned_set64((__UINT64_TYPE__ *)(ptr),(__UINT64_TYPE__)(v)), \
-	                                          __hybrid_unaligned_set128((__UINT128_TYPE__ *)(ptr),(__UINT128_TYPE__)(v))))))
-#define __hybrid_unaligned_get_swap(ptr) \
-	__builtin_choose_expr(sizeof(*(ptr)) == 1,*(__UINT8_TYPE__ *)(ptr), \
-	__builtin_choose_expr(sizeof(*(ptr)) == 2,__hybrid_unaligned_get16_swap((__UINT16_TYPE__ *)(ptr)), \
-	__builtin_choose_expr(sizeof(*(ptr)) == 4,__hybrid_unaligned_get32_swap((__UINT32_TYPE__ *)(ptr)), \
-	__builtin_choose_expr(sizeof(*(ptr)) == 8,__hybrid_unaligned_get64_swap((__UINT64_TYPE__ *)(ptr)), \
-	                                          __hybrid_unaligned_get128_swap((__UINT128_TYPE__ *)(ptr))))))
-#define __hybrid_unaligned_set_swap(ptr,v) \
-	__builtin_choose_expr(sizeof(*(ptr)) == 1,(void)(*(__UINT8_TYPE__ *)(ptr)=(__UINT8_TYPE__)(v)), \
-	__builtin_choose_expr(sizeof(*(ptr)) == 2,__hybrid_unaligned_set16_swap((__UINT16_TYPE__ *)(ptr),(__UINT16_TYPE__)(v)), \
-	__builtin_choose_expr(sizeof(*(ptr)) == 4,__hybrid_unaligned_set32_swap((__UINT32_TYPE__ *)(ptr),(__UINT32_TYPE__)(v)), \
-	__builtin_choose_expr(sizeof(*(ptr)) == 8,__hybrid_unaligned_set64_swap((__UINT64_TYPE__ *)(ptr),(__UINT64_TYPE__)(v)), \
-	                                          __hybrid_unaligned_set128_swap((__UINT128_TYPE__ *)(ptr),(__UINT128_TYPE__)(v))))))
+#define __hybrid_unaligned_get(ptr)                                                                \
+	__builtin_choose_expr(sizeof(*(ptr)) == 1, *(__UINT8_TYPE__ *)(ptr),                           \
+	__builtin_choose_expr(sizeof(*(ptr)) == 2, __hybrid_unaligned_get16((__UINT16_TYPE__ *)(ptr)), \
+	__builtin_choose_expr(sizeof(*(ptr)) == 4, __hybrid_unaligned_get32((__UINT32_TYPE__ *)(ptr)), \
+	__builtin_choose_expr(sizeof(*(ptr)) == 8, __hybrid_unaligned_get64((__UINT64_TYPE__ *)(ptr)), \
+	                                           __hybrid_unaligned_get128((__UINT128_TYPE__ *)(ptr))))))
+#define __hybrid_unaligned_set(ptr, v)                                                                                   \
+	__builtin_choose_expr(sizeof(*(ptr)) == 1, (void)(*(__UINT8_TYPE__ *)(ptr)=(__UINT8_TYPE__)(v)),                     \
+	__builtin_choose_expr(sizeof(*(ptr)) == 2, __hybrid_unaligned_set16((__UINT16_TYPE__ *)(ptr), (__UINT16_TYPE__)(v)), \
+	__builtin_choose_expr(sizeof(*(ptr)) == 4, __hybrid_unaligned_set32((__UINT32_TYPE__ *)(ptr), (__UINT32_TYPE__)(v)), \
+	__builtin_choose_expr(sizeof(*(ptr)) == 8, __hybrid_unaligned_set64((__UINT64_TYPE__ *)(ptr), (__UINT64_TYPE__)(v)), \
+	                                           __hybrid_unaligned_set128((__UINT128_TYPE__ *)(ptr), (__UINT128_TYPE__)(v))))))
+#define __hybrid_unaligned_get_swap(ptr)                                                                \
+	__builtin_choose_expr(sizeof(*(ptr)) == 1, *(__UINT8_TYPE__ *)(ptr),                                \
+	__builtin_choose_expr(sizeof(*(ptr)) == 2, __hybrid_unaligned_get16_swap((__UINT16_TYPE__ *)(ptr)), \
+	__builtin_choose_expr(sizeof(*(ptr)) == 4, __hybrid_unaligned_get32_swap((__UINT32_TYPE__ *)(ptr)), \
+	__builtin_choose_expr(sizeof(*(ptr)) == 8, __hybrid_unaligned_get64_swap((__UINT64_TYPE__ *)(ptr)), \
+	                                           __hybrid_unaligned_get128_swap((__UINT128_TYPE__ *)(ptr))))))
+#define __hybrid_unaligned_set_swap(ptr, v)                                                                                   \
+	__builtin_choose_expr(sizeof(*(ptr)) == 1, (void)(*(__UINT8_TYPE__ *)(ptr)=(__UINT8_TYPE__)(v)),                          \
+	__builtin_choose_expr(sizeof(*(ptr)) == 2, __hybrid_unaligned_set16_swap((__UINT16_TYPE__ *)(ptr), (__UINT16_TYPE__)(v)), \
+	__builtin_choose_expr(sizeof(*(ptr)) == 4, __hybrid_unaligned_set32_swap((__UINT32_TYPE__ *)(ptr), (__UINT32_TYPE__)(v)), \
+	__builtin_choose_expr(sizeof(*(ptr)) == 8, __hybrid_unaligned_set64_swap((__UINT64_TYPE__ *)(ptr), (__UINT64_TYPE__)(v)), \
+	                                           __hybrid_unaligned_set128_swap((__UINT128_TYPE__ *)(ptr), (__UINT128_TYPE__)(v))))))
 #endif
 #else /* !__NO_builtin_choose_expr */
 #ifndef __UINT64_TYPE__
-#define __hybrid_unaligned_get(ptr) \
-	(sizeof(*(ptr)) == 1 ? *(__UINT8_TYPE__ *)(ptr) : \
+#define __hybrid_unaligned_get(ptr)                                             \
+	(sizeof(*(ptr)) == 1 ? *(__UINT8_TYPE__ *)(ptr) :                           \
 	 sizeof(*(ptr)) == 2 ? __hybrid_unaligned_get16((__UINT16_TYPE__ *)(ptr)) : \
 	                       __hybrid_unaligned_get32((__UINT32_TYPE__ *)(ptr)))
-#define __hybrid_unaligned_set(ptr,v) \
-	(sizeof(*(ptr)) == 1 ? (void)(*(__UINT8_TYPE__ *)(ptr)=(__UINT8_TYPE__)(v)) : \
-	 sizeof(*(ptr)) == 2 ? __hybrid_unaligned_set16((__UINT16_TYPE__ *)(ptr),(__UINT8_TYPE__)(v)) : \
-	                       __hybrid_unaligned_set32((__UINT32_TYPE__ *)(ptr),(__UINT16_TYPE__)(v)))
-#define __hybrid_unaligned_get_swap(ptr) \
-	(sizeof(*(ptr)) == 1 ? *(__UINT8_TYPE__ *)(ptr) : \
+#define __hybrid_unaligned_set(ptr, v)                                                               \
+	(sizeof(*(ptr)) == 1 ? (void)(*(__UINT8_TYPE__ *)(ptr)=(__UINT8_TYPE__)(v)) :                    \
+	 sizeof(*(ptr)) == 2 ? __hybrid_unaligned_set16((__UINT16_TYPE__ *)(ptr), (__UINT8_TYPE__)(v)) : \
+	                       __hybrid_unaligned_set32((__UINT32_TYPE__ *)(ptr), (__UINT16_TYPE__)(v)))
+#define __hybrid_unaligned_get_swap(ptr)                                             \
+	(sizeof(*(ptr)) == 1 ? *(__UINT8_TYPE__ *)(ptr) :                                \
 	 sizeof(*(ptr)) == 2 ? __hybrid_unaligned_get16_swap((__UINT16_TYPE__ *)(ptr)) : \
 	                       __hybrid_unaligned_get32_swap((__UINT32_TYPE__ *)(ptr)))
-#define __hybrid_unaligned_set_swap(ptr,v) \
-	(sizeof(*(ptr)) == 1 ? (void)(*(__UINT8_TYPE__ *)(ptr)=(__UINT8_TYPE__)(v)) : \
-	 sizeof(*(ptr)) == 2 ? __hybrid_unaligned_set16_swap((__UINT16_TYPE__ *)(ptr),(__UINT8_TYPE__)(v)) : \
-	                       __hybrid_unaligned_set32_swap((__UINT32_TYPE__ *)(ptr),(__UINT16_TYPE__)(v)))
+#define __hybrid_unaligned_set_swap(ptr, v)                                                               \
+	(sizeof(*(ptr)) == 1 ? (void)(*(__UINT8_TYPE__ *)(ptr)=(__UINT8_TYPE__)(v)) :                         \
+	 sizeof(*(ptr)) == 2 ? __hybrid_unaligned_set16_swap((__UINT16_TYPE__ *)(ptr), (__UINT8_TYPE__)(v)) : \
+	                       __hybrid_unaligned_set32_swap((__UINT32_TYPE__ *)(ptr), (__UINT16_TYPE__)(v)))
 #elif !defined(__UINT128_TYPE__) /* 64-bit integer type */
-#define __hybrid_unaligned_get(ptr) \
-	(sizeof(*(ptr)) == 1 ? *(__UINT8_TYPE__ *)(ptr) : \
+#define __hybrid_unaligned_get(ptr)                                             \
+	(sizeof(*(ptr)) == 1 ? *(__UINT8_TYPE__ *)(ptr) :                           \
 	 sizeof(*(ptr)) == 2 ? __hybrid_unaligned_get16((__UINT16_TYPE__ *)(ptr)) : \
 	 sizeof(*(ptr)) == 4 ? __hybrid_unaligned_get32((__UINT32_TYPE__ *)(ptr)) : \
 	                       __hybrid_unaligned_get64((__UINT64_TYPE__ *)(ptr)))
-#define __hybrid_unaligned_set(ptr,v) \
-	(sizeof(*(ptr)) == 1 ? (void)(*(__UINT8_TYPE__ *)(ptr)=(__UINT8_TYPE__)(v)) : \
-	 sizeof(*(ptr)) == 2 ? __hybrid_unaligned_set16((__UINT16_TYPE__ *)(ptr),(__UINT16_TYPE__)(v)) : \
-	 sizeof(*(ptr)) == 4 ? __hybrid_unaligned_set32((__UINT32_TYPE__ *)(ptr),(__UINT32_TYPE__)(v)) : \
-	                       __hybrid_unaligned_set64((__UINT64_TYPE__ *)(ptr),(__UINT64_TYPE__)(v)))
-#define __hybrid_unaligned_get_swap(ptr) \
-	(sizeof(*(ptr)) == 1 ? *(__UINT8_TYPE__ *)(ptr) : \
+#define __hybrid_unaligned_set(ptr, v)                                                                \
+	(sizeof(*(ptr)) == 1 ? (void)(*(__UINT8_TYPE__ *)(ptr)=(__UINT8_TYPE__)(v)) :                     \
+	 sizeof(*(ptr)) == 2 ? __hybrid_unaligned_set16((__UINT16_TYPE__ *)(ptr), (__UINT16_TYPE__)(v)) : \
+	 sizeof(*(ptr)) == 4 ? __hybrid_unaligned_set32((__UINT32_TYPE__ *)(ptr), (__UINT32_TYPE__)(v)) : \
+	                       __hybrid_unaligned_set64((__UINT64_TYPE__ *)(ptr), (__UINT64_TYPE__)(v)))
+#define __hybrid_unaligned_get_swap(ptr)                                             \
+	(sizeof(*(ptr)) == 1 ? *(__UINT8_TYPE__ *)(ptr) :                                \
 	 sizeof(*(ptr)) == 2 ? __hybrid_unaligned_get16_swap((__UINT16_TYPE__ *)(ptr)) : \
 	 sizeof(*(ptr)) == 4 ? __hybrid_unaligned_get32_swap((__UINT32_TYPE__ *)(ptr)) : \
 	                       __hybrid_unaligned_get64_swap((__UINT64_TYPE__ *)(ptr)))
-#define __hybrid_unaligned_set_swap(ptr,v) \
-	(sizeof(*(ptr)) == 1 ? (void)(*(__UINT8_TYPE__ *)(ptr)=(__UINT8_TYPE__)(v)) : \
-	 sizeof(*(ptr)) == 2 ? __hybrid_unaligned_set16_swap((__UINT16_TYPE__ *)(ptr),(__UINT16_TYPE__)(v)) : \
-	 sizeof(*(ptr)) == 4 ? __hybrid_unaligned_set32_swap((__UINT32_TYPE__ *)(ptr),(__UINT32_TYPE__)(v)) : \
-	                       __hybrid_unaligned_set64_swap((__UINT64_TYPE__ *)(ptr),(__UINT64_TYPE__)(v)))
+#define __hybrid_unaligned_set_swap(ptr, v)                                                                \
+	(sizeof(*(ptr)) == 1 ? (void)(*(__UINT8_TYPE__ *)(ptr)=(__UINT8_TYPE__)(v)) :                          \
+	 sizeof(*(ptr)) == 2 ? __hybrid_unaligned_set16_swap((__UINT16_TYPE__ *)(ptr), (__UINT16_TYPE__)(v)) : \
+	 sizeof(*(ptr)) == 4 ? __hybrid_unaligned_set32_swap((__UINT32_TYPE__ *)(ptr), (__UINT32_TYPE__)(v)) : \
+	                       __hybrid_unaligned_set64_swap((__UINT64_TYPE__ *)(ptr), (__UINT64_TYPE__)(v)))
 #else /* 128-bit integer type */
-#define __hybrid_unaligned_get(ptr) \
-	(sizeof(*(ptr)) == 1 ? *(__UINT8_TYPE__ *)(ptr) : \
+#define __hybrid_unaligned_get(ptr)                                             \
+	(sizeof(*(ptr)) == 1 ? *(__UINT8_TYPE__ *)(ptr) :                           \
 	 sizeof(*(ptr)) == 2 ? __hybrid_unaligned_get16((__UINT16_TYPE__ *)(ptr)) : \
 	 sizeof(*(ptr)) == 4 ? __hybrid_unaligned_get32((__UINT32_TYPE__ *)(ptr)) : \
 	 sizeof(*(ptr)) == 8 ? __hybrid_unaligned_get64((__UINT64_TYPE__ *)(ptr)) : \
 	                       __hybrid_unaligned_get128((__UINT128_TYPE__ *)(ptr)))
-#define __hybrid_unaligned_set(ptr,v) \
-	(sizeof(*(ptr)) == 1 ? (void)(*(__UINT8_TYPE__ *)(ptr)=(__UINT8_TYPE__)(v)) : \
-	 sizeof(*(ptr)) == 2 ? __hybrid_unaligned_set16((__UINT16_TYPE__ *)(ptr),(__UINT16_TYPE__)(v)) : \
-	 sizeof(*(ptr)) == 4 ? __hybrid_unaligned_set32((__UINT32_TYPE__ *)(ptr),(__UINT32_TYPE__)(v)) : \
-	 sizeof(*(ptr)) == 8 ? __hybrid_unaligned_set64((__UINT64_TYPE__ *)(ptr),(__UINT64_TYPE__)(v)) : \
-	                       __hybrid_unaligned_set128((__UINT128_TYPE__ *)(ptr),(__UINT128_TYPE__)(v)))
-#define __hybrid_unaligned_get_swap(ptr) \
-	(sizeof(*(ptr)) == 1 ? *(__UINT8_TYPE__ *)(ptr) : \
+#define __hybrid_unaligned_set(ptr, v)                                                                \
+	(sizeof(*(ptr)) == 1 ? (void)(*(__UINT8_TYPE__ *)(ptr)=(__UINT8_TYPE__)(v)) :                     \
+	 sizeof(*(ptr)) == 2 ? __hybrid_unaligned_set16((__UINT16_TYPE__ *)(ptr), (__UINT16_TYPE__)(v)) : \
+	 sizeof(*(ptr)) == 4 ? __hybrid_unaligned_set32((__UINT32_TYPE__ *)(ptr), (__UINT32_TYPE__)(v)) : \
+	 sizeof(*(ptr)) == 8 ? __hybrid_unaligned_set64((__UINT64_TYPE__ *)(ptr), (__UINT64_TYPE__)(v)) : \
+	                       __hybrid_unaligned_set128((__UINT128_TYPE__ *)(ptr), (__UINT128_TYPE__)(v)))
+#define __hybrid_unaligned_get_swap(ptr)                                             \
+	(sizeof(*(ptr)) == 1 ? *(__UINT8_TYPE__ *)(ptr) :                                \
 	 sizeof(*(ptr)) == 2 ? __hybrid_unaligned_get16_swap((__UINT16_TYPE__ *)(ptr)) : \
 	 sizeof(*(ptr)) == 4 ? __hybrid_unaligned_get32_swap((__UINT32_TYPE__ *)(ptr)) : \
 	 sizeof(*(ptr)) == 8 ? __hybrid_unaligned_get64_swap((__UINT64_TYPE__ *)(ptr)) : \
 	                       __hybrid_unaligned_get128_swap((__UINT128_TYPE__ *)(ptr)))
-#define __hybrid_unaligned_set_swap(ptr,v) \
-	(sizeof(*(ptr)) == 1 ? (void)(*(__UINT8_TYPE__ *)(ptr)=(__UINT8_TYPE__)(v)) : \
-	 sizeof(*(ptr)) == 2 ? __hybrid_unaligned_set16_swap((__UINT16_TYPE__ *)(ptr),(__UINT16_TYPE__)(v)) : \
-	 sizeof(*(ptr)) == 4 ? __hybrid_unaligned_set32_swap((__UINT32_TYPE__ *)(ptr),(__UINT32_TYPE__)(v)) : \
-	 sizeof(*(ptr)) == 8 ? __hybrid_unaligned_set64_swap((__UINT64_TYPE__ *)(ptr),(__UINT64_TYPE__)(v)) : \
-	                       __hybrid_unaligned_set128_swap((__UINT128_TYPE__ *)(ptr),(__UINT128_TYPE__)(v)))
+#define __hybrid_unaligned_set_swap(ptr, v)                                                                \
+	(sizeof(*(ptr)) == 1 ? (void)(*(__UINT8_TYPE__ *)(ptr)=(__UINT8_TYPE__)(v)) :                          \
+	 sizeof(*(ptr)) == 2 ? __hybrid_unaligned_set16_swap((__UINT16_TYPE__ *)(ptr), (__UINT16_TYPE__)(v)) : \
+	 sizeof(*(ptr)) == 4 ? __hybrid_unaligned_set32_swap((__UINT32_TYPE__ *)(ptr), (__UINT32_TYPE__)(v)) : \
+	 sizeof(*(ptr)) == 8 ? __hybrid_unaligned_set64_swap((__UINT64_TYPE__ *)(ptr), (__UINT64_TYPE__)(v)) : \
+	                       __hybrid_unaligned_set128_swap((__UINT128_TYPE__ *)(ptr), (__UINT128_TYPE__)(v)))
 #endif
 #endif /* __NO_builtin_choose_expr */
 #endif /* !__cplusplus */
@@ -988,52 +988,52 @@ __NOTHROW_NCX(__hybrid_unaligned_set_swap)(__UFIFTHINT_TYPE__ *__restrict __ptr,
 #include "__byteorder.h"
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 #define __hybrid_unaligned_getle(ptr)      __hybrid_unaligned_get(ptr)
-#define __hybrid_unaligned_setle(ptr,v)    __hybrid_unaligned_set(ptr,v)
+#define __hybrid_unaligned_setle(ptr, v)   __hybrid_unaligned_set(ptr, v)
 #define __hybrid_unaligned_getbe(ptr)      __hybrid_unaligned_get_swap(ptr)
-#define __hybrid_unaligned_setbe(ptr,v)    __hybrid_unaligned_set_swap(ptr,v)
+#define __hybrid_unaligned_setbe(ptr, v)   __hybrid_unaligned_set_swap(ptr, v)
 #define __hybrid_unaligned_getle16(ptr)    __hybrid_unaligned_get16(ptr)
-#define __hybrid_unaligned_setle16(ptr,v)  __hybrid_unaligned_set16(ptr,v)
+#define __hybrid_unaligned_setle16(ptr, v) __hybrid_unaligned_set16(ptr, v)
 #define __hybrid_unaligned_getbe16(ptr)    __hybrid_unaligned_get16_swap(ptr)
-#define __hybrid_unaligned_setbe16(ptr,v)  __hybrid_unaligned_set16_swap(ptr,v)
+#define __hybrid_unaligned_setbe16(ptr, v) __hybrid_unaligned_set16_swap(ptr, v)
 #define __hybrid_unaligned_getle32(ptr)    __hybrid_unaligned_get32(ptr)
-#define __hybrid_unaligned_setle32(ptr,v)  __hybrid_unaligned_set32(ptr,v)
+#define __hybrid_unaligned_setle32(ptr, v) __hybrid_unaligned_set32(ptr, v)
 #define __hybrid_unaligned_getbe32(ptr)    __hybrid_unaligned_get32_swap(ptr)
-#define __hybrid_unaligned_setbe32(ptr,v)  __hybrid_unaligned_set32_swap(ptr,v)
+#define __hybrid_unaligned_setbe32(ptr, v) __hybrid_unaligned_set32_swap(ptr, v)
 #ifdef __UINT64_TYPE__
-#define __hybrid_unaligned_getle64(ptr)    __hybrid_unaligned_get64(ptr)
-#define __hybrid_unaligned_getbe64(ptr)    __hybrid_unaligned_get64_swap(ptr)
-#define __hybrid_unaligned_setle64(ptr,v)  __hybrid_unaligned_set64(ptr,v)
-#define __hybrid_unaligned_setbe64(ptr,v)  __hybrid_unaligned_set64_swap(ptr,v)
+#define __hybrid_unaligned_getle64(ptr)     __hybrid_unaligned_get64(ptr)
+#define __hybrid_unaligned_getbe64(ptr)     __hybrid_unaligned_get64_swap(ptr)
+#define __hybrid_unaligned_setle64(ptr, v)  __hybrid_unaligned_set64(ptr, v)
+#define __hybrid_unaligned_setbe64(ptr, v)  __hybrid_unaligned_set64_swap(ptr, v)
 #ifdef __UINT128_TYPE__
-#define __hybrid_unaligned_getle128(ptr)   __hybrid_unaligned_get128(ptr)
-#define __hybrid_unaligned_getbe128(ptr)   __hybrid_unaligned_get128_swap(ptr)
-#define __hybrid_unaligned_setle128(ptr,v) __hybrid_unaligned_set128(ptr,v)
-#define __hybrid_unaligned_setbe128(ptr,v) __hybrid_unaligned_set128_swap(ptr,v)
+#define __hybrid_unaligned_getle128(ptr)    __hybrid_unaligned_get128(ptr)
+#define __hybrid_unaligned_getbe128(ptr)    __hybrid_unaligned_get128_swap(ptr)
+#define __hybrid_unaligned_setle128(ptr, v) __hybrid_unaligned_set128(ptr, v)
+#define __hybrid_unaligned_setbe128(ptr, v) __hybrid_unaligned_set128_swap(ptr, v)
 #endif /* __UINT128_TYPE__ */
 #endif /* __UINT64_TYPE__ */
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-#define __hybrid_unaligned_getle(ptr)      __hybrid_unaligned_get_swap(ptr)
-#define __hybrid_unaligned_setle(ptr,v)    __hybrid_unaligned_set_swap(ptr,v)
-#define __hybrid_unaligned_getbe(ptr)      __hybrid_unaligned_get(ptr)
-#define __hybrid_unaligned_setbe(ptr,v)    __hybrid_unaligned_set(ptr,v)
-#define __hybrid_unaligned_getle16(ptr)    __hybrid_unaligned_get16_swap(ptr)
-#define __hybrid_unaligned_setle16(ptr,v)  __hybrid_unaligned_set16_swap(ptr,v)
-#define __hybrid_unaligned_getbe16(ptr)    __hybrid_unaligned_get16(ptr)
-#define __hybrid_unaligned_setbe16(ptr,v)  __hybrid_unaligned_set16(ptr,v)
-#define __hybrid_unaligned_getle32(ptr)    __hybrid_unaligned_get32_swap(ptr)
-#define __hybrid_unaligned_setle32(ptr,v)  __hybrid_unaligned_set32_swap(ptr,v)
-#define __hybrid_unaligned_getbe32(ptr)    __hybrid_unaligned_get32(ptr)
-#define __hybrid_unaligned_setbe32(ptr,v)  __hybrid_unaligned_set32(ptr,v)
+#define __hybrid_unaligned_getle(ptr)       __hybrid_unaligned_get_swap(ptr)
+#define __hybrid_unaligned_setle(ptr, v)    __hybrid_unaligned_set_swap(ptr, v)
+#define __hybrid_unaligned_getbe(ptr)       __hybrid_unaligned_get(ptr)
+#define __hybrid_unaligned_setbe(ptr, v)    __hybrid_unaligned_set(ptr, v)
+#define __hybrid_unaligned_getle16(ptr)     __hybrid_unaligned_get16_swap(ptr)
+#define __hybrid_unaligned_setle16(ptr, v)  __hybrid_unaligned_set16_swap(ptr, v)
+#define __hybrid_unaligned_getbe16(ptr)     __hybrid_unaligned_get16(ptr)
+#define __hybrid_unaligned_setbe16(ptr, v)  __hybrid_unaligned_set16(ptr, v)
+#define __hybrid_unaligned_getle32(ptr)     __hybrid_unaligned_get32_swap(ptr)
+#define __hybrid_unaligned_setle32(ptr, v)  __hybrid_unaligned_set32_swap(ptr, v)
+#define __hybrid_unaligned_getbe32(ptr)     __hybrid_unaligned_get32(ptr)
+#define __hybrid_unaligned_setbe32(ptr, v)  __hybrid_unaligned_set32(ptr, v)
 #ifdef __UINT64_TYPE__
-#define __hybrid_unaligned_getle64(ptr)    __hybrid_unaligned_get64_swap(ptr)
-#define __hybrid_unaligned_getbe64(ptr)    __hybrid_unaligned_get64(ptr)
-#define __hybrid_unaligned_setle64(ptr,v)  __hybrid_unaligned_set64_swap(ptr,v)
-#define __hybrid_unaligned_setbe64(ptr,v)  __hybrid_unaligned_set64(ptr,v)
+#define __hybrid_unaligned_getle64(ptr)     __hybrid_unaligned_get64_swap(ptr)
+#define __hybrid_unaligned_getbe64(ptr)     __hybrid_unaligned_get64(ptr)
+#define __hybrid_unaligned_setle64(ptr, v)  __hybrid_unaligned_set64_swap(ptr, v)
+#define __hybrid_unaligned_setbe64(ptr, v)  __hybrid_unaligned_set64(ptr, v)
 #ifdef __UINT128_TYPE__
-#define __hybrid_unaligned_getle128(ptr)   __hybrid_unaligned_get128_swap(ptr)
-#define __hybrid_unaligned_getbe128(ptr)   __hybrid_unaligned_get128(ptr)
-#define __hybrid_unaligned_setle128(ptr,v) __hybrid_unaligned_set128_swap(ptr,v)
-#define __hybrid_unaligned_setbe128(ptr,v) __hybrid_unaligned_set128(ptr,v)
+#define __hybrid_unaligned_getle128(ptr)    __hybrid_unaligned_get128_swap(ptr)
+#define __hybrid_unaligned_getbe128(ptr)    __hybrid_unaligned_get128(ptr)
+#define __hybrid_unaligned_setle128(ptr, v) __hybrid_unaligned_set128_swap(ptr, v)
+#define __hybrid_unaligned_setbe128(ptr, v) __hybrid_unaligned_set128(ptr, v)
 #endif /* __UINT128_TYPE__ */
 #endif /* __UINT64_TYPE__ */
 #endif /* ... */

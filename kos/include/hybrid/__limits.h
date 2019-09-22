@@ -29,7 +29,7 @@
 #elif defined(__i386__) || defined(__x86_64__) || defined(__arm__)
 #define __SIZEOF_PAGE__        4096
 #endif
-#endif
+#endif /* !__SIZEOF_PAGE__ */
 
 #ifndef __SIZEOF_CACHELINE__
 #ifdef __CACHELINE
@@ -46,9 +46,9 @@
 #ifndef __ATTR_CACHELINE_ALIGNED
 #ifdef __SIZEOF_CACHELINE__
 #define __ATTR_CACHELINE_ALIGNED __ATTR_ALIGNED(__SIZEOF_CACHELINE__)
-#else
+#else /* __SIZEOF_CACHELINE__ */
 #define __ATTR_CACHELINE_ALIGNED /* nothing */
-#endif
+#endif /* !__SIZEOF_CACHELINE__ */
 #endif /* !__ATTR_CACHELINE_ALIGNED */
 
 #endif /* !__GUARD_HYBRID___LIMITS_H */

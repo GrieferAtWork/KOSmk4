@@ -22,6 +22,9 @@
 #include "host.h"
 #include "__limits.h"
 
+/* TODO: There are architectures where PAGESIZE isn't a fixed constant.
+ *       Even on x86, you can have so-called large pages! */
+
 #ifndef PAGESIZE
 #ifdef __SIZEOF_PAGE__
 #define PAGESIZE __SIZEOF_PAGE__
@@ -30,7 +33,7 @@
 
 #ifndef PAGEALIGN
 #define PAGEALIGN  PAGESIZE
-#endif
+#endif /* !PAGEALIGN */
 
 #ifndef PAGESHIFT
 #if PAGESIZE == 0x1
@@ -100,7 +103,7 @@
 #else
 #   error "Unsupported PAGESIZE"
 #endif
-#endif
+#endif /* !PAGESHIFT */
 
 #define ATTR_CACHELINE_ALIGNED __ATTR_CACHELINE_ALIGNED
 

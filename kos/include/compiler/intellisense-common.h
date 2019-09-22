@@ -21,11 +21,11 @@
 
 #ifndef __INTELLISENSE__
 #error "This header is only meant for syntax highlighting. - Don't let your real compiler see it!"
-#endif
+#endif /* !__INTELLISENSE__ */
 
 #ifndef __cplusplus
 #error "Syntax highlighting depends on C++ features being available"
-#endif
+#endif /* !__cplusplus */
 
 #undef __event
 
@@ -281,7 +281,7 @@ __intern::____intellisense_endianint<__ORDER_BIG_ENDIAN__,unsigned short> __inte
 __intern::____intellisense_endianint<__ORDER_BIG_ENDIAN__,unsigned int> __intellisense_beswap32(unsigned int);
 __intern::____intellisense_endianint<__ORDER_BIG_ENDIAN__,unsigned long> __intellisense_beswap32(unsigned long);
 __intern::____intellisense_endianint<__ORDER_BIG_ENDIAN__,unsigned long long> __intellisense_beswap64(unsigned long long);
-#else
+#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
 __intern::____intellisense_endianint<__ORDER_BIG_ENDIAN__,unsigned short> __intellisense_leswap16(unsigned short);
 __intern::____intellisense_endianint<__ORDER_BIG_ENDIAN__,unsigned int> __intellisense_leswap32(unsigned int);
 __intern::____intellisense_endianint<__ORDER_BIG_ENDIAN__,unsigned long> __intellisense_leswap32(unsigned long);
@@ -290,11 +290,12 @@ unsigned short __intellisense_beswap16(unsigned short);
 unsigned int __intellisense_beswap32(unsigned int);
 unsigned long __intellisense_beswap32(unsigned long);
 unsigned long long __intellisense_beswap64(unsigned long long);
-#endif
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 
 }
 
 #ifdef __INTELLISENSE_GCC__
+/* ... */
 #else /* __INTELLISENSE_GCC__ */
 ::__intern::____intellisense_endianint<4321,unsigned short> __builtin_bswap16(__intern::____intellisense_endianint<1234,unsigned short>);
 ::__intern::____intellisense_endianint<1234,unsigned short> __builtin_bswap16(__intern::____intellisense_endianint<4321,unsigned short>);

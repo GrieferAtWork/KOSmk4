@@ -86,14 +86,14 @@
 #define DEFINE_PRIVATE_WEAK_ALIAS(new, old) /* nothing */
 #define DEFINE_PUBLIC_WEAK_ALIAS(new, old)  /* nothing */
 #define DEFINE_INTERN_WEAK_ALIAS(new, old)  /* nothing */
-#else
+#else /* __INTELLISENSE__ */
 #define DEFINE_PRIVATE_ALIAS      __DEFINE_PRIVATE_ALIAS
 #define DEFINE_PUBLIC_ALIAS       __DEFINE_PUBLIC_ALIAS
 #define DEFINE_INTERN_ALIAS       __DEFINE_INTERN_ALIAS
 #define DEFINE_PRIVATE_WEAK_ALIAS __DEFINE_PRIVATE_WEAK_ALIAS
 #define DEFINE_PUBLIC_WEAK_ALIAS  __DEFINE_PUBLIC_WEAK_ALIAS
 #define DEFINE_INTERN_WEAK_ALIAS  __DEFINE_INTERN_WEAK_ALIAS
-#endif
+#endif /* !__INTELLISENSE__ */
 
 #define likely              __likely
 #define unlikely            __unlikely
@@ -112,35 +112,35 @@
 #define NOTHROW_RPC_KOS     /* nothing */
 #define NOTHROW_RPC_NOKOS   /* nothing */
 #define NOTHROW_RPC_PURE    /* nothing */
-#else
+#else /* __INTELLISENSE__ */
 #define NOTHROW             __NOTHROW
 #define NOTHROW_NCX         __NOTHROW_NCX
 #define NOTHROW_RPC         __NOTHROW_RPC
 #define NOTHROW_RPC_KOS     __NOTHROW_RPC_KOS
 #define NOTHROW_RPC_NOKOS   __NOTHROW_RPC_NOKOS
 #define NOTHROW_RPC_PURE    __NOTHROW_RPC_PURE
-#endif
+#endif /* !__INTELLISENSE__ */
 
 #ifdef __REDIRECT_WSUPPRESS_BEGIN
 /* If defined by the compiler, suppress specific warnings within redirections. */
-#define REDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args)                                       __REDIRECT_WSUPPRESS_BEGIN __REDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args) __REDIRECT_WSUPPRESS_END
-#define REDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args)                                          __REDIRECT_WSUPPRESS_BEGIN __REDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args) __REDIRECT_WSUPPRESS_END
-#define VREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)    __REDIRECT_WSUPPRESS_BEGIN __VREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes) __REDIRECT_WSUPPRESS_END
-#define VREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)       __REDIRECT_WSUPPRESS_BEGIN __VREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes) __REDIRECT_WSUPPRESS_END
-#define VFREDIRECT(decl,attr,Treturn,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) __REDIRECT_WSUPPRESS_BEGIN __VFREDIRECT(decl,attr,Treturn,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) __REDIRECT_WSUPPRESS_END
-#define VFREDIRECT_VOID(decl,attr,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)    __REDIRECT_WSUPPRESS_BEGIN __VFREDIRECT_VOID(decl,attr,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) __REDIRECT_WSUPPRESS_END
-#define XREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code)                                      __REDIRECT_WSUPPRESS_BEGIN __XREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code) __REDIRECT_WSUPPRESS_END
-#define XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code)                                         __REDIRECT_WSUPPRESS_BEGIN __XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code) __REDIRECT_WSUPPRESS_END
-#else
-#define REDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args)                                       __REDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args)
-#define REDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args)                                          __REDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args)
-#define VREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)    __VREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)
-#define VREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)       __VREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)
-#define VFREDIRECT(decl,attr,Treturn,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) __VFREDIRECT(decl,attr,Treturn,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)
-#define VFREDIRECT_VOID(decl,attr,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)    __VFREDIRECT_VOID(decl,attr,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)
-#define XREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code)                                      __XREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code)
-#define XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code)                                         __XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code)
-#endif
+#define REDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args)                                       __COMPILER_REDIRECT_WSUPPRESS_BEGIN __REDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args) __REDIRECT_WSUPPRESS_END
+#define REDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args)                                          __COMPILER_REDIRECT_WSUPPRESS_BEGIN __REDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args) __REDIRECT_WSUPPRESS_END
+#define VREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)    __COMPILER_REDIRECT_WSUPPRESS_BEGIN __VREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes) __REDIRECT_WSUPPRESS_END
+#define VREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)       __COMPILER_REDIRECT_WSUPPRESS_BEGIN __VREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes) __REDIRECT_WSUPPRESS_END
+#define VFREDIRECT(decl,attr,Treturn,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) __COMPILER_REDIRECT_WSUPPRESS_BEGIN __VFREDIRECT(decl,attr,Treturn,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) __REDIRECT_WSUPPRESS_END
+#define VFREDIRECT_VOID(decl,attr,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)    __COMPILER_REDIRECT_WSUPPRESS_BEGIN __VFREDIRECT_VOID(decl,attr,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) __REDIRECT_WSUPPRESS_END
+#define XREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code)                                      __COMPILER_REDIRECT_WSUPPRESS_BEGIN __XREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code) __REDIRECT_WSUPPRESS_END
+#define XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code)                                         __COMPILER_REDIRECT_WSUPPRESS_BEGIN __XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code) __REDIRECT_WSUPPRESS_END
+#else /* __REDIRECT_WSUPPRESS_BEGIN */
+#define REDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args)                                       __COMPILER_REDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args)
+#define REDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args)                                          __COMPILER_REDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args)
+#define VREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)    __COMPILER_VREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)
+#define VREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)       __COMPILER_VREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)
+#define VFREDIRECT(decl,attr,Treturn,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) __COMPILER_VFREDIRECT(decl,attr,Treturn,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)
+#define VFREDIRECT_VOID(decl,attr,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)    __COMPILER_VFREDIRECT_VOID(decl,attr,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)
+#define XREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code)                                      __COMPILER_XREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code)
+#define XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code)                                         __COMPILER_XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code)
+#endif /* !__REDIRECT_WSUPPRESS_BEGIN */
 
 #define PP_PRIVATE_STR      __PP_PRIVATE_STR
 #define PP_STR              __PP_STR

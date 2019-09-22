@@ -22,9 +22,9 @@
 #include "__stdinc.h"
 #include <hybrid/__alloca.h>
 
-#ifdef __NO_hybrid_alloca
+#ifndef __hybrid_alloca
 #error "alloca() isn't support on this platform"
-#endif
+#endif /* !__hybrid_alloca */
 
 #define alloca(s)  __hybrid_alloca((s))
 

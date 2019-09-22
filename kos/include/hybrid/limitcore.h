@@ -34,7 +34,7 @@
 #ifdef __CHAR_MIN__
 #if __CHAR_MIN__ == 0 && !defined(__CHAR_UNSIGNED__)
 #define __CHAR_UNSIGNED__ 1
-#endif
+#endif /* __CHAR_MIN__ == 0 && !__CHAR_UNSIGNED__ */
 #elif defined(_CHAR_UNSIGNED) || defined(_CHAR_IS_UNSIGNED)
 #ifndef __CHAR_UNSIGNED__
 #define __CHAR_UNSIGNED__ 1
@@ -43,84 +43,84 @@
 
 #ifndef __CHAR_BIT__
 #define __CHAR_BIT__ 8
-#endif
+#endif /* !__CHAR_BIT__ */
 #ifndef __SCHAR_MIN__
 #define __SCHAR_MIN__ __PRIVATE_MIN_S(__SIZEOF_CHAR__)
-#endif
+#endif /* !__SCHAR_MIN__ */
 #ifndef __SCHAR_MAX__
 #define __SCHAR_MAX__ __PRIVATE_MAX_S(__SIZEOF_CHAR__)
-#endif
+#endif /* !__SCHAR_MAX__ */
 #ifndef __UCHAR_MAX__
 #define __UCHAR_MAX__ __PRIVATE_MAX_U(__SIZEOF_CHAR__)
-#endif
+#endif /* !__UCHAR_MAX__ */
 #ifndef __CHAR_MIN__
 #ifdef __CHAR_UNSIGNED__
 #   define __CHAR_MIN__ __PRIVATE_MIN_U(__SIZEOF_CHAR__)
 #   define __CHAR_MAX__ __PRIVATE_MAX_U(__SIZEOF_CHAR__)
-#else
+#else /* __CHAR_UNSIGNED__ */
 #   define __CHAR_MIN__ __PRIVATE_MIN_S(__SIZEOF_CHAR__)
 #   define __CHAR_MAX__ __PRIVATE_MAX_S(__SIZEOF_CHAR__)
-#endif
+#endif /* !__CHAR_UNSIGNED__ */
 #endif /* !__CHAR_MIN__ */
 #ifndef __SHRT_MIN__
 #define __SHRT_MIN__ __PRIVATE_MIN_S(__SIZEOF_SHORT__)
-#endif
+#endif /* !__SHRT_MIN__ */
 #ifndef __SHRT_MAX__
 #define __SHRT_MAX__ __PRIVATE_MAX_S(__SIZEOF_SHORT__)
-#endif
+#endif /* !__SHRT_MAX__ */
 #ifndef __USHRT_MAX__
 #define __USHRT_MAX__ __PRIVATE_MAX_U(__SIZEOF_SHORT__)
-#endif
+#endif /* !__USHRT_MAX__ */
 #ifndef __INT_MIN__
 #define __INT_MIN__ __PRIVATE_MIN_S(__SIZEOF_INT__)
-#endif
+#endif /* !__INT_MIN__ */
 #ifndef __INT_MAX__
 #define __INT_MAX__ __PRIVATE_MAX_S(__SIZEOF_INT__)
-#endif
+#endif /* !__INT_MAX__ */
 #ifndef __UINT_MAX__
 #define __UINT_MAX__ __PRIVATE_MAX_U(__SIZEOF_INT__)
-#endif
+#endif /* !__UINT_MAX__ */
 #ifndef __LONG_MIN__
 #define __LONG_MIN__ __PRIVATE_MIN_S(__SIZEOF_LONG__)
-#endif
+#endif /* !__LONG_MIN__ */
 #ifndef __LONG_MAX__
 #define __LONG_MAX__ __PRIVATE_MAX_S(__SIZEOF_LONG__)
-#endif
+#endif /* !__LONG_MAX__ */
 #ifndef __ULONG_MAX__
 #define __ULONG_MAX__ __PRIVATE_MAX_U(__SIZEOF_LONG__)
-#endif
+#endif /* !__ULONG_MAX__ */
 #ifndef __LONG_LONG_MIN__
 #define __LONG_LONG_MIN__ __PRIVATE_MIN_S(__SIZEOF_LONG_LONG__)
-#endif
+#endif /* !__LONG_LONG_MIN__ */
 #ifndef __LONG_LONG_MAX__
 #define __LONG_LONG_MAX__ __PRIVATE_MAX_S(__SIZEOF_LONG_LONG__)
-#endif
+#endif /* !__LONG_LONG_MAX__ */
 #ifndef __ULONG_LONG_MAX__
 #define __ULONG_LONG_MAX__ __PRIVATE_MAX_U(__SIZEOF_LONG_LONG__)
-#endif
+#endif /* !__ULONG_LONG_MAX__ */
 
 #ifndef __SIZE_MIN__
 #define __SIZE_MIN__ __PRIVATE_MIN_U(__SIZEOF_SIZE_T__)
-#endif
+#endif /* !__SIZE_MIN__ */
 #ifndef __SIZE_MAX__
 #define __SIZE_MAX__ __PRIVATE_MAX_U(__SIZEOF_SIZE_T__)
-#endif
+#endif /* !__SIZE_MAX__ */
 #ifndef __SSIZE_MIN__
 #define __SSIZE_MIN__ __PRIVATE_MIN_S(__SIZEOF_SIZE_T__)
-#endif
+#endif /* !__SSIZE_MIN__ */
 #ifndef __SSIZE_MAX__
 #define __SSIZE_MAX__ __PRIVATE_MAX_S(__SIZEOF_SIZE_T__)
-#endif
+#endif /* !__SSIZE_MAX__ */
 
 #ifndef __INTMAX_MIN__
 #define __INTMAX_MIN__ __PRIVATE_MIN_S(__SIZEOF_INTMAX_T__)
-#endif
+#endif /* !__INTMAX_MIN__ */
 #ifndef __INTMAX_MAX__
 #define __INTMAX_MAX__ __PRIVATE_MAX_S(__SIZEOF_INTMAX_T__)
-#endif
+#endif /* !__INTMAX_MAX__ */
 #ifndef __UINTMAX_MAX__
 #define __UINTMAX_MAX__ __PRIVATE_MAX_U(__SIZEOF_INTMAX_T__)
-#endif
+#endif /* !__UINTMAX_MAX__ */
 
 #ifndef __INT8_MIN__
 #define __INT8_MIN__         __PRIVATE_MIN_S1
@@ -262,16 +262,16 @@
 #ifndef __SIG_ATOMIC_MIN__
 #ifdef __SIG_ATOMIC_UNSIGNED__
 #define __SIG_ATOMIC_MIN__   __PRIVATE_MIN_U(__SIZEOF_SIG_ATOMIC_T__)
-#else
+#else /* __SIG_ATOMIC_UNSIGNED__ */
 #define __SIG_ATOMIC_MIN__   __PRIVATE_MIN_S(__SIZEOF_SIG_ATOMIC_T__)
-#endif
+#endif /* !__SIG_ATOMIC_UNSIGNED__ */
 #endif /* !__SIG_ATOMIC_MIN__ */
 #ifndef __SIG_ATOMIC_MAX__
 #ifdef __SIG_ATOMIC_UNSIGNED__
 #define __SIG_ATOMIC_MAX__   __PRIVATE_MAX_U(__SIZEOF_SIG_ATOMIC_T__)
-#else
+#else /* __SIG_ATOMIC_UNSIGNED__ */
 #define __SIG_ATOMIC_MAX__   __PRIVATE_MAX_S(__SIZEOF_SIG_ATOMIC_T__)
-#endif
+#endif /* !__SIG_ATOMIC_UNSIGNED__ */
 #endif /* !__SIG_ATOMIC_MAX__ */
 
 #ifndef __WCHAR_MIN__
@@ -284,9 +284,9 @@
 #ifndef __WCHAR_MAX__
 #ifndef __WCHAR_UNSIGNED__
 #   define __WCHAR_MAX__        __PRIVATE_MIN_S(__SIZEOF_WCHAR_T__)
-#else
+#else /* __WCHAR_UNSIGNED__ */
 #   define __WCHAR_MAX__        __PRIVATE_MIN_S(__SIZEOF_WCHAR_T__)
-#endif
+#endif /* !__WCHAR_UNSIGNED__ */
 #endif /* !__WCHAR_MAX__ */
 #ifndef __WINT_MIN__
 #   define __WINT_MIN__         __PRIVATE_MIN_S(__SIZEOF_WINT_T__)

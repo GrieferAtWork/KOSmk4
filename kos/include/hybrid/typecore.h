@@ -24,17 +24,17 @@
 /* Autocomplete gcc-style compiler intrinsic predefined macros. */
 #ifndef __SIZEOF_CHAR__
 #define __SIZEOF_CHAR__  1
-#endif
+#endif /* !__SIZEOF_CHAR__ */
 #ifndef __SIZEOF_SHORT__
 #define __SIZEOF_SHORT__ 2
-#endif
+#endif /* !__SIZEOF_SHORT__ */
 #ifndef __SIZEOF_INT__
 #ifdef __sizeof_int
 #define __SIZEOF_INT__   __sizeof_int
-#else
+#else /* __sizeof_int */
 #define __SIZEOF_INT__   4
-#endif
-#endif
+#endif /* !__sizeof_int */
+#endif /* !__SIZEOF_INT__ */
 #ifndef __SIZEOF_LONG__
 #ifdef __sizeof_long
 #define __SIZEOF_LONG__ __sizeof_long
@@ -47,12 +47,12 @@
 #else
 #   define __SIZEOF_LONG__  __SIZEOF_POINTER__
 #endif
-#endif
+#endif /* !__SIZEOF_LONG__ */
 #ifndef __SIZEOF_LONG_LONG__
 #ifdef __COMPILER_HAVE_LONGLONG
 #   define __SIZEOF_LONG_LONG__  8
-#endif
-#endif
+#endif /* __COMPILER_HAVE_LONGLONG */
+#endif /* !__SIZEOF_LONG_LONG__ */
 
 #ifndef __INT8_C
 #if defined(_MSC_VER) || __has_extension(tpp_msvc_integer_suffix)
@@ -115,7 +115,7 @@
 #define __UINT16_C(c)  c
 #define __UINT32_C(c)  c
 #define __UINT64_C(c)  c
-#endif
+#endif /* !__CC__ */
 
 #define __PRIVATE_MIN_S1  (-__INT8_C(127)-__INT8_C(1))
 #define __PRIVATE_MAX_S1    __INT8_C(127)
@@ -138,7 +138,7 @@
 #define __PRIVATE_MAX_S16   __INT128_C(170141183460469231731687303715884105727)
 #define __PRIVATE_MIN_U16   __UINT128_C(0)
 #define __PRIVATE_MAX_U16   __UINT128_C(0xffffffffffffffffffffffffffffffff)
-#endif
+#endif /* __INT128_C */
 
 #ifndef __INTMAX_C
 #define __INTMAX_C(c)  __INT64_C(c)
@@ -148,7 +148,7 @@
 #ifndef __SIZEOF_POINTER__
 #ifdef __sizeof_ptr
 #define __SIZEOF_POINTER__ __sizeof_ptr
-#else
+#else /* __sizeof_ptr */
 #   include "host.h"
 #if defined(__x86_64__) || defined(__aarch64__)
 #   define __SIZEOF_POINTER__ 8
@@ -187,14 +187,14 @@
 #endif /* !__SIZEOF_POINTER__ */
 #endif /* !__SIZEOF_POINTER__ */
 #endif /* ... */
-#endif
+#endif /* !__sizeof_ptr */
 #endif /* !__SIZEOF_POINTER__ */
 #ifndef __SIZEOF_PTRDIFF_T__
 #define __SIZEOF_PTRDIFF_T__ __SIZEOF_POINTER__
-#endif
+#endif /* !__SIZEOF_PTRDIFF_T__ */
 #ifndef __SIZEOF_SIZE_T__
 #define __SIZEOF_SIZE_T__ __SIZEOF_POINTER__
-#endif
+#endif /* !__SIZEOF_SIZE_T__ */
 
 
 #if __SIZEOF_POINTER__ == 8

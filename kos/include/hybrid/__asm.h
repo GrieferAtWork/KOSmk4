@@ -28,12 +28,12 @@
 #define __ASM_END        );
 #if defined(__TPP_VERSION__)
 #define __ASM_ARG(x)     x
-#else
+#else /* __TPP_VERSION__ */
 /* CPP doesn't seem to escape this backslash when using PP_STR()?
  * Don't know if that's a bug, but I do know TPP does escape it.
  * So... Add the second slash manually to work around that. */
 #define __ASM_ARG(x)     \x
-#endif
+#endif /* !__TPP_VERSION__ */
 #define __ASM_LINE2(...) #__VA_ARGS__ "\n\t"
 #define __ASM_L(...)     __ASM_LINE2(__VA_ARGS__)
 #elif defined(__ASSEMBLY__)

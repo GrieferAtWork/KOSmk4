@@ -67,75 +67,63 @@ __DECL_BEGIN
  *
  * addrlevel:
  *   - The index of the bit that was set for the current iteration.
- *   - Technically not required, as it can be calculated from an addrsemi,
+ *   - Technically not required, as it can be calculated from an addrsemi (s.a. CLZ()),
  *     carrying this around still allows the addrtree to run faster.
  *
- *
- * The 'addrtree_head' is designed as an inline
- * structure to be included in other, larger objects:
- *
- * >> struct my_mapping {
- * >>   struct addrtree_head head;
- * >>   int                  value;
- * >> };
- * >>
- * >> static struct my_mapping *tree = NULL;
- * >>
- * >> static int lookup(uintptr_t addr) {
- * >>   struct my_mapping *m = (struct my_mapping *)ATREE_LOCATE(tree,addr);
- * >>   return m ? m->value : -1;
- * >> }
- * >> static void map(uintptr_t min, uintptr_t max, int val) {
- * >>   struct my_mapping *m = omalloc(struct my_mapping);
- * >>   addrtree_init_for_insert(&m->head,min,max);
- * >>   m->value = val;
- * >>   ATREE_INSERT(&tree,m);
- * >> }
- * >> static void unmapat(uintptr_t addr) {
- * >>   // NOTE: Fast ranged unmapping is also possible, but not covered here.
- * >>   free(ATREE_REMOVE(&tree,addr));
- * >> }
  */
 
 
-#define ATREE_HEAD(T)  T *
-#define ATREE_NODE(T,Tkey) \
- struct { T    *a_min;  /* [0..1] Lower node. */ \
-          T    *a_max;  /* [0..1] Upper node. */ \
-          Tkey  a_vmin; /* Lower bound. */ \
-          Tkey  a_vmax; /* Upper bound. */ \
- }
+#define ATREE_HEAD(T) T *
+#define ATREE_NODE(T, Tkey)                   \
+	struct {                                  \
+		T *a_min;    /* [0..1] Lower node. */ \
+		T *a_max;    /* [0..1] Upper node. */ \
+		Tkey a_vmin; /* Lower bound. */       \
+		Tkey a_vmax; /* Upper bound. */       \
+	}
 
-#define ATREE_NODE_SINGLE(T,Tkey) \
- struct { T    *a_min;   /* [0..1] Lower node. */ \
-          T    *a_max;   /* [0..1] Upper node. */ \
-          Tkey  a_vaddr; /* Node address. */ \
- }
+#define ATREE_NODE_SINGLE(T, Tkey)             \
+	struct {                                   \
+		T *a_min;     /* [0..1] Lower node. */ \
+		T *a_max;     /* [0..1] Upper node. */ \
+		Tkey a_vaddr; /* Node address. */      \
+	}
 
-#define ATREE_XNODE(T) \
- struct { T    *a_min;  /* [0..1] Lower node. */ \
-          T    *a_max;  /* [0..1] Upper node. */ \
- }
+#define ATREE_XNODE(T)                     \
+	struct {                               \
+		T *a_min; /* [0..1] Lower node. */ \
+		T *a_max; /* [0..1] Upper node. */ \
+	}
 
-#define ATREE_LEVEL_T                     unsigned int
-#define ATREE_SEMI_T(Tkey)                Tkey
-#define ATREE_SEMI0(Tkey)                ((((ATREE_SEMI_T(Tkey))-1)/2)+1)
-#define ATREE_LEVEL0(Tkey)               ((sizeof(Tkey)*8)-1)
+#define ATREE_LEVEL_T      unsigned int
+#define ATREE_SEMI_T(Tkey) Tkey
+#define ATREE_SEMI0(Tkey)  ((((ATREE_SEMI_T(Tkey)) - 1) / 2) + 1)
+#define ATREE_LEVEL0(Tkey) ((sizeof(Tkey) * 8) - 1)
 
-#define ATREE_SEMI0_BITS(Tkey,key_bits)  (((((ATREE_SEMI_T(Tkey))1 << (key_bits))-1)/2)+1)
-#define ATREE_LEVEL0_BITS(Tkey,key_bits)    ((key_bits)-1)
+#define ATREE_SEMI0_BITS(Tkey, key_bits) \
+	(((((ATREE_SEMI_T(Tkey))1 << (key_bits)) - 1) / 2) + 1)
+#define ATREE_LEVEL0_BITS(Tkey, key_bits) \
+	((key_bits)-1)
 
-#define ATREE_MAPMIN(Tkey,semi,level)  (Tkey)((semi)&~(((ATREE_SEMI_T(Tkey))1 << (level))))
-#define ATREE_MAPMAX(Tkey,semi,level)  (Tkey)((semi)| (((ATREE_SEMI_T(Tkey))1 << (level))-1))
-#define ATREE_WALKMIN(Tkey,semi,level) ((semi)  = (((semi)&~((ATREE_SEMI_T(Tkey))1 << (level)))| \
-                                                   ((ATREE_SEMI_T(Tkey))1 << ((level)-1))), \
-                                        --(level)) /* unset level`th bit; set level`th-1 bit. */
-#define ATREE_WALKMAX(Tkey,semi,level) (--(level),(semi) |= ((ATREE_SEMI_T(Tkey))1 << (level))) /* set level`th-1 bit. */
-#define ATREE_NEXTMIN(Tkey,semi,level) (((semi)&~((ATREE_SEMI_T(Tkey))1 << (level)))| \
-                                       ((ATREE_SEMI_T(Tkey))1 << ((level)-1))) /* unset level`th bit; set level`th-1 bit. */
-#define ATREE_NEXTMAX(Tkey,semi,level) ((semi)|((ATREE_SEMI_T(Tkey))1 << ((level)-1))) /* set level`th-1 bit. */
-#define ATREE_NEXTLEVEL(level)         ((level)-1)
-#define ATREE_SEMILEVEL(semi)          (ATREE_LEVEL_T)(ffs(semi)-1) /* Get the current level associated with a given semi-key. */
+#define ATREE_MAPMIN(Tkey, semi, level) \
+	(Tkey)((semi) & ~(((ATREE_SEMI_T(Tkey))1 << (level))))
+#define ATREE_MAPMAX(Tkey, semi, level) \
+	(Tkey)((semi) | (((ATREE_SEMI_T(Tkey))1 << (level)) - 1))
+#define ATREE_WALKMIN(Tkey, semi, level)                        \
+	((semi) = (((semi) & ~((ATREE_SEMI_T(Tkey))1 << (level))) | \
+	           ((ATREE_SEMI_T(Tkey))1 << ((level)-1))),         \
+	 --(level)) /* unset level`th bit; set level`th-1 bit. */
+#define ATREE_WALKMAX(Tkey, semi, level) \
+	(--(level), (semi) |= ((ATREE_SEMI_T(Tkey))1 << (level))) /* set level`th-1 bit. */
+#define ATREE_NEXTMIN(Tkey, semi, level)              \
+	(((semi) & ~((ATREE_SEMI_T(Tkey))1 << (level))) | \
+	 ((ATREE_SEMI_T(Tkey))1 << ((level)-1))) /* unset level`th bit; set level`th-1 bit. */
+#define ATREE_NEXTMAX(Tkey, semi, level) \
+	((semi) | ((ATREE_SEMI_T(Tkey))1 << ((level)-1))) /* set level`th-1 bit. */
+#define ATREE_NEXTLEVEL(level) \
+	((level)-1)
+#define ATREE_SEMILEVEL(semi) \
+	(ATREE_LEVEL_T)(ffs(semi) - 1) /* Get the current level associated with a given semi-key. */
 
 __DECL_END
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2977c553 */
+/* HASH CRC-32:0x3a144e2e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,7 +72,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_c16repeat))(__pc16formatprinte
 #define __FORMAT_REPEAT_BUFSIZE 64
 #endif
 	__SSIZE_TYPE__ __result, __temp;
-#ifndef __NO_hybrid_alloca
+#ifdef __hybrid_alloca
 	__CHAR16_TYPE__ *__buffer;
 	if __likely(__num_repetitions <= __FORMAT_REPEAT_BUFSIZE) {
 		__buffer = (__CHAR16_TYPE__ *)__hybrid_alloca(__num_repetitions);
@@ -85,7 +85,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_c16repeat))(__pc16formatprinte
 	}
 	__buffer = (__CHAR16_TYPE__ *)__hybrid_alloca(__FORMAT_REPEAT_BUFSIZE);
 	__localdep_memset(__buffer, __ch, __FORMAT_REPEAT_BUFSIZE);
-#else
+#else /* __hybrid_alloca */
 	__CHAR16_TYPE__ __buffer[__FORMAT_REPEAT_BUFSIZE];
 	if __likely(__num_repetitions <= __FORMAT_REPEAT_BUFSIZE) {
 
@@ -96,7 +96,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_c16repeat))(__pc16formatprinte
 		return (*__printer)(__arg, __buffer, __num_repetitions);
 	}
 	__localdep_memset(__buffer, __ch, __FORMAT_REPEAT_BUFSIZE);
-#endif
+#endif /* !__hybrid_alloca */
 	__result = (*__printer)(__arg, __buffer, __FORMAT_REPEAT_BUFSIZE);
 	if __unlikely(__result < 0)
 		goto __done;

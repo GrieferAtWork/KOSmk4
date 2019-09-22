@@ -16,37 +16,39 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#define __GCC_VERSION(a,b,c) 0
+#ifndef __GCC_VERSION
+#define __GCC_VERSION(a, b, c) 0
+#endif /* !__GCC_VERSION */
 #ifndef __option
 #define __option(x) 0
-#endif
+#endif /* !__option */
 
 #ifndef __has_builtin
 #define __NO_has_builtin 1
 #define __has_builtin(x) 0
-#endif
+#endif /* !__has_builtin */
 #ifndef __has_feature
 #define __NO_has_builtin 1
 #define __has_feature(x) 0
-#endif
+#endif /* !__has_feature */
 #ifndef __has_attribute
 #define __NO_has_attribute 1
 #define __has_attribute(x) 0
-#endif
+#endif /* !__has_attribute */
 #ifndef __has_extension
 #ifndef __NO_has_feature
 #define __NO_has_extension 1
-#endif
+#endif /* !__NO_has_feature */
 #define __has_extension  __has_feature
-#endif
+#endif /* !__has_extension */
 #ifndef __has_declspec_attribute
 #define __NO_has_declspec_attribute 1
 #define __has_declspec_attribute(x) 0
-#endif
+#endif /* !__has_declspec_attribute */
 #ifndef __has_cpp_attribute
 #define __NO_has_cpp_attribute 1
 #define __has_cpp_attribute(x) 0
-#endif
+#endif /* !__has_cpp_attribute */
 
 #if __has_builtin(__builtin_expect) || \
    (defined(__INTEL_VERSION__) && __INTEL_VERSION__ >= 800)
@@ -60,7 +62,7 @@
 #endif
 #if defined(__STDC_VERSION__) && __STDC_VERSION__+0 >= 201112L
 #define __COMPILER_HAVE_C11_GENERIC 1
-#endif
+#endif /* __STDC_VERSION__ >= 201112L */
 #if __has_builtin(__builtin_choose_expr)
 /* Already a builtin. */
 #elif defined(__COMPILER_HAVE_C11_GENERIC)
@@ -74,14 +76,14 @@
 #if !__has_builtin(__builtin_types_compatible_p)
 #define __NO_builtin_types_compatible_p   1
 #define __builtin_types_compatible_p(...) 0
-#endif
+#endif /* !__has_builtin(__builtin_types_compatible_p) */
 
 #ifdef __STDC__
 #   define __P(x) x
-#else
+#else /* __STDC__ */
 #   define __NO_PROTOTYPES 1
 #   define __P(x) ()
-#endif
+#endif /* !__STDC__ */
 
 /* TODO: Unify use of `__FUNCTION__'
 #if __STDC_VERSION__ >= 199901L
@@ -95,8 +97,8 @@
      defined(__CODEGEARC__) || defined(__DMC__) || \
     (defined(__HP_aCC) && __HP_aCC+0 >= 33900) || \
     (defined(__PGIC__) && __PGIC__+0 >= 10))
-#   define __COMPILER_HAVE_LONGLONG 1
-#endif
+#define __COMPILER_HAVE_LONGLONG 1
+#endif /* long long... */
 #define __COMPILER_HAVE_LONGDOUBLE 1
 #define __COMPILER_HAVE_TRANSPARENT_STRUCT 1
 #define __COMPILER_HAVE_TRANSPARENT_UNION 1
@@ -107,12 +109,12 @@
 #define __COMPILER_HAVE_PRAGMA_PACK 1
 #endif
 #if __has_feature(__tpp_pragma_push_macro__) || \
-   (defined(__TPP_VERSION__) && __TPP_VERSION__ == 103)
+    (defined(__TPP_VERSION__) && __TPP_VERSION__ == 103)
 #define __COMPILER_HAVE_PRAGMA_PUSHMACRO 1
-#endif
+#endif /* #pragma push_macro(...) */
 #if __has_feature(__tpp_pragma_deprecated__)
 #define __COMPILER_HAVE_PRAGMA_DEPRECATED 1
-#endif
+#endif /* #pragma deprecated(...) */
 
 #if defined(__DCC_VERSION__)
 #   define __COMPILER_HAVE_AUTOTYPE 1
@@ -122,11 +124,11 @@
 #endif
 #if defined(__DCC_VERSION__) || defined(__TINYC__)
 #   define __COMPILER_HAVE_TYPEOF   1
-#endif
+#endif /* __DCC_VERSION__ || __TINYC__ */
 
 #if defined(__BORLANDC__) && __BORLANDC__ >= 0x599
 #pragma defineonoption __CODEGEAR_0X_SUPPORT__ -Ax
-#endif
+#endif /* __BORLANDC__ >= 0x599 */
 
 #if __has_feature(cxx_static_assert) || \
    (defined(__IBMCPP_STATIC_ASSERT) && __IBMCPP_STATIC_ASSERT+0) || (defined(__cplusplus) && (\
@@ -153,16 +155,16 @@
 
 #if defined(__DCC_VERSION__) || defined(__TINYC__)
 #   define __ASMNAME(x)   __asm__(x)
-#else
+#else /* __DCC_VERSION__ || __TINYC__ */
 #   define __NO_ASMNAME   1
 #   define __ASMNAME(x)   /* Nothing */
-#endif
+#endif /* !__DCC_VERSION__ && !__TINYC__ */
 #ifndef __DCC_VERSION__
 #   define __extension__
-#endif
+#endif /* !__DCC_VERSION__ */
 #if __has_builtin(__builtin_va_list)
 #   define __builtin_va_list      __builtin_va_list
-#endif
+#endif /* __has_builtin(__builtin_va_list) */
 #if !defined(__DCC_VERSION__) && !defined(__FUNCTION__)
 #if defined(__TINYC__) || 1
 #   define __FUNCTION__ __func__
@@ -172,7 +174,7 @@
 #   define __NO_FUNCTION__ 1
 #   define __FUNCTION__ (char *)0
 #endif
-#endif
+#endif /* !__DCC_VERSION__ && !__FUNCTION__ */
 #if __has_attribute(__noinline__)
 #   define __ATTR_NOINLINE       __attribute__((__noinline__))
 #elif __has_declspec_attribute(noinline)
@@ -665,14 +667,14 @@ namespace __intern { template<class T> struct __compiler_alignof { char __x; T _
 #   define __IF1     if(true)
 #   define __WHILE0  while(false)
 #   define __WHILE1  while(true)
-#else
+#else /* __cplusplus */
 #   define __STATIC_IF(x)   if(x)
 #   define __STATIC_ELSE(x) if(!(x))
 #   define __IF0     if(0)
 #   define __IF1     if(1)
 #   define __WHILE0  while(0)
 #   define __WHILE1  while(1)
-#endif
+#endif /* !__cplusplus */
 #define __COMPILER_BARRIERS_ALL_IDENTICAL 1
 #define __COMPILER_BARRIER()       (void)0 /* ??? */
 #define __COMPILER_READ_BARRIER()  (void)0 /* ??? */
@@ -681,43 +683,45 @@ namespace __intern { template<class T> struct __compiler_alignof { char __x; T _
 #ifdef __cplusplus
 #ifdef __INTELLISENSE__
 #   define __NULLPTR    nullptr
-#else
+#else /* __INTELLISENSE__ */
 #   define __NULLPTR          0
-#endif
-#else
+#endif /* !__INTELLISENSE__ */
+#else /* __cplusplus */
 #   define __NULLPTR ((void *)0)
-#endif
+#endif /* !__cplusplus */
 
 /* Mark the wchar_t type as already being defined when pre-defined by the compiler */
 #ifdef __cplusplus
 #if !defined(__MWERKS__) || __option(wchar_type)
 #define __native_wchar_t_defined 1
 #define __wchar_t_defined 1
-#endif
-#endif
+#endif /* !__MWERKS__ || __option(wchar_type) */
+#endif /* __cplusplus */
 
 #ifdef __TINYC__
 /* TCC predefines its own redirect macro incompatible with our's.
  * That's no good, but there is one pretty neat thing we can take
- * out of this: It does so when targeting ELF, meaning that while
- * deleting its predefinition, we can easily detect when compiling
+ * out of this: It does so when targeting ELF, meaning that by
+ * deleting this predefinition, we can easily detect when compiling
  * for ELF, and conversely when compiling for PE. */
 #ifdef __REDIRECT
 #   define __ELF__ 1
+#ifdef __KOS_SYSTEM_HEADERS__
 #   undef __REDIRECT
 #   undef __REDIRECT_NTH
+#endif /* __KOS_SYSTEM_HEADERS__ */
 #else /* __REDIRECT */
 #   define __PE__  1
 #endif /* !__REDIRECT */
 #endif /* __TINYC__ */
 
-#ifdef c_plusplus
+#if defined(c_plusplus) && !defined(__cplusplus)
 #if (c_plusplus+0) != 0
 #   define __cplusplus  (c_plusplus)
 #else
 #   define __cplusplus   0
 #endif
-#endif
+#endif /* c_plusplus && !__cplusplus */
 
 
 /* Define varargs macros expected by system headers. */

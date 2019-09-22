@@ -94,7 +94,7 @@ format_repeat:([nonnull] pformatprinter printer, void *arg, char ch, $size_t num
 #define FORMAT_REPEAT_BUFSIZE 64
 #endif
 	ssize_t result, temp;
-#ifndef __NO_hybrid_alloca
+#ifdef __hybrid_alloca
 	char *buffer;
 	if __likely(num_repetitions <= FORMAT_REPEAT_BUFSIZE) {
 		buffer = (char *)__hybrid_alloca(num_repetitions);
@@ -107,7 +107,7 @@ format_repeat:([nonnull] pformatprinter printer, void *arg, char ch, $size_t num
 	}
 	buffer = (char *)__hybrid_alloca(FORMAT_REPEAT_BUFSIZE);
 	memset(buffer, ch, FORMAT_REPEAT_BUFSIZE);
-#else
+#else /* __hybrid_alloca */
 	char buffer[FORMAT_REPEAT_BUFSIZE];
 	if __likely(num_repetitions <= FORMAT_REPEAT_BUFSIZE) {
 @@if $wchar_function@@
@@ -118,7 +118,7 @@ format_repeat:([nonnull] pformatprinter printer, void *arg, char ch, $size_t num
 		return (*printer)(arg, buffer, num_repetitions);
 	}
 	memset(buffer, ch, FORMAT_REPEAT_BUFSIZE);
-#endif
+#endif /* !__hybrid_alloca */
 	result = (*printer)(arg, buffer, FORMAT_REPEAT_BUFSIZE);
 	if __unlikely(result < 0)
 		goto done;

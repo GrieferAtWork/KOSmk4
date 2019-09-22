@@ -46,47 +46,47 @@ extern unsigned __int64 (_byteswap_uint64)(unsigned __int64 x);
 #define __impl_hybrid_bswap16(x)   _byteswap_ushort(x)
 #define __impl_hybrid_bswap32(x)   _byteswap_ulong(x)
 #define __impl_hybrid_bswap64(x)   _byteswap_uint64(x)
-#else
+#else /* _MSC_VER */
 #if defined(__GNUC__) || __has_builtin(__builtin_bswap16)
 #define __impl_hybrid_bswap16(x)  __builtin_bswap16(x)
-#else
+#else /* __GNUC__ || __has_builtin(__builtin_bswap16) */
 __LOCAL __ATTR_CONST __UINT16_TYPE__
 __NOTHROW(__impl_hybrid_bswap16(__UINT16_TYPE__ __x)) {
 	return __hybrid_bswap16_c(__x);
 }
-#endif
+#endif /* !__GNUC__ && !__has_builtin(__builtin_bswap16) */
 #if defined(__GNUC__) || __has_builtin(__builtin_bswap32)
 #define __impl_hybrid_bswap32(x)  __builtin_bswap32(x)
-#else
+#else /* __GNUC__ || __has_builtin(__builtin_bswap32) */
 __LOCAL __ATTR_CONST __UINT32_TYPE__
 __NOTHROW(__impl_hybrid_bswap32(__UINT32_TYPE__ __x)) {
 	return ((__UINT32_TYPE__)__impl_hybrid_bswap16((__UINT16_TYPE__)__x) << 16) |
 	        (__UINT32_TYPE__)__impl_hybrid_bswap16((__UINT16_TYPE__)((__x) >> 16));
 }
-#endif
+#endif /* !__GNUC__ && !__has_builtin(__builtin_bswap32) */
 #ifdef __UINT64_TYPE__
 #if defined(__GNUC__) || __has_builtin(__builtin_bswap64)
 #define __impl_hybrid_bswap64(x)  __builtin_bswap64(x)
-#else
+#else /* __GNUC__ || __has_builtin(__builtin_bswap64) */
 __LOCAL __ATTR_CONST __UINT64_TYPE__
 __NOTHROW(__impl_hybrid_bswap64(__UINT64_TYPE__ __x)) {
 	return ((__UINT64_TYPE__)__impl_hybrid_bswap32((__UINT32_TYPE__)__x) << 32) |
 	        (__UINT64_TYPE__)__impl_hybrid_bswap32((__UINT32_TYPE__)((__x) >> 32));
 }
-#endif
+#endif /* !__GNUC__ && !__has_builtin(__builtin_bswap64) */
 #endif /* __UINT64_TYPE__ */
-#endif
+#endif /* !_MSC_VER */
 
 #ifdef __UINT128_TYPE__
 #if defined(__GNUC__) || __has_builtin(__builtin_bswap128)
 #define __impl_hybrid_bswap128(x)  __builtin_bswap128(x)
-#else
+#else /* __GNUC__ || __has_builtin(__builtin_bswap128) */
 __LOCAL __ATTR_CONST __UINT128_TYPE__
 __NOTHROW(__impl_hybrid_bswap128(__UINT128_TYPE__ __x)) {
 	return ((__UINT128_TYPE__)__impl_hybrid_bswap64((__UINT64_TYPE__)__x) << 64) |
 	        (__UINT128_TYPE__)__impl_hybrid_bswap64((__UINT64_TYPE__)((__x) >> 64));
 }
-#endif
+#endif /* !__GNUC__ && !__has_builtin(__builtin_bswap128) */
 #endif /* __UINT128_TYPE__ */
 
 #ifndef __CC__

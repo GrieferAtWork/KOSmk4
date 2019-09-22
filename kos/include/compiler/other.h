@@ -21,19 +21,19 @@
 #if __ASSEMBLY__+0 == 0
 #undef __ASSEMBLY__
 #define __ASSEMBLY__  1
-#endif
+#endif /* __ASSEMBLY__+0 == 0 */
 #elif defined(__ASSEMBLER__)
 #if __ASSEMBLER__+0 == 0
 #define __ASSEMBLY__   1
-#else
+#else /* __ASSEMBLER__+0 == 0 */
 #define __ASSEMBLY__   __ASSEMBLER__
-#endif
+#endif /* __ASSEMBLER__+0 != 0 */
 #elif defined(__assembler)
 #if __assembler+0 == 0
 #define __ASSEMBLY__   1
-#else
+#else /* __assembler+0 == 0 */
 #define __ASSEMBLY__   __assembler
-#endif
+#endif /* __assembler+0 != 0 */
 #endif
 
 /* Both `__ASSEMBLER__' and `__ASSEMBLY__'
@@ -41,12 +41,12 @@
 #ifdef __ASSEMBLY__
 #ifndef __ASSEMBLER__
 #define __ASSEMBLER__  __ASSEMBLY__
-#endif
-#endif
+#endif /* !__ASSEMBLER__ */
+#endif /* __ASSEMBLY__ */
 
 #if defined(__ASSEMBLER__) && defined(__LINKER__)
 #error "Detected both assembler and linker?"
-#endif
+#endif /* __ASSEMBLER__ && __LINKER__ */
 
 
 #ifdef __ASSEMBLER__
@@ -73,19 +73,21 @@
 #endif
 
 
-#define __GCC_VERSION(a,b,c)   0
-#define __builtin_expect(x,y) (x)
+#ifndef __GCC_VERSION
+#define __GCC_VERSION(a, b, c) 0
+#endif /* !__GCC_VERSION */
+#define __builtin_expect(x, y) (x)
 #define __NO_builtin_expect    1
 #define __likely               /* Nothing */
 #define __unlikely             /* Nothing */
 #define __P(x)                 /* Nothing */
 #ifdef __LINKER__
-#   define __STATIC_ASSERT(expr)         ASSERT(expr,#expr)
-#   define __STATIC_ASSERT_MSG(expr,msg) ASSERT(expr,msg)
-#else
-#   define __STATIC_ASSERT(expr)         /* Nothing */
-#   define __STATIC_ASSERT_MSG(expr,msg) /* Nothing */
-#endif
+#define __STATIC_ASSERT(expr)          ASSERT(expr, #expr)
+#define __STATIC_ASSERT_MSG(expr, msg) ASSERT(expr, msg)
+#else /* __LINKER__ */
+#define __STATIC_ASSERT(expr)          /* Nothing */
+#define __STATIC_ASSERT_MSG(expr, msg) /* Nothing */
+#endif /* !__LINKER__ */
 
 #define __extension__            /* Nothing */
 #define __restrict               /* nothing */
@@ -231,4 +233,4 @@
 #define union     <<__FILE__:__LINE__:ERROR: Invalid keyword: 'union'>>
 #define typedef   <<__FILE__:__LINE__:ERROR: Invalid keyword: 'typedef'>>
 #define enum      <<__FILE__:__LINE__:ERROR: Invalid keyword: 'enum'>>
-#endif
+#endif /* __LINKER__ */

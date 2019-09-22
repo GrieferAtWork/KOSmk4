@@ -22,7 +22,7 @@
 #include <__stdinc.h>
 #include "__minmax.h"
 
-#define MIN(a,b) __hybrid_min(a,b)
-#define MAX(a,b) __hybrid_max(a,b)
+#define MIN(a, b) __hybrid_min(a, b)
+#define MAX(a, b) __hybrid_max(a, b)
 
 #endif /* !__GUARD_HYBRID_MINMAX_H */

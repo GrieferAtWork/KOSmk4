@@ -356,36 +356,36 @@
 #define ____PRIVATE_VREDIRECT_UNPACK(...)  __VA_ARGS__
 
 /* General purpose redirection implementation. */
-#ifndef __REDIRECT
+#ifndef __COMPILER_REDIRECT
 #ifdef __INTELLISENSE__
 /* Only declare the functions for intellisense to minimize IDE lag. */
-#define __REDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args)                                       decl attr Treturn nothrow(cc name) param;
-#define __REDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args)                                          decl attr void nothrow(cc name) param;
-#define __VREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)    decl attr Treturn nothrow(cc name)(____PRIVATE_VREDIRECT_UNPACK param, ...);
-#define __VREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)       decl attr void nothrow(cc name)(____PRIVATE_VREDIRECT_UNPACK param, ...);
-#define __VFREDIRECT(decl,attr,Treturn,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) decl attr Treturn nothrow(cc name) paramf;
-#define __VFREDIRECT_VOID(decl,attr,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)    decl attr void nothrow(cc name) paramf;
-#define __XREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code)                                      decl attr Treturn nothrow(cc name) param;
-#define __XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code)                                         decl attr void nothrow(cc name) param;
+#define __COMPILER_REDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args)                                       decl attr Treturn nothrow(cc name) param;
+#define __COMPILER_REDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args)                                          decl attr void nothrow(cc name) param;
+#define __COMPILER_VREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)    decl attr Treturn nothrow(cc name)(____PRIVATE_VREDIRECT_UNPACK param, ...);
+#define __COMPILER_VREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)       decl attr void nothrow(cc name)(____PRIVATE_VREDIRECT_UNPACK param, ...);
+#define __COMPILER_VFREDIRECT(decl,attr,Treturn,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) decl attr Treturn nothrow(cc name) paramf;
+#define __COMPILER_VFREDIRECT_VOID(decl,attr,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)    decl attr void nothrow(cc name) paramf;
+#define __COMPILER_XREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code)                                      decl attr Treturn nothrow(cc name) param;
+#define __COMPILER_XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code)                                         decl attr void nothrow(cc name) param;
 #elif !defined(__CC__)
-#define __REDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args)                                       /* nothing */
-#define __REDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args)                                          /* nothing */
-#define __VREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)    /* nothing */
-#define __VREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)       /* nothing */
-#define __VFREDIRECT(decl,attr,Treturn,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) /* nothing */
-#define __VFREDIRECT_VOID(decl,attr,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)    /* nothing */
-#define __XREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code)                                      /* nothing */
-#define __XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code)                                         /* nothing */
+#define __COMPILER_REDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args)                                       /* nothing */
+#define __COMPILER_REDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args)                                          /* nothing */
+#define __COMPILER_VREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)    /* nothing */
+#define __COMPILER_VREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)       /* nothing */
+#define __COMPILER_VFREDIRECT(decl,attr,Treturn,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) /* nothing */
+#define __COMPILER_VFREDIRECT_VOID(decl,attr,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)    /* nothing */
+#define __COMPILER_XREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code)                                      /* nothing */
+#define __COMPILER_XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code)                                         /* nothing */
 #elif !defined(__NO_ASMNAME)
 /* Use GCC family's assembly name extension. */
-#define __REDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args)                                       decl attr Treturn nothrow(cc name) param __ASMNAME(__PP_PRIVATE_STR(asmname));
-#define __REDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args)                                          decl attr void nothrow(cc name) param __ASMNAME(__PP_PRIVATE_STR(asmname));
-#define __VREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)    decl attr Treturn nothrow(cc name)(____PRIVATE_VREDIRECT_UNPACK param, ...) __ASMNAME(__PP_PRIVATE_STR(asmname));
-#define __VREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)       decl attr void nothrow(cc name)(____PRIVATE_VREDIRECT_UNPACK param, ...) __ASMNAME(__PP_PRIVATE_STR(asmname));
-#define __VFREDIRECT(decl,attr,Treturn,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) decl attr Treturn nothrow(cc name) paramf __ASMNAME(__PP_PRIVATE_STR(asmnamef));
-#define __VFREDIRECT_VOID(decl,attr,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)    decl attr void nothrow(cc name) paramf __ASMNAME(__PP_PRIVATE_STR(asmnamef));
-#define __XREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code)                                      decl attr Treturn nothrow(cc name) param __ASMNAME(__PP_PRIVATE_STR(asmname));
-#define __XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code)                                         decl attr void nothrow(cc name) param __ASMNAME(__PP_PRIVATE_STR(asmname));
+#define __COMPILER_REDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args)                                       decl attr Treturn nothrow(cc name) param __ASMNAME(__PP_PRIVATE_STR(asmname));
+#define __COMPILER_REDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args)                                          decl attr void nothrow(cc name) param __ASMNAME(__PP_PRIVATE_STR(asmname));
+#define __COMPILER_VREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)    decl attr Treturn nothrow(cc name)(____PRIVATE_VREDIRECT_UNPACK param, ...) __ASMNAME(__PP_PRIVATE_STR(asmname));
+#define __COMPILER_VREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)       decl attr void nothrow(cc name)(____PRIVATE_VREDIRECT_UNPACK param, ...) __ASMNAME(__PP_PRIVATE_STR(asmname));
+#define __COMPILER_VFREDIRECT(decl,attr,Treturn,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start) decl attr Treturn nothrow(cc name) paramf __ASMNAME(__PP_PRIVATE_STR(asmnamef));
+#define __COMPILER_VFREDIRECT_VOID(decl,attr,nothrow,cc,name,paramf,asmnamef,vparamf,vasmnamef,args,before_va_start)    decl attr void nothrow(cc name) paramf __ASMNAME(__PP_PRIVATE_STR(asmnamef));
+#define __COMPILER_XREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code)                                      decl attr Treturn nothrow(cc name) param __ASMNAME(__PP_PRIVATE_STR(asmname));
+#define __COMPILER_XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code)                                         decl attr void nothrow(cc name) param __ASMNAME(__PP_PRIVATE_STR(asmname));
 #else
 
 #define __VREDIRECT_VARUNIQUE(prefix)      __PP_CAT2(prefix,__LINE__)
@@ -405,23 +405,23 @@
 #ifndef __LOCAL_REDIRECT
 #define __LOCAL_REDIRECT  __LOCAL
 #endif /* !__LOCAL_REDIRECT */
-#define __XREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code)  __LOCAL_REDIRECT attr Treturn nothrow(cc name) param code
-#define __XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code)     __LOCAL_REDIRECT attr void nothrow(cc name) param code
+#define __COMPILER_XREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code)  __LOCAL_REDIRECT attr Treturn nothrow(cc name) param code
+#define __COMPILER_XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code)     __LOCAL_REDIRECT attr void nothrow(cc name) param code
 
 #ifdef __cplusplus
 /* In C++, we can use use namespaces to prevent collisions with incompatible prototypes. */
 #define __REDIRECT_UNIQUE  __PP_CAT2(__u,__LINE__)
-#define __REDIRECT(decl, attr, Treturn, nothrow, cc, name, param, asmname, args)                                  \
+#define __COMPILER_REDIRECT(decl, attr, Treturn, nothrow, cc, name, param, asmname, args)                         \
 	namespace __intern { namespace __REDIRECT_UNIQUE { extern "C" { decl Treturn nothrow(cc asmname) param; } } } \
 	__LOCAL_REDIRECT attr Treturn nothrow(cc name) param {                                                        \
 		return (__intern::__REDIRECT_UNIQUE:: asmname) args;                                                      \
 	}
-#define __REDIRECT_VOID(decl, attr, nothrow, cc, name, param, asmname, args)                                   \
+#define __COMPILER_REDIRECT_VOID(decl, attr, nothrow, cc, name, param, asmname, args)                          \
 	namespace __intern { namespace __REDIRECT_UNIQUE { extern "C" { decl void nothrow(cc asmname) param; } } } \
 	__LOCAL_REDIRECT attr void nothrow(cc name) param {                                                        \
 		(__intern::__REDIRECT_UNIQUE:: asmname) args;                                                          \
 	}
-#define __VREDIRECT(decl, attr, Treturn, nothrow, cc, name, param, asmname, args, before_va_start, varcount, vartypes)                               \
+#define __COMPILER_VREDIRECT(decl, attr, Treturn, nothrow, cc, name, param, asmname, args, before_va_start, varcount, vartypes)                      \
 	namespace __intern { namespace __REDIRECT_UNIQUE { extern "C" { decl Treturn nothrow(cc asmname)(____PRIVATE_VREDIRECT_UNPACK param, ...); } } } \
 	__LOCAL_REDIRECT attr Treturn nothrow(cc name)(____PRIVATE_VREDIRECT_UNPACK param, ...) {                                                        \
 		Treturn ____va_result;                                                                                                                       \
@@ -434,7 +434,7 @@
 		__builtin_va_end(____va_args);                                                                                                               \
 		return ____va_result;                                                                                                                        \
 	}
-#define __VREDIRECT_VOID(decl, attr, nothrow, cc, name, param, asmname, args, before_va_start, varcount, vartypes)                                \
+#define __COMPILER_VREDIRECT_VOID(decl, attr, nothrow, cc, name, param, asmname, args, before_va_start, varcount, vartypes)                       \
 	namespace __intern { namespace __REDIRECT_UNIQUE { extern "C" { decl void nothrow(cc asmname)(____PRIVATE_VREDIRECT_UNPACK param, ...); } } } \
 	__LOCAL_REDIRECT attr void nothrow(cc name)(____PRIVATE_VREDIRECT_UNPACK param, ...) {                                                        \
 		__builtin_va_list ____va_args;                                                                                                            \
@@ -445,25 +445,25 @@
 		}                                                                                                                                         \
 		__builtin_va_end(____va_args);                                                                                                            \
 	}
-#define __VFREDIRECT(decl, attr, Treturn, nothrow, cc, name, paramf, asmnamef, vparamf, vasmnamef, args, before_va_start) \
-	namespace __intern { namespace __REDIRECT_UNIQUE { extern "C" { decl Treturn nothrow(cc vasmnamef) vparamf; } } }     \
-	__LOCAL_REDIRECT attr Treturn nothrow(cc name) paramf {                                                               \
-		Treturn ____va_result;                                                                                            \
-		__builtin_va_list ____va_args;                                                                                    \
-		__builtin_va_start(____va_args, before_va_start);                                                                 \
-		____va_result = (__intern::__REDIRECT_UNIQUE:: vasmnamef)(____PRIVATE_VREDIRECT_UNPACK args, ____va_args);        \
-		__builtin_va_end(____va_args);                                                                                    \
-		return ____va_result;                                                                                             \
+#define __COMPILER_VFREDIRECT(decl, attr, Treturn, nothrow, cc, name, paramf, asmnamef, vparamf, vasmnamef, args, before_va_start) \
+	namespace __intern { namespace __REDIRECT_UNIQUE { extern "C" { decl Treturn nothrow(cc vasmnamef) vparamf; } } }              \
+	__LOCAL_REDIRECT attr Treturn nothrow(cc name) paramf {                                                                        \
+		Treturn ____va_result;                                                                                                     \
+		__builtin_va_list ____va_args;                                                                                             \
+		__builtin_va_start(____va_args, before_va_start);                                                                          \
+		____va_result = (__intern::__REDIRECT_UNIQUE:: vasmnamef)(____PRIVATE_VREDIRECT_UNPACK args, ____va_args);                 \
+		__builtin_va_end(____va_args);                                                                                             \
+		return ____va_result;                                                                                                      \
 	}
-#define __VFREDIRECT_VOID(decl, attr, nothrow, cc, name, paramf, asmnamef, vparamf, vasmnamef, args, before_va_start) \
-	namespace __intern { namespace __REDIRECT_UNIQUE { extern "C" { decl void nothrow(cc vasmnamef) vparamf; } } }    \
-	__LOCAL_REDIRECT attr void nothrow(cc name) paramf {                                                              \
-		__builtin_va_list ____va_args;                                                                                \
-		__builtin_va_start(____va_args, before_va_start);                                                             \
-		(__intern::__REDIRECT_UNIQUE:: vasmnamef)(____PRIVATE_VREDIRECT_UNPACK args, ____va_args);                    \
-		__builtin_va_end(____va_args);                                                                                \
+#define __COMPILER_VFREDIRECT_VOID(decl, attr, nothrow, cc, name, paramf, asmnamef, vparamf, vasmnamef, args, before_va_start) \
+	namespace __intern { namespace __REDIRECT_UNIQUE { extern "C" { decl void nothrow(cc vasmnamef) vparamf; } } }             \
+	__LOCAL_REDIRECT attr void nothrow(cc name) paramf {                                                                       \
+		__builtin_va_list ____va_args;                                                                                         \
+		__builtin_va_start(____va_args, before_va_start);                                                                      \
+		(__intern::__REDIRECT_UNIQUE:: vasmnamef)(____PRIVATE_VREDIRECT_UNPACK args, ____va_args);                             \
+		__builtin_va_end(____va_args);                                                                                         \
 	}
-#else
+#else /* __cplusplus */
 /* Fallback: Assume that the compiler supports scoped declarations,
  *           as well as deleting them once the scope ends.
  * NOTE: GCC actually doesn't support this one, somehow keeping
@@ -472,60 +472,71 @@
  * HINT: This implementation does however work for MSVC when compiling for C.
  */
 
-#define __REDIRECT(decl, attr, Treturn, nothrow, cc, name, param, asmname, args) \
-	__LOCAL_REDIRECT attr Treturn nothrow(cc name) param {                       \
-		decl Treturn nothrow(cc asmname) param;                                  \
-		return (asmname) args;                                                   \
+#define __COMPILER_REDIRECT(decl, attr, Treturn, nothrow, cc, name, param, asmname, args) \
+	__LOCAL_REDIRECT attr Treturn nothrow(cc name) param {                                \
+		decl Treturn nothrow(cc asmname) param;                                           \
+		return (asmname) args;                                                            \
 	}
-#define __REDIRECT_VOID(decl, attr, nothrow, cc, name, param, asmname, args) \
-	__LOCAL_REDIRECT attr void nothrow(cc name) param {                      \
-		decl void nothrow(cc asmname) param;                                 \
-		(asmname) args;                                                      \
+#define __COMPILER_REDIRECT_VOID(decl, attr, nothrow, cc, name, param, asmname, args) \
+	__LOCAL_REDIRECT attr void nothrow(cc name) param {                               \
+		decl void nothrow(cc asmname) param;                                          \
+		(asmname) args;                                                               \
 	}
-#define __VREDIRECT(decl, attr, Treturn, nothrow, cc, name, param, asmname, args, before_va_start, varcount, vartypes) \
-	__LOCAL_REDIRECT attr Treturn nothrow(cc name)(____PRIVATE_VREDIRECT_UNPACK param, ...) {                          \
-		decl Treturn nothrow(cc asmname)(____PRIVATE_VREDIRECT_UNPACK param, ...);                                     \
-		Treturn ____va_result;                                                                                         \
-		__builtin_va_list ____va_args;                                                                                 \
-		__builtin_va_start(____va_args, before_va_start);                                                              \
-		{                                                                                                              \
-			__VREDIRECT_INIT_TYPES(varcount, vartypes)                                                                 \
-			____va_result = (asmname)(____PRIVATE_VREDIRECT_UNPACK args __VREDIRECT_ENUM_VALUES(varcount));            \
-		}                                                                                                              \
-		__builtin_va_end(____va_args);                                                                                 \
-		return ____va_result;                                                                                          \
+#define __COMPILER_VREDIRECT(decl, attr, Treturn, nothrow, cc, name, param, asmname, args, before_va_start, varcount, vartypes) \
+	__LOCAL_REDIRECT attr Treturn nothrow(cc name)(____PRIVATE_VREDIRECT_UNPACK param, ...) {                                   \
+		decl Treturn nothrow(cc asmname)(____PRIVATE_VREDIRECT_UNPACK param, ...);                                              \
+		Treturn ____va_result;                                                                                                  \
+		__builtin_va_list ____va_args;                                                                                          \
+		__builtin_va_start(____va_args, before_va_start);                                                                       \
+		{                                                                                                                       \
+			__VREDIRECT_INIT_TYPES(varcount, vartypes)                                                                          \
+			____va_result = (asmname)(____PRIVATE_VREDIRECT_UNPACK args __VREDIRECT_ENUM_VALUES(varcount));                     \
+		}                                                                                                                       \
+		__builtin_va_end(____va_args);                                                                                          \
+		return ____va_result;                                                                                                   \
 	}
-#define __VREDIRECT_VOID(decl, attr, nothrow, cc, name, param, asmname, args, before_va_start, varcount, vartypes) \
-	__LOCAL_REDIRECT attr void nothrow(cc name)(____PRIVATE_VREDIRECT_UNPACK param, ...) {                         \
-		decl void nothrow(cc asmname)(____PRIVATE_VREDIRECT_UNPACK param, ...);                                    \
-		__builtin_va_list ____va_args;                                                                             \
-		__builtin_va_start(____va_args, before_va_start);                                                          \
-		{                                                                                                          \
-			__VREDIRECT_INIT_TYPES(varcount, vartypes)                                                             \
-			(asmname)(____PRIVATE_VREDIRECT_UNPACK args __VREDIRECT_ENUM_VALUES(varcount));                        \
-		}                                                                                                          \
-		__builtin_va_end(____va_args);                                                                             \
+#define __COMPILER_VREDIRECT_VOID(decl, attr, nothrow, cc, name, param, asmname, args, before_va_start, varcount, vartypes) \
+	__LOCAL_REDIRECT attr void nothrow(cc name)(____PRIVATE_VREDIRECT_UNPACK param, ...) {                                  \
+		decl void nothrow(cc asmname)(____PRIVATE_VREDIRECT_UNPACK param, ...);                                             \
+		__builtin_va_list ____va_args;                                                                                      \
+		__builtin_va_start(____va_args, before_va_start);                                                                   \
+		{                                                                                                                   \
+			__VREDIRECT_INIT_TYPES(varcount, vartypes)                                                                      \
+			(asmname)(____PRIVATE_VREDIRECT_UNPACK args __VREDIRECT_ENUM_VALUES(varcount));                                 \
+		}                                                                                                                   \
+		__builtin_va_end(____va_args);                                                                                      \
 	}
-#define __VFREDIRECT(decl, attr, Treturn, nothrow, cc, name, paramf, asmnamef, vparamf, vasmnamef, args, before_va_start) \
-	__LOCAL_REDIRECT attr Treturn nothrow(cc name) paramf {                                                               \
-		decl Treturn nothrow(cc vasmnamef) vparamf;                                                                       \
-		__builtin_va_list ____va_args;                                                                                    \
-		Treturn ____va_result;                                                                                            \
-		__builtin_va_start(____va_args,before_va_start);                                                                  \
-		____va_result = (vasmnamef)(____PRIVATE_VREDIRECT_UNPACK args,____va_args);                                       \
-		__builtin_va_end(____va_args);                                                                                    \
-		return ____va_result;                                                                                             \
+#define __COMPILER_VFREDIRECT(decl, attr, Treturn, nothrow, cc, name, paramf, asmnamef, vparamf, vasmnamef, args, before_va_start) \
+	__LOCAL_REDIRECT attr Treturn nothrow(cc name) paramf {                                                                        \
+		decl Treturn nothrow(cc vasmnamef) vparamf;                                                                                \
+		__builtin_va_list ____va_args;                                                                                             \
+		Treturn ____va_result;                                                                                                     \
+		__builtin_va_start(____va_args,before_va_start);                                                                           \
+		____va_result = (vasmnamef)(____PRIVATE_VREDIRECT_UNPACK args,____va_args);                                                \
+		__builtin_va_end(____va_args);                                                                                             \
+		return ____va_result;                                                                                                      \
 	}
-#define __VFREDIRECT_VOID(decl, attr, nothrow, cc, name, paramf, asmnamef, vparamf, vasmnamef, args, before_va_start) \
-	__LOCAL_REDIRECT attr void nothrow(cc name) paramf {                                                              \
-		decl void nothrow(cc vasmnamef) vparamf;                                                                      \
-		__builtin_va_list ____va_args;                                                                                \
-		__builtin_va_start(____va_args,before_va_start);                                                              \
-		(vasmnamef)(____PRIVATE_VREDIRECT_UNPACK args,____va_args);                                                   \
-		__builtin_va_end(____va_args);                                                                                \
+#define __COMPILER_VFREDIRECT_VOID(decl, attr, nothrow, cc, name, paramf, asmnamef, vparamf, vasmnamef, args, before_va_start) \
+	__LOCAL_REDIRECT attr void nothrow(cc name) paramf {                                                                       \
+		decl void nothrow(cc vasmnamef) vparamf;                                                                               \
+		__builtin_va_list ____va_args;                                                                                         \
+		__builtin_va_start(____va_args,before_va_start);                                                                       \
+		(vasmnamef)(____PRIVATE_VREDIRECT_UNPACK args,____va_args);                                                            \
+		__builtin_va_end(____va_args);                                                                                         \
 	}
-#endif
+#endif /* !__cplusplus */
 #endif
 #endif /* !__REDIRECT */
+
+#ifdef __KOS_SYSTEM_HEADERS__
+#define __REDIRECT        __COMPILER_REDIRECT
+#define __REDIRECT_VOID   __COMPILER_REDIRECT_VOID
+#define __VREDIRECT       __COMPILER_VREDIRECT
+#define __VREDIRECT_VOID  __COMPILER_VREDIRECT_VOID
+#define __VFREDIRECT      __COMPILER_VFREDIRECT
+#define __VFREDIRECT_VOID __COMPILER_VFREDIRECT_VOID
+#define __XREDIRECT       __COMPILER_XREDIRECT
+#define __XREDIRECT_VOID  __COMPILER_XREDIRECT_VOID
+#endif /* __KOS_SYSTEM_HEADERS__ */
 
 #endif /* !___STDINC_H */

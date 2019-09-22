@@ -45,7 +45,7 @@
 
 #ifdef __CC__
 #   define __COMPILER_UNIPOINTER(p) ((void *)(__UINTPTR_TYPE__)(p))
-#else
+#else /* __CC__ */
 #   define __COMPILER_UNIPOINTER(p)                            (p)
-#endif
+#endif /* !__CC__ */
 

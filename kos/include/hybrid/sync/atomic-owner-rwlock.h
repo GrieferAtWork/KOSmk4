@@ -45,10 +45,10 @@ __DECL_BEGIN
 #if __HYBRID_SIZEOF_TID__ >= __SIZEOF_POINTER__
 #define __ATOMIC_OWNER_RWLOCK_OFFSETOF_OWNER    __HYBRID_SIZEOF_TID__
 #define __ATOMIC_OWNER_RWLOCK_SIZE           (2*__HYBRID_SIZEOF_TID__)
-#else
+#else /* __HYBRID_SIZEOF_TID__ >= __SIZEOF_POINTER__ */
 #define __ATOMIC_OWNER_RWLOCK_OFFSETOF_OWNER    __SIZEOF_POINTER__
 #define __ATOMIC_OWNER_RWLOCK_SIZE           (2*__SIZEOF_POINTER__)
-#endif
+#endif /* __HYBRID_SIZEOF_TID__ < __SIZEOF_POINTER__ */
 
 #ifdef __CC__
 struct __ATTR_PACKED atomic_owner_rwlock {

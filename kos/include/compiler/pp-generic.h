@@ -45,26 +45,26 @@
 #endif /* !__PREPROCESSOR_HAVE_STR */
 
 #ifdef __PREPROCESSOR_HAVE_CAT
-#   define __PP_PRIVATE_CAT2(a,b)     a##b
-#   define __PP_PRIVATE_CAT3(a,b,c)   a##b##c
-#   define __PP_PRIVATE_CAT4(a,b,c,d) a##b##c##d
-#   define __PP_CAT2(a,b)     __PP_PRIVATE_CAT2(a,b)
-#   define __PP_CAT3(a,b,c)   __PP_PRIVATE_CAT3(a,b,c)
-#   define __PP_CAT4(a,b,c,d) __PP_PRIVATE_CAT4(a,b,c,d)
-#else
+#   define __PP_PRIVATE_CAT2(a, b)       a##b
+#   define __PP_PRIVATE_CAT3(a, b, c)    a##b##c
+#   define __PP_PRIVATE_CAT4(a, b, c, d) a##b##c##d
+#   define __PP_CAT2(a, b)       __PP_PRIVATE_CAT2(a, b)
+#   define __PP_CAT3(a, b, c)    __PP_PRIVATE_CAT3(a, b, c)
+#   define __PP_CAT4(a, b, c, d) __PP_PRIVATE_CAT4(a, b, c, d)
+#else /* __PREPROCESSOR_HAVE_CAT */
 #   define __PP_PRIVATE_CAT2(a,b)     a/**/b
 #   define __PP_PRIVATE_CAT3(a,b,c)   a/**/b/**/c
 #   define __PP_PRIVATE_CAT4(a,b,c,d) a/**/b/**/c/**/d
 #   define __PP_CAT2(a,b)             a/**/b
 #   define __PP_CAT3(a,b,c)           a/**/b/**/c
 #   define __PP_CAT4(a,b,c,d)         a/**/b/**/c/**/d
-#endif
+#endif /* !__PREPROCESSOR_HAVE_CAT */
 
-#define __PP_PRIVATE_MUL8_0 0
-#define __PP_PRIVATE_MUL8_1 8
-#define __PP_PRIVATE_MUL8_2 16
-#define __PP_PRIVATE_MUL8_4 32
-#define __PP_PRIVATE_MUL8_8 64
+#define __PP_PRIVATE_MUL8_0  0
+#define __PP_PRIVATE_MUL8_1  8
+#define __PP_PRIVATE_MUL8_2  16
+#define __PP_PRIVATE_MUL8_4  32
+#define __PP_PRIVATE_MUL8_8  64
 #ifdef __PREPROCESSOR_HAVE_CAT
 #define __PP_PRIVATE_MUL8(x) __PP_PRIVATE_MUL8_##x
 #define __PP_MUL8(x)         __PP_PRIVATE_MUL8(x)

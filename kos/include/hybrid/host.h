@@ -27,7 +27,7 @@
      defined(_M_AMD64) || defined(_WIN64) || \
      defined(WIN64))
 #define __x86_64__ 1
-#endif
+#endif /* x86_64... */
 
 #if !defined(__i386__) && \
     (defined(__i386) || defined(i386) || \
@@ -35,7 +35,7 @@
      defined(__X86__) || defined(_X86_) || \
      defined(__THW_INTEL__) || defined(__INTEL__))
 #define __i386__   1
-#endif
+#endif /* i386... */
 
 #ifdef _M_IX86
 #if !defined(__i486__) && _M_IX86 >= 400
@@ -47,7 +47,7 @@
 #if !defined(__i686__) && _M_IX86 >= 600
 #define __i686__ 1
 #endif
-#endif
+#endif /* _M_IX86 */
 
 #if !defined(__arm__) && \
     (defined(_M_ARM) || defined(_M_ARMT) || defined(_M_ARM_NT))
