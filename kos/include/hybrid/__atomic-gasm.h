@@ -25,50 +25,72 @@
 
 #ifndef __GUARD_HYBRID___ATOMIC_H
 #error "Never include this file directly. - Always include `<hybrid/__atomic.h>' instead"
-#endif
+#endif /* !__GUARD_HYBRID___ATOMIC_H */
 
 #ifndef __COMPILER_HAVE_GCC_ASM
 #error "GCC Inline assembly is not supported"
-#endif
+#endif /* !__COMPILER_HAVE_GCC_ASM */
 
 /* Atomic base implementation using GCC inline assembly. */
 
 __DECL_BEGIN
 
 #if defined(__x86_64__)
-#define __impl_hybrid_atomic_cmpxch_val_seqcst(x,oldv,newv) \
- __XBLOCK({ register __typeof__(x) __ix_res; \
-            if __untraced(sizeof(__ix_res) == 1) { \
-            	__asm__ __volatile__("lock; cmpxchgb %2, %0\n" : "+g" (x), "=a" (__ix_res) : "r" (newv), "1" (oldv) : "memory"); \
-            } else if __untraced(sizeof(__ix_res) == 2) { \
-            	__asm__ __volatile__("lock; cmpxchgw %2, %0\n" : "+g" (x), "=a" (__ix_res) : "r" (newv), "1" (oldv) : "memory"); \
-            } else if __untraced(sizeof(__ix_res) == 4) { \
-            	__asm__ __volatile__("lock; cmpxchgl %2, %0\n" : "+g" (x), "=a" (__ix_res) : "r" (newv), "1" (oldv) : "memory"); \
-            } else { \
-            	__asm__ __volatile__("lock; cmpxchgq %2, %0\n" : "+g" (x), "=a" (__ix_res) : "r" (newv), "1" (oldv) : "memory"); \
-            } \
-            __XRETURN __ix_res; \
- })
+#define __impl_hybrid_atomic_cmpxch_val_seqcst(x, oldv, newv)  \
+	__XBLOCK({                                                 \
+		register __typeof__(x) __ix_res;                       \
+		if __untraced(sizeof(__ix_res) == 1) {                 \
+			__asm__ __volatile__("lock; cmpxchgb %2, %0\n"     \
+			                     : "+g" (x), "=a" (__ix_res)   \
+			                     : "r" (newv), "1" (oldv)      \
+			                     : "memory");                  \
+		} else if __untraced(sizeof(__ix_res) == 2) {          \
+			__asm__ __volatile__("lock; cmpxchgw %2, %0\n"     \
+			                     : "+g" (x), "=a" (__ix_res)   \
+			                     : "r" (newv), "1" (oldv)      \
+			                     : "memory");                  \
+		} else if __untraced(sizeof(__ix_res) == 4) {          \
+			__asm__ __volatile__("lock; cmpxchgl %2, %0\n"     \
+			                     : "+g" (x), "=a" (__ix_res)   \
+			                     : "r" (newv), "1" (oldv)      \
+			                     : "memory");                  \
+		} else {                                               \
+			__asm__ __volatile__("lock; cmpxchgq %2, %0\n"     \
+			                     : "+g" (x), "=a" (__ix_res)   \
+			                     : "r" (newv), "1" (oldv)      \
+			                     : "memory");                  \
+		}                                                      \
+		__XRETURN __ix_res;                                    \
+	})
 #elif defined(__i386__)
-#define __impl_hybrid_atomic_cmpxch_val_seqcst(x,oldv,newv) \
- __XBLOCK({ register __typeof__(x) __ix_res; \
-            if __untraced(sizeof(__ix_res) == 1) { \
-            	__asm__ __volatile__("lock; cmpxchgb %2, %0\n" : "+g" (x), "=a" (__ix_res) : "r" (newv), "1" (oldv) : "memory"); \
-            } else if __untraced(sizeof(__ix_res) == 2) { \
-            	__asm__ __volatile__("lock; cmpxchgw %2, %0\n" : "+g" (x), "=a" (__ix_res) : "r" (newv), "1" (oldv) : "memory"); \
-            } else if __untraced(sizeof(__ix_res) == 4) { \
-            	__asm__ __volatile__("lock; cmpxchgl %2, %0\n" : "+g" (x), "=a" (__ix_res) : "r" (newv), "1" (oldv) : "memory"); \
-            } else { \
-            	__asm__ __volatile__("lock; cmpxchg8b %0\n" \
-            	                     : "+m" (x) \
-            	                     , "=A" (__ix_res) \
-            	                     : "A" (oldv) \
-            	                     , "c" ((__UINT32_TYPE__)((__UINT64_TYPE__)(newv) >> 32)) \
-            	                     , "b" ((__UINT32_TYPE__) (__UINT64_TYPE__)(newv)) \
-            	                     : "memory"); \
-            } \
-            __XRETURN __ix_res; \
- })
+#define __impl_hybrid_atomic_cmpxch_val_seqcst(x, oldv, newv)                             \
+	__XBLOCK({                                                                            \
+		register __typeof__(x) __ix_res;                                                  \
+		if __untraced(sizeof(__ix_res) == 1) {                                            \
+			__asm__ __volatile__("lock; cmpxchgb %2, %0\n"                                \
+			                     : "+g" (x), "=a" (__ix_res)                              \
+			                     : "r" (newv), "1" (oldv)                                 \
+			                     : "memory");                                             \
+		} else if __untraced(sizeof(__ix_res) == 2) {                                     \
+			__asm__ __volatile__("lock; cmpxchgw %2, %0\n"                                \
+			                     : "+g" (x), "=a" (__ix_res)                              \
+			                     : "r" (newv), "1" (oldv)                                 \
+			                     : "memory");                                             \
+		} else if __untraced(sizeof(__ix_res) == 4) {                                     \
+			__asm__ __volatile__("lock; cmpxchgl %2, %0\n"                                \
+			                     : "+g" (x), "=a" (__ix_res)                              \
+			                     : "r" (newv), "1" (oldv)                                 \
+			                     : "memory");                                             \
+		} else {                                                                          \
+			__asm__ __volatile__("lock; cmpxchg8b %0\n"                                   \
+			                     : "+m" (x), "=A" (__ix_res)                              \
+			                     : "A" (oldv)                                             \
+			                     , "c" ((__UINT32_TYPE__)((__UINT64_TYPE__)(newv) >> 32)) \
+			                     , "b" ((__UINT32_TYPE__)(__UINT64_TYPE__)(newv))         \
+			                     : "memory");                                             \
+		}                                                                                 \
+		__XRETURN __ix_res;                                                               \
+	})
 #else
 #error "Unsupported Architecture"
 #endif

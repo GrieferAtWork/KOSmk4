@@ -57,17 +57,17 @@ struct __ATTR_PACKED atomic_owner_rwlock {
 		__UINTPTR_TYPE__   aorw_lock;  /* The underlying synchronization atomic. */
 #if __HYBRID_SIZEOF_TID__ > __SIZEOF_POINTER__
 		__BYTE_TYPE__    __aorw_align[__HYBRID_SIZEOF_TID__]; /* Force threadid alignment. */
-#endif
+#endif /* __HYBRID_SIZEOF_TID__ > __SIZEOF_POINTER__ */
 	};
 	__hybrid_tid_t         aorw_owner; /* [valid_if(ATOMIC_READ(self->aorw_lock) & __ATOMIC_OWNER_RWLOCK_WFLAG)]
 	                                    * A unique identifier for the thread owning this lock. */
 #if __HYBRID_SIZEOF_TID__ < __SIZEOF_POINTER__
 	__BYTE_TYPE__        __aorw_pad[__SIZEOF_POINTER__ - __HYBRID_SIZEOF_TID__]; /* ... */
-#endif
+#endif /* __HYBRID_SIZEOF_TID__ < __SIZEOF_POINTER__ */
 };
 
-#define ATOMIC_OWNER_RWLOCK_INIT             {{0}, __HYBRID_GETTID_INVALID}
-#define ATOMIC_OWNER_RWLOCK_INIT_READ        {{1}, __HYBRID_GETTID_INVALID}
+#define ATOMIC_OWNER_RWLOCK_INIT             { { 0 }, __HYBRID_GETTID_INVALID }
+#define ATOMIC_OWNER_RWLOCK_INIT_READ        { { 1 }, __HYBRID_GETTID_INVALID }
 #ifdef __HYBRID_GETTID_INVALID_IS_ZERO
 #define atomic_owner_rwlock_cinit(self)      (void)(__hybrid_assert((self)->aorw_lock == 0), __hybrid_assert((self)->aorw_owner == __HYBRID_GETTID_INVALID))
 #define atomic_owner_rwlock_cinit_read(self) (void)(__hybrid_assert((self)->aorw_lock == 0), __hybrid_assert((self)->aorw_owner == __HYBRID_GETTID_INVALID), (self)->aorw_lock = 1)
@@ -91,7 +91,7 @@ __LOCAL void (atomic_owner_rwlock_write)(struct atomic_owner_rwlock *__restrict 
 #if defined(__KERNEL__) && defined(__KOS_VERSION__) && __KOS_VERSION__ >= 400
 __LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_owner_rwlock_read_nx)(struct atomic_owner_rwlock *__restrict __self);
 __LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_owner_rwlock_write_nx)(struct atomic_owner_rwlock *__restrict __self);
-#endif
+#endif /* __KERNEL__ && __KOS_VERSION__ >= 400 */
 
 /* Same as `atomic_owner_rwlock_trywrite()', but allow for the assumption to
  * be made that the calling thread isn't already holding a write-lock to `self' */
@@ -99,7 +99,7 @@ __LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_owner_rwlock_trywrite_r)(struct a
 __LOCAL void (atomic_owner_rwlock_write_r)(struct atomic_owner_rwlock *__restrict __self);
 #if defined(__KERNEL__) && defined(__KOS_VERSION__) && __KOS_VERSION__ >= 400
 __LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_owner_rwlock_write_r_nx)(struct atomic_owner_rwlock *__restrict __self);
-#endif
+#endif /* __KERNEL__ && __KOS_VERSION__ >= 400 */
 
 
 /* Try to upgrade a read-lock to a write-lock. Return `FALSE' upon failure. */
@@ -117,7 +117,7 @@ __LOCAL __ATTR_WUNUSED __BOOL (atomic_owner_rwlock_upgrade)(struct atomic_owner_
  * NOTE: When `0' is returned, the original read-lock created by the caller has
  *       already been released. */
 __LOCAL __ATTR_WUNUSED unsigned int __NOTHROW(atomic_owner_rwlock_upgrade_nx)(struct atomic_owner_rwlock *__restrict __self);
-#endif
+#endif /* __KERNEL__ && __KOS_VERSION__ >= 400 */
 
 /* Downgrade a write-lock to a read-lock (Always succeeds). */
 __LOCAL void __NOTHROW(atomic_owner_rwlock_downgrade)(struct atomic_owner_rwlock *__restrict __self);
@@ -187,6 +187,7 @@ __LOCAL __BOOL __NOTHROW(atomic_owner_rwlock_endread)(struct atomic_owner_rwlock
 	return __f == 1;
 #endif /* !NDEBUG */
 }
+
 __LOCAL __BOOL __NOTHROW(atomic_owner_rwlock_end)(struct atomic_owner_rwlock *__restrict __self) {
 	__UINTPTR_TYPE__ __f, __newval;
 	__COMPILER_BARRIER();
@@ -208,7 +209,7 @@ __LOCAL __BOOL __NOTHROW(atomic_owner_rwlock_end)(struct atomic_owner_rwlock *__
 			if (!(__f & __ATOMIC_OWNER_RWLOCK_NMASK)) {
 #ifndef NDEBUG
 				__self->aorw_owner = __HYBRID_GETTID_INVALID;
-#endif
+#endif /* !NDEBUG */
 				__newval = 0;
 			}
 		}
@@ -231,6 +232,7 @@ __LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_owner_rwlock_tryread)(struct atom
 	__COMPILER_READ_BARRIER();
 	return 1;
 }
+
 __LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_owner_rwlock_trywrite)(struct atomic_owner_rwlock *__restrict __self) {
 	__UINTPTR_TYPE__ __f, __newval;
 	__hybrid_tid_t __mytid = __hybrid_gettid();
@@ -327,7 +329,7 @@ __NOTHROW(atomic_owner_rwlock_write_r_nx)(struct atomic_owner_rwlock *__restrict
 	__COMPILER_READ_BARRIER();
 	return 1;
 }
-#endif
+#endif /* __KERNEL__ && __KOS_VERSION__ >= 400 */
 
 __LOCAL __ATTR_WUNUSED __BOOL
 __NOTHROW(atomic_owner_rwlock_tryupgrade)(struct atomic_owner_rwlock *__restrict __self) {
@@ -374,14 +376,14 @@ __NOTHROW(atomic_owner_rwlock_upgrade_nx)(struct atomic_owner_rwlock *__restrict
 		return 0;
 	return 2;
 }
-#endif
+#endif /* __KERNEL__ && __KOS_VERSION__ >= 400 */
 
 __LOCAL void
 __NOTHROW(atomic_owner_rwlock_downgrade)(struct atomic_owner_rwlock *__restrict __self) {
 #ifdef NDEBUG
 	__COMPILER_WRITE_BARRIER();
 	ATOMIC_WRITE(__self->aorw_lock, 1);
-#else
+#else /* NDEBUG */
 	__UINT32_TYPE__ __f;
 	__COMPILER_WRITE_BARRIER();
 	__hybrid_assertf(__hybrid_gettid_iscaller(__self->aorw_owner),
@@ -408,7 +410,7 @@ __NOTHROW(atomic_owner_rwlock_downgrade)(struct atomic_owner_rwlock *__restrict 
 		                 __HYBRID_GETTID_PRINTF_ARG(__self->aorw_owner));
 	} while (!__hybrid_atomic_cmpxch_weak(__self->aorw_lock, __f, 1,
 	                                      __ATOMIC_RELEASE, __ATOMIC_RELAXED));
-#endif
+#endif /* !NDEBUG */
 }
 
 __LOCAL __ATTR_WUNUSED __BOOL
@@ -425,8 +427,8 @@ __NOTHROW(atomic_owner_rwlock_canwrite)(struct atomic_owner_rwlock const *__rest
 }
 #endif /* !__INTELLISENSE__ */
 
-
 #endif /* __CC__ */
+
 
 #ifdef __DEFINE_SYNC_RWLOCK
 __DEFINE_SYNC_RWLOCK(struct atomic_owner_rwlock,

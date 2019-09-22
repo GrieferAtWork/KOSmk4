@@ -23,17 +23,6 @@
 #include "typecore.h"
 
 #ifdef __CC__
-#if defined(__DCC_VERSION__) || \
-(__has_builtin(__builtin_min) && __has_builtin(__builtin_max))
-#define __MIN(a, b) __builtin_min(a, b)
-#define __MAX(a, b) __builtin_max(a, b)
-#elif defined(__COMPILER_HAVE_TYPEOF) && !defined(__NO_XBLOCK)
-#define __MIN(a, b) __XBLOCK({ __typeof__(a) _a = (a),_b = (b); __XRETURN _a < _b ? _a : _b; })
-#define __MAX(a, b) __XBLOCK({ __typeof__(a) _a = (a),_b = (b); __XRETURN _b < _a ? _a : _b; })
-#else
-#define __MIN(a, b) ((a) < (b) ? (a) : (b))
-#define __MAX(a, b) ((b) < (a) ? (a) : (b))
-#endif
 
 #ifndef __cplusplus
 #ifndef __COMPILER_HAVE_TYPEOF
@@ -49,9 +38,9 @@
 
 #if defined(_MSC_VER) && !defined(__cplusplus)
 #define __ATOMIC_DOWNCAST(T) (T)(__UINTPTR_TYPE__)
-#else
+#else /* _MSC_VER && !__cplusplus */
 #define __ATOMIC_DOWNCAST(T) (T)
-#endif
+#endif /* !_MSC_VER || __cplusplus */
 
 /* Define atomic memory order constants. */
 #ifndef __ATOMIC_RELAXED
@@ -66,69 +55,69 @@
 #ifdef _MSC_VER
 #ifdef __cplusplus
 #pragma warning(push)           /* Keep `4197' disabled in C because of its use in macros. */
-#endif                          /* __cplusplus */
+#endif /* __cplusplus */
 #pragma warning(disable : 4197) /* Casting away `volatile' */
 #pragma warning(disable : 4047) /* Differing number of dereferences. */
 
 #include "__atomic-msvc.h"
-#endif
+#endif /* _MSC_VER */
 
 __SYSDECL_BEGIN
 
 #if defined(__CC__) || defined(__DEEMON__)
 
 #if __GCC_VERSION(4, 7, 0) || defined(____INTELLISENSE_STDINC_COMMON_H)
-#define __hybrid_atomic_load(x, order) __atomic_load_n(&(x), order)
-#define __hybrid_atomic_store(x, v, order) __atomic_store_n(&(x), v, order)
-#define __hybrid_atomic_xch(x, v, order) __atomic_exchange_n(&(x), v, order)
-#define __hybrid_atomic_cmpxch(x, oldv, newv, succ, fail) __XBLOCK({ __typeof__(x) __oldv=(oldv); __XRETURN __atomic_compare_exchange_n(&(x),&__oldv,newv,0,succ,fail); })
-#define __hybrid_atomic_cmpxch_weak(x, oldv, newv, succ, fail) __XBLOCK({ __typeof__(x) __oldv=(oldv); __XRETURN __atomic_compare_exchange_n(&(x),&__oldv,newv,1,succ,fail); })
-#define __hybrid_atomic_cmpxch_val(x, oldv, newv, succ, fail) __XBLOCK({ __typeof__(x) __oldv=(oldv); __atomic_compare_exchange_n(&(x),&__oldv,newv,0,succ,fail); __XRETURN __oldv; })
+#define __hybrid_atomic_load(x, order)                             __atomic_load_n(&(x), order)
+#define __hybrid_atomic_store(x, v, order)                         __atomic_store_n(&(x), v, order)
+#define __hybrid_atomic_xch(x, v, order)                           __atomic_exchange_n(&(x), v, order)
+#define __hybrid_atomic_cmpxch(x, oldv, newv, succ, fail)          __XBLOCK({ __typeof__(x) __oldv=(oldv); __XRETURN __atomic_compare_exchange_n(&(x),&__oldv,newv,0,succ,fail); })
+#define __hybrid_atomic_cmpxch_weak(x, oldv, newv, succ, fail)     __XBLOCK({ __typeof__(x) __oldv=(oldv); __XRETURN __atomic_compare_exchange_n(&(x),&__oldv,newv,1,succ,fail); })
+#define __hybrid_atomic_cmpxch_val(x, oldv, newv, succ, fail)      __XBLOCK({ __typeof__(x) __oldv=(oldv); __atomic_compare_exchange_n(&(x),&__oldv,newv,0,succ,fail); __XRETURN __oldv; })
 #define __hybrid_atomic_cmpxch_val_weak(x, oldv, newv, succ, fail) __XBLOCK({ __typeof__(x) __oldv=(oldv); __atomic_compare_exchange_n(&(x),&__oldv,newv,1,succ,fail); __XRETURN __oldv; })
-#define __hybrid_atomic_addfetch(x, v, order) __atomic_add_fetch(&(x), v, order)
-#define __hybrid_atomic_subfetch(x, v, order) __atomic_sub_fetch(&(x), v, order)
-#define __hybrid_atomic_andfetch(x, v, order) __atomic_and_fetch(&(x), v, order)
-#define __hybrid_atomic_orfetch(x, v, order) __atomic_or_fetch(&(x), v, order)
-#define __hybrid_atomic_xorfetch(x, v, order) __atomic_xor_fetch(&(x), v, order)
-#define __hybrid_atomic_nandfetch(x, v, order) __atomic_nand_fetch(&(x), v, order)
-#define __hybrid_atomic_fetchadd(x, v, order) __atomic_fetch_add(&(x), v, order)
-#define __hybrid_atomic_fetchsub(x, v, order) __atomic_fetch_sub(&(x), v, order)
-#define __hybrid_atomic_fetchand(x, v, order) __atomic_fetch_and(&(x), v, order)
-#define __hybrid_atomic_fetchor(x, v, order) __atomic_fetch_or(&(x), v, order)
-#define __hybrid_atomic_fetchxor(x, v, order) __atomic_fetch_xor(&(x), v, order)
-#define __hybrid_atomic_fetchnand(x, v, order) __atomic_fetch_nand(&(x), v, order)
-#define __hybrid_atomic_thread_fence(order) __atomic_thread_fence(order)
-#define __hybrid_atomic_signal_fence(order) __atomic_signal_fence(order)
-#define __hybrid_atomic_lockfree(x) __atomic_is_lock_free(sizeof(x), &(x))
+#define __hybrid_atomic_addfetch(x, v, order)                      __atomic_add_fetch(&(x), v, order)
+#define __hybrid_atomic_subfetch(x, v, order)                      __atomic_sub_fetch(&(x), v, order)
+#define __hybrid_atomic_andfetch(x, v, order)                      __atomic_and_fetch(&(x), v, order)
+#define __hybrid_atomic_orfetch(x, v, order)                       __atomic_or_fetch(&(x), v, order)
+#define __hybrid_atomic_xorfetch(x, v, order)                      __atomic_xor_fetch(&(x), v, order)
+#define __hybrid_atomic_nandfetch(x, v, order)                     __atomic_nand_fetch(&(x), v, order)
+#define __hybrid_atomic_fetchadd(x, v, order)                      __atomic_fetch_add(&(x), v, order)
+#define __hybrid_atomic_fetchsub(x, v, order)                      __atomic_fetch_sub(&(x), v, order)
+#define __hybrid_atomic_fetchand(x, v, order)                      __atomic_fetch_and(&(x), v, order)
+#define __hybrid_atomic_fetchor(x, v, order)                       __atomic_fetch_or(&(x), v, order)
+#define __hybrid_atomic_fetchxor(x, v, order)                      __atomic_fetch_xor(&(x), v, order)
+#define __hybrid_atomic_fetchnand(x, v, order)                     __atomic_fetch_nand(&(x), v, order)
+#define __hybrid_atomic_thread_fence(order)                        __atomic_thread_fence(order)
+#define __hybrid_atomic_signal_fence(order)                        __atomic_signal_fence(order)
+#define __hybrid_atomic_lockfree(x)                                __atomic_is_lock_free(sizeof(x), &(x))
 #elif __has_extension(c_atomic) || __has_extension(cxx_atomic) /* clang */
-#define __hybrid_atomic_load(x, order) __c11_atomic_load(&(x), order)
-#define __hybrid_atomic_store(x, v, order) __c11_atomic_store(&(x), v, order)
-#define __hybrid_atomic_xch(x, v, order) __c11_atomic_exchange(&(x), v, order)
-#define __hybrid_atomic_cmpxch(x, oldv, newv, succ, fail) __XBLOCK({ __typeof__(x) __oldv=(oldv); __XRETURN __c11_atomic_compare_exchange_strong(&(x),&__oldv,newv,succ,fail); })
-#define __hybrid_atomic_cmpxch_weak(x, oldv, newv, succ, fail) __XBLOCK({ __typeof__(x) __oldv=(oldv); __XRETURN __c11_atomic_compare_exchange_weak(&(x),&__oldv,newv,succ,fail); })
-#define __hybrid_atomic_cmpxch_val(x, oldv, newv, succ, fail) __XBLOCK({ __typeof__(x) __oldv=(oldv); __c11_atomic_compare_exchange_strong(&(x),&__oldv,newv,succ,fail); __XRETURN __oldv; })
+#define __hybrid_atomic_load(x, order)                             __c11_atomic_load(&(x), order)
+#define __hybrid_atomic_store(x, v, order)                         __c11_atomic_store(&(x), v, order)
+#define __hybrid_atomic_xch(x, v, order)                           __c11_atomic_exchange(&(x), v, order)
+#define __hybrid_atomic_cmpxch(x, oldv, newv, succ, fail)          __XBLOCK({ __typeof__(x) __oldv=(oldv); __XRETURN __c11_atomic_compare_exchange_strong(&(x),&__oldv,newv,succ,fail); })
+#define __hybrid_atomic_cmpxch_weak(x, oldv, newv, succ, fail)     __XBLOCK({ __typeof__(x) __oldv=(oldv); __XRETURN __c11_atomic_compare_exchange_weak(&(x),&__oldv,newv,succ,fail); })
+#define __hybrid_atomic_cmpxch_val(x, oldv, newv, succ, fail)      __XBLOCK({ __typeof__(x) __oldv=(oldv); __c11_atomic_compare_exchange_strong(&(x),&__oldv,newv,succ,fail); __XRETURN __oldv; })
 #define __hybrid_atomic_cmpxch_val_weak(x, oldv, newv, succ, fail) __XBLOCK({ __typeof__(x) __oldv=(oldv); __c11_atomic_compare_exchange_weak(&(x),&__oldv,newv,succ,fail); __XRETURN __oldv; })
-#define __hybrid_atomic_fetchadd(x, v, order) __c11_atomic_fetch_add(&(x), v, order)
-#define __hybrid_atomic_fetchsub(x, v, order) __c11_atomic_fetch_sub(&(x), v, order)
-#define __hybrid_atomic_fetchand(x, v, order) __c11_atomic_fetch_and(&(x), v, order)
-#define __hybrid_atomic_fetchor(x, v, order) __c11_atomic_fetch_or(&(x), v, order)
-#define __hybrid_atomic_fetchxor(x, v, order) __c11_atomic_fetch_xor(&(x), v, order)
-#define __hybrid_atomic_thread_fence(order) __c11_atomic_thread_fence(order)
-#define __hybrid_atomic_signal_fence(order) __c11_atomic_signal_fence(order)
-#define __hybrid_atomic_lockfree(x) __atomic_is_lock_free(sizeof(x), &(x))
+#define __hybrid_atomic_fetchadd(x, v, order)                      __c11_atomic_fetch_add(&(x), v, order)
+#define __hybrid_atomic_fetchsub(x, v, order)                      __c11_atomic_fetch_sub(&(x), v, order)
+#define __hybrid_atomic_fetchand(x, v, order)                      __c11_atomic_fetch_and(&(x), v, order)
+#define __hybrid_atomic_fetchor(x, v, order)                       __c11_atomic_fetch_or(&(x), v, order)
+#define __hybrid_atomic_fetchxor(x, v, order)                      __c11_atomic_fetch_xor(&(x), v, order)
+#define __hybrid_atomic_thread_fence(order)                        __c11_atomic_thread_fence(order)
+#define __hybrid_atomic_signal_fence(order)                        __c11_atomic_signal_fence(order)
+#define __hybrid_atomic_lockfree(x)                                __atomic_is_lock_free(sizeof(x), &(x))
 #else /* Modern GCC... */
 
 #if defined(__GNUC__) || defined(__DCC_VERSION__)
-#define __impl_hybrid_atomic_addfetch_seqcst(x, v) __sync_add_and_fetch(&(x), v)
-#define __impl_hybrid_atomic_subfetch_seqcst(x, v) __sync_sub_and_fetch(&(x), v)
-#define __impl_hybrid_atomic_orfetch_seqcst(x, v) __sync_or_and_fetch(&(x), v)
-#define __impl_hybrid_atomic_andfetch_seqcst(x, v) __sync_and_and_fetch(&(x), v)
-#define __impl_hybrid_atomic_xorfetch_seqcst(x, v) __sync_xor_and_fetch(&(x), v)
-#define __impl_hybrid_atomic_fetchadd_seqcst(x, v) __sync_fetch_and_add(&(x), v)
-#define __impl_hybrid_atomic_fetchsub_seqcst(x, v) __sync_fetch_and_sub(&(x), v)
-#define __impl_hybrid_atomic_fetchor_seqcst(x, v) __sync_fetch_and_or(&(x), v)
-#define __impl_hybrid_atomic_fetchand_seqcst(x, v) __sync_fetch_and_and(&(x), v)
-#define __impl_hybrid_atomic_fetchxor_seqcst(x, v) __sync_fetch_and_xor(&(x), v)
+#define __impl_hybrid_atomic_addfetch_seqcst(x, v)  __sync_add_and_fetch(&(x), v)
+#define __impl_hybrid_atomic_subfetch_seqcst(x, v)  __sync_sub_and_fetch(&(x), v)
+#define __impl_hybrid_atomic_orfetch_seqcst(x, v)   __sync_or_and_fetch(&(x), v)
+#define __impl_hybrid_atomic_andfetch_seqcst(x, v)  __sync_and_and_fetch(&(x), v)
+#define __impl_hybrid_atomic_xorfetch_seqcst(x, v)  __sync_xor_and_fetch(&(x), v)
+#define __impl_hybrid_atomic_fetchadd_seqcst(x, v)  __sync_fetch_and_add(&(x), v)
+#define __impl_hybrid_atomic_fetchsub_seqcst(x, v)  __sync_fetch_and_sub(&(x), v)
+#define __impl_hybrid_atomic_fetchor_seqcst(x, v)   __sync_fetch_and_or(&(x), v)
+#define __impl_hybrid_atomic_fetchand_seqcst(x, v)  __sync_fetch_and_and(&(x), v)
+#define __impl_hybrid_atomic_fetchxor_seqcst(x, v)  __sync_fetch_and_xor(&(x), v)
 #if !defined(__GNUC__) || __GCC_VERSION(4, 4, 0)
 #define __impl_hybrid_atomic_fetchnand_seqcst(x, v) __sync_fetch_and_nand(&(x), v)
 #define __impl_hybrid_atomic_nandfetch_seqcst(x, v) __sync_nand_and_fetch(&(x), v)
@@ -166,12 +155,14 @@ __SYSDECL_BEGIN
 #undef __DEFINE_WRAPPER
 #ifdef __cplusplus
 extern "C++" {
+
 template<class __T, class __OV, class __NV>
 #define __hybrid_atomic_cmpxch_val __hybrid_atomic_cmpxch_val
 __FORCELOCAL __T __NOTHROW_NCX(__hybrid_atomic_cmpxch_val)(__T &__x, __OV __oldv, __NV __newv,
                                                            int __UNUSED(__succ), int __UNUSED(__fail)) {
 	return (__T)__impl_hybrid_atomic_cmpxch_val_seqcst(__x, __oldv, __newv);
 }
+
 }
 #else /* __cplusplus */
 #define __hybrid_atomic_cmpxch_val(x, oldv, newv, succ, fail) \
@@ -187,9 +178,7 @@ __FORCELOCAL __T __NOTHROW_NCX(__hybrid_atomic_cmpxch_val)(__T &__x, __OV __oldv
 	(__hybrid_atomic_cmpxch_val(x, oldv, newv, succ, fail) == (oldv))
 #else /* __hybrid_atomic_cmpxch_val */
 /* Need at least `__hybrid_atomic_cmpxch()' or `__hybrid_atomic_cmpxch_val()' */
-#ifndef __DEEMON__
 #error "ERROR: Not atomic support by this compiler/on this platform."
-#endif
 #endif /* !__hybrid_atomic_cmpxch_val */
 #endif /* !__hybrid_atomic_cmpxch */
 #endif /* !GCC... */
@@ -211,8 +200,7 @@ __FORCELOCAL __T __NOTHROW_NCX(__hybrid_atomic_cmpxch_val)(__T &__x, __OV __oldv
 			                           : __xv_res,            \
 			                           succ, fail))           \
 				break;                                        \
-		}                                                     \
-		__WHILE1;                                             \
+		} __WHILE1;                                           \
 		__XRETURN __xv_res;                                   \
 	})
 #else /* __NO_XBLOCK */
@@ -232,8 +220,7 @@ __FORCELOCAL __T __NOTHROW_NCX(__hybrid_atomic_cmpxch_val)(__T &__x, __OV __oldv
 			                           : __res,                                  \
 			                           __succ, __fail))                          \
 				break;                                                           \
-		}                                                                        \
-		__WHILE1;                                                                \
+		} __WHILE1;                                                              \
 		return __res;                                                            \
 	}
 __NAMESPACE_INT_BEGIN
@@ -245,6 +232,7 @@ __NAMESPACE_INT_END
 #undef __DEFINE_WRAPPER
 #ifdef __cplusplus
 extern "C++" {
+
 template<class __T, class __V>
 __FORCELOCAL __T __NOTHROW_NCX(__hybrid_atomic_cmpxch_val)(__T &__x, __V __oldv, __V __newv, int __succ, int __fail) {
 	__STATIC_IF(sizeof(__T) == 1) {
@@ -264,17 +252,21 @@ __FORCELOCAL __T __NOTHROW_NCX(__hybrid_atomic_cmpxch_val)(__T &__x, __V __oldv,
 		}
 	}
 }
+
 }
 #else /* __cplusplus */
-#define __hybrid_atomic_cmpxch_val(x, oldv, newv, succ, fail) \
-	__ATOMIC_RECAST(x, sizeof(x) == 1 ? __NAMESPACE_INT_SYM __impl_hybrid_atomic_cmpxch_val8((void *)&(x), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(oldv), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(newv), succ, fail) : sizeof(x) == 2 ? __NAMESPACE_INT_SYM __impl_hybrid_atomic_cmpxch_val16((void *)&(x), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(oldv), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(newv), succ, fail) : sizeof(x) == 4 ? __NAMESPACE_INT_SYM __impl_hybrid_atomic_cmpxch_val32((void *)&(x), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(oldv), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(newv), succ, fail) : __NAMESPACE_INT_SYM __impl_hybrid_atomic_cmpxch_val64((void *)&(x), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(oldv), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(newv), succ, fail))
+#define __hybrid_atomic_cmpxch_val(x, oldv, newv, succ, fail)                                                                                                                                                 \
+	__ATOMIC_RECAST(x, sizeof(x) == 1 ? __NAMESPACE_INT_SYM __impl_hybrid_atomic_cmpxch_val8((void *)&(x), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(oldv), __ATOMIC_DOWNCAST(__UINT8_TYPE__)(newv), succ, fail) :    \
+	                   sizeof(x) == 2 ? __NAMESPACE_INT_SYM __impl_hybrid_atomic_cmpxch_val16((void *)&(x), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(oldv), __ATOMIC_DOWNCAST(__UINT16_TYPE__)(newv), succ, fail) : \
+	                   sizeof(x) == 4 ? __NAMESPACE_INT_SYM __impl_hybrid_atomic_cmpxch_val32((void *)&(x), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(oldv), __ATOMIC_DOWNCAST(__UINT32_TYPE__)(newv), succ, fail) : \
+	                                    __NAMESPACE_INT_SYM __impl_hybrid_atomic_cmpxch_val64((void *)&(x), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(oldv), __ATOMIC_DOWNCAST(__UINT64_TYPE__)(newv), succ, fail))
 #endif /* __cplusplus */
 #endif /* !__NO_XBLOCK */
 #endif /* !__hybrid_atomic_cmpxch_val */
 #ifndef __hybrid_atomic_cmpxch_weak
 #define __hybrid_atomic_cmpxch_weak(x, oldv, newv, succ, fail) \
 	__hybrid_atomic_cmpxch(x, oldv, newv, succ, fail)
-#endif
+#endif /* !__hybrid_atomic_cmpxch_weak */
 #ifndef __hybrid_atomic_cmpxch_val_weak
 #define __hybrid_atomic_cmpxch_val_weak(x, oldv, newv, succ, fail) \
 	__hybrid_atomic_cmpxch_val(x, oldv, newv, succ, fail)
@@ -337,6 +329,7 @@ __NAMESPACE_INT_END
 #undef __DEFINE_WRAPPER
 #ifdef __cplusplus
 extern "C++" {
+
 template<class __T>
 #define __hybrid_atomic_load __hybrid_atomic_load
 __FORCELOCAL __T __NOTHROW_NCX(__hybrid_atomic_load)(__T &__x, int __order) {
@@ -357,10 +350,14 @@ __FORCELOCAL __T __NOTHROW_NCX(__hybrid_atomic_load)(__T &__x, int __order) {
 		}
 	}
 }
+
 }
 #else /* __cplusplus */
-#define __hybrid_atomic_load(x, order) \
-	__ATOMIC_RECAST(x, sizeof(x) == 1 ? __NAMESPACE_INT_SYM __impl_hybrid_atomic_load8((void *)&(x), order) : sizeof(x) == 2 ? __NAMESPACE_INT_SYM __impl_hybrid_atomic_load16((void *)&(x), order) : sizeof(x) == 4 ? __NAMESPACE_INT_SYM __impl_hybrid_atomic_load32((void *)&(x), order) : __NAMESPACE_INT_SYM __impl_hybrid_atomic_load64((void *)&(x), order))
+#define __hybrid_atomic_load(x, order)                                                                         \
+	__ATOMIC_RECAST(x, sizeof(x) == 1 ? __NAMESPACE_INT_SYM __impl_hybrid_atomic_load8((void *)&(x), order) :  \
+	                   sizeof(x) == 2 ? __NAMESPACE_INT_SYM __impl_hybrid_atomic_load16((void *)&(x), order) : \
+	                   sizeof(x) == 4 ? __NAMESPACE_INT_SYM __impl_hybrid_atomic_load32((void *)&(x), order) : \
+	                                    __NAMESPACE_INT_SYM __impl_hybrid_atomic_load64((void *)&(x), order))
 #endif /* !__cplusplus */
 #endif /* __NO_XBLOCK || !__COMPILER_HAVE_TYPEOF */
 #endif /* !__hybrid_atomic_load */
