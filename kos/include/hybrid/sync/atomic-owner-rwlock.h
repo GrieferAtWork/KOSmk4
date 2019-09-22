@@ -120,7 +120,7 @@ __LOCAL __ATTR_WUNUSED unsigned int __NOTHROW(atomic_owner_rwlock_upgrade_nx)(st
 #endif
 
 /* Downgrade a write-lock to a read-lock (Always succeeds). */
-__LOCAL __BOOL __NOTHROW(atomic_owner_rwlock_downgrade)(struct atomic_owner_rwlock *__restrict __self);
+__LOCAL void __NOTHROW(atomic_owner_rwlock_downgrade)(struct atomic_owner_rwlock *__restrict __self);
 
 /* End reading/writing/either.
  * @return: true:  The lock has become free.
@@ -376,7 +376,7 @@ __NOTHROW(atomic_owner_rwlock_upgrade_nx)(struct atomic_owner_rwlock *__restrict
 }
 #endif
 
-__LOCAL __BOOL
+__LOCAL void
 __NOTHROW(atomic_owner_rwlock_downgrade)(struct atomic_owner_rwlock *__restrict __self) {
 #ifdef NDEBUG
 	__COMPILER_WRITE_BARRIER();

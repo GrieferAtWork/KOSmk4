@@ -69,7 +69,7 @@ __LOCAL void (atomic_rwlock_write)(struct atomic_rwlock *__restrict __self);
 #if defined(__KERNEL__) && defined(__KOS_VERSION__) && __KOS_VERSION__ >= 400
 __LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_rwlock_read_nx)(struct atomic_rwlock *__restrict __self);
 __LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_rwlock_write_nx)(struct atomic_rwlock *__restrict __self);
-#endif
+#endif /* __KERNEL__ && __KOS_VERSION__ >= 400 */
 
 /* Try to upgrade a read-lock to a write-lock. Return `FALSE' upon failure. */
 __LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_rwlock_tryupgrade)(struct atomic_rwlock *__restrict __self);
@@ -86,7 +86,7 @@ __LOCAL __ATTR_WUNUSED __BOOL (atomic_rwlock_upgrade)(struct atomic_rwlock *__re
  * NOTE: When `0' is returned, the original read-lock created by the caller has
  *       already been released. */
 __LOCAL __ATTR_WUNUSED unsigned int __NOTHROW(atomic_rwlock_upgrade_nx)(struct atomic_rwlock *__restrict __self);
-#endif
+#endif /* __KERNEL__ && __KOS_VERSION__ >= 400 */
 
 /* Downgrade a write-lock to a read-lock (Always succeeds). */
 __LOCAL void __NOTHROW(atomic_rwlock_downgrade)(struct atomic_rwlock *__restrict __self);
@@ -105,61 +105,61 @@ __LOCAL __BOOL __NOTHROW(atomic_rwlock_end)(struct atomic_rwlock *__restrict __s
 __LOCAL void __NOTHROW(atomic_rwlock_endwrite)(struct atomic_rwlock *__restrict __self) {
 	__COMPILER_BARRIER();
 #ifdef NDEBUG
-	__hybrid_atomic_store(__self->arw_lock,0,__ATOMIC_RELEASE);
-#else
+	__hybrid_atomic_store(__self->arw_lock, 0, __ATOMIC_RELEASE);
+#else /* NDEBUG */
 	__UINTPTR_TYPE__ __f;
 	do {
-		__f = __hybrid_atomic_load(__self->arw_lock,__ATOMIC_ACQUIRE);
-		__hybrid_assertf(__f & __ATOMIC_RWLOCK_WFLAG,"Lock isn't in write-mode (%x)",__f);
-	} while (!__hybrid_atomic_cmpxch_weak(__self->arw_lock,__f,0,__ATOMIC_RELEASE,__ATOMIC_RELAXED));
-#endif
+		__f = __hybrid_atomic_load(__self->arw_lock, __ATOMIC_ACQUIRE);
+		__hybrid_assertf(__f & __ATOMIC_RWLOCK_WFLAG, "Lock isn't in write-mode (%x)", __f);
+	} while (!__hybrid_atomic_cmpxch_weak(__self->arw_lock, __f, 0, __ATOMIC_RELEASE, __ATOMIC_RELAXED));
+#endif /* !NDEBUG */
 }
 
 __LOCAL __BOOL __NOTHROW(atomic_rwlock_endread)(struct atomic_rwlock *__restrict __self) {
 	__COMPILER_READ_BARRIER();
 #ifdef NDEBUG
-	return __hybrid_atomic_decfetch(__self->arw_lock,__ATOMIC_RELEASE) == 0;
+	return __hybrid_atomic_decfetch(__self->arw_lock, __ATOMIC_RELEASE) == 0;
 #else /* NDEBUG */
 	__UINTPTR_TYPE__ __f;
 	do {
-		__f = __hybrid_atomic_load(__self->arw_lock,__ATOMIC_ACQUIRE);
+		__f = __hybrid_atomic_load(__self->arw_lock, __ATOMIC_ACQUIRE);
 		__hybrid_assertf(!(__f & __ATOMIC_RWLOCK_WFLAG),"Lock is in write-mode (%x)",__f);
-		__hybrid_assertf(__f != 0,"Lock isn't held by anyone");
-	} while (!__hybrid_atomic_cmpxch_weak(__self->arw_lock,__f,__f-1,__ATOMIC_RELEASE,__ATOMIC_RELAXED));
+		__hybrid_assertf(__f != 0, "Lock isn't held by anyone");
+	} while (!__hybrid_atomic_cmpxch_weak(__self->arw_lock, __f, __f - 1, __ATOMIC_RELEASE, __ATOMIC_RELAXED));
 	return __f == 1;
 #endif /* !NDEBUG */
 }
 
 __LOCAL __BOOL __NOTHROW(atomic_rwlock_end)(struct atomic_rwlock *__restrict __self) {
-	__UINTPTR_TYPE__ __temp,__newval;
+	__UINTPTR_TYPE__ __temp, __newval;
 	__COMPILER_BARRIER();
 	do {
-		__temp = __hybrid_atomic_load(__self->arw_lock,__ATOMIC_ACQUIRE);
+		__temp = __hybrid_atomic_load(__self->arw_lock, __ATOMIC_ACQUIRE);
 		if __untraced(__temp & __ATOMIC_RWLOCK_WFLAG) {
 			__hybrid_assert(!(__temp&__ATOMIC_RWLOCK_RMASK));
 			__newval = 0;
 		} else {
-			__hybrid_assertf(__temp != 0,"No remaining read-locks");
+			__hybrid_assertf(__temp != 0, "No remaining read-locks");
 			__newval = __temp-1;
 		}
-	} while (!__hybrid_atomic_cmpxch_weak(__self->arw_lock,__temp,__newval,__ATOMIC_RELEASE,__ATOMIC_RELAXED));
+	} while (!__hybrid_atomic_cmpxch_weak(__self->arw_lock, __temp, __newval, __ATOMIC_RELEASE, __ATOMIC_RELAXED));
 	return __newval == 0;
 }
 
 __LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_rwlock_tryread)(struct atomic_rwlock *__restrict __self) {
 	__UINTPTR_TYPE__ __temp;
 	do {
-		__temp = __hybrid_atomic_load(__self->arw_lock,__ATOMIC_ACQUIRE);
+		__temp = __hybrid_atomic_load(__self->arw_lock, __ATOMIC_ACQUIRE);
 		if __untraced(__temp & __ATOMIC_RWLOCK_WFLAG)
 			return 0;
 		__hybrid_assert((__temp&__ATOMIC_RWLOCK_RMASK) != __ATOMIC_RWLOCK_RMASK);
-	} while (!__hybrid_atomic_cmpxch_weak(__self->arw_lock,__temp,__temp + 1,__ATOMIC_SEQ_CST,__ATOMIC_RELAXED));
+	} while (!__hybrid_atomic_cmpxch_weak(__self->arw_lock, __temp, __temp + 1, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED));
 	__COMPILER_READ_BARRIER();
 	return 1;
 }
 
 __LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_rwlock_trywrite)(struct atomic_rwlock *__restrict __self) {
-	if __untraced(!__hybrid_atomic_cmpxch(__self->arw_lock,0,__ATOMIC_RWLOCK_WFLAG,__ATOMIC_SEQ_CST,__ATOMIC_RELAXED))
+	if __untraced(!__hybrid_atomic_cmpxch(__self->arw_lock, 0, __ATOMIC_RWLOCK_WFLAG, __ATOMIC_SEQ_CST, __ATOMIC_RELAXED))
 		return 0;
 	__COMPILER_BARRIER();
 	return 1;
@@ -195,16 +195,16 @@ __LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_rwlock_write_nx)(struct atomic_rw
 	__COMPILER_READ_BARRIER();
 	return 1;
 }
-#endif
+#endif /* __KERNEL__ && __KOS_VERSION__ >= 400 */
 
 __LOCAL __ATTR_WUNUSED __BOOL __NOTHROW(atomic_rwlock_tryupgrade)(struct atomic_rwlock *__restrict __self) {
 	__UINTPTR_TYPE__ __temp;
 	do {
-		__temp = __hybrid_atomic_load(__self->arw_lock,__ATOMIC_ACQUIRE);
+		__temp = __hybrid_atomic_load(__self->arw_lock, __ATOMIC_ACQUIRE);
 		if __untraced(__temp != 1)
 			return 0;
-	} while (!__hybrid_atomic_cmpxch_weak(__self->arw_lock,__temp,__ATOMIC_RWLOCK_WFLAG,
-	                                      __ATOMIC_SEQ_CST,__ATOMIC_RELAXED));
+	} while (!__hybrid_atomic_cmpxch_weak(__self->arw_lock, __temp, __ATOMIC_RWLOCK_WFLAG,
+	                                      __ATOMIC_SEQ_CST, __ATOMIC_RELAXED));
 	__COMPILER_WRITE_BARRIER();
 	return 1;
 }
@@ -227,20 +227,20 @@ __NOTHROW(atomic_rwlock_upgrade_nx)(struct atomic_rwlock *__restrict __self) {
 		return 0;
 	return 2;
 }
-#endif
+#endif /* __KERNEL__ && __KOS_VERSION__ >= 400 */
 
 __LOCAL void __NOTHROW(atomic_rwlock_downgrade)(struct atomic_rwlock *__restrict __self) {
 #ifdef NDEBUG
 	__COMPILER_WRITE_BARRIER();
-	__hybrid_atomic_store(__self->arw_lock,1,__ATOMIC_ACQ_REL);
+	__hybrid_atomic_store(__self->arw_lock, 1, __ATOMIC_ACQ_REL);
 #else /* NDEBUG */
 	__UINTPTR_TYPE__ __f;
 	__COMPILER_WRITE_BARRIER();
 	do {
-		__f = __hybrid_atomic_load(__self->arw_lock,__ATOMIC_ACQUIRE);
-		__hybrid_assertf(__f == __ATOMIC_RWLOCK_WFLAG,"Lock not in write-mode (%x)",__f);
-	} while (!__hybrid_atomic_cmpxch_weak(__self->arw_lock,__f,1,
-	                                      __ATOMIC_SEQ_CST,__ATOMIC_RELAXED));
+		__f = __hybrid_atomic_load(__self->arw_lock, __ATOMIC_ACQUIRE);
+		__hybrid_assertf(__f == __ATOMIC_RWLOCK_WFLAG, "Lock not in write-mode (%x)", __f);
+	} while (!__hybrid_atomic_cmpxch_weak(__self->arw_lock, __f, 1,
+	                                      __ATOMIC_SEQ_CST, __ATOMIC_RELAXED));
 #endif /* !NDEBUG */
 }
 #endif /* !__INTELLISENSE__ */
@@ -385,11 +385,11 @@ __LOCAL void __NOTHROW(atomic_rwlock_downgrade)(struct atomic_rwlock *__restrict
 #endif /* __ASSEMBLER__ */
 
 #if !defined(__INTELLISENSE__) && !defined(__NO_builtin_expect)
-#define atomic_rwlock_tryread(__self)    __builtin_expect(atomic_rwlock_tryread(__self),1)
-#define atomic_rwlock_trywrite(__self)   __builtin_expect(atomic_rwlock_trywrite(__self),1)
-#define atomic_rwlock_tryupgrade(__self) __builtin_expect(atomic_rwlock_tryupgrade(__self),1)
-#define atomic_rwlock_upgrade(__self)    __builtin_expect(atomic_rwlock_upgrade(__self),1)
-#endif
+#define atomic_rwlock_tryread(__self)    __builtin_expect(atomic_rwlock_tryread(__self), 1)
+#define atomic_rwlock_trywrite(__self)   __builtin_expect(atomic_rwlock_trywrite(__self), 1)
+#define atomic_rwlock_tryupgrade(__self) __builtin_expect(atomic_rwlock_tryupgrade(__self), 1)
+#define atomic_rwlock_upgrade(__self)    __builtin_expect(atomic_rwlock_upgrade(__self), 1)
+#endif /* !__INTELLISENSE__ && !__NO_builtin_expect */
 
 #ifdef __DEFINE_SYNC_RWLOCK
 __DEFINE_SYNC_RWLOCK(struct atomic_rwlock,
