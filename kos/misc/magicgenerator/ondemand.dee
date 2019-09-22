@@ -24,9 +24,7 @@ import * from ..libmagic.libmagic;
 
 
 function doRunDeemonScript(filename: string): ipc.Process {
-	/* TODO: generate_header.dee crashes deemon with other optimization levels...
-	 *       -> Fix whatever it is that is breaking the deemon core. */
-	local proc = ipc.Process("deemon", ["-O0", filename]);
+	local proc = ipc.Process("deemon", [filename]);
 	proc.start();
 	return proc;
 }
