@@ -384,7 +384,7 @@ __NOTHROW(atomic_owner_rwlock_downgrade)(struct atomic_owner_rwlock *__restrict 
 	__COMPILER_WRITE_BARRIER();
 	ATOMIC_WRITE(__self->aorw_lock, 1);
 #else /* NDEBUG */
-	__UINT32_TYPE__ __f;
+	__UINTPTR_TYPE__ __f;
 	__COMPILER_WRITE_BARRIER();
 	__hybrid_assertf(__hybrid_gettid_iscaller(__self->aorw_owner),
 	                 "You're not the owner!\n"

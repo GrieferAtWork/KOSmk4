@@ -70,6 +70,7 @@ __NAMESPACE_INT_END
 
 #if !defined(__NO_hybrid_dbg_alignment) && \
     !defined(__KOS_SYSTEM_HEADERS__)
+#include "typecore.h"
 /* C's string functions aren't alignment-safe, so we override them here! */
 #include <string.h>
 #ifdef _MSC_VER
