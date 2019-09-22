@@ -122,14 +122,14 @@ global final ROOTDIR: string =
 	fs.expand(fs.headof((argv from rt)[0]), "pac")
 #ifdef __WINDOWS__
 	.replace("\\", "/").lower()
-#endif
+#endif /* __WINDOWS__ */
 	.rstrip("/") + "/";
 
 function joinpath(paths...: string): string {
 	return fs.expand(fs.joinpath(paths...), "p")
 #ifdef __WINDOWS__
 		.replace("\\", "/")
-#endif
+#endif /* __WINDOWS__ */
 		.lsstrip("./")
 	;
 }
@@ -170,6 +170,7 @@ function cygwinReadLink(path: string): string | bool | none {
 	_cygwinReadlinkCache[path] = result;
 	return result;
 }
+
 local final _cygwinRalpathCache: {string: string} = Dict();
 function cygwinRealpath(path: string): string {
 	local orig_path = path;
@@ -195,7 +196,7 @@ again:
 	_cygwinRalpathCache[orig_path] = result;
 	return result;
 }
-#endif
+#endif /* __WINDOWS__ */
 
 
 @@Normalize a given file path
@@ -215,9 +216,9 @@ function normalizePath(path: string, expand_symlinks: bool = true): string {
 	if (path.lower().startswith(ROOTDIR))
 		path = path[#ROOTDIR:];
 	return path;
-#else
+#else /* __WINDOWS__ */
 	return fs.expand(fs.abspath(path, ROOTDIR), "p").lsstrip(ROOTDIR);
-#endif
+#endif /* !__WINDOWS__ */
 }
 
 @@Cache of already created directories.
@@ -228,7 +229,7 @@ final local function createDirectoryTree(path: string) {
 	path = path.rstrip("/");
 	if (path in _createdDirectoriesCache)
 		return;
-	if (!fs.stat.isdir(path)) {
+	if (path && !fs.stat.isdir(path)) {
 		createDirectoryTree(fs.headof(path));
 		fs.mkdir(path);
 	}
@@ -323,6 +324,7 @@ global Toolchain;
 @@Vtable descriptor for a custom build Step
 class Step {
 	this = default;
+
 	operator str() -> name;
 	operator repr() -> name;
 
@@ -386,10 +388,12 @@ class Step {
 		getRequiredFiles = [](self: BoundStep) -> self.group.fixFilenames(files);
 		return this;
 	}
+
 	final function withModifiedOutputFiles(files: {string...}): Step {
 		getModifiedOutputFiles = [](self: BoundStep) -> self.group.fixFilenames(files);
 		return this;
 	}
+
 	final function withMaybeModifiedOutputFiles(files: {string...}): Step {
 		getMaybeModifiedOutputFiles = [](self: BoundStep) -> self.group.fixFilenames(files);
 		return this;
@@ -399,16 +403,20 @@ class Step {
 
 class Group {
 	this = default;
+
 	@@The name of this group (Only for logs; no syntactical meaning)
 	public final member name: string;
+
 	@@List of compilation steps, which are functions invoked
 	@@as Callable(group: Group, changed: bool): {Waitable...}
 	@@The given parameter `changed' is set to true for the first
 	@@step, as well as any step performed after a previous step
 	@@returned at least 1 Waitable Object
 	public final member steps: {Step...} = [];
+
 	@@Group-specific options (for use by step callbacks)
 	public final member options: {string: Object} = Dict();
+
 	@@The path in which this group is defined
 	public final member defPath: string = "";
 
@@ -425,17 +433,19 @@ class Group {
 		}
 	}
 
-
 	private member _wildcardEnumerationCache: {string: {string...}} = Dict();
+
 	function fixFilename(filename: string): string {
 		if (filename.startswith("/"))
 			return filename.lstrip("/");
 		return joinpath(defPath, filename);
 	}
+
 	function fixFilenames(filenames: {string...}): {string...} {
 		for (local x: filenames)
 			yield fixFilename(x);
 	}
+
 	function enumerateWildcardFiles(pattern: string | {string...}): {string...} {
 		if (pattern !is string) {
 			for (local x: pattern)
@@ -486,9 +496,9 @@ class Config {
 	@@The default file extension for produced libraries
 #ifdef __WINDOWS__
 	public final member LIBRARY_SUFFIX: string = ".dll";
-#else
+#else /* __WINDOWS__ */
 	public final member LIBRARY_SUFFIX: string = ".so";
-#endif
+#endif /* !__WINDOWS__ */
 
 	@@Set to true if a re-build of all steps should be forced
 	public final member FORCE: bool = false;
@@ -518,6 +528,7 @@ class Waitable {
 	//function waitfor();
 	//function trywaitfor();
 }
+
 function joinProcess(p: ipc.Process) {
 	local error = p.join();
 	if (error != 0) {
@@ -525,6 +536,7 @@ function joinProcess(p: ipc.Process) {
 			.format({ p.cmdline, error }));
 	}
 }
+
 function tryJoinProcess(p: ipc.Process): bool {
 	local error = p.tryjoin();
 	if (error is none)
@@ -536,14 +548,20 @@ function tryJoinProcess(p: ipc.Process): bool {
 }
 
 class WaitableJoin: Waitable {
+
 	private member obj: ipc.Process | Thread | Object;
-	this(obj) { this.obj = obj; }
+
+	this(obj) {
+		this.obj = obj;
+	}
+
 	function waitfor() {
 		return obj is ipc.Process
 			? joinProcess(obj)
 			: obj.join()
 			;
 	}
+
 	function trywaitfor(): bool {
 		return obj is ipc.Process
 			? tryJoinProcess(obj)
@@ -590,12 +608,16 @@ class BoundStep {
 		result.userData = userData;
 		return result;
 	}
+
 	@@The bound group
 	public final member group: Group;
+
 	@@The bound step
 	public final member step: Step;
+
 	@@The used toolchain
 	public final member toolchain: Toolchain;
+
 	@@Step-specific data
 	public final member userData: Object;
 
@@ -874,7 +896,6 @@ class BoundStep {
 		}
 	}
 
-
 	@@Waitables that need to complete before this step can be finished
 	private final member _step_waitables: {Waitable...};
 
@@ -939,6 +960,7 @@ class BoundStep {
 	}
 }
 
+
 @@Combine the given steps into a single step
 function combineSteps(steps...: Step): Step {
 	if (#steps == 1)
@@ -958,7 +980,6 @@ function combineSteps(steps...: Step): Step {
 		}
 	);
 }
-
 
 
 @@Order build steps and return all steps that need to be performed to build all of the given groups.
@@ -1066,6 +1087,8 @@ did_resolve:
 	}
 	return (allsteps, loop_recheck);
 }
+
+
 function executeBuildSteps(steps: {BoundStep...}, recheck: {BoundStep...}, maxParallelSteps: int = 8) {
 	local missing_steps: {BoundStep...} = HashSet(steps);
 	local finished_steps: {BoundStep...} = HashSet();

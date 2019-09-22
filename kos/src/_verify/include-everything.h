@@ -28,18 +28,21 @@
  *   - _ALL_SOURCE
  *   - __cplusplus
  *   - __cplusplus, _ALL_SOURCE
- *   - __KERNEL__
- *   - __KERNEL__, _ALL_SOURCE
- *   - __KERNEL__, __cplusplus
- *   - __KERNEL__, __cplusplus, _ALL_SOURCE
  *   - __CRT_FREESTANDING
  *   - __CRT_FREESTANDING, _ALL_SOURCE
  *   - __CRT_FREESTANDING, __cplusplus
  *   - __CRT_FREESTANDING, __cplusplus, _ALL_SOURCE
+ *   - __KERNEL__
+ *   - __KERNEL__, _ALL_SOURCE
+ *   - __KERNEL__, __cplusplus
+ *   - __KERNEL__, __cplusplus, _ALL_SOURCE
  *   - __CRT_FREESTANDING, __KERNEL__
  *   - __CRT_FREESTANDING, __KERNEL__, _ALL_SOURCE
  *   - __CRT_FREESTANDING, __KERNEL__, __cplusplus
  *   - __CRT_FREESTANDING, __KERNEL__, __cplusplus, _ALL_SOURCE
+ * NOTE: The __KERNEL__ variants are achieved by include all *.c files
+ *       twice, once as part of the kernel core, and once again as part
+ *       of /bin/system-test
  */
 
  /*[[[deemon
