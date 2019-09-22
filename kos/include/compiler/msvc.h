@@ -246,22 +246,28 @@ template<> struct __msvc_static_if<true> { bool __is_true__(); };
 #define __UINT64_TYPE__          unsigned __int64
 
 #ifndef __USER_LABEL_PREFIX__
-#define __USER_LABEL_PREFIX__           _ /* XXX: This is always the case? */
+#if defined(__x86_64__) || defined(__amd64__) || defined(__amd64) || \
+    defined(__x86_64) || defined(_M_X64) || defined(_M_AMD64) || \
+    defined(_WIN64) || defined(WIN64)
+#define __USER_LABEL_PREFIX__           /* nothing */
+#else
+#define __USER_LABEL_PREFIX__           _
 #endif
-#define __DEFINE_ALIAS_STR(x)           #x
+#endif /* !__USER_LABEL_PREFIX__ */
 
-#define __DEFINE_PRIVATE_ALIAS(new,old) \
-  __pragma(comment(linker,"/alternatename:" __DEFINE_ALIAS_STR(new) "=" __DEFINE_ALIAS_STR(old)))
-#define __DEFINE_PUBLIC_ALIAS(new,old)  \
-  __pragma(comment(linker,"/alternatename:" __DEFINE_ALIAS_STR(new) "=" __DEFINE_ALIAS_STR(old))) \
-  __pragma(comment(linker,"/export:" __DEFINE_ALIAS_STR(new)))
-#define __DEFINE_INTERN_ALIAS(new,old)  \
-  __pragma(comment(linker,"/alternatename:" __DEFINE_ALIAS_STR(new) "=" __DEFINE_ALIAS_STR(old)))
+#define __DEFINE_ALIAS_STR(x)           #x
+#define __DEFINE_PRIVATE_ALIAS(new, old) \
+	__pragma(comment(linker, "/alternatename:" __DEFINE_ALIAS_STR(new) "=" __DEFINE_ALIAS_STR(old)))
+#define __DEFINE_PUBLIC_ALIAS(new, old)                                                              \
+	__pragma(comment(linker, "/alternatename:" __DEFINE_ALIAS_STR(new) "=" __DEFINE_ALIAS_STR(old))) \
+	__pragma(comment(linker, "/export:" __DEFINE_ALIAS_STR(new)))
+#define __DEFINE_INTERN_ALIAS(new, old) \
+	__pragma(comment(linker, "/alternatename:" __DEFINE_ALIAS_STR(new) "=" __DEFINE_ALIAS_STR(old)))
 
 /* TODO: selectany? */
-#define __DEFINE_PRIVATE_WEAK_ALIAS(new,old) __DEFINE_PRIVATE_ALIAS(new,old)
-#define __DEFINE_PUBLIC_WEAK_ALIAS(new,old)  __DEFINE_PUBLIC_ALIAS(new,old)
-#define __DEFINE_INTERN_WEAK_ALIAS(new,old)  __DEFINE_INTERN_ALIAS(new,old)
+#define __DEFINE_PRIVATE_WEAK_ALIAS(new, old) __DEFINE_PRIVATE_ALIAS(new, old)
+#define __DEFINE_PUBLIC_WEAK_ALIAS(new, old)  __DEFINE_PUBLIC_ALIAS(new, old)
+#define __DEFINE_INTERN_WEAK_ALIAS(new, old)  __DEFINE_INTERN_ALIAS(new, old)
 
 
 #if !defined(__INTELLISENSE__)
@@ -269,10 +275,10 @@ template<> struct __msvc_static_if<true> { bool __is_true__(); };
  * that all of these ~comments~ must be passed via the commandline... */
 #define __REDIRECT_PP_STR2(x) #x
 #define __REDIRECT_PP_STR(x) __REDIRECT_PP_STR2(x)
-#define __REDIRECT_ASSEMBLY(x,y) \
-  __pragma(comment(linker,"/alternatename:" __REDIRECT_PP_STR(__USER_LABEL_PREFIX__) #x "=" __REDIRECT_PP_STR(__USER_LABEL_PREFIX__) #y)) \
-  __pragma(comment(linker,"/alternatename:__imp_" __REDIRECT_PP_STR(__USER_LABEL_PREFIX__) #x "=__imp_" __REDIRECT_PP_STR(__USER_LABEL_PREFIX__) #y)) \
-  __pragma(comment(linker,"/alternatename:__imp__" __REDIRECT_PP_STR(__USER_LABEL_PREFIX__) #x "=__imp__" __REDIRECT_PP_STR(__USER_LABEL_PREFIX__) #y))
+#define __REDIRECT_ASSEMBLY(x, y)                                                                                                                        \
+	__pragma(comment(linker, "/alternatename:" __REDIRECT_PP_STR(__USER_LABEL_PREFIX__) #x "=" __REDIRECT_PP_STR(__USER_LABEL_PREFIX__) #y))             \
+	__pragma(comment(linker, "/alternatename:__imp_" __REDIRECT_PP_STR(__USER_LABEL_PREFIX__) #x "=__imp_" __REDIRECT_PP_STR(__USER_LABEL_PREFIX__) #y)) \
+	__pragma(comment(linker, "/alternatename:__imp__" __REDIRECT_PP_STR(__USER_LABEL_PREFIX__) #x "=__imp__" __REDIRECT_PP_STR(__USER_LABEL_PREFIX__) #y))
 #define __REDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args)                                       decl attr Treturn nothrow(cc name) param; __REDIRECT_ASSEMBLY(name,asmname)
 #define __REDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,args)                                          decl attr void nothrow(cc name) param; __REDIRECT_ASSEMBLY(name,asmname)
 #define __VREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,args,before_va_start,varcount,vartypes)    decl attr Treturn nothrow(cc name) param; __REDIRECT_ASSEMBLY(name,asmname)
@@ -282,6 +288,7 @@ template<> struct __msvc_static_if<true> { bool __is_true__(); };
 #define __XREDIRECT(decl,attr,Treturn,nothrow,cc,name,param,asmname,code)                                      decl attr Treturn nothrow(cc name) param; __REDIRECT_ASSEMBLY(name,asmname)
 #define __XREDIRECT_VOID(decl,attr,nothrow,cc,name,param,asmname,code)                                         decl attr void nothrow(cc name) param; __REDIRECT_ASSEMBLY(name,asmname)
 #endif
+
 
 
 /* Define intrinsic barrier functions. */
