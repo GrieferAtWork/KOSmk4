@@ -209,9 +209,9 @@
 #define __NO_builtin_constant_p  1
 #ifdef __LINKER__
 #define __builtin_constant_p(x)  1 /* Anything the linker can work with is constant. */
-#else
+#else /* __LINKER__ */
 #define __builtin_constant_p(x)  0
-#endif
+#endif /* !__LINKER__ */
 #define __restrict_arr           /* nothing */
 #define __COMPILER_FLEXIBLE_ARRAY(T,x) /* nothing */
 

@@ -103,9 +103,9 @@ typedef struct __siginfo32_struct /*[NAME(siginfo32)][PREFIX(si_)]*/ {
 	__INT32_TYPE__ si_code;  /* Signal code. */
 #if defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) && \
 	defined(__COMPILER_HAVE_TRANSPARENT_UNION)
-#if !defined(__USE_KOS) || defined(GUARD_LIBC_HYBRID_ARCH_I386_ASSERT_OFFSETS_C)
+#if !defined(__USE_KOS) || defined(GUARD__VERIFY_ARCH_I386_ASSERT_OFFSETS_C)
 	union {
-#endif /* !__USE_KOS || GUARD_LIBC_HYBRID_ARCH_I386_ASSERT_OFFSETS_C */
+#endif /* !__USE_KOS || GUARD__VERIFY_ARCH_I386_ASSERT_OFFSETS_C */
 	union {
 		__INT32_TYPE__ _si_data[(__SI32_MAX_SIZE / 4) - 3];
 		struct { /* kill(). */
@@ -153,7 +153,7 @@ typedef struct __siginfo32_struct /*[NAME(siginfo32)][PREFIX(si_)]*/ {
 #endif /* Transparent struct/union */
 #if !defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) || \
 	!defined(__COMPILER_HAVE_TRANSPARENT_UNION) || \
-	!defined(__USE_KOS) || defined(GUARD_LIBC_HYBRID_ARCH_I386_ASSERT_OFFSETS_C)
+	!defined(__USE_KOS) || defined(GUARD__VERIFY_ARCH_I386_ASSERT_OFFSETS_C)
 	union {
 		__INT32_TYPE__ _data[(__SI32_MAX_SIZE / 4) - 3];
 		struct { /* kill(). */
@@ -199,9 +199,9 @@ typedef struct __siginfo32_struct /*[NAME(siginfo32)][PREFIX(si_)]*/ {
 #endif /* ... */
 #if defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) && \
 	defined(__COMPILER_HAVE_TRANSPARENT_UNION)
-#if !defined(__USE_KOS) || defined(GUARD_LIBC_HYBRID_ARCH_I386_ASSERT_OFFSETS_C)
+#if !defined(__USE_KOS) || defined(GUARD__VERIFY_ARCH_I386_ASSERT_OFFSETS_C)
 	};
-#endif /* !__USE_KOS || GUARD_LIBC_HYBRID_ARCH_I386_ASSERT_OFFSETS_C */
+#endif /* !__USE_KOS || GUARD__VERIFY_ARCH_I386_ASSERT_OFFSETS_C */
 #else
 #define _si_data        _sifields._data
 #define __sig_si_pid    _sifields._rt._si_pid

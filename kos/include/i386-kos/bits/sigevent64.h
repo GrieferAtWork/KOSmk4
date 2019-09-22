@@ -71,9 +71,9 @@ typedef struct sigevent64 /*[PREFIX(sigev_)]*/ {
 	__INT32_TYPE__   sigev_notify; /* ... */
 #if defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) && \
     defined(__COMPILER_HAVE_TRANSPARENT_UNION)
-#if !defined(__USE_KOS) || defined(GUARD_LIBC_HYBRID_ARCH_I386_ASSERT_OFFSETS_C)
+#if !defined(__USE_KOS) || defined(GUARD__VERIFY_ARCH_I386_ASSERT_OFFSETS_C)
 	union {
-#endif /* !__USE_KOS || GUARD_LIBC_HYBRID_ARCH_I386_ASSERT_OFFSETS_C */
+#endif /* !__USE_KOS || GUARD__VERIFY_ARCH_I386_ASSERT_OFFSETS_C */
 	union {
 		__UINT64_TYPE__ _sigev_data[(__SIGEV64_MAX_SIZE / 8) - 2];
 		__INT32_TYPE__  _sigev_tid; /* When SIGEV_SIGNAL and SIGEV_THREAD_ID set, LWP
@@ -83,7 +83,7 @@ typedef struct sigevent64 /*[PREFIX(sigev_)]*/ {
 			__HYBRID_PTR64(pthread_attr_t)       sigev_notify_attributes;                       /* Thread attributes. */
 		};
 	};
-#if !defined(__USE_KOS) || defined(GUARD_LIBC_HYBRID_ARCH_I386_ASSERT_OFFSETS_C)
+#if !defined(__USE_KOS) || defined(GUARD__VERIFY_ARCH_I386_ASSERT_OFFSETS_C)
 	union {
 		__UINT64_TYPE__ _data[(__SIGEV64_MAX_SIZE / 8) - 2];
 		__INT32_TYPE__  _tid; /* When SIGEV_SIGNAL and SIGEV_THREAD_ID set, LWP
@@ -94,7 +94,7 @@ typedef struct sigevent64 /*[PREFIX(sigev_)]*/ {
 		} _sigev_thread;
 	} _sigev_un;
 	};
-#endif /* !__USE_KOS || GUARD_LIBC_HYBRID_ARCH_I386_ASSERT_OFFSETS_C */
+#endif /* !__USE_KOS || GUARD__VERIFY_ARCH_I386_ASSERT_OFFSETS_C */
 #else
 	union {
 		__UINT64_TYPE__ _data[(__SIGEV64_MAX_SIZE / 8) - 2];

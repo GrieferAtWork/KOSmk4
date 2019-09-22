@@ -21,7 +21,7 @@ KOSmk4 no longer is a small kernel. I'd say it has reached the point of really b
 <a name="applications"></a>
 ## Ported Applications
 
-All ported applications can be installed onto you KOS disk image by using `bash $PROJPATH/kos/misc/make_utility.sh i386 <UTILITY_NAME>`
+All ported applications can be installed onto you KOS disk image by using `bash $PROJPATH/kos/misc/make_utility.sh i386 <UTILITY_NAME>` (see also: [Getting a Shell](#shell))
 
 - Shell/coreutils
 	- [busybox-1.31.0](https://www.busybox.net)
@@ -340,9 +340,27 @@ All ported applications can be installed onto you KOS disk image by using `bash 
 	- The `likely` and `unlikely` keywords cannot be programmed to work correctly with clang-format and need manual adjustment after formatting
 	- Incorrect instances of formatting resulting from this can be detected with the regular expressions found in `/kos/.clang-format`
 - Try not to make direct use of GCC builtin functions. - Use the much more portable functions available through `/kos/include/hybrid/*`. Otherwise, always check if the builtin exists with `__has_builtin()` beforehand (don't worry about GCC not providing `__has_builtin()`; the kos headers are able to emulate that macro for GCC)
+	- As an exception to this rule, the following GCC builtins can always be used without first being checked (since they can easily be emulated, or stubbed out on unsupported compilers):
+		- `__builtin_va_list`, `__builtin_va(start|end|copy|arg)(...)`
+		- `__builtin_prefetch(addr)`
+		- `__builtin_choose_expr(cond, tt, ff)`
+			- But don't assume that the false-branch doesn't get compiled. - Only assume that it doesn't get evaluated at runtime (this one may be emulated as `cond ? tt : ff`)
+		- `__builtin_expect(expr, expected)`
+		- `__builtin_unreachable()`
+		- `__builtin_assume(expr)`
+			- Not actually a GCC builtin, but may be used to instruct the compiler to assume that `expr` is always true (mainly useful as a replacement for `assert()` for when you *really* want to get fast code, and don't care about instabilities; use with caution and remember that it may just be a no-op)
+		- `__builtin_constant_p(expr)` (may be emulated to always evaluate to `false`)
+			- Also comes with a macro `__NO_builtin_types_compatible_p` if not supported
+		- `__restrict`
+			- Even though stdc now defines a standard keyword `restrict`, many compilers don't yet support it to the point where more compilers natively understand `__restrict` that ones that understand `restrict`
+		- `__builtin_types_compatible_p(T1, T2)` (Stubbed out to always return `0`)
+			- Also comes with a macro `__NO_builtin_types_compatible_p` if not supported
 - Always try to maintain compatibility with any arbitrary post-STDC C/C++ compiler in headers
+	- Any header must always ensure that it includes `<__stdinc.h>` at some point, or includes another header that unconditionally includes it (this header is used to do all of the work of creating a common, cross-compiler basis of available features)
 	- Anything that only a C compiler could understand must be wrapped inside a `#ifdef __CC__` block (`CC` standing C/C++-Compiler)
-	- Always allow an assembler or linker script to include any arbirary header found in `/kos/include/`
+		- Always allow an assembler or linker script to include any arbirary header found in `/kos/include/`
+		- Related to the later, also consider if an assembly source file could reasonably need to make use of structures defined in your header, and if so: add `(__|)OFFSET_MYSTRUCT_MYFIELD` and `(__|)SIZEOF_MYSTRUCT` macros describing the absolute offsets of certain fields
+			- To assert that these offsets are valid, you may add the header to the list of checked headers in `$PROJPATH/kos/src/_verify/[arch/(i386|...)/]assert_types.c`
 - Libc:
 	- Try to maintain header (API) compatibility with GLIBc, MSVC and CYGWIN
 	- Try to maintain binary (ABI) compatibility with GLIBc and MSVC (CYGWIN only as far as that is possible)
