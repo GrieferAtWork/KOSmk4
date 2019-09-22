@@ -291,6 +291,8 @@ if ! which deemon > /dev/null 2>&1; then
 		# Update $PATH such that deemon becomes apart of it.
 		export PATH="$KOS_BINUTILS/deemon:$PATH"
 	fi
+else
+	echo "    'deemon' is apart of PATH"
 fi
 
 
