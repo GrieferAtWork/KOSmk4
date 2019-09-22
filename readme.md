@@ -19,7 +19,7 @@ KOSmk4 no longer is a small kernel. I'd say it has reached the point of really b
 
 
 <a name="applications"></a>
-##Ported Applications
+## Ported Applications
 
 All ported applications can be installed onto you KOS disk image by using `bash $PROJPATH/kos/misc/make_utility.sh i386 <UTILITY_NAME>`
 
