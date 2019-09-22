@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc26c18bd */
+/* HASH CRC-32:0x8f2eb48e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -156,7 +156,7 @@
 #define SYS_rt_sigsuspend           __NR_rt_sigsuspend           /* errno_t rt_sigsuspend(struct __sigset_struct const *set, size_t sigsetsize) */
 #define SYS_pread64                 __NR_pread64                 /* ssize_t pread64(fd_t fd, void *buf, size_t bufsize, uint64_t offset) */
 #define SYS_pwrite64                __NR_pwrite64                /* ssize_t pwrite64(fd_t fd, void const *buf, size_t bufsize, uint64_t offset) */
-#define SYS_chown                   __NR_chown                   /* errno_t chown(char const *filename, uint16_t owner, uint16_t group) || errno_t chown(char const *filename, uint32_t owner, uint32_t group) */
+#define SYS_chown                   __NR_chown                   /* errno_t chown(char const *filename, uint32_t owner, uint32_t group) || errno_t chown(char const *filename, uint16_t owner, uint16_t group) */
 #define SYS_getcwd                  __NR_getcwd                  /* ssize_t getcwd(char *buf, size_t size) */
 #define SYS_sigaltstack             __NR_sigaltstack             /* errno_t sigaltstack(struct sigaltstack const *ss, struct sigaltstack *oss) */
 #define SYS_sendfile                __NR_sendfile                /* ssize_t sendfile(fd_t out_fd, fd_t in_fd, syscall_ulong_t *offset, size_t count) */

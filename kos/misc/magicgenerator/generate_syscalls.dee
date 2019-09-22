@@ -1540,6 +1540,7 @@ function generate_x86_bits_syscall_h(
 				if (tempfp !in doc_strings)
 					doc_strings.append(tempfp);
 			}
+			doc_strings.sort();
 			for (local x: doc_strings)
 				fp << x;
 			fp << "#define SYS_" << name << (" " * (longest_name_len - #name));
@@ -1547,13 +1548,15 @@ function generate_x86_bits_syscall_h(
 			if (scs) {
 				fp << (" " * (longest_name_len - #name));
 				fp << " /* ";
-				fp << " || ".join(HashSet([]{
+				local docs = List(HashSet([]{
 					for (local x: scs) {
 						File.Writer temp;
 						x.print_prototype(temp);
 						yield temp.string;
 					}
 				}()));
+				docs.sort();
+				fp << " || ".join(docs);
 				fp << " */";
 			}
 			fp << "\n";
