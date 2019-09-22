@@ -35,7 +35,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:_getdcwd,hash:0x9e02b79f]]]*/
+/*[[[head:_getdcwd,hash:CRC-32=0xda8c98ab]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.property._getdcwd") char *
 NOTHROW_RPC(LIBCCALL libc__getdcwd)(int drive,
                                     char *buf,
@@ -53,7 +53,7 @@ NOTHROW_RPC(LIBCCALL libc__getdcwd)(int drive,
 }
 /*[[[end:_getdcwd]]]*/
 
-/*[[[head:_chdrive,hash:0x794703cd]]]*/
+/*[[[head:_chdrive,hash:CRC-32=0x6f94a8ac]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.property._chdrive") int
 NOTHROW_RPC(LIBCCALL libc__chdrive)(int drive)
 /*[[[body:_chdrive]]]*/
@@ -65,7 +65,7 @@ NOTHROW_RPC(LIBCCALL libc__chdrive)(int drive)
 }
 /*[[[end:_chdrive]]]*/
 
-/*[[[head:_getdrive,hash:0x80582a40]]]*/
+/*[[[head:_getdrive,hash:CRC-32=0xa9ca7337]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.property._getdrive") int
 NOTHROW_RPC(LIBCCALL libc__getdrive)(void)
 /*[[[body:_getdrive]]]*/
@@ -88,7 +88,7 @@ NOTHROW_RPC(LIBCCALL libc__getdrive)(void)
 }
 /*[[[end:_getdrive]]]*/
 
-/*[[[head:_getdrives,hash:0xcf16dc01]]]*/
+/*[[[head:_getdrives,hash:CRC-32=0xd3791409]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.property._getdrives") __ULONG32_TYPE__
 NOTHROW_RPC(LIBCCALL libc__getdrives)(void)
 /*[[[body:_getdrives]]]*/
@@ -103,7 +103,7 @@ NOTHROW_RPC(LIBCCALL libc__getdrives)(void)
 }
 /*[[[end:_getdrives]]]*/
 
-/*[[[head:_getdiskfree,hash:0x4d5f9cc6]]]*/
+/*[[[head:_getdiskfree,hash:CRC-32=0x6127f901]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.property._getdiskfree") unsigned int
 NOTHROW_RPC(LIBCCALL libc__getdiskfree)(unsigned int drive,
                                         struct _diskfree_t *diskfree)
@@ -115,7 +115,7 @@ NOTHROW_RPC(LIBCCALL libc__getdiskfree)(unsigned int drive,
 }
 /*[[[end:_getdiskfree]]]*/
 
-/*[[[head:_mkdir,hash:0x9682bc92]]]*/
+/*[[[head:_mkdir,hash:CRC-32=0x2432c618]]]*/
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.modify._mkdir") int
 NOTHROW_RPC(LIBCCALL libc__mkdir)(char const *path)
@@ -131,7 +131,7 @@ NOTHROW_RPC(LIBCCALL libc__mkdir)(char const *path)
 
 
 
-/*[[[start:exports,hash:0x2f3ab5ca]]]*/
+/*[[[start:exports,hash:CRC-32=0x3aa41bca]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(_getdcwd, libc__getdcwd);
 DEFINE_PUBLIC_WEAK_ALIAS(_chdrive, libc__chdrive);
 DEFINE_PUBLIC_WEAK_ALIAS(_getdrive, libc__getdrive);

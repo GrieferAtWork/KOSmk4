@@ -20,6 +20,7 @@ local copyright =
 
 import fs;
 import * from deemon;
+import hash from hashlib;
 
 /* Automatically generate exception classes, as well as meta-data
  * INPUT:
@@ -36,6 +37,7 @@ import * from deemon;
 fs.chdir(fs.joinpath(fs.headof(__FILE__), "../.."));
 
 
+global hashfunc = "CRC-32";
 global ErrorClass;
 global Constant;
 
@@ -557,10 +559,11 @@ function write_hashed_file(filename: string, fp_writer: Callable) {
 			goto do_overwrite_file;
 		local old_hash = firstline.scanf(" /* HASH %[^ *]")...;
 		old_hash = old_hash.strip();
-		local expected_old_hash = old_text.operator hash().hex();
-		if (old_hash != expected_old_hash) {
+		local old_hash_name, none, old_hash_value = old_hash.partition(":")...;
+		local expected_old_hash = hash(old_hash_name, old_text).hex();
+		if (old_hash_value != expected_old_hash) {
 			print "\n\nERROR: File", repr filename, "has been modified";
-			print "\tStored hash:  ", old_hash;
+			print "\tStored hash:  ", old_hash_value;
 			print "\tExpected hash:", expected_old_hash;
 			throw "Don't overwrite modified file";
 		}
@@ -576,8 +579,8 @@ do_overwrite_file:
 		File.Writer contents;
 		fp_writer(contents);
 		contents = contents.string.encode("utf-8").bytes();
-		local new_hash = contents.operator hash().hex();
-		fp << "/* HASH " << new_hash << " */\n";
+		local new_hash = hash(hashfunc, contents).hex();
+		fp << "/* HASH " << hashfunc << ":" << new_hash << " */\n";
 		fp.write(contents);
 	}
 }
@@ -773,8 +776,6 @@ write_hashed_file("include/kos/except-codes.def", [](fp){
 	fp << "#undef END\n";
 	fp << "#endif\n";
 });
-
-
 
 
 

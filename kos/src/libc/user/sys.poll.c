@@ -32,7 +32,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:poll,hash:0x187fffc4]]]*/
+/*[[[head:poll,hash:CRC-32=0x45d8570e]]]*/
 /* @param timeout: Timeout in milliseconds (or negative for infinity) */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.io.poll.poll") int
@@ -50,7 +50,7 @@ NOTHROW_RPC(LIBCCALL libc_poll)(struct pollfd *fds,
 }
 /*[[[end:poll]]]*/
 
-/*[[[head:ppoll,hash:0x78ae9b1a]]]*/
+/*[[[head:ppoll,hash:CRC-32=0xbbec0961]]]*/
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.io.poll.ppoll") int
 NOTHROW_RPC(LIBCCALL libc_ppoll)(struct pollfd *fds,
@@ -65,7 +65,7 @@ NOTHROW_RPC(LIBCCALL libc_ppoll)(struct pollfd *fds,
 }
 /*[[[end:ppoll]]]*/
 
-/*[[[head:ppoll64,hash:0x53e1c346]]]*/
+/*[[[head:ppoll64,hash:CRC-32=0xe7db7d72]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_ppoll64, libc_ppoll);
 #else
@@ -88,7 +88,7 @@ NOTHROW_RPC(LIBCCALL libc_ppoll64)(struct pollfd *fds,
 
 
 
-/*[[[start:exports,hash:0x36090ba7]]]*/
+/*[[[start:exports,hash:CRC-32=0x99a3069f]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(poll, libc_poll);
 DEFINE_PUBLIC_WEAK_ALIAS(ppoll, libc_ppoll);
 DEFINE_PUBLIC_WEAK_ALIAS(ppoll64, libc_ppoll64);

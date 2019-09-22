@@ -30,7 +30,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:pthread_sigmask,hash:0x73fe30ac]]]*/
+/*[[[head:pthread_sigmask,hash:CRC-32=0x7a19d7df]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_sigmask") int
 NOTHROW_NCX(LIBCCALL libc_pthread_sigmask)(int how,
                                            sigset_t const *__restrict newmask,
@@ -43,7 +43,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_sigmask)(int how,
 }
 /*[[[end:pthread_sigmask]]]*/
 
-/*[[[head:pthread_kill,hash:0xc4c4c93c]]]*/
+/*[[[head:pthread_kill,hash:CRC-32=0x60b7371f]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_kill") int
 NOTHROW_NCX(LIBCCALL libc_pthread_kill)(pthread_t threadid,
                                         int signo)
@@ -55,7 +55,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_kill)(pthread_t threadid,
 }
 /*[[[end:pthread_kill]]]*/
 
-/*[[[head:pthread_sigqueue,hash:0xd8d01490]]]*/
+/*[[[head:pthread_sigqueue,hash:CRC-32=0x9e96b219]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_sigqueue") int
 NOTHROW_NCX(LIBCCALL libc_pthread_sigqueue)(pthread_t threadid,
                                             int signo,
@@ -72,7 +72,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_sigqueue)(pthread_t threadid,
 
 
 
-/*[[[start:exports,hash:0x66a17911]]]*/
+/*[[[start:exports,hash:CRC-32=0xc13f78d]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_sigmask, libc_pthread_sigmask);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_kill, libc_pthread_kill);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_sigqueue, libc_pthread_sigqueue);

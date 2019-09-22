@@ -30,7 +30,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:isastream,hash:0x16f1ecd4]]]*/
+/*[[[head:isastream,hash:CRC-32=0x14bf4ed9]]]*/
 /* Test whether FILDES is associated with a STREAM-based file */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.stropts.isastream") int
 NOTHROW(LIBCCALL libc_isastream)(fd_t fildes)
@@ -42,7 +42,7 @@ NOTHROW(LIBCCALL libc_isastream)(fd_t fildes)
 }
 /*[[[end:isastream]]]*/
 
-/*[[[head:getmsg,hash:0x6852f5ac]]]*/
+/*[[[head:getmsg,hash:CRC-32=0x98a0cdc9]]]*/
 /* Receive next message from a STREAMS file */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.stropts.getmsg") int
 NOTHROW_RPC(LIBCCALL libc_getmsg)(fd_t fildes,
@@ -57,7 +57,7 @@ NOTHROW_RPC(LIBCCALL libc_getmsg)(fd_t fildes,
 }
 /*[[[end:getmsg]]]*/
 
-/*[[[head:getpmsg,hash:0x95c8a409]]]*/
+/*[[[head:getpmsg,hash:CRC-32=0x33a8bb65]]]*/
 /* Receive next message from a STREAMS file, with *FLAGSP allowing to control which message. */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.stropts.getpmsg") int
 NOTHROW_RPC(LIBCCALL libc_getpmsg)(fd_t fildes,
@@ -73,7 +73,7 @@ NOTHROW_RPC(LIBCCALL libc_getpmsg)(fd_t fildes,
 }
 /*[[[end:getpmsg]]]*/
 
-/*[[[head:putmsg,hash:0xb0e7e6bd]]]*/
+/*[[[head:putmsg,hash:CRC-32=0xdaa1b657]]]*/
 /* Send a message on a STREAM */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.stropts.putmsg") int
 NOTHROW_RPC(LIBCCALL libc_putmsg)(fd_t fildes,
@@ -88,7 +88,7 @@ NOTHROW_RPC(LIBCCALL libc_putmsg)(fd_t fildes,
 }
 /*[[[end:putmsg]]]*/
 
-/*[[[head:putpmsg,hash:0x9ca4d014]]]*/
+/*[[[head:putpmsg,hash:CRC-32=0xa58cbaf0]]]*/
 /* Send a message on a STREAM to the BAND */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.stropts.putpmsg") int
 NOTHROW_RPC(LIBCCALL libc_putpmsg)(fd_t fildes,
@@ -104,7 +104,7 @@ NOTHROW_RPC(LIBCCALL libc_putpmsg)(fd_t fildes,
 }
 /*[[[end:putpmsg]]]*/
 
-/*[[[head:fattach,hash:0xdff46995]]]*/
+/*[[[head:fattach,hash:CRC-32=0x2de49da0]]]*/
 /* Attach a STREAMS-based file descriptor FILDES to a file PATH in the file system name space */
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.io.stropts.fattach") int
@@ -118,7 +118,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_fattach)(fd_t fildes,
 }
 /*[[[end:fattach]]]*/
 
-/*[[[head:fdetach,hash:0x61897f92]]]*/
+/*[[[head:fdetach,hash:CRC-32=0x5aeea7f8]]]*/
 /* Detach a name PATH from a STREAMS-based file descriptor */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.io.stropts.fdetach") int
@@ -135,7 +135,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_fdetach)(char const *__restrict path)
 
 
 
-/*[[[start:exports,hash:0xabb08d10]]]*/
+/*[[[start:exports,hash:CRC-32=0x5fc1307c]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(isastream, libc_isastream);
 DEFINE_PUBLIC_WEAK_ALIAS(getmsg, libc_getmsg);
 DEFINE_PUBLIC_WEAK_ALIAS(getpmsg, libc_getpmsg);

@@ -35,7 +35,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:wutime,hash:0x41e6445e]]]*/
+/*[[[head:wutime,hash:CRC-32=0x8e70b93d]]]*/
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.fs.modify_time.wutime") int
 NOTHROW_RPC(LIBCCALL libc_wutime)(char32_t const *filename,
@@ -53,7 +53,7 @@ NOTHROW_RPC(LIBCCALL libc_wutime)(char32_t const *filename,
 }
 /*[[[end:wutime]]]*/
 
-/*[[[head:DOS$wutime,hash:0x8045efba]]]*/
+/*[[[head:DOS$wutime,hash:CRC-32=0xccedc587]]]*/
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.modify_time.wutime") int
 NOTHROW_RPC(LIBDCALL libd_wutime)(char16_t const *filename,
@@ -71,7 +71,7 @@ NOTHROW_RPC(LIBDCALL libd_wutime)(char16_t const *filename,
 }
 /*[[[end:DOS$wutime]]]*/
 
-/*[[[head:wutime64,hash:0x1a9c416f]]]*/
+/*[[[head:wutime64,hash:CRC-32=0x220e6ae9]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_wutime64, libc_wutime);
 #else
@@ -93,7 +93,7 @@ NOTHROW_RPC(LIBCCALL libc_wutime64)(char32_t const *filename,
 #endif /* MAGIC:alias */
 /*[[[end:wutime64]]]*/
 
-/*[[[head:DOS$wutime64,hash:0x4ba88aee]]]*/
+/*[[[head:DOS$wutime64,hash:CRC-32=0xbe6b3df7]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libd_wutime64, libd_wutime);
 #else
@@ -119,7 +119,7 @@ NOTHROW_RPC(LIBDCALL libd_wutime64)(char16_t const *filename,
 
 
 
-/*[[[start:exports,hash:0x2cfaa8b5]]]*/
+/*[[[start:exports,hash:CRC-32=0x2fe7ceaa]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(wutime, libc_wutime);
 DEFINE_PUBLIC_WEAK_ALIAS(_wutime32, libc_wutime);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$wutime, libd_wutime);

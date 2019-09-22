@@ -1301,7 +1301,7 @@ int32_t const *libc___ctype_toupper_loc_pointer = NULL;
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:__ctype_b_loc,hash:0xc0267634]]]*/
+/*[[[head:__ctype_b_loc,hash:CRC-32=0xce2837b9]]]*/
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.ctype.__ctype_b_loc") uint16_t const **
 NOTHROW(LIBCCALL libc___ctype_b_loc)(void)
@@ -1313,7 +1313,7 @@ NOTHROW(LIBCCALL libc___ctype_b_loc)(void)
 }
 /*[[[end:__ctype_b_loc]]]*/
 
-/*[[[head:__ctype_tolower_loc,hash:0x4d520164]]]*/
+/*[[[head:__ctype_tolower_loc,hash:CRC-32=0x89488a95]]]*/
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.ctype.__ctype_tolower_loc") int32_t const **
 NOTHROW(LIBCCALL libc___ctype_tolower_loc)(void)
@@ -1325,7 +1325,7 @@ NOTHROW(LIBCCALL libc___ctype_tolower_loc)(void)
 }
 /*[[[end:__ctype_tolower_loc]]]*/
 
-/*[[[head:__ctype_toupper_loc,hash:0x77292242]]]*/
+/*[[[head:__ctype_toupper_loc,hash:CRC-32=0xb2fcd8d0]]]*/
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.ctype.__ctype_toupper_loc") int32_t const **
 NOTHROW(LIBCCALL libc___ctype_toupper_loc)(void)
@@ -1338,7 +1338,7 @@ NOTHROW(LIBCCALL libc___ctype_toupper_loc)(void)
 /*[[[end:__ctype_toupper_loc]]]*/
 
 
-/*[[[head:__locale_ctype_ptr,hash:0xcf1917f4]]]*/
+/*[[[head:__locale_ctype_ptr,hash:CRC-32=0x6238c0b9]]]*/
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.ctype.__locale_ctype_ptr") char const *
 NOTHROW(LIBCCALL libc___locale_ctype_ptr)(void)
@@ -1350,7 +1350,7 @@ NOTHROW(LIBCCALL libc___locale_ctype_ptr)(void)
 }
 /*[[[end:__locale_ctype_ptr]]]*/
 
-/*[[[head:__locale_ctype_ptr_l,hash:0xd19a7943]]]*/
+/*[[[head:__locale_ctype_ptr_l,hash:CRC-32=0x34410101]]]*/
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.ctype.__locale_ctype_ptr_l") char const *
 NOTHROW_NCX(LIBCCALL libc___locale_ctype_ptr_l)(locale_t locale)
@@ -1362,7 +1362,7 @@ NOTHROW_NCX(LIBCCALL libc___locale_ctype_ptr_l)(locale_t locale)
 }
 /*[[[end:__locale_ctype_ptr_l]]]*/
 
-/*[[[head:_isctype,hash:0xfb7154a4]]]*/
+/*[[[head:_isctype,hash:CRC-32=0x4e34ccbe]]]*/
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.ctype._isctype") int
 NOTHROW(LIBCCALL libc__isctype)(int ch,
@@ -1375,7 +1375,7 @@ NOTHROW(LIBCCALL libc__isctype)(int ch,
 }
 /*[[[end:_isctype]]]*/
 
-/*[[[head:_isctype_l,hash:0x81c961da]]]*/
+/*[[[head:_isctype_l,hash:CRC-32=0x86159c16]]]*/
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.ctype._isctype_l") int
 NOTHROW_NCX(LIBCCALL libc__isctype_l)(int ch,
@@ -1393,7 +1393,7 @@ NOTHROW_NCX(LIBCCALL libc__isctype_l)(int ch,
 
 
 
-/*[[[start:exports,hash:0x89b6ae44]]]*/
+/*[[[start:exports,hash:CRC-32=0xf09b1f79]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(__locale_ctype_ptr, libc___locale_ctype_ptr);
 DEFINE_PUBLIC_WEAK_ALIAS(__locale_ctype_ptr_l, libc___locale_ctype_ptr_l);
 DEFINE_PUBLIC_WEAK_ALIAS(__ctype_b_loc, libc___ctype_b_loc);

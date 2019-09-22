@@ -30,7 +30,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:_clearfp,hash:0xa0592190]]]*/
+/*[[[head:_clearfp,hash:CRC-32=0xfa8af88]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.math.float._clearfp") uint32_t
 NOTHROW_NCX(LIBCCALL libc__clearfp)(void)
 /*[[[body:_clearfp]]]*/
@@ -41,7 +41,7 @@ NOTHROW_NCX(LIBCCALL libc__clearfp)(void)
 }
 /*[[[end:_clearfp]]]*/
 
-/*[[[head:_controlfp,hash:0x6ae0ee2f]]]*/
+/*[[[head:_controlfp,hash:CRC-32=0xc0eae30e]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.math.float._controlfp") uint32_t
 NOTHROW_NCX(LIBCCALL libc__controlfp)(uint32_t newval,
                                       uint32_t mask)
@@ -53,7 +53,7 @@ NOTHROW_NCX(LIBCCALL libc__controlfp)(uint32_t newval,
 }
 /*[[[end:_controlfp]]]*/
 
-/*[[[head:_set_controlfp,hash:0xfd7a86a3]]]*/
+/*[[[head:_set_controlfp,hash:CRC-32=0x594279f]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.math.float._set_controlfp") void
 NOTHROW_NCX(LIBCCALL libc__set_controlfp)(uint32_t newval,
                                           uint32_t mask)
@@ -64,7 +64,7 @@ NOTHROW_NCX(LIBCCALL libc__set_controlfp)(uint32_t newval,
 }
 /*[[[end:_set_controlfp]]]*/
 
-/*[[[head:_controlfp_s,hash:0xdda82888]]]*/
+/*[[[head:_controlfp_s,hash:CRC-32=0x6ebe8b52]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.math.float._controlfp_s") errno_t
 NOTHROW_NCX(LIBCCALL libc__controlfp_s)(uint32_t *pcurrent,
                                         uint32_t newval,
@@ -77,7 +77,7 @@ NOTHROW_NCX(LIBCCALL libc__controlfp_s)(uint32_t *pcurrent,
 }
 /*[[[end:_controlfp_s]]]*/
 
-/*[[[head:_statusfp,hash:0x11bc61ae]]]*/
+/*[[[head:_statusfp,hash:CRC-32=0x29cee024]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.math.float._statusfp") uint32_t
 NOTHROW_NCX(LIBCCALL libc__statusfp)(void)
 /*[[[body:_statusfp]]]*/
@@ -89,7 +89,7 @@ NOTHROW_NCX(LIBCCALL libc__statusfp)(void)
 /*[[[end:_statusfp]]]*/
 
 
-/*[[[head:_statusfp2,hash:0xcea51e02]]]*/
+/*[[[head:_statusfp2,hash:CRC-32=0x47242aa1]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.math.float._statusfp2") void
 NOTHROW_NCX(LIBCCALL libc__statusfp2)(uint32_t *x86_stat,
                                       uint32_t *sse2_stat)
@@ -100,7 +100,7 @@ NOTHROW_NCX(LIBCCALL libc__statusfp2)(uint32_t *x86_stat,
 }
 /*[[[end:_statusfp2]]]*/
 
-/*[[[head:_control87,hash:0x3f9e2903]]]*/
+/*[[[head:_control87,hash:CRC-32=0x2e9050ec]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.math.float._control87") uint32_t
 NOTHROW_NCX(LIBCCALL libc__control87)(uint32_t newval,
                                       uint32_t mask)
@@ -112,7 +112,7 @@ NOTHROW_NCX(LIBCCALL libc__control87)(uint32_t newval,
 }
 /*[[[end:_control87]]]*/
 
-/*[[[head:__control87_2,hash:0xadcb54f8]]]*/
+/*[[[head:__control87_2,hash:CRC-32=0x523dc9df]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.math.float.__control87_2") int
 NOTHROW_NCX(LIBCCALL libc___control87_2)(uint32_t newval,
                                          uint32_t mask,
@@ -126,7 +126,7 @@ NOTHROW_NCX(LIBCCALL libc___control87_2)(uint32_t newval,
 }
 /*[[[end:__control87_2]]]*/
 
-/*[[[head:__fpecode,hash:0x7db19204]]]*/
+/*[[[head:__fpecode,hash:CRC-32=0xd7853063]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.math.float.__fpecode") int *
 NOTHROW_NCX(LIBCCALL libc___fpecode)(void)
 /*[[[body:__fpecode]]]*/
@@ -144,7 +144,7 @@ NOTHROW_NCX(LIBCCALL libc___fpecode)(void)
 
 
 
-/*[[[head:_fpclass,hash:0xb7fd0e65]]]*/
+/*[[[head:_fpclass,hash:CRC-32=0x98cf8163]]]*/
 INTERN WUNUSED ATTR_CONST
 ATTR_WEAK ATTR_SECTION(".text.crt.math.float._fpclass") int
 NOTHROW(LIBCCALL libc__fpclass)(double x)
@@ -157,7 +157,7 @@ NOTHROW(LIBCCALL libc__fpclass)(double x)
 /*[[[end:_fpclass]]]*/
 
 
-/*[[[head:fpreset,hash:0xbbb294c4]]]*/
+/*[[[head:fpreset,hash:CRC-32=0x609ddbf3]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.math.float.fpreset") void
 NOTHROW_NCX(LIBCCALL libc_fpreset)(void)
 /*[[[body:fpreset]]]*/
@@ -171,7 +171,7 @@ NOTHROW_NCX(LIBCCALL libc_fpreset)(void)
 
 
 
-/*[[[start:exports,hash:0xbf877f86]]]*/
+/*[[[start:exports,hash:CRC-32=0xe746b508]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(_clearfp, libc__clearfp);
 DEFINE_PUBLIC_WEAK_ALIAS(_controlfp, libc__controlfp);
 DEFINE_PUBLIC_WEAK_ALIAS(_set_controlfp, libc__set_controlfp);

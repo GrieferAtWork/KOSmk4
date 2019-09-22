@@ -30,7 +30,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:posix_spawn,hash:0x421bc652]]]*/
+/*[[[head:posix_spawn,hash:CRC-32=0x81a8337b]]]*/
 /* Spawn a new process executing PATH with the attributes describes in *ATTRP.
  * Before running the process perform the actions described in FILE-ACTIONS.
  * This function is a possible cancellation point and therefore not marked with __THROW */
@@ -50,7 +50,7 @@ NOTHROW_RPC(LIBCCALL libc_posix_spawn)(pid_t *__restrict pid,
 }
 /*[[[end:posix_spawn]]]*/
 
-/*[[[head:posix_spawnp,hash:0x41ecd4f]]]*/
+/*[[[head:posix_spawnp,hash:CRC-32=0xe1977aad]]]*/
 /* Similar to `posix_spawn' but search for FILE in the PATH.
  * This function is a possible cancellation point and therefore not marked with __THROW */
 INTERN NONNULL((1, 2, 5, 6))
@@ -69,7 +69,7 @@ NOTHROW_RPC(LIBCCALL libc_posix_spawnp)(pid_t *__restrict pid,
 }
 /*[[[end:posix_spawnp]]]*/
 
-/*[[[head:posix_spawnattr_init,hash:0x967ee2c5]]]*/
+/*[[[head:posix_spawnattr_init,hash:CRC-32=0x508e57d1]]]*/
 /* Initialize data structure with attributes for `spawn' to default values */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.exec.posix_spawn.posix_spawnattr_init") int
@@ -82,7 +82,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_init)(posix_spawnattr_t *__restrict at
 }
 /*[[[end:posix_spawnattr_init]]]*/
 
-/*[[[head:posix_spawnattr_destroy,hash:0x72b6a48f]]]*/
+/*[[[head:posix_spawnattr_destroy,hash:CRC-32=0xb08f450d]]]*/
 /* Free resources associated with ATTR */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.exec.posix_spawn.posix_spawnattr_destroy") int
@@ -95,7 +95,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_destroy)(posix_spawnattr_t *__restrict
 }
 /*[[[end:posix_spawnattr_destroy]]]*/
 
-/*[[[head:posix_spawnattr_getsigdefault,hash:0x38d414df]]]*/
+/*[[[head:posix_spawnattr_getsigdefault,hash:CRC-32=0x3802aee6]]]*/
 /* Store signal mask for signals with default handling from ATTR in SIGDEFAULT */
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.exec.posix_spawn.posix_spawnattr_getsigdefault") int
@@ -109,7 +109,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getsigdefault)(posix_spawnattr_t const
 }
 /*[[[end:posix_spawnattr_getsigdefault]]]*/
 
-/*[[[head:posix_spawnattr_setsigdefault,hash:0xb2daae7b]]]*/
+/*[[[head:posix_spawnattr_setsigdefault,hash:CRC-32=0xe37f9242]]]*/
 /* Set signal mask for signals with default handling in ATTR to SIGDEFAULT */
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.exec.posix_spawn.posix_spawnattr_setsigdefault") int
@@ -123,7 +123,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setsigdefault)(posix_spawnattr_t *__re
 }
 /*[[[end:posix_spawnattr_setsigdefault]]]*/
 
-/*[[[head:posix_spawnattr_getsigmask,hash:0x20ed9d49]]]*/
+/*[[[head:posix_spawnattr_getsigmask,hash:CRC-32=0x9da6267e]]]*/
 /* Store signal mask for the new process from ATTR in SIGMASK */
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.exec.posix_spawn.posix_spawnattr_getsigmask") int
@@ -137,7 +137,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getsigmask)(posix_spawnattr_t const *_
 }
 /*[[[end:posix_spawnattr_getsigmask]]]*/
 
-/*[[[head:posix_spawnattr_setsigmask,hash:0x8c4bd0d0]]]*/
+/*[[[head:posix_spawnattr_setsigmask,hash:CRC-32=0x23d65c01]]]*/
 /* Set signal mask for the new process in ATTR to SIGMASK */
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.exec.posix_spawn.posix_spawnattr_setsigmask") int
@@ -151,7 +151,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setsigmask)(posix_spawnattr_t *__restr
 }
 /*[[[end:posix_spawnattr_setsigmask]]]*/
 
-/*[[[head:posix_spawnattr_getflags,hash:0x7700bc2a]]]*/
+/*[[[head:posix_spawnattr_getflags,hash:CRC-32=0xaa5c97c6]]]*/
 /* Get flag word from the attribute structure */
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.exec.posix_spawn.posix_spawnattr_getflags") int
@@ -165,7 +165,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getflags)(posix_spawnattr_t const *__r
 }
 /*[[[end:posix_spawnattr_getflags]]]*/
 
-/*[[[head:posix_spawnattr_setflags,hash:0x1343290b]]]*/
+/*[[[head:posix_spawnattr_setflags,hash:CRC-32=0x68d81a6f]]]*/
 /* Store flags in the attribute structure */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.exec.posix_spawn.posix_spawnattr_setflags") int
@@ -179,7 +179,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setflags)(posix_spawnattr_t *__restric
 }
 /*[[[end:posix_spawnattr_setflags]]]*/
 
-/*[[[head:posix_spawnattr_getpgroup,hash:0x52c55a91]]]*/
+/*[[[head:posix_spawnattr_getpgroup,hash:CRC-32=0x6303e437]]]*/
 /* Get process group ID from the attribute structure */
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.exec.posix_spawn.posix_spawnattr_getpgroup") int
@@ -193,7 +193,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getpgroup)(posix_spawnattr_t const *__
 }
 /*[[[end:posix_spawnattr_getpgroup]]]*/
 
-/*[[[head:posix_spawnattr_setpgroup,hash:0x90f15182]]]*/
+/*[[[head:posix_spawnattr_setpgroup,hash:CRC-32=0x88a69712]]]*/
 /* Store process group ID in the attribute structure */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.exec.posix_spawn.posix_spawnattr_setpgroup") int
@@ -207,7 +207,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setpgroup)(posix_spawnattr_t *__restri
 }
 /*[[[end:posix_spawnattr_setpgroup]]]*/
 
-/*[[[head:posix_spawnattr_getschedpolicy,hash:0x95a381cd]]]*/
+/*[[[head:posix_spawnattr_getschedpolicy,hash:CRC-32=0x38109bda]]]*/
 /* Get scheduling policy from the attribute structure */
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.exec.posix_spawn.posix_spawnattr_getschedpolicy") int
@@ -221,7 +221,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getschedpolicy)(posix_spawnattr_t cons
 }
 /*[[[end:posix_spawnattr_getschedpolicy]]]*/
 
-/*[[[head:posix_spawnattr_setschedpolicy,hash:0x9fe40d23]]]*/
+/*[[[head:posix_spawnattr_setschedpolicy,hash:CRC-32=0x72b8ab8f]]]*/
 /* Store scheduling policy in the attribute structure */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.exec.posix_spawn.posix_spawnattr_setschedpolicy") int
@@ -235,7 +235,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setschedpolicy)(posix_spawnattr_t *__r
 }
 /*[[[end:posix_spawnattr_setschedpolicy]]]*/
 
-/*[[[head:posix_spawnattr_getschedparam,hash:0x90979d09]]]*/
+/*[[[head:posix_spawnattr_getschedparam,hash:CRC-32=0x6ace26d5]]]*/
 /* Get scheduling parameters from the attribute structure */
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.exec.posix_spawn.posix_spawnattr_getschedparam") int
@@ -249,7 +249,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_getschedparam)(posix_spawnattr_t const
 }
 /*[[[end:posix_spawnattr_getschedparam]]]*/
 
-/*[[[head:posix_spawnattr_setschedparam,hash:0x74b5d7b8]]]*/
+/*[[[head:posix_spawnattr_setschedparam,hash:CRC-32=0x60d6be18]]]*/
 /* Store scheduling parameters in the attribute structure */
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.exec.posix_spawn.posix_spawnattr_setschedparam") int
@@ -263,7 +263,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawnattr_setschedparam)(posix_spawnattr_t *__re
 }
 /*[[[end:posix_spawnattr_setschedparam]]]*/
 
-/*[[[head:posix_spawn_file_actions_init,hash:0x44799de0]]]*/
+/*[[[head:posix_spawn_file_actions_init,hash:CRC-32=0x50551f02]]]*/
 /* Initialize data structure for file attribute for `spawn' call */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.exec.posix_spawn.posix_spawn_file_actions_init") int
@@ -276,7 +276,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_init)(posix_spawn_file_action
 }
 /*[[[end:posix_spawn_file_actions_init]]]*/
 
-/*[[[head:posix_spawn_file_actions_destroy,hash:0x79808b7c]]]*/
+/*[[[head:posix_spawn_file_actions_destroy,hash:CRC-32=0x72454da7]]]*/
 /* Free resources associated with FILE-ACTIONS */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.exec.posix_spawn.posix_spawn_file_actions_destroy") int
@@ -289,7 +289,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_destroy)(posix_spawn_file_act
 }
 /*[[[end:posix_spawn_file_actions_destroy]]]*/
 
-/*[[[head:posix_spawn_file_actions_addopen,hash:0x366c810f]]]*/
+/*[[[head:posix_spawn_file_actions_addopen,hash:CRC-32=0xf266d515]]]*/
 /* Add an action to FILE-ACTIONS which tells the implementation
  * to call `open' for the given file during the `spawn' call */
 INTERN NONNULL((1, 3))
@@ -307,7 +307,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addopen)(posix_spawn_file_act
 }
 /*[[[end:posix_spawn_file_actions_addopen]]]*/
 
-/*[[[head:posix_spawn_file_actions_addclose,hash:0xb9720a7c]]]*/
+/*[[[head:posix_spawn_file_actions_addclose,hash:CRC-32=0xfea4c696]]]*/
 /* Add an action to FILE-ACTIONS which tells the implementation to
  * call `close' for the given file descriptor during the `spawn' call */
 INTERN NONNULL((1))
@@ -322,7 +322,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addclose)(posix_spawn_file_ac
 }
 /*[[[end:posix_spawn_file_actions_addclose]]]*/
 
-/*[[[head:posix_spawn_file_actions_adddup2,hash:0xbfce51ec]]]*/
+/*[[[head:posix_spawn_file_actions_adddup2,hash:CRC-32=0x4d327012]]]*/
 /* Add an action to FILE-ACTIONS which tells the implementation to
  * call `dup2' for the given file descriptors during the `spawn' call */
 INTERN NONNULL((1))
@@ -342,7 +342,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_adddup2)(posix_spawn_file_act
 
 
 
-/*[[[start:exports,hash:0x6aacdfa5]]]*/
+/*[[[start:exports,hash:CRC-32=0x1adba2e2]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(posix_spawn, libc_posix_spawn);
 DEFINE_PUBLIC_WEAK_ALIAS(posix_spawnp, libc_posix_spawnp);
 DEFINE_PUBLIC_WEAK_ALIAS(posix_spawnattr_init, libc_posix_spawnattr_init);

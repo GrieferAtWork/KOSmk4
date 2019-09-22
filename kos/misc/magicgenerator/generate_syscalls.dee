@@ -39,9 +39,11 @@ local copyright =
 
 import fs;
 import * from deemon;
+import hash from hashlib;
 
 #define SYSNO_EXTENDED_START 0x80000000
 
+global hashfunc = "CRC-32";
 fs.chdir(fs.joinpath(fs.headof(__FILE__), "../.."));
 
 function getFilenameForLog(filename: string): string {
@@ -593,7 +595,7 @@ function load_syscalls(syscalls_def: string, options: {string...}, variant_index
 }
 
 
-@@Safely re-write a hashed File @filename, by calling ${fp_writer(File fp)}
+@@Safely re-write a hashed file @filename, by calling ${fp_writer(fp: File)}
 function write_hashed_file(filename: string, fp_writer: Callable) {
 	local old_text = none;
 	try {
@@ -604,14 +606,16 @@ function write_hashed_file(filename: string, fp_writer: Callable) {
 		}
 		if (!firstline)
 			goto do_overwrite_file;
+		goto do_overwrite_file;
 		local old_hash = firstline.scanf(" /* HASH %[^ *]")...;
 		old_hash = old_hash.strip();
-		local expected_old_hash = old_text.operator hash().hex();
-		if (old_hash != expected_old_hash) {
+		local old_hash_name, none, old_hash_value = old_hash.partition(":")...;
+		local expected_old_hash = hash(old_hash_name, old_text).hex();
+		if (old_hash_value != expected_old_hash) {
 			print "\n\n",;
 			print getFilenameForLog(filename),;
-			print " : Error : File", repr filename, "has been modified";
-			print "\tStored hash:  ", old_hash;
+			print ": Error: File", repr filename, "has been modified";
+			print "\tStored hash:  ", old_hash_value;
 			print "\tExpected hash:", expected_old_hash;
 			throw "Don't overwrite modified File";
 		}
@@ -620,7 +624,7 @@ function write_hashed_file(filename: string, fp_writer: Callable) {
 	} catch (Error.ValueError.UnpackError) {
 		print "\n\n",;
 		print getFilenameForLog(filename),;
-		print " : Error : File", repr filename, "has been modified";
+		print ": Error: File", repr filename, "has been modified";
 		print "\tNo hash information tag found within the File";
 		throw "Don't overwrite modified File";
 	}
@@ -630,12 +634,13 @@ do_overwrite_file:
 	contents = contents.string.encode("utf-8").bytes();
 	if (old_text is none || old_text != contents) {
 		with (local fp = File.open(filename, "w")) {
-			local new_hash = contents.operator hash().hex();
-			fp << "/* HASH " << new_hash << " */\n";
+			local new_hash = hash(hashfunc, contents).hex();
+			fp << "/* HASH " << hashfunc << ":" << new_hash << " */\n";
 			fp.write(contents);
 		}
 	}
 }
+
 
 function unpack_trace(tags: {(string, string)...}, typ: string): (string, string) {
 	local x = Dict(tags).get("printf");

@@ -31,7 +31,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:swapon,hash:0x8a42999e]]]*/
+/*[[[head:swapon,hash:CRC-32=0xc3d67668]]]*/
 /* @param swapflags: Set of `SWAP_FLAG_*' */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.swap.swapon") int
@@ -45,7 +45,7 @@ NOTHROW_RPC(LIBCCALL libc_swapon)(char const *path,
 }
 /*[[[end:swapon]]]*/
 
-/*[[[head:swapoff,hash:0x2a5e2c5c]]]*/
+/*[[[head:swapoff,hash:CRC-32=0x11430d9e]]]*/
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.swap.swapoff") int
 NOTHROW_RPC(LIBCCALL libc_swapoff)(char const *path)
@@ -61,7 +61,7 @@ NOTHROW_RPC(LIBCCALL libc_swapoff)(char const *path)
 
 
 
-/*[[[start:exports,hash:0x66a45d94]]]*/
+/*[[[start:exports,hash:CRC-32=0x48eef5a1]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(swapon, libc_swapon);
 DEFINE_PUBLIC_WEAK_ALIAS(swapoff, libc_swapoff);
 /*[[[end:exports]]]*/

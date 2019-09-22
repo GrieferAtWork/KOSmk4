@@ -74,7 +74,7 @@ NOTHROW(LIBCCALL libc_p_environ)(void) {
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:execv,hash:0xed2fffc1]]]*/
+/*[[[head:execv,hash:CRC-32=0xc7d9f625]]]*/
 /* >> execv(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
@@ -92,7 +92,7 @@ NOTHROW_RPC(LIBCCALL libc_execv)(char const *__restrict path,
 }
 /*[[[end:execv]]]*/
 
-/*[[[head:execve,hash:0x67d3148]]]*/
+/*[[[head:execve,hash:CRC-32=0x7c36e762]]]*/
 /* >> execve(2)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
@@ -111,7 +111,7 @@ NOTHROW_RPC(LIBCCALL libc_execve)(char const *__restrict path,
 }
 /*[[[end:execve]]]*/
 
-/*[[[head:execvp,hash:0x5a9ab6ca]]]*/
+/*[[[head:execvp,hash:CRC-32=0xe4fb6321]]]*/
 /* >> execvp(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
@@ -126,7 +126,7 @@ NOTHROW_RPC(LIBCCALL libc_execvp)(char const *__restrict file,
 /*[[[end:execvp]]]*/
 
 
-/*[[[head:execl,hash:0xec79d4b7]]]*/
+/*[[[head:execl,hash:CRC-32=0x2b6a9f7]]]*/
 /* >> execl(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
@@ -152,7 +152,7 @@ NOTHROW_RPC(VLIBCCALL libc_execl)(char const *__restrict path,
 }
 /*[[[end:execl]]]*/
 
-/*[[[head:execle,hash:0x7ace3d98]]]*/
+/*[[[head:execle,hash:CRC-32=0x2f5bafd7]]]*/
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinal */
@@ -184,7 +184,7 @@ NOTHROW_RPC(VLIBCCALL libc_execle)(char const *__restrict path,
 }
 /*[[[end:execle]]]*/
 
-/*[[[head:execlp,hash:0x1185df94]]]*/
+/*[[[head:execlp,hash:CRC-32=0xc751e905]]]*/
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
@@ -210,7 +210,7 @@ NOTHROW_RPC(VLIBCCALL libc_execlp)(char const *__restrict file,
 }
 /*[[[end:execlp]]]*/
 
-/*[[[head:execvpe,hash:0x9a093e3e]]]*/
+/*[[[head:execvpe,hash:CRC-32=0x8f1caf8a]]]*/
 /* >> execvpe(3)
  * Replace the calling process with the application image referred to by `FILE'
  * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
@@ -267,7 +267,7 @@ NOTHROW_RPC(LIBCCALL libc_execvpe)(char const *__restrict file,
 }
 /*[[[end:execvpe]]]*/
 
-/*[[[head:execlpe,hash:0xb12b7433]]]*/
+/*[[[head:execlpe,hash:CRC-32=0xbcce3030]]]*/
 /* >> execlpe(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinal */
@@ -299,7 +299,7 @@ NOTHROW_RPC(VLIBCCALL libc_execlpe)(char const *__restrict file,
 }
 /*[[[end:execlpe]]]*/
 
-/*[[[head:getpid,hash:0xa64efec]]]*/
+/*[[[head:getpid,hash:CRC-32=0x1684330]]]*/
 /* >> getpid(2)
  * Return the PID of the calling process (that is the TID of the calling thread group's leader)
  * THIS_THREAD->LEADER->PID */
@@ -313,7 +313,7 @@ NOTHROW_NCX(LIBCCALL libc_getpid)(void)
 }
 /*[[[end:getpid]]]*/
 
-/*[[[head:pipe,hash:0x753e6343]]]*/
+/*[[[head:pipe,hash:CRC-32=0xaf015b0c]]]*/
 /* >> pipe(2)
  * Create a new pair of connected pipes ([0] = reader, [1] = writer) */
 INTERN NONNULL((1))
@@ -327,7 +327,7 @@ NOTHROW_NCX(LIBCCALL libc_pipe)(fd_t pipedes[2])
 }
 /*[[[end:pipe]]]*/
 
-/*[[[head:sleep,hash:0xbf3d8034]]]*/
+/*[[[head:sleep,hash:CRC-32=0xc47231ff]]]*/
 /* >> sleep(3)
  * Sleep for up to `SECONDS' seconds */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.utility.sleep") unsigned int
@@ -339,7 +339,7 @@ NOTHROW_RPC(LIBCCALL libc_sleep)(unsigned int seconds)
 }
 /*[[[end:sleep]]]*/
 
-/*[[[head:getppid,hash:0x66098a62]]]*/
+/*[[[head:getppid,hash:CRC-32=0x615a83ad]]]*/
 /* >> getppid(2)
  * Return the PID of the calling process's parent.
  * (That is the TID of the leader of the parent of the calling thread's leader)
@@ -354,7 +354,7 @@ NOTHROW_NCX(LIBCCALL libc_getppid)(void)
 }
 /*[[[end:getppid]]]*/
 
-/*[[[head:getpgrp,hash:0xcc23dc24]]]*/
+/*[[[head:getpgrp,hash:CRC-32=0xa6e5cfd]]]*/
 /* >> getpgrp(2)
  * Return the ID of the calling process's process group.
  * (That is the TID of the leader of the process group of the calling thread's leader)
@@ -369,7 +369,7 @@ NOTHROW_NCX(LIBCCALL libc_getpgrp)(void)
 }
 /*[[[end:getpgrp]]]*/
 
-/*[[[head:setpgid,hash:0xc8e69f73]]]*/
+/*[[[head:setpgid,hash:CRC-32=0xc4676d12]]]*/
 /* >> setpgid(2)
  * Change the ID of the process group associated with `PID's process.
  * (That is the TID of the leader of the process group of `PID's leader)
@@ -386,7 +386,7 @@ NOTHROW_NCX(LIBCCALL libc_setpgid)(pid_t pid,
 }
 /*[[[end:setpgid]]]*/
 
-/*[[[head:setsid,hash:0xe3e2039]]]*/
+/*[[[head:setsid,hash:CRC-32=0x8a713e8d]]]*/
 /* >> setsid(2)
  * Make the calling thread's process the leader of its associated
  * process group, before also making it its own session leader.
@@ -403,7 +403,7 @@ NOTHROW_NCX(LIBCCALL libc_setsid)(void)
 }
 /*[[[end:setsid]]]*/
 
-/*[[[head:getuid,hash:0xb112dade]]]*/
+/*[[[head:getuid,hash:CRC-32=0x810158f3]]]*/
 /* >> getuid(2)
  * Return the real user ID of the calling process */
 INTERN WUNUSED
@@ -416,7 +416,7 @@ NOTHROW_NCX(LIBCCALL libc_getuid)(void)
 }
 /*[[[end:getuid]]]*/
 
-/*[[[head:geteuid,hash:0x101e95e]]]*/
+/*[[[head:geteuid,hash:CRC-32=0xcacfe745]]]*/
 /* >> geteuid(2)
  * Return the effective user ID of the calling process */
 INTERN WUNUSED
@@ -429,7 +429,7 @@ NOTHROW_NCX(LIBCCALL libc_geteuid)(void)
 }
 /*[[[end:geteuid]]]*/
 
-/*[[[head:getgid,hash:0x9778b640]]]*/
+/*[[[head:getgid,hash:CRC-32=0x3927330a]]]*/
 /* >> getgid(2)
  * Return the real group ID of the calling process */
 INTERN WUNUSED
@@ -442,7 +442,7 @@ NOTHROW_NCX(LIBCCALL libc_getgid)(void)
 }
 /*[[[end:getgid]]]*/
 
-/*[[[head:getegid,hash:0x1e1fa66a]]]*/
+/*[[[head:getegid,hash:CRC-32=0x8f90dbac]]]*/
 /* >> getegid(2)
  * Return the effective group ID of the calling process */
 INTERN WUNUSED
@@ -455,7 +455,7 @@ NOTHROW_NCX(LIBCCALL libc_getegid)(void)
 }
 /*[[[end:getegid]]]*/
 
-/*[[[head:getgroups,hash:0x21b8895d]]]*/
+/*[[[head:getgroups,hash:CRC-32=0x62c16422]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.user.getgroups") int
 NOTHROW_NCX(LIBCCALL libc_getgroups)(int size,
                                      gid_t list[])
@@ -467,7 +467,7 @@ NOTHROW_NCX(LIBCCALL libc_getgroups)(int size,
 }
 /*[[[end:getgroups]]]*/
 
-/*[[[head:setuid,hash:0x312c8aec]]]*/
+/*[[[head:setuid,hash:CRC-32=0xe290d1e3]]]*/
 /* >> setuid(2)
  * Set the effective user ID of the calling process
  * @return: 0 : Success
@@ -483,7 +483,7 @@ NOTHROW_NCX(LIBCCALL libc_setuid)(uid_t uid)
 }
 /*[[[end:setuid]]]*/
 
-/*[[[head:setgid,hash:0x4517360]]]*/
+/*[[[head:setgid,hash:CRC-32=0xbb3c615f]]]*/
 /* >> setgid(2)
  * Set the effective group ID of the calling process
  * @return: 0 : Success
@@ -499,7 +499,7 @@ NOTHROW_NCX(LIBCCALL libc_setgid)(gid_t gid)
 }
 /*[[[end:setgid]]]*/
 
-/*[[[head:fork,hash:0xc82381e0]]]*/
+/*[[[head:fork,hash:CRC-32=0x8c2dab65]]]*/
 /* >> fork(2)
  * Clone the calling thread into a second process and return twice, once
  * in the parent process where this function returns the (non-zero) PID
@@ -519,7 +519,7 @@ NOTHROW_NCX(LIBCCALL libc_fork)(void)
 }
 /*[[[end:fork]]]*/
 
-/*[[[head:alarm,hash:0x24b51851]]]*/
+/*[[[head:alarm,hash:CRC-32=0xb810d88f]]]*/
 /* >> alarm(2)
  * @return: 0 : No alarm was scheduled before.
  * @return: * : The number of seconds yet to pass before a previous alarm would have elapsed.
@@ -535,7 +535,7 @@ NOTHROW_NCX(LIBCCALL libc_alarm)(unsigned int seconds)
 }
 /*[[[end:alarm]]]*/
 
-/*[[[head:pause,hash:0x755211e6]]]*/
+/*[[[head:pause,hash:CRC-32=0xf0c658b]]]*/
 /* >> pause(2)
  * Suspend execution until the delivery of a POSIX_SIGNAL */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.utility.pause") int
@@ -550,7 +550,7 @@ NOTHROW_RPC(LIBCCALL libc_pause)(void)
 
 PRIVATE ATTR_SECTION(".bss.crt.io.tty.ttyname_buffer") char ttyname_buffer[32];
 
-/*[[[head:ttyname,hash:0xa9e90026]]]*/
+/*[[[head:ttyname,hash:CRC-32=0x2267751a]]]*/
 /* >> ttyname(3)
  * Return the name of a TTY given its file descriptor */
 INTERN WUNUSED
@@ -569,7 +569,7 @@ PRIVATE ATTR_SECTION(".rodata.crt.io.tty.str_stdin")  char const str_stdin[] = "
 PRIVATE ATTR_SECTION(".rodata.crt.io.tty.str_stdout") char const str_stdout[] = "stdout";
 PRIVATE ATTR_SECTION(".rodata.crt.io.tty.str_stderr") char const str_stderr[] = "stderr";
 
-/*[[[head:ttyname_r,hash:0xeddcd0f2]]]*/
+/*[[[head:ttyname_r,hash:CRC-32=0xffbc2ea7]]]*/
 /* >> ttyname_r(3)
  * Return the name of a TTY given its file descriptor */
 INTERN NONNULL((2))
@@ -629,7 +629,7 @@ NOTHROW_RPC(LIBCCALL libc_ttyname_r)(fd_t fd,
 }
 /*[[[end:ttyname_r]]]*/
 
-/*[[[head:tcgetpgrp,hash:0xc61b7ca7]]]*/
+/*[[[head:tcgetpgrp,hash:CRC-32=0xfde5e358]]]*/
 /* >> tcgetpgrp(2)
  * Return the foreground process group of a given TTY file descriptor */
 INTERN WUNUSED
@@ -644,7 +644,7 @@ NOTHROW_NCX(LIBCCALL libc_tcgetpgrp)(fd_t fd)
 }
 /*[[[end:tcgetpgrp]]]*/
 
-/*[[[head:tcsetpgrp,hash:0xa595ddc2]]]*/
+/*[[[head:tcsetpgrp,hash:CRC-32=0x291a4c6c]]]*/
 /* >> tcsetpgrp(2)
  * Set the foreground process group of a given TTY file descriptor */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.tcsetpgrp") int
@@ -656,7 +656,7 @@ NOTHROW_NCX(LIBCCALL libc_tcsetpgrp)(fd_t fd,
 }
 /*[[[end:tcsetpgrp]]]*/
 
-/*[[[head:getlogin,hash:0xc3d3f5af]]]*/
+/*[[[head:getlogin,hash:CRC-32=0xfe587258]]]*/
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.getlogin") char *
 NOTHROW_NCX(LIBCCALL libc_getlogin)(void)
@@ -668,7 +668,7 @@ NOTHROW_NCX(LIBCCALL libc_getlogin)(void)
 }
 /*[[[end:getlogin]]]*/
 
-/*[[[head:setlogin,hash:0xe4b34874]]]*/
+/*[[[head:setlogin,hash:CRC-32=0x9bc3e71f]]]*/
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.setlogin") int
 NOTHROW_NCX(LIBCCALL libc_setlogin)(char const *name)
@@ -680,7 +680,7 @@ NOTHROW_NCX(LIBCCALL libc_setlogin)(char const *name)
 }
 /*[[[end:setlogin]]]*/
 
-/*[[[head:chown,hash:0xae040ace]]]*/
+/*[[[head:chown,hash:CRC-32=0xefa7bdc8]]]*/
 /* >> chown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER' */
 INTERN NONNULL((1))
@@ -700,7 +700,7 @@ NOTHROW_RPC(LIBCCALL libc_chown)(char const *file,
 }
 /*[[[end:chown]]]*/
 
-/*[[[head:link,hash:0x532b051d]]]*/
+/*[[[head:link,hash:CRC-32=0xa5b5a700]]]*/
 /* >> link(2)
  * Create a hard link from `FROM', leading to `TO' */
 INTERN NONNULL((1, 2))
@@ -715,7 +715,7 @@ NOTHROW_RPC(LIBCCALL libc_link)(char const *from,
 }
 /*[[[end:link]]]*/
 
-/*[[[head:read,hash:0xf5a9f17a]]]*/
+/*[[[head:read,hash:CRC-32=0x4da52c23]]]*/
 /* >> read(2)
  * Read data from a given file descriptor `FD' and return the number of bytes read.
  * A return value of ZERO(0) is indicative of EOF */
@@ -732,7 +732,7 @@ NOTHROW_RPC(LIBCCALL libc_read)(fd_t fd,
 }
 /*[[[end:read]]]*/
 
-/*[[[head:write,hash:0x4749537]]]*/
+/*[[[head:write,hash:CRC-32=0xd1831abd]]]*/
 /* >> write(2)
  * Write data to a given file descriptor `FD' and return the number of bytes written */
 INTERN NONNULL((2))
@@ -748,7 +748,7 @@ NOTHROW_RPC(LIBCCALL libc_write)(fd_t fd,
 }
 /*[[[end:write]]]*/
 
-/*[[[head:lseek,hash:0x923c310]]]*/
+/*[[[head:lseek,hash:CRC-32=0x7939cbc3]]]*/
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.seek.lseek") off_t
@@ -767,7 +767,7 @@ NOTHROW_NCX(LIBCCALL libc_lseek)(fd_t fd,
 }
 /*[[[end:lseek]]]*/
 
-/*[[[head:isatty,hash:0xf2507caa]]]*/
+/*[[[head:isatty,hash:CRC-32=0x64468f81]]]*/
 /* >> isatty(2)
  * @return: 1: Is a tty
  * @return: 0: Not a tty
@@ -782,7 +782,7 @@ NOTHROW_NCX(LIBCCALL libc_isatty)(fd_t fd)
 }
 /*[[[end:isatty]]]*/
 
-/*[[[head:dup2,hash:0xe769ccbc]]]*/
+/*[[[head:dup2,hash:CRC-32=0x233a62c0]]]*/
 /* >> dup2(2)
  * @return: NEWFD: Returns the new handle upon success.
  * Duplicate a file referred to by `OLDFD' into `NEWFD' */
@@ -797,7 +797,7 @@ NOTHROW_NCX(LIBCCALL libc_dup2)(fd_t oldfd,
 }
 /*[[[end:dup2]]]*/
 
-/*[[[head:dup,hash:0x81247ada]]]*/
+/*[[[head:dup,hash:CRC-32=0x3c21d157]]]*/
 /* >> dup(2)
  * @return: * : Returns the new handle upon success.
  * Duplicate a file referred to by `FD' and return its duplicated handle number */
@@ -812,7 +812,7 @@ NOTHROW_NCX(LIBCCALL libc_dup)(fd_t fd)
 }
 /*[[[end:dup]]]*/
 
-/*[[[head:close,hash:0xc959d272]]]*/
+/*[[[head:close,hash:CRC-32=0xcd5949e0]]]*/
 /* >> close(2)
  * Close a file handle */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.access.close") int
@@ -825,7 +825,7 @@ NOTHROW_NCX(LIBCCALL libc_close)(fd_t fd)
 }
 /*[[[end:close]]]*/
 
-/*[[[head:access,hash:0x8ddc2a24]]]*/
+/*[[[head:access,hash:CRC-32=0x1f1817de]]]*/
 /* >> access(2)
  * @param: TYPE: Set of `X_OK|W_OK|R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE' */
@@ -841,7 +841,7 @@ NOTHROW_RPC(LIBCCALL libc_access)(char const *file,
 }
 /*[[[end:access]]]*/
 
-/*[[[head:chdir,hash:0x8c518cd6]]]*/
+/*[[[head:chdir,hash:CRC-32=0xe916c945]]]*/
 /* >> chdir(2)
  * Change the current working directory to `PATH' */
 INTERN NONNULL((1))
@@ -855,7 +855,7 @@ NOTHROW_RPC(LIBCCALL libc_chdir)(char const *path)
 }
 /*[[[end:chdir]]]*/
 
-/*[[[head:getcwd,hash:0xb63ce83a]]]*/
+/*[[[head:getcwd,hash:CRC-32=0x809bafd4]]]*/
 /* >> getcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.fs.basic_property.getcwd") char *
@@ -916,7 +916,7 @@ done:
 }
 /*[[[end:getcwd]]]*/
 
-/*[[[head:unlink,hash:0x113ef3ed]]]*/
+/*[[[head:unlink,hash:CRC-32=0xea505e67]]]*/
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
 INTERN NONNULL((1))
@@ -934,7 +934,7 @@ NOTHROW_RPC(LIBCCALL libc_unlink)(char const *file)
 }
 /*[[[end:unlink]]]*/
 
-/*[[[head:rmdir,hash:0x7351a4a3]]]*/
+/*[[[head:rmdir,hash:CRC-32=0xe7016d36]]]*/
 /* >> rmdir(2)
  * Remove a directory referred to by `PATH' */
 INTERN NONNULL((1))
@@ -952,7 +952,7 @@ NOTHROW_RPC(LIBCCALL libc_rmdir)(char const *path)
 }
 /*[[[end:rmdir]]]*/
 
-/*[[[head:euidaccess,hash:0x6a37773b]]]*/
+/*[[[head:euidaccess,hash:CRC-32=0x9e258beb]]]*/
 /* >> euidaccess(2)
  * @param: TYPE: Set of `X_OK|W_OK|R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids */
@@ -971,7 +971,7 @@ NOTHROW_RPC(LIBCCALL libc_euidaccess)(char const *file,
 }
 /*[[[end:euidaccess]]]*/
 
-/*[[[head:faccessat,hash:0x181a642]]]*/
+/*[[[head:faccessat,hash:CRC-32=0xbf2968eb]]]*/
 /* >> faccessat(2)
  * @param: TYPE: Set of `X_OK|W_OK|R_OK'
  * Test for access to the specified file `DFD:FILE', testing for `TYPE' */
@@ -992,7 +992,7 @@ NOTHROW_RPC(LIBCCALL libc_faccessat)(fd_t dfd,
 }
 /*[[[end:faccessat]]]*/
 
-/*[[[head:fchownat,hash:0xc5755f68]]]*/
+/*[[[head:fchownat,hash:CRC-32=0xd0f0a8bd]]]*/
 /* >> fchownat(2)
  * Change the ownership of a given `DFD:FILE' to `GROUP:OWNER' */
 INTERN NONNULL((2))
@@ -1014,7 +1014,7 @@ NOTHROW_RPC(LIBCCALL libc_fchownat)(fd_t dfd,
 }
 /*[[[end:fchownat]]]*/
 
-/*[[[head:linkat,hash:0x6005414]]]*/
+/*[[[head:linkat,hash:CRC-32=0xfbab7ecb]]]*/
 /* >> linkat(2)
  * Create a hard link from `FROMFD:FROM', leading to `TOFD:TO' */
 INTERN NONNULL((2, 4))
@@ -1036,7 +1036,7 @@ NOTHROW_RPC(LIBCCALL libc_linkat)(fd_t fromfd,
 }
 /*[[[end:linkat]]]*/
 
-/*[[[head:symlinkat,hash:0xe76d5673]]]*/
+/*[[[head:symlinkat,hash:CRC-32=0x82db8cf]]]*/
 /* >> symlinkat(3)
  * Create a new symbolic link loaded with `FROM' as link
  * text, at the filesystem location referred to by `TOFD:TO' */
@@ -1055,7 +1055,7 @@ NOTHROW_RPC(LIBCCALL libc_symlinkat)(char const *from,
 }
 /*[[[end:symlinkat]]]*/
 
-/*[[[head:readlinkat,hash:0x276d8869]]]*/
+/*[[[head:readlinkat,hash:CRC-32=0xc367fd64]]]*/
 /* >> readlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
  * WARNING: This function is badly designed and will neither append a trailing
@@ -1081,7 +1081,7 @@ NOTHROW_RPC(LIBCCALL libc_readlinkat)(fd_t dfd,
 }
 /*[[[end:readlinkat]]]*/
 
-/*[[[head:unlinkat,hash:0x87b7cb8b]]]*/
+/*[[[head:unlinkat,hash:CRC-32=0x5a6845f3]]]*/
 /* >> unlinkat(2)
  * Remove a file, symbolic link, device or FIFO referred to by `DFD:NAME' */
 INTERN NONNULL((2))
@@ -1099,7 +1099,7 @@ NOTHROW_RPC(LIBCCALL libc_unlinkat)(fd_t dfd,
 }
 /*[[[end:unlinkat]]]*/
 
-/*[[[head:lseek64,hash:0x360ac0fd]]]*/
+/*[[[head:lseek64,hash:CRC-32=0xad588a08]]]*/
 /* >> lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
@@ -1120,7 +1120,7 @@ NOTHROW_NCX(LIBCCALL libc_lseek64)(fd_t fd,
 #endif /* MAGIC:alias */
 /*[[[end:lseek64]]]*/
 
-/*[[[head:pread,hash:0xde0bfb8f]]]*/
+/*[[[head:pread,hash:CRC-32=0x4565dff6]]]*/
 /* >> pread(2)
  * Read data from a file at a specific offset */
 INTERN NONNULL((2))
@@ -1140,7 +1140,7 @@ NOTHROW_RPC(LIBCCALL libc_pread)(fd_t fd,
 }
 /*[[[end:pread]]]*/
 
-/*[[[head:pwrite,hash:0xff51b35b]]]*/
+/*[[[head:pwrite,hash:CRC-32=0x8fd3dc76]]]*/
 /* >> pwrite(2)
  * Write data to a file at a specific offset */
 INTERN NONNULL((2))
@@ -1160,7 +1160,7 @@ NOTHROW_RPC(LIBCCALL libc_pwrite)(fd_t fd,
 }
 /*[[[end:pwrite]]]*/
 
-/*[[[head:pread64,hash:0x1e1a35c8]]]*/
+/*[[[head:pread64,hash:CRC-32=0x606557ab]]]*/
 /* >> pread64(2)
  * Read data from a file at a specific offset */
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
@@ -1184,7 +1184,7 @@ NOTHROW_RPC(LIBCCALL libc_pread64)(fd_t fd,
 #endif /* MAGIC:alias */
 /*[[[end:pread64]]]*/
 
-/*[[[head:pwrite64,hash:0xa3267594]]]*/
+/*[[[head:pwrite64,hash:CRC-32=0x7835e5d3]]]*/
 /* >> pwrite64(2)
  * Write data to a file at a specific offset */
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
@@ -1208,7 +1208,7 @@ NOTHROW_RPC(LIBCCALL libc_pwrite64)(fd_t fd,
 #endif /* MAGIC:alias */
 /*[[[end:pwrite64]]]*/
 
-/*[[[head:pipe2,hash:0xa66a2a0d]]]*/
+/*[[[head:pipe2,hash:CRC-32=0x55c18577]]]*/
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.io.access.pipe2") int
 NOTHROW_NCX(LIBCCALL libc_pipe2)(fd_t pipedes[2],
@@ -1222,7 +1222,7 @@ NOTHROW_NCX(LIBCCALL libc_pipe2)(fd_t pipedes[2],
 }
 /*[[[end:pipe2]]]*/
 
-/*[[[head:dup3,hash:0x861f05f9]]]*/
+/*[[[head:dup3,hash:CRC-32=0x73446b9c]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.access.dup3") fd_t
 NOTHROW_NCX(LIBCCALL libc_dup3)(fd_t oldfd,
                                 fd_t newfd,
@@ -1237,7 +1237,7 @@ NOTHROW_NCX(LIBCCALL libc_dup3)(fd_t oldfd,
 }
 /*[[[end:dup3]]]*/
 
-/*[[[head:get_current_dir_name,hash:0x60e294d2]]]*/
+/*[[[head:get_current_dir_name,hash:CRC-32=0xbcf67a29]]]*/
 INTERN WUNUSED ATTR_MALLOC
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.basic_property.get_current_dir_name") char *
 NOTHROW_RPC(LIBCCALL libc_get_current_dir_name)(void)
@@ -1263,7 +1263,7 @@ group_member_impl(gid_t gid, unsigned int bufsize) {
 	return 0;
 }
 
-/*[[[head:group_member,hash:0xcf9285f3]]]*/
+/*[[[head:group_member,hash:CRC-32=0xccfac7e7]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.user.group_member") int
 NOTHROW_NCX(LIBCCALL libc_group_member)(gid_t gid)
 /*[[[body:group_member]]]*/
@@ -1280,7 +1280,7 @@ NOTHROW_NCX(LIBCCALL libc_group_member)(gid_t gid)
 }
 /*[[[end:group_member]]]*/
 
-/*[[[head:getresuid,hash:0xe3916ce9]]]*/
+/*[[[head:getresuid,hash:CRC-32=0x74fccc14]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.user.getresuid") int
 NOTHROW_NCX(LIBCCALL libc_getresuid)(uid_t *ruid,
                                      uid_t *euid,
@@ -1295,7 +1295,7 @@ NOTHROW_NCX(LIBCCALL libc_getresuid)(uid_t *ruid,
 }
 /*[[[end:getresuid]]]*/
 
-/*[[[head:getresgid,hash:0x755e6e2b]]]*/
+/*[[[head:getresgid,hash:CRC-32=0xa204ce42]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.user.getresgid") int
 NOTHROW_NCX(LIBCCALL libc_getresgid)(gid_t *rgid,
                                      gid_t *egid,
@@ -1310,7 +1310,7 @@ NOTHROW_NCX(LIBCCALL libc_getresgid)(gid_t *rgid,
 }
 /*[[[end:getresgid]]]*/
 
-/*[[[head:setresuid,hash:0xebf99059]]]*/
+/*[[[head:setresuid,hash:CRC-32=0x78b342e5]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.user.setresuid") int
 NOTHROW_NCX(LIBCCALL libc_setresuid)(uid_t ruid,
                                      uid_t euid,
@@ -1325,7 +1325,7 @@ NOTHROW_NCX(LIBCCALL libc_setresuid)(uid_t ruid,
 }
 /*[[[end:setresuid]]]*/
 
-/*[[[head:setresgid,hash:0x1e8cab6]]]*/
+/*[[[head:setresgid,hash:CRC-32=0xaa38d586]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.user.setresgid") int
 NOTHROW_NCX(LIBCCALL libc_setresgid)(gid_t rgid,
                                      gid_t egid,
@@ -1340,7 +1340,7 @@ NOTHROW_NCX(LIBCCALL libc_setresgid)(gid_t rgid,
 }
 /*[[[end:setresgid]]]*/
 
-/*[[[head:usleep,hash:0x6be8b952]]]*/
+/*[[[head:usleep,hash:CRC-32=0x6ebb3d05]]]*/
 /* Sleep for `useconds' microseconds (1/1.000.000 seconds) */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.utility.usleep") int
 NOTHROW_RPC(LIBCCALL libc_usleep)(useconds_t useconds)
@@ -1353,7 +1353,7 @@ NOTHROW_RPC(LIBCCALL libc_usleep)(useconds_t useconds)
 }
 /*[[[end:usleep]]]*/
 
-/*[[[head:getwd,hash:0x26bc40e3]]]*/
+/*[[[head:getwd,hash:CRC-32=0x97252e05]]]*/
 INTERN ATTR_DEPRECATED("Use getcwd()") NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.basic_property.getwd") char *
 NOTHROW_RPC(LIBCCALL libc_getwd)(char *buf)
@@ -1363,7 +1363,7 @@ NOTHROW_RPC(LIBCCALL libc_getwd)(char *buf)
 }
 /*[[[end:getwd]]]*/
 
-/*[[[head:ualarm,hash:0xde572458]]]*/
+/*[[[head:ualarm,hash:CRC-32=0x5732645e]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.utility.ualarm") useconds_t
 NOTHROW_NCX(LIBCCALL libc_ualarm)(useconds_t value,
                                   useconds_t interval)
@@ -1375,7 +1375,7 @@ NOTHROW_NCX(LIBCCALL libc_ualarm)(useconds_t value,
 }
 /*[[[end:ualarm]]]*/
 
-/*[[[head:vfork,hash:0xe2bd7dee]]]*/
+/*[[[head:vfork,hash:CRC-32=0xebaf332d]]]*/
 /* >> vfork(2)
  * Same as `fork(2)', but suspend the calling process until the child
  * process either calls `exit(2)' or one of the many `exec(2)' functions */
@@ -1392,7 +1392,7 @@ NOTHROW_NCX(LIBCCALL libc_vfork)(void)
 }
 /*[[[end:vfork]]]*/
 
-/*[[[head:fchown,hash:0x29940cb1]]]*/
+/*[[[head:fchown,hash:CRC-32=0x516296d4]]]*/
 /* >> fchown(2)
  * Change the ownership of a given `FD' to `GROUP:OWNER' */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify.fchown") int
@@ -1415,7 +1415,7 @@ NOTHROW_RPC(LIBCCALL libc_fchown)(fd_t fd,
 }
 /*[[[end:fchown]]]*/
 
-/*[[[head:fchdir,hash:0xf1ee4cd3]]]*/
+/*[[[head:fchdir,hash:CRC-32=0xb612d469]]]*/
 /* >> chdir(2)
  * Change the current working directory to `PATH' */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.fs.basic_property.fchdir") int
@@ -1428,7 +1428,7 @@ NOTHROW_RPC(LIBCCALL libc_fchdir)(fd_t fd)
 }
 /*[[[end:fchdir]]]*/
 
-/*[[[head:getpgid,hash:0x3e719ceb]]]*/
+/*[[[head:getpgid,hash:CRC-32=0xfc9462e0]]]*/
 /* >> getpgid(2)
  * Return the ID of the process group associated with `PID's process.
  * (That is the TID of the leader of the process group of `PID's leader)
@@ -1445,7 +1445,7 @@ NOTHROW_NCX(LIBCCALL libc_getpgid)(pid_t pid)
 }
 /*[[[end:getpgid]]]*/
 
-/*[[[head:getsid,hash:0xb35820a4]]]*/
+/*[[[head:getsid,hash:CRC-32=0xfbd2cdee]]]*/
 /* >> getsid(2)
  * Return the ID of the session which a process `PID' is apart of.
  * return THREAD[PID]->LEADER->GROUP_LEADER->SESSION_LEADER->PID; */
@@ -1460,7 +1460,7 @@ NOTHROW_NCX(LIBCCALL libc_getsid)(pid_t pid)
 }
 /*[[[end:getsid]]]*/
 
-/*[[[head:lchown,hash:0xb2ea4e26]]]*/
+/*[[[head:lchown,hash:CRC-32=0xa903991]]]*/
 /* >> lchown(2)
  * Change the ownership of a given `FILE' to `GROUP:OWNER',
  * but don't reference it if that file is a symbolic link */
@@ -1485,7 +1485,7 @@ NOTHROW_RPC(LIBCCALL libc_lchown)(char const *file,
 }
 /*[[[end:lchown]]]*/
 
-/*[[[head:truncate,hash:0x795d8f28]]]*/
+/*[[[head:truncate,hash:CRC-32=0xc1871490]]]*/
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 INTERN NONNULL((1))
@@ -1501,7 +1501,7 @@ NOTHROW_NCX(LIBCCALL libc_truncate)(char const *file,
 }
 /*[[[end:truncate]]]*/
 
-/*[[[head:truncate64,hash:0x35395703]]]*/
+/*[[[head:truncate64,hash:CRC-32=0x109516b7]]]*/
 /* >> truncate64(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
@@ -1521,7 +1521,7 @@ NOTHROW_NCX(LIBCCALL libc_truncate64)(char const *file,
 #endif /* MAGIC:alias */
 /*[[[end:truncate64]]]*/
 
-/*[[[head:fexecve,hash:0x48b510b7]]]*/
+/*[[[head:fexecve,hash:CRC-32=0xf31d2aed]]]*/
 /* >> fexecve(2)
  * Replace the calling process with the application image referred to by `FD' and
  * execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
@@ -1542,7 +1542,7 @@ NOTHROW_RPC(LIBCCALL libc_fexecve)(fd_t fd,
 }
 /*[[[end:fexecve]]]*/
 
-/*[[[head:setpgrp,hash:0xbf9e0099]]]*/
+/*[[[head:setpgrp,hash:CRC-32=0x1f8bf7b8]]]*/
 /* >> setpgrp(3)
  * Move the calling process into its own process group.
  * Equivalent to `setpgid(0, 0)' */
@@ -1556,7 +1556,7 @@ NOTHROW_NCX(LIBCCALL libc_setpgrp)(void)
 }
 /*[[[end:setpgrp]]]*/
 
-/*[[[head:setreuid,hash:0xafc1b2fe]]]*/
+/*[[[head:setreuid,hash:CRC-32=0x495e9e77]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.user.setreuid") int
 NOTHROW_NCX(LIBCCALL libc_setreuid)(uid_t ruid,
                                     uid_t euid)
@@ -1569,7 +1569,7 @@ NOTHROW_NCX(LIBCCALL libc_setreuid)(uid_t ruid,
 }
 /*[[[end:setreuid]]]*/
 
-/*[[[head:setregid,hash:0xd913dfac]]]*/
+/*[[[head:setregid,hash:CRC-32=0xf7a9c1b6]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.user.setregid") int
 NOTHROW_NCX(LIBCCALL libc_setregid)(gid_t rgid,
                                     gid_t egid)
@@ -1582,7 +1582,7 @@ NOTHROW_NCX(LIBCCALL libc_setregid)(gid_t rgid,
 }
 /*[[[end:setregid]]]*/
 
-/*[[[head:gethostid,hash:0x51519a9d]]]*/
+/*[[[head:gethostid,hash:CRC-32=0x2867d86]]]*/
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.system.configuration.gethostid") long int
 NOTHROW_NCX(LIBCCALL libc_gethostid)(void)
@@ -1594,7 +1594,7 @@ NOTHROW_NCX(LIBCCALL libc_gethostid)(void)
 }
 /*[[[end:gethostid]]]*/
 
-/*[[[head:sethostid,hash:0x7f70eabb]]]*/
+/*[[[head:sethostid,hash:CRC-32=0x1d1f6fd0]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.configuration.sethostid") int
 NOTHROW_NCX(LIBCCALL libc_sethostid)(long int id)
 /*[[[body:sethostid]]]*/
@@ -1605,7 +1605,7 @@ NOTHROW_NCX(LIBCCALL libc_sethostid)(long int id)
 }
 /*[[[end:sethostid]]]*/
 
-/*[[[head:seteuid,hash:0x8017685b]]]*/
+/*[[[head:seteuid,hash:CRC-32=0x3f3a660d]]]*/
 /* >> seteuid(2)
  * Set the effective user ID of the calling process
  * @return: 0 : Success
@@ -1624,7 +1624,7 @@ NOTHROW_NCX(LIBCCALL libc_seteuid)(uid_t euid)
 }
 /*[[[end:seteuid]]]*/
 
-/*[[[head:setegid,hash:0x281f3077]]]*/
+/*[[[head:setegid,hash:CRC-32=0x4f696722]]]*/
 /* >> setegid(2)
  * Set the effective group ID of the calling process
  * @return: 0 : Success
@@ -1643,7 +1643,7 @@ NOTHROW_NCX(LIBCCALL libc_setegid)(gid_t egid)
 }
 /*[[[end:setegid]]]*/
 
-/*[[[head:ttyslot,hash:0x1ca982e1]]]*/
+/*[[[head:ttyslot,hash:CRC-32=0x49ae567d]]]*/
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.ttyslot") int
 NOTHROW_NCX(LIBCCALL libc_ttyslot)(void)
@@ -1655,7 +1655,7 @@ NOTHROW_NCX(LIBCCALL libc_ttyslot)(void)
 }
 /*[[[end:ttyslot]]]*/
 
-/*[[[head:symlink,hash:0x7f0b9f7e]]]*/
+/*[[[head:symlink,hash:CRC-32=0xb6bf0c9a]]]*/
 /* >> symlink(3)
  * Create a new symbolic link loaded with `FROM' as link
  * text, at the filesystem location referred to by `TO'.
@@ -1672,7 +1672,7 @@ NOTHROW_RPC(LIBCCALL libc_symlink)(char const *from,
 }
 /*[[[end:symlink]]]*/
 
-/*[[[head:readlink,hash:0x46093805]]]*/
+/*[[[head:readlink,hash:CRC-32=0x3788b7d8]]]*/
 /* >> readlink(3)
  * Read the text of a symbolic link under `PATH' into the provided buffer.
  * Same as `readlinkat(AT_FDCWD, PATH, BUF, BUFLEN)'
@@ -1695,7 +1695,7 @@ NOTHROW_RPC(LIBCCALL libc_readlink)(char const *__restrict path,
 }
 /*[[[end:readlink]]]*/
 
-/*[[[head:getlogin_r,hash:0xe04b6fb8]]]*/
+/*[[[head:getlogin_r,hash:CRC-32=0x9043a5b2]]]*/
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.getlogin_r") int
 NOTHROW_RPC(LIBCCALL libc_getlogin_r)(char *name,
@@ -1708,7 +1708,7 @@ NOTHROW_RPC(LIBCCALL libc_getlogin_r)(char *name,
 }
 /*[[[end:getlogin_r]]]*/
 
-/*[[[head:gethostname,hash:0xca116dcc]]]*/
+/*[[[head:gethostname,hash:CRC-32=0x21837829]]]*/
 /* >> gethostname(3)
  * Return the name assigned to the hosting machine, as set by `sethostname(2)' */
 INTERN NONNULL((1))
@@ -1732,7 +1732,7 @@ NOTHROW_NCX(LIBCCALL libc_gethostname)(char *name,
 }
 /*[[[end:gethostname]]]*/
 
-/*[[[head:sethostname,hash:0x9df6c018]]]*/
+/*[[[head:sethostname,hash:CRC-32=0x942a559d]]]*/
 /* >> sethostname(2)
  * Set the name of the hosting machine */
 INTERN NONNULL((1))
@@ -1747,7 +1747,7 @@ NOTHROW_NCX(LIBCCALL libc_sethostname)(char const *name,
 }
 /*[[[end:sethostname]]]*/
 
-/*[[[head:getdomainname,hash:0xe73e8d4a]]]*/
+/*[[[head:getdomainname,hash:CRC-32=0x7ddf3350]]]*/
 /* >> getdomainname(3)
  * Return the name assigned to the hosting machine's domain, as set by `setdomainname(2)' */
 INTERN NONNULL((1))
@@ -1771,7 +1771,7 @@ NOTHROW_NCX(LIBCCALL libc_getdomainname)(char *name,
 }
 /*[[[end:getdomainname]]]*/
 
-/*[[[head:setdomainname,hash:0x4134833]]]*/
+/*[[[head:setdomainname,hash:CRC-32=0x6d68123]]]*/
 /* >> setdomainname(2)
  * Set the name of the hosting machine's domain */
 INTERN NONNULL((1))
@@ -1786,7 +1786,7 @@ NOTHROW_NCX(LIBCCALL libc_setdomainname)(char const *name,
 }
 /*[[[end:setdomainname]]]*/
 
-/*[[[head:vhangup,hash:0x4c502518]]]*/
+/*[[[head:vhangup,hash:CRC-32=0xfecab91e]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.vhangup") int
 NOTHROW_NCX(LIBCCALL libc_vhangup)(void)
 /*[[[body:vhangup]]]*/
@@ -1797,7 +1797,7 @@ NOTHROW_NCX(LIBCCALL libc_vhangup)(void)
 }
 /*[[[end:vhangup]]]*/
 
-/*[[[head:profil,hash:0x136efd44]]]*/
+/*[[[head:profil,hash:CRC-32=0x88101e9a]]]*/
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.system.utility.profil") int
 NOTHROW_NCX(LIBCCALL libc_profil)(unsigned short int *sample_buffer,
@@ -1820,7 +1820,7 @@ NOTHROW_NCX(LIBCCALL libc_profil)(unsigned short int *sample_buffer,
 }
 /*[[[end:profil]]]*/
 
-/*[[[head:getusershell,hash:0x21fdd4e7]]]*/
+/*[[[head:getusershell,hash:CRC-32=0xfc6d7cd2]]]*/
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.database.shell.getusershell") char *
 NOTHROW_RPC(LIBCCALL libc_getusershell)(void)
@@ -1832,7 +1832,7 @@ NOTHROW_RPC(LIBCCALL libc_getusershell)(void)
 }
 /*[[[end:getusershell]]]*/
 
-/*[[[head:endusershell,hash:0x2175fee3]]]*/
+/*[[[head:endusershell,hash:CRC-32=0x52539255]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.shell.endusershell") void
 NOTHROW_NCX(LIBCCALL libc_endusershell)(void)
 /*[[[body:endusershell]]]*/
@@ -1842,7 +1842,7 @@ NOTHROW_NCX(LIBCCALL libc_endusershell)(void)
 }
 /*[[[end:endusershell]]]*/
 
-/*[[[head:setusershell,hash:0x3b361b1e]]]*/
+/*[[[head:setusershell,hash:CRC-32=0x59887bfa]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.shell.setusershell") void
 NOTHROW_RPC(LIBCCALL libc_setusershell)(void)
 /*[[[body:setusershell]]]*/
@@ -1852,7 +1852,7 @@ NOTHROW_RPC(LIBCCALL libc_setusershell)(void)
 }
 /*[[[end:setusershell]]]*/
 
-/*[[[head:daemon,hash:0x5231a942]]]*/
+/*[[[head:daemon,hash:CRC-32=0x22155f43]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.utility.daemon") int
 NOTHROW_RPC(LIBCCALL libc_daemon)(int nochdir,
                                   int noclose)
@@ -1864,7 +1864,7 @@ NOTHROW_RPC(LIBCCALL libc_daemon)(int nochdir,
 }
 /*[[[end:daemon]]]*/
 
-/*[[[head:revoke,hash:0x37e8f773]]]*/
+/*[[[head:revoke,hash:CRC-32=0x4cb80d3b]]]*/
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify.revoke") int
 NOTHROW_RPC(LIBCCALL libc_revoke)(char const *file)
@@ -1876,7 +1876,7 @@ NOTHROW_RPC(LIBCCALL libc_revoke)(char const *file)
 }
 /*[[[end:revoke]]]*/
 
-/*[[[head:acct,hash:0x107ef83c]]]*/
+/*[[[head:acct,hash:CRC-32=0xd6fcb999]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify.acct") int
 NOTHROW_RPC(LIBCCALL libc_acct)(char const *name)
 /*[[[body:acct]]]*/
@@ -1891,7 +1891,7 @@ NOTHROW_RPC(LIBCCALL libc_acct)(char const *name)
 /*[[[skip:syscall]]]*/
 /*[[[skip:syscall64]]]*/
 
-/*[[[head:chroot,hash:0xb20154c8]]]*/
+/*[[[head:chroot,hash:CRC-32=0x66f715e4]]]*/
 /* >> chroot(2)
  * Change the root directory of the calling `CLONE_FS' group of threads
  * (usually the process) to a path that was previously address by `PATH' */
@@ -1906,7 +1906,7 @@ NOTHROW_RPC(LIBCCALL libc_chroot)(char const *__restrict path)
 }
 /*[[[end:chroot]]]*/
 
-/*[[[head:getpass,hash:0x2ea0aed7]]]*/
+/*[[[head:getpass,hash:CRC-32=0xf97b3f36]]]*/
 INTERN WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.getpass") char *
 NOTHROW_RPC(LIBCCALL libc_getpass)(char const *__restrict prompt)
@@ -1918,7 +1918,7 @@ NOTHROW_RPC(LIBCCALL libc_getpass)(char const *__restrict prompt)
 }
 /*[[[end:getpass]]]*/
 
-/*[[[head:ftruncate,hash:0x4dce9ad0]]]*/
+/*[[[head:ftruncate,hash:CRC-32=0xbf04e100]]]*/
 /* >> ftruncate(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.write.ftruncate") int
@@ -1932,7 +1932,7 @@ NOTHROW_NCX(LIBCCALL libc_ftruncate)(fd_t fd,
 }
 /*[[[end:ftruncate]]]*/
 
-/*[[[head:ftruncate64,hash:0x367bc748]]]*/
+/*[[[head:ftruncate64,hash:CRC-32=0x4c7e5e2b]]]*/
 /* >> ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
@@ -1996,7 +1996,7 @@ err:
 }
 
 
-/*[[[head:brk,hash:0xe6e40420]]]*/
+/*[[[head:brk,hash:CRC-32=0xd6704174]]]*/
 /* >> brk(2), sbrk(2)
  * Change the program break, allowing for a rudimentary implementation of a heap.
  * It is recommended to use the much more advanced functions found in <sys/mman.h> instead */
@@ -2012,7 +2012,7 @@ NOTHROW_NCX(LIBCCALL libc_brk)(void *addr)
 }
 /*[[[end:brk]]]*/
 
-/*[[[head:sbrk,hash:0x7f15f008]]]*/
+/*[[[head:sbrk,hash:CRC-32=0x66c87797]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.heap.utility.sbrk") void *
 NOTHROW_NCX(LIBCCALL libc_sbrk)(intptr_t delta)
 /*[[[body:sbrk]]]*/
@@ -2040,7 +2040,7 @@ err_perm:
 
 
 
-/*[[[head:ctermid,hash:0x84808e5]]]*/
+/*[[[head:ctermid,hash:CRC-32=0x45032fdd]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.ctermid") char *
 NOTHROW_NCX(LIBCCALL libc_ctermid)(char *s)
 /*[[[body:ctermid]]]*/
@@ -2052,7 +2052,7 @@ NOTHROW_NCX(LIBCCALL libc_ctermid)(char *s)
 }
 /*[[[end:ctermid]]]*/
 
-/*[[[head:fpathconf,hash:0x39bff5e8]]]*/
+/*[[[head:fpathconf,hash:CRC-32=0xb3cb9f05]]]*/
 /* >> fpathconf(2)
  * @param: NAME: One of `_PC_*' from <bits/confname.h>
  * Return a path configuration value associated with `NAME' for `FD' */
@@ -2069,7 +2069,7 @@ NOTHROW_RPC(LIBCCALL libc_fpathconf)(fd_t fd,
 /*[[[end:fpathconf]]]*/
 
 
-/*[[[head:pathconf,hash:0x814bdaad]]]*/
+/*[[[head:pathconf,hash:CRC-32=0x2e2e544a]]]*/
 /* >> pathconf(2)
  * @param: NAME: One of `_PC_*' from <bits/confname.h>
  * Return a path configuration value associated with `NAME' for `PATH' */
@@ -2085,7 +2085,7 @@ NOTHROW_RPC(LIBCCALL libc_pathconf)(char const *path,
 }
 /*[[[end:pathconf]]]*/
 
-/*[[[head:confstr,hash:0x9abccf95]]]*/
+/*[[[head:confstr,hash:CRC-32=0x2c8a57db]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.configuration.confstr") size_t
 NOTHROW_NCX(LIBCCALL libc_confstr)(int name,
                                    char *buf,
@@ -2098,7 +2098,7 @@ NOTHROW_NCX(LIBCCALL libc_confstr)(int name,
 }
 /*[[[end:confstr]]]*/
 
-/*[[[head:sysconf,hash:0xbe2ec335]]]*/
+/*[[[head:sysconf,hash:CRC-32=0xb223b994]]]*/
 /* >> sysconf(2)
  * @param: NAME: One of `_SC_*' from <bits/confname.h>
  * Return a system configuration value `NAME' */
@@ -3132,7 +3132,7 @@ unlimited: ATTR_UNUSED;
 }
 /*[[[end:sysconf]]]*/
 
-/*[[[head:__crtSleep,hash:0x9ec6efd8]]]*/
+/*[[[head:__crtSleep,hash:CRC-32=0xf5d5be94]]]*/
 /* Hidden function exported by DOS that allows for millisecond precision */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.system.utility.__crtSleep") void
 NOTHROW_RPC(LIBCCALL libc___crtSleep)(__UINT32_TYPE__ msecs)
@@ -3145,7 +3145,7 @@ NOTHROW_RPC(LIBCCALL libc___crtSleep)(__UINT32_TYPE__ msecs)
 }
 /*[[[end:__crtSleep]]]*/
 
-/*[[[head:freadlinkat,hash:0xd8ca4816]]]*/
+/*[[[head:freadlinkat,hash:CRC-32=0xd56347e]]]*/
 /* >> freadlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
  * @param flags: Set of `AT_DOSPATH|AT_READLINK_REQSIZE' */
@@ -3164,7 +3164,7 @@ NOTHROW_RPC(LIBCCALL libc_freadlinkat)(fd_t dfd,
 }
 /*[[[end:freadlinkat]]]*/
 
-/*[[[head:readall,hash:0xff0ad0c4]]]*/
+/*[[[head:readall,hash:CRC-32=0x7c73f9d8]]]*/
 /* >> readall(3)
  * Same as `read(2)', however keep on reading until `read()' indicates EOF (causing
  * `readall()' to immediately return `0') or the entirety of the given buffer has been
@@ -3204,7 +3204,7 @@ NOTHROW_RPC(LIBCCALL libc_readall)(fd_t fd,
 }
 /*[[[end:readall]]]*/
 
-/*[[[head:preadall,hash:0x4b99637a]]]*/
+/*[[[head:preadall,hash:CRC-32=0xf7b0976c]]]*/
 /* >> preadall(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
 INTERN NONNULL((2))
@@ -3219,7 +3219,7 @@ NOTHROW_RPC(LIBCCALL libc_preadall)(fd_t fd,
 }
 /*[[[end:preadall]]]*/
 
-/*[[[head:preadall64,hash:0x607d67c9]]]*/
+/*[[[head:preadall64,hash:CRC-32=0xd97963cf]]]*/
 /* >> preadall64(3)
  * Same as `readall(3)', but using `pread64(2)' instead of `read()' */
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
@@ -3262,7 +3262,7 @@ NOTHROW_RPC(LIBCCALL libc_preadall64)(fd_t fd,
 PRIVATE ATTR_THREAD pid_t cached_tid = 0;
 #endif
 
-/*[[[head:gettid,hash:0xfc421859]]]*/
+/*[[[head:gettid,hash:CRC-32=0xc3dae631]]]*/
 /* >> gettid(2)
  * Return the TID of the calling thread
  * THIS_THREAD->PID */
@@ -3289,7 +3289,7 @@ NOTHROW_NCX(LIBCCALL libc_gettid)(void)
 }
 /*[[[end:gettid]]]*/
 
-/*[[[head:sync,hash:0x645532c5]]]*/
+/*[[[head:sync,hash:CRC-32=0xe85fde2a]]]*/
 /* >> sync(2)
  * Synchronize all disk operations of all mounted file systems and flush
  * unwritten buffers down to the hardware layer, ensuring that modifications
@@ -3302,7 +3302,7 @@ NOTHROW_RPC(LIBCCALL libc_sync)(void)
 }
 /*[[[end:sync]]]*/
 
-/*[[[head:syncfs,hash:0xe5db868e]]]*/
+/*[[[head:syncfs,hash:CRC-32=0xb9dfbf3e]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify.syncfs") int
 NOTHROW_RPC(LIBCCALL libc_syncfs)(fd_t fd)
 /*[[[body:syncfs]]]*/
@@ -3313,7 +3313,7 @@ NOTHROW_RPC(LIBCCALL libc_syncfs)(fd_t fd)
 }
 /*[[[end:syncfs]]]*/
 
-/*[[[head:nice,hash:0x253ef9ee]]]*/
+/*[[[head:nice,hash:CRC-32=0xd84ba128]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.param.nice") int
 NOTHROW_NCX(LIBCCALL libc_nice)(int inc)
 /*[[[body:nice]]]*/
@@ -3328,7 +3328,7 @@ NOTHROW_NCX(LIBCCALL libc_nice)(int inc)
 }
 /*[[[end:nice]]]*/
 
-/*[[[head:fsync,hash:0xa04c365c]]]*/
+/*[[[head:fsync,hash:CRC-32=0x5f28148d]]]*/
 /* >> fsync(2)
  * Synchronize a file (including its descriptor which contains timestamps, and its size),
  * meaning that changes to its data and/or descriptor are written to disk */
@@ -3342,7 +3342,7 @@ NOTHROW_RPC(LIBCCALL libc_fsync)(fd_t fd)
 }
 /*[[[end:fsync]]]*/
 
-/*[[[head:fdatasync,hash:0x9c06d7d2]]]*/
+/*[[[head:fdatasync,hash:CRC-32=0x741bfd0d]]]*/
 /* >> fdatasync(2)
  * Synchronize only the data of a file (not its descriptor which contains
  * timestamps, and its size), meaning that changes are written to disk */
@@ -3360,7 +3360,7 @@ NOTHROW_RPC(LIBCCALL libc_fdatasync)(fd_t fd)
 
 
 
-/*[[[start:exports,hash:0x32b100af]]]*/
+/*[[[start:exports,hash:CRC-32=0xea6d2011]]]*/
 #undef execl
 #undef _execl
 #undef execle

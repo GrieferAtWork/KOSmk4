@@ -58,7 +58,7 @@ INTDEF ATTR_READMOSTLY unsigned int futex_spin_counter;
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:lfutexlock,hash:0xdf1120e4]]]*/
+/*[[[head:lfutexlock,hash:CRC-32=0x9cda60d3]]]*/
 /* >> lfutexlock(2)
  * High-level wrapper around the lfutexlockat system call
  * This function behaves identical to the lfutex() system call, except that it takes
@@ -121,7 +121,7 @@ NOTHROW_RPC(LIBCCALL libc_lfutexlock)(lfutex_t *ulockaddr,
 }
 /*[[[end:lfutexlock]]]*/
 
-/*[[[head:lfutexlock64,hash:0xdb8ed0bd]]]*/
+/*[[[head:lfutexlock64,hash:CRC-32=0x378cbf53]]]*/
 /* >> lfutexlock(2)
  * High-level wrapper around the lfutexlockat system call
  * This function behaves identical to the lfutex() system call, except that it takes
@@ -177,7 +177,7 @@ NOTHROW_RPC(LIBCCALL libc_lfutexlock64)(lfutex_t *ulockaddr,
 #endif /* MAGIC:alias */
 /*[[[end:lfutexlock64]]]*/
 
-/*[[[head:futexlock_wake,hash:0xd716e961]]]*/
+/*[[[head:futexlock_wake,hash:CRC-32=0xc939168c]]]*/
 /* A more efficient variant of `futex_wake()' that can be used to wake up threads waiting
  * on some given futex-lock. - This method of waking is faster, since it doesn't invoke a
  * system call when no thread is waiting on the given lock */
@@ -195,7 +195,7 @@ NOTHROW_NCX(LIBCCALL libc_futexlock_wake)(lfutex_t *ulockaddr,
 }
 /*[[[end:futexlock_wake]]]*/
 
-/*[[[head:futexlock_wakeall,hash:0x729b1c5a]]]*/
+/*[[[head:futexlock_wakeall,hash:CRC-32=0xfbed694c]]]*/
 /* A more efficient variant of `futex_wake()' that can be used to wake up threads waiting
  * on some given futex-lock. - This method of waking is faster, since it doesn't invoke a
  * system call when no thread is waiting on the given lock */
@@ -212,7 +212,7 @@ NOTHROW_NCX(LIBCCALL libc_futexlock_wakeall)(lfutex_t *ulockaddr)
 }
 /*[[[end:futexlock_wakeall]]]*/
 
-/*[[[head:futexlock_waitwhile,hash:0x5ce4d2c4]]]*/
+/*[[[head:futexlock_waitwhile,hash:CRC-32=0x6b1db401]]]*/
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.futexlock_waitwhile") int
 NOTHROW_RPC(LIBCCALL libc_futexlock_waitwhile)(lfutex_t *ulockaddr,
@@ -232,7 +232,7 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_waitwhile)(lfutex_t *ulockaddr,
 }
 /*[[[end:futexlock_waitwhile]]]*/
 
-/*[[[head:futexlock_waituntil,hash:0x40fdfb2a]]]*/
+/*[[[head:futexlock_waituntil,hash:CRC-32=0xbe790072]]]*/
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.futexlock_waituntil") int
 NOTHROW_RPC(LIBCCALL libc_futexlock_waituntil)(lfutex_t *ulockaddr,
@@ -252,7 +252,7 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_waituntil)(lfutex_t *ulockaddr,
 }
 /*[[[end:futexlock_waituntil]]]*/
 
-/*[[[head:futexlock_waitwhile_above,hash:0x55e487a2]]]*/
+/*[[[head:futexlock_waitwhile_above,hash:CRC-32=0xcf0393d7]]]*/
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.futexlock_waitwhile_above") int
 NOTHROW_RPC(LIBCCALL libc_futexlock_waitwhile_above)(lfutex_t *ulockaddr,
@@ -272,7 +272,7 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_waitwhile_above)(lfutex_t *ulockaddr,
 }
 /*[[[end:futexlock_waitwhile_above]]]*/
 
-/*[[[head:futexlock_waitwhile_below,hash:0xb41031a0]]]*/
+/*[[[head:futexlock_waitwhile_below,hash:CRC-32=0xd3877447]]]*/
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.futexlock_waitwhile_below") int
 NOTHROW_RPC(LIBCCALL libc_futexlock_waitwhile_below)(lfutex_t *ulockaddr,
@@ -292,7 +292,7 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_waitwhile_below)(lfutex_t *ulockaddr,
 }
 /*[[[end:futexlock_waitwhile_below]]]*/
 
-/*[[[head:futexlock_waitwhile_aboveequal,hash:0xb709c613]]]*/
+/*[[[head:futexlock_waitwhile_aboveequal,hash:CRC-32=0xe1741a4]]]*/
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.futexlock_waitwhile_aboveequal") int
 NOTHROW_RPC(LIBCCALL libc_futexlock_waitwhile_aboveequal)(lfutex_t *ulockaddr,
@@ -314,7 +314,7 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_waitwhile_aboveequal)(lfutex_t *ulockaddr,
 }
 /*[[[end:futexlock_waitwhile_aboveequal]]]*/
 
-/*[[[head:futexlock_waitwhile_belowequal,hash:0xd7579db7]]]*/
+/*[[[head:futexlock_waitwhile_belowequal,hash:CRC-32=0xd4987356]]]*/
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.futexlock_waitwhile_belowequal") int
 NOTHROW_RPC(LIBCCALL libc_futexlock_waitwhile_belowequal)(lfutex_t *ulockaddr,
@@ -336,7 +336,7 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_waitwhile_belowequal)(lfutex_t *ulockaddr,
 }
 /*[[[end:futexlock_waitwhile_belowequal]]]*/
 
-/*[[[head:futexlock_waitwhile_cmpxch,hash:0x143ce42a]]]*/
+/*[[[head:futexlock_waitwhile_cmpxch,hash:CRC-32=0x68d3422]]]*/
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.futexlock_waitwhile_cmpxch") int
 NOTHROW_RPC(LIBCCALL libc_futexlock_waitwhile_cmpxch)(lfutex_t *ulockaddr,
@@ -357,7 +357,7 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_waitwhile_cmpxch)(lfutex_t *ulockaddr,
 }
 /*[[[end:futexlock_waitwhile_cmpxch]]]*/
 
-/*[[[head:futexlock_waituntil_cmpxch,hash:0xd8d91324]]]*/
+/*[[[head:futexlock_waituntil_cmpxch,hash:CRC-32=0xe460c26f]]]*/
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.futexlock_waituntil_cmpxch") int
 NOTHROW_RPC(LIBCCALL libc_futexlock_waituntil_cmpxch)(lfutex_t *ulockaddr,
@@ -378,7 +378,7 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_waituntil_cmpxch)(lfutex_t *ulockaddr,
 }
 /*[[[end:futexlock_waituntil_cmpxch]]]*/
 
-/*[[[head:futexlock_waitlock,hash:0x978a3358]]]*/
+/*[[[head:futexlock_waitlock,hash:CRC-32=0xa471e567]]]*/
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.futexlock_waitlock") int
 NOTHROW_RPC(LIBCCALL libc_futexlock_waitlock)(lfutex_t *ulockaddr,
@@ -397,7 +397,7 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_waitlock)(lfutex_t *ulockaddr,
 }
 /*[[[end:futexlock_waitlock]]]*/
 
-/*[[[head:futexlock_waitwhile_exactbits,hash:0xac2c2d31]]]*/
+/*[[[head:futexlock_waitwhile_exactbits,hash:CRC-32=0xe47142e1]]]*/
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.futexlock_waitwhile_exactbits") int
 NOTHROW_RPC(LIBCCALL libc_futexlock_waitwhile_exactbits)(lfutex_t *ulockaddr,
@@ -418,7 +418,7 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_waitwhile_exactbits)(lfutex_t *ulockaddr,
 }
 /*[[[end:futexlock_waitwhile_exactbits]]]*/
 
-/*[[[head:futexlock_waituntil_exactbits,hash:0xbac513c8]]]*/
+/*[[[head:futexlock_waituntil_exactbits,hash:CRC-32=0xc7fb84e2]]]*/
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.futexlock_waituntil_exactbits") int
 NOTHROW_RPC(LIBCCALL libc_futexlock_waituntil_exactbits)(lfutex_t *ulockaddr,
@@ -439,7 +439,7 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_waituntil_exactbits)(lfutex_t *ulockaddr,
 }
 /*[[[end:futexlock_waituntil_exactbits]]]*/
 
-/*[[[head:futexlock_waitwhile_anybit,hash:0x6502c0ca]]]*/
+/*[[[head:futexlock_waitwhile_anybit,hash:CRC-32=0x173cc4e0]]]*/
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.futexlock_waitwhile_anybit") int
 NOTHROW_RPC(LIBCCALL libc_futexlock_waitwhile_anybit)(lfutex_t *ulockaddr,
@@ -459,7 +459,7 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_waitwhile_anybit)(lfutex_t *ulockaddr,
 }
 /*[[[end:futexlock_waitwhile_anybit]]]*/
 
-/*[[[head:futexlock_waitwhile_allbits,hash:0x19e69b9a]]]*/
+/*[[[head:futexlock_waitwhile_allbits,hash:CRC-32=0x6f2e450]]]*/
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.futexlock_waitwhile_allbits") int
 NOTHROW_RPC(LIBCCALL libc_futexlock_waitwhile_allbits)(lfutex_t *ulockaddr,
@@ -479,7 +479,7 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_waitwhile_allbits)(lfutex_t *ulockaddr,
 }
 /*[[[end:futexlock_waitwhile_allbits]]]*/
 
-/*[[[head:futexlock_timedwaitwhile,hash:0xb583f116]]]*/
+/*[[[head:futexlock_timedwaitwhile,hash:CRC-32=0xcf6130c6]]]*/
 /* Wait if `*uaddr == equal_to_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -503,7 +503,7 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_timedwaitwhile)(lfutex_t *ulockaddr,
 }
 /*[[[end:futexlock_timedwaitwhile]]]*/
 
-/*[[[head:futexlock_timedwaituntil,hash:0xbfa542c8]]]*/
+/*[[[head:futexlock_timedwaituntil,hash:CRC-32=0xf36a425b]]]*/
 /* Wait if `*uaddr != not_equal_to_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -527,7 +527,7 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_timedwaituntil)(lfutex_t *ulockaddr,
 }
 /*[[[end:futexlock_timedwaituntil]]]*/
 
-/*[[[head:futexlock_timedwaitwhile_above,hash:0x2fce9259]]]*/
+/*[[[head:futexlock_timedwaitwhile_above,hash:CRC-32=0x65a94824]]]*/
 /* Wait if `*uaddr > above_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -551,7 +551,7 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_timedwaitwhile_above)(lfutex_t *ulockaddr,
 }
 /*[[[end:futexlock_timedwaitwhile_above]]]*/
 
-/*[[[head:futexlock_timedwaitwhile_below,hash:0x525896ac]]]*/
+/*[[[head:futexlock_timedwaitwhile_below,hash:CRC-32=0x616f742d]]]*/
 /* Wait if `*uaddr < below_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -575,7 +575,7 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_timedwaitwhile_below)(lfutex_t *ulockaddr,
 }
 /*[[[end:futexlock_timedwaitwhile_below]]]*/
 
-/*[[[head:futexlock_timedwaitwhile_aboveequal,hash:0x9b0e72bc]]]*/
+/*[[[head:futexlock_timedwaitwhile_aboveequal,hash:CRC-32=0x7e5e16c]]]*/
 /* Wait if `*uaddr >= above_equal_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -599,7 +599,7 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_timedwaitwhile_aboveequal)(lfutex_t *ulockad
 }
 /*[[[end:futexlock_timedwaitwhile_aboveequal]]]*/
 
-/*[[[head:futexlock_timedwaitwhile_belowequal,hash:0xa3c061a7]]]*/
+/*[[[head:futexlock_timedwaitwhile_belowequal,hash:CRC-32=0xf8779a3e]]]*/
 /* Wait if `*uaddr <= below_equal_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -623,7 +623,7 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_timedwaitwhile_belowequal)(lfutex_t *ulockad
 }
 /*[[[end:futexlock_timedwaitwhile_belowequal]]]*/
 
-/*[[[head:futexlock_timedwaitwhile_cmpxch,hash:0xb5030db8]]]*/
+/*[[[head:futexlock_timedwaitwhile_cmpxch,hash:CRC-32=0x85a7dd33]]]*/
 /* Wait if `*uaddr == old_value', and set `*uaddr = new_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -648,7 +648,7 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_timedwaitwhile_cmpxch)(lfutex_t *ulockaddr,
 }
 /*[[[end:futexlock_timedwaitwhile_cmpxch]]]*/
 
-/*[[[head:futexlock_timedwaituntil_cmpxch,hash:0x5ac6d62c]]]*/
+/*[[[head:futexlock_timedwaituntil_cmpxch,hash:CRC-32=0x4b5affa5]]]*/
 /* Wait if `*uaddr != old_value', and set `*uaddr = new_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -673,7 +673,7 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_timedwaituntil_cmpxch)(lfutex_t *ulockaddr,
 }
 /*[[[end:futexlock_timedwaituntil_cmpxch]]]*/
 
-/*[[[head:futexlock_timedwaitlock,hash:0x367fa621]]]*/
+/*[[[head:futexlock_timedwaitlock,hash:CRC-32=0x8c2351c3]]]*/
 /* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -696,7 +696,7 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_timedwaitlock)(lfutex_t *ulockaddr,
 }
 /*[[[end:futexlock_timedwaitlock]]]*/
 
-/*[[[head:futexlock_timedwaitwhile_exactbits,hash:0xa1d9e8cf]]]*/
+/*[[[head:futexlock_timedwaitwhile_exactbits,hash:CRC-32=0x37e2f7d4]]]*/
 /* Wait if `(*uaddr & bitmask) == setmask'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -720,7 +720,7 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_timedwaitwhile_exactbits)(lfutex_t *ulockadd
 }
 /*[[[end:futexlock_timedwaitwhile_exactbits]]]*/
 
-/*[[[head:futexlock_timedwaituntil_exactbits,hash:0xdb6c97cf]]]*/
+/*[[[head:futexlock_timedwaituntil_exactbits,hash:CRC-32=0x39c8cdc4]]]*/
 /* Wait if `(*uaddr & bitmask) != setmask'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -744,7 +744,7 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_timedwaituntil_exactbits)(lfutex_t *ulockadd
 }
 /*[[[end:futexlock_timedwaituntil_exactbits]]]*/
 
-/*[[[head:futexlock_timedwaitwhile_anybit,hash:0xa98cab8b]]]*/
+/*[[[head:futexlock_timedwaitwhile_anybit,hash:CRC-32=0x613dcffa]]]*/
 /* Wait if `(*uaddr & bitmask) != 0'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -767,7 +767,7 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_timedwaitwhile_anybit)(lfutex_t *ulockaddr,
 }
 /*[[[end:futexlock_timedwaitwhile_anybit]]]*/
 
-/*[[[head:futexlock_timedwaitwhile_allbits,hash:0xa6eb8acf]]]*/
+/*[[[head:futexlock_timedwaitwhile_allbits,hash:CRC-32=0xfdec6bae]]]*/
 /* Wait if `(*uaddr & bitmask) == bitmask'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -790,7 +790,7 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_timedwaitwhile_allbits)(lfutex_t *ulockaddr,
 }
 /*[[[end:futexlock_timedwaitwhile_allbits]]]*/
 
-/*[[[head:futexlock_timedwaitwhile64,hash:0x3b7e3ea0]]]*/
+/*[[[head:futexlock_timedwaitwhile64,hash:CRC-32=0x3fdf1565]]]*/
 /* Wait if `*uaddr == equal_to_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -822,7 +822,7 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_timedwaitwhile64)(lfutex_t *ulockaddr,
 #endif /* MAGIC:alias */
 /*[[[end:futexlock_timedwaitwhile64]]]*/
 
-/*[[[head:futexlock_timedwaituntil64,hash:0xaab882e3]]]*/
+/*[[[head:futexlock_timedwaituntil64,hash:CRC-32=0x32218a87]]]*/
 /* Wait if `*uaddr != not_equal_to_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -854,7 +854,7 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_timedwaituntil64)(lfutex_t *ulockaddr,
 #endif /* MAGIC:alias */
 /*[[[end:futexlock_timedwaituntil64]]]*/
 
-/*[[[head:futexlock_timedwaitwhile_above64,hash:0x54b8fa57]]]*/
+/*[[[head:futexlock_timedwaitwhile_above64,hash:CRC-32=0x15506341]]]*/
 /* Wait if `*uaddr > above_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -886,7 +886,7 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_timedwaitwhile_above64)(lfutex_t *ulockaddr,
 #endif /* MAGIC:alias */
 /*[[[end:futexlock_timedwaitwhile_above64]]]*/
 
-/*[[[head:futexlock_timedwaitwhile_below64,hash:0x1b9b1313]]]*/
+/*[[[head:futexlock_timedwaitwhile_below64,hash:CRC-32=0x4f6ed213]]]*/
 /* Wait if `*uaddr < below_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -918,7 +918,7 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_timedwaitwhile_below64)(lfutex_t *ulockaddr,
 #endif /* MAGIC:alias */
 /*[[[end:futexlock_timedwaitwhile_below64]]]*/
 
-/*[[[head:futexlock_timedwaitwhile_aboveequal64,hash:0x1d8336c6]]]*/
+/*[[[head:futexlock_timedwaitwhile_aboveequal64,hash:CRC-32=0xf41d2109]]]*/
 /* Wait if `*uaddr >= above_equal_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -951,7 +951,7 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_timedwaitwhile_aboveequal64)(lfutex_t *ulock
 #endif /* MAGIC:alias */
 /*[[[end:futexlock_timedwaitwhile_aboveequal64]]]*/
 
-/*[[[head:futexlock_timedwaitwhile_belowequal64,hash:0xffc9cb81]]]*/
+/*[[[head:futexlock_timedwaitwhile_belowequal64,hash:CRC-32=0xe2334f36]]]*/
 /* Wait if `*uaddr <= below_equal_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -984,7 +984,7 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_timedwaitwhile_belowequal64)(lfutex_t *ulock
 #endif /* MAGIC:alias */
 /*[[[end:futexlock_timedwaitwhile_belowequal64]]]*/
 
-/*[[[head:futexlock_timedwaitwhile_cmpxch64,hash:0xd21f728c]]]*/
+/*[[[head:futexlock_timedwaitwhile_cmpxch64,hash:CRC-32=0x311dfdd0]]]*/
 /* Wait if `*uaddr == old_value', and set `*uaddr = new_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -1017,7 +1017,7 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_timedwaitwhile_cmpxch64)(lfutex_t *ulockaddr
 #endif /* MAGIC:alias */
 /*[[[end:futexlock_timedwaitwhile_cmpxch64]]]*/
 
-/*[[[head:futexlock_timedwaituntil_cmpxch64,hash:0xa7f13908]]]*/
+/*[[[head:futexlock_timedwaituntil_cmpxch64,hash:CRC-32=0x99c0895d]]]*/
 /* Wait if `*uaddr != old_value', and set `*uaddr = new_value'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -1050,7 +1050,7 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_timedwaituntil_cmpxch64)(lfutex_t *ulockaddr
 #endif /* MAGIC:alias */
 /*[[[end:futexlock_timedwaituntil_cmpxch64]]]*/
 
-/*[[[head:futexlock_timedwaitlock64,hash:0x1bd2a0c3]]]*/
+/*[[[head:futexlock_timedwaitlock64,hash:CRC-32=0x5084ead5]]]*/
 /* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -1081,7 +1081,7 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_timedwaitlock64)(lfutex_t *ulockaddr,
 #endif /* MAGIC:alias */
 /*[[[end:futexlock_timedwaitlock64]]]*/
 
-/*[[[head:futexlock_timedwaitwhile_exactbits64,hash:0x44b6f372]]]*/
+/*[[[head:futexlock_timedwaitwhile_exactbits64,hash:CRC-32=0xbe1a5745]]]*/
 /* Wait if `(*uaddr & bitmask) == setmask'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -1113,7 +1113,7 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_timedwaitwhile_exactbits64)(lfutex_t *ulocka
 #endif /* MAGIC:alias */
 /*[[[end:futexlock_timedwaitwhile_exactbits64]]]*/
 
-/*[[[head:futexlock_timedwaituntil_exactbits64,hash:0x118145ff]]]*/
+/*[[[head:futexlock_timedwaituntil_exactbits64,hash:CRC-32=0xd2f7d66d]]]*/
 /* Wait if `(*uaddr & bitmask) != setmask'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -1145,7 +1145,7 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_timedwaituntil_exactbits64)(lfutex_t *ulocka
 #endif /* MAGIC:alias */
 /*[[[end:futexlock_timedwaituntil_exactbits64]]]*/
 
-/*[[[head:futexlock_timedwaitwhile_anybit64,hash:0x86c5b2ec]]]*/
+/*[[[head:futexlock_timedwaitwhile_anybit64,hash:CRC-32=0x3a2b5061]]]*/
 /* Wait if `(*uaddr & bitmask) != 0'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -1176,7 +1176,7 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_timedwaitwhile_anybit64)(lfutex_t *ulockaddr
 #endif /* MAGIC:alias */
 /*[[[end:futexlock_timedwaitwhile_anybit64]]]*/
 
-/*[[[head:futexlock_timedwaitwhile_allbits64,hash:0x39e29c4f]]]*/
+/*[[[head:futexlock_timedwaitwhile_allbits64,hash:CRC-32=0x27b32ff5]]]*/
 /* Wait if `(*uaddr & bitmask) == bitmask'
  * @return: 0: Did wait
  * @return: 1: Didn't wait
@@ -1211,7 +1211,7 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_timedwaitwhile_allbits64)(lfutex_t *ulockadd
 
 
 
-/*[[[start:exports,hash:0xfaf78b50]]]*/
+/*[[[start:exports,hash:CRC-32=0xec38ab8c]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(lfutexlock, libc_lfutexlock);
 DEFINE_PUBLIC_WEAK_ALIAS(lfutexlock64, libc_lfutexlock64);
 DEFINE_PUBLIC_WEAK_ALIAS(futexlock_wake, libc_futexlock_wake);

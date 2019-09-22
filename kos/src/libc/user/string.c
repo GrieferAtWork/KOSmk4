@@ -37,7 +37,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:strdup,hash:0x97af297a]]]*/
+/*[[[head:strdup,hash:CRC-32=0xb1c886cb]]]*/
 INTERN WUNUSED ATTR_MALL_DEFAULT_ALIGNED ATTR_MALLOC NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.heap.strdup.strdup") char *
 NOTHROW_NCX(LIBCCALL libc_strdup)(char const *__restrict string)
@@ -51,7 +51,7 @@ NOTHROW_NCX(LIBCCALL libc_strdup)(char const *__restrict string)
 }
 /*[[[end:strdup]]]*/
 
-/*[[[head:strndup,hash:0x8bad14e0]]]*/
+/*[[[head:strndup,hash:CRC-32=0xcaa7a55f]]]*/
 INTERN WUNUSED ATTR_MALL_DEFAULT_ALIGNED ATTR_MALLOC NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.heap.strdup.strndup") char *
 NOTHROW_NCX(LIBCCALL libc_strndup)(char const *__restrict string,
@@ -78,7 +78,7 @@ PRIVATE ATTR_SECTION(".rodata.crt.errno.strsignal.unknown_error_format") char co
 /*[[[skip:strerrorname_s]]]*/
 
 
-/*[[[head:strerror,hash:0x26407ca5]]]*/
+/*[[[head:strerror,hash:CRC-32=0x5febe1d5]]]*/
 INTERN WUNUSED ATTR_RETNONNULL
 ATTR_WEAK ATTR_SECTION(".text.crt.errno.strerror") char *
 NOTHROW_NCX(LIBCCALL libc_strerror)(int errnum)
@@ -108,7 +108,7 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED __ATTR_RETNONNULL,char const *const *,__N
 #define sys_siglist   __p_sys_siglist()
 #endif /* !sys_siglist */
 
-/*[[[head:strsignal_s,hash:0x6b16d9d]]]*/
+/*[[[head:strsignal_s,hash:CRC-32=0xfa78e701]]]*/
 INTERN WUNUSED ATTR_CONST
 ATTR_WEAK ATTR_SECTION(".text.crt.errno.strsignal_s") char const *
 NOTHROW(LIBCCALL libc_strsignal_s)(int signum)
@@ -120,7 +120,7 @@ NOTHROW(LIBCCALL libc_strsignal_s)(int signum)
 }
 /*[[[end:strsignal_s]]]*/
 
-/*[[[head:strsignal,hash:0x400a03dd]]]*/
+/*[[[head:strsignal,hash:CRC-32=0xb6c64ee8]]]*/
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.strsignal") char *
 NOTHROW_NCX(LIBCCALL libc_strsignal)(int signo)
@@ -140,7 +140,7 @@ NOTHROW_NCX(LIBCCALL libc_strsignal)(int signo)
 }
 /*[[[end:strsignal]]]*/
 
-/*[[[head:strerror_r,hash:0xfc7eb559]]]*/
+/*[[[head:strerror_r,hash:CRC-32=0x97942068]]]*/
 INTERN ATTR_RETNONNULL NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.errno.strerror_r") char *
 NOTHROW_NCX(LIBCCALL libc_strerror_r)(int errnum,
@@ -201,7 +201,7 @@ NOTHROW_NCX(LIBCCALL libc___xpg_strerror_r)(int errnum,
 }
 
 
-/*[[[head:vstrdupf,hash:0xf2e5f854]]]*/
+/*[[[head:vstrdupf,hash:CRC-32=0x2baa3863]]]*/
 /* Print the given `FORMAT' into a newly allocated, heap-allocated string */
 INTERN WUNUSED ATTR_MALL_DEFAULT_ALIGNED ATTR_MALLOC ATTR_LIBC_PRINTF(1, 0)
 ATTR_WEAK ATTR_SECTION(".text.crt.heap.strdup.vstrdupf") char *
@@ -214,7 +214,7 @@ NOTHROW_NCX(LIBCCALL libc_vstrdupf)(char const *__restrict format,
 }
 /*[[[end:vstrdupf]]]*/
 
-/*[[[head:strdupf,hash:0x1c6bf84a]]]*/
+/*[[[head:strdupf,hash:CRC-32=0xe2953fe2]]]*/
 /* Print the given `FORMAT' into a newly allocated, heap-allocated string */
 INTERN WUNUSED ATTR_MALL_DEFAULT_ALIGNED ATTR_MALLOC ATTR_LIBC_PRINTF(1, 0)
 ATTR_WEAK ATTR_SECTION(".text.crt.heap.strdup.strdupf") char *
@@ -231,7 +231,7 @@ NOTHROW_NCX(VLIBCCALL libc_strdupf)(char const *__restrict format,
 }
 /*[[[end:strdupf]]]*/
 
-/*[[[head:_strerror,hash:0x61989887]]]*/
+/*[[[head:_strerror,hash:CRC-32=0xe56d28c3]]]*/
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.errno._strerror") char *
 NOTHROW_RPC(LIBCCALL libc__strerror)(char const *message)
@@ -248,7 +248,7 @@ NOTHROW_RPC(LIBCCALL libc__strerror)(char const *message)
 PRIVATE ATTR_SECTION(".rodata.crt.dos.errno._strerror_s._strerror_s_format") char const libc__strerror_s_format[] = "%s: %s\n";
 PRIVATE ATTR_SECTION(".rodata.crt.dos.errno._strerror_s._strerror_s_unknown") char const libc__strerror_s_unknown[] = "%s: Unknown error %d\n";
 
-/*[[[head:_strerror_s,hash:0xd1ceed0d]]]*/
+/*[[[head:_strerror_s,hash:CRC-32=0x275fbe96]]]*/
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.errno._strerror_s") errno_t
 NOTHROW_RPC(LIBCCALL libc__strerror_s)(char *__restrict buf,
@@ -276,7 +276,7 @@ NOTHROW_RPC(LIBCCALL libc__strerror_s)(char *__restrict buf,
 }
 /*[[[end:_strerror_s]]]*/
 
-/*[[[head:DOS$_strerror_s,hash:0x52eeaa28]]]*/
+/*[[[head:DOS$_strerror_s,hash:CRC-32=0x890a62e4]]]*/
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.errno._strerror_s") errno_t
 NOTHROW_RPC(LIBDCALL libd__strerror_s)(char *__restrict buf,
@@ -304,7 +304,7 @@ NOTHROW_RPC(LIBDCALL libd__strerror_s)(char *__restrict buf,
 }
 /*[[[end:DOS$_strerror_s]]]*/
 
-/*[[[head:strerror_l,hash:0xef6f21f3]]]*/
+/*[[[head:strerror_l,hash:CRC-32=0xe0b038e7]]]*/
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.errno.strerror_l") char *
 NOTHROW_NCX(LIBCCALL libc_strerror_l)(int errnum,
@@ -320,7 +320,7 @@ NOTHROW_NCX(LIBCCALL libc_strerror_l)(int errnum,
 
 
 
-/*[[[start:exports,hash:0x674306ac]]]*/
+/*[[[start:exports,hash:CRC-32=0x6095d3d]]]*/
 #undef strdupf
 DEFINE_PUBLIC_WEAK_ALIAS(strerror, libc_strerror);
 DEFINE_PUBLIC_WEAK_ALIAS(strerror_l, libc_strerror_l);

@@ -33,7 +33,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:format_waprintf_pack,hash:0x5641e595]]]*/
+/*[[[head:format_waprintf_pack,hash:CRC-32=0x9234ff1d]]]*/
 /* Pack and finalize a given aprintf format printer
  * Together with `format_waprintf_printer()', the aprintf
  * format printer sub-system should be used as follows:
@@ -101,7 +101,7 @@ NOTHROW_NCX(LIBCCALL libc_format_waprintf_pack)(struct format_c32aprintf_data *_
 }
 /*[[[end:format_waprintf_pack]]]*/
 
-/*[[[head:DOS$format_waprintf_pack,hash:0xccda656a]]]*/
+/*[[[head:DOS$format_waprintf_pack,hash:CRC-32=0xa462da39]]]*/
 /* Pack and finalize a given aprintf format printer
  * Together with `format_waprintf_printer()', the aprintf
  * format printer sub-system should be used as follows:
@@ -169,7 +169,7 @@ NOTHROW_NCX(LIBDCALL libd_format_waprintf_pack)(struct format_c16aprintf_data *_
 }
 /*[[[end:DOS$format_waprintf_pack]]]*/
 
-/*[[[head:format_waprintf_printer,hash:0x55b68172]]]*/
+/*[[[head:format_waprintf_printer,hash:CRC-32=0x8444cc5a]]]*/
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
 INTERN WUNUSED NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.string.format.format_waprintf_printer") ssize_t
@@ -211,7 +211,7 @@ NOTHROW_NCX(LIBCCALL libc_format_waprintf_printer)(/*struct format_waprintf_data
 }
 /*[[[end:format_waprintf_printer]]]*/
 
-/*[[[head:DOS$format_waprintf_printer,hash:0x8160feb7]]]*/
+/*[[[head:DOS$format_waprintf_printer,hash:CRC-32=0x668cb633]]]*/
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
 INTERN WUNUSED NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.string.format.format_waprintf_printer") ssize_t
@@ -257,7 +257,7 @@ NOTHROW_NCX(LIBDCALL libd_format_waprintf_printer)(/*struct format_waprintf_data
 
 
 
-/*[[[start:exports,hash:0x6df141de]]]*/
+/*[[[start:exports,hash:CRC-32=0xafecefb8]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(format_waprintf_pack, libc_format_waprintf_pack);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$format_waprintf_pack, libd_format_waprintf_pack);
 DEFINE_PUBLIC_WEAK_ALIAS(format_waprintf_printer, libc_format_waprintf_printer);

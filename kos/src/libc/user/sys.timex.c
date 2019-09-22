@@ -30,7 +30,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:adjtimex,hash:0x5043a81c]]]*/
+/*[[[head:adjtimex,hash:CRC-32=0xc1a051d9]]]*/
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.adjtimex") int
 NOTHROW_NCX(LIBCCALL libc_adjtimex)(struct timex *__restrict ntx)
@@ -42,7 +42,7 @@ NOTHROW_NCX(LIBCCALL libc_adjtimex)(struct timex *__restrict ntx)
 }
 /*[[[end:adjtimex]]]*/
 
-/*[[[head:ntp_adjtime,hash:0xe9ec1d0b]]]*/
+/*[[[head:ntp_adjtime,hash:CRC-32=0x93e56b1b]]]*/
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.ntp_adjtime") int
 NOTHROW_NCX(LIBCCALL libc_ntp_adjtime)(struct timex *__restrict tntx)
@@ -54,7 +54,7 @@ NOTHROW_NCX(LIBCCALL libc_ntp_adjtime)(struct timex *__restrict tntx)
 }
 /*[[[end:ntp_adjtime]]]*/
 
-/*[[[head:adjtimex64,hash:0x5b501c70]]]*/
+/*[[[head:adjtimex64,hash:CRC-32=0x48cedaf9]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_adjtimex64, libc_adjtimex);
 #else
@@ -70,7 +70,7 @@ NOTHROW_NCX(LIBCCALL libc_adjtimex64)(struct timex64 *__restrict ntx)
 #endif /* MAGIC:alias */
 /*[[[end:adjtimex64]]]*/
 
-/*[[[head:ntp_adjtime64,hash:0x40748481]]]*/
+/*[[[head:ntp_adjtime64,hash:CRC-32=0x15fd2c51]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_ntp_adjtime64, libc_ntp_adjtime);
 #else
@@ -86,7 +86,7 @@ NOTHROW_NCX(LIBCCALL libc_ntp_adjtime64)(struct timex64 *__restrict tntx)
 #endif /* MAGIC:alias */
 /*[[[end:ntp_adjtime64]]]*/
 
-/*[[[head:ntp_gettime,hash:0x34e1e4d1]]]*/
+/*[[[head:ntp_gettime,hash:CRC-32=0x59596c4e]]]*/
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.ntp_gettime") int
 NOTHROW_NCX(LIBCCALL libc_ntp_gettime)(struct ntptimeval *__restrict ntv)
@@ -98,7 +98,7 @@ NOTHROW_NCX(LIBCCALL libc_ntp_gettime)(struct ntptimeval *__restrict ntv)
 }
 /*[[[end:ntp_gettime]]]*/
 
-/*[[[head:ntp_gettime64,hash:0x82956fff]]]*/
+/*[[[head:ntp_gettime64,hash:CRC-32=0xfd2c51df]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_ntp_gettime64, libc_ntp_gettime);
 #else
@@ -118,7 +118,7 @@ NOTHROW_NCX(LIBCCALL libc_ntp_gettime64)(struct ntptimeval64 *__restrict ntv)
 
 
 
-/*[[[start:exports,hash:0x5ba21f1f]]]*/
+/*[[[start:exports,hash:CRC-32=0x68ec3c1c]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(adjtimex, libc_adjtimex);
 DEFINE_PUBLIC_WEAK_ALIAS(__adjtimex, libc_adjtimex);
 DEFINE_PUBLIC_WEAK_ALIAS(ntp_gettimex, libc_ntp_gettime);

@@ -31,7 +31,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:setfsuid,hash:0x8837b9f1]]]*/
+/*[[[head:setfsuid,hash:CRC-32=0x882ccb24]]]*/
 /* Change uid used for file access control to UID, without affecting
  * other privileges (such as who can send signals at the process) */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.user.setfsuid") int
@@ -44,7 +44,7 @@ NOTHROW_NCX(LIBCCALL libc_setfsuid)(uid_t uid)
 }
 /*[[[end:setfsuid]]]*/
 
-/*[[[head:setfsgid,hash:0x4c9d3eaa]]]*/
+/*[[[head:setfsgid,hash:CRC-32=0x8d9425e7]]]*/
 /* Ditto for group id */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.user.setfsgid") int
 NOTHROW_NCX(LIBCCALL libc_setfsgid)(gid_t gid)
@@ -60,7 +60,7 @@ NOTHROW_NCX(LIBCCALL libc_setfsgid)(gid_t gid)
 
 
 
-/*[[[start:exports,hash:0xcaf0ac56]]]*/
+/*[[[start:exports,hash:CRC-32=0x2ca593b6]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(setfsuid, libc_setfsuid);
 DEFINE_PUBLIC_WEAK_ALIAS(setfsgid, libc_setfsgid);
 /*[[[end:exports]]]*/

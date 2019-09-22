@@ -1,4 +1,4 @@
-/* HASH 0xa04bd0de */
+/* HASH CRC-32:0x78a40c78 */
 DEFINE_PUBLIC_WEAK_ALIAS(sys32_waitpid, sys32_invalid3);                 /* 7 */
 DEFINE_PUBLIC_WEAK_ALIAS(sys32_linux_oldstat, sys32_invalid2);           /* 18 */
 DEFINE_PUBLIC_WEAK_ALIAS(sys32_lseek, sys32_invalid3);                   /* 19 */

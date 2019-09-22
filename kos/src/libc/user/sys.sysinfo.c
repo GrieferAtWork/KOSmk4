@@ -32,7 +32,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:sysinfo,hash:0xae3cd06b]]]*/
+/*[[[head:sysinfo,hash:CRC-32=0x26384dcb]]]*/
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.system.info.sysinfo") int
 NOTHROW_RPC(LIBCCALL libc_sysinfo)(struct sysinfo *info)
@@ -44,7 +44,7 @@ NOTHROW_RPC(LIBCCALL libc_sysinfo)(struct sysinfo *info)
 }
 /*[[[end:sysinfo]]]*/
 
-/*[[[head:get_nprocs_conf,hash:0x8efe8131]]]*/
+/*[[[head:get_nprocs_conf,hash:CRC-32=0x5fbd960b]]]*/
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.system.info.get_nprocs_conf") int
 NOTHROW_RPC(LIBCCALL libc_get_nprocs_conf)(void)
@@ -57,7 +57,7 @@ NOTHROW_RPC(LIBCCALL libc_get_nprocs_conf)(void)
 }
 /*[[[end:get_nprocs_conf]]]*/
 
-/*[[[head:get_nprocs,hash:0x7566e9df]]]*/
+/*[[[head:get_nprocs,hash:CRC-32=0xd29da6c8]]]*/
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.system.info.get_nprocs") int
 NOTHROW_RPC(LIBCCALL libc_get_nprocs)(void)
@@ -70,7 +70,7 @@ NOTHROW_RPC(LIBCCALL libc_get_nprocs)(void)
 }
 /*[[[end:get_nprocs]]]*/
 
-/*[[[head:get_phys_pages,hash:0xa3b6a96c]]]*/
+/*[[[head:get_phys_pages,hash:CRC-32=0x88c7fce5]]]*/
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.system.info.get_phys_pages") __INTPTR_TYPE__
 NOTHROW_RPC(LIBCCALL libc_get_phys_pages)(void)
@@ -83,7 +83,7 @@ NOTHROW_RPC(LIBCCALL libc_get_phys_pages)(void)
 }
 /*[[[end:get_phys_pages]]]*/
 
-/*[[[head:get_avphys_pages,hash:0x36cb5f8d]]]*/
+/*[[[head:get_avphys_pages,hash:CRC-32=0x46d41c4c]]]*/
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.system.info.get_avphys_pages") __INTPTR_TYPE__
 NOTHROW_RPC(LIBCCALL libc_get_avphys_pages)(void)
@@ -100,7 +100,7 @@ NOTHROW_RPC(LIBCCALL libc_get_avphys_pages)(void)
 
 
 
-/*[[[start:exports,hash:0x3e8246c3]]]*/
+/*[[[start:exports,hash:CRC-32=0x8a6ea4c]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(sysinfo, libc_sysinfo);
 DEFINE_PUBLIC_WEAK_ALIAS(get_nprocs_conf, libc_get_nprocs_conf);
 DEFINE_PUBLIC_WEAK_ALIAS(get_nprocs, libc_get_nprocs);

@@ -27,7 +27,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:set_exception_handler,hash:0xffd80275]]]*/
+/*[[[head:set_exception_handler,hash:CRC-32=0x91268b3c]]]*/
 /* Set the exception handler mode for the calling thread.
  * Examples:
  *     Set mode #1: set_exception_handler(EXCEPT_HANDLER_MODE_DISABLED, NULL, NULL)
@@ -57,7 +57,7 @@ NOTHROW(LIBCCALL libc_set_exception_handler)(int mode,
 }
 /*[[[end:set_exception_handler]]]*/
 
-/*[[[head:get_exception_handler,hash:0xe5c0853a]]]*/
+/*[[[head:get_exception_handler,hash:CRC-32=0x7a9a2c12]]]*/
 /* Get the current exception handler mode for the calling thread.
  * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
  *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'
@@ -98,7 +98,7 @@ NOTHROW_NCX(LIBCCALL libc_get_exception_handler)(int *pmode,
 
 
 
-/*[[[start:exports,hash:0x498f7f61]]]*/
+/*[[[start:exports,hash:CRC-32=0x1abb0a1d]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(set_exception_handler, libc_set_exception_handler);
 DEFINE_PUBLIC_WEAK_ALIAS(get_exception_handler, libc_get_exception_handler);
 /*[[[end:exports]]]*/

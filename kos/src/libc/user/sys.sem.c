@@ -30,7 +30,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:semctl,hash:0x6ea5f5d2]]]*/
+/*[[[head:semctl,hash:CRC-32=0x56758402]]]*/
 /* Semaphore control operation. */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.poll.semctl") int
 NOTHROW_NCX(VLIBCCALL libc_semctl)(int semid,
@@ -45,7 +45,7 @@ NOTHROW_NCX(VLIBCCALL libc_semctl)(int semid,
 }
 /*[[[end:semctl]]]*/
 
-/*[[[head:semget,hash:0xa503e32a]]]*/
+/*[[[head:semget,hash:CRC-32=0x917e441b]]]*/
 /* Get semaphore */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.poll.semget") int
 NOTHROW_NCX(LIBCCALL libc_semget)(key_t key,
@@ -59,7 +59,7 @@ NOTHROW_NCX(LIBCCALL libc_semget)(key_t key,
 }
 /*[[[end:semget]]]*/
 
-/*[[[head:semop,hash:0x4b7d53f6]]]*/
+/*[[[head:semop,hash:CRC-32=0x565dbfe7]]]*/
 /* Operate on semaphore */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.poll.semop") int
 NOTHROW_NCX(LIBCCALL libc_semop)(int semid,
@@ -73,7 +73,7 @@ NOTHROW_NCX(LIBCCALL libc_semop)(int semid,
 }
 /*[[[end:semop]]]*/
 
-/*[[[head:semtimedop,hash:0x3c5cb3e9]]]*/
+/*[[[head:semtimedop,hash:CRC-32=0x1b735898]]]*/
 /* Operate on semaphore with timeout */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.poll.semtimedop") int
 NOTHROW_NCX(LIBCCALL libc_semtimedop)(int semid,
@@ -92,7 +92,7 @@ NOTHROW_NCX(LIBCCALL libc_semtimedop)(int semid,
 
 
 
-/*[[[start:exports,hash:0x5a30a6dd]]]*/
+/*[[[start:exports,hash:CRC-32=0x4a7d4fff]]]*/
 #undef semctl
 DEFINE_PUBLIC_WEAK_ALIAS(semctl, libc_semctl);
 DEFINE_PUBLIC_WEAK_ALIAS(semget, libc_semget);

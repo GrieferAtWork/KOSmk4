@@ -35,7 +35,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:mmap,hash:0xe198adee]]]*/
+/*[[[head:mmap,hash:CRC-32=0x94ac3e90]]]*/
 /* @param prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
  * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_FIXED_NOREPLACE|MAP_GROWSDOWN|
@@ -62,7 +62,7 @@ NOTHROW_NCX(LIBCCALL libc_mmap)(void *addr,
 }
 /*[[[end:mmap]]]*/
 
-/*[[[head:munmap,hash:0x3f5bc65]]]*/
+/*[[[head:munmap,hash:CRC-32=0xc733d599]]]*/
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.heap.mman.munmap") int
 NOTHROW_NCX(LIBCCALL libc_munmap)(void *addr,
@@ -76,7 +76,7 @@ NOTHROW_NCX(LIBCCALL libc_munmap)(void *addr,
 }
 /*[[[end:munmap]]]*/
 
-/*[[[head:mprotect,hash:0x40f9b14e]]]*/
+/*[[[head:mprotect,hash:CRC-32=0x155463a7]]]*/
 /* @param prot: Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED' */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.system.mman.mprotect") int
@@ -93,7 +93,7 @@ NOTHROW_NCX(LIBCCALL libc_mprotect)(void *addr,
 }
 /*[[[end:mprotect]]]*/
 
-/*[[[head:msync,hash:0x902a6cc0]]]*/
+/*[[[head:msync,hash:CRC-32=0xd1b2f502]]]*/
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.system.mman.msync") int
 NOTHROW_RPC(LIBCCALL libc_msync)(void *addr,
@@ -109,7 +109,7 @@ NOTHROW_RPC(LIBCCALL libc_msync)(void *addr,
 }
 /*[[[end:msync]]]*/
 
-/*[[[head:mlock,hash:0x68e1034a]]]*/
+/*[[[head:mlock,hash:CRC-32=0x28267a22]]]*/
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.system.mman.mlock") int
 NOTHROW_NCX(LIBCCALL libc_mlock)(void const *addr,
@@ -123,7 +123,7 @@ NOTHROW_NCX(LIBCCALL libc_mlock)(void const *addr,
 }
 /*[[[end:mlock]]]*/
 
-/*[[[head:munlock,hash:0x6cdc82f8]]]*/
+/*[[[head:munlock,hash:CRC-32=0xdb208ffe]]]*/
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.system.mman.munlock") int
 NOTHROW_NCX(LIBCCALL libc_munlock)(void const *addr,
@@ -137,7 +137,7 @@ NOTHROW_NCX(LIBCCALL libc_munlock)(void const *addr,
 }
 /*[[[end:munlock]]]*/
 
-/*[[[head:mlockall,hash:0xe93d771a]]]*/
+/*[[[head:mlockall,hash:CRC-32=0xc69eb7ea]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.mman.mlockall") int
 NOTHROW_NCX(LIBCCALL libc_mlockall)(int flags)
 /*[[[body:mlockall]]]*/
@@ -148,7 +148,7 @@ NOTHROW_NCX(LIBCCALL libc_mlockall)(int flags)
 }
 /*[[[end:mlockall]]]*/
 
-/*[[[head:munlockall,hash:0xb7bbd911]]]*/
+/*[[[head:munlockall,hash:CRC-32=0xc4a643fc]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.mman.munlockall") int
 NOTHROW_NCX(LIBCCALL libc_munlockall)(void)
 /*[[[body:munlockall]]]*/
@@ -159,7 +159,7 @@ NOTHROW_NCX(LIBCCALL libc_munlockall)(void)
 }
 /*[[[end:munlockall]]]*/
 
-/*[[[head:shm_open,hash:0xade163c5]]]*/
+/*[[[head:shm_open,hash:CRC-32=0x7bedb1d5]]]*/
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.system.mman.shm_open") int
 NOTHROW_RPC(LIBCCALL libc_shm_open)(char const *name,
@@ -173,7 +173,7 @@ NOTHROW_RPC(LIBCCALL libc_shm_open)(char const *name,
 }
 /*[[[end:shm_open]]]*/
 
-/*[[[head:shm_unlink,hash:0x7b5b9fed]]]*/
+/*[[[head:shm_unlink,hash:CRC-32=0x25c99c5]]]*/
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.system.mman.shm_unlink") int
 NOTHROW_RPC(LIBCCALL libc_shm_unlink)(char const *name)
@@ -185,7 +185,7 @@ NOTHROW_RPC(LIBCCALL libc_shm_unlink)(char const *name)
 }
 /*[[[end:shm_unlink]]]*/
 
-/*[[[head:madvise,hash:0x17a82572]]]*/
+/*[[[head:madvise,hash:CRC-32=0xf32e87f2]]]*/
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.system.mman.madvise") int
 NOTHROW_NCX(LIBCCALL libc_madvise)(void *addr,
@@ -201,7 +201,7 @@ NOTHROW_NCX(LIBCCALL libc_madvise)(void *addr,
 }
 /*[[[end:madvise]]]*/
 
-/*[[[head:mincore,hash:0x67aa9259]]]*/
+/*[[[head:mincore,hash:CRC-32=0xe025e057]]]*/
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.system.mman.mincore") int
 NOTHROW_NCX(LIBCCALL libc_mincore)(void *start,
@@ -217,7 +217,7 @@ NOTHROW_NCX(LIBCCALL libc_mincore)(void *start,
 }
 /*[[[end:mincore]]]*/
 
-/*[[[head:mmap64,hash:0xe83e4b88]]]*/
+/*[[[head:mmap64,hash:CRC-32=0xea08617]]]*/
 /* @param prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
  * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_FIXED_NOREPLACE|MAP_GROWSDOWN|
@@ -261,7 +261,7 @@ NOTHROW_NCX(LIBCCALL libc_mmap64)(void *addr,
 #endif /* MAGIC:alias */
 /*[[[end:mmap64]]]*/
 
-/*[[[head:posix_madvise,hash:0xc565a9bc]]]*/
+/*[[[head:posix_madvise,hash:CRC-32=0x3cbcf0e2]]]*/
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.system.mman.posix_madvise") int
 NOTHROW_NCX(LIBCCALL libc_posix_madvise)(void *addr,
@@ -275,7 +275,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_madvise)(void *addr,
 }
 /*[[[end:posix_madvise]]]*/
 
-/*[[[head:mremap,hash:0x1750e5e6]]]*/
+/*[[[head:mremap,hash:CRC-32=0xd559c1d0]]]*/
 /* @param flags: Set of `MREMAP_MAYMOVE|MREMAP_FIXED' */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.heap.mman.mremap") void *
 NOTHROW_NCX(VLIBCCALL libc_mremap)(void *addr,
@@ -298,7 +298,7 @@ NOTHROW_NCX(VLIBCCALL libc_mremap)(void *addr,
 }
 /*[[[end:mremap]]]*/
 
-/*[[[head:remap_file_pages,hash:0x27ffbddf]]]*/
+/*[[[head:remap_file_pages,hash:CRC-32=0xd5e4d222]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.mman.remap_file_pages") int
 NOTHROW_NCX(LIBCCALL libc_remap_file_pages)(void *start,
                                             size_t size,
@@ -321,7 +321,7 @@ NOTHROW_NCX(LIBCCALL libc_remap_file_pages)(void *start,
 
 
 
-/*[[[start:exports,hash:0xaf14813c]]]*/
+/*[[[start:exports,hash:CRC-32=0x76738747]]]*/
 #undef mremap
 DEFINE_PUBLIC_WEAK_ALIAS(mmap, libc_mmap);
 DEFINE_PUBLIC_WEAK_ALIAS(munmap, libc_munmap);

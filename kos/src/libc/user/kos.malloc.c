@@ -34,7 +34,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:Malloc,hash:0xaf8a9fb8]]]*/
+/*[[[head:Malloc,hash:CRC-32=0x31d4b58a]]]*/
 /* @throws: E_BADALLOC: ... */
 INTERN WUNUSED ATTR_MALL_DEFAULT_ALIGNED ATTR_MALLOC ATTR_RETNONNULL ATTR_ALLOC_SIZE((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.except.heap.malloc.Malloc") void *
@@ -49,7 +49,7 @@ NOTHROW_NCX(LIBCCALL libc_Malloc)(size_t n_bytes)
 }
 /*[[[end:Malloc]]]*/
 
-/*[[[head:Calloc,hash:0xcb3bc913]]]*/
+/*[[[head:Calloc,hash:CRC-32=0x90fef843]]]*/
 /* @throws: E_BADALLOC: ... */
 INTERN WUNUSED ATTR_MALL_DEFAULT_ALIGNED ATTR_MALLOC ATTR_RETNONNULL ATTR_ALLOC_SIZE((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.except.heap.malloc.Calloc") void *
@@ -69,7 +69,7 @@ NOTHROW_NCX(LIBCCALL libc_Calloc)(size_t count,
 }
 /*[[[end:Calloc]]]*/
 
-/*[[[head:Realloc,hash:0x7f07d3c8]]]*/
+/*[[[head:Realloc,hash:CRC-32=0xbe67005]]]*/
 /* @throws: E_BADALLOC: ... */
 INTERN WUNUSED ATTR_MALL_DEFAULT_ALIGNED ATTR_MALLOC ATTR_ALLOC_SIZE((2)) ATTR_RETNONNULL
 ATTR_WEAK ATTR_SECTION(".text.crt.except.heap.malloc.Realloc") void *
@@ -85,7 +85,7 @@ NOTHROW_NCX(LIBCCALL libc_Realloc)(void *mallptr,
 }
 /*[[[end:Realloc]]]*/
 
-/*[[[head:Memalign,hash:0x5a9ec8a9]]]*/
+/*[[[head:Memalign,hash:CRC-32=0xd0ff00c3]]]*/
 /* @throws: E_BADALLOC: ... */
 INTERN WUNUSED ATTR_ALLOC_ALIGN(1) ATTR_ALLOC_SIZE((2)) ATTR_MALLOC ATTR_RETNONNULL
 ATTR_WEAK ATTR_SECTION(".text.crt.except.heap.malloc.Memalign") void *
@@ -101,7 +101,7 @@ NOTHROW_NCX(LIBCCALL libc_Memalign)(size_t alignment,
 }
 /*[[[end:Memalign]]]*/
 
-/*[[[head:PValloc,hash:0x3094f5ba]]]*/
+/*[[[head:PValloc,hash:CRC-32=0x656689a4]]]*/
 /* @throws: E_BADALLOC: ... */
 INTERN WUNUSED ATTR_MALL_PAGEALIGNED ATTR_ALLOC_SIZE((1)) ATTR_MALLOC ATTR_RETNONNULL
 ATTR_WEAK ATTR_SECTION(".text.crt.except.heap.rare_helpers.PValloc") void *
@@ -116,7 +116,7 @@ NOTHROW_NCX(LIBCCALL libc_PValloc)(size_t n_bytes)
 }
 /*[[[end:PValloc]]]*/
 
-/*[[[head:Valloc,hash:0x14302238]]]*/
+/*[[[head:Valloc,hash:CRC-32=0x3b861b8c]]]*/
 /* @throws: E_BADALLOC: ... */
 INTERN ATTR_RETNONNULL WUNUSED ATTR_MALL_PAGEALIGNED ATTR_ALLOC_SIZE((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.except.heap.rare_helpers.Valloc") void *
@@ -131,7 +131,7 @@ NOTHROW_NCX(LIBCCALL libc_Valloc)(size_t n_bytes)
 }
 /*[[[end:Valloc]]]*/
 
-/*[[[head:Memdup,hash:0xf2c6a1ac]]]*/
+/*[[[head:Memdup,hash:CRC-32=0x6584d5d8]]]*/
 /* @throws: E_BADALLOC: ... */
 INTERN WUNUSED ATTR_MALL_DEFAULT_ALIGNED ATTR_ALLOC_SIZE((2)) ATTR_MALLOC ATTR_RETNONNULL NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.except.heap.rare_helpers.Memdup") void *
@@ -147,7 +147,7 @@ NOTHROW_NCX(LIBCCALL libc_Memdup)(void const *__restrict ptr,
 }
 /*[[[end:Memdup]]]*/
 
-/*[[[head:Memcdup,hash:0xe5094469]]]*/
+/*[[[head:Memcdup,hash:CRC-32=0x6670eeea]]]*/
 /* @throws: E_BADALLOC: ... */
 INTERN WUNUSED ATTR_MALL_DEFAULT_ALIGNED ATTR_ALLOC_SIZE((2)) ATTR_MALLOC ATTR_RETNONNULL NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.except.heap.rare_helpers.Memcdup") void *
@@ -170,7 +170,7 @@ NOTHROW_NCX(LIBCCALL libc_Memcdup)(void const *__restrict ptr,
 
 
 
-/*[[[start:exports,hash:0xa1ebfb23]]]*/
+/*[[[start:exports,hash:CRC-32=0x1e5e31f6]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(Malloc, libc_Malloc);
 DEFINE_PUBLIC_WEAK_ALIAS(Calloc, libc_Calloc);
 DEFINE_PUBLIC_WEAK_ALIAS(Realloc, libc_Realloc);

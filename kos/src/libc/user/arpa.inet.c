@@ -30,7 +30,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:inet_addr,hash:0x6a1c0380]]]*/
+/*[[[head:inet_addr,hash:CRC-32=0x4f469a8a]]]*/
 /* Convert Internet host address from numbers-and-dots
  * notation in CP into binary data in network byte order */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.inet_addr") in_addr_t
@@ -43,7 +43,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_addr)(char const *cp)
 }
 /*[[[end:inet_addr]]]*/
 
-/*[[[head:inet_lnaof,hash:0x85d1eb7d]]]*/
+/*[[[head:inet_lnaof,hash:CRC-32=0x3a4b7493]]]*/
 /* Return the local host address part of the Internet address in IN */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.inet_lnaof") in_addr_t
 NOTHROW_RPC_KOS(LIBCCALL libc_inet_lnaof)(struct in_addr inaddr)
@@ -55,7 +55,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_lnaof)(struct in_addr inaddr)
 }
 /*[[[end:inet_lnaof]]]*/
 
-/*[[[head:inet_makeaddr,hash:0xc12d240d]]]*/
+/*[[[head:inet_makeaddr,hash:CRC-32=0x72a1f1e8]]]*/
 /* Make Internet host address in network byte order by
  * combining the network number NET with the local address HOST */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.inet_makeaddr") struct in_addr
@@ -71,7 +71,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_makeaddr)(in_addr_t net,
 }
 /*[[[end:inet_makeaddr]]]*/
 
-/*[[[head:inet_netof,hash:0xa4dbeac7]]]*/
+/*[[[head:inet_netof,hash:CRC-32=0x4a053d3d]]]*/
 /* Return network number part of the Internet address IN */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.inet_netof") in_addr_t
 NOTHROW_RPC_KOS(LIBCCALL libc_inet_netof)(struct in_addr inaddr)
@@ -83,7 +83,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_netof)(struct in_addr inaddr)
 }
 /*[[[end:inet_netof]]]*/
 
-/*[[[head:inet_network,hash:0xbeda23fc]]]*/
+/*[[[head:inet_network,hash:CRC-32=0xd46d0b04]]]*/
 /* Extract the network number in network byte order from
  * the address in numbers-and-dots natation starting at CP */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.inet_network") in_addr_t
@@ -96,7 +96,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_network)(char const *cp)
 }
 /*[[[end:inet_network]]]*/
 
-/*[[[head:inet_ntoa,hash:0x91f7b800]]]*/
+/*[[[head:inet_ntoa,hash:CRC-32=0x17c7895a]]]*/
 /* Convert Internet number in IN to ASCII representation. The return
  * value is a pointer to an internal array containing the string */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.inet_ntoa") char *
@@ -109,7 +109,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_ntoa)(struct in_addr inaddr)
 }
 /*[[[end:inet_ntoa]]]*/
 
-/*[[[head:inet_pton,hash:0xcfaa4cbb]]]*/
+/*[[[head:inet_pton,hash:CRC-32=0x537a65dd]]]*/
 /* Convert from presentation format of an Internet number in buffer
  * starting at CP to the binary network format and store result for
  * interface type AF in buffer starting at BUF */
@@ -125,7 +125,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_pton)(int af,
 }
 /*[[[end:inet_pton]]]*/
 
-/*[[[head:inet_ntop,hash:0xac69eddc]]]*/
+/*[[[head:inet_ntop,hash:CRC-32=0xae5e4be7]]]*/
 /* Convert a Internet address in binary network format for interface
  * type AF in buffer starting at CP to presentation form and place
  * result in buffer of length LEN astarting at BUF */
@@ -142,7 +142,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_ntop)(int af,
 }
 /*[[[end:inet_ntop]]]*/
 
-/*[[[head:inet_aton,hash:0xb914b658]]]*/
+/*[[[head:inet_aton,hash:CRC-32=0x1be34d2b]]]*/
 /* Convert Internet host address from numbers-and-dots notation in CP
  * into binary data and store the result in the structure INP */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.inet_aton") int
@@ -156,7 +156,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_aton)(char const *cp,
 }
 /*[[[end:inet_aton]]]*/
 
-/*[[[head:inet_neta,hash:0xf5e8c991]]]*/
+/*[[[head:inet_neta,hash:CRC-32=0x11c52fb0]]]*/
 /* Format a network number NET into presentation format and place
  * result in buffer starting at BUF with length of LEN bytes */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.inet_neta") char *
@@ -171,7 +171,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_neta)(in_addr_t net,
 }
 /*[[[end:inet_neta]]]*/
 
-/*[[[head:inet_net_ntop,hash:0x613ffee6]]]*/
+/*[[[head:inet_net_ntop,hash:CRC-32=0xd9d375c2]]]*/
 /* Convert network number for interface type AF in buffer starting at
  * CP to presentation format.  The result will specifiy BITS bits of
  * the number */
@@ -189,7 +189,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_net_ntop)(int af,
 }
 /*[[[end:inet_net_ntop]]]*/
 
-/*[[[head:inet_net_pton,hash:0x395860e9]]]*/
+/*[[[head:inet_net_pton,hash:CRC-32=0x4caac56d]]]*/
 /* Convert network number for interface type AF from presentation in
  * buffer starting at CP to network format and store result int
  * buffer starting at BUF of size LEN */
@@ -206,7 +206,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_net_pton)(int af,
 }
 /*[[[end:inet_net_pton]]]*/
 
-/*[[[head:inet_nsap_addr,hash:0x8d5ff924]]]*/
+/*[[[head:inet_nsap_addr,hash:CRC-32=0x5a92a5d4]]]*/
 /* Convert ASCII representation in hexadecimal form of the Internet
  * address to binary form and place result in buffer of length LEN
  * starting at BUF */
@@ -222,7 +222,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_nsap_addr)(char const *cp,
 }
 /*[[[end:inet_nsap_addr]]]*/
 
-/*[[[head:inet_nsap_ntoa,hash:0xf5575c9c]]]*/
+/*[[[head:inet_nsap_ntoa,hash:CRC-32=0x548a8291]]]*/
 /* Convert internet address in binary form in LEN bytes starting
  * at CP a presentation form and place result in BUF */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.inet_nsap_ntoa") char *
@@ -241,7 +241,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet_nsap_ntoa)(int len,
 
 
 
-/*[[[start:exports,hash:0xec49198d]]]*/
+/*[[[start:exports,hash:CRC-32=0xa5c8b668]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(inet_addr, libc_inet_addr);
 DEFINE_PUBLIC_WEAK_ALIAS(inet_lnaof, libc_inet_lnaof);
 DEFINE_PUBLIC_WEAK_ALIAS(inet_makeaddr, libc_inet_makeaddr);

@@ -30,7 +30,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:klogctl,hash:0x960acf76]]]*/
+/*[[[head:klogctl,hash:CRC-32=0xd9345e8a]]]*/
 /* Control the kernel's logging facility.  This corresponds exactly to
  * the kernel's syslog system call, but that name is easily confused
  * with the user-level syslog facility, which is something completely
@@ -51,7 +51,7 @@ NOTHROW_NCX(LIBCCALL libc_klogctl)(int type,
 
 
 
-/*[[[start:exports,hash:0xa59b450e]]]*/
+/*[[[start:exports,hash:CRC-32=0xbc85017f]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(klogctl, libc_klogctl);
 /*[[[end:exports]]]*/
 

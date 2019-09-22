@@ -48,7 +48,7 @@ DECLARE_NOREL_GLOBAL_META(char **, environ);
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:Execv,hash:0x59705b3f]]]*/
+/*[[[head:Execv,hash:CRC-32=0x20d6d5c5]]]*/
 /* >> execv(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
@@ -66,7 +66,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.Execv") void
 
 /*[[[skip:Execve]]]*/
 
-/*[[[head:Execvp,hash:0x90e3c858]]]*/
+/*[[[head:Execvp,hash:CRC-32=0x3e8d8bfa]]]*/
 /* >> execvp(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
@@ -81,7 +81,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.Execvp") void
 }
 /*[[[end:Execvp]]]*/
 
-/*[[[head:Execvpe,hash:0xc8bf47ed]]]*/
+/*[[[head:Execvpe,hash:CRC-32=0x104dbbbf]]]*/
 /* >> execvpe(3)
  * Replace the calling process with the application image referred to by `FILE'
  * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
@@ -135,7 +135,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.Execvpe") void
 
 
 
-/*[[[head:Execl,hash:0xd1cf0471]]]*/
+/*[[[head:Execl,hash:CRC-32=0x77699431]]]*/
 /* >> execl(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
@@ -163,7 +163,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.Execl") void
 }
 /*[[[end:Execl]]]*/
 
-/*[[[head:Execle,hash:0xca697fbe]]]*/
+/*[[[head:Execle,hash:CRC-32=0x87164caf]]]*/
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinal */
@@ -197,7 +197,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.Execle") void
 }
 /*[[[end:Execle]]]*/
 
-/*[[[head:Execpl,hash:0x6591f95c]]]*/
+/*[[[head:Execpl,hash:CRC-32=0xd23ee48d]]]*/
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
@@ -225,7 +225,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.Execpl") void
 }
 /*[[[end:Execpl]]]*/
 
-/*[[[head:Execlpe,hash:0x3ade13bb]]]*/
+/*[[[head:Execlpe,hash:CRC-32=0x8aa3af5a]]]*/
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinal */
@@ -259,7 +259,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.Execlpe") void
 }
 /*[[[end:Execlpe]]]*/
 
-/*[[[head:FPathConf,hash:0xedb8c00e]]]*/
+/*[[[head:FPathConf,hash:CRC-32=0xcf0e4dee]]]*/
 /* >> fpathconf(2)
  * @param: NAME: One of `_PC_*' from <bits/confname.h>
  * Return a path configuration value associated with `NAME' for `FD' */
@@ -276,7 +276,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.property.FPathConf") long int
 }
 /*[[[end:FPathConf]]]*/
 
-/*[[[head:PathConf,hash:0xdb8c2c6f]]]*/
+/*[[[head:PathConf,hash:CRC-32=0xc2013534]]]*/
 /* >> pathconf(2)
  * @param: NAME: One of `_PC_*' from <bits/confname.h>
  * Return a path configuration value associated with `NAME' for `PATH' */
@@ -294,7 +294,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.property.PathConf") long int
 /*[[[end:PathConf]]]*/
 
 
-/*[[[head:ReadAll,hash:0xc44b9688]]]*/
+/*[[[head:ReadAll,hash:CRC-32=0x9dde3e2c]]]*/
 /* >> readall(3)
  * Same as `read(2)', however keep on reading until `read()' indicates EOF (causing
  * `readall()' to immediately return `0') or the entirety of the given buffer has been
@@ -340,7 +340,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.io.read.ReadAll") size_t
 /*[[[end:ReadAll]]]*/
 
 
-/*[[[head:GetCwd,hash:0x504a0d5]]]*/
+/*[[[head:GetCwd,hash:CRC-32=0x74bb4835]]]*/
 /* >> getcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.basic_property.GetCwd") char *
@@ -396,7 +396,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.basic_property.GetCwd") char 
 }
 /*[[[end:GetCwd]]]*/
 
-/*[[[head:PRead,hash:0x85f1536f]]]*/
+/*[[[head:PRead,hash:CRC-32=0x88aea0de]]]*/
 /* >> pread(2)
  * Read data from a file at a specific offset */
 INTERN NONNULL((2))
@@ -412,7 +412,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.io.read.PRead") size_t
 }
 /*[[[end:PRead]]]*/
 
-/*[[[head:PWrite,hash:0xcab708bc]]]*/
+/*[[[head:PWrite,hash:CRC-32=0x544807fa]]]*/
 /* >> pwrite(2)
  * Write data to a file at a specific offset */
 INTERN NONNULL((2))
@@ -428,7 +428,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.io.write.PWrite") size_t
 }
 /*[[[end:PWrite]]]*/
 
-/*[[[head:PReadAll,hash:0x256b334d]]]*/
+/*[[[head:PReadAll,hash:CRC-32=0x42a91a7f]]]*/
 /* >> preadall(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
 INTERN NONNULL((2))
@@ -444,7 +444,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.io.read.PReadAll") size_t
 }
 /*[[[end:PReadAll]]]*/
 
-/*[[[head:PReadAll64,hash:0x6bcc1b4a]]]*/
+/*[[[head:PReadAll64,hash:CRC-32=0xbce3330a]]]*/
 /* >> preadall64(3)
  * Same as `readall(3)', but using `pread64(2)' instead of `read()' */
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
@@ -482,7 +482,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.io.large.read.PReadAll64") size_t
 #endif /* MAGIC:alias */
 /*[[[end:PReadAll64]]]*/
 
-/*[[[head:GetCurrentDirName,hash:0x55e6dde8]]]*/
+/*[[[head:GetCurrentDirName,hash:CRC-32=0x1e38de7]]]*/
 INTERN WUNUSED ATTR_RETNONNULL ATTR_MALLOC
 ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.basic_property.GetCurrentDirName") char *
 (LIBCCALL libc_GetCurrentDirName)(void)
@@ -493,7 +493,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.basic_property.GetCurrentDirName") c
 }
 /*[[[end:GetCurrentDirName]]]*/
 
-/*[[[head:FExecve,hash:0xa4f6cb9c]]]*/
+/*[[[head:FExecve,hash:CRC-32=0x9cc9a3ce]]]*/
 /* >> fexecve(2)
  * Replace the calling process with the application image referred to by `FD' and
  * execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */
@@ -514,7 +514,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.FExecve") void
 }
 /*[[[end:FExecve]]]*/
 
-/*[[[head:Nice,hash:0x6cc02c04]]]*/
+/*[[[head:Nice,hash:CRC-32=0xdb38ede6]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.except.sched.param.Nice") int
 (LIBCCALL libc_Nice)(int inc)
 		__THROWS(...)
@@ -524,7 +524,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.except.sched.param.Nice") int
 }
 /*[[[end:Nice]]]*/
 
-/*[[[head:SetPGrp,hash:0xefbaf415]]]*/
+/*[[[head:SetPGrp,hash:CRC-32=0xd2c4da8b]]]*/
 /* >> setpgrp(3)
  * Move the calling process into its own process group.
  * Equivalent to `setpgid(0, 0)' */
@@ -537,7 +537,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.except.sched.process.SetPGrp") void
 }
 /*[[[end:SetPGrp]]]*/
 
-/*[[[head:SetEUid,hash:0x9417ddb]]]*/
+/*[[[head:SetEUid,hash:CRC-32=0xee65fbd2]]]*/
 /* >> seteuid(2)
  * Set the effective user ID of the calling process
  * @return: 0 : Success
@@ -554,7 +554,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.except.sched.user.SetEUid") void
 }
 /*[[[end:SetEUid]]]*/
 
-/*[[[head:SetEGid,hash:0x4742bc0e]]]*/
+/*[[[head:SetEGid,hash:CRC-32=0x1eb8561a]]]*/
 /* >> setegid(2)
  * Set the effective group ID of the calling process
  * @return: 0 : Success
@@ -571,7 +571,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.except.sched.user.SetEGid") void
 }
 /*[[[end:SetEGid]]]*/
 
-/*[[[head:GetHostName,hash:0xfb60f890]]]*/
+/*[[[head:GetHostName,hash:CRC-32=0x6c477876]]]*/
 /* >> gethostname(3)
  * Return the name assigned to the hosting machine, as set by `sethostname(2)' */
 INTERN NONNULL((1))
@@ -592,7 +592,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.system.configuration.GetHostName") void
 }
 /*[[[end:GetHostName]]]*/
 
-/*[[[head:GetDomainName,hash:0x9571e2a]]]*/
+/*[[[head:GetDomainName,hash:CRC-32=0x19e73961]]]*/
 /* >> getdomainname(3)
  * Return the name assigned to the hosting machine's domain, as set by `setdomainname(2)' */
 INTERN NONNULL((1))
@@ -670,7 +670,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.system.configuration.GetDomainName") vo
 
 
 
-/*[[[start:exports,hash:0xb32cd50c]]]*/
+/*[[[start:exports,hash:CRC-32=0x73c8397f]]]*/
 #undef Execl
 #undef Execle
 #undef Execpl

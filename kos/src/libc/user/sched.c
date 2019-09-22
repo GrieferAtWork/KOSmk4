@@ -31,7 +31,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:sched_setparam,hash:0x732e3a11]]]*/
+/*[[[head:sched_setparam,hash:CRC-32=0x464be025]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.param.sched_setparam") int
 NOTHROW_NCX(LIBCCALL libc_sched_setparam)(pid_t pid,
                                           struct sched_param const *param)
@@ -43,7 +43,7 @@ NOTHROW_NCX(LIBCCALL libc_sched_setparam)(pid_t pid,
 }
 /*[[[end:sched_setparam]]]*/
 
-/*[[[head:sched_getparam,hash:0xfe915620]]]*/
+/*[[[head:sched_getparam,hash:CRC-32=0xcfdc37d3]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.param.sched_getparam") int
 NOTHROW_NCX(LIBCCALL libc_sched_getparam)(pid_t pid,
                                           struct sched_param *param)
@@ -55,7 +55,7 @@ NOTHROW_NCX(LIBCCALL libc_sched_getparam)(pid_t pid,
 }
 /*[[[end:sched_getparam]]]*/
 
-/*[[[head:sched_setscheduler,hash:0x60db43cf]]]*/
+/*[[[head:sched_setscheduler,hash:CRC-32=0xa056877b]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.param.sched_setscheduler") int
 NOTHROW_NCX(LIBCCALL libc_sched_setscheduler)(pid_t pid,
                                               int policy,
@@ -70,7 +70,7 @@ NOTHROW_NCX(LIBCCALL libc_sched_setscheduler)(pid_t pid,
 }
 /*[[[end:sched_setscheduler]]]*/
 
-/*[[[head:sched_getscheduler,hash:0x910b5243]]]*/
+/*[[[head:sched_getscheduler,hash:CRC-32=0xf606b571]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.param.sched_getscheduler") int
 NOTHROW_NCX(LIBCCALL libc_sched_getscheduler)(pid_t pid)
 /*[[[body:sched_getscheduler]]]*/
@@ -81,7 +81,7 @@ NOTHROW_NCX(LIBCCALL libc_sched_getscheduler)(pid_t pid)
 }
 /*[[[end:sched_getscheduler]]]*/
 
-/*[[[head:sched_yield,hash:0x9019085c]]]*/
+/*[[[head:sched_yield,hash:CRC-32=0x2c5bef03]]]*/
 /* @return: 1: Another thread was executed prior to the function returning
  *             The thread may not necessarily be apart of the calling process
  * @return: 0: The function returned immediately when no other thread was executed */
@@ -95,7 +95,7 @@ NOTHROW_NCX(LIBCCALL libc_sched_yield)(void)
 }
 /*[[[end:sched_yield]]]*/
 
-/*[[[head:sched_get_priority_max,hash:0x3cd840ff]]]*/
+/*[[[head:sched_get_priority_max,hash:CRC-32=0xd113b7a6]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.param.sched_get_priority_max") int
 NOTHROW_NCX(LIBCCALL libc_sched_get_priority_max)(int algorithm)
 /*[[[body:sched_get_priority_max]]]*/
@@ -106,7 +106,7 @@ NOTHROW_NCX(LIBCCALL libc_sched_get_priority_max)(int algorithm)
 }
 /*[[[end:sched_get_priority_max]]]*/
 
-/*[[[head:sched_get_priority_min,hash:0x1d398b47]]]*/
+/*[[[head:sched_get_priority_min,hash:CRC-32=0x1743359f]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.param.sched_get_priority_min") int
 NOTHROW_NCX(LIBCCALL libc_sched_get_priority_min)(int algorithm)
 /*[[[body:sched_get_priority_min]]]*/
@@ -117,7 +117,7 @@ NOTHROW_NCX(LIBCCALL libc_sched_get_priority_min)(int algorithm)
 }
 /*[[[end:sched_get_priority_min]]]*/
 
-/*[[[head:sched_setaffinity,hash:0xf5de87e4]]]*/
+/*[[[head:sched_setaffinity,hash:CRC-32=0xdadcbeaa]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.param.sched_setaffinity") int
 NOTHROW_NCX(LIBCCALL libc_sched_setaffinity)(pid_t pid,
                                              size_t cpusetsize,
@@ -130,7 +130,7 @@ NOTHROW_NCX(LIBCCALL libc_sched_setaffinity)(pid_t pid,
 }
 /*[[[end:sched_setaffinity]]]*/
 
-/*[[[head:sched_getaffinity,hash:0x347f1597]]]*/
+/*[[[head:sched_getaffinity,hash:CRC-32=0xf95fbb08]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.param.sched_getaffinity") int
 NOTHROW_NCX(LIBCCALL libc_sched_getaffinity)(pid_t pid,
                                              size_t cpusetsize,
@@ -143,7 +143,7 @@ NOTHROW_NCX(LIBCCALL libc_sched_getaffinity)(pid_t pid,
 }
 /*[[[end:sched_getaffinity]]]*/
 
-/*[[[head:sched_rr_get_interval,hash:0xb45ded83]]]*/
+/*[[[head:sched_rr_get_interval,hash:CRC-32=0x83958234]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.param.sched_rr_get_interval") int
 NOTHROW_NCX(LIBCCALL libc_sched_rr_get_interval)(pid_t pid,
                                                  struct timespec *tms)
@@ -155,7 +155,7 @@ NOTHROW_NCX(LIBCCALL libc_sched_rr_get_interval)(pid_t pid,
 }
 /*[[[end:sched_rr_get_interval]]]*/
 
-/*[[[head:sched_rr_get_interval64,hash:0xabc4a16e]]]*/
+/*[[[head:sched_rr_get_interval64,hash:CRC-32=0xb04cdd3f]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_sched_rr_get_interval64, libc_sched_rr_get_interval);
 #else
@@ -175,7 +175,7 @@ NOTHROW_NCX(LIBCCALL libc_sched_rr_get_interval64)(pid_t pid,
 
 
 
-/*[[[start:exports,hash:0xfc364c5e]]]*/
+/*[[[start:exports,hash:CRC-32=0x97e5284f]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(sched_setparam, libc_sched_setparam);
 DEFINE_PUBLIC_WEAK_ALIAS(sched_getparam, libc_sched_getparam);
 DEFINE_PUBLIC_WEAK_ALIAS(sched_setscheduler, libc_sched_setscheduler);

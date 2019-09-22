@@ -42,7 +42,10 @@ local copyright =
 
 import fs;
 import * from deemon;
+import hash from hashlib;
 
+
+global hashfunc = "CRC-32";
 global include_line_directives = true;
 global single_line_local_wrappers = true;
 global print_documention_strings = true;
@@ -5139,14 +5142,15 @@ function write_hashed_file(filename: string, fp_writer: Callable) {
 		}
 		if (!firstline)
 			goto do_overwrite_file;
-		local old_hash = firstline.scanf(" /* HASH %[^ *]")...;
+		local old_hash = firstline.decode("utf-8").scanf(" /* HASH %[^ *]")...;
 		old_hash = old_hash.strip();
-		local expected_old_hash = old_text.operator hash().hex();
-		if (old_hash != expected_old_hash) {
+		local old_hash_name, none, old_hash_value = old_hash.partition(":")...;
+		local expected_old_hash = hash(old_hash_name, old_text).hex();
+		if (old_hash_value != expected_old_hash) {
 			print "\n\n",;
 			print getFilenameForLog(filename),;
 			print ": Error: File", repr filename, "has been modified";
-			print "\tStored hash:  ", old_hash;
+			print "\tStored hash:  ", old_hash_value;
 			print "\tExpected hash:", expected_old_hash;
 			throw "Don't overwrite modified File";
 		}
@@ -5165,8 +5169,8 @@ do_overwrite_file:
 	contents = contents.string.encode("utf-8").bytes();
 	if (old_text is none || old_text != contents) {
 		with (local fp = File.open(filename, "w")) {
-			local new_hash = contents.operator hash().hex();
-			fp << "/* HASH " << new_hash << " */\n";
+			local new_hash = hash(hashfunc, contents).hex();
+			fp << "/* HASH " << hashfunc << ":" << new_hash << " */\n";
 			fp.write(contents);
 		}
 	}
@@ -6224,8 +6228,8 @@ function print_libc_user_exports(fp: File, comnam: string, funcs: {Function...})
 	File.Writer tempfp;
 	generate_libc_user_exports(tempfp, comnam, funcs);
 	local s = tempfp.string;
-	local h = s.strip().operator hash().hex();
-	fp << "/*[[[start:exports,hash:" << h << "]]]*/\n";
+	local h = hash(hashfunc, s.strip()).hex();
+	fp << "/*[[[start:exports,hash:" << hashfunc << "=" << h << "]]]*/\n";
 	fp << s;
 	fp << "/*[[[end:exports]]]*/\n";
 }
@@ -6262,9 +6266,9 @@ function generate_libc_user_source(fp: File, comnam: string, funcs: {Function...
 			f.generate_libc_user_impl_proto(tempfp,
 				is_dos ? key_libd_internal : key_libc_internal);
 			local s = tempfp.string;
-			local h = s.strip().operator hash().hex();
+			local h = hash(hashfunc, s.strip()).hex();
 			fp << "\n";
-			fp << "/*[[[head:" << n << ",hash:" << h << "]]]*/\n";
+			fp << "/*[[[head:" << n << ",hash:" << hashfunc << "=" << h << "]]]*/\n";
 			fp << s;
 			fp << "/*[[[body:" << n << "]]]*/\n";
 			f.print_default_body(fp, is_dos);
@@ -6407,16 +6411,20 @@ function libc_user_update_implementation_section(
 		if (text.substr(pos, pos + 5) != "hash:")
 			err(pos, "Unexpected tag (expected `hash:' argument for `head:')");
 		pos += 5;
-		local hash = int(text.substr(pos, head_end).strip());
+		local hashstr = text.substr(pos, head_end).strip();
 		head_end += #tag_ending;
 		local tag_body = "/*[[[body:{}]]]*/\n".format({ name });
 		pos = text.find(tag_body, head_end);
 		if (pos < 0)
 			err(head_end, "Missing " + repr tag_body);
-		local head = text.substr(head_end, pos);
-		if (hash != head.strip().operator hash() && head.strip())
+		local head = text.substr(head_end, pos).strip();
+		local hash_func, none, hash_value = hashstr.partition("=")...;
+		hash_func = hash_func.strip();
+		hash_value = try int(hash_value.strip()) catch (...) -1;
+		local hash_real = hash(hash_func.decode("utf-8"), head);
+		if ((hash_value != hash_real) && head)
 			err(pos, "Miss-matching function {!r} header hash ({} != {})"
-				.format({ name, hash.hex(), head.strip().operator hash().hex() }));
+				.format({ name, hash_value.hex(), hash_real.hex() }));
 		pos += #tag_body;
 		local tag_end = "/*[[[end:{}]]]*/\n".format({ name });
 		local body_end = text.find(tag_end, pos);
@@ -6467,8 +6475,8 @@ function libc_user_update_implementation_section(
 		f.generate_libc_user_impl_proto(tempfp,
 			key_libd_is_export(name) ? key_libd_internal : key_libc_internal);
 		local s = tempfp.string;
-		local h = s.strip().operator hash().hex();
-		fp << "/*[[[head:" << name << ",hash:" << h << "]]]*/\n";
+		local h = hash(hashfunc, s.strip()).hex();
+		fp << "/*[[[head:" << name << ",hash:" << hashfunc << "=" << h << "]]]*/\n";
 		fp << s;
 		fp << "/*[[[body:" << name << "]]]*/\n";
 		local body = function_text_body.pop(name, none)[1];
@@ -6502,8 +6510,8 @@ function libc_user_update_implementation_section(
 		f.generate_libc_user_impl_proto(tempfp,
 			key_libd_is_export(name) ? key_libd_internal : key_libc_internal);
 		local s = tempfp.string;
-		local h = s.strip().operator hash().hex();
-		fp << "/*[[[head:" << name << ",hash:" << h << "]]]*/\n";
+		local h = hash(hashfunc, s.strip()).hex();
+		fp << "/*[[[head:" << name << ",hash:" << hashfunc << "=" << h << "]]]*/\n";
 		fp << s;
 		fp << "/*[[[body:" << name << "]]]*/\n";
 		local body = function_text_body.pop(name, none)[1];
@@ -6599,7 +6607,7 @@ create_new_file:
 		print "Missing `/*[[[start:exports,hash:...' tag";
 		throw "Missing exports block";
 	}
-	local exports_hash = int(text.substr(export_start + #s_export_start, export_hash_end));
+	local exports_hash = text.substr(export_start + #s_export_start, export_hash_end);
 	export_hash_end += #s_export_start2;
 	local export_end = text.find(s_export_end, export_hash_end);
 	if (export_end < 0) {
@@ -6615,12 +6623,18 @@ create_new_file:
 	local before_exports = text.substr(impl_end + #s_impl_end, export_start);
 	local exports = text.substr(export_hash_end, export_end);
 	local after_exports = text.substr(export_end + #s_export_end);
-	if (exports_hash != exports.strip().operator hash()) {
+	local exports_hash_func, none, exports_hash_value = exports_hash.partition("=")...;
+	exports_hash_func = exports_hash_func.strip();
+	exports_hash_value = try int(exports_hash_value.strip()) catch (...) 0;
+	exports = exports.strip();
+	local exports_hash_real = try hash(exports_hash_func.decode("utf-8"), exports) catch (...) 0;
+	if ((exports_hash_value != exports_hash_real) && exports) {
 		print getFilenameForLog(filename),;
 		print "(",;
 		print 1 + text.count("\n", 0, export_start),;
 		print ") : Error: ",;
-		print "exports section hash missmatch:", exports_hash.hex(), "!=", exports.strip().operator hash().hex();
+		print "exports section hash missmatch:",
+			exports_hash_value.hex(), "!=", exports_hash_real.hex();
 		throw "Modified exports section";
 	}
 	File.Writer tempfp;

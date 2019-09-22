@@ -31,7 +31,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:eventfd,hash:0x4c602f57]]]*/
+/*[[[head:eventfd,hash:CRC-32=0x317b29e1]]]*/
 /* Return file descriptor for generic event channel. Set initial value to COUNT */
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.eventfd.eventfd") fd_t
@@ -46,7 +46,7 @@ NOTHROW_NCX(LIBCCALL libc_eventfd)(unsigned int count,
 }
 /*[[[end:eventfd]]]*/
 
-/*[[[head:eventfd_read,hash:0x4a5fd281]]]*/
+/*[[[head:eventfd_read,hash:CRC-32=0xcb08c7c7]]]*/
 /* Read event counter and possibly wait for events */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.eventfd.eventfd_read") int
 NOTHROW_RPC(LIBCCALL libc_eventfd_read)(fd_t fd,
@@ -65,7 +65,7 @@ NOTHROW_RPC(LIBCCALL libc_eventfd_read)(fd_t fd,
 }
 /*[[[end:eventfd_read]]]*/
 
-/*[[[head:eventfd_write,hash:0xf551483f]]]*/
+/*[[[head:eventfd_write,hash:CRC-32=0xbce4c292]]]*/
 /* Increment event counter */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.eventfd.eventfd_write") int
 NOTHROW_RPC(LIBCCALL libc_eventfd_write)(fd_t fd,
@@ -88,7 +88,7 @@ NOTHROW_RPC(LIBCCALL libc_eventfd_write)(fd_t fd,
 
 
 
-/*[[[start:exports,hash:0x51c1310f]]]*/
+/*[[[start:exports,hash:CRC-32=0x35c0103a]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(eventfd, libc_eventfd);
 DEFINE_PUBLIC_WEAK_ALIAS(eventfd_read, libc_eventfd_read);
 DEFINE_PUBLIC_WEAK_ALIAS(eventfd_write, libc_eventfd_write);

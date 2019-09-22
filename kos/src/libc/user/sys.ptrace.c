@@ -32,7 +32,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:ptrace,hash:0x2a815e82]]]*/
+/*[[[head:ptrace,hash:CRC-32=0x4836010d]]]*/
 /* Perform process tracing functions. REQUEST is one of
  * the values above, and determines the action to be taken.
  * For all requests except PTRACE_TRACEME, PID specifies the process to be traced.
@@ -64,7 +64,7 @@ NOTHROW_NCX(VLIBCCALL libc_ptrace)(__ptrace_request_t request,
 
 
 
-/*[[[start:exports,hash:0x1ae6e848]]]*/
+/*[[[start:exports,hash:CRC-32=0xfaf35d71]]]*/
 #undef ptrace
 DEFINE_PUBLIC_WEAK_ALIAS(ptrace, libc_ptrace);
 /*[[[end:exports]]]*/

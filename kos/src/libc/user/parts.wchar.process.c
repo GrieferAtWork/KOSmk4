@@ -186,7 +186,7 @@ done:
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:wexecv,hash:0x28f8a7ab]]]*/
+/*[[[head:wexecv,hash:CRC-32=0x268e1466]]]*/
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.fs.exec.exec.wexecv") int
 NOTHROW_RPC(LIBCCALL libc_wexecv)(char32_t const *__restrict path,
@@ -197,7 +197,7 @@ NOTHROW_RPC(LIBCCALL libc_wexecv)(char32_t const *__restrict path,
 }
 /*[[[end:wexecv]]]*/
 
-/*[[[head:DOS$wexecv,hash:0xe837f6ef]]]*/
+/*[[[head:DOS$wexecv,hash:CRC-32=0x2417b608]]]*/
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.exec.exec.wexecv") int
 NOTHROW_RPC(LIBDCALL libd_wexecv)(char16_t const *__restrict path,
@@ -208,7 +208,7 @@ NOTHROW_RPC(LIBDCALL libd_wexecv)(char16_t const *__restrict path,
 }
 /*[[[end:DOS$wexecv]]]*/
 
-/*[[[head:wexecve,hash:0x56a97e3a]]]*/
+/*[[[head:wexecve,hash:CRC-32=0x94034cd2]]]*/
 INTERN NONNULL((1, 2, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.fs.exec.exec.wexecve") int
 NOTHROW_RPC(LIBCCALL libc_wexecve)(char32_t const *__restrict path,
@@ -220,7 +220,7 @@ NOTHROW_RPC(LIBCCALL libc_wexecve)(char32_t const *__restrict path,
 }
 /*[[[end:wexecve]]]*/
 
-/*[[[head:DOS$wexecve,hash:0xe394080c]]]*/
+/*[[[head:DOS$wexecve,hash:CRC-32=0xb0746e8b]]]*/
 INTERN NONNULL((1, 2, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.exec.exec.wexecve") int
 NOTHROW_RPC(LIBDCALL libd_wexecve)(char16_t const *__restrict path,
@@ -232,7 +232,7 @@ NOTHROW_RPC(LIBDCALL libd_wexecve)(char16_t const *__restrict path,
 }
 /*[[[end:DOS$wexecve]]]*/
 
-/*[[[head:wexecvp,hash:0x6687398d]]]*/
+/*[[[head:wexecvp,hash:CRC-32=0xbc4f78a4]]]*/
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.fs.exec.exec.wexecvp") int
 NOTHROW_RPC(LIBCCALL libc_wexecvp)(char32_t const *__restrict file,
@@ -243,7 +243,7 @@ NOTHROW_RPC(LIBCCALL libc_wexecvp)(char32_t const *__restrict file,
 }
 /*[[[end:wexecvp]]]*/
 
-/*[[[head:DOS$wexecvp,hash:0x8c183ed8]]]*/
+/*[[[head:DOS$wexecvp,hash:CRC-32=0x9601ca1]]]*/
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.exec.exec.wexecvp") int
 NOTHROW_RPC(LIBDCALL libd_wexecvp)(char16_t const *__restrict file,
@@ -254,7 +254,7 @@ NOTHROW_RPC(LIBDCALL libd_wexecvp)(char16_t const *__restrict file,
 }
 /*[[[end:DOS$wexecvp]]]*/
 
-/*[[[head:wexecvpe,hash:0xf53bccbf]]]*/
+/*[[[head:wexecvpe,hash:CRC-32=0xcb98311e]]]*/
 INTERN NONNULL((1, 2, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.fs.exec.exec.wexecvpe") int
 NOTHROW_RPC(LIBCCALL libc_wexecvpe)(char32_t const *__restrict file,
@@ -266,7 +266,7 @@ NOTHROW_RPC(LIBCCALL libc_wexecvpe)(char32_t const *__restrict file,
 }
 /*[[[end:wexecvpe]]]*/
 
-/*[[[head:DOS$wexecvpe,hash:0x6c595fbf]]]*/
+/*[[[head:DOS$wexecvpe,hash:CRC-32=0x9ae47d70]]]*/
 INTERN NONNULL((1, 2, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.exec.exec.wexecvpe") int
 NOTHROW_RPC(LIBDCALL libd_wexecvpe)(char16_t const *__restrict file,
@@ -278,7 +278,7 @@ NOTHROW_RPC(LIBDCALL libd_wexecvpe)(char16_t const *__restrict file,
 }
 /*[[[end:DOS$wexecvpe]]]*/
 
-/*[[[head:wexecl,hash:0xebbf1aa5]]]*/
+/*[[[head:wexecl,hash:CRC-32=0x65662067]]]*/
 INTERN ATTR_SENTINEL NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.fs.exec.exec.wexecl") int
 NOTHROW_RPC(VLIBCCALL libc_wexecl)(char32_t const *__restrict path,
@@ -299,7 +299,7 @@ NOTHROW_RPC(VLIBCCALL libc_wexecl)(char32_t const *__restrict path,
 }
 /*[[[end:wexecl]]]*/
 
-/*[[[head:DOS$wexecl,hash:0xb49ec86]]]*/
+/*[[[head:DOS$wexecl,hash:CRC-32=0x6a918260]]]*/
 INTERN ATTR_SENTINEL NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.exec.exec.wexecl") int
 NOTHROW_RPC(VLIBDCALL libd_wexecl)(char16_t const *__restrict path,
@@ -320,7 +320,7 @@ NOTHROW_RPC(VLIBDCALL libd_wexecl)(char16_t const *__restrict path,
 }
 /*[[[end:DOS$wexecl]]]*/
 
-/*[[[head:wexecle,hash:0xf18d5dc3]]]*/
+/*[[[head:wexecle,hash:CRC-32=0xd764a989]]]*/
 INTERN ATTR_SENTINEL_O(1) NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.fs.exec.exec.wexecle") int
 NOTHROW_RPC(VLIBCCALL libc_wexecle)(char32_t const *__restrict path,
@@ -351,7 +351,7 @@ NOTHROW_RPC(VLIBCCALL libc_wexecle)(char32_t const *__restrict path,
 }
 /*[[[end:wexecle]]]*/
 
-/*[[[head:DOS$wexecle,hash:0x25907509]]]*/
+/*[[[head:DOS$wexecle,hash:CRC-32=0x6cc3e456]]]*/
 INTERN ATTR_SENTINEL_O(1) NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.exec.exec.wexecle") int
 NOTHROW_RPC(VLIBDCALL libd_wexecle)(char16_t const *__restrict path,
@@ -382,7 +382,7 @@ NOTHROW_RPC(VLIBDCALL libd_wexecle)(char16_t const *__restrict path,
 }
 /*[[[end:DOS$wexecle]]]*/
 
-/*[[[head:wexeclp,hash:0x6d37c823]]]*/
+/*[[[head:wexeclp,hash:CRC-32=0xb1930363]]]*/
 INTERN ATTR_SENTINEL NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.fs.exec.exec.wexeclp") int
 NOTHROW_RPC(VLIBCCALL libc_wexeclp)(char32_t const *__restrict file,
@@ -403,7 +403,7 @@ NOTHROW_RPC(VLIBCCALL libc_wexeclp)(char32_t const *__restrict file,
 }
 /*[[[end:wexeclp]]]*/
 
-/*[[[head:DOS$wexeclp,hash:0xe4432dba]]]*/
+/*[[[head:DOS$wexeclp,hash:CRC-32=0x9eaa14d2]]]*/
 INTERN ATTR_SENTINEL NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.exec.exec.wexeclp") int
 NOTHROW_RPC(VLIBDCALL libd_wexeclp)(char16_t const *__restrict file,
@@ -424,7 +424,7 @@ NOTHROW_RPC(VLIBDCALL libd_wexeclp)(char16_t const *__restrict file,
 }
 /*[[[end:DOS$wexeclp]]]*/
 
-/*[[[head:wexeclpe,hash:0xb954b42b]]]*/
+/*[[[head:wexeclpe,hash:CRC-32=0x95579611]]]*/
 INTERN ATTR_SENTINEL_O(1) NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.fs.exec.exec.wexeclpe") int
 NOTHROW_RPC(VLIBCCALL libc_wexeclpe)(char32_t const *__restrict file,
@@ -455,7 +455,7 @@ NOTHROW_RPC(VLIBCCALL libc_wexeclpe)(char32_t const *__restrict file,
 }
 /*[[[end:wexeclpe]]]*/
 
-/*[[[head:DOS$wexeclpe,hash:0xac905d0b]]]*/
+/*[[[head:DOS$wexeclpe,hash:CRC-32=0xa31fed53]]]*/
 INTERN ATTR_SENTINEL_O(1) NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.exec.exec.wexeclpe") int
 NOTHROW_RPC(VLIBDCALL libd_wexeclpe)(char16_t const *__restrict file,
@@ -486,7 +486,7 @@ NOTHROW_RPC(VLIBDCALL libd_wexeclpe)(char16_t const *__restrict file,
 }
 /*[[[end:DOS$wexeclpe]]]*/
 
-/*[[[head:wspawnv,hash:0x5da4eb13]]]*/
+/*[[[head:wspawnv,hash:CRC-32=0xc0986f2a]]]*/
 INTERN NONNULL((2, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.fs.exec.spawn.wspawnv") pid_t
 NOTHROW_RPC(LIBCCALL libc_wspawnv)(int mode,
@@ -498,7 +498,7 @@ NOTHROW_RPC(LIBCCALL libc_wspawnv)(int mode,
 }
 /*[[[end:wspawnv]]]*/
 
-/*[[[head:DOS$wspawnv,hash:0x2b3ac6]]]*/
+/*[[[head:DOS$wspawnv,hash:CRC-32=0x34e391aa]]]*/
 INTERN NONNULL((2, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.exec.spawn.wspawnv") pid_t
 NOTHROW_RPC(LIBDCALL libd_wspawnv)(int mode,
@@ -510,7 +510,7 @@ NOTHROW_RPC(LIBDCALL libd_wspawnv)(int mode,
 }
 /*[[[end:DOS$wspawnv]]]*/
 
-/*[[[head:wspawnve,hash:0xd67f9330]]]*/
+/*[[[head:wspawnve,hash:CRC-32=0x181a5ef0]]]*/
 INTERN NONNULL((2, 3, 4))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.fs.exec.spawn.wspawnve") pid_t
 NOTHROW_RPC(LIBCCALL libc_wspawnve)(int mode,
@@ -523,7 +523,7 @@ NOTHROW_RPC(LIBCCALL libc_wspawnve)(int mode,
 }
 /*[[[end:wspawnve]]]*/
 
-/*[[[head:DOS$wspawnve,hash:0xd41784fc]]]*/
+/*[[[head:DOS$wspawnve,hash:CRC-32=0x18bbc8d7]]]*/
 INTERN NONNULL((2, 3, 4))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.exec.spawn.wspawnve") pid_t
 NOTHROW_RPC(LIBDCALL libd_wspawnve)(int mode,
@@ -536,7 +536,7 @@ NOTHROW_RPC(LIBDCALL libd_wspawnve)(int mode,
 }
 /*[[[end:DOS$wspawnve]]]*/
 
-/*[[[head:wspawnvp,hash:0xaba888e3]]]*/
+/*[[[head:wspawnvp,hash:CRC-32=0xe4276940]]]*/
 INTERN NONNULL((2, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.fs.exec.spawn.wspawnvp") pid_t
 NOTHROW_RPC(LIBCCALL libc_wspawnvp)(int mode,
@@ -548,7 +548,7 @@ NOTHROW_RPC(LIBCCALL libc_wspawnvp)(int mode,
 }
 /*[[[end:wspawnvp]]]*/
 
-/*[[[head:DOS$wspawnvp,hash:0x90bc7bf1]]]*/
+/*[[[head:DOS$wspawnvp,hash:CRC-32=0xd97ba375]]]*/
 INTERN NONNULL((2, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.exec.spawn.wspawnvp") pid_t
 NOTHROW_RPC(LIBDCALL libd_wspawnvp)(int mode,
@@ -560,7 +560,7 @@ NOTHROW_RPC(LIBDCALL libd_wspawnvp)(int mode,
 }
 /*[[[end:DOS$wspawnvp]]]*/
 
-/*[[[head:wspawnvpe,hash:0xc828710e]]]*/
+/*[[[head:wspawnvpe,hash:CRC-32=0xc86d3bb6]]]*/
 INTERN NONNULL((2, 3, 4))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.fs.exec.spawn.wspawnvpe") pid_t
 NOTHROW_RPC(LIBCCALL libc_wspawnvpe)(int mode,
@@ -573,7 +573,7 @@ NOTHROW_RPC(LIBCCALL libc_wspawnvpe)(int mode,
 }
 /*[[[end:wspawnvpe]]]*/
 
-/*[[[head:DOS$wspawnvpe,hash:0xcda15743]]]*/
+/*[[[head:DOS$wspawnvpe,hash:CRC-32=0xd0df20a4]]]*/
 INTERN NONNULL((2, 3, 4))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.exec.spawn.wspawnvpe") pid_t
 NOTHROW_RPC(LIBDCALL libd_wspawnvpe)(int mode,
@@ -586,7 +586,7 @@ NOTHROW_RPC(LIBDCALL libd_wspawnvpe)(int mode,
 }
 /*[[[end:DOS$wspawnvpe]]]*/
 
-/*[[[head:wspawnl,hash:0xf9918168]]]*/
+/*[[[head:wspawnl,hash:CRC-32=0xccd275a0]]]*/
 INTERN ATTR_SENTINEL NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.fs.exec.spawn.wspawnl") pid_t
 NOTHROW_RPC(VLIBCCALL libc_wspawnl)(int mode,
@@ -608,7 +608,7 @@ NOTHROW_RPC(VLIBCCALL libc_wspawnl)(int mode,
 }
 /*[[[end:wspawnl]]]*/
 
-/*[[[head:DOS$wspawnl,hash:0xcc481072]]]*/
+/*[[[head:DOS$wspawnl,hash:CRC-32=0xd6e83385]]]*/
 INTERN ATTR_SENTINEL NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.exec.spawn.wspawnl") pid_t
 NOTHROW_RPC(VLIBDCALL libd_wspawnl)(int mode,
@@ -630,7 +630,7 @@ NOTHROW_RPC(VLIBDCALL libd_wspawnl)(int mode,
 }
 /*[[[end:DOS$wspawnl]]]*/
 
-/*[[[head:wspawnle,hash:0x667f3516]]]*/
+/*[[[head:wspawnle,hash:CRC-32=0x806ceda8]]]*/
 INTERN ATTR_SENTINEL_O(1) NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.fs.exec.spawn.wspawnle") pid_t
 NOTHROW_RPC(VLIBCCALL libc_wspawnle)(int mode,
@@ -662,7 +662,7 @@ NOTHROW_RPC(VLIBCCALL libc_wspawnle)(int mode,
 }
 /*[[[end:wspawnle]]]*/
 
-/*[[[head:DOS$wspawnle,hash:0x124847a7]]]*/
+/*[[[head:DOS$wspawnle,hash:CRC-32=0x2d1d427b]]]*/
 INTERN ATTR_SENTINEL_O(1) NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.exec.spawn.wspawnle") pid_t
 NOTHROW_RPC(VLIBDCALL libd_wspawnle)(int mode,
@@ -694,7 +694,7 @@ NOTHROW_RPC(VLIBDCALL libd_wspawnle)(int mode,
 }
 /*[[[end:DOS$wspawnle]]]*/
 
-/*[[[head:wspawnlp,hash:0xb20d3fb7]]]*/
+/*[[[head:wspawnlp,hash:CRC-32=0x804d31eb]]]*/
 INTERN ATTR_SENTINEL NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.fs.exec.spawn.wspawnlp") pid_t
 NOTHROW_RPC(VLIBCCALL libc_wspawnlp)(int mode,
@@ -716,7 +716,7 @@ NOTHROW_RPC(VLIBCCALL libc_wspawnlp)(int mode,
 }
 /*[[[end:wspawnlp]]]*/
 
-/*[[[head:DOS$wspawnlp,hash:0x4955fb23]]]*/
+/*[[[head:DOS$wspawnlp,hash:CRC-32=0xef6dab6]]]*/
 INTERN ATTR_SENTINEL NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.exec.spawn.wspawnlp") pid_t
 NOTHROW_RPC(VLIBDCALL libd_wspawnlp)(int mode,
@@ -738,7 +738,7 @@ NOTHROW_RPC(VLIBDCALL libd_wspawnlp)(int mode,
 }
 /*[[[end:DOS$wspawnlp]]]*/
 
-/*[[[head:wspawnlpe,hash:0x8350dccb]]]*/
+/*[[[head:wspawnlpe,hash:CRC-32=0xb33f601c]]]*/
 INTERN ATTR_SENTINEL_O(1) NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.fs.exec.spawn.wspawnlpe") pid_t
 NOTHROW_RPC(VLIBCCALL libc_wspawnlpe)(int mode,
@@ -770,7 +770,7 @@ NOTHROW_RPC(VLIBCCALL libc_wspawnlpe)(int mode,
 }
 /*[[[end:wspawnlpe]]]*/
 
-/*[[[head:DOS$wspawnlpe,hash:0x4826df73]]]*/
+/*[[[head:DOS$wspawnlpe,hash:CRC-32=0xb99d6296]]]*/
 INTERN ATTR_SENTINEL_O(1) NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.exec.spawn.wspawnlpe") pid_t
 NOTHROW_RPC(VLIBDCALL libd_wspawnlpe)(int mode,
@@ -802,7 +802,7 @@ NOTHROW_RPC(VLIBDCALL libd_wspawnlpe)(int mode,
 }
 /*[[[end:DOS$wspawnlpe]]]*/
 
-/*[[[head:wsystem,hash:0x87fc0a01]]]*/
+/*[[[head:wsystem,hash:CRC-32=0xceaf1ad0]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.wchar.fs.exec.system.wsystem") int
 NOTHROW_RPC(LIBCCALL libc_wsystem)(char32_t const *cmd)
 /*[[[body:wsystem]]]*/
@@ -822,7 +822,7 @@ NOTHROW_RPC(LIBCCALL libc_wsystem)(char32_t const *cmd)
 }
 /*[[[end:wsystem]]]*/
 
-/*[[[head:DOS$wsystem,hash:0x5438b134]]]*/
+/*[[[head:DOS$wsystem,hash:CRC-32=0xeef624e3]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.exec.system.wsystem") int
 NOTHROW_RPC(LIBDCALL libd_wsystem)(char16_t const *cmd)
 /*[[[body:DOS$wsystem]]]*/
@@ -846,7 +846,7 @@ NOTHROW_RPC(LIBDCALL libd_wsystem)(char16_t const *cmd)
 
 
 
-/*[[[start:exports,hash:0x821a6564]]]*/
+/*[[[start:exports,hash:CRC-32=0xb805b42]]]*/
 #undef wexecl
 #undef _wexecl
 #undef wexecle

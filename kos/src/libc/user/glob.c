@@ -30,7 +30,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:glob,hash:0xccfe2509]]]*/
+/*[[[head:glob,hash:CRC-32=0xb987b302]]]*/
 /* Do glob searching for PATTERN, placing results in PGLOB.
  * The bits defined above may be set in FLAGS.
  * If a directory cannot be opened or read and ERRFUNC is not nil,
@@ -56,7 +56,7 @@ NOTHROW_NCX(LIBCCALL libc_glob)(char const *__restrict pattern,
 }
 /*[[[end:glob]]]*/
 
-/*[[[head:globfree,hash:0xabb438b4]]]*/
+/*[[[head:globfree,hash:CRC-32=0xc49448d2]]]*/
 /* Free storage allocated in PGLOB by a previous `glob' call */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.utility.glob.globfree") void
@@ -68,7 +68,7 @@ NOTHROW_NCX(LIBCCALL libc_globfree)(glob_t *pglob)
 }
 /*[[[end:globfree]]]*/
 
-/*[[[head:glob64,hash:0xc0519b80]]]*/
+/*[[[head:glob64,hash:CRC-32=0x31ff354e]]]*/
 /* Do glob searching for PATTERN, placing results in PGLOB.
  * The bits defined above may be set in FLAGS.
  * If a directory cannot be opened or read and ERRFUNC is not nil,
@@ -94,7 +94,7 @@ NOTHROW_NCX(LIBCCALL libc_glob64)(const char *__restrict pattern,
 }
 /*[[[end:glob64]]]*/
 
-/*[[[head:globfree64,hash:0xaf062d41]]]*/
+/*[[[head:globfree64,hash:CRC-32=0xe87aae80]]]*/
 /* Free storage allocated in PGLOB by a previous `glob' call */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.utility.glob.globfree64") void
@@ -110,7 +110,7 @@ NOTHROW_NCX(LIBCCALL libc_globfree64)(struct __glob64_struct *pglob)
 
 
 
-/*[[[start:exports,hash:0x2f905adc]]]*/
+/*[[[start:exports,hash:CRC-32=0x5affe86d]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(glob, libc_glob);
 DEFINE_PUBLIC_WEAK_ALIAS(globfree, libc_globfree);
 DEFINE_PUBLIC_WEAK_ALIAS(glob64, libc_glob64);

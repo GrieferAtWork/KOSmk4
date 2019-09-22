@@ -32,7 +32,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:format_aprintf_pack,hash:0x3f711b2d]]]*/
+/*[[[head:format_aprintf_pack,hash:CRC-32=0x7ece4f73]]]*/
 /* Pack and finalize a given aprintf format printer
  * Together with `format_aprintf_printer()', the aprintf
  * format printer sub-system should be used as follows:
@@ -100,7 +100,7 @@ NOTHROW_NCX(LIBCCALL libc_format_aprintf_pack)(struct format_aprintf_data *__res
 }
 /*[[[end:format_aprintf_pack]]]*/
 
-/*[[[head:format_aprintf_printer,hash:0xdc590d6a]]]*/
+/*[[[head:format_aprintf_printer,hash:CRC-32=0x9102ef72]]]*/
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
 INTERN WUNUSED NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_aprintf_printer") ssize_t
@@ -146,7 +146,7 @@ NOTHROW_NCX(LIBCCALL libc_format_aprintf_printer)(/*struct format_aprintf_data *
 
 
 
-/*[[[start:exports,hash:0x1409b12c]]]*/
+/*[[[start:exports,hash:CRC-32=0xc53cf32b]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(format_aprintf_pack, libc_format_aprintf_pack);
 DEFINE_PUBLIC_WEAK_ALIAS(format_aprintf_printer, libc_format_aprintf_printer);
 /*[[[end:exports]]]*/

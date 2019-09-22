@@ -26,7 +26,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:backtrace,hash:0x67627a6]]]*/
+/*[[[head:backtrace,hash:CRC-32=0xc9d74cf8]]]*/
 /* Store up to SIZE return address of the current program state
  * in ARRAY and return the exact number of values stored */
 INTERN NONNULL((1))
@@ -41,7 +41,7 @@ NOTHROW_NCX(LIBCCALL libc_backtrace)(void **array,
 }
 /*[[[end:backtrace]]]*/
 
-/*[[[head:backtrace_symbols,hash:0x3368db8e]]]*/
+/*[[[head:backtrace_symbols,hash:CRC-32=0xd0e9f051]]]*/
 /* Return names of functions from the backtrace list
  * in ARRAY in a newly malloc()ed memory block */
 INTERN NONNULL((1))
@@ -56,7 +56,7 @@ NOTHROW_NCX(LIBCCALL libc_backtrace_symbols)(void *const *array,
 }
 /*[[[end:backtrace_symbols]]]*/
 
-/*[[[head:backtrace_symbols_fd,hash:0xfe3257f3]]]*/
+/*[[[head:backtrace_symbols_fd,hash:CRC-32=0xd9afa429]]]*/
 /* This function is similar to backtrace_symbols()
  * but it writes the result immediately to a file */
 INTERN NONNULL((1))
@@ -75,7 +75,7 @@ NOTHROW_NCX(LIBCCALL libc_backtrace_symbols_fd)(void *const *array,
 
 
 
-/*[[[start:exports,hash:0x6a5101cf]]]*/
+/*[[[start:exports,hash:CRC-32=0x2f4cb626]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(backtrace, libc_backtrace);
 DEFINE_PUBLIC_WEAK_ALIAS(backtrace_symbols, libc_backtrace_symbols);
 DEFINE_PUBLIC_WEAK_ALIAS(backtrace_symbols_fd, libc_backtrace_symbols_fd);

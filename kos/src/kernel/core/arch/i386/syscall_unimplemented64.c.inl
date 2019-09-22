@@ -1,4 +1,4 @@
-/* HASH 0x1c05d1ef */
+/* HASH CRC-32:0x16fb4a71 */
 DEFINE_PUBLIC_WEAK_ALIAS(sys_read, sys_invalid3);                   /* 0 */
 DEFINE_PUBLIC_WEAK_ALIAS(sys_write, sys_invalid3);                  /* 1 */
 DEFINE_PUBLIC_WEAK_ALIAS(sys_open, sys_invalid3);                   /* 2 */

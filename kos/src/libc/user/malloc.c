@@ -43,7 +43,7 @@ DECL_BEGIN
 /*[[[skip:malloc_usable_size]]]*/
 /*[[[skip:cfree]]]*/
 
-/*[[[head:_heapmin,hash:0xdfa93f35]]]*/
+/*[[[head:_heapmin,hash:CRC-32=0x85c22195]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.heap.utility._heapmin") int
 NOTHROW_NCX(LIBCCALL libc__heapmin)(void)
 /*[[[body:_heapmin]]]*/
@@ -53,7 +53,7 @@ NOTHROW_NCX(LIBCCALL libc__heapmin)(void)
 /*[[[end:_heapmin]]]*/
 
 
-/*[[[head:memcdup,hash:0x35740ef0]]]*/
+/*[[[head:memcdup,hash:CRC-32=0xaf5cac1a]]]*/
 INTERN WUNUSED ATTR_MALL_DEFAULT_ALIGNED ATTR_ALLOC_SIZE((2)) ATTR_MALLOC NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.heap.rare_helpers.memcdup") void *
 NOTHROW_NCX(LIBCCALL libc_memcdup)(void const *__restrict ptr,
@@ -73,7 +73,7 @@ NOTHROW_NCX(LIBCCALL libc_memcdup)(void const *__restrict ptr,
 }
 /*[[[end:memcdup]]]*/
 
-/*[[[head:memdup,hash:0x9b373046]]]*/
+/*[[[head:memdup,hash:CRC-32=0x958d735]]]*/
 INTERN WUNUSED ATTR_MALL_DEFAULT_ALIGNED ATTR_ALLOC_SIZE((2)) ATTR_MALLOC NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.heap.rare_helpers.memdup") void *
 NOTHROW_NCX(LIBCCALL libc_memdup)(void const *__restrict ptr,
@@ -92,7 +92,7 @@ NOTHROW_NCX(LIBCCALL libc_memdup)(void const *__restrict ptr,
 
 
 
-/*[[[start:exports,hash:0x3ebd7318]]]*/
+/*[[[start:exports,hash:CRC-32=0xbb0f392f]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(memdup, libc_memdup);
 DEFINE_PUBLIC_WEAK_ALIAS(__memdup, libc_memdup);
 DEFINE_PUBLIC_WEAK_ALIAS(memcdup, libc_memcdup);

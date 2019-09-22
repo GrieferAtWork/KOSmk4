@@ -41,7 +41,7 @@ struct hsearch_data htab = { NULL, 0, 0 };
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:hsearch,hash:0xe66a70b7]]]*/
+/*[[[head:hsearch,hash:CRC-32=0x43237a0a]]]*/
 /* Search for entry matching ITEM.key in internal hash table.
  * If ACTION is `FIND' return found entry or signal error by returning NULL.
  * If ACTION is `ENTER' replace existing data (if any) with ITEM.data */
@@ -56,7 +56,7 @@ NOTHROW_NCX(LIBCCALL libc_hsearch)(ENTRY item,
 }
 /*[[[end:hsearch]]]*/
 
-/*[[[head:hcreate,hash:0xec5f9327]]]*/
+/*[[[head:hcreate,hash:CRC-32=0x787ea6ee]]]*/
 /* Create a new hashing table which will at most contain NEL elements */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.search.hcreate") int
 NOTHROW_NCX(LIBCCALL libc_hcreate)(size_t nel)
@@ -66,7 +66,7 @@ NOTHROW_NCX(LIBCCALL libc_hcreate)(size_t nel)
 }
 /*[[[end:hcreate]]]*/
 
-/*[[[head:hdestroy,hash:0x2648b7f8]]]*/
+/*[[[head:hdestroy,hash:CRC-32=0x2cf1a85e]]]*/
 /* Destroy current internal hashing table */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.search.hdestroy") void
 NOTHROW_NCX(LIBCCALL libc_hdestroy)(void)
@@ -76,7 +76,7 @@ NOTHROW_NCX(LIBCCALL libc_hdestroy)(void)
 }
 /*[[[end:hdestroy]]]*/
 
-/*[[[head:hcreate_r,hash:0x5f2009ca]]]*/
+/*[[[head:hcreate_r,hash:CRC-32=0xd1526c77]]]*/
 /* Reentrant versions which can handle multiple hashing tables at the same time */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.search.hcreate_r") int
 NOTHROW_NCX(LIBCCALL libc_hcreate_r)(size_t nel,
@@ -116,7 +116,7 @@ NOTHROW_NCX(LIBCCALL libc_hcreate_r)(size_t nel,
 }
 /*[[[end:hcreate_r]]]*/
 
-/*[[[head:hdestroy_r,hash:0xfd902bfb]]]*/
+/*[[[head:hdestroy_r,hash:CRC-32=0xdf3c98e4]]]*/
 /* Reentrant versions which can handle multiple hashing tables at the same time */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.search.hdestroy_r") void
 NOTHROW_NCX(LIBCCALL libc_hdestroy_r)(struct hsearch_data *htab)
@@ -133,7 +133,7 @@ NOTHROW_NCX(LIBCCALL libc_hdestroy_r)(struct hsearch_data *htab)
 }
 /*[[[end:hdestroy_r]]]*/
 
-/*[[[head:tsearch,hash:0xe2603b58]]]*/
+/*[[[head:tsearch,hash:CRC-32=0x799fe269]]]*/
 /* Search for an entry matching the given KEY in the tree
  * pointed to by *ROOTP and insert a new element if not found */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.search.tsearch") void *
@@ -191,7 +191,7 @@ NOTHROW_NCX(LIBCCALL libc_tsearch)(void const *key,
 }
 /*[[[end:tsearch]]]*/
 
-/*[[[head:tdelete,hash:0xd462c507]]]*/
+/*[[[head:tdelete,hash:CRC-32=0xf2b3fe96]]]*/
 /* Remove the element matching KEY from the tree pointed to by *ROOTP */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.search.tdelete") void *
 NOTHROW_NCX(LIBCCALL libc_tdelete)(void const *__restrict key,
@@ -376,7 +376,7 @@ done:
 }
 /*[[[end:tdelete]]]*/
 
-/*[[[head:tdestroy,hash:0xfa375074]]]*/
+/*[[[head:tdestroy,hash:CRC-32=0xf57a9d0]]]*/
 /* Destroy the whole tree, call FREEFCT for each node or leaf */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.search.tdestroy") void
 NOTHROW_NCX(LIBCCALL libc_tdestroy)(void *root,
@@ -408,7 +408,7 @@ again:
 
 
 
-/*[[[start:exports,hash:0x4a0c18e2]]]*/
+/*[[[start:exports,hash:CRC-32=0x14cacea]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(hsearch, libc_hsearch);
 DEFINE_PUBLIC_WEAK_ALIAS(hcreate, libc_hcreate);
 DEFINE_PUBLIC_WEAK_ALIAS(hdestroy, libc_hdestroy);

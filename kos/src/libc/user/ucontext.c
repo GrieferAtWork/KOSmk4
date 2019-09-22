@@ -30,7 +30,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:getcontext,hash:0xeb22b66c]]]*/
+/*[[[head:getcontext,hash:CRC-32=0x1da89edf]]]*/
 /* Get user context and store it in variable pointed to by UCP */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.getcontext") int
@@ -43,7 +43,7 @@ NOTHROW_NCX(LIBCCALL libc_getcontext)(ucontext_t *__restrict ucp)
 }
 /*[[[end:getcontext]]]*/
 
-/*[[[head:setcontext,hash:0x284dfbf1]]]*/
+/*[[[head:setcontext,hash:CRC-32=0x73d881e5]]]*/
 /* Set user context from information of variable pointed to by UCP */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.setcontext") int
@@ -56,7 +56,7 @@ NOTHROW_NCX(LIBCCALL libc_setcontext)(ucontext_t const *__restrict ucp)
 }
 /*[[[end:setcontext]]]*/
 
-/*[[[head:swapcontext,hash:0xb6050c0e]]]*/
+/*[[[head:swapcontext,hash:CRC-32=0x2a139d3a]]]*/
 /* Save current context in context variable pointed to by OUCP and set
  * context from variable pointed to by UCP */
 INTERN NONNULL((1, 2))
@@ -71,7 +71,7 @@ NOTHROW_NCX(LIBCCALL libc_swapcontext)(ucontext_t *__restrict oucp,
 }
 /*[[[end:swapcontext]]]*/
 
-/*[[[head:makecontext,hash:0xb11eb742]]]*/
+/*[[[head:makecontext,hash:CRC-32=0x2691e488]]]*/
 /* Manipulate user context UCP to continue with calling functions FUNC
  * and the ARGC-1 parameters following ARGC when the context is used
  * the next time in `setcontext' or `swapcontext'.
@@ -94,7 +94,7 @@ NOTHROW_NCX(VLIBCCALL libc_makecontext)(ucontext_t *ucp,
 
 
 
-/*[[[start:exports,hash:0x718ac24]]]*/
+/*[[[start:exports,hash:CRC-32=0xee137fe2]]]*/
 #undef makecontext
 DEFINE_PUBLIC_WEAK_ALIAS(getcontext, libc_getcontext);
 DEFINE_PUBLIC_WEAK_ALIAS(setcontext, libc_setcontext);

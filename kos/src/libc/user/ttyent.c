@@ -30,7 +30,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:getttyent,hash:0x9e0d25a7]]]*/
+/*[[[head:getttyent,hash:CRC-32=0xacd058f]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.utmpx.getttyent") struct ttyent *
 NOTHROW_RPC_KOS(LIBCCALL libc_getttyent)(void)
 /*[[[body:getttyent]]]*/
@@ -41,7 +41,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getttyent)(void)
 }
 /*[[[end:getttyent]]]*/
 
-/*[[[head:getttynam,hash:0x6a154131]]]*/
+/*[[[head:getttynam,hash:CRC-32=0xf75ae736]]]*/
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.database.utmpx.getttynam") struct ttyent *
 NOTHROW_RPC_KOS(LIBCCALL libc_getttynam)(char const *tty)
@@ -53,7 +53,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getttynam)(char const *tty)
 }
 /*[[[end:getttynam]]]*/
 
-/*[[[head:setttyent,hash:0xbfcba41b]]]*/
+/*[[[head:setttyent,hash:CRC-32=0xd671f5ae]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.utmpx.setttyent") int
 NOTHROW_RPC_KOS(LIBCCALL libc_setttyent)(void)
 /*[[[body:setttyent]]]*/
@@ -64,7 +64,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_setttyent)(void)
 }
 /*[[[end:setttyent]]]*/
 
-/*[[[head:endttyent,hash:0x5b5b340]]]*/
+/*[[[head:endttyent,hash:CRC-32=0xa6a6312b]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.utmpx.endttyent") int
 NOTHROW_RPC_KOS(LIBCCALL libc_endttyent)(void)
 /*[[[body:endttyent]]]*/
@@ -79,7 +79,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_endttyent)(void)
 
 
 
-/*[[[start:exports,hash:0xb5d2067e]]]*/
+/*[[[start:exports,hash:CRC-32=0x6e8a6eb0]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(getttyent, libc_getttyent);
 DEFINE_PUBLIC_WEAK_ALIAS(getttynam, libc_getttynam);
 DEFINE_PUBLIC_WEAK_ALIAS(setttyent, libc_setttyent);

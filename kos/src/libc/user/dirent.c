@@ -57,7 +57,7 @@ struct __dirstream {
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:opendir,hash:0x365e52f7]]]*/
+/*[[[head:opendir,hash:CRC-32=0x18bfb71c]]]*/
 /* Open and return a new directory stream for reading, referring to `name' */
 INTERN WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.dir.opendir") DIR *
@@ -77,7 +77,7 @@ err:
 }
 /*[[[end:opendir]]]*/
 
-/*[[[head:fopendirat,hash:0x44b49f4d]]]*/
+/*[[[head:fopendirat,hash:CRC-32=0xfc4ad71]]]*/
 /* Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
 INTERN WUNUSED NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.dir.fopendirat") DIR *
@@ -101,7 +101,7 @@ err:
 }
 /*[[[end:fopendirat]]]*/
 
-/*[[[head:opendirat,hash:0x27b79eec]]]*/
+/*[[[head:opendirat,hash:CRC-32=0xde3f20f5]]]*/
 /* Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
 INTERN WUNUSED NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.dir.opendirat") DIR *
@@ -115,7 +115,7 @@ NOTHROW_RPC(LIBCCALL libc_opendirat)(fd_t dirfd,
 }
 /*[[[end:opendirat]]]*/
 
-/*[[[head:closedir,hash:0x4213ef32]]]*/
+/*[[[head:closedir,hash:CRC-32=0xce4b29d0]]]*/
 /* Close a directory stream previously returned by `opendir(3)' and friends */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.dir.closedir") int
@@ -132,7 +132,7 @@ err_null:
 }
 /*[[[end:closedir]]]*/
 
-/*[[[head:readdir,hash:0xf0188e0b]]]*/
+/*[[[head:readdir,hash:CRC-32=0x60024c5a]]]*/
 /* Read and return the next pending directory entry of the given directory stream `DIRP'
  * @EXCEPT: Returns NULL for end-of-directory; throws an error if something else went wrong */
 INTERN NONNULL((1))
@@ -196,7 +196,7 @@ err_null:
 /*[[[impl:readdir64]]]*/
 DEFINE_INTERN_WEAK_ALIAS(libc_readdir64,libc_readdir);
 
-/*[[[head:rewinddir,hash:0xf4a37fd6]]]*/
+/*[[[head:rewinddir,hash:CRC-32=0xcdb2c099]]]*/
 /* Rewind the given directory stream in such a way that the next call
  * to `readdir(3)' will once again return the first directory entry */
 INTERN NONNULL((1))
@@ -215,7 +215,7 @@ NOTHROW_NCX(LIBCCALL libc_rewinddir)(DIR *__restrict dirp)
 }
 /*[[[end:rewinddir]]]*/
 
-/*[[[head:fdopendir,hash:0x7294ebf4]]]*/
+/*[[[head:fdopendir,hash:CRC-32=0x2e2ba4d3]]]*/
 /* Create a new directory stream by inheriting the given `FD' as stream handle */
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.dir.fdopendir") DIR *
@@ -231,7 +231,7 @@ done:
 }
 /*[[[end:fdopendir]]]*/
 
-/*[[[head:readdir_r,hash:0x4300c828]]]*/
+/*[[[head:readdir_r,hash:CRC-32=0x898461b5]]]*/
 /* Reentrant version of `readdir(3)' (Using this is not recommended in KOS) */
 INTERN NONNULL((1, 2, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.dir.readdir_r") int
@@ -246,7 +246,7 @@ NOTHROW_RPC(LIBCCALL libc_readdir_r)(DIR *__restrict dirp,
 }
 /*[[[end:readdir_r]]]*/
 
-/*[[[head:readdir64_r,hash:0xc96597f3]]]*/
+/*[[[head:readdir64_r,hash:CRC-32=0x6366cd63]]]*/
 /* NOTE: This ~reentrant~ version of readdir() is strongly discouraged from being used in KOS, as the
  *       kernel does not impose a limit on the length of a single directory entry name (s.a. 'kreaddir')
  * >> Instead, simply use `readdir()' / `readdir64()', which will automatically (re-)allocate an internal,
@@ -268,7 +268,7 @@ NOTHROW_RPC(LIBCCALL libc_readdir64_r)(DIR *__restrict dirp,
 #endif /* MAGIC:alias */
 /*[[[end:readdir64_r]]]*/
 
-/*[[[head:seekdir,hash:0xd0ec6d73]]]*/
+/*[[[head:seekdir,hash:CRC-32=0x31f23e16]]]*/
 /* Get the directory stream position */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.dir.seekdir") void
@@ -287,7 +287,7 @@ NOTHROW_NCX(LIBCCALL libc_seekdir)(DIR *__restrict dirp,
 }
 /*[[[end:seekdir]]]*/
 
-/*[[[head:telldir,hash:0x8391ec3f]]]*/
+/*[[[head:telldir,hash:CRC-32=0x17cc87aa]]]*/
 /* Get the directory stream position */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.dir.telldir") long int
@@ -308,7 +308,7 @@ err_null:
 }
 /*[[[end:telldir]]]*/
 
-/*[[[head:dirfd,hash:0x9eb44dbd]]]*/
+/*[[[head:dirfd,hash:CRC-32=0x540848d2]]]*/
 /* Return the underlying file descriptor of the given directory stream */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.dir.dirfd") fd_t
@@ -319,7 +319,7 @@ NOTHROW_NCX(LIBCCALL libc_dirfd)(DIR *__restrict dirp)
 }
 /*[[[end:dirfd]]]*/
 
-/*[[[head:scandir,hash:0x27a1bdf8]]]*/
+/*[[[head:scandir,hash:CRC-32=0xde1a0c61]]]*/
 /* Scan a directory `DIR' for all contained directory entries */
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.dir.scandir") int
@@ -335,7 +335,7 @@ NOTHROW_RPC(LIBCCALL libc_scandir)(char const *__restrict dir,
 }
 /*[[[end:scandir]]]*/
 
-/*[[[head:scandirat,hash:0xca4cf6]]]*/
+/*[[[head:scandirat,hash:CRC-32=0x287c1967]]]*/
 /* Scan a directory `DIRFD:DIR' for all contained directory entries */
 INTERN NONNULL((2, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.dir.scandirat") int
@@ -358,7 +358,7 @@ DEFINE_INTERN_WEAK_ALIAS(libc_scandir64, libc_scandir);
 DEFINE_INTERN_WEAK_ALIAS(libc_scandirat64, libc_scandirat);
 
 
-/*[[[head:getdirentries,hash:0x21066ce]]]*/
+/*[[[head:getdirentries,hash:CRC-32=0x2e0c7f33]]]*/
 /* Linux's underlying system call for reading the entries of a directory */
 INTERN NONNULL((2, 4))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.dir.getdirentries") ssize_t
@@ -380,7 +380,7 @@ err:
 }
 /*[[[end:getdirentries]]]*/
 
-/*[[[head:getdirentries64,hash:0xa47efe93]]]*/
+/*[[[head:getdirentries64,hash:CRC-32=0x80f05f96]]]*/
 /* 64-bit variant of `getdirentries()' */
 #if defined(_DIRENT_MATCHES_DIRENT64)
 DEFINE_INTERN_ALIAS(libc_getdirentries64, libc_getdirentries);
@@ -411,7 +411,7 @@ err:
 DEFINE_INTERN_WEAK_ALIAS(libc_kreaddirf64, libc_kreaddirf);
 DEFINE_INTERN_WEAK_ALIAS(libc_kreaddir64, libc_kreaddir);
 
-/*[[[head:kreaddirf,hash:0x13abe819]]]*/
+/*[[[head:kreaddirf,hash:CRC-32=0xe7bd10f]]]*/
 /* The KOS-specific system call for reading a single directory entry
  * from a file descriptor referring to an open directory stream.
  * @param: MODE: One of `READDIR_*' (See below)
@@ -435,7 +435,7 @@ NOTHROW_RPC(LIBCCALL libc_kreaddirf)(fd_t fd,
 }
 /*[[[end:kreaddirf]]]*/
 
-/*[[[head:kreaddir,hash:0x7a668441]]]*/
+/*[[[head:kreaddir,hash:CRC-32=0x3da31234]]]*/
 /* The KOS-specific system call for reading a single directory entry
  * from a file descriptor referring to an open directory stream.
  * @param: MODE: One of `READDIR_*' (See below)
@@ -462,7 +462,7 @@ NOTHROW_RPC(LIBCCALL libc_kreaddir)(fd_t fd,
 
 
 
-/*[[[start:exports,hash:0xbf221de]]]*/
+/*[[[start:exports,hash:CRC-32=0xc35b741c]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(opendir, libc_opendir);
 DEFINE_PUBLIC_WEAK_ALIAS(fopendirat, libc_fopendirat);
 DEFINE_PUBLIC_WEAK_ALIAS(opendirat, libc_opendirat);

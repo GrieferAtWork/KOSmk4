@@ -30,7 +30,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:crypt,hash:0x403e94cb]]]*/
+/*[[[head:crypt,hash:CRC-32=0xfbc2fdb5]]]*/
 /* Encrypt at most 8 characters from KEY using salt to perturb DES */
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.encrypt.crypt") char *
@@ -44,7 +44,7 @@ NOTHROW_NCX(LIBCCALL libc_crypt)(char const *key,
 }
 /*[[[end:crypt]]]*/
 
-/*[[[head:setkey,hash:0xba9eeda5]]]*/
+/*[[[head:setkey,hash:CRC-32=0x7bf52d68]]]*/
 /* Setup DES tables according KEY */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.encrypt.setkey") void
@@ -56,7 +56,7 @@ NOTHROW_NCX(LIBCCALL libc_setkey)(char const *key)
 }
 /*[[[end:setkey]]]*/
 
-/*[[[head:encrypt,hash:0x86b60ea3]]]*/
+/*[[[head:encrypt,hash:CRC-32=0x4ca25de7]]]*/
 /* Encrypt data in BLOCK in place if EDFLAG is zero; otherwise decrypt block in place */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.encrypt.encrypt") void
@@ -69,7 +69,7 @@ NOTHROW_NCX(LIBCCALL libc_encrypt)(char *glibc_block,
 }
 /*[[[end:encrypt]]]*/
 
-/*[[[head:crypt_r,hash:0x2046cee3]]]*/
+/*[[[head:crypt_r,hash:CRC-32=0x1e1f0b]]]*/
 /* Encrypt at most 8 characters from KEY using salt to perturb DES */
 INTERN NONNULL((1, 2, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.encrypt.crypt_r") char *
@@ -84,7 +84,7 @@ NOTHROW_NCX(LIBCCALL libc_crypt_r)(char const *key,
 }
 /*[[[end:crypt_r]]]*/
 
-/*[[[head:setkey_r,hash:0x32283e6b]]]*/
+/*[[[head:setkey_r,hash:CRC-32=0x84fb22b1]]]*/
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.encrypt.setkey_r") void
 NOTHROW_NCX(LIBCCALL libc_setkey_r)(char const *key,
@@ -96,7 +96,7 @@ NOTHROW_NCX(LIBCCALL libc_setkey_r)(char const *key,
 }
 /*[[[end:setkey_r]]]*/
 
-/*[[[head:encrypt_r,hash:0x6f278844]]]*/
+/*[[[head:encrypt_r,hash:CRC-32=0x5ac3c828]]]*/
 /* Encrypt data in BLOCK in place if EDFLAG is zero; otherwise decrypt block in place */
 INTERN NONNULL((1, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.encrypt.encrypt_r") void
@@ -114,7 +114,7 @@ NOTHROW_NCX(LIBCCALL libc_encrypt_r)(char *glibc_block,
 
 
 
-/*[[[start:exports,hash:0x673882fc]]]*/
+/*[[[start:exports,hash:CRC-32=0xd7ded9a8]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(setkey, libc_setkey);
 DEFINE_PUBLIC_WEAK_ALIAS(crypt, libc_crypt);
 DEFINE_PUBLIC_WEAK_ALIAS(encrypt, libc_encrypt);

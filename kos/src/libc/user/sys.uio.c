@@ -30,7 +30,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:process_vm_readv,hash:0xe170d80c]]]*/
+/*[[[head:process_vm_readv,hash:CRC-32=0xd51fcc4]]]*/
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.process_vm_readv") ssize_t
 NOTHROW_RPC(LIBCCALL libc_process_vm_readv)(pid_t pid,
@@ -47,7 +47,7 @@ NOTHROW_RPC(LIBCCALL libc_process_vm_readv)(pid_t pid,
 }
 /*[[[end:process_vm_readv]]]*/
 
-/*[[[head:process_vm_writev,hash:0x1d431a4e]]]*/
+/*[[[head:process_vm_writev,hash:CRC-32=0x89f6b70c]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.process_vm_writev") ssize_t
 NOTHROW_RPC(LIBCCALL libc_process_vm_writev)(pid_t pid,
                                              struct iovec const *local_iov,
@@ -63,7 +63,7 @@ NOTHROW_RPC(LIBCCALL libc_process_vm_writev)(pid_t pid,
 }
 /*[[[end:process_vm_writev]]]*/
 
-/*[[[head:readv,hash:0x2076f3a4]]]*/
+/*[[[head:readv,hash:CRC-32=0x47681edd]]]*/
 INTERN WUNUSED NONNULL((2)) NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.readv") ssize_t
 NOTHROW_RPC(LIBCCALL libc_readv)(fd_t fd,
@@ -77,7 +77,7 @@ NOTHROW_RPC(LIBCCALL libc_readv)(fd_t fd,
 }
 /*[[[end:readv]]]*/
 
-/*[[[head:writev,hash:0x99dda1a4]]]*/
+/*[[[head:writev,hash:CRC-32=0x42b657ab]]]*/
 INTERN NONNULL((2)) NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.writev") ssize_t
 NOTHROW_RPC(LIBCCALL libc_writev)(fd_t fd,
@@ -91,7 +91,7 @@ NOTHROW_RPC(LIBCCALL libc_writev)(fd_t fd,
 }
 /*[[[end:writev]]]*/
 
-/*[[[head:preadv,hash:0x180b8daa]]]*/
+/*[[[head:preadv,hash:CRC-32=0xab3c71dc]]]*/
 INTERN WUNUSED NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.preadv") ssize_t
 NOTHROW_RPC(LIBCCALL libc_preadv)(fd_t fd,
@@ -106,7 +106,7 @@ NOTHROW_RPC(LIBCCALL libc_preadv)(fd_t fd,
 }
 /*[[[end:preadv]]]*/
 
-/*[[[head:pwritev,hash:0xc99a237e]]]*/
+/*[[[head:pwritev,hash:CRC-32=0xcd111123]]]*/
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.pwritev") ssize_t
 NOTHROW_RPC(LIBCCALL libc_pwritev)(fd_t fd,
@@ -121,7 +121,7 @@ NOTHROW_RPC(LIBCCALL libc_pwritev)(fd_t fd,
 }
 /*[[[end:pwritev]]]*/
 
-/*[[[head:preadv64,hash:0x2c1fed27]]]*/
+/*[[[head:preadv64,hash:CRC-32=0x4329cfea]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_preadv64, libc_preadv);
 #else
@@ -140,7 +140,7 @@ NOTHROW_RPC(LIBCCALL libc_preadv64)(fd_t fd,
 #endif /* MAGIC:alias */
 /*[[[end:preadv64]]]*/
 
-/*[[[head:pwritev64,hash:0x9bb9b49f]]]*/
+/*[[[head:pwritev64,hash:CRC-32=0x3b0cd27b]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_pwritev64, libc_pwritev);
 #else
@@ -163,7 +163,7 @@ NOTHROW_RPC(LIBCCALL libc_pwritev64)(fd_t fd,
 
 
 
-/*[[[start:exports,hash:0x2fab4fe6]]]*/
+/*[[[start:exports,hash:CRC-32=0x3af7381a]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(process_vm_readv, libc_process_vm_readv);
 DEFINE_PUBLIC_WEAK_ALIAS(process_vm_writev, libc_process_vm_writev);
 DEFINE_PUBLIC_WEAK_ALIAS(readv, libc_readv);

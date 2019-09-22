@@ -32,7 +32,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:uname,hash:0xd8be4906]]]*/
+/*[[[head:uname,hash:CRC-32=0x839c748c]]]*/
 /* Put information about the system in NAME */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.uname") int
@@ -49,7 +49,7 @@ NOTHROW_NCX(LIBCCALL libc_uname)(struct utsname *name)
 
 
 
-/*[[[start:exports,hash:0x43b271f1]]]*/
+/*[[[start:exports,hash:CRC-32=0xccbd8562]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(uname, libc_uname);
 /*[[[end:exports]]]*/
 

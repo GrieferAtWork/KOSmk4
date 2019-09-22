@@ -30,7 +30,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:bindresvport,hash:0x8054e0c2]]]*/
+/*[[[head:bindresvport,hash:CRC-32=0xfab11b09]]]*/
 /* Bind socket to a privileged IP port */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.bind_reserved.bindresvport") int
 NOTHROW_RPC(LIBCCALL libc_bindresvport)(fd_t sockfd,
@@ -43,7 +43,7 @@ NOTHROW_RPC(LIBCCALL libc_bindresvport)(fd_t sockfd,
 }
 /*[[[end:bindresvport]]]*/
 
-/*[[[head:bindresvport6,hash:0x8c0b5d4a]]]*/
+/*[[[head:bindresvport6,hash:CRC-32=0xb3f3c897]]]*/
 /* The IPv6 version of this function */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.bind_reserved.bindresvport6") int
 NOTHROW_RPC(LIBCCALL libc_bindresvport6)(fd_t sockfd,
@@ -56,7 +56,7 @@ NOTHROW_RPC(LIBCCALL libc_bindresvport6)(fd_t sockfd,
 }
 /*[[[end:bindresvport6]]]*/
 
-/*[[[head:inet6_option_space,hash:0xb746b19]]]*/
+/*[[[head:inet6_option_space,hash:CRC-32=0x9c9db436]]]*/
 /* Obsolete hop-by-hop and Destination Options Processing (RFC 2292) */
 INTERN ATTR_DEPRECATED_
 ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.RFC_2292.inet6_option_space") int
@@ -69,7 +69,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_option_space)(int nbytes)
 }
 /*[[[end:inet6_option_space]]]*/
 
-/*[[[head:inet6_option_init,hash:0xdc925c24]]]*/
+/*[[[head:inet6_option_init,hash:CRC-32=0x8fc5380d]]]*/
 /* Obsolete hop-by-hop and Destination Options Processing (RFC 2292) */
 INTERN ATTR_DEPRECATED_
 ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.RFC_2292.inet6_option_init") int
@@ -84,7 +84,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_option_init)(void *bp,
 }
 /*[[[end:inet6_option_init]]]*/
 
-/*[[[head:inet6_option_append,hash:0xfa2818d]]]*/
+/*[[[head:inet6_option_append,hash:CRC-32=0x11458101]]]*/
 /* Obsolete hop-by-hop and Destination Options Processing (RFC 2292) */
 INTERN ATTR_DEPRECATED_
 ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.RFC_2292.inet6_option_append") int
@@ -100,7 +100,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_option_append)(struct cmsghdr *cmsg,
 }
 /*[[[end:inet6_option_append]]]*/
 
-/*[[[head:inet6_option_alloc,hash:0x62d87fe2]]]*/
+/*[[[head:inet6_option_alloc,hash:CRC-32=0xf5e405e2]]]*/
 /* Obsolete hop-by-hop and Destination Options Processing (RFC 2292) */
 INTERN ATTR_DEPRECATED_
 ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.RFC_2292.inet6_option_alloc") uint8_t *
@@ -116,7 +116,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_option_alloc)(struct cmsghdr *cmsg,
 }
 /*[[[end:inet6_option_alloc]]]*/
 
-/*[[[head:inet6_option_next,hash:0x177e198a]]]*/
+/*[[[head:inet6_option_next,hash:CRC-32=0x324c15fd]]]*/
 /* Obsolete hop-by-hop and Destination Options Processing (RFC 2292) */
 INTERN ATTR_DEPRECATED_
 ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.RFC_2292.inet6_option_next") int
@@ -130,7 +130,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_option_next)(struct cmsghdr const *cmsg,
 }
 /*[[[end:inet6_option_next]]]*/
 
-/*[[[head:inet6_option_find,hash:0xc0798c88]]]*/
+/*[[[head:inet6_option_find,hash:CRC-32=0x7894c466]]]*/
 /* Obsolete hop-by-hop and Destination Options Processing (RFC 2292) */
 INTERN ATTR_DEPRECATED_
 ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.RFC_2292.inet6_option_find") int
@@ -145,7 +145,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_option_find)(struct cmsghdr const *cmsg,
 }
 /*[[[end:inet6_option_find]]]*/
 
-/*[[[head:inet6_opt_init,hash:0x3074535c]]]*/
+/*[[[head:inet6_opt_init,hash:CRC-32=0x275263c0]]]*/
 /* Hop-by-Hop and Destination Options Processing (RFC 3542) */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.RFC_3542.inet6_opt_init") int
 NOTHROW_RPC_KOS(LIBCCALL libc_inet6_opt_init)(void *extbuf,
@@ -158,7 +158,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_opt_init)(void *extbuf,
 }
 /*[[[end:inet6_opt_init]]]*/
 
-/*[[[head:inet6_opt_append,hash:0xb2ecf60e]]]*/
+/*[[[head:inet6_opt_append,hash:CRC-32=0x2410fcb2]]]*/
 /* Hop-by-Hop and Destination Options Processing (RFC 3542) */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.RFC_3542.inet6_opt_append") int
 NOTHROW_RPC_KOS(LIBCCALL libc_inet6_opt_append)(void *extbuf,
@@ -176,7 +176,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_opt_append)(void *extbuf,
 }
 /*[[[end:inet6_opt_append]]]*/
 
-/*[[[head:inet6_opt_finish,hash:0x6d579ac]]]*/
+/*[[[head:inet6_opt_finish,hash:CRC-32=0x6fd0c98b]]]*/
 /* Hop-by-Hop and Destination Options Processing (RFC 3542) */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.RFC_3542.inet6_opt_finish") int
 NOTHROW_RPC_KOS(LIBCCALL libc_inet6_opt_finish)(void *extbuf,
@@ -190,7 +190,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_opt_finish)(void *extbuf,
 }
 /*[[[end:inet6_opt_finish]]]*/
 
-/*[[[head:inet6_opt_set_val,hash:0x97359e4a]]]*/
+/*[[[head:inet6_opt_set_val,hash:CRC-32=0xc538d4a4]]]*/
 /* Hop-by-Hop and Destination Options Processing (RFC 3542) */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.RFC_3542.inet6_opt_set_val") int
 NOTHROW_RPC_KOS(LIBCCALL libc_inet6_opt_set_val)(void *databuf,
@@ -205,7 +205,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_opt_set_val)(void *databuf,
 }
 /*[[[end:inet6_opt_set_val]]]*/
 
-/*[[[head:inet6_opt_next,hash:0xff297f64]]]*/
+/*[[[head:inet6_opt_next,hash:CRC-32=0xac69f704]]]*/
 /* Hop-by-Hop and Destination Options Processing (RFC 3542) */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.RFC_3542.inet6_opt_next") int
 NOTHROW_RPC_KOS(LIBCCALL libc_inet6_opt_next)(void *extbuf,
@@ -222,7 +222,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_opt_next)(void *extbuf,
 }
 /*[[[end:inet6_opt_next]]]*/
 
-/*[[[head:inet6_opt_find,hash:0xa67b8106]]]*/
+/*[[[head:inet6_opt_find,hash:CRC-32=0xd1308eb0]]]*/
 /* Hop-by-Hop and Destination Options Processing (RFC 3542) */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.RFC_3542.inet6_opt_find") int
 NOTHROW_RPC_KOS(LIBCCALL libc_inet6_opt_find)(void *extbuf,
@@ -239,7 +239,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_opt_find)(void *extbuf,
 }
 /*[[[end:inet6_opt_find]]]*/
 
-/*[[[head:inet6_opt_get_val,hash:0x4b5edd8e]]]*/
+/*[[[head:inet6_opt_get_val,hash:CRC-32=0x54598588]]]*/
 /* Hop-by-Hop and Destination Options Processing (RFC 3542) */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.RFC_3542.inet6_opt_get_val") int
 NOTHROW_RPC_KOS(LIBCCALL libc_inet6_opt_get_val)(void *databuf,
@@ -254,7 +254,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_opt_get_val)(void *databuf,
 }
 /*[[[end:inet6_opt_get_val]]]*/
 
-/*[[[head:inet6_rth_space,hash:0x7ac4a01d]]]*/
+/*[[[head:inet6_rth_space,hash:CRC-32=0xd9a39ba3]]]*/
 /* Routing Header Option (RFC 3542) */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.RFC_3542.inet6_rth_space") socklen_t
 NOTHROW_RPC_KOS(LIBCCALL libc_inet6_rth_space)(int type,
@@ -267,7 +267,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_rth_space)(int type,
 }
 /*[[[end:inet6_rth_space]]]*/
 
-/*[[[head:inet6_rth_init,hash:0x29a9ccc3]]]*/
+/*[[[head:inet6_rth_init,hash:CRC-32=0x1afe122d]]]*/
 /* Routing Header Option (RFC 3542) */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.RFC_3542.inet6_rth_init") void *
 NOTHROW_RPC_KOS(LIBCCALL libc_inet6_rth_init)(void *bp,
@@ -282,7 +282,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_rth_init)(void *bp,
 }
 /*[[[end:inet6_rth_init]]]*/
 
-/*[[[head:inet6_rth_add,hash:0x8f9c890b]]]*/
+/*[[[head:inet6_rth_add,hash:CRC-32=0xab75a3c7]]]*/
 /* Routing Header Option (RFC 3542) */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.RFC_3542.inet6_rth_add") int
 NOTHROW_RPC_KOS(LIBCCALL libc_inet6_rth_add)(void *bp,
@@ -295,7 +295,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_rth_add)(void *bp,
 }
 /*[[[end:inet6_rth_add]]]*/
 
-/*[[[head:inet6_rth_reverse,hash:0x26251655]]]*/
+/*[[[head:inet6_rth_reverse,hash:CRC-32=0x206f1701]]]*/
 /* Routing Header Option (RFC 3542) */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.RFC_3542.inet6_rth_reverse") int
 NOTHROW_RPC_KOS(LIBCCALL libc_inet6_rth_reverse)(void const *in,
@@ -308,7 +308,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_rth_reverse)(void const *in,
 }
 /*[[[end:inet6_rth_reverse]]]*/
 
-/*[[[head:inet6_rth_segments,hash:0x300055f3]]]*/
+/*[[[head:inet6_rth_segments,hash:CRC-32=0x6d19fb8f]]]*/
 /* Routing Header Option (RFC 3542) */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.RFC_3542.inet6_rth_segments") int
 NOTHROW_RPC_KOS(LIBCCALL libc_inet6_rth_segments)(void const *bp)
@@ -320,7 +320,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_rth_segments)(void const *bp)
 }
 /*[[[end:inet6_rth_segments]]]*/
 
-/*[[[head:inet6_rth_getaddr,hash:0x1872fe22]]]*/
+/*[[[head:inet6_rth_getaddr,hash:CRC-32=0x141d119b]]]*/
 /* Routing Header Option (RFC 3542) */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.RFC_3542.inet6_rth_getaddr") struct in6_addr *
 NOTHROW_RPC_KOS(LIBCCALL libc_inet6_rth_getaddr)(void const *bp,
@@ -333,7 +333,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_inet6_rth_getaddr)(void const *bp,
 }
 /*[[[end:inet6_rth_getaddr]]]*/
 
-/*[[[head:getipv4sourcefilter,hash:0x28c745c2]]]*/
+/*[[[head:getipv4sourcefilter,hash:CRC-32=0x393a6d7f]]]*/
 /* Get IPv4 source filter */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.ipv4_source_filter.getipv4sourcefilter") int
 NOTHROW_RPC_KOS(LIBCCALL libc_getipv4sourcefilter)(fd_t sockfd,
@@ -350,7 +350,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getipv4sourcefilter)(fd_t sockfd,
 }
 /*[[[end:getipv4sourcefilter]]]*/
 
-/*[[[head:setipv4sourcefilter,hash:0xb5b5b6bf]]]*/
+/*[[[head:setipv4sourcefilter,hash:CRC-32=0xe5be540f]]]*/
 /* Set IPv4 source filter */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.ipv4_source_filter.setipv4sourcefilter") int
 NOTHROW_RPC_KOS(LIBCCALL libc_setipv4sourcefilter)(fd_t sockfd,
@@ -367,7 +367,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_setipv4sourcefilter)(fd_t sockfd,
 }
 /*[[[end:setipv4sourcefilter]]]*/
 
-/*[[[head:getsourcefilter,hash:0x2e8d9757]]]*/
+/*[[[head:getsourcefilter,hash:CRC-32=0xb61f7b9e]]]*/
 /* Get source filter */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.source_filter.getsourcefilter") int
 NOTHROW_RPC_KOS(LIBCCALL libc_getsourcefilter)(fd_t sockfd,
@@ -385,7 +385,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getsourcefilter)(fd_t sockfd,
 }
 /*[[[end:getsourcefilter]]]*/
 
-/*[[[head:setsourcefilter,hash:0xc666715f]]]*/
+/*[[[head:setsourcefilter,hash:CRC-32=0x99e3babc]]]*/
 /* Set source filter */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.inet.6.source_filter.setsourcefilter") int
 NOTHROW_RPC_KOS(LIBCCALL libc_setsourcefilter)(fd_t sockfd,
@@ -407,7 +407,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_setsourcefilter)(fd_t sockfd,
 
 
 
-/*[[[start:exports,hash:0xbaffd976]]]*/
+/*[[[start:exports,hash:CRC-32=0xe3ae14f4]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(bindresvport, libc_bindresvport);
 DEFINE_PUBLIC_WEAK_ALIAS(bindresvport6, libc_bindresvport6);
 DEFINE_PUBLIC_WEAK_ALIAS(inet6_option_space, libc_inet6_option_space);

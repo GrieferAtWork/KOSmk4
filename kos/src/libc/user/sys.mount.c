@@ -32,7 +32,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:mount,hash:0x358c883d]]]*/
+/*[[[head:mount,hash:CRC-32=0x7bf6e968]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.fs.mount.mount") int
 NOTHROW_RPC(LIBCCALL libc_mount)(char const *special_file,
                                  char const *dir,
@@ -51,7 +51,7 @@ NOTHROW_RPC(LIBCCALL libc_mount)(char const *special_file,
 }
 /*[[[end:mount]]]*/
 
-/*[[[head:umount,hash:0xb4aa087a]]]*/
+/*[[[head:umount,hash:CRC-32=0x96d2a7ad]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.fs.mount.umount") int
 NOTHROW_RPC(LIBCCALL libc_umount)(char const *special_file)
 /*[[[body:umount]]]*/
@@ -66,7 +66,7 @@ NOTHROW_RPC(LIBCCALL libc_umount)(char const *special_file)
 }
 /*[[[end:umount]]]*/
 
-/*[[[head:umount2,hash:0x49c6d6aa]]]*/
+/*[[[head:umount2,hash:CRC-32=0x9b341e02]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.fs.mount.umount2") int
 NOTHROW_RPC(LIBCCALL libc_umount2)(char const *special_file,
                                    int flags)
@@ -83,7 +83,7 @@ NOTHROW_RPC(LIBCCALL libc_umount2)(char const *special_file,
 
 
 
-/*[[[start:exports,hash:0x32b69eb8]]]*/
+/*[[[start:exports,hash:CRC-32=0xd52505d0]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(mount, libc_mount);
 DEFINE_PUBLIC_WEAK_ALIAS(umount, libc_umount);
 DEFINE_PUBLIC_WEAK_ALIAS(umount2, libc_umount2);

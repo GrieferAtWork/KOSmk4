@@ -32,7 +32,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:delay,hash:0xa7ad6627]]]*/
+/*[[[head:delay,hash:CRC-32=0x34b5ea90]]]*/
 /* Sleep for `mill' milliseconds (1/1.000 seconds) */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.system.delay") void
 NOTHROW_RPC(LIBCCALL libc_delay)(unsigned int mill)
@@ -46,7 +46,7 @@ NOTHROW_RPC(LIBCCALL libc_delay)(unsigned int mill)
 
 
 
-/*[[[start:exports,hash:0xaa7cd6eb]]]*/
+/*[[[start:exports,hash:CRC-32=0x2b32ee8e]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(delay, libc_delay);
 DEFINE_PUBLIC_WEAK_ALIAS(__crtSleep, libc_delay);
 /*[[[end:exports]]]*/

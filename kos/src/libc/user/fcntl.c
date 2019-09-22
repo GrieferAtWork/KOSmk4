@@ -110,7 +110,7 @@ NOTHROW_RPC(LIBDCALL libd_creat)(char const *filename, mode_t mode){
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:open,hash:0xfbb0b5f]]]*/
+/*[[[head:open,hash:CRC-32=0x69fdf65]]]*/
 INTERN WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.io.access.open") fd_t
 NOTHROW_RPC(VLIBCCALL libc_open)(char const *filename,
@@ -136,7 +136,7 @@ NOTHROW_RPC(VLIBCCALL libc_open)(char const *filename,
 }
 /*[[[end:open]]]*/
 
-/*[[[head:creat,hash:0xfd9ac150]]]*/
+/*[[[head:creat,hash:CRC-32=0xdd508186]]]*/
 INTERN WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.io.access.creat") fd_t
 NOTHROW_RPC(LIBCCALL libc_creat)(char const *filename,
@@ -155,7 +155,7 @@ NOTHROW_RPC(LIBCCALL libc_creat)(char const *filename,
 }
 /*[[[end:creat]]]*/
 
-/*[[[head:openat,hash:0x1a90cba1]]]*/
+/*[[[head:openat,hash:CRC-32=0x20c8655a]]]*/
 INTERN WUNUSED NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.io.access.openat") fd_t
 NOTHROW_RPC(VLIBCCALL libc_openat)(fd_t dirfd,
@@ -186,7 +186,7 @@ DEFINE_INTERN_ALIAS(libc_openat64, libc_openat);
 
 
 
-/*[[[head:readahead,hash:0xc3bcb646]]]*/
+/*[[[head:readahead,hash:CRC-32=0xba1d1a23]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.utility.readahead") ssize_t
 NOTHROW_NCX(LIBCCALL libc_readahead)(fd_t fd,
                                      off64_t offset,
@@ -199,7 +199,7 @@ NOTHROW_NCX(LIBCCALL libc_readahead)(fd_t fd,
 }
 /*[[[end:readahead]]]*/
 
-/*[[[head:sync_file_range,hash:0xb7e29384]]]*/
+/*[[[head:sync_file_range,hash:CRC-32=0xb014ff45]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.utility.sync_file_range") int
 NOTHROW_NCX(LIBCCALL libc_sync_file_range)(fd_t fd,
                                            off64_t offset,
@@ -216,7 +216,7 @@ NOTHROW_NCX(LIBCCALL libc_sync_file_range)(fd_t fd,
 }
 /*[[[end:sync_file_range]]]*/
 
-/*[[[head:vmsplice,hash:0x8c889bb7]]]*/
+/*[[[head:vmsplice,hash:CRC-32=0xf20a9e2d]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.utility.vmsplice") ssize_t
 NOTHROW_RPC(LIBCCALL libc_vmsplice)(fd_t fdout,
                                     struct iovec const *iov,
@@ -230,7 +230,7 @@ NOTHROW_RPC(LIBCCALL libc_vmsplice)(fd_t fdout,
 }
 /*[[[end:vmsplice]]]*/
 
-/*[[[head:splice,hash:0x661891aa]]]*/
+/*[[[head:splice,hash:CRC-32=0xdf557f2c]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.utility.splice") ssize_t
 NOTHROW_RPC(LIBCCALL libc_splice)(fd_t fdin,
                                   off64_t *offin,
@@ -251,7 +251,7 @@ NOTHROW_RPC(LIBCCALL libc_splice)(fd_t fdin,
 }
 /*[[[end:splice]]]*/
 
-/*[[[head:tee,hash:0x70285f0e]]]*/
+/*[[[head:tee,hash:CRC-32=0x699285c7]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.utility.tee") ssize_t
 NOTHROW_RPC(LIBCCALL libc_tee)(fd_t fdin,
                                fd_t fdout,
@@ -268,7 +268,7 @@ NOTHROW_RPC(LIBCCALL libc_tee)(fd_t fdin,
 }
 /*[[[end:tee]]]*/
 
-/*[[[head:name_to_handle_at,hash:0xc7fc791c]]]*/
+/*[[[head:name_to_handle_at,hash:CRC-32=0x6bd5026c]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.utility.name_to_handle_at") int
 NOTHROW_RPC(LIBCCALL libc_name_to_handle_at)(fd_t dirfd,
                                              char const *name,
@@ -287,7 +287,7 @@ NOTHROW_RPC(LIBCCALL libc_name_to_handle_at)(fd_t dirfd,
 }
 /*[[[end:name_to_handle_at]]]*/
 
-/*[[[head:open_by_handle_at,hash:0x14311b26]]]*/
+/*[[[head:open_by_handle_at,hash:CRC-32=0x18f05b75]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.utility.open_by_handle_at") fd_t
 NOTHROW_RPC(LIBCCALL libc_open_by_handle_at)(fd_t mountdirfd,
                                              struct file_handle *handle,
@@ -302,7 +302,7 @@ NOTHROW_RPC(LIBCCALL libc_open_by_handle_at)(fd_t mountdirfd,
 }
 /*[[[end:open_by_handle_at]]]*/
 
-/*[[[head:fallocate,hash:0x3da26c46]]]*/
+/*[[[head:fallocate,hash:CRC-32=0x478a8504]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.utility.fallocate") int
 NOTHROW_NCX(LIBCCALL libc_fallocate)(fd_t fd,
                                      int mode,
@@ -319,7 +319,7 @@ NOTHROW_NCX(LIBCCALL libc_fallocate)(fd_t fd,
 }
 /*[[[end:fallocate]]]*/
 
-/*[[[head:fallocate64,hash:0x86137b9d]]]*/
+/*[[[head:fallocate64,hash:CRC-32=0xf5e9b2fa]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_fallocate64, libc_fallocate);
 #else
@@ -340,7 +340,7 @@ NOTHROW_NCX(LIBCCALL libc_fallocate64)(fd_t fd,
 #endif /* MAGIC:alias */
 /*[[[end:fallocate64]]]*/
 
-/*[[[head:fcntl,hash:0x6dc1c473]]]*/
+/*[[[head:fcntl,hash:CRC-32=0x61f22bad]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.utility.fcntl") __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBCCALL libc_fcntl)(fd_t fd,
                                   int cmd,
@@ -358,7 +358,7 @@ NOTHROW_NCX(VLIBCCALL libc_fcntl)(fd_t fd,
 }
 /*[[[end:fcntl]]]*/
 
-/*[[[head:posix_fadvise,hash:0x567c505d]]]*/
+/*[[[head:posix_fadvise,hash:CRC-32=0x51e305a7]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.utility.posix_fadvise") int
 NOTHROW_NCX(LIBCCALL libc_posix_fadvise)(fd_t fd,
                                          off_t offset,
@@ -373,7 +373,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_fadvise)(fd_t fd,
 }
 /*[[[end:posix_fadvise]]]*/
 
-/*[[[head:posix_fallocate,hash:0x776973f]]]*/
+/*[[[head:posix_fallocate,hash:CRC-32=0x573a3e72]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.utility.posix_fallocate") int
 NOTHROW_NCX(LIBCCALL libc_posix_fallocate)(fd_t fd,
                                            off_t offset,
@@ -386,7 +386,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_fallocate)(fd_t fd,
 }
 /*[[[end:posix_fallocate]]]*/
 
-/*[[[head:posix_fadvise64,hash:0x5b402b83]]]*/
+/*[[[head:posix_fadvise64,hash:CRC-32=0xd1c595ac]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_posix_fadvise64, libc_posix_fadvise);
 #else
@@ -404,7 +404,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_fadvise64)(fd_t fd,
 #endif /* MAGIC:alias */
 /*[[[end:posix_fadvise64]]]*/
 
-/*[[[head:posix_fallocate64,hash:0x731e348b]]]*/
+/*[[[head:posix_fallocate64,hash:CRC-32=0x3be409cc]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_posix_fallocate64, libc_posix_fallocate);
 #else
@@ -421,7 +421,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_fallocate64)(fd_t fd,
 #endif /* MAGIC:alias */
 /*[[[end:posix_fallocate64]]]*/
 
-/*[[[head:lockf,hash:0x7c706119]]]*/
+/*[[[head:lockf,hash:CRC-32=0x87e62c28]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.lock.lockf") int
 NOTHROW_RPC(LIBCCALL libc_lockf)(fd_t fd,
                                  int cmd,
@@ -432,7 +432,7 @@ NOTHROW_RPC(LIBCCALL libc_lockf)(fd_t fd,
 }
 /*[[[end:lockf]]]*/
 
-/*[[[head:lockf64,hash:0x853e501c]]]*/
+/*[[[head:lockf64,hash:CRC-32=0x323251ab]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_lockf64, libc_lockf);
 #else
@@ -453,7 +453,7 @@ NOTHROW_RPC(LIBCCALL libc_lockf64)(fd_t fd,
 
 
 
-/*[[[start:exports,hash:0x5b34fd17]]]*/
+/*[[[start:exports,hash:CRC-32=0xf1d35e13]]]*/
 #undef fcntl
 #undef open
 #undef _open

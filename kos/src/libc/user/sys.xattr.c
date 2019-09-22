@@ -31,7 +31,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:setxattr,hash:0x7d07f8ca]]]*/
+/*[[[head:setxattr,hash:CRC-32=0x8b94443b]]]*/
 /* Set the attribute NAME of the file pointed to by PATH to VALUE
  * (which is SIZE bytes long). Return 0 on success, -1 for errors
  * @param: flags: 0, or a one of `XATTR_*' */
@@ -50,7 +50,7 @@ NOTHROW_RPC(LIBCCALL libc_setxattr)(char const *path,
 }
 /*[[[end:setxattr]]]*/
 
-/*[[[head:lsetxattr,hash:0x77e35ad5]]]*/
+/*[[[head:lsetxattr,hash:CRC-32=0xbdfba82d]]]*/
 /* Set the attribute NAME of the file pointed to by PATH to VALUE (which is
  * SIZE bytes long), not following symlinks for the last pathname component.
  * Return 0 on success, -1 for errors
@@ -70,7 +70,7 @@ NOTHROW_RPC(LIBCCALL libc_lsetxattr)(char const *path,
 }
 /*[[[end:lsetxattr]]]*/
 
-/*[[[head:fsetxattr,hash:0xf796f6b8]]]*/
+/*[[[head:fsetxattr,hash:CRC-32=0x68b80750]]]*/
 /* Set the attribute NAME of the file descriptor FD to VALUE
  * (which is SIZE bytes long). Return 0 on success, -1 for errors
  * @param: flags: 0, or a one of `XATTR_*' */
@@ -89,7 +89,7 @@ NOTHROW_RPC(LIBCCALL libc_fsetxattr)(fd_t fd,
 }
 /*[[[end:fsetxattr]]]*/
 
-/*[[[head:getxattr,hash:0xd008a986]]]*/
+/*[[[head:getxattr,hash:CRC-32=0xe88dba55]]]*/
 /* Get the attribute NAME of the file pointed to by PATH to VALUE
  * (which is SIZE bytes long). Return 0 on success, -1 for errors */
 INTERN NONNULL((1, 2, 3))
@@ -106,7 +106,7 @@ NOTHROW_RPC(LIBCCALL libc_getxattr)(char const *path,
 }
 /*[[[end:getxattr]]]*/
 
-/*[[[head:lgetxattr,hash:0xbf417ba3]]]*/
+/*[[[head:lgetxattr,hash:CRC-32=0x385d911c]]]*/
 /* Get the attribute NAME of the file pointed to by PATH to VALUE (which is
  * SIZE bytes long), not following symlinks for the last pathname component.
  * Return 0 on success, -1 for errors */
@@ -124,7 +124,7 @@ NOTHROW_RPC(LIBCCALL libc_lgetxattr)(char const *path,
 }
 /*[[[end:lgetxattr]]]*/
 
-/*[[[head:fgetxattr,hash:0x8167180d]]]*/
+/*[[[head:fgetxattr,hash:CRC-32=0x207145d0]]]*/
 /* Get the attribute NAME of the file descriptor FD to VALUE
  * (which is SIZE bytes long). Return 0 on success, -1 for errors */
 INTERN NONNULL((2, 3))
@@ -141,7 +141,7 @@ NOTHROW_RPC(LIBCCALL libc_fgetxattr)(fd_t fd,
 }
 /*[[[end:fgetxattr]]]*/
 
-/*[[[head:listxattr,hash:0x9ecc74cd]]]*/
+/*[[[head:listxattr,hash:CRC-32=0xa8177bea]]]*/
 /* List attributes of the file pointed to by PATH into the
  * user-supplied buffer LIST (which is SIZE bytes big).
  * Return 0 on success, -1 for errors */
@@ -158,7 +158,7 @@ NOTHROW_RPC(LIBCCALL libc_listxattr)(char const *path,
 }
 /*[[[end:listxattr]]]*/
 
-/*[[[head:llistxattr,hash:0xf806365c]]]*/
+/*[[[head:llistxattr,hash:CRC-32=0x71dd9ce3]]]*/
 /* List attributes of the file pointed to by PATH into the user-supplied
  * buffer LIST (which is SIZE bytes big), not following symlinks for the
  * last pathname component. Return 0 on success, -1 for errors */
@@ -175,7 +175,7 @@ NOTHROW_RPC(LIBCCALL libc_llistxattr)(char const *path,
 }
 /*[[[end:llistxattr]]]*/
 
-/*[[[head:flistxattr,hash:0xcee2b00a]]]*/
+/*[[[head:flistxattr,hash:CRC-32=0x46e5eea1]]]*/
 /* List attributes of the file descriptor FD into the user-supplied buffer
  * LIST (which is SIZE bytes big). Return 0 on success, -1 for errors */
 INTERN NONNULL((2))
@@ -191,7 +191,7 @@ NOTHROW_RPC(LIBCCALL libc_flistxattr)(fd_t fd,
 }
 /*[[[end:flistxattr]]]*/
 
-/*[[[head:removexattr,hash:0xe2c1f20f]]]*/
+/*[[[head:removexattr,hash:CRC-32=0xa58bcabc]]]*/
 /* Remove the attribute NAME from the file pointed to by PATH.
  * Return 0 on success, -1 for errors */
 INTERN NONNULL((1, 2))
@@ -206,7 +206,7 @@ NOTHROW_RPC(LIBCCALL libc_removexattr)(char const *path,
 }
 /*[[[end:removexattr]]]*/
 
-/*[[[head:lremovexattr,hash:0x61407f52]]]*/
+/*[[[head:lremovexattr,hash:CRC-32=0xf1a2c7df]]]*/
 /* Remove the attribute NAME from the file pointed to by PATH, not
  * following symlinks for the last pathname component.
  * Return 0 on success, -1 for errors */
@@ -222,7 +222,7 @@ NOTHROW_RPC(LIBCCALL libc_lremovexattr)(char const *path,
 }
 /*[[[end:lremovexattr]]]*/
 
-/*[[[head:fremovexattr,hash:0xbcca7651]]]*/
+/*[[[head:fremovexattr,hash:CRC-32=0x8907691]]]*/
 /* Remove the attribute NAME from the file descriptor FD.
  * Return 0 on success, -1 for errors */
 INTERN NONNULL((2))
@@ -241,7 +241,7 @@ NOTHROW_RPC(LIBCCALL libc_fremovexattr)(fd_t fd,
 
 
 
-/*[[[start:exports,hash:0xd1b88ad5]]]*/
+/*[[[start:exports,hash:CRC-32=0x7249f2c7]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(setxattr, libc_setxattr);
 DEFINE_PUBLIC_WEAK_ALIAS(lsetxattr, libc_lsetxattr);
 DEFINE_PUBLIC_WEAK_ALIAS(fsetxattr, libc_fsetxattr);

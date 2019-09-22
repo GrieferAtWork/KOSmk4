@@ -39,7 +39,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:_access_s,hash:0xfbcbde4c]]]*/
+/*[[[head:_access_s,hash:CRC-32=0xa45154a8]]]*/
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.property._access_s") errno_t
 NOTHROW_RPC(LIBCCALL libc__access_s)(char const *filename,
@@ -53,7 +53,7 @@ NOTHROW_RPC(LIBCCALL libc__access_s)(char const *filename,
 }
 /*[[[end:_access_s]]]*/
 
-/*[[[head:_findclose,hash:0xd38348f2]]]*/
+/*[[[head:_findclose,hash:CRC-32=0x6ff1c05d]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted._findclose") int
 NOTHROW_NCX(LIBCCALL libc__findclose)(intptr_t findfd)
 /*[[[body:_findclose]]]*/
@@ -64,7 +64,7 @@ NOTHROW_NCX(LIBCCALL libc__findclose)(intptr_t findfd)
 }
 /*[[[end:_findclose]]]*/
 
-/*[[[head:_findfirst32,hash:0xa5f85bc5]]]*/
+/*[[[head:_findfirst32,hash:CRC-32=0x75e2a634]]]*/
 INTERN WUNUSED NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted._findfirst32") intptr_t
 NOTHROW_RPC(LIBCCALL libc__findfirst32)(char const *__restrict filename,
@@ -77,7 +77,7 @@ NOTHROW_RPC(LIBCCALL libc__findfirst32)(char const *__restrict filename,
 }
 /*[[[end:_findfirst32]]]*/
 
-/*[[[head:_findfirst32i64,hash:0x77a7a470]]]*/
+/*[[[head:_findfirst32i64,hash:CRC-32=0xff334ba1]]]*/
 INTERN WUNUSED NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted._findfirst32i64") intptr_t
 NOTHROW_RPC(LIBCCALL libc__findfirst32i64)(char const *__restrict filename,
@@ -90,7 +90,7 @@ NOTHROW_RPC(LIBCCALL libc__findfirst32i64)(char const *__restrict filename,
 }
 /*[[[end:_findfirst32i64]]]*/
 
-/*[[[head:_findnext32,hash:0xac05d74b]]]*/
+/*[[[head:_findnext32,hash:CRC-32=0xe91e0889]]]*/
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted._findnext32") int
 NOTHROW_RPC(LIBCCALL libc__findnext32)(intptr_t findfd,
@@ -103,7 +103,7 @@ NOTHROW_RPC(LIBCCALL libc__findnext32)(intptr_t findfd,
 }
 /*[[[end:_findnext32]]]*/
 
-/*[[[head:_findnext32i64,hash:0x2253d363]]]*/
+/*[[[head:_findnext32i64,hash:CRC-32=0xd60a4584]]]*/
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted._findnext32i64") int
 NOTHROW_RPC(LIBCCALL libc__findnext32i64)(intptr_t findfd,
@@ -116,7 +116,7 @@ NOTHROW_RPC(LIBCCALL libc__findnext32i64)(intptr_t findfd,
 }
 /*[[[end:_findnext32i64]]]*/
 
-/*[[[head:_findfirst64i32,hash:0xba5ecf82]]]*/
+/*[[[head:_findfirst64i32,hash:CRC-32=0x9e9b42dd]]]*/
 INTERN WUNUSED NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted._findfirst64i32") intptr_t
 NOTHROW_RPC(LIBCCALL libc__findfirst64i32)(char const *__restrict filename,
@@ -129,7 +129,7 @@ NOTHROW_RPC(LIBCCALL libc__findfirst64i32)(char const *__restrict filename,
 }
 /*[[[end:_findfirst64i32]]]*/
 
-/*[[[head:_findnext64,hash:0xd926b914]]]*/
+/*[[[head:_findnext64,hash:CRC-32=0x43dd2bae]]]*/
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted._findnext64") int
 NOTHROW_RPC(LIBCCALL libc__findnext64)(intptr_t findfd,
@@ -142,7 +142,7 @@ NOTHROW_RPC(LIBCCALL libc__findnext64)(intptr_t findfd,
 }
 /*[[[end:_findnext64]]]*/
 
-/*[[[head:_sopen_s,hash:0xf9ac6e77]]]*/
+/*[[[head:_sopen_s,hash:CRC-32=0x840ebcbd]]]*/
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted._sopen_s") errno_t
 NOTHROW_RPC(LIBCCALL libc__sopen_s)(fd_t *fd,
@@ -166,7 +166,7 @@ NOTHROW_RPC(LIBCCALL libc__sopen_s)(fd_t *fd,
 }
 /*[[[end:_sopen_s]]]*/
 
-/*[[[head:_mktemp_s,hash:0xa665eb2e]]]*/
+/*[[[head:_mktemp_s,hash:CRC-32=0x7367b64e]]]*/
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted._mktemp_s") errno_t
 NOTHROW_NCX(LIBCCALL libc__mktemp_s)(char *template_,
@@ -179,7 +179,7 @@ NOTHROW_NCX(LIBCCALL libc__mktemp_s)(char *template_,
 }
 /*[[[end:_mktemp_s]]]*/
 
-/*[[[head:_pipe,hash:0x6ae9032b]]]*/
+/*[[[head:_pipe,hash:CRC-32=0x6797ad3b]]]*/
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted._pipe") int
 NOTHROW_NCX(LIBCCALL libc__pipe)(fd_t pipedes[2],
@@ -193,7 +193,7 @@ NOTHROW_NCX(LIBCCALL libc__pipe)(fd_t pipedes[2],
 }
 /*[[[end:_pipe]]]*/
 
-/*[[[head:_filelengthi64,hash:0xf1071d0e]]]*/
+/*[[[head:_filelengthi64,hash:CRC-32=0x73b5b47f]]]*/
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted._filelengthi64") int64_t
 NOTHROW_NCX(LIBCCALL libc__filelengthi64)(fd_t fd)
@@ -212,7 +212,7 @@ err:
 }
 /*[[[end:_filelengthi64]]]*/
 
-/*[[[head:_telli64,hash:0x3c9b2a3a]]]*/
+/*[[[head:_telli64,hash:CRC-32=0x30de0469]]]*/
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted._telli64") int64_t
 NOTHROW_NCX(LIBCCALL libc__telli64)(fd_t fd)
@@ -222,7 +222,7 @@ NOTHROW_NCX(LIBCCALL libc__telli64)(fd_t fd)
 }
 /*[[[end:_telli64]]]*/
 
-/*[[[head:umask_s,hash:0x7992dc31]]]*/
+/*[[[head:umask_s,hash:CRC-32=0x47378268]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.umask_s") errno_t
 NOTHROW_NCX(LIBCCALL libc_umask_s)(mode_t newmode,
                                    mode_t *oldmode)
@@ -239,7 +239,7 @@ NOTHROW_NCX(LIBCCALL libc_umask_s)(mode_t newmode,
 }
 /*[[[end:umask_s]]]*/
 
-/*[[[head:__lock_fhandle,hash:0x55be9173]]]*/
+/*[[[head:__lock_fhandle,hash:CRC-32=0x60cafd83]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.__lock_fhandle") int
 NOTHROW_RPC(LIBCCALL libc___lock_fhandle)(fd_t fd)
 /*[[[body:__lock_fhandle]]]*/
@@ -249,7 +249,7 @@ NOTHROW_RPC(LIBCCALL libc___lock_fhandle)(fd_t fd)
 }
 /*[[[end:__lock_fhandle]]]*/
 
-/*[[[head:_unlock_fhandle,hash:0xdb5d1733]]]*/
+/*[[[head:_unlock_fhandle,hash:CRC-32=0x193465]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted._unlock_fhandle") void
 NOTHROW_NCX(LIBCCALL libc__unlock_fhandle)(fd_t fd)
 /*[[[body:_unlock_fhandle]]]*/
@@ -258,7 +258,7 @@ NOTHROW_NCX(LIBCCALL libc__unlock_fhandle)(fd_t fd)
 }
 /*[[[end:_unlock_fhandle]]]*/
 
-/*[[[head:sopen,hash:0x92392a65]]]*/
+/*[[[head:sopen,hash:CRC-32=0xfbce2e5f]]]*/
 INTERN WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.sopen") fd_t
 NOTHROW_RPC(VLIBCCALL libc_sopen)(char const *filename,
@@ -279,7 +279,7 @@ NOTHROW_RPC(VLIBCCALL libc_sopen)(char const *filename,
 }
 /*[[[end:sopen]]]*/
 
-/*[[[head:filelength,hash:0xb7863541]]]*/
+/*[[[head:filelength,hash:CRC-32=0xcac6b817]]]*/
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.filelength") __LONG32_TYPE__
 NOTHROW_NCX(LIBCCALL libc_filelength)(fd_t fd)
@@ -298,7 +298,7 @@ err:
 }
 /*[[[end:filelength]]]*/
 
-/*[[[head:eof,hash:0xa81f62d1]]]*/
+/*[[[head:eof,hash:CRC-32=0x9371f1dd]]]*/
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.eof") int
 NOTHROW_NCX(LIBCCALL libc_eof)(fd_t fd)
@@ -318,7 +318,7 @@ NOTHROW_NCX(LIBCCALL libc_eof)(fd_t fd)
 }
 /*[[[end:eof]]]*/
 
-/*[[[head:tell,hash:0x9e4d48ac]]]*/
+/*[[[head:tell,hash:CRC-32=0x204b7140]]]*/
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.tell") __LONG32_TYPE__
 NOTHROW_NCX(LIBCCALL libc_tell)(fd_t fd)
@@ -328,7 +328,7 @@ NOTHROW_NCX(LIBCCALL libc_tell)(fd_t fd)
 }
 /*[[[end:tell]]]*/
 
-/*[[[head:setmode,hash:0x9efc2c58]]]*/
+/*[[[head:setmode,hash:CRC-32=0x65542c1d]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.setmode") oflag_t
 NOTHROW_NCX(LIBCCALL libc_setmode)(fd_t fd,
                                    oflag_t mode)
@@ -342,7 +342,7 @@ NOTHROW_NCX(LIBCCALL libc_setmode)(fd_t fd,
 
 
 
-/*[[[start:exports,hash:0x233405a0]]]*/
+/*[[[start:exports,hash:CRC-32=0xc0b8c3f2]]]*/
 #undef sopen
 #undef _sopen
 DEFINE_PUBLIC_WEAK_ALIAS(_access_s, libc__access_s);

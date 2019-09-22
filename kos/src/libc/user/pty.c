@@ -33,7 +33,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:openpty,hash:0x3c139ab1]]]*/
+/*[[[head:openpty,hash:CRC-32=0xa48d70d7]]]*/
 /* Create pseudo tty master slave pair with NAME and set terminal
  * attributes according to TERMP and WINP and return handles for
  * both ends in AMASTER and ASLAVE */
@@ -55,7 +55,7 @@ NOTHROW_NCX(LIBCCALL libc_openpty)(fd_t *amaster,
 }
 /*[[[end:openpty]]]*/
 
-/*[[[head:forkpty,hash:0x61db729c]]]*/
+/*[[[head:forkpty,hash:CRC-32=0x1448b4e5]]]*/
 /* Create child process and establish the slave pseudo
  * terminal as the child's controlling terminal */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.forkpty") pid_t
@@ -94,7 +94,7 @@ NOTHROW_NCX(LIBCCALL libc_forkpty)(fd_t *amaster,
 
 
 
-/*[[[start:exports,hash:0x3c33b340]]]*/
+/*[[[start:exports,hash:CRC-32=0x396159a5]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(openpty, libc_openpty);
 DEFINE_PUBLIC_WEAK_ALIAS(forkpty, libc_forkpty);
 /*[[[end:exports]]]*/

@@ -30,7 +30,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:setrpcent,hash:0xab02e582]]]*/
+/*[[[head:setrpcent,hash:CRC-32=0xc16be5d]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.rpc.setrpcent") void
 NOTHROW_RPC_KOS(LIBCCALL libc_setrpcent)(int stayopen)
 /*[[[body:setrpcent]]]*/
@@ -40,7 +40,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_setrpcent)(int stayopen)
 }
 /*[[[end:setrpcent]]]*/
 
-/*[[[head:endrpcent,hash:0xfb0674bd]]]*/
+/*[[[head:endrpcent,hash:CRC-32=0xd7e19706]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.rpc.endrpcent") void
 NOTHROW_NCX(LIBCCALL libc_endrpcent)(void)
 /*[[[body:endrpcent]]]*/
@@ -50,7 +50,7 @@ NOTHROW_NCX(LIBCCALL libc_endrpcent)(void)
 }
 /*[[[end:endrpcent]]]*/
 
-/*[[[head:getrpcbyname,hash:0x4581a157]]]*/
+/*[[[head:getrpcbyname,hash:CRC-32=0x68de33b6]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.rpc.getrpcbyname") struct rpcent *
 NOTHROW_RPC_KOS(LIBCCALL libc_getrpcbyname)(char const *name)
 /*[[[body:getrpcbyname]]]*/
@@ -61,7 +61,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getrpcbyname)(char const *name)
 }
 /*[[[end:getrpcbyname]]]*/
 
-/*[[[head:getrpcbynumber,hash:0x32a57e33]]]*/
+/*[[[head:getrpcbynumber,hash:CRC-32=0x90244390]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.rpc.getrpcbynumber") struct rpcent *
 NOTHROW_RPC_KOS(LIBCCALL libc_getrpcbynumber)(int number)
 /*[[[body:getrpcbynumber]]]*/
@@ -72,7 +72,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getrpcbynumber)(int number)
 }
 /*[[[end:getrpcbynumber]]]*/
 
-/*[[[head:getrpcent,hash:0x2a995cba]]]*/
+/*[[[head:getrpcent,hash:CRC-32=0xfa655f77]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.rpc.getrpcent") struct rpcent *
 NOTHROW_RPC_KOS(LIBCCALL libc_getrpcent)(void)
 /*[[[body:getrpcent]]]*/
@@ -83,7 +83,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getrpcent)(void)
 }
 /*[[[end:getrpcent]]]*/
 
-/*[[[head:getrpcbyname_r,hash:0xeb7e2784]]]*/
+/*[[[head:getrpcbyname_r,hash:CRC-32=0x9a4581fb]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.rpc.getrpcbyname_r") int
 NOTHROW_RPC_KOS(LIBCCALL libc_getrpcbyname_r)(char const *name,
                                               struct rpcent *result_buf,
@@ -98,7 +98,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getrpcbyname_r)(char const *name,
 }
 /*[[[end:getrpcbyname_r]]]*/
 
-/*[[[head:getrpcbynumber_r,hash:0xf2fdaa07]]]*/
+/*[[[head:getrpcbynumber_r,hash:CRC-32=0x76e02a22]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.rpc.getrpcbynumber_r") int
 NOTHROW_RPC_KOS(LIBCCALL libc_getrpcbynumber_r)(int number,
                                                 struct rpcent *result_buf,
@@ -113,7 +113,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getrpcbynumber_r)(int number,
 }
 /*[[[end:getrpcbynumber_r]]]*/
 
-/*[[[head:getrpcent_r,hash:0xd080ce5e]]]*/
+/*[[[head:getrpcent_r,hash:CRC-32=0x9310b344]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.rpc.getrpcent_r") int
 NOTHROW_RPC_KOS(LIBCCALL libc_getrpcent_r)(struct rpcent *result_buf,
                                            char *buffer,
@@ -131,7 +131,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getrpcent_r)(struct rpcent *result_buf,
 
 
 
-/*[[[start:exports,hash:0x45275b21]]]*/
+/*[[[start:exports,hash:CRC-32=0x9e1d8d17]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(setrpcent, libc_setrpcent);
 DEFINE_PUBLIC_WEAK_ALIAS(endrpcent, libc_endrpcent);
 DEFINE_PUBLIC_WEAK_ALIAS(getrpcbyname, libc_getrpcbyname);

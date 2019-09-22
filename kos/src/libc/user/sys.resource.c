@@ -31,7 +31,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:getrlimit,hash:0xb97802b]]]*/
+/*[[[head:getrlimit,hash:CRC-32=0xf680a78f]]]*/
 /* Put the soft and hard limits for RESOURCE in *RLIMITS.
  * Returns 0 if successful, -1 if not (and sets errno) */
 INTERN NONNULL((2))
@@ -46,7 +46,7 @@ NOTHROW_NCX(LIBCCALL libc_getrlimit)(__rlimit_resource_t resource,
 }
 /*[[[end:getrlimit]]]*/
 
-/*[[[head:setrlimit,hash:0xebc6f90c]]]*/
+/*[[[head:setrlimit,hash:CRC-32=0xd8b536dc]]]*/
 /* Set the soft and hard limits for RESOURCE to *RLIMITS.
  * Only the super-user can increase hard limits.
  * Return 0 if successful, -1 if not (and sets errno) */
@@ -62,7 +62,7 @@ NOTHROW_NCX(LIBCCALL libc_setrlimit)(__rlimit_resource_t resource,
 }
 /*[[[end:setrlimit]]]*/
 
-/*[[[head:getrusage,hash:0x330d05cb]]]*/
+/*[[[head:getrusage,hash:CRC-32=0xbec786ef]]]*/
 /* Return resource usage information on process indicated by WHO
  * and put it in *USAGE. Returns 0 for success, -1 for failure */
 INTERN NONNULL((2))
@@ -77,7 +77,7 @@ NOTHROW_NCX(LIBCCALL libc_getrusage)(__rusage_who_t who,
 }
 /*[[[end:getrusage]]]*/
 
-/*[[[head:getpriority,hash:0xbc17ba72]]]*/
+/*[[[head:getpriority,hash:CRC-32=0x67344261]]]*/
 /* Return the highest priority of any process specified by WHICH and
  * WHO (see above); if WHO is zero, the current process, process group,
  * or user (as specified by WHO) is used.  A lower priority number means
@@ -97,7 +97,7 @@ NOTHROW_NCX(LIBCCALL libc_getpriority)(__priority_which_t which,
 }
 /*[[[end:getpriority]]]*/
 
-/*[[[head:setpriority,hash:0x282c5a49]]]*/
+/*[[[head:setpriority,hash:CRC-32=0xc81fe9d0]]]*/
 /* Set the priority of all processes specified by WHICH and WHO (see above) to PRIO.
  * Returns 0 on success, -1 on errors */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.resource.setpriority") int
@@ -112,7 +112,7 @@ NOTHROW_NCX(LIBCCALL libc_setpriority)(__priority_which_t which,
 }
 /*[[[end:setpriority]]]*/
 
-/*[[[head:getrlimit64,hash:0xe56dadd6]]]*/
+/*[[[head:getrlimit64,hash:CRC-32=0xcdba0ca9]]]*/
 /* Put the soft and hard limits for RESOURCE in *RLIMITS.
  * Returns 0 if successful, -1 if not (and sets errno) */
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
@@ -131,7 +131,7 @@ NOTHROW_NCX(LIBCCALL libc_getrlimit64)(__rlimit_resource_t resource,
 #endif /* MAGIC:alias */
 /*[[[end:getrlimit64]]]*/
 
-/*[[[head:setrlimit64,hash:0x4b99779f]]]*/
+/*[[[head:setrlimit64,hash:CRC-32=0x9cb114d0]]]*/
 /* Set the soft and hard limits for RESOURCE to *RLIMITS.
  * Only the super-user can increase hard limits.
  * Return 0 if successful, -1 if not (and sets errno) */
@@ -155,7 +155,7 @@ NOTHROW_NCX(LIBCCALL libc_setrlimit64)(__rlimit_resource_t resource,
 
 
 
-/*[[[start:exports,hash:0x40982b9a]]]*/
+/*[[[start:exports,hash:CRC-32=0x181f7199]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(getrlimit, libc_getrlimit);
 DEFINE_PUBLIC_WEAK_ALIAS(setrlimit, libc_setrlimit);
 DEFINE_PUBLIC_WEAK_ALIAS(getrusage, libc_getrusage);

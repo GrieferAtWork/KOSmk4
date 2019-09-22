@@ -30,7 +30,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:setspent,hash:0x813d9ed8]]]*/
+/*[[[head:setspent,hash:CRC-32=0x6dfa6052]]]*/
 /* Open database for reading.
  * This function is not part of POSIX and therefore no official cancellation point */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.shadow.setspent") void
@@ -42,7 +42,7 @@ NOTHROW_RPC(LIBCCALL libc_setspent)(void)
 }
 /*[[[end:setspent]]]*/
 
-/*[[[head:endspent,hash:0xc70427a7]]]*/
+/*[[[head:endspent,hash:CRC-32=0xfff1c73f]]]*/
 /* Close database. */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.shadow.endspent") void
 NOTHROW_RPC_NOKOS(LIBCCALL libc_endspent)(void)
@@ -53,7 +53,7 @@ NOTHROW_RPC_NOKOS(LIBCCALL libc_endspent)(void)
 }
 /*[[[end:endspent]]]*/
 
-/*[[[head:getspent,hash:0x3ebd5792]]]*/
+/*[[[head:getspent,hash:CRC-32=0xf659bab2]]]*/
 /* Get next entry from database, perhaps after opening the file.
  * This function is not part of POSIX and therefore no official cancellation point */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.shadow.getspent") struct spwd *
@@ -66,7 +66,7 @@ NOTHROW_RPC(LIBCCALL libc_getspent)(void)
 }
 /*[[[end:getspent]]]*/
 
-/*[[[head:getspnam,hash:0x6d186db8]]]*/
+/*[[[head:getspnam,hash:CRC-32=0xc935ac36]]]*/
 /* Get shadow entry matching NAME.
  * This function is not part of POSIX and therefore no official cancellation point */
 INTERN NONNULL((1))
@@ -80,7 +80,7 @@ NOTHROW_RPC(LIBCCALL libc_getspnam)(char const *__restrict name)
 }
 /*[[[end:getspnam]]]*/
 
-/*[[[head:sgetspent,hash:0x84371bf1]]]*/
+/*[[[head:sgetspent,hash:CRC-32=0x4064e4e9]]]*/
 /* Read shadow entry from STRING.
  * This function is not part of POSIX and therefore no official cancellation point */
 INTERN NONNULL((1))
@@ -94,7 +94,7 @@ NOTHROW_RPC(LIBCCALL libc_sgetspent)(char const *__restrict string)
 }
 /*[[[end:sgetspent]]]*/
 
-/*[[[head:fgetspent,hash:0x9cecae52]]]*/
+/*[[[head:fgetspent,hash:CRC-32=0xd70c1a72]]]*/
 /* Read next shadow entry from STREAM.
  * This function is not part of POSIX and therefore no official cancellation point */
 INTERN NONNULL((1))
@@ -108,7 +108,7 @@ NOTHROW_RPC(LIBCCALL libc_fgetspent)(FILE *__restrict stream)
 }
 /*[[[end:fgetspent]]]*/
 
-/*[[[head:putspent,hash:0x3b19de2f]]]*/
+/*[[[head:putspent,hash:CRC-32=0x40464108]]]*/
 /* Write line containing shadow password entry to stream.
  * This function is not part of POSIX and therefore no official cancellation point */
 INTERN NONNULL((1, 2))
@@ -123,7 +123,7 @@ NOTHROW_RPC(LIBCCALL libc_putspent)(struct spwd const *__restrict p,
 }
 /*[[[end:putspent]]]*/
 
-/*[[[head:getspent_r,hash:0x7281d804]]]*/
+/*[[[head:getspent_r,hash:CRC-32=0xbd8ea05f]]]*/
 /* Reentrant versions of some of the functions above.
  * These functions are not part of POSIX and therefore no official cancellation point */
 INTERN NONNULL((1, 2, 4))
@@ -140,7 +140,7 @@ NOTHROW_RPC(LIBCCALL libc_getspent_r)(struct spwd *__restrict result_buf,
 }
 /*[[[end:getspent_r]]]*/
 
-/*[[[head:getspnam_r,hash:0x569a3857]]]*/
+/*[[[head:getspnam_r,hash:CRC-32=0x2d32830b]]]*/
 /* Reentrant versions of some of the functions above.
  * These functions are not part of POSIX and therefore no official cancellation point */
 INTERN NONNULL((1, 2, 3, 5))
@@ -158,7 +158,7 @@ NOTHROW_RPC(LIBCCALL libc_getspnam_r)(char const *__restrict name,
 }
 /*[[[end:getspnam_r]]]*/
 
-/*[[[head:sgetspent_r,hash:0xd3f188bd]]]*/
+/*[[[head:sgetspent_r,hash:CRC-32=0x1761f05]]]*/
 /* Reentrant versions of some of the functions above.
  * These functions are not part of POSIX and therefore no official cancellation point */
 INTERN NONNULL((1, 2, 3, 5))
@@ -176,7 +176,7 @@ NOTHROW_RPC(LIBCCALL libc_sgetspent_r)(char const *__restrict string,
 }
 /*[[[end:sgetspent_r]]]*/
 
-/*[[[head:fgetspent_r,hash:0xcc7dea14]]]*/
+/*[[[head:fgetspent_r,hash:CRC-32=0xf54bf1bf]]]*/
 /* Reentrant versions of some of the functions above.
  * These functions are not part of POSIX and therefore no official cancellation point */
 INTERN NONNULL((1, 2, 3, 5))
@@ -194,7 +194,7 @@ NOTHROW_RPC(LIBCCALL libc_fgetspent_r)(FILE *__restrict stream,
 }
 /*[[[end:fgetspent_r]]]*/
 
-/*[[[head:lckpwdf,hash:0xb3978cad]]]*/
+/*[[[head:lckpwdf,hash:CRC-32=0xcb3c07b7]]]*/
 /* Protect password file against multi writers */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.shadow.lckpwdf") int
 NOTHROW_RPC_KOS(LIBCCALL libc_lckpwdf)(void)
@@ -206,7 +206,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_lckpwdf)(void)
 }
 /*[[[end:lckpwdf]]]*/
 
-/*[[[head:ulckpwdf,hash:0x17bf970c]]]*/
+/*[[[head:ulckpwdf,hash:CRC-32=0x9ba809e4]]]*/
 /* Unlock password file */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.shadow.ulckpwdf") int
 NOTHROW_NCX(LIBCCALL libc_ulckpwdf)(void)
@@ -222,7 +222,7 @@ NOTHROW_NCX(LIBCCALL libc_ulckpwdf)(void)
 
 
 
-/*[[[start:exports,hash:0xf8e2b070]]]*/
+/*[[[start:exports,hash:CRC-32=0x13b46cd0]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(setspent, libc_setspent);
 DEFINE_PUBLIC_WEAK_ALIAS(endspent, libc_endspent);
 DEFINE_PUBLIC_WEAK_ALIAS(getspent, libc_getspent);

@@ -34,7 +34,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:gettimeofday,hash:0xddb091e6]]]*/
+/*[[[head:gettimeofday,hash:CRC-32=0x7609ea3c]]]*/
 /* Get the current time of day and timezone information,
  * putting it into *TV and *TZ.  If TZ is NULL, *TZ is not filled.
  * Returns 0 on success, -1 on errors.
@@ -52,7 +52,7 @@ NOTHROW_NCX(LIBCCALL libc_gettimeofday)(struct timeval *__restrict tv,
 }
 /*[[[end:gettimeofday]]]*/
 
-/*[[[head:getitimer,hash:0xe725f326]]]*/
+/*[[[head:getitimer,hash:CRC-32=0x213b3a5e]]]*/
 /* Set *VALUE to the current setting of timer WHICH.
  * Return 0 on success, -1 on errors */
 INTERN NONNULL((2))
@@ -67,7 +67,7 @@ NOTHROW_NCX(LIBCCALL libc_getitimer)(__itimer_which_t which,
 }
 /*[[[end:getitimer]]]*/
 
-/*[[[head:setitimer,hash:0x8c661e87]]]*/
+/*[[[head:setitimer,hash:CRC-32=0x9ca764ad]]]*/
 /* Set the timer WHICH to *NEWVAL. If OLDVAL is not NULL, set *OLDVAL to the old value of timer WHICH.
  * Returns 0 on success, -1 on errors */
 INTERN NONNULL((2))
@@ -83,7 +83,7 @@ NOTHROW_NCX(LIBCCALL libc_setitimer)(__itimer_which_t which,
 }
 /*[[[end:setitimer]]]*/
 
-/*[[[head:utimes,hash:0x68c9e1f7]]]*/
+/*[[[head:utimes,hash:CRC-32=0xfa149490]]]*/
 /* Change the access time of FILE to TVP[0] and the modification time of
  * FILE to TVP[1]. If TVP is a null pointer, use the current time instead.
  * Returns 0 on success, -1 on errors */
@@ -99,7 +99,7 @@ NOTHROW_NCX(LIBCCALL libc_utimes)(char const *file,
 }
 /*[[[end:utimes]]]*/
 
-/*[[[head:futimesat,hash:0xe1c085eb]]]*/
+/*[[[head:futimesat,hash:CRC-32=0xb82d4f22]]]*/
 /* Same as `utimes', but takes an open file descriptor instead of a name */
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify_time.futimesat") int
@@ -114,7 +114,7 @@ NOTHROW_NCX(LIBCCALL libc_futimesat)(fd_t fd,
 }
 /*[[[end:futimesat]]]*/
 
-/*[[[head:settimeofday,hash:0x5c4cc7c]]]*/
+/*[[[head:settimeofday,hash:CRC-32=0x2fd8087f]]]*/
 /* Set the current time of day and timezone information.
  * This call is restricted to the super-user */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.adjtime.settimeofday") int
@@ -128,7 +128,7 @@ NOTHROW_NCX(LIBCCALL libc_settimeofday)(struct timeval const *tv,
 }
 /*[[[end:settimeofday]]]*/
 
-/*[[[head:adjtime,hash:0xbd14a8c3]]]*/
+/*[[[head:adjtime,hash:CRC-32=0xfde21674]]]*/
 /* Adjust the current time of day by the amount in DELTA.
  * If OLDDELTA is not NULL, it is filled in with the amount of time
  * adjustment remaining to be done from the last `adjtime' call.
@@ -155,7 +155,7 @@ NOTHROW_NCX(LIBCCALL libc_adjtime)(struct timeval const *delta,
 }
 /*[[[end:adjtime]]]*/
 
-/*[[[head:lutimes,hash:0xc3c043e6]]]*/
+/*[[[head:lutimes,hash:CRC-32=0x2c6cff56]]]*/
 /* Same as `utimes', but does not follow symbolic links */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify_time.lutimes") int
@@ -172,7 +172,7 @@ NOTHROW_NCX(LIBCCALL libc_lutimes)(char const *file,
 }
 /*[[[end:lutimes]]]*/
 
-/*[[[head:futimes,hash:0x22b45c4e]]]*/
+/*[[[head:futimes,hash:CRC-32=0xb33ee961]]]*/
 /* Same as `utimes', but takes an open file descriptor instead of a name */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify_time.futimes") int
 NOTHROW_NCX(LIBCCALL libc_futimes)(fd_t fd,
@@ -192,7 +192,7 @@ NOTHROW_NCX(LIBCCALL libc_futimes)(fd_t fd,
 }
 /*[[[end:futimes]]]*/
 
-/*[[[head:gettimeofday64,hash:0xdbf6a565]]]*/
+/*[[[head:gettimeofday64,hash:CRC-32=0xbb8e1c36]]]*/
 /* Get the current time of day and timezone information,
  * putting it into *TV and *TZ.  If TZ is NULL, *TZ is not filled.
  * Returns 0 on success, -1 on errors.
@@ -214,7 +214,7 @@ NOTHROW_NCX(LIBCCALL libc_gettimeofday64)(struct timeval64 *__restrict tv,
 #endif /* MAGIC:alias */
 /*[[[end:gettimeofday64]]]*/
 
-/*[[[head:getitimer64,hash:0x31b063fb]]]*/
+/*[[[head:getitimer64,hash:CRC-32=0x3a34ee27]]]*/
 /* Set *VALUE to the current setting of timer WHICH.
  * Return 0 on success, -1 on errors */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -233,7 +233,7 @@ NOTHROW_NCX(LIBCCALL libc_getitimer64)(__itimer_which_t which,
 #endif /* MAGIC:alias */
 /*[[[end:getitimer64]]]*/
 
-/*[[[head:setitimer64,hash:0xa9620b3d]]]*/
+/*[[[head:setitimer64,hash:CRC-32=0x8b17a63d]]]*/
 /* Set the timer WHICH to *NEWVAL. If OLDVAL is not NULL, set *OLDVAL to the old value of timer WHICH.
  * Returns 0 on success, -1 on errors */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -253,7 +253,7 @@ NOTHROW_NCX(LIBCCALL libc_setitimer64)(__itimer_which_t which,
 #endif /* MAGIC:alias */
 /*[[[end:setitimer64]]]*/
 
-/*[[[head:utimes64,hash:0xc952e676]]]*/
+/*[[[head:utimes64,hash:CRC-32=0x9e404299]]]*/
 /* Change the access time of FILE to TVP[0] and the modification time of
  * FILE to TVP[1]. If TVP is a null pointer, use the current time instead.
  * Returns 0 on success, -1 on errors */
@@ -273,7 +273,7 @@ NOTHROW_NCX(LIBCCALL libc_utimes64)(char const *file,
 #endif /* MAGIC:alias */
 /*[[[end:utimes64]]]*/
 
-/*[[[head:settimeofday64,hash:0xbdabf88]]]*/
+/*[[[head:settimeofday64,hash:CRC-32=0x6627348b]]]*/
 /* Set the current time of day and timezone information.
  * This call is restricted to the super-user */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
@@ -291,7 +291,7 @@ NOTHROW_NCX(LIBCCALL libc_settimeofday64)(struct timeval64 const *tv,
 #endif /* MAGIC:alias */
 /*[[[end:settimeofday64]]]*/
 
-/*[[[head:adjtime64,hash:0x42f3b616]]]*/
+/*[[[head:adjtime64,hash:CRC-32=0x82a73cd5]]]*/
 /* Adjust the current time of day by the amount in DELTA.
  * If OLDDELTA is not NULL, it is filled in with the amount of time
  * adjustment remaining to be done from the last `adjtime' call.
@@ -333,7 +333,7 @@ NOTHROW_NCX(LIBCCALL libc_adjtime64)(struct timeval64 const *delta,
 #endif /* MAGIC:alias */
 /*[[[end:adjtime64]]]*/
 
-/*[[[head:lutimes64,hash:0x5dc5e015]]]*/
+/*[[[head:lutimes64,hash:CRC-32=0xdd76983e]]]*/
 /* Same as `utimes', but does not follow symbolic links */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_lutimes64, libc_lutimes);
@@ -354,7 +354,7 @@ NOTHROW_NCX(LIBCCALL libc_lutimes64)(char const *file,
 #endif /* MAGIC:alias */
 /*[[[end:lutimes64]]]*/
 
-/*[[[head:futimes64,hash:0x8f9aafe2]]]*/
+/*[[[head:futimes64,hash:CRC-32=0x3663dd8]]]*/
 /* Same as `utimes', but does not follow symbolic links */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_futimes64, libc_lutimes);
@@ -378,7 +378,7 @@ NOTHROW_NCX(LIBCCALL libc_futimes64)(fd_t fd,
 #endif /* MAGIC:alias */
 /*[[[end:futimes64]]]*/
 
-/*[[[head:futimesat64,hash:0x486d2ea4]]]*/
+/*[[[head:futimesat64,hash:CRC-32=0xddd91621]]]*/
 /* Same as `utimes', but takes an open file descriptor instead of a name */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_futimesat64, libc_futimesat);
@@ -401,7 +401,7 @@ NOTHROW_NCX(LIBCCALL libc_futimesat64)(fd_t fd,
 
 
 
-/*[[[start:exports,hash:0x1cf953f5]]]*/
+/*[[[start:exports,hash:CRC-32=0x4df9c20d]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(gettimeofday, libc_gettimeofday);
 DEFINE_PUBLIC_WEAK_ALIAS(getitimer, libc_getitimer);
 DEFINE_PUBLIC_WEAK_ALIAS(setitimer, libc_setitimer);

@@ -31,7 +31,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:sendfile,hash:0x49c1fd61]]]*/
+/*[[[head:sendfile,hash:CRC-32=0xec68991c]]]*/
 /* Send up to COUNT bytes from file associated with IN_FD starting at *OFFSET
  * to descriptor OUT_FD. Set *OFFSET to the IN_FD's file position following the
  * read bytes. If OFFSET is a null pointer, use the normal file position instead.
@@ -49,7 +49,7 @@ NOTHROW_NCX(LIBCCALL libc_sendfile)(fd_t out_fd,
 }
 /*[[[end:sendfile]]]*/
 
-/*[[[head:sendfile64,hash:0x81e1a15e]]]*/
+/*[[[head:sendfile64,hash:CRC-32=0xc3e39e4c]]]*/
 /* Send up to COUNT bytes from file associated with IN_FD starting at *OFFSET
  * to descriptor OUT_FD. Set *OFFSET to the IN_FD's file position following the
  * read bytes. If OFFSET is a null pointer, use the normal file position instead.
@@ -75,7 +75,7 @@ NOTHROW_NCX(LIBCCALL libc_sendfile64)(fd_t out_fd,
 
 
 
-/*[[[start:exports,hash:0x9a3de675]]]*/
+/*[[[start:exports,hash:CRC-32=0x4253a57b]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(sendfile, libc_sendfile);
 DEFINE_PUBLIC_WEAK_ALIAS(sendfile64, libc_sendfile64);
 /*[[[end:exports]]]*/

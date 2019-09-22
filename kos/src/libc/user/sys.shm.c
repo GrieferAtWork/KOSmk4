@@ -30,7 +30,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:shmctl,hash:0xb95fd8d5]]]*/
+/*[[[head:shmctl,hash:CRC-32=0x63ba5214]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.shm.shmctl") int
 NOTHROW_NCX(LIBCCALL libc_shmctl)(int shmid,
                                   int cmd,
@@ -43,7 +43,7 @@ NOTHROW_NCX(LIBCCALL libc_shmctl)(int shmid,
 }
 /*[[[end:shmctl]]]*/
 
-/*[[[head:shmget,hash:0x6e126270]]]*/
+/*[[[head:shmget,hash:CRC-32=0x5f93079d]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.shm.shmget") int
 NOTHROW_NCX(LIBCCALL libc_shmget)(key_t key,
                                   size_t size,
@@ -56,7 +56,7 @@ NOTHROW_NCX(LIBCCALL libc_shmget)(key_t key,
 }
 /*[[[end:shmget]]]*/
 
-/*[[[head:shmat,hash:0xe7f83112]]]*/
+/*[[[head:shmat,hash:CRC-32=0xd354a954]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.shm.shmat") void *
 NOTHROW_NCX(LIBCCALL libc_shmat)(int shmid,
                                  void const *shmaddr,
@@ -69,7 +69,7 @@ NOTHROW_NCX(LIBCCALL libc_shmat)(int shmid,
 }
 /*[[[end:shmat]]]*/
 
-/*[[[head:shmdt,hash:0xbaf250a]]]*/
+/*[[[head:shmdt,hash:CRC-32=0x98fc4352]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.shm.shmdt") int
 NOTHROW_NCX(LIBCCALL libc_shmdt)(void const *shmaddr)
 /*[[[body:shmdt]]]*/
@@ -84,7 +84,7 @@ NOTHROW_NCX(LIBCCALL libc_shmdt)(void const *shmaddr)
 
 
 
-/*[[[start:exports,hash:0x8fa8e858]]]*/
+/*[[[start:exports,hash:CRC-32=0xa4c16ee9]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(shmctl, libc_shmctl);
 DEFINE_PUBLIC_WEAK_ALIAS(shmget, libc_shmget);
 DEFINE_PUBLIC_WEAK_ALIAS(shmat, libc_shmat);

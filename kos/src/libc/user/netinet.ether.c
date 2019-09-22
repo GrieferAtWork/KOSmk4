@@ -30,7 +30,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:ether_ntoa,hash:0x8b24cc46]]]*/
+/*[[[head:ether_ntoa,hash:CRC-32=0x6872e776]]]*/
 /* Convert 48 bit Ethernet ADDRess to ASCII */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.ether.ether_ntoa") char *
 NOTHROW_RPC_KOS(LIBCCALL libc_ether_ntoa)(struct ether_addr const *addr)
@@ -42,7 +42,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_ether_ntoa)(struct ether_addr const *addr)
 }
 /*[[[end:ether_ntoa]]]*/
 
-/*[[[head:ether_ntoa_r,hash:0xc66dd6fe]]]*/
+/*[[[head:ether_ntoa_r,hash:CRC-32=0x9c4a939]]]*/
 /* Convert 48 bit Ethernet ADDRess to ASCII */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.ether.ether_ntoa_r") char *
 NOTHROW_RPC_KOS(LIBCCALL libc_ether_ntoa_r)(struct ether_addr const *addr,
@@ -55,7 +55,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_ether_ntoa_r)(struct ether_addr const *addr,
 }
 /*[[[end:ether_ntoa_r]]]*/
 
-/*[[[head:ether_aton,hash:0xf1570449]]]*/
+/*[[[head:ether_aton,hash:CRC-32=0x88bf789c]]]*/
 /* Convert ASCII string S to 48 bit Ethernet address */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.ether.ether_aton") struct ether_addr *
 NOTHROW_RPC_KOS(LIBCCALL libc_ether_aton)(char const *asc)
@@ -67,7 +67,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_ether_aton)(char const *asc)
 }
 /*[[[end:ether_aton]]]*/
 
-/*[[[head:ether_aton_r,hash:0xfdadc05e]]]*/
+/*[[[head:ether_aton_r,hash:CRC-32=0xf6e0249c]]]*/
 /* Convert ASCII string S to 48 bit Ethernet address */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.ether.ether_aton_r") struct ether_addr *
 NOTHROW_RPC_KOS(LIBCCALL libc_ether_aton_r)(char const *asc,
@@ -80,7 +80,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_ether_aton_r)(char const *asc,
 }
 /*[[[end:ether_aton_r]]]*/
 
-/*[[[head:ether_ntohost,hash:0xd9b2cdea]]]*/
+/*[[[head:ether_ntohost,hash:CRC-32=0x5eed1bb3]]]*/
 /* Map 48 bit Ethernet number ADDR to HOSTNAME */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.ether.ether_ntohost") int
 NOTHROW_RPC_KOS(LIBCCALL libc_ether_ntohost)(char *hostname,
@@ -93,7 +93,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_ether_ntohost)(char *hostname,
 }
 /*[[[end:ether_ntohost]]]*/
 
-/*[[[head:ether_hostton,hash:0xee934618]]]*/
+/*[[[head:ether_hostton,hash:CRC-32=0xf9ac0d61]]]*/
 /* Map HOSTNAME to 48 bit Ethernet address */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.ether.ether_hostton") int
 NOTHROW_RPC_KOS(LIBCCALL libc_ether_hostton)(char const *hostname,
@@ -106,7 +106,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_ether_hostton)(char const *hostname,
 }
 /*[[[end:ether_hostton]]]*/
 
-/*[[[head:ether_line,hash:0xf98c4249]]]*/
+/*[[[head:ether_line,hash:CRC-32=0xf8c61a51]]]*/
 /* Scan LINE and set ADDR and HOSTNAME */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.ether.ether_line") int
 NOTHROW_RPC_KOS(LIBCCALL libc_ether_line)(char const *line,
@@ -124,7 +124,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_ether_line)(char const *line,
 
 
 
-/*[[[start:exports,hash:0x7d181380]]]*/
+/*[[[start:exports,hash:CRC-32=0xc34b092b]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(ether_ntoa, libc_ether_ntoa);
 DEFINE_PUBLIC_WEAK_ALIAS(ether_ntoa_r, libc_ether_ntoa_r);
 DEFINE_PUBLIC_WEAK_ALIAS(ether_aton, libc_ether_aton);

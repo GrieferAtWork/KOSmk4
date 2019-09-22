@@ -31,7 +31,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:acct,hash:0xddc6d5da]]]*/
+/*[[[head:acct,hash:CRC-32=0x8e9ce467]]]*/
 /* Switch process accounting on and off */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.acct") int
 NOTHROW_RPC_KOS(LIBCCALL libc_acct)(const char *filename)
@@ -47,7 +47,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_acct)(const char *filename)
 
 
 
-/*[[[start:exports,hash:0xd07bb173]]]*/
+/*[[[start:exports,hash:CRC-32=0x9448cbab]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(acct, libc_acct);
 /*[[[end:exports]]]*/
 

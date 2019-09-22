@@ -30,7 +30,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:if_nametoindex,hash:0x105509f9]]]*/
+/*[[[head:if_nametoindex,hash:CRC-32=0x7f481076]]]*/
 /* Convert an interface name to an index, and vice versa */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.interface.if_nametoindex") unsigned int
 NOTHROW_RPC_KOS(LIBCCALL libc_if_nametoindex)(char const *ifname)
@@ -42,7 +42,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_if_nametoindex)(char const *ifname)
 }
 /*[[[end:if_nametoindex]]]*/
 
-/*[[[head:if_indextoname,hash:0x2831fc7b]]]*/
+/*[[[head:if_indextoname,hash:CRC-32=0xeb47f6b9]]]*/
 /* Convert an interface name to an index, and vice versa */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.interface.if_indextoname") char *
 NOTHROW_RPC_KOS(LIBCCALL libc_if_indextoname)(unsigned int ifindex,
@@ -55,7 +55,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_if_indextoname)(unsigned int ifindex,
 }
 /*[[[end:if_indextoname]]]*/
 
-/*[[[head:if_nameindex,hash:0x8da368e7]]]*/
+/*[[[head:if_nameindex,hash:CRC-32=0x6a9f5e41]]]*/
 /* Return a list of all interfaces and their indices */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.interface.if_nameindex") struct if_nameindex *
 NOTHROW_RPC_KOS(LIBCCALL libc_if_nameindex)(void)
@@ -67,7 +67,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_if_nameindex)(void)
 }
 /*[[[end:if_nameindex]]]*/
 
-/*[[[head:if_freenameindex,hash:0x7e512115]]]*/
+/*[[[head:if_freenameindex,hash:CRC-32=0xac5d832d]]]*/
 /* Free the data returned from if_nameindex */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.net.interface.if_freenameindex") void
 NOTHROW_NCX(LIBCCALL libc_if_freenameindex)(struct if_nameindex *ptr)
@@ -82,7 +82,7 @@ NOTHROW_NCX(LIBCCALL libc_if_freenameindex)(struct if_nameindex *ptr)
 
 
 
-/*[[[start:exports,hash:0x8e08ad74]]]*/
+/*[[[start:exports,hash:CRC-32=0x3f9d14fe]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(if_nametoindex, libc_if_nametoindex);
 DEFINE_PUBLIC_WEAK_ALIAS(if_indextoname, libc_if_indextoname);
 DEFINE_PUBLIC_WEAK_ALIAS(if_nameindex, libc_if_nameindex);

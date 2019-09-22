@@ -77,7 +77,7 @@ PRIVATE bool LIBCCALL libc_has_kernel64(void) {
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:getauxval,hash:0x9ad76dd8]]]*/
+/*[[[head:getauxval,hash:CRC-32=0x669846f2]]]*/
 /* Return the value associated with an Elf*_auxv_t type from the auxv list
  * passed to the program on startup.  If TYPE was not present in the auxv
  * list, returns zero and sets errno to ENOENT */
@@ -239,7 +239,7 @@ not_found:
 
 
 
-/*[[[start:exports,hash:0xe367f55a]]]*/
+/*[[[start:exports,hash:CRC-32=0xde6b8304]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(getauxval, libc_getauxval);
 /*[[[end:exports]]]*/
 

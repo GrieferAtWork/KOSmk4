@@ -30,7 +30,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:ftok,hash:0x29c98fe5]]]*/
+/*[[[head:ftok,hash:CRC-32=0x8ccd7d4c]]]*/
 /* Generates key for System V style IPC */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.ftok") key_t
@@ -48,7 +48,7 @@ NOTHROW_RPC(LIBCCALL libc_ftok)(char const *pathname,
 
 
 
-/*[[[start:exports,hash:0x6850b797]]]*/
+/*[[[start:exports,hash:CRC-32=0x48be70aa]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(ftok, libc_ftok);
 /*[[[end:exports]]]*/
 

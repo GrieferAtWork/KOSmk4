@@ -66,7 +66,7 @@ INTDEF void libc_sig_restore(void);
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:DOS$raise,hash:0x8f2c09ef]]]*/
+/*[[[head:DOS$raise,hash:CRC-32=0x693a2f09]]]*/
 /* @param signo: One of `SIG*' */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.sched.signal.raise") int
 NOTHROW_NCX(LIBDCALL libd_raise)(int signo)
@@ -76,7 +76,7 @@ NOTHROW_NCX(LIBDCALL libd_raise)(int signo)
 }
 /*[[[end:DOS$raise]]]*/
 
-/*[[[head:DOS$signal,hash:0x9835922]]]*/
+/*[[[head:DOS$signal,hash:CRC-32=0x195f877e]]]*/
 /* @param signo: One of `SIG*' */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.sched.signal.signal") sighandler_t
 NOTHROW_NCX(LIBDCALL libd_signal)(int signo,
@@ -94,7 +94,7 @@ NOTHROW_NCX(LIBDCALL libd_signal)(int signo,
 /*[[[end:DOS$signal]]]*/
 
 
-/*[[[head:raise,hash:0xb1af0209]]]*/
+/*[[[head:raise,hash:CRC-32=0x45efbcff]]]*/
 /* @param signo: One of `SIG*' */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.raise") int
 NOTHROW_NCX(LIBCCALL libc_raise)(int signo)
@@ -105,7 +105,7 @@ NOTHROW_NCX(LIBCCALL libc_raise)(int signo)
 }
 /*[[[end:raise]]]*/
 
-/*[[[head:sysv_signal,hash:0xb46c318]]]*/
+/*[[[head:sysv_signal,hash:CRC-32=0x64d1e4ea]]]*/
 /* @param signo: One of `SIG*' */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.sysv_signal") sighandler_t
 NOTHROW_NCX(LIBCCALL libc_sysv_signal)(int signo,
@@ -128,7 +128,7 @@ NOTHROW_NCX(LIBCCALL libc_sysv_signal)(int signo,
 }
 /*[[[end:sysv_signal]]]*/
 
-/*[[[head:sigblock,hash:0x3388e58d]]]*/
+/*[[[head:sigblock,hash:CRC-32=0x8ebec395]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.sigblock") int
 NOTHROW_NCX(LIBCCALL libc_sigblock)(int mask)
 /*[[[body:sigblock]]]*/
@@ -142,7 +142,7 @@ NOTHROW_NCX(LIBCCALL libc_sigblock)(int mask)
 }
 /*[[[end:sigblock]]]*/
 
-/*[[[head:sigsetmask,hash:0xadda4f28]]]*/
+/*[[[head:sigsetmask,hash:CRC-32=0x6b5f0370]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.sigsetmask") int
 NOTHROW_NCX(LIBCCALL libc_sigsetmask)(int mask)
 /*[[[body:sigsetmask]]]*/
@@ -156,7 +156,7 @@ NOTHROW_NCX(LIBCCALL libc_sigsetmask)(int mask)
 }
 /*[[[end:sigsetmask]]]*/
 
-/*[[[head:siggetmask,hash:0xdea61e8a]]]*/
+/*[[[head:siggetmask,hash:CRC-32=0x35ccd1ff]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.siggetmask") int
 NOTHROW_NCX(LIBCCALL libc_siggetmask)(void)
 /*[[[body:siggetmask]]]*/
@@ -175,7 +175,7 @@ NOTHROW_NCX(LIBCCALL libc_siggetmask)(void)
 }
 /*[[[end:siggetmask]]]*/
 
-/*[[[head:sigreturn,hash:0x729c68e6]]]*/
+/*[[[head:sigreturn,hash:CRC-32=0x70b88744]]]*/
 INTERN ATTR_NORETURN
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.sigreturn") void
 NOTHROW_NCX(LIBCCALL libc_sigreturn)(struct sigcontext const *scp)
@@ -192,7 +192,7 @@ NOTHROW_NCX(LIBCCALL libc_sigreturn)(struct sigcontext const *scp)
 
 PRIVATE sigset_t __sigintr;
 
-/*[[[head:bsd_signal,hash:0x1772935c]]]*/
+/*[[[head:bsd_signal,hash:CRC-32=0x24c22b5f]]]*/
 /* @param signo: One of `SIG*' */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.bsd_signal") sighandler_t
 NOTHROW_NCX(LIBCCALL libc_bsd_signal)(int signo,
@@ -220,7 +220,7 @@ NOTHROW_NCX(LIBCCALL libc_bsd_signal)(int signo,
 }
 /*[[[end:bsd_signal]]]*/
 
-/*[[[head:kill,hash:0xe59a348f]]]*/
+/*[[[head:kill,hash:CRC-32=0xf4b1ad3b]]]*/
 /* @param signo: One of `SIG*' */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.kill") int
 NOTHROW_NCX(LIBCCALL libc_kill)(pid_t pid,
@@ -233,7 +233,7 @@ NOTHROW_NCX(LIBCCALL libc_kill)(pid_t pid,
 }
 /*[[[end:kill]]]*/
 
-/*[[[head:sigprocmask,hash:0x20d8e9]]]*/
+/*[[[head:sigprocmask,hash:CRC-32=0x138a0ed3]]]*/
 /* @param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK' */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.sigprocmask") int
 NOTHROW_NCX(LIBCCALL libc_sigprocmask)(int how,
@@ -253,7 +253,7 @@ NOTHROW_NCX(LIBCCALL libc_sigprocmask)(int how,
 }
 /*[[[end:sigprocmask]]]*/
 
-/*[[[head:sigsuspend,hash:0x89d952c0]]]*/
+/*[[[head:sigsuspend,hash:CRC-32=0x179b3c55]]]*/
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.sigsuspend") int
 NOTHROW_RPC(LIBCCALL libc_sigsuspend)(sigset_t const *set)
@@ -269,7 +269,7 @@ NOTHROW_RPC(LIBCCALL libc_sigsuspend)(sigset_t const *set)
 }
 /*[[[end:sigsuspend]]]*/
 
-/*[[[head:sigaction,hash:0xa26d6bd0]]]*/
+/*[[[head:sigaction,hash:CRC-32=0x76616ea9]]]*/
 /* @param signo: One of `SIG*' */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.sigaction") int
 NOTHROW_NCX(LIBCCALL libc_sigaction)(int signo,
@@ -295,7 +295,7 @@ NOTHROW_NCX(LIBCCALL libc_sigaction)(int signo,
 }
 /*[[[end:sigaction]]]*/
 
-/*[[[head:sigpending,hash:0xba047d03]]]*/
+/*[[[head:sigpending,hash:CRC-32=0xe67c9535]]]*/
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.sigpending") int
 NOTHROW_NCX(LIBCCALL libc_sigpending)(sigset_t *set)
@@ -311,7 +311,7 @@ NOTHROW_NCX(LIBCCALL libc_sigpending)(sigset_t *set)
 }
 /*[[[end:sigpending]]]*/
 
-/*[[[head:sigwait,hash:0xc75a958e]]]*/
+/*[[[head:sigwait,hash:CRC-32=0x1946ce8d]]]*/
 /* @param signo: One of `SIG*' */
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.sigwait") int
@@ -340,7 +340,7 @@ NOTHROW_RPC(LIBCCALL libc_sigwait)(sigset_t const *__restrict set,
 }
 /*[[[end:sigwait]]]*/
 
-/*[[[head:sigwaitinfo,hash:0xe75bef0a]]]*/
+/*[[[head:sigwaitinfo,hash:CRC-32=0x7f8a7e45]]]*/
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.sigwaitinfo") int
 NOTHROW_RPC(LIBCCALL libc_sigwaitinfo)(sigset_t const *__restrict set,
@@ -363,7 +363,7 @@ NOTHROW_RPC(LIBCCALL libc_sigwaitinfo)(sigset_t const *__restrict set,
 }
 /*[[[end:sigwaitinfo]]]*/
 
-/*[[[head:sigtimedwait,hash:0xc66d8f33]]]*/
+/*[[[head:sigtimedwait,hash:CRC-32=0xf7a9cbb4]]]*/
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.sigtimedwait") int
 NOTHROW_RPC(LIBCCALL libc_sigtimedwait)(sigset_t const *__restrict set,
@@ -380,7 +380,7 @@ NOTHROW_RPC(LIBCCALL libc_sigtimedwait)(sigset_t const *__restrict set,
 }
 /*[[[end:sigtimedwait]]]*/
 
-/*[[[head:sigtimedwait64,hash:0x79ee95ba]]]*/
+/*[[[head:sigtimedwait64,hash:CRC-32=0xc32f7d3]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_sigtimedwait64, libc_sigtimedwait);
 #else
@@ -401,7 +401,7 @@ NOTHROW_RPC(LIBCCALL libc_sigtimedwait64)(sigset_t const *__restrict set,
 #endif /* MAGIC:alias */
 /*[[[end:sigtimedwait64]]]*/
 
-/*[[[head:sigqueue,hash:0xa4ce162d]]]*/
+/*[[[head:sigqueue,hash:CRC-32=0x4e68846d]]]*/
 /* @param signo: One of `SIG*' */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.sigqueue") int
 NOTHROW_NCX(LIBCCALL libc_sigqueue)(pid_t pid,
@@ -417,7 +417,7 @@ NOTHROW_NCX(LIBCCALL libc_sigqueue)(pid_t pid,
 }
 /*[[[end:sigqueue]]]*/
 
-/*[[[head:sigqueueinfo,hash:0x4533d027]]]*/
+/*[[[head:sigqueueinfo,hash:CRC-32=0x9aaac0bb]]]*/
 /* @param signo: One of `SIG*' */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.sigqueueinfo") int
 NOTHROW_NCX(LIBCCALL libc_sigqueueinfo)(pid_t tgid,
@@ -433,7 +433,7 @@ NOTHROW_NCX(LIBCCALL libc_sigqueueinfo)(pid_t tgid,
 }
 /*[[[end:sigqueueinfo]]]*/
 
-/*[[[head:tgsigqueueinfo,hash:0xa2e16341]]]*/
+/*[[[head:tgsigqueueinfo,hash:CRC-32=0x124b2075]]]*/
 /* @param signo: One of `SIG*' */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.tgsigqueueinfo") int
 NOTHROW_NCX(LIBCCALL libc_tgsigqueueinfo)(pid_t tgid,
@@ -451,7 +451,7 @@ NOTHROW_NCX(LIBCCALL libc_tgsigqueueinfo)(pid_t tgid,
 }
 /*[[[end:tgsigqueueinfo]]]*/
 
-/*[[[head:killpg,hash:0x495075b1]]]*/
+/*[[[head:killpg,hash:CRC-32=0x8f6a270b]]]*/
 /* @param signo: One of `SIG*' */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.killpg") int
 NOTHROW_NCX(LIBCCALL libc_killpg)(pid_t pgrp,
@@ -462,7 +462,7 @@ NOTHROW_NCX(LIBCCALL libc_killpg)(pid_t pgrp,
 }
 /*[[[end:killpg]]]*/
 
-/*[[[head:psignal,hash:0xa8dcec33]]]*/
+/*[[[head:psignal,hash:CRC-32=0xc668b19f]]]*/
 /* @param signo: One of `SIG*' */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.psignal") void
 NOTHROW_NCX(LIBCCALL libc_psignal)(int signo,
@@ -474,7 +474,7 @@ NOTHROW_NCX(LIBCCALL libc_psignal)(int signo,
 }
 /*[[[end:psignal]]]*/
 
-/*[[[head:psiginfo,hash:0x3d78fa76]]]*/
+/*[[[head:psiginfo,hash:CRC-32=0x6b3daa58]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.psiginfo") void
 NOTHROW_NCX(LIBCCALL libc_psiginfo)(siginfo_t const *pinfo,
                                     char const *s)
@@ -485,7 +485,7 @@ NOTHROW_NCX(LIBCCALL libc_psiginfo)(siginfo_t const *pinfo,
 }
 /*[[[end:psiginfo]]]*/
 
-/*[[[head:siginterrupt,hash:0xe2769a4a]]]*/
+/*[[[head:siginterrupt,hash:CRC-32=0xeab33338]]]*/
 /* @param signo: One of `SIG*' */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.siginterrupt") int
 NOTHROW_NCX(LIBCCALL libc_siginterrupt)(int signo,
@@ -510,7 +510,7 @@ err:
 }
 /*[[[end:siginterrupt]]]*/
 
-/*[[[head:sigstack,hash:0x8bdaebd4]]]*/
+/*[[[head:sigstack,hash:CRC-32=0x4a026d]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.sigstack") int
 NOTHROW_NCX(LIBCCALL libc_sigstack)(struct sigstack *ss,
                                     struct sigstack *oss)
@@ -535,7 +535,7 @@ NOTHROW_NCX(LIBCCALL libc_sigstack)(struct sigstack *ss,
 }
 /*[[[end:sigstack]]]*/
 
-/*[[[head:sigaltstack,hash:0x649e27c9]]]*/
+/*[[[head:sigaltstack,hash:CRC-32=0xb25d39f1]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.sigaltstack") int
 NOTHROW_NCX(LIBCCALL libc_sigaltstack)(struct sigaltstack const *__restrict ss,
                                        struct sigaltstack *__restrict oss)
@@ -556,7 +556,7 @@ set_single_signal_action(int sig, int how) {
 	return libc_sigprocmask(SIG_BLOCK, &set, NULL);
 }
 
-/*[[[head:sighold,hash:0xf3be7a3f]]]*/
+/*[[[head:sighold,hash:CRC-32=0xfb16e1a7]]]*/
 /* @param signo: One of `SIG*' */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.sighold") int
 NOTHROW_NCX(LIBCCALL libc_sighold)(int signo)
@@ -566,7 +566,7 @@ NOTHROW_NCX(LIBCCALL libc_sighold)(int signo)
 }
 /*[[[end:sighold]]]*/
 
-/*[[[head:sigrelse,hash:0x3a41f28]]]*/
+/*[[[head:sigrelse,hash:CRC-32=0xce1ae74a]]]*/
 /* @param signo: One of `SIG*' */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.sigrelse") int
 NOTHROW_NCX(LIBCCALL libc_sigrelse)(int signo)
@@ -576,7 +576,7 @@ NOTHROW_NCX(LIBCCALL libc_sigrelse)(int signo)
 }
 /*[[[end:sigrelse]]]*/
 
-/*[[[head:sigignore,hash:0x994cd165]]]*/
+/*[[[head:sigignore,hash:CRC-32=0x817fd89f]]]*/
 /* @param signo: One of `SIG*' */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.sigignore") int
 NOTHROW_NCX(LIBCCALL libc_sigignore)(int signo)
@@ -586,7 +586,7 @@ NOTHROW_NCX(LIBCCALL libc_sigignore)(int signo)
 }
 /*[[[end:sigignore]]]*/
 
-/*[[[head:sigset,hash:0x4e0c30ec]]]*/
+/*[[[head:sigset,hash:CRC-32=0x2788a44a]]]*/
 /* @param signo: One of `SIG*' */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.sigset") sighandler_t
 NOTHROW_NCX(LIBCCALL libc_sigset)(int signo,
@@ -626,7 +626,7 @@ err:
 }
 /*[[[end:sigset]]]*/
 
-/*[[[head:__libc_current_sigrtmin,hash:0x84a64035]]]*/
+/*[[[head:__libc_current_sigrtmin,hash:CRC-32=0x182ba356]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.__libc_current_sigrtmin") int
 NOTHROW_NCX(LIBCCALL libc___libc_current_sigrtmin)(void)
 /*[[[body:__libc_current_sigrtmin]]]*/
@@ -635,7 +635,7 @@ NOTHROW_NCX(LIBCCALL libc___libc_current_sigrtmin)(void)
 }
 /*[[[end:__libc_current_sigrtmin]]]*/
 
-/*[[[head:__libc_current_sigrtmax,hash:0xfebe3d7f]]]*/
+/*[[[head:__libc_current_sigrtmax,hash:CRC-32=0xcf60aeb5]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.__libc_current_sigrtmax") int
 NOTHROW_NCX(LIBCCALL libc___libc_current_sigrtmax)(void)
 /*[[[body:__libc_current_sigrtmax]]]*/
@@ -656,7 +656,7 @@ DEFINE_INTERN_ALIAS(libc_gsignal, libc_raise);
 
 
 
-/*[[[start:exports,hash:0xf5c15dd9]]]*/
+/*[[[start:exports,hash:CRC-32=0xf7dac137]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(raise, libc_raise);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$raise, libd_raise);
 DEFINE_PUBLIC_WEAK_ALIAS(sysv_signal, libc_sysv_signal);

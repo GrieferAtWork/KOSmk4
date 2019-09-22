@@ -32,7 +32,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:times,hash:0x3e307b94]]]*/
+/*[[[head:times,hash:CRC-32=0x141b050]]]*/
 /* Store the CPU time used by this process and all its
  * dead children (and their dead children) in BUFFER.
  * Return the elapsed real time, or (clock_t) -1 for errors.
@@ -51,7 +51,7 @@ NOTHROW_NCX(LIBCCALL libc_times)(struct tms *buffer)
 
 
 
-/*[[[start:exports,hash:0xd1601007]]]*/
+/*[[[start:exports,hash:CRC-32=0xd97f92dd]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(times, libc_times);
 /*[[[end:exports]]]*/
 

@@ -30,7 +30,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:gtty,hash:0xb79fa7dc]]]*/
+/*[[[head:gtty,hash:CRC-32=0xdfabfd4e]]]*/
 /* Fill in *PARAMS with terminal parameters associated with FD */
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.database.utmpx.gtty") int
@@ -44,7 +44,7 @@ NOTHROW_NCX(LIBCCALL libc_gtty)(fd_t fd,
 }
 /*[[[end:gtty]]]*/
 
-/*[[[head:stty,hash:0xb99a89d]]]*/
+/*[[[head:stty,hash:CRC-32=0x91e6970d]]]*/
 /* Set the terminal parameters associated with FD to *PARAMS */
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.database.utmpx.stty") int
@@ -62,7 +62,7 @@ NOTHROW_NCX(LIBCCALL libc_stty)(fd_t fd,
 
 
 
-/*[[[start:exports,hash:0xcd20de10]]]*/
+/*[[[start:exports,hash:CRC-32=0x27273b1]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(gtty, libc_gtty);
 DEFINE_PUBLIC_WEAK_ALIAS(stty, libc_stty);
 /*[[[end:exports]]]*/

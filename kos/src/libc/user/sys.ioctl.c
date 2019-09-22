@@ -32,7 +32,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:ioctl,hash:0x396e522d]]]*/
+/*[[[head:ioctl,hash:CRC-32=0x1305bc25]]]*/
 /* Perform the I/O control operation specified by REQUEST on FD.
  * One argument may follow; its presence and type depend on REQUEST.
  * Return value depends on REQUEST. Usually -1 indicates error */
@@ -57,7 +57,7 @@ NOTHROW_RPC(VLIBCCALL libc_ioctl)(fd_t fd,
 
 
 
-/*[[[start:exports,hash:0x973ac260]]]*/
+/*[[[start:exports,hash:CRC-32=0xe0fe93a6]]]*/
 #undef ioctl
 DEFINE_PUBLIC_WEAK_ALIAS(ioctl, libc_ioctl);
 /*[[[end:exports]]]*/

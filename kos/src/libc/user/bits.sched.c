@@ -37,7 +37,7 @@ DECL_BEGIN
 /* Clone must be implemented in assembly! */
 /*[[[skip:clone]]]*/
 
-/*[[[head:unshare,hash:0x94b30794]]]*/
+/*[[[head:unshare,hash:CRC-32=0x1fac0a45]]]*/
 /* >> unshare(2)
  * Unshare certain components of the calling thread that may be shared with other
  * threads or processes, such as the filesystem, or opened file descriptors.
@@ -72,7 +72,7 @@ NOTHROW_NCX(LIBCCALL libc_unshare)(int flags)
 }
 /*[[[end:unshare]]]*/
 
-/*[[[head:sched_getcpu,hash:0x530dff14]]]*/
+/*[[[head:sched_getcpu,hash:CRC-32=0xee1dd0c1]]]*/
 /* >> sched_getcpu(3)
  * Returns the number of the CPU for the calling thread.
  * Note that due to unforseeable scheduling conditions, this may change at any
@@ -89,7 +89,7 @@ NOTHROW_NCX(LIBCCALL libc_sched_getcpu)(void)
 }
 /*[[[end:sched_getcpu]]]*/
 
-/*[[[head:setns,hash:0xb328e74b]]]*/
+/*[[[head:setns,hash:CRC-32=0x2ad1758]]]*/
 /* >> setns(2)
  * With `FD' referring to a namespace, reassociate the calling thread with that namespace.
  * For this purpose, `FD' was opened for one of the files in `/proc/[pid]/ns/'
@@ -109,7 +109,7 @@ NOTHROW_NCX(LIBCCALL libc_setns)(fd_t fd,
 }
 /*[[[end:setns]]]*/
 
-/*[[[head:exit_thread,hash:0xc96828bf]]]*/
+/*[[[head:exit_thread,hash:CRC-32=0x7d2ac39a]]]*/
 /* Exits the current thread by invoking the SYS_exit system call,
  * after performing some additional cleanup not done by the kernel.
  * Assuming that the calling thread was constructed by `clone()',
@@ -142,7 +142,7 @@ NOTHROW_NCX(LIBCCALL libc_exit_thread)(int exit_code)
 
 
 
-/*[[[start:exports,hash:0x4984795a]]]*/
+/*[[[start:exports,hash:CRC-32=0x79af6541]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(unshare, libc_unshare);
 DEFINE_PUBLIC_WEAK_ALIAS(sched_getcpu, libc_sched_getcpu);
 DEFINE_PUBLIC_WEAK_ALIAS(setns, libc_setns);

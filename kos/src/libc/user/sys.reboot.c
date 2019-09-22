@@ -31,7 +31,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:reboot,hash:0xcceb6c97]]]*/
+/*[[[head:reboot,hash:CRC-32=0xc06314be]]]*/
 /* Reboot or halt the system
  * @param: howto: One of the `RB_*' constants above */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.reboot.reboot") int
@@ -48,7 +48,7 @@ NOTHROW_NCX(LIBCCALL libc_reboot)(int howto)
 
 
 
-/*[[[start:exports,hash:0x7409680f]]]*/
+/*[[[start:exports,hash:CRC-32=0x4d62a40e]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(reboot, libc_reboot);
 /*[[[end:exports]]]*/
 

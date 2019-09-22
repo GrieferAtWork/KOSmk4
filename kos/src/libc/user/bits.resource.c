@@ -30,7 +30,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:prlimit,hash:0xb561bbbe]]]*/
+/*[[[head:prlimit,hash:CRC-32=0x9eaefd14]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.resource.prlimit") int
 NOTHROW_NCX(LIBCCALL libc_prlimit)(pid_t pid,
                                    __rlimit_resource_t resource,
@@ -44,7 +44,7 @@ NOTHROW_NCX(LIBCCALL libc_prlimit)(pid_t pid,
 }
 /*[[[end:prlimit]]]*/
 
-/*[[[head:prlimit64,hash:0xdb2e71ce]]]*/
+/*[[[head:prlimit64,hash:CRC-32=0xfad2914a]]]*/
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_prlimit64, libc_prlimit);
 #else
@@ -66,7 +66,7 @@ NOTHROW_NCX(LIBCCALL libc_prlimit64)(pid_t pid,
 
 
 
-/*[[[start:exports,hash:0x57606293]]]*/
+/*[[[start:exports,hash:CRC-32=0xa01dde2b]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(prlimit, libc_prlimit);
 DEFINE_PUBLIC_WEAK_ALIAS(prlimit64, libc_prlimit64);
 /*[[[end:exports]]]*/

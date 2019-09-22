@@ -33,7 +33,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:closelog,hash:0xd4e15c4e]]]*/
+/*[[[head:closelog,hash:CRC-32=0x54f0e523]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.syslog.closelog") void
 NOTHROW_NCX(LIBCCALL libc_closelog)(void)
 /*[[[body:closelog]]]*/
@@ -43,7 +43,7 @@ NOTHROW_NCX(LIBCCALL libc_closelog)(void)
 }
 /*[[[end:closelog]]]*/
 
-/*[[[head:openlog,hash:0x35ab6e1c]]]*/
+/*[[[head:openlog,hash:CRC-32=0x716b33f5]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.syslog.openlog") void
 NOTHROW_RPC(LIBCCALL libc_openlog)(char const *ident,
                                    int option,
@@ -55,7 +55,7 @@ NOTHROW_RPC(LIBCCALL libc_openlog)(char const *ident,
 }
 /*[[[end:openlog]]]*/
 
-/*[[[head:setlogmask,hash:0x33cb6142]]]*/
+/*[[[head:setlogmask,hash:CRC-32=0xccb38207]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.syslog.setlogmask") int
 NOTHROW_NCX(LIBCCALL libc_setlogmask)(int mask)
 /*[[[body:setlogmask]]]*/
@@ -66,7 +66,7 @@ NOTHROW_NCX(LIBCCALL libc_setlogmask)(int mask)
 }
 /*[[[end:setlogmask]]]*/
 
-/*[[[head:syslog,hash:0xc4bb13fc]]]*/
+/*[[[head:syslog,hash:CRC-32=0xc3bbe50b]]]*/
 INTERN ATTR_LIBC_PRINTF(2,3) NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.system.syslog.syslog") void
 NOTHROW_RPC(VLIBCCALL libc_syslog)(int level,
@@ -84,7 +84,7 @@ NOTHROW_RPC(VLIBCCALL libc_syslog)(int level,
 }
 /*[[[end:syslog]]]*/
 
-/*[[[head:vsyslog,hash:0x4d1f9381]]]*/
+/*[[[head:vsyslog,hash:CRC-32=0xe30c304]]]*/
 INTERN ATTR_LIBC_PRINTF(2,0) NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.system.syslog.vsyslog") void
 NOTHROW_RPC(LIBCCALL libc_vsyslog)(int level,
@@ -99,7 +99,7 @@ NOTHROW_RPC(LIBCCALL libc_vsyslog)(int level,
 }
 /*[[[end:vsyslog]]]*/
 
-/*[[[head:syslog_printer,hash:0x19a8e28a]]]*/
+/*[[[head:syslog_printer,hash:CRC-32=0x90817ab9]]]*/
 /* Helper functions for printing to the system log */
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.system.syslog.syslog_printer") ssize_t
@@ -120,7 +120,7 @@ NOTHROW_RPC(LIBCCALL libc_syslog_printer)(void *arg,
 
 
 
-/*[[[start:exports,hash:0x926aaedd]]]*/
+/*[[[start:exports,hash:CRC-32=0xbfbd2114]]]*/
 #undef syslog
 DEFINE_PUBLIC_WEAK_ALIAS(closelog, libc_closelog);
 DEFINE_PUBLIC_WEAK_ALIAS(openlog, libc_openlog);

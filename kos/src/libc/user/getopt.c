@@ -451,7 +451,7 @@ NOTHROW_NCX(LIBCCALL libc___posix_getopt)(int argc,
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:getopt,hash:0xcba2d72b]]]*/
+/*[[[head:getopt,hash:CRC-32=0xf8d530e2]]]*/
 /* Return the option character from OPTS just read.  Return -1 when
  * there are no more options.  For unrecognized options, or options
  * missing arguments, `optopt' is set to the option letter, and '?' is
@@ -484,7 +484,7 @@ NOTHROW_NCX(LIBCCALL libc_getopt)(int argc,
 }
 /*[[[end:getopt]]]*/
 
-/*[[[head:getopt_long,hash:0x5caf5a7f]]]*/
+/*[[[head:getopt_long,hash:CRC-32=0xe5690ba6]]]*/
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.application.options.getopt_long") int
 NOTHROW_NCX(LIBCCALL libc_getopt_long)(int argc,
@@ -504,7 +504,7 @@ NOTHROW_NCX(LIBCCALL libc_getopt_long)(int argc,
 }
 /*[[[end:getopt_long]]]*/
 
-/*[[[head:getopt_long_only,hash:0xe6beb05d]]]*/
+/*[[[head:getopt_long_only,hash:CRC-32=0x784a30b2]]]*/
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.application.options.getopt_long_only") int
 NOTHROW_NCX(LIBCCALL libc_getopt_long_only)(int argc,
@@ -528,7 +528,7 @@ NOTHROW_NCX(LIBCCALL libc_getopt_long_only)(int argc,
 
 
 
-/*[[[start:exports,hash:0xda6c3ca2]]]*/
+/*[[[start:exports,hash:CRC-32=0x7cead5e3]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(getopt, libc_getopt);
 DEFINE_PUBLIC_WEAK_ALIAS(getopt_long, libc_getopt_long);
 DEFINE_PUBLIC_WEAK_ALIAS(getopt_long_only, libc_getopt_long_only);

@@ -32,7 +32,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:flock,hash:0xbb2c075e]]]*/
+/*[[[head:flock,hash:CRC-32=0x3c0354aa]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.flock") int
 NOTHROW_RPC(LIBCCALL libc_flock)(fd_t fd,
                                  int operation)
@@ -48,7 +48,7 @@ NOTHROW_RPC(LIBCCALL libc_flock)(fd_t fd,
 
 
 
-/*[[[start:exports,hash:0x1653340d]]]*/
+/*[[[start:exports,hash:CRC-32=0xbb27860a]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(flock, libc_flock);
 /*[[[end:exports]]]*/
 

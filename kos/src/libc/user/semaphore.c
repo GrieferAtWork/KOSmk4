@@ -30,7 +30,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:sem_init,hash:0xfbb93833]]]*/
+/*[[[head:sem_init,hash:CRC-32=0x9b49de17]]]*/
 /* Initialize semaphore object SEM to VALUE.
  * If PSHARED then share it with other processes */
 INTERN NONNULL((1))
@@ -46,7 +46,7 @@ NOTHROW_NCX(LIBCCALL libc_sem_init)(sem_t *sem,
 }
 /*[[[end:sem_init]]]*/
 
-/*[[[head:sem_destroy,hash:0x679ca2b]]]*/
+/*[[[head:sem_destroy,hash:CRC-32=0xbc662e37]]]*/
 /* Free resources associated with semaphore object SEM */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.semaphore.sem_destroy") int
@@ -59,7 +59,7 @@ NOTHROW_NCX(LIBCCALL libc_sem_destroy)(sem_t *sem)
 }
 /*[[[end:sem_destroy]]]*/
 
-/*[[[head:sem_open,hash:0x2a4d2f45]]]*/
+/*[[[head:sem_open,hash:CRC-32=0x6e6740d]]]*/
 /* Open a named semaphore NAME with open flags OFLAG */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.semaphore.sem_open") sem_t *
@@ -74,7 +74,7 @@ NOTHROW_RPC_KOS(VLIBCCALL libc_sem_open)(char const *name,
 }
 /*[[[end:sem_open]]]*/
 
-/*[[[head:sem_close,hash:0x1d25aab2]]]*/
+/*[[[head:sem_close,hash:CRC-32=0xbe535676]]]*/
 /* Close descriptor for named semaphore SEM */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.semaphore.sem_close") int
@@ -87,7 +87,7 @@ NOTHROW_NCX(LIBCCALL libc_sem_close)(sem_t *sem)
 }
 /*[[[end:sem_close]]]*/
 
-/*[[[head:sem_unlink,hash:0x47ec2b11]]]*/
+/*[[[head:sem_unlink,hash:CRC-32=0xb789d603]]]*/
 /* Remove named semaphore NAME */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.semaphore.sem_unlink") int
@@ -100,7 +100,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_sem_unlink)(const char *name)
 }
 /*[[[end:sem_unlink]]]*/
 
-/*[[[head:sem_wait,hash:0x9eb8bbf5]]]*/
+/*[[[head:sem_wait,hash:CRC-32=0x57284335]]]*/
 /* Wait for SEM being posted */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.semaphore.sem_wait") int
@@ -113,7 +113,7 @@ NOTHROW_RPC(LIBCCALL libc_sem_wait)(sem_t *sem)
 }
 /*[[[end:sem_wait]]]*/
 
-/*[[[head:sem_timedwait,hash:0x83c96cc4]]]*/
+/*[[[head:sem_timedwait,hash:CRC-32=0xe2bd3d49]]]*/
 /* Similar to `sem_wait' but wait only until ABSTIME */
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.semaphore.sem_timedwait") int
@@ -127,7 +127,7 @@ NOTHROW_RPC(LIBCCALL libc_sem_timedwait)(sem_t *__restrict sem,
 }
 /*[[[end:sem_timedwait]]]*/
 
-/*[[[head:sem_timedwait64,hash:0x7cac3176]]]*/
+/*[[[head:sem_timedwait64,hash:CRC-32=0x77a1bf9b]]]*/
 /* Similar to `sem_wait' but wait only until ABSTIME */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_sem_timedwait64, libc_sem_timedwait);
@@ -145,7 +145,7 @@ NOTHROW_RPC(LIBCCALL libc_sem_timedwait64)(sem_t *__restrict sem,
 #endif /* MAGIC:alias */
 /*[[[end:sem_timedwait64]]]*/
 
-/*[[[head:sem_trywait,hash:0x67e5280c]]]*/
+/*[[[head:sem_trywait,hash:CRC-32=0x8c0b11f3]]]*/
 /* Test whether SEM is posted */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.semaphore.sem_trywait") int
@@ -158,7 +158,7 @@ NOTHROW_NCX(LIBCCALL libc_sem_trywait)(sem_t *sem)
 }
 /*[[[end:sem_trywait]]]*/
 
-/*[[[head:sem_post,hash:0xec6661d7]]]*/
+/*[[[head:sem_post,hash:CRC-32=0xb4a241a8]]]*/
 /* Post SEM */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.semaphore.sem_post") int
@@ -171,7 +171,7 @@ NOTHROW_NCX(LIBCCALL libc_sem_post)(sem_t *sem)
 }
 /*[[[end:sem_post]]]*/
 
-/*[[[head:sem_getvalue,hash:0x265861e1]]]*/
+/*[[[head:sem_getvalue,hash:CRC-32=0x80176003]]]*/
 /* Get current value of SEM and store it in *SVAL */
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.semaphore.sem_getvalue") int
@@ -189,7 +189,7 @@ NOTHROW_NCX(LIBCCALL libc_sem_getvalue)(sem_t *__restrict sem,
 
 
 
-/*[[[start:exports,hash:0x25d57a48]]]*/
+/*[[[start:exports,hash:CRC-32=0x5d60f078]]]*/
 #undef sem_open
 DEFINE_PUBLIC_WEAK_ALIAS(sem_init, libc_sem_init);
 DEFINE_PUBLIC_WEAK_ALIAS(sem_destroy, libc_sem_destroy);

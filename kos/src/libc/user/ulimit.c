@@ -37,7 +37,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:ulimit,hash:0x1b87edbe]]]*/
+/*[[[head:ulimit,hash:CRC-32=0x4668b8ae]]]*/
 /* Control process limits according to CMD */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.ulimit") long int
 NOTHROW_NCX(VLIBCCALL libc_ulimit)(int cmd,
@@ -87,7 +87,7 @@ NOTHROW_NCX(VLIBCCALL libc_ulimit)(int cmd,
 
 
 
-/*[[[start:exports,hash:0xf4251c9]]]*/
+/*[[[start:exports,hash:CRC-32=0x5fa99f49]]]*/
 #undef ulimit
 DEFINE_PUBLIC_WEAK_ALIAS(ulimit, libc_ulimit);
 /*[[[end:exports]]]*/

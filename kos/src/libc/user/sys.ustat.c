@@ -31,7 +31,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:ustat,hash:0xa2410aaf]]]*/
+/*[[[head:ustat,hash:CRC-32=0x7e56b8b1]]]*/
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.ustat") int
 NOTHROW_NCX(LIBCCALL libc_ustat)(dev_t dev,
@@ -46,7 +46,7 @@ NOTHROW_NCX(LIBCCALL libc_ustat)(dev_t dev,
 
 /*[[[end:implementation]]]*/
 
-/*[[[start:exports,hash:0x40eba5bd]]]*/
+/*[[[start:exports,hash:CRC-32=0xe88b8b47]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(ustat, libc_ustat);
 /*[[[end:exports]]]*/
 

@@ -30,7 +30,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:getifaddrs,hash:0x1bbf3213]]]*/
+/*[[[head:getifaddrs,hash:CRC-32=0xe4d9ffa]]]*/
 /* Create a linked list of `struct ifaddrs' structures, one for each
  * network interface on the host machine. If successful, store the
  * list in *IFAP and return 0. On errors, return -1 and set `errno'.
@@ -46,7 +46,7 @@ NOTHROW_NCX(LIBCCALL libc_getifaddrs)(struct ifaddrs **ifap)
 }
 /*[[[end:getifaddrs]]]*/
 
-/*[[[head:freeifaddrs,hash:0x2e90281a]]]*/
+/*[[[head:freeifaddrs,hash:CRC-32=0x90a6ae29]]]*/
 /* Reclaim the storage allocated by a previous `getifaddrs' call */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.freeifaddrs") void
 NOTHROW_NCX(LIBCCALL libc_freeifaddrs)(struct ifaddrs *ifa)
@@ -61,7 +61,7 @@ NOTHROW_NCX(LIBCCALL libc_freeifaddrs)(struct ifaddrs *ifa)
 
 
 
-/*[[[start:exports,hash:0xcc88c630]]]*/
+/*[[[start:exports,hash:CRC-32=0xb53e034d]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(getifaddrs, libc_getifaddrs);
 DEFINE_PUBLIC_WEAK_ALIAS(freeifaddrs, libc_freeifaddrs);
 /*[[[end:exports]]]*/

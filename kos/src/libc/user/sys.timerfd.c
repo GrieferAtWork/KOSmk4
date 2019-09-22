@@ -31,7 +31,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:timerfd_create,hash:0xf6db289f]]]*/
+/*[[[head:timerfd_create,hash:CRC-32=0xf52726d4]]]*/
 /* Return file descriptor for new interval timer source */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.timer.timerfd_create") fd_t
 NOTHROW(LIBCCALL libc_timerfd_create)(clockid_t clock_id,
@@ -44,7 +44,7 @@ NOTHROW(LIBCCALL libc_timerfd_create)(clockid_t clock_id,
 }
 /*[[[end:timerfd_create]]]*/
 
-/*[[[head:timerfd_settime,hash:0x3e2fc93e]]]*/
+/*[[[head:timerfd_settime,hash:CRC-32=0xf134c1a3]]]*/
 /* Set next expiration time of interval timer source UFD to UTMR.
  * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout utmr
  * is absolute. Optionally return the old expiration time in OTMR */
@@ -62,7 +62,7 @@ NOTHROW_NCX(LIBCCALL libc_timerfd_settime)(fd_t ufd,
 }
 /*[[[end:timerfd_settime]]]*/
 
-/*[[[head:timerfd_gettime,hash:0x47798a85]]]*/
+/*[[[head:timerfd_gettime,hash:CRC-32=0x31437c4c]]]*/
 /* Return the next expiration time of UFD */
 INTERN NONNULL((2)) NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.timer.timerfd_gettime") int
@@ -76,7 +76,7 @@ NOTHROW_NCX(LIBCCALL libc_timerfd_gettime)(fd_t ufd,
 }
 /*[[[end:timerfd_gettime]]]*/
 
-/*[[[head:timerfd_settime64,hash:0x821e826]]]*/
+/*[[[head:timerfd_settime64,hash:CRC-32=0x8ccf7a5d]]]*/
 /* Set next expiration time of interval timer source UFD to UTMR.
  * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout utmr
  * is absolute. Optionally return the old expiration time in OTMR */
@@ -98,7 +98,7 @@ NOTHROW_NCX(LIBCCALL libc_timerfd_settime64)(fd_t ufd,
 #endif /* MAGIC:alias */
 /*[[[end:timerfd_settime64]]]*/
 
-/*[[[head:timerfd_gettime64,hash:0x41dd115]]]*/
+/*[[[head:timerfd_gettime64,hash:CRC-32=0x1b09caeb]]]*/
 /* Return the next expiration time of UFD */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_timerfd_gettime64, libc_timerfd_gettime);
@@ -120,7 +120,7 @@ NOTHROW_NCX(LIBCCALL libc_timerfd_gettime64)(fd_t ufd,
 
 
 
-/*[[[start:exports,hash:0x1614a0e8]]]*/
+/*[[[start:exports,hash:CRC-32=0x819948c6]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(timerfd_create, libc_timerfd_create);
 DEFINE_PUBLIC_WEAK_ALIAS(timerfd_settime, libc_timerfd_settime);
 DEFINE_PUBLIC_WEAK_ALIAS(timerfd_gettime, libc_timerfd_gettime);

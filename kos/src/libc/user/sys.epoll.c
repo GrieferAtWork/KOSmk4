@@ -31,7 +31,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:epoll_create,hash:0x616081ab]]]*/
+/*[[[head:epoll_create,hash:CRC-32=0x7f19677a]]]*/
 /* Creates an epoll instance.  Returns an fd for the new instance.
  * The "size" parameter is a hint specifying the number of file
  * descriptors to be associated with the new instance. The fd
@@ -47,7 +47,7 @@ NOTHROW_NCX(LIBCCALL libc_epoll_create)(int size)
 }
 /*[[[end:epoll_create]]]*/
 
-/*[[[head:epoll_create1,hash:0x821d707]]]*/
+/*[[[head:epoll_create1,hash:CRC-32=0x37265d85]]]*/
 /* Same as epoll_create but with an FLAGS parameter.
  * The unused SIZE parameter has been dropped
  * @param: flags: Set of `EPOLL_*' */
@@ -62,7 +62,7 @@ NOTHROW_NCX(LIBCCALL libc_epoll_create1)(int flags)
 }
 /*[[[end:epoll_create1]]]*/
 
-/*[[[head:epoll_ctl,hash:0x8ad3059e]]]*/
+/*[[[head:epoll_ctl,hash:CRC-32=0x7669f5d4]]]*/
 /* Manipulate an epoll instance "epfd". Returns 0 in case of success,
  * -1 in case of error (the "errno" variable will contain the
  * specific error code) The "op" parameter is one of the EPOLL_CTL_*
@@ -82,7 +82,7 @@ NOTHROW_NCX(LIBCCALL libc_epoll_ctl)(fd_t epfd,
 }
 /*[[[end:epoll_ctl]]]*/
 
-/*[[[head:epoll_wait,hash:0xa4732696]]]*/
+/*[[[head:epoll_wait,hash:CRC-32=0xc653885]]]*/
 /* Wait for events on an epoll instance "epfd". Returns the number of
  * triggered events returned in "events" buffer. Or -1 in case of
  * error with the "errno" variable set to the specific error code. The
@@ -106,7 +106,7 @@ NOTHROW_RPC(LIBCCALL libc_epoll_wait)(fd_t epfd,
 }
 /*[[[end:epoll_wait]]]*/
 
-/*[[[head:epoll_pwait,hash:0x1ff8974f]]]*/
+/*[[[head:epoll_pwait,hash:CRC-32=0x3313c95]]]*/
 /* Same as epoll_wait, but the thread's signal mask is temporarily
  * and atomically replaced with the one provided as parameter */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.poll.epoll_pwait") int
@@ -131,7 +131,7 @@ NOTHROW_RPC(LIBCCALL libc_epoll_pwait)(fd_t epfd,
 
 
 
-/*[[[start:exports,hash:0x77240656]]]*/
+/*[[[start:exports,hash:CRC-32=0xd812a1ee]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(epoll_create, libc_epoll_create);
 DEFINE_PUBLIC_WEAK_ALIAS(epoll_create1, libc_epoll_create1);
 DEFINE_PUBLIC_WEAK_ALIAS(epoll_ctl, libc_epoll_ctl);

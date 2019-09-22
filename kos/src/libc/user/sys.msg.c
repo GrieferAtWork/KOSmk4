@@ -30,7 +30,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:msgctl,hash:0xbd1f7127]]]*/
+/*[[[head:msgctl,hash:CRC-32=0x2e14daed]]]*/
 /* Message queue control operation */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.msg.msgctl") int
 NOTHROW_NCX(LIBCCALL libc_msgctl)(int msqid,
@@ -44,7 +44,7 @@ NOTHROW_NCX(LIBCCALL libc_msgctl)(int msqid,
 }
 /*[[[end:msgctl]]]*/
 
-/*[[[head:msgget,hash:0xa060d27a]]]*/
+/*[[[head:msgget,hash:CRC-32=0xb918008d]]]*/
 /* Get messages queue */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.msg.msgget") int
 NOTHROW_NCX(LIBCCALL libc_msgget)(key_t key,
@@ -57,7 +57,7 @@ NOTHROW_NCX(LIBCCALL libc_msgget)(key_t key,
 }
 /*[[[end:msgget]]]*/
 
-/*[[[head:msgrcv,hash:0x5f7cfef5]]]*/
+/*[[[head:msgrcv,hash:CRC-32=0xad686d23]]]*/
 /* Receive message from message queue */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.msg.msgrcv") ssize_t
 NOTHROW_RPC(LIBCCALL libc_msgrcv)(int msqid,
@@ -73,7 +73,7 @@ NOTHROW_RPC(LIBCCALL libc_msgrcv)(int msqid,
 }
 /*[[[end:msgrcv]]]*/
 
-/*[[[head:msgsnd,hash:0x33a3535f]]]*/
+/*[[[head:msgsnd,hash:CRC-32=0x4b0dd8b0]]]*/
 /* Send message to message queue */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.msg.msgsnd") int
 NOTHROW_RPC(LIBCCALL libc_msgsnd)(int msqid,
@@ -92,7 +92,7 @@ NOTHROW_RPC(LIBCCALL libc_msgsnd)(int msqid,
 
 
 
-/*[[[start:exports,hash:0xadef3e08]]]*/
+/*[[[start:exports,hash:CRC-32=0xd4606b2c]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(msgctl, libc_msgctl);
 DEFINE_PUBLIC_WEAK_ALIAS(msgget, libc_msgget);
 DEFINE_PUBLIC_WEAK_ALIAS(msgrcv, libc_msgrcv);

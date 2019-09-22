@@ -62,7 +62,7 @@ statfs64_to_statvfs64(struct statvfs64 *__restrict dst,
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:statvfs,hash:0xd4ff9a46]]]*/
+/*[[[head:statvfs,hash:CRC-32=0xfe0a9f40]]]*/
 /* Return information about the filesystem on which FILE resides */
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.statfs.statvfs.statvfs") int
@@ -79,7 +79,7 @@ NOTHROW_NCX(LIBCCALL libc_statvfs)(char const *file,
 }
 /*[[[end:statvfs]]]*/
 
-/*[[[head:fstatvfs,hash:0x31202059]]]*/
+/*[[[head:fstatvfs,hash:CRC-32=0x3f0bb8e6]]]*/
 /* Return information about the filesystem containing the file FILDES refers to */
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.statfs.statvfs.fstatvfs") int
@@ -96,7 +96,7 @@ NOTHROW_NCX(LIBCCALL libc_fstatvfs)(fd_t filedes,
 }
 /*[[[end:fstatvfs]]]*/
 
-/*[[[head:statvfs64,hash:0xd71a06e9]]]*/
+/*[[[head:statvfs64,hash:CRC-32=0x814686ec]]]*/
 /* Return information about the filesystem on which FILE resides */
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_statvfs64, libc_statvfs);
@@ -117,7 +117,7 @@ NOTHROW_NCX(LIBCCALL libc_statvfs64)(const char *file,
 #endif /* MAGIC:alias */
 /*[[[end:statvfs64]]]*/
 
-/*[[[head:fstatvfs64,hash:0xa2d29bc]]]*/
+/*[[[head:fstatvfs64,hash:CRC-32=0x76f50b54]]]*/
 /* Return information about the filesystem containing the file FILDES refers to */
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_fstatvfs64, libc_fstatvfs);
@@ -142,7 +142,7 @@ NOTHROW_NCX(LIBCCALL libc_fstatvfs64)(fd_t filedes,
 
 
 
-/*[[[start:exports,hash:0x31ac869b]]]*/
+/*[[[start:exports,hash:CRC-32=0x2ae8331b]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(statvfs, libc_statvfs);
 DEFINE_PUBLIC_WEAK_ALIAS(fstatvfs, libc_fstatvfs);
 DEFINE_PUBLIC_WEAK_ALIAS(statvfs64, libc_statvfs64);

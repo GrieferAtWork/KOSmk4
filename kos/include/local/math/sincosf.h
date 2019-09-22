@@ -1,4 +1,4 @@
-/* HASH 0x2f8d98e7 */
+/* HASH CRC-32:0x521d9347 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *

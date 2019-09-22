@@ -30,7 +30,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:setaliasent,hash:0x7147f2d7]]]*/
+/*[[[head:setaliasent,hash:CRC-32=0x7aa4e8c]]]*/
 /* Open alias data base files */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.aliases.setaliasent") void
 NOTHROW_RPC_KOS(LIBCCALL libc_setaliasent)(void)
@@ -41,7 +41,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_setaliasent)(void)
 }
 /*[[[end:setaliasent]]]*/
 
-/*[[[head:endaliasent,hash:0xca9f596e]]]*/
+/*[[[head:endaliasent,hash:CRC-32=0x18c47f61]]]*/
 /* Close alias data base files */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.aliases.endaliasent") void
 NOTHROW_NCX(LIBCCALL libc_endaliasent)(void)
@@ -52,7 +52,7 @@ NOTHROW_NCX(LIBCCALL libc_endaliasent)(void)
 }
 /*[[[end:endaliasent]]]*/
 
-/*[[[head:getaliasent,hash:0x970d5a58]]]*/
+/*[[[head:getaliasent,hash:CRC-32=0x6c2cef2f]]]*/
 /* Get the next entry from the alias data base */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.aliases.getaliasent") struct aliasent *
 NOTHROW_RPC_KOS(LIBCCALL libc_getaliasent)(void)
@@ -64,7 +64,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getaliasent)(void)
 }
 /*[[[end:getaliasent]]]*/
 
-/*[[[head:getaliasent_r,hash:0xf302c3c7]]]*/
+/*[[[head:getaliasent_r,hash:CRC-32=0x617dd09e]]]*/
 /* Get the next entry from the alias data base and put it in RESULT_BUF */
 INTERN NONNULL((1, 2, 4))
 ATTR_WEAK ATTR_SECTION(".text.crt.database.aliases.getaliasent_r") int
@@ -80,7 +80,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getaliasent_r)(struct aliasent *__restrict result_
 }
 /*[[[end:getaliasent_r]]]*/
 
-/*[[[head:getaliasbyname,hash:0x7d1ec7ff]]]*/
+/*[[[head:getaliasbyname,hash:CRC-32=0x592b56f1]]]*/
 /* Get alias entry corresponding to NAME */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.database.aliases.getaliasbyname") struct aliasent *
@@ -93,7 +93,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getaliasbyname)(char const *name)
 }
 /*[[[end:getaliasbyname]]]*/
 
-/*[[[head:getaliasbyname_r,hash:0x757d8979]]]*/
+/*[[[head:getaliasbyname_r,hash:CRC-32=0xacfc38d0]]]*/
 /* Get alias entry corresponding to NAME and put it in RESULT_BUF */
 INTERN NONNULL((1, 2, 3, 5))
 ATTR_WEAK ATTR_SECTION(".text.crt.database.aliases.getaliasbyname_r") int
@@ -114,7 +114,7 @@ NOTHROW_RPC_KOS(LIBCCALL libc_getaliasbyname_r)(char const *__restrict name,
 
 
 
-/*[[[start:exports,hash:0xadadda79]]]*/
+/*[[[start:exports,hash:CRC-32=0x26b82686]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(setaliasent, libc_setaliasent);
 DEFINE_PUBLIC_WEAK_ALIAS(endaliasent, libc_endaliasent);
 DEFINE_PUBLIC_WEAK_ALIAS(getaliasent, libc_getaliasent);

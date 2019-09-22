@@ -30,7 +30,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:setmntent,hash:0xb7ff44ee]]]*/
+/*[[[head:setmntent,hash:CRC-32=0x8be63af0]]]*/
 /* Prepare to begin reading and/or writing mount table
  * entries from the beginning of FILE.  MODE is as for `fopen' */
 INTERN NONNULL((1, 2))
@@ -45,7 +45,7 @@ NOTHROW_RPC(LIBCCALL libc_setmntent)(char const *file,
 }
 /*[[[end:setmntent]]]*/
 
-/*[[[head:getmntent,hash:0x243a738c]]]*/
+/*[[[head:getmntent,hash:CRC-32=0x3e073f87]]]*/
 /* Read one mount table entry from STREAM.  Returns a pointer to storage
  * reused on the next call, or null for EOF or error (use feof/ferror to check) */
 INTERN NONNULL((1))
@@ -59,7 +59,7 @@ NOTHROW_RPC(LIBCCALL libc_getmntent)(FILE *stream)
 }
 /*[[[end:getmntent]]]*/
 
-/*[[[head:getmntent_r,hash:0x8b32bf41]]]*/
+/*[[[head:getmntent_r,hash:CRC-32=0x955948c3]]]*/
 /* Reentrant version of the above function */
 INTERN NONNULL((1, 2, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.database.mntent.getmntent_r") struct mntent *
@@ -75,7 +75,7 @@ NOTHROW_RPC(LIBCCALL libc_getmntent_r)(FILE *__restrict stream,
 }
 /*[[[end:getmntent_r]]]*/
 
-/*[[[head:addmntent,hash:0x2246ccbc]]]*/
+/*[[[head:addmntent,hash:CRC-32=0x303ff22e]]]*/
 /* Write the mount table entry described by MNT to STREAM.
  * Return zero on success, nonzero on failure */
 INTERN NONNULL((1, 2))
@@ -90,7 +90,7 @@ NOTHROW_RPC(LIBCCALL libc_addmntent)(FILE *__restrict stream,
 }
 /*[[[end:addmntent]]]*/
 
-/*[[[head:endmntent,hash:0xa14d920f]]]*/
+/*[[[head:endmntent,hash:CRC-32=0x670faef7]]]*/
 /* Close a stream opened with `setmntent' */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.database.mntent.endmntent") int
@@ -107,7 +107,7 @@ NOTHROW_RPC_NOKOS(LIBCCALL libc_endmntent)(FILE *stream)
 
 
 
-/*[[[start:exports,hash:0xeafc4b0f]]]*/
+/*[[[start:exports,hash:CRC-32=0xdeeeebf0]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(setmntent, libc_setmntent);
 DEFINE_PUBLIC_WEAK_ALIAS(getmntent, libc_getmntent);
 DEFINE_PUBLIC_WEAK_ALIAS(getmntent_r, libc_getmntent_r);

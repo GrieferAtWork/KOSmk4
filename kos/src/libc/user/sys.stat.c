@@ -472,7 +472,7 @@ NOTHROW_RPC(LIBCCALL libc_dos_stat64)(char const *__restrict filename,
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:mkdir,hash:0x5f276ca6]]]*/
+/*[[[head:mkdir,hash:CRC-32=0x6f2a9192]]]*/
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify.mkdir") int
 NOTHROW_RPC(LIBCCALL libc_mkdir)(char const *pathname,
@@ -487,7 +487,7 @@ NOTHROW_RPC(LIBCCALL libc_mkdir)(char const *pathname,
 }
 /*[[[end:mkdir]]]*/
 
-/*[[[head:chmod,hash:0x13b58f24]]]*/
+/*[[[head:chmod,hash:CRC-32=0xd584609d]]]*/
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify.chmod") int
 NOTHROW_RPC(LIBCCALL libc_chmod)(char const *filename,
@@ -506,7 +506,7 @@ DEFINE_INTERN_ALIAS(libc__chmod, libc_chmod);
 DEFINE_PUBLIC_WEAK_ALIAS(_chmod, libc__chmod);
 
 
-/*[[[head:lchmod,hash:0x650bac64]]]*/
+/*[[[head:lchmod,hash:CRC-32=0x6b42d38f]]]*/
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify.lchmod") int
 NOTHROW_RPC(LIBCCALL libc_lchmod)(char const *filename,
@@ -522,7 +522,7 @@ NOTHROW_RPC(LIBCCALL libc_lchmod)(char const *filename,
 }
 /*[[[end:lchmod]]]*/
 
-/*[[[head:umask,hash:0xede0c36]]]*/
+/*[[[head:umask,hash:CRC-32=0xf001d99b]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.fs.basic_property.umask") mode_t
 NOTHROW_NCX(LIBCCALL libc_umask)(mode_t mode)
 /*[[[body:umask]]]*/
@@ -531,7 +531,7 @@ NOTHROW_NCX(LIBCCALL libc_umask)(mode_t mode)
 }
 /*[[[end:umask]]]*/
 
-/*[[[head:getumask,hash:0x5f12beb2]]]*/
+/*[[[head:getumask,hash:CRC-32=0x16105000]]]*/
 /* Return the current umask.
  * WARNING: This function isn't thread-safe */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.fs.basic_property.getumask") mode_t
@@ -545,7 +545,7 @@ NOTHROW_NCX(LIBCCALL libc_getumask)(void)
 }
 /*[[[end:getumask]]]*/
 
-/*[[[head:fmkdirat,hash:0xec454724]]]*/
+/*[[[head:fmkdirat,hash:CRC-32=0x171a590c]]]*/
 /* @param flags: Set of `0|AT_DOSPATH' */
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify.fmkdirat") int
@@ -564,7 +564,7 @@ NOTHROW_RPC(LIBCCALL libc_fmkdirat)(fd_t dirfd,
 }
 /*[[[end:fmkdirat]]]*/
 
-/*[[[head:fmknodat,hash:0xb6bb0c1]]]*/
+/*[[[head:fmknodat,hash:CRC-32=0x1b55cfa2]]]*/
 /* @param flags: Set of `0|AT_DOSPATH' */
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify.fmknodat") int
@@ -585,7 +585,7 @@ NOTHROW_RPC(LIBCCALL libc_fmknodat)(fd_t dirfd,
 }
 /*[[[end:fmknodat]]]*/
 
-/*[[[head:mkfifo,hash:0x12b7a012]]]*/
+/*[[[head:mkfifo,hash:CRC-32=0xe709c355]]]*/
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify.mkfifo") int
 NOTHROW_RPC(LIBCCALL libc_mkfifo)(char const *fifoname,
@@ -596,7 +596,7 @@ NOTHROW_RPC(LIBCCALL libc_mkfifo)(char const *fifoname,
 }
 /*[[[end:mkfifo]]]*/
 
-/*[[[head:fchmodat,hash:0x382c84be]]]*/
+/*[[[head:fchmodat,hash:CRC-32=0x27f8f28b]]]*/
 /* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_DOSPATH' */
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify.fchmodat") int
@@ -615,7 +615,7 @@ NOTHROW_RPC(LIBCCALL libc_fchmodat)(fd_t dirfd,
 }
 /*[[[end:fchmodat]]]*/
 
-/*[[[head:mkdirat,hash:0x97c84560]]]*/
+/*[[[head:mkdirat,hash:CRC-32=0x9a1e59ff]]]*/
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify.mkdirat") int
 NOTHROW_RPC(LIBCCALL libc_mkdirat)(fd_t dirfd,
@@ -631,7 +631,7 @@ NOTHROW_RPC(LIBCCALL libc_mkdirat)(fd_t dirfd,
 }
 /*[[[end:mkdirat]]]*/
 
-/*[[[head:mkfifoat,hash:0x206155a6]]]*/
+/*[[[head:mkfifoat,hash:CRC-32=0x5fadfde]]]*/
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify.mkfifoat") int
 NOTHROW_RPC(LIBCCALL libc_mkfifoat)(fd_t dirfd,
@@ -643,7 +643,7 @@ NOTHROW_RPC(LIBCCALL libc_mkfifoat)(fd_t dirfd,
 }
 /*[[[end:mkfifoat]]]*/
 
-/*[[[head:fchmod,hash:0x339a7cd]]]*/
+/*[[[head:fchmod,hash:CRC-32=0xc7b04afd]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify.fchmod") int
 NOTHROW_RPC(LIBCCALL libc_fchmod)(fd_t fd,
                                   mode_t mode)
@@ -656,7 +656,7 @@ NOTHROW_RPC(LIBCCALL libc_fchmod)(fd_t fd,
 }
 /*[[[end:fchmod]]]*/
 
-/*[[[head:mknod,hash:0xa94d6080]]]*/
+/*[[[head:mknod,hash:CRC-32=0x7ecd01ca]]]*/
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify.mknod") int
 NOTHROW_RPC(LIBCCALL libc_mknod)(char const *nodename,
@@ -673,7 +673,7 @@ NOTHROW_RPC(LIBCCALL libc_mknod)(char const *nodename,
 }
 /*[[[end:mknod]]]*/
 
-/*[[[head:mknodat,hash:0xf7e1415a]]]*/
+/*[[[head:mknodat,hash:CRC-32=0xb168e1e7]]]*/
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify.mknodat") int
 NOTHROW_RPC(LIBCCALL libc_mknodat)(fd_t dirfd,
@@ -693,7 +693,7 @@ NOTHROW_RPC(LIBCCALL libc_mknodat)(fd_t dirfd,
 
 
 
-/*[[[head:utimensat,hash:0x1c09df59]]]*/
+/*[[[head:utimensat,hash:CRC-32=0xffe22c80]]]*/
 /* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify_time.utimensat") int
@@ -712,7 +712,7 @@ NOTHROW_RPC(LIBCCALL libc_utimensat)(fd_t dirfd,
 }
 /*[[[end:utimensat]]]*/
 
-/*[[[head:utimensat64,hash:0x73bde57e]]]*/
+/*[[[head:utimensat64,hash:CRC-32=0xc00999ff]]]*/
 /* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_utimensat64, libc_utimensat);
@@ -735,7 +735,7 @@ NOTHROW_RPC(LIBCCALL libc_utimensat64)(fd_t dirfd,
 #endif /* MAGIC:alias */
 /*[[[end:utimensat64]]]*/
 
-/*[[[head:futimens,hash:0x371ffb20]]]*/
+/*[[[head:futimens,hash:CRC-32=0xe192a680]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify_time.futimens") int
 NOTHROW_RPC(LIBCCALL libc_futimens)(fd_t fd,
                                     struct timespec const times[2/*or:3*/])
@@ -750,7 +750,7 @@ NOTHROW_RPC(LIBCCALL libc_futimens)(fd_t fd,
 }
 /*[[[end:futimens]]]*/
 
-/*[[[head:futimens64,hash:0x387958a2]]]*/
+/*[[[head:futimens64,hash:CRC-32=0x67035e9]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_futimens64, libc_futimens);
 #else
@@ -774,7 +774,7 @@ NOTHROW_RPC(LIBCCALL libc_futimens64)(fd_t fd,
 DEFINE_INTERN_ALIAS(libc__wstat64i32, libc__wstat64);
 DEFINE_INTERN_ALIAS(libd__wstat64i32, libd__wstat64);
 
-/*[[[head:_wstat64,hash:0x92a75de0]]]*/
+/*[[[head:_wstat64,hash:CRC-32=0x7ea9427]]]*/
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.stat._wstat64") int
 NOTHROW_NCX(LIBCCALL libc__wstat64)(char32_t const *filename,
@@ -792,7 +792,7 @@ NOTHROW_NCX(LIBCCALL libc__wstat64)(char32_t const *filename,
 }
 /*[[[end:_wstat64]]]*/
 
-/*[[[head:DOS$_wstat64,hash:0xcd556392]]]*/
+/*[[[head:DOS$_wstat64,hash:CRC-32=0x1bff22b]]]*/
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.stat._wstat64") int
 NOTHROW_NCX(LIBDCALL libd__wstat64)(char16_t const *filename,
@@ -810,7 +810,7 @@ NOTHROW_NCX(LIBDCALL libd__wstat64)(char16_t const *filename,
 }
 /*[[[end:DOS$_wstat64]]]*/
 
-/*[[[head:_wstat32i64,hash:0x886e57f]]]*/
+/*[[[head:_wstat32i64,hash:CRC-32=0x1f9a0df]]]*/
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.stat._wstat32i64") int
 NOTHROW_NCX(LIBCCALL libc__wstat32i64)(char32_t const *filename,
@@ -828,7 +828,7 @@ NOTHROW_NCX(LIBCCALL libc__wstat32i64)(char32_t const *filename,
 }
 /*[[[end:_wstat32i64]]]*/
 
-/*[[[head:DOS$_wstat32i64,hash:0xc1168b35]]]*/
+/*[[[head:DOS$_wstat32i64,hash:CRC-32=0x8d52c647]]]*/
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.stat._wstat32i64") int
 NOTHROW_NCX(LIBDCALL libd__wstat32i64)(char16_t const *filename,
@@ -846,7 +846,7 @@ NOTHROW_NCX(LIBDCALL libd__wstat32i64)(char16_t const *filename,
 }
 /*[[[end:DOS$_wstat32i64]]]*/
 
-/*[[[head:_wstat32,hash:0xf4ed6134]]]*/
+/*[[[head:_wstat32,hash:CRC-32=0xba2e88ba]]]*/
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.stat._wstat32") int
 NOTHROW_NCX(LIBCCALL libc__wstat32)(char32_t const *filename,
@@ -864,7 +864,7 @@ NOTHROW_NCX(LIBCCALL libc__wstat32)(char32_t const *filename,
 }
 /*[[[end:_wstat32]]]*/
 
-/*[[[head:DOS$_wstat32,hash:0xe610fba1]]]*/
+/*[[[head:DOS$_wstat32,hash:CRC-32=0xbc7beeb6]]]*/
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.stat._wstat32") int
 NOTHROW_NCX(LIBDCALL libd__wstat32)(char16_t const *filename,
@@ -886,7 +886,7 @@ NOTHROW_NCX(LIBDCALL libd__wstat32)(char16_t const *filename,
 
 
 
-/*[[[start:exports,hash:0x10749090]]]*/
+/*[[[start:exports,hash:CRC-32=0x4b7e23c]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(mkdir, libc_mkdir);
 DEFINE_PUBLIC_WEAK_ALIAS(chmod, libc_chmod);
 DEFINE_PUBLIC_WEAK_ALIAS(_chmod, libc_chmod);

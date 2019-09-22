@@ -32,7 +32,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:lfutexexpr,hash:0x1ea5afcc]]]*/
+/*[[[head:lfutexexpr,hash:CRC-32=0x337a71f7]]]*/
 /* >> lfutexexpr(2)
  * High-level wrapper around the lfutexexpr system call
  * The lfutexexpr() system call can be used to specify arbitrarily complex
@@ -79,7 +79,7 @@ NOTHROW_RPC(LIBCCALL libc_lfutexexpr)(lfutex_t *uaddr,
 }
 /*[[[end:lfutexexpr]]]*/
 
-/*[[[head:lfutexlockexpr,hash:0x57a03698]]]*/
+/*[[[head:lfutexlockexpr,hash:CRC-32=0x3b681a1c]]]*/
 /* >> lfutexlockexpr(2)
  * Same as `lfutexlock()' is for `lfutex()', but instead implemented for `lfutexexpr()'
  * @param: ulockaddr:     Address of the futex lock to-be used / The futex on which to wait
@@ -123,7 +123,7 @@ NOTHROW_RPC(LIBCCALL libc_lfutexlockexpr)(lfutex_t *ulockaddr,
 }
 /*[[[end:lfutexlockexpr]]]*/
 
-/*[[[head:lfutexexpr64,hash:0xb4a13dfd]]]*/
+/*[[[head:lfutexexpr64,hash:CRC-32=0xbcef16bd]]]*/
 /* >> lfutexexpr(2)
  * High-level wrapper around the lfutexexpr system call
  * The lfutexexpr() system call can be used to specify arbitrarily complex
@@ -165,7 +165,7 @@ NOTHROW_RPC(LIBCCALL libc_lfutexexpr64)(lfutex_t *uaddr,
 #endif /* MAGIC:alias */
 /*[[[end:lfutexexpr64]]]*/
 
-/*[[[head:lfutexlockexpr64,hash:0xa28901d4]]]*/
+/*[[[head:lfutexlockexpr64,hash:CRC-32=0x6fc74037]]]*/
 /* >> lfutexlockexpr(2)
  * Same as `lfutexlock()' is for `lfutex()', but instead implemented for `lfutexexpr()'
  * @param: ulockaddr:     Address of the futex lock to-be used / The futex on which to wait
@@ -208,7 +208,7 @@ NOTHROW_RPC(LIBCCALL libc_lfutexlockexpr64)(lfutex_t *ulockaddr,
 
 
 
-/*[[[start:exports,hash:0x14518d2]]]*/
+/*[[[start:exports,hash:CRC-32=0xaca9cef5]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(lfutexexpr, libc_lfutexexpr);
 DEFINE_PUBLIC_WEAK_ALIAS(lfutexlockexpr, libc_lfutexlockexpr);
 DEFINE_PUBLIC_WEAK_ALIAS(lfutexexpr64, libc_lfutexexpr64);

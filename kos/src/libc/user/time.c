@@ -68,7 +68,7 @@ NOTHROW_NCX(libd___timezone)(void) {
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:tzset,hash:0x458e3012]]]*/
+/*[[[head:tzset,hash:CRC-32=0x492f9fc0]]]*/
 /* Set time conversion information from the TZ environment variable.
  * If TZ is not defined, a locale-dependent default is used */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.time.tzset") void
@@ -83,7 +83,7 @@ NOTHROW_NCX(LIBCCALL libc_tzset)(void)
 
 
 
-/*[[[head:clock,hash:0x40b664f]]]*/
+/*[[[head:clock,hash:CRC-32=0xddb0b9af]]]*/
 /* Time used by the program so far (user time + system time)
  * The result / CLOCKS_PER_SECOND is program time in seconds */
 INTERN WUNUSED
@@ -97,7 +97,7 @@ NOTHROW_NCX(LIBCCALL libc_clock)(void)
 }
 /*[[[end:clock]]]*/
 
-/*[[[head:getdate,hash:0xa8832f69]]]*/
+/*[[[head:getdate,hash:CRC-32=0x398178c7]]]*/
 /* Parse the given string as a date specification and return a value
  * representing the value.  The templates from the file identified by
  * the environment variable DATEMSK are used.  In case of an error
@@ -113,7 +113,7 @@ NOTHROW_NCX(LIBCCALL libc_getdate)(const char *string)
 }
 /*[[[end:getdate]]]*/
 
-/*[[[head:getdate_r,hash:0xd53d3a21]]]*/
+/*[[[head:getdate_r,hash:CRC-32=0x1e426bfb]]]*/
 /* Since `getdate' is not reentrant because of the use of `getdate_err'
  * and the static buffer to return the result in, we provide a thread-safe
  * variant.  The functionality is the same.  The result is returned in
@@ -131,7 +131,7 @@ NOTHROW_NCX(LIBCCALL libc_getdate_r)(const char *__restrict string,
 }
 /*[[[end:getdate_r]]]*/
 
-/*[[[head:timespec_get,hash:0xe5011dfd]]]*/
+/*[[[head:timespec_get,hash:CRC-32=0xe844bbac]]]*/
 /* Set TS to calendar time based in time base BASE */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.time.timespec_get") int
@@ -145,7 +145,7 @@ NOTHROW_NCX(LIBCCALL libc_timespec_get)(struct timespec *ts,
 }
 /*[[[end:timespec_get]]]*/
 
-/*[[[head:time,hash:0xf37cd6c0]]]*/
+/*[[[head:time,hash:CRC-32=0x76530343]]]*/
 /* Return the current time and put it in *TIMER if TIMER is not NULL */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.time.time") time_t
 NOTHROW_NCX(LIBCCALL libc_time)(time_t *timer)
@@ -157,7 +157,7 @@ NOTHROW_NCX(LIBCCALL libc_time)(time_t *timer)
 }
 /*[[[end:time]]]*/
 
-/*[[[head:time64,hash:0x6778725a]]]*/
+/*[[[head:time64,hash:CRC-32=0x3895b2a4]]]*/
 /* Return the current time and put it in *TIMER if TIMER is not NULL */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_time64, libc_time);
@@ -173,7 +173,7 @@ NOTHROW_NCX(LIBCCALL libc_time64)(time64_t *timer)
 #endif /* MAGIC:alias */
 /*[[[end:time64]]]*/
 
-/*[[[head:stime,hash:0x963193b3]]]*/
+/*[[[head:stime,hash:CRC-32=0xad3640eb]]]*/
 /* Set the system time to *WHEN. This call is restricted to the superuser */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.time.stime") int
@@ -193,7 +193,7 @@ NOTHROW_NCX(LIBCCALL libc_stime)(time_t const *when)
 }
 /*[[[end:stime]]]*/
 
-/*[[[head:stime64,hash:0xd91a7cdc]]]*/
+/*[[[head:stime64,hash:CRC-32=0x8cb7c7cc]]]*/
 /* Set the system time to *WHEN. This call is restricted to the superuser */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_stime64, libc_stime);
@@ -218,7 +218,7 @@ NOTHROW_NCX(LIBCCALL libc_stime64)(time64_t const *when)
 /*[[[end:stime64]]]*/
 
 
-/*[[[head:nanosleep,hash:0x4e2bf026]]]*/
+/*[[[head:nanosleep,hash:CRC-32=0xfd20d3e9]]]*/
 /* Pause execution for a number of nanoseconds */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.time.nanosleep") int
@@ -232,7 +232,7 @@ NOTHROW_RPC(LIBCCALL libc_nanosleep)(struct timespec const *requested_time,
 }
 /*[[[end:nanosleep]]]*/
 
-/*[[[head:nanosleep64,hash:0xb7bcdf81]]]*/
+/*[[[head:nanosleep64,hash:CRC-32=0x37a52444]]]*/
 /* Pause execution for a number of nanoseconds */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_nanosleep64, libc_nanosleep);
@@ -250,7 +250,7 @@ NOTHROW_RPC(LIBCCALL libc_nanosleep64)(struct timespec64 const *__restrict reque
 #endif /* MAGIC:alias */
 /*[[[end:nanosleep64]]]*/
 
-/*[[[head:clock_settime64,hash:0xde181355]]]*/
+/*[[[head:clock_settime64,hash:CRC-32=0xe4b49a58]]]*/
 /* Set clock CLOCK_ID to value TP */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_clock_settime64, libc_clock_settime);
@@ -268,7 +268,7 @@ NOTHROW_NCX(LIBCCALL libc_clock_settime64)(clockid_t clock_id,
 #endif /* MAGIC:alias */
 /*[[[end:clock_settime64]]]*/
 
-/*[[[head:clock_settime,hash:0xa48e3c48]]]*/
+/*[[[head:clock_settime,hash:CRC-32=0xa18c2f96]]]*/
 /* Set clock CLOCK_ID to value TP */
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.time.clock_settime") int
@@ -282,7 +282,7 @@ NOTHROW_NCX(LIBCCALL libc_clock_settime)(clockid_t clock_id,
 }
 /*[[[end:clock_settime]]]*/
 
-/*[[[head:clock_getcpuclockid,hash:0x2048e414]]]*/
+/*[[[head:clock_getcpuclockid,hash:CRC-32=0x61427c43]]]*/
 /* Return clock ID for CPU-time clock */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.time.clock_getcpuclockid") int
 NOTHROW_NCX(LIBCCALL libc_clock_getcpuclockid)(pid_t pid,
@@ -295,7 +295,7 @@ NOTHROW_NCX(LIBCCALL libc_clock_getcpuclockid)(pid_t pid,
 }
 /*[[[end:clock_getcpuclockid]]]*/
 
-/*[[[head:clock_gettime,hash:0xf10de39d]]]*/
+/*[[[head:clock_gettime,hash:CRC-32=0x270ca9de]]]*/
 /* Get current value of clock CLOCK_ID and store it in TP */
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.time.clock_gettime") int
@@ -309,7 +309,7 @@ NOTHROW_NCX(LIBCCALL libc_clock_gettime)(clockid_t clock_id,
 }
 /*[[[end:clock_gettime]]]*/
 
-/*[[[head:clock_gettime64,hash:0x891badd]]]*/
+/*[[[head:clock_gettime64,hash:CRC-32=0xdafedac9]]]*/
 /* Get current value of clock CLOCK_ID and store it in TP */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_clock_gettime64, libc_clock_gettime);
@@ -327,7 +327,7 @@ NOTHROW_NCX(LIBCCALL libc_clock_gettime64)(clockid_t clock_id,
 #endif /* MAGIC:alias */
 /*[[[end:clock_gettime64]]]*/
 
-/*[[[head:clock_getres,hash:0x824f24b0]]]*/
+/*[[[head:clock_getres,hash:CRC-32=0x43f02de6]]]*/
 /* Get resolution of clock CLOCK_ID */
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.time.clock_getres") int
@@ -341,7 +341,7 @@ NOTHROW_NCX(LIBCCALL libc_clock_getres)(clockid_t clock_id,
 }
 /*[[[end:clock_getres]]]*/
 
-/*[[[head:clock_getres64,hash:0xd4231630]]]*/
+/*[[[head:clock_getres64,hash:CRC-32=0x9e7fb8bf]]]*/
 /* Get resolution of clock CLOCK_ID */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_clock_getres64, libc_clock_getres);
@@ -359,7 +359,7 @@ NOTHROW_NCX(LIBCCALL libc_clock_getres64)(clockid_t clock_id,
 #endif /* MAGIC:alias */
 /*[[[end:clock_getres64]]]*/
 
-/*[[[head:clock_nanosleep,hash:0xdb5e7418]]]*/
+/*[[[head:clock_nanosleep,hash:CRC-32=0xd84ddb6]]]*/
 /* High-resolution sleep with the specified clock */
 INTERN NONNULL((3))
 ATTR_WEAK ATTR_SECTION(".text.crt.time.clock_nanosleep") int
@@ -377,7 +377,7 @@ NOTHROW_RPC(LIBCCALL libc_clock_nanosleep)(clockid_t clock_id,
 }
 /*[[[end:clock_nanosleep]]]*/
 
-/*[[[head:clock_nanosleep64,hash:0x605e923f]]]*/
+/*[[[head:clock_nanosleep64,hash:CRC-32=0x3037707]]]*/
 /* High-resolution sleep with the specified clock */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_clock_nanosleep64, libc_clock_nanosleep);
@@ -399,7 +399,7 @@ NOTHROW_RPC(LIBCCALL libc_clock_nanosleep64)(clockid_t clock_id,
 #endif /* MAGIC:alias */
 /*[[[end:clock_nanosleep64]]]*/
 
-/*[[[head:timer_create,hash:0x208dbaad]]]*/
+/*[[[head:timer_create,hash:CRC-32=0x80dea55c]]]*/
 /* Create new per-process timer using CLOCK_ID */
 INTERN NONNULL((3))
 ATTR_WEAK ATTR_SECTION(".text.crt.timer.timer_create") int
@@ -414,7 +414,7 @@ NOTHROW_NCX(LIBCCALL libc_timer_create)(clockid_t clock_id,
 }
 /*[[[end:timer_create]]]*/
 
-/*[[[head:timer_delete,hash:0x1f23182]]]*/
+/*[[[head:timer_delete,hash:CRC-32=0x7803c09c]]]*/
 /* Delete timer TIMERID */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.timer.timer_delete") int
 NOTHROW_NCX(LIBCCALL libc_timer_delete)(timer_t timerid)
@@ -426,7 +426,7 @@ NOTHROW_NCX(LIBCCALL libc_timer_delete)(timer_t timerid)
 }
 /*[[[end:timer_delete]]]*/
 
-/*[[[head:timer_getoverrun,hash:0xbd93e9d9]]]*/
+/*[[[head:timer_getoverrun,hash:CRC-32=0x59f05e2c]]]*/
 /* Get expiration overrun for timer TIMERID */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.timer.timer_getoverrun") int
 NOTHROW_NCX(LIBCCALL libc_timer_getoverrun)(timer_t timerid)
@@ -438,7 +438,7 @@ NOTHROW_NCX(LIBCCALL libc_timer_getoverrun)(timer_t timerid)
 }
 /*[[[end:timer_getoverrun]]]*/
 
-/*[[[head:timer_gettime,hash:0xa11006ce]]]*/
+/*[[[head:timer_gettime,hash:CRC-32=0xff66caf9]]]*/
 /* Get current value of timer TIMERID and store it in VALUE */
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.timer.timer_gettime") int
@@ -452,7 +452,7 @@ NOTHROW_NCX(LIBCCALL libc_timer_gettime)(timer_t timerid,
 }
 /*[[[end:timer_gettime]]]*/
 
-/*[[[head:timer_gettime64,hash:0xd42b8801]]]*/
+/*[[[head:timer_gettime64,hash:CRC-32=0xb718214d]]]*/
 /* Get current value of timer TIMERID and store it in VALUE */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_timer_gettime64, libc_timer_gettime);
@@ -470,7 +470,7 @@ NOTHROW_NCX(LIBCCALL libc_timer_gettime64)(timer_t timerid,
 #endif /* MAGIC:alias */
 /*[[[end:timer_gettime64]]]*/
 
-/*[[[head:timer_settime,hash:0x722054ae]]]*/
+/*[[[head:timer_settime,hash:CRC-32=0xa408bcc5]]]*/
 /* Set timer TIMERID to VALUE, returning old value in OVALUE */
 INTERN NONNULL((3))
 ATTR_WEAK ATTR_SECTION(".text.crt.timer.timer_settime") int
@@ -488,7 +488,7 @@ NOTHROW_NCX(LIBCCALL libc_timer_settime)(timer_t timerid,
 }
 /*[[[end:timer_settime]]]*/
 
-/*[[[head:timer_settime64,hash:0x89b6b25d]]]*/
+/*[[[head:timer_settime64,hash:CRC-32=0xaff7f5e4]]]*/
 /* Set timer TIMERID to VALUE, returning old value in OVALUE */
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_timer_settime64, libc_timer_settime);
@@ -514,7 +514,7 @@ NOTHROW_NCX(LIBCCALL libc_timer_settime64)(timer_t timerid,
 
 
 
-/*[[[start:exports,hash:0x424737ce]]]*/
+/*[[[start:exports,hash:CRC-32=0xbfd69bfb]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(clock, libc_clock);
 DEFINE_PUBLIC_WEAK_ALIAS(time, libc_time);
 DEFINE_PUBLIC_WEAK_ALIAS(time64, libc_time64);

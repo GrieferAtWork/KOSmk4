@@ -38,7 +38,7 @@ DECLARE_NOREL_GLOBAL_META(char **, environ);
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:_beginthread,hash:0x23be959b]]]*/
+/*[[[head:_beginthread,hash:CRC-32=0x6b63b655]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.sched.thread._beginthread") uintptr_t
 NOTHROW_NCX(LIBCCALL libc__beginthread)(__dos_beginthread_entry_t entry,
                                         u32 stacksz,
@@ -51,7 +51,7 @@ NOTHROW_NCX(LIBCCALL libc__beginthread)(__dos_beginthread_entry_t entry,
 }
 /*[[[end:_beginthread]]]*/
 
-/*[[[head:_beginthreadex,hash:0x3a500bff]]]*/
+/*[[[head:_beginthreadex,hash:CRC-32=0x5be0a6dc]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.sched.thread._beginthreadex") uintptr_t
 NOTHROW_NCX(LIBCCALL libc__beginthreadex)(void *sec,
                                           u32 stacksz,
@@ -67,7 +67,7 @@ NOTHROW_NCX(LIBCCALL libc__beginthreadex)(void *sec,
 }
 /*[[[end:_beginthreadex]]]*/
 
-/*[[[head:_endthread,hash:0x6a0240b4]]]*/
+/*[[[head:_endthread,hash:CRC-32=0xd28aafa8]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.sched.thread._endthread") void
 NOTHROW_NCX(LIBCCALL libc__endthread)(void)
 /*[[[body:_endthread]]]*/
@@ -77,7 +77,7 @@ NOTHROW_NCX(LIBCCALL libc__endthread)(void)
 }
 /*[[[end:_endthread]]]*/
 
-/*[[[head:_endthreadex,hash:0x318c40e4]]]*/
+/*[[[head:_endthreadex,hash:CRC-32=0x1b75da54]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.sched.thread._endthreadex") void
 NOTHROW_NCX(LIBCCALL libc__endthreadex)(u32 exitcode)
 /*[[[body:_endthreadex]]]*/
@@ -87,7 +87,7 @@ NOTHROW_NCX(LIBCCALL libc__endthreadex)(u32 exitcode)
 }
 /*[[[end:_endthreadex]]]*/
 
-/*[[[head:_cexit,hash:0xbfa2a4ec]]]*/
+/*[[[head:_cexit,hash:CRC-32=0xe78f4ddf]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.process._cexit") void
 (LIBCCALL libc__cexit)(void)
 		__THROWS(...)
@@ -98,7 +98,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.process._cexit") void
 }
 /*[[[end:_cexit]]]*/
 
-/*[[[head:_c_exit,hash:0x8a3f2b62]]]*/
+/*[[[head:_c_exit,hash:CRC-32=0x83b36421]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.process._c_exit") void
 (LIBCCALL libc__c_exit)(void)
 		__THROWS(...)
@@ -109,7 +109,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.process._c_exit") void
 }
 /*[[[end:_c_exit]]]*/
 
-/*[[[head:_loaddll,hash:0xc3995ae6]]]*/
+/*[[[head:_loaddll,hash:CRC-32=0x122b8fc8]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.dlfcn._loaddll") intptr_t
 (LIBCCALL libc__loaddll)(char __KOS_FIXED_CONST *file)
 		__THROWS(...)
@@ -119,7 +119,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.dlfcn._loaddll") intptr_t
 }
 /*[[[end:_loaddll]]]*/
 
-/*[[[head:_unloaddll,hash:0x4ef6aff1]]]*/
+/*[[[head:_unloaddll,hash:CRC-32=0xe5af5eb5]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.dlfcn._unloaddll") int
 (LIBCCALL libc__unloaddll)(intptr_t hnd)
 		__THROWS(...)
@@ -129,7 +129,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.dlfcn._unloaddll") int
 }
 /*[[[end:_unloaddll]]]*/
 
-/*[[[head:_getdllprocaddr,hash:0xad201aef]]]*/
+/*[[[head:_getdllprocaddr,hash:CRC-32=0xf0e809eb]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.dlfcn._getdllprocaddr") __procfun
 (LIBCCALL libc__getdllprocaddr)(intptr_t hnd,
                                 char __KOS_FIXED_CONST *symname,
@@ -142,7 +142,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.dlfcn._getdllprocaddr") __procfu
 }
 /*[[[end:_getdllprocaddr]]]*/
 
-/*[[[head:cwait,hash:0x9c97906b]]]*/
+/*[[[head:cwait,hash:CRC-32=0xee0a97bc]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.exec.spawn.cwait") pid_t
 NOTHROW_RPC(LIBCCALL libc_cwait)(int *tstat,
                                  pid_t pid,
@@ -157,7 +157,7 @@ NOTHROW_RPC(LIBCCALL libc_cwait)(int *tstat,
 }
 /*[[[end:cwait]]]*/
 
-/*[[[head:spawnv,hash:0x57ed1e48]]]*/
+/*[[[head:spawnv,hash:CRC-32=0x56f6f306]]]*/
 INTERN NONNULL((2, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.exec.spawn.spawnv") pid_t
 NOTHROW_RPC(LIBCCALL libc_spawnv)(int mode,
@@ -171,7 +171,7 @@ NOTHROW_RPC(LIBCCALL libc_spawnv)(int mode,
 }
 /*[[[end:spawnv]]]*/
 
-/*[[[head:spawnve,hash:0x2d7a30cf]]]*/
+/*[[[head:spawnve,hash:CRC-32=0xcf3d7097]]]*/
 INTERN NONNULL((2, 3, 4))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.exec.spawn.spawnve") pid_t
 NOTHROW_RPC(LIBCCALL libc_spawnve)(int mode,
@@ -186,7 +186,7 @@ NOTHROW_RPC(LIBCCALL libc_spawnve)(int mode,
 }
 /*[[[end:spawnve]]]*/
 
-/*[[[head:spawnvp,hash:0x990c4196]]]*/
+/*[[[head:spawnvp,hash:CRC-32=0x3a44237]]]*/
 INTERN NONNULL((2, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.exec.spawn.spawnvp") pid_t
 NOTHROW_RPC(LIBCCALL libc_spawnvp)(int mode,
@@ -200,7 +200,7 @@ NOTHROW_RPC(LIBCCALL libc_spawnvp)(int mode,
 }
 /*[[[end:spawnvp]]]*/
 
-/*[[[head:spawnvpe,hash:0x5266dd0a]]]*/
+/*[[[head:spawnvpe,hash:CRC-32=0x9ef0e3b5]]]*/
 INTERN NONNULL((2, 3, 4))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.exec.spawn.spawnvpe") pid_t
 NOTHROW_RPC(LIBCCALL libc_spawnvpe)(int mode,
@@ -215,7 +215,7 @@ NOTHROW_RPC(LIBCCALL libc_spawnvpe)(int mode,
 }
 /*[[[end:spawnvpe]]]*/
 
-/*[[[head:spawnl,hash:0xc056f59b]]]*/
+/*[[[head:spawnl,hash:CRC-32=0x13ab784c]]]*/
 INTERN ATTR_SENTINEL NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.exec.spawn.spawnl") pid_t
 NOTHROW_RPC(VLIBCCALL libc_spawnl)(int mode,
@@ -230,7 +230,7 @@ NOTHROW_RPC(VLIBCCALL libc_spawnl)(int mode,
 }
 /*[[[end:spawnl]]]*/
 
-/*[[[head:spawnle,hash:0x9a9d2e1b]]]*/
+/*[[[head:spawnle,hash:CRC-32=0x7fbe68bf]]]*/
 INTERN ATTR_SENTINEL_O(1) NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.exec.spawn.spawnle") pid_t
 NOTHROW_RPC(VLIBCCALL libc_spawnle)(int mode,
@@ -245,7 +245,7 @@ NOTHROW_RPC(VLIBCCALL libc_spawnle)(int mode,
 }
 /*[[[end:spawnle]]]*/
 
-/*[[[head:spawnlp,hash:0x24483bcc]]]*/
+/*[[[head:spawnlp,hash:CRC-32=0x650d3228]]]*/
 INTERN ATTR_SENTINEL NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.exec.spawn.spawnlp") pid_t
 NOTHROW_RPC(VLIBCCALL libc_spawnlp)(int mode,
@@ -260,7 +260,7 @@ NOTHROW_RPC(VLIBCCALL libc_spawnlp)(int mode,
 }
 /*[[[end:spawnlp]]]*/
 
-/*[[[head:spawnlpe,hash:0x68a72c4f]]]*/
+/*[[[head:spawnlpe,hash:CRC-32=0x6022363f]]]*/
 INTERN ATTR_SENTINEL_O(1) NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.exec.spawn.spawnlpe") pid_t
 NOTHROW_RPC(VLIBCCALL libc_spawnlpe)(int mode,
@@ -279,7 +279,7 @@ NOTHROW_RPC(VLIBCCALL libc_spawnlpe)(int mode,
 
 
 
-/*[[[start:exports,hash:0xd264da4a]]]*/
+/*[[[start:exports,hash:CRC-32=0xa616d6c5]]]*/
 #undef spawnl
 #undef _spawnl
 #undef spawnle

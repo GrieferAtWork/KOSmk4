@@ -33,7 +33,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:wait,hash:0x1fe61303]]]*/
+/*[[[head:wait,hash:CRC-32=0x51c2a33d]]]*/
 /* Wait for any child process (same as `waitpid(-1, STAT_LOC, 0);') */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wait") pid_t
 NOTHROW_RPC(LIBCCALL libc_wait)(__WAIT_STATUS stat_loc)
@@ -51,7 +51,7 @@ NOTHROW_RPC(LIBCCALL libc_wait)(__WAIT_STATUS stat_loc)
 }
 /*[[[end:wait]]]*/
 
-/*[[[head:waitpid,hash:0x63d756de]]]*/
+/*[[[head:waitpid,hash:CRC-32=0xb94e8d5d]]]*/
 /* Wait for a child process:
  *  - `pid < -1':  Wait for any child process whose process group ID is `-PID'
  *  - `pid == -1': Wait for any child process
@@ -79,7 +79,7 @@ NOTHROW_RPC(LIBCCALL libc_waitpid)(pid_t pid,
 }
 /*[[[end:waitpid]]]*/
 
-/*[[[head:waitid,hash:0x3b74e836]]]*/
+/*[[[head:waitid,hash:CRC-32=0x98f3d30f]]]*/
 /* @param options: At least one of `WEXITED|WSTOPPED|WCONTINUED', optionally or'd with `WNOHANG|WNOWAIT' */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.waitid") int
 NOTHROW_RPC(LIBCCALL libc_waitid)(idtype_t idtype,
@@ -98,7 +98,7 @@ NOTHROW_RPC(LIBCCALL libc_waitid)(idtype_t idtype,
 }
 /*[[[end:waitid]]]*/
 
-/*[[[head:wait3,hash:0x4e7e8367]]]*/
+/*[[[head:wait3,hash:CRC-32=0x9c75742b]]]*/
 /* Same as `waitpid(-1,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wait3") pid_t
@@ -116,7 +116,7 @@ NOTHROW_RPC(LIBCCALL libc_wait3)(__WAIT_STATUS stat_loc,
 }
 /*[[[end:wait3]]]*/
 
-/*[[[head:wait4,hash:0xf78ba31e]]]*/
+/*[[[head:wait4,hash:CRC-32=0x3269b18]]]*/
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wait4") pid_t
@@ -135,7 +135,7 @@ NOTHROW_RPC(LIBCCALL libc_wait4)(pid_t pid,
 }
 /*[[[end:wait4]]]*/
 
-/*[[[head:detach,hash:0x998e9815]]]*/
+/*[[[head:detach,hash:CRC-32=0x9da0d053]]]*/
 /* >> detach(2)
  * Detach the descriptor of `PID' from the thread that
  * would have received a signal when it changes state,
@@ -238,7 +238,7 @@ NOTHROW_NCX(LIBCCALL libc_detach)(pid_t pid)
 
 
 
-/*[[[start:exports,hash:0x43a8f9b5]]]*/
+/*[[[start:exports,hash:CRC-32=0xab4f5564]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(wait, libc_wait);
 DEFINE_PUBLIC_WEAK_ALIAS(waitpid, libc_waitpid);
 DEFINE_PUBLIC_WEAK_ALIAS(waitid, libc_waitid);

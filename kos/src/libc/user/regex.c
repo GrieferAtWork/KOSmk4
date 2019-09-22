@@ -120,7 +120,7 @@ DEFINE_NOREL_GLOBAL_META(reg_syntax_t, re_syntax_options, ".crt.utility.regex");
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:re_set_syntax,hash:0x5f49b6f1]]]*/
+/*[[[head:re_set_syntax,hash:CRC-32=0x76a52738]]]*/
 /* Sets the current default syntax to SYNTAX, and return the old syntax.
  * You can also simply assign to the `re_syntax_options' variable */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.regex.re_set_syntax") reg_syntax_t
@@ -131,7 +131,7 @@ NOTHROW_NCX(LIBCCALL libc_re_set_syntax)(reg_syntax_t syntax)
 }
 /*[[[end:re_set_syntax]]]*/
 
-/*[[[head:re_compile_pattern,hash:0x47ca4498]]]*/
+/*[[[head:re_compile_pattern,hash:CRC-32=0x36201f21]]]*/
 /* Compile the regular expression PATTERN, with length LENGTH
  * and syntax given by the global `re_syntax_options', into the buffer
  * BUFFER. Return NULL if successful, and an error string if not.
@@ -153,7 +153,7 @@ NOTHROW_NCX(LIBCCALL libc_re_compile_pattern)(char const *pattern,
 }
 /*[[[end:re_compile_pattern]]]*/
 
-/*[[[head:re_compile_fastmap,hash:0x61ea192d]]]*/
+/*[[[head:re_compile_fastmap,hash:CRC-32=0x7f01b7bb]]]*/
 /* Compile a fastmap for the compiled pattern in BUFFER; used to
  * accelerate searches. Return 0 if successful and -2 if was an internal error */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.regex.re_compile_fastmap") int
@@ -165,7 +165,7 @@ NOTHROW_NCX(LIBCCALL libc_re_compile_fastmap)(struct re_pattern_buffer *buffer)
 }
 /*[[[end:re_compile_fastmap]]]*/
 
-/*[[[head:re_search,hash:0x13f4cfc3]]]*/
+/*[[[head:re_search,hash:CRC-32=0xc45c2c8]]]*/
 /* Search in the string STRING (with length LENGTH) for the pattern
  * compiled into BUFFER. Start searching at position START, for RANGE
  * characters. Return the starting position of the match, -1 for no
@@ -192,7 +192,7 @@ NOTHROW_NCX(LIBCCALL libc_re_search)(struct re_pattern_buffer *buffer,
 }
 /*[[[end:re_search]]]*/
 
-/*[[[head:re_search_2,hash:0x4ba0fdcb]]]*/
+/*[[[head:re_search_2,hash:CRC-32=0x54dae2f1]]]*/
 /* Like `re_search', but search in the concatenation of STRING1
  * and STRING2. Also, stop searching at index START + STOP */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.regex.re_search_2") int
@@ -216,7 +216,7 @@ NOTHROW_NCX(LIBCCALL libc_re_search_2)(struct re_pattern_buffer *buffer,
 }
 /*[[[end:re_search_2]]]*/
 
-/*[[[head:re_match,hash:0xc3f31c7]]]*/
+/*[[[head:re_match,hash:CRC-32=0xf34c14fa]]]*/
 /* Like `re_search', but return how many characters in STRING
  * the regexp in BUFFER matched, starting at position START */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.regex.re_match") int
@@ -238,7 +238,7 @@ NOTHROW_NCX(LIBCCALL libc_re_match)(struct re_pattern_buffer *buffer,
 }
 /*[[[end:re_match]]]*/
 
-/*[[[head:re_match_2,hash:0x85dd6a50]]]*/
+/*[[[head:re_match_2,hash:CRC-32=0x97439455]]]*/
 /* Relates to `re_match' as `re_search_2' relates to `re_search' */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.regex.re_match_2") int
 NOTHROW_NCX(LIBCCALL libc_re_match_2)(struct re_pattern_buffer *buffer,
@@ -257,7 +257,7 @@ NOTHROW_NCX(LIBCCALL libc_re_match_2)(struct re_pattern_buffer *buffer,
 }
 /*[[[end:re_match_2]]]*/
 
-/*[[[head:re_set_registers,hash:0xb77bef7c]]]*/
+/*[[[head:re_set_registers,hash:CRC-32=0x59800159]]]*/
 /* Set REGS to hold NUM_REGS registers, storing them in STARTS and
  * ENDS. Subsequent matches using BUFFER and REGS will use this memory
  * for recording register information. STARTS and ENDS must be allocated
@@ -278,7 +278,7 @@ NOTHROW_NCX(LIBCCALL libc_re_set_registers)(struct re_pattern_buffer *buffer,
 }
 /*[[[end:re_set_registers]]]*/
 
-/*[[[head:regcomp,hash:0x455f36a1]]]*/
+/*[[[head:regcomp,hash:CRC-32=0xa5c28382]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.regex.regcomp") int
 NOTHROW_NCX(LIBCCALL libc_regcomp)(regex_t *__restrict preg,
                                    char const *__restrict pattern,
@@ -291,7 +291,7 @@ NOTHROW_NCX(LIBCCALL libc_regcomp)(regex_t *__restrict preg,
 }
 /*[[[end:regcomp]]]*/
 
-/*[[[head:regexec,hash:0x986f42f7]]]*/
+/*[[[head:regexec,hash:CRC-32=0x86fb3b30]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.regex.regexec") int
 NOTHROW_NCX(LIBCCALL libc_regexec)(regex_t const *__restrict preg,
                                    char const *__restrict string,
@@ -306,7 +306,7 @@ NOTHROW_NCX(LIBCCALL libc_regexec)(regex_t const *__restrict preg,
 }
 /*[[[end:regexec]]]*/
 
-/*[[[head:regerror,hash:0x6f143221]]]*/
+/*[[[head:regerror,hash:CRC-32=0x690d5c1]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.regex.regerror") size_t
 NOTHROW_NCX(LIBCCALL libc_regerror)(int errcode,
                                     regex_t const *__restrict preg,
@@ -320,7 +320,7 @@ NOTHROW_NCX(LIBCCALL libc_regerror)(int errcode,
 }
 /*[[[end:regerror]]]*/
 
-/*[[[head:regfree,hash:0xa0b70927]]]*/
+/*[[[head:regfree,hash:CRC-32=0x61d2afc3]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.regex.regfree") void
 NOTHROW_NCX(LIBCCALL libc_regfree)(regex_t *preg)
 /*[[[body:regfree]]]*/
@@ -334,7 +334,7 @@ NOTHROW_NCX(LIBCCALL libc_regfree)(regex_t *preg)
 
 
 
-/*[[[start:exports,hash:0x67c996d7]]]*/
+/*[[[start:exports,hash:CRC-32=0x28500a93]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(re_set_syntax, libc_re_set_syntax);
 DEFINE_PUBLIC_WEAK_ALIAS(re_compile_pattern, libc_re_compile_pattern);
 DEFINE_PUBLIC_WEAK_ALIAS(re_compile_fastmap, libc_re_compile_fastmap);

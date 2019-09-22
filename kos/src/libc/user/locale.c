@@ -30,7 +30,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:setlocale,hash:0x15100da8]]]*/
+/*[[[head:setlocale,hash:CRC-32=0xfb0ee566]]]*/
 /* Set and/or return the current locale */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.setlocale") char *
 NOTHROW_NCX(LIBCCALL libc_setlocale)(int category,
@@ -43,7 +43,7 @@ NOTHROW_NCX(LIBCCALL libc_setlocale)(int category,
 }
 /*[[[end:setlocale]]]*/
 
-/*[[[head:localeconv,hash:0xb8928fdc]]]*/
+/*[[[head:localeconv,hash:CRC-32=0x1ee9be68]]]*/
 /* Return the numeric/monetary information for the current locale */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.localeconv") struct lconv *
 NOTHROW_NCX(LIBCCALL libc_localeconv)(void)
@@ -55,7 +55,7 @@ NOTHROW_NCX(LIBCCALL libc_localeconv)(void)
 }
 /*[[[end:localeconv]]]*/
 
-/*[[[head:newlocale,hash:0xef858b88]]]*/
+/*[[[head:newlocale,hash:CRC-32=0x172b0606]]]*/
 /* Return a reference to a data structure representing a set of locale
  * datasets. Unlike for the CATEGORY parameter for `setlocale' the
  * CATEGORY_MASK parameter here uses a single bit for each category,
@@ -72,7 +72,7 @@ NOTHROW_NCX(LIBCCALL libc_newlocale)(int category_mask,
 }
 /*[[[end:newlocale]]]*/
 
-/*[[[head:duplocale,hash:0x7a60a08]]]*/
+/*[[[head:duplocale,hash:CRC-32=0xb1bab76c]]]*/
 /* Return a duplicate of the set of locale in DATASET.
  * All usage counters are increased if necessary */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.duplocale") locale_t
@@ -85,7 +85,7 @@ NOTHROW_NCX(LIBCCALL libc_duplocale)(locale_t dataset)
 }
 /*[[[end:duplocale]]]*/
 
-/*[[[head:freelocale,hash:0xc985b0eb]]]*/
+/*[[[head:freelocale,hash:CRC-32=0xfa9bb671]]]*/
 /* Free the data associated with a locale dataset
  * previously returned by a call to `setlocale_r' */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.freelocale") void
@@ -97,7 +97,7 @@ NOTHROW_NCX(LIBCCALL libc_freelocale)(locale_t dataset)
 }
 /*[[[end:freelocale]]]*/
 
-/*[[[head:uselocale,hash:0xa655c840]]]*/
+/*[[[head:uselocale,hash:CRC-32=0x10db78cf]]]*/
 /* Switch the current thread's locale to DATASET.
  * If DATASET is null, instead just return the current setting.
  * The special value LC_GLOBAL_LOCALE is the initial setting
@@ -117,7 +117,7 @@ NOTHROW_NCX(LIBCCALL libc_uselocale)(locale_t dataset)
 
 
 
-/*[[[start:exports,hash:0x57da9bed]]]*/
+/*[[[start:exports,hash:CRC-32=0x3795ec3b]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(setlocale, libc_setlocale);
 DEFINE_PUBLIC_WEAK_ALIAS(localeconv, libc_localeconv);
 DEFINE_PUBLIC_WEAK_ALIAS(newlocale, libc_newlocale);

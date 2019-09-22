@@ -30,7 +30,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:getpwuid,hash:0xc325a731]]]*/
+/*[[[head:getpwuid,hash:CRC-32=0xbcdb765a]]]*/
 /* Search for an entry with a matching user ID */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.pwd.getpwuid") struct passwd *
 NOTHROW_RPC(LIBCCALL libc_getpwuid)(uid_t uid)
@@ -42,7 +42,7 @@ NOTHROW_RPC(LIBCCALL libc_getpwuid)(uid_t uid)
 }
 /*[[[end:getpwuid]]]*/
 
-/*[[[head:getpwnam,hash:0x32e4e474]]]*/
+/*[[[head:getpwnam,hash:CRC-32=0x49312a85]]]*/
 /* Search for an entry with a matching username */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.database.pwd.getpwnam") struct passwd *
@@ -55,7 +55,7 @@ NOTHROW_RPC(LIBCCALL libc_getpwnam)(const char *name)
 }
 /*[[[end:getpwnam]]]*/
 
-/*[[[head:setpwent,hash:0x7d679ba7]]]*/
+/*[[[head:setpwent,hash:CRC-32=0xe8f78261]]]*/
 /* Rewind the password-file stream */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.pwd.setpwent") void
 NOTHROW_RPC(LIBCCALL libc_setpwent)(void)
@@ -66,7 +66,7 @@ NOTHROW_RPC(LIBCCALL libc_setpwent)(void)
 }
 /*[[[end:setpwent]]]*/
 
-/*[[[head:endpwent,hash:0xa7b0144f]]]*/
+/*[[[head:endpwent,hash:CRC-32=0x42e0811b]]]*/
 /* Close the password-file stream */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.pwd.endpwent") void
 NOTHROW_RPC_NOKOS(LIBCCALL libc_endpwent)(void)
@@ -77,7 +77,7 @@ NOTHROW_RPC_NOKOS(LIBCCALL libc_endpwent)(void)
 }
 /*[[[end:endpwent]]]*/
 
-/*[[[head:getpwent,hash:0x1f18db96]]]*/
+/*[[[head:getpwent,hash:CRC-32=0x504700f0]]]*/
 /* Read an entry from the password-file stream, opening it if necessary */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.pwd.getpwent") struct passwd *
 NOTHROW_RPC(LIBCCALL libc_getpwent)(void)
@@ -89,7 +89,7 @@ NOTHROW_RPC(LIBCCALL libc_getpwent)(void)
 }
 /*[[[end:getpwent]]]*/
 
-/*[[[head:fgetpwent,hash:0x19027b20]]]*/
+/*[[[head:fgetpwent,hash:CRC-32=0xee7f96e6]]]*/
 /* Read an entry from STREAM */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.database.pwd.fgetpwent") struct passwd *
@@ -102,7 +102,7 @@ NOTHROW_RPC(LIBCCALL libc_fgetpwent)(FILE *__restrict stream)
 }
 /*[[[end:fgetpwent]]]*/
 
-/*[[[head:putpwent,hash:0x515a663f]]]*/
+/*[[[head:putpwent,hash:CRC-32=0x687d9592]]]*/
 /* Write the given entry onto the given stream */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.database.pwd.putpwent") int
 NOTHROW_RPC(LIBCCALL libc_putpwent)(struct passwd const *__restrict p,
@@ -115,7 +115,7 @@ NOTHROW_RPC(LIBCCALL libc_putpwent)(struct passwd const *__restrict p,
 }
 /*[[[end:putpwent]]]*/
 
-/*[[[head:getpwuid_r,hash:0xc6108571]]]*/
+/*[[[head:getpwuid_r,hash:CRC-32=0xed182177]]]*/
 /* Search for an entry with a matching user ID */
 INTERN NONNULL((2, 3, 5))
 ATTR_WEAK ATTR_SECTION(".text.crt.database.pwd.getpwuid_r") int
@@ -132,7 +132,7 @@ NOTHROW_RPC(LIBCCALL libc_getpwuid_r)(__uid_t __uid,
 }
 /*[[[end:getpwuid_r]]]*/
 
-/*[[[head:getpwnam_r,hash:0x6ccf8663]]]*/
+/*[[[head:getpwnam_r,hash:CRC-32=0xcdfbd81d]]]*/
 /* Search for an entry with a matching username */
 INTERN NONNULL((1, 2, 3, 5))
 ATTR_WEAK ATTR_SECTION(".text.crt.database.pwd.getpwnam_r") int
@@ -149,7 +149,7 @@ NOTHROW_RPC(LIBCCALL libc_getpwnam_r)(const char *__restrict name,
 }
 /*[[[end:getpwnam_r]]]*/
 
-/*[[[head:getpwent_r,hash:0x5dbe6d50]]]*/
+/*[[[head:getpwent_r,hash:CRC-32=0xe5fdfc2f]]]*/
 /* Read an entry from the password-file stream, opening it if necessary */
 INTERN NONNULL((1, 2, 4))
 ATTR_WEAK ATTR_SECTION(".text.crt.database.pwd.getpwent_r") int
@@ -165,7 +165,7 @@ NOTHROW_RPC(LIBCCALL libc_getpwent_r)(struct passwd *__restrict resultbuf,
 }
 /*[[[end:getpwent_r]]]*/
 
-/*[[[head:fgetpwent_r,hash:0x797ab55c]]]*/
+/*[[[head:fgetpwent_r,hash:CRC-32=0x9355bda]]]*/
 /* Read an entry from STREAM */
 INTERN NONNULL((1, 2, 3, 5))
 ATTR_WEAK ATTR_SECTION(".text.crt.database.pwd.fgetpwent_r") int
@@ -182,7 +182,7 @@ NOTHROW_RPC(LIBCCALL libc_fgetpwent_r)(FILE *__restrict stream,
 }
 /*[[[end:fgetpwent_r]]]*/
 
-/*[[[head:getpw,hash:0x22b9c1f7]]]*/
+/*[[[head:getpw,hash:CRC-32=0x75081d73]]]*/
 /* Re-construct the password-file line for the given uid in the
  * given buffer. This knows the format that the caller will
  * expect, but this need not be the format of the password file */
@@ -201,7 +201,7 @@ NOTHROW_RPC(LIBCCALL libc_getpw)(__uid_t uid,
 
 
 
-/*[[[start:exports,hash:0xe299da17]]]*/
+/*[[[start:exports,hash:CRC-32=0xf6c1b098]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(getpwuid, libc_getpwuid);
 DEFINE_PUBLIC_WEAK_ALIAS(getpwnam, libc_getpwnam);
 DEFINE_PUBLIC_WEAK_ALIAS(setpwent, libc_setpwent);

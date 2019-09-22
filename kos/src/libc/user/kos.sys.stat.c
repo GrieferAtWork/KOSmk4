@@ -32,7 +32,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:FUtimens,hash:0x6a4c81ab]]]*/
+/*[[[head:FUtimens,hash:CRC-32=0x9d6dc5e6]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.modify_time.FUtimens") void
 (LIBCCALL libc_FUtimens)(fd_t fd,
                          struct timespec const times[2/*or:3*/])
@@ -43,7 +43,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.modify_time.FUtimens") void
 }
 /*[[[end:FUtimens]]]*/
 
-/*[[[head:FUtimens64,hash:0x800e85b7]]]*/
+/*[[[head:FUtimens64,hash:CRC-32=0x659eb8a1]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_FUtimens64, libc_FUtimens);
 #else
@@ -58,7 +58,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.modify_time.FUtimens64") void
 #endif /* MAGIC:alias */
 /*[[[end:FUtimens64]]]*/
 
-/*[[[head:Mknod,hash:0xfdca60fb]]]*/
+/*[[[head:Mknod,hash:CRC-32=0x3ee0713a]]]*/
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.modify.Mknod") void
 (LIBCCALL libc_Mknod)(char const *nodename,
@@ -74,7 +74,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.modify.Mknod") void
 }
 /*[[[end:Mknod]]]*/
 
-/*[[[head:Mkfifo,hash:0x6f153bc3]]]*/
+/*[[[head:Mkfifo,hash:CRC-32=0x466f3d3]]]*/
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.modify.Mkfifo") void
 (LIBCCALL libc_Mkfifo)(char const *fifoname,
@@ -86,7 +86,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.modify.Mkfifo") void
 }
 /*[[[end:Mkfifo]]]*/
 
-/*[[[head:MkfifoAt,hash:0xb4dd04b7]]]*/
+/*[[[head:MkfifoAt,hash:CRC-32=0x3cf621d1]]]*/
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.modify.MkfifoAt") void
 (LIBCCALL libc_MkfifoAt)(fd_t dirfd,
@@ -123,7 +123,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.modify.MkfifoAt") void
 
 
 
-/*[[[start:exports,hash:0x6a2d6f9a]]]*/
+/*[[[start:exports,hash:CRC-32=0x75894c4f]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(Mkfifo, libc_Mkfifo);
 DEFINE_PUBLIC_WEAK_ALIAS(MkfifoAt, libc_MkfifoAt);
 DEFINE_PUBLIC_WEAK_ALIAS(Mknod, libc_Mknod);

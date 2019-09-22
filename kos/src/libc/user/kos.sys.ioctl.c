@@ -34,7 +34,7 @@ DECL_BEGIN
 
 
 
-/*[[[start:exports,hash:0x0]]]*/
+/*[[[start:exports,hash:CRC-32=0x0]]]*/
 /*[[[end:exports]]]*/
 
 DECL_END
