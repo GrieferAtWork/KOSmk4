@@ -137,10 +137,10 @@ BEGIN
 	BEGIN GROUP("kernel") { LINK, MCOPY, /* ELF_FLATTEN, */
 			enumerateSymbolsStep(
 				elfBinary: KERNEL_BINARY,
-				callback: [](self: BoundStep, symbols: {(string,string,string,string,string)...}) {
+				callback: [](self: BoundStep, symbols: {(string, string, string, string, string)...}) {
 					local symbols_map: {string: int} = Dict();
-					for (local symbolName,symbolType,symbolBind,
-					           symbolVisi,symbolSize,none: symbols) {
+					for (local symbolName, symbolType, symbolBind,
+					           symbolVisi, symbolSize, none: symbols) {
 						if (symbolVisi != "DEFAULT")
 							continue;
 						if (symbolBind != "GLOBAL" && symbolBind != "WEAK")
@@ -156,15 +156,15 @@ BEGIN
 						/* Ensure that we're always exporting the kernel symbol table itself! */
 						symbols_map["kernel_symbol_table"] = 0; /* Filled later */
 					}
-					updateFileContents(self.group.fixFilename(KERNEL_FEATURES_HEADER),[](fp: File) {
+					local sorted_keys = symbols_map.keys.sorted();
+					updateFileContents(self.group.fixFilename(KERNEL_FEATURES_HEADER), [](fp: File) {
 						fp << COPYRIGHT << "\n\n\n";
-						for (local x: symbols_map.keys.sorted())
+						for (local x: sorted_keys)
 							fp << "#define __CRT_HAVE_" << x << " 1\n";
 					});
-					updateFileContents(self.group.fixFilename(KERNEL_EXPORTS_SOURCE),[](fp: File) {
+					updateFileContents(self.group.fixFilename(KERNEL_EXPORTS_SOURCE), [](fp: File) {
 						/* Generate the hash-vector */
-						local R_SIZE32;
-						local PTR, U32;
+						local R_SIZE32, PTR, U32;
 						if (TARGET_ARCH == "i386") {
 							PTR = U32 = ".long";
 							R_SIZE32 = "R_386_SIZE32";
@@ -186,15 +186,15 @@ BEGIN
 						symbols_map["kernel_symbol_table"] =
 							TARGET_POINTER_SIZE + ((hash_mask + 1) * (8 + (2 * TARGET_POINTER_SIZE)));
 						@@Hash-vector of (name,size,hash)
-						local hash_vector: {(string,int,int) | none...} = [none] * (hash_mask + 1);
-						for (local name: symbols_map.keys) {
+						local hash_vector: {(string, int, int) | none...} = [none] * (hash_mask + 1);
+						for (local name: sorted_keys) {
 							local hash = ElfSymbolHash(name);
-							local perturb,j;
+							local perturb, j;
 							perturb = j = hash & hash_mask;
 							for (;;) {
 								local index = j & hash_mask;
 								if (hash_vector[index] is none) {
-									hash_vector[index] = pack(name,symbols_map[name],hash);
+									hash_vector[index] = pack(name, symbols_map[name], hash);
 									break;
 								}
 								j = ((j << 2) + j + perturb + 1);
