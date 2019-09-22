@@ -108,7 +108,7 @@ __NOTHROW_NCX(__impl_hybrid_atomic_cmpxch_val##n)(void *__x, __UINT##n##_TYPE__ 
 	int const __order = __MAX(__succ,__fail); \
 	if (__order >= __ATOMIC_ACQ_REL) return (__UINT##n##_TYPE__)__NAMESPACE_INT_SYM _InterlockedCompareExchange##y((T volatile *)__x,(T)__newv,(T)__oldv); \
 	if (__order >= __ATOMIC_RELEASE) return (__UINT##n##_TYPE__)__NAMESPACE_INT_SYM _InterlockedCompareExchange##y##_rel((T volatile *)__x,(T)__newv,(T)__oldv); \
-	if (__order >= __ATOMIC_ACQUIRE) return (__UINT##n##_TYPE__)__NAMESPACE_INT_SYM _InterlockedCompareExchange##y##_acq((T volatile *)__x,(T)__newv,(T)__oldv); \
+	if (__order >= __ATOMIC_CONSUME) return (__UINT##n##_TYPE__)__NAMESPACE_INT_SYM _InterlockedCompareExchange##y##_acq((T volatile *)__x,(T)__newv,(T)__oldv); \
 	return (__UINT##n##_TYPE__)__NAMESPACE_INT_SYM _InterlockedCompareExchange##y##_nf((T volatile *)__x,(T)__newv,(T)__oldv); \
 }
 __DEFINE_WRAPPER(8,8,char)
@@ -460,35 +460,35 @@ __FORCELOCAL __UINT##n##_TYPE__ \
 __NOTHROW_NCX(__impl_hybrid_atomic_xch##n)(void *__x, __UINT##n##_TYPE__ __v, int __order) { \
 	if (__order >= __ATOMIC_ACQ_REL) return (__UINT##n##_TYPE__)__NAMESPACE_INT_SYM _InterlockedExchange##y((T volatile *)__x,(T)__v); \
 	if (__order >= __ATOMIC_RELEASE) return (__UINT##n##_TYPE__)__NAMESPACE_INT_SYM _InterlockedExchange##y##_rel((T volatile *)__x,(T)__v); \
-	if (__order >= __ATOMIC_ACQUIRE) return (__UINT##n##_TYPE__)__NAMESPACE_INT_SYM _InterlockedExchange##y##_acq((T volatile *)__x,(T)__v); \
+	if (__order >= __ATOMIC_CONSUME) return (__UINT##n##_TYPE__)__NAMESPACE_INT_SYM _InterlockedExchange##y##_acq((T volatile *)__x,(T)__v); \
 	return (__UINT##n##_TYPE__)__NAMESPACE_INT_SYM _InterlockedExchange##y##_nf((T volatile *)__x,(T)__v); \
 } \
 __FORCELOCAL __UINT##n##_TYPE__ \
 __NOTHROW_NCX(__impl_hybrid_atomic_fetchadd##n)(void *__x, __UINT##n##_TYPE__ __v, int __order) { \
 	if (__order >= __ATOMIC_ACQ_REL) return (__UINT##n##_TYPE__)__NAMESPACE_INT_SYM _InterlockedExchangeAdd##y((T volatile *)__x,(T)__v); \
 	if (__order >= __ATOMIC_RELEASE) return (__UINT##n##_TYPE__)__NAMESPACE_INT_SYM _InterlockedExchangeAdd##y##_rel((T volatile *)__x,(T)__v); \
-	if (__order >= __ATOMIC_ACQUIRE) return (__UINT##n##_TYPE__)__NAMESPACE_INT_SYM _InterlockedExchangeAdd##y##_acq((T volatile *)__x,(T)__v); \
+	if (__order >= __ATOMIC_CONSUME) return (__UINT##n##_TYPE__)__NAMESPACE_INT_SYM _InterlockedExchangeAdd##y##_acq((T volatile *)__x,(T)__v); \
 	return (__UINT##n##_TYPE__)__NAMESPACE_INT_SYM _InterlockedExchangeAdd##y##_nf((T volatile *)__x,(T)__v); \
 } \
 __FORCELOCAL __UINT##n##_TYPE__ \
 __NOTHROW_NCX(__impl_hybrid_atomic_fetchand##n)(void *__x, __UINT##n##_TYPE__ __v, int __order) { \
 	if (__order >= __ATOMIC_ACQ_REL) return (__UINT##n##_TYPE__)__NAMESPACE_INT_SYM _InterlockedAnd##y((T volatile *)__x,(T)__v); \
 	if (__order >= __ATOMIC_RELEASE) return (__UINT##n##_TYPE__)__NAMESPACE_INT_SYM _InterlockedAnd##y##_rel((T volatile *)__x,(T)__v); \
-	if (__order >= __ATOMIC_ACQUIRE) return (__UINT##n##_TYPE__)__NAMESPACE_INT_SYM _InterlockedAnd##y##_acq((T volatile *)__x,(T)__v); \
+	if (__order >= __ATOMIC_CONSUME) return (__UINT##n##_TYPE__)__NAMESPACE_INT_SYM _InterlockedAnd##y##_acq((T volatile *)__x,(T)__v); \
 	return (__UINT##n##_TYPE__)__NAMESPACE_INT_SYM _InterlockedAnd##y##_nf((T volatile *)__x,(T)__v); \
 } \
 __FORCELOCAL __UINT##n##_TYPE__ \
 __NOTHROW_NCX(__impl_hybrid_atomic_fetchor##n)(void *__x, __UINT##n##_TYPE__ __v, int __order) { \
 	if (__order >= __ATOMIC_ACQ_REL) return (__UINT##n##_TYPE__)__NAMESPACE_INT_SYM _InterlockedOr##y((T volatile *)__x,(T)__v); \
 	if (__order >= __ATOMIC_RELEASE) return (__UINT##n##_TYPE__)__NAMESPACE_INT_SYM _InterlockedOr##y##_rel((T volatile *)__x,(T)__v); \
-	if (__order >= __ATOMIC_ACQUIRE) return (__UINT##n##_TYPE__)__NAMESPACE_INT_SYM _InterlockedOr##y##_acq((T volatile *)__x,(T)__v); \
+	if (__order >= __ATOMIC_CONSUME) return (__UINT##n##_TYPE__)__NAMESPACE_INT_SYM _InterlockedOr##y##_acq((T volatile *)__x,(T)__v); \
 	return (__UINT##n##_TYPE__)__NAMESPACE_INT_SYM _InterlockedOr##y##_nf((T volatile *)__x,(T)__v); \
 } \
 __FORCELOCAL __UINT##n##_TYPE__ \
 __NOTHROW_NCX(__impl_hybrid_atomic_fetchxor##n)(void *__x, __UINT##n##_TYPE__ __v, int __order) { \
 	if (__order >= __ATOMIC_ACQ_REL) return (__UINT##n##_TYPE__)__NAMESPACE_INT_SYM _InterlockedXor##y((T volatile *)__x,(T)__v); \
 	if (__order >= __ATOMIC_RELEASE) return (__UINT##n##_TYPE__)__NAMESPACE_INT_SYM _InterlockedXor##y##_rel((T volatile *)__x,(T)__v); \
-	if (__order >= __ATOMIC_ACQUIRE) return (__UINT##n##_TYPE__)__NAMESPACE_INT_SYM _InterlockedXor##y##_acq((T volatile *)__x,(T)__v); \
+	if (__order >= __ATOMIC_CONSUME) return (__UINT##n##_TYPE__)__NAMESPACE_INT_SYM _InterlockedXor##y##_acq((T volatile *)__x,(T)__v); \
 	return (__UINT##n##_TYPE__)__NAMESPACE_INT_SYM _InterlockedXor##y##_nf((T volatile *)__x,(T)__v); \
 }
 __DEFINE_WRAPPER(8,8,char)
@@ -586,7 +586,7 @@ __FORCELOCAL void __NOTHROW_NCX(__impl_hybrid_atomic_thread_fence)(int __order) 
 		__COMPILER_BARRIER();
 	else if (__order >= __ATOMIC_RELEASE)
 		__COMPILER_WRITE_BARRIER();
-	else if (__order >= __ATOMIC_ACQUIRE)
+	else if (__order >= __ATOMIC_CONSUME)
 		__COMPILER_READ_BARRIER();
 }
 __NAMESPACE_INT_END
