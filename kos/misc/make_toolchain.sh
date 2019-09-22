@@ -246,7 +246,7 @@ if [ -f "${KOS_ROOT}/kos/misc/config/launch.vs.json" ]; then
 fi
 
 cmd mkdir -p "binutils"
-cd "binutils"
+cmd cd "binutils"
 KOS_BINUTILS="$(pwd)"
 
 cmd mkdir -p "$NAME"
@@ -254,7 +254,45 @@ cmd mkdir -p "src"
 
 # Make sure that we have required programs in $PATH
 require_program make
-require_program deemon
+
+# If the user doesn't have deemon installed, download, configure,
+# and build a version that can be used to drive the KOS toolchain.
+echo "Check if deemon is installed on the machine"
+if ! which deemon > /dev/null 2>&1; then
+	echo "    'deemon' is not in PATH"
+	echo "Check if deemon was installed under '$KOS_BINUTILS/deemon'"
+	if [ -f "$KOS_BINUTILS/deemon/deemon" ] || [ -f "$KOS_BINUTILS/deemon/deemon.exe" ]; then
+		echo "    Found deemon in '$KOS_BINUTILS/deemon'"
+	else
+		echo "    Deemon is missing (now downloading, configuring and building a local copy)"
+		# Don't use the latest patch, but this very specific one that
+		# should be usable to drive the entirety of the KOS toolchain.
+		#     v -- Fix integer underflow in Bytes.replace and similar functions
+		DEEMON_VERSION="9612b819bac30290ea2b8480a77eebe9d6e1df30"
+		if ! [ -f "$KOS_BINUTILS/deemon/configure" ]; then
+			require_program git
+			rm -rf "$KOS_BINUTILS/deemon" > /dev/null 2>&1
+			cmd mkdir -p "$KOS_BINUTILS/deemon"
+			cmd cd "$KOS_BINUTILS/deemon"
+			# https://stackoverflow.com/questions/3489173/how-to-clone-git-repository-with-specific-revision-changeset
+			cmd git init
+			cmd git remote add origin https://github.com/GrieferAtWork/deemon.git
+			cmd git fetch origin $DEEMON_VERSION
+			cmd git reset --hard FETCH_HEAD
+		fi
+		cmd cd "$KOS_BINUTILS/deemon"
+		echo "Configuring deemon..."
+		cmd bash ./configure
+		echo "Making deemon..."
+		cmd make -j $MAKE_PARALLEL_COUNT
+		cmd cd "$KOS_BINUTILS"
+		echo "Adding '$KOS_BINUTILS/deemon' to PATH"
+		echo "    NOTE: In order to run magic.dee later one, you may use '$KOS_BINUTILS/deemon/deemon' as driver"
+		# Update $PATH such that deemon becomes apart of it.
+		export PATH="$KOS_BINUTILS/deemon:$PATH"
+	fi
+fi
+
 
 # Download sources
 download_binutils

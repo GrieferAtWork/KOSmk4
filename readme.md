@@ -338,12 +338,17 @@ KOSmk4 no longer is a small kernel. I'd say it has reached the point of really b
 Requirements:
 
 - Working installation of [deemon 200](https://github.com/GrieferAtWork/deemon)
+	- If not apart of `$PATH`, this will automatically be downloaded + configured + build by:
+		`bash $PROJPATH/kos/misc/make_toolchain.sh i386-kos`
+		Don't worry: the install location will still be contained within the KOS source tree.
+		More specifically, the deemon executable will end up in `$PROJPATH/binutils/deemon/deemon[.exe]`
 - binutils: `$PROJPATH/binutils/i386-kos/bin/i686-kos-*[.exe]`
 	- Can be easily be downloaded + configured + build by:
 		`bash $PROJPATH/kos/misc/make_toolchain.sh i386-kos`
 - qemu: qemu-system-i386[.exe] (preferrably in $PATH. otherwise, add the location to the `enumerateQEmuInstallationLocations()` function in `$PROJPATH/kos/misc/magicemulator/qemu.dee`)
 - On windows: Cygwin
 - On linux: \*shrugs\* - You'll figure it out (Because I couldn't be bothered, to)
+	- Note that at the time of me writing this, there are still a couple of crutial elements unimplemented in deemon. Most importantly, the process API used to spawn new processes has only been implemented for windows, so until I implement it for linux, it will never work because deemon won't know how to invoke gcc in order to build KOS
 	
 Building KOS (from $PROJPATH):
 
