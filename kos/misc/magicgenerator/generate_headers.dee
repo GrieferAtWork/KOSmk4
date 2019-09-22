@@ -7289,6 +7289,7 @@ done_sect:
 	for (local sects: final_sections_mapping) {
 		if (!sects)
 			continue;
+		sects.sort();
 		tempfp << "\tCB(";
 		local is_first = true;
 		local current_line = HashSet();
