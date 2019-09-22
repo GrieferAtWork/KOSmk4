@@ -29,6 +29,11 @@
 /* debug-data-alignment runs into problems in dynamically linked DLLs,
  * because GCC tends to leave the PLT unaligned, meaning that any access
  * to an imported symbol could lead to an error being thrown wrongly! */
+#elif defined(__PE__) && defined(_MSC_VER)
+/* While we do get further with MSVC, the compiler occasionally generates
+ * stack-cookie checks (similar to gcc's -fstack-smash-protection). And
+ * it's these checks that will always perform unaligned memory accesses,
+ * so we can't actually turn on this functionality here, either... */
 #elif defined(__x86_64__)
 #ifdef _MSC_VER
 __NAMESPACE_INT_BEGIN
