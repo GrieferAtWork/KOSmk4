@@ -497,7 +497,7 @@ EOF
 
 
 ##############################################################################
-	deemon | deemon-latest)
+	deemon | deemon-200 | deemon-latest)
 		SRCPATH="$KOS_ROOT/binutils/src/deemon-git/deemon"
 		if ! [ -f "$SRCPATH/configure" ]; then
 			rm -rf "$KOS_ROOT/binutils/src/deemon-git" > /dev/null 2>&1

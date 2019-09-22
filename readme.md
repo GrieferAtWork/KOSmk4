@@ -5,6 +5,7 @@ KOSmk4 no longer is a small kernel. I'd say it has reached the point of really b
 
 
 ## Table of contents
+- [Ported Applications](#applications)
 - [KOS Features](#features)
 - [Project rules / Code guidelines](#rules)
 - [Building KOS](#building)
@@ -15,6 +16,23 @@ KOSmk4 no longer is a small kernel. I'd say it has reached the point of really b
 - [Notes on building KOS](#building-notes)
 - [Building & using Bochs to run KOS](#bochs)
 - [Automatic System Headers](#headers)
+
+
+<a name="applications"></a>
+##Ported Applications
+
+All ported applications can be installed onto you KOS disk image by using `bash $PROJPATH/kos/misc/make_utility.sh i386 <UTILITY_NAME>`
+
+- Shell/coreutils
+	- [busybox-1.31.0](https://www.busybox.net)
+- Programming
+	- [tcc-0.9.27](https://bellard.org/tcc/)
+	- [nano-4.4](https://www.nano-editor.org/)
+	- [deemon-200](https://github.com/GrieferAtWork/deemon)
+- Games
+	- [vitetris-0.58.0](https://www.victornils.net/tetris/)
+- Libraries
+	- [ncurses-6.1](https://www.gnu.org/software/ncurses/)
 
 
 <a name="features"></a>
@@ -341,7 +359,7 @@ Requirements:
 	- If not apart of `$PATH`, this will automatically be downloaded + configured + build by:
 		`bash $PROJPATH/kos/misc/make_toolchain.sh i386-kos`
 		Don't worry: the install location will still be contained within the KOS source tree.
-		More specifically, the deemon executable will end up in `$PROJPATH/binutils/deemon/deemon[.exe]`
+		More specifically, the deemon executable will end up as `$PROJPATH/binutils/deemon/deemon[.exe]`
 - binutils: `$PROJPATH/binutils/i386-kos/bin/i686-kos-*[.exe]`
 	- Can be easily be downloaded + configured + build by:
 		`bash $PROJPATH/kos/misc/make_toolchain.sh i386-kos`
