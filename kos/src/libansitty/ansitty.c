@@ -260,30 +260,26 @@ stub_getcursor(struct ansitty *__restrict UNUSED(self),
 PRIVATE NONNULL((1)) void CC
 stub_cls(struct ansitty *__restrict self,
          unsigned int mode) {
-	ansitty_coord_t sxsy[2], xy[2];
-	ansitty_coord_t &sx = sxsy[0];
-	ansitty_coord_t &sy = sxsy[1];
-	ansitty_coord_t &x = xy[0];
-	ansitty_coord_t &y = xy[1];
+	ansitty_coord_t sxsy[2];
+	ansitty_coord_t xy[2];
 	size_t count;
 	GETCURSOR(xy);
 	switch (mode) {
 
 	case ANSITTY_CLS_AFTER:
 		GETSIZE(sxsy);
-		count = ((sy - y) * sx) - x;
+		count = ((sxsy[1] - xy[1]) * sxsy[0]) - xy[0];
 		break;
 
 	case ANSITTY_CLS_BEFORE:
 		GETSIZE(sxsy);
 		SETCURSOR(0, 0, false);
-		count = (y * sx) + x;
+		count = (xy[1] * sxsy[0]) + xy[0];
 		break;
 
 	default:
-		GETSIZE(sxsy);
 		SETCURSOR(0, 0, false);
-		count = sx * sy;
+		count = (size_t)-1;
 		break;
 	}
 	FILLCELL(CC_SPC, count);
@@ -295,27 +291,24 @@ stub_el(struct ansitty *__restrict self,
         unsigned int mode) {
 	ansitty_coord_t xy[2];
 	ansitty_coord_t sxy[2];
-	ansitty_coord_t &x = xy[0];
-	ansitty_coord_t &y = xy[1];
-	ansitty_coord_t &sx = sxy[0];
 	ansitty_coord_t count;
 	GETCURSOR(xy);
 	switch (mode) {
 
 	case ANSITTY_EL_AFTER:
 		GETSIZE(sxy);
-		count = sx - x;
+		count = sxy[0] - xy[0];
 		break;
 
 	case ANSITTY_EL_BEFORE:
-		SETCURSOR(0, y, false);
-		count = x;
+		SETCURSOR(0, xy[1], false);
+		count = xy[0];
 		break;
 
 	default:
-		SETCURSOR(0, y, false);
+		SETCURSOR(0, xy[1], false);
 		GETSIZE(sxy);
-		count = sx;
+		count = sxy[0];
 		break;
 	}
 	FILLCELL(CC_SPC, count);
