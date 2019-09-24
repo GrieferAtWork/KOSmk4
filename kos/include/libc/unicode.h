@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x90b481dd */
+/* HASH CRC-32:0xffd7a980 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,18 +37,18 @@
 /* Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
  * This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst' */
 #define __libc_unicode_writeutf8 __libc_slow_unicode_writeutf8
-#define __LIBC_UNICODE_UTF8_MAXLEN       8
-#define __LIBC_UNICODE_UTF8_CURLEN       7
-#define __LIBC_UNICODE_UTF16_MAXLEN      2
-#define __LIBC_UNICODE_UTF16_CURLEN      2
-#define __LIBC_UNICODE_UTF32_MAXLEN      1
-#define __LIBC_UNICODE_UTF32_CURLEN      1
-#define __LIBC_UNICODE_ISVALIDUTF16(ch) (sizeof(ch) == 1 ? 1 : ((sizeof(ch) == 2 || (ch) <= 0x10ffff)) && ((ch) < 0xd800 || (ch) > 0xdfff))
-#define __LIBC_UNICODE_MAXCHAR           0x10ffff
-#define __LIBC_UNICODE_8TO16_MAXBUF(num_chars)   (num_chars)
-#define __LIBC_UNICODE_8TO32_MAXBUF(num_chars)   (num_chars)
+#define __LIBC_UNICODE_UTF8_MAXLEN              8
+#define __LIBC_UNICODE_UTF8_CURLEN              7
+#define __LIBC_UNICODE_UTF16_MAXLEN             2
+#define __LIBC_UNICODE_UTF16_CURLEN             2
+#define __LIBC_UNICODE_UTF32_MAXLEN             1
+#define __LIBC_UNICODE_UTF32_CURLEN             1
+#define __LIBC_UNICODE_ISVALIDUTF16(ch)         (sizeof(ch) == 1 ? 1 : ((sizeof(ch) == 2 || (ch) <= 0x10ffff)) && ((ch) < 0xd800 || (ch) > 0xdfff))
+#define __LIBC_UNICODE_MAXCHAR                  0x10ffff
+#define __LIBC_UNICODE_8TO16_MAXBUF(num_chars)  (num_chars)
+#define __LIBC_UNICODE_8TO32_MAXBUF(num_chars)  (num_chars)
 #define __LIBC_UNICODE_16TO8_MAXBUF(num_chars)  ((num_chars) * 3)
-#define __LIBC_UNICODE_16TO32_MAXBUF(num_chars)  (num_chars)
+#define __LIBC_UNICODE_16TO32_MAXBUF(num_chars) (num_chars)
 #define __LIBC_UNICODE_32TO8_MAXBUF(num_chars)  ((num_chars) * 7)
 #define __LIBC_UNICODE_32TO16_MAXBUF(num_chars) ((num_chars) * 2)
 
@@ -142,10 +142,10 @@ __NOTHROW_NCX(__LIBCCALL __libc_unicode_fold)(__CHAR32_TYPE__ __ch, __CHAR32_TYP
 	return __buf + 1;
 }
 
-#define __libc_unicode_tolower(ch)  (__libc_unicode_isupper(ch) ? (__CHAR32_TYPE__)(ch) + 0x20 : (__CHAR32_TYPE__)(ch))
-#define __libc_unicode_toupper(ch)  (__libc_unicode_islower(ch) ? (__CHAR32_TYPE__)(ch) - 0x20 : (__CHAR32_TYPE__)(ch))
-#define __libc_unicode_totitle(ch)  (__libc_unicode_islower(ch) ? (__CHAR32_TYPE__)(ch) - 0x20 : (__CHAR32_TYPE__)(ch))
-#define __libc_unicode_asdigit(ch) ((__UINT8_TYPE__)(ch) - 0x30)
+#define __libc_unicode_tolower(ch)   (__libc_unicode_isupper(ch) ? (__CHAR32_TYPE__)(ch) + 0x20 : (__CHAR32_TYPE__)(ch))
+#define __libc_unicode_toupper(ch)   (__libc_unicode_islower(ch) ? (__CHAR32_TYPE__)(ch) - 0x20 : (__CHAR32_TYPE__)(ch))
+#define __libc_unicode_totitle(ch)   (__libc_unicode_islower(ch) ? (__CHAR32_TYPE__)(ch) - 0x20 : (__CHAR32_TYPE__)(ch))
+#define __libc_unicode_asdigit(ch)   ((__UINT8_TYPE__)(ch) - 0x30)
 #define __libc_unicode_isalpha(ch)   __libc_isalpha(ch)
 #define __libc_unicode_islower(ch)   __libc_islower(ch)
 #define __libc_unicode_isupper(ch)   __libc_isupper(ch)

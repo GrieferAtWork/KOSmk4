@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x41f18044 */
+/* HASH CRC-32:0x95f84397 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_c8toc16))(__CHAR16_TYPE__ *__
                                                              /*utf-8*/ char const *__restrict __s,
                                                              __SIZE_TYPE__ __n,
                                                              __mbstate_t *__restrict __mbs) {
-#line 1072 "kos/src/libc/magic/unicode.c"
+#line 1108 "kos/src/libc/magic/unicode.c"
 	__CHAR32_TYPE__ __resch;
 	__SIZE_TYPE__ __i;
 	if ((__mbs->__word & __MBSTATE_TYPE_MASK) == __MBSTATE_TYPE_WR_UTF16_LO) {
@@ -72,51 +72,67 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_c8toc16))(__CHAR16_TYPE__ *__
 			goto __error_ilseq; /* Must be a follow-up byte */
 		__ch &= 0x3f;
 		switch (__mbs->__word & __MBSTATE_TYPE_MASK) {
+
 		case __MBSTATE_TYPE_UTF8_2_2: /* expect 2nd character of a 2-byte utf-8 sequence. { WORD & 0x0000001f } */
 			*__pc16 = ((__mbs->__word & 0x1f) << __MBSTATE_TYPE_UTF8_SHIFT) | __ch;
 			goto __done_empty;
+
 		case __MBSTATE_TYPE_UTF8_3_2: /* expect 2nd character of a 3-byte utf-8 sequence. { WORD & 0x000003c0 } */
 			__mbs->__word = __MBSTATE_TYPE_UTF8_3_3 | (__mbs->__word & 0x3c0) | __ch;
 			break;
+
 		case __MBSTATE_TYPE_UTF8_3_3: /* expect 3rd character of a 3-byte utf-8 sequence. { WORD & 0x000003c0, WORD & 0x0000003f } */
 			__resch = ((__mbs->__word & 0x3ff) << __MBSTATE_TYPE_UTF8_SHIFT) | __ch;
 			goto __done_empty_chk_surrogate;
+
 		case __MBSTATE_TYPE_UTF8_4_2: /* expect 2nd character of a 4-byte utf-8 sequence. { WORD & 0x00007000 } */
 			__mbs->__word = __MBSTATE_TYPE_UTF8_4_3 | (__mbs->__word & 0x7000) | ((__UINT32_TYPE__)__ch << __MBSTATE_TYPE_UTF8_SHIFT);
 			break;
+
 		case __MBSTATE_TYPE_UTF8_4_3: /* expect 3rd character of a 4-byte utf-8 sequence. { WORD & 0x00007000, WORD & 0x00000fc0 } */
 			__mbs->__word = __MBSTATE_TYPE_UTF8_4_4 | (__mbs->__word & 0x7fc0) | __ch;
 			break;
+
 		case __MBSTATE_TYPE_UTF8_4_4: /* expect 4th character of a 4-byte utf-8 sequence. { WORD & 0x00007000, WORD & 0x00000fc0, WORD & 0x0000003f } */
 			__resch = ((__mbs->__word & 0x7fff) << __MBSTATE_TYPE_UTF8_SHIFT) | __ch;
 			goto __done_empty_chk_surrogate;
+
 		case __MBSTATE_TYPE_UTF8_5_2: /* expect 2nd character of a 5-byte utf-8 sequence. { WORD & 0x000c0000 } */
 			__mbs->__word = __MBSTATE_TYPE_UTF8_5_3 | (__mbs->__word & 0xc0000) | ((__UINT32_TYPE__)__ch << (2 * __MBSTATE_TYPE_UTF8_SHIFT));
 			break;
+
 		case __MBSTATE_TYPE_UTF8_5_3: /* expect 3rd character of a 5-byte utf-8 sequence. { WORD & 0x000c0000, WORD & 0x0003f000 } */
 			__mbs->__word = __MBSTATE_TYPE_UTF8_5_4 | (__mbs->__word & 0xff000) | ((__UINT32_TYPE__)__ch << __MBSTATE_TYPE_UTF8_SHIFT);
 			break;
+
 		case __MBSTATE_TYPE_UTF8_5_4: /* expect 4th character of a 5-byte utf-8 sequence. { WORD & 0x000c0000, WORD & 0x0003f000, WORD & 0x00000fc0 } */
 			__mbs->__word = __MBSTATE_TYPE_UTF8_5_5 | (__mbs->__word & 0xfffc0) | __ch;
 			break;
+
 		case __MBSTATE_TYPE_UTF8_5_5: /* expect 5th character of a 5-byte utf-8 sequence. { WORD & 0x000c0000, WORD & 0x0003f000, WORD & 0x00000fc0, WORD & 0x0000003f } */
 			__resch = ((__mbs->__word & 0x000cffff) << __MBSTATE_TYPE_UTF8_SHIFT) | __ch;
 			goto __done_empty_chk_surrogate;
+
 		case __MBSTATE_TYPE_UTF8_6_2: /* expect 2nd character of a 6-byte utf-8 sequence. { WORD & 0x01000000 } */
 			__mbs->__word = __MBSTATE_TYPE_UTF8_6_3 | (__mbs->__word & 0x1000000) | ((__UINT32_TYPE__)__ch << (3 * __MBSTATE_TYPE_UTF8_SHIFT));
 			break;
+
 		case __MBSTATE_TYPE_UTF8_6_3: /* expect 3rd character of a 6-byte utf-8 sequence. { WORD & 0x01000000, WORD & 0x00fc0000 } */
 			__mbs->__word = __MBSTATE_TYPE_UTF8_6_4 | (__mbs->__word & 0x1fc0000) | ((__UINT32_TYPE__)__ch << (2 * __MBSTATE_TYPE_UTF8_SHIFT));
 			break;
+
 		case __MBSTATE_TYPE_UTF8_6_4: /* expect 4th character of a 6-byte utf-8 sequence. { WORD & 0x01000000, WORD & 0x00fc0000, WORD & 0x0003f000 } */
 			__mbs->__word = __MBSTATE_TYPE_UTF8_6_5 | (__mbs->__word & 0x1fff000) | ((__UINT32_TYPE__)__ch << __MBSTATE_TYPE_UTF8_SHIFT);
 			break;
+
 		case __MBSTATE_TYPE_UTF8_6_5: /* expect 5th character of a 6-byte utf-8 sequence. { WORD & 0x01000000, WORD & 0x00fc0000, WORD & 0x0003f000, WORD & 0x00000fc0 } */
 			__mbs->__word = __MBSTATE_TYPE_UTF8_6_6 | (__mbs->__word & 0x1ffffc0) | __ch;
 			break;
+
 		case __MBSTATE_TYPE_UTF8_6_6: /* expect 6th character of a 6-byte utf-8 sequence. { WORD & 0x01000000, WORD & 0x00fc0000, WORD & 0x0003f000, WORD & 0x00000fc0, WORD & 0x0000003f } */
 			__resch = ((__mbs->__word & 0x1ffffff) << __MBSTATE_TYPE_UTF8_SHIFT) | __ch;
 			goto __done_empty_chk_surrogate;
+
 		default:
 __error_ilseq:
 			return (__SIZE_TYPE__)-1;

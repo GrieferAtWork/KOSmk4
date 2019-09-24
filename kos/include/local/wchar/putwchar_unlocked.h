@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x76fe43dc */
+/* HASH CRC-32:0x6afe3975 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_putwchar_unlocked_defined
-#include <features.h>
+#include <__crt.h>
 #if (defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE__fputwc_nolock)) && !defined(__NO_STDSTREAMS)
 #define __local_putwchar_unlocked_defined 1
 #include <kos/anno.h>
@@ -37,7 +37,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,,__localdep_fputwc_unlocked,(__WCH
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(putwchar_unlocked) __WINT_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(putwchar_unlocked))(__WCHAR_TYPE__ __wc) __THROWS(...) {
-#line 900 "kos/src/libc/magic/wchar.c"
+#line 899 "kos/src/libc/magic/wchar.c"
 	return __localdep_fputwc_unlocked(__wc, __LOCAL_stdin);
 }
 __NAMESPACE_LOCAL_END

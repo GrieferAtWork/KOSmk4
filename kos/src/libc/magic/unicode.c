@@ -114,20 +114,24 @@ unicode_readutf8:([nonnull] /*utf-8*/char const **__restrict ptext) -> $char32_t
 	result = (char32_t)(u8)*iter++;
 	if (result >= 0xc0) {
 		switch (__LIBC_LOCAL_NAME(@unicode_utf8seqlen@)[result]) {
+
 		case 0:
 		case 1:
 			break;
+
 		case 2:
 			result  = (result & 0x1f) << 6;
 			result |= (iter[0] & 0x3f);
 			iter += 1;
 			break;
+
 		case 3:
 			result  = (result & 0x0f) << 12;
 			result |= (iter[0] & 0x3f) << 6;
 			result |= (iter[1] & 0x3f);
 			iter += 2;
 			break;
+
 		case 4:
 			result  = (result & 0x07) << 18;
 			result |= (iter[0] & 0x3f) << 12;
@@ -135,6 +139,7 @@ unicode_readutf8:([nonnull] /*utf-8*/char const **__restrict ptext) -> $char32_t
 			result |= (iter[2] & 0x3f);
 			iter += 3;
 			break;
+
 		case 5:
 			result  = (result & 0x03) << 24;
 			result |= (iter[0] & 0x3f) << 18;
@@ -143,6 +148,7 @@ unicode_readutf8:([nonnull] /*utf-8*/char const **__restrict ptext) -> $char32_t
 			result |= (iter[3] & 0x3f);
 			iter += 4;
 			break;
+
 		case 6:
 			result  = (result & 0x01) << 30;
 			result |= (iter[0] & 0x3f) << 24;
@@ -152,6 +158,7 @@ unicode_readutf8:([nonnull] /*utf-8*/char const **__restrict ptext) -> $char32_t
 			result |= (iter[4] & 0x3f);
 			iter += 5;
 			break;
+
 		case 7:
 			result  = (iter[0] & 0x03/*0x3f*/) << 30;
 			result |= (iter[1] & 0x3f) << 24;
@@ -161,6 +168,7 @@ unicode_readutf8:([nonnull] /*utf-8*/char const **__restrict ptext) -> $char32_t
 			result |= (iter[5] & 0x3f);
 			iter += 6;
 			break;
+
 		case 8:
 			/*result = (iter[0] & 0x3f) << 36;*/
 			result  = (iter[1] & 0x03/*0x3f*/) << 30;
@@ -171,6 +179,7 @@ unicode_readutf8:([nonnull] /*utf-8*/char const **__restrict ptext) -> $char32_t
 			result |= (iter[6] & 0x3f);
 			iter += 7;
 			break;
+
 		default:
 			__builtin_unreachable();
 		}
@@ -201,20 +210,24 @@ unicode_readutf8_rev:([nonnull] /*utf-8*/char const **__restrict ptext) -> $char
 	}
 	if (result >= 0xc0) {
 		switch (seqlen) {
+
 		case 0:
 		case 1:
 			break;
+
 		case 2:
 			result  = (result & 0x1f) << 6;
 			result |= (iter[0] & 0x3f);
 			iter += 1;
 			break;
+
 		case 3:
 			result  = (result & 0x0f) << 12;
 			result |= (iter[0] & 0x3f) << 6;
 			result |= (iter[1] & 0x3f);
 			iter += 2;
 			break;
+
 		case 4:
 			result  = (result & 0x07) << 18;
 			result |= (iter[0] & 0x3f) << 12;
@@ -222,6 +235,7 @@ unicode_readutf8_rev:([nonnull] /*utf-8*/char const **__restrict ptext) -> $char
 			result |= (iter[2] & 0x3f);
 			iter += 3;
 			break;
+
 		case 5:
 			result  = (result & 0x03) << 24;
 			result |= (iter[0] & 0x3f) << 18;
@@ -230,6 +244,7 @@ unicode_readutf8_rev:([nonnull] /*utf-8*/char const **__restrict ptext) -> $char
 			result |= (iter[3] & 0x3f);
 			iter += 4;
 			break;
+
 		case 6:
 			result  = (result & 0x01) << 30;
 			result |= (iter[0] & 0x3f) << 24;
@@ -239,6 +254,7 @@ unicode_readutf8_rev:([nonnull] /*utf-8*/char const **__restrict ptext) -> $char
 			result |= (iter[4] & 0x3f);
 			iter += 5;
 			break;
+
 		case 7:
 			result  = (iter[0] & 0x03/*0x3f*/) << 30;
 			result |= (iter[1] & 0x3f) << 24;
@@ -248,6 +264,7 @@ unicode_readutf8_rev:([nonnull] /*utf-8*/char const **__restrict ptext) -> $char
 			result |= (iter[5] & 0x3f);
 			iter += 6;
 			break;
+
 		case 8:
 			/*result = (iter[0] & 0x3f) << 36;*/
 			result  = (iter[1] & 0x03/*0x3f*/) << 30;
@@ -258,6 +275,7 @@ unicode_readutf8_rev:([nonnull] /*utf-8*/char const **__restrict ptext) -> $char
 			result |= (iter[6] & 0x3f);
 			iter += 7;
 			break;
+
 		default:
 			__builtin_unreachable();
 		}
@@ -285,20 +303,24 @@ unicode_readutf8_n:([nonnull] /*utf-8*/char const **__restrict ptext, [nonnull] 
 		if (iter + len-1 >= text_end)
 			len = (u8)(text_end - iter)+1;
 		switch (len) {
+
 		case 0:
 		case 1:
 			break;
+
 		case 2:
 			result  = (result & 0x1f) << 6;
 			result |= (iter[0] & 0x3f);
 			iter += 1;
 			break;
+
 		case 3:
 			result  = (result & 0x0f) << 12;
 			result |= (iter[0] & 0x3f) << 6;
 			result |= (iter[1] & 0x3f);
 			iter += 2;
 			break;
+
 		case 4:
 			result  = (result & 0x07) << 18;
 			result |= (iter[0] & 0x3f) << 12;
@@ -306,6 +328,7 @@ unicode_readutf8_n:([nonnull] /*utf-8*/char const **__restrict ptext, [nonnull] 
 			result |= (iter[2] & 0x3f);
 			iter += 3;
 			break;
+
 		case 5:
 			result  = (result & 0x03) << 24;
 			result |= (iter[0] & 0x3f) << 18;
@@ -314,6 +337,7 @@ unicode_readutf8_n:([nonnull] /*utf-8*/char const **__restrict ptext, [nonnull] 
 			result |= (iter[3] & 0x3f);
 			iter += 4;
 			break;
+
 		case 6:
 			result  = (result & 0x01) << 30;
 			result |= (iter[0] & 0x3f) << 24;
@@ -323,6 +347,7 @@ unicode_readutf8_n:([nonnull] /*utf-8*/char const **__restrict ptext, [nonnull] 
 			result |= (iter[4] & 0x3f);
 			iter += 5;
 			break;
+
 		case 7:
 			result  = (iter[0] & 0x03/*0x3f*/) << 30;
 			result |= (iter[1] & 0x3f) << 24;
@@ -332,6 +357,7 @@ unicode_readutf8_n:([nonnull] /*utf-8*/char const **__restrict ptext, [nonnull] 
 			result |= (iter[5] & 0x3f);
 			iter += 6;
 			break;
+
 		case 8:
 			/*result = (iter[0] & 0x3f) << 36;*/
 			result  = (iter[1] & 0x03/*0x3f*/) << 30;
@@ -342,6 +368,7 @@ unicode_readutf8_n:([nonnull] /*utf-8*/char const **__restrict ptext, [nonnull] 
 			result |= (iter[6] & 0x3f);
 			iter += 7;
 			break;
+
 		default:
 			__builtin_unreachable();
 		}
@@ -374,20 +401,24 @@ unicode_readutf8_rev_n:([nonnull] /*utf-8*/char const **__restrict ptext, [nonnu
 	}
 	if (result >= 0xc0) {
 		switch (seqlen) {
+
 		case 0:
 		case 1:
 			break;
+
 		case 2:
 			result  = (result & 0x1f) << 6;
 			result |= (iter[0] & 0x3f);
 			iter += 1;
 			break;
+
 		case 3:
 			result  = (result & 0x0f) << 12;
 			result |= (iter[0] & 0x3f) << 6;
 			result |= (iter[1] & 0x3f);
 			iter += 2;
 			break;
+
 		case 4:
 			result  = (result & 0x07) << 18;
 			result |= (iter[0] & 0x3f) << 12;
@@ -395,6 +426,7 @@ unicode_readutf8_rev_n:([nonnull] /*utf-8*/char const **__restrict ptext, [nonnu
 			result |= (iter[2] & 0x3f);
 			iter += 3;
 			break;
+
 		case 5:
 			result  = (result & 0x03) << 24;
 			result |= (iter[0] & 0x3f) << 18;
@@ -403,6 +435,7 @@ unicode_readutf8_rev_n:([nonnull] /*utf-8*/char const **__restrict ptext, [nonnu
 			result |= (iter[3] & 0x3f);
 			iter += 4;
 			break;
+
 		case 6:
 			result  = (result & 0x01) << 30;
 			result |= (iter[0] & 0x3f) << 24;
@@ -412,6 +445,7 @@ unicode_readutf8_rev_n:([nonnull] /*utf-8*/char const **__restrict ptext, [nonnu
 			result |= (iter[4] & 0x3f);
 			iter += 5;
 			break;
+
 		case 7:
 			result  = (iter[0] & 0x03/*0x3f*/) << 30;
 			result |= (iter[1] & 0x3f) << 24;
@@ -421,6 +455,7 @@ unicode_readutf8_rev_n:([nonnull] /*utf-8*/char const **__restrict ptext, [nonnu
 			result |= (iter[5] & 0x3f);
 			iter += 6;
 			break;
+
 		case 8:
 			/*result = (iter[0] & 0x3f) << 36;*/
 			result  = (iter[1] & 0x03/*0x3f*/) << 30;
@@ -431,6 +466,7 @@ unicode_readutf8_rev_n:([nonnull] /*utf-8*/char const **__restrict ptext, [nonnu
 			result |= (iter[6] & 0x3f);
 			iter += 7;
 			break;
+
 		default:
 			__builtin_unreachable();
 		}
@@ -1066,7 +1102,7 @@ unicode_32to16:([nonnull] /*utf-16*/$char16_t *__restrict utf16_dst,
 @@@return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
 @@@return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated)
 [dependency_include(<bits/mbstate.h>)]
-unicode_c8toc16:([nonnull] char16_t *__restrict pc16,
+unicode_c8toc16:([nonnull] $char16_t *__restrict pc16,
                  [nonnull] /*utf-8*/ char const *__restrict s, $size_t n,
                  [nonnull] __mbstate_t *__restrict mbs) -> $size_t {
 	char32_t resch;
@@ -1110,51 +1146,67 @@ unicode_c8toc16:([nonnull] char16_t *__restrict pc16,
 			goto error_ilseq; /* Must be a follow-up byte */
 		ch &= 0x3f;
 		switch (mbs->__word & __MBSTATE_TYPE_MASK) {
+
 		case __MBSTATE_TYPE_UTF8_2_2: /* expect 2nd character of a 2-byte utf-8 sequence. { WORD & 0x0000001f } */
 			*pc16 = ((mbs->__word & 0x1f) << __MBSTATE_TYPE_UTF8_SHIFT) | ch;
 			goto done_empty;
+
 		case __MBSTATE_TYPE_UTF8_3_2: /* expect 2nd character of a 3-byte utf-8 sequence. { WORD & 0x000003c0 } */
 			mbs->__word = __MBSTATE_TYPE_UTF8_3_3 | (mbs->__word & 0x3c0) | ch;
 			break;
+
 		case __MBSTATE_TYPE_UTF8_3_3: /* expect 3rd character of a 3-byte utf-8 sequence. { WORD & 0x000003c0, WORD & 0x0000003f } */
 			resch = ((mbs->__word & 0x3ff) << __MBSTATE_TYPE_UTF8_SHIFT) | ch;
 			goto done_empty_chk_surrogate;
+
 		case __MBSTATE_TYPE_UTF8_4_2: /* expect 2nd character of a 4-byte utf-8 sequence. { WORD & 0x00007000 } */
 			mbs->__word = __MBSTATE_TYPE_UTF8_4_3 | (mbs->__word & 0x7000) | ((uint32_t)ch << __MBSTATE_TYPE_UTF8_SHIFT);
 			break;
+
 		case __MBSTATE_TYPE_UTF8_4_3: /* expect 3rd character of a 4-byte utf-8 sequence. { WORD & 0x00007000, WORD & 0x00000fc0 } */
 			mbs->__word = __MBSTATE_TYPE_UTF8_4_4 | (mbs->__word & 0x7fc0) | ch;
 			break;
+
 		case __MBSTATE_TYPE_UTF8_4_4: /* expect 4th character of a 4-byte utf-8 sequence. { WORD & 0x00007000, WORD & 0x00000fc0, WORD & 0x0000003f } */
 			resch = ((mbs->__word & 0x7fff) << __MBSTATE_TYPE_UTF8_SHIFT) | ch;
 			goto done_empty_chk_surrogate;
+
 		case __MBSTATE_TYPE_UTF8_5_2: /* expect 2nd character of a 5-byte utf-8 sequence. { WORD & 0x000c0000 } */
 			mbs->__word = __MBSTATE_TYPE_UTF8_5_3 | (mbs->__word & 0xc0000) | ((uint32_t)ch << (2 * __MBSTATE_TYPE_UTF8_SHIFT));
 			break;
+
 		case __MBSTATE_TYPE_UTF8_5_3: /* expect 3rd character of a 5-byte utf-8 sequence. { WORD & 0x000c0000, WORD & 0x0003f000 } */
 			mbs->__word = __MBSTATE_TYPE_UTF8_5_4 | (mbs->__word & 0xff000) | ((uint32_t)ch << __MBSTATE_TYPE_UTF8_SHIFT);
 			break;
+
 		case __MBSTATE_TYPE_UTF8_5_4: /* expect 4th character of a 5-byte utf-8 sequence. { WORD & 0x000c0000, WORD & 0x0003f000, WORD & 0x00000fc0 } */
 			mbs->__word = __MBSTATE_TYPE_UTF8_5_5 | (mbs->__word & 0xfffc0) | ch;
 			break;
+
 		case __MBSTATE_TYPE_UTF8_5_5: /* expect 5th character of a 5-byte utf-8 sequence. { WORD & 0x000c0000, WORD & 0x0003f000, WORD & 0x00000fc0, WORD & 0x0000003f } */
 			resch = ((mbs->__word & 0x000cffff) << __MBSTATE_TYPE_UTF8_SHIFT) | ch;
 			goto done_empty_chk_surrogate;
+
 		case __MBSTATE_TYPE_UTF8_6_2: /* expect 2nd character of a 6-byte utf-8 sequence. { WORD & 0x01000000 } */
 			mbs->__word = __MBSTATE_TYPE_UTF8_6_3 | (mbs->__word & 0x1000000) | ((uint32_t)ch << (3 * __MBSTATE_TYPE_UTF8_SHIFT));
 			break;
+
 		case __MBSTATE_TYPE_UTF8_6_3: /* expect 3rd character of a 6-byte utf-8 sequence. { WORD & 0x01000000, WORD & 0x00fc0000 } */
 			mbs->__word = __MBSTATE_TYPE_UTF8_6_4 | (mbs->__word & 0x1fc0000) | ((uint32_t)ch << (2 * __MBSTATE_TYPE_UTF8_SHIFT));
 			break;
+
 		case __MBSTATE_TYPE_UTF8_6_4: /* expect 4th character of a 6-byte utf-8 sequence. { WORD & 0x01000000, WORD & 0x00fc0000, WORD & 0x0003f000 } */
 			mbs->__word = __MBSTATE_TYPE_UTF8_6_5 | (mbs->__word & 0x1fff000) | ((uint32_t)ch << __MBSTATE_TYPE_UTF8_SHIFT);
 			break;
+
 		case __MBSTATE_TYPE_UTF8_6_5: /* expect 5th character of a 6-byte utf-8 sequence. { WORD & 0x01000000, WORD & 0x00fc0000, WORD & 0x0003f000, WORD & 0x00000fc0 } */
 			mbs->__word = __MBSTATE_TYPE_UTF8_6_6 | (mbs->__word & 0x1ffffc0) | ch;
 			break;
+
 		case __MBSTATE_TYPE_UTF8_6_6: /* expect 6th character of a 6-byte utf-8 sequence. { WORD & 0x01000000, WORD & 0x00fc0000, WORD & 0x0003f000, WORD & 0x00000fc0, WORD & 0x0000003f } */
 			resch = ((mbs->__word & 0x1ffffff) << __MBSTATE_TYPE_UTF8_SHIFT) | ch;
 			goto done_empty_chk_surrogate;
+
 		default:
 error_ilseq:
 			return (size_t)-1;
@@ -1184,7 +1236,7 @@ done:
 @@@return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
 @@@return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated)
 [dependency_include(<bits/mbstate.h>)]
-unicode_c8toc32:([nonnull] char32_t *__restrict pc32,
+unicode_c8toc32:([nonnull] $char32_t *__restrict pc32,
                  [nonnull] /*utf-8*/ char const *__restrict s, $size_t n,
                  [nonnull] __mbstate_t *__restrict mbs) -> $size_t {
 	size_t i;
@@ -1222,51 +1274,67 @@ unicode_c8toc32:([nonnull] char32_t *__restrict pc32,
 			goto error_ilseq; /* Must be a follow-up byte */
 		ch &= 0x3f;
 		switch (mbs->__word & __MBSTATE_TYPE_MASK) {
+
 		case __MBSTATE_TYPE_UTF8_2_2: /* expect 2nd character of a 2-byte utf-8 sequence. { WORD & 0x0000001f } */
 			*pc32 = ((mbs->__word & 0x1f) << __MBSTATE_TYPE_UTF8_SHIFT) | ch;
 			goto done_empty;
+
 		case __MBSTATE_TYPE_UTF8_3_2: /* expect 2nd character of a 3-byte utf-8 sequence. { WORD & 0x000003c0 } */
 			mbs->__word = __MBSTATE_TYPE_UTF8_3_3 | (mbs->__word & 0x3c0) | ch;
 			break;
+
 		case __MBSTATE_TYPE_UTF8_3_3: /* expect 3rd character of a 3-byte utf-8 sequence. { WORD & 0x000003c0, WORD & 0x0000003f } */
 			*pc32 = ((mbs->__word & 0x3ff) << __MBSTATE_TYPE_UTF8_SHIFT) | ch;
 			goto done_empty;
+
 		case __MBSTATE_TYPE_UTF8_4_2: /* expect 2nd character of a 4-byte utf-8 sequence. { WORD & 0x00007000 } */
 			mbs->__word = __MBSTATE_TYPE_UTF8_4_3 | (mbs->__word & 0x7000) | ((uint32_t)ch << __MBSTATE_TYPE_UTF8_SHIFT);
 			break;
+
 		case __MBSTATE_TYPE_UTF8_4_3: /* expect 3rd character of a 4-byte utf-8 sequence. { WORD & 0x00007000, WORD & 0x00000fc0 } */
 			mbs->__word = __MBSTATE_TYPE_UTF8_4_4 | (mbs->__word & 0x7fc0) | ch;
 			break;
+
 		case __MBSTATE_TYPE_UTF8_4_4: /* expect 4th character of a 4-byte utf-8 sequence. { WORD & 0x00007000, WORD & 0x00000fc0, WORD & 0x0000003f } */
 			*pc32 = ((mbs->__word & 0x7fff) << __MBSTATE_TYPE_UTF8_SHIFT) | ch;
 			goto done_empty;
+
 		case __MBSTATE_TYPE_UTF8_5_2: /* expect 2nd character of a 5-byte utf-8 sequence. { WORD & 0x000c0000 } */
 			mbs->__word = __MBSTATE_TYPE_UTF8_5_3 | (mbs->__word & 0xc0000) | ((uint32_t)ch << (2 * __MBSTATE_TYPE_UTF8_SHIFT));
 			break;
+
 		case __MBSTATE_TYPE_UTF8_5_3: /* expect 3rd character of a 5-byte utf-8 sequence. { WORD & 0x000c0000, WORD & 0x0003f000 } */
 			mbs->__word = __MBSTATE_TYPE_UTF8_5_4 | (mbs->__word & 0xff000) | ((uint32_t)ch << __MBSTATE_TYPE_UTF8_SHIFT);
 			break;
+
 		case __MBSTATE_TYPE_UTF8_5_4: /* expect 4th character of a 5-byte utf-8 sequence. { WORD & 0x000c0000, WORD & 0x0003f000, WORD & 0x00000fc0 } */
 			mbs->__word = __MBSTATE_TYPE_UTF8_5_5 | (mbs->__word & 0xfffc0) | ch;
 			break;
+
 		case __MBSTATE_TYPE_UTF8_5_5: /* expect 5th character of a 5-byte utf-8 sequence. { WORD & 0x000c0000, WORD & 0x0003f000, WORD & 0x00000fc0, WORD & 0x0000003f } */
 			*pc32 = ((mbs->__word & 0x000cffff) << __MBSTATE_TYPE_UTF8_SHIFT) | ch;
 			goto done_empty;
+
 		case __MBSTATE_TYPE_UTF8_6_2: /* expect 2nd character of a 6-byte utf-8 sequence. { WORD & 0x01000000 } */
 			mbs->__word = __MBSTATE_TYPE_UTF8_6_3 | (mbs->__word & 0x1000000) | ((uint32_t)ch << (3 * __MBSTATE_TYPE_UTF8_SHIFT));
 			break;
+
 		case __MBSTATE_TYPE_UTF8_6_3: /* expect 3rd character of a 6-byte utf-8 sequence. { WORD & 0x01000000, WORD & 0x00fc0000 } */
 			mbs->__word = __MBSTATE_TYPE_UTF8_6_4 | (mbs->__word & 0x1fc0000) | ((uint32_t)ch << (2 * __MBSTATE_TYPE_UTF8_SHIFT));
 			break;
+
 		case __MBSTATE_TYPE_UTF8_6_4: /* expect 4th character of a 6-byte utf-8 sequence. { WORD & 0x01000000, WORD & 0x00fc0000, WORD & 0x0003f000 } */
 			mbs->__word = __MBSTATE_TYPE_UTF8_6_5 | (mbs->__word & 0x1fff000) | ((uint32_t)ch << __MBSTATE_TYPE_UTF8_SHIFT);
 			break;
+
 		case __MBSTATE_TYPE_UTF8_6_5: /* expect 5th character of a 6-byte utf-8 sequence. { WORD & 0x01000000, WORD & 0x00fc0000, WORD & 0x0003f000, WORD & 0x00000fc0 } */
 			mbs->__word = __MBSTATE_TYPE_UTF8_6_6 | (mbs->__word & 0x1ffffc0) | ch;
 			break;
+
 		case __MBSTATE_TYPE_UTF8_6_6: /* expect 6th character of a 6-byte utf-8 sequence. { WORD & 0x01000000, WORD & 0x00fc0000, WORD & 0x0003f000, WORD & 0x00000fc0, WORD & 0x0000003f } */
 			*pc32 = ((mbs->__word & 0x1ffffff) << __MBSTATE_TYPE_UTF8_SHIFT) | ch;
 			goto done_empty;
+
 		default:
 error_ilseq:
 			return (size_t)-1;
@@ -1299,7 +1367,7 @@ struct format_8to16_data {
 [dependency_include(<bits/mbstate.h>)]
 [dependency_include(<bits/format-printer.h>)]
 [dependency_include(<bits/uformat-printer.h>)]
-format_8to16:(/*struct format_8to16_data **/void *arg,
+format_8to16:(/*struct format_8to16_data **/ void *arg,
               /*utf-8*/char const *data, $size_t datalen) -> $ssize_t {
 	struct __local_format_8to16_data {
 		__pc16formatprinter fd_printer;    /* [1..1] Inner printer */
@@ -1350,7 +1418,7 @@ struct format_8to32_data {
 @@converting UTF-8 unicode input data into a UTF-32 output
 [dependency_include(<bits/format-printer.h>)]
 [dependency_include(<bits/uformat-printer.h>)]
-format_8to32:(/*struct format_8to32_data **/void *arg,
+format_8to32:(/*struct format_8to32_data **/ void *arg,
               /*utf-8*/char const *data, $size_t datalen) -> $ssize_t {
 	struct __local_format_8to32_data {
 		__pc32formatprinter fd_printer;    /* [1..1] Inner printer */
@@ -1400,7 +1468,7 @@ struct format_16to8_data {
 @@Format printer (compatible with `__pc16formatprinter') for
 @@converting UTF-16 unicode input data into a UTF-8 output
 [dependency_include(<bits/format-printer.h>)]
-format_16to8:(/*struct format_16to8_data **/void *arg,
+format_16to8:(/*struct format_16to8_data **/ void *arg,
               $char16_t const *data, $size_t datalen) -> $ssize_t {
 	struct __local_format_16to8_data {
 		__pformatprinter fd_printer;   /* [1..1] Inner printer */
@@ -1466,7 +1534,7 @@ struct format_16to32_data {
 @@Format printer (compatible with `__pc16formatprinter') for
 @@converting UTF-16 unicode input data into a UTF-32 output
 [dependency_include(<bits/uformat-printer.h>)]
-format_16to32:(/*struct format_16to32_data **/void *arg,
+format_16to32:(/*struct format_16to32_data **/ void *arg,
                $char16_t const *data, $size_t datalen) -> $ssize_t {
 	struct __local_format_16to32_data {
 		__pc32formatprinter fd_printer;   /* [1..1] Inner printer */
@@ -1531,7 +1599,7 @@ struct format_32to8_data {
 @@Format printer (compatible with `__pc32formatprinter') for
 @@converting UTF-32 unicode input data into a UTF-8 output
 [dependency_include(<bits/format-printer.h>)]
-format_32to8:(/*struct format_32to8_data **/void *arg,
+format_32to8:(/*struct format_32to8_data **/ void *arg,
               $char32_t const *data, $size_t datalen) -> $ssize_t {
 	struct __local_format_32to8_data {
 		__pformatprinter fd_printer; /* [1..1] Inner printer */
@@ -1571,7 +1639,7 @@ struct format_32to16_data {
 @@converting UTF-32 unicode input data into a UTF-16 output
 [dependency_include(<bits/format-printer.h>)]
 [dependency_include(<bits/uformat-printer.h>)]
-format_32to16:(/*struct format_32to16_data **/void *arg,
+format_32to16:(/*struct format_32to16_data **/ void *arg,
                $char32_t const *data, $size_t datalen) -> $ssize_t {
 	struct __local_format_32to16_data {
 		__pc16formatprinter fd_printer; /* [1..1] Inner printer */
@@ -1730,18 +1798,18 @@ __SYSDECL_END
 
 
 %(libc_fast){
-#define __LIBC_UNICODE_UTF8_MAXLEN       8
-#define __LIBC_UNICODE_UTF8_CURLEN       7
-#define __LIBC_UNICODE_UTF16_MAXLEN      2
-#define __LIBC_UNICODE_UTF16_CURLEN      2
-#define __LIBC_UNICODE_UTF32_MAXLEN      1
-#define __LIBC_UNICODE_UTF32_CURLEN      1
-#define __LIBC_UNICODE_ISVALIDUTF16(ch) (sizeof(ch) == 1 ? 1 : ((sizeof(ch) == 2 || (ch) <= 0x10ffff)) && ((ch) < 0xd800 || (ch) > 0xdfff))
-#define __LIBC_UNICODE_MAXCHAR           0x10ffff
-#define __LIBC_UNICODE_8TO16_MAXBUF(num_chars)   (num_chars)
-#define __LIBC_UNICODE_8TO32_MAXBUF(num_chars)   (num_chars)
+#define __LIBC_UNICODE_UTF8_MAXLEN              8
+#define __LIBC_UNICODE_UTF8_CURLEN              7
+#define __LIBC_UNICODE_UTF16_MAXLEN             2
+#define __LIBC_UNICODE_UTF16_CURLEN             2
+#define __LIBC_UNICODE_UTF32_MAXLEN             1
+#define __LIBC_UNICODE_UTF32_CURLEN             1
+#define __LIBC_UNICODE_ISVALIDUTF16(ch)         (sizeof(ch) == 1 ? 1 : ((sizeof(ch) == 2 || (ch) <= 0x10ffff)) && ((ch) < 0xd800 || (ch) > 0xdfff))
+#define __LIBC_UNICODE_MAXCHAR                  0x10ffff
+#define __LIBC_UNICODE_8TO16_MAXBUF(num_chars)  (num_chars)
+#define __LIBC_UNICODE_8TO32_MAXBUF(num_chars)  (num_chars)
 #define __LIBC_UNICODE_16TO8_MAXBUF(num_chars)  ((num_chars) * 3)
-#define __LIBC_UNICODE_16TO32_MAXBUF(num_chars)  (num_chars)
+#define __LIBC_UNICODE_16TO32_MAXBUF(num_chars) (num_chars)
 #define __LIBC_UNICODE_32TO8_MAXBUF(num_chars)  ((num_chars) * 7)
 #define __LIBC_UNICODE_32TO16_MAXBUF(num_chars) ((num_chars) * 2)
 }
@@ -1838,10 +1906,10 @@ __NOTHROW_NCX(__LIBCCALL __libc_unicode_fold)(__CHAR32_TYPE__ __ch, __CHAR32_TYP
 	return __buf + 1;
 }
 
-#define __libc_unicode_tolower(ch)  (__libc_unicode_isupper(ch) ? (__CHAR32_TYPE__)(ch) + 0x20 : (__CHAR32_TYPE__)(ch))
-#define __libc_unicode_toupper(ch)  (__libc_unicode_islower(ch) ? (__CHAR32_TYPE__)(ch) - 0x20 : (__CHAR32_TYPE__)(ch))
-#define __libc_unicode_totitle(ch)  (__libc_unicode_islower(ch) ? (__CHAR32_TYPE__)(ch) - 0x20 : (__CHAR32_TYPE__)(ch))
-#define __libc_unicode_asdigit(ch) ((__UINT8_TYPE__)(ch) - 0x30)
+#define __libc_unicode_tolower(ch)   (__libc_unicode_isupper(ch) ? (__CHAR32_TYPE__)(ch) + 0x20 : (__CHAR32_TYPE__)(ch))
+#define __libc_unicode_toupper(ch)   (__libc_unicode_islower(ch) ? (__CHAR32_TYPE__)(ch) - 0x20 : (__CHAR32_TYPE__)(ch))
+#define __libc_unicode_totitle(ch)   (__libc_unicode_islower(ch) ? (__CHAR32_TYPE__)(ch) - 0x20 : (__CHAR32_TYPE__)(ch))
+#define __libc_unicode_asdigit(ch)   ((__UINT8_TYPE__)(ch) - 0x30)
 #define __libc_unicode_isalpha(ch)   __libc_isalpha(ch)
 #define __libc_unicode_islower(ch)   __libc_islower(ch)
 #define __libc_unicode_isupper(ch)   __libc_isupper(ch)

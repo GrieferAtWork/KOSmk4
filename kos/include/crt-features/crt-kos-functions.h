@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x23403c21 */
+/* HASH CRC-32:0xa6d08559 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -654,12 +654,12 @@ __CRT_FUNCTION(fopencookie,0,(),3,(void *__restrict,magic_cookie,char const *__r
 __CRT_FUNCTION(fopendirat,0,(),3,(fd_t,dirfd,char const *,name,oflag_t,oflags),DIR *)
 __CRT_FUNCTION(fork,0,(),0,(),pid_t)
 __CRT_FUNCTION(forkpty,0,(),4,(fd_t *,amaster,char *,name,struct termios const *,termp,struct winsize const *,winp),pid_t)
-__CRT_FUNCTION(format_16to32,0,(),3,(/*struct format_16to32_data **/void *,arg,char16_t const *,data,size_t,datalen),ssize_t)
-__CRT_FUNCTION(format_16to8,0,(),3,(/*struct format_16to8_data **/void *,arg,char16_t const *,data,size_t,datalen),ssize_t)
-__CRT_FUNCTION(format_32to16,0,(),3,(/*struct format_32to16_data **/void *,arg,char32_t const *,data,size_t,datalen),ssize_t)
-__CRT_FUNCTION(format_32to8,0,(),3,(/*struct format_32to8_data **/void *,arg,char32_t const *,data,size_t,datalen),ssize_t)
-__CRT_FUNCTION(format_8to16,0,(),3,(/*struct format_8to16_data **/void *,arg,/*utf-8*/char const *,data,size_t,datalen),ssize_t)
-__CRT_FUNCTION(format_8to32,0,(),3,(/*struct format_8to32_data **/void *,arg,/*utf-8*/char const *,data,size_t,datalen),ssize_t)
+__CRT_FUNCTION(format_16to32,0,(),3,(/*struct format_16to32_data **/ void *,arg,char16_t const *,data,size_t,datalen),ssize_t)
+__CRT_FUNCTION(format_16to8,0,(),3,(/*struct format_16to8_data **/ void *,arg,char16_t const *,data,size_t,datalen),ssize_t)
+__CRT_FUNCTION(format_32to16,0,(),3,(/*struct format_32to16_data **/ void *,arg,char32_t const *,data,size_t,datalen),ssize_t)
+__CRT_FUNCTION(format_32to8,0,(),3,(/*struct format_32to8_data **/ void *,arg,char32_t const *,data,size_t,datalen),ssize_t)
+__CRT_FUNCTION(format_8to16,0,(),3,(/*struct format_8to16_data **/ void *,arg,/*utf-8*/char const *,data,size_t,datalen),ssize_t)
+__CRT_FUNCTION(format_8to32,0,(),3,(/*struct format_8to32_data **/ void *,arg,/*utf-8*/char const *,data,size_t,datalen),ssize_t)
 __CRT_FUNCTION(format_aprintf_pack,0,(),2,(struct format_aprintf_data *__restrict,self,size_t *,pstrlen),char *)
 __CRT_FUNCTION(format_aprintf_printer,0,(),3,(/*struct format_aprintf_data **/void *,arg,/*utf-8*/char const *__restrict,data,size_t,datalen),ssize_t)
 __CRT_FUNCTION(format_escape,0,(),5,(pformatprinter,printer,void *,arg,/*utf-8*/char const *__restrict,text,size_t,textlen,unsigned int,flags),ssize_t)

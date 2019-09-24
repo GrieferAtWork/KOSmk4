@@ -969,7 +969,7 @@ fcvt_r:(double val, int ndigit, int *__restrict decptr, int *__restrict sign, ch
 #endif
 }
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[requires_include(<hybrid/floatcore.h>)]
+[impl_include(<hybrid/floatcore.h>)]
 [ATTR_NONNULL((3))]
 [if(__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__), alias(_gcvt)]
 qgcvt:(long double val, int ndigit, char *buf) -> char * {

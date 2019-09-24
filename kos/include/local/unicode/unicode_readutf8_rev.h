@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb1d6669f */
+/* HASH CRC-32:0xc43c0410 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
  * being updated to point to the start of the character that was read */
 __LOCAL_LIBC(unicode_readutf8_rev) __ATTR_NONNULL((1)) __CHAR32_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_readutf8_rev))(/*utf-8*/char const **__restrict __ptext) {
-#line 191 "kos/src/libc/magic/unicode.c"
+#line 200 "kos/src/libc/magic/unicode.c"
 	__CHAR32_TYPE__ __result;
 	char const *__iter = *__ptext;
 	__UINT8_TYPE__ __seqlen = 1;
@@ -39,20 +39,24 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_readutf8_rev))(/*utf-8*/char 
 	}
 	if (__result >= 0xc0) {
 		switch (__seqlen) {
+
 		case 0:
 		case 1:
 			break;
+
 		case 2:
 			__result  = (__result & 0x1f) << 6;
 			__result |= (__iter[0] & 0x3f);
 			__iter += 1;
 			break;
+
 		case 3:
 			__result  = (__result & 0x0f) << 12;
 			__result |= (__iter[0] & 0x3f) << 6;
 			__result |= (__iter[1] & 0x3f);
 			__iter += 2;
 			break;
+
 		case 4:
 			__result  = (__result & 0x07) << 18;
 			__result |= (__iter[0] & 0x3f) << 12;
@@ -60,6 +64,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_readutf8_rev))(/*utf-8*/char 
 			__result |= (__iter[2] & 0x3f);
 			__iter += 3;
 			break;
+
 		case 5:
 			__result  = (__result & 0x03) << 24;
 			__result |= (__iter[0] & 0x3f) << 18;
@@ -68,6 +73,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_readutf8_rev))(/*utf-8*/char 
 			__result |= (__iter[3] & 0x3f);
 			__iter += 4;
 			break;
+
 		case 6:
 			__result  = (__result & 0x01) << 30;
 			__result |= (__iter[0] & 0x3f) << 24;
@@ -77,6 +83,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_readutf8_rev))(/*utf-8*/char 
 			__result |= (__iter[4] & 0x3f);
 			__iter += 5;
 			break;
+
 		case 7:
 			__result  = (__iter[0] & 0x03/*0x3f*/) << 30;
 			__result |= (__iter[1] & 0x3f) << 24;
@@ -86,6 +93,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_readutf8_rev))(/*utf-8*/char 
 			__result |= (__iter[5] & 0x3f);
 			__iter += 6;
 			break;
+
 		case 8:
 			/*result = (iter[0] & 0x3f) << 36;*/
 			__result  = (__iter[1] & 0x03/*0x3f*/) << 30;
@@ -96,6 +104,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_readutf8_rev))(/*utf-8*/char 
 			__result |= (__iter[6] & 0x3f);
 			__iter += 7;
 			break;
+
 		default:
 			__builtin_unreachable();
 		}

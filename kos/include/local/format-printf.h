@@ -18,40 +18,40 @@
  */
 #ifndef __CHAR_TYPE
 #define __CHAR_TYPE      char
-#endif
+#endif /* !__CHAR_TYPE */
 #ifndef __CHAR_SIZE
 #define __CHAR_SIZE      __SIZEOF_CHAR__
-#endif
+#endif /* !__CHAR_SIZE */
 #ifndef __FORMAT_VPRINTF
 #define __FORMAT_VPRINTF format_vprintf
-#endif
+#endif /* !__FORMAT_VPRINTF */
 #ifndef __FORMAT_ESCAPE
 #define __FORMAT_ESCAPE  format_escape
-#endif
+#endif /* !__FORMAT_ESCAPE */
 #ifndef __FORMAT_REPEAT
 #define __FORMAT_REPEAT  format_repeat
-#endif
+#endif /* !__FORMAT_REPEAT */
 #ifndef __FORMAT_HEXDUMP
 #define __FORMAT_HEXDUMP format_hexdump
-#endif
+#endif /* !__FORMAT_HEXDUMP */
 #ifndef __FORMAT_UNICODE_WRITEUTF8
 #define __FORMAT_UNICODE_WRITEUTF8 unicode_writeutf8
-#endif
+#endif /* !__FORMAT_UNICODE_WRITEUTF8 */
 #ifndef __FORMAT_WIDTH
 #define __FORMAT_WIDTH format_width
-#endif
+#endif /* !__FORMAT_WIDTH */
 #ifndef __FORMAT_FORMAT
 #define __FORMAT_FORMAT  format
-#endif
+#endif /* !__FORMAT_FORMAT */
 #ifndef __FORMAT_PRINTER
 #define __FORMAT_PRINTER printer
-#endif
+#endif /* !__FORMAT_PRINTER */
 #ifndef __FORMAT_ARG
 #define __FORMAT_ARG     arg
-#endif
+#endif /* !__FORMAT_ARG */
 #ifndef __FORMAT_ARGS
 #define __FORMAT_ARGS    args
-#endif
+#endif /* !__FORMAT_ARGS */
 
 #include <hybrid/typecore.h>
 
@@ -64,7 +64,7 @@
 #else
 #define __VA_SIZE  __SIZEOF_INT__
 #endif
-#endif
+#endif /* !__VA_SIZE */
 #if __VA_SIZE >= 8
 #   define __PRINTF_LENGTH_R64  0
 #   define __PRINTF_LENGTH_R32  0
@@ -95,9 +95,9 @@
 
 #if __SIZEOF_WCHAR_T__ == 2
 #define __PRINTF_LENGTH_L    (0x210|__PRINTF_LENGTH_R16)
-#else
+#else /* __SIZEOF_WCHAR_T__ == 2 */
 #define __PRINTF_LENGTH_L    (0x220|__PRINTF_LENGTH_R32)
-#endif
+#endif /* __SIZEOF_WCHAR_T__ != 2 */
 #if __SIZEOF_SIZE_T__ == 4
 #define __PRINTF_LENGTH_Z    (0x320|__PRINTF_LENGTH_R32)
 #elif __SIZEOF_SIZE_T__ == 8
@@ -123,9 +123,9 @@
 #define __PRINTF_LENGTH_l    __PP_CAT2(__PRINTF_LENGTH_I, __PP_MUL8(__SIZEOF_LONG__))
 #ifdef __SIZEOF_LONG_LONG__
 #define __PRINTF_LENGTH_LL   __PP_CAT2(__PRINTF_LENGTH_I, __PP_MUL8(__SIZEOF_LONG_LONG__))
-#else
+#else /* __SIZEOF_LONG_LONG__ */
 #define __PRINTF_LENGTH_LL   __PRINTF_LENGTH_I64
-#endif
+#endif /* !__SIZEOF_LONG_LONG__ */
 
 #define __PRINTF_F_NONE     0x0000
 #define __PRINTF_F_PREFIX   0x0001 /* `%#'. */
@@ -148,7 +148,7 @@
 #define __FORMAT_ESCAPE_FNOCTRL   0x0008 /* Disable special encoding strings such as `"\r"', `"\n"' or `"\e"' */
 #define __FORMAT_ESCAPE_FNOASCII  0x0010 /* Disable regular ascii-characters and print everything using special encodings. */
 #define __FORMAT_ESCAPE_FUPPERHEX 0x0020 /* Use uppercase characters for hex (e.g.: `"\xAB"'). */
-#endif
+#endif /* !__FORMAT_ESCAPE_FNORMAL */
 
 
 {
@@ -159,7 +159,7 @@
 		{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' },
 		{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' },
 	};
-#endif
+#endif /* !__DECIMALS_SELECTOR */
 	__SSIZE_TYPE__ __temp, __result = 0;
 	__SIZE_TYPE__ __width, __precision;
 	__CHAR_TYPE const *__flush_start;
@@ -216,7 +216,7 @@ __nextfmt:
 #if __SIZEOF_POINTER__ > __VA_SIZE
 		__width = __builtin_va_arg(__FORMAT_ARGS, __SIZE_TYPE__);
 		goto __nextfmt;
-#endif
+#endif /* __SIZEOF_POINTER__ > __VA_SIZE */
 	case '*':
 		__width = (__SIZE_TYPE__)__builtin_va_arg(__FORMAT_ARGS, unsigned int);
 		goto __nextfmt;
@@ -230,9 +230,9 @@ __nextfmt:
 		if (__ch == '*') {
 			__precision = (__SIZE_TYPE__)__builtin_va_arg(__FORMAT_ARGS, unsigned int);
 		} else if (__ch == '?')
-#else
+#else /* __SIZEOF_POINTER__ > __VA_SIZE */
 		if (__ch == '*' || __ch == '?')
-#endif
+#endif /* __SIZEOF_POINTER__ <= __VA_SIZE */
 		{
 			__IF0 {
 	case '$':
@@ -347,15 +347,15 @@ __nextfmt:
 #if __SIZEOF_POINTER__ < 8
 				if ((__length & 0xf0) == 0x30)
 					__precision = 16;
-#endif
+#endif /* __SIZEOF_POINTER__ < 8 */
 #if __SIZEOF_POINTER__ < 4
 				if ((__length & 0xf0) == 0x20)
 					__precision = 8;
-#endif
+#endif /* __SIZEOF_POINTER__ < 4 */
 #if __SIZEOF_POINTER__ < 2
 				if ((__length & 0xf0) == 0x10)
 					__precision = 4;
-#endif
+#endif /* __SIZEOF_POINTER__ < 2 */
 				__flags |= __PRINTF_F_HASPREC;
 			}
 			__ATTR_FALLTHROUGH
@@ -374,21 +374,21 @@ __nextfmt:
 			if (__flags & __PRINTF_F_SIGNED)
 				__data.__i = (__INT64_TYPE__)(__INT8_TYPE__)(__UINT8_TYPE__)__data.__u;
 		} else
-#endif
+#endif /* __VA_SIZE < 2 */
 #if __VA_SIZE < 4
 		if __likely((__length & 0xf) == __PRINTF_LENGTH_R16) {
 			__data.__u = (__UINT64_TYPE__)__builtin_va_arg(__FORMAT_ARGS, __UINT16_TYPE__);
 			if (__flags & __PRINTF_F_SIGNED)
 				__data.__i = (__INT64_TYPE__)(__INT16_TYPE__)(__UINT16_TYPE__)__data.__u;
 		} else
-#endif
+#endif /* __VA_SIZE < 4 */
 #if __VA_SIZE < 8
 		if __likely((__length & 0xf) == __PRINTF_LENGTH_R32) {
 			__data.__u = (__UINT64_TYPE__)__builtin_va_arg(__FORMAT_ARGS, __UINT32_TYPE__);
 			if (__flags & __PRINTF_F_SIGNED)
 				__data.__i = (__INT64_TYPE__)(__INT32_TYPE__)(__UINT32_TYPE__)__data.__u;
 		} else
-#endif
+#endif /* __VA_SIZE < 8 */
 		{
 			__data.__u = __builtin_va_arg(__FORMAT_ARGS, __UINT64_TYPE__);
 		}
@@ -399,14 +399,14 @@ __nextfmt:
 			if (__flags & __PRINTF_F_SIGNED)
 				__data.__i = (__INT32_TYPE__)(__INT8_TYPE__)(__UINT8_TYPE__)__data.__u;
 		} else
-#endif
+#endif /* __VA_SIZE < 2 */
 #if __VA_SIZE < 4
 		if ((__length & 0xf) == __PRINTF_LENGTH_R16) {
 			__data.__u = (__UINT32_TYPE__)__builtin_va_arg(__FORMAT_ARGS, __UINT16_TYPE__);
 			if (__flags & __PRINTF_F_SIGNED)
 				__data.__i = (__INT32_TYPE__)(__INT16_TYPE__)(__UINT16_TYPE__)__data.__u;
 		} else
-#endif
+#endif /* __VA_SIZE < 4 */
 		{
 			__data.__u = __builtin_va_arg(__FORMAT_ARGS, __UINT32_TYPE__);
 		}
@@ -414,9 +414,9 @@ __nextfmt:
 
 #if __PRINTF_F_UPPER == 1
 		__dec = __DECIMALS_SELECTOR[__flags & __PRINTF_F_UPPER];
-#else
+#else /* __PRINTF_F_UPPER == 1 */
 		__dec = __DECIMALS_SELECTOR[!!(__flags & __PRINTF_F_UPPER)];
-#endif
+#endif /* __PRINTF_F_UPPER != 1 */
 		__is_neg = 0;
 		if ((__flags & __PRINTF_F_SIGNED) && __data.__i < 0) {
 			__is_neg = 1;
@@ -541,9 +541,9 @@ __nextfmt:
 #if __CHAR_SIZE == 4
 		__given_char[0] = __ch32;
 		__string_length = 1;
-#else
+#else /* __CHAR_SIZE == 4 */
 		__string_length = (__SIZE_TYPE__)(__FORMAT_UNICODE_WRITEUTF8(__given_char, __ch32) - __given_char);
-#endif
+#endif /* __CHAR_SIZE != 4 */
 #endif /* !__NO_PRINTF_UNICODE_CHARS */
 		goto print_string;
 #ifndef __NO_PRINTF_QUOTE
@@ -758,7 +758,7 @@ print_string:
 			if (__xformat_argsize == 1 && __xformat_arg[0] == 'c') {
 				/* Generator with closure */
 				switch (__length & 0xf0) {
-#define __DEFINE_GENERATOR_IMPLEMENTATION(__T, __va_type) \
+#define __DEFINE_GENERATOR_IMPLEMENTATION(__T, __va_type)                                                 \
 				{                                                                                         \
 					typedef __SSIZE_TYPE__(__LIBCCALL *__gen_t)(__T, __PFORMATPRINTER_TYPE, void *);      \
 					__gen_t __gen;                                                                        \
@@ -770,30 +770,30 @@ print_string:
 				break;
 #if __SIZEOF_POINTER__ < 2
 				default:
-#endif
+#endif /* __SIZEOF_POINTER__ < 2 */
 				case 0x00:
 					__DEFINE_GENERATOR_IMPLEMENTATION(__UINT8_TYPE__, unsigned int)
 #if __SIZEOF_POINTER__ >= 2 && __SIZEOF_POINTER__ < 4
 				default:
-#endif
+#endif /* __SIZEOF_POINTER__ >= 2 && __SIZEOF_POINTER__ < 4 */
 				case 0x10:
 #if __SIZEOF_INT__ > 2
 					__DEFINE_GENERATOR_IMPLEMENTATION(__UINT16_TYPE__, unsigned int)
-#else
+#else /* __SIZEOF_INT__ > 2 */
 					__DEFINE_GENERATOR_IMPLEMENTATION(__UINT16_TYPE__, __UINT16_TYPE__)
-#endif
+#endif /* __SIZEOF_INT__ <= 2 */
 #if __SIZEOF_POINTER__ >= 4 && __SIZEOF_POINTER__ < 8
 				default:
-#endif
+#endif /* __SIZEOF_POINTER__ >= 4 && __SIZEOF_POINTER__ < 8 */
 				case 0x20:
 #if __SIZEOF_INT__ > 4
 					__DEFINE_GENERATOR_IMPLEMENTATION(__UINT32_TYPE__, unsigned int)
-#else
+#else /* __SIZEOF_INT__ > 4 */
 					__DEFINE_GENERATOR_IMPLEMENTATION(__UINT32_TYPE__, __UINT32_TYPE__)
-#endif
+#endif /* __SIZEOF_INT__ <= 4 */
 #if __SIZEOF_POINTER__ >= 8
 				default:
-#endif
+#endif /* __SIZEOF_POINTER__ >= 8 */
 				case 0x30:
 #ifdef __UINT64_TYPE__
 					__DEFINE_GENERATOR_IMPLEMENTATION(__UINT64_TYPE__, __UINT64_TYPE__)
@@ -845,15 +845,15 @@ print_string:
 				if (!(__flags & __PRINTF_F_FIXBUF)) {
 #if defined(__KERNEL__) && defined(__KOS__)
 					__temp = disasm_single(__FORMAT_PRINTER, __FORMAT_ARG, __p, DISASSEMBLER_TARGET_CURRENT, DISASSEMBLER_FNORMAL);
-#else
+#else /* __KERNEL__ && __KOS__ */
 					__temp = (*__p_disasm_single)(__FORMAT_PRINTER, __FORMAT_ARG, __p, DISASSEMBLER_TARGET_CURRENT, DISASSEMBLER_FNORMAL);
-#endif
+#endif /* !__KERNEL__ || !__KOS__ */
 				} else {
 #if defined(__KERNEL__) && defined(__KOS__)
 					__temp = disasm(__FORMAT_PRINTER, __FORMAT_ARG, __p, __precision, DISASSEMBLER_TARGET_CURRENT, DISASSEMBLER_FNORMAL);
-#else
+#else /* __KERNEL__ && __KOS__ */
 					__temp = (*__p_disasm)(__FORMAT_PRINTER, __FORMAT_ARG, __p, __precision, DISASSEMBLER_TARGET_CURRENT, DISASSEMBLER_FNORMAL);
-#endif
+#endif /* !__KERNEL__ || !__KOS__ */
 				}
 #else /* __CHAR_SIZE == __SIZEOF_CHAR__ */
 				__temp = 0; /* TODO */
@@ -1060,9 +1060,9 @@ __do_vinfo_decimal:
 				case 'f':
 #if !defined(__KERNEL__) || !defined(__KOS__)
 					__temp = (*__p_debug_print_filename)(__FORMAT_PRINTER, __FORMAT_ARG, __info.al_cubase, __info.al_srcpath, __info.al_srcfile);
-#else
+#else /* !__KERNEL__ || !__KOS__ */
 					__temp = debug_print_filename(__FORMAT_PRINTER, __FORMAT_ARG, __info.al_cubase, __info.al_srcpath, __info.al_srcfile);
-#endif
+#endif /* __KERNEL__ && __KOS__ */
 					if __unlikely(__temp < 0)
 						goto __err_vinfo;
 					__result += __temp;
@@ -1085,9 +1085,9 @@ __do_vinfo_decimal:
 					case 'f':
 #if !defined(__KERNEL__) || !defined(__KOS__)
 						__temp = (*__p_debug_print_filename)(__FORMAT_PRINTER, __FORMAT_ARG, __info.al_cubase, __info.al_dclpath, __info.al_dclfile);
-#else
+#else /* !__KERNEL__ || !__KOS__ */
 						__temp = debug_print_filename(__FORMAT_PRINTER, __FORMAT_ARG, __info.al_cubase, __info.al_dclpath, __info.al_dclfile);
-#endif
+#endif /* __KERNEL__ && __KOS__ */
 						if __unlikely(__temp < 0)
 							goto __err_vinfo;
 						__result += __temp;
@@ -1139,7 +1139,7 @@ __err_vinfo:
 			}
 #if defined(__KERNEL__)
 			__temp = (*__FORMAT_PRINTER)(__FORMAT_ARG, "%{vinfo:/os/kernel.bin:",
-			                      __COMPILER_STRLEN("%{vinfo:/os/kernel.bin:"));
+			                             __COMPILER_STRLEN("%{vinfo:/os/kernel.bin:"));
 			if __unlikely(__temp < 0)
 				goto __err;
 			__result += __temp;
@@ -1189,10 +1189,10 @@ __err_vinfo:
 			if __unlikely(__temp < 0)
 				goto __err;
 			__result += __temp;
-#else
+#else /* __KERNEL__ */
 			(void)__xformat_arg;
 			(void)__p;
-#endif
+#endif /* !__KERNEL__ */
 			break;
 		}
 #endif
@@ -1213,9 +1213,9 @@ __err_vinfo:
 	{
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #define __USED_FLOAT_TYPE  long double
-#else
+#else /* __COMPILER_HAVE_LONGDOUBLE */
 #define __USED_FLOAT_TYPE  double
-#endif
+#endif /* !__COMPILER_HAVE_LONGDOUBLE */
 		__PRIVATE __USED_FLOAT_TYPE const __pow10[10] = {
 			1, 10, 100, 1000, 10000, 100000, 1000000,
 			10000000, 100000000, 1000000000 };
@@ -1226,9 +1226,9 @@ __err_vinfo:
 		unsigned int __max_prec, __min_prec;
 #ifdef __UINT64_TYPE__
 		__UINT64_TYPE__ __whole, __frac;
-#else
+#else /* __UINT64_TYPE__ */
 		__UINT32_TYPE__ __whole, __frac;
-#endif
+#endif /* !__UINT64_TYPE__ */
 		if (__length == __PRINTF_LENGTH_L) {
 			__val = __builtin_va_arg(__FORMAT_ARGS, __USED_FLOAT_TYPE);
 		} else {
@@ -1236,12 +1236,12 @@ __err_vinfo:
 		}
 		/* TODO: Don't use builtins directly. - Add a hybrid API for this!
 		 * TODO: When enabling this code, GCC generates code to load the special INF
-         *       floating point constants at the start of the function. Unconditionally!
-         *       I can't have that! - Switching FPU context is expensive, and I don't
-         *       want it to happen _every_ _time_ user-code makes use of a printf()-like
-         *       function. That's just wasteful!
-         *    -> I hope that by using dedicated functions instead of builtins, that
-         *       problem can be solved, but until them, let's just keep this disabled... */
+		 *       floating point constants at the start of the function. Unconditionally!
+		 *       I can't have that! - Switching FPU context is expensive, and I don't
+		 *       want it to happen _every_ _time_ user-code makes use of a printf()-like
+		 *       function. That's just wasteful!
+		 *    -> I hope that by using dedicated functions instead of builtins, that
+		 *       problem can be solved, but until them, let's just keep this disabled... */
 #if (__has_builtin(__builtin_isinf) && __has_builtin(__builtin_isnan)) && 0
 		if (__builtin_isinf(__val)) {
 			__buf[1] = 'I';
@@ -1307,15 +1307,15 @@ __do_special_float:
 		/* XXX: This cast can overflow */
 #ifdef __UINT64_TYPE__
 		__whole = (__UINT64_TYPE__)__val;
-#else
+#else /* __UINT64_TYPE__ */
 		__whole = (__UINT32_TYPE__)__val;
-#endif
+#endif /* !__UINT64_TYPE__ */
 		__tmpval = (__val - __whole) * __pow10[__max_prec];
 #ifdef __UINT64_TYPE__
 		__frac = (__UINT64_TYPE__)__tmpval;
-#else
+#else /* __UINT64_TYPE__ */
 		__frac = (__UINT32_TYPE__)__tmpval;
-#endif
+#endif /* !__UINT64_TYPE__ */
 		__diff = __tmpval - __frac;
 		/* Round to the closest fraction. */
 		if (__diff > 0.5) {

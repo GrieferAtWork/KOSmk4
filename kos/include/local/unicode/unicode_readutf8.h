@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x67ccd34e */
+/* HASH CRC-32:0xa84f633a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,20 +30,24 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_readutf8))(/*utf-8*/char cons
 	__result = (__CHAR32_TYPE__)(__UINT8_TYPE__)*__iter++;
 	if (__result >= 0xc0) {
 		switch (__LIBC_LOCAL_NAME(unicode_utf8seqlen)[__result]) {
+
 		case 0:
 		case 1:
 			break;
+
 		case 2:
 			__result  = (__result & 0x1f) << 6;
 			__result |= (__iter[0] & 0x3f);
 			__iter += 1;
 			break;
+
 		case 3:
 			__result  = (__result & 0x0f) << 12;
 			__result |= (__iter[0] & 0x3f) << 6;
 			__result |= (__iter[1] & 0x3f);
 			__iter += 2;
 			break;
+
 		case 4:
 			__result  = (__result & 0x07) << 18;
 			__result |= (__iter[0] & 0x3f) << 12;
@@ -51,6 +55,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_readutf8))(/*utf-8*/char cons
 			__result |= (__iter[2] & 0x3f);
 			__iter += 3;
 			break;
+
 		case 5:
 			__result  = (__result & 0x03) << 24;
 			__result |= (__iter[0] & 0x3f) << 18;
@@ -59,6 +64,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_readutf8))(/*utf-8*/char cons
 			__result |= (__iter[3] & 0x3f);
 			__iter += 4;
 			break;
+
 		case 6:
 			__result  = (__result & 0x01) << 30;
 			__result |= (__iter[0] & 0x3f) << 24;
@@ -68,6 +74,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_readutf8))(/*utf-8*/char cons
 			__result |= (__iter[4] & 0x3f);
 			__iter += 5;
 			break;
+
 		case 7:
 			__result  = (__iter[0] & 0x03/*0x3f*/) << 30;
 			__result |= (__iter[1] & 0x3f) << 24;
@@ -77,6 +84,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_readutf8))(/*utf-8*/char cons
 			__result |= (__iter[5] & 0x3f);
 			__iter += 6;
 			break;
+
 		case 8:
 			/*result = (iter[0] & 0x3f) << 36;*/
 			__result  = (__iter[1] & 0x03/*0x3f*/) << 30;
@@ -87,6 +95,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_readutf8))(/*utf-8*/char cons
 			__result |= (__iter[6] & 0x3f);
 			__iter += 7;
 			break;
+
 		default:
 			__builtin_unreachable();
 		}

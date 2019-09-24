@@ -363,8 +363,7 @@ wcsxfrm:([nonnull] wchar_t *dst, [inp(maxlen)] wchar_t const *__restrict src, si
 
 
 %[default_impl_section({.text.crt.wchar.FILE.locked.read.getc|.text.crt.dos.wchar.FILE.locked.read.getc})]
-[cp_stdio][std][std_guard][wchar]
-[requires_include(<features.h>)]
+[cp_stdio][std][std_guard][wchar][requires_include(<__crt.h>)]
 [requires(!defined(__NO_STDSTREAMS) && $has_function(fgetwc))]
 [dependency_include(<local/stdstreams.h>)][same_impl]
 getwchar:() -> wint_t {
@@ -374,7 +373,7 @@ getwchar:() -> wint_t {
 [cp_stdio][std][std_guard][wchar] getwc:([nonnull] $FILE *__restrict stream) -> wint_t = fgetwc;
 
 [section({.text.crt.wchar.FILE.locked.write.putc|.text.crt.dos.wchar.FILE.locked.write.putc})]
-[cp_stdio][std][std_guard][wchar][requires_include(<features.h>)]
+[cp_stdio][std][std_guard][wchar][requires_include(<__crt.h>)]
 [requires(!defined(__NO_STDSTREAMS) && $has_function(fputwc))]
 [dependency_include(<local/stdstreams.h>)][same_impl]
 putwchar:(wchar_t wc) -> wint_t {
@@ -554,7 +553,7 @@ wprintf:([nonnull] wchar_t const *__restrict format, ...) -> __STDC_INT_AS_SIZE_
 	%{auto_block(printf(vwprintf))}
 
 [cp_stdio][std][std_guard][ATTR_LIBC_WPRINTF(1, 0)][wchar]
-[requires_include(<features.h>)]
+[requires_include(<__crt.h>)]
 [requires($has_function(vfwprintf) && !defined(__NO_STDSTREAMS))]
 [dependency_include(<local/stdstreams.h>)][same_impl]
 [section({.text.crt.wchar.FILE.locked.write.printf|.text.crt.dos.wchar.FILE.locked.write.printf})]
@@ -627,7 +626,7 @@ vfwscanf:([nonnull] $FILE *__restrict stream, [nonnull] wchar_t const *__restric
 /* TODO: format_scanf() implementation for `vfwscanf'! */
 
 [cp_stdio][std][std_guard][ATTR_WUNUSED][ATTR_LIBC_WSCANF(1, 0)]
-[requires_include(<features.h>)]
+[requires_include(<__crt.h>)]
 [requires($has_function(vfwscanf) && !defined(__NO_STDSTREAMS))]
 [dependency_include(<local/stdstreams.h>)][wchar][same_impl]
 vwscanf:([nonnull] wchar_t const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T {
@@ -886,14 +885,14 @@ wcstold_l:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr
 %#endif /* __COMPILER_HAVE_LONGDOUBLE */
 %#endif /* !__NO_FPU */
 
-[cp_stdio][alias(_getwchar_nolock)][requires_include(<features.h>)][wchar]
+[cp_stdio][alias(_getwchar_nolock)][requires_include(<__crt.h>)][wchar]
 [requires($has_function(fgetwc_unlocked) && !defined(__NO_STDSTREAMS))][same_impl]
 [section({.text.crt.wchar.FILE.unlocked.read.getc|.text.crt.dos.wchar.FILE.unlocked.read.getc})]
 getwchar_unlocked:() -> wint_t {
 	return fgetwc_unlocked(@__LOCAL_stdin@);
 }
 
-[cp_stdio][alias(_putwchar_nolock)][requires_include(<features.h>)][wchar]
+[cp_stdio][alias(_putwchar_nolock)][requires_include(<__crt.h>)][wchar]
 [requires($has_function(fputwc_unlocked) && !defined(__NO_STDSTREAMS))][same_impl]
 [section({.text.crt.wchar.FILE.unlocked.write.putc|.text.crt.dos.wchar.FILE.unlocked.write.putc})]
 putwchar_unlocked:(wchar_t wc) -> wint_t {
@@ -1061,8 +1060,7 @@ fwprintf_unlocked:([nonnull] $FILE *__restrict stream, [nonnull] wchar_t const *
 wprintf_unlocked:([nonnull] wchar_t const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T
 	%{auto_block(printf(vwprintf_unlocked))}
 
-[cp_stdio][ATTR_LIBC_WPRINTF(1, 0)][wchar]
-[requires_include(<features.h>)]
+[cp_stdio][ATTR_LIBC_WPRINTF(1, 0)][wchar][requires_include(<__crt.h>)]
 [requires($has_function(vfwprintf_unlocked) && !defined(__NO_STDSTREAMS))]
 [dependency_include(<local/stdstreams.h>)][same_impl]
 [section({.text.crt.wchar.FILE.unlocked.write.printf|.text.crt.dos.wchar.FILE.unlocked.write.printf})]

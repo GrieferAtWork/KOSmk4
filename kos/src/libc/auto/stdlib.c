@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa5e127cf */
+/* HASH CRC-32:0x52a973b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -704,6 +704,7 @@ NOTHROW_NCX(LIBCCALL libc_fcvt_r)(double val,
 #endif
 }
 
+#include <hybrid/floatcore.h>
 INTERN NONNULL((3))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.convert.qgcvt") char *
 NOTHROW_NCX(LIBCCALL libc_qgcvt)(long double val,
