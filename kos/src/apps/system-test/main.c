@@ -22,6 +22,7 @@
 
 #include <hybrid/compiler.h>
 
+#include <stdio.h>
 #include <sys/syslog.h>
 #include <system-test/ctest.h>
 
@@ -46,6 +47,7 @@ int main(int argc, char *argv[], char *envp[]) {
 	 * KOS are functioning properly. */
 
 	run_all_tests();
+	printf("All tests OK\n");
 	return 0;
 }
 
