@@ -1447,8 +1447,8 @@ NOTHROW(LIBANSITTY_CC VGA_FillCell)(struct ansitty *__restrict self,
                                     ansitty_coord_t count) {
 	VGA *vga  = container_of(self, VGA, at_ansi);
 	if (sync_tryread(&vga->v_textlock)) {
-		ansitty_coord_t used_count;
-		u16 *ptr, *end, *copyend, cell;
+		ansitty_coord_t used_count, max_count;
+		u16 *ptr, *end, cell;
 		char cpch = cp437_encode((u32)ch);
 		if unlikely(!cpch)
 			cpch = '?';
@@ -1456,10 +1456,10 @@ NOTHROW(LIBANSITTY_CC VGA_FillCell)(struct ansitty *__restrict self,
 		do {
 			ptr = ATOMIC_READ(vga->v_textptr);
 			end = ATOMIC_READ(vga->v_textend);
+			max_count = (size_t)(end - ptr);
 			used_count = count;
-			copyend = ptr + used_count;
-			if (copyend > end)
-				used_count = (size_t)(end - ptr);
+			if (used_count > max_count)
+				used_count = max_count;
 		} while (!ATOMIC_CMPXCH_WEAK(vga->v_textptr, ptr, ptr + used_count));
 		memsetw(ptr, cell, used_count);
 		sync_endread(&vga->v_textlock);
