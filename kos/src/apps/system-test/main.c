@@ -37,6 +37,7 @@ PRIVATE void run_all_tests(void) {
 		syslog(LOG_DEBUG, "[test:%s] %s:%d\n",
 		       iter->td_name,
 		       iter->td_file, iter->td_line);
+		printf("test:%s\n", iter->td_name);
 		(*iter->td_func)();
 	}
 }
