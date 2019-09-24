@@ -672,7 +672,7 @@ INTERN_FUNCTION(x86_smp_entry32)
 #ifndef CONFIG_NO_FPU
 	/* Disable the FPU, preparing it to be loaded lazily. */
 	movl   %cr0, %ecx
-	orl    $CR0_TS, %ecx
+	orl    $(CR0_TS), %ecx
 	movl   %ecx, %cr0
 	/* Also: Indicate that no task is currently holding an FPU context.
 	 * NOTE: Technically, we could also move this part into `cpu_enter_deepsleep()',

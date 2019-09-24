@@ -230,7 +230,11 @@ NOTHROW(FCALL cpu_loadpending_chain)(struct cpu *__restrict me,
 	struct task *first_new, *last_new;
 	struct task *first_before, *first_after;
 	assert(!PREEMPTION_ENABLED());
+#if 0 /* We can't actually assert integrity here, since also get called \
+       * from early SMP startup code at a point where segment register  \
+       * have yet to be initialized. */
 	cpu_assert_integrity();
+#endif
 	first_new = last_new = chain;
 	next = chain->t_sched.s_pending.ss_pennxt;
 	for (;;) {
@@ -267,7 +271,9 @@ NOTHROW(FCALL cpu_loadpending_chain)(struct cpu *__restrict me,
 	first_before->t_sched.s_running.sr_runnxt = first_new;
 	last_new->t_sched.s_running.sr_runnxt     = first_after;
 	first_after->t_sched.s_running.sr_runprv  = last_new;
+#if 0 /* Same reason as above: can't be done here... */
 	cpu_assert_integrity();
+#endif
 }
 
 PUBLIC NOBLOCK bool NOTHROW(KCALL cpu_loadpending)(void) {
