@@ -2896,8 +2896,8 @@ do_process_string_command:
 
 		case '8':
 			/* VT100: align DECALN */
-			/* Screen alignment display (whatever it is. - Ignore it...) */
-			/* TODO: screen(1) documents this one as:
+			/* Screen alignment display (whatever that is) */
+			/* screen(1) documents this one as:
 			 *     ESC # 8               (V)  Fill Screen with E's
 			 * So I guess that's a simple enough explanation, although I'm not
 			 * entirely sure if there's some kind of joke I'm missing, or if
@@ -2905,7 +2905,17 @@ do_process_string_command:
 			 * all E's (I mean: don't get me wrong. How often didn't I want a
 			 * screen full of E's, wishing there was an easier way of getting
 			 * them all...)
-			 */
+			 * -> I've just checked with putty, and yes: It literally fills
+			 *    the tty with all E's. As dumb as that sounds... */
+			{
+				ansitty_coord_t xy[2];
+				ansitty_coord_t sxy[2];
+				GETCURSOR(xy);
+				GETSIZE(sxy);
+				SETCURSOR(0, 0, false);
+				FILLCELL('E', sxy[0] * sxy[1]);
+				SETCURSOR(xy[0], xy[1], false);
+			}
 			goto set_text_and_done;
 
 		case CC_NUL:
