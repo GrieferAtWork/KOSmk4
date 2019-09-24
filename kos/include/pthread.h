@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7465c9fe */
+/* HASH CRC-32:0x1b536a9a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -194,7 +194,7 @@ typedef void *(*__pthread_start_routine_t)(void *);
 /* Create a new thread, starting with execution of START-ROUTINE
  * getting passed ARG. Creation attributed come from ATTR. The new
  * handle is stored in *NEWTHREAD */
-__CDECLARE(__ATTR_NONNULL((1, 3)),int,__NOTHROW_NCX,pthread_create,(pthread_t *__restrict __newthread, pthread_attr_t const *__restrict __attr, __pthread_start_routine_t ____start_routine, void *__restrict ____arg),(__newthread,__attr,____start_routine,____arg))
+__CDECLARE(__ATTR_NONNULL((1, 3)),int,__NOTHROW_NCX,pthread_create,(pthread_t *__restrict __newthread, pthread_attr_t const *__restrict __attr, __pthread_start_routine_t __start_routine, void *__restrict __arg),(__newthread,__attr,__start_routine,__arg))
 #endif /* pthread_create... */
 
 #if defined(__CRT_HAVE_pthread_exit)
@@ -492,8 +492,7 @@ __CDECLARE(,int,__NOTHROW_NCX,pthread_cancel,(pthread_t __pthread),(__pthread))
 
 #if defined(__CRT_HAVE_pthread_testcancel)
 /* Test for pending cancellation for the current thread and terminate
- * the thread as per pthread_exit(PTHREAD_CANCELED) if it has been
- * cancelled */
+ * the thread as per pthread_exit(PTHREAD_CANCELED) if it has been canceled */
 __CDECLARE_VOID(,__NOTHROW_RPC,pthread_testcancel,(void),())
 #endif /* pthread_testcancel... */
 

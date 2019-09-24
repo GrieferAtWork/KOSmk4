@@ -191,7 +191,7 @@ typedef void *(*__pthread_start_routine_t)(void *);
 @@getting passed ARG. Creation attributed come from ATTR. The new
 @@handle is stored in *NEWTHREAD
 pthread_create:([nonnull] pthread_t *__restrict newthread, pthread_attr_t const *__restrict attr,
-                [nonnull] __pthread_start_routine_t __start_routine, void *__restrict __arg) -> int;
+                [nonnull] __pthread_start_routine_t start_routine, void *__restrict arg) -> int;
 
 %
 @@Terminate calling thread.
@@ -449,8 +449,7 @@ pthread_cancel:(pthread_t pthread) -> int;
 
 %
 @@Test for pending cancellation for the current thread and terminate
-@@the thread as per pthread_exit(PTHREAD_CANCELED) if it has been
-@@cancelled
+@@the thread as per pthread_exit(PTHREAD_CANCELED) if it has been canceled
 [cp] pthread_testcancel:();
 
 %

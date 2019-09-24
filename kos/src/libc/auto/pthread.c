@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x327629b4 */
+/* HASH CRC-32:0x3f5cf00c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_equal)(pthread_t pthread1,
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.__pthread_cleanup_routine") void
 NOTHROW_NCX(LIBCCALL libc___pthread_cleanup_routine)(struct __pthread_cleanup_frame *frame) {
-#line 549 "kos/src/libc/magic/pthread.c"
+#line 548 "kos/src/libc/magic/pthread.c"
 	if (frame->__do_it)
 		(*frame->__cancel_routine)(frame->__cancel_arg);
 }

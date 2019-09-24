@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9a394cf0 */
+/* HASH CRC-32:0x43b75d51 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ DECL_BEGIN
 /* Create a new thread, starting with execution of START-ROUTINE
  * getting passed ARG. Creation attributed come from ATTR. The new
  * handle is stored in *NEWTHREAD */
-INTDEF NONNULL((1, 3)) int NOTHROW_NCX(LIBCCALL libc_pthread_create)(pthread_t *__restrict newthread, pthread_attr_t const *__restrict attr, __pthread_start_routine_t __start_routine, void *__restrict __arg);
+INTDEF NONNULL((1, 3)) int NOTHROW_NCX(LIBCCALL libc_pthread_create)(pthread_t *__restrict newthread, pthread_attr_t const *__restrict attr, __pthread_start_routine_t start_routine, void *__restrict arg);
 /* Terminate calling thread.
  * The registered cleanup handlers are called via exception handling */
 INTDEF ATTR_NORETURN void (LIBCCALL libc_pthread_exit)(void *retval);
@@ -152,8 +152,7 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_pthread_setcanceltype)(int type, int *oldty
 /* Cancel THREAD immediately or at the next possibility */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_pthread_cancel)(pthread_t pthread);
 /* Test for pending cancellation for the current thread and terminate
- * the thread as per pthread_exit(PTHREAD_CANCELED) if it has been
- * cancelled */
+ * the thread as per pthread_exit(PTHREAD_CANCELED) if it has been canceled */
 INTDEF void NOTHROW_RPC(LIBCCALL libc_pthread_testcancel)(void);
 INTDEF __cleanup_fct_attribute void NOTHROW_NCX(LIBCCALL libc___pthread_register_cancel)(__pthread_unwind_buf_t *buf);
 INTDEF __cleanup_fct_attribute NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc___pthread_unregister_cancel)(__pthread_unwind_buf_t *buf);

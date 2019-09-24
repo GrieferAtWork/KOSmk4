@@ -20,6 +20,15 @@
 #define GUARD_LIBC_USER_BITS_SIGTHREAD_C 1
 
 #include "../api.h"
+/**/
+
+#include <hybrid/atomic.h>
+
+#include <kos/syscalls.h>
+
+#include <string.h>
+
+#include "../libc/pthread.h"
 #include "bits.sigthread.h"
 
 DECL_BEGIN
@@ -37,9 +46,15 @@ NOTHROW_NCX(LIBCCALL libc_pthread_sigmask)(int how,
                                            sigset_t *__restrict oldmask)
 /*[[[body:pthread_sigmask]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_sigmask"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	errno_t result;
+#ifdef __NR_sigprocmask
+	result = sys_sigprocmask((syscall_ulong_t)(unsigned int)how,
+	                         newmask, oldmask);
+#else /* __NR_sigprocmask */
+	result = sys_rt_sigprocmask((syscall_ulong_t)(unsigned int)how,
+	                            newmask, oldmask, sizeof(sigset_t));
+#endif /* !__NR_sigprocmask */
+	return -result;
 }
 /*[[[end:pthread_sigmask]]]*/
 
@@ -49,9 +64,16 @@ NOTHROW_NCX(LIBCCALL libc_pthread_kill)(pthread_t threadid,
                                         int signo)
 /*[[[body:pthread_kill]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_kill"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	struct pthread *pt = (struct pthread *)threadid;
+	pid_t tid;
+	errno_t result;
+	tid = ATOMIC_READ(pt->pt_tid);
+	if unlikely(tid == 0)
+		return ESRCH;
+	/* No way to handle the case where `pt_tid' got set
+	 * to zero, and `tid' got re-used. - Sorry... */
+	result = sys_kill(tid, signo);
+	return -result;
 }
 /*[[[end:pthread_kill]]]*/
 
@@ -62,9 +84,20 @@ NOTHROW_NCX(LIBCCALL libc_pthread_sigqueue)(pthread_t threadid,
                                             union sigval const value)
 /*[[[body:pthread_sigqueue]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_sigqueue"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	struct pthread *pt = (struct pthread *)threadid;
+	siginfo_t info;
+	errno_t result;
+	pid_t tid;
+	memset(&info, 0, sizeof(siginfo_t));
+	info.si_value = value;
+	info.si_code  = SI_QUEUE;
+	tid = ATOMIC_READ(pt->pt_tid);
+	if unlikely(tid == 0)
+		return ESRCH;
+	/* No way to handle the case where `pt_tid' got set
+	 * to zero, and `tid' got re-used. - Sorry... */
+	result = sys_rt_sigqueueinfo(tid, signo, &info);
+	return -result;
 }
 /*[[[end:pthread_sigqueue]]]*/
 

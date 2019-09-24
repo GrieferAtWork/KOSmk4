@@ -20,17 +20,268 @@
 #define GUARD_LIBC_USER_PTHREAD_C 1
 
 #include "../api.h"
+/**/
+
+#include "../libc/pthread.h"
+/**/
+
+#include <hybrid/atomic.h>
+#include <hybrid/host.h>
+#include <hybrid/sync/atomic-rwlock.h>
+
+#include <kos/anno.h>
+#include <kos/except.h>
+#include <kos/syscalls.h>
+#include <kos/thread.h>
+#include <kos/types.h>
+#include <linux/futex.h>
+#include <sys/mman.h>
+#include <sys/resource.h>
+
+#include <assert.h>
+#include <dlfcn.h>
+#include <errno.h>
+#include <limits.h>
+#include <malloc.h>
+#include <sched.h>
+#include <stddef.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+
+#include <librpc/rpc.h>
+
 #include "pthread.h"
 
 DECL_BEGIN
 
+PRIVATE ATTR_SECTION(".rodata.crt.sched.pthread.rpc.libname") char const librpc_name[] = LIBRPC_LIBRARY_NAME;
+PRIVATE ATTR_SECTION(".bss.crt.sched.pthread.rpc.librpc") void *librpc = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.sched.pthread.rpc.rpc_schedule") PRPC_SCHEDULE pdyn_rpc_schedule = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.sched.pthread.rpc.rpc_service") PRPC_SERVICE pdyn_rpc_service = NULL;
+PRIVATE ATTR_SECTION(".rodata.crt.sched.pthread.rpc.name_rpc_schedule") char const name_rpc_schedule[] = "rpc_schedule";
+PRIVATE ATTR_SECTION(".rodata.crt.sched.pthread.rpc.name_rpc_service") char const name_rpc_service[] = "rpc_service";
+
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread.rpc.librpc_init")
+WUNUSED bool LIBCCALL librpc_init(void) {
+	void *lib;
+again:
+	lib = ATOMIC_READ(librpc);
+	if (lib)
+		return lib != (void *)-1;
+	lib = dlopen(librpc_name, RTLD_LOCAL);
+	if (!lib)
+		goto err_nolib;
+	*(void **)&pdyn_rpc_schedule = dlsym(lib, name_rpc_schedule);
+	if unlikely(!pdyn_rpc_schedule)
+		goto err;
+	*(void **)&pdyn_rpc_service = dlsym(lib, name_rpc_service);
+	if unlikely(!pdyn_rpc_service)
+		goto err;
+	if (!ATOMIC_CMPXCH(librpc, NULL, lib)) {
+		dlclose(lib);
+		goto again;
+	}
+	return true;
+err_nolib:
+	dlclose(lib);
+err:
+	if (!ATOMIC_CMPXCH(librpc, NULL, (void *)-1))
+		goto again;
+	return false;
+}
 
 
 
+
+STATIC_ASSERT(offsetof(struct pthread, pt_tid) == OFFSET_PTHREAD_TID);
+STATIC_ASSERT(offsetof(struct pthread, pt_refcnt) == OFFSET_PTHREAD_REFCNT);
+STATIC_ASSERT(offsetof(struct pthread, pt_retval) == OFFSET_PTHREAD_RETVAL);
+STATIC_ASSERT(offsetof(struct pthread, pt_tls) == OFFSET_PTHREAD_TLS);
+STATIC_ASSERT(offsetof(struct pthread, pt_stackaddr) == OFFSET_PTHREAD_STACKADDR);
+STATIC_ASSERT(offsetof(struct pthread, pt_stacksize) == OFFSET_PTHREAD_STACKSIZE);
+STATIC_ASSERT(offsetof(struct pthread, pt_flags) == OFFSET_PTHREAD_FLAGS);
+
+
+LOCAL void
+NOTHROW(LIBCCALL destroy)(struct pthread *__restrict self) {
+	free(self);
+}
+
+
+struct pthread_attr {
+	/* NOTE: This structure shares binary compatibility with GLibc (for the most part)
+	 *       The only difference is that we allow the re-use of `pa_cpusetsize' as an
+	 *       in-line 32/64-bit cpuset, thus preventing the need to dynamically allocate
+	 *       small cpu sets on the heap when most of the time those structures would
+	 *       only be a couple of bytes large. */
+	struct sched_param pa_schedparam;  /* Scheduler parameters and priority. */
+	int                pa_schedpolicy;
+	int                pa_flags;       /* Various flags like detachstate, scope, etc (St of `ATTR_FLAG_*'). */
+	size_t             pa_guardsize;   /* Size of guard area. */
+	void              *pa_stackaddr;   /* Stack handling. */
+	size_t             pa_stacksize;
+	cpu_set_t         *pa_cpuset;      /* Affinity map. */
+	size_t             pa_cpusetsize;
+};
+#define ATTR_FLAG_DETACHSTATE     0x0001
+#define ATTR_FLAG_NOTINHERITSCHED 0x0002
+#define ATTR_FLAG_SCOPEPROCESS    0x0004
+#define ATTR_FLAG_STACKADDR       0x0008
+#define ATTR_FLAG_OLDATTR         0x0010
+#define ATTR_FLAG_SCHED_SET       0x0020
+#define ATTR_FLAG_POLICY_SET      0x0040
+STATIC_ASSERT(__SIZEOF_PTHREAD_ATTR_T >= sizeof(struct pthread_attr));
+
+/* Attributes used by `pthread_create()' when the given `ATTR' is NULL
+ * NOTE: When `pa_stacksize' is zero, `PTHREAD_STACK_MIN' will be used instead! */
+ATTR_SECTION(".bss.crt.sched.pthread.pthread_default_attr.attr")
+PRIVATE struct pthread_attr pthread_default_attr = {};
+ATTR_SECTION(".bss.crt.sched.pthread.pthread_default_attr.lock")
+PRIVATE DEFINE_ATOMIC_RWLOCK(pthread_default_attr_lock);
+
+/* [0..1] Pointer to the calling thread's pthread_self() field. */
+PRIVATE ATTR_THREAD __REF struct pthread *pthread_self_p = NULL;
+
+
+/* Called just before a thread exists (used to destroy() the thread's
+ * `pthread_self' structure in case the thread was detached) */
+INTERN ATTR_SECTION(".text.crt.sched.pthread.pthread_onexit") void
+NOTHROW(LIBCCALL libc_pthread_onexit)(struct pthread *__restrict me) {
+	void *tls;
+	tls = me->pt_tls;
+	if (ATOMIC_FETCHDEC(me->pt_refcnt) == 1) {
+		/* At some point, our thread got detached from its creator,
+		 * so it is left up to us to destroy() our own descriptor.
+		 * Because of this, we must prevent the kernel from attempting
+		 * to write into our TID address field (since we're freeing
+		 * the associated structure right now). */
+		sys_set_tid_address(NULL);
+		destroy(me);
+	}
+	/* Free our thread's TLS segment. */
+	dltlsfreeseg(tls);
+}
+
+
+INTERN ATTR_NORETURN ATTR_SECTION(".text.crt.sched.pthread.pthread_main") void
+NOTHROW(__FCALL libc_pthread_main)(struct pthread *__restrict me,
+                                   __pthread_start_routine_t start) {
+	/* Set the TLS variable for `pthread_self' to `me' */
+	pthread_self_p = me;
+	COMPILER_BARRIER();
+	/* Apply the initial affinity mask (if given) */
+	if (me->pt_cpuset) {
+		size_t cpuset_size;
+		cpuset_size = me->pt_cpusetsize;
+		if (me->pt_cpuset == (cpu_set_t *)&me->pt_cpusetsize) {
+			cpuset_size = sizeof(me->pt_cpusetsize);
+			while (cpuset_size && ((byte_t *)&me->pt_cpusetsize)[cpuset_size - 1] == 0)
+				--cpuset_size;
+		}
+		sys_sched_setaffinity(me->pt_tid, cpuset_size, me->pt_cpuset);
+		if (me->pt_cpuset != (cpu_set_t *)&me->pt_cpusetsize)
+			free(me->pt_cpuset);
+	}
+	COMPILER_BARRIER();
+	TRY {
+		/* Invoke the thread-main function. */
+		me->pt_retval = (*start)(me->pt_retval);
+	} EXCEPT {
+		/* Always invoke the on-exit callback, no matter what happens! */
+		me->pt_retval = NULL;
+		libc_pthread_onexit(me);
+		RETHROW();
+	}
+	libc_pthread_onexit(me);
+	/* Reminder: `sys_exit()' only terminates the calling thread.
+	 * To terminate the calling process, you'd have to call `sys_exit_group()'! */
+	sys_exit(0);
+}
+
+/* Assembly-side for the process of cloning a thread.
+ * This function simply clones the calling thread before invoking
+ * `libc_pthread_main()' within the context of the newly spawned thread.
+ * NOTE: This function also fills in `thread->pt_tid' */
+INTDEF pid_t NOTHROW(__FCALL libc_pthread_clone)(struct pthread *__restrict thread,
+                                                 __pthread_start_routine_t start);
+
+
+
+INTERN NONNULL((1, 2, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_dp_create") int
+NOTHROW_NCX(LIBCCALL libc_pthread_do_create)(pthread_t *__restrict newthread,
+                                             pthread_attr_t const *__restrict attr,
+                                             __pthread_start_routine_t start_routine,
+                                             void *__restrict arg) {
+	pid_t cpid;
+	struct pthread *pt;
+	struct pthread_attr const *at = (struct pthread_attr const *)attr;
+	pt = (struct pthread *)malloc(sizeof(struct pthread));
+	if unlikely(!pt)
+		goto err_nomem;
+	/* Allocate the DL TLS segment */
+	pt->pt_tls = dltlsallocseg();
+	if unlikely(!pt->pt_tls)
+		goto err_nomem_pt;
+	pt->pt_refcnt    = 2;
+	pt->pt_flags     = PTHREAD_FNORMAL;
+	pt->pt_stackaddr = at->pa_stackaddr;
+	pt->pt_stacksize = at->pa_stacksize;
+	pt->pt_cpuset    = NULL;
+	/* Copy affinity cpuset information. */
+	if (at->pa_cpuset) {
+		pt->pt_cpusetsize = at->pa_cpusetsize;
+		if (at->pa_cpuset == (cpu_set_t *)&at->pa_cpusetsize) {
+			pt->pt_cpuset = (cpu_set_t *)&pt->pt_cpusetsize;
+		} else {
+			pt->pt_cpuset = (cpu_set_t *)malloc(pt->pt_cpusetsize);
+			if unlikely(!pt->pt_cpuset)
+				goto err_nomem_pt_tls_noaff;
+			memcpy(pt->pt_cpuset, at->pa_cpuset, pt->pt_cpusetsize);
+		}
+	}
+	if (!(at->pa_flags & ATTR_FLAG_STACKADDR)) {
+		/* Automatically allocate a stack. */
+		if (!pt->pt_stacksize)
+			pt->pt_stacksize = PTHREAD_STACK_MIN;
+		pt->pt_stackaddr = mmap(NULL, pt->pt_stacksize,
+		                        PROT_READ | PROT_WRITE,
+		                        MAP_PRIVATE | MAP_STACK | MAP_ANONYMOUS,
+		                        -1, 0);
+		if (pt->pt_stackaddr == MAP_FAILED)
+			goto err_nomem_pt_tls;
+	} else {
+		/* The thread uses a custom, user-provided stack. */
+		pt->pt_flags |= PTHREAD_FUSERSTACK;
+	}
+	pt->pt_retval = arg;
+	cpid = libc_pthread_clone(pt, start_routine);
+	if unlikely(E_ISERR(cpid)) {
+		/* The clone() system call failed. */
+		dltlsfreeseg(pt->pt_tls);
+		if (pt->pt_cpuset != (cpu_set_t *)&pt->pt_cpusetsize)
+			free(pt->pt_cpuset);
+		free(pt);
+		return (int)-cpid;
+	}
+	*newthread = (pthread_t)pt;
+	return EOK;
+err_nomem_pt_tls:
+	if (pt->pt_cpuset != (cpu_set_t *)&pt->pt_cpusetsize)
+		free(pt->pt_cpuset);
+err_nomem_pt_tls_noaff:
+	dltlsfreeseg(pt->pt_tls);
+err_nomem_pt:
+	free(pt);
+err_nomem:
+	return ENOMEM;
+}
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:pthread_create,hash:CRC-32=0xd15efbbc]]]*/
+/*[[[head:pthread_create,hash:CRC-32=0x4cd3ccdf]]]*/
 /* Create a new thread, starting with execution of START-ROUTINE
  * getting passed ARG. Creation attributed come from ATTR. The new
  * handle is stored in *NEWTHREAD */
@@ -38,13 +289,22 @@ INTERN NONNULL((1, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_create") int
 NOTHROW_NCX(LIBCCALL libc_pthread_create)(pthread_t *__restrict newthread,
                                           pthread_attr_t const *__restrict attr,
-                                          __pthread_start_routine_t __start_routine,
-                                          void *__restrict __arg)
+                                          __pthread_start_routine_t start_routine,
+                                          void *__restrict arg)
 /*[[[body:pthread_create]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_create"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	int result;
+	if (attr) {
+		result = libc_pthread_do_create(newthread, attr, start_routine, arg);
+	} else {
+		pthread_attr_t def;
+		result = pthread_getattr_default_np(&def);
+		if likely(result == EOK) {
+			result = libc_pthread_do_create(newthread, &def, start_routine, arg);
+			pthread_attr_destroy(&def);
+		}
+	}
+	return result;
 }
 /*[[[end:pthread_create]]]*/
 
@@ -56,10 +316,15 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_exit") void
 (LIBCCALL libc_pthread_exit)(void *retval)
 /*[[[body:pthread_exit]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_exit"); /* TODO */
-	libc_seterrno(ENOSYS);
-	for (;;) {
+	__REF struct pthread *me = pthread_self_p;
+	if (me) {
+		me->pt_retval = retval;
+		libc_pthread_onexit(me);
 	}
+	/* XXX: THROW(E_EXIT_THREAD)? */
+	/* Reminder: `sys_exit()' only terminates the calling thread.
+	 * To terminate the calling process, you'd have to call `sys_exit_group()'! */
+	sys_exit(0);
 }
 /*[[[end:pthread_exit]]]*/
 
@@ -72,9 +337,11 @@ NOTHROW_RPC(LIBCCALL libc_pthread_join)(pthread_t pthread,
                                         void **thread_return)
 /*[[[body:pthread_join]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_join"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	int result;
+	result = libc_pthread_timedjoin_np(pthread,
+	                                   thread_return,
+	                                   NULL);
+	return result;
 }
 /*[[[end:pthread_join]]]*/
 
@@ -86,9 +353,17 @@ NOTHROW_NCX(LIBCCALL libc_pthread_tryjoin_np)(pthread_t pthread,
                                               void **thread_return)
 /*[[[body:pthread_tryjoin_np]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_tryjoin_np"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	struct pthread *pt = (struct pthread *)pthread;
+	if (ATOMIC_READ(pt->pt_tid) == 0) {
+		if (thread_return)
+			*thread_return = pt->pt_retval;
+		if (ATOMIC_FETCHDEC(pt->pt_refcnt) == 1)
+			destroy(pt);
+		return EOK;
+	}
+	if unlikely(pt == pthread_self_p)
+		return EDEADLK;
+	return EBUSY;
 }
 /*[[[end:pthread_tryjoin_np]]]*/
 
@@ -102,9 +377,28 @@ NOTHROW_RPC(LIBCCALL libc_pthread_timedjoin_np)(pthread_t pthread,
                                                 struct timespec const *abstime)
 /*[[[body:pthread_timedjoin_np]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_timedjoin_np"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	struct pthread *pt = (struct pthread *)pthread;
+	for (;;) {
+		pid_t tid;
+		syscall_slong_t result;
+		/* Check if the thread already terminated. */
+		tid = ATOMIC_READ(pt->pt_tid);
+		if (tid == 0)
+			break;
+		if unlikely(pt == pthread_self_p)
+			return EDEADLK;
+		/* >> wait_while(pt->pt_tid == tid) */
+		result = sys_futex((unsigned int *)&pt->pt_tid,
+		                   FUTEX_WAIT_BITSET, tid,
+		                   abstime, NULL, (unsigned int)-3);
+		if (result == -ETIMEDOUT)
+			return (int)-result;
+	}
+	if (thread_return)
+		*thread_return = pt->pt_retval;
+	if (ATOMIC_FETCHDEC(pt->pt_refcnt) == 1)
+		destroy(pt);
+	return EOK;
 }
 /*[[[end:pthread_timedjoin_np]]]*/
 
@@ -117,9 +411,35 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_detach") int
 NOTHROW_NCX(LIBCCALL libc_pthread_detach)(pthread_t pthread)
 /*[[[body:pthread_detach]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_detach"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	struct pthread *pt = (struct pthread *)pthread;
+	refcnt_t refcnt;
+	for (;;) {
+		refcnt = ATOMIC_READ(pt->pt_refcnt);
+		assert(refcnt >= 1);
+		if (refcnt == 1) {
+			/* Special handling requiring for when this is the last reference!
+			 * In this case, the thread will have already invoked `libc_pthread_onexit()',
+			 * however did not destroy() its own structure, or deleted its kernel tid-address.
+			 * There is a chance that the thread is still running, and that the kernel is
+			 * still going to write 0 to the TID address.
+			 * In this case, we must wait for it to do so, since we musn't destroy() the
+			 * pthread structure before then, else the kernel would to into destroy()'d
+			 * memory. */
+			if (ATOMIC_READ(pt->pt_tid) != 0) {
+				sys_sched_yield();
+				continue;
+			}
+			/* The TID field was already set to ZERO. -> Set the reference
+			 * counter to zero and destroy() the pthread structure ourself. */
+			if (!ATOMIC_CMPXCH_WEAK(pt->pt_refcnt, 1, 0))
+				continue;
+			destroy(pt);
+			break;
+		}
+		if (ATOMIC_CMPXCH_WEAK(pt->pt_refcnt, refcnt, refcnt - 1))
+			break;
+	}
+	return EOK;
 }
 /*[[[end:pthread_detach]]]*/
 
@@ -144,9 +464,11 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_attr_init") int
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_init)(pthread_attr_t *attr)
 /*[[[body:pthread_attr_init]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_attr_init"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	struct pthread_attr *at;
+	memset(attr, '\0', __SIZEOF_PTHREAD_ATTR_T);
+	at = (struct pthread_attr *)attr;
+	at->pa_guardsize = getpagesize();
+	return EOK;
 }
 /*[[[end:pthread_attr_init]]]*/
 
@@ -157,9 +479,12 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_attr_destroy") int
 NOTHROW_NCX(LIBCCALL libc_pthread_attr_destroy)(pthread_attr_t *attr)
 /*[[[body:pthread_attr_destroy]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_attr_destroy"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	struct pthread_attr *at = (struct pthread_attr *)attr;
+	if likely(!(at->pa_flags & ATTR_FLAG_OLDATTR)) {
+		if (at->pa_cpuset != (cpu_set_t *)&at->pa_cpusetsize)
+			free(at->pa_cpuset);
+	}
+	return EOK;
 }
 /*[[[end:pthread_attr_destroy]]]*/
 
@@ -171,9 +496,12 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_getdetachstate)(pthread_attr_t const *att
                                                        int *detachstate)
 /*[[[body:pthread_attr_getdetachstate]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_attr_getdetachstate"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	struct pthread_attr const *at;
+	at = (struct pthread_attr const *)attr;
+	*detachstate = (at->pa_flags & ATTR_FLAG_DETACHSTATE
+	                ? PTHREAD_CREATE_DETACHED
+	                : PTHREAD_CREATE_JOINABLE);
+	return EOK;
 }
 /*[[[end:pthread_attr_getdetachstate]]]*/
 
@@ -185,9 +513,16 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_setdetachstate)(pthread_attr_t *attr,
                                                        int detachstate)
 /*[[[body:pthread_attr_setdetachstate]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_attr_setdetachstate"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	struct pthread_attr *at;
+	at = (struct pthread_attr *)attr;
+	if (detachstate == PTHREAD_CREATE_DETACHED)
+		at->pa_flags |= ATTR_FLAG_DETACHSTATE;
+	else if (detachstate == PTHREAD_CREATE_JOINABLE)
+		at->pa_flags &= ~ATTR_FLAG_DETACHSTATE;
+	else {
+		return EINVAL;
+	}
+	return EOK;
 }
 /*[[[end:pthread_attr_setdetachstate]]]*/
 
@@ -199,9 +534,10 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_getguardsize)(pthread_attr_t const *attr,
                                                      size_t *guardsize)
 /*[[[body:pthread_attr_getguardsize]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_attr_getguardsize"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	struct pthread_attr const *at;
+	at = (struct pthread_attr const *)attr;
+	*guardsize = at->pa_guardsize;
+	return EOK;
 }
 /*[[[end:pthread_attr_getguardsize]]]*/
 
@@ -213,9 +549,10 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_setguardsize)(pthread_attr_t *attr,
                                                      size_t guardsize)
 /*[[[body:pthread_attr_setguardsize]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_attr_setguardsize"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	struct pthread_attr *at;
+	at = (struct pthread_attr *)attr;
+	at->pa_guardsize = guardsize;
+	return EOK;
 }
 /*[[[end:pthread_attr_setguardsize]]]*/
 
@@ -227,9 +564,10 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_getschedparam)(pthread_attr_t const *__re
                                                       struct sched_param *__restrict param)
 /*[[[body:pthread_attr_getschedparam]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_attr_getschedparam"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	struct pthread_attr const *at;
+	at = (struct pthread_attr const *)attr;
+	memcpy(param, &at->pa_schedparam, sizeof(struct sched_param));
+	return EOK;
 }
 /*[[[end:pthread_attr_getschedparam]]]*/
 
@@ -241,9 +579,10 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_setschedparam)(pthread_attr_t *__restrict
                                                       struct sched_param const *__restrict param)
 /*[[[body:pthread_attr_setschedparam]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_attr_setschedparam"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	struct pthread_attr *at;
+	at = (struct pthread_attr *)attr;
+	memcpy(&at->pa_schedparam, param, sizeof(struct sched_param));
+	return EOK;
 }
 /*[[[end:pthread_attr_setschedparam]]]*/
 
@@ -255,9 +594,10 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_getschedpolicy)(pthread_attr_t const *__r
                                                        int *__restrict policy)
 /*[[[body:pthread_attr_getschedpolicy]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_attr_getschedpolicy"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	struct pthread_attr const *at;
+	at = (struct pthread_attr const *)attr;
+	*policy = at->pa_schedpolicy;
+	return EOK;
 }
 /*[[[end:pthread_attr_getschedpolicy]]]*/
 
@@ -269,9 +609,13 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_setschedpolicy)(pthread_attr_t *attr,
                                                        int policy)
 /*[[[body:pthread_attr_setschedpolicy]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_attr_setschedpolicy"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	struct pthread_attr *at;
+	at = (struct pthread_attr *)attr;
+	if (policy != SCHED_OTHER && policy != SCHED_FIFO && policy != SCHED_RR)
+		return EINVAL;
+	at->pa_schedpolicy = policy;
+	at->pa_flags |= ATTR_FLAG_POLICY_SET;
+	return EOK;
 }
 /*[[[end:pthread_attr_setschedpolicy]]]*/
 
@@ -283,9 +627,12 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_getinheritsched)(pthread_attr_t const *__
                                                         int *__restrict inherit)
 /*[[[body:pthread_attr_getinheritsched]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_attr_getinheritsched"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	struct pthread_attr const *at;
+	at = (struct pthread_attr const *)attr;
+	*inherit = (at->pa_flags & ATTR_FLAG_NOTINHERITSCHED
+	            ? PTHREAD_EXPLICIT_SCHED
+	            : PTHREAD_INHERIT_SCHED);
+	return EOK;
 }
 /*[[[end:pthread_attr_getinheritsched]]]*/
 
@@ -297,9 +644,16 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_setinheritsched)(pthread_attr_t *attr,
                                                         int inherit)
 /*[[[body:pthread_attr_setinheritsched]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_attr_setinheritsched"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	struct pthread_attr *at;
+	at = (struct pthread_attr *)attr;
+	if (inherit == PTHREAD_EXPLICIT_SCHED)
+		at->pa_flags |= ATTR_FLAG_NOTINHERITSCHED;
+	else if (inherit == PTHREAD_INHERIT_SCHED)
+		at->pa_flags &= ~ATTR_FLAG_NOTINHERITSCHED;
+	else {
+		return EINVAL;
+	}
+	return EOK;
 }
 /*[[[end:pthread_attr_setinheritsched]]]*/
 
@@ -311,9 +665,12 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_getscope)(pthread_attr_t const *__restric
                                                  int *__restrict scope)
 /*[[[body:pthread_attr_getscope]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_attr_getscope"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	struct pthread_attr *at;
+	at = (struct pthread_attr *)attr;
+	*scope = (at->pa_flags & ATTR_FLAG_SCOPEPROCESS
+	          ? PTHREAD_SCOPE_PROCESS
+	          : PTHREAD_SCOPE_SYSTEM);
+	return EOK;
 }
 /*[[[end:pthread_attr_getscope]]]*/
 
@@ -325,9 +682,16 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_setscope)(pthread_attr_t *attr,
                                                  int scope)
 /*[[[body:pthread_attr_setscope]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_attr_setscope"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	struct pthread_attr *at;
+	at = (struct pthread_attr *)attr;
+	if (scope == PTHREAD_SCOPE_PROCESS)
+		at->pa_flags |= ATTR_FLAG_SCOPEPROCESS;
+	else if (scope == PTHREAD_SCOPE_SYSTEM)
+		at->pa_flags &= ~ATTR_FLAG_SCOPEPROCESS;
+	else {
+		return EINVAL;
+	}
+	return EOK;
 }
 /*[[[end:pthread_attr_setscope]]]*/
 
@@ -339,9 +703,10 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_getstackaddr)(pthread_attr_t const *__res
                                                      void **__restrict stackaddr)
 /*[[[body:pthread_attr_getstackaddr]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_attr_getstackaddr"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	struct pthread_attr const *at;
+	at = (struct pthread_attr const *)attr;
+	*stackaddr = at->pa_stackaddr;
+	return EOK;
 }
 /*[[[end:pthread_attr_getstackaddr]]]*/
 
@@ -356,9 +721,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_setstackaddr)(pthread_attr_t *attr,
                                                      void *stackaddr)
 /*[[[body:pthread_attr_setstackaddr]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_attr_setstackaddr"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	struct pthread_attr *at;
+	at = (struct pthread_attr *)attr;
+	at->pa_stackaddr = stackaddr;
+	at->pa_flags |= ATTR_FLAG_STACKADDR;
+	return EOK;
 }
 /*[[[end:pthread_attr_setstackaddr]]]*/
 
@@ -370,9 +737,10 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_getstacksize)(pthread_attr_t const *__res
                                                      size_t *__restrict stacksize)
 /*[[[body:pthread_attr_getstacksize]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_attr_getstacksize"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	struct pthread_attr const *at;
+	at = (struct pthread_attr const *)attr;
+	*stacksize = at->pa_stacksize;
+	return EOK;
 }
 /*[[[end:pthread_attr_getstacksize]]]*/
 
@@ -386,9 +754,12 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_setstacksize)(pthread_attr_t *attr,
                                                      size_t stacksize)
 /*[[[body:pthread_attr_setstacksize]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_attr_setstacksize"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	struct pthread_attr *at;
+	at = (struct pthread_attr *)attr;
+	if unlikely(stacksize < PTHREAD_STACK_MIN)
+		return EINVAL;
+	at->pa_stacksize = stacksize;
+	return EOK;
 }
 /*[[[end:pthread_attr_setstacksize]]]*/
 
@@ -401,9 +772,15 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_getstack)(pthread_attr_t const *__restric
                                                  size_t *__restrict stacksize)
 /*[[[body:pthread_attr_getstack]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_attr_getstack"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	struct pthread_attr *at;
+	at = (struct pthread_attr *)attr;
+#ifdef __ARCH_STACK_GROWS_DOWNWARDS
+	*stackaddr = (byte_t *)at->pa_stackaddr - at->pa_stacksize;
+#else /* __ARCH_STACK_GROWS_DOWNWARDS */
+	*stackaddr = at->pa_stackaddr;
+#endif /* !__ARCH_STACK_GROWS_DOWNWARDS */
+	*stacksize = at->pa_stacksize;
+	return EOK;
 }
 /*[[[end:pthread_attr_getstack]]]*/
 
@@ -418,9 +795,18 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_setstack)(pthread_attr_t *attr,
                                                  size_t stacksize)
 /*[[[body:pthread_attr_setstack]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_attr_setstack"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	struct pthread_attr *at;
+	at = (struct pthread_attr *)attr;
+	if (stacksize < PTHREAD_STACK_MIN)
+		return EINVAL;
+#ifdef __ARCH_STACK_GROWS_DOWNWARDS
+	at->pa_stackaddr = (byte_t *)stackaddr + at->pa_stacksize;
+#else /* __ARCH_STACK_GROWS_DOWNWARDS */
+	at->pa_stackaddr = stackaddr;
+#endif /* !__ARCH_STACK_GROWS_DOWNWARDS */
+	at->pa_stacksize = stacksize;
+	at->pa_flags |= ATTR_FLAG_STACKADDR;
+	return EOK;
 }
 /*[[[end:pthread_attr_setstack]]]*/
 
@@ -434,9 +820,49 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_setaffinity_np)(pthread_attr_t *attr,
                                                        cpu_set_t const *cpuset)
 /*[[[body:pthread_attr_setaffinity_np]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_attr_setaffinity_np"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	struct pthread_attr *at;
+	at = (struct pthread_attr *)attr;
+	/* Truncate the cpu set */
+	while (cpusetsize && ((byte_t *)cpuset)[cpusetsize - 1] == 0)
+		--cpusetsize;
+	if (!cpusetsize || !cpuset) {
+		/* NOTE: Glibc also accepts a zero-value in either argument as indicator
+		 *       to clear out a previously set affinity, even though it would make
+		 *       more sense to only allow `cpusetsize == 0', and require a non-NULL
+		 *       `cpuset' when `cpusetsize != 0'... */
+		if (at->pa_cpuset != (cpu_set_t *)&at->pa_cpusetsize)
+			free(at->pa_cpuset);
+		at->pa_cpuset     = NULL;
+		at->pa_cpusetsize = 0;
+	} else if (cpusetsize <= sizeof(at->pa_cpusetsize)) {
+		/* Optimization: Don't use the heap for small cpu sets.
+		 * In practice, this means that we usually always get here,
+		 * since most machines don't have more than 32 cpus... */
+		if (at->pa_cpuset != (cpu_set_t *)&at->pa_cpusetsize) {
+			free(at->pa_cpuset);
+			at->pa_cpuset = (cpu_set_t *)&at->pa_cpusetsize;
+		}
+		memset(&at->pa_cpusetsize, 0, sizeof(at->pa_cpusetsize));
+		memcpy(&at->pa_cpusetsize, cpuset, cpusetsize);
+	} else {
+		cpu_set_t *newset;
+		if (at->pa_cpuset == (cpu_set_t *)&at->pa_cpusetsize) {
+			newset = (cpu_set_t *)malloc(cpusetsize);
+			if unlikely(!newset)
+				return ENOMEM;
+			goto use_newset;
+		} else if (cpusetsize != at->pa_cpusetsize) {
+			newset = (cpu_set_t *)realloc(at->pa_cpuset,
+			                              cpusetsize);
+			if unlikely(!newset)
+				return ENOMEM;
+use_newset:
+			at->pa_cpuset     = newset;
+			at->pa_cpusetsize = cpusetsize;
+		}
+		memcpy(at->pa_cpuset, cpuset, cpusetsize);
+	}
+	return EOK;
 }
 /*[[[end:pthread_attr_setaffinity_np]]]*/
 
@@ -449,9 +875,28 @@ NOTHROW_NCX(LIBCCALL libc_pthread_attr_getaffinity_np)(pthread_attr_t const *att
                                                        cpu_set_t *cpuset)
 /*[[[body:pthread_attr_getaffinity_np]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_attr_getaffinity_np"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	struct pthread_attr const *at;
+	at = (struct pthread_attr const *)attr;
+	if (at->pa_cpuset) {
+		size_t setsize;
+		byte_t *p;
+		setsize = at->pa_cpusetsize;
+		if (at->pa_cpuset == (cpu_set_t *)&at->pa_cpusetsize) {
+			setsize = sizeof(at->pa_cpusetsize);
+			while (setsize && ((byte_t *)at->pa_cpuset)[setsize - 1] == 0)
+				--setsize;
+		}
+		/* Check if the given buffer is too small. */
+		if (cpusetsize < setsize)
+			return EINVAL; /* GLibc returns EINVAL here (I would have used ERANGE for this, but whatever...) */
+		p = (byte_t *)mempcpy(cpuset, at->pa_cpuset, setsize);
+		/* Fill in the remainder with zeroes */
+		memset(p, 0, cpusetsize - setsize);
+	} else {
+		/* No affinity set defined -> All cpus may be used. */
+		memset(cpuset, 0xff, cpusetsize);
+	}
+	return EOK;
 }
 /*[[[end:pthread_attr_getaffinity_np]]]*/
 
@@ -462,9 +907,37 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_getattr_default_np") int
 NOTHROW_NCX(LIBCCALL libc_pthread_getattr_default_np)(pthread_attr_t *attr)
 /*[[[body:pthread_getattr_default_np]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_getattr_default_np"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	struct pthread_attr *at;
+	cpu_set_t *cpuset = NULL;
+	size_t cpuset_size = 0;
+	at = (struct pthread_attr *)attr;
+again:
+	atomic_rwlock_read(&pthread_default_attr_lock);
+	memcpy(at, &pthread_default_attr, sizeof(struct pthread_attr));
+	if (pthread_default_attr.pa_cpuset) {
+		if (pthread_default_attr.pa_cpuset == (cpu_set_t *)&pthread_default_attr.pa_cpusetsize) {
+			at->pa_cpuset = (cpu_set_t *)&at->pa_cpusetsize;
+		} else if (cpuset_size != pthread_default_attr.pa_cpusetsize) {
+			cpuset_size = pthread_default_attr.pa_cpusetsize;
+			atomic_rwlock_endread(&pthread_default_attr_lock);
+			cpuset = (cpu_set_t *)realloc(cpuset, cpuset_size);
+			if unlikely(!cpuset)
+				return ENOMEM;
+			goto again;
+		}
+		at->pa_cpuset     = cpuset;
+		at->pa_cpusetsize = cpuset_size;
+		cpuset            = NULL; /* Don't free() below */
+	}
+	atomic_rwlock_endread(&pthread_default_attr_lock);
+	if (at->pa_stacksize == 0)
+		at->pa_stacksize = PTHREAD_STACK_MIN;
+	free(cpuset);
+	__STATIC_IF(sizeof(pthread_attr_t) > sizeof(struct pthread_attr)) {
+		memset((byte_t *)at + sizeof(struct pthread_attr), 0x00,
+		       sizeof(pthread_attr_t) - sizeof(struct pthread_attr));
+	}
+	return EOK;
 }
 /*[[[end:pthread_getattr_default_np]]]*/
 
@@ -475,9 +948,45 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_setattr_default_np") int
 NOTHROW_NCX(LIBCCALL libc_pthread_setattr_default_np)(pthread_attr_t const *attr)
 /*[[[body:pthread_setattr_default_np]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_setattr_default_np"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	struct pthread_attr *at;
+	cpu_set_t *old_set = NULL;
+	cpu_set_t *new_set = NULL;
+	size_t new_set_size = 0;
+	at = (struct pthread_attr *)attr;
+	if (at->pa_cpuset &&
+	    at->pa_cpuset != (cpu_set_t *)&at->pa_cpusetsize) {
+		new_set_size = at->pa_cpusetsize;
+		new_set      = (cpu_set_t *)malloc(at->pa_cpusetsize);
+		if unlikely(!new_set)
+			return ENOMEM;
+	}
+	atomic_rwlock_write(&pthread_default_attr_lock);
+	old_set = pthread_default_attr.pa_cpuset;
+	if (old_set == (cpu_set_t *)&pthread_default_attr.pa_cpusetsize)
+		old_set = NULL;
+	if (new_set) {
+		/* Set large affinity set */
+		pthread_default_attr.pa_cpuset     = new_set;
+		pthread_default_attr.pa_cpusetsize = new_set_size;
+	} else if (at->pa_cpuset) {
+		/* Copy small affinity set */
+		assert(at->pa_cpuset == (cpu_set_t *)&at->pa_cpusetsize);
+		pthread_default_attr.pa_cpuset     = (cpu_set_t *)&pthread_default_attr.pa_cpusetsize;
+		pthread_default_attr.pa_cpusetsize = at->pa_cpusetsize;
+	} else {
+		/* Clear affinity */
+		pthread_default_attr.pa_cpuset     = NULL;
+		pthread_default_attr.pa_cpusetsize = 0;
+	}
+	pthread_default_attr.pa_schedparam  = at->pa_schedparam;
+	pthread_default_attr.pa_schedpolicy = at->pa_schedpolicy;
+	pthread_default_attr.pa_flags       = at->pa_flags;
+	pthread_default_attr.pa_guardsize   = at->pa_guardsize;
+	pthread_default_attr.pa_stackaddr   = at->pa_stackaddr;
+	pthread_default_attr.pa_stacksize   = at->pa_stacksize;
+	atomic_rwlock_endwrite(&pthread_default_attr_lock);
+	free(old_set);
+	return EOK;
 }
 /*[[[end:pthread_setattr_default_np]]]*/
 
@@ -491,9 +1000,61 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getattr_np)(pthread_t pthread,
                                               pthread_attr_t *attr)
 /*[[[body:pthread_getattr_np]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_getattr_np"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	int result;
+	struct pthread *pt = (struct pthread *)pthread;
+	struct pthread_attr *at = (struct pthread_attr *)attr;
+	result = pthread_getschedparam(pthread, &at->pa_schedpolicy, &at->pa_schedparam);
+	if (result != EOK)
+		goto done;
+	if (pt->pt_flags & PTHREAD_FNOSTACK) {
+		at->pa_stackaddr = NULL;
+		at->pa_stacksize = 0;
+	} else {
+		at->pa_stackaddr = pt->pt_stackaddr;
+		at->pa_stacksize = pt->pt_stacksize;
+	}
+	at->pa_guardsize = getpagesize();
+	at->pa_flags = ATTR_FLAG_SCHED_SET | ATTR_FLAG_POLICY_SET;
+	if (pt->pt_flags & PTHREAD_FUSERSTACK)
+		at->pa_flags |= ATTR_FLAG_STACKADDR;
+	at->pa_cpuset = (cpu_set_t *)&at->pa_cpusetsize;
+	result = pthread_getaffinity_np(pthread, sizeof(at->pa_cpusetsize), at->pa_cpuset);
+	if (result == EINVAL) {
+		/* Buffer too small. */
+		cpu_set_t *buf = NULL, *newbuf;
+		size_t bufsize = sizeof(at->pa_cpusetsize) * 2;
+		do {
+			newbuf = (cpu_set_t *)realloc(buf, bufsize);
+			if unlikely(!newbuf) {
+				free(buf);
+				return ENOMEM;
+			}
+			buf = newbuf;
+			result = pthread_getaffinity_np(pthread, bufsize, buf);
+			if (result == EOK) {
+				while (bufsize && ((byte_t *)buf)[bufsize - 1])
+					--bufsize;
+				if unlikely(!bufsize) {
+					free(buf);
+					at->pa_cpuset     = NULL;
+					at->pa_cpusetsize = 0;
+				} else {
+					newbuf = (cpu_set_t *)realloc(buf, bufsize);
+					if likely(newbuf)
+						buf = newbuf;
+					at->pa_cpuset     = buf;
+					at->pa_cpusetsize = bufsize;
+				}
+				goto done;
+			}
+			if (result != EINVAL)
+				break;
+			bufsize *= 2;
+		} while (bufsize < sizeof(at->pa_cpusetsize) * 512);
+		free(buf);
+	}
+done:
+	return result;
 }
 /*[[[end:pthread_getattr_np]]]*/
 
@@ -506,9 +1067,32 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setschedparam)(pthread_t target_thread,
                                                  struct sched_param const *param)
 /*[[[body:pthread_setschedparam]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_setschedparam"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	errno_t result;
+	struct pthread *pt = (struct pthread *)target_thread;
+	pid_t tid = ATOMIC_READ(pt->pt_tid);
+	syscall_slong_t old_policy;
+	struct sched_param old_param;
+	if unlikely(tid == 0)
+		return ESRCH; /* The given thread has already terminated. */
+	old_policy = sys_sched_getscheduler(tid);
+	if (E_ISERR(old_policy))
+		return (int)-old_policy;
+	result = sys_sched_getparam(tid, &old_param);
+	if (E_ISERR(result))
+		return (int)-result;
+	result = sys_sched_setscheduler(tid, policy, param);
+	if (E_ISERR(result))
+		return -result;
+	if unlikely(tid != ATOMIC_READ(pt->pt_tid)) {
+		/* The thread has terminated in the mean time, and we've accidentally
+		 * modified the scheduler parameters of some unrelated thread.
+		 * Try to undo the damage we've caused...
+		 * Note: This is a race condition that Glibc
+		 *       doesn't even check and simply ignores! */
+		sys_sched_setscheduler(tid, old_policy, &old_param);
+		return ESRCH;
+	}
+	return EOK;
 }
 /*[[[end:pthread_setschedparam]]]*/
 
@@ -521,9 +1105,26 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getschedparam)(pthread_t target_thread,
                                                  struct sched_param *__restrict param)
 /*[[[body:pthread_getschedparam]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_getschedparam"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	errno_t result;
+	struct pthread *pt = (struct pthread *)target_thread;
+	pid_t tid = ATOMIC_READ(pt->pt_tid);
+	syscall_slong_t sys_policy;
+	if unlikely(tid == 0)
+		return ESRCH; /* The given thread has already terminated. */
+	sys_policy = sys_sched_getscheduler(tid);
+	if (E_ISERR(sys_policy))
+		return (int)-sys_policy;
+	*policy = sys_policy;
+	result = sys_sched_getparam(tid, param);
+	if (E_ISERR(result))
+		return (int)-result;
+	if unlikely(tid != ATOMIC_READ(pt->pt_tid)) {
+		/* The thread has terminated in the mean time.
+		 * Note: This is a race condition that Glibc
+		 *       doesn't even check and simply ignores! */
+		return ESRCH;
+	}
+	return EOK;
 }
 /*[[[end:pthread_getschedparam]]]*/
 
@@ -534,9 +1135,26 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setschedprio)(pthread_t target_thread,
                                                 int prio)
 /*[[[body:pthread_setschedprio]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_setschedprio"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	errno_t error;
+	syscall_slong_t old_prio;
+	struct pthread *pt = (struct pthread *)target_thread;
+	pid_t tid = ATOMIC_READ(pt->pt_tid);
+	if (tid == 0)
+		return ESRCH;
+	old_prio = sys_getpriority(PRIO_PROCESS, tid);
+	if (E_ISERR(old_prio))
+		return (int)-old_prio;
+	error = sys_setpriority(PRIO_PROCESS, tid, (syscall_ulong_t)(20 - prio));
+	if (E_ISERR(error))
+		return (int)-error;
+	if unlikely(tid != ATOMIC_READ(pt->pt_tid)) {
+		/* The thread has terminated in the mean time.
+		 * Note: This is a race condition that Glibc
+		 *       doesn't even check and simply ignores! */
+		sys_setpriority(PRIO_PROCESS, tid, old_prio);
+		return ESRCH;
+	}
+	return EOK;
 }
 /*[[[end:pthread_setschedprio]]]*/
 
@@ -549,9 +1167,15 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getname_np)(pthread_t target_thread,
                                               size_t buflen)
 /*[[[body:pthread_getname_np]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_getname_np"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	struct pthread *pt = (struct pthread *)target_thread;
+	pid_t tid = ATOMIC_READ(pt->pt_tid);
+	if (tid == 0)
+		return ESRCH;
+	if (snprintf(buf, buflen, "tid{%u}", tid) >= buflen)
+		return ERANGE;
+	if (tid != ATOMIC_READ(pt->pt_tid))
+		return ESRCH;
+	return EOK;
 }
 /*[[[end:pthread_getname_np]]]*/
 
@@ -563,11 +1187,17 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setname_np)(pthread_t target_thread,
                                               const char *name)
 /*[[[body:pthread_setname_np]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_setname_np"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	struct pthread *pt = (struct pthread *)target_thread;
+	pid_t tid = ATOMIC_READ(pt->pt_tid);
+	if (tid == 0)
+		return ESRCH;
+	/* Unsupported */
+	(void)name;
+	return ENOSYS;
 }
 /*[[[end:pthread_setname_np]]]*/
+
+PRIVATE ATTR_SECTION(".bss.crt.sched.pthread.pthread_concurrency_level") int pthread_concurrency_level = 0;
 
 /*[[[head:pthread_getconcurrency,hash:CRC-32=0x885c8e2a]]]*/
 /* Determine level of concurrency */
@@ -575,9 +1205,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_getconcurrency") 
 NOTHROW_NCX(LIBCCALL libc_pthread_getconcurrency)(void)
 /*[[[body:pthread_getconcurrency]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_getconcurrency"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	return pthread_concurrency_level;
 }
 /*[[[end:pthread_getconcurrency]]]*/
 
@@ -587,9 +1215,10 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_setconcurrency") 
 NOTHROW_NCX(LIBCCALL libc_pthread_setconcurrency)(int level)
 /*[[[body:pthread_setconcurrency]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_setconcurrency"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	if (level < 0)
+		return EINVAL;
+	pthread_concurrency_level = level;
+	return EOK;
 }
 /*[[[end:pthread_setconcurrency]]]*/
 
@@ -602,9 +1231,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_yield") int
 NOTHROW_NCX(LIBCCALL libc_pthread_yield)(void)
 /*[[[body:pthread_yield]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_yield"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	return -sys_sched_yield();
 }
 /*[[[end:pthread_yield]]]*/
 
@@ -617,9 +1244,64 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setaffinity_np)(pthread_t pthread,
                                                   cpu_set_t const *cpuset)
 /*[[[body:pthread_setaffinity_np]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_setaffinity_np"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	errno_t error;
+	struct pthread *pt = (struct pthread *)pthread;
+	size_t old_cpusetsize;
+	cpu_set_t *old_cpuset = (cpu_set_t *)&old_cpusetsize;
+	pid_t tid = ATOMIC_READ(pt->pt_tid);
+	if (tid == 0)
+		return ESRCH;
+	error = sys_sched_getaffinity(tid, sizeof(old_cpusetsize), old_cpuset);
+	if (error == EINVAL) {
+		/* Buffer too small. */
+		cpu_set_t *buf = NULL, *newbuf;
+		size_t bufsize = sizeof(old_cpusetsize) * 2;
+		for (;;) {
+			newbuf = (cpu_set_t *)realloc(buf, bufsize);
+			if unlikely(!newbuf) {
+				free(buf);
+				return ENOMEM;
+			}
+			buf = newbuf;
+			error = sys_sched_getaffinity(tid, bufsize, buf);
+			if (E_ISOK(error)) {
+				while (bufsize && ((byte_t *)buf)[bufsize - 1])
+					--bufsize;
+				if unlikely(!bufsize) {
+					free(buf);
+					old_cpuset     = NULL;
+					old_cpusetsize = 0;
+				} else {
+					newbuf = (cpu_set_t *)realloc(buf, bufsize);
+					if likely(newbuf)
+						buf = newbuf;
+					old_cpuset     = buf;
+					old_cpusetsize = bufsize;
+				}
+				goto got_old_affinity;
+			}
+			if (error != -EINVAL || (bufsize >= sizeof(old_cpusetsize) * 512)) {
+				free(buf);
+				return (int)-error;
+			}
+			bufsize *= 2;
+		}
+		free(buf);
+	}
+got_old_affinity:
+	error = sys_sched_setaffinity(tid, cpusetsize, cpuset);
+	if (E_ISOK(error)) {
+		if unlikely(tid != ATOMIC_READ(pt->pt_tid)) {
+			/* The thread has terminated in the mean time.
+			 * Note: This is a race condition that Glibc
+			 *       doesn't even check and simply ignores! */
+			sys_sched_setaffinity(tid, old_cpusetsize, old_cpuset);
+			error = -ESRCH;
+		}
+	}
+	if (old_cpuset != (cpu_set_t *)&old_cpusetsize)
+		free(old_cpuset);
+	return (int)-error;
 }
 /*[[[end:pthread_setaffinity_np]]]*/
 
@@ -632,9 +1314,21 @@ NOTHROW_NCX(LIBCCALL libc_pthread_getaffinity_np)(pthread_t pthread,
                                                   cpu_set_t *cpuset)
 /*[[[body:pthread_getaffinity_np]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_getaffinity_np"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	errno_t error;
+	struct pthread *pt = (struct pthread *)pthread;
+	pid_t tid = ATOMIC_READ(pt->pt_tid);
+	if unlikely(tid == 0)
+		return ESRCH;
+	error = sys_sched_getaffinity(tid, cpusetsize, cpuset);
+	if (E_ISOK(error)) {
+		if unlikely(tid != ATOMIC_READ(pt->pt_tid)) {
+			/* The thread has terminated in the mean time.
+			 * Note: This is a race condition that Glibc
+			 *       doesn't even check and simply ignores! */
+			error = -ESRCH;
+		}
+	}
+	return (int)-error;
 }
 /*[[[end:pthread_getaffinity_np]]]*/
 
@@ -684,28 +1378,48 @@ NOTHROW_NCX(LIBCCALL libc_pthread_setcanceltype)(int type,
 }
 /*[[[end:pthread_setcanceltype]]]*/
 
+PRIVATE ATTR_SECTION(".text.crt.sched.pthread.pthread_cancel_self")
+void LIBCCALL pthread_cancel_self(void) {
+	THROW(E_EXIT_THREAD);
+}
+
 /*[[[head:pthread_cancel,hash:CRC-32=0x2e8ff8d9]]]*/
 /* Cancel THREAD immediately or at the next possibility */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_cancel") int
 NOTHROW_NCX(LIBCCALL libc_pthread_cancel)(pthread_t pthread)
 /*[[[body:pthread_cancel]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_cancel"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	struct pthread *pt = (struct pthread *)pthread;
+	pid_t tid;
+	/* Make sure that we can load librpc */
+	if (!librpc_init())
+		return ENOSYS;
+	tid = ATOMIC_READ(pt->pt_tid);
+	if unlikely(tid == 0)
+		return ESRCH;
+	/* Schedule an RPC in the target thread that will cause the thread to terminate itself. */
+	/* In this case, we sadly cannot handle the race condition of `tid'
+	 * terminating at this point (causing the id to become invalid), since
+	 * we cannot undo the RPC schedule operation in that case... */
+	if ((*pdyn_rpc_schedule)(tid, RPC_SCHEDULE_SYNC, (void (*)())&pthread_cancel_self, 0))
+		return libc_geterrno();
+	return EOK;
 }
 /*[[[end:pthread_cancel]]]*/
 
-/*[[[head:pthread_testcancel,hash:CRC-32=0xe33f9406]]]*/
+/*[[[head:pthread_testcancel,hash:CRC-32=0xc47b2d2c]]]*/
 /* Test for pending cancellation for the current thread and terminate
- * the thread as per pthread_exit(PTHREAD_CANCELED) if it has been
- * cancelled */
+ * the thread as per pthread_exit(PTHREAD_CANCELED) if it has been canceled */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_testcancel") void
 NOTHROW_RPC(LIBCCALL libc_pthread_testcancel)(void)
 /*[[[body:pthread_testcancel]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_testcancel"); /* TODO */
-	libc_seterrno(ENOSYS);
+	/* Load librpc and use it to service RPCs
+	 * Technically, we could just directly invoke `sys_rpc_service()', however
+	 * this method allows librpc to perform additional functions, and also makes
+	 * it more clear that it is actually librpc that implements this behavior! */
+	if (librpc_init())
+		(*pdyn_rpc_service)();
 }
 /*[[[end:pthread_testcancel]]]*/
 

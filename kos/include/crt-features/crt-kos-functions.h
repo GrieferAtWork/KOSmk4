@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7539a2c3 */
+/* HASH CRC-32:0x6fb8c95d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1492,7 +1492,7 @@ __CRT_FUNCTION(pthread_condattr_getpshared,0,(),2,(pthread_condattr_t const *__r
 __CRT_FUNCTION(pthread_condattr_init,0,(),1,(pthread_condattr_t *,attr),int)
 __CRT_FUNCTION(pthread_condattr_setclock,0,(),2,(pthread_condattr_t *,attr,clockid_t,clock_id),int)
 __CRT_FUNCTION(pthread_condattr_setpshared,0,(),2,(pthread_condattr_t *,attr,int,pshared),int)
-__CRT_FUNCTION(pthread_create,0,(),4,(pthread_t *__restrict,newthread,pthread_attr_t const *__restrict,attr,__pthread_start_routine_t,__start_routine,void *__restrict,__arg),int)
+__CRT_FUNCTION(pthread_create,0,(),4,(pthread_t *__restrict,newthread,pthread_attr_t const *__restrict,attr,__pthread_start_routine_t,start_routine,void *__restrict,arg),int)
 __CRT_FUNCTION(pthread_detach,0,(),1,(pthread_t,pthread),int)
 __CRT_FUNCTION(pthread_equal,0,(),2,(pthread_t,pthread1,pthread_t,pthread2),int)
 __CRT_FUNCTION(pthread_exit,0,(),1,(void *,retval),void)

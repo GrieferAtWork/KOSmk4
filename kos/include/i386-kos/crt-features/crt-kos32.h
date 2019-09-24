@@ -1312,6 +1312,8 @@
 #define __CRT_HAVE_dlmodulefd 1
 #define __CRT_HAVE_dlopen 1
 #define __CRT_HAVE_dlsym 1
+#define __CRT_HAVE_dltlsallocseg 1
+#define __CRT_HAVE_dltlsfreeseg 1
 #define __CRT_HAVE_dprintf 1
 #define __CRT_HAVE_drand48 1
 #define __CRT_HAVE_drand48_r 1

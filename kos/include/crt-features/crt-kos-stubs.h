@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd8c8a8bd */
+/* HASH CRC-32:0x4a3de292 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -424,28 +424,6 @@
 #define __CRT_STUB_psiginfo 1
 #define __CRT_STUB_psignal 1
 #define __CRT_STUB_pthread_atfork 1
-#define __CRT_STUB_pthread_attr_destroy 1
-#define __CRT_STUB_pthread_attr_getaffinity_np 1
-#define __CRT_STUB_pthread_attr_getdetachstate 1
-#define __CRT_STUB_pthread_attr_getguardsize 1
-#define __CRT_STUB_pthread_attr_getinheritsched 1
-#define __CRT_STUB_pthread_attr_getschedparam 1
-#define __CRT_STUB_pthread_attr_getschedpolicy 1
-#define __CRT_STUB_pthread_attr_getscope 1
-#define __CRT_STUB_pthread_attr_getstack 1
-#define __CRT_STUB_pthread_attr_getstackaddr 1
-#define __CRT_STUB_pthread_attr_getstacksize 1
-#define __CRT_STUB_pthread_attr_init 1
-#define __CRT_STUB_pthread_attr_setaffinity_np 1
-#define __CRT_STUB_pthread_attr_setdetachstate 1
-#define __CRT_STUB_pthread_attr_setguardsize 1
-#define __CRT_STUB_pthread_attr_setinheritsched 1
-#define __CRT_STUB_pthread_attr_setschedparam 1
-#define __CRT_STUB_pthread_attr_setschedpolicy 1
-#define __CRT_STUB_pthread_attr_setscope 1
-#define __CRT_STUB_pthread_attr_setstack 1
-#define __CRT_STUB_pthread_attr_setstackaddr 1
-#define __CRT_STUB_pthread_attr_setstacksize 1
 #define __CRT_STUB_pthread_barrier_destroy 1
 #define __CRT_STUB_pthread_barrier_init 1
 #define __CRT_STUB_pthread_barrier_wait 1
@@ -453,7 +431,6 @@
 #define __CRT_STUB_pthread_barrierattr_getpshared 1
 #define __CRT_STUB_pthread_barrierattr_init 1
 #define __CRT_STUB_pthread_barrierattr_setpshared 1
-#define __CRT_STUB_pthread_cancel 1
 #define __CRT_STUB_pthread_cond_broadcast 1
 #define __CRT_STUB_pthread_cond_destroy 1
 #define __CRT_STUB_pthread_cond_init 1
@@ -466,18 +443,8 @@
 #define __CRT_STUB_pthread_condattr_init 1
 #define __CRT_STUB_pthread_condattr_setclock 1
 #define __CRT_STUB_pthread_condattr_setpshared 1
-#define __CRT_STUB_pthread_create 1
-#define __CRT_STUB_pthread_detach 1
-#define __CRT_STUB_pthread_exit 1
-#define __CRT_STUB_pthread_getaffinity_np 1
-#define __CRT_STUB_pthread_getattr_default_np 1
-#define __CRT_STUB_pthread_getattr_np 1
-#define __CRT_STUB_pthread_getconcurrency 1
 #define __CRT_STUB_pthread_getcpuclockid 1
-#define __CRT_STUB_pthread_getname_np 1
-#define __CRT_STUB_pthread_getschedparam 1
 #define __CRT_STUB_pthread_getspecific 1
-#define __CRT_STUB_pthread_join 1
 #define __CRT_STUB_pthread_key_create 1
 #define __CRT_STUB_pthread_key_delete 1
 #define __CRT_STUB_pthread_kill 1
@@ -522,14 +489,8 @@
 #define __CRT_STUB_pthread_rwlockattr_setkind_np 1
 #define __CRT_STUB_pthread_rwlockattr_setpshared 1
 #define __CRT_STUB_pthread_self 1
-#define __CRT_STUB_pthread_setaffinity_np 1
-#define __CRT_STUB_pthread_setattr_default_np 1
 #define __CRT_STUB_pthread_setcancelstate 1
 #define __CRT_STUB_pthread_setcanceltype 1
-#define __CRT_STUB_pthread_setconcurrency 1
-#define __CRT_STUB_pthread_setname_np 1
-#define __CRT_STUB_pthread_setschedparam 1
-#define __CRT_STUB_pthread_setschedprio 1
 #define __CRT_STUB_pthread_setspecific 1
 #define __CRT_STUB_pthread_sigmask 1
 #define __CRT_STUB_pthread_sigqueue 1
@@ -538,10 +499,6 @@
 #define __CRT_STUB_pthread_spin_lock 1
 #define __CRT_STUB_pthread_spin_trylock 1
 #define __CRT_STUB_pthread_spin_unlock 1
-#define __CRT_STUB_pthread_testcancel 1
-#define __CRT_STUB_pthread_timedjoin_np 1
-#define __CRT_STUB_pthread_tryjoin_np 1
-#define __CRT_STUB_pthread_yield 1
 #define __CRT_STUB_ptsname 1
 #define __CRT_STUB_ptsname_r 1
 #define __CRT_STUB_putenv 1
