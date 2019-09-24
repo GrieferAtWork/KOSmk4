@@ -387,8 +387,14 @@ stub_scroll_with_copycell(struct ansitty *__restrict self,
 done:
 	return;
 clearall:
-	/* TODO: Only clear within the scroll region! */
-	CLS(ANSITTY_CLS_ALL);
+	/* Only clear cells within the scroll region! */
+	if (y_start == 0 && y_end >= sxy[1]) {
+		CLS(ANSITTY_CLS_ALL);
+	} else {
+		SETCURSOR(0, xy[1], false);
+		FILLCELL(' ', y_size * xy[0]);
+		SETCURSOR(xy[0], xy[1], false);
+	}
 }
 
 
