@@ -33,6 +33,7 @@
 #include <kernel/syscall.h>
 #include <kernel/user.h>
 #include <kernel/vm.h>
+#include <sched/except-handler.h>
 #include <sched/cpu.h>
 #include <sched/pid.h>
 #include <sched/rpc.h>
@@ -310,7 +311,8 @@ again_lock_vm:
 		if (clone_flags & CLONE_PARENT_SETTID)
 			ATOMIC_WRITE(*parent_tidptr, result_pid);
 		if (clone_flags & CLONE_CHILD_CLEARTID) {
-			/* TODO: `set_tid_address(child_tidptr)' (we're just not implementing that system call, yet...) */
+			/* `set_tid_address(child_tidptr)' */
+			FORTASK(result, _this_tid_address) = child_tidptr;
 		}
 
 #if 0 /* XXX: Remove me (only here to force & verify use of IPI mechanisms in multi-core situations)

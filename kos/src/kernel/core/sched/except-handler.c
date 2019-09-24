@@ -24,10 +24,11 @@
 #include <kernel/except.h>
 #include <kernel/paging.h>
 #include <kernel/syscall.h>
-#include <kernel/vm.h> /* DEFINE_PERVM_ONEXEC() */
 #include <kernel/types.h>
 #include <kernel/user.h>
+#include <kernel/vm.h> /* DEFINE_PERVM_ONEXEC() */
 #include <sched/except-handler.h>
+#include <sched/pid.h>
 #include <sched/task.h>
 
 #include <kos/except-handler.h>
@@ -44,6 +45,45 @@ PUBLIC ATTR_PERTASK struct user_except_handler _this_user_except_handler = {
 	/* .ueh_handler = */NULL,
 	/* .ueh_stack   = */EXCEPT_HANDLER_SP_CURRENT,
 };
+
+/* [0..1] User-space TID address used to implement functionality such as `pthread_join()'
+ *        When the associated thread exits, it will:
+ *        >> pid_t *addr = PERTASK_GET(_this_tid_address);
+ *        >> if (addr) {
+ *        >>     TRY {
+ *        >>         *addr = 0;
+ *        >>         vm_futex_broadcast(addr);
+ *        >>     } EXCEPT {
+ *        >>         if (!was_thrown(E_SEGFAULT) ||
+ *        >>             error_data()->e_pointers[0] != (uintptr_t)addr)
+ *        >>             error_printf("...");
+ *        >>     }
+ *        >> }
+ * When a new thread is created by clone(), the `CLONE_CHILD_CLEARTID' flag will cause
+ * the given `ctid' to be used as the initial value for `_this_tid_address', while the
+ * `CLONE_CHILD_SETTID' flag will cause the same address to be filled with the thread's
+ * TID. */
+PUBLIC ATTR_PERTASK USER CHECKED pid_t *_this_tid_address = NULL;
+DEFINE_PERTASK_ONEXIT(pertask_onexit_broadcast_tid_address);
+INTERN ATTR_USED void NOTHROW(KCALL pertask_onexit_broadcast_tid_address)(void) {
+	pid_t *addr = PERTASK_GET(_this_tid_address);
+	if (addr) {
+		TRY {
+			*addr = 0;
+			vm_futex_broadcast(addr);
+		} EXCEPT {
+			/* Explicitly handle E_SEGFAULT:addr as a no-op */
+			if (!was_thrown(E_SEGFAULT) ||
+			    error_data()->e_pointers[0] != (uintptr_t)addr) {
+				/* We can't RETHROW() the exception since our function
+				 * has to be NOTHROW() (especially so since we're called
+				 * as part of thread cleanup)
+				 * Because of this, dump all other errors that happen here. */
+				error_printf("Broadcasting tid_address=%p", addr);
+			}
+		}
+	}
+}
 
 
 DEFINE_PERTASK_CLONE(clone_user_except_handler);
@@ -62,6 +102,8 @@ NOTHROW(KCALL reset_user_except_handler)(void) {
 	hand            = &PERTASK(_this_user_except_handler);
 	hand->ueh_mode  = EXCEPT_HANDLER_MODE_DISABLED;
 	hand->ueh_stack = EXCEPT_HANDLER_SP_CURRENT;
+	/* Reset the TID address of the calling thread. */
+	PERTASK_SET(_this_tid_address, (pid_t *)NULL);
 }
 
 
@@ -86,9 +128,9 @@ DEFINE_SYSCALL3(errno_t, set_exception_handler,
 		if (handler_sp != EXCEPT_HANDLER_SP_CURRENT) {
 #ifdef __ARCH_STACK_GROWS_DOWNWARDS
 			validate_writable((byte_t *)handler_sp - 1, 1);
-#else
+#else /* __ARCH_STACK_GROWS_DOWNWARDS */
 			validate_writable((byte_t *)handler_sp, 1);
-#endif
+#endif /* !__ARCH_STACK_GROWS_DOWNWARDS */
 		}
 		exc->ueh_stack = handler_sp;
 	}
@@ -104,6 +146,7 @@ DEFINE_SYSCALL3(errno_t, set_exception_handler,
 	}
 	return -EOK;
 }
+
 DEFINE_SYSCALL3(errno_t, get_exception_handler,
                 USER UNCHECKED syscall_ulong_t *, pmode,
                 USER UNCHECKED except_handler_t *, phandler,
@@ -128,7 +171,6 @@ DEFINE_SYSCALL3(errno_t, get_exception_handler,
 	return -EOK;
 }
 
-
 DEFINE_SYSCALL2(errno_t, sigaltstack,
                 USER UNCHECKED struct sigaltstack const *, ss,
                 USER UNCHECKED struct sigaltstack *, oss) {
@@ -151,7 +193,7 @@ DEFINE_SYSCALL2(errno_t, sigaltstack,
 				oss->ss_sp   = (void *)PAGESIZE;
 				oss->ss_size = (uintptr_t)sp - PAGESIZE;
 			}
-#else
+#else /* HIGH_MEMORY_KERNEL */
 			if unlikely((uintptr_t)sp <= KERNEL_CEILING) {
 				oss->ss_sp   = 0;
 				oss->ss_size = (uintptr_t)sp;
@@ -159,16 +201,16 @@ DEFINE_SYSCALL2(errno_t, sigaltstack,
 				oss->ss_sp   = (void *)KERNEL_CEILING;
 				oss->ss_size = (uintptr_t)sp - KERNEL_CEILING;
 			}
-#endif
-#else
+#endif /* !HIGH_MEMORY_KERNEL */
+#else /* __ARCH_STACK_GROWS_DOWNWARDS */
 #ifdef HIGH_MEMORY_KERNEL
 			oss->ss_sp   = sp;
 			oss->ss_size = (uintptr_t)KERNEL_BASE - (uintptr_t)sp;
-#else
+#else /* HIGH_MEMORY_KERNEL */
 			oss->ss_sp   = sp;
 			oss->ss_size = sp == 0 ? (uintptr_t)-1 : (uintptr_t)0 - (uintptr_t)sp;
-#endif
-#endif
+#endif /* !HIGH_MEMORY_KERNEL */
+#endif /* !__ARCH_STACK_GROWS_DOWNWARDS */
 		}
 	}
 	if (ss) {
@@ -192,6 +234,14 @@ DEFINE_SYSCALL2(errno_t, sigaltstack,
 	}
 	return -EOK;
 }
+
+DEFINE_SYSCALL1(pid_t, set_tid_address,
+                USER UNCHECKED pid_t *, tidptr) {
+	validate_writable(tidptr, sizeof(*tidptr));
+	PERTASK_SET(_this_tid_address, tidptr);
+	return task_gettid();
+}
+
 
 
 DECL_END

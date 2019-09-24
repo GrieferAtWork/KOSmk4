@@ -1425,8 +1425,10 @@ NOTHROW_NCX(LIBCCALL libc_pthread_cancel)(pthread_t pthread)
 	/* In this case, we sadly cannot handle the race condition of `tid'
 	 * terminating at this point (causing the id to become invalid), since
 	 * we cannot undo the RPC schedule operation in that case...
-	 * TODO: This is unsafe when the target thread has already unmapped
-	 *       its stack within `libc_pthread_unmap_stack_and_exit()' */
+	 * NOTE: This is _NOT_ unsafe, even when the target thread has already
+	 *       unmapped its stack within `libc_pthread_unmap_stack_and_exit()'
+	 *       The reason for this is the `RPC_SCHEDULE_SYNC' which only allows
+	 *       the RPC to be executed as the result of a blocking operation! */
 	if ((*pdyn_rpc_schedule)(tid, RPC_SCHEDULE_SYNC, (void (*)())&pthread_cancel_self, 0))
 		return libc_geterrno();
 	return EOK;

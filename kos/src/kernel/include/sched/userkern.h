@@ -46,8 +46,6 @@ DATDEF struct vm_datablock_type_vio userkern_segment_vio;
 DATDEF struct vm_datablock userkern_segment_block;
 DATDEF struct vm_datapart userkern_segment_part;
 
-
-
 DECL_END
 
 #endif /* __CC__ */

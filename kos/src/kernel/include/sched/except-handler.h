@@ -31,14 +31,33 @@ DECL_BEGIN
 /* User-space exception handler descriptor. */
 #ifdef __CC__
 struct user_except_handler {
-	uintptr_t                       ueh_mode;    /* Handler mode (One of `EXCEPT_HANDLER_MODE_*' + set of `EXCEPT_HANDLER_FLAG_*') */
-	USER CHECKED except_handler_t   ueh_handler; /* [valid_if(EXCEPT_HANDLER_FLAG_SETHANDLER)] Handler entry point */
-	USER CHECKED void              *ueh_stack;   /* Handler stack (or `EXCEPT_HANDLER_SP_CURRENT' when not set)
-	                                              * NOTE: This pointer also doubles as the user-space sigaltstack! */
+	uintptr_t                     ueh_mode;    /* Handler mode (One of `EXCEPT_HANDLER_MODE_*' + set of `EXCEPT_HANDLER_FLAG_*') */
+	USER CHECKED except_handler_t ueh_handler; /* [valid_if(EXCEPT_HANDLER_FLAG_SETHANDLER)] Handler entry point */
+	USER CHECKED void            *ueh_stack;   /* Handler stack (or `EXCEPT_HANDLER_SP_CURRENT' when not set)
+	                                            * NOTE: This pointer also doubles as the user-space sigaltstack! */
 };
 
 /* User-space exception handler mode for the current thread. */
 DATDEF ATTR_PERTASK struct user_except_handler _this_user_except_handler;
+
+/* [0..1] User-space TID address used to implement functionality such as `pthread_join()'
+ *        When the associated thread exits, it will:
+ *        >> pid_t *addr = PERTASK_GET(_this_tid_address);
+ *        >> if (addr) {
+ *        >>     TRY {
+ *        >>         *addr = 0;
+ *        >>         vm_futex_broadcast(addr);
+ *        >>     } EXCEPT {
+ *        >>         if (!was_thrown(E_SEGFAULT) ||
+ *        >>             error_data()->e_pointers[0] != (uintptr_t)addr)
+ *        >>             error_printf("...");
+ *        >>     }
+ *        >> }
+ * When a new thread is created by clone(), the `CLONE_CHILD_CLEARTID' flag will cause
+ * the given `ctid' to be used as the initial value for `_this_tid_address', while the
+ * `CLONE_CHILD_SETTID' flag will cause the same address to be filled with the thread's
+ * TID. */
+DATDEF ATTR_PERTASK USER CHECKED pid_t *_this_tid_address;
 
 #endif /* __CC__ */
 

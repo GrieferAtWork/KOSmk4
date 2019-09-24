@@ -64,6 +64,7 @@
 #define __CRT_HAVE__this_task 1
 #define __CRT_HAVE__this_taskgroup 1
 #define __CRT_HAVE__this_taskpid 1
+#define __CRT_HAVE__this_tid_address 1
 #define __CRT_HAVE__this_trampoline_page 1
 #define __CRT_HAVE__this_user_except_handler 1
 #define __CRT_HAVE__this_vm 1

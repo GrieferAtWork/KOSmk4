@@ -2427,9 +2427,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, vm_node_update_write_access_locked_vm; .long 0
 	.long 0xd08a25d
 	.long .Lname606 /* index: 606 */
-	.weak task_alloc; .long task_alloc
-	.reloc ., R_386_SIZE32, task_alloc; .long 0
-	.long 0x1519bf3
+	.weak path_alloc; .long path_alloc
+	.reloc ., R_386_SIZE32, path_alloc; .long 0
+	.long 0xe515bf3
 	.long .Lname607 /* index: 607 */
 	.weak lookup_filesystem_type; .long lookup_filesystem_type
 	.reloc ., R_386_SIZE32, lookup_filesystem_type; .long 0
@@ -7887,9 +7887,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, unicode_8to32; .long 0
 	.long 0x76017b2
 	.long .Lname1971 /* index: 1971 */
-	.weak path_alloc; .long path_alloc
-	.reloc ., R_386_SIZE32, path_alloc; .long 0
-	.long 0xe515bf3
+	.weak aio_pbuffer_copyfromphys; .long aio_pbuffer_copyfromphys
+	.reloc ., R_386_SIZE32, aio_pbuffer_copyfromphys; .long 0
+	.long 0x3fe8bf3
 	.long 0 /* index: 1972 */
 	.long 0
 	.long 0
@@ -12126,10 +12126,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 3031 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname3031 /* index: 3031 */
+	.weak task_alloc; .long task_alloc
+	.reloc ., R_386_SIZE32, task_alloc; .long 0
+	.long 0x1519bf3
 	.long 0 /* index: 3032 */
 	.long 0
 	.long 0
@@ -12239,9 +12239,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname3059 /* index: 3059 */
-	.weak aio_pbuffer_copyfromphys; .long aio_pbuffer_copyfromphys
-	.reloc ., R_386_SIZE32, aio_pbuffer_copyfromphys; .long 0
-	.long 0x3fe8bf3
+	.weak _this_tid_address; .long _this_tid_address
+	.reloc ., R_386_SIZE32, _this_tid_address; .long 0
+	.long 0xea7dbf3
 	.long 0 /* index: 3060 */
 	.long 0
 	.long 0
@@ -17017,7 +17017,7 @@ END(kernel_symbol_table)
 .Lname605:
 	.string "vm_node_update_write_access_locked_vm"
 .Lname606:
-	.string "task_alloc"
+	.string "path_alloc"
 .Lname607:
 	.string "lookup_filesystem_type"
 .Lname609:
@@ -18341,7 +18341,7 @@ END(kernel_symbol_table)
 .Lname1970:
 	.string "unicode_8to32"
 .Lname1971:
-	.string "path_alloc"
+	.string "aio_pbuffer_copyfromphys"
 .Lname1973:
 	.string "cmdline_decode"
 .Lname1975:
@@ -19402,6 +19402,8 @@ END(kernel_symbol_table)
 	.string "__stack_chk_guard"
 .Lname3029:
 	.string "dbg_setcur_visible"
+.Lname3031:
+	.string "task_alloc"
 .Lname3033:
 	.string "dev_tty"
 .Lname3034:
@@ -19431,7 +19433,7 @@ END(kernel_symbol_table)
 .Lname3057:
 	.string "memmoveq"
 .Lname3059:
-	.string "aio_pbuffer_copyfromphys"
+	.string "_this_tid_address"
 .Lname3061:
 	.string "kernel_panic_scpustate"
 .Lname3063:
