@@ -38,6 +38,33 @@
 //#undef __USE_CTYPE_MACROS
 
 
+
+#if defined(__cplusplus) && !defined(_NO_IMPLICIT_GNU_SOURCE) && \
+   (defined(__GNUC__) || __has_include(<bits/vector.tcc>))
+/* Hacky work-around to satisfy header requirements for libstdc++
+ * And before you say that this is a bad way of doing it, know that
+ * on linux, g++ will _always_ pre-define `_GNU_SOURCE' straight
+ * from within the compiler itself, in order to get access to some
+ * of the symbols that are required to implement the inline functions
+ * form headers. Don't believe me? - Compile the following on a linux
+ * machine:
+ * foo.cc:
+ * >> #ifdef _GNU_SOURCE
+ * >> #error "Well... I was right."
+ * >> #endif
+ * $ g++ foo.cc
+ * So to satisfy libstdc++ in this regard, but try to be a bit nicer
+ * about it by only defining this macro when hosted by g++ (which still
+ * must be handled explicitly so-as to already expose the required
+ * symbols during the libstdc++ configure phase), or when one of the
+ * headers specific to libstdc++ are apart of the include-path (thus
+ * also supporting compilers other than g++ as well).
+ */
+#undef _GNU_SOURCE
+#define _GNU_SOURCE 1
+#endif
+
+
 #ifdef _KOS_SOURCE
 #define __USE_KOS 1
 #define __USE_STRING_BWLQ 1
@@ -67,15 +94,15 @@
 #if (_DOS_SOURCE+0) != 0
 #define __USE_DOS 1
 #define __USE_DOS_SLIB 1
-#endif
+#endif /* (_DOS_SOURCE+0) != 0 */
 #elif defined(_MSC_VER)
 #define __USE_DOS 1
 #ifndef __STDC_WANT_SECURE_LIB__
 #define __STDC_WANT_SECURE_LIB__ 1
-#endif
+#endif /* !__STDC_WANT_SECURE_LIB__ */
 #if (__STDC_WANT_SECURE_LIB__+0) != 0
 #define __USE_DOS_SLIB 1
-#endif
+#endif /* (__STDC_WANT_SECURE_LIB__+0) != 0 */
 #endif
 
 /* 64-bit time_t extensions for KOS
@@ -83,12 +110,15 @@
  *  similar to what glibc will have to do if it doesn't wan'na roll over) */
 #ifdef _TIME64_SOURCE
 #define __USE_TIME64 1
-#endif
+#endif /* _TIME64_SOURCE */
+
 #ifdef _TIME_T_BITS
 #if (_TIME_T_BITS+0) == 64
 #define __USE_TIME_BITS64 1
-#else
+#elif (_TIME_T_BITS+0) == 32
 #undef __USE_TIME_BITS64
+#else
+#error "Must #define _TIME_T_BITS as either 32 or 64"
 #endif
 #elif defined(_USE_32BIT_TIME_T)
 #undef __USE_TIME_BITS64
@@ -125,7 +155,7 @@
 #define _DEFAULT_SOURCE 1
 #undef  _ATFILE_SOURCE
 #define _ATFILE_SOURCE 1
-#endif
+#endif /* _GNU_SOURCE */
 
 #if (defined(_DEFAULT_SOURCE) || (!defined(__STRICT_ANSI__) && !defined(_ISOC99_SOURCE) && \
     !defined(_POSIX_SOURCE) && !defined(_POSIX_C_SOURCE) && !defined(_XOPEN_SOURCE)))
@@ -137,27 +167,33 @@
     (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L))
 #define __USE_ISOC11 1
 #endif
+
 #if (defined(_ISOC99_SOURCE) || defined(_ISOC11_SOURCE) || \
     (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L))
 #define __USE_ISOC99 1
 #endif
+
 #if (defined(_ISOC99_SOURCE) || defined(_ISOC11_SOURCE) || \
     (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199409L))
 #define __USE_ISOC95 1
 #endif
-#if (defined(_ISOCXX11_SOURCE) || defined(_ISOCXX14_SOURCE)) || \
+
+#if (defined(_ISOCXX11_SOURCE) || defined(_ISOCXX14_SOURCE)) || defined(_ISOCXX17_SOURCE) || \
      defined(__GXX_EXPERIMENTAL_CXX0X__) || \
     (defined(__cplusplus) && __cplusplus >= 201103L)
 #define __USE_ISOCXX11 1
 #endif
-#if defined(_ISOCXX14_SOURCE) || \
+
+#if defined(_ISOCXX14_SOURCE) || defined(_ISOCXX17_SOURCE) || \
    (defined(__cplusplus) && __cplusplus >= 201103L)
 #define __USE_ISOCXX14 1
 #endif
+
 #if defined(_ISOCXX17_SOURCE) || \
    (defined(__cplusplus) && __cplusplus >= 201703L)
 #define __USE_ISOCXX17 1
 #endif
+
 #if defined(__cplusplus) && \
   (!defined(__GNUC__) || __GCC_VERSION(4,4,0))
 /* Enable proper C++ prototype declarations. */
@@ -170,15 +206,15 @@
 #endif
 
 #ifdef _DEFAULT_SOURCE
-#if !defined(_POSIX_SOURCE) && \
-    !defined(_POSIX_C_SOURCE)
+#if !defined(_POSIX_SOURCE) && !defined(_POSIX_C_SOURCE)
 #define __USE_POSIX_IMPLICITLY 1
-#endif
+#endif /* !_POSIX_SOURCE && !_POSIX_C_SOURCE */
 #undef  _POSIX_SOURCE
 #define _POSIX_SOURCE 1
 #undef  _POSIX_C_SOURCE
 #define _POSIX_C_SOURCE 200809L
-#endif
+#endif /* _DEFAULT_SOURCE */
+
 #if (!defined(__STRICT_ANSI__) || \
      (defined(_XOPEN_SOURCE) && _XOPEN_SOURCE+0 >= 500)) && \
      !defined(_POSIX_SOURCE) && !defined(_POSIX_C_SOURCE)
@@ -198,34 +234,34 @@
 #if defined(_POSIX_SOURCE) || \
    (defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE+0 >= 1) || \
     defined(_XOPEN_SOURCE)
-# define __USE_POSIX 1
+#define __USE_POSIX 1
 #endif
 
 #if defined(_XOPEN_SOURCE) || \
    (defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE+0 >= 2)
-# define __USE_POSIX2 1
+#define __USE_POSIX2 1
 #endif
 
 #if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE+0 >= 199309L
-# define __USE_POSIX199309 1
+#define __USE_POSIX199309 1
 #endif
 
 #if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE+0 >= 199506L
-# define __USE_POSIX199506 1
+#define __USE_POSIX199506 1
 #endif
 
 #if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE+0 >= 200112L
-# define __USE_XOPEN2K  1
-# undef __USE_ISOC95
-# define __USE_ISOC95  1
-# undef __USE_ISOC99
-# define __USE_ISOC99  1
+#define __USE_XOPEN2K 1
+#undef __USE_ISOC95
+#define __USE_ISOC95 1
+#undef __USE_ISOC99
+#define __USE_ISOC99 1
 #endif
 
 #if defined(_POSIX_C_SOURCE) && _POSIX_C_SOURCE+0 >= 200809L
-# define __USE_XOPEN2K8  1
-# undef  _ATFILE_SOURCE
-# define _ATFILE_SOURCE 1
+#define __USE_XOPEN2K8 1
+#undef _ATFILE_SOURCE
+#define _ATFILE_SOURCE 1
 #endif
 
 #ifdef _XOPEN_SOURCE
@@ -239,27 +275,27 @@
 #   if _XOPEN_SOURCE+0 >= 700
 #    define __USE_XOPEN2K8 1
 #    define __USE_XOPEN2K8XSI 1
-#   endif
+#   endif /* _XOPEN_SOURCE+0 >= 700 */
 #   define __USE_XOPEN2K 1
 #   define __USE_XOPEN2KXSI 1
 #   undef __USE_ISOC95
 #   define __USE_ISOC95  1
 #   undef __USE_ISOC99
 #   define __USE_ISOC99  1
-#  endif
-# else
+#  endif /* _XOPEN_SOURCE+0 >= 600 */
+# else /* _XOPEN_SOURCE+0 >= 500 */
 #  ifdef _XOPEN_SOURCE_EXTENDED
 #   define __USE_XOPEN_EXTENDED 1
-#  endif
-# endif
-#endif
+#  endif /* _XOPEN_SOURCE_EXTENDED */
+# endif /* _XOPEN_SOURCE+0 < 500 */
+#endif /* _XOPEN_SOURCE */
 
 #ifdef _LARGEFILE_SOURCE
 #define __USE_LARGEFILE 1
-#endif
+#endif /* _LARGEFILE_SOURCE */
 #ifdef _LARGEFILE64_SOURCE
 #define __USE_LARGEFILE64 1
-#endif
+#endif /* _LARGEFILE64_SOURCE */
 #ifdef _FILE_OFFSET_BITS
 #if (_FILE_OFFSET_BITS+0) == 64
 #define __USE_FILE_OFFSET64 1
@@ -269,13 +305,13 @@
 #endif
 #ifdef _DEFAULT_SOURCE
 #define __USE_MISC 1
-#endif
+#endif /* _DEFAULT_SOURCE */
 #ifdef _ATFILE_SOURCE
 #define __USE_ATFILE 1
-#endif
+#endif /* _ATFILE_SOURCE */
 #ifdef _GNU_SOURCE
 #define __USE_GNU 1
-#endif
+#endif /* _GNU_SOURCE */
 #if (defined(_REENTRANT) || defined(_THREAD_SAFE)) || \
     (defined(__CRT_CYG) && defined(__DYNAMIC_REENT__) && !defined(__SINGLE_THREAD__))
 #define __USE_REENTRANT 1
@@ -285,7 +321,7 @@
 #ifdef _UTF_SOURCE
 #undef __USE_UTF
 #define __USE_UTF 1
-#endif
+#endif /* _UTF_SOURCE */
 
 
 #ifdef _ALL_SOURCE
@@ -365,24 +401,24 @@
 #   define __FS_SIZEOF(x)    __SIZEOF_##x##64_T__
 #   define __FS_ALTTYPE(x)   __##x##32_t
 #   define __FS_ALTSIZEOF(x) __SIZEOF_##x##32_T__
-#else
+#else /* __USE_FILE_OFFSET64 */
 #   define __FS_TYPE(x)      __##x##32_t
 #   define __FS_SIZEOF(x)    __SIZEOF_##x##32_T__
 #   define __FS_ALTTYPE(x)   __##x##64_t
 #   define __FS_ALTSIZEOF(x) __SIZEOF_##x##64_T__
-#endif
+#endif /* !__USE_FILE_OFFSET64 */
 #ifdef __USE_TIME_BITS64
 #   define __TM_TYPE(x)      __##x##64_t
 #   define __TM_SIZEOF(x)    __SIZEOF_##x##64_T__
 #   define __TM_ALTTYPE(x)   __##x##32_t
 #   define __TM_ALTSIZEOF(x) __SIZEOF_##x##32_T__
-#else
+#else /* __USE_TIME_BITS64 */
 #   define __TM_TYPE(x)      __##x##32_t
 #   define __TM_SIZEOF(x)    __SIZEOF_##x##32_T__
 #   define __TM_ALTTYPE(x)   __##x##64_t
 #   define __TM_ALTSIZEOF(x) __SIZEOF_##x##64_T__
-#endif
-#else
+#endif /* !__USE_TIME_BITS64 */
+#else /* !__KERNEL__ || !__KOS__ */
 #   define __FS_TYPE(x)      __##x##64_t
 #   define __FS_SIZEOF(x)    __SIZEOF_##x##64_T__
 #   define __FS_ALTTYPE(x)   __##x##32_t
@@ -391,7 +427,7 @@
 #   define __TM_SIZEOF(x)    __SIZEOF_##x##64_T__
 #   define __TM_ALTTYPE(x)   __##x##32_t
 #   define __TM_ALTSIZEOF(x) __SIZEOF_##x##32_T__
-#endif
+#endif /* __KERNEL__ && __KOS__ */
 
 
 #ifdef __USE_KOS
@@ -427,19 +463,5 @@
 #define __KOS_FIXED_CONST /* Nothing */
 #endif /* !__USE_KOS */
 #endif /* !__KOS_FIXED_CONST */
-
-//#define __USE_KOS 1
-//#define __USE_KXS 1
-//#define __USE_EXCEPT 1
-//#define __USE_STRING_BWLQ 1
-//#define __USE_STRING_XCHR 1
-//#define __USE_XOPEN2K8 1
-//#define __USE_MISC 1
-//#define __USE_DOS 1
-//#define __USE_GNU 1
-//#define __USE_XOPEN2K 1
-//#define __USE_ISOC99 1
-//#define __CORRECT_ISO_CPP_STRING_H_PROTO 1
-//#define _USE_32BIT_TIME_T 1
 
 #endif /* !_FEATURES_H */

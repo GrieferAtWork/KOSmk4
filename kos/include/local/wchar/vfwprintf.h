@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf70a20eb */
+/* HASH CRC-32:0x7c70cb3a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -108,17 +108,17 @@ __CREDIRECT(__ATTR_LIBC_PRINTF(3, 0) __ATTR_NONNULL((1, 3)),__SSIZE_TYPE__,__NOT
 #ifndef ____localdep_file_wprinter_defined
 #define ____localdep_file_wprinter_defined 1
 #if defined(__CRT_HAVE_file_wprinter_unlocked) && (defined(__USE_STDIO_UNLOCKED))
-/* For use with `format_printf()' and friends: Prints to a `$FILE *' closure argument */
+/* For use with `format_printf()' and friends: Prints to a `FILE *' closure argument */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,,__localdep_file_wprinter,(void *__arg, __WCHAR_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter_unlocked,(__arg,__data,__datalen)) __THROWS(...)
 #elif defined(__CRT_HAVE_file_wprinter)
-/* For use with `format_printf()' and friends: Prints to a `$FILE *' closure argument */
+/* For use with `format_printf()' and friends: Prints to a `FILE *' closure argument */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,,__localdep_file_wprinter,(void *__arg, __WCHAR_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter,(__arg,__data,__datalen)) __THROWS(...)
 #elif defined(__CRT_HAVE_file_wprinter_unlocked)
-/* For use with `format_printf()' and friends: Prints to a `$FILE *' closure argument */
+/* For use with `format_printf()' and friends: Prints to a `FILE *' closure argument */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,,__localdep_file_wprinter,(void *__arg, __WCHAR_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter_unlocked,(__arg,__data,__datalen)) __THROWS(...)
 #elif defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc)
 #include <local/wchar/file_wprinter.h>
-/* For use with `format_printf()' and friends: Prints to a `$FILE *' closure argument */
+/* For use with `format_printf()' and friends: Prints to a `FILE *' closure argument */
 #define __localdep_file_wprinter (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(file_wprinter))
 #else /* CUSTOM: file_wprinter */
 #undef ____localdep_file_wprinter_defined

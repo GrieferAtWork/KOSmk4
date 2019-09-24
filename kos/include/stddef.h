@@ -37,12 +37,16 @@ __NAMESPACE_STD_USING(max_align_t)
 #else /* _CXX_CSTDDEF && !__CXX_SYSTEM_HEADER */
 #include <features.h>
 #include <hybrid/typecore.h>
+#ifdef __cplusplus
+#include <__stdcxx.h>
+#endif /* __cplusplus */
+
 
 __SYSDECL_BEGIN
 
 #ifndef __MAX_ALIGN_TYPE__
 #define __MAX_ALIGN_TYPE__ long double
-#endif
+#endif /* !__MAX_ALIGN_TYPE__ */
 
 #ifdef __CC__
 __NAMESPACE_STD_BEGIN
@@ -63,15 +67,17 @@ typedef __MAX_ALIGN_TYPE__ max_align_t;
 #endif /* !__std_max_align_t_defined */
 
 #ifdef __cplusplus
+#ifdef __USE_ISOCXX11
 #ifndef __std_nullptr_t_defined
 #define __std_nullptr_t_defined 1
-#if 1 /* TODO: Has `decltype' + has `nullptr' */
+#if defined(__COMPILER_HAVE_CXX_DECLTYPE) && defined(__COMPILER_HAVE_CXX_NULLPTR)
 typedef decltype(nullptr) nullptr_t;
-#else
+#else /* __COMPILER_HAVE_CXX_DECLTYPE && __COMPILER_HAVE_CXX_NULLPTR */
 typedef void *nullptr_t; /* Ugly fallback... */
-#endif
+#endif /* !__COMPILER_HAVE_CXX_DECLTYPE || !__COMPILER_HAVE_CXX_NULLPTR */
 #endif /* !__std_nullptr_t_defined */
-#endif
+#endif /* __USE_ISOCXX11 */
+#endif /* __cplusplus */
 
 __NAMESPACE_STD_END
 
@@ -94,9 +100,12 @@ __NAMESPACE_STD_USING(max_align_t)
 #define __wchar_t_defined 1
 typedef __WCHAR_TYPE__ wchar_t;
 #endif /* !__wchar_t_defined */
+
 #endif /* __CC__ */
 
+#ifndef offsetof
 #define offsetof(s, m) __builtin_offsetof(s, m)
+#endif /* !offsetof */
 
 #ifdef __USE_KOS
 #define offsetafter(s, m)               __COMPILER_OFFSETAFTER(s, m)
@@ -105,7 +114,7 @@ typedef __WCHAR_TYPE__ wchar_t;
 
 #ifndef NULL
 #define NULL __NULLPTR
-#endif
+#endif /* !NULL */
 
 __SYSDECL_END
 

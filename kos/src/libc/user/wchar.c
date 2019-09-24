@@ -782,14 +782,14 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.wchar.FILE.unlocked.write.putc.putwchar
 }
 /*[[[end:putwchar_unlocked]]]*/
 
-/*[[[head:DOS$wcsnrtombs,hash:CRC-32=0xd015330d]]]*/
+/*[[[head:DOS$wcsnrtombs,hash:CRC-32=0x6a7f6115]]]*/
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs.wcsnrtombs") size_t
 NOTHROW_NCX(LIBDCALL libd_wcsnrtombs)(char *dst,
                                       char16_t const **__restrict psrc,
                                       size_t nwc,
                                       size_t len,
-                                      mbstate_t *ps)
+                                      __mbstate_t *ps)
 /*[[[body:DOS$wcsnrtombs]]]*/
 {
 	CRT_UNIMPLEMENTED("wcsnrtombs"); /* TODO */
@@ -838,14 +838,14 @@ ATTR_WEAK ATTR_SECTION(".text.crt.wchar.FILE.unlocked.write.write.fputws_unlocke
 }
 /*[[[end:fputws_unlocked]]]*/
 
-/*[[[head:wcsnrtombs,hash:CRC-32=0x98e9ebb6]]]*/
+/*[[[head:wcsnrtombs,hash:CRC-32=0xe546047c]]]*/
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.unicode.static.mbs.wcsnrtombs") size_t
 NOTHROW_NCX(LIBCCALL libc_wcsnrtombs)(char *dst,
                                       char32_t const **__restrict psrc,
                                       size_t nwc,
                                       size_t len,
-                                      mbstate_t *ps)
+                                      __mbstate_t *ps)
 /*[[[body:wcsnrtombs]]]*/
 {
 	CRT_UNIMPLEMENTED("wcsnrtombs"); /* TODO */
@@ -878,14 +878,14 @@ NOTHROW_NCX(LIBCCALL libc_wcsdup)(char32_t const *__restrict string)
 }
 /*[[[end:wcsdup]]]*/
 
-/*[[[head:mbsnrtowcs,hash:CRC-32=0xf94fd2a2]]]*/
+/*[[[head:mbsnrtowcs,hash:CRC-32=0x94ed3a87]]]*/
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.unicode.static.mbs.mbsnrtowcs") size_t
 NOTHROW_NCX(LIBCCALL libc_mbsnrtowcs)(char32_t *dst,
                                       char const **__restrict psrc,
                                       size_t nmc,
                                       size_t len,
-                                      mbstate_t *ps)
+                                      __mbstate_t *ps)
 /*[[[body:mbsnrtowcs]]]*/
 {
 	CRT_UNIMPLEMENTED("mbsnrtowcs"); /* TODO */
@@ -923,14 +923,14 @@ NOTHROW_NCX(LIBCCALL libc_wcwidth)(char32_t ch)
 /*[[[end:wcwidth]]]*/
 
 
-/*[[[head:DOS$mbsnrtowcs,hash:CRC-32=0x2fadaaca]]]*/
+/*[[[head:DOS$mbsnrtowcs,hash:CRC-32=0x6717f4c4]]]*/
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs.mbsnrtowcs") size_t
 NOTHROW_NCX(LIBDCALL libd_mbsnrtowcs)(char16_t *dst,
                                       char const **__restrict psrc,
                                       size_t nmc,
                                       size_t len,
-                                      mbstate_t *ps)
+                                      __mbstate_t *ps)
 /*[[[body:DOS$mbsnrtowcs]]]*/
 {
 	CRT_UNIMPLEMENTED("mbsnrtowcs"); /* TODO */
@@ -1102,8 +1102,8 @@ NOTHROW_NCX(LIBDCALL libd_wcsndup)(char16_t const *__restrict string,
 /*[[[end:DOS$wcsndup]]]*/
 
 
-/*[[[head:file_wprinter,hash:CRC-32=0x199a60a8]]]*/
-/* For use with `format_printf()' and friends: Prints to a `$FILE *' closure argument */
+/*[[[head:file_wprinter,hash:CRC-32=0x9487ed4]]]*/
+/* For use with `format_printf()' and friends: Prints to a `FILE *' closure argument */
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.FILE.locked.write.write.file_wprinter") ssize_t
 (LIBCCALL libc_file_wprinter)(void *arg,
@@ -1241,8 +1241,8 @@ ATTR_WEAK ATTR_SECTION(".text.crt.wchar.FILE.unlocked.write.write.file_wprinter_
 }
 /*[[[end:file_wprinter_unlocked]]]*/
 
-/*[[[head:DOS$file_wprinter,hash:CRC-32=0xdd0993a8]]]*/
-/* For use with `format_printf()' and friends: Prints to a `$FILE *' closure argument */
+/*[[[head:DOS$file_wprinter,hash:CRC-32=0xcddb8dd4]]]*/
+/* For use with `format_printf()' and friends: Prints to a `FILE *' closure argument */
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.FILE.locked.write.write.file_wprinter") ssize_t
 (LIBDCALL libd_file_wprinter)(void *arg,

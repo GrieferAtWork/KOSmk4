@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd9b4673e */
+/* HASH CRC-32:0x214c218d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,12 +45,12 @@ __NAMESPACE_LOCAL_BEGIN
 #define __WEOF    (__WINT_TYPE__)(0xffff)
 #endif /* __SIZEOF_WCHAR_T__ != 4 */
 #endif
-/* For use with `format_printf()' and friends: Prints to a `$FILE *' closure argument */
+/* For use with `format_printf()' and friends: Prints to a `FILE *' closure argument */
 __LOCAL_LIBC(file_c16printer) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(file_c16printer))(void *__arg,
                                                 __CHAR16_TYPE__ const *__restrict __data,
                                                 __SIZE_TYPE__ __datalen) __THROWS(...) {
-#line 1011 "kos/src/libc/magic/wchar.c"
+#line 1013 "kos/src/libc/magic/wchar.c"
 	__SIZE_TYPE__ __i;
 	for (__i = 0; __i < __datalen; ++__i) {
 		if (__localdep_fputc16(__data[__i], (__FILE *)__arg) == __WEOF)

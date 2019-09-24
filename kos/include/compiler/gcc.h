@@ -678,9 +678,9 @@ __extension__ typedef unsigned long long __ulonglong_t;
 
 #ifdef __cplusplus
 #ifdef __INTELLISENSE__
-#   define __NULLPTR    nullptr
+#   define __NULLPTR nullptr
 #else /* __INTELLISENSE__ */
-#   define __NULLPTR          0
+#   define __NULLPTR 0
 #endif /* !__INTELLISENSE__ */
 #else /* __cplusplus */
 #   define __NULLPTR ((void *)0)

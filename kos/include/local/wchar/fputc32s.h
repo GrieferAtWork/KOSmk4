@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3df2e08e */
+/* HASH CRC-32:0xe639cf56 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,22 +25,22 @@
 #ifndef ____localdep_file_c32printer_defined
 #define ____localdep_file_c32printer_defined 1
 #if defined(__CRT_HAVE_file_wprinter) && (__SIZEOF_WCHAR_T__ == 4)
-/* For use with `format_printf()' and friends: Prints to a `$FILE *' closure argument */
+/* For use with `format_printf()' and friends: Prints to a `FILE *' closure argument */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_file_c32printer,(void *__arg, __CHAR32_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_file_wprinter_unlocked) && (defined(__USE_STDIO_UNLOCKED) && (__SIZEOF_WCHAR_T__ == 4))
-/* For use with `format_printf()' and friends: Prints to a `$FILE *' closure argument */
+/* For use with `format_printf()' and friends: Prints to a `FILE *' closure argument */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_file_c32printer,(void *__arg, __CHAR32_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter_unlocked,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_file_wprinter_unlocked) && (__SIZEOF_WCHAR_T__ == 4)
-/* For use with `format_printf()' and friends: Prints to a `$FILE *' closure argument */
+/* For use with `format_printf()' and friends: Prints to a `FILE *' closure argument */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_file_c32printer,(void *__arg, __CHAR32_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter_unlocked,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc)
 #if __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/file_wprinter.h>
-/* For use with `format_printf()' and friends: Prints to a `$FILE *' closure argument */
+/* For use with `format_printf()' and friends: Prints to a `FILE *' closure argument */
 #define __localdep_file_c32printer(arg, data, datalen) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(file_wprinter))(arg, (__WCHAR_TYPE__ const *)(data), datalen)
 #else /* LIBC: file_c32printer */
 #include <local/wchar/file_c32printer.h>
-/* For use with `format_printf()' and friends: Prints to a `$FILE *' closure argument */
+/* For use with `format_printf()' and friends: Prints to a `FILE *' closure argument */
 #define __localdep_file_c32printer (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(file_c32printer))
 #endif /* LIBC: file_c32printer */
 #else /* CUSTOM: file_wprinter */

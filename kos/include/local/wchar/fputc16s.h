@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7ce8bc82 */
+/* HASH CRC-32:0x685d5c7b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,31 +25,31 @@
 #ifndef ____localdep_file_c16printer_defined
 #define ____localdep_file_c16printer_defined 1
 #if defined(__CRT_HAVE_file_wprinter) && (__SIZEOF_WCHAR_T__ == 2)
-/* For use with `format_printf()' and friends: Prints to a `$FILE *' closure argument */
+/* For use with `format_printf()' and friends: Prints to a `FILE *' closure argument */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_file_c16printer,(void *__arg, __CHAR16_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_file_wprinter_unlocked) && (defined(__USE_STDIO_UNLOCKED) && (__SIZEOF_WCHAR_T__ == 2))
-/* For use with `format_printf()' and friends: Prints to a `$FILE *' closure argument */
+/* For use with `format_printf()' and friends: Prints to a `FILE *' closure argument */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_file_c16printer,(void *__arg, __CHAR16_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter_unlocked,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_DOS$file_wprinter_unlocked) && (defined(__USE_STDIO_UNLOCKED))
-/* For use with `format_printf()' and friends: Prints to a `$FILE *' closure argument */
+/* For use with `format_printf()' and friends: Prints to a `FILE *' closure argument */
 __CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_file_c16printer,(void *__arg, __CHAR16_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter_unlocked,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_file_wprinter_unlocked) && (__SIZEOF_WCHAR_T__ == 2)
-/* For use with `format_printf()' and friends: Prints to a `$FILE *' closure argument */
+/* For use with `format_printf()' and friends: Prints to a `FILE *' closure argument */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_file_c16printer,(void *__arg, __CHAR16_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter_unlocked,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_DOS$file_wprinter_unlocked)
-/* For use with `format_printf()' and friends: Prints to a `$FILE *' closure argument */
+/* For use with `format_printf()' and friends: Prints to a `FILE *' closure argument */
 __CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_file_c16printer,(void *__arg, __CHAR16_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter_unlocked,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_DOS$file_wprinter)
-/* For use with `format_printf()' and friends: Prints to a `$FILE *' closure argument */
+/* For use with `format_printf()' and friends: Prints to a `FILE *' closure argument */
 __CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_file_c16printer,(void *__arg, __CHAR16_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc)
 #if __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/file_wprinter.h>
-/* For use with `format_printf()' and friends: Prints to a `$FILE *' closure argument */
+/* For use with `format_printf()' and friends: Prints to a `FILE *' closure argument */
 #define __localdep_file_c16printer(arg, data, datalen) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(file_wprinter))(arg, (__WCHAR_TYPE__ const *)(data), datalen)
 #else /* LIBC: file_c16printer */
 #include <local/wchar/file_c16printer.h>
-/* For use with `format_printf()' and friends: Prints to a `$FILE *' closure argument */
+/* For use with `format_printf()' and friends: Prints to a `FILE *' closure argument */
 #define __localdep_file_c16printer (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(file_c16printer))
 #endif /* LIBC: file_c16printer */
 #else /* CUSTOM: file_wprinter */

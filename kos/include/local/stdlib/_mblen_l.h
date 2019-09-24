@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfe6c989b */
+/* HASH CRC-32:0xedfc10be */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ __LOCAL_LIBC(_mblen_l) __ATTR_PURE __ATTR_NONNULL((1)) __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mblen_l))(char const *__str,
                                                       __SIZE_TYPE__ __maxlen,
                                                       __locale_t __locale) {
-#line 2047 "kos/src/libc/magic/stdlib.c"
+#line 2055 "kos/src/libc/magic/stdlib.c"
 	(void)__locale;
 	return __localdep_mblen(__str, __maxlen);
 }

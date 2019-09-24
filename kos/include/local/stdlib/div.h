@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd5a87353 */
+/* HASH CRC-32:0x746b8c9f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(div) __ATTR_CONST __ATTR_WUNUSED div_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(div))(int __numer,
                                                  int __denom) {
-#line 559 "kos/src/libc/magic/stdlib.c"
+#line 567 "kos/src/libc/magic/stdlib.c"
 	div_t __result;
 	__result.quot = __numer / __denom;
 	__result.rem  = __numer % __denom;

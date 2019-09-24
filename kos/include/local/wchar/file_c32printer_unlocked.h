@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf88b5d19 */
+/* HASH CRC-32:0xa3d20b86 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ __LOCAL_LIBC(file_c32printer_unlocked) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(file_c32printer_unlocked))(void *__arg,
                                                          __CHAR32_TYPE__ const *__restrict __data,
                                                          __SIZE_TYPE__ __datalen) __THROWS(...) {
-#line 1033 "kos/src/libc/magic/wchar.c"
+#line 1035 "kos/src/libc/magic/wchar.c"
 	__SIZE_TYPE__ __i;
 	for (__i = 0; __i < __datalen; ++__i) {
 		if (__localdep_fputc32_unlocked(__data[__i], (__FILE *)__arg) == __WEOF)

@@ -443,6 +443,8 @@ bsearch:(void const *pkey, void const *pbase, size_t item_count, size_t item_siz
 labs:(long x) -> long {
 	return x < 0 ? -x : x;
 }
+
+%(std, c)#ifdef __USE_ISOC99
 [ATTR_CONST][ATTR_WUNUSED][nothrow][std][crtbuiltin]
 [if(__SIZEOF_LONG_LONG__ == __SIZEOF_INT__), alias(abs)]
 [if(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias(labs)]
@@ -450,6 +452,7 @@ labs:(long x) -> long {
 llabs:(__LONGLONG x) -> __LONGLONG {
 	return x < 0 ? -x : x;
 }
+%(std, c)#endif /* __USE_ISOC99 */
 
 [ATTR_CONST][ATTR_WUNUSED][std]
 [if(__SIZEOF_LONG__ == __SIZEOF_INT__), alias(div)]
@@ -461,6 +464,8 @@ ldiv:(long numer, long denom) -> ldiv_t {
 	result.@rem@  = numer % denom;
 	return result;
 }
+
+%(std, c)#ifdef __USE_ISOC99
 [ATTR_CONST][ATTR_WUNUSED][std]
 [if(__SIZEOF_LONG_LONG__ == __SIZEOF_INT__), alias(div)]
 [if(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias(ldiv)]
@@ -471,79 +476,82 @@ lldiv:(__LONGLONG numer, __LONGLONG denom) -> lldiv_t {
 	result.@rem@  = numer % denom;
 	return result;
 }
+%(std, c)#endif /* __USE_ISOC99 */
 
+%(std)#if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STDLIB_H_PROTO)
 %(std){
-#if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STDLIB_H_PROTO)
 extern "C++" {
 #ifdef __CRT_HAVE_abs
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED, int, __NOTHROW, abs, (int __x), abs, (__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,abs,(int __x),abs,(__x))
 #elif defined(__CRT_HAVE_labs) && __SIZEOF_INT__ == __SIZEOF_LONG__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED, int, __NOTHROW, abs, (int __x), labs, (__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,abs,(int __x),labs,(__x))
 #elif defined(__CRT_HAVE_llabs) && __SIZEOF_INT__ == __SIZEOF_LONG_LONG__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED, int, __NOTHROW, abs, (int __x), llabs, (__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,abs,(int __x),llabs,(__x))
 #elif defined(__CRT_HAVE_imaxabs) && __SIZEOF_INT__ == __SIZEOF_INTMAX_T__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED, int, __NOTHROW, abs, (int __x), imaxabs, (__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,abs,(int __x),imaxabs,(__x))
 #else /* __CRT_HAVE_abs */
 __LOCAL __ATTR_CONST __ATTR_WUNUSED int (__LIBCCALL abs)(int __x) { return __x < 0 ? -__x : __x; }
 #endif /* !__CRT_HAVE_abs */
 #ifdef __CRT_HAVE_labs
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED, long, __NOTHROW, abs, (long __x), labs, (__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long,__NOTHROW,abs,(long __x),labs,(__x))
 #elif defined(__CRT_HAVE_abs) && __SIZEOF_LONG__ == __SIZEOF_INT__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED, long, __NOTHROW, abs, (long __x), abs, (__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long,__NOTHROW,abs,(long __x),abs,(__x))
 #elif defined(__CRT_HAVE_llabs) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED, long, __NOTHROW, abs, (long __x), llabs, (__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long,__NOTHROW,abs,(long __x),llabs,(__x))
 #elif defined(__CRT_HAVE_imaxabs) && __SIZEOF_LONG__ == __SIZEOF_INTMAX_T__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED, long, __NOTHROW, abs, (long __x), imaxabs, (__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long,__NOTHROW,abs,(long __x),imaxabs,(__x))
 #else /* __CRT_HAVE_labs */
 __LOCAL __ATTR_CONST __ATTR_WUNUSED long (__LIBCCALL abs)(long __x) { return (labs)(__x); }
 #endif /* !__CRT_HAVE_labs */
-#ifdef __CRT_HAVE_llabs
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED, __LONGLONG, __NOTHROW, abs, (__LONGLONG __x), llabs, (__x))
-#elif defined(__CRT_HAVE_abs) && __SIZEOF_LONG_LONG__ == __SIZEOF_INT__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED, __LONGLONG, __NOTHROW, abs, (__LONGLONG __x), abs, (__x))
-#elif defined(__CRT_HAVE_labs) && __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED, __LONGLONG, __NOTHROW, abs, (__LONGLONG __x), labs, (__x))
-#elif defined(__CRT_HAVE_imaxabs) && __SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED, __LONGLONG, __NOTHROW, abs, (__LONGLONG __x), imaxabs, (__x))
-#else /* __CRT_HAVE_llabs */
-__LOCAL __ATTR_CONST __ATTR_WUNUSED __LONGLONG (__LIBCCALL abs)(__LONGLONG __x) { return (llabs)(__x); }
-#endif /* !__CRT_HAVE_llabs */
 #ifdef __CRT_HAVE_div
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED, div_t, __NOTHROW_NCX, div, (int __numer, int __denom), div, (__numer, __denom))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,div_t,__NOTHROW_NCX,div,(int __numer, int __denom),div,(__numer,__denom))
 #elif defined(__CRT_HAVE_ldiv) && __SIZEOF_INT__ == __SIZEOF_LONG__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED, div_t, __NOTHROW_NCX, div, (int __numer, int __denom), ldiv, (__numer, __denom))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,div_t,__NOTHROW_NCX,div,(int __numer, int __denom),ldiv,(__numer,__denom))
 #elif defined(__CRT_HAVE_lldiv) && __SIZEOF_INT__ == __SIZEOF_LONG_LONG__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED, div_t, __NOTHROW_NCX, div, (int __numer, int __denom), lldiv, (__numer, __denom))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,div_t,__NOTHROW_NCX,div,(int __numer, int __denom),lldiv,(__numer,__denom))
 #elif defined(__CRT_HAVE_imaxdiv) && __SIZEOF_INT__ == __SIZEOF_INTMAX_T__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED, div_t, __NOTHROW_NCX, div, (int __numer, int __denom), imaxdiv, (__numer, __denom))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,div_t,__NOTHROW_NCX,div,(int __numer, int __denom),imaxdiv,(__numer,__denom))
 #else
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED div_t (__LIBCCALL div)(int __numer, int __denom) { div_t __result; __result.quot = __numer / __denom; __result.rem = __numer % __denom; return __result; }
 #endif
 #ifdef __CRT_HAVE_ldiv
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED, ldiv_t, __NOTHROW_NCX, div, (long __numer, long __denom), ldiv, (__numer, __denom))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,ldiv_t,__NOTHROW_NCX,div,(long __numer, long __denom),ldiv,(__numer,__denom))
 #elif defined(__CRT_HAVE_div) && __SIZEOF_LONG__ == __SIZEOF_INT__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED, ldiv_t, __NOTHROW_NCX, div, (long __numer, long __denom), div, (__numer, __denom))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,ldiv_t,__NOTHROW_NCX,div,(long __numer, long __denom),div,(__numer,__denom))
 #elif defined(__CRT_HAVE_lldiv) && __SIZEOF_LONG__ == __SIZEOF_LONG_LONG__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED, ldiv_t, __NOTHROW_NCX, div, (long __numer, long __denom), lldiv, (__numer, __denom))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,ldiv_t,__NOTHROW_NCX,div,(long __numer, long __denom),lldiv,(__numer,__denom))
 #elif defined(__CRT_HAVE_imaxdiv) && __SIZEOF_LONG__ == __SIZEOF_INTMAX_T__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED, ldiv_t, __NOTHROW_NCX, div, (long __numer, long __denom), imaxdiv, (__numer, __denom))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,ldiv_t,__NOTHROW_NCX,div,(long __numer, long __denom),imaxdiv,(__numer,__denom))
 #else
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED ldiv_t (__LIBCCALL div)(long __numer, long __denom) { return ldiv(__numer, __denom); }
 #endif
+#ifdef __USE_ISOC99
+#ifdef __CRT_HAVE_llabs
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,abs,(__LONGLONG __x),llabs,(__x))
+#elif defined(__CRT_HAVE_abs) && __SIZEOF_LONG_LONG__ == __SIZEOF_INT__
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,abs,(__LONGLONG __x),abs,(__x))
+#elif defined(__CRT_HAVE_labs) && __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,abs,(__LONGLONG __x),labs,(__x))
+#elif defined(__CRT_HAVE_imaxabs) && __SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__LONGLONG,__NOTHROW,abs,(__LONGLONG __x),imaxabs,(__x))
+#else /* __CRT_HAVE_llabs */
+__LOCAL __ATTR_CONST __ATTR_WUNUSED __LONGLONG (__LIBCCALL abs)(__LONGLONG __x) { return (llabs)(__x); }
+#endif /* !__CRT_HAVE_llabs */
 #ifdef __CRT_HAVE_lldiv
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED, lldiv_t, __NOTHROW_NCX, div, (__LONGLONG __numer, __LONGLONG __denom), lldiv, (__numer, __denom))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,lldiv_t,__NOTHROW_NCX,div,(__LONGLONG __numer, __LONGLONG __denom),lldiv,(__numer,__denom))
 #elif defined(__CRT_HAVE_div) && __SIZEOF_LONG_LONG__ == __SIZEOF_INT__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED, lldiv_t, __NOTHROW_NCX, div, (__LONGLONG __numer, __LONGLONG __denom), div, (__numer, __denom))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,lldiv_t,__NOTHROW_NCX,div,(__LONGLONG __numer, __LONGLONG __denom),div,(__numer,__denom))
 #elif defined(__CRT_HAVE_div) && __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED, lldiv_t, __NOTHROW_NCX, div, (__LONGLONG __numer, __LONGLONG __denom), ldiv, (__numer, __denom))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,lldiv_t,__NOTHROW_NCX,div,(__LONGLONG __numer, __LONGLONG __denom),ldiv,(__numer,__denom))
 #elif defined(__CRT_HAVE_div) && __SIZEOF_LONG_LONG__ == __SIZEOF_INTMAX_T__
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED, lldiv_t, __NOTHROW_NCX, div, (__LONGLONG __numer, __LONGLONG __denom), imaxdiv, (__numer, __denom))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,lldiv_t,__NOTHROW_NCX,div,(__LONGLONG __numer, __LONGLONG __denom),imaxdiv,(__numer,__denom))
 #else
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED lldiv_t (__LIBCCALL div)(__LONGLONG __numer, __LONGLONG __denom) { return lldiv(__numer, __denom); }
 #endif
+#endif /* __USE_ISOC99 */
+} /* extern "C++" */
 }
-#else /* __cplusplus && __CORRECT_ISO_CPP_STDLIB_H_PROTO */
-}
+%(std)#else /* __cplusplus && __CORRECT_ISO_CPP_STDLIB_H_PROTO */
 [ATTR_CONST][ATTR_WUNUSED][nothrow][std][crtbuiltin]
 [if(__SIZEOF_INT__ == __SIZEOF_LONG__), alias(labs)]
 [if(__SIZEOF_INT__ == __SIZEOF_LONG_LONG__), alias(llabs)]
@@ -1143,7 +1151,7 @@ aligned_alloc:(size_t alignment, size_t n_bytes) -> void * = memalign;
 %{
 #ifndef MB_CUR_MAX
 #ifdef __CRT_HAVE___ctype_get_mb_cur_max
-__CDECLARE(__ATTR_WUNUSED, size_t, __NOTHROW, __ctype_get_mb_cur_max, (void), ())
+__CDECLARE(__ATTR_WUNUSED, size_t,__NOTHROW, __ctype_get_mb_cur_max, (void), ())
 #define MB_CUR_MAX  (__ctype_get_mb_cur_max())
 #else
 #define MB_CUR_MAX   7 /* == UNICODE_UTF8_CURLEN */
@@ -1573,14 +1581,14 @@ _set_doserrno:($u32 err) -> errno_t;
 #if defined(__CRT_HAVE__sys_errlist)
 __LIBC char const *const _sys_errlist[];
 #elif defined(__CRT_HAVE___sys_errlist)
-__CDECLARE(, char const *const *, __NOTHROW, __sys_errlist, (void), ())
+__CDECLARE(, char const *const *,__NOTHROW, __sys_errlist, (void), ())
 #define _sys_errlist (__sys_errlist())
 #endif
 
 #if defined(__CRT_HAVE__sys_nerr)
 __LIBC int _sys_nerr;
 #elif defined(__CRT_HAVE___sys_nerr)
-__CDECLARE(, int *, __NOTHROW, __sys_nerr, (void), ())
+__CDECLARE(, int *,__NOTHROW, __sys_nerr, (void), ())
 #define _sys_nerr    (*__sys_nerr())
 #endif
 #endif /* !___sys_errlist_defined */
@@ -1605,7 +1613,7 @@ __LIBC char **environ;
 #elif defined(__CRT_HAVE___p__environ)
 #ifndef ____p__environ_defined
 #define ____p__environ_defined 1
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL, char ***, __NOTHROW, __p__environ, (void), ())
+__CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL, char ***,__NOTHROW, __p__environ, (void), ())
 #endif /* !____p__environ_defined */
 #define _environ (*__p__environ())
 #else
@@ -2524,7 +2532,7 @@ __LIBC char **_environ;
 #elif defined(__CRT_HAVE___p__environ)
 #ifndef ____p__environ_defined
 #define ____p__environ_defined 1
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL, char ***, __NOTHROW, __p__environ, (void), ())
+__CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL, char ***,__NOTHROW, __p__environ, (void), ())
 #endif /* !____p__environ_defined */
 #define environ   (*__p__environ())
 #else

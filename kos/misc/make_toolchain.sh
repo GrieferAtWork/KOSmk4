@@ -451,17 +451,21 @@ delete_header_file() {
 	fi
 }
 
-remove_fixinclude "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/include/unwind.h"
-remove_fixinclude "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/include/stddef.h"
-remove_fixinclude "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/include/stdbool.h"
-remove_fixinclude "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/include/stdarg.h"
-remove_fixinclude "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/include/stdatomic.h"
-remove_fixinclude "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/include/stdnoreturn.h"
-remove_fixinclude "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/include/stdalign.h"
-remove_fixinclude "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/include/float.h"
-remove_fixinclude "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/include/iso646.h"
-remove_fixinclude "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/include-fixed/limits.h"
-remove_fixinclude "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/include/varargs.h"
+remove_bad_fixinclude() {
+	remove_fixinclude "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/include/unwind.h"
+	remove_fixinclude "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/include/stddef.h"
+	remove_fixinclude "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/include/stdbool.h"
+	remove_fixinclude "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/include/stdarg.h"
+	remove_fixinclude "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/include/stdatomic.h"
+	remove_fixinclude "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/include/stdnoreturn.h"
+	remove_fixinclude "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/include/stdalign.h"
+	remove_fixinclude "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/include/float.h"
+	remove_fixinclude "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/include/iso646.h"
+	remove_fixinclude "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/include-fixed/limits.h"
+	remove_fixinclude "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/include/varargs.h"
+}
+
+remove_bad_fixinclude
 
 echo "Check if $GCC_VERSION:libgcc needs to be built"
 if ! [ -f "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/libgcc.a" ] || \
@@ -489,6 +493,7 @@ if ! [ -f "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/libgcc.a" ] || \
 		cmd cp "$PREFIX/gcc/$TARGET/libgcc/libgcc.a" "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/libgcc.a"
 		# Now try to build our libc.so (and also libm.so just to be safe)
 		cmd cd "$KOS_ROOT"
+		remove_bad_fixinclude
 		cmd deemon "magic.dee" \
 			--gen="bin/$NAME-$KOS_CONFIG_FOR_LINKING/lib/libc.so" \
 			--gen="bin/$NAME-$KOS_CONFIG_FOR_LINKING/lib/libm.so" \
@@ -501,6 +506,7 @@ if ! [ -f "$PREFIX/lib/gcc/$TARGET/$GCC_VERSION_NUMBER/libgcc.a" ] || \
 	fi
 	cmd make -j $MAKE_PARALLEL_COUNT all-target-libgcc
 	cmd make -j $MAKE_PARALLEL_COUNT install-target-libgcc
+	remove_bad_fixinclude
 	cmd cd "$KOS_BINUTILS"
 else
 	echo "    $GCC_VERSION:libgcc has already been built"
@@ -540,6 +546,7 @@ if ! [ -f "$PREFIX/$TARGET/lib/libstdc++.so.$LIBSTDCXX_VERSION_FULL" ]; then
 	cmd cd "$PREFIX/gcc"
 	cmd make -j $MAKE_PARALLEL_COUNT all-target-libstdc++-v3
 	cmd make -j $MAKE_PARALLEL_COUNT install-target-libstdc++-v3
+	remove_bad_fixinclude
 	cmd cd "$KOS_BINUTILS"
 	# Restore the arch-specific portion of the other toolchain
 	if [ $OTHER_TOOLCHAIN != "" ]; then
