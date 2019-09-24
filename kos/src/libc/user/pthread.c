@@ -165,7 +165,7 @@ NOTHROW(LIBCCALL libc_pthread_onexit)(struct pthread *__restrict me) {
 }
 
 INTDEF ATTR_NORETURN void __FCALL
-libc_pthread_exit_and_unmap_stack(void *stackaddr,
+libc_pthread_unmap_stack_and_exit(void *stackaddr,
                                   size_t stacksize,
                                   int exitcode);
 
@@ -214,7 +214,7 @@ NOTHROW(__FCALL libc_pthread_main)(struct pthread *__restrict me,
 		stack_addr = me->pt_stackaddr;
 		stack_size = me->pt_stacksize;
 		libc_pthread_onexit(me);
-		libc_pthread_exit_and_unmap_stack(stack_addr,
+		libc_pthread_unmap_stack_and_exit(stack_addr,
 		                                  stack_size,
 		                                  exitcode);
 	}
@@ -1426,7 +1426,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_cancel)(pthread_t pthread)
 	 * terminating at this point (causing the id to become invalid), since
 	 * we cannot undo the RPC schedule operation in that case...
 	 * TODO: This is unsafe when the target thread has already unmapped
-	 *       its stack within `libc_pthread_exit_and_unmap_stack()' */
+	 *       its stack within `libc_pthread_unmap_stack_and_exit()' */
 	if ((*pdyn_rpc_schedule)(tid, RPC_SCHEDULE_SYNC, (void (*)())&pthread_cancel_self, 0))
 		return libc_geterrno();
 	return EOK;
