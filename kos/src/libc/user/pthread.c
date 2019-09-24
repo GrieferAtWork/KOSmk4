@@ -164,10 +164,16 @@ NOTHROW(LIBCCALL libc_pthread_onexit)(struct pthread *__restrict me) {
 	dltlsfreeseg(tls);
 }
 
+INTDEF ATTR_NORETURN void __FCALL
+libc_pthread_exit_and_unmap_stack(void *stackaddr,
+                                  size_t stacksize,
+                                  int exitcode);
+
 
 INTERN ATTR_NORETURN ATTR_SECTION(".text.crt.sched.pthread.pthread_main") void
 NOTHROW(__FCALL libc_pthread_main)(struct pthread *__restrict me,
                                    __pthread_start_routine_t start) {
+	int exitcode = 0;
 	/* Set the TLS variable for `pthread_self' to `me' */
 	pthread_self_p = me;
 	COMPILER_BARRIER();
@@ -190,14 +196,32 @@ NOTHROW(__FCALL libc_pthread_main)(struct pthread *__restrict me,
 		me->pt_retval = (*start)(me->pt_retval);
 	} EXCEPT {
 		/* Always invoke the on-exit callback, no matter what happens! */
+		if (!was_thrown(E_EXIT_THREAD)) {
+			/* Anything else can just be propagated directly,
+			 * since it's considered an unhandled exception that
+			 * will cause the process to terminate.
+			 * However, E_EXIT_THREAD must be handled explicitly
+			 * in case we have to unmap our own stack. */
+			RETHROW();
+		}
+		exitcode = error_data()->e_pointers[0];
 		me->pt_retval = NULL;
+	}
+	if ((me->pt_flags & (PTHREAD_FUSERSTACK | PTHREAD_FNOSTACK)) == 0) {
+		/* Must unmap our own stack. */
+		void *stack_addr;
+		size_t stack_size;
+		stack_addr = me->pt_stackaddr;
+		stack_size = me->pt_stacksize;
 		libc_pthread_onexit(me);
-		RETHROW();
+		libc_pthread_exit_and_unmap_stack(stack_addr,
+		                                  stack_size,
+		                                  exitcode);
 	}
 	libc_pthread_onexit(me);
 	/* Reminder: `sys_exit()' only terminates the calling thread.
 	 * To terminate the calling process, you'd have to call `sys_exit_group()'! */
-	sys_exit(0);
+	sys_exit(exitcode);
 }
 
 /* Assembly-side for the process of cloning a thread.
@@ -1400,7 +1424,9 @@ NOTHROW_NCX(LIBCCALL libc_pthread_cancel)(pthread_t pthread)
 	/* Schedule an RPC in the target thread that will cause the thread to terminate itself. */
 	/* In this case, we sadly cannot handle the race condition of `tid'
 	 * terminating at this point (causing the id to become invalid), since
-	 * we cannot undo the RPC schedule operation in that case... */
+	 * we cannot undo the RPC schedule operation in that case...
+	 * TODO: This is unsafe when the target thread has already unmapped
+	 *       its stack within `libc_pthread_exit_and_unmap_stack()' */
 	if ((*pdyn_rpc_schedule)(tid, RPC_SCHEDULE_SYNC, (void (*)())&pthread_cancel_self, 0))
 		return libc_geterrno();
 	return EOK;

@@ -70,4 +70,25 @@ INTERN_FUNCTION(libc_pthread_clone)
 END(libc_pthread_clone)
 
 
+/* INTDEF ATTR_NORETURN void __FCALL
+ * libc_pthread_exit_and_unmap_stack(void *stackaddr,
+ *                                   size_t stacksize,
+ *                                   int exitcode); */
+.section .text.crt.sched.pthread.pthread_exit_and_unmap_stack
+INTERN_FUNCTION(libc_pthread_exit_and_unmap_stack)
+	movl 4(%esp), %esp       /* int exitcode */
+	movl %ecx,          %ebx /* munmap:addr = void *stackaddr */
+	movl %edx,          %ecx /* munmap:len  = size_t stacksize */
+	movl $(SYS_munmap), %eax
+	int  $0x80               /* unmap our own stack. */
+	/* WARNING: No more accessing stack memory from here on! */
+
+	movl %esp,        %ebx   /* int exitcode */
+	movl $(SYS_exit), %eax
+	int  $0x80
+	/* -unreachable- */
+END(libc_pthread_exit_and_unmap_stack)
+
+
+
 
