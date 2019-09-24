@@ -532,9 +532,9 @@ again_already_disabled:
 		 * to move the `PREEMPTION_DISABLE()' above in such a manner that it would follow
 		 * our `PREEMPTION_ENABLE()' immediately. */
 		PREEMPTION_ENABLE_P();
-#else
+#else /* PREEMPTION_ENABLE_P */
 		PREEMPTION_ENABLE();
-#endif
+#endif /* !PREEMPTION_ENABLE_P */
 		goto again;
 	}
 	/* TODO: Check `ipi_inuse' for allocated, but  */

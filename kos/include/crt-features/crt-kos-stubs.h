@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2b93f0d6 */
+/* HASH CRC-32:0xfc9f7390 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -487,7 +487,6 @@
 #define __CRT_STUB_pthread_rwlockattr_init 1
 #define __CRT_STUB_pthread_rwlockattr_setkind_np 1
 #define __CRT_STUB_pthread_rwlockattr_setpshared 1
-#define __CRT_STUB_pthread_self 1
 #define __CRT_STUB_pthread_setcancelstate 1
 #define __CRT_STUB_pthread_setcanceltype 1
 #define __CRT_STUB_pthread_setspecific 1

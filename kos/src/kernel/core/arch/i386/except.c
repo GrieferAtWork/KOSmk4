@@ -436,7 +436,7 @@ NOTHROW(KCALL print_unhandled_exception)(pformatprinter printer, void *arg,
 		                 (uintptr_t)instruction_trypred(info->ei_trace[i]),
 		                 (uintptr_t)info->ei_trace[i], "Called here");
 	}
-#endif
+#endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 }
 
 
@@ -473,6 +473,7 @@ struct panic_args {
 	uintptr_t              last_pc;
 	struct exception_info *info;
 };
+
 PRIVATE void KCALL
 panic_uhe_dbg_main(void *arg) {
 	struct panic_args *args;
@@ -515,7 +516,7 @@ panic_uhe_dbg_main(void *arg) {
 		dbg_addr2line_printf((uintptr_t)instruction_trypred(info->ei_trace[i]),
 		                     (uintptr_t)info->ei_trace[i], "Called here");
 	}
-#endif
+#endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 #if EXCEPT_BACKTRACE_SIZE != 0
 	{
 		struct exception_info *info = &PERTASK(_this_exception_info);
@@ -535,7 +536,7 @@ panic_uhe_dbg_main(void *arg) {
 			                 my_last_pc, "Traceback ends here");
 		}
 	}
-#endif
+#endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 	if (args->error == UNWIND_SUCCESS) {
 		dbg_printf("Unwinding stopped when " DF_FGCOLOR(DBG_COLOR_PURPLE, "NOTHROW")
 		           "() function " "%[vinfo:" DF_WHITE("%n") "] was reached\n",
@@ -585,7 +586,7 @@ halt_unhandled_exception(unsigned int unwind_error,
 			                 my_last_pc, "Traceback ends here");
 		}
 	}
-#endif
+#endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 	if (unwind_error == UNWIND_SUCCESS) {
 		printk(KERN_EMERG
 		       "Unwinding stopped when NOTHROW() function "
@@ -624,9 +625,9 @@ halt_unhandled_exception(unsigned int unwind_error,
 		args.info    = info;
 		dbg_enter(unwind_state, &panic_uhe_dbg_main, &args);
 	}
-#else
+#else /* !CONFIG_NO_DEBUGGER */
 	kernel_panic(unwind_state, "Unhandled exception\n");
-#endif
+#endif /* CONFIG_NO_DEBUGGER */
 }
 
 
@@ -644,7 +645,7 @@ NOTHROW(FCALL libc_error_unwind)(struct kcpustate *__restrict state) {
 	DEFINE_INTERN_SYMBOL(_this_exception_flags, &_this_exception_info.ei_flags, sizeof(_this_exception_info.ei_flags));
 #if EXCEPT_BACKTRACE_SIZE != 0
 	DEFINE_INTERN_SYMBOL(_this_exception_trace, &_this_exception_info.ei_trace[0], sizeof(_this_exception_info.ei_trace));
-#endif
+#endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 
 search_fde:
 	/* unwind `state' until the nearest exception handler, or until user-space is reached.
@@ -737,9 +738,9 @@ search_fde:
 				break;
 		}
 		PERTASK_SET(_this_exception_info.ei_trace[i], (void *)KCPUSTATE_PC(*state));
-#else
+#else /* EXCEPT_BACKTRACE_SIZE > 1 */
 		PERTASK_SET(_this_exception_info.ei_trace[0], (void *)KCPUSTATE_PC(*state));
-#endif
+#endif /* EXCEPT_BACKTRACE_SIZE <= 1 */
 	}
 #endif /* EXCEPT_BACKTRACE_SIZE != 0 */
 

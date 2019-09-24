@@ -76,8 +76,8 @@ INTDEF byte_t __kernel_pertask_size[];
 DATDEF ATTR_PERTASK struct vm_node __this_kernel_stack ASMNAME("_this_kernel_stack");
 DATDEF ATTR_PERTASK struct vm_datapart __this_kernel_stack_part ASMNAME("_this_kernel_stack_part");
 
-#define HINT_ADDR(x,y) x
-#define HINT_MODE(x,y) y
+#define HINT_ADDR(x, y) x
+#define HINT_MODE(x, y) y
 #define HINT_GETADDR(x) HINT_ADDR x
 #define HINT_GETMODE(x) HINT_MODE x
 
@@ -488,14 +488,14 @@ DEFINE_SYSCALL5(pid_t, clone,
                 USER UNCHECKED pid_t *, ptid,
                 USER UNCHECKED pid_t *, ctid,
                 uintptr_t, newtls)
-#else
+#else /* __x86_64__ */
 DEFINE_SYSCALL5(pid_t, clone,
                 syscall_ulong_t, flags,
                 USER UNCHECKED void *, child_stack,
                 USER UNCHECKED pid_t *, ptid,
                 uintptr_t, newtls,
                 USER UNCHECKED pid_t *, ctid)
-#endif
+#endif /* !__x86_64__ */
 {
 	/* Send an RPC to ourself, so we can gain access to the user-space register state. */
 	task_schedule_user_rpc(THIS_TASK,
@@ -509,7 +509,7 @@ DEFINE_SYSCALL5(pid_t, clone,
 	return -EOK;
 }
 
-DEFINE_SYSCALL0(pid_t,fork) {
+DEFINE_SYSCALL0(pid_t, fork) {
 	/* Send an RPC to ourself, so we can gain access to the user-space register state. */
 	task_schedule_user_rpc(THIS_TASK,
 	                       &task_fork_rpc,

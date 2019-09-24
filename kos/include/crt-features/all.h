@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc34f9307 */
+/* HASH CRC-32:0x9e1c958e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2484,6 +2484,7 @@
 #define __CRT_HAVE_pthread_getname_np 1
 #define __CRT_HAVE_pthread_getschedparam 1
 #define __CRT_HAVE_pthread_getspecific 1
+#define __CRT_HAVE_pthread_gettid_np 1
 #define __CRT_HAVE_pthread_join 1
 #define __CRT_HAVE_pthread_key_create 1
 #define __CRT_HAVE_pthread_key_delete 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x28f51b42 */
+/* HASH CRC-32:0x71cdda3b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2150,6 +2150,7 @@
 #define __CRT_ATTR_NOTHROW_NCX_pthread_getname_np 1
 #define __CRT_ATTR_NOTHROW_NCX_pthread_getschedparam 1
 #define __CRT_ATTR_NOTHROW_NCX_pthread_getspecific 1
+#define __CRT_ATTR_NOTHROW_NCX_pthread_gettid_np 1
 #define __CRT_ATTR_NOTHROW_NCX_pthread_key_create 1
 #define __CRT_ATTR_NOTHROW_NCX_pthread_key_delete 1
 #define __CRT_ATTR_NOTHROW_NCX_pthread_kill 1
@@ -4331,6 +4332,7 @@
 #define __CRT_ATTR_CONST_ntohl 1
 #define __CRT_ATTR_CONST_ntohs 1
 #define __CRT_ATTR_CONST_pthread_equal 1
+#define __CRT_ATTR_CONST_pthread_gettid_np 1
 #define __CRT_ATTR_CONST_pthread_self 1
 #define __CRT_ATTR_CONST_round 1
 #define __CRT_ATTR_CONST_roundf 1

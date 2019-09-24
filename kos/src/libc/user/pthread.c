@@ -30,6 +30,7 @@
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <kos/anno.h>
+#include <syslog.h>
 #include <kos/except.h>
 #include <kos/syscalls.h>
 #include <kos/thread.h>
@@ -497,6 +498,21 @@ NOTHROW_NCX(LIBCCALL libc_pthread_self)(void)
 	return (pthread_t)result;
 }
 /*[[[end:pthread_self]]]*/
+
+/*[[[head:pthread_gettid_np,hash:CRC-32=0x8318e75]]]*/
+/* Return the TID of the given `target_thread'
+ * If the given `target_thread' has already terminated, 0 is returned */
+INTERN WUNUSED ATTR_CONST
+ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_gettid_np") pid_t
+NOTHROW_NCX(LIBCCALL libc_pthread_gettid_np)(pthread_t target_thread)
+/*[[[body:pthread_gettid_np]]]*/
+{
+	pid_t result;
+	struct pthread *pt = (struct pthread *)target_thread;
+	result = ATOMIC_READ(pt->pt_tid);
+	return result;
+}
+/*[[[end:pthread_gettid_np]]]*/
 
 /*[[[head:pthread_attr_init,hash:CRC-32=0x4457033b]]]*/
 /* Initialize thread attribute *ATTR with default attributes
@@ -2489,7 +2505,7 @@ NOTHROW_NCX(LIBCCALL libc___pthread_register_cancel_defer)(__pthread_unwind_buf_
 
 
 
-/*[[[start:exports,hash:CRC-32=0x50bbbb43]]]*/
+/*[[[start:exports,hash:CRC-32=0xabc8c404]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_create, libc_pthread_create);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_exit, libc_pthread_exit);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_join, libc_pthread_join);
@@ -2527,6 +2543,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(pthread_getschedparam, libc_pthread_getschedparam);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_setschedprio, libc_pthread_setschedprio);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_getname_np, libc_pthread_getname_np);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_setname_np, libc_pthread_setname_np);
+DEFINE_PUBLIC_WEAK_ALIAS(pthread_gettid_np, libc_pthread_gettid_np);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_getconcurrency, libc_pthread_getconcurrency);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_setconcurrency, libc_pthread_setconcurrency);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_yield, libc_pthread_yield);

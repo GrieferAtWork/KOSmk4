@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1b536a9a */
+/* HASH CRC-32:0xa042d7a2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -414,6 +414,18 @@ __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,pthread_getname_np,(pthread_t _
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,pthread_setname_np,(pthread_t __target_thread, const char *__name),(__target_thread,__name))
 #endif /* pthread_setname_np... */
 #endif /* __USE_GNU */
+#ifdef __USE_KOS
+#ifndef __pthread_gettid_np_defined
+#define __pthread_gettid_np_defined 1
+#if defined(__CRT_HAVE_pthread_gettid_np)
+/* Return the TID of the given `target_thread'
+ * If the given `target_thread' has already terminated, 0 is returned */
+__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,__pid_t,__NOTHROW_NCX,pthread_gettid_np,(pthread_t __target_thread),(__target_thread))
+#else /* LIBC: pthread_gettid_np */
+#undef __pthread_gettid_np_defined
+#endif /* pthread_gettid_np... */
+#endif /* !__pthread_gettid_np_defined */
+#endif /* __USE_KOS */
 #ifdef __USE_UNIX98
 #if defined(__CRT_HAVE_pthread_getconcurrency)
 /* Determine level of concurrency */

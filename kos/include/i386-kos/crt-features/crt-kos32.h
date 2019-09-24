@@ -2472,6 +2472,7 @@
 #define __CRT_HAVE_pthread_getname_np 1
 #define __CRT_HAVE_pthread_getschedparam 1
 #define __CRT_HAVE_pthread_getspecific 1
+#define __CRT_HAVE_pthread_gettid_np 1
 #define __CRT_HAVE_pthread_join 1
 #define __CRT_HAVE_pthread_key_create 1
 #define __CRT_HAVE_pthread_key_delete 1

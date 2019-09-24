@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6fb8c95d */
+/* HASH CRC-32:0x23403c21 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1504,6 +1504,7 @@ __CRT_FUNCTION(pthread_getcpuclockid,0,(),2,(pthread_t,pthread_id,clockid_t *,cl
 __CRT_FUNCTION(pthread_getname_np,0,(),3,(pthread_t,target_thread,char *,buf,size_t,buflen),int)
 __CRT_FUNCTION(pthread_getschedparam,0,(),3,(pthread_t,target_thread,int *__restrict,policy,struct sched_param *__restrict,param),int)
 __CRT_FUNCTION(pthread_getspecific,0,(),1,(pthread_key_t,key),void *)
+__CRT_FUNCTION(pthread_gettid_np,0,(),1,(pthread_t,target_thread),pid_t)
 __CRT_FUNCTION(pthread_join,0,(),2,(pthread_t,pthread,void **,thread_return),int)
 __CRT_FUNCTION(pthread_key_create,0,(),2,(pthread_key_t *,key,__pthread_destr_function_t,destr_function),int)
 __CRT_FUNCTION(pthread_key_delete,0,(),1,(pthread_key_t,key),int)

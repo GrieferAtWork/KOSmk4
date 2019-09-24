@@ -388,6 +388,14 @@ pthread_setname_np:(pthread_t target_thread, [nonnull] const char *name) -> int;
 %#endif /* __USE_GNU */
 
 
+%#ifdef __USE_KOS
+@@Return the TID of the given `target_thread'
+@@If the given `target_thread' has already terminated, 0 is returned
+[guard][ATTR_WUNUSED][ATTR_CONST]
+pthread_gettid_np:(pthread_t target_thread) -> $pid_t;
+%#endif /* __USE_KOS */
+
+
 %#ifdef __USE_UNIX98
 @@Determine level of concurrency
 pthread_getconcurrency:(void) -> int;

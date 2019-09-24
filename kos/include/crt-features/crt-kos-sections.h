@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2910762f */
+/* HASH CRC-32:0x4d71d590 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2514,6 +2514,7 @@
 #define __CRT_SECTION_pthread_getname_np                    __CRT_SECTINFO_sched_pthread                            /* .text.crt.sched.pthread.pthread_getname_np */
 #define __CRT_SECTION_pthread_getschedparam                 __CRT_SECTINFO_sched_pthread                            /* .text.crt.sched.pthread.pthread_getschedparam */
 #define __CRT_SECTION_pthread_getspecific                   __CRT_SECTINFO_sched_pthread                            /* .text.crt.sched.pthread.pthread_getspecific */
+#define __CRT_SECTION_pthread_gettid_np                     __CRT_SECTINFO_sched_pthread                            /* .text.crt.sched.pthread.pthread_gettid_np */
 #define __CRT_SECTION_pthread_join                          __CRT_SECTINFO_sched_pthread                            /* .text.crt.sched.pthread.pthread_join */
 #define __CRT_SECTION_pthread_key_create                    __CRT_SECTINFO_sched_pthread                            /* .text.crt.sched.pthread.pthread_key_create */
 #define __CRT_SECTION_pthread_key_delete                    __CRT_SECTINFO_sched_pthread                            /* .text.crt.sched.pthread.pthread_key_delete */
