@@ -782,14 +782,14 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.wchar.FILE.unlocked.write.putc.putwchar
 }
 /*[[[end:putwchar_unlocked]]]*/
 
-/*[[[head:DOS$wcsnrtombs,hash:CRC-32=0x6a7f6115]]]*/
+/*[[[head:DOS$wcsnrtombs,hash:CRC-32=0xd015330d]]]*/
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs.wcsnrtombs") size_t
 NOTHROW_NCX(LIBDCALL libd_wcsnrtombs)(char *dst,
                                       char16_t const **__restrict psrc,
                                       size_t nwc,
                                       size_t len,
-                                      __mbstate_t *ps)
+                                      mbstate_t *ps)
 /*[[[body:DOS$wcsnrtombs]]]*/
 {
 	CRT_UNIMPLEMENTED("wcsnrtombs"); /* TODO */
@@ -838,14 +838,14 @@ ATTR_WEAK ATTR_SECTION(".text.crt.wchar.FILE.unlocked.write.write.fputws_unlocke
 }
 /*[[[end:fputws_unlocked]]]*/
 
-/*[[[head:wcsnrtombs,hash:CRC-32=0xe546047c]]]*/
+/*[[[head:wcsnrtombs,hash:CRC-32=0x98e9ebb6]]]*/
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.unicode.static.mbs.wcsnrtombs") size_t
 NOTHROW_NCX(LIBCCALL libc_wcsnrtombs)(char *dst,
                                       char32_t const **__restrict psrc,
                                       size_t nwc,
                                       size_t len,
-                                      __mbstate_t *ps)
+                                      mbstate_t *ps)
 /*[[[body:wcsnrtombs]]]*/
 {
 	CRT_UNIMPLEMENTED("wcsnrtombs"); /* TODO */
@@ -878,14 +878,14 @@ NOTHROW_NCX(LIBCCALL libc_wcsdup)(char32_t const *__restrict string)
 }
 /*[[[end:wcsdup]]]*/
 
-/*[[[head:mbsnrtowcs,hash:CRC-32=0x94ed3a87]]]*/
+/*[[[head:mbsnrtowcs,hash:CRC-32=0xf94fd2a2]]]*/
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.unicode.static.mbs.mbsnrtowcs") size_t
 NOTHROW_NCX(LIBCCALL libc_mbsnrtowcs)(char32_t *dst,
                                       char const **__restrict psrc,
                                       size_t nmc,
                                       size_t len,
-                                      __mbstate_t *ps)
+                                      mbstate_t *ps)
 /*[[[body:mbsnrtowcs]]]*/
 {
 	CRT_UNIMPLEMENTED("mbsnrtowcs"); /* TODO */
@@ -923,14 +923,14 @@ NOTHROW_NCX(LIBCCALL libc_wcwidth)(char32_t ch)
 /*[[[end:wcwidth]]]*/
 
 
-/*[[[head:DOS$mbsnrtowcs,hash:CRC-32=0x6717f4c4]]]*/
+/*[[[head:DOS$mbsnrtowcs,hash:CRC-32=0x2fadaaca]]]*/
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.unicode.static.mbs.mbsnrtowcs") size_t
 NOTHROW_NCX(LIBDCALL libd_mbsnrtowcs)(char16_t *dst,
                                       char const **__restrict psrc,
                                       size_t nmc,
                                       size_t len,
-                                      __mbstate_t *ps)
+                                      mbstate_t *ps)
 /*[[[body:DOS$mbsnrtowcs]]]*/
 {
 	CRT_UNIMPLEMENTED("mbsnrtowcs"); /* TODO */

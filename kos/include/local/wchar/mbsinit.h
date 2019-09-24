@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4c1c0cce */
+/* HASH CRC-32:0x5703f740 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,8 +21,8 @@
 #define __local_mbsinit_defined 1
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(mbsinit) __ATTR_WUNUSED __ATTR_PURE int
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mbsinit))(mbstate_t const *__ps) {
-#line 247 "kos/src/libc/magic/wchar.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mbsinit))(__mbstate_t const *__ps) {
+#line 248 "kos/src/libc/magic/wchar.c"
 	return !__ps || __MBSTATE_ISINIT(__ps);
 }
 __NAMESPACE_LOCAL_END

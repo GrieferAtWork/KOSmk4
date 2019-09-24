@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe7feda20 */
+/* HASH CRC-32:0xe9c12657 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,10 +59,10 @@ INTDEF WUNUSED ATTR_LIBC_WSCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBC
 INTDEF WUNUSED ATTR_LIBC_WSCANF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (LIBDCALL libd_vfwscanf)(FILE *__restrict stream, char16_t const *__restrict format, va_list args) __THROWS(...);
 INTDEF WUNUSED ATTR_LIBC_WSCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T (LIBCCALL libc_vwscanf)(char32_t const *__restrict format, va_list args) __THROWS(...);
 INTDEF WUNUSED ATTR_LIBC_WSCANF(1, 0) NONNULL((1)) __STDC_INT_AS_SIZE_T (LIBDCALL libd_vwscanf)(char16_t const *__restrict format, va_list args) __THROWS(...);
-INTDEF NONNULL((2)) size_t NOTHROW_NCX(LIBCCALL libc_mbsnrtowcs)(char32_t *dst, char const **__restrict psrc, size_t nmc, size_t len, __mbstate_t *ps);
-INTDEF NONNULL((2)) size_t NOTHROW_NCX(LIBDCALL libd_mbsnrtowcs)(char16_t *dst, char const **__restrict psrc, size_t nmc, size_t len, __mbstate_t *ps);
-INTDEF NONNULL((2)) size_t NOTHROW_NCX(LIBCCALL libc_wcsnrtombs)(char *dst, char32_t const **__restrict psrc, size_t nwc, size_t len, __mbstate_t *ps);
-INTDEF NONNULL((2)) size_t NOTHROW_NCX(LIBDCALL libd_wcsnrtombs)(char *dst, char16_t const **__restrict psrc, size_t nwc, size_t len, __mbstate_t *ps);
+INTDEF NONNULL((2)) size_t NOTHROW_NCX(LIBCCALL libc_mbsnrtowcs)(char32_t *dst, char const **__restrict psrc, size_t nmc, size_t len, mbstate_t *ps);
+INTDEF NONNULL((2)) size_t NOTHROW_NCX(LIBDCALL libd_mbsnrtowcs)(char16_t *dst, char const **__restrict psrc, size_t nmc, size_t len, mbstate_t *ps);
+INTDEF NONNULL((2)) size_t NOTHROW_NCX(LIBCCALL libc_wcsnrtombs)(char *dst, char32_t const **__restrict psrc, size_t nwc, size_t len, mbstate_t *ps);
+INTDEF NONNULL((2)) size_t NOTHROW_NCX(LIBDCALL libd_wcsnrtombs)(char *dst, char16_t const **__restrict psrc, size_t nwc, size_t len, mbstate_t *ps);
 INTDEF FILE *NOTHROW_NCX(LIBCCALL libc_open_wmemstream)(char32_t **bufloc, size_t *sizeloc);
 INTDEF FILE *NOTHROW_NCX(LIBDCALL libd_open_wmemstream)(char16_t **bufloc, size_t *sizeloc);
 INTDEF WUNUSED ATTR_MALL_DEFAULT_ALIGNED ATTR_MALLOC NONNULL((1)) char32_t *NOTHROW_NCX(LIBCCALL libc_wcsdup)(char32_t const *__restrict string);

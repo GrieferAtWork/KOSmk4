@@ -19,6 +19,7 @@
 
 %[define_ccompat_header(cwchar)]
 
+%[define_replacement(mbstate_t = __mbstate_t)]
 %[define_replacement(wchar_t = __WCHAR_TYPE__)]
 %[define_replacement(wint_t = __WINT_TYPE__)]
 %[define_wchar_replacement(__SIZEOF_WCHAR_T__ = 2, 4)]
@@ -690,7 +691,7 @@ __NAMESPACE_STD_USING(wcstok)
 
 [ATTR_WUNUSED][alias(*)]
 __mbrlen:([inp(maxlen)] char const *__restrict str, $size_t maxlen,
-          [nullable] __mbstate_t *ps) -> $size_t = mbrlen;
+          [nullable] $mbstate_t *ps) -> $size_t = mbrlen;
 
 
 %
@@ -737,12 +738,12 @@ wcpncpy:([nonnull] wchar_t *__restrict buf, [nonnull] wchar_t const *__restrict 
 [wchar][section({.text.crt.wchar.unicode.static.mbs|.text.crt.dos.wchar.unicode.static.mbs})]
 mbsnrtowcs:([nullable] wchar_t *dst,
             [nonnull] char const **__restrict psrc, $size_t nmc, $size_t len,
-            [nullable] __mbstate_t *ps) -> $size_t;
+            [nullable] $mbstate_t *ps) -> $size_t;
 
 [wchar][section({.text.crt.wchar.unicode.static.mbs|.text.crt.dos.wchar.unicode.static.mbs})]
 wcsnrtombs:([nullable] char *dst,
             [nonnull] wchar_t const **__restrict psrc, $size_t nwc, $size_t len,
-            [nullable] __mbstate_t *ps) -> $size_t;
+            [nullable] $mbstate_t *ps) -> $size_t;
 
 [wchar][section({.text.crt.wchar.FILE.locked.access|.text.crt.dos.wchar.FILE.locked.access})]
 open_wmemstream:(wchar_t **bufloc, $size_t *sizeloc) -> $FILE *;

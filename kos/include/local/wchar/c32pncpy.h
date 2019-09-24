@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5d583eec */
+/* HASH CRC-32:0xf920baf5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -78,7 +78,7 @@ __LOCAL_LIBC(c32pncpy) __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __CHAR32_TYPE__ 
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(c32pncpy))(__CHAR32_TYPE__ *__restrict __buf,
                                                       __CHAR32_TYPE__ const *__restrict __src,
                                                       __SIZE_TYPE__ __buflen) {
-#line 1222 "kos/src/libc/magic/wchar.c"
+#line 1223 "kos/src/libc/magic/wchar.c"
 	__SIZE_TYPE__ __srclen = __localdep_c32nlen(__src, __buflen);
 	__localdep_c32memcpy(__buf, __src, __srclen);
 	return __localdep_c32mempset(__buf+__srclen, '\0', __buflen - __srclen);
