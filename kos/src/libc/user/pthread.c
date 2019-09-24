@@ -48,6 +48,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include <unistd.h>
 
 #include <librpc/rpc.h>
@@ -474,9 +475,26 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_self") pthread_t
 NOTHROW_NCX(LIBCCALL libc_pthread_self)(void)
 /*[[[body:pthread_self]]]*/
 {
-	CRT_UNIMPLEMENTED("pthread_self"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	struct pthread *result;
+	result = pthread_self_p;
+	if unlikely(!result) {
+		result = (struct pthread *)malloc(sizeof(struct pthread));
+		if unlikely(!result) {
+			PRIVATE ATTR_SECTION(".rodata.crt.sched.pthread.pthread_self_error_message") char const
+				message[] = "[libc] Failed to allocate descriptor for pthread_self()\n";
+			syslog(LOG_ERR, message);
+			exit(EXIT_FAILURE);
+		}
+		pthread_self_p       = result;
+		result->pt_tid       = sys_set_tid_address(&result->pt_tid);
+		result->pt_refcnt    = 1;
+		result->pt_retval    = NULL;
+		result->pt_tls       = RD_TLS_BASE_REGISTER();
+		result->pt_stackaddr = NULL;
+		result->pt_stacksize = 0;
+		result->pt_flags     = PTHREAD_FNOSTACK;
+	}
+	return (pthread_t)result;
 }
 /*[[[end:pthread_self]]]*/
 
