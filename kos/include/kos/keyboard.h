@@ -657,7 +657,7 @@
 #define KEY_MM_NEXT_TRACK     KEY_NEXTSONG
 #define KEY_MM_PLAY_PAUSE     KEY_PLAYPAUSE
 #define KEY_MM_STOP           KEY_STOPCD /* ??? */
-#define KEY_MM_SELECT         KEY_SELECT
+#define KEY_MM_SELECT         KEY_MEDIA
 
 #define KEY_MY_COMPUTER       KEY_COMPUTER
 #define KEY_MEDIA_PLAYER      KEY_PLAYER
