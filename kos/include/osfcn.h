@@ -16,15 +16,12 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _MEMORY_H
-#define _MEMORY_H 1
+#ifndef _OSFCN_H
+#define _OSFCN_H 1
 
-#if 1 /* Glibc */
-#include <string.h>
-#endif
+#include <sys/resource.h>
 
-#if 1 /* djgpp */
-#include <stdlib.h>
-#endif
+#include <time.h>
+#include <unistd.h>
 
-#endif /* !_MEMORY_H */
+#endif /* !_OSFCN_H */

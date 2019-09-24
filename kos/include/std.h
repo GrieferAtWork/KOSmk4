@@ -16,15 +16,11 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _MEMORY_H
-#define _MEMORY_H 1
+#ifndef _STD_H
+#define _STD_H 1
 
-#if 1 /* Glibc */
-#include <string.h>
-#endif
-
-#if 1 /* djgpp */
 #include <stdlib.h>
-#endif
+#include <string.h>
+#include <unistd.h>
 
-#endif /* !_MEMORY_H */
+#endif /* !_STD_H */
