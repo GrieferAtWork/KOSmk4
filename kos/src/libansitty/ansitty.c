@@ -387,6 +387,7 @@ stub_scroll_with_copycell(struct ansitty *__restrict self,
 done:
 	return;
 clearall:
+	/* TODO: Only clear within the scroll region! */
 	CLS(ANSITTY_CLS_ALL);
 }
 
@@ -509,8 +510,9 @@ PRIVATE void CC loadcursor(struct ansitty *__restrict self) {
 	SETCURSOR(self->at_savecur[0], self->at_savecur[1], true);
 }
 
-PRIVATE void CC setscrollregion(struct ansitty *__restrict self,
-                                ansitty_coord_t sl, ansitty_coord_t el) {
+PRIVATE void CC
+setscrollregion(struct ansitty *__restrict self,
+                ansitty_coord_t sl, ansitty_coord_t el) {
 	if (sl == self->at_scroll_sl &&
 	    el == self->at_scroll_el)
 		return;
@@ -519,8 +521,9 @@ PRIVATE void CC setscrollregion(struct ansitty *__restrict self,
 	SCROLLREGION(sl, el);
 }
 
-PRIVATE void CC setscrollmargin(struct ansitty *__restrict self,
-                                ansitty_coord_t sc, ansitty_coord_t ec) {
+PRIVATE void CC
+setscrollmargin(struct ansitty *__restrict self,
+                ansitty_coord_t sc, ansitty_coord_t ec) {
 	self->at_scroll_sc = sc;
 	self->at_scroll_ec = ec;
 }
@@ -1875,7 +1878,7 @@ done_insert_ansitty_flag_hedit:
 
 
 	case 'r': { /* VT100: setwin DECSTBM */
-		/* Set top and bottom line#s of a window */
+		/* Set top and bottom (inclusive) line#s of a window */
 		ansitty_coord_t startline;
 		ansitty_coord_t endline;
 		if (!arglen) {
@@ -1893,8 +1896,13 @@ done_insert_ansitty_flag_hedit:
 				endline = (ansitty_coord_t)strtoul(end, &end, 10);
 				if (end != arg + arglen)
 					goto nope;
+#if 0 /* The bottom-line is actually the index of the last
+       * line to-be included within the scroll region.
+       * As such, we'd have to add +1 onto it later, so we skip
+       * that step by never subtracting 1 in the first place! */
 				if (endline)
 					--endline;
+#endif
 			}
 			if (startline)
 				--startline;
