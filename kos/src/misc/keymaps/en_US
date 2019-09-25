@@ -121,6 +121,7 @@ KEY_SLASH:'/'
 KEY_SLASH:shift:'?'
 
 KEY_SPACE:' '
+KEY_SPACE:shift:' '
 
 KEY_KP_SLASH:'/'
 KEY_KP_STAR:'*'

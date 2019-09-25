@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7fef3717 */
+/* HASH CRC-32:0x2ed46331 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1033,10 +1033,10 @@ __NOTHROW_NCX(__LIBCCALL unicode_fold)(__CHAR32_TYPE__ __ch, __CHAR32_TYPE__ __b
 	return __buf + 1;
 }
 
-#define unicode_tolower(ch)  (unicode_isupper(ch) ? (__CHAR32_TYPE__)(ch) + 0x20 : (__CHAR32_TYPE__)(ch))
-#define unicode_toupper(ch)  (unicode_islower(ch) ? (__CHAR32_TYPE__)(ch) - 0x20 : (__CHAR32_TYPE__)(ch))
-#define unicode_totitle(ch)  (unicode_islower(ch) ? (__CHAR32_TYPE__)(ch) - 0x20 : (__CHAR32_TYPE__)(ch))
-#define unicode_asdigit(ch) ((__UINT8_TYPE__)(ch) - 0x30)
+#define unicode_tolower(ch)   (unicode_isupper(ch) ? (__CHAR32_TYPE__)(ch) + 0x20 : (__CHAR32_TYPE__)(ch))
+#define unicode_toupper(ch)   (unicode_islower(ch) ? (__CHAR32_TYPE__)(ch) - 0x20 : (__CHAR32_TYPE__)(ch))
+#define unicode_totitle(ch)   (unicode_islower(ch) ? (__CHAR32_TYPE__)(ch) - 0x20 : (__CHAR32_TYPE__)(ch))
+#define unicode_asdigit(ch)   ((__UINT8_TYPE__)(ch) - 0x30)
 #define unicode_isalpha(ch)   __libc_isalpha(ch)
 #define unicode_islower(ch)   __libc_islower(ch)
 #define unicode_isupper(ch)   __libc_isupper(ch)

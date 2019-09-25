@@ -96,7 +96,7 @@ PRIVATE struct basic_key const basic_keys_en_US[0xe0] = {
 	DEF(KEY_DOT, '.', '>'),
 	DEF(KEY_SLASH, '/', '?'),
 
-	DEF(KEY_SPACE, ' ', 0),
+	DEF(KEY_SPACE, ' ', ' '),
 
 	DEF(KEY_KP_SLASH, '/', 0),
 	DEF(KEY_KP_STAR, '*', 0),
