@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xebc2d3d2 */
+/* HASH CRC-32:0x7b59f22a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wildstrcmp) __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wildstrcmp))(char const *__pattern,
                                                         char const *__string) {
-#line 3482 "kos/src/libc/magic/string.c"
+#line 3512 "kos/src/libc/magic/string.c"
 	char __card_post;
 	for (;;) {
 		if (!*__string) {

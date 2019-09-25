@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6189971a */
+/* HASH CRC-32:0xf2448ab5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memccpy))(void *__restrict __dst,
                                                      void const *__restrict __src,
                                                      int __needle,
                                                      __SIZE_TYPE__ __num_bytes) {
-#line 845 "kos/src/libc/magic/string.c"
+#line 854 "kos/src/libc/magic/string.c"
 	__BYTE_TYPE__ *__pdst = (__BYTE_TYPE__ *)__dst;
 	__BYTE_TYPE__ const *__psrc = (__BYTE_TYPE__ const *)__src;
 	while (__num_bytes--) {

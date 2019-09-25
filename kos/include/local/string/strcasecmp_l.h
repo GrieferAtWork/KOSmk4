@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1c48cfe3 */
+/* HASH CRC-32:0x498eaf6a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,7 +45,7 @@ __LOCAL_LIBC(strcasecmp_l) __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strcasecmp_l))(char const *__s1,
                                                           char const *__s2,
                                                           __locale_t __locale) {
-#line 710 "kos/src/libc/magic/string.c"
+#line 719 "kos/src/libc/magic/string.c"
 	(void)__locale;
 	return __localdep_strcasecmp(__s1, __s2);
 }

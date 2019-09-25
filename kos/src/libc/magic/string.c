@@ -606,16 +606,25 @@ strcasestr:([nonnull] char const *haystack, [nonnull] char const *needle) -> cha
 	return NULL;
 }
 
+@@Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
+@@If no such sub-string exists, return `NULL' instead.
+@@When `needlelen' is ZERO(0), also return `NULL' unconditionally.
 [libc][kernel][ATTR_WUNUSED][ATTR_PURE]
 memmem:([nonnull] void const *haystack, size_t haystacklen, [nonnull] void const *needle, size_t needlelen) -> void *
 	[([nonnull] void *haystack, size_t haystacklen, [nonnull] void const *needle, size_t needlelen) -> void *]
 	[([nonnull] void const *haystack, size_t haystacklen, [nonnull] void const *needle, size_t needlelen) -> void const *]
 {
-	byte_t *iter = (byte_t *)haystack;
-	while (haystacklen >= needlelen) {
-		if (memcmp(iter, needle, needlelen) == 0)
-			return (void *)iter;
-		++iter;
+	byte_t *candidate, marker;
+	if unlikely(!needlelen || needlelen > haystacklen)
+		return NULL;
+	haystacklen -= (needlelen - 1);
+	marker       = *(byte_t *)needle;
+	while ((candidate = (byte_t *)memchr(haystack, marker, haystacklen)) != NULL) {
+		if (memcmp(candidate, needle, needlelen) == 0)
+			return (void *)candidate;
+		++candidate;
+		haystacklen = ((byte_t *)haystack + haystacklen) - candidate;
+		haystack    = (void const *)candidate;
 	}
 	return NULL;
 }
@@ -2335,17 +2344,38 @@ memcasecmp:([nonnull] void const *s1, [nonnull] void const *s2, size_t n_bytes) 
 	     ((v1 = tolower(v1)) == (v2 = tolower(v2)))));
 	return (int)v1 - (int)v2;
 }
-[alias(_memicmp_l)][ATTR_WUNUSED][ATTR_PURE]
+
+
+@@Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
+@@During comprisons, casing of character is ignored (s.a. `memmem()')
+@@If no such sub-string exists, return `NULL' instead.
+@@When `needlelen' is ZERO(0), also return `NULL' unconditionally.
+[ATTR_WUNUSED][ATTR_PURE]
 [section(.text.crt.unicode.static.memory)]
 memcasemem:([nonnull] void const *haystack, size_t haystacklen, [nonnull] void const *needle, size_t needlelen) -> void *
 	[([nonnull] void *haystack, size_t haystacklen, [nonnull] void const *needle, size_t needlelen) -> void *]
 	[([nonnull] void const *haystack, size_t haystacklen, [nonnull] void const *needle, size_t needlelen) -> void const *]
 {
-	byte_t *iter = (byte_t *)haystack;
-	while (haystacklen >= needlelen) {
-		if (memcasecmp(iter, needle, needlelen) == 0)
-			return (void *)iter;
-		++iter;
+	byte_t *candidate, marker;
+	byte_t *hayend;
+	if unlikely(!needlelen || needlelen > haystacklen)
+		return NULL;
+	haystacklen -= (needlelen - 1);
+	marker       = tolower(*(byte_t *)needle);
+	hayend       = (byte_t *)haystack + haystacklen;
+	for (;;) {
+		for (candidate = (byte_t *)haystack; candidate < hayend; ++candidate) {
+			byte_t b = *candidate;
+			if (b == marker || tolower(b) == marker)
+				goto got_candidate;
+		}
+		break;
+got_candidate:
+		if (memcasecmp(candidate, needle, needlelen) == 0)
+			return (void *)candidate;
+		++candidate;
+		haystacklen = ((byte_t *)haystack + haystacklen) - candidate;
+		haystack    = (void const *)candidate;
 	}
 	return NULL;
 }

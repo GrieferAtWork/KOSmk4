@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbfe4f738 */
+/* HASH CRC-32:0xa187b367 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -76,6 +76,9 @@
 #define __libc_strnlen __libc_slow_strnlen
 /* Descendingly search for `NEEDLE', starting at `HAYSTACK+N_BYTES'. - Return `NULL' if `NEEDLE' wasn't found. */
 #define __libc_memrchr __libc_slow_memrchr
+/* Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
+ * If no such sub-string exists, return `NULL' instead.
+ * When `needlelen' is ZERO(0), also return `NULL' unconditionally. */
 #define __libc_memmem __libc_slow_memmem
 #ifdef __fast_mempcpy_defined
 /* Same as `memcpy', but return `DST+N_BYTES', rather than `DST' */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa6840534 */
+/* HASH CRC-32:0x3ea11b8b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -119,9 +119,15 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,
 #define __libc_slow_memrchr (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrchr))
 #endif /* memrchr... */
 #if defined(__CRT_HAVE_memmem)
+/* Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
+ * If no such sub-string exists, return `NULL' instead.
+ * When `needlelen' is ZERO(0), also return `NULL' unconditionally. */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 3)),void *,__NOTHROW_NCX,__libc_slow_memmem,(void const *__haystack, __SIZE_TYPE__ __haystacklen, void const *__needle, __SIZE_TYPE__ __needlelen),memmem,(__haystack,__haystacklen,__needle,__needlelen))
 #else /* LIBC: memmem */
 #include <local/string/memmem.h>
+/* Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
+ * If no such sub-string exists, return `NULL' instead.
+ * When `needlelen' is ZERO(0), also return `NULL' unconditionally. */
 #define __libc_slow_memmem (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmem))
 #endif /* memmem... */
 #if defined(__CRT_HAVE_mempcpy)

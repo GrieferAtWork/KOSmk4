@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb91182bc */
+/* HASH CRC-32:0x11337168 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,6 +58,9 @@ INTDEF WUNUSED ATTR_PURE NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_strnlen)(
 INTDEF WUNUSED ATTR_PURE NONNULL((1)) void *NOTHROW_NCX(LIBCCALL libc_memrchr)(void const *__restrict haystack, int needle, size_t n_bytes);
 /* Same as `memchr' with a search limit of `(size_t)-1' */
 INTDEF ATTR_RETNONNULL WUNUSED ATTR_PURE NONNULL((1)) void *NOTHROW_NCX(LIBCCALL libc_rawmemchr)(void const *__restrict haystack, int needle);
+/* Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
+ * If no such sub-string exists, return `NULL' instead.
+ * When `needlelen' is ZERO(0), also return `NULL' unconditionally. */
 INTDEF WUNUSED ATTR_PURE NONNULL((1, 3)) void *NOTHROW_NCX(LIBCCALL libc_memmem)(void const *haystack, size_t haystacklen, void const *needle, size_t needlelen);
 /* Same as `memcpy', but return `DST+N_BYTES', rather than `DST' */
 INTDEF ATTR_RETNONNULL NONNULL((1, 2)) void *NOTHROW_NCX(LIBCCALL libc_mempcpy)(void *__restrict dst, void const *__restrict src, size_t n_bytes);
@@ -335,6 +338,10 @@ INTDEF WUNUSED ATTR_PURE NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_strnoff)(
 /* Same as `strnrchrnul', but return the offset from `STR', rather than the actual address */
 INTDEF WUNUSED ATTR_PURE NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_strnroff)(char const *__restrict haystack, int needle, size_t maxlen);
 INTDEF WUNUSED ATTR_PURE NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_memcasecmp)(void const *s1, void const *s2, size_t n_bytes);
+/* Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
+ * During comprisons, casing of character is ignored (s.a. `memmem()')
+ * If no such sub-string exists, return `NULL' instead.
+ * When `needlelen' is ZERO(0), also return `NULL' unconditionally. */
 INTDEF WUNUSED ATTR_PURE NONNULL((1, 3)) void *NOTHROW_NCX(LIBCCALL libc_memcasemem)(void const *haystack, size_t haystacklen, void const *needle, size_t needlelen);
 INTDEF WUNUSED ATTR_PURE NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_memcasecmp_l)(void const *s1, void const *s2, size_t n_bytes, locale_t locale);
 INTDEF WUNUSED ATTR_PURE NONNULL((1, 3)) void *NOTHROW_NCX(LIBCCALL libc_memcasemem_l)(void const *haystack, size_t haystacklen, void const *needle, size_t needlelen, locale_t locale);

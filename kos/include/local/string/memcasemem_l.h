@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb9be3bd6 */
+/* HASH CRC-32:0x9e12191d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcasemem_l))(void const *__haystack
                                                           void const *__needle,
                                                           __SIZE_TYPE__ __needlelen,
                                                           __locale_t __locale) {
-#line 2366 "kos/src/libc/magic/string.c"
+#line 2396 "kos/src/libc/magic/string.c"
 	__BYTE_TYPE__ *__iter = (__BYTE_TYPE__ *)__haystack;
 	while (__haystacklen >= __needlelen) {
 		if (__localdep_memcasecmp_l(__iter, __needle, __needlelen, __locale) == 0)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf4dac4b0 */
+/* HASH CRC-32:0xc361ecdc */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __LOCAL_LIBC(_wcsset_s) __ATTR_NONNULL((1)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wcsset_s))(__WCHAR_TYPE__ *__dst,
                                                        __SIZE_TYPE__ __dstsize,
                                                        __WCHAR_TYPE__ __ch) {
-#line 4193 "kos/src/libc/magic/string.c"
+#line 4223 "kos/src/libc/magic/string.c"
 
 
 	__WCHAR_TYPE__ *__p;
