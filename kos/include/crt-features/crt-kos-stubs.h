@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2aa6680b */
+/* HASH CRC-32:0xd565ca8a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -109,7 +109,6 @@
 #define __CRT_STUB_bindresvport 1
 #define __CRT_STUB_bindresvport6 1
 #define __CRT_STUB_cbrt 1
-#define __CRT_STUB_clearenv 1
 #define __CRT_STUB_clock 1
 #define __CRT_STUB_clock_getcpuclockid 1
 #define __CRT_STUB_closelog 1
@@ -497,7 +496,6 @@
 #define __CRT_STUB_pthread_spin_unlock 1
 #define __CRT_STUB_ptsname 1
 #define __CRT_STUB_ptsname_r 1
-#define __CRT_STUB_putenv 1
 #define __CRT_STUB_putgrent 1
 #define __CRT_STUB_putmsg 1
 #define __CRT_STUB_putpmsg 1
@@ -535,7 +533,6 @@
 #define __CRT_STUB_scandir 1
 #define __CRT_STUB_scandirat 1
 #define __CRT_STUB_sched_getcpu 1
-#define __CRT_STUB_secure_getenv 1
 #define __CRT_STUB_seed48 1
 #define __CRT_STUB_seed48_r 1
 #define __CRT_STUB_sem_close 1
@@ -555,7 +552,6 @@
 #define __CRT_STUB_semtimedop 1
 #define __CRT_STUB_setaliasent 1
 #define __CRT_STUB_setcontext 1
-#define __CRT_STUB_setenv 1
 #define __CRT_STUB_setgrent 1
 #define __CRT_STUB_setgroups 1
 #define __CRT_STUB_sethostent 1
@@ -624,7 +620,6 @@
 #define __CRT_STUB_ungetwc 1
 #define __CRT_STUB_ungetwc_unlocked 1
 #define __CRT_STUB_unlockpt 1
-#define __CRT_STUB_unsetenv 1
 #define __CRT_STUB_updwtmp 1
 #define __CRT_STUB_updwtmpx 1
 #define __CRT_STUB_uselocale 1

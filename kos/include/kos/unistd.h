@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9072308c */
+/* HASH CRC-32:0x3b65152e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -85,7 +85,7 @@ __NAMESPACE_LOCAL_USING(Execl)
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinal */
-__LIBC __ATTR_SENTINEL __ATTR_NORETURN __ATTR_NONNULL((1)) void (__VLIBCCALL Execle)(char const *__restrict __path, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __THROWS(...) __CASMNAME_SAME("Execle");
+__LIBC __ATTR_SENTINEL_O(1) __ATTR_NORETURN __ATTR_NONNULL((1)) void (__VLIBCCALL Execle)(char const *__restrict __path, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __THROWS(...) __CASMNAME_SAME("Execle");
 #elif defined(__CRT_HAVE_Execve)
 #include <local/kos.unistd/Execle.h>
 #ifdef __cplusplus
@@ -117,7 +117,7 @@ __NAMESPACE_LOCAL_USING(Execpl)
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinal */
-__LIBC __ATTR_SENTINEL __ATTR_NORETURN __ATTR_NONNULL((1)) void (__VLIBCCALL Execlpe)(char const *__restrict __file, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __THROWS(...) __CASMNAME_SAME("Execlpe");
+__LIBC __ATTR_SENTINEL_O(1) __ATTR_NORETURN __ATTR_NONNULL((1)) void (__VLIBCCALL Execlpe)(char const *__restrict __file, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __THROWS(...) __CASMNAME_SAME("Execlpe");
 #elif defined(__CRT_HAVE_Execvpe)
 #include <local/kos.unistd/Execlpe.h>
 #ifdef __cplusplus

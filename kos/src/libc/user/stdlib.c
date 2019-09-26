@@ -25,16 +25,19 @@
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
 #include <hybrid/sync/atomic-once.h>
+#include <hybrid/sync/atomic-rwlock.h>
 
 #include <kos/process.h>
 #include <kos/syscalls.h>
 #include <parts/dos/errno.h>
 #include <parts/errno.h>
 #include <sys/wait.h>
+#include <sys/auxv.h>
 
 #include <assert.h>
 #include <dlfcn.h>
 #include <fcntl.h>
+#include <malloc.h>
 #include <limits.h>
 #include <string.h>
 #include <unistd.h>
@@ -54,6 +57,50 @@ extern char **environ;
 #endif /* !__environ_defined */
 DECLARE_NOREL_GLOBAL_META(char **, environ);
 #define environ  GET_NOREL_GLOBAL(environ)
+INTDEF struct atomic_rwlock libc_environ_lock;
+
+/* Since `environ' can easily contain strings that weren't allocated
+ * using `malloc()' and friends, as well as since `putenv()' exists,
+ * which can be used to directly inject user-provided strings into
+ * the environ map, we run into a problem when it comes to preventing
+ * memory leaks in regards of strings that _were_ injected dynamically
+ * through use of functions such as `setenv()'
+ * The solution is to keep track of a singly-linked list of all environ
+ * strings that _were_ allocated through use of `malloc()', and simply
+ * `free()' only strings apart of this list when functions such as
+ * `unsetenv()' or `clearenv()' are called.
+ * Lastly, in order to check if the `environ' vector itself was dynamically
+ * allocated on the heap, we keep a secondary, environ-like variable
+ * `libc_environ_heap' that is set to `NULL' initially (or after `clearenv()'),
+ * and when non-NULL is then compared against the real `environ' to determine
+ * is changes were made, including the hosted application overwriting the
+ * value of `environ' itself. */
+
+struct environ_heapstr {
+	struct environ_heapstr       *ehs_next;  /* [0..1] next heap string. */
+	COMPILER_FLEXIBLE_ARRAY(char, ehs_text); /* The NUL-terminated text of this string. */
+};
+
+/* [lock(libc_environ_lock)][0..1] The heap-allocated variant of `environ', or `NULL' if never used. */
+PRIVATE ATTR_SECTION(".bss.crt.fs.environ.heap") char **libc_environ_heap = NULL;
+/* [lock(libc_environ_lock)][0..1] Linked list of heap-allocated environ strings. */
+PRIVATE ATTR_SECTION(".bss.crt.fs.environ.heap") struct environ_heapstr *libc_environ_strings = NULL;
+
+LOCAL ATTR_SECTION(".text.crt.fs.environ.heap.environ_remove_heapstring_locked")
+bool LIBCCALL environ_remove_heapstring_locked(struct environ_heapstr *ptr) {
+	struct environ_heapstr **piter, *iter;
+	assert(atomic_rwlock_reading(&libc_environ_lock));
+	for (piter = &libc_environ_strings; (iter = *piter) != NULL;
+	     piter = &iter->ehs_next) {
+		if (iter == ptr) {
+			*piter = iter->ehs_next;
+			return true;
+		}
+	}
+	return false;
+}
+
+
 
 #undef __argc
 #undef __argv
@@ -209,13 +256,31 @@ ATTR_WEAK ATTR_SECTION(".text.crt.fs.environ.getenv") char *
 NOTHROW_NCX(LIBCCALL libc_getenv)(char const *varname)
 /*[[[body:getenv]]]*/
 {
-	if (!strcmp(varname, "TERM"))
-		return (char *)"xterm";
-	CRT_UNIMPLEMENTED("getenv"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
+	size_t namelen;
+	char *result, **envp;
+	if unlikely(!varname)
+		return NULL;
+	namelen = strlen(varname);
+	atomic_rwlock_read(&libc_environ_lock);
+	envp = environ;
+	if unlikely(!envp)
+		result = NULL;
+	else {
+		for (; (result = *envp) != NULL; ++envp) {
+			if (memcmp(result, varname, namelen * sizeof(char)) != 0 ||
+			    result[namelen] != '=')
+				continue;
+			result += namelen + 1;
+			break;
+		}
+	}
+	atomic_rwlock_endread(&libc_environ_lock);
+	return result;
 }
 /*[[[end:getenv]]]*/
+
+
+
 
 /*[[[head:setenv,hash:CRC-32=0xb3054959]]]*/
 INTERN NONNULL((2))
@@ -225,9 +290,115 @@ NOTHROW_NCX(LIBCCALL libc_setenv)(char const *varname,
                                   int replace)
 /*[[[body:setenv]]]*/
 {
-	CRT_UNIMPLEMENTED("setenv"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	char **envp, **new_envp, **old_heap_envp;
+	struct environ_heapstr *line;
+	size_t namelen, vallen, envc, new_enva;
+	if unlikely(!varname || !*varname || strchr(varname, '=')) {
+		libc_seterrno(EINVAL);
+		return -1;
+	}
+	/* Quick check: if we're not supported to replace variables, and if
+	 *              the variable already exists, then there is no need
+	 *              to allocate a new environment line for it, only to
+	 *              free that line if it does already exist. */
+	if (!replace) {
+		if (getenv(varname) != NULL)
+			return 0; /* Don't overwrite existing variables. */
+	}
+	namelen = strlen(varname);
+	vallen  = strlen(val);
+	line = (struct environ_heapstr *)malloc(offsetof(struct environ_heapstr, ehs_text) +
+	                                        (namelen + 1 + vallen + 1) * sizeof(char));
+	if unlikely(!line)
+		return -1;
+	memcpy(line->ehs_text, varname, namelen * sizeof(char));
+	line->ehs_text[namelen] = '=';
+	memcpy(line->ehs_text + namelen + 1, val, vallen * sizeof(char));
+	line->ehs_text[namelen + 1 + vallen] = '\0';
+	new_envp = NULL;
+	new_enva = 0;
+again_searchenv:
+	atomic_rwlock_write(&libc_environ_lock);
+	envp = environ;
+	envc = 0;
+	if (envp) {
+		char **iter = envp, *existing_line;
+		/* Search for an existing instance of `varname' */
+		for (; (existing_line = *iter) != NULL; ++iter, ++envc) {
+			struct environ_heapstr *existing_heapline;
+			if (memcmp(existing_line, line->ehs_text, (namelen + 1) * sizeof(char)) != 0)
+				continue;
+			if (!replace) {
+				/* Even though we've already checked this above, another thread
+				 * may have added the environment variable in the mean time. */
+				atomic_rwlock_endwrite(&libc_environ_lock);
+				free(line);
+				return 0;
+			}
+			/* Check if the existing line was already allocated on the heap. */
+			existing_heapline = COMPILER_CONTAINER_OF(existing_line,
+			                                          struct environ_heapstr,
+			                                          ehs_text);
+			if (!environ_remove_heapstring_locked(existing_heapline))
+				existing_heapline = NULL;
+			/* Override the existing line. */
+			*iter = line->ehs_text;
+			line->ehs_next = libc_environ_strings;
+			libc_environ_strings = line;
+			atomic_rwlock_endwrite(&libc_environ_lock);
+			/* Free the old line if it was heap-allocated. */
+			free(existing_heapline);
+			return 0;
+		}
+	}
+	/* Using malloc_usable_size(), try to re-use an existing heap-based environ */
+	if (!new_enva && (new_envp = libc_environ_heap) != NULL) {
+		new_enva = malloc_usable_size(libc_environ_heap) / sizeof(char *);
+		if likely(new_enva)
+			--new_enva; /* Account for the trailing NULL */
+	}
+	/* The variable doesn't exist, yet.
+	 * -> Allocate a larger environment table and add the variable to it. */
+	if (new_enva != envc + 1) {
+		char **new_new_envp;
+		if (new_envp == libc_environ_heap) {
+			if (new_enva >= envc + 1)
+				goto do_fill_environ;
+			new_envp = NULL;
+		}
+		atomic_rwlock_endwrite(&libc_environ_lock);
+		new_enva = envc + 1;
+		new_new_envp = (char **)realloc(new_envp, (new_enva + 1) * sizeof(char *));
+		if unlikely(!new_new_envp) {
+			free(new_envp);
+			return -1;
+		}
+		new_envp = new_new_envp;
+		goto again_searchenv;
+	}
+
+do_fill_environ:
+	/* Fill in the new environment table. */
+	memmove(new_envp, envp, envc * sizeof(char *));
+	new_envp[envc]     = line->ehs_text;
+	new_envp[envc + 1] = NULL; /* Keep the table NULL-terminated */
+
+	/* Add the new line as an environ heap-pointer. */
+	line->ehs_next = libc_environ_strings;
+	libc_environ_strings = line;
+
+	/* Set the new environ map as the one that is active. */
+	old_heap_envp     = libc_environ_heap;
+	libc_environ_heap = new_envp;
+	environ           = new_envp;
+
+	atomic_rwlock_endwrite(&libc_environ_lock);
+
+	/* Free the old environ table. */
+	if (old_heap_envp != new_envp)
+		free(old_heap_envp);
+
+	return 0;
 }
 /*[[[end:setenv]]]*/
 
@@ -237,9 +408,59 @@ ATTR_WEAK ATTR_SECTION(".text.crt.fs.environ.unsetenv") int
 NOTHROW_NCX(LIBCCALL libc_unsetenv)(char const *varname)
 /*[[[body:unsetenv]]]*/
 {
-	CRT_UNIMPLEMENTED("unsetenv"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	char **envp;
+	size_t namelen;
+	if unlikely(!varname || !*varname || strchr(varname, '=')) {
+		libc_seterrno(EINVAL);
+		return -1;
+	}
+	namelen = strlen(varname);
+	atomic_rwlock_write(&libc_environ_lock);
+	envp = environ;
+	if (envp) {
+		struct environ_heapstr *existing_heaplines = NULL;
+		char *existing_line;
+		/* Search for an existing instance of `varname' */
+		for (; (existing_line = *envp) != NULL; ++envp) {
+			char **envp_fwd;
+			struct environ_heapstr *existing_heapline;
+			if (memcmp(existing_line, varname, namelen * sizeof(char)) != 0 ||
+			    existing_line[namelen] != '=')
+				continue;
+			/* Remove the line by shifting. */
+			for (envp_fwd = envp;;) {
+				char *next;
+				next = envp_fwd[1];
+				envp_fwd[0] = next;
+				if (!next)
+					break;
+				++envp_fwd;
+			}
+			/* Check if the existing line was allocated on the heap. */
+			existing_heapline = COMPILER_CONTAINER_OF(existing_line,
+			                                          struct environ_heapstr,
+			                                          ehs_text);
+			if (environ_remove_heapstring_locked(existing_heapline)) {
+				existing_heapline->ehs_next = existing_heaplines;
+				existing_heaplines = existing_heapline;
+			}
+			/* Continue searching for more matching lines.
+			 * Since `environ' is exposed as-is to the hosted application,
+			 * there is the possibility that the user manually added the
+			 * same variable more than once... */
+		}
+		atomic_rwlock_endwrite(&libc_environ_lock);
+		/* Free all removed lines that were allocated on the heap. */
+		while (existing_heaplines) {
+			struct environ_heapstr *next;
+			next = existing_heaplines->ehs_next;
+			free(existing_heaplines);
+			existing_heaplines = next;
+		}
+		return 0;
+	}
+	atomic_rwlock_endwrite(&libc_environ_lock);
+	return 0;
 }
 /*[[[end:unsetenv]]]*/
 
@@ -248,9 +469,24 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.fs.environ.clearenv") int
 NOTHROW_NCX(LIBCCALL libc_clearenv)(void)
 /*[[[body:clearenv]]]*/
 {
-	CRT_UNIMPLEMENTED("clearenv"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	char **heap_envp;
+	struct environ_heapstr *heap_strings, *next;
+	atomic_rwlock_write(&libc_environ_lock);
+	heap_envp            = libc_environ_heap;
+	heap_strings         = libc_environ_strings;
+	environ              = NULL;
+	libc_environ_heap    = NULL;
+	libc_environ_strings = NULL;
+	atomic_rwlock_endwrite(&libc_environ_lock);
+	/* Free all dynamically allocated strings, as
+	 * well a dynamically allocated environ map. */
+	while (heap_strings) {
+		next = heap_strings->ehs_next;
+		free(heap_strings);
+		heap_strings = next;
+	}
+	free(heap_envp);
+	return 0;
 }
 /*[[[end:clearenv]]]*/
 
@@ -260,9 +496,88 @@ ATTR_WEAK ATTR_SECTION(".text.crt.fs.environ.putenv") int
 NOTHROW_NCX(LIBCCALL libc_putenv)(char *string)
 /*[[[body:putenv]]]*/
 {
-	CRT_UNIMPLEMENTED("putenv"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	char *eq, **envp, **new_envp, **old_heap_envp;
+	size_t namelen, envc, new_enva;
+	eq = strchr(string, '=');
+	if (!eq)
+		return unsetenv(string);
+	namelen = (size_t)(eq - string);
+	if unlikely(!namelen) {
+		/* Empty name is not allowed */
+		libc_seterrno(EINVAL);
+		return -1;
+	}
+	new_envp = NULL;
+	new_enva = 0;
+again_searchenv:
+	atomic_rwlock_write(&libc_environ_lock);
+	envp = environ;
+	envc = 0;
+	if (envp) {
+		char **iter = envp, *existing_line;
+		/* Search for an existing instance of `varname' */
+		for (; (existing_line = *iter) != NULL; ++iter, ++envc) {
+			struct environ_heapstr *existing_heapline;
+			if (memcmp(existing_line, string, (namelen + 1) * sizeof(char)) != 0)
+				continue;
+			/* Check if the existing line was allocated on the heap. */
+			existing_heapline = COMPILER_CONTAINER_OF(existing_line,
+			                                          struct environ_heapstr,
+			                                          ehs_text);
+			if (!environ_remove_heapstring_locked(existing_heapline))
+				existing_heapline = NULL;
+			/* Override the existing line. */
+			*iter = string;
+			atomic_rwlock_endwrite(&libc_environ_lock);
+			/* Free the old line if it was heap-allocated. */
+			free(existing_heapline);
+			return 0;
+		}
+	}
+	/* Using malloc_usable_size(), try to re-use an existing heap-based environ */
+	if (!new_enva && (new_envp = libc_environ_heap) != NULL) {
+		new_enva = malloc_usable_size(libc_environ_heap) / sizeof(char *);
+		if likely(new_enva)
+			--new_enva; /* Account for the trailing NULL */
+	}
+	/* The variable doesn't exist, yet.
+	 * -> Allocate a larger environment table and add the variable to it. */
+	if (new_enva != envc + 1) {
+		char **new_new_envp;
+		if (new_envp == libc_environ_heap) {
+			if (new_enva >= envc + 1)
+				goto do_fill_environ;
+			new_envp = NULL;
+		}
+		atomic_rwlock_endwrite(&libc_environ_lock);
+		new_enva = envc + 1;
+		new_new_envp = (char **)realloc(new_envp, (new_enva + 1) * sizeof(char *));
+		if unlikely(!new_new_envp) {
+			free(new_envp);
+			return -1;
+		}
+		new_envp = new_new_envp;
+		goto again_searchenv;
+	}
+
+do_fill_environ:
+	/* Fill in the new environment table. */
+	memmove(new_envp, envp, envc * sizeof(char *));
+	new_envp[envc]     = string;
+	new_envp[envc + 1] = NULL; /* Keep the table NULL-terminated */
+
+	/* Set the new environ map as the one that is active. */
+	old_heap_envp     = libc_environ_heap;
+	libc_environ_heap = new_envp;
+	environ           = new_envp;
+
+	atomic_rwlock_endwrite(&libc_environ_lock);
+
+	/* Free the old environ table. */
+	if (old_heap_envp != new_envp)
+		free(old_heap_envp);
+
+	return 0;
 }
 /*[[[end:putenv]]]*/
 
@@ -272,9 +587,9 @@ ATTR_WEAK ATTR_SECTION(".text.crt.fs.environ.secure_getenv") char *
 NOTHROW_NCX(LIBCCALL libc_secure_getenv)(char const *varname)
 /*[[[body:secure_getenv]]]*/
 {
-	CRT_UNIMPLEMENTED("secure_getenv"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
+	if (getauxval(AT_SECURE))
+		return NULL; /* Unconditionally return `NULL' for setuid() programs */
+	return getenv(varname);
 }
 /*[[[end:secure_getenv]]]*/
 

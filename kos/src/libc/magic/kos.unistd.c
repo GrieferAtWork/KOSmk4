@@ -52,7 +52,7 @@ Execl:([notnull] char const *__restrict path, char const *args, ... /*, (char *)
 }
 
 [throws][cp][dependency_include(<parts/redirect-exec.h>)][doc_alias(execle)]
-[requires($has_function(Execve))][ATTR_SENTINEL][ATTR_NORETURN][allow_macros]
+[requires($has_function(Execve))][ATTR_SENTINEL_O(1)][ATTR_NORETURN][allow_macros]
 Execle:([notnull] char const *__restrict path, char const *args, ... /*, (char *)NULL, (char **)environ*/) {
 	__REDIRECT_XEXECLE(char, Execve, path, args)
 }
@@ -64,7 +64,7 @@ Execpl:([notnull] char const *__restrict file, char const *args, ... /*, (char *
 }
 
 [throws][cp][dependency_include(<parts/redirect-exec.h>)][doc_alias(execle)]
-[requires($has_function(Execvpe))][ATTR_SENTINEL][ATTR_NORETURN][allow_macros]
+[requires($has_function(Execvpe))][ATTR_SENTINEL_O(1)][ATTR_NORETURN][allow_macros]
 Execlpe:([notnull] char const *__restrict file, char const *args, ... /*, (char *)NULL, (char **)environ*/) {
 	__REDIRECT_XEXECLE(char, Execvpe, file, args)
 }

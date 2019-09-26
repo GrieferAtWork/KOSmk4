@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e82a5d5 */
+/* HASH CRC-32:0xcf00c3fa */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,7 @@ INTDEF ATTR_SENTINEL ATTR_NORETURN NONNULL((1)) void (VLIBCCALL libc_Execl)(char
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinal */
-INTDEF ATTR_SENTINEL ATTR_NORETURN NONNULL((1)) void (VLIBCCALL libc_Execle)(char const *__restrict path, char const *args, ... /*, (char *)NULL, (char **)environ*/) __THROWS(...);
+INTDEF ATTR_SENTINEL_O(1) ATTR_NORETURN NONNULL((1)) void (VLIBCCALL libc_Execle)(char const *__restrict path, char const *args, ... /*, (char *)NULL, (char **)environ*/) __THROWS(...);
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
@@ -56,7 +56,7 @@ INTDEF ATTR_SENTINEL ATTR_NORETURN NONNULL((1)) void (VLIBCCALL libc_Execpl)(cha
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinal */
-INTDEF ATTR_SENTINEL ATTR_NORETURN NONNULL((1)) void (VLIBCCALL libc_Execlpe)(char const *__restrict file, char const *args, ... /*, (char *)NULL, (char **)environ*/) __THROWS(...);
+INTDEF ATTR_SENTINEL_O(1) ATTR_NORETURN NONNULL((1)) void (VLIBCCALL libc_Execlpe)(char const *__restrict file, char const *args, ... /*, (char *)NULL, (char **)environ*/) __THROWS(...);
 /* >> pipe(2)
  * Create a new pair of connected pipes ([0] = reader, [1] = writer) */
 INTDEF NONNULL((1)) void (LIBCCALL libc_Pipe)(fd_t pipedes[2]) __THROWS(...);

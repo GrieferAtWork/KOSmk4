@@ -163,11 +163,11 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.Execl") void
 }
 /*[[[end:Execl]]]*/
 
-/*[[[head:Execle,hash:CRC-32=0x87164caf]]]*/
+/*[[[head:Execle,hash:CRC-32=0x15c230bd]]]*/
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinal */
-INTERN ATTR_SENTINEL ATTR_NORETURN NONNULL((1))
+INTERN ATTR_SENTINEL_O(1) ATTR_NORETURN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.Execle") void
 (VLIBCCALL libc_Execle)(char const *__restrict path,
                         char const *args,
@@ -176,12 +176,12 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.Execle") void
 /*[[[body:Execle]]]*/
 {
 #if defined(__i386__) && !defined(__x86_64__)
-	char **envp = (char **)&args;
-	while (*envp++)
+	char ***penvp = (char ***)&args;
+	while (*penvp++)
 		; /* Envp is located 1 after the first NULL-entry */
 	Execve(path,
 	       (char const *const *)&args,
-	       (char const *const *)&envp);
+	       (char const *const *)*penvp);
 #else
 	va_list vargs;
 	char **vector, **envp;
@@ -225,11 +225,11 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.Execpl") void
 }
 /*[[[end:Execpl]]]*/
 
-/*[[[head:Execlpe,hash:CRC-32=0x8aa3af5a]]]*/
+/*[[[head:Execlpe,hash:CRC-32=0xd60d5309]]]*/
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinal */
-INTERN ATTR_SENTINEL ATTR_NORETURN NONNULL((1))
+INTERN ATTR_SENTINEL_O(1) ATTR_NORETURN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.Execlpe") void
 (VLIBCCALL libc_Execlpe)(char const *__restrict file,
                          char const *args,
@@ -238,12 +238,12 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.Execlpe") void
 /*[[[body:Execlpe]]]*/
 {
 #if defined(__i386__) && !defined(__x86_64__)
-	char **envp = (char **)&args;
-	while (*envp++)
+	char ***penvp = (char ***)&args;
+	while (*penvp++)
 		; /* Envp is located 1 after the first NULL-entry */
 	Execvpe(file,
 	        (char const *const *)&args,
-	        (char const *const *)&envp);
+	        (char const *const *)*penvp);
 #else
 	va_list vargs;
 	char **vector, **envp;

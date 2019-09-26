@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x21f7c90c */
+/* HASH CRC-32:0x7fc7bbf8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -109,7 +109,6 @@
 #define __stub_bindresvport 1
 #define __stub_bindresvport6 1
 #define __stub_cbrt 1
-#define __stub_clearenv 1
 #define __stub_clock 1
 #define __stub_clock_getcpuclockid 1
 #define __stub_closelog 1
@@ -497,7 +496,6 @@
 #define __stub_pthread_spin_unlock 1
 #define __stub_ptsname 1
 #define __stub_ptsname_r 1
-#define __stub_putenv 1
 #define __stub_putgrent 1
 #define __stub_putmsg 1
 #define __stub_putpmsg 1
@@ -535,7 +533,6 @@
 #define __stub_scandir 1
 #define __stub_scandirat 1
 #define __stub_sched_getcpu 1
-#define __stub_secure_getenv 1
 #define __stub_seed48 1
 #define __stub_seed48_r 1
 #define __stub_sem_close 1
@@ -555,7 +552,6 @@
 #define __stub_semtimedop 1
 #define __stub_setaliasent 1
 #define __stub_setcontext 1
-#define __stub_setenv 1
 #define __stub_setgrent 1
 #define __stub_setgroups 1
 #define __stub_sethostent 1
@@ -624,7 +620,6 @@
 #define __stub_ungetwc 1
 #define __stub_ungetwc_unlocked 1
 #define __stub_unlockpt 1
-#define __stub_unsetenv 1
 #define __stub_updwtmp 1
 #define __stub_updwtmpx 1
 #define __stub_uselocale 1

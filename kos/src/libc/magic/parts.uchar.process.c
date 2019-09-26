@@ -125,7 +125,7 @@ c32execlp:([nonnull] char32_t const *__restrict file, char32_t const *args, ... 
 
 
 [cp][dependency_include(<parts/redirect-exec.h>)]
-[requires($has_function(c16execve))][ATTR_SENTINEL][allow_macros]
+[requires($has_function(c16execve))][ATTR_SENTINEL_O(1)][allow_macros]
 [if(__SIZEOF_WCHAR_T__ == 2), preferred_alias(wexecle, _wexecle)]
 [preferred_alias(DOS$_wexecle)][nocrt][noexport][nouser][doc_alias(wexecle)]
 c16execle:([nonnull] char16_t const *__restrict path, char16_t const *args, ... /*, (char16_t *)NULL, char16_t **environ*/) -> int {
@@ -133,7 +133,7 @@ c16execle:([nonnull] char16_t const *__restrict path, char16_t const *args, ... 
 }
 
 [cp][dependency_include(<parts/redirect-exec.h>)]
-[requires($has_function(c32execve))][ATTR_SENTINEL][allow_macros]
+[requires($has_function(c32execve))][ATTR_SENTINEL_O(1)][allow_macros]
 [if(__SIZEOF_WCHAR_T__ == 4), preferred_alias(wexecle, _wexecle)]
 [nocrt][noexport][nouser][doc_alias(wexecle)]
 c32execle:([nonnull] char32_t const *__restrict path, char32_t const *args, ... /*, (char32_t *)NULL, char32_t **environ*/) -> int {
@@ -141,7 +141,7 @@ c32execle:([nonnull] char32_t const *__restrict path, char32_t const *args, ... 
 }
 
 [cp][dependency_include(<parts/redirect-exec.h>)]
-[requires($has_function(c16execvpe))][ATTR_SENTINEL][allow_macros]
+[requires($has_function(c16execvpe))][ATTR_SENTINEL_O(1)][allow_macros]
 [if(__SIZEOF_WCHAR_T__ == 2), preferred_alias(wexeclpe, _wexeclpe)]
 [preferred_alias(DOS$_wexeclpe)][nocrt][noexport][nouser][doc_alias(wexeclpe)]
 c16execlpe:([nonnull] char16_t const *__restrict file, char16_t const *args, ... /*, (char16_t *)NULL, char16_t **environ*/) -> int {
@@ -149,7 +149,7 @@ c16execlpe:([nonnull] char16_t const *__restrict file, char16_t const *args, ...
 }
 
 [cp][dependency_include(<parts/redirect-exec.h>)]
-[requires($has_function(c32execvpe))][ATTR_SENTINEL][allow_macros]
+[requires($has_function(c32execvpe))][ATTR_SENTINEL_O(1)][allow_macros]
 [if(__SIZEOF_WCHAR_T__ == 4), preferred_alias(wexeclpe, _wexeclpe)]
 [nocrt][noexport][nouser][doc_alias(wexeclpe)]
 c32execlpe:([nonnull] char32_t const *__restrict file, char32_t const *args, ... /*, (char32_t *)NULL, char32_t **environ*/) -> int {
@@ -228,7 +228,7 @@ c32spawnlp:(int mode, [nonnull] char32_t const *__restrict file, char32_t const 
 
 
 [cp][dependency_include(<parts/redirect-exec.h>)]
-[requires($has_function(c16spawnve))][ATTR_SENTINEL][allow_macros]
+[requires($has_function(c16spawnve))][ATTR_SENTINEL_O(1)][allow_macros]
 [if(__SIZEOF_WCHAR_T__ == 2), preferred_alias(wspawnle, _wspawnle)]
 [preferred_alias(DOS$_wspawnle)][nocrt][noexport][nouser][doc_alias(wspawnle)]
 c16spawnle:(int mode, [nonnull] char16_t const *__restrict path, char16_t const *args, ... /*, (char16_t *)NULL, char16_t **environ*/) -> $pid_t {
@@ -236,7 +236,7 @@ c16spawnle:(int mode, [nonnull] char16_t const *__restrict path, char16_t const 
 }
 
 [cp][dependency_include(<parts/redirect-exec.h>)]
-[requires($has_function(c32spawnve))][ATTR_SENTINEL][allow_macros]
+[requires($has_function(c32spawnve))][ATTR_SENTINEL_O(1)][allow_macros]
 [if(__SIZEOF_WCHAR_T__ == 4), preferred_alias(wspawnle, _wspawnle)]
 [nocrt][noexport][nouser][doc_alias(wspawnle)]
 c32spawnle:(int mode, [nonnull] char32_t const *__restrict path, char32_t const *args, ... /*, (char32_t *)NULL, char32_t **environ*/) -> $pid_t {
@@ -244,7 +244,7 @@ c32spawnle:(int mode, [nonnull] char32_t const *__restrict path, char32_t const 
 }
 
 [cp][dependency_include(<parts/redirect-exec.h>)]
-[requires($has_function(c16spawnvpe))][ATTR_SENTINEL][allow_macros]
+[requires($has_function(c16spawnvpe))][ATTR_SENTINEL_O(1)][allow_macros]
 [if(__SIZEOF_WCHAR_T__ == 2), preferred_alias(wspawnlpe, _wspawnlpe)]
 [preferred_alias(DOS$_wspawnlpe)][nocrt][noexport][nouser][doc_alias(wspawnlpe)]
 c16spawnlpe:(int mode, [nonnull] char16_t const *__restrict file, char16_t const *args, ... /*, (char16_t *)NULL, char16_t **environ*/) -> $pid_t {
@@ -252,7 +252,7 @@ c16spawnlpe:(int mode, [nonnull] char16_t const *__restrict file, char16_t const
 }
 
 [cp][dependency_include(<parts/redirect-exec.h>)]
-[requires($has_function(c32spawnvpe))][ATTR_SENTINEL][allow_macros]
+[requires($has_function(c32spawnvpe))][ATTR_SENTINEL_O(1)][allow_macros]
 [if(__SIZEOF_WCHAR_T__ == 4), preferred_alias(wspawnlpe, _wspawnlpe)]
 [nocrt][noexport][nouser][doc_alias(wspawnlpe)]
 c32spawnlpe:(int mode, [nonnull] char32_t const *__restrict file, char32_t const *args, ... /*, (char32_t *)NULL, char32_t **environ*/) -> $pid_t {

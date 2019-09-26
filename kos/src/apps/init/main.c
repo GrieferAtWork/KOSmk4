@@ -39,6 +39,13 @@
 
 DECL_BEGIN
 
+PRIVATE char const *init_envp[] = {
+	"TERM=xterm",
+	NULL
+};
+
+
+
 int main(int argc, char *argv[], char *envp[]) {
 	syslog(LOG_NOTICE, "[init] Init started\n");
 
@@ -113,7 +120,8 @@ done_procfs:
 	        "\033[J" /* ED(0):    Clear screen */
 	        "\033[f" /* HVP(1,1): Place cursor at 0,0 */);
 
-	Execl("/bin/busybox", "bash", (char *)NULL);
+	execle("/bin/busybox", "bash", (char *)NULL, init_envp);
+	Execle("/bin/sh", "sh", (char *)NULL, init_envp);
 
 	/* TODO: `__CORRECT_ISO_CPP_MATH_H_PROTO' interferes with libstdc++'s autoconf detection... */
 	/* TODO: libstdc++ doesn't detect `HAVE_ISWBLANK' properly */

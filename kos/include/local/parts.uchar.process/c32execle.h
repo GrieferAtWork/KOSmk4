@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x287b8d1f */
+/* HASH CRC-32:0x7d5dd0c7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ __CREDIRECT(__ATTR_NONNULL((2, 3)) __ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,_
 #endif /* !____localdep_c32execve_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(c32execle) __ATTR_SENTINEL __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(c32execle) __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(c32execle))(__CHAR32_TYPE__ const *__restrict __path,
                                                         __CHAR32_TYPE__ const *__args,
                                                         ... /*, (char32_t *)NULL, char32_t **environ*/) {

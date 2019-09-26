@@ -329,12 +329,12 @@ NOTHROW_RPC(VLIBCCALL libc_wexecle)(char32_t const *__restrict path,
 /*[[[body:wexecle]]]*/
 {
 #if defined(__i386__) && !defined(__x86_64__)
-	char32_t **envp = (char32_t **)&args;
-	while (*envp++)
+	char32_t ***penvp = (char32_t ***)&args;
+	while (*penvp++)
 		; /* Envp is located 1 after the first NULL-entry */
 	return libc_do_c32exec(path,
 	                       (char32_t const *const *)&args,
-	                       (char32_t const *const *)envp,
+	                       (char32_t const *const *)*penvp,
 	                       false);
 #else
 	va_list vargs;
@@ -360,12 +360,12 @@ NOTHROW_RPC(VLIBDCALL libd_wexecle)(char16_t const *__restrict path,
 /*[[[body:DOS$wexecle]]]*/
 {
 #if defined(__i386__) && !defined(__x86_64__)
-	char16_t **envp = (char16_t **)&args;
-	while (*envp++)
+	char16_t ***penvp = (char16_t ***)&args;
+	while (*penvp++)
 		; /* Envp is located 1 after the first NULL-entry */
 	return libc_do_c16exec(path,
 	                       (char16_t const *const *)&args,
-	                       (char16_t const *const *)envp,
+	                       (char16_t const *const *)*penvp,
 	                       false);
 #else
 	va_list vargs;
@@ -433,12 +433,12 @@ NOTHROW_RPC(VLIBCCALL libc_wexeclpe)(char32_t const *__restrict file,
 /*[[[body:wexeclpe]]]*/
 {
 #if defined(__i386__) && !defined(__x86_64__)
-	char32_t **envp = (char32_t **)&args;
-	while (*envp++)
+	char32_t ***penvp = (char32_t ***)&args;
+	while (*penvp++)
 		; /* Envp is located 1 after the first NULL-entry */
 	return libc_do_c32exec(file,
 	                       (char32_t const *const *)&args,
-	                       (char32_t const *const *)envp,
+	                       (char32_t const *const *)*penvp,
 	                       true);
 #else
 	va_list vargs;
@@ -464,12 +464,12 @@ NOTHROW_RPC(VLIBDCALL libd_wexeclpe)(char16_t const *__restrict file,
 /*[[[body:DOS$wexeclpe]]]*/
 {
 #if defined(__i386__) && !defined(__x86_64__)
-	char16_t **envp = (char16_t **)&args;
-	while (*envp++)
+	char16_t ***penvp = (char16_t ***)&args;
+	while (*penvp++)
 		; /* Envp is located 1 after the first NULL-entry */
 	return libc_do_c16exec(file,
 	                       (char16_t const *const *)&args,
-	                       (char16_t const *const *)envp,
+	                       (char16_t const *const *)*penvp,
 	                       true);
 #else
 	va_list vargs;
@@ -640,12 +640,12 @@ NOTHROW_RPC(VLIBCCALL libc_wspawnle)(int mode,
 /*[[[body:wspawnle]]]*/
 {
 #if defined(__i386__) && !defined(__x86_64__)
-	char32_t **envp = (char32_t **)&args;
-	while (*envp++)
+	char32_t ***penvp = (char32_t ***)&args;
+	while (*penvp++)
 		; /* Envp is located 1 after the first NULL-entry */
 	return libc_do_c32spawn(mode, path,
 	                        (char32_t const *const *)&args,
-	                        (char32_t const *const *)envp,
+	                        (char32_t const *const *)*penvp,
 	                        false);
 #else
 	va_list vargs;
@@ -672,12 +672,12 @@ NOTHROW_RPC(VLIBDCALL libd_wspawnle)(int mode,
 /*[[[body:DOS$wspawnle]]]*/
 {
 #if defined(__i386__) && !defined(__x86_64__)
-	char16_t **envp = (char16_t **)&args;
-	while (*envp++)
+	char16_t ***penvp = (char16_t ***)&args;
+	while (*penvp++)
 		; /* Envp is located 1 after the first NULL-entry */
 	return libc_do_c16spawn(mode, path,
 	                        (char16_t const *const *)&args,
-	                        (char16_t const *const *)envp,
+	                        (char16_t const *const *)*penvp,
 	                        false);
 #else
 	va_list vargs;
@@ -748,12 +748,12 @@ NOTHROW_RPC(VLIBCCALL libc_wspawnlpe)(int mode,
 /*[[[body:wspawnlpe]]]*/
 {
 #if defined(__i386__) && !defined(__x86_64__)
-	char32_t **envp = (char32_t **)&args;
-	while (*envp++)
+	char32_t ***penvp = (char32_t ***)&args;
+	while (*penvp++)
 		; /* Envp is located 1 after the first NULL-entry */
 	return libc_do_c32spawn(mode, file,
 	                        (char32_t const *const *)&args,
-	                        (char32_t const *const *)envp,
+	                        (char32_t const *const *)*penvp,
 	                        true);
 #else
 	va_list vargs;
@@ -780,12 +780,12 @@ NOTHROW_RPC(VLIBDCALL libd_wspawnlpe)(int mode,
 /*[[[body:DOS$wspawnlpe]]]*/
 {
 #if defined(__i386__) && !defined(__x86_64__)
-	char16_t **envp = (char16_t **)&args;
-	while (*envp++)
+	char16_t ***penvp = (char16_t ***)&args;
+	while (*penvp++)
 		; /* Envp is located 1 after the first NULL-entry */
 	return libc_do_c16spawn(mode, file,
 	                        (char16_t const *const *)&args,
-	                        (char16_t const *const *)envp,
+	                        (char16_t const *const *)*penvp,
 	                        true);
 #else
 	va_list vargs;

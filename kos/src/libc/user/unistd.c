@@ -64,6 +64,10 @@ extern char **environ;
 DEFINE_NOREL_GLOBAL_META(char **, environ, ".crt.fs.environ.environ");
 #define environ  GET_NOREL_GLOBAL(environ)
 
+INTERN ATTR_SECTION(".bss.crt.fs.environ.lock")
+DEFINE_ATOMIC_RWLOCK(libc_environ_lock);
+
+
 DEFINE_PUBLIC_WEAK_ALIAS(__p__environ, libc_p_environ);
 INTERN WUNUSED ATTR_CONST ATTR_RETNONNULL
 ATTR_SECTION(".text.crt.dos.fs.environ.__p__environ") char ***
@@ -85,9 +89,11 @@ NOTHROW_RPC(LIBCCALL libc_execv)(char const *__restrict path,
 /*[[[body:execv]]]*/
 {
 	errno_t result;
+	atomic_rwlock_read(&libc_environ_lock);
 	result = sys_execve(path,
 	                    (char *const *)___argv,
 	                    (char *const *)environ);
+	atomic_rwlock_endread(&libc_environ_lock);
 	return (int)libc_seterrno(-result);
 }
 /*[[[end:execv]]]*/
@@ -121,7 +127,11 @@ NOTHROW_RPC(LIBCCALL libc_execvp)(char const *__restrict file,
                                   __TARGV)
 /*[[[body:execvp]]]*/
 {
-	return execvpe(file, ___argv, environ);
+	int result;
+	atomic_rwlock_read(&libc_environ_lock);
+	result = execvpe(file, ___argv, environ);
+	atomic_rwlock_endread(&libc_environ_lock);
+	return result;
 }
 /*[[[end:execvp]]]*/
 
@@ -164,12 +174,12 @@ NOTHROW_RPC(VLIBCCALL libc_execle)(char const *__restrict path,
 /*[[[body:execle]]]*/
 {
 #if defined(__i386__) && !defined(__x86_64__)
-	char **envp = (char **)&args;
-	while (*envp++)
+	char ***penvp = (char ***)&args;
+	while (*penvp++)
 		; /* Envp is located 1 after the first NULL-entry */
 	return execve(path,
 	              (char const *const *)&args,
-	              (char const *const *)&envp);
+	              (char const *const *)*penvp);
 #else
 	va_list vargs;
 	char **vector, **envp;
@@ -279,12 +289,12 @@ NOTHROW_RPC(VLIBCCALL libc_execlpe)(char const *__restrict file,
 /*[[[body:execlpe]]]*/
 {
 #if defined(__i386__) && !defined(__x86_64__)
-	char **envp = (char **)&args;
-	while (*envp++)
+	char ***penvp = (char ***)&args;
+	while (*penvp++)
 		; /* Envp is located 1 after the first NULL-entry */
 	return execvpe(file,
 	               (char const *const *)&args,
-	               (char const *const *)&envp);
+	               (char const *const *)*penvp);
 #else
 	va_list vargs;
 	char **vector, **envp;
