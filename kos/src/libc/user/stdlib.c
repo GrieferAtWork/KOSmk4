@@ -20,22 +20,27 @@
 #define GUARD_LIBC_USER_STDLIB_C 1
 
 #include "../api.h"
-#include "stdlib.h"
+/**/
 
-#include <dlfcn.h>
-#include <assert.h>
-#include <fcntl.h>
+#include <hybrid/align.h>
+#include <hybrid/atomic.h>
+#include <hybrid/sync/atomic-once.h>
+
+#include <kos/process.h>
 #include <kos/syscalls.h>
+#include <parts/dos/errno.h>
+#include <parts/errno.h>
+#include <sys/wait.h>
+
+#include <assert.h>
+#include <dlfcn.h>
+#include <fcntl.h>
 #include <limits.h>
 #include <string.h>
 #include <unistd.h>
 
-#include <parts/errno.h>
-#include <parts/dos/errno.h>
-#include <kos/process.h>
-#include <hybrid/atomic.h>
-#include <hybrid/sync/atomic-once.h>
-#include <hybrid/align.h>
+#include "../libc/init.h"
+#include "stdlib.h"
 
 DECL_BEGIN
 
@@ -212,14 +217,172 @@ NOTHROW_NCX(LIBCCALL libc_getenv)(char const *varname)
 }
 /*[[[end:getenv]]]*/
 
+/*[[[head:setenv,hash:CRC-32=0xb3054959]]]*/
+INTERN NONNULL((2))
+ATTR_WEAK ATTR_SECTION(".text.crt.fs.environ.setenv") int
+NOTHROW_NCX(LIBCCALL libc_setenv)(char const *varname,
+                                  char const *val,
+                                  int replace)
+/*[[[body:setenv]]]*/
+{
+	CRT_UNIMPLEMENTED("setenv"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return -1;
+}
+/*[[[end:setenv]]]*/
+
+/*[[[head:unsetenv,hash:CRC-32=0xe95b689e]]]*/
+INTERN NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.fs.environ.unsetenv") int
+NOTHROW_NCX(LIBCCALL libc_unsetenv)(char const *varname)
+/*[[[body:unsetenv]]]*/
+{
+	CRT_UNIMPLEMENTED("unsetenv"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return -1;
+}
+/*[[[end:unsetenv]]]*/
+
+/*[[[head:clearenv,hash:CRC-32=0x13a7d7a3]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.fs.environ.clearenv") int
+NOTHROW_NCX(LIBCCALL libc_clearenv)(void)
+/*[[[body:clearenv]]]*/
+{
+	CRT_UNIMPLEMENTED("clearenv"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return -1;
+}
+/*[[[end:clearenv]]]*/
+
+/*[[[head:putenv,hash:CRC-32=0x18400de0]]]*/
+INTERN NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.fs.environ.putenv") int
+NOTHROW_NCX(LIBCCALL libc_putenv)(char *string)
+/*[[[body:putenv]]]*/
+{
+	CRT_UNIMPLEMENTED("putenv"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return -1;
+}
+/*[[[end:putenv]]]*/
+
+/*[[[head:secure_getenv,hash:CRC-32=0xc94db2bd]]]*/
+INTERN WUNUSED NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.fs.environ.secure_getenv") char *
+NOTHROW_NCX(LIBCCALL libc_secure_getenv)(char const *varname)
+/*[[[body:secure_getenv]]]*/
+{
+	CRT_UNIMPLEMENTED("secure_getenv"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return NULL;
+}
+/*[[[end:secure_getenv]]]*/
+
+/*[[[head:_putenv_s,hash:CRC-32=0x9712fa75]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.environ._putenv_s") errno_t
+NOTHROW_NCX(LIBCCALL libc__putenv_s)(char const *varname,
+                                     char const *val)
+/*[[[body:_putenv_s]]]*/
+/*AUTO*/{
+	return libc_setenv(varname, val, 1) ? __libc_geterrno_or(__EINVAL) : 0;
+}
+/*[[[end:_putenv_s]]]*/
+
+/*[[[head:_dupenv_s,hash:CRC-32=0x70fe2978]]]*/
+INTERN NONNULL((1, 2, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.utility._dupenv_s") errno_t
+NOTHROW_NCX(LIBCCALL libc__dupenv_s)(char **__restrict pbuf,
+                                     size_t *pbuflen,
+                                     char const *varname)
+/*[[[body:_dupenv_s]]]*/
+{
+	CRT_UNIMPLEMENTED("_dupenv_s"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+/*[[[end:_dupenv_s]]]*/
+
+/*[[[head:getenv_s,hash:CRC-32=0x96a565cd]]]*/
+INTERN NONNULL((1, 2, 4))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.utility.getenv_s") errno_t
+NOTHROW_NCX(LIBCCALL libc_getenv_s)(size_t *psize,
+                                    char *buf,
+                                    rsize_t bufsize,
+                                    char const *varname)
+/*[[[body:getenv_s]]]*/
+{
+	CRT_UNIMPLEMENTED("getenv_s"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+/*[[[end:getenv_s]]]*/
+
+/*[[[head:_searchenv_s,hash:CRC-32=0x5cde1c3]]]*/
+INTERN NONNULL((1, 2, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.utility._searchenv_s") errno_t
+NOTHROW_RPC(LIBCCALL libc__searchenv_s)(char const *file,
+                                        char const *envvar,
+                                        char *__restrict resultpath,
+                                        size_t buflen)
+/*[[[body:_searchenv_s]]]*/
+{
+	CRT_UNIMPLEMENTED("_searchenv_s"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+/*[[[end:_searchenv_s]]]*/
+
+/*[[[head:_searchenv,hash:CRC-32=0xcf9d896b]]]*/
+INTERN NONNULL((1, 2, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.utility._searchenv") void
+NOTHROW_RPC(LIBCCALL libc__searchenv)(char const *file,
+                                      char const *envvar,
+                                      char *__restrict resultpath)
+/*[[[body:_searchenv]]]*/
+/*AUTO*/{
+	libc__searchenv_s(file, envvar, resultpath, (size_t)-1);
+}
+/*[[[end:_searchenv]]]*/
+
+
+
+PRIVATE ATTR_SECTION(".rodata.crt.fs.exec.system.system") char const path_bin_busybox[] = "/bin/busybox";
+PRIVATE ATTR_SECTION(".rodata.crt.fs.exec.system.system") char const path_bin_sh[] = "/bin/sh";
+PRIVATE ATTR_SECTION(".rodata.crt.fs.exec.system.system") char const dash_c[] = "-c";
+
+INTERN ATTR_NOINLINE ATTR_SECTION(".text.crt.fs.exec.system.system") pid_t
+NOTHROW_RPC(LIBCCALL libc_do_system_spawn)(char const *__restrict command) {
+	pid_t cpid;
+	cpid = vfork();
+	if (cpid == 0) {
+		execl(path_bin_busybox, path_bin_sh + 5, dash_c, command, (char *)NULL);
+		execl(path_bin_sh, path_bin_sh + 5, dash_c, command, (char *)NULL);
+		/* NOTE: system() must return ZERO(0) if no command processor is available. */
+		_Exit(command ? 127 : 0);
+	}
+	return cpid;
+}
+
 /*[[[head:system,hash:CRC-32=0x46b37e69]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.fs.exec.system.system") int
 NOTHROW_RPC(LIBCCALL libc_system)(char const *__restrict command)
 /*[[[body:system]]]*/
 {
-	CRT_UNIMPLEMENTED("system"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	pid_t cpid, error;
+	int status;
+	cpid = libc_do_system_spawn(command);
+	if (cpid < 0)
+		return -1;
+	for (;;) {
+		error = waitpid(cpid, &status, WEXITED);
+		if (error == cpid)
+			break;
+		if (error >= 0)
+			continue;
+		if (libc_geterrno() != EINTR)
+			return -1;
+	}
+	return status;
 }
 /*[[[end:system]]]*/
 
@@ -242,7 +405,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.application.exit.exit") void
 {
 	/* TODO: Run at-exit */
 	/* TODO: Run library finalizers */
-	/* TODO: flush stdio */
+	libc_fini();
 	_Exit(status);
 }
 /*[[[end:exit]]]*/
@@ -479,17 +642,6 @@ NOTHROW_NCX(LIBCCALL libc_on_exit)(__on_exit_func_t func,
 }
 /*[[[end:on_exit]]]*/
 
-/*[[[head:clearenv,hash:CRC-32=0x13a7d7a3]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.fs.environ.clearenv") int
-NOTHROW_NCX(LIBCCALL libc_clearenv)(void)
-/*[[[body:clearenv]]]*/
-{
-	CRT_UNIMPLEMENTED("clearenv"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
-}
-/*[[[end:clearenv]]]*/
-
 /*[[[head:mkstemps,hash:CRC-32=0x78f97579]]]*/
 INTERN WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.utility.mkstemps") int
@@ -646,18 +798,6 @@ NOTHROW_NCX(LIBCCALL libc_lcong48)(unsigned short param[7])
 }
 /*[[[end:lcong48]]]*/
 
-/*[[[head:putenv,hash:CRC-32=0x18400de0]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.environ.putenv") int
-NOTHROW_NCX(LIBCCALL libc_putenv)(char *string)
-/*[[[body:putenv]]]*/
-{
-	CRT_UNIMPLEMENTED("putenv"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
-}
-/*[[[end:putenv]]]*/
-
 /*[[[head:initstate,hash:CRC-32=0x533d5321]]]*/
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.random.initstate") char *
@@ -726,11 +866,11 @@ NOTHROW_RPC(LIBCCALL libc_realpath)(char const *__restrict filename,
 }
 /*[[[end:realpath]]]*/
 
-/*[[[head:frealpath,hash:CRC-32=0x226ef26e]]]*/
+/*[[[head:frealpath,hash:CRC-32=0xde151c69]]]*/
 /* Load the filesystem location of a given file handle.
  * This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
  * NOTE: You may also pass `NULL' for `resolved' to have a buffer of `bufsize'
- *       bytes automatically allocated in the heap, optop of which you may also
+ *       bytes automatically allocated in the heap, ontop of which you may also
  *       pass `0' for `bufsize' to automatically determine the required buffer size. */
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.property.frealpath") char *
@@ -743,12 +883,12 @@ NOTHROW_RPC(LIBCCALL libc_frealpath)(fd_t fd,
 }
 /*[[[end:frealpath]]]*/
 
-/*[[[head:frealpath4,hash:CRC-32=0xc913b599]]]*/
+/*[[[head:frealpath4,hash:CRC-32=0x103a07d1]]]*/
 /* Load the filesystem location of a given file handle.
  * This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
  * @param flags: Set of `0|AT_ALTPATH|AT_DOSPATH'
  * NOTE: You may also pass `NULL' for `resolved' to have a buffer of `bufsize'
- *       bytes automatically allocated in the heap, optop of which you may also
+ *       bytes automatically allocated in the heap, ontop of which you may also
  *       pass `0' for `bufsize' to automatically determine the required buffer size. */
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.property.frealpath4") char *
@@ -817,13 +957,13 @@ done:
 }
 /*[[[end:frealpath4]]]*/
 
-/*[[[head:frealpathat,hash:CRC-32=0x2ee0f2c5]]]*/
+/*[[[head:frealpathat,hash:CRC-32=0x2a5dcd44]]]*/
 /* Returns the absolute filesystem path for the specified file
  * When `AT_SYMLINK_FOLLOW' is given, a final symlink is dereferenced,
  * causing the pointed-to file location to be retrieved. - Otherwise, the
  * location of the link is printed instead.
  * NOTE: You may also pass `NULL' for `resolved' to have a buffer of `bufsize'
- *       bytes automatically allocated in the heap, optop of which you may also
+ *       bytes automatically allocated in the heap, ontop of which you may also
  *       pass `0' for `bufsize' to automatically determine the required buffer size.
  * @param flags: Set of `0|AT_ALTPATH|AT_SYMLINK_FOLLOW|AT_DOSPATH' */
 INTERN WUNUSED NONNULL((2))
@@ -896,32 +1036,6 @@ done:
 	return buffer;
 }
 /*[[[end:frealpathat]]]*/
-
-/*[[[head:setenv,hash:CRC-32=0xb3054959]]]*/
-INTERN NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.environ.setenv") int
-NOTHROW_NCX(LIBCCALL libc_setenv)(char const *varname,
-                                  char const *val,
-                                  int replace)
-/*[[[body:setenv]]]*/
-{
-	CRT_UNIMPLEMENTED("setenv"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
-}
-/*[[[end:setenv]]]*/
-
-/*[[[head:unsetenv,hash:CRC-32=0xe95b689e]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.environ.unsetenv") int
-NOTHROW_NCX(LIBCCALL libc_unsetenv)(char const *varname)
-/*[[[body:unsetenv]]]*/
-{
-	CRT_UNIMPLEMENTED("unsetenv"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
-}
-/*[[[end:unsetenv]]]*/
 
 /*[[[head:mktemp,hash:CRC-32=0x1e8369]]]*/
 INTERN NONNULL((1))
@@ -1027,18 +1141,6 @@ NOTHROW_RPC(LIBCCALL libc_getpt)(void)
 }
 /*[[[end:getpt]]]*/
 
-/*[[[head:secure_getenv,hash:CRC-32=0xc94db2bd]]]*/
-INTERN WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.fs.environ.secure_getenv") char *
-NOTHROW_NCX(LIBCCALL libc_secure_getenv)(char const *varname)
-/*[[[body:secure_getenv]]]*/
-{
-	CRT_UNIMPLEMENTED("secure_getenv"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:secure_getenv]]]*/
-
 /*[[[head:ptsname_r,hash:CRC-32=0xa47ed5ed]]]*/
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.ptsname_r") int
@@ -1130,16 +1232,6 @@ NOTHROW_RPC(LIBCCALL libc_mkostemps64)(char *template_,
 /* `__errno_location' is provided in libc/errno.c */
 /*[[[skip:__errno_location]]]*/
 
-/*[[[head:_putenv_s,hash:CRC-32=0x9712fa75]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.environ._putenv_s") errno_t
-NOTHROW_NCX(LIBCCALL libc__putenv_s)(char const *varname,
-                                     char const *val)
-/*[[[body:_putenv_s]]]*/
-/*AUTO*/{
-	return libc_setenv(varname, val, 1) ? __libc_geterrno_or(__EINVAL) : 0;
-}
-/*[[[end:_putenv_s]]]*/
-
 /*[[[head:__p___argc,hash:CRC-32=0xe372686d]]]*/
 INTERN ATTR_RETNONNULL ATTR_CONST
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p___argc") int *
@@ -1228,6 +1320,44 @@ NOTHROW_NCX(LIBDCALL libd___p__wenviron)(void)
 }
 /*[[[end:DOS$__p__wenviron]]]*/
 
+/*[[[head:__p__wenviron,hash:CRC-32=0x88c8c39b]]]*/
+INTERN ATTR_RETNONNULL ATTR_CONST
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p__wenviron") char32_t ***
+NOTHROW_NCX(LIBCCALL libc___p__wenviron)(void)
+/*[[[body:__p__wenviron]]]*/
+{
+	CRT_UNIMPLEMENTED("__p__wenviron"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return NULL;
+}
+/*[[[end:__p__wenviron]]]*/
+
+/*[[[head:DOS$__p___winitenv,hash:CRC-32=0xea43d103]]]*/
+/* Access to the initial environment block */
+INTERN ATTR_CONST
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p___winitenv") char16_t ***
+NOTHROW_NCX(LIBDCALL libd___p___winitenv)(void)
+/*[[[body:DOS$__p___winitenv]]]*/
+{
+	CRT_UNIMPLEMENTED("__p___winitenv"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return NULL;
+}
+/*[[[end:DOS$__p___winitenv]]]*/
+
+/*[[[head:__p___winitenv,hash:CRC-32=0x974bb0d6]]]*/
+/* Access to the initial environment block */
+INTERN ATTR_CONST
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p___winitenv") char32_t ***
+NOTHROW_NCX(LIBCCALL libc___p___winitenv)(void)
+/*[[[body:__p___winitenv]]]*/
+{
+	CRT_UNIMPLEMENTED("__p___winitenv"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return NULL;
+}
+/*[[[end:__p___winitenv]]]*/
+
 /*[[[head:DOS$__p___wargv,hash:CRC-32=0xb26c9cec]]]*/
 INTERN ATTR_RETNONNULL ATTR_CONST
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p___wargv") char16_t ***
@@ -1240,19 +1370,29 @@ NOTHROW_NCX(LIBDCALL libd___p___wargv)(void)
 }
 /*[[[end:DOS$__p___wargv]]]*/
 
-/*[[[head:_dupenv_s,hash:CRC-32=0x70fe2978]]]*/
-INTERN NONNULL((1, 2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.utility._dupenv_s") errno_t
-NOTHROW_NCX(LIBCCALL libc__dupenv_s)(char **__restrict pbuf,
-                                     size_t *pbuflen,
-                                     char const *varname)
-/*[[[body:_dupenv_s]]]*/
+/*[[[head:__p__wpgmptr,hash:CRC-32=0x5e56539c]]]*/
+INTERN ATTR_RETNONNULL ATTR_CONST
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p__wpgmptr") char32_t **
+NOTHROW_NCX(LIBCCALL libc___p__wpgmptr)(void)
+/*[[[body:__p__wpgmptr]]]*/
 {
-	CRT_UNIMPLEMENTED("_dupenv_s"); /* TODO */
+	CRT_UNIMPLEMENTED("__p__wpgmptr"); /* TODO */
 	libc_seterrno(ENOSYS);
-	return 0;
+	return NULL;
 }
-/*[[[end:_dupenv_s]]]*/
+/*[[[end:__p__wpgmptr]]]*/
+
+/*[[[head:DOS$__p__wpgmptr,hash:CRC-32=0x360ea0b]]]*/
+INTERN ATTR_RETNONNULL ATTR_CONST
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p__wpgmptr") char16_t **
+NOTHROW_NCX(LIBDCALL libd___p__wpgmptr)(void)
+/*[[[body:DOS$__p__wpgmptr]]]*/
+{
+	CRT_UNIMPLEMENTED("__p__wpgmptr"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return NULL;
+}
+/*[[[end:DOS$__p__wpgmptr]]]*/
 
 /*[[[head:_fullpath,hash:CRC-32=0xb89e2b18]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.utility._fullpath") char *
@@ -1276,19 +1416,6 @@ NOTHROW_NCX(LIBCCALL libc__aligned_free)(void *mptr)
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:_aligned_free]]]*/
-
-/*[[[head:DOS$__p___winitenv,hash:CRC-32=0xea43d103]]]*/
-/* Access to the initial environment block */
-INTERN ATTR_CONST
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p___winitenv") char16_t ***
-NOTHROW_NCX(LIBDCALL libd___p___winitenv)(void)
-/*[[[body:DOS$__p___winitenv]]]*/
-{
-	CRT_UNIMPLEMENTED("__p___winitenv"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:DOS$__p___winitenv]]]*/
 
 /*[[[head:_aligned_recalloc,hash:CRC-32=0xd99df40f]]]*/
 INTERN WUNUSED ATTR_ALLOC_ALIGN(4) ATTR_ALLOC_SIZE((2, 3))
@@ -1354,21 +1481,6 @@ NOTHROW_NCX(LIBCCALL libc__aligned_offset_malloc)(size_t num_bytes,
 }
 /*[[[end:_aligned_offset_malloc]]]*/
 
-/*[[[head:getenv_s,hash:CRC-32=0x96a565cd]]]*/
-INTERN NONNULL((1, 2, 4))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.utility.getenv_s") errno_t
-NOTHROW_NCX(LIBCCALL libc_getenv_s)(size_t *psize,
-                                    char *buf,
-                                    rsize_t bufsize,
-                                    char const *varname)
-/*[[[body:getenv_s]]]*/
-{
-	CRT_UNIMPLEMENTED("getenv_s"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:getenv_s]]]*/
-
 /*[[[head:_aligned_offset_realloc,hash:CRC-32=0x776dc7c4]]]*/
 INTERN WUNUSED ATTR_ALLOC_SIZE((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap._aligned_offset_realloc") void *
@@ -1383,18 +1495,6 @@ NOTHROW_NCX(LIBCCALL libc__aligned_offset_realloc)(void *mptr,
 	return NULL;
 }
 /*[[[end:_aligned_offset_realloc]]]*/
-
-/*[[[head:__p__wpgmptr,hash:CRC-32=0x5e56539c]]]*/
-INTERN ATTR_RETNONNULL ATTR_CONST
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p__wpgmptr") char32_t **
-NOTHROW_NCX(LIBCCALL libc___p__wpgmptr)(void)
-/*[[[body:__p__wpgmptr]]]*/
-{
-	CRT_UNIMPLEMENTED("__p__wpgmptr"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:__p__wpgmptr]]]*/
 
 /*[[[head:_aligned_offset_recalloc,hash:CRC-32=0xb2922b1c]]]*/
 INTERN WUNUSED ATTR_ALLOC_SIZE((2, 3))
@@ -1411,31 +1511,6 @@ NOTHROW_NCX(LIBCCALL libc__aligned_offset_recalloc)(void *mptr,
 	return NULL;
 }
 /*[[[end:_aligned_offset_recalloc]]]*/
-
-/*[[[head:__p___winitenv,hash:CRC-32=0x974bb0d6]]]*/
-/* Access to the initial environment block */
-INTERN ATTR_CONST
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p___winitenv") char32_t ***
-NOTHROW_NCX(LIBCCALL libc___p___winitenv)(void)
-/*[[[body:__p___winitenv]]]*/
-{
-	CRT_UNIMPLEMENTED("__p___winitenv"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:__p___winitenv]]]*/
-
-/*[[[head:__p__wenviron,hash:CRC-32=0x88c8c39b]]]*/
-INTERN ATTR_RETNONNULL ATTR_CONST
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p__wenviron") char32_t ***
-NOTHROW_NCX(LIBCCALL libc___p__wenviron)(void)
-/*[[[body:__p__wenviron]]]*/
-{
-	CRT_UNIMPLEMENTED("__p__wenviron"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:__p__wenviron]]]*/
 
 /*[[[head:_recalloc,hash:CRC-32=0xa131f187]]]*/
 INTERN WUNUSED ATTR_MALL_DEFAULT_ALIGNED ATTR_ALLOC_SIZE((2, 3))
@@ -1472,18 +1547,6 @@ NOTHROW_NCX(LIBCCALL libc__set_error_mode)(int mode)
 	return -1;
 }
 /*[[[end:_set_error_mode]]]*/
-
-/*[[[head:DOS$__p__wpgmptr,hash:CRC-32=0x360ea0b]]]*/
-INTERN ATTR_RETNONNULL ATTR_CONST
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p__wpgmptr") char16_t **
-NOTHROW_NCX(LIBDCALL libd___p__wpgmptr)(void)
-/*[[[body:DOS$__p__wpgmptr]]]*/
-{
-	CRT_UNIMPLEMENTED("__p__wpgmptr"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
-}
-/*[[[end:DOS$__p__wpgmptr]]]*/
 
 /*[[[head:_aligned_realloc,hash:CRC-32=0x53b01b1]]]*/
 INTERN WUNUSED ATTR_ALLOC_ALIGN(3) ATTR_ALLOC_SIZE((2))
@@ -1531,21 +1594,6 @@ NOTHROW_NCX(LIBCCALL libc__seterrormode)(int mode)
 }
 /*[[[end:_seterrormode]]]*/
 
-/*[[[head:_searchenv_s,hash:CRC-32=0x5cde1c3]]]*/
-INTERN NONNULL((1, 2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.utility._searchenv_s") errno_t
-NOTHROW_RPC(LIBCCALL libc__searchenv_s)(char const *file,
-                                        char const *envvar,
-                                        char *__restrict resultpath,
-                                        size_t buflen)
-/*[[[body:_searchenv_s]]]*/
-{
-	CRT_UNIMPLEMENTED("_searchenv_s"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
-}
-/*[[[end:_searchenv_s]]]*/
-
 /*[[[head:DOS$_wperror,hash:CRC-32=0xf1b3aa1]]]*/
 INTERN ATTR_COLD
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.errno._wperror") void
@@ -1556,18 +1604,6 @@ NOTHROW_RPC(LIBDCALL libd__wperror)(char16_t const *errmsg)
 	libc_seterrno(ENOSYS);
 }
 /*[[[end:DOS$_wperror]]]*/
-
-/*[[[head:_searchenv,hash:CRC-32=0xcf9d896b]]]*/
-INTERN NONNULL((1, 2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.fs.utility._searchenv") void
-NOTHROW_RPC(LIBCCALL libc__searchenv)(char const *file,
-                                      char const *envvar,
-                                      char *__restrict resultpath)
-/*[[[body:_searchenv]]]*/
-/*AUTO*/{
-	libc__searchenv_s(file, envvar, resultpath, (size_t)-1);
-}
-/*[[[end:_searchenv]]]*/
 
 /*[[[head:_beep,hash:CRC-32=0xac9f7eb3]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.system._beep") void

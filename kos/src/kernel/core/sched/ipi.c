@@ -639,7 +639,7 @@ again_already_disabled:
 		/* Re-enable preemption until the end of the current quantum. */
 		PREEMPTION_ENABLE_WAIT_DISABLE();
 	} else
-#endif
+#endif /* !CONFIG_NO_SMP */
 	{
 		cpu_disable_preemptive_interrupts_nopr();
 		/* Wait for a single interrupt */

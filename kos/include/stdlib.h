@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c4173dd */
+/* HASH CRC-32:0x3f42bc6c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1542,7 +1542,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_RPC,realpath,(cha
 /* Load the filesystem location of a given file handle.
  * This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
  * NOTE: You may also pass `NULL' for `resolved' to have a buffer of `bufsize'
- *       bytes automatically allocated in the heap, optop of which you may also
+ *       bytes automatically allocated in the heap, ontop of which you may also
  *       pass `0' for `bufsize' to automatically determine the required buffer size. */
 __CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_RPC,frealpath,(__fd_t __fd, char *__resolved, size_t __bufsize),(__fd,__resolved,__bufsize))
 #endif /* frealpath... */
@@ -1554,7 +1554,7 @@ __CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_RPC,frealpath,(__fd_t __fd, char *__r
  * This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
  * @param flags: Set of `0|AT_ALTPATH|AT_DOSPATH'
  * NOTE: You may also pass `NULL' for `resolved' to have a buffer of `bufsize'
- *       bytes automatically allocated in the heap, optop of which you may also
+ *       bytes automatically allocated in the heap, ontop of which you may also
  *       pass `0' for `bufsize' to automatically determine the required buffer size. */
 __CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_RPC,frealpath4,(__fd_t __fd, char *__resolved, size_t __bufsize, __atflag_t __flags),(__fd,__resolved,__bufsize,__flags))
 #endif /* frealpath4... */
@@ -1564,7 +1564,7 @@ __CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_RPC,frealpath4,(__fd_t __fd, char *__
  * causing the pointed-to file location to be retrieved. - Otherwise, the
  * location of the link is printed instead.
  * NOTE: You may also pass `NULL' for `resolved' to have a buffer of `bufsize'
- *       bytes automatically allocated in the heap, optop of which you may also
+ *       bytes automatically allocated in the heap, ontop of which you may also
  *       pass `0' for `bufsize' to automatically determine the required buffer size.
  * @param flags: Set of `0|AT_ALTPATH|AT_SYMLINK_FOLLOW|AT_DOSPATH' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),char *,__NOTHROW_RPC,frealpathat,(__fd_t __dirfd, char const *__filename, char *__resolved, size_t __bufsize, __atflag_t __flags),(__dirfd,__filename,__resolved,__bufsize,__flags))

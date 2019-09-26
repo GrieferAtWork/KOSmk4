@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeff2838a */
+/* HASH CRC-32:0xead8efd7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -85,14 +85,14 @@ INTDEF WUNUSED NONNULL((1)) char *NOTHROW_RPC(LIBCCALL libc_realpath)(char const
 /* Load the filesystem location of a given file handle.
  * This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
  * NOTE: You may also pass `NULL' for `resolved' to have a buffer of `bufsize'
- *       bytes automatically allocated in the heap, optop of which you may also
+ *       bytes automatically allocated in the heap, ontop of which you may also
  *       pass `0' for `bufsize' to automatically determine the required buffer size. */
 INTDEF WUNUSED char *NOTHROW_RPC(LIBCCALL libc_frealpath)(fd_t fd, char *resolved, size_t bufsize);
 /* Load the filesystem location of a given file handle.
  * This function behaves similar to `readlink("/proc/self/fd/%d" % fd)'
  * @param flags: Set of `0|AT_ALTPATH|AT_DOSPATH'
  * NOTE: You may also pass `NULL' for `resolved' to have a buffer of `bufsize'
- *       bytes automatically allocated in the heap, optop of which you may also
+ *       bytes automatically allocated in the heap, ontop of which you may also
  *       pass `0' for `bufsize' to automatically determine the required buffer size. */
 INTDEF WUNUSED char *NOTHROW_RPC(LIBCCALL libc_frealpath4)(fd_t fd, char *resolved, size_t bufsize, atflag_t flags);
 /* Returns the absolute filesystem path for the specified file
@@ -100,7 +100,7 @@ INTDEF WUNUSED char *NOTHROW_RPC(LIBCCALL libc_frealpath4)(fd_t fd, char *resolv
  * causing the pointed-to file location to be retrieved. - Otherwise, the
  * location of the link is printed instead.
  * NOTE: You may also pass `NULL' for `resolved' to have a buffer of `bufsize'
- *       bytes automatically allocated in the heap, optop of which you may also
+ *       bytes automatically allocated in the heap, ontop of which you may also
  *       pass `0' for `bufsize' to automatically determine the required buffer size.
  * @param flags: Set of `0|AT_ALTPATH|AT_SYMLINK_FOLLOW|AT_DOSPATH' */
 INTDEF WUNUSED NONNULL((2)) char *NOTHROW_RPC(LIBCCALL libc_frealpathat)(fd_t dirfd, char const *filename, char *resolved, size_t bufsize, atflag_t flags);
