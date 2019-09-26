@@ -150,12 +150,10 @@ done_procfs:
 	/* TODO: Add support for `HAVE___CXA_THREAD_ATEXIT' */
 	/* TODO: Add system header <sys/machine.h> */
 	/* TODO: Add system header <sys/sdt.h> */
-	/* TODO: Add system header <sys/sem.h> */
 	/* TODO: Add system header <fenv.h> */
 	/* TODO: Add system header <fp.h> */
 	/* TODO: Add system header <libintl.h> */
 	/* TODO: Add system header <nan.h> */
-	/* TODO: Add system header <sys/sendfile.h> */
 	/* TODO: Add system header <ftw.h> */
 }
 

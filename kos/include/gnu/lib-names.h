@@ -25,7 +25,7 @@
 //#define LIBCRYPT_SO                     "libcrypt.so"
 #define LIBC_SO                         "libc.so"
 #define LIBDL_SO                        LD_LINUX_SO
-#define LIBGCC_S_SO                     "libgcc_s.so"
+#define LIBGCC_S_SO                     "libgcc_s.so.1"
 //#define LIBMVEC_SO                      "libmvec.so"
 #define LIBM_SO                         "libm.so"
 //#define LIBNSL_SO                       "libnsl.so"
