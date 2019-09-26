@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x48b3964a */
+/* HASH CRC-32:0x7288e401 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -398,6 +398,12 @@ __DECL_BEGIN
 #define E_INVALID_ARGUMENT_CONTEXT_FACCESSAT_TYPE 0x005b
 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The `flags' argument passed to `faccessat()' isn't a set of `0|AT_SYMLINK_NOFOLLOW|AT_EACCESS|AT_DOSPATH' */
 #define E_INVALID_ARGUMENT_CONTEXT_FACCESSAT_FLAGS 0x005c
+/* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to read()/write() to/from an eventfd object using a buffer size less that 8 */
+#define E_INVALID_ARGUMENT_CONTEXT_EVENTFD_BUFSIZE 0x005d
+/* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to write 0xffffffffffffffff to a eventfd object */
+#define E_INVALID_ARGUMENT_CONTEXT_EVENTFD_WRITE_FFFFFFFFFFFFFFFFh 0x005e
+/* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to `sys_eventfd2()' is not a set of `EFD_SEMAPHORE | EFD_NONBLOCK | EFD_CLOEXEC' */
+#define E_INVALID_ARGUMENT_CONTEXT_EVENTFD_FLAGS 0x005f
 
 
 

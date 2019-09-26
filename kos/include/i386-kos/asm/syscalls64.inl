@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf2818d2d */
+/* HASH CRC-32:0xcb378597 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -270,7 +270,7 @@
 #define __NR64_epoll_pwait               281        /* errno_t epoll_pwait(fd_t epfd, struct epoll_event *events, syscall_ulong_t maxevents, syscall_slong_t timeout, struct __sigset_struct const *ss) */
 /* Return file descriptor for new interval timer source */
 #define __NR64_timerfd_create            283        /* fd_t timerfd_create(clockid_t clock_id, syscall_ulong_t flags) */
-#define __NR64_eventfd                   284        /* errno_t eventfd(syscall_ulong_t initval) */
+#define __NR64_eventfd                   284        /* fd_t eventfd(syscall_ulong_t initval) */
 #define __NR64_fallocate                 285        /* errno_t fallocate(fd_t fd, syscall_ulong_t mode, uint32_t offset, uint32_t length) */
 /* Set next expiration time of interval timer source UFD to UTMR.
  * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout value
@@ -279,7 +279,7 @@
 /* Return the next expiration time of UFD */
 #define __NR64_timerfd_gettime           287        /* errno_t timerfd_gettime(fd_t ufd, struct __itimerspec32 *otmr) */
 #define __NR64_accept4                   288        /* fd_t accept4(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len, syscall_ulong_t flags) */
-#define __NR64_eventfd2                  290        /* errno_t eventfd2(syscall_ulong_t initval, syscall_ulong_t flags) */
+#define __NR64_eventfd2                  290        /* fd_t eventfd2(syscall_ulong_t initval, syscall_ulong_t flags) */
 #define __NR64_epoll_create1             291        /* fd_t epoll_create1(syscall_ulong_t flags) */
 /* @param: flags:  Set of `O_CLOEXEC|O_CLOFORK' */
 #define __NR64_dup3                      292        /* fd_t dup3(fd_t oldfd, fd_t newfd, oflag_t flags) */
@@ -1409,12 +1409,12 @@
 #define __NR64RT_utimensat                 errno_t
 #define __NR64RT_epoll_pwait               errno_t
 #define __NR64RT_timerfd_create            fd_t
-#define __NR64RT_eventfd                   errno_t
+#define __NR64RT_eventfd                   fd_t
 #define __NR64RT_fallocate                 errno_t
 #define __NR64RT_timerfd_settime           errno_t
 #define __NR64RT_timerfd_gettime           errno_t
 #define __NR64RT_accept4                   fd_t
-#define __NR64RT_eventfd2                  errno_t
+#define __NR64RT_eventfd2                  fd_t
 #define __NR64RT_epoll_create1             fd_t
 #define __NR64RT_dup3                      fd_t
 #define __NR64RT_pipe2                     errno_t

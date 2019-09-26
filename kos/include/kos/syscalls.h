@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2bdf529c */
+/* HASH CRC-32:0x7f02b832 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -523,13 +523,13 @@ __CDECLARE_SC(,__errno_t,epoll_wait_old,(__fd_t __epfd, struct epoll_event *__ev
 #if __CRT_HAVE_SC(eventfd)
 #ifndef __sys_eventfd_defined
 #define __sys_eventfd_defined 1
-__CDECLARE_SC(,__errno_t,eventfd,(__syscall_ulong_t __initval),(__initval))
+__CDECLARE_SC(,__fd_t,eventfd,(__syscall_ulong_t __initval),(__initval))
 #endif /* !__sys_eventfd_defined */
 #endif /* sys_eventfd... */
 #if __CRT_HAVE_SC(eventfd2)
 #ifndef __sys_eventfd2_defined
 #define __sys_eventfd2_defined 1
-__CDECLARE_SC(,__errno_t,eventfd2,(__syscall_ulong_t __initval, __syscall_ulong_t __flags),(__initval,__flags))
+__CDECLARE_SC(,__fd_t,eventfd2,(__syscall_ulong_t __initval, __syscall_ulong_t __flags),(__initval,__flags))
 #endif /* !__sys_eventfd2_defined */
 #endif /* sys_eventfd2... */
 #if __CRT_HAVE_SC(execve)
@@ -3297,13 +3297,13 @@ __CDECLARE_XSC(,__errno_t,epoll_wait_old,(__fd_t __epfd, struct epoll_event *__e
 #if __CRT_HAVE_XSC(eventfd)
 #ifndef __sys_Xeventfd_defined
 #define __sys_Xeventfd_defined 1
-__CDECLARE_XSC(,__errno_t,eventfd,(__syscall_ulong_t __initval),(__initval))
+__CDECLARE_XSC(,__fd_t,eventfd,(__syscall_ulong_t __initval),(__initval))
 #endif /* !__sys_Xeventfd_defined */
 #endif /* sys_Xeventfd... */
 #if __CRT_HAVE_XSC(eventfd2)
 #ifndef __sys_Xeventfd2_defined
 #define __sys_Xeventfd2_defined 1
-__CDECLARE_XSC(,__errno_t,eventfd2,(__syscall_ulong_t __initval, __syscall_ulong_t __flags),(__initval,__flags))
+__CDECLARE_XSC(,__fd_t,eventfd2,(__syscall_ulong_t __initval, __syscall_ulong_t __flags),(__initval,__flags))
 #endif /* !__sys_Xeventfd2_defined */
 #endif /* sys_Xeventfd2... */
 #if __CRT_HAVE_XSC(execve)

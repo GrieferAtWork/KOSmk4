@@ -16,34 +16,30 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_EVENTFD_H
-#define _BITS_EVENTFD_H 1
+#ifndef GUARD_KERNEL_INCLUDE_SCHED_EVENTFD_H
+#define GUARD_KERNEL_INCLUDE_SCHED_EVENTFD_H 1
 
-#include <__stdinc.h>
+#include <kernel/compiler.h>
 
-__DECL_BEGIN
+#include <kernel/malloc.h>
+#include <kernel/types.h>
+#include <sched/atomic64.h>
+#include <sched/signal.h>
 
-/* Flags for eventfd. */
-/*[[[enum]]]*/
+DECL_BEGIN
+
 #ifdef __CC__
-enum {
-	EFD_SEMAPHORE = 00000001,
-	EFD_NONBLOCK  = 00004000,
-	EFD_CLOEXEC   = 02000000
+
+struct eventfd {
+	WEAK refcnt_t   ef_refcnt; /* Reference counter. */
+	struct sig      ef_signal; /* Signal broadcast when reading or writing becomes non-blocking. */
+	struct atomic64 ef_value;  /* Eventfd value. */
 };
+
+DEFINE_REFCOUNT_FUNCTIONS(struct eventfd, ef_refcnt, kfree)
+
 #endif /* __CC__ */
-/*[[[AUTO]]]*/
-#ifdef __COMPILER_PREFERR_ENUMS
-#define EFD_SEMAPHORE EFD_SEMAPHORE
-#define EFD_NONBLOCK  EFD_NONBLOCK
-#define EFD_CLOEXEC   EFD_CLOEXEC
-#else /* __COMPILER_PREFERR_ENUMS */
-#define EFD_SEMAPHORE 00000001
-#define EFD_NONBLOCK  00004000
-#define EFD_CLOEXEC   02000000
-#endif /* !__COMPILER_PREFERR_ENUMS */
-/*[[[end]]]*/
 
-__DECL_END
+DECL_END
 
-#endif /* !_BITS_EVENTFD_H */
+#endif /* !GUARD_KERNEL_INCLUDE_SCHED_EVENTFD_H */

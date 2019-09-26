@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f2eb48e */
+/* HASH CRC-32:0xc21d5613 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -256,7 +256,7 @@
 #define SYS_utimensat               __NR_utimensat               /* errno_t utimensat(fd_t dirfd, char const *filename, [2-3]struct __timespec32 const *times, atflag_t flags) */
 /* Return file descriptor for new interval timer source */
 #define SYS_timerfd_create          __NR_timerfd_create          /* fd_t timerfd_create(clockid_t clock_id, syscall_ulong_t flags) */
-#define SYS_eventfd                 __NR_eventfd                 /* errno_t eventfd(syscall_ulong_t initval) */
+#define SYS_eventfd                 __NR_eventfd                 /* fd_t eventfd(syscall_ulong_t initval) */
 #define SYS_fallocate               __NR_fallocate               /* errno_t fallocate(fd_t fd, syscall_ulong_t mode, uint32_t offset, uint32_t length) */
 /* Set next expiration time of interval timer source UFD to UTMR.
  * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout value
@@ -264,7 +264,7 @@
 #define SYS_timerfd_settime         __NR_timerfd_settime         /* errno_t timerfd_settime(fd_t ufd, syscall_ulong_t flags, struct __itimerspec32 const *utmr, struct __itimerspec32 *otmr) */
 /* Return the next expiration time of UFD */
 #define SYS_timerfd_gettime         __NR_timerfd_gettime         /* errno_t timerfd_gettime(fd_t ufd, struct __itimerspec32 *otmr) */
-#define SYS_eventfd2                __NR_eventfd2                /* errno_t eventfd2(syscall_ulong_t initval, syscall_ulong_t flags) */
+#define SYS_eventfd2                __NR_eventfd2                /* fd_t eventfd2(syscall_ulong_t initval, syscall_ulong_t flags) */
 #define SYS_epoll_create1           __NR_epoll_create1           /* fd_t epoll_create1(syscall_ulong_t flags) */
 /* @param: flags:  Set of `O_CLOEXEC|O_CLOFORK' */
 #define SYS_dup3                    __NR_dup3                    /* fd_t dup3(fd_t oldfd, fd_t newfd, oflag_t flags) */

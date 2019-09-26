@@ -634,7 +634,7 @@ DEFINE {0x0000013f,0x00000119} = epoll_pwait(
 @@Return file descriptor for new interval timer source
 DEFINE {0x00000142,0x0000011b} = timerfd_create(clockid_t clock_id, syscall_ulong_t flags): fd_t;
 
-DEFINE {0x00000143,0x0000011c} = eventfd(syscall_ulong_t initval): errno_t;
+DEFINE {0x00000143,0x0000011c} = eventfd(syscall_ulong_t initval): fd_t;
 DEFINE {0x00000144,0x0000011d} = fallocate(fd_t fd, syscall_ulong_t mode, uint32_t offset, uint32_t length): errno_t;
 DEFINE {0x80000144,0x8000011d} = fallocate64(fd_t fd, syscall_ulong_t mode, [double_wide] uint64_t offset, [double_wide] uint64_t length): errno_t;
 
@@ -655,7 +655,7 @@ DEFINE {0x00000146,0x0000011f} = timerfd_gettime(fd_t ufd, struct __itimerspec32
 //TODO:DEFINE {0x00000147,0x00000121} = signalfd4(...): errno_t;
 
 DEFINE {0x00000148,0x00000122} = eventfd2(syscall_ulong_t initval,
-	[printf(flagset(EFD_SEMAPHORE, EFD_NONBLOCK, EFD_CLOEXEC))] syscall_ulong_t flags): errno_t;
+	[printf(flagset(EFD_SEMAPHORE, EFD_NONBLOCK, EFD_CLOEXEC))] syscall_ulong_t flags): fd_t;
 
 DEFINE {0x00000149,0x00000123} = epoll_create1(syscall_ulong_t flags): fd_t;
 

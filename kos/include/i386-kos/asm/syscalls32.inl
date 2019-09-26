@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x716146c1 */
+/* HASH CRC-32:0xaa1d506d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -316,7 +316,7 @@
 #define __NR32_utimensat                  320        /* errno_t utimensat(fd_t dirfd, char const *filename, [2-3]struct __timespec32 const *times, atflag_t flags) */
 /* Return file descriptor for new interval timer source */
 #define __NR32_timerfd_create             322        /* fd_t timerfd_create(clockid_t clock_id, syscall_ulong_t flags) */
-#define __NR32_eventfd                    323        /* errno_t eventfd(syscall_ulong_t initval) */
+#define __NR32_eventfd                    323        /* fd_t eventfd(syscall_ulong_t initval) */
 #define __NR32_fallocate                  324        /* errno_t fallocate(fd_t fd, syscall_ulong_t mode, uint32_t offset, uint32_t length) */
 /* Set next expiration time of interval timer source UFD to UTMR.
  * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout value
@@ -324,7 +324,7 @@
 #define __NR32_timerfd_settime            325        /* errno_t timerfd_settime(fd_t ufd, syscall_ulong_t flags, struct __itimerspec32 const *utmr, struct __itimerspec32 *otmr) */
 /* Return the next expiration time of UFD */
 #define __NR32_timerfd_gettime            326        /* errno_t timerfd_gettime(fd_t ufd, struct __itimerspec32 *otmr) */
-#define __NR32_eventfd2                   328        /* errno_t eventfd2(syscall_ulong_t initval, syscall_ulong_t flags) */
+#define __NR32_eventfd2                   328        /* fd_t eventfd2(syscall_ulong_t initval, syscall_ulong_t flags) */
 #define __NR32_epoll_create1              329        /* fd_t epoll_create1(syscall_ulong_t flags) */
 /* @param: flags:  Set of `O_CLOEXEC|O_CLOFORK' */
 #define __NR32_dup3                       330        /* fd_t dup3(fd_t oldfd, fd_t newfd, oflag_t flags) */
@@ -1661,11 +1661,11 @@
 #define __NR32RT_epoll_pwait                errno_t
 #define __NR32RT_utimensat                  errno_t
 #define __NR32RT_timerfd_create             fd_t
-#define __NR32RT_eventfd                    errno_t
+#define __NR32RT_eventfd                    fd_t
 #define __NR32RT_fallocate                  errno_t
 #define __NR32RT_timerfd_settime            errno_t
 #define __NR32RT_timerfd_gettime            errno_t
-#define __NR32RT_eventfd2                   errno_t
+#define __NR32RT_eventfd2                   fd_t
 #define __NR32RT_epoll_create1              fd_t
 #define __NR32RT_dup3                       fd_t
 #define __NR32RT_pipe2                      errno_t

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x29297ed2 */
+/* HASH CRC-32:0x756c0a2a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3058,7 +3058,7 @@ INTERN_FUNCTION(libc_sys_timerfd_create)
 END(libc_sys_timerfd_create)
 
 .section .text.crt.syscall.eventfd
-/* errno_t eventfd(syscall_ulong_t initval) */
+/* fd_t eventfd(syscall_ulong_t initval) */
 INTERN_FUNCTION(libc_sys_eventfd)
 	/* Argument count: 1 */
 	.cfi_startproc
@@ -3135,8 +3135,8 @@ INTERN_FUNCTION(libc_sys_accept4)
 END(libc_sys_accept4)
 
 .section .text.crt.syscall.eventfd2
-/* errno_t eventfd2(syscall_ulong_t initval,
- *                  syscall_ulong_t flags) */
+/* fd_t eventfd2(syscall_ulong_t initval,
+ *               syscall_ulong_t flags) */
 INTERN_FUNCTION(libc_sys_eventfd2)
 	/* Argument count: 2 */
 	.cfi_startproc
@@ -7499,7 +7499,7 @@ INTERN_FUNCTION(libc_sys_Xtimerfd_create)
 END(libc_sys_Xtimerfd_create)
 
 .section .text.crt.syscall.Xeventfd
-/* errno_t eventfd(syscall_ulong_t initval) */
+/* fd_t eventfd(syscall_ulong_t initval) */
 INTERN_FUNCTION(libc_sys_Xeventfd)
 	/* Argument count: 1 */
 	.cfi_startproc
@@ -7576,8 +7576,8 @@ INTERN_FUNCTION(libc_sys_Xaccept4)
 END(libc_sys_Xaccept4)
 
 .section .text.crt.syscall.Xeventfd2
-/* errno_t eventfd2(syscall_ulong_t initval,
- *                  syscall_ulong_t flags) */
+/* fd_t eventfd2(syscall_ulong_t initval,
+ *               syscall_ulong_t flags) */
 INTERN_FUNCTION(libc_sys_Xeventfd2)
 	/* Argument count: 2 */
 	.cfi_startproc

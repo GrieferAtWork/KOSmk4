@@ -71,7 +71,11 @@
 #define HANDLE_TYPE_DRIVER_STATE    0x0010 /* `struct driver_state' */
 #define HANDLE_TYPE_CHARACTERDEVICE 0x0011 /* `struct character_device'
                                             * Castable into: HANDLE_TYPE_DATABLOCK (if supported) */
-#define HANDLE_TYPE_COUNT           0x0012 /* # of recognized handle types */
+#define HANDLE_TYPE_EVENTFD_FENCE   0x0012 /* `struct eventfd' (without `EFD_SEMAPHORE') */
+#define HANDLE_TYPE_EVENTFD_SEMA    0x0013 /* `struct eventfd' (with `EFD_SEMAPHORE') */
+#define HANDLE_TYPE_COUNT           0x0014 /* # of recognized handle types
+                                            * NOTE: After changing this value, be sure to
+                                            * `touch /kos/src/kernel/include/kernel/handle.h' */
 
 /* Handle type-kind codes (used to identify special sub-classes of handle types). */
 #define HANDLE_TYPEKIND_GENERIC     0x0000 /* Generic catch-all handle-type kind */

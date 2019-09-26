@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd061c2b8 */
+/* HASH CRC-32:0xc9259719 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -10211,7 +10211,7 @@ INTERN_FUNCTION(__asm32_int80_timerfd_create)
 END(__asm32_int80_timerfd_create)
 
 .section .text.x86.asm32_syscall_int80.eventfd
-	/* errno_t eventfd(syscall_ulong_t initval) */
+	/* fd_t eventfd(syscall_ulong_t initval) */
 	.weak __asm32_int80_eventfd
 INTERN_FUNCTION(__asm32_int80_eventfd)
 	.cfi_startproc simple
@@ -10374,8 +10374,8 @@ INTERN_FUNCTION(__asm32_int80_timerfd_gettime)
 END(__asm32_int80_timerfd_gettime)
 
 .section .text.x86.asm32_syscall_int80.eventfd2
-	/* errno_t eventfd2(syscall_ulong_t initval,
-	 *                  syscall_ulong_t flags) */
+	/* fd_t eventfd2(syscall_ulong_t initval,
+	 *               syscall_ulong_t flags) */
 	.weak __asm32_int80_eventfd2
 INTERN_FUNCTION(__asm32_int80_eventfd2)
 	.cfi_startproc simple
@@ -24790,7 +24790,7 @@ INTERN_FUNCTION(__asm32_sysenter_timerfd_create)
 END(__asm32_sysenter_timerfd_create)
 
 .section .text.x86.asm32_syscall_sysenter.eventfd
-	/* errno_t eventfd(syscall_ulong_t initval) */
+	/* fd_t eventfd(syscall_ulong_t initval) */
 	.weak __asm32_sysenter_eventfd
 INTERN_FUNCTION(__asm32_sysenter_eventfd)
 	.cfi_startproc simple
@@ -24953,8 +24953,8 @@ INTERN_FUNCTION(__asm32_sysenter_timerfd_gettime)
 END(__asm32_sysenter_timerfd_gettime)
 
 .section .text.x86.asm32_syscall_sysenter.eventfd2
-	/* errno_t eventfd2(syscall_ulong_t initval,
-	 *                  syscall_ulong_t flags) */
+	/* fd_t eventfd2(syscall_ulong_t initval,
+	 *               syscall_ulong_t flags) */
 	.weak __asm32_sysenter_eventfd2
 INTERN_FUNCTION(__asm32_sysenter_eventfd2)
 	.cfi_startproc simple

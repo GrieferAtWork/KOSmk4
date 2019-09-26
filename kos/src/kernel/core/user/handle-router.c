@@ -935,6 +935,66 @@ INTDEF void KCALL handle_characterdevice_datasync(void *__restrict ptr);
 INTDEF void KCALL handle_characterdevice_stat(void *__restrict ptr, USER CHECKED struct stat *result);
 INTDEF poll_mode_t KCALL handle_characterdevice_poll(void *__restrict ptr, poll_mode_t what);
 INTDEF syscall_slong_t KCALL handle_characterdevice_hop(void *__restrict ptr, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode);
+INTDEF NOBLOCK void NOTHROW(FCALL handle_eventfd_fence_incref)(void *__restrict ptr);
+INTDEF NOBLOCK void NOTHROW(FCALL handle_eventfd_fence_decref)(void *__restrict ptr);
+INTDEF NOBLOCK refcnt_t NOTHROW(FCALL handle_eventfd_fence_refcnt)(void *__restrict ptr);
+INTDEF size_t KCALL handle_eventfd_fence_read(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, iomode_t mode);
+INTDEF size_t KCALL handle_eventfd_fence_write(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, iomode_t mode);
+INTDEF size_t KCALL handle_eventfd_fence_pread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode);
+INTDEF size_t KCALL handle_eventfd_fence_pwrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode);
+INTDEF size_t KCALL handle_eventfd_fence_readv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode);
+INTDEF size_t KCALL handle_eventfd_fence_writev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode);
+INTDEF size_t KCALL handle_eventfd_fence_preadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode);
+INTDEF size_t KCALL handle_eventfd_fence_pwritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode);
+INTDEF size_t KCALL handle_eventfd_fence_aread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio);
+INTDEF size_t KCALL handle_eventfd_fence_awrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio);
+INTDEF size_t KCALL handle_eventfd_fence_apread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio);
+INTDEF size_t KCALL handle_eventfd_fence_apwrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio);
+INTDEF size_t KCALL handle_eventfd_fence_areadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio);
+INTDEF size_t KCALL handle_eventfd_fence_awritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio);
+INTDEF size_t KCALL handle_eventfd_fence_apreadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio);
+INTDEF size_t KCALL handle_eventfd_fence_apwritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio);
+INTDEF size_t KCALL handle_eventfd_fence_readdir(void *__restrict ptr, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode);
+INTDEF pos_t KCALL handle_eventfd_fence_seek(void *__restrict ptr, off_t offset, unsigned int whence);
+INTDEF syscall_slong_t KCALL handle_eventfd_fence_ioctl(void *__restrict ptr, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode);
+INTDEF void KCALL handle_eventfd_fence_truncate(void *__restrict ptr, pos_t new_size);
+INTDEF REF struct vm_datablock *KCALL handle_eventfd_fence_mmap(void *__restrict ptr, vm_vpage64_t *__restrict pminpage, vm_vpage64_t *__restrict pmaxpage);
+INTDEF pos_t KCALL handle_eventfd_fence_allocate(void *__restrict ptr, fallocate_mode_t mode, pos_t start, pos_t length);
+INTDEF void KCALL handle_eventfd_fence_sync(void *__restrict ptr);
+INTDEF void KCALL handle_eventfd_fence_datasync(void *__restrict ptr);
+INTDEF void KCALL handle_eventfd_fence_stat(void *__restrict ptr, USER CHECKED struct stat *result);
+INTDEF poll_mode_t KCALL handle_eventfd_fence_poll(void *__restrict ptr, poll_mode_t what);
+INTDEF syscall_slong_t KCALL handle_eventfd_fence_hop(void *__restrict ptr, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode);
+INTDEF NOBLOCK void NOTHROW(FCALL handle_eventfd_sema_incref)(void *__restrict ptr);
+INTDEF NOBLOCK void NOTHROW(FCALL handle_eventfd_sema_decref)(void *__restrict ptr);
+INTDEF NOBLOCK refcnt_t NOTHROW(FCALL handle_eventfd_sema_refcnt)(void *__restrict ptr);
+INTDEF size_t KCALL handle_eventfd_sema_read(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, iomode_t mode);
+INTDEF size_t KCALL handle_eventfd_sema_write(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, iomode_t mode);
+INTDEF size_t KCALL handle_eventfd_sema_pread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode);
+INTDEF size_t KCALL handle_eventfd_sema_pwrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode);
+INTDEF size_t KCALL handle_eventfd_sema_readv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode);
+INTDEF size_t KCALL handle_eventfd_sema_writev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode);
+INTDEF size_t KCALL handle_eventfd_sema_preadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode);
+INTDEF size_t KCALL handle_eventfd_sema_pwritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode);
+INTDEF size_t KCALL handle_eventfd_sema_aread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio);
+INTDEF size_t KCALL handle_eventfd_sema_awrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio);
+INTDEF size_t KCALL handle_eventfd_sema_apread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio);
+INTDEF size_t KCALL handle_eventfd_sema_apwrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio);
+INTDEF size_t KCALL handle_eventfd_sema_areadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio);
+INTDEF size_t KCALL handle_eventfd_sema_awritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio);
+INTDEF size_t KCALL handle_eventfd_sema_apreadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio);
+INTDEF size_t KCALL handle_eventfd_sema_apwritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio);
+INTDEF size_t KCALL handle_eventfd_sema_readdir(void *__restrict ptr, USER CHECKED struct dirent *buf, size_t bufsize, readdir_mode_t readdir_mode, iomode_t mode);
+INTDEF pos_t KCALL handle_eventfd_sema_seek(void *__restrict ptr, off_t offset, unsigned int whence);
+INTDEF syscall_slong_t KCALL handle_eventfd_sema_ioctl(void *__restrict ptr, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode);
+INTDEF void KCALL handle_eventfd_sema_truncate(void *__restrict ptr, pos_t new_size);
+INTDEF REF struct vm_datablock *KCALL handle_eventfd_sema_mmap(void *__restrict ptr, vm_vpage64_t *__restrict pminpage, vm_vpage64_t *__restrict pmaxpage);
+INTDEF pos_t KCALL handle_eventfd_sema_allocate(void *__restrict ptr, fallocate_mode_t mode, pos_t start, pos_t length);
+INTDEF void KCALL handle_eventfd_sema_sync(void *__restrict ptr);
+INTDEF void KCALL handle_eventfd_sema_datasync(void *__restrict ptr);
+INTDEF void KCALL handle_eventfd_sema_stat(void *__restrict ptr, USER CHECKED struct stat *result);
+INTDEF poll_mode_t KCALL handle_eventfd_sema_poll(void *__restrict ptr, poll_mode_t what);
+INTDEF syscall_slong_t KCALL handle_eventfd_sema_hop(void *__restrict ptr, syscall_ulong_t cmd, USER UNCHECKED void *arg, iomode_t mode);
 
 PUBLIC_CONST struct handle_types const handle_type_db = {
 	/* .h_typename = */{
@@ -955,7 +1015,9 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_PIPE_WRITER]            = */"pipe_writer",
 		/* [HANDLE_TYPE_PIDNS]                  = */"pidns",
 		/* [HANDLE_TYPE_DRIVER_STATE]           = */"driver_state",
-		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */"characterdevice"
+		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */"characterdevice",
+		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */"eventfd_fence",
+		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */"eventfd_sema"
 	},
 	/* .h_incref = */{
 		/* [HANDLE_TYPE_UNDEFINED]              = */&handle_undefined_incref,
@@ -975,7 +1037,9 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_PIPE_WRITER]            = */&handle_pipe_writer_incref,
 		/* [HANDLE_TYPE_PIDNS]                  = */&handle_pidns_incref,
 		/* [HANDLE_TYPE_DRIVER_STATE]           = */&handle_driver_state_incref,
-		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_incref
+		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_incref,
+		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */&handle_eventfd_fence_incref,
+		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */&handle_eventfd_sema_incref
 	},
 	/* .h_decref = */{
 		/* [HANDLE_TYPE_UNDEFINED]              = */&handle_undefined_decref,
@@ -995,7 +1059,9 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_PIPE_WRITER]            = */&handle_pipe_writer_decref,
 		/* [HANDLE_TYPE_PIDNS]                  = */&handle_pidns_decref,
 		/* [HANDLE_TYPE_DRIVER_STATE]           = */&handle_driver_state_decref,
-		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_decref
+		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_decref,
+		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */&handle_eventfd_fence_decref,
+		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */&handle_eventfd_sema_decref
 	},
 	/* .h_refcnt = */{
 		/* [HANDLE_TYPE_UNDEFINED]              = */&handle_undefined_refcnt,
@@ -1015,7 +1081,9 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_PIPE_WRITER]            = */&handle_pipe_writer_refcnt,
 		/* [HANDLE_TYPE_PIDNS]                  = */&handle_pidns_refcnt,
 		/* [HANDLE_TYPE_DRIVER_STATE]           = */&handle_driver_state_refcnt,
-		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_refcnt
+		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_refcnt,
+		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */&handle_eventfd_fence_refcnt,
+		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */&handle_eventfd_sema_refcnt
 	},
 	/* .h_read = */{
 		/* [HANDLE_TYPE_UNDEFINED]              = */&handle_undefined_read,
@@ -1035,7 +1103,9 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_PIPE_WRITER]            = */&handle_pipe_writer_read,
 		/* [HANDLE_TYPE_PIDNS]                  = */&handle_pidns_read,
 		/* [HANDLE_TYPE_DRIVER_STATE]           = */&handle_driver_state_read,
-		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_read
+		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_read,
+		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */&handle_eventfd_fence_read,
+		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */&handle_eventfd_sema_read
 	},
 	/* .h_write = */{
 		/* [HANDLE_TYPE_UNDEFINED]              = */&handle_undefined_write,
@@ -1055,7 +1125,9 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_PIPE_WRITER]            = */&handle_pipe_writer_write,
 		/* [HANDLE_TYPE_PIDNS]                  = */&handle_pidns_write,
 		/* [HANDLE_TYPE_DRIVER_STATE]           = */&handle_driver_state_write,
-		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_write
+		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_write,
+		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */&handle_eventfd_fence_write,
+		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */&handle_eventfd_sema_write
 	},
 	/* .h_pread = */{
 		/* [HANDLE_TYPE_UNDEFINED]              = */&handle_undefined_pread,
@@ -1075,7 +1147,9 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_PIPE_WRITER]            = */&handle_pipe_writer_pread,
 		/* [HANDLE_TYPE_PIDNS]                  = */&handle_pidns_pread,
 		/* [HANDLE_TYPE_DRIVER_STATE]           = */&handle_driver_state_pread,
-		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_pread
+		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_pread,
+		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */&handle_eventfd_fence_pread,
+		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */&handle_eventfd_sema_pread
 	},
 	/* .h_pwrite = */{
 		/* [HANDLE_TYPE_UNDEFINED]              = */&handle_undefined_pwrite,
@@ -1095,7 +1169,9 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_PIPE_WRITER]            = */&handle_pipe_writer_pwrite,
 		/* [HANDLE_TYPE_PIDNS]                  = */&handle_pidns_pwrite,
 		/* [HANDLE_TYPE_DRIVER_STATE]           = */&handle_driver_state_pwrite,
-		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_pwrite
+		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_pwrite,
+		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */&handle_eventfd_fence_pwrite,
+		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */&handle_eventfd_sema_pwrite
 	},
 	/* .h_readv = */{
 		/* [HANDLE_TYPE_UNDEFINED]              = */&handle_undefined_readv,
@@ -1115,7 +1191,9 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_PIPE_WRITER]            = */&handle_pipe_writer_readv,
 		/* [HANDLE_TYPE_PIDNS]                  = */&handle_pidns_readv,
 		/* [HANDLE_TYPE_DRIVER_STATE]           = */&handle_driver_state_readv,
-		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_readv
+		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_readv,
+		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */&handle_eventfd_fence_readv,
+		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */&handle_eventfd_sema_readv
 	},
 	/* .h_writev = */{
 		/* [HANDLE_TYPE_UNDEFINED]              = */&handle_undefined_writev,
@@ -1135,7 +1213,9 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_PIPE_WRITER]            = */&handle_pipe_writer_writev,
 		/* [HANDLE_TYPE_PIDNS]                  = */&handle_pidns_writev,
 		/* [HANDLE_TYPE_DRIVER_STATE]           = */&handle_driver_state_writev,
-		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_writev
+		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_writev,
+		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */&handle_eventfd_fence_writev,
+		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */&handle_eventfd_sema_writev
 	},
 	/* .h_preadv = */{
 		/* [HANDLE_TYPE_UNDEFINED]              = */&handle_undefined_preadv,
@@ -1155,7 +1235,9 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_PIPE_WRITER]            = */&handle_pipe_writer_preadv,
 		/* [HANDLE_TYPE_PIDNS]                  = */&handle_pidns_preadv,
 		/* [HANDLE_TYPE_DRIVER_STATE]           = */&handle_driver_state_preadv,
-		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_preadv
+		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_preadv,
+		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */&handle_eventfd_fence_preadv,
+		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */&handle_eventfd_sema_preadv
 	},
 	/* .h_pwritev = */{
 		/* [HANDLE_TYPE_UNDEFINED]              = */&handle_undefined_pwritev,
@@ -1175,7 +1257,9 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_PIPE_WRITER]            = */&handle_pipe_writer_pwritev,
 		/* [HANDLE_TYPE_PIDNS]                  = */&handle_pidns_pwritev,
 		/* [HANDLE_TYPE_DRIVER_STATE]           = */&handle_driver_state_pwritev,
-		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_pwritev
+		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_pwritev,
+		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */&handle_eventfd_fence_pwritev,
+		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */&handle_eventfd_sema_pwritev
 	},
 	/* .h_aread = */{
 		/* [HANDLE_TYPE_UNDEFINED]              = */&handle_undefined_aread,
@@ -1195,7 +1279,9 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_PIPE_WRITER]            = */&handle_pipe_writer_aread,
 		/* [HANDLE_TYPE_PIDNS]                  = */&handle_pidns_aread,
 		/* [HANDLE_TYPE_DRIVER_STATE]           = */&handle_driver_state_aread,
-		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_aread
+		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_aread,
+		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */&handle_eventfd_fence_aread,
+		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */&handle_eventfd_sema_aread
 	},
 	/* .h_awrite = */{
 		/* [HANDLE_TYPE_UNDEFINED]              = */&handle_undefined_awrite,
@@ -1215,7 +1301,9 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_PIPE_WRITER]            = */&handle_pipe_writer_awrite,
 		/* [HANDLE_TYPE_PIDNS]                  = */&handle_pidns_awrite,
 		/* [HANDLE_TYPE_DRIVER_STATE]           = */&handle_driver_state_awrite,
-		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_awrite
+		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_awrite,
+		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */&handle_eventfd_fence_awrite,
+		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */&handle_eventfd_sema_awrite
 	},
 	/* .h_apread = */{
 		/* [HANDLE_TYPE_UNDEFINED]              = */&handle_undefined_apread,
@@ -1235,7 +1323,9 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_PIPE_WRITER]            = */&handle_pipe_writer_apread,
 		/* [HANDLE_TYPE_PIDNS]                  = */&handle_pidns_apread,
 		/* [HANDLE_TYPE_DRIVER_STATE]           = */&handle_driver_state_apread,
-		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_apread
+		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_apread,
+		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */&handle_eventfd_fence_apread,
+		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */&handle_eventfd_sema_apread
 	},
 	/* .h_apwrite = */{
 		/* [HANDLE_TYPE_UNDEFINED]              = */&handle_undefined_apwrite,
@@ -1255,7 +1345,9 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_PIPE_WRITER]            = */&handle_pipe_writer_apwrite,
 		/* [HANDLE_TYPE_PIDNS]                  = */&handle_pidns_apwrite,
 		/* [HANDLE_TYPE_DRIVER_STATE]           = */&handle_driver_state_apwrite,
-		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_apwrite
+		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_apwrite,
+		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */&handle_eventfd_fence_apwrite,
+		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */&handle_eventfd_sema_apwrite
 	},
 	/* .h_areadv = */{
 		/* [HANDLE_TYPE_UNDEFINED]              = */&handle_undefined_areadv,
@@ -1275,7 +1367,9 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_PIPE_WRITER]            = */&handle_pipe_writer_areadv,
 		/* [HANDLE_TYPE_PIDNS]                  = */&handle_pidns_areadv,
 		/* [HANDLE_TYPE_DRIVER_STATE]           = */&handle_driver_state_areadv,
-		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_areadv
+		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_areadv,
+		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */&handle_eventfd_fence_areadv,
+		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */&handle_eventfd_sema_areadv
 	},
 	/* .h_awritev = */{
 		/* [HANDLE_TYPE_UNDEFINED]              = */&handle_undefined_awritev,
@@ -1295,7 +1389,9 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_PIPE_WRITER]            = */&handle_pipe_writer_awritev,
 		/* [HANDLE_TYPE_PIDNS]                  = */&handle_pidns_awritev,
 		/* [HANDLE_TYPE_DRIVER_STATE]           = */&handle_driver_state_awritev,
-		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_awritev
+		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_awritev,
+		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */&handle_eventfd_fence_awritev,
+		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */&handle_eventfd_sema_awritev
 	},
 	/* .h_apreadv = */{
 		/* [HANDLE_TYPE_UNDEFINED]              = */&handle_undefined_apreadv,
@@ -1315,7 +1411,9 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_PIPE_WRITER]            = */&handle_pipe_writer_apreadv,
 		/* [HANDLE_TYPE_PIDNS]                  = */&handle_pidns_apreadv,
 		/* [HANDLE_TYPE_DRIVER_STATE]           = */&handle_driver_state_apreadv,
-		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_apreadv
+		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_apreadv,
+		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */&handle_eventfd_fence_apreadv,
+		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */&handle_eventfd_sema_apreadv
 	},
 	/* .h_apwritev = */{
 		/* [HANDLE_TYPE_UNDEFINED]              = */&handle_undefined_apwritev,
@@ -1335,7 +1433,9 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_PIPE_WRITER]            = */&handle_pipe_writer_apwritev,
 		/* [HANDLE_TYPE_PIDNS]                  = */&handle_pidns_apwritev,
 		/* [HANDLE_TYPE_DRIVER_STATE]           = */&handle_driver_state_apwritev,
-		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_apwritev
+		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_apwritev,
+		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */&handle_eventfd_fence_apwritev,
+		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */&handle_eventfd_sema_apwritev
 	},
 	/* .h_readdir = */{
 		/* [HANDLE_TYPE_UNDEFINED]              = */&handle_undefined_readdir,
@@ -1355,7 +1455,9 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_PIPE_WRITER]            = */&handle_pipe_writer_readdir,
 		/* [HANDLE_TYPE_PIDNS]                  = */&handle_pidns_readdir,
 		/* [HANDLE_TYPE_DRIVER_STATE]           = */&handle_driver_state_readdir,
-		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_readdir
+		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_readdir,
+		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */&handle_eventfd_fence_readdir,
+		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */&handle_eventfd_sema_readdir
 	},
 	/* .h_seek = */{
 		/* [HANDLE_TYPE_UNDEFINED]              = */&handle_undefined_seek,
@@ -1375,7 +1477,9 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_PIPE_WRITER]            = */&handle_pipe_writer_seek,
 		/* [HANDLE_TYPE_PIDNS]                  = */&handle_pidns_seek,
 		/* [HANDLE_TYPE_DRIVER_STATE]           = */&handle_driver_state_seek,
-		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_seek
+		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_seek,
+		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */&handle_eventfd_fence_seek,
+		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */&handle_eventfd_sema_seek
 	},
 	/* .h_ioctl = */{
 		/* [HANDLE_TYPE_UNDEFINED]              = */&handle_undefined_ioctl,
@@ -1395,7 +1499,9 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_PIPE_WRITER]            = */&handle_pipe_writer_ioctl,
 		/* [HANDLE_TYPE_PIDNS]                  = */&handle_pidns_ioctl,
 		/* [HANDLE_TYPE_DRIVER_STATE]           = */&handle_driver_state_ioctl,
-		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_ioctl
+		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_ioctl,
+		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */&handle_eventfd_fence_ioctl,
+		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */&handle_eventfd_sema_ioctl
 	},
 	/* .h_truncate = */{
 		/* [HANDLE_TYPE_UNDEFINED]              = */&handle_undefined_truncate,
@@ -1415,7 +1521,9 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_PIPE_WRITER]            = */&handle_pipe_writer_truncate,
 		/* [HANDLE_TYPE_PIDNS]                  = */&handle_pidns_truncate,
 		/* [HANDLE_TYPE_DRIVER_STATE]           = */&handle_driver_state_truncate,
-		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_truncate
+		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_truncate,
+		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */&handle_eventfd_fence_truncate,
+		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */&handle_eventfd_sema_truncate
 	},
 	/* .h_mmap = */{
 		/* [HANDLE_TYPE_UNDEFINED]              = */&handle_undefined_mmap,
@@ -1435,7 +1543,9 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_PIPE_WRITER]            = */&handle_pipe_writer_mmap,
 		/* [HANDLE_TYPE_PIDNS]                  = */&handle_pidns_mmap,
 		/* [HANDLE_TYPE_DRIVER_STATE]           = */&handle_driver_state_mmap,
-		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_mmap
+		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_mmap,
+		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */&handle_eventfd_fence_mmap,
+		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */&handle_eventfd_sema_mmap
 	},
 	/* .h_allocate = */{
 		/* [HANDLE_TYPE_UNDEFINED]              = */&handle_undefined_allocate,
@@ -1455,7 +1565,9 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_PIPE_WRITER]            = */&handle_pipe_writer_allocate,
 		/* [HANDLE_TYPE_PIDNS]                  = */&handle_pidns_allocate,
 		/* [HANDLE_TYPE_DRIVER_STATE]           = */&handle_driver_state_allocate,
-		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_allocate
+		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_allocate,
+		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */&handle_eventfd_fence_allocate,
+		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */&handle_eventfd_sema_allocate
 	},
 	/* .h_sync = */{
 		/* [HANDLE_TYPE_UNDEFINED]              = */&handle_undefined_sync,
@@ -1475,7 +1587,9 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_PIPE_WRITER]            = */&handle_pipe_writer_sync,
 		/* [HANDLE_TYPE_PIDNS]                  = */&handle_pidns_sync,
 		/* [HANDLE_TYPE_DRIVER_STATE]           = */&handle_driver_state_sync,
-		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_sync
+		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_sync,
+		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */&handle_eventfd_fence_sync,
+		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */&handle_eventfd_sema_sync
 	},
 	/* .h_datasync = */{
 		/* [HANDLE_TYPE_UNDEFINED]              = */&handle_undefined_datasync,
@@ -1495,7 +1609,9 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_PIPE_WRITER]            = */&handle_pipe_writer_datasync,
 		/* [HANDLE_TYPE_PIDNS]                  = */&handle_pidns_datasync,
 		/* [HANDLE_TYPE_DRIVER_STATE]           = */&handle_driver_state_datasync,
-		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_datasync
+		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_datasync,
+		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */&handle_eventfd_fence_datasync,
+		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */&handle_eventfd_sema_datasync
 	},
 	/* .h_stat = */{
 		/* [HANDLE_TYPE_UNDEFINED]              = */&handle_undefined_stat,
@@ -1515,7 +1631,9 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_PIPE_WRITER]            = */&handle_pipe_writer_stat,
 		/* [HANDLE_TYPE_PIDNS]                  = */&handle_pidns_stat,
 		/* [HANDLE_TYPE_DRIVER_STATE]           = */&handle_driver_state_stat,
-		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_stat
+		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_stat,
+		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */&handle_eventfd_fence_stat,
+		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */&handle_eventfd_sema_stat
 	},
 	/* .h_poll = */{
 		/* [HANDLE_TYPE_UNDEFINED]              = */&handle_undefined_poll,
@@ -1535,7 +1653,9 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_PIPE_WRITER]            = */&handle_pipe_writer_poll,
 		/* [HANDLE_TYPE_PIDNS]                  = */&handle_pidns_poll,
 		/* [HANDLE_TYPE_DRIVER_STATE]           = */&handle_driver_state_poll,
-		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_poll
+		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_poll,
+		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */&handle_eventfd_fence_poll,
+		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */&handle_eventfd_sema_poll
 	},
 	/* .h_hop = */{
 		/* [HANDLE_TYPE_UNDEFINED]              = */&handle_undefined_hop,
@@ -1555,7 +1675,9 @@ PUBLIC_CONST struct handle_types const handle_type_db = {
 		/* [HANDLE_TYPE_PIPE_WRITER]            = */&handle_pipe_writer_hop,
 		/* [HANDLE_TYPE_PIDNS]                  = */&handle_pidns_hop,
 		/* [HANDLE_TYPE_DRIVER_STATE]           = */&handle_driver_state_hop,
-		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_hop
+		/* [HANDLE_TYPE_CHARACTERDEVICE]        = */&handle_characterdevice_hop,
+		/* [HANDLE_TYPE_EVENTFD_FENCE]          = */&handle_eventfd_fence_hop,
+		/* [HANDLE_TYPE_EVENTFD_SEMA]           = */&handle_eventfd_sema_hop
 	}
 };
 
@@ -1865,6 +1987,42 @@ DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_datasync, handle_undefined_datas
 DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_stat, handle_undefined_stat);
 DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_poll, handle_undefined_poll);
 DEFINE_INTERN_WEAK_ALIAS(handle_characterdevice_hop, handle_undefined_hop);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_incref, handle_undefined_incref);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_decref, handle_undefined_decref);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_refcnt, handle_undefined_refcnt);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_read, handle_undefined_read);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_write, handle_undefined_write);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_pread, handle_undefined_pread);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_pwrite, handle_undefined_pwrite);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_readdir, handle_undefined_readdir);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_seek, handle_undefined_seek);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_ioctl, handle_undefined_ioctl);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_truncate, handle_undefined_truncate);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_mmap, handle_undefined_mmap);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_allocate, handle_undefined_allocate);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_sync, handle_undefined_sync);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_datasync, handle_undefined_datasync);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_stat, handle_undefined_stat);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_poll, handle_undefined_poll);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_fence_hop, handle_undefined_hop);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_incref, handle_undefined_incref);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_decref, handle_undefined_decref);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_refcnt, handle_undefined_refcnt);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_read, handle_undefined_read);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_write, handle_undefined_write);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_pread, handle_undefined_pread);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_pwrite, handle_undefined_pwrite);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_readdir, handle_undefined_readdir);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_seek, handle_undefined_seek);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_ioctl, handle_undefined_ioctl);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_truncate, handle_undefined_truncate);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_mmap, handle_undefined_mmap);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_allocate, handle_undefined_allocate);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_sync, handle_undefined_sync);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_datasync, handle_undefined_datasync);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_stat, handle_undefined_stat);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_poll, handle_undefined_poll);
+DEFINE_INTERN_WEAK_ALIAS(handle_eventfd_sema_hop, handle_undefined_hop);
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.datablock.readv") size_t KCALL
 handle_datablock_readv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode) {
 	size_t temp, result = 0;
@@ -4003,6 +4161,258 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.characterdevice.apwr
 handle_characterdevice_apwritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
 	result = handle_characterdevice_pwritev(ptr, src, num_bytes, addr, mode);
+	aio_multihandle_done(aio);
+	return result;
+}
+
+INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.eventfd_fence.readv") size_t KCALL
+handle_eventfd_fence_readv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode) {
+	size_t temp, result = 0;
+	struct aio_buffer_entry ent;
+	assert(aio_buffer_size(dst) == num_bytes);
+	(void)num_bytes;
+	AIO_BUFFER_FOREACH(ent, dst) {
+		temp = handle_eventfd_fence_read(ptr, ent.ab_base, ent.ab_size, mode);
+		result += temp;
+		if (temp != ent.ab_size)
+			break;
+	}
+	return result;
+}
+
+INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.eventfd_fence.writev") size_t KCALL
+handle_eventfd_fence_writev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode) {
+	size_t temp, result = 0;
+	struct aio_buffer_entry ent;
+	assert(aio_buffer_size(src) == num_bytes);
+	(void)num_bytes;
+	AIO_BUFFER_FOREACH(ent, src) {
+		temp = handle_eventfd_fence_write(ptr, ent.ab_base, ent.ab_size, mode);
+		result += temp;
+		if (temp != ent.ab_size)
+			break;
+	}
+	return result;
+}
+
+INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.eventfd_fence.preadv") size_t KCALL
+handle_eventfd_fence_preadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) {
+	size_t temp, result = 0;
+	struct aio_buffer_entry ent;
+	assert(aio_buffer_size(dst) == num_bytes);
+	(void)num_bytes;
+	AIO_BUFFER_FOREACH(ent, dst) {
+		temp = handle_eventfd_fence_pread(ptr, ent.ab_base, ent.ab_size, addr, mode);
+		result += temp;
+		if (temp != ent.ab_size)
+			break;
+		addr += temp;
+	}
+	return result;
+}
+
+INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.eventfd_fence.pwritev") size_t KCALL
+handle_eventfd_fence_pwritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) {
+	size_t temp, result = 0;
+	struct aio_buffer_entry ent;
+	assert(aio_buffer_size(src) == num_bytes);
+	(void)num_bytes;
+	AIO_BUFFER_FOREACH(ent, src) {
+		temp = handle_eventfd_fence_pwrite(ptr, ent.ab_base, ent.ab_size, addr, mode);
+		result += temp;
+		if (temp != ent.ab_size)
+			break;
+		addr += temp;
+	}
+	return result;
+}
+
+INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.eventfd_fence.aread") size_t KCALL
+handle_eventfd_fence_aread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
+	size_t result;
+	result = handle_eventfd_fence_read(ptr, dst, num_bytes, mode);
+	aio_multihandle_done(aio);
+	return result;
+}
+
+INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.eventfd_fence.awrite") size_t KCALL
+handle_eventfd_fence_awrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
+	size_t result;
+	result = handle_eventfd_fence_write(ptr, src, num_bytes, mode);
+	aio_multihandle_done(aio);
+	return result;
+}
+
+INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.eventfd_fence.apread") size_t KCALL
+handle_eventfd_fence_apread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
+	size_t result;
+	result = handle_eventfd_fence_pread(ptr, dst, num_bytes, addr, mode);
+	aio_multihandle_done(aio);
+	return result;
+}
+
+INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.eventfd_fence.apwrite") size_t KCALL
+handle_eventfd_fence_apwrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
+	size_t result;
+	result = handle_eventfd_fence_pwrite(ptr, src, num_bytes, addr, mode);
+	aio_multihandle_done(aio);
+	return result;
+}
+
+INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.eventfd_fence.areadv") size_t KCALL
+handle_eventfd_fence_areadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
+	size_t result;
+	result = handle_eventfd_fence_readv(ptr, dst, num_bytes, mode);
+	aio_multihandle_done(aio);
+	return result;
+}
+
+INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.eventfd_fence.awritev") size_t KCALL
+handle_eventfd_fence_awritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
+	size_t result;
+	result = handle_eventfd_fence_writev(ptr, src, num_bytes, mode);
+	aio_multihandle_done(aio);
+	return result;
+}
+
+INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.eventfd_fence.apreadv") size_t KCALL
+handle_eventfd_fence_apreadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
+	size_t result;
+	result = handle_eventfd_fence_preadv(ptr, dst, num_bytes, addr, mode);
+	aio_multihandle_done(aio);
+	return result;
+}
+
+INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.eventfd_fence.apwritev") size_t KCALL
+handle_eventfd_fence_apwritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
+	size_t result;
+	result = handle_eventfd_fence_pwritev(ptr, src, num_bytes, addr, mode);
+	aio_multihandle_done(aio);
+	return result;
+}
+
+INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.eventfd_sema.readv") size_t KCALL
+handle_eventfd_sema_readv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode) {
+	size_t temp, result = 0;
+	struct aio_buffer_entry ent;
+	assert(aio_buffer_size(dst) == num_bytes);
+	(void)num_bytes;
+	AIO_BUFFER_FOREACH(ent, dst) {
+		temp = handle_eventfd_sema_read(ptr, ent.ab_base, ent.ab_size, mode);
+		result += temp;
+		if (temp != ent.ab_size)
+			break;
+	}
+	return result;
+}
+
+INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.eventfd_sema.writev") size_t KCALL
+handle_eventfd_sema_writev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode) {
+	size_t temp, result = 0;
+	struct aio_buffer_entry ent;
+	assert(aio_buffer_size(src) == num_bytes);
+	(void)num_bytes;
+	AIO_BUFFER_FOREACH(ent, src) {
+		temp = handle_eventfd_sema_write(ptr, ent.ab_base, ent.ab_size, mode);
+		result += temp;
+		if (temp != ent.ab_size)
+			break;
+	}
+	return result;
+}
+
+INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.eventfd_sema.preadv") size_t KCALL
+handle_eventfd_sema_preadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) {
+	size_t temp, result = 0;
+	struct aio_buffer_entry ent;
+	assert(aio_buffer_size(dst) == num_bytes);
+	(void)num_bytes;
+	AIO_BUFFER_FOREACH(ent, dst) {
+		temp = handle_eventfd_sema_pread(ptr, ent.ab_base, ent.ab_size, addr, mode);
+		result += temp;
+		if (temp != ent.ab_size)
+			break;
+		addr += temp;
+	}
+	return result;
+}
+
+INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.eventfd_sema.pwritev") size_t KCALL
+handle_eventfd_sema_pwritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) {
+	size_t temp, result = 0;
+	struct aio_buffer_entry ent;
+	assert(aio_buffer_size(src) == num_bytes);
+	(void)num_bytes;
+	AIO_BUFFER_FOREACH(ent, src) {
+		temp = handle_eventfd_sema_pwrite(ptr, ent.ab_base, ent.ab_size, addr, mode);
+		result += temp;
+		if (temp != ent.ab_size)
+			break;
+		addr += temp;
+	}
+	return result;
+}
+
+INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.eventfd_sema.aread") size_t KCALL
+handle_eventfd_sema_aread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
+	size_t result;
+	result = handle_eventfd_sema_read(ptr, dst, num_bytes, mode);
+	aio_multihandle_done(aio);
+	return result;
+}
+
+INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.eventfd_sema.awrite") size_t KCALL
+handle_eventfd_sema_awrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
+	size_t result;
+	result = handle_eventfd_sema_write(ptr, src, num_bytes, mode);
+	aio_multihandle_done(aio);
+	return result;
+}
+
+INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.eventfd_sema.apread") size_t KCALL
+handle_eventfd_sema_apread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
+	size_t result;
+	result = handle_eventfd_sema_pread(ptr, dst, num_bytes, addr, mode);
+	aio_multihandle_done(aio);
+	return result;
+}
+
+INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.eventfd_sema.apwrite") size_t KCALL
+handle_eventfd_sema_apwrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
+	size_t result;
+	result = handle_eventfd_sema_pwrite(ptr, src, num_bytes, addr, mode);
+	aio_multihandle_done(aio);
+	return result;
+}
+
+INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.eventfd_sema.areadv") size_t KCALL
+handle_eventfd_sema_areadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
+	size_t result;
+	result = handle_eventfd_sema_readv(ptr, dst, num_bytes, mode);
+	aio_multihandle_done(aio);
+	return result;
+}
+
+INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.eventfd_sema.awritev") size_t KCALL
+handle_eventfd_sema_awritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
+	size_t result;
+	result = handle_eventfd_sema_writev(ptr, src, num_bytes, mode);
+	aio_multihandle_done(aio);
+	return result;
+}
+
+INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.eventfd_sema.apreadv") size_t KCALL
+handle_eventfd_sema_apreadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
+	size_t result;
+	result = handle_eventfd_sema_preadv(ptr, dst, num_bytes, addr, mode);
+	aio_multihandle_done(aio);
+	return result;
+}
+
+INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.eventfd_sema.apwritev") size_t KCALL
+handle_eventfd_sema_apwritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
+	size_t result;
+	result = handle_eventfd_sema_pwritev(ptr, src, num_bytes, addr, mode);
 	aio_multihandle_done(aio);
 	return result;
 }
