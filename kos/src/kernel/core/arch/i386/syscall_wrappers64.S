@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4eefd577 */
+/* HASH CRC-32:0xe536fb51 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -244,12 +244,14 @@ EXTERN(sys_sync_file_range)
 EXTERN(sys_vmsplice)
 EXTERN(sys_utimensat)
 EXTERN(sys_epoll_pwait)
+EXTERN(sys_signalfd)
 EXTERN(sys_timerfd_create)
 EXTERN(sys_eventfd)
 EXTERN(sys_fallocate)
 EXTERN(sys_timerfd_settime)
 EXTERN(sys_timerfd_gettime)
 EXTERN(sys_accept4)
+EXTERN(sys_signalfd4)
 EXTERN(sys_eventfd2)
 EXTERN(sys_epoll_create1)
 EXTERN(sys_dup3)
@@ -578,11 +580,13 @@ EXTERN(sys32_vmsplice)
 EXTERN(sys32_getcpu)
 EXTERN(sys32_epoll_pwait)
 EXTERN(sys32_utimensat)
+EXTERN(sys32_signalfd)
 EXTERN(sys32_timerfd_create)
 EXTERN(sys32_eventfd)
 EXTERN(sys32_fallocate)
 EXTERN(sys32_timerfd_settime)
 EXTERN(sys32_timerfd_gettime)
+EXTERN(sys32_signalfd4)
 EXTERN(sys32_eventfd2)
 EXTERN(sys32_epoll_create1)
 EXTERN(sys32_dup3)
@@ -890,11 +894,13 @@ EXTERN(sys32_recvmmsg64)
 .weak sys32_getcpu; .set sys32_getcpu, sys_getcpu
 .weak sys32_epoll_pwait; .set sys32_epoll_pwait, sys_epoll_pwait
 .weak sys32_utimensat; .set sys32_utimensat, sys_utimensat
+.weak sys32_signalfd; .set sys32_signalfd, sys_signalfd
 .weak sys32_timerfd_create; .set sys32_timerfd_create, sys_timerfd_create
 .weak sys32_eventfd; .set sys32_eventfd, sys_eventfd
 .weak sys32_fallocate; .set sys32_fallocate, sys_fallocate
 .weak sys32_timerfd_settime; .set sys32_timerfd_settime, sys_timerfd_settime
 .weak sys32_timerfd_gettime; .set sys32_timerfd_gettime, sys_timerfd_gettime
+.weak sys32_signalfd4; .set sys32_signalfd4, sys_signalfd4
 .weak sys32_eventfd2; .set sys32_eventfd2, sys_eventfd2
 .weak sys32_epoll_create1; .set sys32_epoll_create1, sys_epoll_create1
 .weak sys32_dup3; .set sys32_dup3, sys_dup3
@@ -7680,6 +7686,37 @@ INTERN_FUNCTION(__asm64_syscall_epoll_pwait)
 	.cfi_endproc
 END(__asm64_syscall_epoll_pwait)
 
+.section .text.x86.asm64_syscall.signalfd
+	/* errno_t signalfd(fd_t fd,
+	 *                  struct __sigset_struct const *sigmask,
+	 *                  size_t sigsetsize) */
+	.weak __asm64_syscall_signalfd
+INTERN_FUNCTION(__asm64_syscall_signalfd)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality
+	.cfi_lsda 0, 0x11a
+	.cfi_iret_signal_frame
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	call   sys_signalfd
+	pushq_cfi_r %r11
+	pushq_cfi_r %r10
+	pushq_cfi_r %r9
+	pushq_cfi_r %r8
+	pushq_cfi_r %rdi
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__asm64_syscall_signalfd)
+
 /* Return file descriptor for new interval timer source */
 .section .text.x86.asm64_syscall.timerfd_create
 	/* fd_t timerfd_create(clockid_t clock_id,
@@ -7872,6 +7909,39 @@ INTERN_FUNCTION(__asm64_syscall_accept4)
 	intr_exit_sysret
 	.cfi_endproc
 END(__asm64_syscall_accept4)
+
+.section .text.x86.asm64_syscall.signalfd4
+	/* errno_t signalfd4(fd_t fd,
+	 *                   struct __sigset_struct const *sigmask,
+	 *                   size_t sigsetsize,
+	 *                   syscall_ulong_t flags) */
+	.weak __asm64_syscall_signalfd4
+INTERN_FUNCTION(__asm64_syscall_signalfd4)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality
+	.cfi_lsda 0, 0x121
+	.cfi_iret_signal_frame
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	pushq_cfi_r %r8
+	pushq_cfi_r %r9
+	pushq_cfi_r %r10
+	pushq_cfi_r %r11
+	movq   %r10, %rcx
+	call   sys_signalfd4
+	pushq_cfi_r %r11
+	pushq_cfi_r %r10
+	pushq_cfi_r %r9
+	pushq_cfi_r %r8
+	pushq_cfi_r %rdi
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rcx
+	intr_exit_sysret
+	.cfi_endproc
+END(__asm64_syscall_signalfd4)
 
 .section .text.x86.asm64_syscall.eventfd2
 	/* fd_t eventfd2(syscall_ulong_t initval,
@@ -16622,6 +16692,31 @@ INTERN_FUNCTION(__asm32_int80_utimensat)
 	.cfi_endproc
 END(__asm32_int80_utimensat)
 
+.section .text.x86.asm32_syscall_int80.signalfd
+	/* errno_t signalfd(fd_t fd,
+	 *                  struct __sigset_struct const *sigmask,
+	 *                  size_t sigsetsize) */
+	.weak __asm32_int80_signalfd
+INTERN_FUNCTION(__asm32_int80_signalfd)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality
+	.cfi_lsda 0, 0x141
+	.cfi_iret_signal_frame
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	movl   %ecx, %esi
+	movl   %ebx, %edi
+	call   sys32_signalfd
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	iretq
+	.cfi_endproc
+END(__asm32_int80_signalfd)
+
 /* Return file descriptor for new interval timer source */
 .section .text.x86.asm32_syscall_int80.timerfd_create
 	/* fd_t timerfd_create(clockid_t clock_id,
@@ -16750,6 +16845,33 @@ INTERN_FUNCTION(__asm32_int80_timerfd_gettime)
 	iretq
 	.cfi_endproc
 END(__asm32_int80_timerfd_gettime)
+
+.section .text.x86.asm32_syscall_int80.signalfd4
+	/* errno_t signalfd4(fd_t fd,
+	 *                   struct __sigset_struct const *sigmask,
+	 *                   size_t sigsetsize,
+	 *                   syscall_ulong_t flags) */
+	.weak __asm32_int80_signalfd4
+INTERN_FUNCTION(__asm32_int80_signalfd4)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality
+	.cfi_lsda 0, 0x147
+	.cfi_iret_signal_frame
+	pushq_cfi_r %rcx
+	pushq_cfi_r %rdx
+	pushq_cfi_r %rsi
+	pushq_cfi_r %rdi
+	movl   %esi, %r10d
+	movl   %ecx, %esi
+	movl   %ebx, %edi
+	call   sys32_signalfd4
+	popq_cfi_r %rdi
+	popq_cfi_r %rsi
+	popq_cfi_r %rdx
+	popq_cfi_r %rcx
+	iretq
+	.cfi_endproc
+END(__asm32_int80_signalfd4)
 
 .section .text.x86.asm32_syscall_int80.eventfd2
 	/* fd_t eventfd2(syscall_ulong_t initval,
@@ -23158,6 +23280,20 @@ INTERN_FUNCTION(__asm32_sysenter_utimensat)
 	.cfi_endproc
 END(__asm32_sysenter_utimensat)
 
+.section .text.x86.asm32_syscall_sysenter.signalfd
+	/* errno_t signalfd(fd_t fd,
+	 *                  struct __sigset_struct const *sigmask,
+	 *                  size_t sigsetsize) */
+	.weak __asm32_sysenter_signalfd
+INTERN_FUNCTION(__asm32_sysenter_signalfd)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality
+	.cfi_lsda 0, 0x40000141
+	.cfi_iret_signal_frame
+	/* TODO: print_x64_386sysenter_wrapper() */
+	.cfi_endproc
+END(__asm32_sysenter_signalfd)
+
 /* Return file descriptor for new interval timer source */
 .section .text.x86.asm32_syscall_sysenter.timerfd_create
 	/* fd_t timerfd_create(clockid_t clock_id,
@@ -23230,6 +23366,21 @@ INTERN_FUNCTION(__asm32_sysenter_timerfd_gettime)
 	/* TODO: print_x64_386sysenter_wrapper() */
 	.cfi_endproc
 END(__asm32_sysenter_timerfd_gettime)
+
+.section .text.x86.asm32_syscall_sysenter.signalfd4
+	/* errno_t signalfd4(fd_t fd,
+	 *                   struct __sigset_struct const *sigmask,
+	 *                   size_t sigsetsize,
+	 *                   syscall_ulong_t flags) */
+	.weak __asm32_sysenter_signalfd4
+INTERN_FUNCTION(__asm32_sysenter_signalfd4)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality
+	.cfi_lsda 0, 0x40000147
+	.cfi_iret_signal_frame
+	/* TODO: print_x64_386sysenter_wrapper() */
+	.cfi_endproc
+END(__asm32_sysenter_signalfd4)
 
 .section .text.x86.asm32_syscall_sysenter.eventfd2
 	/* fd_t eventfd2(syscall_ulong_t initval,

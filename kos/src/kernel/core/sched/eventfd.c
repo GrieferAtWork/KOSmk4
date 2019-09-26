@@ -196,7 +196,6 @@ DEFINE_INTERN_ALIAS(handle_eventfd_sema_write, handle_eventfd_fence_write);
 DEFINE_INTERN_ALIAS(handle_eventfd_sema_poll, handle_eventfd_fence_poll);
 
 
-/* TODO: DEFINE_SYSCALLn(eventfd) */
 DEFINE_SYSCALL2(fd_t, eventfd2,
                 syscall_ulong_t, initval,
                 syscall_ulong_t, flags) {

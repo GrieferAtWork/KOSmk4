@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc21d5613 */
+/* HASH CRC-32:0x54c01246 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -254,6 +254,7 @@
 #define SYS_epoll_pwait             __NR_epoll_pwait             /* errno_t epoll_pwait(fd_t epfd, struct epoll_event *events, syscall_ulong_t maxevents, syscall_slong_t timeout, struct __sigset_struct const *ss) */
 /* @param: flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
 #define SYS_utimensat               __NR_utimensat               /* errno_t utimensat(fd_t dirfd, char const *filename, [2-3]struct __timespec32 const *times, atflag_t flags) */
+#define SYS_signalfd                __NR_signalfd                /* errno_t signalfd(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize) */
 /* Return file descriptor for new interval timer source */
 #define SYS_timerfd_create          __NR_timerfd_create          /* fd_t timerfd_create(clockid_t clock_id, syscall_ulong_t flags) */
 #define SYS_eventfd                 __NR_eventfd                 /* fd_t eventfd(syscall_ulong_t initval) */
@@ -264,6 +265,7 @@
 #define SYS_timerfd_settime         __NR_timerfd_settime         /* errno_t timerfd_settime(fd_t ufd, syscall_ulong_t flags, struct __itimerspec32 const *utmr, struct __itimerspec32 *otmr) */
 /* Return the next expiration time of UFD */
 #define SYS_timerfd_gettime         __NR_timerfd_gettime         /* errno_t timerfd_gettime(fd_t ufd, struct __itimerspec32 *otmr) */
+#define SYS_signalfd4               __NR_signalfd4               /* errno_t signalfd4(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize, syscall_ulong_t flags) */
 #define SYS_eventfd2                __NR_eventfd2                /* fd_t eventfd2(syscall_ulong_t initval, syscall_ulong_t flags) */
 #define SYS_epoll_create1           __NR_epoll_create1           /* fd_t epoll_create1(syscall_ulong_t flags) */
 /* @param: flags:  Set of `O_CLOEXEC|O_CLOFORK' */

@@ -2820,6 +2820,7 @@
 #define __CRT_HAVE_sigismember 1
 #define __CRT_HAVE_siglongjmp 1
 #define __CRT_HAVE_signal 1
+#define __CRT_HAVE_signalfd 1
 #define __CRT_HAVE_significand 1
 #define __CRT_HAVE_significandf 1
 #define __CRT_HAVE_significandl 1
@@ -3305,6 +3306,8 @@
 #define __CRT_HAVE_sys_Xsigaction 1
 #define __CRT_HAVE_sys_Xsigaltstack 1
 #define __CRT_HAVE_sys_Xsignal 1
+#define __CRT_HAVE_sys_Xsignalfd 1
+#define __CRT_HAVE_sys_Xsignalfd4 1
 #define __CRT_HAVE_sys_Xsigpending 1
 #define __CRT_HAVE_sys_Xsigprocmask 1
 #define __CRT_HAVE_sys_Xsigsuspend 1
@@ -3665,6 +3668,8 @@
 #define __CRT_HAVE_sys_sigaction 1
 #define __CRT_HAVE_sys_sigaltstack 1
 #define __CRT_HAVE_sys_signal 1
+#define __CRT_HAVE_sys_signalfd 1
+#define __CRT_HAVE_sys_signalfd4 1
 #define __CRT_HAVE_sys_sigpending 1
 #define __CRT_HAVE_sys_sigprocmask 1
 #define __CRT_HAVE_sys_sigreturn 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x71cdda3b */
+/* HASH CRC-32:0xd8bfee2c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2390,6 +2390,7 @@
 #define __CRT_ATTR_NOTHROW_NCX_sigisemptyset 1
 #define __CRT_ATTR_NOTHROW_NCX_sigismember 1
 #define __CRT_ATTR_NOTHROW_NCX_signal 1
+#define __CRT_ATTR_NOTHROW_NCX_signalfd 1
 #define __CRT_ATTR_NOTHROW_NCX_sigorset 1
 #define __CRT_ATTR_NOTHROW_NCX_sigpause 1
 #define __CRT_ATTR_NOTHROW_NCX_sigpending 1

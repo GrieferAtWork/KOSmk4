@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x697c21ed */
+/* HASH CRC-32:0xedef7563 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -9217,6 +9217,41 @@ INTERN_FUNCTION(libc_sys_utimensat)
 	.cfi_endproc
 END(libc_sys_utimensat)
 
+.section .text.crt.syscall.signalfd
+/* errno_t signalfd(fd_t fd,
+ *                  struct __sigset_struct const *sigmask,
+ *                  size_t sigsetsize) */
+INTERN_FUNCTION(libc_sys_signalfd)
+	/* Argument count: 3 */
+	.cfi_startproc
+	movl   $SYS_signalfd, %eax
+#ifdef CONFIG_SYSCALL_USING_INT80
+	pushl_cfi_r %ebx
+	movl   8(%esp), %ebx
+	movl   12(%esp), %ecx
+	movl   16(%esp), %edx
+	clc
+	int    $0x80
+	popl_cfi_r %ebx
+	ret
+#elif defined(CONFIG_SYSCALL_USING_SYSENTER)
+	pushl_cfi_r %edi
+	pushl_cfi_r %ebp
+	pushl_cfi_r %ebx
+	movl   16(%esp), %ebx
+	movl   20(%esp), %ecx
+	movl   24(%esp), %edx
+	call   libc_x86_sysenter_common
+	popl_cfi_r %ebx
+	popl_cfi_r %ebp
+	popl_cfi_r %edi
+	ret
+#else
+	jmp    libc_x86_exec_syscall3
+#endif
+	.cfi_endproc
+END(libc_sys_signalfd)
+
 /* Return file descriptor for new interval timer source */
 .section .text.crt.syscall.timerfd_create
 /* fd_t timerfd_create(clockid_t clock_id,
@@ -9398,6 +9433,48 @@ INTERN_FUNCTION(libc_sys_timerfd_gettime)
 #endif
 	.cfi_endproc
 END(libc_sys_timerfd_gettime)
+
+.section .text.crt.syscall.signalfd4
+/* errno_t signalfd4(fd_t fd,
+ *                   struct __sigset_struct const *sigmask,
+ *                   size_t sigsetsize,
+ *                   syscall_ulong_t flags) */
+INTERN_FUNCTION(libc_sys_signalfd4)
+	/* Argument count: 4 */
+	.cfi_startproc
+	movl   $SYS_signalfd4, %eax
+#ifdef CONFIG_SYSCALL_USING_INT80
+	pushl_cfi_r %ebx
+	pushl_cfi_r %esi
+	movl   12(%esp), %ebx
+	movl   16(%esp), %ecx
+	movl   20(%esp), %edx
+	movl   24(%esp), %esi
+	clc
+	int    $0x80
+	popl_cfi_r %esi
+	popl_cfi_r %ebx
+	ret
+#elif defined(CONFIG_SYSCALL_USING_SYSENTER)
+	pushl_cfi_r %edi
+	pushl_cfi_r %ebp
+	pushl_cfi_r %ebx
+	pushl_cfi_r %esi
+	movl   20(%esp), %ebx
+	movl   24(%esp), %ecx
+	movl   28(%esp), %edx
+	movl   32(%esp), %esi
+	call   libc_x86_sysenter_common
+	popl_cfi_r %esi
+	popl_cfi_r %ebx
+	popl_cfi_r %ebp
+	popl_cfi_r %edi
+	ret
+#else
+	jmp    libc_x86_exec_syscall4
+#endif
+	.cfi_endproc
+END(libc_sys_signalfd4)
 
 .section .text.crt.syscall.eventfd2
 /* fd_t eventfd2(syscall_ulong_t initval,
@@ -22401,6 +22478,41 @@ INTERN_FUNCTION(libc_sys_Xutimensat)
 	.cfi_endproc
 END(libc_sys_Xutimensat)
 
+.section .text.crt.syscall.Xsignalfd
+/* errno_t signalfd(fd_t fd,
+ *                  struct __sigset_struct const *sigmask,
+ *                  size_t sigsetsize) */
+INTERN_FUNCTION(libc_sys_Xsignalfd)
+	/* Argument count: 3 */
+	.cfi_startproc
+	movl   $SYS_signalfd, %eax
+#ifdef CONFIG_SYSCALL_USING_INT80
+	pushl_cfi_r %ebx
+	movl   8(%esp), %ebx
+	movl   12(%esp), %ecx
+	movl   16(%esp), %edx
+	stc
+	int    $0x80
+	popl_cfi_r %ebx
+	ret
+#elif defined(CONFIG_SYSCALL_USING_SYSENTER)
+	pushl_cfi_r %edi
+	pushl_cfi_r %ebp
+	pushl_cfi_r %ebx
+	movl   16(%esp), %ebx
+	movl   20(%esp), %ecx
+	movl   24(%esp), %edx
+	call   libc_x86_sysenter_Xcommon
+	popl_cfi_r %ebx
+	popl_cfi_r %ebp
+	popl_cfi_r %edi
+	ret
+#else
+	jmp    libc_x86_exec_Xsyscall3
+#endif
+	.cfi_endproc
+END(libc_sys_Xsignalfd)
+
 /* Return file descriptor for new interval timer source */
 .section .text.crt.syscall.Xtimerfd_create
 /* fd_t timerfd_create(clockid_t clock_id,
@@ -22582,6 +22694,48 @@ INTERN_FUNCTION(libc_sys_Xtimerfd_gettime)
 #endif
 	.cfi_endproc
 END(libc_sys_Xtimerfd_gettime)
+
+.section .text.crt.syscall.Xsignalfd4
+/* errno_t signalfd4(fd_t fd,
+ *                   struct __sigset_struct const *sigmask,
+ *                   size_t sigsetsize,
+ *                   syscall_ulong_t flags) */
+INTERN_FUNCTION(libc_sys_Xsignalfd4)
+	/* Argument count: 4 */
+	.cfi_startproc
+	movl   $SYS_signalfd4, %eax
+#ifdef CONFIG_SYSCALL_USING_INT80
+	pushl_cfi_r %ebx
+	pushl_cfi_r %esi
+	movl   12(%esp), %ebx
+	movl   16(%esp), %ecx
+	movl   20(%esp), %edx
+	movl   24(%esp), %esi
+	stc
+	int    $0x80
+	popl_cfi_r %esi
+	popl_cfi_r %ebx
+	ret
+#elif defined(CONFIG_SYSCALL_USING_SYSENTER)
+	pushl_cfi_r %edi
+	pushl_cfi_r %ebp
+	pushl_cfi_r %ebx
+	pushl_cfi_r %esi
+	movl   20(%esp), %ebx
+	movl   24(%esp), %ecx
+	movl   28(%esp), %edx
+	movl   32(%esp), %esi
+	call   libc_x86_sysenter_Xcommon
+	popl_cfi_r %esi
+	popl_cfi_r %ebx
+	popl_cfi_r %ebp
+	popl_cfi_r %edi
+	ret
+#else
+	jmp    libc_x86_exec_Xsyscall4
+#endif
+	.cfi_endproc
+END(libc_sys_Xsignalfd4)
 
 .section .text.crt.syscall.Xeventfd2
 /* fd_t eventfd2(syscall_ulong_t initval,
@@ -27307,11 +27461,13 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_vmsplice, libc_sys_vmsplice)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_getcpu, libc_sys_getcpu)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_epoll_pwait, libc_sys_epoll_pwait)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_utimensat, libc_sys_utimensat)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_signalfd, libc_sys_signalfd)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_timerfd_create, libc_sys_timerfd_create)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_eventfd, libc_sys_eventfd)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_fallocate, libc_sys_fallocate)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_timerfd_settime, libc_sys_timerfd_settime)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_timerfd_gettime, libc_sys_timerfd_gettime)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_signalfd4, libc_sys_signalfd4)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_eventfd2, libc_sys_eventfd2)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_epoll_create1, libc_sys_epoll_create1)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_dup3, libc_sys_dup3)
@@ -27669,11 +27825,13 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_Xvmsplice, libc_sys_Xvmsplice)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xgetcpu, libc_sys_Xgetcpu)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xepoll_pwait, libc_sys_Xepoll_pwait)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xutimensat, libc_sys_Xutimensat)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xsignalfd, libc_sys_Xsignalfd)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xtimerfd_create, libc_sys_Xtimerfd_create)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xeventfd, libc_sys_Xeventfd)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xfallocate, libc_sys_Xfallocate)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xtimerfd_settime, libc_sys_Xtimerfd_settime)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xtimerfd_gettime, libc_sys_Xtimerfd_gettime)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xsignalfd4, libc_sys_Xsignalfd4)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xeventfd2, libc_sys_Xeventfd2)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xepoll_create1, libc_sys_Xepoll_create1)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xdup3, libc_sys_Xdup3)

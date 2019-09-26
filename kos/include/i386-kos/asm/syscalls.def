@@ -629,7 +629,7 @@ DEFINE {0x0000013f,0x00000119} = epoll_pwait(
 	[printf(flagset(AT_SYMLINK_NOFOLLOW,AT_CHANGE_CTIME,AT_DOSPATH))] atflag_t flags): errno_t;
 %(i386)@@@param: flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH'
 %(i386)[cp] DEFINE {0x80000140,0x80000118} = utimensat64(fd_t dirfd, char const *filename, /*[2-3]*/struct __timespec64 const *times, [printf(flagset(AT_SYMLINK_NOFOLLOW,AT_CHANGE_CTIME,AT_DOSPATH))] atflag_t flags): errno_t;
-//TODO:DEFINE {0x00000141,0x0000011a} = signalfd(...): errno_t;
+DEFINE {0x00000141,0x0000011a} = signalfd(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize): errno_t;
 
 @@Return file descriptor for new interval timer source
 DEFINE {0x00000142,0x0000011b} = timerfd_create(clockid_t clock_id, syscall_ulong_t flags): fd_t;
@@ -652,7 +652,9 @@ DEFINE {0x00000146,0x0000011f} = timerfd_gettime(fd_t ufd, struct __itimerspec32
 %(i386)@@Return the next expiration time of UFD
 %(i386)DEFINE {0x80000146,0x8000011f} = timerfd_gettime64(fd_t ufd, struct __itimerspec64 *otmr): errno_t;
 
-//TODO:DEFINE {0x00000147,0x00000121} = signalfd4(...): errno_t;
+DEFINE {0x00000147,0x00000121} = signalfd4(
+	fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize,
+	[printf(flagset(SFD_NONBLOCK, SFD_CLOEXEC))] syscall_ulong_t flags): errno_t;
 
 DEFINE {0x00000148,0x00000122} = eventfd2(syscall_ulong_t initval,
 	[printf(flagset(EFD_SEMAPHORE, EFD_NONBLOCK, EFD_CLOEXEC))] syscall_ulong_t flags): fd_t;

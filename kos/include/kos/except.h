@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7288e401 */
+/* HASH CRC-32:0x845f1370 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -402,8 +402,10 @@ __DECL_BEGIN
 #define E_INVALID_ARGUMENT_CONTEXT_EVENTFD_BUFSIZE 0x005d
 /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to write 0xffffffffffffffff to a eventfd object */
 #define E_INVALID_ARGUMENT_CONTEXT_EVENTFD_WRITE_FFFFFFFFFFFFFFFFh 0x005e
-/* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to `sys_eventfd2()' is not a set of `EFD_SEMAPHORE | EFD_NONBLOCK | EFD_CLOEXEC' */
+/* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to `sys_eventfd2()' is not masked by `EFD_SEMAPHORE | EFD_NONBLOCK | EFD_CLOEXEC' */
 #define E_INVALID_ARGUMENT_CONTEXT_EVENTFD_FLAGS 0x005f
+/* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to `sys_signalfd4()' is not masked by `SFD_NONBLOCK | SFD_CLOEXEC' */
+#define E_INVALID_ARGUMENT_CONTEXT_SIGNALFD_FLAGS 0x0060
 
 
 

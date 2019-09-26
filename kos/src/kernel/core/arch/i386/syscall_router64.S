@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5bc3e2cd */
+/* HASH CRC-32:0x62158654 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -283,11 +283,13 @@ EXTERN(sys32_vmsplice)
 EXTERN(sys32_getcpu)
 EXTERN(sys32_epoll_pwait)
 EXTERN(sys32_utimensat)
+EXTERN(sys32_signalfd)
 EXTERN(sys32_timerfd_create)
 EXTERN(sys32_eventfd)
 EXTERN(sys32_fallocate)
 EXTERN(sys32_timerfd_settime)
 EXTERN(sys32_timerfd_gettime)
+EXTERN(sys32_signalfd4)
 EXTERN(sys32_eventfd2)
 EXTERN(sys32_epoll_create1)
 EXTERN(sys32_dup3)
@@ -612,12 +614,14 @@ EXTERN(sys_sync_file_range)
 EXTERN(sys_vmsplice)
 EXTERN(sys_utimensat)
 EXTERN(sys_epoll_pwait)
+EXTERN(sys_signalfd)
 EXTERN(sys_timerfd_create)
 EXTERN(sys_eventfd)
 EXTERN(sys_fallocate)
 EXTERN(sys_timerfd_settime)
 EXTERN(sys_timerfd_gettime)
 EXTERN(sys_accept4)
+EXTERN(sys_signalfd4)
 EXTERN(sys_eventfd2)
 EXTERN(sys_epoll_create1)
 EXTERN(sys_dup3)
@@ -911,12 +915,14 @@ INTERN(__asm64_syscall_sync_file_range)
 INTERN(__asm64_syscall_vmsplice)
 INTERN(__asm64_syscall_utimensat)
 INTERN(__asm64_syscall_epoll_pwait)
+INTERN(__asm64_syscall_signalfd)
 INTERN(__asm64_syscall_timerfd_create)
 INTERN(__asm64_syscall_eventfd)
 INTERN(__asm64_syscall_fallocate)
 INTERN(__asm64_syscall_timerfd_settime)
 INTERN(__asm64_syscall_timerfd_gettime)
 INTERN(__asm64_syscall_accept4)
+INTERN(__asm64_syscall_signalfd4)
 INTERN(__asm64_syscall_eventfd2)
 INTERN(__asm64_syscall_epoll_create1)
 INTERN(__asm64_syscall_dup3)
@@ -1245,11 +1251,13 @@ INTERN(__asm32_int80_vmsplice)
 INTERN(__asm32_int80_getcpu)
 INTERN(__asm32_int80_epoll_pwait)
 INTERN(__asm32_int80_utimensat)
+INTERN(__asm32_int80_signalfd)
 INTERN(__asm32_int80_timerfd_create)
 INTERN(__asm32_int80_eventfd)
 INTERN(__asm32_int80_fallocate)
 INTERN(__asm32_int80_timerfd_settime)
 INTERN(__asm32_int80_timerfd_gettime)
+INTERN(__asm32_int80_signalfd4)
 INTERN(__asm32_int80_eventfd2)
 INTERN(__asm32_int80_epoll_create1)
 INTERN(__asm32_int80_dup3)
@@ -1609,11 +1617,13 @@ INTERN(__asm32_sysenter_vmsplice)
 INTERN(__asm32_sysenter_getcpu)
 INTERN(__asm32_sysenter_epoll_pwait)
 INTERN(__asm32_sysenter_utimensat)
+INTERN(__asm32_sysenter_signalfd)
 INTERN(__asm32_sysenter_timerfd_create)
 INTERN(__asm32_sysenter_eventfd)
 INTERN(__asm32_sysenter_fallocate)
 INTERN(__asm32_sysenter_timerfd_settime)
 INTERN(__asm32_sysenter_timerfd_gettime)
+INTERN(__asm32_sysenter_signalfd4)
 INTERN(__asm32_sysenter_eventfd2)
 INTERN(__asm32_sysenter_epoll_create1)
 INTERN(__asm32_sysenter_dup3)
@@ -2009,14 +2019,14 @@ PUBLIC_OBJECT(__asm64_syscallrouter)
 	.quad __asm64_syscall_invalid
 	.quad __asm64_syscall_utimensat              /* 280 */
 	.quad __asm64_syscall_epoll_pwait            /* 281 */
-	.quad __asm64_syscall_invalid
+	.quad __asm64_syscall_signalfd               /* 282 */
 	.quad __asm64_syscall_timerfd_create         /* 283 */
 	.quad __asm64_syscall_eventfd                /* 284 */
 	.quad __asm64_syscall_fallocate              /* 285 */
 	.quad __asm64_syscall_timerfd_settime        /* 286 */
 	.quad __asm64_syscall_timerfd_gettime        /* 287 */
 	.quad __asm64_syscall_accept4                /* 288 */
-	.quad __asm64_syscall_invalid
+	.quad __asm64_syscall_signalfd4              /* 289 */
 	.quad __asm64_syscall_eventfd2               /* 290 */
 	.quad __asm64_syscall_epoll_create1          /* 291 */
 	.quad __asm64_syscall_dup3                   /* 292 */
@@ -2641,14 +2651,14 @@ PUBLIC_OBJECT(__c64_syscallrouter)
 	.quad sys_invalid0
 	.quad sys_utimensat              /* 280 */
 	.quad sys_epoll_pwait            /* 281 */
-	.quad sys_invalid0
+	.quad sys_signalfd               /* 282 */
 	.quad sys_timerfd_create         /* 283 */
 	.quad sys_eventfd                /* 284 */
 	.quad sys_fallocate              /* 285 */
 	.quad sys_timerfd_settime        /* 286 */
 	.quad sys_timerfd_gettime        /* 287 */
 	.quad sys_accept4                /* 288 */
-	.quad sys_invalid0
+	.quad sys_signalfd4              /* 289 */
 	.quad sys_eventfd2               /* 290 */
 	.quad sys_epoll_create1          /* 291 */
 	.quad sys_dup3                   /* 292 */
@@ -3312,13 +3322,13 @@ PUBLIC_OBJECT(__asm32_syscallrouter_int80)
 	.quad __asm32_int80_getcpu                 /* 318 */
 	.quad __asm32_int80_epoll_pwait            /* 319 */
 	.quad __asm32_int80_utimensat              /* 320 */
-	.quad __asm32_int80_invalid
+	.quad __asm32_int80_signalfd               /* 321 */
 	.quad __asm32_int80_timerfd_create         /* 322 */
 	.quad __asm32_int80_eventfd                /* 323 */
 	.quad __asm32_int80_fallocate              /* 324 */
 	.quad __asm32_int80_timerfd_settime        /* 325 */
 	.quad __asm32_int80_timerfd_gettime        /* 326 */
-	.quad __asm32_int80_invalid
+	.quad __asm32_int80_signalfd4              /* 327 */
 	.quad __asm32_int80_eventfd2               /* 328 */
 	.quad __asm32_int80_epoll_create1          /* 329 */
 	.quad __asm32_int80_dup3                   /* 330 */
@@ -4035,13 +4045,13 @@ PUBLIC_OBJECT(__asm32_syscallrouter_sysenter)
 	.quad __asm32_sysenter_getcpu                 /* 318 */
 	.quad __asm32_sysenter_epoll_pwait            /* 319 */
 	.quad __asm32_sysenter_utimensat              /* 320 */
-	.quad __asm32_sysenter_invalid
+	.quad __asm32_sysenter_signalfd               /* 321 */
 	.quad __asm32_sysenter_timerfd_create         /* 322 */
 	.quad __asm32_sysenter_eventfd                /* 323 */
 	.quad __asm32_sysenter_fallocate              /* 324 */
 	.quad __asm32_sysenter_timerfd_settime        /* 325 */
 	.quad __asm32_sysenter_timerfd_gettime        /* 326 */
-	.quad __asm32_sysenter_invalid
+	.quad __asm32_sysenter_signalfd4              /* 327 */
 	.quad __asm32_sysenter_eventfd2               /* 328 */
 	.quad __asm32_sysenter_epoll_create1          /* 329 */
 	.quad __asm32_sysenter_dup3                   /* 330 */
@@ -4758,13 +4768,13 @@ PUBLIC_OBJECT(__c32_syscallrouter)
 	.quad sys32_getcpu                 /* 318 */
 	.quad sys32_epoll_pwait            /* 319 */
 	.quad sys32_utimensat              /* 320 */
-	.quad sys32_invalid0
+	.quad sys32_signalfd               /* 321 */
 	.quad sys32_timerfd_create         /* 322 */
 	.quad sys32_eventfd                /* 323 */
 	.quad sys32_fallocate              /* 324 */
 	.quad sys32_timerfd_settime        /* 325 */
 	.quad sys32_timerfd_gettime        /* 326 */
-	.quad sys32_invalid0
+	.quad sys32_signalfd4              /* 327 */
 	.quad sys32_eventfd2               /* 328 */
 	.quad sys32_epoll_create1          /* 329 */
 	.quad sys32_dup3                   /* 330 */

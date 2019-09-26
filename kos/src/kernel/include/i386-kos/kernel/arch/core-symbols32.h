@@ -3814,10 +3814,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak path_lock_tryupgrade; .long path_lock_tryupgrade
 	.reloc ., R_386_SIZE32, path_lock_tryupgrade; .long 0
 	.long 0xed66795
-	.long 0 /* index: 953 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname953 /* index: 953 */
+	.weak vm_datablock_locatepart; .long vm_datablock_locatepart
+	.reloc ., R_386_SIZE32, vm_datablock_locatepart; .long 0
+	.long 0xa5c95f4
 	.long 0 /* index: 954 */
 	.long 0
 	.long 0
@@ -6099,9 +6099,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, cpu_broadcastipi_notthis; .long 0
 	.long 0x20bde53
 	.long .Lname1524 /* index: 1524 */
-	.weak vm_datablock_locatepart; .long vm_datablock_locatepart
-	.reloc ., R_386_SIZE32, vm_datablock_locatepart; .long 0
-	.long 0xa5c95f4
+	.weak sys_signalfd4; .long sys_signalfd4
+	.reloc ., R_386_SIZE32, sys_signalfd4; .long 0
+	.long 0x74f45f4
 	.long .Lname1525 /* index: 1525 */
 	.weak mall_untrace; .long mall_untrace
 	.reloc ., R_386_SIZE32, mall_untrace; .long 0
@@ -10214,10 +10214,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 2553 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2553 /* index: 2553 */
+	.weak sys_signalfd; .long sys_signalfd
+	.reloc ., R_386_SIZE32, sys_signalfd; .long 0
+	.long 0x874f454
 	.long 0 /* index: 2554 */
 	.long 0
 	.long 0
@@ -17364,6 +17364,8 @@ END(kernel_symbol_table)
 	.string "vm_datablock_anonymous_type"
 .Lname952:
 	.string "path_lock_tryupgrade"
+.Lname953:
+	.string "vm_datablock_locatepart"
 .Lname957:
 	.string "memmem"
 .Lname959:
@@ -17937,7 +17939,7 @@ END(kernel_symbol_table)
 .Lname1523:
 	.string "cpu_broadcastipi_notthis"
 .Lname1524:
-	.string "vm_datablock_locatepart"
+	.string "sys_signalfd4"
 .Lname1525:
 	.string "mall_untrace"
 .Lname1527:
@@ -18924,6 +18926,8 @@ END(kernel_symbol_table)
 	.string "sys_bind"
 .Lname2549:
 	.string "kernel_panic_ucpustate"
+.Lname2553:
+	.string "sys_signalfd"
 .Lname2555:
 	.string "sys_brk"
 .Lname2556:

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x81ec8b29 */
+/* HASH CRC-32:0x1c336d94 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -326,14 +326,14 @@ __SYSCALL(vmsplice)
 __SYSCALL_UNUSED(279, 279, 279)
 __SYSCALL(utimensat)
 __SYSCALL(epoll_pwait)
-__SYSCALL_UNUSED(282, 282, 282)
+__SYSCALL(signalfd)
 __SYSCALL(timerfd_create)
 __SYSCALL(eventfd)
 __SYSCALL(fallocate)
 __SYSCALL(timerfd_settime)
 __SYSCALL(timerfd_gettime)
 __SYSCALL(accept4)
-__SYSCALL_UNUSED(289, 289, 289)
+__SYSCALL(signalfd4)
 __SYSCALL(eventfd2)
 __SYSCALL(epoll_create1)
 __SYSCALL(dup3)

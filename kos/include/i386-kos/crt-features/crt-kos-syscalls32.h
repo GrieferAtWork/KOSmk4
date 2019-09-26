@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4a87e835 */
+/* HASH CRC-32:0x39153ff6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -271,11 +271,13 @@
 #define __CRT_HAVE_sys_getcpu 1
 #define __CRT_HAVE_sys_epoll_pwait 1
 #define __CRT_HAVE_sys_utimensat 1
+#define __CRT_HAVE_sys_signalfd 1
 #define __CRT_HAVE_sys_timerfd_create 1
 #define __CRT_HAVE_sys_eventfd 1
 #define __CRT_HAVE_sys_fallocate 1
 #define __CRT_HAVE_sys_timerfd_settime 1
 #define __CRT_HAVE_sys_timerfd_gettime 1
+#define __CRT_HAVE_sys_signalfd4 1
 #define __CRT_HAVE_sys_eventfd2 1
 #define __CRT_HAVE_sys_epoll_create1 1
 #define __CRT_HAVE_sys_dup3 1
@@ -634,11 +636,13 @@
 #define __CRT_HAVE_sys_Xgetcpu 1
 #define __CRT_HAVE_sys_Xepoll_pwait 1
 #define __CRT_HAVE_sys_Xutimensat 1
+#define __CRT_HAVE_sys_Xsignalfd 1
 #define __CRT_HAVE_sys_Xtimerfd_create 1
 #define __CRT_HAVE_sys_Xeventfd 1
 #define __CRT_HAVE_sys_Xfallocate 1
 #define __CRT_HAVE_sys_Xtimerfd_settime 1
 #define __CRT_HAVE_sys_Xtimerfd_gettime 1
+#define __CRT_HAVE_sys_Xsignalfd4 1
 #define __CRT_HAVE_sys_Xeventfd2 1
 #define __CRT_HAVE_sys_Xepoll_create1 1
 #define __CRT_HAVE_sys_Xdup3 1

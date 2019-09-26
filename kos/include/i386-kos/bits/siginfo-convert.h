@@ -59,8 +59,8 @@ __NOTHROW_NCX(siginfo32_to_siginfo64)(siginfo64_t *__restrict dst,
 		break;
 
 	case __SIGPOLL:
-		dst->si_band = dst->si_band;
-		dst->si_fd   = dst->si_fd;
+		dst->si_band = src->si_band;
+		dst->si_fd   = src->si_fd;
 		break;
 
 	case __SIGSYS:
@@ -105,8 +105,8 @@ __NOTHROW_NCX(siginfo64_to_siginfo32)(siginfo32_t *__restrict dst,
 		break;
 
 	case __SIGPOLL:
-		dst->si_band = dst->si_band;
-		dst->si_fd   = dst->si_fd;
+		dst->si_band = src->si_band;
+		dst->si_fd   = src->si_fd;
 		break;
 
 	case __SIGSYS:

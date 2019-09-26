@@ -175,7 +175,7 @@
 	CB(PREFIX.sched.semaphore.*) \
 	CB(PREFIX.sched.param.*) \
 	CB(PREFIX.sched.process.*) \
-	CB(PREFIX.sched.signal.*) \
+	CB(PREFIX.sched.signalfd.* PREFIX.sched.signal.*) \
 	CB(PREFIX.sched.utility.*) \
 	CB(PREFIX.sched.user.*) \
 	CB(PREFIX.sched.eventfd.*) \

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f02b832 */
+/* HASH CRC-32:0x881141a6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2401,6 +2401,18 @@ __CDECLARE_SC(,__sighandler_t,signal,(__syscall_ulong_t __signo, __sighandler_t 
 #endif /* !... */
 #endif /* !__sys_signal_defined */
 #endif /* sys_signal... */
+#if __CRT_HAVE_SC(signalfd)
+#ifndef __sys_signalfd_defined
+#define __sys_signalfd_defined 1
+__CDECLARE_SC(,__errno_t,signalfd,(__fd_t __fd, struct __sigset_struct const *__sigmask, __size_t __sigsetsize),(__fd,__sigmask,__sigsetsize))
+#endif /* !__sys_signalfd_defined */
+#endif /* sys_signalfd... */
+#if __CRT_HAVE_SC(signalfd4)
+#ifndef __sys_signalfd4_defined
+#define __sys_signalfd4_defined 1
+__CDECLARE_SC(,__errno_t,signalfd4,(__fd_t __fd, struct __sigset_struct const *__sigmask, __size_t __sigsetsize, __syscall_ulong_t __flags),(__fd,__sigmask,__sigsetsize,__flags))
+#endif /* !__sys_signalfd4_defined */
+#endif /* sys_signalfd4... */
 #if __CRT_HAVE_SC(sigpending)
 #ifndef __sys_sigpending_defined
 #define __sys_sigpending_defined 1
@@ -5175,6 +5187,18 @@ __CDECLARE_XSC(,__sighandler_t,signal,(__syscall_ulong_t __signo, __sighandler_t
 #endif /* !... */
 #endif /* !__sys_Xsignal_defined */
 #endif /* sys_Xsignal... */
+#if __CRT_HAVE_XSC(signalfd)
+#ifndef __sys_Xsignalfd_defined
+#define __sys_Xsignalfd_defined 1
+__CDECLARE_XSC(,__errno_t,signalfd,(__fd_t __fd, struct __sigset_struct const *__sigmask, __size_t __sigsetsize),(__fd,__sigmask,__sigsetsize))
+#endif /* !__sys_Xsignalfd_defined */
+#endif /* sys_Xsignalfd... */
+#if __CRT_HAVE_XSC(signalfd4)
+#ifndef __sys_Xsignalfd4_defined
+#define __sys_Xsignalfd4_defined 1
+__CDECLARE_XSC(,__errno_t,signalfd4,(__fd_t __fd, struct __sigset_struct const *__sigmask, __size_t __sigsetsize, __syscall_ulong_t __flags),(__fd,__sigmask,__sigsetsize,__flags))
+#endif /* !__sys_Xsignalfd4_defined */
+#endif /* sys_Xsignalfd4... */
 #if __CRT_HAVE_XSC(sigpending)
 #ifndef __sys_Xsigpending_defined
 #define __sys_Xsigpending_defined 1

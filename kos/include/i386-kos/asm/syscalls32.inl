@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaa1d506d */
+/* HASH CRC-32:0x69e4f14f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -314,6 +314,7 @@
 #define __NR32_epoll_pwait                319        /* errno_t epoll_pwait(fd_t epfd, struct epoll_event *events, syscall_ulong_t maxevents, syscall_slong_t timeout, struct __sigset_struct const *ss) */
 /* @param: flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
 #define __NR32_utimensat                  320        /* errno_t utimensat(fd_t dirfd, char const *filename, [2-3]struct __timespec32 const *times, atflag_t flags) */
+#define __NR32_signalfd                   321        /* errno_t signalfd(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize) */
 /* Return file descriptor for new interval timer source */
 #define __NR32_timerfd_create             322        /* fd_t timerfd_create(clockid_t clock_id, syscall_ulong_t flags) */
 #define __NR32_eventfd                    323        /* fd_t eventfd(syscall_ulong_t initval) */
@@ -324,6 +325,7 @@
 #define __NR32_timerfd_settime            325        /* errno_t timerfd_settime(fd_t ufd, syscall_ulong_t flags, struct __itimerspec32 const *utmr, struct __itimerspec32 *otmr) */
 /* Return the next expiration time of UFD */
 #define __NR32_timerfd_gettime            326        /* errno_t timerfd_gettime(fd_t ufd, struct __itimerspec32 *otmr) */
+#define __NR32_signalfd4                  327        /* errno_t signalfd4(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize, syscall_ulong_t flags) */
 #define __NR32_eventfd2                   328        /* fd_t eventfd2(syscall_ulong_t initval, syscall_ulong_t flags) */
 #define __NR32_epoll_create1              329        /* fd_t epoll_create1(syscall_ulong_t flags) */
 /* @param: flags:  Set of `O_CLOEXEC|O_CLOFORK' */
@@ -932,11 +934,13 @@
 #define __NR32RM_getcpu                     0
 #define __NR32RM_epoll_pwait                1
 #define __NR32RM_utimensat                  0
+#define __NR32RM_signalfd                   0
 #define __NR32RM_timerfd_create             0
 #define __NR32RM_eventfd                    0
 #define __NR32RM_fallocate                  0
 #define __NR32RM_timerfd_settime            0
 #define __NR32RM_timerfd_gettime            0
+#define __NR32RM_signalfd4                  0
 #define __NR32RM_eventfd2                   0
 #define __NR32RM_epoll_create1              0
 #define __NR32RM_dup3                       0
@@ -1296,11 +1300,13 @@
 #define __NR32CP_getcpu                     0
 #define __NR32CP_epoll_pwait                1
 #define __NR32CP_utimensat                  1
+#define __NR32CP_signalfd                   0
 #define __NR32CP_timerfd_create             0
 #define __NR32CP_eventfd                    0
 #define __NR32CP_fallocate                  0
 #define __NR32CP_timerfd_settime            0
 #define __NR32CP_timerfd_gettime            0
+#define __NR32CP_signalfd4                  0
 #define __NR32CP_eventfd2                   0
 #define __NR32CP_epoll_create1              0
 #define __NR32CP_dup3                       0
@@ -1660,11 +1666,13 @@
 #define __NR32RT_getcpu                     errno_t
 #define __NR32RT_epoll_pwait                errno_t
 #define __NR32RT_utimensat                  errno_t
+#define __NR32RT_signalfd                   errno_t
 #define __NR32RT_timerfd_create             fd_t
 #define __NR32RT_eventfd                    fd_t
 #define __NR32RT_fallocate                  errno_t
 #define __NR32RT_timerfd_settime            errno_t
 #define __NR32RT_timerfd_gettime            errno_t
+#define __NR32RT_signalfd4                  errno_t
 #define __NR32RT_eventfd2                   fd_t
 #define __NR32RT_epoll_create1              fd_t
 #define __NR32RT_dup3                       fd_t
@@ -2361,6 +2369,9 @@
 #define __NR32AT1_utimensat                  char const *
 #define __NR32AT2_utimensat                  /*[2-3]*/struct __timespec32 const *
 #define __NR32AT3_utimensat                  atflag_t
+#define __NR32AT0_signalfd                   fd_t
+#define __NR32AT1_signalfd                   struct __sigset_struct const *
+#define __NR32AT2_signalfd                   size_t
 #define __NR32AT0_timerfd_create             clockid_t
 #define __NR32AT1_timerfd_create             syscall_ulong_t
 #define __NR32AT0_eventfd                    syscall_ulong_t
@@ -2374,6 +2385,10 @@
 #define __NR32AT3_timerfd_settime            struct __itimerspec32 *
 #define __NR32AT0_timerfd_gettime            fd_t
 #define __NR32AT1_timerfd_gettime            struct __itimerspec32 *
+#define __NR32AT0_signalfd4                  fd_t
+#define __NR32AT1_signalfd4                  struct __sigset_struct const *
+#define __NR32AT2_signalfd4                  size_t
+#define __NR32AT3_signalfd4                  syscall_ulong_t
 #define __NR32AT0_eventfd2                   syscall_ulong_t
 #define __NR32AT1_eventfd2                   syscall_ulong_t
 #define __NR32AT0_epoll_create1              syscall_ulong_t
@@ -3335,6 +3350,9 @@
 #define __NR32AN1_utimensat                  "filename"
 #define __NR32AN2_utimensat                  "times"
 #define __NR32AN3_utimensat                  "flags"
+#define __NR32AN0_signalfd                   "fd"
+#define __NR32AN1_signalfd                   "sigmask"
+#define __NR32AN2_signalfd                   "sigsetsize"
 #define __NR32AN0_timerfd_create             "clock_id"
 #define __NR32AN1_timerfd_create             "flags"
 #define __NR32AN0_eventfd                    "initval"
@@ -3348,6 +3366,10 @@
 #define __NR32AN3_timerfd_settime            "otmr"
 #define __NR32AN0_timerfd_gettime            "ufd"
 #define __NR32AN1_timerfd_gettime            "otmr"
+#define __NR32AN0_signalfd4                  "fd"
+#define __NR32AN1_signalfd4                  "sigmask"
+#define __NR32AN2_signalfd4                  "sigsetsize"
+#define __NR32AN3_signalfd4                  "flags"
 #define __NR32AN0_eventfd2                   "initval"
 #define __NR32AN1_eventfd2                   "flags"
 #define __NR32AN0_epoll_create1              "flags"
@@ -5031,6 +5053,12 @@
 #define __NR32ATRA3_utimensat(dirfd, filename, times, flags) ,(uintptr_t)(flags),(flags) & AT_SYMLINK_NOFOLLOW ? "AT_SYMLINK_NOFOLLOW" : "" \
                                                              ,((flags) & AT_CHANGE_CTIME) && ((flags) & (AT_SYMLINK_NOFOLLOW)) ? "|" : "",(flags) & AT_CHANGE_CTIME ? "AT_CHANGE_CTIME" : "" \
                                                              ,((flags) & AT_DOSPATH) && ((flags) & (AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME)) ? "|" : "",(flags) & AT_DOSPATH ? "AT_DOSPATH" : ""
+#define __NR32ATRF0_signalfd                   "%d"
+#define __NR32ATRA0_signalfd(fd, sigmask, sigsetsize) ,(int)(fd)
+#define __NR32ATRF1_signalfd                   "%p"
+#define __NR32ATRA1_signalfd(fd, sigmask, sigsetsize) ,sigmask
+#define __NR32ATRF2_signalfd                   "%Iu"
+#define __NR32ATRA2_signalfd(fd, sigmask, sigsetsize) ,sigsetsize
 #define __NR32ATRF0_timerfd_create             "?"
 #define __NR32ATRA0_timerfd_create(clock_id, flags) /* nothing */
 #define __NR32ATRF1_timerfd_create             "%#Ix"
@@ -5057,6 +5085,15 @@
 #define __NR32ATRA0_timerfd_gettime(ufd, otmr) ,(int)(ufd)
 #define __NR32ATRF1_timerfd_gettime            "%p"
 #define __NR32ATRA1_timerfd_gettime(ufd, otmr) ,otmr
+#define __NR32ATRF0_signalfd4                  "%d"
+#define __NR32ATRA0_signalfd4(fd, sigmask, sigsetsize, flags) ,(int)(fd)
+#define __NR32ATRF1_signalfd4                  "%p"
+#define __NR32ATRA1_signalfd4(fd, sigmask, sigsetsize, flags) ,sigmask
+#define __NR32ATRF2_signalfd4                  "%Iu"
+#define __NR32ATRA2_signalfd4(fd, sigmask, sigsetsize, flags) ,sigsetsize
+#define __NR32ATRF3_signalfd4                  "%#Ix=%s%s%s"
+#define __NR32ATRA3_signalfd4(fd, sigmask, sigsetsize, flags) ,(uintptr_t)(flags),(flags) & SFD_NONBLOCK ? "SFD_NONBLOCK" : "" \
+                                                              ,((flags) & SFD_CLOEXEC) && ((flags) & (SFD_NONBLOCK)) ? "|" : "",(flags) & SFD_CLOEXEC ? "SFD_CLOEXEC" : ""
 #define __NR32ATRF0_eventfd2                   "%#Ix"
 #define __NR32ATRA0_eventfd2(initval, flags)   ,(uintptr_t)(initval)
 #define __NR32ATRF1_eventfd2                   "%#Ix=%s%s%s%s%s"
@@ -6224,11 +6261,13 @@
 #define __NR32AC_getcpu                     3
 #define __NR32AC_epoll_pwait                5
 #define __NR32AC_utimensat                  4
+#define __NR32AC_signalfd                   3
 #define __NR32AC_timerfd_create             2
 #define __NR32AC_eventfd                    1
 #define __NR32AC_fallocate                  4
 #define __NR32AC_timerfd_settime            4
 #define __NR32AC_timerfd_gettime            2
+#define __NR32AC_signalfd4                  4
 #define __NR32AC_eventfd2                   2
 #define __NR32AC_epoll_create1              1
 #define __NR32AC_dup3                       3
@@ -6588,11 +6627,13 @@
 #define __NR32AM_getcpu(a, b, c, d, e, f)                     (__uint32_t *)a, (__uint32_t *)b, (struct getcpu_cache *)c
 #define __NR32AM_epoll_pwait(a, b, c, d, e, f)                (__fd_t)a, (struct epoll_event *)b, (__syscall_ulong_t)c, (__syscall_slong_t)d, (struct __sigset_struct const *)e
 #define __NR32AM_utimensat(a, b, c, d, e, f)                  (__fd_t)a, (char const *)b, (/*[2-3]*/struct __timespec32 const *)c, (__atflag_t)d
+#define __NR32AM_signalfd(a, b, c, d, e, f)                   (__fd_t)a, (struct __sigset_struct const *)b, (__size_t)c
 #define __NR32AM_timerfd_create(a, b, c, d, e, f)             (__clockid_t)a, (__syscall_ulong_t)b
 #define __NR32AM_eventfd(a, b, c, d, e, f)                    (__syscall_ulong_t)a
 #define __NR32AM_fallocate(a, b, c, d, e, f)                  (__fd_t)a, (__syscall_ulong_t)b, (__uint32_t)c, (__uint32_t)d
 #define __NR32AM_timerfd_settime(a, b, c, d, e, f)            (__fd_t)a, (__syscall_ulong_t)b, (struct __itimerspec32 const *)c, (struct __itimerspec32 *)d
 #define __NR32AM_timerfd_gettime(a, b, c, d, e, f)            (__fd_t)a, (struct __itimerspec32 *)b
+#define __NR32AM_signalfd4(a, b, c, d, e, f)                  (__fd_t)a, (struct __sigset_struct const *)b, (__size_t)c, (__syscall_ulong_t)d
 #define __NR32AM_eventfd2(a, b, c, d, e, f)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AM_epoll_create1(a, b, c, d, e, f)              (__syscall_ulong_t)a
 #define __NR32AM_dup3(a, b, c, d, e, f)                       (__fd_t)a, (__fd_t)b, (__oflag_t)c
@@ -6952,11 +6993,13 @@
 #define __NR32AP_getcpu(a, b, c)                              (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR32AP_epoll_pwait(a, b, c, d, e)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR32AP_utimensat(a, b, c, d)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NR32AP_signalfd(a, b, c)                            (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR32AP_timerfd_create(a, b)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AP_eventfd(a)                                   (__syscall_ulong_t)a
 #define __NR32AP_fallocate(a, b, c, d)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NR32AP_timerfd_settime(a, b, c, d)                  (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NR32AP_timerfd_gettime(a, b)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b
+#define __NR32AP_signalfd4(a, b, c, d)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NR32AP_eventfd2(a, b)                               (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AP_epoll_create1(a)                             (__syscall_ulong_t)a
 #define __NR32AP_dup3(a, b, c)                                (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
@@ -7327,11 +7370,13 @@
 #define __NR32AC386_getcpu                     3
 #define __NR32AC386_epoll_pwait                5
 #define __NR32AC386_utimensat                  4
+#define __NR32AC386_signalfd                   3
 #define __NR32AC386_timerfd_create             2
 #define __NR32AC386_eventfd                    1
 #define __NR32AC386_fallocate                  4
 #define __NR32AC386_timerfd_settime            4
 #define __NR32AC386_timerfd_gettime            2
+#define __NR32AC386_signalfd4                  4
 #define __NR32AC386_eventfd2                   2
 #define __NR32AC386_epoll_create1              1
 #define __NR32AC386_dup3                       3

@@ -73,7 +73,8 @@
                                             * Castable into: HANDLE_TYPE_DATABLOCK (if supported) */
 #define HANDLE_TYPE_EVENTFD_FENCE   0x0012 /* `struct eventfd' (without `EFD_SEMAPHORE') */
 #define HANDLE_TYPE_EVENTFD_SEMA    0x0013 /* `struct eventfd' (with `EFD_SEMAPHORE') */
-#define HANDLE_TYPE_COUNT           0x0014 /* # of recognized handle types
+#define HANDLE_TYPE_SIGNALFD        0x0014 /* `struct signalfd' */
+#define HANDLE_TYPE_COUNT           0x0015 /* # of recognized handle types
                                             * NOTE: After changing this value, be sure to
                                             * `touch /kos/src/kernel/include/kernel/handle.h' */
 

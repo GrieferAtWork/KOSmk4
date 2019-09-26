@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x78b96ea0 */
+/* HASH CRC-32:0xc697f8a6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -282,11 +282,13 @@ EXTERN(sys_vmsplice)
 EXTERN(sys_getcpu)
 EXTERN(sys_epoll_pwait)
 EXTERN(sys_utimensat)
+EXTERN(sys_signalfd)
 EXTERN(sys_timerfd_create)
 EXTERN(sys_eventfd)
 EXTERN(sys_fallocate)
 EXTERN(sys_timerfd_settime)
 EXTERN(sys_timerfd_gettime)
+EXTERN(sys_signalfd4)
 EXTERN(sys_eventfd2)
 EXTERN(sys_epoll_create1)
 EXTERN(sys_dup3)
@@ -646,11 +648,13 @@ INTERN(__asm32_int80_vmsplice)
 INTERN(__asm32_int80_getcpu)
 INTERN(__asm32_int80_epoll_pwait)
 INTERN(__asm32_int80_utimensat)
+INTERN(__asm32_int80_signalfd)
 INTERN(__asm32_int80_timerfd_create)
 INTERN(__asm32_int80_eventfd)
 INTERN(__asm32_int80_fallocate)
 INTERN(__asm32_int80_timerfd_settime)
 INTERN(__asm32_int80_timerfd_gettime)
+INTERN(__asm32_int80_signalfd4)
 INTERN(__asm32_int80_eventfd2)
 INTERN(__asm32_int80_epoll_create1)
 INTERN(__asm32_int80_dup3)
@@ -1010,11 +1014,13 @@ INTERN(__asm32_sysenter_vmsplice)
 INTERN(__asm32_sysenter_getcpu)
 INTERN(__asm32_sysenter_epoll_pwait)
 INTERN(__asm32_sysenter_utimensat)
+INTERN(__asm32_sysenter_signalfd)
 INTERN(__asm32_sysenter_timerfd_create)
 INTERN(__asm32_sysenter_eventfd)
 INTERN(__asm32_sysenter_fallocate)
 INTERN(__asm32_sysenter_timerfd_settime)
 INTERN(__asm32_sysenter_timerfd_gettime)
+INTERN(__asm32_sysenter_signalfd4)
 INTERN(__asm32_sysenter_eventfd2)
 INTERN(__asm32_sysenter_epoll_create1)
 INTERN(__asm32_sysenter_dup3)
@@ -1449,13 +1455,13 @@ PUBLIC_OBJECT(__asm32_syscallrouter_int80)
 	.long __asm32_int80_getcpu                 /* 318 */
 	.long __asm32_int80_epoll_pwait            /* 319 */
 	.long __asm32_int80_utimensat              /* 320 */
-	.long __asm32_int80_invalid
+	.long __asm32_int80_signalfd               /* 321 */
 	.long __asm32_int80_timerfd_create         /* 322 */
 	.long __asm32_int80_eventfd                /* 323 */
 	.long __asm32_int80_fallocate              /* 324 */
 	.long __asm32_int80_timerfd_settime        /* 325 */
 	.long __asm32_int80_timerfd_gettime        /* 326 */
-	.long __asm32_int80_invalid
+	.long __asm32_int80_signalfd4              /* 327 */
 	.long __asm32_int80_eventfd2               /* 328 */
 	.long __asm32_int80_epoll_create1          /* 329 */
 	.long __asm32_int80_dup3                   /* 330 */
@@ -2172,13 +2178,13 @@ PUBLIC_OBJECT(__asm32_syscallrouter_sysenter)
 	.long __asm32_sysenter_getcpu                 /* 318 */
 	.long __asm32_sysenter_epoll_pwait            /* 319 */
 	.long __asm32_sysenter_utimensat              /* 320 */
-	.long __asm32_sysenter_invalid
+	.long __asm32_sysenter_signalfd               /* 321 */
 	.long __asm32_sysenter_timerfd_create         /* 322 */
 	.long __asm32_sysenter_eventfd                /* 323 */
 	.long __asm32_sysenter_fallocate              /* 324 */
 	.long __asm32_sysenter_timerfd_settime        /* 325 */
 	.long __asm32_sysenter_timerfd_gettime        /* 326 */
-	.long __asm32_sysenter_invalid
+	.long __asm32_sysenter_signalfd4              /* 327 */
 	.long __asm32_sysenter_eventfd2               /* 328 */
 	.long __asm32_sysenter_epoll_create1          /* 329 */
 	.long __asm32_sysenter_dup3                   /* 330 */
@@ -2895,13 +2901,13 @@ PUBLIC_OBJECT(__c32_syscallrouter)
 	.long sys_getcpu                 /* 318 */
 	.long sys_epoll_pwait            /* 319 */
 	.long sys_utimensat              /* 320 */
-	.long sys_invalid0
+	.long sys_signalfd               /* 321 */
 	.long sys_timerfd_create         /* 322 */
 	.long sys_eventfd                /* 323 */
 	.long sys_fallocate              /* 324 */
 	.long sys_timerfd_settime        /* 325 */
 	.long sys_timerfd_gettime        /* 326 */
-	.long sys_invalid0
+	.long sys_signalfd4              /* 327 */
 	.long sys_eventfd2               /* 328 */
 	.long sys_epoll_create1          /* 329 */
 	.long sys_dup3                   /* 330 */

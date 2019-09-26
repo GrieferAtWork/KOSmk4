@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x910ed39c */
+/* HASH CRC-32:0x5ef2c9bd */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -268,6 +268,7 @@
 /* @param: flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
 #define __NR_utimensat                 280        /* errno_t utimensat(fd_t dirfd, char const *filename, [2-3]struct __timespec32 const *times, atflag_t flags) */
 #define __NR_epoll_pwait               281        /* errno_t epoll_pwait(fd_t epfd, struct epoll_event *events, syscall_ulong_t maxevents, syscall_slong_t timeout, struct __sigset_struct const *ss) */
+#define __NR_signalfd                  282        /* errno_t signalfd(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize) */
 /* Return file descriptor for new interval timer source */
 #define __NR_timerfd_create            283        /* fd_t timerfd_create(clockid_t clock_id, syscall_ulong_t flags) */
 #define __NR_eventfd                   284        /* fd_t eventfd(syscall_ulong_t initval) */
@@ -279,6 +280,7 @@
 /* Return the next expiration time of UFD */
 #define __NR_timerfd_gettime           287        /* errno_t timerfd_gettime(fd_t ufd, struct __itimerspec32 *otmr) */
 #define __NR_accept4                   288        /* fd_t accept4(fd_t sockfd, struct sockaddr *addr, socklen_t *addr_len, syscall_ulong_t flags) */
+#define __NR_signalfd4                 289        /* errno_t signalfd4(fd_t fd, struct __sigset_struct const *sigmask, size_t sigsetsize, syscall_ulong_t flags) */
 #define __NR_eventfd2                  290        /* fd_t eventfd2(syscall_ulong_t initval, syscall_ulong_t flags) */
 #define __NR_epoll_create1             291        /* fd_t epoll_create1(syscall_ulong_t flags) */
 /* @param: flags:  Set of `O_CLOEXEC|O_CLOFORK' */
@@ -810,12 +812,14 @@
 #define __NRRM_vmsplice                  0
 #define __NRRM_utimensat                 0
 #define __NRRM_epoll_pwait               1
+#define __NRRM_signalfd                  0
 #define __NRRM_timerfd_create            0
 #define __NRRM_eventfd                   0
 #define __NRRM_fallocate                 0
 #define __NRRM_timerfd_settime           0
 #define __NRRM_timerfd_gettime           0
 #define __NRRM_accept4                   1
+#define __NRRM_signalfd4                 0
 #define __NRRM_eventfd2                  0
 #define __NRRM_epoll_create1             0
 #define __NRRM_dup3                      0
@@ -1109,12 +1113,14 @@
 #define __NRCP_vmsplice                  1
 #define __NRCP_utimensat                 1
 #define __NRCP_epoll_pwait               1
+#define __NRCP_signalfd                  0
 #define __NRCP_timerfd_create            0
 #define __NRCP_eventfd                   0
 #define __NRCP_fallocate                 0
 #define __NRCP_timerfd_settime           0
 #define __NRCP_timerfd_gettime           0
 #define __NRCP_accept4                   1
+#define __NRCP_signalfd4                 0
 #define __NRCP_eventfd2                  0
 #define __NRCP_epoll_create1             0
 #define __NRCP_dup3                      0
@@ -1408,12 +1414,14 @@
 #define __NRRT_vmsplice                  ssize_t
 #define __NRRT_utimensat                 errno_t
 #define __NRRT_epoll_pwait               errno_t
+#define __NRRT_signalfd                  errno_t
 #define __NRRT_timerfd_create            fd_t
 #define __NRRT_eventfd                   fd_t
 #define __NRRT_fallocate                 errno_t
 #define __NRRT_timerfd_settime           errno_t
 #define __NRRT_timerfd_gettime           errno_t
 #define __NRRT_accept4                   fd_t
+#define __NRRT_signalfd4                 errno_t
 #define __NRRT_eventfd2                  fd_t
 #define __NRRT_epoll_create1             fd_t
 #define __NRRT_dup3                      fd_t
@@ -2030,6 +2038,9 @@
 #define __NRAT2_epoll_pwait               syscall_ulong_t
 #define __NRAT3_epoll_pwait               syscall_slong_t
 #define __NRAT4_epoll_pwait               struct __sigset_struct const *
+#define __NRAT0_signalfd                  fd_t
+#define __NRAT1_signalfd                  struct __sigset_struct const *
+#define __NRAT2_signalfd                  size_t
 #define __NRAT0_timerfd_create            clockid_t
 #define __NRAT1_timerfd_create            syscall_ulong_t
 #define __NRAT0_eventfd                   syscall_ulong_t
@@ -2047,6 +2058,10 @@
 #define __NRAT1_accept4                   struct sockaddr *
 #define __NRAT2_accept4                   socklen_t *
 #define __NRAT3_accept4                   syscall_ulong_t
+#define __NRAT0_signalfd4                 fd_t
+#define __NRAT1_signalfd4                 struct __sigset_struct const *
+#define __NRAT2_signalfd4                 size_t
+#define __NRAT3_signalfd4                 syscall_ulong_t
 #define __NRAT0_eventfd2                  syscall_ulong_t
 #define __NRAT1_eventfd2                  syscall_ulong_t
 #define __NRAT0_epoll_create1             syscall_ulong_t
@@ -2853,6 +2868,9 @@
 #define __NRAN2_epoll_pwait               "maxevents"
 #define __NRAN3_epoll_pwait               "timeout"
 #define __NRAN4_epoll_pwait               "ss"
+#define __NRAN0_signalfd                  "fd"
+#define __NRAN1_signalfd                  "sigmask"
+#define __NRAN2_signalfd                  "sigsetsize"
 #define __NRAN0_timerfd_create            "clock_id"
 #define __NRAN1_timerfd_create            "flags"
 #define __NRAN0_eventfd                   "initval"
@@ -2870,6 +2888,10 @@
 #define __NRAN1_accept4                   "addr"
 #define __NRAN2_accept4                   "addr_len"
 #define __NRAN3_accept4                   "flags"
+#define __NRAN0_signalfd4                 "fd"
+#define __NRAN1_signalfd4                 "sigmask"
+#define __NRAN2_signalfd4                 "sigsetsize"
+#define __NRAN3_signalfd4                 "flags"
 #define __NRAN0_eventfd2                  "initval"
 #define __NRAN1_eventfd2                  "flags"
 #define __NRAN0_epoll_create1             "flags"
@@ -4369,6 +4391,12 @@
 #define __NRATRA3_epoll_pwait(epfd, events, maxevents, timeout, ss) ,(intptr_t)(timeout)
 #define __NRATRF4_epoll_pwait               "%p"
 #define __NRATRA4_epoll_pwait(epfd, events, maxevents, timeout, ss) ,ss
+#define __NRATRF0_signalfd                  "%d"
+#define __NRATRA0_signalfd(fd, sigmask, sigsetsize) ,(int)(fd)
+#define __NRATRF1_signalfd                  "%p"
+#define __NRATRA1_signalfd(fd, sigmask, sigsetsize) ,sigmask
+#define __NRATRF2_signalfd                  "%Iu"
+#define __NRATRA2_signalfd(fd, sigmask, sigsetsize) ,sigsetsize
 #define __NRATRF0_timerfd_create            "?"
 #define __NRATRA0_timerfd_create(clock_id, flags) /* nothing */
 #define __NRATRF1_timerfd_create            "%#Ix"
@@ -4405,6 +4433,15 @@
 #define __NRATRA3_accept4(sockfd, addr, addr_len, flags) ,(uintptr_t)(flags),(flags) & SOCK_NONBLOCK ? "SOCK_NONBLOCK" : "" \
                                                          ,((flags) & SOCK_CLOEXEC) && ((flags) & (SOCK_NONBLOCK)) ? "|" : "",(flags) & SOCK_CLOEXEC ? "SOCK_CLOEXEC" : "" \
                                                          ,((flags) & SOCK_CLOFORK) && ((flags) & (SOCK_NONBLOCK|SOCK_CLOEXEC)) ? "|" : "",(flags) & SOCK_CLOFORK ? "SOCK_CLOFORK" : ""
+#define __NRATRF0_signalfd4                 "%d"
+#define __NRATRA0_signalfd4(fd, sigmask, sigsetsize, flags) ,(int)(fd)
+#define __NRATRF1_signalfd4                 "%p"
+#define __NRATRA1_signalfd4(fd, sigmask, sigsetsize, flags) ,sigmask
+#define __NRATRF2_signalfd4                 "%Iu"
+#define __NRATRA2_signalfd4(fd, sigmask, sigsetsize, flags) ,sigsetsize
+#define __NRATRF3_signalfd4                 "%#Ix=%s%s%s"
+#define __NRATRA3_signalfd4(fd, sigmask, sigsetsize, flags) ,(uintptr_t)(flags),(flags) & SFD_NONBLOCK ? "SFD_NONBLOCK" : "" \
+                                                            ,((flags) & SFD_CLOEXEC) && ((flags) & (SFD_NONBLOCK)) ? "|" : "",(flags) & SFD_CLOEXEC ? "SFD_CLOEXEC" : ""
 #define __NRATRF0_eventfd2                  "%#Ix"
 #define __NRATRA0_eventfd2(initval, flags)  ,(uintptr_t)(initval)
 #define __NRATRF1_eventfd2                  "%#Ix=%s%s%s%s%s"
@@ -5297,12 +5334,14 @@
 #define __NRAC_vmsplice                  4
 #define __NRAC_utimensat                 4
 #define __NRAC_epoll_pwait               5
+#define __NRAC_signalfd                  3
 #define __NRAC_timerfd_create            2
 #define __NRAC_eventfd                   1
 #define __NRAC_fallocate                 4
 #define __NRAC_timerfd_settime           4
 #define __NRAC_timerfd_gettime           2
 #define __NRAC_accept4                   4
+#define __NRAC_signalfd4                 4
 #define __NRAC_eventfd2                  2
 #define __NRAC_epoll_create1             1
 #define __NRAC_dup3                      3
@@ -5596,12 +5635,14 @@
 #define __NRAM_vmsplice(a, b, c, d, e, f)                  (__fd_t)a, (struct iovec const *)b, (__size_t)c, (__syscall_ulong_t)d
 #define __NRAM_utimensat(a, b, c, d, e, f)                 (__fd_t)a, (char const *)b, (/*[2-3]*/struct __timespec32 const *)c, (__atflag_t)d
 #define __NRAM_epoll_pwait(a, b, c, d, e, f)               (__fd_t)a, (struct epoll_event *)b, (__syscall_ulong_t)c, (__syscall_slong_t)d, (struct __sigset_struct const *)e
+#define __NRAM_signalfd(a, b, c, d, e, f)                  (__fd_t)a, (struct __sigset_struct const *)b, (__size_t)c
 #define __NRAM_timerfd_create(a, b, c, d, e, f)            (__clockid_t)a, (__syscall_ulong_t)b
 #define __NRAM_eventfd(a, b, c, d, e, f)                   (__syscall_ulong_t)a
 #define __NRAM_fallocate(a, b, c, d, e, f)                 (__fd_t)a, (__syscall_ulong_t)b, (__uint32_t)c, (__uint32_t)d
 #define __NRAM_timerfd_settime(a, b, c, d, e, f)           (__fd_t)a, (__syscall_ulong_t)b, (struct __itimerspec32 const *)c, (struct __itimerspec32 *)d
 #define __NRAM_timerfd_gettime(a, b, c, d, e, f)           (__fd_t)a, (struct __itimerspec32 *)b
 #define __NRAM_accept4(a, b, c, d, e, f)                   (__fd_t)a, (struct sockaddr *)b, (__socklen_t *)c, (__syscall_ulong_t)d
+#define __NRAM_signalfd4(a, b, c, d, e, f)                 (__fd_t)a, (struct __sigset_struct const *)b, (__size_t)c, (__syscall_ulong_t)d
 #define __NRAM_eventfd2(a, b, c, d, e, f)                  (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAM_epoll_create1(a, b, c, d, e, f)             (__syscall_ulong_t)a
 #define __NRAM_dup3(a, b, c, d, e, f)                      (__fd_t)a, (__fd_t)b, (__oflag_t)c
@@ -5895,12 +5936,14 @@
 #define __NRAP_vmsplice(a, b, c, d)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NRAP_utimensat(a, b, c, d)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NRAP_epoll_pwait(a, b, c, d, e)                  (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
+#define __NRAP_signalfd(a, b, c)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_timerfd_create(a, b)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_eventfd(a)                                  (__syscall_ulong_t)a
 #define __NRAP_fallocate(a, b, c, d)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NRAP_timerfd_settime(a, b, c, d)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NRAP_timerfd_gettime(a, b)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_accept4(a, b, c, d)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
+#define __NRAP_signalfd4(a, b, c, d)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NRAP_eventfd2(a, b)                              (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_epoll_create1(a)                            (__syscall_ulong_t)a
 #define __NRAP_dup3(a, b, c)                               (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa6d08559 */
+/* HASH CRC-32:0xcb003085 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1839,6 +1839,7 @@ __CRT_FUNCTION(sigignore,0,(),1,(int,signo),int)
 __CRT_FUNCTION(siginterrupt,0,(),2,(int,signo,int,interrupt),int)
 __CRT_FUNCTION(sigisemptyset,0,(),1,(sigset_t const *,set),int)
 __CRT_FUNCTION(sigismember,0,(),2,(sigset_t const *,set,int,signo),int)
+__CRT_FUNCTION(signalfd,0,(),3,(fd_t,fd,sigset_t const *,mask,int,flags),fd_t)
 __CRT_FUNCTION(significand,0,(),1,(double,x),double)
 __CRT_FUNCTION(significandf,0,(),1,(float,x),float)
 __CRT_FUNCTION(significandl,0,(),1,(long double,x),long double)

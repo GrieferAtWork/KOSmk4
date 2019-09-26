@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x756c0a2a */
+/* HASH CRC-32:0xdfd41335 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3043,6 +3043,20 @@ INTERN_FUNCTION(libc_sys_epoll_pwait)
 	.cfi_endproc
 END(libc_sys_epoll_pwait)
 
+.section .text.crt.syscall.signalfd
+/* errno_t signalfd(fd_t fd,
+ *                  struct __sigset_struct const *sigmask,
+ *                  size_t sigsetsize) */
+INTERN_FUNCTION(libc_sys_signalfd)
+	/* Argument count: 3 */
+	.cfi_startproc
+	movq   $SYS_signalfd, %rax
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_signalfd)
+
 /* Return file descriptor for new interval timer source */
 .section .text.crt.syscall.timerfd_create
 /* fd_t timerfd_create(clockid_t clock_id,
@@ -3133,6 +3147,22 @@ INTERN_FUNCTION(libc_sys_accept4)
 	ret
 	.cfi_endproc
 END(libc_sys_accept4)
+
+.section .text.crt.syscall.signalfd4
+/* errno_t signalfd4(fd_t fd,
+ *                   struct __sigset_struct const *sigmask,
+ *                   size_t sigsetsize,
+ *                   syscall_ulong_t flags) */
+INTERN_FUNCTION(libc_sys_signalfd4)
+	/* Argument count: 4 */
+	.cfi_startproc
+	movq   $SYS_signalfd4, %rax
+	movq   %rcx, %r10
+	clc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_signalfd4)
 
 .section .text.crt.syscall.eventfd2
 /* fd_t eventfd2(syscall_ulong_t initval,
@@ -7484,6 +7514,20 @@ INTERN_FUNCTION(libc_sys_Xepoll_pwait)
 	.cfi_endproc
 END(libc_sys_Xepoll_pwait)
 
+.section .text.crt.syscall.Xsignalfd
+/* errno_t signalfd(fd_t fd,
+ *                  struct __sigset_struct const *sigmask,
+ *                  size_t sigsetsize) */
+INTERN_FUNCTION(libc_sys_Xsignalfd)
+	/* Argument count: 3 */
+	.cfi_startproc
+	movq   $SYS_signalfd, %rax
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xsignalfd)
+
 /* Return file descriptor for new interval timer source */
 .section .text.crt.syscall.Xtimerfd_create
 /* fd_t timerfd_create(clockid_t clock_id,
@@ -7574,6 +7618,22 @@ INTERN_FUNCTION(libc_sys_Xaccept4)
 	ret
 	.cfi_endproc
 END(libc_sys_Xaccept4)
+
+.section .text.crt.syscall.Xsignalfd4
+/* errno_t signalfd4(fd_t fd,
+ *                   struct __sigset_struct const *sigmask,
+ *                   size_t sigsetsize,
+ *                   syscall_ulong_t flags) */
+INTERN_FUNCTION(libc_sys_Xsignalfd4)
+	/* Argument count: 4 */
+	.cfi_startproc
+	movq   $SYS_signalfd4, %rax
+	movq   %rcx, %r10
+	stc
+	syscall
+	ret
+	.cfi_endproc
+END(libc_sys_Xsignalfd4)
 
 .section .text.crt.syscall.Xeventfd2
 /* fd_t eventfd2(syscall_ulong_t initval,
@@ -9126,12 +9186,14 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_sync_file_range, libc_sys_sync_file_range)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_vmsplice, libc_sys_vmsplice)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_utimensat, libc_sys_utimensat)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_epoll_pwait, libc_sys_epoll_pwait)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_signalfd, libc_sys_signalfd)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_timerfd_create, libc_sys_timerfd_create)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_eventfd, libc_sys_eventfd)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_fallocate, libc_sys_fallocate)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_timerfd_settime, libc_sys_timerfd_settime)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_timerfd_gettime, libc_sys_timerfd_gettime)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_accept4, libc_sys_accept4)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_signalfd4, libc_sys_signalfd4)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_eventfd2, libc_sys_eventfd2)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_epoll_create1, libc_sys_epoll_create1)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_dup3, libc_sys_dup3)
@@ -9424,12 +9486,14 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_Xsync_file_range, libc_sys_Xsync_file_range)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xvmsplice, libc_sys_Xvmsplice)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xutimensat, libc_sys_Xutimensat)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xepoll_pwait, libc_sys_Xepoll_pwait)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xsignalfd, libc_sys_Xsignalfd)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xtimerfd_create, libc_sys_Xtimerfd_create)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xeventfd, libc_sys_Xeventfd)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xfallocate, libc_sys_Xfallocate)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xtimerfd_settime, libc_sys_Xtimerfd_settime)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xtimerfd_gettime, libc_sys_Xtimerfd_gettime)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xaccept4, libc_sys_Xaccept4)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xsignalfd4, libc_sys_Xsignalfd4)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xeventfd2, libc_sys_Xeventfd2)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xepoll_create1, libc_sys_Xepoll_create1)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xdup3, libc_sys_Xdup3)

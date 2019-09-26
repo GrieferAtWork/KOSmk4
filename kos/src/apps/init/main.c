@@ -156,13 +156,6 @@ done_procfs:
 	/* TODO: Add system header <libintl.h> */
 	/* TODO: Add system header <nan.h> */
 	/* TODO: Add system header <sys/sendfile.h> */
-	/* TODO: Add system header <sys/signalfd.h> (Also: implement the kernel-side of this)
-	 * read(): >> CHECK_PENDING_SIGNALS(domain: PROCESS | THREAD, mask: mask in signalfd(fd, mask, flags))
-	 *         -> Translate any such pending signal into `struct signalfd_siginfo',
-	 *            after removing it from the signal queue.
-	 * poll(): >> task_connect(PROCESS->SIGQUEUE->AVAIL);
-	 *         >> task_connect(THREAD->SIGQUEUE->AVAIL);
-	 */
 	/* TODO: Add system header <ftw.h> */
 }
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x92c92dfd */
+/* HASH CRC-32:0xa24ab123 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -365,13 +365,13 @@ __SYSCALL_UNUSED(317, 317, 316)
 __SYSCALL(getcpu)
 __SYSCALL(epoll_pwait)
 __SYSCALL(utimensat)
-__SYSCALL_UNUSED(321, 321, 320)
+__SYSCALL(signalfd)
 __SYSCALL(timerfd_create)
 __SYSCALL(eventfd)
 __SYSCALL(fallocate)
 __SYSCALL(timerfd_settime)
 __SYSCALL(timerfd_gettime)
-__SYSCALL_UNUSED(327, 327, 326)
+__SYSCALL(signalfd4)
 __SYSCALL(eventfd2)
 __SYSCALL(epoll_create1)
 __SYSCALL(dup3)

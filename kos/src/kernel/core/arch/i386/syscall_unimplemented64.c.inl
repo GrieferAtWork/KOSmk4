@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x16fb4a71 */
+/* HASH CRC-32:0x4b24a35f */
 DEFINE_PUBLIC_WEAK_ALIAS(sys_read, sys_invalid3);                   /* 0 */
 DEFINE_PUBLIC_WEAK_ALIAS(sys_write, sys_invalid3);                  /* 1 */
 DEFINE_PUBLIC_WEAK_ALIAS(sys_open, sys_invalid3);                   /* 2 */
@@ -215,12 +215,14 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_sync_file_range, sys_invalid4);        /* 277 */
 DEFINE_PUBLIC_WEAK_ALIAS(sys_vmsplice, sys_invalid4);               /* 278 */
 DEFINE_PUBLIC_WEAK_ALIAS(sys_utimensat, sys_invalid4);              /* 280 */
 DEFINE_PUBLIC_WEAK_ALIAS(sys_epoll_pwait, sys_invalid5);            /* 281 */
+DEFINE_PUBLIC_WEAK_ALIAS(sys_signalfd, sys_invalid3);               /* 282 */
 DEFINE_PUBLIC_WEAK_ALIAS(sys_timerfd_create, sys_invalid2);         /* 283 */
 DEFINE_PUBLIC_WEAK_ALIAS(sys_eventfd, sys_invalid1);                /* 284 */
 DEFINE_PUBLIC_WEAK_ALIAS(sys_fallocate, sys_invalid4);              /* 285 */
 DEFINE_PUBLIC_WEAK_ALIAS(sys_timerfd_settime, sys_invalid4);        /* 286 */
 DEFINE_PUBLIC_WEAK_ALIAS(sys_timerfd_gettime, sys_invalid2);        /* 287 */
 DEFINE_PUBLIC_WEAK_ALIAS(sys_accept4, sys_invalid4);                /* 288 */
+DEFINE_PUBLIC_WEAK_ALIAS(sys_signalfd4, sys_invalid4);              /* 289 */
 DEFINE_PUBLIC_WEAK_ALIAS(sys_eventfd2, sys_invalid2);               /* 290 */
 DEFINE_PUBLIC_WEAK_ALIAS(sys_epoll_create1, sys_invalid1);          /* 291 */
 DEFINE_PUBLIC_WEAK_ALIAS(sys_dup3, sys_invalid3);                   /* 292 */

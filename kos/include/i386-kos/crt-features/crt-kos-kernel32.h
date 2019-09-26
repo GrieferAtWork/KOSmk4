@@ -1522,6 +1522,8 @@
 #define __CRT_HAVE_sys_sigaction 1
 #define __CRT_HAVE_sys_sigaltstack 1
 #define __CRT_HAVE_sys_signal 1
+#define __CRT_HAVE_sys_signalfd 1
+#define __CRT_HAVE_sys_signalfd4 1
 #define __CRT_HAVE_sys_sigpending 1
 #define __CRT_HAVE_sys_sigprocmask 1
 #define __CRT_HAVE_sys_sigreturn 1

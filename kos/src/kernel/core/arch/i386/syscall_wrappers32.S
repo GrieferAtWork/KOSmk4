@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc9259719 */
+/* HASH CRC-32:0x76f78f84 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -278,11 +278,13 @@ EXTERN(sys_vmsplice)
 EXTERN(sys_getcpu)
 EXTERN(sys_epoll_pwait)
 EXTERN(sys_utimensat)
+EXTERN(sys_signalfd)
 EXTERN(sys_timerfd_create)
 EXTERN(sys_eventfd)
 EXTERN(sys_fallocate)
 EXTERN(sys_timerfd_settime)
 EXTERN(sys_timerfd_gettime)
+EXTERN(sys_signalfd4)
 EXTERN(sys_eventfd2)
 EXTERN(sys_epoll_create1)
 EXTERN(sys_dup3)
@@ -10171,6 +10173,45 @@ INTERN_FUNCTION(__asm32_int80_utimensat)
 	.cfi_endproc
 END(__asm32_int80_utimensat)
 
+.section .text.x86.asm32_syscall_int80.signalfd
+	/* errno_t signalfd(fd_t fd,
+	 *                  struct __sigset_struct const *sigmask,
+	 *                  size_t sigsetsize) */
+	.weak __asm32_int80_signalfd
+INTERN_FUNCTION(__asm32_int80_signalfd)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality
+	.cfi_lsda 0, 0x141
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	call   sys_signalfd
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__asm32_int80_signalfd)
+
 /* Return file descriptor for new interval timer source */
 .section .text.x86.asm32_syscall_int80.timerfd_create
 	/* fd_t timerfd_create(clockid_t clock_id,
@@ -10372,6 +10413,48 @@ INTERN_FUNCTION(__asm32_int80_timerfd_gettime)
 	iret
 	.cfi_endproc
 END(__asm32_int80_timerfd_gettime)
+
+.section .text.x86.asm32_syscall_int80.signalfd4
+	/* errno_t signalfd4(fd_t fd,
+	 *                   struct __sigset_struct const *sigmask,
+	 *                   size_t sigsetsize,
+	 *                   syscall_ulong_t flags) */
+	.weak __asm32_int80_signalfd4
+INTERN_FUNCTION(__asm32_int80_signalfd4)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality
+	.cfi_lsda 0, 0x147
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %esi  /* Arg #3 */
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	call   sys_signalfd4
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	popl_cfi_r %esi
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__asm32_int80_signalfd4)
 
 .section .text.x86.asm32_syscall_int80.eventfd2
 	/* fd_t eventfd2(syscall_ulong_t initval,
@@ -24750,6 +24833,45 @@ INTERN_FUNCTION(__asm32_sysenter_utimensat)
 	.cfi_endproc
 END(__asm32_sysenter_utimensat)
 
+.section .text.x86.asm32_syscall_sysenter.signalfd
+	/* errno_t signalfd(fd_t fd,
+	 *                  struct __sigset_struct const *sigmask,
+	 *                  size_t sigsetsize) */
+	.weak __asm32_sysenter_signalfd
+INTERN_FUNCTION(__asm32_sysenter_signalfd)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality
+	.cfi_lsda 0, 0x40000141
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	call   sys_signalfd
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__asm32_sysenter_signalfd)
+
 /* Return file descriptor for new interval timer source */
 .section .text.x86.asm32_syscall_sysenter.timerfd_create
 	/* fd_t timerfd_create(clockid_t clock_id,
@@ -24951,6 +25073,48 @@ INTERN_FUNCTION(__asm32_sysenter_timerfd_gettime)
 	X86_IRET_BUT_PREFER_SYSEXIT
 	.cfi_endproc
 END(__asm32_sysenter_timerfd_gettime)
+
+.section .text.x86.asm32_syscall_sysenter.signalfd4
+	/* errno_t signalfd4(fd_t fd,
+	 *                   struct __sigset_struct const *sigmask,
+	 *                   size_t sigsetsize,
+	 *                   syscall_ulong_t flags) */
+	.weak __asm32_sysenter_signalfd4
+INTERN_FUNCTION(__asm32_sysenter_signalfd4)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality
+	.cfi_lsda 0, 0x40000147
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %esi  /* Arg #3 */
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	call   sys_signalfd4
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	popl_cfi_r %esi
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__asm32_sysenter_signalfd4)
 
 .section .text.x86.asm32_syscall_sysenter.eventfd2
 	/* fd_t eventfd2(syscall_ulong_t initval,
