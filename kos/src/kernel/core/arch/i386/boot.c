@@ -92,14 +92,20 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 */
 	if (__x86_bootcpu_idfeatures.ci_80000002a == MAKE_DWORD('Q', 'E', 'M', 'U'))
 		debug_port = (port_t)0x3f8;
-	else if (__x86_bootcpu_idfeatures.ci_80000002a == MAKE_DWORD('B', 'O', 'C', 'H'))
+	else if (__x86_bootcpu_idfeatures.ci_80000002a == MAKE_DWORD('B', 'O', 'C', 'H')) {
 		debug_port = (port_t)0xe9;
+	}
 
 	printk(FREESTR(KERN_NOTICE "[boot] Begin kernel initialization\n"));
 	printk(FREESTR(KERN_INFO "[boot] CPU brand: %q\n"), __x86_bootcpu_idfeatures.ci_brand);
 
 	/* Initialize the paging configuration */
 	x86_initialize_paging();
+
+#ifndef __x86_64__
+	/* Initialize the atomic64 configuration */
+	x86_initialize_atomic64();
+#endif /* !__x86_64__ */
 
 	/* Initialize per-task/per-cpu structures */
 	kernel_initialize_scheduler();

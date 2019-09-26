@@ -163,7 +163,8 @@ NOTHROW(FCALL pagedir_install_jmp)(void *redirection_addr,
                                    void const *redirection_target) {
 	byte_t *dst = (byte_t *)redirection_addr;
 	*(u8 *)(dst + 0) = 0xe9;
-	*(s32 *)(dst + 1) = ((s32)(uintptr_t)redirection_target - (s32)(uintptr_t)(dst + 5));
+	*(s32 *)(dst + 1) = ((s32)(uintptr_t)redirection_target -
+	                     (s32)(uintptr_t)(dst + 5));
 }
 #endif /* HYBRID_PAGING_MODE */
 

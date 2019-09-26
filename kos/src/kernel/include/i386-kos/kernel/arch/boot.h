@@ -72,6 +72,9 @@ INTDEF FREE void NOTHROW(KCALL x86_initialize_fpu)(void);
 INTDEF uintptr_t NOTHROW(KCALL x86_this_userkern_init)(void);
 #endif /* __x86_64__ */
 #endif /* !CONFIG_NO_USERKERN_SEGMENT */
+#ifndef __x86_64__
+INTDEF FREE void NOTHROW(KCALL x86_initialize_atomic64)(void);
+#endif /* !__x86_64__ */
 INTDEF FREE void NOTHROW(KCALL x86_initialize_commandline_himem)(void);
 INTDEF FREE void NOTHROW(KCALL x86_initialize_bootloader_drivers)(void);
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
