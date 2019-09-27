@@ -1046,21 +1046,21 @@ NOTHROW_RPC(LIBCCALL libc_linkat)(fd_t fromfd,
 }
 /*[[[end:linkat]]]*/
 
-/*[[[head:symlinkat,hash:CRC-32=0x82db8cf]]]*/
+/*[[[head:symlinkat,hash:CRC-32=0x701a81c2]]]*/
 /* >> symlinkat(3)
- * Create a new symbolic link loaded with `FROM' as link
- * text, at the filesystem location referred to by `TOFD:TO' */
+ * Create a new symbolic link loaded with `LINK_TEXT' as link
+ * text, at the filesystem location referred to by `TOFD:TARGET_PATH' */
 INTERN NONNULL((1, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify.symlinkat") int
-NOTHROW_RPC(LIBCCALL libc_symlinkat)(char const *from,
+NOTHROW_RPC(LIBCCALL libc_symlinkat)(char const *link_text,
                                      fd_t tofd,
-                                     char const *to)
+                                     char const *target_path)
 /*[[[body:symlinkat]]]*/
 {
 	errno_t result;
-	result = sys_symlinkat(from,
+	result = sys_symlinkat(link_text,
 	                       tofd,
-	                       to);
+	                       target_path);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:symlinkat]]]*/
@@ -1665,19 +1665,19 @@ NOTHROW_NCX(LIBCCALL libc_ttyslot)(void)
 }
 /*[[[end:ttyslot]]]*/
 
-/*[[[head:symlink,hash:CRC-32=0xb6bf0c9a]]]*/
+/*[[[head:symlink,hash:CRC-32=0x24ccea24]]]*/
 /* >> symlink(3)
- * Create a new symbolic link loaded with `FROM' as link
- * text, at the filesystem location referred to by `TO'.
- * Same as `symlinkat(FROM, AT_FDCWD, TO)' */
+ * Create a new symbolic link loaded with `LINK_TEXT' as link
+ * text, at the filesystem location referred to by `TARGET_PATH'.
+ * Same as `symlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)' */
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify.symlink") int
-NOTHROW_RPC(LIBCCALL libc_symlink)(char const *from,
-                                   char const *to)
+NOTHROW_RPC(LIBCCALL libc_symlink)(char const *link_text,
+                                   char const *target_path)
 /*[[[body:symlink]]]*/
 {
 	errno_t result;
-	result = sys_symlink(from, to);
+	result = sys_symlink(link_text, target_path);
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:symlink]]]*/

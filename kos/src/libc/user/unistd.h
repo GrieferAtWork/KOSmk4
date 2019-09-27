@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5e8cc25d */
+/* HASH CRC-32:0x2306edbd */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -239,9 +239,9 @@ INTDEF NONNULL((2)) int NOTHROW_RPC(LIBCCALL libc_fchownat)(fd_t dfd, char const
  * Create a hard link from `FROMFD:FROM', leading to `TOFD:TO' */
 INTDEF NONNULL((2, 4)) int NOTHROW_RPC(LIBCCALL libc_linkat)(fd_t fromfd, char const *from, fd_t tofd, char const *to, atflag_t flags);
 /* >> symlinkat(3)
- * Create a new symbolic link loaded with `FROM' as link
- * text, at the filesystem location referred to by `TOFD:TO' */
-INTDEF NONNULL((1, 3)) int NOTHROW_RPC(LIBCCALL libc_symlinkat)(char const *from, fd_t tofd, char const *to);
+ * Create a new symbolic link loaded with `LINK_TEXT' as link
+ * text, at the filesystem location referred to by `TOFD:TARGET_PATH' */
+INTDEF NONNULL((1, 3)) int NOTHROW_RPC(LIBCCALL libc_symlinkat)(char const *link_text, fd_t tofd, char const *target_path);
 /* >> readlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
  * WARNING: This function is badly designed and will neither append a trailing
@@ -356,10 +356,10 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_seteuid)(uid_t euid);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_setegid)(gid_t egid);
 INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc_ttyslot)(void);
 /* >> symlink(3)
- * Create a new symbolic link loaded with `FROM' as link
- * text, at the filesystem location referred to by `TO'.
- * Same as `symlinkat(FROM, AT_FDCWD, TO)' */
-INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_symlink)(char const *from, char const *to);
+ * Create a new symbolic link loaded with `LINK_TEXT' as link
+ * text, at the filesystem location referred to by `TARGET_PATH'.
+ * Same as `symlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)' */
+INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_symlink)(char const *link_text, char const *target_path);
 /* >> readlink(3)
  * Read the text of a symbolic link under `PATH' into the provided buffer.
  * Same as `readlinkat(AT_FDCWD, PATH, BUF, BUFLEN)'

@@ -254,7 +254,7 @@ LinkAt:($fd_t fromfd, [notnull] char const *from, $fd_t tofd, [notnull] char con
 
 %
 [throws][cp][doc_alias(symlinkat)]
-SymlinkAt:([notnull] char const *from, $fd_t tofd, [notnull] char const *to);
+SymlinkAt:([notnull] char const *link_text, $fd_t tofd, [notnull] char const *target_path);
 
 %[default_impl_section(.text.crt.except.fs.property)]
 
@@ -519,8 +519,8 @@ Nice:(int inc) -> int {
 %#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
 [throws][doc_alias(symlink)][cp][noexport][section(.text.crt.except.fs.modify)]
 [requires(defined(__CRT_AT_FDCWD) && $has_function(SymlinkAt))]
-Symlink:([notnull] char const *from, [notnull] char const *to) {
-	SymlinkAt(from, __CRT_AT_FDCWD, to);
+Symlink:([notnull] char const *link_text, [notnull] char const *target_path) {
+	SymlinkAt(link_text, __CRT_AT_FDCWD, target_path);
 }
 
 %

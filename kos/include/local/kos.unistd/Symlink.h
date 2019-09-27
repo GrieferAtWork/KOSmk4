@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x951fb685 */
+/* HASH CRC-32:0xea0773c2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,9 +26,9 @@
 #define ____localdep_SymlinkAt_defined 1
 #if defined(__CRT_HAVE_SymlinkAt)
 /* >> symlinkat(3)
- * Create a new symbolic link loaded with `FROM' as link
- * text, at the filesystem location referred to by `TOFD:TO' */
-__CREDIRECT_VOID(__ATTR_NONNULL((1, 3)),,__localdep_SymlinkAt,(char const *__from, __fd_t __tofd, char const *__to),SymlinkAt,(__from,__tofd,__to)) __THROWS(...)
+ * Create a new symbolic link loaded with `LINK_TEXT' as link
+ * text, at the filesystem location referred to by `TOFD:TARGET_PATH' */
+__CREDIRECT_VOID(__ATTR_NONNULL((1, 3)),,__localdep_SymlinkAt,(char const *__link_text, __fd_t __tofd, char const *__target_path),SymlinkAt,(__link_text,__tofd,__target_path)) __THROWS(...)
 #else /* LIBC: SymlinkAt */
 #undef ____localdep_SymlinkAt_defined
 #endif /* SymlinkAt... */
@@ -36,14 +36,14 @@ __CREDIRECT_VOID(__ATTR_NONNULL((1, 3)),,__localdep_SymlinkAt,(char const *__fro
 
 __NAMESPACE_LOCAL_BEGIN
 /* >> symlink(3)
- * Create a new symbolic link loaded with `FROM' as link
- * text, at the filesystem location referred to by `TO'.
- * Same as `symlinkat(FROM, AT_FDCWD, TO)' */
+ * Create a new symbolic link loaded with `LINK_TEXT' as link
+ * text, at the filesystem location referred to by `TARGET_PATH'.
+ * Same as `symlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)' */
 __LOCAL_LIBC(Symlink) __ATTR_NONNULL((1, 2)) void
-(__LIBCCALL __LIBC_LOCAL_NAME(Symlink))(char const *__from,
-                                        char const *__to) __THROWS(...) {
+(__LIBCCALL __LIBC_LOCAL_NAME(Symlink))(char const *__link_text,
+                                        char const *__target_path) __THROWS(...) {
 #line 523 "kos/src/libc/magic/kos.unistd.c"
-	__localdep_SymlinkAt(__from, __CRT_AT_FDCWD, __to);
+	__localdep_SymlinkAt(__link_text, __CRT_AT_FDCWD, __target_path);
 }
 __NAMESPACE_LOCAL_END
 #endif /* defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_SymlinkAt) */

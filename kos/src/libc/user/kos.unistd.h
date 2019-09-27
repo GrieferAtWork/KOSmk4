@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcf00c3fa */
+/* HASH CRC-32:0xa7513147 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -155,9 +155,9 @@ INTDEF NONNULL((2)) void (LIBCCALL libc_FChownAt)(fd_t dfd, char const *file, ui
  * Create a hard link from `FROMFD:FROM', leading to `TOFD:TO' */
 INTDEF NONNULL((2, 4)) void (LIBCCALL libc_LinkAt)(fd_t fromfd, char const *from, fd_t tofd, char const *to, atflag_t flags) __THROWS(...);
 /* >> symlinkat(3)
- * Create a new symbolic link loaded with `FROM' as link
- * text, at the filesystem location referred to by `TOFD:TO' */
-INTDEF NONNULL((1, 3)) void (LIBCCALL libc_SymlinkAt)(char const *from, fd_t tofd, char const *to) __THROWS(...);
+ * Create a new symbolic link loaded with `LINK_TEXT' as link
+ * text, at the filesystem location referred to by `TOFD:TARGET_PATH' */
+INTDEF NONNULL((1, 3)) void (LIBCCALL libc_SymlinkAt)(char const *link_text, fd_t tofd, char const *target_path) __THROWS(...);
 /* >> readlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
  * WARNING: This function is badly designed and will neither append a trailing
@@ -261,10 +261,10 @@ INTDEF void (LIBCCALL libc_SetEUid)(uid_t euid) __THROWS(...);
  * @return: -1: [errno=EPERM]  : The current user is not privileged */
 INTDEF void (LIBCCALL libc_SetEGid)(gid_t egid) __THROWS(...);
 /* >> symlink(3)
- * Create a new symbolic link loaded with `FROM' as link
- * text, at the filesystem location referred to by `TO'.
- * Same as `symlinkat(FROM, AT_FDCWD, TO)' */
-INTDEF NONNULL((1, 2)) void (LIBCCALL libc_Symlink)(char const *from, char const *to) __THROWS(...);
+ * Create a new symbolic link loaded with `LINK_TEXT' as link
+ * text, at the filesystem location referred to by `TARGET_PATH'.
+ * Same as `symlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)' */
+INTDEF NONNULL((1, 2)) void (LIBCCALL libc_Symlink)(char const *link_text, char const *target_path) __THROWS(...);
 /* >> readlink(3)
  * Read the text of a symbolic link under `PATH' into the provided buffer.
  * Same as `readlinkat(AT_FDCWD, PATH, BUF, BUFLEN)'

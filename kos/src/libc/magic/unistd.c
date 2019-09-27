@@ -732,9 +732,9 @@ eaccess:([notnull] char const *file, int type) -> int = euidaccess;
 
 %
 @@>> symlinkat(3)
-@@Create a new symbolic link loaded with `FROM' as link
-@@text, at the filesystem location referred to by `TOFD:TO'
-[cp] symlinkat:([notnull] char const *from, $fd_t tofd, [notnull] char const *to) -> int;
+@@Create a new symbolic link loaded with `LINK_TEXT' as link
+@@text, at the filesystem location referred to by `TOFD:TARGET_PATH'
+[cp] symlinkat:([notnull] char const *link_text, $fd_t tofd, [notnull] char const *target_path) -> int;
 
 %[default_impl_section(.text.crt.fs.property)]
 
@@ -1412,14 +1412,14 @@ setegid:($gid_t egid) -> int;
 %#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
 
 @@>> symlink(3)
-@@Create a new symbolic link loaded with `FROM' as link
-@@text, at the filesystem location referred to by `TO'.
-@@Same as `symlinkat(FROM, AT_FDCWD, TO)'
+@@Create a new symbolic link loaded with `LINK_TEXT' as link
+@@text, at the filesystem location referred to by `TARGET_PATH'.
+@@Same as `symlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)'
 [cp][noexport][section(.text.crt.fs.modify)]
 [requires(defined(__CRT_AT_FDCWD) && $has_function(symlinkat))]
-symlink:([notnull] char const *from, [notnull] char const *to) -> int {
+symlink:([notnull] char const *link_text, [notnull] char const *target_path) -> int {
 	/* TODO: Header-implementation for `symlink()' on DOS (using the windows API) */
-	return symlinkat(from, __CRT_AT_FDCWD, to);
+	return symlinkat(link_text, __CRT_AT_FDCWD, target_path);
 }
 
 %

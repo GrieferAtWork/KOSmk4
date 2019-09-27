@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x23c6d8ee */
+/* HASH CRC-32:0x31797c7c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,9 +25,9 @@
 #define ____localdep_c32symlinkat_defined 1
 #if defined(__CRT_HAVE_wsymlinkat) && (__SIZEOF_WCHAR_T__ == 4)
 /* >> c32symlinkat(3)
- * Create a new symbolic link loaded with `FROM' as link
- * text, at the filesystem location referred to by `TOFD:TO' */
-__CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,__localdep_c32symlinkat,(__CHAR32_TYPE__ const *__from, __fd_t __tofd, __CHAR32_TYPE__ const *__to),wsymlinkat,(__from,__tofd,__to))
+ * Create a new symbolic link loaded with `LINK_TEXT' as link
+ * text, at the filesystem location referred to by `TOFD:TARGET_PATH' */
+__CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,__localdep_c32symlinkat,(__CHAR32_TYPE__ const *__link_text, __fd_t __tofd, __CHAR32_TYPE__ const *__target_path),wsymlinkat,(__link_text,__tofd,__target_path))
 #else /* LIBC: wsymlinkat */
 #undef ____localdep_c32symlinkat_defined
 #endif /* c32symlinkat... */
@@ -35,15 +35,15 @@ __CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,__localdep_c32symlinkat,(__
 
 __NAMESPACE_LOCAL_BEGIN
 /* >> c32symlink(3)
- * Create a new symbolic link loaded with `FROM' as link
- * text, at the filesystem location referred to by `TO'.
- * Same as `c32symlinkat(FROM, AT_FDCWD, TO)' */
+ * Create a new symbolic link loaded with `LINK_TEXT' as link
+ * text, at the filesystem location referred to by `TARGET_PATH'.
+ * Same as `c32symlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)' */
 __LOCAL_LIBC(c32symlink) __ATTR_NONNULL((1, 2)) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(c32symlink))(__CHAR32_TYPE__ const *__from,
-                                                        __CHAR32_TYPE__ const *__to) {
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(c32symlink))(__CHAR32_TYPE__ const *__link_text,
+                                                        __CHAR32_TYPE__ const *__target_path) {
 #line 1421 "kos/src/libc/magic/unistd.c"
 	/* TODO: Header-implementation for `symlink()' on DOS (using the windows API) */
-	return __localdep_c32symlinkat(__from, __CRT_AT_FDCWD, __to);
+	return __localdep_c32symlinkat(__link_text, __CRT_AT_FDCWD, __target_path);
 }
 __NAMESPACE_LOCAL_END
 #endif /* defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wsymlinkat) */

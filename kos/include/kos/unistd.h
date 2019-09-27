@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3b65152e */
+/* HASH CRC-32:0x5ac9d02a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -356,9 +356,9 @@ __CDECLARE_VOID(__ATTR_NONNULL((2, 4)),,LinkAt,(__fd_t __fromfd, char const *__f
 
 #if defined(__CRT_HAVE_SymlinkAt)
 /* >> symlinkat(3)
- * Create a new symbolic link loaded with `FROM' as link
- * text, at the filesystem location referred to by `TOFD:TO' */
-__CDECLARE_VOID(__ATTR_NONNULL((1, 3)),,SymlinkAt,(char const *__from, __fd_t __tofd, char const *__to),(__from,__tofd,__to)) __THROWS(...)
+ * Create a new symbolic link loaded with `LINK_TEXT' as link
+ * text, at the filesystem location referred to by `TOFD:TARGET_PATH' */
+__CDECLARE_VOID(__ATTR_NONNULL((1, 3)),,SymlinkAt,(char const *__link_text, __fd_t __tofd, char const *__target_path),(__link_text,__tofd,__target_path)) __THROWS(...)
 #endif /* SymlinkAt... */
 
 #if defined(__CRT_HAVE_ReadlinkAt)
@@ -693,17 +693,17 @@ __CDECLARE_VOID(,,SetEGid,(__gid_t __egid),(__egid)) __THROWS(...)
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
 #if defined(__CRT_HAVE_Symlink)
 /* >> symlink(3)
- * Create a new symbolic link loaded with `FROM' as link
- * text, at the filesystem location referred to by `TO'.
- * Same as `symlinkat(FROM, AT_FDCWD, TO)' */
-__CDECLARE_VOID(__ATTR_NONNULL((1, 2)),,Symlink,(char const *__from, char const *__to),(__from,__to)) __THROWS(...)
+ * Create a new symbolic link loaded with `LINK_TEXT' as link
+ * text, at the filesystem location referred to by `TARGET_PATH'.
+ * Same as `symlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)' */
+__CDECLARE_VOID(__ATTR_NONNULL((1, 2)),,Symlink,(char const *__link_text, char const *__target_path),(__link_text,__target_path)) __THROWS(...)
 #elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_SymlinkAt)
 #include <local/kos.unistd/Symlink.h>
 /* >> symlink(3)
- * Create a new symbolic link loaded with `FROM' as link
- * text, at the filesystem location referred to by `TO'.
- * Same as `symlinkat(FROM, AT_FDCWD, TO)' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(Symlink, __FORCELOCAL __ATTR_NONNULL((1, 2)) void (__LIBCCALL Symlink)(char const *__from, char const *__to) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Symlink))(__from, __to); })
+ * Create a new symbolic link loaded with `LINK_TEXT' as link
+ * text, at the filesystem location referred to by `TARGET_PATH'.
+ * Same as `symlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(Symlink, __FORCELOCAL __ATTR_NONNULL((1, 2)) void (__LIBCCALL Symlink)(char const *__link_text, char const *__target_path) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Symlink))(__link_text, __target_path); })
 #endif /* Symlink... */
 
 #if defined(__CRT_HAVE_Readlink)

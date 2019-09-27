@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x598acd2 */
+/* HASH CRC-32:0x941a30 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -124,13 +124,13 @@ INTDEF NONNULL((2, 4)) int NOTHROW_RPC(LIBCCALL libc_wlinkat)(fd_t fromfd, char3
  * Create a hard link from `FROMFD:FROM', leading to `TOFD:TO' */
 INTDEF NONNULL((2, 4)) int NOTHROW_RPC(LIBDCALL libd_wlinkat)(fd_t fromfd, char16_t const *from, fd_t tofd, char16_t const *to, atflag_t flags);
 /* >> wsymlinkat(3)
- * Create a new symbolic link loaded with `FROM' as link
- * text, at the filesystem location referred to by `TOFD:TO' */
-INTDEF NONNULL((1, 3)) int NOTHROW_RPC(LIBCCALL libc_wsymlinkat)(char32_t const *from, fd_t tofd, char32_t const *to);
+ * Create a new symbolic link loaded with `LINK_TEXT' as link
+ * text, at the filesystem location referred to by `TOFD:TARGET_PATH' */
+INTDEF NONNULL((1, 3)) int NOTHROW_RPC(LIBCCALL libc_wsymlinkat)(char32_t const *link_text, fd_t tofd, char32_t const *target_path);
 /* >> wsymlinkat(3)
- * Create a new symbolic link loaded with `FROM' as link
- * text, at the filesystem location referred to by `TOFD:TO' */
-INTDEF NONNULL((1, 3)) int NOTHROW_RPC(LIBDCALL libd_wsymlinkat)(char16_t const *from, fd_t tofd, char16_t const *to);
+ * Create a new symbolic link loaded with `LINK_TEXT' as link
+ * text, at the filesystem location referred to by `TOFD:TARGET_PATH' */
+INTDEF NONNULL((1, 3)) int NOTHROW_RPC(LIBDCALL libd_wsymlinkat)(char16_t const *link_text, fd_t tofd, char16_t const *target_path);
 /* >> wreadlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
  * WARNING: This function is badly designed and will neither append a trailing
@@ -184,15 +184,15 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_wtruncate64)(char32_t const *f
  * Truncate the given file `FILE' to a length of `LENGTH' */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBDCALL libd_wtruncate64)(char16_t const *file, __PIO_OFFSET64 length);
 /* >> wsymlink(3)
- * Create a new symbolic link loaded with `FROM' as link
- * text, at the filesystem location referred to by `TO'.
- * Same as `wsymlinkat(FROM, AT_FDCWD, TO)' */
-INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_wsymlink)(char32_t const *from, char32_t const *to);
+ * Create a new symbolic link loaded with `LINK_TEXT' as link
+ * text, at the filesystem location referred to by `TARGET_PATH'.
+ * Same as `wsymlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)' */
+INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_wsymlink)(char32_t const *link_text, char32_t const *target_path);
 /* >> wsymlink(3)
- * Create a new symbolic link loaded with `FROM' as link
- * text, at the filesystem location referred to by `TO'.
- * Same as `wsymlinkat(FROM, AT_FDCWD, TO)' */
-INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBDCALL libd_wsymlink)(char16_t const *from, char16_t const *to);
+ * Create a new symbolic link loaded with `LINK_TEXT' as link
+ * text, at the filesystem location referred to by `TARGET_PATH'.
+ * Same as `wsymlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)' */
+INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBDCALL libd_wsymlink)(char16_t const *link_text, char16_t const *target_path);
 /* >> wreadlink(3)
  * Read the text of a symbolic link under `PATH' into the provided buffer.
  * Same as `wreadlinkat(AT_FDCWD, PATH, BUF, BUFLEN)'

@@ -449,23 +449,23 @@ NOTHROW_RPC(LIBDCALL libd_wfchownat)(fd_t dfd,
 }
 /*[[[end:DOS$wfchownat]]]*/
 
-/*[[[head:wsymlinkat,hash:CRC-32=0xeb3fcd70]]]*/
+/*[[[head:wsymlinkat,hash:CRC-32=0x2e2ba70b]]]*/
 /* >> wsymlinkat(3)
- * Create a new symbolic link loaded with `FROM' as link
- * text, at the filesystem location referred to by `TOFD:TO' */
+ * Create a new symbolic link loaded with `LINK_TEXT' as link
+ * text, at the filesystem location referred to by `TOFD:TARGET_PATH' */
 INTERN NONNULL((1, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wsymlinkat") int
-NOTHROW_RPC(LIBCCALL libc_wsymlinkat)(char32_t const *from,
+NOTHROW_RPC(LIBCCALL libc_wsymlinkat)(char32_t const *link_text,
                                       fd_t tofd,
-                                      char32_t const *to)
+                                      char32_t const *target_path)
 /*[[[body:wsymlinkat]]]*/
 {
 	int result = -1;
 	char *used_from, *used_to;
-	used_from = libc_uchar_c32tombs(from);
+	used_from = libc_uchar_c32tombs(link_text);
 	if unlikely(!used_from)
 		goto done;
-	used_to = libc_uchar_c32tombs(to);
+	used_to = libc_uchar_c32tombs(target_path);
 	if unlikely(!used_to)
 		goto done_from;
 	result = symlinkat(used_from, tofd, used_to);
@@ -477,23 +477,23 @@ done:
 }
 /*[[[end:wsymlinkat]]]*/
 
-/*[[[head:DOS$wsymlinkat,hash:CRC-32=0xd0cf8329]]]*/
+/*[[[head:DOS$wsymlinkat,hash:CRC-32=0xee2b59e2]]]*/
 /* >> wsymlinkat(3)
- * Create a new symbolic link loaded with `FROM' as link
- * text, at the filesystem location referred to by `TOFD:TO' */
+ * Create a new symbolic link loaded with `LINK_TEXT' as link
+ * text, at the filesystem location referred to by `TOFD:TARGET_PATH' */
 INTERN NONNULL((1, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wsymlinkat") int
-NOTHROW_RPC(LIBDCALL libd_wsymlinkat)(char16_t const *from,
+NOTHROW_RPC(LIBDCALL libd_wsymlinkat)(char16_t const *link_text,
                                       fd_t tofd,
-                                      char16_t const *to)
+                                      char16_t const *target_path)
 /*[[[body:DOS$wsymlinkat]]]*/
 {
 	int result = -1;
 	char *used_from, *used_to;
-	used_from = libc_uchar_c16tombs(from);
+	used_from = libc_uchar_c16tombs(link_text);
 	if unlikely(!used_from)
 		goto done;
-	used_to = libc_uchar_c16tombs(to);
+	used_to = libc_uchar_c16tombs(target_path);
 	if unlikely(!used_to)
 		goto done_from;
 	result = symlinkat(used_from, tofd, used_to);
@@ -1317,33 +1317,33 @@ NOTHROW_NCX(LIBDCALL libd_wtruncate64)(char16_t const *file,
 #endif /* MAGIC:alias */
 /*[[[end:DOS$wtruncate64]]]*/
 
-/*[[[head:wsymlink,hash:CRC-32=0xde8d0da5]]]*/
+/*[[[head:wsymlink,hash:CRC-32=0x98dedafa]]]*/
 /* >> wsymlink(3)
- * Create a new symbolic link loaded with `FROM' as link
- * text, at the filesystem location referred to by `TO'.
- * Same as `wsymlinkat(FROM, AT_FDCWD, TO)' */
+ * Create a new symbolic link loaded with `LINK_TEXT' as link
+ * text, at the filesystem location referred to by `TARGET_PATH'.
+ * Same as `wsymlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)' */
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wsymlink") int
-NOTHROW_RPC(LIBCCALL libc_wsymlink)(char32_t const *from,
-                                    char32_t const *to)
+NOTHROW_RPC(LIBCCALL libc_wsymlink)(char32_t const *link_text,
+                                    char32_t const *target_path)
 /*[[[body:wsymlink]]]*/
 {
-	return libc_wsymlinkat(from, AT_FDCWD, to);
+	return libc_wsymlinkat(link_text, AT_FDCWD, target_path);
 }
 /*[[[end:wsymlink]]]*/
 
-/*[[[head:DOS$wsymlink,hash:CRC-32=0xf2232bf9]]]*/
+/*[[[head:DOS$wsymlink,hash:CRC-32=0x15d289b2]]]*/
 /* >> wsymlink(3)
- * Create a new symbolic link loaded with `FROM' as link
- * text, at the filesystem location referred to by `TO'.
- * Same as `wsymlinkat(FROM, AT_FDCWD, TO)' */
+ * Create a new symbolic link loaded with `LINK_TEXT' as link
+ * text, at the filesystem location referred to by `TARGET_PATH'.
+ * Same as `wsymlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)' */
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wsymlink") int
-NOTHROW_RPC(LIBDCALL libd_wsymlink)(char16_t const *from,
-                                    char16_t const *to)
+NOTHROW_RPC(LIBDCALL libd_wsymlink)(char16_t const *link_text,
+                                    char16_t const *target_path)
 /*[[[body:DOS$wsymlink]]]*/
 {
-	return libd_wsymlinkat(from, AT_FDCWD, to);
+	return libd_wsymlinkat(link_text, AT_FDCWD, target_path);
 }
 /*[[[end:DOS$wsymlink]]]*/
 

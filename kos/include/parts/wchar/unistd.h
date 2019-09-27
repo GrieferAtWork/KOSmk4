@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe31355d8 */
+/* HASH CRC-32:0x19f4596e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -195,9 +195,9 @@ __CDECLARE(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,wlinkat,(__fd_t __fromfd, wc
 #endif /* wlinkat... */
 #if defined(__CRT_HAVE_wsymlinkat)
 /* >> wsymlinkat(3)
- * Create a new symbolic link loaded with `FROM' as link
- * text, at the filesystem location referred to by `TOFD:TO' */
-__CDECLARE(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,wsymlinkat,(wchar_t const *__from, __fd_t __tofd, wchar_t const *__to),(__from,__tofd,__to))
+ * Create a new symbolic link loaded with `LINK_TEXT' as link
+ * text, at the filesystem location referred to by `TOFD:TARGET_PATH' */
+__CDECLARE(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,wsymlinkat,(wchar_t const *__link_text, __fd_t __tofd, wchar_t const *__target_path),(__link_text,__tofd,__target_path))
 #endif /* wsymlinkat... */
 #if defined(__CRT_HAVE_wreadlinkat)
 /* >> wreadlinkat(2)
@@ -280,17 +280,17 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wtruncate64, __FORCELOCAL __ATTR_NONNULL((1)) in
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
 #if defined(__CRT_HAVE_wsymlink)
 /* >> wsymlink(3)
- * Create a new symbolic link loaded with `FROM' as link
- * text, at the filesystem location referred to by `TO'.
- * Same as `wsymlinkat(FROM, AT_FDCWD, TO)' */
-__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,wsymlink,(wchar_t const *__from, wchar_t const *__to),(__from,__to))
+ * Create a new symbolic link loaded with `LINK_TEXT' as link
+ * text, at the filesystem location referred to by `TARGET_PATH'.
+ * Same as `wsymlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)' */
+__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,wsymlink,(wchar_t const *__link_text, wchar_t const *__target_path),(__link_text,__target_path))
 #elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wsymlinkat)
 #include <local/parts.wchar.unistd/wsymlink.h>
 /* >> wsymlink(3)
- * Create a new symbolic link loaded with `FROM' as link
- * text, at the filesystem location referred to by `TO'.
- * Same as `wsymlinkat(FROM, AT_FDCWD, TO)' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(wsymlink, __FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL wsymlink)(wchar_t const *__from, wchar_t const *__to) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wsymlink))(__from, __to); })
+ * Create a new symbolic link loaded with `LINK_TEXT' as link
+ * text, at the filesystem location referred to by `TARGET_PATH'.
+ * Same as `wsymlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(wsymlink, __FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL wsymlink)(wchar_t const *__link_text, wchar_t const *__target_path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wsymlink))(__link_text, __target_path); })
 #endif /* wsymlink... */
 #if defined(__CRT_HAVE_wreadlink)
 /* >> wreadlink(3)

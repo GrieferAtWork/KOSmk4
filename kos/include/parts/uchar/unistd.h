@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc3572ec9 */
+/* HASH CRC-32:0x95b5b0ec */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -439,20 +439,20 @@ __CREDIRECT(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,c32linkat,(__fd_t __fromfd,
 #endif /* c32linkat... */
 #if defined(__CRT_HAVE_wsymlinkat) && (__SIZEOF_WCHAR_T__ == 2)
 /* >> c16symlinkat(3)
- * Create a new symbolic link loaded with `FROM' as link
- * text, at the filesystem location referred to by `TOFD:TO' */
-__CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,c16symlinkat,(char16_t const *__from, __fd_t __tofd, char16_t const *__to),wsymlinkat,(__from,__tofd,__to))
+ * Create a new symbolic link loaded with `LINK_TEXT' as link
+ * text, at the filesystem location referred to by `TOFD:TARGET_PATH' */
+__CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,c16symlinkat,(char16_t const *__link_text, __fd_t __tofd, char16_t const *__target_path),wsymlinkat,(__link_text,__tofd,__target_path))
 #elif defined(__CRT_HAVE_DOS$wsymlinkat)
 /* >> c16symlinkat(3)
- * Create a new symbolic link loaded with `FROM' as link
- * text, at the filesystem location referred to by `TOFD:TO' */
-__CREDIRECT_DOS(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,c16symlinkat,(char16_t const *__from, __fd_t __tofd, char16_t const *__to),wsymlinkat,(__from,__tofd,__to))
+ * Create a new symbolic link loaded with `LINK_TEXT' as link
+ * text, at the filesystem location referred to by `TOFD:TARGET_PATH' */
+__CREDIRECT_DOS(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,c16symlinkat,(char16_t const *__link_text, __fd_t __tofd, char16_t const *__target_path),wsymlinkat,(__link_text,__tofd,__target_path))
 #endif /* c16symlinkat... */
 #if defined(__CRT_HAVE_wsymlinkat) && (__SIZEOF_WCHAR_T__ == 4)
 /* >> c32symlinkat(3)
- * Create a new symbolic link loaded with `FROM' as link
- * text, at the filesystem location referred to by `TOFD:TO' */
-__CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,c32symlinkat,(char32_t const *__from, __fd_t __tofd, char32_t const *__to),wsymlinkat,(__from,__tofd,__to))
+ * Create a new symbolic link loaded with `LINK_TEXT' as link
+ * text, at the filesystem location referred to by `TOFD:TARGET_PATH' */
+__CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,c32symlinkat,(char32_t const *__link_text, __fd_t __tofd, char32_t const *__target_path),wsymlinkat,(__link_text,__tofd,__target_path))
 #endif /* c32symlinkat... */
 #if defined(__CRT_HAVE_wreadlinkat) && (__SIZEOF_WCHAR_T__ == 2)
 /* >> c16readlinkat(2)
@@ -681,54 +681,54 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32truncate64, __FORCELOCAL __ATTR_NONNULL((1)) 
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
 #if defined(__CRT_HAVE_wsymlink) && (__SIZEOF_WCHAR_T__ == 2)
 /* >> c16symlink(3)
- * Create a new symbolic link loaded with `FROM' as link
- * text, at the filesystem location referred to by `TO'.
- * Same as `c16symlinkat(FROM, AT_FDCWD, TO)' */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,c16symlink,(char16_t const *__from, char16_t const *__to),wsymlink,(__from,__to))
+ * Create a new symbolic link loaded with `LINK_TEXT' as link
+ * text, at the filesystem location referred to by `TARGET_PATH'.
+ * Same as `c16symlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)' */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,c16symlink,(char16_t const *__link_text, char16_t const *__target_path),wsymlink,(__link_text,__target_path))
 #elif defined(__CRT_HAVE_DOS$wsymlink)
 /* >> c16symlink(3)
- * Create a new symbolic link loaded with `FROM' as link
- * text, at the filesystem location referred to by `TO'.
- * Same as `c16symlinkat(FROM, AT_FDCWD, TO)' */
-__CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,c16symlink,(char16_t const *__from, char16_t const *__to),wsymlink,(__from,__to))
+ * Create a new symbolic link loaded with `LINK_TEXT' as link
+ * text, at the filesystem location referred to by `TARGET_PATH'.
+ * Same as `c16symlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)' */
+__CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,c16symlink,(char16_t const *__link_text, char16_t const *__target_path),wsymlink,(__link_text,__target_path))
 #elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wsymlinkat)
 #if __SIZEOF_WCHAR_T__ == 2
 #include <local/parts.wchar.unistd/wsymlink.h>
 /* >> c16symlink(3)
- * Create a new symbolic link loaded with `FROM' as link
- * text, at the filesystem location referred to by `TO'.
- * Same as `c16symlinkat(FROM, AT_FDCWD, TO)' */
-__FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL c16symlink)(char16_t const *__from, char16_t const *__to) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wsymlink))((__WCHAR_TYPE__ const *)__from, (__WCHAR_TYPE__ const *)__to); }
+ * Create a new symbolic link loaded with `LINK_TEXT' as link
+ * text, at the filesystem location referred to by `TARGET_PATH'.
+ * Same as `c16symlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)' */
+__FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL c16symlink)(char16_t const *__link_text, char16_t const *__target_path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wsymlink))((__WCHAR_TYPE__ const *)__link_text, (__WCHAR_TYPE__ const *)__target_path); }
 #else /* LIBC: c16symlink */
 #include <local/parts.wchar.unistd/c16symlink.h>
 /* >> c16symlink(3)
- * Create a new symbolic link loaded with `FROM' as link
- * text, at the filesystem location referred to by `TO'.
- * Same as `c16symlinkat(FROM, AT_FDCWD, TO)' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(c16symlink, __FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL c16symlink)(char16_t const *__from, char16_t const *__to) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16symlink))(__from, __to); })
+ * Create a new symbolic link loaded with `LINK_TEXT' as link
+ * text, at the filesystem location referred to by `TARGET_PATH'.
+ * Same as `c16symlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(c16symlink, __FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL c16symlink)(char16_t const *__link_text, char16_t const *__target_path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16symlink))(__link_text, __target_path); })
 #endif /* LIBC: c16symlink */
 #endif /* c16symlink... */
 #if defined(__CRT_HAVE_wsymlink) && (__SIZEOF_WCHAR_T__ == 4)
 /* >> c32symlink(3)
- * Create a new symbolic link loaded with `FROM' as link
- * text, at the filesystem location referred to by `TO'.
- * Same as `c32symlinkat(FROM, AT_FDCWD, TO)' */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,c32symlink,(char32_t const *__from, char32_t const *__to),wsymlink,(__from,__to))
+ * Create a new symbolic link loaded with `LINK_TEXT' as link
+ * text, at the filesystem location referred to by `TARGET_PATH'.
+ * Same as `c32symlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)' */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,c32symlink,(char32_t const *__link_text, char32_t const *__target_path),wsymlink,(__link_text,__target_path))
 #elif defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wsymlinkat)
 #if __SIZEOF_WCHAR_T__ == 4
 #include <local/parts.wchar.unistd/wsymlink.h>
 /* >> c32symlink(3)
- * Create a new symbolic link loaded with `FROM' as link
- * text, at the filesystem location referred to by `TO'.
- * Same as `c32symlinkat(FROM, AT_FDCWD, TO)' */
-__FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL c32symlink)(char32_t const *__from, char32_t const *__to) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wsymlink))((__WCHAR_TYPE__ const *)__from, (__WCHAR_TYPE__ const *)__to); }
+ * Create a new symbolic link loaded with `LINK_TEXT' as link
+ * text, at the filesystem location referred to by `TARGET_PATH'.
+ * Same as `c32symlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)' */
+__FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL c32symlink)(char32_t const *__link_text, char32_t const *__target_path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wsymlink))((__WCHAR_TYPE__ const *)__link_text, (__WCHAR_TYPE__ const *)__target_path); }
 #else /* LIBC: c32symlink */
 #include <local/parts.wchar.unistd/c32symlink.h>
 /* >> c32symlink(3)
- * Create a new symbolic link loaded with `FROM' as link
- * text, at the filesystem location referred to by `TO'.
- * Same as `c32symlinkat(FROM, AT_FDCWD, TO)' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(c32symlink, __FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL c32symlink)(char32_t const *__from, char32_t const *__to) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32symlink))(__from, __to); })
+ * Create a new symbolic link loaded with `LINK_TEXT' as link
+ * text, at the filesystem location referred to by `TARGET_PATH'.
+ * Same as `c32symlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(c32symlink, __FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL c32symlink)(char32_t const *__link_text, char32_t const *__target_path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32symlink))(__link_text, __target_path); })
 #endif /* LIBC: c32symlink */
 #endif /* c32symlink... */
 #if defined(__CRT_HAVE_wreadlink) && (__SIZEOF_WCHAR_T__ == 2)

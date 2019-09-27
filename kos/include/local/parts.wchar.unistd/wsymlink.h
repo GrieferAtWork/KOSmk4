@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x260fda52 */
+/* HASH CRC-32:0xa1d2ad1f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,9 +25,9 @@
 #define ____localdep_wsymlinkat_defined 1
 #if defined(__CRT_HAVE_wsymlinkat)
 /* >> wsymlinkat(3)
- * Create a new symbolic link loaded with `FROM' as link
- * text, at the filesystem location referred to by `TOFD:TO' */
-__CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,__localdep_wsymlinkat,(__WCHAR_TYPE__ const *__from, __fd_t __tofd, __WCHAR_TYPE__ const *__to),wsymlinkat,(__from,__tofd,__to))
+ * Create a new symbolic link loaded with `LINK_TEXT' as link
+ * text, at the filesystem location referred to by `TOFD:TARGET_PATH' */
+__CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,__localdep_wsymlinkat,(__WCHAR_TYPE__ const *__link_text, __fd_t __tofd, __WCHAR_TYPE__ const *__target_path),wsymlinkat,(__link_text,__tofd,__target_path))
 #else /* LIBC: wsymlinkat */
 #undef ____localdep_wsymlinkat_defined
 #endif /* wsymlinkat... */
@@ -35,15 +35,15 @@ __CREDIRECT(__ATTR_NONNULL((1, 3)),int,__NOTHROW_RPC,__localdep_wsymlinkat,(__WC
 
 __NAMESPACE_LOCAL_BEGIN
 /* >> wsymlink(3)
- * Create a new symbolic link loaded with `FROM' as link
- * text, at the filesystem location referred to by `TO'.
- * Same as `wsymlinkat(FROM, AT_FDCWD, TO)' */
+ * Create a new symbolic link loaded with `LINK_TEXT' as link
+ * text, at the filesystem location referred to by `TARGET_PATH'.
+ * Same as `wsymlinkat(LINK_TEXT, AT_FDCWD, TARGET_PATH)' */
 __LOCAL_LIBC(wsymlink) __ATTR_NONNULL((1, 2)) int
-__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wsymlink))(__WCHAR_TYPE__ const *__from,
-                                                      __WCHAR_TYPE__ const *__to) {
+__NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wsymlink))(__WCHAR_TYPE__ const *__link_text,
+                                                      __WCHAR_TYPE__ const *__target_path) {
 #line 1421 "kos/src/libc/magic/unistd.c"
 	/* TODO: Header-implementation for `symlink()' on DOS (using the windows API) */
-	return __localdep_wsymlinkat(__from, __CRT_AT_FDCWD, __to);
+	return __localdep_wsymlinkat(__link_text, __CRT_AT_FDCWD, __target_path);
 }
 __NAMESPACE_LOCAL_END
 #endif /* defined(__CRT_AT_FDCWD) && defined(__CRT_HAVE_wsymlinkat) */
