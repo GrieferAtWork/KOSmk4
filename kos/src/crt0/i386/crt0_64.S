@@ -37,8 +37,8 @@ INTERN_FUNCTION(_start)
 END(_start)
 
 
-
-
-
-
+.section .bss.__dso_handle
+INTERN_OBJECT(__dso_handle)
+	.quad 0
+END(__dso_handle)
 

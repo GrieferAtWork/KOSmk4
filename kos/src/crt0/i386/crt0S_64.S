@@ -24,6 +24,3 @@ INTERN_OBJECT(__dso_handle)
 	.quad __dso_handle
 END(__dso_handle)
 
-
-
-

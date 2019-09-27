@@ -46,8 +46,3 @@ INTERN_OBJECT(__dso_handle)
 	.long 0
 END(__dso_handle)
 
-
-
-
-
-
