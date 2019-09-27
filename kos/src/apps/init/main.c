@@ -116,6 +116,15 @@ done_procfs:
 			close(console);
 	}
 
+	/* Construct the recommended symlinks for devfs
+	 * Don't do any error checking, since these missing
+	 * shouldn't hinder minimal operability of the system. */
+	symlink("/proc/self/fd", "/dev/fd");
+	symlink("/proc/self/fd/0", "/dev/stdin");
+	symlink("/proc/self/fd/1", "/dev/stdout");
+	symlink("/proc/self/fd/2", "/dev/stderr");
+
+
 	dprintf(STDOUT_FILENO,
 	        "\033[J" /* ED(0):    Clear screen */
 	        "\033[f" /* HVP(1,1): Place cursor at 0,0 */);
