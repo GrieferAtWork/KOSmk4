@@ -621,7 +621,7 @@ NOTHROW_RPC(LIBCCALL libc_ttyname_r)(fd_t fd,
 			continue;
 		if (d->d_ino != ino)
 			continue;
-#if 0 /* These are symlinks (DT_LNK), so we've already skipped then ;) */
+#if 0 /* These are symlinks (DT_LNK), so we've already skipped them ;) */
 		{
 			PRIVATE ATTR_SECTION(".rodata.crt.io.tty.str_stdin")  char const str_stdin[] = "stdin";
 			PRIVATE ATTR_SECTION(".rodata.crt.io.tty.str_stdout") char const str_stdout[] = "stdout";
