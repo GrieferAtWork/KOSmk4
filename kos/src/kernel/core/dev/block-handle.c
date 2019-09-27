@@ -23,6 +23,7 @@
 #include <kernel/compiler.h>
 
 #include <dev/block.h>
+#include <fs/node.h>
 #include <kernel/aio.h>
 #include <kernel/compat.h>
 #include <kernel/handle.h>
@@ -34,6 +35,7 @@
 #include <kos/hop.h>
 #include <kos/io.h>
 #include <sys/mount.h>
+#include <sys/stat.h>
 
 #include <string.h>
 
@@ -413,9 +415,21 @@ handle_blockdevice_sync(struct basic_block_device *__restrict self) {
 DEFINE_INTERN_ALIAS(handle_blockdevice_datasync,
                     handle_blockdevice_sync);
 
-INTERN void /* TODO */ KCALL
+INTERN void KCALL
 handle_blockdevice_stat(struct basic_block_device *__restrict self,
-                                USER CHECKED struct stat *result);
+                        USER CHECKED struct stat *result) {
+	struct inode *node;
+	memset(result, 0, sizeof(*result));
+	node = self->bd_devfs_inode;
+	if (node)
+		inode_stat(node, result);
+	result->st_mode = (result->st_mode & ~S_IFMT) | S_IFBLK;
+	result->st_dev      = (__dev_t)block_device_devno(self);
+	result->st_rdev     = (__dev_t)block_device_devno(self);
+	result->st_size64   = (__pos64_t)self->bd_total_bytes;
+	result->st_blksize  = (__blksize_t)self->bd_sector_size;
+	result->st_blocks64 = (__blkcnt64_t)self->bd_sector_count;
+}
 
 INTERN poll_mode_t KCALL
 handle_blockdevice_poll(struct basic_block_device *__restrict self, poll_mode_t what) {

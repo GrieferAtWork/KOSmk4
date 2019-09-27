@@ -717,13 +717,16 @@ handle_characterdevice_sync(struct character_device *__restrict self) {
 INTERN void KCALL
 handle_characterdevice_stat(struct character_device *__restrict self,
                             USER CHECKED struct stat *result) {
+	struct inode *node;
 	memset(result, 0, sizeof(*result));
-	result->st_mode = S_IFCHR;
+	node = self->cd_devfs_inode;
+	if (node)
+		inode_stat(node, result);
+	result->st_mode = (result->st_mode & ~S_IFMT) | S_IFCHR;
 	result->st_dev  = (__dev_t)character_device_devno(self);
 	result->st_rdev = (__dev_t)character_device_devno(self);
-	if unlikely(self->cd_type.ct_stat) {
+	if unlikely(self->cd_type.ct_stat)
 		(*self->cd_type.ct_stat)(self, result);
-	}
 }
 
 INTERN poll_mode_t KCALL
