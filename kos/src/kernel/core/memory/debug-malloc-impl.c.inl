@@ -35,16 +35,15 @@ DECL_BEGIN
 
 
 #ifdef MALLOC_NX
-#define TRACE_IN_CALLER_CONTEXT_OR_FREE_AND_FAIL(result_ptr, flags, nx_on_failure)         \
-	assert(!(flags & MALLNODE_FUSERNODE));                                                 \
-	if unlikely((result_ptr).hp_siz == 0) {                                                \
-		nx_on_failure                                                                      \
-	}                                                                                      \
-	if unlikely(!FUNC(mall_trace_impl)((result_ptr).hp_ptr, (result_ptr).hp_siz,           \
-	                                   (flags & (GFP_NOLEAK | GFP_NOWALK | GFP_INHERIT)) | \
-	                                   MALLNODE_FUSERNODE, context)) {                     \
-		heap_free_untraced(self, (result_ptr).hp_ptr, (result_ptr).hp_siz, flags);         \
-		nx_on_failure                                                                      \
+#define TRACE_IN_CALLER_CONTEXT_OR_FREE_AND_FAIL(result_ptr, flags, nx_on_failure)                \
+	assert(!(flags & MALLNODE_FUSERNODE));                                                        \
+	if unlikely((result_ptr).hp_siz == 0) {                                                       \
+		nx_on_failure                                                                             \
+	} else if unlikely(!FUNC(mall_trace_impl)((result_ptr).hp_ptr, (result_ptr).hp_siz,           \
+	                                          (flags & (GFP_NOLEAK | GFP_NOWALK | GFP_INHERIT)) | \
+	                                          MALLNODE_FUSERNODE, context)) {                     \
+		heap_free_untraced(self, (result_ptr).hp_ptr, (result_ptr).hp_siz, flags);                \
+		nx_on_failure                                                                             \
 	}
 #else /* MALLOC_NX */
 #define TRACE_IN_CALLER_CONTEXT_OR_FREE_AND_FAIL(result_ptr, flags, nx_on_failure)                              \
