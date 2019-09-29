@@ -327,10 +327,12 @@ at_segment_seperator:
 				}
 				segment_length = (u16)(segment_end - segment_start);
 				switch (segment_length) {
+
 				case 0:
 					if (!(mode & FS_MODE_FEMPTY_PATH))
 						THROW(E_FSERROR_ILLEGAL_PATH);
 					break;
+
 				case 2:
 					TRY {
 						if (segment_start[0] != '.')
@@ -347,6 +349,7 @@ at_segment_seperator:
 						next_path = cwd;
 					incref(next_path);
 					goto set_next_path;
+
 				case 1:
 					TRY {
 						if (segment_start[0] == '.')
@@ -448,6 +451,7 @@ done:
 	return cwd;
 #undef READCH
 }
+
 
 #ifdef TRAVERSE_N
 PUBLIC ATTR_RETNONNULL WUNUSED NONNULL((1)) REF struct path *KCALL

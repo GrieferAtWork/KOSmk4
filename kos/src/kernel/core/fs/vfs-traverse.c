@@ -373,8 +373,10 @@ at_segment_seperator:
 			}
 			segment_length = (u16)(segment_end - segment_start);
 			switch (segment_length) {
+
 			case 0:
 				break;
+
 			case 2:
 				if (segment_start[0] != '.')
 					goto generic_directory_child;
@@ -386,6 +388,7 @@ at_segment_seperator:
 					next_path = cwd;
 				incref(next_path);
 				goto set_next_path;
+
 			case 1:
 				if (segment_start[0] == '.')
 					break; /* Current directory reference. */
@@ -427,6 +430,6 @@ DECL_END
 #define TRAVERSE_N 1
 #include "vfs-traverse-impl.c.inl"
 #include "vfs-traverse-impl.c.inl"
-#endif
+#endif /* !__INTELLISENSE__ */
 
 #endif /* !GUARD_KERNEL_CORE_FS_VFS_TRAVERSE_C */
