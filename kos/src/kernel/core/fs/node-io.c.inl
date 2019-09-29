@@ -384,14 +384,19 @@ load_next_part:
 #else /* IO_ASYNC */
 	struct aio_multihandle_generic hand;
 	aio_multihandle_generic_init(&hand);
-	FUNC1(inode_a)(self,
-	               buf,
-	               num_bytes,
-	               file_position,
-	               &hand);
-	aio_multihandle_done(&hand);
-	/* Wait for AIO completion */
 	TRY {
+		TRY {
+			FUNC1(inode_a)(self,
+			               buf,
+			               num_bytes,
+			               file_position,
+			               &hand);
+		} EXCEPT {
+			aio_multihandle_fail(&hand);
+			RETHROW();
+		}
+		aio_multihandle_done(&hand);
+		/* Wait for AIO completion */
 		aio_multihandle_generic_waitfor(&hand);
 		aio_multihandle_generic_checkerror(&hand);
 	} EXCEPT {
@@ -406,9 +411,9 @@ load_next_part:
 #define FUNC1_READ(x) FUNC0(x##read)
 #ifdef IO_ASYNC
 #define FUNC2_READ(x) FUNC1_READ(x##a)
-#else
+#else /* IO_ASYNC */
 #define FUNC2_READ    FUNC1_READ
-#endif
+#endif /* !IO_ASYNC */
 
 
 #ifdef IO_PHYS
@@ -553,14 +558,14 @@ NOTHROW(KCALL FUNC2_READ(inode_))(struct inode *__restrict self,
 			file_position += temp;
 		}
 #ifdef IO_ASYNC
-		aio_multihandle_done(aio);
+		(void)aio;
 #endif /* IO_ASYNC */
 		return result;
 #elif defined(IO_PHYS)
 #ifdef IO_ASYNC
 		size_t result;
 		result = do_inode_flexread_phys(self, buf, num_bytes, file_position);
-		aio_multihandle_done(aio);
+		(void)aio;
 		return result;
 #else /* IO_ASYNC */
 		return do_inode_flexread_phys(self, buf, num_bytes, file_position);
@@ -569,7 +574,7 @@ NOTHROW(KCALL FUNC2_READ(inode_))(struct inode *__restrict self,
 #ifdef IO_ASYNC
 		size_t result;
 		result = (*self->i_type->it_file.f_flexread)(self, buf, num_bytes, file_position);
-		aio_multihandle_done(aio);
+		(void)aio;
 		return result;
 #else /* IO_ASYNC */
 		return (*self->i_type->it_file.f_flexread)(self, buf, num_bytes, file_position);
@@ -706,7 +711,7 @@ again_check_size:
 		              file_position
 #ifdef IO_ASYNC
 		              , aio
-#endif
+#endif /* IO_ASYNC */
 		              );
 	} EXCEPT {
 		if (rwlock_endread(&self->db_lock))

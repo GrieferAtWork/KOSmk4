@@ -146,9 +146,9 @@ struct inode_type {
 		 *    `BD_ASYNC_COMPLETED_SUCCESS', which can also be done at any
 		 *    point after this function has already returned normally.
 		 *    I.e.: It is done asynchronously!
-		 * WARNING: If this function intends to throw an error, _IT_ is responsible
-		 *          to invoke `completed' in order to indicate an error through that
-		 *          channel as well!
+		 * NOTE: Don't call `aio_multihandle_done(aio)' from within these callbacks!
+		 *       It is the responsibility of whoever declared the multihandle to indicate
+		 *       that all async operations to-be performed with it have been started!
 		 * @assume(self->i_flags & INODE_FATTRLOADED);
 		 * @assume(num_bytes != 0);
 		 * @assume(file_position + num_bytes <= self->i_filesize);
@@ -186,9 +186,9 @@ struct inode_type {
 
 		/* [0..1][locked(WRITE(self))] Write function.
 		 * Same as `f_read', but used for writing data instead.
-		 * WARNING: If this function intends to throw an error, _IT_ is responsible
-		 *          to invoke `completed' in order to indicate an error through
-		 *          that channel as well!
+		 * NOTE: Don't call `aio_multihandle_done(aio)' from within these callbacks!
+		 *       It is the responsibility of whoever declared the multihandle to indicate
+		 *       that all async operations to-be performed with it have been started!
 		 * @assume(self->i_flags & INODE_FATTRLOADED);
 		 * @assume(num_bytes != 0);
 		 * @assume(file_position + num_bytes <= self->i_filesize);

@@ -608,7 +608,6 @@ handle_characterdevice_aread(struct character_device *__restrict self,
                              struct aio_multihandle *__restrict aio) {
 	size_t result;
 	result = handle_characterdevice_read(self, dst, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
@@ -619,7 +618,6 @@ handle_characterdevice_awrite(struct character_device *__restrict self,
                               struct aio_multihandle *__restrict aio) {
 	size_t result;
 	result = handle_characterdevice_write(self, src, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
@@ -630,7 +628,6 @@ handle_characterdevice_areadv(struct character_device *__restrict self,
                               struct aio_multihandle *__restrict aio) {
 	size_t result;
 	result = handle_characterdevice_readv(self, dst, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
@@ -641,7 +638,6 @@ handle_characterdevice_awritev(struct character_device *__restrict self,
                                struct aio_multihandle *__restrict aio) {
 	size_t result;
 	result = handle_characterdevice_writev(self, src, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
@@ -652,7 +648,6 @@ handle_characterdevice_apread(struct character_device *__restrict self,
                               struct aio_multihandle *__restrict aio) {
 	size_t result;
 	result = handle_characterdevice_pread(self, dst, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
@@ -663,7 +658,6 @@ handle_characterdevice_apwrite(struct character_device *__restrict self,
                                struct aio_multihandle *__restrict aio) {
 	size_t result;
 	result = handle_characterdevice_pwrite(self, src, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
@@ -674,7 +668,6 @@ handle_characterdevice_apreadv(struct character_device *__restrict self,
                                struct aio_multihandle *__restrict aio) {
 	size_t result;
 	result = handle_characterdevice_preadv(self, dst, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 INTERN size_t KCALL
@@ -684,7 +677,6 @@ handle_characterdevice_apwritev(struct character_device *__restrict self,
                                 struct aio_multihandle *__restrict aio) {
 	size_t result;
 	result = handle_characterdevice_pwritev(self, src, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 

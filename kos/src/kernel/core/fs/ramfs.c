@@ -46,47 +46,43 @@ PRIVATE NONNULL((1, 5)) void KCALL
 ramfs_read(struct inode *__restrict UNUSED(self),
            USER CHECKED void *dst,
            size_t num_bytes, pos_t UNUSED(file_position),
-           struct aio_multihandle *__restrict aio)
+           struct aio_multihandle *__restrict UNUSED(aio))
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
 	/* Initialize data to all zeroes. (This function shouldn't actually be called) */
 	memset(dst, 0, num_bytes);
-	aio_multihandle_done(aio);
 }
 
 PRIVATE NONNULL((1, 5)) void KCALL
 ramfs_pread(struct inode *__restrict UNUSED(self),
             vm_phys_t dst,
             size_t num_bytes, pos_t UNUSED(file_position),
-            struct aio_multihandle *__restrict aio)
+            struct aio_multihandle *__restrict UNUSED(aio))
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
 	vm_memsetphys(dst, 0, num_bytes);
-	aio_multihandle_done(aio);
 }
 
 PRIVATE NONNULL((1, 2, 5)) void KCALL
 ramfs_readv(struct inode *__restrict UNUSED(self),
             struct aio_buffer *__restrict buf,
             size_t UNUSED(num_bytes), pos_t UNUSED(file_position),
-            struct aio_multihandle *__restrict aio)
+            struct aio_multihandle *__restrict UNUSED(aio))
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
 	struct aio_buffer_entry ent;
 	AIO_BUFFER_FOREACH(ent, buf) {
 		memset(ent.ab_base, 0, ent.ab_size);
 	}
-	aio_multihandle_done(aio);
 }
 
 PRIVATE NONNULL((1, 2, 5)) void KCALL
 ramfs_preadv(struct inode *__restrict UNUSED(self),
              struct aio_pbuffer *__restrict buf,
              size_t UNUSED(num_bytes), pos_t UNUSED(file_position),
-             struct aio_multihandle *__restrict aio)
+             struct aio_multihandle *__restrict UNUSED(aio))
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
 	struct aio_pbuffer_entry ent;
 	AIO_PBUFFER_FOREACH(ent, buf) {
 		vm_memsetphys(ent.ab_base, 0, ent.ab_size);
 	}
-	aio_multihandle_done(aio);
 }
 
 
@@ -94,36 +90,32 @@ PRIVATE NONNULL((1, 5)) void KCALL
 ramfs_write(struct inode *__restrict UNUSED(self),
              USER CHECKED void const *UNUSED(src),
              size_t UNUSED(num_bytes), pos_t UNUSED(file_position),
-             struct aio_multihandle *__restrict aio)
+             struct aio_multihandle *__restrict UNUSED(aio))
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
-	aio_multihandle_done(aio);
 }
 
 PRIVATE NONNULL((1, 5)) void KCALL
 ramfs_pwrite(struct inode *__restrict UNUSED(self),
              vm_phys_t UNUSED(src),
              size_t UNUSED(num_bytes), pos_t UNUSED(file_position),
-             struct aio_multihandle *__restrict aio)
+             struct aio_multihandle *__restrict UNUSED(aio))
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
-	aio_multihandle_done(aio);
 }
 
 PRIVATE NONNULL((1, 2, 5)) void KCALL
 ramfs_writev(struct inode *__restrict UNUSED(self),
              struct aio_buffer *__restrict UNUSED(buf),
              size_t UNUSED(num_bytes), pos_t UNUSED(file_position),
-             struct aio_multihandle *__restrict aio)
+             struct aio_multihandle *__restrict UNUSED(aio))
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
-	aio_multihandle_done(aio);
 }
 
 PRIVATE NONNULL((1, 2, 5)) void KCALL
 ramfs_pwritev(struct inode *__restrict UNUSED(self),
               struct aio_pbuffer *__restrict UNUSED(buf),
               size_t UNUSED(num_bytes), pos_t UNUSED(file_position),
-              struct aio_multihandle *__restrict aio)
+              struct aio_multihandle *__restrict UNUSED(aio))
 		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
-	aio_multihandle_done(aio);
 }
 
 PRIVATE NONNULL((1)) void KCALL

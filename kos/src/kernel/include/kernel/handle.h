@@ -74,6 +74,9 @@ struct handle_types {
 	size_t (KCALL *h_writev[HANDLE_TYPE_COUNT])(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode) THROWS(...);
 	size_t (KCALL *h_preadv[HANDLE_TYPE_COUNT])(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
 	size_t (KCALL *h_pwritev[HANDLE_TYPE_COUNT])(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode) THROWS(...);
+	/* NOTE: Don't call `aio_multihandle_done(aio)' from within these callbacks!
+	 *       It is the responsibility of whoever declared the multihandle to indicate
+	 *       that all async operations to-be performed with it have been started! */
 	size_t (KCALL *h_aread[HANDLE_TYPE_COUNT])(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) THROWS(...);
 	size_t (KCALL *h_awrite[HANDLE_TYPE_COUNT])(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) THROWS(...);
 	size_t (KCALL *h_apread[HANDLE_TYPE_COUNT])(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) THROWS(...);

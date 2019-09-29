@@ -560,67 +560,31 @@ handle_pipe_writer_hop(struct pipe_writer *__restrict self,
 }
 
 INTERN size_t KCALL
-handle_pipe_aread(struct pipe *__restrict self,
-                  USER CHECKED void *dst, size_t num_bytes,
-                  iomode_t mode, struct aio_multihandle *__restrict aio) {
-	size_t result = handle_pipe_read(self, dst, num_bytes, mode);
-	aio_multihandle_done(aio);
-	return result;
-}
-
-INTERN size_t KCALL
-handle_pipe_awrite(struct pipe *__restrict self,
-                   USER CHECKED void const *src, size_t num_bytes,
-                   iomode_t mode, struct aio_multihandle *__restrict aio) {
-	size_t result = handle_pipe_write(self, src, num_bytes, mode);
-	aio_multihandle_done(aio);
-	return result;
-}
-
-INTERN size_t KCALL
-handle_pipe_areadv(struct pipe *__restrict self,
-                   struct aio_buffer *__restrict dst, size_t num_bytes,
-                   iomode_t mode, struct aio_multihandle *__restrict aio) {
-	size_t result = handle_pipe_readv(self, dst, num_bytes, mode);
-	aio_multihandle_done(aio);
-	return result;
-}
-
-INTERN size_t KCALL
-handle_pipe_awritev(struct pipe *__restrict self,
-                    struct aio_buffer *__restrict src, size_t num_bytes,
-                    iomode_t mode, struct aio_multihandle *__restrict aio) {
-	size_t result = handle_pipe_writev(self, src, num_bytes, mode);
-	aio_multihandle_done(aio);
-	return result;
-}
-
-INTERN size_t KCALL
 handle_pipe_reader_aread(struct pipe_reader *__restrict self,
                          USER CHECKED void *dst, size_t num_bytes,
-                         iomode_t mode, struct aio_multihandle *__restrict aio) {
-	return handle_pipe_aread(self->pr_pipe, dst, num_bytes, mode, aio);
+                         iomode_t mode, struct aio_multihandle *__restrict UNUSED(aio)) {
+	return handle_pipe_read(self->pr_pipe, dst, num_bytes, mode);
 }
 
 INTERN size_t KCALL
 handle_pipe_reader_areadv(struct pipe_reader *__restrict self,
                           struct aio_buffer *__restrict dst, size_t num_bytes,
-                          iomode_t mode, struct aio_multihandle *__restrict aio) {
-	return handle_pipe_areadv(self->pr_pipe, dst, num_bytes, mode, aio);
+                          iomode_t mode, struct aio_multihandle *__restrict UNUSED(aio)) {
+	return handle_pipe_readv(self->pr_pipe, dst, num_bytes, mode);
 }
 
 INTERN size_t KCALL
 handle_pipe_writer_awrite(struct pipe_writer *__restrict self,
                           USER CHECKED void const *src, size_t num_bytes,
-                          iomode_t mode, struct aio_multihandle *__restrict aio) {
-	return handle_pipe_awrite(self->pw_pipe, src, num_bytes, mode, aio);
+                          iomode_t mode, struct aio_multihandle *__restrict UNUSED(aio)) {
+	return handle_pipe_write(self->pw_pipe, src, num_bytes, mode);
 }
 
 INTERN size_t KCALL
 handle_pipe_writer_awritev(struct pipe_writer *__restrict self,
                            struct aio_buffer *__restrict src, size_t num_bytes,
-                           iomode_t mode, struct aio_multihandle *__restrict aio) {
-	return handle_pipe_awritev(self->pw_pipe, src, num_bytes, mode, aio);
+                           iomode_t mode, struct aio_multihandle *__restrict UNUSED(aio)) {
+	return handle_pipe_writev(self->pw_pipe, src, num_bytes, mode);
 }
 
 #if 0

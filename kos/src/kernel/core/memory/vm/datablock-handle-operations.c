@@ -106,7 +106,6 @@ handle_datablock_apread(struct vm_datablock *__restrict self,
 		return inode_aread((struct inode *)self, dst, num_bytes, addr, aio);
 	}
 	vm_datablock_read(self, dst, num_bytes, addr);
-	aio_multihandle_done(aio);
 	return num_bytes;
 }
 
@@ -121,7 +120,6 @@ handle_datablock_apwrite(struct vm_datablock *__restrict self,
 		return num_bytes;
 	}
 	vm_datablock_write(self, src, num_bytes, addr);
-	aio_multihandle_done(aio);
 	return num_bytes;
 }
 
@@ -134,7 +132,6 @@ handle_datablock_apreadv(struct vm_datablock *__restrict self,
 		return inode_areadv((struct inode *)self, dst, num_bytes, addr, aio);
 	}
 	vm_datablock_readv(self, dst, num_bytes, addr);
-	aio_multihandle_done(aio);
 	return num_bytes;
 }
 
@@ -148,7 +145,6 @@ handle_datablock_apwritev(struct vm_datablock *__restrict self,
 		return num_bytes;
 	}
 	vm_datablock_writev(self, src, num_bytes, addr);
-	aio_multihandle_done(aio);
 	return num_bytes;
 }
 

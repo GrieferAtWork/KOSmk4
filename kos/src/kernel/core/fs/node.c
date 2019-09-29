@@ -211,6 +211,19 @@ NOTHROW(KCALL directory_entry_destroy)(struct directory_entry *__restrict self) 
 	heap_free(FS_HEAP, self, self->de_heapsize, FS_GFP);
 }
 
+/* Allocate a new directory entry.
+ * The caller must still initialize:
+ *   - de_next
+ *   - de_bypos
+ *   - de_fsdata (as needed)
+ *   - de_pos
+ *   - de_ino
+ *   - de_hash   (`directory_entry_alloc' only)
+ *   - de_type
+ *   - de_name   (`directory_entry_alloc' only)
+ * NOTE: These functions will have already ensured that
+ *       `return->de_name[namelen] == '\0''
+ */
 PUBLIC ATTR_MALLOC ATTR_RETNONNULL WUNUSED REF struct directory_entry *KCALL
 directory_entry_alloc(u16 namelen) THROWS(E_BADALLOC) {
 	struct heapptr resptr;

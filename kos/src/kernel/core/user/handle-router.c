@@ -125,57 +125,57 @@ local default_impls = {
 	"aread" :
 		"{{\n"
 		"	size_t result;\n"
+		"	(void)aio;\n"
 		"	result = handle_{name}_read(ptr, dst, num_bytes, mode);\n"
-		"	aio_multihandle_done(aio);\n"
 		"	return result;\n"
 		"}}",
 	"awrite" :
 		"{{\n"
 		"	size_t result;\n"
+		"	(void)aio;\n"
 		"	result = handle_{name}_write(ptr, src, num_bytes, mode);\n"
-		"	aio_multihandle_done(aio);\n"
 		"	return result;\n"
 		"}}",
 	"apread" :
 		"{{\n"
 		"	size_t result;\n"
+		"	(void)aio;\n"
 		"	result = handle_{name}_pread(ptr, dst, num_bytes, addr, mode);\n"
-		"	aio_multihandle_done(aio);\n"
 		"	return result;\n"
 		"}}",
 	"apwrite" :
 		"{{\n"
 		"	size_t result;\n"
+		"	(void)aio;\n"
 		"	result = handle_{name}_pwrite(ptr, src, num_bytes, addr, mode);\n"
-		"	aio_multihandle_done(aio);\n"
 		"	return result;\n"
 		"}}",
 	"areadv" :
 		"{{\n"
 		"	size_t result;\n"
+		"	(void)aio;\n"
 		"	result = handle_{name}_readv(ptr, dst, num_bytes, mode);\n"
-		"	aio_multihandle_done(aio);\n"
 		"	return result;\n"
 		"}}",
 	"awritev" :
 		"{{\n"
 		"	size_t result;\n"
+		"	(void)aio;\n"
 		"	result = handle_{name}_writev(ptr, src, num_bytes, mode);\n"
-		"	aio_multihandle_done(aio);\n"
 		"	return result;\n"
 		"}}",
 	"apreadv" :
 		"{{\n"
 		"	size_t result;\n"
+		"	(void)aio;\n"
 		"	result = handle_{name}_preadv(ptr, dst, num_bytes, addr, mode);\n"
-		"	aio_multihandle_done(aio);\n"
 		"	return result;\n"
 		"}}",
 	"apwritev" :
 		"{{\n"
 		"	size_t result;\n"
+		"	(void)aio;\n"
 		"	result = handle_{name}_pwritev(ptr, src, num_bytes, addr, mode);\n"
-		"	aio_multihandle_done(aio);\n"
 		"	return result;\n"
 		"}}",
 };
@@ -2167,64 +2167,64 @@ handle_datablock_pwritev(void *__restrict ptr, struct aio_buffer *__restrict src
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.datablock.aread") size_t KCALL
 handle_datablock_aread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_datablock_read(ptr, dst, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.datablock.awrite") size_t KCALL
 handle_datablock_awrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_datablock_write(ptr, src, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.datablock.apread") size_t KCALL
 handle_datablock_apread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_datablock_pread(ptr, dst, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.datablock.apwrite") size_t KCALL
 handle_datablock_apwrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_datablock_pwrite(ptr, src, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.datablock.areadv") size_t KCALL
 handle_datablock_areadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_datablock_readv(ptr, dst, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.datablock.awritev") size_t KCALL
 handle_datablock_awritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_datablock_writev(ptr, src, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.datablock.apreadv") size_t KCALL
 handle_datablock_apreadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_datablock_preadv(ptr, dst, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.datablock.apwritev") size_t KCALL
 handle_datablock_apwritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_datablock_pwritev(ptr, src, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
@@ -2293,64 +2293,64 @@ handle_blockdevice_pwritev(void *__restrict ptr, struct aio_buffer *__restrict s
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.blockdevice.aread") size_t KCALL
 handle_blockdevice_aread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_blockdevice_read(ptr, dst, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.blockdevice.awrite") size_t KCALL
 handle_blockdevice_awrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_blockdevice_write(ptr, src, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.blockdevice.apread") size_t KCALL
 handle_blockdevice_apread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_blockdevice_pread(ptr, dst, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.blockdevice.apwrite") size_t KCALL
 handle_blockdevice_apwrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_blockdevice_pwrite(ptr, src, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.blockdevice.areadv") size_t KCALL
 handle_blockdevice_areadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_blockdevice_readv(ptr, dst, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.blockdevice.awritev") size_t KCALL
 handle_blockdevice_awritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_blockdevice_writev(ptr, src, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.blockdevice.apreadv") size_t KCALL
 handle_blockdevice_apreadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_blockdevice_preadv(ptr, dst, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.blockdevice.apwritev") size_t KCALL
 handle_blockdevice_apwritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_blockdevice_pwritev(ptr, src, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
@@ -2419,64 +2419,64 @@ handle_directoryentry_pwritev(void *__restrict ptr, struct aio_buffer *__restric
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.directoryentry.aread") size_t KCALL
 handle_directoryentry_aread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_directoryentry_read(ptr, dst, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.directoryentry.awrite") size_t KCALL
 handle_directoryentry_awrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_directoryentry_write(ptr, src, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.directoryentry.apread") size_t KCALL
 handle_directoryentry_apread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_directoryentry_pread(ptr, dst, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.directoryentry.apwrite") size_t KCALL
 handle_directoryentry_apwrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_directoryentry_pwrite(ptr, src, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.directoryentry.areadv") size_t KCALL
 handle_directoryentry_areadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_directoryentry_readv(ptr, dst, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.directoryentry.awritev") size_t KCALL
 handle_directoryentry_awritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_directoryentry_writev(ptr, src, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.directoryentry.apreadv") size_t KCALL
 handle_directoryentry_apreadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_directoryentry_preadv(ptr, dst, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.directoryentry.apwritev") size_t KCALL
 handle_directoryentry_apwritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_directoryentry_pwritev(ptr, src, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
@@ -2545,64 +2545,64 @@ handle_file_pwritev(void *__restrict ptr, struct aio_buffer *__restrict src, siz
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.file.aread") size_t KCALL
 handle_file_aread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_file_read(ptr, dst, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.file.awrite") size_t KCALL
 handle_file_awrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_file_write(ptr, src, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.file.apread") size_t KCALL
 handle_file_apread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_file_pread(ptr, dst, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.file.apwrite") size_t KCALL
 handle_file_apwrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_file_pwrite(ptr, src, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.file.areadv") size_t KCALL
 handle_file_areadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_file_readv(ptr, dst, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.file.awritev") size_t KCALL
 handle_file_awritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_file_writev(ptr, src, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.file.apreadv") size_t KCALL
 handle_file_apreadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_file_preadv(ptr, dst, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.file.apwritev") size_t KCALL
 handle_file_apwritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_file_pwritev(ptr, src, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
@@ -2671,64 +2671,64 @@ handle_oneshot_directory_file_pwritev(void *__restrict ptr, struct aio_buffer *_
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.oneshot_directory_file.aread") size_t KCALL
 handle_oneshot_directory_file_aread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_oneshot_directory_file_read(ptr, dst, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.oneshot_directory_file.awrite") size_t KCALL
 handle_oneshot_directory_file_awrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_oneshot_directory_file_write(ptr, src, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.oneshot_directory_file.apread") size_t KCALL
 handle_oneshot_directory_file_apread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_oneshot_directory_file_pread(ptr, dst, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.oneshot_directory_file.apwrite") size_t KCALL
 handle_oneshot_directory_file_apwrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_oneshot_directory_file_pwrite(ptr, src, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.oneshot_directory_file.areadv") size_t KCALL
 handle_oneshot_directory_file_areadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_oneshot_directory_file_readv(ptr, dst, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.oneshot_directory_file.awritev") size_t KCALL
 handle_oneshot_directory_file_awritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_oneshot_directory_file_writev(ptr, src, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.oneshot_directory_file.apreadv") size_t KCALL
 handle_oneshot_directory_file_apreadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_oneshot_directory_file_preadv(ptr, dst, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.oneshot_directory_file.apwritev") size_t KCALL
 handle_oneshot_directory_file_apwritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_oneshot_directory_file_pwritev(ptr, src, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
@@ -2797,64 +2797,64 @@ handle_path_pwritev(void *__restrict ptr, struct aio_buffer *__restrict src, siz
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.path.aread") size_t KCALL
 handle_path_aread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_path_read(ptr, dst, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.path.awrite") size_t KCALL
 handle_path_awrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_path_write(ptr, src, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.path.apread") size_t KCALL
 handle_path_apread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_path_pread(ptr, dst, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.path.apwrite") size_t KCALL
 handle_path_apwrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_path_pwrite(ptr, src, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.path.areadv") size_t KCALL
 handle_path_areadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_path_readv(ptr, dst, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.path.awritev") size_t KCALL
 handle_path_awritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_path_writev(ptr, src, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.path.apreadv") size_t KCALL
 handle_path_apreadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_path_preadv(ptr, dst, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.path.apwritev") size_t KCALL
 handle_path_apwritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_path_pwritev(ptr, src, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
@@ -2923,64 +2923,64 @@ handle_fs_pwritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.fs.aread") size_t KCALL
 handle_fs_aread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_fs_read(ptr, dst, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.fs.awrite") size_t KCALL
 handle_fs_awrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_fs_write(ptr, src, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.fs.apread") size_t KCALL
 handle_fs_apread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_fs_pread(ptr, dst, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.fs.apwrite") size_t KCALL
 handle_fs_apwrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_fs_pwrite(ptr, src, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.fs.areadv") size_t KCALL
 handle_fs_areadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_fs_readv(ptr, dst, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.fs.awritev") size_t KCALL
 handle_fs_awritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_fs_writev(ptr, src, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.fs.apreadv") size_t KCALL
 handle_fs_apreadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_fs_preadv(ptr, dst, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.fs.apwritev") size_t KCALL
 handle_fs_apwritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_fs_pwritev(ptr, src, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
@@ -3049,64 +3049,64 @@ handle_vm_pwritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.vm.aread") size_t KCALL
 handle_vm_aread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_vm_read(ptr, dst, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.vm.awrite") size_t KCALL
 handle_vm_awrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_vm_write(ptr, src, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.vm.apread") size_t KCALL
 handle_vm_apread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_vm_pread(ptr, dst, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.vm.apwrite") size_t KCALL
 handle_vm_apwrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_vm_pwrite(ptr, src, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.vm.areadv") size_t KCALL
 handle_vm_areadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_vm_readv(ptr, dst, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.vm.awritev") size_t KCALL
 handle_vm_awritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_vm_writev(ptr, src, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.vm.apreadv") size_t KCALL
 handle_vm_apreadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_vm_preadv(ptr, dst, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.vm.apwritev") size_t KCALL
 handle_vm_apwritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_vm_pwritev(ptr, src, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
@@ -3175,64 +3175,64 @@ handle_task_pwritev(void *__restrict ptr, struct aio_buffer *__restrict src, siz
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.task.aread") size_t KCALL
 handle_task_aread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_task_read(ptr, dst, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.task.awrite") size_t KCALL
 handle_task_awrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_task_write(ptr, src, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.task.apread") size_t KCALL
 handle_task_apread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_task_pread(ptr, dst, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.task.apwrite") size_t KCALL
 handle_task_apwrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_task_pwrite(ptr, src, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.task.areadv") size_t KCALL
 handle_task_areadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_task_readv(ptr, dst, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.task.awritev") size_t KCALL
 handle_task_awritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_task_writev(ptr, src, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.task.apreadv") size_t KCALL
 handle_task_apreadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_task_preadv(ptr, dst, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.task.apwritev") size_t KCALL
 handle_task_apwritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_task_pwritev(ptr, src, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
@@ -3301,64 +3301,64 @@ handle_clock_pwritev(void *__restrict ptr, struct aio_buffer *__restrict src, si
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.clock.aread") size_t KCALL
 handle_clock_aread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_clock_read(ptr, dst, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.clock.awrite") size_t KCALL
 handle_clock_awrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_clock_write(ptr, src, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.clock.apread") size_t KCALL
 handle_clock_apread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_clock_pread(ptr, dst, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.clock.apwrite") size_t KCALL
 handle_clock_apwrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_clock_pwrite(ptr, src, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.clock.areadv") size_t KCALL
 handle_clock_areadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_clock_readv(ptr, dst, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.clock.awritev") size_t KCALL
 handle_clock_awritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_clock_writev(ptr, src, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.clock.apreadv") size_t KCALL
 handle_clock_apreadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_clock_preadv(ptr, dst, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.clock.apwritev") size_t KCALL
 handle_clock_apwritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_clock_pwritev(ptr, src, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
@@ -3427,64 +3427,64 @@ handle_driver_pwritev(void *__restrict ptr, struct aio_buffer *__restrict src, s
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.driver.aread") size_t KCALL
 handle_driver_aread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_driver_read(ptr, dst, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.driver.awrite") size_t KCALL
 handle_driver_awrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_driver_write(ptr, src, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.driver.apread") size_t KCALL
 handle_driver_apread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_driver_pread(ptr, dst, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.driver.apwrite") size_t KCALL
 handle_driver_apwrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_driver_pwrite(ptr, src, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.driver.areadv") size_t KCALL
 handle_driver_areadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_driver_readv(ptr, dst, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.driver.awritev") size_t KCALL
 handle_driver_awritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_driver_writev(ptr, src, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.driver.apreadv") size_t KCALL
 handle_driver_apreadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_driver_preadv(ptr, dst, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.driver.apwritev") size_t KCALL
 handle_driver_apwritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_driver_pwritev(ptr, src, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
@@ -3553,64 +3553,64 @@ handle_pipe_pwritev(void *__restrict ptr, struct aio_buffer *__restrict src, siz
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.pipe.aread") size_t KCALL
 handle_pipe_aread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_pipe_read(ptr, dst, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.pipe.awrite") size_t KCALL
 handle_pipe_awrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_pipe_write(ptr, src, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.pipe.apread") size_t KCALL
 handle_pipe_apread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_pipe_pread(ptr, dst, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.pipe.apwrite") size_t KCALL
 handle_pipe_apwrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_pipe_pwrite(ptr, src, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.pipe.areadv") size_t KCALL
 handle_pipe_areadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_pipe_readv(ptr, dst, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.pipe.awritev") size_t KCALL
 handle_pipe_awritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_pipe_writev(ptr, src, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.pipe.apreadv") size_t KCALL
 handle_pipe_apreadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_pipe_preadv(ptr, dst, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.pipe.apwritev") size_t KCALL
 handle_pipe_apwritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_pipe_pwritev(ptr, src, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
@@ -3679,64 +3679,64 @@ handle_pipe_reader_pwritev(void *__restrict ptr, struct aio_buffer *__restrict s
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.pipe_reader.aread") size_t KCALL
 handle_pipe_reader_aread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_pipe_reader_read(ptr, dst, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.pipe_reader.awrite") size_t KCALL
 handle_pipe_reader_awrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_pipe_reader_write(ptr, src, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.pipe_reader.apread") size_t KCALL
 handle_pipe_reader_apread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_pipe_reader_pread(ptr, dst, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.pipe_reader.apwrite") size_t KCALL
 handle_pipe_reader_apwrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_pipe_reader_pwrite(ptr, src, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.pipe_reader.areadv") size_t KCALL
 handle_pipe_reader_areadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_pipe_reader_readv(ptr, dst, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.pipe_reader.awritev") size_t KCALL
 handle_pipe_reader_awritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_pipe_reader_writev(ptr, src, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.pipe_reader.apreadv") size_t KCALL
 handle_pipe_reader_apreadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_pipe_reader_preadv(ptr, dst, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.pipe_reader.apwritev") size_t KCALL
 handle_pipe_reader_apwritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_pipe_reader_pwritev(ptr, src, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
@@ -3805,64 +3805,64 @@ handle_pipe_writer_pwritev(void *__restrict ptr, struct aio_buffer *__restrict s
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.pipe_writer.aread") size_t KCALL
 handle_pipe_writer_aread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_pipe_writer_read(ptr, dst, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.pipe_writer.awrite") size_t KCALL
 handle_pipe_writer_awrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_pipe_writer_write(ptr, src, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.pipe_writer.apread") size_t KCALL
 handle_pipe_writer_apread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_pipe_writer_pread(ptr, dst, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.pipe_writer.apwrite") size_t KCALL
 handle_pipe_writer_apwrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_pipe_writer_pwrite(ptr, src, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.pipe_writer.areadv") size_t KCALL
 handle_pipe_writer_areadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_pipe_writer_readv(ptr, dst, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.pipe_writer.awritev") size_t KCALL
 handle_pipe_writer_awritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_pipe_writer_writev(ptr, src, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.pipe_writer.apreadv") size_t KCALL
 handle_pipe_writer_apreadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_pipe_writer_preadv(ptr, dst, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.pipe_writer.apwritev") size_t KCALL
 handle_pipe_writer_apwritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_pipe_writer_pwritev(ptr, src, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
@@ -3931,64 +3931,64 @@ handle_pidns_pwritev(void *__restrict ptr, struct aio_buffer *__restrict src, si
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.pidns.aread") size_t KCALL
 handle_pidns_aread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_pidns_read(ptr, dst, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.pidns.awrite") size_t KCALL
 handle_pidns_awrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_pidns_write(ptr, src, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.pidns.apread") size_t KCALL
 handle_pidns_apread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_pidns_pread(ptr, dst, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.pidns.apwrite") size_t KCALL
 handle_pidns_apwrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_pidns_pwrite(ptr, src, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.pidns.areadv") size_t KCALL
 handle_pidns_areadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_pidns_readv(ptr, dst, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.pidns.awritev") size_t KCALL
 handle_pidns_awritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_pidns_writev(ptr, src, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.pidns.apreadv") size_t KCALL
 handle_pidns_apreadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_pidns_preadv(ptr, dst, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.pidns.apwritev") size_t KCALL
 handle_pidns_apwritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_pidns_pwritev(ptr, src, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
@@ -4057,64 +4057,64 @@ handle_driver_state_pwritev(void *__restrict ptr, struct aio_buffer *__restrict 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.driver_state.aread") size_t KCALL
 handle_driver_state_aread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_driver_state_read(ptr, dst, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.driver_state.awrite") size_t KCALL
 handle_driver_state_awrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_driver_state_write(ptr, src, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.driver_state.apread") size_t KCALL
 handle_driver_state_apread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_driver_state_pread(ptr, dst, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.driver_state.apwrite") size_t KCALL
 handle_driver_state_apwrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_driver_state_pwrite(ptr, src, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.driver_state.areadv") size_t KCALL
 handle_driver_state_areadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_driver_state_readv(ptr, dst, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.driver_state.awritev") size_t KCALL
 handle_driver_state_awritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_driver_state_writev(ptr, src, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.driver_state.apreadv") size_t KCALL
 handle_driver_state_apreadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_driver_state_preadv(ptr, dst, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.driver_state.apwritev") size_t KCALL
 handle_driver_state_apwritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_driver_state_pwritev(ptr, src, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
@@ -4183,64 +4183,64 @@ handle_characterdevice_pwritev(void *__restrict ptr, struct aio_buffer *__restri
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.characterdevice.aread") size_t KCALL
 handle_characterdevice_aread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_characterdevice_read(ptr, dst, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.characterdevice.awrite") size_t KCALL
 handle_characterdevice_awrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_characterdevice_write(ptr, src, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.characterdevice.apread") size_t KCALL
 handle_characterdevice_apread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_characterdevice_pread(ptr, dst, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.characterdevice.apwrite") size_t KCALL
 handle_characterdevice_apwrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_characterdevice_pwrite(ptr, src, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.characterdevice.areadv") size_t KCALL
 handle_characterdevice_areadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_characterdevice_readv(ptr, dst, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.characterdevice.awritev") size_t KCALL
 handle_characterdevice_awritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_characterdevice_writev(ptr, src, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.characterdevice.apreadv") size_t KCALL
 handle_characterdevice_apreadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_characterdevice_preadv(ptr, dst, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.characterdevice.apwritev") size_t KCALL
 handle_characterdevice_apwritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_characterdevice_pwritev(ptr, src, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
@@ -4309,64 +4309,64 @@ handle_eventfd_fence_pwritev(void *__restrict ptr, struct aio_buffer *__restrict
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.eventfd_fence.aread") size_t KCALL
 handle_eventfd_fence_aread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_eventfd_fence_read(ptr, dst, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.eventfd_fence.awrite") size_t KCALL
 handle_eventfd_fence_awrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_eventfd_fence_write(ptr, src, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.eventfd_fence.apread") size_t KCALL
 handle_eventfd_fence_apread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_eventfd_fence_pread(ptr, dst, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.eventfd_fence.apwrite") size_t KCALL
 handle_eventfd_fence_apwrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_eventfd_fence_pwrite(ptr, src, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.eventfd_fence.areadv") size_t KCALL
 handle_eventfd_fence_areadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_eventfd_fence_readv(ptr, dst, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.eventfd_fence.awritev") size_t KCALL
 handle_eventfd_fence_awritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_eventfd_fence_writev(ptr, src, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.eventfd_fence.apreadv") size_t KCALL
 handle_eventfd_fence_apreadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_eventfd_fence_preadv(ptr, dst, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.eventfd_fence.apwritev") size_t KCALL
 handle_eventfd_fence_apwritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_eventfd_fence_pwritev(ptr, src, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
@@ -4435,64 +4435,64 @@ handle_eventfd_sema_pwritev(void *__restrict ptr, struct aio_buffer *__restrict 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.eventfd_sema.aread") size_t KCALL
 handle_eventfd_sema_aread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_eventfd_sema_read(ptr, dst, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.eventfd_sema.awrite") size_t KCALL
 handle_eventfd_sema_awrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_eventfd_sema_write(ptr, src, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.eventfd_sema.apread") size_t KCALL
 handle_eventfd_sema_apread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_eventfd_sema_pread(ptr, dst, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.eventfd_sema.apwrite") size_t KCALL
 handle_eventfd_sema_apwrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_eventfd_sema_pwrite(ptr, src, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.eventfd_sema.areadv") size_t KCALL
 handle_eventfd_sema_areadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_eventfd_sema_readv(ptr, dst, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.eventfd_sema.awritev") size_t KCALL
 handle_eventfd_sema_awritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_eventfd_sema_writev(ptr, src, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.eventfd_sema.apreadv") size_t KCALL
 handle_eventfd_sema_apreadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_eventfd_sema_preadv(ptr, dst, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.eventfd_sema.apwritev") size_t KCALL
 handle_eventfd_sema_apwritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_eventfd_sema_pwritev(ptr, src, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
@@ -4561,64 +4561,64 @@ handle_signalfd_pwritev(void *__restrict ptr, struct aio_buffer *__restrict src,
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.signalfd.aread") size_t KCALL
 handle_signalfd_aread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_signalfd_read(ptr, dst, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.signalfd.awrite") size_t KCALL
 handle_signalfd_awrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_signalfd_write(ptr, src, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.signalfd.apread") size_t KCALL
 handle_signalfd_apread(void *__restrict ptr, USER CHECKED void *dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_signalfd_pread(ptr, dst, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.signalfd.apwrite") size_t KCALL
 handle_signalfd_apwrite(void *__restrict ptr, USER CHECKED void const *src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_signalfd_pwrite(ptr, src, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.signalfd.areadv") size_t KCALL
 handle_signalfd_areadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_signalfd_readv(ptr, dst, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.signalfd.awritev") size_t KCALL
 handle_signalfd_awritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_signalfd_writev(ptr, src, num_bytes, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.signalfd.apreadv") size_t KCALL
 handle_signalfd_apreadv(void *__restrict ptr, struct aio_buffer *__restrict dst, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_signalfd_preadv(ptr, dst, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 
 INTERN ATTR_WEAK ATTR_SECTION(".text.kernel.handle_fallback.signalfd.apwritev") size_t KCALL
 handle_signalfd_apwritev(void *__restrict ptr, struct aio_buffer *__restrict src, size_t num_bytes, pos_t addr, iomode_t mode, struct aio_multihandle *__restrict aio) {
 	size_t result;
+	(void)aio;
 	result = handle_signalfd_pwritev(ptr, src, num_bytes, addr, mode);
-	aio_multihandle_done(aio);
 	return result;
 }
 //[[[end]]]
