@@ -81,9 +81,11 @@ MKREG_RW(sys_fs_pipe_max_size, 0622, ProcFS_Sys_Fs_PipeMaxSize_Print, ProcFS_Sys
 MKDIR(sys_kernel, 0555,
       F(sys_kernel, "hostname", DT_REG, sys_kernel_hostname)
       F(sys_kernel, "domainname", DT_REG, sys_kernel_domainname)
+      F(sys_kernel, "randomize_va_space", DT_REG, sys_kernel_randomize_va_space)
       F_END)
 MKREG_RW(sys_kernel_hostname, 0622, ProcFS_Sys_Kernel_Hostname_Print, ProcFS_Sys_Kernel_Hostname_Write)
 MKREG_RW(sys_kernel_domainname, 0622, ProcFS_Sys_Kernel_Domainname_Print, ProcFS_Sys_Kernel_Domainname_Write)
+MKREG_RW(sys_kernel_randomize_va_space, 0622, ProcFS_Sys_Kernel_RandomizeVaSpace_Print, ProcFS_Sys_Kernel_RandomizeVaSpace_Write)
 
 
 #define PROCFS_NO_CUSTOM 1 /* Delete if we ever get CUSTOM() entries */
