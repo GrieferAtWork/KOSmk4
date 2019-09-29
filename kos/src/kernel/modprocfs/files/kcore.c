@@ -26,7 +26,7 @@
 DECL_BEGIN
 
 INTERN NONNULL((1, 2)) ssize_t KCALL
-ProcFS_KCore_Printer(struct inode *__restrict UNUSED(self),
+ProcFS_KCore_Printer(struct regular_node *__restrict UNUSED(self),
                      pformatprinter printer, void *arg) {
 	/* TODO: Print a coredump for the kernel core itself */
 	return 0;

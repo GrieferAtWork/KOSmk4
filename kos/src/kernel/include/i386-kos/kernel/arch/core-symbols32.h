@@ -511,9 +511,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, task_rpc_exec_here_onexit; .long 0
 	.long 0x125e004
 	.long .Lname127 /* index: 127 */
-	.weak fs_filesystems_lock_endwrite; .long fs_filesystems_lock_endwrite
-	.reloc ., R_386_SIZE32, fs_filesystems_lock_endwrite; .long 0
-	.long 0x254f815
+	.weak debuginfo_cu_parser_loadattr_type; .long debuginfo_cu_parser_loadattr_type
+	.reloc ., R_386_SIZE32, debuginfo_cu_parser_loadattr_type; .long 0
+	.long 0xe700815
 	.long 0 /* index: 128 */
 	.long 0
 	.long 0
@@ -1495,9 +1495,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname373 /* index: 373 */
-	.weak pidns_trywrite; .long pidns_trywrite
-	.reloc ., R_386_SIZE32, pidns_trywrite; .long 0
-	.long 0x7bb2175
+	.weak inode_file_pwritev_with_pwrite; .long inode_file_pwritev_with_pwrite
+	.reloc ., R_386_SIZE32, inode_file_pwritev_with_pwrite; .long 0
+	.long 0x9350175
 	.long 0 /* index: 374 */
 	.long 0
 	.long 0
@@ -2802,10 +2802,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 700 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname700 /* index: 700 */
+	.weak fs_filesystems_lock_endwrite; .long fs_filesystems_lock_endwrite
+	.reloc ., R_386_SIZE32, fs_filesystems_lock_endwrite; .long 0
+	.long 0x254f815
 	.long 0 /* index: 701 */
 	.long 0
 	.long 0
@@ -4566,10 +4566,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak atomic64_read; .long atomic64_read
 	.reloc ., R_386_SIZE32, atomic64_read; .long 0
 	.long 0x130b474
-	.long 0 /* index: 1141 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname1141 /* index: 1141 */
+	.weak inode_file_pwrite_with_write; .long inode_file_pwrite_with_write
+	.reloc ., R_386_SIZE32, inode_file_pwrite_with_write; .long 0
+	.long 0x7ea9475
 	.long 0 /* index: 1142 */
 	.long 0
 	.long 0
@@ -7014,10 +7014,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 1753 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname1753 /* index: 1753 */
+	.weak pipe_max_bufsize_unprivileged; .long pipe_max_bufsize_unprivileged
+	.reloc ., R_386_SIZE32, pipe_max_bufsize_unprivileged; .long 0
+	.long 0x7d03124
 	.long 0 /* index: 1754 */
 	.long 0
 	.long 0
@@ -7166,10 +7166,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 1791 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname1791 /* index: 1791 */
+	.weak inode_file_writev_with_write; .long inode_file_writev_with_write
+	.reloc ., R_386_SIZE32, inode_file_writev_with_write; .long 0
+	.long 0x1142bd5
 	.long 0 /* index: 1792 */
 	.long 0
 	.long 0
@@ -8279,9 +8279,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, keyboard_device_read; .long 0
 	.long 0xf151814
 	.long .Lname2069 /* index: 2069 */
-	.weak debuginfo_cu_parser_loadattr_type; .long debuginfo_cu_parser_loadattr_type
-	.reloc ., R_386_SIZE32, debuginfo_cu_parser_loadattr_type; .long 0
-	.long 0xe700815
+	.weak cred_require_resource; .long cred_require_resource
+	.reloc ., R_386_SIZE32, cred_require_resource; .long 0
+	.long 0xd489815
 	.long 0 /* index: 2070 */
 	.long 0
 	.long 0
@@ -8959,9 +8959,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname2239 /* index: 2239 */
-	.weak rwlock_write_aggressive; .long rwlock_write_aggressive
-	.reloc ., R_386_SIZE32, rwlock_write_aggressive; .long 0
-	.long 0x8f0f175
+	.weak pidns_trywrite; .long pidns_trywrite
+	.reloc ., R_386_SIZE32, pidns_trywrite; .long 0
+	.long 0x7bb2175
 	.long 0 /* index: 2240 */
 	.long 0
 	.long 0
@@ -12062,10 +12062,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak terminal_owrite; .long terminal_owrite
 	.reloc ., R_386_SIZE32, terminal_owrite; .long 0
 	.long 0xd2ece45
-	.long 0 /* index: 3015 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname3015 /* index: 3015 */
+	.weak rwlock_write_aggressive; .long rwlock_write_aggressive
+	.reloc ., R_386_SIZE32, rwlock_write_aggressive; .long 0
+	.long 0x8f0f175
 	.long 0 /* index: 3016 */
 	.long 0
 	.long 0
@@ -16523,7 +16523,7 @@ END(kernel_symbol_table)
 .Lname126:
 	.string "task_rpc_exec_here_onexit"
 .Lname127:
-	.string "fs_filesystems_lock_endwrite"
+	.string "debuginfo_cu_parser_loadattr_type"
 .Lname130:
 	.string "character_device_unregister"
 .Lname131:
@@ -16751,7 +16751,7 @@ END(kernel_symbol_table)
 .Lname371:
 	.string "sys_getdrives"
 .Lname373:
-	.string "pidns_trywrite"
+	.string "inode_file_pwritev_with_pwrite"
 .Lname375:
 	.string "vmb_overlay"
 .Lname376:
@@ -17120,6 +17120,8 @@ END(kernel_symbol_table)
 	.string "cpu_wake"
 .Lname697:
 	.string "driver_insmod"
+.Lname700:
+	.string "fs_filesystems_lock_endwrite"
 .Lname702:
 	.string "memlen"
 .Lname704:
@@ -17558,6 +17560,8 @@ END(kernel_symbol_table)
 	.string "dbg_ungetc"
 .Lname1140:
 	.string "atomic64_read"
+.Lname1141:
+	.string "inode_file_pwrite_with_write"
 .Lname1144:
 	.string "sys_sigsuspend"
 .Lname1145:
@@ -18150,6 +18154,8 @@ END(kernel_symbol_table)
 	.string "dbg_print"
 .Lname1749:
 	.string "inode_recent"
+.Lname1753:
+	.string "pipe_max_bufsize_unprivileged"
 .Lname1755:
 	.string "syscall_emulate"
 .Lname1759:
@@ -18188,6 +18194,8 @@ END(kernel_symbol_table)
 	.string "unwind_emulator_exec_autostack"
 .Lname1788:
 	.string "vio_orl"
+.Lname1791:
+	.string "inode_file_writev_with_write"
 .Lname1795:
 	.string "handle_get_fs"
 .Lname1796:
@@ -18453,7 +18461,7 @@ END(kernel_symbol_table)
 .Lname2068:
 	.string "keyboard_device_read"
 .Lname2069:
-	.string "debuginfo_cu_parser_loadattr_type"
+	.string "cred_require_resource"
 .Lname2071:
 	.string "sys_sigpending"
 .Lname2072:
@@ -18623,7 +18631,7 @@ END(kernel_symbol_table)
 .Lname2236:
 	.string "memrchrl"
 .Lname2239:
-	.string "rwlock_write_aggressive"
+	.string "pidns_trywrite"
 .Lname2241:
 	.string "mempatq"
 .Lname2242:
@@ -19422,6 +19430,8 @@ END(kernel_symbol_table)
 	.string "sys_linux_stat64"
 .Lname3014:
 	.string "terminal_owrite"
+.Lname3015:
+	.string "rwlock_write_aggressive"
 .Lname3017:
 	.string "pipe_reader_destroy"
 .Lname3021:

@@ -22,11 +22,15 @@
 
 #include <kernel/compiler.h>
 #include <kernel/driver.h>
+#include <kernel/aio.h>
+#include <kernel/paging.h>
+#include <kernel/vm.h>
 #include <fs/node.h>
 #include <sys/stat.h>
 #include <assert.h>
 #include <string.h>
 
+#include "util.h"
 #include "procfs.h"
 
 DECL_BEGIN
@@ -85,6 +89,17 @@ DECL_BEGIN
 		/* .psd_gid     = */ 0,                                            \
 		/* .psr_printer = */ &printer,                                     \
 	};
+#define MKREG_RW(id, mode, reader, writer)                                 \
+	PRIVATE struct procfs_singleton_reg_rw_data srd_fsdata_reg_rw_##id = { \
+		/* .psd_atime   = */ { 0, 0 },                                     \
+		/* .psd_mtime   = */ { 0, 0 },                                     \
+		/* .psd_ctime   = */ { 0, 0 },                                     \
+		/* .psd_mode    = */ S_IFREG | (mode),                             \
+		/* .psd_uid     = */ 0,                                            \
+		/* .psd_gid     = */ 0,                                            \
+		/* .psr_printer = */ &reader,                                      \
+		/* .psr_writer  = */ &writer,                                      \
+	};
 #define DYNAMIC_SYMLINK(id, mode, readlink)                                          \
 	PRIVATE struct procfs_singleton_dynamic_symlink_data srd_fsdata_symlink_##id = { \
 		/* .psd_atime    = */ { 0, 0 },                                              \
@@ -100,9 +115,11 @@ DECL_BEGIN
 #undef F
 
 
+#ifndef PROCFS_NO_CUSTOM
 #define CUSTOM(id, type) \
-	INTDEF ATTR_WEAK byte_t __##type##_fsdata[] ASMNAME(#type "_fsdata");
+	INTDEF byte_t __##type##_fsdata[] ASMNAME(#type "_fsdata");
 #include "singleton.h"
+#endif /* !PROCFS_NO_CUSTOM */
 
 
 INTERN_CONST struct procfs_singleton_data *const
@@ -113,6 +130,9 @@ ProcFS_Singleton_FsData[PROCFS_SINGLETON_COUNT] = {
 #include "singleton.h"
 #define MKREG_RO(id, mode, printer) \
 	[PROCFS_SINGLETON_ID_##id] = (struct procfs_singleton_data *)&srd_fsdata_reg_ro_##id,
+#include "singleton.h"
+#define MKREG_RW(id, mode, reader, writer) \
+	[PROCFS_SINGLETON_ID_##id] = (struct procfs_singleton_data *)&srd_fsdata_reg_rw_##id,
 #include "singleton.h"
 #define DYNAMIC_SYMLINK(id, mode, readlink) \
 	[PROCFS_SINGLETON_ID_##id] = (struct procfs_singleton_data *)&srd_fsdata_symlink_##id,
@@ -223,41 +243,6 @@ ProcFS_Singleton_Directory_Enum(struct directory_node *__restrict self,
 
 
 
-typedef struct {
-	size_t             ssp_offset; /* Remaining number of bytes to skip */
-	size_t             ssp_size;   /* Remaining number of bytes to print */
-	USER CHECKED char *ssp_buf;    /* Destination buffer. */
-} ProcFS_SubStringPrinterData;
-
-PRIVATE ssize_t
-NOTHROW(KCALL ProcFS_SubStringPrinter)(void *arg, char const *__restrict data, size_t datalen) {
-	ProcFS_SubStringPrinterData *closure;
-	ssize_t result = (ssize_t)datalen;
-	closure = (ProcFS_SubStringPrinterData *)arg;
-	if (closure->ssp_offset != 0) {
-		if (closure->ssp_offset >= datalen) {
-			closure->ssp_offset -= datalen;
-			goto done;
-		}
-		data    += closure->ssp_offset;
-		datalen -= closure->ssp_offset;
-		closure->ssp_offset = 0;
-	}
-	if (datalen >= closure->ssp_size) {
-		memcpy(closure->ssp_buf, data, closure->ssp_size);
-		closure->ssp_buf += closure->ssp_size;
-		closure->ssp_size = 0;
-		return __SSIZE_MIN__; /* Stop printing (we've gotten everything) */
-	}
-	/* Print everything */
-	memcpy(closure->ssp_buf, data, datalen);
-	closure->ssp_size -= datalen;
-	closure->ssp_buf  += datalen;
-done:
-	return result;
-}
-
-
 PRIVATE NONNULL((1)) size_t KCALL
 ProcFS_Singleton_RegularRo_FlexRead(struct inode *__restrict self,
                                     USER CHECKED void *dst, size_t num_bytes,
@@ -274,7 +259,7 @@ ProcFS_Singleton_RegularRo_FlexRead(struct inode *__restrict self,
 	closure.ssp_buf    = (USER CHECKED char *)dst;
 	closure.ssp_size   = num_bytes;
 	/* Print the contents of the file using a sub-string printer. */
-	(*data->psr_printer)(self, &ProcFS_SubStringPrinter, &closure);
+	(*data->psr_printer)((struct regular_node *)self, &ProcFS_SubStringPrinter, &closure);
 	return (size_t)((USER CHECKED byte_t *)closure.ssp_buf - (USER CHECKED byte_t *)dst);
 }
 
@@ -332,6 +317,56 @@ INTERN struct inode_type ProcFS_Singleton_RegularRo_Type = {
 	},
 };
 
+PRIVATE NONNULL((1, 5)) void KCALL
+ProcFS_Singleton_RegularRw_Write(struct inode *__restrict self,
+                                 USER CHECKED void const *src,
+                                 size_t num_bytes, pos_t file_position,
+                                 struct aio_multihandle *__restrict aio)
+		THROWS(E_FSERROR_UNSUPPORTED_OPERATION,
+		       E_FSERROR_DISK_FULL, E_FSERROR_READONLY,
+		       E_IOERROR_BADBOUNDS, E_IOERROR_READONLY,
+		       E_IOERROR, ...) {
+	struct procfs_singleton_reg_rw_data *data;
+	data = (struct procfs_singleton_reg_rw_data *)self->i_fsdata;
+	if (file_position != 0)
+		THROW(E_IOERROR_BADBOUNDS, E_IOERROR_SUBSYSTEM_FILE);
+	(*data->psr_writer)((struct regular_node *)self, src, num_bytes);
+}
+
+PRIVATE NONNULL((1)) void KCALL
+ProcFS_Singleton_RegularRw_Truncate(struct inode *__restrict UNUSED(self),
+                                    pos_t UNUSED(new_size))
+		THROWS(E_FSERROR_UNSUPPORTED_OPERATION,
+		       E_FSERROR_DISK_FULL, E_FSERROR_READONLY,
+		       E_IOERROR_BADBOUNDS, E_IOERROR_READONLY,
+		       E_IOERROR, ...) {
+	/* no-op */
+}
+
+
+
+
+/* Type for general-purpose singleton read/write files */
+INTERN struct inode_type ProcFS_Singleton_RegularRw_Type = {
+	/* .it_fini = */ NULL,
+	/* .it_attr = */ {
+		/* .a_loadattr = */ &ProcFS_Singleton_LoadAttr,
+		/* .a_saveattr = */ &ProcFS_Singleton_SaveAttr,
+	},
+	/* .it_file = */ {
+		/* .f_read     = */ NULL,
+		/* .f_pread    = */ NULL,
+		/* .f_readv    = */ NULL,
+		/* .f_preadv   = */ NULL,
+		/* .f_write    = */ &ProcFS_Singleton_RegularRw_Write,
+		/* .f_pwrite   = */ &inode_file_pwrite_with_write,
+		/* .f_writev   = */ &inode_file_writev_with_write,
+		/* .f_pwritev  = */ &inode_file_pwritev_with_pwrite,
+		/* .f_truncate = */ &ProcFS_Singleton_RegularRw_Truncate,
+		/* .f_flexread = */ &ProcFS_Singleton_RegularRo_FlexRead,
+	},
+};
+
 
 /* Type for general-purpose singleton dynamic symlink files */
 INTERN struct inode_type ProcFS_Singleton_DynamicSymlink_Type = {
@@ -357,29 +392,6 @@ INTERN struct inode_type ProcFS_Singleton_DynamicSymlink_Type = {
 /* ROOT DIRECTORY                                                       */
 /************************************************************************/
 
-PRIVATE NONNULL((1, 2)) REF struct directory_entry *KCALL
-ProcFS_RootDirectory_Lookup(struct directory_node *__restrict self,
-                            CHECKED USER /*utf-8*/ char const *__restrict name,
-                            u16 namelen, uintptr_t hash, fsmode_t mode)
-		THROWS(E_SEGFAULT, E_FSERROR_FILE_NOT_FOUND,
-		       E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
-	assert(self->i_fsdata == (struct inode_data *)&ProcFS_RootDirectory_FsData);
-	/* TODO: Evaluate running process PIDs */
-	return ProcFS_Singleton_Directory_Lookup(self, name, namelen, hash, mode);
-}
-
-PRIVATE NONNULL((1, 2)) void KCALL
-ProcFS_RootDirectory_Enum(struct directory_node *__restrict self,
-                          directory_enum_callback_t callback,
-                          void *arg)
-		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
-	assert(self->i_fsdata == (struct inode_data *)&ProcFS_RootDirectory_FsData);
-	/* TODO: Enumerate running process PIDs */
-	ProcFS_Singleton_Directory_Enum(self, callback, arg);
-}
-
-
-
 INTERN struct procfs_singleton_dir_data ProcFS_RootDirectory_FsData = {
 	/* .psd_atime = */ { 0, 0 },
 	/* .psd_mtime = */ { 0, 0 },
@@ -391,25 +403,6 @@ INTERN struct procfs_singleton_dir_data ProcFS_RootDirectory_FsData = {
 #define ROOT_DIRECTORY_ENTRY(name, type, id) &srd_rootent_##id,
 #include "singleton.h"
 		NULL
-	}
-};
-
-INTERN struct inode_type ProcFS_RootDirectory_Type = {
-	/* .it_fini = */ NULL,
-	/* .it_attr = */ {
-		/* .a_loadattr = */ &ProcFS_Singleton_LoadAttr,
-		/* .a_saveattr = */ &ProcFS_Singleton_SaveAttr,
-	},
-	/* .it_file = */ {
-	},
-	{
-		/* .it_directory = */ {
-			/* .d_readdir = */ NULL,
-			/* .d_oneshot = */ {
-				/* .o_lookup = */ &ProcFS_RootDirectory_Lookup,
-				/* .o_enum   = */ &ProcFS_RootDirectory_Enum,
-			}
-		}
 	}
 };
 

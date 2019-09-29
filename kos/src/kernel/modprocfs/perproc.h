@@ -31,56 +31,53 @@
 #define MKREG_RO(id, mode, printer)
 #endif /* !MKREG_RO */
 
-#ifndef MKREG_RW
-#define MKREG_RW(id, mode, reader, writer)
-#endif /* !MKREG_RW */
-
 #ifndef DYNAMIC_SYMLINK
 #define DYNAMIC_SYMLINK(id, mode, readlink)
 #endif /* !DYNAMIC_SYMLINK */
 
 #ifndef CUSTOM
-#define CUSTOM(id, inode_type)
+#define CUSTOM(id, mode, inode_type)
 #endif /* !CUSTOM */
 
-#ifndef ROOT_DIRECTORY_ENTRY
-#define ROOT_DIRECTORY_ENTRY(name, type, id)
-#endif /* !ROOT_DIRECTORY_ENTRY */
+#ifndef PERPROC_DIRECTORY_ENTRY
+#define PERPROC_DIRECTORY_ENTRY(name, type, id)
+#endif /* !PERPROC_DIRECTORY_ENTRY */
 
 
-ROOT_DIRECTORY_ENTRY("self", DT_LNK, self)
-DYNAMIC_SYMLINK(self, 0777, ProcFS_Self_Printer)
-
-ROOT_DIRECTORY_ENTRY("thread-self", DT_LNK, thread_self)
-DYNAMIC_SYMLINK(thread_self, 0777, ProcFS_ThreadSelf_Printer)
-
-ROOT_DIRECTORY_ENTRY("kcore", DT_REG, kcore)
-MKREG_RO(kcore, 0400, ProcFS_KCore_Printer)
-
-ROOT_DIRECTORY_ENTRY("cmdline", DT_REG, cmdline)
-MKREG_RO(cmdline, 0444, ProcFS_Cmdline_Printer)
-
-ROOT_DIRECTORY_ENTRY("kos", DT_DIR, kos)
-MKDIR(kos, 0555,
-      F(kos, "raminfo", DT_REG, kos_raminfo)
+PERPROC_DIRECTORY_ENTRY("attr", DT_DIR, attr)
+MKDIR(attr, 0333,
+      F(attr, "current", DT_REG, attr_current)
       F_END)
-MKREG_RO(kos_raminfo, 0444, ProcFS_Kos_RamInfo_Printer)
 
-ROOT_DIRECTORY_ENTRY("sys", DT_DIR, sys)
-MKDIR(sys, 0555,
-      F(sys, "fs", DT_DIR, sys_fs)
+MKREG_RO(attr_current, 0666, ProcFS_PerProc_Attr_Current_Printer)
+
+PERPROC_DIRECTORY_ENTRY("exe", DT_LNK, exe)
+DYNAMIC_SYMLINK(exe, 0777, ProcFS_PerProc_Exe_Printer)
+
+PERPROC_DIRECTORY_ENTRY("cwd", DT_LNK, cwd)
+DYNAMIC_SYMLINK(cwd, 0777, ProcFS_PerProc_Cwd_Printer)
+
+PERPROC_DIRECTORY_ENTRY("root", DT_LNK, root)
+DYNAMIC_SYMLINK(root, 0777, ProcFS_PerProc_Root_Printer)
+
+PERPROC_DIRECTORY_ENTRY("cmdline", DT_REG, cmdline)
+MKREG_RO(cmdline, 0222, ProcFS_PerProc_Cmdline_Printer)
+
+PERPROC_DIRECTORY_ENTRY("fd", DT_DIR, fd)
+CUSTOM(fd, S_IFDIR | 0300, ProcFS_PerProc_Fd_Type)
+
+PERPROC_DIRECTORY_ENTRY("kos", DT_DIR, kos)
+MKDIR(kos, 0333,
+      F(attr, "drives", DT_DIR, kos_drives)
+      F(attr, "dcwd", DT_DIR, kos_dcwd)
       F_END)
-MKDIR(sys_fs, 0555,
-      F(sys_fs, "pipe-max-size", DT_REG, sys_fs_pipe_max_size)
-      F_END)
-MKREG_RW(sys_fs_pipe_max_size, 0622, ProcFS_Sys_Fs_PipeMaxSize_Print, ProcFS_Sys_Fs_PipeMaxSize_Write)
+CUSTOM(kos_drives, S_IFDIR | 0300, ProcFS_PerProc_Kos_Drives_Type)
+CUSTOM(kos_dcwd, S_IFDIR | 0300, ProcFS_PerProc_Kos_DrivesCwd_Type)
 
+//#define PROCFS_PERPROC_NO_CUSTOM 1 /* Delete if we ever get CUSTOM() entries */
 
-#define PROCFS_NO_CUSTOM 1 /* Delete if we ever get CUSTOM() entries */
-
-#undef ROOT_DIRECTORY_ENTRY
+#undef PERPROC_DIRECTORY_ENTRY
 #undef CUSTOM
 #undef DYNAMIC_SYMLINK
-#undef MKREG_RW
 #undef MKREG_RO
 #undef MKDIR

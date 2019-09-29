@@ -16,29 +16,27 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_MODPROCFS_FILES_CMDLINE_C
-#define GUARD_MODPROCFS_FILES_CMDLINE_C 1
+#ifndef GUARD_MODPROCFS_FILES_PERPROC_EXE_C
+#define GUARD_MODPROCFS_FILES_PERPROC_EXE_C 1
 #define _KOS_SOURCE 1 /* snprintf returns size_t */
 
 #include <kernel/compiler.h>
-#include <kernel/driver.h>
-#include <string.h>
-#include <libcmdline/encode.h>
+#include <sched/pid.h>
+#include <stdio.h>
 
 #include "../procfs.h"
 
 DECL_BEGIN
 
-INTERN NONNULL((1, 2)) ssize_t KCALL
-ProcFS_Cmdline_Printer(struct regular_node *__restrict UNUSED(self),
-                       pformatprinter printer, void *arg) {
-	cmdline_encode(printer,
-	               arg,
-	               kernel_driver.d_argc,
-	               kernel_driver.d_argv);
-	return (*printer)(arg, "\n", 1);
+INTERN NONNULL((1)) size_t KCALL
+ProcFS_PerProc_Exe_Printer(struct symlink_node *__restrict self,
+                           USER CHECKED /*utf-8*/ char *buf,
+                           size_t bufsize) {
+	(void)self; /* TODO */
+	return snprintf(buf, bufsize, "TODO");
 }
+
 
 DECL_END
 
-#endif /* !GUARD_MODPROCFS_FILES_CMDLINE_C */
+#endif /* !GUARD_MODPROCFS_FILES_PERPROC_EXE_C */

@@ -273,6 +273,7 @@
 #define __CRT_HAVE_cpuid_features 1
 #define __CRT_HAVE_cred_require_hwio 1
 #define __CRT_HAVE_cred_require_mount 1
+#define __CRT_HAVE_cred_require_resource 1
 #define __CRT_HAVE_cred_require_vmread 1
 #define __CRT_HAVE_cred_require_vmwrite 1
 #define __CRT_HAVE_dbg 1
@@ -614,6 +615,9 @@
 #define __CRT_HAVE_inode_chown 1
 #define __CRT_HAVE_inode_chtime 1
 #define __CRT_HAVE_inode_datablock_type 1
+#define __CRT_HAVE_inode_file_pwrite_with_write 1
+#define __CRT_HAVE_inode_file_pwritev_with_pwrite 1
+#define __CRT_HAVE_inode_file_writev_with_write 1
 #define __CRT_HAVE_inode_ioctl 1
 #define __CRT_HAVE_inode_loadattr 1
 #define __CRT_HAVE_inode_pathconf 1
@@ -1038,6 +1042,7 @@
 #define __CRT_HAVE_pidns_write_nx 1
 #define __CRT_HAVE_pipe_create 1
 #define __CRT_HAVE_pipe_destroy 1
+#define __CRT_HAVE_pipe_max_bufsize_unprivileged 1
 #define __CRT_HAVE_pipe_reader_create 1
 #define __CRT_HAVE_pipe_reader_destroy 1
 #define __CRT_HAVE_pipe_writer_create 1

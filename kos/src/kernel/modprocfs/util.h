@@ -16,29 +16,28 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_MODPROCFS_FILES_CMDLINE_C
-#define GUARD_MODPROCFS_FILES_CMDLINE_C 1
-#define _KOS_SOURCE 1 /* snprintf returns size_t */
+#ifndef GUARD_MODPROCFS_UTIL_H
+#define GUARD_MODPROCFS_UTIL_H 1
 
 #include <kernel/compiler.h>
-#include <kernel/driver.h>
-#include <string.h>
-#include <libcmdline/encode.h>
 
-#include "../procfs.h"
+#include <kos/types.h>
+#include <format-printer.h>
 
 DECL_BEGIN
 
-INTERN NONNULL((1, 2)) ssize_t KCALL
-ProcFS_Cmdline_Printer(struct regular_node *__restrict UNUSED(self),
-                       pformatprinter printer, void *arg) {
-	cmdline_encode(printer,
-	               arg,
-	               kernel_driver.d_argc,
-	               kernel_driver.d_argv);
-	return (*printer)(arg, "\n", 1);
-}
+typedef struct {
+	size_t             ssp_offset; /* Remaining number of bytes to skip */
+	size_t             ssp_size;   /* Remaining number of bytes to print */
+	USER CHECKED char *ssp_buf;    /* Destination buffer. */
+} ProcFS_SubStringPrinterData;
+
+INTDEF WUNUSED NONNULL((1, 2)) ssize_t
+NOTHROW(KCALL ProcFS_SubStringPrinter)(void *arg,
+                                       char const *__restrict data,
+                                       size_t datalen);
+
 
 DECL_END
 
-#endif /* !GUARD_MODPROCFS_FILES_CMDLINE_C */
+#endif /* !GUARD_MODPROCFS_UTIL_H */

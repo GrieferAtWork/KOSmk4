@@ -16,29 +16,66 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_MODPROCFS_FILES_CMDLINE_C
-#define GUARD_MODPROCFS_FILES_CMDLINE_C 1
-#define _KOS_SOURCE 1 /* snprintf returns size_t */
+#ifndef GUARD_MODPROCFS_FILES_PERPROC_FD_C
+#define GUARD_MODPROCFS_FILES_PERPROC_FD_C 1
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
-#include <kernel/driver.h>
-#include <string.h>
-#include <libcmdline/encode.h>
+#include <sched/pid.h>
+#include <stdio.h>
 
 #include "../procfs.h"
 
 DECL_BEGIN
 
-INTERN NONNULL((1, 2)) ssize_t KCALL
-ProcFS_Cmdline_Printer(struct regular_node *__restrict UNUSED(self),
-                       pformatprinter printer, void *arg) {
-	cmdline_encode(printer,
-	               arg,
-	               kernel_driver.d_argc,
-	               kernel_driver.d_argv);
-	return (*printer)(arg, "\n", 1);
+
+INTERN NONNULL((1, 2)) REF struct directory_entry *KCALL
+ProcFS_PerProc_Fd_Lookup(struct directory_node *__restrict self,
+                         CHECKED USER /*utf-8*/ char const *__restrict name,
+                         u16 namelen, uintptr_t hash, fsmode_t mode)
+		THROWS(E_SEGFAULT, E_FSERROR_FILE_NOT_FOUND,
+		       E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
+	(void)self;
+	(void)name;
+	(void)namelen;
+	(void)hash;
+	(void)mode;
+	/* TODO */
+	return NULL;
 }
+
+INTERN NONNULL((1, 2)) void KCALL
+ProcFS_PerProc_Fd_Enum(struct directory_node *__restrict self,
+                       directory_enum_callback_t callback,
+                       void *arg)
+		THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...) {
+	(void)self;
+	(void)callback;
+	(void)arg;
+	/* TODO */
+}
+
+
+INTERN struct inode_type ProcFS_PerProc_Fd_Type = {
+	/* .it_fini = */ NULL,
+	/* .it_attr = */ {
+		/* .a_loadattr = */ NULL,
+		/* .a_saveattr = */ NULL,
+	},
+	/* .it_file = */ {
+	},
+	{
+		/* .it_directory = */ {
+			/* .d_readdir = */ NULL,
+			/* .d_oneshot = */ {
+				/* .o_lookup = */ &ProcFS_PerProc_Fd_Lookup,
+				/* .o_enum   = */ &ProcFS_PerProc_Fd_Enum,
+			}
+		}
+	}
+};
+
 
 DECL_END
 
-#endif /* !GUARD_MODPROCFS_FILES_CMDLINE_C */
+#endif /* !GUARD_MODPROCFS_FILES_PERPROC_FD_C */

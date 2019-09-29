@@ -16,29 +16,52 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_MODPROCFS_FILES_CMDLINE_C
-#define GUARD_MODPROCFS_FILES_CMDLINE_C 1
-#define _KOS_SOURCE 1 /* snprintf returns size_t */
+#ifndef GUARD_MODPROCFS_UTIL_C
+#define GUARD_MODPROCFS_UTIL_C 1
+
+#include "util.h"
 
 #include <kernel/compiler.h>
-#include <kernel/driver.h>
-#include <string.h>
-#include <libcmdline/encode.h>
 
-#include "../procfs.h"
+#include <kos/types.h>
+#include <string.h>
+#include <hybrid/limitcore.h>
+
+#include <format-printer.h>
 
 DECL_BEGIN
 
-INTERN NONNULL((1, 2)) ssize_t KCALL
-ProcFS_Cmdline_Printer(struct regular_node *__restrict UNUSED(self),
-                       pformatprinter printer, void *arg) {
-	cmdline_encode(printer,
-	               arg,
-	               kernel_driver.d_argc,
-	               kernel_driver.d_argv);
-	return (*printer)(arg, "\n", 1);
+INTERN WUNUSED NONNULL((1, 2)) ssize_t
+NOTHROW(KCALL ProcFS_SubStringPrinter)(void *arg,
+                                       char const *__restrict data,
+                                       size_t datalen) {
+	ProcFS_SubStringPrinterData *closure;
+	ssize_t result = (ssize_t)datalen;
+	closure = (ProcFS_SubStringPrinterData *)arg;
+	if (closure->ssp_offset != 0) {
+		if (closure->ssp_offset >= datalen) {
+			closure->ssp_offset -= datalen;
+			goto done;
+		}
+		data    += closure->ssp_offset;
+		datalen -= closure->ssp_offset;
+		closure->ssp_offset = 0;
+	}
+	if (datalen >= closure->ssp_size) {
+		memcpy(closure->ssp_buf, data, closure->ssp_size);
+		closure->ssp_buf += closure->ssp_size;
+		closure->ssp_size = 0;
+		return __SSIZE_MIN__; /* Stop printing (we've gotten everything) */
+	}
+	/* Print everything */
+	memcpy(closure->ssp_buf, data, datalen);
+	closure->ssp_size -= datalen;
+	closure->ssp_buf  += datalen;
+done:
+	return result;
 }
+
 
 DECL_END
 
-#endif /* !GUARD_MODPROCFS_FILES_CMDLINE_C */
+#endif /* !GUARD_MODPROCFS_UTIL_C */

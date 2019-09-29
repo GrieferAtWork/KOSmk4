@@ -64,7 +64,7 @@ print_pagecount(pformatprinter printer, void *arg, pagecnt_t count) {
 }
 
 INTERN NONNULL((1, 2)) ssize_t KCALL
-ProcFS_Kos_RamInfo_Printer(struct inode *__restrict UNUSED(self),
+ProcFS_Kos_RamInfo_Printer(struct regular_node *__restrict UNUSED(self),
                            pformatprinter printer, void *arg) {
 	struct pmemstat st;
 	unsigned int usage_percent;

@@ -20,7 +20,11 @@
 #define GUARD_MODPROCFS_OPENNODE_C 1
 
 #include <kernel/compiler.h>
+
 #include <kernel/driver.h>
+#include <fs/vfs.h>
+
+#include <assert.h>
 
 #include "procfs.h"
 
@@ -54,6 +58,8 @@ ProcFS_OpenNode(struct superblock *__restrict self,
 		node->db_parts = VM_DATABLOCK_ANONPARTS;
 		if (id >= PROCFS_SINGLETON_START_LNK_DYN)
 			node->i_type = &ProcFS_Singleton_DynamicSymlink_Type;
+		else if (id >= PROCFS_SINGLETON_START_REG_RW)
+			node->i_type = &ProcFS_Singleton_RegularRw_Type;
 		else if (id >= PROCFS_SINGLETON_START_REG_RO)
 			node->i_type = &ProcFS_Singleton_RegularRo_Type;
 		else if (id > PROCFS_SINGLETON_ROOT)
@@ -61,6 +67,62 @@ ProcFS_OpenNode(struct superblock *__restrict self,
 		else {
 			node->i_type = &ProcFS_RootDirectory_Type;
 		}
+	}	break;
+
+	case PROCFS_INOTYPE_PERPROC: {
+		unsigned int id;
+		id = (unsigned int)(((u64)ino & PROCFS_INOTYPE_PERPROC_IDMASK) >>
+		                    PROCFS_INOTYPE_PERPROC_IDSHIFT);
+		if (id >= PROCFS_PERPROC_COUNT)
+			goto badino;
+		assert((node->i_filemode & S_IFMT) == (ProcFS_PerProc_FileMode[id] & S_IFMT));
+		node->i_flags    |= INODE_FATTRLOADED;
+		node->i_filemode  = ProcFS_PerProc_FileMode[id];
+		node->i_filenlink = (nlink_t)1;
+		node->i_filesize  = (pos_t)4096;
+		node->i_fsdata    = (struct inode_data *)ProcFS_PerProc_FsData[id];
+#ifndef PROCFS_PERPROC_NO_CUSTOM
+		if (id >= PROCFS_PERPROC_START_CUSTOM) {
+			node->i_type = ProcFS_PerProc_CustomTypes[id - PROCFS_PERPROC_START_CUSTOM];
+			break;
+		}
+#endif /* !PROCFS_PERPROC_NO_CUSTOM */
+		node->db_parts = VM_DATABLOCK_ANONPARTS;
+		if (id >= PROCFS_PERPROC_START_LNK_DYN)
+			node->i_type = &ProcFS_PerProc_DynamicSymlink_Type;
+		else if (id >= PROCFS_PERPROC_START_REG_RO)
+			node->i_type = &ProcFS_PerProc_RegularRo_Type;
+		else if (id > PROCFS_PERPROC_ROOT)
+			node->i_type = &ProcFS_PerProc_Directory_Type;
+		else {
+			node->i_type = &ProcFS_PerProcRootDirectory_Type;
+		}
+	}	break;
+
+	case PROCFS_INOTYPE_DRIVE: {
+		unsigned int id;
+		id = (unsigned int)(((u64)ino & PROCFS_INOTYPE_DRIVE_DRVMASK) >>
+		                    PROCFS_INOTYPE_DRIVE_DRVSHIFT);
+		if unlikely(id >= VFS_DRIVECOUNT)
+			goto badino;
+		node->i_flags    |= INODE_FATTRLOADED;
+		node->i_filemode  = S_IFLNK | 0777;
+		node->i_filenlink = (nlink_t)1;
+		node->i_filesize  = (pos_t)4096;
+		node->i_type      = &ProcFS_PerProc_Kos_Drives_Entry_Type;
+	}	break;
+
+	case PROCFS_INOTYPE_DCWD: {
+		unsigned int id;
+		id = (unsigned int)(((u64)ino & PROCFS_INOTYPE_DCWD_DRVMASK) >>
+		                    PROCFS_INOTYPE_DCWD_DRVSHIFT);
+		if unlikely(id >= VFS_DRIVECOUNT)
+			goto badino;
+		node->i_flags    |= INODE_FATTRLOADED;
+		node->i_filemode  = S_IFLNK | 0777;
+		node->i_filenlink = (nlink_t)1;
+		node->i_filesize  = (pos_t)4096;
+		node->i_type      = &ProcFS_PerProc_Kos_Dcwd_Entry_Type;
 	}	break;
 
 	default:

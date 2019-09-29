@@ -685,6 +685,34 @@ struct inode_type {
 		} it_symlink;
 	};
 };
+
+/* Implementation for `f_pwrite' that uses `f_write' */
+FUNDEF NONNULL((1, 5)) void KCALL
+inode_file_pwrite_with_write(struct inode *__restrict self, vm_phys_t src,
+                             size_t num_bytes, pos_t file_position,
+                             struct aio_multihandle *__restrict aio)
+	THROWS(E_FSERROR_UNSUPPORTED_OPERATION,
+	       E_FSERROR_DISK_FULL, E_FSERROR_READONLY,
+	       E_IOERROR_BADBOUNDS, E_IOERROR_READONLY,
+	       E_IOERROR, ...);
+
+/* Implementation for `f_writev' that uses `f_write' */
+FUNDEF NONNULL((1, 2, 5)) void KCALL
+inode_file_writev_with_write(struct inode *__restrict self,
+                             struct aio_buffer *__restrict buf,
+                             size_t num_bytes, pos_t file_position,
+                             struct aio_multihandle *__restrict aio)
+	THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...);
+
+/* Implementation for `f_pwritev' that uses `f_pwrite' */
+FUNDEF NONNULL((1, 2, 5)) void KCALL
+inode_file_pwritev_with_pwrite(struct inode *__restrict self,
+                               struct aio_pbuffer *__restrict buf,
+                               size_t num_bytes, pos_t file_position,
+                               struct aio_multihandle *__restrict aio)
+	THROWS(E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...);
+
+
 #endif /* __CC__ */
 
 
