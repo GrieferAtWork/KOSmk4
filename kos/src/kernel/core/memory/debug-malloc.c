@@ -36,6 +36,7 @@
 #ifdef CONFIG_DEBUG_MALLOC
 #include <kernel/addr2line.h>
 #include <kernel/debugger.h>
+#include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/paging.h>
 #include <kernel/panic.h>
@@ -996,7 +997,31 @@ NOTHROW(KCALL mall_search_leaks_impl)(void) {
 	PRINT_LEAKS_SEARCH_PHASE("Phase #1: Scan .data + .bss\n");
 	mall_reachable_data((byte_t *)__debug_malloc_tracked_start,
 	                    (size_t)__debug_malloc_tracked_size);
-	/* TODO: Also search the static data segments of loaded drivers. */
+	/* Also search state data segments of loaded drivers.
+	 * For this purpose, we only scan writable segments */
+	{
+		REF struct driver_state *ds;
+		size_t i;
+		ds = driver_get_state();
+		for (i = 0; i < ds->ds_count; ++i) {
+			struct driver *d = ds->ds_drivers[i];
+			Elf_Half j;
+			for (j = 0; j < d->d_phnum; ++j) {
+				uintptr_t progaddr;
+				size_t progsize;
+				if (d->d_phdr[i].p_type != PT_LOAD)
+					continue; /* Skip segments that don't describe program memory. */
+				if (!(d->d_phdr[i].p_flags & PF_W))
+					continue; /* Skip non-writable segments. */
+				progaddr = (uintptr_t)(d->d_loadaddr + d->d_phdr[i].p_vaddr);
+				progsize = d->d_phdr[i].p_memsz;
+				/* Scan the contents of this segment. */
+				mall_reachable_data((byte_t *)progaddr, progsize);
+			}
+		}
+		decref_unlikely(ds);
+	}
+
 	/* Search all threads on all CPUs. */
 	PRINT_LEAKS_SEARCH_PHASE("Phase #2: Scan running threads\n");
 	for (i = 0; i < cpu_count; ++i) {
@@ -1654,7 +1679,7 @@ DECL_END
 #define MALLOC_NX 1
 #include "debug-malloc-impl.c.inl"
 #include "debug-malloc-impl.c.inl"
-#endif
+#endif /* !__INTELLISENSE__ */
 
 #endif /* CONFIG_DEBUG_MALLOC */
 

@@ -391,7 +391,13 @@ struct driver_library_path_string {
 	WEAK refcnt_t                              dlp_refcnt; /* Reference counter. */
 	COMPILER_FLEXIBLE_ARRAY(char DRIVER_CONST, dlp_path);  /* Path string. */
 };
+
+#ifdef __OMIT_KMALLOC_CONSTANT_P_WRAPPERS
+DEFINE_REFCOUNT_FUNCTIONS(struct driver_library_path_string, dlp_refcnt, __os_free);
+#else /* __OMIT_KMALLOC_CONSTANT_P_WRAPPERS */
 DEFINE_REFCOUNT_FUNCTIONS(struct driver_library_path_string, dlp_refcnt, kfree);
+#endif /* !__OMIT_KMALLOC_CONSTANT_P_WRAPPERS */
+
 
 /* [1..1] The current driver library path.
  * This path is a ':'-separated list of UNIX-style pathnames
