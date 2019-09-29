@@ -655,11 +655,11 @@ DEFINE_SYSCALL2(errno_t, pipe2,
 			pipedes[1] = wfd;
 			COMPILER_WRITE_BARRIER();
 		} EXCEPT {
-			handle_close(THIS_HANDLE_MANAGER, wfd);
+			handle_tryclose_nosym(wfd, THIS_HANDLE_MANAGER);
 			RETHROW();
 		}
 	} EXCEPT {
-		handle_close(THIS_HANDLE_MANAGER, rfd);
+		handle_tryclose_nosym(rfd, THIS_HANDLE_MANAGER);
 		RETHROW();
 	}
 	return -EOK;

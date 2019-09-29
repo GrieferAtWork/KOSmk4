@@ -271,6 +271,7 @@
 #define __CRT_HAVE_cpu_vector 1
 #define __CRT_HAVE_cpu_wake 1
 #define __CRT_HAVE_cpuid_features 1
+#define __CRT_HAVE_cred_require_driveroot 1
 #define __CRT_HAVE_cred_require_hwio 1
 #define __CRT_HAVE_cred_require_mount 1
 #define __CRT_HAVE_cred_require_resource 1
@@ -530,6 +531,7 @@
 #define __CRT_HAVE_fs_filesystems_remove 1
 #define __CRT_HAVE_fs_kernel 1
 #define __CRT_HAVE_handle_close 1
+#define __CRT_HAVE_handle_close_nosym 1
 #define __CRT_HAVE_handle_datasize 1
 #define __CRT_HAVE_handle_existsin 1
 #define __CRT_HAVE_handle_fcntl 1
@@ -565,6 +567,7 @@
 #define __CRT_HAVE_handle_manager_destroy 1
 #define __CRT_HAVE_handle_manager_kernel 1
 #define __CRT_HAVE_handle_tryclose 1
+#define __CRT_HAVE_handle_tryclose_nosym 1
 #define __CRT_HAVE_handle_trylookup 1
 #define __CRT_HAVE_handle_type_db 1
 #define __CRT_HAVE_handle_typekind 1

@@ -18,6 +18,8 @@
  */
 #ifndef GUARD_APPS_INIT_MAIN_C
 #define GUARD_APPS_INIT_MAIN_C 1
+#define _KOS_SOURCE 1
+#define _ATFILE_SOURCE 1
 
 #include <hybrid/compiler.h>
 
@@ -32,6 +34,7 @@
 #include <sys/syslog.h>    /* syslog() */
 
 #include <errno.h>  /* errno */
+#include <fcntl.h>  /* AT_FDDRIVE_ROOT() */
 #include <stddef.h> /* NULL */
 #include <stdio.h>  /* dprintf() */
 #include <string.h> /* strerror() */
@@ -124,6 +127,14 @@ done_procfs:
 	symlink("/proc/self/fd/1", "/dev/stdout");
 	symlink("/proc/self/fd/2", "/dev/stderr");
 
+	/* Setup dos drives. */
+	{
+		fd_t rfd = open("/", O_RDONLY | O_DIRECTORY);
+		if (rfd >= 0) {
+			dup2(rfd, AT_FDDRIVE_ROOT('C'));
+			close(rfd);
+		}
+	}
 
 	dprintf(STDOUT_FILENO,
 	        "\033[J" /* ED(0):    Clear screen */

@@ -58,6 +58,7 @@ FUNDEF void KCALL cred_require_vmread(struct vm *__restrict target_vm) THROWS(E_
 FUNDEF void KCALL cred_require_vmwrite(struct vm *__restrict target_vm) THROWS(E_INSUFFICIENT_RIGHTS); /* Caller can write to `target_vm' */
 FUNDEF void KCALL cred_require_resource(void) THROWS(E_INSUFFICIENT_RIGHTS); /* `CAP_SYS_RESOURCE' */
 FUNDEF void KCALL cred_require_sysadmin(void) THROWS(E_INSUFFICIENT_RIGHTS); /* `CAP_SYS_ADMIN' */
+FUNDEF void KCALL cred_require_driveroot(void) THROWS(E_INSUFFICIENT_RIGHTS); /* Caller is allowed to change DOS drive roots */
 
 /* TODO: Go through all system calls already defined and add credential checks where necessary. */
 /* TODO: Add credential checks for individual sysctl() and hop() commands */

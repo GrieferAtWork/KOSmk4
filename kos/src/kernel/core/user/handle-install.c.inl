@@ -28,7 +28,7 @@ DECL_BEGIN
 #ifdef INSTALL_IN
 /* Same as `handle_installinto()', but return the old handle
  * (or a HANDLE_TYPE_UNDEFINED) previously bound to that slot. */
-PUBLIC REF struct handle FCALL
+PUBLIC WUNUSED NONNULL((1)) REF struct handle FCALL
 handle_installxchg(struct handle_manager *__restrict self,
                    unsigned int dst_fd, struct handle hnd)
 #elif defined(INSTALL_AT)
@@ -38,7 +38,7 @@ handle_installxchg(struct handle_manager *__restrict self,
  * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS: Too many open handles
  * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_RANGE: `hint' is outside the allowed handle range.
  * @throw: E_WOULDBLOCK: Preemption was disabled, and the operation would have blocked */
-FUNDEF unsigned int FCALL
+FUNDEF NONNULL((1)) unsigned int FCALL
 handle_installat(struct handle_manager *__restrict self,
                  unsigned int hint, struct handle hnd)
 #else /* INSTALL_AT */
@@ -48,7 +48,7 @@ handle_installat(struct handle_manager *__restrict self,
  * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS: Too many open handles
  * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_RANGE: Too many open handles
  * @throw: E_WOULDBLOCK: Preemption was disabled, and the operation would have blocked */
-PUBLIC unsigned int FCALL
+PUBLIC NONNULL((1)) unsigned int FCALL
 handle_install(struct handle_manager *__restrict self,
                struct handle hnd)
 #endif /* !INSTALL_AT */

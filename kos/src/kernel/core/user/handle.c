@@ -460,7 +460,7 @@ PRIVATE ATTR_USED void KCALL handler_manager_onexec(void) {
 
 /* Close all handles with the `IO_FCLOEXEC' flag set.
  * @throw: E_WOULDBLOCK: Preemption was disabled, and the operation would have blocked. */
-PUBLIC void FCALL
+PUBLIC NONNULL((1)) void FCALL
 handle_manager_cloexec(struct handle_manager *__restrict self)
 		THROWS(E_WOULDBLOCK) {
 	unsigned int i, cloexec_count = 0;
@@ -743,9 +743,9 @@ check_truncate_hashvec:
  * @return: true:  The handle under `fd' was closed.
  * @return: false: No handle was associated with `fd'.
  * @throw: E_WOULDBLOCK: Preemption was disabled, and the operation would have blocked. */
-PUBLIC bool FCALL
-handle_tryclose(struct handle_manager *__restrict self,
-                unsigned int fd)
+PUBLIC NONNULL((2)) bool FCALL
+handle_tryclose_nosym(unsigned int fd,
+                      struct handle_manager *__restrict self)
 		THROWS(E_WOULDBLOCK) {
 	bool result = false;
 	struct handle *ent;
@@ -889,9 +889,9 @@ NOTHROW(FCALL handle_manager_get_max_hashvector_fd_plus_one)(struct handle_manag
 
 
 /* Same as `handle_tryclose()', but throw an error if the given `fd' is invalid */
-PUBLIC void FCALL
-handle_close(struct handle_manager *__restrict self,
-             unsigned int fd)
+PUBLIC NONNULL((2)) void FCALL
+handle_close_nosym(unsigned int fd,
+                   struct handle_manager *__restrict self)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE) {
 	struct handle *ent;
 	struct handle delete_handle;
@@ -1209,7 +1209,7 @@ handle_manage_rehash(struct handle_manager *__restrict self)
  * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS: Too many open handles
  * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_RANGE: `dst_fd' is outside the allowed handle range.
  * @throw: E_WOULDBLOCK: Preemption was disabled, and the operation would have blocked */
-PUBLIC void FCALL
+PUBLIC NONNULL((1)) void FCALL
 handle_installinto(struct handle_manager *__restrict self,
                    unsigned int dst_fd, struct handle hnd)
 		THROWS(E_WOULDBLOCK, E_BADALLOC,
@@ -1495,6 +1495,112 @@ handle_lookup_ptr(unsigned int fd, struct handle_manager *__restrict self)
 	return result;
 }
 
+PRIVATE ATTR_RETNONNULL WUNUSED REF struct path *KCALL
+handle_getpath(struct handle const *__restrict hnd) {
+	REF struct path *result;
+	switch (hnd->h_type) {
+
+	case HANDLE_TYPE_FILE:
+	case HANDLE_TYPE_ONESHOT_DIRECTORY_FILE:
+		result = incref(((struct file *)hnd->h_data)->f_path);
+		break;
+
+	case HANDLE_TYPE_PATH:
+		result = incref((struct path *)hnd->h_data);
+		break;
+
+	default:
+		THROW(E_INVALID_HANDLE_FILETYPE,
+		      -1,
+		      HANDLE_TYPE_PATH,
+		      hnd->h_type,
+		      HANDLE_TYPEKIND_GENERIC,
+		      handle_typekind(hnd));
+	}
+	return result;
+}
+
+
+
+PRIVATE bool FCALL
+handle_tryclose_symolic(unsigned int fd)
+		THROWS(E_WOULDBLOCK) {
+	switch (fd) {
+
+	case HANDLE_SYMBOLIC_FDCWD: {
+		REF struct path *oldp;
+		struct fs *f;
+		f = THIS_FS;
+		sync_write(&f->f_pathlock);
+		oldp     = f->f_cwd;
+		f->f_cwd = incref(f->f_root);
+		sync_endwrite(&f->f_pathlock);
+		decref(oldp);
+	}	break;
+
+	case HANDLE_SYMBOLIC_DDRIVECWD(HANDLE_SYMBOLIC_DDRIVEMIN) ...
+	     HANDLE_SYMBOLIC_DDRIVECWD(HANDLE_SYMBOLIC_DDRIVEMAX): {
+		REF struct path *p, *oldp;
+		unsigned int id;
+		struct fs *f;
+		id = (fd - HANDLE_SYMBOLIC_DDRIVECWD(HANDLE_SYMBOLIC_DDRIVEMIN));
+		f = THIS_FS;
+		sync_read(&f->f_vfs->v_drives_lock);
+		p = xincref(f->f_vfs->v_drives[id]);
+		sync_endread(&f->f_vfs->v_drives_lock);
+		TRY {
+			sync_write(&f->f_pathlock);
+		} EXCEPT {
+			decref(p);
+			RETHROW();
+		}
+		oldp = f->f_dcwd[id];
+		f->f_dcwd[id] = p; /* Inherit reference */
+		sync_endwrite(&f->f_pathlock);
+		xdecref(oldp);
+		if unlikely(!p && !oldp)
+			throw_unbound_handle(fd, THIS_HANDLE_MANAGER);
+	}	break;
+
+	case HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMIN) ...
+	     HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMAX): {
+		struct vfs *v;
+		unsigned int id;
+		REF struct path *oldp;
+		v = THIS_FS->f_vfs;
+		id = (fd - HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMIN));
+		cred_require_driveroot();
+		sync_write(&v->v_drives_lock);
+		oldp = v->v_drives[id];
+		v->v_drives[id] = NULL;
+		sync_endwrite(&v->v_drives_lock);
+		if unlikely(!oldp)
+			throw_unbound_handle(fd, THIS_HANDLE_MANAGER);
+	}	break;
+
+	default:
+		break;
+	}
+	return false;
+}
+
+PUBLIC bool FCALL
+handle_tryclose(unsigned int fd)
+		THROWS(E_WOULDBLOCK) {
+	if (handle_tryclose_symolic(fd))
+		return true;
+	return handle_tryclose_nosym(fd, THIS_HANDLE_MANAGER);
+}
+
+PUBLIC void FCALL
+handle_close(unsigned int fd)
+		THROWS(E_WOULDBLOCK) {
+	if (handle_tryclose_symolic(fd))
+		return;
+	handle_close_nosym(fd, THIS_HANDLE_MANAGER);
+}
+
+
 
 
 /* Same as `handle_installinto()', but allow `dst_fd' to be a writable, symbolic handle.
@@ -1507,8 +1613,85 @@ handle_installinto_sym(unsigned int dst_fd, struct handle hnd)
 		THROWS(E_WOULDBLOCK, E_BADALLOC,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_RANGE) {
+	/* Symbolic handles */
 	switch (dst_fd) {
-		/* TODO: Symbolic handles */
+
+	case HANDLE_SYMBOLIC_FDCWD: {
+		REF struct path *p, *oldp;
+		struct fs *f;
+		p = handle_getpath(&hnd);
+		f = THIS_FS;
+		TRY {
+			sync_write(&f->f_pathlock);
+		} EXCEPT {
+			decref(p);
+			RETHROW();
+		}
+		oldp     = f->f_cwd;
+		f->f_cwd = p; /* Inherit reference */
+		sync_endwrite(&f->f_pathlock);
+		decref(oldp);
+	}	break;
+
+	case HANDLE_SYMBOLIC_FDROOT: {
+		REF struct path *p, *oldp;
+		struct fs *f;
+		p = handle_getpath(&hnd);
+		f = THIS_FS;
+		TRY {
+			sync_write(&f->f_pathlock);
+		} EXCEPT {
+			decref(p);
+			RETHROW();
+		}
+		oldp      = f->f_root;
+		f->f_root = p; /* Inherit reference */
+		sync_endwrite(&f->f_pathlock);
+		decref(oldp);
+	}	break;
+
+	case HANDLE_SYMBOLIC_DDRIVECWD(HANDLE_SYMBOLIC_DDRIVEMIN) ...
+	     HANDLE_SYMBOLIC_DDRIVECWD(HANDLE_SYMBOLIC_DDRIVEMAX): {
+		REF struct path *p, *oldp;
+		unsigned int id;
+		struct fs *f;
+		/* Bind DOS per-drive current working directories */
+		id = (dst_fd - HANDLE_SYMBOLIC_DDRIVECWD(HANDLE_SYMBOLIC_DDRIVEMIN));
+		p = handle_getpath(&hnd);
+		f = THIS_FS;
+		TRY {
+			sync_write(&f->f_pathlock);
+		} EXCEPT {
+			decref(p);
+			RETHROW();
+		}
+		oldp = f->f_dcwd[id];
+		f->f_dcwd[id] = p; /* Inherit reference */
+		sync_endwrite(&f->f_pathlock);
+		decref(oldp);
+	}	break;
+
+	case HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMIN) ...
+	     HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMAX): {
+		REF struct path *p, *oldp;
+		struct vfs *v;
+		unsigned int id;
+		cred_require_driveroot();
+		/* Bind DOS drives */
+		id = (dst_fd - HANDLE_SYMBOLIC_DDRIVEROOT(HANDLE_SYMBOLIC_DDRIVEMIN));
+		p = handle_getpath(&hnd);
+		v = THIS_FS->f_vfs;
+		TRY {
+			sync_read(&v->v_drives_lock);
+		} EXCEPT {
+			decref(p);
+			RETHROW();
+		}
+		oldp = v->v_drives[id];
+		v->v_drives[id] = p; /* Inherit reference */
+		sync_endread(&v->v_drives_lock);
+		xdecref(oldp);
+	}	break;
 
 	default:
 		/* Fallback: Install a regular handle */
@@ -2366,7 +2549,7 @@ handle_stflags(struct handle_manager *__restrict self,
 
 
 /* The kernel-space equivalent of the user-space `fcntl()' function. */
-PUBLIC syscall_ulong_t KCALL
+PUBLIC NONNULL((1)) syscall_ulong_t KCALL
 handle_fcntl(struct handle_manager *__restrict self,
              unsigned int fd, syscall_ulong_t cmd,
              UNCHECKED USER void *arg)

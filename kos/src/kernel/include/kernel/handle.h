@@ -295,19 +295,31 @@ DATDEF ATTR_PERTASK struct handle_manager *_this_handle_manager;
 
 /* Close all handles with the `IO_FCLOEXEC' flag set.
  * @throw: E_WOULDBLOCK: Preemption was disabled, and the operation would have blocked. */
-FUNDEF void FCALL handle_manager_cloexec(struct handle_manager *__restrict self) THROWS(E_WOULDBLOCK);
+FUNDEF NONNULL((1)) void FCALL
+handle_manager_cloexec(struct handle_manager *__restrict self) THROWS(E_WOULDBLOCK);
 
 /* Try to close the handle associated with `fd'.
  * @return: true:  The handle under `fd' was closed.
  * @return: false: No handle was associated with `fd'.
  * @throw: E_WOULDBLOCK: Preemption was disabled, and the operation would have blocked. */
-FUNDEF bool FCALL handle_tryclose(struct handle_manager *__restrict self,
-                                  unsigned int fd)
+FUNDEF bool FCALL
+handle_tryclose(unsigned int fd) THROWS(E_WOULDBLOCK);
+FUNDEF NONNULL((2)) bool FCALL
+handle_tryclose_nosym(unsigned int fd,
+                      struct handle_manager *__restrict self)
 		THROWS(E_WOULDBLOCK);
+
 /* Same as `handle_tryclose()', but throw an error if the given `fd' is invalid */
-FUNDEF void FCALL handle_close(struct handle_manager *__restrict self,
-                               unsigned int fd)
+FUNDEF void FCALL handle_close(unsigned int fd)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE);
+
+/* Same as `handle_tryclose_nosym()', but throw an error if the given `fd' is invalid */
+FUNDEF NONNULL((2)) void FCALL
+handle_close_nosym(unsigned int fd,
+                   struct handle_manager *__restrict self)
+		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE);
+
+
 
 /* Add the given handle to the handle manager and
  * return the handle number of where it was placed.
@@ -315,8 +327,9 @@ FUNDEF void FCALL handle_close(struct handle_manager *__restrict self,
  * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS: Too many open handles
  * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_RANGE: Too many open handles
  * @throw: E_WOULDBLOCK: Preemption was disabled, and the operation would have blocked */
-FUNDEF unsigned int FCALL handle_install(struct handle_manager *__restrict self,
-                                         struct handle hnd)
+FUNDEF NONNULL((1)) unsigned int FCALL
+handle_install(struct handle_manager *__restrict self,
+               struct handle hnd)
 		THROWS(E_WOULDBLOCK, E_BADALLOC,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_RANGE);
@@ -327,8 +340,9 @@ FUNDEF unsigned int FCALL handle_install(struct handle_manager *__restrict self,
  * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS: Too many open handles
  * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_RANGE: `hint' is outside the allowed handle range.
  * @throw: E_WOULDBLOCK: Preemption was disabled, and the operation would have blocked */
-FUNDEF unsigned int FCALL handle_installat(struct handle_manager *__restrict self,
-                                           unsigned int hint, struct handle hnd)
+FUNDEF NONNULL((1)) unsigned int FCALL
+handle_installat(struct handle_manager *__restrict self,
+                 unsigned int hint, struct handle hnd)
 		THROWS(E_WOULDBLOCK, E_BADALLOC,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_RANGE);
@@ -338,15 +352,16 @@ FUNDEF unsigned int FCALL handle_installat(struct handle_manager *__restrict sel
  * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS: Too many open handles
  * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_RANGE: `dst_fd' is outside the allowed handle range.
  * @throw: E_WOULDBLOCK: Preemption was disabled, and the operation would have blocked */
-FUNDEF void FCALL handle_installinto(struct handle_manager *__restrict self,
-                                     unsigned int dst_fd, struct handle hnd)
+FUNDEF NONNULL((1)) void FCALL
+handle_installinto(struct handle_manager *__restrict self,
+                   unsigned int dst_fd, struct handle hnd)
 		THROWS(E_WOULDBLOCK, E_BADALLOC,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_RANGE);
 
 /* Same as `handle_installinto()', but return the old handle
  * (or a HANDLE_TYPE_UNDEFINED) previously bound to that slot. */
-FUNDEF REF struct handle FCALL
+FUNDEF WUNUSED NONNULL((1)) REF struct handle FCALL
 handle_installxchg(struct handle_manager *__restrict self,
                    unsigned int dst_fd, struct handle hnd)
 		THROWS(E_WOULDBLOCK, E_BADALLOC,
@@ -357,7 +372,8 @@ handle_installxchg(struct handle_manager *__restrict self,
 
 struct hop_openfd;
 /* Do everything required to install a handle via a open openfd
- * command data packet that has been passed via user-space. */
+ * command data packet that has been passed via user-space.
+ * Note that `data' is an UNCHECKED user pointer! */
 FUNDEF unsigned int FCALL
 handle_installhop(USER UNCHECKED struct hop_openfd *data,
                   struct handle hnd)
@@ -372,14 +388,15 @@ handle_installhop(USER UNCHECKED struct hop_openfd *data,
  * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS: Too many open handles
  * @throw: E_BADALLOC_INSUFFICIENT_HANDLE_RANGE: `dst_fd' is outside the allowed handle range.
  * @throw: E_WOULDBLOCK: Preemption was disabled, and the operation would have blocked */
-FUNDEF void FCALL handle_installinto_sym(unsigned int dst_fd, struct handle hnd)
+FUNDEF void FCALL
+handle_installinto_sym(unsigned int dst_fd, struct handle hnd)
 		THROWS(E_WOULDBLOCK, E_BADALLOC,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_NUMBERS,
 		       E_BADALLOC_INSUFFICIENT_HANDLE_RANGE);
 
 /* The kernel-space equivalent of the user-space `fcntl()' function.
  * @param: cmd: One of `F_*' from <kos/io.h> */
-FUNDEF syscall_ulong_t KCALL
+FUNDEF NONNULL((1)) syscall_ulong_t KCALL
 handle_fcntl(struct handle_manager *__restrict self,
              unsigned int fd, syscall_ulong_t cmd,
              UNCHECKED USER void *arg)
@@ -398,20 +415,29 @@ FUNDEF WUNUSED REF struct handle FCALL
 handle_trylookup(struct handle_manager *__restrict self,
                  unsigned int fd)
 		THROWS(E_WOULDBLOCK);
+
 /* Same as `handle_trylookup()', but throw an error when `fd' is invalid. */
-FUNDEF WUNUSED REF struct handle FCALL handle_lookup(unsigned int fd)
+FUNDEF WUNUSED REF struct handle FCALL
+handle_lookup(unsigned int fd)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE);
-FUNDEF WUNUSED REF struct handle FCALL handle_lookupin(unsigned int fd, struct handle_manager *__restrict self)
+
+FUNDEF WUNUSED REF struct handle FCALL
+handle_lookupin(unsigned int fd, struct handle_manager *__restrict self)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE);
-FUNDEF WUNUSED bool FCALL handle_existsin(unsigned int fd, struct handle_manager *__restrict self)
+
+FUNDEF WUNUSED bool FCALL
+handle_existsin(unsigned int fd, struct handle_manager *__restrict self)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE);
+
 /* Same as `handle_lookup()', but don't allow for symbolic handles. */
-FUNDEF WUNUSED REF struct handle FCALL handle_lookup_nosym(unsigned int fd)
+FUNDEF WUNUSED REF struct handle FCALL
+handle_lookup_nosym(unsigned int fd)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE);
 
 /* Same as `handle_lookup()', but throw an `E_INVALID_HANDLE_FILETYPE'
  * error when the found handle's type doesn't match `type' */
-FUNDEF WUNUSED REF struct handle FCALL handle_lookup_type(unsigned int fd, uintptr_half_t type)
+FUNDEF WUNUSED REF struct handle FCALL
+handle_lookup_type(unsigned int fd, uintptr_half_t type)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE, E_INVALID_HANDLE_FILETYPE);
 
 

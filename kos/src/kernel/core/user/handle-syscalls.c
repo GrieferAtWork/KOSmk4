@@ -94,6 +94,11 @@ DEFINE_SYSCALL2(fd_t, dup2, fd_t, oldfd, fd_t, newfd) {
 	TRY {
 		handle_installinto_sym((unsigned int)newfd, hand);
 	} EXCEPT {
+		if (was_thrown(E_INVALID_HANDLE_FILETYPE)) {
+			struct exception_data *d = error_data();
+			if (d->e_pointers[0] == (__UINTPTR_TYPE__)-1)
+				d->e_pointers[0] = (__UINTPTR_TYPE__)(__INTPTR_TYPE__)oldfd;
+		}
 		decref(hand);
 		RETHROW();
 	}
@@ -344,8 +349,7 @@ DEFINE_SYSCALL4(errno_t, fallocate, fd_t, fd, syscall_ulong_t, mode, uint32_t, o
 #endif /* __NR_fallocate64 */
 
 DEFINE_SYSCALL1(errno_t, close, fd_t, fd) {
-	handle_close(THIS_HANDLE_MANAGER,
-	             (unsigned int)fd);
+	handle_close((unsigned int)fd);
 	return 0;
 }
 

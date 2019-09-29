@@ -384,11 +384,11 @@ DEFINE_SYSCALL5(errno_t,openpty,
 				ATOMIC_WRITE(*amaster, fdmaster);
 				ATOMIC_WRITE(*aslave, fdslave);
 			} EXCEPT {
-				handle_close(THIS_HANDLE_MANAGER, fdslave);
+				handle_tryclose_nosym(fdslave, THIS_HANDLE_MANAGER);
 				RETHROW();
 			}
 		} EXCEPT {
-			handle_close(THIS_HANDLE_MANAGER, fdmaster);
+			handle_tryclose_nosym(fdmaster, THIS_HANDLE_MANAGER);
 			RETHROW();
 		}
 	} EXCEPT {

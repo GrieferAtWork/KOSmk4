@@ -4471,9 +4471,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, vmb_find_last_node_lower_equal; .long 0
 	.long 0xe02545c
 	.long .Lname1117 /* index: 1117 */
-	.weak vm_datablock_vio_write; .long vm_datablock_vio_write
-	.reloc ., R_386_SIZE32, vm_datablock_vio_write; .long 0
-	.long 0xc405025
+	.weak handle_tryclose_nosym; .long handle_tryclose_nosym
+	.reloc ., R_386_SIZE32, handle_tryclose_nosym; .long 0
+	.long 0x82a645d
 	.long .Lname1118 /* index: 1118 */
 	.weak heap_align; .long heap_align
 	.reloc ., R_386_SIZE32, heap_align; .long 0
@@ -4998,10 +4998,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 1249 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname1249 /* index: 1249 */
+	.weak rwlock_reading_r; .long rwlock_reading_r
+	.reloc ., R_386_SIZE32, rwlock_reading_r; .long 0
+	.long 0x208bbe2
 	.long 0 /* index: 1250 */
 	.long 0
 	.long 0
@@ -7479,9 +7479,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, keyboard_device_poll; .long 0
 	.long 0xf16074c
 	.long .Lname1869 /* index: 1869 */
-	.weak rwlock_reading_r; .long rwlock_reading_r
-	.reloc ., R_386_SIZE32, rwlock_reading_r; .long 0
-	.long 0x208bbe2
+	.weak handle_close_nosym; .long handle_close_nosym
+	.reloc ., R_386_SIZE32, handle_close_nosym; .long 0
+	.long 0x8f7174d
 	.long 0 /* index: 1870 */
 	.long 0
 	.long 0
@@ -9714,10 +9714,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 2428 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2428 /* index: 2428 */
+	.weak sys_timer_gettime64; .long sys_timer_gettime64
+	.reloc ., R_386_SIZE32, sys_timer_gettime64; .long 0
+	.long 0x3610fc4
 	.long 0 /* index: 2429 */
 	.long 0
 	.long 0
@@ -14951,9 +14951,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname3737 /* index: 3737 */
-	.weak sys_timer_gettime64; .long sys_timer_gettime64
-	.reloc ., R_386_SIZE32, sys_timer_gettime64; .long 0
-	.long 0x3610fc4
+	.weak sys_linux_oldstat; .long sys_linux_oldstat
+	.reloc ., R_386_SIZE32, sys_linux_oldstat; .long 0
+	.long 0x8b56fc4
 	.long 0 /* index: 3738 */
 	.long 0
 	.long 0
@@ -15902,10 +15902,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 3975 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname3975 /* index: 3975 */
+	.weak vm_datablock_vio_write; .long vm_datablock_vio_write
+	.reloc ., R_386_SIZE32, vm_datablock_vio_write; .long 0
+	.long 0xc405025
 	.long 0 /* index: 3976 */
 	.long 0
 	.long 0
@@ -16147,9 +16147,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, character_device_alloc; .long 0
 	.long 0x888efc3
 	.long .Lname4036 /* index: 4036 */
-	.weak sys_linux_oldstat; .long sys_linux_oldstat
-	.reloc ., R_386_SIZE32, sys_linux_oldstat; .long 0
-	.long 0x8b56fc4
+	.weak cred_require_driveroot; .long cred_require_driveroot
+	.reloc ., R_386_SIZE32, cred_require_driveroot; .long 0
+	.long 0xa29cfc4
 	.long .Lname4037 /* index: 4037 */
 	.weak disasm_print_line; .long disasm_print_line
 	.reloc ., R_386_SIZE32, disasm_print_line; .long 0
@@ -17539,7 +17539,7 @@ END(kernel_symbol_table)
 .Lname1116:
 	.string "vmb_find_last_node_lower_equal"
 .Lname1117:
-	.string "vm_datablock_vio_write"
+	.string "handle_tryclose_nosym"
 .Lname1118:
 	.string "heap_align"
 .Lname1122:
@@ -17682,6 +17682,8 @@ END(kernel_symbol_table)
 	.string "vio_readl_aligned"
 .Lname1247:
 	.string "error_print_into"
+.Lname1249:
+	.string "rwlock_reading_r"
 .Lname1251:
 	.string "task_start_default_flags"
 .Lname1252:
@@ -18287,7 +18289,7 @@ END(kernel_symbol_table)
 .Lname1868:
 	.string "keyboard_device_poll"
 .Lname1869:
-	.string "rwlock_reading_r"
+	.string "handle_close_nosym"
 .Lname1872:
 	.string "pidns_lookup"
 .Lname1875:
@@ -18826,6 +18828,8 @@ END(kernel_symbol_table)
 	.string "vpage_realloc_nx"
 .Lname2425:
 	.string "vio_memset"
+.Lname2428:
+	.string "sys_timer_gettime64"
 .Lname2431:
 	.string "slab_malloc20"
 .Lname2433:
@@ -20213,7 +20217,7 @@ END(kernel_symbol_table)
 .Lname3733:
 	.string "pagedir_translate"
 .Lname3737:
-	.string "sys_timer_gettime64"
+	.string "sys_linux_oldstat"
 .Lname3739:
 	.string "sys_flock"
 .Lname3740:
@@ -20472,6 +20476,8 @@ END(kernel_symbol_table)
 	.string "dbg_getfunc_start"
 .Lname3973:
 	.string "dbg_enter_here"
+.Lname3975:
+	.string "vm_datablock_vio_write"
 .Lname3981:
 	.string "debuginfo_cu_parser_skipform"
 .Lname3985:
@@ -20533,7 +20539,7 @@ END(kernel_symbol_table)
 .Lname4035:
 	.string "character_device_alloc"
 .Lname4036:
-	.string "sys_linux_oldstat"
+	.string "cred_require_driveroot"
 .Lname4037:
 	.string "disasm_print_line"
 .Lname4039:

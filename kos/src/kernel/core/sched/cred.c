@@ -57,6 +57,11 @@ cred_require_sysadmin(void) THROWS(E_INSUFFICIENT_RIGHTS) {
 	/* TODO: `CAP_SYS_ADMIN' */
 }
 
+PUBLIC void KCALL
+cred_require_driveroot(void) THROWS(E_INSUFFICIENT_RIGHTS) {
+	/* TODO */
+}
+
 
 DECL_END
 
