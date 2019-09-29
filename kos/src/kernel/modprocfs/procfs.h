@@ -40,7 +40,7 @@ DECL_BEGIN
 
 /* Per-process data */
 #define PROCFS_INOTYPE_PERPROC         0x01 /* Per-process INode */
-#define PROCFS_INOTYPE_PERPROC_PIDMASK UINT64_C(0x00000000ffffffff) /* PID mask */
+#define PROCFS_INOTYPE_PERPROC_PIDMASK UINT64_C(0x000000007fffffff) /* PID mask */
 #define PROCFS_INOTYPE_PERPROC_IDMASK  UINT64_C(0x0000ffff00000000) /* ID mask */
 #define PROCFS_INOTYPE_PERPROC_IDSHIFT 32
 /* @param: id: One of PROCFS_PERPROC_* */
@@ -50,7 +50,7 @@ DECL_BEGIN
 
 /* DOS Drive bindings. `readlink /proc/[pid]/kos/drives/[a-z]' */
 #define PROCFS_INOTYPE_DRIVE          0x02 /* Per-process drives */
-#define PROCFS_INOTYPE_DRIVE_PIDMASK  UINT64_C(0x00000000ffffffff) /* PID mask */
+#define PROCFS_INOTYPE_DRIVE_PIDMASK  UINT64_C(0x000000007fffffff) /* PID mask */
 #define PROCFS_INOTYPE_DRIVE_DRVMASK  UINT64_C(0x0000001f00000000) /* DOS Drive id ('a' + .) */
 #define PROCFS_INOTYPE_DRIVE_DRVSHIFT 32
 #define PROCFS_INOMAKE_DRIVE(pid, drive_id) \
@@ -59,12 +59,22 @@ DECL_BEGIN
 
 /* DOS Drive cwd bindings. `readlink /proc/[pid]/kos/dcwd/[a-z]' */
 #define PROCFS_INOTYPE_DCWD          0x03 /* Per-process drives */
-#define PROCFS_INOTYPE_DCWD_PIDMASK  UINT64_C(0x00000000ffffffff) /* PID mask */
+#define PROCFS_INOTYPE_DCWD_PIDMASK  UINT64_C(0x000000007fffffff) /* PID mask */
 #define PROCFS_INOTYPE_DCWD_DRVMASK  UINT64_C(0x0000001f00000000) /* DOS Drive id ('a' + .) */
 #define PROCFS_INOTYPE_DCWD_DRVSHIFT 32
 #define PROCFS_INOMAKE_DCWD(pid, drive_id) \
 	(((ino_t)PROCFS_INOTYPE_DCWD << PROCFS_INO_TYPESHFT) | \
 	 ((ino_t)(drive_id) << PROCFS_INOTYPE_DCWD_DRVSHIFT) | (ino_t)(pid))
+
+/* File handle bindings. `readlink /proc/[pid]/fd/[id]' */
+#define PROCFS_INOTYPE_FD_LO       0x80 /* Per-process file handles */
+#define PROCFS_INOTYPE_FD_HI       0xff /* Per-process file handles */
+#define PROCFS_INOTYPE_FD_PIDMASK  UINT64_C(0x000000007fffffff) /* PID mask */
+#define PROCFS_INOTYPE_FD_FDMASK   UINT64_C(0x7fffffff80000000) /* File handle number */
+#define PROCFS_INOTYPE_FD_FDSHIFT  31
+#define PROCFS_INOMAKE_FD(pid, fd) \
+	(((ino_t)PROCFS_INOTYPE_FD_LO << PROCFS_INO_TYPESHFT) | \
+	 ((ino_t)(fd) << PROCFS_INOTYPE_FD_FDSHIFT) | (ino_t)(pid))
 
 
 
@@ -223,6 +233,7 @@ INTDEF struct inode_type ProcFS_RootDirectory_Type;
 INTDEF struct inode_type ProcFS_PerProcRootDirectory_Type;
 INTDEF struct inode_type ProcFS_PerProc_Kos_Drives_Entry_Type; /* For `PROCFS_INOTYPE_DRIVE' */
 INTDEF struct inode_type ProcFS_PerProc_Kos_Dcwd_Entry_Type; /* For `PROCFS_INOTYPE_DCWD' */
+INTDEF struct inode_type ProcFS_PerProc_Fd_Entry_Type; /* For `PROCFS_INOTYPE_FD_(LO|HI)' */
 
 INTDEF struct superblock_type ProcFS_Type;
 INTDEF struct superblock ProcFS;

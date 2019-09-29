@@ -4058,8 +4058,11 @@ check_result_for_deletion:
 		}
 		assertf(result->i_type != NULL, "`f_opennode' must fill in `i_type'");
 		assert(result->i_fileino == parent_directory_entry->de_ino);
-		assert((result->i_filemode & S_IFMT) ==
-		       (DTTOIF(parent_directory_entry->de_type) & S_IFMT));
+		assertf((result->i_filemode & S_IFMT) ==
+		        (DTTOIF(parent_directory_entry->de_type) & S_IFMT),
+		        "%u != %u",
+		        IFTODT(result->i_filemode & S_IFMT),
+		        parent_directory_entry->de_type);
 		if unlikely(ATOMIC_READ(result->i_flags) & INODE_FDELETED) {
 			/* Might happen due to race conditions. (start over...) */
 			superblock_nodeslock_endwrite(self);

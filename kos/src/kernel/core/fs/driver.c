@@ -1442,6 +1442,7 @@ driver_enable_textrel(struct driver *__restrict self)
 	if (did_lock_kernel)
 		vm_kernel_treelock_endwrite();
 }
+
 PRIVATE NONNULL((1)) void KCALL
 driver_disable_textrel(struct driver *__restrict self)
 		THROWS(E_WOULDBLOCK) {

@@ -530,6 +530,7 @@
 #define __CRT_HAVE_fs_kernel 1
 #define __CRT_HAVE_handle_close 1
 #define __CRT_HAVE_handle_datasize 1
+#define __CRT_HAVE_handle_existsin 1
 #define __CRT_HAVE_handle_fcntl 1
 #define __CRT_HAVE_handle_get_datablock 1
 #define __CRT_HAVE_handle_get_directory_entry 1

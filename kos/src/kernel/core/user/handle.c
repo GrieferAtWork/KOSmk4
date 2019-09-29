@@ -1227,7 +1227,7 @@ handle_installinto(struct handle_manager *__restrict self,
  *       handle has its type set to `HANDLE_TYPE_UNDEFINED'.
  * NOTE: This function also handles symbolic file descriptors!
  * @throw: E_WOULDBLOCK: Preemption was disabled, and the operation would have blocked */
-PUBLIC REF struct handle FCALL
+PUBLIC WUNUSED REF struct handle FCALL
 handle_trylookup(struct handle_manager *__restrict self,
                  unsigned int fd)
 		THROWS(E_WOULDBLOCK) {
@@ -1283,7 +1283,7 @@ throw_unbound_handle(unsigned int fd, struct handle_manager *__restrict self) {
 }
 
 /* Same as `handle_trylookup()', but throw an error when `fd' is invalid. */
-PUBLIC REF struct handle FCALL
+PUBLIC WUNUSED REF struct handle FCALL
 handle_lookupin(unsigned int fd, struct handle_manager *__restrict self)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE) {
 	REF struct handle result;
@@ -1365,7 +1365,45 @@ handle_lookupin(unsigned int fd, struct handle_manager *__restrict self)
 	return result;
 }
 
-PUBLIC REF struct handle FCALL
+FUNDEF WUNUSED bool FCALL
+handle_existsin(unsigned int fd, struct handle_manager *__restrict self)
+		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE) {
+	sync_read(&self->hm_lock);
+	if (self->hm_mode == HANDLE_MANAGER_MODE_LINEAR) {
+		assert(self->hm_count <= self->hm_linear.hm_alloc);
+		if unlikely(fd >= self->hm_linear.hm_alloc)
+			goto nope;
+		if unlikely(self->hm_linear.hm_vector[fd].h_type == HANDLE_TYPE_UNDEFINED)
+			goto nope;
+	} else {
+		unsigned int i, perturb;
+		assert(self->hm_mode == HANDLE_MANAGER_MODE_HASHVECTOR);
+		assert(self->hm_hashvector.hm_hashvec);
+		assert(self->hm_count <= self->hm_hashvector.hm_alloc);
+		i = perturb = fd & self->hm_hashvector.hm_hashmsk;
+		for (;; handle_manager_hashnext(i, perturb)) {
+			struct handle_hashent *hashent;
+			unsigned int vecid;
+			hashent = &self->hm_hashvector.hm_hashvec[i & self->hm_hashvector.hm_hashmsk];
+			if (hashent->hh_handle_id == HANDLE_HASHENT_SENTINEL_ID)
+				goto nope;
+			if (hashent->hh_handle_id != fd)
+				continue; /* Some other handle. */
+			/* Found it! */
+			vecid = hashent->hh_vector_index;
+			if (vecid == (unsigned int)-1)
+				goto nope; /* Handle has already been deleted! */
+			break;
+		}
+	}
+	sync_endread(&self->hm_lock);
+	return true;
+nope:
+	sync_endread(&self->hm_lock);
+	return false;
+}
+
+PUBLIC WUNUSED REF struct handle FCALL
 handle_lookup_nosym(unsigned int fd)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE) {
 	return handle_lookupin(fd, THIS_HANDLE_MANAGER);
@@ -1482,7 +1520,7 @@ handle_installinto_sym(unsigned int dst_fd, struct handle hnd)
 }
 
 /* Same as `handle_lookup()', but also allow for symbolic handles. */
-PUBLIC REF struct handle FCALL
+PUBLIC WUNUSED REF struct handle FCALL
 handle_lookup(unsigned int fd)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE) {
 	REF struct handle result;
@@ -1580,7 +1618,7 @@ handle_lookup(unsigned int fd)
 
 /* Same as `handle_lookup()', but throw an `E_INVALID_HANDLE_FILETYPE'
  * error when the found handle's type doesn't match `type' */
-PUBLIC REF struct handle FCALL
+PUBLIC WUNUSED REF struct handle FCALL
 handle_lookup_type(unsigned int fd, uintptr_half_t type)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE, E_INVALID_HANDLE_FILETYPE) {
 	REF struct handle result;

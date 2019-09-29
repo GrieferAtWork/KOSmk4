@@ -2811,9 +2811,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname702 /* index: 702 */
-	.weak memlen; .long memlen
-	.reloc ., R_386_SIZE32, memlen; .long 0
-	.long 0x73c42be
+	.weak handle_existsin; .long handle_existsin
+	.reloc ., R_386_SIZE32, handle_existsin; .long 0
+	.long 0xbb862be
 	.long 0 /* index: 703 */
 	.long 0
 	.long 0
@@ -11574,10 +11574,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 2893 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2893 /* index: 2893 */
+	.weak strlen; .long strlen
+	.reloc ., R_386_SIZE32, strlen; .long 0
+	.long 0x7ab92be
 	.long 0 /* index: 2894 */
 	.long 0
 	.long 0
@@ -12147,9 +12147,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, superblock_mountlock_upgrade_nx; .long 0
 	.long 0xf4a04a8
 	.long .Lname3036 /* index: 3036 */
-	.weak strlen; .long strlen
-	.reloc ., R_386_SIZE32, strlen; .long 0
-	.long 0x7ab92be
+	.weak memlen; .long memlen
+	.reloc ., R_386_SIZE32, memlen; .long 0
+	.long 0x73c42be
 	.long 0 /* index: 3037 */
 	.long 0
 	.long 0
@@ -17123,7 +17123,7 @@ END(kernel_symbol_table)
 .Lname700:
 	.string "fs_filesystems_lock_endwrite"
 .Lname702:
-	.string "memlen"
+	.string "handle_existsin"
 .Lname704:
 	.string "__gxx_personality_v0"
 .Lname707:
@@ -19304,6 +19304,8 @@ END(kernel_symbol_table)
 	.string "inode_readv_phys_blocking"
 .Lname2891:
 	.string "handle_get_taskpid"
+.Lname2893:
+	.string "strlen"
 .Lname2898:
 	.string "block_device_awritev_phys_sector"
 .Lname2901:
@@ -19457,7 +19459,7 @@ END(kernel_symbol_table)
 .Lname3035:
 	.string "superblock_mountlock_upgrade_nx"
 .Lname3036:
-	.string "strlen"
+	.string "memlen"
 .Lname3039:
 	.string "inode_readall_phys"
 .Lname3040:

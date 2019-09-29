@@ -35,10 +35,10 @@ struct directory_entry;
 struct file {
 	/* [HANDLE_TYPE(HANDLE_TYPE_FILE)] */
 	WEAK refcnt_t               f_refcnt; /* File reference counter. */
-	REF struct inode           *f_node;   /* [1..1] The opened file INode. */
-	REF struct path            *f_path;   /* [0..1] The path from which `f_node' was opened. */
-	REF struct directory_node  *f_dir;    /* [0..1] The directory node bound to `f_path' at the time of the file being opened. */
-	REF struct directory_entry *f_dirent; /* [0..1] The directory entry associated with `f_node' that was used to open the file. */
+	REF struct inode           *f_node;   /* [1..1][const] The opened file INode. */
+	REF struct path            *f_path;   /* [0..1][const] The path from which `f_node' was opened. */
+	REF struct directory_node  *f_dir;    /* [0..1][const] The directory node bound to `f_path' at the time of the file being opened. */
+	REF struct directory_entry *f_dirent; /* [0..1][const] The directory entry associated with `f_node' that was used to open the file. */
 	WEAK pos_t                  f_offset; /* File I/O read/write position. */
 	struct atomic_rwlock        f_curlck; /* Lock for accessing the current directory entry & its index. */
 	pos_t                       f_curidx; /* [lock(f_curlck)][valid_if(INODE_ISDIR(f_node))]

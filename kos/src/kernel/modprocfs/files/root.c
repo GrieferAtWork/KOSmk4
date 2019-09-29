@@ -142,6 +142,7 @@ unlock_and_flush_pids:
 					if (pid)
 						enumpid(callback, arg, pid);
 				}
+				pidlen = 0;
 				sync_read(ns);
 				continue;
 			}

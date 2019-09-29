@@ -125,6 +125,14 @@ ProcFS_OpenNode(struct superblock *__restrict self,
 		node->i_type      = &ProcFS_PerProc_Kos_Dcwd_Entry_Type;
 	}	break;
 
+	case PROCFS_INOTYPE_FD_LO ... PROCFS_INOTYPE_FD_HI: {
+		node->i_flags    |= INODE_FATTRLOADED;
+		node->i_filemode  = S_IFLNK | 0777;
+		node->i_filenlink = (nlink_t)1;
+		node->i_filesize  = (pos_t)4096;
+		node->i_type      = &ProcFS_PerProc_Fd_Entry_Type;
+	}	break;
+
 	default:
 badino:
 		THROW(E_FSERROR_DELETED,

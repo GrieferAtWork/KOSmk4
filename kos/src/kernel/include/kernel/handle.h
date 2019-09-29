@@ -394,21 +394,24 @@ handle_fcntl(struct handle_manager *__restrict self,
  *       handle has its type set to `HANDLE_TYPE_UNDEFINED'.
  * NOTE: This function also handles symbolic file descriptors!
  * @throw: E_WOULDBLOCK: Preemption was disabled, and the operation would have blocked */
-FUNDEF REF struct handle FCALL handle_trylookup(struct handle_manager *__restrict self,
-                                                unsigned int fd)
+FUNDEF WUNUSED REF struct handle FCALL
+handle_trylookup(struct handle_manager *__restrict self,
+                 unsigned int fd)
 		THROWS(E_WOULDBLOCK);
 /* Same as `handle_trylookup()', but throw an error when `fd' is invalid. */
-FUNDEF REF struct handle FCALL handle_lookup(unsigned int fd)
+FUNDEF WUNUSED REF struct handle FCALL handle_lookup(unsigned int fd)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE);
-FUNDEF REF struct handle FCALL handle_lookupin(unsigned int fd, struct handle_manager *__restrict self)
+FUNDEF WUNUSED REF struct handle FCALL handle_lookupin(unsigned int fd, struct handle_manager *__restrict self)
+		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE);
+FUNDEF WUNUSED bool FCALL handle_existsin(unsigned int fd, struct handle_manager *__restrict self)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE);
 /* Same as `handle_lookup()', but don't allow for symbolic handles. */
-FUNDEF REF struct handle FCALL handle_lookup_nosym(unsigned int fd)
+FUNDEF WUNUSED REF struct handle FCALL handle_lookup_nosym(unsigned int fd)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE);
 
 /* Same as `handle_lookup()', but throw an `E_INVALID_HANDLE_FILETYPE'
  * error when the found handle's type doesn't match `type' */
-FUNDEF REF struct handle FCALL handle_lookup_type(unsigned int fd, uintptr_half_t type)
+FUNDEF WUNUSED REF struct handle FCALL handle_lookup_type(unsigned int fd, uintptr_half_t type)
 		THROWS(E_WOULDBLOCK, E_INVALID_HANDLE_FILE, E_INVALID_HANDLE_FILETYPE);
 
 
