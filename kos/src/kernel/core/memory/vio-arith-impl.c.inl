@@ -22,15 +22,15 @@
 
 #define NAME             xch
 #define OP(oldval,value) value
-#endif
+#endif /* __INTELLISENSE__ */
 
 DECL_BEGIN
 
-#define FUNC3(name,bwlq) vio_ ## name ## bwlq
-#define FUNC2(name,bwlq) FUNC3(name,bwlq)
-#define FUNC(bwlq)       FUNC2(NAME,bwlq)
+#define FUNC3(name, bwlq) vio_##name##bwlq
+#define FUNC2(name, bwlq) FUNC3(name, bwlq)
+#define FUNC(bwlq)        FUNC2(NAME, bwlq)
 
-#define COMPONENT3(name) dtv_ ## name
+#define COMPONENT3(name) dtv_##name
 #define COMPONENT2(name) COMPONENT3(name)
 #define COMPONENT        COMPONENT2(NAME)
 

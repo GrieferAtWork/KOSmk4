@@ -19,17 +19,17 @@
 #ifdef __INTELLISENSE__
 #include "malloc.c"
 #define MALLOC_NX
-#endif
+#endif /* __INTELLISENSE__ */
 
 #ifdef MALLOC_NX
 #define IFELSE_NX(if_nx,if_x)    if_nx
 #define FUNC(x)                  x##_nx
 #define NOTHROW_NX               NOTHROW
-#else
+#else /* MALLOC_NX */
 #define IFELSE_NX(if_nx,if_x)    if_x
 #define FUNC(x)                  x
 #define NOTHROW_NX               /* nothing */
-#endif
+#endif /* !MALLOC_NX */
 
 DECL_BEGIN
 
@@ -52,7 +52,7 @@ IFELSE_NX(err:, err_overflow:)
 	IFELSE_NX(return NULL, THROW(E_BADALLOC_INSUFFICIENT_HEAP_MEMORY, n_bytes));
 }
 #elif defined(MALLOC_NX)
-#define kmalloc_no_slab_nx  kmalloc_nx
+#define kmalloc_no_slab_nx kmalloc_nx
 #else
 #define kmalloc_noslab     kmalloc
 #endif

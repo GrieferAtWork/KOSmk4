@@ -18,7 +18,7 @@
  */
 #ifndef SECTION
 #error "Must #define SECTION(name, type, flags, start, size, entsize, link, info) before #including this file"
-#endif
+#endif /* !SECTION */
 
 #ifndef SECTION_GLOBALS_DEFINED
 #define SECTION_GLOBALS_DEFINED 1
@@ -54,7 +54,7 @@ INTDEF byte_t __kernel_sect_data_start[];
 INTDEF byte_t __kernel_sect_data_size[];
 INTDEF byte_t __kernel_sect_bss_start[];
 INTDEF byte_t __kernel_sect_bss_size[];
-#endif
+#endif /* !SECTION_GLOBALS_DEFINED */
 
 SECTION(".text", SHT_PROGBITS, SHF_ALLOC | SHF_EXECINSTR, __kernel_sect_text_start, __kernel_sect_text_size, 0, 0, 0)
 SECTION(".rodata", SHT_PROGBITS, SHF_ALLOC, __kernel_sect_rodata_start, __kernel_sect_rodata_size, 0, 0, 0)

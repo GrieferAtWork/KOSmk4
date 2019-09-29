@@ -27,10 +27,10 @@
 #include <fs/node.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
-#include <kernel/user.h>
 #include <kernel/malloc.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
+#include <kernel/user.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>

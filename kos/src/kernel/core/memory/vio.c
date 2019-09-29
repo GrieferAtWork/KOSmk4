@@ -25,8 +25,9 @@
 #include <kernel/types.h>
 #include <kernel/vio.h>
 
-#include <assert.h>
 #include <hybrid/unaligned.h>
+
+#include <assert.h>
 
 DECL_BEGIN
 
@@ -239,13 +240,13 @@ typedef union ATTR_PACKED {
 #define CASEW    case 2: case 6:
 #define CASEL    case 4:
 #define CASEQ    case 0:
-#else
+#else /* CONFIG_VIO_HAS_QWORD */
 #define MMASK  3
 #define CASEB    case 1: case 3:
 #define CASEW    case 2:
 #define CASEL    case 0:
 #define CASEQ    /* nothing */
-#endif
+#endif /* !CONFIG_VIO_HAS_QWORD */
 
 
 

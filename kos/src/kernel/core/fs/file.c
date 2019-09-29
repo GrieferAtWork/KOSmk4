@@ -31,17 +31,17 @@
 #include <kernel/malloc.h>
 #include <kernel/user.h>
 
+#include <hybrid/align.h>
 #include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
-#include <hybrid/align.h>
 
 #include <kos/hop.h>
 
-#include <dirent.h>
 #include <assert.h>
+#include <dirent.h>
+#include <stdalign.h>
 #include <string.h>
 #include <unistd.h>
-#include <stdalign.h>
 
 DECL_BEGIN
 

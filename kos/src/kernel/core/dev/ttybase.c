@@ -24,27 +24,29 @@
 
 #include <dev/char.h>
 #include <dev/ttybase.h>
-#include <kernel/printk.h>
-#include <kernel/user.h>
 #include <kernel/except.h>
+#include <kernel/printk.h>
 #include <kernel/types.h>
-#include <sched/pid-ctty.h>
+#include <kernel/user.h>
 #include <sched/cred.h>
+#include <sched/pid-ctty.h>
 #include <sched/pid.h>
 #include <sched/posix-signal.h>
 
-#include <assert.h>
-#include <signal.h>
-#include <string.h>
-#include <stddef.h>
-#include <errno.h>
-
-#include <libterm/termio.h>
 #include <hybrid/atomic.h>
-#include <sys/stat.h>
-#include <sys/types.h> /* loff_t */
+
 #include <asm/ioctls.h>
 #include <linux/termios.h> /* struct termiox */
+#include <sys/stat.h>
+#include <sys/types.h> /* loff_t */
+
+#include <assert.h>
+#include <errno.h>
+#include <signal.h>
+#include <stddef.h>
+#include <string.h>
+
+#include <libterm/termio.h>
 
 DECL_BEGIN
 

@@ -39,9 +39,9 @@
 #include <kernel/vio.h>
 #include <kernel/vm.h>
 #include <sched/cpu.h>
+#include <sched/cred.h>
 #include <sched/rpc.h>
 #include <sched/signal.h>
-#include <sched/cred.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
@@ -186,24 +186,24 @@ directory_entry_hash(CHECKED USER /*utf-8*/char const *__restrict name,
 }
 
 PUBLIC struct directory_entry empty_directory_entry = {
-	/* .de_refcnt   = */1,
-	/* .de_heapsize = */sizeof(empty_directory_entry),
-	/* .de_next     = */NULL,
-	/* .de_bypos    = */LLIST_INITNODE,
-	/* .de_fsdata   = */{
-		/* .de_start = */0,
-		/* .de_data  = */{ 0 },
+	/* .de_refcnt   = */ 1,
+	/* .de_heapsize = */ sizeof(empty_directory_entry),
+	/* .de_next     = */ NULL,
+	/* .de_bypos    = */ LLIST_INITNODE,
+	/* .de_fsdata   = */ {
+		/* .de_start = */ 0,
+		/* .de_data  = */ { 0 },
 	},
-	/* .de_pos      = */(pos_t)0,
-	/* .de_ino      = */(ino_t)0,
-	/* .de_hash     = */DIRECTORY_ENTRY_EMPTY_HASH,
-	/* .de_namelen  = */0,
+	/* .de_pos      = */ (pos_t)0,
+	/* .de_ino      = */ (ino_t)0,
+	/* .de_hash     = */ DIRECTORY_ENTRY_EMPTY_HASH,
+	/* .de_namelen  = */ 0,
 #if 1
-	/* .de_type     = */DT_DIR, /* DIR, because this entry is used as entry in `open("/")' */
+	/* .de_type     = */ DT_DIR, /* DIR, because this entry is used as entry in `open("/")' */
 #else
-	/* .de_type     = */DT_UNKNOWN,
+	/* .de_type     = */ DT_UNKNOWN,
 #endif
-	/* .de_name     = */{ 0 }
+	/* .de_name     = */ { 0 }
 };
 
 PUBLIC NOBLOCK NONNULL((1)) void

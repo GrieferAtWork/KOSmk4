@@ -27,8 +27,8 @@
 #include <fs/vfs.h>
 #include <kernel/debugger.h>
 #include <kernel/debugtrap.h>
-#include <kernel/driver.h>
 #include <kernel/driver-param.h>
+#include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/handle.h>
 #include <kernel/heap.h>
@@ -46,17 +46,17 @@
 #include <hybrid/sequence/list.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
+#include <bits/elf.h> /* ELF_HOST_RELA_UNUSED */
 #include <kos/debugtrap.h>
 
+#include <assert.h>
 #include <ctype.h>
 #include <elf.h>
 #include <malloca.h>
 #include <signal.h>
-#include <assert.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
-#include <bits/elf.h> /* ELF_HOST_RELA_UNUSED */
 #include <libunwind/eh_frame.h>
 
 DECL_BEGIN
@@ -824,57 +824,57 @@ struct kernel_shstrtab {
 
 
 PUBLIC struct driver kernel_driver = {
-	/* .d_refcnt               = */2, /* kernel_driver, !DRIVER_FLAG_FINALIZED */
-	/* .d_name                 = */kernel_driver_name,
-	/* .d_filename             = */kernel_driver_filename,
-	/* .d_file                 = */NULL,
-	/* .d_cmdline              = */NULL,
-	/* .d_argc                 = */0,
-	/* .d_argv                 = */NULL,
-	/* .d_flags                = */(DRIVER_FLAG_DEPLOADING | DRIVER_FLAG_DEPLOADED |
-	                                DRIVER_FLAG_RELOCATING | DRIVER_FLAG_RELOCATED |
-	                                DRIVER_FLAG_INITIALIZED | DRIVER_FLAG_INITIALIZING),
-	/* .d_initthread           = */NULL,
-	/* .d_loadaddr             = */0,
-	/* .d_loadstart            = */(uintptr_t)__kernel_start,
-	/* .d_loadend              = */(uintptr_t)__kernel_end,
-	/* .d_eh_frame_start       = */(byte_t *)__kernel_eh_frame_start,
-	/* .d_eh_frame_end         = */(byte_t *)__kernel_eh_frame_end,
-	/* .d_eh_frame_cache       = */NULL,
-	/* .d_eh_frame_cache_lock  = */ATOMIC_RWLOCK_INIT,
-	/* .d_eh_frame_cache_semi0 = */ATREE_SEMI0(uintptr_t),   /* TODO: Optimize specifically for the kernel core? */
-	/* .d_eh_frame_cache_leve0 = */ATREE_LEVEL0(uintptr_t),  /* TODO: Optimize specifically for the kernel core? */
-	/* .d_depcnt               = */0,
-	/* .d_depvec               = */NULL,
-	/* .d_dyncnt               = */0,
-	/* .d_dynhdr               = */NULL,
-	/* .d_dynsym_tab           = */NULL,
-	/* .d_dynsym_cnt           = */0,
-	/* .d_hashtab              = */NULL,
-	/* .d_dynstr               = */NULL,
-	/* .d_dynstr_end           = */NULL,
-	/* .d_shoff                = */0,
+	/* .d_refcnt               = */ 2, /* kernel_driver, !DRIVER_FLAG_FINALIZED */
+	/* .d_name                 = */ kernel_driver_name,
+	/* .d_filename             = */ kernel_driver_filename,
+	/* .d_file                 = */ NULL,
+	/* .d_cmdline              = */ NULL,
+	/* .d_argc                 = */ 0,
+	/* .d_argv                 = */ NULL,
+	/* .d_flags                = */ (DRIVER_FLAG_DEPLOADING | DRIVER_FLAG_DEPLOADED |
+	                                 DRIVER_FLAG_RELOCATING | DRIVER_FLAG_RELOCATED |
+	                                 DRIVER_FLAG_INITIALIZED | DRIVER_FLAG_INITIALIZING),
+	/* .d_initthread           = */ NULL,
+	/* .d_loadaddr             = */ 0,
+	/* .d_loadstart            = */ (uintptr_t)__kernel_start,
+	/* .d_loadend              = */ (uintptr_t)__kernel_end,
+	/* .d_eh_frame_start       = */ (byte_t *)__kernel_eh_frame_start,
+	/* .d_eh_frame_end         = */ (byte_t *)__kernel_eh_frame_end,
+	/* .d_eh_frame_cache       = */ NULL,
+	/* .d_eh_frame_cache_lock  = */ ATOMIC_RWLOCK_INIT,
+	/* .d_eh_frame_cache_semi0 = */ ATREE_SEMI0(uintptr_t),   /* TODO: Optimize specifically for the kernel core? */
+	/* .d_eh_frame_cache_leve0 = */ ATREE_LEVEL0(uintptr_t),  /* TODO: Optimize specifically for the kernel core? */
+	/* .d_depcnt               = */ 0,
+	/* .d_depvec               = */ NULL,
+	/* .d_dyncnt               = */ 0,
+	/* .d_dynhdr               = */ NULL,
+	/* .d_dynsym_tab           = */ NULL,
+	/* .d_dynsym_cnt           = */ 0,
+	/* .d_hashtab              = */ NULL,
+	/* .d_dynstr               = */ NULL,
+	/* .d_dynstr_end           = */ NULL,
+	/* .d_shoff                = */ 0,
 #ifdef __INTELLISENSE__
-	/* .d_shstrndx             = */0,
-	/* .d_shnum                = */0,
+	/* .d_shstrndx             = */ 0,
+	/* .d_shnum                = */ 0,
 #else
-	/* .d_shstrndx             = */KERNEL_SECTIONS_COUNT - 1,
-	/* .d_shnum                = */KERNEL_SECTIONS_COUNT,
+	/* .d_shstrndx             = */ KERNEL_SECTIONS_COUNT - 1,
+	/* .d_shnum                = */ KERNEL_SECTIONS_COUNT,
 #endif
-	/* .d_shdr                 = */kernel_shdr,
-	/* .d_sections_lock        = */ATOMIC_RWLOCK_INIT,
-	/* .d_sections             = */(struct driver_section **)kernel_sections,
-	/* .d_deadsect             = */NULL,
-	/* .d_dangsect             = */NULL,
-	/* .d_shstrtab             = */kernel_shstrtab_data,
+	/* .d_shdr                 = */ kernel_shdr,
+	/* .d_sections_lock        = */ ATOMIC_RWLOCK_INIT,
+	/* .d_sections             = */ (struct driver_section **)kernel_sections,
+	/* .d_deadsect             = */ NULL,
+	/* .d_dangsect             = */ NULL,
+	/* .d_shstrtab             = */ kernel_shstrtab_data,
 #ifdef __INTELLISENSE__
-	/* .d_shstrtab_end         = */kernel_shstrtab_data,
+	/* .d_shstrtab_end         = */ kernel_shstrtab_data,
 #else
-	/* .d_shstrtab_end         = */kernel_shstrtab_data + sizeof(struct kernel_shstrtab),
+	/* .d_shstrtab_end         = */ kernel_shstrtab_data + sizeof(struct kernel_shstrtab),
 #endif
-	/* .d_phnum                = */2,
+	/* .d_phnum                = */ 2,
 	{
-		/* [0] = */ELF_PHDR_INIT(
+		/* [0] = */ ELF_PHDR_INIT(
 			/* .p_type   = */PT_LOAD,
 			/* .p_offset = */0, /* Doesn't matter... */
 			/* .p_vaddr  = */(uintptr_t)__kernel_start,
@@ -888,7 +888,7 @@ PUBLIC struct driver kernel_driver = {
 			/* .p_align  = */__ALIGNOF_MAX_ALIGN_T__
 #endif /* !PAGESIZE */
 		),
-		/* [1] = */ELF_PHDR_INIT(
+		/* [1] = */ ELF_PHDR_INIT(
 			/* .p_type   = */PT_LOAD,
 			/* .p_offset = */0, /* Doesn't matter... */
 			/* .p_vaddr  = */(uintptr_t)__kernel_free_start,
@@ -4037,8 +4037,8 @@ driver_insmod_filename(USER CHECKED char const *driver_filename,
  * NOTE: This path can be restored with
  *      `sysctl_set_driver_library_path(SYSCTL_DRIVER_LIBRARY_PATH_DEFAULT)' */
 INTERN struct driver_library_path_string default_library_path = {
-	/* .dlp_refcnt = */2, /* +1:default_library_path, +1:current_library_path */
-	/* .dlp_path   = */KERNEL_DRIVER_DEFAULT_LIBRARY_PATH
+	/* .dlp_refcnt = */ 2, /* +1:default_library_path, +1:current_library_path */
+	/* .dlp_path   = */ KERNEL_DRIVER_DEFAULT_LIBRARY_PATH
 };
 
 /* TODO: Kernel commandline option `driver-libpath=...' */

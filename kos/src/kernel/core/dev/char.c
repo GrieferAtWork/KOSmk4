@@ -23,14 +23,13 @@
 #include <kernel/compiler.h>
 
 #include <dev/char.h>
+#include <dev/keyboard.h>
+#include <dev/mouse.h>
 #include <dev/pty.h>
 #include <dev/ttybase.h>
-#include <dev/mouse.h>
-#include <dev/keyboard.h>
 #include <fs/node.h>
 #include <fs/ramfs.h>
 #include <kernel/aio.h>
-#include <kernel/user.h>
 #include <kernel/debugger.h>
 #include <kernel/except.h>
 #include <kernel/handle.h>
@@ -38,14 +37,16 @@
 #include <kernel/malloc.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
+#include <kernel/user.h>
 
 #include <kos/dev.h>
 #include <sys/stat.h>
 #include <sys/types.h> /* loff_t */
 
+#include <assert.h>
+#include <errno.h>
 #include <stdio.h>
 #include <string.h>
-#include <errno.h>
 
 /* Implement the ABI for the address tree used by character_device. */
 #define ATREE(x)                  cdev_tree_##x

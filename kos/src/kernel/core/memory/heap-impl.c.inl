@@ -19,7 +19,7 @@
 #ifdef __INTELLISENSE__
 #include "heap.c"
 #define HEAP_NX 1
-#endif
+#endif /* __INTELLISENSE__ */
 
 #include <kernel/driver.h>
 #include <kernel/rand.h>

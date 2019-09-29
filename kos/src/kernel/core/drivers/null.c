@@ -25,10 +25,11 @@
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/printk.h>
-#include <kernel/vio.h>
 #include <kernel/rand.h>
 #include <kernel/types.h>
+#include <kernel/vio.h>
 #include <kernel/vm.h>
+
 #include <hybrid/unaligned.h>
 
 #include <kos/dev.h>
@@ -47,24 +48,28 @@ null_read(struct character_device *__restrict UNUSED(self),
           iomode_t UNUSED(mode)) THROWS(...) {
 	return 0;
 }
+
 PRIVATE NONNULL((1)) size_t KCALL
 null_write(struct character_device *__restrict UNUSED(self),
            USER CHECKED void const *UNUSED(src), size_t num_bytes,
            iomode_t UNUSED(mode)) THROWS(...) {
 	return num_bytes;
 }
+
 PRIVATE NONNULL((1)) size_t KCALL
 null_pread(struct character_device *__restrict UNUSED(self),
            USER CHECKED void *UNUSED(dst), size_t UNUSED(num_bytes),
            pos_t UNUSED(addr), iomode_t UNUSED(mode)) THROWS(...) {
 	return 0;
 }
+
 PRIVATE NONNULL((1)) size_t KCALL
 null_pwrite(struct character_device *__restrict UNUSED(self),
             USER CHECKED void const *UNUSED(src), size_t num_bytes,
             pos_t UNUSED(addr), iomode_t UNUSED(mode)) THROWS(...) {
 	return num_bytes;
 }
+
 PRIVATE NONNULL((1)) poll_mode_t KCALL
 null_poll(struct character_device *__restrict UNUSED(self),
           poll_mode_t what) {
@@ -94,6 +99,7 @@ zero_read(struct character_device *__restrict UNUSED(self),
 	memset(dst, 0, num_bytes);
 	return num_bytes;
 }
+
 PRIVATE NONNULL((1)) size_t KCALL
 zero_pread(struct character_device *__restrict UNUSED(self),
            USER CHECKED void *dst, size_t num_bytes,
@@ -109,6 +115,7 @@ full_write(struct character_device *__restrict UNUSED(self),
            iomode_t UNUSED(mode)) THROWS(...) {
 	THROW(E_FSERROR_DISK_FULL);
 }
+
 PRIVATE NONNULL((1)) size_t KCALL
 full_pwrite(struct character_device *__restrict UNUSED(self),
             USER CHECKED void const *UNUSED(src), size_t UNUSED(num_bytes),
@@ -124,6 +131,7 @@ mem_pread(struct character_device *__restrict UNUSED(self),
 	vm_copyfromphys(dst, (vm_phys_t)addr, num_bytes);
 	return num_bytes;
 }
+
 PRIVATE NONNULL((1)) size_t KCALL
 mem_pwrite(struct character_device *__restrict UNUSED(self),
            USER CHECKED void const *src, size_t num_bytes,
@@ -158,6 +166,7 @@ port_pread(struct character_device *__restrict UNUSED(self),
 		((u8 *)dst)[i] = inb((port_t)(addr + i));
 	return num_bytes;
 }
+
 PRIVATE NONNULL((1)) size_t KCALL
 port_pwrite(struct character_device *__restrict UNUSED(self),
             USER CHECKED void const *src, size_t num_bytes,
@@ -192,12 +201,14 @@ urandom_read(struct character_device *__restrict UNUSED(self),
 	}
 	return result;
 }
+
 PRIVATE NONNULL((1)) size_t KCALL
 urandom_pread(struct character_device *__restrict self,
               USER CHECKED void *dst, size_t num_bytes,
               pos_t UNUSED(addr), iomode_t mode) THROWS(...) {
 	return urandom_read(self, dst, num_bytes, mode);
 }
+
 PRIVATE NONNULL((1)) poll_mode_t KCALL
 urandom_poll(struct character_device *__restrict UNUSED(self),
              poll_mode_t what) {
@@ -209,9 +220,11 @@ PRIVATE u32 KCALL krand32_nondeterministic(void) {
 	/* TODO */
 	return krand();
 }
+
 PRIVATE u16 KCALL krand16_nondeterministic(void) {
 	return (u16)krand32_nondeterministic();
 }
+
 PRIVATE u8 KCALL krand8_nondeterministic(void) {
 	return (u8)krand32_nondeterministic();
 }
@@ -240,12 +253,14 @@ random_read(struct character_device *__restrict self,
 	}
 	return result;
 }
+
 PRIVATE NONNULL((1)) size_t KCALL
 random_pread(struct character_device *__restrict self,
              USER CHECKED void *dst, size_t num_bytes,
              pos_t UNUSED(addr), iomode_t mode) THROWS(...) {
 	return random_read(self, dst, num_bytes, mode);
 }
+
 PRIVATE NONNULL((1)) poll_mode_t KCALL
 random_poll(struct character_device *__restrict UNUSED(self),
             poll_mode_t what) {
@@ -260,6 +275,7 @@ kmsg_write(struct character_device *__restrict UNUSED(self),
            iomode_t UNUSED(mode)) THROWS(...) {
 	return (size_t)kprinter((void *)KERN_RAW, (char const *)src, num_bytes);
 }
+
 PRIVATE NONNULL((1)) poll_mode_t KCALL
 kmsg_poll(struct character_device *__restrict UNUSED(self),
           poll_mode_t what) {
@@ -272,9 +288,11 @@ kmsg_poll(struct character_device *__restrict UNUSED(self),
 PRIVATE u8 KCALL port_rdb(struct vio_args *__restrict UNUSED(args), vm_daddr_t addr) {
 	return inb((port_t)addr);
 }
+
 PRIVATE u16 KCALL port_rdw(struct vio_args *__restrict UNUSED(args), vm_daddr_t addr) {
 	return inw((port_t)addr);
 }
+
 PRIVATE u32 KCALL port_rdl(struct vio_args *__restrict UNUSED(args), vm_daddr_t addr) {
 	return inl((port_t)addr);
 }
@@ -282,9 +300,11 @@ PRIVATE u32 KCALL port_rdl(struct vio_args *__restrict UNUSED(args), vm_daddr_t 
 PRIVATE void KCALL port_wrb(struct vio_args *__restrict UNUSED(args), vm_daddr_t addr, u8 value) {
 	outb((port_t)addr, value);
 }
+
 PRIVATE void KCALL port_wrw(struct vio_args *__restrict UNUSED(args), vm_daddr_t addr, u16 value) {
 	outw((port_t)addr, value);
 }
+
 PRIVATE void KCALL port_wrl(struct vio_args *__restrict UNUSED(args), vm_daddr_t addr, u32 value) {
 	outl((port_t)addr, value);
 }

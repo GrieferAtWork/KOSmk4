@@ -33,8 +33,8 @@
 #include <hybrid/align.h>
 #include <hybrid/overflow.h>
 
-#include <stdint.h>
 #include <assert.h>
+#include <stdint.h>
 #include <string.h>
 
 DECL_BEGIN

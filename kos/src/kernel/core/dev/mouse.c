@@ -26,20 +26,20 @@
 #include <kernel/except.h>
 #include <kernel/panic.h>
 #include <kernel/types.h>
-#include <sched/task.h>
 #include <kernel/user.h>
+#include <sched/task.h>
 
-#include <hybrid/overflow.h>
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
+#include <hybrid/overflow.h>
 
 #include <sys/stat.h>
 
-#include <errno.h>
 #include <assert.h>
+#include <errno.h>
 #include <stddef.h>
-#include <string.h>
 #include <stdint.h>
+#include <string.h>
 
 DECL_BEGIN
 

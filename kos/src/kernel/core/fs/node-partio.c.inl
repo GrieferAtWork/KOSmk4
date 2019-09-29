@@ -22,9 +22,11 @@
 #endif
 
 #include <fs/node.h>
-#include <hybrid/overflow.h>
-#include "../memory/vm/vm-partapi.h"
 #include <kernel/swap.h>
+
+#include <hybrid/overflow.h>
+
+#include "../memory/vm/vm-partapi.h"
 
 DECL_BEGIN
 

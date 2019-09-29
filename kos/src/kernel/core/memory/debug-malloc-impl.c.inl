@@ -451,5 +451,5 @@ DECL_END
 #undef FUNC
 #undef IFELSE_NX
 #undef MALLOC_NX
-#endif
+#endif /* !__INTELLISENSE__ */
 

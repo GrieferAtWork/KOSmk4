@@ -136,9 +136,9 @@ NOTHROW(KCALL slab_freepage)(struct slab *__restrict self) {
 	struct slab_pool *pool;
 #if SLAB_FLOCKED == 1
 	pool = &slab_freepool[self->s_flags & SLAB_FLOCKED];
-#else
+#else /* SLAB_FLOCKED == 1 */
 	pool = &slab_freepool[(self->s_flags & SLAB_FLOCKED) ? 1 : 0];
-#endif
+#endif /* SLAB_FLOCKED != 1 */
 	if (pool_lock_trywrite(pool)) {
 		pool_do_free(pool, self);
 		pool_lock_endwrite(pool);
@@ -674,7 +674,7 @@ NOTHROW(KCALL slab_free)(void *__restrict ptr) {
 		break;
 	SLAB_FOREACH_SIZE(CASE_SLAB_FREE)
 #undef CASE_SLAB_FREE
-#endif
+#endif /* !__INTELLISENSE__ */
 	default:
 #ifndef NDEBUG
 		kernel_panic("Corrupted SLAB page at %p has an invalid size of %I8u",
@@ -699,7 +699,7 @@ NOTHROW(KCALL slab_ffree)(void *__restrict ptr, gfp_t flags) {
 		break;
 	SLAB_FOREACH_SIZE(CASE_SLAB_FREE)
 #undef CASE_SLAB_FREE
-#endif
+#endif /* !__INTELLISENSE__ */
 	default:
 #ifndef NDEBUG
 		kernel_panic("Corrupted SLAB page at %p has an invalid size of %I8u",
@@ -719,7 +719,7 @@ NOTHROW(KCALL __os_slab_malloc)(size_t num_bytes, gfp_t flags) {
 		return slab_malloc##sz(flags);
 	SLAB_FOREACH_SIZE(CASE_SLAB_MALLOC)
 #undef CASE_SLAB_MALLOC
-#endif
+#endif /* !__INTELLISENSE__ */
 #ifndef NDEBUG
 	kernel_panic("Invalid slab size %Iu", num_bytes);
 #else /* !NDEBUG */
@@ -735,7 +735,7 @@ __os_slab_kmalloc(size_t num_bytes, gfp_t flags) {
 		return slab_kmalloc##sz(flags);
 	SLAB_FOREACH_SIZE(CASE_SLAB_MALLOC)
 #undef CASE_SLAB_MALLOC
-#endif
+#endif /* !__INTELLISENSE__ */
 #ifndef NDEBUG
 	kernel_panic("Invalid slab size %Iu", num_bytes);
 #else /* !NDEBUG */
@@ -751,7 +751,7 @@ NOTHROW(KCALL __os_slab_kmalloc_nx)(size_t num_bytes, gfp_t flags) {
 		return slab_kmalloc_nx##sz(flags);
 	SLAB_FOREACH_SIZE(CASE_SLAB_MALLOC)
 #undef CASE_SLAB_MALLOC
-#endif
+#endif /* !__INTELLISENSE__ */
 #ifndef NDEBUG
 	kernel_panic("Invalid slab size %Iu", num_bytes);
 #else /* !NDEBUG */

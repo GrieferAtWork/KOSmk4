@@ -20,6 +20,7 @@
 #define GUARD_KERNEL_CORE_DRIVERS_SERIAL_C 1
 
 #include <kernel/compiler.h>
+
 #include <kernel/serial.h>
 #include <kernel/types.h>
 
@@ -50,7 +51,7 @@ PUBLIC bool KCALL serial_probe(port_t base) {
 		static u8 const test_data[4] = { 't', 'e', 's', 't' };
 		unsigned int i;
 		for (i = 0; i < COMPILER_LENOF(test_data); ++i) {
-			u8 recv,send = test_data[i];
+			u8 recv, send = test_data[i];
 			outb(SERIAL_IOADDR_THR(base), send);
 			recv = inb(SERIAL_IOADDR_THR(base));
 			if (recv != send)

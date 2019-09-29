@@ -28,10 +28,12 @@
 #include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <kernel/vm.h>
+
 #include <hybrid/atomic.h>
 
 #include <asm/intrin.h>
 
+#include <assert.h>
 #include <stddef.h>
 #include <string.h>
 

@@ -23,6 +23,7 @@
 #endif /* __INTELLISENSE__ */
 
 #include <kernel/malloc.h>
+
 #include <alloca.h>
 
 DECL_BEGIN

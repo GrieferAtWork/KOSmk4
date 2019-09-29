@@ -183,7 +183,7 @@ PUBLIC struct vm_datablock vm_datablock_debugheap = {
 	/* .db_type   = */&vm_datablock_debugheap_type,
 #ifdef CONFIG_VIO
 	/* .db_vio    = */NULL,
-#endif
+#endif /* CONFIG_VIO */
 	/* .db_parts  = */VM_DATABLOCK_ANONPARTS_INIT,
 	VM_DATABLOCK_INIT_PAGEINFO(0)
 };

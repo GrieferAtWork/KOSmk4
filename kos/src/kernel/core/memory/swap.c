@@ -46,6 +46,7 @@ NOTHROW(KCALL swap_malloc)(pagecnt_t num_pages) {
 	       (res_pages == num_pages));
 	return result;
 }
+
 PUBLIC NONNULL((3)) swapptr_t
 NOTHROW(KCALL swap_malloc_part)(pagecnt_t min_pages, pagecnt_t max_pages,
                                 pagecnt_t *__restrict res_pages) {

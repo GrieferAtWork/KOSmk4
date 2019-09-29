@@ -42,9 +42,9 @@
 #include <bits/param.h>
 #include <kos/hop.h>
 
+#include <assert.h>
 #include <format-printer.h>
 #include <sched.h>
-#include <assert.h>
 #include <string.h>
 
 DECL_BEGIN

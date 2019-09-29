@@ -25,7 +25,6 @@
 #include <dev/ansitty.h>
 #include <dev/keyboard.h>
 #include <dev/tty.h>
-#include <kernel/printk.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/handle.h>

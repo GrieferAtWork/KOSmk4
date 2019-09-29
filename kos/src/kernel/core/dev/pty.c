@@ -26,11 +26,11 @@
 #include <dev/pty.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
+#include <kernel/handle.h>
 #include <kernel/printk.h>
+#include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
-#include <kernel/syscall.h>
-#include <kernel/handle.h>
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
@@ -38,6 +38,7 @@
 #include <kos/io.h>
 #include <sys/stat.h>
 
+#include <assert.h>
 #include <errno.h>
 #include <signal.h>
 #include <stdio.h>

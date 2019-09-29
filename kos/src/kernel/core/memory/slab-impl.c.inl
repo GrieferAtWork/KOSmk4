@@ -19,11 +19,11 @@
 #ifdef __INTELLISENSE__
 #include "slab.c"
 #define SEGMENT_SIZE 4
-#endif
+#endif /* __INTELLISENSE__ */
 
 #define FUNC3(x, y) x##y
 #define FUNC2(x, y) FUNC3(x, y)
-#define FUNC(x) FUNC2(x, SEGMENT_SIZE)
+#define FUNC(x)     FUNC2(x, SEGMENT_SIZE)
 
 #define SEGMENT_OFFSET   SLAB_SEGMENT_OFFSET(SEGMENT_SIZE)
 #define SEGMENT_COUNT    SLAB_SEGMENT_COUNT(SEGMENT_SIZE)
@@ -42,9 +42,9 @@ struct FUNC(segment) {
 	byte_t s_data[SEGMENT_SIZE];
 };
 
-#define DESC           FUNC(desc)
-#define BITSET(s)    ((uintptr_t *)((struct slab *)(s) + 1))
-#define SEGMENTS(s)  ((struct FUNC(segment) *)((byte_t *)(s) + SEGMENT_OFFSET))
+#define DESC        FUNC(desc)
+#define BITSET(s)   ((uintptr_t *)((struct slab *)(s) + 1))
+#define SEGMENTS(s) ((struct FUNC(segment) *)((byte_t *)(s) + SEGMENT_OFFSET))
 
 LOCAL void
 NOTHROW(KCALL FUNC(slab_dofreeptr))(struct slab *__restrict self,
@@ -99,7 +99,7 @@ NOTHROW(KCALL FUNC(slab_freeptr))(struct slab *__restrict self,
 #ifdef CONFIG_DEBUG_HEAP
 	if (!(flags & GFP_CALLOC))
 		mempatl(ptr, DEBUGHEAP_NO_MANS_LAND, SEGMENT_SIZE);
-#endif
+#endif /* CONFIG_DEBUG_HEAP */
 	if likely(sync_trywrite(&DESC.sd_lock)) {
 		FUNC(slab_service_pending)();
 		FUNC(slab_dofreeptr)(self, ptr, flags);
@@ -112,7 +112,7 @@ NOTHROW(KCALL FUNC(slab_freeptr))(struct slab *__restrict self,
 #if SEGMENT_SIZE > __SIZEOF_POINTER__
 		if (flags & GFP_CALLOC)
 			mempatl((byte_t *)ptr + sizeof(void *), DEBUGHEAP_NO_MANS_LAND, SEGMENT_SIZE - sizeof(void *));
-#endif
+#endif /* SEGMENT_SIZE > __SIZEOF_POINTER__ */
 #endif /* CONFIG_DEBUG_HEAP */
 		pend = (struct slab_pending_free *)ptr;
 		do {
@@ -184,7 +184,7 @@ again:
 				result_page->s_pself = NULL;
 #ifndef NDEBUG
 				memset(&result_page->s_next, 0xcc, sizeof(result_page->s_next));
-#endif
+#endif /* !NDEBUG */
 			}
 			FUNC(slab_endwrite)();
 #ifdef CONFIG_DEBUG_HEAP
@@ -196,10 +196,10 @@ again:
 			} else {
 				mempatl(result, DEBUGHEAP_FRESH_MEMORY, SEGMENT_SIZE);
 			}
-#else
+#else /* CONFIG_DEBUG_HEAP */
 			if ((flags & GFP_CALLOC) && !(page_flags & SLAB_FCALLOC))
 				memset(result, 0, SEGMENT_SIZE);
-#endif
+#endif /* !CONFIG_DEBUG_HEAP */
 			return result;
 		}
 	}
@@ -252,9 +252,9 @@ err:
 #define NEXT_FUNC2(x, y) x##y
 #define NEXT_FUNC(x, y) NEXT_FUNC2(x, y)
 	return NEXT_FUNC(slab_malloc, NEXT_SEGMENT_SIZE)(flags);
-#else
+#else /* NEXT_SEGMENT_SIZE */
 	return NULL;
-#endif
+#endif /* !NEXT_SEGMENT_SIZE */
 }
 
 

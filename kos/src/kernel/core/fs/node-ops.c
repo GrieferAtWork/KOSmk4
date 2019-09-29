@@ -21,13 +21,14 @@
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
-#include <kernel/except.h>
+
+#include <fs/node.h>
 #include <kernel/aio.h>
-#include <kernel/vm.h>
+#include <kernel/except.h>
 #include <kernel/paging.h>
+#include <kernel/vm.h>
 
 #include <assert.h>
-#include <fs/node.h>
 
 DECL_BEGIN
 
