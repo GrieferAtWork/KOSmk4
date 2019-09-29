@@ -115,11 +115,11 @@ done_procfs:
 			if (console != i)
 				Dup2(console, i);
 		}
-		if (console > 3)
+		if (console >= 3)
 			close(console);
 	}
 
-	/* Construct the recommended symlinks for devfs
+	/* Construct the recommended symlinks for devfs.
 	 * Don't do any error checking, since these missing
 	 * shouldn't hinder minimal operability of the system. */
 	symlink("/proc/self/fd", "/dev/fd");
