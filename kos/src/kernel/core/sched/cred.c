@@ -52,6 +52,11 @@ cred_require_resource(void) THROWS(E_INSUFFICIENT_RIGHTS) {
 	/* TODO: `CAP_SYS_RESOURCE' */
 }
 
+PUBLIC void KCALL
+cred_require_sysadmin(void) THROWS(E_INSUFFICIENT_RIGHTS) {
+	/* TODO: `CAP_SYS_ADMIN' */
+}
+
 
 DECL_END
 

@@ -3386,10 +3386,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak vm_datablock_write_unsafe; .long vm_datablock_write_unsafe
 	.reloc ., R_386_SIZE32, vm_datablock_write_unsafe; .long 0
 	.long 0xaa46f95
-	.long 0 /* index: 846 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname846 /* index: 846 */
+	.weak cred_require_sysadmin; .long cred_require_sysadmin
+	.reloc ., R_386_SIZE32, cred_require_sysadmin; .long 0
+	.long 0x13a034e
 	.long 0 /* index: 847 */
 	.long 0
 	.long 0
@@ -17254,6 +17254,8 @@ END(kernel_symbol_table)
 	.string "unwind_getreg_ucpustate"
 .Lname845:
 	.string "vm_datablock_write_unsafe"
+.Lname846:
+	.string "cred_require_sysadmin"
 .Lname848:
 	.string "task_raisesignalprocessgroup"
 .Lname851:

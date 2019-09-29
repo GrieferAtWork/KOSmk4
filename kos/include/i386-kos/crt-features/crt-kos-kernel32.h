@@ -274,6 +274,7 @@
 #define __CRT_HAVE_cred_require_hwio 1
 #define __CRT_HAVE_cred_require_mount 1
 #define __CRT_HAVE_cred_require_resource 1
+#define __CRT_HAVE_cred_require_sysadmin 1
 #define __CRT_HAVE_cred_require_vmread 1
 #define __CRT_HAVE_cred_require_vmwrite 1
 #define __CRT_HAVE_dbg 1

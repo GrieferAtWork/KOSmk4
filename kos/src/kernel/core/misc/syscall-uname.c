@@ -33,6 +33,7 @@
 #include <hybrid/host.h>
 
 #include <sys/utsname.h>
+#include <sched/cred.h>
 
 #include <errno.h>
 #include <string.h>
@@ -116,10 +117,10 @@ DEFINE_SYSCALL2(errno_t, sethostname,
                 USER UNCHECKED char const *, name,
                 size_t, namelen) {
 	char temp[_UTSNAME_NODENAME_LENGTH];
-	/* TODO: capable(CAP_SYS_ADMIN). */
 	validate_readable(name, namelen);
 	if (namelen > _UTSNAME_NODENAME_LENGTH)
 		THROW(E_BUFFER_TOO_SMALL, namelen, _UTSNAME_NODENAME_LENGTH);
+	cred_require_sysadmin();
 	memcpy(temp, name, namelen * sizeof(char));
 	memset(temp + namelen, 0, (_UTSNAME_NODENAME_LENGTH - namelen) * sizeof(char));
 	COMPILER_READ_BARRIER();
@@ -131,10 +132,10 @@ DEFINE_SYSCALL2(errno_t, setdomainname,
                 USER UNCHECKED char const *, name,
                 size_t, namelen) {
 	char temp[_UTSNAME_DOMAIN_LENGTH];
-	/* TODO: capable(CAP_SYS_ADMIN). */
 	validate_readable(name, namelen);
 	if (namelen > _UTSNAME_DOMAIN_LENGTH)
 		THROW(E_BUFFER_TOO_SMALL, namelen, _UTSNAME_DOMAIN_LENGTH);
+	cred_require_sysadmin();
 	memcpy(temp, name, namelen * sizeof(char));
 	memset(temp + namelen, 0, (_UTSNAME_DOMAIN_LENGTH - namelen) * sizeof(char));
 	COMPILER_READ_BARRIER();

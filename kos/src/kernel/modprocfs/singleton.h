@@ -62,18 +62,28 @@ MKREG_RO(cmdline, 0444, ProcFS_Cmdline_Printer)
 
 ROOT_DIRECTORY_ENTRY("kos", DT_DIR, kos)
 MKDIR(kos, 0555,
-      F(kos, "raminfo", DT_REG, kos_raminfo)
+      F(kos, "raminfo", DT_REG, kos_raminfo) /* /proc/kos/raminfo */
       F_END)
 MKREG_RO(kos_raminfo, 0444, ProcFS_Kos_RamInfo_Printer)
 
 ROOT_DIRECTORY_ENTRY("sys", DT_DIR, sys)
+
 MKDIR(sys, 0555,
-      F(sys, "fs", DT_DIR, sys_fs)
+      F(sys, "fs", DT_DIR, sys_fs)         /* /proc/sys/fs */
+      F(sys, "kernel", DT_DIR, sys_kernel) /* /proc/sys/kernel */
       F_END)
+
 MKDIR(sys_fs, 0555,
-      F(sys_fs, "pipe-max-size", DT_REG, sys_fs_pipe_max_size)
+      F(sys_fs, "pipe-max-size", DT_REG, sys_fs_pipe_max_size) /* /proc/sys/fs/pipe-max-size */
       F_END)
 MKREG_RW(sys_fs_pipe_max_size, 0622, ProcFS_Sys_Fs_PipeMaxSize_Print, ProcFS_Sys_Fs_PipeMaxSize_Write)
+
+MKDIR(sys_kernel, 0555,
+      F(sys_kernel, "hostname", DT_REG, sys_kernel_hostname)
+      F(sys_kernel, "domainname", DT_REG, sys_kernel_domainname)
+      F_END)
+MKREG_RW(sys_kernel_hostname, 0622, ProcFS_Sys_Kernel_Hostname_Print, ProcFS_Sys_Kernel_Hostname_Write)
+MKREG_RW(sys_kernel_domainname, 0622, ProcFS_Sys_Kernel_Domainname_Print, ProcFS_Sys_Kernel_Domainname_Write)
 
 
 #define PROCFS_NO_CUSTOM 1 /* Delete if we ever get CUSTOM() entries */
