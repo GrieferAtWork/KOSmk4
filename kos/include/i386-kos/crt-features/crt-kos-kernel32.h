@@ -1676,6 +1676,7 @@
 #define __CRT_HAVE_task_sleep 1
 #define __CRT_HAVE_task_sleep_cputime 1
 #define __CRT_HAVE_task_start 1
+#define __CRT_HAVE_task_start_default_flags 1
 #define __CRT_HAVE_task_trywait 1
 #define __CRT_HAVE_task_tryyield 1
 #define __CRT_HAVE_task_tryyield_or_pause 1

@@ -674,6 +674,8 @@ yield_and_return:
 }
 
 
+PUBLIC unsigned int task_start_default_flags = TASK_START_FNORMAL;
+
 FUNDEF NOBLOCK ATTR_RETNONNULL NONNULL((1)) struct task *
 NOTHROW(FCALL task_start)(struct task *__restrict thread, unsigned int flags) {
 	pflag_t was;

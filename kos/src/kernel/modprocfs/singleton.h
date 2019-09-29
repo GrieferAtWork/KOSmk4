@@ -82,10 +82,12 @@ MKDIR(sys_kernel, 0555,
       F(sys_kernel, "hostname", DT_REG, sys_kernel_hostname)
       F(sys_kernel, "domainname", DT_REG, sys_kernel_domainname)
       F(sys_kernel, "randomize_va_space", DT_REG, sys_kernel_randomize_va_space)
+      F(sys_kernel, "sched_child_runs_first", DT_REG, sys_kernel_sched_child_runs_first)
       F_END)
 MKREG_RW(sys_kernel_hostname, 0622, ProcFS_Sys_Kernel_Hostname_Print, ProcFS_Sys_Kernel_Hostname_Write)
 MKREG_RW(sys_kernel_domainname, 0622, ProcFS_Sys_Kernel_Domainname_Print, ProcFS_Sys_Kernel_Domainname_Write)
 MKREG_RW(sys_kernel_randomize_va_space, 0622, ProcFS_Sys_Kernel_RandomizeVaSpace_Print, ProcFS_Sys_Kernel_RandomizeVaSpace_Write)
+MKREG_RW(sys_kernel_sched_child_runs_first, 0622, ProcFS_Sys_Kernel_SchedChildRunsFirst_Print, ProcFS_Sys_Kernel_SchedChildRunsFirst_Write)
 
 
 #define PROCFS_NO_CUSTOM 1 /* Delete if we ever get CUSTOM() entries */

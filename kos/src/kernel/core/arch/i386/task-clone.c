@@ -356,7 +356,7 @@ again_lock_vm:
 		}
 
 		/* Actually start execution of the newly created thread. */
-		task_start(result, TASK_START_FNORMAL);
+		task_start(result);
 	} EXCEPT {
 		decref_likely(result);
 		RETHROW();

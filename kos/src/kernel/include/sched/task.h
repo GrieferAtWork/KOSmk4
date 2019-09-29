@@ -152,8 +152,8 @@ typedef void (KCALL *thread_main_t)();
  * >> }
  * >>
  * >> struct task *thread = task_alloc(&vm_kernel);
- * >> task_setup_kernel(thread,(thread_main_t)&kernel_main,"foo","bar",NULL);
- * >> task_start(thread,TASK_START_FNORMAL);
+ * >> task_setup_kernel(thread, (thread_main_t)&kernel_main, "foo", "bar", NULL);
+ * >> task_start(thread, TASK_START_FNORMAL);
  * >> decref(thread);
  * `thread_main' returning will automatically call `task_exit()' */
 FUNDEF NOBLOCK ATTR_RETNONNULL NONNULL((1, 2)) struct task *
@@ -174,9 +174,21 @@ NOTHROW(VCALL task_setup_kernel)(struct task *__restrict thread,
  * HINT: By default, `task_alloc()' will assign new tasks to the boot CPU.
  * @return: * : Always re-returns `thread' */
 FUNDEF NOBLOCK ATTR_RETNONNULL NONNULL((1)) struct task *
-NOTHROW(FCALL task_start)(struct task *__restrict thread,
-                          unsigned int flags DFL(TASK_START_FNORMAL));
+NOTHROW(FCALL task_start)(struct task *__restrict thread, unsigned int flags);
 
+/* Default flags used for `task_start()'
+ * These can be controlled by /proc:
+ *  - TASK_START_FHIGHPRIO == /proc/sys/kernel/sched_child_runs_first */
+DATDEF unsigned int task_start_default_flags;
+
+#ifdef __cplusplus
+extern "C++" {
+FORCELOCAL NOBLOCK ATTR_RETNONNULL NONNULL((1)) struct task *
+NOTHROW(FCALL task_start)(struct task *__restrict thread) {
+	return task_start(thread, task_start_default_flags);
+}
+}
+#endif /* __cplusplus */
 
 
 DATDEF ATTR_PERTASK struct task _this_task; /* The current task (for use with `PERTASK') */

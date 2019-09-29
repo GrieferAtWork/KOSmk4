@@ -5006,10 +5006,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 1251 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname1251 /* index: 1251 */
+	.weak task_start_default_flags; .long task_start_default_flags
+	.reloc ., R_386_SIZE32, task_start_default_flags; .long 0
+	.long 0xfe194e3
 	.long .Lname1252 /* index: 1252 */
 	.weak rwlock_pollread; .long rwlock_pollread
 	.reloc ., R_386_SIZE32, rwlock_pollread; .long 0
@@ -17682,6 +17682,8 @@ END(kernel_symbol_table)
 	.string "vio_readl_aligned"
 .Lname1247:
 	.string "error_print_into"
+.Lname1251:
+	.string "task_start_default_flags"
 .Lname1252:
 	.string "rwlock_pollread"
 .Lname1255:
