@@ -53,6 +53,7 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <format-printer.h>
+#include <malloca.h>
 #include <signal.h>
 #include <stddef.h>
 #include <string.h>
@@ -1622,6 +1623,114 @@ DEFINE_SYSCALL2(fd_t, creat,
 	                  mode);
 }
 
+PRIVATE ATTR_NOINLINE NONNULL((1, 2, 4, 7, 8, 9, 10, 11, 12, 13)) bool KCALL
+openat_create_follow_symlink_dynamic_impl(struct fs *__restrict f,
+                                          struct path *__restrict root,
+                                          fsmode_t fsmode,
+                                          /*in|out*/ u32 *__restrict pmax_remaining_links,
+                                          oflag_t oflags, mode_t mode,
+                                          struct symlink_node *__restrict sl_node,
+                                          /*in|out*/ REF struct path **__restrict presult_containing_path,
+                                          /*in|out*/ REF struct directory_node **__restrict presult_containing_directory,
+                                          /*in|out*/ REF struct directory_entry **__restrict presult_containing_dirent,
+                                          /*in|out*/ REF struct inode **__restrict presult_inode,
+                                          /*out*/ bool *__restrict pwas_newly_created,
+                                          /*in|out*/ size_t *__restrict pbufsize) {
+	char const *last_seg;
+	u16 last_seglen;
+	REF struct inode *new_result_inode;
+	REF struct path *new_result_containing_path;
+	REF struct directory_node *new_result_containing_directory;
+	REF struct directory_entry *new_result_containing_dirent;
+	size_t reqsize, bufsize = *pbufsize;
+	char *buf;
+	buf = (char *)malloca(bufsize);
+	TRY {
+		assert(sl_node->i_type->it_symlink.sl_readlink_dynamic);
+		reqsize = (*sl_node->i_type->it_symlink.sl_readlink_dynamic)(sl_node,
+		                                                             buf,
+		                                                             bufsize);
+		if unlikely(reqsize > bufsize) {
+			/* Must try again with a larger buffer size. */
+			*pbufsize = reqsize;
+			freea(buf);
+			return false;
+		}
+		/* Traverse the symlink text. */
+		new_result_containing_path = path_traversen_ex(f,
+		                                               *presult_containing_path,
+		                                               root,
+		                                               buf,
+		                                               reqsize,
+		                                               &last_seg,
+		                                               &last_seglen,
+		                                               fsmode,
+		                                               pmax_remaining_links);
+		decref(*presult_containing_path);
+		*presult_containing_path = new_result_containing_path;
+
+		sync_read(*presult_containing_path);
+		new_result_containing_directory = (REF struct directory_node *)
+		incref((*presult_containing_path)->p_inode);
+		sync_endread(*presult_containing_path);
+		decref(*presult_containing_directory);
+		*presult_containing_directory = new_result_containing_directory;
+
+		/* Repeat the create() function with the symlink's dereferenced text. */
+		new_result_inode = directory_creatfile(new_result_containing_directory,
+		                                       last_seg,
+		                                       last_seglen,
+		                                       oflags & (O_CREAT | /*O_EXCL|*/ O_DOSPATH),
+		                                       fs_getuid(f),
+		                                       fs_getgid(f),
+		                                       mode,
+		                                       &new_result_containing_dirent,
+		                                       pwas_newly_created);
+		decref(*presult_containing_dirent);
+		*presult_containing_dirent = new_result_containing_dirent;
+		decref(*presult_inode);
+		*presult_inode = new_result_inode;
+	} EXCEPT {
+		freea(buf);
+		RETHROW();
+	}
+	freea(buf);
+	return true;
+}
+
+PRIVATE ATTR_NOINLINE NONNULL((1, 2, 4, 7, 8, 9, 10, 11, 12)) void KCALL
+openat_create_follow_symlink_dynamic(struct fs *__restrict f,
+                                     struct path *__restrict root,
+                                     fsmode_t fsmode,
+                                     /*in|out*/ u32 *__restrict pmax_remaining_links,
+                                     oflag_t oflags, mode_t mode,
+                                     struct symlink_node *__restrict sl_node,
+                                     /*in|out*/ REF struct path **__restrict presult_containing_path,
+                                     /*in|out*/ REF struct directory_node **__restrict presult_containing_directory,
+                                     /*in|out*/ REF struct directory_entry **__restrict presult_containing_dirent,
+                                     /*in|out*/ REF struct inode **__restrict presult_inode,
+                                     /*out*/ bool *__restrict pwas_newly_created) {
+	size_t bufsize = 128;
+	for (;;) {
+		bool ok;
+		ok = openat_create_follow_symlink_dynamic_impl(f,
+		                                               root,
+		                                               fsmode,
+		                                               pmax_remaining_links,
+		                                               oflags,
+		                                               mode,
+		                                               sl_node,
+		                                               presult_containing_path,
+		                                               presult_containing_directory,
+		                                               presult_containing_dirent,
+		                                               presult_inode,
+		                                               pwas_newly_created,
+		                                               &bufsize);
+		if (ok)
+			break;
+	}
+}
+
 
 DEFINE_SYSCALL4(fd_t, openat, fd_t, dirfd,
                 USER UNCHECKED char const *, filename,
@@ -1777,8 +1886,10 @@ check_result_inode_for_symlink:
 								 * link. - In this case, we must continue following that file's link for at
 								 * most `max_remaining_links' additional links and open/create the file at its
 								 * target location. */
-								if (symlink_node_load((struct symlink_node *)result_inode)) {
-									char *text = ((struct symlink_node *)result_inode)->sl_text;
+								struct symlink_node *sl_node;
+								sl_node = (struct symlink_node *)result_inode;
+
+								if (symlink_node_load(sl_node)) {
 									REF struct inode *new_result_inode;
 									REF struct path *new_result_containing_path;
 									REF struct directory_node *new_result_containing_directory;
@@ -1787,7 +1898,7 @@ check_result_inode_for_symlink:
 									new_result_containing_path = path_traverse_ex(f,
 									                                              result_containing_path,
 									                                              root,
-									                                              text,
+									                                              sl_node->sl_text,
 									                                              &last_seg,
 									                                              &last_seglen,
 									                                              fsmode,
@@ -1816,12 +1927,22 @@ check_result_inode_for_symlink:
 									result_containing_dirent = new_result_containing_dirent;
 									decref(result_inode);
 									result_inode = new_result_inode;
-
-									goto check_result_inode_for_symlink;
 								} else {
-									/* TODO: Use the dynamic interface! */
-									THROW(E_NOT_IMPLEMENTED_TODO);
+									/* Use the dynamic interface! */
+									openat_create_follow_symlink_dynamic(f,
+									                                     root,
+									                                     fsmode,
+									                                     &max_remaining_links,
+									                                     oflags,
+									                                     mode,
+									                                     sl_node,
+									                                     &result_containing_path,
+									                                     &result_containing_directory,
+									                                     &result_containing_dirent,
+									                                     &result_inode,
+									                                     &was_newly_created);
 								}
+								goto check_result_inode_for_symlink;
 							}
 							if (!was_newly_created) {
 								/* If the O_EXCL flag was given, make sure that the file was newly created.

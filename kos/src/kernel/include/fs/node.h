@@ -679,7 +679,7 @@ struct inode_type {
 			 * @throw: E_IOERROR:  Failed to read data from disk. */
 			NONNULL((1))
 			size_t (KCALL *sl_readlink_dynamic)(struct symlink_node *__restrict self,
-			                                    USER CHECKED /*utf-8*/char *buf,
+			                                    USER CHECKED /*utf-8*/ char *buf,
 			                                    size_t bufsize)
 					THROWS(E_SEGFAULT, E_IOERROR, ...);
 		} it_symlink;

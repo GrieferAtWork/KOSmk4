@@ -30,17 +30,131 @@
 #include <kernel/types.h>
 
 #include <assert.h>
+#include <malloca.h>
 #include <string.h>
 #include <unicode.h>
 
 DECL_BEGIN
 
-PRIVATE ATTR_RETNONNULL REF struct path *KCALL
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 5)) REF struct path *KCALL
 path_expandchild_symlink(struct path *cwd,
                          struct path *root,
                          char const *__restrict symlink_path,
                          size_t symlink_size,
                          u32 *__restrict premaining_links);
+
+#define PATH_FOLLOW_SYMLINK_DYNAMIC_GOT_RESULT_PATH 0 /* `*presult_path' was filled */
+#define PATH_FOLLOW_SYMLINK_DYNAMIC_GOT_NEW_RESULT  1 /* `*pnew_result' was filled */
+#define PATH_FOLLOW_SYMLINK_DYNAMIC_GOT_RETRY       2 /* Only returned by `path_follow_symlink_dynamic_impl()':
+                                                       *     retry (the buffer size was already updated) */
+
+/* Follow a given dynamic symlink node */
+PRIVATE ATTR_NOINLINE WUNUSED NONNULL((1, 2, 3, 4, 6, 8, 9, 10)) unsigned int KCALL
+path_follow_symlink_dynamic_impl(struct fs *__restrict filesystem,
+                                 struct path *containing_path,
+                                 struct path *root,
+                                 struct symlink_node *__restrict sl_node,
+                                 fsmode_t mode,
+                                 u32 *__restrict premaining_symlinks,
+                                 /*out*/ REF struct directory_entry **pcontaining_dirent,
+                                 /*out*/ REF struct directory_node **__restrict pnew_containing_directory,
+                                 /*out*/ REF struct path **__restrict presult_path,
+                                 /*out*/ REF struct inode **__restrict pnew_result,
+                                 size_t *__restrict pbufsize) {
+	char const *last_seg;
+	u16 last_seglen;
+	uintptr_t hash;
+	REF struct path *new_containing_path;
+	size_t bufsize = *pbufsize;
+	char *buf;
+	buf = (char *)malloca(bufsize);
+	TRY {
+		size_t reqlen;
+		assert(sl_node->i_type->it_symlink.sl_readlink_dynamic);
+		reqlen = (*sl_node->i_type->it_symlink.sl_readlink_dynamic)(sl_node, buf, bufsize);
+		if unlikely(reqlen > bufsize) {
+			*pbufsize = bufsize;
+			freea(buf);
+			return PATH_FOLLOW_SYMLINK_DYNAMIC_GOT_RETRY;
+		}
+		new_containing_path = path_traverse_ex_recent(filesystem,
+		                                              containing_path,
+		                                              root,
+		                                              sl_node->sl_text,
+		                                              &last_seg,
+		                                              &last_seglen,
+		                                              mode,
+		                                              premaining_symlinks);
+		decref(containing_path);
+		containing_path = new_containing_path;
+		hash = directory_entry_hash(last_seg, last_seglen);
+		COMPILER_READ_BARRIER();
+		/* Check for mounting points & cached paths. */
+		*presult_path = mode & FS_MODE_FDOSPATH
+		                ? path_getcasechild_and_parent_inode(containing_path, last_seg, last_seglen,
+		                                                     hash, pnew_containing_directory)
+		                : path_getchild_and_parent_inode(containing_path, last_seg, last_seglen,
+		                                                 hash, pnew_containing_directory);
+		if (*presult_path) {
+			freea(buf);
+			return PATH_FOLLOW_SYMLINK_DYNAMIC_GOT_RESULT_PATH;
+		}
+		TRY {
+			if (pcontaining_dirent) {
+				decref(*pcontaining_dirent);
+				*pcontaining_dirent = NULL;
+			}
+			/* Lookup the last path segment within the associated directory. */
+			*pnew_result = mode & FS_MODE_FDOSPATH
+			               ? directory_getcasenode(*pnew_containing_directory, last_seg,
+			                                       last_seglen, hash, pcontaining_dirent)
+			               : directory_getnode(*pnew_containing_directory, last_seg,
+			                                   last_seglen, hash, pcontaining_dirent);
+			if unlikely(!*pnew_result)
+				THROW(E_FSERROR_FILE_NOT_FOUND);
+		} EXCEPT {
+			decref(*pnew_containing_directory);
+			RETHROW();
+		}
+	} EXCEPT {
+		freea(buf);
+		RETHROW();
+	}
+	freea(buf);
+	return PATH_FOLLOW_SYMLINK_DYNAMIC_GOT_NEW_RESULT;
+}
+
+LOCAL WUNUSED NONNULL((1, 2, 3, 4, 6, 8, 9)) unsigned int KCALL
+path_follow_symlink_dynamic(struct fs *__restrict filesystem,
+                            struct path *containing_path,
+                            struct path *root,
+                            struct symlink_node *__restrict sl_node,
+                            fsmode_t mode,
+                            u32 *__restrict premaining_symlinks,
+                            /*out*/ REF struct directory_entry **pcontaining_dirent,
+                            /*out*/ REF struct directory_node **__restrict pnew_containing_directory,
+                            /*out*/ REF struct path **__restrict presult_path,
+                            /*out*/ REF struct inode **__restrict pnew_result) {
+	unsigned int result;
+	size_t bufsize = 128;
+	for (;;) {
+		result = path_follow_symlink_dynamic_impl(filesystem,
+		                                          containing_path,
+		                                          root,
+		                                          sl_node,
+		                                          mode,
+		                                          premaining_symlinks,
+		                                          pcontaining_dirent,
+		                                          pnew_containing_directory,
+		                                          presult_path,
+		                                          pnew_result,
+		                                          &bufsize);
+		if likely(result != PATH_FOLLOW_SYMLINK_DYNAMIC_GOT_RETRY)
+			break;
+	}
+	return result;
+}
+
 
 
 /* Returns `NULL' if the stack-allocated name buffer was too small. */
@@ -209,7 +323,7 @@ path_walkcasechild(struct path *__restrict self,
 }
 
 
-PRIVATE ATTR_RETNONNULL REF struct path *KCALL
+PRIVATE ATTR_RETNONNULL WUNUSED NONNULL((1, 2, 3, 5)) REF struct path *KCALL
 path_expandchild_symlink(struct path *cwd,
                          struct path *root,
                          char const *__restrict symlink_path,
@@ -302,6 +416,9 @@ set_next_path:
 	}
 	return cwd;
 }
+
+
+
 
 DECL_END
 

@@ -633,7 +633,6 @@ path_traversefull_ex(struct fs *__restrict filesystem,
 		/* Check if the given filename refers to a path (must be done explicitly since
 		 * that path may in turn refer to a mounting point which we must dereference) */
 		REF struct path *result_path;
-		uintptr_t hash;
 		if (!last_seglen) {
 			sync_read(containing_path);
 			containing_directory = (REF struct directory_node *)incref(containing_path->p_inode);
@@ -643,6 +642,7 @@ path_traversefull_ex(struct fs *__restrict filesystem,
 			if (pcontaining_dirent)
 				*pcontaining_dirent = incref(&empty_directory_entry);
 		} else {
+			uintptr_t hash;
 			hash = directory_entry_hash(last_seg, last_seglen);
 			COMPILER_READ_BARRIER();
 			result_path = mode & FS_MODE_FDOSPATH
@@ -682,15 +682,18 @@ got_result_path:
 				if (follow_final_link && INODE_ISLNK(result)) {
 					TRY {
 						REF struct inode *new_result;
-						REF struct directory_node *new_containing_directory;
+						struct symlink_node *sl_node;
 						/* Follow this INode. */
 again_follow_symlink:
-						if (symlink_node_load((struct symlink_node *)result)) {
+						sl_node = (struct symlink_node *)result;
+						if (symlink_node_load(sl_node)) {
+							REF struct directory_node *new_containing_directory;
 							REF struct path *new_containing_path;
+							uintptr_t hash;
 							new_containing_path = path_traverse_ex_recent(filesystem,
 							                                              containing_path,
 							                                              root,
-							                                              ((struct symlink_node *)result)->sl_text,
+							                                              sl_node->sl_text,
 							                                              &last_seg,
 							                                              &last_seglen,
 							                                              mode,
@@ -717,22 +720,39 @@ again_follow_symlink:
 								}
 								/* Lookup the last path segment within the associated directory. */
 								new_result = mode & FS_MODE_FDOSPATH
-								             ? directory_getcasenode(new_containing_directory, last_seg, last_seglen, hash, pcontaining_dirent)
-								             : directory_getnode(new_containing_directory, last_seg, last_seglen, hash, pcontaining_dirent);
+								             ? directory_getcasenode(new_containing_directory, last_seg,
+								                                     last_seglen, hash, pcontaining_dirent)
+								             : directory_getnode(new_containing_directory, last_seg,
+								                                 last_seglen, hash, pcontaining_dirent);
 								if unlikely(!new_result)
 									THROW(E_FSERROR_FILE_NOT_FOUND);
 							} EXCEPT {
 								decref(new_containing_directory);
 								RETHROW();
 							}
+							decref(containing_directory);
+							containing_directory = new_containing_directory;
 						} else {
-							/* TODO: Use the dynamic interface! */
-							THROW(E_NOT_IMPLEMENTED_TODO, "Follow dynamic symlinks");
+							/* Use the dynamic interface! */
+							unsigned int mode;
+							REF struct directory_node *new_containing_directory;
+							mode = path_follow_symlink_dynamic(filesystem,
+							                                   containing_path,
+							                                   root,
+							                                   sl_node,
+							                                   mode,
+							                                   premaining_symlinks,
+							                                   pcontaining_dirent,
+							                                   &new_containing_directory,
+							                                   &result_path,
+							                                   &new_result);
+							decref(containing_directory);
+							containing_directory = new_containing_directory;
+							if (mode == PATH_FOLLOW_SYMLINK_DYNAMIC_GOT_RESULT_PATH)
+								goto got_result_path;
 						}
 						decref(result);
 						result = new_result;
-						decref(containing_directory);
-						containing_directory = new_containing_directory;
 						if (INODE_ISLNK(result))
 							goto again_follow_symlink;
 					} EXCEPT {
