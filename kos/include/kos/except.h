@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x845f1370 */
+/* HASH CRC-32:0x3f542d2a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -406,6 +406,10 @@ __DECL_BEGIN
 #define E_INVALID_ARGUMENT_CONTEXT_EVENTFD_FLAGS 0x005f
 /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to `sys_signalfd4()' is not masked by `SFD_NONBLOCK | SFD_CLOEXEC' */
 #define E_INVALID_ARGUMENT_CONTEXT_SIGNALFD_FLAGS 0x0060
+/* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to pass a too low value to `F_SETPIPE_SZ' */
+#define E_INVALID_ARGUMENT_CONTEXT_BAD_PIPE_BUFFER_SIZE 0x0061
+/* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to write an invalid integer to a system configuration file */
+#define E_INVALID_ARGUMENT_CONTEXT_BAD_INTEGER 0x0062
 
 
 

@@ -47,6 +47,12 @@ cred_require_vmwrite(struct vm *__restrict target_vm) THROWS(E_INSUFFICIENT_RIGH
 	/* TODO */
 }
 
+PUBLIC void KCALL
+cred_require_resource(void) THROWS(E_INSUFFICIENT_RIGHTS) {
+	/* TODO: `CAP_SYS_RESOURCE' */
+}
+
+
 DECL_END
 
 #endif /* !GUARD_KERNEL_SRC_SCHED_CRED_C */

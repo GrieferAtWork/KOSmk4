@@ -56,6 +56,7 @@ FUNDEF void KCALL cred_require_hwio(void) THROWS(E_INSUFFICIENT_RIGHTS);        
 FUNDEF void KCALL cred_require_mount(void) THROWS(E_INSUFFICIENT_RIGHTS);                              /* Caller can mount/umount filesystems. */
 FUNDEF void KCALL cred_require_vmread(struct vm *__restrict target_vm) THROWS(E_INSUFFICIENT_RIGHTS);  /* Caller can read from `target_vm' */
 FUNDEF void KCALL cred_require_vmwrite(struct vm *__restrict target_vm) THROWS(E_INSUFFICIENT_RIGHTS); /* Caller can write to `target_vm' */
+FUNDEF void KCALL cred_require_resource(void) THROWS(E_INSUFFICIENT_RIGHTS); /* `CAP_SYS_RESOURCE' */
 
 /* TODO: Go through all system calls already defined and add credential checks where necessary. */
 /* TODO: Add credential checks for individual sysctl() and hop() commands */

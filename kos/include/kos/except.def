@@ -474,6 +474,10 @@ const E_INVALID_ARGUMENT_CONTEXT_EVENTFD_WRITE_FFFFFFFFFFFFFFFFh = 0x005e;
 const E_INVALID_ARGUMENT_CONTEXT_EVENTFD_FLAGS = 0x005f;
 @@E_INVALID_ARGUMENT_UNKNOWN_FLAG: The set of flags passed to `sys_signalfd4()' is not masked by `SFD_NONBLOCK | SFD_CLOEXEC'
 const E_INVALID_ARGUMENT_CONTEXT_SIGNALFD_FLAGS = 0x0060;
+@@E_INVALID_ARGUMENT_BAD_VALUE: Attempted to pass a too low value to `F_SETPIPE_SZ'
+const E_INVALID_ARGUMENT_CONTEXT_BAD_PIPE_BUFFER_SIZE = 0x0061; /* TODO: This should translate to EBUSY */
+@@E_INVALID_ARGUMENT_BAD_VALUE: Attempted to write an invalid integer to a system configuration file
+const E_INVALID_ARGUMENT_CONTEXT_BAD_INTEGER = 0x0062;
 
 
 

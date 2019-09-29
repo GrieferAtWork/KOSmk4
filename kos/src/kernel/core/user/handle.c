@@ -36,6 +36,8 @@
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <kernel/vm.h>
+#include <kernel/paging.h>
+#include <sched/cred.h>
 #include <sched/pid.h>
 
 #include <hybrid/atomic.h>
@@ -2436,8 +2438,63 @@ handle_fcntl(struct handle_manager *__restrict self,
 	//TODO:case F_SETLEASE:
 	//TODO:case F_GETLEASE:
 	//TODO:case F_NOTIFY:
-	//TODO:case F_SETPIPE_SZ:
-	//TODO:case F_GETPIPE_SZ:
+
+	case F_SETPIPE_SZ:
+		temp = handle_lookupin(fd, self);
+		TRY {
+			struct pipe *p;
+			size_t newsize;
+			if (temp.h_type == HANDLE_TYPE_PIPE_READER ||
+			    temp.h_type == HANDLE_TYPE_PIPE_WRITER) {
+				p = ((struct pipe_reader *)temp.h_data)->pr_pipe;
+			} else if (temp.h_type == HANDLE_TYPE_PIPE) {
+				p = (struct pipe *)temp.h_data;
+			} else {
+				THROW(E_INVALID_HANDLE_FILETYPE, fd,
+				      HANDLE_TYPE_PIDNS, temp.h_type,
+				      HANDLE_TYPEKIND_GENERIC,
+				      handle_typekind(&temp));
+			}
+			newsize = (size_t)arg;
+			if unlikely(newsize < 1) {
+				/* Linux requires PAGESIZE here... */
+				THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+				      E_INVALID_ARGUMENT_CONTEXT_BAD_PIPE_BUFFER_SIZE,
+				      newsize);
+			}
+			/* Require `CAP_SYS_RESOURCE' for very large buffers */
+			if (newsize > pipe_max_bufsize_unprivileged)
+				cred_require_resource();
+			ATOMIC_WRITE(p->p_buffer.rb_limit, newsize);
+		} EXCEPT {
+			decref_unlikely(temp);
+			RETHROW();
+		}
+		decref_unlikely(temp);
+		break;
+
+	case F_GETPIPE_SZ:
+		temp = handle_lookupin(fd, self);
+		TRY {
+			struct pipe *p;
+			if (temp.h_type == HANDLE_TYPE_PIPE_READER ||
+			    temp.h_type == HANDLE_TYPE_PIPE_WRITER) {
+				p = ((struct pipe_reader *)temp.h_data)->pr_pipe;
+			} else if (temp.h_type == HANDLE_TYPE_PIPE) {
+				p = (struct pipe *)temp.h_data;
+			} else {
+				THROW(E_INVALID_HANDLE_FILETYPE, fd,
+				      HANDLE_TYPE_PIDNS, temp.h_type,
+				      HANDLE_TYPEKIND_GENERIC,
+				      handle_typekind(&temp));
+			}
+			result = ATOMIC_READ(p->p_buffer.rb_limit);
+		} EXCEPT {
+			decref_unlikely(temp);
+			RETHROW();
+		}
+		decref_unlikely(temp);
+		break;
 
 	default:
 		THROW(E_INVALID_ARGUMENT_UNKNOWN_COMMAND,

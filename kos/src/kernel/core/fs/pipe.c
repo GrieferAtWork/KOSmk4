@@ -29,6 +29,7 @@
 #include <kernel/malloc.h>
 #include <kernel/syscall.h>
 #include <kernel/user.h>
+#include <kernel/driver-param.h>
 
 #include <hybrid/atomic.h>
 
@@ -43,6 +44,14 @@
 #include <libbuffer/ringbuffer.h>
 
 DECL_BEGIN
+
+/* The max pipe buffer size which may be set by an unprivileged process. */
+PUBLIC size_t pipe_max_bufsize_unprivileged = RINGBUFFER_DEFAULT_LIMIT * 8;
+DEFINE_KERNEL_COMMANDLINE_OPTION(pipe_max_bufsize_unprivileged,
+                                 KERNEL_COMMANDLINE_OPTION_TYPE_SIZE_T,
+                                 "pipe-max-size");
+
+
 
 /* Create a new pipe object. */
 PUBLIC ATTR_RETNONNULL ATTR_MALLOC WUNUSED REF struct pipe *KCALL
