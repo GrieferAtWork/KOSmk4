@@ -312,6 +312,26 @@ NOTHROW(KCALL rwlock_reading_r)(struct rwlock const *__restrict self) {
 	return lock ? lock->rl_recursion : 0;
 }
 
+/* Return the total number of hold read-locks (or 0 if this is not tracked by the implementation) */
+PUBLIC WUNUSED uintptr_t NOTHROW(KCALL rwlock_reading_any)(void) {
+	size_t i, result = 0;
+	struct read_locks *locks;
+	locks = &PERTASK(_this_read_locks);
+	if (!locks->rls_use)
+		return 0;
+	for (i = 0; i <= locks->rls_msk; ++i) {
+		struct read_lock *l;
+		l = &locks->rls_vec[i];
+		if (l->rl_rwlock == NULL)
+			continue;
+		if (l->rl_rwlock == READLOCK_DUMMYLOCK)
+			continue;
+		result += l->rl_recursion;
+	}
+	return result;
+}
+
+
 PUBLIC WUNUSED NONNULL((1)) uintptr_t
 NOTHROW(KCALL rwlock_writing_r)(struct rwlock const *__restrict self) {
 	return (self->rw_mode == RWLOCK_MODE_FWRITING &&

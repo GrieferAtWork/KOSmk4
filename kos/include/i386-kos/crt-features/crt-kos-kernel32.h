@@ -1120,6 +1120,7 @@
 #define __CRT_HAVE_rwlock_read 1
 #define __CRT_HAVE_rwlock_read_nx 1
 #define __CRT_HAVE_rwlock_reading 1
+#define __CRT_HAVE_rwlock_reading_any 1
 #define __CRT_HAVE_rwlock_reading_r 1
 #define __CRT_HAVE_rwlock_tryread 1
 #define __CRT_HAVE_rwlock_tryread_readonly 1

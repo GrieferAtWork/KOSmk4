@@ -129,6 +129,10 @@ done_procfs:
 	        "\033[J" /* ED(0):    Clear screen */
 	        "\033[f" /* HVP(1,1): Place cursor at 0,0 */);
 
+	/* TODO: We shouldn't directly exec() busybox.
+	 *       Instead, we should fork()+exec(), then keep on doing
+	 *       so whenever busybox dies (such as when the user presses
+	 *       CTRL+D do trigger an end-of-input event) */
 	execle("/bin/busybox", "bash", (char *)NULL, init_envp);
 	Execle("/bin/sh", "sh", (char *)NULL, init_envp);
 

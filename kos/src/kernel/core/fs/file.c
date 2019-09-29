@@ -478,7 +478,7 @@ again:
 		atomic_rwlock_endread(&self->f_curlck);
 		orig_entry = entry;
 
-		sync_read(self->f_node);
+		vm_datablock_lock_read(self->f_node);
 		TRY {
 			if (!entry) {
 read_entry_pos_0:
@@ -491,7 +491,7 @@ read_entry_pos_0:
 						COMPILER_READ_BARRIER();
 						entry = ((struct directory_node *)self->f_node)->d_bypos;
 						if (!entry)
-							return 0; /* Empty directory */
+							goto eof_unlock_node; /* Empty directory */
 					}
 					entry = ((struct directory_node *)self->f_node)->d_bypos;
 					assert(entry);

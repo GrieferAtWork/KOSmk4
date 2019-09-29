@@ -6238,10 +6238,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak sys_setgid; .long sys_setgid
 	.reloc ., R_386_SIZE32, sys_setgid; .long 0
 	.long 0x69b1d64
-	.long 0 /* index: 1559 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname1559 /* index: 1559 */
+	.weak rwlock_reading_any; .long rwlock_reading_any
+	.reloc ., R_386_SIZE32, rwlock_reading_any; .long 0
+	.long 0x8bbd659
 	.long 0 /* index: 1560 */
 	.long 0
 	.long 0
@@ -17980,6 +17980,8 @@ END(kernel_symbol_table)
 	.string "syscall_printtrace"
 .Lname1558:
 	.string "sys_setgid"
+.Lname1559:
+	.string "rwlock_reading_any"
 .Lname1561:
 	.string "krealign_offset"
 .Lname1564:

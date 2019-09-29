@@ -808,12 +808,12 @@ struct vm_datablock {
 #ifdef CONFIG_VIO
 	struct vm_datablock_type_vio const *db_vio;    /* [0..1][const] VIO callbacks (or NULL if the datablock doesn't use VIO). */
 #endif
-	REF LLIST(struct vm_datapart)       db_parts; /* [0..1][lock(db_lock)] The first part of this datablock.
-	                                               * NOTE: When set to `VM_DATABLOCK_ANONPARTS', new parts are always
-	                                               *       allocated anonymously, and never added to the actual datablock.
-	                                               * NOTE: Due the process of anonymizing a data block, this field is set
-	                                               *       to `VM_DATABLOCK_ANONPARTS', as is done when (e.g.) the associated
-	                                               *       file gets deleted. */
+	REF LLIST(struct vm_datapart)       db_parts;  /* [0..1][lock(db_lock)] The first part of this datablock.
+	                                                * NOTE: When set to `VM_DATABLOCK_ANONPARTS', new parts are always
+	                                                *       allocated anonymously, and never added to the actual datablock.
+	                                                * NOTE: Due the process of anonymizing a data block, this field is set
+	                                                *       to `VM_DATABLOCK_ANONPARTS', as is done when (e.g.) the associated
+	                                                *       file gets deleted. */
 	/* Page index conversion.
 	 * NOTE: This can entirely be ignored for most data
 	 *       blocks which simply fill in these members as:
