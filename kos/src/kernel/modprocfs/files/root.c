@@ -30,6 +30,11 @@
 
 DECL_BEGIN
 
+#undef CONFIG_PROCFS_ALLOW_ROOT_TID
+#ifndef CONFIG_PROCFS_DISALLOW_ROOT_TID
+#define CONFIG_PROCFS_ALLOW_ROOT_TID 1
+#endif /* !CONFIG_PROCFS_DISALLOW_ROOT_TID */
+
 
 PRIVATE NONNULL((1, 2)) REF struct directory_entry *KCALL
 ProcFS_RootDirectory_Lookup(struct directory_node *__restrict self,
@@ -42,7 +47,9 @@ ProcFS_RootDirectory_Lookup(struct directory_node *__restrict self,
 	if likely(namelen != 0) {
 		char ch = ATOMIC_READ(name[0]);
 		if (ch >= '1' && ch <= '9') {
+#ifndef CONFIG_PROCFS_ALLOW_ROOT_TID
 			REF struct task *thread;
+#endif /* !CONFIG_PROCFS_ALLOW_ROOT_TID */
 			upid_t pidno = (upid_t)(ch - '0');
 			size_t i;
 			for (i = 1; i < namelen; ++i) {
@@ -52,12 +59,18 @@ ProcFS_RootDirectory_Lookup(struct directory_node *__restrict self,
 				pidno *= 10;
 				pidno += (upid_t)(ch - '0');
 			}
+#ifndef CONFIG_PROCFS_ALLOW_ROOT_TID
 			thread = pidns_trylookup_task(THIS_PIDNS, pidno);
-			if likely(thread) {
+			if likely(thread)
+#endif /* !CONFIG_PROCFS_ALLOW_ROOT_TID */
+			{
+#ifndef CONFIG_PROCFS_ALLOW_ROOT_TID
 				bool isproc;
 				isproc = task_isprocessleader_p(thread);
 				decref_unlikely(thread);
-				if (isproc) {
+				if (isproc)
+#endif /* !CONFIG_PROCFS_ALLOW_ROOT_TID */
+				{
 					REF struct directory_entry *result;
 					result = directory_entry_alloc(namelen);
 #ifdef NDEBUG
