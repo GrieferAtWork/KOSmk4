@@ -60,6 +60,17 @@ DECL_BEGIN
 PRIVATE ATTR_NOINLINE void FCALL
 handle_manager_assert_integrity(struct handle_manager *__restrict self) {
 	unsigned int i, counted, counted_cloexec, counted_clofork;
+	if (self->hm_mode == HANDLE_MANAGER_MODE_HASHVECTOR) {
+		assert(self->hm_count <= self->hm_hashvector.hm_hashuse);
+		counted = 0;
+		for (i = 0; i <= self->hm_hashvector.hm_hashmsk; ++i) {
+			if (self->hm_hashvector.hm_hashvec[i].hh_handle_id != HANDLE_HASHENT_SENTINEL_ID)
+				++counted;
+		}
+		assert(self->hm_hashvector.hm_hashuse == counted);
+		assert(self->hm_hashvector.hm_vecfree <= self->hm_count);
+		assert(self->hm_hashvector.hm_vecfree <= self->hm_hashvector.hm_alloc);
+	}
 	assert(self->hm_minfree <= self->hm_count); /* Yes, this one makes sense! */
 	assert(self->hm_cloexec_count <= self->hm_count);
 	assert(self->hm_clofork_count <= self->hm_count);
@@ -304,7 +315,8 @@ check_new_alloc_linear:
 			if (minfree > self->hm_hashvector.hm_vecfree)
 				minfree = self->hm_hashvector.hm_vecfree;
 			result->hm_hashvector.hm_vecfree = minfree;
-			if (count <= result->hm_hashvector.hm_hashmsk) {
+			if (result->hm_hashvector.hm_hashvec &&
+			    count <= result->hm_hashvector.hm_hashmsk) {
 				map = result->hm_hashvector.hm_hashvec;
 				krealloc_in_place_nx(map, (count + 1) * sizeof(struct handle_hashent),
 				                     GFP_PREFLT | GFP_ATOMIC);
@@ -368,8 +380,6 @@ check_new_alloc_linear:
 							result->hm_minfree = map[i].hh_handle_id;
 						/* Must delete this one! */
 						map[i].hh_vector_index = (unsigned int)-1;
-						assert(result->hm_hashvector.hm_hashuse != 0);
-						--result->hm_hashvector.hm_hashuse;
 					}
 				}
 			}
@@ -543,8 +553,6 @@ handle_manager_cloexec(struct handle_manager *__restrict self)
 				if (self->hm_minfree > ent->hh_handle_id)
 					self->hm_minfree = ent->hh_handle_id;
 				ent->hh_vector_index = (unsigned int)-1; /* This one _we_ just closed! */
-				assert(self->hm_hashvector.hm_hashuse != 0);
-				--self->hm_hashvector.hm_hashuse;
 			}
 		}
 	}
@@ -1011,8 +1019,6 @@ do_delete_handle:
 				ent = &self->hm_hashvector.hm_vector[vecid];
 				assert(ent->h_type != HANDLE_TYPE_UNDEFINED);
 				hashent->hh_vector_index = (unsigned int)-1;
-				assert(self->hm_hashvector.hm_hashuse != 0);
-				--self->hm_hashvector.hm_hashuse;
 				delete_handle = *ent;
 				ent->h_type   = HANDLE_TYPE_UNDEFINED;
 				if (self->hm_hashvector.hm_vecfree > vecid)

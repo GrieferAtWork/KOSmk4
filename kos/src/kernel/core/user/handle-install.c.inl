@@ -113,10 +113,14 @@ update_old_handle:
 				if (ent.hh_handle_id == HANDLE_HASHENT_SENTINEL_ID)
 					break;
 				vecid = ent.hh_vector_index;
-				if (vecid == (unsigned int)-1)
-					break;
 				assert(vecid < self->hm_hashvector.hm_alloc);
-				old_handle                       = self->hm_linear.hm_vector[vecid];
+				if (vecid == (unsigned int)-1) {
+					old_handle.h_type = HANDLE_TYPE_UNDEFINED;
+					old_handle.h_mode = IO_GENERIC;
+					old_handle.h_data = NULL;
+				} else {
+					old_handle = self->hm_linear.hm_vector[vecid];
+				}
 				self->hm_linear.hm_vector[vecid] = incref(hnd);
 				goto update_old_handle;
 			}
@@ -145,7 +149,7 @@ update_old_handle:
 		assert(self->hm_count <= self->hm_hashvector.hm_alloc);
 		for (;;) {
 			unsigned int j, perturb;
-#ifndef INSTALL_AT
+#if !defined(INSTALL_AT) && !defined(INSTALL_IN)
 			assertf(dst_fd <= self->hm_hashvector.hm_hashmsk,
 			        "There needs to be a free entry before `hm_hashmsk', as this "
 			        "is a requirement for how hash-vectors work (mask >= count)\n"
@@ -153,15 +157,16 @@ update_old_handle:
 			        "self->hm_hashvector.hm_hashmsk = %u\n",
 			        dst_fd, self->hm_hashvector.hm_hashmsk);
 			j = perturb = dst_fd;
-#else /* !INSTALL_AT */
+#else /* !INSTALL_AT && !INSTALL_IN */
 			j = perturb = dst_fd & self->hm_hashvector.hm_hashmsk;
-#endif /* INSTALL_AT */
+#endif /* INSTALL_AT || INSTALL_IN */
 			for (;; handle_manager_hashnext(j, perturb)) {
 				struct handle_hashent *ent;
 				ent = &self->hm_hashvector.hm_hashvec[j & self->hm_hashvector.hm_hashmsk];
 				if (ent->hh_handle_id == HANDLE_HASHENT_SENTINEL_ID)
 					goto got_result_slot; /* File descriptor index is unused */
-				if (ent->hh_handle_id == dst_fd)
+				if (ent->hh_handle_id == dst_fd &&
+				    ent->hh_vector_index != (unsigned int)-1)
 					break; /* File descriptor index is used */
 			}
 			++dst_fd;
@@ -185,7 +190,7 @@ got_result_slot:
 	/* Now that we've got an appropriate handle
 	 * number, install the handle into that slot! */
 	if (self->hm_mode == HANDLE_MANAGER_MODE_LINEAR) {
-#ifdef INSTALL_AT
+#if defined(INSTALL_AT) || defined(INSTALL_IN)
 		unsigned int how;
 		how = handle_manage_switch_to_hashmode_for_handle(self, dst_fd);
 		if (how == HANDLE_MANAGE_SWITCH_TO_HASHMODE_FOR_HANDLE_NOT_CHANGED_UNLOCKED ||
@@ -193,13 +198,13 @@ got_result_slot:
 			goto again_locked;
 		if (how == HANDLE_MANAGE_SWITCH_TO_HASHMODE_FOR_HANDLE_CHANGED_LOCKED)
 			goto install_hash_handle;
-#else /* INSTALL_AT */
+#else /* INSTALL_AT || INSTALL_IN */
 		assert(dst_fd <= self->hm_linear.hm_alloc);
-#endif /* !INSTALL_AT */
+#endif /* !INSTALL_AT && !INSTALL_IN */
 		if (dst_fd >= self->hm_linear.hm_alloc) {
 			struct handle *new_vector;
 			unsigned int new_alloc;
-#ifndef INSTALL_AT
+#if !defined(INSTALL_AT) && !defined(INSTALL_IN)
 			assertf(dst_fd == self->hm_count,
 			        "If this isn't true, then there must be unused "
 			        "slots somewhere, which we should have picked up on\n"
@@ -208,7 +213,7 @@ got_result_slot:
 			        "self->hm_minfree = %u\n"
 			        "self->hm_mode    = %u\n",
 			        dst_fd, self->hm_count, self->hm_minfree, self->hm_mode);
-#endif /* !INSTALL_AT */
+#endif /* !INSTALL_AT && !INSTALL_IN */
 			new_alloc = dst_fd + 16;
 			if unlikely(new_alloc > self->hm_maxlimit)
 				new_alloc > self->hm_maxlimit;
@@ -308,9 +313,9 @@ got_result_slot:
 		unsigned int j, perturb;
 		unsigned int vector_index;
 		struct handle_hashent *ent;
-#ifdef INSTALL_AT
+#if defined(INSTALL_AT) || defined(INSTALL_IN)
 install_hash_handle:
-#endif /* INSTALL_AT */
+#endif /* INSTALL_AT || INSTALL_IN */
 		/* Figure out where we want to put the new handle within the indirection handle-vector. */
 		vector_index = self->hm_hashvector.hm_vecfree;
 		assert(vector_index <= self->hm_count);
@@ -405,12 +410,14 @@ install_hash_handle:
 		}
 		assert(vector_index < self->hm_hashvector.hm_alloc);
 
-#ifdef INSTALL_AT
+#if defined(INSTALL_AT) || defined(INSTALL_IN)
 		j = perturb = dst_fd & self->hm_hashvector.hm_hashmsk;
-#else /* INSTALL_AT */
+#else /* INSTALL_AT || INSTALL_IN */
 		assert(dst_fd <= self->hm_hashvector.hm_hashmsk);
 		j = perturb = dst_fd;
-#endif /* !INSTALL_AT */
+#endif /* !INSTALL_AT && !INSTALL_IN */
+		assert(dst_fd != HANDLE_HASHENT_SENTINEL_ID);
+		assert(vector_index != (unsigned int)-1);
 		for (;; handle_manager_hashnext(j, perturb)) {
 			ent = &self->hm_hashvector.hm_hashvec[j & self->hm_hashvector.hm_hashmsk];
 			if (ent->hh_handle_id == HANDLE_HASHENT_SENTINEL_ID) {
@@ -421,6 +428,7 @@ install_hash_handle:
 						goto got_result_slot;
 					goto again_locked;
 				}
+				assert(ent->hh_handle_id == HANDLE_HASHENT_SENTINEL_ID);
 				++self->hm_hashvector.hm_hashuse;
 				break;
 			}
@@ -428,7 +436,7 @@ install_hash_handle:
 				/* Re-use a previously deleted entry. */
 				break;
 			}
-			assertf(ent->hh_vector_index != dst_fd,
+			assertf(ent->hh_handle_id != dst_fd,
 			        "Handle %u already in use",
 			        dst_fd);
 		}
@@ -438,6 +446,7 @@ install_hash_handle:
 		assert(self->hm_hashvector.hm_vector[vector_index].h_type == HANDLE_TYPE_UNDEFINED);
 		self->hm_hashvector.hm_vector[vector_index] = incref(hnd);
 		assert(self->hm_count <= self->hm_hashvector.hm_alloc);
+		assert(self->hm_count + 1 <= self->hm_hashvector.hm_hashuse);
 	}
 
 	/* Keep track of the number of used handles. */
@@ -446,9 +455,9 @@ install_hash_handle:
 		++self->hm_cloexec_count;
 	if (hnd.h_mode & IO_CLOFORK)
 		++self->hm_clofork_count;
-#ifndef INSTALL_AT
+#if !defined(INSTALL_AT) && !defined(INSTALL_IN)
 	self->hm_minfree = dst_fd + 1;
-#endif /* !INSTALL_AT */
+#endif /* !INSTALL_AT && !INSTALL_IN */
 	handle_manager_assert_integrity(self);
 	sync_endwrite(&self->hm_lock);
 #ifdef INSTALL_IN

@@ -264,7 +264,7 @@ struct handle_manager {
 			                           * `hh_handle_id != HANDLE_HASHENT_SENTINEL_ID').
 			                           * Note that this is very similar to `hm_count', but includes handles
 			                           * that have been deleted (i.e. `hh_vector_index == (unsigned int)-1') */
-			unsigned int   hm_vecfree;/* [lock(hm_lock)] Lowest index in `hm_hashvec' that may contain an unused slow. */
+			unsigned int   hm_vecfree;/* [lock(hm_lock)] Lowest index in `hm_vector' that may contain an unused slot. */
 #define handle_manager_hashnext(i, perturb) ((i) = (((i) << 2) + (i) + (perturb) + 1),(perturb) >>= 5)
 		}                hm_hashvector; /* HANDLE_MANAGER_MODE_HASHVECTOR */
 	};
