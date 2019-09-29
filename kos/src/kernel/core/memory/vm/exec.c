@@ -28,6 +28,7 @@
 #include <kernel/vm.h>
 #include <kernel/vm/builder.h>
 #include <kernel/vm/library.h>
+#include <kernel/vm/exec.h>
 
 #include <hybrid/align.h>
 
@@ -42,6 +43,23 @@
 #include "vm-nodeapi.h"
 
 DECL_BEGIN
+
+DEFINE_PERVM_FINI(pervm_fini_execinfo);
+INTERN NONNULL((1)) void
+NOTHROW(KCALL pervm_fini_execinfo)(struct vm *__restrict self) {
+	struct vm_execinfo_struct *execinfo;
+	execinfo = &FORVM(self, vm_execinfo);
+	xdecref(execinfo->ei_node);
+	xdecref(execinfo->ei_dent);
+	xdecref(execinfo->ei_path);
+}
+
+PUBLIC ATTR_PERVM struct vm_execinfo_struct vm_execinfo = {
+	/* .ei_node = */ NULL,
+	/* .ei_dent = */ NULL,
+	/* .ei_path = */ NULL
+};
+
 
 #define HINT_ADDR(x,y) x
 #define HINT_MODE(x,y) y
@@ -442,9 +460,17 @@ err_overlap:
 
 			/* Apply the newly loaded binary to the given VM and
 			 * terminate all threads using it except for the caller. */
-			vmb_apply(&builder,
-			          effective_vm,
-			          VMB_APPLY_AA_TERMTHREADS);
+			{
+				struct vm_execinfo_struct ei;
+				ei.ei_node = exec_node;
+				ei.ei_dent = exec_dentry;
+				ei.ei_path = exec_path;
+				vmb_apply(&builder,
+				          effective_vm,
+				          VMB_APPLY_AA_TERMTHREADS |
+				          VMB_APPLY_AA_SETEXECINFO,
+				          &ei);
+			}
 		} EXCEPT {
 			vmb_fini(&builder);
 			RETHROW();

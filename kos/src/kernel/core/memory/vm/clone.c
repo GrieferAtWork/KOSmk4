@@ -22,15 +22,18 @@
 
 #include <kernel/compiler.h>
 
+#include <fs/node.h>
+#include <fs/vfs.h>
 #include <kernel/except.h>
 #include <kernel/printk.h>
 #include <kernel/vm.h>
+#include <kernel/vm/exec.h>
 
 #include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 
-#include <string.h>
 #include <assert.h>
+#include <string.h>
 
 #include "vm-nodeapi.h"
 
@@ -93,6 +96,12 @@ free_nodes_chain(struct vm_node *chain) {
 		chain = next;
 	}
 }
+
+
+typedef void (KCALL *pervm_clone_t)(struct vm *__restrict newvm,
+                                    struct vm *__restrict oldvm) THROWS(...);
+INTDEF pervm_clone_t __kernel_pervm_clone_start[];
+INTDEF pervm_clone_t __kernel_pervm_clone_end[];
 
 
 /* Clone the given VM `self'
@@ -333,7 +342,19 @@ handle_remove_write_error:
 		RETHROW();
 	}
 	/* And with that, we're done! */
-	assert((result_nodes == NULL) == (node_alloc_count == node_req_count));
+	assert((result_nodes == NULL) ==
+	       (node_alloc_count == node_req_count));
+
+	/* Copy execinfo */
+	{
+		struct vm_execinfo_struct *dst, *src;
+		dst = &FORVM(result, vm_execinfo);
+		src = &FORVM(self, vm_execinfo);
+		dst->ei_node = (REF struct inode *)xincref(src->ei_node);
+		dst->ei_dent = xincref(src->ei_dent);
+		dst->ei_path = xincref(src->ei_path);
+	}
+
 	/* Unlock all of the locked parts. */
 	pointer_set_unlock_vm_dataparts(&locked_parts);
 	/* Unlock the source VM */
@@ -341,6 +362,16 @@ handle_remove_write_error:
 	/* Free any unused nodes. (Though there really shouldn't be any) */
 	free_nodes_chain(result_nodes);
 	pointer_set_fini(&locked_parts);
+	TRY {
+		pervm_clone_t *iter;
+		for (iter = __kernel_pervm_clone_start;
+		     iter < __kernel_pervm_clone_end; ++iter)
+			(**iter)(result, self);
+		assert(iter == __kernel_pervm_clone_end);
+	} EXCEPT {
+		destroy(result);
+		RETHROW();
+	}
 	return result;
 }
 

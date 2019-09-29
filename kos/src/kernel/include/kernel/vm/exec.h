@@ -16,59 +16,29 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_MODPROCFS_FILES_PERPROC_EXE_C
-#define GUARD_MODPROCFS_FILES_PERPROC_EXE_C 1
-#define _KOS_SOURCE 1 /* snprintf returns size_t */
+#ifndef GUARD_KERNEL_INCLUDE_KERNEL_VM_EXEC_H
+#define GUARD_KERNEL_INCLUDE_KERNEL_VM_EXEC_H 1
 
 #include <kernel/compiler.h>
-
-#include <fs/node.h>
-#include <fs/vfs.h>
+#include <kernel/types.h>
 #include <kernel/vm.h>
-#include <kernel/vm/exec.h>
-#include <sched/pid.h>
-
-#include <stdio.h>
-
-#include "../procfs.h"
 
 DECL_BEGIN
 
-INTERN NONNULL((1)) size_t KCALL
-ProcFS_PerProc_Exe_Printer(struct symlink_node *__restrict self,
-                           USER CHECKED /*utf-8*/ char *buf,
-                           size_t bufsize) {
-	upid_t pid;
-	REF struct task *thread;
-	REF struct vm *v;
-	struct pidns *myns = THIS_PIDNS;
-	REF struct directory_entry *exec_dent;
-	REF struct path            *exec_path;
-	pid  = (upid_t)(self->i_fileino & PROCFS_INOTYPE_PERPROC_PIDMASK);
-	thread = pidns_lookup_task(myns, pid);
-	{
-		FINALLY_DECREF_UNLIKELY(thread);
-		v = task_getvm(thread);
-	}
-	FINALLY_DECREF_UNLIKELY(v);
-	sync_read(v);
-	exec_dent = xincref(FORVM(v, vm_execinfo).ei_dent);
-	exec_path = xincref(FORVM(v, vm_execinfo).ei_path);
-	sync_endread(v);
-	if unlikely(!exec_dent || !exec_path) {
-		xdecref_unlikely(exec_dent);
-		xdecref_unlikely(exec_path);
-		THROW(E_PROCESS_EXITED, pid);
-	}
-	FINALLY_DECREF_UNLIKELY(exec_dent);
-	FINALLY_DECREF_UNLIKELY(exec_path);
-	return path_sprintent(buf,
-	                      bufsize,
-	                      exec_path,
-	                      exec_dent);
-}
+struct inode;
+struct directory_entry;
+struct path;
+
+struct vm_execinfo_struct {
+	REF struct inode           *ei_node; /* [0..1][lock(:THIS_VM)] Exec INode */
+	REF struct directory_entry *ei_dent; /* [0..1][lock(:THIS_VM)] Exec directory entry */
+	REF struct path            *ei_path; /* [0..1][lock(:THIS_VM)] Exec path */
+};
+
+/* VM exec() information */
+DATDEF ATTR_PERVM struct vm_execinfo_struct vm_execinfo;
 
 
 DECL_END
 
-#endif /* !GUARD_MODPROCFS_FILES_PERPROC_EXE_C */
+#endif /* !GUARD_KERNEL_INCLUDE_KERNEL_VM_EXEC_H */

@@ -137,6 +137,7 @@ SECTIONS {
 		DEFINE_CALLBACK_VECTOR(pertask_onexit,.rodata.callback.pertask.onexit)
 		DEFINE_CALLBACK_VECTOR(pervm_init,.rodata.callback.pervm.init)
 		DEFINE_CALLBACK_VECTOR(pervm_fini,.rodata.callback.pervm.fini)
+		DEFINE_CALLBACK_VECTOR(pervm_clone,.rodata.callback.pervm.clone)
 		DEFINE_CALLBACK_VECTOR(pervm_onexec,.rodata.callback.pervm.onexec)
 		DEFINE_CALLBACK_VECTOR(validatable_heaps,.rodata.heaps.validatable)
 	}

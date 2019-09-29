@@ -1394,6 +1394,10 @@ vm_clone(struct vm *__restrict self,
  *       the old or new VM's list of tasks. */
 FUNDEF void KCALL task_setvm(struct vm *__restrict newvm) THROWS(E_WOULDBLOCK);
 
+/* Return the active VM of the given `thread' */
+FUNDEF REF struct vm *KCALL
+task_getvm(struct task *__restrict thread) THROWS(E_WOULDBLOCK);
+
 
 
 /* Acquire locks to the tree of the kernel VM */
@@ -2051,7 +2055,13 @@ DATDEF CALLBACK_LIST(void FCALL(struct vm *)) vm_onfini_callbacks;
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 /* >> void KCALL func(void);
  * Invoked before returning to user-space after a new application was loaded. */
-#define DEFINE_PERVM_ONEXEC(func)  DEFINE_CALLBACK(".rodata.callback.pervm.onexec",func)
+#define DEFINE_PERVM_ONEXEC(func)  DEFINE_CALLBACK(".rodata.callback.pervm.onexec", func)
+/* >> void KCALL func(struct vm *__restrict self); */
+#define DEFINE_PERVM_INIT(func)    DEFINE_CALLBACK(".rodata.callback.pervm.init", func)
+/* >> NOBLOCK void NOTHROW(KCALL func)(struct vm *__restrict self); */
+#define DEFINE_PERVM_FINI(func)    DEFINE_CALLBACK(".rodata.callback.pervm.fini", func)
+/* >> NOBLOCK void KCALL func(struct vm *__restrict newvm, struct vm *__restrict oldvm); */
+#define DEFINE_PERVM_CLONE(func)   DEFINE_CALLBACK(".rodata.callback.pervm.clone", func)
 #endif /* CONFIG_BUILDING_KERNEL_CORE */
 
 

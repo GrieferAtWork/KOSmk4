@@ -1633,6 +1633,7 @@
 #define __CRT_HAVE_task_exec_asynchronous_srpc 1
 #define __CRT_HAVE_task_exit 1
 #define __CRT_HAVE_task_free_rpc 1
+#define __CRT_HAVE_task_getvm 1
 #define __CRT_HAVE_task_isconnected 1
 #define __CRT_HAVE_task_pause 1
 #define __CRT_HAVE_task_popconnections 1
@@ -1951,6 +1952,7 @@
 #define __CRT_HAVE_vm_enumdmav_nx 1
 #define __CRT_HAVE_vm_exec 1
 #define __CRT_HAVE_vm_exec_assert_regular 1
+#define __CRT_HAVE_vm_execinfo 1
 #define __CRT_HAVE_vm_find_first_node_greater_equal 1
 #define __CRT_HAVE_vm_find_last_node_lower_equal 1
 #define __CRT_HAVE_vm_free 1

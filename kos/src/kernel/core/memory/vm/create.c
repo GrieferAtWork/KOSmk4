@@ -31,6 +31,7 @@
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
+#include <hybrid/sync/atomic-rwlock.h>
 
 #include <assert.h>
 #include <string.h>
@@ -186,6 +187,8 @@ NOTHROW(KCALL vm_destroy)(struct vm *__restrict self) {
 }
 
 
+PRIVATE struct atomic_rwlock change_vm_lock = ATOMIC_RWLOCK_INIT;
+
 
 /* Set the VM active within the calling thread, as well as
  * change page directories to make use of the new VM before
@@ -196,11 +199,17 @@ PUBLIC void KCALL task_setvm(struct vm *__restrict newvm)
 	REF struct vm *oldvm;
 	struct task *me = THIS_TASK;
 again:
-	was   = PREEMPTION_PUSHOFF();
+	was = PREEMPTION_PUSHOFF();
+	if (!sync_trywrite(&change_vm_lock)) {
+		PREEMPTION_POP(was);
+		task_yield();
+		goto again;
+	}
 	oldvm = FORTASK(me, _this_vm);
 	if likely(oldvm != newvm) {
 		if unlikely(!vm_tasklock_trywrite(newvm)) {
 			PREEMPTION_POP(was);
+			sync_endwrite(&change_vm_lock);
 			vm_tasklock_write(newvm);
 			vm_tasklock_endwrite(newvm);
 			goto again;
@@ -209,6 +218,7 @@ again:
 			if unlikely(!vm_tasklock_trywrite(oldvm)) {
 				incref(oldvm);
 				PREEMPTION_POP(was);
+				sync_endwrite(&change_vm_lock);
 				vm_tasklock_endwrite(newvm);
 				FINALLY_DECREF_UNLIKELY(oldvm);
 				vm_tasklock_write(oldvm);
@@ -224,12 +234,39 @@ again:
 		vm_tasklock_endwrite(newvm);
 		FORTASK(me, _this_vm) = incref(newvm);
 		pagedir_set(newvm->v_pdir_phys_ptr);
+		sync_endwrite(&change_vm_lock);
 		PREEMPTION_POP(was);
 		decref(oldvm);
 	} else {
+		sync_endwrite(&change_vm_lock);
 		PREEMPTION_POP(was);
 	}
 }
+
+/* Return the active VM of the given `thread' */
+PUBLIC REF struct vm *KCALL
+task_getvm(struct task *__restrict thread) THROWS(E_WOULDBLOCK) {
+	REF struct vm *result;
+	struct task *me = THIS_TASK;
+	pflag_t was;
+again:
+	was = PREEMPTION_PUSHOFF();
+	if (thread == me || thread->t_cpu == me->t_cpu)
+		result = incref(thread->t_vm);
+	else {
+		if (!sync_tryread(&change_vm_lock)) {
+			PREEMPTION_POP(was);
+			task_yield();
+			COMPILER_READ_BARRIER();
+			goto again;
+		}
+		result = incref(thread->t_vm);
+		sync_endread(&change_vm_lock);
+	}
+	PREEMPTION_POP(was);
+	return result;
+}
+
 
 
 /* Allocate an set a new VM for /bin/init during booting.

@@ -205,6 +205,7 @@ NOTHROW(KCALL vmb_find_last_node_lower_equal)(struct vmb *__restrict self,
                                               vm_vpage_t max_page_index);
 
 
+struct vm_execinfo_struct;
 
 /* Apply all of the mappings from `self' onto `target', whilst simultaneously deleting
  * any memory mapping still present within `target' (except for the kernel-reserve node)
@@ -224,12 +225,14 @@ NOTHROW(KCALL vmb_find_last_node_lower_equal)(struct vmb *__restrict self,
 FUNDEF void KCALL
 vmb_apply(struct vmb *__restrict self,
           struct vm *__restrict target,
-          unsigned int additional_actions)
+          unsigned int additional_actions,
+          struct vm_execinfo_struct *execinfo DFL(__NULLPTR))
 		THROWS(E_BADALLOC, E_WOULDBLOCK);
 #define VMB_APPLY_AA_NOTHING      0x0000
 #define VMB_APPLY_AA_TERMTHREADS  0x0001 /* Terminate all threads using `target', excluding the caller.
                                           * If the calling thread isn't using `target', simply terminate
                                           * all threads that are using `target' */
+#define VMB_APPLY_AA_SETEXECINFO  0x0002 /* Set the given `execinfo' for the given VM */
 
 
 

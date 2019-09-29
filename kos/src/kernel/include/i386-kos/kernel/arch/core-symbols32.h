@@ -3511,9 +3511,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, sys_gettimeofday64; .long 0
 	.long 0xec0fae4
 	.long .Lname877 /* index: 877 */
-	.weak task_setvm; .long task_setvm
-	.reloc ., R_386_SIZE32, task_setvm; .long 0
-	.long 0x16e636d
+	.weak task_getvm; .long task_getvm
+	.reloc ., R_386_SIZE32, task_getvm; .long 0
+	.long 0x15a636d
 	.long 0 /* index: 878 */
 	.long 0
 	.long 0
@@ -4670,10 +4670,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 1167 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname1167 /* index: 1167 */
+	.weak task_setvm; .long task_setvm
+	.reloc ., R_386_SIZE32, task_setvm; .long 0
+	.long 0x16e636d
 	.long .Lname1168 /* index: 1168 */
 	.weak pagedir_prepare_map; .long pagedir_prepare_map
 	.reloc ., R_386_SIZE32, pagedir_prepare_map; .long 0
@@ -6510,10 +6510,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak system_clearcaches_s; .long system_clearcaches_s
 	.reloc ., R_386_SIZE32, system_clearcaches_s; .long 0
 	.long 0xd1f8713
-	.long 0 /* index: 1627 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname1627 /* index: 1627 */
+	.weak vm_execinfo; .long vm_execinfo
+	.reloc ., R_386_SIZE32, vm_execinfo; .long 0
+	.long 0xec4d10f
 	.long .Lname1628 /* index: 1628 */
 	.weak x86_this_user_fsbase; .long x86_this_user_fsbase
 	.reloc ., R_386_SIZE32, x86_this_user_fsbase; .long 0
@@ -17283,7 +17283,7 @@ END(kernel_symbol_table)
 .Lname876:
 	.string "sys_gettimeofday64"
 .Lname877:
-	.string "task_setvm"
+	.string "task_getvm"
 .Lname879:
 	.string "sys_sched_setaffinity"
 .Lname882:
@@ -17580,6 +17580,8 @@ END(kernel_symbol_table)
 	.string "regdump_gpreg"
 .Lname1161:
 	.string "tty_device_poll"
+.Lname1167:
+	.string "task_setvm"
 .Lname1168:
 	.string "pagedir_prepare_map"
 .Lname1170:
@@ -18054,6 +18056,8 @@ END(kernel_symbol_table)
 	.string "pagedir_maphint"
 .Lname1626:
 	.string "system_clearcaches_s"
+.Lname1627:
+	.string "vm_execinfo"
 .Lname1628:
 	.string "x86_this_user_fsbase"
 .Lname1632:

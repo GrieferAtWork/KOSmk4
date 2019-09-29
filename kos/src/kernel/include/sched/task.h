@@ -86,7 +86,9 @@ struct task {
 	WEAK uintptr_t  t_flags;      /* Thread state & flags (Set of `TASK_F*'). */
 	struct cpu     *t_cpu;        /* [1..1][lock(PRIVATE)] The CPU that this task is being hosted by.
 	                               * NOTE: Also accessible via the `_this_cpu' field. */
-	REF struct vm  *t_vm;         /* [1..1][lock(PRIVATE)] The VM used to host this task.
+	REF struct vm  *t_vm;         /* [1..1][lock(read(THIS_TASK || INTERN(lock)),
+	                               *             write(THIS_TASK && INTERN(lock)))]
+	                               * The VM used to host this task.
 	                               * NOTE: Also accessible via the `_this_vm' field. */
 	LLIST_NODE(struct task) t_vm_tasks; /* [lock(t_vm->v_tasklock)] Chain of tasks using `t_vm' */
 	size_t          t_heapsz;     /* [const] Allocated heap size of this task. */

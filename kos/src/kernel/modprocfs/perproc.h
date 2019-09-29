@@ -63,6 +63,9 @@ DYNAMIC_SYMLINK(root, 0777, ProcFS_PerProc_Root_Printer)
 PERPROC_DIRECTORY_ENTRY("cmdline", DT_REG, cmdline)
 MKREG_RO(cmdline, 0222, ProcFS_PerProc_Cmdline_Printer)
 
+PERPROC_DIRECTORY_ENTRY("stat", DT_REG, stat)
+MKREG_RO(stat, 0222, ProcFS_PerProc_Stat_Printer)
+
 PERPROC_DIRECTORY_ENTRY("fd", DT_DIR, fd)
 CUSTOM(fd, S_IFDIR | 0300, ProcFS_PerProc_Fd_Type)
 

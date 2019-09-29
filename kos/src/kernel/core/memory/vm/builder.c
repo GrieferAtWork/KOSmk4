@@ -22,10 +22,13 @@
 
 #include <kernel/compiler.h>
 
+#include <fs/node.h>
+#include <fs/vfs.h>
 #include <kernel/except.h>
 #include <kernel/printk.h>
 #include <kernel/vm.h>
 #include <kernel/vm/builder.h>
+#include <kernel/vm/exec.h>
 #include <sched/rpc-internal.h>
 #include <sched/rpc.h>
 
@@ -471,12 +474,15 @@ vmb_apply_terminate_thread(void *UNUSED(arg)) {
 PUBLIC void KCALL
 vmb_apply(struct vmb *__restrict self,
           struct vm *__restrict target,
-          unsigned int additional_actions)
-          THROWS(E_BADALLOC,E_WOULDBLOCK) {
+          unsigned int additional_actions,
+          struct vm_execinfo_struct *execinfo)
+		THROWS(E_BADALLOC,E_WOULDBLOCK) {
 	struct vm_node *node;
 	struct pointer_set locked_parts;
+	struct vm_execinfo_struct old_execinfo;
 	struct rpc_entry *task_terminate_rpcs = NULL;
 	assert(target != &vm_kernel);
+	memset(&old_execinfo, 0, sizeof(old_execinfo));
 
 	/* Step #1: Acquire write-lock to all mapped data-parts.
 	 * NOTE:    This part's kind-of complicated, since we need to make sure
@@ -830,10 +836,17 @@ handle_remove_write_error:
 		 * core.
 		 * With that in mind, we're succeeded and can now move on applying the new VM contents. */
 	}
+	/* Set the given execinfo if the caller wants us to do so. */
+	if (additional_actions & VMB_APPLY_AA_SETEXECINFO) {
+		memcpy(&old_execinfo, &FORVM(target, vm_execinfo), sizeof(struct vm_execinfo_struct));
+		memcpy(&FORVM(target, vm_execinfo), execinfo, sizeof(struct vm_execinfo_struct));
+		xincref(execinfo->ei_node);
+		xincref(execinfo->ei_dent);
+		xincref(execinfo->ei_path);
+	}
 
 	{
 		struct vm_node *old_node_list;
-
 		/* Unlink the kernel-reserve node. */
 #ifndef NDEBUG
 #ifdef HIGH_MEMORY_KERNEL
@@ -935,6 +948,9 @@ handle_remove_write_error:
 		}
 		sync_endwrite(target);
 	}
+	xdecref(old_execinfo.ei_dent);
+	xdecref(old_execinfo.ei_node);
+	xdecref(old_execinfo.ei_path);
 #ifndef NDEBUG
 	/* Undefined state... */
 	memset(self, 0xcc, sizeof(*self));
