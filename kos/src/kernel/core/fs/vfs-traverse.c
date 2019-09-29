@@ -45,13 +45,13 @@ path_expandchild_symlink(struct path *cwd,
 
 #define PATH_FOLLOW_SYMLINK_DYNAMIC_GOT_RESULT_PATH 0 /* `*presult_path' was filled */
 #define PATH_FOLLOW_SYMLINK_DYNAMIC_GOT_NEW_RESULT  1 /* `*pnew_result' was filled */
-#define PATH_FOLLOW_SYMLINK_DYNAMIC_GOT_RETRY       2 /* Only returned by `path_follow_symlink_dynamic_impl()':
+#define PATH_FOLLOW_SYMLINK_DYNAMIC_MUST_RETRY      2 /* Only returned by `path_follow_symlink_dynamic_impl()':
                                                        *     retry (the buffer size was already updated) */
 
 /* Follow a given dynamic symlink node */
 PRIVATE ATTR_NOINLINE WUNUSED NONNULL((1, 2, 3, 4, 6, 8, 9, 10)) unsigned int KCALL
 path_follow_symlink_dynamic_impl(struct fs *__restrict filesystem,
-                                 struct path *containing_path,
+                                 /*in|out*/ struct path **__restrict pcontaining_path,
                                  struct path *root,
                                  struct symlink_node *__restrict sl_node,
                                  fsmode_t mode,
@@ -75,25 +75,26 @@ path_follow_symlink_dynamic_impl(struct fs *__restrict filesystem,
 		if unlikely(reqlen > bufsize) {
 			*pbufsize = bufsize;
 			freea(buf);
-			return PATH_FOLLOW_SYMLINK_DYNAMIC_GOT_RETRY;
+			return PATH_FOLLOW_SYMLINK_DYNAMIC_MUST_RETRY;
 		}
-		new_containing_path = path_traverse_ex_recent(filesystem,
-		                                              containing_path,
-		                                              root,
-		                                              sl_node->sl_text,
-		                                              &last_seg,
-		                                              &last_seglen,
-		                                              mode,
-		                                              premaining_symlinks);
-		decref(containing_path);
-		containing_path = new_containing_path;
+		new_containing_path = path_traversen_ex_recent(filesystem,
+		                                               *pcontaining_path,
+		                                               root,
+		                                               buf,
+		                                               reqlen,
+		                                               &last_seg,
+		                                               &last_seglen,
+		                                               mode,
+		                                               premaining_symlinks);
+		decref(*pcontaining_path);
+		*pcontaining_path = new_containing_path;
 		hash = directory_entry_hash(last_seg, last_seglen);
 		COMPILER_READ_BARRIER();
 		/* Check for mounting points & cached paths. */
 		*presult_path = mode & FS_MODE_FDOSPATH
-		                ? path_getcasechild_and_parent_inode(containing_path, last_seg, last_seglen,
+		                ? path_getcasechild_and_parent_inode(*pcontaining_path, last_seg, last_seglen,
 		                                                     hash, pnew_containing_directory)
-		                : path_getchild_and_parent_inode(containing_path, last_seg, last_seglen,
+		                : path_getchild_and_parent_inode(*pcontaining_path, last_seg, last_seglen,
 		                                                 hash, pnew_containing_directory);
 		if (*presult_path) {
 			freea(buf);
@@ -126,7 +127,7 @@ path_follow_symlink_dynamic_impl(struct fs *__restrict filesystem,
 
 LOCAL WUNUSED NONNULL((1, 2, 3, 4, 6, 8, 9)) unsigned int KCALL
 path_follow_symlink_dynamic(struct fs *__restrict filesystem,
-                            struct path *containing_path,
+                            struct path **__restrict pcontaining_path,
                             struct path *root,
                             struct symlink_node *__restrict sl_node,
                             fsmode_t mode,
@@ -139,7 +140,7 @@ path_follow_symlink_dynamic(struct fs *__restrict filesystem,
 	size_t bufsize = 128;
 	for (;;) {
 		result = path_follow_symlink_dynamic_impl(filesystem,
-		                                          containing_path,
+		                                          pcontaining_path,
 		                                          root,
 		                                          sl_node,
 		                                          mode,
@@ -149,7 +150,7 @@ path_follow_symlink_dynamic(struct fs *__restrict filesystem,
 		                                          presult_path,
 		                                          pnew_result,
 		                                          &bufsize);
-		if likely(result != PATH_FOLLOW_SYMLINK_DYNAMIC_GOT_RETRY)
+		if likely(result != PATH_FOLLOW_SYMLINK_DYNAMIC_MUST_RETRY)
 			break;
 	}
 	return result;

@@ -737,7 +737,7 @@ again_follow_symlink:
 							unsigned int mode;
 							REF struct directory_node *new_containing_directory;
 							mode = path_follow_symlink_dynamic(filesystem,
-							                                   containing_path,
+							                                   &containing_path,
 							                                   root,
 							                                   sl_node,
 							                                   mode,
