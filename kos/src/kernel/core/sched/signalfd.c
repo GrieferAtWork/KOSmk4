@@ -26,16 +26,18 @@
 #include <kernel/malloc.h>
 #include <kernel/syscall.h>
 #include <kernel/user.h>
-#include <sched/posix-signal.h>
 #include <sched/pid.h>
+#include <sched/posix-signal.h>
 #include <sched/signalfd.h>
+
 #include <hybrid/atomic.h>
+
+#include <sys/poll.h>
+#include <sys/signalfd.h>
 
 #include <assert.h>
 #include <signal.h>
 #include <string.h>
-#include <sys/poll.h>
-#include <sys/signalfd.h>
 
 DECL_BEGIN
 

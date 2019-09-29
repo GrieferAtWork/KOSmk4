@@ -24,40 +24,41 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/printk.h>
-#include <kernel/user.h>
-#include <kernel/paging.h> /* HIGH_MEMORY_KERNEL */
-#include <kernel/except.h>
 #include <kernel/coredump.h>
+#include <kernel/except.h>
+#include <kernel/paging.h> /* HIGH_MEMORY_KERNEL */
+#include <kernel/printk.h>
 #include <kernel/syscall.h>
 #include <kernel/types.h>
+#include <kernel/user.h>
 #include <kernel/vm.h> /* DEFINE_PERVM_ONEXEC() */
-#include <sched/pid.h>
-#include <sched/cred.h>
-#include <sched/posix-signal.h>
-#include <sched/task.h>
-#include <sched/rpc.h>
-#include <sched/cpu.h>
-#include <sched.h>
 #include <misc/atomic-ref.h>
+#include <sched/cpu.h>
+#include <sched/cred.h>
+#include <sched/pid.h>
+#include <sched/posix-signal.h>
+#include <sched/rpc.h>
+#include <sched/task.h>
 
 #include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
 
+#include <sys/wait.h>
+
 #include <assert.h>
 #include <errno.h>
-#include <string.h>
+#include <sched.h>
 #include <signal.h>
-#include <sys/wait.h>
+#include <string.h>
 
 #include <librpc/rpc.h>
 
 DECL_BEGIN
 
 PUBLIC struct kernel_sigmask empty_kernel_sigmask = {
-	/* .sm_refcnt = */2,
-	/* .sm_share  = */2,
-	/* .sm_mask   = */{{0}}
+	/* .sm_refcnt = */ 2,
+	/* .sm_share  = */ 2,
+	/* .sm_mask   = */ { { 0 } }
 };
 
 /* [0..1][lock(READ(ATOMIC), WRITE(THIS_TASK))]

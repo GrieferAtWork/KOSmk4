@@ -32,16 +32,13 @@
 #include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 
+#include <bits/timespec.h>
 #include <kos/jiffies.h>
 #include <sys/wait.h>
 
-#include <bits/timespec.h>
+#include <assert.h>
 #include <stddef.h>
 #include <string.h>
-#include <assert.h>
-
-
-#include <sys/io.h>
 
 DECL_BEGIN
 

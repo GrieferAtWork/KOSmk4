@@ -32,12 +32,12 @@
 #include <sched/rpc.h>
 #include <sched/task.h>
 
-#include <bits/timeval.h>
 #include <bits/timespec.h>
-
-#include <errno.h>
+#include <bits/timeval.h>
 #include <sys/time.h>
 #include <sys/timeb.h>
+
+#include <errno.h>
 
 DECL_BEGIN
 

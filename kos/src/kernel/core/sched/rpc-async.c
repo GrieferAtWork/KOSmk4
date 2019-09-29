@@ -26,13 +26,13 @@
 #include <kernel/vm.h>
 #include <sched/cpu.h>
 #include <sched/rpc.h>
-#include <assert.h>
 #include <sched/signal.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
 
 #include <alloca.h>
+#include <assert.h>
 #include <stddef.h>
 #include <string.h>
 

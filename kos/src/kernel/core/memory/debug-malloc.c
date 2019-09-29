@@ -997,6 +997,7 @@ NOTHROW(KCALL mall_search_leaks_impl)(void) {
 	PRINT_LEAKS_SEARCH_PHASE("Phase #1: Scan .data + .bss\n");
 	mall_reachable_data((byte_t *)__debug_malloc_tracked_start,
 	                    (size_t)__debug_malloc_tracked_size);
+
 	/* Also search state data segments of loaded drivers.
 	 * For this purpose, we only scan writable segments */
 	{

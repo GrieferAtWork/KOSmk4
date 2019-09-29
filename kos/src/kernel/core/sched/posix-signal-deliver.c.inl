@@ -25,13 +25,13 @@
 #include <misc/pointer-set.h>
 
 #ifdef DELIVER_NX
-#define FUNC(x)      x##_nx
-#define IFELSE(x,nx) nx
-#define NOTHROW_NX   NOTHROW
+#define FUNC(x)       x##_nx
+#define IFELSE(x, nx) nx
+#define NOTHROW_NX    NOTHROW
 #else /* DELIVER_NX */
-#define FUNC(x)      x
-#define IFELSE(x,nx) x
-#define NOTHROW_NX   /* nothing */
+#define FUNC(x)       x
+#define IFELSE(x, nx) x
+#define NOTHROW_NX    /* nothing */
 #endif /* !DELIVER_NX */
 
 DECL_BEGIN

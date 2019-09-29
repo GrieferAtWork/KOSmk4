@@ -21,7 +21,7 @@
 //#define RPC_SIMPLE    1
 //#define RPC_NOEXCEPT  1
 #define RPC_USER      1
-#endif
+#endif /* __INTELLISENSE__ */
 
 DECL_BEGIN
 
@@ -45,10 +45,10 @@ DECL_BEGIN
 #ifdef RPC_SIMPLE
 #define RPC_FUNCTION_ARGS   struct task *__restrict target, task_srpc_t func, void *arg, uintptr_t mode, struct sig *completed, gfp_t rpc_gfp
 #define RPC_ALLOC_ARGS      task_srpc_t func, void *arg, uintptr_t mode, struct sig *completed, gfp_t rpc_gfp
-#else
+#else /* RPC_SIMPLE */
 #define RPC_FUNCTION_ARGS   struct task *__restrict target, task_rpc_t func, void *arg, uintptr_t mode, struct sig *completed, gfp_t rpc_gfp
 #define RPC_ALLOC_ARGS      task_rpc_t func, void *arg, uintptr_t mode, struct sig *completed, gfp_t rpc_gfp
-#endif
+#endif /* !RPC_SIMPLE */
 
 
 

@@ -41,13 +41,13 @@
 
 #include <sys/wait.h>
 
-#include <librpc/rpc.h>
-
 #include <alloca.h>
+#include <assert.h>
 #include <errno.h>
 #include <stddef.h>
-#include <assert.h>
 #include <string.h>
+
+#include <librpc/rpc.h>
 
 DECL_BEGIN
 
@@ -407,11 +407,11 @@ struct user_rpc_data {
 };
 DEFINE_REFCOUNT_FUNCTIONS(struct user_rpc_data, rpc_refcnt, kfree)
 
-#ifdef KERNEL_BASE
-#define UNUSED_FUTEX_POINTER  ((uintptr_t *)KERNEL_BASE)
-#else
-#define UNUSED_FUTEX_POINTER  ((uintptr_t *)KERNEL_CEILING-1)
-#endif
+#ifdef HIGH_MEMORY_KERNEL
+#define UNUSED_FUTEX_POINTER ((uintptr_t *)KERNEL_BASE)
+#else /* HIGH_MEMORY_KERNEL */
+#define UNUSED_FUTEX_POINTER ((uintptr_t *)KERNEL_CEILING - 1)
+#endif /* !HIGH_MEMORY_KERNEL */
 
 PRIVATE struct icpustate *FCALL
 user_rpc_callback(void *arg, struct icpustate *__restrict state,
@@ -429,9 +429,9 @@ user_rpc_callback(void *arg, struct icpustate *__restrict state,
 		if unlikely(!ADDR_IS_USER(data->rpc_arguments)) {
 #ifdef HIGH_MEMORY_KERNEL
 			data->rpc_arguments = NULL;
-#else
+#else /* HIGH_MEMORY_KERNEL */
 			data->rpc_arguments = (void **)-1;
-#endif
+#endif /* !HIGH_MEMORY_KERNEL */
 		}
 		assert(reason == TASK_RPC_REASON_ASYNCUSER ||
 		       reason == TASK_RPC_REASON_SYSCALL ||
@@ -628,8 +628,7 @@ next_opcode:
 					                          RPC_REGISTER_STATE_GETREG(program_state, b) != 0
 					                          ? RPC_REGISTER_STATE_GETREG(program_state, c)
 					                          : RPC_REGISTER_STATE_GETREG(program_state, d));
-					goto next_opcode;
-				}
+				}	goto next_opcode;
 
 
 				case RPC_PROGRAM_OP_add:
@@ -727,8 +726,7 @@ err_divide_by_zero:
 do_save_lhs_value:
 					/* Save the result */
 					RPC_REGISTER_STATE_SETREG(program_state, dst, lhs_value);
-					goto next_opcode;
-				}	break;
+				}	goto next_opcode;
 
 				case RPC_PROGRAM_OP_padd:
 				case RPC_PROGRAM_OP_psub: {
@@ -808,8 +806,7 @@ do_save_lhs_value:
 					            : lhs_value - rhs_value;
 do_push_lhs_value:
 					RPC_PUSH(lhs_value);
-					goto next_opcode;
-				}	break;
+				}	goto next_opcode;
 
 
 				case RPC_PROGRAM_OP_pshr:

@@ -20,6 +20,7 @@
 #define GUARD_KERNEL_SRC_SCHED_CRED_C 1
 
 #include <kernel/compiler.h>
+
 #include <kernel/types.h>
 #include <sched/cred.h>
 

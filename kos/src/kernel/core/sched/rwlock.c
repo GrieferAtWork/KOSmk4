@@ -44,6 +44,13 @@
 
 DECL_BEGIN
 
+#define RWLOCK_STATE  __RWLOCK_STATE
+#define RWLOCK_MODE   __RWLOCK_MODE
+#define RWLOCK_IND    __RWLOCK_IND
+#define RWLOCK_INCIND __RWLOCK_INCIND
+#define RWLOCK_DECIND __RWLOCK_DECIND
+
+
 
 #if !defined(NDEBUG) && 0
 #define RWLOCK_TRACE(...) (printk(KERN_TRACE __VA_ARGS__))
@@ -381,13 +388,13 @@ NOTHROW(KCALL __os_rwlock_tryread)(struct rwlock *__restrict self) {
 		/* Only allow acquisition when the lock is in read-mode.
 		 * In upgrade or write-mode, we cannot allow more locks
 		 * to be acquired. */
-		if (__RWLOCK_MODE(control_word) != RWLOCK_MODE_FREADING) {
+		if (RWLOCK_MODE(control_word) != RWLOCK_MODE_FREADING) {
 			/* This also deals with upgrade-mode. */
 			rwlock_delete_readlock(desc);
 			return false;
 		}
 	} while (!ATOMIC_CMPXCH_WEAK(self->rw_state, control_word,
-	                             __RWLOCK_INCIND(control_word)));
+	                             RWLOCK_INCIND(control_word)));
 	/* Initial read-lock. */
 	desc->rl_recursion = 1;
 	return true;
@@ -435,13 +442,13 @@ NOTHROW(KCALL __os_rwlock_tryread_readonly)(struct rwlock *__restrict self) {
 		/* Only allow acquisition when the lock is in read-mode.
 		 * In upgrade or write-mode, we cannot allow more locks
 		 * to be acquired. */
-		if (__RWLOCK_MODE(control_word) != RWLOCK_MODE_FREADING) {
+		if (RWLOCK_MODE(control_word) != RWLOCK_MODE_FREADING) {
 			/* This also deals with upgrade-mode. */
 			rwlock_delete_readlock(desc);
 			return false;
 		}
 	} while (!ATOMIC_CMPXCH_WEAK(self->rw_state, control_word,
-	                             __RWLOCK_INCIND(control_word)));
+	                             RWLOCK_INCIND(control_word)));
 	/* Initial read-lock. */
 	desc->rl_recursion = 1;
 	return true;
@@ -488,16 +495,16 @@ acquire_read_lock:
 		/* Only allow acquisition when the lock is in read-mode.
 		 * In upgrade or write-mode, we cannot allow more locks
 		 * to be acquired. */
-		if (__RWLOCK_MODE(control_word) != RWLOCK_MODE_FREADING) {
+		if (RWLOCK_MODE(control_word) != RWLOCK_MODE_FREADING) {
 			/* Connect to the chmode-signal. */
 			task_connect(&self->rw_chmode);
 			/* Wait for the lock to become available. */
 			for (;;) {
 				control_word = ATOMIC_READ(self->rw_state);
 				/* Check if the lock switched to read-mode. */
-				if unlikely(__RWLOCK_MODE(control_word) == RWLOCK_MODE_FREADING) {
+				if unlikely(RWLOCK_MODE(control_word) == RWLOCK_MODE_FREADING) {
 					if (!ATOMIC_CMPXCH_WEAK(self->rw_state, control_word,
-					                        __RWLOCK_INCIND(control_word)))
+					                        RWLOCK_INCIND(control_word)))
 						continue;
 					/* It actually did! */
 					task_disconnectall();
@@ -514,7 +521,7 @@ acquire_read_lock:
 		}
 		/* Try to increment the read-indirection */
 	} while (!ATOMIC_CMPXCH_WEAK(self->rw_state, control_word,
-	                             __RWLOCK_INCIND(control_word)));
+	                             RWLOCK_INCIND(control_word)));
 initial_lock:
 	/* Initial read-lock. */
 	desc->rl_recursion = 1;
@@ -564,16 +571,16 @@ acquire_read_lock:
 		/* Only allow acquisition when the lock is in read-mode.
 		 * In upgrade or write-mode, we cannot allow more locks
 		 * to be acquired. */
-		if (__RWLOCK_MODE(control_word) != RWLOCK_MODE_FREADING) {
+		if (RWLOCK_MODE(control_word) != RWLOCK_MODE_FREADING) {
 			/* Connect to the chmode-signal. */
 			task_connect(&self->rw_chmode);
 			/* Wait for the lock to become available. */
 			for (;;) {
 				control_word = ATOMIC_READ(self->rw_state);
 				/* Check if the lock switched to read-mode. */
-				if unlikely(__RWLOCK_MODE(control_word) == RWLOCK_MODE_FREADING) {
+				if unlikely(RWLOCK_MODE(control_word) == RWLOCK_MODE_FREADING) {
 					if (!ATOMIC_CMPXCH_WEAK(self->rw_state, control_word,
-					                        __RWLOCK_INCIND(control_word)))
+					                        RWLOCK_INCIND(control_word)))
 						continue;
 					/* It actually did! */
 					task_disconnectall();
@@ -590,7 +597,7 @@ acquire_read_lock:
 		}
 		/* Try to increment the read-indirection */
 	} while (!ATOMIC_CMPXCH_WEAK(self->rw_state, control_word,
-	                             __RWLOCK_INCIND(control_word)));
+	                             RWLOCK_INCIND(control_word)));
 initial_lock:
 	/* Initial read-lock. */
 	desc->rl_recursion = 1;
@@ -603,7 +610,7 @@ NOTHROW(KCALL __os_rwlock_trywrite)(struct rwlock *__restrict self) {
 	RWLOCK_TRACE_F("rwlock_trywrite");
 again:
 	control_word = ATOMIC_READ(self->rw_state);
-	switch (__RWLOCK_MODE(control_word)) {
+	switch (RWLOCK_MODE(control_word)) {
 
 	case RWLOCK_MODE_FWRITING:
 		if (self->rw_xowner == THIS_TASK) {
@@ -621,24 +628,24 @@ again:
 	}
 
 	/* Read-mode. */
-	if (__RWLOCK_IND(control_word) == 0) {
+	if (RWLOCK_IND(control_word) == 0) {
 		/* Direct switch to write-mode. */
 		assertf(!rwlock_find_readlock(self), "Without any read-locks, how can you be holding any?");
 		if (!ATOMIC_CMPXCH(self->rw_state, control_word,
-		                   __RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1)))
+		                   RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1)))
 			goto again;
 got_lock:
 		self->rw_xowner = THIS_TASK;
 		return true;
 	} else {
 		bool caller_has_lock;
-		assert(__RWLOCK_IND(control_word) >= 1);
+		assert(RWLOCK_IND(control_word) >= 1);
 		caller_has_lock = rwlock_find_readlock(self) != NULL;
 		/* Must use upgrade-mode to acquire the lock. */
-		if (caller_has_lock && __RWLOCK_IND(control_word) == 1) {
+		if (caller_has_lock && RWLOCK_IND(control_word) == 1) {
 			/* We seem to be the only reader. - Try to do an atomic upgrade. */
 			if (!ATOMIC_CMPXCH(self->rw_state, control_word,
-			                   __RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1)))
+			                   RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1)))
 				goto again;
 			goto got_lock;
 		}
@@ -658,7 +665,7 @@ PUBLIC NONNULL((1)) bool
 	RWLOCK_TRACE_F2("rwlock_write", abs_timeout);
 again:
 	control_word = ATOMIC_READ(self->rw_state);
-	switch (__RWLOCK_MODE(control_word)) {
+	switch (RWLOCK_MODE(control_word)) {
 
 	case RWLOCK_MODE_FWRITING:
 		if (self->rw_xowner == THIS_TASK) {
@@ -699,31 +706,31 @@ wait_for_endwrite:
 
 	default:
 		/* Read-mode. */
-		if (__RWLOCK_IND(control_word) == 0) {
+		if (RWLOCK_IND(control_word) == 0) {
 			/* Direct switch to write-mode. */
 			assertf(!rwlock_find_readlock(self), "Without any read-locks, how can you be holding any?");
 			if (!ATOMIC_CMPXCH(self->rw_state, control_word,
-			                   __RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1)))
+			                   RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1)))
 				goto again;
 got_lock:
 			self->rw_xowner = THIS_TASK;
 			return true;
 		} else {
 			bool caller_has_lock;
-			assert(__RWLOCK_IND(control_word) >= 1);
+			assert(RWLOCK_IND(control_word) >= 1);
 			caller_has_lock = rwlock_find_readlock(self) != NULL;
 			/* Must use upgrade-mode to acquire the lock. */
-			if (caller_has_lock && __RWLOCK_IND(control_word) == 1) {
+			if (caller_has_lock && RWLOCK_IND(control_word) == 1) {
 				/* We seem to be the only reader. - Try to do an atomic upgrade. */
 				if (!ATOMIC_CMPXCH(self->rw_state, control_word,
-				                   __RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1)))
+				                   RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1)))
 					goto again;
 				goto got_lock;
 			}
 			/* Switch to upgrade-mode. */
 			if (!ATOMIC_CMPXCH(self->rw_state, control_word,
-			                   __RWLOCK_STATE(RWLOCK_MODE_FUPGRADING,
-			                                  __RWLOCK_IND(control_word) -
+			                   RWLOCK_STATE(RWLOCK_MODE_FUPGRADING,
+			                                  RWLOCK_IND(control_word) -
 			                                  (caller_has_lock ? 1 : 0))))
 				goto again;
 wait_for_unshare:
@@ -731,16 +738,16 @@ wait_for_unshare:
 				/* Wait for the end of all readers to be signaled. */
 				TASK_POLL_BEFORE_CONNECT({
 					if unlikely(ATOMIC_CMPXCH(self->rw_state,
-					                           __RWLOCK_STATE(RWLOCK_MODE_FUPGRADING, 0),
-					                           __RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1)))
+					                           RWLOCK_STATE(RWLOCK_MODE_FUPGRADING, 0),
+					                           RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1)))
 						goto got_lock;
 				});
 				/* Connect to the unshare-signal. */
 				task_connect(&self->rw_unshare);
 				/* Check if the upgrade already finished (unlikely) */
 				if unlikely(ATOMIC_CMPXCH(self->rw_state,
-				                          __RWLOCK_STATE(RWLOCK_MODE_FUPGRADING, 0),
-				                          __RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1))) {
+				                          RWLOCK_STATE(RWLOCK_MODE_FUPGRADING, 0),
+				                          RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1))) {
 					task_disconnectall();
 					goto got_lock;
 				}
@@ -749,10 +756,10 @@ wait_for_unshare:
 					 * switch back to read-mode, and return `false' */
 					do {
 						control_word = ATOMIC_READ(self->rw_state);
-						assert(__RWLOCK_MODE(control_word) == RWLOCK_MODE_FUPGRADING);
+						assert(RWLOCK_MODE(control_word) == RWLOCK_MODE_FUPGRADING);
 					} while (!ATOMIC_CMPXCH_WEAK(self->rw_state, control_word,
-					                             __RWLOCK_STATE(RWLOCK_MODE_FREADING,
-					                                            __RWLOCK_IND(control_word) +
+					                             RWLOCK_STATE(RWLOCK_MODE_FREADING,
+					                                            RWLOCK_IND(control_word) +
 					                                            (caller_has_lock ? 1 : 0))));
 					return false;
 				}
@@ -762,10 +769,10 @@ wait_for_unshare:
 				 * (if we had one), switch back to read-mode. */
 				do {
 					control_word = ATOMIC_READ(self->rw_state);
-					assert(__RWLOCK_MODE(control_word) == RWLOCK_MODE_FUPGRADING);
+					assert(RWLOCK_MODE(control_word) == RWLOCK_MODE_FUPGRADING);
 				} while (!ATOMIC_CMPXCH_WEAK(self->rw_state, control_word,
-				                             __RWLOCK_STATE(RWLOCK_MODE_FREADING,
-				                                            __RWLOCK_IND(control_word) +
+				                             RWLOCK_STATE(RWLOCK_MODE_FREADING,
+				                                            RWLOCK_IND(control_word) +
 				                                            (caller_has_lock ? 1 : 0))));
 				RETHROW();
 			}
@@ -787,7 +794,7 @@ NOTHROW(KCALL __os_rwlock_write_nx)(struct rwlock *__restrict self,
 	RWLOCK_TRACE_F2("rwlock_write", abs_timeout);
 again:
 	control_word = ATOMIC_READ(self->rw_state);
-	switch (__RWLOCK_MODE(control_word)) {
+	switch (RWLOCK_MODE(control_word)) {
 
 	case RWLOCK_MODE_FWRITING:
 		if (self->rw_xowner == THIS_TASK) {
@@ -828,47 +835,47 @@ wait_for_endwrite:
 
 	default:
 		/* Read-mode. */
-		if (__RWLOCK_IND(control_word) == 0) {
+		if (RWLOCK_IND(control_word) == 0) {
 			/* Direct switch to write-mode. */
 			assertf(!rwlock_find_readlock(self), "Without any read-locks, how can you be holding any?");
 			if (!ATOMIC_CMPXCH(self->rw_state, control_word,
-			                   __RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1)))
+			                   RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1)))
 				goto again;
 got_lock:
 			self->rw_xowner = THIS_TASK;
 			return true;
 		} else {
 			bool caller_has_lock;
-			assert(__RWLOCK_IND(control_word) >= 1);
+			assert(RWLOCK_IND(control_word) >= 1);
 			caller_has_lock = rwlock_find_readlock(self) != NULL;
 			/* Must use upgrade-mode to acquire the lock. */
-			if (caller_has_lock && __RWLOCK_IND(control_word) == 1) {
+			if (caller_has_lock && RWLOCK_IND(control_word) == 1) {
 				/* We seem to be the only reader. - Try to do an atomic upgrade. */
 				if (!ATOMIC_CMPXCH(self->rw_state, control_word,
-				                   __RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1)))
+				                   RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1)))
 					goto again;
 				goto got_lock;
 			}
 			/* Switch to upgrade-mode. */
 			if (!ATOMIC_CMPXCH(self->rw_state, control_word,
-			                   __RWLOCK_STATE(RWLOCK_MODE_FUPGRADING,
-			                                  __RWLOCK_IND(control_word) -
+			                   RWLOCK_STATE(RWLOCK_MODE_FUPGRADING,
+			                                  RWLOCK_IND(control_word) -
 			                                  (caller_has_lock ? 1 : 0))))
 				goto again;
 wait_for_unshare:
 			/* Wait for the end of all readers to be signaled. */
 			TASK_POLL_BEFORE_CONNECT({
 				if unlikely(ATOMIC_CMPXCH(self->rw_state,
-				                          __RWLOCK_STATE(RWLOCK_MODE_FUPGRADING, 0),
-				                          __RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1)))
+				                          RWLOCK_STATE(RWLOCK_MODE_FUPGRADING, 0),
+				                          RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1)))
 					goto got_lock;
 			});
 			/* Connect to the unshare-signal. */
 			task_connect(&self->rw_unshare);
 			/* Check if the upgrade already finished (unlikely) */
 			if unlikely(ATOMIC_CMPXCH(self->rw_state,
-			                          __RWLOCK_STATE(RWLOCK_MODE_FUPGRADING, 0),
-			                          __RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1))) {
+			                          RWLOCK_STATE(RWLOCK_MODE_FUPGRADING, 0),
+			                          RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1))) {
 				task_disconnectall();
 				goto got_lock;
 			}
@@ -877,10 +884,10 @@ wait_for_unshare:
 				 * switch back to read-mode, and return `false' */
 				do {
 					control_word = ATOMIC_READ(self->rw_state);
-					assert(__RWLOCK_MODE(control_word) == RWLOCK_MODE_FUPGRADING);
+					assert(RWLOCK_MODE(control_word) == RWLOCK_MODE_FUPGRADING);
 				} while (!ATOMIC_CMPXCH_WEAK(self->rw_state, control_word,
-				                             __RWLOCK_STATE(RWLOCK_MODE_FREADING,
-				                                            __RWLOCK_IND(control_word) +
+				                             RWLOCK_STATE(RWLOCK_MODE_FREADING,
+				                                            RWLOCK_IND(control_word) +
 				                                            (caller_has_lock ? 1 : 0))));
 				return false;
 			}
@@ -972,7 +979,7 @@ PUBLIC NONNULL((1)) bool
 	RWLOCK_TRACE_F("rwlock_write_aggressive");
 again:
 	control_word = ATOMIC_READ(self->rw_state);
-	switch (__RWLOCK_MODE(control_word)) {
+	switch (RWLOCK_MODE(control_word)) {
 
 	case RWLOCK_MODE_FWRITING:
 		if (self->rw_xowner == THIS_TASK) {
@@ -1013,31 +1020,31 @@ wait_for_endwrite:
 
 	default:
 		/* Read-mode. */
-		if (__RWLOCK_IND(control_word) == 0) {
+		if (RWLOCK_IND(control_word) == 0) {
 			/* Direct switch to write-mode. */
 			assertf(!rwlock_find_readlock(self), "Without any read-locks, how can you be holding any?");
 			if (!ATOMIC_CMPXCH(self->rw_state, control_word,
-			                   __RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1)))
+			                   RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1)))
 				goto again;
 got_lock:
 			self->rw_xowner = THIS_TASK;
 			return true;
 		} else {
 			bool caller_has_lock;
-			assert(__RWLOCK_IND(control_word) >= 1);
+			assert(RWLOCK_IND(control_word) >= 1);
 			caller_has_lock = rwlock_find_readlock(self) != NULL;
 			/* Must use upgrade-mode to acquire the lock. */
-			if (caller_has_lock && __RWLOCK_IND(control_word) == 1) {
+			if (caller_has_lock && RWLOCK_IND(control_word) == 1) {
 				/* We seem to be the only reader. - Try to do an atomic upgrade. */
 				if (!ATOMIC_CMPXCH(self->rw_state, control_word,
-				                   __RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1)))
+				                   RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1)))
 					goto again;
 				goto got_lock;
 			}
 			/* Switch to upgrade-mode. */
 			if (!ATOMIC_CMPXCH(self->rw_state, control_word,
-			                   __RWLOCK_STATE(RWLOCK_MODE_FUPGRADING,
-			                                  __RWLOCK_IND(control_word) -
+			                   RWLOCK_STATE(RWLOCK_MODE_FUPGRADING,
+			                                  RWLOCK_IND(control_word) -
 			                                  (caller_has_lock ? 1 : 0))))
 				goto again;
 wait_for_unshare:
@@ -1045,15 +1052,15 @@ wait_for_unshare:
 				/* Wait for the end of all readers to be signaled. */
 				TASK_POLL_BEFORE_CONNECT({
 					if unlikely(ATOMIC_CMPXCH(self->rw_state,
-					                          __RWLOCK_STATE(RWLOCK_MODE_FUPGRADING, 0),
-					                          __RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1)))
+					                          RWLOCK_STATE(RWLOCK_MODE_FUPGRADING, 0),
+					                          RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1)))
 						goto got_lock;
 				});
 				rwlock_kill_readers(self);
 				TASK_POLL_BEFORE_CONNECT({
 					if unlikely(ATOMIC_CMPXCH(self->rw_state,
-					                          __RWLOCK_STATE(RWLOCK_MODE_FUPGRADING, 0),
-					                          __RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1)))
+					                          RWLOCK_STATE(RWLOCK_MODE_FUPGRADING, 0),
+					                          RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1)))
 						goto got_lock;
 				});
 
@@ -1061,15 +1068,15 @@ wait_for_unshare:
 				task_connect(&self->rw_unshare);
 				/* Check if the upgrade already finished (unlikely) */
 				if unlikely(ATOMIC_CMPXCH(self->rw_state,
-				                          __RWLOCK_STATE(RWLOCK_MODE_FUPGRADING, 0),
-				                          __RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1))) {
+				                          RWLOCK_STATE(RWLOCK_MODE_FUPGRADING, 0),
+				                          RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1))) {
 					task_disconnectall();
 					goto got_lock;
 				}
 				rwlock_kill_readers(self);
 				if unlikely(ATOMIC_CMPXCH(self->rw_state,
-				                          __RWLOCK_STATE(RWLOCK_MODE_FUPGRADING, 0),
-				                          __RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1))) {
+				                          RWLOCK_STATE(RWLOCK_MODE_FUPGRADING, 0),
+				                          RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1))) {
 					task_disconnectall();
 					goto got_lock;
 				}
@@ -1087,10 +1094,10 @@ wait_for_unshare:
 				 * (if we had one), switch back to read-mode. */
 				do {
 					control_word = ATOMIC_READ(self->rw_state);
-					assert(__RWLOCK_MODE(control_word) == RWLOCK_MODE_FUPGRADING);
+					assert(RWLOCK_MODE(control_word) == RWLOCK_MODE_FUPGRADING);
 				} while (!ATOMIC_CMPXCH_WEAK(self->rw_state, control_word,
-				                             __RWLOCK_STATE(RWLOCK_MODE_FREADING,
-				                                            __RWLOCK_IND(control_word) +
+				                             RWLOCK_STATE(RWLOCK_MODE_FREADING,
+				                                            RWLOCK_IND(control_word) +
 				                                            (caller_has_lock ? 1 : 0))));
 				RETHROW();
 			}
@@ -1109,7 +1116,7 @@ NOTHROW(KCALL __os_rwlock_tryupgrade)(struct rwlock *__restrict self) {
 	RWLOCK_TRACE_F("rwlock_tryupgrade");
 again:
 	control_word = ATOMIC_READ(self->rw_state);
-	switch (__RWLOCK_MODE(control_word)) {
+	switch (RWLOCK_MODE(control_word)) {
 
 	case RWLOCK_MODE_FWRITING:
 		assertf(self->rw_xowner == THIS_TASK,
@@ -1132,13 +1139,13 @@ again:
 	}
 	/* Read-mode. */
 	assertf(rwlock_find_readlock(self), "You're not holding any read-locks");
-	assertf(__RWLOCK_IND(control_word) >= 1,
+	assertf(RWLOCK_IND(control_word) >= 1,
 	        "Inconsistent R/W-lock state: You're holding "
 	        "read-locks that the lock knows nothing about");
-	if (__RWLOCK_IND(control_word) == 1) {
+	if (RWLOCK_IND(control_word) == 1) {
 		/* We seem to be the only reader. - Try to do an atomic upgrade. */
 		if (!ATOMIC_CMPXCH(self->rw_state, control_word,
-		                   __RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1)))
+		                   RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1)))
 			goto again;
 		/* Atomically upgraded to write-mode. */
 		self->rw_xowner = THIS_TASK;
@@ -1164,7 +1171,7 @@ PUBLIC NONNULL((1)) bool
 	        "You mustn't be connected when calling this function");
 again:
 	control_word = ATOMIC_READ(self->rw_state);
-	switch (__RWLOCK_MODE(control_word)) {
+	switch (RWLOCK_MODE(control_word)) {
 
 	case RWLOCK_MODE_FWRITING:
 		assertf(self->rw_xowner == THIS_TASK,
@@ -1191,14 +1198,14 @@ again:
 	default:
 		/* Read-mode. */
 		assertf(rwlock_find_readlock(self), "You're not holding any read-locks");
-		assertf(__RWLOCK_IND(control_word) >= 1,
+		assertf(RWLOCK_IND(control_word) >= 1,
 		        "Inconsistent R/W-lock state: You're holding "
 		        "read-locks that the lock knows nothing about");
-		if (__RWLOCK_IND(control_word) == 1) {
+		if (RWLOCK_IND(control_word) == 1) {
 			struct read_lock *rlock;
 			/* We seem to be the only reader. - Try to do an atomic upgrade. */
 			if (!ATOMIC_CMPXCH(self->rw_state, control_word,
-			                   __RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1)))
+			                   RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1)))
 				goto again;
 got_lock:
 			/* Atomically upgraded to write-mode. */
@@ -1216,24 +1223,24 @@ got_lock:
 		}
 		/* Switch to upgrade-mode. */
 		if (!ATOMIC_CMPXCH(self->rw_state, control_word,
-		                   __RWLOCK_STATE(RWLOCK_MODE_FUPGRADING,
-		                                  __RWLOCK_IND(control_word) - 1)))
+		                   RWLOCK_STATE(RWLOCK_MODE_FUPGRADING,
+		                                  RWLOCK_IND(control_word) - 1)))
 			goto again;
 wait_for_unshare:
 		TRY {
 			/* Wait for the end of all readers to be signaled. */
 			TASK_POLL_BEFORE_CONNECT({
 				if unlikely(ATOMIC_CMPXCH(self->rw_state,
-				                          __RWLOCK_STATE(RWLOCK_MODE_FUPGRADING, 0),
-				                          __RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1)))
+				                          RWLOCK_STATE(RWLOCK_MODE_FUPGRADING, 0),
+				                          RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1)))
 					goto got_lock;
 			});
 			/* Connect to the unshare-signal. */
 			task_connect(&self->rw_unshare);
 			/* Check if the upgrade already finished (unlikely) */
 			if unlikely(ATOMIC_CMPXCH(self->rw_state,
-			                          __RWLOCK_STATE(RWLOCK_MODE_FUPGRADING, 0),
-			                          __RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1))) {
+			                          RWLOCK_STATE(RWLOCK_MODE_FUPGRADING, 0),
+			                          RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1))) {
 				task_disconnectall();
 				goto got_lock;
 			}
@@ -1242,20 +1249,20 @@ wait_for_unshare:
 				 * switch back to read-mode, and return `false' */
 				do {
 					control_word = ATOMIC_READ(self->rw_state);
-					assert(__RWLOCK_MODE(control_word) == RWLOCK_MODE_FUPGRADING);
+					assert(RWLOCK_MODE(control_word) == RWLOCK_MODE_FUPGRADING);
 				} while (!ATOMIC_CMPXCH_WEAK(self->rw_state, control_word,
-				                             __RWLOCK_STATE(RWLOCK_MODE_FREADING,
-				                                            __RWLOCK_IND(control_word) + 1)));
+				                             RWLOCK_STATE(RWLOCK_MODE_FREADING,
+				                                            RWLOCK_IND(control_word) + 1)));
 				return false;
 			}
 		} EXCEPT {
 			/* Something went wrong. - Re-acquire the read-lock and switch back to read-mode. */
 			do {
 				control_word = ATOMIC_READ(self->rw_state);
-				assert(__RWLOCK_MODE(control_word) == RWLOCK_MODE_FUPGRADING);
+				assert(RWLOCK_MODE(control_word) == RWLOCK_MODE_FUPGRADING);
 			} while (!ATOMIC_CMPXCH_WEAK(self->rw_state, control_word,
-			                             __RWLOCK_STATE(RWLOCK_MODE_FREADING,
-			                                            __RWLOCK_IND(control_word) + 1)));
+			                             RWLOCK_STATE(RWLOCK_MODE_FREADING,
+			                                            RWLOCK_IND(control_word) + 1)));
 			RETHROW();
 		}
 		/* Signal received. - Check if the unshared is complete. */
@@ -1276,7 +1283,7 @@ NOTHROW(KCALL __os_rwlock_upgrade_nx)(struct rwlock *__restrict self,
 	        "You mustn't be connected when calling this function");
 again:
 	control_word = ATOMIC_READ(self->rw_state);
-	switch (__RWLOCK_MODE(control_word)) {
+	switch (RWLOCK_MODE(control_word)) {
 
 	case RWLOCK_MODE_FWRITING:
 		assertf(self->rw_xowner == THIS_TASK,
@@ -1319,15 +1326,15 @@ again:
 			rwlock_delete_readlock(desc);
 			do {
 				control_word = ATOMIC_READ(self->rw_state);
-				assert(__RWLOCK_MODE(control_word) != RWLOCK_MODE_FWRITING);
-				assert(__RWLOCK_IND(control_word) != 0);
+				assert(RWLOCK_MODE(control_word) != RWLOCK_MODE_FWRITING);
+				assert(RWLOCK_IND(control_word) != 0);
 			} while (!ATOMIC_CMPXCH_WEAK(self->rw_state, control_word,
-			                             __RWLOCK_DECIND(control_word)));
+			                             RWLOCK_DECIND(control_word)));
 			/* If the last reader went away, send the downgrade signal.
 			 * NOTE: Since the lock is now ready for exclusive locking,
 			 *       only signal a single thread to improve its chances
 			 *       of acquiring that lock. */
-			if (__RWLOCK_IND(control_word) == 1)
+			if (RWLOCK_IND(control_word) == 1)
 				sig_send(&self->rw_unshare);
 		} else {
 			/* Recursively release a read-lock, but don't signal the
@@ -1340,13 +1347,13 @@ again:
 	default:
 		/* Read-mode. */
 		assertf(rwlock_find_readlock(self), "You're not holding any read-locks");
-		assertf(__RWLOCK_IND(control_word) >= 1,
+		assertf(RWLOCK_IND(control_word) >= 1,
 		        "Inconsistent R/W-lock state: You're holding "
 		        "read-locks that the lock knows nothing about");
-		if (__RWLOCK_IND(control_word) == 1) {
+		if (RWLOCK_IND(control_word) == 1) {
 			/* We seem to be the only reader. - Try to do an atomic upgrade. */
 			if (!ATOMIC_CMPXCH(self->rw_state, control_word,
-			                   __RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1)))
+			                   RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1)))
 				goto again;
 got_lock:
 			/* Atomically upgraded to write-mode. */
@@ -1355,23 +1362,23 @@ got_lock:
 		}
 		/* Switch to upgrade-mode. */
 		if (!ATOMIC_CMPXCH(self->rw_state, control_word,
-		                   __RWLOCK_STATE(RWLOCK_MODE_FUPGRADING,
-		                                  __RWLOCK_IND(control_word) - 1)))
+		                   RWLOCK_STATE(RWLOCK_MODE_FUPGRADING,
+		                                  RWLOCK_IND(control_word) - 1)))
 			goto again;
 wait_for_unshare:
 		/* Wait for the end of all readers to be signaled. */
 		TASK_POLL_BEFORE_CONNECT({
 			if unlikely(ATOMIC_CMPXCH(self->rw_state,
-			                          __RWLOCK_STATE(RWLOCK_MODE_FUPGRADING, 0),
-			                          __RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1)))
+			                          RWLOCK_STATE(RWLOCK_MODE_FUPGRADING, 0),
+			                          RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1)))
 				goto got_lock;
 		});
 		/* Connect to the unshare-signal. */
 		task_connect(&self->rw_unshare);
 		/* Check if the upgrade already finished (unlikely) */
 		if unlikely(ATOMIC_CMPXCH(self->rw_state,
-		                          __RWLOCK_STATE(RWLOCK_MODE_FUPGRADING, 0),
-		                          __RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1))) {
+		                          RWLOCK_STATE(RWLOCK_MODE_FUPGRADING, 0),
+		                          RWLOCK_STATE(RWLOCK_MODE_FWRITING, 1))) {
 			task_disconnectall();
 			goto got_lock;
 		}
@@ -1380,10 +1387,10 @@ wait_for_unshare:
 			 * switch back to read-mode, and return `false' */
 			do {
 				control_word = ATOMIC_READ(self->rw_state);
-				assert(__RWLOCK_MODE(control_word) == RWLOCK_MODE_FUPGRADING);
+				assert(RWLOCK_MODE(control_word) == RWLOCK_MODE_FUPGRADING);
 			} while (!ATOMIC_CMPXCH_WEAK(self->rw_state, control_word,
-			                             __RWLOCK_STATE(RWLOCK_MODE_FREADING,
-			                                            __RWLOCK_IND(control_word) + 1)));
+			                             RWLOCK_STATE(RWLOCK_MODE_FREADING,
+			                                            RWLOCK_IND(control_word) + 1)));
 			return false;
 		}
 		/* Signal received. - Check if the unshared is complete. */
@@ -1464,7 +1471,7 @@ NOTHROW(KCALL __os_rwlock_endwrite)(struct rwlock *__restrict self) {
 			ATOMIC_WRITE(self->rw_mode, RWLOCK_MODE_FREADING);
 		} else {
 			/* Last lock. */
-			ATOMIC_WRITE(self->rw_state, __RWLOCK_STATE(RWLOCK_MODE_FREADING, 0));
+			ATOMIC_WRITE(self->rw_state, RWLOCK_STATE(RWLOCK_MODE_FREADING, 0));
 		}
 		/* Signal the unlock. */
 		sig_broadcast(&self->rw_chmode);
@@ -1499,7 +1506,7 @@ NOTHROW(KCALL __os_rwlock_end)(struct rwlock *__restrict self) {
 				ATOMIC_WRITE(self->rw_mode, RWLOCK_MODE_FREADING);
 			} else {
 				/* Last lock. */
-				ATOMIC_WRITE(self->rw_state, __RWLOCK_STATE(RWLOCK_MODE_FREADING, 0));
+				ATOMIC_WRITE(self->rw_state, RWLOCK_STATE(RWLOCK_MODE_FREADING, 0));
 			}
 			/* Signal the unlock. */
 			sig_broadcast(&self->rw_chmode);
@@ -1529,15 +1536,15 @@ NOTHROW(KCALL __os_rwlock_end)(struct rwlock *__restrict self) {
 			rwlock_delete_readlock(desc);
 			do {
 				control_word = ATOMIC_READ(self->rw_state);
-				assert(__RWLOCK_MODE(control_word) != RWLOCK_MODE_FWRITING);
-				assert(__RWLOCK_IND(control_word) != 0);
+				assert(RWLOCK_MODE(control_word) != RWLOCK_MODE_FWRITING);
+				assert(RWLOCK_IND(control_word) != 0);
 			} while (!ATOMIC_CMPXCH_WEAK(self->rw_state, control_word,
-			                             __RWLOCK_DECIND(control_word)));
+			                             RWLOCK_DECIND(control_word)));
 			/* If the last reader went away, send the downgrade signal.
 			 * NOTE: Since the lock is now ready for exclusive locking,
 			 *       only signal a single thread to improve its chances
 			 *       of acquiring that lock. */
-			if (__RWLOCK_IND(control_word) == 1)
+			if (RWLOCK_IND(control_word) == 1)
 				sig_send(&self->rw_unshare);
 
 			/* Deal with parallel-upgrade exceptions. */
@@ -1563,13 +1570,13 @@ PUBLIC WUNUSED NONNULL((1)) bool
 (KCALL rwlock_pollread)(struct rwlock *__restrict self) THROWS(E_BADALLOC) {
 	u32 state;
 	state = ATOMIC_READ(self->rw_state);
-	if (__RWLOCK_MODE(state) == RWLOCK_MODE_FREADING ||
+	if (RWLOCK_MODE(state) == RWLOCK_MODE_FREADING ||
 	    self->rw_xowner == THIS_TASK)
 		return true;
 	task_connect_ghost(&self->rw_chmode);
 	COMPILER_READ_BARRIER();
 	state = ATOMIC_READ(self->rw_state);
-	if (__RWLOCK_MODE(state) == RWLOCK_MODE_FREADING)
+	if (RWLOCK_MODE(state) == RWLOCK_MODE_FREADING)
 		return true;
 	return false;
 }
@@ -1578,9 +1585,9 @@ PUBLIC WUNUSED NONNULL((1)) bool
 (KCALL rwlock_pollwrite)(struct rwlock *__restrict self) THROWS(E_BADALLOC) {
 	u32 state;
 	state = ATOMIC_READ(self->rw_state);
-	if (__RWLOCK_MODE(state) == RWLOCK_MODE_FREADING) {
-		if (__RWLOCK_IND(state) == 0 ||
-		    (__RWLOCK_IND(state) == 1 && rwlock_find_readlock(self)))
+	if (RWLOCK_MODE(state) == RWLOCK_MODE_FREADING) {
+		if (RWLOCK_IND(state) == 0 ||
+		    (RWLOCK_IND(state) == 1 && rwlock_find_readlock(self)))
 			return true; /* No [other] readers -> Write lock is available. */
 	} else if (self->rw_xowner == THIS_TASK) {
 		/* Caller is holding the write-lock. */
@@ -1589,9 +1596,9 @@ PUBLIC WUNUSED NONNULL((1)) bool
 	task_connect_ghost(&self->rw_chmode);
 	COMPILER_READ_BARRIER();
 	state = ATOMIC_READ(self->rw_state);
-	if (__RWLOCK_MODE(state) == RWLOCK_MODE_FREADING) {
-		if (__RWLOCK_IND(state) == 0 ||
-		    (__RWLOCK_IND(state) == 1 && rwlock_find_readlock(self))) {
+	if (RWLOCK_MODE(state) == RWLOCK_MODE_FREADING) {
+		if (RWLOCK_IND(state) == 0 ||
+		    (RWLOCK_IND(state) == 1 && rwlock_find_readlock(self))) {
 			/* No [other] readers -> Write lock is available. */
 			return true;
 		}
@@ -1603,9 +1610,9 @@ PUBLIC NOBLOCK WUNUSED NONNULL((1)) bool
 NOTHROW(KCALL rwlock_canwrite)(struct rwlock const *__restrict self) {
 	u32 state;
 	state = ATOMIC_READ(self->rw_state);
-	if (__RWLOCK_MODE(state) == RWLOCK_MODE_FREADING) {
-		if (__RWLOCK_IND(state) == 0 ||
-		    (__RWLOCK_IND(state) == 1 && rwlock_find_readlock(self)))
+	if (RWLOCK_MODE(state) == RWLOCK_MODE_FREADING) {
+		if (RWLOCK_IND(state) == 0 ||
+		    (RWLOCK_IND(state) == 1 && rwlock_find_readlock(self)))
 			return true; /* No [other] readers -> Write lock is available. */
 	} else if (self->rw_xowner == THIS_TASK) {
 		/* Caller is holding the write-lock. */
@@ -1620,50 +1627,51 @@ NOTHROW(KCALL rwlock_canwrite)(struct rwlock const *__restrict self) {
 TEST(rwlock_recursion)
 {
 	struct rwlock test = RWLOCK_INIT;
-#define ASSERT_LOCKS(rlocks, wlocks) \
+#define ASSERT_LOCKS(rlocks, wlocks)             \
 	assertf(rwlock_reading_r(&test) == rlocks && \
 	        rwlock_writing_r(&test) == wlocks,   \
 	        "rwlock_reading_r: %Iu\n"            \
 	        "rwlock_writing_r: %Iu\n",           \
-	        rwlock_reading_r(&test), rwlock_writing_r(&test))
+	        rwlock_reading_r(&test),             \
+	        rwlock_writing_r(&test))
 
-	rwlock_write(&test);       ASSERT_LOCKS(1,1);
-	rwlock_endwrite(&test);    ASSERT_LOCKS(0,0); /* Release a simple write-lock */
+	rwlock_write(&test);       ASSERT_LOCKS(1, 1);
+	rwlock_endwrite(&test);    ASSERT_LOCKS(0, 0); /* Release a simple write-lock */
 
-	rwlock_write(&test);       ASSERT_LOCKS(1,1);
-	rwlock_end(&test);         ASSERT_LOCKS(0,0); /* Auto-release a simple write-lock */
+	rwlock_write(&test);       ASSERT_LOCKS(1, 1);
+	rwlock_end(&test);         ASSERT_LOCKS(0, 0); /* Auto-release a simple write-lock */
 
-	rwlock_read(&test);        ASSERT_LOCKS(1,0);
-	rwlock_endread(&test);     ASSERT_LOCKS(0,0); /* Release a simple read-lock */
+	rwlock_read(&test);        ASSERT_LOCKS(1, 0);
+	rwlock_endread(&test);     ASSERT_LOCKS(0, 0); /* Release a simple read-lock */
 
-	rwlock_read(&test);        ASSERT_LOCKS(1,0);
-	rwlock_end(&test);         ASSERT_LOCKS(0,0); /* Auto-release a simple read-lock */
+	rwlock_read(&test);        ASSERT_LOCKS(1, 0);
+	rwlock_end(&test);         ASSERT_LOCKS(0, 0); /* Auto-release a simple read-lock */
 
-	rwlock_read(&test);        ASSERT_LOCKS(1,0);
-	rwlock_read(&test);        ASSERT_LOCKS(2,0);
-	rwlock_end(&test);         ASSERT_LOCKS(1,0); /* Release recursive read-locks */
-	rwlock_end(&test);         ASSERT_LOCKS(0,0);
+	rwlock_read(&test);        ASSERT_LOCKS(1, 0);
+	rwlock_read(&test);        ASSERT_LOCKS(2, 0);
+	rwlock_end(&test);         ASSERT_LOCKS(1, 0); /* Release recursive read-locks */
+	rwlock_end(&test);         ASSERT_LOCKS(0, 0);
 
-	rwlock_read(&test);        ASSERT_LOCKS(1,0);
-	rwlock_read(&test);        ASSERT_LOCKS(2,0);
-	rwlock_upgrade(&test);     ASSERT_LOCKS(1,1);
-	rwlock_endwrite(&test);    ASSERT_LOCKS(1,0); /* Release an upgraded lock */
-	rwlock_read(&test);        ASSERT_LOCKS(2,0);
-	rwlock_end(&test);         ASSERT_LOCKS(1,0);
-	rwlock_end(&test);         ASSERT_LOCKS(0,0);
+	rwlock_read(&test);        ASSERT_LOCKS(1, 0);
+	rwlock_read(&test);        ASSERT_LOCKS(2, 0);
+	rwlock_upgrade(&test);     ASSERT_LOCKS(1, 1);
+	rwlock_endwrite(&test);    ASSERT_LOCKS(1, 0); /* Release an upgraded lock */
+	rwlock_read(&test);        ASSERT_LOCKS(2, 0);
+	rwlock_end(&test);         ASSERT_LOCKS(1, 0);
+	rwlock_end(&test);         ASSERT_LOCKS(0, 0);
 
-	rwlock_read(&test);        ASSERT_LOCKS(1,0);
-	rwlock_read(&test);        ASSERT_LOCKS(2,0);
-	rwlock_upgrade(&test);     ASSERT_LOCKS(1,1);
-	rwlock_downgrade(&test);   ASSERT_LOCKS(2,0); /* Downgrade an upgraded lock */
-	rwlock_endread(&test);     ASSERT_LOCKS(1,0);
-	rwlock_endread(&test);     ASSERT_LOCKS(0,0);
+	rwlock_read(&test);        ASSERT_LOCKS(1, 0);
+	rwlock_read(&test);        ASSERT_LOCKS(2, 0);
+	rwlock_upgrade(&test);     ASSERT_LOCKS(1, 1);
+	rwlock_downgrade(&test);   ASSERT_LOCKS(2, 0); /* Downgrade an upgraded lock */
+	rwlock_endread(&test);     ASSERT_LOCKS(1, 0);
+	rwlock_endread(&test);     ASSERT_LOCKS(0, 0);
 
-	rwlock_read(&test);        ASSERT_LOCKS(1,0);
-	rwlock_write(&test);       ASSERT_LOCKS(1,1); /* Write-after-read */
-	rwlock_downgrade(&test);   ASSERT_LOCKS(2,0); /* Downgrade an upgraded lock */
-	rwlock_endread(&test);     ASSERT_LOCKS(1,0);
-	rwlock_endread(&test);     ASSERT_LOCKS(0,0);
+	rwlock_read(&test);        ASSERT_LOCKS(1, 0);
+	rwlock_write(&test);       ASSERT_LOCKS(1, 1); /* Write-after-read */
+	rwlock_downgrade(&test);   ASSERT_LOCKS(2, 0); /* Downgrade an upgraded lock */
+	rwlock_endread(&test);     ASSERT_LOCKS(1, 0);
+	rwlock_endread(&test);     ASSERT_LOCKS(0, 0);
 
 #undef ASSERT_LOCKS
 }

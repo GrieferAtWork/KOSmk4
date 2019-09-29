@@ -19,7 +19,7 @@
 #ifdef __INTELLISENSE__
 #include "rpc.c"
 #define RPC_SERVE_ALL 1
-#endif
+#endif /* __INTELLISENSE__ */
 
 DECL_BEGIN
 

@@ -31,9 +31,9 @@
 #include <kernel/syscall.h>
 #include <kernel/vio.h>
 #include <kernel/vm.h>
+#include <sched/cred.h>
 #include <sched/pertask.h>
 #include <sched/pid.h>
-#include <sched/cred.h>
 
 #include <kos/ukern.h>
 

@@ -21,19 +21,21 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/except.h>
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
-#include <kernel/types.h>
 #include <kernel/syscall.h>
-#include <kernel/except.h>
+#include <kernel/types.h>
 #include <sched/eventfd.h>
 #include <sched/signal.h>
-#include <hybrid/unaligned.h>
-#include <hybrid/overflow.h>
 
-#include <stdint.h>
+#include <hybrid/overflow.h>
+#include <hybrid/unaligned.h>
+
 #include <kos/io.h>
 #include <sys/eventfd.h>
+
+#include <stdint.h>
 
 DECL_BEGIN
 

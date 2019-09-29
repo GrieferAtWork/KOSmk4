@@ -48,9 +48,9 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 
+#include <assert.h>
 #include <errno.h>
 #include <limits.h>
-#include <assert.h>
 #include <sched.h>
 #include <string.h>
 
@@ -97,7 +97,8 @@ NOTHROW(KCALL process_sigqueue_set_term)(struct process_sigqueue *__restrict sel
 
 
 
-#define PATH_this_taskgroup__tg_proc_group_siblings(x) FORTASK(x,_this_taskgroup).tg_proc_group_siblings
+#define PATH_this_taskgroup__tg_proc_group_siblings(x) \
+	FORTASK(x, _this_taskgroup).tg_proc_group_siblings
 
 
 PRIVATE NOBLOCK NONNULL((1)) void
@@ -216,9 +217,9 @@ NOTHROW(KCALL this_taskgroup_cleanup)(void) {
 	struct taskpid *mypid = THIS_TASKPID;
 #ifdef __INTELLISENSE__
 	struct taskgroup &mygroup = FORTASK(proc, _this_taskgroup);
-#else
+#else /* __INTELLISENSE__ */
 #define mygroup FORTASK(proc, _this_taskgroup)
-#endif
+#endif /* !__INTELLISENSE__ */
 	sigqueue_set_term(&THIS_SIGQUEUE);
 	proc = task_getprocess();
 	if (!proc) {
@@ -240,7 +241,7 @@ NOTHROW(KCALL this_taskgroup_cleanup)(void) {
 #ifndef NDEBUG
 			memset(&threads->tp_siblings.ln_next, 0xcc,
 			       sizeof(threads->tp_siblings.ln_next));
-#endif
+#endif /* !NDEBUG */
 			child_thread = threads->tp_thread.get();
 			if (child_thread) {
 				/* Must differentiate:
@@ -367,9 +368,9 @@ NOTHROW(KCALL this_taskgroup_fini)(struct task *__restrict self) {
 	struct taskpid *mypid = FORTASK(self, _this_taskpid);
 #ifdef __INTELLISENSE__
 	struct taskgroup &mygroup = FORTASK(self, _this_taskgroup);
-#else
+#else /* __INTELLISENSE__ */
 #define mygroup FORTASK(self, _this_taskgroup)
-#endif
+#endif /* !__INTELLISENSE__ */
 	sigqueue_fini(&FORTASK(self, _this_sigqueue));
 	if unlikely(mygroup.tg_process == NULL)
 		; /* Incomplete initialization... */
@@ -401,7 +402,7 @@ NOTHROW(KCALL this_taskgroup_fini)(struct task *__restrict self) {
 #ifndef NDEBUG
 			memset(&mygroup.tg_proc_group_siblings, 0xcc, sizeof(mygroup.tg_proc_group_siblings));
 			memset(&mygroup.tg_proc_group, 0xcc, sizeof(mygroup.tg_proc_group));
-#endif
+#endif /* !NDEBUG */
 			decref(group_leader);
 		} else {
 			/* Process group leader. */
@@ -443,26 +444,26 @@ NOTHROW(KCALL this_taskgroup_fini)(struct task *__restrict self) {
 }
 
 PUBLIC ATTR_PERTASK struct taskgroup _this_taskgroup = {
-	/* .tg_process             = */NULL,                /* Initialized by `task_setthread()' / `task_setprocess()' */
-	/* .tg_proc_threads_lock   = */ATOMIC_RWLOCK_INIT,
-	/* .tg_proc_threads        = */LLIST_INIT,
-	/* .tg_proc_threads_change = */SIG_INIT,
-	/* .tg_proc_parent_lock    = */ATOMIC_RWLOCK_INIT,
-	/* .tg_proc_parent         = */NULL,                /* Initialized by `task_setprocess()' */
-	/* .tg_proc_group_lock     = */ATOMIC_RWLOCK_INIT,
-	/* .tg_proc_group          = */NULL,                /* Initialized by `task_setprocess()' */
-	/* .tg_proc_group_siblings = */LLIST_INITNODE,
-	/* .tg_proc_signals        = */{
-		/* .psq_lock  = */ATOMIC_RWLOCK_INIT,
-		/* .psq_queue = */{
-			/* .sq_newsig = */SIG_INIT,
-			/* .sq_queue  = */NULL
+	/* .tg_process             = */ NULL,                /* Initialized by `task_setthread()' / `task_setprocess()' */
+	/* .tg_proc_threads_lock   = */ ATOMIC_RWLOCK_INIT,
+	/* .tg_proc_threads        = */ LLIST_INIT,
+	/* .tg_proc_threads_change = */ SIG_INIT,
+	/* .tg_proc_parent_lock    = */ ATOMIC_RWLOCK_INIT,
+	/* .tg_proc_parent         = */ NULL,                /* Initialized by `task_setprocess()' */
+	/* .tg_proc_group_lock     = */ ATOMIC_RWLOCK_INIT,
+	/* .tg_proc_group          = */ NULL,                /* Initialized by `task_setprocess()' */
+	/* .tg_proc_group_siblings = */ LLIST_INITNODE,
+	/* .tg_proc_signals        = */ {
+		/* .psq_lock  = */ ATOMIC_RWLOCK_INIT,
+		/* .psq_queue = */ {
+			/* .sq_newsig = */ SIG_INIT,
+			/* .sq_queue  = */ NULL
 		}
 	},
-	/* .tg_pgrp_processes_lock = */ATOMIC_RWLOCK_INIT,
-	/* .tg_pgrp_processes      = */LLIST_INIT,
-	/* .tg_pgrp_session_lock   = */ATOMIC_RWLOCK_INIT,
-	/* .tg_pgrp_session        = */NULL,                /* Initialized by `task_setprocess()' */
+	/* .tg_pgrp_processes_lock = */ ATOMIC_RWLOCK_INIT,
+	/* .tg_pgrp_processes      = */ LLIST_INIT,
+	/* .tg_pgrp_session_lock   = */ ATOMIC_RWLOCK_INIT,
+	/* .tg_pgrp_session        = */ NULL,                /* Initialized by `task_setprocess()' */
 };
 
 
@@ -567,7 +568,7 @@ task_setprocess(struct task *__restrict self,
 #ifndef NDEBUG
 		memset(&pid->tp_siblings.ln_next, 0xcc,
 		       sizeof(pid->tp_siblings.ln_next));
-#endif
+#endif /* !NDEBUG */
 	} else {
 		/* Set the proper parent process. */
 		parent = task_getprocess_of(parent);
@@ -604,10 +605,10 @@ task_setprocessgroupleader(struct task *thread, struct task *leader,
 #ifdef __INTELLISENSE__
 	struct taskgroup &thread_taskgroup = FORTASK(thread, _this_taskgroup);
 	struct taskgroup &leader_taskgroup = FORTASK(leader, _this_taskgroup);
-#else
+#else /* __INTELLISENSE__ */
 #define thread_taskgroup FORTASK(thread, _this_taskgroup)
 #define leader_taskgroup FORTASK(leader, _this_taskgroup)
-#endif
+#endif /* !__INTELLISENSE__ */
 	thread = task_getprocess_of(thread);
 	leader = task_getprocess_of(leader);
 	assert(task_isprocessleader_p(thread));
@@ -677,10 +678,10 @@ again_set_self:
 #ifdef __INTELLISENSE__
 		struct taskgroup &new_group_leader_taskgroup = FORTASK(new_group_leader, _this_taskgroup);
 		struct taskgroup &old_group_leader_taskgroup = FORTASK(old_group_leader, _this_taskgroup);
-#else
+#else /* __INTELLISENSE__ */
 #define new_group_leader_taskgroup FORTASK(new_group_leader, _this_taskgroup)
 #define old_group_leader_taskgroup FORTASK(old_group_leader, _this_taskgroup)
-#endif
+#endif /* !__INTELLISENSE__ */
 		/* Add the given thread to an existing process group.
 		 * But first: Load the leader of that group.
 		 * Also note that the identity of that leader is quite volatile,
@@ -801,9 +802,9 @@ task_setsessionleader(struct task *thread, struct task *leader,
 	REF struct task *new_session_leader;
 #ifdef __INTELLISENSE__
 	struct taskgroup &thread_taskgroup = FORTASK(thread, _this_taskgroup);
-#else
+#else /* __INTELLISENSE__ */
 #define thread_taskgroup FORTASK(thread, _this_taskgroup)
-#endif
+#endif /* !__INTELLISENSE__ */
 	thread = task_getprocess_of(thread);
 	leader = task_getprocess_of(leader);
 	assert(task_isprocessleader_p(thread));
@@ -919,20 +920,21 @@ INTERN struct pidns_entry empty_pidns_list[1] = {
 
 /* The root PID namespace. */
 PUBLIC struct pidns pidns_root = {
-	/* .pn_refcnt      = */1,
-	/* .pn_indirection = */0,
-	/* .pn_parent      = */NULL,
-	/* .pn_lock        = */ATOMIC_RWLOCK_INIT,
-	/* .pn_used        = */0,
-	/* .pn_size        = */0,
-	/* .pn_mask        = */0,
-	/* .pn_list        = */empty_pidns_list,
-	/* .pn_dead        = */NULL
+	/* .pn_refcnt      = */ 1,
+	/* .pn_indirection = */ 0,
+	/* .pn_parent      = */ NULL,
+	/* .pn_lock        = */ ATOMIC_RWLOCK_INIT,
+	/* .pn_used        = */ 0,
+	/* .pn_size        = */ 0,
+	/* .pn_mask        = */ 0,
+	/* .pn_list        = */ empty_pidns_list,
+	/* .pn_dead        = */ NULL
 };
 
 
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL pidns_service_dead)(struct pidns *__restrict self);
+
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL pidns_do_remove)(struct pidns *__restrict self,
                                struct taskpid *__restrict pid) {
@@ -977,7 +979,8 @@ again:
 	}
 }
 
-#define PIDNS_MUSTSERVICE(self) (ATOMIC_READ((self)->pn_dead) != NULL)
+#define PIDNS_MUSTSERVICE(self) \
+	(ATOMIC_READ((self)->pn_dead) != NULL)
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL pidns_service_dead)(struct pidns *__restrict self) {
 	struct taskpid *dead, *next;
@@ -1132,7 +1135,6 @@ NOTHROW(KCALL pidns_upgrade_nx)(struct pidns *__restrict self) {
 	pidns_service_dead(self);
 	return result;
 }
-
 
 PUBLIC NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL pidns_destroy)(struct pidns *__restrict self) {
@@ -1389,7 +1391,7 @@ task_setpid(struct task *__restrict self,
 	assert(!FORTASK(self, _this_taskpid));
 	/* Step #1: Allocate the PID descriptor */
 	pid = (REF struct taskpid *)kmalloc(offsetof(struct taskpid, tp_pids) +
-	                                    (ns->pn_indirection + 1) * sizeof(upid_t),
+	                                    ((ns->pn_indirection + 1) * sizeof(upid_t)),
 	                                    GFP_NORMAL);
 	TRY {
 		/* Step #2: Acquire write-locks to all of the PID namespaces in which we want to allocate,
@@ -1475,7 +1477,7 @@ next_random_pid:
 	pid->tp_siblings.ln_pself = NULL;
 #ifndef NDEBUG
 	memset(&pid->tp_siblings.ln_next, 0xcc, sizeof(pid->tp_siblings.ln_next));
-#endif
+#endif /* !NDEBUG */
 	pid->tp_pidns = incref(ns);
 	COMPILER_WRITE_BARRIER();
 
@@ -1660,7 +1662,7 @@ parent_is_dead:
 #ifndef NDEBUG
 			memset(&pid->tp_siblings.ln_next, 0xcc,
 			       sizeof(pid->tp_siblings.ln_next));
-#endif
+#endif /* !NDEBUG */
 			/* Delete the parent link within our own process. */
 			FORTASK(thread, _this_taskgroup).tg_proc_parent = NULL;
 			sync_endwrite(&FORTASK(parent, _this_taskgroup).tg_proc_threads_lock);
@@ -1681,7 +1683,7 @@ parent_is_dead:
 #ifndef NDEBUG
 		memset(&pid->tp_siblings.ln_next, 0xcc,
 		       sizeof(pid->tp_siblings.ln_next));
-#endif
+#endif /* !NDEBUG */
 		sync_endwrite(&FORTASK(thread, _this_taskgroup).tg_proc_threads_lock);
 		decref_nokill(pid); /* Inherited from the `tp_siblings' chain */
 		return true;
@@ -1700,9 +1702,9 @@ task_detach_children(struct task *__restrict process)
 	size_t result = 0;
 #ifdef __INTELLISENSE__
 	struct taskgroup &procgroup = FORTASK(process, _this_taskgroup);
-#else
+#else /* __INTELLISENSE__ */
 #define procgroup FORTASK(process, _this_taskgroup)
-#endif
+#endif /* !__INTELLISENSE__ */
 	assert(process == task_getprocess_of(process));
 
 	/* Detach all child threads. */
@@ -1746,7 +1748,7 @@ again:
 #ifndef NDEBUG
 		memset(&iter->tp_siblings.ln_next, 0xcc,
 		       sizeof(iter->tp_siblings.ln_next));
-#endif
+#endif /* !NDEBUG */
 		sync_endwrite(&procgroup.tg_proc_threads_lock);
 		/* Drop the reference previously held by our `tp_siblings' chain. */
 		decref(iter);
@@ -1830,7 +1832,7 @@ again:
 #ifndef NDEBUG
 			memset(&iter->tp_siblings.ln_next, 0xcc,
 			       sizeof(iter->tp_siblings.ln_next));
-#endif
+#endif /* !NDEBUG */
 			sync_endwrite(&procgroup->tg_proc_threads_lock);
 			decref(iter); /* The reference previously contained within the `tg_proc_threads' chain */
 			result = -EOK;
@@ -1867,9 +1869,9 @@ posix_waitfor(idtype_t which,
 	struct task *proc = task_getprocess();
 #ifdef __INTELLISENSE__
 	struct taskgroup &mygroup = FORTASK(proc, _this_taskgroup);
-#else
+#else /* __INTELLISENSE__ */
 #define mygroup FORTASK(proc, _this_taskgroup)
-#endif
+#endif /* !__INTELLISENSE__ */
 	assert(!(THIS_TASK->t_flags & TASK_FKERNTHREAD));
 	/* Check for special behavior when SIGCLD is being ignored. */
 	{
@@ -1910,7 +1912,7 @@ reapall_check_already_locked:
 #ifndef NDEBUG
 								memset(&child->tp_siblings.ln_next, 0xcc,
 								       sizeof(child->tp_siblings.ln_next));
-#endif
+#endif /* !NDEBUG */
 								sync_endwrite(&mygroup.tg_proc_threads_lock);
 								decref(child);
 								goto reapall_check;
@@ -2023,7 +2025,7 @@ again_read_status:
 #ifndef NDEBUG
 							memset(&child->tp_siblings.ln_next, 0xcc,
 							       sizeof(child->tp_siblings.ln_next));
-#endif
+#endif /* !NDEBUG */
 							/* Inherit reference to `child' */
 							sync_endwrite(&mygroup.tg_proc_threads_lock);
 						} else {
