@@ -170,6 +170,11 @@ All ported applications can be installed onto you KOS disk image by using `bash 
 	- Support for device files (both block-(`S_ISBLK()`) and character(`S_ISCHR()`)-devices)
 	- Support for devfs (`/dev/...`)
 	- Support for ram file system (as one would expect `/tmp` to be)
+	- Support for procfs (`/proc/[pid]/...`)
+		- `/proc/self`
+		- `/proc/[pid]/exe`
+		- `/proc/[pid]/fd/[fdno]`
+		- ...
 - System calls
 	- `int 80h`
 		- With linux ABI compatibility
