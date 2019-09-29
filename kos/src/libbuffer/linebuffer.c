@@ -29,6 +29,7 @@
 #include <hybrid/atomic.h>
 
 #include <libbuffer/linebuffer.h>
+#include <assert.h>
 #include <string.h>
 
 #include "linebuffer.h"
@@ -37,7 +38,8 @@
 #include <kernel/vm.h>
 #include <kernel/except.h>
 #include <sched/signal.h>
-#define HEAP_FREE(base, size) heap_free(&kernel_default_heap, base, size, GFP_NORMAL)
+#define HEAP_FREE(base, size) \
+	((size) ? heap_free(&kernel_default_heap, base, size, GFP_NORMAL) : (void)0)
 #else /* __KERNEL__ */
 #include <stddef.h>
 #include <malloc.h>
