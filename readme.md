@@ -573,7 +573,7 @@ So here are your options:
 Notes:
 
 - When opening KOS using Visual Studio, do _not_ just open `$PROJPATH`, but open `$PROJPATH/kos` instead. - Opening the former will not work properly and Visual Studio may even crash after a while since (at least for me) it seem unable to coax with the thousands of source files apart of binutils and gcc, and despite all of the methods that (supposedly) exist to have Visual Studio ignore certain paths within your source tree, all them only function to hide folders from the Solution Explorer (despite their documentation claiming to also hide them from the source code scanners). So my solution was to move everything that's actually interesting to me into the `$PROJPATH/kos` sub-folder and always open that one when programming.
-- Before debugging with Visual Studio for the first time, make sure to have already run `make_toolchain.sh` at least once to ensure that it was able to generate the file `$PROJPATH/kos/.vs/launch.vs.json` (this has to be done dynamically since it must contain some absolute paths depending on where your `$PROJPATH` is located at) (for this purpose, it's likely to be ok if `make_toolchain.sh`, since the creation of this file is one of the first things it does)
+- Before debugging with Visual Studio for the first time, make sure to have already run `make_toolchain.sh` at least once to ensure that it was able to generate the file `$PROJPATH/kos/.vs/launch.vs.json` (this has to be done dynamically since it must contain some absolute paths depending on where your `$PROJPATH` is located at) (for this purpose, it's likely to work even if `make_toolchain.sh` fails, since the creation of this file is one of the first things it does)
 
 
 
