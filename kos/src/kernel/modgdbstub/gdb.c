@@ -163,16 +163,16 @@ done:
 
 #ifdef __x86_64__
 #define REASON_REGISTER_MAXSIZE 8
-#define FOREACH_REASON_REGISTER(callback)  \
-	callback("4", GDB_REGISTER_X86_64_RSP) \
-	callback("5", GDB_REGISTER_X86_64_RBP) \
+#define FOREACH_REASON_REGISTER(callback)   \
+	callback("04", GDB_REGISTER_X86_64_RSP) \
+	callback("05", GDB_REGISTER_X86_64_RBP) \
 	callback("10", GDB_REGISTER_X86_64_RIP)
 #elif defined(__i386__)
 #define REASON_REGISTER_MAXSIZE 4
 #define FOREACH_REASON_REGISTER(callback) \
-	callback("5", GDB_REGISTER_I386_EBP)  \
-	callback("4", GDB_REGISTER_I386_ESP)  \
-	callback("8", GDB_REGISTER_I386_EIP)
+	callback("05", GDB_REGISTER_I386_EBP) \
+	callback("04", GDB_REGISTER_I386_ESP) \
+	callback("08", GDB_REGISTER_I386_EIP)
 #endif
 
 
@@ -186,6 +186,14 @@ PRIVATE char *NOTHROW(FCALL GDB_ConstructStopReply)(char *ptr) {
 	*ptr++ = 'T';
 	*ptr++ = tohex((GDBReason_TrapNo >> 4) & 0xf);
 	*ptr++ = tohex(GDBReason_TrapNo & 0xf);
+	/* Include additional trap registers. */
+	if (GDBReason_Registers) {
+		ptr = stpcpy(ptr, GDBReason_Registers);
+		/* Make sure that the register list is properly terminated.
+		 * If it isn't, GDB will print an error, then hang itself. */
+		if (ptr[-1] != ';')
+			*ptr++ = ';';
+	}
 	/* Always include a select number of registers in the response. */
 #ifdef FOREACH_REASON_REGISTER
 #ifndef REASON_REGISTER_MAXSIZE
@@ -211,15 +219,6 @@ PRIVATE char *NOTHROW(FCALL GDB_ConstructStopReply)(char *ptr) {
 #ifndef CONFIG_NO_SMP
 	ptr += sprintf(ptr, "core:%x;", thread->t_cpu->c_id);
 #endif /* !CONFIG_NO_SMP */
-
-	/* Include additional trap registers. */
-	if (GDBReason_Registers) {
-		ptr = stpcpy(ptr, GDBReason_Registers);
-		/* Make sure that the register list is properly terminated.
-		 * If it isn't, GDB will print an error, then hang itself. */
-		if (ptr[-1] != ';')
-			*ptr++ = ';';
-	}
 	return ptr;
 }
 
@@ -1163,7 +1162,7 @@ send_empty:
 					if (nameEnd[-1] == '+') {
 						--nameLen;
 						if (ISNAME("multiprocess"))
-							/*GDB_RemoteFeatures |= GDB_REMOTEFEATURE_MULTIPROCESS*/;
+							GDB_RemoteFeatures |= GDB_REMOTEFEATURE_MULTIPROCESS;
 						else if (ISNAME("swbreak"))
 							GDB_RemoteFeatures |= GDB_REMOTEFEATURE_SWBREAK;
 						else if (ISNAME("hwbreak"))
@@ -1185,7 +1184,7 @@ send_empty:
 				ERRORF(err_syntax, "p=%$q, %Iu\n", (size_t)(endptr - p), p, (size_t)(endptr - p));
 			dst = GDBPacket_Start();
 			dst += sprintf(dst, "PacketSize=%Ix", GDB_PACKET_MAXLEN + 4);
-/*			dst = STPCAT(dst, ";QNonStop+"); // It's just not ready, yet... */
+			/*dst = STPCAT(dst, ";QNonStop+");*/
 			dst = STPCAT(dst, ";QStartNoAckMode+");
 			if (GDB_RemoteFeatures & GDB_REMOTEFEATURE_MULTIPROCESS)
 				dst = STPCAT(dst, ";multiprocess+");
@@ -1212,7 +1211,7 @@ send_empty:
 			if (nameEnd != endptr && *nameEnd != ':')
 				ERROR(err_syntax);
 			/* NOTE: Intentionally don't check the exact arguments, since those are variable. */
-			goto send_ok;
+			goto send_empty;
 		} else if (ISNAME("ThreadExtraInfo")) {
 			REF struct task *thread;
 			char *dst;
@@ -1333,7 +1332,7 @@ send_empty:
 				if (p != endptr)
 					ERROR(err_syntax);
 			}
-#if 1
+#if 0
 			if (!GDBPacket_Send("0")) /* Created a new process */
 				ERROR(gdb_exit);
 #else
@@ -1813,10 +1812,17 @@ INTERN DRIVER_INIT void KCALL GDB_Initialize(void) {
 		 *             doing this part wrong, or this isn't the answer either.
 		 * NOTE: This FIXME is mirrored in `/kos/src/kernel/core/arch/i386/task-clone.c'
 		 */
-		kernel_debugtrap(SIGTRAP, DEBUG_TRAP_REGISTER_FORK ":p1.1");
+		{
+			char buf[64];
+			sprintf(buf, DEBUG_TRAP_REGISTER_FORK ":p%p.%p",
+			        GDB_MULTIPROCESS_KERNEL_PID,
+			        (uintptr_t)&_bootidle - KERNEL_BASE);
+			kernel_debugtrap(SIGTRAP, buf);
+		}
 	}
 #endif
 	printk(KERN_INFO "[gdb] Initialization complete\n");
+
 }
 
 INTERN DRIVER_FINI void KCALL GDB_Finalize(void) {

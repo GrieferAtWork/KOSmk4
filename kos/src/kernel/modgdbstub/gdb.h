@@ -383,9 +383,14 @@ INTDEF void KCALL GDB_Finalize(void);
 /* Make sure that `thread' is a valid thread. If it isn't, return NULL. */
 INTDEF WUNUSED REF struct task *NOTHROW(FCALL GDB_VerifyThreadAndIncref)(struct task *thread);
 INTDEF WUNUSED REF struct task *NOTHROW(FCALL GDB_GetProcessByPID)(upid_t pid);
-#define GDB_ENCODETHREADID_MAXCHARS 18 /* p12345678.12345678 */
-INTDEF WUNUSED ATTR_RETNONNULL NONNULL((1, 2)) char *NOTHROW(FCALL GDB_EncodeThreadID)(char *ptr, struct task *__restrict thread, bool need_p_prefix DFL(true));
-INTDEF WUNUSED NONNULL((1)) REF struct task *NOTHROW(FCALL GDB_DecodeThreadID)(char **__restrict pptr, bool need_p_prefix DFL(true));
+#define GDB_ENCODETHREADID_MAXCHARS 19 /* p12345678.12345678\0 */
+INTDEF WUNUSED ATTR_RETNONNULL NONNULL((1, 2)) char *
+NOTHROW(FCALL GDB_EncodeThreadID)(char *ptr, struct task *__restrict thread,
+                                  bool need_p_prefix DFL(true));
+
+INTDEF WUNUSED NONNULL((1)) REF struct task *
+NOTHROW(FCALL GDB_DecodeThreadID)(char **__restrict pptr,
+                                  bool need_p_prefix DFL(true));
 
 /* NOTE: All of the following functions return negative ERRNO values on failure. */
 /* Print a human-readable name for `thread' */

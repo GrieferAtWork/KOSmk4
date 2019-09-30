@@ -351,7 +351,9 @@ again_lock_vm:
 			 *             doing this part wrong, or this isn't the answer either.
 			 * NOTE: This FIXME is mirrored in `/kos/src/kernel/modgdbstu/gdb.c'
 			 */
-			sprintf(regbuf, DEBUG_TRAP_REGISTER_FORK ":p1.1;" /*, (uintptr_t)result - KERNEL_BASE*/);
+			sprintf(regbuf, DEBUG_TRAP_REGISTER_FORK ":p%x.%x;",
+			        task_getrootpid_of_s(result),
+			        task_getroottid_of_s(result));
 			kernel_debugtrap(SIGTRAP, regbuf);
 		}
 

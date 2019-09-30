@@ -164,7 +164,7 @@ addr2line_printf(pformatprinter printer, void *arg, uintptr_t start_pc,
 
 PRIVATE ssize_t KCALL
 do_addr2line_vprintf(struct addr2line_buf const *__restrict ainfo,
-                     pformatprinter printer, void *arg,
+                     pformatprinter printer, void *arg, struct driver *d,
                      uintptr_t module_relative_pc, uintptr_t start_pc,
                      uintptr_t end_pc, char const *message_format,
                      va_list args) {
@@ -173,25 +173,57 @@ do_addr2line_vprintf(struct addr2line_buf const *__restrict ainfo,
 	addr2line_errno_t error;
 	error = addr2line(ainfo, module_relative_pc, &info, 0);
 	if (error != DEBUG_INFO_ERROR_SUCCESS) {
-		result = format_printf(printer, arg, "%p+%Iu",
-		                       start_pc,
-		                       (size_t)(end_pc - start_pc));
-		if unlikely(result < 0)
-			goto done;
-		if (message_format) {
-			temp = (*printer)(arg, " : ", 1);
+		if (d) {
+			if (d->d_filename) {
+				result = format_printf(printer, arg, "%%{vinfo:%s:",
+				                       d->d_filename);
+			} else {
+				result = format_printf(printer, arg, "%%{vinfo:/os/drivers/%s:",
+				                       d->d_name);
+			}
+			if unlikely(result < 0)
+				goto done;
+			temp = format_printf(printer, arg,
+			                     "%p:%p:%%f(%%l,%%c) : %%n : %%p",
+			                     module_relative_pc, start_pc);
 			if unlikely(temp < 0)
 				goto err;
 			result += temp;
-			temp = format_vprintf(printer, arg, message_format, args);
+			if (message_format) {
+				temp = (*printer)(arg, " : ", 3);
+				if unlikely(temp < 0)
+					goto err;
+				result += temp;
+				temp = format_vprintf(printer, arg, message_format, args);
+				if unlikely(temp < 0)
+					goto err;
+				result += temp;
+			}
+			temp = (*printer)(arg, "}\n", 2);
+			if unlikely(temp < 0)
+				goto err;
+			result += temp;
+		} else {
+			result = format_printf(printer, arg, "%p+%Iu",
+			                       start_pc,
+			                       (size_t)(end_pc - start_pc));
+			if unlikely(result < 0)
+				goto done;
+			if (message_format) {
+				temp = (*printer)(arg, " : ", 3);
+				if unlikely(temp < 0)
+					goto err;
+				result += temp;
+				temp = format_vprintf(printer, arg, message_format, args);
+				if unlikely(temp < 0)
+					goto err;
+				result += temp;
+			}
+			temp = (*printer)(arg, "\n", 1);
 			if unlikely(temp < 0)
 				goto err;
 			result += temp;
 		}
-		temp = (*printer)(arg, "\n", 1);
-		if unlikely(temp < 0)
-			goto err;
-		result += temp;
 	} else {
 		uintptr_t level = 0;
 again_printlevel:
@@ -269,15 +301,37 @@ addr2line_vprintf(pformatprinter printer, void *arg, uintptr_t start_pc,
 	ssize_t result;
 	uintptr_t module_relative_pc;
 	struct addr2line_buf ainfo;
-	module_relative_pc = addr2line_begin(&ainfo, start_pc);
+	REF struct driver *d;
+	d = driver_at_address((void const *)start_pc);
+	if unlikely(!d) {
+		memset(&ainfo, 0, sizeof(ainfo));
+		module_relative_pc = start_pc;
+	} else {
+		if (d == &kernel_driver) {
+			memcpy(&ainfo.ds_info, &kernel_debug_sections, sizeof(ainfo.ds_info));
+			memset(&ainfo.ds_sect, 0, sizeof(ainfo.ds_sect));
+			module_relative_pc = start_pc;
+		} else {
+#if 1 /* FIXME: `debug_dllocksections()' needs a non-blocking variant! */
+			memset(&ainfo, 0, sizeof(ainfo));
+			module_relative_pc = start_pc - d->d_loadaddr;
+#else
+			if (debug_dllocksections(d, &ainfo.ds_info, &ainfo.ds_sect) != DEBUG_INFO_ERROR_SUCCESS)
+				memset(&ainfo, 0, sizeof(ainfo));
+			module_relative_pc = start_pc - d->d_loadaddr;
+#endif
+		}
+	}
 	result = do_addr2line_vprintf(&ainfo,
 	                              printer,
 	                              arg,
+	                              d,
 	                              module_relative_pc,
 	                              start_pc,
 	                              end_pc,
 	                              message_format,
 	                              args);
+	xdecref_unlikely(d);
 	addr2line_end(&ainfo);
 	return result;
 }

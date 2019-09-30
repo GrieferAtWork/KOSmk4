@@ -1135,7 +1135,7 @@ __err_vinfo:
 		}
 #elif defined(__KOS__)
 		if (__COMPARE_NAME("vinfo")) {
-			__PRIVATE char const __vinfo_default_format[] = "%f(%l, %c) : %n";
+			__PRIVATE char const __vinfo_default_format[] = "%f(%l,%c) : %n";
 			void *__p = __builtin_va_arg(__FORMAT_ARGS, void *);
 			if (!__xformat_arg) {
 				__xformat_arg = __vinfo_default_format;

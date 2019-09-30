@@ -573,6 +573,7 @@ NOTHROW(FCALL GDBInfo_PrintThreadList)(pformatprinter printer, void *arg) {
 		uintptr_t flags;
 		FINALLY_DECREF_UNLIKELY(thread);
 		id_end = GDB_EncodeThreadID(id_buf, thread, true);
+		assert((size_t)(id_end - id_buf) <= GDB_ENCODETHREADID_MAXCHARS);
 		PRINTF("<thread id=\"%$s\" core=\"%u\" name=\"",
 		       (size_t)(id_end - id_buf), id_buf,
 		       thread->t_cpu->c_id);

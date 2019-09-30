@@ -130,7 +130,7 @@ kernel_halt_dump_traceback(pformatprinter printer, void *arg,
 #ifdef __ARCH_STACK_GROWS_DOWNWARDS
 				                 - sizeof(void *)
 #endif /* __ARCH_STACK_GROWS_DOWNWARDS */
-				);
+				                 );
 			}
 		}
 	}
