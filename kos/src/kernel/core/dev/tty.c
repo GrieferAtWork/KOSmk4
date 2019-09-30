@@ -185,8 +185,10 @@ again_read:
 			RETHROW();
 		}
 		decref(tty);
-		if (what & POLLIN)
+		if (what & POLLIN) {
+			task_disconnectall();
 			goto again;
+		}
 		task_connect_c(&cancel_con, &fwd->tf_cancel);
 		COMPILER_READ_BARRIER();
 		if unlikely(ATOMIC_READ(fwd->tf_device.m_pointer) == NULL) {

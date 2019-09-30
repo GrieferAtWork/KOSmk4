@@ -18,6 +18,7 @@
  */
 #ifndef GUARD_APPS_INIT_MAIN_C
 #define GUARD_APPS_INIT_MAIN_C 1
+#define _GNU_SOURCE 1
 #define _KOS_SOURCE 1
 #define _ATFILE_SOURCE 1
 
@@ -32,6 +33,7 @@
 #include <kos/unistd.h>    /* Dup2() */
 #include <sys/mount.h>     /* mount() */
 #include <sys/syslog.h>    /* syslog() */
+#include <sys/wait.h>      /* waitpid() */
 
 #include <errno.h>  /* errno */
 #include <fcntl.h>  /* AT_FDDRIVE_ROOT() */
@@ -39,6 +41,9 @@
 #include <stdio.h>  /* dprintf() */
 #include <string.h> /* strerror() */
 #include <unistd.h> /* sync() */
+#include <sched.h>  /* sched_yield() */
+
+#include <libansitty/ansitty.h>
 
 DECL_BEGIN
 
@@ -136,16 +141,25 @@ done_procfs:
 		}
 	}
 
-	dprintf(STDOUT_FILENO,
-	        "\033[J" /* ED(0):    Clear screen */
-	        "\033[f" /* HVP(1,1): Place cursor at 0,0 */);
+	for (;;) {
+		pid_t cpid;
+		dprintf(STDOUT_FILENO,
+		        ANSITTY_RESET_SEQUENCE /* Reset the TTY */
+		        "\033[f" /* HVP(1,1): Place cursor at 0,0 */
+		        "\033[J" /* ED(0):    Clear screen */);
 
-	/* TODO: We shouldn't directly exec() busybox.
-	 *       Instead, we should fork()+exec(), then keep on doing
-	 *       so whenever busybox dies (such as when the user presses
-	 *       CTRL+D do trigger an end-of-input event) */
-	execle("/bin/busybox", "bash", (char *)NULL, init_envp);
-	Execle("/bin/sh", "sh", (char *)NULL, init_envp);
+		/* Don't directly exec() busybox.
+		 * Instead, fork()+exec(), then keep on doing so
+		 * whenever busybox dies (such as when the user presses
+		 * CTRL+D do trigger an end-of-input event) */
+		cpid = VFork();
+		if (cpid == 0) {
+			execle("/bin/busybox", "bash", (char *)NULL, init_envp);
+			Execle("/bin/sh", "sh", (char *)NULL, init_envp);
+		}
+		while (waitpid(cpid, NULL, 0) < 0)
+			sched_yield();
+	}
 
 	/* TODO: `__CORRECT_ISO_CPP_MATH_H_PROTO' interferes with libstdc++'s autoconf detection... */
 	/* TODO: libstdc++ doesn't detect `HAVE_ISWBLANK' properly */

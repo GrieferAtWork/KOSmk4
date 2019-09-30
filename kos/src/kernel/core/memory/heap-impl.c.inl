@@ -77,7 +77,7 @@ NOTHROW_NX(KCALL FUNC(core_page_alloc))(struct heap *__restrict self,
 	/* Throw a would-block error if we're not allowed to map new memory. */
 	if (flags & GFP_NOMMAP)
 		IFELSE_NX(return CORE_PAGE_MALLOC_ERROR, THROW(E_WOULDBLOCK_PREEMPTED));
-	heap_validate_all();
+	heap_validate_all_pedantic();
 	/* Only allocate using corebase when `GFP_SHARED|GFP_LOCKED'
 	 * Otherwise, we can allocate the region and node using
 	 * that same set of flags in a call to `kmalloc()'. */

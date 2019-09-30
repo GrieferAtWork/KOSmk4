@@ -515,6 +515,7 @@
 #define __CRT_HAVE_fpustate_savecpu 1
 #define __CRT_HAVE_fpustate_saveinto 1
 #define __CRT_HAVE_fs_alloc 1
+#define __CRT_HAVE_fs_clone 1
 #define __CRT_HAVE_fs_destroy 1
 #define __CRT_HAVE_fs_filesystem_types 1
 #define __CRT_HAVE_fs_filesystems 1
@@ -1786,6 +1787,7 @@
 #define __CRT_HAVE_validate_writablem_opt 1
 #define __CRT_HAVE_vfs_alloc 1
 #define __CRT_HAVE_vfs_clearmounts 1
+#define __CRT_HAVE_vfs_clone 1
 #define __CRT_HAVE_vfs_kernel 1
 #define __CRT_HAVE_vio_addb 1
 #define __CRT_HAVE_vio_addl 1

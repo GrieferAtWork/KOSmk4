@@ -789,6 +789,10 @@ FUNDEF NOBLOCK void NOTHROW(KCALL vfs_clearmounts)(struct vfs *__restrict self);
 FUNDEF ATTR_RETNONNULL WUNUSED ATTR_MALLOC
 REF struct vfs *KCALL vfs_alloc(void) THROWS(E_BADALLOC);
 
+/* Clone the given VFS */
+FUNDEF ATTR_RETNONNULL WUNUSED ATTR_MALLOC REF struct vfs *KCALL
+vfs_clone(struct vfs *__restrict self) THROWS(E_BADALLOC);
+
 
 
 #define CONFIG_FS_UMASK_DEFAULT   022 /* S_IWGRP|S_IWOTH */
@@ -825,6 +829,11 @@ DEFINE_REFCOUNT_FUNCTIONS(struct fs, f_refcnt, fs_destroy)
 /* Allocate a new FS object. */
 FUNDEF ATTR_RETNONNULL WUNUSED ATTR_MALLOC
 REF struct fs *KCALL fs_alloc(void) THROWS(E_BADALLOC);
+
+/* Clone the given FS
+ * @param: clone_vfs: When true, clone the VFS, else share the same one. */
+FUNDEF ATTR_RETNONNULL WUNUSED ATTR_MALLOC REF struct fs *KCALL
+fs_clone(struct fs *__restrict self, bool clone_vfs) THROWS(E_BADALLOC);
 
 
 /* The kernel's own filesystem / the filesystem used when running `/bin/init'. */

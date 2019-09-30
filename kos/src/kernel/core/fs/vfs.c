@@ -1905,15 +1905,25 @@ DECL_BEGIN
 PUBLIC ATTR_RETNONNULL WUNUSED ATTR_MALLOC
 REF struct vfs *(KCALL vfs_alloc)(void) THROWS(E_BADALLOC) {
 	REF struct vfs *result;
-	result           = (REF struct vfs *)kmalloc(sizeof(struct vfs), FS_GFP | GFP_CALLOC);
+	result = (REF struct vfs *)kmalloc(sizeof(struct vfs),
+	                                   FS_GFP | GFP_CALLOC);
 	result->p_refcnt = 1;
 	result->p_vfs    = result;
 	atomic_rwlock_cinit(&result->p_lock);
 	result->v_fscount = 1;
 	atomic_rwlock_cinit(&result->v_mount_lock);
 	atomic_rwlock_cinit(&result->v_recent_lock);
+	atomic_rwlock_cinit(&result->v_drives_lock);
 	result->v_recent_limit = VFS_DEFAULT_RECENT_LIMIT;
 	return result;
+}
+
+
+/* Clone the given VFS */
+PUBLIC ATTR_RETNONNULL WUNUSED ATTR_MALLOC REF struct vfs *KCALL
+vfs_clone(struct vfs *__restrict self) THROWS(E_BADALLOC) {
+	(void)self;
+	THROW(E_NOT_IMPLEMENTED_TODO);
 }
 
 
@@ -1944,14 +1954,137 @@ REF struct fs *(KCALL fs_alloc)(void) THROWS(E_BADALLOC) {
 	result->f_cwd  = incref(result_vfs);
 #if CONFIG_FS_UMASK_DEFAULT != 0
 	result->f_umask = CONFIG_FS_UMASK_DEFAULT;
-#endif
+#endif /* CONFIG_FS_UMASK_DEFAULT != 0 */
 	result->f_lnkmax = MAXSYMLINKS;
 	result->f_atmask = FS_MODE_FALWAYS1MASK | (~FS_MODE_FALWAYS0MASK);
 #if FS_MODE_FALWAYS1FLAG != 0
 	result->f_atflag = FS_MODE_FALWAYS1FLAG;
-#endif
+#endif /* FS_MODE_FALWAYS1FLAG != 0 */
 	return result;
 }
+
+PRIVATE WUNUSED NONNULL((1, 2, 3)) struct path *
+NOTHROW(KCALL vfs_findpath_nolock)(struct vfs *__restrict new_vfs,
+                                   struct vfs *old_vfs,
+                                   struct path *old_path) {
+	struct path *parent;
+	assert(new_vfs);
+	assert(old_vfs);
+	assert(old_path);
+	assert(new_vfs != old_vfs);
+	if (old_path == old_vfs)
+		return new_vfs;
+	parent = vfs_findpath_nolock(new_vfs, old_vfs, old_path->p_parent);
+	if likely(parent) {
+		struct path *result;
+		struct directory_entry *dent;
+		dent = old_path->p_dirent;
+		result = parent->p_cldlist[dent->de_hash & parent->p_cldmask];
+		for (; result; result = result->p_dirnext.ln_next) {
+			if (result->p_dirent != dent)
+				continue;
+			return result; /* Found it! */
+		}
+	}
+	return NULL;
+}
+
+/* Clone the given FS
+ * @param: clone_vfs: When true, clone the VFS, else share the same one. */
+PUBLIC ATTR_RETNONNULL WUNUSED ATTR_MALLOC REF struct fs *KCALL
+fs_clone(struct fs *__restrict self, bool clone_vfs) THROWS(E_BADALLOC) {
+	struct heapptr resptr;
+	REF struct fs *result;
+	REF struct vfs *result_vfs;
+	resptr = heap_alloc(FS_HEAP, sizeof(struct fs),
+	                    FS_GFP | GFP_CALLOC);
+	if (clone_vfs) {
+		unsigned int i;
+		struct path *newpath;
+again_clone:
+		TRY {
+			result_vfs = vfs_clone(self->f_vfs);
+			TRY {
+				sync_read(&self->f_pathlock);
+			} EXCEPT {
+				decref(result_vfs);
+				RETHROW();
+			}
+		} EXCEPT {
+			heap_free(FS_HEAP,
+			          resptr.hp_ptr,
+			          resptr.hp_siz,
+			          FS_GFP | GFP_CALLOC);
+			RETHROW();
+		}
+		result = (REF struct fs *)resptr.hp_ptr;
+		newpath = vfs_findpath_nolock(result_vfs, self->f_vfs, self->f_root);
+		if unlikely(!newpath) {
+			sync_endread(&self->f_pathlock);
+			decref(result_vfs);
+			goto again_clone;
+		}
+		result->f_root = incref(newpath);
+		newpath = vfs_findpath_nolock(result_vfs, self->f_vfs, self->f_cwd);
+		if unlikely(!newpath) {
+			sync_endread(&self->f_pathlock);
+			decref(result->f_root);
+			decref(result_vfs);
+			goto again_clone;
+		}
+		result->f_cwd = incref(newpath);
+		for (i = 0; i < VFS_DRIVECOUNT; ++i) {
+			struct path *o = self->f_dcwd[i];
+			if (!o) {
+				result->f_dcwd[i] = NULL;
+				continue;
+			}
+			newpath = vfs_findpath_nolock(result_vfs, self->f_vfs, o);
+			if unlikely(!newpath) {
+				sync_endread(&self->f_pathlock);
+				while (i--)
+					xdecref(result->f_dcwd[i]);
+				decref(result->f_cwd);
+				decref(result->f_root);
+				decref(result_vfs);
+				goto again_clone;
+			}
+			result->f_dcwd[i] = incref(newpath);
+		}
+		sync_endread(&self->f_pathlock);
+	} else {
+		unsigned int i;
+		result = (REF struct fs *)resptr.hp_ptr;
+		TRY {
+			sync_read(&self->f_pathlock);
+		} EXCEPT {
+			heap_free(FS_HEAP,
+			          resptr.hp_ptr,
+			          resptr.hp_siz,
+			          FS_GFP | GFP_CALLOC);
+			RETHROW();
+		}
+		result->f_root = incref(self->f_root);
+		result->f_cwd  = incref(self->f_cwd);
+		for (i = 0; i < VFS_DRIVECOUNT; ++i) {
+			result->f_dcwd[i] = xincref(self->f_dcwd[i]);
+		}
+		sync_endread(&self->f_pathlock);
+		result_vfs = (REF struct vfs *)incref(self->f_vfs);
+		vfs_inc_fscount(result_vfs);
+	}
+	result->f_umask  = ATOMIC_READ(self->f_umask);
+	result->f_lnkmax = ATOMIC_READ(self->f_lnkmax);
+	result->f_fsuid  = ATOMIC_READ(self->f_fsuid);
+	result->f_fsgid  = ATOMIC_READ(self->f_fsgid);
+	result->f_mode   = ATOMIC_READ(self->f_mode);
+	result->f_refcnt   = 1;
+	result->f_heapsize = resptr.hp_siz;
+	result->f_vfs      = result_vfs; /* Inherit reference. */
+	atomic_rwlock_cinit(&result->f_pathlock);
+	return result;
+}
+
 
 
 PUBLIC NOBLOCK void
@@ -1960,7 +2093,7 @@ NOTHROW(KCALL fs_destroy)(struct fs *__restrict self) {
 	decref(self->f_root);
 	decref(self->f_cwd);
 	for (i = 0; i < VFS_DRIVECOUNT; ++i)
-		decref(self->f_dcwd[i]);
+		xdecref(self->f_dcwd[i]);
 	vfs_dec_fscount(self->f_vfs);
 	decref(self->f_vfs);
 	heap_free(FS_HEAP,
@@ -1974,24 +2107,22 @@ NOTHROW(KCALL fs_destroy)(struct fs *__restrict self) {
  * NOTE: Initialized to NULL. - Must be initialized before the task is started. */
 PUBLIC ATTR_PERTASK REF struct fs *_this_fs = NULL;
 
-DEFINE_PERTASK_FINI(finalize_this_fs);
-PRIVATE ATTR_USED NOBLOCK void
-NOTHROW(KCALL finalize_this_fs)(struct task *__restrict self) {
+DEFINE_PERTASK_FINI(pertask_this_fs_fini);
+INTERN NONNULL((1)) NOBLOCK void
+NOTHROW(KCALL pertask_this_fs_fini)(struct task *__restrict self) {
 	xdecref(FORTASK(self, _this_fs));
 }
 
-DEFINE_PERTASK_CLONE(clone_this_fs);
-PRIVATE ATTR_USED void KCALL
-clone_this_fs(struct task *__restrict new_thread, uintptr_t flags) {
+DEFINE_PERTASK_CLONE(pertask_this_fs_clone);
+INTERN NONNULL((1)) void KCALL
+pertask_this_fs_clone(struct task *__restrict new_thread, uintptr_t flags) {
 	struct fs *f;
 	f = THIS_FS;
 	if (flags & CLONE_FS) {
 		incref(f); /* Re-use the same fs. */
 	} else {
 		/* Clone the old fs. */
-		/* TODO: `f = fs_clone(f);'
-		 * NOTE: When `CLONE_NEWNS' is set, also clone the mount namespace! */
-		incref(f);
+		f = fs_clone(f, (flags & CLONE_NEWNS) != 0);
 	}
 	assert(!FORTASK(new_thread, _this_fs));
 	FORTASK(new_thread, _this_fs) = f; /* Inherit reference */

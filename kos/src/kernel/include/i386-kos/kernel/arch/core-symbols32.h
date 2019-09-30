@@ -4695,9 +4695,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, sys_setpgid; .long 0
 	.long 0x9b06494
 	.long .Lname1173 /* index: 1173 */
-	.weak superblock_mountlock_upgrade; .long superblock_mountlock_upgrade
-	.reloc ., R_386_SIZE32, superblock_mountlock_upgrade; .long 0
-	.long 0x56ff495
+	.weak fs_clone; .long fs_clone
+	.reloc ., R_386_SIZE32, fs_clone; .long 0
+	.long 0x95a3495
 	.long .Lname1174 /* index: 1174 */
 	.weak isr_usage_of; .long isr_usage_of
 	.reloc ., R_386_SIZE32, isr_usage_of; .long 0
@@ -9858,10 +9858,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak kernel_vpanic_ucpustate; .long kernel_vpanic_ucpustate
 	.reloc ., R_386_SIZE32, kernel_vpanic_ucpustate; .long 0
 	.long 0xf5adc45
-	.long 0 /* index: 2464 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2464 /* index: 2464 */
+	.weak vm_kernel_treelock_tryupgrade; .long vm_kernel_treelock_tryupgrade
+	.reloc ., R_386_SIZE32, vm_kernel_treelock_tryupgrade; .long 0
+	.long 0xcfa0495
 	.long 0 /* index: 2465 */
 	.long 0
 	.long 0
@@ -11775,9 +11775,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname2943 /* index: 2943 */
-	.weak vm_kernel_treelock_tryupgrade; .long vm_kernel_treelock_tryupgrade
-	.reloc ., R_386_SIZE32, vm_kernel_treelock_tryupgrade; .long 0
-	.long 0xcfa0495
+	.weak superblock_mountlock_upgrade; .long superblock_mountlock_upgrade
+	.reloc ., R_386_SIZE32, superblock_mountlock_upgrade; .long 0
+	.long 0x56ff495
 	.long .Lname2944 /* index: 2944 */
 	.weak path_remove; .long path_remove
 	.reloc ., R_386_SIZE32, path_remove; .long 0
@@ -14146,10 +14146,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 3536 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname3536 /* index: 3536 */
+	.weak x86_syscall_restart_mode; .long x86_syscall_restart_mode
+	.reloc ., R_386_SIZE32, x86_syscall_restart_mode; .long 0
+	.long 0x84c6a95
 	.long .Lname3537 /* index: 3537 */
 	.weak task_alloc_synchronous_srpc_nx; .long task_alloc_synchronous_srpc_nx
 	.reloc ., R_386_SIZE32, task_alloc_synchronous_srpc_nx; .long 0
@@ -15871,9 +15871,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, vm_set_aslr_disabled; .long 0
 	.long 0xc9d5884
 	.long .Lname3967 /* index: 3967 */
-	.weak x86_syscall_restart_mode; .long x86_syscall_restart_mode
-	.reloc ., R_386_SIZE32, x86_syscall_restart_mode; .long 0
-	.long 0x84c6a95
+	.weak vfs_clone; .long vfs_clone
+	.reloc ., R_386_SIZE32, vfs_clone; .long 0
+	.long 0x95a6a95
 	.long 0 /* index: 3968 */
 	.long 0
 	.long 0
@@ -17593,7 +17593,7 @@ END(kernel_symbol_table)
 .Lname1172:
 	.string "sys_setpgid"
 .Lname1173:
-	.string "superblock_mountlock_upgrade"
+	.string "fs_clone"
 .Lname1174:
 	.string "isr_usage_of"
 .Lname1176:
@@ -18868,6 +18868,8 @@ END(kernel_symbol_table)
 	.string "sys_kill"
 .Lname2463:
 	.string "kernel_vpanic_ucpustate"
+.Lname2464:
+	.string "vm_kernel_treelock_tryupgrade"
 .Lname2467:
 	.string "block_device_write_phys_sync"
 .Lname2468:
@@ -19351,7 +19353,7 @@ END(kernel_symbol_table)
 .Lname2938:
 	.string "vm_syncone_locked"
 .Lname2943:
-	.string "vm_kernel_treelock_tryupgrade"
+	.string "superblock_mountlock_upgrade"
 .Lname2944:
 	.string "path_remove"
 .Lname2945:
@@ -19980,6 +19982,8 @@ END(kernel_symbol_table)
 	.string "__acheck"
 .Lname3532:
 	.string "block_device_partition_ioctl"
+.Lname3536:
+	.string "x86_syscall_restart_mode"
 .Lname3537:
 	.string "task_alloc_synchronous_srpc_nx"
 .Lname3539:
@@ -20469,7 +20473,7 @@ END(kernel_symbol_table)
 .Lname3966:
 	.string "vm_set_aslr_disabled"
 .Lname3967:
-	.string "x86_syscall_restart_mode"
+	.string "vfs_clone"
 .Lname3971:
 	.string "system_clearcaches"
 .Lname3972:

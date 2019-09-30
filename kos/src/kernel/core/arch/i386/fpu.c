@@ -281,7 +281,6 @@ x86_cirq_07(struct icpustate *__restrict state) {
 			/* Lazily allocate a new state upon first access.
 			 * NOTE: If this causes an exception, that exception
 			 *       will be propagated to user-space. */
-			heap_validate_all();
 			mystate = fpustate_alloc();
 			__cli();
 			PERTASK_SET(_this_fpustate, mystate);

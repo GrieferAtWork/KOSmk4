@@ -69,6 +69,14 @@ STATIC_ASSERT(SIZEOF_MFREE == offsetof(struct mfree,mf_data));
 #define heap_validate_all()    (void)0
 #endif
 
+#if defined(NDEBUG) || 0 /* Pedantic heap validation enable/disable */
+#define heap_validate_after_free(heap) (void)0
+#define heap_validate_all_after_free() (void)0
+#else
+#define heap_validate_after_free(heap) heap_validate(heap)
+#define heap_validate_all_after_free() heap_validate_all()
+#endif
+
 #if defined(NDEBUG) || 1 /* Pedantic heap validation enable/disable */
 #define heap_validate_pedantic(heap) (void)0
 #define heap_validate_all_pedantic() (void)0
@@ -433,6 +441,7 @@ NOTHROW(KCALL heap_validate_all)(void) {
 #endif /* !CONFIG_DEBUG_HEAP */
 
 
+#ifdef CONFIG_DEBUG_HEAP
 PRIVATE NOBLOCK void
 NOTHROW(KCALL reset_heap_data)(byte_t *ptr, u32 pattern, size_t num_bytes) {
 	if (num_bytes < pagedir_pagesize())
@@ -460,6 +469,7 @@ do_remainder:
 		mempatl(ptr, pattern, num_bytes);
 	}
 }
+#endif /* CONFIG_DEBUG_HEAP */
 
 
 
@@ -965,7 +975,7 @@ load_new_slot:
 						break;
 				} while (!ATOMIC_CMPXCH_WEAK(self->h_hintpage, old_hint, free_minpage));
 			}
-			heap_validate_all();
+			heap_validate_all_after_free();
 			return false;
 		}
 	}
@@ -973,7 +983,7 @@ do_load_new_slot:
 	mfree_set_checksum(new_slot);
 	/* Insert the node into the address and size trees. */
 	heap_insert_node_unlocked(self, new_slot);
-	heap_validate_all();
+	heap_validate_all_after_free();
 	return true;
 }
 
