@@ -54,14 +54,14 @@ __PUBDEF di_debug_sections_t const kernel_debug_sections;
 #endif /* __KERNEL__ */
 
 typedef struct {
-	/*REF*/section_handle_t dl_debug_line;    /* [0..1] Reference to the `.debug_line' section */
-	/*REF*/section_handle_t dl_debug_info;    /* [0..1] Reference to the `.debug_info' section */
-	/*REF*/section_handle_t dl_debug_abbrev;  /* [0..1] Reference to the `.debug_abbrev' section */
-	/*REF*/section_handle_t dl_debug_aranges; /* [0..1] Reference to the `.debug_aranges' section */
-	/*REF*/section_handle_t dl_debug_str;     /* [0..1] Reference to the `.debug_str' section */
-	/*REF*/section_handle_t dl_debug_ranges;  /* [0..1] Reference to the `.debug_ranges' section */
-	/*REF*/section_handle_t dl_symtab;        /* [0..1] Reference to the `.symtab' or `.dynsym' section */
-	/*REF*/section_handle_t dl_strtab;        /* [0..1] Reference to the `.strtab' or `.dynstr' section */
+	/*REF*/ section_handle_t dl_debug_line;    /* [0..1] Reference to the `.debug_line' section */
+	/*REF*/ section_handle_t dl_debug_info;    /* [0..1] Reference to the `.debug_info' section */
+	/*REF*/ section_handle_t dl_debug_abbrev;  /* [0..1] Reference to the `.debug_abbrev' section */
+	/*REF*/ section_handle_t dl_debug_aranges; /* [0..1] Reference to the `.debug_aranges' section */
+	/*REF*/ section_handle_t dl_debug_str;     /* [0..1] Reference to the `.debug_str' section */
+	/*REF*/ section_handle_t dl_debug_ranges;  /* [0..1] Reference to the `.debug_ranges' section */
+	/*REF*/ section_handle_t dl_symtab;        /* [0..1] Reference to the `.symtab' or `.dynsym' section */
+	/*REF*/ section_handle_t dl_strtab;        /* [0..1] Reference to the `.strtab' or `.dynstr' section */
 } di_dl_debug_sections_t;
 
 

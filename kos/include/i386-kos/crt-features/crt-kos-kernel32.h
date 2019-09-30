@@ -79,6 +79,8 @@
 #define __CRT_HAVE_acpi_root 1
 #define __CRT_HAVE_acpi_sdt_count 1
 #define __CRT_HAVE_addr2line 1
+#define __CRT_HAVE_addr2line_begin 1
+#define __CRT_HAVE_addr2line_end 1
 #define __CRT_HAVE_addr2line_printf 1
 #define __CRT_HAVE_addr2line_vprintf 1
 #define __CRT_HAVE_aio_buffer_copyfromphys 1

@@ -35,6 +35,11 @@ typedef unsigned int addr2line_errno_t; /* One of `ADDR2LINE_ERROR_*' */
 
 
 #ifdef __CC__
+struct addr2line_buf {
+	di_debug_sections_t    ds_info; /* Section pointers */
+	di_dl_debug_sections_t ds_sect; /* Section references */
+};
+
 /* Lookup addr2line information for the given source address.
  * >> di_debug_addr2line_t info;
  * >> addr2line_errno_t error;
@@ -48,11 +53,16 @@ typedef unsigned int addr2line_errno_t; /* One of `ADDR2LINE_ERROR_*' */
  * >>            info.al_srcline,
  * >>            info.al_name);
  * >> } while (++level < info.al_levelcnt);
+ * @param: module_relative_pc: The return value of `addr2line_begin()'
  */
 FUNDEF addr2line_errno_t
-NOTHROW(KCALL addr2line)(uintptr_t abs_pc,
+NOTHROW(KCALL addr2line)(struct addr2line_buf const *__restrict info,
+                         uintptr_t module_relative_pc,
                          di_debug_addr2line_t *__restrict result,
                          uintptr_t level DFL(0));
+FUNDEF WUNUSED uintptr_t
+NOTHROW(KCALL addr2line_begin)(struct addr2line_buf *__restrict buf, uintptr_t abs_pc);
+FUNDEF void NOTHROW(KCALL addr2line_end)(struct addr2line_buf *__restrict buf);
 
 /* Print addr2line information for the given source address:
  * @param: printer:  The printer to which to output data.

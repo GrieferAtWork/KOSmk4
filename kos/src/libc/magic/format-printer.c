@@ -43,7 +43,11 @@
 #include <dlfcn.h>
 #include <libdisasm/disassembler.h>
 #define CONFIG_USE_LIBDISASM 1
+#ifdef __KERNEL__
+#include <kernel/addr2line.h>
+#else /* __KERNEL__ */
 #include <libdebuginfo/addr2line.h>
+#endif /* !__KERNEL__ */
 #define CONFIG_USE_LIBDEBUGINFO 1
 }
 
@@ -766,8 +770,10 @@ err:
 #ifdef CONFIG_USE_LIBDEBUGINFO
 #if !defined(__KERNEL__) || !defined(__KOS__)
 #include @<dlfcn.h>@
-#endif
 #include @<libdebuginfo/addr2line.h>@
+#else
+#include @<kernel/addr2line.h>@
+#endif
 #endif
 )][decl_prefix(
 @@if $wchar_function@@

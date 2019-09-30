@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x23a17477 */
+/* HASH CRC-32:0x93b2490b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __LOCAL_LIBC(format_c32sprintf_printer) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_c32sprintf_printer))(/*wchar_t ***/void *__arg,
                                                                        __CHAR32_TYPE__ const *__restrict __data,
                                                                        __SIZE_TYPE__ __datalen) {
-#line 883 "kos/src/libc/magic/format-printer.c"
+#line 889 "kos/src/libc/magic/format-printer.c"
 
 	*(__CHAR32_TYPE__ **)__arg = (__CHAR32_TYPE__ *)__localdep_c32mempcpy(*(__CHAR32_TYPE__ **)__arg, __data, __datalen);
 

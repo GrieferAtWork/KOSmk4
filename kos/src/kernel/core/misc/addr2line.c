@@ -24,6 +24,7 @@
 
 #include <kernel/addr2line.h>
 #include <kernel/types.h>
+#include <kernel/driver.h>
 
 #include <elf.h>
 #include <format-printer.h>
@@ -56,35 +57,63 @@ INTDEF byte_t __kernel_debug_ranges_end[];
 INTDEF byte_t __kernel_debug_ranges_size[];
 
 PUBLIC_CONST ATTR_COLDRODATA di_debug_sections_t const kernel_debug_sections = {
-	/* .ds_debug_line_start    = */(byte_t *)__kernel_debug_line_start,
-	/* .ds_debug_line_end      = */(byte_t *)__kernel_debug_line_end,
-	/* .ds_debug_info_start    = */(byte_t *)__kernel_debug_info_start,
-	/* .ds_debug_info_end      = */(byte_t *)__kernel_debug_info_end,
-	/* .ds_debug_abbrev_start  = */(byte_t *)__kernel_debug_abbrev_start,
-	/* .ds_debug_abbrev_end    = */(byte_t *)__kernel_debug_abbrev_end,
-	/* .ds_debug_aranges_start = */(byte_t *)__kernel_debug_aranges_start,
-	/* .ds_debug_aranges_end   = */(byte_t *)__kernel_debug_aranges_end,
-	/* .ds_debug_str_start     = */(byte_t *)__kernel_debug_str_start,
-	/* .ds_debug_str_end       = */(byte_t *)__kernel_debug_str_end,
-	/* .ds_debug_ranges_start  = */(byte_t *)__kernel_debug_ranges_start,
-	/* .ds_debug_ranges_end    = */(byte_t *)__kernel_debug_ranges_end,
-	/* .ds_symtab_start        = */(byte_t *)NULL,
-	/* .ds_symtab_end          = */(byte_t *)NULL,
-	/* .ds_symtab_ent          = */sizeof(Elf_Sym),
-	/* .ds_strtab_start        = */(byte_t *)NULL,
-	/* .ds_strtab_end          = */(byte_t *)NULL
+	/* .ds_debug_line_start    = */ (byte_t *)__kernel_debug_line_start,
+	/* .ds_debug_line_end      = */ (byte_t *)__kernel_debug_line_end,
+	/* .ds_debug_info_start    = */ (byte_t *)__kernel_debug_info_start,
+	/* .ds_debug_info_end      = */ (byte_t *)__kernel_debug_info_end,
+	/* .ds_debug_abbrev_start  = */ (byte_t *)__kernel_debug_abbrev_start,
+	/* .ds_debug_abbrev_end    = */ (byte_t *)__kernel_debug_abbrev_end,
+	/* .ds_debug_aranges_start = */ (byte_t *)__kernel_debug_aranges_start,
+	/* .ds_debug_aranges_end   = */ (byte_t *)__kernel_debug_aranges_end,
+	/* .ds_debug_str_start     = */ (byte_t *)__kernel_debug_str_start,
+	/* .ds_debug_str_end       = */ (byte_t *)__kernel_debug_str_end,
+	/* .ds_debug_ranges_start  = */ (byte_t *)__kernel_debug_ranges_start,
+	/* .ds_debug_ranges_end    = */ (byte_t *)__kernel_debug_ranges_end,
+	/* .ds_symtab_start        = */ (byte_t *)NULL,
+	/* .ds_symtab_end          = */ (byte_t *)NULL,
+	/* .ds_symtab_ent          = */ sizeof(Elf_Sym),
+	/* .ds_strtab_start        = */ (byte_t *)NULL,
+	/* .ds_strtab_end          = */ (byte_t *)NULL
 };
 
 /* Lookup addr2line information for the given source address. */
 PUBLIC ATTR_COLDTEXT addr2line_errno_t
-NOTHROW(KCALL addr2line)(uintptr_t abs_pc,
+NOTHROW(KCALL addr2line)(struct addr2line_buf const *__restrict info,
+                         uintptr_t module_relative_pc,
                          di_debug_addr2line_t *__restrict result,
                          uintptr_t level) {
-	return debug_sections_addr2line(&kernel_debug_sections,
+	return debug_sections_addr2line(&info->ds_info,
 	                                result,
-	                                abs_pc,
+	                                module_relative_pc,
 	                                level,
 	                                DEBUG_ADDR2LINE_FNORMAL);
+}
+
+PUBLIC WUNUSED uintptr_t
+NOTHROW(KCALL addr2line_begin)(struct addr2line_buf *__restrict buf,
+                               uintptr_t abs_pc) {
+	REF struct driver *d;
+	d = driver_at_address((void const *)abs_pc);
+	if unlikely(!d) {
+		memset(buf, 0, sizeof(*buf));
+		return abs_pc;
+	}
+	if (d == &kernel_driver) {
+		memcpy(&buf->ds_info, &kernel_debug_sections, sizeof(buf->ds_info));
+		memset(&buf->ds_sect, 0, sizeof(buf->ds_sect));
+		decref_nokill(d);
+		return abs_pc;
+	}
+	abs_pc -= d->d_loadaddr;
+	if (debug_dllocksections(d, &buf->ds_info, &buf->ds_sect) != DEBUG_INFO_ERROR_SUCCESS)
+		memset(buf, 0, sizeof(*buf));
+	decref_unlikely(d);
+	return abs_pc;
+}
+
+PUBLIC void
+NOTHROW(KCALL addr2line_end)(struct addr2line_buf *__restrict buf) {
+	debug_dlunlocksections(&buf->ds_sect);
 }
 
 
@@ -133,14 +162,16 @@ addr2line_printf(pformatprinter printer, void *arg, uintptr_t start_pc,
 	return result;
 }
 
-PUBLIC ssize_t KCALL
-addr2line_vprintf(pformatprinter printer, void *arg, uintptr_t start_pc,
-                  uintptr_t end_pc, char const *message_format,
-                  va_list args) {
+PRIVATE ssize_t KCALL
+do_addr2line_vprintf(struct addr2line_buf const *__restrict ainfo,
+                     pformatprinter printer, void *arg,
+                     uintptr_t module_relative_pc, uintptr_t start_pc,
+                     uintptr_t end_pc, char const *message_format,
+                     va_list args) {
 	ssize_t result, temp;
 	di_debug_addr2line_t info;
 	addr2line_errno_t error;
-	error = addr2line(start_pc, &info, 0);
+	error = addr2line(ainfo, module_relative_pc, &info, 0);
 	if (error != DEBUG_INFO_ERROR_SUCCESS) {
 		result = format_printf(printer, arg, "%p+%Iu",
 		                       start_pc,
@@ -220,7 +251,7 @@ again_printlevel:
 		result += temp;
 		if (++level < info.al_levelcnt) {
 			/* Print additional levels */
-			error = addr2line(start_pc, &info, level);
+			error = addr2line(ainfo, start_pc, &info, level);
 			if (error == DEBUG_INFO_ERROR_SUCCESS)
 				goto again_printlevel;
 		}
@@ -229,6 +260,26 @@ done:
 	return result;
 err:
 	return temp;
+}
+
+PUBLIC ssize_t KCALL
+addr2line_vprintf(pformatprinter printer, void *arg, uintptr_t start_pc,
+                  uintptr_t end_pc, char const *message_format,
+                  va_list args) {
+	ssize_t result;
+	uintptr_t module_relative_pc;
+	struct addr2line_buf ainfo;
+	module_relative_pc = addr2line_begin(&ainfo, start_pc);
+	result = do_addr2line_vprintf(&ainfo,
+	                              printer,
+	                              arg,
+	                              module_relative_pc,
+	                              start_pc,
+	                              end_pc,
+	                              message_format,
+	                              args);
+	addr2line_end(&ainfo);
+	return result;
 }
 
 

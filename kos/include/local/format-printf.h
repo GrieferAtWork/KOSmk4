@@ -880,7 +880,7 @@ print_string:
 				char __buf[32], *__bufiter;
 				di_debug_addr2line_t __info;
 				char const *__xiter, *__xend, *__xflush;
-				__UINTPTR_TYPE__ __val;
+				__UINTPTR_TYPE__ __val, __modrel;
 #if !defined(__KERNEL__) || !defined(__KOS__)
 				di_debug_sections_t __debug_sections;
 				di_dl_debug_sections_t __dl_debug_sections;
@@ -890,7 +890,7 @@ print_string:
 				static PDEBUG_DLUNLOCKSECTIONS __p_debug_dlunlocksections;
 				static PDEBUG_SECTIONS_ADDR2LINE __p_debug_sections_addr2line;
 				static PDEBUG_PRINT_FILENAME __p_debug_print_filename;
-				void *__ptr_module, *__module_base;
+				void *__ptr_module;
 				if (!__p_libdebuginfo) {
 					void *__m = dlopen(LIBDEBUGINFO_LIBRARY_NAME, RTLD_LOCAL);
 					if __unlikely(!__m) {
@@ -912,16 +912,17 @@ print_string:
 						goto __broken_format;
 				}
 				__ptr_module = dlgethandle(__p, DLGETHANDLE_FNORMAL);
-				__module_base = dlmodulebase(__ptr_module);
+				__modrel = (__UINTPTR_TYPE__)dlmodulebase(__ptr_module);
 				(*__p_debug_dllocksections)(__ptr_module, &__debug_sections, &__dl_debug_sections);
 				(*__p_debug_sections_addr2line)(&__debug_sections, &__info,
-				                               (__UINTPTR_TYPE__)__p - (__UINTPTR_TYPE__)__module_base,
+				                               (__UINTPTR_TYPE__)__p - __modrel,
 				                                0, DEBUG_ADDR2LINE_FNORMAL);
 #else /* !__KERNEL__ || !__KOS__ */
-#define __err_vinfo    __err
-				debug_sections_addr2line(&kernel_debug_sections, &__info,
-				                        (__UINTPTR_TYPE__)__p,
-				                         0, DEBUG_ADDR2LINE_FNORMAL);
+				struct addr2line_buf __dl_debug_sections;
+				__UINTPTR_TYPE__ __rel;
+				__rel = addr2line_begin(&__dl_debug_sections, (__UINTPTR_TYPE__)__p);
+				__modrel = (__UINTPTR_TYPE__)__p - __rel;
+				addr2line(&__dl_debug_sections, __rel, &__info, 0);
 #endif /* __KERNEL__ && __KOS__ */
 				__xiter = __xflush = __xformat_arg;
 				__xend = __xformat_arg + __xformat_argsize;
@@ -941,7 +942,7 @@ __again_vinfo_xiter:
 				switch (__ch) {
 
 				case '<':
-					__val = __info.al_linestart;
+					__val = __modrel + __info.al_linestart;
 __do_vinfo_hex:
 					__bufiter = __COMPILER_ENDOF(__buf);
 					do {
@@ -1011,11 +1012,11 @@ __do_vinfo_hex:
 					__ch = *__xiter++;
 					if (__ch == '>') {
 						/* '1>'  (Same as `>', but decrement by one) */
-						__val = __info.al_lineend - 1;
+						__val = __modrel + __info.al_lineend - 1;
 						goto __do_vinfo_hex;
 					} else if (__ch == 'E') {
 						/* '1E'  (Same as `E', but decrement by one) */
-						__val = __info.al_symend - 1;
+						__val = __modrel + __info.al_symend - 1;
 						goto __do_vinfo_hex;
 					} else {
 						--__xiter;
@@ -1024,15 +1025,15 @@ __do_vinfo_hex:
 					break;
 
 				case '>':
-					__val = __info.al_lineend;
+					__val = __modrel + __info.al_lineend;
 					goto __do_vinfo_hex;
 
 				case 'S':
-					__val = __info.al_symstart;
+					__val = __modrel + __info.al_symstart;
 					goto __do_vinfo_hex;
 
 				case 'E':
-					__val = __info.al_symend;
+					__val = __modrel + __info.al_symend;
 					goto __do_vinfo_hex;
 
 				case 'p':
@@ -1119,14 +1120,17 @@ __end_vinfo_xiter:
 				}
 #if !defined(__KERNEL__) || !defined(__KOS__)
 				(*__p_debug_dlunlocksections)(&__dl_debug_sections);
-#endif /* !__KERNEL__ || !__KOS__ */
+#else /* !__KERNEL__ || !__KOS__ */
+				addr2line_end(&__dl_debug_sections);
+#endif /* __KERNEL__ && __KOS__ */
 				break;
-#undef __err_vinfo
-#if !defined(__KERNEL__) || !defined(__KOS__)
 __err_vinfo:
+#if !defined(__KERNEL__) || !defined(__KOS__)
 				(*__p_debug_dlunlocksections)(&__dl_debug_sections);
-				goto __err;
+#else /* !__KERNEL__ || !__KOS__ */
+				addr2line_end(&__dl_debug_sections);
 #endif /* !__KERNEL__ || !__KOS__ */
+				goto __err;
 			}
 		}
 #elif defined(__KOS__)

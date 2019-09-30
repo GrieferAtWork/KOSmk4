@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbbbcc8d0 */
+/* HASH CRC-32:0x8932f526 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,8 +53,10 @@
 #ifdef CONFIG_USE_LIBDEBUGINFO
 #if !defined(__KERNEL__) || !defined(__KOS__)
 #include <dlfcn.h>
-#endif
 #include <libdebuginfo/addr2line.h>
+#else
+#include <kernel/addr2line.h>
+#endif
 #endif
 /* Dependency: "format_wrepeat" from "parts.wchar.format-printer" */
 #ifndef ____localdep_format_c16repeat_defined
@@ -280,7 +282,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_vc16printf))(__pc16formatprint
                                                                void *__arg,
                                                                __CHAR16_TYPE__ const *__restrict __format,
                                                                __builtin_va_list __args) {
-#line 782 "kos/src/libc/magic/format-printer.c"
+#line 788 "kos/src/libc/magic/format-printer.c"
 #define __CHAR_TYPE                 __CHAR16_TYPE__
 #define __CHAR_SIZE                 2
 #define __FORMAT_REPEAT             __localdep_format_c16repeat

@@ -57,12 +57,14 @@ NOTHROW(VCALL dbg_addr2line_printf)(uintptr_t start_pc, uintptr_t end_pc,
 	va_end(args);
 }
 
-PUBLIC ATTR_DBGTEXT void
-NOTHROW(KCALL dbg_addr2line_vprintf)(uintptr_t start_pc, uintptr_t end_pc,
-                                     char const *message_format, va_list args) {
+PRIVATE ATTR_DBGTEXT void
+NOTHROW(KCALL do_dbg_addr2line_vprintf)(struct addr2line_buf const *__restrict ainfo,
+                                        uintptr_t module_relative_pc,
+                                        uintptr_t start_pc, uintptr_t end_pc,
+                                        char const *message_format, va_list args) {
 	di_debug_addr2line_t info;
 	addr2line_errno_t error;
-	error = addr2line(start_pc, &info, 0);
+	error = addr2line(ainfo, module_relative_pc, &info, 0);
 	if (error != DEBUG_INFO_ERROR_SUCCESS) {
 		dbg_printf(DBGSTR(DF_SETFGCOLOR(DBG_COLOR_WHITE) "%p" DF_DEFFGCOLOR "+"
 		                  DF_SETFGCOLOR(DBG_COLOR_WHITE) "%-4Iu" DF_DEFFGCOLOR),
@@ -163,11 +165,26 @@ again_printlevel:
 		dbg_putc('\n');
 		if (++level < info.al_levelcnt) {
 			/* Print additional levels */
-			error = addr2line(start_pc, &info, level);
+			error = addr2line(ainfo, start_pc, &info, level);
 			if (error == DEBUG_INFO_ERROR_SUCCESS)
 				goto again_printlevel;
 		}
 	}
+}
+
+PUBLIC ATTR_DBGTEXT void
+NOTHROW(KCALL dbg_addr2line_vprintf)(uintptr_t start_pc, uintptr_t end_pc,
+                                     char const *message_format, va_list args) {
+	struct addr2line_buf ainfo;
+	uintptr_t module_relative_pc;
+	module_relative_pc = addr2line_begin(&ainfo, start_pc);
+	do_dbg_addr2line_vprintf(&ainfo,
+	                         module_relative_pc,
+	                         start_pc,
+	                         end_pc,
+	                         message_format,
+	                         args);
+	addr2line_end(&ainfo);
 }
 
 

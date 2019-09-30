@@ -3090,10 +3090,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 772 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname772 /* index: 772 */
+	.weak addr2line_end; .long addr2line_end
+	.reloc ., R_386_SIZE32, addr2line_end; .long 0
+	.long 0x9e20304
 	.long .Lname773 /* index: 773 */
 	.weak pagedir_unmap_userspace; .long pagedir_unmap_userspace
 	.reloc ., R_386_SIZE32, pagedir_unmap_userspace; .long 0
@@ -3714,10 +3714,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak path_lock_endwrite; .long path_lock_endwrite
 	.reloc ., R_386_SIZE32, path_lock_endwrite; .long 0
 	.long 0x28c4b45
-	.long 0 /* index: 928 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname928 /* index: 928 */
+	.weak vm_datapart_lockread_setcore_unsharecow_nx; .long vm_datapart_lockread_setcore_unsharecow_nx
+	.reloc ., R_386_SIZE32, vm_datapart_lockread_setcore_unsharecow_nx; .long 0
+	.long 0xfc3afd8
 	.long 0 /* index: 929 */
 	.long 0
 	.long 0
@@ -4219,9 +4219,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, handle_get_vm; .long 0
 	.long 0xb58341d
 	.long .Lname1054 /* index: 1054 */
-	.weak terminal_flush_icanon; .long terminal_flush_icanon
-	.reloc ., R_386_SIZE32, terminal_flush_icanon; .long 0
-	.long 0x96a941e
+	.weak addr2line_begin; .long addr2line_begin
+	.reloc ., R_386_SIZE32, addr2line_begin; .long 0
+	.long 0x201f41e
 	.long .Lname1055 /* index: 1055 */
 	.weak heap_validate; .long heap_validate
 	.reloc ., R_386_SIZE32, heap_validate; .long 0
@@ -11947,9 +11947,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname2986 /* index: 2986 */
-	.weak vm_datapart_lockread_setcore_unsharecow_nx; .long vm_datapart_lockread_setcore_unsharecow_nx
-	.reloc ., R_386_SIZE32, vm_datapart_lockread_setcore_unsharecow_nx; .long 0
-	.long 0xfc3afd8
+	.weak terminal_flush_icanon; .long terminal_flush_icanon
+	.reloc ., R_386_SIZE32, terminal_flush_icanon; .long 0
+	.long 0x96a941e
 	.long 0 /* index: 2987 */
 	.long 0
 	.long 0
@@ -17184,6 +17184,8 @@ END(kernel_symbol_table)
 	.string "slab_kmalloc_nx4"
 .Lname766:
 	.string "superblock_mountlock_trywrite"
+.Lname772:
+	.string "addr2line_end"
 .Lname773:
 	.string "pagedir_unmap_userspace"
 .Lname777:
@@ -17340,6 +17342,8 @@ END(kernel_symbol_table)
 	.string "memrendl"
 .Lname927:
 	.string "path_lock_endwrite"
+.Lname928:
+	.string "vm_datapart_lockread_setcore_unsharecow_nx"
 .Lname930:
 	.string "cpu_disable_preemptive_interrupts_nopr"
 .Lname931:
@@ -17473,7 +17477,7 @@ END(kernel_symbol_table)
 .Lname1053:
 	.string "handle_get_vm"
 .Lname1054:
-	.string "terminal_flush_icanon"
+	.string "addr2line_begin"
 .Lname1055:
 	.string "heap_validate"
 .Lname1057:
@@ -19411,7 +19415,7 @@ END(kernel_symbol_table)
 .Lname2984:
 	.string "unicode_writeutf8"
 .Lname2986:
-	.string "vm_datapart_lockread_setcore_unsharecow_nx"
+	.string "terminal_flush_icanon"
 .Lname2989:
 	.string "strchr"
 .Lname2991:

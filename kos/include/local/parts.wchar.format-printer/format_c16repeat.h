@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3a144e2e */
+/* HASH CRC-32:0xd7b56842 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -67,7 +67,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_c16repeat))(__pc16formatprinte
                                                               void *__arg,
                                                               __CHAR16_TYPE__ __ch,
                                                               __SIZE_TYPE__ __num_repetitions) {
-#line 93 "kos/src/libc/magic/format-printer.c"
+#line 97 "kos/src/libc/magic/format-printer.c"
 #ifndef __FORMAT_REPEAT_BUFSIZE
 #define __FORMAT_REPEAT_BUFSIZE 64
 #endif
