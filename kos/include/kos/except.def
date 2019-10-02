@@ -478,6 +478,8 @@ const E_INVALID_ARGUMENT_CONTEXT_SIGNALFD_FLAGS = 0x0060;
 const E_INVALID_ARGUMENT_CONTEXT_BAD_PIPE_BUFFER_SIZE = 0x0061; /* TODO: This should translate to EBUSY */
 @@E_INVALID_ARGUMENT_BAD_VALUE: Attempted to write an invalid integer to a system configuration file
 const E_INVALID_ARGUMENT_CONTEXT_BAD_INTEGER = 0x0062;
+@@E_INVALID_ARGUMENT_BAD_VALUE: Bad reason code passed to `debugtrap()'
+const E_INVALID_ARGUMENT_CONTEXT_DEBUG_REASON = 0x0063;
 
 
 

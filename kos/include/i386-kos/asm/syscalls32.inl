@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x69e4f14f */
+/* HASH CRC-32:0xdc18590d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -527,12 +527,11 @@
  * given `state', though given the purpose of this system call being
  * to inform a connected debugger of some breakable event, allowing
  * it to do whatever it wishes before execution is resumed.
- * @param: trapno:   One of `SIG*' (e.g. `SIGTRAP')
- * @param: regs:     When non-NULL, additional trap register data
+ * @param: reason:   When non-NULL, the reason for the debug trap (else: use `SIGTRAP:DEBUGTRAP_REASON_NONE')
  * @param: state:    When non-NULL, the CPU state where the trap should return to by default
  * @return: -EOK:    `state' was NULL and the trap returned successfully
  * @return: -ENOENT: No debugger is connected to the calling process/process-group/system */
-#define __NR32_debugtrap                  0x80000011 /* errno_t debugtrap(struct ucpustate const *state, syscall_ulong_t trapno, struct debug_trap_register const *regs) */
+#define __NR32_debugtrap                  0x80000011 /* errno_t debugtrap(struct ucpustate const *state, struct debugtrap_reason const *reason) */
 #define __NR32_lfutex                     0x80000012 /* syscall_slong_t lfutex(uintptr_t *uaddr, syscall_ulong_t futex_op, uintptr_t val, struct __timespec64 const *timeout, uintptr_t val2) */
 #define __NR32_lseek64                    0x80000013 /* int64_t lseek64(fd_t fd, int64_t offset, syscall_ulong_t whence) */
 #define __NR32_lfutexlock                 0x80000014 /* syscall_slong_t lfutexlock(uintptr_t *ulockaddr, uintptr_t *uaddr, syscall_ulong_t futex_op, uintptr_t val, struct __timespec64 const *timeout, uintptr_t val2) */
@@ -2563,8 +2562,7 @@
 #define __NR32AT2_get_exception_handler      void **
 #define __NR32AT0_set_library_listdef        struct library_listdef const *
 #define __NR32AT0_debugtrap                  struct ucpustate const *
-#define __NR32AT1_debugtrap                  syscall_ulong_t
-#define __NR32AT2_debugtrap                  struct debug_trap_register const *
+#define __NR32AT1_debugtrap                  struct debugtrap_reason const *
 #define __NR32AT0_lfutex                     uintptr_t *
 #define __NR32AT1_lfutex                     syscall_ulong_t
 #define __NR32AT2_lfutex                     uintptr_t
@@ -3544,8 +3542,7 @@
 #define __NR32AN2_get_exception_handler      "phandler_sp"
 #define __NR32AN0_set_library_listdef        "listdef"
 #define __NR32AN0_debugtrap                  "state"
-#define __NR32AN1_debugtrap                  "trapno"
-#define __NR32AN2_debugtrap                  "regs"
+#define __NR32AN1_debugtrap                  "reason"
 #define __NR32AN0_lfutex                     "uaddr"
 #define __NR32AN1_lfutex                     "futex_op"
 #define __NR32AN2_lfutex                     "val"
@@ -5533,11 +5530,9 @@
 #define __NR32ATRF0_set_library_listdef        "%p"
 #define __NR32ATRA0_set_library_listdef(listdef) ,listdef
 #define __NR32ATRF0_debugtrap                  "%p"
-#define __NR32ATRA0_debugtrap(state, trapno, regs) ,state
-#define __NR32ATRF1_debugtrap                  "%#Ix"
-#define __NR32ATRA1_debugtrap(state, trapno, regs) ,(uintptr_t)(trapno)
-#define __NR32ATRF2_debugtrap                  "%p"
-#define __NR32ATRA2_debugtrap(state, trapno, regs) ,regs
+#define __NR32ATRA0_debugtrap(state, reason)   ,state
+#define __NR32ATRF1_debugtrap                  "%p"
+#define __NR32ATRA1_debugtrap(state, reason)   ,reason
 #define __NR32ATRF0_lfutex                     "%p"
 #define __NR32ATRA0_lfutex(uaddr, futex_op, val, timeout, val2) ,uaddr
 #define __NR32ATRF1_lfutex                     "%#Ix"
@@ -6318,7 +6313,7 @@
 #define __NR32AC_set_exception_handler      3
 #define __NR32AC_get_exception_handler      3
 #define __NR32AC_set_library_listdef        1
-#define __NR32AC_debugtrap                  3
+#define __NR32AC_debugtrap                  2
 #define __NR32AC_lfutex                     5
 #define __NR32AC_lseek64                    3
 #define __NR32AC_lfutexlock                 6
@@ -6684,7 +6679,7 @@
 #define __NR32AM_set_exception_handler(a, b, c, d, e, f)      (__syscall_ulong_t)a, (__except_handler_t)b, (void *)c
 #define __NR32AM_get_exception_handler(a, b, c, d, e, f)      (__syscall_ulong_t *)a, (__except_handler_t *)b, (void **)c
 #define __NR32AM_set_library_listdef(a, b, c, d, e, f)        (struct library_listdef const *)a
-#define __NR32AM_debugtrap(a, b, c, d, e, f)                  (struct ucpustate const *)a, (__syscall_ulong_t)b, (struct debug_trap_register const *)c
+#define __NR32AM_debugtrap(a, b, c, d, e, f)                  (struct ucpustate const *)a, (struct debugtrap_reason const *)b
 #define __NR32AM_lfutex(a, b, c, d, e, f)                     (__uintptr_t *)a, (__syscall_ulong_t)b, (__uintptr_t)c, (struct __timespec64 const *)d, (__uintptr_t)e
 #define __NR32AM_lseek64(a, b, c, d, e, f)                    (__fd_t)a, (__int64_t)((__uint64_t)b | (__uint64_t)c << 32), (__syscall_ulong_t)d
 #define __NR32AM_lfutexlock(a, b, c, d, e, f)                 (__uintptr_t *)a, (__uintptr_t *)b, (__syscall_ulong_t)c, (__uintptr_t)d, (struct __timespec64 const *)e, (__uintptr_t)f
@@ -7050,7 +7045,7 @@
 #define __NR32AP_set_exception_handler(a, b, c)               (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR32AP_get_exception_handler(a, b, c)               (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NR32AP_set_library_listdef(a)                       (__syscall_ulong_t)a
-#define __NR32AP_debugtrap(a, b, c)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
+#define __NR32AP_debugtrap(a, b)                              (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AP_lfutex(a, b, c, d, e)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR32AP_lseek64(a, b, c)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)((__uint64_t)b >> 32), (__syscall_ulong_t)c
 #define __NR32AP_lfutexlock(a, b, c, d, e, f)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
@@ -7427,7 +7422,7 @@
 #define __NR32AC386_set_exception_handler      3
 #define __NR32AC386_get_exception_handler      3
 #define __NR32AC386_set_library_listdef        1
-#define __NR32AC386_debugtrap                  3
+#define __NR32AC386_debugtrap                  2
 #define __NR32AC386_lfutex                     5
 #define __NR32AC386_lseek64                    4
 #define __NR32AC386_lfutexlock                 6

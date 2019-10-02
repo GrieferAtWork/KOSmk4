@@ -369,11 +369,13 @@ STATIC_ASSERT(alignof(struct sigaction64) == __ALIGNOF_SIGACTION64);
 /* struct sigstack32 */
 STATIC_ASSERT(offsetof(struct sigstack32, ss_sp) == __OFFSET_SIGSTACK32_SP);
 STATIC_ASSERT(offsetof(struct sigstack32, ss_onstack) == __OFFSET_SIGSTACK32_ONSTACK);
+STATIC_ASSERT(sizeof(struct sigstack32) == __SIZEOF_SIGSTACK32);
 
 /* struct sigaltstack32 */
 STATIC_ASSERT(offsetof(struct sigaltstack32, ss_flags) == __OFFSET_SIGALTSTACK32_FLAGS);
 STATIC_ASSERT(offsetof(struct sigaltstack32, ss_size) == __OFFSET_SIGALTSTACK32_SIZE);
 STATIC_ASSERT(offsetof(struct sigaltstack32, ss_sp) == __OFFSET_SIGALTSTACK32_SP);
+STATIC_ASSERT(sizeof(struct sigaltstack32) == __SIZEOF_SIGALTSTACK32);
 
 
 
@@ -493,10 +495,13 @@ STATIC_ASSERT(sizeof(struct x86_64_va_list_struct) == SIZEOF_X86_64_VA_LIST_STRU
 
 #include <kos/bits/debugtrap32.h>
 
-/* struct debug_trap_register32 */
-STATIC_ASSERT(offsetof(struct debug_trap_register32, dtr_value) == __OFFSET_DEBUG_TRAP_REGISTER32_VALUE);
-STATIC_ASSERT(offsetof(struct debug_trap_register32, dtr_name) == __OFFSET_DEBUG_TRAP_REGISTER32_NAME);
-STATIC_ASSERT(sizeof(struct debug_trap_register32) == __SIZEOF_DEBUG_TRAP_REGISTER32);
+/* struct debugtrap_reason32 */
+STATIC_ASSERT(offsetof(struct debugtrap_reason32, dtr_intarg) == __OFFSET_DEBUGTRAP_REASON32_INTARG);
+STATIC_ASSERT(offsetof(struct debugtrap_reason32, dtr_ptrarg) == __OFFSET_DEBUGTRAP_REASON32_PTRARG);
+STATIC_ASSERT(offsetof(struct debugtrap_reason32, dtr_reason) == __OFFSET_DEBUGTRAP_REASON32_REASON);
+STATIC_ASSERT(offsetof(struct debugtrap_reason32, dtr_signo) == __OFFSET_DEBUGTRAP_REASON32_SIGNO);
+STATIC_ASSERT(offsetof(struct debugtrap_reason32, dtr_strarg) == __OFFSET_DEBUGTRAP_REASON32_STRARG);
+STATIC_ASSERT(sizeof(struct debugtrap_reason32) == __SIZEOF_DEBUGTRAP_REASON32);
 
 
 
@@ -504,10 +509,13 @@ STATIC_ASSERT(sizeof(struct debug_trap_register32) == __SIZEOF_DEBUG_TRAP_REGIST
 
 #include <kos/bits/debugtrap64.h>
 
-/* struct debug_trap_register64 */
-STATIC_ASSERT(offsetof(struct debug_trap_register64, dtr_value) == __OFFSET_DEBUG_TRAP_REGISTER64_VALUE);
-STATIC_ASSERT(offsetof(struct debug_trap_register64, dtr_name) == __OFFSET_DEBUG_TRAP_REGISTER64_NAME);
-STATIC_ASSERT(sizeof(struct debug_trap_register64) == __SIZEOF_DEBUG_TRAP_REGISTER64);
+/* struct debugtrap_reason64 */
+STATIC_ASSERT(offsetof(struct debugtrap_reason64, dtr_intarg) == __OFFSET_DEBUGTRAP_REASON64_INTARG);
+STATIC_ASSERT(offsetof(struct debugtrap_reason64, dtr_ptrarg) == __OFFSET_DEBUGTRAP_REASON64_PTRARG);
+STATIC_ASSERT(offsetof(struct debugtrap_reason64, dtr_reason) == __OFFSET_DEBUGTRAP_REASON64_REASON);
+STATIC_ASSERT(offsetof(struct debugtrap_reason64, dtr_signo) == __OFFSET_DEBUGTRAP_REASON64_SIGNO);
+STATIC_ASSERT(offsetof(struct debugtrap_reason64, dtr_strarg) == __OFFSET_DEBUGTRAP_REASON64_STRARG);
+STATIC_ASSERT(sizeof(struct debugtrap_reason64) == __SIZEOF_DEBUGTRAP_REASON64);
 
 
 

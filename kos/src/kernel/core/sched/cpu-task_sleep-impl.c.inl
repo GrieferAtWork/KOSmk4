@@ -100,20 +100,33 @@ PUBLIC bool NOTHROW(FCALL task_sleep)(qtime_t const *abs_timeout)
 
 	mycpu = me->t_cpu;
 	cpu_assert_running(me);
+	if (me == mycpu->c_override)
+		goto wait_a_bit;
+
 	/* The caller is the only thread hosted by this cpu. */
 	if likely(me->t_sched.s_running.sr_runnxt == me) {
+		struct task *idle;
 		/* Special case: blocking call made by the IDLE thread. */
 		if unlikely(me == &FORCPU(mycpu, _this_idle)) {
+wait_a_bit:
 			/* Wait for the next interrupt. */
 			PREEMPTION_ENABLE_WAIT();
 			/* Indicate a sporadic wake-up. */
 			return false;
 		}
+		/* Check if the IDLE thread had been sleeping. */
+		idle = &FORCPU(mycpu, _this_idle);
+		if (idle->t_sched.s_asleep.ss_pself) {
+			/* The IDLE thread had been sleeping (time it out) */
+			ATOMIC_FETCHOR(idle->t_flags, TASK_FTIMEOUT);
+			if ((*idle->t_sched.s_asleep.ss_pself = idle->t_sched.s_asleep.ss_tmonxt) != NULL)
+				idle->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = idle->t_sched.s_asleep.ss_pself;
+		}
 		/* Unschedule the caller, and instead schedule the IDLE thread. */
-		FORCPU(mycpu, _this_idle).t_sched.s_running.sr_runprv = &FORCPU(mycpu, _this_idle);
-		FORCPU(mycpu, _this_idle).t_sched.s_running.sr_runnxt = &FORCPU(mycpu, _this_idle);
-		ATOMIC_FETCHOR(FORCPU(mycpu, _this_idle).t_flags, TASK_FRUNNING);
-		mycpu->c_current = &FORCPU(mycpu, _this_idle);
+		idle->t_sched.s_running.sr_runprv = idle;
+		idle->t_sched.s_running.sr_runnxt = idle;
+		ATOMIC_FETCHOR(idle->t_flags, TASK_FRUNNING);
+		mycpu->c_current = idle;
 	} else {
 		/* Schedule the next task. */
 		struct task *prev = me->t_sched.s_running.sr_runprv;
@@ -140,7 +153,7 @@ PUBLIC bool NOTHROW(FCALL task_sleep)(qtime_t const *abs_timeout)
 	cpu_run_current_and_remember(me);
 
 	/* HINT: If your debugger break here, it means that your
-	 *       thread is probably waiting some sort of signal. */
+	 *       thread is probably waiting on some kind of signal. */
 	cpu_assert_running(me);
 
 	/* Check if we got timed out. */

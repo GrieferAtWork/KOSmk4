@@ -63,6 +63,11 @@ cred_require_driveroot(void) THROWS(E_INSUFFICIENT_RIGHTS) {
 	/* TODO */
 }
 
+PUBLIC void KCALL
+cred_require_debugtrap(void) THROWS(E_INSUFFICIENT_RIGHTS) {
+	/* Caller is allowed to trigger arbitrary debug traps */
+}
+
 
 DECL_END
 

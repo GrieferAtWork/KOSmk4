@@ -247,6 +247,7 @@ NOTHROW(KCALL kernel_initialize_scheduler)(void) {
 	DEFINE_INTERN_SYMBOL(_this_sched_runnxt, offsetof(struct task, t_sched.s_running.sr_runnxt), sizeof(struct task *));
 	DEFINE_INTERN_SYMBOL(_this_cpu_id, offsetof(struct cpu, c_id), sizeof(cpuid_t));
 	DEFINE_INTERN_SYMBOL(_this_cpu_current, offsetof(struct cpu, c_current), sizeof(struct task *));
+	DEFINE_INTERN_SYMBOL(_this_cpu_override, offsetof(struct cpu, c_override), sizeof(struct task *));
 	DEFINE_INTERN_SYMBOL(_this_cpu_pending, offsetof(struct cpu, c_pending), sizeof(struct task *));
 	assert(_boottask.t_refcnt == 1);
 	assert(_bootidle.t_refcnt == 1);

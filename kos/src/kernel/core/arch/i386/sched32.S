@@ -243,6 +243,12 @@ PUBLIC_FUNCTION(task_yield)
 	cmpl   %esi, %edi
 	je     .Lyield_same_target
 .Ldo_task_yield_esi_to_edi:
+	movl   _this_cpu(%esi), %ebx
+
+	/* Check for a scheduling override. */
+	cmpl   $0, _this_cpu_override(%ebx)
+	jne    .Lyield_same_target_with_override
+
 	/* CURR: %esi */
 	/* NEXT: %edi */
 	movl   %esp, _this_sched_state(%esi)
@@ -251,15 +257,22 @@ PUBLIC_FUNCTION(task_yield)
 	call   cpu_quantum_end
 
 	/* Load the new CPU state */
-	movl   _this_cpu(%esi), %ebx
 	movl   %edi, _this_cpu_current(%ebx)
 	movl   %edi, %eax
 	jmp    x86_load_thread_eax_cpu_ebx
+.Lyield_same_target_with_override:
+#ifndef NDEBUG
+	cmpl   %esi, _this_cpu_override(%ebx)
+	je     .Lyield_same_target
+	int3   /* Assertion failed: CPU override does not match calling thread.
+	        * >> struct task *caller = %esi;
+	        * >> struct cpu  *mycpu = %ebx; */
+#endif /* !NDEBUG */
 .Lyield_same_target:
 	sti
 #ifndef CONFIG_NO_SMP
 	pause
-#endif
+#endif /* !CONFIG_NO_SMP */
 	jmp    .Lload_scpustate_esp
 	.cfi_restore_state
 .Lillegal_task_yield:

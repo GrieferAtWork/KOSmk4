@@ -16,39 +16,38 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_MODGDBSERVER_ARCH_I386_KILL_C
+#define GUARD_MODGDBSERVER_ARCH_I386_KILL_C 1
 
 #include <kernel/compiler.h>
-#include <asm/cfi.h>
+#include <kernel/printk.h>
+#include <kernel/cpuid.h>
+#include <sched/task.h>
+#include <sys/io.h>
 
-.section .text
-/* Same as `GDBRemote_PutByte()', but using the current CPU state.
- * This function is mainly intended for use by communications initializers,
- * where it can happen that an already pending byte must be handled without
- * the help of an interrupt. */
-INTERN_FUNCTION(GDBRemote_PutByteFromHere)
-	.cfi_startproc
-	.cfi_signal_frame
-	/* INTERN void NOTHROW(FCALL GDBRemote_PutByteFromHere)(byte_t byte); */
-	popl_cfi  %eax
-	.cfi_register %eip, %eax
-	pushfl_cfi
-	pushl_cfi %cs
-	pushl_cfi %eax
-	pushl_cfi %ds
-	pushl_cfi %es
-	pushl_cfi %fs
-	pushal_cfi
+#include "../../gdb.h"
 
-	movl   %ecx, %edx /* GDBRemote_PutByte:byte */
-	movl   %esp, %ecx /* GDBRemote_PutByte:state */
+DECL_BEGIN
 
-	INTERN(GDBRemote_PutByte)
-	call   GDBRemote_PutByte
+#define MAKE_DWORD(a, b, c, d) \
+	((u32)(a) | ((u32)(b) << 8) | ((u32)(c) << 16) | ((u32)(d) << 24))
 
-	movl   %eax, %esp
+/* Kill the kernel. (== shutdown()) */
+INTERN ATTR_NORETURN void NOTHROW(FCALL GDBThread_KillKernel)(void) {
+	printk(KERN_INFO "[gdb] Shutdown via GDB stub\n");
+	/* Emulator-specific shutdown control codes. */
+	if (CPUID_FEATURES.ci_80000002a == MAKE_DWORD('Q', 'E', 'M', 'U')) {
+		/* `qemu -device isa-debug-exit,iobase=0xf4,iosize=0x04'
+		 * TODO: Make this configurable! */
+		outb((port_t)0xf4, 0x00);
+		outw((port_t)0x604, 0x2000);
+	} else if (CPUID_FEATURES.ci_80000002a == MAKE_DWORD('B', 'O', 'C', 'H')) {
+		outw((port_t)0xB004, 0x2000);
+	}
+	PREEMPTION_HALT();
+}
 
-	EXTERN(cpu_apply_icpustate_esp)
-	jmp    cpu_apply_icpustate_esp
-	.cfi_endproc
-END(GDBRemote_PutByteFromHere)
 
+DECL_END
+
+#endif /* !GUARD_MODGDBSERVER_ARCH_I386_KILL_C */

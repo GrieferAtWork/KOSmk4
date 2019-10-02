@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2011e760 */
+/* HASH CRC-32:0x1f54f51d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -527,12 +527,11 @@
  * given `state', though given the purpose of this system call being
  * to inform a connected debugger of some breakable event, allowing
  * it to do whatever it wishes before execution is resumed.
- * @param: trapno:   One of `SIG*' (e.g. `SIGTRAP')
- * @param: regs:     When non-NULL, additional trap register data
+ * @param: reason:   When non-NULL, the reason for the debug trap (else: use `SIGTRAP:DEBUGTRAP_REASON_NONE')
  * @param: state:    When non-NULL, the CPU state where the trap should return to by default
  * @return: -EOK:    `state' was NULL and the trap returned successfully
  * @return: -ENOENT: No debugger is connected to the calling process/process-group/system */
-#define __NR_debugtrap                  0x80000011 /* errno_t debugtrap(struct ucpustate const *state, syscall_ulong_t trapno, struct debug_trap_register const *regs) */
+#define __NR_debugtrap                  0x80000011 /* errno_t debugtrap(struct ucpustate const *state, struct debugtrap_reason const *reason) */
 #define __NR_lfutex                     0x80000012 /* syscall_slong_t lfutex(uintptr_t *uaddr, syscall_ulong_t futex_op, uintptr_t val, struct __timespec64 const *timeout, uintptr_t val2) */
 #define __NR_lseek64                    0x80000013 /* int64_t lseek64(fd_t fd, int64_t offset, syscall_ulong_t whence) */
 #define __NR_lfutexlock                 0x80000014 /* syscall_slong_t lfutexlock(uintptr_t *ulockaddr, uintptr_t *uaddr, syscall_ulong_t futex_op, uintptr_t val, struct __timespec64 const *timeout, uintptr_t val2) */
@@ -2563,8 +2562,7 @@
 #define __NRAT2_get_exception_handler      void **
 #define __NRAT0_set_library_listdef        struct library_listdef const *
 #define __NRAT0_debugtrap                  struct ucpustate const *
-#define __NRAT1_debugtrap                  syscall_ulong_t
-#define __NRAT2_debugtrap                  struct debug_trap_register const *
+#define __NRAT1_debugtrap                  struct debugtrap_reason const *
 #define __NRAT0_lfutex                     uintptr_t *
 #define __NRAT1_lfutex                     syscall_ulong_t
 #define __NRAT2_lfutex                     uintptr_t
@@ -3544,8 +3542,7 @@
 #define __NRAN2_get_exception_handler      "phandler_sp"
 #define __NRAN0_set_library_listdef        "listdef"
 #define __NRAN0_debugtrap                  "state"
-#define __NRAN1_debugtrap                  "trapno"
-#define __NRAN2_debugtrap                  "regs"
+#define __NRAN1_debugtrap                  "reason"
 #define __NRAN0_lfutex                     "uaddr"
 #define __NRAN1_lfutex                     "futex_op"
 #define __NRAN2_lfutex                     "val"
@@ -5533,11 +5530,9 @@
 #define __NRATRF0_set_library_listdef        "%p"
 #define __NRATRA0_set_library_listdef(listdef) ,listdef
 #define __NRATRF0_debugtrap                  "%p"
-#define __NRATRA0_debugtrap(state, trapno, regs) ,state
-#define __NRATRF1_debugtrap                  "%#Ix"
-#define __NRATRA1_debugtrap(state, trapno, regs) ,(uintptr_t)(trapno)
-#define __NRATRF2_debugtrap                  "%p"
-#define __NRATRA2_debugtrap(state, trapno, regs) ,regs
+#define __NRATRA0_debugtrap(state, reason)   ,state
+#define __NRATRF1_debugtrap                  "%p"
+#define __NRATRA1_debugtrap(state, reason)   ,reason
 #define __NRATRF0_lfutex                     "%p"
 #define __NRATRA0_lfutex(uaddr, futex_op, val, timeout, val2) ,uaddr
 #define __NRATRF1_lfutex                     "%#Ix"
@@ -6318,7 +6313,7 @@
 #define __NRAC_set_exception_handler      3
 #define __NRAC_get_exception_handler      3
 #define __NRAC_set_library_listdef        1
-#define __NRAC_debugtrap                  3
+#define __NRAC_debugtrap                  2
 #define __NRAC_lfutex                     5
 #define __NRAC_lseek64                    3
 #define __NRAC_lfutexlock                 6
@@ -6684,7 +6679,7 @@
 #define __NRAM_set_exception_handler(a, b, c, d, e, f)      (__syscall_ulong_t)a, (__except_handler_t)b, (void *)c
 #define __NRAM_get_exception_handler(a, b, c, d, e, f)      (__syscall_ulong_t *)a, (__except_handler_t *)b, (void **)c
 #define __NRAM_set_library_listdef(a, b, c, d, e, f)        (struct library_listdef const *)a
-#define __NRAM_debugtrap(a, b, c, d, e, f)                  (struct ucpustate const *)a, (__syscall_ulong_t)b, (struct debug_trap_register const *)c
+#define __NRAM_debugtrap(a, b, c, d, e, f)                  (struct ucpustate const *)a, (struct debugtrap_reason const *)b
 #define __NRAM_lfutex(a, b, c, d, e, f)                     (__uintptr_t *)a, (__syscall_ulong_t)b, (__uintptr_t)c, (struct __timespec64 const *)d, (__uintptr_t)e
 #define __NRAM_lseek64(a, b, c, d, e, f)                    (__fd_t)a, (__int64_t)((__uint64_t)b | (__uint64_t)c << 32), (__syscall_ulong_t)d
 #define __NRAM_lfutexlock(a, b, c, d, e, f)                 (__uintptr_t *)a, (__uintptr_t *)b, (__syscall_ulong_t)c, (__uintptr_t)d, (struct __timespec64 const *)e, (__uintptr_t)f
@@ -7050,7 +7045,7 @@
 #define __NRAP_set_exception_handler(a, b, c)               (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_get_exception_handler(a, b, c)               (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
 #define __NRAP_set_library_listdef(a)                       (__syscall_ulong_t)a
-#define __NRAP_debugtrap(a, b, c)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
+#define __NRAP_debugtrap(a, b)                              (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NRAP_lfutex(a, b, c, d, e)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NRAP_lseek64(a, b, c)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)((__uint64_t)b >> 32), (__syscall_ulong_t)c
 #define __NRAP_lfutexlock(a, b, c, d, e, f)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
@@ -7427,7 +7422,7 @@
 #define __NRAC386_set_exception_handler      3
 #define __NRAC386_get_exception_handler      3
 #define __NRAC386_set_library_listdef        1
-#define __NRAC386_debugtrap                  3
+#define __NRAC386_debugtrap                  2
 #define __NRAC386_lfutex                     5
 #define __NRAC386_lseek64                    4
 #define __NRAC386_lfutexlock                 6

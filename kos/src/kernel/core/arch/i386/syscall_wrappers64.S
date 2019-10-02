@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe536fb51 */
+/* HASH CRC-32:0x225cd0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -9433,15 +9433,13 @@ END(__asm64_syscall_set_library_listdef)
  * given `state', though given the purpose of this system call being
  * to inform a connected debugger of some breakable event, allowing
  * it to do whatever it wishes before execution is resumed.
- * @param: trapno:   One of `SIG*' (e.g. `SIGTRAP')
- * @param: regs:     When non-NULL, additional trap register data
+ * @param: reason:   When non-NULL, the reason for the debug trap (else: use `SIGTRAP:DEBUGTRAP_REASON_NONE')
  * @param: state:    When non-NULL, the CPU state where the trap should return to by default
  * @return: -EOK:    `state' was NULL and the trap returned successfully
  * @return: -ENOENT: No debugger is connected to the calling process/process-group/system */
 .section .text.x86.asm64_syscall.debugtrap
 	/* errno_t debugtrap(struct ucpustate const *state,
-	 *                   syscall_ulong_t trapno,
-	 *                   struct debug_trap_register const *regs) */
+	 *                   struct debugtrap_reason const *reason) */
 	.weak __asm64_syscall_debugtrap
 INTERN_FUNCTION(__asm64_syscall_debugtrap)
 	.cfi_startproc simple
@@ -18335,15 +18333,13 @@ END(__asm32_int80_set_library_listdef)
  * given `state', though given the purpose of this system call being
  * to inform a connected debugger of some breakable event, allowing
  * it to do whatever it wishes before execution is resumed.
- * @param: trapno:   One of `SIG*' (e.g. `SIGTRAP')
- * @param: regs:     When non-NULL, additional trap register data
+ * @param: reason:   When non-NULL, the reason for the debug trap (else: use `SIGTRAP:DEBUGTRAP_REASON_NONE')
  * @param: state:    When non-NULL, the CPU state where the trap should return to by default
  * @return: -EOK:    `state' was NULL and the trap returned successfully
  * @return: -ENOENT: No debugger is connected to the calling process/process-group/system */
 .section .text.x86.asm32_syscall_int80.debugtrap
 	/* errno_t debugtrap(struct ucpustate const *state,
-	 *                   syscall_ulong_t trapno,
-	 *                   struct debug_trap_register const *regs) */
+	 *                   struct debugtrap_reason const *reason) */
 	.weak __asm32_int80_debugtrap
 INTERN_FUNCTION(__asm32_int80_debugtrap)
 	.cfi_startproc simple
@@ -24257,15 +24253,13 @@ END(__asm32_sysenter_set_library_listdef)
  * given `state', though given the purpose of this system call being
  * to inform a connected debugger of some breakable event, allowing
  * it to do whatever it wishes before execution is resumed.
- * @param: trapno:   One of `SIG*' (e.g. `SIGTRAP')
- * @param: regs:     When non-NULL, additional trap register data
+ * @param: reason:   When non-NULL, the reason for the debug trap (else: use `SIGTRAP:DEBUGTRAP_REASON_NONE')
  * @param: state:    When non-NULL, the CPU state where the trap should return to by default
  * @return: -EOK:    `state' was NULL and the trap returned successfully
  * @return: -ENOENT: No debugger is connected to the calling process/process-group/system */
 .section .text.x86.asm32_syscall_sysenter.debugtrap
 	/* errno_t debugtrap(struct ucpustate const *state,
-	 *                   syscall_ulong_t trapno,
-	 *                   struct debug_trap_register const *regs) */
+	 *                   struct debugtrap_reason const *reason) */
 	.weak __asm32_sysenter_debugtrap
 INTERN_FUNCTION(__asm32_sysenter_debugtrap)
 	.cfi_startproc simple

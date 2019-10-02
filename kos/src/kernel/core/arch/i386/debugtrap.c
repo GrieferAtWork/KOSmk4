@@ -27,9 +27,10 @@
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
+#include <sched/cred.h>
+#include <sched/pid.h>
 #include <sched/rpc.h>
 #include <sched/task.h>
-#include <sched/cred.h>
 
 #include <hybrid/atomic.h>
 #include <hybrid/sync/atomic-rwlock.h>
@@ -39,15 +40,14 @@
 #include <kos/debugtrap.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/cpu-state32.h>
-#include <kos/bits/debugtrap.h>
-#include <kos/bits/debugtrap32.h>
 
+#include <assert.h>
 #include <errno.h>
+#include <malloca.h>
 #include <signal.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <assert.h>
 #include <string.h>
 
 #include <librpc/rpc.h>
@@ -179,173 +179,21 @@ kernel_debugtraps_get(struct kernel_debugtraps *__restrict handlers)
 }
 
 
-
-#ifdef __x86_64__
-INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
-sys_debugtrap64_impl(struct icpustate *__restrict return_state,
-                     USER UNCHECKED struct ucpustate64 const *state,
-                     syscall_ulong_t trapno,
-                     USER UNCHECKED struct debug_trap_register64 const *regs) {
-	char trap_register_text[DEBUG_TRAP_REGISTER_MAXSIZE + 1];
-	if (!kernel_debugtrap_enabled()) {
-		/* Debug traps are disabled. */
-		return_state->ics_gpregs.gp_rax = (u32)-ENOENT;
-		return;
-	}
-	if (trapno == 0 || trapno >= NSIG)
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_DEBUG_TRAPNO,
-		      trapno);
-	if (regs) {
-		size_t reqlen = 0;
-		validate_readable(regs, sizeof(*regs));
-		for (;; ++regs) {
-			size_t avail;
-			USER UNCHECKED char const *name, *value;
-			name = ATOMIC_READ(regs->dtr_name);
-			if (!name)
-				break; /* Sentinel */
-			value = ATOMIC_READ(regs->dtr_value);
-			validate_readable(name, 1);
-			validate_readable(value, 1);
-			avail = DEBUG_TRAP_REGISTER_MAXSIZE - reqlen;
-			if (reqlen >= DEBUG_TRAP_REGISTER_MAXSIZE)
-				avail = 0;
-			/* Append event text. */
-			/* TODO: Ensure that `name' and `value' only contain valid characters. */
-			reqlen += (size_t)snprintf(trap_register_text + reqlen,
-			                           avail, "%s:%s;",
-			                           name, value);
-		}
-		/* Ensure NUL-termination (this is why we allocate `trap_register_text' with +1 items) */
-		trap_register_text[DEBUG_TRAP_REGISTER_MAXSIZE] = 0;
-		/* Make sure that we don't use too much */
-		if unlikely(reqlen > DEBUG_TRAP_REGISTER_MAXSIZE)
-			THROW(E_BUFFER_TOO_SMALL, reqlen, DEBUG_TRAP_REGISTER_MAXSIZE);
-	}
-	if (state) {
-		u16 gs, fs, es, ds, ss, cs;
-		uintptr_t rflags;
-		uintptr_t rflags_mask = cred_allow_eflags_modify_mask();
-		validate_readable(state, sizeof(*state));
-		gs     = state->ucs_sgregs.sg_gs;
-		fs     = state->ucs_sgregs.sg_fs;
-		es     = state->ucs_sgregs.sg_es;
-		ds     = state->ucs_sgregs.sg_ds;
-		ss     = state->ucs_ss;
-		cs     = state->ucs_cs;
-		rflags = state->ucs_rflags;
-		COMPILER_READ_BARRIER();
-		/* Validate segment register indices before actually restoring them. */
-		if unlikely(!SEGMENT_IS_VALID_USERCODE(cs))
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-			      X86_REGISTER_SEGMENT_CS, cs);
-		if unlikely(!SEGMENT_IS_VALID_USERDATA(gs))
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-			      X86_REGISTER_SEGMENT_GS, gs);
-		if unlikely(!SEGMENT_IS_VALID_USERDATA(fs))
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-			      X86_REGISTER_SEGMENT_FS, fs);
-		if unlikely(!SEGMENT_IS_VALID_USERDATA(es))
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-			      X86_REGISTER_SEGMENT_ES, es);
-		if unlikely(!SEGMENT_IS_VALID_USERDATA(ds))
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-			      X86_REGISTER_SEGMENT_DS, ds);
-		if unlikely(!SEGMENT_IS_VALID_USERDATA(ss))
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-			      X86_REGISTER_SEGMENT_SS, ss);
-		if unlikely((irregs_rdflags(&return_state->ics_irregs) & ~rflags_mask) !=
-		            (rflags & ~rflags_mask))
-			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-			      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
-			      X86_REGISTER_MISC_RFLAGS, rflags);
-		__wrgs(gs);
-		__wrfs(fs);
-		__wres(es);
-		__wrds(ds);
-		irregs_wrcs(&return_state->ics_irregs, cs);
-		irregs_wrss(&return_state->ics_irregs, ss);
-		GPREGS_TO_GPREGSNSP(return_state->ics_gpregs, state->ucs_gpregs);
-		irregs_wrflags(&return_state->ics_irregs, rflags);
-		irregs_wrip(&return_state->ics_irregs, state->ucs_rip);
-		irregs_wrsp(&return_state->ics_irregs, state->ucs_gpregs.gp_rsp);
-		set_user_fsbase(state->ucs_sgbase.sg_fsbase);
-		set_user_gsbase(state->ucs_sgbase.sg_gsbase);
-	} else {
-		/* Return EOK to indicate that the trap got triggered */
-		return_state->ics_gpregs.gp_rax = (u32)-EOK;
-	}
-	/* Trigger the trap. */
-	return kernel_debugtrap_r_icpustate(return_state,
-	                                    trapno,
-	                                    regs ? trap_register_text : NULL);
-}
-#endif /* __x86_64__ */
-
-INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
-sys_debugtrap32_impl(struct icpustate *__restrict return_state,
-                     USER UNCHECKED struct ucpustate32 const *state,
-                     syscall_ulong_t trapno,
-                     USER UNCHECKED struct debug_trap_register32 const *regs) {
-	char trap_register_text[DEBUG_TRAP_REGISTER_MAXSIZE + 1];
-	if (!kernel_debugtrap_enabled()) {
-		/* Debug traps are disabled. */
-#ifdef __x86_64__
-		return_state->ics_gpregs.gp_rax = (u32)-ENOENT;
-#else /* __x86_64__ */
-		return_state->ics_gpregs.gp_eax = (u32)-ENOENT;
-#endif /* !__x86_64__ */
-		return return_state;
-	}
-	if (trapno == 0 || trapno >= NSIG)
-		THROW(E_INVALID_ARGUMENT_BAD_VALUE,
-		      E_INVALID_ARGUMENT_CONTEXT_DEBUG_TRAPNO,
-		      trapno);
-	if (regs) {
-		size_t reqlen = 0;
-		validate_readable(regs, sizeof(*regs));
-		for (;; ++regs) {
-			size_t avail;
-			USER UNCHECKED char const *name, *value;
-			name = (char const *)ATOMIC_READ(*(u32 *)&regs->dtr_name);
-			if (!name)
-				break; /* Sentinel */
-			value = (char const *)ATOMIC_READ(*(u32 *)&regs->dtr_value);
-			validate_readable(name, 1);
-			validate_readable(value, 1);
-			avail = DEBUG_TRAP_REGISTER_MAXSIZE - reqlen;
-			if (reqlen >= DEBUG_TRAP_REGISTER_MAXSIZE)
-				avail = 0;
-			/* Append event text. */
-			/* TODO: Ensure that `name' and `value' only contain valid characters. */
-			reqlen += (size_t)snprintf(trap_register_text + reqlen,
-			                           avail, "%s:%s;",
-			                           name, value);
-		}
-		/* Ensure NUL-termination (this is why we allocate `trap_register_text' with +1 items) */
-		trap_register_text[DEBUG_TRAP_REGISTER_MAXSIZE] = 0;
-		/* Make sure that we don't use too much */
-		if unlikely(reqlen > DEBUG_TRAP_REGISTER_MAXSIZE)
-			THROW(E_BUFFER_TOO_SMALL, reqlen, DEBUG_TRAP_REGISTER_MAXSIZE);
-	}
-	if (state) {
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1, 3)) struct icpustate *FCALL
+sys_do_debugtrap32_impl(struct icpustate *__restrict return_state,
+                        USER UNCHECKED struct ucpustate32 const *ustate,
+                        struct debugtrap_reason const *__restrict reason) {
+	if (ustate) {
 		u16 gs, fs, es, ds, ss, cs;
 		u32 eflags, eflags_mask = (u32)cred_allow_eflags_modify_mask();
-		validate_readable(state, sizeof(*state));
-		gs     = state->ucs_sgregs.sg_gs;
-		fs     = state->ucs_sgregs.sg_fs;
-		es     = state->ucs_sgregs.sg_es;
-		ds     = state->ucs_sgregs.sg_ds;
-		ss     = state->ucs_ss;
-		cs     = state->ucs_cs;
-		eflags = state->ucs_eflags;
+		validate_readable(ustate, sizeof(*ustate));
+		gs     = ustate->ucs_sgregs.sg_gs;
+		fs     = ustate->ucs_sgregs.sg_fs;
+		es     = ustate->ucs_sgregs.sg_es;
+		ds     = ustate->ucs_sgregs.sg_ds;
+		ss     = ustate->ucs_ss;
+		cs     = ustate->ucs_cs;
+		eflags = ustate->ucs_eflags;
 		COMPILER_READ_BARRIER();
 		if unlikely((irregs_rdflags(&return_state->ics_irregs) & ~eflags_mask) !=
 		            (eflags & ~eflags_mask))
@@ -404,27 +252,27 @@ sys_debugtrap32_impl(struct icpustate *__restrict return_state,
 #endif /* !__x86_64__ */
 		}
 #ifdef __x86_64__
-		return_state->ics_gpregs.gp_rdi = state->ucs_gpregs.gp_edi;
-		return_state->ics_gpregs.gp_rsi = state->ucs_gpregs.gp_esi;
-		return_state->ics_gpregs.gp_rbp = state->ucs_gpregs.gp_ebp;
-		return_state->ics_gpregs.gp_rbx = state->ucs_gpregs.gp_ebx;
-		return_state->ics_gpregs.gp_rdx = state->ucs_gpregs.gp_edx;
-		return_state->ics_gpregs.gp_rcx = state->ucs_gpregs.gp_ecx;
-		return_state->ics_gpregs.gp_rax = state->ucs_gpregs.gp_eax;
+		return_state->ics_gpregs.gp_rdi = ustate->ucs_gpregs.gp_edi;
+		return_state->ics_gpregs.gp_rsi = ustate->ucs_gpregs.gp_esi;
+		return_state->ics_gpregs.gp_rbp = ustate->ucs_gpregs.gp_ebp;
+		return_state->ics_gpregs.gp_rbx = ustate->ucs_gpregs.gp_ebx;
+		return_state->ics_gpregs.gp_rdx = ustate->ucs_gpregs.gp_edx;
+		return_state->ics_gpregs.gp_rcx = ustate->ucs_gpregs.gp_ecx;
+		return_state->ics_gpregs.gp_rax = ustate->ucs_gpregs.gp_eax;
 		irregs_wrflags(&return_state->ics_irregs, eflags);
-		irregs_wrip(&return_state->ics_irregs, state->ucs_eip);
-		irregs_wrsp(&return_state->ics_irregs, state->ucs_gpregs.gp_esp);
+		irregs_wrip(&return_state->ics_irregs, ustate->ucs_eip);
+		irregs_wrsp(&return_state->ics_irregs, ustate->ucs_gpregs.gp_esp);
 #else /* __x86_64__ */
-		return_state->ics_gpregs.gp_edi = state->ucs_gpregs.gp_edi;
-		return_state->ics_gpregs.gp_esi = state->ucs_gpregs.gp_esi;
-		return_state->ics_gpregs.gp_ebp = state->ucs_gpregs.gp_ebp;
-		return_state->ics_gpregs.gp_ebx = state->ucs_gpregs.gp_ebx;
-		return_state->ics_gpregs.gp_edx = state->ucs_gpregs.gp_edx;
-		return_state->ics_gpregs.gp_ecx = state->ucs_gpregs.gp_ecx;
-		return_state->ics_gpregs.gp_eax = state->ucs_gpregs.gp_eax;
+		return_state->ics_gpregs.gp_edi = ustate->ucs_gpregs.gp_edi;
+		return_state->ics_gpregs.gp_esi = ustate->ucs_gpregs.gp_esi;
+		return_state->ics_gpregs.gp_ebp = ustate->ucs_gpregs.gp_ebp;
+		return_state->ics_gpregs.gp_ebx = ustate->ucs_gpregs.gp_ebx;
+		return_state->ics_gpregs.gp_edx = ustate->ucs_gpregs.gp_edx;
+		return_state->ics_gpregs.gp_ecx = ustate->ucs_gpregs.gp_ecx;
+		return_state->ics_gpregs.gp_eax = ustate->ucs_gpregs.gp_eax;
 		irregs_wrflags(&return_state->ics_irregs_k, eflags);
-		irregs_wrip(&return_state->ics_irregs_k, state->ucs_eip);
-		return_state->ics_irregs_u.ir_esp = state->ucs_gpregs.gp_esp;
+		irregs_wrip(&return_state->ics_irregs_k, ustate->ucs_eip);
+		return_state->ics_irregs_u.ir_esp = ustate->ucs_gpregs.gp_esp;
 #endif /* !__x86_64__ */
 	} else {
 		/* Return EOK to indicate that the trap got triggered */
@@ -435,47 +283,121 @@ sys_debugtrap32_impl(struct icpustate *__restrict return_state,
 #endif /* !__x86_64__ */
 	}
 	/* Trigger the trap. */
-	return kernel_debugtrap_r_icpustate(return_state,
-	                                    trapno,
-	                                    regs ? trap_register_text
-	                                         : NULL);
+	return kernel_debugtrap_r_icpustate(return_state, reason);
 }
 
-
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1)) struct icpustate *FCALL
+sys_debugtrap32_impl(struct icpustate *__restrict return_state,
+                     USER UNCHECKED struct ucpustate32 const *ustate,
+                     USER UNCHECKED struct debugtrap_reason32 const *ureason) {
+	struct debugtrap_reason reason;
+	if (!kernel_debugtrap_enabled()) {
+		/* Debug traps are disabled. */
 #ifdef __x86_64__
-PRIVATE struct icpustate *FCALL
-sys_debugtrap_rpc64(void *UNUSED(arg), struct icpustate *__restrict state,
-                    unsigned int reason, struct rpc_syscall_info const *sc_info) {
-	if (reason == TASK_RPC_REASON_SYSCALL) {
-		state = sys_debugtrap64_impl(state,
-		                             (USER UNCHECKED struct ucpustate64 const *)sc_info->rsi_args[2],
-		                             (syscall_ulong_t)sc_info->rsi_args[0],
-		                             (USER UNCHECKED struct debug_trap_register64 const *)sc_info->rsi_args[1]);
+		return_state->ics_gpregs.gp_rax = (u32)-ENOENT;
+#else /* __x86_64__ */
+		return_state->ics_gpregs.gp_eax = (u32)-ENOENT;
+#endif /* !__x86_64__ */
+		return return_state;
 	}
-	return state;
+	if (ureason) {
+		validate_readable(ureason, sizeof(*ureason));
+		COMPILER_READ_BARRIER();
+		reason.dtr_signo  = ureason->dtr_signo;
+		reason.dtr_reason = ureason->dtr_reason;
+		reason.dtr_intarg = ureason->dtr_intarg;
+		COMPILER_READ_BARRIER();
+		if (reason.dtr_reason > DEBUGTRAP_REASON_MAX)
+			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+			      E_INVALID_ARGUMENT_CONTEXT_DEBUG_REASON,
+			      reason.dtr_reason);
+		switch (reason.dtr_reason) {
+
+		case DEBUGTRAP_REASON_FORK:
+		case DEBUGTRAP_REASON_VFORK:
+		case DEBUGTRAP_REASON_TEXITED:
+		case DEBUGTRAP_REASON_PEXITED: {
+			REF struct task *thread;
+			cred_require_debugtrap();
+			thread = pidns_lookup_task(THIS_PIDNS, (upid_t)reason.dtr_intarg);
+			FINALLY_DECREF_UNLIKELY(thread);
+			reason.dtr_ptrarg = thread;
+			return_state = sys_do_debugtrap32_impl(return_state, ustate, &reason);
+			goto done;
+		}	break;
+
+		case DEBUGTRAP_REASON_EXEC: {
+			char *namebuf;
+			size_t namelen;
+			enum { MAXLEN = 4096 };
+			validate_readable(reason.dtr_strarg, 1);
+			namelen = strlen(reason.dtr_strarg);
+			if (namelen > MAXLEN)
+				THROW(E_BUFFER_TOO_SMALL, MAXLEN, namelen);
+			namebuf = (char *)malloca((namelen + 1) * sizeof(char));
+			TRY {
+				memcpy(namebuf, reason.dtr_strarg, namelen * sizeof(char));
+				namebuf[namelen]  = '\0';
+				reason.dtr_strarg = namebuf;
+				return_state = sys_do_debugtrap32_impl(return_state, ustate, &reason);
+			} EXCEPT {
+				freea(namebuf);
+				RETHROW();
+			}
+			freea(namebuf);
+			goto done;
+		}	break;
+
+		case DEBUGTRAP_REASON_VFORKDONE:
+		case DEBUGTRAP_REASON_SC_ENTRY:
+		case DEBUGTRAP_REASON_SC_EXIT:
+		case DEBUGTRAP_REASON_CLONE:
+		case DEBUGTRAP_REASON_HWBREAK:
+			cred_require_debugtrap();
+			reason.dtr_intarg = 0;
+			break;
+
+		default:
+			reason.dtr_intarg = 0;
+			break;
+		}
+		if (reason.dtr_reason != DEBUGTRAP_REASON_TEXITED &&
+		    reason.dtr_reason != DEBUGTRAP_REASON_PEXITED) {
+			/* Verify a valid signal number.
+			 * NOTE: The (T|P)EXITED reason use the SIGNO field as the exit status. */
+			if (reason.dtr_signo == 0 || reason.dtr_signo >= NSIG)
+				THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+				      E_INVALID_ARGUMENT_CONTEXT_DEBUG_TRAPNO,
+				      reason.dtr_signo);
+		}
+	} else {
+		reason.dtr_signo  = SIGTRAP;
+		reason.dtr_reason = DEBUGTRAP_REASON_NONE;
+		reason.dtr_intarg = 0;
+	}
+	return_state = sys_do_debugtrap32_impl(return_state, ustate, &reason);
+done:
+	return return_state;
 }
-#endif /* __x86_64__ */
+
 
 PRIVATE struct icpustate *FCALL
 sys_debugtrap_rpc32(void *UNUSED(arg), struct icpustate *__restrict state,
                     unsigned int reason, struct rpc_syscall_info const *sc_info) {
 	if (reason == TASK_RPC_REASON_SYSCALL) {
 		state = sys_debugtrap32_impl(state,
-		                             (USER UNCHECKED struct ucpustate32 const *)sc_info->rsi_args[2],
-		                             (syscall_ulong_t)sc_info->rsi_args[0],
-		                             (USER UNCHECKED struct debug_trap_register32 const *)sc_info->rsi_args[1]);
+		                             (USER UNCHECKED struct ucpustate32 const *)sc_info->rsi_args[0],
+		                             (USER UNCHECKED struct debugtrap_reason32 const *)sc_info->rsi_args[1]);
 	}
 	return state;
 }
 
 
-DEFINE_SYSCALL3(errno_t, debugtrap,
+DEFINE_SYSCALL2(errno_t, debugtrap,
                 USER UNCHECKED struct ucpustate const *, state,
-                syscall_ulong_t, trapno,
-                USER UNCHECKED struct debug_trap_register const *, regs) {
+                USER UNCHECKED struct debugtrap_reason const *, reason) {
 	(void)state;
-	(void)trapno;
-	(void)regs;
+	(void)reason;
 	if (kernel_debugtrap_enabled()) {
 		task_schedule_user_rpc(THIS_TASK,
 #ifdef __x86_64__
@@ -491,28 +413,6 @@ DEFINE_SYSCALL3(errno_t, debugtrap,
 	}
 	return -ENOENT;
 }
-
-
-#ifdef __x86_64__
-DEFINE_SYSCALL32_3(errno_t, debugtrap,
-                   USER UNCHECKED struct ucpustate const *, state,
-                   syscall_ulong_t, trapno,
-                   USER UNCHECKED struct debug_trap_register const *, regs) {
-	(void)state;
-	(void)trapno;
-	(void)regs;
-	if (kernel_debugtrap_enabled()) {
-		task_schedule_user_rpc(THIS_TASK,
-		                       &sys_debugtrap_rpc32,
-		                       NULL,
-		                       TASK_RPC_FHIGHPRIO |
-		                       TASK_USER_RPC_FINTR,
-		                       NULL,
-		                       GFP_NORMAL);
-	}
-	return -ENOENT;
-}
-#endif /* __x86_64__ */
 
 
 DECL_END

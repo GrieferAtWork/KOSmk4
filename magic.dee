@@ -482,7 +482,7 @@ _err_unknown_argument:
 #if defined(__MAIN__) && __BASE_FILE__ == __FILE__
 try {
 	main([...][1:]);
-} catch (e...) {
+} @[interrupt] catch (e...) {
 	print e;
 	print repr Traceback.current;
 	File.Buffer.sync();

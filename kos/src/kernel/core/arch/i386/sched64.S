@@ -278,6 +278,12 @@ INTERN_FUNCTION(X86_ASMSYSCALL64(sched_yield))
 	cmpq   %rbx, %rbp
 	je     .Lyield_same_target
 .Ldo_task_yield_rbx_to_rbp:
+
+	/* Check for a scheduling override. */
+	movq   _this_cpu(%rbx), %rax
+	cmpq   $0, _this_cpu_override(%rax)
+	jne    .Lyield_same_target_with_override
+
 	/* CURR: %rbx */
 	/* NEXT: %rbp*/
 	movq   %rsp, _this_sched_state(%rbx)
@@ -290,11 +296,19 @@ INTERN_FUNCTION(X86_ASMSYSCALL64(sched_yield))
 	movq   %rbp, _this_cpu_current(%rbx)
 	movq   %rbp, %rax
 	jmp    x86_load_thread_rax_cpu_rbx
+.Lyield_same_target_with_override:
+#ifndef NDEBUG
+	cmpq   %rbx, _this_cpu_override(%rax)
+	je     .Lyield_same_target
+	int3   /* Assertion failed: CPU override does not match calling thread.
+	        * >> struct task *caller = %rbx;
+	        * >> struct cpu  *mycpu = %rax; */
+#endif /* !NDEBUG */
 .Lyield_same_target:
 	sti
 #ifndef CONFIG_NO_SMP
 	pause
-#endif
+#endif /* !CONFIG_NO_SMP */
 	jmp    .Lload_scpustate_rsp
 	.cfi_restore_state
 .Lillegal_task_yield:

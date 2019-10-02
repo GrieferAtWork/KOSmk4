@@ -269,10 +269,10 @@ got_exe:
 	local gdb_mode = options.get(opt.QEMU_GDB);
 	if (gdb_mode !is none) {
 		if (gdb_mode == "stub") {
-			/* Make use of out GDB-stub driver */
+			/* Make use of out GDB server driver */
 			qemu_arguments.extend({
 				"-serial", "tcp::1234,server",
-				"-initrd", binPath + "/os/drivers/gdbstub transport=serial:0x2f8:0xf3",
+				"-initrd", binPath + "/os/drivers/gdbserver transport=serial:0x2f8:0xf3",
 			});
 		} else if (gdb_mode == "qemu") {
 			/* Use qemu's builtin GDB support */
@@ -319,206 +319,211 @@ got_exe:
 	proc.stdout = w;
 	proc.stderr = w;
 	proc.start();
-	w.close();
+	try {
+		w.close();
 #undef CONFIG_POSTPROCESS_QEMU_SERIAL_OUTPUT
 #define CONFIG_POSTPROCESS_QEMU_SERIAL_OUTPUT 1
 #ifndef CONFIG_POSTPROCESS_QEMU_SERIAL_OUTPUT
-	while (local text = r.read(1)) {
-		File.stdout << text;
-		File.stdout.sync();
-	}
+		while (local text = r.read(1)) {
+			File.stdout << text;
+			File.stdout.sync();
+		}
 #else /* !CONFIG_POSTPROCESS_QEMU_SERIAL_OUTPUT */
-	local outFile = File.stddbg;
-	final local MAX_COMMAND_LENGTH = 512;
-	local running_addr2line: {string: Addr2line} = Dict();
-	local stored_data = Cell();
-	function writeData(data: Bytes) {
-		if (stored_data.value is bound) {
-			data = stored_data.value + data;
-			del stored_data.value;
-		}
-		local flushStart = 0;
-		local i = 0;
-		for (;;) {
-			local pos = data.find(") :", i);
-			if (pos < 0)
-				break;
-			local lineStart = data.rfind("\n", flushStart, pos);
-			if (lineStart >= 0) {
-				++lineStart;
+		local outFile = File.stddbg;
+		final local MAX_COMMAND_LENGTH = 512;
+		local running_addr2line: {string: Addr2line} = Dict();
+		local stored_data = Cell();
+		function writeData(data: Bytes) {
+			if (stored_data.value is bound) {
+				data = stored_data.value + data;
+				del stored_data.value;
+			}
+			local flushStart = 0;
+			local i = 0;
+			for (;;) {
+				local pos = data.find(") :", i);
+				if (pos < 0)
+					break;
+				local lineStart = data.rfind("\n", flushStart, pos);
+				if (lineStart >= 0) {
+					++lineStart;
 do_format_line:
-				local line = data[lineStart:pos];
-				if (line.isanyspace() || "(" !in line) {
-					i = pos + 3;
-					continue;
+					local line = data[lineStart:pos];
+					if (line.isanyspace() || "(" !in line) {
+						i = pos + 3;
+						continue;
+					}
+					/* Clickable line directive (must normalize the path) */
+					outFile.write(FINAL_FORMAT_RAW_DATA(data[flushStart:lineStart]));
+					local filename, none, line = line.partition("(")...;
+					filename = normalizeFilenameForLog(filename);
+					outFile.write(filename);
+					outFile.write("(");
+					outFile.write(line);
+					flushStart = pos;
+				} else if (flushStart == 0) {
+					lineStart = 0;
+					goto do_format_line;
 				}
-				/* Clickable line directive (must normalize the path) */
-				outFile.write(FINAL_FORMAT_RAW_DATA(data[flushStart:lineStart]));
-				local filename, none, line = line.partition("(")...;
-				filename = normalizeFilenameForLog(filename);
-				outFile.write(filename);
-				outFile.write("(");
-				outFile.write(line);
-				flushStart = pos;
-			} else if (flushStart == 0) {
-				lineStart = 0;
-				goto do_format_line;
+				i = pos + 3;
 			}
-			i = pos + 3;
-		}
-		local lineEnd = data.rfind("\n", flushStart);
-		local savedData;
-		if (lineEnd < 0) {
-			savedData = data[flushStart:];
-		} else {
-			++lineEnd;
-			outFile.write(FINAL_FORMAT_RAW_DATA(data[flushStart:lineEnd]));
-			savedData = data[lineEnd:];
-		}
-		if (savedData)
-			stored_data.value = savedData;
-	}
-	local tracedControllers: {string: TraceController} = Dict();
-	while (local text = r.read()) {
-		local flushStart = 0;
-		local len = #text;
-		for (;;) {
-			local i = text.find("%", flushStart);
-			if (i < 0)
-				break;
-			writeData(text[flushStart:i]);
-			++i;
-			flushStart = i;
-			if (i >= len) {
-				flushStart = i = 0;
-				text = r.read();
-				if (!text) {
-					writeData("%");
-					goto done_join;
-				}
-				len = #text;
-			}
-			if (text.substr(i, i + 1) != "{") {
-				writeData("%");
-				continue;
+			local lineEnd = data.rfind("\n", flushStart);
+			local savedData;
+			if (lineEnd < 0) {
+				savedData = data[flushStart:];
 			} else {
+				++lineEnd;
+				outFile.write(FINAL_FORMAT_RAW_DATA(data[flushStart:lineEnd]));
+				savedData = data[lineEnd:];
+			}
+			if (savedData)
+				stored_data.value = savedData;
+		}
+		local tracedControllers: {string: TraceController} = Dict();
+		while (local text = r.read()) {
+			local flushStart = 0;
+			local len = #text;
+			for (;;) {
+				local i = text.find("%", flushStart);
+				if (i < 0)
+					break;
+				writeData(text[flushStart:i]);
 				++i;
+				flushStart = i;
 				if (i >= len) {
 					flushStart = i = 0;
 					text = r.read();
 					if (!text) {
-						writeData("%{");
+						writeData("%");
 						goto done_join;
 					}
 					len = #text;
 				}
+				if (text.substr(i, i + 1) != "{") {
+					writeData("%");
+					continue;
+				} else {
+					++i;
+					if (i >= len) {
+						flushStart = i = 0;
+						text = r.read();
+						if (!text) {
+							writeData("%{");
+							goto done_join;
+						}
+						len = #text;
+					}
 again_find_match:
-				local end = text.findmatch("{", "}", i, i + MAX_COMMAND_LENGTH);
-				if (end < 0) {
-					if (len >= i + MAX_COMMAND_LENGTH) {
-						flushStart = i - 2;
-						goto do_flush_text;
+					local end = text.findmatch("{", "}", i, i + MAX_COMMAND_LENGTH);
+					if (end < 0) {
+						if (len >= i + MAX_COMMAND_LENGTH) {
+							flushStart = i - 2;
+							goto do_flush_text;
+						}
+						local temp = r.read();
+						if (!temp) {
+							flushStart = i - 2;
+							goto do_flush_text;
+						}
+						text = text + temp;
+						len = #text;
+						goto again_find_match;
 					}
-					local temp = r.read();
-					if (!temp) {
-						flushStart = i - 2;
-						goto do_flush_text;
-					}
-					text = text + temp;
-					len = #text;
-					goto again_find_match;
-				}
-				local command = text[i:end];
-				local argument = "";
-				if (":" in command)
-					command, none, argument = command.partition(":")...;
-				switch (command.strip()) {
-				case "trace": {
-					local method, name;
-					method, none, argument = argument.partition(":")...;
-					if (":" in argument) {
-						name, none, argument = argument.partition(":")...;
-					} else {
-						name = argument;
-						argument = "";
-					}
-					name = string(name);
-					local obj = tracedControllers.get(name);
-					if (obj is none)
-						tracedControllers[name] = obj = TraceController(name);
-					obj.doMethod(outFile, method, argument);
-				}	break;
-				case "artifact": {
-					local outfile, filesize = argument.scanf("%[^:]:%[^:]")...;
-					filesize = int(filesize);
-					with (local fp = File.open(
-							fs.joinpath(fs.headof(kernelFile), outfile), "w")) {
-						local temp = text[end + 1:];
-						local written = #temp;
-						if (written >= filesize) {
-							fp.write(temp[:filesize]);
-							flushStart = i = end + 1 + filesize;
+					local command = text[i:end];
+					local argument = "";
+					if (":" in command)
+						command, none, argument = command.partition(":")...;
+					switch (command.strip()) {
+					case "trace": {
+						local method, name;
+						method, none, argument = argument.partition(":")...;
+						if (":" in argument) {
+							name, none, argument = argument.partition(":")...;
 						} else {
-							fp.write(temp);
-							flushStart = i = len;
+							name = argument;
+							argument = "";
 						}
-						while (filesize > written) {
-							temp = r.read(filesize - written);
-							fp.write(temp);
-							written += #temp;
+						name = string(name);
+						local obj = tracedControllers.get(name);
+						if (obj is none)
+							tracedControllers[name] = obj = TraceController(name);
+						obj.doMethod(outFile, method, argument);
+					}	break;
+					case "artifact": {
+						local outfile, filesize = argument.scanf("%[^:]:%[^:]")...;
+						filesize = int(filesize);
+						with (local fp = File.open(
+								fs.joinpath(fs.headof(kernelFile), outfile), "w")) {
+							local temp = text[end + 1:];
+							local written = #temp;
+							if (written >= filesize) {
+								fp.write(temp[:filesize]);
+								flushStart = i = end + 1 + filesize;
+							} else {
+								fp.write(temp);
+								flushStart = i = len;
+							}
+							while (filesize > written) {
+								temp = r.read(filesize - written);
+								fp.write(temp);
+								written += #temp;
+							}
 						}
+					}	break;
+					case "vinfo": {
+						local binary, address, req_address;
+						binary, address, req_address, argument =
+							argument.scanf("%[^:]:%[^:]:%[^:]:%[^]")...;
+						binary = binary.replace("\\", "/").lstrip("/");
+						local a2l = running_addr2line.get(binary);
+						if (a2l is none) {
+							local host_binary = findDiskFileOrigin(groups, binary);
+							a2l = host_binary is none ? none : Addr2line(config, host_binary);
+							running_addr2line[binary] = a2l;
+						}
+						local is_first = true;
+						for (local file, line, func: a2l.addr2line(address)) {
+							if (!is_first)
+								writeData("\n");
+							printFormattedAddr2line(
+								outFile: outFile,
+								format: argument,
+								file: file,
+								line: line,
+								func: func,
+								addr: req_address);
+							is_first = false;
+						}
+					}	break;
+					case "vload":
+						argument = argument.replace("\\", "/").lstrip("/");
+						if (argument !in running_addr2line) {
+							local host_binary = findDiskFileOrigin(groups, argument);
+							local a2l = host_binary is none ? none : Addr2line(config, host_binary);
+							running_addr2line[argument] = a2l;
+						}
+						break;
+					default:
+						flushStart = i - 2;
+						goto do_flush_text;
 					}
-				}	break;
-				case "vinfo": {
-					local binary, address, req_address;
-					binary, address, req_address, argument =
-						argument.scanf("%[^:]:%[^:]:%[^:]:%[^]")...;
-					binary = binary.replace("\\", "/").lstrip("/");
-					local a2l = running_addr2line.get(binary);
-					if (a2l is none) {
-						local host_binary = findDiskFileOrigin(groups, binary);
-						a2l = host_binary is none ? none : Addr2line(config, host_binary);
-						running_addr2line[binary] = a2l;
-					}
-					local is_first = true;
-					for (local file, line, func: a2l.addr2line(address)) {
-						if (!is_first)
-							writeData("\n");
-						printFormattedAddr2line(
-							outFile: outFile,
-							format: argument,
-							file: file,
-							line: line,
-							func: func,
-							addr: req_address);
-						is_first = false;
-					}
-				}	break;
-				case "vload":
-					argument = argument.replace("\\", "/").lstrip("/");
-					if (argument !in running_addr2line) {
-						local host_binary = findDiskFileOrigin(groups, argument);
-						local a2l = host_binary is none ? none : Addr2line(config, host_binary);
-						running_addr2line[argument] = a2l;
-					}
-					break;
-				default:
-					flushStart = i - 2;
-					goto do_flush_text;
+					flushStart = i = end + 1;
 				}
-				flushStart = i = end + 1;
 			}
-		}
 do_flush_text:
-		writeData(text[flushStart:]);
-	}
+			writeData(text[flushStart:]);
+		}
 done_join:
-	if (stored_data.value is bound)
-		outFile.write(FINAL_FORMAT_RAW_DATA(stored_data.value));
-	for (local none, x: running_addr2line)
-		x.close();
+		if (stored_data.value is bound)
+			outFile.write(FINAL_FORMAT_RAW_DATA(stored_data.value));
+		for (local none, x: running_addr2line)
+			x.close();
 #endif /* CONFIG_POSTPROCESS_QEMU_SERIAL_OUTPUT */
-	joinProcess(proc);
+		joinProcess(proc);
+	} @[interrupt] catch (e...) {
+		proc.terminate();
+		throw;
+	}
 }
 
 

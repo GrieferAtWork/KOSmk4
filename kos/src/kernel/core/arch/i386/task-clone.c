@@ -322,39 +322,11 @@ again_lock_vm:
 #endif
 
 		if (kernel_debugtrap_enabled()) {
-			char regbuf[64];
-			/* FIXME: Actually telling GDB about the correct thread ID (which by the way is impossible
-			 *        to do for us dynamically, since its format depends on configurations only known
-			 *        to the gdbstub driver), causes GDB to freeze with its process taking up 100% cpu
-			 *        usage (though mind you, only using a single core of my host which equates to 8%)
-			 *        However, just putting in the multiprocess-compliant pid=1;tid=1 seems to prevent
-			 *        it from hanging itself...
-			 *        Looking at the GDB source code I've started to get the feeling that it expects 2
-			 *        trap interrupts when a fork happens (???), however this can only ever be done in
-			 *        non-stop mode (which is a way bigger thing of weirdness that the online documentation
-			 *        fails to let me comprehend), so I don't really know what GDB wants from me...
-			 *        Anyways, the online documentation of the `fork' stop reply packet ...
-			 *        https://sourceware.org/gdb/onlinedocs/gdb/Stop-Reply-Packets.html#Stop-Reply-Packets
-			 *        ... doesn't even mention the fact that a fork always implies there being 2 processes,
-			 *        nor does it mention which of them should send the stop reply.
-			 *        Inference from other stop reply packets also doesn't help:
-			 *         #1: Since a vfork() reply exists, and a vfork() always implies that the parent process
-			 *             remains suspended until the child exit()- or exec()s would imply that it is the
-			 *             child process (and only the child?) which is supposed to send fork notifications
-			 *             However, since the docs _do_ mention that the fork stop reason should be followed
-			 *             by the _child_ thread-id, GDB would never know who the parent is, so while vfork()
-			 *             isn't even on the table, its similarity poses more questions than it answers
-			 *         #2: Since fork() should include the thread-ID of the child process, it would seem
-			 *             obvious that the parent process should send a packet like:
-			 *             $T05[...]thread:<PARENT_THREAD_ID>;[...]fork:<CHILD_THREAD_ID>;#[...]
-			 *             However, having tried this, it is what causes GDB to hang itself, so either I'm
-			 *             doing this part wrong, or this isn't the answer either.
-			 * NOTE: This FIXME is mirrored in `/kos/src/kernel/modgdbstu/gdb.c'
-			 */
-			sprintf(regbuf, DEBUG_TRAP_REGISTER_FORK ":p%x.%x;",
-			        task_getrootpid_of_s(result),
-			        task_getroottid_of_s(result));
-			kernel_debugtrap(SIGTRAP, regbuf);
+			struct debugtrap_reason r;
+			r.dtr_signo  = SIGTRAP;
+			r.dtr_reason = DEBUGTRAP_REASON_FORK;
+			r.dtr_ptrarg = result;
+			kernel_debugtrap(&r);
 		}
 
 		/* Actually start execution of the newly created thread. */

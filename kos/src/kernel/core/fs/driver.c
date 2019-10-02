@@ -3854,7 +3854,12 @@ done_dynsym:
 			 * NOTE: This is done after relocations, but before initializers, so that
 			 *       a debugger is able to safely set breakpoints without overriding
 			 *       memory locations possibly affected by relocations. */
-			kernel_debugtrap(SIGTRAP, DEBUG_TRAP_REGISTER_LIBRARY ":;");
+			if (kernel_debugtrap_enabled()) {
+				struct debugtrap_reason r;
+				r.dtr_signo  = SIGTRAP;
+				r.dtr_reason = DEBUGTRAP_REASON_LIBRARY;
+				kernel_debugtrap(&r);
+			}
 			/* Run driver initializers. */
 			driver_run_initializers(result);
 			/* Invoke dynamic driver-level callbacks for a new driver being loaded. */

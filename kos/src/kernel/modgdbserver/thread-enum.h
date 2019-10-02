@@ -16,20 +16,30 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_MODGDB_REMOTE_SERIAL_H
-#define GUARD_MODGDB_REMOTE_SERIAL_H 1
+#ifndef GUARD_MODGDBSERVER_THREAD_ENUM_H
+#define GUARD_MODGDBSERVER_THREAD_ENUM_H 1
 
 #include <kernel/compiler.h>
+#include <sched/cpu.h>
 
 #include "gdb.h"
 
 DECL_BEGIN
 
-/* Serial-based communications interface */
-INTDEF void FCALL GDBSerial_PutData(void const *buf, size_t bufsize);
-INTDEF void FCALL GDBSerial_Initialize(char *args);
-INTDEF void FCALL GDBSerial_Finalize(void);
+typedef ssize_t /*NOTHROW*/(FCALL PTHREAD_ENUM_CALLBACK)(void *arg, struct task *__restrict thread);
+
+/* Enumerate thread that are:
+ *  - In EVERY_CPU->c_running
+ *  - In EVERY_CPU->c_sleeping
+ *  - In EVERY_CPU->c_pending
+ *  - In FORCPU(EVERY_CPU, _this_idle)
+ * @return: >= 0: The total sum of return values of `callback'
+ * @return: <  0: The first negative return value of `callback' */
+INTDEF ssize_t NOTHROW(FCALL GDBThread_Enumerate)(PTHREAD_ENUM_CALLBACK callback, void *arg);
+
+/* Return the nth, system-wide thread, or NULL if `nth' is out-of-bounds */
+INTDEF REF struct task *NOTHROW(FCALL GDBThread_GetNth)(size_t nth);
 
 DECL_END
 
-#endif /* !GUARD_MODGDB_REMOTE_SERIAL_H */
+#endif /* !GUARD_MODGDBSERVER_THREAD_ENUM_H */

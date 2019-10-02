@@ -27,9 +27,9 @@ DECL_BEGIN
 
 #ifndef CONFIG_NO_FPU
 #define CONFIG_FPU 1
-#else
+#else /* !CONFIG_NO_FPU */
 #undef CONFIG_FPU
-#endif
+#endif /* CONFIG_NO_FPU */
 
 #define FPU_STATE_SSTATE 0 /* `struct sfpustate' is used */
 #define FPU_STATE_XSTATE 1 /* `struct xfpustate' is used */

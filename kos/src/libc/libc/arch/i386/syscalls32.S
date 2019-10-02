@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xedef7563 */
+/* HASH CRC-32:0x6b5e4f2e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11615,24 +11615,21 @@ END(libc_sys_set_library_listdef)
  * given `state', though given the purpose of this system call being
  * to inform a connected debugger of some breakable event, allowing
  * it to do whatever it wishes before execution is resumed.
- * @param: trapno:   One of `SIG*' (e.g. `SIGTRAP')
- * @param: regs:     When non-NULL, additional trap register data
+ * @param: reason:   When non-NULL, the reason for the debug trap (else: use `SIGTRAP:DEBUGTRAP_REASON_NONE')
  * @param: state:    When non-NULL, the CPU state where the trap should return to by default
  * @return: -EOK:    `state' was NULL and the trap returned successfully
  * @return: -ENOENT: No debugger is connected to the calling process/process-group/system */
 .section .text.crt.syscall.debugtrap
 /* errno_t debugtrap(struct ucpustate const *state,
- *                   syscall_ulong_t trapno,
- *                   struct debug_trap_register const *regs) */
+ *                   struct debugtrap_reason const *reason) */
 INTERN_FUNCTION(libc_sys_debugtrap)
-	/* Argument count: 3 */
+	/* Argument count: 2 */
 	.cfi_startproc
 	movl   $SYS_debugtrap, %eax
 #ifdef CONFIG_SYSCALL_USING_INT80
 	pushl_cfi_r %ebx
 	movl   8(%esp), %ebx
 	movl   12(%esp), %ecx
-	movl   16(%esp), %edx
 	clc
 	int    $0x80
 	popl_cfi_r %ebx
@@ -11643,14 +11640,13 @@ INTERN_FUNCTION(libc_sys_debugtrap)
 	pushl_cfi_r %ebx
 	movl   16(%esp), %ebx
 	movl   20(%esp), %ecx
-	movl   24(%esp), %edx
 	call   libc_x86_sysenter_common
 	popl_cfi_r %ebx
 	popl_cfi_r %ebp
 	popl_cfi_r %edi
 	ret
 #else
-	jmp    libc_x86_exec_syscall3
+	jmp    libc_x86_exec_syscall2
 #endif
 	.cfi_endproc
 END(libc_sys_debugtrap)
@@ -24876,24 +24872,21 @@ END(libc_sys_Xset_library_listdef)
  * given `state', though given the purpose of this system call being
  * to inform a connected debugger of some breakable event, allowing
  * it to do whatever it wishes before execution is resumed.
- * @param: trapno:   One of `SIG*' (e.g. `SIGTRAP')
- * @param: regs:     When non-NULL, additional trap register data
+ * @param: reason:   When non-NULL, the reason for the debug trap (else: use `SIGTRAP:DEBUGTRAP_REASON_NONE')
  * @param: state:    When non-NULL, the CPU state where the trap should return to by default
  * @return: -EOK:    `state' was NULL and the trap returned successfully
  * @return: -ENOENT: No debugger is connected to the calling process/process-group/system */
 .section .text.crt.syscall.Xdebugtrap
 /* errno_t debugtrap(struct ucpustate const *state,
- *                   syscall_ulong_t trapno,
- *                   struct debug_trap_register const *regs) */
+ *                   struct debugtrap_reason const *reason) */
 INTERN_FUNCTION(libc_sys_Xdebugtrap)
-	/* Argument count: 3 */
+	/* Argument count: 2 */
 	.cfi_startproc
 	movl   $SYS_debugtrap, %eax
 #ifdef CONFIG_SYSCALL_USING_INT80
 	pushl_cfi_r %ebx
 	movl   8(%esp), %ebx
 	movl   12(%esp), %ecx
-	movl   16(%esp), %edx
 	stc
 	int    $0x80
 	popl_cfi_r %ebx
@@ -24904,14 +24897,13 @@ INTERN_FUNCTION(libc_sys_Xdebugtrap)
 	pushl_cfi_r %ebx
 	movl   16(%esp), %ebx
 	movl   20(%esp), %ecx
-	movl   24(%esp), %edx
 	call   libc_x86_sysenter_Xcommon
 	popl_cfi_r %ebx
 	popl_cfi_r %ebp
 	popl_cfi_r %edi
 	ret
 #else
-	jmp    libc_x86_exec_Xsyscall3
+	jmp    libc_x86_exec_Xsyscall2
 #endif
 	.cfi_endproc
 END(libc_sys_Xdebugtrap)

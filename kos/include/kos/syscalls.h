@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x881141a6 */
+/* HASH CRC-32:0xf527c3bc */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -86,7 +86,7 @@ struct __timespec64;
 struct __timeval32;
 struct __timeval64;
 struct __utimbuf32;
-struct debug_trap_register;
+struct debugtrap_reason;
 struct dirent;
 struct epoll_event;
 struct exception_data;
@@ -349,12 +349,11 @@ __CDECLARE_SC(,__fd_t,creat,(char const *__filename, __mode_t __mode),(__filenam
  * given `state', though given the purpose of this system call being
  * to inform a connected debugger of some breakable event, allowing
  * it to do whatever it wishes before execution is resumed.
- * @param: trapno:   One of `SIG*' (e.g. `SIGTRAP')
- * @param: regs:     When non-NULL, additional trap register data
+ * @param: reason:   When non-NULL, the reason for the debug trap (else: use `SIGTRAP:DEBUGTRAP_REASON_NONE')
  * @param: state:    When non-NULL, the CPU state where the trap should return to by default
  * @return: -EOK:    `state' was NULL and the trap returned successfully
  * @return: -ENOENT: No debugger is connected to the calling process/process-group/system */
-__CDECLARE_SC(,__errno_t,debugtrap,(struct ucpustate const *__state, __syscall_ulong_t __trapno, struct debug_trap_register const *__regs),(__state,__trapno,__regs))
+__CDECLARE_SC(,__errno_t,debugtrap,(struct ucpustate const *__state, struct debugtrap_reason const *__reason),(__state,__reason))
 #endif /* !__sys_debugtrap_defined */
 #endif /* sys_debugtrap... */
 #if __CRT_HAVE_SC(detach)
@@ -3135,12 +3134,11 @@ __CDECLARE_XSC(,__fd_t,creat,(char const *__filename, __mode_t __mode),(__filena
  * given `state', though given the purpose of this system call being
  * to inform a connected debugger of some breakable event, allowing
  * it to do whatever it wishes before execution is resumed.
- * @param: trapno:   One of `SIG*' (e.g. `SIGTRAP')
- * @param: regs:     When non-NULL, additional trap register data
+ * @param: reason:   When non-NULL, the reason for the debug trap (else: use `SIGTRAP:DEBUGTRAP_REASON_NONE')
  * @param: state:    When non-NULL, the CPU state where the trap should return to by default
  * @return: -EOK:    `state' was NULL and the trap returned successfully
  * @return: -ENOENT: No debugger is connected to the calling process/process-group/system */
-__CDECLARE_XSC(,__errno_t,debugtrap,(struct ucpustate const *__state, __syscall_ulong_t __trapno, struct debug_trap_register const *__regs),(__state,__trapno,__regs))
+__CDECLARE_XSC(,__errno_t,debugtrap,(struct ucpustate const *__state, struct debugtrap_reason const *__reason),(__state,__reason))
 #endif /* !__sys_Xdebugtrap_defined */
 #endif /* sys_Xdebugtrap... */
 #if __CRT_HAVE_XSC(detach)

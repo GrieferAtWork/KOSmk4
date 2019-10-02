@@ -16,8 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_MODGDB_ARCH_I386_INTERRUPT_C
-#define GUARD_MODGDB_ARCH_I386_INTERRUPT_C 1
+#ifndef GUARD_MODGDBSERVER_ARCH_I386_INTERRUPT_C
+#define GUARD_MODGDBSERVER_ARCH_I386_INTERRUPT_C 1
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -34,40 +34,11 @@ DECL_BEGIN
 
 DATDEF struct idt_segment x86_idt_start[256];
 DATDEF struct idt_segment x86_idt_start_traced[256];
-PRIVATE struct idt_segment *pdyn_x86_idt_start_debug = NULL;
 
 
 #define IDT_VARIANT_NORMAL 0 /* `x86_idt_start' */
 #define IDT_VARIANT_TRACED 1 /* `x86_idt_start_traced' */
-#define IDT_VARIANT_DEBUG  2 /* `x86_idt_start_debug' */
-#define IDT_VARIANT_COUNT  3 /* Number of known IDT variants. */
-
-/* Return the currently active IDT variant (one of `IDT_VARIANT_*') */
-LOCAL NOBLOCK WUNUSED unsigned int
-NOTHROW(FCALL GDBX86RemoteInterrupt_GetCurrentIDTVariant)(void) {
-	struct desctab idt;
-	__sidt(&idt);
-	assertf(idt.dt_limit == (256 * sizeof(struct idt_segment)) - 1,
-	        "Incorrect IDT limit %I16u", idt.dt_limit);
-	if (idt.dt_base == (uintptr_t)pdyn_x86_idt_start_debug) {
-		assert(pdyn_x86_idt_start_debug != NULL);
-		return IDT_VARIANT_DEBUG;
-	}
-	if (idt.dt_base == (uintptr_t)x86_idt_start)
-		return IDT_VARIANT_NORMAL;
-	assertf(idt.dt_base == (uintptr_t)x86_idt_start_traced,
-	        "Unrecognized IDT variant at %p", idt.dt_base);
-	return IDT_VARIANT_TRACED;
-
-}
-
-
-PRIVATE WUNUSED NONNULL((1)) struct icpustate *FCALL
-GDBX86RemoteInterrupt_NoopHandler(struct icpustate *__restrict UNUSED(state)) {
-	return NULL; /* Unhandled interrupt */
-}
-INTERN PGDBREMOTE_INTERRUPT_HANDLER GDBX86RemoteInterrupt_CHandler = &GDBX86RemoteInterrupt_NoopHandler;
-
+#define IDT_VARIANT_COUNT  2 /* Number of known IDT variants. */
 
 typedef struct {
 	struct idt_segment ib_segments[IDT_VARIANT_COUNT]; /* Saved segments. */
@@ -94,13 +65,9 @@ GDBX86InterruptBackup_Override(GDBX86InterruptBackup *__restrict backup,
 	COMPILER_BARRIER();
 	backup->ib_segments[IDT_VARIANT_NORMAL] = x86_idt_start[vector];
 	backup->ib_segments[IDT_VARIANT_TRACED] = x86_idt_start_traced[vector];
-	if (pdyn_x86_idt_start_debug)
-		backup->ib_segments[IDT_VARIANT_DEBUG] = pdyn_x86_idt_start_debug[vector];
 	COMPILER_BARRIER();
 	GDBX86Interrupt_EncodeSegment(&x86_idt_start[vector], asmHandler, dpl);
 	GDBX86Interrupt_EncodeSegment(&x86_idt_start_traced[vector], asmHandler, dpl);
-	if (pdyn_x86_idt_start_debug)
-		GDBX86Interrupt_EncodeSegment(&pdyn_x86_idt_start_debug[vector], asmHandler, dpl);
 	COMPILER_BARRIER();
 }
 
@@ -109,50 +76,8 @@ GDBX86InterruptBackup_Restore(GDBX86InterruptBackup *__restrict backup,
                               isr_vector_t vector) {
 	x86_idt_start[vector]        = backup->ib_segments[IDT_VARIANT_NORMAL];
 	x86_idt_start_traced[vector] = backup->ib_segments[IDT_VARIANT_TRACED];
-	if (pdyn_x86_idt_start_debug)
-		pdyn_x86_idt_start_debug[vector] = backup->ib_segments[IDT_VARIANT_DEBUG];
 }
 
-
-
-/* Backup of segments overwritten for the remote interrupt handler. */
-PRIVATE GDBX86InterruptBackup GDBX86RemoteInterrupt_Backup;
-
-/* The assembly-level handler for the interrupt */
-INTDEF void ASMCALL GDBX86RemoteInterrupt_AsmHandler(void);
-
-/* Return the original handler of the interrupt (called from assembly) */
-INTERN WUNUSED ATTR_RETNONNULL NOBLOCK void *
-NOTHROW(FCALL GDBX86RemoteInterrupt_GetOriginalHandler)(void) {
-	unsigned int variant;
-	struct idt_segment segment;
-	variant = GDBX86RemoteInterrupt_GetCurrentIDTVariant();
-	segment = GDBX86RemoteInterrupt_Backup.ib_segments[variant];
-	return (void *)segment_rdbaseX(&segment.i_seg);
-}
-
-
-
-/* Register/Unregister the interrupt handler used by the communications driver.
- * Note that only a single handler can ever be registered! */
-INTERN NONNULL((2)) void FCALL
-GDBRemote_RegisterInterruptHandler(isr_vector_t vector,
-                                   PGDBREMOTE_INTERRUPT_HANDLER func) {
-	assert(GDBX86RemoteInterrupt_CHandler == &GDBX86RemoteInterrupt_NoopHandler);
-	GDBX86InterruptBackup_Override(&GDBX86RemoteInterrupt_Backup, vector,
-	                               &GDBX86RemoteInterrupt_AsmHandler, 0);
-	COMPILER_BARRIER();
-	GDBX86RemoteInterrupt_CHandler = func;
-}
-
-
-INTERN void FCALL
-GDBRemote_UnregisterInterruptHandler(isr_vector_t vector) {
-	/* Restore saved IDT segments. */
-	GDBX86InterruptBackup_Restore(&GDBX86RemoteInterrupt_Backup, vector);
-	COMPILER_BARRIER();
-	GDBX86RemoteInterrupt_CHandler = &GDBX86RemoteInterrupt_NoopHandler;
-}
 
 
 
@@ -167,10 +92,7 @@ INTDEF void ASMCALL GDBX86Interrupt_AsmInt3Handler(void);
 PRIVATE bool GDBInterrupt_WasInitialized = false;
 
 /* Initialize/Finalize GDB interrupt handling. */
-INTERN void FCALL
-GDBInterrupt_Initialize(void) {
-	pdyn_x86_idt_start_debug = (struct idt_segment *)driver_symbol(&kernel_driver,
-	                                                               "x86_idt_start_debug");
+INTERN void FCALL GDBInterrupt_Init(void) {
 	GDBX86InterruptBackup_Override(&GDBX86Interrupt_Backup01, 0x01,
 	                               &GDBX86Interrupt_AsmInt1Handler, 0);
 	/* NOTE: We set DPL=3 for int3, so that user-space
@@ -181,8 +103,7 @@ GDBInterrupt_Initialize(void) {
 	GDBInterrupt_WasInitialized = true;
 }
 
-INTERN void FCALL
-GDBInterrupt_Finalize(void) {
+INTERN void FCALL GDBInterrupt_Fini(void) {
 	if (GDBInterrupt_WasInitialized) {
 		/* Restore the original interrupt handlers for INT1 and INT3 */
 		GDBX86InterruptBackup_Restore(&GDBX86Interrupt_Backup03, 0x03);
@@ -195,4 +116,4 @@ GDBInterrupt_Finalize(void) {
 
 DECL_END
 
-#endif /* !GUARD_MODGDB_ARCH_I386_INTERRUPT_C */
+#endif /* !GUARD_MODGDBSERVER_ARCH_I386_INTERRUPT_C */

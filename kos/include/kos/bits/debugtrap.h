@@ -21,16 +21,28 @@
 
 #include <__stdinc.h>
 
+#include <hybrid/typecore.h>
+
+#include <bits/types.h>
+
 __DECL_BEGIN
 
+#define __OFFSET_DEBUGTRAP_REASON_SIGNO  0
+#define __OFFSET_DEBUGTRAP_REASON_REASON 4
+#define __OFFSET_DEBUGTRAP_REASON_INTARG 8
+#define __OFFSET_DEBUGTRAP_REASON_STRARG 8
+#define __OFFSET_DEBUGTRAP_REASON_PTRARG 8
+#define __SIZEOF_DEBUGTRAP_REASON (8 + __SIZEOF_POINTER__)
+
 #ifdef __CC__
-struct debug_trap_register {
-	/* Trap register pair.
-	 * e.g.: { "library", "/lib/libc.so" }
-	 * Used to inform a GDB remote of some special trap
-	 * event which it may generate a breakpoint for. */
-	char const *dtr_name;  /* [0..1][SENTINEL(NULL)] Register name */
-	char const *dtr_value; /* [1..1][valid_if(dtr_name)] Register value */
+struct debugtrap_reason /*[PREFIX(dtr_)]*/ {
+	__uint32_t dtr_signo;  /* Trap signal number (one of `SIG*' from <bits/signum.h>) */
+	__uint32_t dtr_reason; /* Trap reason (one of `DEBUGTRAP_REASON_*') */
+	union {
+		__uintptr_t dtr_intarg; /* Integer argument. */
+		char const *dtr_strarg; /* String argument. */
+		void       *dtr_ptrarg; /* Pointer argument. */
+	};
 };
 #endif /* __CC__ */
 

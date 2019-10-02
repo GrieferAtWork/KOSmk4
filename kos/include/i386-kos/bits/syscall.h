@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x54c01246 */
+/* HASH CRC-32:0x6ef9c86d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -467,12 +467,11 @@
  * given `state', though given the purpose of this system call being
  * to inform a connected debugger of some breakable event, allowing
  * it to do whatever it wishes before execution is resumed.
- * @param: trapno:   One of `SIG*' (e.g. `SIGTRAP')
- * @param: regs:     When non-NULL, additional trap register data
+ * @param: reason:   When non-NULL, the reason for the debug trap (else: use `SIGTRAP:DEBUGTRAP_REASON_NONE')
  * @param: state:    When non-NULL, the CPU state where the trap should return to by default
  * @return: -EOK:    `state' was NULL and the trap returned successfully
  * @return: -ENOENT: No debugger is connected to the calling process/process-group/system */
-#define SYS_debugtrap               __NR_debugtrap               /* errno_t debugtrap(struct ucpustate const *state, syscall_ulong_t trapno, struct debug_trap_register const *regs) */
+#define SYS_debugtrap               __NR_debugtrap               /* errno_t debugtrap(struct ucpustate const *state, struct debugtrap_reason const *reason) */
 #define SYS_lfutex                  __NR_lfutex                  /* syscall_slong_t lfutex(uintptr_t *uaddr, syscall_ulong_t futex_op, uintptr_t val, struct __timespec64 const *timeout, uintptr_t val2) */
 #define SYS_lseek64                 __NR_lseek64                 /* int64_t lseek64(fd_t fd, int64_t offset, syscall_ulong_t whence) */
 #define SYS_lfutexlock              __NR_lfutexlock              /* syscall_slong_t lfutexlock(uintptr_t *ulockaddr, uintptr_t *uaddr, syscall_ulong_t futex_op, uintptr_t val, struct __timespec64 const *timeout, uintptr_t val2) */

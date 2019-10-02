@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d56cbfc */
+/* HASH CRC-32:0x95caceda */
 DEFINE_PUBLIC_WEAK_ALIAS(sys_exit, sys_invalid1);                    /* 1 */
 DEFINE_PUBLIC_WEAK_ALIAS(sys_fork, sys_invalid0);                    /* 2 */
 DEFINE_PUBLIC_WEAK_ALIAS(sys_read, sys_invalid3);                    /* 3 */
@@ -307,7 +307,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_time64, sys_invalid1);                  /* 0x800000
 DEFINE_PUBLIC_WEAK_ALIAS(sys_set_exception_handler, sys_invalid3);   /* 0x8000000e */
 DEFINE_PUBLIC_WEAK_ALIAS(sys_get_exception_handler, sys_invalid3);   /* 0x8000000f */
 DEFINE_PUBLIC_WEAK_ALIAS(sys_set_library_listdef, sys_invalid1);     /* 0x80000010 */
-DEFINE_PUBLIC_WEAK_ALIAS(sys_debugtrap, sys_invalid3);               /* 0x80000011 */
+DEFINE_PUBLIC_WEAK_ALIAS(sys_debugtrap, sys_invalid2);               /* 0x80000011 */
 DEFINE_PUBLIC_WEAK_ALIAS(sys_lfutex, sys_invalid5);                  /* 0x80000012 */
 DEFINE_PUBLIC_WEAK_ALIAS(sys_lseek64, sys_invalid4);                 /* 0x80000013 */
 DEFINE_PUBLIC_WEAK_ALIAS(sys_lfutexlock, sys_invalid6);              /* 0x80000014 */

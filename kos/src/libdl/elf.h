@@ -131,10 +131,11 @@ struct elf_dlsection {
 #ifdef __INTELLISENSE__
 INTDEF void CC DlSection_Incref(DlSection *__restrict self);
 INTDEF void CC DlSection_Decref(DlSection *__restrict self);
-#else
-#define DlSection_Incref(self)    ATOMIC_FETCHINC((self)->ds_refcnt)
-#define DlSection_Decref(self)   (ATOMIC_DECFETCH((self)->ds_refcnt) || (DlSection_Destroy(self),0))
-#endif
+#else /* __INTELLISENSE__ */
+#define DlSection_Incref(self) (ATOMIC_FETCHINC((self)->ds_refcnt))
+#define DlSection_Decref(self) (ATOMIC_DECFETCH((self)->ds_refcnt) || (DlSection_Destroy(self), 0))
+#endif /* !__INTELLISENSE__ */
+
 FORCELOCAL bool CC
 DlSection_TryIncref(DlSection *__restrict self) {
 	refcnt_t refcnt;
@@ -145,6 +146,7 @@ DlSection_TryIncref(DlSection *__restrict self) {
 	} while (!ATOMIC_CMPXCH_WEAK(self->ds_refcnt, refcnt, refcnt + 1));
 	return true;
 }
+
 INTDEF void CC DlSection_Destroy(DlSection *__restrict self);
 
 
@@ -247,10 +249,12 @@ LOCAL void CC DlModule_AddToGlobals(DlModule *__restrict self) {
 	self->dm_globals.ln_next  = NULL;
 	*plist                    = self;
 }
+
 LOCAL void CC DlModule_RemoveFromGlobals(DlModule *__restrict self) {
 	assert(self != &ld_rtld_module);
 	*self->dm_globals.ln_pself = self->dm_globals.ln_next;
 }
+
 LOCAL void CC DlModule_AddToAll(DlModule *__restrict self) {
 	DlModule **plist, *next;
 	plist = &DlModule_AllList;
@@ -260,6 +264,7 @@ LOCAL void CC DlModule_AddToAll(DlModule *__restrict self) {
 	self->dm_modules.ln_next  = NULL;
 	*plist                    = self;
 }
+
 LOCAL void CC DlModule_RemoveFromAll(DlModule *__restrict self) {
 	assert(self != &ld_rtld_module);
 	*self->dm_modules.ln_pself = self->dm_modules.ln_next;
@@ -279,11 +284,12 @@ INTDEF char *ld_library_path_env;
 INTDEF void CC DlModule_Incref(DlModule *__restrict self);
 INTDEF bool CC DlModule_Decref(DlModule *__restrict self);
 INTDEF bool CC DlModule_DecrefNoKill(DlModule *__restrict self);
-#else
+#else /* __INTELLISENSE__ */
 #define DlModule_Incref(self)         ATOMIC_FETCHINC((self)->dm_refcnt)
 #define DlModule_Decref(self)        (ATOMIC_DECFETCH((self)->dm_refcnt) || (DlModule_Destroy(self),0))
 #define DlModule_DecrefNoKill(self)   ATOMIC_FETCHDEC((self)->dm_refcnt)
-#endif
+#endif /* !__INTELLISENSE__ */
+
 FORCELOCAL bool CC
 DlModule_TryIncref(DlModule *__restrict self) {
 	refcnt_t refcnt;
@@ -294,6 +300,7 @@ DlModule_TryIncref(DlModule *__restrict self) {
 	} while (!ATOMIC_CMPXCH_WEAK(self->dm_refcnt, refcnt, refcnt + 1));
 	return true;
 }
+
 INTDEF void CC DlModule_Destroy(DlModule *__restrict self);
 
 /* Open a DL Module.
@@ -496,6 +503,8 @@ INTDEF char const *FCALL dlsec_builtin_name(size_t sect_index);
  * application ungracefully. */
 INTDEF ATTR_RETNONNULL void *FCALL require_global(char const *__restrict name);
 
+/* Set to true if the sys_debugtrap() system call is disabled. */
+INTDEF bool sys_debugtrap_disabled;
 
 DECL_END
 

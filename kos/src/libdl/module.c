@@ -54,12 +54,12 @@ DlModule_Destroy(DlModule *__restrict self) {
 	atomic_rwlock_endwrite(&DlModule_AllLock);
 
 	/* Trigger the trap informing a debugger of the change in loaded libraries. */
-	{
-		struct debug_trap_register regs[2];
-		regs[0].dtr_name  = DEBUG_TRAP_REGISTER_LIBRARY;
-		regs[0].dtr_value = "";
-		regs[1].dtr_name  = NULL;
-		sys_debugtrap(NULL, SIGTRAP, regs);
+	if (!sys_debugtrap_disabled) {
+		struct debugtrap_reason r;
+		r.dtr_signo  = SIGTRAP;
+		r.dtr_reason = DEBUGTRAP_REASON_LIBRARY;
+		if (sys_debugtrap(NULL, &r) == -ENOENT)
+			sys_debugtrap_disabled = true;
 	}
 
 	/* Unbind the module from the global symbol table. */

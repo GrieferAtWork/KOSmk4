@@ -24,8 +24,8 @@ gcc_opt.append("-fexceptions");
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_MODGDB_HEX_C
-#define GUARD_MODGDB_HEX_C 1
+#ifndef GUARD_MODGDBSERVER_HEX_C
+#define GUARD_MODGDBSERVER_HEX_C 1
 
 #include <kernel/compiler.h>
 
@@ -51,7 +51,6 @@ INTERN_CONST char const GDB_HexChars[16] = {
 	[0xe] = 'e',
 	[0xf] = 'f',
 };
-
 
 #pragma GCC diagnostic ignored "-Woverride-init"
 INTERN_CONST u8 const GDB_HexValues[256] = {
@@ -87,4 +86,4 @@ INTERN_CONST u8 const GDB_HexValues[256] = {
 
 DECL_END
 
-#endif /* !GUARD_MODGDB_HEX_C */
+#endif /* !GUARD_MODGDBSERVER_HEX_C */

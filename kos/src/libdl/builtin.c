@@ -53,9 +53,12 @@ NOTHROW_RPC(LIBCCALL syslog_printer)(void *arg,
 INTERN uintptr_t __stack_chk_guard = 0x123baf37;
 DEFINE_INTERN_ALIAS(__stack_chk_fail,__stack_chk_fail_local);
 INTERN ATTR_NORETURN void __stack_chk_fail_local(void) {
+	struct debugtrap_reason r;
 	syslog(LOG_ERR, "[rtld] Stack check failure [pc=%p]\n",
 	       __builtin_return_address(0));
-	sys_debugtrap(NULL, SIGABRT, NULL);
+	r.dtr_signo  = SIGABRT;
+	r.dtr_reason = DEBUGTRAP_REASON_NONE;
+	sys_debugtrap(NULL, &r);
 	sys_exit_group(EXIT_FAILURE);
 }
 
@@ -86,7 +89,12 @@ assertion_failure_core(struct assert_args *__restrict args) {
 		va_end(vargs);
 		syslog(LOG_ERR, "\n");
 	}
-	sys_debugtrap(NULL, SIGABRT, NULL);
+	{
+		struct debugtrap_reason r;
+		r.dtr_signo  = SIGABRT;
+		r.dtr_reason = DEBUGTRAP_REASON_NONE;
+		sys_debugtrap(NULL, &r);
+	}
 	sys_exit_group(EXIT_FAILURE);
 }
 
@@ -1751,9 +1759,12 @@ require_global(char const *__restrict name) {
 	/* Search all globally loaded modules for the symbol. */
 	result = libdl_dlsym((DlModule *)RTLD_DEFAULT, name);
 	if unlikely(!result) {
+		struct debugtrap_reason r;
 		syslog(LOG_ERR, "[rtld] Required function %q not found (%q)\n",
 		       name, elf_dlerror_message);
-		sys_debugtrap(NULL, SIGABRT, NULL);
+		r.dtr_signo  = SIGABRT;
+		r.dtr_reason = DEBUGTRAP_REASON_NONE;
+		sys_debugtrap(NULL, &r);
 		sys_exit_group(EXIT_FAILURE);
 	}
 	return result;

@@ -48,8 +48,11 @@ PUBLIC uintptr_t __stack_chk_guard = 0x123baf37;
 PRIVATE void LIBCCALL trap(struct kcpustate *__restrict state,
                            syscall_ulong_t trapno) {
 	struct ucpustate ustate;
+	struct debugtrap_reason r;
 	KCPUSTATE_TO_UCPUSTATE(ustate, *state);
-	sys_debugtrap(&ustate, SIGABRT, NULL);
+	r.dtr_signo  = SIGABRT;
+	r.dtr_reason = DEBUGTRAP_REASON_NONE;
+	sys_debugtrap(&ustate, &r);
 }
 
 

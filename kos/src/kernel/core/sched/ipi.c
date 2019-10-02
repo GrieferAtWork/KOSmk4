@@ -149,21 +149,25 @@ NOTHROW(FCALL cpu_delrunningtask)(/*out*/REF struct task *__restrict thread) {
 	assert(thread->t_sched.s_running.sr_runprv != NULL);
 	cpu_assert_running(thread);
 	if (thread == me->c_current) {
+		assert(me->c_override != thread);
 		me->c_current = thread->t_sched.s_running.sr_runnxt;
 		if unlikely(thread == me->c_current) {
+			struct task *idle;
 			assert(thread->t_sched.s_running.sr_runnxt == thread);
 			assert(thread->t_sched.s_running.sr_runprv == thread);
-			if (FORCPU(me, _this_idle).t_sched.s_asleep.ss_pself) {
+			idle = &FORCPU(me, _this_idle);
+			/* Check if the IDLE thread had been sleeping. */
+			if (idle->t_sched.s_asleep.ss_pself) {
 				/* The IDLE thread had been sleeping (time it out) */
-				ATOMIC_FETCHOR(FORCPU(me, _this_idle).t_flags, TASK_FTIMEOUT);
-				if ((*FORCPU(me, _this_idle).t_sched.s_asleep.ss_pself = FORCPU(me, _this_idle).t_sched.s_asleep.ss_tmonxt) != NULL)
-					FORCPU(me, _this_idle).t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = FORCPU(me, _this_idle).t_sched.s_asleep.ss_pself;
+				ATOMIC_FETCHOR(idle->t_flags, TASK_FTIMEOUT);
+				if ((*idle->t_sched.s_asleep.ss_pself = idle->t_sched.s_asleep.ss_tmonxt) != NULL)
+					idle->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = idle->t_sched.s_asleep.ss_pself;
 			}
 			/* Remove the last thread (replacing it with the IDLE thread) */
-			FORCPU(me, _this_idle).t_sched.s_running.sr_runprv = &FORCPU(me, _this_idle);
-			FORCPU(me, _this_idle).t_sched.s_running.sr_runnxt = &FORCPU(me, _this_idle);
-			ATOMIC_FETCHOR(FORCPU(me, _this_idle).t_flags, TASK_FRUNNING);
-			me->c_current = &FORCPU(me, _this_idle);
+			idle->t_sched.s_running.sr_runprv = idle;
+			idle->t_sched.s_running.sr_runnxt = idle;
+			ATOMIC_FETCHOR(idle->t_flags, TASK_FRUNNING);
+			me->c_current = idle;
 			goto done;
 		}
 	}
@@ -176,7 +180,7 @@ done:
 	/* Clear the scheduling pointers to indicate the thread no longer has a designated role */
 	thread->t_sched.s_running.sr_runprv = NULL;
 	thread->t_sched.s_running.sr_runnxt = NULL;
-	cpu_assert_integrity(/*ignored_thread:*/thread);
+	cpu_assert_integrity(/*ignored_thread:*/ thread);
 }
 
 PUBLIC NOBLOCK NONNULL((1)) void
@@ -191,7 +195,7 @@ NOTHROW(FCALL cpu_delsleepingtask)(/*out*/REF struct task *__restrict thread) {
 	/* Clear the scheduling pointers to indicate the thread no longer has a designated role */
 	thread->t_sched.s_asleep.ss_pself  = NULL;
 	thread->t_sched.s_asleep.ss_tmonxt = NULL;
-	cpu_assert_integrity(/*ignored_thread:*/thread);
+	cpu_assert_integrity(/*ignored_thread:*/ thread);
 }
 
 
@@ -333,8 +337,10 @@ unset_waking:
 		ATOMIC_FETCHAND(thread->t_flags, ~TASK_FWAKING);
 		cpu_assert_running(thread);
 		/* Indicate that we wish to switch tasks. */
-		if ((unsigned int)(uintptr_t)args[1] & TASK_WAKE_FHIGHPRIO)
+		if ((unsigned int)(uintptr_t)args[1] & TASK_WAKE_FHIGHPRIO) {
+			thread_cpu->c_current = thread;
 			return CPU_IPI_MODE_SWITCH_TASKS;
+		}
 	}
 #if 0 /* No need to send another IPI to the target CPU!                            \
        * Whenever a thread changes CPUs, a sporadic wakeup will be triggered,      \
@@ -477,7 +483,8 @@ unset_waking:
 		ATOMIC_FETCHAND(thread->t_flags, ~TASK_FWAKING);
 		cpu_assert_running(thread);
 		if (PREEMPTION_WASENABLED(was)) {
-			if (flags & TASK_WAKE_FHIGHPRIO) {
+			if ((flags & TASK_WAKE_FHIGHPRIO) &&
+			    mycpu->c_override != caller) {
 				/* End the current quantum prematurely. */
 				cpu_quantum_end();
 				/* Directly switch execution to the thread in question,
@@ -504,6 +511,8 @@ PUBLIC void NOTHROW(KCALL cpu_deepsleep)(void) {
 	        "cpu_deepsleep() may only be called form a cpu's IDLE thread!");
 	assertf(me->c_current == &FORCPU(me, _this_idle),
 	        "cpu_deepsleep() may only be called form a cpu's IDLE thread!");
+	assertf(me->c_override == NULL,
+	        "cpu_deepsleep() cannot be called while a scheduling override is active");
 	assert(FORCPU(me, _this_idle).t_flags & TASK_FRUNNING);
 	assert(me->c_state == CPU_STATE_RUNNING);
 again:
@@ -665,8 +674,10 @@ yield_and_return:
 	assert(me->c_current != &FORCPU(me, _this_idle));
 	FORCPU(me, _this_idle).t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv = FORCPU(me, _this_idle).t_sched.s_running.sr_runprv;
 	FORCPU(me, _this_idle).t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt = FORCPU(me, _this_idle).t_sched.s_running.sr_runnxt;
-	FORCPU(me, _this_idle).t_sched.s_running.sr_runnxt = NULL;
-	FORCPU(me, _this_idle).t_sched.s_running.sr_runprv = NULL;
+	/* Without the RUNNING flag, setup a special case of sleeping (outside of the chain) */
+	FORCPU(me, _this_idle).t_sched.s_asleep.ss_pself           = NULL;
+	FORCPU(me, _this_idle).t_sched.s_asleep.ss_tmonxt          = NULL;
+	FORCPU(me, _this_idle).t_sched.s_asleep.ss_timeout.q_jtime = (jtime_t)-1;
 	cpu_assert_integrity(/*ignored_thread:*/THIS_TASK);
 	/* Switch context to the next task. */
 	cpu_run_current_and_remember(&FORCPU(me, _this_idle));
@@ -684,13 +695,6 @@ NOTHROW(FCALL task_start)(struct task *__restrict thread, unsigned int flags) {
 #endif /* !CONFIG_NO_SMP */
 	assertf(thread->t_sched.s_state != NULL,
 	        "Task hasn't been given a restore-state at which execution can start");
-#ifndef CONFIG_NO_SMP
-	assertf(!(thread->t_flags & (TASK_FPENDING | TASK_FRUNNING)),
-	        "Attempted to start a task with the `TASK_FPENDING' or `TASK_FRUNNING' flag already set");
-#else /* !CONFIG_NO_SMP */
-	assertf(!(thread->t_flags & TASK_FRUNNING),
-	        "Attempted to start a task with the `TASK_FRUNNING' flag already set");
-#endif /* CONFIG_NO_SMP */
 
 	/* Create the reference that is then inherited
 	 * by the target cpu's scheduler system. */
@@ -700,12 +704,22 @@ NOTHROW(FCALL task_start)(struct task *__restrict thread, unsigned int flags) {
 #ifndef CONFIG_NO_SMP
 	mycpu      = THIS_CPU;
 	target_cpu = ATOMIC_READ(thread->t_cpu);
-	thread->t_ctime = quantum_time();
-	printk(KERN_INFO "[sched:cpu#%u] Starting thread %p [tid=%u]\n",
-	       (unsigned int)target_cpu->c_id, thread,
-	       (unsigned int)task_getroottid_of_s(thread));
 	if (mycpu != target_cpu) {
-		ATOMIC_FETCHOR(thread->t_flags, (TASK_FSTARTED | TASK_FPENDING));
+		uintptr_t old_flags;
+		do {
+			old_flags = ATOMIC_READ(thread->t_flags);
+			if (old_flags & (TASK_FSTARTED | TASK_FPENDING | TASK_FRUNNING)) {
+				assertf(!(old_flags & (TASK_FRUNNING | TASK_FPENDING)) || (old_flags & TASK_FSTARTED),
+				        "old_flags = %#Ix", old_flags);
+				goto done_pop_preemption;
+			}
+		} while (!ATOMIC_CMPXCH_WEAK(thread->t_flags, old_flags,
+		                             old_flags | (TASK_FSTARTED |
+		                                          TASK_FPENDING)));
+		printk(KERN_INFO "[sched:cpu#%u] Starting thread %p [tid=%u]\n",
+		       (unsigned int)target_cpu->c_id, thread,
+		       (unsigned int)task_getroottid_of_s(thread));
+		thread->t_ctime = quantum_time();
 #ifndef NDEBUG
 		{
 			bool ok = cpu_addpendingtask(target_cpu, thread);
@@ -716,17 +730,34 @@ NOTHROW(FCALL task_start)(struct task *__restrict thread, unsigned int flags) {
 #endif /* NDEBUG */
 		/* Wake up the targeted CPU, forcing it to load pending tasks. */
 		cpu_wake(target_cpu);
+done_pop_preemption:
 		PREEMPTION_POP(was);
 	} else
-#else /* !CONFIG_NO_SMP */
-	printk(KERN_INFO "[sched] Starting thread %p [tid=%u]\n",
-	       (unsigned int)task_getroottid_of_s(thread));
-#endif /* CONFIG_NO_SMP */
+#endif /* !CONFIG_NO_SMP */
 	{
 		struct task *caller, *next;
-		/* Schedule on the current CPU. */
+		uintptr_t old_flags;
 		cpu_assert_integrity(thread);
-		ATOMIC_FETCHOR(thread->t_flags, (TASK_FSTARTED | TASK_FRUNNING));
+		/* Schedule on the current CPU. */
+		do {
+			old_flags = ATOMIC_READ(thread->t_flags);
+			if (old_flags & (TASK_FSTARTED | TASK_FRUNNING)) {
+				assertf(!(old_flags & TASK_FRUNNING) || (old_flags & TASK_FSTARTED),
+				        "old_flags = %#Ix", old_flags);
+#ifdef CONFIG_NO_SMP
+				goto done_pop_preemption;
+#else /* CONFIG_NO_SMP */
+				PREEMPTION_POP(was);
+				goto done;
+#endif /* !CONFIG_NO_SMP */
+			}
+		} while (!ATOMIC_CMPXCH_WEAK(thread->t_flags, old_flags,
+		                             old_flags | (TASK_FSTARTED |
+		                                          TASK_FRUNNING)));
+		printk(KERN_INFO "[sched:cpu#%u] Starting thread %p [tid=%u]\n",
+		       (unsigned int)target_cpu->c_id, thread,
+		       (unsigned int)task_getroottid_of_s(thread));
+		thread->t_ctime = quantum_time();
 		caller = THIS_TASK;
 		next   = caller->t_sched.s_running.sr_runnxt;
 		caller->t_sched.s_running.sr_runnxt = thread;
@@ -736,7 +767,8 @@ NOTHROW(FCALL task_start)(struct task *__restrict thread, unsigned int flags) {
 		next->t_sched.s_running.sr_runprv = thread;
 		cpu_assert_running(thread);
 		if (PREEMPTION_WASENABLED(was)) {
-			if (flags & TASK_START_FHIGHPRIO) {
+			if ((flags & TASK_START_FHIGHPRIO) &&
+			    mycpu->c_override != caller) {
 				/* End the current quantum prematurely. */
 				cpu_quantum_end();
 				/* Directly switch execution to the new thread,
@@ -750,6 +782,9 @@ NOTHROW(FCALL task_start)(struct task *__restrict thread, unsigned int flags) {
 			PREEMPTION_ENABLE();
 		}
 	}
+#ifndef CONFIG_NO_SMP
+done:
+#endif /* !CONFIG_NO_SMP */
 	return thread;
 }
 

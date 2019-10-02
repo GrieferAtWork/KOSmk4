@@ -16,8 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_MODGDB_ARCH_I386_REGISTER_C
-#define GUARD_MODGDB_ARCH_I386_REGISTER_C 1
+#ifndef GUARD_MODGDBSERVER_ARCH_I386_REGISTER_C
+#define GUARD_MODGDBSERVER_ARCH_I386_REGISTER_C 1
 
 #include <kernel/compiler.h>
 
@@ -58,26 +58,36 @@ DECL_BEGIN
 #endif /* !__x86_64__ */
 
 /* Get/Set the single-step mode that is active when execution of the current thread resumes. */
-INTERN WUNUSED bool
-NOTHROW(FCALL GDB_GetSingleStep)(void) {
+INTERN bool 
+NOTHROW(FCALL GDB_GetSingleStep)(struct task *__restrict thread,
+                                 bool *__restrict penabled) {
 	uintptr_t flags;
-	GDB_GetRegister(FLAGS_REGNO, &flags, sizeof(flags));
-	return flags & EFLAGS_TF;
+	if (!GDB_GetRegister(thread, FLAGS_REGNO, &flags, sizeof(flags)))
+		return false;
+	*penabled = flags & EFLAGS_TF;
+	return true;
 }
 
-INTERN void
-NOTHROW(FCALL GDB_SetSingleStep)(bool enabled) {
+INTERN bool
+NOTHROW(FCALL GDB_SetSingleStep)(struct task *__restrict thread,
+                                 bool enabled) {
 	uintptr_t flags, new_flags;
-	GDB_GetRegister(FLAGS_REGNO, &flags, sizeof(flags));
+	if (!GDB_GetRegister(thread, FLAGS_REGNO,
+	                     &flags, sizeof(flags)))
+		return false;
 	new_flags = flags & ~EFLAGS_TF;
 	if (enabled)
 		new_flags |= EFLAGS_TF;
-	if (new_flags != flags)
-		GDB_SetRegister(FLAGS_REGNO, &new_flags, sizeof(new_flags));
+	if (new_flags != flags) {
+		if (!GDB_SetRegister(thread, FLAGS_REGNO,
+		                     &new_flags, sizeof(new_flags)))
+			return false;
+	}
+	return true;
 }
 
 
 
 DECL_END
 
-#endif /* !GUARD_MODGDB_ARCH_I386_REGISTER_C */
+#endif /* !GUARD_MODGDBSERVER_ARCH_I386_REGISTER_C */

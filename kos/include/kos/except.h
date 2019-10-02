@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f542d2a */
+/* HASH CRC-32:0x1e7c8204 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -410,6 +410,8 @@ __DECL_BEGIN
 #define E_INVALID_ARGUMENT_CONTEXT_BAD_PIPE_BUFFER_SIZE 0x0061
 /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to write an invalid integer to a system configuration file */
 #define E_INVALID_ARGUMENT_CONTEXT_BAD_INTEGER 0x0062
+/* E_INVALID_ARGUMENT_BAD_VALUE: Bad reason code passed to `debugtrap()' */
+#define E_INVALID_ARGUMENT_CONTEXT_DEBUG_REASON 0x0063
 
 
 

@@ -20,31 +20,42 @@
 #define _I386_KOS_KOS_BITS_DEBUGTRAP32_H 1
 
 #include <__stdinc.h>
-#include <hybrid/host.h>
+
 #include <hybrid/__pointer.h>
+#include <hybrid/host.h>
+#include <hybrid/typecore.h>
+
+#include <bits/types.h>
 
 __DECL_BEGIN
 
 #ifndef __x86_64__
-#define __OFFSET_DEBUG_TRAP_REGISTER_NAME  __OFFSET_DEBUG_TRAP_REGISTER32_NAME
-#define __OFFSET_DEBUG_TRAP_REGISTER_VALUE __OFFSET_DEBUG_TRAP_REGISTER32_VALUE
-#define __SIZEOF_DEBUG_TRAP_REGISTER       __SIZEOF_DEBUG_TRAP_REGISTER32
-#define debug_trap_register32 debug_trap_register
+#define __OFFSET_DEBUGTRAP_REASON_SIGNO   __OFFSET_DEBUGTRAP_REASON32_SIGNO
+#define __OFFSET_DEBUGTRAP_REASON_REASON  __OFFSET_DEBUGTRAP_REASON32_REASON
+#define __OFFSET_DEBUGTRAP_REASON_INTARG  __OFFSET_DEBUGTRAP_REASON32_INTARG
+#define __OFFSET_DEBUGTRAP_REASON_STRARG  __OFFSET_DEBUGTRAP_REASON32_STRARG
+#define __OFFSET_DEBUGTRAP_REASON_PTRARG  __OFFSET_DEBUGTRAP_REASON32_PTRARG
+#define __SIZEOF_DEBUGTRAP_REASON         __SIZEOF_DEBUGTRAP_REASON32
+#define debugtrap_reason32 debugtrap_reason
 #endif /* !__x86_64__ */
 
 
-#define __OFFSET_DEBUG_TRAP_REGISTER32_NAME  0
-#define __OFFSET_DEBUG_TRAP_REGISTER32_VALUE 4
-#define __SIZEOF_DEBUG_TRAP_REGISTER32       8
+#define __OFFSET_DEBUGTRAP_REASON32_SIGNO  0
+#define __OFFSET_DEBUGTRAP_REASON32_REASON 4
+#define __OFFSET_DEBUGTRAP_REASON32_INTARG 8
+#define __OFFSET_DEBUGTRAP_REASON32_STRARG 8
+#define __OFFSET_DEBUGTRAP_REASON32_PTRARG 8
+#define __SIZEOF_DEBUGTRAP_REASON32        12
 
 #ifdef __CC__
-struct debug_trap_register32 /*[PREFIX(dtr_)]*/ {
-	/* Trap register pair.
-	 * e.g.: { "library", "/lib/libc.so" }
-	 * Used to inform a GDB remote of some special trap
-	 * event which it may generate a breakpoint for. */
-	__HYBRID_PTR32(char const) dtr_name;  /* [0..1][SENTINEL(NULL)] Register name */
-	__HYBRID_PTR32(char const) dtr_value; /* [1..1][valid_if(dtr_name)] Register value */
+struct debugtrap_reason32 /*[PREFIX(dtr_)]*/ {
+	__uint32_t dtr_signo;  /* Trap signal number (one of `SIG*' from <bits/signum.h>) */
+	__uint32_t dtr_reason; /* Trap reason (one of `DEBUGTRAP_REASON_*') */
+	union {
+		__uint32_t                 dtr_intarg; /* Integer argument. */
+		__HYBRID_PTR32(char const) dtr_strarg; /* String argument. */
+		__HYBRID_PTR32(void)       dtr_ptrarg; /* Pointer argument. */
+	};
 };
 #endif /* __CC__ */
 

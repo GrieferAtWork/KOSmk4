@@ -905,7 +905,7 @@ INTERN struct icpustate *FCALL
 x86_cirq_29(struct icpustate *__restrict state) {
 	enum { SIGNO = SIGABRT };
 	if (kernel_debugtrap_enabled())
-		kernel_debugtrap(state, SIGNO, NULL);
+		kernel_debugtrap(state, SIGNO);
 	/* Use the fastfail code as exitcode for the program (not
 	 * exactly what window does, but still close enough...) */
 #ifdef __x86_64__

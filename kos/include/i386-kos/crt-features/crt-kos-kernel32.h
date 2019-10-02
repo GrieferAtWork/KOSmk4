@@ -273,6 +273,7 @@
 #define __CRT_HAVE_cpu_vector 1
 #define __CRT_HAVE_cpu_wake 1
 #define __CRT_HAVE_cpuid_features 1
+#define __CRT_HAVE_cred_require_debugtrap 1
 #define __CRT_HAVE_cred_require_driveroot 1
 #define __CRT_HAVE_cred_require_hwio 1
 #define __CRT_HAVE_cred_require_mount 1

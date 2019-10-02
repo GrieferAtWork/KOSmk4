@@ -181,13 +181,12 @@ INTERN_FUNCTION(FUNC(debugtrap))
 	movl   $(SEGMENT_KERNEL_FSBASE), %eax
 	movl   %eax, %fs
 
-	pushl_cfi %edx        /* Arg #3 (USER UNCHECKED struct debug_trap_register const *regs) */
-	pushl_cfi %ecx        /* Arg #2 (syscall_ulong_t trapno) */
+	pushl_cfi %ecx        /* Arg #2 (USER UNCHECKED struct debugtrap_reason const *ureason) */
 	movl   %ebx, %edx     /* Arg #1 (USER UNCHECKED struct ucpustate const *state) */
-	leal   8(%esp), %ecx  /* struct icpustate *__restrict return_state */
+	leal   4(%esp), %ecx  /* struct icpustate *__restrict return_state */
 	INTERN(sys_debugtrap32_impl)
 	call   sys_debugtrap32_impl
-	.cfi_adjust_cfa_offset -8
+	.cfi_adjust_cfa_offset -4
 
 	popal_cfi_r
 

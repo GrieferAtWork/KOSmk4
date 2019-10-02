@@ -317,6 +317,7 @@ i386_allocate_secondary_cores(void) {
 
 		altcore->c_id                        = i;
 		altcore->c_current                   = altidle;
+		altcore->c_override                  = NULL;
 		altidle->t_cpu                       = altcore;
 		altidle->t_self                      = altidle;
 		altidle->t_flags                     = TASK_FSTARTED | TASK_FRUNNING | TASK_FKEEPCORE;

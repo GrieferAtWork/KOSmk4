@@ -237,6 +237,7 @@ local files = {
 	"../../include/kos/hop.h",
 	"../../include/kos/sysctl.h",
 	"../../include/kos/bits/ukern-struct.h",
+	"../../include/kos/bits/debugtrap.h",
 };
 
 local include_prefixes = {
@@ -735,6 +736,20 @@ STATIC_ASSERT(offsetof(struct userkern, uk_suid) == OFFSET_USERKERN_SUID);
 STATIC_ASSERT(offsetof(struct userkern, uk_tid) == OFFSET_USERKERN_TID);
 STATIC_ASSERT(offsetof(struct userkern, uk_uid) == OFFSET_USERKERN_UID);
 STATIC_ASSERT(sizeof(struct userkern) == SIZEOF_USERKERN);
+
+
+
+
+
+#include <kos/bits/debugtrap.h>
+
+/* struct debugtrap_reason */
+STATIC_ASSERT(offsetof(struct debugtrap_reason, dtr_intarg) == __OFFSET_DEBUGTRAP_REASON_INTARG);
+STATIC_ASSERT(offsetof(struct debugtrap_reason, dtr_ptrarg) == __OFFSET_DEBUGTRAP_REASON_PTRARG);
+STATIC_ASSERT(offsetof(struct debugtrap_reason, dtr_reason) == __OFFSET_DEBUGTRAP_REASON_REASON);
+STATIC_ASSERT(offsetof(struct debugtrap_reason, dtr_signo) == __OFFSET_DEBUGTRAP_REASON_SIGNO);
+STATIC_ASSERT(offsetof(struct debugtrap_reason, dtr_strarg) == __OFFSET_DEBUGTRAP_REASON_STRARG);
+STATIC_ASSERT(sizeof(struct debugtrap_reason) == __SIZEOF_DEBUGTRAP_REASON);
 //[[[end]]]
 
 

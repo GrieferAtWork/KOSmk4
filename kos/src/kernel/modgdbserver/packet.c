@@ -16,8 +16,10 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_MODGDB_PACKET_C
-#define GUARD_MODGDB_PACKET_C 1
+#ifndef GUARD_MODGDBSERVER_PACKET_C
+#define GUARD_MODGDBSERVER_PACKET_C 1
+
+/* Packet API */
 
 #include <kernel/compiler.h>
 
@@ -29,25 +31,27 @@
 #include <string.h>
 
 #include "gdb.h"
+#include "server.h"
 
 DECL_BEGIN
 
+/* Buffer used to store the contents of remote command packets. */
+INTDEF char GDBRemote_CommandBuffer[CONFIG_GDBSERVER_PACKET_MAXLEN];
 
 /* Buffer for out-bound packets. */
-PRIVATE char GDBPacket_Buffer[GDB_PACKET_MAXLEN + 4];
+PRIVATE char GDBServer_PacketBuffer[CONFIG_GDBSERVER_PACKET_MAXLEN + 4];
+
+/* Begin a new packet, returning a buffer of up to `CONFIG_GDBSERVER_PACKET_MAXLEN' bytes. */
 INTERN char *NOTHROW(FCALL GDBPacket_Start)(void) {
-	return GDBPacket_Buffer + 1;
+	return GDBServer_PacketBuffer + 1;
 }
 
-
-
-INTDEF char GDBCommand_Buffer[GDB_PACKET_MAXLEN];
 
 
 /* @return: '+': ACK
  * @return: '-': NACK
  * @return: -1:  Error (timed out) */
-LOCAL int NOTHROW(FCALL GDBPacket_WaitForResponse)(size_t len) {
+LOCAL int NOTHROW(FCALL GDBPacket_WaitForResponse)(size_t previous_packet_length_with_frame) {
 	/* Deal with the repeated packet sending done by GDB when it gets nervous
 	 * This happens when we don't immediately respond after QEMU connects to
 	 * gdb early on, but we need some time to initialize before we can start
@@ -62,21 +66,21 @@ LOCAL int NOTHROW(FCALL GDBPacket_WaitForResponse)(size_t len) {
 		if (result == '$') {
 			/* This is what I was talking about above!
 			 * An unexpected packet probably taken from kind of buffer. */
-			char *dst = GDBCommand_Buffer;
+			char *dst = GDBRemote_CommandBuffer;
 			for (;;) {
 				result = GDBRemote_TimedGetByte();
 				if (result < 0)
 					goto done;
 				if (result == '#')
 					break;
-				if (dst < COMPILER_ENDOF(GDBCommand_Buffer))
+				if (dst < COMPILER_ENDOF(GDBRemote_CommandBuffer))
 					*dst++ = (char)result;
 				if (result == '}') {
 					/* Escaped byte. */
 					result = GDBRemote_TimedGetByte();
 					if (result < 0)
 						goto done;
-					if (dst < COMPILER_ENDOF(GDBCommand_Buffer))
+					if (dst < COMPILER_ENDOF(GDBRemote_CommandBuffer))
 						*dst++ = (char)result;
 				}
 			}
@@ -88,20 +92,21 @@ LOCAL int NOTHROW(FCALL GDBPacket_WaitForResponse)(size_t len) {
 			if (result < 0)
 				goto done;
 			printk(KERN_WARNING "[gdb] Unexpected command %$q received after transmitting packet %$q\n",
-			       (size_t)(dst - GDBCommand_Buffer), GDBCommand_Buffer, len, GDBPacket_Buffer);
+			       (size_t)(dst - GDBRemote_CommandBuffer), GDBRemote_CommandBuffer,
+			       previous_packet_length_with_frame, GDBServer_PacketBuffer);
 		} else {
 			char resp[1];
 			resp[0] = (char)result;
 			printk(KERN_WARNING "[gdb] Unexpected response byte %$q received after transmitting packet %$q\n",
-			       (size_t)1, resp, len, GDBPacket_Buffer);
+			       (size_t)1, resp, previous_packet_length_with_frame, GDBServer_PacketBuffer);
 		}
 	}
 done:
 	return result;
 }
 
-
-INTERN byte_t
+/* Calculate and return the checksum for the given memory block. */
+INTERN WUNUSED NONNULL((1)) byte_t
 NOTHROW(KCALL GDBPacket_GetCheckSum)(void const *__restrict buf, size_t buflen) {
 	byte_t result;
 	size_t i;
@@ -110,27 +115,29 @@ NOTHROW(KCALL GDBPacket_GetCheckSum)(void const *__restrict buf, size_t buflen) 
 	return result;
 }
 
+
 PRIVATE size_t
 NOTHROW(FCALL GDBPacket_TransmitAsync)(char *endptr, char firstChar) {
 	byte_t checksum;
 	size_t len;
-	assert(endptr >= GDBPacket_Buffer + 1);
-	assert(endptr <= (GDBPacket_Buffer + 1 + GDB_PACKET_MAXLEN));
-	len = (size_t)(endptr - (GDBPacket_Buffer + 1));
-	checksum = GDBPacket_GetCheckSum(GDBPacket_Buffer + 1, len);
-	GDBPacket_Buffer[0]   = firstChar;
+	assert(endptr >= GDBServer_PacketBuffer + 1);
+	assert(endptr <= (GDBServer_PacketBuffer + 1 + CONFIG_GDBSERVER_PACKET_MAXLEN));
+	len = (size_t)(endptr - (GDBServer_PacketBuffer + 1));
+	checksum = GDBPacket_GetCheckSum(GDBServer_PacketBuffer + 1, len);
+	GDBServer_PacketBuffer[0]   = firstChar;
 	((byte_t *)endptr)[0] = '#';
-	((byte_t *)endptr)[1] = tohex(checksum >> 4);
-	((byte_t *)endptr)[2] = tohex(checksum & 0x0f);
+	((byte_t *)endptr)[1] = GDB_ToHex(checksum >> 4);
+	((byte_t *)endptr)[2] = GDB_ToHex(checksum & 0x0f);
 	COMPILER_WRITE_BARRIER();
 	/* Send the packet */
 	len += 4;
-	GDB_DEBUG("[gdb] reply: %$q\n", len, GDBPacket_Buffer);
-	GDBRemote_PutData(GDBPacket_Buffer, len);
+	GDB_DEBUG("[gdb] reply: %$q\n", len, GDBServer_PacketBuffer);
+	GDBRemote_PutData(GDBServer_PacketBuffer, len);
 	return len;
 }
 
 
+/* Max # of times to attempt to transmit a packet before giving up. */
 INTERN unsigned int GDBPacket_RetryTransmitLimit = 4;
 
 /* Transmit a packet ending at `endptr'
@@ -142,7 +149,7 @@ NOTHROW(FCALL GDBPacket_Transmit)(char *endptr) {
 	size_t len;
 	int response;
 	len = GDBPacket_TransmitAsync(endptr, '$');
-	if (GDB_Features & GDB_FEATURE_NOACK_MODE)
+	if (GDBServer_Features & GDB_SERVER_FEATURE_NOACK)
 		return true; /* NOACK-mode */
 wait_for_response:
 	response = GDBPacket_WaitForResponse(len);
@@ -155,7 +162,7 @@ wait_for_response:
 		return false;
 	/* Re-transmit the packet */
 	++retry_counter;
-	GDBRemote_PutData(GDBPacket_Buffer, len);
+	GDBRemote_PutData(GDBServer_PacketBuffer, len);
 	goto wait_for_response;
 }
 
@@ -166,7 +173,6 @@ NOTHROW(FCALL GDBPacket_TransmitNotification)(char *endptr) {
 	 *       notification events don't ever produce + or - */
 	GDBPacket_TransmitAsync(endptr, '%');
 }
-
 
 
 /* Escaping work by taking any `ch' for which `ESC_MUST(ch)' is true,
@@ -210,24 +216,23 @@ NOTHROW(FCALL GDBRemote_PutDataEscape)(char *data, size_t datalen) {
 	GDBRemote_PutData(flush_start, (size_t)(end - flush_start) + 3);
 }
 
-
 PRIVATE size_t
 NOTHROW(FCALL GDBPacket_TransmitAsyncEscape)(char *endptr) {
 	byte_t checksum;
 	size_t len;
-	assert(endptr >= GDBPacket_Buffer + 1);
-	assert(endptr <= (GDBPacket_Buffer + 1 + GDB_PACKET_MAXLEN));
-	len = (size_t)(endptr - (GDBPacket_Buffer + 1));
-	checksum = GDBPacket_GetCheckSumEscape(GDBPacket_Buffer + 1, len);
-	GDB_DEBUG("[gdb] reply: %$q\n", len, GDBPacket_Buffer + 1);
-	GDBPacket_Buffer[0]  = '$';
+	assert(endptr >= GDBServer_PacketBuffer + 1);
+	assert(endptr <= (GDBServer_PacketBuffer + 1 + CONFIG_GDBSERVER_PACKET_MAXLEN));
+	len = (size_t)(endptr - (GDBServer_PacketBuffer + 1));
+	checksum = GDBPacket_GetCheckSumEscape(GDBServer_PacketBuffer + 1, len);
+	GDB_DEBUG("[gdb] reply: %$q\n", len, GDBServer_PacketBuffer + 1);
+	GDBServer_PacketBuffer[0]  = '$';
 	((byte_t *)endptr)[0] = '#';
-	((byte_t *)endptr)[1] = tohex(checksum >> 4);
-	((byte_t *)endptr)[2] = tohex(checksum & 0x0f);
+	((byte_t *)endptr)[1] = GDB_ToHex(checksum >> 4);
+	((byte_t *)endptr)[2] = GDB_ToHex(checksum & 0x0f);
 	COMPILER_WRITE_BARRIER();
 	/* Send the packet */
 	len += 4;
-	GDBRemote_PutDataEscape(GDBPacket_Buffer, len);
+	GDBRemote_PutDataEscape(GDBServer_PacketBuffer, len);
 	return len;
 }
 
@@ -240,7 +245,7 @@ NOTHROW(FCALL GDBPacket_TransmitEscape)(char *endptr) {
 	size_t len;
 	int response;
 	len = GDBPacket_TransmitAsyncEscape(endptr);
-	if (GDB_Features & GDB_FEATURE_NOACK_MODE)
+	if (GDBServer_Features & GDB_SERVER_FEATURE_NOACK)
 		return true; /* NOACK-mode */
 wait_for_response:
 	response = GDBPacket_WaitForResponse(len);
@@ -253,9 +258,10 @@ wait_for_response:
 		return false;
 	/* Re-transmit the packet */
 	++retry_counter;
-	GDBRemote_PutDataEscape(GDBPacket_Buffer, len);
+	GDBRemote_PutDataEscape(GDBServer_PacketBuffer, len);
 	goto wait_for_response;
 }
+
 
 
 INTERN WUNUSED bool
@@ -263,20 +269,23 @@ NOTHROW(FCALL GDBPacket_SendEmpty)(void) {
 	char *ptr = GDBPacket_Start();
 	return GDBPacket_Transmit(ptr);
 }
+
 INTERN WUNUSED bool
 NOTHROW(FCALL GDBPacket_Send)(char const *__restrict text) {
 	char *ptr = GDBPacket_Start();
 	ptr = stpcpy(ptr, text);
 	return GDBPacket_Transmit(ptr);
 }
+
 INTERN WUNUSED bool
 NOTHROW(FCALL GDBPacket_SendError)(u8 error_code) {
 	char *ptr = GDBPacket_Start();
 	*ptr++ = 'E';
-	*ptr++ = tohex(error_code >> 4);
-	*ptr++ = tohex(error_code & 0xf);
+	*ptr++ = GDB_ToHex(error_code >> 4);
+	*ptr++ = GDB_ToHex(error_code & 0xf);
 	return GDBPacket_Transmit(ptr);
 }
+
 INTERN WUNUSED bool
 NOTHROW(VCALL GDBPacket_Sendf)(char const *__restrict format, ...) {
 	bool result;
@@ -286,6 +295,7 @@ NOTHROW(VCALL GDBPacket_Sendf)(char const *__restrict format, ...) {
 	va_end(args);
 	return result;
 }
+
 INTERN WUNUSED bool
 NOTHROW(FCALL GDBPacket_VSendf)(char const *__restrict format, va_list args) {
 	char *ptr = GDBPacket_Start();
@@ -294,6 +304,7 @@ NOTHROW(FCALL GDBPacket_VSendf)(char const *__restrict format, va_list args) {
 }
 
 
+
 DECL_END
 
-#endif /* !GUARD_MODGDB_PACKET_C */
+#endif /* !GUARD_MODGDBSERVER_PACKET_C */

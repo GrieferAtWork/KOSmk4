@@ -437,12 +437,12 @@ done_dynamic:
 	 * However: Still signal init before calling constructors, so that those are invoked
 	 *          after GCC has injected potential breakpoints, so-as to allow breakpoints
 	 *          to function properly within __attribute__((constructor)) functions. */
-	{
-		struct debug_trap_register regs[2];
-		regs[0].dtr_name  = DEBUG_TRAP_REGISTER_LIBRARY;
-		regs[0].dtr_value = "";
-		regs[1].dtr_name  = NULL;
-		sys_debugtrap(NULL, SIGTRAP, regs);
+	if (!sys_debugtrap_disabled) {
+		struct debugtrap_reason r;
+		r.dtr_reason = DEBUGTRAP_REASON_LIBRARY;
+		r.dtr_signo  = SIGTRAP;
+		if (sys_debugtrap(NULL, &r) == -ENOENT)
+			sys_debugtrap_disabled = true;
 	}
 
 	if (!(self->dm_flags & RTLD_NOINIT)) {

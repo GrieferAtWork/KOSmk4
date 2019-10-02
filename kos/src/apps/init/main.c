@@ -42,6 +42,7 @@
 #include <string.h> /* strerror() */
 #include <unistd.h> /* sync() */
 #include <sched.h>  /* sched_yield() */
+#include <signal.h> /* signal() */
 
 #include <libansitty/ansitty.h>
 
@@ -92,6 +93,12 @@ done_procfs:
 	/* Load some additional drivers that we need for the I/O console. */
 	SysctlInsmod("ps2", NULL); /* Keyboard */
 	SysctlInsmod("vga", NULL); /* Display */
+
+	/* Setup a couple of signals to-be ignored */
+	signal(SIGHUP, SIG_IGN);
+	signal(SIGINT, SIG_IGN);
+	signal(SIGTTIN, SIG_IGN);
+	signal(SIGTTOU, SIG_IGN);
 
 	/* Construct /dev/console from the VGA display, and a PS/2 keyboard. */
 	{

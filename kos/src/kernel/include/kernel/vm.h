@@ -1395,7 +1395,7 @@ vm_clone(struct vm *__restrict self,
 FUNDEF void KCALL task_setvm(struct vm *__restrict newvm) THROWS(E_WOULDBLOCK);
 
 /* Return the active VM of the given `thread' */
-FUNDEF REF struct vm *KCALL
+FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct vm *KCALL
 task_getvm(struct task *__restrict thread) THROWS(E_WOULDBLOCK);
 
 

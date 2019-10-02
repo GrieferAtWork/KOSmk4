@@ -640,10 +640,14 @@ default_action:
 		xdecref_unlikely(action.sa_mask);
 		/* Create a coredump */
 		coredump_create_for_signal(state, &info->sqe_info);
+		if (THIS_TASK == &_boottask)
+			asm("int3");
 		THROW(E_EXIT_PROCESS, W_EXITCODE(1, info->sqe_info.si_signo));
 
 	case KERNEL_SIG_TERM:
 		xdecref_unlikely(action.sa_mask);
+		if (THIS_TASK == &_boottask)
+			asm("int3");
 		THROW(E_EXIT_PROCESS, W_EXITCODE(1, info->sqe_info.si_signo));
 
 	case KERNEL_SIG_EXIT:

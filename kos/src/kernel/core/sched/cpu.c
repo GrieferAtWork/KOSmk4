@@ -89,6 +89,9 @@ NOTHROW(FCALL cpu_do_assert_running)(struct task *__restrict thread,
 	        me, (unsigned int)me->c_id,
 	        thread->t_cpu, (unsigned int)thread->t_cpu->c_id,
 	        thread, task_getroottid_of_s(thread));
+	/* Special case: The IDLE thread doesn't need to be part of the active chain! */
+	if (thread == &FORCPU(me, _this_idle))
+		return true;
 	if (__assertion_checkf("thread in THIS_CPU->c_current",
 	                       "Thread %p [tid=%u] is not running on cpu %p [cid=%u]\n",
 	                       thread, task_getroottid_of_s(thread),
@@ -102,7 +105,7 @@ NOTHROW(FCALL cpu_do_assert_sleeping)(struct task *__restrict thread,
                                       struct cpu *__restrict me) {
 	struct task *iter;
 	assertf(DO_FLAGS_INDICATE_SLEEPING(thread->t_flags),
-	        "Flags do not indicate that the thread is running\n"
+	        "Flags do not indicate that the thread is sleeping\n"
 	        "thread          = %p [tid=%u]\n"
 	        "thread->t_flags = %#Ix\n",
 	        thread, task_getroottid_of_s(thread), thread->t_flags);
@@ -123,6 +126,9 @@ NOTHROW(FCALL cpu_do_assert_sleeping)(struct task *__restrict thread,
 	        me, (unsigned int)me->c_id,
 	        thread->t_cpu, (unsigned int)thread->t_cpu->c_id,
 	        thread, task_getroottid_of_s(thread));
+	/* Special case: The IDLE thread doesn't need to be part of the active chain! */
+	if (thread == &FORCPU(me, _this_idle))
+		return true;
 	if (__assertion_checkf("thread in THIS_CPU->c_sleeping",
 	                       "Thread %p [tid=%u] is not running on cpu %p [cid=%u]\n",
 	                       thread, task_getroottid_of_s(thread),
@@ -427,14 +433,15 @@ INTDEF byte_t __kernel_percpu_size[];
 
 PRIVATE ATTR_USED ATTR_SECTION(".data.percpu.head")
 struct cpu cpu_header = {
-	/*.c_id       = */0,
-	/*.c_current  = */NULL,
-	/*.c_sleeping = */NULL,
+	/*.c_id       = */ 0,
+	/*.c_current  = */ NULL,
+	/*.c_sleeping = */ NULL,
 #ifndef CONFIG_NO_SMP
-	/*.c_pending  = */CPU_PENDING_ENDOFCHAIN,
+	/*.c_pending  = */ CPU_PENDING_ENDOFCHAIN,
 #endif /* !CONFIG_NO_SMP */
-	/*.c_heapsize = */(size_t)__kernel_percpu_size,
-	/*.c_state    = */CPU_STATE_RUNNING
+	/*.c_override = */ NULL,
+	/*.c_heapsize = */ (size_t)__kernel_percpu_size,
+	/*.c_state    = */ CPU_STATE_RUNNING
 };
 
 PUBLIC ATTR_PERCPU jtime_t volatile cpu_jiffies = 0;
@@ -700,7 +707,7 @@ NOTHROW(FCALL cpu_add_quantum_offset)(quantum_diff_t diff) {
 			if (next)
 				next->t_sched.s_asleep.ss_pself = &me->c_sleeping;
 			/* Re-schedule all of the sleepers. */
-			next                                       = me->c_current->t_sched.s_running.sr_runnxt;
+			next = me->c_current->t_sched.s_running.sr_runnxt;
 			sleeper->t_sched.s_running.sr_runprv       = me->c_current;
 			last_sleeper->t_sched.s_running.sr_runnxt  = next;
 			next->t_sched.s_running.sr_runprv          = last_sleeper;
@@ -755,7 +762,14 @@ NOTHROW(FCALL cpu_scheduler_interrupt)(struct cpu *__restrict caller,
 	 * as the previous thread's active-time. */
 	++FORCPU(caller, cpu_jiffies);
 	++thread->t_atime.q_jtime;
-
+	/* Check for a scheduling override */
+	next = caller->c_override;
+	/* Unlikely, since a sched override usually
+	 * also disables preemptive interrupts. */
+	if unlikely(next) {
+		assert(thread == next);
+		return next;
+	}
 	if ((sleeper = caller->c_sleeping) != NULL) {
 		jtime_t now = FORCPU(caller, cpu_jiffies);
 		quantum_diff_t diff, length;
@@ -793,7 +807,7 @@ NOTHROW(FCALL cpu_scheduler_interrupt)(struct cpu *__restrict caller,
 		if (next)
 			next->t_sched.s_asleep.ss_pself = &caller->c_sleeping;
 		/* Re-schedule all of the sleepers. */
-		next                                           = caller->c_current->t_sched.s_running.sr_runnxt;
+		next = caller->c_current->t_sched.s_running.sr_runnxt;
 		sleeper->t_sched.s_running.sr_runprv           = caller->c_current;
 		last_sleeper->t_sched.s_running.sr_runnxt      = next;
 		next->t_sched.s_running.sr_runprv              = last_sleeper;
@@ -859,6 +873,7 @@ NOTHROW(FCALL task_exit)(int w_status) {
 	PREEMPTION_DISABLE();
 	mycpu = caller->t_cpu;
 	assertf(mycpu->c_current == caller, "Inconsistent scheduler state");
+	assertf(mycpu->c_override != caller, "Cannot exit while being the scheduling override");
 	assertf(caller != &FORCPU(mycpu, _this_idle), "The IDLE task cannot be terminated");
 	cpu_assert_integrity();
 
@@ -873,9 +888,9 @@ NOTHROW(FCALL task_exit)(int w_status) {
 		mycpu->c_current = next = &FORCPU(mycpu, _this_idle);
 	} else {
 		/* Unlink and load the next task. */
-		mycpu->c_current = next                                          = caller->t_sched.s_running.sr_runnxt;
+		mycpu->c_current = next = caller->t_sched.s_running.sr_runnxt;
 		caller->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt = next;
-		next->t_sched.s_running.sr_runprv                                = caller->t_sched.s_running.sr_runprv;
+		next->t_sched.s_running.sr_runprv = caller->t_sched.s_running.sr_runprv;
 	}
 	caller->t_sched.s_running.sr_runprv = NULL;
 	caller->t_sched.s_running.sr_runnxt = NULL;

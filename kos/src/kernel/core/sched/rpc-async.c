@@ -44,6 +44,22 @@ DECL_BEGIN
 #error "Unsupported arch"
 #endif
 
+
+#ifndef CONFIG_NO_SMP
+#define WAS_START_AND_IS_NOT_PENDING(f) (((f) & (TASK_FPENDING | TASK_FSTARTED)) == TASK_FSTARTED)
+#define WAS_START_AND_IS_SLEEPING(f)    (((f) & (TASK_FRUNNING | TASK_FPENDING | TASK_FSTARTED)) == TASK_FSTARTED)
+#else /* !CONFIG_NO_SMP */
+#define WAS_START_AND_IS_NOT_PENDING(f) (((f) & TASK_FSTARTED) != 0)
+#define WAS_START_AND_IS_SLEEPING(f)    (((f) & (TASK_FRUNNING | TASK_FSTARTED)) == TASK_FSTARTED)
+#endif /* CONFIG_NO_SMP */
+
+
+#ifdef CONFIG_NO_SMP
+#define IFELSE_SMP(if_smp, if_no_smp) if_no_smp
+#else /* CONFIG_NO_SMP */
+#define IFELSE_SMP(if_smp, if_no_smp) if_smp
+#endif /* !CONFIG_NO_SMP */
+
 #ifndef CONFIG_NO_SMP
 PRIVATE NOBLOCK struct icpustate *
 NOTHROW(FCALL ipi_schedule_asynchronous_rpc_dw)(struct icpustate *__restrict state,
@@ -126,13 +142,18 @@ NOTHROW(FCALL ipi_schedule_asynchronous_rpc_lp)(struct icpustate *__restrict sta
 	}
 	target->t_sched.s_state = task_push_asynchronous_rpc(target->t_sched.s_state,
 	                                                     func, arg, completed);
-	if (!(target_flags & (TASK_FRUNNING | TASK_FPENDING))) {
+	if (WAS_START_AND_IS_SLEEPING(target_flags)) {
 		struct task *next;
 		/* Wake up a sleeping thread by using a sporadic wake-up. */
 		cpu_assert_sleeping(target);
 		ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
-		if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
-			target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
+		if unlikely(!target->t_sched.s_asleep.ss_pself) {
+			/* Special case: The IDLE thread can sleep outside of the sleepers chain */
+			assert(target == &FORCPU(mycpu, _this_idle));
+		} else {
+			if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
+				target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
+		}
 		next = caller->t_sched.s_running.sr_runnxt;
 		target->t_sched.s_running.sr_runprv = caller;
 		target->t_sched.s_running.sr_runnxt = next;
@@ -195,12 +216,17 @@ insert_target_after_caller:
 		next->t_sched.s_running.sr_runprv   = target;
 		ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
 		cpu_assert_running(target);
-	} else if (!(target_flags & TASK_FPENDING)) {
+	} else if (WAS_START_AND_IS_NOT_PENDING(target_flags)) {
 		/* Wake up a sleeping thread by using a sporadic wake-up. */
 		cpu_assert_sleeping(target);
 		ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
-		if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
-			target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
+		if unlikely(!target->t_sched.s_asleep.ss_pself) {
+			/* Special case: The IDLE thread can sleep outside of the sleepers chain */
+			assert(target == &FORCPU(mycpu, _this_idle));
+		} else {
+			if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
+				target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
+		}
 		goto insert_target_after_caller;
 	}
 	return state;
@@ -257,13 +283,19 @@ insert_target_after_caller:
 		next->t_sched.s_running.sr_runprv   = target;
 		ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
 		cpu_assert_running(target);
+		mycpu->c_current = target;
 		return CPU_IPI_MODE_SWITCH_TASKS;
-	} else if (!(target_flags & TASK_FPENDING)) {
+	} else if (WAS_START_AND_IS_NOT_PENDING(target_flags)) {
 		/* Wake up a sleeping thread by using a sporadic wake-up. */
 		cpu_assert_sleeping(target);
 		ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
-		if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
-			target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
+		if unlikely(!target->t_sched.s_asleep.ss_pself) {
+			/* Special case: The IDLE thread can sleep outside of the sleepers chain */
+			assert(target == &FORCPU(mycpu, _this_idle));
+		} else {
+			if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
+				target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
+		}
 		goto insert_target_after_caller;
 	}
 	return state;
@@ -312,13 +344,18 @@ NOTHROW(FCALL ipi_redirect_usercode_rpc_lp)(struct icpustate *__restrict state,
 	if unlikely(target_flags & TASK_FTERMINATED)
 		return state;
 	task_enable_redirect_usercode_rpc(target);
-	if (!(target_flags & (TASK_FRUNNING | TASK_FPENDING))) {
+	if (WAS_START_AND_IS_SLEEPING(target_flags)) {
 		struct task *next;
 		/* Wake up a sleeping thread by using a sporadic wake-up. */
 		cpu_assert_sleeping(target);
 		ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
-		if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
-			target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
+		if unlikely(!target->t_sched.s_asleep.ss_pself) {
+			/* Special case: The IDLE thread can sleep outside of the sleepers chain */
+			assert(target == &FORCPU(mycpu, _this_idle));
+		} else {
+			if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
+				target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
+		}
 		next = caller->t_sched.s_running.sr_runnxt;
 		target->t_sched.s_running.sr_runprv = caller;
 		target->t_sched.s_running.sr_runnxt = next;
@@ -364,14 +401,20 @@ insert_target_after_caller:
 			next->t_sched.s_running.sr_runprv   = target;
 			ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
 			cpu_assert_running(target);
+			mycpu->c_current = target;
 			return CPU_IPI_MODE_SWITCH_TASKS;
 		}
-	} else if (!(target_flags & TASK_FPENDING)) {
+	} else if (WAS_START_AND_IS_NOT_PENDING(target_flags)) {
 		/* Wake up a sleeping thread by using a sporadic wake-up. */
 		cpu_assert_sleeping(target);
 		ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
-		if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
-			target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
+		if unlikely(!target->t_sched.s_asleep.ss_pself) {
+			/* Special case: The IDLE thread can sleep outside of the sleepers chain */
+			assert(target == &FORCPU(mycpu, _this_idle));
+		} else {
+			if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
+				target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
+		}
 		goto insert_target_after_caller;
 	}
 	return state;
@@ -412,14 +455,20 @@ insert_target_after_caller:
 			next->t_sched.s_running.sr_runprv   = target;
 			ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
 			cpu_assert_running(target);
+			mycpu->c_current = target;
 			return CPU_IPI_MODE_SWITCH_TASKS;
 		}
-	} else if (!(target_flags & TASK_FPENDING)) {
+	} else if (WAS_START_AND_IS_NOT_PENDING(target_flags)) {
 		/* Wake up a sleeping thread by using a sporadic wake-up. */
 		cpu_assert_sleeping(target);
 		ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
-		if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
-			target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
+		if unlikely(!target->t_sched.s_asleep.ss_pself) {
+			/* Special case: The IDLE thread can sleep outside of the sleepers chain */
+			assert(target == &FORCPU(mycpu, _this_idle));
+		} else {
+			if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
+				target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
+		}
 		goto insert_target_after_caller;
 	}
 	return state;
@@ -487,34 +536,34 @@ insert_target_after_caller:
 				ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
 				cpu_assert_running(target);
 				if (PREEMPTION_WASENABLED(was)) {
-					if (mode & TASK_RPC_FHIGHPRIO) {
+					if ((mode & TASK_RPC_FHIGHPRIO) &&
+					    IFELSE_SMP((*mycpu), _bootcpu).c_override != caller) {
 						/* End the current quantum prematurely. */
 						cpu_quantum_end();
 						/* Immediately switch to the next target thread. */
-#ifndef CONFIG_NO_SMP
-						mycpu->c_current = target;
-#else /* !CONFIG_NO_SMP */
-						_bootcpu.c_current = target;
-#endif /* CONFIG_NO_SMP */
+						IFELSE_SMP((*mycpu), _bootcpu).c_current = target;
 						cpu_run_current_and_remember(caller);
 					}
 					PREEMPTION_ENABLE();
 				}
 				return true;
 			}
-		}
-#ifndef CONFIG_NO_SMP
-		else if (!(target_flags & TASK_FPENDING))
-#else /* !CONFIG_NO_SMP */
-		else
-#endif /* CONFIG_NO_SMP */
-		{
+		} else if (WAS_START_AND_IS_NOT_PENDING(target_flags)) {
 			/* Wake up a sleeping thread by using a sporadic wake-up. */
 			assert(target != caller);
 			cpu_assert_sleeping(target);
 			ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
-			if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
-				target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
+			if unlikely(!target->t_sched.s_asleep.ss_pself) {
+				/* Special case: The IDLE thread can sleep outside of the sleepers chain */
+#ifndef CONFIG_NO_SMP
+				assert(target == &FORCPU(mycpu, _this_idle));
+#else /* !CONFIG_NO_SMP */
+				assert(target == &PERCPU(_this_idle));
+#endif /* CONFIG_NO_SMP */
+			} else {
+				if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
+					target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
+			}
 			goto insert_target_after_caller;
 		}
 done_success:
@@ -597,33 +646,33 @@ insert_target_after_caller:
 				ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
 				cpu_assert_running(target);
 				if (PREEMPTION_WASENABLED(was)) {
-					if (mode & TASK_RPC_FHIGHPRIO) {
+					if ((mode & TASK_RPC_FHIGHPRIO) &&
+					    IFELSE_SMP((*mycpu), _bootcpu).c_override != caller) {
 						/* End the current quantum prematurely. */
 						cpu_quantum_end();
 						/* Immediately switch to the next target thread. */
-#ifndef CONFIG_NO_SMP
-						mycpu->c_current = target;
-#else /* !CONFIG_NO_SMP */
-						_bootcpu.c_current = target;
-#endif /* CONFIG_NO_SMP */
+						IFELSE_SMP((*mycpu), _bootcpu).c_current = target;
 						cpu_run_current_and_remember(caller);
 					}
 					PREEMPTION_ENABLE();
 				}
 				return true;
 			}
-		}
-#ifndef CONFIG_NO_SMP
-		else if (!(target_flags & TASK_FPENDING))
-#else /* !CONFIG_NO_SMP */
-		else
-#endif /* CONFIG_NO_SMP */
-		{
+		} else if (WAS_START_AND_IS_NOT_PENDING(target_flags)) {
 			/* Wake up a sleeping thread by using a sporadic wake-up. */
 			cpu_assert_sleeping(target);
 			ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
-			if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
-				target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
+			if unlikely(!target->t_sched.s_asleep.ss_pself) {
+				/* Special case: The IDLE thread can sleep outside of the sleepers chain */
+#ifndef CONFIG_NO_SMP
+				assert(target == &FORCPU(mycpu, _this_idle));
+#else /* !CONFIG_NO_SMP */
+				assert(target == &PERCPU(_this_idle));
+#endif /* CONFIG_NO_SMP */
+			} else {
+				if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
+					target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
+			}
 			goto insert_target_after_caller;
 		}
 done_success:
@@ -701,13 +750,18 @@ NOTHROW(FCALL ipi_schedule_asynchronous_srpc_lp)(struct icpustate *__restrict st
 	}
 	target->t_sched.s_state = task_push_asynchronous_srpc(target->t_sched.s_state,
 	                                                      func, arg, completed);
-	if (!(target_flags & (TASK_FRUNNING | TASK_FPENDING))) {
+	if (WAS_START_AND_IS_SLEEPING(target_flags)) {
 		struct task *next;
 		/* Wake up a sleeping thread by using a sporadic wake-up. */
 		cpu_assert_sleeping(target);
 		ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
-		if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
-			target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
+		if unlikely(!target->t_sched.s_asleep.ss_pself) {
+			/* Special case: The IDLE thread can sleep outside of the sleepers chain */
+			assert(target == &FORCPU(mycpu, _this_idle));
+		} else {
+			if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
+				target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
+		}
 		next = caller->t_sched.s_running.sr_runnxt;
 		target->t_sched.s_running.sr_runprv = caller;
 		target->t_sched.s_running.sr_runnxt = next;
@@ -765,12 +819,17 @@ insert_target_after_caller:
 		next->t_sched.s_running.sr_runprv   = target;
 		ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
 		cpu_assert_running(target);
-	} else if (!(target_flags & TASK_FPENDING)) {
+	} else if (WAS_START_AND_IS_NOT_PENDING(target_flags)) {
 		/* Wake up a sleeping thread by using a sporadic wake-up. */
 		cpu_assert_sleeping(target);
 		ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
-		if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
-			target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
+		if unlikely(!target->t_sched.s_asleep.ss_pself) {
+			/* Special case: The IDLE thread can sleep outside of the sleepers chain */
+			assert(target == &FORCPU(mycpu, _this_idle));
+		} else {
+			if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
+				target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
+		}
 		goto insert_target_after_caller;
 	}
 	return state;
@@ -825,18 +884,24 @@ insert_target_after_caller:
 		next->t_sched.s_running.sr_runprv   = target;
 		ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
 		cpu_assert_running(target);
+		mycpu->c_current = target;
 		return CPU_IPI_MODE_SWITCH_TASKS;
-	} else if (!(target_flags & TASK_FPENDING)) {
+	} else if (WAS_START_AND_IS_NOT_PENDING(target_flags)) {
 		/* Wake up a sleeping thread by using a sporadic wake-up. */
 		cpu_assert_sleeping(target);
 		ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
-		if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
-			target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
+		if unlikely(!target->t_sched.s_asleep.ss_pself) {
+			/* Special case: The IDLE thread can sleep outside of the sleepers chain */
+			assert(target == &FORCPU(mycpu, _this_idle));
+		} else {
+			if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
+				target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
+		}
 		goto insert_target_after_caller;
 	}
 	return state;
 }
-#endif
+#endif /* !CONFIG_NO_SMP */
 
 PUBLIC NOBLOCK NONNULL((1, 2)) bool
 NOTHROW(KCALL task_schedule_asynchronous_srpc)(struct task *__restrict target, task_srpc_t func,
@@ -910,33 +975,33 @@ insert_target_after_caller:
 				ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
 				cpu_assert_running(target);
 				if (PREEMPTION_WASENABLED(was)) {
-					if (mode & TASK_RPC_FHIGHPRIO) {
+					if ((mode & TASK_RPC_FHIGHPRIO) &&
+					    IFELSE_SMP((*mycpu), _bootcpu).c_override != caller) {
 						/* End the current quantum prematurely. */
 						cpu_quantum_end();
 						/* Immediately switch to the next target thread. */
-#ifndef CONFIG_NO_SMP
-						mycpu->c_current = target;
-#else /* !CONFIG_NO_SMP */
-						_bootcpu.c_current = target;
-#endif /* CONFIG_NO_SMP */
+						IFELSE_SMP((*mycpu), _bootcpu).c_current = target;
 						cpu_run_current_and_remember(caller);
 					}
 					PREEMPTION_ENABLE();
 				}
 				return true;
 			}
-		}
-#ifndef CONFIG_NO_SMP
-		else if (!(target_flags & TASK_FPENDING))
-#else /* !CONFIG_NO_SMP */
-		else
-#endif /* CONFIG_NO_SMP */
-		{
+		} else if (WAS_START_AND_IS_NOT_PENDING(target_flags)) {
 			/* Wake up a sleeping thread by using a sporadic wake-up. */
 			cpu_assert_sleeping(target);
 			ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
-			if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
-				target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
+			if unlikely(!target->t_sched.s_asleep.ss_pself) {
+				/* Special case: The IDLE thread can sleep outside of the sleepers chain */
+#ifndef CONFIG_NO_SMP
+				assert(target == &FORCPU(mycpu, _this_idle));
+#else /* !CONFIG_NO_SMP */
+				assert(target == &PERCPU(_this_idle));
+#endif /* CONFIG_NO_SMP */
+			} else {
+				if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
+					target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
+			}
 			goto insert_target_after_caller;
 		}
 done_success:
@@ -1025,15 +1090,21 @@ insert_target_after_caller:
 				COMPILER_BARRIER();
 				ATOMIC_WRITE(data->ar_status, EXEC_ASYNC_STATUS_CONFIRMED);
 				COMPILER_BARRIER();
+				mycpu->c_current = target;
 				return CPU_IPI_MODE_SWITCH_TASKS;
 			}
 		}
-	} else if (!(target_flags & TASK_FPENDING)) {
+	} else if (WAS_START_AND_IS_NOT_PENDING(target_flags)) {
 		/* Wake up a sleeping thread by using a sporadic wake-up. */
 		cpu_assert_sleeping(target);
 		ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
-		if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
-			target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
+		if unlikely(!target->t_sched.s_asleep.ss_pself) {
+			/* Special case: The IDLE thread can sleep outside of the sleepers chain */
+			assert(target == &FORCPU(mycpu, _this_idle));
+		} else {
+			if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
+				target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
+		}
 		goto insert_target_after_caller;
 	}
 done_success:
@@ -1117,7 +1188,8 @@ insert_target_after_caller:
 				ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
 				cpu_assert_running(target);
 				if (PREEMPTION_WASENABLED(was)) {
-					if (mode & TASK_RPC_FHIGHPRIO) {
+					if ((mode & TASK_RPC_FHIGHPRIO) &&
+					    mycpu->c_override != caller) {
 						/* End the current quantum prematurely. */
 						cpu_quantum_end();
 						/* Immediately switch to the next target thread. */
@@ -1128,13 +1200,18 @@ insert_target_after_caller:
 				}
 				return true;
 			}
-		} else if (!(target_flags & TASK_FPENDING)) {
+		} else if (WAS_START_AND_IS_NOT_PENDING(target_flags)) {
 			/* Wake up a sleeping thread by using a sporadic wake-up. */
 			cpu_assert_sleeping(target);
 			ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
 			assert(target->t_sched.s_asleep.ss_pself);
-			if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
-				target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
+			if unlikely(!target->t_sched.s_asleep.ss_pself) {
+				/* Special case: The IDLE thread can sleep outside of the sleepers chain */
+				assert(target == &FORCPU(mycpu, _this_idle));
+			} else {
+				if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
+					target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
+			}
 			goto insert_target_after_caller;
 		}
 done_success:
@@ -1212,15 +1289,21 @@ insert_target_after_caller:
 				COMPILER_BARRIER();
 				ATOMIC_WRITE(data->ar_status, EXEC_ASYNC_STATUS_CONFIRMED);
 				COMPILER_BARRIER();
+				mycpu->c_current = target;
 				return CPU_IPI_MODE_SWITCH_TASKS;
 			}
 		}
-	} else if (!(target_flags & TASK_FPENDING)) {
+	} else if (WAS_START_AND_IS_NOT_PENDING(target_flags)) {
 		/* Wake up a sleeping thread by using a sporadic wake-up. */
 		cpu_assert_sleeping(target);
 		ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
-		if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
-			target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
+		if unlikely(!target->t_sched.s_asleep.ss_pself) {
+			/* Special case: The IDLE thread can sleep outside of the sleepers chain */
+			assert(target == &FORCPU(mycpu, _this_idle));
+		} else {
+			if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
+				target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
+		}
 		goto insert_target_after_caller;
 	}
 done_success:
@@ -1306,7 +1389,8 @@ insert_target_after_caller:
 				ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
 				cpu_assert_running(target);
 				if (PREEMPTION_WASENABLED(was)) {
-					if (mode & TASK_RPC_FHIGHPRIO) {
+					if ((mode & TASK_RPC_FHIGHPRIO) &&
+					    mycpu->c_override != caller) {
 						/* End the current quantum prematurely. */
 						cpu_quantum_end();
 						/* Immediately switch to the next target thread. */
@@ -1317,12 +1401,17 @@ insert_target_after_caller:
 				}
 				return true;
 			}
-		} else if (!(target_flags & TASK_FPENDING)) {
+		} else if (WAS_START_AND_IS_NOT_PENDING(target_flags)) {
 			/* Wake up a sleeping thread by using a sporadic wake-up. */
 			cpu_assert_sleeping(target);
 			ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
-			if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
-				target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
+			if unlikely(!target->t_sched.s_asleep.ss_pself) {
+				/* Special case: The IDLE thread can sleep outside of the sleepers chain */
+				assert(target == &FORCPU(mycpu, _this_idle));
+			} else {
+				if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
+					target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
+			}
 			goto insert_target_after_caller;
 		}
 done_success:
@@ -1412,15 +1501,21 @@ insert_target_after_caller:
 				COMPILER_BARRIER();
 				ATOMIC_WRITE(data->ar_status, EXEC_ASYNC_STATUS_CONFIRMED);
 				COMPILER_BARRIER();
+				mycpu->c_current = target;
 				return CPU_IPI_MODE_SWITCH_TASKS;
 			}
 		}
-	} else if (!(target_flags & TASK_FPENDING)) {
+	} else if (WAS_START_AND_IS_NOT_PENDING(target_flags)) {
 		/* Wake up a sleeping thread by using a sporadic wake-up. */
 		cpu_assert_sleeping(target);
 		ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
-		if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
-			target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
+		if unlikely(!target->t_sched.s_asleep.ss_pself) {
+			/* Special case: The IDLE thread can sleep outside of the sleepers chain */
+			assert(target == &FORCPU(mycpu, _this_idle));
+		} else {
+			if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
+				target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
+		}
 		goto insert_target_after_caller;
 	}
 done_success:
@@ -1514,33 +1609,33 @@ insert_target_after_caller:
 				ATOMIC_FETCHAND(target->t_flags, ~TASK_FWAKING);
 				cpu_assert_running(target);
 				if (PREEMPTION_WASENABLED(was)) {
-					if (mode & TASK_RPC_FHIGHPRIO) {
+					if ((mode & TASK_RPC_FHIGHPRIO) &&
+					    IFELSE_SMP((*mycpu), _bootcpu).c_override != caller) {
 						/* End the current quantum prematurely. */
 						cpu_quantum_end();
 						/* Immediately switch to the next target thread. */
-#ifndef CONFIG_NO_SMP
-						mycpu->c_current = target;
-#else /* !CONFIG_NO_SMP */
-						_bootcpu.c_current = target;
-#endif /* CONFIG_NO_SMP */
+						IFELSE_SMP((*mycpu), _bootcpu).c_current = target;
 						cpu_run_current_and_remember(caller);
 					}
 					PREEMPTION_ENABLE();
 				}
 				return true;
 			}
-		}
-#ifndef CONFIG_NO_SMP
-		else if (!(target_flags & TASK_FPENDING))
-#else /* !CONFIG_NO_SMP */
-		else
-#endif /* CONFIG_NO_SMP */
-		{
+		} else if (WAS_START_AND_IS_NOT_PENDING(target_flags)) {
 			/* Wake up a sleeping thread by using a sporadic wake-up. */
 			cpu_assert_sleeping(target);
 			ATOMIC_FETCHOR(target->t_flags, TASK_FRUNNING);
-			if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
-				target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
+			if unlikely(!target->t_sched.s_asleep.ss_pself) {
+				/* Special case: The IDLE thread can sleep outside of the sleepers chain */
+#ifndef CONFIG_NO_SMP
+				assert(target == &FORCPU(mycpu, _this_idle));
+#else /* !CONFIG_NO_SMP */
+				assert(target == &PERCPU(_this_idle));
+#endif /* CONFIG_NO_SMP */
+			} else {
+				if ((*target->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_tmonxt) != NULL)
+					target->t_sched.s_asleep.ss_tmonxt->t_sched.s_asleep.ss_pself = target->t_sched.s_asleep.ss_pself;
+			}
 			goto insert_target_after_caller;
 		}
 done_success:

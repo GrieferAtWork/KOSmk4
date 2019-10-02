@@ -84,9 +84,9 @@ DECL_BEGIN
 #endif
 
 
-PRIVATE NONNULL((2, 4)) size_t
-NOTHROW(FCALL FUNC(x86FpuRegister))(uintptr_t regno, void BUF_CONST *buf, size_t bufsize,
-                                    struct task *__restrict thread) {
+PRIVATE NONNULL((1, 3)) size_t
+NOTHROW(FCALL FUNC(x86FpuRegister))(struct task *__restrict thread, uintptr_t regno,
+                                    void BUF_CONST *buf, size_t bufsize) {
 	if (regno >= GDB_REGISTER_I386_ST0 &&
 	    regno <= GDB_REGISTER_I386_MXCSR) {
 		struct fpustate *fpu;
@@ -303,9 +303,9 @@ NOTHROW(FCALL GDB_SetSCpustateEsp)(struct scpustate *__restrict state, u32 new_e
 
 /* Arch-specific: Get/Set the value of a given register `regno'
  * @return: 0 : Invalid `regno'. */
-INTERN NONNULL((2, 4, 5)) size_t FCALL
-NOTHROW(FUNC(ICpuStateRegister))(uintptr_t regno, void BUF_CONST *buf, size_t bufsize,
-                                 struct task *__restrict thread,
+INTERN NONNULL((1, 3, 5)) size_t FCALL
+NOTHROW(FUNC(ICpuStateRegister))(struct task *__restrict thread,
+                                 uintptr_t regno, void BUF_CONST *buf, size_t bufsize,
                                  struct icpustate STATE_PARAM) {
 	switch (regno) {
 
@@ -367,16 +367,16 @@ NOTHROW(FUNC(ICpuStateRegister))(uintptr_t regno, void BUF_CONST *buf, size_t bu
 		size_t result;
 		result = FUNC(GPRegsRegister)(regno, buf, bufsize, &STATE->ics_gpregs);
 		if (result == 0)
-			result = FUNC(x86FpuRegister)(regno, buf, bufsize, thread);
+			result = FUNC(x86FpuRegister)(thread, regno, buf, bufsize);
 		return result;
 	}	break;
 	}
 	return 0;
 }
 
-INTERN NONNULL((2, 4, 5)) size_t
-NOTHROW(FCALL FUNC(SCpuStateRegister))(uintptr_t regno, void BUF_CONST *buf, size_t bufsize,
-                                       struct task *__restrict thread,
+INTERN NONNULL((1, 3, 5)) size_t
+NOTHROW(FCALL FUNC(SCpuStateRegister))(struct task *__restrict thread,
+                                       uintptr_t regno, void BUF_CONST *buf, size_t bufsize,
                                        struct scpustate STATE_PARAM) {
 	switch (regno) {
 
@@ -436,16 +436,16 @@ NOTHROW(FCALL FUNC(SCpuStateRegister))(uintptr_t regno, void BUF_CONST *buf, siz
 		size_t result;
 		result = FUNC(GPRegsRegister)(regno, buf, bufsize, &STATE->scs_gpregs);
 		if (result == 0)
-			result = FUNC(x86FpuRegister)(regno, buf, bufsize, thread);
+			result = FUNC(x86FpuRegister)(thread, regno, buf, bufsize);
 		return result;
 	}	break;
 	}
 	return 0;
 }
 
-INTERN NONNULL((2, 4, 5)) size_t
-NOTHROW(FCALL FUNC(UCpuStateRegister))(uintptr_t regno, void BUF_CONST *buf, size_t bufsize,
-                                       struct task *__restrict thread,
+INTERN NONNULL((1, 3, 5)) size_t
+NOTHROW(FCALL FUNC(UCpuStateRegister))(struct task *__restrict thread,
+                                       uintptr_t regno, void BUF_CONST *buf, size_t bufsize,
                                        struct ucpustate STATE_PARAM) {
 	switch (regno) {
 
@@ -485,7 +485,7 @@ NOTHROW(FCALL FUNC(UCpuStateRegister))(uintptr_t regno, void BUF_CONST *buf, siz
 		size_t result;
 		result = FUNC(GPRegsRegister)(regno, buf, bufsize, &STATE->ucs_gpregs);
 		if (result == 0)
-			result = FUNC(x86FpuRegister)(regno, buf, bufsize, thread);
+			result = FUNC(x86FpuRegister)(thread, regno, buf, bufsize);
 		return result;
 	}	break;
 	}
@@ -494,7 +494,9 @@ NOTHROW(FCALL FUNC(UCpuStateRegister))(uintptr_t regno, void BUF_CONST *buf, siz
 
 
 INTERN NONNULL((2)) size_t
-NOTHROW(FCALL FUNC(ActiveSegmentRegister))(uintptr_t regno, void BUF_CONST *buf, size_t bufsize) {
+NOTHROW(FCALL FUNC(ActiveSegmentRegister))(uintptr_t regno,
+                                           void BUF_CONST *buf,
+                                           size_t bufsize) {
 	switch (regno) {
 
 	case GDB_REGISTER_I386_CS:
@@ -527,9 +529,9 @@ NOTHROW(FCALL FUNC(ActiveSegmentRegister))(uintptr_t regno, void BUF_CONST *buf,
 	return 0;
 }
 
-INTERN NONNULL((2, 4, 5)) size_t
-NOTHROW(FCALL FUNC(KCpuStateRegister))(uintptr_t regno, void BUF_CONST *buf, size_t bufsize,
-                                       struct task *__restrict thread,
+INTERN NONNULL((1, 3, 5)) size_t
+NOTHROW(FCALL FUNC(KCpuStateRegister))(struct task *__restrict thread,
+                                       uintptr_t regno, void BUF_CONST *buf, size_t bufsize,
                                        struct kcpustate STATE_PARAM) {
 	switch (regno) {
 
@@ -547,16 +549,16 @@ NOTHROW(FCALL FUNC(KCpuStateRegister))(uintptr_t regno, void BUF_CONST *buf, siz
 		if (result == 0)
 			result = FUNC(ActiveSegmentRegister)(regno, buf, bufsize);
 		if (result == 0)
-			result = FUNC(x86FpuRegister)(regno, buf, bufsize, thread);
+			result = FUNC(x86FpuRegister)(thread, regno, buf, bufsize);
 		return result;
 	}	break;
 	}
 	return 0;
 }
 
-INTERN NONNULL((2, 4, 5)) size_t
-NOTHROW(FCALL FUNC(LCpuStateRegister))(uintptr_t regno, void BUF_CONST *buf, size_t bufsize,
-                                       struct task *__restrict thread,
+INTERN NONNULL((1, 3, 5)) size_t
+NOTHROW(FCALL FUNC(LCpuStateRegister))(struct task *__restrict thread,
+                                       uintptr_t regno, void BUF_CONST *buf, size_t bufsize,
                                        struct lcpustate STATE_PARAM) {
 	switch (regno) {
 
@@ -595,16 +597,16 @@ NOTHROW(FCALL FUNC(LCpuStateRegister))(uintptr_t regno, void BUF_CONST *buf, siz
 			GETSET4_NOOP();
 		result = FUNC(ActiveSegmentRegister)(regno, buf, bufsize);
 		if (result == 0)
-			result = FUNC(x86FpuRegister)(regno, buf, bufsize, thread);
+			result = FUNC(x86FpuRegister)(thread, regno, buf, bufsize);
 		return result;
 	}	break;
 	}
 	return 0;
 }
 
-INTERN NONNULL((2, 4, 5)) size_t
-NOTHROW(FCALL FUNC(FCpuStateRegister))(uintptr_t regno, void BUF_CONST *buf, size_t bufsize,
-                                       struct task *__restrict thread,
+INTERN NONNULL((1, 3, 5)) size_t
+NOTHROW(FCALL FUNC(FCpuStateRegister))(struct task *__restrict thread,
+                                       uintptr_t regno, void BUF_CONST *buf, size_t bufsize,
                                        struct fcpustate STATE_PARAM) {
 	switch (regno) {
 
@@ -644,7 +646,7 @@ NOTHROW(FCALL FUNC(FCpuStateRegister))(uintptr_t regno, void BUF_CONST *buf, siz
 		size_t result;
 		result = FUNC(GPRegsRegister)(regno, buf, bufsize, &STATE->fcs_gpregs);
 		if (result == 0)
-			result = FUNC(x86FpuRegister)(regno, buf, bufsize, thread);
+			result = FUNC(x86FpuRegister)(thread, regno, buf, bufsize);
 		return result;
 	}	break;
 	}
@@ -653,12 +655,15 @@ NOTHROW(FCALL FUNC(FCpuStateRegister))(uintptr_t regno, void BUF_CONST *buf, siz
 
 
 /* Get/Set the full GDB cpustate. */
-INTERN NONNULL((1)) void
-NOTHROW(FCALL FUNC(Registers))(struct gdb_cpustate BUF_CONST *buf) {
+INTERN NONNULL((1, 2)) bool
+NOTHROW(FCALL FUNC(Registers))(struct task *__restrict thread,
+                               struct gdb_cpustate BUF_CONST *buf) {
 	uintptr_t regno;
 	for (regno = 0; regno <= sizeof(struct gdb_cpustate)/4; ++regno) {
-		FUNC(Register)(regno, (u32 *)buf + regno, 4);
+		if (!FUNC(Register)(thread, regno, (u32 *)buf + regno, 4))
+			return false;
 	}
+	return true;
 }
 
 

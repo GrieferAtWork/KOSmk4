@@ -2178,10 +2178,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak task_sleep_cputime; .long task_sleep_cputime
 	.reloc ., R_386_SIZE32, task_sleep_cputime; .long 0
 	.long 0x5ffcb05
-	.long 0 /* index: 544 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname544 /* index: 544 */
+	.weak cred_require_debugtrap; .long cred_require_debugtrap
+	.reloc ., R_386_SIZE32, cred_require_debugtrap; .long 0
+	.long 0x35b8220
 	.long 0 /* index: 545 */
 	.long 0
 	.long 0
@@ -16940,6 +16940,8 @@ END(kernel_symbol_table)
 	.string "__cpuset_full_mask"
 .Lname543:
 	.string "task_sleep_cputime"
+.Lname544:
+	.string "cred_require_debugtrap"
 .Lname546:
 	.string "sys_linux_lstat32"
 .Lname547:

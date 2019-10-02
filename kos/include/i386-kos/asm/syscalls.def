@@ -919,12 +919,11 @@ DEFINE {0x80000010,0x80000015} = set_library_listdef(struct library_listdef cons
 @@given `state', though given the purpose of this system call being
 @@to inform a connected debugger of some breakable event, allowing
 @@it to do whatever it wishes before execution is resumed.
-@@@param: trapno:   One of `SIG*' (e.g. `SIGTRAP')
-@@@param: regs:     When non-NULL, additional trap register data
+@@@param: reason:   When non-NULL, the reason for the debug trap (else: use `SIGTRAP:DEBUGTRAP_REASON_NONE')
 @@@param: state:    When non-NULL, the CPU state where the trap should return to by default
 @@@return: -EOK:    `state' was NULL and the trap returned successfully
 @@@return: -ENOENT: No debugger is connected to the calling process/process-group/system
-DEFINE {0x80000011,0x80000016} = debugtrap(struct ucpustate const *state, syscall_ulong_t trapno, struct debug_trap_register const *regs): errno_t;
+DEFINE {0x80000011,0x80000016} = debugtrap(struct ucpustate const *state, struct debugtrap_reason const *reason): errno_t;
 
 [restart(dont)][cp] DEFINE {0x80000012,0x80000019} = lfutex(
 	uintptr_t *uaddr,

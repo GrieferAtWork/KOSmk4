@@ -105,6 +105,8 @@ INTERN DlModule ld_rtld_module = {
 PRIVATE char const ld_rtld_module_filename[] = LIBDL_FILENAME;
 INTERN struct process_peb *root_peb = NULL;
 
+/* Set to true if the sys_debugtrap() system call is disabled. */
+INTERN bool sys_debugtrap_disabled = false;
 
 /* Kernel meta-information: Library listing. */
 PRIVATE struct library_listdef dl_library_layout = {

@@ -16,8 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_MODGDB_ARCH_I386_INTERRUPT_HANDLER_C
-#define GUARD_MODGDB_ARCH_I386_INTERRUPT_HANDLER_C 1
+#ifndef GUARD_MODGDBSERVER_ARCH_I386_INTERRUPT_HANDLER_C
+#define GUARD_MODGDBSERVER_ARCH_I386_INTERRUPT_HANDLER_C 1
 
 #include <kernel/compiler.h>
 
@@ -26,11 +26,14 @@
 
 #include <asm/cpu-flags.h>
 #include <asm/intrin.h>
+#include <kos/debugtrap.h>
 #include <kos/kernel/cpu-state.h>
 
+#include <string.h>
 #include <signal.h>
 
 #include "../../gdb.h"
+#include "../../server.h"
 
 DECL_BEGIN
 
@@ -38,27 +41,28 @@ PRIVATE struct task *GDB_SingleStep_IngoreThread = NULL;
 PRIVATE uintptr_t GDB_SingleStep_IngoreStart     = 0;
 PRIVATE uintptr_t GDB_SingleStep_IngoreEnd       = 0;
 
-/* Set/clear a special address range and/or thread (when `thread' is NULL, apply to any thread)
- * inside of which single-step breakpoints should not cause a debugger trap, but simply continue
- * stepping. */
+/* Set a hint to the GDB backend to ignore single-step events
+ * for instruction pointers `>= start_pc && < end_pc'.
+ * Only a single such hint can exist at any point in time. */
 INTERN void
-NOTHROW(FCALL GDB_SetSingleStepIgnoredRange)(struct task *thread, void *start_pc, void *end_pc) {
+NOTHROW(FCALL GDB_SetSingleStepIgnoredRange)(struct task *thread,
+                                             vm_virt_t start_pc,
+                                             vm_virt_t end_pc) {
 	GDB_SingleStep_IngoreThread = thread;
 	GDB_SingleStep_IngoreStart  = (uintptr_t)start_pc;
 	GDB_SingleStep_IngoreEnd    = (uintptr_t)end_pc;
 }
 
 INTERN void
-NOTHROW(FCALL GDB_ClearSingleStepIgnoredRange)(void) {
+NOTHROW(FCALL GDB_DelSingleStepIgnoredRange)(void) {
 	GDB_SingleStep_IngoreThread = NULL;
 	GDB_SingleStep_IngoreStart  = 0;
 	GDB_SingleStep_IngoreEnd    = 0;
 }
 
-PRIVATE char const hwbreak[] = DEBUG_TRAP_REGISTER_HWBREAK ":;";
-
 INTERN WUNUSED ATTR_RETNONNULL NONNULL((1)) struct icpustate *FCALL
 GDBX86Interrupt_Int1Handler(struct icpustate *__restrict state) {
+	struct debugtrap_reason reason;
 	uintptr_t dr6 = __rddr6();
 	__wrdr6(dr6 & ~(DR6_B0 | DR6_B1 | DR6_B2 |
 	                DR6_B3 | DR6_BS | DR6_BT));
@@ -75,12 +79,16 @@ GDBX86Interrupt_Int1Handler(struct icpustate *__restrict state) {
 		}
 		printk(KERN_TRACE "[gdb][pc:%p] Single-step hit\n",
 		       irregs_rdip(&state->ics_irregs));
-		return GDB_TrapICpuState(state, SIGTRAP, NULL);
+		reason.dtr_signo  = SIGTRAP;
+		reason.dtr_reason = DEBUGTRAP_REASON_NONE;
+		return GDBServer_TrapICpuState(state, &reason);
 	}
 	if (dr6 & (DR6_B0 | DR6_B1 | DR6_B2 | DR6_B3)) {
 		printk(KERN_TRACE "[gdb][pc:%p] hw-breakpoint hit\n",
 		       irregs_rdip(&state->ics_irregs));
-		return GDB_TrapICpuState(state, SIGTRAP, hwbreak);
+		reason.dtr_signo  = SIGTRAP;
+		reason.dtr_reason = DEBUGTRAP_REASON_HWBREAK;
+		return GDBServer_TrapICpuState(state, &reason);
 	}
 	printk(KERN_WARNING "[gdb][pc:%p] int1 triggered without discernible reason\n",
 	       irregs_rdip(&state->ics_irregs));
@@ -90,19 +98,22 @@ GDBX86Interrupt_Int1Handler(struct icpustate *__restrict state) {
 INTERN WUNUSED ATTR_RETNONNULL NONNULL((1)) struct icpustate *FCALL
 GDBX86Interrupt_Int3Handler(struct icpustate *__restrict state) {
 	/* INT3 - #BP */
-	char const *regs = NULL;
+	struct debugtrap_reason reason;
 	struct exception_info old_error;
 	uintptr_t pc = irregs_rdip(&state->ics_irregs);
+	reason.dtr_signo  = SIGTRAP;
+	reason.dtr_reason = DEBUGTRAP_REASON_NONE;
 	printk(KERN_TRACE "[gdb][pc:%p] sw-breakpoint hit\n", pc);
-	if (GDB_RemoteFeatures & GDB_REMOTEFEATURE_SWBREAK) {
+	if (GDBRemote_Features & GDB_REMOTE_FEATURE_SWBREAK) {
 		/* Try to rewind an `int3' or `int $3' instruction.
 		 * If this succeeds, set the `swbreak' register when triggering the trap. */
 		byte_t instr;
-		old_error = *error_info();
+		memcpy(&old_error, error_info(), sizeof(old_error));
 		TRY {
 			instr = ((byte_t *)pc)[-1];
 		} EXCEPT {
-			if (!was_thrown(E_SEGFAULT) && !was_thrown(E_WOULDBLOCK))
+			if (!was_thrown(E_SEGFAULT) &&
+			    !was_thrown(E_WOULDBLOCK))
 				RETHROW();
 			goto restore_except_and_set_trap;
 		}
@@ -110,7 +121,7 @@ GDBX86Interrupt_Int3Handler(struct icpustate *__restrict state) {
 			/* int3 */
 			irregs_wrip(&state->ics_irregs, pc - 1);
 set_swbreak_regs:
-			regs = DEBUG_TRAP_REGISTER_SWBREAK ":;";
+			reason.dtr_reason = DEBUGTRAP_REASON_SWBREAK;
 		} else if (instr == 0x03) {
 			TRY {
 				instr = ((byte_t *)pc)[-2];
@@ -125,12 +136,12 @@ set_swbreak_regs:
 		}
 	}
 set_trap:
-	return GDB_TrapICpuState(state, SIGTRAP, regs);
+	return GDBServer_TrapICpuState(state, &reason);
 restore_except_and_set_trap:
-	*error_info() = old_error;
+	memcpy(error_info(), &old_error, sizeof(old_error));
 	goto set_trap;
 }
 
 DECL_END
 
-#endif /* !GUARD_MODGDB_ARCH_I386_INTERRUPT_HANDLER_C */
+#endif /* !GUARD_MODGDBSERVER_ARCH_I386_INTERRUPT_HANDLER_C */

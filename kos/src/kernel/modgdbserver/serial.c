@@ -16,36 +16,35 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_MODGDB_REMOTE_SERIAL_C
-#define GUARD_MODGDB_REMOTE_SERIAL_C 1
+#ifndef GUARD_MODGDBSERVER_SERIAL_C
+#define GUARD_MODGDBSERVER_SERIAL_C 1
+#define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
 #include <kernel/interrupt.h>
-#include <kernel/printk.h>
 #include <kernel/except.h>
+#include <kernel/printk.h>
 #include <hybrid/host.h>
 #include <kos/io/serial.h>
 #include <sys/io.h>
 #include <stdio.h>
 
-#if defined(__i386__) || defined(__x86_64__)
-#include <kernel/pic.h>
-#include <kernel/cpuid.h>
-#endif
-
 #include "gdb.h"
 
-DECL_BEGIN
+#if defined(__i386__) || defined(__x86_64__)
+#include <kernel/cpuid.h>
+#endif /* __i386__ || __x86_64__ */
 
+DECL_BEGIN
 
 PRIVATE u8     GDBSerial_IO_IsrVector;
 PRIVATE port_t GDBSerial_IO_PortBase;
 
-INTERN NOBLOCK struct icpustate *
-NOTHROW(FCALL GDBSerial_InterruptHandler)(struct icpustate *__restrict state) {
+PRIVATE NOBLOCK bool
+NOTHROW(FCALL GDBSerial_InterruptHandler)(void *UNUSED(arg)) {
 	u8 iir = inb(SERIAL_IOADDR_IIR(GDBSerial_IO_PortBase));
 	if (iir & SERIAL_IRR_NIP)
-		return NULL; /* Not for us! */
+		return false; /* Not for us! */
 	switch (iir & SERIAL_IRR_TYP) {
 
 	case SERIAL_IRR_TYP_RDA:
@@ -56,11 +55,11 @@ NOTHROW(FCALL GDBSerial_InterruptHandler)(struct icpustate *__restrict state) {
 #ifdef X86_PIC_EOI
 		X86_PIC_EOI(GDBSerial_IO_IsrVector);
 #endif /* X86_PIC_EOI */
-		state = GDBRemote_PutByte(state, data);
+		GDBRemote_PostByte(data);
 #else
 		for (;;) {
 			data  = inb(SERIAL_IOADDR_RBR(GDBSerial_IO_PortBase));
-			state = GDBRemote_PutByte(state, data);
+			GDBRemote_PostByte(data);
 			/* Keep on reading while there is still data! */
 			if (!(inb(SERIAL_IOADDR_LSR(GDBSerial_IO_PortBase)) & SERIAL_LSR_DA))
 				break;
@@ -69,21 +68,18 @@ NOTHROW(FCALL GDBSerial_InterruptHandler)(struct icpustate *__restrict state) {
 	}	break;
 
 	default:
-		printk(KERN_WARNING "Unexpected serial interrupt: %#.2I8x\n", iir);
+		printk(KERN_WARNING "[gdb] Unexpected serial interrupt: %#.2I8x\n", iir);
 		break;
 	}
-	return state;
+	return true;
 }
-
-
 
 FORCELOCAL bool FCALL GDBSerial_IO_IsTransmitEmpty(void) {
 	return inb(SERIAL_IOADDR_LSR(GDBSerial_IO_PortBase)) & SERIAL_LSR_THRE;
 }
 
-
-INTERN void FCALL
-GDBSerial_PutData(void const *buf, size_t bufsize) {
+INTERN void
+NOTHROW(FCALL GDBSerial_PutData)(void const *buf, size_t bufsize) {
 #if defined(__i386__) || defined(__x86_64__)
 #define MAKE_DWORD(a, b, c, d) ((u32)(a) | ((u32)(b) << 8) | ((u32)(c) << 16) | ((u32)(d) << 24))
 	if (__x86_bootcpu_idfeatures.ci_80000002a == MAKE_DWORD('Q', 'E', 'M', 'U')) {
@@ -91,7 +87,7 @@ GDBSerial_PutData(void const *buf, size_t bufsize) {
 		 * -> To make debugging with QEMU faster, write all data at once. */
 		outsb(SERIAL_IOADDR_THR(GDBSerial_IO_PortBase), buf, bufsize);
 	} else
-#endif
+#endif /* __i386__ || __x86_64__ */
 	{
 		size_t i;
 		for (i = 0; i < bufsize; ++i) {
@@ -103,9 +99,7 @@ GDBSerial_PutData(void const *buf, size_t bufsize) {
 }
 
 
-
-INTERN void FCALL
-GDBSerial_Initialize(char *args) {
+INTERN void FCALL GDBSerial_Init(char *args) {
 	if (sscanf(args, "%I16U:%I8U",
 	           &GDBSerial_IO_PortBase,
 	           &GDBSerial_IO_IsrVector) != 2) {
@@ -114,8 +108,8 @@ GDBSerial_Initialize(char *args) {
 	}
 	printk(KERN_INFO "[gdb] Enable serial transport on port %#I16x (isr#%#I8x)\n",
 	       GDBSerial_IO_PortBase, GDBSerial_IO_IsrVector);
-	GDBRemote_RegisterInterruptHandler((isr_vector_t)GDBSerial_IO_IsrVector,
-	                                   &GDBSerial_InterruptHandler);
+	isr_register_at((isr_vector_t)GDBSerial_IO_IsrVector,
+	                &GDBSerial_InterruptHandler, NULL);
 	/* Configure serial */
 	outb(SERIAL_IOADDR_IER(GDBSerial_IO_PortBase), 0);
 	outb(SERIAL_IOADDR_LCR(GDBSerial_IO_PortBase), SERIAL_LCR_DLAB);
@@ -137,17 +131,18 @@ GDBSerial_Initialize(char *args) {
 		if (avail & SERIAL_LSR_DA) {
 			u8 data = inb(SERIAL_IOADDR_RBR(GDBSerial_IO_PortBase));
 			printk(KERN_INFO "[gdb] Processing initial byte %#.2I8x\n", data);
-			GDBRemote_PutByteFromHere(data);
+			GDBRemote_PostByte(data);
 		}
 	}
 }
 
-INTERN void FCALL GDBSerial_Finalize(void) {
-	GDBRemote_UnregisterInterruptHandler((isr_vector_t)GDBSerial_IO_IsrVector);
+INTERN void FCALL GDBSerial_Fini(void) {
+	isr_unregister_at((isr_vector_t)GDBSerial_IO_IsrVector,
+	                  &GDBSerial_InterruptHandler, NULL);
 }
 
 
 
 DECL_END
 
-#endif /* !GUARD_MODGDB_REMOTE_SERIAL_C */
+#endif /* !GUARD_MODGDBSERVER_SERIAL_C */

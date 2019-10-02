@@ -109,6 +109,11 @@ struct cpu {
 	                              * This chain is loaded by the CPU itself, which can be
 	                              * provoked by another CPU calling `cpu_wake()' */
 #endif /* !CONFIG_NO_SMP */
+	REF struct task *c_override; /* [0..1][lock(PRIVATE(THIS_CPU))] Scheduling override.
+	                              * When non-NULL, this is the only thread that may run on this CPU.
+	                              * Note that any given thread can only ever set itself as override,
+	                              * the general requirement being that setting an override requires
+	                              * `c_override == NULL || c_current == c_override' */
 	size_t           c_heapsize; /* [const] Allocated heap size of this CPU */
 	WEAK u16         c_state;    /* CPU State (one of `CPU_STATE_*') */
 	u16              c_pad[(sizeof(void *)-2)/2]; /* ... */
@@ -201,13 +206,13 @@ DATDEF cpuid_t cpu_online_count;
 
 
 #ifndef CONFIG_NO_SMP
+#define task_isonlythread()                                           \
+	(__hybrid_atomic_load(cpu_online_count, __ATOMIC_ACQUIRE) <= 1 && \
+	 __hybrid_atomic_load(THIS_TASK->t_sched.s_running.sr_runnxt, __ATOMIC_ACQUIRE) == THIS_TASK)
+#else /* !CONFIG_NO_SMP */
 #define task_isonlythread() \
-       (__hybrid_atomic_load(cpu_online_count,__ATOMIC_ACQUIRE) <= 1 && \
-        __hybrid_atomic_load(THIS_TASK->t_sched.s_running.sr_runnxt,__ATOMIC_ACQUIRE) == THIS_TASK)
-#else
-#define task_isonlythread() \
-       (__hybrid_atomic_load(THIS_TASK->t_sched.s_running.sr_runnxt,__ATOMIC_ACQUIRE) == THIS_TASK)
-#endif
+	(__hybrid_atomic_load(THIS_TASK->t_sched.s_running.sr_runnxt, __ATOMIC_ACQUIRE) == THIS_TASK)
+#endif /* CONFIG_NO_SMP */
 
 
 /* [1..1][cpu_count] Vector of CPU descriptors.
@@ -236,6 +241,7 @@ typedef uintptr_t cpuset_t[(CONFIG_MAX_CPU_COUNT + (BITS_PER_POINTER-1)) / BITS_
 #define CPUSET_CONTAINS(x,id) ((x)[(id) / BITS_PER_POINTER] & ((uintptr_t)1 << ((id) % BITS_PER_POINTER)))
 #define CPUSET_INSERT(x,id)   (void)((x)[(id) / BITS_PER_POINTER] |= ((uintptr_t)1 << ((id) % BITS_PER_POINTER)))
 #define CPUSET_REMOVE(x,id)   (void)((x)[(id) / BITS_PER_POINTER] &= ~((uintptr_t)1 << ((id) % BITS_PER_POINTER)))
+#define CPUSET_COUNT(x) cpuset_count_impl(x)
 FORCELOCAL size_t NOTHROW(KCALL cpuset_count_impl)(cpuset_t self) {
 	size_t result = 0;
 	cpuid_t i;
@@ -245,8 +251,16 @@ FORCELOCAL size_t NOTHROW(KCALL cpuset_count_impl)(cpuset_t self) {
 	}
 	return result;
 }
-#define CPUSET_COUNT(x)       cpuset_count_impl(x)
-#else
+#define CPUSET_ISEMPTY(x) cpuset_isempty_impl(x)
+FORCELOCAL bool NOTHROW(KCALL cpuset_isempty_impl)(cpuset_t self) {
+	cpuid_t i;
+	for (i = 0; i < cpu_count; ++i) {
+		if (CPUSET_CONTAINS(self, i))
+			return false;
+	}
+	return true;
+}
+#else /* CONFIG_MAX_CPU_COUNT > BITS_PER_POINTER */
 typedef uintptr_t cpuset_t;
 #if CONFIG_MAX_CPU_COUNT <= 1
 #define __cpuset_full_mask  1
@@ -264,16 +278,17 @@ DATDEF cpuset_t const __cpuset_full_mask; /* [== (1 << cpu_count) - 1] */
 #else
 #define CPUSET_COUNT(x)       __hybrid_popcount8((u8)((x) & __cpuset_full_mask))
 #endif
-#define CPUSET_CLEAR(x)       (void)((x)=0)
-#define CPUSET_SETFULL(x)     (void)((x)=(uintptr_t)-1)
-#define CPUSET_SETONE(x,id)   (void)((x)=((uintptr_t)1 << (id)))
-#define CPUSET_CONTAINS(x,id) ((x) & ((uintptr_t)1 << (id)))
-#define CPUSET_INSERT(x,id)   (void)((x) |= ((uintptr_t)1 << (id)))
-#define CPUSET_REMOVE(x,id)   (void)((x) &= ~((uintptr_t)1 << (id)))
-#endif
+#define CPUSET_CLEAR(x)        (void)((x) = 0)
+#define CPUSET_ISEMPTY(x)      (((x) & __cpuset_full_mask) == 0)
+#define CPUSET_SETFULL(x)      (void)((x) = (uintptr_t)-1)
+#define CPUSET_SETONE(x, id)   (void)((x) = ((uintptr_t)1 << (id)))
+#define CPUSET_CONTAINS(x, id) ((x) & ((uintptr_t)1 << (id)))
+#define CPUSET_INSERT(x, id)   (void)((x) |= ((uintptr_t)1 << (id)))
+#define CPUSET_REMOVE(x, id)   (void)((x) &= ~((uintptr_t)1 << (id)))
+#endif /* CONFIG_MAX_CPU_COUNT <= BITS_PER_POINTER */
 #ifndef CPUSET_SETONE
 #define CPUSET_SETONE(x,id)  (CPUSET_CLEAR(x),CPUSET_INSERT(x,id))
-#endif
+#endif /* !CPUSET_SETONE */
 
 
 
@@ -282,6 +297,24 @@ DATDEF cpuset_t const __cpuset_full_mask; /* [== (1 << cpu_count) - 1] */
 DATDEF struct cpu _bootcpu;
 DATDEF struct task _bootidle;
 DATDEF ATTR_PERTASK struct cpu *_this_cpu;
+
+/* NOTE: When it comes to scheduling, the IDLE thread is special in that:
+ *   - It doesn't necessarily have to be apart of any chain (`c_current' or `c_sleeping'),
+ *     but can just be sitting around without being recognized by the scheduler at all.
+ *     >> (t_flags & TASK_FRUNNING) == 0;
+ *     >> t_sched.s_asleep.ss_pself == NULL;
+ *   - It can be apart of the `c_current' chain if it wants to
+ *     >> (t_flags & TASK_FRUNNING) != 0;
+ *   - It can be apart of the `c_sleeping' chain if it wants to
+ *     >> (t_flags & TASK_FRUNNING) == 0;
+ *     >> t_sched.s_asleep.ss_pself != NULL;
+ *   - It can never be apart of the `c_pending' chain, and neither
+ *     can it ever switch its hosting CPU to be moved to another CPU
+ *   - When no other thread is running on the associated CPU, the IDLE
+ *     thread will be the thread in `c_current'
+ *   - Calling `task_pause()' is called from the IDLE thread will always
+ *     return after the next sporadic interrupt (always returning `false')
+ */
 DATDEF ATTR_PERCPU struct task _this_idle;
 
 #ifdef CONFIG_NO_SMP
@@ -289,14 +322,14 @@ DATDEF ATTR_PERCPU struct task _this_idle;
 #undef THIS_IDLE
 #define THIS_CPU   (&_bootcpu)
 #define THIS_IDLE  (&_bootidle)
-#else
+#else /* CONFIG_NO_SMP */
 #ifndef THIS_CPU
 #define THIS_CPU   PERTASK_GET(_this_cpu)
-#endif
+#endif /* !THIS_CPU */
 #ifndef THIS_IDLE
 #define THIS_IDLE  (&PERCPU(_this_idle))
-#endif
-#endif
+#endif /* !THIS_IDLE */
+#endif /* !CONFIG_NO_SMP */
 
 
 /* Enter deep-sleep mode on the given CPU.
@@ -526,9 +559,8 @@ typedef NOBLOCK NONNULL((1, 2)) /*ATTR_NOTHROW*/struct icpustate *
 #define CPU_IPI_MODE_SPECIAL_MIN      (__CCAST(uintptr_t)(-1))
 #define CPU_IPI_MODE_ISSPECIAL(x)     (__CCAST(uintptr_t)(x) >= CPU_IPI_MODE_SPECIAL_MIN)
 
-/* Prematurely end the current quantum and switch to the next task,
- * the same way a call to `task_yield()' would have when done by the
- * code that got interrupted.
+/* Prematurely end the current quantum and switch execution over
+ * to `THIS_CPU->c_current'.
  * This is mainly used to quickly cause a thread woken by `task_wake()'
  * to resume execution when it was hosted by a different CPU before then. */
 #define CPU_IPI_MODE_SWITCH_TASKS     (__CCAST(struct icpustate *)(-1))

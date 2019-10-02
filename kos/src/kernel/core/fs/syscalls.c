@@ -2848,25 +2848,6 @@ LOCAL void KCALL run_pertask_onexec(void) {
 
 
 
-LOCAL char KCALL tohex(u8 value) {
-	if (value >= 10)
-		return (char)('A' + (value - 10));
-	return (char)('0' + value);
-}
-
-PRIVATE ssize_t KCALL
-str2hex_printer(void *arg, char const *__restrict data, size_t datalen) {
-	char *dst = *(char **)arg;
-	size_t i;
-	for (i = 0; i < datalen; ++i) {
-		u8 ch = (u8)data[i];
-		*dst++ = tohex((ch >> 4) & 0xf);
-		*dst++ = tohex(ch & 0xf);
-	}
-	*(char **)arg = dst;
-	return (ssize_t)datalen * 2;
-}
-
 
 PRIVATE struct icpustate *KCALL
 kernel_do_execveat(struct icpustate *__restrict state,
@@ -2877,27 +2858,22 @@ kernel_do_execveat(struct icpustate *__restrict state,
                    USER UNCHECKED char const *USER CHECKED const *envp) {
 	if (kernel_debugtrap_enabled()) {
 		/* Trigger an EXEC debug trap. */
-		char *regbuf, *dst;
+		char *buf, *dst;
 		size_t reglen;
-		/* "exec:<ABS_PATH_OF_FILE_IN_HEX>;" */
-		reglen  = (2 + COMPILER_STRLEN(DEBUG_TRAP_REGISTER_EXEC));
-		reglen += (2 * (size_t)path_printent(containing_path, containing_dentry, &format_length, NULL));
+		reglen = (size_t)path_printent(containing_path, containing_dentry, &format_length, NULL);
 		/* Allocate the register buffer beforehand, so this
 		 * allocation failing can still be handled by user-space.
 		 * NOTE: We always allocate this buffer on the heap, since file paths can get quite long,
 		 *       an being as far to the bottom of the kernel stack as we are, it could be a bit
 		 *       risky to allocate a huge stack-based structure when we still have to call `vm_exec()',
 		 *       even when using `malloca()' (but maybe I'm just overlay cautios...) */
-		regbuf = (char *)kmalloc((reglen + 1) * sizeof(char), GFP_NORMAL);
-		dst = (char *)mempcpy(regbuf, DEBUG_TRAP_REGISTER_EXEC,
-		                      COMPILER_STRLEN(DEBUG_TRAP_REGISTER_EXEC) *
-		                      sizeof(char));
-		*dst++ = ':';
-		path_printent(containing_path, containing_dentry, &str2hex_printer, &dst);
-		*dst++ = ';';
-		assert(dst == regbuf + reglen);
-		*dst = 0;
+		buf = (char *)kmalloc((reglen + 1) * sizeof(char), GFP_NORMAL);
 		TRY {
+			dst = buf;
+			path_printent(containing_path, containing_dentry, &format_sprintf_printer, &dst);
+			*dst = '\0';
+			assert(dst == buf + reglen);
+			*dst = 0;
 			/* Actually map the specified file into memory! */
 			state = vm_exec(THIS_VM,
 			                state,
@@ -2910,12 +2886,18 @@ kernel_do_execveat(struct icpustate *__restrict state,
 			                envp);
 			/* Upon success, run onexec callbacks (which will clear all CLOEXEC handles). */
 			run_pertask_onexec();
+			{
+				struct debugtrap_reason r;
+				r.dtr_signo  = SIGTRAP;
+				r.dtr_reason = DEBUGTRAP_REASON_EXEC;
+				r.dtr_strarg = buf;
+				state = kernel_debugtrap_r(state, &r);
+			}
 		} EXCEPT {
-			kfree(regbuf);
+			kfree(buf);
 			RETHROW();
 		}
-		state = kernel_debugtrap_r(state, SIGTRAP, regbuf);
-		kfree(regbuf);
+		kfree(buf);
 	} else {
 		/* Actually map the specified file into memory! */
 		state = vm_exec(THIS_VM,

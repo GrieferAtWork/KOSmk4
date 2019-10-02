@@ -24,8 +24,7 @@
 .section .xdata
 PUBLIC_FUNCTION(kernel_debugtrap)
 	/* PUBLIC void FCALL
-	 * kernel_debugtrap(syscall_ulong_t trapno,
-	 *                  char const *trap_regs); */
+	 * kernel_debugtrap(struct debugtrap_reason const *reason); */
 	.cfi_startproc
 	.cfi_signal_frame
 	.byte 0xc3 /* ret */
@@ -39,9 +38,8 @@ PUBLIC_FUNCTION(kernel_debugtrap)
 	pushl_cfi_r %es
 	pushl_cfi_r %fs
 	pushal_cfi_r
-	pushl_cfi %edx         /* char const *trap_regs */
-	movl   %ecx, %edx      /* syscall_ulong_t trapno */
-	leal   4(%esp), %ecx   /* struct icpustate *__restrict state */
+	movl   %ecx, %edx   /* struct debugtrap_reason const *reason */
+	movl   %esp, %ecx   /* struct icpustate *state */
 	EXTERN(kernel_debugtrap_icpustate)
 	call   kernel_debugtrap_icpustate
 	nop /* Aid with unwinding */

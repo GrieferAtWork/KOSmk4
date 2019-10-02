@@ -487,14 +487,14 @@ INTERN_FUNCTION(x86_smp_entry32)
 	andl   $CPUID_1A_MODEL_M, %ecx
 #if CPUID_1A_MODEL_S
 	shrl   $CPUID_1A_MODEL_S, %ecx
-#endif
+#endif /* CPUID_1A_MODEL_S */
 	cmpl   $3, %ecx
 	jae    1f  /* if (Model >= 3) goto 1f; */
 	movl   %eax, %ecx
 	andl   $CPUID_1A_STEPPING_M, %ecx
 #if CPUID_1A_STEPPING_S
 	shrl   $CPUID_1A_STEPPING_S, %ecx
-#endif
+#endif /* CPUID_1A_STEPPING_S */
 	cmpl   $3, %ecx
 	/* if (Stepping >= 3) goto 1f; */
 	jae    1f

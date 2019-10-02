@@ -29,6 +29,8 @@
 #include <kernel/malloc.h>
 #include <kernel/slab.h>
 
+/* TODO: With `#undef CONFIG_DEBUG_MALLOC': Running `deemon' (no arguments)
+ *       causes an assertion failure in the non-debug realloc() function. */
 #if 0 /* Quick toggle to disable debug_malloc (and use the weak definitions from `malloc.c'). */
 #undef CONFIG_DEBUG_MALLOC
 #endif

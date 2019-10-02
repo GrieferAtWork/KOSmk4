@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4562e301 */
+/* HASH CRC-32:0x17782835 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -467,12 +467,11 @@
  * given `state', though given the purpose of this system call being
  * to inform a connected debugger of some breakable event, allowing
  * it to do whatever it wishes before execution is resumed.
- * @param: trapno:   One of `SIG*' (e.g. `SIGTRAP')
- * @param: regs:     When non-NULL, additional trap register data
+ * @param: reason:   When non-NULL, the reason for the debug trap (else: use `SIGTRAP:DEBUGTRAP_REASON_NONE')
  * @param: state:    When non-NULL, the CPU state where the trap should return to by default
  * @return: -EOK:    `state' was NULL and the trap returned successfully
  * @return: -ENOENT: No debugger is connected to the calling process/process-group/system */
-#define __NR64_debugtrap                 0x80000016 /* errno_t debugtrap(struct ucpustate const *state, syscall_ulong_t trapno, struct debug_trap_register const *regs) */
+#define __NR64_debugtrap                 0x80000016 /* errno_t debugtrap(struct ucpustate const *state, struct debugtrap_reason const *reason) */
 #define __NR64_select64                  0x80000017 /* ssize_t select64(size_t nfds, struct __fd_set_struct *readfds, struct __fd_set_struct *writefds, struct __fd_set_struct *exceptfds, struct __timeval64 *timeout) */
 #define __NR64_rpc_service               0x80000018 /* syscall_slong_t rpc_service(void) */
 #define __NR64_lfutex                    0x80000019 /* syscall_slong_t lfutex(uintptr_t *uaddr, syscall_ulong_t futex_op, uintptr_t val, struct __timespec64 const *timeout, uintptr_t val2) */
@@ -2208,8 +2207,7 @@
 #define __NR64AT3_writevf                   iomode_t
 #define __NR64AT0_set_library_listdef       struct library_listdef const *
 #define __NR64AT0_debugtrap                 struct ucpustate const *
-#define __NR64AT1_debugtrap                 syscall_ulong_t
-#define __NR64AT2_debugtrap                 struct debug_trap_register const *
+#define __NR64AT1_debugtrap                 struct debugtrap_reason const *
 #define __NR64AT0_select64                  size_t
 #define __NR64AT1_select64                  struct __fd_set_struct *
 #define __NR64AT2_select64                  struct __fd_set_struct *
@@ -3038,8 +3036,7 @@
 #define __NR64AN3_writevf                   "mode"
 #define __NR64AN0_set_library_listdef       "listdef"
 #define __NR64AN0_debugtrap                 "state"
-#define __NR64AN1_debugtrap                 "trapno"
-#define __NR64AN2_debugtrap                 "regs"
+#define __NR64AN1_debugtrap                 "reason"
 #define __NR64AN0_select64                  "nfds"
 #define __NR64AN1_select64                  "readfds"
 #define __NR64AN2_select64                  "writefds"
@@ -4839,11 +4836,9 @@
 #define __NR64ATRF0_set_library_listdef       "%p"
 #define __NR64ATRA0_set_library_listdef(listdef) ,listdef
 #define __NR64ATRF0_debugtrap                 "%p"
-#define __NR64ATRA0_debugtrap(state, trapno, regs) ,state
-#define __NR64ATRF1_debugtrap                 "%#Ix"
-#define __NR64ATRA1_debugtrap(state, trapno, regs) ,(uintptr_t)(trapno)
-#define __NR64ATRF2_debugtrap                 "%p"
-#define __NR64ATRA2_debugtrap(state, trapno, regs) ,regs
+#define __NR64ATRA0_debugtrap(state, reason)  ,state
+#define __NR64ATRF1_debugtrap                 "%p"
+#define __NR64ATRA1_debugtrap(state, reason)  ,reason
 #define __NR64ATRF0_select64                  "%Iu"
 #define __NR64ATRA0_select64(nfds, readfds, writefds, exceptfds, timeout) ,nfds
 #define __NR64ATRF1_select64                  "%p"
@@ -5384,7 +5379,7 @@
 #define __NR64AC_readvf                    4
 #define __NR64AC_writevf                   4
 #define __NR64AC_set_library_listdef       1
-#define __NR64AC_debugtrap                 3
+#define __NR64AC_debugtrap                 2
 #define __NR64AC_select64                  5
 #define __NR64AC_rpc_service               0
 #define __NR64AC_lfutex                    5
@@ -5685,7 +5680,7 @@
 #define __NR64AM_readvf(a, b, c, d, e, f)                    (__fd_t)a, (struct iovec const *)b, (__size_t)c, (__iomode_t)d
 #define __NR64AM_writevf(a, b, c, d, e, f)                   (__fd_t)a, (struct iovec const *)b, (__size_t)c, (__iomode_t)d
 #define __NR64AM_set_library_listdef(a, b, c, d, e, f)       (struct library_listdef const *)a
-#define __NR64AM_debugtrap(a, b, c, d, e, f)                 (struct ucpustate const *)a, (__syscall_ulong_t)b, (struct debug_trap_register const *)c
+#define __NR64AM_debugtrap(a, b, c, d, e, f)                 (struct ucpustate const *)a, (struct debugtrap_reason const *)b
 #define __NR64AM_select64(a, b, c, d, e, f)                  (__size_t)a, (struct __fd_set_struct *)b, (struct __fd_set_struct *)c, (struct __fd_set_struct *)d, (struct __timeval64 *)e
 #define __NR64AM_rpc_service(a, b, c, d, e, f)               /* nothing */
 #define __NR64AM_lfutex(a, b, c, d, e, f)                    (__uintptr_t *)a, (__syscall_ulong_t)b, (__uintptr_t)c, (struct __timespec64 const *)d, (__uintptr_t)e
@@ -5986,7 +5981,7 @@
 #define __NR64AP_readvf(a, b, c, d)                          (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NR64AP_writevf(a, b, c, d)                         (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NR64AP_set_library_listdef(a)                      (__syscall_ulong_t)a
-#define __NR64AP_debugtrap(a, b, c)                          (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c
+#define __NR64AP_debugtrap(a, b)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR64AP_select64(a, b, c, d, e)                     (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR64AP_rpc_service()                                 /* nothing */
 #define __NR64AP_lfutex(a, b, c, d, e)                       (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e

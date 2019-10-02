@@ -19,36 +19,42 @@
 #ifndef _KOS_DEBUGTRAP_H
 #define _KOS_DEBUGTRAP_H 1
 
-/* Helper structures for triggering debug events. */
-
-#include <__crt.h>
 #include <__stdinc.h>
 
-#include <bits/types.h>
-#include <kos/bits/debugtrap.h> /* struct debug_trap_register */
+#include <kos/bits/debugtrap.h>
 
-__SYSDECL_BEGIN
-
-#ifndef DEBUG_TRAP_REGISTER_MAXSIZE
-#define DEBUG_TRAP_REGISTER_MAXSIZE 512 /* Max total size of the trap register data string. */
-#endif /* !DEBUG_TRAP_REGISTER_MAXSIZE */
-
-/* From: https://sourceware.org/gdb/onlinedocs/gdb/Stop-Reply-Packets.html#Stop-Reply-Packets
- * Registers are written as `NAME:VALUE;NAME:VALUE;...' */
-#define DEBUG_TRAP_REGISTER_WATCH          "watch"          /* Value: "DATA_ADDRESS_HEX"  (write watchpoint) */
-#define DEBUG_TRAP_REGISTER_RWATCH         "rwatch"         /* Value: "DATA_ADDRESS_HEX"  (read watchpoint) */
-#define DEBUG_TRAP_REGISTER_AWATCH         "awatch"         /* Value: "DATA_ADDRESS_HEX"  (read/write watchpoint) */
-#define DEBUG_TRAP_REGISTER_SYSCALL_ENTRY  "syscall_entry"  /* Value: "SYSCALL_HEX"  (Trigger when entering a system call) */
-#define DEBUG_TRAP_REGISTER_SYSCALL_RETURN "syscall_return" /* Value: "SYSCALL_HEX"  (Trigger when leaving a system call) */
-#define DEBUG_TRAP_REGISTER_LIBRARY        "library"        /* Value: ""  (Trigger when loading/unloading libraries) */
-#define DEBUG_TRAP_REGISTER_SWBREAK        "swbreak"        /* Value: ""  (Trigger when hitting a software breakpoint) */
-#define DEBUG_TRAP_REGISTER_HWBREAK        "hwbreak"        /* Value: ""  (Trigger when hitting a hardware breakpoint) */
-#define DEBUG_TRAP_REGISTER_FORK           "fork"           /* Value: "THREAD_ID_OF_NEW_PROCESS"  (Trigger after fork() or clone()) */
-#define DEBUG_TRAP_REGISTER_VFORK          "vfork"          /* Value: "THREAD_ID_OF_NEW_PROCESS"  (Trigger after vfork() or clone(CLONE_VFORK)) */
-#define DEBUG_TRAP_REGISTER_VFORKDONE      "vforkdone"      /* Value: ""  (Trigger when a vfork client calls exec() or exit(), thus unsharing the original process's address space) */
-#define DEBUG_TRAP_REGISTER_EXEC           "exec"           /* Value: "FULL_PATH_OF_EXEC_FILE_HEX"  (Trigger when exec() is called) */
-#define DEBUG_TRAP_REGISTER_CREATE         "create"         /* Value: ""  (Trigger when creating a new thread (using the initial context of the new thread)) */
-
-__SYSDECL_END
+/* NOTE: Use of trap reasons require special permissions, with the exception of:
+ *  -  DEBUGTRAP_REASON_NONE
+ *  -  DEBUGTRAP_REASON_LIBRARY
+ *  -  DEBUGTRAP_REASON_WATCHW
+ *  -  DEBUGTRAP_REASON_WATCHR
+ *  -  DEBUGTRAP_REASON_WATCHRW
+ *  -  DEBUGTRAP_REASON_SWBREAK */
+#define DEBUGTRAP_REASON_NONE      0x0000 /* No special reason */
+#define DEBUGTRAP_REASON_WATCHW    0x0001 /* [dtr_ptrarg = (void *)watch_addr] write watchpoint */
+#define DEBUGTRAP_REASON_WATCHR    0x0002 /* [dtr_ptrarg = (void *)watch_addr] read watchpoint */
+#define DEBUGTRAP_REASON_WATCHRW   0x0003 /* [dtr_ptrarg = (void *)watch_addr] read/write watchpoint */
+#define DEBUGTRAP_REASON_SC_ENTRY  0x0004 /* [dtr_intarg = sysno] System call entry */
+#define DEBUGTRAP_REASON_SC_EXIT   0x0005 /* [dtr_intarg = sysno] System call exit */
+#define DEBUGTRAP_REASON_LIBRARY   0x0006 /* Set of loaded libraries has changed. */
+#define DEBUGTRAP_REASON_FORK      0x0007 /* [USER(dtr_intarg = (pid_t)CHILD)]
+                                           * [KERNEL(dtr_ptrarg = (struct task *)CHILD)]
+                                           * New process created (invoked by the parent process,
+                                           * with the child already available, but not yet started) */
+#define DEBUGTRAP_REASON_VFORK     0x0008 /* [USER(dtr_intarg = (pid_t)CHILD)]
+                                           * [KERNEL(dtr_ptrarg = (struct task *)CHILD)]
+                                           * Same as `DEBUGTRAP_REASON_FORK' */
+#define DEBUGTRAP_REASON_VFORKDONE 0x0009 /* A vfork() child process has executed exec() or exit() */
+#define DEBUGTRAP_REASON_EXEC      0x000a /* [dtr_strarg = exec_path] Executing a new program. */
+#define DEBUGTRAP_REASON_CLONE     0x000b /* New thread created (invoked in by the child thread itself) */
+#define DEBUGTRAP_REASON_TEXITED   0x000c /* [USER(dtr_intarg = (pid_t)thread_tid)]
+                                           * [KERNEL(dtr_ptrarg = (struct task *)thread)]
+                                           * [dtr_signo = (int)$?] A thread has exited */
+#define DEBUGTRAP_REASON_PEXITED   0x000d /* [USER(dtr_intarg = (pid_t)proc_pid)]
+                                           * [KERNEL(dtr_ptrarg = (struct task *)some_thread_of_process)]
+                                           * [dtr_signo = (union wait)status] A process has exited */
+#define DEBUGTRAP_REASON_SWBREAK   0x000e /* Software breakpoint */
+#define DEBUGTRAP_REASON_HWBREAK   0x000f /* Hardware breakpoint */
+#define DEBUGTRAP_REASON_MAX DEBUGTRAP_REASON_HWBREAK
 
 #endif /* !_KOS_DEBUGTRAP_H */

@@ -24,8 +24,8 @@
 
 
 .section .xdata
-/* struct CPUSTATE *FCALL kernel_debugtrap_r_CPUSTATE(struct CPUSTATE *__restrict state,
- *                                                    syscall_ulong_t trapno, char const *trap_regs); */
+/* struct CPUSTATE *FCALL kernel_debugtrap_r_CPUSTATE(struct CPUSTATE *state,
+ *                                                    struct debugtrap_reason const *reason); */
 PUBLIC_FUNCTION(PP_CAT2(kernel_debugtrap_r_,CPUSTATE))
 	.cfi_startproc
 	.byte 0xe9       /* jmp 1f; 1: */
@@ -33,20 +33,17 @@ INTERN_BEGIN(PP_CAT3(__x86_kernel_debugtrap_r_,CPUSTATE,_jmp_offset))
 	.long 0x00000000
 END(PP_CAT3(__x86_kernel_debugtrap_r_,CPUSTATE,_jmp_offset))
 	movl  %ecx, %eax
-	ret   $4
+	ret
 	.cfi_endproc
 END(PP_CAT2(kernel_debugtrap_r_,CPUSTATE))
 
 
 
 .section .xdata
-/* ATTR_NORETURN void FCALL trigger_debugtrap_CPUSTATE(struct CPUSTATE *__restrict state,
- *                                                     syscall_ulong_t trapno, char const *trap_regs); */
+/* ATTR_NORETURN void FCALL trigger_debugtrap_CPUSTATE(struct CPUSTATE *state,
+ *                                                     struct debugtrap_reason const *reason); */
 INTERN_FUNCTION(PP_CAT2(trigger_debugtrap_,CPUSTATE))
 	.cfi_startproc
-	movl   4(%esp), %eax
-	pushl_cfi  %eax /* trap_regs */
-
 	.byte  0xe8        /* call PP_CAT2(kernel_debugtrap_r_,CPUSTATE) */
 INTERN_BEGIN(PP_CAT3(__x86_trigger_debugtrap_,CPUSTATE,_call_offset))
 	.reloc ., R_386_PC32, PP_CAT2(kernel_debugtrap_r_,CPUSTATE)

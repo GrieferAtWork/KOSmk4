@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4b24a35f */
+/* HASH CRC-32:0x6bfae17 */
 DEFINE_PUBLIC_WEAK_ALIAS(sys_read, sys_invalid3);                   /* 0 */
 DEFINE_PUBLIC_WEAK_ALIAS(sys_write, sys_invalid3);                  /* 1 */
 DEFINE_PUBLIC_WEAK_ALIAS(sys_open, sys_invalid3);                   /* 2 */
@@ -265,7 +265,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_pwrite64f, sys_invalid5);              /* 0x8000001
 DEFINE_PUBLIC_WEAK_ALIAS(sys_readvf, sys_invalid4);                 /* 0x80000013 */
 DEFINE_PUBLIC_WEAK_ALIAS(sys_writevf, sys_invalid4);                /* 0x80000014 */
 DEFINE_PUBLIC_WEAK_ALIAS(sys_set_library_listdef, sys_invalid1);    /* 0x80000015 */
-DEFINE_PUBLIC_WEAK_ALIAS(sys_debugtrap, sys_invalid3);              /* 0x80000016 */
+DEFINE_PUBLIC_WEAK_ALIAS(sys_debugtrap, sys_invalid2);              /* 0x80000016 */
 DEFINE_PUBLIC_WEAK_ALIAS(sys_select64, sys_invalid5);               /* 0x80000017 */
 DEFINE_PUBLIC_WEAK_ALIAS(sys_rpc_service, sys_invalid0);            /* 0x80000018 */
 DEFINE_PUBLIC_WEAK_ALIAS(sys_lfutex, sys_invalid5);                 /* 0x80000019 */

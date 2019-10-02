@@ -16,38 +16,35 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_MODGDB_ARCH_I386_KILL_C
-#define GUARD_MODGDB_ARCH_I386_KILL_C 1
 
 #include <kernel/compiler.h>
-#include <kernel/printk.h>
-#include <kernel/cpuid.h>
-#include <sched/task.h>
-#include <sys/io.h>
+#include <kernel/paging.h> /* KERNEL_DEBUG_STACKSIZE */
+#include <asm/cfi.h>
 
-#include "../../gdb.h"
+.section .bss
+INTERN_OBJECT(GDB_Main_alternate_stack)
+	.skip KERNEL_DEBUG_STACKSIZE
+END(GDB_Main_alternate_stack)
 
-DECL_BEGIN
+.section .text
+/* Wrapper for `GDB_Main()' that will invoke said function
+ * using an alternate, statically allocated stack. */
+/* INTDEF void NOTHROW(FCALL GDB_MainWithAlternateStack)(void); */
+INTERN_FUNCTION(GDB_MainWithAlternateStack)
+	.cfi_startproc
+	pushl_cfi_r %ebp
+	movl   %esp, %ebp
+	.cfi_def_cfa_register %ebp
 
-#define MAKE_DWORD(a, b, c, d) \
-	((u32)(a) | ((u32)(b) << 8) | ((u32)(c) << 16) | ((u32)(d) << 24))
+	/* Load the alternate stack and call the regular GDB_Main() function. */
+	movl   $(GDB_Main_alternate_stack + KERNEL_DEBUG_STACKSIZE), %esp
+	INTERN(GDB_Main)
+	call   GDB_Main
 
-/* Kill the kernel. (== shutdown()) */
-INTERN ATTR_NORETURN void NOTHROW(FCALL GDB_KillKernel)(void) {
-	printk(KERN_INFO "[gdb] Shutdown via GDB stub\n");
-	/* Emulator-specific shutdown control codes. */
-	if (CPUID_FEATURES.ci_80000002a == MAKE_DWORD('Q', 'E', 'M', 'U')) {
-		/* `qemu -device isa-debug-exit,iobase=0xf4,iosize=0x04'
-		 * TODO: Make this configurable! */
-		outb((port_t)0xf4, 0x00);
-		outw((port_t)0x604, 0x2000);
-	} else if (CPUID_FEATURES.ci_80000002a == MAKE_DWORD('B', 'O', 'C', 'H')) {
-		outw((port_t)0xB004, 0x2000);
-	}
-	PREEMPTION_HALT();
-}
+	leave
+	.cfi_restore %ebp
+	.cfi_adjust_cfa_offset -4
+	ret
+	.cfi_endproc
+END(GDB_MainWithAlternateStack)
 
-
-DECL_END
-
-#endif /* !GUARD_MODGDB_ARCH_I386_KILL_C */

@@ -29,6 +29,7 @@
 #include <hybrid/host.h>
 
 #include <kos/except.h>
+#include <kos/debugtrap.h>
 #include <kos/kernel/cpu-state.h>
 #include <sys/syslog.h>
 
@@ -439,9 +440,12 @@ PRIVATE ATTR_NOINLINE void LIBCCALL
 trigger_debugtrap(struct ucpustate *__restrict state,
                   struct exception_data *__restrict error) {
 	siginfo_t si;
+	struct debugtrap_reason r;
 	if (!error_as_signal(error, &si))
-		si.si_signo = SIGTRAP;
-	sys_debugtrap(state, si.si_signo, NULL);
+		si.si_signo = SIGABRT;
+	r.dtr_signo  = si.si_signo;
+	r.dtr_reason = DEBUGTRAP_REASON_NONE;
+	sys_debugtrap(state, &r);
 }
 
 PRIVATE ATTR_NOINLINE ATTR_NORETURN NONNULL((1, 2)) void LIBCCALL

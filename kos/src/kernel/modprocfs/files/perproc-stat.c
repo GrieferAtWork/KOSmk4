@@ -147,7 +147,7 @@ no_exec:
 			else if (flags & TASK_FWAKING)
 #endif /* CONFIG_NO_SMP */
 				state = 'W'; /* Waking */
-			else if (flags & TASK_FSUSPENDED)
+			else if (flags & (TASK_FSUSPENDED | TASK_FGDB_STOPPED))
 				state = 'T'; /* Stopped */
 			else if (flags & TASK_FSTARTED)
 				state = 'S'; /* Sleeping */

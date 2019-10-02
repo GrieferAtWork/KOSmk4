@@ -369,6 +369,7 @@ task_connect(struct sig *__restrict target) THROWS(E_BADALLOC) {
 		if (con->tc_signal == TASK_CONNECTION_DISCONNECTED)
 			goto initialize_con;
 	}
+	assert(task_isconnected());
 	con   = connection_alloc(SIGNAL_GFP);
 	flags = 1;
 initialize_con:
