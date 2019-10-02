@@ -29,6 +29,7 @@
 #include <kernel/vm.h>
 #include <kernel/vm/exec.h>
 #include <kernel/vm/library.h>
+#include <kernel/handle.h>
 #include <sched/pid.h>
 #include <sched/task.h>
 
@@ -86,6 +87,23 @@ NOTHROW(FCALL GDBInfo_PrintKernelFilename)(pformatprinter printer, void *arg,
 	                  : kernel_driver.d_filename;
 	return (*printer)(arg, str, strlen(str));
 }
+
+/* Print the commandline of a given `thread' */
+INTERN NONNULL((1, 3)) ssize_t
+NOTHROW(FCALL GDBInfo_PrintThreadCommandline)(pformatprinter printer, void *arg,
+                                              struct task *__restrict thread) {
+	ssize_t result;
+	if (GDBThread_IsKernelThread(thread)) {
+		result = cmdline_encode(printer, arg,
+		                        kernel_driver.d_argc,
+		                        kernel_driver.d_argv);
+	} else {
+		/* TODO: Must eventually use the same trick as `/proc/[pid]/cmdline' */
+		result = GDBInfo_PrintThreadExecFile(printer, arg, thread, false);
+	}
+	return result;
+}
+
 
 /* `qXfer:exec-file:read': Print the absolute filename for the original
  * binary passed to exec() when the process of `thread' was started.
@@ -393,7 +411,7 @@ err:
 PRIVATE ssize_t
 NOTHROW(FCALL GDBInfo_PrintProcessList_Callback)(void *closure,
                                                  struct task *__restrict thread) {
-	ssize_t temp, result = 0; u32 pid;
+	ssize_t temp, result = 0; upid_t pid;
 	pformatprinter printer; void *arg;
 	if (!task_isprocessleader_p(thread))
 		goto done;
@@ -409,8 +427,7 @@ NOTHROW(FCALL GDBInfo_PrintProcessList_Callback)(void *closure,
 	DO(GDBInfo_PrintThreadExecFile(printer, arg, thread, false));
 	PRINT("</column>"
 	      "<column name=\"command\">");
-	/* TODO: Display the program's commandline instead! */
-	DO(GDBInfo_PrintThreadExecFile(printer, arg, thread, false));
+	DO(GDBInfo_PrintThreadCommandline(printer, arg, thread));
 	PRINT("</column>"
 	      /* XXX: <column name="cores">1,2,3</column> */
 	      "</item>");
@@ -522,6 +539,97 @@ err:
 	return temp;
 }
 
+PRIVATE ssize_t
+NOTHROW(FCALL GDBInfo_PrintFdListEntry)(pformatprinter printer, void *arg,
+                                        struct task *__restrict thread,
+                                        upid_t pid, unsigned int fdno,
+                                        struct handle *__restrict hnd) {
+	ssize_t temp, result = 0;
+	PRINTF("<item>"
+	       "<column name=\"pid\">%I32x</column>", pid);
+	PRINT("<column name=\"command\">");
+	DO(GDBInfo_PrintThreadCommandline(printer, arg, thread));
+	PRINTF("</column>"
+	       "<column name=\"file descriptor\">%u</column>"
+	       "<column name=\"name\">", fdno);
+	DO(handle_print(hnd, printer, arg));
+	PRINT("</column>"
+	      "</item>");
+	return result;
+err:
+	return temp;
+}
+
+PRIVATE ssize_t
+NOTHROW(FCALL GDBInfo_PrintFdList_Callback)(void *closure,
+                                            struct task *__restrict thread) {
+	ssize_t temp, result = 0; upid_t pid;
+	pformatprinter printer; void *arg;
+	REF struct handle_manager *hman;
+	unsigned int i;
+	if (!task_isprocessleader_p(thread))
+		goto done;
+	if (GDBThread_IsKernelThread(thread))
+		goto done;
+	printer = ((struct GDBInfo_PrintThreadList_Data *)closure)->ptld_printer;
+	arg     = ((struct GDBInfo_PrintThreadList_Data *)closure)->ptld_arg;
+	pid     = task_getrootpid_of_s(thread);
+	hman    = task_gethandlemanager(thread);
+	if (!GDBThread_IsAllStopModeActive) {
+		/* FIXME: What if one of the suspended threads is holding the VM lock?
+		 *        We should have some kind of timeout here, and switch to all-stop
+		 *        mode if the timeout expires. */
+		sync_read(&hman->hm_lock);
+	}
+	if (hman->hm_mode == HANDLE_MANAGER_MODE_LINEAR) {
+		for (i = 0; i < hman->hm_linear.hm_alloc; ++i) {
+			if (hman->hm_linear.hm_vector[i].h_type == HANDLE_TYPE_UNDEFINED)
+				continue;
+			DO(GDBInfo_PrintFdListEntry(printer, arg, thread, pid, i,
+			                            &hman->hm_linear.hm_vector[i]));
+		}
+	} else {
+		for (i = 0; i <= hman->hm_hashvector.hm_hashmsk; ++i) {
+			unsigned int fd, index;
+			fd = hman->hm_hashvector.hm_hashvec[i].hh_handle_id;
+			if (fd == HANDLE_HASHENT_SENTINEL_ID)
+				continue; /* Unused / Sentinal */
+			index = hman->hm_hashvector.hm_hashvec[i].hh_vector_index;
+			if (index == (unsigned int)-1)
+				continue; /* Deleted */
+			DO(GDBInfo_PrintFdListEntry(printer, arg, thread, pid, fd,
+			                            &hman->hm_hashvector.hm_vector[index]));
+		}
+	}
+	if (!GDBThread_IsAllStopModeActive)
+		sync_endread(&hman->hm_lock);
+	decref_unlikely(hman);
+done:
+	return result;
+err:
+	if (!GDBThread_IsAllStopModeActive)
+		sync_endread(&hman->hm_lock);
+	decref_unlikely(hman);
+	return temp;
+}
+
+
+/* `qXfer:osdata:read:processes': Print the list of processes running on the system. */
+PRIVATE NONNULL((1)) ssize_t
+NOTHROW(FCALL GDBInfo_PrintFdList)(pformatprinter printer, void *arg) {
+	struct GDBInfo_PrintThreadList_Data data;
+	ssize_t temp, result = 0;
+	PRINT("<osdata type=\"files\">");
+	data.ptld_printer = printer;
+	data.ptld_arg     = arg;
+	DO(GDBThread_Enumerate(&GDBInfo_PrintFdList_Callback, &data));
+	PRINT("</osdata>");
+	return result;
+err:
+	return temp;
+}
+
+
 
 PRIVATE char const GDBInfo_OsDataOverview[] =
 "<osdata type=\"types\">"
@@ -529,6 +637,11 @@ PRIVATE char const GDBInfo_OsDataOverview[] =
 		"<column name=\"Type\">processes</column>"
 		"<column name=\"Description\">Processes</column>"
 		"<column name=\"Title\">Listing of all processes</column>"
+	"</item>"
+	"<item>"
+		"<column name=\"Type\">files</column>"
+		"<column name=\"Description\">File descriptors</column>"
+		"<column name=\"Title\">Listing of all file descriptors</column>"
 	"</item>"
 	"<item>"
 		"<column name=\"Type\">drivers</column>"
@@ -552,6 +665,8 @@ NOTHROW(FCALL GDBInfo_PrintOSData)(pformatprinter printer, void *arg,
 		result = GDBInfo_PrintProcessList(printer, arg);
 	} else if (strcmp(name, "drivers") == 0) {
 		result = GDBInfo_PrintDriverList(printer, arg);
+	} else if (strcmp(name, "files") == 0) {
+		result = GDBInfo_PrintFdList(printer, arg);
 	} else {
 		result = -ENOENT;
 	}

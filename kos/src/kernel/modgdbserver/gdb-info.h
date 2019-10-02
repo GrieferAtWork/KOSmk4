@@ -42,6 +42,11 @@ NOTHROW(FCALL GDBInfo_PrintThreadExecFile)(pformatprinter printer, void *arg,
                                            struct task *__restrict thread,
                                            bool filename_only);
 
+/* Print the commandline of a given `thread' */
+INTDEF NONNULL((1, 3)) ssize_t
+NOTHROW(FCALL GDBInfo_PrintThreadCommandline)(pformatprinter printer, void *arg,
+                                              struct task *__restrict thread);
+
 /* `qXfer:features:read': Print the named features file `filename' */
 INTDEF NONNULL((1, 3)) ssize_t
 NOTHROW(FCALL GDBInfo_PrintFeaturesFile)(pformatprinter printer, void *arg,
