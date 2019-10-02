@@ -29,7 +29,7 @@
  *  -  DEBUGTRAP_REASON_WATCHW
  *  -  DEBUGTRAP_REASON_WATCHR
  *  -  DEBUGTRAP_REASON_WATCHRW
- *  -  DEBUGTRAP_REASON_SWBREAK */
+ *  -  DEBUGTRAP_REASON_MESSAGE */
 #define DEBUGTRAP_REASON_NONE      0x0000 /* No special reason */
 #define DEBUGTRAP_REASON_WATCHW    0x0001 /* [dtr_ptrarg = (void *)watch_addr] write watchpoint */
 #define DEBUGTRAP_REASON_WATCHR    0x0002 /* [dtr_ptrarg = (void *)watch_addr] read watchpoint */
@@ -55,6 +55,10 @@
                                            * [dtr_signo = (union wait)status] A process has exited */
 #define DEBUGTRAP_REASON_SWBREAK   0x000e /* Software breakpoint */
 #define DEBUGTRAP_REASON_HWBREAK   0x000f /* Hardware breakpoint */
-#define DEBUGTRAP_REASON_MAX DEBUGTRAP_REASON_HWBREAK
+#define DEBUGTRAP_REASON_MESSAGE   0x0010 /* [dtr_strarg = message, dtr_signo = length]
+                                           * Output a human-readable message to the debugger.
+                                           * NOTE: This command is special, in that (on output), it will
+                                           *       store the number of written bytes within `dtr_signo' */
+#define DEBUGTRAP_REASON_MAX DEBUGTRAP_REASON_MESSAGE
 
 #endif /* !_KOS_DEBUGTRAP_H */

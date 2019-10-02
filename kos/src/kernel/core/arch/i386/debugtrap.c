@@ -313,6 +313,13 @@ sys_debugtrap32_impl(struct icpustate *__restrict return_state,
 			      reason.dtr_reason);
 		switch (reason.dtr_reason) {
 
+		case DEBUGTRAP_REASON_MESSAGE:
+			/* Debug message event. */
+			validate_readable(reason.dtr_strarg, reason.dtr_signo);
+			return_state = sys_do_debugtrap32_impl(return_state, ustate, &reason);
+			((struct debugtrap_reason32 *)ureason)->dtr_signo = reason.dtr_signo;
+			goto done;
+
 		case DEBUGTRAP_REASON_FORK:
 		case DEBUGTRAP_REASON_VFORK:
 		case DEBUGTRAP_REASON_TEXITED:
@@ -352,6 +359,7 @@ sys_debugtrap32_impl(struct icpustate *__restrict return_state,
 		case DEBUGTRAP_REASON_SC_ENTRY:
 		case DEBUGTRAP_REASON_SC_EXIT:
 		case DEBUGTRAP_REASON_CLONE:
+		case DEBUGTRAP_REASON_SWBREAK:
 		case DEBUGTRAP_REASON_HWBREAK:
 			cred_require_debugtrap();
 			reason.dtr_intarg = 0;

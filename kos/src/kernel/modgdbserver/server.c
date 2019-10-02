@@ -66,6 +66,7 @@
 
 DECL_BEGIN
 
+
 typedef struct {
 	size_t ol_offset; /* Remaining number of bytes to skip */
 	size_t ol_size;   /* Remaining number of bytes to print */
@@ -184,6 +185,52 @@ NOTHROW(KCALL GDB_HexPrinter)(void *arg, char const *__restrict data, size_t dat
 	*(char **)arg = dst;
 	return (ssize_t)datalen;
 }
+
+
+
+/* Print a message while in non-stop or all-stop mode.
+ * @return: * : The total number of printed bytes. */
+INTERN size_t FCALL
+GDBServer_PrintMessageInNonStopMode(USER CHECKED char const *message,
+                                    size_t message_length) {
+	return (size_t)kprinter((char *)KERN_RAW,
+	                        message,
+	                        message_length);
+}
+
+/* Print a message while in non-stop or all-stop mode.
+ * @return: * : The total number of printed bytes. */
+INTERN size_t FCALL
+GDBServer_PrintMessageInAllStopMode(USER CHECKED char const *message,
+                                    size_t message_length) {
+	size_t result = message_length;
+	if likely(message_length != 0) {
+		for (;;) {
+			size_t maxlen;
+			char *p;
+			maxlen = message_length;
+			/* Make sure not to exceed out packet size. */
+			if (maxlen > (CONFIG_GDBSERVER_PACKET_MAXLEN - 1) / 2)
+				maxlen = (CONFIG_GDBSERVER_PACKET_MAXLEN - 1) / 2;
+			/* Send a special packet */
+			p = GDBPacket_Start();
+			*p++ = 'O';
+			p = GDB_EncodeHex(p, message, maxlen);
+			if unlikely(!GDBPacket_Transmit(p)) {
+				message_length -= maxlen;
+				result -= message_length;
+				break;
+			}
+			if likely(maxlen >= message_length)
+				break;
+			message += maxlen;
+			message_length -= maxlen;
+		}
+	}
+	return result;
+}
+
+
 
 /* Inplace-decode escaped binary data and return the number of decoded bytes. */
 PRIVATE size_t
@@ -756,11 +803,13 @@ LOCAL bool NOTHROW(FCALL GDB_GetNonStopModeEnabled)(void) {
 LOCAL void NOTHROW(FCALL GDB_SetNonStopModeEnabled)(bool enabled) {
 	if (enabled) {
 		/* Enable non-stop mode. */
-		ATOMIC_FETCHOR(GDBServer_Features, GDB_SERVER_FEATURE_NONSTOP);
+		if (ATOMIC_FETCHOR(GDBServer_Features, GDB_SERVER_FEATURE_NONSTOP) & GDB_SERVER_FEATURE_NONSTOP)
+			return; /* Unchanged */
 		GDBThread_ResumeAllCpus();
 	} else {
 		/* Disable non-stop mode (and enter all-stop mode) */
-		ATOMIC_FETCHAND(GDBServer_Features, ~GDB_SERVER_FEATURE_NONSTOP);
+		if (!(ATOMIC_FETCHAND(GDBServer_Features, ~GDB_SERVER_FEATURE_NONSTOP) & GDB_SERVER_FEATURE_NONSTOP))
+			return; /* Unchanged */
 		GDBThread_StopAllCpus();
 	}
 }

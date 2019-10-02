@@ -336,28 +336,28 @@ INTDEF NONNULL((1, 3, 5)) size_t NOTHROW(FCALL GDB_SetFCpuStateRegister)(struct 
 
 /* Debug trap entry points. */
 INTDEF struct kernel_debugtraps const GDBServer_DebugTraps;
-INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) void *
-NOTHROW(FCALL GDBServer_TrapCpuState)(void *__restrict state,
-                                      struct debugtrap_reason const *__restrict reason,
-                                      unsigned int state_kind);
-INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *
-NOTHROW(FCALL GDBServer_TrapICpuState)(struct icpustate *__restrict state,
-                                       struct debugtrap_reason const *__restrict reason);
-INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct scpustate *
-NOTHROW(FCALL GDBServer_TrapSCpuState)(struct scpustate *__restrict state,
-                                       struct debugtrap_reason const *__restrict reason);
-INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct ucpustate *
-NOTHROW(FCALL GDBServer_TrapUCpuState)(struct ucpustate *__restrict state,
-                                       struct debugtrap_reason const *__restrict reason);
-INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct kcpustate *
-NOTHROW(FCALL GDBServer_TrapKCpuState)(struct kcpustate *__restrict state,
-                                       struct debugtrap_reason const *__restrict reason);
-INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct lcpustate *
-NOTHROW(FCALL GDBServer_TrapLCpuState)(struct lcpustate *__restrict state,
-                                       struct debugtrap_reason const *__restrict reason);
-INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct fcpustate *
-NOTHROW(FCALL GDBServer_TrapFCpuState)(struct fcpustate *__restrict state,
-                                       struct debugtrap_reason const *__restrict reason);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) void *FCALL
+GDBServer_TrapCpuState(void *__restrict state,
+                       struct debugtrap_reason const *__restrict reason,
+                       unsigned int state_kind);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
+GDBServer_TrapICpuState(struct icpustate *__restrict state,
+                        struct debugtrap_reason const *__restrict reason);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct scpustate *FCALL
+GDBServer_TrapSCpuState(struct scpustate *__restrict state,
+                        struct debugtrap_reason const *__restrict reason);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct ucpustate *FCALL
+GDBServer_TrapUCpuState(struct ucpustate *__restrict state,
+                        struct debugtrap_reason const *__restrict reason);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct kcpustate *FCALL
+GDBServer_TrapKCpuState(struct kcpustate *__restrict state,
+                        struct debugtrap_reason const *__restrict reason);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct lcpustate *FCALL
+GDBServer_TrapLCpuState(struct lcpustate *__restrict state,
+                        struct debugtrap_reason const *__restrict reason);
+INTDEF NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct fcpustate *FCALL
+GDBServer_TrapFCpuState(struct fcpustate *__restrict state,
+                        struct debugtrap_reason const *__restrict reason);
 
 
 

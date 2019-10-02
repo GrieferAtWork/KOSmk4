@@ -26,6 +26,7 @@
 
 #include <kernel/debugger.h>
 #include <kernel/debugtrap.h>
+#include <kernel/except.h>
 #include <kernel/fpu.h>
 #include <kernel/panic.h>
 #include <sched/cpu.h>
@@ -103,13 +104,59 @@ PRIVATE void KCALL GDBServer_RecursiveEntryDebuggerMain(void *UNUSED(arg)) {
 
 
 /* Debug trap entry points. */
-INTERN NOBLOCK ATTR_NOINLINE ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) void *
-NOTHROW(FCALL GDBServer_TrapCpuState)(void *__restrict state,
-                                      struct debugtrap_reason const *__restrict reason,
-                                      unsigned int state_kind) {
+INTERN NOBLOCK ATTR_NOINLINE ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) void *FCALL
+GDBServer_TrapCpuState(void *__restrict state,
+                       struct debugtrap_reason const *__restrict reason,
+                       unsigned int state_kind) {
 	struct task *oldhost;
 	bool was_preemption_enabled;
 	GDBThreadStopEvent stop_event;
+	/* Special handling for message traps. (think of it as KOS's version of `OutputDebugStringA()') */
+	if (reason->dtr_reason == DEBUGTRAP_REASON_MESSAGE) {
+		size_t num_printed;
+again_message:
+		if (ATOMIC_READ(GDBServer_Features) & GDB_SERVER_FEATURE_NONSTOP) {
+do_print_message_in_nonstop_mode:
+			num_printed = GDBServer_PrintMessageInNonStopMode(reason->dtr_strarg,
+			                                          reason->dtr_signo);
+		} else {
+			stop_event.tse_thread = THIS_TASK;
+			oldhost = ATOMIC_CMPXCH_VAL(GDBServer_Host, NULL, stop_event.tse_thread);
+			if (oldhost != NULL) {
+				if (oldhost == stop_event.tse_thread) {
+					/* Message from inside of GDB? ok... */
+					num_printed = GDBServer_PrintMessageInAllStopMode(reason->dtr_strarg,
+					                                                  reason->dtr_signo);
+				} else {
+					/* Getting here means we are about to, or already had been suspended:
+					 *  - GDB is configured for all-stop mode
+					 *  - We are unable to acquire the host-lock, meaning some other thread
+					 *    is/was already running as GDB host, and had everything suspended.
+					 *  - And this ~everything~ must have/will include our own thread, too.
+					 * -> Going off of this, simply try to post the message once again. */
+					goto again_message;
+				}
+			} else {
+				/* Got the GDB context lock! */
+				if unlikely(ATOMIC_READ(GDBServer_Features) & GDB_SERVER_FEATURE_NONSTOP)
+					goto do_print_message_in_nonstop_mode;
+				TRY {
+					num_printed = GDBServer_PrintMessageInAllStopMode(reason->dtr_strarg,
+					                                                  reason->dtr_signo);
+				} EXCEPT {
+					ATOMIC_WRITE(GDBServer_Host, NULL);
+					sig_broadcast(&GDBServer_HostUnlocked);
+					RETHROW();
+				}
+				ATOMIC_WRITE(GDBServer_Host, NULL);
+				sig_broadcast(&GDBServer_HostUnlocked);
+			}
+		}
+		/* Write back the number of actually written bytes. */
+		((struct debugtrap_reason *)reason)->dtr_signo = (u32)num_printed;
+		return state;
+	}
+
 	task_pushconnections(&stop_event.tse_oldcon);
 	stop_event.tse_thread    = THIS_TASK;
 	stop_event.tse_reason    = (struct debugtrap_reason *)reason;
@@ -432,39 +479,39 @@ INTERN_CONST struct kernel_debugtraps const GDBServer_DebugTraps = {
 	.dt_trap_fcpustate = &GDBServer_TrapFCpuState,
 };
 
-INTERN NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *
-NOTHROW(FCALL GDBServer_TrapICpuState)(struct icpustate *__restrict state,
-                                       struct debugtrap_reason const *__restrict reason) {
+INTERN NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct icpustate *FCALL
+GDBServer_TrapICpuState(struct icpustate *__restrict state,
+                        struct debugtrap_reason const *__restrict reason) {
 	return (struct icpustate *)GDBServer_TrapCpuState(state, reason, CPUSTATE_KIND_ICPUSTATE);
 }
 
-INTERN NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct scpustate *
-NOTHROW(FCALL GDBServer_TrapSCpuState)(struct scpustate *__restrict state,
-                                       struct debugtrap_reason const *__restrict reason) {
+INTERN NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct scpustate *FCALL
+GDBServer_TrapSCpuState(struct scpustate *__restrict state,
+                        struct debugtrap_reason const *__restrict reason) {
 	return (struct scpustate *)GDBServer_TrapCpuState(state, reason, CPUSTATE_KIND_SCPUSTATE);
 }
 
-INTERN NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct ucpustate *
-NOTHROW(FCALL GDBServer_TrapUCpuState)(struct ucpustate *__restrict state,
-                                       struct debugtrap_reason const *__restrict reason) {
+INTERN NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct ucpustate *FCALL
+GDBServer_TrapUCpuState(struct ucpustate *__restrict state,
+                        struct debugtrap_reason const *__restrict reason) {
 	return (struct ucpustate *)GDBServer_TrapCpuState(state, reason, CPUSTATE_KIND_UCPUSTATE);
 }
 
-INTERN NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct kcpustate *
-NOTHROW(FCALL GDBServer_TrapKCpuState)(struct kcpustate *__restrict state,
-                                       struct debugtrap_reason const *__restrict reason) {
+INTERN NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct kcpustate *FCALL
+GDBServer_TrapKCpuState(struct kcpustate *__restrict state,
+                        struct debugtrap_reason const *__restrict reason) {
 	return (struct kcpustate *)GDBServer_TrapCpuState(state, reason, CPUSTATE_KIND_KCPUSTATE);
 }
 
-INTERN NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct lcpustate *
-NOTHROW(FCALL GDBServer_TrapLCpuState)(struct lcpustate *__restrict state,
-                                       struct debugtrap_reason const *__restrict reason) {
+INTERN NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct lcpustate *FCALL
+GDBServer_TrapLCpuState(struct lcpustate *__restrict state,
+                        struct debugtrap_reason const *__restrict reason) {
 	return (struct lcpustate *)GDBServer_TrapCpuState(state, reason, CPUSTATE_KIND_LCPUSTATE);
 }
 
-INTERN NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct fcpustate *
-NOTHROW(FCALL GDBServer_TrapFCpuState)(struct fcpustate *__restrict state,
-                                       struct debugtrap_reason const *__restrict reason) {
+INTERN NOBLOCK ATTR_RETNONNULL WUNUSED NONNULL((1, 2)) struct fcpustate *FCALL
+GDBServer_TrapFCpuState(struct fcpustate *__restrict state,
+                        struct debugtrap_reason const *__restrict reason) {
 	return (struct fcpustate *)GDBServer_TrapCpuState(state, reason, CPUSTATE_KIND_FCPUSTATE);
 }
 
