@@ -71,8 +71,9 @@ ProcFS_PerProc_Fd_Lookup(struct directory_node *__restrict self,
 			pid    = (upid_t)(self->i_fileino & PROCFS_INOTYPE_PERPROC_PIDMASK);
 			thread = pidns_trylookup_task(THIS_PIDNS, pid);
 			if likely(thread) {
-				struct handle_manager *hman;
-				hman = FORTASK(thread, _this_handle_manager);
+				REF struct handle_manager *hman;
+				hman = task_gethandlemanager(thread);
+				FINALLY_DECREF_UNLIKELY(hman);
 				if (handle_existsin(fdno, hman)) {
 					REF struct directory_entry *result;
 					result = directory_entry_alloc(namelen);
@@ -117,13 +118,14 @@ ProcFS_PerProc_Fd_Enum(struct directory_node *__restrict self,
 	unsigned int buf[64];
 	size_t buflen = 0;
 	REF struct task *thread;
-	struct handle_manager *hman;
+	REF struct handle_manager *hman;
 	pid    = (upid_t)(self->i_fileino & PROCFS_INOTYPE_PERPROC_PIDMASK);
 	thread = pidns_trylookup_task(THIS_PIDNS, pid);
 	if unlikely(!thread)
 		return;
 	FINALLY_DECREF_UNLIKELY(thread);
-	hman = FORTASK(thread, _this_handle_manager);
+	hman = task_gethandlemanager(thread);
+	FINALLY_DECREF_UNLIKELY(hman);
 	sync_read(&hman->hm_lock);
 	if (hman->hm_mode == HANDLE_MANAGER_MODE_LINEAR) {
 		unsigned int i;
@@ -219,7 +221,12 @@ ProcFS_PerProc_Fd_Entry_Readlink(struct symlink_node *__restrict self,
 		goto err;
 	{
 		FINALLY_DECREF_UNLIKELY(thread);
-		hnd = handle_lookupin(fdno, FORTASK(thread, _this_handle_manager));
+		{
+			REF struct handle_manager *hman;
+			hman = task_gethandlemanager(thread);
+			FINALLY_DECREF_UNLIKELY(hman);
+			hnd = handle_lookupin(fdno, hman);
+		}
 		TRY {
 			struct format_snprintf_data data;
 			data.sd_buffer = buf;

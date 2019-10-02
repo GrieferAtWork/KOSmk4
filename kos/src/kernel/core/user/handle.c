@@ -441,6 +441,7 @@ PRIVATE ATTR_USED void KCALL
 clone_this_handle_manager(struct task *__restrict new_thread, uintptr_t flags) {
 	struct handle_manager *hman;
 	hman = THIS_HANDLE_MANAGER;
+	assert(hman);
 	if (flags & CLONE_FILES) {
 		incref(hman); /* Re-use the same handle manager. */
 	} else {
@@ -449,6 +450,44 @@ clone_this_handle_manager(struct task *__restrict new_thread, uintptr_t flags) {
 	}
 	assert(!FORTASK(new_thread, _this_handle_manager));
 	FORTASK(new_thread, _this_handle_manager) = hman; /* Inherit reference */
+}
+
+
+/* Lock for accessing any remote thread's _this_handle_manager field */
+PRIVATE struct atomic_rwlock handle_manager_change_lock = ATOMIC_RWLOCK_INIT;
+DEFINE_DBG_BZERO_OBJECT(handle_manager_change_lock);
+
+/* Return the handle manager of the given thread. */
+PUBLIC NOBLOCK WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct handle_manager *
+NOTHROW(FCALL task_gethandlemanager)(struct task *__restrict thread) {
+	REF struct handle_manager *result;
+	while unlikely(!sync_tryread(&handle_manager_change_lock))
+		task_pause();
+	assert(FORTASK(thread, _this_handle_manager));
+	result = incref(FORTASK(thread, _this_handle_manager));
+	sync_endread(&handle_manager_change_lock);
+	return result;
+}
+
+/* Exchange the handle manager of the calling thread. */
+PUBLIC WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct handle_manager *FCALL
+task_sethandlemanager(struct handle_manager *__restrict newman) THROWS(E_WOULDBLOCK) {
+	pflag_t was;
+	REF struct handle_manager *result;
+again:
+	was = PREEMPTION_PUSHOFF();
+	if unlikely(!sync_trywrite(&handle_manager_change_lock)) {
+		PREEMPTION_POP(was);
+		/* Try to yield to that whoever is holding the lock will release it shortly. */
+		task_yield();
+		goto again;
+	}
+	result = PERTASK(_this_handle_manager);
+	PERTASK(_this_handle_manager) = incref(newman);
+	sync_endwrite(&handle_manager_change_lock);
+	PREEMPTION_POP(was);
+	assert(result);
+	return result;
 }
 
 

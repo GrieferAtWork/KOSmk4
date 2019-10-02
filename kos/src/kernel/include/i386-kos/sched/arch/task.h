@@ -47,8 +47,7 @@ DECL_BEGIN
 
 #ifdef __CC__
 #define task_pause()    x86_pause()
-FORCELOCAL NOBLOCK void
-NOTHROW(KCALL x86_pause)(void) {
+FORCELOCAL NOBLOCK void NOTHROW(KCALL x86_pause)(void) {
 	__asm__ __volatile__("pause");
 }
 
@@ -61,6 +60,7 @@ FORCELOCAL NOBLOCK void NOTHROW(KCALL x86_interrupt_enable)(void) {
 	                     : "memory");
 	COMPILER_BARRIER();
 }
+
 FORCELOCAL NOBLOCK void NOTHROW(KCALL x86_interrupt_enable_wait)(void) {
 	COMPILER_BARRIER();
 	__asm__ __volatile__("sti\n\t"
@@ -70,6 +70,7 @@ FORCELOCAL NOBLOCK void NOTHROW(KCALL x86_interrupt_enable_wait)(void) {
 	                     : "memory");
 	COMPILER_BARRIER();
 }
+
 FORCELOCAL NOBLOCK void NOTHROW(KCALL x86_interrupt_enable_wait_disable)(void) {
 	COMPILER_BARRIER();
 	__asm__ __volatile__("sti\n\t"
@@ -80,6 +81,7 @@ FORCELOCAL NOBLOCK void NOTHROW(KCALL x86_interrupt_enable_wait_disable)(void) {
 	                     : "memory");
 	COMPILER_BARRIER();
 }
+
 FORCELOCAL void NOTHROW(KCALL x86_interrupt_wait)(void) {
 	COMPILER_BARRIER();
 	__asm__ __volatile__("hlt"
@@ -88,6 +90,7 @@ FORCELOCAL void NOTHROW(KCALL x86_interrupt_wait)(void) {
 	                     : "memory");
 	COMPILER_BARRIER();
 }
+
 FORCELOCAL ATTR_NORETURN void NOTHROW(KCALL x86_interrupt_halt)(void) {
 	COMPILER_BARRIER();
 	__asm__ __volatile__("cli\n\t"
@@ -99,6 +102,7 @@ FORCELOCAL ATTR_NORETURN void NOTHROW(KCALL x86_interrupt_halt)(void) {
 	__builtin_unreachable();
 	COMPILER_BARRIER();
 }
+
 FORCELOCAL NOBLOCK void NOTHROW(KCALL x86_interrupt_enable_p)(void) {
 	COMPILER_BARRIER();
 	__asm__ __volatile__("sti\n\t"
@@ -108,6 +112,7 @@ FORCELOCAL NOBLOCK void NOTHROW(KCALL x86_interrupt_enable_p)(void) {
 	                     : "memory");
 	COMPILER_BARRIER();
 }
+
 FORCELOCAL NOBLOCK void NOTHROW(KCALL x86_interrupt_disable)(void) {
 	COMPILER_BARRIER();
 	__asm__ __volatile__("cli"
@@ -116,7 +121,9 @@ FORCELOCAL NOBLOCK void NOTHROW(KCALL x86_interrupt_disable)(void) {
 	                     : "memory");
 	COMPILER_BARRIER();
 }
+
 typedef uintptr_t pflag_t;
+
 #ifdef __x86_64__
 FORCELOCAL NOBLOCK pflag_t NOTHROW(KCALL x86_interrupt_enabled)(void) {
 	pflag_t result;
@@ -127,6 +134,7 @@ FORCELOCAL NOBLOCK pflag_t NOTHROW(KCALL x86_interrupt_enabled)(void) {
 	                     : "memory");
 	return result & 0x00000200; /* EFLAGS_IF */
 }
+
 FORCELOCAL NOBLOCK pflag_t NOTHROW(KCALL x86_interrupt_pushoff)(void) {
 	pflag_t result;
 	COMPILER_BARRIER();
@@ -139,6 +147,7 @@ FORCELOCAL NOBLOCK pflag_t NOTHROW(KCALL x86_interrupt_pushoff)(void) {
 	COMPILER_BARRIER();
 	return result & 0x00000200; /* EFLAGS_IF */
 }
+
 FORCELOCAL NOBLOCK void NOTHROW(KCALL x86_interrupt_pop)(pflag_t flag) {
 	COMPILER_BARRIER();
 	__asm__ __volatile__("pushq %0\n\t"
@@ -148,7 +157,9 @@ FORCELOCAL NOBLOCK void NOTHROW(KCALL x86_interrupt_pop)(pflag_t flag) {
 	                     : "memory", "cc");
 	COMPILER_BARRIER();
 }
-#else
+
+#else /* __x86_64__ */
+
 FORCELOCAL NOBLOCK pflag_t NOTHROW(KCALL x86_interrupt_enabled)(void) {
 	pflag_t result;
 	__asm__ __volatile__("pushfl\n\t"
@@ -158,6 +169,7 @@ FORCELOCAL NOBLOCK pflag_t NOTHROW(KCALL x86_interrupt_enabled)(void) {
 	                     : "memory");
 	return result & 0x00000200; /* EFLAGS_IF */
 }
+
 FORCELOCAL NOBLOCK pflag_t NOTHROW(KCALL x86_interrupt_pushoff)(void) {
 	pflag_t result;
 	COMPILER_BARRIER();
@@ -170,6 +182,7 @@ FORCELOCAL NOBLOCK pflag_t NOTHROW(KCALL x86_interrupt_pushoff)(void) {
 	COMPILER_BARRIER();
 	return result & 0x00000200; /* EFLAGS_IF */
 }
+
 FORCELOCAL NOBLOCK void NOTHROW(KCALL x86_interrupt_pop)(pflag_t flag) {
 	COMPILER_BARRIER();
 	__asm__ __volatile__("pushl %0\n\t"
@@ -180,6 +193,7 @@ FORCELOCAL NOBLOCK void NOTHROW(KCALL x86_interrupt_pop)(pflag_t flag) {
 	COMPILER_BARRIER();
 }
 #endif /* !__x86_64__ */
+
 #define PREEMPTION_ENABLE()              x86_interrupt_enable()
 #define PREEMPTION_ENABLE_WAIT()         x86_interrupt_enable_wait()
 #define PREEMPTION_ENABLE_WAIT_DISABLE() x86_interrupt_enable_wait_disable()
@@ -483,7 +497,6 @@ NOTHROW(FCALL irregs_mskflags)(struct irregs_kernel *__restrict self, uintptr_t 
 	}
 	PREEMPTION_POP(was);
 }
-
 
 #endif /* !__x86_64__ */
 

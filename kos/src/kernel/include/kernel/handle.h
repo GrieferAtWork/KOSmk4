@@ -296,9 +296,20 @@ handle_manager_clone(struct handle_manager *__restrict self)
 /* The handle manager of the kernel itself. */
 DATDEF struct handle_manager handle_manager_kernel;
 
-/* [1..1][lock(PRIVATE(THIS_TASK))] Handle manager of the calling thread. */
+/* [1..1][lock(read(THIS_TASK || INTERN(lock)),
+ *             write(THIS_TASK && INTERN(lock)))]
+ * Handle manager of the calling thread. */
 DATDEF ATTR_PERTASK struct handle_manager *_this_handle_manager;
 #define THIS_HANDLE_MANAGER    PERTASK_GET(_this_handle_manager)
+
+/* Return the handle manager of the given thread. */
+FUNDEF NOBLOCK WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct handle_manager *
+NOTHROW(FCALL task_gethandlemanager)(struct task *__restrict thread);
+
+/* Exchange the handle manager of the calling thread (and return the old one). */
+FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct handle_manager *FCALL
+task_sethandlemanager(struct handle_manager *__restrict newman) THROWS(E_WOULDBLOCK);
+
 
 /* Close all handles with the `IO_FCLOEXEC' flag set.
  * @throw: E_WOULDBLOCK: Preemption was disabled, and the operation would have blocked. */

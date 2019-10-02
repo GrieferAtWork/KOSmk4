@@ -8502,10 +8502,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak ansitty_device_ioctl; .long ansitty_device_ioctl
 	.reloc ., R_386_SIZE32, ansitty_device_ioctl; .long 0
 	.long 0xb54284c
-	.long 0 /* index: 2125 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2125 /* index: 2125 */
+	.weak task_gethandlemanager; .long task_gethandlemanager
+	.reloc ., R_386_SIZE32, task_gethandlemanager; .long 0
+	.long 0x7156962
 	.long 0 /* index: 2126 */
 	.long 0
 	.long 0
@@ -10038,10 +10038,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 2509 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2509 /* index: 2509 */
+	.weak task_sethandlemanager; .long task_sethandlemanager
+	.reloc ., R_386_SIZE32, task_sethandlemanager; .long 0
+	.long 0x7162962
 	.long .Lname2510 /* index: 2510 */
 	.weak mouse_device_button; .long mouse_device_button
 	.reloc ., R_386_SIZE32, mouse_device_button; .long 0
@@ -18538,6 +18538,8 @@ END(kernel_symbol_table)
 	.string "kernel_vpanic_icpustate"
 .Lname2124:
 	.string "ansitty_device_ioctl"
+.Lname2125:
+	.string "task_gethandlemanager"
 .Lname2128:
 	.string "__asm32_syscallrouter_int80"
 .Lname2129:
@@ -18920,6 +18922,8 @@ END(kernel_symbol_table)
 	.string "kmemalign_offset_nx"
 .Lname2505:
 	.string "superblock_nodeslock_tryupgrade"
+.Lname2509:
+	.string "task_sethandlemanager"
 .Lname2510:
 	.string "mouse_device_button"
 .Lname2514:

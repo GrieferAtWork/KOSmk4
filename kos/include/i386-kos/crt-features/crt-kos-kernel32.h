@@ -1643,6 +1643,7 @@
 #define __CRT_HAVE_task_exec_asynchronous_srpc 1
 #define __CRT_HAVE_task_exit 1
 #define __CRT_HAVE_task_free_rpc 1
+#define __CRT_HAVE_task_gethandlemanager 1
 #define __CRT_HAVE_task_getvm 1
 #define __CRT_HAVE_task_isconnected 1
 #define __CRT_HAVE_task_pause 1
@@ -1672,6 +1673,7 @@
 #define __CRT_HAVE_task_schedule_user_srpc_nx 1
 #define __CRT_HAVE_task_serve 1
 #define __CRT_HAVE_task_serve_nx 1
+#define __CRT_HAVE_task_sethandlemanager 1
 #define __CRT_HAVE_task_setpid 1
 #define __CRT_HAVE_task_setprocess 1
 #define __CRT_HAVE_task_setprocessgroupleader 1

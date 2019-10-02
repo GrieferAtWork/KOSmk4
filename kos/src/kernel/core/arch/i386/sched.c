@@ -127,7 +127,7 @@ NOTHROW(VCALL task_setup_kernel)(struct task *__restrict thread,
 		for (i = 0; i < (argc - 6); ++i)
 			((u64 *)dest)[i] = va_arg(args, u64);
 	}
-#else
+#else /* __x86_64__ */
 	byte_t *dest = (byte_t *)FORTASK(thread, x86_this_kernel_sp0);
 	struct scpustate *state;
 #define PUSH(x) (dest -= sizeof(u32), *(u32 *)dest = (x))
@@ -147,7 +147,7 @@ NOTHROW(VCALL task_setup_kernel)(struct task *__restrict thread,
 	/* No special values required for general purpose registers. */
 	memset(&state->scs_gpregs, 0, sizeof(state->scs_gpregs));
 #undef PUSH
-#endif
+#endif /* !__x86_64__ */
 	/* TODO: Must also execute thread startup callbacks! */
 	ATOMIC_FETCHOR(thread->t_flags, TASK_FKERNTHREAD);
 	thread->t_sched.s_state = state;
