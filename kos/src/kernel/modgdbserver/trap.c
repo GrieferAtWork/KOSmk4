@@ -109,7 +109,6 @@ NOTHROW(FCALL GDBServer_TrapCpuState)(void *__restrict state,
                                       unsigned int state_kind) {
 	struct task *oldhost;
 	GDBThreadStopEvent stop_event;
-	GDB_DEBUG("[gdb] GDBServer_TrapCpuState()\n");
 	task_pushconnections(&stop_event.tse_oldcon);
 	stop_event.tse_thread    = THIS_TASK;
 	stop_event.tse_reason    = (struct debugtrap_reason *)reason;

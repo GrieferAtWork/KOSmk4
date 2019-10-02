@@ -95,10 +95,28 @@ NOTHROW(FCALL GDBThread_Enumerate)(PTHREAD_ENUM_CALLBACK callback,
 	bool mustStopAll;
 	/* If our CPU is the only one online, then
 	 * there's no need to stop the entire system! */
+again_check_must_stop:
 	mustStopAll = GDBThread_IsNonStopModeActive &&
 	              ATOMIC_READ(cpu_online_count) > 1;
 	if (mustStopAll)
 		GDBThread_StopAllCpus();
+	else {
+		/* In non-stop mode, must also disable preemption in order
+		 * to prevent other threads from running on our own CPU, which
+		 * could break thread enumeration. */
+		if (GDBThread_IsNonStopModeActive) {
+			PREEMPTION_DISABLE();
+			if (ATOMIC_READ(cpu_online_count) > 1) {
+				PREEMPTION_ENABLE();
+				goto again_check_must_stop;
+			}
+		}
+	}
+#else /* !CONFIG_NO_SMP */
+	/* In non-stop mode, must also disable preemption in order
+	 * to prevent other threads from running on our own CPU */
+	if (GDBThread_IsNonStopModeActive)
+		PREEMPTION_DISABLE();
 #endif /* !CONFIG_NO_SMP */
 	for (cid = 0; cid < cpu_count; ++cid) {
 		struct task *iter, *first;
@@ -114,6 +132,8 @@ NOTHROW(FCALL GDBThread_Enumerate)(PTHREAD_ENUM_CALLBACK callback,
 			}
 			if (iter == &FORCPU(c, _this_idle))
 				didThisIdle = true;
+			assert(iter->t_sched.s_running.sr_runnxt->t_sched.s_running.sr_runprv == iter);
+			assert(iter->t_sched.s_running.sr_runprv->t_sched.s_running.sr_runnxt == iter);
 			iter = iter->t_sched.s_running.sr_runnxt;
 		} while (iter != first);
 		for (iter = c->c_sleeping; iter;
@@ -149,6 +169,7 @@ NOTHROW(FCALL GDBThread_Enumerate)(PTHREAD_ENUM_CALLBACK callback,
 		}
 	}
 done:
+	PREEMPTION_ENABLE();
 #ifndef CONFIG_NO_SMP
 	if (mustStopAll)
 		GDBThread_ResumeAllCpus();
