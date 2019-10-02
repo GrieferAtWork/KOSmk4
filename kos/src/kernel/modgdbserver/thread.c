@@ -72,6 +72,8 @@ NOTHROW(FCALL GDBServer_HasStopEvent)(GDBThreadStopEvent *chain,
 
 PRIVATE void
 NOTHROW(FCALL GDBThread_StopRPC_BecomeGDBHostImpl)(GDBThreadStopEvent *__restrict notif) {
+	assert(PREEMPTION_ENABLED());
+
 	/* Configure non-/all-stop mode */
 	GDBThread_IsNonStopModeActive = true;
 	if (!(GDBServer_Features & GDB_SERVER_FEATURE_NONSTOP))

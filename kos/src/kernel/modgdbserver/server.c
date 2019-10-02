@@ -501,8 +501,8 @@ LOCAL void NOTHROW(FCALL GDBServer_SetRemoteDetached)(void) {
 #ifdef __x86_64__
 #define REASON_REGISTER_MAXSIZE 8
 #define FOREACH_REASON_REGISTER(callback)   \
-	callback("04", GDB_REGISTER_X86_64_RSP) \
 	callback("05", GDB_REGISTER_X86_64_RBP) \
+	callback("04", GDB_REGISTER_X86_64_RSP) \
 	callback("10", GDB_REGISTER_X86_64_RIP)
 #elif defined(__i386__)
 #define REASON_REGISTER_MAXSIZE 4
@@ -1893,6 +1893,7 @@ INTERN void NOTHROW(FCALL GDB_Main)(void) {
 	char *endptr;
 	struct exception_info saved_exceptions;
 	GDBThreadStopEvent *notif;
+	assert(PREEMPTION_ENABLED());
 	memcpy(&saved_exceptions, error_info(), sizeof(saved_exceptions));
 again:
 	/* Determine the initial current thread. */
@@ -1971,6 +1972,7 @@ do_process_notif:
 		byte_t b;
 next_packet:
 		assert(!task_isconnected());
+		assert(PREEMPTION_ENABLED());
 		if (((GDBServer_Features &
 		      (GDB_SERVER_FEATURE_ATTACHED | GDB_SERVER_FEATURE_NONSTOP)) ==
 		     (GDB_SERVER_FEATURE_ATTACHED | GDB_SERVER_FEATURE_NONSTOP)) &&

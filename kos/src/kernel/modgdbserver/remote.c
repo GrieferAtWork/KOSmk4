@@ -92,8 +92,9 @@ INTERN NOBLOCK void NOTHROW(FCALL GDBRemote_PostByte)(byte_t b) {
  * @return: -1: No data available / timed out. */
 INTERN byte_t NOTHROW(FCALL GDBRemote_GetByte)(void) {
 	int result;
-	assert(!task_isconnected());
 	for (;;) {
+		assert(PREEMPTION_ENABLED());
+		assert(!task_isconnected());
 		result = GDBRemote_TryGetByte();
 		if (result >= 0)
 			break;
@@ -106,6 +107,7 @@ INTERN byte_t NOTHROW(FCALL GDBRemote_GetByte)(void) {
 		}
 		if (!task_waitfor_norpc_nx())
 			task_disconnectall();
+		assert(PREEMPTION_ENABLED());
 	}
 	assert(result >= 0);
 	return (byte_t)result;
@@ -115,9 +117,10 @@ PRIVATE unsigned int GDBRemote_Timeout = 1000; /* Milliseconds */
 
 INTERN int NOTHROW(FCALL GDBRemote_TimedGetByte)(void) {
 	int result;
-	assert(!task_isconnected());
 	for (;;) {
 		qtime_t tmo;
+		assert(PREEMPTION_ENABLED());
+		assert(!task_isconnected());
 		result = GDBRemote_TryGetByte();
 		if (result >= 0)
 			break;
