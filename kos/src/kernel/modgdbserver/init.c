@@ -24,6 +24,7 @@
 #include <kernel/debugtrap.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
+#include <kernel/printk.h>
 #include <kernel/vm.h>
 #include <sched/rpc.h>
 #include <sched/task.h>
@@ -87,7 +88,7 @@ PRIVATE DRIVER_INIT void KCALL GDBServer_Init(void) {
 		ATOMIC_FETCHOR(GDBServer_FallbackHost->t_flags, TASK_FGDB_STOPPED);
 		task_start(GDBServer_FallbackHost, TASK_START_FNORMAL);
 
-		printk(KERN_INFO "[gdb] Wait for attach\n");
+		printk(KERN_INFO "[gdb] Wait for remote to attach itself\n");
 		/* Wait until the GDB remote has been attached.
 		 * For this purpose, keep waiting on the GDB host to become
 		 * unlocked until the `GDB_SERVER_FEATURE_ATTACHED' feature

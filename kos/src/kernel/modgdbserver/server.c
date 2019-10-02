@@ -1723,6 +1723,25 @@ send_empty:
 			if (nameEnd != endptr)
 				ERROR(err_syntax);
 			*o++ = GDB_GetDisableRandomization() ? '1' : '0';
+		} else if (ISNAME("Offsets")) {
+			if (nameEnd != endptr)
+				ERROR(err_syntax);
+			/* Not supported (and not required) */
+		} else if (ISNAME("Symbol")) {
+			/* Not supported (and not required)
+			 * This packet simply informs us that the GDB remote is able to service
+			 * symbol lookup requests (something like name2addr("memcpy") == &memcpy)
+			 * Some other implementation may need this in order to inject code into
+			 * specific functions (such as `pthread_create()') in order to allow for
+			 * tracing of special events such as the creation of a thread.
+			 * However, we won't need to so something like that, so we can just
+			 * ignore this packet. */
+		} else if (ISNAME("TStatus")) {
+			if (nameEnd != endptr)
+				ERROR(err_syntax);
+			/* This packet is used by GDB to probe support for tracepoint packets.
+			 * Since we don't support something like this (yet?), just ignore the
+			 * packet to prevent it from showing up as an `Unknown command' warning. */
 		} else if (ISNAME("NoAckMode")) {
 			if (nameEnd != endptr)
 				ERROR(err_syntax);
