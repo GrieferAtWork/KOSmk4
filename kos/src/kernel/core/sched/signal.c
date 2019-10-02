@@ -109,250 +109,23 @@ NOTHROW(KCALL pertask_init_task_connections)(struct task *__restrict self) {
 	cons->tc_signals.ts_thread = self;
 }
 
-PUBLIC NOBLOCK NONNULL((1)) bool
-NOTHROW(KCALL sig_send)(struct sig *__restrict self) {
-	struct task_connection *c;
-	struct sig *constate;
-	pflag_t was;
-again:
-#ifndef CONFIG_NO_SMP
-	for (;;) {
-		c = ATOMIC_READ(self->s_ptr);
-		if (c == NULL)
-			return false;
-		if (c == SIG_TEMPLOCK) {
-			task_pause();
-			continue;
-		}
-		/* Disable preemption to we don't get interrupted by other code that may try
-		 * to do the same thing we're trying to do: Send/broadcast this signal. */
-		was = PREEMPTION_PUSHOFF();
-		if (ATOMIC_CMPXCH_WEAK(self->s_ptr, c, SIG_TEMPLOCK))
-			break;
-		PREEMPTION_POP(was);
-	}
-	ATOMIC_WRITE(self->s_ptr, c->tc_signext);
-	PREEMPTION_POP(was);
-#else /* !CONFIG_NO_SMP */
-	was = PREEMPTION_PUSHOFF();
-	c   = ATOMIC_READ(self->s_ptr);
-	if (c == NULL) {
-		PREEMPTION_POP(was);
-		return false;
-	}
-	ATOMIC_WRITE(self->s_ptr, c->tc_signext);
-	PREEMPTION_POP(was);
-#endif /* CONFIG_NO_SMP */
-	for (;;) {
-		constate = ATOMIC_READ(c->tc_signal);
-		if (constate == TASK_CONNECTION_DISCONNECTING) {
-			if (!ATOMIC_CMPXCH_WEAK(c->tc_signal,
-			                        TASK_CONNECTION_DISCONNECTING,
-			                        TASK_CONNECTION_DELIVERED))
-				continue;
-			goto again;
-		}
-		if (((uintptr_t)constate & ~1) == (uintptr_t)self) {
-			struct task_sigset *set;
-			if (!ATOMIC_CMPXCH_WEAK(c->tc_signal, constate, TASK_CONNECTION_DELIVERING))
-				continue;
-			COMPILER_READ_BARRIER();
-			set = ATOMIC_XCH(c->tc_cons, NULL);
-			if (set) {
-				if (ATOMIC_CMPXCH(set->ts_dlvr, NULL, self)) {
-					struct task *thread;
-					thread = set->ts_thread;
-					if (thread)
-						task_wake(thread);
-					if ((uintptr_t)constate & 1) /* Don't track ghosts */
-						goto again;
-					return true;
-				}
-			}
-			ATOMIC_WRITE(c->tc_signal, TASK_CONNECTION_DELIVERED);
-			goto again;
-		}
-	}
-}
+#ifndef __INTELLISENSE__
+DECL_END
 
+#include "signal-send.c.inl"
 
+#define DEFINE_ALTERNATE 1
+#include "signal-send.c.inl"
 
-PUBLIC NOBLOCK NONNULL((1, 2)) bool
-NOTHROW(KCALL sig_altsend)(struct sig *__restrict self, struct sig *sender) {
-	struct task_connection *c;
-	struct sig *constate;
-	pflag_t was;
-	assertf(sender != NULL, "Invalid sender");
-again:
-#ifndef CONFIG_NO_SMP
-	for (;;) {
-		c = ATOMIC_READ(self->s_ptr);
-		if (c == NULL)
-			return false;
-		if (c == SIG_TEMPLOCK) {
-			task_pause();
-			continue;
-		}
-		/* Disable preemption to we don't get interrupted by other code that may try
-		 * to do the same thing we're trying to do: Send/broadcast this signal. */
-		was = PREEMPTION_PUSHOFF();
-		if (ATOMIC_CMPXCH_WEAK(self->s_ptr, c, SIG_TEMPLOCK))
-			break;
-		PREEMPTION_POP(was);
-	}
-	ATOMIC_WRITE(self->s_ptr, c->tc_signext);
-	PREEMPTION_POP(was);
-#else /* !CONFIG_NO_SMP */
-	was = PREEMPTION_PUSHOFF();
-	c   = ATOMIC_READ(self->s_ptr);
-	if (c == NULL) {
-		PREEMPTION_POP(was);
-		return false;
-	}
-	ATOMIC_WRITE(self->s_ptr, c->tc_signext);
-	PREEMPTION_POP(was);
-#endif /* CONFIG_NO_SMP */
-	for (;;) {
-		constate = ATOMIC_READ(c->tc_signal);
-		if (constate == TASK_CONNECTION_DISCONNECTING) {
-			if (!ATOMIC_CMPXCH_WEAK(c->tc_signal,
-			                        TASK_CONNECTION_DISCONNECTING,
-			                        TASK_CONNECTION_DELIVERED))
-				continue;
-			goto again;
-		}
-		if (((uintptr_t)constate & ~1) == (uintptr_t)self) {
-			struct task_sigset *set;
-			if (!ATOMIC_CMPXCH_WEAK(c->tc_signal, constate, TASK_CONNECTION_DELIVERING))
-				continue;
-			COMPILER_READ_BARRIER();
-			set = ATOMIC_XCH(c->tc_cons, NULL);
-			if (set) {
-				if (ATOMIC_CMPXCH(set->ts_dlvr, NULL, sender)) {
-					struct task *thread;
-					thread = set->ts_thread;
-					if (thread)
-						task_wake(thread);
-					if ((uintptr_t)constate & 1) /* Don't track ghosts */
-						goto again;
-					return true;
-				}
-			}
-			ATOMIC_WRITE(c->tc_signal, TASK_CONNECTION_DELIVERED);
-			goto again;
-		}
-	}
-}
+#define DEFINE_SINGLE    1
+#include "signal-send.c.inl"
 
+#define DEFINE_SINGLE    1
+#define DEFINE_ALTERNATE 1
+#include "signal-send.c.inl"
 
-
-PUBLIC NOBLOCK NONNULL((1)) size_t
-NOTHROW(KCALL sig_broadcast)(struct sig *__restrict self) {
-	size_t result = 0;
-	struct task_connection *c, *n;
-	assert(IS_ALIGNED((uintptr_t)self, 2));
-#ifdef SIG_TEMPLOCK
-	do {
-		c = ATOMIC_READ(self->s_ptr);
-		if unlikely(c == SIG_TEMPLOCK) {
-			task_pause();
-			continue;
-		}
-	} while (!ATOMIC_CMPXCH_WEAK(self->s_ptr, c, NULL));
-#else
-	c = ATOMIC_XCH(self->s_ptr, NULL);
-#endif
-	while (c) {
-		struct sig *constate;
-		n = c->tc_signext;
-		for (;;) {
-			constate = ATOMIC_READ(c->tc_signal);
-			if (constate == TASK_CONNECTION_DISCONNECTING) {
-				if (!ATOMIC_CMPXCH_WEAK(c->tc_signal,
-				                        TASK_CONNECTION_DISCONNECTING,
-				                        TASK_CONNECTION_DELIVERED))
-					continue;
-				break;
-			}
-			if (((uintptr_t)constate & ~1) == (uintptr_t)self) {
-				struct task_sigset *set;
-				if (!ATOMIC_CMPXCH_WEAK(c->tc_signal, constate, TASK_CONNECTION_DELIVERING))
-					continue;
-				COMPILER_READ_BARRIER();
-				set = ATOMIC_XCH(c->tc_cons, NULL);
-				if (set) {
-					if (ATOMIC_CMPXCH(set->ts_dlvr, NULL, self)) {
-						struct task *thread;
-						thread = set->ts_thread;
-						if (thread)
-							task_wake(thread);
-						if (!((uintptr_t)constate & 1)) /* Don't track ghosts */
-							++result;
-					}
-				}
-				ATOMIC_WRITE(c->tc_signal, TASK_CONNECTION_DELIVERED);
-				break;
-			}
-		}
-		c = n;
-	}
-	return result;
-}
-
-PUBLIC NOBLOCK NONNULL((1, 2)) size_t
-NOTHROW(KCALL sig_altbroadcast)(struct sig *__restrict self, struct sig *sender) {
-	size_t result = 0;
-	struct task_connection *c, *n;
-	assertf(sender != NULL, "Invalid sender");
-	assert(IS_ALIGNED((uintptr_t)self, 2));
-#ifdef SIG_TEMPLOCK
-	do {
-		c = ATOMIC_READ(self->s_ptr);
-		if unlikely(c == SIG_TEMPLOCK) {
-			task_pause();
-			continue;
-		}
-	} while (!ATOMIC_CMPXCH_WEAK(self->s_ptr, c, NULL));
-#else
-	c = ATOMIC_XCH(self->s_ptr, NULL);
-#endif
-	while (c) {
-		struct sig *constate;
-		n = c->tc_signext;
-		for (;;) {
-			constate = ATOMIC_READ(c->tc_signal);
-			if (constate == TASK_CONNECTION_DISCONNECTING) {
-				if (!ATOMIC_CMPXCH_WEAK(c->tc_signal,
-				                        TASK_CONNECTION_DISCONNECTING,
-				                        TASK_CONNECTION_DELIVERED))
-					continue;
-				break;
-			}
-			if (((uintptr_t)constate & ~1) == (uintptr_t)self) {
-				struct task_sigset *set;
-				if (!ATOMIC_CMPXCH_WEAK(c->tc_signal, constate, TASK_CONNECTION_DELIVERING))
-					continue;
-				COMPILER_READ_BARRIER();
-				set = ATOMIC_XCH(c->tc_cons, NULL);
-				if (set) {
-					if (ATOMIC_CMPXCH(set->ts_dlvr, NULL, sender)) {
-						struct task *thread;
-						thread = set->ts_thread;
-						if (thread)
-							task_wake(thread);
-						if (!((uintptr_t)constate & 1)) /* Don't track ghosts */
-							++result;
-					}
-				}
-				ATOMIC_WRITE(c->tc_signal, TASK_CONNECTION_DELIVERED);
-				break;
-			}
-		}
-		c = n;
-	}
-	return result;
-}
-
+DECL_BEGIN
+#endif /* !__INTELLISENSE__ */
 
 
 
@@ -382,6 +155,7 @@ initialize_con:
 			task_pause();
 			goto initialize_con;
 		}
+		assert(con != SIG_TEMPLOCK);
 #endif /* SIG_TEMPLOCK */
 		con->tc_cons = &mycons->tc_signals;
 		assert(!((uintptr_t)mycons->tc_signals.ts_cons & 1));
@@ -405,6 +179,7 @@ task_connect_ghost(struct sig *__restrict target) THROWS(E_BADALLOC) {
 		if (con->tc_signal == TASK_CONNECTION_DISCONNECTED)
 			goto initialize_con;
 	}
+	assert(task_isconnected());
 	con   = connection_alloc(SIGNAL_GFP);
 	flags = 1;
 initialize_con:
@@ -417,7 +192,8 @@ initialize_con:
 			task_pause();
 			goto initialize_con;
 		}
-#endif
+		assert(con != SIG_TEMPLOCK);
+#endif /* SIG_TEMPLOCK */
 		con->tc_cons = &mycons->tc_signals;
 		assert(!((uintptr_t)mycons->tc_signals.ts_cons & 1));
 		con->tc_connext = (struct task_connection *)((uintptr_t)mycons->tc_signals.ts_cons | flags);
@@ -436,7 +212,7 @@ NOTHROW(KCALL task_connect_c)(struct task_connection *__restrict con,
 	mycons = &PERTASK(_this_cons);
 #ifdef SIG_TEMPLOCK
 initialize_con:
-#endif
+#endif /* SIG_TEMPLOCK */
 	do {
 		chain = ATOMIC_READ(target->s_ptr);
 		if (ATOMIC_READ(mycons->tc_signals.ts_dlvr))
@@ -446,7 +222,8 @@ initialize_con:
 			task_pause();
 			goto initialize_con;
 		}
-#endif
+		assert(con != SIG_TEMPLOCK);
+#endif /* SIG_TEMPLOCK */
 		con->tc_cons = &mycons->tc_signals;
 		assert(!((uintptr_t)mycons->tc_signals.ts_cons & 1));
 		con->tc_connext = mycons->tc_signals.ts_cons;
@@ -465,7 +242,7 @@ NOTHROW(KCALL task_connect_ghost_c)(struct task_connection *__restrict con,
 	mycons = &PERTASK(_this_cons);
 #ifdef SIG_TEMPLOCK
 initialize_con:
-#endif
+#endif /* SIG_TEMPLOCK */
 	do {
 		chain = ATOMIC_READ(target->s_ptr);
 		if (ATOMIC_READ(mycons->tc_signals.ts_dlvr))
@@ -475,7 +252,8 @@ initialize_con:
 			task_pause();
 			goto initialize_con;
 		}
-#endif
+		assert(con != SIG_TEMPLOCK);
+#endif /* SIG_TEMPLOCK */
 		con->tc_cons = &mycons->tc_signals;
 		assert(!((uintptr_t)mycons->tc_signals.ts_cons & 1));
 		con->tc_connext = mycons->tc_signals.ts_cons;
@@ -535,6 +313,9 @@ again_read_signal_pointer:
 	sigcon = ATOMIC_READ(signal->s_ptr);
 	if (sigcon == con) {
 		/* lucky! we're the first connection, so we can try to directly unlink ourself! */
+#ifdef SIG_TEMPLOCK
+		assert(con->tc_signext != SIG_TEMPLOCK);
+#endif /* SIG_TEMPLOCK */
 		if (ATOMIC_CMPXCH_WEAK(signal->s_ptr, con, con->tc_signext))
 			goto done_unlink_con;
 		goto again_read_signal_pointer;
@@ -560,7 +341,7 @@ again_read_signal_pointer:
 		task_pause();
 		goto again_read_signal_pointer;
 	}
-#endif
+#endif /* SIG_TEMPLOCK */
 	/* The slow case:
 	 *   - We must steal all of the signal's connections and replace them with
 	 *     a new, temporary set of connections which we can track independently
@@ -608,19 +389,22 @@ again_read_signal_pointer:
 #ifdef SIG_TEMPLOCK
 		{
 			struct task_connection *oldcon;
+			assert(sigcon != SIG_TEMPLOCK);
 			while ((oldcon = ATOMIC_CMPXCH_VAL(signal->s_ptr, &tempcon, sigcon)) != &tempcon) {
-				if (oldcon == SIG_TEMPLOCK)
+				if (oldcon == SIG_TEMPLOCK) {
+					task_pause();
 					continue;
+				}
 				/* Manually disconnect the temporary connection. */
 				task_disconnect_c_impl(&tempcon);
 			}
 		}
-#else
+#else /* SIG_TEMPLOCK */
 		if (!ATOMIC_CMPXCH(signal->s_ptr, &tempcon, sigcon)) {
 			/* Manually disconnect the temporary connection. */
 			task_disconnect_c_impl(&tempcon);
 		}
-#endif
+#endif /* !SIG_TEMPLOCK */
 		if (tempcons.ts_dlvr)
 			sig_altbroadcast(signal, tempcons.ts_dlvr);
 		if (!did_find) {
