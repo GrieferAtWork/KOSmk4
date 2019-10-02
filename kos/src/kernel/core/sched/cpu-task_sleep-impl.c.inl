@@ -68,9 +68,9 @@ PUBLIC bool NOTHROW(FCALL task_sleep)(qtime_t const *abs_timeout)
 	cpu_assert_integrity();
 	if (abs_timeout) {
 		qtime_t now;
-		/* Immediately time out. */
+		/* Check if we should immediately time out. */
 		if (!abs_timeout->q_jtime && !abs_timeout->q_qtime)
-			return false;
+			goto do_return_false;
 		/* Copy the given timeout with preemption still enabled.
 		 * That way, a faulty input pointer can be handled more easily. */
 		memcpy(&me->t_sched.s_asleep.ss_timeout,
@@ -86,6 +86,7 @@ PUBLIC bool NOTHROW(FCALL task_sleep)(qtime_t const *abs_timeout)
 #endif /* !TASK_SLEEP_CPUTIME */
 		/* Check if the given timeout has already expired. */
 		if (now >= me->t_sched.s_asleep.ss_timeout) {
+do_return_false:
 			PREEMPTION_ENABLE();
 			return false;
 		}
@@ -151,6 +152,8 @@ wait_a_bit:
 
 	/* Continue execution in the next thread. */
 	cpu_run_current_and_remember(me);
+
+	assert(PREEMPTION_ENABLED());
 
 	/* HINT: If your debugger break here, it means that your
 	 *       thread is probably waiting on some kind of signal. */
