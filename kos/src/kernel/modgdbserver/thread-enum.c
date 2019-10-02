@@ -74,8 +74,6 @@ NOTHROW(FCALL GDBThread_ShouldEnumerate)(struct task *__restrict thread) {
 	if (!(GDBServer_Features & GDB_SERVER_FEATURE_SHOWKERNEL) &&
 	    GDBThread_IsKernelThread(thread))
 		return false;
-	if (thread == &FORCPU(cpu_vector[1], _this_idle))
-		return false;
 	return true;
 }
 
