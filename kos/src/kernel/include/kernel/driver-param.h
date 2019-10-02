@@ -182,11 +182,11 @@ struct kernel_commandline_option {
 #endif /* !CONFIG_BUILDING_KERNEL_CORE */
 
 
-/* >> int8_t varname;
- * >> if (has_option("<parname>=$VALUE")) varname = strto64("$VALUE", NULL, 0); */
+/* >> char *varname;
+ * >> if (has_option("<parname>=$VALUE")) varname = "$VALUE"; */
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 #define DEFINE_CMDLINE_PARAM_STRING(string_name, parname) \
-	DEFINE_KERNEL_COMMANDLINE_OPTION(string_name, KERNEL_COMMANDLINE_OPTION_TYPE_INT8, parname)
+	DEFINE_KERNEL_COMMANDLINE_OPTION(string_name, KERNEL_COMMANDLINE_OPTION_TYPE_STRING, parname)
 #define DEFINE_CMDLINE_PARAM_STRING_VAR(string_name, parname) \
 	INTERN char const *string_name = __NULLPTR;               \
 	DEFINE_CMDLINE_PARAM_STRING(string_name, parname)

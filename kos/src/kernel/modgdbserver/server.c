@@ -24,6 +24,7 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/driver-param.h> /* DEFINE_CMDLINE_FLAG_VAR() */
 #include <kernel/except.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
@@ -49,9 +50,9 @@
 #include <kernel/gdt.h>
 #endif /* __x86_64__ || __i386__ */
 
+#include "gdb-info.h"
 #include "gdb.h"
 #include "thread-enum.h"
-#include "gdb-info.h"
 
 #define STPCAT(buf, str) ((char *)mempcpy(buf, str, COMPILER_STRLEN(str) * sizeof(char)))
 
@@ -278,13 +279,30 @@ NOTHROW(FCALL GDBThreadSel_EncodeThreadID)(char *buf,
 	return buf;
 }
 
+PRIVATE ssize_t
+NOTHROW(FCALL GDBThread_VerifyPointer_Callback)(void *arg,
+                                                struct task *__restrict thread) {
+	if ((struct task *)arg == thread) {
+		incref(thread);
+		return -1; /* Found it! */
+	}
+	return 0;
+}
+
+
+DEFINE_CMDLINE_FLAG_VAR(opt_trust_pointers, "trust_pointers");
 
 /* Verify that `thread' is a valid thread pointer, and return a new
  * reference to it if this is the case. - Otherwise, return `NULL'. */
 PRIVATE WUNUSED REF struct task *
 NOTHROW(FCALL GDBThread_VerifyPointer)(struct task *__restrict thread) {
-	/* TODO */
-	return incref(thread);
+	/* Don't do the (costly) enumeration if we think that we can trust the remote. */
+	if (opt_trust_pointers)
+		return incref(thread);
+	/* Enumerate all threads, searching for the given `thread' in particular. */
+	if (GDBThread_Enumerate(&GDBThread_VerifyPointer_Callback, thread) < 0)
+		return thread;
+	return NULL;
 }
 
 PRIVATE WUNUSED REF struct task *
