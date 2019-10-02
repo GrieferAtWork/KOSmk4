@@ -117,6 +117,9 @@ INTERN uintptr_t GDBServer_Features = 0;
  *    when waiting for the first byte of some new packet. */
 PRIVATE bool GDBServer_DidSendAsyncStopNotification = false;
 
+/* Set to true when a detach command was issued that implies detach-from-everything
+ * Set to false when a command other than detach-something or select-thread is encountered. */
+PRIVATE bool GDBServer_DidDetachFromEverything = false;
 
 #define GDBTHREADSEL_MODE_SINGLE  0 /* Only a single thread */
 #define GDBTHREADSEL_MODE_PROCESS 1 /* The entire process that `ts_thread' is apart of */
@@ -135,23 +138,6 @@ typedef struct {
 PRIVATE GDBThreadSel GDB_CurrentThread_general  = { NULL, 0 };
 PRIVATE GDBThreadSel GDB_CurrentThread_continue = { NULL, 0 };
 
-
-#define GDB_KERNEL_PID          ((pid_t)(upid_t)0x7fffffff)
-#ifdef HIGH_MEMORY_KERNEL
-#if 1
-#define GDB_KERNEL_TID(thread)  ((pid_t)((uintptr_t)(thread) - KERNEL_BASE))
-#define GDB_KERNEL_TID_GET(tid) ((struct task *)((uintptr_t)(tid) + KERNEL_BASE))
-#define GDB_KERNEL_TID_CHK(tid) ADDR_IS_KERNEL((uintptr_t)(tid) + KERNEL_BASE)
-#else
-#define GDB_KERNEL_TID(thread)  ((pid_t)((uintptr_t)(thread)))
-#define GDB_KERNEL_TID_GET(tid) ((struct task *)((uintptr_t)(tid)))
-#define GDB_KERNEL_TID_CHK(tid) ADDR_IS_KERNEL((uintptr_t)(tid))
-#endif
-#else /* HIGH_MEMORY_KERNEL */
-#define GDB_KERNEL_TID(thread)  ((pid_t)((uintptr_t)(thread) - KERNEL_CEILING))
-#define GDB_KERNEL_TID_GET(tid) ((struct task *)((uintptr_t)(tid) + KERNEL_CEILING))
-#define GDB_KERNEL_TID_CHK(tid) ADDR_IS_KERNEL((uintptr_t)(tid) + KERNEL_CEILING)
-#endif /* !HIGH_MEMORY_KERNEL */
 
 PRIVATE char *
 NOTHROW(FCALL GDB_EncodeError)(char *ptr, errno_t err) {
@@ -789,7 +775,10 @@ PRIVATE unsigned int
 NOTHROW(FCALL GDB_HandleCommand)(char *endptr) {
 	char *o = GDBPacket_Start();
 	char *i = GDBRemote_CommandBuffer;
+	bool old_GDBServer_DidDetachFromEverything;
 	GDBThreadSel newThread;
+	old_GDBServer_DidDetachFromEverything = GDBServer_DidDetachFromEverything;
+	GDBServer_DidDetachFromEverything = false;
 	switch (*i++) {
 
 	case '!':
@@ -884,9 +873,39 @@ resume_nostep:
 		break;
 
 	case 'D': {
-		if (i == endptr) /* Gracefully detach */
+		pid_t pid;
+		GDBServer_DidDetachFromEverything = old_GDBServer_DidDetachFromEverything;
+		if (i == endptr) {
+			/* Gracefully detach */
+send_ok_and_detach:
+			GDBServer_DidDetachFromEverything = true;
+			if (!GDBPacket_Send("OK")) /* Prevent WUNUSED warning */
+				return GDB_HANDLECOMMAND_DTCH;
 			return GDB_HANDLECOMMAND_DTCH;
-		/* Detach form specific process (ignored) */
+		}
+		if (*i++ != ';')
+			ERROR(err_syntax);
+		pid = strto32(i, &i, 16); /* PID */
+		if (i != endptr)
+			ERROR(err_syntax);
+		if (pid == -1)
+			goto send_ok_and_detach; /* Detach from everything */
+		if (pid == 0)
+			goto send_ok_and_detach; /* Detach from anything */
+		if (pid == GDB_KERNEL_PID)
+			goto send_ok_and_detach; /* Detach from the kernel (also implies detach-from-everything) */
+		/* For anything else, we handle detach as a
+		 * command to resume execution of that process. */
+		{
+			REF struct task *proc;
+			proc = GDBThread_DoLookupPID(pid);
+			if unlikely(!proc)
+				ERROR(err_ESRCH);
+			GDBThread_ResumeProcess(proc);
+			decref_unlikely(proc);
+		}
+		if (GDBServer_DidDetachFromEverything)
+			goto send_ok_and_detach; /* Just keep on detaching... */
 		goto send_ok;
 	}	break;
 
@@ -906,6 +925,7 @@ resume_nostep:
 
 	case 'H': {
 		char op = *i++;
+		GDBServer_DidDetachFromEverything = old_GDBServer_DidDetachFromEverything;
 		if (op != 'c' && op != 'g')
 			ERROR(err_syntax);
 		if (!GDBThread_DecodeThreadID(&i, &newThread))
@@ -1419,11 +1439,7 @@ send_empty:
 					ERROR(err_qXfer_syntax);
 				error = GDBInfo_PrintThreadList(&GDB_OffsetAndLengthPrinter, &dst);
 			} else if (ISNAME("osdata") && isReadOperation) {
-				if (strcmp(annex, "processes") == 0) {
-					error = GDBInfo_PrintProcessList(&GDB_OffsetAndLengthPrinter, &dst);
-				} else {
-					ERROR(unknown);
-				}
+				error = GDBInfo_PrintOSData(&GDB_OffsetAndLengthPrinter, &dst, annex);
 			} else {
 				ERROR(unknown);
 			}
@@ -1641,7 +1657,7 @@ send_empty:
 			o = STPCAT(o, ";qXfer:exec-file:read+");
 			o = STPCAT(o, ";qXfer:libraries:read+");
 			o = STPCAT(o, ";qXfer:threads:read+");
-//			o = STPCAT(o, ";qXfer:osdata:read+");
+			o = STPCAT(o, ";qXfer:osdata:read+");
 /*			o = STPCAT(o, ";qXfer:features:read+"); // I don't really understand what this is good for (yet) */
 			o = STPCAT(o, ";vContSupported+");
 		} else if (nameLen == 1 + COMPILER_STRLEN("ThreadInfo") &&
@@ -1762,6 +1778,7 @@ send_empty:
 			GDB_SetNonStopModeEnabled(mode != 0);
 			goto send_ok;
 		} else if (ISNAME("C") && *nameEnd == ':') {
+			GDBServer_DidDetachFromEverything = old_GDBServer_DidDetachFromEverything;
 			i = nameEnd + 1;
 			if (!GDBThread_DecodeThreadID(&i, &newThread))
 				goto err_ESRCH;

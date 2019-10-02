@@ -20,6 +20,7 @@
 #define GUARD_MODGDBSERVER_SERVER_H 1
 
 #include <kernel/compiler.h>
+#include <kernel/paging.h> /* HIGH_MEMORY_KERNEL */
 
 #include "gdb.h"
 
@@ -106,6 +107,28 @@ INTDEF char const GDB_HexChars[16];
 INTDEF u8 const GDB_HexValues[256];
 #define GDB_FromHex(ch) GDB_HexValues[(u8)(ch)]
 #define GDB_ToHex(ord)  GDB_HexChars[(u8)(ord)]
+
+
+
+/* TID management. */
+#define GDB_KERNEL_PID          ((pid_t)(upid_t)0x7fffffff)
+#ifdef HIGH_MEMORY_KERNEL
+#if 1
+#define GDB_KERNEL_TID(thread)  ((pid_t)((uintptr_t)(thread) - KERNEL_BASE))
+#define GDB_KERNEL_TID_GET(tid) ((struct task *)((uintptr_t)(tid) + KERNEL_BASE))
+#define GDB_KERNEL_TID_CHK(tid) ADDR_IS_KERNEL((uintptr_t)(tid) + KERNEL_BASE)
+#else
+#define GDB_KERNEL_TID(thread)  ((pid_t)((uintptr_t)(thread)))
+#define GDB_KERNEL_TID_GET(tid) ((struct task *)((uintptr_t)(tid)))
+#define GDB_KERNEL_TID_CHK(tid) ADDR_IS_KERNEL((uintptr_t)(tid))
+#endif
+#else /* HIGH_MEMORY_KERNEL */
+#define GDB_KERNEL_TID(thread)  ((pid_t)((uintptr_t)(thread)/* - KERNEL_CEILING*/))
+#define GDB_KERNEL_TID_GET(tid) ((struct task *)((uintptr_t)(tid)/* + KERNEL_CEILING*/))
+#define GDB_KERNEL_TID_CHK(tid) ADDR_IS_KERNEL((uintptr_t)(tid)/* + KERNEL_CEILING*/)
+#endif /* !HIGH_MEMORY_KERNEL */
+
+
 
 
 DECL_END

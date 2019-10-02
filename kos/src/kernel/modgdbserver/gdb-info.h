@@ -59,9 +59,11 @@ NOTHROW(FCALL GDBInfo_PrintVMLibraryList)(pformatprinter printer, void *arg,
 INTDEF NONNULL((1)) ssize_t
 NOTHROW(FCALL GDBInfo_PrintThreadList)(pformatprinter printer, void *arg);
 
-/* `qXfer:osdata:read:processes': Print the list of processes running on the system. */
+/* `qXfer:osdata:read:<name>': Print os-specific data.
+ * @return: -ENOENT: Invalid `name' */
 INTDEF NONNULL((1)) ssize_t
-NOTHROW(FCALL GDBInfo_PrintProcessList)(pformatprinter printer, void *arg);
+NOTHROW(FCALL GDBInfo_PrintOSData)(pformatprinter printer, void *arg,
+                                   char const *__restrict name);
 
 
 

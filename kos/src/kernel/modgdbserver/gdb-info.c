@@ -33,6 +33,7 @@
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
+#include <libcmdline/encode.h>
 
 #include <assert.h>
 #include <errno.h>
@@ -40,14 +41,16 @@
 #include <string.h>
 
 #include "gdb.h"
+#include "server.h"
 #include "thread-enum.h"
 
 
 DECL_BEGIN
 
-#define DO(expr)    do{ if ((temp = (expr)) < 0) goto err; result += temp; }__WHILE0
-#define PRINT(str)  DO((*printer)(arg, str, COMPILER_STRLEN(str)))
-#define PRINTF(...) DO(format_printf(printer, arg, __VA_ARGS__))
+#define DO(expr)      do{ if ((temp = (expr)) < 0) goto err; result += temp; }__WHILE0
+#define print(p, len) DO((*printer)(arg, p, len))
+#define PRINT(str)    DO((*printer)(arg, str, COMPILER_STRLEN(str)))
+#define PRINTF(...)   DO(format_printf(printer, arg, __VA_ARGS__))
 
 
 /* NOTE: All of the following functions return negative ERRNO values on failure. */
@@ -387,10 +390,172 @@ err:
 }
 
 
+PRIVATE ssize_t
+NOTHROW(FCALL GDBInfo_PrintProcessList_Callback)(void *closure,
+                                                 struct task *__restrict thread) {
+	ssize_t temp, result = 0; u32 pid;
+	pformatprinter printer; void *arg;
+	if (!task_isprocessleader_p(thread))
+		goto done;
+	if (GDBThread_IsKernelThread(thread))
+		goto done;
+	printer = ((struct GDBInfo_PrintThreadList_Data *)closure)->ptld_printer;
+	arg     = ((struct GDBInfo_PrintThreadList_Data *)closure)->ptld_arg;
+	pid = task_getrootpid_of_s(thread);
+	PRINTF("<item>"
+	       "<column name=\"pid\">%I32x</column>"
+	       "<column name=\"user\">root</column>"
+	       "<column name=\"program\">", pid);
+	DO(GDBInfo_PrintThreadExecFile(printer, arg, thread, false));
+	PRINT("</column>"
+	      "<column name=\"command\">");
+	/* TODO: Display the program's commandline instead! */
+	DO(GDBInfo_PrintThreadExecFile(printer, arg, thread, false));
+	PRINT("</column>"
+	      /* XXX: <column name="cores">1,2,3</column> */
+	      "</item>");
+done:
+	return result;
+err:
+	return temp;
+}
+
+
 /* `qXfer:osdata:read:processes': Print the list of processes running on the system. */
-INTERN NONNULL((1)) ssize_t
+PRIVATE NONNULL((1)) ssize_t
 NOTHROW(FCALL GDBInfo_PrintProcessList)(pformatprinter printer, void *arg) {
-	return -ENOSYS;
+	struct GDBInfo_PrintThreadList_Data data;
+	ssize_t temp, result = 0;
+	PRINT("<?xml version=\"1.0\"?>"
+	      "<!DOCTYPE target SYSTEM \"osdata.dtd\">"
+	      "<osdata type=\"processes\">");
+	PRINTF("<item>"
+	       "<column name=\"pid\">%I32x</column>"
+	       "<column name=\"user\">root</column>"
+	       "<column name=\"program\">%s</column>"
+	       "<column name=\"command\">",
+	       GDB_KERNEL_PID,
+	       kernel_driver.d_filename);
+	DO(cmdline_encode(printer, arg,
+	                  kernel_driver.d_argc,
+	                  kernel_driver.d_argv));
+	PRINT("</column>"
+	      "</item>");
+	data.ptld_printer = printer;
+	data.ptld_arg     = arg;
+	DO(GDBThread_Enumerate(&GDBInfo_PrintProcessList_Callback, &data));
+	PRINT("</osdata>");
+	return result;
+err:
+	return temp;
+}
+
+PRIVATE bool FCALL
+is_a_valid_driver(struct driver *__restrict d,
+                  struct driver_state const *__restrict ds) {
+	size_t i;
+	if (d == &kernel_driver)
+		return true;
+	for (i = 0; i < ds->ds_count; ++i) {
+		if (ds->ds_drivers[i] == d)
+			return true;
+	}
+	return false;
+}
+
+PRIVATE NONNULL((1)) ssize_t
+NOTHROW(FCALL GDBInfo_PrintDriverListEntry)(pformatprinter printer, void *arg,
+                                            struct driver *__restrict d,
+                                            struct driver_state const *__restrict ds) {
+	size_t i;
+	ssize_t temp, result = 0;
+	PRINTF("<item>"
+	       "<column name=\"name\">%s</column>"
+	       "<column name=\"file\">%s</column>"
+	       "<column name=\"args\">",
+	       d->d_name,
+	       d->d_filename);
+	DO(cmdline_encode(printer, arg, d->d_argc, d->d_argv));
+	PRINTF("</column>"
+	       "<column name=\"loadaddr\">%p</column>"
+	       "<column name=\"loadstart\">%p</column>"
+	       "<column name=\"loadend\">%p</column>"
+	       "<column name=\"dependencies\">",
+	       d->d_loadaddr,
+	       d->d_loadstart,
+	       d->d_loadend);
+	for (i = 0; i < d->d_depcnt; ++i) {
+		struct driver *dep = d->d_depvec[i];
+		if (i != 0)
+			PRINT(",");
+		if (is_a_valid_driver(dep, ds)) {
+			print(dep->d_name, strlen(dep->d_name));
+		} else {
+			PRINT("?");
+		}
+	}
+	PRINT("</column>");
+	PRINT("</item>");
+	return result;
+err:
+	return temp;
+}
+
+PRIVATE NONNULL((1)) ssize_t
+NOTHROW(FCALL GDBInfo_PrintDriverList)(pformatprinter printer, void *arg) {
+	size_t i;
+	ssize_t temp, result = 0;
+	REF struct driver_state *ds;
+	ds = driver_get_state();
+	PRINT("<osdata type=\"drivers\">");
+	DO(GDBInfo_PrintDriverListEntry(printer, arg,
+	                                &kernel_driver, ds));
+	for (i = 0; i < ds->ds_count; ++i) {
+		DO(GDBInfo_PrintDriverListEntry(printer, arg,
+		                                ds->ds_drivers[i], ds));
+	}
+	PRINT("</osdata>");
+	decref_unlikely(ds);
+	return result;
+err:
+	decref_unlikely(ds);
+	return temp;
+}
+
+
+PRIVATE char const GDBInfo_OsDataOverview[] =
+"<osdata type=\"types\">"
+	"<item>"
+		"<column name=\"Type\">processes</column>"
+		"<column name=\"Description\">Processes</column>"
+		"<column name=\"Title\">Listing of all processes</column>"
+	"</item>"
+	"<item>"
+		"<column name=\"Type\">drivers</column>"
+		"<column name=\"Description\">Kernel drivers</column>"
+		"<column name=\"Title\">Listing of all kernel drivers</column>"
+	"</item>"
+"</osdata>";
+
+
+/* `qXfer:osdata:read:<name>': Print os-specific data.
+ * @return: -ENOENT: Invalid `name' */
+INTERN NONNULL((1)) ssize_t
+NOTHROW(FCALL GDBInfo_PrintOSData)(pformatprinter printer, void *arg,
+                                   char const *__restrict name) {
+	ssize_t result;
+	if (!*name) {
+		result = (*printer)(arg,
+		                    GDBInfo_OsDataOverview,
+		                    COMPILER_STRLEN(GDBInfo_OsDataOverview));
+	} else if (strcmp(name, "processes") == 0) {
+		result = GDBInfo_PrintProcessList(printer, arg);
+	} else if (strcmp(name, "drivers") == 0) {
+		result = GDBInfo_PrintDriverList(printer, arg);
+	} else {
+		result = -ENOENT;
+	}
+	return result;
 }
 
 
