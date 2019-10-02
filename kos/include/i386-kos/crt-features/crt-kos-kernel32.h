@@ -570,6 +570,7 @@
 #define __CRT_HAVE_handle_manager_clone 1
 #define __CRT_HAVE_handle_manager_destroy 1
 #define __CRT_HAVE_handle_manager_kernel 1
+#define __CRT_HAVE_handle_print 1
 #define __CRT_HAVE_handle_tryclose 1
 #define __CRT_HAVE_handle_tryclose_nosym 1
 #define __CRT_HAVE_handle_trylookup 1

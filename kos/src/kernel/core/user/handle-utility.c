@@ -43,6 +43,8 @@
 
 #include <sys/stat.h>
 
+#include <format-printer.h>
+
 DECL_BEGIN
 
 /* Returns the type-kind code for `self' (One of `HANDLE_TYPEKIND_*') */
@@ -194,6 +196,175 @@ badtype:
 	*presult = value;
 	return true;
 }
+
+/* Print the text that should result from `readlink("/proc/[pid]/fd/[fdno]")' */
+PUBLIC ssize_t KCALL
+handle_print(struct handle const *__restrict self,
+             pformatprinter printer, void *arg) {
+	size_t result;
+	switch (self->h_type) {
+
+	case HANDLE_TYPE_DATABLOCK: {
+		struct vm_datablock *b = (struct vm_datablock *)self->h_data;
+		if (vm_datablock_isinode(b)) {
+			result = format_printf(printer, arg,
+			                       "anon_inode:[inode:%I64u]",
+			                       ((struct inode *)b)->i_fileino);
+		} else {
+			result = format_printf(printer, arg,
+			                       "anon_inode:[datablock:%Iu]",
+			                       b);
+		}
+	}	break;
+
+	case HANDLE_TYPE_BLOCKDEVICE: {
+		struct block_device *dev = (struct block_device *)self->h_data;
+		result = format_printf(printer, arg, "/dev/%s", dev->bd_name);
+	}	break;
+
+	case HANDLE_TYPE_DIRECTORYENTRY: {
+		struct directory_entry *ent = (struct directory_entry *)self->h_data;
+		result = format_printf(printer, arg, "anon_inode:[directory_entry:%$s]",
+		                  ent->de_namelen, ent->de_name);
+	}	break;
+
+	case HANDLE_TYPE_FILE: {
+		struct file *f = (struct file *)self->h_data;
+		if (f->f_path && f->f_dirent) {
+			result = path_printent(f->f_path,
+			                       f->f_dirent,
+			                       printer, arg);
+		} else {
+			result = format_printf(printer, arg,
+			                       "anon_inode:[file:inode:%I64u]",
+			                       f->f_node->i_fileino);
+		}
+	}	break;
+
+	case HANDLE_TYPE_ONESHOT_DIRECTORY_FILE: {
+		struct oneshot_directory_file *f = (struct oneshot_directory_file *)self->h_data;
+		if (f->d_path && f->d_dirent) {
+			result = path_printent(f->d_path,
+			                       f->d_dirent,
+			                       printer, arg);
+		} else {
+			result = format_printf(printer, arg, "anon_inode:[oneshot_directory_file:inode:%I64u]",
+			                  f->d_node->i_fileino);
+		}
+	}	break;
+
+	case HANDLE_TYPE_PATH: {
+		struct path *p = (struct path *)self->h_data;
+		result = path_print(p, printer, arg);
+	}	break;
+
+	case HANDLE_TYPE_FS: {
+		struct fs *f = (struct fs *)self->h_data;
+		result = format_printf(printer, arg,
+		                       "anon_inode:[fs:%Iu]",
+		                       f);
+	}	break;
+
+	case HANDLE_TYPE_VM: {
+		struct vm *f = (struct vm *)self->h_data;
+		result = format_printf(printer, arg,
+		                       "anon_inode:[vm:%Iu]",
+		                       f);
+	}	break;
+
+	case HANDLE_TYPE_TASK: {
+		struct taskpid *t = (struct taskpid *)self->h_data;
+		result = format_printf(printer, arg,
+		                       "anon_inode:[task:%u]",
+		                       taskpid_getpid_s(t));
+	}	break;
+
+	case HANDLE_TYPE_CLOCK: {
+		struct wall_clock *c = (struct wall_clock *)self->h_data;
+		result = format_printf(printer, arg,
+		                       "anon_inode:[wall_clock:%Iu]",
+		                       c);
+	}	break;
+
+	case HANDLE_TYPE_DRIVER: {
+		struct driver *d = (struct driver *)self->h_data;
+		result = format_printf(printer, arg,
+		                       "anon_inode:[driver:%s]",
+		                       d->d_filename ? d->d_filename
+		                                     : d->d_name);
+	}	break;
+
+	case HANDLE_TYPE_PIPE: {
+		struct pipe *p = (struct pipe *)self->h_data;
+		result = format_printf(printer, arg,
+		                       "anon_inode:[pipe:%Iu]",
+		                       p);
+	}	break;
+
+	case HANDLE_TYPE_PIPE_READER: {
+		struct pipe_reader *p = (struct pipe_reader *)self->h_data;
+		result = format_printf(printer, arg,
+		                       "anon_inode:[reader:pipe:%Iu]",
+		                       p->pr_pipe);
+	}	break;
+
+	case HANDLE_TYPE_PIPE_WRITER: {
+		struct pipe_writer *p = (struct pipe_writer *)self->h_data;
+		result = format_printf(printer, arg,
+		                       "anon_inode:[writer:pipe:%Iu]",
+		                       p->pw_pipe);
+	}	break;
+
+	case HANDLE_TYPE_PIDNS: {
+		struct pidns *ns = (struct pidns *)self->h_data;
+		result = format_printf(printer, arg,
+		                       "anon_inode:[pidns:%Iu]",
+		                       ns);
+	}	break;
+
+	case HANDLE_TYPE_DRIVER_STATE: {
+		struct driver_state *st = (struct driver_state *)self->h_data;
+		result = format_printf(printer, arg,
+		                       "anon_inode:[driver_state:%Iu]",
+		                       st);
+	}	break;
+
+	case HANDLE_TYPE_CHARACTERDEVICE: {
+		struct character_device *dev = (struct character_device *)self->h_data;
+		result = format_printf(printer, arg,
+		                       "/dev/%s",
+		                       dev->cd_name);
+	}	break;
+
+	case HANDLE_TYPE_EVENTFD_FENCE: {
+		struct eventfd *efd = (struct eventfd *)self->h_data;
+		result = format_printf(printer, arg,
+		                       "anon_inode:[eventfd:fence:%Iu]",
+		                       efd);
+	}	break;
+
+	case HANDLE_TYPE_EVENTFD_SEMA: {
+		struct eventfd *efd = (struct eventfd *)self->h_data;
+		result = format_printf(printer, arg,
+		                       "anon_inode:[eventfd:semaphore:%Iu]",
+		                       efd);
+	}	break;
+
+	case HANDLE_TYPE_SIGNALFD: {
+		struct signalfd *sfd = (struct signalfd *)self->h_data;
+		result = format_printf(printer, arg,
+		                       "anon_inode:[signalfd:%Iu]",
+		                       sfd);
+	}	break;
+
+	default:
+		result = format_printf(printer, arg, "anon_inode:[%s]",
+		                       handle_typename(*self));
+		break;
+	}
+	return result;
+}
+
 
 
 DECL_END

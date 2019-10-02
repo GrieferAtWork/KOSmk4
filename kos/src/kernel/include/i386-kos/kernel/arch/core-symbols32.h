@@ -5586,10 +5586,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak vm_datapart_writev_phys; .long vm_datapart_writev_phys
 	.reloc ., R_386_SIZE32, vm_datapart_writev_phys; .long 0
 	.long 0xe1d8393
-	.long 0 /* index: 1396 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname1396 /* index: 1396 */
+	.weak handle_print; .long handle_print
+	.reloc ., R_386_SIZE32, handle_print; .long 0
+	.long 0xd8fc574
 	.long 0 /* index: 1397 */
 	.long 0
 	.long 0
@@ -17828,6 +17828,8 @@ END(kernel_symbol_table)
 	.string "vpage_alloc_nx"
 .Lname1395:
 	.string "vm_datapart_writev_phys"
+.Lname1396:
+	.string "handle_print"
 .Lname1400:
 	.string "x86_fpu_current"
 .Lname1401:
