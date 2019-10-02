@@ -298,6 +298,8 @@ END(x86_lcall7_main)
 .section .text.hot
 INTERN_FUNCTION(x86_sysenter_main)
 	.cfi_startproc simple
+	.cfi_signal_frame
+	.cfi_def_cfa %esp, 0
 	.cfi_register %esp, %ebp /* EBP is the designated return-sp register */
 	.cfi_register %eip, %edi /* EDI is the designated return-pc register */
 	/* `IA32_SYSENTER_ESP' points at the ESP0 field of the CPU's TSS
@@ -314,13 +316,14 @@ INTERN_FUNCTION(x86_sysenter_main)
 	.cfi_reg_offset %eflags, 4, %esp
 	pushl  %edi                   /* %eip */
 	.cfi_reg_offset %eflags, 8, %esp
-	.cfi_endproc
 
-	/* With the IRET tail constructed, start a new CFI function with the SIGNAL_FRAME
-	 * property enabled, thus allowing for normal system call return behavior. */
-	.cfi_startproc simple
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
+	/* Switch over to IRET signal framing */
+/*	.cfi_def_cfa %esp, 0 */
+	.cfi_restore_iret_eip
+	.cfi_restore_iret_cs
+	.cfi_restore_iret_eflags
+	.cfi_restore_iret_esp
+	.cfi_restore_iret_ss
 	/* Enable interrupts. */
 	sti
 .Ldo_prepared_sysenter:
@@ -382,6 +385,8 @@ END(x86_asmirq_80)
 .section .text.hot
 INTERN_FUNCTION(x86_sysenter_main_traced)
 	.cfi_startproc simple
+	.cfi_signal_frame
+	.cfi_def_cfa %esp, 0
 	.cfi_register %esp, %ebp /* EBP is the designated return-sp register */
 	.cfi_register %eip, %edi /* EDI is the designated return-pc register */
 	/* `IA32_SYSENTER_ESP' points at the ESP0 field of the CPU's TSS
@@ -397,14 +402,15 @@ INTERN_FUNCTION(x86_sysenter_main_traced)
 	pushl  $SEGMENT_USER_CODE_RPL /* %cs */
 	.cfi_reg_offset %eflags, 4, %esp
 	pushl  %edi                   /* %eip */
-	.cfi_reg_offset %eflags, 8, %esp
-	.cfi_endproc
 
 	/* With the IRET tail constructed, start a new CFI function with the SIGNAL_FRAME
 	 * property enabled, thus allowing for normal system call return behavior. */
-	.cfi_startproc simple
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
+/*	.cfi_def_cfa %esp, 0 */
+	.cfi_restore_iret_eip
+	.cfi_restore_iret_cs
+	.cfi_restore_iret_eflags
+	.cfi_restore_iret_esp
+	.cfi_restore_iret_ss
 	/* Enable interrupts. */
 	sti
 .Ldo_prepared_sysenter_traced:
