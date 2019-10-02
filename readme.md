@@ -53,8 +53,8 @@ All ported applications can be installed onto you KOS disk image by using `bash 
 		- Not to boast, but I've seen ~finished~ hobby OSs with less functionality than this debugger alone
 		- Disassemble x86 assembly into human-readable assembly dumps
 	- GDB support
-		- QEMU features a builtin gdb stub, that is supported for debugging the core itself
-		- Seperately, KOS provides a custom GDB stub driver (s.a. `/kos/src/kernel/modgdbstub`) for emulator-independent and real-hardware debugging
+		- QEMU features a builtin gdb server, that is supported for debugging the core itself
+		- Seperately, KOS provides a custom GDB server driver (s.a. `/kos/src/kernel/modgdbserver`) for emulator-independent and real-hardware debugging
 		- Fully integrated with Visual Studio (who knew you could do this... I certainly didn't until I stumbled across some vague reports of GDB debugging support in VS2017, that later turned out to be true)
 - multiboot
 	- Full (but optional) support for multiboot- and multiboot2-compliant bootloaders
@@ -494,9 +494,9 @@ To help you understand how this script works to do what it does, here is a docum
 	- The given `FILE` is interpreted relative to the PWD set when `magic.dee` got invoked
 - `--gdb=MODE` (Defaults to not-given)
 	- Enable GDB debugging support, where `MODE` must be one of
-		- `stub`: Use the builtin GDB driver
+		- `server`: Use the builtin GDB server driver
 		- `qemu`: Use QEMU's builtin GDB stub
-	- Note that the GDB stub is always created as a server socket `tcp:localhost:1234` on your machine
+	- Note that the GDB server/stub is always created as a server socket `tcp:localhost:1234` on your machine
 - `--emulator-started-pattern=TEXT`
 	- Print the given `TEXT` to `stdout` when the emulator is started (needed for syncing with Visual Studio)
 - `--target=TARGET` (Defaults to automatic detection; see below)
@@ -555,17 +555,17 @@ I mean seriously: Even when you scoure the osdev wiki you'll come across referen
 
 Anyways. - Even though practically no documentation on this feature of Visual Studio (which you can get the Community Edition of for free by the way) exists, I managed to get it working through trial an error.
 
-And if you don't like Visual Studio (or aren't using Windows) I do know for a fact that Visual Studio Code also includes functionality for connecting to a GDB client/stub when you start diving into extensions
+And if you don't like Visual Studio (or aren't using Windows) I do know for a fact that Visual Studio Code also includes functionality for connecting to a GDB server/stub when you start diving into extensions
 
 So here are your options:
 
-- To debug the kernel, you must start it with one of the following 2 commandlines (both of which will run a GDB stub on `tcp:localhost:1234`, and have qemu wait until something connects to it):
-	- `deemon magic.dee --run-only --gdb=stub --target=i386 --config=OD` 
-	This one uses my own personal gdb stub that gets loaded as a driver into the kernel. It offers out-of-the-box integrated support for enumerating libraries, drivers, and running threads
+- To debug the kernel, you must start it with one of the following 2 commandlines (both of which will run a GDB server/stub on `tcp:localhost:1234`, and have qemu wait until something connects to it):
+	- `deemon magic.dee --run-only --gdb=server --target=i386 --config=OD` 
+	This one uses my own personal gdb server that gets loaded as a driver into the kernel. It offers out-of-the-box integrated support for enumerating libraries, drivers, and running threads
 	- `deemon magic.dee --run-only --gdb=qemu --target=i386 --config=OD` 
 	This one uses qemu's built-in gdb stub, which offers less functionality since it won't know how to enumerate threads created by the KOS scheduler, or list all of the libraries/drivers loaded into the kernel, meaning that tracebacks will only include source locations from the kernel core.
 	This option is mainly meant for debugging things that happen before the GDB driver is loaded, or things that break the GDB stub driver itself (It's home-made and hacked together based on knowledge leared from observation, qemu's implementation, gdb's reference implementation (which only implements about 1% of the protocol...), and bits and pieces of documentation from across the internet)
-- To connect to the stub, you can do one of the following:
+- To connect to the server/stub, you can do one of the following:
 	- Use Visual Studio's Open-Folder function to open the `/kos` folder and have all of this happen in 1 step when you press the debug button
 	- Start a new instance of `gdb` built for a generic `i386` target and type `target remote localhost:1234`
 	- Screw around with Visual Studio Code until you get it to connect to that same port, and have it be your debugging experience (I know for a fact that this is possible since I managed to get it to work before figuring out how to get Visual Studio's Open-Folder method to do my bidding)

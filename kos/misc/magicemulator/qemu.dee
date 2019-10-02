@@ -268,7 +268,7 @@ got_exe:
 		qemu_arguments.extend({ "-no-reboot", "-no-shutdown" });
 	local gdb_mode = options.get(opt.QEMU_GDB);
 	if (gdb_mode !is none) {
-		if (gdb_mode == "stub") {
+		if (gdb_mode == "server") {
 			/* Make use of out GDB server driver */
 			qemu_arguments.extend({
 				"-serial", "tcp::1234,server",
@@ -277,10 +277,6 @@ got_exe:
 		} else if (gdb_mode == "qemu") {
 			/* Use qemu's builtin GDB support */
 			/* Make use of out GDB-stub driver */
-//			qemu_arguments.extend({
-//				"-serial", "tcp::1235,server",
-//				"-initrd", binPath + "/os/drivers/gdbstub transport=serial:0x2f8:0xf3",
-//			});
 			qemu_arguments.extend({ "-s", "-S" });
 		} else {
 			throw Error("Invalid GDB mode: " + repr gdb_mode);

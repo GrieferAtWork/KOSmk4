@@ -5,7 +5,7 @@
 	"configurations": [
 		{
 			"type": "cppdbg",
-			"name": "kernel (--gdb=stub)",
+			"name": "kernel (--gdb=server)",
 			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
 			"project": "src",
 			"sourceFileMap": {
@@ -15,15 +15,22 @@
 				"/cygdrive/d": "D:\\",
 				"/cygdrive/e": "E:\\",
 				"/cygdrive/f": "F:\\",
-				"/cygdrive/g": "G:\\"
+				"/cygdrive/g": "G:\\",
+				"/cygdrive/h": "H:\\",
+				"/cygdrive/i": "I:\\",
+				"/cygdrive/j": "J:\\",
+				"/cygdrive/k": "K:\\",
+				"/cygdrive/x": "X:\\",
+				"/cygdrive/y": "Y:\\",
+				"/cygdrive/z": "Z:\\"
 			},
-			"program": "${workspaceRoot}\\..\\bin\\${env.TARGET}-kos-${env.CONFIG}\\os\\kernel.bin",
+			"program": ".",
 			"MIMode": "gdb",
 			"miDebuggerPath": "gdb.exe",
 			"targetArchitecture": "x86",
 			"debugType": "native",
 			"launchCompleteCommand": "None",
-			"miDebuggerServerAddress": "localhost:1234",
+			"miDebuggerServerAddress": ".",
 			"customLaunchSetupCommands": [
 				{ "text": "cd ${workspaceRoot}\\..\\", "ignoreFailures": false },
 				{ "text": "set sysroot ${workspaceRoot}\\..\\bin\\${env.TARGET}-kos-${env.CONFIG}", "ignoreFailures": false },
@@ -43,7 +50,7 @@
 				{ "text": "set detach-on-fork off", "ignoreFailures": false }
 			],
 			"debugServerPath": "${env.SYSTEMROOT}\\system32\\cmd.exe",
-			"debugServerArgs": "/c \"deemon ${workspaceRoot}\\..\\magic.dee --run-only --gdb=stub --emulator-started-pattern=EMULATOR_STARTED --target=${env.TARGET} --config=${env.CONFIG}\"",
+			"debugServerArgs": "/c \"deemon ${workspaceRoot}\\..\\magic.dee --run-only --gdb=server --emulator-started-pattern=EMULATOR_STARTED --target=${env.TARGET} --config=${env.CONFIG}\"",
 			"serverStarted": "EMULATOR_STARTED",
 			"serverLaunchTimeout": 120000,
 			"filterStdout": true,
@@ -51,7 +58,7 @@
 		},
 		{
 			"type": "cppdbg",
-			"name": "kernel (--gdb=stub) (external)",
+			"name": "kernel (--gdb=server) (external)",
 			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
 			"project": "src",
 			"sourceFileMap": {
@@ -61,15 +68,22 @@
 				"/cygdrive/d": "D:\\",
 				"/cygdrive/e": "E:\\",
 				"/cygdrive/f": "F:\\",
-				"/cygdrive/g": "G:\\"
+				"/cygdrive/g": "G:\\",
+				"/cygdrive/h": "H:\\",
+				"/cygdrive/i": "I:\\",
+				"/cygdrive/j": "J:\\",
+				"/cygdrive/k": "K:\\",
+				"/cygdrive/x": "X:\\",
+				"/cygdrive/y": "Y:\\",
+				"/cygdrive/z": "Z:\\"
 			},
-			"program": "${workspaceRoot}\\..\\bin\\${env.TARGET}-kos-${env.CONFIG}\\os\\kernel.bin",
+			"program": ".",
 			"MIMode": "gdb",
 			"miDebuggerPath": "gdb.exe",
 			"targetArchitecture": "x86",
 			"debugType": "native",
 			"launchCompleteCommand": "None",
-			"miDebuggerServerAddress": "localhost:1234",
+			"miDebuggerServerAddress": ".",
 			"customLaunchSetupCommands": [
 				{ "text": "cd ${workspaceRoot}\\..\\", "ignoreFailures": false },
 				{ "text": "set sysroot ${workspaceRoot}\\..\\bin\\${env.TARGET}-kos-${env.CONFIG}", "ignoreFailures": false },
@@ -91,6 +105,108 @@
 		},
 		{
 			"type": "cppdbg",
+			"name": "kernel (--gdb=server) [QNonStop:1]",
+			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
+			"project": "src",
+			"sourceFileMap": {
+				"ABSOLUTE_KOS_PROJECT_ROOT/kos": "${workspaceRoot}",
+				"ABSOLUTE_KOS_PROJECT_ROOT": "${workspaceRoot}\\..",
+				"/cygdrive/c": "C:\\",
+				"/cygdrive/d": "D:\\",
+				"/cygdrive/e": "E:\\",
+				"/cygdrive/f": "F:\\",
+				"/cygdrive/g": "G:\\",
+				"/cygdrive/h": "H:\\",
+				"/cygdrive/i": "I:\\",
+				"/cygdrive/j": "J:\\",
+				"/cygdrive/k": "K:\\",
+				"/cygdrive/x": "X:\\",
+				"/cygdrive/y": "Y:\\",
+				"/cygdrive/z": "Z:\\"
+			},
+			"program": ".",
+			"MIMode": "gdb",
+			"miDebuggerPath": "gdb.exe",
+			"targetArchitecture": "x86",
+			"debugType": "native",
+			"launchCompleteCommand": "None",
+			"miDebuggerServerAddress": ".",
+			"customLaunchSetupCommands": [
+				{ "text": "cd ${workspaceRoot}\\..\\", "ignoreFailures": false },
+				{ "text": "set sysroot ${workspaceRoot}\\..\\bin\\${env.TARGET}-kos-${env.CONFIG}", "ignoreFailures": false },
+				{ "text": "set solib-search-path bin/${env.TARGET}-kos-${env.CONFIG}/lib:bin/${env.TARGET}-kos-${env.CONFIG}/os/drivers", "ignoreFailures": false },
+				{ "text": "set auto-solib-add on", "ignoreFailures": false },
+				{ "text": "-target-select remote localhost:1234", "ignoreFailures": false }
+			],
+			"setupCommands": [
+				{ "text": "-enable-pretty-printing", "ignoreFailures": true },
+				{ "text": "set print pretty on", "ignoreFailures": true },
+				{ "text": "set print object on", "ignoreFailures": true },
+				{ "text": "set print static-members on", "ignoreFailures": true },
+				{ "text": "set print vtbl on", "ignoreFailures": true },
+				{ "text": "set print demangle on", "ignoreFailures": true },
+				{ "text": "set demangle-style gnu-v3", "ignoreFailures": true },
+				{ "text": "set print sevenbit-strings off", "ignoreFailures": true },
+				{ "text": "set detach-on-fork off", "ignoreFailures": false },
+				{ "text": "set non-stop on", "ignoreFailures": false }
+			],
+			"debugServerPath": "${env.SYSTEMROOT}\\system32\\cmd.exe",
+			"debugServerArgs": "/c \"deemon ${workspaceRoot}\\..\\magic.dee --run-only --gdb=server --emulator-started-pattern=EMULATOR_STARTED --target=${env.TARGET} --config=${env.CONFIG}\"",
+			"serverStarted": "EMULATOR_STARTED",
+			"serverLaunchTimeout": 120000,
+			"filterStdout": true,
+			"filterStderr": true
+		},
+		{
+			"type": "cppdbg",
+			"name": "kernel (--gdb=server) [QNonStop:1] (external)",
+			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
+			"project": "src",
+			"sourceFileMap": {
+				"ABSOLUTE_KOS_PROJECT_ROOT/kos": "${workspaceRoot}",
+				"ABSOLUTE_KOS_PROJECT_ROOT": "${workspaceRoot}\\..",
+				"/cygdrive/c": "C:\\",
+				"/cygdrive/d": "D:\\",
+				"/cygdrive/e": "E:\\",
+				"/cygdrive/f": "F:\\",
+				"/cygdrive/g": "G:\\",
+				"/cygdrive/h": "H:\\",
+				"/cygdrive/i": "I:\\",
+				"/cygdrive/j": "J:\\",
+				"/cygdrive/k": "K:\\",
+				"/cygdrive/x": "X:\\",
+				"/cygdrive/y": "Y:\\",
+				"/cygdrive/z": "Z:\\"
+			},
+			"program": ".",
+			"MIMode": "gdb",
+			"miDebuggerPath": "gdb.exe",
+			"targetArchitecture": "x86",
+			"debugType": "native",
+			"launchCompleteCommand": "None",
+			"miDebuggerServerAddress": ".",
+			"customLaunchSetupCommands": [
+				{ "text": "cd ${workspaceRoot}\\..\\", "ignoreFailures": false },
+				{ "text": "set sysroot ${workspaceRoot}\\..\\bin\\${env.TARGET}-kos-${env.CONFIG}", "ignoreFailures": false },
+				{ "text": "set solib-search-path bin/${env.TARGET}-kos-${env.CONFIG}/lib:bin/${env.TARGET}-kos-${env.CONFIG}/os/drivers", "ignoreFailures": false },
+				{ "text": "set auto-solib-add on", "ignoreFailures": false },
+				{ "text": "-target-select remote localhost:1234", "ignoreFailures": false }
+			],
+			"setupCommands": [
+				{ "text": "-enable-pretty-printing", "ignoreFailures": true },
+				{ "text": "set print pretty on", "ignoreFailures": true },
+				{ "text": "set print object on", "ignoreFailures": true },
+				{ "text": "set print static-members on", "ignoreFailures": true },
+				{ "text": "set print vtbl on", "ignoreFailures": true },
+				{ "text": "set print demangle on", "ignoreFailures": true },
+				{ "text": "set demangle-style gnu-v3", "ignoreFailures": true },
+				{ "text": "set print sevenbit-strings off", "ignoreFailures": true },
+				{ "text": "set detach-on-fork off", "ignoreFailures": false },
+				{ "text": "set non-stop on", "ignoreFailures": false }
+			]
+		},
+		{
+			"type": "cppdbg",
 			"name": "kernel (--gdb=qemu)",
 			"inheritEnvironments": [ "${cpp.activeConfiguration}" ],
 			"project": "src",
@@ -101,7 +217,14 @@
 				"/cygdrive/d": "D:\\",
 				"/cygdrive/e": "E:\\",
 				"/cygdrive/f": "F:\\",
-				"/cygdrive/g": "G:\\"
+				"/cygdrive/g": "G:\\",
+				"/cygdrive/h": "H:\\",
+				"/cygdrive/i": "I:\\",
+				"/cygdrive/j": "J:\\",
+				"/cygdrive/k": "K:\\",
+				"/cygdrive/x": "X:\\",
+				"/cygdrive/y": "Y:\\",
+				"/cygdrive/z": "Z:\\"
 			},
 			"program": "${workspaceRoot}\\..\\bin\\${env.TARGET}-kos-${env.CONFIG}\\os\\kernel.bin",
 			"MIMode": "gdb",
@@ -127,8 +250,8 @@
 			 * bit provided by the tooltips within vistual studio.
 			 * Anyways: With Visual Studio 2017, you don't need to spend $100
 			 *          on VisualGDB in order to be a be able to get Visual
-			 *          Studio to connect to a GDB stub and client
-			 * Our stub:   Provided by "qemu -s -S"
+			 *          Studio to connect to a GDB server and client
+			 * Our server: Provided by "qemu -s -S"
 			 * Our client: Apart of the i386-kos toolchain (any unmodified i386-elf-gdb
 			 *             client would do) /binutils/i386-kos/bin/i386-elf-gdb.exe
 			 * NOTE: Start deemon via cmd, so-as to allow users any of the
@@ -159,7 +282,14 @@
 				"/cygdrive/d": "D:\\",
 				"/cygdrive/e": "E:\\",
 				"/cygdrive/f": "F:\\",
-				"/cygdrive/g": "G:\\"
+				"/cygdrive/g": "G:\\",
+				"/cygdrive/h": "H:\\",
+				"/cygdrive/i": "I:\\",
+				"/cygdrive/j": "J:\\",
+				"/cygdrive/k": "K:\\",
+				"/cygdrive/x": "X:\\",
+				"/cygdrive/y": "Y:\\",
+				"/cygdrive/z": "Z:\\"
 			},
 			"program": "${workspaceRoot}\\..\\bin\\${env.TARGET}-kos-${env.CONFIG}\\os\\kernel.bin",
 			"MIMode": "gdb",
