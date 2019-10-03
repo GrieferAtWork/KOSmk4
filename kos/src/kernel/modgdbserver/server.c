@@ -66,6 +66,8 @@
 
 DECL_BEGIN
 
+DEFINE_CMDLINE_FLAG_VAR(opt_disable_noack, "disable_noack");
+
 
 typedef struct {
 	size_t ol_offset; /* Remaining number of bytes to skip */
@@ -978,7 +980,8 @@ send_ok_and_detach:
 
 	case 'g': {
 		struct gdb_cpustate st;
-		GDB_GetRegisters(GDB_CurrentThread_general.ts_thread, &st);
+		if (!GDB_GetRegisters(GDB_CurrentThread_general.ts_thread, &st))
+			ERROR(err_ESRCH);
 		o = GDB_EncodeHex(o, &st, sizeof(st));
 	}	break;
 
@@ -987,22 +990,28 @@ send_ok_and_detach:
 		i = GDB_DecodeHex(i, &st, sizeof(st));
 		if (i != endptr)
 			ERROR(err_syntax);
-		GDB_SetRegisters(GDB_CurrentThread_general.ts_thread, &st);
+		if (!GDB_SetRegisters(GDB_CurrentThread_general.ts_thread, &st))
+			ERROR(err_ESRCH);
 	}	goto send_ok;
 
 	case 'H': {
 		char op = *i++;
+		if (op != 'c' && op != 'g' && op != 's')
+			goto send_empty; /* The real gdbserver also responds with empty for this one */
 		GDBServer_DidDetachFromEverything = old_GDBServer_DidDetachFromEverything;
-		if (op != 'c' && op != 'g')
-			ERROR(err_syntax);
 		if (!GDBThread_DecodeThreadID(&i, &newThread))
 			ERROR(err_ESRCH);
 		if (i != endptr)
 			ERROR(err_syntax_newthread);
 		if (op == 'c') {
 			GDBThreadSel_MoveAssign(&GDB_CurrentThread_continue, &newThread);
-		} else {
+		} else if (op == 'g') {
 			GDBThreadSel_MoveAssign(&GDB_CurrentThread_general, &newThread);
+		} else {
+			/* the real gdbserver also accepts `s', but doesn't seem to do
+			 * anything (other than verify a valid thread?). However to do
+			 * that, we already have the `T' packet... Whatever. */
+			GDBThreadSel_Fini(&newThread);
 		}
 	}	goto send_ok;
 
@@ -1100,8 +1109,11 @@ resume_dostep:
 			ERROR(err_syntax);
 		reqlen = GDB_GetRegister(GDB_CurrentThread_general.ts_thread,
 		                         regno, regbuf, sizeof(regbuf));
-		if (!reqlen)
-			ERROR(err_unknown_register);
+		if (!reqlen) {
+			if (GDBThread_HasTerminated(GDB_CurrentThread_general.ts_thread))
+				ERROR(err_ESRCH);
+			ERROR(err_unknown_register_get);
+		}
 		o = GDB_EncodeHex(o, regbuf, reqlen);
 	}	break;
 
@@ -1123,9 +1135,10 @@ resume_dostep:
 		reqlen = GDB_SetRegister(GDB_CurrentThread_general.ts_thread,
 		                         regno, regbuf, reglen);
 		if (!reqlen) {
+handle_set_register_error:
 			if (GDBThread_HasTerminated(GDB_CurrentThread_general.ts_thread))
-				goto send_ok;
-			ERROR(err_unknown_register);
+				ERROR(err_ESRCH);
+			ERROR(err_unknown_register_set);
 		}
 		if (reqlen != reglen) {
 			if (reqlen > reglen) {
@@ -1176,8 +1189,9 @@ resume_dostep:
 				if (reglen != reqlen)
 					ERROR(err_invalid_register_size);
 			}
-			GDB_SetRegister(GDB_CurrentThread_general.ts_thread,
-			                regno, regbuf, reqlen);
+			if (!GDB_SetRegister(GDB_CurrentThread_general.ts_thread,
+			                     regno, regbuf, reqlen))
+				goto handle_set_register_error;
 		}
 		goto send_ok;
 	}	break;
@@ -1188,10 +1202,10 @@ resume_dostep:
 		addr = (vm_virt_t)strtou(i, &i, 16);
 		if (*i++ != ':')
 			ERROR(err_syntax);
-		pattern = (u32)strtoul(i, &i, 16);
+		pattern = (u32)strtou32(i, &i, 16);
 		if (*i++ != ',')
 			ERROR(err_syntax);
-		mask = (u32)strtoul(i, &i, 16);
+		mask = (u32)strtou32(i, &i, 16);
 		if (i != endptr)
 			ERROR(err_syntax);
 		/* Really weird packet, but easy enough to implement... */
@@ -1707,7 +1721,15 @@ send_empty:
 				ERRORF(err_syntax, "i=%$q, %Iu\n", (size_t)(endptr - i), i, (size_t)(endptr - i));
 			o += sprintf(o, "PacketSize=%Ix", CONFIG_GDBSERVER_PACKET_MAXLEN/* + 4*/);
 			o = STPCAT(o, ";QNonStop+");
-			o = STPCAT(o, ";QStartNoAckMode+");
+			/* Always indicate that we support NoAck mode.
+			 * Another option would be to only indicate so when hosted by an emulator (which
+			 * would indicate that our serial connection is reliable), but also indicating it
+			 * allows the GDB remote (and the human sitting infront of it) to decide themself
+			 * if noack mode should be used.
+			 * Alternatively, allow the commandline flag `disable_noack' to indicate that this
+			 * mode should become disabled. */
+			if (!opt_disable_noack)
+				o = STPCAT(o, ";QStartNoAckMode+");
 			if (GDBServer_Features & GDB_SERVER_FEATURE_MULTIPROCESS)
 				o = STPCAT(o, ";multiprocess+");
 			if (GDBRemote_Features & GDB_REMOTE_FEATURE_SWBREAK)
@@ -1918,8 +1940,8 @@ send_empty:
 		        : GDB_DelBreak(GDB_CurrentThread_general.ts_thread, type, addr, kind);
 		if (error == EOK)
 			goto send_ok;
-		if (error == ENOSYS || error == ENOMEM)
-			goto send_empty; /* Respond empty if adding a breakpoint failed, or the system isn't supported. */
+		if (error == ENOSYS)
+			goto send_empty; /* Respond empty if adding the breakpoint isn't supported. */
 		o = GDB_EncodeError(o, error);
 	}	break;
 
@@ -1938,7 +1960,13 @@ do_transmit:
 	if (!GDBPacket_Transmit(o))
 		return GDB_HANDLECOMMAND_DTCH;
 	return GDB_HANDLECOMMAND_CONT;
-err_unknown_register:
+err_unknown_register_get:
+	printk(KERN_WARNING "[gdb] Unknown register accessed by packet: %$q\n",
+	       (size_t)(endptr - GDBRemote_CommandBuffer), GDBRemote_CommandBuffer);
+	/* The docs specify that we should send an empty packet for an invalid query
+	 * I'm just going to assume that this means: unrecognized-register... */
+	goto send_empty;
+err_unknown_register_set:
 	printk(KERN_WARNING "[gdb] Unknown register accessed by packet: %$q\n",
 	       (size_t)(endptr - GDBRemote_CommandBuffer), GDBRemote_CommandBuffer);
 /*err_EPERM:*/
