@@ -260,6 +260,37 @@ not_found:
 	return false;
 }
 
+/* See `memory-crc32.c' for the implementation. */
+INTDEF u32 FCALL libiberty_xcrc32(byte_t const *buf, size_t len, u32 crc);
+
+/* Calculate the CRC32 checksum for the given region of memory.
+ * If access to anything with the given range fail, return `false'.
+ * Otherwise, return `true' and store the CRC value in `*presult' */
+INTERN NONNULL((1, 4)) bool
+NOTHROW(FCALL GDB_CalculateCRC32)(struct task *__restrict thread,
+                                  vm_virt_t addr, size_t length,
+                                  u32 *__restrict presult) {
+	u32 result = 0xffffffff;
+	if likely(length != 0) {
+		byte_t *buf;
+		buf = (byte_t *)GDBPacket_Start();
+		for (;;) {
+			size_t maxlen = length;
+			if (maxlen > CONFIG_GDBSERVER_PACKET_MAXLEN)
+				maxlen = CONFIG_GDBSERVER_PACKET_MAXLEN;
+			if (!GDB_ReadMemory(thread, addr, buf, maxlen))
+				return false;
+			result = libiberty_xcrc32(buf, maxlen, result);
+			if (maxlen >= length)
+				break;
+			length -= maxlen;
+			addr += maxlen;
+		}
+	}
+	*presult = result;
+	return true;
+}
+
 
 DECL_END
 

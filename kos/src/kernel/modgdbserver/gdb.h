@@ -305,6 +305,14 @@ NOTHROW(FCALL GDB_FindMemory)(struct task *__restrict thread,
                               void const *needle, size_t needle_length,
                               vm_virt_t *__restrict presult);
 
+/* Calculate the CRC32 checksum for the given region of memory.
+ * If access to anything with the given range fail, return `false'.
+ * Otherwise, return `true' and store the CRC value in `*presult' */
+INTDEF NONNULL((1, 4)) bool
+NOTHROW(FCALL GDB_CalculateCRC32)(struct task *__restrict thread,
+                                  vm_virt_t addr, size_t length,
+                                  u32 *__restrict presult);
+
 /* Include (insert) or exclude (remove) SwBreak instruction overrides
  * defined within the range `addr...+=bufsize' with the given `buf'
  * This is used to hide/expose software breakpoint bytes from GDB, since

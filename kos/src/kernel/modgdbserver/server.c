@@ -1447,6 +1447,23 @@ send_empty:
 			*o++ = 'Q';
 			*o++ = 'C';
 			o = GDBThreadSel_EncodeThreadID(o, &GDB_CurrentThread_general);
+		} else if (ISNAME("CRC")) {
+			vm_virt_t addr;
+			size_t length;
+			u32 res;
+			if (*nameEnd++ != ':')
+				ERROR(err_syntax);
+			addr = (vm_virt_t)strtou(i, &i, 16);
+			if (*i++ != ',')
+				ERROR(err_syntax);
+			length = strtou(i, &i, 16);
+			if (i != endptr)
+				ERROR(err_syntax);
+			if (!GDB_CalculateCRC32(GDB_CurrentThread_general.ts_thread,
+			                        addr, length, &res))
+				ERROR(err_EFAULT);
+			*o++ = 'C';
+			o += sprintf(o, "%I32x", res);
 		} else if (ISNAME("Search")) {
 			vm_virt_t haystack, addr;
 			size_t haystack_length, needle_length;
