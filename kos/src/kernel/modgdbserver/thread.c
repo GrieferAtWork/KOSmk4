@@ -333,6 +333,7 @@ INTERN void NOTHROW(FCALL GDBThread_StopAllCpus)(void) {
 	GDBThread_DisablePreemptionForHostCPU();
 	{
 		void *args[CPU_IPI_ARGCOUNT];
+		/* Atomically send IPIs to all CPUs that aren't in deep sleep (excluding our own) */
 		count = cpu_broadcastipi_notthis(&GDBThread_StopAllCpusIPI, args,
 		                                 CPU_IPI_FWAITFOR);
 	}
