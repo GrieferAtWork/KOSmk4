@@ -209,6 +209,8 @@ raise_user_signal(struct icpustate *__restrict state,
 	struct kernel_sigaction action;
 	/* Raise a POSIX signal */
 again_gethand:
+	assert(siginfo->si_signo != 0);
+	assert(siginfo->si_signo < NSIG);
 	if (!THIS_SIGHAND_PTR) {
 		action.sa_handler = KERNEL_SIG_DFL;
 		action.sa_flags   = 0;

@@ -188,7 +188,7 @@ sigmask_getwr(void) THROWS(E_BADALLOC) {
 PUBLIC NOBLOCK void
 NOTHROW(KCALL sighand_destroy)(struct sighand *__restrict self) {
 	u32 i;
-	for (i = 0; i < NSIG-1; ++i)
+	for (i = 0; i < NSIG - 1; ++i)
 		xdecref(self->sh_actions[i].sa_mask);
 	kfree(self);
 }
@@ -337,9 +337,11 @@ again_lock_ptr_for_copy:
 				return result;
 			}
 			/* Initialize the new copy as a duplicate of the old handler table. */
-			memcpy(copy->sh_actions, result->sh_actions, sizeof(result->sh_actions));
+			memcpy(copy->sh_actions,
+			       result->sh_actions,
+			       sizeof(result->sh_actions));
 			/* Load references to signal masks. */
-			for (i = 0; i < NSIG-1; ++i)
+			for (i = 0; i < NSIG - 1; ++i)
 				xincref(copy->sh_actions[i].sa_mask);
 			sync_endread(result);
 			copy->sh_share = 1; /* Only 1 sighand_ptr will use this copy (for now) */
@@ -502,7 +504,8 @@ sighand_reset_handler(u32 signo,
                       struct kernel_sigaction const *__restrict current_action)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	struct sighand *hand;
-	assert(signo != 0 && signo < NSIG);
+	assert(signo != 0);
+	assert(signo < NSIG);
 	if unlikely(!THIS_SIGHAND_PTR)
 		return false;
 	hand = sighand_ptr_lockwrite();
@@ -606,6 +609,8 @@ again_gethand:
 	myhandptr = THIS_SIGHAND_PTR;
 	if (!myhandptr)
 		goto default_action;
+	assert(info->sqe_info.si_signo != 0);
+	assert(info->sqe_info.si_signo < NSIG);
 	myhand = sighand_ptr_lockread(myhandptr);
 	if (!myhand) {
 		/* Default action. */
@@ -614,7 +619,7 @@ default_action:
 		assert(action.sa_handler == KERNEL_SIG_DFL);
 	} else {
 		memcpy(&action,
-		       &myhand->sh_actions[info->sqe_info.si_signo],
+		       &myhand->sh_actions[info->sqe_info.si_signo - 1],
 		       sizeof(action));
 		xincref(action.sa_mask);
 		sync_endread(myhand);
@@ -1218,7 +1223,9 @@ do_sigaction(syscall_ulong_t signo,
 				hand = sighand_ptr_lockread(handptr);
 				if (!hand)
 					goto no_old_handler;
-				memcpy(&ohandler, &hand->sh_actions[signo - 1], sizeof(ohandler));
+				memcpy(&ohandler,
+				       &hand->sh_actions[signo - 1],
+				       sizeof(ohandler));
 				xincref(ohandler.sa_mask);
 				sync_endread(hand);
 inherit_and_copy_ohandler:

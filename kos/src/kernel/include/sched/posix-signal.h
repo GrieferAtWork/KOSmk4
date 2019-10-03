@@ -202,10 +202,10 @@ struct kernel_sigaction {
 
 struct sighand {
 	/* Descriptor for how signals ought to be handled. */
-	struct atomic_rwlock    sh_lock;            /* Lock for this signal handler descriptor. */
-	WEAK refcnt_t           sh_share;           /* [lock(INC(sh_lock),DEC(ATOMIC))]
-	                                             * Amount of unrelated processes sharing this sighand. */
-	struct kernel_sigaction sh_actions[NSIG-1]; /* Signal handlers. */
+	struct atomic_rwlock    sh_lock;              /* Lock for this signal handler descriptor. */
+	WEAK refcnt_t           sh_share;             /* [lock(INC(sh_lock),DEC(ATOMIC))]
+	                                               * Amount of unrelated processes sharing this sighand. */
+	struct kernel_sigaction sh_actions[NSIG - 1]; /* Signal handlers. */
 };
 __DEFINE_SYNC_PROXY(struct sighand, sh_lock)
 
