@@ -119,7 +119,7 @@ NOTHROW_NCX(LIBCCALL libc_sysv_signal)(int signo,
 	}
 	act.sa_handler = handler;
 	libc_sigemptyset(&act.sa_mask);
-	act.sa_flags = SA_ONESHOT | SA_NOMASK | SA_INTERRUPT;
+	act.sa_flags = SA_RESETHAND | SA_NOMASK | SA_INTERRUPT;
 	/*act.sa_flags &= ~SA_RESTART;*/
 	SET_SIGRESTORE(act);
 	if unlikely(sigaction(signo, &act, &oact))

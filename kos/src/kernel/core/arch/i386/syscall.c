@@ -232,9 +232,11 @@ again_gethand:
 
 	case KERNEL_SIG_IGN:
 		xdecref_unlikely(action.sa_mask);
+#if 0 /* `SA_RESETHAND' only affects user-space signal handler functions */
 		if ((action.sa_flags & SIGACTION_SA_RESETHAND) &&
 		    unlikely(!sighand_reset_handler(siginfo->si_signo, &action)))
 			goto again_gethand;
+#endif
 		if (reason == TASK_RPC_REASON_SYSCALL)
 			state = translate_exception_errno(state, reason);
 		return state;
@@ -258,9 +260,11 @@ again_gethand:
 
 	case KERNEL_SIG_CONT:
 		xdecref_unlikely(action.sa_mask);
+#if 0 /* `SA_RESETHAND' only affects user-space signal handler functions */
 		if ((action.sa_flags & SIGACTION_SA_RESETHAND) &&
 		    unlikely(!sighand_reset_handler(siginfo->si_signo, &action)))
 			goto again_gethand;
+#endif
 		/* Continue execution. */
 		task_sigcont(THIS_TASK);
 		return state;
@@ -268,9 +272,11 @@ again_gethand:
 	case KERNEL_SIG_STOP:
 		/* TODO: Mask additional signals by looking at `SIGACTION_SA_NODEFER' and `action.sa_mask' */
 		xdecref_unlikely(action.sa_mask);
+#if 0 /* `SA_RESETHAND' only affects user-space signal handler functions */
 		if ((action.sa_flags & SIGACTION_SA_RESETHAND) &&
 			unlikely(!sighand_reset_handler(siginfo->si_signo, &action)))
 			goto again_gethand;
+#endif
 		/* Suspend execution. */
 		task_sigstop(W_STOPCODE(siginfo->si_signo));
 		return state;
