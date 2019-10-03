@@ -47,6 +47,7 @@
 #include <kernel/vm.h>
 #include <sched/cpu.h>
 #include <sched/task.h>
+#include <sched/pid.h>
 #ifndef CONFIG_NO_SMP
 #include <sched/signal.h>
 #endif /* !CONFIG_NO_SMP */
@@ -75,7 +76,8 @@
 
 DECL_BEGIN
 
-INTERN void
+INTERN void /* Must be INTERN, because this function gets overwritten
+             * when `nomall' is passed on the commandline */
 NOTHROW(KCALL debug_malloc_generate_traceback)(void **__restrict buffer, size_t buflen,
                                                struct lcpustate *__restrict state) {
 #if 1
@@ -95,6 +97,7 @@ NOTHROW(KCALL debug_malloc_generate_traceback)(void **__restrict buffer, size_t 
 			RETHROW(); /* This causes panic because we're NOTHROW */
 	}
 #endif
+	/* Make sure that when there are unused entries, the chain is NULL-terminated */
 	if (buflen)
 		*buffer = NULL;
 }
@@ -109,15 +112,18 @@ DECL_END
 #define PANIC_HERE(...) kernel_panic(__VA_ARGS__)
 #define PANIC_CALL(...) kernel_panic(__VA_ARGS__) /* XXX: Panic at __builtin_return_address() */
 
-#define PANIC_UNTRACE_NONUSER_NODE_WITH_CALLER_TRACEBACK(node, pointer) \
-	/* TODO: Also print the node's traceback. */                        \
-	PANIC_CALL("Attempted to untrace non-user-defined mall node %p...%p (pointer: %p)\n", (node)->m_tree.a_vmin, (node)->m_tree.a_vmax, pointer)
-#define PANIC_UNTRACE_NONUSER_NODE(node, pointer) \
-	/* TODO: Also print the node's traceback. */  \
-	PANIC_HERE("Attempted to untrace non-user-defined mall node %p...%p (pointer: %p)\n", (node)->m_tree.a_vmin, (node)->m_tree.a_vmax, pointer)
-#define PANIC_SIZEOF_USER_NODE_WITH_CALLER_TRACEBACK(node, pointer) \
-	/* TODO: Also print the node's traceback. */                    \
-	PANIC_HERE("Attempted to kmalloc_usable_size() a user-defined node %p...%p (pointer: %p)\n", (node)->m_tree.a_vmin, (node)->m_tree.a_vmax, pointer)
+#define PANIC_UNTRACE_NONUSER_NODE_WITH_CALLER_TRACEBACK(node, pointer)                   \
+	/* TODO: Also print the node's traceback. */                                          \
+	PANIC_CALL("Attempted to untrace non-user-defined mall node %p...%p (pointer: %p)\n", \
+	           (node)->m_tree.a_vmin, (node)->m_tree.a_vmax, pointer)
+#define PANIC_UNTRACE_NONUSER_NODE(node, pointer)                                         \
+	/* TODO: Also print the node's traceback. */                                          \
+	PANIC_HERE("Attempted to untrace non-user-defined mall node %p...%p (pointer: %p)\n", \
+	           (node)->m_tree.a_vmin, (node)->m_tree.a_vmax, pointer)
+#define PANIC_SIZEOF_USER_NODE_WITH_CALLER_TRACEBACK(node, pointer)                              \
+	/* TODO: Also print the node's traceback. */                                                 \
+	PANIC_HERE("Attempted to kmalloc_usable_size() a user-defined node %p...%p (pointer: %p)\n", \
+	           (node)->m_tree.a_vmin, (node)->m_tree.a_vmax, pointer)
 #define PANIC_SIZEOF_NOT_NODE_BASE_ADDRESS_WITH_CALLER_TRACEBACK(node, pointer) \
 	/* TODO: Also print the node's traceback. */                                                                 \
 	PANIC_CALL("The pointer %p passed to kmalloc_usable_size() isn't the malloc base address of node %p...%p\n", \
@@ -130,18 +136,20 @@ DECL_END
 	PANIC_CALL("Invalid mall pointer: %p\n", pointer)
 #define PANIC_INVALID_MALL_POINTER(pointer) \
 	PANIC_HERE("Invalid mall pointer: %p\n", pointer)
-#define PANIC_FREE_USER_NODE(node, pointer) \
-	/* TODO: Also print the node's traceback. */ \
-	PANIC_HERE("Attempted to kfree() a user-defined node %p...%p (pointer: %p)\n", (node)->m_tree.a_vmin, (node)->m_tree.a_vmax, pointer)
-#define PANIC_REALLOC_USER_NODE_WITH_CALLER_TRACEBACK(node, pointer) \
-	/* TODO: Also print the node's traceback. */                     \
-	PANIC_CALL("Attempted to krealloc() a user-defined node %p...%p (pointer: %p)\n", (node)->m_tree.a_vmin, (node)->m_tree.a_vmax, pointer)
-#define PANIC_FREE_NOT_NODE_BASE_ADDRESS(node, pointer) \
+#define PANIC_FREE_USER_NODE(node, pointer)                                        \
+	/* TODO: Also print the node's traceback. */                                   \
+	PANIC_HERE("Attempted to kfree() a user-defined node %p...%p (pointer: %p)\n", \
+	           (node)->m_tree.a_vmin, (node)->m_tree.a_vmax, pointer)
+#define PANIC_REALLOC_USER_NODE_WITH_CALLER_TRACEBACK(node, pointer)                  \
+	/* TODO: Also print the node's traceback. */                                      \
+	PANIC_CALL("Attempted to krealloc() a user-defined node %p...%p (pointer: %p)\n", \
+	           (node)->m_tree.a_vmin, (node)->m_tree.a_vmax, pointer)
+#define PANIC_FREE_NOT_NODE_BASE_ADDRESS(node, pointer)                                            \
 	/* TODO: Also print the node's traceback. */                                                   \
 	PANIC_CALL("The pointer %p passed to kfree() isn't the malloc base address of node %p...%p\n", \
 	           pointer, (node)->m_tree.a_vmin + (CONFIG_MALL_PREFIX_SIZE + CONFIG_MALL_HEAD_SIZE), \
 	           (node)->m_tree.a_vmax - (CONFIG_MALL_TAIL_SIZE))
-#define PANIC_REALLOC_NOT_NODE_BASE_ADDRESS_WITH_CALLER_TRACEBACK(node, pointer) \
+#define PANIC_REALLOC_NOT_NODE_BASE_ADDRESS_WITH_CALLER_TRACEBACK(node, pointer)                      \
 	/* TODO: Also print the node's traceback. */                                                      \
 	PANIC_CALL("The pointer %p passed to krealloc() isn't the malloc base address of node %p...%p\n", \
 	           pointer, (node)->m_tree.a_vmin + (CONFIG_MALL_PREFIX_SIZE + CONFIG_MALL_HEAD_SIZE),    \
@@ -193,12 +201,12 @@ DECL_BEGIN
 #define CONFIG_MALL_TRACEMIN       4
 #endif /* !CONFIG_MALL_TRACEMIN */
 
-#define HINT_ADDR(x,y) x
-#define HINT_MODE(x,y) y
+#define HINT_ADDR(x, y) x
+#define HINT_MODE(x, y) y
 #define HINT_GETADDR(x) HINT_ADDR x
 #define HINT_GETMODE(x) HINT_MODE x
 
-#define MALL_HEAP_FLAGS  (GFP_NORMAL|GFP_LOCKED|GFP_PREFLT)
+#define MALL_HEAP_FLAGS  (GFP_NORMAL | GFP_LOCKED | GFP_PREFLT)
 
 #ifndef HEAP_THRESHOLD_PAGESIZE
 #define HEAP_THRESHOLD_PAGESIZE PAGEDIR_MIN_PAGESIZE
@@ -208,8 +216,8 @@ DECL_BEGIN
 INTERN struct heap mall_heap =
 HEAP_INIT(HEAP_THRESHOLD_PAGESIZE * 4,
           HEAP_THRESHOLD_PAGESIZE * 16,
-         (vm_vpage_t)HINT_GETADDR(KERNEL_VMHINT_DHEAP),
-                     HINT_GETMODE(KERNEL_VMHINT_DHEAP));
+          (vm_vpage_t)HINT_GETADDR(KERNEL_VMHINT_DHEAP),
+          HINT_GETMODE(KERNEL_VMHINT_DHEAP));
 DEFINE_VALIDATABLE_HEAP(mall_heap);
 DEFINE_DBG_BZERO_OBJECT(mall_heap.h_lock);
 
@@ -241,12 +249,8 @@ struct mallnode {
 	                                                   * valid for the purposes of GC searches, as well as other passive
 	                                                   * interactions such as reading its size.
 	                                                   * Note that this only applies to nodes with the `MALLNODE_FUSERNODE' flag set! */
-#if 1
-	u32                                   m_pad;      /* ... */
-#else
-	upid_t                                m_tracepid; /* Traceback process id (in the root namespace). */
-#endif
-	COMPILER_FLEXIBLE_ARRAY(void *,m_trace);          /* [1..1][0..MALLNODE_TRACESZ(self)]
+	upid_t                                m_tracetid; /* Traceback thread id (in the root namespace). */
+	COMPILER_FLEXIBLE_ARRAY(void *, m_trace);         /* [1..1][0..MALLNODE_TRACESZ(self)]
 	                                                   * Traceback of where the pointer was originally allocated. */
 };
 #define MALLNODE_MIN(x)        ((x)->m_tree.a_vmin)
@@ -1679,12 +1683,14 @@ mall_trace_impl(void *base, size_t num_bytes, gfp_t flags, void *context) {
 	node->m_tree.a_vmax = (uintptr_t)base + num_bytes - 1;
 	node->m_flags       = flags;
 	node->m_userver     = mall_valid_user_node_version_number;
+	node->m_tracetid    = task_gettid_s();
 	/* Insert the new node into the tree of user-defined tracing points. */
 	if (!mall_acquire(flags)) {
 		/* Register the node as a pending allocation. */
 		do {
 			node->m_tree.a_min = ATOMIC_READ(mall_pending_newnodes);
-		} while (!ATOMIC_CMPXCH_WEAK(mall_pending_newnodes, node->m_tree.a_min, node));
+		} while (!ATOMIC_CMPXCH_WEAK(mall_pending_newnodes,
+		                             node->m_tree.a_min, node));
 		return base;
 	}
 	mall_insert_tree(node);
@@ -1704,12 +1710,14 @@ NOTHROW(KCALL mall_trace_impl_nx)(void *base, size_t num_bytes, gfp_t flags, voi
 	node->m_tree.a_vmax = (uintptr_t)base + num_bytes - 1;
 	node->m_flags       = flags;
 	node->m_userver     = mall_valid_user_node_version_number;
+	node->m_tracetid    = task_gettid_s();
 	/* Insert the new node into the tree of user-defined tracing points. */
 	if (!mall_acquire(flags)) {
 		/* Register the node as a pending allocation. */
 		do {
 			node->m_tree.a_min = ATOMIC_READ(mall_pending_newnodes);
-		} while (!ATOMIC_CMPXCH_WEAK(mall_pending_newnodes, node->m_tree.a_min, node));
+		} while (!ATOMIC_CMPXCH_WEAK(mall_pending_newnodes,
+		                             node->m_tree.a_min, node));
 		return base;
 	}
 	mall_insert_tree(node);

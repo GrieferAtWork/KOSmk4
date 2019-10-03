@@ -77,9 +77,10 @@ kernel_disable_debug_malloc(void) {
 	 * associated with mall debugging enabled.
 	 * If that function as defined (we check for this by weakly linking it),
 	 * then redirect it against a no-op traceback generator function. */
-	if (debug_malloc_generate_traceback)
+	if (debug_malloc_generate_traceback) {
 		inject_jmp((void *)&debug_malloc_generate_traceback,
 		           (void *)&noop_generate_traceback);
+	}
 }
 
 DEFINE_VERY_EARLY_KERNEL_COMMANDLINE_OPTION(kernel_disable_debug_malloc,
