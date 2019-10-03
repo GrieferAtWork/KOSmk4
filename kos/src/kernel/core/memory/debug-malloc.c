@@ -85,6 +85,7 @@ NOTHROW(KCALL debug_malloc_generate_traceback)(void **__restrict buffer, size_t 
 			*buffer++ = (void *)LCPUSTATE_PC(*state);
 			if (!--buflen)
 				return;
+			oldstate = *state;
 		}
 	} EXCEPT {
 		if (!was_thrown(E_SEGFAULT) && !was_thrown(E_WOULDBLOCK))
