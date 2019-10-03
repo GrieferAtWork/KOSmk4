@@ -385,7 +385,7 @@ Requirements:
 		Don't worry: the install location will still be contained within the KOS source tree.
 		More specifically, the deemon executable will end up as `$PROJPATH/binutils/deemon/deemon[.exe]`
 - binutils: `$PROJPATH/binutils/i386-kos/bin/i686-kos-*[.exe]`
-	- Can be easily be downloaded + configured + build by:
+	- Can be easily downloaded + configured + build by:
 		`bash $PROJPATH/kos/misc/make_toolchain.sh i386-kos`
 - qemu: qemu-system-i386[.exe] (preferrably in $PATH. otherwise, add the location to the `enumerateQEmuInstallationLocations()` function in `$PROJPATH/kos/misc/magicemulator/qemu.dee`)
 - On windows: Cygwin
@@ -561,12 +561,12 @@ So here are your options:
 
 - To debug the kernel, you must start it with one of the following 2 commandlines (both of which will run a GDB server/stub on `tcp:localhost:1234`, and have qemu wait until something connects to it):
 	- `deemon magic.dee --run-only --gdb=server --target=i386 --config=OD` 
-	This one uses my own personal gdb server that gets loaded as a driver into the kernel. It offers out-of-the-box integrated support for enumerating libraries, drivers, and running threads
+	This one uses my own personal gdb server that gets loaded into the kernel as a driver. It offers out-of-the-box integrated support for enumerating libraries, drivers, and running threads/processes (offering both `multiprocess+` and `QNonStop:1` support)
 	- `deemon magic.dee --run-only --gdb=qemu --target=i386 --config=OD` 
 	This one uses qemu's built-in gdb stub, which offers less functionality since it won't know how to enumerate threads created by the KOS scheduler, or list all of the libraries/drivers loaded into the kernel, meaning that tracebacks will only include source locations from the kernel core.
-	This option is mainly meant for debugging things that happen before the GDB driver is loaded, or things that break the GDB stub driver itself (It's home-made and hacked together based on knowledge leared from observation, qemu's implementation, gdb's reference implementation (which only implements about 1% of the protocol...), and bits and pieces of documentation from across the internet)
+	This option is mainly meant for debugging things that happen before the GDB driver is loaded, or things that break the GDB stub driver itself (It's home-made and hacked together based on knowledge leared from observation, qemu's implementation, gdbserver, and bits and pieces of documentation from across the internet)
 - To connect to the server/stub, you can do one of the following:
-	- Use Visual Studio's Open-Folder function to open the `/kos` folder and have all of this happen in 1 step when you press the debug button
+	- Use Visual Studio's Open-Folder function to open the `$PROJPATH/kos` folder and have all of this happen in 1 step when you press the debug button
 	- Start a new instance of `gdb` built for a generic `i386` target and type `target remote localhost:1234`
 	- Screw around with Visual Studio Code until you get it to connect to that same port, and have it be your debugging experience (I know for a fact that this is possible since I managed to get it to work before figuring out how to get Visual Studio's Open-Folder method to do my bidding)
 
