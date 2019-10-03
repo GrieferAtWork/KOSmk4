@@ -211,7 +211,7 @@ INTDEF void NOTHROW(FCALL GDB_SetSingleStepIgnoredRange)(struct task *thread, vm
 INTDEF void NOTHROW(FCALL GDB_DelSingleStepIgnoredRange)(void);
 
 
-INTERN void FCALL GDBInterrupt_Init(void);
+INTERN FREE void FCALL GDBInterrupt_Init(void);
 INTERN void FCALL GDBInterrupt_Fini(void);
 
 
@@ -402,7 +402,7 @@ INTDEF int NOTHROW(FCALL GDBRemote_TimedGetByte)(void);
 INTDEF NOBLOCK int NOTHROW(FCALL GDBRemote_TryGetByte)(void);
 
 /* Initialize/finalize the GDB remote API */
-INTDEF void FCALL GDBRemote_Init(void);
+INTDEF FREE void FCALL GDBRemote_Init(void);
 INTDEF void FCALL GDBRemote_Fini(void);
 INTDEF void (FCALL *PGDBRemote_Fini)(void);
 

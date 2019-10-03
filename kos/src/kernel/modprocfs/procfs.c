@@ -105,7 +105,7 @@ INTERN struct superblock ProcFS = {
 };
 
 
-PRIVATE DRIVER_INIT void KCALL ProcFS_Init(void) {
+PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL ProcFS_Init(void) {
 	/* Allocate the initial directory map. */
 	ProcFS.s_rootdir.d_map = (REF struct directory_entry **)kmalloc((PROCFS_INITIAL_ROOTDIR_MASK + 1) *
 	                                                                sizeof(REF struct directory_entry *),

@@ -92,7 +92,7 @@ INTDEF void ASMCALL GDBX86Interrupt_AsmInt3Handler(void);
 PRIVATE bool GDBInterrupt_WasInitialized = false;
 
 /* Initialize/Finalize GDB interrupt handling. */
-INTERN void FCALL GDBInterrupt_Init(void) {
+INTERN ATTR_FREETEXT void FCALL GDBInterrupt_Init(void) {
 	GDBX86InterruptBackup_Override(&GDBX86Interrupt_Backup01, 0x01,
 	                               &GDBX86Interrupt_AsmInt1Handler, 0);
 	/* NOTE: We set DPL=3 for int3, so that user-space

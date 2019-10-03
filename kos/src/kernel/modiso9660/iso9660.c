@@ -374,7 +374,7 @@ INTERN struct superblock_type Iso9660_SuperblockType = {
 	}
 };
 
-PRIVATE DRIVER_INIT void init(void) {
+PRIVATE ATTR_FREETEXT DRIVER_INIT void init(void) {
 	register_filesystem_type(&Iso9660_SuperblockType);
 }
 

@@ -413,7 +413,7 @@ STATIC_ASSERT(PS2_KEYBOARD_CMD_SCANSET_SET2 == 2);
 STATIC_ASSERT(PS2_KEYBOARD_CMD_SCANSET_SET3 == 3);
 DEFINE_CMDLINE_PARAM_UINT8_VAR(ps2_keyboard_preferred_scanset, "preferred_scanset", 2);
 
-INTERN void KCALL
+INTERN ATTR_FREETEXT void KCALL
 ps2_keyboard_create(struct ps2_probe_data *__restrict probe_data,
                     ps2_portid_t portno) {
 	REF struct ps2_keyboard *kbd;

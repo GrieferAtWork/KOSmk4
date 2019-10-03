@@ -175,22 +175,22 @@ INTERN NONNULL((1)) void (FCALL *PGDBRemote_PutData)(void const *buf, size_t buf
 INTERN void (FCALL *PGDBRemote_Fini)(void) = NULL;
 
 
-INTERN void FCALL GDBRemote_Init(void) {
+INTERN ATTR_FREETEXT void FCALL GDBRemote_Init(void) {
 	char *transport_name, *transport_args;
 	if (*opt_timeout) {
 		GDBRemote_Timeout = strtou32(opt_timeout, NULL, 0);
-		printk(KERN_INFO "[gdb] Use timeout of %u milliseconds\n",
+		printk(FREESTR(KERN_INFO "[gdb] Use timeout of %u milliseconds\n"),
 		       GDBRemote_Timeout);
 	}
 	if (*opt_retry) {
 		GDBPacket_RetryTransmitLimit = strtou32(opt_retry, NULL, 0);
-		printk(KERN_INFO "[gdb] Retry packet transmit %u times after NAC\n",
+		printk(FREESTR(KERN_INFO "[gdb] Retry packet transmit %u times after NAC\n"),
 		       GDBPacket_RetryTransmitLimit);
 	}
 	transport_name = opt_transport;
 	transport_args = strchr(transport_name, ':');
 	if unlikely(!transport_args) {
-		printk(KERN_ERR "[gdb] Missing/malformed argument `transport'\n");
+		printk(FREESTR(KERN_ERR "[gdb] Missing/malformed argument `transport'\n"));
 		THROW(E_INVALID_ARGUMENT);
 	}
 	*transport_args++ = '\0';
@@ -199,7 +199,7 @@ INTERN void FCALL GDBRemote_Init(void) {
 		GDBSerial_Init(transport_args);
 		PGDBRemote_Fini = &GDBSerial_Fini;
 	} else {
-		printk(KERN_ERR "[gdb] Unknown transport method: %q (args: %q)\n",
+		printk(FREESTR(KERN_ERR "[gdb] Unknown transport method: %q (args: %q)\n"),
 		       transport_name, transport_args);
 		THROW(E_INVALID_ARGUMENT);
 	}

@@ -759,7 +759,7 @@ INTERN struct superblock_type Ext2_SuperblockType = {
 	}
 };
 
-PRIVATE DRIVER_INIT void init(void) {
+PRIVATE ATTR_FREETEXT DRIVER_INIT void init(void) {
 	register_filesystem_type(&Ext2_SuperblockType);
 }
 PRIVATE DRIVER_FINI void fini(void) {
@@ -768,7 +768,7 @@ PRIVATE DRIVER_FINI void fini(void) {
 
 
 #if 0
-PRIVATE DRIVER_INIT void init2(void) {
+PRIVATE ATTR_FREETEXT DRIVER_INIT void init2(void) {
 	printk(KERN_DEBUG "ext2fs-- constructor\n");
 	printk(KERN_DEBUG "drv_self          = %p\n", &drv_self);
 	printk(KERN_DEBUG "d_eh_frame_start  = %p\n", drv_self.d_eh_frame_start);

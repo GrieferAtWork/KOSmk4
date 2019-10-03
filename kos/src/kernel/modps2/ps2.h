@@ -142,13 +142,13 @@ struct ps2_probe_data {
 	struct sig pd_avail; /* Broadcast when a response is received */
 };
 
-INTDEF void KCALL
+INTDEF FREE void KCALL
 ps2_probe_run_simple_ack_command(struct ps2_probe_data *__restrict probe_data,
                                  ps2_portid_t portno, u8 command) THROWS(E_IOERROR);
-INTDEF u8 KCALL
+INTDEF FREE u8 KCALL
 ps2_probe_run_ack_plus_data_command(struct ps2_probe_data *__restrict probe_data,
                                     ps2_portid_t portno, u8 command) THROWS(E_IOERROR);
-INTDEF u8 KCALL
+INTDEF FREE u8 KCALL
 ps2_run_identify_command(struct ps2_probe_data *__restrict probe_data,
                          ps2_portid_t portno, u8 id[2]) THROWS(E_IOERROR);
 

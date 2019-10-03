@@ -699,32 +699,6 @@ VGA_ScreenOff(VGA *__restrict self)
 
 
 
-PRIVATE NOBLOCK ATTR_FREETEXT void
-NOTHROW(KCALL vga_disable_annoying_blinking)(void) {
-	u8 qr1, temp;
-	qr1 = vga_rseq(VGA_SEQ_CLOCK_MODE);
-	vga_wseq(VGA_SEQ_RESET, 0x1);
-	vga_wseq(VGA_SEQ_CLOCK_MODE, qr1 | VGA_SR01_FSCREEN_OFF);
-	vga_wseq(VGA_SEQ_RESET, 0x3);
-
-	vga_r(VGA_IS1_RC);
-	vga_w(VGA_ATT_W, 0x00);
-
-	vga_r(VGA_IS1_RC);
-	temp = vga_rattr(VGA_ATC_MODE);
-	vga_r(VGA_IS1_RC);
-	vga_wattr(VGA_ATC_MODE, temp & ~(VGA_AT10_FBLINK));
-
-	vga_r(VGA_IS1_RC);
-	vga_w(VGA_ATT_W, 0x20);
-
-	vga_wseq(VGA_SEQ_RESET, 0x1);
-	vga_wseq(VGA_SEQ_CLOCK_MODE, qr1 & ~VGA_SR01_FSCREEN_OFF);
-	vga_wseq(VGA_SEQ_RESET, 0x3);
-}
-
-
-
 
 
 /* Conversion table: LATIN-1 --> CP437 */
@@ -1677,7 +1651,31 @@ VGA_MMap(struct character_device *__restrict self,
 
 PRIVATE REF VGA *vga_device = NULL;
 
-PRIVATE DRIVER_INIT void KCALL init(void) {
+PRIVATE NOBLOCK ATTR_FREETEXT void
+NOTHROW(KCALL vga_disable_annoying_blinking)(void) {
+	u8 qr1, temp;
+	qr1 = vga_rseq(VGA_SEQ_CLOCK_MODE);
+	vga_wseq(VGA_SEQ_RESET, 0x1);
+	vga_wseq(VGA_SEQ_CLOCK_MODE, qr1 | VGA_SR01_FSCREEN_OFF);
+	vga_wseq(VGA_SEQ_RESET, 0x3);
+
+	vga_r(VGA_IS1_RC);
+	vga_w(VGA_ATT_W, 0x00);
+
+	vga_r(VGA_IS1_RC);
+	temp = vga_rattr(VGA_ATC_MODE);
+	vga_r(VGA_IS1_RC);
+	vga_wattr(VGA_ATC_MODE, temp & ~(VGA_AT10_FBLINK));
+
+	vga_r(VGA_IS1_RC);
+	vga_w(VGA_ATT_W, 0x20);
+
+	vga_wseq(VGA_SEQ_RESET, 0x1);
+	vga_wseq(VGA_SEQ_CLOCK_MODE, qr1 & ~VGA_SR01_FSCREEN_OFF);
+	vga_wseq(VGA_SEQ_RESET, 0x3);
+}
+
+PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL init(void) {
 	vga_disable_annoying_blinking();
 	vga_device = CHARACTER_DEVICE_ALLOC(VGA);
 	TRY {
@@ -1710,7 +1708,7 @@ PRIVATE DRIVER_INIT void KCALL init(void) {
 			vga_device->cd_type.ct_ioctl = &VGA_Ioctl;
 			vga_device->cd_type.ct_mmap  = &VGA_MMap;
 
-			strcpy(vga_device->cd_name, "vga");
+			strcpy(vga_device->cd_name, FREESTR("vga"));
 
 			/* Configure text-mode pointers. */
 			vga_device->v_textbase_real = (u16 *)(vga_device->v_vram + 0x18000);

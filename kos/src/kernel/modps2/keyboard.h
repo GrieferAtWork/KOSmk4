@@ -84,7 +84,7 @@ struct ps2_keyboard
 };
 
 
-INTDEF void KCALL
+INTDEF FREE void KCALL
 ps2_keyboard_create(struct ps2_probe_data *__restrict probe_data,
                     ps2_portid_t portno);
 

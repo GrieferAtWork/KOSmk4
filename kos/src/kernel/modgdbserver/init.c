@@ -70,7 +70,7 @@ PRIVATE DRIVER_INIT void KCALL GDBServer_Fini(void) {
 	}
 }
 
-PRIVATE DRIVER_INIT void KCALL GDBServer_Init(void) {
+PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL GDBServer_Init(void) {
 	TRY {
 		/* Initialize the remote API. */
 		GDBRemote_Init();
@@ -88,7 +88,7 @@ PRIVATE DRIVER_INIT void KCALL GDBServer_Init(void) {
 		ATOMIC_FETCHOR(GDBServer_FallbackHost->t_flags, TASK_FGDB_STOPPED);
 		task_start(GDBServer_FallbackHost, TASK_START_FNORMAL);
 
-		printk(KERN_INFO "[gdb] Wait for remote to attach itself\n");
+		printk(FREESTR(KERN_INFO "[gdb] Wait for remote to attach itself\n"));
 		/* Wait until the GDB remote has been attached.
 		 * For this purpose, keep waiting on the GDB host to become
 		 * unlocked until the `GDB_SERVER_FEATURE_ATTACHED' feature
@@ -102,12 +102,19 @@ PRIVATE DRIVER_INIT void KCALL GDBServer_Init(void) {
 			task_waitfor();
 		}
 
-		printk(KERN_INFO "[gdb] Client attached (unlock kernel access & simulate fork())\n");
+		printk(FREESTR(KERN_INFO "[gdb] Client attached (unlock kernel access & simulate fork())\n"));
 		/* Expose the kernel core to the GDB remote, and simulate a fork()
 		 * -> As far as GDB is concerned, the kernel core is a child of /bin/init
 		 * NOTE: This hacky work-around is required because GDB will $h1t itself during
 		 *       initialization if it sees more than one process (in this case `/bin/init'
-		 *       and `kernel') already attached when starting */
+		 *       and `kernel') already attached when starting
+		 *
+		 * With this in mind, loading the GDB driver produces the
+		 * following sequence of events (as seen from the GDB remote):
+		 * #1:attach: [1:kernel]
+		 * #2:fork(): [1:kernel] -> [1:kernel,7fffffff:kernel]
+		 * #3:exec(): [1:kernel,7fffffff:kernel] -> [1:/bin/init,7fffffff:kernel]
+		 */
 		ATOMIC_FETCHOR(GDBServer_Features, GDB_SERVER_FEATURE_SHOWKERNEL);
 		{
 			struct debugtrap_reason r;

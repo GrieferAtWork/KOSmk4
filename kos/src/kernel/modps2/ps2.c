@@ -52,7 +52,7 @@ DEFINE_CMDLINE_PARAM_UINT_VAR(ps2_command_attempts, "attempts_command", 3);
 
 
 /* Probing code from here on... */
-PRIVATE NOBLOCK void
+PRIVATE NOBLOCK ATTR_FREETEXT void
 NOTHROW(FCALL ps2_probe_process_data)(struct ps2_probe_data *__restrict probe_data,
                                       ps2_portid_t portno, u8 data) {
 	struct ps2_probe_data &port = probe_data[portno];
@@ -110,7 +110,7 @@ handle_resend_or_other:
 }
 
 
-PRIVATE NOBLOCK bool
+PRIVATE NOBLOCK ATTR_FREETEXT bool
 NOTHROW(FCALL ps2_probe_handle_interrupt)(void *arg) {
 	u8 data, status = inb(PS2_STATUS);
 	struct ps2_probe_data *probe = (struct ps2_probe_data *)arg;
@@ -127,7 +127,7 @@ NOTHROW(FCALL ps2_probe_handle_interrupt)(void *arg) {
 }
 
 
-INTERN void KCALL
+INTERN ATTR_FREETEXT void KCALL
 ps2_probe_run_simple_ack_command(struct ps2_probe_data *__restrict probe_data,
                                  ps2_portid_t portno, u8 command) THROWS(E_IOERROR) {
 	unsigned int attempt = 0;
@@ -161,7 +161,7 @@ again:
 	goto again;
 }
 
-INTERN u8 KCALL
+INTERN ATTR_FREETEXT u8 KCALL
 ps2_probe_run_ack_plus_data_command(struct ps2_probe_data *__restrict probe_data,
                                     ps2_portid_t portno, u8 command) THROWS(E_IOERROR) {
 	unsigned int attempt = 0;
@@ -204,7 +204,7 @@ try_resend:
 }
 
 
-INTERN u8 KCALL
+INTERN ATTR_FREETEXT u8 KCALL
 ps2_run_identify_command(struct ps2_probe_data *__restrict probe_data,
                          ps2_portid_t portno, u8 id[2]) THROWS(E_IOERROR) {
 	unsigned int attempt = 0;
@@ -258,7 +258,7 @@ try_resend:
 
 
 
-PRIVATE void KCALL
+PRIVATE ATTR_FREETEXT void KCALL
 ps2_probe_port(struct ps2_probe_data *__restrict probe_data,
                ps2_portid_t portno) {
 	u8 nid_port, id_port[2];
@@ -267,7 +267,8 @@ ps2_probe_port(struct ps2_probe_data *__restrict probe_data,
 	} EXCEPT {
 		if (!was_thrown(E_IOERROR))
 			RETHROW();
-		error_printf("disabling scanning on ps2 port #%u", portno + 1);
+		error_printf(FREESTR("disabling scanning on ps2 port #%u"),
+		             portno + 1);
 	}
 	nid_port = ps2_run_identify_command(probe_data, portno, id_port);
 	if (nid_port == 0) {
@@ -280,13 +281,14 @@ init_keyboard:
 init_mouse:
 		ps2_mouse_create(probe_data, portno);
 	} else {
-		printk(KERN_WARNING "[ps2] Failed to detect device on port #%u [id=[", portno + 1);
+		printk(FREESTR(KERN_WARNING "[ps2] Failed to detect device on port #%u [id=["), portno + 1);
 		if (nid_port >= 1)
-			printk(KERN_WARNING "0x%.2I8x", id_port[0]);
+			printk(FREESTR(KERN_WARNING "0x%.2I8x"), id_port[0]);
 		if (nid_port >= 2)
-			printk(KERN_WARNING ",0x%.2I8x", id_port[1]);
-		printk(KERN_WARNING "]] assume it's a %s\n",
-		       portno == PS2_PORT1 ? "keyboard" : "mouse");
+			printk(FREESTR(KERN_WARNING ",0x%.2I8x"), id_port[1]);
+		printk(FREESTR(KERN_WARNING "]] assume it's a %s\n"),
+		       portno == PS2_PORT1 ? FREESTR("keyboard")
+		                           : FREESTR("mouse"));
 		if (portno == PS2_PORT1)
 			goto init_keyboard;
 		goto init_mouse;
