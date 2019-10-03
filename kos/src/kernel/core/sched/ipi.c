@@ -54,11 +54,61 @@ PUBLIC ATTR_WEAK NOBLOCK NONNULL((2, 3)) ATTR_SECTION(".text.kernel.cpu_sendipi_
 NOTHROW(KCALL cpu_sendipi_cpuset)(cpuset_t targets, cpu_ipi_t func,
                                   void *args[CPU_IPI_ARGCOUNT], unsigned int flags) {
 	cpuid_t i, result = 0;
-	for (i = 0; i < cpu_count; ++i) {
-		if (!CPUSET_CONTAINS(targets, i))
-			continue;
-		if (cpu_sendipi(cpu_vector[i], func, args, flags))
-			++result;
+	if (flags & CPU_IPI_FWAKEUP) {
+		for (i = 0; i < cpu_count; ++i) {
+			if (!CPUSET_CONTAINS(targets, i))
+				continue;
+			if (cpu_sendipi(cpu_vector[i], func, args, flags))
+				++result;
+		}
+	} else {
+		/* Must keep track of all CPUs where the send was successful,
+		 * so that we can double-check during a second pass that all
+		 * CPUs that aren't in deep-sleep afterwards have received the
+		 * IPI.
+		 * if we find any CPU that isn't in deep-sleep, we try to send
+		 * the IPI once again, so-as to ensure that all CPUs  */
+		cpuset_t success_set;
+		bool did_find_new_cpus;
+		CPUSET_CLEAR(success_set);
+		for (i = 0; i < cpu_count; ++i) {
+			if (!CPUSET_CONTAINS(targets, i))
+				continue;
+			if (cpu_sendipi(cpu_vector[i], func, args, flags)) {
+				CPUSET_INSERT(success_set, i);
+				++result;
+			}
+		}
+		/* Second pass: Check for cpus not in deep-sleep mode, that
+		 *              aren't apart of the set of CPUs successfully
+		 *              contacted. */
+		COMPILER_BARRIER();
+		do {
+			did_find_new_cpus = false;
+			for (i = 0; i < cpu_count; ++i) {
+				struct cpu *c;
+				if (!CPUSET_CONTAINS(targets, i))
+					continue; /* Not an intended target. */
+				if (CPUSET_CONTAINS(success_set, i))
+					continue; /* Already contacted. */
+				c = cpu_vector[i];
+again_check_cpu_state:
+				if (ATOMIC_READ(c->c_state) == CPU_STATE_DREAMING)
+					continue; /* CPU is in deep sleep mode. */
+				/* Try to send the IPI.
+				 * If doing so fails, re-check the CPU's state, since it
+				 * may have entered deep-sleep mode in the mean time. */
+				if (!cpu_sendipi(c, func, args, flags)) {
+					task_pause();
+					goto again_check_cpu_state;
+				}
+				CPUSET_INSERT(success_set, i);
+				++result;
+				/* Force another pass after this one, since
+				 * we've managed to find more CPUs to contact. */
+				did_find_new_cpus = true;
+			}
+		} while (did_find_new_cpus);
 	}
 	return result;
 }
@@ -79,12 +129,20 @@ PUBLIC ATTR_WEAK NOBLOCK NONNULL((1, 2)) ATTR_SECTION(".text.kernel.cpu_broadcas
 NOTHROW(KCALL cpu_broadcastipi_notthis)(cpu_ipi_t func, void *args[CPU_IPI_ARGCOUNT], unsigned int flags) {
 	cpuid_t result;
 	cpuset_t set;
-	pflag_t was;
+	uintptr_t old_flags;
+	struct task *me = THIS_TASK;
 	CPUSET_SETFULL(set);
-	was = PREEMPTION_PUSHOFF();
+	/* Prevent our own thread from being moved to a different core,
+	 * thus ensuring that we can guaranty that our own CPU doesn't
+	 * get the IPI.
+	 * We don't want to do this by disabling preemption, since that
+	 * could lead to unintended race conditions, since it would prevent
+	 * our own CPU from servicing interrupts send by other CPUs. */
+	old_flags = ATOMIC_FETCHOR(me->t_flags, TASK_FKEEPCORE);
 	CPUSET_REMOVE(set, THIS_CPU->c_id);
 	result = cpu_sendipi_cpuset(set, func, args, flags);
-	PREEMPTION_POP(was);
+	if (!(old_flags & TASK_FKEEPCORE))
+		ATOMIC_FETCHAND(me->t_flags, ~TASK_FKEEPCORE);
 	return result;
 }
 

@@ -568,7 +568,16 @@ typedef NOBLOCK NONNULL((1, 2)) /*ATTR_NOTHROW*/struct icpustate *
 
 
 #define CPU_IPI_FNORMAL   0x0000 /* Normal IPI delivery flags. */
-#define CPU_IPI_FWAKEUP   0x0001 /* FLAG: Wake up the target CPU if it is currently in deep-sleep mode. */
+#define CPU_IPI_FWAKEUP   0x0001 /* FLAG: Wake up the target CPU if it is currently in deep-sleep mode.
+                                  * When this flag isn't given, broadcasting IPIs to some set to CPUs,
+                                  * as can be done with `cpu_sendipi_cpuset()', `cpu_broadcastipi()',
+                                  * as well as `cpu_broadcastipi_notthis()' is guarantied to be atomic,
+                                  * in the sense that any CPU that isn't in deep by the time the associated
+                                  * function returns will have received the IPI.
+                                  * This in turns allows you to restrict execution of IPIs to only the
+                                  * set of CPUs considered to be on-line, allowing the efficient implementation
+                                  * of single-core sub-systems that only need to interrupt CPUs that aren't
+                                  * already off-line. */
 #define CPU_IPI_FNOINTR   0x0002 /* FLAG: The IPI may be executed when preemption is disabled.
                                   *       When this flag is set, sending a non-blocking IPI to
                                   *       one self is allowed. */
