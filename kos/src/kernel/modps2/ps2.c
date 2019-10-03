@@ -293,19 +293,19 @@ init_mouse:
 	}
 }
 
-PRIVATE void KCALL ps2_probe_install_handlers(struct ps2_probe_data *__restrict probe_data) {
+PRIVATE ATTR_FREETEXT void KCALL ps2_probe_install_handlers(struct ps2_probe_data *__restrict probe_data) {
 	isr_register_at(X86_INTNO_PIC1_KBD, &ps2_probe_handle_interrupt, probe_data);
 	isr_register_at(X86_INTNO_PIC2_PS2M, &ps2_probe_handle_interrupt, probe_data);
 }
 
-PRIVATE void KCALL ps2_probe_delete_handlers(struct ps2_probe_data *__restrict probe_data) {
+PRIVATE ATTR_FREETEXT void KCALL ps2_probe_delete_handlers(struct ps2_probe_data *__restrict probe_data) {
 	isr_unregister_at(X86_INTNO_PIC1_KBD, &ps2_probe_handle_interrupt, probe_data);
 	isr_unregister_at(X86_INTNO_PIC2_PS2M, &ps2_probe_handle_interrupt, probe_data);
 }
 
 
-PRIVATE struct ps2_probe_data ps2_probe_data_buffer[PS2_PORTCOUNT];
-PRIVATE DRIVER_INIT void KCALL ps2_init(void) {
+PRIVATE ATTR_FREEBSS struct ps2_probe_data ps2_probe_data_buffer[PS2_PORTCOUNT];
+PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL ps2_init(void) {
 	u8 data;
 	ps2_portid_t portno;
 	memset(ps2_probe_data_buffer, 0, sizeof(ps2_probe_data_buffer));

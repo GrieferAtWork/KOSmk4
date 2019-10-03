@@ -32,10 +32,6 @@
 
 DECL_BEGIN
 
-#ifndef MMIO
-#define MMIO /* nothing */
-#endif
-
 /* macro for composing an 8-bit VGA register
  * index and value into a single 16-bit quantity */
 #define VGA_OUT16VAL(v,r)    (((v) << 8)|(r))
@@ -43,7 +39,7 @@ DECL_BEGIN
 /* decide whether we should enable the faster 16-bit VGA register writes */
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 #define VGA_OUTW_WRITE 1
-#endif
+#endif /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
 
 
 /* generic VGA port read/write */

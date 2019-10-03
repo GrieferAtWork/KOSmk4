@@ -20,7 +20,7 @@
 #define _KOS_IO_SERIAL_H 1
 
 #include <__stdinc.h>
-#include <bits/types.h>
+
 #include <sys/io.h>
 
 /* Documentation derived from https://www.lammertbies.nl/comm/info/serial-uart.html */

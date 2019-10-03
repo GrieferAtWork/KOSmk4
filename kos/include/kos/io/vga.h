@@ -16,13 +16,13 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_IO_VGA_H
-#define _I386_KOS_IO_VGA_H 1
+#ifndef _KOS_IO_VGA_H
+#define _KOS_IO_VGA_H 1
 
 #include <__stdinc.h>
-#include <hybrid/host.h>
-#include <hybrid/typecore.h>
-#include <asm/ioctl.h>
+
+#include <bits/types.h>
+#include <sys/io.h>
 
 __SYSDECL_BEGIN
 
@@ -257,9 +257,9 @@ struct __ATTR_PACKED vga_color {
 	 *       will automatically up/down-scale the color intensity
 	 *       in order to clamp it to VGA's limit of `0x3f'.
 	 *       With that in mind, to get `0x3f', you should pass `0xff'! */
-	__UINT8_TYPE__   c_red;       /* Red color component. */
-	__UINT8_TYPE__   c_green;     /* Green color component. */
-	__UINT8_TYPE__   c_blue;      /* Blue color component. */
+	__uint8_t   c_red;       /* Red color component. */
+	__uint8_t   c_green;     /* Green color component. */
+	__uint8_t   c_blue;      /* Blue color component. */
 };
 
 struct __ATTR_PACKED vga_palette {
@@ -268,7 +268,7 @@ struct __ATTR_PACKED vga_palette {
 
 
 struct __ATTR_PACKED vga_font_char {
-	__BYTE_TYPE__    fc_lines[16]; /* Character lines. */
+	__byte_t    fc_lines[16]; /* Character lines. */
 };
 
 struct __ATTR_PACKED vga_font {
@@ -276,54 +276,54 @@ struct __ATTR_PACKED vga_font {
 };
 
 struct __ATTR_PACKED vga_mode {
-	__UINT8_TYPE__ vm_att_mode;          /* VGA_ATC_MODE. */
-	__UINT8_TYPE__ vm_att_overscan;      /* VGA_ATC_OVERSCAN. */
-	__UINT8_TYPE__ vm_att_plane_enable;  /* VGA_ATC_PLANE_ENABLE. */
-	__UINT8_TYPE__ vm_att_pel;           /* VGA_ATC_PEL. */
-	__UINT8_TYPE__ vm_att_color_page;    /* VGA_ATC_COLOR_PAGE. */
-	__UINT8_TYPE__ vm_mis;               /* VGA_MIS_R / VGA_MIS_W. */
-	__UINT8_TYPE__ vm_gfx_sr_value;      /* VGA_GFX_SR_VALUE. */
-	__UINT8_TYPE__ vm_gfx_sr_enable;     /* VGA_GFX_SR_ENABLE. */
-	__UINT8_TYPE__ vm_gfx_compare_value; /* VGA_GFX_COMPARE_VALUE. */
-	__UINT8_TYPE__ vm_gfx_data_rotate;   /* VGA_GFX_DATA_ROTATE. */
-	__UINT8_TYPE__ vm_gfx_mode;          /* VGA_GFX_MODE. */
-	__UINT8_TYPE__ vm_gfx_misc;          /* VGA_GFX_MISC. */
-	__UINT8_TYPE__ vm_gfx_compare_mask;  /* VGA_GFX_COMPARE_MASK. */
-	__UINT8_TYPE__ vm_gfx_bit_mask;      /* VGA_GFX_BIT_MASK. */
-	__UINT8_TYPE__ vm_crt_h_total;       /* VGA_CRTC_H_TOTAL. */
-	__UINT8_TYPE__ vm_crt_h_disp;        /* VGA_CRTC_H_DISP. */
-	__UINT8_TYPE__ vm_crt_h_blank_start; /* VGA_CRTC_H_BLANK_START. */
-	__UINT8_TYPE__ vm_crt_h_blank_end;   /* VGA_CRTC_H_BLANK_END. */
-	__UINT8_TYPE__ vm_crt_h_sync_start;  /* VGA_CRTC_H_SYNC_START. */
-	__UINT8_TYPE__ vm_crt_h_sync_end;    /* VGA_CRTC_H_SYNC_END. */
-	__UINT8_TYPE__ vm_crt_v_total;       /* VGA_CRTC_V_TOTAL. */
-	__UINT8_TYPE__ vm_crt_overflow;      /* VGA_CRTC_OVERFLOW. */
-	__UINT8_TYPE__ vm_crt_preset_row;    /* VGA_CRTC_PRESET_ROW. */
-	__UINT8_TYPE__ vm_crt_max_scan;      /* VGA_CRTC_MAX_SCAN. */
+	__uint8_t vm_att_mode;          /* VGA_ATC_MODE. */
+	__uint8_t vm_att_overscan;      /* VGA_ATC_OVERSCAN. */
+	__uint8_t vm_att_plane_enable;  /* VGA_ATC_PLANE_ENABLE. */
+	__uint8_t vm_att_pel;           /* VGA_ATC_PEL. */
+	__uint8_t vm_att_color_page;    /* VGA_ATC_COLOR_PAGE. */
+	__uint8_t vm_mis;               /* VGA_MIS_R / VGA_MIS_W. */
+	__uint8_t vm_gfx_sr_value;      /* VGA_GFX_SR_VALUE. */
+	__uint8_t vm_gfx_sr_enable;     /* VGA_GFX_SR_ENABLE. */
+	__uint8_t vm_gfx_compare_value; /* VGA_GFX_COMPARE_VALUE. */
+	__uint8_t vm_gfx_data_rotate;   /* VGA_GFX_DATA_ROTATE. */
+	__uint8_t vm_gfx_mode;          /* VGA_GFX_MODE. */
+	__uint8_t vm_gfx_misc;          /* VGA_GFX_MISC. */
+	__uint8_t vm_gfx_compare_mask;  /* VGA_GFX_COMPARE_MASK. */
+	__uint8_t vm_gfx_bit_mask;      /* VGA_GFX_BIT_MASK. */
+	__uint8_t vm_crt_h_total;       /* VGA_CRTC_H_TOTAL. */
+	__uint8_t vm_crt_h_disp;        /* VGA_CRTC_H_DISP. */
+	__uint8_t vm_crt_h_blank_start; /* VGA_CRTC_H_BLANK_START. */
+	__uint8_t vm_crt_h_blank_end;   /* VGA_CRTC_H_BLANK_END. */
+	__uint8_t vm_crt_h_sync_start;  /* VGA_CRTC_H_SYNC_START. */
+	__uint8_t vm_crt_h_sync_end;    /* VGA_CRTC_H_SYNC_END. */
+	__uint8_t vm_crt_v_total;       /* VGA_CRTC_V_TOTAL. */
+	__uint8_t vm_crt_overflow;      /* VGA_CRTC_OVERFLOW. */
+	__uint8_t vm_crt_preset_row;    /* VGA_CRTC_PRESET_ROW. */
+	__uint8_t vm_crt_max_scan;      /* VGA_CRTC_MAX_SCAN. */
 
-	__UINT8_TYPE__ vm_crt_cursor_start;  /* VGA_CRTC_CURSOR_START. */
-	__UINT8_TYPE__ vm_crt_cursor_end;    /* VGA_CRTC_CURSOR_END. */
-	__UINT8_TYPE__ vm_crt_start_hi;      /* VGA_CRTC_START_HI. */
-	__UINT8_TYPE__ vm_crt_start_lo;      /* VGA_CRTC_START_LO. */
-	__UINT8_TYPE__ vm_crt_cursor_hi;     /* VGA_CRTC_CURSOR_HI. */
-	__UINT8_TYPE__ vm_crt_cursor_lo;     /* VGA_CRTC_CURSOR_LO. */
+	__uint8_t vm_crt_cursor_start;  /* VGA_CRTC_CURSOR_START. */
+	__uint8_t vm_crt_cursor_end;    /* VGA_CRTC_CURSOR_END. */
+	__uint8_t vm_crt_start_hi;      /* VGA_CRTC_START_HI. */
+	__uint8_t vm_crt_start_lo;      /* VGA_CRTC_START_LO. */
+	__uint8_t vm_crt_cursor_hi;     /* VGA_CRTC_CURSOR_HI. */
+	__uint8_t vm_crt_cursor_lo;     /* VGA_CRTC_CURSOR_LO. */
 
-	__UINT8_TYPE__ vm_crt_v_sync_start;  /* VGA_CRTC_V_SYNC_START. */
-	__UINT8_TYPE__ vm_crt_v_sync_end;    /* VGA_CRTC_V_SYNC_END. */
-	__UINT8_TYPE__ vm_crt_v_disp_end;    /* VGA_CRTC_V_DISP_END. */
-	__UINT8_TYPE__ vm_crt_offset;        /* VGA_CRTC_OFFSET. */
-	__UINT8_TYPE__ vm_crt_underline;     /* VGA_CRTC_UNDERLINE. */
-	__UINT8_TYPE__ vm_crt_v_blank_start; /* VGA_CRTC_V_BLANK_START. */
-	__UINT8_TYPE__ vm_crt_v_blank_end;   /* VGA_CRTC_V_BLANK_END. */
-	__UINT8_TYPE__ vm_crt_mode;          /* VGA_CRTC_MODE. */
-	__UINT8_TYPE__ vm_crt_line_compare;  /* VGA_CRTC_LINE_COMPARE. */
-	__UINT8_TYPE__ vm_seq_clock_mode;    /* VGA_SEQ_CLOCK_MODE. */
-	__UINT8_TYPE__ vm_seq_plane_write;   /* VGA_SEQ_PLANE_WRITE. */
-	__UINT8_TYPE__ vm_seq_character_map; /* VGA_SEQ_CHARACTER_MAP. */
-	__UINT8_TYPE__ vm_seq_memory_mode;   /* VGA_SEQ_MEMORY_MODE. */
+	__uint8_t vm_crt_v_sync_start;  /* VGA_CRTC_V_SYNC_START. */
+	__uint8_t vm_crt_v_sync_end;    /* VGA_CRTC_V_SYNC_END. */
+	__uint8_t vm_crt_v_disp_end;    /* VGA_CRTC_V_DISP_END. */
+	__uint8_t vm_crt_offset;        /* VGA_CRTC_OFFSET. */
+	__uint8_t vm_crt_underline;     /* VGA_CRTC_UNDERLINE. */
+	__uint8_t vm_crt_v_blank_start; /* VGA_CRTC_V_BLANK_START. */
+	__uint8_t vm_crt_v_blank_end;   /* VGA_CRTC_V_BLANK_END. */
+	__uint8_t vm_crt_mode;          /* VGA_CRTC_MODE. */
+	__uint8_t vm_crt_line_compare;  /* VGA_CRTC_LINE_COMPARE. */
+	__uint8_t vm_seq_clock_mode;    /* VGA_SEQ_CLOCK_MODE. */
+	__uint8_t vm_seq_plane_write;   /* VGA_SEQ_PLANE_WRITE. */
+	__uint8_t vm_seq_character_map; /* VGA_SEQ_CHARACTER_MAP. */
+	__uint8_t vm_seq_memory_mode;   /* VGA_SEQ_MEMORY_MODE. */
 };
 #endif /* __CC__ */
 
 __SYSDECL_END
 
-#endif /* !_I386_KOS_IO_VGA_H */
+#endif /* !_KOS_IO_VGA_H */

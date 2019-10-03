@@ -16,10 +16,12 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _I386_KOS_IO_PS2_H
-#define _I386_KOS_IO_PS2_H 1
+#ifndef _KOS_IO_PS2_H
+#define _KOS_IO_PS2_H 1
 
 #include <__stdinc.h>
+
+#include <sys/io.h>
 
 __DECL_BEGIN
 
@@ -85,4 +87,4 @@ __DECL_BEGIN
 
 __DECL_END
 
-#endif /* !_I386_KOS_IO_PS2_H */
+#endif /* !_KOS_IO_PS2_H */
