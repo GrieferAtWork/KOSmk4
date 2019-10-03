@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x846f5ed9 */
+/* HASH CRC-32:0x2019c02a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@ __LOCAL_LIBC(format_c16snprintf_printer) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_c16snprintf_printer))(/*struct format_wsnprintf_data**/void *__arg,
                                                                         __CHAR16_TYPE__ const *__restrict __data,
                                                                         __SIZE_TYPE__ __datalen) {
-#line 921 "kos/src/libc/magic/format-printer.c"
+#line 973 "kos/src/libc/magic/format-printer.c"
 	struct __format_snprintf_data_ {
 		__CHAR16_TYPE__         *__sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
 		__SIZE_TYPE__ __sd_bufsiz; /* Remaining buffer size. */

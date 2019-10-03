@@ -870,7 +870,7 @@ print_string:
 #if __CHAR_SIZE == __SIZEOF_CHAR__ /* TODO: Other char sizes! */
 #if defined(CONFIG_USE_LIBDEBUGINFO)
 		if (__COMPARE_NAME("vinfo")) {
-			__PRIVATE char const __vinfo_default_format[] = "%f(%l, %c) : %n";
+			__PRIVATE char const __vinfo_default_format[] = "%f(%l,%c) : %n";
 			void *__p = __builtin_va_arg(__FORMAT_ARGS, void *);
 			if (!__xformat_arg) {
 				__xformat_arg = __vinfo_default_format;

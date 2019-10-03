@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbc7305c */
+/* HASH CRC-32:0xf08afdfa */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,7 +60,7 @@ __LOCAL_LIBC(format_waprintf_printer) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SS
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_waprintf_printer))(/*struct format_waprintf_data **/void *__arg,
                                                                      __WCHAR_TYPE__ const *__restrict __data,
                                                                      __SIZE_TYPE__ __datalen) {
-#line 1089 "kos/src/libc/magic/format-printer.c"
+#line 1141 "kos/src/libc/magic/format-printer.c"
 	struct __format_aprintf_data {
 		__WCHAR_TYPE__         *__ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
 		__SIZE_TYPE__ __ap_avail; /* Unused buffer size */
