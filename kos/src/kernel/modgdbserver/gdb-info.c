@@ -30,6 +30,7 @@
 #include <kernel/vm/exec.h>
 #include <kernel/vm/library.h>
 #include <kernel/handle.h>
+#include <kernel/uname.h>
 #include <sched/pid.h>
 #include <sched/task.h>
 
@@ -630,6 +631,84 @@ err:
 }
 
 
+/* `qXfer:osdata:read:processes': Print the list of processes running on the system. */
+PRIVATE NONNULL((1)) ssize_t
+NOTHROW(FCALL GDBInfo_PrintUname)(pformatprinter printer, void *arg) {
+#define FIELD(name)                            \
+	"<item>"                                   \
+	"<column name=\"field\">" name "</column>" \
+	"<column name=\"value\">%s</column>"       \
+	"</item>"
+	return format_printf(printer, arg,
+	                     "<osdata type=\"uname\">"
+	                     FIELD("sysname")
+	                     FIELD("nodename")
+	                     FIELD("release")
+	                     FIELD("version")
+	                     FIELD("machine")
+	                     FIELD("domainname")
+	                     "</osdata>",
+	                     kernel_uname.sysname,
+	                     kernel_uname.nodename,
+	                     kernel_uname.release,
+	                     kernel_uname.version,
+	                     kernel_uname.machine,
+	                     kernel_uname.domainname);
+#undef FIELD
+}
+
+
+PRIVATE ssize_t
+NOTHROW(FCALL GDBInfo_PrintOSThreadList_Callback)(void *closure,
+                                                  struct task *__restrict thread) {
+	ssize_t temp, result = 0;
+	pformatprinter printer; void *arg;
+	pid_t pid, tid;
+	pid = task_getrootpid_of_s(thread);
+	tid = task_getroottid_of_s(thread);
+	if unlikely(!pid || !tid) {
+		pid = GDB_KERNEL_PID; /* Kernel thread. */
+		tid = GDB_KERNEL_TID(thread);
+	}
+	printer = ((struct GDBInfo_PrintThreadList_Data *)closure)->ptld_printer;
+	arg     = ((struct GDBInfo_PrintThreadList_Data *)closure)->ptld_arg;
+	PRINTF("<item>"
+	       "<column name=\"pid\">%I32x</column>"
+	       "<column name=\"tid\">%I32x</column>"
+	       "<column name=\"program\">",
+	       pid, tid);
+	DO(GDBInfo_PrintThreadExecFile(printer, arg, thread, false));
+	PRINT("</column>"
+	      "<column name=\"command\">");
+	DO(GDBInfo_PrintThreadCommandline(printer, arg, thread));
+	PRINTF("</column>"
+	       "<column name=\"core\">%u</column>"
+	       "</item>",
+	       ATOMIC_READ(thread->t_cpu)->c_id);
+	return result;
+err:
+	return temp;
+}
+
+
+/* `qXfer:osdata:read:processes': Print the list of processes running on the system. */
+PRIVATE NONNULL((1)) ssize_t
+NOTHROW(FCALL GDBInfo_PrintOSThreadList)(pformatprinter printer, void *arg) {
+	struct GDBInfo_PrintThreadList_Data data;
+	ssize_t temp, result = 0;
+	PRINT("<osdata type=\"threads\">");
+	data.ptld_printer = printer;
+	data.ptld_arg     = arg;
+	DO(GDBThread_Enumerate(&GDBInfo_PrintOSThreadList_Callback, &data));
+	/* Unlike everywhere else, also include the GDB fallback host thread in here! */
+	DO(GDBInfo_PrintOSThreadList_Callback(&data, GDBServer_FallbackHost));
+	PRINT("</osdata>");
+	return result;
+err:
+	return temp;
+}
+
+
 
 PRIVATE char const GDBInfo_OsDataOverview[] =
 "<osdata type=\"types\">"
@@ -647,6 +726,16 @@ PRIVATE char const GDBInfo_OsDataOverview[] =
 		"<column name=\"Type\">drivers</column>"
 		"<column name=\"Description\">Kernel drivers</column>"
 		"<column name=\"Title\">Listing of all kernel drivers</column>"
+	"</item>"
+	"<item>"
+		"<column name=\"Type\">uname</column>"
+		"<column name=\"Description\">Kernel information</column>"
+		"<column name=\"Title\">Information returned by uname()</column>"
+	"</item>"
+	"<item>"
+		"<column name=\"Type\">threads</column>"
+		"<column name=\"Description\">Threads</column>"
+		"<column name=\"Title\">Listing of all threads</column>"
 	"</item>"
 "</osdata>";
 
@@ -667,6 +756,10 @@ NOTHROW(FCALL GDBInfo_PrintOSData)(pformatprinter printer, void *arg,
 		result = GDBInfo_PrintDriverList(printer, arg);
 	} else if (strcmp(name, "files") == 0) {
 		result = GDBInfo_PrintFdList(printer, arg);
+	} else if (strcmp(name, "uname") == 0) {
+		result = GDBInfo_PrintUname(printer, arg);
+	} else if (strcmp(name, "threads") == 0) {
+		result = GDBInfo_PrintOSThreadList(printer, arg);
 	} else {
 		result = -ENOENT;
 	}

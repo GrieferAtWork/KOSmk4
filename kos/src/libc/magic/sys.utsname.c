@@ -27,19 +27,19 @@ __SYSDECL_BEGIN
 
 #ifndef _UTSNAME_SYSNAME_LENGTH
 #define _UTSNAME_SYSNAME_LENGTH  _UTSNAME_LENGTH
-#endif
+#endif /* !_UTSNAME_SYSNAME_LENGTH */
 #ifndef _UTSNAME_NODENAME_LENGTH
 #define _UTSNAME_NODENAME_LENGTH _UTSNAME_LENGTH
-#endif
+#endif /* !_UTSNAME_NODENAME_LENGTH */
 #ifndef _UTSNAME_RELEASE_LENGTH
 #define _UTSNAME_RELEASE_LENGTH  _UTSNAME_LENGTH
-#endif
+#endif /* !_UTSNAME_RELEASE_LENGTH */
 #ifndef _UTSNAME_VERSION_LENGTH
 #define _UTSNAME_VERSION_LENGTH  _UTSNAME_LENGTH
-#endif
+#endif /* !_UTSNAME_VERSION_LENGTH */
 #ifndef _UTSNAME_MACHINE_LENGTH
 #define _UTSNAME_MACHINE_LENGTH  _UTSNAME_LENGTH
-#endif
+#endif /* !_UTSNAME_MACHINE_LENGTH */
 
 /* Note that SVID assumes all members have the same size.  */
 #ifdef __USE_MISC
@@ -86,10 +86,10 @@ struct utsname {
 #if (_UTSNAME_DOMAIN_LENGTH-0) != 0
 #ifdef __USE_GNU
 	char domainname[_UTSNAME_DOMAIN_LENGTH]; /* Name of the domain of this node on the network. */
-#else
+#else /* __USE_GNU */
 	char __domainname[_UTSNAME_DOMAIN_LENGTH]; /* Name of the domain of this node on the network. */
-#endif
-#endif
+#endif /* !__USE_GNU */
+#endif /* (_UTSNAME_DOMAIN_LENGTH-0) != 0 */
 };
 
 #if defined(__USE_GNU) && (_UTSNAME_DOMAIN_LENGTH-0) != 0
