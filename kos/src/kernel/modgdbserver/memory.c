@@ -21,12 +21,16 @@
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
-#include <kernel/except.h>
 
-#include <sched/task.h>
+#include <kernel/except.h>
 #include <kernel/vm.h>
+#include <sched/task.h>
+
+#include <assert.h>
+#include <string.h>
 
 #include "gdb.h"
+#include "server.h" /* CONFIG_GDBSERVER_PACKET_MAXLEN, GDBPacket_Start() */
 
 DECL_BEGIN
 
@@ -147,6 +151,113 @@ NOTHROW(FCALL GDB_VM_WriteMemoryWithoutSwBreak)(struct vm *__restrict effective_
 		}
 	}
 	return result;
+}
+
+
+
+/* Search memory for a specific need
+ * This function behaves identical to `memmem()'
+ * @return: true:  Found the needle at `*presult'
+ * @return: false: The needle wasn't found. */
+INTERN NONNULL((1, 4)) bool
+NOTHROW(FCALL GDB_FindMemory)(struct task *__restrict thread,
+                              vm_virt_t haystack, size_t haystack_length,
+                              void const *needle, size_t needle_length,
+                              vm_virt_t *__restrict presult) {
+	/* Since the length of `needle' is restricted by the max length of a packet,
+	 * we can assume that `needle_length < CONFIG_GDBSERVER_PACKET_MAXLEN / 2', as
+	 * well as that we are free to use `GDBPacket_Start()' as a temporary buffer. */
+	byte_t *buf;
+	byte_t firstbyte;
+	assert(needle_length < CONFIG_GDBSERVER_PACKET_MAXLEN / 2);
+	if unlikely(!needle_length)
+		return false;
+	buf = (byte_t *)GDBPacket_Start();
+	firstbyte = ((byte_t *)needle)[0];
+	for (;;) {
+		size_t maxcount, realcount;
+		if (needle_length > haystack_length)
+			break;
+		maxcount = CONFIG_GDBSERVER_PACKET_MAXLEN;
+		if (maxcount > haystack_length)
+			maxcount = haystack_length;
+		realcount = maxcount;
+		realcount -= GDB_ReadMemory(thread, haystack, buf, maxcount);
+		if likely(realcount >= needle_length) {
+			/* Scan `buf...+=realcount' for the needle */
+			byte_t *pos, *end;
+			size_t avail;
+			pos   = buf;
+			end   = buf + realcount;
+continue_scanning:
+			avail = (size_t)(end - pos);
+			for (;;) {
+				pos = (byte_t *)memchr(pos, firstbyte, avail);
+				if (!pos)
+					break;
+				/* Check if the needle would already be fully contained in the buffer. */
+				avail = (size_t)(end - pos);
+				if (avail >= needle_length) {
+					/* If this _is_ the match, then we've already got all the data we need. */
+					if (memcmp(pos + 1, (byte_t *)needle + 1, needle_length - 1) != 0) {
+						/* Continue searching... */
+						++pos;
+						--avail;
+						continue;
+					}
+found_it_at_pos:
+					/* Found it! */
+					*presult = haystack + (size_t)(pos - buf);
+					return true;
+				} else {
+					size_t missing_bytes;
+					/* We may still have a partial match that may
+					 * cross over into the next block of memory. */
+					if (memcmp(pos + 1, (byte_t *)needle + 1, avail - 1) != 0) {
+						/* Not this one... */
+						++pos;
+						--avail;
+						continue;
+					}
+					/* All the data we have right now indicate that this
+					 * can still be the match we're looking for, since
+					 * the following (but incomplete) range _does_ match:
+					 * >> haystack + (size_t)(pos - buf)...+=avail
+					 * Same as:
+					 * >> needle...+=avail
+					 * Since we're allowed to assume that our buffer is always
+					 * at least as large as a max-sized needle, we can also assume
+					 * that reading the next block of memory will yield all of the
+					 * remaining data left to-be matched. */
+					missing_bytes = needle_length - avail;
+					haystack += maxcount;
+					haystack_length -= maxcount;
+					if (missing_bytes > haystack_length)
+						goto not_found;
+					maxcount = CONFIG_GDBSERVER_PACKET_MAXLEN;
+					if (maxcount > haystack_length)
+						maxcount = haystack_length;
+					realcount = maxcount;
+					realcount -= GDB_ReadMemory(thread, haystack, buf, maxcount);
+					if unlikely(realcount < missing_bytes)
+						goto advance_to_next_haystack;
+					/* Compare the remaining data. */
+					if (memcmp(buf, (byte_t *)needle + avail, missing_bytes) == 0)
+						goto found_it_at_pos; /* Found it! (as `haystack + (size_t)(pos - buf)') */
+					pos = buf + missing_bytes;
+					end = buf + realcount;
+					goto continue_scanning;
+				}
+			}
+		}
+advance_to_next_haystack:
+		if (maxcount >= haystack_length)
+			break;
+		haystack += maxcount;
+		haystack_length -= maxcount;
+	}
+not_found:
+	return false;
 }
 
 

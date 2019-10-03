@@ -1447,6 +1447,33 @@ send_empty:
 			*o++ = 'Q';
 			*o++ = 'C';
 			o = GDBThreadSel_EncodeThreadID(o, &GDB_CurrentThread_general);
+		} else if (ISNAME("Search")) {
+			vm_virt_t haystack, addr;
+			size_t haystack_length, needle_length;
+			if (*nameEnd++ != ':')
+				ERROR(err_syntax);
+			if (memcmp(nameEnd, "memory", COMPILER_STRLEN("memory") * sizeof(char)) != 0)
+				ERROR(unknown);
+			i = nameEnd + COMPILER_STRLEN("memory");
+			if (*i++ != ':')
+				ERROR(err_syntax);
+			haystack = (vm_virt_t)strtou(i, &i, 16);
+			if (*i++ != ';')
+				ERROR(err_syntax);
+			haystack_length = strtou(i, &i, 16);
+			if (*i++ != ';')
+				ERROR(err_syntax);
+			needle_length = (size_t)((endptr - i) / 2);
+			GDB_DecodeHex(i, i, needle_length);
+			if (!GDB_FindMemory(GDB_CurrentThread_general.ts_thread,
+			                    haystack, haystack_length,
+			                    i, needle_length, &addr))
+				*o++ = '0';
+			else {
+				*o++ = '1';
+				*o++ = ',';
+				o += sprintf(o, "%Ix", (uintptr_t)addr);
+			}
 		} else if (ISNAME("Xfer")) {
 			char *annex;
 			ssize_t error;

@@ -295,6 +295,16 @@ INTDEF NONNULL((1, 3)) size_t NOTHROW(FCALL GDB_VM_WriteMemory)(struct vm *__res
 INTDEF NONNULL((1, 3)) size_t NOTHROW(FCALL GDB_VM_ReadMemoryWithoutSwBreak)(struct vm *__restrict effective_vm, vm_virt_t addr, void *buf, size_t num_bytes);
 INTDEF NONNULL((1, 3)) size_t NOTHROW(FCALL GDB_VM_WriteMemoryWithoutSwBreak)(struct vm *__restrict effective_vm, vm_virt_t addr, void const *buf, size_t num_bytes);
 
+/* Search memory for a specific need
+ * This function behaves identical to `memmem()'
+ * @return: true:  Found the needle at `*presult'
+ * @return: false: The needle wasn't found. */
+INTDEF NONNULL((1, 4)) bool
+NOTHROW(FCALL GDB_FindMemory)(struct task *__restrict thread,
+                              vm_virt_t haystack, size_t haystack_length,
+                              void const *needle, size_t needle_length,
+                              vm_virt_t *__restrict presult);
+
 /* Include (insert) or exclude (remove) SwBreak instruction overrides
  * defined within the range `addr...+=bufsize' with the given `buf'
  * This is used to hide/expose software breakpoint bytes from GDB, since
