@@ -2047,7 +2047,17 @@ again_read_status:
 						if (infop) {
 							infop->si_signo  = SIGCLD + 1;
 							infop->si_errno  = 0;
-							infop->si_code   = WIFCONTINUED(status) ? CLD_CONTINUED : WIFSTOPPED(status) ? CLD_STOPPED : WCOREDUMP(status) ? CLD_DUMPED : WIFEXITED(status) ? CLD_EXITED : WIFSIGNALED(status) ? CLD_KILLED : CLD_TRAPPED;
+							infop->si_code   = WIFCONTINUED(status)
+							                 ? CLD_CONTINUED
+							                 : WIFSTOPPED(status)
+							                   ? CLD_STOPPED
+							                   : WCOREDUMP(status)
+							                     ? CLD_DUMPED
+							                     : WIFEXITED(status)
+							                       ? CLD_EXITED
+							                       : WIFSIGNALED(status)
+							                         ? CLD_KILLED
+							                         : CLD_TRAPPED;
 							infop->si_pid    = result;
 							infop->si_uid    = 0; /* ??? */
 							infop->si_status = status.w_status;

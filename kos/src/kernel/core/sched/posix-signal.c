@@ -386,10 +386,10 @@ NOTHROW(KCALL sighand_default_action)(u32 signo) {
 	case SIGXFSZ:
 #if defined(SIGIOT) && SIGIOT != SIGABRT
 	case SIGIOT:
-#endif
+#endif /* SIGIOT != SIGABRT */
 #if defined(SIGUNUSED) && SIGUNUSED != SIGSYS
 	case SIGUNUSED:
-#endif
+#endif /* SIGUNUSED != SIGSYS */
 		result = KERNEL_SIG_CORE;
 		break;
 
@@ -406,15 +406,15 @@ NOTHROW(KCALL sighand_default_action)(u32 signo) {
 	case SIGVTALRM:
 #ifdef SIGEMT
 	case SIGEMT:
-#endif
+#endif /* SIGEMT */
 	case SIGSTKFLT:
 #if defined(SIGIO) && SIGIO != SIGPOLL
 	case SIGIO:
-#endif
+#endif /* SIGIO != SIGPOLL */
 	case SIGPWR:
 #ifdef SIGLOST
 	case SIGLOST:
-#endif
+#endif /* SIGLOST */
 		result = KERNEL_SIG_TERM;
 		break;
 
@@ -1581,7 +1581,7 @@ DEFINE_SYSCALL2(errno_t, kill, pid_t, pid, syscall_ulong_t, signo) {
 		target = task_getprocessgroupleader();
 		goto do_inherit_target_and_raise_processgroup;
 	} else if (pid == -1) {
-		/* TODO: Kill all processes that we're allowed to. */
+		/* TODO: Kill all processes that we're allowed to (except for pid=1). */
 		THROW(E_NOT_IMPLEMENTED_TODO);
 	} else {
 		/* Kill the entirety of a process group. */

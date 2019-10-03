@@ -228,6 +228,11 @@ done_procfs:
 		}
 		while (waitpid(cpid, NULL, 0) < 0)
 			sched_yield();
+		/* Kill anything which may have been left alive by the shell.
+		 * Note that kill(-1, ...) will never kill a process with pid=1,
+		 * meaning that we (the process with pid=1) won't get killed
+		 * by this! */
+		kill(-1, SIGKILL);
 	}
 
 	/* TODO: `__CORRECT_ISO_CPP_MATH_H_PROTO' interferes with libstdc++'s autoconf detection... */
