@@ -25,6 +25,7 @@
 #include <sched/signal.h>
 #include <libc/string.h>
 #include <hybrid/__assert.h>
+#include <hybrid/typecore.h>
 
 DECL_BEGIN
 
@@ -455,8 +456,9 @@ typedef NOBLOCK NONNULL((1)) void /*NOTHROW*/(KCALL *aio_completion_t)(struct ai
 /* Number of pointers available for drivers
  * to store data inline within AIO handles. */
 #define AIO_HANDLE_DRIVER_POINTER_COUNT 6
+#define AIO_HANDLE_ALIGNMENT __SIZEOF_POINTER__
 
-struct aio_handle {
+struct ATTR_ALIGNED(AIO_HANDLE_ALIGNMENT) aio_handle {
 #define AIO_HANDLE_HEAD                                                                              \
 	struct aio_handle      *ah_next; /* [0..1][lock(INTERNAL)] Pointer to the next AIO handle.       \
 	                                  * This field is only used internally in order to easily        \
@@ -499,7 +501,7 @@ struct aio_handle {
 
 
 /* A general purpose AIO handle that can be used for synchronizing for completion. */
-struct aio_handle_generic
+struct ATTR_ALIGNED(AIO_HANDLE_ALIGNMENT) aio_handle_generic
 #ifdef __cplusplus
 	: aio_handle
 #endif
@@ -583,7 +585,7 @@ aio_handle_generic_waitfor(struct aio_handle_generic *__restrict self)
 
 
 struct aio_multihandle;
-struct aio_handle_multiple
+struct ATTR_ALIGNED(AIO_HANDLE_ALIGNMENT) aio_handle_multiple
 #ifdef __cplusplus
 	: aio_handle
 #endif
