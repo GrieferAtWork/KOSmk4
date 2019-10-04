@@ -112,18 +112,18 @@ struct rpc_register_state64 {
 
 #ifdef __USE_KOS_KERNEL
 #if defined(__x86_64__) && defined(__KERNEL__)
-#define RPC_REGISTER_STATE64_INIT_ICPUSTATE(x, state)                 \
+#define RPC_REGISTER_STATE64_INIT_ICPUSTATE(x, state)          \
 	((x).rs_valid = ((__uint64_t)1 << RPC_X86_64_REGISTER_SP), \
 	 (x).rs_regs[RPC_X86_64_REGISTER_SP] = irregs_rdsp(&(state).ics_irregs))
 #elif !defined(__x86_64__)
-#define RPC_REGISTER_STATE64_INIT_ICPUSTATE(x, state)                 \
+#define RPC_REGISTER_STATE64_INIT_ICPUSTATE(x, state)          \
 	((x).rs_valid = ((__uint64_t)1 << RPC_X86_64_REGISTER_SP), \
 	 (x).rs_regs[RPC_X86_64_REGISTER_SP] = ICPUSTATE_USER_ESP(state))
-#else
-#define RPC_REGISTER_STATE64_INIT_ICPUSTATE(x, state)                 \
+#else /* !__x86_64__ */
+#define RPC_REGISTER_STATE64_INIT_ICPUSTATE(x, state)          \
 	((x).rs_valid = ((__uint64_t)1 << RPC_X86_64_REGISTER_SP), \
 	 (x).rs_regs[RPC_X86_64_REGISTER_SP] = ICPUSTATE_SP(state))
-#endif /* !__x86_64__ */
+#endif /* __x86_64__ */
 
 
 /* Apply modifications made by a given RPC register state to the given `state' */
@@ -180,7 +180,7 @@ rpc_register_state64_apply_icpustate(struct rpc_register_state64 *__restrict sel
 #else /* __KERNEL__ */
 	LIBRPC_PRIVATE_RESTORE_SIMPLE(RPC_X86_64_REGISTER_RSP, state->ics_irregs.ir_rsp);   /* [P] Stack pointer. */
 #endif /* !__KERNEL__ */
-#else
+#else /* __x86_64__ */
 	LIBRPC_PRIVATE_RESTORE_SIMPLE(RPC_X86_64_REGISTER_RAX, state->ics_gpregs.gp_eax);   /* [C] Accumulator. */
 	LIBRPC_PRIVATE_RESTORE_SIMPLE(RPC_X86_64_REGISTER_RCX, state->ics_gpregs.gp_ecx);   /* [C] Counter register. */
 	LIBRPC_PRIVATE_RESTORE_SIMPLE(RPC_X86_64_REGISTER_RDX, state->ics_gpregs.gp_edx);   /* [C] General purpose d-register. */
@@ -189,7 +189,7 @@ rpc_register_state64_apply_icpustate(struct rpc_register_state64 *__restrict sel
 	LIBRPC_PRIVATE_RESTORE_SIMPLE(RPC_X86_64_REGISTER_RBP, state->ics_gpregs.gp_ebp);   /* [P] Stack base pointer. */
 	LIBRPC_PRIVATE_RESTORE_SIMPLE(RPC_X86_64_REGISTER_RSI, state->ics_gpregs.gp_esi);   /* [P] Source pointer. */
 	LIBRPC_PRIVATE_RESTORE_SIMPLE(RPC_X86_64_REGISTER_RDI, state->ics_gpregs.gp_edi);   /* [P] Destination pointer. */
-#endif
+#endif /* !__x86_64__ */
 #ifdef __KERNEL__
 	if (RPC_REGISTER_STATE64_ISVALID(*self, RPC_X86_64_REGISTER_RIP))
 		irregs_wrip(&state->ics_irregs, (__uintptr_t)self->rs_regs[RPC_X86_64_REGISTER_RIP]);

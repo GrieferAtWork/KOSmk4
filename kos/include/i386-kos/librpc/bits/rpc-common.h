@@ -26,7 +26,7 @@
 #define RPC_SYSCALL_INFO_METHOD_CALLBACK        0x02 /* call into the ukern segment */
 #define RPC_SYSCALL_INFO_METHOD_LCALL7          0x03 /* lcall $7, ... */
 #define RPC_SYSCALL_INFO_METHOD_X86_64_SYSCALL  0x40 /* 64-bit code: int 80h / syscall */
-#define RPC_SYSCALL_INFO_METHOD_X86_64_CALLBACK 0x42 /* 64-bit code: call into the ukern segment / lcall 47, ... */
+#define RPC_SYSCALL_INFO_METHOD_X86_64_CALLBACK 0x42 /* 64-bit code: call into the ukern segment / lcall $7, ... */
 #define RPC_SYSCALL_INFO_METHOD_EMULATE         0xff /* Untyped system call emulation */
 
 #endif /* !_I386_KOS_LIBRPC_BITS_RPC_COMMON_H */

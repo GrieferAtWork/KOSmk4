@@ -21,7 +21,7 @@
 
 #include <__stdinc.h>
 
-/* Platform-independent, optimized string.h functions. */
+/* Platform-dependent, optimized string.h functions. */
 #if !defined(__NO_ATTR_FORCEINLINE) && \
     !defined(__NO_builtin_constant_p)
 #include <hybrid/host.h>
@@ -49,55 +49,67 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpy))(void *__restrict __dst,
 #endif
 	{
 		switch (__n_bytes) {
+
 		case 0:
 			return __dst;
+
 		case 1:
 			((__UINT8_TYPE__ *)__dst)[0] = ((__UINT8_TYPE__ const *)__src)[0];
 			return __dst;
+
 		case 2:
 			((__UINT16_TYPE__ *)__dst)[0] = ((__UINT16_TYPE__ const *)__src)[0];
 			return __dst;
+
 		case 3:
 			((__UINT16_TYPE__ *)__dst)[0] = ((__UINT16_TYPE__ const *)__src)[0];
 			((__UINT8_TYPE__ *)__dst)[2] = ((__UINT8_TYPE__ const *)__src)[2];
 			return __dst;
+
 		case 4:
 			((__UINT32_TYPE__ *)__dst)[0] = ((__UINT32_TYPE__ const *)__src)[0];
 			return __dst;
+
 		case 5:
 			((__UINT32_TYPE__ *)__dst)[0] = ((__UINT32_TYPE__ const *)__src)[0];
 			((__UINT8_TYPE__ *)__dst)[4] = ((__UINT8_TYPE__ const *)__src)[4];
 			return __dst;
+
 		case 6:
 			((__UINT32_TYPE__ *)__dst)[0] = ((__UINT32_TYPE__ const *)__src)[0];
 			((__UINT16_TYPE__ *)__dst)[2] = ((__UINT16_TYPE__ const *)__src)[2];
 			return __dst;
+
 #ifdef __x86_64__
 		case 8:
 			((__UINT64_TYPE__ *)__dst)[0] = ((__UINT64_TYPE__ const *)__src)[0];
 			return __dst;
+
 		case 9:
 			((__UINT64_TYPE__ *)__dst)[0] = ((__UINT64_TYPE__ const *)__src)[0];
 			((__UINT8_TYPE__ *)__dst)[8] = ((__UINT8_TYPE__ const *)__src)[8];
 			return __dst;
+
 		case 10:
 			((__UINT64_TYPE__ *)__dst)[0] = ((__UINT64_TYPE__ const *)__src)[0];
 			((__UINT16_TYPE__ *)__dst)[4] = ((__UINT16_TYPE__ const *)__src)[4];
 			return __dst;
+
 		case 12:
 			((__UINT64_TYPE__ *)__dst)[0] = ((__UINT64_TYPE__ const *)__src)[0];
 			((__UINT32_TYPE__ *)__dst)[3] = ((__UINT32_TYPE__ const *)__src)[3];
 			return __dst;
+
 		case 16:
 			((__UINT64_TYPE__ *)__dst)[0] = ((__UINT64_TYPE__ const *)__src)[0];
 			((__UINT64_TYPE__ *)__dst)[1] = ((__UINT64_TYPE__ const *)__src)[1];
 			return __dst;
-#else
+#else /* __x86_64__ */
 		case 8:
 			((__UINT32_TYPE__ *)__dst)[0] = ((__UINT32_TYPE__ const *)__src)[0];
 			((__UINT32_TYPE__ *)__dst)[1] = ((__UINT32_TYPE__ const *)__src)[1];
 			return __dst;
-#endif
+#endif /* !__x86_64__ */
 		default:
 			break;
 		}
@@ -111,7 +123,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpy))(void *__restrict __dst,
 				__asm__ __volatile__(
 #ifdef __KERNEL__
 				                     "cld\n\t"
-#endif
+#endif /* __KERNEL__ */
 				                     "rep; movsq\n\t"
 				                     ".if (%a8 & 3)\n\t"
 				                     "movsl\n\t"
@@ -136,7 +148,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpy))(void *__restrict __dst,
 				__asm__ __volatile__(
 #ifdef __KERNEL__
 				                     "cld\n\t"
-#endif
+#endif /* __KERNEL__ */
 				                     ".if (%a6 >= 32)\n\t"
 				                     "movsq\n\t"
 				                     ".endif\n\t"
@@ -167,13 +179,13 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpy))(void *__restrict __dst,
 				                     , "i" (__n_bytes)
 				                     );
 			}
-#else
+#else /* __x86_64__ */
 			if (__n_bytes >= 5 * 4) {
 				__register __ULONGPTR_TYPE__ __386_ecx;
 				__asm__ __volatile__(
 #ifdef __KERNEL__
 				                     "cld\n\t"
-#endif
+#endif /* __KERNEL__ */
 				                     "rep; movsl\n\t"
 				                     ".if (%a8 & 2)\n\t"
 				                     "movsw\n\t"
@@ -195,7 +207,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpy))(void *__restrict __dst,
 				__asm__ __volatile__(
 #ifdef __KERNEL__
 				                     "cld\n\t"
-#endif
+#endif /* __KERNEL__ */
 				                     ".if (%a6 >= 16)\n\t"
 				                     "movsl\n\t"
 				                     ".endif\n\t"
@@ -223,7 +235,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpy))(void *__restrict __dst,
 				                     , "i" (__n_bytes)
 				                     );
 			}
-#endif
+#endif /* !__x86_64__ */
 			return __dst;
 		}
 #else /* __COMPILER_HAVE_GCC_ASM */
@@ -245,33 +257,42 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempcpy))(void *__restrict __dst,
 #endif
 	{
 		switch (__n_bytes) {
+
 		case 0:
 			return __dst;
+
 		case 1:
 			((__UINT8_TYPE__ *)__dst)[0] = ((__UINT8_TYPE__ const *)__src)[0];
 			return (__UINT8_TYPE__ *)__dst + 1;
+
 		case 2:
 			((__UINT16_TYPE__ *)__dst)[0] = ((__UINT16_TYPE__ const *)__src)[0];
 			return (__UINT8_TYPE__ *)__dst + 2;
+
 		case 3:
 			((__UINT16_TYPE__ *)__dst)[0] = ((__UINT16_TYPE__ const *)__src)[0];
 			((__UINT8_TYPE__ *)__dst)[2] = ((__UINT8_TYPE__ const *)__src)[2];
 			return (__UINT8_TYPE__ *)__dst + 3;
+
 		case 4:
 			((__UINT32_TYPE__ *)__dst)[0] = ((__UINT32_TYPE__ const *)__src)[0];
 			return (__UINT8_TYPE__ *)__dst + 4;
+
 		case 5:
 			((__UINT32_TYPE__ *)__dst)[0] = ((__UINT32_TYPE__ const *)__src)[0];
 			((__UINT8_TYPE__ *)__dst)[4] = ((__UINT8_TYPE__ const *)__src)[4];
 			return (__UINT8_TYPE__ *)__dst + 5;
+
 		case 6:
 			((__UINT32_TYPE__ *)__dst)[0] = ((__UINT32_TYPE__ const *)__src)[0];
 			((__UINT16_TYPE__ *)__dst)[2] = ((__UINT16_TYPE__ const *)__src)[2];
 			return (__UINT8_TYPE__ *)__dst + 6;
+
 		case 8:
 			((__UINT32_TYPE__ *)__dst)[0] = ((__UINT32_TYPE__ const *)__src)[0];
 			((__UINT32_TYPE__ *)__dst)[1] = ((__UINT32_TYPE__ const *)__src)[1];
 			return (__UINT8_TYPE__ *)__dst + 8;
+
 		default:
 			break;
 		}
@@ -285,7 +306,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempcpy))(void *__restrict __dst,
 				__asm__ __volatile__(
 #ifdef __KERNEL__
 				                     "cld\n\t"
-#endif
+#endif /* __KERNEL__ */
 				                     "rep; movsq\n\t"
 				                     ".if (%a8 & 3)\n\t"
 				                     "movsl\n\t"
@@ -310,7 +331,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempcpy))(void *__restrict __dst,
 				__asm__ __volatile__(
 #ifdef __KERNEL__
 				                     "cld\n\t"
-#endif
+#endif /* __KERNEL__ */
 				                     ".if (%a6 >= 32)\n\t"
 				                     "movsq\n\t"
 				                     ".endif\n\t"
@@ -341,13 +362,13 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempcpy))(void *__restrict __dst,
 				                     , "i" (__n_bytes)
 				                     );
 			}
-#else
+#else /* __x86_64__ */
 			if (__n_bytes >= 5 * 4) {
 				__register __ULONGPTR_TYPE__ __386_ecx;
 				__asm__ __volatile__(
 #ifdef __KERNEL__
 				                     "cld\n\t"
-#endif
+#endif /* __KERNEL__ */
 				                     "rep; movsl\n\t"
 				                     ".if (%a8 & 2)\n\t"
 				                     "movsw\n\t"
@@ -369,7 +390,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempcpy))(void *__restrict __dst,
 				__asm__ __volatile__(
 #ifdef __KERNEL__
 				                     "cld\n\t"
-#endif
+#endif /* __KERNEL__ */
 				                     ".if (%a6 >= 16)\n\t"
 				                     "movsl\n\t"
 				                     ".endif\n\t"
@@ -397,7 +418,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempcpy))(void *__restrict __dst,
 				                     , "i" (__n_bytes)
 				                     );
 			}
-#endif
+#endif /* !__x86_64__ */
 			__builtin_assume(__386_edi == (__ULONGPTR_TYPE__)__dst + __n_bytes);
 			return (void *)__386_edi;
 		}

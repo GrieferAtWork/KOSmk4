@@ -106,11 +106,11 @@ struct rpc_register_state32 {
 #define RPC_REGISTER_STATE32_INIT_ICPUSTATE(x, state)       \
 	((x).rs_valid = ((__uint32_t)1 << RPC_386_REGISTER_SP), \
 	 (x).rs_regs[RPC_386_REGISTER_SP] = ICPUSTATE_USER_ESP(state))
-#else
+#else /* !__x86_64__ */
 #define RPC_REGISTER_STATE32_INIT_ICPUSTATE(x, state)       \
 	((x).rs_valid = ((__uint32_t)1 << RPC_386_REGISTER_SP), \
 	 (x).rs_regs[RPC_386_REGISTER_SP] = ICPUSTATE_SP(state))
-#endif /* !__x86_64__ */
+#endif /* __x86_64__ */
 
 
 /* Apply modifications made by a given RPC register state to the given `state' */
@@ -159,7 +159,7 @@ rpc_register_state32_apply_icpustate(struct rpc_register_state32 *__restrict sel
 #else /* __KERNEL__ */
 	LIBRPC_PRIVATE_RESTORE_SIMPLE(RPC_386_REGISTER_ESP, state->ics_irregs.ir_rsp);   /* [P] Stack pointer. */
 #endif /* !__KERNEL__ */
-#else
+#else /* __x86_64__ */
 	LIBRPC_PRIVATE_RESTORE_SIMPLE(RPC_386_REGISTER_EAX, state->ics_gpregs.gp_eax);   /* [C] Accumulator. */
 	LIBRPC_PRIVATE_RESTORE_SIMPLE(RPC_386_REGISTER_ECX, state->ics_gpregs.gp_ecx);   /* [C] Counter register. */
 	LIBRPC_PRIVATE_RESTORE_SIMPLE(RPC_386_REGISTER_EDX, state->ics_gpregs.gp_edx);   /* [C] General purpose d-register. */
@@ -168,7 +168,7 @@ rpc_register_state32_apply_icpustate(struct rpc_register_state32 *__restrict sel
 	LIBRPC_PRIVATE_RESTORE_SIMPLE(RPC_386_REGISTER_EBP, state->ics_gpregs.gp_ebp);   /* [P] Stack base pointer. */
 	LIBRPC_PRIVATE_RESTORE_SIMPLE(RPC_386_REGISTER_ESI, state->ics_gpregs.gp_esi);   /* [P] Source pointer. */
 	LIBRPC_PRIVATE_RESTORE_SIMPLE(RPC_386_REGISTER_EDI, state->ics_gpregs.gp_edi);   /* [P] Destination pointer. */
-#endif
+#endif /* !__x86_64__ */
 #ifdef __KERNEL__
 	if (RPC_REGISTER_STATE32_ISVALID(*self, RPC_386_REGISTER_EIP))
 		irregs_wrip(&state->ics_irregs, (__uintptr_t)self->rs_regs[RPC_386_REGISTER_EIP]);

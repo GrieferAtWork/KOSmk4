@@ -51,13 +51,13 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpyq))(void *__restrict __dst,
 			((__UINT64_TYPE__ *)__dst)[0] = ((__UINT64_TYPE__ const *)__src)[0];
 			((__UINT64_TYPE__ *)__dst)[1] = ((__UINT64_TYPE__ const *)__src)[1];
 			return (__UINT64_TYPE__ *)__dst;
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		case 1:
 			((__UINT32_TYPE__ *)__dst)[0] = ((__UINT32_TYPE__ const *)__src)[0];
 			((__UINT32_TYPE__ *)__dst)[1] = ((__UINT32_TYPE__ const *)__src)[1];
 			return (__UINT64_TYPE__ *)__dst;
-#endif
-    /* More optimizations for small data blocks that require more assignments (though no more than 4). */
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
+			/* More optimizations for small data blocks that require more assignments (though no more than 4). */
 #ifndef __OPTIMIZE_SIZE__
 #if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
 		case 3:
@@ -71,15 +71,15 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpyq))(void *__restrict __dst,
 			((__UINT64_TYPE__ *)__dst)[2] = ((__UINT64_TYPE__ const *)__src)[2];
 			((__UINT64_TYPE__ *)__dst)[3] = ((__UINT64_TYPE__ const *)__src)[3];
 			return (__UINT64_TYPE__ *)__dst;
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		case 2:
 			((__UINT32_TYPE__ *)__dst)[0] = ((__UINT32_TYPE__ const *)__src)[0];
 			((__UINT32_TYPE__ *)__dst)[1] = ((__UINT32_TYPE__ const *)__src)[1];
 			((__UINT32_TYPE__ *)__dst)[2] = ((__UINT32_TYPE__ const *)__src)[2];
 			((__UINT32_TYPE__ *)__dst)[3] = ((__UINT32_TYPE__ const *)__src)[3];
 			return (__UINT64_TYPE__ *)__dst;
-#endif
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
+#endif /* !__OPTIMIZE_SIZE__ */
 		default: break;
 		}
 	}
@@ -114,13 +114,14 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpyl))(void *__restrict __dst,
 			((__UINT64_TYPE__ *)__dst)[0] = ((__UINT64_TYPE__ const *)__src)[0];
 			((__UINT64_TYPE__ *)__dst)[1] = ((__UINT64_TYPE__ const *)__src)[1];
 			return (__UINT32_TYPE__ *)__dst;
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		case 2:
 			((__UINT32_TYPE__ *)__dst)[0] = ((__UINT32_TYPE__ const *)__src)[0];
 			((__UINT32_TYPE__ *)__dst)[1] = ((__UINT32_TYPE__ const *)__src)[1];
 			return (__UINT32_TYPE__ *)__dst;
-#endif
-    /* More optimizations for small data blocks that require more assignments (though no more than 4). */
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
+
+		/* More optimizations for small data blocks that require more assignments (though no more than 4). */
 #ifndef __OPTIMIZE_SIZE__
 #if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
 		case 5:
@@ -145,7 +146,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpyl))(void *__restrict __dst,
 			((__UINT64_TYPE__ *)__dst)[2] = ((__UINT64_TYPE__ const *)__src)[2];
 			((__UINT64_TYPE__ *)__dst)[3] = ((__UINT64_TYPE__ const *)__src)[3];
 			return (__UINT32_TYPE__ *)__dst;
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		case 3:
 			((__UINT32_TYPE__ *)__dst)[0] = ((__UINT32_TYPE__ const *)__src)[0];
 			((__UINT32_TYPE__ *)__dst)[1] = ((__UINT32_TYPE__ const *)__src)[1];
@@ -157,8 +158,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpyl))(void *__restrict __dst,
 			((__UINT32_TYPE__ *)__dst)[2] = ((__UINT32_TYPE__ const *)__src)[2];
 			((__UINT32_TYPE__ *)__dst)[3] = ((__UINT32_TYPE__ const *)__src)[3];
 			return (__UINT32_TYPE__ *)__dst;
-#endif
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
+#endif /* !__OPTIMIZE_SIZE__ */
 		default: break;
 		}
 #if defined(__CRT_HAVE_memcpyq) && __SIZEOF_BUSINT__ >= 8
@@ -172,7 +173,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpyl))(void *__restrict __dst,
 		if (!(__n_dwords & 1))
 			return __libc_slow_memcpyq(__dst, __src, __n_dwords >> 1);
 #endif /* __OPTIMIZE_SIZE__ */
-#endif
+#endif /* __CRT_HAVE_memcpyq && __SIZEOF_BUSINT__ >= 8 */
 	}
 	return __libc_slow_memcpyl(__dst, __src, __n_dwords);
 }
@@ -215,13 +216,13 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpyw))(void *__restrict __dst,
 			((__UINT64_TYPE__ *)__dst)[0] = ((__UINT64_TYPE__ const *)__src)[0];
 			((__UINT64_TYPE__ *)__dst)[1] = ((__UINT64_TYPE__ const *)__src)[1];
 			return (__UINT16_TYPE__ *)__dst;
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		case 4:
 			((__UINT32_TYPE__ *)__dst)[0] = ((__UINT32_TYPE__ const *)__src)[0];
 			((__UINT32_TYPE__ *)__dst)[1] = ((__UINT32_TYPE__ const *)__src)[1];
 			return (__UINT16_TYPE__ *)__dst;
-#endif
-    /* More optimizations for small data blocks that require more assignments (though no more than 4). */
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
+			/* More optimizations for small data blocks that require more assignments (though no more than 4). */
 #ifndef __OPTIMIZE_SIZE__
 #if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
 		case 7:
@@ -268,7 +269,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpyw))(void *__restrict __dst,
 			((__UINT64_TYPE__ *)__dst)[2] = ((__UINT64_TYPE__ const *)__src)[2];
 			((__UINT64_TYPE__ *)__dst)[3] = ((__UINT64_TYPE__ const *)__src)[3];
 			return (__UINT16_TYPE__ *)__dst;
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		case 5:
 			((__UINT32_TYPE__ *)__dst)[0] = ((__UINT32_TYPE__ const *)__src)[0];
 			((__UINT32_TYPE__ *)__dst)[1] = ((__UINT32_TYPE__ const *)__src)[1];
@@ -291,8 +292,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpyw))(void *__restrict __dst,
 			((__UINT32_TYPE__ *)__dst)[2] = ((__UINT32_TYPE__ const *)__src)[2];
 			((__UINT32_TYPE__ *)__dst)[3] = ((__UINT32_TYPE__ const *)__src)[3];
 			return (__UINT16_TYPE__ *)__dst;
-#endif
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
+#endif /* !__OPTIMIZE_SIZE__ */
 		default: break;
 		}
 #if defined(__CRT_HAVE_memcpyq) && __SIZEOF_BUSINT__ >= 8
@@ -314,7 +315,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpyw))(void *__restrict __dst,
 		if (!(__n_words & 7))
 			return (__UINT16_TYPE__ *)__libc_slow_memcpyq(__dst, __src, __n_words >> 3);
 #endif /* __OPTIMIZE_SIZE__ */
-#endif
+#endif /* __CRT_HAVE_memcpyq && __SIZEOF_BUSINT__ >= 8 */
 #if defined(__CRT_HAVE_memcpyl)
 #ifndef __OPTIMIZE_SIZE__
 		if (!(__n_words & 1))
@@ -326,7 +327,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpyw))(void *__restrict __dst,
 		if (!(__n_words & 1))
 			return __libc_slow_memcpyw(__dst, __src, __n_words >> 1);
 #endif /* __OPTIMIZE_SIZE__ */
-#endif
+#endif /* __CRT_HAVE_memcpyl */
 	}
 	return __libc_slow_memcpyw(__dst, __src, __n_words);
 }
@@ -385,13 +386,13 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpy))(void *__restrict __dst,
 			((__UINT64_TYPE__ *)__dst)[0] = ((__UINT64_TYPE__ const *)__src)[0];
 			((__UINT64_TYPE__ *)__dst)[1] = ((__UINT64_TYPE__ const *)__src)[1];
 			return __dst;
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		case 8:
 			((__UINT32_TYPE__ *)__dst)[0] = ((__UINT32_TYPE__ const *)__src)[0];
 			((__UINT32_TYPE__ *)__dst)[1] = ((__UINT32_TYPE__ const *)__src)[1];
 			return __dst;
-#endif
-    /* More optimizations for small data blocks that require more assignments (though no more than 4). */
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
+			/* More optimizations for small data blocks that require more assignments (though no more than 4). */
 #ifndef __OPTIMIZE_SIZE__
 		case 7:
 			((__UINT32_TYPE__ *)__dst)[0] = ((__UINT32_TYPE__ const *)__src)[0];
@@ -482,7 +483,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpy))(void *__restrict __dst,
 			((__UINT64_TYPE__ *)__dst)[2] = ((__UINT64_TYPE__ const *)__src)[2];
 			((__UINT64_TYPE__ *)__dst)[3] = ((__UINT64_TYPE__ const *)__src)[3];
 			return __dst;
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		case 9:
 			((__UINT32_TYPE__ *)__dst)[0] = ((__UINT32_TYPE__ const *)__src)[0];
 			((__UINT32_TYPE__ *)__dst)[1] = ((__UINT32_TYPE__ const *)__src)[1];
@@ -522,8 +523,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpy))(void *__restrict __dst,
 			((__UINT32_TYPE__ *)__dst)[2] = ((__UINT32_TYPE__ const *)__src)[2];
 			((__UINT32_TYPE__ *)__dst)[3] = ((__UINT32_TYPE__ const *)__src)[3];
 			return __dst;
-#endif
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
+#endif /* !__OPTIMIZE_SIZE__ */
 		default: break;
 		}
 #if defined(__CRT_HAVE_memcpyq) && __SIZEOF_BUSINT__ >= 8
@@ -549,7 +550,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpy))(void *__restrict __dst,
 		if (!(__n_bytes & 7))
 			return __libc_slow_memcpyq(__dst, __src, __n_bytes >> 3);
 #endif /* __OPTIMIZE_SIZE__ */
-#endif
+#endif /* __CRT_HAVE_memcpyq && __SIZEOF_BUSINT__ >= 8 */
 #if defined(__CRT_HAVE_memcpyl)
 #ifndef __OPTIMIZE_SIZE__
 		switch (__n_bytes & 3) {
@@ -569,7 +570,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpy))(void *__restrict __dst,
 		if (!(__n_bytes & 3))
 			return __libc_slow_memcpyl(__dst, __src, __n_bytes >> 2);
 #endif /* __OPTIMIZE_SIZE__ */
-#endif
+#endif /* __CRT_HAVE_memcpyl */
 #if defined(__CRT_HAVE_memcpyw)
 #ifndef __OPTIMIZE_SIZE__
 		if (!(__n_bytes & 1))
@@ -581,7 +582,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcpy))(void *__restrict __dst,
 		if (!(__n_bytes & 1))
 			return __libc_slow_memcpyw(__dst, __src, __n_bytes >> 1);
 #endif /* __OPTIMIZE_SIZE__ */
-#endif
+#endif /* __CRT_HAVE_memcpyw */
 	}
 	return __libc_slow_memcpy(__dst, __src, __n_bytes);
 }
@@ -609,13 +610,13 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempcpyq))(void *__restrict __dst,
 			((__UINT64_TYPE__ *)__dst)[0] = ((__UINT64_TYPE__ const *)__src)[0];
 			((__UINT64_TYPE__ *)__dst)[1] = ((__UINT64_TYPE__ const *)__src)[1];
 			return (__UINT64_TYPE__ *)((__UINT8_TYPE__ *)__dst + 16);
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		case 1:
 			((__UINT32_TYPE__ *)__dst)[0] = ((__UINT32_TYPE__ const *)__src)[0];
 			((__UINT32_TYPE__ *)__dst)[1] = ((__UINT32_TYPE__ const *)__src)[1];
 			return (__UINT64_TYPE__ *)((__UINT8_TYPE__ *)__dst + 8);
-#endif
-    /* More optimizations for small data blocks that require more assignments (though no more than 4). */
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
+			/* More optimizations for small data blocks that require more assignments (though no more than 4). */
 #ifndef __OPTIMIZE_SIZE__
 #if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
 		case 3:
@@ -629,15 +630,15 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempcpyq))(void *__restrict __dst,
 			((__UINT64_TYPE__ *)__dst)[2] = ((__UINT64_TYPE__ const *)__src)[2];
 			((__UINT64_TYPE__ *)__dst)[3] = ((__UINT64_TYPE__ const *)__src)[3];
 			return (__UINT64_TYPE__ *)((__UINT8_TYPE__ *)__dst + 32);
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		case 2:
 			((__UINT32_TYPE__ *)__dst)[0] = ((__UINT32_TYPE__ const *)__src)[0];
 			((__UINT32_TYPE__ *)__dst)[1] = ((__UINT32_TYPE__ const *)__src)[1];
 			((__UINT32_TYPE__ *)__dst)[2] = ((__UINT32_TYPE__ const *)__src)[2];
 			((__UINT32_TYPE__ *)__dst)[3] = ((__UINT32_TYPE__ const *)__src)[3];
 			return (__UINT64_TYPE__ *)((__UINT8_TYPE__ *)__dst + 16);
-#endif
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
+#endif /* !__OPTIMIZE_SIZE__ */
 		default: break;
 		}
 	}
@@ -673,13 +674,13 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempcpyl))(void *__restrict __dst,
 			((__UINT64_TYPE__ *)__dst)[0] = ((__UINT64_TYPE__ const *)__src)[0];
 			((__UINT64_TYPE__ *)__dst)[1] = ((__UINT64_TYPE__ const *)__src)[1];
 			return (__UINT32_TYPE__ *)((__UINT8_TYPE__ *)__dst + 16);
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		case 2:
 			((__UINT32_TYPE__ *)__dst)[0] = ((__UINT32_TYPE__ const *)__src)[0];
 			((__UINT32_TYPE__ *)__dst)[1] = ((__UINT32_TYPE__ const *)__src)[1];
 			return (__UINT32_TYPE__ *)((__UINT8_TYPE__ *)__dst + 8);
-#endif
-    /* More optimizations for small data blocks that require more assignments (though no more than 4). */
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
+			/* More optimizations for small data blocks that require more assignments (though no more than 4). */
 #ifndef __OPTIMIZE_SIZE__
 #if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
 		case 5:
@@ -704,7 +705,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempcpyl))(void *__restrict __dst,
 			((__UINT64_TYPE__ *)__dst)[2] = ((__UINT64_TYPE__ const *)__src)[2];
 			((__UINT64_TYPE__ *)__dst)[3] = ((__UINT64_TYPE__ const *)__src)[3];
 			return (__UINT32_TYPE__ *)((__UINT8_TYPE__ *)__dst + 32);
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		case 3:
 			((__UINT32_TYPE__ *)__dst)[0] = ((__UINT32_TYPE__ const *)__src)[0];
 			((__UINT32_TYPE__ *)__dst)[1] = ((__UINT32_TYPE__ const *)__src)[1];
@@ -716,8 +717,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempcpyl))(void *__restrict __dst,
 			((__UINT32_TYPE__ *)__dst)[2] = ((__UINT32_TYPE__ const *)__src)[2];
 			((__UINT32_TYPE__ *)__dst)[3] = ((__UINT32_TYPE__ const *)__src)[3];
 			return (__UINT32_TYPE__ *)((__UINT8_TYPE__ *)__dst + 16);
-#endif
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
+#endif /* !__OPTIMIZE_SIZE__ */
 		default: break;
 		}
 #if defined(__CRT_HAVE_mempcpyq) && __SIZEOF_BUSINT__ >= 8
@@ -731,7 +732,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempcpyl))(void *__restrict __dst,
 		if (!(__n_dwords & 1))
 			return __libc_slow_mempcpyq(__dst, __src, __n_dwords >> 1);
 #endif /* __OPTIMIZE_SIZE__ */
-#endif
+#endif /* __CRT_HAVE_mempcpyq && __SIZEOF_BUSINT__ >= 8 */
 	}
 	return __libc_slow_mempcpyl(__dst, __src, __n_dwords);
 }
@@ -775,12 +776,12 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempcpyw))(void *__restrict __dst,
 			((__UINT64_TYPE__ *)__dst)[0] = ((__UINT64_TYPE__ const *)__src)[0];
 			((__UINT64_TYPE__ *)__dst)[1] = ((__UINT64_TYPE__ const *)__src)[1];
 			return (__UINT16_TYPE__ *)((__UINT8_TYPE__ *)__dst + 16);
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		case 4:
 			((__UINT32_TYPE__ *)__dst)[0] = ((__UINT32_TYPE__ const *)__src)[0];
 			((__UINT32_TYPE__ *)__dst)[1] = ((__UINT32_TYPE__ const *)__src)[1];
 			return (__UINT16_TYPE__ *)((__UINT8_TYPE__ *)__dst + 8);
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
 		/* More optimizations for small data blocks that require more assignments (though no more than 4). */
 #ifndef __OPTIMIZE_SIZE__
 #if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
@@ -828,7 +829,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempcpyw))(void *__restrict __dst,
 			((__UINT64_TYPE__ *)__dst)[2] = ((__UINT64_TYPE__ const *)__src)[2];
 			((__UINT64_TYPE__ *)__dst)[3] = ((__UINT64_TYPE__ const *)__src)[3];
 			return (__UINT16_TYPE__ *)((__UINT8_TYPE__ *)__dst + 32);
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		case 5:
 			((__UINT32_TYPE__ *)__dst)[0] = ((__UINT32_TYPE__ const *)__src)[0];
 			((__UINT32_TYPE__ *)__dst)[1] = ((__UINT32_TYPE__ const *)__src)[1];
@@ -851,8 +852,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempcpyw))(void *__restrict __dst,
 			((__UINT32_TYPE__ *)__dst)[2] = ((__UINT32_TYPE__ const *)__src)[2];
 			((__UINT32_TYPE__ *)__dst)[3] = ((__UINT32_TYPE__ const *)__src)[3];
 			return (__UINT16_TYPE__ *)((__UINT8_TYPE__ *)__dst + 16);
-#endif
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
+#endif /* !__OPTIMIZE_SIZE__ */
 		default: break;
 		}
 #if defined(__CRT_HAVE_mempcpyq) && __SIZEOF_BUSINT__ >= 8
@@ -874,7 +875,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempcpyw))(void *__restrict __dst,
 		if (!(__n_words & 3))
 			return (__UINT16_TYPE__ *)__libc_slow_mempcpyq(__dst, __src, __n_words >> 2);
 #endif /* __OPTIMIZE_SIZE__ */
-#endif
+#endif /* __CRT_HAVE_mempcpyq && __SIZEOF_BUSINT__ >= 8 */
 #if defined(__CRT_HAVE_mempcpyl)
 #ifndef __OPTIMIZE_SIZE__
 		if (!(__n_words & 1))
@@ -886,7 +887,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempcpyw))(void *__restrict __dst,
 		if (!(__n_words & 1))
 			return (__UINT16_TYPE__ *)__libc_slow_mempcpyl(__dst, __src, __n_words >> 1);
 #endif /* __OPTIMIZE_SIZE__ */
-#endif
+#endif /* __CRT_HAVE_mempcpyl */
 	}
 	return __libc_slow_mempcpyw(__dst, __src, __n_words);
 }
@@ -945,12 +946,12 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempcpy))(void *__restrict __dst,
 			((__UINT64_TYPE__ *)__dst)[0] = ((__UINT64_TYPE__ const *)__src)[0];
 			((__UINT64_TYPE__ *)__dst)[1] = ((__UINT64_TYPE__ const *)__src)[1];
 			return (__UINT8_TYPE__ *)__dst + 16;
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		case 8:
 			((__UINT32_TYPE__ *)__dst)[0] = ((__UINT32_TYPE__ const *)__src)[0];
 			((__UINT32_TYPE__ *)__dst)[1] = ((__UINT32_TYPE__ const *)__src)[1];
 			return (__UINT8_TYPE__ *)__dst + 8;
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
 		/* More optimizations for small data blocks that require more assignments (though no more than 4). */
 #ifndef __OPTIMIZE_SIZE__
 		case 7:
@@ -1042,7 +1043,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempcpy))(void *__restrict __dst,
 			((__UINT64_TYPE__ *)__dst)[2] = ((__UINT64_TYPE__ const *)__src)[2];
 			((__UINT64_TYPE__ *)__dst)[3] = ((__UINT64_TYPE__ const *)__src)[3];
 			return (__UINT8_TYPE__ *)__dst + 32;
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		case 9:
 			((__UINT32_TYPE__ *)__dst)[0] = ((__UINT32_TYPE__ const *)__src)[0];
 			((__UINT32_TYPE__ *)__dst)[1] = ((__UINT32_TYPE__ const *)__src)[1];
@@ -1082,8 +1083,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempcpy))(void *__restrict __dst,
 			((__UINT32_TYPE__ *)__dst)[2] = ((__UINT32_TYPE__ const *)__src)[2];
 			((__UINT32_TYPE__ *)__dst)[3] = ((__UINT32_TYPE__ const *)__src)[3];
 			return (__UINT8_TYPE__ *)__dst + 16;
-#endif
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
+#endif /* !__OPTIMIZE_SIZE__ */
 		default: break;
 		}
 #if defined(__CRT_HAVE_mempcpyq) && __SIZEOF_BUSINT__ >= 8
@@ -1109,7 +1110,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempcpy))(void *__restrict __dst,
 		if (!(__n_bytes & 7))
 			return __libc_slow_mempcpyq(__dst, __src, __n_bytes >> 3);
 #endif /* __OPTIMIZE_SIZE__ */
-#endif
+#endif /* __CRT_HAVE_mempcpyq && __SIZEOF_BUSINT__ >= 8 */
 #if defined(__CRT_HAVE_mempcpyl)
 #ifndef __OPTIMIZE_SIZE__
 		switch (__n_bytes & 3) {
@@ -1129,7 +1130,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempcpy))(void *__restrict __dst,
 		if (!(__n_bytes & 3))
 			return __libc_slow_mempcpyl(__dst, __src, __n_bytes >> 2);
 #endif /* __OPTIMIZE_SIZE__ */
-#endif
+#endif /* __CRT_HAVE_mempcpyl */
 #if defined(__CRT_HAVE_mempcpyw)
 #ifndef __OPTIMIZE_SIZE__
 		if (!(__n_bytes & 1))
@@ -1141,8 +1142,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempcpy))(void *__restrict __dst,
 		if (!(__n_bytes & 1))
 			return __libc_slow_mempcpyw(__dst, __src, __n_bytes >> 1);
 #endif /* __OPTIMIZE_SIZE__ */
-
-#endif
+#endif /* __CRT_HAVE_mempcpyw */
 	}
 	return __libc_slow_mempcpy(__dst, __src, __n_bytes);
 }
@@ -1178,11 +1178,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memsetq))(void *__restrict __dst,
 				((__UINT64_TYPE__ *)__dst)[0] =
 				((__UINT64_TYPE__ *)__dst)[1] = __qword;
 				return (__UINT64_TYPE__ *)__dst;
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 			case 1:
 				((__UINT64_TYPE__ *)__dst)[0] = __qword;
 				return (__UINT64_TYPE__ *)__dst;
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
 			/* More optimizations for small data blocks that require more assignments (though no more than 4). */
 #ifndef __OPTIMIZE_SIZE__
 #if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
@@ -1197,13 +1197,13 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memsetq))(void *__restrict __dst,
 				((__UINT64_TYPE__ *)__dst)[2] =
 				((__UINT64_TYPE__ *)__dst)[3] = __qword;
 				return (__UINT64_TYPE__ *)__dst;
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 			case 2:
 				((__UINT64_TYPE__ *)__dst)[0] =
 				((__UINT64_TYPE__ *)__dst)[1] = __qword;
 				return (__UINT64_TYPE__ *)__dst;
-#endif
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
+#endif /* !__OPTIMIZE_SIZE__ */
 			default: break;
 			}
 		}
@@ -1276,12 +1276,12 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memsetl))(void *__restrict __dst,
 				((__UINT64_TYPE__ *)__dst)[0] =
 				((__UINT64_TYPE__ *)__dst)[1] = (__UINT64_TYPE__)((__UINT64_TYPE__)__dword * __UINT64_C(0x0000000100000001));
 				return (__UINT32_TYPE__ *)__dst;
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 			case 2:
 				((__UINT32_TYPE__ *)__dst)[0] =
 				((__UINT32_TYPE__ *)__dst)[1] = __dword;
 				return (__UINT32_TYPE__ *)__dst;
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
 
 			/* More optimizations for small data blocks that require more assignments (though no more than 4). */
 #ifndef __OPTIMIZE_SIZE__
@@ -1308,7 +1308,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memsetl))(void *__restrict __dst,
 				((__UINT64_TYPE__ *)__dst)[2] =
 				((__UINT64_TYPE__ *)__dst)[3] = (__UINT64_TYPE__)((__UINT64_TYPE__)__dword * __UINT64_C(0x0000000100000001));
 				return (__UINT32_TYPE__ *)__dst;
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 			case 3:
 				((__UINT32_TYPE__ *)__dst)[0] =
 				((__UINT32_TYPE__ *)__dst)[1] =
@@ -1320,8 +1320,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memsetl))(void *__restrict __dst,
 				((__UINT32_TYPE__ *)__dst)[2] =
 				((__UINT32_TYPE__ *)__dst)[3] = __dword;
 				return (__UINT32_TYPE__ *)__dst;
-#endif
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
+#endif /* !__OPTIMIZE_SIZE__ */
 			default: break;
 			}
 		}
@@ -1334,7 +1334,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memsetl))(void *__restrict __dst,
 		if (__n_dwords & 1)
 			((__UINT32_TYPE__ *)__temp)[0] = __dword;
 		return (__UINT32_TYPE__ *)__dst;
-#endif
+#endif /* __CRT_HAVE_mempsetq && __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 #endif /* !__OPTIMIZE_SIZE__ */
 	}
 #if !defined(__CRT_HAVE_memsetl) && \
@@ -1351,7 +1351,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memsetl))(void *__restrict __dst,
 			return (__UINT32_TYPE__ *)__libc_slow_memset(__dst, __dword & __UINT8_C(0xff), __n_dwords * 4);
 #endif /* __CRT_HAVE_memset */
 	}
-#endif /* !__CRT_HAVE_memsetl */
+#endif /* !__CRT_HAVE_memsetl && (__CRT_HAVE_memsetw || __CRT_HAVE_memset) */
 #ifdef __CRT_HAVE_bzero
 	if (__builtin_constant_p(__dword) && __dword == 0) {
 		__localdep_bzero(__dst, __n_dwords * 4);
@@ -1401,12 +1401,12 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memsetw))(void *__restrict __dst,
 				((__UINT64_TYPE__ *)__dst)[0] =
 				((__UINT64_TYPE__ *)__dst)[1] = (__UINT64_TYPE__)((__UINT64_TYPE__)__word * __UINT64_C(0x0001000100010001));
 				return (__UINT16_TYPE__ *)__dst;
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 			case 4:
 				((__UINT32_TYPE__ *)__dst)[0] =
 				((__UINT32_TYPE__ *)__dst)[1] = (__UINT32_TYPE__)((__UINT32_TYPE__)__word * __UINT32_C(0x00010001));
 				return (__UINT16_TYPE__ *)__dst;
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
 
 			/* More optimizations for small data blocks that require more assignments (though no more than 4). */
 #ifndef __OPTIMIZE_SIZE__
@@ -1455,7 +1455,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memsetw))(void *__restrict __dst,
 				((__UINT64_TYPE__ *)__dst)[2] =
 				((__UINT64_TYPE__ *)__dst)[3] = (__UINT64_TYPE__)((__UINT64_TYPE__)__word * __UINT64_C(0x0001000100010001));
 				return (__UINT16_TYPE__ *)__dst;
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 			case 5:
 				((__UINT32_TYPE__ *)__dst)[0] =
 				((__UINT32_TYPE__ *)__dst)[1] = (__UINT32_TYPE__)((__UINT32_TYPE__)__word * __UINT32_C(0x00010001));
@@ -1478,8 +1478,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memsetw))(void *__restrict __dst,
 				((__UINT32_TYPE__ *)__dst)[2] =
 				((__UINT32_TYPE__ *)__dst)[3] = (__UINT32_TYPE__)((__UINT32_TYPE__)__word * __UINT32_C(0x00010001));
 				return (__UINT16_TYPE__ *)__dst;
-#endif
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
+#endif /* !__OPTIMIZE_SIZE__ */
 			default: break;
 			}
 		}
@@ -1503,7 +1503,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memsetw))(void *__restrict __dst,
 			break;
 		}
 		return (__UINT16_TYPE__ *)__dst;
-#else
+#else /* __CRT_HAVE_mempsetq && __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		void *__temp;
 		__temp = __libc_slow_mempsetl(__dst,
 		                             (__UINT32_TYPE__)((__UINT32_TYPE__)__word * __UINT32_C(0x00010001)),
@@ -1511,7 +1511,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memsetw))(void *__restrict __dst,
 		if (__n_words & 1)
 			((__UINT16_TYPE__ *)__temp)[0] = __word;
 		return (__UINT16_TYPE__ *)__dst;
-#endif
+#endif /* !__CRT_HAVE_mempsetq || __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
 #endif /* !__OPTIMIZE_SIZE__ */
 	}
 #if !defined(__CRT_HAVE_memsetw) && defined(__CRT_HAVE_memset)
@@ -1584,12 +1584,12 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memset))(void *__restrict __dst,
 				((__UINT64_TYPE__ *)__dst)[0] =
 				((__UINT64_TYPE__ *)__dst)[1] = (__UINT64_TYPE__)((__UINT64_TYPE__)(__byte & __UINT8_C(0xff)) * __UINT64_C(0x0101010101010101));
 				return __dst;
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 			case 8:
 				((__UINT32_TYPE__ *)__dst)[0] =
 				((__UINT32_TYPE__ *)__dst)[1] = (__UINT32_TYPE__)((__UINT32_TYPE__)(__byte & __UINT8_C(0xff)) * __UINT32_C(0x01010101));
 				return __dst;
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
 
 			/* More optimizations for small data blocks that require more assignments (though no more than 4). */
 #ifndef __OPTIMIZE_SIZE__
@@ -1682,7 +1682,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memset))(void *__restrict __dst,
 				((__UINT64_TYPE__ *)__dst)[2] =
 				((__UINT64_TYPE__ *)__dst)[3] = (__UINT64_TYPE__)((__UINT64_TYPE__)(__byte & __UINT8_C(0xff)) * __UINT64_C(0x0101010101010101));
 				return __dst;
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 			case 9:
 				((__UINT32_TYPE__ *)__dst)[0] =
 				((__UINT32_TYPE__ *)__dst)[1] = (__UINT32_TYPE__)((__UINT32_TYPE__)(__byte & __UINT8_C(0xff)) * __UINT32_C(0x01010101));
@@ -1722,8 +1722,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memset))(void *__restrict __dst,
 				((__UINT32_TYPE__ *)__dst)[2] =
 				((__UINT32_TYPE__ *)__dst)[3] = (__UINT32_TYPE__)((__UINT32_TYPE__)(__byte & __UINT8_C(0xff)) * __UINT32_C(0x01010101));
 				return __dst;
-#endif
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
+#endif /* !__OPTIMIZE_SIZE__ */
 			default: break;
 			}
 		}
@@ -1769,7 +1769,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memset))(void *__restrict __dst,
 			break;
 		}
 		return __dst;
-#else
+#else /* __CRT_HAVE_mempsetq && __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		void *__temp;
 		__temp = __libc_slow_mempsetl(__dst,
 		                             (__UINT32_TYPE__)((__UINT32_TYPE__)(__byte & __UINT8_C(0xff)) * __UINT32_C(0x01010101)),
@@ -1788,7 +1788,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memset))(void *__restrict __dst,
 			break;
 		}
 		return __dst;
-#endif
+#endif /* !__CRT_HAVE_mempsetq || __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
 #endif /* !__OPTIMIZE_SIZE__ */
 	}
 #ifdef __CRT_HAVE_bzero
@@ -1823,11 +1823,11 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempsetq))(void *__restrict __dst,
 				((__UINT64_TYPE__ *)__dst)[0] =
 				((__UINT64_TYPE__ *)__dst)[1] = __qword;
 				return (__UINT64_TYPE__ *)((__UINT8_TYPE__ *)__dst + 16);
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 			case 1:
 				((__UINT64_TYPE__ *)__dst)[0] = __qword;
 				return (__UINT64_TYPE__ *)((__UINT8_TYPE__ *)__dst + 8);
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
 
 			/* More optimizations for small data blocks that require more assignments (though no more than 4). */
 #ifndef __OPTIMIZE_SIZE__
@@ -1843,13 +1843,13 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempsetq))(void *__restrict __dst,
 				((__UINT64_TYPE__ *)__dst)[2] =
 				((__UINT64_TYPE__ *)__dst)[3] = __qword;
 				return (__UINT64_TYPE__ *)((__UINT8_TYPE__ *)__dst + 32);
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 			case 2:
 				((__UINT64_TYPE__ *)__dst)[0] =
 				((__UINT64_TYPE__ *)__dst)[1] = __qword;
 				return (__UINT64_TYPE__ *)((__UINT8_TYPE__ *)__dst + 16);
-#endif
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
+#endif /* !__OPTIMIZE_SIZE__ */
 			default: break;
 			}
 		}
@@ -1923,12 +1923,12 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempsetl))(void *__restrict __dst,
 				((__UINT64_TYPE__ *)__dst)[0] =
 				((__UINT64_TYPE__ *)__dst)[1] = (__UINT64_TYPE__)((__UINT64_TYPE__)__dword * __UINT64_C(0x0000000100000001));
 				return (__UINT32_TYPE__ *)((__UINT8_TYPE__ *)__dst + 16);
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 			case 2:
 				((__UINT32_TYPE__ *)__dst)[0] =
 				((__UINT32_TYPE__ *)__dst)[1] = __dword;
 				return (__UINT32_TYPE__ *)((__UINT8_TYPE__ *)__dst + 8);
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
 
 			/* More optimizations for small data blocks that require more assignments (though no more than 4). */
 #ifndef __OPTIMIZE_SIZE__
@@ -1955,7 +1955,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempsetl))(void *__restrict __dst,
 				((__UINT64_TYPE__ *)__dst)[2] =
 				((__UINT64_TYPE__ *)__dst)[3] = (__UINT64_TYPE__)((__UINT64_TYPE__)__dword * __UINT64_C(0x0000000100000001));
 				return (__UINT32_TYPE__ *)((__UINT8_TYPE__ *)__dst + 32);
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 			case 3:
 				((__UINT32_TYPE__ *)__dst)[0] =
 				((__UINT32_TYPE__ *)__dst)[1] =
@@ -1967,8 +1967,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempsetl))(void *__restrict __dst,
 				((__UINT32_TYPE__ *)__dst)[2] =
 				((__UINT32_TYPE__ *)__dst)[3] = __dword;
 				return (__UINT32_TYPE__ *)((__UINT8_TYPE__ *)__dst + 16);
-#endif
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
+#endif /* !__OPTIMIZE_SIZE__ */
 			default: break;
 			}
 		}
@@ -1988,7 +1988,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempsetl))(void *__restrict __dst,
 			return (__UINT32_TYPE__ *)((__UINT8_TYPE__ *)__dst + 2);
 		}
 		return (__UINT32_TYPE__ *)__dst;
-#endif
+#endif /* __CRT_HAVE_mempsetq && __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 #endif /* !__OPTIMIZE_SIZE__ */
 	}
 #if !defined(__CRT_HAVE_memsetl) && !defined(__CRT_HAVE_mempsetl) && \
@@ -2006,7 +2006,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempsetl))(void *__restrict __dst,
 			return (__UINT32_TYPE__ *)__libc_slow_mempset(__dst, __dword & __UINT8_C(0xff), __n_dwords * 4);
 #endif /* __CRT_HAVE_memset || __CRT_HAVE_mempset */
 	}
-#endif /* !__CRT_HAVE_memsetl */
+#endif /* !__CRT_HAVE_memsetl && ... */
 #ifdef __CRT_HAVE_bzero
 	if (__builtin_constant_p(__dword) && __dword == 0) {
 		__localdep_bzero(__dst, __n_dwords * 4);
@@ -2056,12 +2056,12 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempsetw))(void *__restrict __dst,
 				((__UINT64_TYPE__ *)__dst)[0] =
 				((__UINT64_TYPE__ *)__dst)[1] = (__UINT64_TYPE__)((__UINT64_TYPE__)__word * __UINT64_C(0x0001000100010001));
 				return (__UINT16_TYPE__ *)((__UINT8_TYPE__ *)__dst + 16);
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 			case 4:
 				((__UINT32_TYPE__ *)__dst)[0] =
 				((__UINT32_TYPE__ *)__dst)[1] = (__UINT32_TYPE__)((__UINT32_TYPE__)__word * __UINT32_C(0x00010001));
 				return (__UINT16_TYPE__ *)((__UINT8_TYPE__ *)__dst + 8);
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
 
 			/* More optimizations for small data blocks that require more assignments (though no more than 4). */
 #ifndef __OPTIMIZE_SIZE__
@@ -2110,7 +2110,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempsetw))(void *__restrict __dst,
 				((__UINT64_TYPE__ *)__dst)[2] =
 				((__UINT64_TYPE__ *)__dst)[3] = (__UINT64_TYPE__)((__UINT64_TYPE__)__word * __UINT64_C(0x0001000100010001));
 				return (__UINT16_TYPE__ *)((__UINT8_TYPE__ *)__dst + 32);
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 			case 5:
 				((__UINT32_TYPE__ *)__dst)[0] =
 				((__UINT32_TYPE__ *)__dst)[1] = (__UINT32_TYPE__)((__UINT32_TYPE__)__word * __UINT32_C(0x00010001));
@@ -2133,8 +2133,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempsetw))(void *__restrict __dst,
 				((__UINT32_TYPE__ *)__dst)[2] =
 				((__UINT32_TYPE__ *)__dst)[3] = (__UINT32_TYPE__)((__UINT32_TYPE__)__word * __UINT32_C(0x00010001));
 				return (__UINT16_TYPE__ *)((__UINT8_TYPE__ *)__dst + 16);
-#endif
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
+#endif /* !__OPTIMIZE_SIZE__ */
 			default: break;
 			}
 		}
@@ -2163,7 +2163,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempsetw))(void *__restrict __dst,
 			return (__UINT16_TYPE__ *)((__UINT8_TYPE__ *)__dst + 6);
 		}
 		return (__UINT16_TYPE__ *)__dst;
-#else
+#else /* __CRT_HAVE_mempsetq && __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		__dst = __libc_slow_mempsetl(__dst,
 		                            (__UINT32_TYPE__)((__UINT32_TYPE__)__word * __UINT32_C(0x00010001)),
 		                             __n_words >> 1);
@@ -2172,7 +2172,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempsetw))(void *__restrict __dst,
 			return (__UINT16_TYPE__ *)__dst + 1;
 		}
 		return (__UINT16_TYPE__ *)__dst;
-#endif
+#endif /* !__CRT_HAVE_mempsetq || __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
 #endif /* !__OPTIMIZE_SIZE__ */
 	}
 #if !defined(__CRT_HAVE_memsetw) && !defined(__CRT_HAVE_mempsetw) && \
@@ -2246,12 +2246,12 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempset))(void *__restrict __dst,
 				((__UINT64_TYPE__ *)__dst)[0] =
 				((__UINT64_TYPE__ *)__dst)[1] = (__UINT64_TYPE__)((__UINT64_TYPE__)(__byte & __UINT8_C(0xff)) * __UINT64_C(0x0101010101010101));
 				return (__UINT8_TYPE__ *)__dst + 16;
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 			case 8:
 				((__UINT32_TYPE__ *)__dst)[0] =
 				((__UINT32_TYPE__ *)__dst)[1] = (__UINT32_TYPE__)((__UINT32_TYPE__)(__byte & __UINT8_C(0xff)) * __UINT32_C(0x01010101));
 				return (__UINT8_TYPE__ *)__dst + 8;
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
 
 			/* More optimizations for small data blocks that require more assignments (though no more than 4). */
 #ifndef __OPTIMIZE_SIZE__
@@ -2344,7 +2344,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempset))(void *__restrict __dst,
 				((__UINT64_TYPE__ *)__dst)[2] =
 				((__UINT64_TYPE__ *)__dst)[3] = (__UINT64_TYPE__)((__UINT64_TYPE__)(__byte & __UINT8_C(0xff)) * __UINT64_C(0x0101010101010101));
 				return (__UINT8_TYPE__ *)__dst + 32;
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 			case 9:
 				((__UINT32_TYPE__ *)__dst)[0] =
 				((__UINT32_TYPE__ *)__dst)[1] = (__UINT32_TYPE__)((__UINT32_TYPE__)(__byte & __UINT8_C(0xff)) * __UINT32_C(0x01010101));
@@ -2384,8 +2384,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempset))(void *__restrict __dst,
 				((__UINT32_TYPE__ *)__dst)[2] =
 				((__UINT32_TYPE__ *)__dst)[3] = (__UINT32_TYPE__)((__UINT32_TYPE__)(__byte & __UINT8_C(0xff)) * __UINT32_C(0x01010101));
 				return (__UINT8_TYPE__ *)__dst + 16;
-#endif
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
+#endif /* !__OPTIMIZE_SIZE__ */
 			default: break;
 			}
 		}
@@ -2430,7 +2430,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempset))(void *__restrict __dst,
 			return (__UINT8_TYPE__ *)__dst + 7;
 		}
 		return __dst;
-#else
+#else /* __CRT_HAVE_mempsetq && __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		__dst = __libc_slow_mempsetl(__dst,
 		                            (__UINT32_TYPE__)((__UINT32_TYPE__)(__byte & __UINT8_C(0xff)) * __UINT32_C(0x01010101)),
 		                             __n_bytes >> 2);
@@ -2448,7 +2448,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempset))(void *__restrict __dst,
 			return (__UINT8_TYPE__ *)__dst + 3;
 		}
 		return __dst;
-#endif
+#endif /* !__CRT_HAVE_mempsetq || __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
 #endif /* !__OPTIMIZE_SIZE__ */
 	}
 #ifdef __CRT_HAVE_bzero
@@ -2631,7 +2631,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memchrq))(void const *__restrict __hay
 			if (((__UINT64_TYPE__ *)__haystack)[3] == __qword)
 				return (__UINT64_TYPE__ *)__haystack + 3;
 			return __NULLPTR;
-#endif /* __SIZEOF_BUSINT__ >= 8 */
+#endif /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		default: break;
 		}
 	}
@@ -2751,7 +2751,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memrchrq))(void const *__restrict __ha
 			if (((__UINT64_TYPE__ *)__haystack)[2] == __qword)
 				return (__UINT64_TYPE__ *)__haystack + 2;
 			__ATTR_FALLTHROUGH
-#endif /* __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__) */
+#endif /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		case 2:
 			if (((__UINT64_TYPE__ *)__haystack)[1] == __qword)
 				return (__UINT64_TYPE__ *)__haystack + 1;
@@ -2813,9 +2813,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcmp))(void const *__restrict __s1,
 #define __DO_COMPARE32(off) __DO_COMPARE(__UINT32_TYPE__, off)
 #if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
 #define __DO_COMPARE64(off) __DO_COMPARE(__UINT64_TYPE__, off)
-#endif
-#else
-#define __DO_COMPARE8(off) \
+#endif /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
+#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
+#define __DO_COMPARE8(off)                                     \
 	{                                                          \
 		__UINT8_TYPE__ __x1 = *((__UINT8_TYPE__ *)__s1 + off), \
 		               __x2 = *((__UINT8_TYPE__ *)__s2 + off); \
@@ -2824,7 +2824,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcmp))(void const *__restrict __s1,
 		if (__x1 > __x2)                                       \
 			return 1;                                          \
 	}
-#define __DO_COMPARE16(off) \
+#define __DO_COMPARE16(off)                                          \
 	{                                                                \
 		__UINT16_TYPE__ __x1 = *((__UINT16_TYPE__ *)__s1 + off),     \
 		                __x2 = *((__UINT16_TYPE__ *)__s2 + off);     \
@@ -2838,7 +2838,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcmp))(void const *__restrict __s1,
 			return 1;                                                \
 		}                                                            \
 	}
-#define __DO_COMPARE32(off) \
+#define __DO_COMPARE32(off)                                                    \
 	{                                                                          \
 		__UINT32_TYPE__ __x1 = *((__UINT32_TYPE__ *)__s1 + off),               \
 		                __x2 = *((__UINT32_TYPE__ *)__s2 + off);               \
@@ -2861,7 +2861,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcmp))(void const *__restrict __s1,
 		}                                                                      \
 	}
 #if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
-#define __DO_COMPARE64(off) \
+#define __DO_COMPARE64(off)                                                                    \
 	{                                                                                          \
 		__UINT64_TYPE__ __x1 = *((__UINT64_TYPE__ *)__s1 + off),                               \
 		                __x2 = *((__UINT64_TYPE__ *)__s2 + off);                               \
@@ -2899,8 +2899,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcmp))(void const *__restrict __s1,
 			return 1;                                                                          \
 		}                                                                                      \
 	}
-#endif
-#endif
+#endif /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
+#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
 
 		/* Add constant cases all compares with less than 2 memory lookups. */
 		switch (__n_bytes) {
@@ -2947,12 +2947,12 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcmp))(void const *__restrict __s1,
 			__DO_COMPARE64(0)
 			__DO_COMPARE64(1)
 			return 0;
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		case 8:
 			__DO_COMPARE32(0)
 			__DO_COMPARE32(1)
 			return 0;
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
 			/* More optimizations for small data blocks that require more assignments (though no more than 4). */
 #ifndef __OPTIMIZE_SIZE__
 		case 7:
@@ -3044,7 +3044,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcmp))(void const *__restrict __s1,
 			__DO_COMPARE64(2)
 			__DO_COMPARE64(3)
 			return 0;
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		case 9:
 			__DO_COMPARE32(0)
 			__DO_COMPARE32(1)
@@ -3084,8 +3084,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcmp))(void const *__restrict __s1,
 			__DO_COMPARE32(2)
 			__DO_COMPARE32(3)
 			return 0;
-#endif
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
+#endif /* !__OPTIMIZE_SIZE__ */
 		default: break;
 		}
 #undef __DO_COMPARE64
@@ -3107,7 +3107,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcmpw))(void const *__restrict __s1,
                                                     __SIZE_TYPE__ __n_words) {
 	if (__builtin_constant_p(__n_words)) {
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-#define __DO_COMPARE(T, off) \
+#define __DO_COMPARE(T, off)         \
 	{                                \
 		T __x1 = *((T *)__s1 + off), \
 		  __x2 = *((T *)__s2 + off); \
@@ -3120,8 +3120,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcmpw))(void const *__restrict __s1,
 #define __DO_COMPARE32(off) __DO_COMPARE(__UINT32_TYPE__, off)
 #if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
 #define __DO_COMPARE64(off) __DO_COMPARE(__UINT64_TYPE__, off)
-#endif
-#else
+#endif /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
+#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
 #define __DO_COMPARE16(off) \
 	{                                                            \
 		__UINT16_TYPE__ __x1 = *((__UINT16_TYPE__ *)__s1 + off), \
@@ -3169,8 +3169,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcmpw))(void const *__restrict __s1,
 			return 1;                                                                      \
 		}                                                                                  \
 	}
-#endif
-#endif
+#endif /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
+#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
 
 		/* Add constant cases all compares with less than 2 memory lookups. */
 		switch (__n_words) {
@@ -3202,13 +3202,13 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcmpw))(void const *__restrict __s1,
 			__DO_COMPARE64(0)
 			__DO_COMPARE64(1)
 			return 0;
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		case 4:
 			__DO_COMPARE32(0)
 			__DO_COMPARE32(1)
 			return 0;
-#endif
-    /* More optimizations for small data blocks that require more assignments (though no more than 4). */
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
+			/* More optimizations for small data blocks that require more assignments (though no more than 4). */
 #ifndef __OPTIMIZE_SIZE__
 #if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
 		case 7:
@@ -3255,7 +3255,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcmpw))(void const *__restrict __s1,
 			__DO_COMPARE64(2)
 			__DO_COMPARE64(3)
 			return 0;
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		case 5:
 			__DO_COMPARE32(0)
 			__DO_COMPARE32(1)
@@ -3278,8 +3278,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcmpw))(void const *__restrict __s1,
 			__DO_COMPARE32(2)
 			__DO_COMPARE32(3)
 			return 0;
-#endif
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
+#endif /* !__OPTIMIZE_SIZE__ */
 		default: break;
 		}
 #undef __DO_COMPARE64
@@ -3312,8 +3312,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcmpl))(void const *__restrict __s1,
 #define __DO_COMPARE32(off) __DO_COMPARE(__UINT32_TYPE__, off)
 #if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
 #define __DO_COMPARE64(off) __DO_COMPARE(__UINT64_TYPE__, off)
-#endif
-#else
+#endif /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
+#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
 #define __DO_COMPARE32(off) \
 	{                                                            \
 		__UINT32_TYPE__ __x1 = *((__UINT32_TYPE__ *)__s1 + off), \
@@ -3339,8 +3339,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcmpl))(void const *__restrict __s1,
 			return 1;                                                              \
 		}                                                                          \
 	}
-#endif
-#endif
+#endif /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
+#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
 
 		/* Add constant cases all compares with less than 2 memory lookups. */
 		switch (__n_dwords) {
@@ -3361,12 +3361,12 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcmpl))(void const *__restrict __s1,
 			__DO_COMPARE64(0)
 			__DO_COMPARE64(1)
 			return 0;
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		case 2:
 			__DO_COMPARE32(0)
 			__DO_COMPARE32(1)
 			return 0;
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
 		/* More optimizations for small data blocks that require more assignments (though no more than 4). */
 #ifndef __OPTIMIZE_SIZE__
 #if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
@@ -3392,7 +3392,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcmpl))(void const *__restrict __s1,
 			__DO_COMPARE64(2)
 			__DO_COMPARE64(3)
 			return 0;
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		case 3:
 			__DO_COMPARE32(0)
 			__DO_COMPARE32(1)
@@ -3404,8 +3404,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcmpl))(void const *__restrict __s1,
 			__DO_COMPARE32(2)
 			__DO_COMPARE32(3)
 			return 0;
-#endif
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
+#endif /* !__OPTIMIZE_SIZE__ */
 		default:
 			break;
 		}
@@ -3439,8 +3439,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcmpq))(void const *__restrict __s1,
 #define __DO_COMPARE32(off) __DO_COMPARE(__UINT32_TYPE__, off)
 #if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
 #define __DO_COMPARE64(off) __DO_COMPARE(__UINT64_TYPE__, off)
-#endif
-#else
+#endif /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
+#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
 #define __DO_COMPARE32(off) \
 	{                                                            \
 		__UINT32_TYPE__ __x1 = *((__UINT32_TYPE__ *)__s1 + off), \
@@ -3466,8 +3466,8 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcmpq))(void const *__restrict __s1,
 			return 1;                                                              \
 		}                                                                          \
 	}
-#endif
-#endif
+#endif /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
+#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
 		/* Add constant cases all compares with less than 2 memory lookups. */
 		switch (__n_qwords) {
 		case 0:
@@ -3480,12 +3480,12 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcmpq))(void const *__restrict __s1,
 			__DO_COMPARE64(0)
 			__DO_COMPARE64(1)
 			return 0;
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		case 1:
 			__DO_COMPARE32(0)
 			__DO_COMPARE32(1)
 			return 0;
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
 		/* More optimizations for small data blocks that require more assignments (though no more than 4). */
 #ifndef __OPTIMIZE_SIZE__
 #if __SIZEOF_BUSINT__ >= 8 && defined(__UINT64_TYPE__)
@@ -3500,15 +3500,15 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memcmpq))(void const *__restrict __s1,
 			__DO_COMPARE64(2)
 			__DO_COMPARE64(3)
 			return 0;
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		case 2:
 			__DO_COMPARE32(0)
 			__DO_COMPARE32(1)
 			__DO_COMPARE32(2)
 			__DO_COMPARE32(3)
 			return 0;
-#endif
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
+#endif /* !__OPTIMIZE_SIZE__ */
 		default:
 			break;
 		}
@@ -3545,7 +3545,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memmoveq))(void *__dst,
 			((__UINT64_TYPE__ *)__dst)[1] = __temp;
 			return (__UINT64_TYPE__ *)__dst;
 		}	break;
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		case 1: {
 			__UINT32_TYPE__ __temp;
 			__temp = ((__UINT32_TYPE__ const *)__src)[1];
@@ -3553,7 +3553,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memmoveq))(void *__dst,
 			((__UINT32_TYPE__ *)__dst)[1] = __temp;
 			return (__UINT64_TYPE__ *)__dst;
 		}
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
 		/* More optimizations when the move can be done using
 		 * at most 4 read/writes, and at most 3 temporaries. */
 #ifndef __OPTIMIZE_SIZE__
@@ -3582,7 +3582,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memmoveq))(void *__dst,
 			((__UINT64_TYPE__ *)__dst)[3] = __temp3;
 			return (__UINT64_TYPE__ *)__dst;
 		}	break;
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		case 2: {
 			__UINT32_TYPE__ __temp1;
 			__UINT32_TYPE__ __temp2;
@@ -3596,7 +3596,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memmoveq))(void *__dst,
 			((__UINT32_TYPE__ *)__dst)[3] = __temp3;
 			return (__UINT64_TYPE__ *)__dst;
 		}
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
 #endif /* !__OPTIMIZE_SIZE__ */
 
 		default:
@@ -3642,7 +3642,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memmovel))(void *__dst,
 			((__UINT64_TYPE__ *)__dst)[1] = __temp;
 			return (__UINT32_TYPE__ *)__dst;
 		}	break;
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		case 2: {
 			__UINT32_TYPE__ __temp;
 			__temp = ((__UINT32_TYPE__ const *)__src)[1];
@@ -3650,7 +3650,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memmovel))(void *__dst,
 			((__UINT32_TYPE__ *)__dst)[1] = __temp;
 			return (__UINT32_TYPE__ *)__dst;
 		}	break;
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
 
 		/* More optimizations when the move can be done using
 		 * at most 4 read/writes, and at most 3 temporaries. */
@@ -3705,7 +3705,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memmovel))(void *__dst,
 			((__UINT64_TYPE__ *)__dst)[3] = __temp3;
 			return (__UINT32_TYPE__ *)__dst;
 		}	break;
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		case 3: {
 			__UINT32_TYPE__ __temp1;
 			__UINT32_TYPE__ __temp2;
@@ -3730,7 +3730,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memmovel))(void *__dst,
 			((__UINT32_TYPE__ *)__dst)[3] = __temp3;
 			return (__UINT32_TYPE__ *)__dst;
 		}
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
 #endif /* !__OPTIMIZE_SIZE__ */
 
 		default: break;
@@ -3750,7 +3750,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memmovel))(void *__dst,
 		if (!(__n_dwords & 1))
 			return (__UINT32_TYPE__ *)__libc_slow_memmoveq(__dst, __src, __n_dwords >> 1);
 #endif /* __OPTIMIZE_SIZE__ */
-#endif
+#endif /* __CRT_HAVE_memmoveq && __SIZEOF_BUSINT__ >= 8 */
 	}
 	return __libc_slow_memmovel(__dst, __src, __n_dwords);
 }
@@ -3809,7 +3809,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memmovew))(void *__dst,
 			((__UINT64_TYPE__ *)__dst)[1] = __temp;
 			return (__UINT16_TYPE__ *)__dst;
 		}	break;
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		case 4: {
 			__UINT32_TYPE__ __temp;
 			__temp = ((__UINT32_TYPE__ const *)__src)[1];
@@ -3817,7 +3817,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memmovew))(void *__dst,
 			((__UINT32_TYPE__ *)__dst)[1] = __temp;
 			return (__UINT16_TYPE__ *)__dst;
 		}
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
 
 		/* More optimizations when the move can be done using
 		 * at most 4 read/writes, and at most 3 temporaries. */
@@ -3911,7 +3911,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memmovew))(void *__dst,
 			((__UINT64_TYPE__ *)__dst)[3] = __temp3;
 			return (__UINT16_TYPE__ *)__dst;
 		}	break;
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		case 5: {
 			__UINT32_TYPE__ __temp1;
 			__UINT16_TYPE__ __temp2;
@@ -3961,7 +3961,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memmovew))(void *__dst,
 			((__UINT32_TYPE__ *)__dst)[3] = __temp3;
 			return (__UINT16_TYPE__ *)__dst;
 		}
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
 #endif /* !__OPTIMIZE_SIZE__ */
 
 		default:
@@ -3993,7 +3993,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memmovew))(void *__dst,
 		if (!(__n_words & 3))
 			return (__UINT16_TYPE__ *)__libc_slow_memmoveq(__dst, __src, __n_words >> 2);
 #endif /* __OPTIMIZE_SIZE__ */
-#endif
+#endif /* __CRT_HAVE_memmoveq && __SIZEOF_BUSINT__ >= 8 */
 #if defined(__CRT_HAVE_memmovel)
 #ifndef __OPTIMIZE_SIZE__
 		if (!(__n_words & 1))
@@ -4009,7 +4009,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memmovew))(void *__dst,
 		if (!(__n_words & 1))
 			return (__UINT16_TYPE__ *)__libc_slow_memmovel(__dst, __src, __n_words >> 1);
 #endif /* __OPTIMIZE_SIZE__ */
-#endif
+#endif /* __CRT_HAVE_memmovel */
 	}
 	return __libc_slow_memmovew(__dst, __src, __n_words);
 }
@@ -4094,7 +4094,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memmove))(void *__dst,
 			((__UINT64_TYPE__ *)__dst)[1] = __temp;
 			return __dst;
 		}	break;
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		case 8: {
 			__UINT32_TYPE__ __temp;
 			__temp = ((__UINT32_TYPE__ const *)__src)[1];
@@ -4102,7 +4102,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memmove))(void *__dst,
 			((__UINT32_TYPE__ *)__dst)[1] = __temp;
 			return __dst;
 		}
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
 
 		/* More optimizations when the move can be done using
 		 * at most 4 read/writes, and at most 3 temporaries. */
@@ -4306,7 +4306,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memmove))(void *__dst,
 			((__UINT64_TYPE__ *)__dst)[3] = __temp3;
 			return __dst;
 		}	break;
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		case 9: {
 			__UINT32_TYPE__ __temp1;
 			__UINT8_TYPE__ __temp2;
@@ -4395,7 +4395,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memmove))(void *__dst,
 			((__UINT32_TYPE__ *)__dst)[3] = __temp3;
 			return __dst;
 		}
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
 #endif /* !__OPTIMIZE_SIZE__ */
 
 		default:
@@ -4436,7 +4436,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memmove))(void *__dst,
 		if (!(__n_bytes & 7))
 			return __libc_slow_memmoveq(__dst, __src, __n_bytes >> 3);
 #endif /* __OPTIMIZE_SIZE__ */
-#endif
+#endif /* __CRT_HAVE_memmoveq && __SIZEOF_BUSINT__ >= 8 */
 #if defined(__CRT_HAVE_memmovel)
 #ifndef __OPTIMIZE_SIZE__
 		switch (__n_bytes & 3) {
@@ -4464,7 +4464,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memmove))(void *__dst,
 		if (!(__n_bytes & 3))
 			return __libc_slow_memmovel(__dst, __src, __n_bytes >> 2);
 #endif /* __OPTIMIZE_SIZE__ */
-#endif
+#endif /* __CRT_HAVE_memmovel */
 #if defined(__CRT_HAVE_memmovew)
 #ifndef __OPTIMIZE_SIZE__
 		if (!(__n_bytes & 1))
@@ -4480,7 +4480,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(memmove))(void *__dst,
 		if (!(__n_bytes & 1))
 			return __libc_slow_memmovew(__dst, __src, __n_bytes >> 1);
 #endif /* __OPTIMIZE_SIZE__ */
-#endif
+#endif /* __CRT_HAVE_memmovew */
 	}
 	return __libc_slow_memmove(__dst, __src, __n_bytes);
 }
@@ -4510,7 +4510,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmoveq))(void *__dst,
 			((__UINT64_TYPE__ *)__dst)[1] = __temp;
 			return (__UINT64_TYPE__ *)((__BYTE_TYPE__ *)__dst + 16);
 		}	break;
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		case 1: {
 			__UINT32_TYPE__ __temp;
 			__temp = ((__UINT32_TYPE__ const *)__src)[1];
@@ -4518,7 +4518,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmoveq))(void *__dst,
 			((__UINT32_TYPE__ *)__dst)[1] = __temp;
 			return (__UINT64_TYPE__ *)((__BYTE_TYPE__ *)__dst + 8);
 		}
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
 
 		/* More optimizations when the move can be done using
 		 * at most 4 read/writes, and at most 3 temporaries. */
@@ -4548,7 +4548,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmoveq))(void *__dst,
 			((__UINT64_TYPE__ *)__dst)[3] = __temp3;
 			return (__UINT64_TYPE__ *)((__BYTE_TYPE__ *)__dst + 32);
 		}	break;
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		case 2: {
 			__UINT32_TYPE__ __temp1;
 			__UINT32_TYPE__ __temp2;
@@ -4562,7 +4562,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmoveq))(void *__dst,
 			((__UINT32_TYPE__ *)__dst)[3] = __temp3;
 			return (__UINT64_TYPE__ *)((__BYTE_TYPE__ *)__dst + 16);
 		}
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
 #endif /* !__OPTIMIZE_SIZE__ */
 
 		default:
@@ -4608,7 +4608,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmovel))(void *__dst,
 			((__UINT64_TYPE__ *)__dst)[1] = __temp;
 			return (__UINT32_TYPE__ *)((__BYTE_TYPE__ *)__dst + 16);
 		}	break;
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		case 2: {
 			__UINT32_TYPE__ __temp;
 			__temp = ((__UINT32_TYPE__ const *)__src)[1];
@@ -4616,7 +4616,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmovel))(void *__dst,
 			((__UINT32_TYPE__ *)__dst)[1] = __temp;
 			return (__UINT32_TYPE__ *)((__BYTE_TYPE__ *)__dst + 8);
 		}
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
 
 		/* More optimizations when the move can be done using
 		 * at most 4 read/writes, and at most 3 temporaries. */
@@ -4671,7 +4671,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmovel))(void *__dst,
 			((__UINT64_TYPE__ *)__dst)[3] = __temp3;
 			return (__UINT32_TYPE__ *)((__BYTE_TYPE__ *)__dst + 32);
 		}	break;
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		case 3: {
 			__UINT32_TYPE__ __temp1;
 			__UINT32_TYPE__ __temp2;
@@ -4696,7 +4696,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmovel))(void *__dst,
 			((__UINT32_TYPE__ *)__dst)[3] = __temp3;
 			return (__UINT32_TYPE__ *)((__BYTE_TYPE__ *)__dst + 16);
 		}
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
 #endif /* !__OPTIMIZE_SIZE__ */
 
 		default:
@@ -4717,7 +4717,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmovel))(void *__dst,
 		if (!(__n_dwords & 1))
 			return (__UINT32_TYPE__ *)__libc_slow_mempmoveq(__dst, __src, __n_dwords >> 1);
 #endif /* __OPTIMIZE_SIZE__ */
-#endif
+#endif /* __CRT_HAVE_mempmoveq && __SIZEOF_BUSINT__ >= 8 */
 	}
 	return __libc_slow_mempmovel(__dst, __src, __n_dwords);
 }
@@ -4775,7 +4775,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmovew))(void *__dst,
 			((__UINT64_TYPE__ *)__dst)[1] = __temp;
 			return (__UINT16_TYPE__ *)((__BYTE_TYPE__ *)__dst + 16);
 		}	break;
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		case 4: {
 			__UINT32_TYPE__ __temp;
 			__temp = ((__UINT32_TYPE__ const *)__src)[1];
@@ -4783,7 +4783,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmovew))(void *__dst,
 			((__UINT32_TYPE__ *)__dst)[1] = __temp;
 			return (__UINT16_TYPE__ *)((__BYTE_TYPE__ *)__dst + 8);
 		}
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
 
 		/* More optimizations when the move can be done using
 		 * at most 4 read/writes, and at most 3 temporaries. */
@@ -4877,7 +4877,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmovew))(void *__dst,
 			((__UINT64_TYPE__ *)__dst)[3] = __temp3;
 			return (__UINT16_TYPE__ *)((__BYTE_TYPE__ *)__dst + 32);
 		}	break;
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		case 5: {
 			__UINT32_TYPE__ __temp1;
 			__UINT16_TYPE__ __temp2;
@@ -4927,7 +4927,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmovew))(void *__dst,
 			((__UINT32_TYPE__ *)__dst)[3] = __temp3;
 			return (__UINT16_TYPE__ *)((__BYTE_TYPE__ *)__dst + 16);
 		}
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
 #endif /* !__OPTIMIZE_SIZE__ */
 
 		default:
@@ -4959,7 +4959,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmovew))(void *__dst,
 		if (!(__n_words & 3))
 			return (__UINT16_TYPE__ *)__libc_slow_mempmoveq(__dst, __src, __n_words >> 2);
 #endif /* __OPTIMIZE_SIZE__ */
-#endif
+#endif /* __CRT_HAVE_mempmoveq && __SIZEOF_BUSINT__ >= 8 */
 #if defined(__CRT_HAVE_mempmovel)
 #ifndef __OPTIMIZE_SIZE__
 		if (!(__n_words & 1))
@@ -4974,7 +4974,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmovew))(void *__dst,
 		if (!(__n_words & 1))
 			return (__UINT16_TYPE__ *)__libc_slow_mempmovel(__dst, __src, __n_words >> 1);
 #endif /* __OPTIMIZE_SIZE__ */
-#endif
+#endif /* __CRT_HAVE_mempmovel */
 	}
 	return __libc_slow_mempmovew(__dst, __src, __n_words);
 }
@@ -5059,7 +5059,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmove))(void *__dst,
 			((__UINT64_TYPE__ *)__dst)[1] = __temp;
 			return (__BYTE_TYPE__ *)__dst + 16;
 		}	break;
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		case 8: {
 			__UINT32_TYPE__ __temp;
 			__temp = ((__UINT32_TYPE__ const *)__src)[1];
@@ -5067,7 +5067,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmove))(void *__dst,
 			((__UINT32_TYPE__ *)__dst)[1] = __temp;
 			return (__BYTE_TYPE__ *)__dst + 8;
 		}
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
 
 		/* More optimizations when the move can be done using
 		 * at most 4 read/writes, and at most 3 temporaries. */
@@ -5271,7 +5271,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmove))(void *__dst,
 			((__UINT64_TYPE__ *)__dst)[3] = __temp3;
 			return (__BYTE_TYPE__ *)__dst + 32;
 		}	break;
-#else
+#else /* __SIZEOF_BUSINT__ >= 8 && __UINT64_TYPE__ */
 		case 9: {
 			__UINT32_TYPE__ __temp1;
 			__UINT8_TYPE__ __temp2;
@@ -5360,7 +5360,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmove))(void *__dst,
 			((__UINT32_TYPE__ *)__dst)[3] = __temp3;
 			return (__BYTE_TYPE__ *)__dst + 16;
 		}
-#endif
+#endif /* __SIZEOF_BUSINT__ < 8 || !__UINT64_TYPE__ */
 #endif /* !__OPTIMIZE_SIZE__ */
 
 		default:
@@ -5400,7 +5400,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmove))(void *__dst,
 		if (!(__n_bytes & 7))
 			return __libc_slow_mempmoveq(__dst, __src, __n_bytes >> 3);
 #endif /* __OPTIMIZE_SIZE__ */
-#endif
+#endif /* __CRT_HAVE_mempmoveq && __SIZEOF_BUSINT__ >= 8 */
 #if defined(__CRT_HAVE_mempmovel)
 #ifndef __OPTIMIZE_SIZE__
 		switch (__n_bytes & 3) {
@@ -5427,7 +5427,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmove))(void *__dst,
 		if (!(__n_bytes & 3))
 			return __libc_slow_mempmovel(__dst, __src, __n_bytes >> 2);
 #endif /* __OPTIMIZE_SIZE__ */
-#endif
+#endif /* __CRT_HAVE_mempmovel */
 #if defined(__CRT_HAVE_mempmovew)
 #ifndef __OPTIMIZE_SIZE__
 		if (!(__n_bytes & 1))
@@ -5442,7 +5442,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempmove))(void *__dst,
 		if (!(__n_bytes & 1))
 			return __libc_slow_mempmovew(__dst, __src, __n_bytes >> 1);
 #endif /* __OPTIMIZE_SIZE__ */
-#endif
+#endif /* __CRT_HAVE_mempmovew */
 	}
 	return __libc_slow_mempmove(__dst, __src, __n_bytes);
 }
@@ -5465,7 +5465,6 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempatw))(void *__restrict __dst,
 	}
 	return __libc_slow_mempatw(__dst, __pattern, __n_bytes);
 }
-
 #endif /* !__fast_mempatw_defined */
 
 #ifndef __fast_mempatl_defined
@@ -5487,7 +5486,6 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempatl))(void *__restrict __dst,
 	}
 	return __libc_slow_mempatl(__dst, __pattern, __n_bytes);
 }
-
 #endif /* !__fast_mempatw_defined */
 
 #ifdef __UINT64_TYPE__
@@ -5514,7 +5512,6 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_FAST_NAME(mempatq))(void *__restrict __dst,
 	}
 	return __libc_slow_mempatq(__dst, __pattern, __n_bytes);
 }
-
 #endif /* !__fast_mempatw_defined */
 #endif /* __UINT64_TYPE__ */
 

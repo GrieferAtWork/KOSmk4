@@ -541,7 +541,7 @@
 #   define __NO_builtin_assume     1
 #   define __builtin_assume(x)     (void)0
 #endif
-#endif
+#endif /* !__has_builtin(__builtin_assume) */
 #endif
 #if __GCC_VERSION(4,3,0) && (!defined(__GCCXML__) && \
    !defined(__clang__) && !defined(unix) && \
