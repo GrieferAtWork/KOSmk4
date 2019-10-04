@@ -25,16 +25,16 @@
 #include <drivers/ata.h>
 #include <drivers/pci.h>
 #include <kernel/aio.h>
+#include <kernel/compat.h>
+#include <kernel/driver-param.h>
 #include <kernel/except.h>
 #include <kernel/heap.h>
 #include <kernel/interrupt.h>
 #include <kernel/pic.h>
 #include <kernel/printk.h>
-#include <kernel/compat.h>
 #include <kernel/types.h>
-#include <kernel/vm.h>
 #include <kernel/user.h>
-#include <kernel/driver-param.h>
+#include <kernel/vm.h>
 #include <sched/cpu.h>
 
 #include <hybrid/align.h>
@@ -44,13 +44,14 @@
 #include <hybrid/overflow.h>
 
 #include <kos/dev.h>
+#include <kos/except-io.h>
 #include <kos/jiffies.h>
+#include <linux/hdreg.h>
 #include <sys/io.h>
 
 #include <assert.h>
 #include <stddef.h>
 #include <string.h>
-#include <linux/hdreg.h>
 
 DECL_BEGIN
 
@@ -427,16 +428,21 @@ err:
 }
 
 
+typedef u32 errr_t; /* ERRor and Reason */
+#define ERRR(error, reason) (ERROR_CODEOF(error) | (reason) << 16)
+#define ERRR_OK              ERRR(E_OK, 0)
+#define ERRR_E(x)           ((x) & 0xffff)
+#define ERRR_R(x)           (((x) >> 16) & 0xffff)
 
 /* PIO-based data transfer helpers for passing data to/from an ATA drive. */
-LOCAL error_code_t KCALL Ata_ReceiveDataSectors(struct ata_bus *__restrict bus, struct ata_drive *__restrict drive, USER CHECKED byte_t *buffer, u16 num_sectors);
-LOCAL error_code_t KCALL Ata_ReceiveDataSectorsPhys(struct ata_bus *__restrict bus, struct ata_drive *__restrict drive, vm_phys_t buffer, u16 num_sectors);
-LOCAL error_code_t KCALL Ata_ReceiveDataSectorsVector(struct ata_bus *__restrict bus, struct ata_drive *__restrict drive, struct aio_buffer *__restrict buffer, u16 num_sectors);
-LOCAL error_code_t KCALL Ata_ReceiveDataSectorsVectorPhys(struct ata_bus *__restrict bus, struct ata_drive *__restrict drive, struct aio_pbuffer *__restrict buffer, u16 num_sectors);
-LOCAL error_code_t KCALL Ata_TransmitDataSectors(struct ata_bus *__restrict bus, struct ata_drive *__restrict drive, USER CHECKED byte_t const *buffer, u16 num_sectors);
-LOCAL error_code_t KCALL Ata_TransmitDataSectorsPhys(struct ata_bus *__restrict bus, struct ata_drive *__restrict drive, vm_phys_t buffer, u16 num_sectors);
-LOCAL error_code_t KCALL Ata_TransmitDataSectorsVector(struct ata_bus *__restrict bus, struct ata_drive *__restrict drive, struct aio_buffer *__restrict buffer, u16 num_sectors);
-LOCAL error_code_t KCALL Ata_TransmitDataSectorsVectorPhys(struct ata_bus *__restrict bus, struct ata_drive *__restrict drive, struct aio_pbuffer *__restrict buffer, u16 num_sectors);
+LOCAL errr_t KCALL Ata_ReceiveDataSectors(struct ata_bus *__restrict bus, struct ata_drive *__restrict drive, USER CHECKED byte_t *buffer, u16 num_sectors);
+LOCAL errr_t KCALL Ata_ReceiveDataSectorsPhys(struct ata_bus *__restrict bus, struct ata_drive *__restrict drive, vm_phys_t buffer, u16 num_sectors);
+LOCAL errr_t KCALL Ata_ReceiveDataSectorsVector(struct ata_bus *__restrict bus, struct ata_drive *__restrict drive, struct aio_buffer *__restrict buffer, u16 num_sectors);
+LOCAL errr_t KCALL Ata_ReceiveDataSectorsVectorPhys(struct ata_bus *__restrict bus, struct ata_drive *__restrict drive, struct aio_pbuffer *__restrict buffer, u16 num_sectors);
+LOCAL errr_t KCALL Ata_TransmitDataSectors(struct ata_bus *__restrict bus, struct ata_drive *__restrict drive, USER CHECKED byte_t const *buffer, u16 num_sectors);
+LOCAL errr_t KCALL Ata_TransmitDataSectorsPhys(struct ata_bus *__restrict bus, struct ata_drive *__restrict drive, vm_phys_t buffer, u16 num_sectors);
+LOCAL errr_t KCALL Ata_TransmitDataSectorsVector(struct ata_bus *__restrict bus, struct ata_drive *__restrict drive, struct aio_buffer *__restrict buffer, u16 num_sectors);
+LOCAL errr_t KCALL Ata_TransmitDataSectorsVectorPhys(struct ata_bus *__restrict bus, struct ata_drive *__restrict drive, struct aio_pbuffer *__restrict buffer, u16 num_sectors);
 
 
 
@@ -448,45 +454,54 @@ LOCAL error_code_t KCALL Ata_TransmitDataSectorsVectorPhys(struct ata_bus *__res
 #define ATA_SELECT_DELAY(ctrl) \
 	(inb(ctrl), inb(ctrl), inb(ctrl), inb(ctrl))
 
-PRIVATE NOBLOCK error_code_t
+LOCAL NOBLOCK errr_t
+NOTHROW(KCALL ATA_GetErrrForStatusRegister)(u8 status) {
+	if ((status & (ATA_DCR_ERR | ATA_DCR_DF)) == (ATA_DCR_ERR | ATA_DCR_DF))
+		return ERRR(E_IOERROR_ERRORBIT, E_IOERROR_REASON_ATA_DCR_ERR_DF);
+	return ERRR(E_IOERROR_ERRORBIT,
+	            status & ATA_DCR_ERR ? E_IOERROR_REASON_ATA_DCR_ERR
+	                                 : E_IOERROR_REASON_ATA_DCR_DF);
+}
+
+PRIVATE NOBLOCK errr_t
 NOTHROW(KCALL Ata_WaitForBusy)(port_t ctrl) {
 	u8 status;
 	volatile unsigned int timeout;
 	if (!(inb(ctrl) & ATA_DCR_BSY))
-		return E_OK;
+		return ERRR_OK;
 	/* XXX: this is _really_ unspecific. - It'd be better to use some kind of clock... */
 	timeout = 0x10000000;
 	while ((status = inb(ctrl)) & ATA_DCR_BSY) {
 		if unlikely(status & (ATA_DCR_ERR | ATA_DCR_DF))
-			return E_IOERROR_ERRORBIT;
+			return ATA_GetErrrForStatusRegister(status);
 		if unlikely(timeout--)
-			return E_IOERROR_TIMEOUT;
+			return ERRR(E_IOERROR_TIMEOUT, E_IOERROR_REASON_ATA_DCR_BSY);
 		task_pause();
 		io_delay();
 	}
-	return E_OK;
+	return ERRR_OK;
 }
 
 
-PRIVATE error_code_t
+PRIVATE errr_t
 NOTHROW(KCALL Ata_WaitForBusyTimeout)(port_t ctrl) {
 	u8 status;
 	jtime_t abs_timeout;
 	if (!(inb(ctrl) & ATA_DCR_BSY))
-		return E_OK;
+		return ERRR_OK;
 	abs_timeout = jiffies + JIFFIES_FROM_SECONDS(3);
 	while ((status = inb(ctrl)) & ATA_DCR_BSY) {
 		if unlikely(status & (ATA_DCR_ERR | ATA_DCR_DF))
-			return E_IOERROR_ERRORBIT;
+			return ATA_GetErrrForStatusRegister(status);
 		if unlikely(jiffies >= abs_timeout)
-			return E_IOERROR_TIMEOUT;
+			return ERRR(E_IOERROR_TIMEOUT, E_IOERROR_REASON_ATA_DCR_BSY);
 		task_tryyield_or_pause();
 		io_delay();
 	}
-	return E_OK;
+	return ERRR_OK;
 }
 
-PRIVATE error_code_t
+PRIVATE errr_t
 NOTHROW(KCALL Ata_WaitForDrq)(port_t bus, port_t ctrl) {
 	u8 status;
 	jtime_t abs_timeout;
@@ -494,30 +509,30 @@ NOTHROW(KCALL Ata_WaitForDrq)(port_t bus, port_t ctrl) {
 		abs_timeout = jiffies + JIFFIES_FROM_SECONDS(3);
 		while ((status = inb(ctrl)) & ATA_DCR_BSY) {
 			if unlikely(status & (ATA_DCR_ERR | ATA_DCR_DF))
-				return E_IOERROR_ERRORBIT;
+				return ATA_GetErrrForStatusRegister(status);
 			if unlikely(jiffies >= abs_timeout)
-				return E_IOERROR_TIMEOUT;
+				return ERRR(E_IOERROR_TIMEOUT, E_IOERROR_REASON_ATA_DCR_BSY);
 			task_tryyield_or_pause();
 			io_delay();
 		}
 	}
 	if (status & (ATA_DCR_ERR | ATA_DCR_DF))
-		return E_IOERROR_ERRORBIT;
+		return ATA_GetErrrForStatusRegister(status);
 	if (status & ATA_DCR_DRQ)
-		return E_OK;
+		return ERRR_OK;
 	abs_timeout = jiffies + JIFFIES_FROM_SECONDS(3);
 	for (;;) {
 		task_tryyield_or_pause();
 		io_delay();
 		status = inb(ctrl);
 		if unlikely(status & (ATA_DCR_ERR | ATA_DCR_DF))
-			return E_IOERROR_ERRORBIT;
+			return ATA_GetErrrForStatusRegister(status);
 		if unlikely(jiffies >= abs_timeout)
-			return E_IOERROR_TIMEOUT;
+			return ERRR(E_IOERROR_TIMEOUT, E_IOERROR_REASON_ATA_DCR_BSY);
 		if (status & ATA_DCR_DRQ)
 			break;
 	}
-	return E_OK;
+	return ERRR_OK;
 }
 
 PRIVATE NOBLOCK void
@@ -557,6 +572,7 @@ NOTHROW(FCALL ata_dohandle_signal)(struct aio_handle *__restrict self,
 		kfree(data->hd_prd_vector);
 	(*self->ah_func)(self, status);
 }
+
 PRIVATE NOBLOCK void
 NOTHROW(FCALL ata_handle_signal)(struct aio_handle *__restrict self,
                                  unsigned int status) {
@@ -565,16 +581,16 @@ NOTHROW(FCALL ata_handle_signal)(struct aio_handle *__restrict self,
 		ata_dohandle_signal(self, status);
 }
 
-
 PRIVATE NOBLOCK ATTR_NOINLINE void
 NOTHROW(FCALL handle_completion_ioerror)(struct aio_handle *__restrict self,
-                                         uintptr_t error_code) {
+                                         errr_t errr) {
 	struct exception_data old_data;
 	struct exception_data *mydata = &THIS_EXCEPTION_INFO.ei_data;
 	memcpy(&old_data, mydata, sizeof(struct exception_data));
 	memset(mydata, 0, sizeof(struct exception_data));
-	mydata->e_code        = error_code;
+	mydata->e_code        = ERRR_E(errr);
 	mydata->e_pointers[0] = E_IOERROR_SUBSYSTEM_HARDDISK;
+	mydata->e_pointers[1] = ERRR_R(errr);
 	COMPILER_WRITE_BARRIER();
 	ata_handle_signal(self, AIO_COMPLETION_FAILURE);
 	COMPILER_WRITE_BARRIER();
@@ -583,13 +599,14 @@ NOTHROW(FCALL handle_completion_ioerror)(struct aio_handle *__restrict self,
 
 PRIVATE NOBLOCK ATTR_NOINLINE void
 NOTHROW(FCALL handle_completion_ioerror_generic)(struct aio_handle *__restrict self,
-                                                 uintptr_t error_code) {
+                                                 errr_t errr) {
 	struct exception_data old_data;
 	struct exception_data *mydata = &THIS_EXCEPTION_INFO.ei_data;
 	memcpy(&old_data, mydata, sizeof(struct exception_data));
 	memset(mydata, 0, sizeof(struct exception_data));
-	mydata->e_code        = error_code;
+	mydata->e_code        = ERRR_E(errr);
 	mydata->e_pointers[0] = E_IOERROR_SUBSYSTEM_HARDDISK;
+	mydata->e_pointers[1] = ERRR_R(errr);
 	COMPILER_WRITE_BARRIER();
 	aio_handle_fail(self);
 	COMPILER_WRITE_BARRIER();
@@ -602,9 +619,9 @@ PRIVATE NOBLOCK bool
 NOTHROW(FCALL dostart_dma_operation)(struct ata_bus *__restrict self,
                                      struct aio_handle *__restrict handle) {
 	AtaAIOHandleData *data;
-	error_code_t error;
+	errr_t error;
 	unsigned int reset_counter = 0;
-	data                       = (AtaAIOHandleData *)handle->ah_data;
+	data = (AtaAIOHandleData *)handle->ah_data;
 again:
 	ATA_VERBOSE("[ata] Starting %s-DMA operation [lba=%I64u] [sector_count=%I16u] [prd0:%I32p+%I32u]\n",
 	            data->hd_flags & ATA_AIO_HANDLE_FWRITING ? "Write" : "Read",
@@ -634,7 +651,7 @@ again:
 	     DMA_STATUS_FTRANSPORT_FAILURE |
 	     DMA_STATUS_FINTERRUPTED);
 	error = Ata_WaitForBusy(self->b_ctrlio);
-	if unlikely(error != E_OK)
+	if unlikely(error != ERRR_OK)
 		goto handle_io_error;
 	if (data->hd_io_sectors[1] || (data->hd_io_lbaaddr[3] & 0xf0) ||
 	    data->hd_io_lbaaddr[4] || data->hd_io_lbaaddr[5]) {
@@ -653,7 +670,7 @@ again:
 		if (data->hd_flags & ATA_AIO_HANDLE_FWRITING) {
 			outb(self->b_busio + ATA_COMMAND, ATA_COMMAND_WRITE_DMA_EXT);
 			error = Ata_WaitForBusy(self->b_ctrlio);
-			if unlikely(error != E_OK)
+			if unlikely(error != ERRR_OK)
 				goto handle_io_error;
 			ATA_VERBOSE("[ata] Switch to `ATA_BUS_STATE_INDMA' to start DMA (LBA48+WRITE)\n");
 			ATOMIC_WRITE(self->b_state, ATA_BUS_STATE_INDMA);
@@ -661,7 +678,7 @@ again:
 		} else {
 			outb(self->b_busio + ATA_COMMAND, ATA_COMMAND_READ_DMA_EXT);
 			error = Ata_WaitForBusy(self->b_ctrlio);
-			if unlikely(error != E_OK)
+			if unlikely(error != ERRR_OK)
 				goto handle_io_error;
 			ATA_VERBOSE("[ata] Switch to `ATA_BUS_STATE_INDMA' to start DMA (LBA48+READ)\n");
 			ATOMIC_WRITE(self->b_state, ATA_BUS_STATE_INDMA);
@@ -681,7 +698,7 @@ again:
 		if (data->hd_flags & ATA_AIO_HANDLE_FWRITING) {
 			outb(self->b_busio + ATA_COMMAND, ATA_COMMAND_WRITE_DMA);
 			error = Ata_WaitForBusy(self->b_ctrlio);
-			if unlikely(error != E_OK)
+			if unlikely(error != ERRR_OK)
 				goto handle_io_error;
 			ATA_VERBOSE("[ata] Switch to `ATA_BUS_STATE_INDMA' to start DMA (LBA28+WRITE)\n");
 			ATOMIC_WRITE(self->b_state, ATA_BUS_STATE_INDMA);
@@ -689,7 +706,7 @@ again:
 		} else {
 			outb(self->b_busio + ATA_COMMAND, ATA_COMMAND_READ_DMA);
 			error = Ata_WaitForBusy(self->b_ctrlio);
-			if unlikely(error != E_OK)
+			if unlikely(error != ERRR_OK)
 				goto handle_io_error;
 			ATA_VERBOSE("[ata] Switch to `ATA_BUS_STATE_INDMA' to start DMA (LBA28+READ)\n");
 			ATOMIC_WRITE(self->b_state, ATA_BUS_STATE_INDMA);
@@ -700,8 +717,8 @@ again:
 	return true;
 handle_io_error:
 	/* Always reset the bus (even if merely done for the next access) */
-	printk(KERN_ERR "[ata] Reseting IDE on DMA-I/O error code %#Ix (bus:%#I16x,ctrl:%#I16x,dma:%#I16x)\n",
-	       error, self->b_busio, self->b_ctrlio, self->b_dmaio);
+	printk(KERN_ERR "[ata] Reseting IDE on DMA-I/O error code %#Ix:%#Ix (bus:%#I16x,ctrl:%#I16x,dma:%#I16x)\n",
+	       ERRR_E(error), ERRR_R(error), self->b_busio, self->b_ctrlio, self->b_dmaio);
 	Ata_ResetBus(self->b_ctrlio);
 	{
 		vm_phys_t phys;
@@ -1267,7 +1284,7 @@ do_compat_hdio_getgeo:
 				if (!signal)
 					THROW(E_IOERROR_TIMEOUT, E_IOERROR_SUBSYSTEM_HARDDISK);
 			}
-			if (Ata_WaitForDrq(bus->b_busio, bus->b_ctrlio) != E_OK)
+			if (Ata_WaitForDrq(bus->b_busio, bus->b_ctrlio) != ERRR_OK)
 				THROW(E_IOERROR_TIMEOUT, E_IOERROR_SUBSYSTEM_HARDDISK);
 			insw(bus->b_busio + ATA_DATA, &specs, 256);
 			outb(bus->b_busio + ATA_FEATURES, 0); /* ??? */
@@ -1374,7 +1391,7 @@ NOTHROW(KCALL Ata_InitializeDrive)(struct ata_ports *__restrict ports,
 		ATA_SELECT_DELAY(ports->a_ctrl);
 
 		/* Wait for the command to be acknowledged. */
-		if (Ata_WaitForBusyTimeout(ports->a_ctrl) != E_OK)
+		if (Ata_WaitForBusyTimeout(ports->a_ctrl) != ERRR_OK)
 			return false;
 
 		/* Figure out what kind of drive this is. */
@@ -1413,7 +1430,7 @@ NOTHROW(KCALL Ata_InitializeDrive)(struct ata_ports *__restrict ports,
 				struct sig *signal;
 				struct ata_drive *drive;
 				ATOMIC_WRITE(bus->b_state, ATA_BUS_STATE_INPIO);
-				if (Ata_WaitForBusyTimeout(bus->b_ctrlio) != E_OK)
+				if (Ata_WaitForBusyTimeout(bus->b_ctrlio) != ERRR_OK)
 					return false;
 				task_connect(&bus->b_piointr);
 				outb(bus->b_busio + ATA_FEATURES, 1); /* ??? */
@@ -1431,7 +1448,7 @@ reset_bus_and_fail:
 						return false;
 					}
 				}
-				if (Ata_WaitForDrq(bus->b_busio, bus->b_ctrlio) != E_OK)
+				if (Ata_WaitForDrq(bus->b_busio, bus->b_ctrlio) != ERRR_OK)
 					goto reset_bus_and_fail;
 				insw(bus->b_busio + ATA_DATA, &specs, 256);
 				outb(bus->b_busio + ATA_FEATURES, 0); /* ??? */

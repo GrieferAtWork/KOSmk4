@@ -936,24 +936,39 @@ class E_IOERROR_ERRORBIT : E_IOERROR = 0x0001 {
 	@@The miss-behaving sub-system (One of `E_IOERROR_SUBSYSTEM_*')
 	[tostr(select("E_IOERROR_SUBSYSTEM_*"))]
 	member subsystem: uintptr_t;
+	@@A more precise description of the error (One of `E_IOERROR_REASON_*')
+	[tostr(select("E_IOERROR_REASON_*"))]
+	member reason: uintptr_t;
 }
+
 [message("Hardware component timed out")]
-class E_IOERROR_TIMEOUT  : E_IOERROR = 0x0002 {
+class E_IOERROR_TIMEOUT : E_IOERROR = 0x0002 {
 	@@The miss-behaving sub-system (One of `E_IOERROR_SUBSYSTEM_*')
 	[tostr(select("E_IOERROR_SUBSYSTEM_*"))]
 	member subsystem: uintptr_t;
+	@@A more precise description of the error (One of `E_IOERROR_REASON_*')
+	[tostr(select("E_IOERROR_REASON_*"))]
+	member reason: uintptr_t;
 }
+
 [message("Attempted to write to read-only disk component")]
 class E_IOERROR_READONLY : E_IOERROR = 0x0003 {
 	@@The miss-behaving sub-system (One of `E_IOERROR_SUBSYSTEM_*')
 	[tostr(select("E_IOERROR_SUBSYSTEM_*"))]
 	member subsystem: uintptr_t;
+	@@A more precise description of the error (One of `E_IOERROR_REASON_*')
+	[tostr(select("E_IOERROR_REASON_*"))]
+	member reason: uintptr_t;
 }
+
 [message("Attempted to write beyond the end of a disk")]
 class E_IOERROR_BADBOUNDS: E_IOERROR = 0x0004 {
 	@@The miss-behaving sub-system (One of `E_IOERROR_SUBSYSTEM_*')
 	[tostr(select("E_IOERROR_SUBSYSTEM_*"))]
 	member subsystem: uintptr_t;
+	@@A more precise description of the error (One of `E_IOERROR_REASON_*')
+	[tostr(select("E_IOERROR_REASON_*"))]
+	member reason: uintptr_t;
 }
 
 @@The error stems from the physical disk faulting
@@ -962,7 +977,8 @@ const E_IOERROR_SUBSYSTEM_HARDDISK = 0x0001;
 const E_IOERROR_SUBSYSTEM_FILE     = 0x0002;
 @@The error stems from a HumanInterfaceDevice-related connection error
 const E_IOERROR_SUBSYSTEM_HID      = 0x0003;
-
+@@The error stems from the USB sub-system
+const E_IOERROR_SUBSYSTEM_USB      = 0x0004;
 
 %
 %

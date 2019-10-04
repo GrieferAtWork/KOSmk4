@@ -122,7 +122,7 @@ LOCAL void KCALL vm_outsw_phys(port_t port, vm_phys_t buf, size_t count)
 
 
 /* PIO-based data transfer helpers for passing data to/from an ATA drive. */
-LOCAL error_code_t
+LOCAL errr_t
 #ifdef IO_READ
 (KCALL FUNC_VECTORPHYS(Ata_ReceiveDataSectors))
 #else
@@ -155,11 +155,11 @@ LOCAL error_code_t
 				timeout.add_seconds(2);
 				signal = task_waitfor(&timeout);
 				if unlikely(!signal)
-					return E_IOERROR_TIMEOUT;
+					return ERRR(E_IOERROR_TIMEOUT, E_IOERROR_REASON_ATA_SECTOR_WAIT);
 			}
 			status = ATA_PIOINTR_ALT_DECODE(signal);
 			if (status & (ATA_DCR_ERR | ATA_DCR_DF))
-				return E_IOERROR_ERRORBIT;
+				return ATA_GetErrrForStatusRegister(status);
 			if (num_sectors != 1)
 				task_connect(&bus->b_piointr);
 			Ata_WaitForDrq(bus->b_busio, bus->b_ctrlio);
@@ -269,7 +269,7 @@ LOCAL error_code_t
 		RETHROW();
 	}
 	assert(!task_isconnected());
-	return E_OK;
+	return ERRR_OK;
 }
 
 

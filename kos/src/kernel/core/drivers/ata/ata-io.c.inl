@@ -346,7 +346,7 @@ service_without_dma:
 	VECTOR_TYPE view, view2;
 #endif
 	unsigned int reset_counter = 0;
-	error_code_t error;
+	errr_t error;
 	struct ata_bus *bus = self->d_bus;
 	AtaBus_LockPIO(bus);
 again_service_io:
@@ -358,7 +358,7 @@ again_service_io:
 			if ((size_t)part_sectors > num_sectors)
 				part_sectors = (MAX_SECTORS_PER_TRANSFER_T)num_sectors;
 			error = Ata_WaitForBusy(bus->b_ctrlio);
-			if unlikely(error != 0)
+			if unlikely(error != ERRR_OK)
 				goto err_io_error;
 			task_connect(&bus->b_piointr);
 #ifdef IO_CHS
@@ -440,7 +440,7 @@ again_service_io:
 #endif /* !IO_READ */
 			assert(!task_isconnected());
 
-			if (error != E_OK)
+			if (error != ERRR_OK)
 				goto err_io_error;
 
 			/* Check for transfer completion, and update pointers */
@@ -481,8 +481,8 @@ again_service_io:
 err_io_error:
 	/* Always reset the bus (even if merely done for the next access) */
 	assert(!task_isconnected());
-	printk(KERN_ERR "Reseting IDE on PIO-I/O error code %#Ix (bus:%#I16x;ctrl:%#I16x;dma:%#I16x)\n",
-	       error, bus->b_busio, bus->b_ctrlio, bus->b_dmaio);
+	printk(KERN_ERR "Reseting IDE on PIO-I/O error code %#Ix:%#Ix (bus:%#I16x;ctrl:%#I16x;dma:%#I16x)\n",
+	       ERRR_E(error), ERRR_R(error), bus->b_busio, bus->b_ctrlio, bus->b_dmaio);
 	Ata_ResetAndReinitializeBus(bus);
 	if (reset_counter < 3) { /* TODO: Make this `3' configurable */
 		++reset_counter;

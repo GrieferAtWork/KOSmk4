@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1e7c8204 */
+/* HASH CRC-32:0x3ea38112 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -718,19 +718,27 @@ __DECL_BEGIN
 #define E_IOERROR (0x0082)
 /* A hardware error bit has been set
  * 	@@The miss-behaving sub-system (One of `E_IOERROR_SUBSYSTEM_*')
- * 	member subsystem: uintptr_t; */
+ * 	member subsystem: uintptr_t;
+ * 	@@A more precise description of the error (One of `E_IOERROR_REASON_*')
+ * 	member reason: uintptr_t; */
 #define E_IOERROR_ERRORBIT (E_IOERROR,0x0001)
 /* Hardware component timed out
  * 	@@The miss-behaving sub-system (One of `E_IOERROR_SUBSYSTEM_*')
- * 	member subsystem: uintptr_t; */
+ * 	member subsystem: uintptr_t;
+ * 	@@A more precise description of the error (One of `E_IOERROR_REASON_*')
+ * 	member reason: uintptr_t; */
 #define E_IOERROR_TIMEOUT (E_IOERROR,0x0002)
 /* Attempted to write to read-only disk component
  * 	@@The miss-behaving sub-system (One of `E_IOERROR_SUBSYSTEM_*')
- * 	member subsystem: uintptr_t; */
+ * 	member subsystem: uintptr_t;
+ * 	@@A more precise description of the error (One of `E_IOERROR_REASON_*')
+ * 	member reason: uintptr_t; */
 #define E_IOERROR_READONLY (E_IOERROR,0x0003)
 /* Attempted to write beyond the end of a disk
  * 	@@The miss-behaving sub-system (One of `E_IOERROR_SUBSYSTEM_*')
- * 	member subsystem: uintptr_t; */
+ * 	member subsystem: uintptr_t;
+ * 	@@A more precise description of the error (One of `E_IOERROR_REASON_*')
+ * 	member reason: uintptr_t; */
 #define E_IOERROR_BADBOUNDS (E_IOERROR,0x0004)
 /* The error stems from the physical disk faulting */
 #define E_IOERROR_SUBSYSTEM_HARDDISK 0x0001
@@ -738,6 +746,8 @@ __DECL_BEGIN
 #define E_IOERROR_SUBSYSTEM_FILE 0x0002
 /* The error stems from a HumanInterfaceDevice-related connection error */
 #define E_IOERROR_SUBSYSTEM_HID 0x0003
+/* The error stems from the USB sub-system */
+#define E_IOERROR_SUBSYSTEM_USB 0x0004
 
 
 
