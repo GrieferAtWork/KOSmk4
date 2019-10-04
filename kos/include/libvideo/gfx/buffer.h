@@ -102,43 +102,57 @@ struct video_buffer {
 #endif /* !GUARD_LIBVIDEO_GFX_API_H */
 public:
 
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("lock")
+#pragma push_macro("unlock")
+#pragma push_macro("gfx")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef lock
+#undef unlock
+#undef gfx
+
 	/* Lock the video buffer into memory.
 	 * @return: 0:  Success
 	 * @return: -1: Error (s.a. `errno') */
 	__CXX_CLASSMEMBER __ATTR_NONNULL((1))
-	int LIBVIDEO_GFX_CC lock(struct video_lock &lock) {
-		return (*vb_ops->vi_lock)(this,&lock);
+	int LIBVIDEO_GFX_CC lock(struct video_lock &__lock) {
+		return (*vb_ops->vi_lock)(this,&__lock);
 	}
 
 	/* Unlock a video buffer that has previously been mapped into memory. */
 	__CXX_CLASSMEMBER __ATTR_NONNULL((1))
-	void LIBVIDEO_GFX_CC unlock(struct video_lock const &lock) {
-		(*vb_ops->vi_unlock)(this, &lock);
+	void LIBVIDEO_GFX_CC unlock(struct video_lock const &__lock) {
+		(*vb_ops->vi_unlock)(this, &__lock);
 	}
 
 
 	/* Get graphics functions for use with the given buffer
 	 * @param: flags: Set of `VIDEO_GFX_F*' */
 	__CXX_CLASSMEMBER struct video_buffer_gfx &LIBVIDEO_GFX_CC
-	gfx(struct video_buffer_gfx &result,
-	    gfx_blendmode_t blendmode = GFX_BLENDINFO_ALPHA,
-	    __uintptr_t flags         = VIDEO_GFX_FNORMAL,
-	    video_color_t colorkey    = 0) {
-		(*vb_ops->vi_getgfx)(this, &result, blendmode, flags, colorkey);
-		return result;
+	gfx(struct video_buffer_gfx &__result,
+	    gfx_blendmode_t __blendmode = GFX_BLENDINFO_ALPHA,
+	    __uintptr_t __flags         = VIDEO_GFX_FNORMAL,
+	    video_color_t __colorkey    = 0) {
+		(*vb_ops->vi_getgfx)(this, &__result, __blendmode, __flags, __colorkey);
+		return __result;
 	}
 
 	/* Get graphics functions for use with the given buffer
 	 * @param: flags: Set of `VIDEO_GFX_F*' */
 	__CXX_CLASSMEMBER struct video_buffer_gfx LIBVIDEO_GFX_CC
-	gfx(gfx_blendmode_t blendmode = GFX_BLENDINFO_ALPHA,
-	    __uintptr_t flags         = VIDEO_GFX_FNORMAL,
-	    video_color_t colorkey    = 0) {
-		struct video_buffer_gfx result;
-		gfx(result, blendmode, flags, colorkey);
-		return result;
+	gfx(gfx_blendmode_t __blendmode = GFX_BLENDINFO_ALPHA,
+	    __uintptr_t __flags         = VIDEO_GFX_FNORMAL,
+	    video_color_t __colorkey    = 0) {
+		struct video_buffer_gfx __result;
+		gfx(__result, __blendmode, __flags, __colorkey);
+		return __result;
 	}
 
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("gfx")
+#pragma pop_macro("unlock")
+#pragma pop_macro("lock")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 #endif /* __cplusplus */
 };
 
@@ -147,7 +161,14 @@ public:
                                    ((*(self)->vb_ops->vi_destroy)(self), 0))
 
 #if defined(__cplusplus) && defined(__USE_KOS)
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("incref")
+#pragma push_macro("decref")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef incref
+#undef decref
 extern "C++" {
+
 __FORCELOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) struct video_buffer *
 (LIBVIDEO_GFX_CC incref)(struct video_buffer *__restrict self) {
 	video_buffer_incref(self);
@@ -157,7 +178,12 @@ __FORCELOCAL __ATTR_NONNULL((1)) void
 (LIBVIDEO_GFX_CC decref)(struct video_buffer *__restrict self) {
 	video_buffer_decref(self);
 }
+
 }
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("decref")
+#pragma pop_macro("incref")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 #endif /* __cplusplus && __USE_KOS */
 #endif /* __CC__ */
 
