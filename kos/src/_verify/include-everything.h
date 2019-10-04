@@ -45,7 +45,16 @@
  *       of /bin/system-test
  */
 
- /*[[[deemon
+/*[[[deemon
+local chk_include = {
+	"curses.h",
+	"ncurses.h",
+	"ncurses_dll.h",
+	"term.h",
+	"termcap.h",
+	"unctrl.h"
+};
+
 import fs;
 function incdir(prefix, path) {
 	for (local x: fs.dir(path)) {
@@ -58,19 +67,27 @@ function incdir(prefix, path) {
 		}
 		if (x !in ["atree-abi.h", "__atomic-gasm.h", "__atomic-msvc.h", "__stdcxx.h"]) {
 			if (x.endswith(".h") && !x.endswith("-impl.h")) {
+				local full;
 				if (".." in prefix) {
-					print "#include \"" + prefix + x + "\"";
+					full = "\"" + prefix + x + "\"";
 				} else {
-					print "#include <" + prefix + x + ">";
+					full = "<" + prefix + x + ">";
+				}
+				if (x in chk_include) {
+					print "#if __has_include(" + full + ")";
+					print "#include",full;
+					print "#endif /" "* __has_include(" + full + ") *" "/";
+				} else {
+					print "#include",full;
 				}
 			}
 		}
 	}
 }
 //print "#if 0";
-//incdir("../../../include/", "../../../include");
+//incdir("../../include/", "../../include");
 //print "#else";
-incdir("", "../../../include");
+incdir("", "../../include");
 //print "#endif";
 ]]]*/
 #include <aliases.h>
@@ -90,12 +107,15 @@ incdir("", "../../../include");
 #include <asm/posix_types.h>
 #include <asm/socket.h>
 #include <asm/sockios.h>
+#include <asm/termbits.h>
+#include <asm/termios.h>
 #include <asm/types.h>
 #include <asm/unistd.h>
 #include <assert.h>
 #include <attr/xattr.h>
 #include <bits/auxv.h>
 #include <bits/byteswap.h>
+#include <bits/compat.h>
 #include <bits/confname.h>
 #include <bits/dirent.h>
 #include <bits/dlfcn.h>
@@ -123,6 +143,7 @@ incdir("", "../../../include");
 #include <bits/mathdef.h>
 #include <bits/mbstate.h>
 #include <bits/mman.h>
+#include <bits/msq.h>
 #include <bits/nan.h>
 #include <bits/netdb.h>
 #include <bits/oflags.h>
@@ -134,6 +155,7 @@ incdir("", "../../../include");
 #include <bits/resource.h>
 #include <bits/sched.h>
 #include <bits/select.h>
+#include <bits/sem.h>
 #include <bits/semaphore.h>
 #include <bits/shm.h>
 #include <bits/sigaction-struct.h>
@@ -143,6 +165,7 @@ incdir("", "../../../include");
 #include <bits/siginfo-struct.h>
 #include <bits/siginfo-values.h>
 #include <bits/siginfo.h>
+#include <bits/signalfd.h>
 #include <bits/signum-values.h>
 #include <bits/signum.h>
 #include <bits/sigset.h>
@@ -213,7 +236,11 @@ incdir("", "../../../include");
 #include <ConcurrencySal.h>
 #include <cpio.h>
 #include <crtdefs.h>
+#include <crypt.h>
 #include <ctype.h>
+#if __has_include(<curses.h>)
+#include <curses.h>
+#endif /* __has_include(<curses.h>) */
 #include <dir.h>
 #include <direct.h>
 #include <dirent.h>
@@ -225,10 +252,13 @@ incdir("", "../../../include");
 #include <execinfo.h>
 #include <fcntl.h>
 #include <features.h>
+#include <file.h>
 #include <float.h>
 #include <fnmatch.h>
 #include <format-printer.h>
 #include <getopt.h>
+#include <getpagesize.h>
+#include <glob.h>
 #include <gnu/lib-names.h>
 #include <gnu/stubs.h>
 #include <grp.h>
@@ -257,6 +287,7 @@ incdir("", "../../../include");
 #include <hybrid/sequence/list.h>
 #include <hybrid/sequence/vector.h>
 #include <hybrid/struct.h>
+#include <hybrid/sync/atomic-once.h>
 #include <hybrid/sync/atomic-owner-rwlock.h>
 #include <hybrid/sync/atomic-rwlock.h>
 #include <hybrid/typecore.h>
@@ -279,6 +310,7 @@ incdir("", "../../../include");
 #include <hybrid/__unaligned.h>
 #include <hybrid/__wordbits.h>
 #include <ieee754.h>
+#include <ifaddrs.h>
 #include <inttypes.h>
 #include <io.h>
 #include <iso646.h>
@@ -298,12 +330,11 @@ incdir("", "../../../include");
 #include <kos/bits/ukern-struct.h>
 #include <kos/bits/ukern.h>
 #include <kos/debugtrap.h>
-#include <kos/dev/clock.h>
-#include <kos/dev/keyboard.h>
-#include <kos/dev/mouse.h>
 #include <kos/dev.h>
 #include <kos/except-handler.h>
+#include <kos/except-io.h>
 #include <kos/except.h>
+#include <kos/fcntl.h>
 #include <kos/futex.h>
 #include <kos/futexexpr.h>
 #include <kos/futexlock.h>
@@ -312,8 +343,15 @@ incdir("", "../../../include");
 #include <kos/hybrid/heap.h>
 #include <kos/hybrid/library.h>
 #include <kos/hybrid/sched-signal.h>
+#include <kos/io/pci.h>
+#include <kos/io/ps2.h>
 #include <kos/io/serial.h>
+#include <kos/io/uhci.h>
+#include <kos/io/vga.h>
 #include <kos/io.h>
+#include <kos/ioctl/clock.h>
+#include <kos/ioctl/keyboard.h>
+#include <kos/ioctl/mouse.h>
 #include <kos/jiffies.h>
 #include <kos/kernel/handle.h>
 #include <kos/kernel/types.h>
@@ -322,6 +360,8 @@ incdir("", "../../../include");
 #include <kos/library-listdef.h>
 #include <kos/malloc.h>
 #include <kos/process.h>
+#include <kos/sys/ioctl.h>
+#include <kos/sys/stat.h>
 #include <kos/syscalls.h>
 #include <kos/sysctl.h>
 #include <kos/thread.h>
@@ -374,6 +414,8 @@ incdir("", "../../../include");
 #include <libkeymap/keymap.h>
 #include <libregdump/api.h>
 #include <libregdump/printer.h>
+#include <libregex/api.h>
+#include <libregex/regex.h>
 #include <librpc/api.h>
 #include <librpc/bits/rpc.h>
 #include <librpc/bits/syscall-info.h>
@@ -402,11 +444,15 @@ incdir("", "../../../include");
 #include <libvm86/emulator.h>
 #include <libvm86/intrin86.h>
 #include <limits.h>
+#include <linux/fd.h>
 #include <linux/fs.h>
+#include <linux/futex.h>
+#include <linux/hdreg.h>
 #include <linux/if_arp.h>
 #include <linux/if_ether.h>
 #include <linux/if_fddi.h>
 #include <linux/ioctl.h>
+#include <linux/kd.h>
 #include <linux/kernel.h>
 #include <linux/limits.h>
 #include <linux/magic.h>
@@ -416,7 +462,9 @@ incdir("", "../../../include");
 #include <linux/posix_types.h>
 #include <linux/stddef.h>
 #include <linux/sysinfo.h>
+#include <linux/termios.h>
 #include <linux/types.h>
+#include <linux/vt.h>
 #include <locale.h>
 #include <machine/ansi.h>
 #include <machine/endian.h>
@@ -435,9 +483,16 @@ incdir("", "../../../include");
 #include <malloc.h>
 #include <malloca.h>
 #include <math.h>
+#include <mem.h>
 #include <memory.h>
 #include <minmax.h>
 #include <mntent.h>
+#if __has_include(<ncurses.h>)
+#include <ncurses.h>
+#endif /* __has_include(<ncurses.h>) */
+#if __has_include(<ncurses_dll.h>)
+#include <ncurses_dll.h>
+#endif /* __has_include(<ncurses_dll.h>) */
 #include <net/ethernet.h>
 #include <net/if.h>
 #include <net/if_arp.h>
@@ -456,8 +511,10 @@ incdir("", "../../../include");
 #include <netinet/ip_icmp.h>
 #include <netinet/tcp.h>
 #include <netinet/udp.h>
+#include <netpacket/packet.h>
 #include <newlib.h>
 #include <optimized/string.h>
+#include <osfcn.h>
 #include <parts/assert.h>
 #include <parts/cyg/errno.h>
 #include <parts/dos/errno.h>
@@ -476,6 +533,7 @@ incdir("", "../../../include");
 #include <parts/uchar/string.h>
 #include <parts/uchar/sys/mman.h>
 #include <parts/uchar/sys/stat.h>
+#include <parts/uchar/time.h>
 #include <parts/uchar/unistd.h>
 #include <parts/uchar/utime.h>
 #include <parts/wchar/format-printer.h>
@@ -489,6 +547,8 @@ incdir("", "../../../include");
 #include <pthread.h>
 #include <pty.h>
 #include <pwd.h>
+#include <random.h>
+#include <regex.h>
 #include <rpc/netdb.h>
 #include <sal.h>
 #include <sched.h>
@@ -497,8 +557,10 @@ incdir("", "../../../include");
 #include <setjmp.h>
 #include <sgtty.h>
 #include <shadow.h>
+#include <share.h>
 #include <signal.h>
 #include <spawn.h>
+#include <std.h>
 #include <stdalign.h>
 #include <stdarg.h>
 #include <stdbool.h>
@@ -529,17 +591,24 @@ incdir("", "../../../include");
 #include <sys/ioctl.h>
 #include <sys/ipc.h>
 #include <sys/isa_defs.h>
+#include <sys/kd.h>
+#include <sys/klog.h>
 #include <sys/mman.h>
 #include <sys/mount.h>
+#include <sys/msg.h>
 #include <sys/param.h>
 #include <sys/pci.h>
 #include <sys/poll.h>
 #include <sys/procfs.h>
 #include <sys/ptrace.h>
+#include <sys/reboot.h>
 #include <sys/resource.h>
 #include <sys/select.h>
+#include <sys/sem.h>
+#include <sys/sendfile.h>
 #include <sys/shm.h>
 #include <sys/signal.h>
+#include <sys/signalfd.h>
 #include <sys/socket.h>
 #include <sys/socketvar.h>
 #include <sys/stat.h>
@@ -567,11 +636,19 @@ incdir("", "../../../include");
 #include <sys/ustat.h>
 #include <sys/utime.h>
 #include <sys/utsname.h>
+#include <sys/vfs.h>
+#include <sys/vt.h>
 #include <sys/wait.h>
 #include <sys/xattr.h>
 #include <sys/_types.h>
 #include <syscall.h>
 #include <syslog.h>
+#if __has_include(<term.h>)
+#include <term.h>
+#endif /* __has_include(<term.h>) */
+#if __has_include(<termcap.h>)
+#include <termcap.h>
+#endif /* __has_include(<termcap.h>) */
 #include <termio.h>
 #include <termios.h>
 #include <time.h>
@@ -579,6 +656,9 @@ incdir("", "../../../include");
 #include <uchar.h>
 #include <ucontext.h>
 #include <ulimit.h>
+#if __has_include(<unctrl.h>)
+#include <unctrl.h>
+#endif /* __has_include(<unctrl.h>) */
 #include <unicode.h>
 #include <unistd.h>
 #include <unwind.h>

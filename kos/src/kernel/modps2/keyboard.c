@@ -31,13 +31,14 @@
 #include <kernel/types.h>
 
 #include <hybrid/atomic.h>
+
+#include <kos/ioctl/keyboard.h>
+
 #include <assert.h>
 #include <stdio.h>
 
-#include <kos/dev/keyboard.h>
-
-#include "ps2.h"
 #include "keyboard-scansets.h"
+#include "ps2.h"
 
 DECL_BEGIN
 

@@ -195,6 +195,27 @@ struct video_buffer_gfx {
 	void                *bfx_driver[4]; /* [?..?] Driver-specific graphics data. */
 
 #ifdef __cplusplus
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma push_macro("getcolor")
+#pragma push_macro("putcolor")
+#pragma push_macro("line")
+#pragma push_macro("vline")
+#pragma push_macro("hline")
+#pragma push_macro("fill")
+#pragma push_macro("rect")
+#pragma push_macro("blit")
+#pragma push_macro("stretch")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+#undef getcolor
+#undef putcolor
+#undef line
+#undef vline
+#undef hline
+#undef fill
+#undef rect
+#undef blit
+#undef stretch
+
 public:
 	/* Get a pixel */
 	template<class T>
@@ -366,6 +387,17 @@ public:
 		                       src, src_x, src_y, src_size_x, src_size_y);
 	}
 
+#ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
+#pragma pop_macro("stretch")
+#pragma pop_macro("blit")
+#pragma pop_macro("rect")
+#pragma pop_macro("fill")
+#pragma pop_macro("hline")
+#pragma pop_macro("vline")
+#pragma pop_macro("line")
+#pragma pop_macro("putcolor")
+#pragma pop_macro("getcolor")
+#endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 #endif /* __cplusplus */
 };
 

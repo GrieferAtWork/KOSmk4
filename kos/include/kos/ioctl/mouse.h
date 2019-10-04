@@ -16,8 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_DEV_MOUSE_H
-#define _KOS_DEV_MOUSE_H 1
+#ifndef _KOS_IOCTL_MOUSE_H
+#define _KOS_IOCTL_MOUSE_H 1
 
 /* KOS-specific mouse-device system interface. */
 
@@ -189,4 +189,4 @@ struct mouse_fake_button {
 
 __DECL_END
 
-#endif /* !_KOS_DEV_MOUSE_H */
+#endif /* !_KOS_IOCTL_MOUSE_H */

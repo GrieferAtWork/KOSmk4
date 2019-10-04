@@ -16,8 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_DEV_KEYBOARD_H
-#define _KOS_DEV_KEYBOARD_H 1
+#ifndef _KOS_IOCTL_KEYBOARD_H
+#define _KOS_IOCTL_KEYBOARD_H 1
 
 /* KOS-specific keyboard-device system interface. */
 
@@ -93,4 +93,4 @@ struct keyboard_string {
 
 __DECL_END
 
-#endif /* !_KOS_DEV_KEYBOARD_H */
+#endif /* !_KOS_IOCTL_KEYBOARD_H */

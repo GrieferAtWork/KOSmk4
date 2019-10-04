@@ -27,7 +27,7 @@
 
 #include <hybrid/sync/atomic-rwlock.h>
 
-#include <kos/dev/mouse.h>
+#include <kos/ioctl/mouse.h>
 
 #include <stdbool.h>
 

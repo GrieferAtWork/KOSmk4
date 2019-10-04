@@ -16,8 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _KOS_DEV_CLOCK_H
-#define _KOS_DEV_CLOCK_H 1
+#ifndef _KOS_IOCTL_CLOCK_H
+#define _KOS_IOCTL_CLOCK_H 1
 
 /* KOS-specific clock-device system interface. */
 
@@ -48,4 +48,4 @@ struct clock_timestamp {
 #define CDIO_GETBASE       _IOR('C', 0x02, __uint32_t)             /* Return the clock timer base value (one of `CLOCK_DEVICE_TIMEBASE_*') */
 #define CDIO_SETWALLCLOCK   _IO('C', 0x03)                         /* Set this clock as the default system clock (the one used by `time(2)') */
 
-#endif /* !_KOS_DEV_CLOCK_H */
+#endif /* !_KOS_IOCTL_CLOCK_H */
