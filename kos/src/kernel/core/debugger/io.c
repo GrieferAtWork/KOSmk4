@@ -97,7 +97,7 @@ DEFINE_DEBUG_FUNCTION(
 	if (!dbg_evaladdr(argv[1], &port))
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
 	val = inb((port_t)port);
-	dbg_printf(DBGSTR("inb 0x%.4I16x: 0x%.2I8x (%I8u)\n"), (u16)port, val, val);
+	dbg_printf(DBGSTR("inb %#.4I16x: %#.2I8x (%I8u)\n"), (u16)port, val, val);
 	return (uintptr_t)val;
 }
 DEFINE_DEBUG_FUNCTION(
@@ -112,7 +112,7 @@ DEFINE_DEBUG_FUNCTION(
 	if (!dbg_evaladdr(argv[1], &port))
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
 	val = inw((port_t)port);
-	dbg_printf(DBGSTR("inw 0x%.4I16x: 0x%.4I16x (%I16u)\n"), (u16)port, val, val);
+	dbg_printf(DBGSTR("inw %#.4I16x: %#.4I16x (%I16u)\n"), (u16)port, val, val);
 	return (uintptr_t)val;
 }
 
@@ -128,7 +128,7 @@ DEFINE_DEBUG_FUNCTION(
 	if (!dbg_evaladdr(argv[1], &port))
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
 	val = inl((port_t)port);
-	dbg_printf(DBGSTR("inl 0x%.4I16x: 0x%.8I32x (%I32u)\n"), (u16)port, val, val);
+	dbg_printf(DBGSTR("inl %#.4I16x: %#.8I32x (%I32u)\n"), (u16)port, val, val);
 	return (uintptr_t)val;
 }
 
@@ -142,7 +142,7 @@ DEFINE_DEBUG_FUNCTION(
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
 	if (!dbg_evaladdr(argv[1], &port) || !dbg_evalexpr(argv[2], &val))
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
-	dbg_printf(DBGSTR("outb 0x%.4I16x, 0x%.2I8x (%I8u)\n"), (u16)port, (u8)val, (u8)val);
+	dbg_printf(DBGSTR("outb %#.4I16x, %#.2I8x (%I8u)\n"), (u16)port, (u8)val, (u8)val);
 	outb((port_t)port, (u8)val);
 	return val;
 }
@@ -157,7 +157,7 @@ DEFINE_DEBUG_FUNCTION(
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
 	if (!dbg_evaladdr(argv[1], &port) || !dbg_evalexpr(argv[2], &val))
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
-	dbg_printf(DBGSTR("outw 0x%.4I16x, 0x%.4I16x (%I16u)\n"), (u16)port, (u16)val, (u16)val);
+	dbg_printf(DBGSTR("outw %#.4I16x, %#.4I16x (%I16u)\n"), (u16)port, (u16)val, (u16)val);
 	outw((port_t)port, (u16)val);
 	return val;
 }
@@ -172,7 +172,7 @@ DEFINE_DEBUG_FUNCTION(
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
 	if (!dbg_evaladdr(argv[1], &port) || !dbg_evalexpr(argv[2], &val))
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
-	dbg_printf(DBGSTR("outl 0x%.4I16x, 0x%.8I32x (%I32u)\n"), (u16)port, (u32)val, (u32)val);
+	dbg_printf(DBGSTR("outl %#.4I16x, %#.8I32x (%I32u)\n"), (u16)port, (u32)val, (u32)val);
 	outl((port_t)port, (u32)val);
 	return val;
 }

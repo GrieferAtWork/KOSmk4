@@ -602,7 +602,7 @@ search_heap:
 		chain = *iter;
 		while (chain &&
 		       (HEAP_ASSERTF(IS_ALIGNED(MFREE_SIZE(chain), HEAP_ALIGNMENT),
-		                     "MFREE_SIZE(chain) = 0x%Ix\n",
+		                     "MFREE_SIZE(chain) = %#Ix\n",
 		                     MFREE_SIZE(chain)),
 		        MFREE_SIZE(chain) < result.hp_siz))
 			chain = LLIST_NEXT(chain, mf_lsize);
@@ -1115,7 +1115,7 @@ NOTHROW_NX(KCALL FUNC(heap_align_untraced))(struct heap *__restrict self,
 			chain = *iter;
 			while (chain &&
 			       (HEAP_ASSERTF(IS_ALIGNED(MFREE_SIZE(chain), HEAP_ALIGNMENT),
-			                     "MFREE_SIZE(chain) = 0x%Ix",
+			                     "MFREE_SIZE(chain) = %#Ix",
 			                     MFREE_SIZE(chain)),
 			        MFREE_SIZE(chain) < alloc_bytes))
 				chain = LLIST_NEXT(chain, mf_lsize);

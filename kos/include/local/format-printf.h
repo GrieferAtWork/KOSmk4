@@ -138,6 +138,7 @@
 #define __PRINTF_F_HASPREC  0x0080 /* `%.123'. */
 #define __PRINTF_F_SIGNED   0x0100
 #define __PRINTF_F_FIXBUF   0x0200
+#define __PRINTF_F_UPPER2   0x0400 /* Print the `x' and `b' in `0x123' and `0b010' as uppercase. */
 
 
 #ifndef __FORMAT_ESCAPE_FNORMAL
@@ -316,7 +317,7 @@ __nextfmt:
 #endif /* !__UINT64_TYPE__ */
 		} __data;
 		__SIZE_TYPE__ __print_width, __space_width;
-		__CHAR_TYPE *__iter, __buffer[67]; /* 64-bit binary, w/prefix + __sign */
+		__CHAR_TYPE *__iter, __buffer[67]; /* 64-bit binary, w/prefix + sign */
 		__IF0 {
 	case 'b':
 			__numsys = 2;
@@ -359,7 +360,10 @@ __nextfmt:
 				__flags |= __PRINTF_F_HASPREC;
 			}
 			__ATTR_FALLTHROUGH
+			__IF0 {
 	case 'X':
+				__flags |= __PRINTF_F_UPPER2;
+			}
 			__flags |= __PRINTF_F_UPPER;
 			__ATTR_FALLTHROUGH
 	case 'x':
@@ -428,25 +432,19 @@ __nextfmt:
 			__hybrid_assert(__iter > __buffer);
 			*--__iter = __dec[__data.__u % __numsys];
 		} while ((__data.__u /= __numsys) != 0);
-		if ((__flags & __PRINTF_F_PREFIX) && __numsys != 10) {
-			if (__numsys == 16) {
-				__hybrid_assert(__iter > __buffer);
-				*--__iter = __flags & __PRINTF_F_UPPER ? 'X' : 'x';
-			} else if (__numsys == 2) {
-				__hybrid_assert(__iter > __buffer);
-				*--__iter = __dec[11]; /* B/b */
-			}
-			if (__numsys != 8 || __data.__u != 0) {
-				__hybrid_assert(__iter > __buffer);
-				*--__iter = '0';
-			}
-		}
 		__space_width = 0;
 		__print_width = (__SIZE_TYPE__)(__COMPILER_ENDOF(__buffer) - __iter);
 		if ((__flags & __PRINTF_F_HASPREC) && __precision > __print_width)
 			__print_width = __precision;
 		if (__is_neg || (__flags & (__PRINTF_F_SIGN | __PRINTF_F_SPACE)))
 			++__print_width;
+		if ((__flags & __PRINTF_F_PREFIX) && __numsys != 10) {
+			if (__numsys == 16 || __numsys == 2) {
+				__print_width += 2;
+			} else if (__numsys == 8 && __data.__u != 0) {
+				__print_width += 1;
+			}
+		}
 		if __unlikely((__flags & __PRINTF_F_HASWIDTH) && __width > __print_width) {
 			__space_width = __width - __print_width;
 			if (!(__flags & __PRINTF_F_LJUST)) {
@@ -458,15 +456,27 @@ __nextfmt:
 			}
 		}
 		{
-			__CHAR_TYPE __sign[1] = { 0 };
+			__CHAR_TYPE __sign[3];
+			__CHAR_TYPE *__dst = __sign;
 			if (__is_neg)
-				__sign[0] = '-';
+				*__dst++ = '-';
 			else if (__flags & __PRINTF_F_SIGN)
-				__sign[0] = '+';
+				*__dst++ = '+';
 			else if (__flags & __PRINTF_F_SPACE)
-				__sign[0] = ' ';
-			if (__sign[0]) {
-				__temp = (*__FORMAT_PRINTER)(__FORMAT_ARG, __sign, 1);
+				*__dst++ = ' ';
+			if ((__flags & __PRINTF_F_PREFIX) && __numsys != 10) {
+				if (__numsys == 16) {
+					*__dst++ = '0';
+					*__dst++ = __flags & __PRINTF_F_UPPER2 ? 'X' : 'x';
+				} else if (__numsys == 2) {
+					*__dst++ = '0';
+					*__dst++ = __dec[11]; /* B/b */
+				} else if (__numsys == 8 && __data.__u != 0) {
+					*__dst++ = '0';
+				}
+			}
+			if (__dst > __sign) {
+				__temp = (*__FORMAT_PRINTER)(__FORMAT_ARG, __sign, (__SIZE_TYPE__)(__dst - __sign));
 				if __unlikely(__temp < 0)
 					goto __err;
 				__result += __temp;
@@ -1454,7 +1464,7 @@ __do_float_normal_width:
 		}
 #undef __USED_FLOAT_TYPE
 	}	break;
-#endif
+#endif /* !__NO_PRINTF_FLOATING_POINT && !__NO_FPU */
 
 
 	default:
@@ -1515,6 +1525,7 @@ __err:
 #undef __PRINTF_LENGTH_l
 #undef __PRINTF_LENGTH_LL
 #undef __PRINTF_F_NONE
+#undef __PRINTF_F_UPPER2
 #undef __PRINTF_F_UPPER
 #undef __PRINTF_F_LJUST
 #undef __PRINTF_F_SIGN

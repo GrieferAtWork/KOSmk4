@@ -613,7 +613,7 @@ libdi_debug_repr_dump(pformatprinter printer, void *arg,
 	                                          &cu_sections, &parser, &abbrev, NULL) == DEBUG_INFO_ERROR_SUCCESS) {
 		do {
 			DO(format_repeat(printer, arg, '\t', parser.dup_child_depth));
-			DO(format_printf(printer, arg, REPR_STRING("0x%p:"), parser.dup_cu_info_pos));
+			DO(format_printf(printer, arg, REPR_STRING("%#p:"), parser.dup_cu_info_pos));
 			s = libdi_debug_repr_DW_TAG(parser.dup_comp.dic_tag);
 			DO(s ? format_printf(printer, arg, REPR_STRING("DW_TAG_%s:\n"), s) : format_printf(printer, arg, REPR_STRING("%#Ix:\n"), parser.dup_comp.dic_tag));
 			di_debuginfo_component_attrib_t attr;
@@ -641,7 +641,7 @@ libdi_debug_repr_dump(pformatprinter printer, void *arg,
 					uintptr_t value;
 					if (!libdi_debuginfo_cu_parser_getaddr(&parser, attr.dica_form, &value))
 						goto err_bad_value;
-					DO(format_printf(printer, arg, REPR_STRING("0x%p"), value));
+					DO(format_printf(printer, arg, REPR_STRING("%#p"), value));
 				}	break;
 
 				case DW_FORM_data1:
@@ -682,7 +682,7 @@ libdi_debug_repr_dump(pformatprinter printer, void *arg,
 					if unlikely(!libdi_debuginfo_cu_parser_next(&p2)) {
 						PRINT("<BAD REFERENCE>");
 					} else {
-						DO(format_printf(printer, arg, REPR_STRING("0x%p:"), p2.dup_cu_info_pos));
+						DO(format_printf(printer, arg, REPR_STRING("%#p:"), p2.dup_cu_info_pos));
 						s = libdi_debug_repr_DW_TAG(p2.dup_comp.dic_tag);
 						DO(s ? format_printf(printer, arg, REPR_STRING("DW_TAG_%s"), s)
 						     : format_printf(printer, arg, REPR_STRING("%#Ix"), p2.dup_comp.dic_tag));

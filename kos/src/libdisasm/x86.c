@@ -2903,7 +2903,7 @@ print_byte:
 		disasm_print_format(self, DISASSEMBLER_FORMAT_PSEUDOOP_PREFIX);
 		disasm_print(self, ".byte", 5);
 		disasm_print_format(self, DISASSEMBLER_FORMAT_PSEUDOOP_SUFFIX);
-		disasm_printf(self, " 0x%.2I8x", *self->d_pc++);
+		disasm_printf(self, " %#.2I8x", *self->d_pc++);
 		return;
 	}
 #ifdef CONFIG_AUTOSELECT_JCC
@@ -3372,7 +3372,7 @@ do_print_moffs:
 					disasm_print_format(self, DISASSEMBLER_FORMAT_IMMEDIATE_SUFFIX);
 					disasm_print(self, ":", 1);
 					disasm_print_format(self, DISASSEMBLER_FORMAT_SYMBOL_PREFIX);
-					disasm_printf(self, "0x%I32p", offset);
+					disasm_printf(self, "%#I32p", offset);
 					disasm_print_format(self, DISASSEMBLER_FORMAT_SYMBOL_SUFFIX);
 				}	break;
 

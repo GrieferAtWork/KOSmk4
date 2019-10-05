@@ -47,11 +47,11 @@ PRIVATE REF struct ps2_keyboard *ps2_keyboards[PS2_PORTCOUNT];
 PRIVATE NOBLOCK void
 NOTHROW(FCALL ps2_keyboard_postkey)(struct ps2_keyboard *__restrict self, u16 key) {
 	assert(key != KEY_NONE); /* Use KEY_UNKNOWN instead! */
-	printk(KERN_DEBUG "[ps2:%q] Post key 0x%.4I16x [state=%u]\n",
+	printk(KERN_DEBUG "[ps2:%q] Post key %#.4I16x [state=%u]\n",
 	       self->cd_name, key, (unsigned int)self->pk_state);
 	/* Schedule the key */
 	if unlikely(!keyboard_device_putkey_nopr(self, key)) {
-		printk(KERN_WARNING "[ps2:%q] Keyboard buffer is full (dropping 0x%.4I16x)\n",
+		printk(KERN_WARNING "[ps2:%q] Keyboard buffer is full (dropping %#.4I16x)\n",
 		       self->cd_name, key);
 	}
 }

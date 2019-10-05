@@ -55,7 +55,7 @@ DECL_BEGIN
 LOCAL void KCALL do_trace_external(char const *method, pageptr_t min, pageptr_t max) {
 	pflag_t was;
 	was = PREEMPTION_PUSHOFF();
-	printk(KERN_RAW "%%{trace:%s:pmem:0x%p:0x%p}", method, min, max);
+	printk(KERN_RAW "%%{trace:%s:pmem:%#p:%#p}", method, min, max);
 	PREEMPTION_POP(was);
 }
 #define TRACE_EXTERNAL(method, min, max) \

@@ -1381,7 +1381,7 @@ do_read_bit_pieces:
 			break;
 
 		default:
-			ERRORF(err_unknown_instruction, "opcode = 0x%.2I8x (%p/%p/%p/%Iu)\n%$[hex]\n",
+			ERRORF(err_unknown_instruction, "opcode = %#.2I8x (%p/%p/%p/%Iu)\n%$[hex]\n",
 			       opcode, pc - 1, self->ue_pc_start, self->ue_pc_end,
 			       (size_t)(self->ue_pc_end - (pc - 1)),
 			       (size_t)(self->ue_pc_end - self->ue_pc_start),

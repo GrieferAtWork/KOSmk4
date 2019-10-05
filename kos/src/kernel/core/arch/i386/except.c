@@ -255,11 +255,11 @@ PRIVATE void
 NOTHROW(KCALL print_opcode)(pformatprinter printer, void *arg, uintptr_t opcode) {
 	uintptr_t opno = E_ILLEGAL_INSTRUCTION_X86_OPCODE_GETOPC(opcode);
 	if (opno <= 0xff) {
-		format_printf(printer, arg, " [opcode=0x%.2Ix", opno);
+		format_printf(printer, arg, " [opcode=%#.2Ix", opno);
 	} else if (opno <= 0xffff) {
-		format_printf(printer, arg, " [opcode=0x%.4Ix", opno);
+		format_printf(printer, arg, " [opcode=%#.4Ix", opno);
 	} else {
-		format_printf(printer, arg, " [opcode=0x%Ix", opno);
+		format_printf(printer, arg, " [opcode=%#Ix", opno);
 	}
 	if (E_ILLEGAL_INSTRUCTION_X86_OPCODE_HASREG(opcode))
 		format_printf(printer, arg, "/%u",
@@ -286,7 +286,7 @@ NOTHROW(KCALL print_exception_desc_of)(struct exception_data const *__restrict d
 		switch (data->e_subclass) {
 
 		case E_ILLEGAL_INSTRUCTION_X86_INTERRUPT:
-			format_printf(printer, arg, " [int=0x%.2Ix:%#Ix] [seg=%#Ix]",
+			format_printf(printer, arg, " [int=%#.2Ix:%#Ix] [seg=%#Ix]",
 			              data->e_pointers[1],
 			              data->e_pointers[2],
 			              data->e_pointers[3]);

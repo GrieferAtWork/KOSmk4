@@ -283,9 +283,9 @@ init_mouse:
 	} else {
 		printk(FREESTR(KERN_WARNING "[ps2] Failed to detect device on port #%u [id=["), portno + 1);
 		if (nid_port >= 1)
-			printk(FREESTR(KERN_WARNING "0x%.2I8x"), id_port[0]);
+			printk(FREESTR(KERN_WARNING "%#.2I8x"), id_port[0]);
 		if (nid_port >= 2)
-			printk(FREESTR(KERN_WARNING ",0x%.2I8x"), id_port[1]);
+			printk(FREESTR(KERN_WARNING ",%#.2I8x"), id_port[1]);
 		printk(FREESTR(KERN_WARNING "]] assume it's a %s\n"),
 		       portno == PS2_PORT1 ? FREESTR("keyboard")
 		                           : FREESTR("mouse"));

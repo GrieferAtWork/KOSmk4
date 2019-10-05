@@ -846,7 +846,7 @@ NOTHROW(FCALL handle_ata_bus_interrupt)(struct ata_bus *__restrict self) {
 		     DMA_STATUS_FDMARUNNING |
 		     DMA_STATUS_FINTERRUPTED);
 		status = inb(self->b_busio + ATA_STATUS); /* Must always be read... */
-		ATA_VERBOSE("[ata] IDE interrupt on bus:%#I16x,ctrl:%#I16x,dma:%#I16x [bus_status=0x%.2I8x,dma_status=0x%.2I8x]\n",
+		ATA_VERBOSE("[ata] IDE interrupt on bus:%#I16x,ctrl:%#I16x,dma:%#I16x [bus_status=%#.2I8x,dma_status=%#.2I8x]\n",
 		            self->b_busio, self->b_ctrlio, self->b_dmaio, status, dma_status);
 again_readstate:
 		switch (ATOMIC_READ(self->b_state)) {
@@ -902,7 +902,7 @@ again_readstate:
 	} else {
 		/* BUS without DMA support */
 		status = inb(self->b_busio + ATA_STATUS);
-		ATA_VERBOSE("[ata] IDE interrupt on bus:%#I16x,ctrl:%#I16x,dma:%#I16x [bus_status=0x%.2I8x]\n",
+		ATA_VERBOSE("[ata] IDE interrupt on bus:%#I16x,ctrl:%#I16x,dma:%#I16x [bus_status=%#.2I8x]\n",
 		            self->b_busio, self->b_ctrlio, self->b_dmaio, status);
 		switch (ATOMIC_READ(self->b_state)) {
 

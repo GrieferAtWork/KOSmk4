@@ -1084,7 +1084,7 @@ again:
 		chain = *iter;
 		while (chain &&
 		       (HEAP_ASSERTF(IS_ALIGNED(MFREE_SIZE(chain), HEAP_ALIGNMENT),
-		                     "MFREE_SIZE(chain) = 0x%Ix",
+		                     "MFREE_SIZE(chain) = %#Ix",
 		                     MFREE_SIZE(chain)),
 		        MFREE_SIZE(chain) < threshold))
 			chain = LLIST_NEXT(chain, mf_lsize);

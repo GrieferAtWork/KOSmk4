@@ -206,7 +206,7 @@ libda_single_generic(struct disassembler *__restrict self) {
 	disasm_print_format(self, DISASSEMBLER_FORMAT_PSEUDOOP_PREFIX);
 	disasm_print(self, ".byte", 5);
 	disasm_print_format(self, DISASSEMBLER_FORMAT_PSEUDOOP_SUFFIX);
-	disasm_printf(self, " 0x%.2I8x", *self->d_pc++);
+	disasm_printf(self, " %#.2I8x", *self->d_pc++);
 }
 
 #undef CONFIG_LOOKUP_SYMBOL_NAME
@@ -360,7 +360,7 @@ generic_print_symbol_addr:
 #endif /* !__KERNEL__ */
 #endif /* CONFIG_LOOKUP_SYMBOL_NAME */
 				{
-					disasm_printf(self, "0x%p", symbol_addr);
+					disasm_printf(self, "%#p", symbol_addr);
 				}
 			}
 		}

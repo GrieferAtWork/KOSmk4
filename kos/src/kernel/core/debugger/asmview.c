@@ -391,7 +391,7 @@ NOTHROW(LIBDISASM_CC av_symbol_printer)(struct disassembler *__restrict self,
 			disasm_printf(self, "+%#Ix", symbol_offset);
 		disasm_print(self, ">", 1);
 	} else {
-		disasm_printf(self, "0x%p", symbol_addr);
+		disasm_printf(self, "%#p", symbol_addr);
 	}
 	return 0;
 }

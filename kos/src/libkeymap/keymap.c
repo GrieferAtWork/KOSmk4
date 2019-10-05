@@ -42,8 +42,8 @@
 
 #if !defined(NDEBUG) && !defined(__KERNEL__) && 0
 #include <sys/syslog.h>
-#define CASE(value)        case value: syslog(LOG_DEBUG, "%s(%d) : %s [reg_key=0x%.4I16x]\n", __FILE__, __LINE__, #value, reg_key);
-#define CASEF(value, ...)  case value: syslog(LOG_DEBUG, "%s(%d) : %s [reg_key=0x%.4I16x] : ", __FILE__, __LINE__, #value, reg_key); syslog(LOG_DEBUG, __VA_ARGS__);
+#define CASE(value)        case value: syslog(LOG_DEBUG, "%s(%d) : %s [reg_key=%#.4I16x]\n", __FILE__, __LINE__, #value, reg_key);
+#define CASEF(value, ...)  case value: syslog(LOG_DEBUG, "%s(%d) : %s [reg_key=%#.4I16x] : ", __FILE__, __LINE__, #value, reg_key); syslog(LOG_DEBUG, __VA_ARGS__);
 #define ERROR(label)       do{ syslog(LOG_ERR, "%s(%d) : Error\n", __FILE__, __LINE__); goto label; }__WHILE0
 #define ERRORF(label, ...) do{ syslog(LOG_ERR, "%s(%d) : Error : ", __FILE__, __LINE__); syslog(LOG_ERR, __VA_ARGS__); goto label; }__WHILE0
 #else
@@ -289,7 +289,7 @@ NOTHROW_NCX(CC libkeymap_translate)(struct keymap *__restrict self,
 				reader += 2;
 				break;
 
-			CASEF(KMP_OP_SETKEYMOD2, "mask=0x%.4I16x\n", UNALIGNED_GETLE16((u16 *)reader)) {
+			CASEF(KMP_OP_SETKEYMOD2, "mask=%#.4I16x\n", UNALIGNED_GETLE16((u16 *)reader)) {
 				u16 mask;
 				mask = UNALIGNED_GETLE16((u16 *)reader);
 				reader += 2;
@@ -298,7 +298,7 @@ NOTHROW_NCX(CC libkeymap_translate)(struct keymap *__restrict self,
 				goto skip_character;
 			}	break;
 
-			CASEF(KMP_OP_SETKEYMOD, "mask=0x%.2I8x\n", *reader) {
+			CASEF(KMP_OP_SETKEYMOD, "mask=%#.2I8x\n", *reader) {
 				u8 mask;
 				mask = *reader++;
 				if (reg_key == key && mod == mask)

@@ -2201,7 +2201,7 @@ check_for_notif_or_remote_byte:
 			continue;
 		}
 		if (b != '$') {
-			printk(KERN_WARNING "[gdb] Unrecognized out-of-band byte: %Q (0x%.2I8x)\n", b, b);
+			printk(KERN_WARNING "[gdb] Unrecognized out-of-band byte: %Q (%#.2I8x)\n", b, b);
 			if (b == '+' || b == '-') {
 				ATOMIC_FETCHAND(GDBServer_Features, ~GDB_SERVER_FEATURE_NOACK);
 			}

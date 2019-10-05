@@ -1924,13 +1924,13 @@ libdi_debuginfo_do_print_unknown_data(pformatprinter printer, void *arg,
 					goto err;
 				result += temp;
 			}
-			temp = format_printf(printer, arg, "0x%.16I64x", val);
+			temp = format_printf(printer, arg, "%#.16I64x", val);
 			if unlikely(temp < 0)
 				goto err;
 			result += temp;
 		}
 	} else
-#endif
+#endif /* __SIZEOF_POINTER__ >= 8 */
 	if ((datasize & 3) == 0) {
 		for (i = 0; i < (datasize >> 2); ++i) {
 			uint32_t val = UNALIGNED_GET32((uint32_t *)data + i);
@@ -1940,7 +1940,7 @@ libdi_debuginfo_do_print_unknown_data(pformatprinter printer, void *arg,
 					goto err;
 				result += temp;
 			}
-			temp = format_printf(printer, arg, "0x%.8I32x", val);
+			temp = format_printf(printer, arg, "%#.8I32x", val);
 			if unlikely(temp < 0)
 				goto err;
 			result += temp;
@@ -1954,7 +1954,7 @@ libdi_debuginfo_do_print_unknown_data(pformatprinter printer, void *arg,
 					goto err;
 				result += temp;
 			}
-			temp = format_printf(printer, arg, "0x%.4I16x", val);
+			temp = format_printf(printer, arg, "%#.4I16x", val);
 			if unlikely(temp < 0)
 				goto err;
 			result += temp;
@@ -1968,7 +1968,7 @@ libdi_debuginfo_do_print_unknown_data(pformatprinter printer, void *arg,
 					goto err;
 				result += temp;
 			}
-			temp = format_printf(printer, arg, "0x%.2I8x", val);
+			temp = format_printf(printer, arg, "%#.2I8x", val);
 			if unlikely(temp < 0)
 				goto err;
 			result += temp;
@@ -2068,7 +2068,7 @@ generic_print_address:
 			}
 			result = 0;
 			FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_PREFIX);
-			DO(format_printf(printer, arg, "0x%p", addr));
+			DO(format_printf(printer, arg, "%#p", addr));
 			FORMAT(DEBUGINFO_PRINT_FORMAT_INTEGER_SUFFIX);
 		}	break;
 

@@ -857,7 +857,7 @@ skip_expression:
 				break;
 
 			default:
-				ERRORF(err_unknown_instruction, "operand = 0x%.2I8x\n", operand);
+				ERRORF(err_unknown_instruction, "operand = %#.2I8x\n", operand);
 			}
 		}
 	}

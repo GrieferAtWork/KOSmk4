@@ -188,10 +188,10 @@ panic_uhi_dbg_main(void *arg) {
 	args = (struct panic_args *)arg;
 	dbg_printf(DF_COLOR(DBG_COLOR_WHITE, DBG_COLOR_MAROON,
 	                    "Unhandled interrupt")
-	           " [int: " DF_WHITE("0x%.2I8x") " (" DF_WHITE("%I8u") ")]",
+	           " [int: " DF_WHITE("%#.2I8x") " (" DF_WHITE("%I8u") ")]",
 	           (u8)args->intno, (u8)args->intno);
 	if (args->ecode)
-		dbg_printf(" [ecode=" DF_WHITE("0x%.8I32x") "]", (u32)args->ecode);
+		dbg_printf(" [ecode=" DF_WHITE("%#.8I32x") "]", (u32)args->ecode);
 	{
 		char const *name, *desc;
 		name = get_interrupt_name(args->intno);

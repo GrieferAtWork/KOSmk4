@@ -857,7 +857,7 @@ NOTHROW(KCALL vm_node_insert_ignore_missmatch)(struct vm_node *__restrict self) 
 	        self->vn_node.a_vmax < insert_before->vn_node.a_vmin,
 	        "insert_before  = %p:%p...%p\n"
 	        "self           = %p:%p...%p\n"
-	        "self->vn_flags = 0x%.4I16x\n",
+	        "self->vn_flags = %#.4I16x\n",
 	        insert_before, VM_NODE_MINADDR(insert_before), VM_NODE_MAXADDR(insert_before),
 	        self, VM_NODE_MINADDR(self), VM_NODE_MAXADDR(self),
 	        self->vn_flags);
@@ -4012,7 +4012,7 @@ NOTHROW(KCALL vm_node_insert)(struct vm_node *__restrict self) {
 	        self->vn_node.a_vmax < insert_before->vn_node.a_vmin,
 	        "insert_before  = %p:%p...%p\n"
 	        "self           = %p:%p...%p\n"
-	        "self->vn_flags = 0x%.4I16x\n",
+	        "self->vn_flags = %#.4I16x\n",
 	        insert_before, VM_NODE_MINADDR(insert_before), VM_NODE_MAXADDR(insert_before),
 	        self, VM_NODE_MINADDR(self), VM_NODE_MAXADDR(self),
 	        self->vn_flags);

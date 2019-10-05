@@ -345,7 +345,7 @@ NOTHROW(KCALL vmb_node_insert)(struct vmb *__restrict self,
 	        node->vn_node.a_vmax < insert_before->vn_node.a_vmin,
 	        "insert_before  = %p:%p...%p\n"
 	        "node           = %p:%p...%p\n"
-	        "node->vn_flags = 0x%.4I16x\n",
+	        "node->vn_flags = %#.4I16x\n",
 	        insert_before, VM_NODE_MINADDR(insert_before), VM_NODE_MAXADDR(insert_before),
 	        node, VM_NODE_MINADDR(node), VM_NODE_MAXADDR(node),
 	        node->vn_flags);

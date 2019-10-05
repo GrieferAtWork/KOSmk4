@@ -53,8 +53,8 @@ DECL_BEGIN
 
 PRIVATE ATTR_DBGTEXT void KCALL
 print_cpuid_reg(u32 leaf, char reg_acdb, u32 reg_value) {
-	dbg_printf(DBGSTR("cpuid "    DF_SETFGCOLOR(DBG_COLOR_WHITE) "0x%.8I32x" DF_DEFFGCOLOR
-	                  ": %%e%cx=" DF_SETFGCOLOR(DBG_COLOR_WHITE) "0x%.8I32x" DF_DEFFGCOLOR
+	dbg_printf(DBGSTR("cpuid "    DF_SETFGCOLOR(DBG_COLOR_WHITE) "%#.8I32x" DF_DEFFGCOLOR
+	                  ": %%e%cx=" DF_SETFGCOLOR(DBG_COLOR_WHITE) "%#.8I32x" DF_DEFFGCOLOR
 	                  " (" DF_SETFGCOLOR(DBG_COLOR_YELLOW) "%$q" DF_DEFFGCOLOR ")"
 	                  " (" DF_SETFGCOLOR(DBG_COLOR_WHITE) "%I32u" ")" DF_DEFFGCOLOR "\n"),
 	           leaf, reg_acdb, reg_value, 4, &reg_value, reg_value);
@@ -189,7 +189,7 @@ DEFINE_DEBUG_FUNCTION(
 	    sscanf(argv[1], DBGSTR("%I16U"), &limit) != 1 ||
 	    sscanf(argv[2], DBGSTR("%Ix"), &base) != 1)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
-	dbg_printf("lgdt 0x%.4I16x (%I16u), %p\n", limit, limit, base);
+	dbg_printf("lgdt #%.4I16x (%I16u), %p\n", limit, limit, base);
 	dbg_viewstate.fcs_gdt.dt_limit = limit;
 	dbg_viewstate.fcs_gdt.dt_base  = base;
 	return 0;
@@ -201,7 +201,7 @@ DEFINE_DEBUG_FUNCTION(
 		, argc, argv) {
 	if (argc != 1)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
-	dbg_printf(DBGSTR("sgdt 0x%.4I16x (%I16u), %p\n"),
+	dbg_printf(DBGSTR("sgdt %#.4I16x (%I16u), %p\n"),
 	           dbg_viewstate.fcs_gdt.dt_limit,
 	           dbg_viewstate.fcs_gdt.dt_limit,
 	           dbg_viewstate.fcs_gdt.dt_base);
@@ -219,7 +219,7 @@ DEFINE_DEBUG_FUNCTION(
 	    sscanf(argv[1], "%I16U", &limit) != 1 ||
 	    sscanf(argv[2], "%Ix", &base) != 1)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
-	dbg_printf(DBGSTR("lidt 0x%.4I16x (%I16u), %p\n"),
+	dbg_printf(DBGSTR("lidt %#.4I16x (%I16u), %p\n"),
 	           limit, limit, base);
 	dbg_viewstate.fcs_idt.dt_limit = limit;
 	dbg_viewstate.fcs_idt.dt_base  = base;
@@ -232,7 +232,7 @@ DEFINE_DEBUG_FUNCTION(
 		, argc, argv) {
 	if (argc != 1)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
-	dbg_printf(DBGSTR("sidt 0x%.4I16x (%I16u), %p\n"),
+	dbg_printf(DBGSTR("sidt %#.4I16x (%I16u), %p\n"),
 	           dbg_viewstate.fcs_idt.dt_limit,
 	           dbg_viewstate.fcs_idt.dt_limit,
 	           dbg_viewstate.fcs_idt.dt_base);
@@ -293,8 +293,8 @@ DEFINE_DEBUG_FUNCTION(
 	    sscanf(argv[1], DBGSTR("%I32x"), &id) != 1)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
 	val = __rdmsr(id);
-	dbg_printf(DBGSTR("rdmsr " DF_WHITE("0x%.8I32x") " (" DF_WHITE("%I32u") "): "
-	                  DF_WHITE("0x%.16I64x") " (" DF_WHITE("%I64u") ")\n"),
+	dbg_printf(DBGSTR("rdmsr " DF_WHITE("%#.8I32x") " (" DF_WHITE("%I32u") "): "
+	                  DF_WHITE("%#.16I64x") " (" DF_WHITE("%I64u") ")\n"),
 	           id, id, val, val);
 	return 0;
 }
@@ -308,8 +308,8 @@ DEFINE_DEBUG_FUNCTION(
 	    sscanf(argv[1], DBGSTR("%I32x"), &id) != 1 ||
 	    sscanf(argv[2], DBGSTR("%I64U"), &val) != 1)
 		return DBG_FUNCTION_INVALID_ARGUMENTS;
-	dbg_printf(DBGSTR("wrmsr " DF_WHITE("0x%.8I32x") " (" DF_WHITE("%I32u") "): "
-	                  DF_WHITE("0x%.16I64x") " (" DF_WHITE("%I64u") ")\n"),
+	dbg_printf(DBGSTR("wrmsr " DF_WHITE("%#.8I32x") " (" DF_WHITE("%I32u") "): "
+	                  DF_WHITE("%#.16I64x") " (" DF_WHITE("%I64u") ")\n"),
 	           id, id, val, val);
 	__wrmsr(id, val);
 	return 0;
