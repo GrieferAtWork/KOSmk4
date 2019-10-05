@@ -148,11 +148,11 @@ isr_try_register_at_impl(/*inherit(on_success)*/REF struct driver *__restrict fu
 	if (isr_vectors[index].cmpxch_inherit_new(old_state, new_state)) {
 		printk(KERN_INFO "[isr] Register handler for vector %#Ix (%[vinfo:%n(%p)] with %p in driver %q)\n",
 		       (size_t)ISR_INDEX_TO_VECTOR(index), func, arg, func_driver->d_name);
-		decref(func_driver); /* Inherit on success. */
+		decref_unlikely(func_driver); /* Inherit on success. */
 		return true;
 	}
 	/* Failed to install the new state (so we must destroy it now) */
-	decref(new_state);  /* Destroy the new state. */
+	decref_likely(new_state);  /* Destroy the new state. */
 	return false;
 }
 

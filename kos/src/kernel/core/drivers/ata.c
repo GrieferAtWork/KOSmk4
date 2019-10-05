@@ -577,6 +577,11 @@ PRIVATE NOBLOCK void
 NOTHROW(FCALL ata_handle_signal)(struct aio_handle *__restrict self,
                                  unsigned int status) {
 	AtaAIOHandleData *data = (AtaAIOHandleData *)self->ah_data;
+	/* FIXME: This we need something smarter than a flag to implement AIO!
+	 *        If the waiter has allocated the handle on their stack, and calls
+	 *        cancel() after we got here, but before we finished invoking their
+	 *        callback, then cancel() won't wait for us to finish, and we may
+	 *        access uninitialized memory! */
 	if (!(ATOMIC_FETCHOR(data->hd_flags, ATA_AIO_HANDLE_FSERVED) & ATA_AIO_HANDLE_FSERVED))
 		ata_dohandle_signal(self, status);
 }

@@ -78,9 +78,10 @@ DEFINE_REFCOUNT_FUNCTIONS(struct character_device, cd_refcnt, character_device_d
  */
 FUNDEF WUNUSED ATTR_RETNONNULL ATTR_MALLOC REF struct character_device *KCALL
 character_device_alloc(struct driver *__restrict owner,
-                       size_t structure_size DFL(sizeof(struct character_device)))
+                       size_t structure_size DFL(sizeof(struct character_device)),
+                       size_t structure_align DFL(COMPILER_ALIGNOF(struct character_device)))
 		THROWS(E_BADALLOC, E_WOULDBLOCK);
-#define CHARACTER_DEVICE_ALLOC(T) ((REF T *)character_device_alloc(&drv_self, sizeof(T)))
+#define CHARACTER_DEVICE_ALLOC(T) ((REF T *)character_device_alloc(&drv_self, sizeof(T), COMPILER_ALIGNOF(T)))
 
 
 /* Returns the device number of `self', or `DEV_UNSET' if not set. */

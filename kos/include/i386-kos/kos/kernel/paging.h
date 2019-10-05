@@ -74,18 +74,18 @@
 #define ADDR_IS_CANON(addr)     1
 #endif /* !__x86_64__ */
 
-#define ADDR_IS_KERNEL(ptr)           ((__UINTPTR_TYPE__)(ptr) >= KERNEL_BASE)
-#define PAGE_IS_KERNEL(ptr)           ((__UINTPTR_TYPE__)(ptr) >= KERNEL_BASE_PAGE)
-#define ADDR_IS_USER(ptr)             ((__UINTPTR_TYPE__)(ptr) < KERNEL_BASE)
-#define PAGE_IS_USER(ptr)             ((__UINTPTR_TYPE__)(ptr) < KERNEL_BASE_PAGE)
-#define ARANGE_IS_KERNEL(start,end)   ((__UINTPTR_TYPE__)(start) >= KERNEL_BASE)
-#define PRANGE_IS_KERNEL(start,end)   ((__UINTPTR_TYPE__)(start) >= KERNEL_BASE_PAGE)
-#define ARANGE_IS_USER(start,end)     ((__UINTPTR_TYPE__)(end) <= KERNEL_BASE)
-#define PRANGE_IS_USER(start,end)     ((__UINTPTR_TYPE__)(end) <= KERNEL_BASE_PAGE)
-#define ARANGE_IS_KERNEL_PARTIAL(start,end)   ((__UINTPTR_TYPE__)(end) > KERNEL_BASE)
-#define PRANGE_IS_KERNEL_PARTIAL(start,end)   ((__UINTPTR_TYPE__)(end) > KERNEL_BASE_PAGE)
-#define ARANGE_IS_USER_PARTIAL(start,end)     ((__UINTPTR_TYPE__)(start) < KERNEL_BASE)
-#define PRANGE_IS_USER_PARTIAL(start,end)     ((__UINTPTR_TYPE__)(start) < KERNEL_BASE_PAGE)
+#define ADDR_IS_KERNEL(ptr)            ((__UINTPTR_TYPE__)(ptr) >= KERNEL_BASE)
+#define PAGE_IS_KERNEL(ptr)            ((__UINTPTR_TYPE__)(ptr) >= KERNEL_BASE_PAGE)
+#define ADDR_IS_USER(ptr)              ((__UINTPTR_TYPE__)(ptr) < KERNEL_BASE)
+#define PAGE_IS_USER(ptr)              ((__UINTPTR_TYPE__)(ptr) < KERNEL_BASE_PAGE)
+#define ARANGE_IS_KERNEL(start, end)   ((__UINTPTR_TYPE__)(start) >= KERNEL_BASE)
+#define PRANGE_IS_KERNEL(start, end)   ((__UINTPTR_TYPE__)(start) >= KERNEL_BASE_PAGE)
+#define ARANGE_IS_USER(start, end)     ((__UINTPTR_TYPE__)(end) <= KERNEL_BASE)
+#define PRANGE_IS_USER(start, end)     ((__UINTPTR_TYPE__)(end) <= KERNEL_BASE_PAGE)
+#define ARANGE_IS_KERNEL_PARTIAL(start, end)   ((__UINTPTR_TYPE__)(end) > KERNEL_BASE)
+#define PRANGE_IS_KERNEL_PARTIAL(start, end)   ((__UINTPTR_TYPE__)(end) > KERNEL_BASE_PAGE)
+#define ARANGE_IS_USER_PARTIAL(start, end)     ((__UINTPTR_TYPE__)(start) < KERNEL_BASE)
+#define PRANGE_IS_USER_PARTIAL(start, end)     ((__UINTPTR_TYPE__)(start) < KERNEL_BASE_PAGE)
 
 
 /* VM hints for where to map different, dynamic kernel components. */

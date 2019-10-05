@@ -99,13 +99,16 @@ NOTHROW(KCALL character_device_destroy)(struct character_device *__restrict self
  *   >> return->cd_max_retry = 2;
  */
 PUBLIC WUNUSED ATTR_RETNONNULL ATTR_MALLOC REF struct character_device *KCALL
-character_device_alloc(struct driver *__restrict owner, size_t structure_size)
+character_device_alloc(struct driver *__restrict owner,
+                       size_t structure_size,
+                       size_t structure_align)
 		THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	REF struct character_device *result;
 	struct heapptr resptr;
 	assert(structure_size >= sizeof(struct character_device));
 	assert(owner);
-	resptr = heap_alloc(CHARACTER_DEVICE_HEAP,
+	resptr = heap_align(CHARACTER_DEVICE_HEAP,
+	                    structure_align, 0,
 	                    structure_size,
 	                    CHARACTER_DEVICE_GFP |
 	                    GFP_PREFLT |
