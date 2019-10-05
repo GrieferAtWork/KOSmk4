@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3ea38112 */
+/* HASH CRC-32:0xc3bbe54 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -740,6 +740,12 @@ __DECL_BEGIN
  * 	@@A more precise description of the error (One of `E_IOERROR_REASON_*')
  * 	member reason: uintptr_t; */
 #define E_IOERROR_BADBOUNDS (E_IOERROR,0x0004)
+/* No data could be read/written
+ * 	@@The miss-behaving sub-system (One of `E_IOERROR_SUBSYSTEM_*')
+ * 	member subsystem: uintptr_t;
+ * 	@@A more precise description of the error (One of `E_IOERROR_REASON_*')
+ * 	member reason: uintptr_t; */
+#define E_IOERROR_NODATA (E_IOERROR,0x0005)
 /* The error stems from the physical disk faulting */
 #define E_IOERROR_SUBSYSTEM_HARDDISK 0x0001
 /* The error stems from an I/O-related file error */

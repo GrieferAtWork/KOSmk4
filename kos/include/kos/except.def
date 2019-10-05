@@ -971,6 +971,16 @@ class E_IOERROR_BADBOUNDS: E_IOERROR = 0x0004 {
 	member reason: uintptr_t;
 }
 
+[message("No data could be read/written")]
+class E_IOERROR_NODATA : E_IOERROR = 0x0005 {
+	@@The miss-behaving sub-system (One of `E_IOERROR_SUBSYSTEM_*')
+	[tostr(select("E_IOERROR_SUBSYSTEM_*"))]
+	member subsystem: uintptr_t;
+	@@A more precise description of the error (One of `E_IOERROR_REASON_*')
+	[tostr(select("E_IOERROR_REASON_*"))]
+	member reason: uintptr_t;
+}
+
 @@The error stems from the physical disk faulting
 const E_IOERROR_SUBSYSTEM_HARDDISK = 0x0001;
 @@The error stems from an I/O-related file error

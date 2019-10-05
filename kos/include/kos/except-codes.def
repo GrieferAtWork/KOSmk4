@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5788a77c */
+/* HASH CRC-32:0xcec540a7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -116,6 +116,7 @@ CLASS(E_IOERROR,MESSAGE("Hardware error, or miss-behaving/miss-configured device
 	SUBCLASS(E_IOERROR_TIMEOUT,MESSAGE("Hardware component timed out"),NO_ERRNO,(MEMBER(uintptr_t,subsystem) MEMBER(uintptr_t,reason)))
 	SUBCLASS(E_IOERROR_READONLY,MESSAGE("Attempted to write to read-only disk component"),NO_ERRNO,(MEMBER(uintptr_t,subsystem) MEMBER(uintptr_t,reason)))
 	SUBCLASS(E_IOERROR_BADBOUNDS,MESSAGE("Attempted to write beyond the end of a disk"),NO_ERRNO,(MEMBER(uintptr_t,subsystem) MEMBER(uintptr_t,reason)))
+	SUBCLASS(E_IOERROR_NODATA,MESSAGE("No data could be read/written"),NO_ERRNO,(MEMBER(uintptr_t,subsystem) MEMBER(uintptr_t,reason)))
 END
 CLASS(E_NOT_EXECUTABLE,MESSAGE("The named file was not recognized as a valid executable"),ERRNO(ENOEXEC),())
 	SUBCLASS(E_NOT_EXECUTABLE_NOEXEC,MESSAGE("File does not have execute permissions"),NO_ERRNO,())
