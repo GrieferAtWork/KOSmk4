@@ -54,6 +54,26 @@
 
 DECL_BEGIN
 
+/* Exception handler for unhandled exceptions thrown by  */
+INTERN ATTR_USED NONNULL((1, 2)) unsigned int
+NOTHROW(KCALL driver_initializer_personality)(struct unwind_fde_struct *__restrict fde,
+                                              struct kcpustate *__restrict state,
+                                              void *lsda) {
+	if (kernel_debugtrap_enabled() &&
+	    (kernel_debugtrap_on & KERNEL_DEBUGTRAP_ON_DRIVER_INIT_FAILURE)) {
+		siginfo_t si;
+		struct kcpustate *st;
+		struct exception_info *info = error_info();
+		if (!error_as_signal(&info->ei_data, &si))
+			si.si_signo = SIGILL;
+		st = kernel_debugtrap_r(&info->ei_state, si.si_signo);
+		(void)st;
+	}
+	return DWARF_PERSO_CONTINUE_UNWIND;
+}
+
+
+
 
 /* Set of `KERNEL_DEBUGTRAP_ON_*', specifying events for which to trigger traps. */
 PUBLIC uintptr_t volatile kernel_debugtrap_on = KERNEL_DEBUGTRAP_ON_DEFAULT;

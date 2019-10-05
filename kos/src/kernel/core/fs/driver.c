@@ -3089,6 +3089,18 @@ again:
 	return true;
 }
 
+INTERN ATTR_WEAK NONNULL((1)) void FCALL
+driver_invoke_initializer(void (*func)(void)) {
+	TRY {
+		(*func)();
+	} EXCEPT {
+		if (kernel_debugtrap_enabled() &&
+		    (kernel_debugtrap_on & KERNEL_DEBUGTRAP_ON_DRIVER_INIT_FAILURE))
+			kernel_debugtrap(SIGTRAP);
+		RETHROW();
+	}
+}
+
 PRIVATE NONNULL((1)) void KCALL
 driver_do_run_initializers(struct driver *__restrict self) THROWS(...) {
 	size_t i; uint16_t dyni;
@@ -3132,13 +3144,13 @@ done_dyntag:
 		init_addr = preinit_array_base[i] /* + self->d_loadaddr*/;
 		if unlikely(init_addr < self->d_loadstart || init_addr >= self->d_loadend)
 			THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_INIT_FUNC);
-		(*(void (*)(void))init_addr)();
+		driver_invoke_initializer(*(void (*)(void))init_addr);
 	}
 	/* Service a init function, if one was specified. */
 	if (init_func) {
 		if unlikely(init_func < self->d_loadstart || init_func >= self->d_loadend)
 			THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_INIT_FUNC);
-		(*(void (*)(void))init_func)();
+		driver_invoke_initializer(*(void (*)(void))init_func);
 	}
 	/* Service init-array functions in forward order. */
 	for (i = 0; i < init_array_size; ++i) {
@@ -3146,7 +3158,7 @@ done_dyntag:
 		init_addr = init_array_base[i] /* + self->d_loadaddr*/;
 		if unlikely(init_addr < self->d_loadstart || init_addr >= self->d_loadend)
 			THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_INIT_FUNC);
-		(*(void (*)(void))init_addr)();
+		driver_invoke_initializer((void (*)(void))init_addr);
 	}
 }
 

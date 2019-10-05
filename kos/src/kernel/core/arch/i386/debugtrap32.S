@@ -47,6 +47,19 @@ PUBLIC_FUNCTION(kernel_debugtrap)
 END(kernel_debugtrap)
 
 
+.section .text
+INTERN_FUNCTION(driver_invoke_initializer)
+	.cfi_startproc
+	INTERN(driver_initializer_personality)
+	.cfi_personality 0, driver_initializer_personality
+	call   *%ecx
+	ret
+	.cfi_endproc
+END(driver_invoke_initializer)
+
+
+
+
 #define CPUSTATE_IS_ICPUSTATE
 #define CPUSTATE icpustate
 #include "debugtrap32-impl.S"
