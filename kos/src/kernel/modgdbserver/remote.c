@@ -138,6 +138,8 @@ INTERN int NOTHROW(FCALL GDBRemote_TimedGetByte)(void) {
 		result = GDBRemote_TryGetByte();
 		if (result >= 0)
 			break;
+		if (quantum_time() <= tmo)
+			continue;
 		printk(KERN_WARNING "[gdb] Timeout while waiting for a response\n");
 		return -1;
 	}
