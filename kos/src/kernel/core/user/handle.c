@@ -2740,6 +2740,7 @@ handle_fcntl(struct handle_manager *__restrict self,
 			RETHROW();
 		}
 		decref_unlikely(temp);
+		result = 0;
 		break;
 
 	case F_GETPIPE_SZ:

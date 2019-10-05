@@ -86,9 +86,9 @@ again:
 		goto again;
 	}
 	return true;
-err_nolib:
-	dlclose(lib);
 err:
+	dlclose(lib);
+err_nolib:
 	if (!ATOMIC_CMPXCH(librpc, NULL, (void *)-1))
 		goto again;
 	return false;
