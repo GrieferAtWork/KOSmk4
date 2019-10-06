@@ -611,6 +611,7 @@ again:
 			goto again;
 	}
 }
+
 PUBLIC NOBLOCK void
 NOTHROW(FCALL uhci_controller_endread)(struct uhci_controller *__restrict self) {
 	assert(sync_reading(&self->uc_lock));
@@ -810,6 +811,7 @@ struct uhci_syncheap_page {
 	vm_ppage_t shp_next;  /* Pointer to the next page (or `PAGEPTR_INVALID') */
 	size_t     shp_count; /* Number of consecutively allocated pages. */
 };
+
 struct uhci_syncheap {
 	vm_ppage_t sh_current; /* Physical address of a `struct uhci_syncheap_page' structure
 	                        * describing the next allocated page (or `PAGEPTR_INVALID'). */
@@ -1184,6 +1186,7 @@ copy_next_tx:
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL uhci_aio_noop_noarg)(struct aio_handle *__restrict UNUSED(self)) {
 }
+
 PRIVATE NOBLOCK WUNUSED NONNULL((1)) size_t
 NOTHROW(KCALL uhci_aio_sync_retsize)(struct aio_handle *__restrict self) {
 	return (size_t)self->ah_data[0];
