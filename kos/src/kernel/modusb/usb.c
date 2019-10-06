@@ -37,7 +37,8 @@ DECL_BEGIN
 
 
 /* Same as `usb_controller_transfer()', but wait for the transfer to
- * complete (essentially just a wrapper using `struct aio_handle_generic') */
+ * complete (essentially just a wrapper using `struct aio_handle_generic')
+ * @return: * : The total number of transferred bytes. */
 PUBLIC size_t KCALL
 usb_controller_transfer_sync(struct usb_controller *__restrict self,
                              struct usb_endpoint *__restrict endp,
@@ -53,8 +54,7 @@ usb_controller_transfer_sync(struct usb_controller *__restrict self,
 		aio_handle_generic_fini(&aio);
 		RETHROW();
 	}
-	assert(aio.ah_type);
-	assert(aio.ah_type->ht_retsize);
+	assert(aio.ah_type->ht_retsize != NULL);
 	result = (*aio.ah_type->ht_retsize)(&aio);
 	aio_handle_generic_fini(&aio);
 	return result;

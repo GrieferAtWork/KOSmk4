@@ -94,7 +94,7 @@ struct usb_controller
 	(KCALL *uc_transfer)(struct usb_controller *__restrict self,
 	                     struct usb_endpoint *__restrict endp,
 	                     struct usb_transfer const *__restrict tx,
-	                     struct aio_handle *__restrict aio);
+	                     /*out*/ struct aio_handle *__restrict aio);
 	/* TODO: Interface for registering Isochronous interrupt handlers. */
 };
 
@@ -115,12 +115,16 @@ struct usb_controller
  *               any of the pointed-to buffer controller structures (though
  *               obviously not the buffers themself), as well as later transfer
  *               descriptors even before the given `aio' handle is invoked to
- *               indicate completion. */
+ *               indicate completion.
+ *               Note that USB protocols also allow for back-propagation of
+ *               the total number of transferred bytes from, which is available
+ *               upon AIO completion via the `ht_retsize' operator of `aio',
+ *               which is guarantied to have been initialized by this function. */
 LOCAL NONNULL((1, 2, 3, 4)) void KCALL
 usb_controller_transfer(struct usb_controller *__restrict self,
                         struct usb_endpoint *__restrict endp,
                         struct usb_transfer const *__restrict tx,
-                        struct aio_handle *__restrict aio) {
+                        /*out*/ struct aio_handle *__restrict aio) {
 	(*self->uc_transfer)(self, endp, tx, aio);
 }
 

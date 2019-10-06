@@ -51,6 +51,12 @@
 
 #include "usb.h"
 
+#if !defined(NDEBUG) && 0
+#define UHCI_DEBUG(...) printk(__VA_ARGS__)
+#else
+#define UHCI_DEBUG(...) (void)0
+#endif
+
 DECL_BEGIN
 
 #define HINT_ADDR(x, y) x
@@ -387,9 +393,10 @@ NOTHROW(FCALL uhci_osqh_aio_completed)(struct uhci_controller *__restrict self,
 		u32 cs = ATOMIC_READ(td->td_cs);
 		actlen = (cs + 1) & UHCI_TDCS_ACTLEN;
 		maxlen = uhci_td_maxlen(td);
-		printk(KERN_DEBUG "[usb][pci:%I32p,io:%#Ix] uhci:td:complete [actlen=%#I16x,maxlen=%#I16x,cs=%#I32x,tok=%#I32x]\n",
-		       self->uc_pci->pd_base, self->uc_base.uc_mmbase,
-		       actlen, maxlen, cs, td->td_tok);
+		UHCI_DEBUG(KERN_DEBUG "[usb][pci:%I32p,io:%#Ix] uhci:td:complete"
+		                      " [actlen=%#I16x,maxlen=%#I16x,cs=%#I32x,tok=%#I32x]\n",
+		           self->uc_pci->pd_base, self->uc_base.uc_mmbase,
+		           actlen, maxlen, cs, td->td_tok);
 		/* Check for short packet */
 		if (actlen < maxlen) {
 			if unlikely(cs & UHCI_TDCS_SPD) {
@@ -412,15 +419,18 @@ NOTHROW(FCALL uhci_osqh_aio_completed)(struct uhci_controller *__restrict self,
 					if ((next_nonempty = next_nonempty->td_next) == NULL)
 						goto short_packet_ok; /* There are no later buffers (Partially filled, trailing buffers are OK) */
 				}
-				printk(KERN_DEBUG "[usb][pci:%I32p,io:%#Ix] "
-				                  "uhci:td:incomplete packet (%I16u/%I16u) followed "
-				                  "by non-empty packets of the same type (pid=%#I8x)\n",
+				printk(KERN_WARNING "[usb][pci:%I32p,io:%#Ix] "
+				                    "uhci:td:incomplete packet (%I16u/%I16u) followed "
+				                    "by non-empty packets of the same type (pid=%#I8x)\n",
 				       self->uc_pci->pd_base, self->uc_base.uc_mmbase,
 				       actlen, maxlen, mypid);
 				/* XXX: What now? Should we be trying to shift around buffer memory
 				 *      in order to fill the gap? - When does this even happen? Or
 				 *      is this even allowed to happen, because if not, then I can
-				 *      just have the transmission be completed with an error. */
+				 *      just have the transmission be completed with an error.
+				 *      If we were to blindly re-merge data buffers, we might end
+				 *      up causing problems in case there is some endpoint function
+				 *      that results in multiple chunks of dynamically sized packets. */
 			}
 		}
 short_packet_ok:
@@ -568,12 +578,12 @@ NOTHROW(FCALL uhci_finish_completed)(struct uhci_controller *__restrict self) {
 			decref(iter);
 			continue;
 		}
-#if 1 /* Incomplete transmission (can happen when an operation is split between multiple
-       * frames because of its size, or because it was sharing bandwidth by not having
-       * the `UHCI_TDLP_DBS' flag set) */
-		printk(KERN_DEBUG "[usb][pci:%I32p,io:%#Ix] uhci:incomplete [ep=%#I32x,cs=%#I32x]\n",
-		       self->uc_pci->pd_base, self->uc_base.uc_mmbase, ep, cs);
-#endif
+		/* Incomplete transmission (can happen when an operation is split between multiple
+		 * frames because of its size, or because it was sharing bandwidth by not having
+		 * the `UHCI_TDLP_DBS' flag set) */
+		UHCI_DEBUG(KERN_DEBUG "[usb][pci:%I32p,io:%#Ix] uhci:incomplete [ep=%#I32x,cs=%#I32x]\n",
+		           self->uc_pci->pd_base, self->uc_base.uc_mmbase, ep, cs);
+
 		/* In the case of depth-first, we can assume that there are no
 		 * more completed queues to be found, since that would imply that
 		 * our current queue would have also been completed! */
@@ -634,9 +644,9 @@ NOTHROW(FCALL uhci_interrupt)(void *arg) {
 		       self->uc_pci->pd_base, self->uc_base.uc_mmbase, status);
 		return false; /* Not our interrupt! */
 	}
-	uhci_wrw(self, UHCI_USBSTS, status);
-	printk(KERN_TRACE "[usb][pci:%I32p,io:%#Ix] uhci interrupt (status=%#I8x)\n",
-	       self->uc_pci->pd_base, self->uc_base.uc_mmbase, status);
+	uhci_wrw(self, UHCI_USBSTS, status & (UHCI_USBSTS_USBINT | UHCI_USBSTS_ERROR));
+	UHCI_DEBUG(KERN_TRACE "[usb][pci:%I32p,io:%#Ix] uhci interrupt (status=%#I8x)\n",
+	           self->uc_pci->pd_base, self->uc_base.uc_mmbase, status);
 	if unlikely(status & UHCI_USBSTS_HSE) {
 		printk(KERN_CRIT "[usb][pci:%I32p,io:%#Ix] uhci:Host-System-Error set (status=%#I8x)\n",
 		       self->uc_pci->pd_base, self->uc_base.uc_mmbase, status);
@@ -794,7 +804,7 @@ PRIVATE NONNULL((1, 2, 3, 4)) void KCALL
 uhci_transfer(struct usb_controller *__restrict self,
               struct usb_endpoint *__restrict endp,
               struct usb_transfer const *__restrict tx,
-              struct aio_handle *__restrict aio);
+              /*out*/ struct aio_handle *__restrict aio);
 
 struct uhci_syncheap_page {
 	vm_ppage_t shp_next;  /* Pointer to the next page (or `PAGEPTR_INVALID') */
@@ -1210,7 +1220,7 @@ PRIVATE NONNULL((1, 2, 3, 4)) void KCALL
 uhci_transfer(struct usb_controller *__restrict self,
               struct usb_endpoint *__restrict endp,
               struct usb_transfer const *__restrict tx,
-              struct aio_handle *__restrict aio) {
+              /*out*/ struct aio_handle *__restrict aio) {
 	struct uhci_aio_data *data;
 	struct uhci_osqh *qh;
 	struct uhci_ostd **pnexttd, *lasttd, *td_iter;
@@ -1397,14 +1407,16 @@ PRIVATE ATTR_FREETEXT void FCALL
 uhci_controller_probeport(struct uhci_controller *__restrict self,
                           unsigned int portno) {
 	u16 status;
-	printk(FREESTR(KERN_INFO "[usb] Checking for device on %#I16x\n"), portno);
+	printk(FREESTR(KERN_INFO "[usb][pci:%I32p,io:%#Ix] Checking for device on uhci:%#I16x\n"),
+	       self->uc_pci->pd_base, self->uc_base.uc_mmbase, portno);
 	status = uhci_controller_resetport(self, portno);
 	if (status & UHCI_PORTSC_PED) {
 		struct usb_endpoint *endpoint;
-		printk(FREESTR(KERN_INFO "[usb] Device found on %#I16x\n"), portno);
+		printk(FREESTR(KERN_INFO "[usb][pci:%I32p,io:%#Ix] Device found on uhci:%#I16x\n"),
+		       self->uc_pci->pd_base, self->uc_base.uc_mmbase, portno);
 		endpoint = (struct usb_endpoint *)kmalloc(sizeof(struct usb_endpoint), GFP_NORMAL);
 		endpoint->ue_refcnt   = 1;
-		endpoint->ue_maxpck   = 0x7ff; /* Not configured. */
+		endpoint->ue_maxpck   = 0x7ff; /* Not configured. (physical limit of the protocol) */
 		endpoint->ue_dev      = 0;     /* Not configured. */
 		endpoint->ue_endp     = 0;     /* Configure channel. */
 		endpoint->ue_toggle   = 0;
