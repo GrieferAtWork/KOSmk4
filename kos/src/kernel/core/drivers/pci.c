@@ -136,7 +136,7 @@ NOTHROW(KCALL RegisterPCIDevice)(pci_addr_t addr) {
 				state         = pci_read(addr, reg);
 				if (!(state & ~0xf))
 					continue; /* Unused. */
-//				pci_write(addr,reg,(u32)-1);
+//				pci_write(addr, reg, (u32)-1);
 				maxsize = pci_read(addr, reg);
 				if (state & 1) {
 					/* I/O range. */
@@ -159,16 +159,16 @@ NOTHROW(KCALL RegisterPCIDevice)(pci_addr_t addr) {
 					iter->pr_flags = 0; /* Ignore this case */
 				/* Allocate PCI resources */
 				if (reg <= PCI_GDEV_BAR5) {
-					//TODO: AllocatePCIDeviceRessource(result,iter);
+					//TODO: AllocatePCIDeviceRessource(result, iter);
 					state = (u32)((state & 1) | iter->pr_start);
 #if __SIZEOF_POINTER__ > 4
 					if ((iter->pr_flags & PCI_RESOURCE_FMEM64) && !(i & 1)) {
-//						pci_write(addr,reg+(PCI_GDEV_BAR1-PCI_GDEV_BAR0),
+//						pci_write(addr, reg + (PCI_GDEV_BAR1 - PCI_GDEV_BAR0),
 //						          (u32)((state & 1) | (iter->pr_start >> 32)));
 					}
 #endif
 				}
-//				pci_write(addr,reg,state);
+//				pci_write(addr, reg, state);
 			}
 			break;
 
@@ -178,7 +178,7 @@ NOTHROW(KCALL RegisterPCIDevice)(pci_addr_t addr) {
 				state         = pci_read(addr, reg);
 				if (!(state & ~0xf))
 					continue; /* Unused. */
-//				pci_write(addr,reg,(u32)-1);
+//				pci_write(addr, reg, (u32)-1);
 				maxsize = pci_read(addr, reg);
 				if (state & 1) {
 					/* I/O range. */
@@ -203,11 +203,11 @@ NOTHROW(KCALL RegisterPCIDevice)(pci_addr_t addr) {
 #if __SIZEOF_POINTER__ > 4
 				if ((iter->pr_flags & PCI_RESOURCE_FMEM64) && !(i & 1) &&
 				    reg <= PCI_GDEV_BAR5) {
-//					pci_write(addr,reg+(PCI_BDEV_BAR1-PCI_BDEV_BAR0),
+//					pci_write(addr, reg + (PCI_BDEV_BAR1 - PCI_BDEV_BAR0),
 //					         (u32)((state&1)|(iter->pr_start >> 32)));
 				}
 #endif
-//				pci_write(addr,reg,state);
+//				pci_write(addr, reg, state);
 			}
 			break;
 

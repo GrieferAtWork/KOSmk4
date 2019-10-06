@@ -29,9 +29,9 @@ DECL_BEGIN
 #define X86_PIC1       __IOPORT(0x20) /* IO base address for master PIC */
 #define X86_PIC2       __IOPORT(0xa0) /* IO base address for slave PIC */
 #define X86_PIC1_CMD   X86_PIC1
-#define X86_PIC1_DATA (X86_PIC1+1)
+#define X86_PIC1_DATA (X86_PIC1 + 1)
 #define X86_PIC2_CMD   X86_PIC2
-#define X86_PIC2_DATA (X86_PIC2+1)
+#define X86_PIC2_DATA (X86_PIC2 + 1)
 
 #define X86_PIC_CMD_EOI     0x20 /* End-of-interrupt command code */
 #define X86_ICW1_ICW4       0x01 /* ICW4 (not) needed */
@@ -48,16 +48,19 @@ DECL_BEGIN
 #define X86_PIC_READ_ISR    0x0b /* OCW3 irq service next CMD read */
 
 #ifdef __CC__
-#define X86_PIC1_IRR()  (outb(X86_PIC1_CMD,X86_PIC_READ_IRR),inb(X86_PIC2_CMD))
-#define X86_PIC2_IRR()  (outb(X86_PIC2_CMD,X86_PIC_READ_IRR),inb(X86_PIC2_CMD))
-#define X86_PIC1_ISR()  (outb(X86_PIC1_CMD,X86_PIC_READ_ISR),inb(X86_PIC2_CMD))
-#define X86_PIC2_ISR()  (outb(X86_PIC2_CMD,X86_PIC_READ_ISR),inb(X86_PIC2_CMD))
+#define X86_PIC1_IRR() (outb(X86_PIC1_CMD, X86_PIC_READ_IRR), inb(X86_PIC2_CMD))
+#define X86_PIC2_IRR() (outb(X86_PIC2_CMD, X86_PIC_READ_IRR), inb(X86_PIC2_CMD))
+#define X86_PIC1_ISR() (outb(X86_PIC1_CMD, X86_PIC_READ_ISR), inb(X86_PIC2_CMD))
+#define X86_PIC2_ISR() (outb(X86_PIC2_CMD, X86_PIC_READ_ISR), inb(X86_PIC2_CMD))
 
 /* Signal EOI (End of interrupt) to the first (master), or second (slave) PIC. */
-#define X86_PIC_EOI(intno) ((intno) >= X86_INTERRUPT_PIC2_BASE ? outb(X86_PIC2_CMD,X86_PIC_CMD_EOI) : (void)0, \
-                             outb(X86_PIC1_CMD,X86_PIC_CMD_EOI))
-#define X86_PIC1_EOI()      (outb(X86_PIC1_CMD,X86_PIC_CMD_EOI))
-#define X86_PIC2_EOI()      (outb(X86_PIC2_CMD,X86_PIC_CMD_EOI),outb(X86_PIC1_CMD,X86_PIC_CMD_EOI))
+#define X86_PIC_EOI(intno)                 \
+	((intno) >= X86_INTERRUPT_PIC2_BASE    \
+	 ? outb(X86_PIC2_CMD, X86_PIC_CMD_EOI) \
+	 : (void)0,                            \
+	 outb(X86_PIC1_CMD, X86_PIC_CMD_EOI))
+#define X86_PIC1_EOI() (outb(X86_PIC1_CMD, X86_PIC_CMD_EOI))
+#define X86_PIC2_EOI() (outb(X86_PIC2_CMD, X86_PIC_CMD_EOI), outb(X86_PIC1_CMD, X86_PIC_CMD_EOI))
 
 
 struct x86_spurious_interrupts {
@@ -76,9 +79,9 @@ DATDEF ATTR_PERCPU struct x86_spurious_interrupts x86_spurious_interrupts;
  * >> `INTNO_PIC1_STMASK()' disables irq_t: 0x20...0x27
  * >> `INTNO_PIC2_STMASK()' disables irq_t: 0x28...0x2f */
 #define X86_PIC1_GTMASK()   inb_p(X86_PIC1_DATA)
-#define X86_PIC1_STMASK(m) outb_p(X86_PIC1_DATA,m)
+#define X86_PIC1_STMASK(m) outb_p(X86_PIC1_DATA, m)
 #define X86_PIC2_GTMASK()   inb_p(X86_PIC2_DATA)
-#define X86_PIC2_STMASK(m) outb_p(X86_PIC2_DATA,m)
+#define X86_PIC2_STMASK(m) outb_p(X86_PIC2_DATA, m)
 #endif /* __CC__ */
 
 

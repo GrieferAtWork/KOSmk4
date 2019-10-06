@@ -21,6 +21,8 @@
 #error "Must #define VECTOR ... before #include-ing this file"
 #endif
 
+#include <kernel/pic.h>
+
 #ifndef FUNC
 #define FUNC3(x, y) x ## y
 #define FUNC2(x, y) FUNC3(x, y)
@@ -77,6 +79,10 @@ INTERN_FUNCTION(FUNC(x86_asmirq_))
 	jz     99f /* if (!(inb(X86_PIC2_CMD) & 0x80)) goto 99f; */
 #endif
 
+	/* Invoke the C-level ISR callback */
+	INTERN(FUNC(kernel_isr))
+	call   FUNC(kernel_isr)
+
 	/* Signal EOI */
 #if VECTOR_ID >= X86_INTERRUPT_PIC1_BASE
 	movb   $(X86_PIC_CMD_EOI), %al
@@ -85,10 +91,6 @@ INTERN_FUNCTION(FUNC(x86_asmirq_))
 #endif /* VECTOR_ID >= X86_INTERRUPT_PIC2_BASE */
 	outb   %al,      $(X86_PIC1_CMD) /* outb(X86_PIC1_CMD, X86_PIC_CMD_EOI); */
 #endif /* VECTOR_ID >= X86_INTERRUPT_PIC1_BASE */
-
-	/* Invoke the C-level ISR callback */
-	INTERN(FUNC(kernel_isr))
-	call   FUNC(kernel_isr)
 
 #ifdef HAVE_SPURIOUS_FAULT
 98:
