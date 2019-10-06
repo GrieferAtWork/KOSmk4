@@ -114,6 +114,11 @@ NOTHROW_NCX_KERNEL(LIBCCALL libc_error_as_signal)(struct exception_data const *_
 		result->si_signo = SIGQUIT;
 		break;
 
+	case E_IOERROR:
+		result->si_signo = SIGBUS;
+		result->si_errno = BUS_OBJERR;
+		break;
+
 	case E_UNKNOWN_SYSTEMCALL:
 		result->si_signo   = SIGSYS;
 		result->si_errno   = ENOSYS;
