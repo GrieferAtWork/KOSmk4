@@ -1,0 +1,26 @@
+{
+	"configurations": [
+		{
+			"name": "i386-kos (DEBUG)",
+			"includePath": [
+				"${workspaceFolder}/include/i386-kos/c++/9.1.0",
+				"${workspaceFolder}/include/i386-kos/c++/9.1.0/i686-kos",
+				"${workspaceFolder}/include/i386-kos/c++/9.1.0/backward",
+				"${workspaceFolder}/include/i386-kos",
+				"${workspaceFolder}/include"
+			],
+			"defines": [
+				"__KOS__"
+			],
+			"compilerPath": "${workspaceFolder}/../binutils/i386-kos/bin/i686-kos-g++",
+			"intelliSenseMode": "gcc-x86",
+			"cStandard": "c11",
+			"cppStandard": "c++17",
+			"forcedInclude": [
+				"${workspaceFolder}/include/compiler/intellisense-gcc.h"
+			],
+			"compilerArgs": [ "-x", "c++" ]
+		}
+	],
+	"version": 4
+}
