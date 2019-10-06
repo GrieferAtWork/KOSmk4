@@ -46,6 +46,10 @@ enum {
 #define E_IOERROR_REASON_ATA_DCR_ERR_DF  E_IOERROR_REASON_ATA_DCR_ERR_DF  /* `ATA_DCR_ERR' and `ATA_DCR_DF' were set */
 #define E_IOERROR_REASON_ATA_DCR_BSY     E_IOERROR_REASON_ATA_DCR_BSY     /* Timeout while waiting for `ATA_DCR_BSY' */
 #define E_IOERROR_REASON_ATA_SECTOR_WAIT E_IOERROR_REASON_ATA_SECTOR_WAIT /* Timeout while waiting for sector data */
+#define E_IOERROR_REASON_USB_SHORTPACKET E_IOERROR_REASON_USB_SHORTPACKET /* Short-packet-detect during a transfer without the `USB_TRANSFER_FLAG_SHORT' flag set. */
+#define E_IOERROR_REASON_UHCI_BADEP      E_IOERROR_REASON_UHCI_BADEP      /* A `uhci_qh::qh_ep' field contained a bad value `POINTER[2]' */
+#define E_IOERROR_REASON_UHCI_TDCS       E_IOERROR_REASON_UHCI_TDCS       /* At least one of the error bits of `UHCI_TDCS_*' is set (POINTER[2] is the `td_cs' field) */
+#define E_IOERROR_REASON_UHCI_INCOMPLETE E_IOERROR_REASON_UHCI_INCOMPLETE /* The `UHCI_TDCS_ACTIVE' bit got cleared without any apparent reason. */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_IOERROR_REASON_GENERIC         0 /* Generic error reason */
 #define E_IOERROR_REASON_ATA_DCR_ERR     1 /* `ATA_DCR_ERR' was set */
@@ -53,6 +57,10 @@ enum {
 #define E_IOERROR_REASON_ATA_DCR_ERR_DF  3 /* `ATA_DCR_ERR' and `ATA_DCR_DF' were set */
 #define E_IOERROR_REASON_ATA_DCR_BSY     4 /* Timeout while waiting for `ATA_DCR_BSY' */
 #define E_IOERROR_REASON_ATA_SECTOR_WAIT 5 /* Timeout while waiting for sector data */
+#define E_IOERROR_REASON_USB_SHORTPACKET 6 /* Short-packet-detect during a transfer without the `USB_TRANSFER_FLAG_SHORT' flag set. */
+#define E_IOERROR_REASON_UHCI_BADEP      7 /* A `uhci_qh::qh_ep' field contained a bad value `POINTER[2]' */
+#define E_IOERROR_REASON_UHCI_TDCS       8 /* At least one of the error bits of `UHCI_TDCS_*' is set (POINTER[2] is the `td_cs' field) */
+#define E_IOERROR_REASON_UHCI_INCOMPLETE 9 /* The `UHCI_TDCS_ACTIVE' bit got cleared without any apparent reason. */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 
