@@ -31,6 +31,10 @@
 #include <hybrid/sync/atomic-rwlock.h>
 #endif /* !CONFIG_NO_SMP */
 
+#ifndef NDEBUG
+#include <libc/string.h>
+#endif /* !NDEBUG */
+
 DECL_BEGIN
 
 #ifdef __CC__
@@ -558,6 +562,9 @@ NOTHROW(KCALL aio_handle_generic_func)(struct aio_handle *__restrict self,
 
 LOCAL NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL aio_handle_generic_init)(struct aio_handle_generic *__restrict self) {
+#ifndef NDEBUG
+	__libc_memset(self, 0xcc, sizeof(*self));
+#endif /* !NDEBUG */
 	self->ah_func   = &aio_handle_generic_func;
 	self->hg_status = 0;
 	sig_init(&self->hg_signal);
@@ -583,16 +590,19 @@ aio_handle_generic_connect(struct aio_handle_generic *__restrict self)
 		THROWS(E_BADALLOC) {
 	task_connect(&self->hg_signal);
 }
+
 LOCAL NONNULL((1)) void KCALL
 aio_handle_generic_connect_ghost(struct aio_handle_generic *__restrict self)
 		THROWS(E_BADALLOC) {
 	task_connect_ghost(&self->hg_signal);
 }
+
 LOCAL NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL aio_handle_generic_connect_c)(struct task_connection *__restrict con,
                                             struct aio_handle_generic *__restrict self) {
 	task_connect_c(con, &self->hg_signal);
 }
+
 LOCAL NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL aio_handle_generic_connect_ghost_c)(struct task_connection *__restrict con,
                                                   struct aio_handle_generic *__restrict self) {
@@ -678,9 +688,13 @@ LOCAL NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL aio_multihandle_init)(struct aio_multihandle *__restrict self,
                                     aio_multiple_completion_t func) {
 	unsigned int i;
+#ifndef NDEBUG
+	__libc_memset(&self->am_error, 0xcc, sizeof(self->am_error));
+	__libc_memset(self->am_ivec, 0xcc, sizeof(self->am_ivec));
+#endif /* !NDEBUG */
 	self->am_func   = func;
-	self->am_ext    = __NULLPTR;
 	self->am_status = (uintptr_t)AIO_COMPLETION_SUCCESS << AIO_MULTIHANDLE_STATUS_STATUSSHFT;
+	self->am_ext    = __NULLPTR;
 	for (i = 0; i < AIO_MULTIHANDLE_IVECLIMIT; ++i)
 		self->am_ivec[i].hg_controller = AIO_HANDLE_MULTIPLE_CONTROLLER_UNUSED;
 }

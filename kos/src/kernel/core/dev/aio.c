@@ -472,6 +472,9 @@ fini_and_fill_in_result:
 		self->am_ext   = iter;
 	}
 fill_in_result:
+#ifndef NDEBUG
+	memset(result, 0xcc, sizeof(struct aio_handle));
+#endif /* !NDEBUG */
 	result->ah_func       = &aio_handle_multiple_func;
 	result->hg_controller = self;
 	ATOMIC_FETCHINC(self->am_status); /* Increment the run counter. */
@@ -526,6 +529,9 @@ fini_and_fill_in_result:
 		self->am_ext   = iter;
 	}
 fill_in_result:
+#ifndef NDEBUG
+	memset(result, 0xcc, sizeof(struct aio_handle));
+#endif /* !NDEBUG */
 	result->ah_func       = &aio_handle_multiple_func;
 	result->hg_controller = self;
 	ATOMIC_FETCHINC(self->am_status); /* Increment the run counter. */
