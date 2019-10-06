@@ -30,9 +30,37 @@
 #include <dev/char.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
+#include <assert.h>
 #include <stddef.h>
 
 DECL_BEGIN
+
+
+/* Same as `usb_controller_transfer()', but wait for the transfer to
+ * complete (essentially just a wrapper using `struct aio_handle_generic') */
+PUBLIC size_t KCALL
+usb_controller_transfer_sync(struct usb_controller *__restrict self,
+                             struct usb_endpoint *__restrict endp,
+                             struct usb_transfer const *__restrict tx) {
+	size_t result;
+	struct aio_handle_generic aio;
+	aio_handle_generic_init(&aio);
+	usb_controller_transfer(self, endp, tx, &aio);
+	TRY {
+		aio_handle_generic_waitfor(&aio);
+		aio_handle_generic_checkerror(&aio);
+	} EXCEPT {
+		aio_handle_generic_fini(&aio);
+		RETHROW();
+	}
+	assert(aio.ah_type);
+	assert(aio.ah_type->ht_retsize);
+	result = (*aio.ah_type->ht_retsize)(&aio);
+	aio_handle_generic_fini(&aio);
+	return result;
+}
+
+
 
 /* Function called when a new USB endpoint is discovered.
  * This function should try to engage with the endpoint in
@@ -40,9 +68,9 @@ DECL_BEGIN
 PUBLIC void KCALL
 usb_endpoint_discovered(struct usb_controller *__restrict self,
                         struct usb_endpoint *__restrict endp) {
-	struct aio_handle_generic aio;
 	struct usb_transfer token, data, handshake;
 	struct usb_request token_request;
+	size_t transfer_size;
 
 	/* TODO */
 
@@ -74,17 +102,11 @@ usb_endpoint_discovered(struct usb_controller *__restrict self,
 	handshake.ut_buflen = 0;
 	handshake.ut_next   = NULL;
 
-	aio_handle_generic_init(&aio);
-	(*self->uc_transfer)(self, endp, &token, &aio);
-	TRY {
-		aio_handle_generic_waitfor(&aio);
-		aio_handle_generic_checkerror(&aio);
-	} EXCEPT {
-		aio_handle_generic_fini(&aio);
-		RETHROW();
-	}
-	aio_handle_generic_fini(&aio);
-	printk(KERN_DEBUG "data_payload = %#I16x\n", data_payload);
+	transfer_size = usb_controller_transfer_sync(self, endp, &token);
+	printk(KERN_DEBUG "data_payload  = %#I16x\n", data_payload);
+	printk(KERN_DEBUG "transfer_size = %Iu\n", transfer_size);
+
+
 }
 
 

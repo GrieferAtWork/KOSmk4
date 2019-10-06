@@ -509,17 +509,31 @@ DATDEF struct aio_handle_type aio_noop_type;
 
 
 
+
+
+
 /* AIO execution order:
  * >> struct aio_handle_generic handle;
  * >> aio_handle_generic_init(&handle);
- * >> block_device_aread_sector(dev,phys_dest,virt_dest,2,0,&handle);
- * >> aio_handle_generic_waitfor(&handle);
- * >> aio_handle_generic_checkerror(&handle);
+ * >> // NOTE: Don't put `block_device_aread_sector()' inside of the TRY!
+ * >> //       Initialization done by `aio_handle_generic_init()' is only
+ * >> //       preliminary, and only the initialization done by actually
+ * >> //       using the AIO handle with some the async I/O function will
+ * >> //       actually initialize it to the point where it must be
+ * >> //       finalized.
+ * >> //       If you were to call `aio_handle_generic_fini(...)' on a
+ * >> //       handle that hasn't actually be used with any sort of async
+ * >> //       I/O function, you'd end up with undefined behavior!
+ * >> block_device_aread_sector(dev, phys_dest, virt_dest, 2, 0, &handle);
+ * >> TRY {
+ * >>     aio_handle_generic_waitfor(&handle);
+ * >>     aio_handle_generic_checkerror(&handle);
+ * >> } EXCEPT {
+ * >>     aio_handle_generic_fini(&handle);
+ * >>     RETHROW();
+ * >> }
+ * >> aio_handle_generic_fini(&handle);
  */
-
-
-
-
 
 /* A general purpose AIO handle that can be used for synchronizing for completion. */
 struct ATTR_ALIGNED(AIO_HANDLE_ALIGNMENT) aio_handle_generic

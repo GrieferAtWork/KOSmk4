@@ -162,8 +162,11 @@ struct /*__ATTR_ALIGNED(16)*/ uhci_td {
 	__PHYS __uint32_t td_buf; /* [in] TD buffer address (any alignment is fine) */
 	/* Software may place more fields here... (e.g. a `struct sig') */
 };
-#define uhci_td_actlen(self) ((__hybrid_atomic_load((self)->td_cs, __ATOMIC_ACQUIRE) & UHCI_TDCS_ACTLEN) + 1)
-#define uhci_td_maxlen(self) ((((self)->td_tok & UHCI_TDTOK_MAXLENM) >> UHCI_TDTOK_MAXLENS) + 1)
+#define uhci_td_actlen(self) \
+	((__hybrid_atomic_load((self)->td_cs, __ATOMIC_ACQUIRE) & UHCI_TDCS_ACTLEN) + 1)
+#define uhci_td_maxlen(self)                                               \
+	(((((self)->td_tok & UHCI_TDTOK_MAXLENM) >> UHCI_TDTOK_MAXLENS) + 1) & \
+	 (UHCI_TDTOK_MAXLENM >> UHCI_TDTOK_MAXLENS))
 
 
 struct /*__ATTR_ALIGNED(16)*/ uhci_qh {

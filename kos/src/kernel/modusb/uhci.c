@@ -344,6 +344,34 @@ NOTHROW(FCALL uhci_osqh_aio_docomplete)(struct aio_handle *__restrict aio,
 	}
 }
 
+PRIVATE NOBLOCK void
+NOTHROW(FCALL uhci_osqh_completed_ioerror)(struct uhci_controller *__restrict self,
+                                           struct uhci_osqh *__restrict osqh,
+                                           error_code_t code,
+                                           uintptr_t io_reason,
+                                           uintptr_t pointer2 DFL(0)) {
+	struct aio_handle *aio;
+	struct uhci_aio_data *aio_data;
+	aio = osqh->qh_aio;
+	aio_data = (struct uhci_aio_data *)aio->ah_data;
+	assert(aio_data->ud_osqh == osqh);
+	if likely(!(ATOMIC_READ(aio_data->ud_flags) & UHCI_AIO_FSERVED)) {
+		struct exception_data odata;
+		struct exception_data *mydat;
+		mydat = error_data();
+		odata = *mydat;
+		memset(mydat, 0, sizeof(*mydat));
+		mydat->e_code        = code;
+		mydat->e_pointers[0] = io_reason;
+		mydat->e_pointers[1] = E_IOERROR_SUBSYSTEM_USB;
+		mydat->e_pointers[2] = pointer2;
+		uhci_osqh_aio_docomplete(aio, AIO_COMPLETION_FAILURE);
+		*mydat = odata;
+	}
+}
+
+
+
 
 PRIVATE NOBLOCK void
 NOTHROW(FCALL uhci_osqh_aio_completed)(struct uhci_controller *__restrict self,
@@ -355,27 +383,55 @@ NOTHROW(FCALL uhci_osqh_aio_completed)(struct uhci_controller *__restrict self,
 	/* Check for transfer errors. */
 	data->ud_retsize = 0;
 	for (td = osqh->qh_tds; td; td = td->td_next) {
-		size_t len;
-		u32 cs = td->td_cs;
-		printk(KERN_DEBUG "[usb][pci:%I32p,io:%#Ix] uhci:td:complete [cs=%#I32x,tok=%#I32x]\n",
-		       self->uc_pci->pd_base, self->uc_base.uc_mmbase, cs, td->td_tok);
-		len = (cs & UHCI_TDCS_ACTLEN) + 1;
-		/* XXX: Check for short packet? */
-		data->ud_retsize += len;
+		u16 actlen, maxlen;
+		u32 cs = ATOMIC_READ(td->td_cs);
+		actlen = (cs + 1) & UHCI_TDCS_ACTLEN;
+		maxlen = uhci_td_maxlen(td);
+		printk(KERN_DEBUG "[usb][pci:%I32p,io:%#Ix] uhci:td:complete [actlen=%#I16x,maxlen=%#I16x,cs=%#I32x,tok=%#I32x]\n",
+		       self->uc_pci->pd_base, self->uc_base.uc_mmbase,
+		       actlen, maxlen, cs, td->td_tok);
+		/* Check for short packet */
+		if (actlen < maxlen) {
+			if unlikely(cs & UHCI_TDCS_SPD) {
+				/* Shouldn't actually get here... From what I can tell, on working
+				 * hardware, this should be handled in `uhci_finish_completed()'. */
+				uhci_osqh_completed_ioerror(self, osqh,
+				                            ERROR_CODEOF(E_IOERROR_NODATA),
+				                            E_IOERROR_REASON_USB_SHORTPACKET);
+				return;
+			}
+			if (td->td_next != NULL) {
+				struct uhci_ostd *next_nonempty;
+				u8 mypid = td->td_tok & UHCI_TDTOK_PID;
+				next_nonempty = td->td_next;
+				for (;;) {
+					if ((next_nonempty->td_tok & UHCI_TDTOK_PID) != mypid)
+						goto short_packet_ok; /* Different type of packet (Partially filled, trailing buffers are OK) */
+					if (uhci_td_actlen(next_nonempty) != 0)
+						break; /* Non-empty follow-up packet. */
+					if ((next_nonempty = next_nonempty->td_next) == NULL)
+						goto short_packet_ok; /* There are no later buffers (Partially filled, trailing buffers are OK) */
+				}
+				printk(KERN_DEBUG "[usb][pci:%I32p,io:%#Ix] "
+				                  "uhci:td:incomplete packet (%I16u/%I16u) followed "
+				                  "by non-empty packets of the same type (pid=%#I8x)\n",
+				       self->uc_pci->pd_base, self->uc_base.uc_mmbase,
+				       actlen, maxlen, mypid);
+				/* XXX: What now? Should we be trying to shift around buffer memory
+				 *      in order to fill the gap? - When does this even happen? Or
+				 *      is this even allowed to happen, because if not, then I can
+				 *      just have the transmission be completed with an error. */
+			}
+		}
+short_packet_ok:
+		data->ud_retsize += actlen;
 		if ((cs & (UHCI_TDCS_CRCTMO | UHCI_TDCS_NAKR |
 		           UHCI_TDCS_BABBLE | UHCI_TDCS_DBE |
 		           UHCI_TDCS_STALL | UHCI_TDCS_ACTIVE)) != 0) {
-			struct exception_data odata;
-			struct exception_data *mydat;
-			mydat = error_data();
-			odata = *mydat;
-			memset(mydat, 0, sizeof(*mydat));
-			mydat->e_code = ERROR_CODEOF(E_IOERROR_ERRORBIT);
-			mydat->e_pointers[0] = E_IOERROR_REASON_UHCI_TDCS;
-			mydat->e_pointers[1] = E_IOERROR_SUBSYSTEM_USB;
-			mydat->e_pointers[2] = cs;
-			uhci_osqh_aio_docomplete(aio, AIO_COMPLETION_FAILURE);
-			*mydat = odata;
+			uhci_osqh_completed_ioerror(self, osqh,
+			                            ERROR_CODEOF(E_IOERROR_ERRORBIT),
+			                            E_IOERROR_REASON_UHCI_TDCS,
+			                            cs);
 			return;
 		}
 	}
@@ -445,10 +501,9 @@ NOTHROW(FCALL uhci_finish_completed)(struct uhci_controller *__restrict self) {
 	assert(sync_writing(&self->uc_lock));
 	piter = &self->uc_qhstart.qh_next;
 	while ((iter = *piter) != NULL) {
-		struct uhci_ostd *tds;
-		u32 ep;
+		struct uhci_ostd *td;
+		u32 ep, cs;
 		ep = ATOMIC_READ(iter->qh_ep);
-		printk(KERN_DEBUG "ep = %#I32x\n", ep);
 		if (ep & UHCI_QHEP_TERM) {
 			/* This queue has completed */
 			uhci_osqh_unlink(self, iter, piter);
@@ -457,18 +512,72 @@ NOTHROW(FCALL uhci_finish_completed)(struct uhci_controller *__restrict self) {
 			continue;
 		}
 		/* Find the TD that is currently being executed. */
-		tds = uhci_ostd_findphys(iter->qh_tds, ep);
-		if unlikely(!tds) {
+		td = uhci_ostd_findphys(iter->qh_tds, ep);
+		if unlikely(!td) {
 			/* Shouldn't happen... */
+			printk(KERN_CRIT "[usb][pci:%I32p,io:%#Ix] uhci:bad:ep (%#I32p)\n",
+			       self->uc_pci->pd_base, self->uc_base.uc_mmbase, ep);
 			uhci_osqh_unlink(self, iter, piter);
 			uhci_osqh_completed_badep(self, iter, ep);
 			decref(iter);
 			continue;
 		}
+		/* Check the status of this TD */
+		cs = ATOMIC_READ(td->td_cs);
+		if (!(cs & UHCI_TDCS_ACTIVE)) {
+			/* This could happen because `UHCI_TDCS_SPD' was set,
+			 * in which case us getting here means an error: packet-too-short. */
+			if (cs & UHCI_TDCS_SPD) {
+				/* Check if the packet really has the wrong size. */
+				u16 actlen = (cs + 1) & UHCI_TDCS_ACTLEN;
+				u16 maxlen = uhci_td_maxlen(td);
+				if (actlen < maxlen) {
+					/* That's an error! */
+					printk(KERN_ERR "[usb][pci:%I32p,io:%#Ix] uhci:short-packet (%I16u < %I16u)\n",
+					       self->uc_pci->pd_base, self->uc_base.uc_mmbase, actlen, maxlen);
+					uhci_osqh_unlink(self, iter, piter);
+					uhci_osqh_completed_ioerror(self, iter,
+					                            ERROR_CODEOF(E_IOERROR_NODATA),
+					                            E_IOERROR_REASON_USB_SHORTPACKET);
+					decref(iter);
+					continue;
+				}
+			}
+		}
+		/* Check for error bits (regardless of the state of ACTIVE). */
+		if (cs & (UHCI_TDCS_CRCTMO | UHCI_TDCS_NAKR |
+		          UHCI_TDCS_BABBLE | UHCI_TDCS_DBE |
+		          UHCI_TDCS_STALL)) {
+			printk(KERN_ERR "[usb][pci:%I32p,io:%#Ix] uhci:error (cs=%#I32x)\n",
+			       self->uc_pci->pd_base, self->uc_base.uc_mmbase, cs);
+			uhci_osqh_unlink(self, iter, piter);
+			uhci_osqh_completed_ioerror(self, iter,
+			                            ERROR_CODEOF(E_IOERROR_ERRORBIT),
+			                            E_IOERROR_REASON_UHCI_TDCS,
+			                            cs);
+			decref(iter);
+			continue;
+		}
+		if (!(cs & UHCI_TDCS_ACTIVE)) {
+			printk(KERN_ERR "[usb][pci:%I32p,io:%#Ix] uhci:inactive for unknown reason\n",
+			       self->uc_pci->pd_base, self->uc_base.uc_mmbase);
+			uhci_osqh_unlink(self, iter, piter);
+			uhci_osqh_completed_ioerror(self, iter,
+			                            ERROR_CODEOF(E_IOERROR_NODATA),
+			                            E_IOERROR_REASON_UHCI_INCOMPLETE);
+			decref(iter);
+			continue;
+		}
+#if 1 /* Incomplete transmission (can happen when an operation is split between multiple
+       * frames because of its size, or because it was sharing bandwidth by not having
+       * the `UHCI_TDLP_DBS' flag set) */
+		printk(KERN_DEBUG "[usb][pci:%I32p,io:%#Ix] uhci:incomplete [ep=%#I32x,cs=%#I32x]\n",
+		       self->uc_pci->pd_base, self->uc_base.uc_mmbase, ep, cs);
+#endif
 		/* In the case of depth-first, we can assume that there are no
 		 * more completed queues to be found, since that would imply that
 		 * our current queue would have also been completed! */
-		if (tds->td_lp & UHCI_TDLP_DBS)
+		if (td->td_lp & UHCI_TDLP_DBS)
 			break; /* Depth-first -> Later QHs havn't been touched, yet */
 		piter = &iter->qh_next;
 	}
@@ -617,28 +726,37 @@ uhci_construct_tds(struct usb_controller *__restrict self,
                    vm_phys_t start, size_t num_bytes) {
 	u32 tok, cs;
 #if __SIZEOF_VM_PHYS_T__ > 4
-	if unlikely(start > (vm_phys_t)0xffffffff ||
-	            (start + num_bytes) > (vm_phys_t)0xffffffff)
+	if unlikely(num_bytes != 0 &&
+	            (start > (vm_phys_t)0xffffffff ||
+	             (start + num_bytes) > (vm_phys_t)0xffffffff))
 		return false; /* Need a 32-bit buffer. */
 #endif /* __SIZEOF_VM_PHYS_T__ > 4 */
 	assert(tx->ut_type < USB_TRANSFER_TYPE_COUNT);
-	switch (tx->ut_type) {
-	case USB_TRANSFER_TYPE_IN:
-		tok = UHCI_TDTOK_PID_IN;
-		break;
-	case USB_TRANSFER_TYPE_OUT:
-		tok = UHCI_TDTOK_PID_OUT;
-		break;
-	case USB_TRANSFER_TYPE_SETUP:
-		tok = UHCI_TDTOK_PID_SETUP;
-		break;
-	default: __builtin_unreachable();
-	}
 	cs = UHCI_TDCS_ACTIVE |
 	     ((3 << UHCI_TDCS_ERRCNTS) & UHCI_TDCS_ERRCNTM);
 	/* When short packets aren't allowed, turn on short packet detection. */
 	if (!(tx->ut_flags & USB_TRANSFER_FLAG_SHORT))
 		cs |= UHCI_TDCS_SPD;
+	switch (tx->ut_type) {
+
+	case USB_TRANSFER_TYPE_IN:
+		tok = UHCI_TDTOK_PID_IN;
+		break;
+
+	case USB_TRANSFER_TYPE_OUT:
+		tok = UHCI_TDTOK_PID_OUT;
+		/* Disable short-packet-detect for outbound data */
+		cs &= ~UHCI_TDCS_SPD;
+		break;
+
+	case USB_TRANSFER_TYPE_SETUP:
+		tok = UHCI_TDTOK_PID_SETUP;
+		/* Disable short-packet-detect for outbound data */
+		cs &= ~UHCI_TDCS_SPD;
+		break;
+
+	default: __builtin_unreachable();
+	}
 	/* Set the LowSpeedDevice bit for low-speed endpoints. */
 	if (endp->ue_lowspeed)
 		cs |= UHCI_TDCS_LSD;
@@ -807,11 +925,13 @@ usb_transfer_allocate_physbuf(struct usb_transfer *__restrict tx,
 /* This function performs a synchronous transfer operation by going
  * through real physical memory in order to allow USB transfers to/
  * from buffers located in VIO memory regions, as well as physical
- * memory locations above 4GiB */
-PRIVATE NONNULL((1, 2, 3)) void KCALL
+ * memory locations above 4GiB
+ * @return: * : The total number of transferred bytes. */
+PRIVATE NONNULL((1, 2, 3)) size_t KCALL
 uhci_transfer_sync_with_phys(struct usb_controller *__restrict self,
                              struct usb_endpoint *__restrict endp,
                              struct usb_transfer const *__restrict tx) {
+	size_t result;
 	struct usb_transfer *tx_firstcopy = NULL;
 	struct usb_transfer **ptx_copy, *tx_copy;
 	struct usb_transfer const *tx_iter;
@@ -939,6 +1059,8 @@ copy_next_tx:
 				aio_handle_generic_fini(&aio);
 				RETHROW();
 			}
+			assert(aio.ah_type == &uhci_aio_type);
+			result = uhci_aio_retsize(&aio);
 			aio_handle_generic_fini(&aio);
 		}
 		/* Transfer input data buffers to their target locations. */
@@ -1045,10 +1167,45 @@ copy_next_tx:
 		tx_firstcopy = tx_copy;
 		tx = tx->ut_next;
 	}
+	return result;
 }
 
 
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL uhci_aio_noop_noarg)(struct aio_handle *__restrict UNUSED(self)) {
+}
+PRIVATE NOBLOCK WUNUSED NONNULL((1)) size_t
+NOTHROW(KCALL uhci_aio_sync_retsize)(struct aio_handle *__restrict self) {
+	return (size_t)self->ah_data[0];
+}
 
+/* No-op AIO handle type (intended for synchronous operations) */
+PRIVATE struct aio_handle_type uhci_aio_sync_type = {
+	/* .ht_fini     = */ &uhci_aio_noop_noarg,
+	/* .ht_cancel   = */ &uhci_aio_noop_noarg,
+	/* .ht_progress = */ NULL,
+	/* .ht_retsize  = */ &uhci_aio_sync_retsize
+};
+
+
+
+/* Perform a one-time transfer of a sequence of packets.
+ * This is the primary functions for OS-initiated communications
+ * with connected USB devices.
+ * For communications initiated by the device, see the interface
+ * for doing this below.
+ * @param: self: The controller which will be used for the transfer
+ * @param: endp: The targeted USB endpoint.
+ * @param: tx:   A chain of USB packets that must be transmitted to
+ *               the given `endp' in the same order in which they
+ *               are given here (the chain is described by `->ut_next->')
+ * @param: aio:  The AIO handle allowing the caller to perform the transfer
+ *               asynchronously.
+ *               Note that the caller is free to invalidate `tx', as well as
+ *               any of the pointed-to buffer controller structures (though
+ *               obviously not the buffers themself), as well as later transfer
+ *               descriptors even before the given `aio' handle is invoked to
+ *               indicate completion. */
 PRIVATE NONNULL((1, 2, 3, 4)) void KCALL
 uhci_transfer(struct usb_controller *__restrict self,
               struct usb_endpoint *__restrict endp,
@@ -1184,8 +1341,13 @@ cleanup_configured_and_do_syncio:
 	 * the operation synchronously before copying data from
 	 * output packets into the original buffers, and freeing
 	 * the temporary buffers. */
-	uhci_transfer_sync_with_phys(self, endp, tx);
-	aio->ah_type = &aio_noop_type;
+	{
+		size_t transfer_size;
+		transfer_size = uhci_transfer_sync_with_phys(self, endp, tx);
+		/* Still always propagate the total number of transferred bytes. */
+		aio->ah_data[0] = (void *)transfer_size;
+		aio->ah_type    = &uhci_aio_sync_type;
+	}
 	aio_handle_success(aio);
 }
 
