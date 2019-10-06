@@ -431,7 +431,16 @@ struct aio_handle_type {
 	                                                                     struct aio_handle_stat *__restrict stat);
 #define AIO_PROGRESS_STATUS_PENDING    0x0000 /* The operation is still pending execution. */
 #define AIO_PROGRESS_STATUS_INPROGRESS 0x0001 /* The operation is currently being performed. */
-#define AIO_PROGRESS_STATUS_COMPLETED  0x0002 /* The operation has finished (either due to being canceled, failing, or succeeding) */
+#define AIO_PROGRESS_STATUS_COMPLETED  0x0002 /* The operation has finished (either due to being canceled, failing, or succeeding)
+                                               * Note however that when this value is returned, it is not guarantied whether or
+                                               * not the completion function has already been called, or has already returned. */
+	/* [0..1] An optional operator for AIO protocols that can consume/produce variable
+	 *        amounts of data (e.g. the USB protocol).
+	 *        For such cases, this operator returns the actual amount of transferred
+	 *        data (in bytes) once AIO operation has completed successfully.
+	 *        Calling this operator at any time other than after/during the completion
+	 *        function was called with `AIO_COMPLETION_SUCCESS' causes undefined behavior. */
+	NOBLOCK WUNUSED NONNULL((1)) size_t /*NOTHROW*/(KCALL *ht_retsize)(struct aio_handle *__restrict self);
 };
 
 

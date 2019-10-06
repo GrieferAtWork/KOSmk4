@@ -40,19 +40,6 @@ struct usb_descriptor {
 	u8 ud_speed; /* Speed of the device (one of `USB_SPEED_*') */
 };
 
-#define USB_TRANSACTION_FNORMAL  0x0000
-#define USB_TRANSACTION_FNOSHORT 0x0001 /* Short packets (ut_reslen < TOTAL_BUFFER_SIZE) are not OK */
-
-#define USB_TRANSACTION_TYPE_READ    0 /* Read (IN) */
-#define USB_TRANSACTION_TYPE_WRITE   1 /* Write (OUT) */
-#define USB_TRANSACTION_TYPE_CONTROL 2 /* Control (CONTROL) */
-
-struct usb_transaction {
-	size_t         ut_reslen; /* Result length */
-	uintptr_half_t ut_flags;  /* Transaction flags (Set of `USB_TRANSACTION_F*'). */
-};
-
-
 
 struct usb_device
 #ifdef __cplusplus
@@ -78,6 +65,7 @@ struct usb_controller
 	struct character_device uc_dev; /* The underlying character device. */
 #endif /* !__cplusplus */
 	/* TODO: Common interface */
+
 };
 
 

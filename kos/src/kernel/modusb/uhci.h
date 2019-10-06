@@ -40,7 +40,7 @@ union uhci_iobase {
 
 struct uhci_ostd: uhci_td {
 	PHYS u32          td_self; /* [const] Physical self-pointer (to the hardware part). */
-	struct uhci_ostd *td_next; /* [0..1] Next TD in this chain / next free TD.
+	struct uhci_ostd *td_next; /* [0..1][owned] Next TD in this chain / next free TD.
 	                            * In the former case, `uhci_td::td_lp' is set to `td_next->td_self' */
 };
 
@@ -48,13 +48,12 @@ struct aio_handle;
 struct uhci_controller;
 
 struct uhci_osqh: uhci_qh {
-	WEAK refcnt_t           qh_refcnt; /* Reference counter. */
-	PHYS u32                qh_self;   /* [const] Physical self-pointer (to the hardware part). */
-	REF struct uhci_osqh   *qh_next;   /* [0..1] Next QH in this chain / next free TD.
-	                                    * In the former case, `uhci_qh::qh_hp' is set to `qh_next->qh_self' */
-	struct uhci_ostd       *qh_tds;    /* [0..1][owned] Chain of TDs used by this queue */
-	WEAK struct aio_handle *qh_aio;    /* [0..1] The associated AIO handle (atomically exchanged
-	                                    *        with `NULL' when indicating completion) */
+	WEAK refcnt_t         qh_refcnt; /* Reference counter. */
+	PHYS u32              qh_self;   /* [const] Physical self-pointer (to the hardware part). */
+	REF struct uhci_osqh *qh_next;   /* [0..1] Next QH in this chain / next free TD.
+	                                  * In the former case, `uhci_qh::qh_hp' is set to `qh_next->qh_self' */
+	struct uhci_ostd     *qh_tds;    /* [0..1][owned] Chain of TDs used by this queue */
+	struct aio_handle    *qh_aio;    /* [1..1][const] The associated AIO handle. */
 };
 
 struct uhci_aio_data {
@@ -68,8 +67,9 @@ struct uhci_aio_data {
 	};
 #define UHCI_AIO_FNORMAL        0x0000         /* Normal AIO flags */
 #define UHCI_AIO_FSERVED        0x0004         /* FLAG: This handle has been serviced. */
-#define UHCI_AIO_FONEDMA        0x0008         /* FLAG: `ud_dmalock' is used, as opposed to `hd_dmalockvec'. */
-	uintptr_t                   ud_flags;      /* Set of `UHCI_AIO_F*' */
+#define UHCI_AIO_FONEDMA        0x0008         /* [const] FLAG: `ud_dmalock' is used, as opposed to `hd_dmalockvec'. */
+	uintptr_t                   ud_flags;      /* [lock(ud_ctrl->uc_lock)] Set of `UHCI_AIO_F*' */
+	size_t                      ud_retsize;    /* Total amount of transferred data (output argument) */
 };
 
 

@@ -39,6 +39,8 @@
 #include <hybrid/atomic.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
+#include <kos/io/usb.h>
+#include <kos/io/uhci.h>
 #include <kos/except-io.h>
 
 #include <assert.h>
@@ -158,25 +160,166 @@ NOTHROW(FCALL uhci_osqh_destroy)(struct uhci_osqh *__restrict self) {
 }
 
 
+PRIVATE NOBLOCK bool
+NOTHROW(FCALL uhci_controller_isstopped)(struct uhci_controller *__restrict self) {
+	return (uhci_rdw(self, UHCI_USBSTS) & UHCI_USBSTS_HCH) != 0;
+}
 
-PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL uhci_aio_cancel)(struct aio_handle *__restrict self);
+PRIVATE NOBLOCK void
+NOTHROW(FCALL uhci_controller_stop)(struct uhci_controller *__restrict self) {
+	u16 cmd;
+	cmd = uhci_rdw(self, UHCI_USBCMD);
+	cmd &= ~UHCI_USBCMD_RS;
+	uhci_wrw(self, UHCI_USBCMD, cmd);
+	while (!uhci_controller_isstopped(self))
+		task_pause();
+}
 
+PRIVATE NOBLOCK void
+NOTHROW(FCALL uhci_controller_resume)(struct uhci_controller *__restrict self) {
+	u16 cmd;
+	cmd = uhci_rdw(self, UHCI_USBCMD);
+	cmd |= UHCI_USBCMD_RS;
+	uhci_wrw(self, UHCI_USBCMD, cmd);
+}
+
+PRIVATE NOBLOCK void
+NOTHROW(FCALL uhci_invcache)(struct uhci_controller *__restrict self,
+                             u32 phys_addr) {
+	/* XXX: Tell the UHCI controller to invalidate 4 bytes of physical memory at `phys_addr'? */
+	(void)self;
+	(void)phys_addr;
+}
+
+
+
+PRIVATE NOBLOCK NONNULL((1)) void NOTHROW(KCALL uhci_aio_fini)(struct aio_handle *__restrict self);
+PRIVATE NOBLOCK NONNULL((1)) void NOTHROW(KCALL uhci_aio_cancel)(struct aio_handle *__restrict self);
+PRIVATE NOBLOCK NONNULL((1, 2)) unsigned int NOTHROW(KCALL uhci_aio_progress)(struct aio_handle *__restrict self, struct aio_handle_stat *__restrict stat);
+PRIVATE NOBLOCK WUNUSED NONNULL((1)) size_t NOTHROW(KCALL uhci_aio_retsize)(struct aio_handle *__restrict self);
+STATIC_ASSERT(sizeof(struct uhci_aio_data) <= (AIO_HANDLE_DRIVER_POINTER_COUNT * sizeof(void *)));
 PRIVATE struct aio_handle_type uhci_aio_type = {
-	/* .ht_cancel = */ &uhci_aio_cancel
+	/* .ht_fini     = */ &uhci_aio_fini,
+	/* .ht_cancel   = */ &uhci_aio_cancel,
+	/* .ht_progress = */ &uhci_aio_progress,
+	/* .ht_retsize  = */ &uhci_aio_retsize,
 };
 
 
 PRIVATE NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL uhci_aio_cancel)(struct aio_handle *__restrict self) {
+NOTHROW(KCALL uhci_aio_fini)(struct aio_handle *__restrict self) {
 	struct uhci_aio_data *data;
 	data = (struct uhci_aio_data *)self->ah_data;
-	if (ATOMIC_FETCHOR(data->ud_flags, UHCI_AIO_FSERVED) & UHCI_AIO_FSERVED)
-		return; /* Already served. */
-	/* TODO */
 	decref_unlikely(data->ud_ctrl);
-	decref(data->ud_osqh);
+	decref_likely(data->ud_osqh);
 }
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL uhci_aio_cancel)(struct aio_handle *__restrict self) {
+	struct uhci_aio_data *data;
+	struct uhci_controller *ctrl;
+	data = (struct uhci_aio_data *)self->ah_data;
+	if (ATOMIC_READ(data->ud_flags) & UHCI_AIO_FSERVED)
+		return; /* Already completed. */
+	ctrl = data->ud_ctrl;
+
+	/* Acquire a lock to the controller to prevent it from completing
+	 * our AIO, and setting `UHCI_AIO_FSERVED' before we can. */
+	sync_write(&ctrl->uc_lock);
+	if likely(!(ATOMIC_READ(data->ud_flags) & UHCI_AIO_FSERVED)) {
+		/* Cancel our AIO now */
+		struct uhci_osqh **posqh, *osqh, *prev, *next;
+		u32 hw_next_pointer;
+		osqh = data->ud_osqh;
+		/* Find the predecessor. */
+		posqh = &ctrl->uc_qhstart.qh_next;
+		for (;;) {
+			struct uhci_osqh *iter;
+			iter = *posqh;
+			assert(iter);
+			if (iter == osqh)
+				break;
+			posqh = &iter->qh_next;
+		}
+		*posqh = next = osqh->qh_next;
+		prev   = container_of(posqh, struct uhci_osqh, qh_next);
+#ifdef CONFIG_UHCI_USE_QH_LOOPS
+		if (!next && prev != &ctrl->uc_qhstart)
+			next = ctrl->uc_qhstart.qh_next;
+#endif /* CONFIG_UHCI_USE_QH_LOOPS */
+		hw_next_pointer = next ? next->qh_self | UHCI_QHHP_QHTD
+		                       : UHCI_QHHP_TERM;
+		if (ATOMIC_READ(osqh->qh_ep) & UHCI_QHEP_TERM) {
+			/* The canceled operation was already completed.
+			 * In this case, we don't need to stop the controller, since
+			 * the unlinking process simply requires a cache invalidation. */
+			ATOMIC_WRITE(prev->qh_hp, hw_next_pointer);
+			uhci_invcache(ctrl, prev->qh_self + offsetof(struct uhci_osqh, qh_hp));
+		} else {
+			/* The operation was be in progress ~right now~
+			 * -> Must stop the controller so that we can unlink it. */
+			uhci_controller_stop(ctrl);
+			ATOMIC_WRITE(prev->qh_hp, hw_next_pointer);
+			uhci_controller_resume(ctrl);
+		}
+		/* Drop the reference taken from the queue chain. */
+		decref_nokill(osqh);
+	}
+	uhci_controller_endwrite(ctrl);
+}
+
+PRIVATE NOBLOCK NONNULL((1, 2)) unsigned int
+NOTHROW(KCALL uhci_aio_progress)(struct aio_handle *__restrict self,
+                                 struct aio_handle_stat *__restrict stat) {
+	size_t complete = 0, total = 0;
+	struct uhci_aio_data *data;
+	struct uhci_osqh *osqh;
+	struct uhci_ostd *td;
+	u32 current_ep;
+	unsigned int result;
+	data = (struct uhci_aio_data *)self->ah_data;
+	osqh = data->ud_osqh;
+	td   = osqh->qh_tds;
+	/* Make use of the EP pointer to figure out
+	 * how many TDs have already been executed. */
+	current_ep = ATOMIC_READ(osqh->qh_ep);
+	result = AIO_PROGRESS_STATUS_INPROGRESS;
+	if (current_ep & UHCI_QHEP_TERM) {
+		/* Queue has already terminated. */
+		for (; td; td = td->td_next) {
+			complete += uhci_td_actlen(td);
+			total    += uhci_td_maxlen(td);
+		}
+	} else {
+		/* If the first TD is still the next one to-be processed,
+		 * then we indicate that the operation is still pending. */
+		if (td->td_self == current_ep)
+			result = AIO_PROGRESS_STATUS_PENDING;
+		for (; td; td = td->td_next) {
+			if (td->td_self == current_ep)
+				break;
+			complete += uhci_td_actlen(td);
+			total    += uhci_td_maxlen(td);
+		}
+		for (; td; td = td->td_next)
+			total += uhci_td_maxlen(td);
+	}
+	if (ATOMIC_READ(data->ud_flags) & UHCI_AIO_FSERVED)
+		result = AIO_PROGRESS_STATUS_COMPLETED;
+	stat->hs_completed = complete;
+	stat->hs_total     = total;
+	return result;
+}
+
+
+PRIVATE NOBLOCK WUNUSED NONNULL((1)) size_t
+NOTHROW(KCALL uhci_aio_retsize)(struct aio_handle *__restrict self) {
+	struct uhci_aio_data *data;
+	data = (struct uhci_aio_data *)self->ah_data;
+	assert(data->ud_flags & UHCI_AIO_FSERVED);
+	return data->ud_retsize;
+}
+
 
 
 PRIVATE NOBLOCK void
@@ -205,10 +348,18 @@ NOTHROW(FCALL uhci_osqh_aio_completed)(struct uhci_controller *__restrict self,
                                        struct uhci_osqh *__restrict osqh,
                                        struct aio_handle *__restrict aio) {
 	struct uhci_ostd *td;
+	struct uhci_aio_data *data;
+	data = (struct uhci_aio_data *)aio->ah_data;
 	/* Check for transfer errors. */
+	data->ud_retsize = 0;
 	for (td = osqh->qh_tds; td; td = td->td_next) {
+		size_t len;
 		u32 cs = td->td_cs;
-		printk(KERN_DEBUG "[uhci] td:complete [cs=%#I32x,tok=%#I32x]\n", cs, td->td_tok);
+		printk(KERN_DEBUG "[usb][pci:%I32p,io:%#Ix] uhci:td:complete [cs=%#I32x,tok=%#I32x]\n",
+		       self->uc_pci->pd_base, self->uc_base.uc_mmbase, cs, td->td_tok);
+		len = (cs & UHCI_TDCS_ACTLEN) + 1;
+		/* XXX: Check for short packet? */
+		data->ud_retsize += len;
 		if ((cs & (UHCI_TDCS_CRCTMO | UHCI_TDCS_NAKR |
 		           UHCI_TDCS_BABBLE | UHCI_TDCS_DBE |
 		           UHCI_TDCS_STALL | UHCI_TDCS_ACTIVE)) != 0) {
@@ -231,23 +382,27 @@ NOTHROW(FCALL uhci_osqh_aio_completed)(struct uhci_controller *__restrict self,
 
 PRIVATE NOBLOCK void
 NOTHROW(FCALL uhci_osqh_completed)(struct uhci_controller *__restrict self,
-                                   REF struct uhci_osqh *__restrict osqh) {
+                                   struct uhci_osqh *__restrict osqh) {
 	struct aio_handle *aio;
+	struct uhci_aio_data *aio_data;
 	/* QH was completed. -> Try to signal the connected AIO receiver. */
-	aio = ATOMIC_XCH(osqh->qh_aio, NULL);
-	if likely(aio != NULL)
+	aio = osqh->qh_aio;
+	aio_data = (struct uhci_aio_data *)aio->ah_data;
+	assert(aio_data->ud_osqh == osqh);
+	if likely(!(ATOMIC_READ(aio_data->ud_flags) & UHCI_AIO_FSERVED))
 		uhci_osqh_aio_completed(self, osqh, aio);
-	decref(osqh);
 }
 
 PRIVATE NOBLOCK void
 NOTHROW(FCALL uhci_osqh_completed_badep)(struct uhci_controller *__restrict self,
-                                         REF struct uhci_osqh *__restrict osqh,
+                                         struct uhci_osqh *__restrict osqh,
                                          u32 ep) {
 	struct aio_handle *aio;
-	/* QH was completed. -> Try to signal the connected AIO receiver. */
-	aio = ATOMIC_XCH(osqh->qh_aio, NULL);
-	if likely(aio != NULL) {
+	struct uhci_aio_data *aio_data;
+	aio = osqh->qh_aio;
+	aio_data = (struct uhci_aio_data *)aio->ah_data;
+	assert(aio_data->ud_osqh == osqh);
+	if likely(!(ATOMIC_READ(aio_data->ud_flags) & UHCI_AIO_FSERVED)) {
 		struct exception_data odata;
 		struct exception_data *mydat;
 		mydat = error_data();
@@ -260,21 +415,15 @@ NOTHROW(FCALL uhci_osqh_completed_badep)(struct uhci_controller *__restrict self
 		uhci_osqh_aio_docomplete(aio, AIO_COMPLETION_FAILURE);
 		*mydat = odata;
 	}
-	decref(osqh);
 }
 
-
-PRIVATE NOBLOCK void
-NOTHROW(FCALL uhci_invcache)(struct uhci_controller *__restrict self,
-                             u32 phys_addr) {
-	/* XXX: Tell the UHCI controller to invalidate 4 bytes of physical memory at `phys_addr'? */
-}
 
 PRIVATE NOBLOCK void
 NOTHROW(FCALL uhci_osqh_unlink)(struct uhci_controller *__restrict self,
                                 struct uhci_osqh *__restrict entry,
                                 struct uhci_osqh **__restrict pentry) {
 	struct uhci_osqh *prev, *next;
+	u32 hw_pointer;
 	prev = container_of(pentry, struct uhci_osqh, qh_next);
 	next = entry->qh_next;
 	prev->qh_next = next;
@@ -282,8 +431,9 @@ NOTHROW(FCALL uhci_osqh_unlink)(struct uhci_controller *__restrict self,
 	if (!next && prev != &self->uc_qhstart)
 		next = self->uc_qhstart.qh_next;
 #endif /* CONFIG_UHCI_USE_QH_LOOPS */
-	prev->qh_hp = next ? next->qh_self | UHCI_QHHP_QHTD
-	                   : UHCI_QHHP_TERM;
+	hw_pointer = next ? next->qh_self | UHCI_QHHP_QHTD
+	                  : UHCI_QHHP_TERM;
+	ATOMIC_WRITE(prev->qh_hp, hw_pointer);
 	uhci_invcache(self, prev->qh_self + offsetof(struct uhci_osqh, qh_hp));
 }
 
@@ -301,6 +451,7 @@ NOTHROW(FCALL uhci_finish_completed)(struct uhci_controller *__restrict self) {
 			/* This queue has completed */
 			uhci_osqh_unlink(self, iter, piter);
 			uhci_osqh_completed(self, iter);
+			decref(iter);
 			continue;
 		}
 		/* Find the TD that is currently being executed. */
@@ -309,6 +460,7 @@ NOTHROW(FCALL uhci_finish_completed)(struct uhci_controller *__restrict self) {
 			/* Shouldn't happen... */
 			uhci_osqh_unlink(self, iter, piter);
 			uhci_osqh_completed_badep(self, iter, ep);
+			decref(iter);
 			continue;
 		}
 		/* In the case of depth-first, we can assume that there are no
@@ -361,30 +513,6 @@ do_try_write:
 
 
 PRIVATE NOBLOCK bool
-NOTHROW(FCALL uhci_controller_isstopped)(struct uhci_controller *__restrict self) {
-	return (uhci_rdw(self, UHCI_USBSTS) & UHCI_USBSTS_HCH) != 0;
-}
-
-PRIVATE NOBLOCK void
-NOTHROW(FCALL uhci_controller_stop)(struct uhci_controller *__restrict self) {
-	u16 cmd;
-	cmd = uhci_rdw(self, UHCI_USBCMD);
-	cmd &= ~UHCI_USBCMD_RS;
-	uhci_wrw(self, UHCI_USBCMD, cmd);
-	while (!uhci_controller_isstopped(self))
-		task_pause();
-}
-
-PRIVATE NOBLOCK void
-NOTHROW(FCALL uhci_controller_resume)(struct uhci_controller *__restrict self) {
-	u16 cmd;
-	cmd = uhci_rdw(self, UHCI_USBCMD);
-	cmd |= UHCI_USBCMD_RS;
-	uhci_wrw(self, UHCI_USBCMD, cmd);
-}
-
-
-PRIVATE NOBLOCK bool
 NOTHROW(FCALL uhci_interrupt)(void *arg) {
 	u16 status;
 	struct uhci_controller *self;
@@ -412,8 +540,6 @@ NOTHROW(FCALL uhci_interrupt)(void *arg) {
 		/* One of two things happened:
 		 *  - A TD with the IOC bit was finished
 		 *  - Some TD got one of its error bits set. */
-		uhci_controller_stop(self);
-
 		if (!sync_trywrite(&self->uc_lock)) {
 			/* Whoever is holding the lock must handle this interrupt, then... */
 			ATOMIC_FETCHOR(self->uc_flags, UHCI_CONTROLLER_FLAG_INTERRUPTED);
@@ -429,7 +555,6 @@ NOTHROW(FCALL uhci_interrupt)(void *arg) {
 		 * know that no additional interrupt could happen after we release this
 		 * lock! */
 		sync_endwrite(&self->uc_lock);
-		uhci_controller_resume(self);
 	}
 done:
 	return true;
@@ -454,7 +579,6 @@ uhci_controller_addqueue(struct uhci_controller *__restrict self,
 		THROWS(E_WOULDBLOCK) {
 	struct uhci_osqh *last;
 	sync_write(&self->uc_lock);
-	uhci_controller_stop(self);
 	last = self->uc_qhstart.qh_next;
 	if (last) {
 		/* TODO: Keep track of the last entry within the controller. */
@@ -475,7 +599,6 @@ uhci_controller_addqueue(struct uhci_controller *__restrict self,
 		/* Set the first (and currently only) element of the hardware list. */
 		ATOMIC_WRITE(self->uc_qhstart.qh_hp, osqh->qh_self | UHCI_QHHP_QHTD);
 	}
-	uhci_controller_resume(self);
 	uhci_controller_endwrite(self);
 }
 
@@ -603,8 +726,14 @@ uhci_controller_probeport(struct uhci_controller *__restrict self,
 
 		uhci_controller_addqueue(self, qh);
 		aio_multihandle_done(&aio);
-		aio_multihandle_generic_waitfor(&aio);
-		aio_multihandle_generic_checkerror(&aio);
+		TRY {
+			aio_multihandle_generic_waitfor(&aio);
+			aio_multihandle_generic_checkerror(&aio);
+		} EXCEPT {
+			aio_multihandle_generic_fini(&aio);
+			RETHROW();
+		}
+		aio_multihandle_generic_fini(&aio);
 		printk(KERN_DEBUG "setup:\n%$[hex]\n", sizeof(setup), setup);
 		printk(KERN_DEBUG "data:\n%$[hex]\n", sizeof(data), data);
 	}
