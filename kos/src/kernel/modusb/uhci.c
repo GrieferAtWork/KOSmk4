@@ -226,13 +226,17 @@ NOTHROW(KCALL uhci_aio_cancel)(struct aio_handle *__restrict self) {
 	struct uhci_aio_data *data;
 	struct uhci_controller *ctrl;
 	data = (struct uhci_aio_data *)self->ah_data;
+again:
 	if (ATOMIC_READ(data->ud_flags) & UHCI_AIO_FSERVED)
 		return; /* Already completed. */
 	ctrl = data->ud_ctrl;
 
 	/* Acquire a lock to the controller to prevent it from completing
 	 * our AIO, and setting `UHCI_AIO_FSERVED' before we can. */
-	sync_write(&ctrl->uc_lock);
+	if unlikely(!sync_trywrite(&ctrl->uc_lock)) {
+		task_tryyield_or_pause();
+		goto again;
+	}
 	if likely(!(ATOMIC_READ(data->ud_flags) & UHCI_AIO_FSERVED)) {
 		/* Cancel our AIO now */
 		struct uhci_osqh **posqh, *osqh, *prev, *next;
