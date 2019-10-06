@@ -226,6 +226,109 @@ NOTHROW(KCALL aio_pbuffer_copytophys)(struct aio_pbuffer const *__restrict self,
 	}
 }
 
+PUBLIC NONNULL((1)) void KCALL
+aio_buffer_copytovphys(struct aio_buffer const *__restrict src,
+                       struct aio_pbuffer const *__restrict dst,
+                       uintptr_t dst_offset,
+                       uintptr_t src_offset,
+                       size_t num_bytes)
+		THROWS(E_SEGFAULT) {
+	struct aio_pbuffer_entry dstent;
+	assert(aio_buffer_size(src) >= src_offset + num_bytes);
+	assert(aio_pbuffer_size(dst) >= dst_offset + num_bytes);
+	AIO_PBUFFER_FOREACH_N(dstent, dst) {
+		size_t partcopy;
+		if (dst_offset != 0) {
+			if (dst_offset >= dstent.ab_size) {
+				dst_offset -= dstent.ab_size;
+				continue;
+			}
+			dstent.ab_base += dst_offset;
+			dstent.ab_size -= dst_offset;
+			dst_offset = 0;
+		}
+		partcopy = dstent.ab_size;
+		if (partcopy > num_bytes)
+			partcopy = num_bytes;
+		aio_buffer_copytophys(src,
+		                      dstent.ab_base,
+		                      src_offset,
+		                      partcopy);
+		if (partcopy >= num_bytes)
+			break;
+		num_bytes  -= partcopy;
+		src_offset += partcopy;
+	}
+}
+
+PUBLIC NONNULL((1)) void KCALL
+aio_pbuffer_copytovmem(struct aio_pbuffer const *__restrict src,
+                       struct aio_buffer const *__restrict dst,
+                       uintptr_t dst_offset,
+                       uintptr_t src_offset,
+                       size_t num_bytes)
+		THROWS(E_SEGFAULT) {
+	struct aio_buffer_entry dstent;
+	assert(aio_pbuffer_size(src) >= src_offset + num_bytes);
+	assert(aio_buffer_size(dst) >= dst_offset + num_bytes);
+	AIO_BUFFER_FOREACH_N(dstent, dst) {
+		size_t partcopy;
+		if (dst_offset != 0) {
+			if (dst_offset >= dstent.ab_size) {
+				dst_offset -= dstent.ab_size;
+				continue;
+			}
+			dstent.ab_base = (byte_t *)dstent.ab_base + dst_offset;
+			dstent.ab_size -= dst_offset;
+			dst_offset = 0;
+		}
+		partcopy = dstent.ab_size;
+		if (partcopy > num_bytes)
+			partcopy = num_bytes;
+		aio_pbuffer_copytomem(src,
+		                      dstent.ab_base,
+		                      src_offset,
+		                      partcopy);
+		if (partcopy >= num_bytes)
+			break;
+		num_bytes  -= partcopy;
+		src_offset += partcopy;
+	}
+}
+
+PUBLIC NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL aio_pbuffer_copytovphys)(struct aio_pbuffer const *__restrict src,
+                                       struct aio_pbuffer const *__restrict dst,
+                                       uintptr_t dst_offset,
+                                       uintptr_t src_offset,
+                                       size_t num_bytes) {
+	struct aio_pbuffer_entry dstent;
+	assert(aio_pbuffer_size(src) >= src_offset + num_bytes);
+	assert(aio_pbuffer_size(dst) >= dst_offset + num_bytes);
+	AIO_PBUFFER_FOREACH_N(dstent, dst) {
+		size_t partcopy;
+		if (dst_offset != 0) {
+			if (dst_offset >= dstent.ab_size) {
+				dst_offset -= dstent.ab_size;
+				continue;
+			}
+			dstent.ab_base += dst_offset;
+			dstent.ab_size -= dst_offset;
+			dst_offset = 0;
+		}
+		partcopy = dstent.ab_size;
+		if (partcopy > num_bytes)
+			partcopy = num_bytes;
+		aio_pbuffer_copytophys(src,
+		                       dstent.ab_base,
+		                       src_offset,
+		                       partcopy);
+		if (partcopy >= num_bytes)
+			break;
+		num_bytes  -= partcopy;
+		src_offset += partcopy;
+	}
+}
 
 
 

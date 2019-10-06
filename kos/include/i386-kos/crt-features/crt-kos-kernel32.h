@@ -85,6 +85,7 @@
 #define __CRT_HAVE_addr2line_vprintf 1
 #define __CRT_HAVE_aio_buffer_copyfromphys 1
 #define __CRT_HAVE_aio_buffer_copytophys 1
+#define __CRT_HAVE_aio_buffer_copytovphys 1
 #define __CRT_HAVE_aio_handle_generic_func 1
 #define __CRT_HAVE_aio_handle_multiple_func 1
 #define __CRT_HAVE_aio_multihandle_allochandle 1
@@ -99,6 +100,8 @@
 #define __CRT_HAVE_aio_pbuffer_copyfromphys 1
 #define __CRT_HAVE_aio_pbuffer_copytomem 1
 #define __CRT_HAVE_aio_pbuffer_copytophys 1
+#define __CRT_HAVE_aio_pbuffer_copytovmem 1
+#define __CRT_HAVE_aio_pbuffer_copytovphys 1
 #define __CRT_HAVE_aio_pbuffer_memset 1
 #define __CRT_HAVE_ansitty_device_cinit 1
 #define __CRT_HAVE_ansitty_device_ioctl 1

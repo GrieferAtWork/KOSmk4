@@ -21,39 +21,48 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/malloc.h>
 #include <kernel/types.h>
 #include <dev/char.h>
 
 DECL_BEGIN
 
-struct usb_device;
-struct usb_descriptor;
-struct usb_transaction;
-struct usb_controller;
-
-#define USB_SPEED_HIGH 0x00
-#define USB_SPEED_FULL 0x01
-#define USB_SPEED_LOW  0x02
-
-struct usb_descriptor {
-	/* USB Device Descriptor */
-	u8 ud_speed; /* Speed of the device (one of `USB_SPEED_*') */
+struct usb_endpoint {
+	WEAK refcnt_t ue_refcnt;       /* Reference counter. */
+	u16           ue_maxpck;       /* [const] Max packet size. */
+	u8            ue_dev;          /* [const] Device address. */
+	u8            ue_endp;         /* [const] Endpoint index. */
+	unsigned int  ue_toggle : 1;   /* Data toggle bit. */
+	unsigned int  ue_lowspeed : 1; /* Low-speed device. */
 };
+DEFINE_REFCOUNT_FUNCTIONS(struct usb_endpoint, ue_refcnt, kfree)
 
 
-struct usb_device
-#ifdef __cplusplus
-	: character_device
-#endif /* __cplusplus */
-{
-#ifndef __cplusplus
-	struct character_device ud_dev;  /* The underlying character device. */
-#endif /* !__cplusplus */
-	struct usb_descriptor   ud_desc; /* Device descriptor. */
-	/* TODO: Common interface */
+
+struct usb_transfer {
+	struct usb_transfer *ut_next;   /* [0..1] Next transfer packet. */
+#define USB_TRANSFER_TYPE_IN    0   /* Receive data. */
+#define USB_TRANSFER_TYPE_OUT   1   /* Send data. */
+#define USB_TRANSFER_TYPE_SETUP 2   /* Send control data. */
+#define USB_TRANSFER_TYPE_COUNT 3   /* # of transfer types */
+	uintptr_quarter_t    ut_type;   /* Transfer type (One of `USB_TRANSFER_TYPE_*'). */
+#define USB_TRANSFER_FLAG_NORMAL 0x00 /* Normal transfer flags. */
+#define USB_TRANSFER_FLAG_SHORT  0x01 /* Allow short packets (used buffer size must not necessarily match given size). */
+	uintptr_quarter_t    ut_flags;  /* Transfer flags (Set of `USB_TRANSFER_FLAG_*'). */
+#define USB_TRANSFER_BUFTYP_VIRT    0 /* Virtual memory buffer */
+#define USB_TRANSFER_BUFTYP_PHYS    1 /* Physical memory buffer */
+#define USB_TRANSFER_BUFTYP_VIRTVEC 2 /* Virtual memory vector buffer */
+#define USB_TRANSFER_BUFTYP_PHYSVEC 3 /* Physical memory vector buffer */
+#define USB_TRANSFER_BUFTYP_COUNT   4 /* # of buffer types */
+	uintptr_quarter_t    ut_buftyp; /* Buffer type (One of `USB_TRANSFER_BUFTYP_*'). */
+	size_t               ut_buflen; /* Buffer length. */
+	union { /* Used input/output buffer. */
+		void                     *ut_buf;   /* [valid_if(ut_buftyp == USB_TRANSFER_BUFTYP_VIRT)] */
+		vm_phys_t                 ut_bufp;  /* [valid_if(ut_buftyp == USB_TRANSFER_BUFTYP_PHYS)] */
+		struct aio_buffer  const *ut_vbuf;  /* [valid_if(ut_buftyp == USB_TRANSFER_BUFTYP_VIRTVEC)] */
+		struct aio_pbuffer const *ut_vbufp; /* [valid_if(ut_buftyp == USB_TRANSFER_BUFTYP_PHYSVEC)] */
+	};
 };
-
-
 
 
 struct usb_controller
@@ -64,11 +73,28 @@ struct usb_controller
 #ifndef __cplusplus
 	struct character_device uc_dev; /* The underlying character device. */
 #endif /* !__cplusplus */
-	/* TODO: Common interface */
-
+	/* [1..1] Initiate a one-time transfer of a sequence of packets. */
+	NONNULL((1, 2, 3, 4)) void
+	(KCALL *uc_transfer)(struct usb_controller *__restrict self,
+	                     struct usb_endpoint *__restrict endp,
+	                     struct usb_transfer const *__restrict tx,
+	                     struct aio_handle *__restrict aio);
+	/* TODO: Interface for registering Isochronous interrupt handlers. */
 };
 
 
+/* Function called when a new USB endpoint is discovered.
+ * This function should try to engage with the endpoint in
+ * order to discover what type of device is connected.
+ * Note that the given `endp->ue_endp' is always `0' (configure
+ * pipe), and that `endp->ue_dev' is also ZERO(0) (aka.: not
+ * configured), with this function then being expected to
+ * initialize those values before trying to detect the type
+ * of connected device, as well as passing the endpoint to
+ * the appropriate driver. */
+FUNDEF void KCALL
+usb_endpoint_discovered(struct usb_controller *__restrict self,
+                        struct usb_endpoint *__restrict endp);
 
 
 

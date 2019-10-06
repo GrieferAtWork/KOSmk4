@@ -28,6 +28,7 @@
 #include <drivers/pci.h>
 #include <kernel/aio.h>
 #include <kernel/driver.h>
+#include <kernel/memory.h>
 #include <kernel/except.h>
 #include <kernel/heap.h>
 #include <kernel/interrupt.h>
@@ -320,7 +321,17 @@ NOTHROW(KCALL uhci_aio_retsize)(struct aio_handle *__restrict self) {
 	return data->ud_retsize;
 }
 
-
+LOCAL NOBLOCK void
+NOTHROW(FCALL uhci_aio_handle_finidma)(struct uhci_aio_data *__restrict self) {
+	if (self->ud_flags & UHCI_AIO_FONEDMA)
+		vm_dmalock_release(&self->ud_dmalock);
+	else if (self->ud_dmalockvec) {
+		struct vm_dmalock *iter;
+		for (iter = self->ud_dmalockvec; iter->dl_part; ++iter)
+			vm_dmalock_release(iter);
+		kfree(self->ud_dmalockvec);
+	}
+}
 
 PRIVATE NOBLOCK void
 NOTHROW(FCALL uhci_osqh_aio_docomplete)(struct aio_handle *__restrict aio,
@@ -328,16 +339,7 @@ NOTHROW(FCALL uhci_osqh_aio_docomplete)(struct aio_handle *__restrict aio,
 	struct uhci_aio_data *data;
 	data = (struct uhci_aio_data *)aio->ah_data;
 	if (!(ATOMIC_FETCHOR(data->ud_flags, UHCI_AIO_FSERVED) & UHCI_AIO_FSERVED)) {
-		if (data->ud_flags & UHCI_AIO_FONEDMA) {
-			vm_dmalock_release(&data->ud_dmalock);
-		} else if (data->ud_dmalockvec) {
-			struct vm_dmalock *iter;
-			for (iter = data->ud_dmalockvec; iter->dl_part; ++iter)
-				vm_dmalock_release(iter);
-			kfree(data->ud_dmalockvec);
-		}
-		decref_unlikely(data->ud_ctrl);
-		decref_unlikely(data->ud_osqh);
+		uhci_aio_handle_finidma(data);
 		(*aio->ah_func)(aio, status);
 	}
 }
@@ -602,6 +604,593 @@ uhci_controller_addqueue(struct uhci_controller *__restrict self,
 	uhci_controller_endwrite(self);
 }
 
+/* Construct new TDs for  */
+#if __SIZEOF_VM_PHYS_T__ > 4
+PRIVATE bool KCALL
+#else /* __SIZEOF_VM_PHYS_T__ > 4 */
+PRIVATE void KCALL
+#endif /* __SIZEOF_VM_PHYS_T__ <= 4 */
+uhci_construct_tds(struct usb_controller *__restrict self,
+                   struct uhci_ostd ***__restrict ppnexttd,
+                   struct usb_endpoint *__restrict endp,
+                   struct usb_transfer const *__restrict tx,
+                   vm_phys_t start, size_t num_bytes) {
+	u32 tok, cs;
+#if __SIZEOF_VM_PHYS_T__ > 4
+	if unlikely(start > (vm_phys_t)0xffffffff ||
+	            (start + num_bytes) > (vm_phys_t)0xffffffff)
+		return false; /* Need a 32-bit buffer. */
+#endif /* __SIZEOF_VM_PHYS_T__ > 4 */
+	assert(tx->ut_type < USB_TRANSFER_TYPE_COUNT);
+	switch (tx->ut_type) {
+	case USB_TRANSFER_TYPE_IN:
+		tok = UHCI_TDTOK_PID_IN;
+		break;
+	case USB_TRANSFER_TYPE_OUT:
+		tok = UHCI_TDTOK_PID_OUT;
+		break;
+	case USB_TRANSFER_TYPE_SETUP:
+		tok = UHCI_TDTOK_PID_SETUP;
+		break;
+	default: __builtin_unreachable();
+	}
+	cs = UHCI_TDCS_ACTIVE |
+	     ((3 << UHCI_TDCS_ERRCNTS) & UHCI_TDCS_ERRCNTM);
+	/* When short packets aren't allowed, turn on short packet detection. */
+	if (!(tx->ut_flags & USB_TRANSFER_FLAG_SHORT))
+		cs |= UHCI_TDCS_SPD;
+	/* Set the LowSpeedDevice bit for low-speed endpoints. */
+	if (endp->ue_lowspeed)
+		cs |= UHCI_TDCS_LSD;
+	tok |= (endp->ue_dev << UHCI_TDTOK_DEVS) & UHCI_TDTOK_DEVM;
+	tok |= (endp->ue_endp << UHCI_TDTOK_ENDPTS) & UHCI_TDTOK_ENDPTM;
+	/* Construct TD entires of up to `endp->ue_maxpck' bytes. */
+	do {
+		u16 mysize;
+		struct uhci_ostd *td;
+		td = uhci_ostd_alloc();
+		**ppnexttd = td;
+		*ppnexttd = &td->td_next;
+		mysize = endp->ue_maxpck;
+		if ((size_t)mysize > num_bytes)
+			mysize = (u16)num_bytes;
+		td->td_cs  = cs;
+		td->td_tok = tok;
+		td->td_tok |= ((mysize - 1) << UHCI_TDTOK_MAXLENS) & UHCI_TDTOK_MAXLENM;
+		td->td_buf = (u32)start;
+		if (tx->ut_type == USB_TRANSFER_TYPE_SETUP)
+			endp->ue_toggle = 0;
+		else {
+			td->td_tok |= (endp->ue_toggle << UHCI_TDTOK_DTOGGS) & UHCI_TDTOK_DTOGGM;
+			endp->ue_toggle ^= 1;
+		}
+		start     += mysize;
+		num_bytes -= mysize;
+	} while (num_bytes);
+#if __SIZEOF_VM_PHYS_T__ > 4
+	return true;
+#endif /* __SIZEOF_VM_PHYS_T__ > 4 */
+}
+
+PRIVATE NONNULL((1, 2, 3, 4)) void KCALL
+uhci_transfer(struct usb_controller *__restrict self,
+              struct usb_endpoint *__restrict endp,
+              struct usb_transfer const *__restrict tx,
+              struct aio_handle *__restrict aio);
+
+struct uhci_syncheap_page {
+	vm_ppage_t shp_next;  /* Pointer to the next page (or `PAGEPTR_INVALID') */
+	size_t     shp_count; /* Number of consecutively allocated pages. */
+};
+struct uhci_syncheap {
+	vm_ppage_t sh_current; /* Physical address of a `struct uhci_syncheap_page' structure
+	                        * describing the next allocated page (or `PAGEPTR_INVALID'). */
+	size_t     sh_free;    /* Number of bytes, starting at `VM_PAGE2ADDR(sh_current) +
+	                        * sizeof(struct uhci_syncheap_page)'. */
+};
+
+#define UHCI_SYNCHEAP_INIT  { PAGEPTR_INVALID, 0 }
+
+PRIVATE NOBLOCK void
+NOTHROW(KCALL uhci_syncheap_fini)(struct uhci_syncheap *__restrict self) {
+	vm_ppage_t page;
+	/* Free all allocated pages of physical memory. */
+	page = self->sh_current;
+	while (page != PAGEPTR_INVALID) {
+		struct uhci_syncheap_page next;
+		vm_copyfromphys(&next, VM_PPAGE2ADDR(self->sh_current),
+		                sizeof(struct uhci_syncheap_page));
+		page_free(page, next.shp_count);
+		page = next.shp_next;
+	}
+	
+}
+
+#define UHCI_SYNCHEAP_ALLOC_FAILED ((u32)-1)
+/* Allocate physical memory (or return `UHCI_SYNCHEAP_ALLOC_FAILED' on failure)
+ * Note that even on failure, when `num_bytes > PAGESIZE', there is a
+ * possibility that the re-attempting the allocation with a smaller size could
+ * succeed. */
+PRIVATE NOBLOCK u32
+NOTHROW(KCALL uhci_syncheap_alloc)(struct uhci_syncheap *__restrict self,
+                                   size_t num_bytes) {
+	u32 result;
+	if (num_bytes > self->sh_free) {
+		/* Must allocate a new page block. */
+		pageptr_t pg;
+		struct uhci_syncheap_page header;
+		header.shp_count = CEILDIV(num_bytes +
+		                           sizeof(struct uhci_syncheap_page),
+		                           PAGESIZE);
+#if __SIZEOF_VM_PHYS_T__ > 4
+		pg = page_malloc_between(0,
+		                         VM_ADDR2PAGE((vm_phys_t)0xffffffff),
+		                         header.shp_count);
+#else /* __SIZEOF_VM_PHYS_T__ > 4 */
+		pg = page_malloc(header.shp_count);
+#endif /* __SIZEOF_VM_PHYS_T__ <= 4 */
+		if (pg == PAGEPTR_INVALID)
+			return UHCI_SYNCHEAP_ALLOC_FAILED;
+		header.shp_next = self->sh_current;
+		vm_copytophys(VM_PPAGE2ADDR(pg), &header, sizeof(header));
+		self->sh_free = (header.shp_count * PAGESIZE) -
+		                sizeof(struct uhci_syncheap_page);
+		self->sh_current = pg;
+	}
+	assert(num_bytes < self->sh_free);
+	result = (u32)VM_PPAGE2ADDR(self->sh_current);
+	result += sizeof(struct uhci_syncheap_page);
+	result += self->sh_free;
+	result -= num_bytes;
+	self->sh_free -= num_bytes;
+	return result;
+}
+
+PRIVATE struct aio_pbuffer *KCALL
+usb_transfer_allocate_pbuffer(struct uhci_syncheap *__restrict heap,
+                              size_t num_bytes) {
+	struct aio_pbuffer *result;
+	struct aio_pbuffer_entry *entv;
+	size_t req_pages = CEILDIV(num_bytes, PAGESIZE);
+	assert(req_pages != 0);
+	result = (struct aio_pbuffer *)kmalloc(sizeof(struct aio_pbuffer) +
+	                                       req_pages *
+	                                       sizeof(struct aio_pbuffer_entry),
+	                                       GFP_NORMAL);
+	TRY {
+		size_t i;
+		entv = (struct aio_pbuffer_entry *)((byte_t *)result + sizeof(struct aio_pbuffer));
+		result->ab_entc = req_pages;
+		result->ab_entv = entv;
+		for (i = 0; i < req_pages; ++i) {
+			u32 addr;
+			size_t reqbytes;
+			reqbytes = i == req_pages - 1
+			           ? num_bytes & (PAGESIZE - 1)
+			           : PAGESIZE;
+			addr = uhci_syncheap_alloc(heap, reqbytes);
+			if unlikely(addr == UHCI_SYNCHEAP_ALLOC_FAILED)
+				THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
+			entv[i].ab_base = (vm_phys_t)addr;
+			entv[i].ab_size = reqbytes;
+		}
+		result->ab_head = entv[0];
+		result->ab_last = entv[req_pages - 1].ab_size;
+	} EXCEPT {
+		kfree(result);
+		RETHROW();
+	}
+	return result;
+}
+
+
+PRIVATE void KCALL
+usb_transfer_allocate_physbuf(struct usb_transfer *__restrict tx,
+                              struct uhci_syncheap *__restrict heap) {
+	u32 bufaddr;
+	bufaddr = uhci_syncheap_alloc(heap, tx->ut_buflen);
+	if likely(bufaddr != UHCI_SYNCHEAP_ALLOC_FAILED) {
+		tx->ut_bufp   = (vm_phys_t)bufaddr;
+		tx->ut_buftyp = USB_TRANSFER_BUFTYP_PHYS;
+		return;
+	}
+	if (tx->ut_buflen > PAGESIZE) {
+		/* Allocate in single pages. */
+		tx->ut_vbufp  = usb_transfer_allocate_pbuffer(heap, tx->ut_buflen);
+		tx->ut_buftyp = USB_TRANSFER_BUFTYP_PHYSVEC;
+		return;
+	}
+	THROW(E_BADALLOC_INSUFFICIENT_PHYSICAL_MEMORY, 1);
+}
+
+
+/* This function performs a synchronous transfer operation by going
+ * through real physical memory in order to allow USB transfers to/
+ * from buffers located in VIO memory regions, as well as physical
+ * memory locations above 4GiB */
+PRIVATE NONNULL((1, 2, 3)) void KCALL
+uhci_transfer_sync_with_phys(struct usb_controller *__restrict self,
+                             struct usb_endpoint *__restrict endp,
+                             struct usb_transfer const *__restrict tx) {
+	struct usb_transfer *tx_firstcopy = NULL;
+	struct usb_transfer **ptx_copy, *tx_copy;
+	struct usb_transfer const *tx_iter;
+	struct uhci_syncheap heap = UHCI_SYNCHEAP_INIT;
+	/* Allocate physical memory buffers for all TX packets
+	 * and copy data from input packets inside, then perform
+	 * the operation synchronously before copying data from
+	 * output packets into the original buffers, and freeing
+	 * the temporary buffers. */
+	TRY {
+		ptx_copy = &tx_firstcopy;
+		tx_iter = tx;
+		do {
+			tx_copy = (struct usb_transfer *)kmalloc(sizeof(struct usb_transfer),
+			                                         GFP_NORMAL);
+			memcpy(tx_copy, tx_iter, sizeof(struct usb_transfer));
+			*ptx_copy = tx_copy;
+			ptx_copy = &tx_copy->ut_next;
+			if (!tx_iter->ut_buflen)
+				goto copy_next_tx;
+			/* Allocate the buffer for the output TX */
+			if (tx_iter->ut_buftyp == USB_TRANSFER_BUFTYP_PHYS) {
+#if __SIZEOF_VM_PHYS_T__ > 4
+				if (tx_iter->ut_bufp > (vm_phys_t)0xffffffff ||
+				    (tx_iter->ut_bufp + tx_iter->ut_buflen) > (vm_phys_t)0xffffffff)
+					goto do_alloc_new_buffer;
+#endif /* __SIZEOF_VM_PHYS_T__ <= 4 */
+				tx_copy->ut_bufp = tx_iter->ut_bufp;
+			} else if (tx_iter->ut_buftyp == USB_TRANSFER_BUFTYP_PHYSVEC) {
+#if __SIZEOF_VM_PHYS_T__ > 4
+				struct aio_pbuffer_entry ent;
+				AIO_PBUFFER_FOREACH(ent, tx_iter->ut_vbufp) {
+					if (ent.ab_base > (vm_phys_t)0xffffffff ||
+					    (ent.ab_base + ent.ab_size) > (vm_phys_t)0xffffffff)
+						goto do_alloc_new_buffer;
+				}
+#endif /* __SIZEOF_VM_PHYS_T__ <= 4 */
+				tx_copy->ut_vbufp = tx_iter->ut_vbufp;
+			} else {
+#if __SIZEOF_VM_PHYS_T__ > 4
+do_alloc_new_buffer:
+#endif /* __SIZEOF_VM_PHYS_T__ <= 4 */
+				usb_transfer_allocate_physbuf(tx_copy, &heap);
+			}
+			/* Copy outgoing packet data into the physical memory buffers. */
+			if (tx_iter->ut_type != USB_TRANSFER_TYPE_IN) {
+				switch (tx_iter->ut_buftyp) {
+
+				case USB_TRANSFER_BUFTYP_VIRT:
+					if (tx_copy->ut_buftyp == USB_TRANSFER_BUFTYP_PHYSVEC) {
+						aio_pbuffer_copyfrommem(tx_copy->ut_vbufp,
+						                        0,
+						                        tx_iter->ut_buf,
+						                        tx_copy->ut_buflen);
+					} else {
+						vm_copytophys(tx_copy->ut_bufp,
+						              tx_iter->ut_buf,
+						              tx_copy->ut_buflen);
+					}
+					break;
+
+				case USB_TRANSFER_BUFTYP_VIRTVEC:
+					if (tx_copy->ut_buftyp == USB_TRANSFER_BUFTYP_PHYSVEC) {
+						aio_buffer_copytovphys(tx_iter->ut_vbuf,
+						                       tx_copy->ut_vbufp,
+						                       0,
+						                       0,
+						                       tx_copy->ut_buflen);
+					} else {
+						aio_buffer_copytophys(tx_iter->ut_vbuf,
+						                      tx_copy->ut_bufp,
+						                      0,
+						                      tx_copy->ut_buflen);
+					}
+					break;
+
+				case USB_TRANSFER_BUFTYP_PHYS:
+					if (tx_copy->ut_buftyp == USB_TRANSFER_BUFTYP_PHYS) {
+						if (tx_copy->ut_bufp == tx_iter->ut_bufp)
+							break; /* Same buffer was used. */
+						vm_copyinphys(tx_copy->ut_bufp,
+						              tx_iter->ut_bufp,
+						              tx_copy->ut_buflen);
+					} else {
+						aio_pbuffer_copytophys(tx_copy->ut_vbufp,
+						                       tx_iter->ut_bufp,
+						                       0,
+						                       tx_copy->ut_buflen);
+					}
+					break;
+
+				case USB_TRANSFER_BUFTYP_PHYSVEC:
+					if (tx_copy->ut_buftyp == USB_TRANSFER_BUFTYP_PHYSVEC) {
+						if (tx_copy->ut_vbufp == tx_iter->ut_vbufp)
+							break; /* Same buffer was used. */
+						aio_pbuffer_copytovphys(tx_copy->ut_vbufp,
+						                        tx_iter->ut_vbufp,
+						                        0,
+						                        0,
+						                        tx_copy->ut_buflen);
+					} else {
+						aio_pbuffer_copyfromphys(tx_iter->ut_vbufp,
+						                         0,
+						                         tx_copy->ut_bufp,
+						                         tx_copy->ut_buflen);
+					}
+					break;
+
+				default: __builtin_unreachable();
+				}
+			}
+copy_next_tx:
+			;
+		} while ((tx_iter = tx_iter->ut_next) != NULL);
+		assert(*ptx_copy == NULL);
+		{
+			struct aio_handle_generic aio;
+			aio_handle_generic_init(&aio);
+			/* perform the transfer using our buffer copies. */
+			uhci_transfer(self, endp, tx_firstcopy, &aio);
+			TRY {
+				aio_handle_generic_waitfor(&aio);
+				aio_handle_generic_checkerror(&aio);
+			} EXCEPT {
+				aio_handle_generic_fini(&aio);
+				RETHROW();
+			}
+			aio_handle_generic_fini(&aio);
+		}
+		/* Transfer input data buffers to their target locations. */
+		tx_copy = tx_firstcopy;
+		tx_iter = tx;
+		assert(tx_copy);
+		assert(tx_iter);
+		for (;;) {
+			assert(tx_copy->ut_type == tx_iter->ut_type);
+			assert(tx_copy->ut_buflen == tx_iter->ut_buflen);
+			if (tx_iter->ut_type == USB_TRANSFER_TYPE_IN) {
+				switch (tx_iter->ut_buftyp) {
+
+				case USB_TRANSFER_BUFTYP_VIRT:
+					if (tx_copy->ut_buftyp == USB_TRANSFER_BUFTYP_PHYSVEC) {
+						aio_pbuffer_copytomem(tx_copy->ut_vbufp,
+						                      tx_iter->ut_buf,
+						                      0,
+						                      tx_copy->ut_buflen);
+					} else {
+						vm_copyfromphys(tx_iter->ut_buf,
+						                tx_copy->ut_bufp,
+						                tx_copy->ut_buflen);
+					}
+					break;
+
+				case USB_TRANSFER_BUFTYP_VIRTVEC:
+					if (tx_copy->ut_buftyp == USB_TRANSFER_BUFTYP_PHYSVEC) {
+						aio_pbuffer_copytovmem(tx_copy->ut_vbufp,
+						                       tx_iter->ut_vbuf,
+						                       0,
+						                       0,
+						                       tx_copy->ut_buflen);
+					} else {
+						aio_buffer_copyfromphys(tx_iter->ut_vbuf,
+						                        0,
+						                        tx_copy->ut_bufp,
+						                        tx_copy->ut_buflen);
+					}
+					break;
+
+				case USB_TRANSFER_BUFTYP_PHYS:
+					if (tx_copy->ut_buftyp == USB_TRANSFER_BUFTYP_PHYS) {
+						if (tx_copy->ut_bufp == tx_iter->ut_bufp)
+							break; /* Same buffer was used. */
+						vm_copyinphys(tx_iter->ut_bufp,
+						              tx_copy->ut_bufp,
+						              tx_copy->ut_buflen);
+					} else {
+						aio_pbuffer_copytophys(tx_copy->ut_vbufp,
+						                       tx_iter->ut_bufp,
+						                       0,
+						                       tx_copy->ut_buflen);
+					}
+					break;
+
+				case USB_TRANSFER_BUFTYP_PHYSVEC:
+					if (tx_copy->ut_buftyp == USB_TRANSFER_BUFTYP_PHYSVEC) {
+						if (tx_copy->ut_vbufp == tx_iter->ut_vbufp)
+							break; /* Same buffer was used. */
+						aio_pbuffer_copytovphys(tx_copy->ut_vbufp,
+						                        tx_iter->ut_vbufp,
+						                        0,
+						                        0,
+						                        tx_copy->ut_buflen);
+					} else {
+						aio_pbuffer_copyfromphys(tx_iter->ut_vbufp,
+						                         0,
+						                         tx_copy->ut_bufp,
+						                         tx_copy->ut_buflen);
+					}
+					break;
+
+				default: __builtin_unreachable();
+				}
+			}
+			tx_copy = tx_copy->ut_next;
+			tx_iter = tx_iter->ut_next;
+			if (!tx_iter)
+				break;
+		}
+		assert((tx_iter != NULL) == (tx_copy != NULL));
+	} EXCEPT {
+		while (tx_firstcopy) {
+			assert(tx);
+			tx_copy = tx_firstcopy->ut_next;
+			if (tx_firstcopy->ut_buftyp == USB_TRANSFER_BUFTYP_PHYSVEC &&
+			    tx_firstcopy->ut_vbufp != tx->ut_vbufp)
+				kfree((void *)tx_firstcopy->ut_vbufp);
+			kfree(tx_firstcopy);
+			tx_firstcopy = tx_copy;
+			tx = tx->ut_next;
+		}
+		uhci_syncheap_fini(&heap);
+		RETHROW();
+	}
+	while (tx_firstcopy) {
+		assert(tx);
+		tx_copy = tx_firstcopy->ut_next;
+		if (tx_firstcopy->ut_buftyp == USB_TRANSFER_BUFTYP_PHYSVEC &&
+		    tx_firstcopy->ut_vbufp != tx->ut_vbufp)
+			kfree((void *)tx_firstcopy->ut_vbufp);
+		kfree(tx_firstcopy);
+		tx_firstcopy = tx_copy;
+		tx = tx->ut_next;
+	}
+}
+
+
+
+PRIVATE NONNULL((1, 2, 3, 4)) void KCALL
+uhci_transfer(struct usb_controller *__restrict self,
+              struct usb_endpoint *__restrict endp,
+              struct usb_transfer const *__restrict tx,
+              struct aio_handle *__restrict aio) {
+	struct uhci_aio_data *data;
+	struct uhci_osqh *qh;
+	struct uhci_ostd **pnexttd, *lasttd, *td_iter;
+	struct uhci_controller *me;
+	struct usb_transfer const *tx_iter;
+	assert(tx != NULL);
+	me   = (struct uhci_controller *)self;
+	data = (struct uhci_aio_data *)aio->ah_data;
+	qh   = uhci_osqh_alloc();
+	aio->ah_type = &uhci_aio_type;
+	TRY {
+		qh->qh_refcnt = 2; /* +1: aio->ah_data->ud_osqh; +1: me->uc_qhstart.qh_next */
+		qh->qh_aio    = aio;
+		data->ud_flags      = UHCI_AIO_FNORMAL;
+		data->ud_dmalockvec = NULL;
+		tx_iter = tx;
+		pnexttd = &qh->qh_tds;
+		TRY {
+			do {
+				assert(tx_iter->ut_type < USB_TRANSFER_TYPE_COUNT);
+				assert(tx_iter->ut_buftyp < USB_TRANSFER_BUFTYP_COUNT);
+				switch (tx_iter->ut_buftyp) {
+
+				case USB_TRANSFER_BUFTYP_VIRT:
+					if (!tx_iter->ut_buflen)
+						goto do_configure_simple_empty;
+					/* TODO: vm_startdma() */
+					goto cleanup_configured_and_do_syncio;
+
+				case USB_TRANSFER_BUFTYP_VIRTVEC:
+					if (!tx_iter->ut_buflen)
+						goto do_configure_simple_empty;
+					/* TODO: vm_startdmav() */
+					goto cleanup_configured_and_do_syncio;
+
+				case USB_TRANSFER_BUFTYP_PHYS:
+do_configure_simple_empty:
+#if __SIZEOF_VM_PHYS_T__ > 4
+					if unlikely(!uhci_construct_tds(self, &pnexttd, endp, tx_iter,
+					                                tx_iter->ut_bufp,
+					                                tx_iter->ut_buflen))
+						goto cleanup_configured_and_do_syncio;
+#else /* __SIZEOF_VM_PHYS_T__ > 4 */
+					uhci_construct_tds(self, &pnexttd, endp, tx_iter,
+					                   tx_iter->ut_bufp,
+					                   tx_iter->ut_buflen);
+#endif /* __SIZEOF_VM_PHYS_T__ <= 4 */
+					break;
+
+				case USB_TRANSFER_BUFTYP_PHYSVEC: {
+					struct aio_pbuffer_entry ent;
+					AIO_PBUFFER_FOREACH(ent, tx_iter->ut_vbufp) {
+#if __SIZEOF_VM_PHYS_T__ > 4
+						if unlikely(!uhci_construct_tds(self, &pnexttd, endp, tx_iter,
+						                                ent.ab_base,
+						                                ent.ab_size))
+							goto cleanup_configured_and_do_syncio;
+#else /* __SIZEOF_VM_PHYS_T__ > 4 */
+						uhci_construct_tds(self, &pnexttd, endp, tx_iter,
+						                   ent.ab_base,
+						                   ent.ab_size);
+#endif /* __SIZEOF_VM_PHYS_T__ <= 4 */
+					}
+				}	break;
+
+				default: __builtin_unreachable();
+				}
+			} while ((tx_iter = tx_iter->ut_next) != NULL);
+			assert(pnexttd != &qh->qh_tds);
+			*pnexttd = NULL;
+			assert(qh->qh_tds != NULL);
+			/* Configure the last TD in the queue. */
+			lasttd = container_of(pnexttd, struct uhci_ostd, td_next);
+			lasttd->td_lp = UHCI_TDLP_TERM;
+			lasttd->td_cs |= UHCI_TDCS_IOC;
+			td_iter = qh->qh_tds;
+			qh->qh_ep = td_iter->td_self; /* Hardware pointer! */
+			for (; td_iter != lasttd;) {
+				struct uhci_ostd *td_next;
+				td_next = td_iter->td_next;
+				/* Link up the hardware TD pointer chain. */
+				td_iter->td_lp = td_next->td_self;
+				td_iter = td_next;
+			}
+			data->ud_osqh = qh; /* Inherit reference */
+			data->ud_ctrl = (REF struct uhci_controller *)incref(me);
+			TRY {
+				uhci_controller_addqueue(me, qh);
+			} EXCEPT {
+				decref_nokill(me);
+				RETHROW();
+			}
+		} EXCEPT {
+			struct uhci_ostd **piter;
+			/* Cleanup already acquired DMA locks */
+			uhci_aio_handle_finidma(data);
+			/* Cleanup already created TDs */
+			piter = &qh->qh_tds;
+			while (piter != pnexttd) {
+				lasttd = *piter;
+				if (piter != &qh->qh_tds)
+					uhci_ostd_free(container_of(piter, struct uhci_ostd, td_next));
+				piter  = &lasttd->td_next;
+			}
+			RETHROW();
+		}
+	} EXCEPT {
+		uhci_osqh_free(qh);
+		RETHROW();
+	}
+	return;
+cleanup_configured_and_do_syncio:
+	/* Cleanup already acquired DMA locks */
+	uhci_aio_handle_finidma(data);
+	{
+		struct uhci_ostd **piter;
+		/* Cleanup already created TDs */
+		piter = &qh->qh_tds;
+		while (piter != pnexttd) {
+			lasttd = *piter;
+			if (piter != &qh->qh_tds)
+				uhci_ostd_free(container_of(piter, struct uhci_ostd, td_next));
+			piter  = &lasttd->td_next;
+		}
+	}
+	/* Allocate physical memory buffers for all TX packets
+	 * and copy data from input packets inside, then perform
+	 * the operation synchronously before copying data from
+	 * output packets into the original buffers, and freeing
+	 * the temporary buffers. */
+	uhci_transfer_sync_with_phys(self, endp, tx);
+	aio->ah_type = &aio_noop_type;
+	aio_handle_success(aio);
+}
+
+
+
 
 PRIVATE void
 NOTHROW(FCALL sleep_milli)(unsigned int n) {
@@ -649,93 +1238,17 @@ uhci_controller_probeport(struct uhci_controller *__restrict self,
 	printk(FREESTR(KERN_INFO "[usb] Checking for device on %#I16x\n"), portno);
 	status = uhci_controller_resetport(self, portno);
 	if (status & UHCI_PORTSC_PED) {
-		struct aio_multihandle_generic aio;
-		struct uhci_osqh *qh;
-		struct uhci_ostd *td;
+		struct usb_endpoint *endpoint;
 		printk(FREESTR(KERN_INFO "[usb] Device found on %#I16x\n"), portno);
-
-
-		/* Just some tinkering with how USB works from here on... */
-		unsigned int toggle = 0;
-		aio_multihandle_generic_init(&aio);
-		td = uhci_ostd_alloc();
-		qh = uhci_osqh_alloc();
-		qh->qh_refcnt = 2;
-		qh->qh_tds    = td;
-		qh->qh_ep     = td->td_self;
-		qh->qh_aio    = aio_multihandle_allochandle(&aio);
-		{
-			struct uhci_aio_data *d;
-			d = (struct uhci_aio_data *)qh->qh_aio->ah_data;
-			d->ud_osqh          = qh; /* Inherit reference */
-			d->ud_ctrl          = (REF struct uhci_controller *)incref(self);
-			d->ud_dmalockvec    = NULL;
-			d->ud_flags         = UHCI_AIO_FNORMAL;
-			qh->qh_aio->ah_type = &uhci_aio_type;
-		}
-
-		alignas(8) byte_t data[8];
-		alignas(8) byte_t setup[8];
-		memset(data, 0xcc, sizeof(data));
-		memset(setup, 0, sizeof(setup));
-		setup[0] = 0x80; /* bmRequestType = Device-to-host | Standard | Device; */
-		setup[1] = 0;    /* bRequest = GET_STATUS; */
-		*(u16 *)(setup + 2) = 0; /* Value */
-		*(u16 *)(setup + 4) = 0; /* Index */
-		*(u16 *)(setup + 6) = sizeof(data);
-		td->td_cs   = UHCI_TDCS_ACTIVE | UHCI_TDCS_ERRCNTM;
-		if (status & UHCI_PORTSC_LSDA)
-			td->td_cs |= UHCI_TDCS_LSD;
-		td->td_tok = UHCI_TDTOK_PID_SETUP |
-		             (0 << UHCI_TDTOK_DEVS) |   /* ??? */
-		             (0 << UHCI_TDTOK_ENDPTS) | /* ??? */
-		             (toggle << UHCI_TDTOK_DTOGGS) |  /* ??? */
-		             ((sizeof(setup) - 1) << UHCI_TDTOK_MAXLENS);
-		td->td_buf = (u32)pagedir_translate((vm_virt_t)setup);
-		td->td_next = uhci_ostd_alloc();
-		td->td_lp   = td->td_next->td_self;
-		td = td->td_next;
-		toggle ^= 1;
-
-		td->td_tok = UHCI_TDTOK_PID_IN |
-		             (0 << UHCI_TDTOK_DEVS) |   /* ??? */
-		             (0 << UHCI_TDTOK_ENDPTS) | /* ??? */
-		             (toggle << UHCI_TDTOK_DTOGGS) |  /* ??? */
-		             ((sizeof(data) - 1) << UHCI_TDTOK_MAXLENS);
-		td->td_buf = (u32)pagedir_translate((vm_virt_t)&data);
-		td->td_cs   = UHCI_TDCS_ACTIVE | UHCI_TDCS_ERRCNTM;
-		if (status & UHCI_PORTSC_LSDA)
-			td->td_cs |= UHCI_TDCS_LSD;
-		td->td_next = uhci_ostd_alloc();
-		td->td_lp   = td->td_next->td_self;
-		td = td->td_next;
-		toggle ^= 1;
-
-		td->td_tok = UHCI_TDTOK_PID_OUT |
-		             (0 << UHCI_TDTOK_DEVS) |   /* ??? */
-		             (0 << UHCI_TDTOK_ENDPTS) | /* ??? */
-		             (toggle << UHCI_TDTOK_DTOGGS) |  /* ??? */
-		             UHCI_TDTOK_MAXLENM;
-		td->td_buf = 0;
-		td->td_cs  = UHCI_TDCS_ACTIVE | UHCI_TDCS_ERRCNTM | UHCI_TDCS_IOC;
-		if (status & UHCI_PORTSC_LSDA)
-			td->td_cs |= UHCI_TDCS_LSD;
-		td->td_lp = UHCI_TDLP_TERM;
-		td->td_next = NULL;
-		toggle ^= 1;
-
-		uhci_controller_addqueue(self, qh);
-		aio_multihandle_done(&aio);
-		TRY {
-			aio_multihandle_generic_waitfor(&aio);
-			aio_multihandle_generic_checkerror(&aio);
-		} EXCEPT {
-			aio_multihandle_generic_fini(&aio);
-			RETHROW();
-		}
-		aio_multihandle_generic_fini(&aio);
-		printk(KERN_DEBUG "setup:\n%$[hex]\n", sizeof(setup), setup);
-		printk(KERN_DEBUG "data:\n%$[hex]\n", sizeof(data), data);
+		endpoint = (struct usb_endpoint *)kmalloc(sizeof(struct usb_endpoint), GFP_NORMAL);
+		endpoint->ue_refcnt   = 1;
+		endpoint->ue_maxpck   = 0x7ff; /* Not configured. */
+		endpoint->ue_dev      = 0;     /* Not configured. */
+		endpoint->ue_endp     = 0;     /* Configure channel. */
+		endpoint->ue_toggle   = 0;
+		endpoint->ue_lowspeed = status & UHCI_PORTSC_LSDA ? 1 : 0;
+		FINALLY_DECREF_UNLIKELY(endpoint);
+		usb_endpoint_discovered(self, endpoint);
 	}
 }
 
@@ -763,6 +1276,7 @@ usb_probe_uhci(struct pci_device *__restrict dev) {
 	}
 	atomic_rwlock_cinit(&result->uc_lock);
 	result->cd_type.ct_fini    = &uhci_fini;
+	result->uc_transfer        = &uhci_transfer;
 	result->uc_framelist       = (u32 *)vpage_alloc(1, 1, GFP_LOCKED | GFP_PREFLT);
 	result->uc_framelist_phys  = (u32)pagedir_translate((vm_virt_t)result->uc_framelist);
 	result->uc_qhstart.qh_self = (u32)pagedir_translate((vm_virt_t)&result->uc_qhstart);

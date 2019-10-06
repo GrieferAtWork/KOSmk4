@@ -1678,10 +1678,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak vm86_outb; .long vm86_outb
 	.reloc ., R_386_SIZE32, vm86_outb; .long 0
 	.long 0xbc611a2
-	.long 0 /* index: 419 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname419 /* index: 419 */
+	.weak aio_pbuffer_copytovphys; .long aio_pbuffer_copytovphys
+	.reloc ., R_386_SIZE32, aio_pbuffer_copytovphys; .long 0
+	.long 0x9c6c1a3
 	.long .Lname420 /* index: 420 */
 	.weak page_malloc_at; .long page_malloc_at
 	.reloc ., R_386_SIZE32, page_malloc_at; .long 0
@@ -4687,9 +4687,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, x86_syscall_is_cancellation_point; .long 0
 	.long 0x848b34
 	.long .Lname1171 /* index: 1171 */
-	.weak sys_fdatasync; .long sys_fdatasync
-	.reloc ., R_386_SIZE32, sys_fdatasync; .long 0
-	.long 0x3a1f493
+	.weak aio_buffer_copytovphys; .long aio_buffer_copytovphys
+	.reloc ., R_386_SIZE32, aio_buffer_copytovphys; .long 0
+	.long 0xaa84493
 	.long .Lname1172 /* index: 1172 */
 	.weak sys_setpgid; .long sys_setpgid
 	.reloc ., R_386_SIZE32, sys_setpgid; .long 0
@@ -7738,10 +7738,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak vm_datablock_write_buffered; .long vm_datablock_write_buffered
 	.reloc ., R_386_SIZE32, vm_datablock_write_buffered; .long 0
 	.long 0xa349104
-	.long 0 /* index: 1934 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname1934 /* index: 1934 */
+	.weak unwind_fde_find; .long unwind_fde_find
+	.reloc ., R_386_SIZE32, unwind_fde_find; .long 0
+	.long 0x4b137d4
 	.long 0 /* index: 1935 */
 	.long 0
 	.long 0
@@ -9527,9 +9527,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, quantum_global_to_local; .long 0
 	.long 0xb1d594c
 	.long .Lname2381 /* index: 2381 */
-	.weak mouse_device_vwheel_nopr; .long mouse_device_vwheel_nopr
-	.reloc ., R_386_SIZE32, mouse_device_vwheel_nopr; .long 0
-	.long 0x3a3aee2
+	.weak aio_pbuffer_copytovmem; .long aio_pbuffer_copytovmem
+	.reloc ., R_386_SIZE32, aio_pbuffer_copytovmem; .long 0
+	.long 0xa9c894d
 	.long 0 /* index: 2382 */
 	.long 0
 	.long 0
@@ -11726,10 +11726,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 2931 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2931 /* index: 2931 */
+	.weak sys_fdatasync; .long sys_fdatasync
+	.reloc ., R_386_SIZE32, sys_fdatasync; .long 0
+	.long 0x3a1f493
 	.long .Lname2932 /* index: 2932 */
 	.weak regdump_sgregs_with_cs_ss; .long regdump_sgregs_with_cs_ss
 	.reloc ., R_386_SIZE32, regdump_sgregs_with_cs_ss; .long 0
@@ -15335,9 +15335,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname3833 /* index: 3833 */
-	.weak unwind_fde_find; .long unwind_fde_find
-	.reloc ., R_386_SIZE32, unwind_fde_find; .long 0
-	.long 0x4b137d4
+	.weak mouse_device_vwheel_nopr; .long mouse_device_vwheel_nopr
+	.reloc ., R_386_SIZE32, mouse_device_vwheel_nopr; .long 0
+	.long 0x3a3aee2
 	.long 0 /* index: 3834 */
 	.long 0
 	.long 0
@@ -16800,6 +16800,8 @@ END(kernel_symbol_table)
 	.string "rawmemrchrq"
 .Lname418:
 	.string "vm86_outb"
+.Lname419:
+	.string "aio_pbuffer_copytovphys"
 .Lname420:
 	.string "page_malloc_at"
 .Lname421:
@@ -17595,7 +17597,7 @@ END(kernel_symbol_table)
 .Lname1170:
 	.string "x86_syscall_is_cancellation_point"
 .Lname1171:
-	.string "sys_fdatasync"
+	.string "aio_buffer_copytovphys"
 .Lname1172:
 	.string "sys_setpgid"
 .Lname1173:
@@ -18350,6 +18352,8 @@ END(kernel_symbol_table)
 	.string "memcpyl"
 .Lname1933:
 	.string "vm_datablock_write_buffered"
+.Lname1934:
+	.string "unwind_fde_find"
 .Lname1939:
 	.string "sys_syncfs"
 .Lname1940:
@@ -18803,7 +18807,7 @@ END(kernel_symbol_table)
 .Lname2380:
 	.string "quantum_global_to_local"
 .Lname2381:
-	.string "mouse_device_vwheel_nopr"
+	.string "aio_pbuffer_copytovmem"
 .Lname2386:
 	.string "atomic64_fetchor_r"
 .Lname2387:
@@ -19360,6 +19364,8 @@ END(kernel_symbol_table)
 	.string "vm_datapart_lock_write"
 .Lname2927:
 	.string "sys_accept4"
+.Lname2931:
+	.string "sys_fdatasync"
 .Lname2932:
 	.string "regdump_sgregs_with_cs_ss"
 .Lname2937:
@@ -20331,7 +20337,7 @@ END(kernel_symbol_table)
 .Lname3829:
 	.string "kernel_debugtrap_icpustate"
 .Lname3833:
-	.string "unwind_fde_find"
+	.string "mouse_device_vwheel_nopr"
 .Lname3836:
 	.string "dbg_scroll"
 .Lname3839:

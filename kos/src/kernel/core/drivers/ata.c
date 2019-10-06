@@ -278,6 +278,7 @@ set_lock_vec:
 	assert(req_prd != 0);
 	return req_prd;
 }
+
 INTERN WUNUSED size_t KCALL
 AtaPRD_InitFromVirtVector(AtaPRD *__restrict prd_buf, size_t prd_siz, struct aio_buffer *__restrict buf,
                           size_t num_bytes, AtaAIOHandleData *__restrict handle, bool for_writing)

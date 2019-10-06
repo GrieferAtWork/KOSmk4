@@ -1068,7 +1068,8 @@ again:
 			(*self->bd_type.dt_write)(self, cache_addr, 1,
 			                          sector_id, &handle);
 		} EXCEPT {
-			(*handle.ah_func)(&handle, AIO_COMPLETION_FAILURE);
+			handle.ah_type = &aio_noop_type;
+			aio_handle_fail(&handle);
 		}
 		/* Search for additional sectors which may need saving, so we can improve
 		 * performance by saving a whole bunch of different blocks at once. */
@@ -1097,8 +1098,8 @@ again:
 				(*self->bd_type.dt_write)(self, cache_addr, 1,
 				                          sector_id, &handle);
 			} EXCEPT {
-				(*ex_handles[ex_handles_count].sh_handle.ah_func)(&ex_handles[ex_handles_count].sh_handle,
-				                                                  AIO_COMPLETION_FAILURE);
+				ex_handles[ex_handles_count].sh_handle.ah_type = &aio_noop_type;
+				aio_handle_fail(&ex_handles[ex_handles_count].sh_handle);
 			}
 			++ex_handles_count;
 		}
@@ -1173,7 +1174,8 @@ check_handle_state_for_save:
 		                         addr,
 		                         &handle);
 	} EXCEPT {
-		(*handle.ah_func)(&handle, AIO_COMPLETION_FAILURE);
+		handle.ah_type = &aio_noop_type;
+		aio_handle_fail(&handle);
 	}
 	COMPILER_BARRIER();
 	TRY {
