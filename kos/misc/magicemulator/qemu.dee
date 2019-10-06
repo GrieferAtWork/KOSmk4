@@ -157,7 +157,7 @@ class TraceController {
 	function err(outFile: File, message: string) {
 		outFile << "{ERROR:trace(" << repr(m_name) <<  "): " << message << "}\n";
 	}
-	
+
 	function printDiff(outFile: File, addrFormat: string, oldSet: {int...}) {
 			local added = HashSet(), removed = HashSet();
 			for (local x: oldSet) {
@@ -304,6 +304,12 @@ got_exe:
 //		"-net", "nic,model=ne2k_pci", "-net", "user",
 		"-vga", "std",
 	});
+	if (fs.stat.exists("bin/ext2.img")) {
+		qemu_arguments.extend({
+			"-blockdev", "driver=file,node-name=usb1,filename=bin/ext2.img",
+			"-usb", "-device", "usb-storage,drive=usb1",
+		});
+	}
 	local cmdline = options.get(opt.QEMU_CMDLINE);
 	if (cmdline) {
 		print "QEMU_CMDLINE",repr(cmdline);

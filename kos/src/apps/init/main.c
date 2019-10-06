@@ -210,6 +210,8 @@ done_procfs:
 		}
 	}
 
+	sysctl_insmod("usb", NULL);
+
 	for (;;) {
 		pid_t cpid;
 		dprintf(STDOUT_FILENO,

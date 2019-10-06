@@ -116,6 +116,7 @@ BEGIN
 		DEFINE_SIMPLE_DRIVER("vga")
 		DEFINE_SIMPLE_DRIVER("ps2")
 		DEFINE_SIMPLE_DRIVER("procfs", SOURCE({ "modprocfs/files/" "*.c" }))
+		DEFINE_SIMPLE_DRIVER("usb")
 
 		DEFINE_SIMPLE_ARCH_DRIVER("gdbserver")
 

@@ -32,6 +32,8 @@ enum {
 	E_IOERROR_REASON_ATA_DCR_ERR_DF,  /* `ATA_DCR_ERR' and `ATA_DCR_DF' were set */
 	E_IOERROR_REASON_ATA_DCR_BSY,     /* Timeout while waiting for `ATA_DCR_BSY' */
 	E_IOERROR_REASON_ATA_SECTOR_WAIT, /* Timeout while waiting for sector data */
+	E_IOERROR_REASON_UHCI_BADEP,      /* A `uhci_qh::qh_ep' field contained a bad value `POINTER[2]' */
+	E_IOERROR_REASON_UHCI_TDCS,       /* At least one of the error bits of `UHCI_TDCS_*' is set (POINTER[2] is the `td_cs' field) */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
