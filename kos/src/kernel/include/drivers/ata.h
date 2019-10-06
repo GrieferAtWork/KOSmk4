@@ -166,7 +166,7 @@ struct ata_drive;
 
 /* The layout of the `ah_data' field of AIO handles used with ATA */
 typedef struct {
-	struct ata_drive *hd_drive;        /* [1..1][const] The drive associated with this handle. */
+	REF struct ata_drive *hd_drive;        /* [1..1][const] The drive associated with this handle. */
 	union {
 		struct vm_dmalock  hd_dmalock;    /* [valid_if(ATA_AIO_HANDLE_FONEDMA)] Single DMA lock */
 		struct vm_dmalock *hd_dmalockvec; /* [valid_if(!ATA_AIO_HANDLE_FONEDMA)][0..1][owned] Vector of DMA locks
@@ -226,6 +226,7 @@ AtaPRD_InitFromVirtVector(AtaPRD *__restrict prd_buf, size_t prd_siz, struct aio
 
 
 INTDEF struct aio_handle_type Ata_DmaHandleType;
+INTDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL Ata_FiniDmaHandle)(struct aio_handle *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL Ata_CancelDmaHandle)(struct aio_handle *__restrict self);
 INTDEF NOBLOCK NONNULL((1)) unsigned int NOTHROW(KCALL Ata_DmaHandleProgress)(struct aio_handle *__restrict self, struct aio_handle_stat *__restrict stat);
 

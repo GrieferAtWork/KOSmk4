@@ -122,23 +122,23 @@ PUBLIC NONNULL((1, 5)) void
 NOTHROW(KCALL _block_device_areadv_phys_sector)(struct block_device *__restrict self,
                                                 struct aio_pbuffer *__restrict buf,
                                                 size_t num_sectors, lba_t addr,
-                                                struct aio_handle *__restrict aio)
+                                                /*out*/ struct aio_handle *__restrict aio)
 #elif defined(IO_VECTOR)
 PUBLIC NONNULL((1, 5)) void
 NOTHROW(KCALL _block_device_areadv_sector)(struct block_device *__restrict self,
                                            struct aio_buffer *__restrict buf,
                                            size_t num_sectors, lba_t addr,
-                                           struct aio_handle *__restrict aio)
+                                           /*out*/ struct aio_handle *__restrict aio)
 #elif defined(IO_PHYS)
 PUBLIC NONNULL((1, 5)) void
 NOTHROW(KCALL _block_device_aread_phys_sector)(struct block_device *__restrict self,
                                                vm_phys_t buf, size_t num_sectors, lba_t addr,
-                                               struct aio_handle *__restrict aio)
+                                               /*out*/ struct aio_handle *__restrict aio)
 #else
 PUBLIC NONNULL((1, 5)) void
 NOTHROW(KCALL _block_device_aread_sector)(struct block_device *__restrict self,
                                           USER CHECKED void *buf, size_t num_sectors,
-                                          lba_t addr, struct aio_handle *__restrict aio)
+                                          lba_t addr, /*out*/ struct aio_handle *__restrict aio)
 #endif
 #else /* IO_SECTOR */
 #if defined(IO_PHYS) && defined(IO_VECTOR)
@@ -146,25 +146,25 @@ PUBLIC NONNULL((1, 5)) void
 NOTHROW(KCALL _block_device_areadv_phys)(struct block_device *__restrict self,
                                          struct aio_pbuffer *__restrict buf, size_t num_bytes,
                                          pos_t device_position,
-                                         struct aio_handle *__restrict aio)
+                                         /*out*/ struct aio_handle *__restrict aio)
 #elif defined(IO_VECTOR)
 PUBLIC NONNULL((1, 5)) void
 NOTHROW(KCALL _block_device_areadv)(struct block_device *__restrict self,
                                     struct aio_buffer *__restrict buf, size_t num_bytes,
                                     pos_t device_position,
-                                    struct aio_handle *__restrict aio)
+                                    /*out*/ struct aio_handle *__restrict aio)
 #elif defined(IO_PHYS)
 PUBLIC NONNULL((1, 5)) void
 NOTHROW(KCALL _block_device_aread_phys)(struct block_device *__restrict self,
                                         vm_phys_t buf, size_t num_bytes,
                                         pos_t device_position,
-                                        struct aio_handle *__restrict aio)
+                                        /*out*/ struct aio_handle *__restrict aio)
 #else
 PUBLIC NONNULL((1, 5)) void
 NOTHROW(KCALL _block_device_aread)(struct block_device *__restrict self,
                                    USER CHECKED void *buf, size_t num_bytes,
                                    pos_t device_position,
-                                   struct aio_handle *__restrict aio)
+                                   /*out*/ struct aio_handle *__restrict aio)
 #endif
 #endif /* !IO_SECTOR */
 #elif defined(IO_WRITE)
@@ -174,23 +174,23 @@ PUBLIC NONNULL((1, 5)) void
 NOTHROW(KCALL _block_device_awritev_phys_sector)(struct block_device *__restrict self,
                                                  struct aio_pbuffer *__restrict buf,
                                                  size_t num_sectors, lba_t addr,
-                                                 struct aio_handle *__restrict aio)
+                                                 /*out*/ struct aio_handle *__restrict aio)
 #elif defined(IO_VECTOR)
 PUBLIC NONNULL((1, 5)) void
 NOTHROW(KCALL _block_device_awritev_sector)(struct block_device *__restrict self,
                                             struct aio_buffer *__restrict buf,
                                             size_t num_sectors, lba_t addr,
-                                            struct aio_handle *__restrict aio)
+                                            /*out*/ struct aio_handle *__restrict aio)
 #elif defined(IO_PHYS)
 PUBLIC NONNULL((1, 5)) void
 NOTHROW(KCALL _block_device_awrite_phys_sector)(struct block_device *__restrict self,
                                                 vm_phys_t buf, size_t num_sectors,
-                                                lba_t addr, struct aio_handle *__restrict aio)
+                                                lba_t addr, /*out*/ struct aio_handle *__restrict aio)
 #else
 PUBLIC NONNULL((1, 5)) void
 NOTHROW(KCALL _block_device_awrite_sector)(struct block_device *__restrict self,
                                            USER CHECKED void const *buf, size_t num_sectors,
-                                           lba_t addr, struct aio_handle *__restrict aio)
+                                           lba_t addr, /*out*/ struct aio_handle *__restrict aio)
 #endif
 #else /* IO_SECTOR */
 #if defined(IO_PHYS) && defined(IO_VECTOR)
@@ -198,25 +198,25 @@ PUBLIC NONNULL((1, 5)) void
 NOTHROW(KCALL _block_device_awritev_phys)(struct block_device *__restrict self,
                                           struct aio_pbuffer *__restrict buf,
                                           size_t num_bytes, pos_t device_position,
-                                          struct aio_handle *__restrict aio)
+                                          /*out*/ struct aio_handle *__restrict aio)
 #elif defined(IO_VECTOR)
 PUBLIC NONNULL((1, 5)) void
 NOTHROW(KCALL _block_device_awritev)(struct block_device *__restrict self,
                                      struct aio_buffer *__restrict buf,
                                      size_t num_bytes, pos_t device_position,
-                                     struct aio_handle *__restrict aio)
+                                     /*out*/ struct aio_handle *__restrict aio)
 #elif defined(IO_PHYS)
 PUBLIC NONNULL((1, 5)) void
 NOTHROW(KCALL _block_device_awrite_phys)(struct block_device *__restrict self,
                                          vm_phys_t buf, size_t num_bytes,
                                          pos_t device_position,
-                                         struct aio_handle *__restrict aio)
+                                         /*out*/ struct aio_handle *__restrict aio)
 #else
 PUBLIC NONNULL((1, 5)) void
 NOTHROW(KCALL _block_device_awrite)(struct block_device *__restrict self,
                                     USER CHECKED void const *buf, size_t num_bytes,
                                     pos_t device_position,
-                                    struct aio_handle *__restrict aio)
+                                    /*out*/ struct aio_handle *__restrict aio)
 #endif
 #endif /* !IO_SECTOR */
 #endif
@@ -292,11 +292,13 @@ NOTHROW(KCALL _block_device_awrite)(struct block_device *__restrict self,
 			}
 			INVOKE_IO(self, buf, num_sectors, addr, aio);
 		} EXCEPT {
+			aio->ah_type = &aio_noop_type;
 			aio_handle_fail(aio);
 		}
 	}
 	return;
 done_success:
+	aio->ah_type = &aio_noop_type;
 	aio_handle_success(aio);
 #else /* IO_SECTOR */
 	pos_t end_addr;
@@ -435,10 +437,12 @@ done_success:
 			goto done_success;
 		}
 	} EXCEPT {
+		aio->ah_type = &aio_noop_type;
 		aio_handle_fail(aio);
 	}
 	return;
 done_success:
+	aio->ah_type = &aio_noop_type;
 	aio_handle_success(aio);
 #endif /* !IO_SECTOR */
 }
@@ -521,8 +525,14 @@ PUBLIC NONNULL((1)) void
 	_block_device_awrite(self, buf, num_bytes, device_position, &hand);
 #endif
 #endif /* !IO_READ */
-	aio_handle_generic_waitfor(&hand);
-	aio_handle_generic_checkerror(&hand);
+	TRY {
+		aio_handle_generic_waitfor(&hand);
+		aio_handle_generic_checkerror(&hand);
+	} EXCEPT {
+		aio_handle_generic_fini(&hand);
+		RETHROW();
+	}
+	aio_handle_generic_fini(&hand);
 }
 #endif
 

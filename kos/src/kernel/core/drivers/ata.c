@@ -546,6 +546,7 @@ NOTHROW(KCALL Ata_ResetBus)(port_t ctrl) {
 
 
 INTERN struct aio_handle_type Ata_DmaHandleType = {
+	/* .ht_cancel   = */&Ata_FiniDmaHandle,
 	/* .ht_cancel   = */&Ata_CancelDmaHandle,
 	/* .ht_progress = */&Ata_DmaHandleProgress
 };
@@ -607,6 +608,8 @@ NOTHROW(FCALL handle_completion_ioerror_generic)(struct aio_handle *__restrict s
                                                  errr_t errr) {
 	struct exception_data old_data;
 	struct exception_data *mydata = &THIS_EXCEPTION_INFO.ei_data;
+	assert(self->ah_type == &Ata_DmaHandleType ||
+	       self->ah_type == &aio_noop_type);
 	memcpy(&old_data, mydata, sizeof(struct exception_data));
 	memset(mydata, 0, sizeof(struct exception_data));
 	mydata->e_code        = ERRR_E(errr);
@@ -922,6 +925,14 @@ err_unexpected_interrupt:
 	return true;
 }
 
+
+INTERN NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL Ata_FiniDmaHandle)(struct aio_handle *__restrict self) {
+	AtaAIOHandleData *data = (AtaAIOHandleData *)self->ah_data;
+	assert(self->ah_type == &Ata_DmaHandleType);
+	assert(data->hd_drive);
+	decref(data->hd_drive);
+}
 
 INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL Ata_CancelDmaHandle)(struct aio_handle *__restrict self) {
@@ -1371,6 +1382,7 @@ do_compat_hdio_getgeo:
 
 
 STATIC_ASSERT(sizeof(struct hd_driveid) == 512);
+
 
 PRIVATE ATTR_NOINLINE ATTR_FREETEXT bool
 NOTHROW(KCALL Ata_InitializeDrive)(struct ata_ports *__restrict ports,

@@ -115,13 +115,13 @@ INTERN NONNULL((1, 5)) void KCALL
 FUNC2(
 #ifdef IO_DMA
       struct ata_dmadrive *__restrict self,
-#else
+#else /* IO_DMA */
       struct ata_drive *__restrict self,
-#endif
+#endif /* !IO_DMA */
       BUFFER_TYPE buf,
       size_t num_sectors,
       lba_t addr,
-      struct aio_handle *__restrict aio)
+      /*out*/ struct aio_handle *__restrict aio)
 		THROWS(E_IOERROR, E_BADALLOC,...) {
 #ifdef IO_DMA
 	size_t prd_count;
@@ -159,14 +159,15 @@ FUNC2(
 			break; /* The bus has been suspended */
 		newstate.b_state = ATA_BUS_STATE_INDMA_SWITCH;
 		newstate.b_flags = state.b_flags;
-		if (!ATOMIC_CMPXCH_WEAK(*(uintptr_t *)ATA_BUSATA_BUS_STATE_AND_FLAGS(bus), state.b_word, newstate.b_word))
+		if (!ATOMIC_CMPXCH_WEAK(*(uintptr_t *)ATA_BUSATA_BUS_STATE_AND_FLAGS(bus),
+		                        state.b_word, newstate.b_word))
 			continue;
 		/* Don't kfree() `hd_prd_vector' */
 #ifdef IO_READ
 		data->hd_flags = ATA_AIO_HANDLE_FSINGLE;
-#else
-		data->hd_flags         = ATA_AIO_HANDLE_FSINGLE | ATA_AIO_HANDLE_FWRITING;
-#endif
+#else /* IO_READ */
+		data->hd_flags = ATA_AIO_HANDLE_FSINGLE | ATA_AIO_HANDLE_FWRITING;
+#endif /* !IO_READ */
 		/* Immediately start a new DMA operation. */
 		prd_count = AtaPRD_INIT_FROM_BUF(bus->b_prdt,
 		                                 ATA_PRD_MAXCOUNT,
@@ -179,12 +180,12 @@ FUNC2(
 		}
 		ATA_VERBOSE("Switch to `ATA_BUS_STATE_INDMA_SWITCH' to setup initial DMA\n");
 		aio->ah_type   = &Ata_DmaHandleType;
-		data->hd_drive = self;
+		data->hd_drive = (REF struct ata_drive *)incref(self);
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 		*(u32 *)&data->hd_io_lbaaddr[0] = (u32)addr;
 		*(u16 *)&data->hd_io_lbaaddr[4] = (u16)(addr >> 32);
 		*(u16 *)&data->hd_io_sectors[0] = (u16)num_sectors;
-#else
+#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
 		data->hd_io_lbaaddr[0] = (u8)(addr);
 		data->hd_io_lbaaddr[1] = (u8)(addr >> 8);
 		data->hd_io_lbaaddr[2] = (u8)(addr >> 16);
@@ -193,11 +194,11 @@ FUNC2(
 		data->hd_io_lbaaddr[5] = (u8)(addr >> 40);
 		data->hd_io_sectors[0] = (u8)(num_sectors);
 		data->hd_io_sectors[1] = (u8)(num_sectors >> 8);
-#endif
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 #ifdef IO_PHYS
 		data->hd_dmalockvec = NULL;
 		assert(!(data->hd_flags & ATA_AIO_HANDLE_FONEDMA));
-#endif
+#endif /* IO_PHYS */
 		bus->b_dma_current = aio;
 		/* Start the DMA operation, and handle any potential initialization failure. */
 		if (!dostart_dma_operation(bus, aio)) {
@@ -272,12 +273,12 @@ again_init_prdv:
 	}
 	/* Initialize additional stuff... */
 	aio->ah_type   = &Ata_DmaHandleType;
-	data->hd_drive = self;
+	data->hd_drive = (REF struct ata_drive *)incref(self);
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 	*(u32 *)&data->hd_io_lbaaddr[0] = (u32)addr;
 	*(u16 *)&data->hd_io_lbaaddr[4] = (u16)(addr >> 32);
 	*(u16 *)&data->hd_io_sectors[0] = (u16)num_sectors;
-#else
+#else /* __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__ */
 	data->hd_io_lbaaddr[0] = (u8)(addr);
 	data->hd_io_lbaaddr[1] = (u8)(addr >> 8);
 	data->hd_io_lbaaddr[2] = (u8)(addr >> 16);
@@ -286,17 +287,19 @@ again_init_prdv:
 	data->hd_io_lbaaddr[5] = (u8)(addr >> 40);
 	data->hd_io_sectors[0] = (u8)(num_sectors);
 	data->hd_io_sectors[1] = (u8)(num_sectors >> 8);
-#endif
+#endif /* __BYTE_ORDER__ != __ORDER_LITTLE_ENDIAN__ */
 #ifdef IO_PHYS
 	data->hd_dmalockvec = NULL;
 	assert(!(data->hd_flags & ATA_AIO_HANDLE_FONEDMA));
-#endif
+#endif /* IO_PHYS */
 	/* Schedule the AIO handle as a pending I/O operation of the bus. */
 	{
 		struct aio_handle *next;
 		COMPILER_READ_BARRIER();
 		do {
-			aio->ah_next = next = ATOMIC_READ(bus->b_dma_future);
+			next = ATOMIC_READ(bus->b_dma_future);
+			aio->ah_next = next;
+			COMPILER_WRITE_BARRIER();
 		} while (!ATOMIC_CMPXCH_WEAK(bus->b_dma_future, next, aio));
 		if (!next) { /* First pending DMA command. */
 			/* The previous DMA chain may have completed the mean time, so
@@ -328,9 +331,9 @@ service_without_dma:
 	/* Perform a non-canonical I/O operation. */
 #ifdef IO_READ
 	(*self->FUNC_VP(d_noncanon_read))(self, buf, num_sectors, addr, aio);
-#else
+#else /* IO_READ */
 	(*self->FUNC_VP(d_noncanon_write))(self, buf, num_sectors, addr, aio);
-#endif
+#endif /* !IO_READ */
 #else /* IO_DMA */
 #ifdef IO_LBA48
 #define MAX_SECTORS_PER_TRANSFER 0xffff
@@ -344,7 +347,7 @@ service_without_dma:
 #endif
 #ifdef IO_VECTOR
 	VECTOR_TYPE view, view2;
-#endif
+#endif /* IO_VECTOR */
 	unsigned int reset_counter = 0;
 	errr_t error;
 	struct ata_bus *bus = self->d_bus;
@@ -379,9 +382,9 @@ again_service_io:
 				outb(bus->b_busio + ATA_ADDRESS3, (u8)(cylinder >> 8));
 #ifdef IO_READ
 				outb(bus->b_busio + ATA_COMMAND, ATA_COMMAND_READ_SECTORS);
-#else
+#else /* IO_READ */
 				outb(bus->b_busio + ATA_COMMAND, ATA_COMMAND_WRITE_SECTORS);
-#endif
+#endif /* !IO_READ */
 			}
 #else /* IO_CHS */
 #ifdef IO_LBA48
@@ -415,7 +418,7 @@ again_service_io:
 			     ATA_COMMAND_WRITE_PIO
 #endif /* !IO_LBA48 */
 #endif
-			);
+			     );
 #endif /* !IO_CHS */
 
 			/* Transfer sectors! */
@@ -476,6 +479,7 @@ again_service_io:
 	}
 	AtaBus_UnlockPIO(bus);
 	/* Indicate AIO completion to the caller. */
+	aio->ah_type = &aio_noop_type;
 	aio_handle_success(aio);
 	return;
 err_io_error:
@@ -490,6 +494,7 @@ err_io_error:
 		goto again_service_io;
 	}
 	AtaBus_UnlockPIO(bus);
+	aio->ah_type = &aio_noop_type;
 	handle_completion_ioerror_generic(aio, error);
 #undef MAX_SECTORS_PER_TRANSFER_T
 #undef MAX_SECTORS_PER_TRANSFER

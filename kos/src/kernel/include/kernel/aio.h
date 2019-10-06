@@ -27,6 +27,10 @@
 #include <hybrid/__assert.h>
 #include <hybrid/typecore.h>
 
+#ifndef CONFIG_NO_SMP
+#include <hybrid/sync/atomic-rwlock.h>
+#endif /* !CONFIG_NO_SMP */
+
 DECL_BEGIN
 
 #ifdef __CC__
@@ -410,6 +414,8 @@ struct aio_handle_stat {
 };
 
 struct aio_handle_type {
+	/* [1..1] Finalizer for this AIO handle. */
+	NOBLOCK NONNULL((1)) void /*NOTHROW*/(KCALL *ht_fini)(struct aio_handle *__restrict self);
 	/* [1..1] Cancel execution of the given AIO operation.
 	 * NOTE: This function is required to _immediatly_ cancel the operation associated
 	 *       with the given handle, so long as that operation hasn't yet completed.
@@ -459,32 +465,35 @@ typedef NOBLOCK NONNULL((1)) void /*NOTHROW*/(KCALL *aio_completion_t)(struct ai
 #define AIO_HANDLE_ALIGNMENT __SIZEOF_POINTER__
 
 struct ATTR_ALIGNED(AIO_HANDLE_ALIGNMENT) aio_handle {
-#define AIO_HANDLE_HEAD                                                                              \
-	struct aio_handle      *ah_next; /* [0..1][lock(INTERNAL)] Pointer to the next AIO handle.       \
-	                                  * This field is only used internally in order to easily        \
-	                                  * chain pending AIO operations */                              \
-	struct aio_handle_type *ah_type; /* [0..1][lock(WRITE_ONCE)]                                     \
-	                                  * AIO usage type (set by a driver implementing AIO             \
-	                                  * such that operations can continue even after the             \
-	                                  * associated callbacks return).                                \
-	                                  * WARNING: In cases where AIO is only emulated, and operations \
-	                                  *          are still blocking, this field is set to `NULL'. */ \
-	aio_completion_t        ah_func; /* [1..1][const] AIO completion callback. */                    \
+#define AIO_HANDLE_HEAD                                                                        \
+	struct aio_handle      *ah_next; /* [0..1][lock(INTERNAL)] Pointer to the next AIO handle. \
+	                                  * This field is only used internally in order to easily  \
+	                                  * chain pending AIO operations */                        \
+	struct aio_handle_type *ah_type; /* [1..1][lock(WRITE_ONCE)]                               \
+	                                  * AIO usage type (set by a driver implementing AIO       \
+	                                  * such that operations can continue even after the       \
+	                                  * associated callbacks return). */                       \
+	aio_completion_t        ah_func; /* [1..1][const] AIO completion callback. */              \
 	void *ah_data[AIO_HANDLE_DRIVER_POINTER_COUNT]; /* Driver/device-specific handle data pointers. */
 /**/
 	AIO_HANDLE_HEAD
 	/* ... Handle-specific data goes here. */
 };
 
+/* No-op AIO handle type (intended for synchronous operations) */
+DATDEF struct aio_handle_type aio_noop_type;
+
+/* Finalize a fully initialized AIO handle. */
+#define aio_handle_fini(self) (*(self)->ah_type->ht_fini)(self)
 
 /* Cancel execution */
-#define aio_handle_cancel(self)  (*(self)->ah_type->ht_cancel)(self)
+#define aio_handle_cancel(self) (*(self)->ah_type->ht_cancel)(self)
 
 /* Indicate AIO execution completion. */
 #define aio_handle_success(self) (*(self)->ah_func)(self, AIO_COMPLETION_SUCCESS)
 
 /* Indicate AIO execution failure due to the currently set exception. */
-#define aio_handle_fail(self)    (*(self)->ah_func)(self, AIO_COMPLETION_FAILURE)
+#define aio_handle_fail(self) (*(self)->ah_func)(self, AIO_COMPLETION_FAILURE)
 
 
 
@@ -513,6 +522,8 @@ struct ATTR_ALIGNED(AIO_HANDLE_ALIGNMENT) aio_handle_generic
 	unsigned int          hg_status; /* Acknowledged AIO completion status (or 0 if still in progress) */
 	struct exception_data hg_error;  /* [valid_if(hg_status == AIO_COMPLETION_FAILURE)] AIO failure error. */
 };
+
+#define aio_handle_generic_fini(self) aio_handle_fini(self)
 
 /* Callback for `aio_handle_generic' */
 FUNDEF NOBLOCK NONNULL((1)) void
@@ -588,13 +599,17 @@ struct aio_multihandle;
 struct ATTR_ALIGNED(AIO_HANDLE_ALIGNMENT) aio_handle_multiple
 #ifdef __cplusplus
 	: aio_handle
-#endif
+#endif /* __cplusplus */
 {
 #ifndef __cplusplus
 	AIO_HANDLE_HEAD
-#endif
-	struct aio_multihandle *hg_controller; /* [0..1][lock(WRITE_ONCE(NULL))] Associated controller.
-	                                        * Set to NULL after this handle's operation has completed. */
+#endif /* __cplusplus */
+#define AIO_HANDLE_MULTIPLE_CONTROLLER_UNUSED_IS_ZERO 1
+#define AIO_HANDLE_MULTIPLE_CONTROLLER_UNUSED   ((struct aio_multihandle *)0)  /* Unused entry */
+#define AIO_HANDLE_MULTIPLE_CONTROLLER_COMPLETE ((struct aio_multihandle *)-1) /* Completed/Cancelled entry */
+	struct aio_multihandle *hg_controller; /* [0..1][lock(WRITE_ONCE(AIO_HANDLE_MULTIPLE_CONTROLLER_COMPLETE))]
+	                                        * Associated controller. Set to `AIO_HANDLE_MULTIPLE_CONTROLLER_COMPLETE'
+	                                        * after this handle's operation has completed. */
 };
 
 /* Callback for `aio_handle_multiple' */
@@ -620,8 +635,6 @@ struct aio_multihandle_extension {
 	struct aio_multihandle_extension *ame_next; /* [0..1][owned] Next extension. */
 	struct aio_handle_multiple        ame_handles[AIO_MULTIHANDLE_XVECLIMIT]; /* Associated handles. */
 };
-FUNDEF NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL aio_multihandle_extension_destroy)(struct aio_multihandle_extension *__restrict self);
 
 struct aio_multihandle {
 	aio_multiple_completion_t  am_func;    /* [1..1][const] AIO completion callback. */
@@ -634,6 +647,7 @@ struct aio_multihandle {
 	/* ... Additional data can go here. */
 };
 
+/* Initialize the given AIO multi-handle */
 LOCAL NOBLOCK NONNULL((1, 2)) void
 NOTHROW(KCALL aio_multihandle_init)(struct aio_multihandle *__restrict self,
                                     aio_multiple_completion_t func) {
@@ -642,14 +656,12 @@ NOTHROW(KCALL aio_multihandle_init)(struct aio_multihandle *__restrict self,
 	self->am_ext    = __NULLPTR;
 	self->am_status = (uintptr_t)AIO_COMPLETION_SUCCESS << AIO_MULTIHANDLE_STATUS_STATUSSHFT;
 	for (i = 0; i < AIO_MULTIHANDLE_IVECLIMIT; ++i)
-		self->am_ivec[i].hg_controller = __NULLPTR;
+		self->am_ivec[i].hg_controller = AIO_HANDLE_MULTIPLE_CONTROLLER_UNUSED;
 }
 
-LOCAL NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL aio_multihandle_fini)(struct aio_multihandle *__restrict self) {
-	if (self->am_ext)
-		aio_multihandle_extension_destroy(self->am_ext);
-}
+/* Finalize the given AIO multi-handle */
+FUNDEF NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL aio_multihandle_fini)(struct aio_multihandle *__restrict self);
 
 
 /* Handle the current exception using the given AIO multi-handle.
@@ -680,13 +692,12 @@ NOTHROW(KCALL aio_multihandle_done)(struct aio_multihandle *__restrict self);
 
 
 
-/* AIO execution order:
+/* AIO multihandle syncing execution order:
  * >> struct aio_multihandle_generic multihandle;
- * >> struct aio_handle *handle;
  * >> aio_multihandle_generic_init(&multihandle);
  * >> TRY {
- * >>     block_device_aread_sector(dev,dst1,2,0,aio_multihandle_allochandle(&multihandle));
- * >>     block_device_aread_sector(dev,dst2,2,8,aio_multihandle_allochandle(&multihandle));
+ * >>     block_device_aread_sector(dev, dst1, 2, 0, aio_multihandle_allochandle(&multihandle));
+ * >>     block_device_aread_sector(dev, dst2, 2, 8, aio_multihandle_allochandle(&multihandle));
  * >> } EXCEPT {
  * >>     aio_multihandle_fail(&multihandle);
  * >> }
@@ -695,10 +706,10 @@ NOTHROW(KCALL aio_multihandle_done)(struct aio_multihandle *__restrict self);
  * >>     aio_multihandle_generic_waitfor(&multihandle);
  * >>     aio_multihandle_generic_checkerror(&multihandle);
  * >> } EXCEPT {
- * >>    aio_multihandle_fini(&multihandle);
- * >>    RETHROW();
+ * >>     aio_multihandle_generic_fini(&multihandle);
+ * >>     RETHROW();
  * >> }
- * >> aio_multihandle_fini(&multihandle);
+ * >> aio_multihandle_generic_fini(&multihandle);
  */
 
 /* Generic multi-handle that is capable of being used as a signal source.
@@ -723,6 +734,9 @@ NOTHROW(KCALL aio_multihandle_generic_init)(struct aio_multihandle_generic *__re
 	aio_multihandle_init(self, &aio_multihandle_generic_func);
 	sig_init(&self->mg_signal);
 }
+
+#define aio_multihandle_generic_fini(self) \
+	aio_multihandle_fini(self)
 
 /* NOTE: Returns `false' if `aio_multihandle_done' hasn't been called, yet. */
 #define aio_multihandle_generic_hascompleted(self)                                                 \

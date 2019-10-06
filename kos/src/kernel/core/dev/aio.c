@@ -36,6 +36,19 @@
 
 DECL_BEGIN
 
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL aio_noop_noarg)(struct aio_handle *__restrict UNUSED(self)) {
+}
+
+/* No-op AIO handle type (intended for synchronous operations) */
+PUBLIC struct aio_handle_type aio_noop_type = {
+	/* .ht_fini   = */ &aio_noop_noarg,
+	/* .ht_cancel = */ &aio_noop_noarg
+};
+
+
+
 /* Callback for `aio_handle_generic' */
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL aio_handle_generic_func_)(struct aio_handle_generic *__restrict self,
@@ -228,9 +241,10 @@ NOTHROW(KCALL aio_handle_multiple_func_)(struct aio_handle_multiple *__restrict 
 	uintptr_t old_status;
 	uintptr_t new_status;
 	hand = self->hg_controller;
-	self->hg_controller = NULL;
+	self->hg_controller = AIO_HANDLE_MULTIPLE_CONTROLLER_COMPLETE;
 	COMPILER_BARRIER();
-	assert(hand != NULL);
+	assert(hand != AIO_HANDLE_MULTIPLE_CONTROLLER_UNUSED &&
+	       hand != AIO_HANDLE_MULTIPLE_CONTROLLER_COMPLETE);
 	do {
 		old_status = ATOMIC_READ(hand->am_status);
 		new_status = (uintptr_t)status << AIO_MULTIHANDLE_STATUS_STATUSSHFT;
@@ -261,16 +275,44 @@ NOTHROW(KCALL aio_handle_multiple_func_)(struct aio_handle_multiple *__restrict 
 
 
 PUBLIC NOBLOCK NONNULL((1)) void
-NOTHROW(KCALL aio_multihandle_extension_destroy)(struct aio_multihandle_extension *__restrict self) {
-	struct aio_multihandle_extension *next;
-	for (;;) {
-		next = self->ame_next;
-		kfree(self);
-		if (!next)
-			break;
-		self = next;
+NOTHROW(KCALL aio_multihandle_fini)(struct aio_multihandle *__restrict self) {
+	unsigned int i;
+	struct aio_multihandle_extension *iter, *next;
+	for (i = 0; i < AIO_MULTIHANDLE_IVECLIMIT; ++i) {
+		struct aio_handle_multiple *ent;
+		ent = &self->am_ivec[i];
+		assert(ent->hg_controller == AIO_HANDLE_MULTIPLE_CONTROLLER_UNUSED ||
+		       ent->hg_controller == AIO_HANDLE_MULTIPLE_CONTROLLER_COMPLETE);
+		if (ent->hg_controller == AIO_HANDLE_MULTIPLE_CONTROLLER_COMPLETE)
+			aio_handle_fini(ent);
+#ifndef NDEBUG
+		memset(ent, 0xcc, sizeof(*ent));
+#endif /* !NDEBUG */
 	}
+	iter = self->am_ext;
+#ifndef NDEBUG
+	memset(&self->am_ext, 0xcc, sizeof(self->am_ext));
+#endif /* !NDEBUG */
+	while (iter) {
+		next = iter->ame_next;
+		for (i = 0; i < AIO_MULTIHANDLE_XVECLIMIT; ++i) {
+			struct aio_handle_multiple *ent;
+			ent = &iter->ame_handles[i];
+			assert(ent->hg_controller == AIO_HANDLE_MULTIPLE_CONTROLLER_UNUSED ||
+			       ent->hg_controller == AIO_HANDLE_MULTIPLE_CONTROLLER_COMPLETE);
+			if (ent->hg_controller == AIO_HANDLE_MULTIPLE_CONTROLLER_COMPLETE)
+				aio_handle_fini(ent);
+		}
+		kfree(iter);
+		iter = next;
+	}
+#ifndef NDEBUG
+	memset(&self->am_func, 0xcc, sizeof(self->am_func));
+	memset(&self->am_status, 0xcc, sizeof(self->am_status));
+	memset(&self->am_error, 0xcc, sizeof(self->am_error));
+#endif /* !NDEBUG */
 }
+
 
 /* Allocate handles for the purpose of AIO completion.
  * WARNING: Don't free a handle after you already started using it in the context of an AIO parameter.
@@ -293,20 +335,35 @@ aio_multihandle_allochandle(struct aio_multihandle *__restrict self)
 		size_t i;
 		struct aio_multihandle_extension *iter;
 		for (i = 0; i < AIO_MULTIHANDLE_IVECLIMIT; ++i) {
+			struct aio_multihandle *ctrl;
 			result = &self->am_ivec[i];
-			if (!result->hg_controller)
+			ctrl   = ATOMIC_READ(result->hg_controller);
+			if (ctrl == AIO_HANDLE_MULTIPLE_CONTROLLER_UNUSED)
 				goto fill_in_result;
+			if (ctrl == AIO_HANDLE_MULTIPLE_CONTROLLER_COMPLETE) {
+fini_and_fill_in_result:
+				aio_handle_fini(result);
+				goto fill_in_result;
+			}
 		}
 		for (iter = self->am_ext; iter; iter = iter->ame_next) {
 			for (i = 0; i < AIO_MULTIHANDLE_XVECLIMIT; ++i) {
+				struct aio_multihandle *ctrl;
 				result = &iter->ame_handles[i];
-				if (!result->hg_controller)
+				ctrl   = ATOMIC_READ(result->hg_controller);
+				if (ctrl == AIO_HANDLE_MULTIPLE_CONTROLLER_UNUSED)
 					goto fill_in_result;
+				if (ctrl == AIO_HANDLE_MULTIPLE_CONTROLLER_COMPLETE)
+					goto fini_and_fill_in_result;
 			}
 		}
 		/* Must allocate a new extension table. */
 		iter = (struct aio_multihandle_extension *)kmalloc(sizeof(struct aio_multihandle_extension),
 		                                                   GFP_CALLOC | GFP_PREFLT | GFP_LOCKED);
+#ifndef AIO_HANDLE_MULTIPLE_CONTROLLER_UNUSED_IS_ZERO
+		for (i = 0; i < AIO_MULTIHANDLE_XVECLIMIT; ++i)
+			iter->ame_handles[i].hg_controller = AIO_HANDLE_MULTIPLE_CONTROLLER_UNUSED;
+#endif /* !AIO_HANDLE_MULTIPLE_CONTROLLER_UNUSED_IS_ZERO */
 		result         = &iter->ame_handles[0];
 		iter->ame_next = self->am_ext;
 		self->am_ext   = iter;
@@ -334,15 +391,26 @@ NOTHROW(KCALL aio_multihandle_allochandle_nx)(struct aio_multihandle *__restrict
 		size_t i;
 		struct aio_multihandle_extension *iter;
 		for (i = 0; i < AIO_MULTIHANDLE_IVECLIMIT; ++i) {
+			struct aio_multihandle *ctrl;
 			result = &self->am_ivec[i];
-			if (!result->hg_controller)
+			ctrl   = ATOMIC_READ(result->hg_controller);
+			if (ctrl == AIO_HANDLE_MULTIPLE_CONTROLLER_UNUSED)
 				goto fill_in_result;
+			if (ctrl == AIO_HANDLE_MULTIPLE_CONTROLLER_COMPLETE) {
+fini_and_fill_in_result:
+				aio_handle_fini(result);
+				goto fill_in_result;
+			}
 		}
 		for (iter = self->am_ext; iter; iter = iter->ame_next) {
 			for (i = 0; i < AIO_MULTIHANDLE_XVECLIMIT; ++i) {
+				struct aio_multihandle *ctrl;
 				result = &iter->ame_handles[i];
-				if (!result->hg_controller)
+				ctrl   = ATOMIC_READ(result->hg_controller);
+				if (ctrl == AIO_HANDLE_MULTIPLE_CONTROLLER_UNUSED)
 					goto fill_in_result;
+				if (ctrl == AIO_HANDLE_MULTIPLE_CONTROLLER_COMPLETE)
+					goto fini_and_fill_in_result;
 			}
 		}
 		/* Must allocate a new extension table. */
@@ -429,8 +497,9 @@ NOTHROW(KCALL aio_multihandle_cancel)(struct aio_multihandle *__restrict self) {
 	struct aio_multihandle_extension *ext;
 	for (i = 0; i < AIO_MULTIHANDLE_IVECLIMIT; ++i) {
 		if (self->am_ivec[i].hg_controller &&
-		    self->am_ivec[i].ah_type)
+		    self->am_ivec[i].ah_type) {
 			aio_handle_cancel(&self->am_ivec[i]);
+		}
 	}
 	for (ext = self->am_ext; ext; ext = ext->ame_next) {
 		for (i = 0; i < AIO_MULTIHANDLE_XVECLIMIT; ++i) {

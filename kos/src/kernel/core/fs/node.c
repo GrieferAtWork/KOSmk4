@@ -4529,10 +4529,10 @@ db_inode_loadpart(struct inode *__restrict self, vm_dpage_t start,
 			aio_multihandle_generic_waitfor(&hand);
 			aio_multihandle_generic_checkerror(&hand);
 		} EXCEPT {
-			aio_multihandle_fini(&hand);
+			aio_multihandle_generic_fini(&hand);
 			RETHROW();
 		}
-		aio_multihandle_fini(&hand);
+		aio_multihandle_generic_fini(&hand);
 	}
 }
 
@@ -4571,10 +4571,10 @@ db_inode_savepart(struct inode *__restrict self, vm_dpage_t start,
 			aio_multihandle_generic_waitfor(&hand);
 			aio_multihandle_generic_checkerror(&hand);
 		} EXCEPT {
-			aio_multihandle_fini(&hand);
+			aio_multihandle_generic_fini(&hand);
 			RETHROW();
 		}
-		aio_multihandle_fini(&hand);
+		aio_multihandle_generic_fini(&hand);
 	}
 }
 

@@ -92,7 +92,7 @@ DEFINE_LATE_KERNEL_COMMANDLINE_OPTION(kernel_boot_option_handler,
 PUBLIC NONNULL((1, 5)) void KCALL
 block_device_partition_read(struct block_device *__restrict self,
                             USER CHECKED void *dst, size_t num_sectors,
-                            lba_t addr, struct aio_handle *__restrict aio)
+                            lba_t addr, /*out*/ struct aio_handle *__restrict aio)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
 	struct block_device *master;
 	master = ((struct block_device_partition *)self)->bp_master;
@@ -106,7 +106,7 @@ block_device_partition_read(struct block_device *__restrict self,
 PUBLIC NONNULL((1, 5)) void KCALL
 block_device_partition_write(struct block_device *__restrict self,
                              USER CHECKED void const *src, size_t num_sectors,
-                             lba_t addr, struct aio_handle *__restrict aio)
+                             lba_t addr, /*out*/ struct aio_handle *__restrict aio)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
 	struct block_device *master;
 	master = ((struct block_device_partition *)self)->bp_master;
@@ -122,7 +122,7 @@ block_device_partition_write(struct block_device *__restrict self,
 PUBLIC NONNULL((1, 5)) void KCALL
 block_device_partition_readv(struct block_device *__restrict self,
                              struct aio_buffer *__restrict buf, size_t num_sectors,
-                             lba_t addr, struct aio_handle *__restrict aio)
+                             lba_t addr, /*out*/ struct aio_handle *__restrict aio)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
 	struct block_device *master;
 	master = ((struct block_device_partition *)self)->bp_master;
@@ -136,7 +136,7 @@ block_device_partition_readv(struct block_device *__restrict self,
 PUBLIC NONNULL((1, 5)) void KCALL
 block_device_partition_writev(struct block_device *__restrict self,
                               struct aio_buffer *__restrict buf, size_t num_sectors,
-                              lba_t addr, struct aio_handle *__restrict aio)
+                              lba_t addr, /*out*/ struct aio_handle *__restrict aio)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
 	struct block_device *master;
 	master = ((struct block_device_partition *)self)->bp_master;
@@ -152,7 +152,7 @@ block_device_partition_writev(struct block_device *__restrict self,
 PUBLIC NONNULL((1, 5)) void KCALL
 block_device_partition_read_phys(struct block_device *__restrict self,
                                  vm_phys_t dst, size_t num_sectors,
-                                 lba_t addr, struct aio_handle *__restrict aio)
+                                 lba_t addr, /*out*/ struct aio_handle *__restrict aio)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
 	struct block_device *master;
 	master = ((struct block_device_partition *)self)->bp_master;
@@ -166,7 +166,7 @@ block_device_partition_read_phys(struct block_device *__restrict self,
 PUBLIC NONNULL((1, 5)) void KCALL
 block_device_partition_write_phys(struct block_device *__restrict self,
                                   vm_phys_t src, size_t num_sectors,
-                                  lba_t addr, struct aio_handle *__restrict aio)
+                                  lba_t addr, /*out*/ struct aio_handle *__restrict aio)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
 	struct block_device *master;
 	master = ((struct block_device_partition *)self)->bp_master;
@@ -182,7 +182,7 @@ block_device_partition_write_phys(struct block_device *__restrict self,
 PUBLIC NONNULL((1, 5)) void KCALL
 block_device_partition_readv_phys(struct block_device *__restrict self,
                                   struct aio_pbuffer *__restrict buf, size_t num_sectors,
-                                  lba_t addr, struct aio_handle *__restrict aio)
+                                  lba_t addr, /*out*/ struct aio_handle *__restrict aio)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
 	struct block_device *master;
 	master = ((struct block_device_partition *)self)->bp_master;
@@ -196,7 +196,7 @@ block_device_partition_readv_phys(struct block_device *__restrict self,
 PUBLIC NONNULL((1, 5)) void KCALL
 block_device_partition_writev_phys(struct block_device *__restrict self,
                                    struct aio_pbuffer *__restrict buf, size_t num_sectors,
-                                   lba_t addr, struct aio_handle *__restrict aio)
+                                   lba_t addr, /*out*/ struct aio_handle *__restrict aio)
 		THROWS(E_IOERROR, E_BADALLOC, ...) {
 	struct block_device *master;
 	master = ((struct block_device_partition *)self)->bp_master;
@@ -842,22 +842,22 @@ FUNDEF NONNULL((1, 2)) void KCALL _block_device_writev_phys(struct block_device 
 
 
 /* Read/write data to/from a block device or partition. */
-FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_aread_sector)(struct block_device *__restrict self, USER CHECKED void *dst, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_BADALLOC, ...) ASMNAME("block_device_aread_sector");
-FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_awrite_sector)(struct block_device *__restrict self, USER CHECKED void const *src, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_IOERROR_READONLY, E_IOERROR_BADBOUNDS, E_BADALLOC, ...) ASMNAME("block_device_awrite_sector");
-FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_aread_phys_sector)(struct block_device *__restrict self, vm_phys_t dst, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_BADALLOC, ...) ASMNAME("block_device_aread_phys_sector");
-FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_awrite_phys_sector)(struct block_device *__restrict self, vm_phys_t src, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_IOERROR_READONLY, E_IOERROR_BADBOUNDS, E_BADALLOC, ...) ASMNAME("block_device_awrite_phys_sector");
-FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_areadv_sector)(struct block_device *__restrict self, struct aio_buffer *__restrict buf, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_BADALLOC, ...) ASMNAME("block_device_areadv_sector");
-FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_awritev_sector)(struct block_device *__restrict self, struct aio_buffer *__restrict buf, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_IOERROR_READONLY, E_IOERROR_BADBOUNDS, E_BADALLOC, ...) ASMNAME("block_device_awritev_sector");
-FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_areadv_phys_sector)(struct block_device *__restrict self, struct aio_pbuffer *__restrict buf, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_BADALLOC, ...) ASMNAME("block_device_areadv_phys_sector");
-FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_awritev_phys_sector)(struct block_device *__restrict self, struct aio_pbuffer *__restrict buf, size_t num_sectors, lba_t addr, struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_IOERROR_READONLY, E_IOERROR_BADBOUNDS, E_BADALLOC, ...) ASMNAME("block_device_awritev_phys_sector");
-FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_aread)(struct block_device *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t device_position, struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_BADALLOC, ...) ASMNAME("block_device_aread");
-FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_awrite)(struct block_device *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t device_position, struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_IOERROR_READONLY, E_IOERROR_BADBOUNDS, E_BADALLOC, ...) ASMNAME("block_device_awrite");
-FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_aread_phys)(struct block_device *__restrict self, vm_phys_t dst, size_t num_bytes, pos_t device_position, struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_BADALLOC, ...) ASMNAME("block_device_aread_phys");
-FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_awrite_phys)(struct block_device *__restrict self, vm_phys_t src, size_t num_bytes, pos_t device_position, struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_IOERROR_READONLY, E_IOERROR_BADBOUNDS, E_BADALLOC, ...) ASMNAME("block_device_awrite_phys");
-FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_areadv)(struct block_device *__restrict self, struct aio_buffer *__restrict buf, size_t num_bytes, pos_t device_position, struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_BADALLOC, ...) ASMNAME("block_device_areadv");
-FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_awritev)(struct block_device *__restrict self, struct aio_buffer *__restrict buf, size_t num_bytes, pos_t device_position, struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_IOERROR_READONLY, E_IOERROR_BADBOUNDS, E_BADALLOC, ...) ASMNAME("block_device_awritev");
-FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_areadv_phys)(struct block_device *__restrict self, struct aio_pbuffer *__restrict buf, size_t num_bytes, pos_t device_position, struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_BADALLOC, ...) ASMNAME("block_device_areadv_phys");
-FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_awritev_phys)(struct block_device *__restrict self, struct aio_pbuffer *__restrict buf, size_t num_bytes, pos_t device_position, struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_IOERROR_READONLY, E_IOERROR_BADBOUNDS, E_BADALLOC, ...) ASMNAME("block_device_awritev_phys");
+FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_aread_sector)(struct block_device *__restrict self, USER CHECKED void *dst, size_t num_sectors, lba_t addr, /*out*/ struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_BADALLOC, ...) ASMNAME("block_device_aread_sector");
+FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_awrite_sector)(struct block_device *__restrict self, USER CHECKED void const *src, size_t num_sectors, lba_t addr, /*out*/ struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_IOERROR_READONLY, E_IOERROR_BADBOUNDS, E_BADALLOC, ...) ASMNAME("block_device_awrite_sector");
+FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_aread_phys_sector)(struct block_device *__restrict self, vm_phys_t dst, size_t num_sectors, lba_t addr, /*out*/ struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_BADALLOC, ...) ASMNAME("block_device_aread_phys_sector");
+FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_awrite_phys_sector)(struct block_device *__restrict self, vm_phys_t src, size_t num_sectors, lba_t addr, /*out*/ struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_IOERROR_READONLY, E_IOERROR_BADBOUNDS, E_BADALLOC, ...) ASMNAME("block_device_awrite_phys_sector");
+FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_areadv_sector)(struct block_device *__restrict self, struct aio_buffer *__restrict buf, size_t num_sectors, lba_t addr, /*out*/ struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_BADALLOC, ...) ASMNAME("block_device_areadv_sector");
+FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_awritev_sector)(struct block_device *__restrict self, struct aio_buffer *__restrict buf, size_t num_sectors, lba_t addr, /*out*/ struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_IOERROR_READONLY, E_IOERROR_BADBOUNDS, E_BADALLOC, ...) ASMNAME("block_device_awritev_sector");
+FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_areadv_phys_sector)(struct block_device *__restrict self, struct aio_pbuffer *__restrict buf, size_t num_sectors, lba_t addr, /*out*/ struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_BADALLOC, ...) ASMNAME("block_device_areadv_phys_sector");
+FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_awritev_phys_sector)(struct block_device *__restrict self, struct aio_pbuffer *__restrict buf, size_t num_sectors, lba_t addr, /*out*/ struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_IOERROR_READONLY, E_IOERROR_BADBOUNDS, E_BADALLOC, ...) ASMNAME("block_device_awritev_phys_sector");
+FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_aread)(struct block_device *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t device_position, /*out*/ struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_BADALLOC, ...) ASMNAME("block_device_aread");
+FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_awrite)(struct block_device *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t device_position, /*out*/ struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_IOERROR_READONLY, E_IOERROR_BADBOUNDS, E_BADALLOC, ...) ASMNAME("block_device_awrite");
+FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_aread_phys)(struct block_device *__restrict self, vm_phys_t dst, size_t num_bytes, pos_t device_position, /*out*/ struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_BADALLOC, ...) ASMNAME("block_device_aread_phys");
+FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_awrite_phys)(struct block_device *__restrict self, vm_phys_t src, size_t num_bytes, pos_t device_position, /*out*/ struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_IOERROR_READONLY, E_IOERROR_BADBOUNDS, E_BADALLOC, ...) ASMNAME("block_device_awrite_phys");
+FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_areadv)(struct block_device *__restrict self, struct aio_buffer *__restrict buf, size_t num_bytes, pos_t device_position, /*out*/ struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_BADALLOC, ...) ASMNAME("block_device_areadv");
+FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_awritev)(struct block_device *__restrict self, struct aio_buffer *__restrict buf, size_t num_bytes, pos_t device_position, /*out*/ struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_IOERROR_READONLY, E_IOERROR_BADBOUNDS, E_BADALLOC, ...) ASMNAME("block_device_awritev");
+FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_areadv_phys)(struct block_device *__restrict self, struct aio_pbuffer *__restrict buf, size_t num_bytes, pos_t device_position, /*out*/ struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_BADALLOC, ...) ASMNAME("block_device_areadv_phys");
+FUNDEF NONNULL((1, 5)) void NOTHROW(KCALL _block_device_awritev_phys)(struct block_device *__restrict self, struct aio_pbuffer *__restrict buf, size_t num_bytes, pos_t device_position, /*out*/ struct aio_handle *__restrict aio) THROWS_INDIRECT(E_IOERROR, E_IOERROR_READONLY, E_IOERROR_BADBOUNDS, E_BADALLOC, ...) ASMNAME("block_device_awritev_phys");
 FUNDEF NONNULL((1)) void KCALL _block_device_read_sync(struct block_device *__restrict self, USER CHECKED void *dst, size_t num_bytes, pos_t device_position) THROWS(E_IOERROR, E_BADALLOC,E_SEGFAULT, ...) ASMNAME("block_device_read_sync");
 FUNDEF NONNULL((1)) void KCALL _block_device_write_sync(struct block_device *__restrict self, USER CHECKED void const *src, size_t num_bytes, pos_t device_position) THROWS(E_IOERROR, E_IOERROR_READONLY, E_IOERROR_BADBOUNDS, E_BADALLOC,E_SEGFAULT, ...) ASMNAME("block_device_write_sync");
 FUNDEF NONNULL((1)) void KCALL _block_device_read_phys_sync(struct block_device *__restrict self, vm_phys_t dst, size_t num_bytes, pos_t device_position) THROWS(E_IOERROR, E_BADALLOC, ...) ASMNAME("block_device_read_phys_sync");
@@ -987,6 +987,7 @@ _block_device_sync(struct block_device *__restrict self)
 				                          handle);
 				++result;
 			} EXCEPT {
+				handle->ah_type = &aio_noop_type;
 				aio_handle_fail(handle);
 				break;
 			}
@@ -999,10 +1000,10 @@ _block_device_sync(struct block_device *__restrict self)
 		aio_multihandle_generic_waitfor(&hand);
 		aio_multihandle_generic_checkerror(&hand);
 	} EXCEPT {
-		aio_multihandle_fini(&hand);
+		aio_multihandle_generic_fini(&hand);
 		RETHROW();
 	}
-	aio_multihandle_fini(&hand);
+	aio_multihandle_generic_fini(&hand);
 	if (result != 0) {
 		/* Clear all of the CHANGED bits. */
 		for (i = 0; i < BD_MAX_CACHE_SECTORS; ++i) {
@@ -1019,9 +1020,9 @@ _block_device_sync(struct block_device *__restrict self)
 }
 
 
-LOCAL NONNULL((1)) bool FCALL
-block_unset_modified(struct block_device *__restrict self,
-                     unsigned int cache_index) {
+LOCAL NOBLOCK NONNULL((1)) bool
+NOTHROW(FCALL block_unset_modified)(struct block_device *__restrict self,
+                                    unsigned int cache_index) {
 	if ((self->bd_cache[cache_index].cs_flags & (BD_CACHED_SECTOR_FPRESENT | BD_CACHED_SECTOR_FCHANGED)) !=
 	    (BD_CACHED_SECTOR_FPRESENT | BD_CACHED_SECTOR_FCHANGED))
 		return false;
@@ -1069,7 +1070,6 @@ again:
 		} EXCEPT {
 			(*handle.ah_func)(&handle, AIO_COMPLETION_FAILURE);
 		}
-
 		/* Search for additional sectors which may need saving, so we can improve
 		 * performance by saving a whole bunch of different blocks at once. */
 		for (i = 0; i < BD_MAX_CACHE_SECTORS; ++i) {
@@ -1105,43 +1105,53 @@ again:
 		/* Wait for secondary task to be completed. */
 		if (ex_handles) {
 			TRY {
-				while (ex_handles_count--) {
+				while (ex_handles_count) {
+					--ex_handles_count;
 					aio_handle_generic_waitfor(&ex_handles[ex_handles_count].sh_handle);
 					/* Mark this handle as having been successfully saved. */
 					if likely(ex_handles[ex_handles_count].sh_handle.hg_status == AIO_COMPLETION_SUCCESS)
 						block_unset_modified(self, ex_handles[ex_handles_count].sh_index);
+					aio_handle_generic_fini(&ex_handles[ex_handles_count].sh_handle);
 				}
 			} EXCEPT {
 				/* Cancel all remaining I/O operations. */
-				while (ex_handles_count--)
+				while (ex_handles_count) {
+					--ex_handles_count;
 					aio_handle_cancel(&ex_handles[ex_handles_count].sh_handle);
+					aio_handle_generic_fini(&ex_handles[ex_handles_count].sh_handle);
+				}
 				kfree(ex_handles);
 				RETHROW();
 			}
 			kfree(ex_handles);
 		}
-		/* Wait for the primary task to be completed. */
+		TRY {
+			/* Wait for the primary task to be completed. */
 check_handle_state_for_save:
-		switch (__builtin_expect(handle.hg_status, AIO_COMPLETION_SUCCESS)) {
-
-		case AIO_COMPLETION_CANCEL:
-			/* Shouldn't happen: If the operation was aborted, re-start. */
-			goto again;
-
-		case AIO_COMPLETION_SUCCESS:
-			break;
-
-		case AIO_COMPLETION_FAILURE:
-			/* Propagate errors as exceptions. */
-			memcpy(&THIS_EXCEPTION_INFO.ei_data,
-			       &handle.hg_error,
-			       sizeof(handle.hg_error));
-			error_throw_current();
-			break;
-
-		default:
-			aio_handle_generic_waitfor(&handle);
-			goto check_handle_state_for_save;
+			switch (__builtin_expect(handle.hg_status, AIO_COMPLETION_SUCCESS)) {
+	
+			case AIO_COMPLETION_CANCEL:
+				/* Shouldn't happen: If the operation was aborted, re-start. */
+				goto again;
+	
+			case AIO_COMPLETION_SUCCESS:
+				break;
+	
+			case AIO_COMPLETION_FAILURE:
+				/* Propagate errors as exceptions. */
+				memcpy(&THIS_EXCEPTION_INFO.ei_data,
+				       &handle.hg_error,
+				       sizeof(handle.hg_error));
+				error_throw_current();
+				break;
+	
+			default:
+				aio_handle_generic_waitfor(&handle);
+				goto check_handle_state_for_save;
+			}
+		} EXCEPT {
+			aio_handle_generic_fini(&handle);
+			RETHROW();
 		}
 	}
 	assert(self->bd_cache_ssiz >= self->bd_sector_size);
@@ -1166,28 +1176,33 @@ check_handle_state_for_save:
 		(*handle.ah_func)(&handle, AIO_COMPLETION_FAILURE);
 	}
 	COMPILER_BARRIER();
-	/* Wait for the read to have completed. */
+	TRY {
+		/* Wait for the read to have completed. */
 check_handle_state_for_load:
-	switch (__builtin_expect(handle.hg_status, AIO_COMPLETION_SUCCESS)) {
-
-	case AIO_COMPLETION_CANCEL:
-		/* Shouldn't happen: If the operation was aborted, re-start. */
-		goto again;
-
-	case AIO_COMPLETION_SUCCESS:
-		break;
-
-	case AIO_COMPLETION_FAILURE:
-		/* Propagate errors as exceptions. */
-		memcpy(&THIS_EXCEPTION_INFO.ei_data,
-		       &handle.hg_error,
-		       sizeof(handle.hg_error));
-		error_throw_current();
-		break;
-
-	default:
-		aio_handle_generic_waitfor(&handle);
-		goto check_handle_state_for_load;
+		switch (__builtin_expect(handle.hg_status, AIO_COMPLETION_SUCCESS)) {
+	
+		case AIO_COMPLETION_CANCEL:
+			/* Shouldn't happen: If the operation was aborted, re-start. */
+			goto again;
+	
+		case AIO_COMPLETION_SUCCESS:
+			break;
+	
+		case AIO_COMPLETION_FAILURE:
+			/* Propagate errors as exceptions. */
+			memcpy(&THIS_EXCEPTION_INFO.ei_data,
+			       &handle.hg_error,
+			       sizeof(handle.hg_error));
+			error_throw_current();
+			break;
+	
+		default:
+			aio_handle_generic_waitfor(&handle);
+			goto check_handle_state_for_load;
+		}
+	} EXCEPT {
+		aio_handle_generic_fini(&handle);
+		RETHROW();
 	}
 	/* Now that it's been loaded from disk, mark the cache-page as present */
 	self->bd_cache[result].cs_flags = BD_CACHED_SECTOR_FPRESENT;

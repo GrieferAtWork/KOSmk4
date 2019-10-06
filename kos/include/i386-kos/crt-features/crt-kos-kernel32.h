@@ -91,9 +91,10 @@
 #define __CRT_HAVE_aio_multihandle_allochandle_nx 1
 #define __CRT_HAVE_aio_multihandle_cancel 1
 #define __CRT_HAVE_aio_multihandle_done 1
-#define __CRT_HAVE_aio_multihandle_extension_destroy 1
 #define __CRT_HAVE_aio_multihandle_fail 1
+#define __CRT_HAVE_aio_multihandle_fini 1
 #define __CRT_HAVE_aio_multihandle_generic_func 1
+#define __CRT_HAVE_aio_noop_type 1
 #define __CRT_HAVE_aio_pbuffer_copyfrommem 1
 #define __CRT_HAVE_aio_pbuffer_copyfromphys 1
 #define __CRT_HAVE_aio_pbuffer_copytomem 1

@@ -5271,9 +5271,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, cred_require_vmread; .long 0
 	.long 0xd52524
 	.long .Lname1317 /* index: 1317 */
-	.weak block_device_write; .long block_device_write
-	.reloc ., R_386_SIZE32, block_device_write; .long 0
-	.long 0xa512525
+	.weak aio_noop_type; .long aio_noop_type
+	.reloc ., R_386_SIZE32, aio_noop_type; .long 0
+	.long 0xe63e525
 	.long .Lname1318 /* index: 1318 */
 	.weak inode_pathconf; .long inode_pathconf
 	.reloc ., R_386_SIZE32, inode_pathconf; .long 0
@@ -5607,9 +5607,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, x86_fpu_current; .long 0
 	.long 0x6948ab4
 	.long .Lname1401 /* index: 1401 */
-	.weak aio_multihandle_extension_destroy; .long aio_multihandle_extension_destroy
-	.reloc ., R_386_SIZE32, aio_multihandle_extension_destroy; .long 0
-	.long 0xe82a579
+	.weak vm_syncone_locked; .long vm_syncone_locked
+	.reloc ., R_386_SIZE32, vm_syncone_locked; .long 0
+	.long 0x620f394
 	.long 0 /* index: 1402 */
 	.long 0
 	.long 0
@@ -6566,10 +6566,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 1641 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname1641 /* index: 1641 */
+	.weak aio_multihandle_fini; .long aio_multihandle_fini
+	.reloc ., R_386_SIZE32, aio_multihandle_fini; .long 0
+	.long 0x81d8669
 	.long 0 /* index: 1642 */
 	.long 0
 	.long 0
@@ -11754,10 +11754,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak sys_kfstatat; .long sys_kfstatat
 	.reloc ., R_386_SIZE32, sys_kfstatat; .long 0
 	.long 0xa1a1c94
-	.long .Lname2938 /* index: 2938 */
-	.weak vm_syncone_locked; .long vm_syncone_locked
-	.reloc ., R_386_SIZE32, vm_syncone_locked; .long 0
-	.long 0x620f394
+	.long 0 /* index: 2938 */
+	.long 0
+	.long 0
+	.long 0
 	.long 0 /* index: 2939 */
 	.long 0
 	.long 0
@@ -15230,10 +15230,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 3807 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname3807 /* index: 3807 */
+	.weak block_device_write; .long block_device_write
+	.reloc ., R_386_SIZE32, block_device_write; .long 0
+	.long 0xa512525
 	.long 0 /* index: 3808 */
 	.long 0
 	.long 0
@@ -17753,7 +17753,7 @@ END(kernel_symbol_table)
 .Lname1316:
 	.string "cred_require_vmread"
 .Lname1317:
-	.string "block_device_write"
+	.string "aio_noop_type"
 .Lname1318:
 	.string "inode_pathconf"
 .Lname1320:
@@ -17833,7 +17833,7 @@ END(kernel_symbol_table)
 .Lname1400:
 	.string "x86_fpu_current"
 .Lname1401:
-	.string "aio_multihandle_extension_destroy"
+	.string "vm_syncone_locked"
 .Lname1403:
 	.string "mouse_device_moveto"
 .Lname1404:
@@ -18084,6 +18084,8 @@ END(kernel_symbol_table)
 	.string "cpu_quantum_end"
 .Lname1639:
 	.string "rawmemrlenw"
+.Lname1641:
+	.string "aio_multihandle_fini"
 .Lname1644:
 	.string "sys_writev"
 .Lname1645:
@@ -19362,8 +19364,6 @@ END(kernel_symbol_table)
 	.string "regdump_sgregs_with_cs_ss"
 .Lname2937:
 	.string "sys_kfstatat"
-.Lname2938:
-	.string "vm_syncone_locked"
 .Lname2943:
 	.string "superblock_mountlock_upgrade"
 .Lname2944:
@@ -20304,6 +20304,8 @@ END(kernel_symbol_table)
 	.string "path_lock_write_nx"
 .Lname3801:
 	.string "json_parser_enterarray"
+.Lname3807:
+	.string "block_device_write"
 .Lname3810:
 	.string "mouse_device_hwheel_nopr"
 .Lname3811:
