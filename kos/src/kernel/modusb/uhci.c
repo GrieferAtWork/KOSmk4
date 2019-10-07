@@ -1383,20 +1383,24 @@ NOTHROW(FCALL uhci_controller_resetport)(struct uhci_controller *__restrict self
 	u16 st;
 	unsigned int n;
 	st = uhci_rdw(self, UHCI_PORTSC(portno));
-	uhci_wrw(self, UHCI_PORTSC(portno), st | UHCI_PORTSC_RST);
+	uhci_wrw(self, UHCI_PORTSC(portno),
+	         st | UHCI_PORTSC_PEDC | UHCI_PORTSC_CSC | UHCI_PORTSC_RST);
 	sleep_milli(50);
 	st = uhci_rdw(self, UHCI_PORTSC(portno));
-	uhci_wrw(self, UHCI_PORTSC(portno), st & ~UHCI_PORTSC_RST);
+	/* Make sure not to write WC bits so they don't get cleared by this! */
+	uhci_wrw(self, UHCI_PORTSC(portno),
+	         st & ~(UHCI_PORTSC_PEDC | UHCI_PORTSC_CSC | UHCI_PORTSC_RST));
 	for (n = 0; n < 10; ++n) {
 		sleep_milli(10);
 		st = uhci_rdw(self, UHCI_PORTSC(portno));
 		/* Check if something is connected. */
 		if (!(st & UHCI_PORTSC_CCS))
 			break;
-		/* ACK the status change */
+		/* ACK the status change
+		 * Note that PEDC and CSC are r/wc, so
+		 * writing them will actually clear them! */
 		if (st & (UHCI_PORTSC_PEDC | UHCI_PORTSC_CSC)) {
-			uhci_wrw(self, UHCI_PORTSC(portno),
-			         st & ~(UHCI_PORTSC_PEDC | UHCI_PORTSC_CSC));
+			uhci_wrw(self, UHCI_PORTSC(portno), st);
 			continue;
 		}
 		/* Check if the device has become enabled. */
