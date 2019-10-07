@@ -55,10 +55,10 @@ __SYSDECL_BEGIN
 
 
 /* Standard (USB_REQUEST_RETYPE_TYPE_STD) USB requests */
-#define USB_REQUEST_GET_STATUS     0x00 /* LEN=2 */
-#define USB_REQUEST_SET_ADDRESS    0x05 /* Set device address. (new address is `ur_value', but must be <= 127) */
-#define USB_REQUEST_GET_DESCRIPTOR 0x06 /* Read the device's descriptor structure
-                                         * The `ur_value' field must be one of `USB_REQUEST_GET_DESCRIPTOR_VALUE_*' */
+#define USB_REQUEST_GET_STATUS        0x00 /* LEN=2 */
+#define USB_REQUEST_SET_ADDRESS       0x05 /* Set device address. (new address is `ur_value', but must be <= 127) */
+#define USB_REQUEST_GET_DESCRIPTOR    0x06 /* Read the device's descriptor structure
+                                            * The `ur_value' field must be one of `USB_REQUEST_GET_DESCRIPTOR_VALUE_*' */
 #define    USB_REQUEST_GET_DESCRIPTOR_VALUE_DEVICE                    0x0100 /* `struct usb_descriptor' */
 #define    USB_REQUEST_GET_DESCRIPTOR_VALUE_CONFIGURATION             0x0200
 #define    USB_REQUEST_GET_DESCRIPTOR_VALUE_STRING                    0x0300
@@ -67,7 +67,29 @@ __SYSDECL_BEGIN
 #define    USB_REQUEST_GET_DESCRIPTOR_VALUE_DEVICE_QUALIFIER          0x0600
 #define    USB_REQUEST_GET_DESCRIPTOR_VALUE_OTHER_SPEED_CONFIGURATION 0x0700
 #define    USB_REQUEST_GET_DESCRIPTOR_VALUE_INTERFACE_POWER           0x0800
+#define USB_REQUEST_SET_CONFIGURATION 0x09 /* Set device configuration. (The conf value should be taken from one of
+                                            * the entries returned by `USB_REQUEST_GET_DESCRIPTOR_VALUE_CONFIGURATION',
+                                            * and should appear in the `ur_value' field, with the upper 8 bits clear) */
 
+
+
+/* Flags for `usb_configuration_descriptor::uc_attrib' */
+#define USB_CONFIGURATION_ATTRIB_EXTPWR 0x40 /* When set to 1, then the device runs on an external
+                                              * power supply. Otherwise, it will run off of bus power. */
+#define USB_CONFIGURATION_ATTRIB_ONE    0x80 /* Always 1 */
+
+
+/* Flags for `usb_endpoint_descriptor::ue_addr' */
+#define USB_ENDPOINT_ADDR_INDEX   0x0f /* Endpoint number (0-15) */
+#define USB_ENDPOINT_ADDR_IN      0x80 /* Input-only endpoint (when not set: output-only endpoint)
+                                        * This bit is ignored by control endpoints (aka. endpoint#0) */
+
+
+/* Flags for `usb_endpoint_descriptor::ue_attrib' */
+#define USB_ENDPOINT_ATTRIB_TRANSFERTYPEM  0x03 /* [bit(0:1)] Transfer type */
+#define USB_ENDPOINT_ATTRIB_TRANSFERTYPES     0 /* Shift for `USB_ENDPOINT_ATTRIB_TRANSFERTYPEM' */
+#define    USB_ENDPOINT_ATTRIB_TRANSFERTYPE_CONTROL     0x00 /* */
+#define    USB_ENDPOINT_ATTRIB_TRANSFERTYPE_ISOCHRONOUS 0x01 /* */
 
 
 #ifdef __CC__
@@ -83,10 +105,10 @@ struct __ATTR_PACKED usb_request {
 	                        * USB_REQUEST_RETYPE_DIR_D2H: Max buffer size of the payload. */
 };
 
-struct __ATTR_PACKED usb_descriptor {
-	/* Structure returned by `USB_REQUEST_GET_DESCRIPTOR' */
+struct __ATTR_PACKED usb_device_descriptor {
+	/* Structure returned by `USB_REQUEST_GET_DESCRIPTOR:USB_REQUEST_GET_DESCRIPTOR_VALUE_DEVICE' */
 	__uint8_t  ud_size;           /* Size of the descriptor (in bytes) */
-	__uint8_t  ud_type;           /* Descriptor type (???) */
+	__uint8_t  ud_type;           /* Descriptor type (== `(USB_REQUEST_GET_DESCRIPTOR_VALUE_DEVICE & 0xff00) >> 8') */
 	__uint16_t ud_usbver;         /* USB version (in BCD; e.g. 2.0 is 0x0200) */
 	__uint8_t  ud_dev_class;      /* Device class */
 	__uint8_t  ud_dev_subclass;   /* Device subclass */
@@ -100,6 +122,43 @@ struct __ATTR_PACKED usb_descriptor {
 	__uint8_t  ud_str_serial;     /* Serial number name (index for `USB_REQUEST_GET_DESCRIPTOR_VALUE_STRING') */
 	__uint8_t  ud_confcount;      /* # of possible configurations. */
 };
+
+struct __ATTR_PACKED usb_configuration_descriptor {
+	/* Structure returned by `USB_REQUEST_GET_DESCRIPTOR:USB_REQUEST_GET_DESCRIPTOR_VALUE_CONFIGURATION' */
+	__uint8_t  uc_size;           /* Size of the descriptor (in bytes) */
+	__uint8_t  uc_type;           /* Descriptor type (== `(USB_REQUEST_GET_DESCRIPTOR_VALUE_CONFIGURATION & 0xff00) >> 8') */
+	__uint16_t uc_total_len;      /* Total length of the descriptor (including trailing data) */
+	__uint8_t  uc_num_interfaces; /* Number of interfaces supported in this configuration */
+	__uint8_t  uc_conf_value;     /* Value to-be passed to `USB_REQUEST_SET_CONFIGURATION' */
+	__uint8_t  uc_conf_name;      /* String index describing the configuration */
+	__uint8_t  uc_attrib;         /* Configuration attributes (Set of `USB_CONFIGURATION_ATTRIB_*') */
+	__uint8_t  uc_maxpower;       /* Max amount of power draw from the USB bus (in units or 2mA) */
+	/* More descriptors may follow here, each one lead by 2 fields:
+	 * uint8_t SIZE;
+	 * uint8_t TYPE; */
+};
+
+struct __ATTR_PACKED usb_interface_descriptor {
+	__uint8_t ui_size;            /* Size of the descriptor (in bytes) */
+	__uint8_t ui_type;            /* Descriptor type (== `(USB_REQUEST_GET_DESCRIPTOR_VALUE_INTERFACE & 0xff00) >> 8') */
+	__uint8_t ui_intf;            /* Interface index. */
+	__uint8_t ui_alt_setting;     /* Non-zero if this is an alternate interface for `ui_intf' */
+	__uint8_t ui_endp_count;      /* Number of endpoints (excluding endpoint 0) */
+	__uint8_t ui_intf_class;      /* Interface class. */
+	__uint8_t ui_intf_subclass;   /* Interface subclass. */
+	__uint8_t ui_intf_protocol;   /* Interface protocol. */
+	__uint8_t ui_intf_str;        /* Interface name (index for `USB_REQUEST_GET_DESCRIPTOR_VALUE_STRING') */
+};
+
+struct __ATTR_PACKED usb_endpoint_descriptor {
+	__uint8_t  ue_size;            /* Size of the descriptor (in bytes) */
+	__uint8_t  ue_type;            /* Descriptor type (== `(USB_REQUEST_GET_DESCRIPTOR_VALUE_ENDPOINT & 0xff00) >> 8') */
+	__uint8_t  ue_addr;            /* Endpoint address (Set of `USB_ENDPOINT_ADDR_*') */
+	__uint8_t  ue_attrib;          /* Endpoint attributes (Set of `USB_ENDPOINT_ATTRIB_*') */
+	__uint16_t ue_maxpacketsize;
+	__uint8_t  ue_interval;
+};
+
 #endif /* __CC__ */
 
 __SYSDECL_END

@@ -51,7 +51,7 @@
 
 #include "usb.h"
 
-#if !defined(NDEBUG) && 1
+#if !defined(NDEBUG) && 0
 #define UHCI_DEBUG(...) printk(__VA_ARGS__)
 #else
 #define UHCI_DEBUG(...) (void)0
@@ -755,7 +755,7 @@ uhci_construct_tds(struct usb_controller *__restrict self,
 	default: __builtin_unreachable();
 	}
 	/* Set the LowSpeedDevice bit for low-speed endpoints. */
-	if (endp->ue_lowspeed)
+	if (endp->ue_flags & USB_ENDPOINT_FLAG_LOWSPEED)
 		cs |= UHCI_TDCS_LSD;
 	tok |= ((u32)endp->ue_dev << UHCI_TDTOK_DEVS) & UHCI_TDTOK_DEVM;
 	tok |= ((u32)endp->ue_endp << UHCI_TDTOK_ENDPTS) & UHCI_TDTOK_ENDPTM;
@@ -777,18 +777,22 @@ uhci_construct_tds(struct usb_controller *__restrict self,
 			/* Setup/Status stage packets. */
 			if (tx->ut_type == USB_TRANSFER_TYPE_SETUP) {
 				/* Setup packets must be followed by DTOG=1 */
-				endp->ue_toggle = 1;
+				endp->ue_flags |= USB_ENDPOINT_FLAG_DATATOGGLE;
 			} else {
 				/* Status packets are used to terminate the sequence and are required
 				 * to have the data toggle bit set. However, if the device is the one
 				 * to send the next data packet, then that page should come with the
 				 * data toggle bit set to 0, so remember that fact now. */
 				td->td_tok |= UHCI_TDTOK_DTOGGM;
-				endp->ue_toggle = 0;
+				endp->ue_flags &= ~USB_ENDPOINT_FLAG_DATATOGGLE;
 			}
 		} else {
-			td->td_tok |= (endp->ue_toggle << UHCI_TDTOK_DTOGGS) & UHCI_TDTOK_DTOGGM;
-			endp->ue_toggle ^= 1;
+#if USB_ENDPOINT_FLAG_DATATOGGLE == 1
+			td->td_tok |= ((endp->ue_flags & USB_ENDPOINT_FLAG_DATATOGGLE) << UHCI_TDTOK_DTOGGS);
+#else /* USB_ENDPOINT_FLAG_DATATOGGLE == 1 */
+			td->td_tok |= (endp->ue_flags & USB_ENDPOINT_FLAG_DATATOGGLE) ? UHCI_TDTOK_DTOGGM : 0;
+#endif /* USB_ENDPOINT_FLAG_DATATOGGLE != 1 */
+			endp->ue_flags ^= USB_ENDPOINT_FLAG_DATATOGGLE;
 		}
 		start     += mysize;
 		num_bytes -= mysize;
@@ -1418,12 +1422,13 @@ uhci_controller_probeport(struct uhci_controller *__restrict self,
 		       self->uc_pci->pd_base, self->uc_base.uc_mmbase, portno);
 		dev = (struct usb_device *)kmalloc(sizeof(struct usb_device),
 		                                   GFP_NORMAL | GFP_CALLOC);
-		dev->ue_refcnt   = 1;
-		dev->ue_maxpck   = 0x7ff; /* Not configured. (Physical limit of the protocol) */
-		dev->ue_dev      = 0;     /* Not configured. (Gets set by `usb_device_discovered()') */
-		dev->ue_endp     = 0;     /* Configure channel. */
-		dev->ue_toggle   = 0;
-		dev->ue_lowspeed = status & UHCI_PORTSC_LSDA ? 1 : 0;
+		dev->ue_refcnt    = 1;
+		dev->ue_interface = dev;
+		dev->ui_device    = dev;
+		dev->ue_maxpck    = 0x7ff; /* Not configured. (Physical limit of the protocol) */
+		dev->ue_dev       = 0;     /* Not configured. (Gets set by `usb_device_discovered()') */
+		dev->ue_endp      = 0;     /* Configure channel. */
+		dev->ue_flags     = status & UHCI_PORTSC_LSDA ? USB_ENDPOINT_FLAG_LOWSPEED : 0;
 		FINALLY_DECREF_UNLIKELY(dev);
 		usb_device_discovered(self, dev);
 	}

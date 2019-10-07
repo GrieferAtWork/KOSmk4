@@ -27,12 +27,15 @@
 
 #include <dev/char.h>
 #include <kernel/aio.h>
+#include <kernel/driver.h>
 #include <kernel/malloc.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
+#include <misc/atomic-ref.h>
 #include <sched/cpu.h>
 #include <sched/task.h>
 
+#include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
 
 #include <kos/except-io.h>
@@ -46,12 +49,477 @@
 
 DECL_BEGIN
 
+struct usb_probe_entry {
+	union {
+		PUSB_DEVICE_PROBE    c_device; /* [1..1] Device probe callback */
+		PUSB_INTERFACE_PROBE c_intf;   /* [1..1] Interface probe callback */
+		void                *c_func;   /* [1..1] Probe callback */
+	};
+	REF struct driver       *c_driver; /* [1..1] The driver implementing this probe. */
+};
+
+struct usb_probe_vector {
+	WEAK refcnt_t                                   upv_refcnt; /* Callback vector reference counter. */
+	size_t                                          upv_count;  /* Number of elements. */
+	COMPILER_FLEXIBLE_ARRAY(struct usb_probe_entry, upv_elem);  /* [0..upv_count] Vector of elements. */
+};
+DEFINE_REFCOUNT_FUNCTIONS(struct usb_probe_vector, upv_refcnt, kfree)
+typedef ATOMIC_REF(struct usb_probe_vector) usb_probe_vector_ref;
+
+PRIVATE struct usb_probe_vector empty_probe_vector = { 3, 0 };
+PRIVATE usb_probe_vector_ref probe_device    = ATOMIC_REF_INIT(&empty_probe_vector);
+PRIVATE usb_probe_vector_ref probe_interface = ATOMIC_REF_INIT(&empty_probe_vector);
+
+
+
+struct usb_unknown_interface {
+	WEAK refcnt_t                                      uui_refcnt; /* Reference counter. */
+	REF struct usb_unknown_interface                  *uui_next;   /* [0..1][lock(ATOMIC)] Next unknown interface. */
+	REF struct usb_controller                         *uui_ctrl;   /* [1..1] The associated controller. */
+	REF struct usb_interface                          *uui_intf;   /* [1..1] The associated interface. */
+	size_t                                             uui_endpc;  /* Number of endpoints. */
+	COMPILER_FLEXIBLE_ARRAY(REF struct usb_endpoint *, uui_endpv); /* [1..1][1..uui_endpc] Associated interfaces. */
+};
+
+LOCAL NOBLOCK void
+NOTHROW(KCALL usb_unknown_interface_destroy)(struct usb_unknown_interface *__restrict self) {
+	size_t i;
+	for (i = 0; i < self->uui_endpc; ++i)
+		decref_likely(self->uui_endpv[i]);
+	decref_likely(self->uui_intf);
+	decref_likely(self->uui_ctrl);
+	kfree(self);
+}
+
+DEFINE_REFCOUNT_FUNCTIONS(struct usb_unknown_interface, uui_refcnt, usb_unknown_interface_destroy)
+
+
+/* [lock(ATOMIC)] Chain of unknown USB interfaces.
+ * NOTE: Set to `USB_UNKNOWNS_CLOSED' after the usb driver has been finalized. */
+PRIVATE WEAK REF struct usb_unknown_interface *usb_unknowns = NULL;
+
+#define USB_UNKNOWNS_CLOSED  ((REF struct usb_unknown_interface *)-1)
+PRIVATE DRIVER_FINI void KCALL usb_unknowns_fini(void) {
+	REF struct usb_unknown_interface *un, *next;
+	un = ATOMIC_XCH(usb_unknowns, USB_UNKNOWNS_CLOSED);
+	if (un != USB_UNKNOWNS_CLOSED) {
+		while (un) {
+			next = un->uui_next;
+			decref_likely(un);
+			un = next;
+		}
+	}
+}
+
+PRIVATE NOBLOCK void
+NOTHROW(KCALL usb_unknowns_appendall)(/*inherit*/ REF struct usb_unknown_interface *__restrict self) {
+	struct usb_unknown_interface *last;
+	last = self;
+	while (last->uui_next)
+		last = last->uui_next;
+	for (;;) {
+		struct usb_unknown_interface *next;
+		next = ATOMIC_READ(usb_unknowns);
+		if unlikely(next == USB_UNKNOWNS_CLOSED) {
+			/* The USB driver was closed (discard the given interface) */
+			decref(self);
+			return;
+		}
+		last->uui_next = next;
+		COMPILER_WRITE_BARRIER();
+		if (ATOMIC_CMPXCH_WEAK(usb_unknowns, next, self))
+			break;
+	}
+}
+
+/* [0..1] The thread currently probing for unknown interfaces.
+ *        To prevent a single interface from being more than once,
+ *        only a single thread can ever probe unknown interfaces,
+ *        and even then, recursion mustn't be allowed, with recursive
+ *        calls simply ending up as no-ops. */
+PRIVATE WEAK struct task *usb_probe_unknown_lock = NULL;
+PRIVATE struct sig usb_probe_unknown_unlock = SIG_INIT;
+
+PRIVATE bool KCALL usb_probe_unknown_acquire(void) {
+	struct task *ot, *me;
+	assert(!task_isconnected());
+	me = THIS_TASK;
+again:
+	ot = ATOMIC_CMPXCH_VAL(usb_probe_unknown_lock, NULL, me);
+	if (!ot)
+		return true; /* Lock acquired. */
+	if unlikely(ot == me)
+		return false; /* Don't allow recursion. */
+	task_connect(&usb_probe_unknown_unlock);
+	if (ATOMIC_CMPXCH(usb_probe_unknown_lock, NULL, me)) {
+		task_disconnectall();
+		return true;
+	}
+	task_waitfor();
+	goto again;
+}
+
+PRIVATE NOBLOCK void NOTHROW(KCALL usb_probe_unknown_release)(void) {
+	assert(usb_probe_unknown_lock == THIS_TASK);
+	ATOMIC_WRITE(usb_probe_unknown_lock, NULL);
+	sig_broadcast(&usb_probe_unknown_unlock);
+}
+
+
+/* Probe all unknown interfaces using the given `func', removing
+ * interfaces  that have been identified following this.
+ * Additionally, `func' may be NULL to use all global callback probes
+ * for probing unknown interfaces. */
+PRIVATE void KCALL usb_probe_identify_unknown(PUSB_INTERFACE_PROBE func) {
+	REF struct usb_unknown_interface *chain, **piter, *iter;
+	REF struct usb_probe_vector *probes = NULL;
+	if (!usb_probe_unknown_acquire())
+		return; /* Recursion within the same thread. */
+	if (!func)
+		probes = probe_interface.get();
+	TRY {
+		for (;;) {
+			chain = ATOMIC_READ(usb_unknowns);
+			if (chain == USB_UNKNOWNS_CLOSED)
+				goto done; /* No-op after finalize */
+			if (chain == NULL)
+				goto done; /* Nothing to enumerate */
+			if (ATOMIC_CMPXCH_WEAK(usb_unknowns, chain, NULL))
+				break;
+		}
+		TRY {
+			piter = &chain;
+again_piter:
+			for (; (iter = *piter) != NULL;
+			     piter = &iter->uui_next) {
+				bool was_found;
+				if (func) {
+					assert(!probes);
+					was_found = (*func)(iter->uui_ctrl,
+					                    iter->uui_intf,
+					                    iter->uui_endpc,
+					                    iter->uui_endpv);
+				} else {
+					/* Scan using all defined probes. */
+					size_t i;
+					assert(probes);
+					for (i = 0; i < probes->upv_count; ++i) {
+						was_found = (*probes->upv_elem[i].c_intf)(iter->uui_ctrl,
+						                                          iter->uui_intf,
+						                                          iter->uui_endpc,
+						                                          iter->uui_endpv);
+						if (was_found)
+							break;
+					}
+				}
+				if (was_found) {
+					/* Found one! (remove from the list to-be restored later) */
+					*piter = iter->uui_next;
+					/* Drop the chain reference from the removed element. */
+					decref_likely(iter);
+					goto again_piter;
+				}
+			}
+		} EXCEPT {
+			usb_unknowns_appendall(chain);
+			RETHROW();
+		}
+		usb_unknowns_appendall(chain);
+	} EXCEPT {
+		usb_probe_unknown_release();
+		xdecref_unlikely(probes);
+		RETHROW();
+	}
+done:
+	usb_probe_unknown_release();
+	xdecref_unlikely(probes);
+}
+
+
+
+
+PRIVATE NOBLOCK bool
+NOTHROW(KCALL vector_contains)(struct usb_probe_vector *__restrict self,
+                               void *func) {
+	size_t i;
+	for (i = 0; i < self->upv_count; ++i) {
+		if (self->upv_elem[i].c_func == func)
+			return true;
+	}
+	return false;
+}
+
+PRIVATE bool KCALL
+probe_add(usb_probe_vector_ref *__restrict self, void *func) {
+	REF struct usb_probe_vector *ovec, *nvec;
+	REF struct driver *func_driver;
+	size_t i;
+again:
+	ovec = self->get();
+	if unlikely(vector_contains(ovec, func)) {
+		decref_unlikely(ovec);
+		return false;
+	}
+	func_driver = driver_at_address(func);
+	TRY {
+		if unlikely(!func_driver)
+			THROW(E_SEGFAULT_NOTEXECUTABLE, func, E_SEGFAULT_CONTEXT_FAULT);
+		nvec = (REF struct usb_probe_vector *)kmalloc(offsetof(struct usb_probe_vector, upv_elem) +
+		                                              (ovec->upv_count + 1) * sizeof(struct usb_probe_entry),
+		                                              GFP_NORMAL);
+	} EXCEPT {
+		decref_unlikely(func_driver);
+		decref_unlikely(ovec);
+		RETHROW();
+	}
+	memcpy(nvec->upv_elem, ovec->upv_elem,
+	       ovec->upv_count * sizeof(struct usb_probe_entry));
+	/* Update reference counts of copied drivers. */
+	for (i = 0; i < ovec->upv_count; ++i)
+		incref(ovec->upv_elem[i].c_driver);
+	nvec->upv_refcnt = 1;
+	nvec->upv_elem[ovec->upv_count].c_func   = func;
+	nvec->upv_elem[ovec->upv_count].c_driver = incref(func_driver);
+	nvec->upv_count = ovec->upv_count + 1;
+
+	if (!self->cmpxch_inherit_new(ovec, nvec)) {
+		destroy(nvec);
+		decref_unlikely(ovec);
+		decref_unlikely(func_driver);
+		goto again;
+	}
+	printk(KERN_INFO "[usb] Register %s-probe (%[vinfo:%n(%p)] in driver %q)\n",
+	       self == &probe_device ? "device" : "interface",
+	       func, func_driver->d_name);
+	decref_unlikely(func_driver);
+	decref(ovec);
+	return true;
+}
+
+PRIVATE bool KCALL
+probe_del(usb_probe_vector_ref *__restrict self, void *func) {
+	REF struct usb_probe_vector *ovec, *nvec;
+	REF struct driver *func_driver;
+	size_t i, del_index;
+again:
+	ovec = self->get();
+	for (del_index = 0; del_index < ovec->upv_count; ++del_index) {
+		if (ovec->upv_elem[del_index].c_func == func)
+			goto found_index;
+	}
+	decref_unlikely(ovec);
+	return false;
+found_index:
+	TRY {
+		nvec = (REF struct usb_probe_vector *)kmalloc(offsetof(struct usb_probe_vector, upv_elem) +
+		                                              (ovec->upv_count - 1) * sizeof(struct usb_probe_entry),
+		                                              GFP_NORMAL);
+	} EXCEPT {
+		decref_unlikely(ovec);
+		RETHROW();
+	}
+	nvec->upv_refcnt = 1;
+	nvec->upv_count  = ovec->upv_count - 1;
+	memcpy(nvec->upv_elem, ovec->upv_elem,
+	       del_index * sizeof(struct usb_probe_entry));
+	memcpy(nvec->upv_elem + del_index,
+	       ovec->upv_elem + (del_index + 1),
+	       (nvec->upv_count - del_index) * sizeof(struct usb_probe_entry));
+	/* Update reference counts of copied drivers. */
+	for (i = 0; i < nvec->upv_count; ++i)
+		incref(nvec->upv_elem[i].c_driver);
+	func_driver = ovec->upv_elem[del_index].c_driver; /* Inherit reference */
+	if (!self->cmpxch_inherit_new(ovec, nvec)) {
+		destroy(nvec);
+		decref_unlikely(ovec);
+		goto again;
+	}
+	printk(KERN_INFO "[usb] Delete %s-probe (%[vinfo:%n(%p)] in driver %q)\n",
+	       self == &probe_device ? "device" : "interface",
+	       func, func_driver->d_name);
+	decref(func_driver);
+	decref(ovec);
+	return true;
+}
+
+/* Register/unregister USB device/interface probe callbacks that get invoked
+ * when a new device is discovered.
+ * Note that device probes are only invoked for multi-function devices (i.e. ones
+ * with multiple configurations), and have the purpose to allow drivers to be provided
+ * for combinations of certain devices.
+ * NOTE: After registering a new interface probe function, any USB interface that had
+ *       not been recognized at that point will immediatly be probed using the given
+ *       `func' before returning. */
+PUBLIC bool KCALL
+usb_register_device_probe(PUSB_DEVICE_PROBE func)
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+	return probe_add(&probe_device, (void *)func);
+}
+
+PUBLIC bool KCALL
+usb_register_interface_probe(PUSB_INTERFACE_PROBE func)
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+	bool result;
+	result = probe_add(&probe_interface, (void *)func);
+	if (result) {
+		/* Got through all strange interfaces we've encountered thus far,
+		 * and try to identify them using this newly added probing function. */
+		usb_probe_identify_unknown(func);
+	}
+	return result;
+}
+
+PUBLIC bool KCALL
+usb_unregister_device_probe(PUSB_DEVICE_PROBE func)
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+	return probe_del(&probe_device, (void *)func);
+}
+
+PUBLIC bool KCALL
+usb_unregister_interface_probe(PUSB_INTERFACE_PROBE func)
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+	return probe_del(&probe_interface, (void *)func);
+}
+
+
+/* Create a character device under /dev for a strange USB endpoint/device. */
+PRIVATE void KCALL
+usb_create_strange_device_nowarn(struct usb_controller *__restrict self,
+                                 struct usb_device *__restrict dev) {
+	/* TODO */
+}
+
+PRIVATE void KCALL
+usb_create_strange_device(struct usb_controller *__restrict self,
+                          struct usb_device *__restrict dev) {
+	printk(KERN_WARNING "[usb] Creating device file for strange USB device %q:%q:%q (interface:%q, endpoint:%I8u)\n",
+	       dev->ue_interface->ui_device->ud_str_vendor,
+	       dev->ue_interface->ui_device->ud_str_product,
+	       dev->ue_interface->ui_device->ud_str_serial,
+	       dev->ue_interface->ui_intf_name,
+	       dev->ue_endp);
+	usb_create_strange_device_nowarn(self, dev);
+}
+
+
+
+
+
+
+
+PRIVATE void KCALL
+usb_interface_discovered(struct usb_controller *__restrict self,
+                         struct usb_interface *__restrict intf,
+                         size_t endpc, struct usb_endpoint *const endpv[]) {
+	size_t i;
+	REF struct usb_probe_vector *probes;
+	REF struct usb_unknown_interface *unknown;
+	assert(endpc != 0);
+	printk(KERN_NOTICE "[usb] Discovered device %q:%q:%q with interface "
+	                   "%q(%#x.%#x.%#x) (config %q) and %Iu endpoints [%I8u",
+	       intf->ui_device->ud_str_vendor,
+	       intf->ui_device->ud_str_product,
+	       intf->ui_device->ud_str_serial,
+	       intf->ui_intf_name,
+	       intf->ui_intf_desc->ui_intf_class,
+	       intf->ui_intf_desc->ui_intf_subclass,
+	       intf->ui_intf_desc->ui_intf_protocol,
+	       intf->ui_device->ud_config->uc_desc,
+	       endpc, endpv[0]->ue_endp);
+	for (i = 1; i < endpc; ++i) {
+		printk(KERN_NOTICE ",%I8u",
+		       endpv[i]->ue_endp);
+	}
+	printk(KERN_NOTICE "]\n");
+
+	/* Go through loaded drivers and try to have drivers bind the interface. */
+	probes = probe_interface.get();
+	{
+		FINALLY_DECREF_UNLIKELY(probes);
+		for (i = 0; i < probes->upv_count; ++i) {
+			/* Try to identify this interface/endpoint combination. */
+			if ((*probes->upv_elem[i].c_intf)(self, intf, endpc, endpv))
+				return;
+		}
+	}
+	/* Create a descriptor to keep track of the unknown interface. */
+	if unlikely(ATOMIC_READ(usb_unknowns) == USB_UNKNOWNS_CLOSED)
+		return; /* No-op after USB has been finalized. */
+
+	unknown = (REF struct usb_unknown_interface *)kmalloc(offsetof(struct usb_unknown_interface, uui_endpv) +
+	                                                      (endpc * sizeof(REF struct usb_endpoint *)),
+	                                                      GFP_NORMAL);
+	unknown->uui_refcnt = 1; /* The reference inherited by `usb_unknowns' */
+	unknown->uui_ctrl   = (REF struct usb_controller *)incref(self);
+	unknown->uui_intf   = (REF struct usb_interface *)incref(intf);
+	unknown->uui_endpc  = endpc;
+	memcpy(unknown->uui_endpv, endpv, endpc * sizeof(REF struct usb_endpoint *));
+	for (i = 0; i < endpc; ++i)
+		incref(unknown->uui_endpv[i]);
+
+	/* Register the unknown interface. */
+	for (;;) {
+		REF struct usb_unknown_interface *next_unknown;
+		next_unknown = ATOMIC_READ(usb_unknowns);
+		if unlikely(next_unknown == USB_UNKNOWNS_CLOSED) {
+			/* No-op after the USB driver has been finalized. */
+			destroy(unknown);
+			return;
+		}
+		unknown->uui_next = next_unknown;
+		COMPILER_WRITE_BARRIER();
+		if (ATOMIC_CMPXCH_WEAK(usb_unknowns, next_unknown, unknown))
+			break;
+	}
+
+	printk(KERN_NOTICE "[usb] Failed to identify device %q:%q:%q with interface %q(%#x.%#x.%#x) (config %q)\n",
+	       intf->ui_device->ud_str_vendor,
+	       intf->ui_device->ud_str_product,
+	       intf->ui_device->ud_str_serial,
+	       intf->ui_intf_name,
+	       intf->ui_intf_desc->ui_intf_class,
+	       intf->ui_intf_desc->ui_intf_subclass,
+	       intf->ui_intf_desc->ui_intf_protocol,
+	       intf->ui_device->ud_config->uc_desc);
+
+	/* Check if new probes may have been added in the mean time.
+	 * If so, try once again to identify unknown devices, thus
+	 * ensuring that every probe has had a chance to identify our
+	 * new unknown interface. */
+	if unlikely(ATOMIC_READ(probe_interface.m_pointer) != probes)
+		usb_probe_identify_unknown(NULL);
+}
+
+
+
+
+
+
+
 /* Destroy the given USB endpoint descriptor */
 PUBLIC NOBLOCK void
 NOTHROW(KCALL usb_endpoint_destroy)(struct usb_endpoint *__restrict self) {
-	kfree(self->ue_str_vendor);
-	kfree(self->ue_str_product);
-	kfree(self->ue_str_serial);
+	if (self->ue_interface != self)
+		decref(self->ue_interface);
+	else {
+		struct usb_interface *intf_me;
+		intf_me = (struct usb_interface *)self;
+		if (intf_me->ui_device != self) {
+			kfree(intf_me->ui_intf_name);
+			decref(intf_me->ui_device);
+		} else {
+			u8 i;
+			struct usb_device *dev_me;
+			dev_me = (struct usb_device *)self;
+			for (i = 0; i < dev_me->ud_configc; ++i) {
+				kfree(dev_me->ud_configv[i].uc_config);
+				kfree(dev_me->ud_configv[i].uc_desc);
+			}
+			kfree(dev_me->ud_str_vendor);
+			kfree(dev_me->ud_str_product);
+			kfree(dev_me->ud_str_serial);
+		}
+	}
 	kfree(self);
 }
 
@@ -197,11 +665,11 @@ usb_controller_assign_device_address(struct usb_controller *__restrict self,
 
 
 /* Print the device string associated with `index' to the given `printer'.
- * If `index' is invalid, or the given `endp' didn't return a string, then
+ * If `index' is invalid, or the given `dev' didn't return a string, then
  * return 0 without doing anything. */
 PUBLIC ssize_t KCALL
 usb_controller_printstring(struct usb_controller *__restrict self,
-                           struct usb_endpoint *__restrict endp, u8 index,
+                           struct usb_device *__restrict dev, u8 index,
                            pformatprinter printer, void *arg) {
 	byte_t buf[256];
 	struct usb_request req;
@@ -212,21 +680,21 @@ usb_controller_printstring(struct usb_controller *__restrict self,
 	ssize_t result;
 	if (!index)
 		return 0; /* Index 0 indicates a string that isn't defined. */
-	if (!endp->ue_lang_used)
+	if (!dev->ud_lang_used)
 		return 0; /* No language string support. */
 	req.ur_reqtype = USB_REQUEST_RETYPE_DEST_DEV |
 	                 USB_REQUEST_RETYPE_TYPE_STD |
 	                 USB_REQUEST_RETYPE_DIR_D2H;
 	req.ur_request = USB_REQUEST_GET_DESCRIPTOR;
 	req.ur_value   = USB_REQUEST_GET_DESCRIPTOR_VALUE_STRING | index;
-	req.ur_index   = endp->ue_lang_used;
+	req.ur_index   = dev->ud_lang_used;
 	req.ur_length  = 1;
-	transfer_size = usb_controller_request_sync(self, endp, &req, buf);
+	transfer_size = usb_controller_request_sync(self, dev, &req, buf);
 	if (!transfer_size || buf[0] < 4)
 		return 0; /* Empty string (just ignore it...) */
 	/* Transfer the entire string. */
 	req.ur_length = buf[0];
-	transfer_size = usb_controller_request_sync(self, endp, &req, buf);
+	transfer_size = usb_controller_request_sync(self, dev, &req, buf);
 	if ((size_t)buf[0] > transfer_size)
 		buf[0] = (u8)transfer_size;
 	if (buf[0] < 4)
@@ -279,17 +747,16 @@ heap_printer(/*struct heap_printer_data **/void *arg,
 	return (ssize_t)datalen;
 }
 
-
 /* Helper wrapper for `usb_controller_printstring()'
  * This function returns a heap-allocated string, or NULL under the same
  * circumstances where `usb_controller_printstring()' would return `0' */
 PUBLIC WUNUSED ATTR_MALLOC NONNULL((1, 2)) /*utf-8*/ char *KCALL
 usb_controller_allocstring(struct usb_controller *__restrict self,
-                           struct usb_endpoint *__restrict endp, u8 index) {
+                           struct usb_device *__restrict dev, u8 index) {
 	char *result;
 	struct heap_printer_data data = { NULL, 0, 0 };
 	TRY {
-		usb_controller_printstring(self, endp, index,
+		usb_controller_printstring(self, dev, index,
 		                           &heap_printer, &data);
 	} EXCEPT {
 		kfree(data.ap_base);
@@ -317,6 +784,85 @@ usb_controller_allocstring(struct usb_controller *__restrict self,
 }
 
 
+PRIVATE WUNUSED ATTR_MALLOC struct usb_configuration_descriptor *KCALL
+usb_controller_lookup_configuration(struct usb_controller *__restrict self,
+                                    struct usb_device *__restrict dev,
+                                    u8 confno) {
+	struct usb_configuration_descriptor *result;
+	struct {
+		__uint8_t  uc_size;      /* Size of the descriptor (in bytes) */
+		__uint8_t  uc_type;      /* Descriptor type (== `(USB_REQUEST_GET_DESCRIPTOR_VALUE_CONFIGURATION & 0xff00) >> 8') */
+		__uint16_t uc_total_len; /* Total length of the descriptor (including trailing data) */
+	} header;
+	size_t transfer_size;
+	struct usb_request req;
+
+	/* Request the configuration header. */
+	req.ur_reqtype = USB_REQUEST_RETYPE_DEST_DEV |
+	                 USB_REQUEST_RETYPE_TYPE_STD |
+	                 USB_REQUEST_RETYPE_DIR_D2H;
+	req.ur_request = USB_REQUEST_GET_DESCRIPTOR;
+	req.ur_value   = USB_REQUEST_GET_DESCRIPTOR_VALUE_CONFIGURATION | confno;
+	req.ur_index   = 0;
+	req.ur_length  = sizeof(header);
+	transfer_size  = usb_controller_request_sync(self, dev, &req, &header);
+	if unlikely(header.uc_type != ((USB_REQUEST_GET_DESCRIPTOR_VALUE_CONFIGURATION & 0xff00) >> 8)) {
+		/* Not actually a configuration */
+badtype:
+		printk(KERN_WARNING "[usb] configuration descriptor #%I8u has incorrect type (%q:%q:%q)\n",
+		       confno, dev->ud_str_vendor, dev->ud_str_product, dev->ud_str_serial);
+		return NULL;
+	}
+	if unlikely(transfer_size < sizeof(header) ||
+	            header.uc_total_len < header.uc_size ||
+	            header.uc_size < offsetafter(struct usb_configuration_descriptor, uc_conf_value)) {
+badconf:
+		/* Invalid configuration constraints. */
+		printk(KERN_WARNING "[usb] Invalid configuration descriptor #%I8u (%q:%q:%q)\n",
+		       confno, dev->ud_str_vendor, dev->ud_str_product, dev->ud_str_serial);
+		return NULL;
+	}
+	result = (struct usb_configuration_descriptor *)kmalloc(header.uc_total_len,
+	                                                        GFP_NORMAL | GFP_PREFLT);
+	TRY {
+		/* Read the remainder of the configuration. */
+		req.ur_length = header.uc_total_len;
+		transfer_size = usb_controller_request_sync(self, dev, &req, result);
+	} EXCEPT {
+		kfree(result);
+		RETHROW();
+	}
+	/* Re-validate data read from the device. */
+	if unlikely(result->uc_type != ((USB_REQUEST_GET_DESCRIPTOR_VALUE_CONFIGURATION & 0xff00) >> 8)) {
+		/* Not actually a configuration */
+		kfree(result);
+		goto badtype;
+	}
+	/* Constrain returned fields by the actual amount of transferred data. */
+	if unlikely((size_t)result->uc_total_len > transfer_size)
+		result->uc_total_len = (u16)transfer_size;
+	if unlikely(result->uc_total_len > header.uc_total_len)
+		result->uc_total_len = header.uc_total_len;
+	if unlikely(transfer_size < sizeof(header) ||
+	            result->uc_total_len < result->uc_size ||
+	            result->uc_size < offsetafter(struct usb_configuration_descriptor, uc_conf_value)) {
+		kfree(result);
+		goto badconf;
+	}
+	assert(result->uc_total_len <= header.uc_total_len);
+	if unlikely(result->uc_total_len < header.uc_total_len) {
+		struct usb_configuration_descriptor *new_result;
+		new_result = (struct usb_configuration_descriptor *)krealloc_nx(result,
+		                                                                result->uc_total_len,
+		                                                                GFP_NORMAL);
+		if likely(new_result)
+			result = new_result;
+	}
+	return result;
+}
+
+
+
 /* Function called when a new USB endpoint is discovered.
  * This function should try to engage with the endpoint in
  * order to discover what type of device is connected.
@@ -334,9 +880,11 @@ PUBLIC void KCALL
 usb_device_discovered(struct usb_controller *__restrict self,
                       struct usb_device *__restrict dev) {
 	struct usb_request req;
-	struct usb_descriptor desc;
+	struct usb_device_descriptor desc;
 	size_t transfer_size;
 	alignas(2) byte_t buf[256];
+	u8 used_conf;
+	u16 device_max_packet_size;
 
 	req.ur_reqtype = USB_REQUEST_RETYPE_DEST_DEV |
 	                 USB_REQUEST_RETYPE_TYPE_STD |
@@ -344,13 +892,15 @@ usb_device_discovered(struct usb_controller *__restrict self,
 	req.ur_request = USB_REQUEST_GET_DESCRIPTOR;
 	req.ur_value   = USB_REQUEST_GET_DESCRIPTOR_VALUE_DEVICE;
 	req.ur_index   = 0;
-	/* NOTE: offsetafter(struct usb_descriptor, ud_maxpacketsize) == 8,
+	/* NOTE: offsetafter(struct usb_device_descriptor, ud_maxpacketsize) == 8,
 	 *       which is the minimum packet size supported by all devices */
-	req.ur_length = offsetafter(struct usb_descriptor, ud_maxpacketsize);
+	req.ur_length = offsetafter(struct usb_device_descriptor, ud_maxpacketsize);
 	transfer_size = usb_controller_request_sync(self, dev, &req, &desc);
 
 	/* Remember the max packet size supported by the device. */
-	if likely(transfer_size >= offsetafter(struct usb_descriptor, ud_maxpacketsize))
+	device_max_packet_size = dev->ue_maxpck;
+	if likely(transfer_size >= offsetafter(struct usb_device_descriptor, ud_maxpacketsize) &&
+	          desc.ud_type == (USB_REQUEST_GET_DESCRIPTOR_VALUE_DEVICE & 0xff00) >> 8)
 		dev->ue_maxpck = desc.ud_maxpacketsize;
 
 	/* Assign an address to the device. */
@@ -383,7 +933,8 @@ usb_device_discovered(struct usb_controller *__restrict self,
 	/* Check if we got less data than expected during the initial
 	 * `USB_REQUEST_GET_DESCRIPTOR' call above. If so, then this
 	 * is considered to be a ~strange~ device. */
-	if unlikely(transfer_size < offsetafter(struct usb_descriptor, ud_maxpacketsize))
+	if unlikely(transfer_size < offsetafter(struct usb_device_descriptor, ud_maxpacketsize) ||
+	            desc.ud_type != (USB_REQUEST_GET_DESCRIPTOR_VALUE_DEVICE & 0xff00) >> 8)
 		goto strange_device;
 
 	/* Load the remainder of the device's descriptor. */
@@ -394,8 +945,14 @@ usb_device_discovered(struct usb_controller *__restrict self,
 	req.ur_value   = USB_REQUEST_GET_DESCRIPTOR_VALUE_DEVICE;
 	req.ur_index   = 0;
 	req.ur_length  = MIN(desc.ud_size, sizeof(desc));
-	memset(&desc, 0, sizeof(desc));
-	usb_controller_request_sync(self, dev, &req, &desc);
+	transfer_size  = usb_controller_request_sync(self, dev, &req, &desc);
+	if unlikely(transfer_size < sizeof(desc))
+		memset((byte_t *)&desc + transfer_size, 0, sizeof(desc) - transfer_size);
+
+	/* Store the identification bits within the device structure. */
+	dev->ud_dev_class    = desc.ud_dev_class;
+	dev->ud_dev_subclass = desc.ud_dev_subclass;
+	dev->ud_dev_protocol = desc.ud_dev_protocol;
 
 	/* Figure out the languages supported by the device. */
 	req.ur_reqtype = USB_REQUEST_RETYPE_DEST_DEV |
@@ -417,55 +974,292 @@ usb_device_discovered(struct usb_controller *__restrict self,
 			 * https://web.archive.org/web/20120417075804/http://www.usb.org/developers/docs/USB_LANGIDs.pdf
 			 * ... And for some reason, the original page no longer exists... */
 			size_t i, count = (buf[0] - 2) / 2;
-			dev->ue_lang_used = *(u16 *)(buf + 2);
+			dev->ud_lang_used = *(u16 *)(buf + 2);
 #define LANG_EN_US 0x0409
 			/* Try to make use of English (if available) */
-			if (count > 1 && dev->ue_lang_used != LANG_EN_US) {
+			if (count > 1 && dev->ud_lang_used != LANG_EN_US) {
 				for (i = 1; i < count; ++i) {
 					u16 l = ((u16 *)(buf + 2))[i];
 					if (l == LANG_EN_US) {
-						dev->ue_lang_used = LANG_EN_US;
+						dev->ud_lang_used = LANG_EN_US;
 						break;
 					}
 				}
 			}
 		}
-		if (dev->ue_lang_used != 0) {
+		if (dev->ud_lang_used != 0) {
 			/* Load device strings. */
-			dev->ue_str_vendor  = usb_controller_allocstring(self, dev, desc.ud_str_vendor);
-			dev->ue_str_product = usb_controller_allocstring(self, dev, desc.ud_str_product);
-			dev->ue_str_serial  = usb_controller_allocstring(self, dev, desc.ud_str_serial);
+			dev->ud_str_vendor  = usb_controller_allocstring(self, dev, desc.ud_str_vendor);
+			dev->ud_str_product = usb_controller_allocstring(self, dev, desc.ud_str_product);
+			dev->ud_str_serial  = usb_controller_allocstring(self, dev, desc.ud_str_serial);
 		}
 	}
 
-	/* TODO: Gather available device configurations */
-	/* TODO: Create descriptors for each of the device's endpoints */
-	/* TODO: Notify loaded usb drivers about the newly discovered endpoint,
-	 *       allowing them to look at it and figure out if they can expose
-	 *       the endpoints functionality to us. */
+	/* Protect against weird devices with more than 16 configurations.
+	 * The USB protocol makes it impossible to query information about
+	 * more than 16 possible configurations! */
+	if unlikely(desc.ud_confcount > 16) {
+		printk(KERN_WARNING "[usb] Device supports more than 16 (%I8u) configurations (%q:%q:%q)\n",
+		       desc.ud_confcount, dev->ud_str_vendor, dev->ud_str_product, dev->ud_str_serial);
+		desc.ud_confcount = 16;
+	}
 
-	printk(KERN_DEBUG "ud_size          = %#I8x\n", desc.ud_size);
-	printk(KERN_DEBUG "ud_type          = %#I8x\n", desc.ud_type);
-	printk(KERN_DEBUG "ud_usbver        = %#I16x\n", desc.ud_usbver);
-	printk(KERN_DEBUG "ud_dev_class     = %#I8x\n", desc.ud_dev_class);
-	printk(KERN_DEBUG "ud_dev_subclass  = %#I8x\n", desc.ud_dev_subclass);
-	printk(KERN_DEBUG "ud_dev_protocol  = %#I8x\n", desc.ud_dev_protocol);
-	printk(KERN_DEBUG "ud_maxpacketsize = %#I8x\n", desc.ud_maxpacketsize);
-	printk(KERN_DEBUG "ud_vendid        = %#I16x\n", desc.ud_vendid);
-	printk(KERN_DEBUG "ud_prodid        = %#I16x\n", desc.ud_prodid);
-	printk(KERN_DEBUG "ud_devicever     = %#I16x\n", desc.ud_devicever);
-	printk(KERN_DEBUG "ud_str_vendor    = %#I8x\n", desc.ud_str_vendor);
-	printk(KERN_DEBUG "ud_str_product   = %#I8x\n", desc.ud_str_product);
-	printk(KERN_DEBUG "ud_str_serial    = %#I8x\n", desc.ud_str_serial);
-	printk(KERN_DEBUG "ud_confcount     = %#I8x\n", desc.ud_confcount);
-	printk(KERN_DEBUG "ue_str_vendor    = %q\n", dev->ue_str_vendor);
-	printk(KERN_DEBUG "ue_str_product   = %q\n", dev->ue_str_product);
-	printk(KERN_DEBUG "ue_str_serial    = %q\n", dev->ue_str_serial);
+	/* The USB specs mandate that any device has at least one configuration.
+	 * And I'm inclined to share that opinion, so anything that doesn't have
+	 * at least one configuration is considered a ~strange~ device. */
+	if unlikely(!desc.ud_confcount) {
+strange_device_without_configs:
+		printk(KERN_WARNING "[usb] Device %q:%q:%q doesn't seem to have any valid configurations\n",
+		       dev->ud_str_vendor, dev->ud_str_product, dev->ud_str_serial);
+		goto strange_device;
+	}
 
+	/* Gather available device configurations */
+	{
+		u8 i, j;
+		/* Must set the max config count beforehand, so that `usb_endpoint_destroy()'
+		 * can easily clean up successfully loaded configurations on error. */
+		dev->ud_configc = desc.ud_confcount;
+		for (i = j = 0; i < desc.ud_confcount; ++i) {
+			struct usb_configuration_descriptor *conf;
+			/* Load the configuration itself. */
+			conf = usb_controller_lookup_configuration(self, dev, i);
+			if unlikely(!conf)
+				continue;
+			dev->ud_configv[j].uc_config = conf;
+			/* Load the configuration description. */
+			if (conf->uc_size >= offsetafter(struct usb_configuration_descriptor, uc_conf_name))
+				dev->ud_configv[j].uc_desc = usb_controller_allocstring(self, dev, conf->uc_conf_name);
+			++j;
+		}
+		dev->ud_configc = j;
+		/* Same as above: We need at least 1 valid configuration. */
+		if unlikely(!j)
+			goto strange_device_without_configs;
+	}
+
+	used_conf = 0;
+	if (dev->ud_configc != 1) {
+		/* Handle multi-purpose devices (e.g. a printer/scanner combo). */
+		u8 i;
+		/* A device class of 0 indicates that the device's different classes operate independently. */
+		if (dev->ud_dev_class != 0) {
+			size_t i;
+			REF struct usb_probe_vector *probes;
+			probes = probe_device.get();
+			FINALLY_DECREF_UNLIKELY(probes);
+			/* Pass the device as a whole to loaded drivers and see if they can
+			 * identify that's the deal with it, and select the configuration
+			 * for us. */
+			for (i = 0; i < probes->upv_count; ++i) {
+#ifndef NDEBUG
+				memset(&dev->ud_config, 0xcc, sizeof(dev->ud_config));
+#endif /* !NDEBUG */
+				if ((*probes->upv_elem[i].c_device)(self, dev)) {
+#ifndef NDEBUG
+					unsigned int j;
+					for (j = 0; j < dev->ud_configc; ++j) {
+						if (dev->ud_config == &dev->ud_configv[j])
+							goto did_find_correct_config;
+					}
+					__assertion_failedf("dev->ud_config in dev->ud_configv",
+					                    "Devie config %p is not a valid configuration",
+					                    dev->ud_config);
+did_find_correct_config:
+#endif /* !NDEBUG */
+					goto done;
+				}
+			}
+		}
+		/* XXX: Change the API to allow for simultaneous use of multi-function
+		 *      USB devices, by switching between configurations on-the-fly? */
+		used_conf = 0; /* ??? (Maybe prioritize certain options over others?) */
+		printk(KERN_WARNING "[usb] Multi-function device %q:%q:%q not recognized. Available configurations are:\n",
+		       dev->ud_str_vendor, dev->ud_str_product, dev->ud_str_serial);
+		for (i = 0; i < dev->ud_configc; ++i) {
+			printk(KERN_WARNING "[usb] Config#%u: %q\n",
+			       i, dev->ud_configv[i].uc_desc);
+		}
+		printk(KERN_WARNING "[usb] Configuring as %q\n",
+		       dev->ud_configv[used_conf].uc_desc);
+	}
+	req.ur_reqtype = USB_REQUEST_RETYPE_DEST_DEV |
+	                 USB_REQUEST_RETYPE_TYPE_STD |
+	                 USB_REQUEST_RETYPE_DIR_H2D;
+	req.ur_request = USB_REQUEST_SET_CONFIGURATION;
+	req.ur_value   = dev->ud_configv[used_conf].uc_config->uc_conf_value;
+	req.ur_index   = 0;
+	req.ur_length  = 0;
+	dev->ud_config = &dev->ud_configv[used_conf];
+	printk(KERN_NOTICE "[usb] Set configuration for %q:%q:%q to %q (conf#%I8u)\n",
+	       dev->ud_str_vendor, dev->ud_str_product, dev->ud_str_serial,
+	       dev->ud_config->uc_desc, used_conf);
+	usb_controller_request_sync(self, dev, &req, NULL);
+
+	/* Create endpoints for every interface:endpoint pair that we can find
+	 * within the selected configuration. Then, pass those endpoints to loaded
+	 * drivers in order to try and figure out an appropriate driver.
+	 * And if that doesn't work, just turn all of them into strange USB endpoints. */
+	{
+		size_t interface_count = 0;
+		byte_t *iter, *end;
+		struct usb_configuration_descriptor *config;
+		u16 used_endpoints = 1;
+		bool allow_alternates = false;
+		bool has_alternates = false;
+		config = dev->ud_config->uc_config;
+again_scanconfig:
+		iter   = (byte_t *)config + config->uc_size;
+		end    = (byte_t *)config + config->uc_total_len;
+		while (iter + 2 < end) {
+			u8 size, type;
+			size = iter[0];
+			type = iter[1];
+			if unlikely(size < 2)
+				break;
+			if unlikely((size_t)size > (size_t)(end - iter)) {
+				size = (u8)(size_t)(end - iter);
+				iter[0] = size;
+			}
+			if (type == ((USB_REQUEST_GET_DESCRIPTOR_VALUE_INTERFACE & 0xff00) >> 8) &&
+			    size >= offsetafter(struct usb_interface_descriptor, ui_intf_protocol)) {
+				REF struct usb_endpoint *interface_endpts[16];
+				REF struct usb_interface *intf;
+				struct usb_interface_descriptor *intf_desc;
+				size_t interface_endpoint_count = 0;
+				intf_desc = (struct usb_interface_descriptor *)iter;
+				if (intf_desc->ui_alt_setting != 0) {
+					has_alternates = true;
+					if (!allow_alternates)
+						goto search_for_next_intf;
+				}
+				intf = (REF struct usb_interface *)kmalloc(sizeof(struct usb_interface), GFP_NORMAL);
+				intf->ue_refcnt    = 1;
+				intf->ue_interface = intf;
+				intf->ue_maxpck    = dev->ue_maxpck;
+				intf->ue_dev       = dev->ue_dev;
+				intf->ue_endp      = 0; /* Interface descriptors always refer to endpoint 0 */
+				intf->ue_flags     = dev->ue_flags & ~(USB_ENDPOINT_FLAG_DATATOGGLE);
+				intf->ue_endp_desc = NULL;
+				intf->ui_device    = (REF struct usb_device *)incref(dev);
+				intf->ui_intf      = intf_desc->ui_intf;
+				intf->ui_intf_desc = intf_desc;
+				intf->ui_intf_name = NULL;
+				FINALLY_DECREF_UNLIKELY(intf);
+				/* Load the name of the interface. */
+				if (size >= offsetafter(struct usb_interface_descriptor, ui_intf_str))
+					intf->ui_intf_name = usb_controller_allocstring(self, dev, intf_desc->ui_intf_str);
+
+				TRY {
+					/* Search for endpoints associated with this interface. */
+					iter += size;
+					while (iter + 2 < end) {
+						size = iter[0];
+						type = iter[1];
+						if unlikely(size < 2)
+							break;
+						if unlikely((size_t)size > (size_t)(end - iter)) {
+							size = (u8)(size_t)(end - iter);
+							iter[0] = size;
+						}
+						if (type == ((USB_REQUEST_GET_DESCRIPTOR_VALUE_ENDPOINT & 0xff00) >> 8) &&
+						    size >= offsetafter(struct usb_endpoint_descriptor, ue_addr)) {
+							REF struct usb_endpoint *endp;
+							struct usb_endpoint_descriptor *endp_desc;
+							u16 addr_mask;
+							endp_desc = (struct usb_endpoint_descriptor *)iter;
+							/* Ignore descriptors for endpoint #0 (that one's always just the control endpoint) */
+							if ((endp_desc->ue_addr & USB_ENDPOINT_ADDR_INDEX) == 0)
+								goto search_for_next_endp;
+							addr_mask = (u16)1 << (endp_desc->ue_addr & USB_ENDPOINT_ADDR_INDEX);
+							if unlikely(used_endpoints & addr_mask) {
+								printk(KERN_WARNING "[usb] Endpoint %u of interface %q on device %q:%q:%q "
+								                    "is already in use and cannot be bound more than once\n",
+								       endp_desc->ue_addr & USB_ENDPOINT_ADDR_INDEX, intf->ui_intf_name,
+								       dev->ud_str_vendor, dev->ud_str_product, dev->ud_str_serial);
+								goto search_for_next_endp;
+							}
+							used_endpoints |= addr_mask;
+							endp = (REF struct usb_endpoint *)kmalloc(sizeof(struct usb_endpoint), GFP_NORMAL);
+							endp->ue_refcnt    = 1;
+							endp->ue_interface = (REF struct usb_interface *)incref(intf);
+							endp->ue_maxpck    = device_max_packet_size;
+							if likely(size >= offsetafter(struct usb_endpoint_descriptor, ue_maxpacketsize))
+								endp->ue_maxpck = endp_desc->ue_maxpacketsize;
+							else {
+								/* Don't run any risks, and use the size limit from the control channel.
+								 * However, for properly functioning devices, we shouldn't even get here. */
+								endp->ue_maxpck = intf->ue_maxpck;
+							}
+							endp->ue_dev   = intf->ue_dev;
+							endp->ue_endp  = endp_desc->ue_addr & USB_ENDPOINT_ADDR_INDEX;
+							endp->ue_flags = dev->ue_flags & USB_ENDPOINT_FLAG_LOWSPEED;
+							if (endp_desc->ue_addr & USB_ENDPOINT_ADDR_IN)
+								endp->ue_flags |= USB_ENDPOINT_FLAG_INPUT;
+							endp->ue_endp_desc = endp_desc;
+							assert(interface_endpoint_count < 16);
+							interface_endpts[interface_endpoint_count] = endp; /* Inherit reference */
+							++interface_endpoint_count;
+						}
+search_for_next_endp:
+						iter += size;
+					}
+					if likely(interface_endpoint_count != 0) {
+						/* Notify the system of the discovery of this
+						 * interface, as well as associated endpoints. */
+						usb_interface_discovered(self, intf,
+						                         interface_endpoint_count,
+						                         interface_endpts);
+					} else {
+						/* Interface without any endpoints (shouldn't happen) */
+						printk(KERN_WARNING "[usb] Interface %q of device %q:%q:%q configured "
+						                    "with %q doesn't seem to have any endpoints\n",
+						       intf->ui_intf_name, dev->ud_str_vendor, dev->ud_str_product,
+						       dev->ud_str_serial, dev->ud_config->uc_desc);
+					}
+					++interface_count;
+				} EXCEPT {
+					while (interface_endpoint_count) {
+						--interface_endpoint_count;
+						decref(interface_endpts[interface_endpoint_count]);
+					}
+					RETHROW();
+				}
+				while (interface_endpoint_count) {
+					--interface_endpoint_count;
+					decref(interface_endpts[interface_endpoint_count]);
+				}
+				if (iter + 2 >= end)
+					break;
+			}
+search_for_next_intf:
+			iter += size;
+		}
+		if (!allow_alternates && has_alternates && used_endpoints != (u16)-1) {
+			/* Do a second scan where we  */
+			allow_alternates = true;
+			goto again_scanconfig;
+		}
+
+		/* If we didn't manage to find any interface, then just consider
+		 * this to be a strange device altogether.
+		 * Note that this has nothing to do with us not finding a driver
+		 * for the endpoint, but just not being able to  */
+		if unlikely(!interface_count) {
+			printk(KERN_WARNING "[usb] Device %q:%q:%q doesn't seem to have any interfaces when configured for %q\n",
+			       dev->ud_str_vendor, dev->ud_str_product, dev->ud_str_serial,
+			       dev->ud_config->uc_desc);
+			goto strange_device;
+		}
+	}
+done:
 	return;
 strange_device:
-	/* TODO: Register the device as a generic character device. */
-	;
+	/* Register the device as a generic character device,
+	 * but don't pass the device for the purpose of endpoint
+	 * detection to loaded drivers. */
+	dev->ue_flags |= USB_ENDPOINT_FLAG_STRANGE;
+	usb_create_strange_device(self, dev);
 }
 
 

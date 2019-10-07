@@ -21,42 +21,91 @@
 
 #include <kernel/compiler.h>
 
-#include <hybrid/sync/atomic-rwlock.h>
-#include <kernel/types.h>
-#include <bits/format-printer.h>
 #include <dev/char.h>
+#include <kernel/types.h>
+
+#include <hybrid/sync/atomic-rwlock.h>
+
+#include <bits/format-printer.h>
+
+#include <stdbool.h>
 
 DECL_BEGIN
 
+struct usb_device;
+struct usb_interface;
+
 struct usb_endpoint {
-	WEAK refcnt_t ue_refcnt;       /* Reference counter. */
-	char         *ue_str_vendor;   /* [0..1][const][owned] Device vendor name (NUL-terminated utf-8 string) */
-	char         *ue_str_product;  /* [0..1][const][owned] Device product name (NUL-terminated utf-8 string) */
-	char         *ue_str_serial;   /* [0..1][const][owned] Device serial number (NUL-terminated utf-8 string) */
-	u16           ue_lang_used;    /* [const] Language code used for strings (or 0 if unsupported). */
-	u16           ue_maxpck;       /* [const] Max packet size. */
-	u8            ue_dev;          /* [const] Device address. */
-	u8            ue_endp;         /* [const] Endpoint index. */
-	unsigned int  ue_toggle : 1;   /* Data toggle bit. */
-	unsigned int  ue_lowspeed : 1; /* Low-speed device. */
+	WEAK refcnt_t                    ue_refcnt;    /* Reference counter. */
+	REF struct usb_interface        *ue_interface; /* [1..1][const][ref_if(!= this)] The associated interface.
+	                                                * Note that an interface is also always a descriptor for endpoint 0! */
+	u16                              ue_maxpck;    /* [const] Max packet size allowed by this endpoint. */
+	u8                               ue_dev;       /* [const] Device address. */
+	u8                               ue_endp;      /* [const] Endpoint index (always 0 when `ue_interface == this'). */
+#define USB_ENDPOINT_FLAG_DATATOGGLE 0x0001        /* Data toggle bit. */
+#define USB_ENDPOINT_FLAG_LOWSPEED   0x0100        /* [const] Low-speed device. */
+#define USB_ENDPOINT_FLAG_INPUT      0x0200        /* [const] Input-only endpoint (when clear: output-only endpoint).
+	                                                * Note that when `ue_endp == 0', then both input and output are allowed! */
+#define USB_ENDPOINT_FLAG_STRANGE    0x0400        /* [const] Set for strange devices (and strange devices only!) */
+	u32                              ue_flags;     /* Flags (Set of `USB_ENDPOINT_FLAG_*') */
+	struct usb_endpoint_descriptor  *ue_endp_desc; /* [1..1][const][valid_if(ue_interface != this)]
+	                                                * The endpoint's descriptor (set to NULL if invalid). */
 };
 
 /* Destroy the given USB endpoint descriptor */
 FUNDEF NOBLOCK void NOTHROW(KCALL usb_endpoint_destroy)(struct usb_endpoint *__restrict self);
 DEFINE_REFCOUNT_FUNCTIONS(struct usb_endpoint, ue_refcnt, usb_endpoint_destroy)
 
-struct usb_device
+struct usb_interface
 #ifdef __cplusplus
 	: usb_endpoint
 #endif /* __cplusplus */
 {
 #ifndef __cplusplus
-	struct usb_endpoint    ud_endp; /* Endpoint 0 (ue_endp==0). */
+	struct usb_endpoint              ui_endp;      /* The associated endpoint. */
 #endif /* !__cplusplus */
-	REF struct usb_device *ud_next; /* [0..1][lock(:uc_endpt_lock)] Next device within the associated controller. */
-	u8                     ud_dev;  /* [const] Device address (usually equals `ue_dev', except during the address-assign phase).
-	                                 * Essentially, when it comes to checking which addresses are already in use,
-	                                 * use `ud_dev'. When it comes to actually talking to a device, use `ue_dev'! */
+	REF struct usb_device           *ui_device;    /* [1..1][const][ref_if(!= this)] The associated device.
+	                                                * Note that a device is also always a descriptor for endpoint 0!
+	                                                * Though also note that an interface is also a descriptor for endpoint 0. */
+	u8                               ui_intf;      /* [const][valid_if(ui_device != this)][== ue_intf_desc->ui_intf]
+	                                                * Interface index. (part of the USB protocol; not part of the packet addressing system) (set to `0' if invalid) */
+	struct usb_interface_descriptor *ui_intf_desc; /* [1..1][const][valid_if(ui_device != this)]
+	                                                * The interface's descriptor (set to NULL if invalid). */
+	char                            *ui_intf_name; /* [0..1][const][valid_if(ui_device != this)][owned]
+	                                                * Name of the interface (if available) (set to NULL if invalid). */
+};
+
+struct usb_configuration {
+	struct usb_configuration_descriptor *uc_config; /* [1..1][owned] Configuration. */
+	char                                *uc_desc;   /* [0..1][owned] An optional string describing this config. */
+};
+
+struct usb_device
+#ifdef __cplusplus
+	: usb_interface
+#endif /* __cplusplus */
+{
+#ifndef __cplusplus
+	struct usb_interface      ud_intf;         /* The associated interface. */
+#endif /* !__cplusplus */
+	REF struct usb_device    *ud_next;         /* [0..1][lock(:uc_endpt_lock)] Next device within the associated controller. */
+	char                     *ud_str_vendor;   /* [0..1][const][owned] Device vendor name (NUL-terminated utf-8 string) */
+	char                     *ud_str_product;  /* [0..1][const][owned] Device product name (NUL-terminated utf-8 string) */
+	char                     *ud_str_serial;   /* [0..1][const][owned] Device serial number (NUL-terminated utf-8 string) */
+	struct usb_configuration *ud_config;       /* [1..1][const] Used configuration. (WARNING: May be NULL for strange devices; s.a. `USB_ENDPOINT_FLAG_STRANGE') */
+	struct usb_configuration  ud_configv[16];  /* [1..ud_configc] Vector of possible configurations.
+	                                            * Each entry in this vector has a total size of `ENT->uc_total_len' bytes,
+	                                            * with the main descriptor being followed by a variable number of additional
+	                                            * descriptors, starting at `(byte_t *)ENT + ENT->uc_size', each of which is
+	                                            * lead by a 2-byte pair `byte_t SIZE, TYPE;' */
+	u16                       ud_lang_used;    /* [const] Language code used for strings (or 0 if unsupported). */
+	u8                        ud_dev;          /* [const] Device address (usually equals `ue_dev', except during the address-assign phase).
+	                                            * Essentially, when it comes to checking which addresses are already in use,
+	                                            * use `ud_dev'. When it comes to actually talking to a device, use `ue_dev'! */
+	u8                        ud_dev_class;    /* [const] Device class */
+	u8                        ud_dev_subclass; /* [const] Device subclass */
+	u8                        ud_dev_protocol; /* [const] Device protocol */
+	u8                        ud_configc;      /* [const][< 16] Number of available configurations */
 };
 
 
@@ -194,11 +243,11 @@ usb_controller_request_sync(struct usb_controller *__restrict self,
                             void *buf);
 
 /* Print the device string associated with `index' to the given `printer'.
- * If `index' is invalid, or the given `endp' didn't return a string, then
+ * If `index' is invalid, or the given `dev' didn't return a string, then
  * return 0 without doing anything. */
 FUNDEF NONNULL((1, 2, 4)) ssize_t KCALL
 usb_controller_printstring(struct usb_controller *__restrict self,
-                           struct usb_endpoint *__restrict endp, u8 index,
+                           struct usb_device *__restrict dev, u8 index,
                            __pformatprinter printer, void *arg);
 
 /* Helper wrapper for `usb_controller_printstring()'
@@ -206,15 +255,15 @@ usb_controller_printstring(struct usb_controller *__restrict self,
  * circumstances where `usb_controller_printstring()' would return `0' */
 FUNDEF WUNUSED ATTR_MALLOC NONNULL((1, 2)) /*utf-8*/ char *KCALL
 usb_controller_allocstring(struct usb_controller *__restrict self,
-                           struct usb_endpoint *__restrict endp, u8 index);
+                           struct usb_device *__restrict dev, u8 index);
 
 
 
 /* Function called when a new USB endpoint is discovered.
  * This function should try to engage with the endpoint in
  * order to discover what type of device is connected.
- * Note that the given `endp->ue_endp' is always `0' (configure
- * pipe), and that `endp->ue_dev' is also ZERO(0) (aka.: not
+ * Note that the given `dev->ue_endp' is always `0' (configure
+ * pipe), and that `dev->ue_dev' is also ZERO(0) (aka.: not
  * configured), with this function then being expected to
  * initialize those values before trying to detect the type
  * of connected device, as well as passing the endpoint to
@@ -226,6 +275,51 @@ usb_controller_allocstring(struct usb_controller *__restrict self,
 FUNDEF void KCALL
 usb_device_discovered(struct usb_controller *__restrict self,
                       struct usb_device *__restrict dev);
+
+
+/* Try to bind the given USB device `dev' to a driver.
+ * This function should look at `dev->ud_dev_(class|subclass|protocol)'
+ * in order to determine the type of connected device.
+ * If all registered callbacks fail to identify the device, at least one
+ * of the device's configurations will be chosen, which will then be used
+ * to scan for interfaces, which are then passed to callbacks registered
+ * with `usb_register_interface_probe()'
+ * @assume(dev->ud_configc >= 2);
+ * @assume(dev->ud_dev_class != 0);
+ * @return: true:  The device was discovered successfully.
+ *                 In this case, the callback will have initialized
+ *                 `dev->ud_config' to point to the appropriate configuration.
+ * @return: false: The device wasn't recognized. */
+typedef bool (KCALL *PUSB_DEVICE_PROBE)(struct usb_controller *__restrict self,
+                                        struct usb_device *__restrict dev);
+
+/* Try to bind the given `intf', as well as the associated endpoints a driver.
+ * This function should be implemented by USB driver providers, and should look
+ * at `intf->ui_intf_desc->ui_intf_(class|subclass|protocol)' in order to determine
+ * if the interface's classification is recognized by the specific driver.
+ * If the interface isn't recognized, the function should bail out and return `false'
+ * @assume(endpc != 0)
+ * @assume(endpv[0..endpc-1] != NULL)
+ * @return: true:  The interface was discovered successfully.
+ * @return: false: The interface wasn't recognized. */
+typedef bool (KCALL *PUSB_INTERFACE_PROBE)(struct usb_controller *__restrict self,
+                                           struct usb_interface *__restrict intf,
+                                           size_t endpc, struct usb_endpoint *const endpv[]);
+
+/* Register/unregister USB device/interface probe callbacks that get invoked
+ * when a new device is discovered.
+ * Note that device probes are only invoked for multi-function devices (i.e. ones
+ * with multiple configurations), and have the purpose to allow drivers to be provided
+ * for combinations of certain devices.
+ * NOTE: After registering a new interface probe function, any USB interface that had
+ *       not been recognized at that point will immediately be probed using the given
+ *       `func' before returning. */
+FUNDEF bool KCALL usb_register_device_probe(PUSB_DEVICE_PROBE func) THROWS(E_WOULDBLOCK, E_BADALLOC);
+FUNDEF bool KCALL usb_register_interface_probe(PUSB_INTERFACE_PROBE func) THROWS(E_WOULDBLOCK, E_BADALLOC);
+FUNDEF bool KCALL usb_unregister_device_probe(PUSB_DEVICE_PROBE func) THROWS(E_WOULDBLOCK, E_BADALLOC);
+FUNDEF bool KCALL usb_unregister_interface_probe(PUSB_INTERFACE_PROBE func) THROWS(E_WOULDBLOCK, E_BADALLOC);
+
+
 
 
 
