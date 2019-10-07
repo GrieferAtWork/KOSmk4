@@ -21,30 +21,55 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/malloc.h>
+#include <hybrid/sync/atomic-rwlock.h>
 #include <kernel/types.h>
+#include <bits/format-printer.h>
 #include <dev/char.h>
 
 DECL_BEGIN
 
 struct usb_endpoint {
 	WEAK refcnt_t ue_refcnt;       /* Reference counter. */
+	char         *ue_str_vendor;   /* [0..1][const][owned] Device vendor name (NUL-terminated utf-8 string) */
+	char         *ue_str_product;  /* [0..1][const][owned] Device product name (NUL-terminated utf-8 string) */
+	char         *ue_str_serial;   /* [0..1][const][owned] Device serial number (NUL-terminated utf-8 string) */
+	u16           ue_lang_used;    /* [const] Language code used for strings (or 0 if unsupported). */
 	u16           ue_maxpck;       /* [const] Max packet size. */
 	u8            ue_dev;          /* [const] Device address. */
 	u8            ue_endp;         /* [const] Endpoint index. */
 	unsigned int  ue_toggle : 1;   /* Data toggle bit. */
 	unsigned int  ue_lowspeed : 1; /* Low-speed device. */
 };
-DEFINE_REFCOUNT_FUNCTIONS(struct usb_endpoint, ue_refcnt, kfree)
 
+/* Destroy the given USB endpoint descriptor */
+FUNDEF NOBLOCK void NOTHROW(KCALL usb_endpoint_destroy)(struct usb_endpoint *__restrict self);
+DEFINE_REFCOUNT_FUNCTIONS(struct usb_endpoint, ue_refcnt, usb_endpoint_destroy)
+
+struct usb_device
+#ifdef __cplusplus
+	: usb_endpoint
+#endif /* __cplusplus */
+{
+#ifndef __cplusplus
+	struct usb_endpoint    ud_endp; /* Endpoint 0 (ue_endp==0). */
+#endif /* !__cplusplus */
+	REF struct usb_device *ud_next; /* [0..1][lock(:uc_endpt_lock)] Next device within the associated controller. */
+	u8                     ud_dev;  /* [const] Device address (usually equals `ue_dev', except during the address-assign phase).
+	                                 * Essentially, when it comes to checking which addresses are already in use,
+	                                 * use `ud_dev'. When it comes to actually talking to a device, use `ue_dev'! */
+};
 
 
 struct usb_transfer {
 	struct usb_transfer *ut_next;   /* [0..1] Next transfer packet. */
-#define USB_TRANSFER_TYPE_IN    0   /* Receive data. */
-#define USB_TRANSFER_TYPE_OUT   1   /* Send data. */
-#define USB_TRANSFER_TYPE_SETUP 2   /* Send control data. */
-#define USB_TRANSFER_TYPE_COUNT 3   /* # of transfer types */
+#define USB_TRANSFER_TYPE_IN          0 /* Receive data. */
+#define USB_TRANSFER_TYPE_OUT         1 /* Send data. */
+#define USB_TRANSFER_TYPE_FLAG_STATUS 2 /* Flag for getting the proper status-stage type, to-be or'd to a data-stage type.
+	                                     * Note that this is the reverse direction of the data stage packet. */
+#define USB_TRANSFER_TYPE_OUT_STATUS  2 /* Out status packet */
+#define USB_TRANSFER_TYPE_IN_STATUS   3 /* In status packet */
+#define USB_TRANSFER_TYPE_SETUP       4 /* Send control data. */
+#define USB_TRANSFER_TYPE_COUNT       5 /* # of transfer types */
 	uintptr_quarter_t    ut_type;   /* Transfer type (One of `USB_TRANSFER_TYPE_*'). */
 #define USB_TRANSFER_FLAG_NORMAL 0x00 /* Normal transfer flags. */
 #define USB_TRANSFER_FLAG_SHORT  0x01 /* Allow short packets (used buffer size must not necessarily match given size). */
@@ -71,8 +96,10 @@ struct usb_controller
 #endif /* __cplusplus */
 {
 #ifndef __cplusplus
-	struct character_device uc_dev; /* The underlying character device. */
+	struct character_device uc_dev;      /* The underlying character device. */
 #endif /* !__cplusplus */
+	struct atomic_rwlock    uc_devslock; /* Lock for `uc_devs' */
+	REF struct usb_device  *uc_devs;     /* [0..1][lock(uc_devslock)] Chain of known USB devices. */
 	/* [1..1] Perform a one-time transfer of a sequence of packets.
 	 * This is the primary functions for OS-initiated communications
 	 * with connected USB devices.
@@ -97,6 +124,10 @@ struct usb_controller
 	                     /*out*/ struct aio_handle *__restrict aio);
 	/* TODO: Interface for registering Isochronous interrupt handlers. */
 };
+
+#define usb_controller_cinit(self)              \
+	(atomic_rwlock_cinit(&(self)->uc_devslock), \
+	 __hybrid_assert((self)->uc_devs == __NULLPTR))
 
 
 /* Perform a one-time transfer of a sequence of packets.
@@ -131,11 +162,51 @@ usb_controller_transfer(struct usb_controller *__restrict self,
 /* Same as `usb_controller_transfer()', but wait for the transfer to
  * complete (essentially just a wrapper using `struct aio_handle_generic')
  * @return: * : The total number of transferred bytes. */
-FUNDEF size_t KCALL
+FUNDEF NONNULL((1, 2, 3)) size_t KCALL
 usb_controller_transfer_sync(struct usb_controller *__restrict self,
                              struct usb_endpoint *__restrict endp,
                              struct usb_transfer const *__restrict tx);
 
+
+/* Perform a USB control request.
+ * This causes a sequence of at least 3 packets to be sent
+ * out to the specified endpoint, starting with a token
+ * command packet containing the given `request', followed
+ * by as many in/out data packets for interfacing with `buf',
+ * and finally followed by a handshake packet
+ * @param: buf: A buffer of `request->ur_length' bytes used for
+ *              request input/output data.
+ *              The flag `request->ur_reqtype & USB_REQUEST_RETYPE_DIR_D2H'
+ *              determines the direction in which data is send to/from
+ *              the device. */
+FUNDEF NONNULL((1, 2, 3, 5)) void KCALL
+usb_controller_request(struct usb_controller *__restrict self,
+                       struct usb_endpoint *__restrict endp,
+                       struct usb_request const *__restrict request,
+                       void *buf, /*out*/ struct aio_handle *__restrict aio);
+
+/* Same as `usb_controller_request()', but wait for the operation to complete.
+ * Additionally, return the number of bytes written to, or read from `buf' */
+FUNDEF NONNULL((1, 2, 3)) size_t KCALL
+usb_controller_request_sync(struct usb_controller *__restrict self,
+                            struct usb_endpoint *__restrict endp,
+                            struct usb_request const *__restrict request,
+                            void *buf);
+
+/* Print the device string associated with `index' to the given `printer'.
+ * If `index' is invalid, or the given `endp' didn't return a string, then
+ * return 0 without doing anything. */
+FUNDEF NONNULL((1, 2, 4)) ssize_t KCALL
+usb_controller_printstring(struct usb_controller *__restrict self,
+                           struct usb_endpoint *__restrict endp, u8 index,
+                           __pformatprinter printer, void *arg);
+
+/* Helper wrapper for `usb_controller_printstring()'
+ * This function returns a heap-allocated string, or NULL under the same
+ * circumstances where `usb_controller_printstring()' would return `0' */
+FUNDEF WUNUSED ATTR_MALLOC NONNULL((1, 2)) /*utf-8*/ char *KCALL
+usb_controller_allocstring(struct usb_controller *__restrict self,
+                           struct usb_endpoint *__restrict endp, u8 index);
 
 
 
@@ -147,11 +218,14 @@ usb_controller_transfer_sync(struct usb_controller *__restrict self,
  * configured), with this function then being expected to
  * initialize those values before trying to detect the type
  * of connected device, as well as passing the endpoint to
- * the appropriate driver. */
+ * the appropriate driver.
+ * NOTE: This function is also responsible for assigning an
+ *       address to the device, meaning that the caller should
+ *       not yet insert `dev' into `self->uc_devs'. Doing this
+ *       is part of this function's job. */
 FUNDEF void KCALL
-usb_endpoint_discovered(struct usb_controller *__restrict self,
-                        struct usb_endpoint *__restrict endp);
-
+usb_device_discovered(struct usb_controller *__restrict self,
+                      struct usb_device *__restrict dev);
 
 
 

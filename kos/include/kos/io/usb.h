@@ -55,7 +55,18 @@ __SYSDECL_BEGIN
 
 
 /* Standard (USB_REQUEST_RETYPE_TYPE_STD) USB requests */
-#define USB_REQUEST_GET_STATUS 0x00 /* LEN=2 */
+#define USB_REQUEST_GET_STATUS     0x00 /* LEN=2 */
+#define USB_REQUEST_SET_ADDRESS    0x05 /* Set device address. (new address is `ur_value', but must be <= 127) */
+#define USB_REQUEST_GET_DESCRIPTOR 0x06 /* Read the device's descriptor structure
+                                         * The `ur_value' field must be one of `USB_REQUEST_GET_DESCRIPTOR_VALUE_*' */
+#define    USB_REQUEST_GET_DESCRIPTOR_VALUE_DEVICE                    0x0100 /* `struct usb_descriptor' */
+#define    USB_REQUEST_GET_DESCRIPTOR_VALUE_CONFIGURATION             0x0200
+#define    USB_REQUEST_GET_DESCRIPTOR_VALUE_STRING                    0x0300
+#define    USB_REQUEST_GET_DESCRIPTOR_VALUE_INTERFACE                 0x0400
+#define    USB_REQUEST_GET_DESCRIPTOR_VALUE_ENDPOINT                  0x0500
+#define    USB_REQUEST_GET_DESCRIPTOR_VALUE_DEVICE_QUALIFIER          0x0600
+#define    USB_REQUEST_GET_DESCRIPTOR_VALUE_OTHER_SPEED_CONFIGURATION 0x0700
+#define    USB_REQUEST_GET_DESCRIPTOR_VALUE_INTERFACE_POWER           0x0800
 
 
 
@@ -70,6 +81,24 @@ struct __ATTR_PACKED usb_request {
 	                        * USB_REQUEST_RETYPE_DEST_ENDP: Set of `USB_REQUEST_ENDP_INDEX_*' */
 	__uint16_t ur_length;  /* USB_REQUEST_RETYPE_DIR_H2D: Exact buffer size of the payload.
 	                        * USB_REQUEST_RETYPE_DIR_D2H: Max buffer size of the payload. */
+};
+
+struct __ATTR_PACKED usb_descriptor {
+	/* Structure returned by `USB_REQUEST_GET_DESCRIPTOR' */
+	__uint8_t  ud_size;           /* Size of the descriptor (in bytes) */
+	__uint8_t  ud_type;           /* Descriptor type (???) */
+	__uint16_t ud_usbver;         /* USB version (in BCD; e.g. 2.0 is 0x0200) */
+	__uint8_t  ud_dev_class;      /* Device class */
+	__uint8_t  ud_dev_subclass;   /* Device subclass */
+	__uint8_t  ud_dev_protocol;   /* Device protocol */
+	__uint8_t  ud_maxpacketsize;  /* The max packet size accepted by this device. */
+	__uint16_t ud_vendid;         /* Vendor ID */
+	__uint16_t ud_prodid;         /* Product ID */
+	__uint16_t ud_devicever;      /* Device version (in BCD; e.g. 2.0 is 0x0200) */
+	__uint8_t  ud_str_vendor;     /* Vendor name (index for `USB_REQUEST_GET_DESCRIPTOR_VALUE_STRING') */
+	__uint8_t  ud_str_product;    /* Product name (index for `USB_REQUEST_GET_DESCRIPTOR_VALUE_STRING') */
+	__uint8_t  ud_str_serial;     /* Serial number name (index for `USB_REQUEST_GET_DESCRIPTOR_VALUE_STRING') */
+	__uint8_t  ud_confcount;      /* # of possible configurations. */
 };
 #endif /* __CC__ */
 

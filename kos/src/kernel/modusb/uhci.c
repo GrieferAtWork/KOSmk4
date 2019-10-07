@@ -28,10 +28,10 @@
 #include <drivers/pci.h>
 #include <kernel/aio.h>
 #include <kernel/driver.h>
-#include <kernel/memory.h>
 #include <kernel/except.h>
 #include <kernel/heap.h>
 #include <kernel/interrupt.h>
+#include <kernel/memory.h>
 #include <kernel/printk.h>
 #include <kernel/vm.h>
 #include <sched/cpu.h>
@@ -40,9 +40,9 @@
 #include <hybrid/atomic.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
-#include <kos/io/usb.h>
-#include <kos/io/uhci.h>
 #include <kos/except-io.h>
+#include <kos/io/uhci.h>
+#include <kos/io/usb.h>
 
 #include <assert.h>
 #include <stddef.h>
@@ -51,7 +51,7 @@
 
 #include "usb.h"
 
-#if !defined(NDEBUG) && 0
+#if !defined(NDEBUG) && 1
 #define UHCI_DEBUG(...) printk(__VA_ARGS__)
 #else
 #define UHCI_DEBUG(...) (void)0
@@ -372,8 +372,8 @@ NOTHROW(FCALL uhci_osqh_completed_ioerror)(struct uhci_controller *__restrict se
 		odata = *mydat;
 		memset(mydat, 0, sizeof(*mydat));
 		mydat->e_code        = code;
-		mydat->e_pointers[0] = io_reason;
-		mydat->e_pointers[1] = E_IOERROR_SUBSYSTEM_USB;
+		mydat->e_pointers[0] = E_IOERROR_SUBSYSTEM_USB;
+		mydat->e_pointers[1] = io_reason;
 		mydat->e_pointers[2] = pointer2;
 		uhci_osqh_aio_docomplete(aio, AIO_COMPLETION_FAILURE);
 		*mydat = odata;
@@ -465,30 +465,6 @@ NOTHROW(FCALL uhci_osqh_completed)(struct uhci_controller *__restrict self,
 		uhci_osqh_aio_completed(self, osqh, aio);
 }
 
-PRIVATE NOBLOCK void
-NOTHROW(FCALL uhci_osqh_completed_badep)(struct uhci_controller *__restrict self,
-                                         struct uhci_osqh *__restrict osqh,
-                                         u32 ep) {
-	struct aio_handle *aio;
-	struct uhci_aio_data *aio_data;
-	aio = osqh->qh_aio;
-	aio_data = (struct uhci_aio_data *)aio->ah_data;
-	assert(aio_data->ud_osqh == osqh);
-	if likely(!(ATOMIC_READ(aio_data->ud_flags) & UHCI_AIO_FSERVED)) {
-		struct exception_data odata;
-		struct exception_data *mydat;
-		mydat = error_data();
-		odata = *mydat;
-		memset(mydat, 0, sizeof(*mydat));
-		mydat->e_code = ERROR_CODEOF(E_IOERROR_NODATA);
-		mydat->e_pointers[0] = E_IOERROR_REASON_UHCI_BADEP;
-		mydat->e_pointers[1] = E_IOERROR_SUBSYSTEM_USB;
-		mydat->e_pointers[2] = ep;
-		uhci_osqh_aio_docomplete(aio, AIO_COMPLETION_FAILURE);
-		*mydat = odata;
-	}
-}
-
 
 PRIVATE NOBLOCK void
 NOTHROW(FCALL uhci_osqh_unlink)(struct uhci_controller *__restrict self,
@@ -532,7 +508,10 @@ NOTHROW(FCALL uhci_finish_completed)(struct uhci_controller *__restrict self) {
 			printk(KERN_CRIT "[usb][pci:%I32p,io:%#Ix] uhci:bad:ep (%#I32p)\n",
 			       self->uc_pci->pd_base, self->uc_base.uc_mmbase, ep);
 			uhci_osqh_unlink(self, iter, piter);
-			uhci_osqh_completed_badep(self, iter, ep);
+			uhci_osqh_completed_ioerror(self, iter,
+			                            ERROR_CODEOF(E_IOERROR_NODATA),
+			                            E_IOERROR_REASON_UHCI_BADEP,
+			                            ep);
 			decref(iter);
 			continue;
 		}
@@ -562,8 +541,8 @@ NOTHROW(FCALL uhci_finish_completed)(struct uhci_controller *__restrict self) {
 		if (cs & (UHCI_TDCS_CRCTMO | UHCI_TDCS_NAKR |
 		          UHCI_TDCS_BABBLE | UHCI_TDCS_DBE |
 		          UHCI_TDCS_STALL)) {
-			printk(KERN_ERR "[usb][pci:%I32p,io:%#Ix] uhci:error (cs=%#I32x)\n",
-			       self->uc_pci->pd_base, self->uc_base.uc_mmbase, cs);
+			printk(KERN_ERR "[usb][pci:%I32p,io:%#Ix] uhci:error (cs=%#I32x,tok=%#I32x)\n",
+			       self->uc_pci->pd_base, self->uc_base.uc_mmbase, cs, ATOMIC_READ(td->td_tok));
 			uhci_osqh_unlink(self, iter, piter);
 			uhci_osqh_completed_ioerror(self, iter,
 			                            ERROR_CODEOF(E_IOERROR_ERRORBIT),
@@ -585,8 +564,9 @@ NOTHROW(FCALL uhci_finish_completed)(struct uhci_controller *__restrict self) {
 		/* Incomplete transmission (can happen when an operation is split between multiple
 		 * frames because of its size, or because it was sharing bandwidth by not having
 		 * the `UHCI_TDLP_DBS' flag set) */
-		UHCI_DEBUG(KERN_DEBUG "[usb][pci:%I32p,io:%#Ix] uhci:incomplete [ep=%#I32x,cs=%#I32x]\n",
-		           self->uc_pci->pd_base, self->uc_base.uc_mmbase, ep, cs);
+		UHCI_DEBUG(KERN_DEBUG "[usb][pci:%I32p,io:%#Ix] uhci:incomplete [ep=%#I32x,cs=%#I32x,tok=%#I32x]\n",
+		           self->uc_pci->pd_base, self->uc_base.uc_mmbase,
+		           ep, cs, ATOMIC_READ(td->td_tok));
 
 		/* In the case of depth-first, we can assume that there are no
 		 * more completed queues to be found, since that would imply that
@@ -662,7 +642,7 @@ NOTHROW(FCALL uhci_interrupt)(void *arg) {
 	}
 	if (status & UHCI_USBSTS_HCH)
 		return true; /* Halted */
-	if (status & UHCI_USBSTS_USBINT) {
+	if (status & (UHCI_USBSTS_USBINT | UHCI_USBSTS_ERROR)) {
 		/* One of two things happened:
 		 *  - A TD with the IOC bit was finished
 		 *  - Some TD got one of its error bits set. */
@@ -755,10 +735,12 @@ uhci_construct_tds(struct usb_controller *__restrict self,
 	switch (tx->ut_type) {
 
 	case USB_TRANSFER_TYPE_IN:
+	case USB_TRANSFER_TYPE_IN_STATUS:
 		tok = UHCI_TDTOK_PID_IN;
 		break;
 
 	case USB_TRANSFER_TYPE_OUT:
+	case USB_TRANSFER_TYPE_OUT_STATUS:
 		tok = UHCI_TDTOK_PID_OUT;
 		/* Disable short-packet-detect for outbound data */
 		cs &= ~UHCI_TDCS_SPD;
@@ -775,8 +757,8 @@ uhci_construct_tds(struct usb_controller *__restrict self,
 	/* Set the LowSpeedDevice bit for low-speed endpoints. */
 	if (endp->ue_lowspeed)
 		cs |= UHCI_TDCS_LSD;
-	tok |= (endp->ue_dev << UHCI_TDTOK_DEVS) & UHCI_TDTOK_DEVM;
-	tok |= (endp->ue_endp << UHCI_TDTOK_ENDPTS) & UHCI_TDTOK_ENDPTM;
+	tok |= ((u32)endp->ue_dev << UHCI_TDTOK_DEVS) & UHCI_TDTOK_DEVM;
+	tok |= ((u32)endp->ue_endp << UHCI_TDTOK_ENDPTS) & UHCI_TDTOK_ENDPTM;
 	/* Construct TD entires of up to `endp->ue_maxpck' bytes. */
 	do {
 		u16 mysize;
@@ -791,9 +773,20 @@ uhci_construct_tds(struct usb_controller *__restrict self,
 		td->td_tok = tok;
 		td->td_tok |= ((mysize - 1) << UHCI_TDTOK_MAXLENS) & UHCI_TDTOK_MAXLENM;
 		td->td_buf = (u32)start;
-		if (tx->ut_type == USB_TRANSFER_TYPE_SETUP)
-			endp->ue_toggle = 0;
-		else {
+		if (tx->ut_type > USB_TRANSFER_TYPE_OUT) {
+			/* Setup/Status stage packets. */
+			if (tx->ut_type == USB_TRANSFER_TYPE_SETUP) {
+				/* Setup packets must be followed by DTOG=1 */
+				endp->ue_toggle = 1;
+			} else {
+				/* Status packets are used to terminate the sequence and are required
+				 * to have the data toggle bit set. However, if the device is the one
+				 * to send the next data packet, then that page should come with the
+				 * data toggle bit set to 0, so remember that fact now. */
+				td->td_tok |= UHCI_TDTOK_DTOGGM;
+				endp->ue_toggle = 0;
+			}
+		} else {
 			td->td_tok |= (endp->ue_toggle << UHCI_TDTOK_DTOGGS) & UHCI_TDTOK_DTOGGM;
 			endp->ue_toggle ^= 1;
 		}
@@ -1375,7 +1368,9 @@ PRIVATE void
 NOTHROW(FCALL sleep_milli)(unsigned int n) {
 	qtime_t then = quantum_time();
 	then.add_milliseconds(n);
-	task_sleep(&then);
+	do {
+		task_sleep(&then);
+	} while (quantum_time() < then);
 }
 
 PRIVATE u16
@@ -1418,18 +1413,19 @@ uhci_controller_probeport(struct uhci_controller *__restrict self,
 	       self->uc_pci->pd_base, self->uc_base.uc_mmbase, portno);
 	status = uhci_controller_resetport(self, portno);
 	if (status & UHCI_PORTSC_PED) {
-		struct usb_endpoint *endpoint;
+		struct usb_device *dev;
 		printk(FREESTR(KERN_INFO "[usb][pci:%I32p,io:%#Ix] Device found on uhci:%#I16x\n"),
 		       self->uc_pci->pd_base, self->uc_base.uc_mmbase, portno);
-		endpoint = (struct usb_endpoint *)kmalloc(sizeof(struct usb_endpoint), GFP_NORMAL);
-		endpoint->ue_refcnt   = 1;
-		endpoint->ue_maxpck   = 0x7ff; /* Not configured. (physical limit of the protocol) */
-		endpoint->ue_dev      = 0;     /* Not configured. */
-		endpoint->ue_endp     = 0;     /* Configure channel. */
-		endpoint->ue_toggle   = 0;
-		endpoint->ue_lowspeed = status & UHCI_PORTSC_LSDA ? 1 : 0;
-		FINALLY_DECREF_UNLIKELY(endpoint);
-		usb_endpoint_discovered(self, endpoint);
+		dev = (struct usb_device *)kmalloc(sizeof(struct usb_device),
+		                                   GFP_NORMAL | GFP_CALLOC);
+		dev->ue_refcnt   = 1;
+		dev->ue_maxpck   = 0x7ff; /* Not configured. (Physical limit of the protocol) */
+		dev->ue_dev      = 0;     /* Not configured. (Gets set by `usb_device_discovered()') */
+		dev->ue_endp     = 0;     /* Configure channel. */
+		dev->ue_toggle   = 0;
+		dev->ue_lowspeed = status & UHCI_PORTSC_LSDA ? 1 : 0;
+		FINALLY_DECREF_UNLIKELY(dev);
+		usb_device_discovered(self, dev);
 	}
 }
 
@@ -1455,6 +1451,7 @@ usb_probe_uhci(struct pci_device *__restrict dev) {
 		result->uc_base.uc_mmbase = (byte_t *)VM_PAGE2ADDR(page);
 		result->uc_flags |= UHCI_CONTROLLER_FLAG_USESMMIO;
 	}
+	usb_controller_cinit(result);
 	atomic_rwlock_cinit(&result->uc_lock);
 	result->cd_type.ct_fini    = &uhci_fini;
 	result->uc_transfer        = &uhci_transfer;

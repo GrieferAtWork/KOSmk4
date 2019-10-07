@@ -94,9 +94,10 @@ kernel_debugtrap_fork_thread_entry(void *UNUSED(arg),
                                    unsigned int reason,
                                    struct rpc_syscall_info const *UNUSED(sc_info)) {
 	if likely(reason != TASK_RPC_REASON_SHUTDOWN) {
-		char regbuf[64];
-		sprintf(regbuf, DEBUG_TRAP_REGISTER_FORK ":%p;", THIS_TASK);
-		state = kernel_debugtrap_r(state, SIGTRAP, regbuf);
+		struct debugtrap_reason r;
+		r.dtr_signo  = SIGTRAP;
+		r.dtr_reason = DEBUGTRAP_REASON_LIBRARY;
+		kernel_debugtrap(&r);
 	}
 	return state;
 }
