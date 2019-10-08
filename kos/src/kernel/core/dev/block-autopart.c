@@ -268,9 +268,15 @@ block_device_autopart_impl(struct basic_block_device *__restrict self,
 			if unlikely(OVERFLOW_UADD(lba_min, part_min, &lba_min))
 				continue; /* Overflow */
 			if unlikely(OVERFLOW_UADD(lba_min, lba_siz - (lba_t)1, &lba_max))
-				continue; /* Overflow */
-			if unlikely(lba_max > part_max)
-				continue; /* Too large */
+				lba_max = (lba_t)-1;
+			if unlikely(lba_max > part_max) {
+				printk(KERN_WARNING "[blk] Partition #%u of %q expands past the end of the "
+				                    "disk (part:%#I64x...%#I64x,disk:%#I64x...%#I64x) (truncate it)\n",
+				       i, self->bd_name,
+				       (u64)lba_min, (u64)lba_max,
+				       (u64)part_min, (u64)part_max);
+				lba_max = part_max;
+			}
 			if (mbr.mbr_part[i].pt.pt_sysid == 0xee) {
 				/* Special case: EFI partition */
 				new_result = block_device_autopart_efi_impl(self, lba_min, lba_max);
