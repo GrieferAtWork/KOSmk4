@@ -353,7 +353,7 @@
 
 #ifndef __LIBC
 #define __LIBC    __IMPDEF
-#endif
+#endif /* !__LIBC */
 
 
 
@@ -382,30 +382,38 @@
 #else
 #define __LOCAL_LIBC(name)    __PRIVATE __ATTR_UNUSED
 #endif
-#endif
+#endif /* !__LOCAL_LIBC */
+
+#ifndef __NO_ATTR_SECTION
+#define __LOCAL_LIBC_DATA_SECTION(name)       __ATTR_SECTION(".data.local." #name)
+#define __LOCAL_LIBC_CONST_DATA_SECTION(name) __ATTR_SECTION(".rodata.local." #name)
+#else /* !__NO_ATTR_SECTION */
+#define __LOCAL_LIBC_DATA_SECTION(name)       /* nothing */
+#define __LOCAL_LIBC_CONST_DATA_SECTION(name) /* nothing */
+#endif /* __NO_ATTR_SECTION */
 
 #ifndef __LOCAL_LIBC_DATA
-#if !defined(__NO_ATTR_SELECTANY) && 0
-#define __LOCAL_LIBC_DATA(name)    __INTERN __ATTR_SELECTANY __ATTR_UNUSED
-#elif !defined(__NO_ATTR_WEAK) && 0
-#define __LOCAL_LIBC_DATA(name)    __INTERN __ATTR_WEAK __ATTR_UNUSED
+#if !defined(__NO_ATTR_SELECTANY) && 1
+#define __LOCAL_LIBC_DATA(name)    __INTERN __ATTR_SELECTANY __ATTR_UNUSED __LOCAL_LIBC_DATA_SECTION(name)
+#elif !defined(__NO_ATTR_WEAK) && 1
+#define __LOCAL_LIBC_DATA(name)    __INTERN __ATTR_WEAK __ATTR_UNUSED __LOCAL_LIBC_DATA_SECTION(name)
 #else
-#define __LOCAL_LIBC_DATA(name)    __PRIVATE __ATTR_UNUSED
+#define __LOCAL_LIBC_DATA(name)    __PRIVATE __ATTR_UNUSED __LOCAL_LIBC_DATA_SECTION(name)
 #endif
 #endif /* !__LOCAL_LIBC_DATA */
 
 #ifndef __LOCAL_LIBC_CONST_DATA
 #ifdef __cplusplus
-#if !defined(__NO_ATTR_SELECTANY) && 0
-#define __LOCAL_LIBC_CONST_DATA(name) __ATTR_SELECTANY __ATTR_UNUSED
-#elif !defined(__NO_ATTR_WEAK) && 0
-#define __LOCAL_LIBC_CONST_DATA(name) extern __INTERN __ATTR_WEAK __ATTR_UNUSED
+#if !defined(__NO_ATTR_SELECTANY) && 1
+#define __LOCAL_LIBC_CONST_DATA(name) __ATTR_SELECTANY __ATTR_UNUSED __LOCAL_LIBC_CONST_DATA_SECTION(name)
+#elif !defined(__NO_ATTR_WEAK) && 1
+#define __LOCAL_LIBC_CONST_DATA(name) extern __INTERN __ATTR_WEAK __ATTR_UNUSED __LOCAL_LIBC_CONST_DATA_SECTION(name)
 #else
-#define __LOCAL_LIBC_CONST_DATA(name) __PRIVATE __ATTR_UNUSED
+#define __LOCAL_LIBC_CONST_DATA(name) __PRIVATE __ATTR_UNUSED __LOCAL_LIBC_CONST_DATA_SECTION(name)
 #endif
-#else
+#else /* __cplusplus */
 #define __LOCAL_LIBC_CONST_DATA       __LOCAL_LIBC_DATA
-#endif
+#endif /* !__cplusplus */
 #endif /* !__LOCAL_LIBC_CONST_DATA */
 
 #ifdef __CC__
