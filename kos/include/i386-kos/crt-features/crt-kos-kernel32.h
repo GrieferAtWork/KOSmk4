@@ -144,6 +144,7 @@
 #define __CRT_HAVE_block_device_areadv_phys_sector 1
 #define __CRT_HAVE_block_device_areadv_sector 1
 #define __CRT_HAVE_block_device_autopart 1
+#define __CRT_HAVE_block_device_autopart_ex 1
 #define __CRT_HAVE_block_device_awrite 1
 #define __CRT_HAVE_block_device_awrite_phys 1
 #define __CRT_HAVE_block_device_awrite_phys_sector 1

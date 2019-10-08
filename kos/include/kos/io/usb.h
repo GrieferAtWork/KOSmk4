@@ -88,8 +88,21 @@ __SYSDECL_BEGIN
 /* Flags for `usb_endpoint_descriptor::ue_attrib' */
 #define USB_ENDPOINT_ATTRIB_TRANSFERTYPEM  0x03 /* [bit(0:1)] Transfer type */
 #define USB_ENDPOINT_ATTRIB_TRANSFERTYPES     0 /* Shift for `USB_ENDPOINT_ATTRIB_TRANSFERTYPEM' */
-#define    USB_ENDPOINT_ATTRIB_TRANSFERTYPE_CONTROL     0x00 /* */
-#define    USB_ENDPOINT_ATTRIB_TRANSFERTYPE_ISOCHRONOUS 0x01 /* */
+#define    USB_ENDPOINT_ATTRIB_TRANSFERTYPE_CONTROL     0x00 /* Control transfer */
+#define    USB_ENDPOINT_ATTRIB_TRANSFERTYPE_ISOCHRONOUS 0x01 /* Isochronous */
+#define    USB_ENDPOINT_ATTRIB_TRANSFERTYPE_BULK        0x02 /* Bulk */
+#define    USB_ENDPOINT_ATTRIB_TRANSFERTYPE_INTERRUPT   0x03 /* Interrupt */
+#define USB_ENDPOINT_ATTRIB_SYNCTYPEM     0x0c /* [bit(2:3)] Synchronization type (USB_ENDPOINT_ATTRIB_TRANSFERTYPE_ISOCHRONOUS-only) */
+#define USB_ENDPOINT_ATTRIB_SYNCTYPES        2 /* Shift for `USB_ENDPOINT_ATTRIB_SYNCTYPEM' */
+#define    USB_ENDPOINT_ATTRIB_SYNCTYPE_NONE  0x00 /* No synchronization */
+#define    USB_ENDPOINT_ATTRIB_SYNCTYPE_ASYNC 0x04 /* Asynchronous */
+#define    USB_ENDPOINT_ATTRIB_SYNCTYPE_ADAPT 0x08 /* Adaptive */
+#define    USB_ENDPOINT_ATTRIB_SYNCTYPE_SYNC  0x0c /* Synchronous */
+#define USB_ENDPOINT_ATTRIB_USAGETYPEM    0x30 /* [bit(4:5)] Usage Type (USB_ENDPOINT_ATTRIB_TRANSFERTYPE_ISOCHRONOUS-only) */
+#define USB_ENDPOINT_ATTRIB_USAGETYPES       4 /* Shift for `USB_ENDPOINT_ATTRIB_USAGETYPEM' */
+#define    USB_ENDPOINT_ATTRIB_USAGETYPE_DATA     0x00 /* Data endpoint */
+#define    USB_ENDPOINT_ATTRIB_USAGETYPE_FEEDBACK 0x10 /* Feedback endpoint */
+#define    USB_ENDPOINT_ATTRIB_USAGETYPE_IMPLFEED 0x20 /* Implicit feedback data endpoint */
 
 
 #ifdef __CC__
@@ -151,11 +164,11 @@ struct __ATTR_PACKED usb_interface_descriptor {
 };
 
 struct __ATTR_PACKED usb_endpoint_descriptor {
-	__uint8_t  ue_size;            /* Size of the descriptor (in bytes) */
-	__uint8_t  ue_type;            /* Descriptor type (== `(USB_REQUEST_GET_DESCRIPTOR_VALUE_ENDPOINT & 0xff00) >> 8') */
-	__uint8_t  ue_addr;            /* Endpoint address (Set of `USB_ENDPOINT_ADDR_*') */
-	__uint8_t  ue_attrib;          /* Endpoint attributes (Set of `USB_ENDPOINT_ATTRIB_*') */
-	__uint16_t ue_maxpacketsize;
+	__uint8_t  ue_size;           /* Size of the descriptor (in bytes) */
+	__uint8_t  ue_type;           /* Descriptor type (== `(USB_REQUEST_GET_DESCRIPTOR_VALUE_ENDPOINT & 0xff00) >> 8') */
+	__uint8_t  ue_addr;           /* Endpoint address (Set of `USB_ENDPOINT_ADDR_*') */
+	__uint8_t  ue_attrib;         /* Endpoint attributes (Set of `USB_ENDPOINT_ATTRIB_*') */
+	__uint16_t ue_maxpacketsize;  /* Max packet size supported by this endpoint. */
 	__uint8_t  ue_interval;
 };
 

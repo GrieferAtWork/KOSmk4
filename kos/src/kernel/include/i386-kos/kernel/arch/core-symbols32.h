@@ -5283,9 +5283,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname1320 /* index: 1320 */
-	.weak task_raisesignalprocessgroup_nx; .long task_raisesignalprocessgroup_nx
-	.reloc ., R_386_SIZE32, task_raisesignalprocessgroup_nx; .long 0
-	.long 0xa352528
+	.weak block_device_autopart_ex; .long block_device_autopart_ex
+	.reloc ., R_386_SIZE32, block_device_autopart_ex; .long 0
+	.long 0xcef0528
 	.long 0 /* index: 1321 */
 	.long 0
 	.long 0
@@ -15302,10 +15302,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak pagedir_unwriteone_p; .long pagedir_unwriteone_p
 	.reloc ., R_386_SIZE32, pagedir_unwriteone_p; .long 0
 	.long 0xbdc2b40
-	.long 0 /* index: 3825 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname3825 /* index: 3825 */
+	.weak task_raisesignalprocessgroup_nx; .long task_raisesignalprocessgroup_nx
+	.reloc ., R_386_SIZE32, task_raisesignalprocessgroup_nx; .long 0
+	.long 0xa352528
 	.long 0 /* index: 3826 */
 	.long 0
 	.long 0
@@ -17759,7 +17759,7 @@ END(kernel_symbol_table)
 .Lname1318:
 	.string "inode_pathconf"
 .Lname1320:
-	.string "task_raisesignalprocessgroup_nx"
+	.string "block_device_autopart_ex"
 .Lname1323:
 	.string "memrendw"
 .Lname1324:
@@ -20330,6 +20330,8 @@ END(kernel_symbol_table)
 	.string "driver_getshdrs"
 .Lname3824:
 	.string "pagedir_unwriteone_p"
+.Lname3825:
+	.string "task_raisesignalprocessgroup_nx"
 .Lname3827:
 	.string "sys_sched_rr_get_interval64"
 .Lname3828:
