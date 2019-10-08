@@ -130,8 +130,12 @@ INTERN void FCALL GDBSerial_Init(char *args) {
 		outb(SERIAL_IOADDR_IER(GDBSerial_IO_PortBase), SERIAL_EIR_RDA);
 		if (avail & SERIAL_LSR_DA) {
 			u8 data = inb(SERIAL_IOADDR_RBR(GDBSerial_IO_PortBase));
+			pflag_t was;
 			printk(KERN_INFO "[gdb] Processing initial byte %#.2I8x\n", data);
+			/* Calls to `GDBRemote_PostByte()' require that preemption be turned off. */
+			was = PREEMPTION_PUSHOFF();
 			GDBRemote_PostByte(data);
+			PREEMPTION_POP(was);
 		}
 	}
 }
