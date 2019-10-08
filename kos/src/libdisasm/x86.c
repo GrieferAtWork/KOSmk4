@@ -2941,7 +2941,6 @@ print_byte:
 #endif /* CONFIG_AUTOSELECT_JCC */
 	/* Print the instruction. */
 	if (opcode <= 0xff) {
-		enum{ x = sizeof(ops) };
 		chain = ops;
 #ifdef HAVE_OPS_OFFSETS
 		chain += ops_offsets[opcode];
