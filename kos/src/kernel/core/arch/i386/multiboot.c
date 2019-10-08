@@ -480,8 +480,12 @@ NOTHROW(KCALL x86_load_mb2info)(PHYS u32 info) {
 				if (x86_boot_driver_format == X86_BOOT_DRIVER_FORMAT_NONE) {
 					x86_boot_driver_format = X86_BOOT_DRIVER_FORMAT_MB2;
 					x86_boot_driver_base   = (byte_t *)tag_iter - KERNEL_CORE_BASE;
-					x86_boot_driver_size   = (size_t)((byte_t *)tag_end - (byte_t *)tag_iter);
 				}
+				/* Remember the offset of the last driver tag, so we may enumerate
+				 * them once again during `x86_initialize_bootloader_drivers()' */
+				x86_boot_driver_size = (size_t)((byte_t *)tag_end -
+				                                ((byte_t *)x86_boot_driver_base +
+				                                 KERNEL_CORE_BASE));
 				break;
 
 			case MB2_TAG_TYPE_BOOTDEV:
