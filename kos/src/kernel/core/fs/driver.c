@@ -33,6 +33,7 @@
 #include <kernel/handle.h>
 #include <kernel/heap.h>
 #include <kernel/malloc.h>
+#include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
 #include <misc/atomic-ref.h>
@@ -2761,7 +2762,26 @@ driver_do_load_dependencies(struct driver *__restrict self)
 			if unlikely(filename < self->d_dynstr ||
 			            filename >= self->d_dynstr_end)
 				THROW_FAULTY_ELF_ERROR(E_NOT_EXECUTABLE_FAULTY_REASON_ELF_BAD_NEEDED);
-			dependency    = driver_insmod(filename);
+			if unlikely(!ATOMIC_READ(vfs_kernel.p_inode)) {
+				char const *name;
+				dependency = driver_with_name(filename);
+				if likely(dependency)
+					goto got_dependency;
+				/* We get here if a driver loaded via the kernel commandline required
+				 * another driver as a dependency, with that other driver not having
+				 * been specified on the commandline.
+				 * In this case, tell the user that they've booted KOS in an impossible
+				 * configuration, also telling them which driver is missing.
+				 * Note that when build with the builtin debugger enabled, the user
+				 * will even be prompted with a really nice error message! ;) */
+				name = strchr(filename, '/');
+				name = name ? name + 1 : filename;
+				kernel_panic("Cannot load dependency %q of driver %q\n"
+				             "Consider starting KOS with the dependency as a boot-module",
+				             name, self->d_name);
+			}
+			dependency = driver_insmod(filename);
+got_dependency:
 			depvec[dep_i] = dependency; /* Inherit reference. */
 			++dep_i;
 		}
