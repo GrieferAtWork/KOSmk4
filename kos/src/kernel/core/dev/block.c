@@ -1155,6 +1155,7 @@ check_handle_state_for_save:
 			aio_handle_generic_fini(&handle);
 			RETHROW();
 		}
+		aio_handle_generic_fini(&handle);
 	}
 	assert(self->bd_cache_ssiz >= self->bd_sector_size);
 	assert(self->bd_sector_size != 0);
@@ -1207,6 +1208,7 @@ check_handle_state_for_load:
 		aio_handle_generic_fini(&handle);
 		RETHROW();
 	}
+	aio_handle_generic_fini(&handle);
 	/* Now that it's been loaded from disk, mark the cache-page as present */
 	self->bd_cache[result].cs_flags = BD_CACHED_SECTOR_FPRESENT;
 	return result;

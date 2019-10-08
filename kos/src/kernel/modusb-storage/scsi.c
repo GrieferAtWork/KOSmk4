@@ -58,7 +58,7 @@ usb_scsi_io(struct usb_controller *__restrict self,
 
 	/* Setup the command descriptor. */
 	cbw.cbw_sig    = SCSI_CBW_SIG;
-	cbw.cbw_tag    = 123; /* TODO: Dynamically allocate */
+	cbw.cbw_tag    = 123;
 	cbw.cbw_tx_len = buflen;
 	cbw.cbw_dir    = SCSI_CBW_DIR_READ;
 	cbw.cbw_lun    = lun;
@@ -208,6 +208,7 @@ ms_scsi_doio(struct ms_scsi_device *__restrict self,
 		 *       the transfer. */
 		usb_controller_transfer_sync(self->msd_ctrl, &req);
 	}
+	aio->ah_type = &aio_noop_type;
 	aio_handle_success(aio);
 }
 
