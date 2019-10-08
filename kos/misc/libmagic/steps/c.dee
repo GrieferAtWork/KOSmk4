@@ -129,6 +129,8 @@ final local function getCompileOptions(self: BoundStep, srcFile: string): {strin
 		if (fp !is none) {
 			local header = fp.read(11);
 			local content;
+			if (header.startswith("\xEF\xBB\xBF"))
+				header = header[3:] + fp.read(3);
 			if (#header == 11) {
 				if (header.startswith("/*[[[magic")) {
 					if (header.isspace(10) || header.islf(10)) {

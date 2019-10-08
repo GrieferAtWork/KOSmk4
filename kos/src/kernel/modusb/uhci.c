@@ -1430,8 +1430,8 @@ uhci_controller_probeport(struct uhci_controller *__restrict self,
 		dev->ue_interface = dev;
 		dev->ui_device    = dev;
 		dev->ue_maxpck    = 0x7ff; /* Not configured. (Physical limit of the protocol) */
-		dev->ue_dev       = 0;     /* Not configured. (Gets set by `usb_device_discovered()') */
-		dev->ue_endp      = 0;     /* Configure channel. */
+//		dev->ue_dev       = 0;     /* Not configured. (Gets set by `usb_device_discovered()') */
+//		dev->ue_endp      = 0;     /* Configure channel. */
 		dev->ue_flags     = status & UHCI_PORTSC_LSDA ? USB_ENDPOINT_FLAG_LOWSPEED : 0;
 		FINALLY_DECREF_UNLIKELY(dev);
 		usb_device_discovered(self, dev);

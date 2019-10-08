@@ -1,4 +1,10 @@
-﻿/* Copyright (c) 2019 Griefer@Work                                            *
+﻿/*[[[magic
+// Optimize this file for size
+local opt = options.setdefault("GCC.options",[]);
+opt.removeif([](e) -> e.startswith("-O"));
+opt.append("-Os");
+]]]*/
+/* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
  * warranty. In no event will the authors be held liable for any damages      *
@@ -18,6 +24,7 @@
  */
 #ifndef GUARD_LIBVM86_EMUINSTR_C
 #define GUARD_LIBVM86_EMUINSTR_C 1
+#define DISABLE_BRANCH_PROFILING 1
 
 #include <hybrid/compiler.h>
 
