@@ -110,7 +110,6 @@ BEGIN
 		BEGIN GROUP("mod." name) { LINK, MCOPY };                                                     \
 			SET_OUTPUT("/" + BINPATH + "/os/drivers/" name)                                           \
 			SET_DISKFILE("/os/drivers/" name)                                                         \
-			LD_FLAGS({ "-shared" })                                                                   \
 			LD_FLAGS({ "-soname=" name })                                                             \
 			SOURCE({                                                                                  \
 				"mod" name "/" "*.c",                                                                 \
