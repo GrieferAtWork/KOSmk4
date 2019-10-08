@@ -234,6 +234,7 @@ function start(
 		config: Config,
 		binPath: string,
 		kernelFile: string,
+		multibootDrivers: {(string, string)...},
 		targetArch: string,
 		targetCpu: string,
 		diskFile: string,
@@ -267,13 +268,16 @@ got_exe:
 	if (options.get(opt.QEMU_HOSTED, true))
 		qemu_arguments.extend({ "-no-reboot", "-no-shutdown" });
 	local gdb_mode = options.get(opt.QEMU_GDB);
+	local boot_drivers = List(multibootDrivers);
+
 	if (gdb_mode !is none) {
 		if (gdb_mode == "server") {
 			/* Make use of out GDB server driver */
-			qemu_arguments.extend({
-				"-serial", "tcp::1234,server",
-				"-initrd", binPath + "/os/drivers/gdbserver transport=serial:0x2f8:0xf3",
-			});
+			boot_drivers.append((
+				binPath + "/os/drivers/gdbserver",
+				"transport=serial:0x2f8:0xf3"
+			));
+			qemu_arguments.extend({ "-serial", "tcp::1234,server" });
 		} else if (gdb_mode == "qemu") {
 			/* Use qemu's builtin GDB support */
 			/* Make use of out GDB-stub driver */
@@ -284,6 +288,18 @@ got_exe:
 	}
 	if (targetArch == "x86_64") {
 		/* TODO: Must create+use a custom kernel binary with e_machine = EM_386 */
+	}
+	if (boot_drivers) {
+		qemu_arguments.append("-initrd");
+		qemu_arguments.append(",".join(
+			for (local name, cmdline: boot_drivers)
+				!cmdline
+					? name.replace(",", ",,")
+					: "{} {}".format({
+						name.replace(",", ",,"),
+						cmdline.replace(",", ",,")
+					})
+		));
 	}
 	qemu_arguments.extend({
 		"-kernel", kernelFile,

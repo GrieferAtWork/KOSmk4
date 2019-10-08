@@ -26,6 +26,7 @@ final global COPYRIGHT=
 
 import fs;
 import ipc;
+import util;
 import * from deemon;
 import * from .kos.misc.libmagic.libmagic;
 import * from .kos.misc.libmagic.steps.c;
@@ -55,7 +56,8 @@ global CONFIG_EMULATOR_OPTIONS: {string: Object} = Dict();
 global CONFIG_DONT_BUILD: bool = false;
 global CONFIG_EMULATOR_STARTED_PATTERN: string = none;
 global CONFIG_EMULATOR_GDB_MODE: string = none;
-global requiredOutputWhiteList: {(bool,string)...} | none = none;
+global CONFIG_MULTIBOOT_DRIVERS: {(string, string)...} = List();
+global requiredOutputWhiteList: {(bool, string)...} | none = none;
 global requiredGroupWhiteList: {string...} | none = none;
 global requiredGroupOfSourceFileWhiteList: {string...} | none = none;
 global final EXE: string = "";
@@ -291,6 +293,16 @@ function main(argv: {string...}) {
 				case "--regen":
 					generateFile(value, true);
 					break;
+
+				case "--driver": {
+					for (local opt: value.split(":")) {
+						local name = opt, cmdline = "";
+						if ("," in opt)
+							name, none, cmdline = opt.partition(",")...;
+						CONFIG_MULTIBOOT_DRIVERS.append((name, cmdline));
+					}
+				}	break;
+
 				default:
 					goto _err_unknown_argument;
 				}
@@ -311,6 +323,7 @@ _err_unknown_argument:
 		getConfig(),
 	});
 
+
 	{
 		/* Make sure that the correct bin-config is selected. */
 		local selConfig;
@@ -325,6 +338,16 @@ _err_unknown_argument:
 			]);
 			p.start();
 			joinProcess(p);
+		}
+	}
+
+	/* Driver name without any slashes are automatically
+	 * loaded from the /os/drivers directory. */
+	for (local i, elem: util.enumerate(CONFIG_MULTIBOOT_DRIVERS)) {
+		local name, cmdline = elem...;
+		if ("/" !in name && "\\" !in name) {
+			name = "bin/{}/os/drivers/{}".format({ TARGET_NAME, name });
+			CONFIG_MULTIBOOT_DRIVERS[i] = (name, cmdline);
 		}
 	}
 
@@ -467,14 +490,15 @@ _err_unknown_argument:
 		if (CONFIG_EMULATOR_STARTED_PATTERN)
 			print CONFIG_EMULATOR_STARTED_PATTERN;
 		import(".kos.misc.magicemulator." + CONFIG_EMULATOR_USED).start(
-			groups:         groups,
-			config:         config,
-			binPath:        BINPATH,
-			kernelFile:     KERNEL_BINARY.lstrip("/"),
-			targetArch:     TARGET_ARCH,
-			targetCpu:      TARGET_CPU,
-			diskFile:       toolchain.options[TOOLCHAIN_MTOOLS_DISK],
-			options:        CONFIG_EMULATOR_OPTIONS,
+			groups:           groups,
+			config:           config,
+			binPath:          BINPATH,
+			kernelFile:       KERNEL_BINARY.lstrip("/"),
+			multibootDrivers: CONFIG_MULTIBOOT_DRIVERS,
+			targetArch:       TARGET_ARCH,
+			targetCpu:        TARGET_CPU,
+			diskFile:         toolchain.options[TOOLCHAIN_MTOOLS_DISK],
+			options:          CONFIG_EMULATOR_OPTIONS,
 		);
 	}
 }

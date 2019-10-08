@@ -529,6 +529,17 @@ To help you understand how this script works to do what it does, here is a docum
 - `--regen=PATTERN`
 	- Same as `--gen=...`, but select files using a regular expression pattern
 	- The given `PATTERN` doesn't get formatted according to the PWD set when `magic.dee` got invoked
+- `--driver=NAME[:NAME]`, `--driver=NAME,CMDLINE`
+	- Inject a driver `NAME` into the kernel during boot, where `NAME` is either the driver's filename within `$PROJPATH/bin/$TARGET-kos-$CONFIG/os/drivers/`, or a filename without the host filesystem if it contains any slashes
+	- Optionally, a commandline `CMDLINE` may be given, which is then passed to the driver during initialization
+	- This method of loading drivers makes it possible to give KOS the ability to identify alternative devices or filesystems before having initialized its own filesystem, meaning that KOS can be booted from a device/fs combo not known to the kernel core
+	- Note that loading a driver that has dependencies on other driver(s) using this method, you must also inject all dependencies
+	- The order in which drivers are given affects their initialization order. However drivers that are dependencies of other drivers are always initialized first
+	- Example:
+		- `deemon magic.dee --driver=usb-storage:usb`
+			- OK: `usb` is a dependency of `usb-storage`
+		- `deemon magic.dee --driver=usb-storage`
+			- Wrong: This will cause a kernel panic telling you that the `usb` driver is missing
 
 ##### Target/Config-specific paths
 
