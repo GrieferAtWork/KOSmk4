@@ -411,7 +411,7 @@ usb_interface_discovered(struct usb_controller *__restrict self,
                          struct usb_interface *__restrict intf,
                          size_t endpc, struct usb_endpoint *const endpv[]) {
 	size_t i;
-	REF struct usb_probe_vector *probes;
+	REF struct usb_probe_vector *probes, *new_probes;
 	REF struct usb_unknown_interface *unknown;
 	assert(endpc != 0);
 	printk(KERN_NOTICE "[usb] Discovered device %q:%q:%q with interface "
@@ -485,8 +485,13 @@ usb_interface_discovered(struct usb_controller *__restrict self,
 	 * If so, try once again to identify unknown devices, thus
 	 * ensuring that every probe has had a chance to identify our
 	 * new unknown interface. */
-	if unlikely(ATOMIC_READ(probe_interface.m_pointer) != probes)
+	for (;;) {
+		new_probes = ATOMIC_READ(probe_interface.m_pointer);
+		if likely(new_probes == probes)
+			break;
+		probes = new_probes;
 		usb_probe_identify_unknown(NULL);
+	}
 }
 
 
