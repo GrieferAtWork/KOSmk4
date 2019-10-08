@@ -50,7 +50,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#if !defined(NDEBUG) && 0
+#if !defined(NDEBUG) && 1
 #define UHCI_DEBUG(...) printk(__VA_ARGS__)
 #else
 #define UHCI_DEBUG(...) (void)0
@@ -713,9 +713,9 @@ uhci_controller_addqueue(struct uhci_controller *__restrict self,
 
 /* Construct new TDs for  */
 #if __SIZEOF_VM_PHYS_T__ > 4
-PRIVATE bool KCALL
+LOCAL bool KCALL
 #else /* __SIZEOF_VM_PHYS_T__ > 4 */
-PRIVATE void KCALL
+LOCAL void KCALL
 #endif /* __SIZEOF_VM_PHYS_T__ <= 4 */
 uhci_construct_tds(struct uhci_ostd ***__restrict ppnexttd,
                    struct usb_endpoint *__restrict endp,
@@ -804,9 +804,8 @@ uhci_construct_tds(struct uhci_ostd ***__restrict ppnexttd,
 #endif /* __SIZEOF_VM_PHYS_T__ > 4 */
 }
 
-PRIVATE NONNULL((1, 2, 3, 4)) void KCALL
+PRIVATE NONNULL((1, 2, 3)) void KCALL
 uhci_transfer(struct usb_controller *__restrict self,
-              struct usb_endpoint *__restrict endp,
               struct usb_transfer const *__restrict tx,
               /*out*/ struct aio_handle *__restrict aio);
 
@@ -942,9 +941,8 @@ usb_transfer_allocate_physbuf(struct usb_transfer *__restrict tx,
  * from buffers located in VIO memory regions, as well as physical
  * memory locations above 4GiB
  * @return: * : The total number of transferred bytes. */
-PRIVATE NONNULL((1, 2, 3)) size_t KCALL
+PRIVATE NONNULL((1, 2)) size_t KCALL
 uhci_transfer_sync_with_phys(struct uhci_controller *__restrict self,
-                             struct usb_endpoint *__restrict endp,
                              struct usb_transfer const *__restrict tx) {
 	size_t result;
 	struct usb_transfer *tx_firstcopy = NULL;
@@ -1066,7 +1064,7 @@ copy_next_tx:
 			struct aio_handle_generic aio;
 			aio_handle_generic_init(&aio);
 			/* perform the transfer using our buffer copies. */
-			uhci_transfer(self, endp, tx_firstcopy, &aio);
+			uhci_transfer(self, tx_firstcopy, &aio);
 			TRY {
 				aio_handle_generic_waitfor(&aio);
 				aio_handle_generic_checkerror(&aio);
@@ -1211,7 +1209,6 @@ PRIVATE struct aio_handle_type uhci_aio_sync_type = {
  * For communications initiated by the device, see the interface
  * for doing this below.
  * @param: self: The controller which will be used for the transfer
- * @param: endp: The targeted USB endpoint.
  * @param: tx:   A chain of USB packets that must be transmitted to
  *               the given `endp' in the same order in which they
  *               are given here (the chain is described by `->ut_next->')
@@ -1222,9 +1219,8 @@ PRIVATE struct aio_handle_type uhci_aio_sync_type = {
  *               obviously not the buffers themself), as well as later transfer
  *               descriptors even before the given `aio' handle is invoked to
  *               indicate completion. */
-PRIVATE NONNULL((1, 2, 3, 4)) void KCALL
+PRIVATE NONNULL((1, 2, 3)) void KCALL
 uhci_transfer(struct usb_controller *__restrict self,
-              struct usb_endpoint *__restrict endp,
               struct usb_transfer const *__restrict tx,
               /*out*/ struct aio_handle *__restrict aio) {
 	struct uhci_aio_data *data;
@@ -1265,12 +1261,16 @@ uhci_transfer(struct usb_controller *__restrict self,
 				case USB_TRANSFER_BUFTYP_PHYS:
 do_configure_simple_empty:
 #if __SIZEOF_VM_PHYS_T__ > 4
-					if unlikely(!uhci_construct_tds(&pnexttd, endp, tx_iter,
+					if unlikely(!uhci_construct_tds(&pnexttd,
+					                                tx_iter->ut_endp,
+					                                tx_iter,
 					                                tx_iter->ut_bufp,
 					                                tx_iter->ut_buflen))
 						goto cleanup_configured_and_do_syncio;
 #else /* __SIZEOF_VM_PHYS_T__ > 4 */
-					uhci_construct_tds(&pnexttd, endp, tx_iter,
+					uhci_construct_tds(&pnexttd,
+					                   tx_iter->ut_endp,
+					                   tx_iter,
 					                   tx_iter->ut_bufp,
 					                   tx_iter->ut_buflen);
 #endif /* __SIZEOF_VM_PHYS_T__ <= 4 */
@@ -1280,12 +1280,16 @@ do_configure_simple_empty:
 					struct aio_pbuffer_entry ent;
 					AIO_PBUFFER_FOREACH(ent, tx_iter->ut_vbufp) {
 #if __SIZEOF_VM_PHYS_T__ > 4
-						if unlikely(!uhci_construct_tds(&pnexttd, endp, tx_iter,
+						if unlikely(!uhci_construct_tds(&pnexttd,
+						                                tx_iter->ut_endp,
+						                                tx_iter,
 						                                ent.ab_base,
 						                                ent.ab_size))
 							goto cleanup_configured_and_do_syncio;
 #else /* __SIZEOF_VM_PHYS_T__ > 4 */
-						uhci_construct_tds(&pnexttd, endp, tx_iter,
+						uhci_construct_tds(&pnexttd,
+						                   tx_iter->ut_endp,
+						                   tx_iter,
 						                   ent.ab_base,
 						                   ent.ab_size);
 #endif /* __SIZEOF_VM_PHYS_T__ <= 4 */
@@ -1359,7 +1363,7 @@ cleanup_configured_and_do_syncio:
 	 * the temporary buffers. */
 	{
 		size_t transfer_size;
-		transfer_size = uhci_transfer_sync_with_phys(me, endp, tx);
+		transfer_size = uhci_transfer_sync_with_phys(me, tx);
 		/* Still always propagate the total number of transferred bytes. */
 		aio->ah_data[0] = (void *)transfer_size;
 		aio->ah_type    = &uhci_aio_sync_type;
@@ -1537,9 +1541,8 @@ usb_probe_uhci(struct pci_device *__restrict dev) {
 
 
 	{
-		/* TODO: better naming */
-		static int n = 0;
-		sprintf(result->cd_name, "uhci%d", n++);
+		static int n = 0; /* TODO: better naming */
+		sprintf(result->cd_name, "uhci%c", 'a' + n++);
 	}
 	character_device_register_auto(result);
 

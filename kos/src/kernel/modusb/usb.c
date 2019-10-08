@@ -537,14 +537,13 @@ NOTHROW(KCALL usb_endpoint_destroy)(struct usb_endpoint *__restrict self) {
 /* Same as `usb_controller_transfer()', but wait for the transfer to
  * complete (essentially just a wrapper using `struct aio_handle_generic')
  * @return: * : The total number of transferred bytes. */
-PUBLIC NONNULL((1, 2, 3)) size_t KCALL
+PUBLIC NONNULL((1, 2)) size_t KCALL
 usb_controller_transfer_sync(struct usb_controller *__restrict self,
-                             struct usb_endpoint *__restrict endp,
                              struct usb_transfer const *__restrict tx) {
 	size_t result;
 	struct aio_handle_generic aio;
 	aio_handle_generic_init(&aio);
-	usb_controller_transfer(self, endp, tx, &aio);
+	usb_controller_transfer(self, tx, &aio);
 	TRY {
 		aio_handle_generic_waitfor(&aio);
 		aio_handle_generic_checkerror(&aio);
@@ -583,6 +582,7 @@ usb_controller_request(struct usb_controller *__restrict self,
 	token.ut_buf    = (void *)request;
 	token.ut_buflen = sizeof(*request);
 	token.ut_next   = &data;
+	token.ut_endp   = endp;
 
 	data.ut_type = request->ur_reqtype & USB_REQUEST_RETYPE_DIR_D2H
 	               ? USB_TRANSFER_TYPE_IN
@@ -599,6 +599,7 @@ usb_controller_request(struct usb_controller *__restrict self,
 		data.ut_buf    = buf;
 		data.ut_buflen = request->ur_length;
 		data.ut_next   = &status;
+		data.ut_endp   = endp;
 	}
 
 	/* The terminating status packet. */
@@ -607,8 +608,9 @@ usb_controller_request(struct usb_controller *__restrict self,
 	status.ut_buftyp = USB_TRANSFER_BUFTYP_VIRT;
 	status.ut_buflen = 0;
 	status.ut_next   = NULL;
+	status.ut_endp   = endp;
 
-	usb_controller_transfer(self, endp, &token, aio);
+	usb_controller_transfer(self, &token, aio);
 }
 
 /* Same as `usb_controller_request()', but wait for the operation to complete.

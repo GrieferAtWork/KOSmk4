@@ -113,6 +113,7 @@ struct usb_device
 
 struct usb_transfer {
 	struct usb_transfer *ut_next;   /* [0..1] Next transfer packet. */
+	struct usb_endpoint *ut_endp;   /* [1..1] The target endpoint. */
 #define USB_TRANSFER_TYPE_IN          0 /* Receive data. */
 #define USB_TRANSFER_TYPE_OUT         1 /* Send data. */
 #define USB_TRANSFER_TYPE_FLAG_STATUS 2 /* Flag for getting the proper status-stage type, to-be or'd to a data-stage type.
@@ -168,9 +169,8 @@ struct usb_controller
 	 *               obviously not the buffers themself), as well as later transfer
 	 *               descriptors even before the given `aio' handle is invoked to
 	 *               indicate completion. */
-	NONNULL((1, 2, 3, 4)) void
+	NONNULL((1, 2, 3)) void
 	(KCALL *uc_transfer)(struct usb_controller *__restrict self,
-	                     struct usb_endpoint *__restrict endp,
 	                     struct usb_transfer const *__restrict tx,
 	                     /*out*/ struct aio_handle *__restrict aio);
 	/* TODO: Interface for registering Isochronous interrupt handlers. */
@@ -187,7 +187,6 @@ struct usb_controller
  * For communications initiated by the device, see the interface
  * for doing this below.
  * @param: self: The controller which will be used for the transfer
- * @param: endp: The targeted USB endpoint.
  * @param: tx:   A chain of USB packets that must be transmitted to
  *               the given `endp' in the same order in which they
  *               are given here (the chain is described by `->ut_next->')
@@ -202,20 +201,18 @@ struct usb_controller
  *               the total number of transferred bytes from, which is available
  *               upon AIO completion via the `ht_retsize' operator of `aio',
  *               which is guarantied to have been initialized by this function. */
-LOCAL NONNULL((1, 2, 3, 4)) void KCALL
+LOCAL NONNULL((1, 2, 3)) void KCALL
 usb_controller_transfer(struct usb_controller *__restrict self,
-                        struct usb_endpoint *__restrict endp,
                         struct usb_transfer const *__restrict tx,
                         /*out*/ struct aio_handle *__restrict aio) {
-	(*self->uc_transfer)(self, endp, tx, aio);
+	(*self->uc_transfer)(self, tx, aio);
 }
 
 /* Same as `usb_controller_transfer()', but wait for the transfer to
  * complete (essentially just a wrapper using `struct aio_handle_generic')
  * @return: * : The total number of transferred bytes. */
-FUNDEF NONNULL((1, 2, 3)) size_t KCALL
+FUNDEF NONNULL((1, 2)) size_t KCALL
 usb_controller_transfer_sync(struct usb_controller *__restrict self,
-                             struct usb_endpoint *__restrict endp,
                              struct usb_transfer const *__restrict tx);
 
 
