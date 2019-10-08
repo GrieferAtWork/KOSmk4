@@ -690,6 +690,10 @@ uhci_controller_addqueue(struct uhci_controller *__restrict self,
 		while (last->qh_next)
 			last = last->qh_next;
 		last->qh_next = osqh;
+		/* XXX: Wouldn't it make more sense to only keep OUT/CONTROL-packets in a loop,
+		 *      while keeping IN-packets outside of such a loop, since the attached
+		 *      device can only produce data so fast, meaning that constantly having
+		 *      the controller poll the device won't accomplish anything? */
 #ifdef CONFIG_UHCI_USE_QH_LOOPS
 		osqh->qh_hp = self->uc_qhstart.qh_next->qh_self | UHCI_QHHP_QHTD;
 #else /* CONFIG_UHCI_USE_QH_LOOPS */
@@ -713,8 +717,7 @@ PRIVATE bool KCALL
 #else /* __SIZEOF_VM_PHYS_T__ > 4 */
 PRIVATE void KCALL
 #endif /* __SIZEOF_VM_PHYS_T__ <= 4 */
-uhci_construct_tds(struct usb_controller *__restrict self,
-                   struct uhci_ostd ***__restrict ppnexttd,
+uhci_construct_tds(struct uhci_ostd ***__restrict ppnexttd,
                    struct usb_endpoint *__restrict endp,
                    struct usb_transfer const *__restrict tx,
                    vm_phys_t start, size_t num_bytes) {
@@ -940,7 +943,7 @@ usb_transfer_allocate_physbuf(struct usb_transfer *__restrict tx,
  * memory locations above 4GiB
  * @return: * : The total number of transferred bytes. */
 PRIVATE NONNULL((1, 2, 3)) size_t KCALL
-uhci_transfer_sync_with_phys(struct usb_controller *__restrict self,
+uhci_transfer_sync_with_phys(struct uhci_controller *__restrict self,
                              struct usb_endpoint *__restrict endp,
                              struct usb_transfer const *__restrict tx) {
 	size_t result;
@@ -1262,12 +1265,12 @@ uhci_transfer(struct usb_controller *__restrict self,
 				case USB_TRANSFER_BUFTYP_PHYS:
 do_configure_simple_empty:
 #if __SIZEOF_VM_PHYS_T__ > 4
-					if unlikely(!uhci_construct_tds(self, &pnexttd, endp, tx_iter,
+					if unlikely(!uhci_construct_tds(&pnexttd, endp, tx_iter,
 					                                tx_iter->ut_bufp,
 					                                tx_iter->ut_buflen))
 						goto cleanup_configured_and_do_syncio;
 #else /* __SIZEOF_VM_PHYS_T__ > 4 */
-					uhci_construct_tds(self, &pnexttd, endp, tx_iter,
+					uhci_construct_tds(&pnexttd, endp, tx_iter,
 					                   tx_iter->ut_bufp,
 					                   tx_iter->ut_buflen);
 #endif /* __SIZEOF_VM_PHYS_T__ <= 4 */
@@ -1277,12 +1280,12 @@ do_configure_simple_empty:
 					struct aio_pbuffer_entry ent;
 					AIO_PBUFFER_FOREACH(ent, tx_iter->ut_vbufp) {
 #if __SIZEOF_VM_PHYS_T__ > 4
-						if unlikely(!uhci_construct_tds(self, &pnexttd, endp, tx_iter,
+						if unlikely(!uhci_construct_tds(&pnexttd, endp, tx_iter,
 						                                ent.ab_base,
 						                                ent.ab_size))
 							goto cleanup_configured_and_do_syncio;
 #else /* __SIZEOF_VM_PHYS_T__ > 4 */
-						uhci_construct_tds(self, &pnexttd, endp, tx_iter,
+						uhci_construct_tds(&pnexttd, endp, tx_iter,
 						                   ent.ab_base,
 						                   ent.ab_size);
 #endif /* __SIZEOF_VM_PHYS_T__ <= 4 */
@@ -1356,7 +1359,7 @@ cleanup_configured_and_do_syncio:
 	 * the temporary buffers. */
 	{
 		size_t transfer_size;
-		transfer_size = uhci_transfer_sync_with_phys(self, endp, tx);
+		transfer_size = uhci_transfer_sync_with_phys(me, endp, tx);
 		/* Still always propagate the total number of transferred bytes. */
 		aio->ah_data[0] = (void *)transfer_size;
 		aio->ah_type    = &uhci_aio_sync_type;
@@ -1543,7 +1546,6 @@ usb_probe_uhci(struct pci_device *__restrict dev) {
 	/* Probe connections. */
 	for (i = 0; i < result->uc_portnum; ++i)
 		uhci_controller_probeport(result, i);
-	uhci_wrw(result, UHCI_USBCMD, 0);
 }
 
 
