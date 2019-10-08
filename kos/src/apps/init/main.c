@@ -210,7 +210,7 @@ done_procfs:
 		}
 	}
 
-	sysctl_insmod("usb", NULL);
+	sysctl_insmod("usb-storage", NULL);
 
 	for (;;) {
 		pid_t cpid;

@@ -74,8 +74,15 @@ BEGIN
 		SET_NOSTDLIB()
 		STATIC_USELIBGCC()
 		STATIC_USELIB("libssp")
-		LIBPATH({ "/" + BINPATH + "/drivers/" })
-		LD_FLAGS({ "--nmagic" })
+		LIBPATH({ "/" + BINPATH + "/os/drivers" })
+		LD_FLAGS({
+			"--nmagic",
+			/* XXX: There shouldn't be a reason why we need to specify Bdynamic
+			 *      here, since normally dynamic linking should be the default.
+			 * Maybe there's something wrong with our toolchain that can make it
+			 * think that dynamic linking isn't supported in certain cases? */
+			"-Bdynamic"
+		})
 		if (TARGET_ARCH == "x86_64")
 			LD_FLAGS({ "-z", "noreloc-overflow" })
 		GCC_FLAGS({
@@ -103,6 +110,7 @@ BEGIN
 		BEGIN GROUP("mod." name) { LINK, MCOPY };                                                     \
 			SET_OUTPUT("/" + BINPATH + "/os/drivers/" name)                                           \
 			SET_DISKFILE("/os/drivers/" name)                                                         \
+			LD_FLAGS({ "-shared" })                                                                   \
 			LD_FLAGS({ "-soname=" name })                                                             \
 			SOURCE({                                                                                  \
 				"mod" name "/" "*.c",                                                                 \
@@ -117,6 +125,7 @@ BEGIN
 		DEFINE_SIMPLE_DRIVER("ps2")
 		DEFINE_SIMPLE_DRIVER("procfs", SOURCE({ "modprocfs/files/" "*.c" }))
 		DEFINE_SIMPLE_DRIVER("usb")
+		DEFINE_SIMPLE_DRIVER("usb-storage", LIB(":usb")) /* Link against usb driver */
 
 		DEFINE_SIMPLE_ARCH_DRIVER("gdbserver")
 
