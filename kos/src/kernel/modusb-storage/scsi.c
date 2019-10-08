@@ -149,8 +149,10 @@ ms_scsi_doio(struct ms_scsi_device *__restrict self,
 	cbw.cbw_tx_len = (u32)tx->ut_buflen;
 	cbw.cbw_dir    = is_write ? SCSI_CBW_DIR_WRITE : SCSI_CBW_DIR_READ;
 	cbw.cbw_lun    = self->msd_lun;
+
 	/* Setup the command block. */
 	cbw.cbw_cb_len = 10;
+	/* TODO: Use higher-order read/write functions if available, and applicable. */
 	cbw.cbw_cb[0]  = is_write ? SCSI_CMD_WRITE_10 : SCSI_CMD_READ_10;
 	cbw.cbw_cb[1]  = self->msd_lun;
 	UNALIGNED_SETBE32((u32 *)(cbw.cbw_cb + 2), (u32)addr);
@@ -186,6 +188,8 @@ ms_scsi_doio(struct ms_scsi_device *__restrict self,
 	status.ut_buflen = sizeof(csw);
 	status.ut_next   = NULL;
 
+	/* TODO: Append another set of transaction for
+	 *       querying errors via the inquiry command */
 
 	{
 		/* With all of the data structures set up, acquire a lock to

@@ -201,6 +201,11 @@ All ported applications can be installed onto your KOS disk image by using `bash
 	- ide (ata)
 		- Support for DMA, LBA48 and LBA28 addressing (preferring DMA)
 			- This is real DMA support I might note, as in "Hey, IDE. Copy sector 123 to memory location XYZ and tell me when your done"
+	- USB
+		- controllers
+			- UHCI
+		- devices
+			- SCSI-based Mass Storage (your typical USB flash-drive)
 	- fat
 		- Support for fat12, fat16 and fat32
 		- Support for writing to files
