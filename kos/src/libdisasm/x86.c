@@ -25,6 +25,7 @@
 
 #include <hybrid/compiler.h>
 
+#include <hybrid/byteorder.h>
 #include <hybrid/host.h>
 #include <hybrid/unaligned.h>
 
@@ -33,8 +34,8 @@
 
 #include <stdbool.h>
 #include <stddef.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 DECL_BEGIN
 
