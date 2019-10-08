@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc3bbe54 */
+/* HASH CRC-32:0xe32a4c17 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1224,9 +1224,6 @@ __LIBC __ATTR_NORETURN __ATTR_COLD void (__LIBCCALL error_thrown)(error_code_t _
 #endif
 
 #ifdef __cplusplus
-#define __PRIVATE_CATCH_UNIQUE3(x,y) x ## y
-#define __PRIVATE_CATCH_UNIQUE2(x,y) __PRIVATE_CATCH_UNIQUE3(x,y)
-#define __PRIVATE_CATCH_UNIQUE   __PRIVATE_CATCH_UNIQUE2(__catch_do_handle_,__LINE__)
 #define TRY         try
 #define EXCEPT      catch(...)
 #endif /* __cplusplus */

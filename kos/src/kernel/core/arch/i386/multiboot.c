@@ -82,15 +82,15 @@ INTDEF byte_t __386_kernel_mb2_chksum[];
 #endif
 PRIVATE ATTR_SECTION(".x86.mb2") ATTR_ALIGNED(MB2_HEADER_ALIGN)
 ATTR_USED struct mb2_header mb_multiboot2 = {
-	/* .magic         = */MB2_HEADER_MAGIC,
-	/* .architecture  = */MB2_ARCHITECTURE_I386,
+	/* .magic         = */ MB2_HEADER_MAGIC,
+	/* .architecture  = */ MB2_ARCHITECTURE_I386,
 	{
 #ifdef __x86_64__
 		(u64)__x86_kernel_mb2_hdrlen_and_chksum
 #else
 		{
-			/* .header_length = */(u32)__386_kernel_mb2_hdrlen,
-			/* .checksum      = */(u32)__386_kernel_mb2_chksum
+			/* .header_length = */ (u32)__386_kernel_mb2_hdrlen,
+			/* .checksum      = */ (u32)__386_kernel_mb2_chksum
 		}
 #endif
 	}
@@ -160,17 +160,17 @@ NOTHROW(KCALL x86_initialize_commandline_himem)(void) {
 	}
 }
 
-#define HINT_ADDR(x,y) x
-#define HINT_MODE(x,y) y
+#define HINT_ADDR(x, y) x
+#define HINT_MODE(x, y) y
 #define HINT_GETADDR(x) HINT_ADDR x
 #define HINT_GETMODE(x) HINT_MODE x
 
 
 #define X86_BOOT_DRIVER_FORMAT_NONE 0 /* No drivers specified */
-#define X86_BOOT_DRIVER_FORMAT_MB1  1 /* Multiple mk1-specific driver list */
-#define X86_BOOT_DRIVER_FORMAT_MB2  2 /* Multiple mk2-specific driver list */
+#define X86_BOOT_DRIVER_FORMAT_MB1  1 /* multiboot1-specific driver list */
+#define X86_BOOT_DRIVER_FORMAT_MB2  2 /* multiboot2-specific driver list */
 PRIVATE ATTR_FREEBSS int    x86_boot_driver_format = 0;  /* Boot driver support format. */
-PRIVATE ATTR_FREEBSS void  *x86_boot_driver_base = NULL; /* Base address for boot driver data */
+PRIVATE ATTR_FREEBSS void  *x86_boot_driver_base = NULL; /* Base address for boot driver data. */
 PRIVATE ATTR_FREEBSS size_t x86_boot_driver_size = 0;    /* Size of boot driver data. */
 
 PRIVATE ATTR_FREETEXT void KCALL
@@ -197,7 +197,8 @@ load_bootloader_driver2(PHYS u32 blob_addr, size_t blob_size, char *cmdline) {
 		 *       once all drivers specified by the boot loader have been loaded.
 		 *    -> That way, driver dependencies can be loaded in the same manner,
 		 *       thus not relying on file-system drivers not having any dependencies. */
-		drv = driver_insmod_blob((byte_t *)(VM_PAGE2ADDR(vpage) + (blob_addr & (PAGESIZE - 1))),
+		drv = driver_insmod_blob((byte_t *)(VM_PAGE2ADDR(vpage) +
+		                                    (blob_addr & (PAGESIZE - 1))),
 		                         blob_size,
 		                         cmdline,
 		                         NULL,
@@ -219,18 +220,18 @@ load_bootloader_driver2(PHYS u32 blob_addr, size_t blob_size, char *cmdline) {
 
 PRIVATE ATTR_FREETEXT void KCALL
 load_bootloader_driver(PHYS u32 blob_addr, size_t blob_size,
-                       PHYS u32 cmdline_addr, size_t cmdline_size) {
-	if (!cmdline_size) {
+                       PHYS u32 cmdline_addr, size_t cmdline_maxsize) {
+	if (!cmdline_maxsize) {
 		load_bootloader_driver2(blob_addr, blob_size, NULL);
 	} else {
 		char *cmdline;
-		cmdline = (char *)malloca((cmdline_size + 1) * sizeof(char));
+		cmdline = (char *)malloca((cmdline_maxsize + 1) * sizeof(char));
 		TRY {
 			/* Copy the commandline into our buffer. */
 			vm_copyfromphys(cmdline,
 			                (vm_phys_t)cmdline_addr,
-			                cmdline_size);
-			cmdline[cmdline_size] = '\0';
+			                cmdline_maxsize);
+			cmdline[cmdline_maxsize] = '\0';
 			/* Load the driver blob. */
 			load_bootloader_driver2(blob_addr,
 			                        blob_size,
@@ -260,7 +261,8 @@ NOTHROW(KCALL x86_initialize_bootloader_drivers)(void) {
 				continue;
 			TRY {
 				load_bootloader_driver((u32)driver_descriptor.mod_start,
-				                       (size_t)(driver_descriptor.mod_end - driver_descriptor.mod_start),
+				                       (size_t)(driver_descriptor.mod_end -
+				                                driver_descriptor.mod_start),
 				                       driver_descriptor.cmdline,
 				                       (size_t)driver_descriptor.pad);
 			} EXCEPT {
@@ -285,11 +287,14 @@ NOTHROW(KCALL x86_initialize_bootloader_drivers)(void) {
 					continue;
 				TRY {
 					size_t cmdline_max_length;
+					PHYS struct mb2_tag_module *mod;
 					cmdline_max_length = tag.size - offsetof(struct mb2_tag_module, cmdline);
 					if unlikely(tag.size < offsetof(struct mb2_tag_module, cmdline))
 						cmdline_max_length = 0;
-					load_bootloader_driver((PHYS u32)tag.mod_start, (size_t)(tag.mod_end - tag.mod_start),
-					                       (PHYS u32)(PHYS uintptr_t) & ((PHYS struct mb2_tag_module *)tag_iter)->cmdline[0],
+					mod = (PHYS struct mb2_tag_module *)tag_iter;
+					load_bootloader_driver((PHYS u32)tag.mod_start,
+					                       (size_t)(tag.mod_end - tag.mod_start),
+					                       (PHYS u32)(PHYS uintptr_t)&mod->cmdline[0],
 					                       cmdline_max_length);
 				} EXCEPT {
 					error_printf(FREESTR("Loading bootloader driver from %I64p...%I64p"),

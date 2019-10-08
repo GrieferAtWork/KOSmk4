@@ -408,7 +408,7 @@ DATDEF ATOMIC_REF(struct driver_library_path_string) driver_library_path;
 
 #define DRIVER_INSMOD_FLAG_NORMAL 0x0000 /* Normal insmod flags. */
 #define DRIVER_INSMOD_FLAG_NOINIT 0x0001 /* Don't initialize the driver (don't load dependencies, apply relocations, or run initializers).
-                                          * When this flag is set, the caller must use `driver_initialize()'
+                                          * When this flag is set, the caller must run `driver_initialize()'
                                           * at some point in the future in order to initialize the driver.
                                           * NOTE: This flag is mainly intended to allow for inter-driver
                                           *       dependencies when multiple drivers are loaded from the
