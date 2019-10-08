@@ -22,14 +22,14 @@
 
 #include <kernel/compiler.h>
 
+#include <drivers/usb.h>
 #include <kernel/types.h>
 #include <kernel/vm.h>
 
 #include <kos/io/uhci.h>
-#include <stdalign.h>
 #include <sys/io.h>
 
-#include "usb.h"
+#include <stdalign.h>
 
 DECL_BEGIN
 

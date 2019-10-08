@@ -26,6 +26,7 @@
 #include <kernel/compiler.h>
 
 #include <drivers/pci.h>
+#include <drivers/usb.h>
 #include <kernel/aio.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
@@ -48,8 +49,6 @@
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
-
-#include "usb.h"
 
 #if !defined(NDEBUG) && 0
 #define UHCI_DEBUG(...) printk(__VA_ARGS__)

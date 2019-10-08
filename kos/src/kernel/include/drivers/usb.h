@@ -16,8 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_MODUSB_USB_H
-#define GUARD_MODUSB_USB_H 1
+#ifndef GUARD_KERNEL_INCLUDE_DRIVERS_USB_H
+#define GUARD_KERNEL_INCLUDE_DRIVERS_USB_H 1
 
 #include <kernel/compiler.h>
 
@@ -29,6 +29,8 @@
 #include <bits/format-printer.h>
 
 #include <stdbool.h>
+
+/* To use this header, you must add `LIB(":usb")' to your driver's linker group. */
 
 DECL_BEGIN
 
@@ -337,4 +339,4 @@ INTDEF FREE void KCALL usb_probe_xhci(struct pci_device *__restrict dev);
 
 DECL_END
 
-#endif /* !GUARD_MODUSB_USB_H */
+#endif /* !GUARD_KERNEL_INCLUDE_DRIVERS_USB_H */

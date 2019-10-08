@@ -23,11 +23,10 @@
 #include <kernel/compiler.h>
 
 #include <drivers/pci.h>
+#include <drivers/usb.h>
 #include <kernel/driver.h>
 #include <kernel/printk.h>
 #include <kernel/types.h>
-
-#include "usb.h"
 
 DECL_BEGIN
 

@@ -21,11 +21,10 @@
 #define CONFIG_BUILDING_MODUSB 1
 #define _KOS_SOURCE 1
 
-#include "usb.h"
-
 #include <kernel/compiler.h>
 
 #include <dev/char.h>
+#include <drivers/usb.h>
 #include <kernel/aio.h>
 #include <kernel/driver.h>
 #include <kernel/malloc.h>

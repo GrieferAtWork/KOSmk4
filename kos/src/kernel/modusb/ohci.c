@@ -21,11 +21,10 @@
 #define CONFIG_BUILDING_MODUSB 1
 
 #include <kernel/compiler.h>
-#include <kernel/printk.h>
 
 #include <drivers/pci.h>
-
-#include "usb.h"
+#include <drivers/usb.h>
+#include <kernel/printk.h>
 
 DECL_BEGIN
 
