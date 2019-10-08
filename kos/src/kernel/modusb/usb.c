@@ -111,8 +111,10 @@ PRIVATE DRIVER_FINI void KCALL usb_unknowns_fini(void) {
 }
 
 PRIVATE NOBLOCK void
-NOTHROW(KCALL usb_unknowns_appendall)(/*inherit*/ REF struct usb_unknown_interface *__restrict self) {
+NOTHROW(KCALL usb_unknowns_appendall)(/*inherit*/ REF struct usb_unknown_interface *self) {
 	struct usb_unknown_interface *last;
+	if (!self)
+		return; /* No devices to append. */
 	last = self;
 	while (last->uui_next)
 		last = last->uui_next;
