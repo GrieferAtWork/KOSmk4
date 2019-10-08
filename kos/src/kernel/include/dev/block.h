@@ -368,8 +368,11 @@ block_device_makepart(struct basic_block_device *__restrict master,
  * NOTE: When `self' is a partition itself, its contents will still be parsed for partition
  *       tables like they usually would, though new partitions will still be added to the
  *       master device, as `block_device_makepart()' is used to create them. */
-FUNDEF NONNULL((1)) REF struct block_device_partition *KCALL
+FUNDEF NONNULL((1)) void KCALL
 block_device_autopart(struct basic_block_device *__restrict self)
+		THROWS(E_BADALLOC, E_WOULDBLOCK);
+FUNDEF WUNUSED NONNULL((1)) REF struct block_device_partition *KCALL
+block_device_autopart_ex(struct basic_block_device *__restrict self)
 		THROWS(E_BADALLOC, E_WOULDBLOCK);
 
 /* Delete (unregister + unlink) all partitions of `self' */

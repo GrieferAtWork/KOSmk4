@@ -220,7 +220,7 @@ handle_blockdevice_ioctl(struct basic_block_device *__restrict self,
 			      HANDLE_TYPEKIND_BLOCKDEVICE_DRIVEROOT,
 			      0);
 		block_device_delparts((struct block_device *)self);
-		xdecref(block_device_autopart(self));
+		block_device_autopart(self);
 		break;
 
 	case BLKGETSIZE:

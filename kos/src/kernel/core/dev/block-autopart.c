@@ -25,6 +25,8 @@
 #include <kernel/compiler.h>
 
 #include <dev/block.h>
+#include <fs/vfs.h>
+#include <hybrid/atomic.h>
 #include <kernel/except.h>
 #include <kernel/heap.h>
 #include <kernel/printk.h>
@@ -324,14 +326,50 @@ load_normal_partition:
 	}
 	return result;
 }
+
 PUBLIC NONNULL((1)) REF struct block_device_partition *KCALL
-block_device_autopart(struct basic_block_device *__restrict self)
+block_device_autopart_ex(struct basic_block_device *__restrict self)
 		THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	REF struct block_device_partition *result;
 	result = block_device_autopart_impl(self, (lba_t)0, self->bd_sector_count - (lba_t)1);
 	if (result == (REF struct block_device_partition *)-1)
 		result = NULL;
 	return result;
+}
+
+PUBLIC NONNULL((1)) void KCALL
+block_device_autopart(struct basic_block_device *__restrict self)
+		THROWS(E_BADALLOC, E_WOULDBLOCK) {
+	REF struct block_device_partition *active_part;
+	active_part = block_device_autopart_ex(self);
+	if (active_part) {
+		/* If the the root VFS has already been mounted, then we've moved past the
+		 * early boot phase of trying to figure out what device was used to boot us.
+		 * In that case, simply ignore any possible active partition. */
+		if (ATOMIC_READ(vfs_kernel.p_inode) != NULL)
+			goto do_decref_active_part;
+		printk(FREESTR(KERN_INFO "[boot] Found boot partition: %.2x:%.2x (%q)\n"),
+		       MAJOR(active_part->bd_devlink.a_vaddr),
+		       MINOR(active_part->bd_devlink.a_vaddr),
+		       active_part->bd_name);
+		if likely(!boot_partition) {
+			boot_partition = active_part; /* Inherit reference. */
+		} else if unlikely(boot_partition == (REF struct basic_block_device *)-1) {
+do_decref_active_part:
+			decref_unlikely(active_part);
+		} else {
+			printk(FREESTR(KERN_WARNING "[boot] Ambigous boot partition: could be %.2x:%.2x (%q) or %.2x:%.2x (%q)\n"),
+			       MAJOR(active_part->bd_devlink.a_vaddr),
+			       MINOR(active_part->bd_devlink.a_vaddr),
+			       active_part->bd_name,
+			       MAJOR(boot_partition->bd_devlink.a_vaddr),
+			       MINOR(boot_partition->bd_devlink.a_vaddr),
+			       boot_partition->bd_name);
+			decref(active_part);
+			decref(boot_partition);
+			boot_partition = (REF struct basic_block_device *)-1;
+		}
+	}
 }
 
 

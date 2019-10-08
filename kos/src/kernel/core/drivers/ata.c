@@ -1592,7 +1592,6 @@ calculate_chs:
 				                         (pos_t)ATA_SECTOR_SIZE(drive));
 				TRY {
 					/* Register the new device. */
-					REF struct block_device_partition *active_part;
 					if (is_default_ide) {
 						dev_t devno;
 						devno = MKDEV(is_primary_ata ? 3 : 22,
@@ -1606,29 +1605,7 @@ calculate_chs:
 					} else {
 						block_device_register_auto(drive);
 					}
-					active_part = block_device_autopart(drive);
-					if (active_part) {
-						printk(FREESTR(KERN_INFO "[ata] Found boot partition: %.2x:%.2x (%q)\n"),
-						       MAJOR(active_part->bd_devlink.a_vaddr),
-						       MINOR(active_part->bd_devlink.a_vaddr),
-						       active_part->bd_name);
-						if likely(!boot_partition)
-							boot_partition = active_part; /* Inherit reference. */
-						else if unlikely(boot_partition == (REF struct basic_block_device *)-1)
-							decref(active_part);
-						else {
-							printk(FREESTR(KERN_WARNING "[ata] Ambigous boot partition: could be %.2x:%.2x (%q) or %.2x:%.2x (%q)\n"),
-							       MAJOR(active_part->bd_devlink.a_vaddr),
-							       MINOR(active_part->bd_devlink.a_vaddr),
-							       active_part->bd_name,
-							       MAJOR(boot_partition->bd_devlink.a_vaddr),
-							       MINOR(boot_partition->bd_devlink.a_vaddr),
-							       boot_partition->bd_name);
-							decref(active_part);
-							decref(boot_partition);
-							boot_partition = (REF struct basic_block_device *)-1;
-						}
-					}
+					block_device_autopart(drive);
 				} EXCEPT {
 					decref(drive);
 					RETHROW();

@@ -493,7 +493,8 @@ block_device_alloc(size_t sector_size, size_t structure_size)
 		cacheptr = heap_align(&kernel_locked_heap,
 		                      result->bd_cache_ssiz,
 		                      0,
-		                      BD_MAX_CACHE_SECTORS * result->bd_cache_ssiz,
+		                      BD_MAX_CACHE_SECTORS *
+		                      result->bd_cache_ssiz,
 		                      GFP_LOCKED | GFP_PREFLT);
 		/* Make sure that all cache pages have been pre-faulted. */
 		iter = (byte_t *)cacheptr.hp_ptr;
