@@ -530,7 +530,7 @@ To help you understand how this script works to do what it does, here is a docum
 	- Same as `--gen=...`, but select files using a regular expression pattern
 	- The given `PATTERN` doesn't get formatted according to the PWD set when `magic.dee` got invoked
 - `--driver=NAME[:NAME]`, `--driver=NAME,CMDLINE`
-	- Inject a driver `NAME` into the kernel during boot, where `NAME` is either the driver's filename within `$PROJPATH/bin/$TARGET-kos-$CONFIG/os/drivers/`, or a filename without the host filesystem if it contains any slashes
+	- Inject a driver `NAME` into the kernel during boot, where `NAME` is either the driver's filename within `$PROJPATH/bin/$TARGET-kos-$CONFIG/os/drivers/`, or a filename within the host filesystem if it contains any slashes
 	- Optionally, a commandline `CMDLINE` may be given, which is then passed to the driver during initialization
 	- This method of loading drivers makes it possible to give KOS the ability to identify alternative devices or filesystems before having initialized its own filesystem, meaning that KOS can be booted from a device/fs combo not known to the kernel core
 	- Note that loading a driver that has dependencies on other driver(s) using this method, you must also inject all dependencies
