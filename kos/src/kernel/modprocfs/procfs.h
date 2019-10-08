@@ -22,8 +22,9 @@
 #include <kernel/compiler.h>
 
 #include <fs/node.h>
-#include <stdint.h>
+
 #include <format-printer.h>
+#include <stdint.h>
 
 DECL_BEGIN
 

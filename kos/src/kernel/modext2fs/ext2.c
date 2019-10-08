@@ -41,54 +41,73 @@
 DECL_BEGIN
 
 
-INTERN void KCALL Ext2_VReadFromINode(struct inode *__restrict self,
-                                      CHECKED USER void *buf,
-                                      size_t bufsize, pos_t pos) {
+INTERN void KCALL
+Ext2_VReadFromINode(struct inode *__restrict self,
+                    CHECKED USER void *buf,
+                    size_t bufsize, pos_t pos) {
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
-INTERN void KCALL Ext2_VWriteToINode(struct inode *__restrict self,
-                                     CHECKED USER void const *buf,
-                                     size_t bufsize, pos_t pos) {
+
+INTERN void KCALL
+Ext2_VWriteToINode(struct inode *__restrict self,
+                   CHECKED USER void const *buf,
+                   size_t bufsize, pos_t pos) {
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
-INTERN void KCALL Ext2_ReadFromINode(struct inode *__restrict self,
-                                     CHECKED USER void *buf, size_t bufsize,
-                                     pos_t pos, struct aio_multihandle *__restrict aio) {
+
+INTERN void KCALL
+Ext2_ReadFromINode(struct inode *__restrict self,
+                   CHECKED USER void *buf, size_t bufsize,
+                   pos_t pos, struct aio_multihandle *__restrict aio) {
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
-INTERN void KCALL Ext2_WriteToINode(struct inode *__restrict self,
-                                    CHECKED USER void const *buf, size_t bufsize,
-                                    pos_t pos, struct aio_multihandle *__restrict aio) {
+
+INTERN void KCALL
+Ext2_WriteToINode(struct inode *__restrict self,
+                  CHECKED USER void const *buf, size_t bufsize,
+                  pos_t pos, struct aio_multihandle *__restrict aio) {
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
-INTERN void KCALL Ext2_ReadFromINodePhys(struct inode *__restrict self,
-                                         vm_phys_t dst, size_t bufsize,
-                                         pos_t pos, struct aio_multihandle *__restrict aio) {
+
+INTERN void KCALL
+Ext2_ReadFromINodePhys(struct inode *__restrict self,
+                       vm_phys_t dst, size_t bufsize,
+                       pos_t pos, struct aio_multihandle *__restrict aio) {
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
-INTERN void KCALL Ext2_WriteToINodePhys(struct inode *__restrict self,
-                                        vm_phys_t src, size_t bufsize,
-                                        pos_t pos, struct aio_multihandle *__restrict aio) {
+
+INTERN void KCALL
+Ext2_WriteToINodePhys(struct inode *__restrict self,
+                      vm_phys_t src, size_t bufsize,
+                      pos_t pos, struct aio_multihandle *__restrict aio) {
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
-INTERN void KCALL Ext2_ReadFromINodeVector(struct inode *__restrict self,
-                                           struct aio_buffer *__restrict buf, size_t bufsize,
-                                           pos_t pos, struct aio_multihandle *__restrict aio) {
+
+INTERN void KCALL
+Ext2_ReadFromINodeVector(struct inode *__restrict self,
+                         struct aio_buffer *__restrict buf, size_t bufsize,
+                         pos_t pos, struct aio_multihandle *__restrict aio) {
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
-INTERN void KCALL Ext2_WriteToINodeVector(struct inode *__restrict self,
-                                          struct aio_buffer *__restrict buf, size_t bufsize,
-                                          pos_t pos, struct aio_multihandle *__restrict aio) {
+
+INTERN void KCALL
+Ext2_WriteToINodeVector(struct inode *__restrict self,
+                        struct aio_buffer *__restrict buf, size_t bufsize,
+                        pos_t pos, struct aio_multihandle *__restrict aio) {
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
-INTERN void KCALL Ext2_ReadFromINodeVectorPhys(struct inode *__restrict self,
-                                               struct aio_pbuffer *__restrict buf, size_t bufsize,
-                                               pos_t pos, struct aio_multihandle *__restrict aio) {
+
+INTERN void KCALL
+Ext2_ReadFromINodeVectorPhys(struct inode *__restrict self,
+                             struct aio_pbuffer *__restrict buf, size_t bufsize,
+                             pos_t pos, struct aio_multihandle *__restrict aio) {
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
-INTERN void KCALL Ext2_WriteToINodeVectorPhys(struct inode *__restrict self,
-                                              struct aio_pbuffer *__restrict buf, size_t bufsize,
-                                              pos_t pos, struct aio_multihandle *__restrict aio) {
+
+INTERN void KCALL
+Ext2_WriteToINodeVectorPhys(struct inode *__restrict self,
+                            struct aio_pbuffer *__restrict buf, size_t bufsize,
+                            pos_t pos, struct aio_multihandle *__restrict aio) {
 	THROW(E_NOT_IMPLEMENTED_TODO);
 }
 
@@ -623,7 +642,7 @@ Ext2_OpenSuperblock(Ext2Superblock *__restrict self, UNCHECKED USER char *args)
 #ifndef CONFIG_VM_DATABLOCK_MIN_PAGEINFO
 	self->db_pagealign     = (size_t)1 << self->db_pageshift;
 	self->db_pagemask      = self->db_pagealign - 1;
-#endif
+#endif /* !CONFIG_VM_DATABLOCK_MIN_PAGEINFO */
 
 
 #if 1 /* I'm guessing this is the right answer, but the wiki really isn't clear...                \
@@ -634,8 +653,9 @@ Ext2_OpenSuperblock(Ext2Superblock *__restrict self, UNCHECKED USER char *args)
        * I'm going with the later variant here, since that seems to make the most sense. */
 	if (self->sd_block_shift <= 10)
 		self->sd_bgroups_pos = EXT2_BLOCK2ADDR(self, 2);
-	else
+	else {
 		self->sd_bgroups_pos = EXT2_BLOCK2ADDR(self, 1);
+	}
 #else
 	self->sd_bgroups_pos = EXT2_SUPERBLOCK_OFFSET + 1024;
 #endif

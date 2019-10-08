@@ -37,6 +37,7 @@
 
 #include <malloca.h>
 #include <string.h>
+
 #include <libcmdline/decode.h>
 
 DECL_BEGIN
@@ -76,10 +77,10 @@ ATTR_USED struct mb2_header_tag tag_empty = {
 
 #ifdef __x86_64__
 INTDEF byte_t __x86_kernel_mb2_hdrlen_and_chksum[];
-#else
+#else /* __x86_64__ */
 INTDEF byte_t __386_kernel_mb2_hdrlen[];
 INTDEF byte_t __386_kernel_mb2_chksum[];
-#endif
+#endif /* !__x86_64__ */
 PRIVATE ATTR_SECTION(".x86.mb2") ATTR_ALIGNED(MB2_HEADER_ALIGN)
 ATTR_USED struct mb2_header mb_multiboot2 = {
 	/* .magic         = */ MB2_HEADER_MAGIC,
@@ -87,12 +88,12 @@ ATTR_USED struct mb2_header mb_multiboot2 = {
 	{
 #ifdef __x86_64__
 		(u64)__x86_kernel_mb2_hdrlen_and_chksum
-#else
+#else /* __x86_64__ */
 		{
 			/* .header_length = */ (u32)__386_kernel_mb2_hdrlen,
 			/* .checksum      = */ (u32)__386_kernel_mb2_chksum
 		}
-#endif
+#endif /* !__x86_64__ */
 	}
 };
 

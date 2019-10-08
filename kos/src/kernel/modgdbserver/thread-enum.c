@@ -19,14 +19,18 @@
 #ifndef GUARD_MODGDBSERVER_THREAD_ENUM_C
 #define GUARD_MODGDBSERVER_THREAD_ENUM_C 1
 
+#include "thread-enum.h"
+
 #include <kernel/compiler.h>
+
 #include <sched/cpu.h>
+
 #include <hybrid/atomic.h>
+
 #include <assert.h>
 
 #include "gdb.h"
 #include "server.h" /* GDBServer_Features */
-#include "thread-enum.h"
 
 DECL_BEGIN
 

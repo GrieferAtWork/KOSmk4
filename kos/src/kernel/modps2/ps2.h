@@ -24,8 +24,8 @@
 #include <kernel/except.h> /* THROW() */
 #include <kernel/types.h>  /* jtime_t */
 #include <sched/cpu.h>     /* jiffies */
-#include <sched/task.h>    /* task_tryyield_or_pause */
 #include <sched/signal.h>  /* struct sig */
+#include <sched/task.h>    /* task_tryyield_or_pause */
 
 #include <kos/io/ps2.h> /* PS2_* */
 #include <sys/io.h>     /* (in|out)(b|w|l)[_p]() */

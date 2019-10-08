@@ -29,11 +29,12 @@
 #include <sched/pid.h>
 
 #include <hybrid/atomic.h>
+
 #include <format-printer.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <unicode.h>
 #include <string.h>
+#include <unicode.h>
 
 #include "../procfs.h"
 

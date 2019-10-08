@@ -74,7 +74,7 @@ PRIVATE ATTR_FREERODATA u8 const x86_ack_pic[18] = {
 	0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
 	0x90, 0x90
 };
-#else
+#else /* __x86_64__ */
 PRIVATE ATTR_FREERODATA u8 const x86_ack_pic[15] = {
 	0xb0, X86_PIC_CMD_EOI,  /* movb $X86_PIC_CMD_EOI, %al */
 	0xe6, (u8)X86_PIC1_CMD, /* outb %al, $X86_PIC1_CMD */
@@ -82,7 +82,7 @@ PRIVATE ATTR_FREERODATA u8 const x86_ack_pic[15] = {
 	0x90, 0x90, 0x90, 0x90, 0x90, 0x90,
 	0x90, 0x90, 0x90, 0x90, 0x90
 };
-#endif
+#endif /* !__x86_64__ */
 
 
 
@@ -235,8 +235,8 @@ DATDEF ATTR_PERCPU struct vm_datapart _x86_this_dfstack_part ASMNAME("x86_this_d
 DATDEF ATTR_PERTASK struct vm_node __this_kernel_stack ASMNAME("_this_kernel_stack");
 DATDEF ATTR_PERTASK struct vm_datapart __this_kernel_stack_part ASMNAME("_this_kernel_stack_part");
 
-#define HINT_ADDR(x,y) x
-#define HINT_MODE(x,y) y
+#define HINT_ADDR(x, y) x
+#define HINT_MODE(x, y) y
 #define HINT_GETADDR(x) HINT_ADDR x
 #define HINT_GETMODE(x) HINT_MODE x
 
@@ -715,9 +715,9 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_apic)(void) {
 				if likely(CPU_ALL_ONLINE)
 					goto all_online;
 			}
-#else
+#else /* HZ >= 100 */
 			__hlt(); /* XXX: Waiting for 1ms would be enough here... */
-#endif
+#endif /* HZ < 100 */
 
 			if likely(CPU_ALL_ONLINE)
 				goto all_online;

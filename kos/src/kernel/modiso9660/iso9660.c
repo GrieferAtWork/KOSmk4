@@ -179,12 +179,15 @@ Iso9660_OpenINode(Iso9660Superblock *__restrict self,
 	node->i_filerdev  = 0;
 	node->i_flags |= INODE_FATTRLOADED;
 	switch (node->i_filemode & S_IFMT) {
+
 	case S_IFDIR:
 		node->i_type = &Iso9660_DirType;
 		break;
+
 	case S_IFREG:
 		node->i_type = &Iso9660_RegType;
 		break;
+
 	default:
 		/* Throw an unsupported-function error for any other type of node. */
 		THROW(E_FSERROR_UNSUPPORTED_OPERATION);
@@ -326,7 +329,7 @@ Iso9660_OpenSuperblock(Iso9660Superblock *__restrict self, UNCHECKED USER char *
 		self->db_pagealign = (size_t)1 << self->db_pageshift;
 		self->db_pagemask  = self->db_pagealign - 1;
 		self->db_pagesize  = sector_size;
-#endif
+#endif /* !CONFIG_VM_DATABLOCK_MIN_PAGEINFO */
 	}
 	{
 		DirectoryEntry *root;

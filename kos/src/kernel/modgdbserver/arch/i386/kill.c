@@ -20,9 +20,11 @@
 #define GUARD_MODGDBSERVER_ARCH_I386_KILL_C 1
 
 #include <kernel/compiler.h>
-#include <kernel/printk.h>
+
 #include <kernel/cpuid.h>
+#include <kernel/printk.h>
 #include <sched/task.h>
+
 #include <sys/io.h>
 
 #include "../../gdb.h"

@@ -18,9 +18,11 @@
  */
 
 #include <kernel/compiler.h>
-#include <kos/kernel/cpu-state.h>
-#include <asm/cfi.h>
+
 #include <kernel/gdt.h>
+
+#include <asm/cfi.h>
+#include <kos/kernel/cpu-state.h>
 
 .section .text
 INTERN_FUNCTION(GDBX86Interrupt_AsmInt1Handler)

@@ -20,6 +20,7 @@
 #define GUARD_MODGDBSERVER_THREAD_ENUM_H 1
 
 #include <kernel/compiler.h>
+
 #include <sched/cpu.h>
 
 #include "gdb.h"

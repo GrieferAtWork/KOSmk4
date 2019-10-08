@@ -21,10 +21,13 @@
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
+
 #include <kernel/interrupt.h>
+
+#include <asm/intrin.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/segment.h>
-#include <asm/intrin.h>
+
 #include <assert.h>
 #include <string.h>
 

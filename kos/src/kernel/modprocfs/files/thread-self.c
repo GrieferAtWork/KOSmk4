@@ -21,7 +21,9 @@
 #define _KOS_SOURCE 1 /* snprintf returns size_t */
 
 #include <kernel/compiler.h>
+
 #include <sched/pid.h>
+
 #include <stdio.h>
 
 #include "../procfs.h"

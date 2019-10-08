@@ -23,11 +23,12 @@
 
 #include <kernel/compiler.h>
 
-#include <kos/types.h>
-#include <string.h>
 #include <hybrid/limitcore.h>
 
+#include <kos/types.h>
+
 #include <format-printer.h>
+#include <string.h>
 
 DECL_BEGIN
 

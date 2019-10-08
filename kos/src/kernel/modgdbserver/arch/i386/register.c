@@ -21,14 +21,17 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/fpu.h>
+#include <sched/task.h>
+
+#include <hybrid/unaligned.h>
+
+#include <asm/cpu-flags.h>
+#include <asm/intrin.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/fpu-state.h>
 #include <kos/kernel/gdb-cpu-state.h>
-#include <hybrid/unaligned.h>
-#include <kernel/fpu.h>
-#include <sched/task.h>
-#include <asm/cpu-flags.h>
-#include <asm/intrin.h>
+
 #include <string.h>
 
 #include "../../gdb.h"

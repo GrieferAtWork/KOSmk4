@@ -21,14 +21,17 @@
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
+
 #include <kernel/driver-param.h>
 #include <kernel/except.h>
 #include <kernel/printk.h>
-#include <hybrid/atomic.h>
 #include <sched/cpu.h>
 #include <sched/signal.h>
-#include <string.h>
+
+#include <hybrid/atomic.h>
+
 #include <assert.h>
+#include <string.h>
 
 #include "gdb.h"
 #include "server.h" /* GDBPacket_RetryTransmitLimit */

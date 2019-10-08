@@ -20,6 +20,7 @@
 #define GUARD_MODGDBSERVER_SERVER_H 1
 
 #include <kernel/compiler.h>
+
 #include <kernel/paging.h> /* HIGH_MEMORY_KERNEL */
 
 #include "gdb.h"

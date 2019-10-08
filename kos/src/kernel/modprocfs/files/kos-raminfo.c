@@ -20,7 +20,9 @@
 #define GUARD_MODPROCFS_FILES_KOS_RAMINFO_C 1
 
 #include <kernel/compiler.h>
+
 #include <kernel/memory.h>
+
 #include <format-printer.h>
 
 #include "../procfs.h"

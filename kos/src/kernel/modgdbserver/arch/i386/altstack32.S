@@ -18,7 +18,9 @@
  */
 
 #include <kernel/compiler.h>
+
 #include <kernel/paging.h> /* KERNEL_DEBUG_STACKSIZE */
+
 #include <asm/cfi.h>
 
 .section .bss

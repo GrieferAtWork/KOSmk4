@@ -302,6 +302,7 @@ INTERN struct vm_datapart x86_vm_part_pdata = {
 		}
 	}
 };
+
 INTERN struct vm_node x86_vm_node_pdata =
 	INIT_NODE(x86_vm_node_pdata,
 	         (vm_vpage_t)((uintptr_t)__kernel_pdata_startpage - KERNEL_BASE_PAGE),
@@ -344,6 +345,7 @@ INTERN ATTR_FREEDATA struct vm_datapart x86_kernel_vm_part_free = {
 		}
 	}
 };
+
 INTERN ATTR_FREEDATA struct vm_node x86_kernel_vm_node_free =
 	INIT_NODE(x86_kernel_vm_node_free,
 	         (vm_vpage_t)((uintptr_t)__kernel_free_startpage),
@@ -376,11 +378,11 @@ INTERN struct vm_datapart kernel_vm_part_pagedata = {
 		}
 	}
 };
+
 INTERN struct vm_node kernel_vm_node_pagedata =
 	INIT_NODE(kernel_vm_node_pagedata,0,0,
 	          VM_PROT_READ | VM_PROT_WRITE,
 	          kernel_vm_part_pagedata);
-
 
 INTDEF struct vm_datapart x86_vm_part_lapic;
 INTDEF struct vm_node x86_vm_node_lapic;
@@ -408,6 +410,7 @@ INTERN struct vm_datapart x86_vm_part_lapic = {
 		}
 	}
 };
+
 INTERN struct vm_node x86_vm_node_lapic =
 	INIT_NODE(x86_vm_node_lapic,0,0,
 	          VM_PROT_READ | VM_PROT_WRITE,
@@ -453,8 +456,8 @@ NOTHROW(KCALL simple_insert_and_activate)(struct vm_node *__restrict node,
 }
 
 
-#define HINT_ADDR(x,y) x
-#define HINT_MODE(x,y) y
+#define HINT_ADDR(x, y) x
+#define HINT_MODE(x, y) y
 #define HINT_GETADDR(x) HINT_ADDR x
 #define HINT_GETMODE(x) HINT_MODE x
 
@@ -479,7 +482,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_kernel_vm)(void) {
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	if (pagedir_prepare_map((vm_vpage_t)KERNEL_BASE_PAGE,
 	                        ((uintptr_t)__kernel_text_startpage - KERNEL_BASE_PAGE)))
-#endif
+#endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	{
 		pagedir_unmap((vm_vpage_t)KERNEL_BASE_PAGE,
 		              ((uintptr_t)__kernel_text_startpage - KERNEL_BASE_PAGE));
@@ -548,9 +551,9 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_kernel_vm)(void) {
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 			if (pagedir_prepare_map(pagedata_prev_end, (size_t)(pagedata_next_min - pagedata_prev_end)))
 				pagedir_unmap(pagedata_prev_end, (size_t)(pagedata_next_min - pagedata_prev_end));
-#else
+#else /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 			pagedir_unmap(pagedata_prev_end, (size_t)(pagedata_next_min - pagedata_prev_end));
-#endif
+#endif /* !CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 		}
 	}
 	/* All right! that's our entire kernel VM all cleaned up! */
@@ -612,7 +615,7 @@ void KCALL x86_kernel_unload_free_and_jump_to_userspace(void) {
 #ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	if (pagedir_prepare_map((vm_vpage_t)__kernel_free_startpage,
 	                        (size_t)__kernel_free_numpages))
-#endif
+#endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	{
 		pagedir_unmap((vm_vpage_t)__kernel_free_startpage,
 		              (size_t)__kernel_free_numpages);

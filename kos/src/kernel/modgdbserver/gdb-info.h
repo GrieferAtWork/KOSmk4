@@ -20,6 +20,7 @@
 #define GUARD_MODGDBSERVER_GDB_INFO_H 1
 
 #include <kernel/compiler.h>
+
 #include <format-printer.h>
 
 #include "gdb.h"

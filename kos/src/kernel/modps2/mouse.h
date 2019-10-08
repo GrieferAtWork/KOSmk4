@@ -20,6 +20,7 @@
 #define GUARD_MODPS2_MOUSE_H 1
 
 #include <kernel/compiler.h>
+
 #include <kernel/types.h>
 
 #include "ps2.h"

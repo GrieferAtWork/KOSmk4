@@ -22,25 +22,26 @@
 #include "gdb-info.h"
 
 #include <kernel/compiler.h>
-#include <kernel/driver.h>
 
 #include <fs/node.h>
 #include <fs/vfs.h>
+#include <kernel/driver.h>
+#include <kernel/handle.h>
+#include <kernel/uname.h>
 #include <kernel/vm.h>
 #include <kernel/vm/exec.h>
 #include <kernel/vm/library.h>
-#include <kernel/handle.h>
-#include <kernel/uname.h>
 #include <sched/pid.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
-#include <libcmdline/encode.h>
 
 #include <assert.h>
 #include <errno.h>
 #include <format-printer.h>
 #include <string.h>
+
+#include <libcmdline/encode.h>
 
 #include "gdb.h"
 #include "server.h"

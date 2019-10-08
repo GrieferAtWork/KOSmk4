@@ -21,14 +21,17 @@
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
-#include <kernel/driver.h>
+
 #include <fs/node.h>
+#include <kernel/driver.h>
+
 #include <sys/stat.h>
+
 #include <assert.h>
 #include <string.h>
 
-#include "util.h"
 #include "procfs.h"
+#include "util.h"
 
 DECL_BEGIN
 

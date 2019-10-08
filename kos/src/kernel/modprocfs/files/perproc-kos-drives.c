@@ -21,11 +21,14 @@
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
+
 #include <fs/vfs.h>
 #include <sched/pid.h>
+
 #include <hybrid/atomic.h>
-#include <stdio.h>
+
 #include <assert.h>
+#include <stdio.h>
 
 #include "../procfs.h"
 

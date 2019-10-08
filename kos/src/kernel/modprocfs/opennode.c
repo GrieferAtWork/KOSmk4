@@ -21,8 +21,8 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/driver.h>
 #include <fs/vfs.h>
+#include <kernel/driver.h>
 
 #include <assert.h>
 

@@ -27,13 +27,14 @@ gcc_opt.append("-fexceptions");
 #ifndef GUARD_MODPS2_KEYBOARD_SCANSETS_C
 #define GUARD_MODPS2_KEYBOARD_SCANSETS_C 1
 
+#include "keyboard-scansets.h"
+
 #include <kernel/compiler.h>
 
 #include <kernel/types.h>
-#include <kos/keyboard.h>
 #include <sched/task.h>
 
-#include "keyboard-scansets.h"
+#include <kos/keyboard.h>
 
 /* Keycodes for scanset #2 and #3 are derived from the tables near the
  * top of the linux kernel source file: `/drivers/input/keyboard/atkbd.c' */

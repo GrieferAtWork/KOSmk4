@@ -28,17 +28,17 @@
 #include <fs/node.h>
 #include <fs/pipe.h>
 #include <fs/vfs.h>
-#include <sched/eventfd.h>
-#include <sched/signalfd.h>
 #include <kernel/handle.h>
+#include <sched/eventfd.h>
 #include <sched/pid.h>
+#include <sched/signalfd.h>
 
 #include <hybrid/atomic.h>
 
 #include <kos/kernel/handle.h>
 
-#include <format-printer.h>
 #include <assert.h>
+#include <format-printer.h>
 #include <stdio.h>
 
 #include "../procfs.h"

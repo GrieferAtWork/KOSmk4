@@ -29,8 +29,8 @@
 #include <kos/debugtrap.h>
 #include <kos/kernel/cpu-state.h>
 
-#include <string.h>
 #include <signal.h>
+#include <string.h>
 
 #include "../../gdb.h"
 #include "../../server.h"

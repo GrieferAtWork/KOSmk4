@@ -24,22 +24,23 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/printk.h>
 #include <kernel/fpu.h>
-#include <kos/debugtrap.h>
+#include <kernel/printk.h>
 #include <sched/cpu.h>
-#include <sched/rpc.h>
 #include <sched/pid.h>
+#include <sched/rpc.h>
 #include <sched/signal.h>
 #include <sched/task.h>
 
 #include <hybrid/atomic.h>
 
+#include <kos/debugtrap.h>
+
 #include <assert.h>
 #include <stddef.h>
 
 #include "gdb.h"
-#include "server.h" /* GDBServer_Features */
+#include "server.h"      /* GDBServer_Features */
 #include "thread-enum.h" /* GDBThread_Enumerate() */
 
 DECL_BEGIN

@@ -23,7 +23,9 @@
 #include <kernel/compiler.h>
 
 #include <kernel/vm.h>
+
 #include <hybrid/atomic.h>
+
 #include <unicode.h>
 
 #include "../procfs.h"

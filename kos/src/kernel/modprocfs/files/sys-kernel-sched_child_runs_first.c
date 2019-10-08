@@ -23,7 +23,9 @@
 #include <kernel/compiler.h>
 
 #include <sched/task.h>
+
 #include <hybrid/atomic.h>
+
 #include <unicode.h>
 
 #include "../procfs.h"

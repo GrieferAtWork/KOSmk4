@@ -21,12 +21,16 @@
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
-#include <kernel/interrupt.h>
+
 #include <kernel/except.h>
+#include <kernel/interrupt.h>
 #include <kernel/printk.h>
+
 #include <hybrid/host.h>
+
 #include <kos/io/serial.h>
 #include <sys/io.h>
+
 #include <stdio.h>
 
 #include "gdb.h"

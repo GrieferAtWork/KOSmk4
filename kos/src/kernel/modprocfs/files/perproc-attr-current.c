@@ -20,7 +20,9 @@
 #define GUARD_MODPROCFS_FILES_PERPROC_ATTR_CURRENT_C 1
 
 #include <kernel/compiler.h>
+
 #include <sched/pid.h>
+
 #include <format-printer.h>
 
 #include "../procfs.h"

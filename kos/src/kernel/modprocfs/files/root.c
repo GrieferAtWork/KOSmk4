@@ -21,8 +21,11 @@
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
+
 #include <sched/pid.h>
+
 #include <hybrid/atomic.h>
+
 #include <assert.h>
 #include <stdio.h>
 

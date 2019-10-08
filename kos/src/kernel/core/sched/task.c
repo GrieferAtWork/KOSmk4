@@ -62,8 +62,8 @@ STATIC_ASSERT(offsetof(struct task, t_heapsz) == OFFSET_TASK_HEAPSZ);
 STATIC_ASSERT(offsetof(struct task, t_sched.s_state) == OFFSET_TASK_SCHED_STATE);
 
 
-#define HINT_ADDR(x,y) x
-#define HINT_MODE(x,y) y
+#define HINT_ADDR(x, y) x
+#define HINT_MODE(x, y) y
 #define HINT_GETADDR(x) HINT_ADDR x
 #define HINT_GETMODE(x) HINT_MODE x
 

@@ -67,23 +67,23 @@ STATIC_ASSERT(SIZEOF_MFREE == offsetof(struct mfree,mf_data));
 #if defined(NDEBUG) || 0
 #define heap_validate(heap)    (void)0
 #define heap_validate_all()    (void)0
-#endif
+#endif /* NDEBUG */
 
 #if defined(NDEBUG) || 0 /* Pedantic heap validation enable/disable */
 #define heap_validate_after_free(heap) (void)0
 #define heap_validate_all_after_free() (void)0
-#else
+#else /* NDEBUG */
 #define heap_validate_after_free(heap) heap_validate(heap)
 #define heap_validate_all_after_free() heap_validate_all()
-#endif
+#endif /* !NDEBUG */
 
 #if defined(NDEBUG) || 1 /* Pedantic heap validation enable/disable */
 #define heap_validate_pedantic(heap) (void)0
 #define heap_validate_all_pedantic() (void)0
-#else
+#else /* NDEBUG */
 #define heap_validate_pedantic(heap) heap_validate(heap)
 #define heap_validate_all_pedantic() heap_validate_all()
-#endif
+#endif /* !NDEBUG */
 
 #undef TRACE
 #if 0
@@ -95,16 +95,16 @@ STATIC_ASSERT(SIZEOF_MFREE == offsetof(struct mfree,mf_data));
 
 #if !defined(NDEBUG) && 1
 #define PRINTK_SYSTEM_ALLOCATION(...) printk(KERN_DEBUG __VA_ARGS__)
-#else
+#else /* !NDEBUG */
 #define PRINTK_SYSTEM_ALLOCATION(...) (void)0
-#endif
+#endif /* NDEBUG */
 
 
 #if defined(NDEBUG) || 0
 #define HEAP_ASSERT(expr)       (void)0
 #define HEAP_ASSERTE(expr)      (expr)
 #define HEAP_ASSERTF(expr, ...) (void)0
-#else
+#else /* NDEBUG */
 #ifdef NDEBUG
 #define HEAP_ASSERTE /* nothing */
 #else /* NDEBUG */
@@ -112,7 +112,7 @@ STATIC_ASSERT(SIZEOF_MFREE == offsetof(struct mfree,mf_data));
 #endif /* !NDEBUG */
 #define HEAP_ASSERT  assert
 #define HEAP_ASSERTF assertf
-#endif
+#endif /* !NDEBUG */
 
 
 #if !defined(NDEBUG) && 0
@@ -124,10 +124,10 @@ STATIC_ASSERT(SIZEOF_MFREE == offsetof(struct mfree,mf_data));
         (((count) && (self) == &kernel_locked_heap) ? printk(KERN_RAW "%s(%d) : Sub dangle %Iu - %Iu -> %Iu\n", \
                           __FILE__,__LINE__,(self)->h_dangle,count,(self)->h_dangle - (count)) : (void)0, \
          ATOMIC_FETCHSUB((self)->h_dangle,count))
-#else
+#else /* !NDEBUG */
 #define HEAP_ADD_DANGLE(self,count) ATOMIC_FETCHADD((self)->h_dangle,count)
 #define HEAP_SUB_DANGLE(self,count) ATOMIC_FETCHSUB((self)->h_dangle,count)
-#endif
+#endif /* NDEBUG */
 
 #ifndef HEAP_THRESHOLD_PAGESIZE
 #define HEAP_THRESHOLD_PAGESIZE PAGEDIR_MIN_PAGESIZE
@@ -145,8 +145,8 @@ STATIC_ASSERT(SIZEOF_MFREE == offsetof(struct mfree,mf_data));
 #endif
 
 
-#define HINT_ADDR(x,y) x
-#define HINT_MODE(x,y) y
+#define HINT_ADDR(x, y) x
+#define HINT_MODE(x, y) y
 #define HINT_GETADDR(x) HINT_ADDR x
 #define HINT_GETMODE(x) HINT_MODE x
 

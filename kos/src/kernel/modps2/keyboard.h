@@ -20,9 +20,11 @@
 #define GUARD_MODPS2_KEYBOARD_H 1
 
 #include <kernel/compiler.h>
-#include <kernel/types.h>
+
 #include <dev/keyboard.h>
+#include <kernel/types.h>
 #include <sched/mutex.h>
+
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include "ps2.h"

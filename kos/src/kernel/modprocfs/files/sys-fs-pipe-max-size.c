@@ -27,6 +27,7 @@
 #include <sched/pid.h>
 
 #include <hybrid/atomic.h>
+
 #include <format-printer.h>
 #include <stdio.h>
 #include <stdlib.h>

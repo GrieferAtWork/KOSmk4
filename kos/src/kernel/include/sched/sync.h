@@ -36,9 +36,9 @@ DECL_BEGIN
 		endb;                                             \
 	} __WHILE1
 
-#define __LINEID3(x,y) x##y
-#define __LINEID2(x,y) __LINEID3(x,y)
-#define __LINEID(x) __LINEID2(x,__LINE__)
+#define __LINEID3(x, y) x##y
+#define __LINEID2(x, y) __LINEID3(x, y)
+#define __LINEID(x) __LINEID2(x, __LINE__)
 
 #define SYNC_ACQUIRE3(trya, geta, enda, tryb, getb, endb, tryc, getc, endc) \
 	do {                                                                    \
@@ -76,7 +76,7 @@ __LINEID(continue_b):                                                       \
 #ifdef __cplusplus
 extern "C++" {
 
-#define __DEFINE_SYNCALL(name) \
+#define __DEFINE_SYNCALL(name)                                                                                     \
 	template<class T1, class T2>                                                                                   \
 	NONNULL((1, 2))                                                                                                \
 	void(KCALL sync_##name##all)(T1 *__restrict a, T2 *__restrict b) THROWS(E_WOULDBLOCK, ...) {                   \

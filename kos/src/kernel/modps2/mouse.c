@@ -19,12 +19,14 @@
 #ifndef GUARD_MODPS2_MOUSE_C
 #define GUARD_MODPS2_MOUSE_C 1
 
+#include "mouse.h"
+
 #include <kernel/compiler.h>
-#include <kernel/types.h>
+
 #include <kernel/printk.h>
+#include <kernel/types.h>
 
 #include "ps2.h"
-#include "mouse.h"
 
 DECL_BEGIN
 

@@ -22,6 +22,7 @@
 #include <kernel/compiler.h>
 
 #include <kos/types.h>
+
 #include <format-printer.h>
 
 DECL_BEGIN

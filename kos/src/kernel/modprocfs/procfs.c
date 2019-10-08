@@ -20,11 +20,12 @@
 #define GUARD_MODPROCFS_PROCFS_C 1
 #define CONFIG_WANT_FS_AS_STRUCT 1
 
+#include "procfs.h"
+
 #include <kernel/compiler.h>
-#include <kernel/driver.h>
 
 #include <fs/node.h>
-#include "procfs.h"
+#include <kernel/driver.h>
 
 DECL_BEGIN
 
@@ -66,7 +67,7 @@ INTERN struct superblock ProcFS = {
 			/* .i_filetree     = */ { NULL, NULL, (ino_t)PROCFS_INOMAKE_SINGLETON(PROCFS_SINGLETON_ROOT) },
 #ifdef __INTELLISENSE__
 			/* .i_fileino      = */ (ino_t)PROCFS_INOMAKE_SINGLETON(PROCFS_SINGLETON_ROOT),
-#endif
+#endif /* __INTELLISENSE__ */
 			/* .i_filesize     = */ (pos_t)0,
 			/* .i_filemode     = */ (mode_t)(S_IFDIR | 0555),
 			/* .i_filenlink    = */ (nlink_t)0,

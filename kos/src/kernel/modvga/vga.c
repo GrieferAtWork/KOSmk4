@@ -24,23 +24,24 @@
 
 #include <kernel/compiler.h>
 
-#include <linux/kd.h>
 #include <dev/char.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
-#include <hybrid/atomic.h>
 #include <kernel/printk.h>
 #include <kernel/user.h>
 #include <kernel/vm.h>
 #include <sched/cpu.h>
 
-#include <kos/dev.h>
-#include <hybrid/limits.h>
 #include <hybrid/align.h>
+#include <hybrid/atomic.h>
+#include <hybrid/limits.h>
+
+#include <kos/dev.h>
+#include <linux/kd.h>
 
 #include <assert.h>
-#include <string.h>
 #include <stdio.h>
+#include <string.h>
 
 /* TODO: Split all of the stuff that's required by both this driver, and the builtin debugger
  *       into a seperate file that is then included by both components to reduce redundancy. */

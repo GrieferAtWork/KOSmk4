@@ -21,10 +21,10 @@
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
-#include <kernel/except.h>
 
-#include <sched/task.h>
+#include <kernel/except.h>
 #include <kernel/vm.h>
+#include <sched/task.h>
 
 #include "gdb.h"
 

@@ -23,12 +23,13 @@
 
 #include <dev/ansitty.h>
 #include <kernel/types.h>
-#include <libansitty/ansitty.h>
 
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <kos/io/vga.h>
 #include <sys/io.h>
+
+#include <libansitty/ansitty.h>
 
 DECL_BEGIN
 
