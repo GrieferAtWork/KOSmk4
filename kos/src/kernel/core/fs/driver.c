@@ -682,11 +682,13 @@ NOTHROW(KCALL driver_section_do_destroy_with_sections_lock_held)(struct driver_s
 		uintptr_t sect_base;
 		size_t sect_size;
 		sect_base = (uintptr_t)self->ds_data;
-		sect_size = self->ds_size;
-		sect_size += sect_base & (pagedir_pagesize() - 1);
-		sect_base &= ~(pagedir_pagesize() - 1);
-		vpage_free((void *)sect_base,
-		           (size_t)CEILDIV(sect_size, pagedir_pagesize()));
+		if (sect_base != (uintptr_t)-1) {
+			sect_size = self->ds_size;
+			sect_size += sect_base & (pagedir_pagesize() - 1);
+			sect_base &= ~(pagedir_pagesize() - 1);
+			vpage_free((void *)sect_base,
+			           (size_t)CEILDIV(sect_size, pagedir_pagesize()));
+		}
 	}
 	kfree(self);
 }

@@ -189,7 +189,7 @@ ms_scsi_doio(struct ms_scsi_device *__restrict self,
 	status.ut_next   = NULL;
 
 	/* TODO: Append another set of transaction for
-	 *       querying errors via the inquiry command */
+	 *       querying errors via the sense command */
 
 	{
 		/* With all of the data structures set up, acquire a lock to
