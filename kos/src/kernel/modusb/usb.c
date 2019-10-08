@@ -433,54 +433,55 @@ usb_interface_discovered(struct usb_controller *__restrict self,
 
 	/* Go through loaded drivers and try to have drivers bind the interface. */
 	probes = probe_interface.get();
-	{
-		FINALLY_DECREF_UNLIKELY(probes);
+	TRY {
 		for (i = 0; i < probes->upv_count; ++i) {
 			/* Try to identify this interface/endpoint combination. */
 			if ((*probes->upv_elem[i].c_intf)(self, intf, endpc, endpv))
 				return;
 		}
-	}
-	/* Create a descriptor to keep track of the unknown interface. */
-	if unlikely(ATOMIC_READ(usb_unknowns) == USB_UNKNOWNS_CLOSED)
-		return; /* No-op after USB has been finalized. */
-
-	unknown = (REF struct usb_unknown_interface *)kmalloc(offsetof(struct usb_unknown_interface, uui_endpv) +
-	                                                      (endpc * sizeof(REF struct usb_endpoint *)),
-	                                                      GFP_NORMAL);
-	unknown->uui_refcnt = 1; /* The reference inherited by `usb_unknowns' */
-	unknown->uui_ctrl   = (REF struct usb_controller *)incref(self);
-	unknown->uui_intf   = (REF struct usb_interface *)incref(intf);
-	unknown->uui_endpc  = endpc;
-	memcpy(unknown->uui_endpv, endpv, endpc * sizeof(REF struct usb_endpoint *));
-	for (i = 0; i < endpc; ++i)
-		incref(unknown->uui_endpv[i]);
-
-	/* Register the unknown interface. */
-	for (;;) {
-		REF struct usb_unknown_interface *next_unknown;
-		next_unknown = ATOMIC_READ(usb_unknowns);
-		if unlikely(next_unknown == USB_UNKNOWNS_CLOSED) {
-			/* No-op after the USB driver has been finalized. */
-			destroy(unknown);
-			return;
+		/* Create a descriptor to keep track of the unknown interface. */
+		if unlikely(ATOMIC_READ(usb_unknowns) == USB_UNKNOWNS_CLOSED)
+			return; /* No-op after USB has been finalized. */
+	
+		unknown = (REF struct usb_unknown_interface *)kmalloc(offsetof(struct usb_unknown_interface, uui_endpv) +
+		                                                      (endpc * sizeof(REF struct usb_endpoint *)),
+		                                                      GFP_NORMAL);
+		unknown->uui_refcnt = 1; /* The reference inherited by `usb_unknowns' */
+		unknown->uui_ctrl   = (REF struct usb_controller *)incref(self);
+		unknown->uui_intf   = (REF struct usb_interface *)incref(intf);
+		unknown->uui_endpc  = endpc;
+		memcpy(unknown->uui_endpv, endpv, endpc * sizeof(REF struct usb_endpoint *));
+		for (i = 0; i < endpc; ++i)
+			incref(unknown->uui_endpv[i]);
+	
+		/* Register the unknown interface. */
+		for (;;) {
+			REF struct usb_unknown_interface *next_unknown;
+			next_unknown = ATOMIC_READ(usb_unknowns);
+			if unlikely(next_unknown == USB_UNKNOWNS_CLOSED) {
+				/* No-op after the USB driver has been finalized. */
+				destroy(unknown);
+				return;
+			}
+			unknown->uui_next = next_unknown;
+			COMPILER_WRITE_BARRIER();
+			if (ATOMIC_CMPXCH_WEAK(usb_unknowns, next_unknown, unknown))
+				break;
 		}
-		unknown->uui_next = next_unknown;
-		COMPILER_WRITE_BARRIER();
-		if (ATOMIC_CMPXCH_WEAK(usb_unknowns, next_unknown, unknown))
-			break;
+	
+		printk(KERN_NOTICE "[usb] Failed to identify device %q:%q:%q with interface %q(%#x.%#x.%#x) (config %q)\n",
+		       intf->ui_device->ud_str_vendor,
+		       intf->ui_device->ud_str_product,
+		       intf->ui_device->ud_str_serial,
+		       intf->ui_intf_name,
+		       intf->ui_intf_desc->ui_intf_class,
+		       intf->ui_intf_desc->ui_intf_subclass,
+		       intf->ui_intf_desc->ui_intf_protocol,
+		       intf->ui_device->ud_config->uc_desc);
+	} EXCEPT {
+		decref_unlikely(probes);
+		RETHROW();
 	}
-
-	printk(KERN_NOTICE "[usb] Failed to identify device %q:%q:%q with interface %q(%#x.%#x.%#x) (config %q)\n",
-	       intf->ui_device->ud_str_vendor,
-	       intf->ui_device->ud_str_product,
-	       intf->ui_device->ud_str_serial,
-	       intf->ui_intf_name,
-	       intf->ui_intf_desc->ui_intf_class,
-	       intf->ui_intf_desc->ui_intf_subclass,
-	       intf->ui_intf_desc->ui_intf_protocol,
-	       intf->ui_device->ud_config->uc_desc);
-
 	/* Check if new probes may have been added in the mean time.
 	 * If so, try once again to identify unknown devices, thus
 	 * ensuring that every probe has had a chance to identify our
@@ -489,9 +490,12 @@ usb_interface_discovered(struct usb_controller *__restrict self,
 		new_probes = ATOMIC_READ(probe_interface.m_pointer);
 		if likely(new_probes == probes)
 			break;
+		new_probes = probe_interface.get();
+		decref_unlikely(probes);
 		probes = new_probes;
 		usb_probe_identify_unknown(NULL);
 	}
+	decref_unlikely(probes);
 }
 
 
