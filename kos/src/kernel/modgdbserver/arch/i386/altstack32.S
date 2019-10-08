@@ -22,6 +22,7 @@
 #include <asm/cfi.h>
 
 .section .bss
+	.align 4
 INTERN_OBJECT(GDB_Main_alternate_stack)
 	.skip KERNEL_DEBUG_STACKSIZE
 END(GDB_Main_alternate_stack)

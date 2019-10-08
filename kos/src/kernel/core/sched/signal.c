@@ -135,7 +135,8 @@ task_connect(struct sig *__restrict target) THROWS(E_BADALLOC) {
 	struct task_connections *mycons;
 	unsigned int i;
 	uintptr_t flags = 0;
-	assert(IS_ALIGNED((uintptr_t)target, 2));
+	assertf(IS_ALIGNED((uintptr_t)target, 2),
+	        "target = %p", target);
 	mycons = &PERTASK(_this_cons);
 	for (i = 0; i < CONFIG_TASK_STATIC_CONNECTIONS; ++i) {
 		con = &mycons->tc_static_v[i];
