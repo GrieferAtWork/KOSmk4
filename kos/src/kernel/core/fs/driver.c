@@ -2767,12 +2767,12 @@ driver_do_load_dependencies(struct driver *__restrict self)
 				dependency = driver_with_name(filename);
 				if likely(dependency)
 					goto got_dependency;
-				/* We get here if a driver loaded via the kernel commandline required
+				/* We get here if a driver loaded as a bootloader module required
 				 * another driver as a dependency, with that other driver not having
-				 * been specified on the commandline.
+				 * been provided in the same manner.
 				 * In this case, tell the user that they've booted KOS in an impossible
-				 * configuration, also telling them which driver is missing.
-				 * Note that when build with the builtin debugger enabled, the user
+				 * configuration, also informing them of the missing driver.
+				 * Note that when built with the builtin debugger enabled, the user
 				 * will even be prompted with a really nice error message! ;) */
 				name = strchr(filename, '/');
 				name = name ? name + 1 : filename;

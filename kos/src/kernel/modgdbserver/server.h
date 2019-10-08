@@ -48,7 +48,9 @@ INTDEF uintptr_t GDBRemote_Features;
 #define GDB_SERVER_FEATURE_MULTIPROCESS 0x0001 /* Enable (and use) multiprocess extensions. */
 #define GDB_SERVER_FEATURE_NONSTOP      0x0002 /* GDB_Main() should be invoked in non-stop mode.
                                                 * (`GDBThread_IsNonStopModeActive' is set to `true'
-                                                * at the start of a session) */
+                                                * at the start of a session)
+                                                * FIXME: Somewhere, QNonStop:1 is leaking references to `struct task's
+                                                * When it's enabled, processes no longer disappear from /proc! */
 #define GDB_SERVER_FEATURE_ATTACHED     0x0004 /* A GDB remote has been attached. */
 #define GDB_SERVER_FEATURE_NOACK        0x0008 /* No-ack mode is enabled */
 #define GDB_SERVER_FEATURE_SHOWKERNEL   0x0010 /* Show the kernel core process to the GDB remote */
