@@ -353,7 +353,7 @@ usb_scsi_create_lun(struct usb_controller *__restrict self,
 	if unlikely(num_read < sizeof(cap))
 		return false; /* This really shouldn't happen... */
 
-	if (cap.cap_sector_num == (__be32)0xffffffff) {
+	if (cap.cap_sector_max == (__be32)0xffffffff) {
 		/* TODO: Must use `SCSI_CMD_SAI_READ_CAPACITY_16' to get the real size! */
 	}
 	/* With the disk geometry all figured out, it's time to create the block device! */
@@ -371,7 +371,7 @@ usb_scsi_create_lun(struct usb_controller *__restrict self,
 	assert(result->msd_tag == 0);
 
 	/* Fill in missing capacity information. */
-	result->bd_sector_count = (lba_t)(u32)BESWAP32(cap.cap_sector_num);
+	result->bd_sector_count = (lba_t)(u32)BESWAP32(cap.cap_sector_max) + 1;
 	result->bd_total_bytes  = (pos_t)(result->bd_sector_count * result->bd_sector_size);
 
 	/* Fill in I/O operators. */

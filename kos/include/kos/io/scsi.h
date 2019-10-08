@@ -89,7 +89,7 @@ struct __ATTR_PACKED scsi_csw {
 
 struct __ATTR_PACKED scsi_capacity {
 	/* Buffer returned by `SCSI_CMD_READ_CAPACITY' */
-	__be32 cap_sector_num; /* Number of available sectors. */
+	__be32 cap_sector_max; /* Max valid sectors number. */
 	__be32 cap_sector_len; /* Size of a single sector (in bytes). */
 };
 #endif /* __CC__ */
