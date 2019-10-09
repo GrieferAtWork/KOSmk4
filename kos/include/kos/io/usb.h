@@ -56,6 +56,7 @@ __SYSDECL_BEGIN
 
 /* Standard (USB_REQUEST_RETYPE_TYPE_STD) USB requests */
 #define USB_REQUEST_GET_STATUS        0x00 /* LEN=2 */
+#define USB_REQUEST_SET_FEATURE       0x03 /* Set device features. */
 #define USB_REQUEST_SET_ADDRESS       0x05 /* Set device address. (new address is `ur_value', but must be <= 127) */
 #define USB_REQUEST_GET_DESCRIPTOR    0x06 /* Read the device's descriptor structure
                                             * The `ur_value' field must be one of `USB_REQUEST_GET_DESCRIPTOR_VALUE_*' */

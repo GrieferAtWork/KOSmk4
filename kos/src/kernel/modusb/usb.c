@@ -46,6 +46,8 @@
 #include <string.h>
 #include <unicode.h>
 
+#include "hub.h"
+
 DECL_BEGIN
 
 struct usb_probe_entry {
@@ -77,7 +79,7 @@ struct usb_unknown_interface {
 	REF struct usb_controller                         *uui_ctrl;   /* [1..1] The associated controller. */
 	REF struct usb_interface                          *uui_intf;   /* [1..1] The associated interface. */
 	size_t                                             uui_endpc;  /* Number of endpoints. */
-	COMPILER_FLEXIBLE_ARRAY(REF struct usb_endpoint *, uui_endpv); /* [1..1][1..uui_endpc] Associated interfaces. */
+	COMPILER_FLEXIBLE_ARRAY(REF struct usb_endpoint *, uui_endpv); /* [1..1][0..uui_endpc] Associated interfaces. */
 };
 
 LOCAL NOBLOCK void
@@ -165,6 +167,18 @@ PRIVATE NOBLOCK void NOTHROW(KCALL usb_probe_unknown_release)(void) {
 	ATOMIC_WRITE(usb_probe_unknown_lock, NULL);
 	sig_broadcast(&usb_probe_unknown_unlock);
 }
+
+LOCAL bool KCALL
+usb_probe_builtin_interfaces(struct usb_controller *__restrict self,
+                             struct usb_interface *__restrict intf,
+                             size_t endpc, struct usb_endpoint *const endpv[]) {
+	if (usb_hub_probe(self, intf, endpc, endpv))
+		goto ok;
+	return false;
+ok:
+	return true;
+}
+
 
 
 /* Probe all unknown interfaces using the given `func', removing
@@ -415,9 +429,8 @@ usb_interface_discovered(struct usb_controller *__restrict self,
 	size_t i;
 	REF struct usb_probe_vector *probes, *new_probes;
 	REF struct usb_unknown_interface *unknown;
-	assert(endpc != 0);
 	printk(KERN_NOTICE "[usb] Discovered device %q:%q:%q with interface "
-	                   "%q(%#x.%#x.%#x) (config %q) and %Iu endpoints [%I8u",
+	                   "%q(%#x.%#x.%#x) (config %q) and %Iu endpoints",
 	       intf->ui_device->ud_str_vendor,
 	       intf->ui_device->ud_str_product,
 	       intf->ui_device->ud_str_serial,
@@ -426,16 +439,24 @@ usb_interface_discovered(struct usb_controller *__restrict self,
 	       intf->ui_intf_desc->ui_intf_subclass,
 	       intf->ui_intf_desc->ui_intf_protocol,
 	       intf->ui_device->ud_config->uc_desc,
-	       endpc, endpv[0]->ue_endp);
-	for (i = 1; i < endpc; ++i) {
-		printk(KERN_NOTICE ",%I8u",
-		       endpv[i]->ue_endp);
+	       endpc);
+	if (endpc != 0) {
+		printk(KERN_NOTICE " [%I8u", endpv[0]->ue_endp);
+		for (i = 1; i < endpc; ++i) {
+			printk(KERN_NOTICE ",%I8u",
+				   endpv[i]->ue_endp);
+		}
+		printk(KERN_NOTICE "]\n");
+	} else {
+		printk(KERN_NOTICE "\n");
 	}
-	printk(KERN_NOTICE "]\n");
 
 	/* Go through loaded drivers and try to have drivers bind the interface. */
 	probes = probe_interface.get();
 	TRY {
+		/* Try to probe the device for matching one of the builtin interfaces (e.g. a HUB) */
+		if (usb_probe_builtin_interfaces(self, intf, endpc, endpv))
+			return;
 		for (i = 0; i < probes->upv_count; ++i) {
 			/* Try to identify this interface/endpoint combination. */
 			if ((*probes->upv_elem[i].c_intf)(self, intf, endpc, endpv))
@@ -898,35 +919,42 @@ usb_device_discovered(struct usb_controller *__restrict self,
 	u8 used_conf;
 	u16 device_max_packet_size;
 
-	req.ur_reqtype = USB_REQUEST_RETYPE_DEST_DEV |
-	                 USB_REQUEST_RETYPE_TYPE_STD |
-	                 USB_REQUEST_RETYPE_DIR_D2H;
-	req.ur_request = USB_REQUEST_GET_DESCRIPTOR;
-	req.ur_value   = USB_REQUEST_GET_DESCRIPTOR_VALUE_DEVICE;
-	req.ur_index   = 0;
-	/* NOTE: offsetafter(struct usb_device_descriptor, ud_maxpacketsize) == 8,
-	 *       which is the minimum packet size supported by all devices */
-	req.ur_length = offsetafter(struct usb_device_descriptor, ud_maxpacketsize);
-	transfer_size = usb_controller_request_sync(self, dev, &req, &desc);
-
-	/* Remember the max packet size supported by the device. */
-	device_max_packet_size = dev->ue_maxpck;
-	if likely(transfer_size >= offsetafter(struct usb_device_descriptor, ud_maxpacketsize) &&
-	          desc.ud_type == (USB_REQUEST_GET_DESCRIPTOR_VALUE_DEVICE & 0xff00) >> 8)
-		dev->ue_maxpck = desc.ud_maxpacketsize;
-
-	/* Assign an address to the device. */
-	usb_controller_assign_device_address(self, dev);
-
-	/* Tell the device about the address we've assigned it. */
-	req.ur_reqtype = USB_REQUEST_RETYPE_DEST_DEV |
-	                 USB_REQUEST_RETYPE_TYPE_STD |
-	                 USB_REQUEST_RETYPE_DIR_H2D;
-	req.ur_request = USB_REQUEST_SET_ADDRESS;
-	req.ur_value   = dev->ud_dev;
-	req.ur_index   = dev->ud_dev;
-	req.ur_length  = 0;
-	usb_controller_request_sync(self, dev, &req, NULL);
+	{
+		/* Always release the device-discover-lock as
+		 * soon as we've assigned the device its address. */
+		FINALLY_ENDWRITE(&self->uc_disclock);
+		req.ur_reqtype = USB_REQUEST_RETYPE_DEST_DEV |
+		                 USB_REQUEST_RETYPE_TYPE_STD |
+		                 USB_REQUEST_RETYPE_DIR_D2H;
+		req.ur_request = USB_REQUEST_GET_DESCRIPTOR;
+		req.ur_value   = USB_REQUEST_GET_DESCRIPTOR_VALUE_DEVICE;
+		req.ur_index   = 0;
+		/* NOTE: offsetafter(struct usb_device_descriptor, ud_maxpacketsize) == 8,
+		 *       which is the minimum packet size supported by all devices */
+		req.ur_length = offsetafter(struct usb_device_descriptor, ud_maxpacketsize);
+		transfer_size = usb_controller_request_sync(self, dev, &req, &desc);
+	
+		/* Remember the max packet size supported by the device. */
+		device_max_packet_size = dev->ue_maxpck;
+		if likely(transfer_size >= offsetafter(struct usb_device_descriptor, ud_maxpacketsize) &&
+		          desc.ud_type == (USB_REQUEST_GET_DESCRIPTOR_VALUE_DEVICE & 0xff00) >> 8)
+			dev->ue_maxpck = desc.ud_maxpacketsize;
+	
+		/* Assign an address to the device. */
+		usb_controller_assign_device_address(self, dev);
+	
+		/* Tell the device about the address we've assigned it. */
+		req.ur_reqtype = USB_REQUEST_RETYPE_DEST_DEV |
+		                 USB_REQUEST_RETYPE_TYPE_STD |
+		                 USB_REQUEST_RETYPE_DIR_H2D;
+		req.ur_request = USB_REQUEST_SET_ADDRESS;
+		req.ur_value   = dev->ud_dev;
+		req.ur_index   = dev->ud_dev;
+		req.ur_length  = 0;
+		usb_controller_request_sync(self, dev, &req, NULL);
+	} /* FINALLY {
+		sync_endwrite(&self->uc_disclock);
+	} */
 
 	/* With the address assigned to the device, from now on make use of
 	 * that address for the purposes of communications with the device */
@@ -1216,19 +1244,18 @@ again_scanconfig:
 search_for_next_endp:
 						iter += size;
 					}
-					if likely(interface_endpoint_count != 0) {
-						/* Notify the system of the discovery of this
-						 * interface, as well as associated endpoints. */
-						usb_interface_discovered(self, intf,
-						                         interface_endpoint_count,
-						                         interface_endpts);
-					} else {
-						/* Interface without any endpoints (shouldn't happen) */
+					if unlikely(interface_endpoint_count == 0) {
+						/* Interface without any endpoints (shouldn't happen... I think?) */
 						printk(KERN_WARNING "[usb] Interface %q of device %q:%q:%q configured "
 						                    "with %q doesn't seem to have any endpoints\n",
 						       intf->ui_intf_name, dev->ud_str_vendor, dev->ud_str_product,
 						       dev->ud_str_serial, dev->ud_config->uc_desc);
 					}
+					/* Notify the system of the discovery of this
+					 * interface, as well as associated endpoints. */
+					usb_interface_discovered(self, intf,
+					                         interface_endpoint_count,
+					                         interface_endpts);
 					++interface_count;
 				} EXCEPT {
 					while (interface_endpoint_count) {
@@ -1275,6 +1302,43 @@ strange_device:
 }
 
 
+/* Register mappings between USB devices and device files, such that
+ * the USB system can attempt to unregister and remove device files
+ * bound to some USB device when it is detected that the usb device
+ * was unplugged from the system.
+ * Note that these functions should be called like this:
+ * >> struct (character|block)_device *mydev;
+ * >> mydev = CREATE_DEVICE(usb_dev);
+ * >> (character|block)_device_register[_auto](mydev);
+ * >> TRY {
+ * >>     usb_register_device(usb_dev, mydev);
+ * >> } EXCEPT {
+ * >>     (character|block)_device_unregister(mydev);
+ * >>     RETHROW();
+ * >> }
+ * Note that it is possible to register any number of devices for any
+ * single given USB device, however it is not possible to delete such
+ * a registration, other than physically removing the associated device.
+ */
+PUBLIC void KCALL
+usb_register_block_device(struct usb_device *__restrict usb_dev,
+                          struct block_device *__restrict dev)
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+	/* TODO */
+	(void)usb_dev;
+	(void)dev;
+}
+
+PUBLIC void KCALL
+usb_register_character_device(struct usb_device *__restrict usb_dev,
+                              struct character_device *__restrict dev)
+		THROWS(E_WOULDBLOCK, E_BADALLOC) {
+	/* TODO */
+	(void)usb_dev;
+	(void)dev;
+}
+
+
 DECL_END
 
-#endif /* ! */
+#endif /* !GUARD_MODUSB_USB_C */

@@ -50,11 +50,11 @@
 #include <stdio.h>
 #include <string.h>
 
-#if !defined(NDEBUG) && 1
+#if !defined(NDEBUG) && 0
 #define UHCI_DEBUG(...) printk(__VA_ARGS__)
-#else
+#else /* !NDEBUG */
 #define UHCI_DEBUG(...) (void)0
-#endif
+#endif /* NDEBUG */
 
 DECL_BEGIN
 
@@ -1425,13 +1425,24 @@ uhci_controller_probeport(struct uhci_controller *__restrict self,
 	u16 status;
 	printk(FREESTR(KERN_INFO "[usb][pci:%I32p,io:%#Ix] Checking for device on uhci:%#I16x\n"),
 	       self->uc_pci->pd_base, self->uc_base.uc_mmbase, portno);
-	status = uhci_controller_resetport(self, portno);
+	sync_write(&self->uc_disclock);
+	TRY {
+		status = uhci_controller_resetport(self, portno);
+	} EXCEPT {
+		sync_endwrite(&self->uc_disclock);
+		RETHROW();
+	}
 	if (status & UHCI_PORTSC_PED) {
 		struct usb_device *dev;
 		printk(FREESTR(KERN_INFO "[usb][pci:%I32p,io:%#Ix] Device found on uhci:%#I16x\n"),
 		       self->uc_pci->pd_base, self->uc_base.uc_mmbase, portno);
-		dev = (struct usb_device *)kmalloc(sizeof(struct usb_device),
-		                                   GFP_NORMAL | GFP_CALLOC);
+		TRY {
+			dev = (struct usb_device *)kmalloc(sizeof(struct usb_device),
+			                                   GFP_NORMAL | GFP_CALLOC);
+		} EXCEPT {
+			sync_endwrite(&self->uc_disclock);
+			RETHROW();
+		}
 		dev->ue_refcnt    = 1;
 		dev->ue_interface = dev;
 		dev->ui_device    = dev;
@@ -1440,6 +1451,7 @@ uhci_controller_probeport(struct uhci_controller *__restrict self,
 //		dev->ue_endp      = 0;     /* Configure channel. */
 		dev->ue_flags     = status & UHCI_PORTSC_LSDA ? USB_ENDPOINT_FLAG_LOWSPEED : 0;
 		FINALLY_DECREF_UNLIKELY(dev);
+		/* NOTE: A call to `usb_device_discovered()' always releases the `uc_disclock' lock! */
 		usb_device_discovered(self, dev);
 	}
 }

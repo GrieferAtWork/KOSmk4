@@ -396,6 +396,13 @@ usb_scsi_create_lun(struct usb_controller *__restrict self,
 
 	/* Register the new block-device */
 	block_device_register_auto(result);
+	TRY {
+		usb_register_block_device(in->ue_interface->ui_device,
+		                          result);
+	} EXCEPT {
+		block_device_unregister(result);
+		RETHROW();
+	}
 
 	/* Automatically scan for partition */
 	block_device_autopart(result);

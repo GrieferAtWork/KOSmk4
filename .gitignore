@@ -9,6 +9,7 @@
 /kos/.vs/launch.vs.json
 /kos/.vs/ProjectSettings.json
 /kos/.vs/VSWorkspaceState.json
+/qemu-events
 /asm.S
 /kos/include/i386-kos/c++
 __ice__

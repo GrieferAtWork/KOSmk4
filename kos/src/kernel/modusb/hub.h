@@ -16,44 +16,39 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_MODUSB_STORAGE_SCSI_H
-#define GUARD_MODUSB_STORAGE_SCSI_H 1
+#ifndef GUARD_MODUSB_HUB_H
+#define GUARD_MODUSB_HUB_H 1
 
 #include <kernel/compiler.h>
 
-#include <dev/block.h>
+#include <dev/char.h>
 #include <drivers/usb.h>
-#include <kernel/types.h>
-#include <sched/mutex.h>
 
 DECL_BEGIN
 
-
-/* MassStorageSCSIDevice */
-struct ms_scsi_device
+struct usb_hub_device
 #ifdef __cplusplus
-	: block_device
+	: character_device
 #endif /* __cplusplus */
 {
 #ifndef __cplusplus
-	struct block_device        msd_device;   /* The underlying block-device. */
+	struct character_device    uh_dev;          /* The underlying character device. */
 #endif /* !__cplusplus */
-	REF struct usb_controller *msd_ctrl;     /* [1..1][const] The associated USB controller. */
-	REF struct usb_endpoint   *msd_endp_in;  /* [1..1][const] Input endpoint (for reading from the device) */
-	REF struct usb_endpoint   *msd_endp_out; /* [1..1][const] Output endpoint (for writing to the device) */
-	struct mutex               msd_lock;     /* Lock for reading/writing data */
-	u32                        msd_tag;      /* [lock(msd_lock)] Next tag to-be used for I/O */
-	u8                         msd_lun;      /* [const] Logical unit number (think of it as a drive selector). */
+	REF struct usb_controller *uh_ctrl;         /* [1..1][const] The associated USB controller. */
+	REF struct usb_interface  *uh_intf;         /* [1..1][const] The interface of the HUB */
+	u8                         uh_num_ports;    /* [const][!0] # of ports provided by this hub. */
+	u8                         uh_powerondelay; /* [const] Time (in 2 millisecond intervals) before power stabilizes on a port. */
+	u16                        uh_attrib;       /* [const] Hub attributes (characteristics) (Set of `USB_HUB_ATTRIB_*') */
 };
 
-/* Probe for an SCSI device, and create the /dev file(s) if found. */
+
+#ifdef CONFIG_BUILDING_MODUSB
 INTDEF bool KCALL
-usb_scsi_create(struct usb_controller *__restrict self,
-                struct usb_endpoint *__restrict in,
-                struct usb_endpoint *__restrict out);
-
-
+usb_hub_probe(struct usb_controller *__restrict self,
+              struct usb_interface *__restrict intf,
+              size_t endpc, struct usb_endpoint *const endpv[]);
+#endif /* CONFIG_BUILDING_MODUSB */
 
 DECL_END
 
-#endif /* !GUARD_MODUSB_STORAGE_SCSI_H */
+#endif /* !GUARD_MODUSB_HUB_H */

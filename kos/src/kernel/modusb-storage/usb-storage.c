@@ -73,9 +73,10 @@ usb_storage_probe(struct usb_controller *__restrict self,
 			}
 		}
 		if unlikely(!in || !out) {
-			printk(KERN_ERR "[usb-storage] SCSI interface missing its %s%s-endpoint\n",
+			printk(KERN_ERR "[usb-storage] SCSI interface missing its %s%s-endpoint%s\n",
 			       !in ? "in" : "out",
-			       !in && !out ? "- and out" : "");
+			       !in && !out ? "- and out" : "",
+			       !in && !out ? "s" : "");
 			return false;
 		}
 		/* OK! We've got the in- and out-endpoints all figured out. */

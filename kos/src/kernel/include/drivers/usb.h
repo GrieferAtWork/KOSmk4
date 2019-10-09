@@ -23,6 +23,7 @@
 
 #include <dev/char.h>
 #include <kernel/types.h>
+#include <sched/mutex.h>
 
 #include <hybrid/sync/atomic-rwlock.h>
 
@@ -45,10 +46,13 @@ struct usb_endpoint {
 	u8                               ue_dev;       /* [const] Device address. */
 	u8                               ue_endp;      /* [const] Endpoint index (always 0 when `ue_interface == this'). */
 #define USB_ENDPOINT_FLAG_DATATOGGLE 0x0001        /* Data toggle bit. */
+#define USB_ENDPOINT_MASK_SPEED      0x0300        /* Mask for the device's speed. */
+#define USB_ENDPOINT_FLAG_FULLSPEED  0x0000        /* [const] Full-speed device. */
 #define USB_ENDPOINT_FLAG_LOWSPEED   0x0100        /* [const] Low-speed device. */
-#define USB_ENDPOINT_FLAG_INPUT      0x0200        /* [const] Input-only endpoint (when clear: output-only endpoint).
+#define USB_ENDPOINT_FLAG_HIGHSPEED  0x0200        /* [const] Low-speed device. */
+#define USB_ENDPOINT_FLAG_INPUT      0x0400        /* [const] Input-only endpoint (when clear: output-only endpoint).
 	                                                * Note that when `ue_endp == 0', then both input and output are allowed! */
-#define USB_ENDPOINT_FLAG_STRANGE    0x0400        /* [const] Set for strange devices (and strange devices only!) */
+#define USB_ENDPOINT_FLAG_STRANGE    0x0800        /* [const] Set for strange devices (and strange devices only!) */
 	u32                              ue_flags;     /* Flags (Set of `USB_ENDPOINT_FLAG_*') */
 	struct usb_endpoint_descriptor  *ue_endp_desc; /* [1..1][const][valid_if(ue_interface != this)]
 	                                                * The endpoint's descriptor (set to NULL if invalid). */
@@ -152,6 +156,12 @@ struct usb_controller
 #endif /* !__cplusplus */
 	struct atomic_rwlock    uc_devslock; /* Lock for `uc_devs' */
 	REF struct usb_device  *uc_devs;     /* [0..1][lock(uc_devslock)] Chain of known USB devices. */
+	struct mutex            uc_disclock; /* Lock that must be held when resetting ports for the purpose
+	                                      * of discovering new devices. This lock is required to prevent
+	                                      * multiple threads from resetting the ports of different hubs,
+	                                      * which could lead to multiple devices bound to ADDR=0, making
+	                                      * it impossible to safely configure them individually.
+	                                      * This lock must be acquired by  */
 	/* [1..1] Perform a one-time transfer of a sequence of packets.
 	 * This is the primary functions for OS-initiated communications
 	 * with connected USB devices.
@@ -176,9 +186,10 @@ struct usb_controller
 	/* TODO: Interface for registering Isochronous interrupt handlers. */
 };
 
-#define usb_controller_cinit(self)              \
-	(atomic_rwlock_cinit(&(self)->uc_devslock), \
-	 __hybrid_assert((self)->uc_devs == __NULLPTR))
+#define usb_controller_cinit(self)                  \
+	(atomic_rwlock_cinit(&(self)->uc_devslock),     \
+	 __hybrid_assert((self)->uc_devs == __NULLPTR), \
+	 mutex_cinit(&(self)->uc_disclock))
 
 
 /* Perform a one-time transfer of a sequence of packets.
@@ -270,7 +281,12 @@ usb_controller_allocstring(struct usb_controller *__restrict self,
  * NOTE: This function is also responsible for assigning an
  *       address to the device, meaning that the caller should
  *       not yet insert `dev' into `self->uc_devs'. Doing this
- *       is part of this function's job. */
+ *       is part of this function's job.
+ * NOTE: This function also releases a lock to `self->uc_disclock'
+ *       once the device has been assigned an address. In the event
+ *       that an exception occurrs before then, this lock will also
+ *       be released, meaning that this function _always_ releases
+ *       such a lock. */
 FUNDEF void KCALL
 usb_device_discovered(struct usb_controller *__restrict self,
                       struct usb_device *__restrict dev);
@@ -297,7 +313,6 @@ typedef bool (KCALL *PUSB_DEVICE_PROBE)(struct usb_controller *__restrict self,
  * at `intf->ui_intf_desc->ui_intf_(class|subclass|protocol)' in order to determine
  * if the interface's classification is recognized by the specific driver.
  * If the interface isn't recognized, the function should bail out and return `false'
- * @assume(endpc != 0)
  * @assume(endpv[0..endpc-1] != NULL)
  * @return: true:  The interface was discovered successfully.
  * @return: false: The interface wasn't recognized. */
@@ -319,7 +334,35 @@ FUNDEF bool KCALL usb_unregister_device_probe(PUSB_DEVICE_PROBE func) THROWS(E_W
 FUNDEF bool KCALL usb_unregister_interface_probe(PUSB_INTERFACE_PROBE func) THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 
+struct block_device;
+struct character_device;
 
+/* Register mappings between USB devices and device files, such that
+ * the USB system can attempt to unregister and remove device files
+ * bound to some USB device when it is detected that the usb device
+ * was unplugged from the system.
+ * Note that these functions should be called like this:
+ * >> struct (character|block)_device *mydev;
+ * >> mydev = CREATE_DEVICE(usb_dev);
+ * >> (character|block)_device_register[_auto](mydev);
+ * >> TRY {
+ * >>     usb_register_device(usb_dev, mydev);
+ * >> } EXCEPT {
+ * >>     (character|block)_device_unregister(mydev);
+ * >>     RETHROW();
+ * >> }
+ * Note that it is possible to register any number of devices for any
+ * single given USB device, however it is not possible to delete such
+ * a registration, other than physically removing the associated device.
+ */
+FUNDEF void KCALL usb_register_block_device(struct usb_device *__restrict usb_dev, struct block_device *__restrict dev) THROWS(E_WOULDBLOCK, E_BADALLOC);
+FUNDEF void KCALL usb_register_character_device(struct usb_device *__restrict usb_dev, struct character_device *__restrict dev) THROWS(E_WOULDBLOCK, E_BADALLOC);
+#ifdef __cplusplus
+extern "C++" {
+FUNDEF void KCALL usb_register_device(struct usb_device *__restrict usb_dev, struct block_device *__restrict dev) ASMNAME("usb_register_block_device");
+FUNDEF void KCALL usb_register_device(struct usb_device *__restrict usb_dev, struct character_device *__restrict dev) ASMNAME("usb_register_character_device");
+}
+#endif /* __cplusplus */
 
 
 #ifdef CONFIG_BUILDING_MODUSB

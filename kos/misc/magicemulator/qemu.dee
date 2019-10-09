@@ -301,6 +301,22 @@ got_exe:
 					})
 		));
 	}
+	try {
+		final local trace_filename = "qemu-events";
+		local trace_file = File.open(trace_filename, "r");
+		for (local l: trace_file) {
+			l = l.strip();
+			if (l.startswith("#") || !l)
+				continue;
+			/* Non-empty trace file */
+			qemu_arguments.extend({
+				"-trace",
+				"events=" + trace_filename
+			});
+			break;
+		}
+	} catch (...) {
+	}
 	qemu_arguments.extend({
 		"-kernel", kernelFile,
 //		"-initrd", "bin/i386-kos/drivers/ext2fs e f g h",
@@ -323,7 +339,9 @@ got_exe:
 	if (fs.stat.exists("bin/ext2.img")) {
 		qemu_arguments.extend({
 			"-blockdev", "driver=file,node-name=usb1,filename=bin/ext2.img",
-			"-usb", "-device", "usb-storage,drive=usb1",
+			"-usb",
+			"-device", "usb-storage,drive=usb1",
+			"-device", "usb-mouse"
 		});
 	}
 	local cmdline = options.get(opt.QEMU_CMDLINE);
