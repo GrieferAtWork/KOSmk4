@@ -40,6 +40,7 @@
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <bits/param.h>
+#include <kos/except-inval.h>
 #include <kos/hop.h>
 
 #include <assert.h>

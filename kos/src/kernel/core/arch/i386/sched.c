@@ -41,6 +41,7 @@
 
 #include <asm/cpu-flags.h>
 #include <kos/compat/linux-ldt.h>
+#include <kos/except-inval.h>
 #include <sys/io.h>
 
 #include <assert.h>

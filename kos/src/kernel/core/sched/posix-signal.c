@@ -43,6 +43,7 @@
 #include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
 
+#include <kos/except-inval.h>
 #include <sys/wait.h>
 
 #include <assert.h>

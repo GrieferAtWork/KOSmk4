@@ -42,6 +42,7 @@
 
 #include <bits/confname.h>
 #include <kos/dev.h>
+#include <kos/except-inval.h>
 #include <linux/magic.h>
 #include <linux/msdos_fs.h>
 #include <sys/stat.h>

@@ -50,6 +50,7 @@
 
 #include <bits/confname.h>
 #include <bits/dirent.h>
+#include <kos/except-inval.h>
 #include <linux/limits.h>
 #include <sys/stat.h>
 #include <sys/statfs.h>

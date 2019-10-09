@@ -34,6 +34,7 @@
 
 #include <hybrid/atomic.h>
 
+#include <kos/except-inval.h>
 #include <kos/hop.h>
 #include <kos/sysctl.h>
 

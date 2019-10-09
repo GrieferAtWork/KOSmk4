@@ -43,6 +43,7 @@
 #include <bits/resource.h>
 #include <bits/siginfo.h>
 #include <bits/timespec.h>
+#include <kos/except-inval.h>
 #include <kos/hop.h>
 #include <sys/poll.h>
 #include <sys/stat.h>

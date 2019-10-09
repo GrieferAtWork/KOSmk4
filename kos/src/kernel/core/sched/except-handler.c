@@ -32,6 +32,7 @@
 #include <sched/task.h>
 
 #include <kos/except-handler.h>
+#include <kos/except-inval.h>
 
 #include <errno.h>
 #include <signal.h>

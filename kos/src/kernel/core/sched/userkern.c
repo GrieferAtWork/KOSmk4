@@ -35,6 +35,7 @@
 #include <sched/pertask.h>
 #include <sched/pid.h>
 
+#include <kos/except-inval.h>
 #include <kos/ukern.h>
 
 DECL_BEGIN

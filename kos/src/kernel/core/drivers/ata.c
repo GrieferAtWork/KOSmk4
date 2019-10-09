@@ -44,6 +44,7 @@
 #include <hybrid/overflow.h>
 
 #include <kos/dev.h>
+#include <kos/except-inval.h>
 #include <kos/except-io.h>
 #include <kos/jiffies.h>
 #include <linux/hdreg.h>

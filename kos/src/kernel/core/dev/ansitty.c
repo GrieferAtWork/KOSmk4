@@ -22,16 +22,20 @@
 
 #include <kernel/compiler.h>
 
-#include <kernel/except.h>
-#include <kernel/types.h>
-#include <kernel/printk.h>
-#include <kernel/user.h>
-#include <kos/kernel/handle.h>
-#include <stddef.h>
-#include <string.h>
-#include <assert.h>
 #include <dev/ansitty.h>
 #include <dev/keyboard.h>
+#include <kernel/except.h>
+#include <kernel/printk.h>
+#include <kernel/types.h>
+#include <kernel/user.h>
+
+#include <kos/except-inval.h>
+#include <kos/kernel/handle.h>
+
+#include <assert.h>
+#include <stddef.h>
+#include <string.h>
+
 #include <libansitty/ansitty.h>
 
 DECL_BEGIN

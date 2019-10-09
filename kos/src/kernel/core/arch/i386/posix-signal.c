@@ -29,11 +29,11 @@
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
+#include <sched/cred.h>
 #include <sched/except-handler.h>
 #include <sched/posix-signal.h>
 #include <sched/rpc.h>
 #include <sched/task.h>
-#include <sched/cred.h>
 
 #include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
@@ -41,7 +41,8 @@
 #include <asm/cpu-flags.h>
 #include <asm/intrin.h>
 #include <asm/registers.h>
-#include <bits/siginfo-struct32.h>  /* siginfo32_t */
+#include <bits/siginfo-struct32.h> /* siginfo32_t */
+#include <kos/except-inval.h>
 #include <kos/kernel/cpu-state.h>   /* icpustate */
 #include <kos/kernel/cpu-state32.h> /* ucpustate32 */
 #include <kos/kernel/fpu-state32.h> /* fpustate32 */
@@ -55,9 +56,10 @@
 #include <librpc/rpc.h>
 
 #ifdef __x86_64__
-#include <librpc/bits/syscall-info-convert.h> /* rpc_syscall_info64_to_rpc_syscall_info32 */
 #include <bits/siginfo-convert.h> /* siginfo64_to_siginfo32 */
-#endif /* __x86_64__ */
+
+#include <librpc/bits/syscall-info-convert.h> /* rpc_syscall_info64_to_rpc_syscall_info32 */
+#endif                                        /* __x86_64__ */
 
 DECL_BEGIN
 

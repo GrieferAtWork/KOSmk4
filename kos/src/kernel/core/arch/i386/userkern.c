@@ -26,27 +26,29 @@
 #ifndef CONFIG_NO_USERKERN_SEGMENT
 
 #include <kernel/except.h>
+#include <kernel/fpu.h>
 #include <kernel/paging.h>
 #include <kernel/printk.h>
 #include <kernel/syscall.h>
 #include <kernel/vio.h>
 #include <kernel/vm.h>
-#include <kernel/fpu.h>
-#include <sched/pertask.h>
 #include <sched/cred.h>
+#include <sched/pertask.h>
 #include <sched/pid.h>
 
-#include <asm/intrin.h>
 #include <asm/cpu-flags.h>
-#include <string.h>
+#include <asm/intrin.h>
 #include <kos/bits/ukern-struct.h>
+#include <kos/except-inval.h>
+
+#include <string.h>
 #ifdef __x86_64__
 #include <kos/bits/ukern-struct32.h>
 #endif /* __x86_64__ */
+#include <asm/registers.h>
 #include <kos/kernel/segment.h>
 
 #include <stddef.h>
-#include <asm/registers.h>
 
 DECL_BEGIN
 

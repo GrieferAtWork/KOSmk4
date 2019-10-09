@@ -37,6 +37,7 @@
 #include <hybrid/limits.h>
 
 #include <kos/dev.h>
+#include <kos/except-inval.h>
 #include <linux/kd.h>
 
 #include <assert.h>
@@ -44,7 +45,7 @@
 #include <string.h>
 
 /* TODO: Split all of the stuff that's required by both this driver, and the builtin debugger
- *       into a seperate file that is then included by both components to reduce redundancy. */
+ *       into a separate file that is then included by both components to reduce redundancy. */
 
 DECL_BEGIN
 

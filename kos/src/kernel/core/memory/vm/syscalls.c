@@ -32,6 +32,7 @@
 #include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 
+#include <kos/except-inval.h>
 #include <sys/mman.h>
 
 #include <assert.h>

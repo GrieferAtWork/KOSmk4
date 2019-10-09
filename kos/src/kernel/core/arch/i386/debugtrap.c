@@ -38,6 +38,7 @@
 
 #include <asm/registers.h>
 #include <kos/debugtrap.h>
+#include <kos/except-inval.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/cpu-state32.h>
 

@@ -27,9 +27,11 @@
 #include <kernel/handle.h>
 #include <kernel/types.h>
 #include <kernel/vm.h>
-#include <assert.h>
 
+#include <kos/except-inval.h>
 #include <kos/kernel/handle.h>
+
+#include <assert.h>
 
 DECL_BEGIN
 

@@ -26,6 +26,8 @@
 
 #include <hybrid/atomic.h>
 
+#include <kos/except-inval.h>
+
 #include <unicode.h>
 
 #include "../procfs.h"

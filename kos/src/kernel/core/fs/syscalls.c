@@ -45,6 +45,7 @@
 
 #include <kos/compat/linux-stat.h>
 #include <kos/debugtrap.h>
+#include <kos/except-inval.h>
 #include <kos/kernel/handle.h>
 #include <sys/mount.h>
 #include <sys/statfs.h>

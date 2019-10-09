@@ -33,6 +33,7 @@
 
 #include <hybrid/atomic.h>
 
+#include <kos/except-inval.h>
 #include <kos/hop.h>
 #include <kos/syscalls.h>
 #include <sys/stat.h>

@@ -23,6 +23,8 @@
 
 __DECL_BEGIN
 
+/* Reason codes for E_IOERROR exceptions */
+
 /*[[[enum]]]*/
 #ifdef __CC__
 enum {

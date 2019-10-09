@@ -30,6 +30,7 @@
 
 #include <hybrid/atomic.h>
 
+#include <kos/except-inval.h>
 #include <sys/io.h>
 
 #include <assert.h>

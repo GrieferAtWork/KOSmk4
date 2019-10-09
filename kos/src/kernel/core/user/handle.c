@@ -33,15 +33,16 @@
 #include <kernel/except.h>
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
+#include <kernel/paging.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <kernel/vm.h>
-#include <kernel/paging.h>
 #include <sched/cred.h>
 #include <sched/pid.h>
 
 #include <hybrid/atomic.h>
 
+#include <kos/except-inval.h>
 #include <kos/hop.h>
 
 #include <assert.h>

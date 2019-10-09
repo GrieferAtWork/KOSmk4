@@ -45,6 +45,7 @@
 #include <hybrid/overflow.h>
 
 #include <kos/dev.h>
+#include <kos/except-inval.h>
 #include <kos/guid.h>
 
 #include <assert.h>
