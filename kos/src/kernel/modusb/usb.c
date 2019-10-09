@@ -897,64 +897,83 @@ badconf:
 
 
 /* Function called when a new USB endpoint is discovered.
- * This function should try to engage with the endpoint in
- * order to discover what type of device is connected.
- * Note that the given `endp->ue_endp' is always `0' (configure
- * pipe), and that `endp->ue_dev' is also ZERO(0) (aka.: not
- * configured), with this function then being expected to
- * initialize those values before trying to detect the type
- * of connected device, as well as passing the endpoint to
- * the appropriate driver.
- * NOTE: This function is also responsible for assigning an
- *       address to the device, meaning that the caller should
- *       not yet insert `dev' into `self->uc_devs'. Doing this
- *       is part of this function's job. */
+ * NOTE: This function also releases a lock to `self->uc_disclock'
+ *       once the device has been assigned an address. In the event
+ *       that an exception occurs before then, this lock will also
+ *       be released, meaning that this function _always_ releases
+ *       such a lock.
+ * @param: endpoint_flags: Set of `USB_ENDPOINT_FLAG_*' */
 PUBLIC void KCALL
 usb_device_discovered(struct usb_controller *__restrict self,
-                      struct usb_device *__restrict dev) {
+                      u32 endpoint_flags) {
+	REF struct usb_device *dev;
 	struct usb_request req;
 	struct usb_device_descriptor desc;
 	size_t transfer_size;
 	alignas(2) byte_t buf[256];
 	u8 used_conf;
 	u16 device_max_packet_size;
-
+	assert((endpoint_flags & ~USB_ENDPOINT_MASK_SPEED) == 0);
 	{
 		/* Always release the device-discover-lock as
 		 * soon as we've assigned the device its address. */
 		FINALLY_ENDWRITE(&self->uc_disclock);
-		req.ur_reqtype = USB_REQUEST_RETYPE_DEST_DEV |
-		                 USB_REQUEST_RETYPE_TYPE_STD |
-		                 USB_REQUEST_RETYPE_DIR_D2H;
-		req.ur_request = USB_REQUEST_GET_DESCRIPTOR;
-		req.ur_value   = USB_REQUEST_GET_DESCRIPTOR_VALUE_DEVICE;
-		req.ur_index   = 0;
-		/* NOTE: offsetafter(struct usb_device_descriptor, ud_maxpacketsize) == 8,
-		 *       which is the minimum packet size supported by all devices */
-		req.ur_length = offsetafter(struct usb_device_descriptor, ud_maxpacketsize);
-		transfer_size = usb_controller_request_sync(self, dev, &req, &desc);
-	
-		/* Remember the max packet size supported by the device. */
-		device_max_packet_size = dev->ue_maxpck;
-		if likely(transfer_size >= offsetafter(struct usb_device_descriptor, ud_maxpacketsize) &&
-		          desc.ud_type == (USB_REQUEST_GET_DESCRIPTOR_VALUE_DEVICE & 0xff00) >> 8)
-			dev->ue_maxpck = desc.ud_maxpacketsize;
-	
-		/* Assign an address to the device. */
-		usb_controller_assign_device_address(self, dev);
-	
-		/* Tell the device about the address we've assigned it. */
-		req.ur_reqtype = USB_REQUEST_RETYPE_DEST_DEV |
-		                 USB_REQUEST_RETYPE_TYPE_STD |
-		                 USB_REQUEST_RETYPE_DIR_H2D;
-		req.ur_request = USB_REQUEST_SET_ADDRESS;
-		req.ur_value   = dev->ud_dev;
-		req.ur_index   = dev->ud_dev;
-		req.ur_length  = 0;
-		usb_controller_request_sync(self, dev, &req, NULL);
+
+		/* Create a descriptor for the device. */
+		TRY {
+			dev = (REF struct usb_device *)kmalloc(sizeof(struct usb_device),
+			                                       GFP_NORMAL | GFP_CALLOC);
+		} EXCEPT {
+			sync_endwrite(&self->uc_disclock);
+			RETHROW();
+		}
+		dev->ue_refcnt    = 1;
+		dev->ue_interface = dev;
+		dev->ui_device    = dev;
+		dev->ue_maxpck    = 0x7ff; /* Not configured. (Physical limit of the protocol) */
+//		dev->ue_dev       = 0;     /* Not configured. (Gets set by `usb_device_discovered()') */
+//		dev->ue_endp      = 0;     /* Configure channel. */
+		dev->ue_flags     = endpoint_flags;
+		TRY {
+			req.ur_reqtype = USB_REQUEST_RETYPE_DEST_DEV |
+			                 USB_REQUEST_RETYPE_TYPE_STD |
+			                 USB_REQUEST_RETYPE_DIR_D2H;
+			req.ur_request = USB_REQUEST_GET_DESCRIPTOR;
+			req.ur_value   = USB_REQUEST_GET_DESCRIPTOR_VALUE_DEVICE;
+			req.ur_index   = 0;
+			/* NOTE: offsetafter(struct usb_device_descriptor, ud_maxpacketsize) == 8,
+			 *       which is the minimum packet size supported by all devices */
+			req.ur_length = offsetafter(struct usb_device_descriptor, ud_maxpacketsize);
+			transfer_size = usb_controller_request_sync(self, dev, &req, &desc);
+		
+			/* Remember the max packet size supported by the device. */
+			device_max_packet_size = dev->ue_maxpck;
+			if likely(transfer_size >= offsetafter(struct usb_device_descriptor, ud_maxpacketsize) &&
+			          desc.ud_type == (USB_REQUEST_GET_DESCRIPTOR_VALUE_DEVICE & 0xff00) >> 8)
+				dev->ue_maxpck = desc.ud_maxpacketsize;
+		
+			/* Assign an address to the device. */
+			usb_controller_assign_device_address(self, dev);
+		
+			/* Tell the device about the address we've assigned it. */
+			req.ur_reqtype = USB_REQUEST_RETYPE_DEST_DEV |
+			                 USB_REQUEST_RETYPE_TYPE_STD |
+			                 USB_REQUEST_RETYPE_DIR_H2D;
+			req.ur_request = USB_REQUEST_SET_ADDRESS;
+			req.ur_value   = dev->ud_dev;
+			req.ur_index   = dev->ud_dev;
+			req.ur_length  = 0;
+			usb_controller_request_sync(self, dev, &req, NULL);
+		} EXCEPT {
+			decref_unlikely(dev);
+			RETHROW();
+		}
 	} /* FINALLY {
 		sync_endwrite(&self->uc_disclock);
 	} */
+
+	/* Cleanup our initial reference to the device once this function returns. */
+	FINALLY_DECREF_UNLIKELY(dev);
 
 	/* With the address assigned to the device, from now on make use of
 	 * that address for the purposes of communications with the device */
@@ -1337,6 +1356,18 @@ usb_register_character_device(struct usb_device *__restrict usb_dev,
 	(void)usb_dev;
 	(void)dev;
 }
+
+
+
+/* Destroy the given USB interrupt descriptor. */
+PUBLIC NOBLOCK void
+NOTHROW(KCALL usb_interrupt_destroy)(struct usb_interrupt *__restrict self) {
+	assert(self->ui_fini);
+	(*self->ui_fini)(self);
+	decref_unlikely(self->ui_endp);
+	kfree(self);
+}
+
 
 
 DECL_END

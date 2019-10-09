@@ -108,32 +108,18 @@ usb_hub_reset_port_and_probe(struct usb_hub_device *__restrict self,
 	}
 	sync_endwrite(&ctrl->uc_disclock);
 	return;
-	{
-		struct usb_device *dev;
 do_probe_port:
+	{
+		uintptr_t flags;
 		printk(FREESTR(KERN_INFO "[usb][addr:%#I8x] Device found attached to hub on port #%I8u\n"),
 		       self->uh_intf->ue_dev, portno);
-		TRY {
-			dev = (struct usb_device *)kmalloc(sizeof(struct usb_device),
-			                                   GFP_NORMAL | GFP_CALLOC);
-		} EXCEPT {
-			sync_endwrite(&ctrl->uc_disclock);
-			RETHROW();
-		}
-		dev->ue_refcnt    = 1;
-		dev->ue_interface = dev;
-		dev->ui_device    = dev;
-		dev->ue_maxpck    = 8; /* Not configured. (Minimal value) */
-//		dev->ue_dev       = 0; /* Not configured. (Gets set by `usb_device_discovered()') */
-//		dev->ue_endp      = 0; /* Configure channel. */
-		dev->ue_flags = (st & 0x600) == 0
-		                ? USB_ENDPOINT_FLAG_FULLSPEED
-		                : (st & 0x600) == 0x200
-		                  ? USB_ENDPOINT_FLAG_LOWSPEED
-		                  : USB_ENDPOINT_FLAG_HIGHSPEED;
-		FINALLY_DECREF_UNLIKELY(dev);
+		flags = (st & 0x600) == 0
+		        ? USB_ENDPOINT_FLAG_FULLSPEED
+		        : (st & 0x600) == 0x200
+		          ? USB_ENDPOINT_FLAG_LOWSPEED
+		          : USB_ENDPOINT_FLAG_HIGHSPEED;
 		/* NOTE: A call to `usb_device_discovered()' always releases the `uc_disclock' lock! */
-		usb_device_discovered(ctrl, dev);
+		usb_device_discovered(ctrl, flags);
 	}
 }
 

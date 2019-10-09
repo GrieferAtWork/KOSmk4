@@ -83,26 +83,87 @@ FUNDEF NOBLOCK void NOTHROW(FCALL uhci_osqh_destroy)(struct uhci_osqh *__restric
 DEFINE_REFCOUNT_FUNCTIONS(struct uhci_osqh, qh_refcnt, uhci_osqh_destroy)
 
 
+struct uhci_interrupt;
+struct uhci_interrupt_frameentry {
+	REF struct uhci_interrupt *ife_next;    /* [0..1][lock(:uc_lock)] Next interrupt on this frame. */
+	void                      *ife_buf;     /* [0..?|ALLOC(ui_bufsize)][owned][const] Buffer base address. */
+	size_t                     ife_bufsize; /* [const] Allocated buffer size (as returned by `heap_alloc_untraced()')
+	                                         * NOTE: The least significant bit of this field is used to indicate a vpage-based buffer (1=vpage; 0=heap). */
+	struct uhci_ostd          *ife_tdsf;    /* [1..1][owned][const] First TD entry describing this interrupt's data */
+	struct uhci_ostd          *ife_tdsl;    /* [1..1][const] Last TD entry describing this interrupt's data */
+	size_t                     ife_hits;    /* Number of times that this interrupt got hit (used for self-optimization) */
+};
+
+struct uhci_interrupt: usb_interrupt {
+#define UHCI_INTERRUPT_FLAG_ISOCHRONOUS USB_INTERRUPT_FLAG_CTRL(0) /* This interrupt is only checked on specific frames. */
+#define UHCI_INTERRUPT_FLAG_FLIPDBIT    USB_INTERRUPT_FLAG_CTRL(1) /* The total number of TDs is uneven, and their data-toggle
+	                                                                * bits must be flipped before they can be used again.
+	                                                                * NOTE: Never set when `UHCI_INTERRUPT_FLAG_ISOCHRONOUS' is set. */
+	union {
+		struct {
+			struct uhci_interrupt_frameentry ui_reg;       /* [valid_if(!UHCI_INTERRUPT_FLAG_ISOCHRONOUS)] Next interrupt. */
+			u32                              ui_td0_phys;  /* [valid_if(!UHCI_INTERRUPT_FLAG_ISOCHRONOUS)][const][== ui_reg.ife_tdsf->td_self] */
+		};
+		struct uhci_interrupt_frameentry    *ui_iso[1024]; /* [0..1][valid_if(UHCI_INTERRUPT_FLAG_ISOCHRONOUS)] Frame list */
+	};
+	COMPILER_FLEXIBLE_ARRAY(struct uhci_interrupt_frameentry, ui_isobuf); /* Buffer into which `ui_iso' points. */
+};
+
+
+/* UHCI Scheduling model:
+ *
+ *
+ * Frame-List (for n in 0..1023)
+ *
+ * n: uc_framelist[n] -> uc_intiso[n]->ui_iso[n].ife_next->...
+ *                    -> uc_intreg->ui_reg.ife_next->...
+ *                    -> uc_qhstart
+ *                    -> uc_qhstart.qh_next->...
+ *                    -> uc_intreg
+ *
+ * As such:
+ *   - Every frame begins with ISO interrupt handlers
+ *   - Following those, interrupt handlers triggered on every frame are polled
+ *   - Following those, the stub uc_qhstart queue head is reached
+ *   - uc_qhstart then points to any number of one-time transmissions
+ *     created using `usb_controller_transfer()'
+ *   - Finally, the frame loops back on itself by back to interrupt handlers
+ *     polled every frame.
+ *
+ * With all of this in mind, the scheduling used by KOS pretty much mirrors the example
+ * included within the UHCI specifications (Figure 4. Example Schedule), as included
+ * on page #6 (ftp://ftp.netbsd.org/pub/NetBSD/misc/blymn/uhci11d.pdf)
+ *
+ */
 
 struct uhci_controller: usb_controller {
-	union uhci_iobase    uc_base;           /* I/O base address. */
-	struct pci_device   *uc_pci;            /* [1..1][const] The associated PCI device. */
-#define UHCI_CONTROLLER_FLAG_USESMMIO    0x0001 /* [const] The controller uses MMIO */
-#define UHCI_CONTROLLER_FLAG_INTERRUPTED 0x0002 /* [const] A command-completion interrupt happened while `uc_lock' was held. */
-	uintptr_t            uc_flags;          /* Controller flags (Set of `UHCI_CONTROLLER_FLAG_*'). */
-	struct atomic_rwlock uc_lock;           /* Lock for sending commands to the controller. */
+	union uhci_iobase          uc_base;           /* I/O base address. */
+	struct pci_device         *uc_pci;            /* [1..1][const] The associated PCI device. */
+#define UHCI_CONTROLLER_FLAG_USESMMIO    0x0001   /* [const] The controller uses MMIO */
+#define UHCI_CONTROLLER_FLAG_INTERRUPTED 0x0002   /* [const] A command-completion interrupt happened while `uc_lock' was held. */
+	uintptr_t                  uc_flags;          /* Controller flags (Set of `UHCI_CONTROLLER_FLAG_*'). */
+	struct atomic_rwlock       uc_lock;           /* Lock for sending commands to the controller. */
+	REF struct uhci_interrupt *uc_intreg;         /* [lock(uc_lock)][0..1] Chain of interrupts checked every frame (w/o `UHCI_INTERRUPT_FLAG_ISOCHRONOUS').
+	                                               * NOTE: The HW-next pointer of last TD of the last entry of this chain points to `uc_qhstart'! */
+	REF struct uhci_interrupt *uc_intiso[1024];   /* [lock(uc_lock)][0..1][*] Chains of interrupts checked only on certain frames (w/ `UHCI_INTERRUPT_FLAG_ISOCHRONOUS').
+	                                               * NOTE: The HW-next pointer of last TD of the last entry of each of these chains points to `uc_qhstart'! */
+	size_t                     uc_iisocount;      /* [lock(uc_lock)] Number of interrupt descriptors chains through `uc_intiso'.
+	                                               * NOTE: Interrupts chained more than once also count more than once here. */
+	struct uhci_osqh          *uc_qhlast;         /* [lock(uc_lock)][0..1] The last queue head in the `uc_qhstart.qh_next' chain. */
 	alignas(UHCI_FLE_ALIGN)
-	struct uhci_osqh     uc_qhstart;        /* [lock(INSERT(uc_lock))] Queue head start (Entries of `uc_framelist' first point to
-	                                         * optional isochronous, and eventually to this one) Afterwards, all entires point to
-	                                         * this one, allowing one-time transfer descriptors  to be scheduled following after
-	                                         * this queue.
-	                                         * NOTE: The hardware pointer of the last queue head always points back to `uc_qhstart'.
-	                                         *       However, the software pointer of that queue head is set to `NULL'.
-	                                         * NOTE: The `qh_tds' field of this queue head is always `NULL'.
-	                                         * NOTE: The `qh_ep' field of this queue head is always `UHCI_QHEP_TERM'. */
-	u32                 *uc_framelist;      /* [1..1][owned][const] Frame list base address. */
-	u32                  uc_framelist_phys; /* [const][== pagedir_translate(uc_framelist)]. */
-	u8                   uc_portnum;        /* [const] # of available ports. */
+	struct uhci_osqh           uc_qhstart;        /* [lock(INSERT(uc_lock))] Queue head start (Entries of `uc_framelist' first point to
+	                                               * optional isochronous, and eventually to this one) Afterwards, all entires point to
+	                                               * this one, allowing one-time transfer descriptors  to be scheduled following after
+	                                               * this queue.
+	                                               * NOTE: The hardware pointer of the last queue head always points back to `uc_qhstart'.
+	                                               *       However, the software pointer of that queue head is set to `NULL'.
+	                                               * NOTE: The `qh_tds' field of this queue head is always `NULL'.
+	                                               * NOTE: The `qh_ep' field of this queue head is always `UHCI_QHEP_TERM'. */
+	u32                       *uc_framelist;      /* [lock(uc_lock)][1..1][owned][const] Frame list base address. */
+	u32                        uc_framelist_phys; /* [const][== pagedir_translate(uc_framelist)]. */
+	u16                        uc_framelast;      /* [lock(uc_lock)] The value of `UHCI_FRNUM' during the last
+	                                               * interrupt where ISO interrupts where checked for completion. */
+	u8                         uc_portnum;        /* [const] # of available ports. */
 };
 
 /* Safely release a read/write lock on `self->uc_lock' */

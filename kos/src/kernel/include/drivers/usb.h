@@ -24,7 +24,10 @@
 #include <dev/char.h>
 #include <kernel/types.h>
 #include <sched/mutex.h>
+#include <misc/atomic-ref.h>
 
+#include <hybrid/__atomic.h>
+#include <hybrid/__assert.h>
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <bits/format-printer.h>
@@ -146,6 +149,109 @@ struct usb_transfer {
 };
 
 
+struct character_device;
+struct block_device;
+
+
+/* USB interrupt handler.
+ * @param: self:   [1..1] Either a `struct character_device' or `struct block_device'
+ *                 When a reference could not be acquired to the given, the callback
+ *                 is not invoked, and behaves as if `USB_INTERRUPT_HANDLER_RETURN_STOP'
+ *                 was returned.
+ * @param: status: One of `USB_INTERRUPT_HANDLER_STATUS_*'
+ * @return: * :    One of `USB_INTERRUPT_HANDLER_RETURN_*' */
+typedef NOBLOCK unsigned int
+/*NOTHROW*/(KCALL *PUSB_INTERRUPT_HANDLER)(void *__restrict self, unsigned int status,
+                                           void const *data, size_t datalen);
+#define USB_INTERRUPT_HANDLER_STATUS_OK    0 /* Data was successfully received. */
+#define USB_INTERRUPT_HANDLER_STATUS_ERROR 1 /* The USB controller has indicated an error.
+                                              * In this case, error_data() has been filled in with additional
+                                              * information about the error (usually identical to what would
+                                              * be thrown if the same problem had happened during a transmission
+                                              * started with `usb_controller_transfer()')
+                                              * Note however that the interrupt handler itself is called from
+                                              * a context where it may not propagate errors itself, or perform
+                                              * any blocking operation, meaning that the only safe thing for it
+                                              * to do if it wishes to propagate the exception, is to use a mechanism
+                                              * similar (or maybe even backed) by `AIO_COMPLETION_FAILURE' */
+
+#define USB_INTERRUPT_HANDLER_RETURN_SCHED 0 /* Re-schedule the interrupt to-be executed once again. */
+#define USB_INTERRUPT_HANDLER_RETURN_STOP  1 /* Stop polling the device for data, and remove the interrupt descriptor
+                                              * from the set of those that the USB controller will use for polling
+                                              * connected devices for incoming data. */
+
+typedef NOBLOCK unsigned int /*NOTHROW*/(KCALL *PUSB_INTERRUPT_HANDLER_CHR)(struct character_device *__restrict self, unsigned int status, void const *data, size_t datalen);
+typedef NOBLOCK unsigned int /*NOTHROW*/(KCALL *PUSB_INTERRUPT_HANDLER_BLK)(struct block_device *__restrict self, unsigned int status, void const *data, size_t datalen);
+
+
+
+struct usb_interrupt {
+	/* Descriptor for interrupt handlers for isochronous (e.g. a microphone),
+	 * and interrupt-driven (e.g. a keyboard) USB devices. */
+	WEAK refcnt_t            ui_refcnt; /* Reference counter. */
+	/* [1..1][const] Finalizer for controller-specific data. */
+	void             (KCALL *ui_fini)(struct usb_interrupt *__restrict self);
+#define USB_INTERRUPT_FLAG_NORMAL      0x0000 /* Normal flags. */
+#define USB_INTERRUPT_FLAG_ISACHR      0x0000 /* [const] The bound device is a `struct character_device'. */
+#define USB_INTERRUPT_FLAG_ISABLK      0x0001 /* [const] The bound device is a `struct block_device'. */
+#define USB_INTERRUPT_FLAG_SHORT       0x0002 /* [const] Allow short packets. */
+#define USB_INTERRUPT_FLAG_EVENPERIOD  0x0004 /* [const] Try to round `poll_interval_in_milliseconds', such
+	                                           * that all polls happen perfectly evenly spaced from each other.
+	                                           * Otherwise, allow 1 in N poll operations to be made slightly
+	                                           * earlier, or slightly later than the previous/next. */
+#define USB_INTERRUPT_FLAG_DELETED     0x0008 /* [lock(WRITE_ONCE)] The descriptor was deleted. */
+#define USB_INTERRUPT_FLAG_CTRL(i)    (0x0010 << (i)) /* Controller-specific flag #i. */
+	uintptr_t                ui_flags;   /* Flags (Set of `USB_INTERRUPT_FLAG_*') */
+	REF struct usb_endpoint *ui_endp;    /* [const][1..1] The endpoint that is being polled. */
+	PUSB_INTERRUPT_HANDLER   ui_handler; /* [const][1..1] Interrupt handler callback. */
+	union {
+		XATOMIC_WEAKLYREF_STRUCT(struct character_device) ui_chr; /* [0..1] The pointed-to device. */
+		XATOMIC_WEAKLYREF_STRUCT(struct block_device)     ui_blk; /* [0..1] The pointed-to device. */
+	}                        ui_bind;   /* The bound interrupt handler callback. */
+	/* Controller-specific data goes here. */
+};
+
+/* Destroy the given USB interrupt descriptor. */
+FUNDEF NOBLOCK void NOTHROW(KCALL usb_interrupt_destroy)(struct usb_interrupt *__restrict self);
+DEFINE_REFCOUNT_FUNCTIONS(struct usb_interrupt, ui_refcnt, usb_interrupt_destroy)
+
+/* Similar to `decref()', but simultaniously prevent the interrupt for ever firing again.
+ * Note that a USB interrupt will stop firing and be removed from the controller's chain
+ * of registered interrupts under 3 circumstances:
+ *   - When the `USB_INTERRUPT_FLAG_DELETED' flag was set.
+ *   - When the bound character- or block-device has been destroyed.
+ *   - When the associated callback returns `USB_INTERRUPT_HANDLER_RETURN_STOP'.
+ * This function is mean to be used in places such as an ioctl() with the purpose of
+ * suspending the data reception from a device such as a microphone.
+ * WARNING: Even after this function was called, there exists a small window of time
+ *          where the associated interrupt handler will still be invoked, since the
+ *          USB controller driver may have already checked for the presence of the
+ *          `USB_INTERRUPT_FLAG_DELETED' flag before it got set here, at which point
+ *          the callback may be invoked after the interrupt should have already been
+ *          deleted. */
+LOCAL NOBLOCK void
+NOTHROW(KCALL usb_interrupt_delete)(REF struct usb_interrupt *__restrict self) {
+	__hybrid_atomic_fetchor(self->ui_flags, USB_INTERRUPT_FLAG_DELETED,
+	                        __ATOMIC_ACQ_REL);
+	decref(self);
+}
+
+/* Similar to `decref()', but must be called from the finalizer of the bound character-
+ * or block-device in order to both inform the USB controller that the device to which
+ * this interrupt was bound has been destroyed (this part is required since a USB
+ * interrupt only ever holds a weak reference to the bound device, thus preventing the
+ * possibility of a reference loop, meaning it needs to be notified when the device gets
+ * destroyed), as well as drop the reference previously held by the bound device. */
+LOCAL NOBLOCK void
+NOTHROW(KCALL usb_interrupt_clear)(REF struct usb_interrupt *__restrict self) {
+	xatomic_weaklyref_clear(&self->ui_bind.ui_blk);
+	decref(self);
+}
+
+
+
+
+
 struct usb_controller
 #ifdef __cplusplus
 	: character_device
@@ -160,8 +266,7 @@ struct usb_controller
 	                                      * of discovering new devices. This lock is required to prevent
 	                                      * multiple threads from resetting the ports of different hubs,
 	                                      * which could lead to multiple devices bound to ADDR=0, making
-	                                      * it impossible to safely configure them individually.
-	                                      * This lock must be acquired by  */
+	                                      * it impossible to safely configure them individually. */
 	/* [1..1] Perform a one-time transfer of a sequence of packets.
 	 * This is the primary functions for OS-initiated communications
 	 * with connected USB devices.
@@ -183,7 +288,26 @@ struct usb_controller
 	(KCALL *uc_transfer)(struct usb_controller *__restrict self,
 	                     struct usb_transfer const *__restrict tx,
 	                     /*out*/ struct aio_handle *__restrict aio);
-	/* TODO: Interface for registering Isochronous interrupt handlers. */
+
+	/* [1..1] Create an interrupt descriptor.
+	 * @param: endp:                          The endpoint from which to poll data.
+	 * @param: handler:                       The handler to-be invoked.
+	 * @param: character_or_block_device:     Either a `struct character_device' or `struct block_device',
+	 *                                        depending on the setting of `USB_INTERRUPT_FLAG_ISABLK'
+	 * @param: buflen:                        The (max) number of bytes of data to-be pulled from the device.
+	 *                                        Note that unless `USB_INTERRUPT_FLAG_SHORT' is set, this is the
+	 *                                        mandatory buffer size, with it being an error if the device
+	 *                                        produces less data that this, meaning that unless said flag is
+	 *                                        set, your handler is allowed to completely ignore its `datalen'
+	 *                                        argument and simply assume that the buffer's size is equal to
+	 *                                        the `buflen' value passed when the interrupt was registered.
+	 * @param: flags:                         Set of `USB_INTERRUPT_FLAG_*'
+	 * @param: poll_interval_in_milliseconds: A hint for how often the USB device should be polled.
+	 *                                        When set to `0', the device will be polled as often as possible. */
+	WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3, 4)) REF struct usb_interrupt *
+	(KCALL *uc_interrupt)(struct usb_controller *__restrict self, struct usb_endpoint *__restrict endp,
+	                      PUSB_INTERRUPT_HANDLER handler, void *__restrict character_or_block_device,
+	                      size_t buflen, uintptr_t flags, unsigned int poll_interval_in_milliseconds);
 };
 
 #define usb_controller_cinit(self)                  \
@@ -225,6 +349,74 @@ usb_controller_transfer(struct usb_controller *__restrict self,
 FUNDEF NONNULL((1, 2)) size_t KCALL
 usb_controller_transfer_sync(struct usb_controller *__restrict self,
                              struct usb_transfer const *__restrict tx);
+
+
+
+/* Create an interrupt descriptor.
+ * @param: endp:                          The endpoint from which to poll data.
+ * @param: handler:                       The handler to-be invoked.
+ * @param: character_or_block_device:     Either a `struct character_device' or `struct block_device',
+ *                                        depending on the setting of `USB_INTERRUPT_FLAG_ISABLK'
+ * @param: buflen:                        The (max) number of bytes of data to-be pulled from the device.
+ *                                        Note that unless `USB_INTERRUPT_FLAG_SHORT' is set, this is the
+ *                                        mandatory buffer size, with it being an error if the device
+ *                                        produces less data that this, meaning that unless said flag is
+ *                                        set, your handler is allowed to completely ignore its `datalen'
+ *                                        argument and simply assume that the buffer's size is equal to
+ *                                        the `buflen' value passed when the interrupt was registered.
+ * @param: flags:                         Set of `USB_INTERRUPT_FLAG_*'
+ * @param: poll_interval_in_milliseconds: A hint for how often the USB device should be polled.
+ *                                        When set to `0', the device will be polled as often as possible. */
+LOCAL WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3, 4)) REF struct usb_interrupt *KCALL
+usb_controller_interrupt_create(struct usb_controller *__restrict self, struct usb_endpoint *__restrict endp,
+                                PUSB_INTERRUPT_HANDLER handler, void *__restrict character_or_block_device,
+                                size_t buflen, uintptr_t flags, unsigned int poll_interval_in_milliseconds DFL(0)) {
+	REF struct usb_interrupt *result;
+	__hybrid_assert(self->uc_interrupt);
+	result = (*self->uc_interrupt)(self, endp, handler, character_or_block_device,
+	                                      buflen, flags, poll_interval_in_milliseconds);
+	return result;
+}
+
+
+#ifdef __cplusplus
+extern "C++" {
+LOCAL WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3)) REF struct usb_interrupt *KCALL
+usb_controller_interrupt_create(struct usb_controller *__restrict self,
+                                struct usb_endpoint *__restrict endp,
+                                PUSB_INTERRUPT_HANDLER_CHR handler,
+                                struct character_device *__restrict device,
+                                size_t buflen, uintptr_t flags DFL(USB_INTERRUPT_FLAG_NORMAL),
+                                unsigned int poll_interval_in_milliseconds DFL(0)) {
+	REF struct usb_interrupt *result;
+	__hybrid_assert(!(flags & (USB_INTERRUPT_FLAG_ISACHR | USB_INTERRUPT_FLAG_ISABLK)));
+	result = usb_controller_interrupt_create(self, endp,
+	                                         (PUSB_INTERRUPT_HANDLER)handler,
+	                                         (void *)device, buflen,
+	                                         flags | USB_INTERRUPT_FLAG_ISACHR,
+	                                         poll_interval_in_milliseconds);
+	return result;
+}
+LOCAL WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3)) REF struct usb_interrupt *KCALL
+usb_controller_interrupt_create(struct usb_controller *__restrict self,
+                                struct usb_endpoint *__restrict endp,
+                                PUSB_INTERRUPT_HANDLER_BLK handler,
+                                struct block_device *__restrict device,
+                                size_t buflen, uintptr_t flags DFL(USB_INTERRUPT_FLAG_NORMAL),
+                                unsigned int poll_interval_in_milliseconds DFL(0)) {
+	REF struct usb_interrupt *result;
+	__hybrid_assert(!(flags & (USB_INTERRUPT_FLAG_ISACHR | USB_INTERRUPT_FLAG_ISABLK)));
+	result = usb_controller_interrupt_create(self, endp,
+	                                         (PUSB_INTERRUPT_HANDLER)handler,
+	                                         (void *)device, buflen,
+	                                         flags | USB_INTERRUPT_FLAG_ISABLK,
+	                                         poll_interval_in_milliseconds);
+	return result;
+}
+}
+#endif /* __cplusplus */
+
+
 
 
 /* Perform a USB control request.
@@ -270,26 +462,17 @@ usb_controller_allocstring(struct usb_controller *__restrict self,
 
 
 /* Function called when a new USB endpoint is discovered.
- * This function should try to engage with the endpoint in
- * order to discover what type of device is connected.
- * Note that the given `dev->ue_endp' is always `0' (configure
- * pipe), and that `dev->ue_dev' is also ZERO(0) (aka.: not
- * configured), with this function then being expected to
- * initialize those values before trying to detect the type
- * of connected device, as well as passing the endpoint to
- * the appropriate driver.
- * NOTE: This function is also responsible for assigning an
- *       address to the device, meaning that the caller should
- *       not yet insert `dev' into `self->uc_devs'. Doing this
- *       is part of this function's job.
  * NOTE: This function also releases a lock to `self->uc_disclock'
  *       once the device has been assigned an address. In the event
- *       that an exception occurrs before then, this lock will also
+ *       that an exception occurs before then, this lock will also
  *       be released, meaning that this function _always_ releases
- *       such a lock. */
+ *       such a lock.
+ * @param: endpoint_flags: Set of `USB_ENDPOINT_FLAG_*', though only
+ *                         flags masked by `USB_ENDPOINT_MASK_SPEED'
+ *                         may be specified. */
 FUNDEF void KCALL
 usb_device_discovered(struct usb_controller *__restrict self,
-                      struct usb_device *__restrict dev);
+                      u32 endpoint_flags);
 
 
 /* Try to bind the given USB device `dev' to a driver.

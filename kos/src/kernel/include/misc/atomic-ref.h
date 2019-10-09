@@ -249,7 +249,7 @@ template<class T> struct xatomic_ref {
 
 	/* Return a reference to the current pointed-to value */
 	__CXX_CLASSMEMBER NOBLOCK void KCALL clear() __CXX_NOEXCEPT {
-		set_inherit_new(NULL);
+		set_inherit_new(__NULLPTR);
 	}
 
 	/* Return a reference to the current pointed-to value */
@@ -381,6 +381,33 @@ template<class T> struct xatomic_ref {
 	}
 };
 
+#define XATOMIC_WEAKLYREF_STRUCT(...) xatomic_weaklyref_struct< __VA_ARGS__ >
+#ifdef CONFIG_NO_SMP
+#define xatomic_weaklyref_set(self, v)                                   \
+	do {                                                                 \
+		pflag_t _pf_was = PREEMPTION_PUSHOFF();                          \
+		__hybrid_atomic_store((self)->m_pointer, (v), __ATOMIC_SEQ_CST); \
+		PREEMPTION_POP(_pf_was);                                         \
+	} __WHILE0
+#else /* CONFIG_NO_SMP */
+#define xatomic_weaklyref_set(self, v)                                   \
+	do {                                                                 \
+		__hybrid_atomic_store((self)->m_pointer, (v), __ATOMIC_SEQ_CST); \
+		while (__hybrid_atomic_load((self)->m_inuse, __ATOMIC_ACQUIRE))  \
+			task_tryyield_or_pause();                                    \
+	} __WHILE0
+#endif /* CONFIG_NO_SMP */
+#define xatomic_weaklyref_clear(self) xatomic_weaklyref_set(self, __NULLPTR)
+
+template<class T> struct xatomic_weaklyref_struct {
+#ifndef CONFIG_NO_SMP
+	WEAK uintptr_t   m_inuse;   /* Cross-CPU is-in-use tracking */
+#endif /* !CONFIG_NO_SMP */
+	WEAK T          *m_pointer; /* [0..1][lock(COMPLEX(m_inuse))] The pointed-to object.
+	                             * NOTE: This isn't an actual reference! */
+};
+
+
 /* A weakly held reference (must be cleared by the associated object once that object gets destroyed) */
 #define XATOMIC_WEAKLYREF(...) xatomic_weaklyref< __VA_ARGS__ >
 template<class T> struct xatomic_weaklyref {
@@ -401,13 +428,13 @@ template<class T> struct xatomic_weaklyref {
 	WEAK T          *m_pointer; /* [0..1][lock(COMPLEX(m_inuse))] The pointed-to object.
 	                             * NOTE: This isn't an actual reference! */
 
-	/* Return a reference to the current pointed-to value */
+	/* Clear the pointed-to value. */
 	__CXX_CLASSMEMBER ATTR_LEAF NOBLOCK void KCALL clear() __CXX_NOEXCEPT {
-		set(NULL);
+		set(__NULLPTR);
 	}
 
 	__CXX_CLASSMEMBER ATTR_LEAF WUNUSED NOBLOCK bool KCALL is_nonnull() __CXX_NOEXCEPT {
-		return __hybrid_atomic_load(m_pointer, __ATOMIC_ACQUIRE) != NULL;
+		return __hybrid_atomic_load(m_pointer, __ATOMIC_ACQUIRE) != __NULLPTR;
 	}
 
 	/* Return a reference to the current pointed-to value */
@@ -422,7 +449,7 @@ template<class T> struct xatomic_weaklyref {
 		result = this->m_pointer;
 		COMPILER_READ_BARRIER();
 		if (result && !refcnt_methods<T>::tryincref(result))
-			result = NULL;
+			result = __NULLPTR;
 #ifndef CONFIG_NO_SMP
 		__hybrid_atomic_fetchdec(this->m_inuse, __ATOMIC_SEQ_CST);
 #endif /* !CONFIG_NO_SMP */
@@ -430,7 +457,6 @@ template<class T> struct xatomic_weaklyref {
 		return result;
 	}
 
-	/* Return a reference to the current pointed-to value */
 	__CXX_CLASSMEMBER NOBLOCK_IF(!PREEMPTION_ENABLED())
 	void KCALL set(T *new_pointer) __CXX_NOEXCEPT {
 #ifdef CONFIG_NO_SMP
@@ -458,7 +484,7 @@ template<class T> struct xatomic_weaklyref {
 		                                  new_pointer,
 		                                  __ATOMIC_SEQ_CST);
 		if (old_pointer && !refcnt_methods<T>::tryincref(old_pointer))
-			old_pointer = NULL;
+			old_pointer = __NULLPTR;
 #ifndef CONFIG_NO_SMP
 		while (__hybrid_atomic_load(this->m_inuse, __ATOMIC_ACQUIRE))
 			task_tryyield_or_pause();

@@ -33,6 +33,7 @@
 #include <kernel/heap.h>
 #include <kernel/interrupt.h>
 #include <kernel/memory.h>
+#include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <kernel/vm.h>
 #include <sched/cpu.h>
@@ -50,13 +51,16 @@
 #include <stdio.h>
 #include <string.h>
 
-#if !defined(NDEBUG) && 0
+#if !defined(NDEBUG) && 1
 #define UHCI_DEBUG(...) printk(__VA_ARGS__)
 #else /* !NDEBUG */
 #define UHCI_DEBUG(...) (void)0
 #endif /* NDEBUG */
 
 DECL_BEGIN
+
+/* Write a memory location that may be read by hardware at any point in time. */
+#define HW_WRITE(dst, value) ATOMIC_WRITE(dst, value)
 
 #define HINT_ADDR(x, y) x
 #define HINT_MODE(x, y) y
@@ -199,6 +203,178 @@ NOTHROW(FCALL uhci_invcache)(struct uhci_controller *__restrict self,
 
 
 
+
+/* Remove a given QUEUE head `entry', that is pointed to by `pentry', from the chain. */
+PRIVATE NOBLOCK void
+NOTHROW(FCALL uhci_osqh_unlink)(struct uhci_controller *__restrict self,
+                                /*out_ref*/ REF struct uhci_osqh *__restrict entry,
+                                struct uhci_osqh **__restrict pentry) {
+	struct uhci_osqh *prev, *next;
+	u32 hw_pointer;
+	prev = container_of(pentry, struct uhci_osqh, qh_next);
+	next = entry->qh_next;
+	prev->qh_next = next;
+	if (next) {
+		/* Point to the next queue head. */
+		assert(self->uc_qhlast != entry);
+		hw_pointer = next->qh_self | UHCI_QHHP_QHTD;
+	} else {
+		assert(self->uc_qhlast == entry);
+		if (self->uc_intreg) {
+			/* Point back to the first interrupt handler polled every frame. */
+			hw_pointer = self->uc_intreg->ui_td0_phys;
+			/* Make sure to keep the qh-last pointer up to date. */
+			self->uc_qhlast = prev == &self->uc_qhstart ? NULL : prev;
+		} else if (prev != &self->uc_qhstart) {
+			/* We may have been the last queue entry in line,
+			 * but there are still other entires before us.
+			 * As such, point back to the first queue entry. */
+			assert(self->uc_qhstart.qh_next != NULL);
+			hw_pointer = self->uc_qhstart.qh_self | UHCI_QHHP_QHTD;
+			self->uc_qhlast = prev;
+		} else {
+			/* We ere the last queue entry, and there aren't
+			 * even any interrupts handler left to-be called.
+			 * As such, we can safely terminate the list. */
+			hw_pointer = UHCI_QHHP_TERM;
+			self->uc_qhlast = NULL;
+		}
+	}
+	HW_WRITE(prev->qh_hp, hw_pointer);
+	uhci_invcache(self, prev->qh_self + offsetof(struct uhci_osqh, qh_hp));
+}
+
+LOCAL NOBLOCK void
+NOTHROW(FCALL uhci_osqh_append)(struct uhci_controller *__restrict self,
+                                /*in_ref*/ REF struct uhci_osqh *__restrict osqh) {
+	struct uhci_osqh *last;
+	osqh->qh_next = NULL;
+	last = self->uc_qhlast;
+	if (last) {
+		/* Append (or rather: insert) at the end. */
+		osqh->qh_hp     = last->qh_hp;
+		self->uc_qhlast = osqh;
+		assert(self->uc_qhstart.qh_next != NULL);
+		/* Append at the end of the hardware list */
+		HW_WRITE(last->qh_hp, osqh->qh_self | UHCI_QHHP_QHTD);
+	} else {
+		assert(self->uc_qhstart.qh_next == NULL);
+		/* We're the first QUEU head to appear. */
+		self->uc_qhstart.qh_next = osqh;
+		self->uc_qhlast          = osqh;
+		/* Either point back to `uc_qhstart', or to the first interrupt. */
+		osqh->qh_hp = self->uc_intreg ? self->uc_intreg->ui_td0_phys
+		                              : self->uc_qhstart.qh_self | UHCI_QHHP_QHTD;
+		/* Set the hardware link pointer to start the whole thing */
+		HW_WRITE(self->uc_qhstart.qh_hp, osqh->qh_self | UHCI_QHHP_QHTD);
+	}
+}
+
+
+
+LOCAL NOBLOCK void
+NOTHROW(FCALL uhci_intreg_insert)(struct uhci_controller *__restrict self,
+                                  /*in_ref*/ REF struct uhci_interrupt *__restrict ui) {
+	/* Insert interrupts sorted by their number of hits, such that interrupts
+	 * that get hit more often than others get triggered more often. */
+	struct uhci_interrupt **pself, *next;
+	size_t my_hitcount = ui->ui_reg.ife_hits;
+	pself = &self->uc_intreg;
+	while ((next = *pself) != NULL) {
+		if (next->ui_reg.ife_hits <= my_hitcount)
+			break; /* Insert before `next' */
+		pself = &next->ui_reg.ife_next;
+	}
+	/* Insert into the list. */
+	ui->ui_reg.ife_next = next;
+	*pself = ui;
+	/* Special case: The last TD of the last interrupt must point to `uc_qhstart' */
+	if (!next) {
+		ui->ui_reg.ife_tdsl->td_lp = self->uc_qhstart.qh_self | UHCI_TDLP_QHTD;
+	} else {
+		/* Have our last TD point to the first TD of the next interrupt. */
+		assert(next->ui_td0_phys == next->ui_reg.ife_tdsf->td_self);
+		ui->ui_reg.ife_tdsl->td_lp = next->ui_td0_phys;
+	}
+	/* Special case: This is the first interrupt that will get executed
+	 * In this case, we must have all ~empty~ frame lists entries point to it
+	 * instead of pointing to `uc_qhstart'. Frame list entires that already
+	 * contain pointers to isochronous interrupt handlers must be updated such
+	 * that the last TD of the last isochronous interrupt handler points to
+	 * the first TD of our interrupt */
+	if (pself == &self->uc_intreg) {
+		unsigned int i;
+		assert(self->uc_intreg == ui);
+		for (i = 0; i < 1024; ++i) {
+			struct uhci_interrupt *intiso;
+			intiso = self->uc_intiso[i];
+			if (intiso) {
+				struct uhci_interrupt_frameentry *ent;
+				for (;;) {
+					ent = intiso->ui_iso[i];
+					assert(ent);
+					if (!ent->ife_next)
+						break;
+					intiso = ent->ife_next;
+				}
+				assert(ent->ife_tdsf);
+				assert(ent->ife_tdsl);
+				assert(ent->ife_tdsl->td_next == NULL);
+				HW_WRITE(ent->ife_tdsl->td_lp, ui->ui_td0_phys);
+			} else {
+				/* Simple case: Just have the frame list entry directly
+				 * point at our interrupt handler! */
+				HW_WRITE(self->uc_framelist[i], ui->ui_td0_phys);
+			}
+		}
+	} else {
+		struct uhci_interrupt *prev;
+		/* Simple case: we've been inserted after an existing interrupt.
+		 * In this case, we only have to update the next-pointer of the
+		 * last TD of that preceding interrupt handler to point to us. */
+		prev = container_of(pself, struct uhci_interrupt, ui_reg.ife_next);
+		assert(prev->ui_reg.ife_tdsl->td_next == NULL);
+		HW_WRITE(prev->ui_reg.ife_tdsl->td_lp, ui->ui_td0_phys);
+	}
+}
+
+LOCAL NOBLOCK void
+NOTHROW(FCALL uhci_intreg_unlink)(struct uhci_controller *__restrict self,
+                                  struct uhci_interrupt **__restrict pself,
+                                  /*out_ref*/ REF struct uhci_interrupt *__restrict ui) {
+	/* Insert interrupts sorted by their number of hits, such that interrupts
+	 * that get hit more often than others get triggered more often. */
+	struct uhci_interrupt *next;
+	assert(*pself == ui);
+	/* Remove the interrupt from the software list. */
+	next = ui->ui_reg.ife_next;
+	*pself = next;
+	if (next) {
+	} else {
+	}
+}
+
+
+LOCAL NOBLOCK void
+NOTHROW(FCALL uhci_intiso_insert)(struct uhci_controller *__restrict self,
+                                  /*in_ref*/ REF struct uhci_interrupt *__restrict ui,
+                                  unsigned int frameno) {
+	kernel_panic("TODO");
+	++self->uc_iisocount;
+}
+
+LOCAL NOBLOCK void
+NOTHROW(FCALL uhci_intiso_unlink)(struct uhci_controller *__restrict self,
+                                  /*out_ref*/ REF struct uhci_interrupt *__restrict ui,
+                                  unsigned int frameno) {
+	kernel_panic("TODO");
+	--self->uc_iisocount;
+}
+
+
+
+
+
 PRIVATE NOBLOCK NONNULL((1)) void NOTHROW(KCALL uhci_aio_fini)(struct aio_handle *__restrict self);
 PRIVATE NOBLOCK NONNULL((1)) void NOTHROW(KCALL uhci_aio_cancel)(struct aio_handle *__restrict self);
 PRIVATE NOBLOCK NONNULL((1, 2)) unsigned int NOTHROW(KCALL uhci_aio_progress)(struct aio_handle *__restrict self, struct aio_handle_stat *__restrict stat);
@@ -253,23 +429,23 @@ again:
 		}
 		*posqh = next = osqh->qh_next;
 		prev   = container_of(posqh, struct uhci_osqh, qh_next);
-#ifdef CONFIG_UHCI_USE_QH_LOOPS
-		if (!next && prev != &ctrl->uc_qhstart)
-			next = ctrl->uc_qhstart.qh_next;
-#endif /* CONFIG_UHCI_USE_QH_LOOPS */
+		if (!next) {
+			if (prev != &ctrl->uc_qhstart)
+				next = ctrl->uc_qhstart.qh_next;
+		}
 		hw_next_pointer = next ? next->qh_self | UHCI_QHHP_QHTD
 		                       : UHCI_QHHP_TERM;
 		if (ATOMIC_READ(osqh->qh_ep) & UHCI_QHEP_TERM) {
 			/* The canceled operation was already completed.
 			 * In this case, we don't need to stop the controller, since
 			 * the unlinking process simply requires a cache invalidation. */
-			ATOMIC_WRITE(prev->qh_hp, hw_next_pointer);
+			HW_WRITE(prev->qh_hp, hw_next_pointer);
 			uhci_invcache(ctrl, prev->qh_self + offsetof(struct uhci_osqh, qh_hp));
 		} else {
 			/* The operation was be in progress ~right now~
 			 * -> Must stop the controller so that we can unlink it. */
 			uhci_controller_stop(ctrl);
-			ATOMIC_WRITE(prev->qh_hp, hw_next_pointer);
+			HW_WRITE(prev->qh_hp, hw_next_pointer);
 			uhci_controller_resume(ctrl);
 		}
 		/* Drop the reference taken from the queue chain. */
@@ -465,29 +641,92 @@ NOTHROW(FCALL uhci_osqh_completed)(struct uhci_controller *__restrict self,
 }
 
 
-PRIVATE NOBLOCK void
-NOTHROW(FCALL uhci_osqh_unlink)(struct uhci_controller *__restrict self,
-                                struct uhci_osqh *__restrict entry,
-                                struct uhci_osqh **__restrict pentry) {
-	struct uhci_osqh *prev, *next;
-	u32 hw_pointer;
-	prev = container_of(pentry, struct uhci_osqh, qh_next);
-	next = entry->qh_next;
-	prev->qh_next = next;
-#ifdef CONFIG_UHCI_USE_QH_LOOPS
-	if (!next && prev != &self->uc_qhstart)
-		next = self->uc_qhstart.qh_next;
-#endif /* CONFIG_UHCI_USE_QH_LOOPS */
-	hw_pointer = next ? next->qh_self | UHCI_QHHP_QHTD
-	                  : UHCI_QHHP_TERM;
-	ATOMIC_WRITE(prev->qh_hp, hw_pointer);
-	uhci_invcache(self, prev->qh_self + offsetof(struct uhci_osqh, qh_hp));
+LOCAL NOBLOCK struct uhci_interrupt **
+NOTHROW(FCALL uhci_finish_intiso)(struct uhci_controller *__restrict self,
+                                  struct uhci_interrupt **__restrict pui,
+                                  struct uhci_interrupt *__restrict ui) {
+	u32 cs;
+	assert(ui->ui_reg.ife_tdsf);
+	cs = ATOMIC_READ(ui->ui_reg.ife_tdsf->td_cs);
+	if (cs & (UHCI_TDCS_CRCTMO | UHCI_TDCS_NAKR |
+	          UHCI_TDCS_BABBLE | UHCI_TDCS_DBE |
+	          UHCI_TDCS_STALL)) {
+		/* NOTE: When calling a descriptor, also check the `USB_INTERRUPT_FLAG_DELETED' flag! */
+		kernel_panic("TODO: error");
+	} else if (!(cs & UHCI_TDCS_ACTIVE)) {
+		/* NOTE: When calling a descriptor, also check the `USB_INTERRUPT_FLAG_DELETED' flag! */
+		kernel_panic("TODO: completed");
+	}
+	return &ui->ui_reg.ife_next;
+}
+
+LOCAL NOBLOCK struct uhci_interrupt **
+NOTHROW(FCALL uhci_finish_intreg)(struct uhci_controller *__restrict self,
+                                  struct uhci_interrupt **__restrict pui,
+                                  struct uhci_interrupt *__restrict ui) {
+	u32 cs;
+	assert(ui->ui_reg.ife_tdsf);
+	cs = ATOMIC_READ(ui->ui_reg.ife_tdsf->td_cs);
+	if (cs & (UHCI_TDCS_CRCTMO | UHCI_TDCS_NAKR |
+	          UHCI_TDCS_BABBLE | UHCI_TDCS_DBE |
+	          UHCI_TDCS_STALL)) {
+		/* NOTE: Before invoking the callback, also check the `USB_INTERRUPT_FLAG_DELETED' flag! */
+		kernel_panic("TODO: error");
+	} else if (!(cs & UHCI_TDCS_ACTIVE)) {
+		/* NOTE: Before invoking the callback, also check the `USB_INTERRUPT_FLAG_DELETED' flag! */
+		kernel_panic("TODO: completed");
+	}
+	return &ui->ui_reg.ife_next;
+}
+
+LOCAL NOBLOCK void
+NOTHROW(FCALL uhci_finish_completed_iso)(struct uhci_controller *__restrict self,
+                                         unsigned int frameno) {
+	struct uhci_interrupt **piter, *intiso;
+	intiso = self->uc_intiso[frameno];
+	if (!intiso)
+		return;
+	piter = &self->uc_intiso[frameno];
+	do {
+		piter = uhci_finish_intiso(self, piter, intiso);
+	} while ((intiso = *piter) != NULL);
 }
 
 PRIVATE NOBLOCK void
 NOTHROW(FCALL uhci_finish_completed)(struct uhci_controller *__restrict self) {
 	struct uhci_osqh **piter, *iter;
 	assert(sync_writing(&self->uc_lock));
+
+	/* When isochronous interrupts are being used, check if any of them have gotten data. */
+	if (self->uc_iisocount != 0) {
+		u16 i, frcurr;
+		frcurr = uhci_rdw(self, UHCI_FRNUM) & 1023;
+		if (frcurr > self->uc_framelast) {
+			for (i = frcurr; i < self->uc_framelast; ++i)
+				uhci_finish_completed_iso(self, i);
+		} else if (frcurr < self->uc_framelast) {
+			for (i = self->uc_framelast; i < 1024; ++i)
+				uhci_finish_completed_iso(self, i);
+			for (i = 0; i < frcurr; ++i)
+				uhci_finish_completed_iso(self, i);
+		} else {
+			for (i = 0; i < 1024; ++i)
+				uhci_finish_completed_iso(self, i);
+		}
+		self->uc_framelast = frcurr;
+	}
+
+	/* Check if any of the regular interrupts have gotten data. */
+	if (self->uc_intreg != NULL) {
+		struct uhci_interrupt **piter, *iter;
+		piter = &self->uc_intreg;
+		iter  = *piter;
+		do {
+			piter = uhci_finish_intreg(self, piter, iter);
+		} while ((iter = *piter) != NULL);
+	}
+
+	/* Check if any of the one-time command lists have been completed. */
 	piter = &self->uc_qhstart.qh_next;
 	while ((iter = *piter) != NULL) {
 		struct uhci_ostd *td;
@@ -618,7 +857,7 @@ do_try_write:
 
 
 PRIVATE NOBLOCK bool
-NOTHROW(FCALL uhci_interrupt)(void *arg) {
+NOTHROW(FCALL uhci_interrupt_handler)(void *arg) {
 	u16 status;
 	struct uhci_controller *self;
 	self = (struct uhci_controller *)arg;
@@ -665,49 +904,47 @@ done:
 	return true;
 }
 
+
+
+
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL uhci_fini)(struct character_device *__restrict self) {
 	struct uhci_controller *me;
+	REF struct uhci_interrupt *iter, *next;
+	unsigned int i;
 	me = (struct uhci_controller *)self;
 	/* Make sure that the controller is stopped. */
 	uhci_wrw(me, UHCI_USBCMD, 0);
-	isr_unregister(&uhci_interrupt, me);
+	isr_unregister(&uhci_interrupt_handler, me); /* FIXME: This one can cause exceptions... */
+
+	iter = me->uc_intreg;
+	while (iter) {
+		assert(!(iter->ui_flags & UHCI_INTERRUPT_FLAG_ISOCHRONOUS));
+		next = iter->ui_reg.ife_next;
+		decref(iter);
+		iter = next;
+	}
+	for (i = 0; i < 1024; ++i) {
+		iter = me->uc_intiso[i];
+		while (iter) {
+			assert(iter->ui_flags & UHCI_INTERRUPT_FLAG_ISOCHRONOUS);
+			assert(iter->ui_iso[i]);
+			next = iter->ui_iso[i]->ife_next;
+			decref(iter);
+			iter = next;
+		}
+	}
 	if (me->uc_framelist)
 		vpage_free(me->uc_framelist, 1);
 }
-
 
 /* Schedule the given queue for execution. */
 PUBLIC void FCALL
 uhci_controller_addqueue(struct uhci_controller *__restrict self,
                          REF struct uhci_osqh *__restrict osqh)
 		THROWS(E_WOULDBLOCK) {
-	struct uhci_osqh *last;
 	sync_write(&self->uc_lock);
-	last = self->uc_qhstart.qh_next;
-	if (last) {
-		/* TODO: Keep track of the last entry within the controller. */
-		while (last->qh_next)
-			last = last->qh_next;
-		last->qh_next = osqh;
-		/* XXX: Wouldn't it make more sense to only keep OUT/CONTROL-packets in a loop,
-		 *      while keeping IN-packets outside of such a loop, since the attached
-		 *      device can only produce data so fast, meaning that constantly having
-		 *      the controller poll the device won't accomplish anything? */
-#ifdef CONFIG_UHCI_USE_QH_LOOPS
-		osqh->qh_hp = self->uc_qhstart.qh_next->qh_self | UHCI_QHHP_QHTD;
-#else /* CONFIG_UHCI_USE_QH_LOOPS */
-		osqh->qh_hp = UHCI_QHHP_TERM;
-#endif /* !CONFIG_UHCI_USE_QH_LOOPS */
-		/* Append at the end of the hardware list */
-		ATOMIC_WRITE(last->qh_hp, osqh->qh_self | UHCI_QHHP_QHTD);
-	} else {
-		osqh->qh_next = NULL;
-		osqh->qh_hp   = UHCI_QHHP_TERM;
-		self->uc_qhstart.qh_next = osqh;
-		/* Set the first (and currently only) element of the hardware list. */
-		ATOMIC_WRITE(self->uc_qhstart.qh_hp, osqh->qh_self | UHCI_QHHP_QHTD);
-	}
+	uhci_osqh_append(self, osqh);
 	uhci_controller_endwrite(self);
 }
 
@@ -1372,6 +1609,406 @@ cleanup_configured_and_do_syncio:
 }
 
 
+PRIVATE NOBLOCK void
+NOTHROW(KCALL uhci_interrupt_frameentry_fini)(struct uhci_interrupt_frameentry *__restrict self) {
+	struct uhci_ostd *td_iter, *td_next;
+	assert(self->ife_tdsf != NULL);
+	assert(self->ife_tdsl != NULL);
+	/* Free the transfer buffer. */
+	if ((self->ife_bufsize & ~1) != 0) {
+		if (self->ife_bufsize & 1) {
+			assert(IS_ALIGNED((uintptr_t)self->ife_buf, PAGESIZE));
+			assert(IS_ALIGNED((uintptr_t)self->ife_bufsize - 1, PAGESIZE));
+			vpage_free_untraced(self->ife_buf, self->ife_bufsize / PAGESIZE);
+		} else {
+			heap_free_untraced(&kernel_locked_heap,
+			                   self->ife_buf,
+			                   self->ife_bufsize,
+			                   GFP_LOCKED);
+		}
+	}
+	td_iter = self->ife_tdsf;
+	do {
+		td_next = td_iter->td_next;
+		assert((td_next == NULL) == (td_iter == self->ife_tdsl));
+		uhci_ostd_free(td_iter);
+	} while ((td_iter = td_next) != NULL);
+}
+
+PRIVATE NOBLOCK void
+NOTHROW(KCALL uhci_interrupt_fini)(struct usb_interrupt *__restrict self) {
+	struct uhci_interrupt *me;
+	me = (struct uhci_interrupt *)self;
+	/* Free allocated TD descriptors. */
+	if (me->ui_flags & UHCI_INTERRUPT_FLAG_ISOCHRONOUS) {
+		uhci_interrupt_frameentry_fini(&me->ui_reg);
+	} else {
+		unsigned int i;
+		for (i = 0; i < 1024; ++i) {
+			if (me->ui_iso[i])
+				uhci_interrupt_frameentry_fini(me->ui_iso[i]);
+		}
+	}
+}
+
+
+
+/* Construct TD descriptors. */
+LOCAL void KCALL
+uhci_construct_tds_for_interrupt(struct uhci_ostd ***__restrict ppnexttd,
+                                 u32 *__restrict ptok, u32 cs, u16 maxpck,
+                                 vm_phys_t start, size_t num_bytes) {
+#if __SIZEOF_VM_PHYS_T__ > 4
+	assert(!(num_bytes != 0 &&
+	         (start > (vm_phys_t)0xffffffff ||
+	          (start + num_bytes) > (vm_phys_t)0xffffffff)));
+#endif /* __SIZEOF_VM_PHYS_T__ > 4 */
+	/* Construct TD entires of up to `endp->ue_maxpck' bytes. */
+	do {
+		u16 mysize;
+		struct uhci_ostd *td;
+		td = uhci_ostd_alloc();
+		**ppnexttd = td;
+		*ppnexttd = &td->td_next;
+		mysize = maxpck;
+		if ((size_t)mysize > num_bytes)
+			mysize = (u16)num_bytes;
+		td->td_cs  = cs;
+		td->td_tok = *ptok;
+		td->td_tok |= ((mysize - 1) << UHCI_TDTOK_MAXLENS) & UHCI_TDTOK_MAXLENM;
+		td->td_buf = (u32)start;
+		*ptok ^= UHCI_TDTOK_DTOGGM;
+		start     += mysize;
+		num_bytes -= mysize;
+	} while (num_bytes);
+}
+
+
+PRIVATE void KCALL
+uhci_interrupt_frameentry_init(struct uhci_interrupt_frameentry *__restrict self,
+                               u32 *__restrict ptok, u32 cs, u16 maxpck,
+                               size_t buflen) {
+	struct uhci_ostd **pnexttd, *td_iter;
+	pnexttd = &self->ife_tdsf;
+	if likely(buflen < PAGESIZE) {
+		struct heapptr ptr;
+		size_t min_align;
+		vm_phys_t addr;
+		min_align = 1;
+		while (min_align < buflen)
+			min_align <<= 1;
+		assert(min_align >= buflen);
+		ptr = heap_align_untraced(&kernel_locked_heap,
+		                          min_align, 0, buflen,
+		                          GFP_LOCKED | GFP_PREFLT); /* TODO: GFP_32BIT */
+		/* Access the allocated memory at least once to ensure that it was faulted. */
+		COMPILER_WRITE_BARRIER();
+		*(u8 *)ptr.hp_ptr = 0;
+		COMPILER_WRITE_BARRIER();
+		addr = pagedir_translate((vm_virt_t)ptr.hp_ptr);
+		TRY {
+			uhci_construct_tds_for_interrupt(&pnexttd,
+			                                 ptok, cs, maxpck,
+			                                 addr, ptr.hp_siz);
+		} EXCEPT {
+			heap_free_untraced(&kernel_locked_heap,
+			                   ptr.hp_ptr,
+			                   ptr.hp_siz,
+			                   GFP_LOCKED);
+			RETHROW();
+		}
+		self->ife_buf     = ptr.hp_ptr;
+		self->ife_bufsize = ptr.hp_siz;
+	} else {
+		/* Large buffer. */
+		size_t i, num_pages;
+		void *buf;
+		num_pages = CEILDIV(buflen, PAGESIZE);
+		/* NOTE: Unlink the heap allocation functions, vpage_alloc() is guarantied to
+		 *       respect the `GFP_PREFLT' flag, so we don't even have to touch allocated
+		 *       page in order to ensure that it got faulted. */
+		buf = vpage_alloc_untraced(num_pages, 1,
+		                           GFP_LOCKED | GFP_PREFLT); /* TODO: GFP_32BIT */
+		assert(IS_ALIGNED((uintptr_t)self->ife_buf, PAGESIZE));
+		TRY {
+			i = 0;
+			while (i < num_pages) {
+				vm_ppage_t start;
+				size_t num_cont, num_remaining;
+				num_cont      = 1;
+				num_remaining = num_pages - i;
+				start = VM_ADDR2PAGE(pagedir_translate((vm_virt_t)((byte_t *)buf + i * PAGESIZE)));
+				while (num_remaining &&
+				       VM_ADDR2PAGE(pagedir_translate((vm_virt_t)((byte_t *)buf + (i + num_cont) * PAGESIZE))) ==
+				       start + num_cont) {
+					++num_cont;
+					--num_remaining;
+				}
+				uhci_construct_tds_for_interrupt(&pnexttd,
+				                                 ptok, cs, maxpck,
+				                                 VM_PPAGE2ADDR(start),
+				                                 num_cont * PAGESIZE);
+				i += num_cont;
+			}
+		} EXCEPT {
+			vpage_free_untraced(buf, num_pages);
+			RETHROW();
+		}
+		self->ife_buf     = buf;
+		self->ife_bufsize = (num_pages * PAGESIZE) | 1; /* least significant bit: vpage-based buffer. */
+	}
+	assert(pnexttd != &self->ife_tdsf);
+	*pnexttd = NULL;
+	assert(self->ife_tdsf != NULL);
+	self->ife_tdsl = container_of(pnexttd, struct uhci_ostd, td_next);
+	self->ife_tdsl->td_lp   = UHCI_TDLP_TERM;
+	self->ife_tdsl->td_cs  |= UHCI_TDCS_IOC;
+	for (td_iter = self->ife_tdsf; td_iter != self->ife_tdsl;) {
+		struct uhci_ostd *td_next;
+		td_next = td_iter->td_next;
+		/* Link up the hardware TD pointer chain. */
+		td_iter->td_lp = td_next->td_self;
+		td_iter = td_next;
+	}
+}
+
+LOCAL NOBLOCK size_t
+NOTHROW(FCALL uhci_count_tds)(struct uhci_ostd *__restrict first) {
+	size_t result = 1;
+	while ((first = first->td_next) != NULL)
+		++result;
+	return result;
+}
+
+LOCAL NOBLOCK size_t
+NOTHROW(FCALL uhci_count_tds_in_isoint)(struct uhci_interrupt *first,
+                                        unsigned int frameno) {
+	size_t result = 0;
+	while (first) {
+		struct uhci_interrupt_frameentry *ent;
+		ent = first->ui_iso[frameno];
+		assert(ent);
+		assert(ent->ife_tdsf);
+		assert(ent->ife_tdsl);
+		assert(ent->ife_tdsl->td_next == NULL);
+		result += uhci_count_tds(ent->ife_tdsf);
+		first = ent->ife_next;
+	}
+	return result;
+}
+
+LOCAL NOBLOCK size_t
+NOTHROW(FCALL uhci_count_isotds_for_interval_and_offset)(struct uhci_controller *__restrict self,
+                                                         unsigned int offset,
+                                                         unsigned int interval) {
+	size_t result = 0;
+	unsigned int i;
+	for (i = offset; i < 1024; i += interval) {
+		result += uhci_count_tds_in_isoint(self->uc_intiso[i], i);
+	}
+	return result;
+}
+
+
+
+/* Create an interrupt descriptor.
+ * @param: endp:                          The endpoint from which to poll data.
+ * @param: handler:                       The handler to-be invoked.
+ * @param: character_or_block_device:     Either a `struct character_device' or `struct block_device',
+ *                                        depending on the setting of `USB_INTERRUPT_FLAG_ISABLK'
+ * @param: buflen:                        The (max) number of bytes of data to-be pulled from the device.
+ *                                        Note that unless `USB_INTERRUPT_FLAG_SHORT' is set, this is the
+ *                                        mandatory buffer size, with it being an error if the device
+ *                                        produces less data that this, meaning that unless said flag is
+ *                                        set, your handler is allowed to completely ignore its `datalen'
+ *                                        argument and simply assume that the buffer's size is equal to
+ *                                        the `buflen' value passed when the interrupt was registered.
+ * @param: flags:                         Set of `USB_INTERRUPT_FLAG_*'
+ * @param: poll_interval_in_milliseconds: A hint for how often the USB device should be polled.
+ *                                        When set to `0', the device will be polled as often as possible. */
+PRIVATE WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3, 4)) REF struct usb_interrupt *KCALL
+uhci_register_interrupt(struct usb_controller *__restrict self, struct usb_endpoint *__restrict endp,
+                        PUSB_INTERRUPT_HANDLER handler, void *__restrict character_or_block_device,
+                        size_t buflen, uintptr_t flags, unsigned int poll_interval_in_milliseconds) {
+	struct uhci_controller *me;
+	unsigned int interval = 1;
+	unsigned int frame_hits = 1;
+	REF struct uhci_interrupt *result;
+	assert(!(flags & (USB_INTERRUPT_FLAG_ISACHR |
+	                  USB_INTERRUPT_FLAG_ISABLK |
+	                  USB_INTERRUPT_FLAG_SHORT |
+	                  USB_INTERRUPT_FLAG_EVENPERIOD)));
+	if (flags & UHCI_INTERRUPT_FLAG_ISOCHRONOUS) {
+		/* Figure out how often the poll should happen. */
+		unsigned int i;
+		interval = poll_interval_in_milliseconds;
+		if (interval >= 1024)
+			interval = 1024;
+		if (interval < 1024 && (flags & USB_INTERRUPT_FLAG_EVENPERIOD)) {
+			for (interval = 1; interval <= poll_interval_in_milliseconds; interval <<= 1)
+				;
+			interval >>= 1; /* One less. */
+			assert(interval <= poll_interval_in_milliseconds);
+			assert(interval <= 1024);
+			assert(interval >= 1);
+		}
+		/* Duplicate the TD chain for every secondary frame that's going to be executed. */
+		for (i = interval; i < 1024; i += interval)
+			++frame_hits;
+		if (!(flags & USB_INTERRUPT_FLAG_EVENPERIOD)) {
+			/* Remove the last period if it overlaps at least half with the next period. */
+			unsigned int overflow = i - 1024;
+			if (overflow >= interval / 2)
+				--frame_hits;
+		}
+	}
+
+	me = (struct uhci_controller *)self;
+	if (poll_interval_in_milliseconds != 0)
+		flags |= UHCI_INTERRUPT_FLAG_ISOCHRONOUS;
+	result = (REF struct uhci_interrupt *)kmalloc(flags & UHCI_INTERRUPT_FLAG_ISOCHRONOUS
+	                                              ? (offsetof(struct uhci_interrupt, ui_isobuf) +
+	                                                 (frame_hits * sizeof(struct uhci_interrupt_frameentry)))
+	                                              : offsetafter(struct uhci_interrupt, ui_reg),
+	                                              GFP_LOCKED | GFP_CALLOC | GFP_PREFLT);
+	result->ui_refcnt  = 1;
+	result->ui_fini    = &uhci_interrupt_fini;
+	result->ui_flags   = flags;
+	result->ui_endp    = incref(endp);
+	result->ui_handler = handler;
+	xatomic_weaklyref_cinit(&result->ui_bind.ui_blk,
+	                        (struct block_device *)character_or_block_device);
+	TRY {
+		u32 tok, orig_tok, cs;
+		u16 maxpck;
+		STATIC_ASSERT(offsetof(struct uhci_interrupt, ui_reg) ==
+		              offsetof(struct uhci_interrupt, ui_iso[0]));
+		tok = UHCI_TDTOK_PID_IN;
+		tok |= ((u32)endp->ue_dev << UHCI_TDTOK_DEVS) & UHCI_TDTOK_DEVM;
+		tok |= ((u32)endp->ue_endp << UHCI_TDTOK_ENDPTS) & UHCI_TDTOK_ENDPTM;
+#if USB_ENDPOINT_FLAG_DATATOGGLE == 1
+		tok |= ((endp->ue_flags & USB_ENDPOINT_FLAG_DATATOGGLE) << UHCI_TDTOK_DTOGGS);
+#else /* USB_ENDPOINT_FLAG_DATATOGGLE == 1 */
+		tok |= (endp->ue_flags & USB_ENDPOINT_FLAG_DATATOGGLE) ? UHCI_TDTOK_DTOGGM : 0;
+#endif /* USB_ENDPOINT_FLAG_DATATOGGLE != 1 */
+		orig_tok = tok;
+		cs = UHCI_TDCS_ACTIVE | ((3 << UHCI_TDCS_ERRCNTS) & UHCI_TDCS_ERRCNTM);
+		if (endp->ue_flags & USB_ENDPOINT_FLAG_LOWSPEED)
+			cs |= UHCI_TDCS_LSD;
+		if (!(flags & USB_INTERRUPT_FLAG_SHORT))
+			cs |= UHCI_TDCS_SPD;
+		if (flags & UHCI_INTERRUPT_FLAG_ISOCHRONOUS)
+			cs |= UHCI_TDCS_IOS;
+		maxpck = endp->ue_maxpck;
+		if (flags & UHCI_INTERRUPT_FLAG_ISOCHRONOUS) {
+			/* Figure out how often the poll should happen. */
+			unsigned int i, n;
+			uhci_interrupt_frameentry_init(&result->ui_isobuf[0], &tok, cs, maxpck, buflen);
+			result->ui_iso[0] = &result->ui_isobuf[0];
+			/* Duplicate the TD chain for every secondary frame that's going to be executed. */
+			for (n = 1, i = interval; n < frame_hits; ++n, i += interval) {
+				struct uhci_interrupt_frameentry *ent;
+				assert(i < 1024);
+				ent = &result->ui_isobuf[n];
+				uhci_interrupt_frameentry_init(ent, &tok, cs, maxpck, buflen);
+				result->ui_iso[i] = ent;
+			}
+		} else {
+			uhci_interrupt_frameentry_init(&result->ui_reg, &tok, cs, maxpck, buflen);
+			result->ui_td0_phys = result->ui_reg.ife_tdsf->td_self;
+		}
+		/* Check if the data-toggle flag changed. */
+		if ((orig_tok & UHCI_TDTOK_DTOGGM) != (tok & UHCI_TDTOK_DTOGGM)) {
+			if (flags & UHCI_INTERRUPT_FLAG_ISOCHRONOUS) {
+				unsigned int i, n, louse, hiuse, totuse;
+				struct uhci_ostd *hitd, *lotd;
+				/* In the case of frame-specific transfers, it would be too much work
+				 * to update all of those TD descriptors. - So instead, cheat a bit and
+				 * Append one more TD at the very end. */
+				hitd = uhci_ostd_alloc();
+				for (n = 1, i = interval; n < frame_hits; ++n, i += interval)
+					assert(result->ui_iso[i] == &result->ui_isobuf[n]);
+				i -= interval;
+				assert(result->ui_iso[i]);
+				assert(result->ui_iso[i]->ife_tdsf);
+				assert(result->ui_iso[i]->ife_tdsl);
+				lotd = result->ui_iso[i]->ife_tdsl;
+				result->ui_iso[i]->ife_tdsl = hitd;
+
+				lotd->td_next = hitd;
+				lotd->td_lp   = hitd->td_self;
+				hitd->td_next = NULL;
+				hitd->td_lp   = UHCI_TDLP_TERM;
+
+				/* Split the used buffer size. */
+				totuse = uhci_td_maxlen(lotd);
+				louse  = CEILDIV(totuse, 2);
+				hiuse  = totuse - louse;
+
+				lotd->td_tok &= ~UHCI_TDTOK_MAXLENM;
+				hitd->td_tok = lotd->td_tok;
+				lotd->td_tok |= (((u32)louse - 1) << UHCI_TDTOK_MAXLENS) & UHCI_TDTOK_MAXLENM;
+				hitd->td_tok |= (((u32)hiuse - 1) << UHCI_TDTOK_MAXLENS) & UHCI_TDTOK_MAXLENM;
+				hitd->td_cs  = lotd->td_cs;
+				hitd->td_buf = lotd->td_buf + louse;
+				lotd->td_cs &= ~UHCI_TDCS_IOC;
+				/* And with that, the D-bit even itself out over
+				 * the course of the entire frame looping once. */
+			} else {
+				result->ui_flags |= UHCI_INTERRUPT_FLAG_FLIPDBIT;
+			}
+		}
+
+		/* At this point, everything that we could possibly already know about the
+		 * new interrupt handler has already been filled in. - Now it's time to
+		 * actually register the thing! */
+		sync_write(&me->uc_lock);
+		if (flags & UHCI_INTERRUPT_FLAG_ISOCHRONOUS) {
+			unsigned int n, i, winner_offset = 0;
+			size_t winner_score = (size_t)-1;
+			/* Figure out a suitable inter-frame shift with which we can balance
+			 * out the number of isochronous data transfers within the same frame. */
+			for (i = 0; i < interval; ++i) {
+				size_t score;
+				score = uhci_count_isotds_for_interval_and_offset(me, i, interval);
+				if (score < winner_score) {
+					winner_offset = i;
+					if (!winner_score)
+						break; /* Can't beat that! */
+					winner_score = score;
+				}
+			}
+			/* Adjust our `ui_iso' vector for the given offset. */
+			if (winner_offset != 0) {
+				memmove(result->ui_iso + winner_offset,
+				        result->ui_iso,
+				        (1024 - (interval - 1)) *
+				        sizeof(struct uhci_interrupt_frameentry *));
+				result->ui_iso[0] = NULL;
+			}
+
+			/* With that, we've finalized our ISO frame vector, and we can
+			 * insert the interrupt descriptor into all of the proper slots. */
+			for (n = 0, i = winner_offset; n < frame_hits; ++n, i += interval) {
+				assert(result->ui_iso[i] == &result->ui_isobuf[n]);
+				uhci_intiso_insert(me, (struct uhci_interrupt *)incref(result), i);
+			}
+		} else {
+			uhci_intreg_insert(me, (struct uhci_interrupt *)incref(result));
+		}
+		sync_endwrite(&me->uc_lock);
+
+	} EXCEPT {
+		assert(!isshared(result));
+		destroy(result);
+		RETHROW();
+	}
+	return result;
+}
+
+
+
+
 
 
 PRIVATE void
@@ -1433,26 +2070,14 @@ uhci_controller_probeport(struct uhci_controller *__restrict self,
 		RETHROW();
 	}
 	if (status & UHCI_PORTSC_PED) {
-		struct usb_device *dev;
+		uintptr_t flags;
 		printk(FREESTR(KERN_INFO "[usb][pci:%I32p,io:%#Ix] Device found on uhci:%#I16x\n"),
 		       self->uc_pci->pd_base, self->uc_base.uc_mmbase, portno);
-		TRY {
-			dev = (struct usb_device *)kmalloc(sizeof(struct usb_device),
-			                                   GFP_NORMAL | GFP_CALLOC);
-		} EXCEPT {
-			sync_endwrite(&self->uc_disclock);
-			RETHROW();
-		}
-		dev->ue_refcnt    = 1;
-		dev->ue_interface = dev;
-		dev->ui_device    = dev;
-		dev->ue_maxpck    = 0x7ff; /* Not configured. (Physical limit of the protocol) */
-//		dev->ue_dev       = 0;     /* Not configured. (Gets set by `usb_device_discovered()') */
-//		dev->ue_endp      = 0;     /* Configure channel. */
-		dev->ue_flags     = status & UHCI_PORTSC_LSDA ? USB_ENDPOINT_FLAG_LOWSPEED : 0;
-		FINALLY_DECREF_UNLIKELY(dev);
 		/* NOTE: A call to `usb_device_discovered()' always releases the `uc_disclock' lock! */
-		usb_device_discovered(self, dev);
+		flags = status & UHCI_PORTSC_LSDA
+		        ? USB_ENDPOINT_FLAG_LOWSPEED
+		        : USB_ENDPOINT_FLAG_FULLSPEED;
+		usb_device_discovered(self, flags);
 	}
 }
 
@@ -1482,13 +2107,14 @@ usb_probe_uhci(struct pci_device *__restrict dev) {
 	atomic_rwlock_cinit(&result->uc_lock);
 	result->cd_type.ct_fini    = &uhci_fini;
 	result->uc_transfer        = &uhci_transfer;
+	result->uc_interrupt       = &uhci_register_interrupt;
 	result->uc_framelist       = (u32 *)vpage_alloc(1, 1, GFP_LOCKED | GFP_PREFLT);
 	result->uc_framelist_phys  = (u32)pagedir_translate((vm_virt_t)result->uc_framelist);
 	result->uc_qhstart.qh_self = (u32)pagedir_translate((vm_virt_t)&result->uc_qhstart);
 
 	/* Fill in the frame list */
 	for (i = 0; i < UHCI_FRAMELIST_COUNT; ++i)
-		result->uc_framelist[i] = UHCI_FLE_QHTD | result->uc_qhstart.qh_self;
+		result->uc_framelist[i] = result->uc_qhstart.qh_self | UHCI_FLE_QHTD;
 	/* Setup the start queue head as terminal */
 	result->uc_qhstart.qh_hp = UHCI_QHHP_TERM;
 	result->uc_qhstart.qh_ep = UHCI_QHEP_TERM;
@@ -1539,7 +2165,7 @@ usb_probe_uhci(struct pci_device *__restrict dev) {
 	/* Register the interrupt handler. */
 	isr_register_at(X86_INTERRUPT_PIC1_BASE +
 	                PCI_GDEV3C_IRQLINE(pci_read(dev->pd_base, PCI_GDEV3C)),
-	                &uhci_interrupt, result);
+	                &uhci_interrupt_handler, result);
 
 	/* Enable interrupts that we want to listen for. */
 	uhci_wrw(result, UHCI_USBINTR,
