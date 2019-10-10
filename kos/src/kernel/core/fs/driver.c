@@ -53,11 +53,14 @@
 #include <assert.h>
 #include <ctype.h>
 #include <elf.h>
+#include <format-printer.h>
 #include <malloca.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include <libcmdline/decode.h>
+#include <libcmdline/encode.h>
 #include <libunwind/eh_frame.h>
 
 DECL_BEGIN
@@ -74,13 +77,13 @@ struct driver_fde_cache_node {
 
 DECL_END
 
-#define ATREE(x)              driver_fde_cachetree_##x
-#define ATREE_CALL            KCALL
-#define ATREE_NODE_MIN(x)   ((uintptr_t)(x)->cn_fde.f_pcstart)
-#define ATREE_NODE_MAX(x)   ((uintptr_t)(x)->cn_fde.f_pcend - 1)
-#define Tkey                  uintptr_t
-#define T                     struct driver_fde_cache_node
-#define N_NODEPATH            cn_node
+#define ATREE(x)          driver_fde_cachetree_##x
+#define ATREE_CALL        KCALL
+#define ATREE_NODE_MIN(x) ((uintptr_t)(x)->cn_fde.f_pcstart)
+#define ATREE_NODE_MAX(x) ((uintptr_t)(x)->cn_fde.f_pcend - 1)
+#define Tkey              uintptr_t
+#define T                 struct driver_fde_cache_node
+#define N_NODEPATH        cn_node
 #include <hybrid/sequence/atree-abi.h>
 
 DECL_BEGIN
@@ -695,7 +698,7 @@ NOTHROW(KCALL driver_section_do_destroy_with_sections_lock_held)(struct driver_s
 }
 
 #define driver_must_service_dead_sections(self) \
-       (ATOMIC_READ((self)->d_deadsect) != NULL)
+	(ATOMIC_READ((self)->d_deadsect) != NULL)
 
 PRIVATE NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL driver_do_service_dead_sections)(struct driver *__restrict self) {
@@ -860,10 +863,10 @@ PUBLIC struct driver kernel_driver = {
 #ifdef __INTELLISENSE__
 	/* .d_shstrndx             = */ 0,
 	/* .d_shnum                = */ 0,
-#else
+#else /* __INTELLISENSE__ */
 	/* .d_shstrndx             = */ KERNEL_SECTIONS_COUNT - 1,
 	/* .d_shnum                = */ KERNEL_SECTIONS_COUNT,
-#endif
+#endif /* !__INTELLISENSE__ */
 	/* .d_shdr                 = */ kernel_shdr,
 	/* .d_sections_lock        = */ ATOMIC_RWLOCK_INIT,
 	/* .d_sections             = */ (struct driver_section **)kernel_sections,
@@ -872,9 +875,9 @@ PUBLIC struct driver kernel_driver = {
 	/* .d_shstrtab             = */ kernel_shstrtab_data,
 #ifdef __INTELLISENSE__
 	/* .d_shstrtab_end         = */ kernel_shstrtab_data,
-#else
+#else /* __INTELLISENSE__ */
 	/* .d_shstrtab_end         = */ kernel_shstrtab_data + sizeof(struct kernel_shstrtab),
-#endif
+#endif /* !__INTELLISENSE__ */
 	/* .d_phnum                = */ 2,
 	{
 		/* [0] = */ ELF_PHDR_INIT(
@@ -4394,9 +4397,72 @@ again_init_drivers:
 
 
 /* Driver-handle API */
-DEFINE_HANDLE_REFCNT_FUNCTIONS(driver,struct driver);
-DEFINE_HANDLE_REFCNT_FUNCTIONS(driver_state,struct driver_state);
+DEFINE_HANDLE_REFCNT_FUNCTIONS(driver, struct driver);
+DEFINE_HANDLE_REFCNT_FUNCTIONS(driver_state, struct driver_state);
 /* TODO: Other handle operators (specifically: hop()) */
+
+
+#ifndef CONFIG_NO_DEBUGGER
+DEFINE_DEBUG_FUNCTION(
+		"lsmod",
+		"lsmod\n"
+		"\tList all currently loaded drivers\n"
+		, argc, argv) {
+	size_t i, longest_name, longest_cmdl;
+	REF struct driver_state *ds;
+	ds = driver_get_state();
+	longest_name = 4;
+	longest_cmdl = 7;
+	for (i = 0; i < ds->ds_count; ++i) {
+		struct driver *d;
+		size_t temp;
+		d = ds->ds_drivers[i];
+		temp = strlen(d->d_name);
+		if (longest_name < temp)
+			longest_name = temp;
+		temp = (size_t)cmdline_encode(&format_length, NULL, d->d_argc, d->d_argv);
+		if (longest_cmdl < temp)
+			longest_cmdl = temp;
+	}
+	if (longest_name > 24)
+		longest_name = 24;
+	if (longest_cmdl > 24)
+		longest_cmdl = 24;
+#if __SIZEOF_POINTER__ == 8
+	dbg_printf(DBGSTR("%-*s %-*s loadaddr         minaddr          maxaddr\n"),
+	           longest_name, DBGSTR("name"),
+	           longest_cmdl, DBGSTR("cmdline"));
+#else /* __SIZEOF_POINTER__ == 8 */
+	dbg_printf(DBGSTR("%-*s %-*s loadaddr minaddr  maxaddr\n"),
+	           longest_name, DBGSTR("name"),
+	           longest_cmdl, DBGSTR("cmdline"));
+#endif /* __SIZEOF_POINTER__ == 8 */
+	for (i = 0; i < ds->ds_count; ++i) {
+		struct driver *d;
+		size_t temp;
+		d = ds->ds_drivers[i];
+		if (d->d_flags & DRIVER_FLAG_FINALIZED)
+			/* Already finalized */
+			dbg_print(DBGSTR(DF_SETFGCOLOR(DBG_COLOR_MAROON)));
+		else if (d->d_flags & DRIVER_FLAG_FINALIZING)
+			/* In the process of being finalized */
+			dbg_print(DBGSTR(DF_SETFGCOLOR(DBG_COLOR_RED)));
+		else if (!(d->d_flags & DRIVER_FLAG_INITIALIZED)) {
+			/* In the process of being initialized */
+			dbg_print(DBGSTR(DF_SETFGCOLOR(DBG_COLOR_YELLOW)));
+		}
+		dbg_printf(DBGSTR("%-*s "), longest_name, d->d_name);
+		temp = (size_t)cmdline_encode(&dbg_printer, NULL, d->d_argc, d->d_argv);
+		format_repeat(&dbg_printer, NULL, ' ', longest_cmdl - temp);
+		dbg_printf(DBGSTR(" %p %p %p" DF_RESETATTR "\n"),
+		           d->d_loadaddr,
+		           d->d_loadstart,
+		           d->d_loadend - 1);
+	}
+	decref_nokill(ds);
+	return 0;
+}
+#endif /* !CONFIG_NO_DEBUGGER */
 
 
 DECL_END
