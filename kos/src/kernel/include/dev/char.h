@@ -72,7 +72,7 @@ DEFINE_REFCOUNT_FUNCTIONS(struct character_device, cd_refcnt, character_device_d
  * The caller must still initialize:
  *   >> return->cd_type;
  * As well as optionally:
- *   >> return->cd_name
+ *   >> return->cd_name;
  * This function will initialize the following memory to non-zero values:
  *   >> return->cd_max_retry = 2;
  */

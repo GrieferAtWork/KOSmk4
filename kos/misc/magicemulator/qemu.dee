@@ -30,6 +30,7 @@ import * from ..libmagic.steps.mtools;
 import opt = .options;
 import fs;
 import ipc;
+import net;
 
 function normalizeFilenameForLog(filename: string | Bytes): string {
 	if (filename !is string)
@@ -179,6 +180,7 @@ class TraceController {
 
 	function doMethod(outFile: File, method: string, argument: string) {
 		switch (method) {
+
 		case "alloc":
 		case "free": {
 			local minaddr, maxaddr;
@@ -198,9 +200,11 @@ class TraceController {
 					m_addresses.remove(x);
 			}
 		}	break;
+
 		case "push":
 			m_addresses_stack.append(copy m_addresses);
 			break;
+
 		case "diff":
 			if (!m_addresses_stack) {
 				err(outFile, "Stack is empty");
@@ -210,6 +214,7 @@ class TraceController {
 				argument = "%.13I64X000";
 			printDiff(outFile, argument, m_addresses_stack.back);
 			break;
+
 		case "pop": {
 			if (!m_addresses_stack) {
 				err(outFile, "Stack is empty");
@@ -221,10 +226,54 @@ class TraceController {
 			printDiff(outFile, argument, o);
 			m_addresses = o;
 		}	break;
+
 		default:
 			err(outFile, "Unknown trace method " << repr(method));
 			break;
 		}
+	}
+}
+
+function qemuMonitorBackend(addr: string, monitorPipe: File) {
+	local s = net.socket("INET", none, none);
+	for (local i: [5000]) {
+		try {
+			s.connect(addr);
+			break;
+		} catch (e...) {
+			if (i == 4999) {
+				print Traceback.current;
+				print repr e;
+			}
+		}
+		Thread.sleep(milliseconds from time(1));
+	}
+	Thread([]{
+		local isFirst = true;
+		final local prefix = "monitor>: ";
+		for (;;) {
+			local text = s.recv();
+			if (isFirst) {
+				text = prefix + text;
+				isFirst = false;
+			}
+			text = text.replace("\n", "\n" + prefix);
+			File.stdout << text;
+			File.stdout.sync();
+		}
+	}).start();
+	local isFirst = true;
+	final local prefix = "monitor<: ";
+	for (;;) {
+		local text = monitorPipe.read();
+		s.send(text);
+		if (isFirst) {
+			text = prefix + text;
+			isFirst = false;
+		}
+		text = text.replace("\n", "\n" + prefix);
+		File.stdout << text;
+		File.stdout.sync();
 	}
 }
 
@@ -344,6 +393,15 @@ got_exe:
 			"-device", "usb-mouse"
 		});
 	}
+	local enableMonitorCommands = true;
+	local monitorCommandPipe = none;
+	if (enableMonitorCommands) {
+		final local port = "1235";
+		qemu_arguments.extend({ "-monitor", "tcp::" + port + ",server" });
+		local r;
+		r, monitorCommandPipe = ipc.Pipe.new()...;
+		enableMonitorCommands = Thread(qemuMonitorBackend, ("localhost:" + port, r));
+	}
 	local cmdline = options.get(opt.QEMU_CMDLINE);
 	if (cmdline) {
 		print "QEMU_CMDLINE",repr(cmdline);
@@ -355,6 +413,8 @@ got_exe:
 	proc.stdout = w;
 	proc.stderr = w;
 	proc.start();
+	if (enableMonitorCommands is Thread)
+		enableMonitorCommands.start();
 	try {
 		w.close();
 #undef CONFIG_POSTPROCESS_QEMU_SERIAL_OUTPUT
@@ -470,6 +530,9 @@ again_find_match:
 					if (":" in command)
 						command, none, argument = command.partition(":")...;
 					switch (command.strip()) {
+					case "monitor":
+						monitorCommandPipe.write(argument);
+						break;
 					case "trace": {
 						local method, name;
 						method, none, argument = argument.partition(":")...;

@@ -23,8 +23,13 @@
 #include <kernel/compiler.h>
 
 #include <drivers/usb.h>
+#include <kernel/malloc.h>
 #include <kernel/types.h>
 #include <kernel/vm.h>
+#include <misc/atomic-ref.h>
+#include <sched/atomic64.h>
+#include <sched/signal.h>
+#include <sched/task.h>
 
 #include <kos/io/uhci.h>
 #include <sys/io.h>
@@ -91,7 +96,6 @@ struct uhci_interrupt_frameentry {
 	                                         * NOTE: The least significant bit of this field is used to indicate a vpage-based buffer (1=vpage; 0=heap). */
 	struct uhci_ostd          *ife_tdsf;    /* [1..1][owned][const] First TD entry describing this interrupt's data */
 	struct uhci_ostd          *ife_tdsl;    /* [1..1][const] Last TD entry describing this interrupt's data */
-	size_t                     ife_hits;    /* Number of times that this interrupt got hit (used for self-optimization) */
 };
 
 struct uhci_interrupt: usb_interrupt {
@@ -99,10 +103,16 @@ struct uhci_interrupt: usb_interrupt {
 #define UHCI_INTERRUPT_FLAG_FLIPDBIT    USB_INTERRUPT_FLAG_CTRL(1) /* The total number of TDs is uneven, and their data-toggle
 	                                                                * bits must be flipped before they can be used again.
 	                                                                * NOTE: Never set when `UHCI_INTERRUPT_FLAG_ISOCHRONOUS' is set. */
+	u32                                      ui_initcs;    /* [const] Initial CS value for TDs */
 	union {
 		struct {
 			struct uhci_interrupt_frameentry ui_reg;       /* [valid_if(!UHCI_INTERRUPT_FLAG_ISOCHRONOUS)] Next interrupt. */
-			u32                              ui_td0_phys;  /* [valid_if(!UHCI_INTERRUPT_FLAG_ISOCHRONOUS)][const][== ui_reg.ife_tdsf->td_self] */
+			u32                              ui_td0_phys;  /* [valid_if(!UHCI_INTERRUPT_FLAG_ISOCHRONOUS)][const]
+			                                                * [== ui_qh ? ui_qh->qh_self | UHCI_QHHP_QHTD : ui_reg.ife_tdsf->td_self] */
+			u32                             *ui_td1_next;  /* [valid_if(!UHCI_INTERRUPT_FLAG_ISOCHRONOUS)][const]
+			                                                * [== ui_qh ? &ui_qh->qh_hp : &ui_reg.ife_tdsl->td_lp] */
+			struct uhci_osqh                *ui_qh;        /* [0..1][owned][const] First queue head used to describe this interrupt. */
+			size_t                           ui_hits;      /* Number of times that this interrupt got hit (used for self-optimization) */
 		};
 		struct uhci_interrupt_frameentry    *ui_iso[1024]; /* [0..1][valid_if(UHCI_INTERRUPT_FLAG_ISOCHRONOUS)] Frame list */
 	};
@@ -134,14 +144,49 @@ struct uhci_interrupt: usb_interrupt {
  * included within the UHCI specifications (Figure 4. Example Schedule), as included
  * on page #6 (ftp://ftp.netbsd.org/pub/NetBSD/misc/blymn/uhci11d.pdf)
  *
+ * IMPORTANT NOTE ABOUT UHCI:
+ *   - You only get interrupts about devices attaching/detaching when `UHCI_USBCMD_EGSM' is set!
+ *   - As such, plug-and-play requires a background daemon (`uc_powerctl_thrd') that handles all
+ *     of the attach/detach, as well as the delayed setting of `UHCI_USBCMD_EGSM', as that flag
+ *     indicates a sort-of suspension mode for the controller.
+ *     I'm not entirely sure what really gets suspended by that flag on real hardware. - In QEMU
+ *     it only seems to affect the delivery of device change interrupts, so I may be wrong in
+ *     thinking that the flag should be cleared before any USB transmissions are performed.
+ *     However, according to the UHCI specs: `No USB transactions occurs during this time',
+ *     referring to any time that the aforementioned flag is set. So I'd assume you're not
+ *     supposed to have that flag remain enabled while doing any sort of traffic (which is
+ *     what I went with in this implementation by the way...)
+ *  -> Essentially, when `UHCI_USBCMD_EGSM' is set, the controller may fire an interrupt with the
+ *     `UHCI_USBSTS_RD' status flag set, which indicates that the connectivity status of some device
+ *     changed, or that a USB device caused an interrupt (which I assume includes stuff like you
+ *     pressing a key on a USB keyboard, but definitely includes device attach/detach)
+ *  -> This is then handled by setting the `UHCI_CONTROLLER_FLAG_RESDECT' flag below, and broadcasting
+ *     the `uc_resdec' signal, waking up the `uc_powerctl_thrd' and causing it to clear the 
+ *     `UHCI_USBCMD_EGSM' flag (which by the way is kept in sync with `UHCI_CONTROLLER_FLAG_SUSPENDED'),
+ *     before enumerating the root hub ports (`UHCI_PORTSC(0 ... uc_portnum - 1)') and checking each
+ *     of them for the `UHCI_PORTSC_CSC' flag.
+ *  -> There also exists a timeout before `UHCI_CONTROLLER_FLAG_SUSPENDED' automatically gets set once
+ *     again, which is also handled by `uc_powerctl_thrd' and is done in relation to the amount of time
+ *     that has passed since the last interrupt (of any kind)
+ * ...
+ * This all could have been sooo much simpler if it was possible to detect device attach/detach
+ * while still keeping the UHCI controller turned on in its normal configuration.
  */
 
+struct uhci_powerctl;
 struct uhci_controller: usb_controller {
 	union uhci_iobase          uc_base;           /* I/O base address. */
 	struct pci_device         *uc_pci;            /* [1..1][const] The associated PCI device. */
 #define UHCI_CONTROLLER_FLAG_USESMMIO    0x0001   /* [const] The controller uses MMIO */
 #define UHCI_CONTROLLER_FLAG_INTERRUPTED 0x0002   /* [const] A command-completion interrupt happened while `uc_lock' was held. */
+#define UHCI_CONTROLLER_FLAG_RESDECT     0x0004   /* [lock(ATOMIC,INTERLOCKED(uc_resdec))] A resume-detect interrupt happened. */
+#define UHCI_CONTROLLER_FLAG_SUSPENDED   0x0008   /* [lock(uc_lock)] The controller is currently suspended. */
 	uintptr_t                  uc_flags;          /* Controller flags (Set of `UHCI_CONTROLLER_FLAG_*'). */
+	struct sig                 uc_resdec;         /* Signal broadcast when the `UHCI_CONTROLLER_FLAG_RESDECT' flag
+	                                               * is set, or `UHCI_CONTROLLER_FLAG_SUSPENDED' is cleared,
+	                                               * or `uc_qhlast' is set to `NULL'. */
+	REF struct uhci_powerctl  *uc_powerctl_desc;  /* [1..1][const] Power-control / Device-discover descriptor. */
+	REF struct task           *uc_powerctl_thrd;  /* [1..1][const] Power-control / Device-discover thread. */
 	struct atomic_rwlock       uc_lock;           /* Lock for sending commands to the controller. */
 	REF struct uhci_interrupt *uc_intreg;         /* [lock(uc_lock)][0..1] Chain of interrupts checked every frame (w/o `UHCI_INTERRUPT_FLAG_ISOCHRONOUS').
 	                                               * NOTE: The HW-next pointer of last TD of the last entry of this chain points to `uc_qhstart'! */
@@ -150,6 +195,8 @@ struct uhci_controller: usb_controller {
 	size_t                     uc_iisocount;      /* [lock(uc_lock)] Number of interrupt descriptors chains through `uc_intiso'.
 	                                               * NOTE: Interrupts chained more than once also count more than once here. */
 	struct uhci_osqh          *uc_qhlast;         /* [lock(uc_lock)][0..1] The last queue head in the `uc_qhstart.qh_next' chain. */
+	struct atomic64            uc_lastint;        /* Jiffies at the time when the last interrupt happened. */
+	unsigned int               uc_suspdelay;      /* Delay (in jiffies) before the controller is suspended. */
 	alignas(UHCI_FLE_ALIGN)
 	struct uhci_osqh           uc_qhstart;        /* [lock(INSERT(uc_lock))] Queue head start (Entries of `uc_framelist' first point to
 	                                               * optional isochronous, and eventually to this one) Afterwards, all entires point to
@@ -165,6 +212,15 @@ struct uhci_controller: usb_controller {
 	                                               * interrupt where ISO interrupts where checked for completion. */
 	u8                         uc_portnum;        /* [const] # of available ports. */
 };
+
+struct uhci_powerctl {
+	WEAK refcnt_t                                    up_refcnt; /* Reference counter. */
+	XATOMIC_WEAKLYREF_STRUCT(struct uhci_controller) up_ctrl;   /* Weak reference to the controller (cleared when the controller dies) */
+};
+DEFINE_REFCOUNT_FUNCTIONS(struct uhci_powerctl, up_refcnt, kfree)
+
+
+
 
 /* Safely release a read/write lock on `self->uc_lock' */
 FUNDEF NOBLOCK void NOTHROW(FCALL uhci_controller_endread)(struct uhci_controller *__restrict self);

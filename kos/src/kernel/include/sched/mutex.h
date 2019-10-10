@@ -42,11 +42,13 @@ struct mutex {
 	WEAK struct task *m_owner;  /* [0..1][lock(WRITE_IF(== NULL),CLEAR_IF(== THIS_TASK))] The owner of this mutex. */
 	uintptr_t         m_count;  /* [lock(PRIVATE(m_owner == THIS_TASK))] Number of recursive locks (== 1 for the first lock). */
 };
-#define MUTEX_INIT         { SIG_INIT, __NULLPTR, 0 }
-#define mutex_init(x)      (void)(sig_init(&(x)->m_unlock),(x)->m_owner = __NULLPTR,(x)->m_count = 0)
-#define mutex_cinit(x)     (void)(sig_cinit(&(x)->m_unlock),__hybrid_assert((x)->m_owner == __NULLPTR),__hybrid_assert((x)->m_count == 0))
-#define mutex_acquired(x)  (__hybrid_atomic_load(self->m_owner,__ATOMIC_ACQUIRE) == THIS_TASK)
-#define mutex_available(x) (__hybrid_atomic_load(self->m_owner,__ATOMIC_ACQUIRE) == THIS_TASK)
+#define MUTEX_INIT          { SIG_INIT, __NULLPTR, 0 }
+#define mutex_init(x)       (void)(sig_init(&(x)->m_unlock), (x)->m_owner = __NULLPTR, (x)->m_count = 0)
+#define mutex_cinit(x)      (void)(sig_cinit(&(x)->m_unlock), __hybrid_assert((x)->m_owner == __NULLPTR), __hybrid_assert((x)->m_count == 0))
+#define mutex_init_held(x)  (void)(sig_init(&(x)->m_unlock), (x)->m_owner = THIS_TASK, (x)->m_count = 1)
+#define mutex_cinit_held(x) (void)(sig_cinit(&(x)->m_unlock), (x)->m_owner = THIS_TASK, (x)->m_count = 1)
+#define mutex_acquired(x)   (__hybrid_atomic_load(self->m_owner, __ATOMIC_ACQUIRE) == THIS_TASK)
+#define mutex_available(x)  (__hybrid_atomic_load(self->m_owner, __ATOMIC_ACQUIRE) == THIS_TASK)
 
 /* Try to acquire a lock to the given mutex without blocking. */
 LOCAL NOBLOCK WUNUSED NONNULL((1)) bool

@@ -39,7 +39,7 @@ __SYSDECL_BEGIN
 #define    UHCI_USBCMD_RS      0x01 /* [bit(0)] Run/Stop */
 #define    UHCI_USBCMD_HCRESET 0x02 /* [bit(1)] Host Controller Reset */
 #define    UHCI_USBCMD_GRESET  0x04 /* [bit(2)] Global Reset */
-#define    UHCI_USBCMD_EGSM    0x08 /* [bit(3)] Enter Global Suspend Mode */
+#define    UHCI_USBCMD_EGSM    0x08 /* [bit(3)] Enter Global Suspend Mode (See also: notes in `/kos/src/kernel/modusb/uhci.h') */
 #define    UHCI_USBCMD_FGR     0x10 /* [bit(4)] Force Global Resume */
 #define    UHCI_USBCMD_SWDBG   0x20 /* [bit(5)] Software Debug */
 #define    UHCI_USBCMD_CF      0x40 /* [bit(6)] Configure Flag */
@@ -81,7 +81,7 @@ __SYSDECL_BEGIN
 #define    UHCI_SOFMOD_DEFAULT 64 /* == 0x40: Default timing value (just set this one during init) */
 
 #define UHCI_PORTSCMAXCNT 8 /* Max possible number of ports */
-#define UHCI_PORTSC(i) (0x10+(i)*2)
+#define UHCI_PORTSC(i) (0x10 + (i)*2)
 #define UHCI_PORTSC1   0x10 /* Port 1 status/control */
 #define UHCI_PORTSC2   0x12 /* Port 2 status/control  */
 #define    UHCI_PORTSC_CCS      0x0001 /* [bit(0)][ro]   Current Connect Status */

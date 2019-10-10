@@ -33,6 +33,7 @@
 #include <hybrid/align.h>
 #include <hybrid/minmax.h>
 
+#include <assert.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -197,10 +198,10 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_acpi)(void) {
 #if __SIZEOF_VM_PHYS_T__ == 4
 				u64 temp;
 				assert(ACPI_POINTER_SIZE == 8);
-#else
+#else /* __SIZEOF_VM_PHYS_T__ == 4 */
 				u32 temp;
 				assert(ACPI_POINTER_SIZE == 4);
-#endif
+#endif /* __SIZEOF_VM_PHYS_T__ != 4 */
 				vm_copyfromphys(&temp, addr, sizeof(temp));
 				base = (vm_phys_t)temp;
 			}
@@ -256,10 +257,10 @@ NOTHROW(KCALL acpi_lookup)(char const signature[4],
 #if __SIZEOF_VM_PHYS_T__ == 4
 			u64 temp;
 			assert(ACPI_POINTER_SIZE == 8);
-#else
+#else /* __SIZEOF_VM_PHYS_T__ == 4 */
 			u32 temp;
 			assert(ACPI_POINTER_SIZE == 4);
-#endif
+#endif /* __SIZEOF_VM_PHYS_T__ != 4 */
 			vm_copyfromphys(&temp, addr, sizeof(temp));
 			base = (vm_phys_t)temp;
 		}

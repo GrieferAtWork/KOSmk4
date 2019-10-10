@@ -25,6 +25,8 @@
 
 #include <kernel/compiler.h>
 
+#include <dev/block.h>
+#include <dev/char.h>
 #include <drivers/pci.h>
 #include <drivers/usb.h>
 #include <kernel/aio.h>
@@ -52,7 +54,9 @@
 #include <string.h>
 
 #if !defined(NDEBUG) && 1
-#define UHCI_DEBUG(...) printk(__VA_ARGS__)
+//#define UHCI_DEBUG_LOG_TD_COMPLETE 1
+//#define UHCI_DEBUG_LOG_INTERRUPT 1
+#define UHCI_DEBUG(...)             printk(__VA_ARGS__)
 #else /* !NDEBUG */
 #define UHCI_DEBUG(...) (void)0
 #endif /* NDEBUG */
@@ -170,12 +174,12 @@ NOTHROW(FCALL uhci_osqh_destroy)(struct uhci_osqh *__restrict self) {
 }
 
 
-PRIVATE NOBLOCK bool
+LOCAL NOBLOCK bool
 NOTHROW(FCALL uhci_controller_isstopped)(struct uhci_controller *__restrict self) {
 	return (uhci_rdw(self, UHCI_USBSTS) & UHCI_USBSTS_HCH) != 0;
 }
 
-PRIVATE NOBLOCK void
+LOCAL NOBLOCK void
 NOTHROW(FCALL uhci_controller_stop)(struct uhci_controller *__restrict self) {
 	u16 cmd;
 	cmd = uhci_rdw(self, UHCI_USBCMD);
@@ -185,12 +189,74 @@ NOTHROW(FCALL uhci_controller_stop)(struct uhci_controller *__restrict self) {
 		task_pause();
 }
 
-PRIVATE NOBLOCK void
+LOCAL NOBLOCK void
 NOTHROW(FCALL uhci_controller_resume)(struct uhci_controller *__restrict self) {
 	u16 cmd;
 	cmd = uhci_rdw(self, UHCI_USBCMD);
 	cmd |= UHCI_USBCMD_RS;
 	uhci_wrw(self, UHCI_USBCMD, cmd);
+}
+
+
+LOCAL NOBLOCK void
+NOTHROW(FCALL uhci_controller_egsm_enter_log)(struct uhci_controller *__restrict self) {
+	printk(KERN_INFO "[usb][pci:%I32p,io:%#Ix][+] Enter uhci suspend mode\n",
+	       self->uc_pci->pd_base, self->uc_base.uc_mmbase);
+}
+LOCAL NOBLOCK void
+NOTHROW(FCALL uhci_controller_egsm_leave_log)(struct uhci_controller *__restrict self) {
+	printk(KERN_INFO "[usb][pci:%I32p,io:%#Ix][-] Leave uhci suspend mode\n",
+	       self->uc_pci->pd_base, self->uc_base.uc_mmbase);
+}
+
+/* Check if any port has the `UHCI_PORTSC_CSC' (ConnectStatusChange) flag set. */
+LOCAL NOBLOCK bool
+NOTHROW(FCALL uhci_controller_have_csc_port)(struct uhci_controller *__restrict self) {
+	u8 i;
+	for (i = 0; i < self->uc_portnum; ++i) {
+		u16 portst;
+		portst = uhci_rdw(self, UHCI_PORTSC(i));
+		if (portst & UHCI_PORTSC_CSC)
+			return true;
+	}
+	return false;
+}
+
+LOCAL NOBLOCK bool
+NOTHROW(FCALL uhci_controller_egsm_enter)(struct uhci_controller *__restrict self) {
+	if (!(self->uc_flags & UHCI_CONTROLLER_FLAG_SUSPENDED)) {
+		u16 cmd;
+		cmd = uhci_rdw(self, UHCI_USBCMD);
+		cmd |= UHCI_USBCMD_EGSM;
+		uhci_wrw(self, UHCI_USBCMD, cmd);
+		/* If the connected status of any port has changed, then we mustn't
+		 * allow the controller to remain in EGSM mode, but rather handle the
+		 * change in connectivity down below! */
+		if unlikely(uhci_controller_have_csc_port(self)) {
+			uhci_wrw(self, UHCI_USBCMD, cmd & ~(UHCI_USBCMD_EGSM));
+			UHCI_DEBUG(KERN_DEBUG "[usb][pci:%I32p,io:%#Ix] Cannot enter "
+			                      "uhci EGSM mode: there are changed ports\n",
+			           self->uc_pci->pd_base, self->uc_base.uc_mmbase);
+			return false;
+		}
+		self->uc_flags |= UHCI_CONTROLLER_FLAG_SUSPENDED;
+		uhci_controller_egsm_enter_log(self);
+	}
+	return true;
+}
+
+LOCAL NOBLOCK void
+NOTHROW(FCALL uhci_controller_egsm_leave)(struct uhci_controller *__restrict self) {
+	if (self->uc_flags & UHCI_CONTROLLER_FLAG_SUSPENDED) {
+		u16 cmd;
+		uhci_controller_egsm_leave_log(self);
+		cmd = uhci_rdw(self, UHCI_USBCMD);
+		cmd &= ~UHCI_USBCMD_EGSM;
+		uhci_wrw(self, UHCI_USBCMD, cmd);
+		self->uc_flags &= ~UHCI_CONTROLLER_FLAG_SUSPENDED;
+		COMPILER_WRITE_BARRIER();
+		sig_broadcast(&self->uc_resdec);
+	}
 }
 
 PRIVATE NOBLOCK void
@@ -239,6 +305,8 @@ NOTHROW(FCALL uhci_osqh_unlink)(struct uhci_controller *__restrict self,
 			hw_pointer = UHCI_QHHP_TERM;
 			self->uc_qhlast = NULL;
 		}
+		if (self->uc_qhlast == NULL)
+			sig_broadcast(&self->uc_resdec);
 	}
 	HW_WRITE(prev->qh_hp, hw_pointer);
 	uhci_invcache(self, prev->qh_self + offsetof(struct uhci_osqh, qh_hp));
@@ -268,6 +336,8 @@ NOTHROW(FCALL uhci_osqh_append)(struct uhci_controller *__restrict self,
 		/* Set the hardware link pointer to start the whole thing */
 		HW_WRITE(self->uc_qhstart.qh_hp, osqh->qh_self | UHCI_QHHP_QHTD);
 	}
+	/* Make sure that EGSM isn't set, now that we've got something to do. */
+	uhci_controller_egsm_leave(self);
 }
 
 
@@ -278,10 +348,10 @@ NOTHROW(FCALL uhci_intreg_insert)(struct uhci_controller *__restrict self,
 	/* Insert interrupts sorted by their number of hits, such that interrupts
 	 * that get hit more often than others get triggered more often. */
 	struct uhci_interrupt **pself, *next;
-	size_t my_hitcount = ui->ui_reg.ife_hits;
+	size_t my_hitcount = ui->ui_hits;
 	pself = &self->uc_intreg;
 	while ((next = *pself) != NULL) {
-		if (next->ui_reg.ife_hits <= my_hitcount)
+		if (next->ui_hits <= my_hitcount)
 			break; /* Insert before `next' */
 		pself = &next->ui_reg.ife_next;
 	}
@@ -290,11 +360,12 @@ NOTHROW(FCALL uhci_intreg_insert)(struct uhci_controller *__restrict self,
 	*pself = ui;
 	/* Special case: The last TD of the last interrupt must point to `uc_qhstart' */
 	if (!next) {
-		ui->ui_reg.ife_tdsl->td_lp = self->uc_qhstart.qh_self | UHCI_TDLP_QHTD;
+		*ui->ui_td1_next = self->uc_qhstart.qh_self | UHCI_TDLP_QHTD;
 	} else {
 		/* Have our last TD point to the first TD of the next interrupt. */
-		assert(next->ui_td0_phys == next->ui_reg.ife_tdsf->td_self);
-		ui->ui_reg.ife_tdsl->td_lp = next->ui_td0_phys;
+		assert(next->ui_td0_phys == (next->ui_qh ? next->ui_qh->qh_self | UHCI_QHHP_QHTD
+		                                         : next->ui_reg.ife_tdsf->td_self));
+		*ui->ui_td1_next = next->ui_td0_phys;
 	}
 	/* Special case: This is the first interrupt that will get executed
 	 * In this case, we must have all ~empty~ frame lists entries point to it
@@ -317,9 +388,6 @@ NOTHROW(FCALL uhci_intreg_insert)(struct uhci_controller *__restrict self,
 						break;
 					intiso = ent->ife_next;
 				}
-				assert(ent->ife_tdsf);
-				assert(ent->ife_tdsl);
-				assert(ent->ife_tdsl->td_next == NULL);
 				HW_WRITE(ent->ife_tdsl->td_lp, ui->ui_td0_phys);
 			} else {
 				/* Simple case: Just have the frame list entry directly
@@ -333,41 +401,185 @@ NOTHROW(FCALL uhci_intreg_insert)(struct uhci_controller *__restrict self,
 		 * In this case, we only have to update the next-pointer of the
 		 * last TD of that preceding interrupt handler to point to us. */
 		prev = container_of(pself, struct uhci_interrupt, ui_reg.ife_next);
-		assert(prev->ui_reg.ife_tdsl->td_next == NULL);
-		HW_WRITE(prev->ui_reg.ife_tdsl->td_lp, ui->ui_td0_phys);
+		HW_WRITE(*prev->ui_td1_next, ui->ui_td0_phys);
 	}
 }
 
 LOCAL NOBLOCK void
 NOTHROW(FCALL uhci_intreg_unlink)(struct uhci_controller *__restrict self,
-                                  struct uhci_interrupt **__restrict pself,
+                                  struct uhci_interrupt **__restrict pui,
                                   /*out_ref*/ REF struct uhci_interrupt *__restrict ui) {
-	/* Insert interrupts sorted by their number of hits, such that interrupts
-	 * that get hit more often than others get triggered more often. */
+	/* Remove the given interrupt. */
 	struct uhci_interrupt *next;
-	assert(*pself == ui);
+	u32 hw_next_pointer;
+	assert(*pui == ui);
 	/* Remove the interrupt from the software list. */
 	next = ui->ui_reg.ife_next;
-	*pself = next;
+	*pui = next;
 	if (next) {
+		hw_next_pointer = next->ui_td0_phys;
 	} else {
+		/* Without a next-pointer, we're the last regular interrupt handler.
+		 * As such, we must have the previous interrupt point to `uc_qhstart' */
+		hw_next_pointer = self->uc_qhstart.qh_self | UHCI_QHHP_QHTD;
+	}
+	if (pui == &self->uc_intreg) {
+		unsigned int i;
+		/* Special case: Must update the pointers from all of the frame lists,
+		 *               as well as all isochronous interrupt handlers. */
+		uhci_controller_stop(self);
+		COMPILER_WRITE_BARRIER();
+		for (i = 0; i < 1024; ++i) {
+			struct uhci_interrupt *intiso;
+			intiso = self->uc_intiso[i];
+			if (intiso) {
+				struct uhci_interrupt_frameentry *ent;
+				for (;;) {
+					ent = intiso->ui_iso[i];
+					assert(ent);
+					if (!ent->ife_next)
+						break;
+					intiso = ent->ife_next;
+				}
+				assert(ent->ife_tdsf);
+				assert(ent->ife_tdsl);
+				assert(!ent->ife_tdsl->td_next);
+				HW_WRITE(ent->ife_tdsl->td_lp, hw_next_pointer);
+			} else {
+				HW_WRITE(self->uc_framelist[i], hw_next_pointer);
+			}
+		}
+		COMPILER_WRITE_BARRIER();
+		uhci_controller_resume(self);
+	} else {
+		struct uhci_interrupt *prev;
+		prev = container_of(pui, struct uhci_interrupt, ui_reg.ife_next);
+		/* Invalidate the cache of the preceding next-pointer. */
+		uhci_invcache(self,
+		              prev->ui_qh ? prev->ui_qh->qh_self +
+		                            offsetof(struct uhci_osqh, qh_hp)
+		                          : prev->ui_reg.ife_tdsl->td_self +
+		                            offsetof(struct uhci_ostd, td_lp));
 	}
 }
+
 
 
 LOCAL NOBLOCK void
 NOTHROW(FCALL uhci_intiso_insert)(struct uhci_controller *__restrict self,
                                   /*in_ref*/ REF struct uhci_interrupt *__restrict ui,
                                   unsigned int frameno) {
-	kernel_panic("TODO");
+	u32 hw_next_pointer;
+	struct uhci_interrupt_frameentry *ent;
+	struct uhci_interrupt **pself, *next, *prev;
+	ent = ui->ui_iso[frameno];
+	assert(ent);
+	/* Insert the new interrupt into the ISO vector. */
+	pself = &self->uc_intiso[frameno];
+	prev  = NULL;
+	/* XXX: Select a different `pself'? */
+	next          = *pself;
+	ent->ife_next = next;
+	*pself        = ui;
+	/* Link the next pointer. */
+	if (next) {
+		/* Have our last TD point to the first TD of the next interrupt. */
+		struct uhci_interrupt_frameentry *nent;
+		assert(self->uc_iisocount != 0);
+		nent = next->ui_iso[frameno];
+		assert(nent);
+		hw_next_pointer = nent->ife_tdsf->td_self;
+	} else {
+		assert(self->uc_iisocount == 0 ||
+		       pself != &self->uc_intiso[frameno]);
+		/* Must have our last TD point to either the
+		 * first regular interrupt, or `uc_qhstart' */
+		if (self->uc_intreg) {
+			hw_next_pointer = self->uc_intreg->ui_td0_phys;
+		} else {
+			hw_next_pointer = self->uc_qhstart.qh_self | UHCI_QHHP_QHTD;
+		}
+	}
+	ent->ife_tdsl->td_lp = hw_next_pointer;
+	/* Insert our entry into the vector. */
+	hw_next_pointer = ent->ife_tdsf->td_self;
+	if (pself == &self->uc_intiso[frameno]) {
+		assert(!prev);
+		HW_WRITE(self->uc_framelist[frameno], hw_next_pointer);
+	} else {
+		struct uhci_interrupt_frameentry *pent;
+		assert(prev);
+		pent = prev->ui_iso[frameno];
+		assert(pent);
+		assert(pent->ife_tdsf);
+		assert(pent->ife_tdsl);
+		HW_WRITE(pent->ife_tdsl->td_lp, hw_next_pointer);
+	}
 	++self->uc_iisocount;
 }
 
 LOCAL NOBLOCK void
 NOTHROW(FCALL uhci_intiso_unlink)(struct uhci_controller *__restrict self,
+                                  struct uhci_interrupt *prev,
                                   /*out_ref*/ REF struct uhci_interrupt *__restrict ui,
                                   unsigned int frameno) {
-	kernel_panic("TODO");
+	u32 hw_next_pointer, *phw_next_pointer, phw_next_pointer_addr;
+	struct uhci_interrupt **pself, *next;
+	struct uhci_interrupt_frameentry *ent;
+	assert(self->uc_iisocount);
+	assert(self->uc_intiso[frameno]);
+	pself = &self->uc_intiso[frameno];
+	if (prev != NULL)
+		pself = &prev->ui_iso[frameno]->ife_next;
+	assert(*pself == ui);
+	ent = ui->ui_iso[frameno];
+	assert(ent);
+	next = ent->ife_next;
+	/* Unlink from the software list. */
+	*pself = next;
+	if (next) {
+		/* If we have a successor ISO interrupt, our
+		 * hardware self-pointer must be updated to
+		 * point to its first TD. */
+		struct uhci_interrupt_frameentry *nent;
+		nent = next->ui_iso[frameno];
+		assert(nent);
+		assert(nent->ife_tdsf);
+		assert(nent->ife_tdsl);
+		hw_next_pointer = nent->ife_tdsf->td_self;
+	} else {
+		/* Without a succeeding ISO interrupt, our
+		 * hardware self-pointer must be updated to
+		 * either point to the first regular interrupt,
+		 * or simply point at `uc_qhstart'. */
+		if (self->uc_intreg) {
+			hw_next_pointer = self->uc_intreg->ui_td0_phys;
+		} else {
+			hw_next_pointer = self->uc_qhstart.qh_self | UHCI_QHHP_QHTD;
+		}
+	}
+	/* Figure out where our hardware self-pointer is located at. */
+	if (prev) {
+		struct uhci_interrupt_frameentry *pent;
+		struct uhci_ostd *tdsl;
+		pent = prev->ui_iso[frameno];
+		assert(pent);
+		assert(pent->ife_tdsf);
+		assert(pent->ife_tdsl);
+		/* There is another ISO interrupt that is preceding us. */
+		tdsl = pent->ife_tdsl;
+		phw_next_pointer      = &tdsl->td_lp;
+		phw_next_pointer_addr = tdsl->td_self + offsetof(struct uhci_ostd, td_lp);
+	} else {
+		/* Must directly modify the frame list. */
+		phw_next_pointer      = &self->uc_framelist[frameno];
+		phw_next_pointer_addr = self->uc_framelist_phys + frameno * 4;
+	}
+	/* Update our hardware self-pointer */
+	COMPILER_WRITE_BARRIER();
+	HW_WRITE(*phw_next_pointer, hw_next_pointer);
+	COMPILER_WRITE_BARRIER();
+	uhci_invcache(self, phw_next_pointer_addr);
 	--self->uc_iisocount;
 }
 
@@ -529,7 +741,7 @@ NOTHROW(FCALL uhci_osqh_aio_docomplete)(struct aio_handle *__restrict aio,
 	}
 }
 
-PRIVATE NOBLOCK void
+PRIVATE ATTR_NOINLINE NOBLOCK void
 NOTHROW(FCALL uhci_osqh_completed_ioerror)(struct uhci_controller *__restrict self,
                                            struct uhci_osqh *__restrict osqh,
                                            error_code_t code,
@@ -572,10 +784,12 @@ NOTHROW(FCALL uhci_osqh_aio_completed)(struct uhci_controller *__restrict self,
 		u32 cs = ATOMIC_READ(td->td_cs);
 		actlen = (cs + 1) & UHCI_TDCS_ACTLEN;
 		maxlen = uhci_td_maxlen(td);
+#ifdef UHCI_DEBUG_LOG_TD_COMPLETE
 		UHCI_DEBUG(KERN_DEBUG "[usb][pci:%I32p,io:%#Ix] uhci:td:complete"
 		                      " [actlen=%#I16x,maxlen=%#I16x,cs=%#I32x,tok=%#I32x]\n",
 		           self->uc_pci->pd_base, self->uc_base.uc_mmbase,
 		           actlen, maxlen, cs, td->td_tok);
+#endif /* UHCI_DEBUG_LOG_TD_COMPLETE */
 		/* Check for short packet */
 		if (actlen < maxlen) {
 			if unlikely(cs & UHCI_TDCS_SPD) {
@@ -614,9 +828,10 @@ NOTHROW(FCALL uhci_osqh_aio_completed)(struct uhci_controller *__restrict self,
 		}
 short_packet_ok:
 		data->ud_retsize += actlen;
-		if ((cs & (UHCI_TDCS_CRCTMO | UHCI_TDCS_NAKR |
-		           UHCI_TDCS_BABBLE | UHCI_TDCS_DBE |
-		           UHCI_TDCS_STALL | UHCI_TDCS_ACTIVE)) != 0) {
+		if ((cs & (UHCI_TDCS_BSE | UHCI_TDCS_CRCTMO |
+		           UHCI_TDCS_NAKR | UHCI_TDCS_BABBLE |
+		           UHCI_TDCS_DBE | UHCI_TDCS_STALL |
+		           UHCI_TDCS_ACTIVE)) != 0) {
 			uhci_osqh_completed_ioerror(self, osqh,
 			                            ERROR_CODEOF(E_IOERROR_ERRORBIT),
 			                            E_IOERROR_REASON_UHCI_TDCS,
@@ -640,24 +855,160 @@ NOTHROW(FCALL uhci_osqh_completed)(struct uhci_controller *__restrict self,
 		uhci_osqh_aio_completed(self, osqh, aio);
 }
 
-
-LOCAL NOBLOCK struct uhci_interrupt **
-NOTHROW(FCALL uhci_finish_intiso)(struct uhci_controller *__restrict self,
-                                  struct uhci_interrupt **__restrict pui,
-                                  struct uhci_interrupt *__restrict ui) {
-	u32 cs;
-	assert(ui->ui_reg.ife_tdsf);
-	cs = ATOMIC_READ(ui->ui_reg.ife_tdsf->td_cs);
-	if (cs & (UHCI_TDCS_CRCTMO | UHCI_TDCS_NAKR |
-	          UHCI_TDCS_BABBLE | UHCI_TDCS_DBE |
-	          UHCI_TDCS_STALL)) {
-		/* NOTE: When calling a descriptor, also check the `USB_INTERRUPT_FLAG_DELETED' flag! */
-		kernel_panic("TODO: error");
-	} else if (!(cs & UHCI_TDCS_ACTIVE)) {
-		/* NOTE: When calling a descriptor, also check the `USB_INTERRUPT_FLAG_DELETED' flag! */
-		kernel_panic("TODO: completed");
+PRIVATE NOBLOCK unsigned int
+NOTHROW(FCALL uhci_int_do_invoke)(struct uhci_interrupt *__restrict ui,
+                                  unsigned int status,
+                                  void const *data, size_t datalen) {
+	unsigned int result;
+	uintptr_t intflags;
+	intflags = ATOMIC_READ(ui->ui_flags);
+	if unlikely(intflags & USB_INTERRUPT_FLAG_DELETED) {
+do_stop:
+		result = USB_INTERRUPT_HANDLER_RETURN_STOP;
+	} else if (intflags & USB_INTERRUPT_FLAG_ISABLK) {
+		REF struct basic_block_device *dev;
+		dev = ((XATOMIC_WEAKLYREF(struct basic_block_device) *)&ui->ui_bind.ui_blk)->get();
+		if unlikely(!dev)
+			goto do_stop;
+		result = (*ui->ui_handler)(dev, status, data, datalen);
+		decref_unlikely(dev);
+	} else {
+		REF struct character_device *dev;
+		dev = ((XATOMIC_WEAKLYREF(struct character_device) *)&ui->ui_bind.ui_chr)->get();
+		if unlikely(!dev)
+			goto do_stop;
+		result = (*ui->ui_handler)(dev, status, data, datalen);
+		decref_unlikely(dev);
 	}
-	return &ui->ui_reg.ife_next;
+	return result;
+}
+
+PRIVATE ATTR_NOINLINE NOBLOCK unsigned int
+NOTHROW(FCALL uhci_int_completed_ioerror)(struct uhci_interrupt *__restrict ui,
+                                          void const *data, size_t datalen,
+                                          error_code_t code,
+                                          uintptr_t io_reason,
+                                          uintptr_t pointer2 DFL(0)) {
+	unsigned int result;
+	struct exception_data odata;
+	struct exception_data *mydat;
+	mydat = error_data();
+	odata = *mydat;
+	memset(mydat, 0, sizeof(*mydat));
+	mydat->e_code        = code;
+	mydat->e_pointers[0] = E_IOERROR_SUBSYSTEM_USB;
+	mydat->e_pointers[1] = io_reason;
+	mydat->e_pointers[2] = pointer2;
+	result = uhci_int_do_invoke(ui,
+                                USB_INTERRUPT_HANDLER_STATUS_ERROR,
+                                data,
+                                datalen);
+	*mydat = odata;
+	return result;
+}
+
+PRIVATE NOBLOCK unsigned int
+NOTHROW(FCALL uhci_int_completed)(struct uhci_controller *__restrict self,
+                                  struct uhci_interrupt *__restrict ui,
+                                  struct uhci_interrupt_frameentry *__restrict ent) {
+	unsigned int result;
+	struct uhci_ostd *td;
+	size_t retsize = 0;
+	/* Check for transfer errors. */
+	for (td = ent->ife_tdsf; td; td = td->td_next) {
+		u16 actlen, maxlen;
+		u32 cs = ATOMIC_READ(td->td_cs);
+		assert((td->td_next == NULL) == (td == ent->ife_tdsl));
+		actlen = (cs + 1) & UHCI_TDCS_ACTLEN;
+		maxlen = uhci_td_maxlen(td);
+#ifdef UHCI_DEBUG_LOG_TD_COMPLETE
+		UHCI_DEBUG(KERN_DEBUG "[usb][pci:%I32p,io:%#Ix] uhci:int:td:complete"
+		                      " [actlen=%#I16x,maxlen=%#I16x,cs=%#I32x,tok=%#I32x]\n",
+		           self->uc_pci->pd_base, self->uc_base.uc_mmbase,
+		           actlen, maxlen, cs, td->td_tok);
+#endif /* UHCI_DEBUG_LOG_TD_COMPLETE */
+		/* Check for short packet */
+		if (actlen < maxlen) {
+			if unlikely(cs & UHCI_TDCS_SPD) {
+				result = uhci_int_completed_ioerror(ui, ent->ife_buf, retsize,
+				                                    ERROR_CODEOF(E_IOERROR_NODATA),
+				                                    E_IOERROR_REASON_USB_SHORTPACKET);
+				goto done;
+			}
+			if (td->td_next != NULL) {
+				struct uhci_ostd *next_nonempty;
+				u8 mypid = td->td_tok & UHCI_TDTOK_PID;
+				next_nonempty = td->td_next;
+				for (;;) {
+					if ((next_nonempty->td_tok & UHCI_TDTOK_PID) != mypid)
+						goto short_packet_ok; /* Different type of packet (Partially filled, trailing buffers are OK) */
+					if (uhci_td_actlen(next_nonempty) != 0)
+						break; /* Non-empty follow-up packet. */
+					if ((next_nonempty = next_nonempty->td_next) == NULL)
+						goto short_packet_ok; /* There are no later buffers (Partially filled, trailing buffers are OK) */
+				}
+				printk(KERN_WARNING "[usb][pci:%I32p,io:%#Ix] "
+				                    "uhci:int:td:incomplete packet (%I16u/%I16u) followed "
+				                    "by non-empty packets of the same type (pid=%#I8x)\n",
+				       self->uc_pci->pd_base, self->uc_base.uc_mmbase,
+				       actlen, maxlen, mypid);
+				/* XXX: What now? Should we be trying to shift around buffer memory
+				 *      in order to fill the gap? - When does this even happen? Or
+				 *      is this even allowed to happen, because if not, then I can
+				 *      just have the transmission be completed with an error.
+				 *      If we were to blindly re-merge data buffers, we might end
+				 *      up causing problems in case there is some endpoint function
+				 *      that results in multiple chunks of dynamically sized packets. */
+			}
+		}
+short_packet_ok:
+		retsize += actlen;
+		assert(retsize <= ent->ife_bufsize);
+		if ((cs & (UHCI_TDCS_BSE | UHCI_TDCS_CRCTMO |
+		           UHCI_TDCS_NAKR | UHCI_TDCS_BABBLE |
+		           UHCI_TDCS_DBE | UHCI_TDCS_STALL |
+		           UHCI_TDCS_ACTIVE)) != 0) {
+			result = uhci_int_completed_ioerror(ui, ent->ife_buf, retsize,
+			                                    ERROR_CODEOF(E_IOERROR_ERRORBIT),
+			                                    E_IOERROR_REASON_UHCI_TDCS,
+			                                    cs);
+			goto done;
+		}
+	}
+	assert(retsize <= ent->ife_bufsize);
+	result = uhci_int_do_invoke(ui, USB_INTERRUPT_HANDLER_STATUS_OK,
+	                            ent->ife_buf, retsize);
+done:
+	return result;
+}
+
+LOCAL NOBLOCK void
+NOTHROW(FCALL uhci_reset_int)(struct uhci_interrupt *__restrict ui,
+                              struct uhci_interrupt_frameentry *__restrict ent) {
+	struct uhci_ostd *td;
+	td = ent->ife_tdsf;
+	do {
+		assert((td->td_next != NULL) ==
+		       (td == ent->ife_tdsl));
+		td->td_cs = ui->ui_initcs;
+	} while ((td = td->td_next) != NULL);
+	ent->ife_tdsl->td_cs |= UHCI_TDCS_IOC;
+}
+
+LOCAL NOBLOCK void
+NOTHROW(FCALL uhci_update_d_bit)(struct uhci_interrupt *__restrict ui,
+                                 struct uhci_interrupt_frameentry *__restrict ent) {
+	if (ui->ui_flags & UHCI_INTERRUPT_FLAG_FLIPDBIT) {
+		struct uhci_ostd *td;
+		td = ent->ife_tdsf;
+		do {
+			assert((td->td_next != NULL) ==
+			       (td == ent->ife_tdsl));
+			td->td_tok ^= UHCI_TDTOK_DTOGGM;
+		} while ((td = td->td_next) != NULL);
+		/* Also update the data-toggle bit of the endpoint. */
+		ui->ui_endp->ue_flags ^= USB_ENDPOINT_FLAG_DATATOGGLE;
+	}
 }
 
 LOCAL NOBLOCK struct uhci_interrupt **
@@ -665,31 +1016,198 @@ NOTHROW(FCALL uhci_finish_intreg)(struct uhci_controller *__restrict self,
                                   struct uhci_interrupt **__restrict pui,
                                   struct uhci_interrupt *__restrict ui) {
 	u32 cs;
+	struct uhci_osqh *qh;
+	struct uhci_ostd *td;
+	unsigned int restart_mode;
 	assert(ui->ui_reg.ife_tdsf);
-	cs = ATOMIC_READ(ui->ui_reg.ife_tdsf->td_cs);
-	if (cs & (UHCI_TDCS_CRCTMO | UHCI_TDCS_NAKR |
-	          UHCI_TDCS_BABBLE | UHCI_TDCS_DBE |
-	          UHCI_TDCS_STALL)) {
-		/* NOTE: Before invoking the callback, also check the `USB_INTERRUPT_FLAG_DELETED' flag! */
-		kernel_panic("TODO: error");
-	} else if (!(cs & UHCI_TDCS_ACTIVE)) {
-		/* NOTE: Before invoking the callback, also check the `USB_INTERRUPT_FLAG_DELETED' flag! */
-		kernel_panic("TODO: completed");
+	assert(ui->ui_reg.ife_tdsl);
+	if ((qh = ui->ui_qh) != NULL) {
+		/* This one uses a queue-head, meaning we can just check if the QH has been filled. */
+		u32 ep = ATOMIC_READ(qh->qh_ep);
+		if (ep & UHCI_QHEP_TERM) {
+			/* This queue has completed */
+			restart_mode = uhci_int_completed(self, ui, &ui->ui_reg);
+			goto done_qh;
+		}
+		/* Find the TD that is currently being executed. */
+		td = uhci_ostd_findphys(ui->ui_reg.ife_tdsf, ep);
+		if unlikely(!td) {
+			/* Shouldn't happen... */
+			printk(KERN_CRIT "[usb][pci:%I32p,io:%#Ix] uhci:int:bad:ep (%#I32p)\n",
+			       self->uc_pci->pd_base, self->uc_base.uc_mmbase, ep);
+			HW_WRITE(qh->qh_ep, UHCI_QHEP_TERM);
+			restart_mode = uhci_int_completed_ioerror(ui, NULL, 0,
+			                                          ERROR_CODEOF(E_IOERROR_NODATA),
+			                                          E_IOERROR_REASON_UHCI_BADEP,
+			                                          ep);
+			goto done_qh;
+		}
+		/* Check the status of this TD */
+		cs = ATOMIC_READ(td->td_cs);
+		if (!(cs & UHCI_TDCS_ACTIVE)) {
+			/* This could happen because `UHCI_TDCS_SPD' was set,
+			 * in which case us getting here means an error: packet-too-short. */
+			if (cs & UHCI_TDCS_SPD) {
+				/* Check if the packet really has the wrong size. */
+				u16 actlen = (cs + 1) & UHCI_TDCS_ACTLEN;
+				u16 maxlen = uhci_td_maxlen(td);
+				if (actlen < maxlen) {
+					/* That's an error! */
+					printk(KERN_ERR "[usb][pci:%I32p,io:%#Ix] uhci:int:short-packet (%I16u < %I16u)\n",
+					       self->uc_pci->pd_base, self->uc_base.uc_mmbase, actlen, maxlen);
+					restart_mode = uhci_int_completed_ioerror(ui, NULL, 0,
+					                                          ERROR_CODEOF(E_IOERROR_NODATA),
+					                                          E_IOERROR_REASON_USB_SHORTPACKET);
+					goto done_qh;
+				}
+			}
+		}
+		/* Check for error bits (regardless of the state of ACTIVE). */
+		if (cs & (UHCI_TDCS_BSE | UHCI_TDCS_CRCTMO |
+		          UHCI_TDCS_NAKR | UHCI_TDCS_BABBLE |
+		          UHCI_TDCS_DBE | UHCI_TDCS_STALL)) {
+			printk(KERN_ERR "[usb][pci:%I32p,io:%#Ix] uhci:int:error (cs=%#I32x,tok=%#I32x)\n",
+			       self->uc_pci->pd_base, self->uc_base.uc_mmbase, cs, ATOMIC_READ(td->td_tok));
+			restart_mode = uhci_int_completed_ioerror(ui, NULL, 0,
+			                                          ERROR_CODEOF(E_IOERROR_ERRORBIT),
+			                                          E_IOERROR_REASON_UHCI_TDCS,
+			                                          cs);
+			goto done_qh;
+		}
+		if (!(cs & UHCI_TDCS_ACTIVE)) {
+			printk(KERN_ERR "[usb][pci:%I32p,io:%#Ix] uhci:int:inactive for unknown reason\n",
+			       self->uc_pci->pd_base, self->uc_base.uc_mmbase);
+			restart_mode = uhci_int_completed_ioerror(ui, NULL, 0,
+			                                          ERROR_CODEOF(E_IOERROR_NODATA),
+			                                          E_IOERROR_REASON_UHCI_INCOMPLETE);
+			goto done_qh;
+		}
+		/* Incomplete transmission (can happen when an operation is split between multiple
+		 * frames because of its size, or because it was sharing bandwidth by not having
+		 * the `UHCI_TDLP_DBS' flag set) */
+		UHCI_DEBUG(KERN_DEBUG "[usb][pci:%I32p,io:%#Ix] uhci:incomplete [ep=%#I32x,cs=%#I32x,tok=%#I32x]\n",
+		           self->uc_pci->pd_base, self->uc_base.uc_mmbase,
+		           ep, cs, ATOMIC_READ(td->td_tok));
+
+		/* In the case of depth-first, we can assume that there are no
+		 * more completed queues to be found, since that would imply that
+		 * our current queue would have also been completed! */
+		if (td->td_lp & UHCI_TDLP_DBS) {
+			/* Depth-first -> Later QHs havn't been touched, yet
+			 * As such, skip all the way to the very end. */
+			while (ui->ui_reg.ife_next)
+				ui = ui->ui_reg.ife_next;
+		}
+		goto do_next;
+done_qh:
+		if unlikely(restart_mode == USB_INTERRUPT_HANDLER_RETURN_STOP)
+			goto do_unlink;
+		/* Reset the interrupt. */
+		uhci_reset_int(ui, &ui->ui_reg);
+		uhci_update_d_bit(ui, &ui->ui_reg);
+		/* Reset the initial TD pointer of the interrupt handler. */
+		COMPILER_WRITE_BARRIER();
+		HW_WRITE(qh->qh_ep, ui->ui_reg.ife_tdsf->td_self);
+		COMPILER_WRITE_BARRIER();
+	} else {
+		/* Without QH. Check the first TD for completion/error. */
+		td = ui->ui_reg.ife_tdsf;
+		assert(td);
+		assert((td->td_next != NULL) == (td == ui->ui_reg.ife_tdsl));
+		cs = ATOMIC_READ(ui->ui_reg.ife_tdsf->td_cs);
+		if (!(cs & UHCI_TDCS_ACTIVE)) {
+			/* NOTE: `uhci_int_completed()' also checks for errors! */
+			restart_mode = uhci_int_completed(self, ui, &ui->ui_reg);
+			goto done_nqh;
+		}
+		/* Check for error bits. */
+		if (cs & (UHCI_TDCS_BSE | UHCI_TDCS_CRCTMO |
+		          UHCI_TDCS_NAKR | UHCI_TDCS_BABBLE |
+		          UHCI_TDCS_DBE | UHCI_TDCS_STALL)) {
+			printk(KERN_ERR "[usb][pci:%I32p,io:%#Ix] uhci:int:error (cs=%#I32x,tok=%#I32x)\n",
+			       self->uc_pci->pd_base, self->uc_base.uc_mmbase, cs, ATOMIC_READ(td->td_tok));
+			restart_mode = uhci_int_completed_ioerror(ui, NULL, 0,
+			                                          ERROR_CODEOF(E_IOERROR_ERRORBIT),
+			                                          E_IOERROR_REASON_UHCI_TDCS,
+			                                          cs);
+			goto done_nqh;
+		}
+		goto do_next;
+done_nqh:
+		if unlikely(restart_mode == USB_INTERRUPT_HANDLER_RETURN_STOP)
+			goto do_unlink;
+		/* Reset the interrupt. */
+		{
+			struct uhci_ostd *td;
+			td = ui->ui_reg.ife_tdsf;
+			cs = ui->ui_initcs;
+			if likely(td == ui->ui_reg.ife_tdsl) {
+				HW_WRITE(td->td_cs, cs | UHCI_TDCS_IOC);
+			} else {
+				do {
+					assert((td->td_next != NULL) ==
+					       (td == ui->ui_reg.ife_tdsl));
+					if (!td->td_next)
+						cs |= UHCI_TDCS_IOC;
+					HW_WRITE(td->td_cs, cs);
+				} while ((td = td->td_next) != NULL);
+			}
+		}
 	}
+do_next:
 	return &ui->ui_reg.ife_next;
+do_unlink:
+	uhci_intreg_unlink(self, pui, ui);
+	return pui;
+}
+
+/* Returns NULL if the entry was deleted.
+ * Otherwise, return the self-pointer of the next entry. */
+LOCAL NOBLOCK struct uhci_interrupt **
+NOTHROW(FCALL uhci_finish_intiso)(struct uhci_controller *__restrict self,
+                                  struct uhci_interrupt *prev,
+                                  struct uhci_interrupt *__restrict ui,
+                                  unsigned int frameno) {
+	u32 cs;
+	struct uhci_interrupt_frameentry *ent;
+	ent = ui->ui_iso[frameno];
+	assert(ent);
+	assert(ent->ife_tdsf);
+	assert(ent->ife_tdsl);
+	cs = ATOMIC_READ(ent->ife_tdsl->td_cs);
+	kernel_panic("TODO");
+	(void)cs;
+	if (0) {
+		uhci_intiso_unlink(self, prev, ui, frameno);
+		decref(ui);
+		return NULL;
+	}
+	return &ent->ife_next;
 }
 
 LOCAL NOBLOCK void
 NOTHROW(FCALL uhci_finish_completed_iso)(struct uhci_controller *__restrict self,
                                          unsigned int frameno) {
-	struct uhci_interrupt **piter, *intiso;
-	intiso = self->uc_intiso[frameno];
-	if (!intiso)
+	struct uhci_interrupt *prev, **piter, *iter;
+	iter = self->uc_intiso[frameno];
+	if (!iter)
 		return;
 	piter = &self->uc_intiso[frameno];
-	do {
-		piter = uhci_finish_intiso(self, piter, intiso);
-	} while ((intiso = *piter) != NULL);
+	prev  = NULL;
+	for (;;) {
+		struct uhci_interrupt **pnext;
+		pnext = uhci_finish_intiso(self,
+		                           prev,
+		                           iter,
+		                           frameno);
+		if (pnext) {
+			prev  = iter;
+			piter = pnext;
+		}
+		iter = *piter;
+		if (!iter)
+			break;
+	}
 }
 
 PRIVATE NOBLOCK void
@@ -776,9 +1294,9 @@ NOTHROW(FCALL uhci_finish_completed)(struct uhci_controller *__restrict self) {
 			}
 		}
 		/* Check for error bits (regardless of the state of ACTIVE). */
-		if (cs & (UHCI_TDCS_CRCTMO | UHCI_TDCS_NAKR |
-		          UHCI_TDCS_BABBLE | UHCI_TDCS_DBE |
-		          UHCI_TDCS_STALL)) {
+		if (cs & (UHCI_TDCS_BSE | UHCI_TDCS_CRCTMO |
+		          UHCI_TDCS_NAKR | UHCI_TDCS_BABBLE |
+		          UHCI_TDCS_DBE | UHCI_TDCS_STALL)) {
 			printk(KERN_ERR "[usb][pci:%I32p,io:%#Ix] uhci:error (cs=%#I32x,tok=%#I32x)\n",
 			       self->uc_pci->pd_base, self->uc_base.uc_mmbase, cs, ATOMIC_READ(td->td_tok));
 			uhci_osqh_unlink(self, iter, piter);
@@ -858,29 +1376,38 @@ do_try_write:
 
 PRIVATE NOBLOCK bool
 NOTHROW(FCALL uhci_interrupt_handler)(void *arg) {
-	u16 status;
+	u16 status, ack;
 	struct uhci_controller *self;
 	self = (struct uhci_controller *)arg;
 	status = uhci_rdw(self, UHCI_USBSTS);
-	if (!(status & (UHCI_USBSTS_USBINT | UHCI_USBSTS_ERROR))) {
-		printk(KERN_TRACE "[usb][pci:%I32p,io:%#Ix] uhci sporadic (status=%#I8x)\n",
-		       self->uc_pci->pd_base, self->uc_base.uc_mmbase, status);
-		return false; /* Not our interrupt! */
+	ack    = 0;
+	if (status & (UHCI_USBSTS_USBINT | UHCI_USBSTS_ERROR |
+	              UHCI_USBSTS_RD | UHCI_USBSTS_HSE |
+	              UHCI_USBSTS_HCPE | UHCI_USBSTS_HCH)) {
+		/* Remember that we've just gotten an interrupt. */
+		atomic64_write(&self->uc_lastint, jiffies);
 	}
-	uhci_wrw(self, UHCI_USBSTS, status & (UHCI_USBSTS_USBINT | UHCI_USBSTS_ERROR));
-	UHCI_DEBUG(KERN_TRACE "[usb][pci:%I32p,io:%#Ix] uhci interrupt (status=%#I8x)\n",
-	           self->uc_pci->pd_base, self->uc_base.uc_mmbase, status);
 	if unlikely(status & UHCI_USBSTS_HSE) {
 		printk(KERN_CRIT "[usb][pci:%I32p,io:%#Ix] uhci:Host-System-Error set (status=%#I8x)\n",
 		       self->uc_pci->pd_base, self->uc_base.uc_mmbase, status);
+		/* XXX: Do something more? */
+		uhci_wrw(self, UHCI_USBSTS, UHCI_USBSTS_HSE);
+		ack |= UHCI_USBSTS_HSE;
 	}
 	if unlikely(status & UHCI_USBSTS_HCPE) {
 		printk(KERN_CRIT "[usb][pci:%I32p,io:%#Ix] uhci:Host-Controller-Process-Error set (status=%#I8x)\n",
 		       self->uc_pci->pd_base, self->uc_base.uc_mmbase, status);
+		/* XXX: Do something more? */
+		uhci_wrw(self, UHCI_USBSTS, UHCI_USBSTS_HCPE);
+		ack |= UHCI_USBSTS_HCPE;
 	}
-	if (status & UHCI_USBSTS_HCH)
-		return true; /* Halted */
 	if (status & (UHCI_USBSTS_USBINT | UHCI_USBSTS_ERROR)) {
+#ifdef UHCI_DEBUG_LOG_INTERRUPT
+		UHCI_DEBUG(KERN_TRACE "[usb][pci:%I32p,io:%#Ix] uhci interrupt (status=%#I8x)\n",
+		           self->uc_pci->pd_base, self->uc_base.uc_mmbase, status);
+#endif /* UHCI_DEBUG_LOG_INTERRUPT */
+		uhci_wrw(self, UHCI_USBSTS, status & (UHCI_USBSTS_USBINT | UHCI_USBSTS_ERROR));
+		ack |= status & (UHCI_USBSTS_USBINT | UHCI_USBSTS_ERROR);
 		/* One of two things happened:
 		 *  - A TD with the IOC bit was finished
 		 *  - Some TD got one of its error bits set. */
@@ -890,7 +1417,7 @@ NOTHROW(FCALL uhci_interrupt_handler)(void *arg) {
 			/* Try to acquire the lock again, so the `UHCI_CONTROLLER_FLAG_INTERRUPTED'
 			 * flag becomes interlocked on our end. */
 			if (!sync_trywrite(&self->uc_lock))
-				goto done;
+				goto done_tdint;
 			ATOMIC_FETCHAND(self->uc_flags, ~UHCI_CONTROLLER_FLAG_INTERRUPTED);
 		}
 		uhci_finish_completed(self);
@@ -900,7 +1427,20 @@ NOTHROW(FCALL uhci_interrupt_handler)(void *arg) {
 		 * lock! */
 		sync_endwrite(&self->uc_lock);
 	}
-done:
+done_tdint:
+	if (status & UHCI_USBSTS_RD) {
+		UHCI_DEBUG(KERN_TRACE "[usb][pci:%I32p,io:%#Ix] uhci:Resume-Detect (status=%#I8x)\n",
+		           self->uc_pci->pd_base, self->uc_base.uc_mmbase, status);
+		if (!(ATOMIC_FETCHOR(self->uc_flags, UHCI_CONTROLLER_FLAG_RESDECT) & UHCI_CONTROLLER_FLAG_RESDECT))
+			sig_broadcast(&self->uc_resdec);
+		uhci_wrw(self, UHCI_USBSTS, UHCI_USBSTS_RD);
+		ack |= UHCI_USBSTS_RD;
+	}
+	if unlikely(!ack) {
+		printk(KERN_TRACE "[usb][pci:%I32p,io:%#Ix] uhci sporadic (status=%#I8x)\n",
+		       self->uc_pci->pd_base, self->uc_base.uc_mmbase, status);
+		return false;
+	}
 	return true;
 }
 
@@ -913,10 +1453,24 @@ NOTHROW(KCALL uhci_fini)(struct character_device *__restrict self) {
 	REF struct uhci_interrupt *iter, *next;
 	unsigned int i;
 	me = (struct uhci_controller *)self;
-	/* Make sure that the controller is stopped. */
-	uhci_wrw(me, UHCI_USBCMD, 0);
-	isr_unregister(&uhci_interrupt_handler, me); /* FIXME: This one can cause exceptions... */
 
+	/* Destroy the power control descriptor and thread. */
+	if (me->uc_powerctl_desc) {
+		xatomic_weaklyref_clear(&me->uc_powerctl_desc->up_ctrl);
+		decref_unlikely(me->uc_powerctl_desc);
+	}
+	if (me->uc_powerctl_thrd) {
+		decref(me->uc_powerctl_thrd);
+		/* In (the likely) case that the power controller was
+		 * waiting for something to happen, wake it up. */
+		sig_broadcast(&me->uc_resdec);
+	}
+
+	/* Make sure that the controller is stopped. */
+	if (me->uc_base.uc_mmbase != NULL)
+		uhci_wrw(me, UHCI_USBCMD, 0);
+
+	isr_unregister(&uhci_interrupt_handler, me); /* FIXME: This one can cause exceptions... */
 	iter = me->uc_intreg;
 	while (iter) {
 		assert(!(iter->ui_flags & UHCI_INTERRUPT_FLAG_ISOCHRONOUS));
@@ -1641,13 +2195,15 @@ NOTHROW(KCALL uhci_interrupt_fini)(struct usb_interrupt *__restrict self) {
 	me = (struct uhci_interrupt *)self;
 	/* Free allocated TD descriptors. */
 	if (me->ui_flags & UHCI_INTERRUPT_FLAG_ISOCHRONOUS) {
-		uhci_interrupt_frameentry_fini(&me->ui_reg);
-	} else {
 		unsigned int i;
 		for (i = 0; i < 1024; ++i) {
 			if (me->ui_iso[i])
 				uhci_interrupt_frameentry_fini(me->ui_iso[i]);
 		}
+	} else {
+		if (me->ui_qh)
+			uhci_osqh_free(me->ui_qh);
+		uhci_interrupt_frameentry_fini(&me->ui_reg);
 	}
 }
 
@@ -1899,6 +2455,7 @@ uhci_register_interrupt(struct usb_controller *__restrict self, struct usb_endpo
 			cs |= UHCI_TDCS_SPD;
 		if (flags & UHCI_INTERRUPT_FLAG_ISOCHRONOUS)
 			cs |= UHCI_TDCS_IOS;
+		result->ui_initcs = cs;
 		maxpck = endp->ue_maxpck;
 		if (flags & UHCI_INTERRUPT_FLAG_ISOCHRONOUS) {
 			/* Figure out how often the poll should happen. */
@@ -1915,7 +2472,21 @@ uhci_register_interrupt(struct usb_controller *__restrict self, struct usb_endpo
 			}
 		} else {
 			uhci_interrupt_frameentry_init(&result->ui_reg, &tok, cs, maxpck, buflen);
+			assert(result->ui_reg.ife_tdsf);
+			assert(result->ui_reg.ife_tdsl);
 			result->ui_td0_phys = result->ui_reg.ife_tdsf->td_self;
+			result->ui_td1_next = &result->ui_reg.ife_tdsl->td_lp;
+			if (result->ui_reg.ife_tdsf != result->ui_reg.ife_tdsl) {
+				/* Use a queue head to stream-line multi-TD the data transfer. */
+				struct uhci_osqh *qh;
+				qh = uhci_osqh_alloc();
+				qh->qh_ep = result->ui_td0_phys;
+				qh->qh_next         = NULL;                    /* Unused field */
+				qh->qh_tds          = result->ui_reg.ife_tdsf; /* Unused field (still init correctly, though) */
+				qh->qh_aio          = NULL;                    /* Unused field */
+				result->ui_qh       = qh;
+				result->ui_td0_phys = qh->qh_self | UHCI_QHHP_QHTD;
+			}
 		}
 		/* Check if the data-toggle flag changed. */
 		if ((orig_tok & UHCI_TDTOK_DTOGGM) != (tok & UHCI_TDTOK_DTOGGM)) {
@@ -1996,7 +2567,7 @@ uhci_register_interrupt(struct usb_controller *__restrict self, struct usb_endpo
 		} else {
 			uhci_intreg_insert(me, (struct uhci_interrupt *)incref(result));
 		}
-		sync_endwrite(&me->uc_lock);
+		uhci_controller_endwrite(me);
 
 	} EXCEPT {
 		assert(!isshared(result));
@@ -2021,8 +2592,8 @@ NOTHROW(FCALL sleep_milli)(unsigned int n) {
 }
 
 PRIVATE u16
-NOTHROW(FCALL uhci_controller_resetport)(struct uhci_controller *__restrict self,
-                                         unsigned int portno) {
+NOTHROW(FCALL uhci_controller_reset_port)(struct uhci_controller *__restrict self,
+                                          unsigned int portno) {
 	u16 st;
 	unsigned int n;
 	st = uhci_rdw(self, UHCI_PORTSC(portno));
@@ -2056,56 +2627,331 @@ NOTHROW(FCALL uhci_controller_resetport)(struct uhci_controller *__restrict self
 	return st;
 }
 
-PRIVATE ATTR_FREETEXT void FCALL
-uhci_controller_probeport(struct uhci_controller *__restrict self,
-                          unsigned int portno) {
-	u16 status;
-	printk(FREESTR(KERN_INFO "[usb][pci:%I32p,io:%#Ix] Checking for device on uhci:%#I16x\n"),
+/* NOTE: This function _always_ release a lock to `&self->uc_disclock' */
+PRIVATE void
+NOTHROW(FCALL uhci_controller_device_attached)(struct uhci_controller *__restrict self,
+                                               unsigned int portno,
+                                               u16 portsc_status) {
+	uintptr_t flags;
+	printk(KERN_INFO "[usb][pci:%I32p,io:%#Ix] Device attached on uhci:%#I16x\n",
 	       self->uc_pci->pd_base, self->uc_base.uc_mmbase, portno);
+	/* NOTE: A call to `usb_device_discovered()' always releases the `uc_disclock' lock! */
+	flags = portsc_status & UHCI_PORTSC_LSDA
+	        ? USB_ENDPOINT_FLAG_LOWSPEED
+	        : USB_ENDPOINT_FLAG_FULLSPEED;
+	TRY {
+		usb_device_discovered(self, flags);
+	} EXCEPT {
+		error_printf("discovering usb device on uhci[pci:%I32p,io:%#Ix] port #%I16u",
+		             self->uc_pci->pd_base, self->uc_base.uc_mmbase, portno);
+	}
+}
+
+PRIVATE void FCALL
+uhci_controller_device_detached(struct uhci_controller *__restrict self,
+                                unsigned int portno) {
+	printk(KERN_INFO "[usb][pci:%I32p,io:%#Ix] Device detached from uhci port #%I16u\n",
+	       self->uc_pci->pd_base, self->uc_base.uc_mmbase, portno);
+	/* TODO */
+}
+
+
+
+/* Check for newly attached/detached devices. */
+PRIVATE void KCALL
+uhci_chk_port_changes(struct uhci_controller *__restrict self) {
+	unsigned int i;
+	printk(KERN_INFO "[usb][pci:%I32p,io:%#Ix] Check for uhci root-hub connectivity changes\n",
+	       self->uc_pci->pd_base, self->uc_base.uc_mmbase);
+again:
+	sync_write(&self->uc_disclock);
+	for (i = 0; i < self->uc_portnum; ++i) {
+		u16 portsc;
+		portsc = uhci_rdw(self, UHCI_PORTSC(i));
+		if (!(portsc & UHCI_PORTSC_CSC))
+			continue; /* Nothing's changed here... */
+		if (portsc & UHCI_PORTSC_CCS) {
+			uhci_wrw(self, UHCI_PORTSC(i), portsc & ~UHCI_PORTSC_PEDC);
+			portsc = uhci_controller_reset_port(self, i);
+			if (!(portsc & UHCI_PORTSC_PED))
+				continue; /* Init failed... */
+			/* New device was attached. */
+			uhci_controller_device_attached(self, i, portsc);
+			goto again;
+		}
+		/* Disable the port. */
+		/* Clear ConnectStatus/EnableDisable-changed bits */
+		portsc |= UHCI_PORTSC_CSC | UHCI_PORTSC_PEDC;
+		uhci_wrw(self, UHCI_PORTSC(i), portsc);
+		/* Clear the Port Enabled bit. */
+		portsc &= ~(UHCI_PORTSC_PED | UHCI_PORTSC_CSC | UHCI_PORTSC_PEDC);
+		uhci_wrw(self, UHCI_PORTSC(i), portsc);
+		/* Clear the EnableDisable-changed bit */
+		portsc |= UHCI_PORTSC_PEDC;
+		uhci_wrw(self, UHCI_PORTSC(i), portsc);
+		/* Inform the USB sub-system that a device has been detached. */
+		sync_endwrite(&self->uc_disclock);
+		uhci_controller_device_detached(self, i);
+		goto again;
+	}
+	sync_endwrite(&self->uc_disclock);
+}
+
+PRIVATE void KCALL
+uhci_handle_resume_detect(struct uhci_controller *__restrict self) {
+	u16 cmd;
+	/* Resume detected.
+	 * -> Check for changes in port attachments. */
+	ATOMIC_FETCHAND(self->uc_flags, ~UHCI_CONTROLLER_FLAG_RESDECT);
+	sync_write(&self->uc_lock);
+	TRY {
+		/* Check if the FGR command flag was set.
+		 * If it was, wait for 20ms and clear it. */
+		cmd = uhci_rdw(self, UHCI_USBCMD);
+		if (cmd & UHCI_USBCMD_FGR)
+			sleep_milli(20);
+		if (self->uc_flags & UHCI_CONTROLLER_FLAG_SUSPENDED) {
+			/* Log the fact that we're clearing the EGSM flag. */
+			uhci_controller_egsm_leave_log(self);
+			self->uc_flags &= ~UHCI_CONTROLLER_FLAG_SUSPENDED;
+		}
+		/* Note that this is also what implicitly clears the EGSM flag. */
+		if (!(cmd & UHCI_USBCMD_RS) || (cmd & (UHCI_USBCMD_FGR | UHCI_USBCMD_EGSM))) {
+			uhci_wrw(self, UHCI_USBCMD,
+			         UHCI_USBCMD_RS | UHCI_USBCMD_CF |
+			         UHCI_USBCMD_MAXP);
+		}
+	} EXCEPT {
+		uhci_controller_endwrite(self);
+		RETHROW();
+	}
+	uhci_controller_endwrite(self);
+	uhci_chk_port_changes(self);
+}
+
+PRIVATE void KCALL
+uhci_powerctl_main(REF struct uhci_powerctl *__restrict ctl) {
+	FINALLY_DECREF_UNLIKELY(ctl);
+	for (;;) {
+		qtime_t timeout;
+		u64 last_int;
+		uintptr_t flags;
+		REF struct uhci_controller *uc;
+		bool egsm_ok;
+#define READ_CTRL() ((REF struct uhci_controller *)((XATOMIC_WEAKLYREF(struct character_device) *)&ctl->up_ctrl)->get())
+		uc = READ_CTRL();
+		if unlikely(!uc)
+			break;
+again_read_flags:
+		flags = ATOMIC_READ(uc->uc_flags);
+		/* Check if a resume event was detected. */
+		if unlikely(flags & UHCI_CONTROLLER_FLAG_RESDECT) {
+do_resdect:
+			FINALLY_DECREF_UNLIKELY(uc);
+			uhci_handle_resume_detect(uc);
+			continue;
+		}
+		/* Connect to the `uc_resdec' lock and drop our reference from `uc'
+		 * -> We must not be holding it while sleeping, so-as to allow the
+		 *    controller to be destroyed while we're still running.
+		 *    Should this happen, we'll still be informed about it by the
+		 *    weak reference in `ctl' being cleared. */
+do_connect:
+		TRY {
+			task_connect(&uc->uc_resdec);
+		} EXCEPT {
+			decref_unlikely(uc);
+			RETHROW();
+		}
+		/* Now that we're interlocked with the RESDEC signal,
+		 * check if another resume event got triggered. */
+		flags = ATOMIC_READ(uc->uc_flags);
+		if unlikely(flags & UHCI_CONTROLLER_FLAG_RESDECT) {
+			decref_unlikely(uc);
+			continue;
+		}
+		if (ATOMIC_READ(uc->uc_qhlast) != NULL) {
+			/* Wait until all queue heads have been serviced. */
+			/* XXX: We could easily add support for a watchdog here... */
+			decref_unlikely(uc);
+			task_waitfor();
+			continue;
+		}
+		if (flags & UHCI_CONTROLLER_FLAG_SUSPENDED) {
+			/* When the bus has already been suspended, then we can
+			 * just wait until it gets resumed before doing anything! */
+			decref_unlikely(uc);
+			task_waitfor();
+			continue;
+		}
+		/* There doesn't seem to be any traffic, so we wait for traffic
+		 * to appear with a custom timeout that specifies how long to
+		 * wait before the bus should automatically be suspended.
+		 * Note that this is a relatively short delay, because for whatever
+		 * reason, USB attach/detach events only generate interrupts  */
+		last_int = atomic64_read_r(&uc->uc_lastint);
+		timeout.q_jtime = last_int + uc->uc_suspdelay;
+		decref_unlikely(uc);
+		timeout.q_qtime = 0;
+		timeout.q_qsize = 1;
+		/* Wait for our timeout to expire. */
+		if (task_waitfor(&timeout) != NULL)
+			continue; /* Something happened! -> Don't time out. */
+
+		/* Must (try to) suspend the controller. */
+		uc = READ_CTRL();
+		if unlikely(!uc)
+			break;
+		/* Quick check: Has something that we should worry about happened? */
+		flags = ATOMIC_READ(uc->uc_flags);
+		if (flags & UHCI_CONTROLLER_FLAG_RESDECT)
+			goto do_resdect;
+		if (ATOMIC_READ(uc->uc_qhlast) != NULL)
+			goto do_connect;
+		if (flags & UHCI_CONTROLLER_FLAG_SUSPENDED)
+			goto do_connect;
+		/* Lock the controller since we're about to access its registers. */
+		TRY {
+			sync_write(&uc->uc_lock);
+		} EXCEPT {
+			decref_unlikely(uc);
+			RETHROW();
+		}
+		/* Check the controller state again (now that we've got the necessary lock) */
+		flags = ATOMIC_READ(uc->uc_flags);
+		if (flags & UHCI_CONTROLLER_FLAG_RESDECT) {
+			sync_endwrite(&uc->uc_lock);
+			goto do_resdect;
+		}
+		if (ATOMIC_READ(uc->uc_qhlast) != NULL) {
+			sync_endwrite(&uc->uc_lock);
+			goto do_connect;
+		}
+		if (flags & UHCI_CONTROLLER_FLAG_SUSPENDED) {
+			sync_endwrite(&uc->uc_lock);
+			goto do_connect;
+		}
+		/* Try to enter EGSM mode.
+		 * Note that this function returns `false' if there are
+		 * any ports with changed connectivity indicators! */
+		egsm_ok = uhci_controller_egsm_enter(uc);
+		uhci_controller_endwrite(uc);
+		/* If we've successfully managed to enter EGSM mode, directly loop back. */
+		if (egsm_ok)
+			goto again_read_flags;
+		/* There are some ports that have changed their connectivity status.
+		 * -> Handle this change in connectivity, and loop back. */
+		TRY {
+			uhci_chk_port_changes(uc);
+		} EXCEPT {
+			decref_unlikely(uc);
+			RETHROW();
+		}
+		goto again_read_flags;
+	}
+}
+
+
+
+PRIVATE ATTR_FREETEXT void FCALL
+uhci_controller_reset_port_and_probe(struct uhci_controller *__restrict self,
+                                     unsigned int portno) {
+	u16 status;
+	UHCI_DEBUG(FREESTR(KERN_INFO "[usb][pci:%I32p,io:%#Ix] Checking for device on uhci port #%I16u\n"),
+	           self->uc_pci->pd_base, self->uc_base.uc_mmbase, portno);
 	sync_write(&self->uc_disclock);
 	TRY {
-		status = uhci_controller_resetport(self, portno);
+		status = uhci_controller_reset_port(self, portno);
 	} EXCEPT {
 		sync_endwrite(&self->uc_disclock);
 		RETHROW();
 	}
-	if (status & UHCI_PORTSC_PED) {
-		uintptr_t flags;
-		printk(FREESTR(KERN_INFO "[usb][pci:%I32p,io:%#Ix] Device found on uhci:%#I16x\n"),
-		       self->uc_pci->pd_base, self->uc_base.uc_mmbase, portno);
-		/* NOTE: A call to `usb_device_discovered()' always releases the `uc_disclock' lock! */
-		flags = status & UHCI_PORTSC_LSDA
-		        ? USB_ENDPOINT_FLAG_LOWSPEED
-		        : USB_ENDPOINT_FLAG_FULLSPEED;
-		usb_device_discovered(self, flags);
+	if (status & UHCI_PORTSC_PED)
+		uhci_controller_device_attached(self, portno, status);
+	else {
+		sync_endwrite(&self->uc_disclock);
 	}
+}
+
+PRIVATE ATTR_FREETEXT unsigned int KCALL
+uhci_find_pci_bar(struct pci_device *__restrict dev) {
+	unsigned int i, result;
+	/* Nowhere in the UHCI specs does it say which BAR it has to be.
+	 * -> Go through each bar and look for one that matches what we're
+	 *    looking for. - For this, we can look at the IOSIZE attribute
+	 *    of said BAR, as well as check if the BAR is even allocated.
+	 * #1: If only 1 BAR is allocated, that's the one
+	 * #2: If only 1 BAR has the expected I/O size, that's the one
+	 *     FIXME: Looking at the I/O sizes, I have a feeling that the PCI
+	 *            driver loads these incorrectly... (I'm reading 0xffff3fc0,
+	 *            which is 0-BASE...)
+	 * #3: If only 1 BAR has `PCI_RESOURCE_FIO' set, that's the one
+	 * #4: Just use the first matching BAR...
+	 */
+	result = PD_RESOURCE_COUNT;
+	for (i = 0; i < PD_RESOURCE_COUNT; ++i) {
+		struct pci_resource *res;
+		res = &dev->pd_res[PD_RESOURCE_BAR(i)];
+		if (res->pr_flags == PCI_RESOURCE_FUNUSED)
+			continue;
+		if (!(res->pr_flags & PCI_RESOURCE_FIO))
+			continue;
+		if (result == PD_RESOURCE_COUNT)
+			result = i;
+		else {
+			result = PD_RESOURCE_COUNT + 1;
+		}
+	}
+	if (result < PD_RESOURCE_COUNT)
+		goto done;
+	for (i = 0; i < PD_RESOURCE_COUNT; ++i) {
+		struct pci_resource *res;
+		res = &dev->pd_res[PD_RESOURCE_BAR(i)];
+		if (res->pr_flags == PCI_RESOURCE_FUNUSED)
+			continue;
+		result = i;
+		goto done;
+	}
+done:
+	return result;
 }
 
 
 INTERN ATTR_FREETEXT void KCALL
 usb_probe_uhci(struct pci_device *__restrict dev) {
 	struct uhci_controller *result;
-	unsigned int i;
+	unsigned int i, pci_bar;
+	pci_bar = uhci_find_pci_bar(dev);
+	if unlikely(pci_bar >= PD_RESOURCE_COUNT) {
+		printk(FREESTR(KERN_ERR "[usb][pci:%I32p] Failed to determine uhci I/O bar\n"),
+		       dev->pd_base);
+		return;
+	}
+
 	result = CHARACTER_DEVICE_ALLOC(struct uhci_controller);
-	result->uc_pci = dev;
+	FINALLY_DECREF_UNLIKELY(result);
+
+	result->cd_type.ct_fini = &uhci_fini;
+	sig_cinit(&result->uc_resdec);
+	atomic_rwlock_cinit(&result->uc_lock);
+	usb_controller_cinit(result);
+	result->uc_pci          = dev;
 	assert(IS_ALIGNED((uintptr_t)&result->uc_qhstart, UHCI_FLE_ALIGN));
-	if (dev->pd_res[PD_RESOURCE_BAR4].pr_flags & PCI_RESOURCE_FIO) {
-		result->uc_base.uc_iobase = (port_t)dev->pd_res[PD_RESOURCE_BAR4].pr_start;
+
+	if (dev->pd_res[PD_RESOURCE_BAR(pci_bar)].pr_flags & PCI_RESOURCE_FIO) {
+		result->uc_base.uc_iobase = (port_t)dev->pd_res[PD_RESOURCE_BAR(pci_bar)].pr_start;
 	} else {
 		vm_vpage_t page;
 		page = vm_map(&vm_kernel,
 		              (vm_vpage_t)HINT_GETADDR(KERNEL_VMHINT_DEVICE), 1,
 		              1, HINT_GETMODE(KERNEL_VMHINT_DEVICE),
 		              &vm_datablock_physical,
-		              (vm_vpage64_t)(vm_ppage_t)VM_ADDR2PAGE((vm_phys_t)dev->pd_res[PD_RESOURCE_BAR4].pr_start),
+		              (vm_vpage64_t)(vm_ppage_t)VM_ADDR2PAGE((vm_phys_t)dev->pd_res[PD_RESOURCE_BAR(pci_bar)].pr_start),
 		              VM_PROT_READ | VM_PROT_WRITE,
 		              VM_NODE_FLAG_NORMAL, 0);
 		result->uc_base.uc_mmbase = (byte_t *)VM_PAGE2ADDR(page);
 		result->uc_flags |= UHCI_CONTROLLER_FLAG_USESMMIO;
 	}
-	usb_controller_cinit(result);
-	atomic_rwlock_cinit(&result->uc_lock);
-	result->cd_type.ct_fini    = &uhci_fini;
 	result->uc_transfer        = &uhci_transfer;
 	result->uc_interrupt       = &uhci_register_interrupt;
 	result->uc_framelist       = (u32 *)vpage_alloc(1, 1, GFP_LOCKED | GFP_PREFLT);
@@ -2136,7 +2982,7 @@ usb_probe_uhci(struct pci_device *__restrict dev) {
 	pci_write(dev->pd_base, PCI_DEV4,
 	          (pci_read(dev->pd_base, PCI_DEV4) & ~(PCI_CDEV4_NOIRQ)) |
 	          (PCI_CDEV4_BUSMASTER | PCI_CDEV4_ALLOW_MEMWRITE) |
-	          (dev->pd_res[PD_RESOURCE_BAR4].pr_flags & PCI_RESOURCE_FIO
+	          (dev->pd_res[PD_RESOURCE_BAR(pci_bar)].pr_flags & PCI_RESOURCE_FIO
 	           ? PCI_CDEV4_ALLOW_IOTOUCH
 	           : PCI_CDEV4_ALLOW_MEMTOUCH));
 
@@ -2177,6 +3023,33 @@ usb_probe_uhci(struct pci_device *__restrict dev) {
 	         UHCI_USBCMD_RS | UHCI_USBCMD_CF |
 	         UHCI_USBCMD_MAXP);
 
+	/* Configure the suspend timeout */
+	atomic64_cinit(&result->uc_lastint, jiffies);
+	result->uc_suspdelay = CEILDIV(HZ, 5);
+
+	{
+		REF struct task *pth;
+		REF struct uhci_powerctl *pctl;
+		/* Create the power management descriptor. */
+		pctl = (REF struct uhci_powerctl *)kmalloc(sizeof(struct uhci_powerctl),
+		                                           GFP_NORMAL);
+		pctl->up_refcnt = 1;
+		xatomic_weaklyref_init(&pctl->up_ctrl, result);
+		result->uc_powerctl_desc = pctl; /* Inherit reference */
+		/* Create the power management thread. */
+		pth = task_alloc(&vm_kernel);
+		incref(pctl);
+		TRY {
+			task_setup_kernel(pth, (thread_main_t)&uhci_powerctl_main, 1, pctl);
+		} EXCEPT {
+			decref(pctl);
+			decref(pth);
+			RETHROW();
+		}
+		task_start(pth, TASK_START_FNORMAL);
+		result->uc_powerctl_thrd = pth; /* Inherit reference. */
+	}
+
 
 	{
 		static int n = 0; /* TODO: better naming */
@@ -2184,9 +3057,17 @@ usb_probe_uhci(struct pci_device *__restrict dev) {
 	}
 	character_device_register_auto(result);
 
-	/* Probe connections. */
+	/* Reset & probe for new connections. */
 	for (i = 0; i < result->uc_portnum; ++i)
-		uhci_controller_probeport(result, i);
+		uhci_controller_reset_port_and_probe(result, i);
+
+//	sleep_milli(2000);
+//
+//	printk(KERN_RAW "%%{monitor:info usb\n}");
+//	printk(KERN_RAW "%%{monitor:usb_del 0.1\n}");
+//
+//	for (;;)
+//		asm("hlt");
 }
 
 

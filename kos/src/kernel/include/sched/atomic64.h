@@ -100,6 +100,9 @@ struct atomic64 {
  *       This is done by disabling preemption before locking the internal lock
  *       when this has to be done, thus preventing interrupts from happening
  *       while modifying the atomic value.
+ *       As such, if you know that preemption is currently disabled, you may
+ *       also use the non-reentrant variants, and still be guarantied that the
+ *       code will end up being reentrant.
  * NOTE: The read/write functions may be used to guaranty that reads/writes
  *       always return whole values in regards to other reads/writes to the
  *       same memory location. */
