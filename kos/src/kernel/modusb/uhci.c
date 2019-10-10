@@ -3037,15 +3037,13 @@ usb_probe_uhci(struct pci_device *__restrict dev) {
 		xatomic_weaklyref_init(&pctl->up_ctrl, result);
 		result->uc_powerctl_desc = pctl; /* Inherit reference */
 		/* Create the power management thread. */
-		pth = task_alloc(&vm_kernel);
-		incref(pctl);
 		TRY {
-			task_setup_kernel(pth, (thread_main_t)&uhci_powerctl_main, 1, pctl);
+			pth = task_alloc(&vm_kernel);
 		} EXCEPT {
 			decref(pctl);
-			decref(pth);
 			RETHROW();
 		}
+		task_setup_kernel(pth, (thread_main_t)&uhci_powerctl_main, 1, incref(pctl));
 		task_start(pth, TASK_START_FNORMAL);
 		result->uc_powerctl_thrd = pth; /* Inherit reference. */
 	}

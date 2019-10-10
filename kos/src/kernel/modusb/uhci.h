@@ -202,7 +202,8 @@ struct uhci_controller: usb_controller {
 	                                               * optional isochronous, and eventually to this one) Afterwards, all entires point to
 	                                               * this one, allowing one-time transfer descriptors  to be scheduled following after
 	                                               * this queue.
-	                                               * NOTE: The hardware pointer of the last queue head always points back to `uc_qhstart'.
+	                                               * NOTE: The hardware pointer of the last queue head always points back
+	                                               *       to `uc_qhstart', or `uc_intreg' if that is non-NULL.
 	                                               *       However, the software pointer of that queue head is set to `NULL'.
 	                                               * NOTE: The `qh_tds' field of this queue head is always `NULL'.
 	                                               * NOTE: The `qh_ep' field of this queue head is always `UHCI_QHEP_TERM'. */
