@@ -138,10 +138,8 @@ isr_try_register_at_impl(/*inherit(on_success)*/REF struct driver *__restrict fu
 		memcpy(new_state->ivs_handv + 1,
 		       old_state->ivs_handv,
 		       old_state->ivs_handc * sizeof(struct isr_vector_handler));
-		for (i = 1; i < new_state->ivs_handc; ++i) {
-			assert(new_state->ivs_handv[i].ivh_fun != (isr_function_t)func);
+		for (i = 1; i < new_state->ivs_handc; ++i)
 			incref(new_state->ivs_handv[i].ivh_drv);
-		}
 	}
 	new_state->ivs_unhandled = ATOMIC_READ(old_state->ivs_unhandled);
 	/* With the new state now fully initialized, try to install it (atomically). */
