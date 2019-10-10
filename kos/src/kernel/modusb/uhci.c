@@ -2873,9 +2873,42 @@ uhci_controller_reset_port_and_probe(struct uhci_controller *__restrict self,
 	}
 }
 
+
+#define UHC_BAR_CORRECT_IOTYPE 0x01 /* Require I/O typing (as opposed to mmio) */
+#define UHC_BAR_CORRECT_IOSIZE 0x02 /* Require that IOSIZE = 0x20 */
+#define UHC_BAR_CORRECT_UNIQUE 0x04 /* Require a unique match */
+PRIVATE ATTR_FREETEXT unsigned int KCALL
+uhci_find_pci_bar_ex(struct pci_device *__restrict dev,
+                     unsigned int requirements) {
+	unsigned int result, i;
+	result = PD_RESOURCE_COUNT;
+	for (i = 0; i < PD_RESOURCE_COUNT; ++i) {
+		struct pci_resource *res;
+		res = &dev->pd_res[PD_RESOURCE_BAR(i)];
+		if (res->pr_flags == PCI_RESOURCE_FUNUSED)
+			continue;
+		if (!(res->pr_flags & PCI_RESOURCE_FIO) &&
+		    (requirements & UHC_BAR_CORRECT_IOTYPE))
+			continue;
+		if ((res->pr_size != 0x20) &&
+		    (requirements & UHC_BAR_CORRECT_IOSIZE))
+			continue;
+		if (!(requirements & UHC_BAR_CORRECT_UNIQUE)) {
+			result = i;
+			break;
+		}
+		if (result == PD_RESOURCE_COUNT)
+			result = i;
+		else {
+			result = PD_RESOURCE_COUNT + 1;
+		}
+	}
+	return result;
+}
+
 PRIVATE ATTR_FREETEXT unsigned int KCALL
 uhci_find_pci_bar(struct pci_device *__restrict dev) {
-	unsigned int i, result;
+	unsigned int result, flags;
 	/* Nowhere in the UHCI specs does it say which BAR it has to be.
 	 * -> Go through each bar and look for one that matches what we're
 	 *    looking for. - For this, we can look at the IOSIZE attribute
@@ -2888,29 +2921,23 @@ uhci_find_pci_bar(struct pci_device *__restrict dev) {
 	 * #3: If only 1 BAR has `PCI_RESOURCE_FIO' set, that's the one
 	 * #4: Just use the first matching BAR...
 	 */
-	result = PD_RESOURCE_COUNT;
-	for (i = 0; i < PD_RESOURCE_COUNT; ++i) {
-		struct pci_resource *res;
-		res = &dev->pd_res[PD_RESOURCE_BAR(i)];
-		if (res->pr_flags == PCI_RESOURCE_FUNUSED)
-			continue;
-		if (!(res->pr_flags & PCI_RESOURCE_FIO))
-			continue;
-		if (result == PD_RESOURCE_COUNT)
-			result = i;
-		else {
-			result = PD_RESOURCE_COUNT + 1;
-		}
-	}
+	flags = UHC_BAR_CORRECT_UNIQUE;
+again:
+	result = uhci_find_pci_bar_ex(dev, flags | UHC_BAR_CORRECT_IOTYPE | UHC_BAR_CORRECT_IOSIZE);
 	if (result < PD_RESOURCE_COUNT)
 		goto done;
-	for (i = 0; i < PD_RESOURCE_COUNT; ++i) {
-		struct pci_resource *res;
-		res = &dev->pd_res[PD_RESOURCE_BAR(i)];
-		if (res->pr_flags == PCI_RESOURCE_FUNUSED)
-			continue;
-		result = i;
+	result = uhci_find_pci_bar_ex(dev, flags | UHC_BAR_CORRECT_IOSIZE);
+	if (result < PD_RESOURCE_COUNT)
 		goto done;
+	result = uhci_find_pci_bar_ex(dev, flags | UHC_BAR_CORRECT_IOTYPE);
+	if (result < PD_RESOURCE_COUNT)
+		goto done;
+	result = uhci_find_pci_bar_ex(dev, flags);
+	if (result < PD_RESOURCE_COUNT)
+		goto done;
+	if (flags & UHC_BAR_CORRECT_UNIQUE) {
+		flags = 0;
+		goto again;
 	}
 done:
 	return result;
