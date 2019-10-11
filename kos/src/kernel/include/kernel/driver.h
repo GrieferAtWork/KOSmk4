@@ -753,7 +753,7 @@ FUNDEF NOBLOCK size_t NOTHROW(KCALL system_clearcaches)(void);
 
 /* multi-thread-corrected version of `system_clearcaches()'.
  * This function should always be used in favor of `system_clearcaches()', as it
- * solves the szenario of multiple threads calling `system_clearcaches()' at the
+ * solves the scenario of multiple threads calling `system_clearcaches()' at the
  * same time, in which case resources may only get freed by one thread, with the
  * other thread never getting informed about that fact.
  * In this case, `system_clearcaches()' would normally (and correctly I might add)

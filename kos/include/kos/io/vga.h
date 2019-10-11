@@ -286,6 +286,7 @@ struct __ATTR_PACKED vga_mode {
 	__uint8_t vm_gfx_sr_enable;     /* VGA_GFX_SR_ENABLE. */
 	__uint8_t vm_gfx_compare_value; /* VGA_GFX_COMPARE_VALUE. */
 	__uint8_t vm_gfx_data_rotate;   /* VGA_GFX_DATA_ROTATE. */
+	__uint8_t vm_gfx_plane_read;    /* VGA_GFX_PLANE_READ. */
 	__uint8_t vm_gfx_mode;          /* VGA_GFX_MODE. */
 	__uint8_t vm_gfx_misc;          /* VGA_GFX_MISC. */
 	__uint8_t vm_gfx_compare_mask;  /* VGA_GFX_COMPARE_MASK. */
@@ -322,6 +323,70 @@ struct __ATTR_PACKED vga_mode {
 	__uint8_t vm_seq_character_map; /* VGA_SEQ_CHARACTER_MAP. */
 	__uint8_t vm_seq_memory_mode;   /* VGA_SEQ_MEMORY_MODE. */
 };
+
+#define VGA_MODE_INIT_TEXT_80x25                                                     \
+	{                                                                                \
+		/* BAD! DON'T YOU DARE TO BLINK!                                             \
+		 * Like literally, dis shit is dangerous to look at                          \
+		 * (Sorry, but even though I never actually had a seizure                    \
+		 *  from stupid $h1t like this, every time I see this blinking,              \
+		 *  I can just feel that if I were to stare at it for too long,              \
+		 *  I'd either throw up, or literally just die)                              \
+		 * Especially since I use the intensity attribute when the kernel            \
+		 * panics, meaning that while this is still enabled, it'll blink             \
+		 * when I was sitting here knowing that I had to look at it to               \
+		 * figure out what happened.                                                 \
+		 * And I know I could have simply used regular colors at any point,          \
+		 * but before starting this module and reading up on VGA I didn't            \
+		 * see the connection and didn't understand why text was sometimes           \
+		 * blinking.                                                                 \
+		 * (And wiki.osdev's VGA TTY page neglects to mention the seizure-           \
+		 *  inducing blinkyness that happens on real hardware and emulators          \
+		 *  ~supporting~ the VgA sTaNdArT's GrEaT iDeA oF iNcLuDiNg ThIs FeAtUrE) */ \
+		.vm_att_mode         = VGA_AT10_FDUP9 & ~(VGA_AT10_FBLINK),                  \
+		.vm_att_overscan     = 0x00,                                                 \
+		.vm_att_plane_enable = 0x0f & VGA_AT12_FMASK,                                \
+		.vm_att_pel          = 0x08 & VGA_AT13_FMASK,                                \
+		.vm_att_color_page   = 0x00,                                                 \
+		.vm_mis              = VGA_MIS_FCOLOR | VGA_MIS_FENB_MEM_ACCESS |            \
+		                       VGA_MIS_FVSYNCPOL | VGA_MIS_FHSYNCPOL |               \
+		                       VGA_MIS_FSEL_HIGH_PAGE,                               \
+		.vm_gfx_sr_value      = 0x00,                                                \
+		.vm_gfx_sr_enable     = 0x00,                                                \
+		.vm_gfx_compare_value = 0x00,                                                \
+		.vm_gfx_data_rotate   = 0x00,                                                \
+		.vm_gfx_plane_read    = 0x00,                                                \
+		.vm_gfx_mode          = 0x10,                                                \
+		.vm_gfx_misc          = 0x0e,                                                \
+		.vm_gfx_compare_mask  = 0x0f,                                                \
+		.vm_gfx_bit_mask      = 0xff,                                                \
+		.vm_crt_h_total       = 0x5f,                                                \
+		.vm_crt_h_disp        = 0x4f,                                                \
+		.vm_crt_h_blank_start = 0x50,                                                \
+		.vm_crt_h_blank_end   = 0x82,                                                \
+		.vm_crt_h_sync_start  = 0x55,                                                \
+		.vm_crt_h_sync_end    = 0x81,                                                \
+		.vm_crt_v_total       = 0xbf,                                                \
+		.vm_crt_overflow      = 0x1f,                                                \
+		.vm_crt_preset_row    = 0x00,                                                \
+		.vm_crt_max_scan      = 0x4f,                                                \
+		.vm_crt_v_sync_start  = 0x9c,                                                \
+		.vm_crt_v_sync_end    = 0x8e,                                                \
+		.vm_crt_v_disp_end    = 0x8f,                                                \
+		.vm_crt_offset        = 0x28,                                                \
+		.vm_crt_underline     = 0x1f,                                                \
+		.vm_crt_v_blank_start = 0x96,                                                \
+		.vm_crt_v_blank_end   = 0xb9 & ~VGA_CR16_FRESERVED,                          \
+		.vm_crt_mode          = 0xa3,                                                \
+		.vm_crt_line_compare  = 0xff,                                                \
+		.vm_seq_clock_mode    = 0x00,                                                \
+		.vm_seq_plane_write   = 0x03,                                                \
+		.vm_seq_character_map = 0x00,                                                \
+		.vm_seq_memory_mode   = 0x02,                                                \
+	}
+
+
+
 #endif /* __CC__ */
 
 __SYSDECL_END

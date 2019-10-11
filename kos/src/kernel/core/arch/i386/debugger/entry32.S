@@ -281,7 +281,7 @@ PUBLIC_FUNCTION(dbg_exit)
 	movl   EXIT_STATE(OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_EDI), %edi
 #endif /* !CONFIG_NO_SMP */
 	iret
-1:	/* Return to kernel-space (in this szenario, we need to assume a valid destination SP) */
+1:	/* Return to kernel-space (in this scenario, we need to assume a valid destination SP) */
 	movw   EXIT_STATE(OFFSET_FCPUSTATE_SS), %ss
 	movl   EXIT_STATE(OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_ESP), %esp
 	pushl  EXIT_STATE(OFFSET_FCPUSTATE_EFLAGS)

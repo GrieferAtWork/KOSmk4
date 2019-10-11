@@ -50,65 +50,7 @@
 DECL_BEGIN
 
 
-INTERN_CONST struct vga_mode const vga_biosmode = {
-	/* BAD! DON'T YOU DARE TO BLINK!
-	 * Like literally, dis shit is dangerous to look at
-	 * (Sorry, but even though I never actually had a seizure
-	 *  from stupid $h1t like this, every time I see this blinking,
-	 *  I can just feel that if I were to stare at it for too long,
-	 *  I'd either throw up, or literally just die)
-	 * Especially since I use the intensity attribute when the kernel
-	 * panics, meaning that while this is still enabled, it'll blink
-	 * when I was sitting here knowing that I had to look at it to
-	 * figure out what happened.
-	 * And I know I could have simply used regular colors at any point,
-	 * but before starting this module and reading up on VGA I didn't
-	 * see the connection and didn't understand why text was sometimes
-	 * blinking.
-	 * (And wiki.osdev's VGA TTY page neglects to mention the seizure-
-	 *  inducing blinkyness that happens on real hardware and emulators
-	 *  ~supporting~ the VgA sTaNdArT's GrEaT iDeA oF iNcLuDiNg ThIs FeAtUrE) */
-	.vm_att_mode          = VGA_AT10_FDUP9 & ~(VGA_AT10_FBLINK),
-	.vm_att_overscan      = 0x00,
-	.vm_att_plane_enable  = 0x0f & VGA_AT12_FMASK,
-	.vm_att_pel           = 0x08 & VGA_AT13_FMASK,
-	.vm_att_color_page    = 0x00,
-	.vm_mis               = VGA_MIS_FCOLOR|VGA_MIS_FENB_MEM_ACCESS|
-	                        VGA_MIS_FVSYNCPOL|VGA_MIS_FHSYNCPOL|
-	                        VGA_MIS_FSEL_HIGH_PAGE,
-	.vm_gfx_sr_value      = 0x00,
-	.vm_gfx_sr_enable     = 0x00,
-	.vm_gfx_compare_value = 0x00,
-	.vm_gfx_data_rotate   = 0x00,
-	.vm_gfx_mode          = 0x10,
-	.vm_gfx_misc          = 0x0e,
-	.vm_gfx_compare_mask  = 0x0f,
-	.vm_gfx_bit_mask      = 0xff,
-	.vm_crt_h_total       = 0x5f,
-	.vm_crt_h_disp        = 0x4f,
-	.vm_crt_h_blank_start = 0x50,
-	.vm_crt_h_blank_end   = 0x82,
-	.vm_crt_h_sync_start  = 0x55,
-	.vm_crt_h_sync_end    = 0x81,
-	.vm_crt_v_total       = 0xbf,
-	.vm_crt_overflow      = 0x1f,
-	.vm_crt_preset_row    = 0x00,
-	.vm_crt_max_scan      = 0x4f,
-	.vm_crt_v_sync_start  = 0x9c,
-	.vm_crt_v_sync_end    = 0x8e,
-	.vm_crt_v_disp_end    = 0x8f,
-	.vm_crt_offset        = 0x28,
-	.vm_crt_underline     = 0x1f,
-	.vm_crt_v_blank_start = 0x96,
-	.vm_crt_v_blank_end   = 0xb9 & ~VGA_CR16_FRESERVED,
-	.vm_crt_mode          = 0xa3,
-	.vm_crt_line_compare  = 0xff,
-	.vm_seq_clock_mode    = 0x00,
-	.vm_seq_plane_write   = 0x03,
-	.vm_seq_character_map = 0x00,
-	.vm_seq_memory_mode   = 0x02,
-};
-
+INTERN_CONST struct vga_mode const vga_biosmode = VGA_MODE_INIT_TEXT_80x25;
 INTERN_CONST struct vga_mode const vga_mode_gfx320x200_256 = {
 	.vm_att_mode          = 0x41,
 	.vm_att_overscan      = 0x00,
@@ -122,6 +64,7 @@ INTERN_CONST struct vga_mode const vga_mode_gfx320x200_256 = {
 	.vm_gfx_sr_enable     = 0x00,
 	.vm_gfx_compare_value = 0x00,
 	.vm_gfx_data_rotate   = 0x00,
+	.vm_gfx_plane_read    = 0x00,
 	.vm_gfx_mode          = 0x40,
 	.vm_gfx_misc          = 0x05, /* 0x01 */
 	.vm_gfx_compare_mask  = 0x0f, /* 0x00 */
@@ -162,6 +105,7 @@ INTERN_CONST struct vga_mode const vga_mode_gfx640x480_16 = {
 	.vm_gfx_sr_enable     = 0x00, // 0x00,
 	.vm_gfx_compare_value = 0x00, // 0x00,
 	.vm_gfx_data_rotate   = 0x00, // 0x00,
+	.vm_gfx_plane_read    = 0x00, // 0x00,
 	.vm_gfx_mode          = 0x00, // 0x00,
 	.vm_gfx_misc          = 0x05, // 0x01,
 	.vm_gfx_compare_mask  = 0x0f, // 0x00,
@@ -342,6 +286,7 @@ NOTHROW(KCALL VGA_DoSetMode)(VGA *__restrict self,
 	temp = vga_rgfx(VGA_GFX_SR_ENABLE), vga_wgfx(VGA_GFX_SR_ENABLE, (temp & VGA_GR01_FRESERVED) | mode->vm_gfx_sr_enable);
 	temp = vga_rgfx(VGA_GFX_COMPARE_VALUE), vga_wgfx(VGA_GFX_COMPARE_VALUE, (temp & VGA_GR02_FRESERVED) | mode->vm_gfx_compare_value);
 	temp = vga_rgfx(VGA_GFX_DATA_ROTATE), vga_wgfx(VGA_GFX_DATA_ROTATE, (temp & VGA_GR03_FRESERVED) | mode->vm_gfx_data_rotate);
+	temp = vga_rgfx(VGA_GFX_PLANE_READ), vga_wgfx(VGA_GFX_PLANE_READ, (temp & VGA_GR04_FRESERVED) | mode->vm_gfx_plane_read);
 	temp = vga_rgfx(VGA_GFX_MODE), vga_wgfx(VGA_GFX_MODE, (temp & VGA_GR05_FRESERVED) | mode->vm_gfx_mode);
 	temp = vga_rgfx(VGA_GFX_MISC), vga_wgfx(VGA_GFX_MISC, (temp & VGA_GR06_FRESERVED) | mode->vm_gfx_misc);
 	temp = vga_rgfx(VGA_GFX_COMPARE_MASK), vga_wgfx(VGA_GFX_COMPARE_MASK, (temp & VGA_GR07_FRESERVED) | mode->vm_gfx_compare_mask);
@@ -421,6 +366,8 @@ VGA_SetMode(VGA *__restrict self,
 		goto invalid_mode;
 	if (mode->vm_gfx_data_rotate & VGA_GR03_FRESERVED)
 		goto invalid_mode;
+	if (mode->vm_gfx_plane_read & VGA_GR04_FRESERVED)
+		goto invalid_mode;
 	if (mode->vm_gfx_mode & VGA_GR05_FRESERVED)
 		goto invalid_mode;
 	if (mode->vm_gfx_misc & VGA_GR06_FRESERVED)
@@ -464,6 +411,7 @@ VGA_GetMode(VGA *__restrict self,
 	mode->vm_gfx_sr_enable     = vga_rgfx(VGA_GFX_SR_ENABLE) & ~VGA_GR01_FRESERVED;
 	mode->vm_gfx_compare_value = vga_rgfx(VGA_GFX_COMPARE_VALUE) & ~VGA_GR02_FRESERVED;
 	mode->vm_gfx_data_rotate   = vga_rgfx(VGA_GFX_DATA_ROTATE) & ~VGA_GR03_FRESERVED;
+	mode->vm_gfx_plane_read    = vga_rgfx(VGA_GFX_PLANE_READ) & ~VGA_GR04_FRESERVED;
 	mode->vm_gfx_mode          = vga_rgfx(VGA_GFX_MODE) & ~VGA_GR05_FRESERVED;
 	mode->vm_gfx_misc          = vga_rgfx(VGA_GFX_MISC) & ~VGA_GR06_FRESERVED;
 	mode->vm_gfx_compare_mask  = vga_rgfx(VGA_GFX_COMPARE_MASK) & ~VGA_GR07_FRESERVED;
@@ -555,7 +503,6 @@ VGA_DoSetFont(VGA *__restrict self,
 	byte_t *dst = self->v_vram;
 	u8 old_seq_plane_write = vga_rseq(VGA_SEQ_PLANE_WRITE);
 	u8 old_seq_memory_mode = vga_rseq(VGA_SEQ_MEMORY_MODE);
-	/* TODO: `VGA_GFX_PLANE_READ' must be made apart of `struct vga_mode' */
 	u8 old_gfx_plane_read  = vga_rgfx(VGA_GFX_PLANE_READ);
 	u8 old_gfx_mode        = vga_rgfx(VGA_GFX_MODE);
 	u8 old_gfx_sr_enable   = vga_rgfx(VGA_GFX_SR_ENABLE);
@@ -643,14 +590,14 @@ VGA_DoGetFont(VGA *__restrict self,
 INTERN void KCALL
 VGA_SetFont(VGA *__restrict self,
             USER CHECKED struct vga_font const *__restrict font) {
-	SCOPED_WRITELOCK(&self->v_lock); /* XXX: atomic lock in except-szenario */
+	SCOPED_WRITELOCK(&self->v_lock); /* XXX: atomic lock in except-scenario */
 	VGA_DoSetFont(self, font);
 }
 
 INTERN void KCALL
 VGA_GetFont(VGA *__restrict self,
             USER CHECKED struct vga_font *__restrict font) {
-	SCOPED_WRITELOCK(&self->v_lock); /* XXX: atomic lock in except-szenario */
+	SCOPED_WRITELOCK(&self->v_lock); /* XXX: atomic lock in except-scenario */
 	VGA_DoGetFont(self, font);
 }
 
@@ -1429,14 +1376,12 @@ NOTHROW(LIBANSITTY_CC VGA_FillCell)(struct ansitty *__restrict self,
 		if unlikely(!cpch)
 			cpch = '?';
 		cell = VGA_CHR(vga, cpch);
-		do {
-			ptr = ATOMIC_READ(vga->v_textptr);
-			end = ATOMIC_READ(vga->v_textend);
-			max_count = (size_t)(end - ptr);
-			used_count = count;
-			if (used_count > max_count)
-				used_count = max_count;
-		} while (!ATOMIC_CMPXCH_WEAK(vga->v_textptr, ptr, ptr + used_count));
+		ptr = ATOMIC_READ(vga->v_textptr);
+		end = ATOMIC_READ(vga->v_textend);
+		max_count = (size_t)(end - ptr);
+		used_count = count;
+		if (used_count > max_count)
+			used_count = max_count;
 		memsetw(ptr, cell, used_count);
 		sync_endread(&vga->v_textlock);
 	}
@@ -1445,19 +1390,19 @@ NOTHROW(LIBANSITTY_CC VGA_FillCell)(struct ansitty *__restrict self,
 
 
 PRIVATE struct ansitty_operators const vga_ansi_operators = {
-	/* .ato_putc         = */&VGA_Putc,
-	/* .ato_setcursor    = */&VGA_SetCursor,
-	/* .ato_getcursor    = */&VGA_GetCursor,
-	/* .ato_getsize      = */&VGA_GetSize,
-	/* .ato_copycell     = */&VGA_CopyCell,
-	/* .ato_fillcell     = */&VGA_FillCell,
-	/* .ato_scroll       = */NULL, /* TODO */
-	/* .ato_cls          = */NULL, /* TODO */
-	/* .ato_el           = */NULL, /* TODO */
-	/* .ato_setcolor     = */NULL,
-	/* .ato_setattrib    = */NULL,
-	/* .ato_setttymode   = */&VGA_SetTTYMode,
-	/* .ato_scrollregion = */&VGA_SetScrollRegion,
+	/* .ato_putc         = */ &VGA_Putc,
+	/* .ato_setcursor    = */ &VGA_SetCursor,
+	/* .ato_getcursor    = */ &VGA_GetCursor,
+	/* .ato_getsize      = */ &VGA_GetSize,
+	/* .ato_copycell     = */ &VGA_CopyCell,
+	/* .ato_fillcell     = */ &VGA_FillCell,
+	/* .ato_scroll       = */ NULL, /* TODO */
+	/* .ato_cls          = */ NULL, /* TODO */
+	/* .ato_el           = */ NULL, /* TODO */
+	/* .ato_setcolor     = */ NULL,
+	/* .ato_setattrib    = */ NULL,
+	/* .ato_setttymode   = */ &VGA_SetTTYMode,
+	/* .ato_scrollregion = */ &VGA_SetScrollRegion,
 };
 
 
@@ -1684,7 +1629,7 @@ PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL init(void) {
 		vm_vpage_t vram_page;
 		atomic_rwlock_cinit(&vga_device->v_lock);
 		atomic_rwlock_cinit(&vga_device->v_textlock);
-		vga_device->v_vram_addr = (vm_phys_t)0xA0000;
+		vga_device->v_vram_addr = (vm_phys_t)0xa0000;
 		vga_device->v_vram_size = 8192 * 4 * 4; /* 128K */
 		vram_page = vm_map(&vm_kernel,
 		                   (vm_vpage_t)HINT_GETADDR(KERNEL_VMHINT_DEVICE),

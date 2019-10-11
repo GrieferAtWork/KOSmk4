@@ -333,7 +333,7 @@ DATDEF unsigned int dbg_newline_mode; /* Debugger new-line mode */
                                     * HINT: This mode is useful for progress indicators, as well as well as
                                     *       self-updating menus. */
 #define DBG_NEWLINE_MODE_NOWRAP  2 /* Don't automatically wrap to the next line when writing past the end
-                                    * of the current */
+                                    * of the current line. */
 
 
 /* Get/Set debug TTY screen data
@@ -491,9 +491,11 @@ struct debug_function {
  * @return: NULL: No function exists that matches `name' */
 FUNDEF WUNUSED NONNULL((1)) struct debug_function const *KCALL
 dbg_getfunc(char const *__restrict name);
+
 /* Search for a debug function matching the given name most closely. */
 FUNDEF ATTR_RETNONNULL WUNUSED NONNULL((1)) struct debug_function const *KCALL
 dbg_getfunc_fuzzy(char const *__restrict name);
+
 /* Search for a debug function who's name starts with `name'. */
 FUNDEF WUNUSED NONNULL((1)) struct debug_function const *KCALL
 dbg_getfunc_start(char const *__restrict name);

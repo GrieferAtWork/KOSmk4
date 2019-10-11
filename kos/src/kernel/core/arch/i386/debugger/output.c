@@ -53,9 +53,8 @@ if (gcc_opt.remove("-O3"))
 
 DECL_BEGIN
 
-#define VGA_VRAM_ADDR  0xB8000
+#define VGA_VRAM_ADDR  0xb8000
 #define VGA_VRAM_SIZE  0x08000
-
 
 
 INTERN ATTR_DBGBSS struct vga_font vga_debugfont;
@@ -435,8 +434,8 @@ PRIVATE ATTR_DBGBSS u16 *vga_terminal_cur;     /* Terminal display cursor */
 PRIVATE ATTR_DBGBSS u16 *vga_terminal_2ndln;   /* Start of the second line within the terminal display. */
 PRIVATE ATTR_DBGBSS u16 *vga_terminal_lastln;  /* Start of the last line within the terminal display. */
 PRIVATE ATTR_DBGBSS bool vga_terminal_showcur; /* True if the current cursor position should be shown. */
-PUBLIC  ATTR_DBGBSS u16  vga_terminal_attr ASMNAME("dbg_attr"); /* Color attributes. */
-PUBLIC  ATTR_DBGBSS u16  vga_terminal_default_attr ASMNAME("dbg_default_attr"); /* Color attributes. */
+PUBLIC ATTR_DBGBSS dbg_attr_t vga_terminal_attr ASMNAME("dbg_attr");                 /* Color attributes. */
+PUBLIC ATTR_DBGBSS dbg_attr_t vga_terminal_default_attr ASMNAME("dbg_default_attr"); /* Color attributes. */
 
 #undef CONFIG_USE_HARDWARE_CURSOR
 #define CONFIG_USE_HARDWARE_CURSOR 1
@@ -960,24 +959,24 @@ done:
 #define UNENCODABLE_END    "]"
 #define UNENCODABLE(x)     UNENCODABLE_START x UNENCODABLE_END
 
-PRIVATE ATTR_DBGBSS bool vfa_last_chr_caused_linewrap = false;
+PRIVATE ATTR_DBGBSS bool vga_last_chr_caused_linewrap = false;
 
 LOCAL ATTR_DBGTEXT void
 NOTHROW(KCALL dbg_putcp437)(/*cp-437*/u8 ch) {
 	/* VGA terminal output */
 	scroll_down_if_cur_end();
 	/* When indent-mode is active, wraps to the next line */
-	if (dbg_indent != 0 && vfa_last_chr_caused_linewrap &&
+	if (dbg_indent != 0 && vga_last_chr_caused_linewrap &&
 	    !(dbg_newline_mode & DBG_NEWLINE_MODE_NOWRAP) && VGA_GETCUR_X() == 0)
 		vga_terminal_cur += dbg_indent;
 	*vga_terminal_cur = VGA_CHR(ch);
 	if (dbg_newline_mode & DBG_NEWLINE_MODE_NOWRAP) {
 		if (VGA_GETCUR_X() != VGA_WIDTH - 1)
 			++vga_terminal_cur;
-		vfa_last_chr_caused_linewrap = false;
+		vga_last_chr_caused_linewrap = false;
 	} else {
 		++vga_terminal_cur;
-		vfa_last_chr_caused_linewrap = VGA_GETCUR_X() == 0;
+		vga_last_chr_caused_linewrap = VGA_GETCUR_X() == 0;
 	}
 }
 
@@ -1006,7 +1005,7 @@ NOTHROW(KCALL dbg_fillscreen)(/*utf-32*/u32 ch) {
 	        VGA_CHR(cp_ch),
 	        VGA_WIDTH * VGA_HEIGHT);
 	vga_terminal_cur             = vga_terminal_start;
-	vfa_last_chr_caused_linewrap = false;
+	vga_last_chr_caused_linewrap = false;
 }
 
 
@@ -1248,7 +1247,7 @@ LOCAL ATTR_DBGTEXT void NOTHROW(KCALL dbg_do_putuni)(/*utf-32*/u32 ch) {
 		case '\b':
 			if (vga_terminal_cur > vga_terminal_start) {
 				--vga_terminal_cur;
-				vfa_last_chr_caused_linewrap = false;
+				vga_last_chr_caused_linewrap = false;
 			}
 			break;
 
@@ -1281,7 +1280,7 @@ LOCAL ATTR_DBGTEXT void NOTHROW(KCALL dbg_do_putuni)(/*utf-32*/u32 ch) {
 				} else {
 					VGA_SETCUR(dbg_indent, VGA_GETCUR_Y() + 1);
 				}
-				vfa_last_chr_caused_linewrap = false;
+				vga_last_chr_caused_linewrap = false;
 			}
 			break;
 
@@ -1932,12 +1931,12 @@ PRIVATE ATTR_DBGBSS uintptr_t debug_oldvga_paging[VGA_VRAM_SIZE / PAGESIZE];
 PRIVATE ATTR_DBGTEXT void KCALL x86_debug_map_terminal(void) {
 	unsigned int i;
 	vga_terminal_start = (u16 *)(KERNEL_BASE + VGA_VRAM_ADDR);
+#ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	/* TODO: We might get here so early during booting that the page frame allocator
 	 *       has yet to be initialized, at which point prepare would fail. - However,
 	 *       at that point we'd still have access to the physical identity map, so we
 	 *       should instead also support its use instead of only hacking around to
 	 *       place a temporary mapping of the VGA display just before the kernel. */
-#ifdef CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE
 	pagedir_prepare_map(VM_ADDR2PAGE((vm_virt_t)vga_terminal_start), VGA_VRAM_SIZE / PAGESIZE);
 #endif /* CONFIG_PAGEDIR_NEED_PERPARE_FOR_KERNELSPACE */
 	for (i = 0; i < COMPILER_LENOF(debug_oldvga_paging); ++i) {
@@ -1975,7 +1974,7 @@ INTERN ATTR_DBGTEXT void KCALL x86_debug_initialize_vga_terminal(void) {
 	vga_backlog_scrollpos        = 0;
 	vga_terminal_backlog_full    = false;
 	vga_terminal_showcur         = false;
-	vfa_last_chr_caused_linewrap = false;
+	vga_last_chr_caused_linewrap = false;
 	vga_terminal_cur             = vga_terminal_start;
 	vga_terminal_2ndln           = vga_terminal_start + VGA_WIDTH;
 	vga_terminal_end             = vga_terminal_start + VGA_WIDTH * VGA_HEIGHT;
@@ -1985,7 +1984,7 @@ INTERN ATTR_DBGTEXT void KCALL x86_debug_initialize_vga_terminal(void) {
 	dbg_newline_mode             = DBG_NEWLINE_MODE_NORMAL;
 #ifdef CONFIG_USE_HARDWARE_CURSOR
 	vga_cursor_is_shown = false;
-#endif
+#endif /* CONFIG_USE_HARDWARE_CURSOR */
 	memsetw(vga_terminal_start, VGA_EMPTY, VGA_WIDTH * VGA_HEIGHT);
 }
 

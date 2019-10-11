@@ -39,7 +39,7 @@ DECL_BEGIN
 			++count;                                                 \
 		__builtin_va_end(copy);                                      \
 		/* Always need to use alloca(), since malloc() might corrupt \
-		 * the heap in a vfork() szenario */                         \
+		 * the heap in a vfork() scenario */                         \
 		vector = (T **)alloca((count + 1) * sizeof(T *));            \
 		count  = 0;                                                  \
 		do {                                                         \
