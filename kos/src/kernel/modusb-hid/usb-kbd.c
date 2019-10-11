@@ -351,7 +351,6 @@ NOTHROW(KCALL usb_keyboard_interrupt_handler)(struct character_device *__restric
 		unsigned int i;
 		bool did_post_something = false;
 		assert(datalen == 8);
-		printk(KERN_NOTICE "[usb-hid] %$[hex]\n", 8, data);
 		mod_now   = ((byte_t *)data)[0];
 		mod_delta = mod_now ^ me->uk_last[0];
 		if (mod_delta != 0) {

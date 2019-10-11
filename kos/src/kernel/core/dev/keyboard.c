@@ -507,6 +507,7 @@ NOTHROW(KCALL keyboard_device_do_translate)(struct keyboard_device *__restrict s
                                             uint16_t key, uint16_t mod) {
 	size_t result;
 	assert(sync_writing(&self->kd_map_lock));
+	key &= ~(KEY_FREPEAT);
 	result = keymap_translate_buf(&self->kd_map, key, mod, self->kd_map_pend,
 	                              COMPILER_LENOF(self->kd_map_pend));
 	if (!result) {
