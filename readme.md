@@ -206,6 +206,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 			- UHCI
 		- devices
 			- SCSI-based Mass Storage (your typical USB flash-drive)
+			- Keyboard
 	- fat
 		- Support for fat12, fat16 and fat32
 		- Support for writing to files

@@ -124,6 +124,7 @@ BEGIN
 		DEFINE_SIMPLE_DRIVER("ps2")
 		DEFINE_SIMPLE_DRIVER("procfs", SOURCE({ "modprocfs/files/" "*.c" }))
 		DEFINE_SIMPLE_DRIVER("usb")
+		DEFINE_SIMPLE_DRIVER("usb-hid", LIB(":usb")) /* Link against usb driver */
 		DEFINE_SIMPLE_DRIVER("usb-storage", LIB(":usb")) /* Link against usb driver */
 
 		DEFINE_SIMPLE_ARCH_DRIVER("gdbserver")

@@ -318,7 +318,6 @@ got_exe:
 		qemu_arguments.extend({ "-no-reboot", "-no-shutdown" });
 	local gdb_mode = options.get(opt.QEMU_GDB);
 	local boot_drivers = List(multibootDrivers);
-
 	if (gdb_mode !is none) {
 		if (gdb_mode == "server") {
 			/* Make use of out GDB server driver */
@@ -388,12 +387,14 @@ got_exe:
 	if (fs.stat.exists("bin/ext2.img")) {
 		qemu_arguments.extend({
 			"-blockdev", "driver=file,node-name=usb1,filename=bin/ext2.img",
-			"-usb",
-			"-device", "usb-storage,drive=usb1",
-			"-device", "usb-mouse"
+			"-device", "pci-ohci,id=ohci",
+			"-device", "vt82c686b-usb-uhci,id=uhci",
+			"-device", "usb-storage,bus=uhci.0,drive=usb1",
+			"-device", "usb-mouse,bus=ohci.0",
+			"-device", "usb-kbd,bus=uhci.0",
 		});
 	}
-	local enableMonitorCommands = true;
+	local enableMonitorCommands = false;
 	local monitorCommandPipe = none;
 	if (enableMonitorCommands) {
 		final local port = "1235";

@@ -28,6 +28,9 @@ __SYSDECL_BEGIN
 #define USB_CLASS_AUDIO               0x01 /* [TYPE(Interface)] Audio */
 #define USB_CLASS_COM_CDC             0x02 /* [TYPE(Both)] Communications and CDC Control */
 #define USB_CLASS_HID                 0x03 /* [TYPE(Interface)] HID (Human Interface Device) */
+#define    USB_SUBCLASS_HID_BOOT              0x01 /* [TYPE(Interface)] Boot Interface Subclass */
+#define    USB_PROTOCOL_HID_KEYBOARD          0x01 /* Keyboard */
+#define    USB_PROTOCOL_HID_MOUSE             0x02 /* Mouse */
 #define USB_CLASS_PHYSICAL            0x05 /* [TYPE(Interface)] Physical */
 #define USB_CLASS_IMAGE               0x06 /* [TYPE(Interface)] Image */
 #define USB_CLASS_PRINTER             0x07 /* [TYPE(Interface)] Printer */

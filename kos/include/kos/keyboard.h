@@ -75,7 +75,8 @@
 
 
 #define KEY_FREPEAT      0x4000 /* FLAG: The key is being repeated periodically,
-                                 *       because the user is holding down the button. */
+                                 *       because the user is holding down the button.
+                                 * WARNING: This flag may not be supported by all drivers! */
 #define KEY_FRELEASED    0x8000 /* FLAG: The key was released. */
 #define KEY_FMASK        0xc000 /* MASK: Key state flags. */
 #define KEY_KMASK        0x3fff /* MASK: Key code. */

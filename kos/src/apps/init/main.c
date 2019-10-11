@@ -156,6 +156,13 @@ done_procfs:
 	SysctlInsmod("ps2", NULL); /* Keyboard */
 	SysctlInsmod("vga", NULL); /* Display */
 
+	/* TODO: Make it so that the PS/2 driver checks for (and disables) USB
+	 *       emulation, such that we only need to load the usb-hid drivers
+	 *       when the ps2 keyboard files are missing from /dev
+	 *       As it stands right now, PS/2 will still create device files,
+	 *       even when the devices stem from USB emulation. */
+	sysctl_insmod("usb-hid", NULL);
+
 	/* Setup a couple of signals to-be ignored */
 	signal(SIGHUP, SIG_IGN);
 	signal(SIGINT, SIG_IGN);
@@ -165,7 +172,9 @@ done_procfs:
 	/* Construct /dev/console from the VGA display, and a PS/2 keyboard. */
 	{
 		fd_t i, console, display, keyboard;
-		keyboard = open("/dev/ps2kbd1", O_RDONLY | O_CLOEXEC, 0);
+		keyboard = open("/dev/usbkba", O_RDONLY | O_CLOEXEC, 0);
+		if (keyboard < 0)
+			keyboard = open("/dev/ps2kbd1", O_RDONLY | O_CLOEXEC, 0);
 		if (keyboard < 0)
 			keyboard = Open("/dev/ps2kbd2", O_RDONLY | O_CLOEXEC, 0);
 		display = Open("/dev/vga", O_WRONLY | O_CLOEXEC, 0);
@@ -209,8 +218,6 @@ done_procfs:
 			close(rfd);
 		}
 	}
-
-	sysctl_insmod("usb-storage", NULL);
 
 	for (;;) {
 		pid_t cpid;
