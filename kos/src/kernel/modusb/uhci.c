@@ -152,7 +152,8 @@ NOTHROW(FCALL uhci_osqh_free)(struct uhci_osqh *__restrict self) {
 
 PRIVATE WUNUSED struct uhci_ostd *
 NOTHROW(FCALL uhci_ostd_findphys)(struct uhci_ostd *chain, u32 phys_addr) {
-	assert(IS_ALIGNED(phys_addr, UHCI_FLE_ALIGN));
+	assertf(IS_ALIGNED(phys_addr, UHCI_FLE_ALIGN),
+	        "phys_addr = %I32p", phys_addr);
 	for (; chain; chain = chain->td_next) {
 		assert(IS_ALIGNED(chain->td_self, UHCI_FLE_ALIGN));
 		if (chain->td_self == phys_addr)
@@ -277,6 +278,7 @@ NOTHROW(FCALL uhci_osqh_unlink)(struct uhci_controller *__restrict self,
                                 struct uhci_osqh **__restrict pentry) {
 	struct uhci_osqh *prev, *next;
 	u32 hw_pointer;
+	assert(sync_writing(&self->uc_lock));
 	prev = container_of(pentry, struct uhci_osqh, qh_next);
 	next = entry->qh_next;
 	prev->qh_next = next;
@@ -290,7 +292,7 @@ NOTHROW(FCALL uhci_osqh_unlink)(struct uhci_controller *__restrict self,
 			/* Point back to the first interrupt handler polled every frame. */
 			hw_pointer = self->uc_intreg->ui_td0_phys;
 			/* Make sure to keep the qh-last pointer up to date. */
-			self->uc_qhlast = prev == &self->uc_qhstart ? NULL : prev;
+			self->uc_qhlast = prev != &self->uc_qhstart ? prev : NULL;
 		} else if (prev != &self->uc_qhstart) {
 			/* We may have been the last queue entry in line,
 			 * but there are still other entires before us.
@@ -316,12 +318,13 @@ LOCAL NOBLOCK void
 NOTHROW(FCALL uhci_osqh_append)(struct uhci_controller *__restrict self,
                                 /*in_ref*/ REF struct uhci_osqh *__restrict osqh) {
 	struct uhci_osqh *last;
+	assert(sync_writing(&self->uc_lock));
 	osqh->qh_next = NULL;
 	last = self->uc_qhlast;
+	self->uc_qhlast = osqh;
 	if (last) {
 		/* Append (or rather: insert) at the end. */
-		osqh->qh_hp     = last->qh_hp;
-		self->uc_qhlast = osqh;
+		osqh->qh_hp = last->qh_hp;
 		assert(self->uc_qhstart.qh_next != NULL);
 		/* Append at the end of the hardware list */
 		HW_WRITE(last->qh_hp, osqh->qh_self | UHCI_QHHP_QHTD);
@@ -329,7 +332,6 @@ NOTHROW(FCALL uhci_osqh_append)(struct uhci_controller *__restrict self,
 		assert(self->uc_qhstart.qh_next == NULL);
 		/* We're the first QUEU head to appear. */
 		self->uc_qhstart.qh_next = osqh;
-		self->uc_qhlast          = osqh;
 		/* Either point back to `uc_qhstart', or to the first interrupt. */
 		osqh->qh_hp = self->uc_intreg ? self->uc_intreg->ui_td0_phys
 		                              : self->uc_qhstart.qh_self | UHCI_QHHP_QHTD;
@@ -349,6 +351,7 @@ NOTHROW(FCALL uhci_intreg_insert)(struct uhci_controller *__restrict self,
 	 * that get hit more often than others get triggered more often. */
 	struct uhci_interrupt **pself, *next;
 	size_t my_hitcount = ui->ui_hits;
+	assert(sync_writing(&self->uc_lock));
 	pself = &self->uc_intreg;
 	while ((next = *pself) != NULL) {
 		if (next->ui_hits <= my_hitcount)
@@ -412,6 +415,7 @@ NOTHROW(FCALL uhci_intreg_unlink)(struct uhci_controller *__restrict self,
 	/* Remove the given interrupt. */
 	struct uhci_interrupt *next;
 	u32 hw_next_pointer;
+	assert(sync_writing(&self->uc_lock));
 	assert(*pui == ui);
 	/* Remove the interrupt from the software list. */
 	next = ui->ui_reg.ife_next;
@@ -472,6 +476,7 @@ NOTHROW(FCALL uhci_intiso_insert)(struct uhci_controller *__restrict self,
 	u32 hw_next_pointer;
 	struct uhci_interrupt_frameentry *ent;
 	struct uhci_interrupt **pself, *next, *prev;
+	assert(sync_writing(&self->uc_lock));
 	ent = ui->ui_iso[frameno];
 	assert(ent);
 	/* Insert the new interrupt into the ISO vector. */
@@ -526,6 +531,7 @@ NOTHROW(FCALL uhci_intiso_unlink)(struct uhci_controller *__restrict self,
 	u32 hw_next_pointer, *phw_next_pointer, phw_next_pointer_addr;
 	struct uhci_interrupt **pself, *next;
 	struct uhci_interrupt_frameentry *ent;
+	assert(sync_writing(&self->uc_lock));
 	assert(self->uc_iisocount);
 	assert(self->uc_intiso[frameno]);
 	pself = &self->uc_intiso[frameno];
@@ -988,7 +994,7 @@ NOTHROW(FCALL uhci_reset_int)(struct uhci_interrupt *__restrict ui,
 	struct uhci_ostd *td;
 	td = ent->ife_tdsf;
 	do {
-		assert((td->td_next != NULL) ==
+		assert((td->td_next == NULL) ==
 		       (td == ent->ife_tdsl));
 		td->td_cs = ui->ui_initcs;
 	} while ((td = td->td_next) != NULL);
@@ -1002,7 +1008,7 @@ NOTHROW(FCALL uhci_update_d_bit)(struct uhci_interrupt *__restrict ui,
 		struct uhci_ostd *td;
 		td = ent->ife_tdsf;
 		do {
-			assert((td->td_next != NULL) ==
+			assert((td->td_next == NULL) ==
 			       (td == ent->ife_tdsl));
 			td->td_tok ^= UHCI_TDTOK_DTOGGM;
 		} while ((td = td->td_next) != NULL);
@@ -1113,7 +1119,7 @@ done_qh:
 		/* Without QH. Check the first TD for completion/error. */
 		td = ui->ui_reg.ife_tdsf;
 		assert(td);
-		assert((td->td_next != NULL) == (td == ui->ui_reg.ife_tdsl));
+		assert((td->td_next == NULL) == (td == ui->ui_reg.ife_tdsl));
 		cs = ATOMIC_READ(ui->ui_reg.ife_tdsf->td_cs);
 		if (!(cs & UHCI_TDCS_ACTIVE)) {
 			/* NOTE: `uhci_int_completed()' also checks for errors! */
@@ -1145,7 +1151,7 @@ done_nqh:
 				HW_WRITE(td->td_cs, cs | UHCI_TDCS_IOC);
 			} else {
 				do {
-					assert((td->td_next != NULL) ==
+					assert((td->td_next == NULL) ==
 					       (td == ui->ui_reg.ife_tdsl));
 					if (!td->td_next)
 						cs |= UHCI_TDCS_IOC;
@@ -2265,7 +2271,7 @@ uhci_interrupt_frameentry_init(struct uhci_interrupt_frameentry *__restrict self
 		TRY {
 			uhci_construct_tds_for_interrupt(&pnexttd,
 			                                 ptok, cs, maxpck,
-			                                 addr, ptr.hp_siz);
+			                                 addr, buflen);
 		} EXCEPT {
 			heap_free_untraced(&kernel_locked_heap,
 			                   ptr.hp_ptr,
@@ -2291,6 +2297,7 @@ uhci_interrupt_frameentry_init(struct uhci_interrupt_frameentry *__restrict self
 			while (i < num_pages) {
 				vm_ppage_t start;
 				size_t num_cont, num_remaining;
+				size_t maxlen;
 				num_cont      = 1;
 				num_remaining = num_pages - i;
 				start = VM_ADDR2PAGE(pagedir_translate((vm_virt_t)((byte_t *)buf + i * PAGESIZE)));
@@ -2300,10 +2307,19 @@ uhci_interrupt_frameentry_init(struct uhci_interrupt_frameentry *__restrict self
 					++num_cont;
 					--num_remaining;
 				}
+				maxlen = num_cont * PAGESIZE;
+				if (!num_remaining) {
+					size_t remaning_bytes;
+					assert(i + num_cont == num_pages);
+					assert(buflen > (i * PAGESIZE));
+					remaning_bytes = buflen - (i * PAGESIZE);
+					if (maxlen < remaning_bytes)
+						maxlen = remaning_bytes;
+				}
 				uhci_construct_tds_for_interrupt(&pnexttd,
 				                                 ptok, cs, maxpck,
 				                                 VM_PPAGE2ADDR(start),
-				                                 num_cont * PAGESIZE);
+				                                 maxlen);
 				i += num_cont;
 			}
 		} EXCEPT {
@@ -2319,6 +2335,8 @@ uhci_interrupt_frameentry_init(struct uhci_interrupt_frameentry *__restrict self
 	self->ife_tdsl = container_of(pnexttd, struct uhci_ostd, td_next);
 	self->ife_tdsl->td_lp   = UHCI_TDLP_TERM;
 	self->ife_tdsl->td_cs  |= UHCI_TDCS_IOC;
+	assert(self->ife_tdsl->td_next == NULL);
+
 	for (td_iter = self->ife_tdsf; td_iter != self->ife_tdsl;) {
 		struct uhci_ostd *td_next;
 		td_next = td_iter->td_next;
@@ -2425,7 +2443,7 @@ uhci_register_interrupt(struct usb_controller *__restrict self, struct usb_endpo
 	result = (REF struct uhci_interrupt *)kmalloc(flags & UHCI_INTERRUPT_FLAG_ISOCHRONOUS
 	                                              ? (offsetof(struct uhci_interrupt, ui_isobuf) +
 	                                                 (frame_hits * sizeof(struct uhci_interrupt_frameentry)))
-	                                              : offsetafter(struct uhci_interrupt, ui_reg),
+	                                              : offsetafter(struct uhci_interrupt, ui_hits),
 	                                              GFP_LOCKED | GFP_CALLOC | GFP_PREFLT);
 	result->ui_refcnt  = 1;
 	result->ui_fini    = &uhci_interrupt_fini;
@@ -2476,6 +2494,8 @@ uhci_register_interrupt(struct usb_controller *__restrict self, struct usb_endpo
 			assert(result->ui_reg.ife_tdsl);
 			result->ui_td0_phys = result->ui_reg.ife_tdsf->td_self;
 			result->ui_td1_next = &result->ui_reg.ife_tdsl->td_lp;
+			result->ui_hits     = 0;
+			result->ui_qh       = NULL;
 			if (result->ui_reg.ife_tdsf != result->ui_reg.ife_tdsl) {
 				/* Use a queue head to stream-line multi-TD the data transfer. */
 				struct uhci_osqh *qh;
@@ -2568,7 +2588,6 @@ uhci_register_interrupt(struct usb_controller *__restrict self, struct usb_endpo
 			uhci_intreg_insert(me, (struct uhci_interrupt *)incref(result));
 		}
 		uhci_controller_endwrite(me);
-
 	} EXCEPT {
 		assert(!isshared(result));
 		destroy(result);
