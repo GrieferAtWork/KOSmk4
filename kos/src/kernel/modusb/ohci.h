@@ -16,26 +16,22 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_MODUSB_OHCI_C
-#define GUARD_MODUSB_OHCI_C 1
-#define CONFIG_BUILDING_MODUSB 1
+#ifndef GUARD_MODUSB_OHCI_H
+#define GUARD_MODUSB_OHCI_H 1
 
 #include <kernel/compiler.h>
 
 #include <drivers/pci.h>
 #include <drivers/usb.h>
+#include <dev/char.h>
 #include <kernel/printk.h>
 #include <kos/io/ohci.h>
 
-#include "ohci.h"
-
 DECL_BEGIN
 
-INTERN ATTR_FREETEXT void KCALL
-usb_probe_ohci(struct pci_device *__restrict dev) {
-	printk(FREESTR(KERN_WARNING "[usb] Not implemented: ohci support\n"));
-}
+//struct ohci_controller: usb_controller {
+//};
 
 DECL_END
 
-#endif /* !GUARD_MODUSB_OHCI_C */
+#endif /* !GUARD_MODUSB_OHCI_H */
