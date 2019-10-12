@@ -621,13 +621,13 @@ For more information about the header substitution system, and how it makes it p
 <a name="bochs"></a>
 ## Building & using Bochs to run KOS
 
-Download and install [`2.6.9`](https://sourceforge.net/projects/bochs/files/latest/download) and use the following command to launch KOS inside of bochs
+Download and install [bochs 2.6.9](https://sourceforge.net/projects/bochs/files/latest/download) and use the following command to launch KOS
 
 ```sh
 deemon magic.dee --emulator=bochs --target=i386 --config=nOD
 ```
 
-Note that if you chose to install bochs in a non-standard location, the you will have to add that location to the list of paths enumerated by `enumerateBochsInstallationLocations()` in `$PROJPATH/kos/misc/magicemulator/bochs.dee`
+Note that if you chose to install bochs in a non-standard location, then you will have to add your install location to the list of paths enumerated by `enumerateBochsInstallationLocations()` in `$PROJPATH/kos/misc/magicemulator/bochs.dee`
 
 
 
