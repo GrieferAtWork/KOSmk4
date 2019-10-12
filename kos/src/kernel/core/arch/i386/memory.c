@@ -211,23 +211,44 @@ PRIVATE ATTR_FREETEXT bool NOTHROW(KCALL detect_c7)(void) {
 }
 
 
+PRIVATE ATTR_FREETEXT void
+NOTHROW(KCALL log_beginmethod)(char const *name) {
+	printk(FREESTR(KERN_INFO "[bios] Attempting memory detection method: %s\n"), name);
+}
+PRIVATE ATTR_FREETEXT void
+NOTHROW(KCALL log_okmethod)(char const *name) {
+	printk(FREESTR(KERN_INFO "[bios] Attempting memory detection method: %s (Ok)\n"), name);
+}
+PRIVATE ATTR_FREETEXT void
+NOTHROW(KCALL log_badmethod)(char const *name) {
+	printk(FREESTR(KERN_INFO "[bios] Attempting memory detection method: %s (Failed)\n"), name);
+}
+
 
 INTERN ATTR_FREETEXT void
 NOTHROW(KCALL x86_initialize_memory_via_bios)(void) {
 	x86_realmode_initialize();
-	if (detect_e820() && minfo_usable_ram_pages() >= X86_BOOT_MINIMUM_AVAILABLE_RAM)
-		goto done;
-	if (detect_e801() && minfo_usable_ram_pages() >= X86_BOOT_MINIMUM_AVAILABLE_RAM)
-		goto done;
-	if (detect_da88() && minfo_usable_ram_pages() >= X86_BOOT_MINIMUM_AVAILABLE_RAM)
-		goto done;
-	if (detect_88() && minfo_usable_ram_pages() >= X86_BOOT_MINIMUM_AVAILABLE_RAM)
-		goto done;
-	if (detect_8a() && minfo_usable_ram_pages() >= X86_BOOT_MINIMUM_AVAILABLE_RAM)
-		goto done;
-	if (detect_c7() && minfo_usable_ram_pages() >= X86_BOOT_MINIMUM_AVAILABLE_RAM)
-		goto done;
-	printk(FREESTR(KERN_WARNING "Guess available RAM\n"));
+#define TRY_METHOD(name, func)                                              \
+	do {                                                                    \
+		char const *_name = FREESTR(name);                                  \
+		log_beginmethod(_name);                                             \
+		if (func) {                                                         \
+			log_okmethod(_name);                                            \
+			if (minfo_usable_ram_pages() >= X86_BOOT_MINIMUM_AVAILABLE_RAM) \
+				goto done;                                                  \
+		} else {                                                            \
+			log_badmethod(_name);                                           \
+		}                                                                   \
+	} __WHILE0
+
+	TRY_METHOD("e820", detect_e820());
+	TRY_METHOD("e801", detect_e801());
+	TRY_METHOD("da88", detect_da88());
+	TRY_METHOD("88", detect_88());
+	TRY_METHOD("8a", detect_8a());
+	TRY_METHOD("c7", detect_c7());
+#undef TRY_METHOD
+	printk(FREESTR(KERN_WARNING "[bios] Insufficient memory detected. Try to guess available RAM\n"));
 #define RANGE(a, b) \
 	minfo_addbank((vm_phys_t)(a), (vm_phys_t)(b - a) + 1, PMEMBANK_TYPE_RAM)
 	/* Most likely that at least this memory exists... */

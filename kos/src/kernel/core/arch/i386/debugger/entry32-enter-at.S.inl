@@ -165,13 +165,13 @@ PUBLIC_FUNCTION(FUNCNAM)
 	/* Figure out our LAPIC ID so we can try to acquire `dbg_activator_lapic_id',
 	 * and check if the debugger was invoked recursively. */
 L(acquire_lapic_lock):
-	movl   %cs:x86_lapic_base_address, %eax
+	movl   %ss:x86_lapic_base_address, %eax
 	testl  %eax, %eax
 	jz     1f  /* No LAPIC --> We're the only CPU! */
-	movl   %cs:APIC_ID(%eax), %eax
+	movl   %ss:APIC_ID(%eax), %eax
 	andl   $APIC_ID_FMASK, %eax
 	shrl   $APIC_ID_FSHIFT, %eax
-	movl   %ecx, %cs:dbg_cpu_temporary(,%eax,4)
+	movl   %ecx, %ss:dbg_cpu_temporary(,%eax,4)
 	INTERN(__x86_dbg_cpu_temporary_b0)
 	INTERN(__x86_dbg_cpu_temporary_b1)
 	INTERN(__x86_dbg_cpu_temporary_b2)
@@ -271,12 +271,12 @@ L(acquire_lapic_lock):
 
 	leal   1(%eax), %ecx
 	xorl   %eax, %eax
-	lock;  cmpxchgl %ecx, %cs:dbg_activator_lapic_id
+	lock;  cmpxchgl %ecx, %ss:dbg_activator_lapic_id
 	jz     2f             /* First time the debugger is entered. */
 	/* Check if this is a recursive entry? */
 	cmpl   %eax, %ecx     /* PREVIOUS_LAPIC_ID == MY_LAPIC_ID */
 	je     2f             /* Recursive debugger entry */
-	movl   %cs:dbg_cpu_temporary-4(,%ecx,4), %ecx
+	movl   %ss:dbg_cpu_temporary-4(,%ecx,4), %ecx
 	.cfi_remember_state
 	.cfi_def_cfa %ecx, 0
 	/* This is where we get if some other CPU is currently inside the debugger...
@@ -285,14 +285,14 @@ L(acquire_lapic_lock):
 	 * it should send an IPI to let us know that our turn has come, or keep on
 	 * idling (only using pause) if we're not allowed to turn on interrupts. */
 	pause
-	testl  $(EFLAGS_IF), %cs:0(%esp)
+	testl  $(EFLAGS_IF), %ss:0(%esp)
 	jz     L(acquire_lapic_lock) /* Not allowed to block... */
 	sti
 	hlt
 	cli
 	jmp    L(acquire_lapic_lock)
 	.cfi_restore_state
-2:	movl   %cs:dbg_cpu_temporary-4(,%ecx,4), %ecx
+2:	movl   %ss:dbg_cpu_temporary-4(,%ecx,4), %ecx
 1:	.cfi_def_cfa %ecx, 0
 #endif /* !CONFIG_NO_SMP */
 
@@ -305,19 +305,19 @@ L(acquire_lapic_lock):
 	 * command-line driver is active, allowing them to soft-reset the debugger commandline
 	 * in case the current command gets into a loop) */
 	INTERN(dbg_active)
-	cmpl   $0, %cs:dbg_active
+	cmpl   $0, %ss:dbg_active
 	jne    .Lcommon_recursive_debugger
 
 #define COPYWORD(src_offset,dst_offset) \
-	movl   %cs:(src_offset)(%ecx), %eax; \
-	movl   %eax, %cs:dbg_exitstate+(dst_offset)
+	movl   %ss:(src_offset)(%ecx), %eax; \
+	movl   %eax, %ss:dbg_exitstate+(dst_offset)
 #define COPYSEG(src_reg,dst_offset) \
 	movl   src_reg, %eax; \
-	movl   %eax, %cs:dbg_exitstate+(dst_offset)
+	movl   %eax, %ss:dbg_exitstate+(dst_offset)
 #define NULLREG(dst_offset) \
-	movl   $0, %cs:dbg_exitstate+(dst_offset)
+	movl   $0, %ss:dbg_exitstate+(dst_offset)
 #define FIXEDREG(value,dst_offset) \
-	movl   $value, %cs:dbg_exitstate+(dst_offset)
+	movl   $value, %ss:dbg_exitstate+(dst_offset)
 
 
 
@@ -364,7 +364,7 @@ L(acquire_lapic_lock):
 	FIXEDREG(SEGMENT_KERNEL_CODE,OFFSET_FCPUSTATE_CS)
 	FIXEDREG(SEGMENT_KERNEL_DATA,OFFSET_FCPUSTATE_SS)
 	pushfl
-	popl   %cs:dbg_exitstate+OFFSET_FCPUSTATE_EFLAGS
+	popl   %ss:dbg_exitstate+OFFSET_FCPUSTATE_EFLAGS
 #elif defined(ENTER_AT_KCPUSTATE)
 	COPYWORD(OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_EDI,OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_EDI)
 	COPYWORD(OFFSET_KCPUSTATE_GPREGS+OFFSET_GPREGS_ESI,OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_ESI)
@@ -438,7 +438,7 @@ L(no_user_iret):
 	FIXEDREG(SEGMENT_KERNEL_DATA,OFFSET_FCPUSTATE_SS)
 	/* The return-SP is the end-address of the IRREGS structure. */
 	leal   IRREGS_OFFSET+SIZEOF_IRREGS_KERNEL(%ecx), %eax
-	movl   %eax, %cs:dbg_exitstate+OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_ESP
+	movl   %eax, %ss:dbg_exitstate+OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_ESP
 L(copy_common_iret_regs):
 	COPYWORD(IRREGS_OFFSET+OFFSET_IRREGS_CS,OFFSET_FCPUSTATE_CS)
 	COPYWORD(IRREGS_OFFSET+OFFSET_IRREGS_EFLAGS,OFFSET_FCPUSTATE_EFLAGS)
@@ -447,32 +447,32 @@ L(copy_common_iret_regs):
 #undef IRREGS_OFFSET
 #endif
 
-	movl   $0, %cs:dbg_exitstate+OFFSET_FCPUSTATE_TR
-	str    %cs:dbg_exitstate+OFFSET_FCPUSTATE_TR
-	movl   $0, %cs:dbg_exitstate+OFFSET_FCPUSTATE_LDT
-	sldt   %cs:dbg_exitstate+OFFSET_FCPUSTATE_LDT
+	movl   $0, %ss:dbg_exitstate+OFFSET_FCPUSTATE_TR
+	str    %ss:dbg_exitstate+OFFSET_FCPUSTATE_TR
+	movl   $0, %ss:dbg_exitstate+OFFSET_FCPUSTATE_LDT
+	sldt   %ss:dbg_exitstate+OFFSET_FCPUSTATE_LDT
 	movl   %cr0, %eax
-	movl   %eax, %cs:dbg_exitstate+OFFSET_FCPUSTATE_COREGS+OFFSET_COREGS_CR0
+	movl   %eax, %ss:dbg_exitstate+OFFSET_FCPUSTATE_COREGS+OFFSET_COREGS_CR0
 	movl   %cr2, %eax
-	movl   %eax, %cs:dbg_exitstate+OFFSET_FCPUSTATE_COREGS+OFFSET_COREGS_CR2
+	movl   %eax, %ss:dbg_exitstate+OFFSET_FCPUSTATE_COREGS+OFFSET_COREGS_CR2
 	movl   %cr3, %eax
-	movl   %eax, %cs:dbg_exitstate+OFFSET_FCPUSTATE_COREGS+OFFSET_COREGS_CR3
+	movl   %eax, %ss:dbg_exitstate+OFFSET_FCPUSTATE_COREGS+OFFSET_COREGS_CR3
 	movl   %cr4, %eax
-	movl   %eax, %cs:dbg_exitstate+OFFSET_FCPUSTATE_COREGS+OFFSET_COREGS_CR4
+	movl   %eax, %ss:dbg_exitstate+OFFSET_FCPUSTATE_COREGS+OFFSET_COREGS_CR4
 	movl   %dr0, %eax
-	movl   %eax, %cs:dbg_exitstate+OFFSET_FCPUSTATE_DRREGS+OFFSET_DRREGS_DR0
+	movl   %eax, %ss:dbg_exitstate+OFFSET_FCPUSTATE_DRREGS+OFFSET_DRREGS_DR0
 	movl   %dr1, %eax
-	movl   %eax, %cs:dbg_exitstate+OFFSET_FCPUSTATE_DRREGS+OFFSET_DRREGS_DR1
+	movl   %eax, %ss:dbg_exitstate+OFFSET_FCPUSTATE_DRREGS+OFFSET_DRREGS_DR1
 	movl   %dr2, %eax
-	movl   %eax, %cs:dbg_exitstate+OFFSET_FCPUSTATE_DRREGS+OFFSET_DRREGS_DR2
+	movl   %eax, %ss:dbg_exitstate+OFFSET_FCPUSTATE_DRREGS+OFFSET_DRREGS_DR2
 	movl   %dr3, %eax
-	movl   %eax, %cs:dbg_exitstate+OFFSET_FCPUSTATE_DRREGS+OFFSET_DRREGS_DR3
+	movl   %eax, %ss:dbg_exitstate+OFFSET_FCPUSTATE_DRREGS+OFFSET_DRREGS_DR3
 	movl   %dr6, %eax
-	movl   %eax, %cs:dbg_exitstate+OFFSET_FCPUSTATE_DRREGS+OFFSET_DRREGS_DR6
+	movl   %eax, %ss:dbg_exitstate+OFFSET_FCPUSTATE_DRREGS+OFFSET_DRREGS_DR6
 	movl   %dr7, %eax
-	movl   %eax, %cs:dbg_exitstate+OFFSET_FCPUSTATE_DRREGS+OFFSET_DRREGS_DR7
-	sgdtl  %cs:dbg_exitstate+OFFSET_FCPUSTATE_GDT
-	sidtl  %cs:dbg_exitstate+OFFSET_FCPUSTATE_IDT
+	movl   %eax, %ss:dbg_exitstate+OFFSET_FCPUSTATE_DRREGS+OFFSET_DRREGS_DR7
+	sgdtl  %ss:dbg_exitstate+OFFSET_FCPUSTATE_GDT
+	sidtl  %ss:dbg_exitstate+OFFSET_FCPUSTATE_IDT
 #endif
 #undef FIXEDREG
 #undef NULLREG
@@ -521,8 +521,8 @@ L(copy_common_iret_regs):
 	movl   %eax, %cr0
 
 	/* Load the debugger-specific GDT / IDT */
-	lgdtl  %cs:dbg_gdt_pointer
-	lidtl  %cs:dbg_idt_pointer
+	lgdtl  %ss:dbg_gdt_pointer
+	lidtl  %ss:dbg_idt_pointer
 
 	/* Load segment registers. */
 	movl   $(SEGMENT_USER_DATA_RPL), %eax

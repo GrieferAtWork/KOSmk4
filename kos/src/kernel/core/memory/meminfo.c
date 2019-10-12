@@ -592,8 +592,16 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL minfo_makezones)(void) {
 		assert(zone->mz_start == bank_start_page);
 		assert(zone->mz_max == bank_end_page - 1);
 		assert(zone->mz_rmax == (bank_end_page - 1) - bank_start_page);
-		assert(zone->mz_fmax == zone->mz_rmax);
-		assert(zone->mz_cfree <= (pagecnt_t)zone->mz_rmax);
+		assertf(zone->mz_fmax == zone->mz_rmax,
+		        "zone->mz_fmax = %Iu\n"
+		        "zone->mz_rmax = %Iu",
+		        zone->mz_fmax,
+		        zone->mz_rmax);
+		assertf(zone->mz_cfree <= (pagecnt_t)zone->mz_rmax + 1,
+		        "zone->mz_cfree = %Iu\n"
+		        "zone->mz_rmax  = %Iu",
+		        (size_t)zone->mz_cfree,
+		        (size_t)zone->mz_rmax);
 		printk(FREESTR(KERN_INFO "Define memory zone %Iu at " FORMAT_VM_PHYS_T "..." FORMAT_VM_PHYS_T " (%Iu/%Iu free pages)\n"),
 		       (size_t)(zone_count - 1),
 		       VM_PPAGE2ADDR(zone->mz_start),

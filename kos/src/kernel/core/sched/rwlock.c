@@ -51,6 +51,20 @@ DECL_BEGIN
 #define RWLOCK_DECIND __RWLOCK_DECIND
 
 
+#ifndef NDEBUG
+/* Because R/W locks need to be working (and therefor initialized)
+ * while handling an assertion failure, fixup a missing init before
+ * triggering the fault. */
+#define ASSERT_VECTOR_INITIALIZED(locks)                      \
+	(unlikely(!(locks)->rls_vec)                              \
+	 ? ((locks)->rls_vec = (locks)->rls_sbuf,                 \
+	    (void)__assertion_failed(#locks "->rls_vec != NULL")) \
+	 : (void)0)
+#else /* !NDEBUG */
+#define ASSERT_VECTOR_INITIALIZED(locks) (void)0
+#endif /* NDEBUG */
+
+
 
 #if !defined(NDEBUG) && 0
 #define RWLOCK_TRACE(...) (printk(KERN_TRACE __VA_ARGS__))
@@ -66,11 +80,11 @@ DECL_BEGIN
 
 
 INTERN ATTR_PERTASK struct read_locks _this_read_locks = {
-	/* .rls_sbuf = */{ },
-	/* .rls_use  = */0,
-	/* .rls_cnt  = */0,
-	/* .rls_msk  = */CONFIG_TASK_STATIC_READLOCKS-1,
-	/* .rls_vec  = */NULL /* Set in `readlocks_init()' */
+	/* .rls_sbuf = */ { },
+	/* .rls_use  = */ 0,
+	/* .rls_cnt  = */ 0,
+	/* .rls_msk  = */ CONFIG_TASK_STATIC_READLOCKS - 1,
+	/* .rls_vec  = */ NULL /* Set in `readlocks_init()' */
 };
 
 DEFINE_PERTASK_INIT(pertask_readlocks_init);
@@ -86,6 +100,7 @@ INTERN NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL pertask_readlocks_fini)(struct task *__restrict thread) {
 	struct read_locks *locks;
 	locks = &FORTASK(thread, _this_read_locks);
+	ASSERT_VECTOR_INITIALIZED(locks);
 	assertf(locks->rls_use == 0,
 	        "Thread %p died with read locks still held\n"
 	        "locks->rls_use = %Iu (rls_cnt = %Iu)\n"
@@ -105,6 +120,7 @@ NOTHROW(KCALL rwlock_find_readlock)(struct rwlock const *__restrict lock) {
 	struct read_locks *locks;
 	struct read_lock *lockdesc;
 	locks = &PERTASK(_this_read_locks);
+	ASSERT_VECTOR_INITIALIZED(locks);
 	assert(locks->rls_use <= locks->rls_cnt);
 	assert(locks->rls_cnt <= locks->rls_msk);
 	perturb = i = RWLOCK_HASH(lock) & locks->rls_msk;
@@ -127,6 +143,7 @@ rwlock_get_readlock(struct rwlock *__restrict lock) THROWS(E_BADALLOC) {
 	struct read_lock *result;
 	locks = &PERTASK(_this_read_locks);
 again:
+	ASSERT_VECTOR_INITIALIZED(locks);
 	assert(locks->rls_use <= locks->rls_cnt);
 	assert(locks->rls_cnt <= locks->rls_msk);
 	result  = NULL;
@@ -205,6 +222,7 @@ NOTHROW(KCALL rwlock_get_readlock_nx)(struct rwlock *__restrict lock) {
 	struct read_lock *result;
 	locks = &PERTASK(_this_read_locks);
 again:
+	ASSERT_VECTOR_INITIALIZED(locks);
 	assert(locks->rls_use <= locks->rls_cnt);
 	assert(locks->rls_cnt <= locks->rls_msk);
 	result  = NULL;
@@ -324,6 +342,7 @@ PUBLIC WUNUSED uintptr_t NOTHROW(KCALL rwlock_reading_any)(void) {
 	size_t i, result = 0;
 	struct read_locks *locks;
 	locks = &PERTASK(_this_read_locks);
+	ASSERT_VECTOR_INITIALIZED(locks);
 	if (!locks->rls_use)
 		return 0;
 	for (i = 0; i <= locks->rls_msk; ++i) {
@@ -918,6 +937,7 @@ kill_rwlock_reader(struct task *__restrict thread,
 	if (thread == THIS_TASK)
 		goto done; /* Skip our own thread. */
 	locks = &FORTASK(thread, _this_read_locks);
+	ASSERT_VECTOR_INITIALIZED(locks);
 	if (!locks->rls_use)
 		goto done; /* This thread isn't using any R/W-locks */
 	if (FORTASK(thread, _this_exception_info).ei_code == ERROR_CODEOF(__E_RETRY_RWLOCK) &&

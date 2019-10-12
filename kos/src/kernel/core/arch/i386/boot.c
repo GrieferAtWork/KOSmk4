@@ -157,8 +157,7 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       required by the Unwind-FDE cache sub-system, meaning that
 	 *       they are also required for us to be able to handle exceptions.
 	 * In other words: Only once this function has been called can we
-	 *                 start making use of exceptions safely.
-	 */
+	 *                 start making use of exceptions safely. */
 	kernel_initialize_scheduler_callbacks();
 
 	/* Initialize SMP.

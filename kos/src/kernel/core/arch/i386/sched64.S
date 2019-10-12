@@ -136,11 +136,10 @@ INTERN_FUNCTION(x86_asmirq_f0)
 
 	/* Acknowledge the interrupt. */
 INTERN_FUNCTION(x86_pic_acknowledge)
-	/* movq x86_lapic_base_address, %rax */
-	movq x86_lapic_base_address, %rax /* TODO: Replace with instruction bytes */
-
-	/* movl $(APIC_EOI_FSIGNAL), APIC_EOI(%rax) */
-	movl $(APIC_EOI_FSIGNAL), APIC_EOI(%rax) /* TODO: Replace with instruction bytes */
+	.byte  0x90, 0x90, 0x90, 0x90, 0x90
+	.byte  0x90, 0x90, 0x90, 0x90, 0x90
+	.byte  0x90, 0x90, 0x90, 0x90, 0x90
+	.byte  0x90, 0x90, 0x90
 END(x86_pic_acknowledge)
 
 	movq   %gs:0, %rdi           /* cpu_scheduler_interrupt::struct task *__restrict thread */

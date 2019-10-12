@@ -1613,6 +1613,8 @@ calculate_chs:
 				}
 			} EXCEPT {
 				if (busptr.hp_siz) {
+					assert(*pbus == (struct ata_bus *)busptr.hp_ptr);
+					*pbus = NULL;
 					if (bus->b_prdt)
 						vpage_free_untraced(bus->b_prdt, 1);
 					heap_free_untraced(&kernel_heaps[GFP_LOCKED],

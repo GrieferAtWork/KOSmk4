@@ -161,19 +161,19 @@ INTERN_FUNCTION(libcpu_apply_ucpustate)
 	movl   %eax, %es
 	movl   (OFFSET_UCPUSTATE_SGREGS + OFFSET_SGREGS_DS)(%ecx), %eax
 	movl   %eax, %ds
-	testl  $3, %cs:OFFSET_UCPUSTATE_CS(%ecx)
+	testl  $3, %ss:OFFSET_UCPUSTATE_CS(%ecx)
 #ifdef __KERNEL__
 	jz     1f
 #else
 	jnz    1f
 #endif
-	pushl  %cs:OFFSET_UCPUSTATE_SS(%ecx)
-	pushl  %cs:(OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_ESP)(%ecx)
+	pushl  %ss:OFFSET_UCPUSTATE_SS(%ecx)
+	pushl  %ss:(OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_ESP)(%ecx)
 	jmp    2f
 1:	movl   (OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_ESP)(%ecx), %esp
-2:	pushl  %cs:OFFSET_UCPUSTATE_EFLAGS(%ecx)
-	pushl  %cs:OFFSET_UCPUSTATE_CS(%ecx)
-	pushl  %cs:OFFSET_UCPUSTATE_EIP(%ecx)
+2:	pushl  %ss:OFFSET_UCPUSTATE_EFLAGS(%ecx)
+	pushl  %ss:OFFSET_UCPUSTATE_CS(%ecx)
+	pushl  %ss:OFFSET_UCPUSTATE_EIP(%ecx)
 	movl   (OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_EDI)(%ecx), %edi
 	movl   (OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_ESI)(%ecx), %esi
 	movl   (OFFSET_UCPUSTATE_GPREGS + OFFSET_GPREGS_EBP)(%ecx), %ebp
@@ -358,7 +358,7 @@ INTERN_FUNCTION(libcpu_apply_fcpustate)
 	movw   OFFSET_FCPUSTATE_DS(%ecx), %ax
 	movw   %ax, %ds
 	.cfi_same_value %ds
-	testl  $3, %cs:OFFSET_FCPUSTATE_CS(%ecx)
+	testl  $3, %ss:OFFSET_FCPUSTATE_CS(%ecx)
 #ifdef __KERNEL__
 	jz     1f
 #else
@@ -366,14 +366,14 @@ INTERN_FUNCTION(libcpu_apply_fcpustate)
 #endif
 	/* Return to user-space */
 	.cfi_remember_state
-	pushl  %cs:OFFSET_FCPUSTATE_SS(%ecx)
-	pushl  %cs:(OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_ESP)(%ecx)
-	pushl  %cs:OFFSET_FCPUSTATE_EFLAGS(%ecx)
-	pushl  %cs:OFFSET_FCPUSTATE_CS(%ecx)
-	pushl  %cs:OFFSET_FCPUSTATE_EIP(%ecx)
-	movl   %cs:(OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EAX)(%ecx), %eax
+	pushl  %ss:OFFSET_FCPUSTATE_SS(%ecx)
+	pushl  %ss:(OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_ESP)(%ecx)
+	pushl  %ss:OFFSET_FCPUSTATE_EFLAGS(%ecx)
+	pushl  %ss:OFFSET_FCPUSTATE_CS(%ecx)
+	pushl  %ss:OFFSET_FCPUSTATE_EIP(%ecx)
+	movl   %ss:(OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EAX)(%ecx), %eax
 	.cfi_same_value %eax
-	movl   %cs:(OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_ECX)(%ecx), %ecx
+	movl   %ss:(OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_ECX)(%ecx), %ecx
 	.cfi_same_value %ecx
 	.cfi_reg_offset %eip, 0, %esp
 	.cfi_reg_offset %cs, 4, %esp
@@ -383,17 +383,17 @@ INTERN_FUNCTION(libcpu_apply_fcpustate)
 	iret
 	.cfi_restore_state
 1:	/* Return to kernel-space */
-	movl   %cs:(OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_ESP)(%ecx), %esp
+	movl   %ss:(OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_ESP)(%ecx), %esp
 	.cfi_same_value %esp
-	movw   %cs:OFFSET_FCPUSTATE_SS(%ecx), %ax
+	movw   %ss:OFFSET_FCPUSTATE_SS(%ecx), %ax
 	movw   %ax, %ss
 	.cfi_same_value %ss
-	pushl  %cs:OFFSET_FCPUSTATE_EFLAGS(%ecx)
-	pushl  %cs:OFFSET_FCPUSTATE_CS(%ecx)
-	pushl  %cs:OFFSET_FCPUSTATE_EIP(%ecx)
-	movl   %cs:(OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EAX)(%ecx), %eax
+	pushl  %ss:OFFSET_FCPUSTATE_EFLAGS(%ecx)
+	pushl  %ss:OFFSET_FCPUSTATE_CS(%ecx)
+	pushl  %ss:OFFSET_FCPUSTATE_EIP(%ecx)
+	movl   %ss:(OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_EAX)(%ecx), %eax
 	.cfi_same_value %eax
-	movl   %cs:(OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_ECX)(%ecx), %ecx
+	movl   %ss:(OFFSET_FCPUSTATE_GPREGS + OFFSET_GPREGS_ECX)(%ecx), %ecx
 	.cfi_same_value %ecx
 	iret
 	.cfi_endproc

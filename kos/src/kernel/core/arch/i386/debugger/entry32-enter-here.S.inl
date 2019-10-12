@@ -32,18 +32,18 @@ PUBLIC_FUNCTION(dbg)
 #endif
 	.cfi_startproc
 	/* Assume as little as possible about our current CPU state:
-	 *   - Assume that %cs is a valid segment (else: how would we have even gotten here?)
-	 *   - Assume that the return instruction pointer is stored at %cs:0(%esp)
+	 *   - Assume that %ss and %cs is a valid segment (else: how would we have even gotten here?)
+	 *   - Assume that the return instruction pointer is stored at %ss:0(%esp)
 	 *   - Assume that paging is either disabled, or that the kernel remains properly
 	 *     mapped where we expect it to (else: how would we have even gotten here?)
-	 *   - Assume that at least 8 more bytes can be pushed onto the stack at %cs:(%esp)
+	 *   - Assume that at least 8 more bytes can be pushed onto the stack at %ss:(%esp)
 	 */
 	leal   -8(%esp), %esp    /* Allocate 4 bytes. */
 	.cfi_adjust_cfa_offset 8
-	movl   %eax, %cs:4(%esp) /* Save EAX (using %cs) as base register */
+	movl   %eax, %ss:4(%esp) /* Save EAX (using %ss) as base register */
 	.cfi_rel_offset %eax, 4
 	movl   %ss, %eax
-	movl   %eax, %cs:0(%esp) /* Save %ss (using %cs) as base register */
+	movl   %eax, %ss:0(%esp) /* Save %ss (using %ss) as base register */
 	.cfi_rel_offset %ss, 0
 	movl   $(SEGMENT_KERNEL_DATA), %eax
 	movl   %eax, %ss         /* Ensure that a valid stack-segment is set */
@@ -65,34 +65,34 @@ PUBLIC_FUNCTION(dbg)
 	 * NOTE: When LAPIC is disabled, we can assume that there are no other cores
 	 *       that may already be locking debugger mode. */
 L(acquire_lapic_lock):
-	movl   %cs:x86_lapic_base_address, %eax
+	movl   %ss:x86_lapic_base_address, %eax
 	testl  %eax, %eax
 	jz     1f  /* No LAPIC --> We're the only CPU! */
-	movl   %cs:APIC_ID(%eax), %eax
+	movl   %ss:APIC_ID(%eax), %eax
 	andl   $APIC_ID_FMASK, %eax
 	shrl   $APIC_ID_FSHIFT, %eax
-	movl   %ecx, %cs:dbg_cpu_temporary(,%eax,4)
+	movl   %ecx, %ss:dbg_cpu_temporary(,%eax,4)
 	leal   1(%eax), %ecx
 	xorl   %eax, %eax
-	lock;  cmpxchgl %ecx, %cs:dbg_activator_lapic_id
+	lock;  cmpxchgl %ecx, %ss:dbg_activator_lapic_id
 	jz     2f /* First time the debugger is entered. */
 	/* Check if this is a recursive entry? */
 	cmpl   %eax, %ecx /* PREVIOUS_LAPIC_ID == MY_LAPIC_ID */
 	je     2f /* Recursive debugger entry */
-	movl   %cs:dbg_cpu_temporary-4(,%ecx,4), %ecx
+	movl   %ss:dbg_cpu_temporary-4(,%ecx,4), %ecx
 	/* This is where we get if some other CPU is currently inside the debugger...
 	 * At this point, either re-enable interrupts (if they were enabled before),
 	 * and hlt to wait for the locking core to exit debugger mode, at which point
 	 * it should send an IPI to let us know that our turn has come, or keep on
 	 * idling (only using pause) if we're not allowed to turn on interrupts. */
 	pause
-	testl  $(EFLAGS_IF), %cs:0(%esp)
+	testl  $(EFLAGS_IF), %ss:0(%esp)
 	jz     L(acquire_lapic_lock) /* Not allowed to block... */
 	sti
 	hlt
 	cli
 	jmp    L(acquire_lapic_lock)
-2:	movl   %cs:dbg_cpu_temporary-4(,%ecx,4), %ecx
+2:	movl   %ss:dbg_cpu_temporary-4(,%ecx,4), %ecx
 1:
 #endif /* !CONFIG_NO_SMP */
 
@@ -105,62 +105,62 @@ L(acquire_lapic_lock):
 	 * command-line driver is active, allowing them to soft-reset the debugger commandline
 	 * in case the current command gets stuck inside of a loop) */
 	INTERN(dbg_active)
-	cmpl   $0, %cs:dbg_active
+	cmpl   $0, %ss:dbg_active
 	jne    L(recursive_debugger)
 
 	/* Save registers */
-	movl   %cs:0(%esp), %eax        /* %eflags */
-	movl   %eax, %cs:dbg_exitstate+OFFSET_FCPUSTATE_EFLAGS
-	movl   %cs:4(%esp), %eax        /* %eax */
-	movl   %eax, %cs:dbg_exitstate+OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_EAX
-	movl   %edi, %cs:dbg_exitstate+OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_EDI
-	movl   %esi, %cs:dbg_exitstate+OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_ESI
-	movl   %ebp, %cs:dbg_exitstate+OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_EBP
+	movl   %ss:0(%esp), %eax        /* %eflags */
+	movl   %eax, %ss:dbg_exitstate+OFFSET_FCPUSTATE_EFLAGS
+	movl   %ss:4(%esp), %eax        /* %eax */
+	movl   %eax, %ss:dbg_exitstate+OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_EAX
+	movl   %edi, %ss:dbg_exitstate+OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_EDI
+	movl   %esi, %ss:dbg_exitstate+OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_ESI
+	movl   %ebp, %ss:dbg_exitstate+OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_EBP
 	leal   12(%esp), %eax
-	movl   %eax, %cs:dbg_exitstate+OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_ESP
-	movl   %ebx, %cs:dbg_exitstate+OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_EBX
-	movl   %edx, %cs:dbg_exitstate+OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_EDX
-	movl   %ecx, %cs:dbg_exitstate+OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_ECX
-	movl   %cs:8(%esp), %eax        /* %eip */
-	movl   %eax, %cs:dbg_exitstate+OFFSET_FCPUSTATE_EIP
+	movl   %eax, %ss:dbg_exitstate+OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_ESP
+	movl   %ebx, %ss:dbg_exitstate+OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_EBX
+	movl   %edx, %ss:dbg_exitstate+OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_EDX
+	movl   %ecx, %ss:dbg_exitstate+OFFSET_FCPUSTATE_GPREGS+OFFSET_GPREGS_ECX
+	movl   %ss:8(%esp), %eax        /* %eip */
+	movl   %eax, %ss:dbg_exitstate+OFFSET_FCPUSTATE_EIP
 	movl   %es, %eax
-	movl   %eax, %cs:dbg_exitstate+OFFSET_FCPUSTATE_ES
+	movl   %eax, %ss:dbg_exitstate+OFFSET_FCPUSTATE_ES
 	movl   %cs, %eax
-	movl   %eax, %cs:dbg_exitstate+OFFSET_FCPUSTATE_CS
+	movl   %eax, %ss:dbg_exitstate+OFFSET_FCPUSTATE_CS
 	movl   %ss, %eax
-	movl   %eax, %cs:dbg_exitstate+OFFSET_FCPUSTATE_SS
+	movl   %eax, %ss:dbg_exitstate+OFFSET_FCPUSTATE_SS
 	movl   %ds, %eax
-	movl   %eax, %cs:dbg_exitstate+OFFSET_FCPUSTATE_DS
+	movl   %eax, %ss:dbg_exitstate+OFFSET_FCPUSTATE_DS
 	movl   %fs, %eax
-	movl   %eax, %cs:dbg_exitstate+OFFSET_FCPUSTATE_FS
+	movl   %eax, %ss:dbg_exitstate+OFFSET_FCPUSTATE_FS
 	movl   %gs, %eax
-	movl   %eax, %cs:dbg_exitstate+OFFSET_FCPUSTATE_GS
-	movl   $0, %cs:dbg_exitstate+OFFSET_FCPUSTATE_TR
-	str    %cs:dbg_exitstate+OFFSET_FCPUSTATE_TR
-	movl   $0, %cs:dbg_exitstate+OFFSET_FCPUSTATE_LDT
-	sldt   %cs:dbg_exitstate+OFFSET_FCPUSTATE_LDT
+	movl   %eax, %ss:dbg_exitstate+OFFSET_FCPUSTATE_GS
+	movl   $0, %ss:dbg_exitstate+OFFSET_FCPUSTATE_TR
+	str    %ss:dbg_exitstate+OFFSET_FCPUSTATE_TR
+	movl   $0, %ss:dbg_exitstate+OFFSET_FCPUSTATE_LDT
+	sldt   %ss:dbg_exitstate+OFFSET_FCPUSTATE_LDT
 	movl   %cr0, %eax
-	movl   %eax, %cs:dbg_exitstate+OFFSET_FCPUSTATE_COREGS+OFFSET_COREGS_CR0
+	movl   %eax, %ss:dbg_exitstate+OFFSET_FCPUSTATE_COREGS+OFFSET_COREGS_CR0
 	movl   %cr2, %eax
-	movl   %eax, %cs:dbg_exitstate+OFFSET_FCPUSTATE_COREGS+OFFSET_COREGS_CR2
+	movl   %eax, %ss:dbg_exitstate+OFFSET_FCPUSTATE_COREGS+OFFSET_COREGS_CR2
 	movl   %cr3, %eax
-	movl   %eax, %cs:dbg_exitstate+OFFSET_FCPUSTATE_COREGS+OFFSET_COREGS_CR3
+	movl   %eax, %ss:dbg_exitstate+OFFSET_FCPUSTATE_COREGS+OFFSET_COREGS_CR3
 	movl   %cr4, %eax
-	movl   %eax, %cs:dbg_exitstate+OFFSET_FCPUSTATE_COREGS+OFFSET_COREGS_CR4
+	movl   %eax, %ss:dbg_exitstate+OFFSET_FCPUSTATE_COREGS+OFFSET_COREGS_CR4
 	movl   %dr0, %eax
-	movl   %eax, %cs:dbg_exitstate+OFFSET_FCPUSTATE_DRREGS+OFFSET_DRREGS_DR0
+	movl   %eax, %ss:dbg_exitstate+OFFSET_FCPUSTATE_DRREGS+OFFSET_DRREGS_DR0
 	movl   %dr1, %eax
-	movl   %eax, %cs:dbg_exitstate+OFFSET_FCPUSTATE_DRREGS+OFFSET_DRREGS_DR1
+	movl   %eax, %ss:dbg_exitstate+OFFSET_FCPUSTATE_DRREGS+OFFSET_DRREGS_DR1
 	movl   %dr2, %eax
-	movl   %eax, %cs:dbg_exitstate+OFFSET_FCPUSTATE_DRREGS+OFFSET_DRREGS_DR2
+	movl   %eax, %ss:dbg_exitstate+OFFSET_FCPUSTATE_DRREGS+OFFSET_DRREGS_DR2
 	movl   %dr3, %eax
-	movl   %eax, %cs:dbg_exitstate+OFFSET_FCPUSTATE_DRREGS+OFFSET_DRREGS_DR3
+	movl   %eax, %ss:dbg_exitstate+OFFSET_FCPUSTATE_DRREGS+OFFSET_DRREGS_DR3
 	movl   %dr6, %eax
-	movl   %eax, %cs:dbg_exitstate+OFFSET_FCPUSTATE_DRREGS+OFFSET_DRREGS_DR6
+	movl   %eax, %ss:dbg_exitstate+OFFSET_FCPUSTATE_DRREGS+OFFSET_DRREGS_DR6
 	movl   %dr7, %eax
-	movl   %eax, %cs:dbg_exitstate+OFFSET_FCPUSTATE_DRREGS+OFFSET_DRREGS_DR7
-	sgdtl  %cs:dbg_exitstate+OFFSET_FCPUSTATE_GDT
-	sidtl  %cs:dbg_exitstate+OFFSET_FCPUSTATE_IDT
+	movl   %eax, %ss:dbg_exitstate+OFFSET_FCPUSTATE_DRREGS+OFFSET_DRREGS_DR7
+	sgdtl  %ss:dbg_exitstate+OFFSET_FCPUSTATE_GDT
+	sidtl  %ss:dbg_exitstate+OFFSET_FCPUSTATE_IDT
 
 	.cfi_endproc
 L(recursive_debugger):
@@ -197,8 +197,8 @@ L(recursive_debugger):
 	movl   %eax, %cr0
 
 	/* Load the debugger-specific GDT / IDT */
-	lgdtl  %cs:dbg_gdt_pointer
-	lidtl  %cs:dbg_idt_pointer
+	lgdtl  %ss:dbg_gdt_pointer
+	lidtl  %ss:dbg_idt_pointer
 
 	/* Load segment registers. */
 	movl   $(SEGMENT_USER_DATA_RPL), %eax

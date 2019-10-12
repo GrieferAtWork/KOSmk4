@@ -110,15 +110,9 @@ INTERN_FUNCTION(x86_asmirq_f0)
 
 	/* Acknowledge the interrupt. */
 INTERN_FUNCTION(x86_pic_acknowledge)
-	/* movl x86_lapic_base_address, %eax */
-	.byte  0xa1
-	.long  x86_lapic_base_address
-
-	/* movl $(APIC_EOI_FSIGNAL), APIC_EOI(%eax) */
-	.byte  0xc7
-	.byte  0x80
-	.long  APIC_EOI
-	.long  APIC_EOI_FSIGNAL
+	.byte  0x90, 0x90, 0x90, 0x90, 0x90
+	.byte  0x90, 0x90, 0x90, 0x90, 0x90
+	.byte  0x90, 0x90, 0x90, 0x90, 0x90
 END(x86_pic_acknowledge)
 
 	movl   %fs:0, %edx           /* cpu_scheduler_interrupt::struct task *__restrict thread */

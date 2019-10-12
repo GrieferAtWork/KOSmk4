@@ -64,6 +64,34 @@ INTDEF byte_t x86_pic_acknowledge[];
 INTDEF byte_t x86_debug_pic_acknowledge[];
 #endif /* !CONFIG_NO_DEBUGGER */
 
+#ifdef __x86_64__
+PRIVATE ATTR_FREERODATA u8 const x86_ack_apic = {
+	//TODO: movq x86_lapic_base_address, %rax
+	//TODO: movl $(APIC_EOI_FSIGNAL), APIC_EOI(%rax)
+};
+#else /* __x86_64__ */
+struct __ATTR_PACKED x86_ack_apic_data {
+	/* movl x86_lapic_base_address, %eax */
+	u8  b_a1;
+	u32 l_x86_lapic_base_address;
+	/* movl $(APIC_EOI_FSIGNAL), APIC_EOI(%eax) */
+	u8  b_c7;
+	u8  b_80;
+	u32 l_APIC_EOI;
+	u32 l_APIC_EOI_FSIGNAL;
+};
+PRIVATE ATTR_FREERODATA struct x86_ack_apic_data const x86_ack_apic = {
+	/* movl x86_lapic_base_address, %eax */
+	0xa1,
+	(u32)&x86_lapic_base_address,
+	/* movl $(APIC_EOI_FSIGNAL), APIC_EOI(%eax) */
+	0xc7,
+	0x80,
+	APIC_EOI,
+	APIC_EOI_FSIGNAL,
+};
+#endif /* !__x86_64__ */
+
 /* NOTE: This code must match the text size in `x86_pic_acknowledge' */
 #ifdef __x86_64__
 PRIVATE ATTR_FREERODATA u8 const x86_ack_pic[18] = {
@@ -83,7 +111,7 @@ PRIVATE ATTR_FREERODATA u8 const x86_ack_pic[15] = {
 	0x90, 0x90, 0x90, 0x90, 0x90
 };
 #endif /* !__x86_64__ */
-
+STATIC_ASSERT(sizeof(x86_ack_apic) == sizeof(x86_ack_pic));
 
 
 DATDEF ATTR_PERCPU quantum_diff_t _cpu_quantum_length ASMNAME("cpu_quantum_length");
@@ -603,6 +631,10 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_apic)(void) {
 		memcpy((void *)&cpu_quantum_reset, x86_apic_cpu_quantum_reset, (size_t)x86_apic_cpu_quantum_reset_size);
 		memcpy((void *)&cpu_quantum_reset_nopr, x86_apic_cpu_quantum_reset_nopr, (size_t)x86_apic_cpu_quantum_reset_size_nopr);
 		memcpy((void *)&cpu_hwipi_pending, x86_apic_cpu_ipi_pending, (size_t)x86_apic_cpu_ipi_pending_size);
+		memcpy(x86_pic_acknowledge, &x86_ack_apic, sizeof(x86_ack_apic));
+#ifndef CONFIG_NO_DEBUGGER
+		memcpy(x86_debug_pic_acknowledge, &x86_ack_apic, sizeof(x86_ack_apic));
+#endif /* !CONFIG_NO_DEBUGGER */
 
 		/* Read out the boot cpu's LAPIC id if it couldn't be determined before now. */
 		if (FORCPU(&_bootcpu, _x86_lapic_id) == 0xff) {
