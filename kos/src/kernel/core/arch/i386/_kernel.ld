@@ -51,7 +51,15 @@
 ENTRY(_start)
 SECTIONS {
 
-	. = KERNEL_BASE + 1M;
+	. = KERNEL_BASE + 0x100000;
+
+#ifndef CONFIG_NO_BOOT0
+	SECTION(.x86.boot0) {
+		KEEP(*(.x86.boot0))
+	}
+	. = KERNEL_BASE + 0x100200;
+#endif /* !CONFIG_NO_BOOT0 */
+
 	PROVIDE_HIDDEN(__kernel_start = ABSOLUTE(.));
 
 	/* Boot header */
@@ -435,7 +443,9 @@ SECTIONS {
 	PROVIDE(__x86_bootcpu_idfeatures = ABSOLUTE(_bootcpu + cpuid_features));
 	PROVIDE(__x86_bootcpu_gdt = ABSOLUTE(_bootcpu + x86_cpugdt));
 
-
+#ifndef CONFIG_NO_BOOT0
+	PROVIDE_HIDDEN(__kernel_sector_count = ABSOLUTE((__kernel_size + 511) / 512));
+#endif /* !CONFIG_NO_BOOT0 */
 
 #ifdef CONFIG_NO_SMP
 #define TSS_BASE    x86_cputss

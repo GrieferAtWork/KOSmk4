@@ -22,16 +22,16 @@
 
 #ifndef N
 #error "Must #define N before #including this file"
-#endif
+#endif /* !N */
 #ifndef RETURN_PCPY
 #error "Must #define RETURN_PCPY before #including this file"
-#endif
+#endif /* !RETURN_PCPY */
 
 #ifdef __KERNEL__
 #define ENTER_CLD  cld
-#else
+#else /* __KERNEL__ */
 #define ENTER_CLD  /* nothing */
-#endif
+#endif /* !__KERNEL__ */
 
 
 #if N == 1
@@ -60,14 +60,14 @@
 .section .text.crt.string.memory
 #if RETURN_PCPY
 INTERN_FUNCTION(F(libc_mempcpy))
-#else
+#else /* RETURN_PCPY */
 INTERN_FUNCTION(F(libc_memcpy))
-#endif
+#endif /* !RETURN_PCPY */
 	.cfi_startproc
 	ENTER_CLD
 #if !RETURN_PCPY
 	movq   %rdi, %rax
-#endif
+#endif /* !RETURN_PCPY */
 #if N == 1
 	movq   %rdx, %rcx
 	shrq   $3, %rcx
@@ -104,16 +104,16 @@ INTERN_FUNCTION(F(libc_memcpy))
 #endif
 #if RETURN_PCPY
 	movq   %rdi, %rax
-#endif
+#endif /* RETURN_PCPY */
 	ret
 	.cfi_endproc
 #if RETURN_PCPY
 END(F(libc_mempcpy))
 DEFINE_PUBLIC_ALIAS(F(mempcpy),F(libc_mempcpy))
-#else
+#else /* RETURN_PCPY */
 END(F(libc_memcpy))
 DEFINE_PUBLIC_ALIAS(F(memcpy),F(libc_memcpy))
-#endif
+#endif /* !RETURN_PCPY */
 
 
 
@@ -122,9 +122,9 @@ DEFINE_PUBLIC_ALIAS(F(memcpy),F(libc_memcpy))
 .section .text.crt.string.memory
 #if RETURN_PCPY
 INTERN_FUNCTION(F(libc_mempset))
-#else
+#else /* RETURN_PCPY */
 INTERN_FUNCTION(F(libc_memset))
-#endif
+#endif /* !RETURN_PCPY */
 	.cfi_startproc
 	ENTER_CLD
 #if N == 8
@@ -132,13 +132,13 @@ INTERN_FUNCTION(F(libc_memset))
 	movq   %rdx, %rcx
 #if !RETURN_PCPY
 	movq   %rdi, %rdx
-#endif
+#endif /* !RETURN_PCPY */
 	rep    stosq
 #if RETURN_PCPY
 	movq   %rdi, %rax
-#else
+#else /* RETURN_PCPY */
 	movq   %rdx, %rax
-#endif
+#endif /* !RETURN_PCPY */
 #elif N == 4
 	movl   %esi, %esi /* RSI = ESI & 0xffffffff */
 	movl   %esi, %eax
@@ -147,7 +147,7 @@ INTERN_FUNCTION(F(libc_memset))
 	movq   %rdx, %rcx
 #if !RETURN_PCPY
 	movq   %rdi, %rdx
-#endif
+#endif /* !RETURN_PCPY */
 	shrq   $1, %rcx
 	rep    stosq
 	jnc    1f /* if (!(n_dwords & 1)) goto 1f; */
@@ -155,9 +155,9 @@ INTERN_FUNCTION(F(libc_memset))
 1:
 #if RETURN_PCPY
 	movq   %rdi, %rax
-#else
+#else /* RETURN_PCPY */
 	movq   %rdx, %rax
-#endif
+#endif /* !RETURN_PCPY */
 #elif N == 2
 	movw   %si, %ax
 	shll   $16, %eax
@@ -167,7 +167,7 @@ INTERN_FUNCTION(F(libc_memset))
 	orq    %rsi, %rax /* EAX = WORD << 48 | WORD << 32 | WORD << 16 | WORD */
 #if !RETURN_PCPY
 	movq   %rdi, %r8
-#endif
+#endif /* !RETURN_PCPY */
 	shrq   $2, %rcx
 	rep    stosq
 	jnc    1f /* if (!(n_words & 2)) goto 1f; */
@@ -178,9 +178,9 @@ INTERN_FUNCTION(F(libc_memset))
 1:
 #if RETURN_PCPY
 	movq   %rdi, %rax
-#else
+#else /* RETURN_PCPY */
 	movq   %r8, %rax
-#endif
+#endif /* !RETURN_PCPY */
 #elif N == 1
 	movb   %sil, %al
 	movb   %al, %ah
@@ -192,7 +192,7 @@ INTERN_FUNCTION(F(libc_memset))
 	orq    %rsi, %rax
 #if !RETURN_PCPY
 	movq   %rdi, %r8
-#endif
+#endif /* !RETURN_PCPY */
 	shrq   $3, %rcx
 	rep    stosq
 	jnc    1f /* if (!(n_bytes & 4)) goto 1f; */
@@ -206,9 +206,9 @@ INTERN_FUNCTION(F(libc_memset))
 1:
 #if RETURN_PCPY
 	movq   %rdi, %rax
-#else
+#else /* RETURN_PCPY */
 	movq   %r8, %rax
-#endif
+#endif /* !RETURN_PCPY */
 #else
 #error "INVALID N"
 #endif
@@ -217,10 +217,10 @@ INTERN_FUNCTION(F(libc_memset))
 #if RETURN_PCPY
 END(F(libc_mempset))
 DEFINE_PUBLIC_ALIAS(F(mempset),F(libc_mempset))
-#else
+#else /* RETURN_PCPY */
 END(F(libc_memset))
 DEFINE_PUBLIC_ALIAS(F(memset),F(libc_memset))
-#endif
+#endif /* !RETURN_PCPY */
 
 
 
@@ -328,9 +328,9 @@ INTERN_FUNCTION(F_STRING(nend))
 	jne    1f
 #if N == 1
 	decq   %rdi
-#else
+#else /* N == 1 */
 	subq   $N, %rdi
-#endif
+#endif /* N != 1 */
 1:	movq   %rdi, %rax
 	ret
 	.cfi_endproc

@@ -621,48 +621,13 @@ For more information about the header substitution system, and how it makes it p
 <a name="bochs"></a>
 ## Building & using Bochs to run KOS
 
-First, you must patch the Bochs source to fix a bug that normally breaks the unmaintained `load32bitOShack()` feature which KOS makes use of to quickly have itself be loaded into memory, forgoing the need of the usual ISO+bootloader combination required to load a custom kernel into Bochs.
-
-To use bochs, download and extract version 2.6.9 to `$PROJPATH/binutils/src/bochs-2.6.9`
-
-Bochs source fixup (in `$PROJPATH/binutils/src/bochs-2.6.9/load32bitOShack.cc`):
-```patch
-+    unsigned long copysize = size;
-+    if (copysize > 0x1000)
-+      copysize = 0x1000;
-+    ret = read(fd, (bx_ptr_t) BX_MEM(0)->get_vector(paddr + offset), copysize);
--    ret = read(fd, (bx_ptr_t) BX_MEM(0)->get_vector(paddr + offset), size);
-```
-
-Then, you must build Bochs:
-```sh
-mkdir $PROJPATH/binutils/build-bochs-2.6.9
-cd $PROJPATH/binutils/build-bochs-2.6.9
-bash ../src/bochs-2.6.9/configure --enable-disasm --enable-debugger --enable-debugger-gui --enable-pci --enable-smp --enable-3dnow --enable-x86-64 --enable-svm --enable-avx --enable-x86-debugger --enable-monitor-mwait --enable-sb16 --enable-es1370 --enable-gameport --enable-voodoo --enable-usb --enable-usb-ohci --enable-usb-ehci --enable-usb-xhci
-```
-
-Now, copy the file `$PROJPATH/kos/misc/config/kos.bxrc` to `$PROJPATH/bin/i386-kos-$CONFIG/kos.bxrc` and open it in a text editor
-
-Download a pre-built version of `bochs-2.6.9` to get the files `BIOS-bochs-latest` and `VGABIOS-lgpl-latest`. Afterwards, update the following 2 lines in `$PROJPATH/bin/i386-kos-$CONFIG/kos.bxrc` to point to the location of the 2 BIOS files:
-
-```patch
-+ romimage: file="<YOUR_PATH_TO_BOCHS-2.6.8-HERE>/BIOS-bochs-latest"
-+ vgaromimage: file="<YOUR_PATH_TO_BOCHS-2.6.8-HERE>/VGABIOS-lgpl-latest"
-- romimage: file="D:\Bochs-2.6.8/BIOS-bochs-latest"
-- vgaromimage: file="D:\Bochs-2.6.8/VGABIOS-lgpl-latest"
-```
-
-Now, you can start bochs directly using:
+Download and install [`2.6.9`](https://sourceforge.net/projects/bochs/files/latest/download) and use the following command to launch KOS inside of bochs
 
 ```sh
-binutils/build-bochs-2.6.9/bochs -q -f bin/i386-kos-$CONFIG/kos.bxrc
+deemon magic.dee --emulator=bochs --target=i386 --config=nOD
 ```
-	
-Or you can directly build+run KOS with:
 
-```sh
-deemon magic.dee --emulator=bochs ...more.options.here...
-```
+Note that if you chose to install bochs in a non-standard location, the you will have to add that location to the list of paths enumerated by `enumerateBochsInstallationLocations()` in `$PROJPATH/kos/misc/magicemulator/bochs.dee`
 
 
 

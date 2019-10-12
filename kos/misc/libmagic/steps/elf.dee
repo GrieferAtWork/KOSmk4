@@ -122,6 +122,8 @@ function flattenElfBinary(
 					local p_memsz  = file_read4le(i);
 					local p_flags  = file_read4le(i);
 					local p_align  = file_read4le(i);
+					print "PHDR:", p_vaddr.hex(), p_paddr.hex(), p_offset.hex(), 
+						p_memsz.hex(), p_filesz.hex();
 					if (p_type == 2) { /* PT_DYNAMIC */
 						assert requireNoRelocations;
 						/* TODO */

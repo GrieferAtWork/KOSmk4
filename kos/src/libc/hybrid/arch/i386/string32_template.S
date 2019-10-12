@@ -21,18 +21,18 @@
 
 #ifndef N
 #error "Must #define N before #including this file"
-#endif
+#endif /* !N */
 #ifndef RETURN_PCPY
 #error "Must #define RETURN_PCPY before #including this file"
-#endif
+#endif /* !RETURN_PCPY */
 
 #ifdef __KERNEL__
 #define ENTER_CLD  cld
 #define RET(n)     ret $n
-#else
+#else /* __KERNEL__ */
 #define ENTER_CLD  /* nothing */
 #define RET(n)     ret
-#endif
+#endif /* !__KERNEL__ */
 
 
 #if N == 1
@@ -59,9 +59,9 @@
 .section .text.crt.string.memory
 #if RETURN_PCPY
 INTERN_FUNCTION(F(libc_mempcpy))
-#else
+#else /* RETURN_PCPY */
 INTERN_FUNCTION(F(libc_memcpy))
-#endif
+#endif /* !RETURN_PCPY */
 	.cfi_startproc
 	ENTER_CLD
 	pushl_cfi_r %edi
@@ -71,7 +71,7 @@ INTERN_FUNCTION(F(libc_memcpy))
 	movl   20(%esp), %ecx /* n_bytes */
 #if !RETURN_PCPY
 	movl   %edi, %eax
-#endif
+#endif /* !RETURN_PCPY */
 #if N == 1
 	movl   %ecx, %edx
 	shrl   $2, %ecx
@@ -93,7 +93,7 @@ INTERN_FUNCTION(F(libc_memcpy))
 #endif
 #if RETURN_PCPY
 	movl   %edi, %eax
-#endif
+#endif /* RETURN_PCPY */
 	popl_cfi_r  %esi
 	popl_cfi_r  %edi
 	RET(12)
@@ -101,10 +101,10 @@ INTERN_FUNCTION(F(libc_memcpy))
 #if RETURN_PCPY
 END(F(libc_mempcpy))
 DEFINE_PUBLIC_ALIAS(F(mempcpy),F(libc_mempcpy))
-#else
+#else /* RETURN_PCPY */
 END(F(libc_memcpy))
 DEFINE_PUBLIC_ALIAS(F(memcpy),F(libc_memcpy))
-#endif
+#endif /* !RETURN_PCPY */
 
 
 

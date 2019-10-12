@@ -55,6 +55,7 @@
 #endif /* !__x86_64__ */
 
 __ASM_BEGIN
+__ASM_L(.macro jmp8   sym:req; .byte 0xeb; .reloc ., __X86_R_PC8, __ASM_ARG(\sym); .byte -1; .endm)
 __ASM_L(.macro jo8    sym:req; .byte 0x70; .reloc ., __X86_R_PC8, __ASM_ARG(\sym); .byte -1; .endm)
 __ASM_L(.macro jno8   sym:req; .byte 0x71; .reloc ., __X86_R_PC8, __ASM_ARG(\sym); .byte -1; .endm)
 __ASM_L(.macro jb8    sym:req; .byte 0x72; .reloc ., __X86_R_PC8, __ASM_ARG(\sym); .byte -1; .endm)
@@ -90,6 +91,7 @@ __ASM_L(.macro jecxz8 sym:req; .byte 0xe3; .reloc ., __X86_R_PC8, __ASM_ARG(\sym
 #ifdef __x86_64__
 __ASM_L(.macro jrcxz8 sym:req; .byte 0x48, 0xe3; .reloc ., __X86_R_PC8, __ASM_ARG(\sym); .byte -1; .endm)
 #endif /* __x86_64__ */
+__ASM_L(.macro jmp32   sym:req; .byte 0xe9; .reloc ., __X86_R_PC32, __ASM_ARG(\sym); .long -4; .endm)
 __ASM_L(.macro jo32    sym:req; .byte 0x0f, 0x80; .reloc ., __X86_R_PC32, __ASM_ARG(\sym); .long -4; .endm)
 __ASM_L(.macro jno32   sym:req; .byte 0x0f, 0x81; .reloc ., __X86_R_PC32, __ASM_ARG(\sym); .long -4; .endm)
 __ASM_L(.macro jb32    sym:req; .byte 0x0f, 0x82; .reloc ., __X86_R_PC32, __ASM_ARG(\sym); .long -4; .endm)

@@ -1,0 +1,241 @@
+/* Copyright (c) 2019 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+#ifdef __WINDOWS__
+#define HOST_EXE(x)  x ".exe"
+#else
+#define HOST_EXE(x)  x
+#endif
+
+
+import * from deemon;
+import * from ..libmagic.libmagic;
+import flattenElfBinary from ..libmagic.steps.elf;
+import opt = .options;
+import fs;
+import ipc;
+import net;
+import .common;
+
+final global BOCHS_EXE = "bochs"
+#ifdef __WINDOWS__
+	".exe"
+#endif
+;
+
+final global BOCHS_BIOS    = "BIOS-bochs-latest";
+final global BOCHS_VGABIOS = "VGABIOS-lgpl-latest";
+
+function enumerateBochsInstallationLocations(): {string...} {
+#ifdef __WINDOWS__
+	yield "D:\\Bochs-2.6.9\\";
+	yield "C:\\Program Files\\Bochs-2.6.9";
+	yield "C:\\Program Files (x86)\\Bochs-2.6.9";
+	yield "D:\\Bochs-2.6.8\\";
+	yield "C:\\Program Files\\Bochs-2.6.8";
+	yield "C:\\Program Files (x86)\\Bochs-2.6.8";
+#endif /* __WINDOWS__ */
+	yield "binutils/bochs-2.6.9";
+	yield "binutils/build-bochs-2.6.9";
+	yield fs.environ["PATH"].split(fs.DELIM)...;
+}
+
+function enumerateBochsBiosLocations(): {string...} {
+	yield "binutils/build-bochs-2.6.9";
+#ifdef __WINDOWS__
+	yield "D:\\Bochs-2.6.9\\";
+	yield "C:\\Program Files\\Bochs-2.6.9";
+	yield "C:\\Program Files (x86)\\Bochs-2.6.9";
+	yield "D:\\Bochs-2.6.8\\";
+	yield "C:\\Program Files\\Bochs-2.6.8";
+	yield "C:\\Program Files (x86)\\Bochs-2.6.8";
+#endif /* __WINDOWS__ */
+	yield fs.environ["PATH"].split(fs.DELIM)...;
+}
+
+
+function start(
+		groups: {Group...},
+		config: Config,
+		binPath: string,
+		kernelFile: string,
+		multibootDrivers: {(string, string)...},
+		targetArch: string,
+		targetCpu: string,
+		diskFile: string,
+		options: {string: Object}) {
+	local bochs;
+	local bochs_bios;
+	for (local x: enumerateBochsInstallationLocations()) {
+		local fullPath = fs.joinpath(x, BOCHS_EXE);
+		if (fs.stat.isreg(fullPath)) {
+			bochs = fullPath;
+			goto got_exe;
+		}
+	}
+	print "Failed to locate:", repr BOCHS_EXE;
+	throw Error("Cannot locate bochs binary");
+got_exe:
+	for (local x: enumerateBochsBiosLocations()) {
+		if (fs.stat.isreg(fs.joinpath(x, BOCHS_BIOS)) &&
+		    fs.stat.isreg(fs.joinpath(x, BOCHS_VGABIOS))) {
+			bochs_bios = x;
+			goto got_bios;
+		}
+	}
+	print "Failed to locate:", repr BOCHS_EXE;
+	throw Error("Cannot locate bochs binary");
+got_bios:
+	local bochs_arguments = [];
+	local kernelFlatFilename = fs.joinpath(
+		fs.headof(kernelFile),
+		"." + fs.fileof(kernelFile) + "-flat." + fs.extof(kernelFile));
+	local bxrcFilename = kernelFlatFilename + ".bxrc";
+	local flat_last_modified = getLastModfiedTime(kernelFlatFilename);
+	if (flat_last_modified is none ||
+	    flat_last_modified < getLastModfiedTime(kernelFile)) {
+		print "[bochs] Create", repr kernelFlatFilename;
+		flattenElfBinary(
+			inputFile: kernelFile,
+			outputFile: kernelFlatFilename,
+			physBase: 0x00100000, /* 1M */
+			virtBase: 0xc0100000, /* 3G + 1M */
+			keepBss: true,
+			overrideEntry: false);
+		/* In order to be accepted by BOCHS, the size of kernelFlatFilename
+		 * must be divisable by `0x80000' (== 16heads * 64sectors_per_track * 512bytes)
+		 * Otherwise, the bootloader won't be able to read the entire kernel image! */
+		with (local fp = File.open(kernelFlatFilename, "rb+,nobuf")) {
+			print "HERE";
+			local isSize = fp.size();
+			local reqSize = ((isSize + (0x80000 - 1)) / 0x80000) * 0x80000;
+			print "HERE2";
+			assert reqSize >= isSize;
+			print "HERE3";
+			if (reqSize > isSize) {
+				print "HERE4";
+				fp.seek(reqSize - 1);
+				print "HERE5";
+				fp.write("\0");
+			}
+			print "HERE6";
+		}
+	}
+	try fs.unlink(diskFile + ".lock"); catch (...);
+	try fs.unlink(kernelFlatFilename + ".lock"); catch (...);
+	with (local rc = File.open(bxrcFilename, "w")) {
+		rc << "romimage: file=" << repr(fs.joinpath(bochs_bios, BOCHS_BIOS)) << "\n";
+		rc << "vgaromimage: file=" << repr(fs.joinpath(bochs_bios, BOCHS_VGABIOS)) << "\n";
+		rc << "boot: disk\n";
+		rc << "ata0-master: type=disk, path=" << repr(fs.tailof(kernelFlatFilename))
+			<< ", mode=flat, cylinders=0, heads=16, spt=63, model=\"Generic 1234\", biosdetect=auto, translation=auto\n";
+		rc << "ata1-master: type=disk, path=" << repr(fs.relpath(diskFile, fs.headof(kernelFlatFilename)))
+			<< ", mode=flat, cylinders=0, heads=0, spt=0, model=\"Generic 1234\", biosdetect=auto, translation=auto\n";
+		rc << "cpuid: level=6, stepping=3, model=3, family=6, vendor_string=\"GenuineIntel\", brand_string=\"BOCHS         Intel(R) Pentium(R) 4 CPU        \"\n";
+		rc << "cpu: count=1, ips=4000000, model=bx_generic, reset_on_triple_fault=0, cpuid_limit_winnt=0, ignore_bad_msrs=1, mwait_is_nop=0\n";
+		rc << "cpuid: mmx=1, apic=xapic, simd=sse2, sse4a=0, misaligned_sse=0, sep=1, movbe=0, adx=0\n";
+		rc << "cpuid: aes=0, sha=0, xsave=0, xsaveopt=0, x86_64=1, 1g_pages=0, pcid=0, fsgsbase=0\n";
+		rc << "port_e9_hack: enabled=1\n";
+
+//		rc << "load32bitOSImage: os=nullkernel, path=" << repr(kernelFlatFilename) << ", iolog=, initrd=\n";
+//		rc << "plugin_ctrl: unmapped=1, biosdev=1, speaker=1, extfpuirq=1, parallel=1, serial=1, gameport=1\n";
+//		rc << "config_interface: win32config\n";
+//		rc << "display_library: win32, options=\"gui_debug\"\n";
+//		rc << "memory: host=256, guest=256\n";
+//		rc << "boot: floppy\n";
+//		rc << "floppy_bootsig_check: disabled=0\n";
+//		rc << "ata0: enabled=1, ioaddr1=0x1f0, ioaddr2=0x3f0, irq=14\n";
+//		rc << "ata0-slave: type=none\n";
+//		rc << "ata1: enabled=1, ioaddr1=0x170, ioaddr2=0x370, irq=15\n";
+//		rc << "ata1-master: type=none\n";
+//		rc << "ata1-slave: type=none\n";
+//		rc << "ata2: enabled=0\n";
+//		rc << "ata3: enabled=0\n";
+//		rc << "pci: enabled=1, chipset=i440fx\n";
+//		rc << "vga: extension=vbe, update_freq=5, realtime=1\n";
+//		rc << "#cpuid: smep=0, smap=0, mwait=1, vmx=1\n";
+//		rc << "print_timestamps: enabled=0\n";
+//		rc << "private_colormap: enabled=1\n";
+//		rc << "clock: sync=none, time0=local, rtc_sync=0\n";
+//		rc << "log: -\n";
+//		rc << "logprefix: %t%e%d\n";
+//		rc << "debug: action=ignore\n";
+//		rc << "info: action=report\n";
+//		rc << "error: action=report\n";
+//		rc << "panic: action=ask\n";
+//		rc << "keyboard: type=mf, serial_delay=250, paste_delay=100000, user_shortcut=none\n";
+//		rc << "mouse: type=ps2, enabled=0, toggle=ctrl+mbutton\n";
+//		rc << "sound: waveoutdrv=win, waveout=none, waveindrv=win, wavein=none, midioutdrv=win, midiout=none\n";
+//		rc << "speaker: enabled=1, mode=sound\n";
+//		rc << "parport1: enabled=1, file=none\n";
+//		rc << "parport2: enabled=0\n";
+//		rc << "com1: enabled=1, mode=null\n";
+//		rc << "com2: enabled=0\n";
+//		rc << "com3: enabled=0\n";
+//		rc << "com4: enabled=0\n";
+	}
+	bochs_arguments.extend({ "-q", "-f", fs.tailof(bxrcFilename) });
+	print "Bochs arguments", repr(bochs_arguments);
+	bochs = fs.abspath(bochs);
+	local proc = ipc.Process(bochs, bochs_arguments);
+	local r, w = ipc.Pipe.new()...;
+	proc.stdout = w;
+	proc.stderr = w;
+	local ocwd = fs.getcwd();
+	fs.chdir(fs.headof(kernelFlatFilename));
+	proc.start();
+	fs.chdir(ocwd);
+	try {
+		w.close();
+		common.processKosDebugOutput(
+			r: r,
+			groups: groups,
+			config: config);
+		joinProcess(proc);
+	} @[interrupt] catch (e...) {
+		proc.terminate();
+		throw;
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

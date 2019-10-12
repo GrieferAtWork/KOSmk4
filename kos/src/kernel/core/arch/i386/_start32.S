@@ -78,9 +78,14 @@ EXTERN(__kernel_boottask_stack)
 EXTERN(__x86_bootcpu_features)
 EXTERN(__x86_bootcpu_idfeatures)
 
+#ifndef CONFIG_NO_BOOT0
+#include "_boot0.S"
+#endif /* !CONFIG_NO_BOOT0 */
+
 .section .text.free
 INTERN_FUNCTION(_start)
 	/* Boot loader entry point. */
+
 	movl   %edi, V2P(boot_cpustate + OFFSET_FCPUSTATE32_GPREGS + OFFSET_GPREGS32_EDI)
 	movl   %esi, V2P(boot_cpustate + OFFSET_FCPUSTATE32_GPREGS + OFFSET_GPREGS32_ESI)
 	movl   %ebp, V2P(boot_cpustate + OFFSET_FCPUSTATE32_GPREGS + OFFSET_GPREGS32_EBP)
