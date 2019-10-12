@@ -391,7 +391,7 @@ got_exe:
 			"-device", "vt82c686b-usb-uhci,id=uhci",
 			"-device", "usb-storage,bus=uhci.0,drive=usb1",
 			"-device", "usb-mouse,bus=ohci.0",
-			"-device", "usb-kbd,bus=uhci.0",
+//			"-device", "usb-kbd,bus=uhci.0",
 		});
 	}
 	local enableMonitorCommands = false;

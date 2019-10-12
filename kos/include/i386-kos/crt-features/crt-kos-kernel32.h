@@ -293,10 +293,12 @@
 #define __CRT_HAVE_dbg_asmview 1
 #define __CRT_HAVE_dbg_attr 1
 #define __CRT_HAVE_dbg_autocomplete_command 1
+#define __CRT_HAVE_dbg_beginupdate 1
 #define __CRT_HAVE_dbg_bell 1
 #define __CRT_HAVE_dbg_default_attr 1
 #define __CRT_HAVE_dbg_draweditfield 1
 #define __CRT_HAVE_dbg_editfield 1
+#define __CRT_HAVE_dbg_endupdate 1
 #define __CRT_HAVE_dbg_enter_fcpustate 1
 #define __CRT_HAVE_dbg_enter_here 1
 #define __CRT_HAVE_dbg_enter_icpustate 1
@@ -354,6 +356,8 @@
 #define __CRT_HAVE_dbg_setcur_visible 1
 #define __CRT_HAVE_dbg_setreg 1
 #define __CRT_HAVE_dbg_setscreendata 1
+#define __CRT_HAVE_dbg_showscreen_end 1
+#define __CRT_HAVE_dbg_showscreen_start 1
 #define __CRT_HAVE_dbg_tabsize 1
 #define __CRT_HAVE_dbg_trygetc 1
 #define __CRT_HAVE_dbg_trygetkey 1

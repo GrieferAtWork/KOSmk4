@@ -374,16 +374,16 @@ dbg_process_key(unsigned int key) {
 }
 
 
-PRIVATE ATTR_DBGBSS u32 dbg_getkey_pending[16] = { 0  };
-PRIVATE ATTR_DBGBSS u32 dbg_getkey_pending_cnt = 0;
+PRIVATE ATTR_DBGBSS u16 dbg_getkey_pending[16] = { 0  };
+PRIVATE ATTR_DBGBSS u8 dbg_getkey_pending_cnt = 0;
 
 
 /* Unget a key to be re-returned by `dbg_(try)getkey'
  * When ungetting multiple keys, the key last unget'ed will be returned last. */
-PUBLIC ATTR_DBGTEXT NOBLOCK bool NOTHROW(KCALL dbg_ungetkey)(unsigned int key) {
+PUBLIC ATTR_DBGTEXT NOBLOCK bool NOTHROW(KCALL dbg_ungetkey)(u16 key) {
 	if (dbg_getkey_pending_cnt >= COMPILER_LENOF(dbg_getkey_pending))
 		return false;
-	dbg_getkey_pending[dbg_getkey_pending_cnt] = (u32)key;
+	dbg_getkey_pending[dbg_getkey_pending_cnt] = key;
 	++dbg_getkey_pending_cnt;
 	return true;
 }
@@ -392,14 +392,14 @@ PUBLIC ATTR_DBGTEXT NOBLOCK bool NOTHROW(KCALL dbg_ungetkey)(unsigned int key) {
 
 /* Wait for the user to press a key and return its keycode.
  * @return: * : One of `KEY_*' (from <kos/keyboard.h>) */
-LOCAL ATTR_DBGTEXT unsigned int
+LOCAL ATTR_DBGTEXT u16
 NOTHROW(KCALL dbg_getkey_impl)(bool blocking) {
-	unsigned int result;
+	u16 result;
 	u8 byte;
 	if (dbg_getkey_pending_cnt) {
-		result = (unsigned int)dbg_getkey_pending[0];
+		result = dbg_getkey_pending[0];
 		--dbg_getkey_pending_cnt;
-		memmovel(dbg_getkey_pending,
+		memmovew(dbg_getkey_pending,
 		         dbg_getkey_pending + 1,
 		         dbg_getkey_pending_cnt);
 		return result;
@@ -773,14 +773,14 @@ nokey:
 
 
 /* @return: 0: No keys available. */
-PUBLIC ATTR_DBGTEXT unsigned int
+PUBLIC ATTR_DBGTEXT u16
 NOTHROW(KCALL dbg_trygetkey)(void) {
 	return dbg_getkey_impl(false);
 }
 
 /* Wait for the user to press a key and return its keycode.
  * @return: * : One of `KEY_*' (from <kos/keyboard.h>) */
-PUBLIC ATTR_DBGTEXT unsigned int
+PUBLIC ATTR_DBGTEXT u16
 NOTHROW(KCALL dbg_getkey)(void) {
 	return dbg_getkey_impl(true);
 }
@@ -942,23 +942,23 @@ print "\t}";
 
 
 
-PRIVATE ATTR_DBGBSS u32 dbg_getuni_pending[16] = { 0, };
-PRIVATE ATTR_DBGBSS unsigned int dbg_getuni_pending_cnt = 0;
+PRIVATE ATTR_DBGBSS char32_t dbg_getuni_pending[16] = { 0, };
+PRIVATE ATTR_DBGBSS u8 dbg_getuni_pending_cnt = 0;
 
 #define ANSI_ESCAPE "\033"
 
-PRIVATE ATTR_DBGTEXT NOBLOCK NONNULL((1)) u32
+PRIVATE ATTR_DBGTEXT NOBLOCK NONNULL((1)) char32_t
 NOTHROW(KCALL dbg_getuni_setstring)(char const *__restrict text) {
-	u32 result             = (u8)*text++;
+	char32_t result = (char32_t)(u8)*text++;
 	dbg_getuni_pending_cnt = 0;
 	for (; *text; ++text) {
-		dbg_getuni_pending[dbg_getuni_pending_cnt] = (u8)*text;
+		dbg_getuni_pending[dbg_getuni_pending_cnt] = (char32_t)(u8)*text;
 		++dbg_getuni_pending_cnt;
 	}
 	return result;
 }
 
-PUBLIC ATTR_DBGTEXT NOBLOCK bool NOTHROW(KCALL dbg_ungetuni)(/*utf-32*/ u32 ch) {
+PUBLIC ATTR_DBGTEXT NOBLOCK bool NOTHROW(KCALL dbg_ungetuni)(/*utf-32*/ char32_t ch) {
 	if (dbg_getuni_pending_cnt >= COMPILER_LENOF(dbg_getuni_pending))
 		return false;
 	dbg_getuni_pending[dbg_getuni_pending_cnt] = ch;
@@ -976,8 +976,9 @@ PUBLIC ATTR_DBGTEXT NOBLOCK void NOTHROW(KCALL dbg_purgeuni)(void) {
 
 /* Wait for the user to press a key and return the pressed character.
  * NOTE: Modifier keys aren't returned by this function. */
-PUBLIC ATTR_DBGTEXT /*utf-32*/u32 KCALL dbg_getuni(void) {
-	u32 key, result;
+PUBLIC ATTR_DBGTEXT /*utf-32*/ char32_t KCALL dbg_getuni(void) {
+	u16 key;
+	char32_t result;
 	if (dbg_getuni_pending_cnt) {
 		result = dbg_getuni_pending[0];
 		--dbg_getuni_pending_cnt;
@@ -1092,8 +1093,9 @@ PUBLIC ATTR_DBGTEXT NOBLOCK bool NOTHROW(KCALL dbg_isholding_altgr)(void) {
 	       (PS2_KEYBOARD_MODIFIER_CTRL | PS2_KEYBOARD_MODIFIER_ALT);
 }
 
-PUBLIC ATTR_DBGTEXT /*utf-32*/u32 KCALL dbg_trygetuni(void) {
-	u32 key, result;
+PUBLIC ATTR_DBGTEXT /*utf-32*/ char32_t KCALL dbg_trygetuni(void) {
+	u16 key;
+	char32_t result;
 	if (dbg_getuni_pending_cnt) {
 		result = dbg_getuni_pending[0];
 		--dbg_getuni_pending_cnt;

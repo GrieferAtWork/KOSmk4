@@ -148,8 +148,10 @@ NOTHROW(FCALL debugger_wait_for_done)(struct icpustate *__restrict state,
 }
 #endif /* !CONFIG_NO_SMP */
 
-INTDEF void KCALL x86_debug_initialize_vga_terminal(void);
-INTDEF void KCALL x86_debug_finalize_vga_terminal(void);
+INTDEF void KCALL dbg_initialize_tty(void);
+INTDEF void KCALL dbg_finalize_tty(void);
+INTDEF void KCALL dbg_reset_tty(void);
+
 INTDEF void KCALL x86_debug_initialize_ps2_keyboard(void);
 INTDEF void KCALL x86_debug_finalize_ps2_keyboard(void);
 
@@ -304,7 +306,7 @@ INTERN ATTR_DBGTEXT void KCALL dbg_init(void) {
 			}
 		}
 	} else {
-		/* TODO: Use pointers from `dbg_exitstate' to determine the calling CPU */
+		/* XXX: Use pointers from `dbg_exitstate' to determine the calling CPU */
 		debug_mycpu = &_bootcpu;
 	}
 #endif /* !CONFIG_NO_SMP */
@@ -346,7 +348,7 @@ INTERN ATTR_DBGTEXT void KCALL dbg_init(void) {
 	x86_initialize_pic();
 
 	/* Configure VGA + PS/2 keyboard. */
-	x86_debug_initialize_vga_terminal();
+	dbg_initialize_tty();
 	x86_debug_initialize_ps2_keyboard();
 
 	/* Invoke global callbacks. */
@@ -357,6 +359,7 @@ INTERN ATTR_DBGTEXT void KCALL dbg_init(void) {
 INTERN ATTR_DBGTEXT void KCALL dbg_reset(void) {
 	/* Fix kernel segment bases. */
 	dbg_fix_segments();
+	dbg_reset_tty();
 	/* Invoke global callbacks. */
 	CALL_FUNCTIONS(__kernel_dbg_reset_start,
 	               __kernel_dbg_reset_end);
@@ -371,7 +374,7 @@ INTERN ATTR_DBGTEXT void KCALL dbg_fini(void) {
 	                   __kernel_dbg_fini_end);
 
 	x86_debug_finalize_ps2_keyboard();
-	x86_debug_finalize_vga_terminal();
+	dbg_finalize_tty();
 
 	/* Restore active exception information. */
 	memcpy(&FORTASK(debug_original_thread_, _this_exception_info),

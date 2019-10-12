@@ -121,24 +121,24 @@ FUNDEF void NOTHROW(KCALL dbg_impersonate_thread)(struct task *__restrict thread
 
 /* Wait for the user to press a key and return its keycode.
  * @return: * : One of `KEY_*' (from <kos/keyboard.h>) */
-FUNDEF unsigned int NOTHROW(KCALL dbg_getkey)(void);
-FUNDEF NOBLOCK unsigned int NOTHROW(KCALL dbg_trygetkey)(void); /* @return: 0: No keys available. */
+FUNDEF u16 NOTHROW(KCALL dbg_getkey)(void);
+FUNDEF NOBLOCK u16 NOTHROW(KCALL dbg_trygetkey)(void); /* @return: 0: No keys available. */
 
 /* Unget a key to be re-returned by `dbg_(try)getkey'
  * When ungetting multiple keys, the key last unget'ed will be returned last. */
-FUNDEF NOBLOCK bool NOTHROW(KCALL dbg_ungetkey)(unsigned int key);
+FUNDEF NOBLOCK bool NOTHROW(KCALL dbg_ungetkey)(u16 key);
 
 /* Wait for the user to press a key and return the pressed character.
  * NOTE: Modifier keys aren't returned by this function. */
-FUNDEF /*utf-8*/char KCALL dbg_getc(void);
-FUNDEF /*utf-32*/u32 KCALL dbg_getuni(void);
-FUNDEF NOBLOCK /*utf-8*/char KCALL dbg_trygetc(void);
-FUNDEF NOBLOCK /*utf-32*/u32 KCALL dbg_trygetuni(void);
+FUNDEF /*utf-8*/ char KCALL dbg_getc(void);
+FUNDEF /*utf-32*/ char32_t KCALL dbg_getuni(void);
+FUNDEF NOBLOCK /*utf-8*/ char KCALL dbg_trygetc(void);
+FUNDEF NOBLOCK /*utf-32*/ char32_t KCALL dbg_trygetuni(void);
 
 /* Unget a character to be re-returned by `dbg_(try)get(c|uni)'
  * When ungetting multiple characters, the character last unget'ed will be returned last. */
-FUNDEF NOBLOCK bool NOTHROW(KCALL dbg_ungetc)(/*utf-8*/char ch);
-FUNDEF NOBLOCK bool NOTHROW(KCALL dbg_ungetuni)(/*utf-32*/u32 ch);
+FUNDEF NOBLOCK bool NOTHROW(KCALL dbg_ungetc)(/*utf-8*/ char ch);
+FUNDEF NOBLOCK bool NOTHROW(KCALL dbg_ungetuni)(/*utf-32*/ char32_t ch);
 
 /* Check if there are pending unicode characters. */
 FUNDEF NOBLOCK bool NOTHROW(KCALL dbg_hasuni)(void);
@@ -177,20 +177,25 @@ FUNDEF size_t KCALL dbg_readline(/*utf-8*/char *__restrict buf, size_t bufsize,
 
 /* I/O within the debugger. */
 FUNDEF void NOTHROW(KCALL dbg_bell)(void);
-FUNDEF void NOTHROW(KCALL dbg_putc)(/*utf-8*/char ch);
-FUNDEF void NOTHROW(KCALL dbg_putuni)(/*utf-32*/u32 ch);
-FUNDEF void NOTHROW(KCALL dbg_fillscreen)(/*utf-32*/u32 ch); /* Fill the entire screen with `ch' */
-FUNDEF NONNULL((1)) void KCALL dbg_print(/*utf-8*/char const *__restrict str);
-FUNDEF NONNULL((1)) void VCALL dbg_printf(/*utf-8*/char const *__restrict format, ...);
-FUNDEF NONNULL((1)) void KCALL dbg_vprintf(/*utf-8*/char const *__restrict format, __builtin_va_list args);
-FUNDEF NONNULL((2)) ssize_t KCALL dbg_printer(void *ignored, /*utf-8*/char const *__restrict data, size_t datalen);
+FUNDEF void NOTHROW(KCALL dbg_putc)(/*utf-8*/ char ch);
+FUNDEF void NOTHROW(KCALL dbg_putuni)(/*utf-32*/ char32_t ch);
+FUNDEF void NOTHROW(KCALL dbg_fillscreen)(/*utf-32*/ char32_t ch); /* Fill the entire screen with `ch' */
+FUNDEF NONNULL((1)) size_t KCALL dbg_print(/*utf-8*/ char const *__restrict str);
+FUNDEF NONNULL((1)) size_t VCALL dbg_printf(/*utf-8*/ char const *__restrict format, ...);
+FUNDEF NONNULL((1)) size_t KCALL dbg_vprintf(/*utf-8*/ char const *__restrict format, __builtin_va_list args);
+FUNDEF NONNULL((2)) ssize_t KCALL dbg_printer(void *ignored, /*utf-8*/ char const *__restrict data, size_t datalen);
 
 /* Display a rectangle (frame) or box (filled) on-screen. */
-FUNDEF void NOTHROW(KCALL dbg_fillbox)(int x, int y, unsigned int size_x, unsigned int size_y, /*utf-32*/u32 ch);
-FUNDEF void NOTHROW(KCALL dbg_fillrect)(int x, int y, unsigned int size_x, unsigned int size_y, /*utf-32*/u32 ch);
-FUNDEF void NOTHROW(KCALL dbg_fillrect2)(int x, int y, unsigned int size_x, unsigned int size_y, /*utf-32*/u32 tl, /*utf-32*/u32 t, /*utf-32*/u32 tr, /*utf-32*/u32 l, /*utf-32*/u32 r, /*utf-32*/u32 bl, /*utf-32*/u32 b, /*utf-32*/u32 br);
-FUNDEF void NOTHROW(KCALL dbg_hline)(int x, int y, unsigned int size_x, /*utf-32*/u32 ch);
-FUNDEF void NOTHROW(KCALL dbg_vline)(int x, int y, unsigned int size_y, /*utf-32*/u32 ch);
+FUNDEF void NOTHROW(KCALL dbg_fillbox)(int x, int y, unsigned int size_x,
+                                       unsigned int size_y, /*utf-32*/ char32_t ch);
+FUNDEF void NOTHROW(KCALL dbg_fillrect)(int x, int y, unsigned int size_x,
+                                        unsigned int size_y, /*utf-32*/ char32_t ch);
+FUNDEF void NOTHROW(KCALL dbg_fillrect2)(int x, int y, unsigned int size_x, unsigned int size_y,
+                                         /*utf-32*/ char32_t tl, /*utf-32*/ char32_t t, /*utf-32*/ char32_t tr,
+                                         /*utf-32*/ char32_t l,                         /*utf-32*/ char32_t r,
+                                         /*utf-32*/ char32_t bl, /*utf-32*/ char32_t b, /*utf-32*/ char32_t br);
+FUNDEF void NOTHROW(KCALL dbg_hline)(int x, int y, unsigned int size_x, /*utf-32*/ char32_t ch);
+FUNDEF void NOTHROW(KCALL dbg_vline)(int x, int y, unsigned int size_y, /*utf-32*/ char32_t ch);
 
 /* Fill a rectangle with single-stroke or double-stroke outline */
 #define dbg_fillrect_singlestroke(x, y, size_x, size_y) \
@@ -203,11 +208,11 @@ FUNDEF void NOTHROW(KCALL dbg_vline)(int x, int y, unsigned int size_y, /*utf-32
 	              0x2551, 0x255A, 0x2550, 0x255D)
 
 /* Print text to the given coords. */
-FUNDEF void NOTHROW(KCALL dbg_pputuni)(int x, int y, /*utf-32*/u32 ch);
-FUNDEF void KCALL dbg_pprint(int x, int y, /*utf-8*/char const *__restrict str);
-FUNDEF void VCALL dbg_pprintf(int x, int y, /*utf-8*/char const *__restrict format, ...);
-FUNDEF void KCALL dbg_vpprintf(int x, int y, /*utf-8*/char const *__restrict format, __builtin_va_list args);
-FUNDEF ssize_t KCALL dbg_pprinter(/*dbg_pprinter_arg_t*/void *arg, /*utf-8*/char const *__restrict data, size_t datalen);
+FUNDEF void NOTHROW(KCALL dbg_pputuni)(int x, int y, /*utf-32*/ char32_t ch);
+FUNDEF size_t KCALL dbg_pprint(int x, int y, /*utf-8*/ char const *__restrict str);
+FUNDEF size_t VCALL dbg_pprintf(int x, int y, /*utf-8*/ char const *__restrict format, ...);
+FUNDEF size_t KCALL dbg_vpprintf(int x, int y, /*utf-8*/ char const *__restrict format, __builtin_va_list args);
+FUNDEF ssize_t KCALL dbg_pprinter(/*dbg_pprinter_arg_t*/ void *arg, /*utf-8*/ char const *__restrict data, size_t datalen);
 typedef struct {
 	int p_printx;  /* X-coord of the next character */
 	int p_printy;  /* Y-coord of the next character */
@@ -344,8 +349,8 @@ DATDEF unsigned int dbg_newline_mode; /* Debugger new-line mode */
  *      `dbg_setscreendata()' will apply `dbg_scroll(DBG_SCROLL_CMD_SET,0)'
  *       before actually copying cells.
  * @param: buf: A buffer capable of holding `size_x * size_y * dbg_screen_cellsize' bytes of data. */
-FUNDEF NONNULL((5)) void (KCALL dbg_getscreendata)(int x, int y, unsigned int size_x, unsigned int size_y, void *__restrict buf);
-FUNDEF NONNULL((5)) void (KCALL dbg_setscreendata)(int x, int y, unsigned int size_x, unsigned int size_y, void const *__restrict buf);
+FUNDEF NONNULL((5)) void KCALL dbg_getscreendata(int x, int y, unsigned int size_x, unsigned int size_y, void *__restrict buf);
+FUNDEF NONNULL((5)) void KCALL dbg_setscreendata(int x, int y, unsigned int size_x, unsigned int size_y, void const *__restrict buf);
 
 
 /* Set if the current cursor position should be visible.
@@ -356,12 +361,27 @@ FUNDEF bool NOTHROW(KCALL dbg_setcur_visible)(unsigned int cmd);
 #define DBG_SETCUR_VISIBLE_SHOW 1 /* Show the cursor. */
 #define DBG_SETCUR_VISIBLE_TEST 2 /* Check if the cursor is visible. */
 
+/* Hints towards the screen driver to temporarily stop drawing to the screen,
+ * but instead draw to a separate buffer, thus preventing flickering in the
+ * case of whole screen redraw operations.
+ * NOTE: Also affects updates made to the cursor position
+ * @param: force: When true, force updates to stop. */
+FUNDEF void NOTHROW(KCALL dbg_beginupdate)(void);
+FUNDEF void NOTHROW(KCALL dbg_endupdate)(bool force DFL(false));
+
+/* TTY show-screen support (display the contents of the monitor before the debugger was enabled) */
+FUNDEF void NOTHROW(KCALL dbg_showscreen_start)(void);
+FUNDEF void NOTHROW(KCALL dbg_showscreen_end)(void);
+
+
+
 /* Get/Set the current on-screen cursor position.
  * NOTE: Out-of-bounds coords are clamped to their valid ranges. */
 FUNDEF u32 NOTHROW(KCALL dbg_setcur)(int x, int y);
 FUNDEF u32 NOTHROW(KCALL dbg_getcur)(void);
-#define DBG_GETCUR_X(val)  ((unsigned int)((val) & 0xffff))
-#define DBG_GETCUR_Y(val)  ((unsigned int)((val) >> 16))
+#define DBG_GETCUR_X(val) ((unsigned int)((val)&0xffff))
+#define DBG_GETCUR_Y(val) ((unsigned int)((val) >> 16))
+#define DBG_MAKECUR(x, y) ((u32)(x) | ((u32)(y) << 16))
 LOCAL unsigned int NOTHROW(KCALL dbg_getcur_x)(void) { return DBG_GETCUR_X(dbg_getcur()); }
 LOCAL unsigned int NOTHROW(KCALL dbg_getcur_y)(void) { return DBG_GETCUR_Y(dbg_getcur()); }
 

@@ -114,27 +114,27 @@
 #ifndef KERNEL_STACKSIZE
 #ifdef __x86_64__
 #define KERNEL_STACKSIZE      49152    /* 4096*12 */
-#else
+#else /* __x86_64__ */
 #define KERNEL_STACKSIZE      32768    /* 4096*8 */
-#endif
-#endif
+#endif /* !__x86_64__ */
+#endif /* !KERNEL_STACKSIZE */
 #ifndef KERNEL_DF_STACKSIZE
 #ifdef __x86_64__
 #define KERNEL_DF_STACKSIZE   12288    /* 4096*3 */
-#else
+#else /* __x86_64__ */
 #define KERNEL_DF_STACKSIZE   8192     /* 4096*2 */
-#endif
-#endif
+#endif /* !__x86_64__ */
+#endif /* !KERNEL_DF_STACKSIZE */
 #ifndef KERNEL_IDLE_STACKSIZE
 #ifdef __x86_64__
 #define KERNEL_IDLE_STACKSIZE 8192     /* 4096*2 */
-#else
+#else /* __x86_64__ */
 #define KERNEL_IDLE_STACKSIZE 4096     /* 4096 */
-#endif
-#endif
+#endif /* !__x86_64__ */
+#endif /* !KERNEL_IDLE_STACKSIZE */
 #ifndef KERNEL_DEBUG_STACKSIZE
 #define KERNEL_DEBUG_STACKSIZE (KERNEL_STACKSIZE * 4)
-#endif
+#endif /* !KERNEL_DEBUG_STACKSIZE */
 
 #ifndef VM_VPAGE_MAX
 #define VM_VPAGE_MAX       __VM_VPAGE_MAX

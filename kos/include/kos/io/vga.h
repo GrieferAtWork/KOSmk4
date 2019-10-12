@@ -343,21 +343,21 @@ struct __ATTR_PACKED vga_mode {
 		 * (And wiki.osdev's VGA TTY page neglects to mention the seizure-           \
 		 *  inducing blinkyness that happens on real hardware and emulators          \
 		 *  ~supporting~ the VgA sTaNdArT's GrEaT iDeA oF iNcLuDiNg ThIs FeAtUrE) */ \
-		.vm_att_mode         = VGA_AT10_FDUP9 & ~(VGA_AT10_FBLINK),                  \
-		.vm_att_overscan     = 0x00,                                                 \
-		.vm_att_plane_enable = 0x0f & VGA_AT12_FMASK,                                \
-		.vm_att_pel          = 0x08 & VGA_AT13_FMASK,                                \
-		.vm_att_color_page   = 0x00,                                                 \
-		.vm_mis              = VGA_MIS_FCOLOR | VGA_MIS_FENB_MEM_ACCESS |            \
-		                       VGA_MIS_FVSYNCPOL | VGA_MIS_FHSYNCPOL |               \
-		                       VGA_MIS_FSEL_HIGH_PAGE,                               \
+		.vm_att_mode          = VGA_AT10_FDUP9 & ~(VGA_AT10_FBLINK),                 \
+		.vm_att_overscan      = 0x00,                                                \
+		.vm_att_plane_enable  = 0x0f & VGA_AT12_FMASK,                               \
+		.vm_att_pel           = 0x08 & VGA_AT13_FMASK,                               \
+		.vm_att_color_page    = 0x00,                                                \
+		.vm_mis               = VGA_MIS_FCOLOR | VGA_MIS_FENB_MEM_ACCESS |           \
+		                        VGA_MIS_FCLOCK_28322_720 | VGA_MIS_FHSYNCPOL |       \
+		                        VGA_MIS_FSEL_HIGH_PAGE,                              \
 		.vm_gfx_sr_value      = 0x00,                                                \
 		.vm_gfx_sr_enable     = 0x00,                                                \
 		.vm_gfx_compare_value = 0x00,                                                \
 		.vm_gfx_data_rotate   = 0x00,                                                \
 		.vm_gfx_plane_read    = 0x00,                                                \
-		.vm_gfx_mode          = 0x10,                                                \
-		.vm_gfx_misc          = 0x0e,                                                \
+		.vm_gfx_mode          = VGA_GR05_FHOSTOE,                                    \
+		.vm_gfx_misc          = VGA_GR06_FCHAINOE | VGA_GR06_FMM_32K_HI,             \
 		.vm_gfx_compare_mask  = 0x0f,                                                \
 		.vm_gfx_bit_mask      = 0xff,                                                \
 		.vm_crt_h_total       = 0x5f,                                                \
@@ -370,13 +370,19 @@ struct __ATTR_PACKED vga_mode {
 		.vm_crt_overflow      = 0x1f,                                                \
 		.vm_crt_preset_row    = 0x00,                                                \
 		.vm_crt_max_scan      = 0x4f,                                                \
+		.vm_crt_cursor_start  = 0x00,                                                \
+		.vm_crt_cursor_end    = 0x00,                                                \
+		.vm_crt_start_hi      = 0x00,                                                \
+		.vm_crt_start_lo      = 0x00,                                                \
+		.vm_crt_cursor_hi     = 0x00,                                                \
+		.vm_crt_cursor_lo     = 0x00,                                                \
 		.vm_crt_v_sync_start  = 0x9c,                                                \
 		.vm_crt_v_sync_end    = 0x8e,                                                \
 		.vm_crt_v_disp_end    = 0x8f,                                                \
 		.vm_crt_offset        = 0x28,                                                \
 		.vm_crt_underline     = 0x1f,                                                \
 		.vm_crt_v_blank_start = 0x96,                                                \
-		.vm_crt_v_blank_end   = 0xb9 & ~VGA_CR16_FRESERVED,                          \
+		.vm_crt_v_blank_end   = 0x39,                                                \
 		.vm_crt_mode          = 0xa3,                                                \
 		.vm_crt_line_compare  = 0xff,                                                \
 		.vm_seq_clock_mode    = 0x00,                                                \

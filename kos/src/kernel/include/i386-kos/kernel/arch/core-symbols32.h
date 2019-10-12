@@ -1835,9 +1835,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname458 /* index: 458 */
-	.weak sys_klstat; .long sys_klstat
-	.reloc ., R_386_SIZE32, sys_klstat; .long 0
-	.long 0x6241a14
+	.weak sys_kfstat; .long sys_kfstat
+	.reloc ., R_386_SIZE32, sys_kfstat; .long 0
+	.long 0x61a1a14
 	.long 0 /* index: 459 */
 	.long 0
 	.long 0
@@ -2023,9 +2023,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname505 /* index: 505 */
-	.weak sys_clock_nanosleep64; .long sys_clock_nanosleep64
-	.reloc ., R_386_SIZE32, sys_clock_nanosleep64; .long 0
-	.long 0x435e854
+	.weak dbg_showscreen_end; .long dbg_showscreen_end
+	.reloc ., R_386_SIZE32, dbg_showscreen_end; .long 0
+	.long 0x2861854
 	.long 0 /* index: 506 */
 	.long 0
 	.long 0
@@ -4631,9 +4631,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, dbg_indent; .long 0
 	.long 0x6020484
 	.long .Lname1157 /* index: 1157 */
-	.weak vm_datapart_lock_trywrite; .long vm_datapart_lock_trywrite
-	.reloc ., R_386_SIZE32, vm_datapart_lock_trywrite; .long 0
-	.long 0x20bd485
+	.weak dbg_endupdate; .long dbg_endupdate
+	.reloc ., R_386_SIZE32, dbg_endupdate; .long 0
+	.long 0x14bf485
 	.long 0 /* index: 1158 */
 	.long 0
 	.long 0
@@ -9166,10 +9166,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 2291 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2291 /* index: 2291 */
+	.weak sys_klstat; .long sys_klstat
+	.reloc ., R_386_SIZE32, sys_klstat; .long 0
+	.long 0x6241a14
 	.long .Lname2292 /* index: 2292 */
 	.weak json_parser_init; .long json_parser_init
 	.reloc ., R_386_SIZE32, json_parser_init; .long 0
@@ -9639,9 +9639,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname2409 /* index: 2409 */
-	.weak path_newchild; .long path_newchild
-	.reloc ., R_386_SIZE32, path_newchild; .long 0
-	.long 0xa530a14
+	.weak heap_alloc_untraced; .long heap_alloc_untraced
+	.reloc ., R_386_SIZE32, heap_alloc_untraced; .long 0
+	.long 0x8158a14
 	.long 0 /* index: 2410 */
 	.long 0
 	.long 0
@@ -10323,9 +10323,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, driver_unloaded_callbacks; .long 0
 	.long 0x6a5da13
 	.long .Lname2580 /* index: 2580 */
-	.weak heap_align_untraced; .long heap_align_untraced
-	.reloc ., R_386_SIZE32, heap_align_untraced; .long 0
-	.long 0x9fe1a14
+	.weak dbg_showscreen_start; .long dbg_showscreen_start
+	.reloc ., R_386_SIZE32, dbg_showscreen_start; .long 0
+	.long 0x626ba14
 	.long .Lname2581 /* index: 2581 */
 	.weak inode_awrite; .long inode_awrite
 	.reloc ., R_386_SIZE32, inode_awrite; .long 0
@@ -10370,10 +10370,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak vm_datablock_read_unsafe; .long vm_datablock_read_unsafe
 	.reloc ., R_386_SIZE32, vm_datablock_read_unsafe; .long 0
 	.long 0x881af05
-	.long 0 /* index: 2592 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2592 /* index: 2592 */
+	.weak sys_clock_nanosleep64; .long sys_clock_nanosleep64
+	.reloc ., R_386_SIZE32, sys_clock_nanosleep64; .long 0
+	.long 0x435e854
 	.long 0 /* index: 2593 */
 	.long 0
 	.long 0
@@ -11390,10 +11390,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 2847 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2847 /* index: 2847 */
+	.weak vm_datapart_lock_trywrite; .long vm_datapart_lock_trywrite
+	.reloc ., R_386_SIZE32, vm_datapart_lock_trywrite; .long 0
+	.long 0x20bd485
 	.long 0 /* index: 2848 */
 	.long 0
 	.long 0
@@ -12346,10 +12346,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak sys_chdir; .long sys_chdir
 	.reloc ., R_386_SIZE32, sys_chdir; .long 0
 	.long 0x9599202
-	.long 0 /* index: 3086 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname3086 /* index: 3086 */
+	.weak vm_datapart_readv; .long vm_datapart_readv
+	.reloc ., R_386_SIZE32, vm_datapart_readv; .long 0
+	.long 0x2bdea86
 	.long .Lname3087 /* index: 3087 */
 	.weak error_as_errno; .long error_as_errno
 	.reloc ., R_386_SIZE32, error_as_errno; .long 0
@@ -12775,9 +12775,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, vm_datapart_lockwrite_setcore_nx; .long 0
 	.long 0x3700c78
 	.long .Lname3193 /* index: 3193 */
-	.weak heap_allat_untraced; .long heap_allat_untraced
-	.reloc ., R_386_SIZE32, heap_allat_untraced; .long 0
-	.long 0x8297a14
+	.weak heap_align_untraced; .long heap_align_untraced
+	.reloc ., R_386_SIZE32, heap_align_untraced; .long 0
+	.long 0x9fe1a14
 	.long 0 /* index: 3194 */
 	.long 0
 	.long 0
@@ -15035,9 +15035,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname3758 /* index: 3758 */
-	.weak heap_alloc_untraced; .long heap_alloc_untraced
-	.reloc ., R_386_SIZE32, heap_alloc_untraced; .long 0
-	.long 0x8158a14
+	.weak heap_allat_untraced; .long heap_allat_untraced
+	.reloc ., R_386_SIZE32, heap_allat_untraced; .long 0
+	.long 0x8297a14
 	.long 0 /* index: 3759 */
 	.long 0
 	.long 0
@@ -15419,9 +15419,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname3854 /* index: 3854 */
-	.weak sys_kfstat; .long sys_kfstat
-	.reloc ., R_386_SIZE32, sys_kfstat; .long 0
-	.long 0x61a1a14
+	.weak path_newchild; .long path_newchild
+	.reloc ., R_386_SIZE32, path_newchild; .long 0
+	.long 0xa530a14
 	.long 0 /* index: 3855 */
 	.long 0
 	.long 0
@@ -15511,9 +15511,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname3877 /* index: 3877 */
-	.weak vm_datapart_readv; .long vm_datapart_readv
-	.reloc ., R_386_SIZE32, vm_datapart_readv; .long 0
-	.long 0x2bdea86
+	.weak dbg_beginupdate; .long dbg_beginupdate
+	.reloc ., R_386_SIZE32, dbg_beginupdate; .long 0
+	.long 0x89e7f25
 	.long 0 /* index: 3878 */
 	.long 0
 	.long 0
@@ -16851,7 +16851,7 @@ END(kernel_symbol_table)
 .Lname456:
 	.string "driver_symbol_ex"
 .Lname458:
-	.string "sys_klstat"
+	.string "sys_kfstat"
 .Lname465:
 	.string "x86_cpugdt"
 .Lname466:
@@ -16899,7 +16899,7 @@ END(kernel_symbol_table)
 .Lname501:
 	.string "cpu_schedule_idle_job_simple"
 .Lname505:
-	.string "sys_clock_nanosleep64"
+	.string "dbg_showscreen_end"
 .Lname510:
 	.string "unicode_readutf16_swap_n"
 .Lname511:
@@ -17585,7 +17585,7 @@ END(kernel_symbol_table)
 .Lname1156:
 	.string "dbg_indent"
 .Lname1157:
-	.string "vm_datapart_lock_trywrite"
+	.string "dbg_endupdate"
 .Lname1159:
 	.string "regdump_gpreg"
 .Lname1161:
@@ -18710,6 +18710,8 @@ END(kernel_symbol_table)
 	.string "pagedir_unmap"
 .Lname2289:
 	.string "sys_getpgid"
+.Lname2291:
+	.string "sys_klstat"
 .Lname2292:
 	.string "json_parser_init"
 .Lname2293:
@@ -18831,7 +18833,7 @@ END(kernel_symbol_table)
 .Lname2404:
 	.string "sys_getsid"
 .Lname2409:
-	.string "path_newchild"
+	.string "heap_alloc_untraced"
 .Lname2411:
 	.string "lookup_taskpid"
 .Lname2417:
@@ -18999,7 +19001,7 @@ END(kernel_symbol_table)
 .Lname2579:
 	.string "driver_unloaded_callbacks"
 .Lname2580:
-	.string "heap_align_untraced"
+	.string "dbg_showscreen_start"
 .Lname2581:
 	.string "inode_awrite"
 .Lname2582:
@@ -19012,6 +19014,8 @@ END(kernel_symbol_table)
 	.string "vm_datapart_lock_endread"
 .Lname2591:
 	.string "vm_datablock_read_unsafe"
+.Lname2592:
+	.string "sys_clock_nanosleep64"
 .Lname2596:
 	.string "json_writer_beginobject"
 .Lname2598:
@@ -19286,6 +19290,8 @@ END(kernel_symbol_table)
 	.string "task_yield"
 .Lname2844:
 	.string "sys_select64"
+.Lname2847:
+	.string "vm_datapart_lock_trywrite"
 .Lname2850:
 	.string "sys_pread64"
 .Lname2851:
@@ -19536,6 +19542,8 @@ END(kernel_symbol_table)
 	.string "vmb_apply"
 .Lname3085:
 	.string "sys_chdir"
+.Lname3086:
+	.string "vm_datapart_readv"
 .Lname3087:
 	.string "error_as_errno"
 .Lname3090:
@@ -19651,7 +19659,7 @@ END(kernel_symbol_table)
 .Lname3192:
 	.string "vm_datapart_lockwrite_setcore_nx"
 .Lname3193:
-	.string "heap_allat_untraced"
+	.string "heap_align_untraced"
 .Lname3200:
 	.string "pagedir_prepare_map_keep"
 .Lname3201:
@@ -20267,7 +20275,7 @@ END(kernel_symbol_table)
 .Lname3756:
 	.string "sys_fcntl"
 .Lname3758:
-	.string "heap_alloc_untraced"
+	.string "heap_allat_untraced"
 .Lname3763:
 	.string "vm_datablock_vio_read_phys"
 .Lname3764:
@@ -20359,7 +20367,7 @@ END(kernel_symbol_table)
 .Lname3852:
 	.string "inode_ioctl"
 .Lname3854:
-	.string "sys_kfstat"
+	.string "path_newchild"
 .Lname3856:
 	.string "pagedir_map_p"
 .Lname3857:
@@ -20389,7 +20397,7 @@ END(kernel_symbol_table)
 .Lname3873:
 	.string "sys_linux_fstat64"
 .Lname3877:
-	.string "vm_datapart_readv"
+	.string "dbg_beginupdate"
 .Lname3879:
 	.string "inode_read_phys_blocking"
 .Lname3881:

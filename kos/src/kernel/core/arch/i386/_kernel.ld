@@ -234,6 +234,7 @@ SECTIONS {
 		*(.data)
 		*(.data.cold)
 		*(.data.unlikely)
+		*(.data.local.*)
 
 #ifndef CONFIG_NO_BRANCH_PROFILING
 		PROVIDE_HIDDEN(kernel_profile_branch_start = ABSOLUTE(.));
