@@ -90,14 +90,15 @@ struct __ATTR_ALIGNED(ALIGNOF_XFPUSTATE32) __ATTR_PACKED xfpustate32 /*[PREFIX(f
 #endif /* !__COMPILER_HAVE_TRANSPARENT_STRUCT */
 	__u16                     fs_fcw;        /* Floating point control word. (Set of `FCW_*') */
 	__u16                     fs_fsw;        /* Floating point status word. (Set of `FSW_*') */
-	__u16                     fs_ftw;        /* Floating point tag word. (Indicates the contents of `fs_regs' with 2 bits per register; set of `FTW_*') */
+	__u8                      fs_ftw;        /* Compressed floating point tag word. (0 << i: FTW_EMPTY(i), 1 << i: FTW_(VALID|ZERO|SPEC)(i) (based on actually loaded value)) */
+	__u8                    __fs_pad1;       /* ... */
 	__u16                     fs_fop;        /* Lower 11-bit f.p. opcode. */
 	__u32                     fs_fpuip;      /* FPU instruction pointer. */
 	__u16                     fs_fpucs;      /* FPU code segment selector. */
-	__u16                   __fs_pad1;       /* ... */
+	__u16                   __fs_pad2;       /* ... */
 	__u32                     fs_fpudp;      /* FPU data pointer. */
 	__u16                     fs_fpuds;      /* FPU data segment selector. */
-	__u16                   __fs_pad2;       /* ... */
+	__u16                   __fs_pad3;       /* ... */
 #ifndef __COMPILER_HAVE_TRANSPARENT_STRUCT
 	} _fs_env_struct;
 #endif /* !__COMPILER_HAVE_TRANSPARENT_STRUCT */
@@ -108,7 +109,7 @@ struct __ATTR_ALIGNED(ALIGNOF_XFPUSTATE32) __ATTR_PACKED xfpustate32 /*[PREFIX(f
 	__u32                     fs_mxcsr_mask; /* MXCSR mask (SSE only) (Set of `MXCSR_', used to identify available features -- 11.6.6) */
 	union ieee854_long_double fs_regs[8];    /* ST(i) / MMi */
 	union ieee854_long_double fs_xmm[8];     /* XMMi */
-	__u8                    __fs_pad3[224];
+	__u8                    __fs_pad4[224];
 };
 
 #if !defined(__COMPILER_HAVE_TRANSPARENT_STRUCT) && !defined(__COMPILER_HAVE_TRANSPARENT_UNION)

@@ -155,13 +155,13 @@ union __ATTR_ALIGNED(8) __ATTR_PACKED ieee754_double {
 		unsigned int exponent : 11;
 		unsigned int negative : 1;
 		unsigned int mantissa1 : 32;
-#else
+#else /* __FLOAT_WORD_ORDER__ == __ORDER_BIG_ENDIAN__ */
 		/* Together these comprise the mantissa. */
 		unsigned int mantissa1 : 32;
 		unsigned int mantissa0 : 20;
 		unsigned int exponent : 11;
 		unsigned int negative : 1;
-#endif
+#endif /* __FLOAT_WORD_ORDER__ != __ORDER_BIG_ENDIAN__ */
 #endif /* Little endian. */
 	} ieee;
 
@@ -181,14 +181,14 @@ union __ATTR_ALIGNED(8) __ATTR_PACKED ieee754_double {
 		unsigned int exponent : 11;
 		unsigned int negative : 1;
 		unsigned int mantissa1 : 32;
-#else
+#else /* __FLOAT_WORD_ORDER__ == __ORDER_BIG_ENDIAN__ */
 		/* Together these comprise the mantissa. */
 		unsigned int mantissa1 : 32;
 		unsigned int mantissa0 : 19;
 		unsigned int quiet_nan : 1;
 		unsigned int exponent : 11;
 		unsigned int negative : 1;
-#endif
+#endif /* __FLOAT_WORD_ORDER__ != __ORDER_BIG_ENDIAN__ */
 #endif
 	} ieee_nan;
 };
@@ -218,13 +218,13 @@ union __ATTR_ALIGNED(16) __ATTR_PACKED ieee854_long_double {
 		unsigned int empty : 16;
 		unsigned int mantissa0 : 32;
 		unsigned int mantissa1 : 32;
-#else
+#else /* __FLOAT_WORD_ORDER__ == __ORDER_BIG_ENDIAN__ */
 		unsigned int mantissa1 : 32;
 		unsigned int mantissa0 : 32;
 		unsigned int exponent : 15;
 		unsigned int negative : 1;
 		unsigned int empty : 16;
-#endif
+#endif /* __FLOAT_WORD_ORDER__ != __ORDER_BIG_ENDIAN__ */
 #endif
 	} ieee;
 
@@ -247,15 +247,15 @@ union __ATTR_ALIGNED(16) __ATTR_PACKED ieee854_long_double {
 		unsigned int quiet_nan : 1;
 		unsigned int one : 1;
 		unsigned int mantissa1 : 32;
-#else
+#else /* __FLOAT_WORD_ORDER__ == __ORDER_BIG_ENDIAN__ */
 		unsigned int mantissa1 : 32;
 		unsigned int mantissa0 : 30;
-		unsigned int quiet_nan : 1;
-		unsigned int one : 1;
+		unsigned int quiet_nan : 1; /* Called the M-bit in the Intel manual */
+		unsigned int one : 1;       /* Called the Integer bit, or J-bit in the Intel manual */
 		unsigned int exponent : 15;
 		unsigned int negative : 1;
 		unsigned int empty : 16;
-#endif
+#endif /* __FLOAT_WORD_ORDER__ != __ORDER_BIG_ENDIAN__ */
 #endif
 	} ieee_nan;
 };
@@ -278,12 +278,12 @@ union __ATTR_PACKED ieee854_float80 {
 		unsigned int negative : 1;
 		unsigned int mantissa0 : 32;
 		unsigned int mantissa1 : 32;
-#else
+#else /* __FLOAT_WORD_ORDER__ == __ORDER_BIG_ENDIAN__ */
 		unsigned int mantissa1 : 32;
 		unsigned int mantissa0 : 32;
 		unsigned int exponent : 15;
 		unsigned int negative : 1;
-#endif
+#endif /* __FLOAT_WORD_ORDER__ != __ORDER_BIG_ENDIAN__ */
 #endif
 	} ieee;
 
@@ -304,14 +304,14 @@ union __ATTR_PACKED ieee854_float80 {
 		unsigned int quiet_nan : 1;
 		unsigned int one : 1;
 		unsigned int mantissa1 : 32;
-#else
+#else /* __FLOAT_WORD_ORDER__ == __ORDER_BIG_ENDIAN__ */
 		unsigned int mantissa1 : 32;
 		unsigned int mantissa0 : 30;
 		unsigned int quiet_nan : 1;
 		unsigned int one : 1;
 		unsigned int exponent : 15;
 		unsigned int negative : 1;
-#endif
+#endif /* __FLOAT_WORD_ORDER__ != __ORDER_BIG_ENDIAN__ */
 #endif
 	} ieee_nan;
 };

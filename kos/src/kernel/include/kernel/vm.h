@@ -151,17 +151,17 @@ struct vm_datapart {
 				uintptr_t       a_vmin_ptr; /* Lower bound. */
 #ifdef __INTELLISENSE__
 				struct{vm_dpage_t a_vmin;   /* Lower bound. */};
-#else
+#else /* __INTELLISENSE__ */
 				vm_dpage_t      a_vmin;     /* Lower bound. */
-#endif
+#endif /* !__INTELLISENSE__ */
 			};
 			union ATTR_PACKED {
 				uintptr_t       a_vmax_ptr; /* Upper bound. */
 #ifdef __INTELLISENSE__
 				struct{vm_dpage_t a_vmax;   /* Upper bound. */};
-#else
+#else /* __INTELLISENSE__ */
 				vm_dpage_t      a_vmax;     /* Upper bound. */
-#endif
+#endif /* !__INTELLISENSE__ */
 			};
 		}                              dp_tree_ptr;
 		ATREE_NODE(struct vm_datapart, vm_dpage_t)
@@ -345,15 +345,15 @@ NOBLOCK vm_vpage64_t NOTHROW(KCALL vm_datapart_endvpage)(struct vm_datapart *__r
 #define vm_datapart_minbyte(self)    ((vm_daddr_t)(self)->dp_tree.a_vmin << VM_DATABLOCK_ADDRSHIFT((self)->dp_block))
 #define vm_datapart_mindpage(self)   ((vm_dpage_t)(self)->dp_tree.a_vmin)
 #define vm_datapart_minvpage(self)   ((vm_vpage64_t)(self)->dp_tree.a_vmin >> VM_DATABLOCK_PAGESHIFT((self)->dp_block))
-#define vm_datapart_maxbyte(self)  ((((vm_daddr_t)(self)->dp_tree.a_vmax + 1) << VM_DATABLOCK_ADDRSHIFT((self)->dp_block)) - 1)
+#define vm_datapart_maxbyte(self)    ((((vm_daddr_t)(self)->dp_tree.a_vmax + 1) << VM_DATABLOCK_ADDRSHIFT((self)->dp_block)) - 1)
 #define vm_datapart_maxdpage(self)   ((vm_dpage_t)(self)->dp_tree.a_vmax)
 #define vm_datapart_maxvpage(self)   ((vm_vpage64_t)((self)->dp_tree.a_vmax >> VM_DATABLOCK_PAGESHIFT((self)->dp_block)))
-#define vm_datapart_startbyte(self)    vm_datapart_minbyte(self)
-#define vm_datapart_startdpage(self)   vm_datapart_mindpage(self)
-#define vm_datapart_startvpage(self)   vm_datapart_minvpage(self)
-#define vm_datapart_endbyte(self)   (((vm_daddr_t)(self)->dp_tree.a_vmax + 1) << VM_DATABLOCK_ADDRSHIFT((self)->dp_block))
+#define vm_datapart_startbyte(self)  vm_datapart_minbyte(self)
+#define vm_datapart_startdpage(self) vm_datapart_mindpage(self)
+#define vm_datapart_startvpage(self) vm_datapart_minvpage(self)
+#define vm_datapart_endbyte(self)    (((vm_daddr_t)(self)->dp_tree.a_vmax + 1) << VM_DATABLOCK_ADDRSHIFT((self)->dp_block))
 #define vm_datapart_enddpage(self)   ((vm_dpage_t)(self)->dp_tree.a_vmax + 1)
-#define vm_datapart_endvpage(self)    (vm_datapart_maxvpage(self) + 1)
+#define vm_datapart_endvpage(self)   (vm_datapart_maxvpage(self) + 1)
 #endif
 
 

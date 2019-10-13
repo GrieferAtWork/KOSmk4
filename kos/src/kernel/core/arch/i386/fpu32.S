@@ -23,6 +23,7 @@
 
 #include <asm/cfi.h>
 #include <asm/cpu-flags.h>
+#include <asm/instr/jccN.h>
 #include <kos/kernel/fpu-sstate.h>
 #include <kos/kernel/fpu-state32.h>
 
@@ -64,21 +65,32 @@ PUBLIC_FUNCTION(x86_fpustate_init)
 	 * >>          FCW_PC_EXTEND | FCW_RC_NEAREST),  \
 	 * >>        OFFSET_XFPUSTATE_FCW(%ecx) */
 #if OFFSET_XFPUSTATE_FCW == 0
-	.byte 0x66, 0xc7, 0x01
-#else
-	.byte 0x66, 0xc7, 0x41
-	.byte OFFSET_XFPUSTATE_FCW
-#endif
-	.word (FCW_IM | FCW_DM | FCW_ZM | FCW_OM | \
-	       FCW_UM | FCW_PM | 0x40 | /* ??? */ \
-	       FCW_PC_EXTEND | FCW_RC_NEAREST)
+	.byte  0x66, 0xc7, 0x01
+#else /* OFFSET_XFPUSTATE_FCW == 0 */
+	.byte  0x66, 0xc7, 0x41
+	.byte  OFFSET_XFPUSTATE_FCW
+#endif /* OFFSET_XFPUSTATE_FCW != 0 */
+	.word  (FCW_IM | FCW_DM | FCW_ZM | FCW_OM | \
+	        FCW_UM | FCW_PM | 0x40 | /* ??? */ \
+	        FCW_PC_EXTEND | FCW_RC_NEAREST)
 
 	/* movw   $(FTW_ALLEMPTY),  OFFSET_XFPUSTATE_FTW(%ecx) */
-	.byte 0x66, 0xc7, 0x41
+	.byte  0x66, 0xc7, 0x41
 INTERN_FUNCTION(x86_fpustate_init_ftw_offset_byte)
-	.byte OFFSET_XFPUSTATE_FTW
+	.byte  OFFSET_XFPUSTATE_FTW
 END(x86_fpustate_init_ftw_offset_byte)
-	.word FTW_ALLEMPTY
+INTERN_FUNCTION(x86_fpustate_init_ftw_value)
+	.word  FTW_ALLEMPTY
+END(x86_fpustate_init_ftw_value)
+
+	/* movw   $(MXCSR_...),  OFFSET_XFPUSTATE_MXCSR(%ecx) */
+INTERN_FUNCTION(x86_fpustate_init_mxcsr)
+	.byte  0xc7, 0x41
+	.byte  OFFSET_XFPUSTATE_MXCSR
+INTERN_FUNCTION(x86_fpustate_init_mxcsr_value)
+	.long  (MXCSR_IM | MXCSR_DM | MXCSR_ZM | MXCSR_OM | MXCSR_UM | MXCSR_PM)
+END(x86_fpustate_init_mxcsr_value)
+END(x86_fpustate_init_mxcsr)
 	ret
 END(x86_fpustate_init)
 	.cfi_endproc
@@ -97,8 +109,19 @@ PUBLIC_FUNCTION(x86_fxsave)
 
 	movw   OFFSET_SFPUSTATE_FSW(%ecx), %ax
 	movw   %ax, OFFSET_XFPUSTATE_FSW(%ecx)
-	movw   OFFSET_SFPUSTATE_FTW(%ecx), %ax
-	movw   %ax, OFFSET_XFPUSTATE_FTW(%ecx)
+
+	/* Compress the FTW word:
+	 * >> u8 res = 0;
+	 * >> for (unsigned int i = 0; i < 8; ++i) {
+	 * >>     if ((ftw & FTW_MASK(i)) != FTW_EMPTY(i))
+	 * >>         res |= 1 << i;
+	 * >> } */
+	pushl_cfi_r %ecx
+	INTERN(x86_fxsave_compress_ftw)
+	call   x86_fxsave_compress_ftw
+	popl_cfi_r %ecx
+	movb   %al, OFFSET_XFPUSTATE_FTW(%ecx)
+
 	movw   OFFSET_SFPUSTATE_FOP(%ecx), %ax
 	movw   %ax, OFFSET_XFPUSTATE_FOP(%ecx)
 	movl   OFFSET_SFPUSTATE_FPUIP(%ecx), %eax
@@ -183,7 +206,10 @@ PUBLIC_FUNCTION(x86_fxrstor)
 	movl   %eax, OFFSET_SFPUSTATE_FCW(%esp)
 	movzwl OFFSET_XFPUSTATE_FSW(%ecx), %eax
 	movl   %eax, OFFSET_SFPUSTATE_FSW(%esp)
-	movzwl OFFSET_XFPUSTATE_FTW(%ecx), %eax
+	pushl_cfi_r %ecx
+	INTERN(x86_fxsave_decompress_ftw)
+	call   x86_fxsave_decompress_ftw
+	popl_cfi_r %ecx
 	movl   %eax, OFFSET_SFPUSTATE_FTW(%esp)
 	movl   OFFSET_XFPUSTATE_FPUIP(%ecx), %eax
 	movl   %eax, OFFSET_SFPUSTATE_FPUIP(%esp)

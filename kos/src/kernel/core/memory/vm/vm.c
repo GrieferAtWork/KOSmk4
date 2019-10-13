@@ -3283,7 +3283,7 @@ vm_collect_and_lock_parts_and_vm(struct partnode_pair_vector *__restrict info,
 		}
 #define vm_datapart_numvpages_atomic(self)                                           \
 	((size_t)((ATOMIC_READ((self)->dp_tree.a_vmax) - (self)->dp_tree.a_vmin) + 1) >> \
-	 VM_DATABLOCK_PAGESHIFT(data))
+	 VM_DATABLOCK_PAGESHIFT((self)->dp_block))
 		/* Load additional parts which may span the specified range. */
 		total_pages = vm_datapart_numvpages_atomic(part);
 		while (total_pages < num_pages) {

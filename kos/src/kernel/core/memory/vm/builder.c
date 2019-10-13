@@ -91,7 +91,8 @@ NOTHROW(KCALL vmb_fini)(struct vmb *__restrict self) {
 
 #define vm_datapart_numvpages_atomic(self)                                           \
 	((size_t)((ATOMIC_READ((self)->dp_tree.a_vmax) - (self)->dp_tree.a_vmin) + 1) >> \
-	 VM_DATABLOCK_PAGESHIFT(data))
+	 VM_DATABLOCK_PAGESHIFT((self)->dp_block))
+
 
 PRIVATE NOBLOCK void
 NOTHROW(KCALL vmb_do_delete_whole_nodes)(struct vmb *__restrict self,
@@ -159,6 +160,27 @@ again:
 	 * Any reduction of this amount after this point will be handled once
 	 * the VMB gets applied (s.a. `vmb_apply()') */
 	num_vpages = vm_datapart_numvpages_atomic(part);
+	assertf(num_vpages != 0,
+	        "part                      = %p\n"
+	        "part->dp_tree.a_vmin      = %I64p\n"
+	        "part->dp_tree.a_vmax      = %I64p\n"
+	        "vm_datapart_minbyte(part) = %I64p\n"
+	        "vm_datapart_maxbyte(part) = %I64p\n"
+	        "VM_DATABLOCK_PAGESHIFT(.) = %u\n"
+	        "VM_DATABLOCK_ADDRSHIFT(.) = %u\n"
+	        "VM_DATABLOCK_PAGEALIGN(.) = %Iu\n"
+	        "VM_DATABLOCK_PAGEMASK(.)  = %Iu\n"
+	        "VM_DATABLOCK_PAGESIZE(.)  = %Iu",
+	        (uintptr_t)part,
+	        (u64)part->dp_tree.a_vmin,
+	        (u64)part->dp_tree.a_vmax,
+	        (u64)vm_datapart_minbyte(part),
+	        (u64)vm_datapart_maxbyte(part),
+	        VM_DATABLOCK_PAGESHIFT(part->dp_block),
+	        VM_DATABLOCK_ADDRSHIFT(part->dp_block),
+	        VM_DATABLOCK_PAGEALIGN(part->dp_block),
+	        VM_DATABLOCK_PAGEMASK(part->dp_block),
+	        VM_DATABLOCK_PAGESIZE(part->dp_block));
 	assert(num_vpages <= num_pages);
 
 	/* Initialize the new VM Node */

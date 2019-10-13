@@ -326,7 +326,10 @@ INTDEF byte_t x86_fxsave_section_stmxcsr[];
 INTDEF byte_t x86_fxsave_section_savexmm[];
 INTDEF byte_t x86_fxrstor_section_ldmxcsr[];
 INTDEF byte_t x86_fxrstor_section_loadxmm[];
+INTDEF byte_t x86_fpustate_init_mxcsr[];
 INTDEF byte_t x86_fpustate_init_ftw_offset_byte;
+INTDEF u32 x86_fpustate_init_mxcsr_value;
+INTDEF u16 x86_fpustate_init_ftw_value;
 
 
 #define ENCODE32(x) (x) & 0xff, ((x) & 0xff00) >> 8, ((x) & 0xff0000) >> 16, ((x) & 0xff000000) >> 24
@@ -349,6 +352,71 @@ DEFINE_VERY_EARLY_KERNEL_COMMANDLINE_OPTION(x86_config_nofpu,
                                             KERNEL_COMMANDLINE_OPTION_TYPE_BOOL,
                                             "nofpu");
 
+PRIVATE ATTR_FREETEXT void
+NOTHROW(KCALL test_fpu64)(void) {
+#define VAL1  __UINT64_C(0x0123456789abcdef)
+#define VAL2  __UINT64_C(0xfedcba9876543210)
+	volatile u64 value = VAL1;
+	u64 v;
+	v = ATOMIC_READ(value);
+	assertf(v == VAL1, "v = %#I64x", v);
+	ATOMIC_WRITE(value, VAL2);
+	v = ATOMIC_READ(value);
+	assertf(v == VAL2, "v = %#I64x", v);
+}
+
+/* Convert sfpustate's FTW to xfpustate's */
+INTERN NOBLOCK u8
+NOTHROW(FCALL x86_fxsave_compress_ftw)(struct sfpustate const *__restrict self) {
+	unsigned int i;
+	u16 ftw = self->fs_ftw;
+	u8 res = 0;
+	for (i = 0; i < 8; ++i) {
+		if ((ftw & FTW_MASK(i)) != FTW_EMPTY(i))
+			res |= 1 << i;
+	}
+	return res;
+}
+
+/* Convert xfpustate's FTW to sfpustate's
+ * NOTE: Return value is actually a `u16', but use `u32'
+ *       so assembly doesn't have to movzwl the value! */
+INTERN NOBLOCK u32
+NOTHROW(FCALL x86_fxsave_decompress_ftw)(struct xfpustate const *__restrict self) {
+	unsigned int i;
+	u8 ftw = self->fs_ftw;
+	u32 res = 0;
+	for (i = 0; i < 8; ++i) {
+		if (ftw & (1 << i)) {
+			/* s.a. `Table 3-45' in the Intel developer manual */
+			if (self->fs_regs[i].ieee_nan.exponent == 0x7fff) {
+				/* Special */
+				res |= FTW_SPEC(i);
+			} else if (self->fs_regs[i].ieee_nan.exponent == 0) {
+				if (self->fs_regs[i].ieee_nan.mantissa1 == 0 &&
+				    self->fs_regs[i].ieee_nan.mantissa0 == 0 &&
+					self->fs_regs[i].ieee_nan.one == 0)
+					res |= FTW_ZERO(i); /* Fraction all 0's (and j == 0) */
+				else {
+					res |= FTW_SPEC(i);
+				}
+			} else if (self->fs_regs[i].ieee_nan.one == 0) {
+				res |= FTW_SPEC(i);
+			} else {
+				res |= FTW_VALID(i);
+			}
+		} else {
+			res |= FTW_EMPTY(i);
+		}
+	}
+	return res;
+}
+
+
+#define HAVE_FPU  (CPUID_FEATURES.ci_1d & CPUID_1D_FPU)
+#define HAVE_FXSR (CPUID_FEATURES.ci_1d & CPUID_1D_FXSR)
+#define HAVE_SSE  (CPUID_FEATURES.ci_1d & CPUID_1D_SSE)
+
 
 INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_fpu)(void) {
 	u32 cr0;
@@ -364,7 +432,7 @@ setup_fpu_emulation:
 	}
 	/* Check for the existence of an FPU. */
 	cr0 = __rdcr0() & ~(CR0_EM | CR0_TS);
-	if (!(CPUID_FEATURES.ci_1d & CPUID_1D_FPU)) {
+	if (!HAVE_FPU) {
 		u16 testword = 0x55aa;
 		__wrcr0(cr0);
 		__fninit();
@@ -390,27 +458,35 @@ setup_fpu_emulation:
 	__wrcr0(cr0);
 
 	/* Re-write `x86_fxsave()' and `x86_fxrstor()' based on processor capabilities. */
-	if (CPUID_FEATURES.ci_1d & CPUID_1D_FXSR) {
+	if (HAVE_FXSR) {
 		u32 cr4;
 		cr4 = __rdcr4();
-		if (CPUID_FEATURES.ci_1d & CPUID_1D_SSE) {
+		if (HAVE_SSE) {
 			printk(FREESTR(KERN_INFO "[fpu] Enable SSE & #XF exception support\n"));
-			cr4 |= (CR4_OSFXSR | CR4_OSXMMEXCPT);
+			cr4 |= (CR4_OSFXSR/* | CR4_OSXMMEXCPT*/);
 		}
 		__wrcr4(cr4);
-		if (!(CPUID_FEATURES.ci_1d & CPUID_1D_SSE)) {
+		if (!HAVE_SSE) {
 			/* No SSE support */
 			x86_fxsave_mxcsr_mask_ = 0;
 		} else {
 			struct xfpustate32 fst;
 			fst.fs_mxcsr_mask = 0;
+			__fninit();
 			__fxsave(&fst);
 			if (!fst.fs_mxcsr_mask) /* Intel says that zero should equate `0xffbf' */
 				fst.fs_mxcsr_mask = 0x0000ffbf;
 			x86_fxsave_mxcsr_mask_ = fst.fs_mxcsr_mask;
 		}
+		/* Mask the default MXCSR value with what is actually available */
+		x86_fpustate_init_mxcsr_value &= x86_fxsave_mxcsr_mask_;
 		printk(FREESTR(KERN_INFO "[fpu] Enable native fxsave/fxrstor support [mxcsr_mask=%#I32x]\n"),
 		       x86_fxsave_mxcsr_mask_);
+		/* The FXSAVE variants version of FTW works differently: a 0-bit means an empty register,
+		 * and a 1-bit means a used register, whereas FSAVE assigns 2 bits per register, with 3
+		 * meaning empty, and 0-2 meaning used, potentially with special values. */
+		x86_fpustate_init_ftw_value = 0;
+
 		((byte_t *)&x86_fxsave)[0] = 0x0f; /* fxsave (%ecx) */
 		((byte_t *)&x86_fxsave)[1] = 0xae;
 		((byte_t *)&x86_fxsave)[2] = 0x01;
@@ -421,7 +497,7 @@ setup_fpu_emulation:
 		((byte_t *)&x86_fxrstor)[2] = 0x09;
 		((byte_t *)&x86_fxrstor)[3] = 0xc3; /* ret */
 	} else {
-		if (CPUID_FEATURES.ci_1d & CPUID_1D_SSE) {
+		if (HAVE_SSE) {
 			/* x86_fxsave_mxcsr_mask_ = 0x0000ffbf; // Already the default */
 			inject_jmp((void *)&x86_fpustate_load, (void const *)&x86_fxrstor);
 			inject_jmp((void *)&x86_fpustate_save, (void const *)&x86_fxsave);
@@ -462,11 +538,14 @@ setup_fpu_emulation:
 			((byte_t *)&x86_fpustate_save_noreset)[4] = 0xc3; /* ret */
 
 			x86_fpustate_init_ftw_offset_byte = OFFSET_SFPUSTATE_FTW;
+			/* Don't initialize the MXCSR dword, which doesn't exist without SSE */
+			x86_fpustate_init_mxcsr[0] = 0xc3; /* ret */
 		}
 	}
 	/* Set the TS bit because while the FPU is now initialized, `x86_fpu_current'
 	 * isn't actually set to anything, much less the calling thread. */
 	__wrcr0(cr0 | CR0_TS);
+	test_fpu64();
 }
 
 

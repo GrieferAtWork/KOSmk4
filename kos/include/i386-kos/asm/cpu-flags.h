@@ -187,6 +187,7 @@
 #define FTW_ZERO(i)  (0x1 << ((i)*2))  /* Zero */
 #define FTW_SPEC(i)  (0x2 << ((i)*2))  /* Special (invalid (NaN, unsupported), infinity, or denormal) */
 #define FTW_EMPTY(i) (0x3 << ((i)*2))  /* Empty */
+#define FTW_MASK(i)  (0x3 << ((i)*2))  /* Mask */
 #define FTW_ALLEMPTY  0xffff /* All empty */
 
 
