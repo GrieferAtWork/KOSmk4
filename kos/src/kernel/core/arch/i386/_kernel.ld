@@ -53,14 +53,14 @@ SECTIONS {
 
 	. = KERNEL_BASE + 0x100000;
 
+	PROVIDE_HIDDEN(__kernel_start = ABSOLUTE(.));
+
 #ifndef CONFIG_NO_BOOT0
 	SECTION(.x86.boot0) {
 		KEEP(*(.x86.boot0))
 	}
 	. = KERNEL_BASE + 0x100200;
 #endif /* !CONFIG_NO_BOOT0 */
-
-	PROVIDE_HIDDEN(__kernel_start = ABSOLUTE(.));
 
 	/* Boot header */
 	SECTION(.x86.mb) {
