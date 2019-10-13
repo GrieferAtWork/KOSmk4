@@ -100,8 +100,37 @@ kernel_terminal_check_sigttou(struct terminal *__restrict self) {
 	my_leader = task_getprocessgroupleader();
 	FINALLY_DECREF_UNLIKELY(my_leader);
 	if unlikely(FORTASK(my_leader, _this_taskpid) != ATOMIC_READ(term->t_fproc.m_pointer)) {
-		if (term->t_fproc.cmpxch(NULL, FORTASK(my_leader, _this_taskpid)))
+		struct taskpid *my_leader_pid;
+		REF struct task *oldproc;
+		REF struct taskpid *oldpid;
+		my_leader_pid = FORTASK(my_leader, _this_taskpid);
+again_set_myleader_as_fproc:
+		if (term->t_fproc.cmpxch(NULL, my_leader_pid))
 			goto done; /* Lazily set the caller as the initial foreground process */
+		/* Check if the old foreground process has already
+		 * terminated, but hasn't been cleaned up, yet. */
+		oldpid = term->t_fproc.get();
+		if unlikely(!oldpid)
+			goto again_set_myleader_as_fproc;
+		oldproc = taskpid_gettask(oldpid);
+		if unlikely(!oldproc) {
+			bool xch_ok;
+do_try_override_fproc:
+			xch_ok = term->t_fproc.cmpxch(oldpid, my_leader_pid);
+			decref(oldpid);
+			if unlikely(!xch_ok)
+				goto again_set_myleader_as_fproc;
+			goto done; /* All right! we've got the lock. */
+		}
+		if (ATOMIC_READ(oldproc->t_flags) & (TASK_FTERMINATING |
+		                                     TASK_FTERMINATED)) {
+			decref_unlikely(oldproc);
+			goto do_try_override_fproc;
+		}
+		decref_unlikely(oldproc);
+		decref_unlikely(oldpid);
+
+
 		printk(KERN_INFO "[tty:%q] Stop background process group %p [tid=%u] upon thread %p [tid=%u] trying to write\n",
 		       term->cd_name, my_leader, (unsigned int)task_getrootpid_of_s(my_leader),
 		       THIS_TASK, task_getroottid_s());
