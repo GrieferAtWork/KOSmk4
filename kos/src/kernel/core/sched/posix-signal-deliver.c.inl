@@ -101,6 +101,7 @@ task_raisesignalthread(struct task *__restrict target,
 					return false;
 				}
 				entry->sqe_next = next;
+				COMPILER_WRITE_BARRIER();
 			} while (!ATOMIC_CMPXCH_WEAK(pending->sq_queue, next, entry));
 			sig_broadcast(&pending->sq_newsig);
 			/* Check if the signal is still being masked. - If it isn't, it may have gotten
@@ -336,6 +337,8 @@ NOTHROW_NX(KCALL FUNC(deliver_signal_to_some_thread_in_process))(struct task *__
 				kfree(info);
 				return IFELSE(false, TASK_RAISESIGNALTHREAD_NX_TERMINATED);
 			}
+			info->sqe_next = next;
+			COMPILER_WRITE_BARRIER();
 		} while (!ATOMIC_CMPXCH_WEAK(procqueue->psq_queue.sq_queue,
 		                             next, info));
 	}

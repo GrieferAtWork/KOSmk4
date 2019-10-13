@@ -738,6 +738,7 @@ task_signal_rpc_handler(void *arg,
 						                   * But then again, shouldn't `reason == TASK_RPC_REASON_SHUTDOWN' be
 						                   * in this case? - Anyways: better be safe! */
 					info->sqe_next = next;
+					COMPILER_WRITE_BARRIER();
 				} while (!ATOMIC_CMPXCH_WEAK(pertask_pending->sq_queue, next, info));
 				sig_broadcast(&pertask_pending->sq_newsig);
 				/* Restart the interrupted system call without letting userspace know. */
@@ -794,6 +795,7 @@ task_signal_rpc_handler_after_syscall(void *arg,
 						                   * But then again, shouldn't `reason == TASK_RPC_REASON_SHUTDOWN' be
 						                   * in this case? - Anyways: better be safe! */
 					info->sqe_next = next;
+					COMPILER_WRITE_BARRIER();
 				} while (!ATOMIC_CMPXCH_WEAK(pertask_pending->sq_queue, next, info));
 				sig_broadcast(&pertask_pending->sq_newsig);
 				/* Restart the interrupted system call without letting userspace know. */
@@ -914,9 +916,9 @@ send_signal_rpc_to_self_after_syscall(/*inherit(always)*/struct sigqueue_entry *
 	}
 }
 
-LOCAL void KCALL
-restore_perthread_pending_signals(struct sigqueue *__restrict myqueue,
-                                  struct sigqueue_entry *__restrict pending) {
+LOCAL NOBLOCK NONNULL((1, 2)) void
+NOTHROW(KCALL restore_perthread_pending_signals)(struct sigqueue *__restrict myqueue,
+                                                 struct sigqueue_entry *__restrict pending) {
 	/* Restore all signals pending for the calling thread. */
 	if unlikely(!ATOMIC_CMPXCH(myqueue->sq_queue, NULL, pending)) {
 		struct sigqueue_entry *last, *next;
@@ -926,6 +928,7 @@ restore_perthread_pending_signals(struct sigqueue *__restrict myqueue,
 		do {
 			next = ATOMIC_READ(myqueue->sq_queue);
 			last->sqe_next = next;
+			COMPILER_WRITE_BARRIER();
 		} while (!ATOMIC_CMPXCH_WEAK(myqueue->sq_queue, next, pending));
 	}
 }

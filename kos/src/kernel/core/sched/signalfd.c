@@ -62,9 +62,9 @@ signalfd_create(USER CHECKED sigset_t const *mask) THROWS(E_BADALLOC) {
 
 DEFINE_HANDLE_REFCNT_FUNCTIONS(signalfd, struct signalfd)
 
-LOCAL void KCALL
-restore_perthread_pending_signals(struct sigqueue *__restrict myqueue,
-                                  struct sigqueue_entry *__restrict pending) {
+LOCAL NOBLOCK NONNULL((1, 2)) void
+NOTHROW(KCALL restore_perthread_pending_signals)(struct sigqueue *__restrict myqueue,
+                                                 struct sigqueue_entry *__restrict pending) {
 	/* Restore all signals pending for the calling thread. */
 	if unlikely(!ATOMIC_CMPXCH(myqueue->sq_queue, NULL, pending)) {
 		struct sigqueue_entry *last, *next;
@@ -74,6 +74,7 @@ restore_perthread_pending_signals(struct sigqueue *__restrict myqueue,
 		do {
 			next = ATOMIC_READ(myqueue->sq_queue);
 			last->sqe_next = next;
+			COMPILER_WRITE_BARRIER();
 		} while (!ATOMIC_CMPXCH_WEAK(myqueue->sq_queue, next, pending));
 	}
 }
