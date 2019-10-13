@@ -1,7 +1,7 @@
 /*[[[magic
-local opt = options.setdefault("GCC.options",[]);
-opt.removeif([](e) -> e.startswith("-O"));
-opt.append("-O3");
+local gcc_opt = options.setdefault("GCC.options", []);
+if (gcc_opt.remove("-O3"))
+	gcc_opt.append("-Os");
 ]]]*/
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
