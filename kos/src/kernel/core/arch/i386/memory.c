@@ -185,9 +185,9 @@ PRIVATE ATTR_FREETEXT bool NOTHROW(KCALL detect_8a)(void) {
 }
 
 struct c7_record {
-	u16 r_size; /*< 00h: Number of significant bytes of returned data (excluding this uint16_t). */
-	u32 r_1x;   /*< 02h: Amount of local memory between 1-16MB, in 1KB blocks. */
-	u32 r_16x;  /*< 06h: Amount of local memory between 16MB and 4GB, in 1KB blocks. */
+	u16 r_size; /* 00h: Number of significant bytes of returned data (excluding this uint16_t). */
+	u32 r_1x;   /* 02h: Amount of local memory between 1-16MB, in 1KB blocks. */
+	u32 r_16x;  /* 06h: Amount of local memory between 16MB and 4GB, in 1KB blocks. */
 	/* There are more fields here, but they don't matter to us... */
 };
 #define C7_RECORD ((struct c7_record *)x86_realmode_buffer_addr)
@@ -215,10 +215,12 @@ PRIVATE ATTR_FREETEXT void
 NOTHROW(KCALL log_beginmethod)(char const *name) {
 	printk(FREESTR(KERN_INFO "[bios] Attempting memory detection method: %s\n"), name);
 }
+
 PRIVATE ATTR_FREETEXT void
 NOTHROW(KCALL log_okmethod)(char const *name) {
 	printk(FREESTR(KERN_INFO "[bios] Attempting memory detection method: %s (Ok)\n"), name);
 }
+
 PRIVATE ATTR_FREETEXT void
 NOTHROW(KCALL log_badmethod)(char const *name) {
 	printk(FREESTR(KERN_INFO "[bios] Attempting memory detection method: %s (Failed)\n"), name);
@@ -240,7 +242,6 @@ NOTHROW(KCALL x86_initialize_memory_via_bios)(void) {
 			log_badmethod(_name);                                           \
 		}                                                                   \
 	} __WHILE0
-
 	TRY_METHOD("e820", detect_e820());
 	TRY_METHOD("e801", detect_e801());
 	TRY_METHOD("da88", detect_da88());

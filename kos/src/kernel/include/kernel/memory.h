@@ -20,11 +20,14 @@
 #define GUARD_KERNEL_INCLUDE_KERNEL_MEMORY_H 1
 
 #include <kernel/compiler.h>
-#include <kernel/types.h>
+
 #include <kernel/arch/memory.h>
 #include <kernel/paging.h>
-#include <stdbool.h>
+#include <kernel/types.h>
+
 #include <hybrid/__assert.h>
+
+#include <stdbool.h>
 
 /* Physical memory management. */
 
@@ -48,9 +51,9 @@ typedef vm_ppage_t      pagecnt_t;
 #define FORMAT_PAGEPTR_T FORMAT_VM_PPAGE_T
 #if __SIZEOF_VM_PPAGE_T__ >= 8
 #define FORMAT_PAGECNT_T "%I64u"
-#else
+#else /* __SIZEOF_VM_PPAGE_T__ >= 8 */
 #define FORMAT_PAGECNT_T "%Iu"
-#endif
+#endif /* __SIZEOF_VM_PPAGE_T__ < 8 */
 
 
 #define PMEMBANK_TYPE_UNDEF      0 /* Undefined memory (Handled identically to `PMEMBANK_TYPE_BADRAM') */
@@ -78,16 +81,16 @@ struct pmembank {
 	u16            mb_type;     /* Memory bank type. (One of `PMEMBANK_TYPE_*') */
 	u16            mb_pad[(sizeof(vm_phys_t)-2)/2]; /* ... */
 };
-#define PMEMBANK_TYPE_START(x)      ((x).mb_start)
-#define PMEMBANK_TYPE_MIN(x)        ((x).mb_start)
-#define PMEMBANK_TYPE_MAX(x)      ((&(x))[1].mb_start-1)
-#define PMEMBANK_TYPE_END(x)      ((&(x))[1].mb_start)
-#define PMEMBANK_TYPE_SIZE(x)        (PMEMBANK_TYPE_END(x) - PMEMBANK_TYPE_START(x))
-#define PMEMBANK_TYPE_STARTPAGE(x)  ((vm_ppage_t)((PMEMBANK_TYPE_START(x) + (PAGESIZE-1)) / PAGESIZE))
-#define PMEMBANK_TYPE_MINPAGE(x)    ((vm_ppage_t)((PMEMBANK_TYPE_START(x) + (PAGESIZE-1)) / PAGESIZE))
-#define PMEMBANK_TYPE_MAXPAGE(x)    ((vm_ppage_t)((PMEMBANK_TYPE_END(x) / PAGESIZE) - 1))
-#define PMEMBANK_TYPE_ENDPAGE(x)    ((vm_ppage_t)(PMEMBANK_TYPE_END(x) / PAGESIZE))
-#define PMEMBANK_TYPE_NUMPAGES(x)   ((size_t)(PMEMBANK_TYPE_ENDPAGE(x) - PMEMBANK_TYPE_STARTPAGE(x)))
+#define PMEMBANK_TYPE_START(x)     ((x).mb_start)
+#define PMEMBANK_TYPE_MIN(x)       ((x).mb_start)
+#define PMEMBANK_TYPE_MAX(x)       ((&(x))[1].mb_start-1)
+#define PMEMBANK_TYPE_END(x)       ((&(x))[1].mb_start)
+#define PMEMBANK_TYPE_SIZE(x)      (PMEMBANK_TYPE_END(x) - PMEMBANK_TYPE_START(x))
+#define PMEMBANK_TYPE_STARTPAGE(x) ((vm_ppage_t)((PMEMBANK_TYPE_START(x) + (PAGESIZE-1)) / PAGESIZE))
+#define PMEMBANK_TYPE_MINPAGE(x)   ((vm_ppage_t)((PMEMBANK_TYPE_START(x) + (PAGESIZE-1)) / PAGESIZE))
+#define PMEMBANK_TYPE_MAXPAGE(x)   ((vm_ppage_t)((PMEMBANK_TYPE_END(x) / PAGESIZE) - 1))
+#define PMEMBANK_TYPE_ENDPAGE(x)   ((vm_ppage_t)(PMEMBANK_TYPE_END(x) / PAGESIZE))
+#define PMEMBANK_TYPE_NUMPAGES(x)  ((size_t)(PMEMBANK_TYPE_ENDPAGE(x) - PMEMBANK_TYPE_STARTPAGE(x)))
 
 struct pmeminfo {
 	vm_phys_t        mb_total[PMEMBANK_TYPE_COUNT]; /* [const] The total number of bytes corresponding to certain banks. */
@@ -101,10 +104,13 @@ DATDEF struct pmeminfo minfo; /* Physical memory info. */
 #ifdef CONFIG_BUILDING_KERNEL_CORE
 /* Returns the total number of usable pages of RAM */
 INTDEF FREE size_t NOTHROW(KCALL minfo_usable_ram_pages)(void);
+
 /* Add information about a new member bank / region. */
 INTDEF FREE void NOTHROW(KCALL minfo_addbank)(vm_phys_t start, vm_phys_t size, u16 type);
+
 /* Construct memory zones from memory info. */
 INTDEF FREE void NOTHROW(KCALL minfo_makezones)(void);
+
 /* Relocate `minfo', as well as `mzones' data to a more appropriate location
  * after `minfo_makezones()' has been called, and the kernel VM has been
  * cleaned from unused memory mappings.
@@ -117,6 +123,7 @@ INTDEF FREE void NOTHROW(KCALL minfo_makezones)(void);
  * as soon as this becomes possible, thus keeping it from randomly showing up
  * and causing problems for other code. */
 INTDEF FREE void NOTHROW(KCALL minfo_relocate_appropriate)(void);
+
 /* Release all memory previously marked as `PMEMBANK_TYPE_PRESERVE' or
  * `PMEMBANK_TYPE_ALLOCATED', and page_free() all whole pages touched
  * by mappings of type `PMEMBANK_TYPE_PRESERVE' (unless the same page
@@ -125,7 +132,7 @@ INTDEF FREE void NOTHROW(KCALL minfo_relocate_appropriate)(void);
  * bank into `PMEMBANK_TYPE_RAM', and (when possible) merge adjacent
  * banks of identical typing. */
 INTDEF FREE void NOTHROW(KCALL minfo_release_presevations)(void);
-#endif
+#endif /* CONFIG_BUILDING_KERNEL_CORE */
 
 
 
@@ -177,7 +184,6 @@ struct pmem {
 };
 
 DATDEF struct pmem mzones;
-#define MZONE_ANY (mzones.pm_zonec - 1)
 
 LOCAL NOBLOCK WUNUSED ATTR_RETNONNULL struct pmemzone *
 NOTHROW(KCALL page_getzone)(pageptr_t ptr) {
@@ -195,7 +201,7 @@ NOTHROW(KCALL page_getzone)(pageptr_t ptr) {
 
 /* Allocate `num_pages' continuous pages of physical memory and return their page number.
  * WARNING: Physical memory cannot be dereferenced prior to being mapped.
- * @return: * :              The page number of the newly allocated memory range.
+ * @return: * :              The starting page number of the newly allocated memory range.
  * @return: PAGEPTR_INVALID: The allocation failed. */
 FUNDEF NOBLOCK WUNUSED pageptr_t NOTHROW(KCALL page_mallocone)(void);
 #ifndef __NO_PAGE_MALLOC_CONSTANT_P_WRAPPERS
@@ -206,9 +212,9 @@ NOTHROW(KCALL page_malloc)(pagecnt_t num_pages) {
 		return page_mallocone();
 	return __os_page_malloc(num_pages);
 }
-#else
+#else /* !__NO_PAGE_MALLOC_CONSTANT_P_WRAPPERS */
 FUNDEF NOBLOCK WUNUSED pageptr_t NOTHROW(KCALL page_malloc)(pagecnt_t num_pages);
-#endif
+#endif /* __NO_PAGE_MALLOC_CONSTANT_P_WRAPPERS */
 
 
 /* Allocate at least `min_pages', and at most `max_pages',
@@ -217,13 +223,13 @@ FUNDEF NOBLOCK WUNUSED pageptr_t NOTHROW(KCALL page_malloc)(pagecnt_t num_pages)
  *    but will prefer to return the first block of free consecutive pages with
  *    a length of at least `min_pages', thus preventing memory fragmentation by
  *    using up small memory blocks that might otherwise continue going unused.
- * @return: * :              The page number of the newly allocated memory range.
+ * @return: * :              The starting page number of the newly allocated memory range.
  * @return: PAGEPTR_INVALID: The allocation failed. */
 FUNDEF NOBLOCK WUNUSED pageptr_t
 NOTHROW(KCALL page_malloc_part)(pagecnt_t min_pages, pagecnt_t max_pages,
                                 pagecnt_t *__restrict res_pages);
 
-/* Try to allocate the given page, or return `false' if this fails.
+/* Try to allocate the given page.
  * @return: * : One of `PAGE_MALLOC_AT_*' */
 FUNDEF NOBLOCK WUNUSED unsigned int
 NOTHROW(KCALL page_malloc_at)(pageptr_t ptr);
@@ -267,9 +273,9 @@ NOTHROW(KCALL page_free)(pageptr_t base, pagecnt_t num_pages) {
 		__os_page_free(base, num_pages);
 	}
 }
-#else
+#else /* !__NO_PAGE_MALLOC_CONSTANT_P_WRAPPERS */
 FUNDEF NOBLOCK void NOTHROW(KCALL page_free)(pageptr_t base, pagecnt_t num_pages);
-#endif
+#endif /* __NO_PAGE_MALLOC_CONSTANT_P_WRAPPERS */
 
 /* Similar to `page_free()', however set the is-zero-bit for all pages. */
 FUNDEF NOBLOCK void
@@ -292,7 +298,7 @@ NOTHROW(KCALL page_stat_between)(pageptr_t base, pagecnt_t num_pages,
                                   struct pmemstat *__restrict result);
 
 /* Check if a given `page' is current free.
- * NOTE: Returns `false' when `page_ismapped(page,1)' is false. */
+ * NOTE: Returns `false' when `page_ismapped(page, 1)' is false. */
 FUNDEF NOBLOCK WUNUSED bool
 NOTHROW(KCALL page_isfree)(pageptr_t page);
 
@@ -300,16 +306,16 @@ NOTHROW(KCALL page_isfree)(pageptr_t page);
  * check if the given `page' contains only zero-bytes.
  * NOTE: This function doesn't actually look at the contents of
  *       page itself, but rather at what it known about the page.
- * NOTE: Returns `false' when `page_ismapped(page,1)' is false.
+ * NOTE: Returns `false' when `page_ismapped(page, 1)' is false.
  * HINT: This function is mainly used in order to optimize the
  *       mapping of zero-initialized memory, such that the initializer
  *       will do something like:
  *       >> page = page_malloc(1);
- *       >> pagedir_mapone(dest,page,PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
+ *       >> pagedir_mapone(dest, page, PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
  *       >> if (!page_iszero(page))
- *       >>      memset(VM_PAGE2ADDR(dest),0,PAGESIZE);
+ *       >>      memset(VM_PAGE2ADDR(dest), 0, PAGESIZE);
  *       In other words: The information is most useful in freshly
- *       allocated pages, in order to determine the mapped memory
+ *       allocated pages, in order to determine if the mapped memory
  *       already contains all zeros. */
 FUNDEF NOBLOCK WUNUSED bool
 NOTHROW(KCALL page_iszero)(pageptr_t page);

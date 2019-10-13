@@ -30,15 +30,15 @@ DECL_BEGIN
 
 /* PC_SPEAKER bits: http://www.manualsdir.com/manuals/128462/ibm-560.html?page=49 */
 #define PIT_PCSPEAKER                   __IOPORT(0x61) /* PC-speaker I/O port (connected to `PIT_DATA2'). */
-#    define PIT_PCSPEAKER_FSYNCPIT      0x01 /* Synchronize the speaker with the state of `PIT_DATA2'. (read/write) */
-#    define PIT_PCSPEAKER_FINOUT        0x02 /* Mask for the PC speaker position. (read/write) */
-#    define PIT_PCSPEAKER_IN            0x00 /* Move the speaker to the in-position. */
-#    define PIT_PCSPEAKER_OUT           0x02 /* Move the speaker to the out-position. */
-#    define PIT_PCSPEAKER_FPARITYCHECK  0x04 /* Enable parity checks. */
-#    define PIT_PCSPEAKER_FREFRESHTOGGL 0x10 /* Toggles during every refresh (what refresh???). (read) */
-#    define PIT_PCSPEAKER_FPIT2OUT      0x20 /* Output of the `PIT_DATA2' channel (read) */
-#    define PIT_PCSPEAKER_FCHANNELOK    0x40 /* Channel check was OK (read) */
-#    define PIT_PCSPEAKER_FPARITYOK     0x80 /* Parity check was OK (read) */
+#    define PIT_PCSPEAKER_FSYNCPIT      0x01 /* [bit(0)] Synchronize the speaker with the state of `PIT_DATA2'. (read/write) */
+#    define PIT_PCSPEAKER_FINOUT        0x02 /* [bit(1)] Mask for the PC speaker position. (read/write) */
+#    define PIT_PCSPEAKER_IN            0x00 /* [bit(0)] Move the speaker to the in-position. */
+#    define PIT_PCSPEAKER_OUT           0x02 /* [bit(1)] Move the speaker to the out-position. */
+#    define PIT_PCSPEAKER_FPARITYCHECK  0x04 /* [bit(2)] Enable parity checks. */
+#    define PIT_PCSPEAKER_FREFRESHTOGGL 0x10 /* [bit(4)] Toggles during every refresh (what refresh???). (read) */
+#    define PIT_PCSPEAKER_FPIT2OUT      0x20 /* [bit(5)] Output of the `PIT_DATA2' channel (read) */
+#    define PIT_PCSPEAKER_FCHANNELOK    0x40 /* [bit(6)] Channel check was OK (read) */
+#    define PIT_PCSPEAKER_FPARITYOK     0x80 /* [bit(7)] Parity check was OK (read) */
 
 #define PIT_COMMAND                           __IOPORT(0x43) /* I/O port: PIT Command port (write) */
 #    define PIT_COMMAND_FSELECT               0xc0 /* Mask for the selected channel. */

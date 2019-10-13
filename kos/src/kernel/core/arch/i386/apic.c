@@ -49,6 +49,7 @@
 #include <asm/param.h>
 #include <kos/kernel/cpu-state.h>
 
+#include <assert.h>
 #include <stddef.h>
 #include <string.h>
 
@@ -125,12 +126,12 @@ DATDEF struct cpu *_cpu_vector[CONFIG_MAX_CPU_COUNT] ASMNAME("cpu_vector");
 INTDEF NOBLOCK void NOTHROW(KCALL apic_send_init)(u8 procid);
 INTDEF NOBLOCK void NOTHROW(KCALL apic_send_startup)(u8 procid, u8 pageno);
 
-INTERN ATTR_FREEBSS volatile u8 cpu_offline_mask[CEILDIV(CONFIG_MAX_CPU_COUNT,8)];
-#if CEILDIV(CONFIG_MAX_CPU_COUNT,8) == 1
+INTERN ATTR_FREEBSS volatile u8 cpu_offline_mask[CEILDIV(CONFIG_MAX_CPU_COUNT, 8)];
+#if CEILDIV(CONFIG_MAX_CPU_COUNT, 8) == 1
 #define CPU_ALL_ONLINE  (ATOMIC_READ(*(u8 *)cpu_offline_mask) == 0)
-#elif CEILDIV(CONFIG_MAX_CPU_COUNT,8) == 2
+#elif CEILDIV(CONFIG_MAX_CPU_COUNT, 8) == 2
 #define CPU_ALL_ONLINE  (ATOMIC_READ(*(u16 *)cpu_offline_mask) == 0)
-#elif CEILDIV(CONFIG_MAX_CPU_COUNT,8) == 4
+#elif CEILDIV(CONFIG_MAX_CPU_COUNT, 8) == 4
 #define CPU_ALL_ONLINE  (ATOMIC_READ(*(u32 *)cpu_offline_mask) == 0)
 #else
 LOCAL bool KCALL all_all_cpus_online(void) {
@@ -596,7 +597,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_apic)(void) {
 		                                 CEILDIV((size_t)x86_smp_entry_size, PAGESIZE));
 		if unlikely(entry_page == PAGEPTR_INVALID)
 			kernel_panic(FREESTR("Failed to allocate SMP trampoline\n"));
-		printk(FREESTR(KERN_INFO "Allocating SMP trampoline at " FORMAT_VM_PHYS_T "\n"),
+		printk(FREESTR(KERN_INFO "[apic] Allocating SMP trampoline at " FORMAT_VM_PHYS_T "\n"),
 		       VM_PPAGE2ADDR(entry_page));
 		x86_smp_entry_page = (u8)entry_page;
 		/* Apply some custom AP entry relocations. */
@@ -617,7 +618,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_apic)(void) {
 		i386_allocate_secondary_cores();
 #endif /* !CONFIG_NO_SMP */
 
-		printk(FREESTR(KERN_INFO "Using LAPIC for timings\n"));
+		printk(FREESTR(KERN_INFO "[apic] Using LAPIC for timings\n"));
 
 		/* Re-write text for the quantum accessor functions to use the APIC reload counter. */
 		memcpy((void *)&cpu_quantum_elapsed, x86_apic_cpu_quantum_elapsed, (size_t)x86_apic_cpu_quantum_elapsed_size);
@@ -652,7 +653,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_apic)(void) {
 
 #ifndef CONFIG_NO_SMP
 		sync_write(&x86_pit_lock);
-
+		assert(CPU_ALL_ONLINE);
 		/* Send INIT commands to all CPUs. */
 		for (i = 1; i < _cpu_count; ++i) {
 			cpu_offline_mask[i / 8] |= 1 << (i % 8); /* Mark the CPU as offline */
@@ -664,7 +665,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_apic)(void) {
 		 *       our LAPIC calibration code needs to determine the
 		 *       frequency of the BSP's LAPIC timer.
 		 *       So we just merge the two together to speed
-		 *       up boot time by just that time bit more. */
+		 *       up boot time by just that tiny bit more. */
 #endif /* !CONFIG_NO_SMP */
 
 
@@ -719,7 +720,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_apic)(void) {
 #endif /* !CONFIG_NO_SMP */
 
 		num_ticks = (((u32)-1) - num_ticks) * 100;
-		printk(FREESTR(KERN_INFO "Boot CPU uses a LAPIC timing of %u ticks per second\n"), num_ticks);
+		printk(FREESTR(KERN_INFO "[apic] Boot CPU uses a LAPIC timing of %u ticks per second\n"), num_ticks);
 		num_ticks /= HZ;
 		if unlikely(!num_ticks)
 			num_ticks = 1;
@@ -757,7 +758,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_apic)(void) {
 			for (i = 1; i < _cpu_count; ++i) {
 				if (!(ATOMIC_READ(cpu_offline_mask[i / 8]) & (1 << (i % 8))))
 					continue;
-				printk(FREESTR(KERN_WARNING "Re-attempting startup of processor #%u (LAPIC id %#.2I8x)\n"),
+				printk(FREESTR(KERN_WARNING "[apic] Re-attempting startup of processor #%u (LAPIC id %#.2I8x)\n"),
 				       i, FORCPU(cpu_vector[i], x86_lapic_id));
 				apic_send_startup(FORCPU(cpu_vector[i], x86_lapic_id),
 				                  (u8)entry_page);
@@ -781,7 +782,7 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_apic)(void) {
 					++i;
 					continue;
 				}
-				printk(FREESTR(KERN_ERR "CPU with LAPIC id %#.2I8x doesn't want to "
+				printk(FREESTR(KERN_ERR "[apic] CPU with LAPIC id %#.2I8x doesn't want to "
 				                        "come online (removing it from the configuration)\n"),
 				       i, FORCPU(_cpu_vector[i], x86_lapic_id));
 				x86_destroy_cpu(_cpu_vector[i]);
@@ -798,7 +799,7 @@ all_online:
 #endif /* __HAVE_CPUSET_FULL_MASK */
 #endif /* !CONFIG_NO_SMP */
 	} else {
-		printk(FREESTR(KERN_INFO "LAPIC unavailable or disabled. Using PIC for timings\n"));
+		printk(FREESTR(KERN_INFO "[apic] LAPIC unavailable or disabled. Using PIC for timings\n"));
 
 		/* Clear out the lapic pointer when disabled. */
 		x86_lapic_base_address_ = NULL;

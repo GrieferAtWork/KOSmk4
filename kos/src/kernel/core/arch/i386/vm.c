@@ -196,29 +196,29 @@ INTERN struct vm_datapart x86_kernel_vm_parts[5] = {
 };
 
 
-#define INIT_NODE_RESERVE(self, min, max, prot, part)                                          \
-	{                                                                                          \
-		/* .vn_node   = */{ NULL, NULL, min, max },                                            \
-		/* .vn_byaddr = */LLIST_INITNODE,                                                      \
-		/* .vn_prot   = */prot | VM_PROT_SHARED,                                               \
-		/* .vn_flags  = */VM_NODE_FLAG_NOMERGE | VM_NODE_FLAG_PREPARED | VM_NODE_FLAG_KERNPRT, \
-		/* .vn_vm     = */&vm_kernel,                                                          \
-		/* .vn_part   = */NULL,                                                                \
-		/* .vn_block  = */NULL,                                                                \
-		/* .vn_link   = */LLIST_INITNODE,                                                      \
-		/* .vn_guard  = */0                                                                    \
+#define INIT_NODE_RESERVE(self, min, max, prot, part)                                           \
+	{                                                                                           \
+		/* .vn_node   = */ { NULL, NULL, min, max },                                            \
+		/* .vn_byaddr = */ LLIST_INITNODE,                                                      \
+		/* .vn_prot   = */ prot | VM_PROT_SHARED,                                               \
+		/* .vn_flags  = */ VM_NODE_FLAG_NOMERGE | VM_NODE_FLAG_PREPARED | VM_NODE_FLAG_KERNPRT, \
+		/* .vn_vm     = */ &vm_kernel,                                                          \
+		/* .vn_part   = */ NULL,                                                                \
+		/* .vn_block  = */ NULL,                                                                \
+		/* .vn_link   = */ LLIST_INITNODE,                                                      \
+		/* .vn_guard  = */ 0                                                                    \
 	}
-#define INIT_NODE(self, min, max, prot, part)                                                  \
-	{                                                                                          \
-		/* .vn_node   = */{ NULL, NULL, min, max },                                            \
-		/* .vn_byaddr = */LLIST_INITNODE,                                                      \
-		/* .vn_prot   = */prot | VM_PROT_SHARED,                                               \
-		/* .vn_flags  = */VM_NODE_FLAG_NOMERGE | VM_NODE_FLAG_PREPARED | VM_NODE_FLAG_KERNPRT, \
-		/* .vn_vm     = */&vm_kernel,                                                          \
-		/* .vn_part   = */&(part),                                                             \
-		/* .vn_block  = */&vm_datablock_anonymous,                                             \
-		/* .vn_link   = */{ NULL, &LLIST_HEAD((part).dp_srefs) },                              \
-		/* .vn_guard  = */0                                                                    \
+#define INIT_NODE(self, min, max, prot, part)                                                   \
+	{                                                                                           \
+		/* .vn_node   = */ { NULL, NULL, min, max },                                            \
+		/* .vn_byaddr = */ LLIST_INITNODE,                                                      \
+		/* .vn_prot   = */ prot | VM_PROT_SHARED,                                               \
+		/* .vn_flags  = */ VM_NODE_FLAG_NOMERGE | VM_NODE_FLAG_PREPARED | VM_NODE_FLAG_KERNPRT, \
+		/* .vn_vm     = */ &vm_kernel,                                                          \
+		/* .vn_part   = */ &(part),                                                             \
+		/* .vn_block  = */ &vm_datablock_anonymous,                                             \
+		/* .vn_link   = */ { NULL, &LLIST_HEAD((part).dp_srefs) },                              \
+		/* .vn_guard  = */ 0                                                                    \
 	}
 
 
@@ -348,8 +348,8 @@ INTERN ATTR_FREEDATA struct vm_datapart x86_kernel_vm_part_free = {
 
 INTERN ATTR_FREEDATA struct vm_node x86_kernel_vm_node_free =
 	INIT_NODE(x86_kernel_vm_node_free,
-	         (vm_vpage_t)((uintptr_t)__kernel_free_startpage),
-	         (vm_vpage_t)((uintptr_t)__kernel_free_endpage - 1),
+	          (vm_vpage_t)((uintptr_t)__kernel_free_startpage),
+	          (vm_vpage_t)((uintptr_t)__kernel_free_endpage - 1),
 	          VM_PROT_READ | VM_PROT_WRITE | VM_PROT_EXEC,
 	          x86_kernel_vm_part_free);
 

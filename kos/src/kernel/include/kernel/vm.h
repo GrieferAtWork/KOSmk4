@@ -1231,7 +1231,7 @@ DATDEF struct vm_datablock_type vm_ramfile_type;
                                           *         result in kernel panic. */
 
 struct vm_node {
-	ATREE_NODE(struct vm_node,vm_vpage_t)
+	ATREE_NODE(struct vm_node, vm_vpage_t)
 	                         vn_node;   /* [lock(vn_vm->v_treelock,OWNER)] VM Node controller. */
 	LLIST_NODE(struct vm_node)
 	                         vn_byaddr; /* [lock(vn_vm->v_treelock,OWNER)][const_if(VM_NODE_FLAG_KERNPRT)] Order chain of nodes mapped within #vn_vm. */

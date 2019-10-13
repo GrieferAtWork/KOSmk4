@@ -28,6 +28,7 @@
 #include <kernel/panic.h>
 #include <kernel/printk.h>
 #include <kernel/rand.h>
+#include <sched/pid.h>
 
 #include <hybrid/atomic.h>
 #include <hybrid/bit.h>
@@ -37,7 +38,6 @@
 #include <format-printer.h>
 #include <stddef.h>
 #include <string.h>
-#include <sched/pid.h>
 
 DECL_BEGIN
 
@@ -46,13 +46,16 @@ DECL_BEGIN
 
 #if !defined(NDEBUG) && 0
 #define PRINT_ALLOCATION(...) (printk(KERN_DEBUG "[memory] " __VA_ARGS__))
-#else
+#else /* !NDEBUG */
 #define PRINT_ALLOCATION(...) (void)0
-#endif
+#endif /* NDEBUG */
 
 
 #if !defined(NDEBUG) && 0
-LOCAL void KCALL do_trace_external(char const *method, pageptr_t min, pageptr_t max) {
+LOCAL NOBLOCK void
+NOTHROW(KCALL do_trace_external)(char const *method,
+                                 pageptr_t min,
+                                 pageptr_t max) {
 	pflag_t was;
 	was = PREEMPTION_PUSHOFF();
 	printk(KERN_RAW "%%{trace:%s:pmem:%#p:%#p}", method, min, max);
@@ -60,21 +63,21 @@ LOCAL void KCALL do_trace_external(char const *method, pageptr_t min, pageptr_t 
 }
 #define TRACE_EXTERNAL(method, min, max) \
 	do_trace_external(method, min, max)
-#else
+#else /* !NDEBUG */
 #define TRACE_EXTERNAL(method, min, max) (void)0
-#endif
+#endif /* NDEBUG */
 
 
-#define TRACE_ALLOC(zone, min, max)                                                                \
-	(TRACE_EXTERNAL("alloc", min, max), \
+#define TRACE_ALLOC(zone, min, max)                                                                                \
+	(TRACE_EXTERNAL("alloc", min, max),                                                                            \
 	 PRINT_ALLOCATION("Allocate physical ram " FORMAT_VM_PHYS_T "..." FORMAT_VM_PHYS_T " [tid=%u][%Iu-%Iu=%Iu]\n", \
-	                  (vm_phys_t)(min)*PAGESIZE, (vm_phys_t)((max) + 1) * PAGESIZE - 1, task_getroottid_s(), \
-	                  (zone)->mz_cfree - (((max)-(min))+1), ((max)-(min))+1, (zone)->mz_cfree))
-#define TRACE_FREE(zone, min, max)                                                             \
-	(TRACE_EXTERNAL("free", min, max), \
+	                  (vm_phys_t)(min)*PAGESIZE, (vm_phys_t)((max) + 1) * PAGESIZE - 1, task_getroottid_s(),       \
+	                  (zone)->mz_cfree - (((max) - (min)) + 1), ((max) - (min)) + 1, (zone)->mz_cfree))
+#define TRACE_FREE(zone, min, max)                                                                             \
+	(TRACE_EXTERNAL("free", min, max),                                                                         \
 	 PRINT_ALLOCATION("Free physical ram " FORMAT_VM_PHYS_T "..." FORMAT_VM_PHYS_T " [tid=%u][%Iu+%Iu=%Iu]\n", \
-	                  (vm_phys_t)(min)*PAGESIZE, (vm_phys_t)((max) + 1) * PAGESIZE - 1, task_getroottid_s(), \
-	                  (zone)->mz_cfree, ((max)-(min))+1, (zone)->mz_cfree + (((max)-(min))+1)))
+	                  (vm_phys_t)(min)*PAGESIZE, (vm_phys_t)((max) + 1) * PAGESIZE - 1, task_getroottid_s(),   \
+	                  (zone)->mz_cfree, ((max) - (min)) + 1, (zone)->mz_cfree + (((max) - (min)) + 1)))
 
 
 #undef IGNORE_FREE
@@ -633,7 +636,7 @@ NOTHROW(KCALL zone_malloc_before)(struct pmemzone *__restrict self,
 
 /* Allocate `num_pages' continuous pages of physical memory and return their page number.
  * WARNING: Physical memory cannot be dereferenced prior to being mapped.
- * @return: * :              The page number of the newly allocated memory range.
+ * @return: * :              The starting page number of the newly allocated memory range.
  * @return: PAGEPTR_INVALID: The allocation failed. */
 PUBLIC NOBLOCK WUNUSED pageptr_t
 NOTHROW(KCALL page_malloc)(pagecnt_t num_pages) {
@@ -681,7 +684,7 @@ again:
 
 /* Allocate `num_pages' continuous pages of physical memory and return their page number.
  * WARNING: Physical memory cannot be dereferenced prior to being mapped.
- * @return: * :              The page number of the newly allocated memory range.
+ * @return: * :              The starting page number of the newly allocated memory range.
  * @return: PAGEPTR_INVALID: The allocation failed. */
 PUBLIC NOBLOCK WUNUSED pageptr_t
 NOTHROW(KCALL page_mallocone)(void) {
@@ -727,9 +730,14 @@ again:
 	return PAGEPTR_INVALID;
 }
 
-/* Similar to `page_malloc_part()', but only allocate memory
- * from between the two given page addresses.
- * @assume(return == PAGEPTR_INVALID || (return >= min_page && return <= max_page)); */
+/* Allocate at least `min_pages', and at most `max_pages',
+ * writing the actual number of pages allocated to `res_pages'.
+ *  - This function will try to serve the request to allocate `max_pages',
+ *    but will prefer to return the first block of free consecutive pages with
+ *    a length of at least `min_pages', thus preventing memory fragmentation by
+ *    using up small memory blocks that might otherwise continue going unused.
+ * @return: * :              The starting page number of the newly allocated memory range.
+ * @return: PAGEPTR_INVALID: The allocation failed. */
 PUBLIC NOBLOCK WUNUSED NONNULL((3)) pageptr_t
 NOTHROW(KCALL page_malloc_part)(pagecnt_t min_pages, pagecnt_t max_pages,
                                 pagecnt_t *__restrict res_pages) {
@@ -806,7 +814,8 @@ again:
 }
 
 
-/* Try to allocate memory at a given address, or return `false' if this fails. */
+/* Try to allocate the given page.
+ * @return: * : One of `PAGE_MALLOC_AT_*' */
 PUBLIC NOBLOCK WUNUSED unsigned int
 NOTHROW(KCALL page_malloc_at)(pageptr_t ptr) {
 	struct pmemzone *zone;
@@ -837,6 +846,12 @@ again:
 }
 
 
+/* Similar to `page_malloc()' / `page_malloc_part()', but only
+ * allocate memory from between the two given page addresses, such
+ * that all allocated pages are located within the specified range.
+ * @assume(return == PAGEPTR_INVALID ||
+ *        (return >= min_page &&
+ *         return + num_pages - 1 <= max_page)); */
 PUBLIC NOBLOCK WUNUSED pageptr_t
 NOTHROW(KCALL page_malloc_between)(pageptr_t min_page, pageptr_t max_page,
                                    pagecnt_t num_pages) {
@@ -854,9 +869,6 @@ NOTHROW(KCALL page_malloc_between)(pageptr_t min_page, pageptr_t max_page,
 	return result;
 }
 
-
-/* Similar to `page_malloc_part()', but only allocate memory
- * from between the two given page addresses. */
 PUBLIC NOBLOCK WUNUSED NONNULL((5)) pageptr_t
 NOTHROW(KCALL page_malloc_part_between)(pageptr_t min_page, pageptr_t max_page,
                                         pagecnt_t min_pages, pagecnt_t max_pages,
@@ -1012,7 +1024,8 @@ again:
 }
 
 
-/* Collect volatile statistics about the usage of physical memory */
+/* Check if a given `page' is current free.
+ * NOTE: Returns `false' when `page_ismapped(page, 1)' is false. */
 PUBLIC NOBLOCK WUNUSED bool
 NOTHROW(KCALL page_isfree)(pageptr_t page) {
 	struct pmemzone *zone;
@@ -1063,7 +1076,17 @@ NOTHROW(KCALL page_stat_between)(pageptr_t base, pagecnt_t num_pages,
  * check if the given `page' contains only zero-bytes.
  * NOTE: This function doesn't actually look at the contents of
  *       page itself, but rather at what it known about the page.
- * NOTE: Returns `false' when `page_ismapped(page,1)' is false. */
+ * NOTE: Returns `false' when `page_ismapped(page, 1)' is false.
+ * HINT: This function is mainly used in order to optimize the
+ *       mapping of zero-initialized memory, such that the initializer
+ *       will do something like:
+ *       >> page = page_malloc(1);
+ *       >> pagedir_mapone(dest, page, PAGEDIR_MAP_FREAD | PAGEDIR_MAP_FWRITE);
+ *       >> if (!page_iszero(page))
+ *       >>      memset(VM_PAGE2ADDR(dest), 0, PAGESIZE);
+ *       In other words: The information is most useful in freshly
+ *       allocated pages, in order to determine if the mapped memory
+ *       already contains all zeros. */
 PUBLIC NOBLOCK WUNUSED bool
 NOTHROW(KCALL page_iszero)(pageptr_t page) {
 	struct pmemzone *zone;
