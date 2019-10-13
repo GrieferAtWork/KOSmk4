@@ -403,15 +403,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	       state->ics_irregs_u.ir_esp);
 #endif /* !__x86_64__ */
 
-	/* FIXME: This should invoke `DEBUG_TRAP_REGISTER_EXEC', following a FORK
-	 *        GDB must think that /bin/init and the kernel core are 2 different
-	 *        processes! */
-	{
-		struct debugtrap_reason r;
-		r.dtr_signo  = SIGTRAP;
-		r.dtr_reason = DEBUGTRAP_REASON_LIBRARY;
-		kernel_debugtrap(state, &r);
-	}
 	return state;
 }
 

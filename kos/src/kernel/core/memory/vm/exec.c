@@ -25,6 +25,7 @@
 #include <fs/node.h>
 #include <kernel/driver-param.h>
 #include <kernel/except.h>
+#include <kernel/debugtrap.h>
 #include <kernel/vm.h>
 #include <kernel/vm/builder.h>
 #include <kernel/vm/library.h>
@@ -570,6 +571,15 @@ NOTHROW(KCALL kernel_initialize_exec_init)(struct icpustate *__restrict state) {
 	                init_argv,
 	                NULL,
 	                NULL);
+	if (kernel_debugtrap_enabled()) {
+		struct debugtrap_reason r;
+		r.dtr_signo  = SIGTRAP;
+		r.dtr_reason = DEBUGTRAP_REASON_EXEC;
+		/* FIXME: Should re-print the path using `path_sprintent()', since the path
+		 *        given by the bootloader may be ambiguous (or contain/be a symlink) */
+		r.dtr_strarg = kernel_init_binary;
+		state = kernel_debugtrap_r(state, &r);
+	}
 	decref(init_dentry);
 	decref(init_path);
 	decref(init_node);
