@@ -1861,6 +1861,7 @@ directory_getentry_p(struct directory_node *__restrict self,
 			if (code != ERROR_CODEOF(E_FSERROR_UNSUPPORTED_OPERATION) ||
 			    error_data()->e_pointers[0] != E_FILESYSTEM_OPERATION_READDIR)
 				RETHROW();
+			result = NULL;
 		}
 		if (!result)
 			return NULL;
@@ -1925,6 +1926,7 @@ directory_getcaseentry_p(struct directory_node *__restrict self,
 			if (code != ERROR_CODEOF(E_FSERROR_UNSUPPORTED_OPERATION) ||
 			    error_data()->e_pointers[0] != E_FILESYSTEM_OPERATION_READDIR)
 				RETHROW();
+			result = NULL;
 		}
 		if (!result)
 			return NULL;

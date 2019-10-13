@@ -738,21 +738,21 @@ again_follow_symlink:
 							containing_directory = new_containing_directory;
 						} else {
 							/* Use the dynamic interface! */
-							unsigned int mode;
+							unsigned int follow_mode;
 							REF struct directory_node *new_containing_directory;
-							mode = path_follow_symlink_dynamic(filesystem,
-							                                   &containing_path,
-							                                   root,
-							                                   sl_node,
-							                                   mode,
-							                                   premaining_symlinks,
-							                                   pcontaining_dirent,
-							                                   &new_containing_directory,
-							                                   &result_path,
-							                                   &new_result);
+							follow_mode = path_follow_symlink_dynamic(filesystem,
+							                                          &containing_path,
+							                                          root,
+							                                          sl_node,
+							                                          mode,
+							                                          premaining_symlinks,
+							                                          pcontaining_dirent,
+							                                          &new_containing_directory,
+							                                          &result_path,
+							                                          &new_result);
 							decref(containing_directory);
 							containing_directory = new_containing_directory;
-							if (mode == PATH_FOLLOW_SYMLINK_DYNAMIC_GOT_RESULT_PATH)
+							if (follow_mode == PATH_FOLLOW_SYMLINK_DYNAMIC_GOT_RESULT_PATH)
 								goto got_result_path;
 						}
 						decref(result);

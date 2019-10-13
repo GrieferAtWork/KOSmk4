@@ -218,6 +218,7 @@ again_piter:
 					/* Scan using all defined probes. */
 					size_t i;
 					assert(probes);
+					was_found = false;
 					for (i = 0; i < probes->upv_count; ++i) {
 						was_found = (*probes->upv_elem[i].c_intf)(iter->uui_ctrl,
 						                                          iter->uui_intf,
