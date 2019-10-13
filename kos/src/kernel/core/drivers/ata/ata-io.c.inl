@@ -485,8 +485,8 @@ again_service_io:
 err_io_error:
 	/* Always reset the bus (even if merely done for the next access) */
 	assert(!task_isconnected());
-	printk(KERN_ERR "Reseting IDE on PIO-I/O error code %#Ix:%#Ix (bus:%#I16x;ctrl:%#I16x;dma:%#I16x)\n",
-	       ERRR_E(error), ERRR_R(error), bus->b_busio, bus->b_ctrlio, bus->b_dmaio);
+	printk(KERN_ERR "Reseting IDE on PIO-I/O error code %#I16x:%#I16x:%#I16x (bus:%#I16x;ctrl:%#I16x;dma:%#I16x)\n",
+	       (u16)ERRR_C(error), (u16)ERRR_S(error), (u16)ERRR_R(error), bus->b_busio, bus->b_ctrlio, bus->b_dmaio);
 	Ata_ResetAndReinitializeBus(bus);
 	if (reset_counter < 3) { /* TODO: Make this `3' configurable */
 		++reset_counter;

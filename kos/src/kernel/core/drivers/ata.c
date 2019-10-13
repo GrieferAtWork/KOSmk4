@@ -431,9 +431,10 @@ err:
 
 
 typedef u32 errr_t; /* ERRor and Reason */
-#define ERRR(error, reason) (ERROR_CODEOF(error) | (reason) << 16)
+#define ERRR(error, reason) (ERROR_SUBCLASS(ERROR_CODEOF(error)) | ((reason) << 16))
 #define ERRR_OK              ERRR(E_OK, 0)
-#define ERRR_E(x)           ((x) & 0xffff)
+#define ERRR_C(x)            E_IOERROR
+#define ERRR_S(x)           ((x) & 0xffff)
 #define ERRR_R(x)           (((x) >> 16) & 0xffff)
 
 /* PIO-based data transfer helpers for passing data to/from an ATA drive. */
@@ -465,10 +466,11 @@ NOTHROW(KCALL ATA_GetErrrForStatusRegister)(u8 status) {
 	                                 : E_IOERROR_REASON_ATA_DCR_DF);
 }
 
+
 PRIVATE NOBLOCK errr_t
 NOTHROW(KCALL Ata_WaitForBusy)(port_t ctrl) {
 	u8 status;
-	volatile unsigned int timeout;
+	unsigned int timeout;
 	if (!(inb(ctrl) & ATA_DCR_BSY))
 		return ERRR_OK;
 	/* XXX: this is _really_ unspecific. - It'd be better to use some kind of clock... */
@@ -476,14 +478,14 @@ NOTHROW(KCALL Ata_WaitForBusy)(port_t ctrl) {
 	while ((status = inb(ctrl)) & ATA_DCR_BSY) {
 		if unlikely(status & (ATA_DCR_ERR | ATA_DCR_DF))
 			return ATA_GetErrrForStatusRegister(status);
-		if unlikely(timeout--)
+		if unlikely(!timeout)
 			return ERRR(E_IOERROR_TIMEOUT, E_IOERROR_REASON_ATA_DCR_BSY);
 		task_pause();
 		io_delay();
+		--timeout;
 	}
 	return ERRR_OK;
 }
-
 
 PRIVATE errr_t
 NOTHROW(KCALL Ata_WaitForBusyTimeout)(port_t ctrl) {
@@ -596,7 +598,7 @@ NOTHROW(FCALL handle_completion_ioerror)(struct aio_handle *__restrict self,
 	struct exception_data *mydata = &THIS_EXCEPTION_INFO.ei_data;
 	memcpy(&old_data, mydata, sizeof(struct exception_data));
 	memset(mydata, 0, sizeof(struct exception_data));
-	mydata->e_code        = ERRR_E(errr);
+	mydata->e_code        = ERROR_CODE(ERRR_C(errr), ERRR_S(errr));
 	mydata->e_pointers[0] = E_IOERROR_SUBSYSTEM_HARDDISK;
 	mydata->e_pointers[1] = ERRR_R(errr);
 	COMPILER_WRITE_BARRIER();
@@ -614,7 +616,7 @@ NOTHROW(FCALL handle_completion_ioerror_generic)(struct aio_handle *__restrict s
 	       self->ah_type == &aio_noop_type);
 	memcpy(&old_data, mydata, sizeof(struct exception_data));
 	memset(mydata, 0, sizeof(struct exception_data));
-	mydata->e_code        = ERRR_E(errr);
+	mydata->e_code        = ERROR_CODE(ERRR_C(errr), ERRR_S(errr));
 	mydata->e_pointers[0] = E_IOERROR_SUBSYSTEM_HARDDISK;
 	mydata->e_pointers[1] = ERRR_R(errr);
 	COMPILER_WRITE_BARRIER();
@@ -727,8 +729,9 @@ again:
 	return true;
 handle_io_error:
 	/* Always reset the bus (even if merely done for the next access) */
-	printk(KERN_ERR "[ata] Reseting IDE on DMA-I/O error code %#Ix:%#Ix (bus:%#I16x,ctrl:%#I16x,dma:%#I16x)\n",
-	       ERRR_E(error), ERRR_R(error), self->b_busio, self->b_ctrlio, self->b_dmaio);
+	printk(KERN_ERR "[ata] Reseting IDE on DMA-I/O error code %#I16x:%#I16x:%#I16x (bus:%#I16x,ctrl:%#I16x,dma:%#I16x)\n",
+	       (u16)ERRR_C(error), (u16)ERRR_S(error), (u16)ERRR_R(error),
+	       self->b_busio, self->b_ctrlio, self->b_dmaio);
 	Ata_ResetBus(self->b_ctrlio);
 	{
 		vm_phys_t phys;
