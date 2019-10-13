@@ -144,6 +144,45 @@ LOCAL bool KCALL all_all_cpus_online(void) {
 #define CPU_ALL_ONLINE   all_all_cpus_online()
 #endif
 
+PRIVATE NOBLOCK void NOTHROW(KCALL x86_calibrate_apic_with_pic)(void) {
+	u8 temp;
+	/* Make sure that the speaker is off and disconnected. */
+	temp = inb(PIT_PCSPEAKER);
+	outb(PIT_PCSPEAKER, temp & ~(PIT_PCSPEAKER_FSYNCPIT |
+	                             PIT_PCSPEAKER_FINOUT));
+	/* Wait until the speaker moves to the in-position */
+	for (;;) {
+		temp = inb(PIT_PCSPEAKER);
+		if (!(temp & PIT_PCSPEAKER_OUT))
+			break;
+		__pause();
+	}
+	outb(PIT_COMMAND,
+	     PIT_COMMAND_SELECT_F2 |
+	     PIT_COMMAND_ACCESS_FLOHI |
+	     PIT_COMMAND_MODE_FONESHOT |
+	     PIT_COMMAND_FBINARY);
+	/* Configure the PIT to trigger after 1/100th of a second (10ms). */
+	outb_p(PIT_DATA2, (PIT_HZ_DIV(100) & 0xff));
+	outb(PIT_DATA2, (PIT_HZ_DIV(100) >> 8) & 0xff);
+	/*  Move the speaker to trigger the one-shot timer.
+	 * (This is what I call a hack from the last century!) */
+	outb(PIT_PCSPEAKER, temp | (PIT_PCSPEAKER_OUT |
+	                            PIT_PCSPEAKER_FSYNCPIT));
+	/* The PIC timer is now running. */
+	/* Set LAPIC counter to its maximum possible value. */
+	lapic_write(APIC_TIMER_INITIAL, (u32)-1);
+	COMPILER_BARRIER();
+
+	/* Wait for our one-shot time to expire. */
+	while (inb(PIT_PCSPEAKER) & PIT_PCSPEAKER_FPIT2OUT)
+		__pause();
+	/* Turn off the APIC timer. */
+	lapic_write(APIC_TIMER, APIC_TIMER_FDISABLED);
+	/* Make sure to disable the speaker once again. */
+	outb(PIT_PCSPEAKER, temp & ~(PIT_PCSPEAKER_FSYNCPIT |
+	                             PIT_PCSPEAKER_FINOUT));
+}
 
 
 /* TODO: This function being apart of the .free section is unsafe!
@@ -168,26 +207,8 @@ PRIVATE /*ATTR_FREETEXT*/ void KCALL x86_altcore_entry(void) {
 		__pause();
 	lapic_write(APIC_TIMER_DIVIDE, APIC_TIMER_DIVIDE_F16);
 	lapic_write(APIC_TIMER, 0xff | APIC_TIMER_MODE_FONESHOT | APIC_TIMER_SOURCE_FDIV);
-	outb(PIT_PCSPEAKER,
-	     (inb(PIT_PCSPEAKER) &
-	      ~(PIT_PCSPEAKER_FSYNCPIT | PIT_PCSPEAKER_FINOUT)) |
-	     PIT_PCSPEAKER_FSYNCPIT);
-	outb(PIT_COMMAND,
-	     PIT_COMMAND_SELECT_F2 |
-	     PIT_COMMAND_ACCESS_FLOHI |
-	     PIT_COMMAND_MODE_FONESHOT);
-	outb_p(PIT_DATA2, (PIT_HZ_DIV(100) & 0xff));
-	outb(PIT_DATA2, (PIT_HZ_DIV(100) >> 8) & 0xff);
-	{
-		u8 temp = inb(PIT_PCSPEAKER) & ~PIT_PCSPEAKER_FINOUT;
-		outb(PIT_PCSPEAKER, temp);
-		outb(PIT_PCSPEAKER, temp | PIT_PCSPEAKER_OUT);
-	}
-	lapic_write(APIC_TIMER_INITIAL, (u32)-1);
-	while (inb(PIT_PCSPEAKER) & PIT_PCSPEAKER_FPIT2OUT)
-		__pause();
+	x86_calibrate_apic_with_pic();
 	sync_endwrite(&x86_pit_lock);
-	lapic_write(APIC_TIMER, APIC_TIMER_FDISABLED);
 	num_ticks = lapic_read(APIC_TIMER_CURRENT);
 	num_ticks = (((u32)-1) - num_ticks) * 100;
 	printk(/*FREESTR*/ (KERN_INFO "CPU #%u uses a LAPIC timing of %u ticks per second\n"),
@@ -668,47 +689,18 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_apic)(void) {
 		 *       up boot time by just that tiny bit more. */
 #endif /* !CONFIG_NO_SMP */
 
-
 		/* Setup the first portion of an APIC timer. */
 		lapic_write(APIC_TIMER_DIVIDE, APIC_TIMER_DIVIDE_F16);
 		lapic_write(APIC_TIMER,
 		            X86_INTERRUPT_APIC_SPURIOUS |
 		            APIC_TIMER_MODE_FONESHOT |
 		            APIC_TIMER_SOURCE_FDIV);
-
-
-		outb(PIT_PCSPEAKER,
-		     (inb(PIT_PCSPEAKER) & ~(PIT_PCSPEAKER_FSYNCPIT | PIT_PCSPEAKER_FINOUT)) |
-		     PIT_PCSPEAKER_FSYNCPIT);
-		outb(PIT_COMMAND,
-		     PIT_COMMAND_SELECT_F2 |
-		     PIT_COMMAND_ACCESS_FLOHI |
-		     PIT_COMMAND_MODE_FONESHOT);
-		/* Configure the PIT to trigger after 1/100th of a second (10ms). */
-		outb_p(PIT_DATA2, (PIT_HZ_DIV(100) & 0xff));
-		outb(PIT_DATA2, (PIT_HZ_DIV(100) >> 8) & 0xff);
-		{
-			/*  Move the speaker to trigger the one-shot timer.
-			 * (This is what I call a hack from the last century!) */
-			u8 temp = inb(PIT_PCSPEAKER) & ~PIT_PCSPEAKER_FINOUT;
-			outb(PIT_PCSPEAKER, temp);
-			outb(PIT_PCSPEAKER, temp | PIT_PCSPEAKER_OUT);
-		}
-		/* The PIC timer is now running. */
-		/* Set LAPIC counter to its maximum possible value. */
-		lapic_write(APIC_TIMER_INITIAL, (u32)-1);
-		COMPILER_BARRIER();
-
-		/* Wait for our one-shot time to expire. */
-		while (inb(PIT_PCSPEAKER) & PIT_PCSPEAKER_FPIT2OUT)
-			__pause();
+		/* Calibrate the APIC */
+		x86_calibrate_apic_with_pic();
 #ifndef CONFIG_NO_SMP
 		sync_endwrite(&x86_pit_lock);
 #endif /* !CONFIG_NO_SMP */
-
-		/* Stop LAPIC counter */
 		COMPILER_BARRIER();
-		lapic_write(APIC_TIMER, APIC_TIMER_FDISABLED);
 		num_ticks = lapic_read(APIC_TIMER_CURRENT);
 
 #ifndef CONFIG_NO_SMP
@@ -718,8 +710,10 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_apic)(void) {
 			                  (u8)entry_page);
 		}
 #endif /* !CONFIG_NO_SMP */
-
 		num_ticks = (((u32)-1) - num_ticks) * 100;
+#define MAKE_DWORD(a, b, c, d) ((u32)(a) | ((u32)(b) << 8) | ((u32)(c) << 16) | ((u32)(d) << 24))
+		if (__x86_bootcpu_idfeatures.ci_80000002a == MAKE_DWORD('B', 'O', 'C', 'H'))
+			num_ticks = 33057500; /* FIXME: Work-around for weird timing... */
 		printk(FREESTR(KERN_INFO "[apic] Boot CPU uses a LAPIC timing of %u ticks per second\n"), num_ticks);
 		num_ticks /= HZ;
 		if unlikely(!num_ticks)

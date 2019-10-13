@@ -170,11 +170,6 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 *       about them in terms of telling us. */
 	x86_initialize_smp();
 
-	if (__x86_bootcpu_idfeatures.ci_80000002a == MAKE_DWORD('B', 'O', 'C', 'H')) {
-		/* FIXME: On bochs, LAPIC init doesn't work properly (it just beeps at you...) */
-		BREAKPOINT();
-	}
-
 	/* Same as SMP, ACPI needs access to the physical identity mapping. */
 	x86_initialize_acpi();
 

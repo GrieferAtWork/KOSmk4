@@ -117,7 +117,7 @@ again_set_myleader_as_fproc:
 			bool xch_ok;
 do_try_override_fproc:
 			xch_ok = term->t_fproc.cmpxch(oldpid, my_leader_pid);
-			decref(oldpid);
+			decref_likely(oldpid);
 			if unlikely(!xch_ok)
 				goto again_set_myleader_as_fproc;
 			goto done; /* All right! we've got the lock. */

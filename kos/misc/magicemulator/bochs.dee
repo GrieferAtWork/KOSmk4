@@ -136,6 +136,7 @@ got_bios:
 		rc << "cpuid: mmx=1, apic=xapic, simd=sse2, sse4a=0, misaligned_sse=0, sep=1, movbe=0, adx=0\n";
 		rc << "cpuid: aes=0, sha=0, xsave=0, xsaveopt=0, x86_64=1, 1g_pages=0, pcid=0, fsgsbase=0\n";
 		rc << "port_e9_hack: enabled=1\n";
+		rc << "clock: sync=none\n";
 //		rc << "debug: action=report\n";
 
 //		rc << "load32bitOSImage: os=nullkernel, path=" << repr(kernelFlatFilename) << ", iolog=, initrd=\n";
