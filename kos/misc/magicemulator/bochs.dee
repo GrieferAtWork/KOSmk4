@@ -109,16 +109,21 @@ got_bios:
 			keepBss: true,
 			overrideEntry: false);
 		/* In order to be accepted by BOCHS, the size of kernelFlatFilename
-		 * must be divisable by `0x80000' (== 16heads * 64sectors_per_track * 512bytes)
+		 * must be divisable by `0x7e000' (== 16heads * 63sectors_per_track * 512bytes)
 		 * Otherwise, the bootloader won't be able to read the entire kernel image! */
-		with (local fp = File.open(kernelFlatFilename, "rb+,nobuf")) {
-			local isSize = fp.size();
-			local reqSize = ((isSize + (0x80000 - 1)) / 0x80000) * 0x80000;
-			assert reqSize >= isSize;
-			if (reqSize > isSize) {
-				fp.seek(reqSize - 1);
-				fp.write("\0");
+		try {
+			with (local fp = File.open(kernelFlatFilename, "rb+,nobuf")) {
+				local isSize = fp.size();
+				local reqSize = ((isSize + (0x7e000 - 1)) / 0x7e000) * 0x7e000;
+				assert reqSize >= isSize;
+				if (reqSize > isSize) {
+					fp.seek(reqSize - 1);
+					fp.write("\0");
+				}
 			}
+		} @[interrupt] catch (...) {
+			try fs.unlink(kernelFlatFilename); catch (...);
+			throw;
 		}
 	}
 	try fs.unlink(diskFile + ".lock"); catch (...);
