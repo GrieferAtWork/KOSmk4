@@ -123,6 +123,7 @@ __SYSDECL_BEGIN
 #define OFFSET_UCPUSTATE_EFLAGS OFFSET_UCPUSTATE32_EFLAGS
 #define OFFSET_UCPUSTATE_EIP    OFFSET_UCPUSTATE32_EIP
 #define SIZEOF_UCPUSTATE        SIZEOF_UCPUSTATE32
+#define UCPUSTATE_TO_KCPUSTATE  UCPUSTATE32_TO_KCPUSTATE32
 #define UCPUSTATE_PC            UCPUSTATE32_PC
 #define UCPUSTATE_SP            UCPUSTATE32_SP
 
@@ -429,6 +430,10 @@ struct __ATTR_PACKED ucpustate32 { /* u -- User */
 	__u32           ucs_eip;    /* Instruction pointer */
 };
 
+#define UCPUSTATE32_TO_KCPUSTATE32(dst, src) \
+	((dst).kcs_gpregs = (src).ucs_gpregs,    \
+	 (dst).kcs_eflags = (src).ucs_eflags,    \
+	 (dst).kcs_eip    = (src).ucs_eip)
 #define UCPUSTATE32_PC(x) ((x).ucs_eip)
 #define UCPUSTATE32_SP(x) ((x).ucs_gpregs.gp_esp)
 

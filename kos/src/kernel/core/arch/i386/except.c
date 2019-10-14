@@ -708,25 +708,78 @@ search_fde:
 		                                  &unwind_setreg_ucpustate, &ustate);
 		if unlikely(error != UNWIND_SUCCESS)
 			goto err_old_state;
-		if (!(ustate.ucs_cs & 3) &&
+		if ((ustate.ucs_cs & 3) ||
 #ifndef __x86_64__
-		    !(ustate.ucs_eflags & EFLAGS_VM) &&
+		    (ustate.ucs_eflags & EFLAGS_VM)
 #endif /* !__x86_64__ */
-		    UCPUSTATE_PC(ustate) != (uintptr_t)&x86_rpc_user_redirection) {
-			error = UNWIND_INVALID_REGISTER;
-			goto err_old_state;
+		    ) {
+			/* At this point, we've got an exception that should be unwound
+			 * into user-space, with the user-space context at the unwind
+			 * location within user-space.
+			 * Now we must use that state to build a full `struct icpustate',
+			 * then pass that state to `x86_propagate_userspace_exception' */
+			x86_handle_except_before_userspace(&ustate,
+			                                   TASK_RPC_REASON_ASYNCUSER);
 		}
-		/* At this point, we've got an exception that should be unwound
-		 * into user-space, with the user-space context at the unwind
-		 * location within user-space.
-		 * Now we must use that state to build a full `struct icpustate',
-		 * then pass that state to `x86_propagate_userspace_exception' */
-		x86_handle_except_before_userspace(&ustate,
-		                                   TASK_RPC_REASON_ASYNCUSER);
+		{
+			u16 expected_gs = __rdgs();
+			u16 expected_fs = __rdfs();
+			u16 expected_es = __rdes();
+			u16 expected_ds = __rdds();
+			if unlikely(ustate.ucs_cs != SEGMENT_KERNEL_CODE ||
+			            ustate.ucs_ss != SEGMENT_KERNEL_DATA ||
+			            ustate.ucs_sgregs.sg_gs != expected_gs ||
+			            ustate.ucs_sgregs.sg_fs != expected_fs ||
+			            ustate.ucs_sgregs.sg_es != expected_es ||
+			            ustate.ucs_sgregs.sg_ds != expected_ds) {
+#define LOG_SEGNENT_INCONSISTENCY(name, isval, wantval)                                               \
+				do {                                                                                  \
+					if (isval != wantval) {                                                           \
+						printk(KERN_WARNING "[except] Inconsistent unwind %%%cs: %#I16x != %#I16x\n", \
+						       name, isval, wantval);                                                 \
+					}                                                                                 \
+				} __WHILE0
+				/* FIXME: Bochs behaves kind-of weird:
+				 * [warn  ] [except] Inconsistent unwind %cs: 0x80000008 != 0x8
+				 * [warn  ] [except] Inconsistent unwind %fs: 0xeafe0040 != 0x40
+				 * [warn  ] [except] Inconsistent unwind %es: 0x10000023 != 0x23
+				 * -> Testing indicates that bochs implements `pushl %ds' as:
+				 * >> ESP -= 4;
+				 * >> *(u16 *)ESP = DS;
+				 * In other words, it leaves the upper 2 bytes of the pushed DWORD
+				 * undefined (or rather: have them keep their previous values)
+				 * -> To fix this, we must adjust libunwind (and probably also some
+				 *    other places that use segment registers, since until now I've
+				 *    always assumed that the most significant 2 bytes were initialized
+				 *    as all zeroes), in order to either ignore those 2 bytes, or
+				 *    manually fill them with zeroes before passing them on.
+				 * Ok! I've just taken a look at the Intel manuals:
+				 * ... if the operand size is 32-bits, either a zero-extended value is
+				 * pushed on the stack or the segment selector is written on the stack
+				 * using a 16-bit move. For the last case, all recent Core and Atom
+				 * processors perform a 16-bit move, leaving the upper portion of the
+				 * stack location unmodified. ...
+				 * -> In other words: Bochs is entirely correct in its emulation, and
+				 *    I'm a fault here, in which case. Honestly: Thank you Bochs. That's
+				 *    one less Problem for me to figure out the hard way once testing
+				 *    on real Hardware is going to start...
+				 */
+				LOG_SEGNENT_INCONSISTENCY('c', ustate.ucs_cs, SEGMENT_KERNEL_CODE);
+				LOG_SEGNENT_INCONSISTENCY('s', ustate.ucs_ss, SEGMENT_KERNEL_DATA);
+				LOG_SEGNENT_INCONSISTENCY('g', ustate.ucs_sgregs.sg_gs, expected_gs);
+				LOG_SEGNENT_INCONSISTENCY('f', ustate.ucs_sgregs.sg_fs, expected_fs);
+				LOG_SEGNENT_INCONSISTENCY('e', ustate.ucs_sgregs.sg_es, expected_es);
+				LOG_SEGNENT_INCONSISTENCY('d', ustate.ucs_sgregs.sg_ds, expected_ds);
+#undef LOG_SEGNENT_INCONSISTENCY
+				error = UNWIND_INVALID_REGISTER;
+				goto err_old_state;
+			}
+		}
+		UCPUSTATE_TO_KCPUSTATE(*state, ustate);
+	} else {
+		if unlikely(error != UNWIND_SUCCESS)
+			goto err_old_state;
 	}
-
-	if unlikely(error != UNWIND_SUCCESS)
-		goto err_old_state;
 
 #if EXCEPT_BACKTRACE_SIZE != 0
 	/* Remember the current state PC as a new entry in the exception's traceback. */

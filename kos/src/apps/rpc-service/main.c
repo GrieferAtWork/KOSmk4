@@ -16,72 +16,37 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
+#ifndef GUARD_APPS_RPC_SERVICE_MAIN_C
+#define GUARD_APPS_RPC_SERVICE_MAIN_C 1
 
-BEGIN GROUP("apps.init") { COMPILE, LINK, MCOPY };
-	SET_LANGUAGE("c")
-	SET_OUTPUT("/" + BINPATH + "/bin/init")
-	SET_DISKFILE("/bin/init")
-	SOURCE({ "init/*.c" })
-END
+#include <hybrid/compiler.h>
 
-BEGIN GROUP("apps.rpc-service") { COMPILE, LINK, MCOPY };
-	SET_LANGUAGE("c")
-	SET_OUTPUT("/" + BINPATH + "/bin/rpc-service")
-	SET_DISKFILE("/bin/rpc-service")
-	SOURCE({ "rpc-service/*.c" })
-END
+#include <kos/syscalls.h>
+#include <kos/sysctl.h>
 
+#include <signal.h>
 
+DECL_BEGIN
 
-BEGIN GROUP("apps.system-test") { COMPILE, LINK, MCOPY };
-	DEFINE("__INSIDE_LIBTEST")
-	LINKER_SCRIPT("system-test/arch/" + TARGET_XARCH + "/_linker.ld")
-	SET_OUTPUT("/" + BINPATH + "/bin/system-test")
-	SET_DISKFILE("/bin/system-test")
-	USELIB("libdl")
-	SOURCE({
-		"system-test/*.c",
+int main(int argc, char *argv[]) {
+	/* This program is used to test a problem related to exception unwinding
+	 * while inside of `task_serve()' (s.a. `LOG_SEGNENT_INCONSISTENCY()' in
+	 * `kos/src/kernel/core/arch/i386/except.c')
+	 * -> Start this program and press CTRL+C a couple of times (which will
+	 *    eventually cause an E_INTERRUPT_USER_RPC to be thrown and propagated
+	 *    through `task_serve()', that demonstratetes a design flaw caused by
+	 *    a miss-understanding of how `pushl %<SEGMENT_REGISTER>' works on
+	 *    different CPUs)
+	 * (To exit the program, send SIGQUIT using CTRL+\ (which is CTRL+# on
+	 * European keyboard)) */
+	signal(SIGINT, SIG_IGN);
+	sysctl(SYSCTL_SYSCALL_SET_TRACING_ENABLED, 0); /* Prevent log spam of tracing methods */
+	for (;;) {
+		sys_rpc_service();
+	}
+	return 0;
+}
 
-		/* Pull in test files from various other places. */
-		"../libc/libc/*.ctest",
-		"../libkeymap/*.ctest",
-		"../libjson/*.ctest",
-		"../libinstrlen/*.ctest",
+DECL_END
 
-	})
-END
-
-BEGIN GROUP("apps.keymap") { COMPILE, LINK, MCOPY };
-	SET_LANGUAGE("c")
-	SET_OUTPUT("/" + BINPATH + "/bin/keymap")
-	SET_DISKFILE("/bin/keymap")
-	USELIB("libkeymap")
-	SOURCE({ "keymap/*.c" })
-END
-
-
-BEGIN GROUP("apps.gfx") { COMPILE, LINK, MCOPY };
-	SET_LANGUAGE("c")
-	SET_OUTPUT("/" + BINPATH + "/bin/gfx")
-	SET_DISKFILE("/bin/gfx")
-	SOURCE({ "gfx/*.c" })
-END
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#endif /* !GUARD_APPS_RPC_SERVICE_MAIN_C */
