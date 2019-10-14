@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x225cd0 */
+/* HASH CRC-32:0xe375e70f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -10024,9 +10024,9 @@ END(__asm64_syscall_utime64)
  *                       MAP_NORESERVE|MAP_POPULATE|MAP_SYNC|MAP_DONT_MAP|
  *                       MAP_DONT_OVERRIDE'
  * @param: fd:    A handle for the library file being mapped
- *              (must be a file or vm_datablock/inode)
+ *                (must be a file or vm_datablock/inode)
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
- *              (depending on the caller running in 32- or 64-bit mode)
+ *                (depending on the caller running in 32- or 64-bit mode)
  * @param: hdrc:  The number of program headers */
 .section .text.x86.asm64_syscall.maplibrary
 	/* void *maplibrary(void *addr,
@@ -18806,9 +18806,9 @@ END(__asm32_int80_select64)
  *                       MAP_NORESERVE|MAP_POPULATE|MAP_SYNC|MAP_DONT_MAP|
  *                       MAP_DONT_OVERRIDE'
  * @param: fd:    A handle for the library file being mapped
- *              (must be a file or vm_datablock/inode)
+ *                (must be a file or vm_datablock/inode)
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
- *              (depending on the caller running in 32- or 64-bit mode)
+ *                (depending on the caller running in 32- or 64-bit mode)
  * @param: hdrc:  The number of program headers */
 .section .text.x86.asm32_syscall_int80.maplibrary
 	/* void *maplibrary(void *addr,
@@ -24532,9 +24532,9 @@ END(__asm32_sysenter_select64)
  *                       MAP_NORESERVE|MAP_POPULATE|MAP_SYNC|MAP_DONT_MAP|
  *                       MAP_DONT_OVERRIDE'
  * @param: fd:    A handle for the library file being mapped
- *              (must be a file or vm_datablock/inode)
+ *                (must be a file or vm_datablock/inode)
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
- *              (depending on the caller running in 32- or 64-bit mode)
+ *                (depending on the caller running in 32- or 64-bit mode)
  * @param: hdrc:  The number of program headers */
 .section .text.x86.asm32_syscall_sysenter.maplibrary
 	/* void *maplibrary(void *addr,

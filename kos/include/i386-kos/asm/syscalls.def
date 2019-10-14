@@ -154,7 +154,7 @@ DEFINE {0x0000002d,0x0000000c} = brk(void *addr): errno_t;
 %(i386)[restart(must)] DEFINE 0x00000032 = getegid(): uint16_t;
 DEFINE {0x00000033,0x000000a3} = acct(char const *filename): errno_t;
 [cp][restart(must)] DEFINE {0x00000034,0x000000a6} = umount2(char const *special_file, syscall_ulong_t flags): errno_t;
-//TODO:%(i386)DEFINE 0x00000035 = lock(...): errno_t;
+//Unimplemented by linux:%(i386)DEFINE 0x00000035 = lock(...): errno_t;
 [cp] DEFINE {0x00000036,0x00000010} = ioctl(fd_t fd, syscall_ulong_t request, void *arg): syscall_slong_t;
 [cp] DEFINE {0x80000036,0x80000010} = ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg): syscall_slong_t;
 [cp] DEFINE {0x00000037,0x00000048} = fcntl(fd_t fd, syscall_ulong_t cmd, void *arg): syscall_slong_t;
@@ -202,9 +202,9 @@ DEFINE {0x8000004f,0x800000a4} = settimeofday64(struct __timeval64 const *tv, st
 @@                      MAP_NORESERVE|MAP_POPULATE|MAP_SYNC|MAP_DONT_MAP|
 @@                      MAP_DONT_OVERRIDE'
 @@@param: fd:    A handle for the library file being mapped
-@@             (must be a file or vm_datablock/inode)
+@@               (must be a file or vm_datablock/inode)
 @@@param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
-@@             (depending on the caller running in 32- or 64-bit mode)
+@@               (depending on the caller running in 32- or 64-bit mode)
 @@@param: hdrc:  The number of program headers
 DEFINE {0x80000056,0x80000086} = maplibrary(void *addr,
 	[printf(flagset(

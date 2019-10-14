@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x83d757a4 */
+/* HASH CRC-32:0x201831a2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -4242,9 +4242,9 @@ END(libc_sys_utime64)
  *                       MAP_NORESERVE|MAP_POPULATE|MAP_SYNC|MAP_DONT_MAP|
  *                       MAP_DONT_OVERRIDE'
  * @param: fd:    A handle for the library file being mapped
- *              (must be a file or vm_datablock/inode)
+ *                (must be a file or vm_datablock/inode)
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
- *              (depending on the caller running in 32- or 64-bit mode)
+ *                (depending on the caller running in 32- or 64-bit mode)
  * @param: hdrc:  The number of program headers */
 .section .text.crt.syscall.maplibrary
 /* void *maplibrary(void *addr,
@@ -8711,9 +8711,9 @@ END(libc_sys_Xutime64)
  *                       MAP_NORESERVE|MAP_POPULATE|MAP_SYNC|MAP_DONT_MAP|
  *                       MAP_DONT_OVERRIDE'
  * @param: fd:    A handle for the library file being mapped
- *              (must be a file or vm_datablock/inode)
+ *                (must be a file or vm_datablock/inode)
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
- *              (depending on the caller running in 32- or 64-bit mode)
+ *                (depending on the caller running in 32- or 64-bit mode)
  * @param: hdrc:  The number of program headers */
 .section .text.crt.syscall.Xmaplibrary
 /* void *maplibrary(void *addr,

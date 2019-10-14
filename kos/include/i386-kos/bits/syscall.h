@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ef9c86d */
+/* HASH CRC-32:0x89951073 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -528,9 +528,9 @@
  *                       MAP_NORESERVE|MAP_POPULATE|MAP_SYNC|MAP_DONT_MAP|
  *                       MAP_DONT_OVERRIDE'
  * @param: fd:    A handle for the library file being mapped
- *              (must be a file or vm_datablock/inode)
+ *                (must be a file or vm_datablock/inode)
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
- *              (depending on the caller running in 32- or 64-bit mode)
+ *                (depending on the caller running in 32- or 64-bit mode)
  * @param: hdrc:  The number of program headers */
 #define SYS_maplibrary              __NR_maplibrary              /* void * maplibrary(void *addr, syscall_ulong_t flags, fd_t fd, void *hdrv, size_t hdrc) */
 #define SYS_setitimer64             __NR_setitimer64             /* errno_t setitimer64(syscall_ulong_t which, struct __itimerval64 const *newval, struct __itimerval64 *oldval) */

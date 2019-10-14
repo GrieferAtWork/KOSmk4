@@ -129,7 +129,7 @@ SECTIONS {
 		*(.rodata.cold.debug_function_str)
 		IP_ALIGN(__SIZEOF_POINTER__);
 		PROVIDE_HIDDEN(__kernel_debug_functions_start = ABSOLUTE(.));
-		*(.rodata.cold.debug_functions)
+		KEEP(*(.rodata.cold.debug_functions))
 		PROVIDE_HIDDEN(__kernel_debug_functions_end = ABSOLUTE(.));
 		PROVIDE_HIDDEN(__kernel_debug_functions_size = ABSOLUTE(ABSOLUTE(__kernel_debug_functions_end) - ABSOLUTE(__kernel_debug_functions_start)));
 		DEFINE_CALLBACK_VECTOR(dbg_init,.rodata.cold.callback.dbg_init)

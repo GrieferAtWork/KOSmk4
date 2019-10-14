@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf527c3bc */
+/* HASH CRC-32:0x8b521cac */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1404,9 +1404,9 @@ __CDECLARE_SC(,__errno_t,madvise,(void *__addr, __size_t __len, __syscall_ulong_
  *                       MAP_NORESERVE|MAP_POPULATE|MAP_SYNC|MAP_DONT_MAP|
  *                       MAP_DONT_OVERRIDE'
  * @param: fd:    A handle for the library file being mapped
- *              (must be a file or vm_datablock/inode)
+ *                (must be a file or vm_datablock/inode)
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
- *              (depending on the caller running in 32- or 64-bit mode)
+ *                (depending on the caller running in 32- or 64-bit mode)
  * @param: hdrc:  The number of program headers */
 __CDECLARE_SC(,void *,maplibrary,(void *__addr, __syscall_ulong_t __flags, __fd_t __fd, void *__hdrv, __size_t __hdrc),(__addr,__flags,__fd,__hdrv,__hdrc))
 #endif /* !__sys_maplibrary_defined */
@@ -4189,9 +4189,9 @@ __CDECLARE_XSC(,__errno_t,madvise,(void *__addr, __size_t __len, __syscall_ulong
  *                       MAP_NORESERVE|MAP_POPULATE|MAP_SYNC|MAP_DONT_MAP|
  *                       MAP_DONT_OVERRIDE'
  * @param: fd:    A handle for the library file being mapped
- *              (must be a file or vm_datablock/inode)
+ *                (must be a file or vm_datablock/inode)
  * @param: hdrv:  Pointer to a vector of `Elf32_Phdr' or `Elf64_Phdr'
- *              (depending on the caller running in 32- or 64-bit mode)
+ *                (depending on the caller running in 32- or 64-bit mode)
  * @param: hdrc:  The number of program headers */
 __CDECLARE_XSC(,void *,maplibrary,(void *__addr, __syscall_ulong_t __flags, __fd_t __fd, void *__hdrv, __size_t __hdrc),(__addr,__flags,__fd,__hdrv,__hdrc))
 #endif /* !__sys_Xmaplibrary_defined */

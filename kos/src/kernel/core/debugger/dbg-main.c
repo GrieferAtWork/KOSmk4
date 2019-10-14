@@ -331,9 +331,9 @@ split_cmdline(char *__restrict cmdline,
 
 PUBLIC void KCALL
 dbg_main(uintptr_t show_welcome) {
+	/* The main entry function for the debugger.
+	 * Called once the debugger context of single-core + no preemptive interrupts has setup. */
 	if (show_welcome) {
-		/* The main entry function for the debugger.
-		 * Called once the debugger context of single-core + no preemptive interrupts has been restored. */
 		dbg_print(DBGSTR("Use CTRL + SHIFT + UP/DOWN/PAGE_UP/PAGE_DOWN/HOME/END to scroll\n"
 		                 "Type " DF_SETFGCOLOR(DBG_COLOR_WHITE) "help" DF_DEFFGCOLOR
 		                 " for a list of commands\n"));

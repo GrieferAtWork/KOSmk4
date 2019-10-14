@@ -605,9 +605,12 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_apic)(void) {
 
 	/* Initialize the regular PIC */
 	x86_initialize_pic();
+#define MAKE_DWORD(a, b, c, d) ((u32)(a) | ((u32)(b) << 8) | ((u32)(c) << 16) | ((u32)(d) << 24))
+	if (__x86_bootcpu_idfeatures.ci_80000002a == MAKE_DWORD('B', 'O', 'C', 'H'))
+		x86_config_noapic = true; /* FIXME: Work-around for weird timing... */
 
 	/* Check if we should make use of the LAPIC */
-	if (X86_HAVE_LAPIC  && !x86_config_noapic) {
+	if (X86_HAVE_LAPIC && !x86_config_noapic) {
 		u32 num_ticks;
 #ifndef CONFIG_NO_SMP
 		cpuid_t i;
@@ -711,9 +714,6 @@ INTERN ATTR_FREETEXT void NOTHROW(KCALL x86_initialize_apic)(void) {
 		}
 #endif /* !CONFIG_NO_SMP */
 		num_ticks = (((u32)-1) - num_ticks) * 100;
-#define MAKE_DWORD(a, b, c, d) ((u32)(a) | ((u32)(b) << 8) | ((u32)(c) << 16) | ((u32)(d) << 24))
-		if (__x86_bootcpu_idfeatures.ci_80000002a == MAKE_DWORD('B', 'O', 'C', 'H'))
-			num_ticks = 33057500; /* FIXME: Work-around for weird timing... */
 		printk(FREESTR(KERN_INFO "[apic] Boot CPU uses a LAPIC timing of %u ticks per second\n"), num_ticks);
 		num_ticks /= HZ;
 		if unlikely(!num_ticks)

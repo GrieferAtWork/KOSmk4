@@ -1465,8 +1465,19 @@ NOTHROW(KCALL Ata_InitializeDrive)(struct ata_ports *__restrict ports,
 					signal = task_waitfor(&timeout);
 					if (!signal) {
 reset_bus_and_fail:
-						Ata_ResetAndReinitializeBus(bus);
-						ATOMIC_WRITE(bus->b_state, ATA_BUS_STATE_READY);
+						if (busptr.hp_siz) {
+							assert(*pbus == (struct ata_bus *)busptr.hp_ptr);
+							*pbus = NULL;
+							if (bus->b_prdt)
+								vpage_free_untraced(bus->b_prdt, 1);
+							heap_free_untraced(&kernel_heaps[GFP_LOCKED],
+							                   busptr.hp_ptr,
+							                   busptr.hp_siz,
+							                   GFP_LOCKED | GFP_PREFLT);
+						} else {
+							Ata_ResetAndReinitializeBus(bus);
+							ATOMIC_WRITE(bus->b_state, ATA_BUS_STATE_READY);
+						}
 						return false;
 					}
 				}
