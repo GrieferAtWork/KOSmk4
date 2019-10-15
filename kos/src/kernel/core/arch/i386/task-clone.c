@@ -229,29 +229,35 @@ again_lock_vm:
 #endif /* !__x86_64__ */
 #ifdef __x86_64__
 		GPREGS_TO_GPREGSNSP(state->scs_gpregs, init_state->ucs_gpregs);
-		state->scs_sgregs = init_state->ucs_sgregs;
-		state->scs_sgbase = init_state->ucs_sgbase;
+		state->scs_sgregs.sg_gs     = init_state->ucs_sgregs.sg_gs16;
+		state->scs_sgregs.sg_fs     = init_state->ucs_sgregs.sg_fs16;
+		state->scs_sgregs.sg_es     = init_state->ucs_sgregs.sg_es16;
+		state->scs_sgregs.sg_ds     = init_state->ucs_sgregs.sg_ds16;
+		state->scs_sgbase           = init_state->ucs_sgbase;
 		state->scs_irregs.ir_rip    = init_state->ucs_rip;
-		state->scs_irregs.ir_cs     = init_state->ucs_cs;
+		state->scs_irregs.ir_cs     = init_state->ucs_cs16;
 		state->scs_irregs.ir_rflags = init_state->ucs_rflags;
-		state->scs_irregs.ir_ss     = init_state->ucs_ss;
+		state->scs_irregs.ir_ss     = init_state->ucs_ss16;
 		state->scs_irregs.ir_rsp    = init_state->ucs_gpregs.gp_rsp;
 #else /* __x86_64__ */
 		state->scs_gpregs             = init_state->ucs_gpregs;
-		state->scs_sgregs             = init_state->ucs_sgregs;
+		state->scs_sgregs.sg_gs       = init_state->ucs_sgregs.sg_gs16;
+		state->scs_sgregs.sg_fs       = init_state->ucs_sgregs.sg_fs16;
+		state->scs_sgregs.sg_es       = init_state->ucs_sgregs.sg_es16;
+		state->scs_sgregs.sg_ds       = init_state->ucs_sgregs.sg_ds16;
 		state->scs_irregs_u.ir_eip    = init_state->ucs_eip;
-		state->scs_irregs_u.ir_cs     = init_state->ucs_cs;
+		state->scs_irregs_u.ir_cs     = init_state->ucs_cs16;
 		state->scs_irregs_u.ir_eflags = init_state->ucs_eflags;
 		if (init_state->ucs_eflags & EFLAGS_VM) {
 			state->scs_irregs_u.ir_esp = init_state->ucs_gpregs.gp_esp;
-			state->scs_irregs_u.ir_ss  = init_state->ucs_ss;
-			state->scs_irregs_v.ir_es  = init_state->ucs_sgregs.sg_es;
-			state->scs_irregs_v.ir_ds  = init_state->ucs_sgregs.sg_ds;
-			state->scs_irregs_v.ir_fs  = init_state->ucs_sgregs.sg_fs;
-			state->scs_irregs_v.ir_gs  = init_state->ucs_sgregs.sg_gs;
+			state->scs_irregs_u.ir_ss  = init_state->ucs_ss16;
+			state->scs_irregs_v.ir_es  = init_state->ucs_sgregs.sg_es16;
+			state->scs_irregs_v.ir_ds  = init_state->ucs_sgregs.sg_ds16;
+			state->scs_irregs_v.ir_fs  = init_state->ucs_sgregs.sg_fs16;
+			state->scs_irregs_v.ir_gs  = init_state->ucs_sgregs.sg_gs16;
 		} else if (init_state->ucs_cs & 3) {
 			state->scs_irregs_u.ir_esp = init_state->ucs_gpregs.gp_esp;
-			state->scs_irregs_u.ir_ss  = init_state->ucs_ss;
+			state->scs_irregs_u.ir_ss  = init_state->ucs_ss16;
 		}
 #endif /* !__x86_64__ */
 #if 0
@@ -371,9 +377,9 @@ task_clone_rpc(void *UNUSED(arg),
 			ustate.ucs_sgbase.sg_gsbase = sc_info->rsi_args[4]; /* newtls */
 #else /* __x86_64__ */
 		ustate.ucs_gpregs        = state->ics_gpregs;
-		ustate.ucs_sgregs.sg_ds  = state->ics_ds;
-		ustate.ucs_sgregs.sg_es  = state->ics_es;
-		ustate.ucs_sgregs.sg_fs  = state->ics_fs;
+		ustate.ucs_sgregs.sg_ds  = state->ics_ds16;
+		ustate.ucs_sgregs.sg_es  = state->ics_es16;
+		ustate.ucs_sgregs.sg_fs  = state->ics_fs16;
 		ustate.ucs_sgregs.sg_gs  = __rdgs();
 		ustate.ucs_cs            = SEGMENT_USER_CODE_RPL;
 		ustate.ucs_ss            = SEGMENT_USER_DATA_RPL;
@@ -426,12 +432,12 @@ task_fork_rpc(void *UNUSED(arg), struct icpustate *__restrict state,
 		ustate.ucs_gpregs.gp_rax = 0; /* Return 0 for in the child process. */
 #else /* __x86_64__ */
 		ustate.ucs_gpregs        = state->ics_gpregs;
-		ustate.ucs_sgregs.sg_ds  = state->ics_ds;
-		ustate.ucs_sgregs.sg_es  = state->ics_es;
-		ustate.ucs_sgregs.sg_fs  = state->ics_fs;
+		ustate.ucs_sgregs.sg_ds  = state->ics_ds16;
+		ustate.ucs_sgregs.sg_es  = state->ics_es16;
+		ustate.ucs_sgregs.sg_fs  = state->ics_fs16;
 		ustate.ucs_sgregs.sg_gs  = __rdgs();
 		ustate.ucs_cs            = irregs_rdcs(&state->ics_irregs_k);
-		ustate.ucs_ss            = state->ics_irregs_u.ir_ss;
+		ustate.ucs_ss            = state->ics_irregs_u.ir_ss16;
 		ustate.ucs_gpregs.gp_esp = irregs_rdsp(&state->ics_irregs_k);
 		ustate.ucs_eflags        = irregs_rdflags(&state->ics_irregs_k);
 		ustate.ucs_eip           = irregs_rdip(&state->ics_irregs_k);

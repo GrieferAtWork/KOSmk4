@@ -117,29 +117,29 @@ userkern_ucpustate32_getfield32(struct icpustate *__restrict state,
 			*presult = (u32)__rdgs();
 #else /* __x86_64__ */
 			*presult = irregs_isvm86(&state->ics_irregs)
-			           ? state->ics_irregs_v.ir_gs
+			           ? state->ics_irregs_v.ir_gs16
 			           : (u32)__rdgs();
 #endif /* !__x86_64__ */
 			break;
 
 		case offsetof(struct userkern32, uk_regs.ucs_sgregs.sg_fs):
 			*presult = (u32)IFELSE64(irregs_isvm86(&state->ics_irregs)
-			                         ? state->ics_irregs_v.ir_fs
-			                         : state->ics_fs,
+			                         ? state->ics_irregs_v.ir_fs16
+			                         : state->ics_fs16,
 			                         __rdfs());
 			break;
 
 		case offsetof(struct userkern32, uk_regs.ucs_sgregs.sg_es):
 			*presult = (u32)IFELSE64(irregs_isvm86(&state->ics_irregs)
-			                         ? state->ics_irregs_v.ir_es
-			                         : state->ics_es,
+			                         ? state->ics_irregs_v.ir_es16
+			                         : state->ics_es16,
 			                         __rdes());
 			break;
 
 		case offsetof(struct userkern32, uk_regs.ucs_sgregs.sg_ds):
 			*presult = (u32)IFELSE64(irregs_isvm86(&state->ics_irregs)
-			                         ? state->ics_irregs_v.ir_ds
-			                         : state->ics_ds,
+			                         ? state->ics_irregs_v.ir_ds16
+			                         : state->ics_ds16,
 			                         __rdds());
 			break;
 
@@ -148,7 +148,7 @@ userkern_ucpustate32_getfield32(struct icpustate *__restrict state,
 			break;
 
 		case offsetof(struct userkern32, uk_regs.ucs_ss):
-			*presult = (u32)IFELSE64(state->ics_irregs_u.ir_ss,
+			*presult = (u32)IFELSE64(state->ics_irregs_u.ir_ss16,
 			                         irregs_rdss(&state->ics_irregs));
 			break;
 

@@ -104,12 +104,12 @@ NOTHROW(KCALL user_icpu_to_ucpu)(struct icpustate const *__restrict state,
 #error TODO
 #else /* __x86_64__ */
 	ust->ucs_gpregs        = state->ics_gpregs;
-	ust->ucs_sgregs.sg_ds  = state->ics_ds;
-	ust->ucs_sgregs.sg_es  = state->ics_es;
-	ust->ucs_sgregs.sg_fs  = state->ics_fs;
+	ust->ucs_sgregs.sg_ds  = state->ics_ds16;
+	ust->ucs_sgregs.sg_es  = state->ics_es16;
+	ust->ucs_sgregs.sg_fs  = state->ics_fs16;
 	ust->ucs_sgregs.sg_gs  = __rdgs();
 	ust->ucs_cs            = irregs_rdcs(&state->ics_irregs);
-	ust->ucs_ss            = state->ics_irregs_u.ir_ss;
+	ust->ucs_ss            = state->ics_irregs_u.ir_ss16;
 	ust->ucs_eflags        = irregs_rdflags(&state->ics_irregs);
 	ust->ucs_eip           = irregs_rdip(&state->ics_irregs);
 	ust->ucs_gpregs.gp_esp = state->ics_irregs_u.ir_esp;
@@ -563,10 +563,10 @@ NOTHROW(FCALL x86_handle_except_before_userspace)(struct ucpustate *__restrict u
 #ifdef __x86_64__
 		GPREGS_TO_GPREGSNSP(return_state->ics_gpregs, ustate->ucs_gpregs);
 		return_state->ics_irregs.ir_rip    = PERTASK_GET(x86_rpc_redirection_iret.ir_rip);
-		return_state->ics_irregs.ir_cs     = PERTASK_GET(x86_rpc_redirection_iret.ir_cs);
+		return_state->ics_irregs.ir_cs     = PERTASK_GET(x86_rpc_redirection_iret.ir_cs16);
 		return_state->ics_irregs.ir_rflags = PERTASK_GET(x86_rpc_redirection_iret.ir_rflags);
 		return_state->ics_irregs.ir_rsp    = PERTASK_GET(x86_rpc_redirection_iret.ir_rsp);
-		return_state->ics_irregs.ir_ss     = PERTASK_GET(x86_rpc_redirection_iret.ir_ss);
+		return_state->ics_irregs.ir_ss     = PERTASK_GET(x86_rpc_redirection_iret.ir_ss16);
 		__wrds(ustate->ucs_sgregs.sg_ds);
 		__wres(ustate->ucs_sgregs.sg_es);
 		__wrfs(ustate->ucs_sgregs.sg_fs);
@@ -574,10 +574,10 @@ NOTHROW(FCALL x86_handle_except_before_userspace)(struct ucpustate *__restrict u
 #else /* __x86_64__ */
 		return_state->ics_gpregs             = ustate->ucs_gpregs;
 		return_state->ics_irregs_u.ir_eip    = PERTASK_GET(x86_rpc_redirection_iret.ir_eip);
-		return_state->ics_irregs_u.ir_cs     = PERTASK_GET(x86_rpc_redirection_iret.ir_cs);
+		return_state->ics_irregs_u.ir_cs     = PERTASK_GET(x86_rpc_redirection_iret.ir_cs16);
 		return_state->ics_irregs_u.ir_eflags = PERTASK_GET(x86_rpc_redirection_iret.ir_eflags);
 #if 0 /* Still properly initialized... */
-		return_state->ics_irregs_u.ir_ss     = return_state->ics_irregs_u.ir_ss;
+		return_state->ics_irregs_u.ir_ss     = return_state->ics_irregs_u.ir_ss16;
 		return_state->ics_irregs_u.ir_esp    = return_state->ics_irregs_u.ir_esp;
 #endif
 		if (ustate->ucs_eflags & EFLAGS_VM) {
@@ -585,58 +585,58 @@ NOTHROW(FCALL x86_handle_except_before_userspace)(struct ucpustate *__restrict u
 			return_state->ics_ds             = SEGMENT_USER_DATA_RPL;
 			return_state->ics_es             = SEGMENT_USER_DATA_RPL;
 			return_state->ics_fs             = SEGMENT_USER_FSBASE_RPL;
-			return_state->ics_irregs_v.ir_es = ustate->ucs_sgregs.sg_es;
-			return_state->ics_irregs_v.ir_ds = ustate->ucs_sgregs.sg_ds;
-			return_state->ics_irregs_v.ir_fs = ustate->ucs_sgregs.sg_fs;
-			return_state->ics_irregs_v.ir_gs = ustate->ucs_sgregs.sg_gs;
+			return_state->ics_irregs_v.ir_es = ustate->ucs_sgregs.sg_es16;
+			return_state->ics_irregs_v.ir_ds = ustate->ucs_sgregs.sg_ds16;
+			return_state->ics_irregs_v.ir_fs = ustate->ucs_sgregs.sg_fs16;
+			return_state->ics_irregs_v.ir_gs = ustate->ucs_sgregs.sg_gs16;
 		} else {
-			return_state->ics_ds = ustate->ucs_sgregs.sg_ds;
-			return_state->ics_es = ustate->ucs_sgregs.sg_es;
-			return_state->ics_fs = ustate->ucs_sgregs.sg_fs;
-			__wrgs(ustate->ucs_sgregs.sg_gs);
+			return_state->ics_ds = ustate->ucs_sgregs.sg_ds16;
+			return_state->ics_es = ustate->ucs_sgregs.sg_es16;
+			return_state->ics_fs = ustate->ucs_sgregs.sg_fs16;
+			__wrgs(ustate->ucs_sgregs.sg_gs16);
 		}
 #endif /* !__x86_64__ */
 	} else {
 		/* Fill in the user-space return location to match `ustate' */
 #ifdef __x86_64__
 		GPREGS_TO_GPREGSNSP(return_state->ics_gpregs, ustate->ucs_gpregs);
-		__wrgs(ustate->ucs_sgregs.sg_gs);
-		__wrfs(ustate->ucs_sgregs.sg_fs);
-		__wres(ustate->ucs_sgregs.sg_es);
-		__wrds(ustate->ucs_sgregs.sg_ds);
+		__wrgs(ustate->ucs_sgregs.sg_gs16);
+		__wrfs(ustate->ucs_sgregs.sg_fs16);
+		__wres(ustate->ucs_sgregs.sg_es16);
+		__wrds(ustate->ucs_sgregs.sg_ds16);
 		return_state->ics_irregs.ir_rip    = ustate->ucs_rip;
-		return_state->ics_irregs.ir_cs     = ustate->ucs_cs;
+		return_state->ics_irregs.ir_cs     = ustate->ucs_cs16;
 		return_state->ics_irregs.ir_rflags = ustate->ucs_rflags;
 		return_state->ics_irregs.ir_rsp    = ustate->ucs_gpregs.gp_rsp;
-		return_state->ics_irregs.ir_ss     = ustate->ucs_ss;
+		return_state->ics_irregs.ir_ss     = ustate->ucs_ss16;
 #else /* __x86_64__ */
 		return_state->ics_gpregs             = ustate->ucs_gpregs;
 		return_state->ics_irregs_u.ir_eip    = ustate->ucs_eip;
-		return_state->ics_irregs_u.ir_cs     = ustate->ucs_cs;
+		return_state->ics_irregs_u.ir_cs     = ustate->ucs_cs16;
 		return_state->ics_irregs_u.ir_eflags = ustate->ucs_eflags;
 		return_state->ics_irregs_u.ir_esp    = ustate->ucs_gpregs.gp_esp;
-		return_state->ics_irregs_u.ir_ss     = ustate->ucs_ss;
+		return_state->ics_irregs_u.ir_ss     = ustate->ucs_ss16;
 #ifndef CONFIG_NO_VM86
 		if (ustate->ucs_eflags & EFLAGS_VM) {
 			return_state->ics_fs = SEGMENT_USER_FSBASE_RPL;
 			return_state->ics_es = SEGMENT_USER_DATA_RPL;
 			return_state->ics_ds = SEGMENT_USER_DATA_RPL;
-			return_state->ics_irregs_v.ir_es = ustate->ucs_sgregs.sg_es;
-			return_state->ics_irregs_v.ir_ds = ustate->ucs_sgregs.sg_ds;
-			return_state->ics_irregs_v.ir_fs = ustate->ucs_sgregs.sg_fs;
-			return_state->ics_irregs_v.ir_gs = ustate->ucs_sgregs.sg_gs;
+			return_state->ics_irregs_v.ir_es = ustate->ucs_sgregs.sg_es16;
+			return_state->ics_irregs_v.ir_ds = ustate->ucs_sgregs.sg_ds16;
+			return_state->ics_irregs_v.ir_fs = ustate->ucs_sgregs.sg_fs16;
+			return_state->ics_irregs_v.ir_gs = ustate->ucs_sgregs.sg_gs16;
 		} else
 #endif
 		{
-			return_state->ics_fs = ustate->ucs_sgregs.sg_fs;
-			return_state->ics_es = ustate->ucs_sgregs.sg_es;
-			return_state->ics_ds = ustate->ucs_sgregs.sg_ds;
+			return_state->ics_fs = ustate->ucs_sgregs.sg_fs16;
+			return_state->ics_es = ustate->ucs_sgregs.sg_es16;
+			return_state->ics_ds = ustate->ucs_sgregs.sg_ds16;
 			/* Since %gs doesn't get restored by `return_state', set it now,
 			 * thus allowing RPC functions to still manipulate it.
 			 * NOTE: We can be sure that it has a valid value, since this is
 			 *       still the original value that was set when user-space
 			 *       originally entered the kernel. */
-			__wrgs(ustate->ucs_sgregs.sg_gs);
+			__wrgs(ustate->ucs_sgregs.sg_gs16);
 		}
 #endif /* !__x86_64__ */
 	}

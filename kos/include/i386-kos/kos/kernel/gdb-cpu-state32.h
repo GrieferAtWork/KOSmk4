@@ -121,12 +121,12 @@ struct gdb_cpustate32 {
 	__u32 gcs_edi;    /* [C] Destination pointer */
 	__u32 gcs_eip;    /* Instruction pointer */
 	__u32 gcs_eflags; /* Flags register */
-	__u32 gcs_cs;     /* Code segment */
-	__u32 gcs_ss;     /* Stack segment */
-	__u32 gcs_ds;     /* D (destination) segment register */
-	__u32 gcs_es;     /* E (source) segment register */
-	__u32 gcs_fs;     /* F segment register */
-	__u32 gcs_gs;     /* G segment register */
+	__u32 gcs_cs;     /* Code segment (zero-extended) */
+	__u32 gcs_ss;     /* Stack segment (zero-extended) */
+	__u32 gcs_ds;     /* D (destination) segment register (zero-extended) */
+	__u32 gcs_es;     /* E (source) segment register (zero-extended) */
+	__u32 gcs_fs;     /* F segment register (zero-extended) */
+	__u32 gcs_gs;     /* G segment register (zero-extended) */
 };
 
 #define GDB_CPUSTATE32_PC(x) ((x).gcs_eip)
@@ -162,7 +162,7 @@ gdb_cpustate32_from_icpustate32(struct gdb_cpustate32 *__restrict dst,
 	dst->gcs_ecx    = src->ics_gpregs.gp_ecx;
 	dst->gcs_edx    = src->ics_gpregs.gp_edx;
 	dst->gcs_ebx    = src->ics_gpregs.gp_ebx;
-	dst->gcs_esp    = ICPUSTATE_SP(*src);
+	dst->gcs_esp    = ICPUSTATE32_SP(*src);
 	dst->gcs_ebp    = src->ics_gpregs.gp_ebp;
 	dst->gcs_esi    = src->ics_gpregs.gp_esi;
 	dst->gcs_edi    = src->ics_gpregs.gp_edi;
@@ -173,13 +173,13 @@ gdb_cpustate32_from_icpustate32(struct gdb_cpustate32 *__restrict dst,
 #else /* __KERNEL__ */
 	dst->gcs_eip    = src->ics_irregs_k.ir_eip;
 	dst->gcs_eflags = src->ics_irregs_k.ir_eflags;
-	dst->gcs_cs     = src->ics_irregs_k.ir_cs;
+	dst->gcs_cs     = src->ics_irregs_k.ir_cs16;
 #endif /* !__KERNEL__ */
-	dst->gcs_ss     = ICPUSTATE_SS(*src);
-	dst->gcs_ds     = ICPUSTATE_DS(*src);
-	dst->gcs_es     = ICPUSTATE_ES(*src);
-	dst->gcs_fs     = ICPUSTATE_FS(*src);
-	dst->gcs_gs     = ICPUSTATE_GS(*src);
+	dst->gcs_ss     = ICPUSTATE32_SS(*src);
+	dst->gcs_ds     = ICPUSTATE32_DS(*src);
+	dst->gcs_es     = ICPUSTATE32_ES(*src);
+	dst->gcs_fs     = ICPUSTATE32_FS(*src);
+	dst->gcs_gs     = ICPUSTATE32_GS(*src);
 }
 
 __LOCAL void
@@ -189,13 +189,13 @@ gdb_cpustate32_from_scpustate32(struct gdb_cpustate32 *__restrict dst,
 	dst->gcs_ecx    = src->scs_gpregs.gp_ecx;
 	dst->gcs_edx    = src->scs_gpregs.gp_edx;
 	dst->gcs_ebx    = src->scs_gpregs.gp_ebx;
-	dst->gcs_esp    = SCPUSTATE_SP(*src);
+	dst->gcs_esp    = SCPUSTATE32_SP(*src);
 	dst->gcs_ebp    = src->scs_gpregs.gp_ebp;
 	dst->gcs_esi    = src->scs_gpregs.gp_esi;
 	dst->gcs_edi    = src->scs_gpregs.gp_edi;
 	dst->gcs_eip    = src->scs_irregs_k.ir_eip;
 	dst->gcs_eflags = src->scs_irregs_k.ir_eflags;
-	dst->gcs_cs     = src->scs_irregs_k.ir_cs;
+	dst->gcs_cs     = src->scs_irregs_k.ir_cs16;
 	dst->gcs_ss     = SCPUSTATE_SS(*src);
 	dst->gcs_ds     = SCPUSTATE_DS(*src);
 	dst->gcs_es     = SCPUSTATE_ES(*src);
@@ -216,12 +216,12 @@ gdb_cpustate32_from_ucpustate32(struct gdb_cpustate32 *__restrict dst,
 	dst->gcs_edi    = src->ucs_gpregs.gp_edi;
 	dst->gcs_eip    = src->ucs_eip;
 	dst->gcs_eflags = src->ucs_eflags;
-	dst->gcs_cs     = src->ucs_cs;
-	dst->gcs_ss     = src->ucs_ss;
-	dst->gcs_ds     = src->ucs_sgregs.sg_ds;
-	dst->gcs_es     = src->ucs_sgregs.sg_es;
-	dst->gcs_fs     = src->ucs_sgregs.sg_fs;
-	dst->gcs_gs     = src->ucs_sgregs.sg_gs;
+	dst->gcs_cs     = src->ucs_cs16;
+	dst->gcs_ss     = src->ucs_ss16;
+	dst->gcs_ds     = src->ucs_sgregs.sg_ds16;
+	dst->gcs_es     = src->ucs_sgregs.sg_es16;
+	dst->gcs_fs     = src->ucs_sgregs.sg_fs16;
+	dst->gcs_gs     = src->ucs_sgregs.sg_gs16;
 }
 
 __LOCAL void
@@ -279,12 +279,12 @@ gdb_cpustate32_from_fcpustate32(struct gdb_cpustate32 *__restrict dst,
 	dst->gcs_edi    = src->fcs_gpregs.gp_edi;
 	dst->gcs_eip    = src->fcs_eip;
 	dst->gcs_eflags = src->fcs_eflags;
-	dst->gcs_cs     = src->fcs_sgregs.sg_cs;
-	dst->gcs_ss     = src->fcs_sgregs.sg_ss;
-	dst->gcs_ds     = src->fcs_sgregs.sg_ds;
-	dst->gcs_es     = src->fcs_sgregs.sg_es;
-	dst->gcs_fs     = src->fcs_sgregs.sg_fs;
-	dst->gcs_gs     = src->fcs_sgregs.sg_gs;
+	dst->gcs_cs     = src->fcs_sgregs.sg_cs16;
+	dst->gcs_ss     = src->fcs_sgregs.sg_ss16;
+	dst->gcs_ds     = src->fcs_sgregs.sg_ds16;
+	dst->gcs_es     = src->fcs_sgregs.sg_es16;
+	dst->gcs_fs     = src->fcs_sgregs.sg_fs16;
+	dst->gcs_gs     = src->fcs_sgregs.sg_gs16;
 }
 
 

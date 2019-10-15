@@ -250,13 +250,13 @@ NOTHROW(FCALL irregs_rdip)(struct irregs const *__restrict self) {
 	return result;
 }
 
-FORCELOCAL NOBLOCK WUNUSED uintptr_t
+FORCELOCAL NOBLOCK WUNUSED u16
 NOTHROW(FCALL irregs_rdcs)(struct irregs const *__restrict self) {
 	/* NOTE: The read-order here is very important! */
-	uintptr_t result = __hybrid_atomic_load(self->ir_cs, __ATOMIC_ACQUIRE);
-	uintptr_t eip    = __hybrid_atomic_load(self->ir_rip, __ATOMIC_ACQUIRE);
+	u16 result    = __hybrid_atomic_load(self->ir_cs16, __ATOMIC_ACQUIRE);
+	uintptr_t eip = __hybrid_atomic_load(self->ir_rip, __ATOMIC_ACQUIRE);
 	if (eip == (uintptr_t)&x86_rpc_user_redirection)
-		result = PERTASK_GET(x86_rpc_redirection_iret.ir_cs);
+		result = PERTASK_GET(x86_rpc_redirection_iret.ir_cs16);
 	return result;
 }
 
@@ -273,7 +273,7 @@ NOTHROW(FCALL irregs_rdflags)(struct irregs const *__restrict self) {
 FORCELOCAL NOBLOCK WUNUSED __BOOL
 NOTHROW(FCALL irregs_isuser)(struct irregs const *__restrict self) {
 	/* NOTE: The read-order here is very important! */
-	uintptr_t cs  = __hybrid_atomic_load(self->ir_cs, __ATOMIC_ACQUIRE);
+	u16 cs        = __hybrid_atomic_load(self->ir_cs16, __ATOMIC_ACQUIRE);
 	uintptr_t eip = __hybrid_atomic_load(self->ir_rip, __ATOMIC_ACQUIRE);
 	if (eip == (uintptr_t)&x86_rpc_user_redirection || (cs & 3))
 		return 1;
@@ -282,7 +282,7 @@ NOTHROW(FCALL irregs_isuser)(struct irregs const *__restrict self) {
 
 FORCELOCAL NOBLOCK WUNUSED __BOOL
 NOTHROW(FCALL irregs_iscompat)(struct irregs const *__restrict self) {
-	uintptr_t cs = __hybrid_atomic_load(self->ir_cs, __ATOMIC_ACQUIRE);
+	u16 cs = __hybrid_atomic_load(self->ir_cs16, __ATOMIC_ACQUIRE);
 	return cs == SEGMENT_USER_CODE32_RPL;
 }
 
@@ -296,13 +296,13 @@ NOTHROW(FCALL irregs_rdsp)(struct irregs const *__restrict self) {
 	return result;
 }
 
-FORCELOCAL NOBLOCK WUNUSED uintptr_t
+FORCELOCAL NOBLOCK WUNUSED u16
 NOTHROW(FCALL irregs_rdss)(struct irregs const *__restrict self) {
 	/* NOTE: The read-order here is very important! */
-	uintptr_t result = __hybrid_atomic_load(self->ir_ss, __ATOMIC_ACQUIRE);
-	uintptr_t eip    = __hybrid_atomic_load(self->ir_rip, __ATOMIC_ACQUIRE);
+	u16 result    = __hybrid_atomic_load(self->ir_ss16, __ATOMIC_ACQUIRE);
+	uintptr_t eip = __hybrid_atomic_load(self->ir_rip, __ATOMIC_ACQUIRE);
 	if (eip == (uintptr_t)&x86_rpc_user_redirection)
-		result = PERTASK_GET(x86_rpc_redirection_iret.ir_ss);
+		result = PERTASK_GET(x86_rpc_redirection_iret.ir_ss16);
 	return result;
 }
 
@@ -315,17 +315,18 @@ NOTHROW(FCALL irregs_wrip)(struct irregs *__restrict self, uintptr_t value) {
 			PERTASK_SET(x86_rpc_redirection_iret.ir_rip, value);
 			break;
 		}
-	} while (!__hybrid_atomic_cmpxch_weak(self->ir_rip, oldval, value, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST));
+	} while (!__hybrid_atomic_cmpxch_weak(self->ir_rip, oldval, value,
+	                                      __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST));
 }
 
 /* Sadly, these last 2 can only be implemented by disabling preemption... */
 FORCELOCAL NOBLOCK void
-NOTHROW(FCALL irregs_wrcs)(struct irregs *__restrict self, uintptr_t value) {
+NOTHROW(FCALL irregs_wrcs)(struct irregs *__restrict self, u16 value) {
 	pflag_t was = PREEMPTION_PUSHOFF();
 	if (self->ir_rip == (uintptr_t)&x86_rpc_user_redirection) {
-		PERTASK_SET(x86_rpc_redirection_iret.ir_cs, value);
+		PERTASK_SET(x86_rpc_redirection_iret.ir_cs, (uintptr_t)value);
 	} else {
-		self->ir_cs = value;
+		self->ir_cs = (uintptr_t)value;
 	}
 	PREEMPTION_POP(was);
 }
@@ -367,12 +368,12 @@ NOTHROW(FCALL irregs_wrsp)(struct irregs *__restrict self, uintptr_t value) {
 }
 
 FORCELOCAL NOBLOCK void
-NOTHROW(FCALL irregs_wrss)(struct irregs *__restrict self, uintptr_t value) {
+NOTHROW(FCALL irregs_wrss)(struct irregs *__restrict self, u16 value) {
 	pflag_t was = PREEMPTION_PUSHOFF();
 	if (self->ir_rip == (uintptr_t)&x86_rpc_user_redirection) {
-		PERTASK_SET(x86_rpc_redirection_iret.ir_ss, value);
+		PERTASK_SET(x86_rpc_redirection_iret.ir_ss, (uintptr_t)value);
 	} else {
-		self->ir_ss = value;
+		self->ir_ss = (uintptr_t)value;
 	}
 	PREEMPTION_POP(was);
 }
@@ -390,13 +391,13 @@ NOTHROW(FCALL irregs_rdip)(struct irregs_kernel const *__restrict self) {
 	return result;
 }
 
-FORCELOCAL NOBLOCK WUNUSED uintptr_t
+FORCELOCAL NOBLOCK WUNUSED u16
 NOTHROW(FCALL irregs_rdcs)(struct irregs_kernel const *__restrict self) {
 	/* NOTE: The read-order here is very important! */
-	uintptr_t result = __hybrid_atomic_load(self->ir_cs, __ATOMIC_ACQUIRE);
-	uintptr_t eip    = __hybrid_atomic_load(self->ir_eip, __ATOMIC_ACQUIRE);
+	u16 result    = __hybrid_atomic_load(self->ir_cs16, __ATOMIC_ACQUIRE);
+	uintptr_t eip = __hybrid_atomic_load(self->ir_eip, __ATOMIC_ACQUIRE);
 	if (eip == (uintptr_t)&x86_rpc_user_redirection)
-		result = PERTASK_GET(x86_rpc_redirection_iret.ir_cs);
+		result = PERTASK_GET(x86_rpc_redirection_iret.ir_cs16);
 	return result;
 }
 
@@ -413,7 +414,7 @@ NOTHROW(FCALL irregs_rdflags)(struct irregs_kernel const *__restrict self) {
 FORCELOCAL NOBLOCK WUNUSED __BOOL
 NOTHROW(FCALL irregs_isuser)(struct irregs_kernel const *__restrict self) {
 	/* NOTE: The read-order here is very important! */
-	uintptr_t cs     = __hybrid_atomic_load(self->ir_cs, __ATOMIC_ACQUIRE);
+	u16 cs           = __hybrid_atomic_load(self->ir_cs16, __ATOMIC_ACQUIRE);
 	uintptr_t eflags = __hybrid_atomic_load(self->ir_eflags, __ATOMIC_ACQUIRE);
 	uintptr_t eip    = __hybrid_atomic_load(self->ir_eip, __ATOMIC_ACQUIRE);
 	if (eip == (uintptr_t)&x86_rpc_user_redirection || (cs & 3) || (eflags & 0x20000))
@@ -441,7 +442,7 @@ FORCELOCAL NOBLOCK WUNUSED uintptr_t
 NOTHROW(FCALL irregs_rdsp)(struct irregs_kernel const *__restrict self) {
 	/* NOTE: The read-order here is very important! */
 	uintptr_t result = (uintptr_t)(self + 1);
-	uintptr_t cs     = __hybrid_atomic_load(self->ir_cs, __ATOMIC_ACQUIRE);
+	u16 cs           = __hybrid_atomic_load(self->ir_cs16, __ATOMIC_ACQUIRE);
 	uintptr_t eflags = __hybrid_atomic_load(self->ir_eflags, __ATOMIC_ACQUIRE);
 	uintptr_t eip    = __hybrid_atomic_load(self->ir_eip, __ATOMIC_ACQUIRE);
 	if (eip == (uintptr_t)&x86_rpc_user_redirection || (cs & 3) || (eflags & 0x20000))
@@ -463,12 +464,12 @@ NOTHROW(FCALL irregs_wrip)(struct irregs_kernel *__restrict self, uintptr_t valu
 
 /* Sadly, these last 2 can only be implemented by disabling preemption... */
 FORCELOCAL NOBLOCK void
-NOTHROW(FCALL irregs_wrcs)(struct irregs_kernel *__restrict self, uintptr_t value) {
+NOTHROW(FCALL irregs_wrcs)(struct irregs_kernel *__restrict self, u16 value) {
 	pflag_t was = PREEMPTION_PUSHOFF();
 	if (self->ir_eip == (uintptr_t)&x86_rpc_user_redirection) {
-		PERTASK_SET(x86_rpc_redirection_iret.ir_cs, value);
+		PERTASK_SET(x86_rpc_redirection_iret.ir_cs, (uintptr_t)value);
 	} else {
-		self->ir_cs = value;
+		self->ir_cs = (uintptr_t)value;
 	}
 	PREEMPTION_POP(was);
 }

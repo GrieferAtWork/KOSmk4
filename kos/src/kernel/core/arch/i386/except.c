@@ -739,11 +739,11 @@ search_fde:
 						       name, isval, wantval);                                                 \
 					}                                                                                 \
 				} __WHILE0
-				/* FIXME: Bochs behaves kind-of weird:
+				/* NOTE: Some x86 processors behave kind-of weird:
 				 * [warn  ] [except] Inconsistent unwind %cs: 0x80000008 != 0x8
 				 * [warn  ] [except] Inconsistent unwind %fs: 0xeafe0040 != 0x40
 				 * [warn  ] [except] Inconsistent unwind %es: 0x10000023 != 0x23
-				 * -> Testing indicates that bochs implements `pushl %ds' as:
+				 * -> Testing indicates that bochs implements (and is allowed to implement) `pushl %ds' as:
 				 * >> ESP -= 4;
 				 * >> *(u16 *)ESP = DS;
 				 * In other words, it leaves the upper 2 bytes of the pushed DWORD

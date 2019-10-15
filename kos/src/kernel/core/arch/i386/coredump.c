@@ -59,12 +59,12 @@ NOTHROW(KCALL user_icpu_to_ucpu)(struct icpustate const *__restrict state,
 #error TODO
 #else /* __x86_64__ */
 	ust->ucs_gpregs        = state->ics_gpregs;
-	ust->ucs_sgregs.sg_ds  = state->ics_ds;
-	ust->ucs_sgregs.sg_es  = state->ics_es;
-	ust->ucs_sgregs.sg_fs  = state->ics_fs;
+	ust->ucs_sgregs.sg_ds  = state->ics_ds16;
+	ust->ucs_sgregs.sg_es  = state->ics_es16;
+	ust->ucs_sgregs.sg_fs  = state->ics_fs16;
 	ust->ucs_sgregs.sg_gs  = __rdgs();
 	ust->ucs_cs            = irregs_rdcs(&state->ics_irregs);
-	ust->ucs_ss            = state->ics_irregs_u.ir_ss;
+	ust->ucs_ss            = state->ics_irregs_u.ir_ss16;
 	ust->ucs_eflags        = irregs_rdflags(&state->ics_irregs);
 	ust->ucs_eip           = irregs_rdip(&state->ics_irregs);
 	ust->ucs_gpregs.gp_esp = state->ics_irregs_u.ir_esp;
@@ -87,6 +87,12 @@ user_ucpu32_to_ucpu(struct icpustate const *__restrict return_state,
 		      E_INVALID_ARGUMENT_CONTEXT_SIGRETURN_REGISTER,
 		      X86_REGISTER_MISC_EFLAGS, ust->ucs_eflags);
 	}
+	ust->ucs_cs           = ust->ucs_cs16;
+	ust->ucs_ss           = ust->ucs_ss16;
+	ust->ucs_sgregs.sg_gs = ust->ucs_sgregs.sg_gs16;
+	ust->ucs_sgregs.sg_fs = ust->ucs_sgregs.sg_fs16;
+	ust->ucs_sgregs.sg_es = ust->ucs_sgregs.sg_es16;
+	ust->ucs_sgregs.sg_ds = ust->ucs_sgregs.sg_ds16;
 	if (!irregs_isvm86(&return_state->ics_irregs)) {
 		/* Validate segment register indices before actually restoring them. */
 		if unlikely(!SEGMENT_IS_VALID_USERCODE(ust->ucs_cs)) {

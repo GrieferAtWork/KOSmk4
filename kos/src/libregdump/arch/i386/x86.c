@@ -691,16 +691,16 @@ libregdump_sgregs(struct regdump_printer *__restrict self,
 	BEGIN;
 	SEGMENTS_BEGIN
 	format(REGDUMP_FORMAT_INDENT);
-	DO(libregdump_do_segment(self, 'e', data->sg_es SEGMENTS_ARGS));
+	DO(libregdump_do_segment(self, 'e', data->sg_es16 SEGMENTS_ARGS));
 	PRINT("\n");
 	format(REGDUMP_FORMAT_INDENT);
-	DO(libregdump_do_segment(self, 'd', data->sg_ds SEGMENTS_ARGS));
+	DO(libregdump_do_segment(self, 'd', data->sg_ds16 SEGMENTS_ARGS));
 	PRINT("\n");
 	format(REGDUMP_FORMAT_INDENT);
-	DO(libregdump_do_segment(self, 'f', data->sg_fs SEGMENTS_ARGS));
+	DO(libregdump_do_segment(self, 'f', data->sg_fs16 SEGMENTS_ARGS));
 	PRINT("\n");
 	format(REGDUMP_FORMAT_INDENT);
-	DO(libregdump_do_segment(self, 'g', data->sg_gs SEGMENTS_ARGS));
+	DO(libregdump_do_segment(self, 'g', data->sg_gs16 SEGMENTS_ARGS));
 	PRINT("\n");
 	SEGMENTS_END
 	END;
@@ -714,16 +714,16 @@ libregdump_sgregs_with_cs_ss(struct regdump_printer *__restrict self,
 	SEGMENTS_BEGIN
 #ifdef __KERNEL__
 	format(REGDUMP_FORMAT_INDENT);
-	DO(libregdump_do_segment(self, 'e', data->sg_es SEGMENTS_ARGS));
+	DO(libregdump_do_segment(self, 'e', data->sg_es16 SEGMENTS_ARGS));
 	PRINT("\n");
 	format(REGDUMP_FORMAT_INDENT);
-	DO(libregdump_do_segment(self, 'd', data->sg_ds SEGMENTS_ARGS));
+	DO(libregdump_do_segment(self, 'd', data->sg_ds16 SEGMENTS_ARGS));
 	PRINT("\n");
 	format(REGDUMP_FORMAT_INDENT);
-	DO(libregdump_do_segment(self, 'f', data->sg_fs SEGMENTS_ARGS));
+	DO(libregdump_do_segment(self, 'f', data->sg_fs16 SEGMENTS_ARGS));
 	PRINT("\n");
 	format(REGDUMP_FORMAT_INDENT);
-	DO(libregdump_do_segment(self, 'g', data->sg_gs SEGMENTS_ARGS));
+	DO(libregdump_do_segment(self, 'g', data->sg_gs16 SEGMENTS_ARGS));
 	PRINT("\n");
 #else /* __KERNEL__ */
 	DO(libregdump_sgregs(self, data));
@@ -747,16 +747,16 @@ libregdump_sgregs_with_cs_ss_tr_ldt(struct regdump_printer *__restrict self,
 	SEGMENTS_BEGIN
 #ifdef __KERNEL__
 	format(REGDUMP_FORMAT_INDENT);
-	DO(libregdump_do_segment(self, 'e', data->sg_es SEGMENTS_ARGS));
+	DO(libregdump_do_segment(self, 'e', data->sg_es16 SEGMENTS_ARGS));
 	PRINT("\n");
 	format(REGDUMP_FORMAT_INDENT);
-	DO(libregdump_do_segment(self, 'd', data->sg_ds SEGMENTS_ARGS));
+	DO(libregdump_do_segment(self, 'd', data->sg_ds16 SEGMENTS_ARGS));
 	PRINT("\n");
 	format(REGDUMP_FORMAT_INDENT);
-	DO(libregdump_do_segment(self, 'f', data->sg_fs SEGMENTS_ARGS));
+	DO(libregdump_do_segment(self, 'f', data->sg_fs16 SEGMENTS_ARGS));
 	PRINT("\n");
 	format(REGDUMP_FORMAT_INDENT);
-	DO(libregdump_do_segment(self, 'g', data->sg_gs SEGMENTS_ARGS));
+	DO(libregdump_do_segment(self, 'g', data->sg_gs16 SEGMENTS_ARGS));
 	PRINT("\n");
 	format(REGDUMP_FORMAT_INDENT);
 	DO(libregdump_do_segment(self, 'c', cs SEGMENTS_ARGS));

@@ -146,29 +146,29 @@ x86_handle_gpf(struct icpustate *__restrict state, uintptr_t ecode, bool is_ss) 
 
 #ifdef __x86_64__
 		if (is_ss)
-			effective_segment_value = state->ics_irregs.ir_ss;
+			effective_segment_value = state->ics_irregs.ir_ss16;
 		else {
 			switch (flags & F_SEGMASK) {
 			case F_SEGFS: effective_segment_value = __rdfs(); break;
 			case F_SEGGS: effective_segment_value = __rdgs(); break;
-			default: effective_segment_value = state->ics_irregs.ir_ss; break;
+			default: effective_segment_value = state->ics_irregs.ir_ss16; break;
 			}
 		}
 #else
 		if (is_ss) {
 			effective_segment_value = __rdss();
 			if (irregs_isuser(&state->ics_irregs_k))
-				effective_segment_value = state->ics_irregs_u.ir_ss;
+				effective_segment_value = state->ics_irregs_u.ir_ss16;
 		} else {
 			switch (flags & F_SEGMASK) {
-			case F_SEGDS: effective_segment_value = state->ics_ds; break;
-			case F_SEGES: effective_segment_value = state->ics_es; break;
-			case F_SEGFS: effective_segment_value = state->ics_fs; break;
+			case F_SEGDS: effective_segment_value = state->ics_ds16; break;
+			case F_SEGES: effective_segment_value = state->ics_es16; break;
+			case F_SEGFS: effective_segment_value = state->ics_fs16; break;
 			case F_SEGGS: effective_segment_value = __rdgs(); break;
 			case F_SEGCS: effective_segment_value = irregs_rdcs(&state->ics_irregs_k); break;
 			case F_SEGSS:
 				effective_segment_value = irregs_isuser(&state->ics_irregs_k)
-				                          ? state->ics_irregs_u.ir_ss
+				                          ? state->ics_irregs_u.ir_ss16
 				                          : __rdss();
 				break;
 			default: __builtin_unreachable(); break;

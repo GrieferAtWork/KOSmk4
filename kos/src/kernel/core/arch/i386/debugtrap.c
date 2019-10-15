@@ -208,12 +208,12 @@ sys_do_debugtrap32_impl(struct icpustate *__restrict return_state,
 		u16 gs, fs, es, ds, ss, cs;
 		u32 eflags, eflags_mask = (u32)cred_allow_eflags_modify_mask();
 		validate_readable(ustate, sizeof(*ustate));
-		gs     = ustate->ucs_sgregs.sg_gs;
-		fs     = ustate->ucs_sgregs.sg_fs;
-		es     = ustate->ucs_sgregs.sg_es;
-		ds     = ustate->ucs_sgregs.sg_ds;
-		ss     = ustate->ucs_ss;
-		cs     = ustate->ucs_cs;
+		gs     = ustate->ucs_sgregs.sg_gs16;
+		fs     = ustate->ucs_sgregs.sg_fs16;
+		es     = ustate->ucs_sgregs.sg_es16;
+		ds     = ustate->ucs_sgregs.sg_ds16;
+		ss     = ustate->ucs_ss16;
+		cs     = ustate->ucs_cs16;
 		eflags = ustate->ucs_eflags;
 		COMPILER_READ_BARRIER();
 		if unlikely((irregs_rdflags(&return_state->ics_irregs) & ~eflags_mask) !=

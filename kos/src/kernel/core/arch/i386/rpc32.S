@@ -781,14 +781,6 @@ PUBLIC_FUNCTION(task_serve)
 	.cfi_restore_iret_gs
 	.cfi_def_cfa %esp, 0
 
-	/* TODO: Remove these. (Only here to better show that the pushl's below don't
-	 *                      necessarily push zeroes for their individual upper 2
-	 *                      bytes, but leave them unchanged on some CPUs)
-	 * s.a. `LOG_SEGNENT_INCONSISTENCY()' in `kos/src/kernel/core/arch/i386/except.c' */
-	movl   $0xcccccccc, -4(%esp)
-	movl   $0xcccccccc, -8(%esp)
-	movl   $0xcccccccc, -12(%esp)
-
 	pushl_cfi %ds
 	.cfi_restore_iret_ds_or_offset -4
 	pushl_cfi %es

@@ -1461,7 +1461,7 @@ user_push_value_vio_stack_2_4_8:
 		case 0x06:
 			/* 0E      PUSH ES      Push ES. */
 			NIF_X86_64(if (isuser)) {
-				value = IFELSE_X86_64(state->ics_es, __rdes());
+				value = IFELSE_X86_64(state->ics_es16, __rdes());
 				goto user_push_value_vio_stack_2_4_8;
 			}
 			break;
@@ -1483,7 +1483,7 @@ user_push_value_vio_stack_2_4_8:
 		case 0x16:
 			/* 16      PUSH SS      Push SS. */
 			NIF_X86_64(if (isuser)) {
-				value = IFELSE_X86_64(state->ics_irregs_u.ir_ss,
+				value = IFELSE_X86_64(state->ics_irregs_u.ir_ss16,
 				                      irregs_rdss(&state->ics_irregs));
 				goto user_push_value_vio_stack_2_4_8;
 			}
@@ -1495,7 +1495,7 @@ user_push_value_vio_stack_2_4_8:
 		case 0x1e:
 			/* 1E      PUSH DS      Push DS. */
 			NIF_X86_64(if (isuser)) {
-				value = IFELSE_X86_64(state->ics_ds, __rdds());
+				value = IFELSE_X86_64(state->ics_ds16, __rdds());
 				goto user_push_value_vio_stack_2_4_8;
 			}
 			break;
@@ -1505,7 +1505,7 @@ user_push_value_vio_stack_2_4_8:
 		case 0x0fa0:
 			/* 0F A0      PUSH FS      Push FS. */
 			if (isuser) {
-				value = IFELSE_X86_64(state->ics_fs, __rdfs());
+				value = IFELSE_X86_64(state->ics_fs16, __rdfs());
 				goto user_push_value_vio_stack_2_4_8;
 			}
 			break;

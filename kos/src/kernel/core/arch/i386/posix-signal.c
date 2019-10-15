@@ -280,7 +280,7 @@ sighand_raise_signal(struct icpustate *__restrict state,
 	user_ucontext->uc_mcontext.mc_context.ucs_sgregs.sg_es  = ICPUSTATE_ES(*state);
 	user_ucontext->uc_mcontext.mc_context.ucs_sgregs.sg_ds  = ICPUSTATE_DS(*state);
 	user_ucontext->uc_mcontext.mc_context.ucs_cs            = irregs_rdcs(&state->ics_irregs);
-	user_ucontext->uc_mcontext.mc_context.ucs_ss            = state->ics_irregs_u.ir_ss;
+	user_ucontext->uc_mcontext.mc_context.ucs_ss            = state->ics_irregs_u.ir_ss16;
 	user_ucontext->uc_mcontext.mc_context.ucs_eflags        = irregs_rdflags(&state->ics_irregs);
 	user_ucontext->uc_mcontext.mc_context.ucs_eip           = irregs_rdip(&state->ics_irregs);
 #endif /* !__x86_64__ */
@@ -413,15 +413,15 @@ INTERN struct icpustate *FCALL
 syscall_fill_icpustate_from_ucpustate(struct icpustate *__restrict state,
                                       USER CHECKED struct ucpustate const *__restrict ust)
 		THROWS(E_INVALID_ARGUMENT_BAD_VALUE, E_SEGFAULT, ...) {
-	u32 gs, fs, es, ds, ss, cs;
+	u16 gs, fs, es, ds, ss, cs;
 	u32 eflags, eflags_mask;
 	eflags_mask = (u32)cred_allow_eflags_modify_mask();
-	gs = ust->ucs_sgregs.sg_gs;
-	fs = ust->ucs_sgregs.sg_fs;
-	es = ust->ucs_sgregs.sg_es;
-	ds = ust->ucs_sgregs.sg_ds;
-	ss = ust->ucs_ss;
-	cs = ust->ucs_cs;
+	gs = ust->ucs_sgregs.sg_gs16;
+	fs = ust->ucs_sgregs.sg_fs16;
+	es = ust->ucs_sgregs.sg_es16;
+	ds = ust->ucs_sgregs.sg_ds16;
+	ss = ust->ucs_ss16;
+	cs = ust->ucs_cs16;
 	eflags = ust->ucs_eflags;
 	COMPILER_READ_BARRIER();
 	if unlikely((irregs_rdflags(&state->ics_irregs) & ~eflags_mask) !=

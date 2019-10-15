@@ -106,6 +106,7 @@ __SYSDECL_BEGIN
 #define IRREGS32_ISUSER_OR_VM86 IRREGS32_ISUSER_OR_VM86
 #define IRREGS32_USER_ESP       IRREGS32_USER_ESP
 #define IRREGS32_USER_SS        IRREGS32_USER_SS
+#define IRREGS32_USER_SS16      IRREGS32_USER_SS16
 #define IRREGS32_KERNEL_ESP     IRREGS32_KERNEL_ESP
 #define IRREGS32_KERNEL_SS      IRREGS32_KERNEL_SS
 #define IRREGS32_PC             IRREGS32_PC
@@ -166,6 +167,7 @@ __SYSDECL_BEGIN
 #define ICPUSTATE_USER_ESP       ICPUSTATE32_USER_ESP
 #define ICPUSTATE_KERNEL_ESP     ICPUSTATE32_KERNEL_ESP
 #define ICPUSTATE_USER_SS        ICPUSTATE32_USER_SS
+#define ICPUSTATE_USER_SS16      ICPUSTATE32_USER_SS16
 #define ICPUSTATE_KERNEL_SS      ICPUSTATE32_KERNEL_SS
 #define ICPUSTATE_PC             ICPUSTATE32_PC
 #define ICPUSTATE_DS             ICPUSTATE32_DS
@@ -194,6 +196,7 @@ __SYSDECL_BEGIN
 #define SCPUSTATE_USER_ESP       SCPUSTATE32_USER_ESP
 #define SCPUSTATE_KERNEL_ESP     SCPUSTATE32_KERNEL_ESP
 #define SCPUSTATE_USER_SS        SCPUSTATE32_USER_SS
+#define SCPUSTATE_USER_SS16      SCPUSTATE32_USER_SS16
 #define SCPUSTATE_KERNEL_SS      SCPUSTATE32_KERNEL_SS
 #define SCPUSTATE_PC             SCPUSTATE32_PC
 #define SCPUSTATE_DS             SCPUSTATE32_DS
@@ -271,10 +274,26 @@ struct __ATTR_PACKED gpregs32 {
 #define SIZEOF_SGREGS32     16
 #ifdef __CC__
 struct __ATTR_PACKED sgregs32 {
-	__u32   sg_gs;     /* G segment register (Usually `SEGMENT_USER_GSBASE_RPL') */
-	__u32   sg_fs;     /* F segment register (Usually `SEGMENT_USER_FSBASE_RPL' / `SEGMENT_KERNEL_FSBASE') */
-	__u32   sg_es;     /* E (source) segment register (Usually `SEGMENT_USER_DATA_RPL') */
-	__u32   sg_ds;     /* D (destination) segment register (Usually `SEGMENT_USER_DATA_RPL') */
+	union {
+		__u32 sg_gs;     /* G segment register (Usually `SEGMENT_USER_GSBASE_RPL')
+		                  * (upper 16 bits are undefined, but should be written as zeros) */
+		__u16 sg_gs16;   /* G segment register (Usually `SEGMENT_USER_GSBASE_RPL') */
+	};
+	union {
+		__u32 sg_fs;     /* F segment register (Usually `SEGMENT_USER_FSBASE_RPL' / `SEGMENT_KERNEL_FSBASE')
+		                  * (upper 16 bits are undefined, but should be written as zeros) */
+		__u16 sg_fs16;   /* F segment register (Usually `SEGMENT_USER_FSBASE_RPL' / `SEGMENT_KERNEL_FSBASE') */
+	};
+	union {
+		__u32 sg_es;     /* E (source) segment register (Usually `SEGMENT_USER_DATA_RPL')
+		                  * (upper 16 bits are undefined, but should be written as zeros) */
+		__u16 sg_es16;   /* E (source) segment register (Usually `SEGMENT_USER_DATA_RPL') */
+	};
+	union {
+		__u32 sg_ds;     /* D (destination) segment register (Usually `SEGMENT_USER_DATA_RPL')
+		                  * (upper 16 bits are undefined, but should be written as zeros) */
+		__u32 sg_ds16;   /* D (destination) segment register (Usually `SEGMENT_USER_DATA_RPL') */
+	};
 };
 #endif /* __CC__ */
 
@@ -346,65 +365,114 @@ struct __ATTR_PACKED drregs32 {
 
 #ifdef __CC__
 struct __ATTR_PACKED irregs32_kernel {
-	__u32   ir_eip;    /* Instruction pointer */
-	__u32   ir_cs;     /* Code segment (Ring #0, usually `SEGMENT_KERNEL_CODE') */
-	__u32   ir_eflags; /* Flags register */
+	__u32     ir_eip;    /* Instruction pointer */
+	union {
+		__u32 ir_cs;     /* Code segment (Ring #0, usually `SEGMENT_KERNEL_CODE')
+		                  * (upper 16 bits are undefined, but should be written as zeros) */
+		__u16 ir_cs16;   /* Code segment (Ring #0, usually `SEGMENT_KERNEL_CODE') */
+	};
+	__u32     ir_eflags; /* Flags register */
 };
 #if defined(__cplusplus) && 0 /* offsetof() in non-POD is undefined... */
 struct __ATTR_PACKED irregs32_user: irregs_kernel {
 	/* The following fields are popped when `(ir_cs & 3) != CURRENT_RING' */
-	__u32   ir_esp;    /* Stack pointer */
-	__u32   ir_ss;     /* Stack segment (Ring #3, usually `SEGMENT_USER_DATA_RPL') */
+	__u32     ir_esp;    /* Stack pointer */
+	union {
+		__u32 ir_ss;     /* Stack segment (Ring #3, usually `SEGMENT_USER_DATA_RPL')
+		                  * (upper 16 bits are undefined, but should be written as zeros) */
+		__u16 ir_ss16;   /* Stack segment (Ring #3, usually `SEGMENT_USER_DATA_RPL') */
+	};
 };
 struct __ATTR_PACKED irregs32_vm86: irregs_user {
-	/* `ir_eflags' has the `EFLAGS_VM' flag set. */
-	__u32   ir_es;
-	__u32   ir_ds;
-	__u32   ir_fs;
-	__u32   ir_gs;
+	/* `ir_eflags' has the `EFLAGS_VM' flag set.
+	 * NOTE: For each of these, the upper 16 bits are undefined, but should be written as zeros */
+	union {
+		__u32 ir_es;
+		__u16 ir_es16;
+	};
+	union {
+		__u32 ir_ds;
+		__u16 ir_ds16;
+	};
+	union {
+		__u32 ir_fs;
+		__u16 ir_fs16;
+	};
+	union {
+		__u32 ir_gs;
+		__u16 ir_gs16;
+	};
 };
 #else
 struct __ATTR_PACKED irregs32_user {
-	__u32   ir_eip;    /* Instruction pointer */
-	__u32   ir_cs;     /* Code segment (Ring #3, usually `SEGMENT_USER_CODE_RPL') */
-	__u32   ir_eflags; /* Flags register */
+	__u32     ir_eip;    /* Instruction pointer */
+	union {
+		__u32 ir_cs;     /* Code segment (Ring #3, usually `SEGMENT_USER_CODE_RPL')
+		                  * (upper 16 bits are undefined, but should be written as zeros) */
+		__u16 ir_cs16;   /* Code segment (Ring #3, usually `SEGMENT_USER_CODE_RPL') */
+	};
+	__u32     ir_eflags; /* Flags register */
 	/* The following fields are popped when `(ir_cs & 3) != CURRENT_RING' */
-	__u32   ir_esp;    /* Stack pointer */
-	__u32   ir_ss;     /* Stack segment (Ring #3, usually `SEGMENT_USER_DATA_RPL') */
+	__u32     ir_esp;    /* Stack pointer */
+	union {
+		__u32 ir_ss;     /* Stack segment (Ring #3, usually `SEGMENT_USER_DATA_RPL')
+		                  * (upper 16 bits are undefined, but should be written as zeros) */
+		__u16 ir_ss16;   /* Stack segment (Ring #3, usually `SEGMENT_USER_DATA_RPL') */
+	};
 };
 struct __ATTR_PACKED irregs32_vm86 {
-	__u32   ir_eip;
-	__u32   ir_cs;
-	__u32   ir_eflags; /* Has the `EFLAGS_VM' flag set. */
-	__u32   ir_esp;
-	__u32   ir_ss;
-	__u32   ir_es;
-	__u32   ir_ds;
-	__u32   ir_fs;
-	__u32   ir_gs;
+	__u32     ir_eip;
+	union {
+		__u32 ir_cs;
+		__u16 ir_cs16;
+	};
+	__u32     ir_eflags; /* Has the `EFLAGS_VM' flag set. */
+	__u32     ir_esp;
+	/* NOTE: For each of these, the upper 16 bits are undefined, but should be written as zeros */
+	union {
+		__u32 ir_ss;
+		__u16 ir_ss16;
+	};
+	union {
+		__u32 ir_es;
+		__u16 ir_es16;
+	};
+	union {
+		__u32 ir_ds;
+		__u16 ir_ds16;
+	};
+	union {
+		__u32 ir_fs;
+		__u16 ir_fs16;
+	};
+	union {
+		__u32 ir_gs;
+		__u16 ir_gs16;
+	};
 };
 #endif
 
 #define IRREGS32_ISVM86(x)          ((x).ir_eflags & 0x20000)
-#define IRREGS32_ISKERNEL(x)        (!((x).ir_cs & 3) && !IRREGS32_ISVM86(x))
-#define IRREGS32_ISUSER(x)          (((x).ir_cs & 3) && !IRREGS32_ISVM86(x))
-#define IRREGS32_ISUSER_OR_VM86(x)  (((x).ir_cs & 3) || IRREGS32_ISVM86(x))
+#define IRREGS32_ISKERNEL(x)        (!((x).ir_cs16 & 3) && !IRREGS32_ISVM86(x))
+#define IRREGS32_ISUSER(x)          (((x).ir_cs16 & 3) && !IRREGS32_ISVM86(x))
+#define IRREGS32_ISUSER_OR_VM86(x)  (((x).ir_cs16 & 3) || IRREGS32_ISVM86(x))
 
 #define IRREGS32_USER_ESP(x)        (((struct irregs32_user *)&(x))->ir_esp)
 #define IRREGS32_USER_SS(x)         (((struct irregs32_user *)&(x))->ir_ss)
+#define IRREGS32_USER_SS16(x)       (((struct irregs32_user *)&(x))->ir_ss16)
 #define IRREGS32_KERNEL_ESP(x)      ((__uintptr_t)((__byte_t *)&(x) + SIZEOF_IRREGS32_KERNEL))
-#define IRREGS32_KERNEL_SS(x)         SEGMENT_KERNEL_DATA
+#define IRREGS32_KERNEL_SS(x)       SEGMENT_KERNEL_DATA
 
 #define IRREGS32_PC(x)          ((x).ir_eip)
 #define IRREGS32_SP(x)          (IRREGS32_ISUSER_OR_VM86(x) ? IRREGS32_USER_ESP(x) : IRREGS32_KERNEL_ESP(x))
-#define IRREGS32_SS(x)          (IRREGS32_ISUSER_OR_VM86(x) ? IRREGS32_USER_SS(x) : IRREGS32_KERNEL_SS(x))
+#define IRREGS32_SS(x)          (IRREGS32_ISUSER_OR_VM86(x) ? IRREGS32_USER_SS16(x) : IRREGS32_KERNEL_SS(x))
 #define IRREGS32_WRSP(x, value) (IRREGS32_ISUSER_OR_VM86(x) ? (IRREGS32_USER_ESP(x) = (value), 1) : (IRREGS32_KERNEL_ESP(x) == (value)))
 #define IRREGS32_WRSS(x, value) (IRREGS32_ISUSER_OR_VM86(x) ? (IRREGS32_USER_SS(x) = (value), 1) : (IRREGS32_KERNEL_SS(x) == (value)))
 
 /* Returns the total size of the given CPU state. */
 #define IRREGS32_SIZEOF(x)                     \
 	(IRREGS32_ISVM86(x) ? SIZEOF_IRREGS32_VM86 \
-	 ((x).ir_cs & 3)    ? SIZEOF_IRREGS32_USER \
+	 ((x).ir_cs16 & 3)  ? SIZEOF_IRREGS32_USER \
 	                    : SIZEOF_IRREGS32_KERNEL)
 
 #endif /* __CC__ */
@@ -424,8 +492,16 @@ struct __ATTR_PACKED ucpustate32 { /* u -- User */
 	 *       both inside kernel-, as well as user-space. */
 	struct gpregs32 ucs_gpregs; /* General purpose registers. */
 	struct sgregs32 ucs_sgregs; /* Segment registers. */
-	__u32           ucs_cs;     /* Code segment (Ring #3, usually `SEGMENT_USER_CODE_RPL') */
-	__u32           ucs_ss;     /* Stack segment (Ring #3, usually `SEGMENT_USER_DATA_RPL') */
+	union {
+		__u32       ucs_cs;     /* Code segment (Ring #3, usually `SEGMENT_USER_CODE_RPL')
+		                         * (upper 16 bits are undefined, but should be written as zeros) */
+		__u16       ucs_cs16;   /* Code segment (Ring #3, usually `SEGMENT_USER_CODE_RPL') */
+	};
+	union {
+		__u32       ucs_ss;     /* Stack segment (Ring #3, usually `SEGMENT_USER_DATA_RPL')
+		                         * (upper 16 bits are undefined, but should be written as zeros) */
+		__u16       ucs_ss16;   /* Stack segment (Ring #3, usually `SEGMENT_USER_DATA_RPL') */
+	};
 	__u32           ucs_eflags; /* Flags register */
 	__u32           ucs_eip;    /* Instruction pointer */
 };
@@ -571,9 +647,22 @@ struct __ATTR_PACKED icpustate32 { /* i -- Interrupts */
 	 * `struct icpustate'), as well as the fact that modifications to the %gs
 	 * segment selector will not be undone when an `struct icpustate' is loaded. */
 	struct gpregs32    ics_gpregs; /* General purpose registers. */
-	__u32              ics_fs;     /* F segment register (Usually `SEGMENT_USER_FSBASE_RPL' / `SEGMENT_KERNEL_FSBASE') */
-	__u32              ics_es;     /* E (source) segment register (Usually `SEGMENT_USER_DATA_RPL') */
-	__u32              ics_ds;     /* D (destination) segment register (Usually `SEGMENT_USER_DATA_RPL') */
+	union {
+		__u32          ics_fs;     /* F segment register (Usually `SEGMENT_USER_FSBASE_RPL' / `SEGMENT_KERNEL_FSBASE')
+		                            * (upper 16 bits are undefined, but should be written as zeros) */
+		__u16          ics_fs16;   /* F segment register (Usually `SEGMENT_USER_FSBASE_RPL' / `SEGMENT_KERNEL_FSBASE')
+		                            * (upper 16 bits are undefined, but should be written as zeros) */
+	};
+	union {
+		__u32          ics_es;     /* E (source) segment register (Usually `SEGMENT_USER_DATA_RPL')
+		                            * (upper 16 bits are undefined, but should be written as zeros) */
+		__u16          ics_es16;   /* E (source) segment register (Usually `SEGMENT_USER_DATA_RPL') */
+	};
+	union {
+		__u32          ics_ds;     /* D (destination) segment register (Usually `SEGMENT_USER_DATA_RPL')
+		                            * (upper 16 bits are undefined, but should be written as zeros) */
+		__u16          ics_ds16;   /* D (destination) segment register (Usually `SEGMENT_USER_DATA_RPL') */
+	};
 	union __ATTR_PACKED {
 		/* Interrupt return registers.
 		 * NOTE: When returning to user-space, the ESP inside
@@ -607,7 +696,7 @@ struct __ATTR_PACKED icpustate32 { /* i -- Interrupts */
 	    (dst).ucs_sgregs.sg_es = (src).ics_es,                      \
 	    (dst).ucs_sgregs.sg_fs = (src).ics_fs,                      \
 	    (dst).ucs_sgregs.sg_gs = __rdgs(),                          \
-	    ((src).ics_irregs_k.ir_cs & 3)                              \
+	    ((src).ics_irregs_k.ir_cs16 & 3)                            \
 	    ? ((dst).ucs_ss            = ICPUSTATE32_USER_SS(src),      \
 	       (dst).ucs_gpregs.gp_esp = ICPUSTATE32_USER_ESP(src))     \
 	    : ((dst).ucs_ss            = ICPUSTATE32_KERNEL_SS(src),    \
@@ -615,23 +704,24 @@ struct __ATTR_PACKED icpustate32 { /* i -- Interrupts */
 	 (void)0)
 
 #define ICPUSTATE32_ISVM86(x)          ((x).ics_irregs_k.ir_eflags & 0x20000)
-#define ICPUSTATE32_ISKERNEL(x)        (!((x).ics_irregs_k.ir_cs & 3) && !ICPUSTATE32_ISVM86(x))
-#define ICPUSTATE32_ISUSER(x)          (((x).ics_irregs_k.ir_cs & 3) && !ICPUSTATE32_ISVM86(x))
-#define ICPUSTATE32_ISUSER_OR_VM86(x)  (((x).ics_irregs_k.ir_cs & 3) || ICPUSTATE32_ISVM86(x))
+#define ICPUSTATE32_ISKERNEL(x)        (!((x).ics_irregs_k.ir_cs16 & 3) && !ICPUSTATE32_ISVM86(x))
+#define ICPUSTATE32_ISUSER(x)          (((x).ics_irregs_k.ir_cs16 & 3) && !ICPUSTATE32_ISVM86(x))
+#define ICPUSTATE32_ISUSER_OR_VM86(x)  (((x).ics_irregs_k.ir_cs16 & 3) || ICPUSTATE32_ISVM86(x))
 
 #define ICPUSTATE32_USER_ESP(x)   ((x).ics_irregs_u.ir_esp)
 #define ICPUSTATE32_KERNEL_ESP(x) ((__uintptr_t)(&(x).ics_irregs_k + 1))
 #define ICPUSTATE32_USER_SS(x)    ((x).ics_irregs_u.ir_ss)
-#define ICPUSTATE32_KERNEL_SS(x)    SEGMENT_KERNEL_DATA
+#define ICPUSTATE32_USER_SS16(x)  ((x).ics_irregs_u.ir_ss16)
+#define ICPUSTATE32_KERNEL_SS(x)  SEGMENT_KERNEL_DATA
 
 #define ICPUSTATE32_PC(x)         ((x).ics_irregs_k.ir_eip)
 
 /* Get/set the values of segment registers (these setters won't fail)
  * Macros are required for these, because of special handling required for vm86 support */
-#define ICPUSTATE32_DS(x)          (ICPUSTATE32_ISVM86(x) ? (x).ics_irregs_v.ir_ds : (x).ics_ds)
-#define ICPUSTATE32_ES(x)          (ICPUSTATE32_ISVM86(x) ? (x).ics_irregs_v.ir_es : (x).ics_es)
-#define ICPUSTATE32_FS(x)          (ICPUSTATE32_ISVM86(x) ? (x).ics_irregs_v.ir_fs : (x).ics_fs)
-#define ICPUSTATE32_GS(x)          (ICPUSTATE32_ISVM86(x) ? (x).ics_irregs_v.ir_gs : __rdgs())
+#define ICPUSTATE32_DS(x)          (ICPUSTATE32_ISVM86(x) ? (x).ics_irregs_v.ir_ds16 : (x).ics_ds16)
+#define ICPUSTATE32_ES(x)          (ICPUSTATE32_ISVM86(x) ? (x).ics_irregs_v.ir_es16 : (x).ics_es16)
+#define ICPUSTATE32_FS(x)          (ICPUSTATE32_ISVM86(x) ? (x).ics_irregs_v.ir_fs16 : (x).ics_fs16)
+#define ICPUSTATE32_GS(x)          (ICPUSTATE32_ISVM86(x) ? (x).ics_irregs_v.ir_gs16 : __rdgs())
 #define ICPUSTATE32_WRDS(x, value) (ICPUSTATE32_ISVM86(x) ? (void)((x).ics_irregs_v.ir_ds = (value)) : (void)((x).ics_ds = (value)))
 #define ICPUSTATE32_WRES(x, value) (ICPUSTATE32_ISVM86(x) ? (void)((x).ics_irregs_v.ir_es = (value)) : (void)((x).ics_es = (value)))
 #define ICPUSTATE32_WRFS(x, value) (ICPUSTATE32_ISVM86(x) ? (void)((x).ics_irregs_v.ir_fs = (value)) : (void)((x).ics_fs = (value)))
@@ -640,7 +730,7 @@ struct __ATTR_PACKED icpustate32 { /* i -- Interrupts */
 /* Return the values of conditionally restored registers, as
  * they will appear when the cpu state is restored. */
 #define ICPUSTATE32_SP(x)         (ICPUSTATE32_ISUSER_OR_VM86(x) ? ICPUSTATE32_USER_ESP(x) : ICPUSTATE32_KERNEL_ESP(x))
-#define ICPUSTATE32_SS(x)         (ICPUSTATE32_ISUSER_OR_VM86(x) ? ICPUSTATE32_USER_SS(x) : ICPUSTATE32_KERNEL_SS(x))
+#define ICPUSTATE32_SS(x)         (ICPUSTATE32_ISUSER_OR_VM86(x) ? ICPUSTATE32_USER_SS16(x) : ICPUSTATE32_KERNEL_SS(x))
 
 /* Set values of conditionally restored registers.
  * @return: 1: The given `value' will be stored.
@@ -649,10 +739,10 @@ struct __ATTR_PACKED icpustate32 { /* i -- Interrupts */
 #define ICPUSTATE32_WRSS(x, value) (ICPUSTATE32_ISUSER_OR_VM86(x) ? ((x).ics_irregs_u.ir_ss = (value),1) : (ICPUSTATE32_KERNEL_SS(x) == (value)))
 
 /* Returns the total size of the given CPU state. */
-#define ICPUSTATE32_SIZEOF(x) \
-	(((x).ics_irregs_k.ir_eflags & 0x20000) ? (SIZEOF_GPREGS32+12+SIZEOF_IRREGS32_VM86) \
-	 ((x).ics_irregs_k.ir_cs & 3)           ? (SIZEOF_GPREGS32+12+SIZEOF_IRREGS32_USER) \
-	                                        : (SIZEOF_GPREGS32+12+SIZEOF_IRREGS32_KERNEL))
+#define ICPUSTATE32_SIZEOF(x)                                                               \
+	(((x).ics_irregs_k.ir_eflags & 0x20000) ? (SIZEOF_GPREGS32 + 12 + SIZEOF_IRREGS32_VM86) \
+	 ((x).ics_irregs_k.ir_cs16 & 3)         ? (SIZEOF_GPREGS32 + 12 + SIZEOF_IRREGS32_USER) \
+	                                        : (SIZEOF_GPREGS32 + 12 + SIZEOF_IRREGS32_KERNEL))
 #endif /* __CC__ */
 
 
@@ -694,37 +784,32 @@ struct __ATTR_PACKED scpustate32 { /* s -- Scheduling */
 	    (dst).ucs_sgregs.sg_fs  = (src).scs_irregs_v.ir_fs,         \
 	    (dst).ucs_sgregs.sg_gs  = (src).scs_irregs_v.ir_gs)         \
 	 : ((dst).ucs_sgregs = (src).scs_sgregs,                        \
-	    ((src).scs_irregs_k.ir_cs & 3)                              \
+	    ((src).scs_irregs_k.ir_cs16 & 3)                            \
 	    ? ((dst).ucs_ss            = SCPUSTATE32_USER_SS(src),      \
 	       (dst).ucs_gpregs.gp_esp = SCPUSTATE32_USER_ESP(src))     \
 	    : ((dst).ucs_ss            = SCPUSTATE32_KERNEL_SS(src),    \
 	       (dst).ucs_gpregs.gp_esp = SCPUSTATE32_KERNEL_ESP(src))), \
 	 (void)0)
-//	struct coregs32  fcs_coregs; /* Control registers. */
-//	struct drregs32  fcs_drregs; /* Debug registers. */
-//	__u16          __fcs_pad0;   /* ... */
-//	struct desctab32 fcs_gdt;    /* Global descriptor table. */
-//	__u16          __fcs_pad1;   /* ... */
-//	struct desctab32 fcs_idt;    /* Interrupt descriptor table. */
 
 #define SCPUSTATE32_ISVM86(x)          ((x).scs_irregs_k.ir_eflags & 0x20000)
-#define SCPUSTATE32_ISKERNEL(x)        (!((x).scs_irregs_k.ir_cs & 3) && !SCPUSTATE32_ISVM86(x))
-#define SCPUSTATE32_ISUSER(x)          (((x).scs_irregs_k.ir_cs & 3) && !SCPUSTATE32_ISVM86(x))
-#define SCPUSTATE32_ISUSER_OR_VM86(x)  (((x).scs_irregs_k.ir_cs & 3) || SCPUSTATE32_ISVM86(x))
+#define SCPUSTATE32_ISKERNEL(x)        (!((x).scs_irregs_k.ir_cs16 & 3) && !SCPUSTATE32_ISVM86(x))
+#define SCPUSTATE32_ISUSER(x)          (((x).scs_irregs_k.ir_cs16 & 3) && !SCPUSTATE32_ISVM86(x))
+#define SCPUSTATE32_ISUSER_OR_VM86(x)  (((x).scs_irregs_k.ir_cs16 & 3) || SCPUSTATE32_ISVM86(x))
 
 #define SCPUSTATE32_USER_ESP(x)   ((x).scs_irregs_u.ir_esp)
 #define SCPUSTATE32_KERNEL_ESP(x) ((__uintptr_t)(&(x).scs_irregs_k + 1))
 #define SCPUSTATE32_USER_SS(x)    ((x).scs_irregs_u.ir_ss)
-#define SCPUSTATE32_KERNEL_SS(x)    SEGMENT_KERNEL_DATA
+#define SCPUSTATE32_USER_SS16(x)  ((x).scs_irregs_u.ir_ss16)
+#define SCPUSTATE32_KERNEL_SS(x)  SEGMENT_KERNEL_DATA
 
 #define SCPUSTATE32_PC(x)         ((x).scs_irregs_k.ir_eip)
 
 /* Get/set the values of segment registers (these setters won't fail)
  * Macros are required for these, because of special handling required for vm86 support */
-#define SCPUSTATE32_DS(x)         (SCPUSTATE32_ISVM86(x) ? (x).scs_irregs_v.ir_ds : (x).scs_sgregs.sg_ds)
-#define SCPUSTATE32_ES(x)         (SCPUSTATE32_ISVM86(x) ? (x).scs_irregs_v.ir_es : (x).scs_sgregs.sg_es)
-#define SCPUSTATE32_FS(x)         (SCPUSTATE32_ISVM86(x) ? (x).scs_irregs_v.ir_fs : (x).scs_sgregs.sg_fs)
-#define SCPUSTATE32_GS(x)         (SCPUSTATE32_ISVM86(x) ? (x).scs_irregs_v.ir_gs : (x).scs_sgregs.sg_gs)
+#define SCPUSTATE32_DS(x)         (SCPUSTATE32_ISVM86(x) ? (x).scs_irregs_v.ir_ds16 : (x).scs_sgregs.sg_ds16)
+#define SCPUSTATE32_ES(x)         (SCPUSTATE32_ISVM86(x) ? (x).scs_irregs_v.ir_es16 : (x).scs_sgregs.sg_es16)
+#define SCPUSTATE32_FS(x)         (SCPUSTATE32_ISVM86(x) ? (x).scs_irregs_v.ir_fs16 : (x).scs_sgregs.sg_fs16)
+#define SCPUSTATE32_GS(x)         (SCPUSTATE32_ISVM86(x) ? (x).scs_irregs_v.ir_gs16 : (x).scs_sgregs.sg_gs16)
 #define SCPUSTATE32_WRDS(x,value) (SCPUSTATE32_ISVM86(x) ? (void)((x).scs_irregs_v.ir_ds = (value)) : (void)((x).scs_sgregs.sg_ds = (value)))
 #define SCPUSTATE32_WRES(x,value) (SCPUSTATE32_ISVM86(x) ? (void)((x).scs_irregs_v.ir_es = (value)) : (void)((x).scs_sgregs.sg_es = (value)))
 #define SCPUSTATE32_WRFS(x,value) (SCPUSTATE32_ISVM86(x) ? (void)((x).scs_irregs_v.ir_fs = (value)) : (void)((x).scs_sgregs.sg_fs = (value)))
@@ -733,7 +818,7 @@ struct __ATTR_PACKED scpustate32 { /* s -- Scheduling */
 /* Return the values of conditionally restored registers, as
  * they will appear when the cpu state is restored. */
 #define SCPUSTATE32_SP(x)         (SCPUSTATE32_ISUSER_OR_VM86(x) ? SCPUSTATE32_USER_ESP(x) : SCPUSTATE32_KERNEL_ESP(x))
-#define SCPUSTATE32_SS(x)         (SCPUSTATE32_ISUSER_OR_VM86(x) ? SCPUSTATE32_USER_SS(x) : SCPUSTATE32_KERNEL_SS(x))
+#define SCPUSTATE32_SS(x)         (SCPUSTATE32_ISUSER_OR_VM86(x) ? SCPUSTATE32_USER_SS16(x) : SCPUSTATE32_KERNEL_SS(x))
 
 /* Set values of conditionally restored registers.
  * @return: 1: The given `value' will be stored.
@@ -742,10 +827,10 @@ struct __ATTR_PACKED scpustate32 { /* s -- Scheduling */
 #define SCPUSTATE32_WRSS(x, value) (SCPUSTATE32_ISUSER_OR_VM86(x) ? ((x).scs_irregs_u.ir_ss = (value), 1) : (SCPUSTATE32_KERNEL_SS(x) == (value)))
 
 /* Returns the total size of the given CPU state. */
-#define SCPUSTATE32_SIZEOF(x) \
-	(((x).scs_irregs_k.ir_eflags & 0x20000) ? (SIZEOF_GPREGS32+SIZEOF_SGREGS32+SIZEOF_IRREGS32_VM86) : \
-	 ((x).scs_irregs_k.ir_cs & 3)           ? (SIZEOF_GPREGS32+SIZEOF_SGREGS32+SIZEOF_IRREGS32_USER) : \
-	                                          (SIZEOF_GPREGS32+SIZEOF_SGREGS32+SIZEOF_IRREGS32_KERNEL))
+#define SCPUSTATE32_SIZEOF(x)                                                                              \
+	(((x).scs_irregs_k.ir_eflags & 0x20000) ? (SIZEOF_GPREGS32 + SIZEOF_SGREGS32 + SIZEOF_IRREGS32_VM86) : \
+	 ((x).scs_irregs_k.ir_cs16 & 3)         ? (SIZEOF_GPREGS32 + SIZEOF_SGREGS32 + SIZEOF_IRREGS32_USER) : \
+	                                          (SIZEOF_GPREGS32 + SIZEOF_SGREGS32 + SIZEOF_IRREGS32_KERNEL))
 #endif /* __CC__ */
 
 
@@ -785,14 +870,46 @@ struct __ATTR_PACKED fcpustate32 { /* f -- Full */
 	__u32            fcs_eflags; /* Flags register */
 	__u32            fcs_eip;    /* Flags register */
 	struct {
-		__u32        sg_es;      /* E (source) segment register. */
-		__u32        sg_cs;      /* Code segment register. */
-		__u32        sg_ss;      /* Stack segment register. */
-		__u32        sg_ds;      /* D (destination) segment register. */
-		__u32        sg_fs;      /* F segment register. */
-		__u32        sg_gs;      /* G segment register. */
-		__u32        sg_tr;      /* Task register. */
-		__u32        sg_ldt;     /* Load descriptor table. */
+		union {
+			__u32    sg_es;      /* E (source) segment register.
+			                      * (upper 16 bits are undefined, but should be written as zeros) */
+			__u16    sg_es16;    /* E (source) segment register. */
+		};
+		union {
+			__u32    sg_cs;      /* Code segment register.
+		                          * (upper 16 bits are undefined, but should be written as zeros) */
+			__u16    sg_cs16;    /* Code segment register. */
+		};
+		union {
+			__u32    sg_ss;      /* Stack segment register.
+			                      * (upper 16 bits are undefined, but should be written as zeros) */
+			__u16    sg_ss16;    /* Stack segment register. */
+		};
+		union {
+			__u32    sg_ds;      /* D (destination) segment register.
+			                      * (upper 16 bits are undefined, but should be written as zeros) */
+			__u16    sg_ds16;    /* D (destination) segment register. */
+		};
+		union {
+			__u32    sg_fs;      /* F segment register.
+			                      * (upper 16 bits are undefined, but should be written as zeros) */
+			__u16    sg_fs16;    /* F segment register. */
+		};
+		union {
+			__u32    sg_gs;      /* G segment register.
+			                      * (upper 16 bits are undefined, but should be written as zeros) */
+			__u16    sg_gs16;    /* G segment register. */
+		};
+		union {
+			__u32    sg_tr;      /* Task register.
+			                      * (upper 16 bits are undefined, but should be written as zeros) */
+			__u16    sg_tr16;    /* Task register. */
+		};
+		union {
+			__u32    sg_ldt;     /* Load descriptor table.
+			                      * (upper 16 bits are undefined, but should be written as zeros) */
+			__u16    sg_ldt16;   /* Load descriptor table. */
+		};
 	}                fcs_sgregs; /* Segment registers. */
 	struct coregs32  fcs_coregs; /* Control registers. */
 	struct drregs32  fcs_drregs; /* Debug registers. */

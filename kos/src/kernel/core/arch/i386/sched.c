@@ -460,9 +460,9 @@ NOTHROW(FCALL task_push_asynchronous_srpc)(struct scpustate *__restrict state,
 #define SUBSP(x) (dest -= (x))
 #define PUSH(x)  (dest -= sizeof(uintptr_t), *(uintptr_t *)dest = (x))
 	/* Save clobbered registers. */
-	PUSH(regbuf.b_sgregs.sg_ds);
-	PUSH(regbuf.b_sgregs.sg_es);
-	PUSH(regbuf.b_sgregs.sg_fs);
+	PUSH(regbuf.b_sgregs.sg_ds16);
+	PUSH(regbuf.b_sgregs.sg_es16);
+	PUSH(regbuf.b_sgregs.sg_fs16);
 	PUSH(regbuf.b_gpregs.gp_eax);
 	PUSH(regbuf.b_gpregs.gp_ecx);
 	PUSH(regbuf.b_gpregs.gp_edx);

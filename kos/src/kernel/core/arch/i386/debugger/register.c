@@ -145,31 +145,31 @@ PUBLIC void NOTHROW(FCALL dbg_applyreg)(void) {
 			state->scs_sgregs.sg_es   = SEGMENT_USER_DATA_RPL;
 			state->scs_sgregs.sg_fs   = SEGMENT_USER_FSBASE_RPL;
 			state->scs_sgregs.sg_gs   = SEGMENT_USER_GSBASE_RPL;
-			state->scs_irregs_v.ir_es = dbg_viewstate.fcs_sgregs.sg_es;
-			state->scs_irregs_v.ir_ds = dbg_viewstate.fcs_sgregs.sg_ds;
-			state->scs_irregs_v.ir_fs = dbg_viewstate.fcs_sgregs.sg_fs;
-			state->scs_irregs_v.ir_gs = dbg_viewstate.fcs_sgregs.sg_gs;
+			state->scs_irregs_v.ir_es = dbg_viewstate.fcs_sgregs.sg_es16;
+			state->scs_irregs_v.ir_ds = dbg_viewstate.fcs_sgregs.sg_ds16;
+			state->scs_irregs_v.ir_fs = dbg_viewstate.fcs_sgregs.sg_fs16;
+			state->scs_irregs_v.ir_gs = dbg_viewstate.fcs_sgregs.sg_gs16;
 			goto set_user_specific_registers;
 		} else {
 			if (dbg_viewstate.fcs_sgregs.sg_cs & 3) {
 				state = (struct scpustate *)((byte_t *)me->t_sched.s_state + SCPUSTATE_SIZEOF(*state));
 				state = (struct scpustate *)((byte_t *)state - (OFFSET_SCPUSTATE_IRREGS + SIZEOF_IRREGS_USER));
-				state->scs_sgregs.sg_ds = dbg_viewstate.fcs_sgregs.sg_ds;
-				state->scs_sgregs.sg_es = dbg_viewstate.fcs_sgregs.sg_es;
-				state->scs_sgregs.sg_fs = dbg_viewstate.fcs_sgregs.sg_fs;
-				state->scs_sgregs.sg_gs = dbg_viewstate.fcs_sgregs.sg_gs;
+				state->scs_sgregs.sg_ds = dbg_viewstate.fcs_sgregs.sg_ds16;
+				state->scs_sgregs.sg_es = dbg_viewstate.fcs_sgregs.sg_es16;
+				state->scs_sgregs.sg_fs = dbg_viewstate.fcs_sgregs.sg_fs16;
+				state->scs_sgregs.sg_gs = dbg_viewstate.fcs_sgregs.sg_gs16;
 set_user_specific_registers:
 				state->scs_irregs_u.ir_esp = dbg_viewstate.fcs_gpregs.gp_esp;
-				state->scs_irregs_u.ir_ss  = dbg_viewstate.fcs_sgregs.sg_ss;
+				state->scs_irregs_u.ir_ss  = dbg_viewstate.fcs_sgregs.sg_ss16;
 			} else {
 				/* Kernel-space state (must allocate) */
 				state = (struct scpustate *)(dbg_viewstate.fcs_gpregs.gp_esp -
 				                             (OFFSET_SCPUSTATE_IRREGS + SIZEOF_IRREGS_KERNEL));
 			}
-			state->scs_sgregs.sg_ds = dbg_viewstate.fcs_sgregs.sg_ds;
-			state->scs_sgregs.sg_es = dbg_viewstate.fcs_sgregs.sg_es;
-			state->scs_sgregs.sg_fs = dbg_viewstate.fcs_sgregs.sg_fs;
-			state->scs_sgregs.sg_gs = dbg_viewstate.fcs_sgregs.sg_gs;
+			state->scs_sgregs.sg_ds = dbg_viewstate.fcs_sgregs.sg_ds16;
+			state->scs_sgregs.sg_es = dbg_viewstate.fcs_sgregs.sg_es16;
+			state->scs_sgregs.sg_fs = dbg_viewstate.fcs_sgregs.sg_fs16;
+			state->scs_sgregs.sg_gs = dbg_viewstate.fcs_sgregs.sg_gs16;
 		}
 		state->scs_irregs_k.ir_eflags = dbg_viewstate.fcs_eflags;
 		state->scs_irregs_k.ir_cs     = dbg_viewstate.fcs_sgregs.sg_cs;

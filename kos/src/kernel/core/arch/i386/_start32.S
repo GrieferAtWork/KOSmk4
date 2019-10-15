@@ -579,13 +579,13 @@ END(__x86_paging_init_identity_mapped_text)
 	/* Setup the state of /bin/init at our stack base, thus following the
 	 * general expectation that the user-space return state can be found
 	 * at exactly that location. */
-	pushl  $(SEGMENT_USER_DATA_RPL)   /* ir_ss */
+	pushl  $(SEGMENT_USER_DATA_RPL) /* ir_ss */
 	pushl  $0                       /* ir_esp (set by `__i386_kernel_main') */
-	pushl  $(EFLAGS_IF)               /* ir_eflags */
+	pushl  $(EFLAGS_IF)             /* ir_eflags */
 	pushl  $SEGMENT_USER_CODE_RPL   /* ir_cs */
 	pushl  $0                       /* ir_eip (set by `__i386_kernel_main') */
-	pushl  $(SEGMENT_USER_DATA_RPL)   /* ics_ds */
-	pushl  $(SEGMENT_USER_DATA_RPL)   /* ics_es */
+	pushl  $(SEGMENT_USER_DATA_RPL) /* ics_ds */
+	pushl  $(SEGMENT_USER_DATA_RPL) /* ics_es */
 	pushl  $SEGMENT_USER_FSBASE_RPL /* ics_fs */
 	pushl  $0                       /* gp_eax */
 	pushl  $0                       /* gp_ecx */

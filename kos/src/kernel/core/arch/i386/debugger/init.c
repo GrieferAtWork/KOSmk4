@@ -95,22 +95,22 @@ NOTHROW(KCALL dbg_impersonate_thread)(struct task *__restrict thread) {
 		dbg_viewstate.fcs_gpregs        = state->scs_gpregs;
 		dbg_viewstate.fcs_eip           = state->scs_irregs_k.ir_eip;
 		dbg_viewstate.fcs_eflags        = state->scs_irregs_k.ir_eflags;
-		dbg_viewstate.fcs_sgregs.sg_cs  = state->scs_irregs_k.ir_cs;
+		dbg_viewstate.fcs_sgregs.sg_cs  = state->scs_irregs_k.ir_cs16;
 		dbg_viewstate.fcs_coregs.co_cr3 = (u32)thread->t_vm->v_pdir_phys_ptr;
 		if (SCPUSTATE_ISVM86(*state)) {
 			dbg_viewstate.fcs_gpregs.gp_esp = state->scs_irregs_v.ir_esp;
-			dbg_viewstate.fcs_sgregs.sg_ss  = state->scs_irregs_v.ir_ss;
-			dbg_viewstate.fcs_sgregs.sg_ds  = state->scs_irregs_v.ir_ds;
-			dbg_viewstate.fcs_sgregs.sg_es  = state->scs_irregs_v.ir_es;
-			dbg_viewstate.fcs_sgregs.sg_fs  = state->scs_irregs_v.ir_fs;
-			dbg_viewstate.fcs_sgregs.sg_gs  = state->scs_irregs_v.ir_gs;
+			dbg_viewstate.fcs_sgregs.sg_ss  = state->scs_irregs_v.ir_ss16;
+			dbg_viewstate.fcs_sgregs.sg_ds  = state->scs_irregs_v.ir_ds16;
+			dbg_viewstate.fcs_sgregs.sg_es  = state->scs_irregs_v.ir_es16;
+			dbg_viewstate.fcs_sgregs.sg_fs  = state->scs_irregs_v.ir_fs16;
+			dbg_viewstate.fcs_sgregs.sg_gs  = state->scs_irregs_v.ir_gs16;
 		} else {
-			dbg_viewstate.fcs_sgregs.sg_ds = state->scs_sgregs.sg_ds;
-			dbg_viewstate.fcs_sgregs.sg_es = state->scs_sgregs.sg_es;
-			dbg_viewstate.fcs_sgregs.sg_fs = state->scs_sgregs.sg_fs;
-			dbg_viewstate.fcs_sgregs.sg_gs = state->scs_sgregs.sg_gs;
+			dbg_viewstate.fcs_sgregs.sg_ds = state->scs_sgregs.sg_ds16;
+			dbg_viewstate.fcs_sgregs.sg_es = state->scs_sgregs.sg_es16;
+			dbg_viewstate.fcs_sgregs.sg_fs = state->scs_sgregs.sg_fs16;
+			dbg_viewstate.fcs_sgregs.sg_gs = state->scs_sgregs.sg_gs16;
 			if (state->scs_irregs_k.ir_cs & 3) {
-				dbg_viewstate.fcs_sgregs.sg_ss  = SCPUSTATE_USER_SS(*state);
+				dbg_viewstate.fcs_sgregs.sg_ss  = SCPUSTATE_USER_SS16(*state);
 				dbg_viewstate.fcs_gpregs.gp_esp = SCPUSTATE_USER_ESP(*state);
 			} else {
 				dbg_viewstate.fcs_sgregs.sg_ss  = SCPUSTATE_KERNEL_SS(*state);

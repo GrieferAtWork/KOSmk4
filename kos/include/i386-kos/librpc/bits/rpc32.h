@@ -252,7 +252,7 @@ rpc_register_state32_apply_icpustate(struct rpc_register_state32 *__restrict sel
 /* Return the value of a register `regno' for the given `state' */
 __LOCAL WUNUSED ATTR_PURE __uint32_t LIBRPC_CC
 rpc_register_state32_getreg_icpustate(struct icpustate *__restrict state,
-                                    unsigned int regno) {
+                                      unsigned int regno) {
 	__uint32_t result;
 	switch (regno) {
 #ifdef __x86_64__
@@ -273,8 +273,8 @@ rpc_register_state32_getreg_icpustate(struct icpustate *__restrict state,
 	case RPC_386_REGISTER_ESP:    result = state->ics_irregs.ir_rsp; break; /* [P] Stack pointer. */
 	case RPC_386_REGISTER_EIP:    result = state->ics_irregs.ir_rip; break; /* Instruction pointer. */
 	case RPC_386_REGISTER_EFLAGS: result = state->ics_irregs.ir_rflags; break; /* Flags register. */
-	case RPC_386_REGISTER_CS:     result = state->ics_irregs.ir_cs; break; /* CS segment. */
-	case RPC_386_REGISTER_SS:     result = state->ics_irregs.ir_ss; break; /* SS segment. */
+	case RPC_386_REGISTER_CS:     result = state->ics_irregs.ir_cs16; break; /* CS segment. */
+	case RPC_386_REGISTER_SS:     result = state->ics_irregs.ir_ss16; break; /* SS segment. */
 #endif /* !__KERNEL__ */
 	case RPC_386_REGISTER_ES:     result = __rdes(); break; /* ES segment. */
 	case RPC_386_REGISTER_DS:     result = __rdds(); break; /* DS segment. */
@@ -290,7 +290,7 @@ rpc_register_state32_getreg_icpustate(struct icpustate *__restrict state,
 	case RPC_386_REGISTER_ESI:    result = state->ics_gpregs.gp_esi; break; /* [P] Source pointer. */
 	case RPC_386_REGISTER_EDI:    result = state->ics_gpregs.gp_edi; break; /* [P] Destination pointer. */
 	case RPC_386_REGISTER_ES:     result = ICPUSTATE_ES(*state); break; /* ES segment. */
-	case RPC_386_REGISTER_SS:     result = state->ics_irregs_u.ir_ss; break; /* SS segment. */
+	case RPC_386_REGISTER_SS:     result = state->ics_irregs_u.ir_ss16; break; /* SS segment. */
 	case RPC_386_REGISTER_DS:     result = ICPUSTATE_DS(*state); break; /* DS segment. */
 	case RPC_386_REGISTER_FS:     result = ICPUSTATE_FS(*state); break; /* FS segment. */
 	case RPC_386_REGISTER_GS:     result = ICPUSTATE_GS(*state); break; /* GS segment. */
@@ -299,7 +299,7 @@ rpc_register_state32_getreg_icpustate(struct icpustate *__restrict state,
 	case RPC_386_REGISTER_EIP:    result = irregs_rdip(&state->ics_irregs_k); break; /* Instruction pointer. */
 	case RPC_386_REGISTER_EFLAGS: result = irregs_rdflags(&state->ics_irregs_k); break; /* Flags register. */
 #else /* __KERNEL__ */
-	case RPC_386_REGISTER_CS:     result = state->ics_irregs_k.ir_cs; break; /* CS segment. */
+	case RPC_386_REGISTER_CS:     result = state->ics_irregs_k.ir_cs16; break; /* CS segment. */
 	case RPC_386_REGISTER_EIP:    result = state->ics_irregs_k.ir_eip; break; /* Instruction pointer. */
 	case RPC_386_REGISTER_EFLAGS: result = state->ics_irregs_k.ir_eflags; break; /* Flags register. */
 #endif /* !__KERNEL__ */

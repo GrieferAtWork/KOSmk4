@@ -110,7 +110,7 @@ libregdump_lcpustate(struct regdump_printer *__restrict self,
 	DO(libregdump_gpreg(self, REGDUMP_GPREG_R15, data->lcs_r15));
 	PRINT("\n");
 	DO(libregdump_ip(self, data->lcs_rip));
-#else
+#else /* __x86_64__ */
 	DO(libregdump_gpreg(self, REGDUMP_GPREG_EDI, data->lcs_edi));
 	PRINT(" ");
 	DO(libregdump_gpreg(self, REGDUMP_GPREG_ESI, data->lcs_esi));
@@ -123,7 +123,7 @@ libregdump_lcpustate(struct regdump_printer *__restrict self,
 	DO(libregdump_gpreg(self, REGDUMP_GPREG_EBX, data->lcs_ebx));
 	PRINT("\n");
 	DO(libregdump_ip(self, data->lcs_eip));
-#endif
+#endif /* !__x86_64__ */
 	END;
 }
 
@@ -172,8 +172,8 @@ libregdump_icpustate(struct regdump_printer *__restrict self,
 	                                irregs_rdss(&data->ics_irregs)));
 #else /* __KERNEL__ */
 	DO(libregdump_sgregs_with_cs_ss(self, &sg,
-	                                data->ics_irregs.ir_cs,
-	                                data->ics_irregs.ir_ss));
+	                                data->ics_irregs.ir_cs16,
+	                                data->ics_irregs.ir_ss16));
 #endif /* !__KERNEL__ */
 #else /* __x86_64__ */
 #ifdef __KERNEL__
@@ -182,7 +182,7 @@ libregdump_icpustate(struct regdump_printer *__restrict self,
 	                                ICPUSTATE_SS(*data)));
 #else /* __KERNEL__ */
 	DO(libregdump_sgregs_with_cs_ss(self, &sg,
-	                                data->ics_irregs_k.ir_cs,
+	                                data->ics_irregs_k.ir_cs16,
 	                                ICPUSTATE_SS(*data)));
 #endif /* !__KERNEL__ */
 #endif /* !__x86_64__ */
@@ -210,15 +210,15 @@ libregdump_scpustate(struct regdump_printer *__restrict self,
 #ifdef __x86_64__
 	/* TODO: SGBASE */
 	DO(libregdump_sgregs_with_cs_ss(self, &data->scs_sgregs,
-	                                data->scs_irregs.ir_cs,
-	                                data->scs_irregs.ir_ss));
+	                                data->scs_irregs.ir_cs16,
+	                                data->scs_irregs.ir_ss16));
 #else /* __x86_64__ */
 	sg.sg_gs = SCPUSTATE_GS(*data);
 	sg.sg_fs = SCPUSTATE_FS(*data);
 	sg.sg_es = SCPUSTATE_ES(*data);
 	sg.sg_ds = SCPUSTATE_DS(*data);
 	DO(libregdump_sgregs_with_cs_ss(self, &sg,
-	                                data->scs_irregs_k.ir_cs,
+	                                data->scs_irregs_k.ir_cs16,
 	                                SCPUSTATE_SS(*data)));
 #endif /* !__x86_64__ */
 	format(REGDUMP_FORMAT_INDENT);
@@ -239,10 +239,10 @@ libregdump_fcpustate(struct regdump_printer *__restrict self,
 	BEGIN;
 	DO(libregdump_gpregs(self, &data->fcs_gpregs));
 	DO(libregdump_ip(self, FCPUSTATE_PC(*data)));
-	sg.sg_gs = data->fcs_sgregs.sg_gs;
-	sg.sg_fs = data->fcs_sgregs.sg_fs;
-	sg.sg_es = data->fcs_sgregs.sg_es;
-	sg.sg_ds = data->fcs_sgregs.sg_ds;
+	sg.sg_gs = data->fcs_sgregs.sg_gs16;
+	sg.sg_fs = data->fcs_sgregs.sg_fs16;
+	sg.sg_es = data->fcs_sgregs.sg_es16;
+	sg.sg_ds = data->fcs_sgregs.sg_ds16;
 	DO(libregdump_sgregs_with_cs_ss_tr_ldt(self, &sg,
 	                                       data->fcs_sgregs.sg_cs,
 	                                       data->fcs_sgregs.sg_ss,

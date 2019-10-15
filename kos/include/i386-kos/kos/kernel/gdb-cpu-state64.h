@@ -145,12 +145,12 @@ struct gdb_cpustate64 {
 	__u64 gcs_r15;    /* %r15 */
 	__u64 gcs_rip;    /* Instruction pointer */
 	__u64 gcs_rflags; /* Flags register */
-	__u64 gcs_cs;     /* Code segment */
-	__u64 gcs_ss;     /* Stack segment */
-	__u64 gcs_ds;     /* D (destination) segment register */
-	__u64 gcs_es;     /* E (source) segment register */
-	__u64 gcs_fs;     /* F segment register */
-	__u64 gcs_gs;     /* G segment register */
+	__u64 gcs_cs;     /* Code segment (zero-extended) */
+	__u64 gcs_ss;     /* Stack segment (zero-extended) */
+	__u64 gcs_ds;     /* D (destination) segment register (zero-extended) */
+	__u64 gcs_es;     /* E (source) segment register (zero-extended) */
+	__u64 gcs_fs;     /* F segment register (zero-extended) */
+	__u64 gcs_gs;     /* G segment register (zero-extended) */
 };
 
 #define GDB_CPUSTATE64_PC(x) ((x).gcs_rip)
@@ -205,8 +205,8 @@ gdb_cpustate64_from_gpregsnsp64_and_irregs64(struct gdb_cpustate64 *__restrict d
 	dst->gcs_r15    = gpregs->gp_r15;
 	dst->gcs_rip    = irregs->ir_rip;
 	dst->gcs_rflags = irregs->ir_rflags;
-	dst->gcs_cs     = irregs->ir_cs;
-	dst->gcs_ss     = irregs->ir_ss;
+	dst->gcs_cs     = irregs->ir_cs16;
+	dst->gcs_ss     = irregs->ir_ss16;
 }
 
 
@@ -224,10 +224,10 @@ __LOCAL void
 gdb_cpustate64_from_scpustate64(struct gdb_cpustate64 *__restrict dst,
                                 struct scpustate64 const *__restrict src) {
 	gdb_cpustate64_from_gpregsnsp64_and_irregs64(dst, &src->scs_gpregs, &src->scs_irregs);
-	dst->gcs_ds = src->scs_sgregs.sg_ds;
-	dst->gcs_es = src->scs_sgregs.sg_es;
-	dst->gcs_fs = src->scs_sgregs.sg_fs;
-	dst->gcs_gs = src->scs_sgregs.sg_gs;
+	dst->gcs_ds = src->scs_sgregs.sg_ds16;
+	dst->gcs_es = src->scs_sgregs.sg_es16;
+	dst->gcs_fs = src->scs_sgregs.sg_fs16;
+	dst->gcs_gs = src->scs_sgregs.sg_gs16;
 }
 
 __LOCAL void
@@ -251,12 +251,12 @@ gdb_cpustate64_from_ucpustate64(struct gdb_cpustate64 *__restrict dst,
 	dst->gcs_r15    = src->ucs_gpregs.gp_r15;
 	dst->gcs_rip    = src->ucs_rip;
 	dst->gcs_rflags = src->ucs_rflags;
-	dst->gcs_cs     = src->ucs_cs;
-	dst->gcs_ss     = src->ucs_ss;
-	dst->gcs_ds     = src->ucs_sgregs.sg_ds;
-	dst->gcs_es     = src->ucs_sgregs.sg_es;
-	dst->gcs_fs     = src->ucs_sgregs.sg_fs;
-	dst->gcs_gs     = src->ucs_sgregs.sg_gs;
+	dst->gcs_cs     = src->ucs_cs16;
+	dst->gcs_ss     = src->ucs_ss16;
+	dst->gcs_ds     = src->ucs_sgregs.sg_ds16;
+	dst->gcs_es     = src->ucs_sgregs.sg_es16;
+	dst->gcs_fs     = src->ucs_sgregs.sg_fs16;
+	dst->gcs_gs     = src->ucs_sgregs.sg_gs16;
 }
 
 __LOCAL void
@@ -348,12 +348,12 @@ gdb_cpustate64_from_fcpustate64(struct gdb_cpustate64 *__restrict dst,
 	dst->gcs_r15    = src->fcs_gpregs.gp_r15;
 	dst->gcs_rip    = src->fcs_rip;
 	dst->gcs_rflags = src->fcs_rflags;
-	dst->gcs_cs     = src->fcs_sgregs.sg_cs;
-	dst->gcs_ss     = src->fcs_sgregs.sg_ss;
-	dst->gcs_ds     = src->fcs_sgregs.sg_ds;
-	dst->gcs_es     = src->fcs_sgregs.sg_es;
-	dst->gcs_fs     = src->fcs_sgregs.sg_fs;
-	dst->gcs_gs     = src->fcs_sgregs.sg_gs;
+	dst->gcs_cs     = src->fcs_sgregs.sg_cs16;
+	dst->gcs_ss     = src->fcs_sgregs.sg_ss16;
+	dst->gcs_ds     = src->fcs_sgregs.sg_ds16;
+	dst->gcs_es     = src->fcs_sgregs.sg_es16;
+	dst->gcs_fs     = src->fcs_sgregs.sg_fs16;
+	dst->gcs_gs     = src->fcs_sgregs.sg_gs16;
 }
 
 

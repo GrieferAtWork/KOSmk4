@@ -308,11 +308,11 @@ PRIVATE ATTR_FREETEXT void KCALL ps2_probe_delete_handlers(struct ps2_probe_data
 
 PRIVATE ATTR_FREEBSS struct ps2_probe_data ps2_probe_data_buffer[PS2_PORTCOUNT];
 PRIVATE ATTR_FREETEXT DRIVER_INIT void KCALL ps2_init(void) {
-	u8 data;
 	ps2_portid_t portno;
 	memset(ps2_probe_data_buffer, 0, sizeof(ps2_probe_data_buffer));
 	ps2_probe_install_handlers(ps2_probe_data_buffer);
 	TRY {
+		u8 data;
 		/* Configure the PS/2 controller. */
 		ps2_write_cmd(PS2_CONTROLLER_DISABLE_PORT1);
 		ps2_write_cmd(PS2_CONTROLLER_DISABLE_PORT2);

@@ -313,10 +313,26 @@ struct __ATTR_PACKED gpregsnsp64 /*[PREFIX(gp_)]*/ {
 #define SIZEOF_SGREGS64     32
 #ifdef __CC__
 struct __ATTR_PACKED sgregs64 {
-	__u64   sg_gs;     /* G segment register (Usually `SEGMENT_USER_GSBASE_RPL') */
-	__u64   sg_fs;     /* F segment register (Usually `SEGMENT_USER_FSBASE_RPL' / `SEGMENT_KERNEL_FSBASE') */
-	__u64   sg_es;     /* E (source) segment register (Usually `SEGMENT_USER_DATA_RPL') */
-	__u64   sg_ds;     /* D (destination) segment register (Usually `SEGMENT_USER_DATA_RPL') */
+	union {
+		__u64 sg_gs;     /* G segment register (Usually `SEGMENT_USER_GSBASE_RPL')
+		                  * (upper 48 bits are undefined, but should be written as zeros) */
+		__u16 sg_gs16;   /* G segment register (Usually `SEGMENT_USER_GSBASE_RPL') */
+	};
+	union {
+		__u64 sg_fs;     /* F segment register (Usually `SEGMENT_USER_FSBASE_RPL' / `SEGMENT_KERNEL_FSBASE')
+		                  * (upper 48 bits are undefined, but should be written as zeros) */
+		__u16 sg_fs16;   /* F segment register (Usually `SEGMENT_USER_FSBASE_RPL' / `SEGMENT_KERNEL_FSBASE') */
+	};
+	union {
+		__u64 sg_es;     /* E (source) segment register (Usually `SEGMENT_USER_DATA_RPL')
+		                  * (upper 48 bits are undefined, but should be written as zeros) */
+		__u16 sg_es16;   /* E (source) segment register (Usually `SEGMENT_USER_DATA_RPL') */
+	};
+	union {
+		__u64 sg_ds;     /* D (destination) segment register (Usually `SEGMENT_USER_DATA_RPL')
+		                  * (upper 48 bits are undefined, but should be written as zeros) */
+		__u16 sg_ds16;   /* D (destination) segment register (Usually `SEGMENT_USER_DATA_RPL') */
+	};
 };
 #endif /* __CC__ */
 
@@ -376,14 +392,22 @@ struct __ATTR_PACKED drregs64 {
 #ifdef __CC__
 struct __ATTR_PACKED irregs64 {
 	/* On x86_64, the interrupt return tail always looks the same. */
-	__u64   ir_rip;    /* Instruction pointer */
-	__u64   ir_cs;     /* Code segment (Ring #0, usually `SEGMENT_KERNEL_CODE') */
-	__u64   ir_rflags; /* Flags register */
-	__u64   ir_rsp;    /* Return stack pointer */
-	__u64   ir_ss;     /* Return stack segment */
+	__u64     ir_rip;    /* Instruction pointer */
+	union {
+		__u64 ir_cs;     /* Code segment (Ring #0, usually `SEGMENT_KERNEL_CODE')
+		                  * (upper 48 bits are undefined, but should be written as zeros) */
+		__u16 ir_cs16;   /* Code segment (Ring #0, usually `SEGMENT_KERNEL_CODE') */
+	};
+	__u64     ir_rflags; /* Flags register */
+	__u64     ir_rsp;    /* Return stack pointer */
+	union {
+		__u64 ir_ss;     /* Return stack segment
+		                  * (upper 48 bits are undefined, but should be written as zeros) */
+		__u16 ir_ss16;   /* Return stack segment */
+	};
 };
-#define IRREGS64_SP(self)     ((self).ir_rsp)
-#define IRREGS64_PC(self)     ((self).ir_rip)
+#define IRREGS64_SP(self) ((self).ir_rsp)
+#define IRREGS64_PC(self) ((self).ir_rip)
 #endif /* __CC__ */
 
 
@@ -403,8 +427,16 @@ struct __ATTR_PACKED ucpustate64 { /* u -- User */
 	struct sgbase64 ucs_sgbase; /* Segment base registers. */
 	struct sgregs64 ucs_sgregs; /* Segment registers. */
 	struct gpregs64 ucs_gpregs; /* General purpose registers. */
-	__u64           ucs_cs;     /* Code segment (Ring #3, usually `SEGMENT_USER_CODE_RPL') */
-	__u64           ucs_ss;     /* Stack segment (Ring #3, usually `SEGMENT_USER_DATA_RPL') */
+	union {
+		__u64       ucs_cs;     /* Code segment (Ring #3, usually `SEGMENT_USER_CODE_RPL')
+		                         * (upper 48 bits are undefined, but should be written as zeros) */
+		__u16       ucs_cs16;   /* Code segment (Ring #3, usually `SEGMENT_USER_CODE_RPL') */
+	};
+	union {
+		__u64       ucs_ss;     /* Stack segment (Ring #3, usually `SEGMENT_USER_DATA_RPL')
+		                         * (upper 48 bits are undefined, but should be written as zeros) */
+		__u16       ucs_ss16;   /* Stack segment (Ring #3, usually `SEGMENT_USER_DATA_RPL') */
+	};
 	__u64           ucs_rflags; /* Flags register */
 	__u64           ucs_rip;    /* Instruction pointer */
 };
@@ -481,20 +513,20 @@ __FORCELOCAL void __FCALL lcpustate_cur(struct lcpustate64 *__restrict __st) {
 	(LCPUSTATE64_TO_GPREGS64((dst).ucs_gpregs, src),   \
 	 (dst).ucs_sgbase.sg_gsbase = (__u64)__rdgsbase(), \
 	 (dst).ucs_sgbase.sg_fsbase = (__u64)__rdfsbase(), \
-	 (dst).ucs_sgregs.sg_gs     = (__u64)__rdgs(),     \
-	 (dst).ucs_sgregs.sg_fs     = (__u64)__rdfs(),     \
-	 (dst).ucs_sgregs.sg_es     = (__u64)__rdes(),     \
-	 (dst).ucs_sgregs.sg_ds     = (__u64)__rdds(),     \
-	 (dst).ucs_cs               = (__u64)__rdcs(),     \
-	 (dst).ucs_ss               = (__u64)__rdss(),     \
-	 (dst).ucs_rflags           = (__u64)__rdflags(),  \
+	 (dst).ucs_sgregs.sg_gs     = __rdgs(),            \
+	 (dst).ucs_sgregs.sg_fs     = __rdfs(),            \
+	 (dst).ucs_sgregs.sg_es     = __rdes(),            \
+	 (dst).ucs_sgregs.sg_ds     = __rdds(),            \
+	 (dst).ucs_cs               = __rdcs(),            \
+	 (dst).ucs_ss               = __rdss(),            \
+	 (dst).ucs_rflags           = __rdflags(),         \
 	 (dst).ucs_rip              = (src).lcs_rip)
 #define LCPUSTATE64_TO_KCPUSTATE64(dst, src)         \
 	(LCPUSTATE64_TO_GPREGS64((dst).kcs_gpregs, src), \
-	 (dst).kcs_rflags = (__u64)__rdflags(),          \
+	 (dst).kcs_rflags = __rdflags(),                 \
 	 (dst).kcs_rip    = (src).lcs_rip)
-#define LCPUSTATE64_SP(self)  ((self).lcs_rsp)
-#define LCPUSTATE64_PC(self)  ((self).lcs_rip)
+#define LCPUSTATE64_SP(self) ((self).lcs_rsp)
+#define LCPUSTATE64_PC(self) ((self).lcs_rip)
 #endif /* __CC__ */
 
 
@@ -516,12 +548,12 @@ struct __ATTR_PACKED kcpustate64 {
 	((dst).ucs_gpregs           = (src).kcs_gpregs,    \
 	 (dst).ucs_sgbase.sg_gsbase = (__u64)__rdgsbase(), \
 	 (dst).ucs_sgbase.sg_fsbase = (__u64)__rdfsbase(), \
-	 (dst).ucs_sgregs.sg_gs     = (__u64)__rdgs(),     \
-	 (dst).ucs_sgregs.sg_fs     = (__u64)__rdfs(),     \
-	 (dst).ucs_sgregs.sg_es     = (__u64)__rdes(),     \
-	 (dst).ucs_sgregs.sg_ds     = (__u64)__rdds(),     \
-	 (dst).ucs_cs               = (__u64)__rdcs(),     \
-	 (dst).ucs_ss               = (__u64)__rdss(),     \
+	 (dst).ucs_sgregs.sg_gs     = __rdgs(),            \
+	 (dst).ucs_sgregs.sg_fs     = __rdfs(),            \
+	 (dst).ucs_sgregs.sg_es     = __rdes(),            \
+	 (dst).ucs_sgregs.sg_ds     = __rdds(),            \
+	 (dst).ucs_cs               = __rdcs(),            \
+	 (dst).ucs_ss               = __rdss(),            \
 	 (dst).ucs_rflags           = (src).kcs_rflags,    \
 	 (dst).ucs_rip              = (src).kcs_rip)
 #define KCPUSTATE64_TO_LCPUSTATE64(dst, src)  \
@@ -533,8 +565,8 @@ struct __ATTR_PACKED kcpustate64 {
 	 (dst).lcs_rsp = (src).kcs_gpregs.gp_rsp, \
 	 (dst).lcs_rbx = (src).kcs_gpregs.gp_rbx, \
 	 (dst).lcs_rip = (src).kcs_rip)
-#define KCPUSTATE64_SP(self)  ((self).kcs_gpregs.gp_rsp)
-#define KCPUSTATE64_PC(self)  ((self).kcs_rip)
+#define KCPUSTATE64_SP(self) ((self).kcs_gpregs.gp_rsp)
+#define KCPUSTATE64_PC(self) ((self).kcs_rip)
 #endif /* __CC__ */
 
 #define OFFSET_ICPUSTATE64_GPREGSNSP 0   /* [FIELD(ics_gpregs)] */
@@ -613,27 +645,27 @@ struct __ATTR_PACKED icpustate64 { /* i -- Interrupts */
 	 (dst).ucs_gpregs.gp_rax    = (src).ics_gpregs.gp_rax,    \
 	 (dst).ucs_sgbase.sg_fsbase = (__u64)__rdfsbase(),        \
 	 (dst).ucs_sgbase.sg_gsbase = (__u64)__rdgsbase(),        \
-	 (dst).ucs_sgregs.sg_gs     = (__u64)__rdgs(),            \
-	 (dst).ucs_sgregs.sg_fs     = (__u64)__rdfs(),            \
-	 (dst).ucs_sgregs.sg_es     = (__u64)__rdes(),            \
-	 (dst).ucs_sgregs.sg_ds     = (__u64)__rdds(),            \
+	 (dst).ucs_sgregs.sg_gs     = __rdgs(),                   \
+	 (dst).ucs_sgregs.sg_fs     = __rdfs(),                   \
+	 (dst).ucs_sgregs.sg_es     = __rdes(),                   \
+	 (dst).ucs_sgregs.sg_ds     = __rdds(),                   \
 	 (dst).ucs_cs               = (src).ics_irregs.ir_cs,     \
 	 (dst).ucs_ss               = (src).ics_irregs.ir_ss,     \
 	 (dst).ucs_rflags           = (src).ics_irregs.ir_rflags, \
 	 (dst).ucs_rip              = (src).ics_irregs.ir_rip)
-#define ICPUSTATE64_TO_SCPUSTATE64(dst, src)                           \
-	((dst).scs_gpregs           = (src).ics_gpregs.gp_r15,             \
-	 (dst).scs_sgbase.sg_fsbase = (__u64)__rdfsbase(),                 \
-	 (dst).scs_sgbase.sg_gsbase = (__u64)__rdgsbase(),                 \
-	 (dst).scs_sgregs.sg_gs     = (__u64)__rdgs(),                     \
-	 (dst).scs_sgregs.sg_fs     = (__u64)__rdfs(),                     \
-	 (dst).scs_sgregs.sg_es     = (__u64)__rdes(),                     \
-	 (dst).scs_sgregs.sg_ds     = (__u64)__rdds(),                     \
+#define ICPUSTATE64_TO_SCPUSTATE64(dst, src)               \
+	((dst).scs_gpregs           = (src).ics_gpregs.gp_r15, \
+	 (dst).scs_sgbase.sg_fsbase = (__u64)__rdfsbase(),     \
+	 (dst).scs_sgbase.sg_gsbase = (__u64)__rdgsbase(),     \
+	 (dst).scs_sgregs.sg_gs     = __rdgs(),                \
+	 (dst).scs_sgregs.sg_fs     = __rdfs(),                \
+	 (dst).scs_sgregs.sg_es     = __rdes(),                \
+	 (dst).scs_sgregs.sg_ds     = __rdds(),                \
 	 (dst).scs_irregs           = (src).ics_irregs)
-#define ICPUSTATE64_ISKERNEL(self) (!((self).ics_irregs.ir_cs & 3))
-#define ICPUSTATE64_ISUSER(self)     ((self).ics_irregs.ir_cs & 3)
-#define ICPUSTATE64_SP(self)         ((self).ics_irregs.ir_rsp)
-#define ICPUSTATE64_PC(self)         ((self).ics_irregs.ir_rip)
+#define ICPUSTATE64_ISKERNEL(self) (!((self).ics_irregs.ir_cs16 & 3))
+#define ICPUSTATE64_ISUSER(self)   ((self).ics_irregs.ir_cs16 & 3)
+#define ICPUSTATE64_SP(self)       ((self).ics_irregs.ir_rsp)
+#define ICPUSTATE64_PC(self)       ((self).ics_irregs.ir_rip)
 
 #endif /* __CC__ */
 
@@ -681,10 +713,10 @@ struct __ATTR_PACKED scpustate64 { /* i -- Interrupts */
 #define SCPUSTATE64_TO_ICPUSTATE64(dst, src) \
 	((dst).ics_gpregs = (src).scs_gpregs,    \
 	 (dst).ics_irregs = (src).scs_irregs)
-#define SCPUSTATE64_ISKERNEL(self) (!((self).scs_irregs.ir_cs & 3))
-#define SCPUSTATE64_ISUSER(self)     ((self).scs_irregs.ir_cs & 3)
-#define SCPUSTATE64_SP(self)         ((self).scs_irregs.ir_rsp)
-#define SCPUSTATE64_PC(self)         ((self).scs_irregs.ir_rip)
+#define SCPUSTATE64_ISKERNEL(self) (!((self).scs_irregs.ir_cs16 & 3))
+#define SCPUSTATE64_ISUSER(self)   ((self).scs_irregs.ir_cs16 & 3)
+#define SCPUSTATE64_SP(self)       ((self).scs_irregs.ir_rsp)
+#define SCPUSTATE64_PC(self)       ((self).scs_irregs.ir_rip)
 
 #endif /* __CC__ */
 
@@ -725,14 +757,46 @@ struct __ATTR_PACKED fcpustate64 { /* f -- Full */
 	__u64            fcs_rflags; /* Flags register */
 	__u64            fcs_rip;    /* Flags register */
 	struct {
-		__u64        sg_es;       /* E (source) segment register. */
-		__u64        sg_cs;       /* Code segment register. */
-		__u64        sg_ss;       /* Stack segment register. */
-		__u64        sg_ds;       /* D (destination) segment register. */
-		__u64        sg_fs;       /* F segment register. */
-		__u64        sg_gs;       /* G segment register. */
-		__u64        sg_tr;       /* Task register. */
-		__u64        sg_ldt;      /* Load descriptor table. */
+		union {
+			__u64    sg_es;       /* E (source) segment register.
+			                       * (upper 48 bits are undefined, but should be written as zeros) */
+			__u16    sg_es16;     /* E (source) segment register. */
+		};
+		union {
+			__u64    sg_cs;       /* Code segment register.
+			                       * (upper 48 bits are undefined, but should be written as zeros) */
+			__u16    sg_cs16;     /* Code segment register. */
+		};
+		union {
+			__u64    sg_ss;       /* Stack segment register.
+			                       * (upper 48 bits are undefined, but should be written as zeros) */
+			__u16    sg_ss16;     /* Stack segment register. */
+		};
+		union {
+			__u64    sg_ds;       /* D (destination) segment register.
+			                       * (upper 48 bits are undefined, but should be written as zeros) */
+			__u16    sg_ds16;     /* D (destination) segment register. */
+		};
+		union {
+			__u64    sg_fs;       /* F segment register.
+			                       * (upper 48 bits are undefined, but should be written as zeros) */
+			__u16    sg_fs16;     /* F segment register. */
+		};
+		union {
+			__u64    sg_gs;       /* G segment register.
+			                       * (upper 48 bits are undefined, but should be written as zeros) */
+			__u16    sg_gs16;     /* G segment register. */
+		};
+		union {
+			__u64    sg_tr;       /* Task register.
+			                       * (upper 48 bits are undefined, but should be written as zeros) */
+			__u16    sg_tr16;     /* Task register. */
+		};
+		union {
+			__u64    sg_ldt;      /* Load descriptor table.
+			                       * (upper 48 bits are undefined, but should be written as zeros) */
+			__u16    sg_ldt16;    /* Load descriptor table. */
+		};
 	}                fcs_sgregs;  /* Segment index registers. */
 	struct sgbase64  fcs_sgbase;  /* Segment base registers. */
 	struct coregs64  fcs_coregs;  /* Control registers. */
