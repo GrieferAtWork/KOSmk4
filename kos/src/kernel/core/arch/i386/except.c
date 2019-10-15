@@ -748,12 +748,11 @@ search_fde:
 				 * >> *(u16 *)ESP = DS;
 				 * In other words, it leaves the upper 2 bytes of the pushed DWORD
 				 * undefined (or rather: have them keep their previous values)
-				 * -> To fix this, we must adjust libunwind (and probably also some
-				 *    other places that use segment registers, since until now I've
-				 *    always assumed that the most significant 2 bytes were initialized
-				 *    as all zeroes), in order to either ignore those 2 bytes, or
-				 *    manually fill them with zeroes before passing them on.
-				 * Ok! I've just taken a look at the Intel manuals:
+				 * -> To fix this, we libunwind (and also some other components
+				 *    that use segment registers) have been adjusted, in order
+				 *    to either ignore the upper 2 bytes during reads, and fill
+				 *    them as all zeroes during writes.
+				 * Intel manuals:
 				 * ... if the operand size is 32-bits, either a zero-extended value is
 				 * pushed on the stack or the segment selector is written on the stack
 				 * using a 16-bit move. For the last case, all recent Core and Atom

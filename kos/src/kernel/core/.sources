@@ -134,7 +134,7 @@ BEGIN
 	final local KERNEL_EXPORTS_SOURCE =
 		"/kos/src/kernel/include/" + TARGET_XARCH + "-kos/kernel/arch/core-symbols" + CONFIG_FEATURE_FILE_SUFFIX + ".h";
 
-	BEGIN GROUP("kernel") { LINK, MCOPY, /* ELF_FLATTEN, */
+	BEGIN GROUP("kernel") { LINK, MCOPY, ELF_DIHACK, /* ELF_FLATTEN, */
 			enumerateSymbolsStep(
 				elfBinary: KERNEL_BINARY,
 				callback: [](self: BoundStep, symbols: {(string, string, string, string, string)...}) {

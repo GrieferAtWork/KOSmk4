@@ -223,6 +223,21 @@ global final ELF_FLATTEN: Step = Step(
 );
 
 
+local function getLines(fp: File): Bytes {
+	local result = fp.read();
+again:
+	if (result &&
+	    !result.endswith("\n") &&
+	    !result.endswith("\r") &&
+	    !result.endswith("\r\n")) {
+		local d = fp.read();
+		if (d) {
+			result = result + d;
+			goto again;
+		}
+	}
+	return result;
+}
 
 
 @@@param callback: Callable as callback(self: BoundStep, symbols: {(string, string, string, string, string, string)...})
@@ -247,7 +262,10 @@ function enumerateSymbolsStep(elfBinary: string, callback: Callable): Step {
 		w.close();
 		try {
 			callback(self, []{
-				for (local l: r) {
+				/* FIXME: for (local l: r)
+				 * Deemon's line-based file reader is unbelievably slow! */
+				while (local d = getLines(r))
+				for (local l: d.splitlines()) {
 					local symbolName, symbolType, symbolBind, symbolVisi, symbolSize, symbolSect;
 					try {
 						none, none, symbolSize, symbolType,

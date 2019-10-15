@@ -33,6 +33,7 @@ import * from .kos.misc.libmagic.steps.c;
 import * from .kos.misc.libmagic.steps.mtools;
 import * from .kos.misc.libmagic.steps.util;
 import * from .kos.misc.libmagic.steps.elf;
+import * from .kos.misc.libmagic.steps.elf_dihack;
 import * from .kos.misc.libmagic.steps.custom;
 import * from .kos.misc.libmagic.steps.keymap;
 import * from .kos.misc.libmagic.toolchain.gcc;

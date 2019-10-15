@@ -169,31 +169,37 @@ SECTIONS {
 	}
 	PROVIDE_HIDDEN(__kernel_sect_eh_frame_size = ABSOLUTE(ABSOLUTE(.) - ABSOLUTE(__kernel_sect_eh_frame_start)));
 
-#if 0
-#define DEBUG_DEBUG_SECTION(section_name, name, sections, clutch) \
-	PROVIDE_HIDDEN(name##_start = ABSOLUTE(.)); \
-	PROVIDE_HIDDEN(name##_end = ABSOLUTE(.)); \
-	PROVIDE_HIDDEN(name##_size = ABSOLUTE(0));
-#else
-#define DEBUG_DEBUG_SECTION(section_name, name, sections, clutch) \
-	PROVIDE_HIDDEN(name##_start = ABSOLUTE(.)); \
-	. = ABSOLUTE(0); \
-	section_name 0 : AT(name##_start - KERNEL_BASE) { \
-		KEEP(sections) \
-		PROVIDE_HIDDEN(name##_size = ABSOLUTE(.)); \
-		KEEP(clutch) \
-	} \
+#define DEFINE_DEBUG_SECTION(section_name, alignment, name, sections)                      \
+	PROVIDE_HIDDEN(name##_start = ABSOLUTE(ALIGN(alignment)));                             \
+	. = ABSOLUTE(0);                                                                       \
+	section_name 0 : AT(name##_start - KERNEL_BASE) {                                      \
+		KEEP(sections)                                                                     \
+		PROVIDE_HIDDEN(name##_size = ABSOLUTE(.));                                         \
+	}                                                                                      \
 	PROVIDE_HIDDEN(name##_end = ABSOLUTE(ABSOLUTE(name##_start) + ABSOLUTE(name##_size))); \
 	. += ABSOLUTE(name##_start);
-#endif
-	DEBUG_DEBUG_SECTION(.debug_line, __kernel_debug_line, *(.debug_line), *(.rodata.debug_line.clutch))
-	DEBUG_DEBUG_SECTION(.debug_info, __kernel_debug_info, *(.debug_info), *(.rodata.debug_info.clutch))
-	DEBUG_DEBUG_SECTION(.debug_aranges, __kernel_debug_aranges, *(.debug_aranges), *(.rodata.debug_aranges.clutch))
-	DEBUG_DEBUG_SECTION(.debug_abbrev, __kernel_debug_abbrev, *(.debug_abbrev), *(.rodata.debug_abbrev.clutch))
-	DEBUG_DEBUG_SECTION(.debug_str, __kernel_debug_str, *(.debug_str), *(.rodata.debug_str.clutch))
-	DEBUG_DEBUG_SECTION(.debug_ranges, __kernel_debug_ranges, *(.debug_ranges), *(.rodata.debug_ranges.clutch))
-	DEBUG_DEBUG_SECTION(.debug_loc, __kernel_debug_loc, *(.debug_loc), *(.rodata.debug_loc.clutch))
-#undef DEBUG_DEBUG_SECTION
+	DEFINE_DEBUG_SECTION(.debug_line, 1, __kernel_debug_line, *(.debug_line))
+	DEFINE_DEBUG_SECTION(.debug_info, 1, __kernel_debug_info, *(.debug_info))
+	DEFINE_DEBUG_SECTION(.debug_aranges, 8, __kernel_debug_aranges, *(.debug_aranges))
+	DEFINE_DEBUG_SECTION(.debug_abbrev, 1, __kernel_debug_abbrev, *(.debug_abbrev))
+	DEFINE_DEBUG_SECTION(.debug_str, 1, __kernel_debug_str, *(.debug_str))
+	DEFINE_DEBUG_SECTION(.debug_ranges, 8, __kernel_debug_ranges, *(.debug_ranges))
+	DEFINE_DEBUG_SECTION(.debug_loc, 1, __kernel_debug_loc, *(.debug_loc))
+#undef DEFINE_DEBUG_SECTION
+
+#define DEFINE_DEBUG_SECTION_WRAPPER(name)                                    \
+	PROVIDE_HIDDEN(__wrapper_##name##_start = ABSOLUTE(.));                   \
+	. = ABSOLUTE(0);                                                          \
+	.name.wrapper 0 : AT(__wrapper_##name##_start - KERNEL_BASE) { BYTE(0); } \
+	. += ABSOLUTE(__wrapper_##name##_start);
+	DEFINE_DEBUG_SECTION_WRAPPER(debug_line)
+	DEFINE_DEBUG_SECTION_WRAPPER(debug_info)
+	DEFINE_DEBUG_SECTION_WRAPPER(debug_aranges)
+	DEFINE_DEBUG_SECTION_WRAPPER(debug_abbrev)
+	DEFINE_DEBUG_SECTION_WRAPPER(debug_str)
+	DEFINE_DEBUG_SECTION_WRAPPER(debug_ranges)
+	DEFINE_DEBUG_SECTION_WRAPPER(debug_loc)
+#undef DEFINE_DEBUG_SECTION_WRAPPER
 
 	IP_ALIGN(__SIZEOF_CACHELINE__);
 	PEROBJECT_SECTION(.pertask, __kernel_pertask, {

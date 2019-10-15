@@ -93,9 +93,38 @@ if (CONFIG_DEBUG) {
 }
 
 GCC_FLAGS({
-	"-ggdb", /* Always generate debug information. */
-	"-pipe"  /* Use pipes to speed up compilation */
+	"-g",    /* Always generate debug information. */
+	"-pipe", /* Use pipes to speed up compilation */
 })
+
+
+
+/* TODO: Support this in libdebuginfo!
+ * -> With the re-imagining of how we create a kernel binary that will have
+ *    its debug information loaded alongside the main binary, the new method
+ *    allows us to turn on debug information compression without causing `ld'
+ *    to segfault upon try to link the main kernel.
+ * -> And believe me: Enabling compression _does_ _very_ _much_ make a difference:
+ *     - With compression disabled, the kernel binary is about 16.6 Mib large. (--config=OD)
+ *     - With compression enabled, the kernel binary is only 9.1 Mib large. (--config=OD)
+ *    The reason for this drastic difference is that each source file generates the
+ *    same set of debug informations about every structure type found in system headers,
+ *    leaving LD unable to perform any sort of optimization concerning cutting down on
+ *    all of that redundant information.
+ *    In comes compression, and suddenly all of the redundancy goes away, which results
+ *    in the kernel suddenly only being about half as large.
+ * -> Another important reason why this should always be kept on (at least for the kernel
+ *    core, once libdebuginfo supports it) comes to mind when you look at the X86 memory
+ *    map, which specifies a 14Mib hole at 0x0010000 (1Mib), where pretty much any kernel
+ *    you will find out there gets loaded at.
+ *    You should be able to see what I'm getting at: With all debug information, and all
+ *    optimizations enabled (mind you: with --config=nOD, the kernel is still small enough
+ *    to fit into that 14Mib hole, even without compressing debug infos), the kernel can
+ *    no longer fit into that hole, and may no longer be bootable on many machines.
+ * -> So with all of this in mind, adding support for compressed debug information to
+ *    libdebuginfo will allow testing of --config=OD kernels on real hardware!
+ */
+//GCC_FLAGS({ "-gz" })
 
 CC_FLAGS({
 	"-Wall",
