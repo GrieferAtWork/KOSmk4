@@ -989,7 +989,7 @@ _block_device_sync(struct block_device *__restrict self)
 				                          handle);
 				++result;
 			} EXCEPT {
-				handle->ah_type = &aio_noop_type;
+				aio_handle_init(handle, &aio_noop_type);
 				aio_handle_fail(handle);
 				break;
 			}
@@ -1070,7 +1070,7 @@ again:
 			(*self->bd_type.dt_write)(self, cache_addr, 1,
 			                          sector_id, &handle);
 		} EXCEPT {
-			handle.ah_type = &aio_noop_type;
+			aio_handle_init(&handle, &aio_noop_type);
 			aio_handle_fail(&handle);
 		}
 		/* Search for additional sectors which may need saving, so we can improve
@@ -1100,7 +1100,7 @@ again:
 				(*self->bd_type.dt_write)(self, cache_addr, 1,
 				                          sector_id, &handle);
 			} EXCEPT {
-				ex_handles[ex_handles_count].sh_handle.ah_type = &aio_noop_type;
+				aio_handle_init(&ex_handles[ex_handles_count].sh_handle, &aio_noop_type);
 				aio_handle_fail(&ex_handles[ex_handles_count].sh_handle);
 			}
 			++ex_handles_count;
@@ -1177,7 +1177,7 @@ check_handle_state_for_save:
 		                         addr,
 		                         &handle);
 	} EXCEPT {
-		handle.ah_type = &aio_noop_type;
+		aio_handle_init(&handle, &aio_noop_type);
 		aio_handle_fail(&handle);
 	}
 	COMPILER_BARRIER();

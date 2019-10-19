@@ -179,7 +179,7 @@ FUNC2(
 			goto service_without_dma; /* Request contains non-canonical memory. */
 		}
 		ATA_VERBOSE("Switch to `ATA_BUS_STATE_INDMA_SWITCH' to setup initial DMA\n");
-		aio->ah_type   = &Ata_DmaHandleType;
+		aio_handle_init(aio, &Ata_DmaHandleType);
 		data->hd_drive = (REF struct ata_drive *)incref(self);
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 		*(u32 *)&data->hd_io_lbaaddr[0] = (u32)addr;
@@ -272,7 +272,7 @@ again_init_prdv:
 		data->hd_prd_vector = prdv; /* Inherit */
 	}
 	/* Initialize additional stuff... */
-	aio->ah_type   = &Ata_DmaHandleType;
+	aio_handle_init(aio, &Ata_DmaHandleType);
 	data->hd_drive = (REF struct ata_drive *)incref(self);
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 	*(u32 *)&data->hd_io_lbaaddr[0] = (u32)addr;
@@ -479,7 +479,7 @@ again_service_io:
 	}
 	AtaBus_UnlockPIO(bus);
 	/* Indicate AIO completion to the caller. */
-	aio->ah_type = &aio_noop_type;
+	aio_handle_init(aio, &aio_noop_type);
 	aio_handle_success(aio);
 	return;
 err_io_error:
@@ -494,7 +494,7 @@ err_io_error:
 		goto again_service_io;
 	}
 	AtaBus_UnlockPIO(bus);
-	aio->ah_type = &aio_noop_type;
+	aio_handle_init(aio, &aio_noop_type);
 	handle_completion_ioerror_generic(aio, error);
 #undef MAX_SECTORS_PER_TRANSFER_T
 #undef MAX_SECTORS_PER_TRANSFER

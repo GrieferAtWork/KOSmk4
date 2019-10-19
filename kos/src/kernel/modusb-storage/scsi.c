@@ -208,7 +208,7 @@ ms_scsi_doio(struct ms_scsi_device *__restrict self,
 		 *       the transfer. */
 		usb_controller_transfer_sync(self->msd_ctrl, &req);
 	}
-	aio->ah_type = &aio_noop_type;
+	aio_handle_init(aio, &aio_noop_type);
 	aio_handle_success(aio);
 }
 

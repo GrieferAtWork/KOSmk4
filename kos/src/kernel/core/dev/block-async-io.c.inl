@@ -292,13 +292,13 @@ NOTHROW(KCALL _block_device_awrite)(struct block_device *__restrict self,
 			}
 			INVOKE_IO(self, buf, num_sectors, addr, aio);
 		} EXCEPT {
-			aio->ah_type = &aio_noop_type;
+			aio_handle_init(aio, &aio_noop_type);
 			aio_handle_fail(aio);
 		}
 	}
 	return;
 done_success:
-	aio->ah_type = &aio_noop_type;
+	aio_handle_init(aio, &aio_noop_type);
 	aio_handle_success(aio);
 #else /* IO_SECTOR */
 	pos_t end_addr;
@@ -437,12 +437,12 @@ done_success:
 			goto done_success;
 		}
 	} EXCEPT {
-		aio->ah_type = &aio_noop_type;
+		aio_handle_init(aio, &aio_noop_type);
 		aio_handle_fail(aio);
 	}
 	return;
 done_success:
-	aio->ah_type = &aio_noop_type;
+	aio_handle_init(aio, &aio_noop_type);
 	aio_handle_success(aio);
 #endif /* !IO_SECTOR */
 }

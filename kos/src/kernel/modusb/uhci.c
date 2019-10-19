@@ -2029,7 +2029,7 @@ uhci_transfer(struct usb_controller *__restrict self,
 	me   = (struct uhci_controller *)self;
 	data = (struct uhci_aio_data *)aio->ah_data;
 	qh   = uhci_osqh_alloc();
-	aio->ah_type = &uhci_aio_type;
+	aio_handle_init(aio, &uhci_aio_type);
 	TRY {
 		qh->qh_refcnt = 2; /* +1: aio->ah_data->ud_osqh; +1: me->uc_qhstart.qh_next */
 		qh->qh_aio    = aio;
@@ -2163,7 +2163,7 @@ cleanup_configured_and_do_syncio:
 		transfer_size = uhci_transfer_sync_with_phys(me, tx);
 		/* Still always propagate the total number of transferred bytes. */
 		aio->ah_data[0] = (void *)transfer_size;
-		aio->ah_type    = &uhci_aio_sync_type;
+		aio_handle_init(aio, &uhci_aio_sync_type);
 	}
 	aio_handle_success(aio);
 }

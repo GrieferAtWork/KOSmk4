@@ -499,6 +499,10 @@ struct ATTR_ALIGNED(AIO_HANDLE_ALIGNMENT) aio_handle {
 /* No-op AIO handle type (intended for synchronous operations) */
 DATDEF struct aio_handle_type aio_noop_type;
 
+/* Initialize the given AIO handle with a type-specific v-table. */
+#define aio_handle_init(self, type) \
+	((self)->ah_type = (type))
+
 /* Finalize a fully initialized AIO handle. */
 #define aio_handle_fini(self) (*(self)->ah_type->ht_fini)(self)
 
