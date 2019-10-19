@@ -587,7 +587,7 @@ EOF
 		install_header "$OPTPATH/zconf.h" "zconf.h"
 		install_header "$SRCPATH/zlib.h"  "zlib.h"
 		# Install libraries
-		install_file /usr/lib/libz.so.$ZLIB_VERISON_MAJOR "$OPTPATH/libz.so.$ZLIB_VERISON"
+		install_file /lib/libz.so.$ZLIB_VERISON_MAJOR "$OPTPATH/libz.so.$ZLIB_VERISON"
 		install_symlink /lib/libz.so.$ZLIB_VERISON libz.so.$ZLIB_VERISON_MAJOR
 		install_symlink /lib/libz.so libz.so.$ZLIB_VERISON_MAJOR
 		install_file_nodisk /lib/libz.a "$OPTPATH/libz.a"
