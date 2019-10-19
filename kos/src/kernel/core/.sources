@@ -45,6 +45,9 @@ BEGIN
 		/* Required for: Addr2line support, and %[vinfo] */
 		"../../libdebuginfo/*.c",
 
+		/* Required for: Decompressing compressed .debug_* sections */
+		"../../libzlib/*.c",
+
 		/* Required for: Exception handlers to unify PC positions
 		 * (exceptions always point _after_ the faulting instruction) */
 		"../../libinstrlen/*.c",

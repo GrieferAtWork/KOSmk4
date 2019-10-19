@@ -100,6 +100,7 @@ BEGIN
 	DEFINE_SIMPLE_LIBRARY("libterm", USELIB("libbuffer"))
 	DEFINE_SIMPLE_LIBRARY("libkeymap")
 	DEFINE_SIMPLE_LIBRARY("libregex")
+	DEFINE_SIMPLE_LIBRARY("libzlib")
 
 //	DEFINE_SIMPLE_ARCH_LIBRARY("libstdc++")
 	DEFINE_SIMPLE_ARCH_LIBRARY("libunwind", USELIB("libdl"))

@@ -2026,10 +2026,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak dbg_showscreen_end; .long dbg_showscreen_end
 	.reloc ., R_386_SIZE32, dbg_showscreen_end; .long 0
 	.long 0x2861854
-	.long 0 /* index: 506 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname506 /* index: 506 */
+	.weak zlib_reader_setpos; .long zlib_reader_setpos
+	.reloc ., R_386_SIZE32, zlib_reader_setpos; .long 0
+	.long 0x639e343
 	.long 0 /* index: 507 */
 	.long 0
 	.long 0
@@ -6038,10 +6038,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak path_traverse_at; .long path_traverse_at
 	.reloc ., R_386_SIZE32, path_traverse_at; .long 0
 	.long 0x2f555e4
-	.long 0 /* index: 1509 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname1509 /* index: 1509 */
+	.weak zlib_reader_feed; .long zlib_reader_feed
+	.reloc ., R_386_SIZE32, zlib_reader_feed; .long 0
+	.long 0x4256ee4
 	.long 0 /* index: 1510 */
 	.long 0
 	.long 0
@@ -10598,10 +10598,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak sys_lfutex; .long sys_lfutex
 	.reloc ., R_386_SIZE32, sys_lfutex; .long 0
 	.long 0x62a7a58
-	.long 0 /* index: 2649 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2649 /* index: 2649 */
+	.weak zlib_reader_rewind; .long zlib_reader_rewind
+	.reloc ., R_386_SIZE32, zlib_reader_rewind; .long 0
+	.long 0x6298c64
 	.long 0 /* index: 2650 */
 	.long 0
 	.long 0
@@ -12786,10 +12786,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 3196 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname3196 /* index: 3196 */
+	.weak zlib_reader_fini; .long zlib_reader_fini
+	.reloc ., R_386_SIZE32, zlib_reader_fini; .long 0
+	.long 0x4256b19
 	.long 0 /* index: 3197 */
 	.long 0
 	.long 0
@@ -14022,10 +14022,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak vm_datablock_debugheap; .long vm_datablock_debugheap
 	.reloc ., R_386_SIZE32, vm_datablock_debugheap; .long 0
 	.long 0x6931db0
-	.long 0 /* index: 3505 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname3505 /* index: 3505 */
+	.weak zlib_reader_init; .long zlib_reader_init
+	.reloc ., R_386_SIZE32, zlib_reader_init; .long 0
+	.long 0x4256254
 	.long 0 /* index: 3506 */
 	.long 0
 	.long 0
@@ -14138,10 +14138,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 3534 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname3534 /* index: 3534 */
+	.weak zlib_reader_read; .long zlib_reader_read
+	.reloc ., R_386_SIZE32, zlib_reader_read; .long 0
+	.long 0x4262e24
 	.long 0 /* index: 3535 */
 	.long 0
 	.long 0
@@ -16900,6 +16900,8 @@ END(kernel_symbol_table)
 	.string "cpu_schedule_idle_job_simple"
 .Lname505:
 	.string "dbg_showscreen_end"
+.Lname506:
+	.string "zlib_reader_setpos"
 .Lname510:
 	.string "unicode_readutf16_swap_n"
 .Lname511:
@@ -17948,6 +17950,8 @@ END(kernel_symbol_table)
 	.string "block_device_aread_phys_sector"
 .Lname1508:
 	.string "path_traverse_at"
+.Lname1509:
+	.string "zlib_reader_feed"
 .Lname1512:
 	.string "sys_ftime"
 .Lname1513:
@@ -19082,6 +19086,8 @@ END(kernel_symbol_table)
 	.string "memeq_nopf"
 .Lname2648:
 	.string "sys_lfutex"
+.Lname2649:
+	.string "zlib_reader_rewind"
 .Lname2651:
 	.string "ringbuffer_read_nonblock"
 .Lname2654:
@@ -19660,6 +19666,8 @@ END(kernel_symbol_table)
 	.string "vm_datapart_lockwrite_setcore_nx"
 .Lname3193:
 	.string "heap_align_untraced"
+.Lname3196:
+	.string "zlib_reader_fini"
 .Lname3200:
 	.string "pagedir_prepare_map_keep"
 .Lname3201:
@@ -19984,6 +19992,8 @@ END(kernel_symbol_table)
 	.string "_this_exception_info"
 .Lname3504:
 	.string "vm_datablock_debugheap"
+.Lname3505:
+	.string "zlib_reader_init"
 .Lname3507:
 	.string "block_device_writev_phys_sync"
 .Lname3509:
@@ -20008,6 +20018,8 @@ END(kernel_symbol_table)
 	.string "__acheck"
 .Lname3532:
 	.string "block_device_partition_ioctl"
+.Lname3534:
+	.string "zlib_reader_read"
 .Lname3536:
 	.string "x86_syscall_restart_mode"
 .Lname3537:

@@ -2139,3 +2139,9 @@
 #define __CRT_HAVE_x86_vm86_outb 1
 #define __CRT_HAVE_x86_vm86_outl 1
 #define __CRT_HAVE_x86_vm86_outw 1
+#define __CRT_HAVE_zlib_reader_feed 1
+#define __CRT_HAVE_zlib_reader_fini 1
+#define __CRT_HAVE_zlib_reader_init 1
+#define __CRT_HAVE_zlib_reader_read 1
+#define __CRT_HAVE_zlib_reader_rewind 1
+#define __CRT_HAVE_zlib_reader_setpos 1

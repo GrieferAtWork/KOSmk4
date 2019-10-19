@@ -82,6 +82,42 @@ DEFINE_VERY_EARLY_KERNEL_COMMANDLINE_OPTION(dbg, KERNEL_COMMANDLINE_OPTION_TYPE_
 #endif /* !CONFIG_NO_DEBUGGER */
 
 
+
+#include <elf.h>
+#include <string.h>
+#include "../../../../../include/libzlib/inflate.h"
+
+INTDEF byte_t __kernel_debug_str_start[];
+INTDEF byte_t __kernel_debug_str_end[];
+INTDEF byte_t __kernel_debug_str_size[];
+
+PRIVATE void NOTHROW(KCALL test_zlib)(void) {
+//	PRIVATE byte_t defl[275221];
+//	ssize_t defl_len;
+//	struct zlib_reader r;
+//	Elf_Chdr *hdr;
+//	hdr = (Elf_Chdr *)__kernel_debug_str_start;
+//	assert(hdr->ch_type == ELFCOMPRESS_ZLIB);
+//	printk(KERN_DEBUG "hdr->ch_size      = %Iu\n", hdr->ch_size);
+//	printk(KERN_DEBUG "hdr->ch_addralign = %Iu\n", hdr->ch_addralign);
+//	zlib_reader_init(&r, hdr + 1, (size_t)__kernel_debug_str_size - sizeof(Elf_Chdr));
+//again_read:
+//	defl_len = zlib_reader_read(&r, defl, sizeof(defl));
+//	if (defl_len < 0) {
+//		printk(KERN_DEBUG "ZLIB: ERROR: %Id\n", defl_len);
+//	} else {
+//		printk(KERN_DEBUG "%$[hex:P]\n",
+//		       (size_t)defl_len, defl);
+//		if (defl_len)
+//			goto again_read;
+//	}
+//	for (;;)
+//		asm("hlt");
+//	zlib_reader_fini(&r);
+}
+
+
+
 INTERN ATTR_FREETEXT struct icpustate *
 NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	/* Figure out how we can output data to an emulator's STDOUT (if we're being hosted by one)
@@ -159,6 +195,9 @@ NOTHROW(KCALL __i386_kernel_main)(struct icpustate *__restrict state) {
 	 * In other words: Only once this function has been called can we
 	 *                 start making use of exceptions safely. */
 	kernel_initialize_scheduler_callbacks();
+
+	test_zlib();
+
 
 	/* Initialize SMP.
 	 * NOTE: This must be done while the physical identity mapping is still
