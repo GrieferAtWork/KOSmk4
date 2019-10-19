@@ -40,6 +40,7 @@ NOTHROW_NCX(LIBCCALL libc_sem_init)(sem_t *sem,
                                     unsigned int value)
 /*[[[body:sem_init]]]*/
 {
+	return 0;
 	CRT_UNIMPLEMENTED("sem_init"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -53,6 +54,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.semaphore.sem_destroy") int
 NOTHROW_NCX(LIBCCALL libc_sem_destroy)(sem_t *sem)
 /*[[[body:sem_destroy]]]*/
 {
+	return 0;
 	CRT_UNIMPLEMENTED("sem_destroy"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -107,6 +109,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.semaphore.sem_wait") int
 NOTHROW_RPC(LIBCCALL libc_sem_wait)(sem_t *sem)
 /*[[[body:sem_wait]]]*/
 {
+	return 0;
 	CRT_UNIMPLEMENTED("sem_wait"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -121,6 +124,7 @@ NOTHROW_RPC(LIBCCALL libc_sem_timedwait)(sem_t *__restrict sem,
                                          struct timespec const *__restrict abstime)
 /*[[[body:sem_timedwait]]]*/
 {
+	return 0;
 	CRT_UNIMPLEMENTED("sem_timedwait"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -138,6 +142,7 @@ NOTHROW_RPC(LIBCCALL libc_sem_timedwait64)(sem_t *__restrict sem,
                                            struct timespec64 const *__restrict abstime)
 /*[[[body:sem_timedwait64]]]*/
 {
+	return 0;
 	CRT_UNIMPLEMENTED("sem_timedwait64"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -152,6 +157,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.semaphore.sem_trywait") int
 NOTHROW_NCX(LIBCCALL libc_sem_trywait)(sem_t *sem)
 /*[[[body:sem_trywait]]]*/
 {
+	return 0;
 	CRT_UNIMPLEMENTED("sem_trywait"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -165,6 +171,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.semaphore.sem_post") int
 NOTHROW_NCX(LIBCCALL libc_sem_post)(sem_t *sem)
 /*[[[body:sem_post]]]*/
 {
+	return 0;
 	CRT_UNIMPLEMENTED("sem_post"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
@@ -179,6 +186,8 @@ NOTHROW_NCX(LIBCCALL libc_sem_getvalue)(sem_t *__restrict sem,
                                         int *__restrict sval)
 /*[[[body:sem_getvalue]]]*/
 {
+	*sval = 0;
+	return 0;
 	CRT_UNIMPLEMENTED("sem_getvalue"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;

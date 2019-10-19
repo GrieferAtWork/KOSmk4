@@ -29,6 +29,7 @@ All ported applications can be installed onto your KOS disk image by using `bash
 	- [tcc-0.9.27](https://bellard.org/tcc/)
 	- [nano-4.4](https://www.nano-editor.org/)
 	- [deemon-200](https://github.com/GrieferAtWork/deemon)
+	- [python-2.7.16](https://www.python.org/)
 - Games
 	- [vitetris-0.58.0](https://www.victornils.net/tetris/)
 - Libraries

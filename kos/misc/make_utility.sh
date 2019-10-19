@@ -166,6 +166,28 @@ install_path() {
 	done
 }
 
+## install_path_hardcopy <ABSOLUTE_DISK_PATH> <SOURCE>
+install_path_hardcopy() {
+	DISPATH="${1#/}"
+	echo "Installing ${TARGET_NAME}-kos:/$DISPATH/*"
+	cmd mkdir -p "$(dirname "$TARGET_SYSROOT/$DISPATH")"
+	unlink "$TARGET_SYSROOT/$DISPATH" > /dev/null 2>&1
+	cmd cp -R "$2" "$TARGET_SYSROOT/$DISPATH"
+	local RELPATH=$(python -c "import os.path; print os.path.relpath('/${TARGET_NAME}-kos-common/$1', '/foo/$(dirname "/$1")')")
+	for BUILD_CONFIG in $(echo $KOS_VALID_BUILD_CONFIGS); do
+		local CONFIG_SYSROOT="${KOS_ROOT}/bin/${TARGET_NAME}-kos-${BUILD_CONFIG}"
+		unlink "$CONFIG_SYSROOT/$DISPATH" > /dev/null 2>&1
+		if ! ln -s "$RELPATH" "$CONFIG_SYSROOT/$DISPATH" > /dev/null 2>&1; then
+			cmd mkdir -p "$(dirname "$CONFIG_SYSROOT/$DISPATH")"
+			cmd ln -s "$RELPATH" "$CONFIG_SYSROOT/$DISPATH"
+		fi
+		if [ -f "$CONFIG_SYSROOT/disk.img" ]; then
+			echo "    Disk: '$CONFIG_SYSROOT/disk.img'"
+			mtools_install_path "$CONFIG_SYSROOT/disk.img" "$DISPATH" "$2"
+		fi
+	done
+}
+
 
 # download_file  <DST_FILE>  <URL>
 download_file() {
@@ -215,8 +237,9 @@ case $UTILITY_NAME in
 		cmd bash "$KOS_MISC/make_utility.sh" "$TARGET_NAME" ncurses
 		cmd bash "$KOS_MISC/make_utility.sh" "$TARGET_NAME" nano
 		cmd bash "$KOS_MISC/make_utility.sh" "$TARGET_NAME" zlib
-		cmd bash "$KOS_MISC/make_utility.sh" "$TARGET_NAME" kos-headers
 		cmd bash "$KOS_MISC/make_utility.sh" "$TARGET_NAME" deemon
+		cmd bash "$KOS_MISC/make_utility.sh" "$TARGET_NAME" python
+		cmd bash "$KOS_MISC/make_utility.sh" "$TARGET_NAME" kos-headers
 		;;
 ##############################################################################
 
@@ -521,7 +544,7 @@ EOF
 				--with-deemon-path="/usr/lib/deemon" \
 				--config-pthread=""
 		fi
-		if ! [ -f "$OPTPATH/deemon" ] || true; then
+		if ! [ -f "$OPTPATH/deemon" ]; then
 			cmd cd "$OPTPATH"
 			cmd make -j $MAKE_PARALLEL_COUNT
 		fi
@@ -591,6 +614,86 @@ EOF
 		install_symlink /lib/libz.so.$ZLIB_VERISON libz.so.$ZLIB_VERISON_MAJOR
 		install_symlink /lib/libz.so libz.so.$ZLIB_VERISON_MAJOR
 		install_file_nodisk /lib/libz.a "$OPTPATH/libz.a"
+		;;
+##############################################################################
+
+
+##############################################################################
+	python | python-2.7.16)
+		PYTHON_VERISON_MAJOR="2"
+		PYTHON_VERISON_MINOR="7"
+		PYTHON_VERISON_PATCH="16"
+		PYTHON_VERISON="$PYTHON_VERISON_MAJOR.$PYTHON_VERISON_MINOR.$PYTHON_VERISON_PATCH"
+		SRCPATH="$KOS_ROOT/binutils/src/Python-$PYTHON_VERISON"
+		OPTPATH="$BINUTILS_SYSROOT/opt/Python-$PYTHON_VERISON"
+		if ! [ -f "$OPTPATH/python" ] && ! [ -f "$OPTPATH/python.exe" ]; then
+			if ! [ -f "$OPTPATH/Makefile" ]; then
+				if ! [ -f "$SRCPATH/configure" ]; then
+					cmd cd "$KOS_ROOT/binutils/src"
+					download_file \
+						"Python-$PYTHON_VERISON.tar.xz" \
+						https://www.python.org/ftp/python/$PYTHON_VERISON/Python-$PYTHON_VERISON.tar.xz
+					cmd tar xvf "Python-$PYTHON_VERISON.tar.xz"
+				fi
+				rm -rf "$OPTPATH" > /dev/null 2>&1
+				cmd mkdir -p "$OPTPATH"
+				cmd cd "$OPTPATH"
+				export CC="${CROSS_PREFIX}gcc"
+				export CPP="${CROSS_PREFIX}cpp"
+				export CXX="${CROSS_PREFIX}g++"
+				export CFLAGS="-ggdb"
+				export CXXFLAGS="-ggdb"
+				cat > "$OPTPATH/config.site" <<EOF
+ac_cv_file__dev_ptmx=no
+ac_cv_file__dev_ptc=no
+EOF
+				export CONFIG_SITE="$OPTPATH/config.site"
+				cmd bash ../../../src/Python-$PYTHON_VERISON/configure \
+					--prefix="/" \
+					--exec-prefix="/" \
+					--bindir="/bin" \
+					--sbindir="/bin" \
+					--sysconfdir="/etc" \
+					--libexecdir="/usr/libexec" \
+					--sharedstatedir="/usr/com" \
+					--localstatedir="/usr/var" \
+					--libdir="/lib" \
+					--includedir="/usr/include" \
+					--oldincludedir="/usr/include" \
+					--datarootdir="/usr/share" \
+					--infodir="/usr/share/info" \
+					--localedir="/usr/share/locale" \
+					--mandir="/usr/share/man" \
+					--build=$(gcc -dumpmachine) \
+					--host="$TARGET_NAME-linux-gnu" \
+					--target="$TARGET_NAME-linux-gnu" \
+					--enable-shared \
+					--enable-ipv6 \
+					--enable-unicode=ucs4 \
+					--with-suffix="" \
+					--with-signal-module \
+					--with-threads \
+					--with-wctype-functions \
+					--with-libm=-lm \
+					--with-libc=-lc \
+					--with-computed-gotos
+			fi
+			cmd cd "$OPTPATH"
+			cmd make -j $MAKE_PARALLEL_COUNT
+		fi
+		PYTHON_EXE="$OPTPATH/python"
+		if [ -f "$OPTPATH/python.exe" ]; then
+			PYTHON_EXE="$OPTPATH/python.exe"
+		fi
+		# Install the python core
+		install_file /bin/python "$PYTHON_EXE"
+		PYTHON_LIB="libpython${PYTHON_VERISON_MAJOR}.${PYTHON_VERISON_MINOR}"
+		install_file /lib/${PYTHON_LIB}.so.1.0 "$OPTPATH/${PYTHON_LIB}.so.1.0"
+		install_symlink /lib/${PYTHON_LIB}.so ${PYTHON_LIB}.so.1.0
+		install_file_nodisk /lib/${PYTHON_LIB}.a "$OPTPATH/${PYTHON_LIB}.a"
+		# Install modules under `/lib/python2.7/[os.py...]'
+		install_path_hardcopy /lib/python${PYTHON_VERISON_MAJOR}.${PYTHON_VERISON_MINOR} "${SRCPATH}/Lib"
+		install_path /lib/python${PYTHON_VERISON_MAJOR}.${PYTHON_VERISON_MINOR}/lib-dynload "${OPTPATH}/build/lib.linux2-${TARGET_NAME}-${PYTHON_VERISON_MAJOR}.${PYTHON_VERISON_MINOR}"
 		;;
 ##############################################################################
 
