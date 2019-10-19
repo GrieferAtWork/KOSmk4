@@ -35,14 +35,15 @@
 #include <sys/syslog.h>    /* syslog() */
 #include <sys/wait.h>      /* waitpid() */
 
-#include <errno.h>  /* errno */
-#include <fcntl.h>  /* AT_FDDRIVE_ROOT() */
-#include <stddef.h> /* NULL */
-#include <stdio.h>  /* dprintf() */
-#include <string.h> /* strerror() */
-#include <unistd.h> /* sync() */
-#include <sched.h>  /* sched_yield() */
-#include <signal.h> /* signal() */
+#include <errno.h>   /* errno */
+#include <fcntl.h>   /* AT_FDDRIVE_ROOT() */
+#include <sched.h>   /* sched_yield() */
+#include <signal.h>  /* signal() */
+#include <stddef.h>  /* NULL */
+#include <stdio.h>   /* dprintf() */
+#include <string.h>  /* strerror() */
+#include <termios.h> /* struct termios */
+#include <unistd.h>  /* sync() */
 
 #include <libansitty/ansitty.h>
 
@@ -54,6 +55,38 @@ PRIVATE char const *init_envp[] = {
 	"TERM=xterm",
 	NULL
 };
+
+/* Set the calling process as foreground process for /dev/console */
+PRIVATE void console_set_fgproc(void) {
+	pid_t me = 0;
+	Ioctl(STDIN_FILENO, TIOCSPGRP, &me);
+}
+
+/* Reset the termios of /dev/console to sane values */
+PRIVATE void console_sane_ios(void) {
+	struct termios ios;
+	memset(&ios, 0, sizeof(ios));
+	ios.c_iflag = (ICRNL | BRKINT | IXON | IMAXBEL | IUTF8);
+	ios.c_oflag = (OPOST);
+	ios.c_lflag = (ISIG | ICANON | ECHO | ECHOE | ECHOK |
+	               TOSTOP | ECHOCTL | ECHOKE | IEXTEN);
+	ios.c_cflag = (CREAD);
+#define CTRL_CODE(x) ((x)-64)            /* ^x */
+	ios.c_cc[VMIN]     = 1;              /*  */
+	ios.c_cc[VEOF]     = CTRL_CODE('D'); /* ^D. */
+	ios.c_cc[VERASE]   = '\b';
+	ios.c_cc[VINTR]    = CTRL_CODE('C');  /* ^C. */
+	ios.c_cc[VKILL]    = CTRL_CODE('U');  /* ^U. */
+	ios.c_cc[VQUIT]    = CTRL_CODE('\\'); /* ^\ */
+	ios.c_cc[VSTART]   = CTRL_CODE('Q');  /* ^Q. */
+	ios.c_cc[VSTOP]    = CTRL_CODE('S');  /* ^S. */
+	ios.c_cc[VSUSP]    = CTRL_CODE('Z');  /* ^Z. */
+	ios.c_cc[VWERASE]  = CTRL_CODE('W');  /* ^W. */
+	ios.c_cc[VLNEXT]   = CTRL_CODE('V');  /* ^V. */
+	ios.c_cc[VREPRINT] = CTRL_CODE('R');  /* ^R. */
+#undef CTRL_CODE
+	tcsetattr(STDIN_FILENO, TCSADRAIN, &ios);
+}
 
 
 
@@ -161,6 +194,7 @@ done_procfs:
 
 	for (;;) {
 		pid_t cpid;
+		/* Do some cleanup on the console. */
 		dprintf(STDOUT_FILENO,
 		        ANSITTY_RESET_SEQUENCE /* Reset the TTY */
 		        "\033[f" /* HVP(1,1): Place cursor at 0,0 */
@@ -172,16 +206,46 @@ done_procfs:
 		 * CTRL+D do trigger an end-of-input event) */
 		cpid = VFork();
 		if (cpid == 0) {
+			/* Become the foreground process of /dev/console */
+			console_set_fgproc();
 			execle("/bin/busybox", "bash", (char *)NULL, init_envp);
 			Execle("/bin/sh", "sh", (char *)NULL, init_envp);
 		}
+
+		/* Wait for the user-shell to die. */
 		while (waitpid(cpid, NULL, 0) < 0)
 			sched_yield();
+
 		/* Kill anything which may have been left alive by the shell.
 		 * Note that kill(-1, ...) will never kill a process with pid=1,
 		 * meaning that we (the process with pid=1) won't get killed
 		 * by this! */
+		/* TODO: Send SIGQUIT and wait for a configurable timeout until all
+		 *       processes except for our own have died. Only once the timeout
+		 *       expires with different processes still alive should we send
+		 *       SIGKILL. - That way, other processes still get a chance to
+		 *       perform some cleanup (such as saving data to disk) before
+		 *       really going away.
+		 * NOTE: We can't use opendir("/proc") for this, since we mustn't rely
+		 *       on a working procfs (see the procfs init above, which allows
+		 *       for the insmod() and mount() to fail), meaning we need to use
+		 *       a custom (probably sysctl()-based) function for checking how
+		 *       many user-space threads are running on system */
 		kill(-1, SIGKILL);
+
+		/* Become the foreground process of /dev/console
+		 * In theory this shouldn't be necessary, since the kill() before
+		 * should have gotten rid of any process that could have been holding
+		 * this foreground-process lock before, however just in case the kernel
+		 * decides to make a SIGKILL-broadcast be performed asynchronously, in
+		 * which case the old foreground process may still be alive when we
+		 * clear the console above. - Note however that since we've installed
+		 * a SIG_IGN handler for `SIGTTOU', we still wouldn't get suspended in
+		 * such a scenario, but we'd still be unable to reset the tty... */
+		console_set_fgproc();
+
+		/* Reset the termios of /dev/console to sane values */
+		console_sane_ios();
 	}
 
 	/* TODO: `__CORRECT_ISO_CPP_MATH_H_PROTO' interferes with libstdc++'s autoconf detection... */
