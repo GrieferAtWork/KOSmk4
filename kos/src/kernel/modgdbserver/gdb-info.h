@@ -67,9 +67,10 @@ NOTHROW(FCALL GDBInfo_PrintThreadList)(pformatprinter printer, void *arg);
 
 /* `qXfer:osdata:read:<name>': Print os-specific data.
  * @return: -ENOENT: Invalid `name' */
-INTDEF NONNULL((1)) ssize_t
+INTDEF NONNULL((1, 3, 4)) ssize_t
 NOTHROW(FCALL GDBInfo_PrintOSData)(pformatprinter printer, void *arg,
-                                   char const *__restrict name);
+                                   char const *__restrict name,
+                                   struct task *__restrict thread);
 
 
 

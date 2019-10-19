@@ -317,6 +317,7 @@ NOTHROW(FCALL GDBInfo_PrintLibraryList)(pformatprinter printer, void *arg,
 	decref_unlikely(v);
 	return result;
 }
+
 INTERN NONNULL((1)) ssize_t
 NOTHROW(FCALL GDBInfo_PrintVMLibraryList)(pformatprinter printer, void *arg,
                                           struct vm *__restrict effective_vm) {
@@ -345,6 +346,7 @@ NOTHROW(FCALL GDBInfo_PrintVMLibraryList)(pformatprinter printer, void *arg,
 err:
 	return temp;
 }
+
 
 
 struct GDBInfo_PrintThreadList_Data {
@@ -709,6 +711,63 @@ err:
 	return temp;
 }
 
+PRIVATE NONNULL((1, 2)) ssize_t KCALL
+GDB_UserLibraryListPrinter(void *closure,
+                           struct vm *__restrict effective_vm,
+                           USER CHECKED char const *filename,
+                           USER UNCHECKED void *loadaddr,
+                           USER UNCHECKED void *loadstart,
+                           bool UNUSED(filename_may_be_relative)) {
+	ssize_t temp, result = 0;
+	pformatprinter printer; void *arg;
+	printer = ((GDB_LibraryListPrinterData *)closure)->ll_printer;
+	arg     = ((GDB_LibraryListPrinterData *)closure)->ll_arg;
+	PRINTF("<item>"
+	       "<column name=\"loadaddr\">%p</column>"
+	       "<column name=\"loadstart\">%p</column>"
+	       "<column name=\"name\">",
+	       loadaddr, loadstart);
+	TRY {
+		DO(GDB_PrintRemoteVMString(printer, arg, effective_vm, filename, true));
+	} EXCEPT {
+	}
+	PRINT("</column>"
+	      "</item>");
+	return result;
+err:
+	return temp;
+}
+
+PRIVATE NONNULL((1)) ssize_t
+NOTHROW(FCALL GDBInfo_PrintUserLibraryListWithVM)(pformatprinter printer, void *arg,
+                                                  struct vm *__restrict effective_vm) {
+	ssize_t temp, result = 0;
+	GDB_LibraryListPrinterData data;
+	data.ll_printer = printer;
+	data.ll_arg     = arg;
+	PRINT("<osdata type=\"libraries\">");
+	/* Print user-space library listings. */
+	if (effective_vm != &vm_kernel) {
+		TRY {
+			DO(vm_library_enumerate(effective_vm, &GDB_UserLibraryListPrinter, &data));
+		} EXCEPT {
+		}
+	}
+	PRINT("</osdata>");
+	return result;
+err:
+	return temp;
+}
+
+PRIVATE NONNULL((1, 3)) ssize_t
+NOTHROW(FCALL GDBInfo_PrintUserLibraryList)(pformatprinter printer, void *arg,
+                                            struct task *__restrict thread) {
+	ssize_t result;
+	REF struct vm *v = task_getvm(thread);
+	result = GDBInfo_PrintUserLibraryListWithVM(printer, arg, v);
+	decref_unlikely(v);
+	return result;
+}
 
 
 PRIVATE char const GDBInfo_OsDataOverview[] =
@@ -738,14 +797,20 @@ PRIVATE char const GDBInfo_OsDataOverview[] =
 		"<column name=\"Description\">Threads</column>"
 		"<column name=\"Title\">Listing of all threads</column>"
 	"</item>"
+	"<item>"
+		"<column name=\"Type\">libraries</column>"
+		"<column name=\"Description\">Libraries</column>"
+		"<column name=\"Title\">List information about user-space libraries</column>"
+	"</item>"
 "</osdata>";
 
 
 /* `qXfer:osdata:read:<name>': Print os-specific data.
  * @return: -ENOENT: Invalid `name' */
-INTERN NONNULL((1)) ssize_t
+INTERN NONNULL((1, 3, 4)) ssize_t
 NOTHROW(FCALL GDBInfo_PrintOSData)(pformatprinter printer, void *arg,
-                                   char const *__restrict name) {
+                                   char const *__restrict name,
+                                   struct task *__restrict thread) {
 	ssize_t result;
 	if (!*name) {
 		result = (*printer)(arg,
@@ -761,6 +826,8 @@ NOTHROW(FCALL GDBInfo_PrintOSData)(pformatprinter printer, void *arg,
 		result = GDBInfo_PrintUname(printer, arg);
 	} else if (strcmp(name, "threads") == 0) {
 		result = GDBInfo_PrintOSThreadList(printer, arg);
+	} else if (strcmp(name, "libraries") == 0) {
+		result = GDBInfo_PrintUserLibraryList(printer, arg, thread);
 	} else {
 		result = -ENOENT;
 	}

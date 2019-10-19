@@ -1564,7 +1564,8 @@ send_empty:
 					ERROR(err_qXfer_syntax);
 				error = GDBInfo_PrintThreadList(&GDB_OffsetAndLengthPrinter, &dst);
 			} else if (ISNAME("osdata") && isReadOperation) {
-				error = GDBInfo_PrintOSData(&GDB_OffsetAndLengthPrinter, &dst, annex);
+				error = GDBInfo_PrintOSData(&GDB_OffsetAndLengthPrinter, &dst, annex,
+				                            GDB_CurrentThread_general.ts_thread);
 			} else {
 				ERROR(unknown);
 			}
