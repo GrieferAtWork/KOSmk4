@@ -3390,11 +3390,21 @@ NOTHROW_RPC(LIBCCALL libc_fdatasync)(fd_t fd)
 }
 /*[[[end:fdatasync]]]*/
 
+/*[[[head:ctermid_r,hash:CRC-32=0xee76dd02]]]*/
+/* Same as `ctermid', but return `NULL' when `S' is `NULL' */
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.ctermid_r") char *
+NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s)
+/*[[[body:ctermid_r]]]*/
+/*AUTO*/{
+	return s ? libc_ctermid(s) : NULL;
+}
+/*[[[end:ctermid_r]]]*/
+
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0xea6d2011]]]*/
+/*[[[start:exports,hash:CRC-32=0xc035ab60]]]*/
 #undef execl
 #undef _execl
 #undef execle
@@ -3551,6 +3561,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(brk, libc_brk);
 DEFINE_PUBLIC_WEAK_ALIAS(sbrk, libc_sbrk);
 DEFINE_PUBLIC_WEAK_ALIAS(fdatasync, libc_fdatasync);
 DEFINE_PUBLIC_WEAK_ALIAS(ctermid, libc_ctermid);
+DEFINE_PUBLIC_WEAK_ALIAS(ctermid_r, libc_ctermid_r);
 DEFINE_PUBLIC_WEAK_ALIAS(sysconf, libc_sysconf);
 DEFINE_PUBLIC_WEAK_ALIAS(_sysconf, libc_sysconf);
 DEFINE_PUBLIC_WEAK_ALIAS(__sysconf, libc_sysconf);

@@ -41,6 +41,21 @@
 #include <libzlib/inflate.h>
 #include <libzlib/error.h>
 
+#if !defined(NDEBUG) && 1
+#ifdef __KERNEL__
+#include <kernel/printk.h>
+#define TRACE(...) printk(KERN_TRACE __VA_ARGS__)
+#else /* __KERNEL__ */
+#include <syslog.h>
+#define TRACE(...) syslog(LOG_DEBUG, __VA_ARGS__)
+#endif /* !__KERNEL__ */
+#endif /* !NDEBUG */
+
+#ifndef TRACE
+#define TRACE(...) (void)0
+#endif /* !TRACE */
+
+
 DECL_BEGIN
 
 

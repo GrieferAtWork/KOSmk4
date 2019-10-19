@@ -1648,6 +1648,16 @@ swab:([nonnull] void const *__restrict from,
 %#endif /* _ALL_SOURCE || (__USE_XOPEN && !__USE_XOPEN2K) */
 
 %
+%#if defined(__USE_REENTRANT)
+@@Same as `ctermid', but return `NULL' when `S' is `NULL'
+[section(.text.crt.io.tty)]
+[requires($has_function(ctermid))][noexport][user][same_impl]
+ctermid_r:([nullable] char *s) -> char * {
+	return s ? ctermid(s) : NULL;
+}
+%#endif /* __USE_REENTRANT */
+
+%
 @@>> sysconf(2)
 @@@param: NAME: One of `_SC_*' from <bits/confname.h>
 @@Return a system configuration value `NAME'

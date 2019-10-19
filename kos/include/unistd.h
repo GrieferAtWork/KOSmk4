@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd86d8c97 */
+/* HASH CRC-32:0xf09e9210 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1862,6 +1862,17 @@ __CDECLARE(,char *,__NOTHROW_NCX,ctermid,(char *__s),(__s))
 #endif /* ctermid... */
 #endif /* !__ctermid_defined */
 #endif /* _ALL_SOURCE || (__USE_XOPEN && !__USE_XOPEN2K) */
+
+#if defined(__USE_REENTRANT)
+#if defined(__CRT_HAVE_ctermid_r)
+/* Same as `ctermid', but return `NULL' when `S' is `NULL' */
+__CDECLARE(,char *,__NOTHROW_NCX,ctermid_r,(char *__s),(__s))
+#elif defined(__CRT_HAVE_ctermid)
+#include <local/unistd/ctermid_r.h>
+/* Same as `ctermid', but return `NULL' when `S' is `NULL' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(ctermid_r, __FORCELOCAL char *__NOTHROW_NCX(__LIBCCALL ctermid_r)(char *__s) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ctermid_r))(__s); })
+#endif /* ctermid_r... */
+#endif /* __USE_REENTRANT */
 
 #if defined(__CRT_HAVE_sysconf)
 /* >> sysconf(2)

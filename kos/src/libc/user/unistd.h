@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2306edbd */
+/* HASH CRC-32:0x678935da */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -416,6 +416,8 @@ INTDEF void *NOTHROW_NCX(LIBCCALL libc_sbrk)(intptr_t delta);
  * timestamps, and its size), meaning that changes are written to disk */
 INTDEF int NOTHROW_RPC(LIBCCALL libc_fdatasync)(fd_t fd);
 INTDEF char *NOTHROW_NCX(LIBCCALL libc_ctermid)(char *s);
+/* Same as `ctermid', but return `NULL' when `S' is `NULL' */
+INTDEF char *NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s);
 /* >> sysconf(2)
  * @param: NAME: One of `_SC_*' from <bits/confname.h>
  * Return a system configuration value `NAME' */

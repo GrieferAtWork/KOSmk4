@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x62a6cc33 */
+/* HASH CRC-32:0x43ba3ad6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1898,6 +1898,7 @@
 #define __CRT_SECTION_cfsetospeed                           __CRT_SECTINFO_io_tty                                   /* .text.crt.io.tty.cfsetospeed */
 #define __CRT_SECTION_cfsetspeed                            __CRT_SECTINFO_io_tty                                   /* .text.crt.io.tty.cfsetspeed */
 #define __CRT_SECTION_ctermid                               __CRT_SECTINFO_io_tty                                   /* .text.crt.io.tty.ctermid */
+#define __CRT_SECTION_ctermid_r                             __CRT_SECTINFO_io_tty                                   /* .text.crt.io.tty.ctermid_r */
 #define __CRT_SECTION_cuserid                               __CRT_SECTINFO_io_tty                                   /* .text.crt.io.tty.cuserid */
 #define __CRT_SECTION_fisatty                               __CRT_SECTINFO_io_tty                                   /* .text.crt.io.tty.fisatty */
 #define __CRT_SECTION_forkpty                               __CRT_SECTINFO_io_tty                                   /* .text.crt.io.tty.forkpty */

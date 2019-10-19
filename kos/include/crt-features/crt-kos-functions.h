@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8a429ef7 */
+/* HASH CRC-32:0xc9afbbf */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -476,6 +476,7 @@ __CRT_FUNCTION(creat64,1,(!IS_DEFINED(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0,c
 __CRT_FUNCTION(crypt,0,(),2,(char const *,key,char const *,salt),char *)
 __CRT_FUNCTION(crypt_r,0,(),3,(char const *,key,char const *,salt,struct crypt_data *__restrict,data),char *)
 __CRT_FUNCTION(ctermid,0,(),1,(char *,s),char *)
+__CRT_FUNCTION(ctermid_r,0,(),1,(char *,s),char *)
 __CRT_FUNCTION(ctime,0,(),1,(time_t const *,timer),char *)
 __CRT_FUNCTION(ctime64,1,(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__,ctime),1,(time64_t const *,timer),char *)
 __CRT_FUNCTION(ctime64_r,1,(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__,ctime_r),2,(time64_t const *__restrict,timer,char[26],buf),char *)

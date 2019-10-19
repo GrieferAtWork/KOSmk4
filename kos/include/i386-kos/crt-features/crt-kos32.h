@@ -1287,6 +1287,7 @@
 #define __CRT_HAVE_crypt 1
 #define __CRT_HAVE_crypt_r 1
 #define __CRT_HAVE_ctermid 1
+#define __CRT_HAVE_ctermid_r 1
 #define __CRT_HAVE_ctime 1
 #define __CRT_HAVE_ctime64 1
 #define __CRT_HAVE_ctime64_r 1
