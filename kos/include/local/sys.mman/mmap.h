@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3469cd66 */
+/* HASH CRC-32:0x8e97affc */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,23 +26,23 @@
 #if defined(__CRT_HAVE_mmap64)
 /* @param prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
  * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
- *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_FIXED_NOREPLACE|MAP_GROWSDOWN|
- *               MAP_LOCKED|MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
+ *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
+ *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
  *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_DONT_OVERRIDE' */
 __CREDIRECT(__ATTR_WUNUSED,void *,__NOTHROW_NCX,__localdep_mmap64,(void *__addr, __SIZE_TYPE__ __len, int __prot, int __flags, __fd_t __fd, __off64_t __offset),mmap64,(__addr,__len,__prot,__flags,__fd,__offset))
 #elif defined(__CRT_HAVE_mmap) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* @param prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
  * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
- *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_FIXED_NOREPLACE|MAP_GROWSDOWN|
- *               MAP_LOCKED|MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
+ *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
+ *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
  *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_DONT_OVERRIDE' */
 __CREDIRECT(__ATTR_WUNUSED,void *,__NOTHROW_NCX,__localdep_mmap64,(void *__addr, __SIZE_TYPE__ __len, int __prot, int __flags, __fd_t __fd, __off64_t __offset),mmap,(__addr,__len,__prot,__flags,__fd,__offset))
 #elif defined(__CRT_HAVE_mmap)
 #include <local/sys.mman/mmap64.h>
 /* @param prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
  * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
- *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_FIXED_NOREPLACE|MAP_GROWSDOWN|
- *               MAP_LOCKED|MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
+ *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
+ *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
  *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_DONT_OVERRIDE' */
 #define __localdep_mmap64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mmap64))
 #else /* CUSTOM: mmap64 */
@@ -56,8 +56,8 @@ __CREDIRECT(__ATTR_WUNUSED,void *,__NOTHROW_NCX,__localdep_mmap64,(void *__addr,
 #if defined(__CRT_HAVE_mmap)
 /* @param prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
  * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
- *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_FIXED_NOREPLACE|MAP_GROWSDOWN|
- *               MAP_LOCKED|MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
+ *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
+ *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
  *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_DONT_OVERRIDE' */
 __CREDIRECT(,void *,__NOTHROW_NCX,__localdep_mmap32,(void *__addr, __SIZE_TYPE__ __len, int __prot, int __flags, __fd_t __fd, __off32_t __offset),mmap,(__addr,__len,__prot,__flags,__fd,__offset))
 #else /* LIBC: mmap */
@@ -68,8 +68,8 @@ __CREDIRECT(,void *,__NOTHROW_NCX,__localdep_mmap32,(void *__addr, __SIZE_TYPE__
 __NAMESPACE_LOCAL_BEGIN
 /* @param prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
  * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
- *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_FIXED_NOREPLACE|MAP_GROWSDOWN|
- *               MAP_LOCKED|MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
+ *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
+ *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
  *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_DONT_OVERRIDE' */
 __LOCAL_LIBC(mmap) __ATTR_WUNUSED void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mmap))(void *__addr,
@@ -78,7 +78,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mmap))(void *__addr,
                                                   int __flags,
                                                   __fd_t __fd,
                                                   __FS_TYPE(off) __offset) {
-#line 231 "kos/src/libc/magic/sys.mman.c"
+#line 295 "kos/src/libc/magic/sys.mman.c"
 #ifdef __CRT_HAVE_mmap64
 	return __localdep_mmap64(__addr, __len, __prot, __flags, __fd, (__off32_t)__offset);
 #else /* __CRT_HAVE_mmap64 */

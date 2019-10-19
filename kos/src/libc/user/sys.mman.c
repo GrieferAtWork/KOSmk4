@@ -35,11 +35,11 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:mmap,hash:CRC-32=0x94ac3e90]]]*/
+/*[[[head:mmap,hash:CRC-32=0x2a06ccc8]]]*/
 /* @param prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
  * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
- *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_FIXED_NOREPLACE|MAP_GROWSDOWN|
- *               MAP_LOCKED|MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
+ *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
+ *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
  *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_DONT_OVERRIDE' */
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.heap.mman.mmap") void *
@@ -62,7 +62,8 @@ NOTHROW_NCX(LIBCCALL libc_mmap)(void *addr,
 }
 /*[[[end:mmap]]]*/
 
-/*[[[head:munmap,hash:CRC-32=0xc733d599]]]*/
+/*[[[head:munmap,hash:CRC-32=0xfdc6d560]]]*/
+/* Unmap memory from `addr...+=len' */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.heap.mman.munmap") int
 NOTHROW_NCX(LIBCCALL libc_munmap)(void *addr,
@@ -76,8 +77,10 @@ NOTHROW_NCX(LIBCCALL libc_munmap)(void *addr,
 }
 /*[[[end:munmap]]]*/
 
-/*[[[head:mprotect,hash:CRC-32=0x155463a7]]]*/
-/* @param prot: Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED' */
+/*[[[head:mprotect,hash:CRC-32=0x2ac89ff1]]]*/
+/* @param prot: Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|
+ *              PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED|PROT_GROWSUP|
+ *              PROT_GROWSDOWN' */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.system.mman.mprotect") int
 NOTHROW_NCX(LIBCCALL libc_mprotect)(void *addr,
@@ -93,7 +96,8 @@ NOTHROW_NCX(LIBCCALL libc_mprotect)(void *addr,
 }
 /*[[[end:mprotect]]]*/
 
-/*[[[head:msync,hash:CRC-32=0xd1b2f502]]]*/
+/*[[[head:msync,hash:CRC-32=0x7508ff65]]]*/
+/* @param flags: Set of `MS_ASYNC|MS_INVALIDATE|MS_SYNC' */
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.system.mman.msync") int
 NOTHROW_RPC(LIBCCALL libc_msync)(void *addr,
@@ -137,7 +141,8 @@ NOTHROW_NCX(LIBCCALL libc_munlock)(void const *addr,
 }
 /*[[[end:munlock]]]*/
 
-/*[[[head:mlockall,hash:CRC-32=0xc69eb7ea]]]*/
+/*[[[head:mlockall,hash:CRC-32=0x259b4078]]]*/
+/* @param flags: Set of `MCL_CURRENT|MCL_FUTURE|MCL_ONFAULT' */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.mman.mlockall") int
 NOTHROW_NCX(LIBCCALL libc_mlockall)(int flags)
 /*[[[body:mlockall]]]*/
@@ -217,11 +222,11 @@ NOTHROW_NCX(LIBCCALL libc_mincore)(void *start,
 }
 /*[[[end:mincore]]]*/
 
-/*[[[head:mmap64,hash:CRC-32=0xea08617]]]*/
+/*[[[head:mmap64,hash:CRC-32=0xf1bcecd8]]]*/
 /* @param prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
  * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
- *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_FIXED_NOREPLACE|MAP_GROWSDOWN|
- *               MAP_LOCKED|MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
+ *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
+ *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
  *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_DONT_OVERRIDE' */
 #if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
 DEFINE_INTERN_ALIAS(libc_mmap64, libc_mmap);

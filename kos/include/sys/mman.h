@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x810185e9 */
+/* HASH CRC-32:0x87cce5c5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -199,47 +199,115 @@ typedef __mode_t mode_t;
 #define MAP_FAILED   ((void *)-1)
 #endif /* !MAP_FAILED */
 
+/* Extended flags for use with `mprotect()' */
+#define PROT_GROWSDOWN 0x01000000 /* Same as `MAP_GROWSDOWN', but may be used with `mprotect()' */
+#define PROT_GROWSUP   0x02000000 /* Same as `MAP_GROWSUP', but may be used with `mprotect()' */
 
+/* Flags accepted by `msync()'.  */
+#define MS_ASYNC      0x01 /* Perform the operation asynchronously. */
+#define MS_INVALIDATE 0x02 /* Invalidate caches. */
+#define MS_SYNC       0x04 /* Wait for the sync to finish. */
 
 /* Flags for 'mremap'. */
 #ifdef __USE_GNU
-#define MREMAP_MAYMOVE 1
-#define MREMAP_FIXED   2
-#endif
+#define MREMAP_MAYMOVE 0x01 /* Allowed to move to a different location */
+#define MREMAP_FIXED   0x02 /* Allowed to move to a different location */
+#endif /* __USE_GNU */
+
+/* DISCLAIMER: Documentation strings for MADV_*, POSIX_MADV_* and MCL_* were
+ *             taken from glibc /usr/include/i386-linux-gnu/bits/mman-linux.h */
+/* Definitions for POSIX memory map interface.  Linux generic version.
+   Copyright (C) 2001-2016 Free Software Foundation, Inc.
+   This file is part of the GNU C Library.
+
+   The GNU C Library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
+
+   The GNU C Library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
+
+
+/* Advice to `madvise'. */
+#ifdef __USE_MISC
+#define MADV_NORMAL      0   /* No further special treatment. */
+#define MADV_RANDOM      1   /* Expect random page references. */
+#define MADV_SEQUENTIAL  2   /* Expect sequential page references. */
+#define MADV_WILLNEED    3   /* Will need these pages. */
+#define MADV_DONTNEED    4   /* Don't need these pages. */
+#define MADV_REMOVE      9   /* Remove these pages and resources. */
+#define MADV_DONTFORK    10  /* Do not inherit across fork. */
+#define MADV_DOFORK      11  /* Do inherit across fork. */
+#define MADV_MERGEABLE   12  /* KSM may merge identical pages. */
+#define MADV_UNMERGEABLE 13  /* KSM may not merge identical pages. */
+#define MADV_HUGEPAGE    14  /* Worth backing with hugepages. */
+#define MADV_NOHUGEPAGE  15  /* Not worth backing with hugepages. */
+#define MADV_DONTDUMP    16  /* Explicity exclude from the core dump, overrides the coredump filter bits. */
+#define MADV_DODUMP      17  /* Clear the MADV_DONTDUMP flag. */
+#define MADV_HWPOISON    100 /* Poison a page for testing. */
+#endif /* __USE_MISC */
+
+/* The POSIX people had to invent similar names for the same things.  */
+#ifdef __USE_XOPEN2K
+#define POSIX_MADV_NORMAL     0 /* No further special treatment. */
+#define POSIX_MADV_RANDOM     1 /* Expect random page references. */
+#define POSIX_MADV_SEQUENTIAL 2 /* Expect sequential page references. */
+#define POSIX_MADV_WILLNEED   3 /* Will need these pages. */
+#define POSIX_MADV_DONTNEED   4 /* Don't need these pages. */
+#endif /* __USE_XOPEN2K */
+
+/* Flags for `mlockall'.  */
+#ifndef MCL_CURRENT
+#define MCL_CURRENT 1 /* Lock all currently mapped pages. */
+#define MCL_FUTURE  2 /* Lock all additions to address space. */
+#define MCL_ONFAULT 4 /* Lock all pages that are faulted in. */
+#endif /* !MCL_CURRENT */
+
 
 
 #ifdef __CC__
 #if defined(__CRT_HAVE_mmap64) && (defined(__USE_FILE_OFFSET64))
 /* @param prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
  * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
- *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_FIXED_NOREPLACE|MAP_GROWSDOWN|
- *               MAP_LOCKED|MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
+ *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
+ *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
  *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_DONT_OVERRIDE' */
 __CREDIRECT(__ATTR_WUNUSED,void *,__NOTHROW_NCX,mmap,(void *__addr, size_t __len, int __prot, int __flags, __fd_t __fd, __off64_t __offset),mmap64,(__addr,__len,__prot,__flags,__fd,__offset))
 #elif defined(__CRT_HAVE_mmap) && (!defined(__USE_FILE_OFFSET64))
 /* @param prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
  * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
- *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_FIXED_NOREPLACE|MAP_GROWSDOWN|
- *               MAP_LOCKED|MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
+ *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
+ *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
  *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_DONT_OVERRIDE' */
 __CDECLARE(__ATTR_WUNUSED,void *,__NOTHROW_NCX,mmap,(void *__addr, size_t __len, int __prot, int __flags, __fd_t __fd, __off32_t __offset),(__addr,__len,__prot,__flags,__fd,__offset))
 #elif (defined(__CRT_HAVE_mmap) || defined(__CRT_HAVE_mmap64))
 #include <local/sys.mman/mmap.h>
 /* @param prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
  * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
- *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_FIXED_NOREPLACE|MAP_GROWSDOWN|
- *               MAP_LOCKED|MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
+ *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
+ *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
  *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_DONT_OVERRIDE' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(mmap, __FORCELOCAL __ATTR_WUNUSED void *__NOTHROW_NCX(__LIBCCALL mmap)(void *__addr, size_t __len, int __prot, int __flags, __fd_t __fd, __FS_TYPE(off) __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mmap))(__addr, __len, __prot, __flags, __fd, __offset); })
 #endif /* mmap... */
 #if defined(__CRT_HAVE_munmap)
+/* Unmap memory from `addr...+=len' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,munmap,(void *__addr, size_t __len),(__addr,__len))
 #endif /* munmap... */
 #if defined(__CRT_HAVE_mprotect)
-/* @param prot: Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED' */
+/* @param prot: Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|
+ *              PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED|PROT_GROWSUP|
+ *              PROT_GROWSDOWN' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,mprotect,(void *__addr, size_t __len, int __prot),(__addr,__len,__prot))
 #endif /* mprotect... */
 #if defined(__CRT_HAVE_msync)
+/* @param flags: Set of `MS_ASYNC|MS_INVALIDATE|MS_SYNC' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,msync,(void *__addr, size_t __len, int __flags),(__addr,__len,__flags))
 #endif /* msync... */
 #if defined(__CRT_HAVE_mlock)
@@ -249,6 +317,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,mlock,(void const *__addr, size
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,munlock,(void const *__addr, size_t __len),(__addr,__len))
 #endif /* munlock... */
 #if defined(__CRT_HAVE_mlockall)
+/* @param flags: Set of `MCL_CURRENT|MCL_FUTURE|MCL_ONFAULT' */
 __CDECLARE(,int,__NOTHROW_NCX,mlockall,(int __flags),(__flags))
 #endif /* mlockall... */
 #if defined(__CRT_HAVE_munlockall)
@@ -277,23 +346,23 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,mincore,(void *__start, size_t 
 #if defined(__CRT_HAVE_mmap64)
 /* @param prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
  * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
- *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_FIXED_NOREPLACE|MAP_GROWSDOWN|
- *               MAP_LOCKED|MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
+ *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
+ *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
  *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_DONT_OVERRIDE' */
 __CDECLARE(__ATTR_WUNUSED,void *,__NOTHROW_NCX,mmap64,(void *__addr, size_t __len, int __prot, int __flags, __fd_t __fd, __off64_t __offset),(__addr,__len,__prot,__flags,__fd,__offset))
 #elif defined(__CRT_HAVE_mmap) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 /* @param prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
  * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
- *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_FIXED_NOREPLACE|MAP_GROWSDOWN|
- *               MAP_LOCKED|MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
+ *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
+ *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
  *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_DONT_OVERRIDE' */
 __CREDIRECT(__ATTR_WUNUSED,void *,__NOTHROW_NCX,mmap64,(void *__addr, size_t __len, int __prot, int __flags, __fd_t __fd, __off64_t __offset),mmap,(__addr,__len,__prot,__flags,__fd,__offset))
 #elif defined(__CRT_HAVE_mmap)
 #include <local/sys.mman/mmap64.h>
 /* @param prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
  * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
- *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_FIXED_NOREPLACE|MAP_GROWSDOWN|
- *               MAP_LOCKED|MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
+ *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
+ *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
  *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_DONT_OVERRIDE' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(mmap64, __FORCELOCAL __ATTR_WUNUSED void *__NOTHROW_NCX(__LIBCCALL mmap64)(void *__addr, size_t __len, int __prot, int __flags, __fd_t __fd, __off64_t __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mmap64))(__addr, __len, __prot, __flags, __fd, __offset); })
 #endif /* mmap64... */

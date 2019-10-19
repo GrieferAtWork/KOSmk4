@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9971426c */
+/* HASH CRC-32:0xbc6f063f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,16 +29,21 @@ DECL_BEGIN
 
 /* @param prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
  * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
- *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_FIXED_NOREPLACE|MAP_GROWSDOWN|
- *               MAP_LOCKED|MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
+ *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
+ *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
  *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_DONT_OVERRIDE' */
 INTDEF WUNUSED void *NOTHROW_NCX(LIBCCALL libc_mmap)(void *addr, size_t len, int prot, int flags, fd_t fd, off_t offset);
+/* Unmap memory from `addr...+=len' */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_munmap)(void *addr, size_t len);
-/* @param prot: Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED' */
+/* @param prot: Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|
+ *              PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED|PROT_GROWSUP|
+ *              PROT_GROWSDOWN' */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_mprotect)(void *addr, size_t len, int prot);
+/* @param flags: Set of `MS_ASYNC|MS_INVALIDATE|MS_SYNC' */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_msync)(void *addr, size_t len, int flags);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_mlock)(void const *addr, size_t len);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_munlock)(void const *addr, size_t len);
+/* @param flags: Set of `MCL_CURRENT|MCL_FUTURE|MCL_ONFAULT' */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_mlockall)(int flags);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_munlockall)(void);
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_shm_open)(char const *name, oflag_t oflag, mode_t mode);
@@ -47,8 +52,8 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_madvise)(void *addr, size_t le
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_mincore)(void *start, size_t len, unsigned char *vec);
 /* @param prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
  * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
- *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_FIXED_NOREPLACE|MAP_GROWSDOWN|
- *               MAP_LOCKED|MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
+ *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
+ *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
  *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_DONT_OVERRIDE' */
 INTDEF WUNUSED void *NOTHROW_NCX(LIBCCALL libc_mmap64)(void *addr, size_t len, int prot, int flags, fd_t fd, off64_t offset);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_posix_madvise)(void *addr, size_t len, int advice);
