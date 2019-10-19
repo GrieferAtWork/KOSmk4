@@ -33,6 +33,8 @@
 #include <kos/types.h>
 
 #include <format-printer.h>
+#include <ctype.h>
+#include <assert.h>
 #include <malloc.h>
 #include <signal.h>
 #include <stdint.h>
@@ -52,6 +54,17 @@ int main_environ(int argc, char *argv[], char *envp[]) {
 		for (i = 0; envp[i]; ++i)
 			printf("envp[%Iu]: %q\n", i, envp[i]);
 	}
+	return 0;
+}
+/************************************************************************/
+
+
+
+
+
+/************************************************************************/
+int main_ctype(int argc, char *argv[], char *envp[]) {
+	assert(isalpha('s'));
 	return 0;
 }
 /************************************************************************/
@@ -133,6 +146,7 @@ typedef struct {
 PRIVATE DEF defs[] = {
 	{ "environ", &main_environ },
 	{ "dprint", &main_dprint },
+	{ "ctype", &main_ctype },
 	{ NULL, NULL },
 };
 

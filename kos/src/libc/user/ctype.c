@@ -1308,7 +1308,7 @@ NOTHROW(LIBCCALL libc___ctype_b_loc)(void)
 /*[[[body:__ctype_b_loc]]]*/
 {
 	if (!libc___ctype_b_loc_pointer)
-		libc___ctype_b_loc_pointer = libc___ctype_b_loc_matrix;
+		libc___ctype_b_loc_pointer = libc___ctype_b_loc_matrix + 128;
 	return &libc___ctype_b_loc_pointer;
 }
 /*[[[end:__ctype_b_loc]]]*/
@@ -1320,7 +1320,7 @@ NOTHROW(LIBCCALL libc___ctype_tolower_loc)(void)
 /*[[[body:__ctype_tolower_loc]]]*/
 {
 	if (!libc___ctype_tolower_loc_pointer)
-		libc___ctype_tolower_loc_pointer = libc___ctype_tolower_loc_matrix;
+		libc___ctype_tolower_loc_pointer = libc___ctype_tolower_loc_matrix + 128;
 	return &libc___ctype_tolower_loc_pointer;
 }
 /*[[[end:__ctype_tolower_loc]]]*/
@@ -1332,7 +1332,7 @@ NOTHROW(LIBCCALL libc___ctype_toupper_loc)(void)
 /*[[[body:__ctype_toupper_loc]]]*/
 {
 	if (!libc___ctype_toupper_loc_pointer)
-		libc___ctype_toupper_loc_pointer = libc___ctype_toupper_loc_matrix;
+		libc___ctype_toupper_loc_pointer = libc___ctype_toupper_loc_matrix + 128;
 	return &libc___ctype_toupper_loc_pointer;
 }
 /*[[[end:__ctype_toupper_loc]]]*/
