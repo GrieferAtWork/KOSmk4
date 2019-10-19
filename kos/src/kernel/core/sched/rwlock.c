@@ -55,11 +55,12 @@ DECL_BEGIN
 /* Because R/W locks need to be working (and therefor initialized)
  * while handling an assertion failure, fixup a missing init before
  * triggering the fault. */
-#define ASSERT_VECTOR_INITIALIZED(locks)                      \
-	(unlikely(!(locks)->rls_vec)                              \
-	 ? ((locks)->rls_vec = (locks)->rls_sbuf,                 \
-	    (void)__assertion_failed(#locks "->rls_vec != NULL")) \
-	 : (void)0)
+#define ASSERT_VECTOR_INITIALIZED(locks)      \
+	do {                                      \
+		if likely((locks)->rls_vec)           \
+			break;                            \
+		(locks)->rls_vec = (locks)->rls_sbuf; \
+	} while __untraced(__assertion_check(#locks "->rls_vec != NULL"))
 #else /* !NDEBUG */
 #define ASSERT_VECTOR_INITIALIZED(locks) (void)0
 #endif /* NDEBUG */

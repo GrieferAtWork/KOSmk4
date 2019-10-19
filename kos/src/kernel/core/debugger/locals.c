@@ -75,20 +75,20 @@ INTDEF byte_t __kernel_eh_frame_size[];
 
 
 PRIVATE di_enum_locals_sections_t const kernel_enum_locals_sections = {
-	/* .el_eh_frame_start      = */__kernel_eh_frame_start,
-	/* .el_eh_frame_end        = */__kernel_eh_frame_end,
-	/* .el_debug_info_start    = */__kernel_debug_info_start,
-	/* .el_debug_info_end      = */__kernel_debug_info_end,
-	/* .el_debug_abbrev_start  = */__kernel_debug_abbrev_start,
-	/* .el_debug_abbrev_end    = */__kernel_debug_abbrev_end,
-	/* .el_debug_loc_start     = */__kernel_debug_loc_start,
-	/* .el_debug_loc_end       = */__kernel_debug_loc_end,
-	/* .el_debug_str_start     = */__kernel_debug_str_start,
-	/* .el_debug_str_end       = */__kernel_debug_str_end,
-	/* .el_debug_aranges_start = */__kernel_debug_aranges_start,
-	/* .el_debug_aranges_end   = */__kernel_debug_aranges_end,
-	/* .el_debug_ranges_start  = */__kernel_debug_ranges_start,
-	/* .el_debug_ranges_end    = */__kernel_debug_ranges_end
+	/* .el_eh_frame_start      = */ __kernel_eh_frame_start,
+	/* .el_eh_frame_end        = */ __kernel_eh_frame_end,
+	/* .el_debug_info_start    = */ __kernel_debug_info_start,
+	/* .el_debug_info_end      = */ __kernel_debug_info_end,
+	/* .el_debug_abbrev_start  = */ __kernel_debug_abbrev_start,
+	/* .el_debug_abbrev_end    = */ __kernel_debug_abbrev_end,
+	/* .el_debug_loc_start     = */ __kernel_debug_loc_start,
+	/* .el_debug_loc_end       = */ __kernel_debug_loc_end,
+	/* .el_debug_str_start     = */ __kernel_debug_str_start,
+	/* .el_debug_str_end       = */ __kernel_debug_str_end,
+	/* .el_debug_aranges_start = */ __kernel_debug_aranges_start,
+	/* .el_debug_aranges_end   = */ __kernel_debug_aranges_end,
+	/* .el_debug_ranges_start  = */ __kernel_debug_ranges_start,
+	/* .el_debug_ranges_end    = */ __kernel_debug_ranges_end
 };
 
 PRIVATE ATTR_DBGTEXT ssize_t LIBDEBUGINFO_CC
