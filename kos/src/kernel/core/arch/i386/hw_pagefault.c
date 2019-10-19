@@ -828,7 +828,7 @@ PAGEFAULT_F_WRITING == E_SEGFAULT_CONTEXT_WRITING
 do_unwind_state:
 	/* Try to trigger a debugger trap (if enabled) */
 	if (kernel_debugtrap_enabled() && (kernel_debugtrap_on & KERNEL_DEBUGTRAP_ON_SEGFAULT))
-		kernel_debugtrap(state, SIGSEGV);
+		state = kernel_debugtrap_r(state, SIGSEGV);
 	x86_unwind_interrupt(state);
 #undef IS_USER
 }
