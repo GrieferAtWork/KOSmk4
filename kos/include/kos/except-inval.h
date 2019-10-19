@@ -139,6 +139,8 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_BAD_PIPE_BUFFER_SIZE,               /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to pass a too low value to `F_SETPIPE_SZ' */
 	E_INVALID_ARGUMENT_CONTEXT_BAD_INTEGER,                        /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to write an invalid integer to a system configuration file */
 	E_INVALID_ARGUMENT_CONTEXT_DEBUG_REASON,                       /* E_INVALID_ARGUMENT_BAD_VALUE: Bad reason code passed to `debugtrap()' */
+	E_INVALID_ARGUMENT_CONTEXT_BAD_PERSONALITY,                    /* E_INVALID_ARGUMENT_BAD_VALUE:    Bad personality code passed to `SYSCTL_SYSCALL_(GET|SET)_PERSONALITY'
+	                                                                * E_INVALID_ARGUMENT_UNKNOWN_FLAG: The least significant argument-bit of `SYSCTL_SYSCALL_GET_PERSONALITY' was set (arg should be `kp << 1') */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/

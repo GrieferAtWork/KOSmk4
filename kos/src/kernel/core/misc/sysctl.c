@@ -23,6 +23,7 @@
 
 #include <fs/node.h>
 #include <fs/vfs.h>
+#include <kernel/personality.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
 #include <kernel/handle.h>
@@ -77,6 +78,44 @@ DEFINE_SYSCALL2(syscall_slong_t, sysctl, syscall_ulong_t, command,
 
 	case SYSCTL_SYSCALL_SET_TRACING_ENABLED:
 		return syscall_tracing_setenabled(arg != 0) ? 1 : 0;
+
+	case SYSCTL_SYSCALL_GET_PERSONALITY: {
+		uintptr_t kp;
+		if unlikely((uintptr_t)arg & 1) {
+			THROW(E_INVALID_ARGUMENT_UNKNOWN_FLAG,
+			      E_INVALID_ARGUMENT_CONTEXT_BAD_PERSONALITY,
+			      (uintptr_t)arg, 1, 1);
+		}
+		kp = (uintptr_t)arg >> 1;
+		if unlikely(kp == KP_INVALID ||
+		            kp >= KP_COUNT) {
+			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+			      E_INVALID_ARGUMENT_CONTEXT_BAD_PERSONALITY,
+			      (uintptr_t)arg);
+		}
+		return has_personality(kp) ? 1 : 0;
+	}	break;
+
+	case SYSCTL_SYSCALL_SET_PERSONALITY: {
+		uintptr_t kp, index;
+		bool enable = ((uintptr_t)arg & 1) != 0;
+		byte_t oldbyte, mask;
+		kp = (uintptr_t)arg >> 1;
+		if unlikely(kp == KP_INVALID ||
+		            kp >= KP_COUNT) {
+			THROW(E_INVALID_ARGUMENT_BAD_VALUE,
+			      E_INVALID_ARGUMENT_CONTEXT_BAD_PERSONALITY,
+			      (uintptr_t)arg);
+		}
+		index = kp / 8;
+		mask  = (byte_t)1 << (kp % 8);
+		if (enable) {
+			oldbyte = ATOMIC_FETCHOR(kernel_personality[index], mask);
+		} else {
+			oldbyte = ATOMIC_FETCHAND(kernel_personality[index], ~mask);
+		}
+		return (oldbyte & mask) != 0 ? 1 : 0;
+	}	break;
 
 	case SYSCTL_DRIVER_LSMOD: {
 		struct handle temp;

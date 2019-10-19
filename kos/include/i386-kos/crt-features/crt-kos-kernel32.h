@@ -756,6 +756,7 @@
 #define __CRT_HAVE_kernel_panic_lcpustate 1
 #define __CRT_HAVE_kernel_panic_scpustate 1
 #define __CRT_HAVE_kernel_panic_ucpustate 1
+#define __CRT_HAVE_kernel_personality 1
 #define __CRT_HAVE_kernel_pty_oprinter 1
 #define __CRT_HAVE_kernel_slab_break 1
 #define __CRT_HAVE_kernel_symbol_table 1

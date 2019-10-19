@@ -31,6 +31,7 @@
 #include <fs/node.h>
 #include <fs/vfs.h>
 #include <kernel/debugtrap.h>
+#include <kernel/personality.h>
 #include <kernel/except.h>
 #include <kernel/handle.h>
 #include <kernel/printk.h>
@@ -1741,8 +1742,17 @@ DEFINE_SYSCALL4(fd_t, openat, fd_t, dirfd,
 	fsmode_t fsmode;
 	REF struct handle result_handle;
 	validate_readable(filename, 1);
-	if (oflags & O_CREAT)
-		VALIDATE_FLAGSET(mode, 07777, E_INVALID_ARGUMENT_CONTEXT_OPEN_MODE);
+	if (oflags & O_CREAT) {
+		if (has_personality(KP_OPEN_CREAT_CHECK_MODE)) {
+			if unlikely(mode & ~07777) {
+				THROW(E_INVALID_ARGUMENT_UNKNOWN_FLAG,
+				      E_INVALID_ARGUMENT_CONTEXT_OPEN_MODE,
+				      mode, ~07777 /*, 0*/);
+			}
+		}
+		/* Unconditionally mask mode flags. */
+		mode &= 07777;
+	}
 	fsmode = (fsmode_t)0;
 	if (oflags & (O_NOFOLLOW | O_SYMLINK))
 		fsmode |= (fsmode_t)AT_SYMLINK_NOFOLLOW;

@@ -3166,10 +3166,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 791 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname791 /* index: 791 */
+	.weak rwlock_downgrade_readonly; .long rwlock_downgrade_readonly
+	.reloc ., R_386_SIZE32, rwlock_downgrade_readonly; .long 0
+	.long 0xf562dd9
 	.long .Lname792 /* index: 792 */
 	.weak dbg_menuex; .long dbg_menuex
 	.reloc ., R_386_SIZE32, dbg_menuex; .long 0
@@ -14183,9 +14183,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long .Lname3545 /* index: 3545 */
-	.weak rwlock_downgrade_readonly; .long rwlock_downgrade_readonly
-	.reloc ., R_386_SIZE32, rwlock_downgrade_readonly; .long 0
-	.long 0xf562dd9
+	.weak kernel_personality; .long kernel_personality
+	.reloc ., R_386_SIZE32, kernel_personality; .long 0
+	.long 0x33e8dd9
 	.long 0 /* index: 3546 */
 	.long 0
 	.long 0
@@ -17208,6 +17208,8 @@ END(kernel_symbol_table)
 	.string "instruction_trypred"
 .Lname789:
 	.string "fs_filesystems_remove"
+.Lname791:
+	.string "rwlock_downgrade_readonly"
 .Lname792:
 	.string "dbg_menuex"
 .Lname793:
@@ -20031,7 +20033,7 @@ END(kernel_symbol_table)
 .Lname3541:
 	.string "vm_datablock_anonymize"
 .Lname3545:
-	.string "rwlock_downgrade_readonly"
+	.string "kernel_personality"
 .Lname3548:
 	.string "aio_multihandle_fail"
 .Lname3549:

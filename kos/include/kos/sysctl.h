@@ -291,6 +291,10 @@ struct sysctl_driver_set_library_path /*[PREFIX(slp_)]*/ {
 #define SYSCTL_SYSTEM_MEMORY_VALIDATE_PADDING 0xc05ed002 /* Validate heap padding and panic if memory has been corrupted */
 #define SYSCTL_SYSTEM_BRANCH_DUMP_STATS       0xc05ef001 /* Dump kernel branch statistics to the system log */
 
+/* Kernel configuration */
+#define SYSCTL_SYSCALL_GET_PERSONALITY        0x005f0001 /* [int kp << 1] Return 0/1 if the given personality code `kp' (one of `KP_*' from `<kos/personality>') is enabled or not. */
+#define SYSCTL_SYSCALL_SET_PERSONALITY        0x005f0002 /* [int kp << 1 | (enabled & 1)] Enable/Disable the given personality `kp'. (return 0/1 indicative of the old state) */
+
 /* Syscall related */
 #define SYSCTL_SYSCALL_GET_TRACING_ENABLED    0x000c0001 /* Return 0/1 if system call tracing is enabled. */
 #define SYSCTL_SYSCALL_SET_TRACING_ENABLED    0x000c0002 /* [int arg] Set if system call tracing is enabled (return 1 if tracing state changed; 0 otherwise) */
