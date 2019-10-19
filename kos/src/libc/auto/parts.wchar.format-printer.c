@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf475e6b3 */
+/* HASH CRC-32:0x9aec2982 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ NOTHROW_NCX(LIBCCALL libc_format_wrepeat)(pc32formatprinter printer,
 #line 97 "kos/src/libc/magic/format-printer.c"
 #ifndef FORMAT_REPEAT_BUFSIZE
 #define FORMAT_REPEAT_BUFSIZE 64
-#endif
+#endif /* !FORMAT_REPEAT_BUFSIZE */
 	ssize_t result, temp;
 #ifdef __hybrid_alloca
 	char32_t *buffer;
@@ -110,7 +110,7 @@ NOTHROW_NCX(LIBDCALL libd_format_wrepeat)(pc16formatprinter printer,
 #line 97 "kos/src/libc/magic/format-printer.c"
 #ifndef FORMAT_REPEAT_BUFSIZE
 #define FORMAT_REPEAT_BUFSIZE 64
-#endif
+#endif /* !FORMAT_REPEAT_BUFSIZE */
 	ssize_t result, temp;
 #ifdef __hybrid_alloca
 	char16_t *buffer;

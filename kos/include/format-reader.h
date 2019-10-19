@@ -1,3 +1,4 @@
+/* HASH CRC-32:0x967bada4 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -16,32 +17,36 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef _BITS_FORMAT_PRINTER_H
-#define _BITS_FORMAT_PRINTER_H 1
+#ifndef _FORMAT_READER_H
+#define _FORMAT_READER_H 1
 
 #include <__stdinc.h>
 #include <__crt.h>
-#include <hybrid/typecore.h>
+
+#ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
+#pragma GCC system_header
+#endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
+
+#include <features.h>
+#include <bits/format-printer.h>
+
 
 #ifdef __CC__
 __SYSDECL_BEGIN
 
-#if __KOS_VERSION__ >= 400
-typedef __SSIZE_TYPE__ (__LIBCCALL *__pformatprinter)(void *__arg, /*utf-8*/char const *__restrict __data, __SIZE_TYPE__ __datalen);
-typedef /*utf-32*/__SSIZE_TYPE__ (__LIBCCALL *__pformatgetc)(void *__arg);
-typedef __SSIZE_TYPE__ (__LIBCCALL *__pformatungetc)(void *__arg, /*utf-32*/__CHAR32_TYPE__ __ch);
-#else /* __KOS_VERSION__ >= 400 */
-typedef __SSIZE_TYPE__ (__LIBCCALL *__pformatprinter)(/*utf-8*/char const *__restrict __data, __SIZE_TYPE__ __datalen, void *__arg);
-typedef /*utf-32*/__SSIZE_TYPE__ (__LIBCCALL *__pformatgetc)(void *__arg);
-typedef __SSIZE_TYPE__ (__LIBCCALL *__pformatungetc)(/*utf-32*/__CHAR32_TYPE__ __ch, void *__arg);
-#endif /* __KOS_VERSION__ < 400 */
-
-/* Read up to `NUM_BYTES' bytes into `BUF', returning the actual number of
- * read bytes, or a negative error value to-be propagated up the call-stack. */
-typedef __SSIZE_TYPE__ (__LIBCCALL *__pformatreader)(void *__arg, void *__restrict __buf, __SIZE_TYPE__ __num_bytes);
+#ifndef __pformatreader_defined
+#define __pformatreader_defined 1
+/* Callback function for custom data providers, to-be used by data consumers.
+ * @param: BUF:       The base address of a `NUM_BYTES' bytes long vector that should be filled.
+ * @param: NUM_BYTES: The max number of bytes that should be returned in `BUF'
+ * @param: ARG:       The user-defined closure parameter passed alongside this function pointer.
+ * @return: < 0:      An error occurred and the calling function shall return with this same value.
+ * @return: >= 0:     The number of leading bytes of `BUF' that were filled. */
+typedef __pformatreader pformatreader;
+#endif /* !__pformatreader_defined */
 
 
 __SYSDECL_END
 #endif /* __CC__ */
 
-#endif /* !_BITS_FORMAT_PRINTER_H */
+#endif /* !_FORMAT_READER_H */

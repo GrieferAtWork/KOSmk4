@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4fbe8898 */
+/* HASH CRC-32:0x60ccdb02 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,7 +58,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_repeat") ssize_t
 #line 97 "kos/src/libc/magic/format-printer.c"
 #ifndef FORMAT_REPEAT_BUFSIZE
 #define FORMAT_REPEAT_BUFSIZE 64
-#endif
+#endif /* !FORMAT_REPEAT_BUFSIZE */
 	ssize_t result, temp;
 #ifdef __hybrid_alloca
 	char *buffer;

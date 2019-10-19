@@ -96,7 +96,7 @@ typedef __pformatungetc pformatungetc;
 format_repeat:([nonnull] pformatprinter printer, void *arg, char ch, $size_t num_repetitions) -> $ssize_t {
 #ifndef FORMAT_REPEAT_BUFSIZE
 #define FORMAT_REPEAT_BUFSIZE 64
-#endif
+#endif /* !FORMAT_REPEAT_BUFSIZE */
 	ssize_t result, temp;
 #ifdef __hybrid_alloca
 	char *buffer;

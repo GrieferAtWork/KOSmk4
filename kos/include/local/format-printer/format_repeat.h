@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9f95b73d */
+/* HASH CRC-32:0x1de67335 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,7 +53,7 @@ __LOCAL_LIBC(format_repeat) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 #line 97 "kos/src/libc/magic/format-printer.c"
 #ifndef __FORMAT_REPEAT_BUFSIZE
 #define __FORMAT_REPEAT_BUFSIZE 64
-#endif
+#endif /* !FORMAT_REPEAT_BUFSIZE */
 	__SSIZE_TYPE__ __result, __temp;
 #ifdef __hybrid_alloca
 	char *__buffer;
