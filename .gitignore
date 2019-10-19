@@ -19,6 +19,13 @@ __ice__
 
 # These headers are installed by `make_utility.sh i386 ncurses`
 /kos/include/curses.h
+/kos/include/eti.h
+/kos/include/form.h
+/kos/include/menu.h
+/kos/include/nc_tparm.h
+/kos/include/panel.h
+/kos/include/term_entry.h
+/kos/include/tic.h
 /kos/include/ncurses.h
 /kos/include/ncurses_dll.h
 /kos/include/term.h

@@ -458,18 +458,28 @@ EOF
 		install_ncurses_library libmenu
 		install_ncurses_library libncurses
 		install_ncurses_library libpanel
-		install_header() {
+		install_header_ex() {
 			echo "Installing header:/include/$2"
 			unlink "$KOS_ROOT/kos/include/$2" > /dev/null 2>&1
 			cmd cp "$1" "$KOS_ROOT/kos/include/$2"
 		}
-		install_header "$OPTPATH/include/curses.h"      "curses.h"
+		install_header() {
+			install_header_ex "$OPTPATH/include/$1" "$1"
+		}
+		install_header eti.h
+		install_header form.h
+		install_header menu.h
+		install_header panel.h
+		install_header curses.h
+		install_header_ex "$SRCPATH/include/nc_tparm.h" nc_tparm.h
 		echo "Installing header:/include/ncurses.h"
 		echo '#include "curses.h"' > "$KOS_ROOT/kos/include/ncurses.h"
-		install_header "$OPTPATH/include/unctrl.h"      "unctrl.h"
-		install_header "$OPTPATH/include/ncurses_dll.h" "ncurses_dll.h"
-		install_header "$OPTPATH/include/term.h"        "term.h"
-		install_header "$OPTPATH/include/termcap.h"     "termcap.h"
+		install_header ncurses_dll.h
+		install_header term.h
+		install_header_ex "$SRCPATH/include/term_entry.h" term_entry.h
+		install_header termcap.h
+		install_header_ex "$SRCPATH/include/tic.h" tic.h
+		install_header unctrl.h
 		;;
 ##############################################################################
 
