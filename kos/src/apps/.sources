@@ -24,6 +24,13 @@ BEGIN GROUP("apps.init") { COMPILE, LINK, MCOPY };
 	SOURCE({ "init/*.c" })
 END
 
+BEGIN GROUP("apps.playground") { COMPILE, LINK, MCOPY };
+	SET_LANGUAGE("c")
+	SET_OUTPUT("/" + BINPATH + "/bin/playground")
+	SET_DISKFILE("/bin/playground")
+	SOURCE({ "playground/*.c" })
+END
+
 BEGIN GROUP("apps.rpc-service") { COMPILE, LINK, MCOPY };
 	SET_LANGUAGE("c")
 	SET_OUTPUT("/" + BINPATH + "/bin/rpc-service")

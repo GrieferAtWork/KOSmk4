@@ -49,76 +49,16 @@
 DECL_BEGIN
 
 PRIVATE char const *init_envp[] = {
+	"PATH=/bin",
+	"HOME=/",
 	"TERM=xterm",
 	NULL
 };
 
 
 
-#include <format-printer.h>
-#include <kos/debugtrap.h>
-
-PRIVATE ssize_t __LIBCCALL
-debug_printer(void *UNUSED(arg), char const *message, size_t len) {
-	struct debugtrap_reason r;
-	r.dtr_signo  = (uint32_t)len;
-	r.dtr_strarg = message;
-	r.dtr_reason = DEBUGTRAP_REASON_MESSAGE;
-	if (sys_debugtrap(NULL, &r) < 0)
-		r.dtr_signo = 0;
-	return (ssize_t)r.dtr_signo;
-}
-
-
 int main(int argc, char *argv[], char *envp[]) {
 	syslog(LOG_NOTICE, "[init] Init started\n");
-
-	/* XXX: While this ~does~ work to do exactly what it's supposed to do,
-	 *      Visual Studio's MIEngine doesn't seem to understand the protocol
-	 *      that GDB uses to transmit generic, human-readable strings
-	 *      As such, this produces the following output:
-	 *          @"a = "
-	 *          @"Value\n"
-	 *          @" for a"
-	 *          @"\n"
-	 *          @"b = "
-	 *          @"Value for b"
-	 *          @"\n"
-	 *          @"c = "
-	 *          @"fdadsfasdn"
-	 *          @"\n"
-	 *          @"d = "
-	 *          @"This is c"
-	 *          @"\n"
-	 *      And no:  The \n-s in there I did _NOT_ just escape for the visual
-	 *               Those actually appear as-is in the console.
-	 *      However: When running GDB normally from a console, the text is displayed
-	 *               properly:
-	 *          a = Value
-	 *           for a
-	 *          b = Value for b
-	 *          c = fdadsfasdn
-	 *          d = This is c
-	 * So the problem with this is actually Visual Studio...
-	 * This sucks! You want to know why I added support for message debug traps?
-	 * I added it so that I could output text to the Visual studio output window
-	 * without that annoying `cmd: ' prefix caused by the fact that all output
-	 * currently is piped through magic (which is started by `cmd', hence the
-	 * prefix), and is considered as a side channel by visual studio, and there
-	 * doesn't seem to be a way to prevent the `cmd: ' prefix for those.
-	 * Now why do I care? Well: Because of that prefix, it is impossible for me
-	 * to output file paths in such a way that they become clickable so-as to
-	 * allow be to immediately go to the associated source location.
-	 */
-	format_printf(&debug_printer, NULL,
-	              "a = %s\n"
-	              "b = %s\n"
-	              "c = %s\n"
-	              "d = %s\n",
-	              "Value\n for a",
-	              "Value for b",
-	              "fdadsfasdn",
-	              "This is c");
 
 	/* Mount the /dev filesystem. */
 	if (mount(NULL, "/dev", "devfs", 0, NULL) < 0) {
