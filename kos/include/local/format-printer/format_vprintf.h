@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbbd24d4e */
+/* HASH CRC-32:0x23c7cf95 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -93,7 +93,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,,__localdep_format_repeat,(__pfor
  * with the `FORMAT_ESCAPE_FFORCE*' flags
  * @param: PRINTER: A function called for all quoted portions of the text
  * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
-__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,,__localdep_format_escape,(__pformatprinter __printer, void *__arg, /*utf-8*/char const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_escape,(__printer,__arg,__text,__textlen,__flags)) __THROWS(...)
+__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,,__localdep_format_escape,(__pformatprinter __printer, void *__arg, /*utf-8*/ char const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_escape,(__printer,__arg,__text,__textlen,__flags)) __THROWS(...)
 #elif defined(__CRT_HAVE_format_quote)
 /* Do C-style escape on the given text, printing it to the given printer.
  * Input:
@@ -108,7 +108,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,,__localdep_format_escape,(__pfor
  * with the `FORMAT_ESCAPE_FFORCE*' flags
  * @param: PRINTER: A function called for all quoted portions of the text
  * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
-__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,,__localdep_format_escape,(__pformatprinter __printer, void *__arg, /*utf-8*/char const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_quote,(__printer,__arg,__text,__textlen,__flags)) __THROWS(...)
+__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,,__localdep_format_escape,(__pformatprinter __printer, void *__arg, /*utf-8*/ char const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_quote,(__printer,__arg,__text,__textlen,__flags)) __THROWS(...)
 #else /* LIBC: format_escape */
 #include <local/format-printer/format_escape.h>
 /* Do C-style escape on the given text, printing it to the given printer.
@@ -163,7 +163,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,,__localdep_format_hexdump,(__pfo
 #if defined(__CRT_HAVE_unicode_writeutf8)
 /* Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
  * This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst' */
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_unicode_writeutf8,(/*utf-8*/char *__restrict __dst, __CHAR32_TYPE__ __ch),unicode_writeutf8,(__dst,__ch))
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_unicode_writeutf8,(/*utf-8*/ char *__restrict __dst, __CHAR32_TYPE__ __ch),unicode_writeutf8,(__dst,__ch))
 #else /* LIBC: unicode_writeutf8 */
 #include <local/unicode/unicode_writeutf8.h>
 /* Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
@@ -177,7 +177,7 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localde
 #define ____localdep_format_width_defined 1
 #if defined(__CRT_HAVE_format_width)
 /* Returns the width (number of characters; not bytes) of the given unicode string */
-__CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_width,(void *__arg, /*utf-8*/char const *__restrict __data, __SIZE_TYPE__ __datalen),format_width,(__arg,__data,__datalen))
+__CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_width,(void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen),format_width,(__arg,__data,__datalen))
 #else /* LIBC: format_width */
 #include <local/format-printer/format_width.h>
 /* Returns the width (number of characters; not bytes) of the given unicode string */

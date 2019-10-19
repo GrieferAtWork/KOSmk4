@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x578391c2 */
+/* HASH CRC-32:0x13e909e6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #if defined(__CRT_HAVE_unicode_writeutf8)
 /* Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
  * This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst' */
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_unicode_writeutf8,(/*utf-8*/char *__restrict __dst, __CHAR32_TYPE__ __ch),unicode_writeutf8,(__dst,__ch))
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_unicode_writeutf8,(/*utf-8*/ char *__restrict __dst, __CHAR32_TYPE__ __ch),unicode_writeutf8,(__dst,__ch))
 #else /* LIBC: unicode_writeutf8 */
 #include <local/unicode/unicode_writeutf8.h>
 /* Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
@@ -41,7 +41,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @param: utf32_characters: The amount of UTF-32 characters found in `utf32_text'
  * @return: * : A pointer after the last written UTF-8 character */
 __LOCAL_LIBC(unicode_32to8) __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_32to8))(/*utf-8*/char *__restrict __utf8_dst,
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_32to8))(/*utf-8*/ char *__restrict __utf8_dst,
                                                            /*utf-32*/__CHAR32_TYPE__ const *__restrict __utf32_text,
                                                            __SIZE_TYPE__ __utf32_characters) {
 #line 1076 "kos/src/libc/magic/unicode.c"

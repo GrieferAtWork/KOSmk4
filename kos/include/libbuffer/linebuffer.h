@@ -20,22 +20,23 @@
 #define _LIBBUFFER_LINEBUFFER_H 1
 
 #include "api.h"
-#include <bits/types.h>
-#include <kos/anno.h>
-#include <kos/hybrid/sched-signal.h>
+
 #include <hybrid/sync/atomic-rwlock.h>
 
 #include <bits/posix2_lim.h> /* LINE_MAX */
+#include <bits/types.h>
+#include <kos/anno.h>
+#include <kos/hybrid/sched-signal.h>
 
 #ifdef __KERNEL__
-#include <kernel/heap.h>   /* heap_free */
+#include <kernel/heap.h> /* heap_free */
 #else /* __KERNEL__ */
-#include <libc/malloc.h>   /* __libc_free */
+#include <libc/malloc.h> /* __libc_free */
 #endif /* !__KERNEL__ */
 
 #ifndef __INTELLISENSE__
-#include <hybrid/__atomic.h>
 #include <hybrid/__assert.h>
+#include <hybrid/__atomic.h>
 #endif /* !__INTELLISENSE__ */
 
 /* Implementation of the canonical line-buffer used
@@ -81,7 +82,7 @@ struct linebuffer {
 	 * re-used, or destroyed when data has been processed.
 	 * This in turn allows data to be collected before being processed in
 	 * larger batches. - It also offers itself as a way of implementing
-	 * bufferical line-buffers in TTYs, where user-input needs to be buffered
+	 * canonical line-buffers in TTYs, where user-input needs to be buffered
 	 * until an end-of-line character is received. */
 	struct atomic_rwlock lb_lock; /* Lock for this line buffer */
 	struct linecapture   lb_line; /* [lock(lb_lock)] The current line */
@@ -91,9 +92,9 @@ struct linebuffer {
 };
 
 /* Static initialization */
-#define LINEBUFFER_DEFAULT_LIMIT     LINE_MAX
-#define LINEBUFFER_INIT_EX(limit)  { ATOMIC_RWLOCK_INIT, { __NULLPTR, 0, 0 }, limit, SCHED_SIGNAL_INIT }
-#define LINEBUFFER_INIT              LINEBUFFER_INIT_EX(LINEBUFFER_DEFAULT_LIMIT)
+#define LINEBUFFER_DEFAULT_LIMIT  LINE_MAX
+#define LINEBUFFER_INIT_EX(limit) { ATOMIC_RWLOCK_INIT, { __NULLPTR, 0, 0 }, limit, SCHED_SIGNAL_INIT }
+#define LINEBUFFER_INIT           LINEBUFFER_INIT_EX(LINEBUFFER_DEFAULT_LIMIT)
 
 /* Initialization / finalization */
 #define linebuffer_init_ex(self, limit)                      \

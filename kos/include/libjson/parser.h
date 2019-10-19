@@ -311,11 +311,11 @@ __NOTHROW_NCX(LIBJSON_CC json_parser_printstring)(struct json_parser *__restrict
  * @return: NULL:   An error occurred; when `perror` is non-NULL, that error is stored there:
  *                   - JSON_ERROR_NOOBJ:  Parser didn't point at a string object.
  *                   - JSON_ERROR_SYNTAX: Syntax error */
-typedef __ATTR_WUNUSED __ATTR_NONNULL((1)) /*utf-8*/char *
+typedef __ATTR_WUNUSED __ATTR_NONNULL((1)) /*utf-8*/ char *
 (LIBJSON_CC *PJSON_PARSER_GETSTRING)(struct json_parser *__restrict self,
                                      __size_t *plength, int *perror);
 #ifdef LIBJSON_WANT_PROTOTYPES
-LIBJSON_DECL __ATTR_WUNUSED __ATTR_NONNULL((1)) /*utf-8*/char *
+LIBJSON_DECL __ATTR_WUNUSED __ATTR_NONNULL((1)) /*utf-8*/ char *
 __NOTHROW_NCX(LIBJSON_CC json_parser_getstring)(struct json_parser *__restrict self,
                                                 __size_t *plength, int *perror);
 #endif /* LIBJSON_WANT_PROTOTYPES */

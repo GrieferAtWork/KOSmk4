@@ -272,7 +272,7 @@ struct ansitty_operators {
 	/* [0..1] Set the window title of the terminal. */
 	__ATTR_NONNULL((1, 2))
 	void (LIBANSITTY_CC *ato_settitle)(struct ansitty *__restrict self,
-	                                   /*utf-8*/char const *__restrict text);
+	                                   /*utf-8*/ char const *__restrict text);
 	/* [0..1] Output `text' to the slave process (`write(amaster, text, textlen)';
 	 *        amaster from <pty.h>:openpty, or alternatively identical to keyboard
 	 *        input) */
@@ -343,10 +343,10 @@ ansitty_init(struct ansitty *__restrict self,
 
 /* Output a single utf-8 character to the given TTY */
 typedef __ATTR_NONNULL((1)) void
-(LIBANSITTY_CC *PANSITTY_PUTC)(struct ansitty *__restrict self, /*utf-8*/char ch);
+(LIBANSITTY_CC *PANSITTY_PUTC)(struct ansitty *__restrict self, /*utf-8*/ char ch);
 #ifdef LIBANSITTY_WANT_PROTOTYPES
 LIBANSITTY_DECL __ATTR_NONNULL((1)) void LIBANSITTY_CC
-ansitty_putc(struct ansitty *__restrict self, /*utf-8*/char ch);
+ansitty_putc(struct ansitty *__restrict self, /*utf-8*/ char ch);
 #endif /* LIBANSITTY_WANT_PROTOTYPES */
 
 /* Output a single unicode character to the given TTY */
@@ -381,7 +381,7 @@ typedef __ATTR_NONNULL((1, 2)) __size_t
 (LIBANSITTY_CC *PANSITTY_TRANSLATE)(struct ansitty *__restrict self,
                                     char *buf, __CHAR32_TYPE__ ch);
 #ifdef LIBANSITTY_WANT_PROTOTYPES
-LIBANSITTY_DECL __ATTR_NONNULL((1)) __size_t LIBANSITTY_CC
+LIBANSITTY_DECL __ATTR_NONNULL((1, 2)) __size_t LIBANSITTY_CC
 ansitty_translate(struct ansitty *__restrict self,
                   char *buf, __CHAR32_TYPE__ ch);
 #endif /* LIBANSITTY_WANT_PROTOTYPES */

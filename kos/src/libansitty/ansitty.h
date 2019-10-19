@@ -32,7 +32,7 @@ DECL_BEGIN
 /* Initialize the given ANSI TTY
  * After calling this function, the caller is still responsible
  * to initialize at the very least `self->at_ops.ato_putc'. */
-INTDEF NONNULL((1)) void CC
+INTDEF NONNULL((1, 2)) void CC
 libansitty_init(struct ansitty *__restrict self,
                 struct ansitty_operators const *__restrict ops);
 
@@ -56,7 +56,7 @@ libansitty_printer(void *arg, char const *data, size_t datalen);
  * @return: * : The number of produced bytes (<= ANSITTY_TRANSLATE_BUFSIZE)
  * @return: 0 : The character cannot be represented in the current CP, and
  *              should be discarded. */
-INTDEF NONNULL((1)) size_t CC
+INTDEF NONNULL((1, 2)) size_t CC
 libansitty_translate(struct ansitty *__restrict self,
                      char *buf, char32_t ch);
 

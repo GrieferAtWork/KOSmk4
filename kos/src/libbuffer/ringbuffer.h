@@ -37,11 +37,11 @@ DECL_BEGIN
  * NOTE: `ringbuffer_read_nonblock()' can still throw `E_WOULDBLOCK' because
  *        it may call `task_yield()' when trying to acquire `self->rb_lock'
  * @return: * : The number of bytes read. */
-INTDEF __NOCONNECT KERNEL_SELECT(size_t, ssize_t) CC
+INTDEF __NOCONNECT NONNULL((1)) KERNEL_SELECT(size_t, ssize_t) CC
 libringbuffer_read(struct ringbuffer *__restrict self,
                    __USER __CHECKED void *dst, size_t num_bytes)
 		__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, ...);
-INTDEF size_t CC
+INTDEF NONNULL((1)) size_t CC
 libringbuffer_read_nonblock(struct ringbuffer *__restrict self,
                             __USER __CHECKED void *dst, size_t num_bytes)
 		__THROWS(E_SEGFAULT, E_WOULDBLOCK);
@@ -62,24 +62,24 @@ libringbuffer_read_nonblock(struct ringbuffer *__restrict self,
  *        or when allocating more heap memory.
  * @return: * : The number of bytes written.
  * @return: -1: [USERSPACE] Failed to increase the buffer size (s.a. `errno = ENOMEM') */
-INTDEF __NOCONNECT KERNEL_SELECT(size_t, ssize_t) CC
+INTDEF __NOCONNECT NONNULL((1)) KERNEL_SELECT(size_t, ssize_t) CC
 libringbuffer_write(struct ringbuffer *__restrict self,
                     __USER __CHECKED void const *src, size_t num_bytes)
 		KERNEL_SELECT(__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, ...),
 		              __THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, ...));
-INTDEF __NOCONNECT KERNEL_SELECT(size_t, ssize_t) CC
+INTDEF __NOCONNECT NONNULL((1)) KERNEL_SELECT(size_t, ssize_t) CC
 libringbuffer_writesome(struct ringbuffer *__restrict self,
                         __USER __CHECKED void const *src, size_t num_bytes)
 		KERNEL_SELECT(__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, ...),
 		              __THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, ...));
-INTDEF KERNEL_SELECT(size_t, ssize_t) CC
+INTDEF NONNULL((1)) KERNEL_SELECT(size_t, ssize_t) CC
 libringbuffer_write_nonblock(struct ringbuffer *__restrict self,
                              __USER __CHECKED void const *src, size_t num_bytes)
 		KERNEL_SELECT(__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_BADALLOC),
 		              __THROWS(E_SEGFAULT, E_WOULDBLOCK));
 
 /* Same as `ringbuffer_write_nonblock()', but don't increase the buffer's size. */
-INTDEF size_t CC
+INTDEF NONNULL((1)) size_t CC
 libringbuffer_write_nonblock_noalloc(struct ringbuffer *__restrict self,
                                      __USER __CHECKED void const *src, size_t num_bytes)
 		__THROWS(E_SEGFAULT, E_WOULDBLOCK);
@@ -87,7 +87,7 @@ libringbuffer_write_nonblock_noalloc(struct ringbuffer *__restrict self,
 /* Try to unread up to `num_bytes' of data that had yet to be re-written
  * @param: P_RDTOT: When non-NULL, store the new number of total read bytes since the last re-size in there
  * @return: * : The actual number of unread bytes. */
-INTDEF size_t CC
+INTDEF NONNULL((1)) size_t CC
 libringbuffer_unread(struct ringbuffer *__restrict self,
                      size_t num_bytes,
                      size_t *p_rdtot DFL(NULL))
@@ -96,9 +96,10 @@ libringbuffer_unread(struct ringbuffer *__restrict self,
 /* Skip up to `num_bytes' of unread data, returning the actual number of skipped bytes.
  * @param: p_rdtot: When non-NULL, store the new number of total read bytes since the last re-size in there
  * @return: * : The actual number of skipped bytes. */
-INTDEF size_t CC
+INTDEF NONNULL((1)) size_t CC
 libringbuffer_skipread(struct ringbuffer *__restrict self,
-                       size_t num_bytes, size_t *p_rdtot DFL(NULL))
+                       size_t num_bytes,
+                       size_t *p_rdtot DFL(NULL))
 		__THROWS(E_WOULDBLOCK);
 
 /* A combination of `ringbuffer_unread()' and `ringbuffer_skipread()' that can be used
@@ -106,36 +107,38 @@ libringbuffer_skipread(struct ringbuffer *__restrict self,
  * for `offset' will call `ringbuffer_unread()', whilst positive values will call
  * `ringbuffer_skipread()'
  * The return value is always the new total number of read bytes since the last re-size. */
-INTDEF size_t CC
-libringbuffer_rseek(struct ringbuffer *__restrict self, ssize_t offset)
+INTDEF NONNULL((1)) size_t CC
+libringbuffer_rseek(struct ringbuffer *__restrict self,
+                    ssize_t offset)
 		__THROWS(E_WOULDBLOCK);
 
 /* Try to unwrite up to `num_bytes' of data that had yet to be read
  * @param: P_WRTOT: When non-NULL, store the new number of total written bytes since the last re-size in there
  * @return: * : The actual number of unwritten bytes. */
-INTDEF size_t CC
+INTDEF NONNULL((1)) size_t CC
 libringbuffer_unwrite(struct ringbuffer *__restrict self,
-                      size_t num_bytes, size_t *p_wrtot DFL(NULL))
+                      size_t num_bytes,
+                      size_t *p_wrtot DFL(NULL))
 		__THROWS(E_WOULDBLOCK);
 
 /* By using `ringbuffer_unwrite()', implement support for SEEK_CUR when `offset' is negative
  * Alternatively, when `offset' is positive, don't do anything.
  * The return value is always the new total number of written bytes since the last re-size. */
-INTDEF size_t CC
+INTDEF NONNULL((1)) size_t CC
 libringbuffer_wseek(struct ringbuffer *__restrict self, ssize_t offset)
 		__THROWS(E_WOULDBLOCK);
 
 /* Set the total amount of written, but yet-to-be read bytes.
  * If `num_bytes' is larger than the previous total number of written bytes, don't truncate the buffer.
  * @return: * : The actual number of now written bytes. */
-INTDEF size_t CC
+INTDEF NONNULL((1)) size_t CC
 libringbuffer_setwritten(struct ringbuffer *__restrict self, size_t num_bytes)
 		__THROWS(E_WOULDBLOCK);
 
 #ifdef __KERNEL__
 
 /* Poll the given ring buffer `self' for reading (`POLLIN') or writing (`POLLOUT') */
-INTDEF poll_mode_t CC
+INTDEF NONNULL((1)) poll_mode_t CC
 libringbuffer_poll(struct ringbuffer *__restrict self,
                    poll_mode_t what)
 		__THROWS(E_BADALLOC, E_WOULDBLOCK);

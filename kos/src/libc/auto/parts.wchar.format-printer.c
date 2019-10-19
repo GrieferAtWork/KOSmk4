@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9aec2982 */
+/* HASH CRC-32:0x3e2f0c0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -179,7 +179,7 @@ INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.string.format.format_wescape") ssize_t
 NOTHROW_NCX(LIBCCALL libc_format_wescape)(pc32formatprinter printer,
                                           void *arg,
-                                          /*utf-8*/char32_t const *__restrict text,
+                                          /*utf-8*/ char32_t const *__restrict text,
                                           size_t textlen,
                                           unsigned int flags) {
 #line 184 "kos/src/libc/magic/format-printer.c"
@@ -489,7 +489,7 @@ INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.string.format.format_wescape") ssize_t
 NOTHROW_NCX(LIBDCALL libd_format_wescape)(pc16formatprinter printer,
                                           void *arg,
-                                          /*utf-8*/char16_t const *__restrict text,
+                                          /*utf-8*/ char16_t const *__restrict text,
                                           size_t textlen,
                                           unsigned int flags) {
 #line 184 "kos/src/libc/magic/format-printer.c"

@@ -51,8 +51,8 @@ struct keyboard_ledmask {
 	__uint32_t  lm_newled; /* [OUT] Mask of LEDs that are on now */
 };
 struct keyboard_string {
-	/*utf-8*/char const *ks_text; /* [0..ks_size] input text */
-	__size_t             ks_size; /* Length (in bytes) of the input text */
+	/*utf-8*/ char const *ks_text; /* [0..ks_size] input text */
+	__size_t              ks_size; /* Length (in bytes) of the input text */
 };
 #endif /* __CC__ */
 
@@ -73,11 +73,11 @@ struct keyboard_string {
 #define KBDIO_SETKEYMAP     _IOW_KOS('K', 0x06, struct keyboard_keymap) /* Set the key map program of this keyboard. */
 #define KBDIO_RESETKEYMAP    _IO_KOS('K', 0x06) /* Reset the keymap to en_US. */
 #define KBDIO_FLUSHPENDING   _IO_KOS('K', 0x07) /* Clear the buffer of pending keys */
-#define KBDIO_PUTCHAR       _IOW_KOS('K', 0x08, /*utf-8*/char) /* Schedule a character acting as though it was part of the result of translating a multi-byte key stroke.
-                                                                * Note that unlike `KBDIO_PUTKEY', scheduled characters can only be read with `KBDIO_SETRDKEY=1', or through use of `KBDIO_(TRY)GETCHAR'
-                                                                * Also note that the internal buffer for these character is fixed-length and fairly small.
-                                                                * @return: 0: Failed to schedule the character
-                                                                * @return: 1: Successfully scheduled the character */
+#define KBDIO_PUTCHAR       _IOW_KOS('K', 0x08, /*utf-8*/ char) /* Schedule a character acting as though it was part of the result of translating a multi-byte key stroke.
+                                                                 * Note that unlike `KBDIO_PUTKEY', scheduled characters can only be read with `KBDIO_SETRDKEY=1', or through use of `KBDIO_(TRY)GETCHAR'
+                                                                 * Also note that the internal buffer for these character is fixed-length and fairly small.
+                                                                 * @return: 0: Failed to schedule the character
+                                                                 * @return: 1: Successfully scheduled the character */
 #define KBDIO_PUTSTR        _IOW_KOS('K', 0x08, struct keyboard_string) /* Same as `KBDIO_PUTCHAR', but schedule multiple characters.
                                                                          * @return: 0: Nothing could be scheduled; The buffer is full.
                                                                          * @return: *: The number of bytes from `ks_text' that were scheduled before the buffer became full

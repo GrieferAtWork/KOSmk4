@@ -213,7 +213,7 @@ json_print_quote(struct json_writer *__restrict self) {
 
 LOCAL NONNULL((1, 2)) int CC
 json_print_string(struct json_writer *__restrict self,
-                  /*utf-8*/char const *__restrict str,
+                  /*utf-8*/ char const *__restrict str,
                   size_t len) {
 	char const *flush_start = str;
 	char const *end = str + len;
@@ -289,7 +289,7 @@ err:
 
 INTERN NONNULL((1, 2)) int CC
 libjson_writer_addfield(struct json_writer *__restrict self,
-                        /*utf-8*/char const *__restrict key,
+                        /*utf-8*/ char const *__restrict key,
                         size_t keylen) {
 	int error;
 	CHK_STATE();
@@ -314,7 +314,7 @@ err:
 
 INTERN NONNULL((1, 2)) int CC
 libjson_writer_putstring(struct json_writer *__restrict self,
-                         /*utf-8*/char const *__restrict str,
+                         /*utf-8*/ char const *__restrict str,
                          size_t len) {
 	CHK_STATE();
 	if unlikely(json_print_prefixes(self))

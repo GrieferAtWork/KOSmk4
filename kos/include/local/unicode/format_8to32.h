@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x626f9259 */
+/* HASH CRC-32:0xc8c3e350 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,7 +44,7 @@ __NAMESPACE_LOCAL_BEGIN
  * converting UTF-8 unicode input data into a UTF-32 output */
 __LOCAL_LIBC(format_8to32) __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_8to32))(/*struct format_8to32_data **/ void *__arg,
-                                                          /*utf-8*/char const *__data,
+                                                          /*utf-8*/ char const *__data,
                                                           __SIZE_TYPE__ __datalen) {
 #line 1423 "kos/src/libc/magic/unicode.c"
 	struct __local_format_8to32_data {

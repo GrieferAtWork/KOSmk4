@@ -179,7 +179,7 @@ err:
 [kernel][throws][export_alias(format_quote)]
 [decl_include(<bits/format-printer.h>)]
 format_escape:([nonnull] pformatprinter printer, void *arg,
-               /*utf-8*/char const *__restrict text,
+               /*utf-8*/ char const *__restrict text,
                $size_t textlen, unsigned int flags) -> $ssize_t {
 #ifndef FORMAT_ESCAPE_FNORMAL
 #define FORMAT_ESCAPE_FNORMAL   0x0000 /* Normal quote flags. */
@@ -937,7 +937,7 @@ format_scanf:([nonnull] pformatgetc pgetc,
 @@WARNING: No trailing NUL-character is implicitly appended
 [kernel]
 format_sprintf_printer:([nonnull] /*char ***/void *arg,
-                        [nonnull] /*utf-8*/char const *__restrict data, $size_t datalen) -> $ssize_t {
+                        [nonnull] /*utf-8*/ char const *__restrict data, $size_t datalen) -> $ssize_t {
 @@if $wchar_function@@
 	*(wchar_t **)arg = (wchar_t *)wmempcpy(*(wchar_t **)arg, data, datalen);
 @@else@@
@@ -969,7 +969,7 @@ struct format_snprintf_data {
 @@NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively the sum of return values of all calls to `format_snprintf_printer()'
 [dependency_include(<hybrid/typecore.h>)][kernel]
 format_snprintf_printer:([nonnull] /*struct format_snprintf_data**/void *arg,
-                         [nonnull] /*utf-8*/char const *__restrict data, $size_t datalen) -> $ssize_t {
+                         [nonnull] /*utf-8*/ char const *__restrict data, $size_t datalen) -> $ssize_t {
 	struct format_snprintf_data_ {
 		char         *sd_buffer; /* [0..sd_bufsiz] Pointer to the next memory location to which to write. */
 		__SIZE_TYPE__ sd_bufsiz; /* Remaining buffer size. */
@@ -992,7 +992,7 @@ format_snprintf_printer:([nonnull] /*struct format_snprintf_data**/void *arg,
 
 @@Returns the width (number of characters; not bytes) of the given unicode string
 [dependency_include(<local/unicode_utf8seqlen.h>)][kernel]
-format_width:(void *arg, [nonnull] /*utf-8*/char const *__restrict data, $size_t datalen) -> $ssize_t {
+format_width:(void *arg, [nonnull] /*utf-8*/ char const *__restrict data, $size_t datalen) -> $ssize_t {
 	size_t result = 0;
 	char const *iter, *end;
 	(void)arg;
@@ -1010,7 +1010,7 @@ format_width:(void *arg, [nonnull] /*utf-8*/char const *__restrict data, $size_t
 
 @@Always re-return `datalen' and ignore all other arguments
 [alternate_names(format_wwidth)]
-format_length:(void *arg, /*utf-8*/char const *__restrict data, $size_t datalen) -> $ssize_t {
+format_length:(void *arg, /*utf-8*/ char const *__restrict data, $size_t datalen) -> $ssize_t {
 	(void)arg;
 	(void)data;
 	return (ssize_t)datalen;
@@ -1137,7 +1137,7 @@ format_aprintf_pack:([nonnull] struct format_aprintf_data *__restrict self,
 [requires($has_function(realloc))][same_impl]
 [dependency_include(<hybrid/__assert.h>)][ATTR_WUNUSED]
 format_aprintf_printer:([nonnull] /*struct format_aprintf_data **/void *arg,
-                        [nonnull] /*utf-8*/char const *__restrict data, $size_t datalen) -> $ssize_t {
+                        [nonnull] /*utf-8*/ char const *__restrict data, $size_t datalen) -> $ssize_t {
 	struct @__format_aprintf_data@ {
 		char         *ap_base;  /* [0..ap_used|ALLOC(ap_used+ap_avail)][owned] Buffer */
 		__SIZE_TYPE__ ap_avail; /* Unused buffer size */

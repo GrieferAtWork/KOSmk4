@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe359abd5 */
+/* HASH CRC-32:0x2aca716a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Always re-return `datalen' and ignore all other arguments */
 __LOCAL_LIBC(format_length) __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_length))(void *__arg,
-                                                           /*utf-8*/char const *__restrict __data,
+                                                           /*utf-8*/ char const *__restrict __data,
                                                            __SIZE_TYPE__ __datalen) {
 #line 1014 "kos/src/libc/magic/format-printer.c"
 	(void)__arg;

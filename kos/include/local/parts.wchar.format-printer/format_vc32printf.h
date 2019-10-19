@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8dd4f937 */
+/* HASH CRC-32:0xa362334 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -98,7 +98,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_c
  * with the `FORMAT_ESCAPE_FFORCE*' flags
  * @param: PRINTER: A function called for all quoted portions of the text
  * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
-__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_c32escape,(__pc32formatprinter __printer, void *__arg, /*utf-8*/__CHAR32_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
+__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_c32escape,(__pc32formatprinter __printer, void *__arg, /*utf-8*/ __CHAR32_TYPE__ const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),format_wescape,(__printer,__arg,__text,__textlen,__flags))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <local/parts.wchar.format-printer/format_wescape.h>
 /* Do C-style escape on the given text, printing it to the given printer.
@@ -114,7 +114,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_c
  * with the `FORMAT_ESCAPE_FFORCE*' flags
  * @param: PRINTER: A function called for all quoted portions of the text
  * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
-#define __localdep_format_c32escape(printer, arg, text, textlen, flags) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wescape))((__pwformatprinter)(printer), arg, (/*utf-8*/__WCHAR_TYPE__ const *)(text), textlen, flags)
+#define __localdep_format_c32escape(printer, arg, text, textlen, flags) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wescape))((__pwformatprinter)(printer), arg, (/*utf-8*/ __WCHAR_TYPE__ const *)(text), textlen, flags)
 #else /* LIBC: format_c32escape */
 #include <local/parts.wchar.format-printer/format_c32escape.h>
 /* Do C-style escape on the given text, printing it to the given printer.

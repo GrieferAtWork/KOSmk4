@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa77eee4d */
+/* HASH CRC-32:0x37980040 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -82,7 +82,7 @@ __CREDIRECT(__ATTR_LIBC_SCANF(4, 0) __ATTR_NONNULL((1, 2, 4)),__SSIZE_TYPE__,,__
 #define ____localdep_unicode_readutf8_n_defined 1
 #if defined(__CRT_HAVE_unicode_readutf8_n)
 /* Same as `unicode_readutf8()', but don't read past `text_end' */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf8_n,(/*utf-8*/char const **__restrict __ptext, char const *__text_end),unicode_readutf8_n,(__ptext,__text_end))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf8_n,(/*utf-8*/ char const **__restrict __ptext, char const *__text_end),unicode_readutf8_n,(__ptext,__text_end))
 #else /* LIBC: unicode_readutf8_n */
 #include <local/unicode/unicode_readutf8_n.h>
 /* Same as `unicode_readutf8()', but don't read past `text_end' */
@@ -97,7 +97,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unic
 /* Same as `unicode_readutf8', but read backwards, with `*ptext'
  * starting out as a pointer after the character to be read, before
  * being updated to point to the start of the character that was read */
-__CREDIRECT(__ATTR_NONNULL((1)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf8_rev,(/*utf-8*/char const **__restrict __ptext),unicode_readutf8_rev,(__ptext))
+__CREDIRECT(__ATTR_NONNULL((1)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf8_rev,(/*utf-8*/ char const **__restrict __ptext),unicode_readutf8_rev,(__ptext))
 #else /* LIBC: unicode_readutf8_rev */
 #include <local/unicode/unicode_readutf8_rev.h>
 /* Same as `unicode_readutf8', but read backwards, with `*ptext'

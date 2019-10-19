@@ -865,13 +865,13 @@ NOTHROW_NCX(CC libjson_parser_findindex)(struct json_parser *__restrict self,
 
 
 struct format_compare_data {
-	/*utf-8*/char const *str;
-	size_t               len;
+	/*utf-8*/ char const *str;
+	size_t                len;
 };
 
 PRIVATE NONNULL((1, 2)) ssize_t __LIBCCALL
 format_compare_string(void *arg,
-                      /*utf-8*/char const *__restrict data,
+                      /*utf-8*/ char const *__restrict data,
                       size_t datalen) {
 	struct format_compare_data *compare_data;
 	compare_data = (struct format_compare_data *)arg;
@@ -1055,7 +1055,7 @@ done:
 
 PRIVATE NONNULL((1, 2)) ssize_t __LIBCCALL
 json_inline_convert_string(void *arg,
-                           /*utf-8*/char const *__restrict data,
+                           /*utf-8*/ char const *__restrict data,
                            size_t datalen) {
 	char *dst = *(char **)arg;
 #if 1 /* libjson_parser_printstring() never flushes directly from the input source. */

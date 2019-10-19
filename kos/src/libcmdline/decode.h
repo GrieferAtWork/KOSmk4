@@ -40,8 +40,8 @@ DECL_BEGIN
  * When `pargc' is non-NULL, store the number of arguments leading
  * up to (but not including) the terminating NULL-entry.
  * Upon error, NULL is returned. */
-INTDEF WUNUSED ATTR_MALLOC NONNULL((1)) /*utf-8*/char **CC
-libcmdline_decode_argv(/*utf-8*/char *__restrict cmdline, size_t *pargc);
+INTDEF WUNUSED ATTR_MALLOC NONNULL((1)) /*utf-8*/ char **CC
+libcmdline_decode_argv(/*utf-8*/ char *__restrict cmdline, size_t *pargc);
 #endif /* !__KERNEL__ */
 
 /* Decode and transform a given `cmdline' (which must be a \0-terminated string),
@@ -73,7 +73,7 @@ libcmdline_decode_argv(/*utf-8*/char *__restrict cmdline, size_t *pargc);
  *     >ls "" foo<              { "ls", "", "foo" }     // Empty argument!
  */
 INTDEF NONNULL((1, 2)) ssize_t CC
-libcmdline_decode(/*utf-8*/char *__restrict cmdline,
+libcmdline_decode(/*utf-8*/ char *__restrict cmdline,
                   pformatprinter arg_printer,
                   void *arg_printer_arg);
 
@@ -88,7 +88,7 @@ libcmdline_decode(/*utf-8*/char *__restrict cmdline,
  * @param: pendptr: When non-NULL, store a pointer to one byte past the end of the last argument
  * @return: * :     The total number of individual argument strings. */
 INTDEF NONNULL((1)) size_t CC
-libcmdline_split(/*utf-8*/char *__restrict cmdline, char **pendptr);
+libcmdline_split(/*utf-8*/ char *__restrict cmdline, char **pendptr);
 
 
 

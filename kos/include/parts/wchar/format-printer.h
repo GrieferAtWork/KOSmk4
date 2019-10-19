@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x65f0da9e */
+/* HASH CRC-32:0xa6ac2489 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -85,7 +85,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_wrepeat, __FORCELOCAL __ATTR_NONNULL((1))
  * with the `FORMAT_ESCAPE_FFORCE*' flags
  * @param: PRINTER: A function called for all quoted portions of the text
  * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
-__CDECLARE(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,format_wescape,(pwformatprinter __printer, void *__arg, /*utf-8*/wchar_t const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),(__printer,__arg,__text,__textlen,__flags))
+__CDECLARE(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,format_wescape,(pwformatprinter __printer, void *__arg, /*utf-8*/ wchar_t const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags),(__printer,__arg,__text,__textlen,__flags))
 #else /* LIBC: format_wescape */
 #include <local/parts.wchar.format-printer/format_wescape.h>
 /* Do C-style escape on the given text, printing it to the given printer.
@@ -101,7 +101,7 @@ __CDECLARE(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,format_wescape,(pwfo
  * with the `FORMAT_ESCAPE_FFORCE*' flags
  * @param: PRINTER: A function called for all quoted portions of the text
  * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
-__NAMESPACE_LOCAL_USING_OR_IMPL(format_wescape, __FORCELOCAL __ATTR_NONNULL((1)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_wescape)(pwformatprinter __printer, void *__arg, /*utf-8*/wchar_t const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wescape))(__printer, __arg, __text, __textlen, __flags); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(format_wescape, __FORCELOCAL __ATTR_NONNULL((1)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_wescape)(pwformatprinter __printer, void *__arg, /*utf-8*/ wchar_t const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wescape))(__printer, __arg, __text, __textlen, __flags); })
 #endif /* format_wescape... */
 #if defined(__CRT_HAVE_format_whexdump)
 /* Print a hex dump of the given data using the provided format printer
@@ -552,7 +552,7 @@ __CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,format_wlength,(void *__arg, wchar_t c
 #else /* LIBC: format_length */
 #include <local/format-printer/format_length.h>
 /* Always re-return `datalen' and ignore all other arguments */
-__FORCELOCAL __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_wlength)(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_length))(__arg, (/*utf-8*/char const *)__data, __datalen); }
+__FORCELOCAL __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_wlength)(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_length))(__arg, (/*utf-8*/ char const *)__data, __datalen); }
 #endif /* format_wlength... */
 
 #ifndef __format_waprintf_data_defined

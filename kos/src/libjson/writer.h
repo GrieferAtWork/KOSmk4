@@ -39,8 +39,8 @@ INTDEF NONNULL((1)) int CC libjson_writer_beginobject(struct json_writer *__rest
 INTDEF NONNULL((1)) int CC libjson_writer_beginarray(struct json_writer *__restrict self);
 INTDEF NONNULL((1)) int CC libjson_writer_endobject(struct json_writer *__restrict self);
 INTDEF NONNULL((1)) int CC libjson_writer_endarray(struct json_writer *__restrict self);
-INTDEF NONNULL((1, 2)) int CC libjson_writer_addfield(struct json_writer *__restrict self, /*utf-8*/char const *__restrict key, size_t keylen);
-INTDEF NONNULL((1, 2)) int CC libjson_writer_putstring(struct json_writer *__restrict self, /*utf-8*/char const *__restrict str, size_t len);
+INTDEF NONNULL((1, 2)) int CC libjson_writer_addfield(struct json_writer *__restrict self, /*utf-8*/ char const *__restrict key, size_t keylen);
+INTDEF NONNULL((1, 2)) int CC libjson_writer_putstring(struct json_writer *__restrict self, /*utf-8*/ char const *__restrict str, size_t len);
 INTDEF NONNULL((1)) int CC libjson_writer_putnumber(struct json_writer *__restrict self, intptr_t value);
 INTDEF NONNULL((1)) int CC libjson_writer_putint64(struct json_writer *__restrict self, int64_t value);
 INTDEF NONNULL((1)) int CC libjson_writer_putuint64(struct json_writer *__restrict self, uint64_t value);

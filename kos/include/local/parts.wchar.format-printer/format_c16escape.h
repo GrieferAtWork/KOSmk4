@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7feb48b2 */
+/* HASH CRC-32:0x8c58cea */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,7 +50,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(format_c16escape) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(format_c16escape))(__pc16formatprinter __printer,
                                                               void *__arg,
-                                                              /*utf-8*/__CHAR16_TYPE__ const *__restrict __text,
+                                                              /*utf-8*/ __CHAR16_TYPE__ const *__restrict __text,
                                                               __SIZE_TYPE__ __textlen,
                                                               unsigned int __flags) {
 #line 184 "kos/src/libc/magic/format-printer.c"

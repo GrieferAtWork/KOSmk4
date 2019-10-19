@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaa44c3ea */
+/* HASH CRC-32:0x138a0c8f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #define ____localdep_unicode_readutf8_n_defined 1
 #if defined(__CRT_HAVE_unicode_readutf8_n)
 /* Same as `unicode_readutf8()', but don't read past `text_end' */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf8_n,(/*utf-8*/char const **__restrict __ptext, char const *__text_end),unicode_readutf8_n,(__ptext,__text_end))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf8_n,(/*utf-8*/ char const **__restrict __ptext, char const *__text_end),unicode_readutf8_n,(__ptext,__text_end))
 #else /* LIBC: unicode_readutf8_n */
 #include <local/unicode/unicode_readutf8_n.h>
 /* Same as `unicode_readutf8()', but don't read past `text_end' */
@@ -55,7 +55,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: * : A pointer after the last written UTF-16 character */
 __LOCAL_LIBC(unicode_8to16) __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __CHAR16_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_8to16))(/*utf-16*/__CHAR16_TYPE__ *__restrict __utf16_dst,
-                                                           /*utf-8*/char const *__restrict __utf8_text,
+                                                           /*utf-8*/ char const *__restrict __utf8_text,
                                                            __SIZE_TYPE__ __utf8_characters) {
 #line 973 "kos/src/libc/magic/unicode.c"
 	char const *__utf8_end = __utf8_text + __utf8_characters;

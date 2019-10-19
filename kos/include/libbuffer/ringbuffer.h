@@ -20,19 +20,21 @@
 #define _LIBBUFFER_RINGBUFFER_H 1
 
 #include "api.h"
+
+#include <hybrid/sync/atomic-rwlock.h>
+
 #include <bits/types.h>
 #include <kos/anno.h>
 #include <kos/hybrid/sched-signal.h>
-#include <hybrid/sync/atomic-rwlock.h>
 
 #ifndef __INTELLISENSE__
 #include <hybrid/__atomic.h>
 #endif /* !__INTELLISENSE__ */
 
 #ifdef __KERNEL__
-#include <kernel/heap.h>   /* heap_free */
+#include <kernel/heap.h> /* heap_free */
 #else /* __KERNEL__ */
-#include <libc/malloc.h>   /* __libc_free */
+#include <libc/malloc.h> /* __libc_free */
 #endif /* !__KERNEL__ */
 
 
@@ -61,18 +63,24 @@ struct ringbuffer {
 };
 
 /* Static initialization */
-#define RINGBUFFER_DEFAULT_LIMIT           4096
-#define RINGBUFFER_FREE_THRESHOLD(limit) (((limit) >> 4) >= 32 ? ((limit) >> 4) : 32) /* Trim the buffer if more than `RINGBUFFER_FREE_THRESHOLD(LIMIT)' bytes are unused */
-#define RINGBUFFER_INIT_EX(limit)  { ATOMIC_RWLOCK_INIT, __NULLPTR, 0, 0, 0, 0, limit, SCHED_SIGNAL_INIT, SCHED_SIGNAL_INIT }
-#define RINGBUFFER_INIT              RINGBUFFER_INIT_EX(RINGBUFFER_DEFAULT_LIMIT)
+#define RINGBUFFER_DEFAULT_LIMIT         4096
+
+/* Trim the buffer if more than `RINGBUFFER_FREE_THRESHOLD(LIMIT)' bytes are unused */
+#define RINGBUFFER_FREE_THRESHOLD(limit) \
+	(((limit) >> 4) >= 32 ? ((limit) >> 4) : 32)
+
+#define RINGBUFFER_INIT_EX(limit) \
+	{ ATOMIC_RWLOCK_INIT, __NULLPTR, 0, 0, 0, 0, limit, SCHED_SIGNAL_INIT, SCHED_SIGNAL_INIT }
+#define RINGBUFFER_INIT \
+	RINGBUFFER_INIT_EX(RINGBUFFER_DEFAULT_LIMIT)
 
 /* Initialization / finalization */
-#define ringbuffer_init_ex(self, limit) \
+#define ringbuffer_init_ex(self, limit)                                           \
 	(atomic_rwlock_init(&(self)->rb_lock), (self)->rb_data = __NULLPTR,           \
 	 (self)->rb_size = (self)->rb_rptr = (self)->rb_avail = (self)->rb_rdtot = 0, \
 	 (self)->rb_limit = (limit), sched_signal_init(&(self)->rb_nempty),           \
 	 sched_signal_init(&(self)->rb_nfull))
-#define ringbuffer_cinit_ex(self, limit) \
+#define ringbuffer_cinit_ex(self, limit)            \
 	(atomic_rwlock_cinit(&(self)->rb_lock),         \
 	 __hybrid_assert((self)->rb_data == __NULLPTR), \
 	 __hybrid_assert((self)->rb_size == 0),         \
@@ -86,7 +94,7 @@ struct ringbuffer {
 #define ringbuffer_cinit(self) ringbuffer_cinit_ex(self, RINGBUFFER_DEFAULT_LIMIT)
 
 #ifdef __KERNEL__
-#define ringbuffer_fini(self) \
+#define ringbuffer_fini(self)                                                        \
 	((self)->rb_size                                                                 \
 	 ? heap_free(&kernel_default_heap, (self)->rb_data, (self)->rb_size, GFP_NORMAL) \
 	 : (void)0)
@@ -98,13 +106,14 @@ struct ringbuffer {
 
 /* Close the given ring buffer, waking any remaining readers or writers. */
 #ifdef __INTELLISENSE__
-__NOBLOCK void __NOTHROW(ringbuffer_close)(struct ringbuffer *__restrict self);
-#else
-#define ringbuffer_close(self) \
+__NOBLOCK __ATTR_NONNULL((1)) void
+__NOTHROW(ringbuffer_close)(struct ringbuffer *__restrict self);
+#else /* __INTELLISENSE__ */
+#define ringbuffer_close(self)                                     \
 	(__hybrid_atomic_store((self)->rb_limit, 0, __ATOMIC_RELEASE), \
 	 sched_signal_broadcast(&(self)->rb_nempty),                   \
 	 sched_signal_broadcast(&(self)->rb_nfull))
-#endif
+#endif /* !__INTELLISENSE__ */
 
 #ifdef __KERNEL__
 #define __KERNEL_SELECT(if_kernel, if_not_kernel) if_kernel
@@ -119,22 +128,22 @@ __NOBLOCK void __NOTHROW(ringbuffer_close)(struct ringbuffer *__restrict self);
  * NOTE: `ringbuffer_read_nonblock()' can still throw `E_WOULDBLOCK' because
  *        it may call `task_yield()' when trying to acquire `self->rb_lock'
  * @return: * : The number of bytes read. */
-typedef __NOCONNECT __KERNEL_SELECT(__size_t, __ssize_t)
+typedef __NOCONNECT __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t)
 (LIBBUFFER_CC *PRINGBUFFER_READ)(struct ringbuffer *__restrict __self,
                                  __USER __CHECKED void *__dst,
                                  __size_t __num_bytes)
 		__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, ...);
-typedef __size_t
+typedef __ATTR_NONNULL((1)) __size_t
 (LIBBUFFER_CC *PRINGBUFFER_READ_NONBLOCK)(struct ringbuffer *__restrict __self,
                                           __USER __CHECKED void *__dst,
                                           __size_t __num_bytes)
 		__THROWS(E_SEGFAULT, E_WOULDBLOCK);
 #ifdef LIBBUFFER_WANT_PROTOTYPES
-LIBBUFFER_DECL __NOCONNECT __KERNEL_SELECT(__size_t, __ssize_t) LIBBUFFER_CC
+LIBBUFFER_DECL __NOCONNECT __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t) LIBBUFFER_CC
 ringbuffer_read(struct ringbuffer *__restrict __self,
                 __USER __CHECKED void *__dst, __size_t __num_bytes)
 		__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, ...);
-LIBBUFFER_DECL __size_t LIBBUFFER_CC
+LIBBUFFER_DECL __ATTR_NONNULL((1)) __size_t LIBBUFFER_CC
 ringbuffer_read_nonblock(struct ringbuffer *__restrict __self,
                          __USER __CHECKED void *__dst, __size_t __num_bytes)
 		__THROWS(E_SEGFAULT, E_WOULDBLOCK);
@@ -156,36 +165,36 @@ ringbuffer_read_nonblock(struct ringbuffer *__restrict __self,
  *        or when allocating more heap memory.
  * @return: * : The number of bytes written.
  * @return: -1: [USERSPACE] Failed to increase the buffer size (s.a. `errno = ENOMEM') */
-typedef __NOCONNECT __KERNEL_SELECT(__size_t, __ssize_t)
+typedef __NOCONNECT __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t)
 (LIBBUFFER_CC *PRINGBUFFER_WRITE)(struct ringbuffer *__restrict __self,
                                   __USER __CHECKED void const *__src,
                                   __size_t __num_bytes)
 		__KERNEL_SELECT(__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, ...),
 		                __THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, ...));
-typedef __NOCONNECT __KERNEL_SELECT(__size_t, __ssize_t)
+typedef __NOCONNECT __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t)
 (LIBBUFFER_CC *PRINGBUFFER_WRITESOME)(struct ringbuffer *__restrict __self,
                                       __USER __CHECKED void const *__src,
                                       __size_t __num_bytes)
 		__KERNEL_SELECT(__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, ...),
 		                __THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, ...));
-typedef __KERNEL_SELECT(__size_t, __ssize_t)
+typedef __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t)
 (LIBBUFFER_CC *PRINGBUFFER_WRITE_NONBLOCK)(struct ringbuffer *__restrict __self,
                                            __USER __CHECKED void const *__src,
                                            __size_t __num_bytes)
 		__KERNEL_SELECT(__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_BADALLOC),
 		                __THROWS(E_SEGFAULT, E_WOULDBLOCK));
 #ifdef LIBBUFFER_WANT_PROTOTYPES
-LIBBUFFER_DECL __NOCONNECT __KERNEL_SELECT(__size_t, __ssize_t) LIBBUFFER_CC
+LIBBUFFER_DECL __NOCONNECT __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t) LIBBUFFER_CC
 ringbuffer_write(struct ringbuffer *__restrict __self,
                  __USER __CHECKED void const *__src, __size_t __num_bytes)
 		__KERNEL_SELECT(__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, ...),
 		                __THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, ...));
-LIBBUFFER_DECL __NOCONNECT __KERNEL_SELECT(__size_t, __ssize_t) LIBBUFFER_CC
+LIBBUFFER_DECL __NOCONNECT __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t) LIBBUFFER_CC
 ringbuffer_writesome(struct ringbuffer *__restrict __self,
                      __USER __CHECKED void const *__src, __size_t __num_bytes)
 		__KERNEL_SELECT(__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, ...),
 		                __THROWS(E_SEGFAULT, E_WOULDBLOCK, E_INTERRUPT, ...));
-LIBBUFFER_DECL __KERNEL_SELECT(__size_t, __ssize_t) LIBBUFFER_CC
+LIBBUFFER_DECL __ATTR_NONNULL((1)) __KERNEL_SELECT(__size_t, __ssize_t) LIBBUFFER_CC
 ringbuffer_write_nonblock(struct ringbuffer *__restrict __self,
                           __USER __CHECKED void const *__src, __size_t __num_bytes)
 		__KERNEL_SELECT(__THROWS(E_SEGFAULT, E_WOULDBLOCK, E_BADALLOC),
@@ -193,13 +202,13 @@ ringbuffer_write_nonblock(struct ringbuffer *__restrict __self,
 #endif /* LIBBUFFER_WANT_PROTOTYPES */
 
 /* Same as `ringbuffer_write_nonblock()', but don't increase the buffer's size. */
-typedef __size_t
+typedef __ATTR_NONNULL((1)) __size_t
 (LIBBUFFER_CC *PRINGBUFFER_WRITE_NONBLOCK_NOALLOC)(struct ringbuffer *__restrict __self,
                                                    __USER __CHECKED void const *__src,
                                                    __size_t __num_bytes)
 		__THROWS(E_SEGFAULT, E_WOULDBLOCK);
 #ifdef LIBBUFFER_WANT_PROTOTYPES
-LIBBUFFER_DECL __size_t LIBBUFFER_CC
+LIBBUFFER_DECL __ATTR_NONNULL((1)) __size_t LIBBUFFER_CC
 ringbuffer_write_nonblock_noalloc(struct ringbuffer *__restrict __self,
                                   __USER __CHECKED void const *__src, __size_t __num_bytes)
 		__THROWS(E_SEGFAULT, E_WOULDBLOCK);
@@ -207,19 +216,19 @@ ringbuffer_write_nonblock_noalloc(struct ringbuffer *__restrict __self,
 
 /* XXX: Dedicated functions for these? */
 #ifdef LIBBUFFER_WANT_PROTOTYPES
-__FORCELOCAL __NOCONNECT __size_t LIBBUFFER_CC
+__FORCELOCAL __NOCONNECT __ATTR_NONNULL((1)) __size_t LIBBUFFER_CC
 ringbuffer_putc(struct ringbuffer *__restrict __self, __byte_t __ch)
 		__KERNEL_SELECT(__THROWS(E_WOULDBLOCK, E_INTERRUPT, E_BADALLOC, ...),
 		                __THROWS(E_WOULDBLOCK, E_INTERRUPT, ...)) {
 	return ringbuffer_write(__self, &__ch, 1);
 }
-__FORCELOCAL __size_t LIBBUFFER_CC
+__FORCELOCAL __ATTR_NONNULL((1)) __size_t LIBBUFFER_CC
 ringbuffer_putc_nonblock(struct ringbuffer *__restrict __self, __byte_t __ch)
 		__KERNEL_SELECT(__THROWS(E_WOULDBLOCK, E_BADALLOC),
 		                __THROWS(E_WOULDBLOCK)) {
 	return ringbuffer_write_nonblock(__self, &__ch, 1);
 }
-__FORCELOCAL __size_t LIBBUFFER_CC
+__FORCELOCAL __ATTR_NONNULL((1)) __size_t LIBBUFFER_CC
 __ringbuffer_putc_nonblock_noalloc(struct ringbuffer *__restrict __self, __byte_t __ch)
 		__THROWS(E_WOULDBLOCK) {
 	return ringbuffer_write_nonblock_noalloc(__self, &__ch, 1);
@@ -231,13 +240,13 @@ __ringbuffer_putc_nonblock_noalloc(struct ringbuffer *__restrict __self, __byte_
 /* Try to unread up to `num_bytes' of data that had yet to be re-written
  * @param: P_RDTOT: When non-NULL, store the new number of total read bytes since the last re-size in there
  * @return: * : The actual number of unread bytes. */
-typedef __size_t
+typedef __ATTR_NONNULL((1)) __size_t
 (LIBBUFFER_CC *PRINGBUFFER_UNREAD)(struct ringbuffer *__restrict __self,
                                    __size_t __num_bytes,
                                    __size_t *__p_rdtot /*__DFL(__NULLPTR)*/)
 		__THROWS(E_WOULDBLOCK);
 #ifdef LIBBUFFER_WANT_PROTOTYPES
-LIBBUFFER_DECL __size_t LIBBUFFER_CC
+LIBBUFFER_DECL __ATTR_NONNULL((1)) __size_t LIBBUFFER_CC
 ringbuffer_unread(struct ringbuffer *__restrict __self,
                   __size_t __num_bytes,
                   __size_t *__p_rdtot __DFL(__NULLPTR))
@@ -247,15 +256,16 @@ ringbuffer_unread(struct ringbuffer *__restrict __self,
 /* Skip up to `num_bytes' of unread data, returning the actual number of skipped bytes.
  * @param: p_rdtot: When non-NULL, store the new number of total read bytes since the last re-size in there
  * @return: * : The actual number of skipped bytes. */
-typedef __size_t
+typedef __ATTR_NONNULL((1)) __size_t
 (LIBBUFFER_CC *PRINGBUFFER_SKIPREAD)(struct ringbuffer *__restrict __self,
                                      __size_t __num_bytes,
                                      __size_t *__p_rdtot /*__DFL(__NULLPTR)*/)
 		__THROWS(E_WOULDBLOCK);
 #ifdef LIBBUFFER_WANT_PROTOTYPES
-LIBBUFFER_DECL __size_t LIBBUFFER_CC
+LIBBUFFER_DECL __ATTR_NONNULL((1)) __size_t LIBBUFFER_CC
 ringbuffer_skipread(struct ringbuffer *__restrict __self,
-                    __size_t __num_bytes, __size_t *__p_rdtot __DFL(__NULLPTR))
+                    __size_t __num_bytes,
+                    __size_t *__p_rdtot __DFL(__NULLPTR))
 		__THROWS(E_WOULDBLOCK);
 #endif /* LIBBUFFER_WANT_PROTOTYPES */
 
@@ -264,12 +274,12 @@ ringbuffer_skipread(struct ringbuffer *__restrict __self,
  * for `offset' will call `ringbuffer_unread()', whilst positive values will call
  * `ringbuffer_skipread()'
  * The return value is always the new total number of read bytes since the last re-size. */
-typedef __size_t
+typedef __ATTR_NONNULL((1)) __size_t
 (LIBBUFFER_CC *PRINGBUFFER_RSEEK)(struct ringbuffer *__restrict __self,
                                   __ssize_t __offset)
 		__THROWS(E_WOULDBLOCK);
 #ifdef LIBBUFFER_WANT_PROTOTYPES
-LIBBUFFER_DECL __size_t LIBBUFFER_CC
+LIBBUFFER_DECL __ATTR_NONNULL((1)) __size_t LIBBUFFER_CC
 ringbuffer_rseek(struct ringbuffer *__restrict __self, __ssize_t __offset)
 		__THROWS(E_WOULDBLOCK);
 #endif /* LIBBUFFER_WANT_PROTOTYPES */
@@ -277,27 +287,28 @@ ringbuffer_rseek(struct ringbuffer *__restrict __self, __ssize_t __offset)
 /* Try to unwrite up to `num_bytes' of data that had yet to be read
  * @param: P_WRTOT: When non-NULL, store the new number of total written bytes since the last re-size in there
  * @return: * : The actual number of unwritten bytes. */
-typedef __size_t
+typedef __ATTR_NONNULL((1)) __size_t
 (LIBBUFFER_CC *PRINGBUFFER_UNWRITE)(struct ringbuffer *__restrict __self,
                                     __size_t __num_bytes,
                                     __size_t *__p_wrtot /*__DFL(__NULLPTR)*/)
 		__THROWS(E_WOULDBLOCK);
 #ifdef LIBBUFFER_WANT_PROTOTYPES
-LIBBUFFER_DECL __size_t LIBBUFFER_CC
+LIBBUFFER_DECL __ATTR_NONNULL((1)) __size_t LIBBUFFER_CC
 ringbuffer_unwrite(struct ringbuffer *__restrict __self,
-                   __size_t __num_bytes, __size_t *__p_wrtot __DFL(__NULLPTR))
+                   __size_t __num_bytes,
+                   __size_t *__p_wrtot __DFL(__NULLPTR))
 		__THROWS(E_WOULDBLOCK);
 #endif /* LIBBUFFER_WANT_PROTOTYPES */
 
 /* By using `ringbuffer_unwrite()', implement support for SEEK_CUR when `offset' is negative
  * Alternatively, when `offset' is positive, don't do anything.
  * The return value is always the new total number of written bytes since the last re-size. */
-typedef __size_t
+typedef __ATTR_NONNULL((1)) __size_t
 (LIBBUFFER_CC *PRINGBUFFER_WSEEK)(struct ringbuffer *__restrict __self,
                                   __ssize_t __offset)
 		__THROWS(E_WOULDBLOCK);
 #ifdef LIBBUFFER_WANT_PROTOTYPES
-LIBBUFFER_DECL __size_t LIBBUFFER_CC
+LIBBUFFER_DECL __ATTR_NONNULL((1)) __size_t LIBBUFFER_CC
 ringbuffer_wseek(struct ringbuffer *__restrict __self, __ssize_t __offset)
 		__THROWS(E_WOULDBLOCK);
 #endif /* LIBBUFFER_WANT_PROTOTYPES */
@@ -305,12 +316,12 @@ ringbuffer_wseek(struct ringbuffer *__restrict __self, __ssize_t __offset)
 /* Set the total amount of written, but yet-to-be read bytes.
  * If `num_bytes' is larger than the previous total number of written bytes, don't truncate the buffer.
  * @return: * : The actual number of now written bytes. */
-typedef __size_t
+typedef __ATTR_NONNULL((1)) __size_t
 (LIBBUFFER_CC *PRINGBUFFER_SETWRITTEN)(struct ringbuffer *__restrict __self,
                                        __size_t __num_bytes)
 		__THROWS(E_WOULDBLOCK);
 #ifdef LIBBUFFER_WANT_PROTOTYPES
-LIBBUFFER_DECL __size_t LIBBUFFER_CC
+LIBBUFFER_DECL __ATTR_NONNULL((1)) __size_t LIBBUFFER_CC
 ringbuffer_setwritten(struct ringbuffer *__restrict __self, __size_t __num_bytes)
 		__THROWS(E_WOULDBLOCK);
 #endif /* LIBBUFFER_WANT_PROTOTYPES */
@@ -323,12 +334,12 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 #endif /* !poll_mode_t_defined */
 
 /* Poll the given ring buffer `self' for reading (`POLLIN') or writing (`POLLOUT') */
-typedef poll_mode_t
+typedef __ATTR_NONNULL((1)) poll_mode_t
 (LIBBUFFER_CC *PRINGBUFFER_POLL)(struct ringbuffer *__restrict __self,
                                  poll_mode_t __what)
 		__THROWS(E_BADALLOC, E_WOULDBLOCK);
 #ifdef LIBBUFFER_WANT_PROTOTYPES
-LIBBUFFER_DECL poll_mode_t LIBBUFFER_CC
+LIBBUFFER_DECL __ATTR_NONNULL((1)) poll_mode_t LIBBUFFER_CC
 ringbuffer_poll(struct ringbuffer *__restrict __self,
                 poll_mode_t __what)
 		__THROWS(E_BADALLOC, E_WOULDBLOCK);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7de59710 */
+/* HASH CRC-32:0x29d3290a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,7 +50,7 @@ DECL_BEGIN
  *                  (e.g. `format_aprintf_printer(&my_printer, "\0", 1)') */
 INTDEF WUNUSED ATTR_MALL_DEFAULT_ALIGNED ATTR_MALLOC NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_format_aprintf_pack)(struct format_aprintf_data *__restrict self, size_t *pstrlen);
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
-INTDEF WUNUSED NONNULL((1, 2)) ssize_t NOTHROW_NCX(LIBCCALL libc_format_aprintf_printer)(/*struct format_aprintf_data **/void *arg, /*utf-8*/char const *__restrict data, size_t datalen);
+INTDEF WUNUSED NONNULL((1, 2)) ssize_t NOTHROW_NCX(LIBCCALL libc_format_aprintf_printer)(/*struct format_aprintf_data **/void *arg, /*utf-8*/ char const *__restrict data, size_t datalen);
 
 DECL_END
 

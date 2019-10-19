@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x10e61869 */
+/* HASH CRC-32:0x5631f16 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 #define ____localdep_unicode_readutf8_n_defined 1
 #if defined(__CRT_HAVE_unicode_readutf8_n)
 /* Same as `unicode_readutf8()', but don't read past `text_end' */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf8_n,(/*utf-8*/char const **__restrict __ptext, char const *__text_end),unicode_readutf8_n,(__ptext,__text_end))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf8_n,(/*utf-8*/ char const **__restrict __ptext, char const *__text_end),unicode_readutf8_n,(__ptext,__text_end))
 #else /* LIBC: unicode_readutf8_n */
 #include <local/unicode/unicode_readutf8_n.h>
 /* Same as `unicode_readutf8()', but don't read past `text_end' */
@@ -51,7 +51,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(format_escape) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(format_escape))(__pformatprinter __printer,
                                               void *__arg,
-                                              /*utf-8*/char const *__restrict __text,
+                                              /*utf-8*/ char const *__restrict __text,
                                               __SIZE_TYPE__ __textlen,
                                               unsigned int __flags) __THROWS(...) {
 #line 184 "kos/src/libc/magic/format-printer.c"

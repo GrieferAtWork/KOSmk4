@@ -35,14 +35,14 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 struct argv_append_data {
-	/*utf-8*/char **aad_argv; /* [1..1][1..aad_argc|alloc(aad_arga)][owned] Argument vector */
-	size_t          aad_argc; /* Used argument count */
-	size_t          aad_arga; /* Allocated argument count */
+	/*utf-8*/ char **aad_argv; /* [1..1][1..aad_argc|alloc(aad_arga)][owned] Argument vector */
+	size_t           aad_argc; /* Used argument count */
+	size_t           aad_arga; /* Allocated argument count */
 };
 
 PRIVATE NONNULL((1, 2)) ssize_t __LIBCCALL
 argv_append(void *__restrict arg,
-            /*utf-8*/char const *__restrict data,
+            /*utf-8*/ char const *__restrict data,
             size_t UNUSED(len)) {
 	struct argv_append_data *buf;
 	buf = (struct argv_append_data *)arg;
@@ -70,8 +70,8 @@ argv_append(void *__restrict arg,
  * When `pargc' is non-NULL, store the number of arguments leading
  * up to (but not including) the terminating NULL-entry.
  * Upon error, NULL is returned. */
-INTERN WUNUSED ATTR_MALLOC NONNULL((1)) /*utf-8*/char **CC
-libcmdline_decode_argv(/*utf-8*/char *__restrict cmdline, size_t *pargc) {
+INTERN WUNUSED ATTR_MALLOC NONNULL((1)) /*utf-8*/ char **CC
+libcmdline_decode_argv(/*utf-8*/ char *__restrict cmdline, size_t *pargc) {
 	struct argv_append_data buf;
 	buf.aad_argc = 0;
 	buf.aad_arga = 8;
@@ -132,7 +132,7 @@ err:
  *     >ls "" foo<              { "ls", "", "foo" }     // Empty argument!
  */
 INTERN NONNULL((1, 2)) ssize_t CC
-libcmdline_decode(/*utf-8*/char *__restrict cmdline,
+libcmdline_decode(/*utf-8*/ char *__restrict cmdline,
                   pformatprinter arg_printer,
                   void *arg_printer_arg) {
 	char *cmdline_end;
@@ -305,7 +305,7 @@ cmdline_flatten_callback(void *arg,
  * @param: pendptr: When non-NULL, store a pointer to one byte past the end of the last argument
  * @return: * :     The total number of individual argument strings. */
 INTERN NONNULL((1)) size_t CC
-libcmdline_split(/*utf-8*/char *__restrict cmdline, char **pendptr) {
+libcmdline_split(/*utf-8*/ char *__restrict cmdline, char **pendptr) {
 	size_t result;
 	result = (size_t)libcmdline_decode(cmdline,
 	                                   &cmdline_flatten_callback,

@@ -185,7 +185,7 @@ NOTHROW_NCX(CC libjson_parser_printstring)(struct json_parser *__restrict self,
  * @return: NULL:   An error occurred; when `perror` is non-NULL, that error is stored there:
  *                   - JSON_ERROR_NOOBJ:  Parser didn't point at a string object.
  *                   - JSON_ERROR_SYNTAX: Syntax error */
-INTDEF WUNUSED NONNULL((1)) /*utf-8*/char *
+INTDEF WUNUSED NONNULL((1)) /*utf-8*/ char *
 NOTHROW_NCX(CC libjson_parser_getstring)(struct json_parser *__restrict self,
                                          size_t *plength, int *perror);
 

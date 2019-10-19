@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x60ccdb02 */
+/* HASH CRC-32:0xd4e9a04e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -127,7 +127,7 @@ INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_escape") ssize_t
 (LIBCCALL libc_format_escape)(pformatprinter printer,
                               void *arg,
-                              /*utf-8*/char const *__restrict text,
+                              /*utf-8*/ char const *__restrict text,
                               size_t textlen,
                               unsigned int flags) __THROWS(...) {
 #line 184 "kos/src/libc/magic/format-printer.c"
@@ -988,7 +988,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_scanf") ssize_t
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_sprintf_printer") ssize_t
 NOTHROW_NCX(LIBCCALL libc_format_sprintf_printer)(/*char ***/void *arg,
-                                                  /*utf-8*/char const *__restrict data,
+                                                  /*utf-8*/ char const *__restrict data,
                                                   size_t datalen) {
 #line 941 "kos/src/libc/magic/format-printer.c"
 
@@ -1007,7 +1007,7 @@ NOTHROW_NCX(LIBCCALL libc_format_sprintf_printer)(/*char ***/void *arg,
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_snprintf_printer") ssize_t
 NOTHROW_NCX(LIBCCALL libc_format_snprintf_printer)(/*struct format_snprintf_data**/void *arg,
-                                                   /*utf-8*/char const *__restrict data,
+                                                   /*utf-8*/ char const *__restrict data,
                                                    size_t datalen) {
 #line 973 "kos/src/libc/magic/format-printer.c"
 	struct format_snprintf_data_ {
@@ -1034,7 +1034,7 @@ NOTHROW_NCX(LIBCCALL libc_format_snprintf_printer)(/*struct format_snprintf_data
 INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_width") ssize_t
 NOTHROW_NCX(LIBCCALL libc_format_width)(void *arg,
-                                        /*utf-8*/char const *__restrict data,
+                                        /*utf-8*/ char const *__restrict data,
                                         size_t datalen) {
 #line 996 "kos/src/libc/magic/format-printer.c"
 	size_t result = 0;
@@ -1056,7 +1056,7 @@ NOTHROW_NCX(LIBCCALL libc_format_width)(void *arg,
 /* Always re-return `datalen' and ignore all other arguments */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_length") ssize_t
 NOTHROW_NCX(LIBCCALL libc_format_length)(void *arg,
-                                         /*utf-8*/char const *__restrict data,
+                                         /*utf-8*/ char const *__restrict data,
                                          size_t datalen) {
 #line 1014 "kos/src/libc/magic/format-printer.c"
 	(void)arg;

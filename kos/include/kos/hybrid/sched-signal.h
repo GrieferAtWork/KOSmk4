@@ -25,8 +25,9 @@
 
 #include <__crt.h>
 #include <__stdinc.h>
-#include <hybrid/typecore.h>
+
 #include <hybrid/__assert.h>
+#include <hybrid/typecore.h>
 
 #ifdef __KERNEL__
 #include <sched/signal.h>

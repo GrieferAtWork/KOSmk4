@@ -172,7 +172,7 @@ again_old_flags:
 DEFINE_INTERN_ALIAS(libdl_dlfopen, DlModule_OpenFd);
 DEFINE_PUBLIC_ALIAS(dlfopen, libdl_dlfopen);
 INTERN REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *LIBCCALL
-DlModule_OpenFd(fd_t fd, unsigned int mode) {
+DlModule_OpenFd(/*inherit(on_success)*/ fd_t fd, unsigned int mode) {
 	REF DlModule *result;
 	char *rp = realpath_malloc(fd);
 	if unlikely(!rp)
@@ -460,7 +460,7 @@ err:
 
 
 INTERN REF_IF(!(mode & RTLD_NODELETE)) DlModule *CC
-DlModule_OpenLoadedProgramHeaders(/*inherit(on_success,HEAP)*/char *__restrict filename,
+DlModule_OpenLoadedProgramHeaders(/*inherit(on_success,HEAP)*/ char *__restrict filename,
                                   uint16_t pnum, Elf_Phdr *__restrict phdr,
                                   uintptr_t loadaddr, unsigned int mode) {
 	REF DlModule *result;
@@ -553,8 +553,8 @@ err:
 
 
 PRIVATE REF DlModule *CC
-DlModule_MapProgramHeaders(/*inherit(on_success,HEAP)*/char *__restrict filename,
-                           /*inherit(on_success)*/fd_t fd) {
+DlModule_MapProgramHeaders(/*inherit(on_success,HEAP)*/ char *__restrict filename,
+                           /*inherit(on_success)*/ fd_t fd) {
 	Elf_Ehdr ehdr;
 	uint16_t pidx;
 	REF DlModule *result;
@@ -630,8 +630,8 @@ err:
 
 
 INTERN REF_IF(!(return->dm_flags & RTLD_NODELETE)) DlModule *CC
-DlModule_OpenFilenameAndFd(/*inherit(on_success,HEAP)*/char *__restrict filename,
-                           /*inherit(on_success)*/fd_t fd, unsigned int mode) {
+DlModule_OpenFilenameAndFd(/*inherit(on_success,HEAP)*/ char *__restrict filename,
+                           /*inherit(on_success)*/ fd_t fd, unsigned int mode) {
 	REF DlModule *result;
 	result = DlModule_FindFromFilename(filename);
 	if (result)

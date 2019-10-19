@@ -102,7 +102,7 @@ typedef __ATTR_NONNULL((1)) __size_t
 (LIBCMDLINE_CC *PCMDLINE_SPLIT)(/*utf-8*/ char *__restrict cmdline, char **pendptr);
 #ifdef LIBCMDLINE_WANT_PROTOTYPES
 LIBCMDLINE_DECL __ATTR_NONNULL((1)) __size_t LIBCMDLINE_CC
-cmdline_split(/*utf-8*/char *__restrict cmdline, char **pendptr);
+cmdline_split(/*utf-8*/ char *__restrict cmdline, char **pendptr);
 #endif /* LIBCMDLINE_WANT_PROTOTYPES */
 
 

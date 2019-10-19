@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc43c0410 */
+/* HASH CRC-32:0xae300b71 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@ __NAMESPACE_LOCAL_BEGIN
  * starting out as a pointer after the character to be read, before
  * being updated to point to the start of the character that was read */
 __LOCAL_LIBC(unicode_readutf8_rev) __ATTR_NONNULL((1)) __CHAR32_TYPE__
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_readutf8_rev))(/*utf-8*/char const **__restrict __ptext) {
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(unicode_readutf8_rev))(/*utf-8*/ char const **__restrict __ptext) {
 #line 200 "kos/src/libc/magic/unicode.c"
 	__CHAR32_TYPE__ __result;
 	char const *__iter = *__ptext;

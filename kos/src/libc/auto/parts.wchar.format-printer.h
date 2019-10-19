@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x79c5b0fe */
+/* HASH CRC-32:0xb839da09 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,7 +50,7 @@ INTDEF NONNULL((1)) ssize_t NOTHROW_NCX(LIBDCALL libd_format_wrepeat)(pc16format
  * with the `FORMAT_ESCAPE_FFORCE*' flags
  * @param: PRINTER: A function called for all quoted portions of the text
  * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
-INTDEF NONNULL((1)) ssize_t NOTHROW_NCX(LIBCCALL libc_format_wescape)(pc32formatprinter printer, void *arg, /*utf-8*/char32_t const *__restrict text, size_t textlen, unsigned int flags);
+INTDEF NONNULL((1)) ssize_t NOTHROW_NCX(LIBCCALL libc_format_wescape)(pc32formatprinter printer, void *arg, /*utf-8*/ char32_t const *__restrict text, size_t textlen, unsigned int flags);
 /* Do C-style escape on the given text, printing it to the given printer.
  * Input:
  * >> Hello "World" W
@@ -64,7 +64,7 @@ INTDEF NONNULL((1)) ssize_t NOTHROW_NCX(LIBCCALL libc_format_wescape)(pc32format
  * with the `FORMAT_ESCAPE_FFORCE*' flags
  * @param: PRINTER: A function called for all quoted portions of the text
  * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
-INTDEF NONNULL((1)) ssize_t NOTHROW_NCX(LIBDCALL libd_format_wescape)(pc16formatprinter printer, void *arg, /*utf-8*/char16_t const *__restrict text, size_t textlen, unsigned int flags);
+INTDEF NONNULL((1)) ssize_t NOTHROW_NCX(LIBDCALL libd_format_wescape)(pc16formatprinter printer, void *arg, /*utf-8*/ char16_t const *__restrict text, size_t textlen, unsigned int flags);
 /* Print a hex dump of the given data using the provided format printer
  * @param: PRINTER:  A function called for all quoted portions of the text
  * @param: DATA:     A pointer to the data that should be dumped

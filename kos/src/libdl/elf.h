@@ -306,7 +306,7 @@ INTDEF void CC DlModule_Destroy(DlModule *__restrict self);
 /* Open a DL Module.
  * @return: NULL: Failed to open the module. (no error is set if the file could not be found
  *                in a call to one of `DlModule_OpenFilename' or `DlModule_OpenFilenameInPath') */
-INTDEF REF DlModule *LIBCCALL DlModule_OpenFd(/*inherit(on_success)*/fd_t fd, unsigned int mode);
+INTDEF REF DlModule *LIBCCALL DlModule_OpenFd(/*inherit(on_success)*/ fd_t fd, unsigned int mode);
 INTDEF REF DlModule *CC DlModule_OpenFilename(char const *__restrict filename, unsigned int mode);
 INTDEF REF DlModule *CC DlModule_OpenFilenameInPath(char const *__restrict path, size_t pathlen,
                                                     char const *__restrict filename, size_t filenamelen,
@@ -314,9 +314,9 @@ INTDEF REF DlModule *CC DlModule_OpenFilenameInPath(char const *__restrict path,
 INTDEF REF DlModule *CC DlModule_OpenFilenameInPathList(char const *__restrict path,
                                                         char const *__restrict filename,
                                                         unsigned int mode);
-INTDEF REF DlModule *CC DlModule_OpenFilenameAndFd(/*inherit(on_success,HEAP)*/char *__restrict filename,
-                                                   /*inherit(on_success)*/fd_t fd, unsigned int mode);
-INTDEF REF DlModule *CC DlModule_OpenLoadedProgramHeaders(/*inherit(on_success,HEAP)*/char *__restrict filename,
+INTDEF REF DlModule *CC DlModule_OpenFilenameAndFd(/*inherit(on_success,HEAP)*/ char *__restrict filename,
+                                                   /*inherit(on_success)*/ fd_t fd, unsigned int mode);
+INTDEF REF DlModule *CC DlModule_OpenLoadedProgramHeaders(/*inherit(on_success,HEAP)*/ char *__restrict filename,
                                                           uint16_t pnum, Elf_Phdr *__restrict phdr,
                                                           uintptr_t loadaddr, unsigned int mode);
 /* Try to find an already-loaded module. */
