@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd07a9959 */
+/* HASH CRC-32:0x791294f1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1097,7 +1097,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_CONST,__STDC_INT_AS_SIZE_T,__NOTHROW,ffs,(int _
 __NAMESPACE_LOCAL_USING_OR_IMPL(ffs, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __STDC_INT_AS_SIZE_T __NOTHROW(__LIBCCALL ffs)(int __i) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ffs))(__i); })
 #endif /* ffs... */
 #ifdef __USE_KOS
-#include <hybrid/bit.h>
+#include <hybrid/__bit.h>
 /* unsigned int FFS(INTEGER i):
  *     FindFirstSet
  *     Returns the index (starting at 1 for 0x01) of the first

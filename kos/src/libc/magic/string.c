@@ -793,7 +793,7 @@ ffs:(int i) -> __STDC_INT_AS_SIZE_T {
 
 %{
 #ifdef __USE_KOS
-#include <hybrid/bit.h>
+#include <hybrid/__bit.h>
 /* unsigned int FFS(INTEGER i):
  *     FindFirstSet
  *     Returns the index (starting at 1 for 0x01) of the first
