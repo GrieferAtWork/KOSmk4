@@ -549,7 +549,7 @@ EOF
 		ZLIB_VERISON="$ZLIB_VERISON_MAJOR.2.11"
 		SRCPATH="$KOS_ROOT/binutils/src/zlib-$ZLIB_VERISON"
 		OPTPATH="$BINUTILS_SYSROOT/opt/zlib-$ZLIB_VERISON"
-		if ! [ -f "$OPTPATH/lib/libz.so.$ZLIB_VERISON" ]; then
+		if ! [ -f "$OPTPATH/libz.so.$ZLIB_VERISON" ]; then
 			if ! [ -f "$OPTPATH/Makefile" ]; then
 				if ! [ -f "$SRCPATH/configure" ]; then
 					cmd cd "$KOS_ROOT/binutils/src"
