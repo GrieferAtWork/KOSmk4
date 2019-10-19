@@ -214,6 +214,7 @@ case $UTILITY_NAME in
 		cmd bash "$KOS_MISC/make_utility.sh" "$TARGET_NAME" tcc
 		cmd bash "$KOS_MISC/make_utility.sh" "$TARGET_NAME" ncurses
 		cmd bash "$KOS_MISC/make_utility.sh" "$TARGET_NAME" nano
+		cmd bash "$KOS_MISC/make_utility.sh" "$TARGET_NAME" zlib
 		cmd bash "$KOS_MISC/make_utility.sh" "$TARGET_NAME" kos-headers
 		cmd bash "$KOS_MISC/make_utility.sh" "$TARGET_NAME" deemon
 		;;
@@ -538,6 +539,58 @@ EOF
 				install_file "/usr/lib/deemon/$folder/$(basename -- "$filename")" "$filename"
 			done
 		done
+		;;
+##############################################################################
+
+
+##############################################################################
+	zlib | zlib-1.2.11)
+		ZLIB_VERISON_MAJOR="1"
+		ZLIB_VERISON="$ZLIB_VERISON_MAJOR.2.11"
+		SRCPATH="$KOS_ROOT/binutils/src/zlib-$ZLIB_VERISON"
+		OPTPATH="$BINUTILS_SYSROOT/opt/zlib-$ZLIB_VERISON"
+		if ! [ -f "$OPTPATH/lib/libz.so.$ZLIB_VERISON" ]; then
+			if ! [ -f "$OPTPATH/Makefile" ]; then
+				if ! [ -f "$SRCPATH/configure" ]; then
+					cmd cd "$KOS_ROOT/binutils/src"
+					download_file \
+						"zlib-$ZLIB_VERISON.tar.gz" \
+						https://www.zlib.net/zlib-$ZLIB_VERISON.tar.gz
+					cmd tar xvf "zlib-$ZLIB_VERISON.tar.gz"
+				fi
+				rm -rf "$OPTPATH" > /dev/null 2>&1
+				cmd mkdir -p "$OPTPATH"
+				cmd cd "$OPTPATH"
+				export CC="${CROSS_PREFIX}gcc"
+				export CPP="${CROSS_PREFIX}cpp"
+				export CXX="${CROSS_PREFIX}g++"
+				export CFLAGS="-ggdb"
+				export CXXFLAGS="-ggdb"
+				export LDSHARED="${CROSS_PREFIX}gcc -shared"
+				cmd bash ../../../src/zlib-$ZLIB_VERISON/configure \
+					--prefix=/ \
+					--eprefix=/ \
+					--libdir=/lib \
+					--sharedlibdir=/lib \
+					--includedir=/usr/include \
+					--enable-shared
+			fi
+			cmd cd "$OPTPATH"
+			cmd make -j $MAKE_PARALLEL_COUNT
+		fi
+		# Install headers
+		install_header() {
+			echo "Installing header:/include/$2"
+			unlink "$KOS_ROOT/kos/include/$2" > /dev/null 2>&1
+			cmd cp "$1" "$KOS_ROOT/kos/include/$2"
+		}
+		install_header "$OPTPATH/zconf.h" "zconf.h"
+		install_header "$SRCPATH/zlib.h"  "zlib.h"
+		# Install libraries
+		install_file /usr/lib/libz.so.$ZLIB_VERISON_MAJOR "$OPTPATH/libz.so.$ZLIB_VERISON"
+		install_symlink /lib/libz.so.$ZLIB_VERISON libz.so.$ZLIB_VERISON_MAJOR
+		install_symlink /lib/libz.so libz.so.$ZLIB_VERISON_MAJOR
+		install_file_nodisk /lib/libz.a "$OPTPATH/libz.a"
 		;;
 ##############################################################################
 

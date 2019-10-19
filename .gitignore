@@ -24,3 +24,7 @@ __ice__
 /kos/include/term.h
 /kos/include/termcap.h
 /kos/include/unctrl.h
+
+# These headers are installed by `make_utility.sh i386 zlib`
+/kos/include/zconf.h
+/kos/include/zlib.h
