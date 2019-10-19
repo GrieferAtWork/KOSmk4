@@ -389,7 +389,7 @@ typedef struct elf64_shdr /*[PREFIX(sh_)]*/ {
 	 (dst).sh_info      = (src).sh_info,      \
 	 (dst).sh_addralign = (src).sh_addralign, \
 	 (dst).sh_entsize   = (src).sh_entsize)
-#endif
+#endif /* __CC__ */
 
 /* Special section indices. */
 
@@ -461,12 +461,6 @@ typedef struct elf64_shdr /*[PREFIX(sh_)]*/ {
 #define SHF_ORDERED          (1 << 30)  /* Special ordering requirement (Solaris). */
 #define SHF_EXCLUDE          (1 << 31)  /* Section is excluded unless referenced or allocated (Solaris).*/
 
-#if defined(__USE_KOS)
-#define SHF_SHARED           (1 << 27)  /* KOS-specific: The section is shared (changes made to section contents (e.g. globals)
-                                         *               will be visible in all running instance of the module immediately)
-                                         * This is the equivalent of the `PROT_SHARED' flag, or NT's `IMAGE_SCN_MEM_SHARED' */
-#endif
-
 /* Section group handling. */
 #define GRP_COMDAT      0x1             /* Mark group as COMDAT. */
 
@@ -503,7 +497,7 @@ typedef struct {
 	Elf64_Half si_boundto;                /* Direct bindings, symbol bound to */
 	Elf64_Half si_flags;                  /* Per symbol flags */
 } Elf64_Syminfo;
-#endif
+#endif /* __CC__ */
 
 /* Possible values for si_boundto. */
 #define SYMINFO_BT_SELF         0xffff  /* Symbol bound to self */
@@ -614,7 +608,7 @@ typedef struct {
 	Elf64_Xword   r_info;                 /* Relocation type and symbol index */
 	Elf64_Sxword  r_addend;               /* Addend */
 } Elf64_Rela;
-#endif
+#endif /* __CC__ */
 
 /* How to extract and insert information held in the r_info field. */
 
@@ -667,8 +661,7 @@ typedef struct {
 	 (dst).p_filesz = (src).p_filesz, \
 	 (dst).p_memsz  = (src).p_memsz,  \
 	 (dst).p_align  = (src).p_align)
-
-#endif
+#endif /* __CC__ */
 
 /* Legal values for p_type (segment type). */
 
@@ -776,9 +769,9 @@ typedef struct {
 #define ELF_DYN32TO64(dst, src)      \
 	((dst).d_tag      = (src).d_tag, \
 	 (dst).d_un.d_val = (src).d_un.d_val)
+#endif /* __CC__ */
 
 
-#endif
 
 /* Legal values for d_tag (dynamic entry type). */
 
@@ -883,7 +876,7 @@ typedef struct {
    range.  Be compatible. */
 #define DT_AUXILIARY    0x7ffffffd      /* Shared object to load before self */
 #define DT_FILTER       0x7fffffff      /* Shared object to get values from */
-#define DT_EXTRATAGIDX(tag)     ((Elf32_Word)-((Elf32_Sword) (tag) <<1>>1)-1)
+#define DT_EXTRATAGIDX(tag) ((Elf32_Word) - ((Elf32_Sword)(tag) << 1 >> 1) - 1)
 #define DT_EXTRANUM     3
 
 /* Values of `d_un.d_val' in the DT_FLAGS entry. */
@@ -921,6 +914,43 @@ typedef struct {
 #define DF_P1_LAZYLOAD  0x00000001      /* Lazyload following object. */
 #define DF_P1_GROUPPERM 0x00000002      /* Symbols from next object are not generally available. */
 
+
+
+/* Compression header */
+#define __OFFSET_ELF32_CHDR_TYPE      0
+#define __OFFSET_ELF32_CHDR_SIZE      4
+#define __OFFSET_ELF32_CHDR_ADDRALIGN 8
+#define __SIZEOF_ELF32_CHDR           12
+#define __OFFSET_ELF64_CHDR_TYPE      0
+#define __OFFSET_ELF64_CHDR_SIZE      8
+#define __OFFSET_ELF64_CHDR_ADDRALIGN 16
+#define __SIZEOF_ELF64_CHDR           24
+#ifdef __CC__
+typedef struct elf32_chdr /*[PREFIX(ch_)]*/ {
+	Elf32_Word    ch_type;      /* Type of compression (one of `ELFCOMPRESS_*') */
+	Elf32_Word    ch_size;      /* Size of uncompressed data in bytes */
+	Elf32_Word    ch_addralign; /* Alignment of uncompressed data  */
+} Elf32_Chdr;
+
+typedef struct elf64_chdr /*[PREFIX(ch_)]*/ {
+	Elf64_Word    ch_type;       /* Type of compression (one of `ELFCOMPRESS_*') */
+	Elf64_Word    ch_reserved;   /* Padding */
+	Elf64_Xword   ch_size;       /* Size of uncompressed data in bytes */
+	Elf64_Xword   ch_addralign;  /* Alignment of uncompressed data  */
+} Elf64_Chdr;
+#endif /* __CC__ */
+
+/* Compression types.  */
+#define ELFCOMPRESS_ZLIB   1          /* Compressed with zlib. */
+#define ELFCOMPRESS_LOOS   0x60000000 /* OS-specific semantics, lo */
+#define ELFCOMPRESS_HIOS   0x6fffffff /* OS-specific semantics, hi */
+#define ELFCOMPRESS_LOPROC 0x70000000 /* Processor-specific semantics, lo */
+#define ELFCOMPRESS_HIPROC 0x7fffffff /* Processor-specific semantics, hi */
+
+
+
+
+
 /* Version definition sections. */
 
 #ifdef __CC__
@@ -943,7 +973,7 @@ typedef struct {
 	Elf64_Word    vd_aux;                 /* Offset in bytes to verdaux array */
 	Elf64_Word    vd_next;                /* Offset in bytes to next verdef entry */
 } Elf64_Verdef;
-#endif
+#endif /* __CC__ */
 
 
 /* Legal values for vd_version (version revision). */
@@ -2743,6 +2773,7 @@ typedef Elf(Rel)       Elf_Rel;
 typedef Elf(Rela)      Elf_Rela;
 typedef Elf(Phdr)      Elf_Phdr;
 typedef Elf(Dyn)       Elf_Dyn;
+typedef Elf(Chdr)      Elf_Chdr;
 typedef Elf(Verdef)    Elf_Verdef;
 typedef Elf(Verdaux)   Elf_Verdaux;
 typedef Elf(Verneed)   Elf_Verneed;

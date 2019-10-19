@@ -404,6 +404,18 @@ STATIC_ASSERT(offsetof(struct elf64_shdr, sh_size) == __OFFSET_ELF64_SHDR_SIZE);
 STATIC_ASSERT(offsetof(struct elf64_shdr, sh_type) == __OFFSET_ELF64_SHDR_TYPE);
 STATIC_ASSERT(sizeof(struct elf64_shdr) == __SIZEOF_ELF64_SHDR);
 
+/* struct elf32_chdr */
+STATIC_ASSERT(offsetof(struct elf32_chdr, ch_addralign) == __OFFSET_ELF32_CHDR_ADDRALIGN);
+STATIC_ASSERT(offsetof(struct elf32_chdr, ch_size) == __OFFSET_ELF32_CHDR_SIZE);
+STATIC_ASSERT(offsetof(struct elf32_chdr, ch_type) == __OFFSET_ELF32_CHDR_TYPE);
+STATIC_ASSERT(sizeof(struct elf32_chdr) == __SIZEOF_ELF32_CHDR);
+
+/* struct elf64_chdr */
+STATIC_ASSERT(offsetof(struct elf64_chdr, ch_addralign) == __OFFSET_ELF64_CHDR_ADDRALIGN);
+STATIC_ASSERT(offsetof(struct elf64_chdr, ch_size) == __OFFSET_ELF64_CHDR_SIZE);
+STATIC_ASSERT(offsetof(struct elf64_chdr, ch_type) == __OFFSET_ELF64_CHDR_TYPE);
+STATIC_ASSERT(sizeof(struct elf64_chdr) == __SIZEOF_ELF64_CHDR);
+
 
 
 
