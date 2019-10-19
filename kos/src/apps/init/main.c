@@ -58,7 +58,7 @@ PRIVATE char const *init_envp[] = {
 
 /* Set the calling process as foreground process for /dev/console */
 PRIVATE void console_set_fgproc(void) {
-	pid_t me = 0;
+	pid_t me = 0; /* `0' is an alias for `getpid()' here. */
 	Ioctl(STDIN_FILENO, TIOCSPGRP, &me);
 }
 
@@ -162,7 +162,7 @@ done_procfs:
 		{
 			/* Set our process as the foreground process
 			 * group controlled by /dev/console. */
-			pid_t me = getpid();
+			pid_t me = 0; /* `0' is an alias for `getpid()' here. */
 			Ioctl(console, TIOCSPGRP, &me);
 		}
 
@@ -176,7 +176,7 @@ done_procfs:
 	}
 
 	/* Construct the recommended symlinks for devfs.
-	 * Don't do any error checking, since these missing
+	 * Don't do any error checking, since their absence
 	 * shouldn't hinder minimal operability of the system. */
 	symlink("/proc/self/fd", "/dev/fd");
 	symlink("/proc/self/fd/0", "/dev/stdin");
