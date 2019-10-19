@@ -1077,6 +1077,7 @@ again:
 		 * performance by saving a whole bunch of different blocks at once. */
 		for (i = 0; i < BD_MAX_CACHE_SECTORS; ++i) {
 			struct extended_save_handle *new_handles;
+			struct aio_handle_generic *my_handle;
 			if (ATOMIC_READ(handle.hg_status) != 0)
 				break; /* Stop once the initial write has been completed, so we don't waste any time. */
 			if (i == result)
@@ -1085,12 +1086,14 @@ again:
 			    (BD_CACHED_SECTOR_FPRESENT | BD_CACHED_SECTOR_FCHANGED))
 				continue;
 			new_handles = (struct extended_save_handle *)krealloc_nx(ex_handles,
-			                                                         (ex_handles_count + 1) * sizeof(struct extended_save_handle),
+			                                                         (ex_handles_count + 1) *
+			                                                         sizeof(struct extended_save_handle),
 			                                                         GFP_LOCKED | GFP_PREFLT);
 			if unlikely(!new_handles)
 				continue; /* Failed to allocate more extended handles. */
 			ex_handles = new_handles;
-			aio_handle_generic_init(&ex_handles[ex_handles_count].sh_handle);
+			my_handle  = &ex_handles[ex_handles_count].sh_handle;
+			aio_handle_generic_init(my_handle);
 			ex_handles[ex_handles_count].sh_index = i;
 			cache_addr = self->bd_cache_base + i * self->bd_cache_ssiz;
 			TRY {
@@ -1098,10 +1101,10 @@ again:
 				sector_id = self->bd_cache[i].cs_addr;
 				log_sync(self, sector_id);
 				(*self->bd_type.dt_write)(self, cache_addr, 1,
-				                          sector_id, &handle);
+				                          sector_id, my_handle);
 			} EXCEPT {
-				aio_handle_init(&ex_handles[ex_handles_count].sh_handle, &aio_noop_type);
-				aio_handle_fail(&ex_handles[ex_handles_count].sh_handle);
+				aio_handle_init(my_handle, &aio_noop_type);
+				aio_handle_fail(my_handle);
 			}
 			++ex_handles_count;
 		}
@@ -1109,19 +1112,23 @@ again:
 		if (ex_handles) {
 			TRY {
 				while (ex_handles_count) {
+					struct aio_handle_generic *my_handle;
 					--ex_handles_count;
-					aio_handle_generic_waitfor(&ex_handles[ex_handles_count].sh_handle);
+					my_handle = &ex_handles[ex_handles_count].sh_handle;
+					aio_handle_generic_waitfor(my_handle);
 					/* Mark this handle as having been successfully saved. */
-					if likely(ex_handles[ex_handles_count].sh_handle.hg_status == AIO_COMPLETION_SUCCESS)
+					if likely(my_handle->hg_status == AIO_COMPLETION_SUCCESS)
 						block_unset_modified(self, ex_handles[ex_handles_count].sh_index);
-					aio_handle_generic_fini(&ex_handles[ex_handles_count].sh_handle);
+					aio_handle_generic_fini(my_handle);
 				}
 			} EXCEPT {
 				/* Cancel all remaining I/O operations. */
 				while (ex_handles_count) {
+					struct aio_handle_generic *my_handle;
 					--ex_handles_count;
-					aio_handle_cancel(&ex_handles[ex_handles_count].sh_handle);
-					aio_handle_generic_fini(&ex_handles[ex_handles_count].sh_handle);
+					my_handle = &ex_handles[ex_handles_count].sh_handle;
+					aio_handle_cancel(my_handle);
+					aio_handle_generic_fini(my_handle);
 				}
 				kfree(ex_handles);
 				RETHROW();
