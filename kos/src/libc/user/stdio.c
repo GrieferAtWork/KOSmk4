@@ -1138,7 +1138,6 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.read.read.fread_unlocked") size_
 		return 0;
 	}
 	result = libc_fdoread(buf, total, stream);
-	syslog(LOG_DEBUG, "%$s", result, buf);
 	return result / elemsize;
 }
 /*[[[end:fread_unlocked]]]*/
