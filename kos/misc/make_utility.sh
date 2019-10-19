@@ -9,19 +9,32 @@ cmd() {
 	}
 }
 
+MODE_FORCE_CONF=no
+MODE_FORCE_MAKE=no
+
 while [[ $# -gt 0 ]]; do
 	case $1 in
+
+	--force-configure)
+		MODE_FORCE_CONF=yes
+		;;
+
+	--force-make)
+		MODE_FORCE_MAKE=yes
+		;;
 
 	*)
 		break
 		;;
 	esac
+	shift
 done
 
 if (($# != 2)); then
 	echo "Usage: ./make_utility.sh [OPTIONS...] <TARGET_NAME> <UTILITY_NAME>"
 	echo "    OPTIONS:"
-	echo "        ..."
+	echo "        --force-configure     Force configure to be re-executed"
+	echo "        --force-make          Force make to be re-executed"
 	echo "    TARGET_NAME should be one of:"
 	echo "        i386"
 	echo "        x86_64"
@@ -234,15 +247,18 @@ case $UTILITY_NAME in
 
 ##############################################################################
 	all)
-		cmd bash "$KOS_MISC/make_utility.sh" "$TARGET_NAME" busybox
-		cmd bash "$KOS_MISC/make_utility.sh" "$TARGET_NAME" vitetris
-		cmd bash "$KOS_MISC/make_utility.sh" "$TARGET_NAME" tcc
-		cmd bash "$KOS_MISC/make_utility.sh" "$TARGET_NAME" ncurses
-		cmd bash "$KOS_MISC/make_utility.sh" "$TARGET_NAME" nano
-		cmd bash "$KOS_MISC/make_utility.sh" "$TARGET_NAME" zlib
-		cmd bash "$KOS_MISC/make_utility.sh" "$TARGET_NAME" deemon
-		cmd bash "$KOS_MISC/make_utility.sh" "$TARGET_NAME" python
-		cmd bash "$KOS_MISC/make_utility.sh" "$TARGET_NAME" kos-headers
+		OPTS=""
+		if [ "$MODE_FORCE_CONF" == yes ]; then OPTS="$OPTS --force-configure"; fi
+		if [ "$MODE_FORCE_MAKE" == yes ]; then OPTS="$OPTS --force-make"; fi
+		cmd bash "$KOS_MISC/make_utility.sh" $OPTS "$TARGET_NAME" busybox
+		cmd bash "$KOS_MISC/make_utility.sh" $OPTS "$TARGET_NAME" vitetris
+		cmd bash "$KOS_MISC/make_utility.sh" $OPTS "$TARGET_NAME" tcc
+		cmd bash "$KOS_MISC/make_utility.sh" $OPTS "$TARGET_NAME" ncurses
+		cmd bash "$KOS_MISC/make_utility.sh" $OPTS "$TARGET_NAME" nano
+		cmd bash "$KOS_MISC/make_utility.sh" $OPTS "$TARGET_NAME" zlib
+		cmd bash "$KOS_MISC/make_utility.sh" $OPTS "$TARGET_NAME" deemon
+		cmd bash "$KOS_MISC/make_utility.sh" $OPTS "$TARGET_NAME" python
+		cmd bash "$KOS_MISC/make_utility.sh" $OPTS "$TARGET_NAME" kos-headers
 		;;
 ##############################################################################
 
@@ -251,28 +267,27 @@ case $UTILITY_NAME in
 	busybox | busybox-1.31.0)
 		BUSYBOX_VERISON="1.31.0"
 		## Check final output binary
-		if ! [ -f "$BINUTILS_SYSROOT/opt/busybox-$BUSYBOX_VERISON/busybox_unstripped" ]; then
+		OPTPATH="$BINUTILS_SYSROOT/opt/busybox-$BUSYBOX_VERISON"
+		SRCPATH="$KOS_ROOT/binutils/src/busybox-$BUSYBOX_VERISON"
+		if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "${OPTPATH}/busybox_unstripped" ]; then
 			## Check arch makefile
-			if ! [ -f "$BINUTILS_SYSROOT/opt/busybox-$BUSYBOX_VERISON/Makefile" ]; then
+			if [ "$MODE_FORCE_CONF" == yes ] || ! [ -f "${OPTPATH}/Makefile" ]; then
 				## Check shared (original) makefile
-				if ! [ -f "$KOS_ROOT/binutils/src/busybox-$BUSYBOX_VERISON/Makefile" ]; then
+				if [ "$MODE_FORCE_CONF" == yes ] || ! [ -f "${SRCPATH}/Makefile" ]; then
 					cmd cd "$KOS_ROOT/binutils/src"
 					download_file \
 						"busybox-$BUSYBOX_VERISON.tar.bz2" \
 						https://www.busybox.net/downloads/busybox-$BUSYBOX_VERISON.tar.bz2
 					cmd tar jxvf "busybox-$BUSYBOX_VERISON.tar.bz2"
 				fi
-				if [ -d "$BINUTILS_SYSROOT/opt/busybox-$BUSYBOX_VERISON" ]; then
-					cmd rm -rf "$BINUTILS_SYSROOT/opt/busybox-$BUSYBOX_VERISON"
+				if [ -d "${OPTPATH}" ]; then
+					cmd rm -rf "${OPTPATH}"
 				fi
-				cmd cp -R \
-					"$KOS_ROOT/binutils/src/busybox-$BUSYBOX_VERISON" \
-					"$BINUTILS_SYSROOT/opt/"
+				rm -rf 
+				cmd cp -R "${SRCPATH}" "$BINUTILS_SYSROOT/opt/"
 			fi
-			apply_patch \
-				"$BINUTILS_SYSROOT/opt/busybox-$BUSYBOX_VERISON" \
-				"$KOS_ROOT/kos/misc/patches/busybox-$BUSYBOX_VERISON.patch"
-			cmd cd "$BINUTILS_SYSROOT/opt/busybox-$BUSYBOX_VERISON"
+			apply_patch "${OPTPATH}" "$KOS_ROOT/kos/misc/patches/busybox-$BUSYBOX_VERISON.patch"
+			cmd cd "${OPTPATH}"
 			PATCH_CONFIG="$KOS_ROOT/kos/misc/patches/busybox.config"
 			if ! [ -f ".config" ] || [ ".config" -ot "$PATCH_CONFIG" ]; then
 				unlink ".config" > /dev/null 2>&1
@@ -281,8 +296,7 @@ case $UTILITY_NAME in
 			cmd make -j $MAKE_PARALLEL_COUNT CROSS_COMPILE="$CROSS_PREFIX"
 		fi
 		# Install busybox in KOS
-		install_file /bin/busybox  \
-			"$BINUTILS_SYSROOT/opt/busybox-$BUSYBOX_VERISON/busybox_unstripped"
+		install_file /bin/busybox "${OPTPATH}/busybox_unstripped"
 		;;
 ##############################################################################
 
@@ -292,9 +306,9 @@ case $UTILITY_NAME in
 		VITETRIS_VERISON="0.58.0"
 		SRCPATH="$KOS_ROOT/binutils/src/vitetris-$VITETRIS_VERISON"
 		OPTPATH="$BINUTILS_SYSROOT/opt/vitetris-$VITETRIS_VERISON"
-		if ! [ -f "$OPTPATH/tetris" ]; then
+		if [ "$MODE_FORCE_MAKE" == yes ] || ! [ -f "$OPTPATH/tetris" ]; then
 			set_archpath
-			if ! [ -f "$OPTPATH/configure" ]; then
+			if [ "$MODE_FORCE_CONF" == yes ] || ! [ -f "$OPTPATH/configure" ]; then
 				if ! [ -f "$SRCPATH/configure" ]; then
 					cmd cd "$KOS_ROOT/binutils/src"
 					if ! [ -f "vitetris-$VITETRIS_VERISON.tar.gz" ]; then
@@ -322,7 +336,9 @@ case $UTILITY_NAME in
 		TCC_VERISON="0.9.27"
 		SRCPATH="$KOS_ROOT/binutils/src/tcc-$TCC_VERISON"
 		OPTPATH="$BINUTILS_SYSROOT/opt/tcc-$TCC_VERISON"
-		if ! [ -f "$OPTPATH/$TARGET_NAME-tcc" ]; then
+		if [ "$MODE_FORCE_MAKE" == yes ] || \
+		   [ "$MODE_FORCE_CONF" == yes ] || ! \
+		   [ -f "$OPTPATH/$TARGET_NAME-tcc" ]; then
 			set_archpath
 			if ! [ -f "$SRCPATH/configure" ]; then
 				cmd cd "$KOS_ROOT/binutils/src"
@@ -399,8 +415,10 @@ EOF
 		NCURSES_VERISON="$NCURSES_VERISON_MAJOR.1"
 		SRCPATH="$KOS_ROOT/binutils/src/ncurses-$NCURSES_VERISON"
 		OPTPATH="$BINUTILS_SYSROOT/opt/ncurses-$NCURSES_VERISON"
-		if ! [ -f "$OPTPATH/lib/libncurses.so" ]; then
-			if ! [ -f "$OPTPATH/Makefile" ]; then
+		if [ "$MODE_FORCE_MAKE" == yes ] || \
+		 ! [ -f "$OPTPATH/lib/libncurses.so" ]; then
+			if [ "$MODE_FORCE_CONF" == yes ] || \
+			 ! [ -f "$OPTPATH/Makefile" ]; then
 				if ! [ -f "$SRCPATH/configure" ]; then
 					cmd cd "$KOS_ROOT/binutils/src"
 					download_file \
@@ -489,8 +507,10 @@ EOF
 		NANO_VERISON="4.4"
 		SRCPATH="$KOS_ROOT/binutils/src/nano-$NANO_VERISON"
 		OPTPATH="$BINUTILS_SYSROOT/opt/nano-$NANO_VERISON"
-		if ! [ -f "$OPTPATH/src/nano" ]; then
-			if ! [ -f "$OPTPATH/Makefile" ]; then
+		if [ "$MODE_FORCE_MAKE" == yes ] || \
+		 ! [ -f "$OPTPATH/src/nano" ]; then
+			if [ "$MODE_FORCE_CONF" == yes ] || \
+			 ! [ -f "$OPTPATH/Makefile" ]; then
 				if ! [ -f "$SRCPATH/configure" ]; then
 					cmd cd "$KOS_ROOT/binutils/src"
 					download_file \
@@ -545,19 +565,21 @@ EOF
 		cmd cd "$SRCPATH"
 		DEEMON_VERSION=$(git rev-parse HEAD)
 		OPTPATH="$BINUTILS_SYSROOT/opt/deemon-git-$DEEMON_VERSION"
-		if ! [ -f "$OPTPATH/Makefile" ]; then
-			rm -rf "$OPTPATH" > /dev/null 2>&1
-			mkdir -p "$OPTPATH"
-			cmd cd "$OPTPATH"
-			cmd bash "$SRCPATH/configure" \
-				--cross-prefix="$CROSS_PREFIX" \
-				--config-exe-extension="" \
-				--config-dll-extension=".so" \
-				--with-deemon-home="/usr/lib/deemon" \
-				--with-deemon-path="/usr/lib/deemon" \
-				--config-pthread=""
-		fi
-		if ! [ -f "$OPTPATH/deemon" ]; then
+		if [ "$MODE_FORCE_MAKE" == yes ] || \
+		 ! [ -f "$OPTPATH/deemon" ]; then
+			if [ "$MODE_FORCE_CONF" == yes ] || \
+			 ! [ -f "$OPTPATH/Makefile" ]; then
+				rm -rf "$OPTPATH" > /dev/null 2>&1
+				mkdir -p "$OPTPATH"
+				cmd cd "$OPTPATH"
+				cmd bash "$SRCPATH/configure" \
+					--cross-prefix="$CROSS_PREFIX" \
+					--config-exe-extension="" \
+					--config-dll-extension=".so" \
+					--with-deemon-home="/usr/lib/deemon" \
+					--with-deemon-path="/usr/lib/deemon" \
+					--config-pthread=""
+			fi
 			cmd cd "$OPTPATH"
 			cmd make -j $MAKE_PARALLEL_COUNT
 		fi
@@ -585,8 +607,10 @@ EOF
 		ZLIB_VERISON="$ZLIB_VERISON_MAJOR.2.11"
 		SRCPATH="$KOS_ROOT/binutils/src/zlib-$ZLIB_VERISON"
 		OPTPATH="$BINUTILS_SYSROOT/opt/zlib-$ZLIB_VERISON"
-		if ! [ -f "$OPTPATH/libz.so.$ZLIB_VERISON" ]; then
-			if ! [ -f "$OPTPATH/Makefile" ]; then
+		if [ "$MODE_FORCE_MAKE" == yes ] || \
+		 ! [ -f "$OPTPATH/libz.so.$ZLIB_VERISON" ]; then
+			if [ "$MODE_FORCE_CONF" == yes ] || \
+			 ! [ -f "$OPTPATH/Makefile" ]; then
 				if ! [ -f "$SRCPATH/configure" ]; then
 					cmd cd "$KOS_ROOT/binutils/src"
 					download_file \
@@ -639,8 +663,12 @@ EOF
 		PYTHON_VERISON="$PYTHON_VERISON_MAJOR.$PYTHON_VERISON_MINOR.$PYTHON_VERISON_PATCH"
 		SRCPATH="$KOS_ROOT/binutils/src/Python-$PYTHON_VERISON"
 		OPTPATH="$BINUTILS_SYSROOT/opt/Python-$PYTHON_VERISON"
-		if ! [ -f "$OPTPATH/python" ] && ! [ -f "$OPTPATH/python.exe" ]; then
-			if ! [ -f "$OPTPATH/Makefile" ]; then
+		if [ "$MODE_FORCE_MAKE" == yes ] || {
+			! [ -f "$OPTPATH/python" ] &&
+			! [ -f "$OPTPATH/python.exe" ]
+		}; then
+			if [ "$MODE_FORCE_CONF" == yes ] || \
+			 ! [ -f "$OPTPATH/Makefile" ]; then
 				if ! [ -f "$SRCPATH/configure" ]; then
 					cmd cd "$KOS_ROOT/binutils/src"
 					download_file \
