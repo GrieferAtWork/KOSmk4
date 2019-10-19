@@ -336,7 +336,9 @@ done_result:
 
 #ifdef R_JMP_SLOT
 #undef LAZY_TRACE
-//#define LAZY_TRACE 1
+#if 1
+#define LAZY_TRACE 1
+#endif
 
 /* Assert that the offset/info fields of relocation descriptors are at the
  * same location, regardless if the relocation has, or hasn't got an addend */

@@ -300,7 +300,7 @@ libc_fdoread(void *__restrict buf, size_t size, FILE *__restrict self) {
 	size -= result;
 	if (!size)
 		goto end;
-	*(uintptr_t *)&buf += result;
+	buf = (byte_t *)buf + result;
 	libc_fchecktty(self);
 
 	/* Read everything that is too large directly. */
@@ -320,7 +320,7 @@ libc_fdoread(void *__restrict buf, size_t size, FILE *__restrict self) {
 		size -= temp;
 		if (!size)
 			goto end;
-		*(uintptr_t *)&buf += temp;
+		buf = (byte_t *)buf + temp;
 	}
 	assert(size);
 	assert(!self->if_cnt);
@@ -340,7 +340,7 @@ part_again:
 			            part);
 			if (temp <= 0)
 				goto err;
-			*(uintptr_t *)&buf += temp;
+			buf = (byte_t *)buf + temp;
 			size -= temp;
 			if ((size_t)temp != part)
 				goto part_again;
@@ -397,7 +397,7 @@ fill_buffer:
 	if (temp <= 0)
 		goto err;
 	self->if_exdata->io_read = (size_t)temp;
-	self->if_exdata->io_pos += temp;
+	self->if_exdata->io_pos += (size_t)temp;
 	self->if_cnt = (size_t)temp;
 	self->if_ptr = buffer;
 	self->if_flag |= IO_R;
@@ -849,6 +849,7 @@ INTERN int LIBCCALL libc_doungetc(int c, FILE *__restrict self) {
 		    self->if_ptr[-1] != (char)c)
 			libc_fmarkchanged(self);
 		*--self->if_ptr = (char)c;
+		++self->if_cnt;
 		return c;
 	}
 	/* Make sure we're not going too far back. */
@@ -1137,6 +1138,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.read.read.fread_unlocked") size_
 		return 0;
 	}
 	result = libc_fdoread(buf, total, stream);
+	syslog(LOG_DEBUG, "%$s", result, buf);
 	return result / elemsize;
 }
 /*[[[end:fread_unlocked]]]*/
