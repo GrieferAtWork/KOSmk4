@@ -154,10 +154,13 @@ install_path() {
 	local RELPATH=$(python -c "import os.path; print os.path.relpath('/${TARGET_NAME}-kos-common/$1', '/foo/$(dirname "/$1")')")
 	for BUILD_CONFIG in $(echo $KOS_VALID_BUILD_CONFIGS); do
 		local CONFIG_SYSROOT="${KOS_ROOT}/bin/${TARGET_NAME}-kos-${BUILD_CONFIG}"
-		unlink "$CONFIG_SYSROOT/$DISPATH" > /dev/null 2>&1
-		if ! ln -s "$RELPATH" "$CONFIG_SYSROOT/$DISPATH" > /dev/null 2>&1; then
-			cmd mkdir -p "$(dirname "$CONFIG_SYSROOT/$DISPATH")"
-			cmd ln -s "$RELPATH" "$CONFIG_SYSROOT/$DISPATH"
+		if [ "$(readlink -f "$CONFIG_SYSROOT/$DISPATH")" != \
+		     "$(readlink -f "$TARGET_SYSROOT/$DISPATH")" ]; then
+			unlink "$CONFIG_SYSROOT/$DISPATH" > /dev/null 2>&1
+			if ! ln -s "$RELPATH" "$CONFIG_SYSROOT/$DISPATH" > /dev/null 2>&1; then
+				cmd mkdir -p "$(dirname "$CONFIG_SYSROOT/$DISPATH")"
+				cmd ln -s "$RELPATH" "$CONFIG_SYSROOT/$DISPATH"
+			fi
 		fi
 		if [ -f "$CONFIG_SYSROOT/disk.img" ]; then
 			echo "    Disk: '$CONFIG_SYSROOT/disk.img'"
