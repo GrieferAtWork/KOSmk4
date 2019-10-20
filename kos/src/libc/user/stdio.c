@@ -1580,8 +1580,8 @@ struct open_option const open_options[] = {
 
 /* @param: poflags: When non-NULL, filled with `O_*'
  * @return: * :     Set of `IO_*' */
-PRIVATE ATTR_SECTION(".text.crt.FILE.core.utility.file_evalmode")
-WUNUSED uint32_t LIBCCALL file_evalmode(char const *modes,
+PRIVATE ATTR_SECTION(".text.crt.FILE.core.utility.file_evalmodes")
+WUNUSED uint32_t LIBCCALL file_evalmodes(char const *modes,
                                         oflag_t *poflags) {
 	/* IO_LNIFTYY: Check if the stream handle is a tty
 	 *             the first time it is read from. */
@@ -2922,7 +2922,7 @@ NOTHROW_RPC(LIBCCALL libc_fopen)(char const *__restrict filename,
 	FILE *result;
 	uint32_t flags;
 	oflag_t oflags;
-	flags = file_evalmode(modes, &oflags);
+	flags = file_evalmodes(modes, &oflags);
 	fd    = open(filename, oflags, 0644);
 	if unlikely(fd < 0)
 		return NULL;
@@ -2944,7 +2944,7 @@ NOTHROW_NCX(LIBCCALL libc_fdopen)(fd_t fd,
 {
 	FILE *result;
 	uint32_t flags;
-	flags  = file_evalmode(modes, NULL);
+	flags  = file_evalmodes(modes, NULL);
 	result = file_openfd(fd, flags);
 	return result;
 }
@@ -3490,7 +3490,7 @@ NOTHROW_NCX(LIBCCALL libc_fopencookie)(void *__restrict magic_cookie,
 {
 	FILE *result;
 	uint32_t flags;
-	flags  = file_evalmode(modes, NULL);
+	flags  = file_evalmodes(modes, NULL);
 	result = file_opencookie(&io_funcs, magic_cookie, flags);
 	return result;
 }
@@ -3606,6 +3606,80 @@ again:
 /*[[[end:fcloseall]]]*/
 
 
+struct memopen_cookie {
+	byte_t *moc_base; /* [1..1] Base-pointer */
+	byte_t *moc_cur;  /* [1..1] Current position */
+	byte_t *moc_end;  /* [1..1] End-pointer */
+};
+
+PRIVATE ATTR_SECTION(".text.crt.FILE.utility.memopen.read")
+ssize_t LIBCCALL memopen_read(void *cookie, char *buf, size_t num_bytes) {
+	size_t maxlen;
+	struct memopen_cookie *me;
+	me = (struct memopen_cookie *)cookie;
+	maxlen = (size_t)(me->moc_end - me->moc_cur);
+	if (maxlen > num_bytes)
+		maxlen = num_bytes;
+	memcpy(buf, me->moc_cur, maxlen);
+	me->moc_cur += maxlen;
+	return (size_t)maxlen;
+}
+
+PRIVATE ATTR_SECTION(".text.crt.FILE.utility.memopen.write")
+ssize_t LIBCCALL memopen_write(void *cookie, char const *buf, size_t num_bytes) {
+	size_t maxlen;
+	struct memopen_cookie *me;
+	me = (struct memopen_cookie *)cookie;
+	maxlen = (size_t)(me->moc_end - me->moc_cur);
+	if (maxlen > num_bytes)
+		maxlen = num_bytes;
+	memcpy(me->moc_cur, buf, maxlen);
+	me->moc_cur += maxlen;
+	return (size_t)maxlen;
+}
+
+PRIVATE ATTR_SECTION(".text.crt.FILE.utility.memopen.seek")
+int LIBCCALL memopen_seek(void *cookie, off64_t *pos, int whence) {
+	pos64_t newpos;
+	struct memopen_cookie *me;
+	size_t maxlen;
+	me = (struct memopen_cookie *)cookie;
+	newpos = (pos64_t)*pos;
+	maxlen = (size_t)(me->moc_end - me->moc_cur);
+	switch (whence) {
+
+	case SEEK_SET:
+		break;
+
+	case SEEK_CUR:
+		newpos += (size_t)(me->moc_cur - me->moc_base);
+		if ((off64_t)newpos < 0)
+			newpos = 0;
+		break;
+
+	case SEEK_END:
+		newpos += maxlen;
+		if ((off64_t)newpos < 0)
+			newpos = 0;
+		break;
+
+	default:
+		libc_seterrno(EINVAL);
+		return -1;
+	}
+	if (newpos > maxlen)
+		newpos = maxlen;
+	me->moc_cur = me->moc_base + (size_t)newpos;
+	*pos = (off64_t)newpos;
+	return 0;
+}
+
+PRIVATE ATTR_SECTION(".text.crt.FILE.utility.memopen.close")
+int LIBCCALL memopen_close(void *cookie) {
+	free(cookie);
+	return 0;
+}
+
 
 
 /*[[[head:fmemopen,hash:CRC-32=0xe54d8f29]]]*/
@@ -3616,9 +3690,25 @@ NOTHROW_NCX(LIBCCALL libc_fmemopen)(void *mem,
                                     char const *modes)
 /*[[[body:fmemopen]]]*/
 {
-	CRT_UNIMPLEMENTED("fmemopen"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
+	FILE *result;
+	uint32_t flags;
+	cookie_io_functions_t cookies;
+	struct memopen_cookie *magic;
+	magic = (struct memopen_cookie *)malloc(sizeof(struct memopen_cookie));
+	if unlikely(!magic)
+		return NULL;
+	magic->moc_base = (byte_t *)mem;
+	magic->moc_cur  = (byte_t *)mem;
+	magic->moc_end  = (byte_t *)mem + len;
+	cookies.read  = &memopen_read;
+	cookies.write = &memopen_write;
+	cookies.seek  = &memopen_seek;
+	cookies.close = &memopen_close;
+	flags  = file_evalmodes(modes, NULL);
+	result = file_opencookie(&cookies, magic, flags);
+	if unlikely(!result)
+		free(magic);
+	return result;
 }
 /*[[[end:fmemopen]]]*/
 
@@ -4774,7 +4864,7 @@ NOTHROW_RPC(LIBCCALL libc_freopen)(char const *__restrict filename,
 	FILE *result;
 	uint32_t flags;
 	oflag_t oflags;
-	flags = file_evalmode(modes, &oflags);
+	flags = file_evalmodes(modes, &oflags);
 	fd    = open(filename, oflags, 0644);
 	if unlikely(fd < 0)
 		return NULL;
@@ -4800,7 +4890,7 @@ NOTHROW_RPC(LIBCCALL libc_freopen_unlocked)(char const *__restrict filename,
 	FILE *result;
 	uint32_t flags;
 	oflag_t oflags;
-	flags = file_evalmode(modes, &oflags);
+	flags = file_evalmodes(modes, &oflags);
 	fd    = open(filename, oflags, 0644);
 	if unlikely(fd < 0)
 		return NULL;

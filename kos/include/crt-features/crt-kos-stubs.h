@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfeab94cf */
+/* HASH CRC-32:0x13382ad */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -164,7 +164,6 @@
 #define __CRT_STUB_fgetspent_r 1
 #define __CRT_STUB_fgetwc 1
 #define __CRT_STUB_fgetwc_unlocked 1
-#define __CRT_STUB_fmemopen 1
 #define __CRT_STUB_fmod 1
 #define __CRT_STUB_fpathconf 1
 #define __CRT_STUB_fpreset 1

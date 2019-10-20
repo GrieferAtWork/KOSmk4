@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xef33188b */
+/* HASH CRC-32:0xaaa3d377 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -164,7 +164,6 @@
 #define __stub_fgetspent_r 1
 #define __stub_fgetwc 1
 #define __stub_fgetwc_unlocked 1
-#define __stub_fmemopen 1
 #define __stub_fmod 1
 #define __stub_fpathconf 1
 #define __stub_fpreset 1

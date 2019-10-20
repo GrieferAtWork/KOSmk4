@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb7d00753 */
+/* HASH CRC-32:0x1c17c2a0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -81,15 +81,15 @@ typedef __WINT_TYPE__ wint_t;
 
 /* Read NBYTES bytes from COOKIE into a buffer pointed to by BUF.
  * Return number of bytes read. */
-typedef __ssize_t (__LIBCCALL __io_read_fn)(void *__cookie, char *__buf, __size_t __nbytes);
+typedef __ssize_t (__LIBCCALL __io_read_fn)(void *__cookie, char *__buf, __size_t __num_bytes);
 
 /* Write N bytes pointed to by BUF to COOKIE. Write all N bytes
  * unless there is an error. Return number of bytes written. If
  * there is an error, return 0 and do not write anything. If the file
- * has been opened for append (__mode.__append set), then set the file
+ * has been opened for append (mode.append set), then set the file
  * pointer to the end of the file and then do the write; if not, just
  * write at the current file pointer. */
-typedef __ssize_t (__LIBCCALL __io_write_fn)(void *__cookie, const char *__buf, __size_t __n);
+typedef __ssize_t (__LIBCCALL __io_write_fn)(void *__cookie, const char *__buf, __size_t __num_bytes);
 
 /* Move COOKIE's file position to *POS bytes from the
  * beginning of the file (if W is SEEK_SET),
@@ -97,7 +97,7 @@ typedef __ssize_t (__LIBCCALL __io_write_fn)(void *__cookie, const char *__buf, 
  * or the end of the file (if W is SEEK_END).
  * Set *POS to the new file position.
  * Returns zero if successful, nonzero if not. */
-typedef int (__LIBCCALL __io_seek_fn)(void *__cookie, __off64_t *__pos, int __w);
+typedef int (__LIBCCALL __io_seek_fn)(void *__cookie, __off64_t *__pos, int __whence);
 
 /* Close COOKIE. */
 typedef int (__LIBCCALL __io_close_fn)(void *__cookie);
