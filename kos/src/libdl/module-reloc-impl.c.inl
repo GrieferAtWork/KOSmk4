@@ -277,7 +277,6 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 #endif /* R_USED_PC64 */
 
 
-#if defined(R_USED_GLOB_DAT) || defined(R_JMP_SLOT)
 #ifdef R_JMP_SLOT
 		case R_JMP_SLOT:
 			if (!(flags & DL_MODULE_INITIALIZE_FBINDNOW)) {
@@ -285,16 +284,18 @@ DlModule_ApplyRelocations(DlModule *__restrict self,
 				*(uintptr_t *)reladdr += (uintptr_t)loadaddr;
 				break;
 			}
-			ATTR_FALLTHROUGH
+			LOOKUP_SYMBOL();
+			*(uintptr_t *)reladdr = (uintptr_t)(value + REL_ADDEND);
+			break;
 //#undef R_JMP_SLOT /* Don't undef this one! */
 #endif /* R_JMP_SLOT */
+
 #ifdef R_USED_GLOB_DAT
 		case R_USED_GLOB_DAT:
-#undef R_USED_GLOB_DAT
-#endif /* R_USED_GLOB_DAT */
 			LOOKUP_SYMBOL();
-			*(u32 *)reladdr SET_OR_INPLACE_ADD (u32)(value + REL_ADDEND);
+			*(uintptr_t *)reladdr SET_OR_INPLACE_ADD (uintptr_t)(value + REL_ADDEND);
 			break;
+#undef R_USED_GLOB_DAT
 #endif /* R_USED_GLOB_DAT */
 
 
