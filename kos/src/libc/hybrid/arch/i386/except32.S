@@ -498,6 +498,7 @@ INTERN_FUNCTION(x86_unwind_interrupt_esp)
 	/* The interrupt points into kernel-space (or possibly towards
 	 * `x86_rpc_user_redirection', which is also kernel-space). */
 	.cfi_startproc simple
+	.cfi_signal_frame
 	.cfi_def_cfa %esp, OFFSET_ICPUSTATE_IRREGS + SIZEOF_IRREGS_KERNEL
 	.cfi_rel_offset %edi, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_EDI
 	.cfi_rel_offset %esi, OFFSET_ICPUSTATE_GPREGS + OFFSET_GPREGS_ESI
