@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f435869 */
+/* HASH CRC-32:0x2d184fec */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,6 +25,8 @@
 #define ____localdep_select32_defined 1
 #if defined(__CRT_HAVE_select)
 __CREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_select32,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct __timeval32 *__restrict __timeout),select,(__nfds,__readfds,__writefds,__exceptfds,__timeout))
+#elif defined(__CRT_HAVE___select)
+__CREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_select32,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct __timeval32 *__restrict __timeout),__select,(__nfds,__readfds,__writefds,__exceptfds,__timeout))
 #else /* LIBC: select */
 #undef ____localdep_select32_defined
 #endif /* select32... */
@@ -37,7 +39,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(select64))(__STDC_INT_AS_SIZE_T __nfd
                                                       fd_set *__restrict __writefds,
                                                       fd_set *__restrict __exceptfds,
                                                       struct __timeval64 *__restrict __timeout) {
-#line 161 "kos/src/libc/magic/sys.select.c"
+#line 174 "kos/src/libc/magic/sys.select.c"
 	struct __timeval32 __tmv;
 	if (!__timeout)
 		return __localdep_select32(__nfds, __readfds, __writefds, __exceptfds, __NULLPTR);

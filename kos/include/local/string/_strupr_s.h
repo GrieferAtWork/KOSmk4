@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7b46acf3 */
+/* HASH CRC-32:0xf0ece20c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,6 +42,8 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHR
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_toupper)(int __ch) { return __builtin_toupper(__ch); }
 #elif defined(__CRT_HAVE_toupper)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_toupper,(int __ch),toupper,(__ch))
+#elif defined(__CRT_HAVE__toupper)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_toupper,(int __ch),_toupper,(__ch))
 #else /* LIBC: toupper */
 #include <local/ctype/toupper.h>
 #define __localdep_toupper (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(toupper))

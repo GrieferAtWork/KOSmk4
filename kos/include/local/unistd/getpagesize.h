@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x11745010 */
+/* HASH CRC-32:0xd9d78ace */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
  * Return the size of a PAGE (in bytes) */
 __LOCAL_LIBC(getpagesize) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getpagesize))(void) {
-#line 1421 "kos/src/libc/magic/unistd.c"
+#line 1425 "kos/src/libc/magic/unistd.c"
 #ifdef __SIZEOF_PAGE__
 	return __SIZEOF_PAGE__;
 #else

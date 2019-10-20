@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x76c5400c */
+/* HASH CRC-32:0x9deaf53e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,8 @@ __CREDIRECT(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,__localdep_strtoll_l,(c
 __CREDIRECT(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,__localdep_strtoll_l,(char const *__restrict __nptr, char **__endptr, int __base, __locale_t __locale),_strtoll_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_strtoq_l)
 __CREDIRECT(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,__localdep_strtoll_l,(char const *__restrict __nptr, char **__endptr, int __base, __locale_t __locale),strtoq_l,(__nptr,__endptr,__base,__locale))
+#elif defined(__CRT_HAVE___strtoll_l)
+__CREDIRECT(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,__localdep_strtoll_l,(char const *__restrict __nptr, char **__endptr, int __base, __locale_t __locale),__strtoll_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_strtol_l) && (__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__)
 __CREDIRECT(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,__localdep_strtoll_l,(char const *__restrict __nptr, char **__endptr, int __base, __locale_t __locale),strtol_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE__strtol_l) && (__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__)

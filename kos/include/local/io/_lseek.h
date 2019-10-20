@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1bd26ad4 */
+/* HASH CRC-32:0x1f9c5837 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ __CREDIRECT(,__off64_t,__NOTHROW_NCX,__localdep_lseek64,(__fd_t __fd, __off64_t 
 /* >> lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __CREDIRECT(,__off64_t,__NOTHROW_NCX,__localdep_lseek64,(__fd_t __fd, __off64_t __offset, int __whence),_lseeki64,(__fd,__offset,__whence))
-#elif defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek)
+#elif defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)
 #include <local/unistd/lseek64.h>
 /* >> lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f42bc6c */
+/* HASH CRC-32:0xc6c3662a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1596,6 +1596,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(unsetenv, __FORCELOCAL __ATTR_NONNULL((1)) int _
 __CDECLARE(__ATTR_NONNULL((1)),char *,__NOTHROW_NCX,mktemp,(char *__template_),(__template_))
 #elif defined(__CRT_HAVE__mktemp)
 __CREDIRECT(__ATTR_NONNULL((1)),char *,__NOTHROW_NCX,mktemp,(char *__template_),_mktemp,(__template_))
+#elif defined(__CRT_HAVE___mktemp)
+__CREDIRECT(__ATTR_NONNULL((1)),char *,__NOTHROW_NCX,mktemp,(char *__template_),__mktemp,(__template_))
 #else /* LIBC: mktemp */
 #undef __mktemp_defined
 #endif /* mktemp... */
@@ -1635,7 +1637,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getsubopt, __FORCELOCAL __ATTR_WUNUSED __ATTR_NO
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,mkstemp,(char *__template_),mkstemp64,(__template_))
 #elif defined(__CRT_HAVE_mkstemp)
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,mkstemp,(char *__template_),(__template_))
-#elif defined(__CRT_HAVE_mktemp) || defined(__CRT_HAVE__mktemp)
+#elif defined(__CRT_HAVE_mktemp) || defined(__CRT_HAVE__mktemp) || defined(__CRT_HAVE___mktemp)
 #include <local/stdlib/mkstemp.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(mkstemp, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL mkstemp)(char *__template_) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mkstemp))(__template_); })
 #endif /* mkstemp... */
@@ -1646,7 +1648,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,mkstemp64,(char 
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,mkstemp64,(char *__template_),mkstemp,(__template_))
 #elif defined(__CRT_HAVE_mkstemp) && (!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,mkstemp64,(char *__template_),mkstemp,(__template_))
-#elif defined(__CRT_HAVE_mktemp) || defined(__CRT_HAVE__mktemp)
+#elif defined(__CRT_HAVE_mktemp) || defined(__CRT_HAVE__mktemp) || defined(__CRT_HAVE___mktemp)
 #include <local/stdlib/mkstemp.h>
 __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL mkstemp64)(char *__template_) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mkstemp))(__template_); }
 #endif /* mkstemp64... */
@@ -1691,6 +1693,8 @@ __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_RPC,posix_openpt,(__oflag_t __oflag),(__
 __CDECLARE(__ATTR_NONNULL((1)),long,__NOTHROW_NCX,strtol_l,(char const *__restrict __nptr, char **__endptr, int __base, __locale_t __locale),(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE__strtol_l)
 __CREDIRECT(__ATTR_NONNULL((1)),long,__NOTHROW_NCX,strtol_l,(char const *__restrict __nptr, char **__endptr, int __base, __locale_t __locale),_strtol_l,(__nptr,__endptr,__base,__locale))
+#elif defined(__CRT_HAVE___strtol_l)
+__CREDIRECT(__ATTR_NONNULL((1)),long,__NOTHROW_NCX,strtol_l,(char const *__restrict __nptr, char **__endptr, int __base, __locale_t __locale),__strtol_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_strtoll_l) && (__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__)
 __CREDIRECT(__ATTR_NONNULL((1)),long,__NOTHROW_NCX,strtol_l,(char const *__restrict __nptr, char **__endptr, int __base, __locale_t __locale),strtoll_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE__strtoll_l) && (__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__)
@@ -1709,6 +1713,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strtol_l, __FORCELOCAL __ATTR_NONNULL((1)) long 
 __CDECLARE(__ATTR_NONNULL((1)),unsigned long,__NOTHROW_NCX,strtoul_l,(char const *__restrict __nptr, char **__endptr, int __base, __locale_t __locale),(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE__strtoul_l)
 __CREDIRECT(__ATTR_NONNULL((1)),unsigned long,__NOTHROW_NCX,strtoul_l,(char const *__restrict __nptr, char **__endptr, int __base, __locale_t __locale),_strtoul_l,(__nptr,__endptr,__base,__locale))
+#elif defined(__CRT_HAVE___strtoul_l)
+__CREDIRECT(__ATTR_NONNULL((1)),unsigned long,__NOTHROW_NCX,strtoul_l,(char const *__restrict __nptr, char **__endptr, int __base, __locale_t __locale),__strtoul_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_strtoull_l) && (__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__)
 __CREDIRECT(__ATTR_NONNULL((1)),unsigned long,__NOTHROW_NCX,strtoul_l,(char const *__restrict __nptr, char **__endptr, int __base, __locale_t __locale),strtoull_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE__strtoll_l) && (__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__)
@@ -1730,6 +1736,8 @@ __CDECLARE(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,strtoll_l,(char const *_
 __CREDIRECT(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,strtoll_l,(char const *__restrict __nptr, char **__endptr, int __base, __locale_t __locale),_strtoll_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_strtoq_l)
 __CREDIRECT(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,strtoll_l,(char const *__restrict __nptr, char **__endptr, int __base, __locale_t __locale),strtoq_l,(__nptr,__endptr,__base,__locale))
+#elif defined(__CRT_HAVE___strtoll_l)
+__CREDIRECT(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,strtoll_l,(char const *__restrict __nptr, char **__endptr, int __base, __locale_t __locale),__strtoll_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_strtol_l) && (__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__)
 __CREDIRECT(__ATTR_NONNULL((1)),__LONGLONG,__NOTHROW_NCX,strtoll_l,(char const *__restrict __nptr, char **__endptr, int __base, __locale_t __locale),strtol_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE__strtol_l) && (__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__)
@@ -1748,6 +1756,8 @@ __CDECLARE(__ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,strtoull_l,(char const 
 __CREDIRECT(__ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,strtoull_l,(char const *__restrict __nptr, char **__endptr, int __base, __locale_t __locale),_strtoull_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_strtouq_l)
 __CREDIRECT(__ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,strtoull_l,(char const *__restrict __nptr, char **__endptr, int __base, __locale_t __locale),strtouq_l,(__nptr,__endptr,__base,__locale))
+#elif defined(__CRT_HAVE___strtoull_l)
+__CREDIRECT(__ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,strtoull_l,(char const *__restrict __nptr, char **__endptr, int __base, __locale_t __locale),__strtoull_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE_strtoul_l) && (__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__)
 __CREDIRECT(__ATTR_NONNULL((1)),__ULONGLONG,__NOTHROW_NCX,strtoull_l,(char const *__restrict __nptr, char **__endptr, int __base, __locale_t __locale),strtoul_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE__strtoul_l) && (__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__)
@@ -1766,6 +1776,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strtoull_l, __FORCELOCAL __ATTR_NONNULL((1)) __U
 __CDECLARE(__ATTR_NONNULL((1)),double,__NOTHROW_NCX,strtod_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),(__nptr,__endptr,__locale))
 #elif defined(__CRT_HAVE__strtod_l)
 __CREDIRECT(__ATTR_NONNULL((1)),double,__NOTHROW_NCX,strtod_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),_strtod_l,(__nptr,__endptr,__locale))
+#elif defined(__CRT_HAVE___strtod_l)
+__CREDIRECT(__ATTR_NONNULL((1)),double,__NOTHROW_NCX,strtod_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),__strtod_l,(__nptr,__endptr,__locale))
 #elif defined(__CRT_HAVE_strtold_l) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 __CREDIRECT(__ATTR_NONNULL((1)),double,__NOTHROW_NCX,strtod_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),strtold_l,(__nptr,__endptr,__locale))
 #elif defined(__CRT_HAVE__strtold_l) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
@@ -1778,6 +1790,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strtod_l, __FORCELOCAL __ATTR_NONNULL((1)) doubl
 __CDECLARE(__ATTR_NONNULL((1)),float,__NOTHROW_NCX,strtof_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),(__nptr,__endptr,__locale))
 #elif defined(__CRT_HAVE__strtof_l)
 __CREDIRECT(__ATTR_NONNULL((1)),float,__NOTHROW_NCX,strtof_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),_strtof_l,(__nptr,__endptr,__locale))
+#elif defined(__CRT_HAVE___strtof_l)
+__CREDIRECT(__ATTR_NONNULL((1)),float,__NOTHROW_NCX,strtof_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),__strtof_l,(__nptr,__endptr,__locale))
 #else /* LIBC: strtof_l */
 #include <local/stdlib/strtof_l.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(strtof_l, __FORCELOCAL __ATTR_NONNULL((1)) float __NOTHROW_NCX(__LIBCCALL strtof_l)(char const *__restrict __nptr, char **__endptr, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtof_l))(__nptr, __endptr, __locale); })
@@ -1787,6 +1801,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strtof_l, __FORCELOCAL __ATTR_NONNULL((1)) float
 __CDECLARE(__ATTR_NONNULL((1)),long double,__NOTHROW_NCX,strtold_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),(__nptr,__endptr,__locale))
 #elif defined(__CRT_HAVE__strtold_l)
 __CREDIRECT(__ATTR_NONNULL((1)),long double,__NOTHROW_NCX,strtold_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),_strtold_l,(__nptr,__endptr,__locale))
+#elif defined(__CRT_HAVE___strtold_l)
+__CREDIRECT(__ATTR_NONNULL((1)),long double,__NOTHROW_NCX,strtold_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),__strtold_l,(__nptr,__endptr,__locale))
 #elif defined(__CRT_HAVE_strtod_l) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 __CREDIRECT(__ATTR_NONNULL((1)),long double,__NOTHROW_NCX,strtold_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),strtod_l,(__nptr,__endptr,__locale))
 #elif defined(__CRT_HAVE__strtod_l) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
@@ -1801,6 +1817,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strtold_l, __FORCELOCAL __ATTR_NONNULL((1)) long
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,secure_getenv,(char const *__varname),(__varname))
 #elif defined(__CRT_HAVE_getenv)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,secure_getenv,(char const *__varname),getenv,(__varname))
+#elif defined(__CRT_HAVE___secure_getenv)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,secure_getenv,(char const *__varname),__secure_getenv,(__varname))
 #endif /* secure_getenv... */
 #if defined(__CRT_HAVE_ptsname_r)
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,ptsname_r,(__fd_t __fd, char *__buf, size_t __buflen),(__fd,__buf,__buflen))

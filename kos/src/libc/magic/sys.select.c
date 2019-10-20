@@ -101,13 +101,26 @@ typedef __fd_mask fd_mask;
 
 }
 
-[cp][ignore] select32:(__STDC_INT_AS_SIZE_T nfds, [nullable] fd_set *__restrict readfds, [nullable] fd_set *__restrict writefds, [nullable] fd_set *__restrict exceptfds, [nullable] struct $timeval32 *__restrict timeout) -> __STDC_INT_AS_SSIZE_T = select?;
-[cp][ignore] pselect32:(__STDC_INT_AS_SIZE_T nfds, [nullable] fd_set *__restrict readfds, [nullable] fd_set *__restrict writefds, [nullable] fd_set *__restrict exceptfds, [nullable] struct $timespec32 const *__restrict timeout, [nullable] $sigset_t const *__restrict sigmask) -> __STDC_INT_AS_SSIZE_T = pselect?;
+[cp][ignore][alias(__select)]
+select32:(__STDC_INT_AS_SIZE_T nfds,
+          [nullable] fd_set *__restrict readfds,
+          [nullable] fd_set *__restrict writefds,
+          [nullable] fd_set *__restrict exceptfds,
+          [nullable] struct $timeval32 *__restrict timeout)
+	-> __STDC_INT_AS_SSIZE_T = select?;
+[cp][ignore]
+pselect32:(__STDC_INT_AS_SIZE_T nfds,
+           [nullable] fd_set *__restrict readfds,
+           [nullable] fd_set *__restrict writefds,
+           [nullable] fd_set *__restrict exceptfds,
+           [nullable] struct $timespec32 const *__restrict timeout,
+           [nullable] $sigset_t const *__restrict sigmask)
+	-> __STDC_INT_AS_SSIZE_T = pselect?;
 
 
 [cp][if(defined(__USE_TIME_BITS64)), preferred_alias(select64)]
-[if(!defined(__USE_TIME_BITS64)), preferred_alias(select)]
-[noexport][requires(defined(__CRT_HAVE_select) || defined(__CRT_HAVE_select64))]
+[if(!defined(__USE_TIME_BITS64)), preferred_alias(select, __select)][alternate_name(__select)]
+[noexport][requires(defined(__CRT_HAVE_select) || defined(__CRT_HAVE___select) || defined(__CRT_HAVE_select64))]
 select:(__STDC_INT_AS_SIZE_T nfds, [nullable] fd_set *__restrict readfds, [nullable] fd_set *__restrict writefds,
         [nullable] fd_set *__restrict exceptfds, [nullable] struct timeval *__restrict timeout) -> __STDC_INT_AS_SSIZE_T {
 #ifdef __CRT_HAVE_select64

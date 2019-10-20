@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7cf3813b */
+/* HASH CRC-32:0x672f318e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -58,6 +58,9 @@ __SYSDECL_BEGIN
 #if defined(__CRT_HAVE_statfs) && (!defined(__USE_FILE_OFFSET64))
 /* Return information about the filesystem on which FILE resides */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,statfs,(char const *__file, struct statfs *__buf),(__file,__buf))
+#elif defined(__CRT_HAVE___statfs) && (!defined(__USE_FILE_OFFSET64))
+/* Return information about the filesystem on which FILE resides */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,statfs,(char const *__file, struct statfs *__buf),__statfs,(__file,__buf))
 #elif defined(__CRT_HAVE_statfs64) && (defined(__USE_FILE_OFFSET64))
 /* Return information about the filesystem on which FILE resides */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,statfs,(char const *__file, struct statfs *__buf),statfs64,(__file,__buf))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9b9922de */
+/* HASH CRC-32:0x82d32cc3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,9 @@
 #if defined(__CRT_HAVE_clock_gettime)
 /* Get current value of clock CLOCK_ID and store it in TP */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_gettime32,(__clockid_t __clock_id, struct __timespec32 *__tp),clock_gettime,(__clock_id,__tp))
+#elif defined(__CRT_HAVE___clock_gettime)
+/* Get current value of clock CLOCK_ID and store it in TP */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_gettime32,(__clockid_t __clock_id, struct __timespec32 *__tp),__clock_gettime,(__clock_id,__tp))
 #else /* LIBC: clock_gettime */
 #undef ____localdep_clock_gettime32_defined
 #endif /* clock_gettime32... */
@@ -40,7 +43,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_gettime64,(__
 #elif defined(__CRT_HAVE_clock_gettime) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Get current value of clock CLOCK_ID and store it in TP */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_gettime64,(__clockid_t __clock_id, struct __timespec64 *__tp),clock_gettime,(__clock_id,__tp))
-#elif defined(__CRT_HAVE_clock_gettime)
+#elif defined(__CRT_HAVE_clock_gettime) || defined(__CRT_HAVE___clock_gettime)
 #include <local/time/clock_gettime64.h>
 /* Get current value of clock CLOCK_ID and store it in TP */
 #define __localdep_clock_gettime64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(clock_gettime64))
@@ -54,7 +57,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(clock_gettime) __ATTR_NONNULL((2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(clock_gettime))(__clockid_t __clock_id,
                                                            struct __TM_TYPE(timespec) *__tp) {
-#line 1090 "kos/src/libc/magic/time.c"
+#line 1093 "kos/src/libc/magic/time.c"
 #ifdef __CRT_HAVE_clock_gettime
 	int __result;
 	struct __timespec32 __res32;

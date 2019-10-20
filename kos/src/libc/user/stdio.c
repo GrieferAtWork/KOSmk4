@@ -5043,7 +5043,7 @@ DEFINE_INTERN_ALIAS(libc_ferror_unlocked, libc_ferror);
 
 
 
-/*[[[start:exports,hash:CRC-32=0x180419b1]]]*/
+/*[[[start:exports,hash:CRC-32=0x37dd4774]]]*/
 #undef fprintf
 #undef fprintf_unlocked
 #undef fprintf_s
@@ -5145,6 +5145,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(printf, libc_printf);
 DEFINE_PUBLIC_WEAK_ALIAS(printf_unlocked, libc_printf);
 DEFINE_PUBLIC_WEAK_ALIAS(printf_s, libc_printf);
 DEFINE_PUBLIC_WEAK_ALIAS(vfscanf, libc_vfscanf);
+DEFINE_PUBLIC_WEAK_ALIAS(__vfscanf, libc_vfscanf);
 DEFINE_PUBLIC_WEAK_ALIAS(vfscanf_unlocked, libc_vfscanf);
 DEFINE_PUBLIC_WEAK_ALIAS(_vfscanf, libc_vfscanf);
 DEFINE_PUBLIC_WEAK_ALIAS(_vfscanf_s, libc_vfscanf);

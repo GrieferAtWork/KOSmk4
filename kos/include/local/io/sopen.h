@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x72595a2f */
+/* HASH CRC-32:0xdc2af5be */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sopen_defined
-#if ((defined(__CRT_HAVE_open64) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat) || defined(__CRT_HAVE_openat64)))) || (defined(__CRT_HAVE_open64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_open) && !defined(__USE_FILE_OFFSET64)) || defined(__CRT_HAVE__open))
+#if ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat) || defined(__CRT_HAVE_openat64)))) || (defined(__CRT_HAVE_open64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_open) && !defined(__USE_FILE_OFFSET64)) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE__open))
 #define __local_sopen_defined 1
 #include <bits/types.h>
 #include <bits/types.h>
@@ -29,9 +29,11 @@
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),open64,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_open) && (!defined(__USE_FILE_OFFSET64))
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),open,(__filename,__oflags),__oflags,1,(__mode_t))
+#elif defined(__CRT_HAVE___open)
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),__open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE__open)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),_open,(__filename,__oflags),__oflags,1,(__mode_t))
-#elif (defined(__CRT_HAVE_open64) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat) || defined(__CRT_HAVE_openat64))))
+#elif (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat) || defined(__CRT_HAVE_openat64))))
 #include <local/fcntl/open.h>
 #define __localdep_open (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(open))
 #else /* CUSTOM: open */
@@ -55,5 +57,5 @@ __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(sopen))(char const *__filename,
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((defined(__CRT_HAVE_open64) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat) || defined(__CRT_HAVE_openat64)))) || (defined(__CRT_HAVE_open64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_open) && !defined(__USE_FILE_OFFSET64)) || defined(__CRT_HAVE__open)) */
+#endif /* ((defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat) || defined(__CRT_HAVE_openat64)))) || (defined(__CRT_HAVE_open64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_open) && !defined(__USE_FILE_OFFSET64)) || defined(__CRT_HAVE___open) || defined(__CRT_HAVE__open)) */
 #endif /* !__local_sopen_defined */

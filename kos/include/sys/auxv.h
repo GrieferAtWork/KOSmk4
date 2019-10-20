@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x512ad08c */
+/* HASH CRC-32:0x80d89c68 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,6 +40,11 @@ __SYSDECL_BEGIN
  * passed to the program on startup.  If TYPE was not present in the auxv
  * list, returns zero and sets errno to ENOENT */
 __CDECLARE(,__ULONGPTR_TYPE__,__NOTHROW_NCX,getauxval,(__ULONGPTR_TYPE__ __type),(__type))
+#elif defined(__CRT_HAVE___getauxval)
+/* Return the value associated with an Elf*_auxv_t type from the auxv list
+ * passed to the program on startup.  If TYPE was not present in the auxv
+ * list, returns zero and sets errno to ENOENT */
+__CREDIRECT(,__ULONGPTR_TYPE__,__NOTHROW_NCX,getauxval,(__ULONGPTR_TYPE__ __type),__getauxval,(__type))
 #endif /* getauxval... */
 
 #endif /* __CC__ */

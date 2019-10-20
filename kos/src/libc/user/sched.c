@@ -175,14 +175,20 @@ NOTHROW_NCX(LIBCCALL libc_sched_rr_get_interval64)(pid_t pid,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x97e5284f]]]*/
+/*[[[start:exports,hash:CRC-32=0x423f1895]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(sched_setparam, libc_sched_setparam);
 DEFINE_PUBLIC_WEAK_ALIAS(sched_getparam, libc_sched_getparam);
+DEFINE_PUBLIC_WEAK_ALIAS(__sched_getparam, libc_sched_getparam);
 DEFINE_PUBLIC_WEAK_ALIAS(sched_setscheduler, libc_sched_setscheduler);
+DEFINE_PUBLIC_WEAK_ALIAS(__sched_setscheduler, libc_sched_setscheduler);
 DEFINE_PUBLIC_WEAK_ALIAS(sched_getscheduler, libc_sched_getscheduler);
+DEFINE_PUBLIC_WEAK_ALIAS(__sched_getscheduler, libc_sched_getscheduler);
 DEFINE_PUBLIC_WEAK_ALIAS(sched_yield, libc_sched_yield);
+DEFINE_PUBLIC_WEAK_ALIAS(__sched_yield, libc_sched_yield);
 DEFINE_PUBLIC_WEAK_ALIAS(sched_get_priority_max, libc_sched_get_priority_max);
+DEFINE_PUBLIC_WEAK_ALIAS(__sched_get_priority_max, libc_sched_get_priority_max);
 DEFINE_PUBLIC_WEAK_ALIAS(sched_get_priority_min, libc_sched_get_priority_min);
+DEFINE_PUBLIC_WEAK_ALIAS(__sched_get_priority_min, libc_sched_get_priority_min);
 DEFINE_PUBLIC_WEAK_ALIAS(sched_setaffinity, libc_sched_setaffinity);
 DEFINE_PUBLIC_WEAK_ALIAS(sched_getaffinity, libc_sched_getaffinity);
 DEFINE_PUBLIC_WEAK_ALIAS(sched_rr_get_interval, libc_sched_rr_get_interval);

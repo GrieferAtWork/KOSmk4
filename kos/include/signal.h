@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9852f43c */
+/* HASH CRC-32:0x7c612425 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -163,7 +163,10 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_USING(raise)
 #endif /* !__raise_defined && !__std_raise_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
-#if defined(__CRT_HAVE_sysv_signal)
+#if defined(__CRT_HAVE___sysv_signal)
+/* @param signo: One of `SIG*' */
+__CDECLARE(,__sighandler_t,__NOTHROW_NCX,__sysv_signal,(int __signo, __sighandler_t __handler),(__signo,__handler))
+#elif defined(__CRT_HAVE_sysv_signal)
 /* @param signo: One of `SIG*' */
 __CREDIRECT(,__sighandler_t,__NOTHROW_NCX,__sysv_signal,(int __signo, __sighandler_t __handler),sysv_signal,(__signo,__handler))
 #endif /* __sysv_signal... */
@@ -171,6 +174,9 @@ __CREDIRECT(,__sighandler_t,__NOTHROW_NCX,__sysv_signal,(int __signo, __sighandl
 #if defined(__CRT_HAVE_sysv_signal)
 /* @param signo: One of `SIG*' */
 __CDECLARE(,__sighandler_t,__NOTHROW_NCX,sysv_signal,(int __signo, __sighandler_t __handler),(__signo,__handler))
+#elif defined(__CRT_HAVE___sysv_signal)
+/* @param signo: One of `SIG*' */
+__CREDIRECT(,__sighandler_t,__NOTHROW_NCX,sysv_signal,(int __signo, __sighandler_t __handler),__sysv_signal,(__signo,__handler))
 #endif /* sysv_signal... */
 #endif /* __USE_GNU */
 #ifndef __CXX_SYSTEM_HEADER
@@ -307,10 +313,15 @@ __CDECLARE(,int,__NOTHROW_NCX,sigprocmask,(int __how, sigset_t const *__restrict
 #endif /* sigprocmask... */
 #if defined(__CRT_HAVE_sigsuspend)
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,sigsuspend,(sigset_t const *__set),(__set))
+#elif defined(__CRT_HAVE___sigsuspend)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,sigsuspend,(sigset_t const *__set),__sigsuspend,(__set))
 #endif /* sigsuspend... */
 #if defined(__CRT_HAVE_sigaction)
 /* @param signo: One of `SIG*' */
 __CDECLARE(,int,__NOTHROW_NCX,sigaction,(int __signo, struct sigaction const *__restrict __act, struct sigaction *__restrict __oact),(__signo,__act,__oact))
+#elif defined(__CRT_HAVE___sigaction)
+/* @param signo: One of `SIG*' */
+__CREDIRECT(,int,__NOTHROW_NCX,sigaction,(int __signo, struct sigaction const *__restrict __act, struct sigaction *__restrict __oact),__sigaction,(__signo,__act,__oact))
 #endif /* sigaction... */
 #if defined(__CRT_HAVE_sigpending)
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,sigpending,(sigset_t *__set),(__set))

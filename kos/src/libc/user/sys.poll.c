@@ -88,8 +88,9 @@ NOTHROW_RPC(LIBCCALL libc_ppoll64)(struct pollfd *fds,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x99a3069f]]]*/
+/*[[[start:exports,hash:CRC-32=0x81df5e06]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(poll, libc_poll);
+DEFINE_PUBLIC_WEAK_ALIAS(__poll, libc_poll);
 DEFINE_PUBLIC_WEAK_ALIAS(ppoll, libc_ppoll);
 DEFINE_PUBLIC_WEAK_ALIAS(ppoll64, libc_ppoll64);
 /*[[[end:exports]]]*/

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x15c729ce */
+/* HASH CRC-32:0xd613e456 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __LOCAL_LIBC(trecurse) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(trecurse))(void const *__root,
                                                       __action_fn_t __action,
                                                       int __level) {
-#line 713 "kos/src/libc/magic/search.c"
+#line 714 "kos/src/libc/magic/search.c"
 	void *__l, *__r;
 	__l = ((void **)__root)[1];
 	__r = ((void **)__root)[2];

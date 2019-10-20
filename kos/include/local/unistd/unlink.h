@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x40fb8e40 */
+/* HASH CRC-32:0xef50b7ca */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ __NAMESPACE_LOCAL_BEGIN
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
 __LOCAL_LIBC(unlink) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(unlink))(char const *__file) {
-#line 707 "kos/src/libc/magic/unistd.c"
+#line 709 "kos/src/libc/magic/unistd.c"
 	return __localdep_unlinkat(__CRT_AT_FDCWD, __file, 0);
 }
 __NAMESPACE_LOCAL_END

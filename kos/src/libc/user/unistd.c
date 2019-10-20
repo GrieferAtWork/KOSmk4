@@ -3525,7 +3525,7 @@ NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x7bb17b6f]]]*/
+/*[[[start:exports,hash:CRC-32=0x4db8e36f]]]*/
 #undef execl
 #undef _execl
 #undef execle
@@ -3551,9 +3551,11 @@ DEFINE_PUBLIC_WEAK_ALIAS(_execvpe, libc_execvpe);
 DEFINE_PUBLIC_WEAK_ALIAS(execlpe, libc_execlpe);
 DEFINE_PUBLIC_WEAK_ALIAS(_execlpe, libc_execlpe);
 DEFINE_PUBLIC_WEAK_ALIAS(getpid, libc_getpid);
+DEFINE_PUBLIC_WEAK_ALIAS(__getpid, libc_getpid);
 DEFINE_PUBLIC_WEAK_ALIAS(_getpid, libc_getpid);
 DEFINE_PUBLIC_WEAK_ALIAS(gettid, libc_gettid);
 DEFINE_PUBLIC_WEAK_ALIAS(pipe, libc_pipe);
+DEFINE_PUBLIC_WEAK_ALIAS(__pipe, libc_pipe);
 DEFINE_PUBLIC_WEAK_ALIAS(sleep, libc_sleep);
 DEFINE_PUBLIC_WEAK_ALIAS(_sleep, libc_sleep);
 DEFINE_PUBLIC_WEAK_ALIAS(fsync, libc_fsync);
@@ -3562,6 +3564,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(fdatasync, libc_fsync);
 DEFINE_PUBLIC_WEAK_ALIAS(getppid, libc_getppid);
 DEFINE_PUBLIC_WEAK_ALIAS(getpgrp, libc_getpgrp);
 DEFINE_PUBLIC_WEAK_ALIAS(setpgid, libc_setpgid);
+DEFINE_PUBLIC_WEAK_ALIAS(__setpgid, libc_setpgid);
 DEFINE_PUBLIC_WEAK_ALIAS(setsid, libc_setsid);
 DEFINE_PUBLIC_WEAK_ALIAS(getuid, libc_getuid);
 DEFINE_PUBLIC_WEAK_ALIAS(geteuid, libc_geteuid);
@@ -3571,6 +3574,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(getgroups, libc_getgroups);
 DEFINE_PUBLIC_WEAK_ALIAS(setuid, libc_setuid);
 DEFINE_PUBLIC_WEAK_ALIAS(setgid, libc_setgid);
 DEFINE_PUBLIC_WEAK_ALIAS(fork, libc_fork);
+DEFINE_PUBLIC_WEAK_ALIAS(__fork, libc_fork);
 DEFINE_PUBLIC_WEAK_ALIAS(alarm, libc_alarm);
 DEFINE_PUBLIC_WEAK_ALIAS(pause, libc_pause);
 DEFINE_PUBLIC_WEAK_ALIAS(fpathconf, libc_fpathconf);
@@ -3591,13 +3595,16 @@ DEFINE_PUBLIC_WEAK_ALIAS(_write, libc_write);
 DEFINE_PUBLIC_WEAK_ALIAS(readall, libc_readall);
 DEFINE_PUBLIC_WEAK_ALIAS(writeall, libc_writeall);
 DEFINE_PUBLIC_WEAK_ALIAS(lseek, libc_lseek);
+DEFINE_PUBLIC_WEAK_ALIAS(__lseek, libc_lseek);
 DEFINE_PUBLIC_WEAK_ALIAS(isatty, libc_isatty);
 DEFINE_PUBLIC_WEAK_ALIAS(_isatty, libc_isatty);
 DEFINE_PUBLIC_WEAK_ALIAS(dup2, libc_dup2);
+DEFINE_PUBLIC_WEAK_ALIAS(__dup2, libc_dup2);
 DEFINE_PUBLIC_WEAK_ALIAS(_dup2, libc_dup2);
 DEFINE_PUBLIC_WEAK_ALIAS(dup, libc_dup);
 DEFINE_PUBLIC_WEAK_ALIAS(_dup, libc_dup);
 DEFINE_PUBLIC_WEAK_ALIAS(close, libc_close);
+DEFINE_PUBLIC_WEAK_ALIAS(__close, libc_close);
 DEFINE_PUBLIC_WEAK_ALIAS(_close, libc_close);
 DEFINE_PUBLIC_WEAK_ALIAS(access, libc_access);
 DEFINE_PUBLIC_WEAK_ALIAS(_access, libc_access);
@@ -3623,7 +3630,9 @@ DEFINE_PUBLIC_WEAK_ALIAS(pwrite, libc_pwrite);
 DEFINE_PUBLIC_WEAK_ALIAS(preadall, libc_preadall);
 DEFINE_PUBLIC_WEAK_ALIAS(pwriteall, libc_pwriteall);
 DEFINE_PUBLIC_WEAK_ALIAS(pread64, libc_pread64);
+DEFINE_PUBLIC_WEAK_ALIAS(__pread64, libc_pread64);
 DEFINE_PUBLIC_WEAK_ALIAS(pwrite64, libc_pwrite64);
+DEFINE_PUBLIC_WEAK_ALIAS(__pwrite64, libc_pwrite64);
 DEFINE_PUBLIC_WEAK_ALIAS(preadall64, libc_preadall64);
 DEFINE_PUBLIC_WEAK_ALIAS(pwriteall64, libc_pwriteall64);
 DEFINE_PUBLIC_WEAK_ALIAS(pipe2, libc_pipe2);
@@ -3639,9 +3648,11 @@ DEFINE_PUBLIC_WEAK_ALIAS(usleep, libc_usleep);
 DEFINE_PUBLIC_WEAK_ALIAS(getwd, libc_getwd);
 DEFINE_PUBLIC_WEAK_ALIAS(ualarm, libc_ualarm);
 DEFINE_PUBLIC_WEAK_ALIAS(vfork, libc_vfork);
+DEFINE_PUBLIC_WEAK_ALIAS(__vfork, libc_vfork);
 DEFINE_PUBLIC_WEAK_ALIAS(fchown, libc_fchown);
 DEFINE_PUBLIC_WEAK_ALIAS(fchdir, libc_fchdir);
 DEFINE_PUBLIC_WEAK_ALIAS(getpgid, libc_getpgid);
+DEFINE_PUBLIC_WEAK_ALIAS(__getpgid, libc_getpgid);
 DEFINE_PUBLIC_WEAK_ALIAS(getsid, libc_getsid);
 DEFINE_PUBLIC_WEAK_ALIAS(lchown, libc_lchown);
 DEFINE_PUBLIC_WEAK_ALIAS(truncate, libc_truncate);
@@ -3683,6 +3694,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(ftruncate64, libc_ftruncate64);
 DEFINE_PUBLIC_WEAK_ALIAS(_chsize_s, libc_ftruncate64);
 DEFINE_PUBLIC_WEAK_ALIAS(brk, libc_brk);
 DEFINE_PUBLIC_WEAK_ALIAS(sbrk, libc_sbrk);
+DEFINE_PUBLIC_WEAK_ALIAS(__sbrk, libc_sbrk);
 DEFINE_PUBLIC_WEAK_ALIAS(fdatasync, libc_fdatasync);
 DEFINE_PUBLIC_WEAK_ALIAS(ctermid, libc_ctermid);
 DEFINE_PUBLIC_WEAK_ALIAS(ctermid_r, libc_ctermid_r);

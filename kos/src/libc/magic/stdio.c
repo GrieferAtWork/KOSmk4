@@ -833,7 +833,7 @@ printf:([nonnull] char const *__restrict format, ...) -> __STDC_INT_AS_SSIZE_T
 __LOCAL_LIBC(@vfscanf_ungetc@) __SSIZE_TYPE__ (__LIBCCALL __vfscanf_ungetc)(void *__arg, __CHAR32_TYPE__ __ch) {
 	return ungetc((int)(unsigned int)__ch, (FILE *)__arg);
 }
-)][crtbuiltin]
+)][crtbuiltin][export_alias(__vfscanf)]
 vfscanf:([nonnull] FILE *__restrict stream, [nonnull] char const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T {
 	return format_vscanf((pformatgetc)&@fgetc@, &@__vfscanf_ungetc@, (void *)stream, format, args);
 }
@@ -916,7 +916,7 @@ __LOCAL_LIBC(@vsscanf_ungetc@) __SSIZE_TYPE__ (__LIBCCALL __vsscanf_ungetc)(void
 	return 0;
 }
 )][ATTR_LIBC_SCANF(2, 0)][ATTR_WUNUSED][alias(_vsscanf, _vsscanf_s)][crtbuiltin]
-[section(.text.crt.unicode.static.format.scanf)]
+[section(.text.crt.unicode.static.format.scanf)][export_alias(__vsscanf)]
 vsscanf:([nonnull] char const *__restrict input,
          [nonnull] char const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T {
 	return format_vscanf(&@__vsscanf_getc@, &@__vsscanf_ungetc@, (void *)&input, format, args);
@@ -977,7 +977,7 @@ struct __format_snprintf_data {
 };
 #endif /* !____format_snprintf_data_defined */
 )][crtbuiltin]
-[section(.text.crt.unicode.static.format.printf)]
+[section(.text.crt.unicode.static.format.printf)][export_alias(__vsnprintf)]
 vsnprintf:([outp_opt(min(return,buflen))] char *__restrict buf, size_t buflen,
            [nonnull] char const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T {
 	struct @__format_snprintf_data@ data;
@@ -1217,7 +1217,7 @@ __getdelim:([nonnull] char **__restrict lineptr,
             [nonnull] size_t *__restrict pcount, int delimiter,
             [nonnull] $FILE *__restrict stream) -> $ssize_t = getdelim;
 
-[cp_stdio][ATTR_WUNUSED][alias(getdelim_unlocked)][same_impl]
+[cp_stdio][ATTR_WUNUSED][alias(getdelim_unlocked)][same_impl][alias(__getdelim)]
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(getdelim_unlocked)]
 [requires($has_function(realloc) && $has_function(fgetc) && $has_function(ungetc))]
 getdelim:([nonnull] char **__restrict lineptr,
@@ -1694,7 +1694,7 @@ vasprintf:([nonnull] char **__restrict pstr, [nonnull] char const *__restrict fo
 	return (__STDC_INT_AS_SSIZE_T)error;
 }
 @@Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR'
-[ATTR_LIBC_PRINTF(2, 3)][ATTR_WUNUSED]
+[ATTR_LIBC_PRINTF(2, 3)][ATTR_WUNUSED][alias(__asprintf)]
 asprintf:([nonnull] char **__restrict pstr, [nonnull] char const *__restrict format, ...) -> __STDC_INT_AS_SSIZE_T
 %{
 	auto_block(printf(vasprintf))

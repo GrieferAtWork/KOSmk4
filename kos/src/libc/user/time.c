@@ -514,7 +514,7 @@ NOTHROW_NCX(LIBCCALL libc_timer_settime64)(timer_t timerid,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xbfd69bfb]]]*/
+/*[[[start:exports,hash:CRC-32=0x591e4492]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(clock, libc_clock);
 DEFINE_PUBLIC_WEAK_ALIAS(time, libc_time);
 DEFINE_PUBLIC_WEAK_ALIAS(time64, libc_time64);
@@ -522,16 +522,22 @@ DEFINE_PUBLIC_WEAK_ALIAS(tzset, libc_tzset);
 DEFINE_PUBLIC_WEAK_ALIAS(stime, libc_stime);
 DEFINE_PUBLIC_WEAK_ALIAS(stime64, libc_stime64);
 DEFINE_PUBLIC_WEAK_ALIAS(nanosleep, libc_nanosleep);
+DEFINE_PUBLIC_WEAK_ALIAS(__nanosleep, libc_nanosleep);
 DEFINE_PUBLIC_WEAK_ALIAS(clock_getres, libc_clock_getres);
+DEFINE_PUBLIC_WEAK_ALIAS(__clock_getres, libc_clock_getres);
 DEFINE_PUBLIC_WEAK_ALIAS(clock_gettime, libc_clock_gettime);
+DEFINE_PUBLIC_WEAK_ALIAS(__clock_gettime, libc_clock_gettime);
 DEFINE_PUBLIC_WEAK_ALIAS(clock_settime, libc_clock_settime);
+DEFINE_PUBLIC_WEAK_ALIAS(__clock_settime, libc_clock_settime);
 DEFINE_PUBLIC_WEAK_ALIAS(timer_create, libc_timer_create);
 DEFINE_PUBLIC_WEAK_ALIAS(timer_delete, libc_timer_delete);
 DEFINE_PUBLIC_WEAK_ALIAS(timer_settime, libc_timer_settime);
 DEFINE_PUBLIC_WEAK_ALIAS(timer_gettime, libc_timer_gettime);
 DEFINE_PUBLIC_WEAK_ALIAS(timer_getoverrun, libc_timer_getoverrun);
 DEFINE_PUBLIC_WEAK_ALIAS(clock_nanosleep, libc_clock_nanosleep);
+DEFINE_PUBLIC_WEAK_ALIAS(__clock_nanosleep, libc_clock_nanosleep);
 DEFINE_PUBLIC_WEAK_ALIAS(clock_getcpuclockid, libc_clock_getcpuclockid);
+DEFINE_PUBLIC_WEAK_ALIAS(__clock_getcpuclockid, libc_clock_getcpuclockid);
 DEFINE_PUBLIC_WEAK_ALIAS(nanosleep64, libc_nanosleep64);
 DEFINE_PUBLIC_WEAK_ALIAS(clock_getres64, libc_clock_getres64);
 DEFINE_PUBLIC_WEAK_ALIAS(clock_gettime64, libc_clock_gettime64);

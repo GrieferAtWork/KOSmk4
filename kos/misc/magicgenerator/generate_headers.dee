@@ -38,6 +38,8 @@ local copyright =
 
 #undef WARN_KNOWN_BUILTINS
 #define WARN_KNOWN_BUILTINS 1
+#undef WARN_KNOWN_ALIASES
+#define WARN_KNOWN_ALIASES 1
 
 
 import fs;
@@ -77,6 +79,27 @@ with (local fp = try File.open("misc/scripts/gcc_builtins_known", "r") catch (..
 	}
 }
 #endif /* WARN_KNOWN_BUILTINS */
+
+#ifdef WARN_KNOWN_ALIASES
+global final known_aliases = Dict();
+with (local fp = try File.open("include/i386-kos/crt-features/crt-glc.h", "r") catch (...) none) {
+	local known_functions = HashSet();
+	for (local l: fp) {
+		try {
+			local n = l.scanf(" # define __CRT_HAVE_%[^ ]")...;
+			known_functions.insert(n.strip().decode("utf-8"));
+		} catch (...) {
+		}
+	}
+	for (local f: known_functions) {
+		if (f.startswith("__")) {
+			local alt = f[2:];
+			if (alt in known_functions)
+				known_aliases[alt] = f;
+		}
+	}
+}
+#endif /* WARN_KNOWN_ALIASES */
 
 
 function key_identity(x) {
@@ -1885,6 +1908,7 @@ again_enum_name:
 						aliases.append(("", x));
 					}
 					break;
+				case "alternate_name":
 				case "alternate_names":
 					for (local x: get_tag_operand().split(",")) {
 						x = x.strip();
@@ -2791,6 +2815,48 @@ again_enum_name:
 				}
 			}
 #endif /* WARN_KNOWN_BUILTINS */
+#ifdef WARN_KNOWN_ALIASES
+			if (block !is UndefinedFunctionAlias) {
+				local ka = known_aliases.get(funname);
+				if (ka !is none && ka !in alternate_names) {
+					/* Check if the alias is defined as a regular alias. */
+					for (local none, name: aliases) {
+						if (name == ka)
+							goto known_alias_declared;
+					}
+					for (local none, name: preferred_aliases) {
+						if (name == ka)
+							goto known_alias_declared;
+					}
+					print getFilenameForLog(filename),;
+					print "(",;
+					print 1+text.count("\n", 0, funname_start),;
+					print ") : Warning : Missing, known alias [export_alias(",;
+					print ka,;
+					print ")] for", repr(funname);
+				}
+			} else {
+				local ka = known_aliases.get(block.name);
+				if (ka !is none) {
+					/* Check if the alias is defined as a regular alias. */
+					for (local none, name: aliases) {
+						if (name == ka)
+							goto known_alias_declared;
+					}
+					for (local none, name: preferred_aliases) {
+						if (name == ka)
+							goto known_alias_declared;
+					}
+					print getFilenameForLog(filename),;
+					print "(",;
+					print 1+text.count("\n", 0, funname_start),;
+					print ") : Warning : Missing, known alias [export_alias(",;
+					print ka,;
+					print ")] for", repr(block.name);
+				}
+			}
+known_alias_declared:
+#endif /* WARN_KNOWN_ALIASES */
 			yield fun;
 			aliases = [];
 			intern_aliases = [];

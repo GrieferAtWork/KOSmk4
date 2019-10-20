@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x67b600b0 */
+/* HASH CRC-32:0x4d7c0d23 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,6 +31,8 @@
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_tolower)(int __ch) { return __builtin_tolower(__ch); }
 #elif defined(__CRT_HAVE_tolower)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_tolower,(int __ch),tolower,(__ch))
+#elif defined(__CRT_HAVE__tolower)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_tolower,(int __ch),_tolower,(__ch))
 #else /* LIBC: tolower */
 #include <local/ctype/tolower.h>
 #define __localdep_tolower (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tolower))

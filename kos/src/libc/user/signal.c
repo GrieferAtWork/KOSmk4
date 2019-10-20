@@ -656,10 +656,11 @@ DEFINE_INTERN_ALIAS(libc_gsignal, libc_raise);
 
 
 
-/*[[[start:exports,hash:CRC-32=0xf7dac137]]]*/
+/*[[[start:exports,hash:CRC-32=0xc5b29a53]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(raise, libc_raise);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$raise, libd_raise);
 DEFINE_PUBLIC_WEAK_ALIAS(sysv_signal, libc_sysv_signal);
+DEFINE_PUBLIC_WEAK_ALIAS(__sysv_signal, libc_sysv_signal);
 DEFINE_PUBLIC_WEAK_ALIAS(signal, libc_signal);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$signal, libd_signal);
 DEFINE_PUBLIC_WEAK_ALIAS(ssignal, libc_ssignal);
@@ -672,7 +673,9 @@ DEFINE_PUBLIC_WEAK_ALIAS(bsd_signal, libc_bsd_signal);
 DEFINE_PUBLIC_WEAK_ALIAS(kill, libc_kill);
 DEFINE_PUBLIC_WEAK_ALIAS(sigprocmask, libc_sigprocmask);
 DEFINE_PUBLIC_WEAK_ALIAS(sigsuspend, libc_sigsuspend);
+DEFINE_PUBLIC_WEAK_ALIAS(__sigsuspend, libc_sigsuspend);
 DEFINE_PUBLIC_WEAK_ALIAS(sigaction, libc_sigaction);
+DEFINE_PUBLIC_WEAK_ALIAS(__sigaction, libc_sigaction);
 DEFINE_PUBLIC_WEAK_ALIAS(sigpending, libc_sigpending);
 DEFINE_PUBLIC_WEAK_ALIAS(sigwait, libc_sigwait);
 DEFINE_PUBLIC_WEAK_ALIAS(sigwaitinfo, libc_sigwaitinfo);

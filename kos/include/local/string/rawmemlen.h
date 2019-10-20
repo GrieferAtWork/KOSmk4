@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xec2755f5 */
+/* HASH CRC-32:0xd4419097 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,6 +25,9 @@
 #if defined(__CRT_HAVE_rawmemchr)
 /* Same as `memchr' with a search limit of `(size_t)-1' */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_rawmemchr,(void const *__restrict __haystack, int __needle),rawmemchr,(__haystack,__needle))
+#elif defined(__CRT_HAVE___rawmemchr)
+/* Same as `memchr' with a search limit of `(size_t)-1' */
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_rawmemchr,(void const *__restrict __haystack, int __needle),__rawmemchr,(__haystack,__needle))
 #else /* LIBC: rawmemchr */
 #include <local/string/rawmemchr.h>
 /* Same as `memchr' with a search limit of `(size_t)-1' */

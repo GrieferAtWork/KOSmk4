@@ -305,7 +305,7 @@ __SYSDECL_BEGIN
 
 [ATTR_CONST][ATTR_WUNUSED][libc][nothrow][libc_impl({
 	return isupper(ch) ? ((u8)ch+0x20) : ch;
-})][crtbuiltin][std] tolower:(int ch) -> int {
+})][crtbuiltin][std][export_alias(_tolower)] tolower:(int ch) -> int {
 #if defined(__CRT_HAVE___ctype_tolower_loc) && defined(__CRT_CYG)
 	return ch >= -128 && ch < 256 ? (*__ctype_tolower_loc())[ch] : ch;
 #else
@@ -314,7 +314,7 @@ __SYSDECL_BEGIN
 }
 [ATTR_CONST][ATTR_WUNUSED][libc][nothrow][libc_impl({
 	return islower(ch) ? ((u8)ch-0x20) : ch;
-})][crtbuiltin][std] toupper:(int ch) -> int {
+})][crtbuiltin][std][export_alias(_toupper)] toupper:(int ch) -> int {
 #if defined(__CRT_HAVE___ctype_toupper_loc) && defined(__CRT_CYG)
 	return ch >= -128 && ch < 256 ? (*__ctype_toupper_loc())[ch] : ch;
 #else
@@ -351,7 +351,8 @@ __SYSDECL_BEGIN
 [ATTR_CONST][ATTR_WUNUSED][libc_impl({
 	(void)locale;
 	return iscntrl(ch);
-})] iscntrl_l:(int ch, __locale_t locale) -> int {
+})][export_alias(__iscntrl_l)]
+iscntrl_l:(int ch, __locale_t locale) -> int {
 #ifdef __CRT_CYG
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 	return locale->__ctype_b[ch] & (1 << 9);
@@ -372,7 +373,8 @@ __SYSDECL_BEGIN
 [ATTR_CONST][ATTR_WUNUSED][libc_impl({
 	(void)locale;
 	return isspace(ch);
-})] isspace_l:(int ch, __locale_t locale) -> int {
+})][export_alias(__isspace_l)]
+isspace_l:(int ch, __locale_t locale) -> int {
 #if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
 #include <hybrid/byteorder.h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -393,7 +395,8 @@ __SYSDECL_BEGIN
 [ATTR_CONST][ATTR_WUNUSED][libc_impl({
 	(void)locale;
 	return isupper(ch);
-})] isupper_l:(int ch, __locale_t locale) -> int {
+})][export_alias(__isupper_l)]
+isupper_l:(int ch, __locale_t locale) -> int {
 #if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
 #include <hybrid/byteorder.h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -414,7 +417,8 @@ __SYSDECL_BEGIN
 [ATTR_CONST][ATTR_WUNUSED][libc_impl({
 	(void)locale;
 	return islower(ch);
-})] islower_l:(int ch, __locale_t locale) -> int {
+})][export_alias(__islower_l)]
+islower_l:(int ch, __locale_t locale) -> int {
 #if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
 #include <hybrid/byteorder.h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -435,7 +439,8 @@ __SYSDECL_BEGIN
 [ATTR_CONST][ATTR_WUNUSED][libc_impl({
 	(void)locale;
 	return isalpha(ch);
-})] isalpha_l:(int ch, __locale_t locale) -> int {
+})][export_alias(__isalpha_l)]
+isalpha_l:(int ch, __locale_t locale) -> int {
 #if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
 #include <hybrid/byteorder.h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -456,7 +461,8 @@ __SYSDECL_BEGIN
 [ATTR_CONST][ATTR_WUNUSED][libc_impl({
 	(void)locale;
 	return isdigit(ch);
-})] isdigit_l:(int ch, __locale_t locale) -> int {
+})][export_alias(__isdigit_l)]
+isdigit_l:(int ch, __locale_t locale) -> int {
 #if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
 #include <hybrid/byteorder.h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -477,7 +483,8 @@ __SYSDECL_BEGIN
 [ATTR_CONST][ATTR_WUNUSED][libc_impl({
 	(void)locale;
 	return isxdigit(ch);
-})] isxdigit_l:(int ch, __locale_t locale) -> int {
+})][export_alias(__isxdigit_l)]
+isxdigit_l:(int ch, __locale_t locale) -> int {
 #if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
 #include <hybrid/byteorder.h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -498,7 +505,8 @@ __SYSDECL_BEGIN
 [ATTR_CONST][ATTR_WUNUSED][libc_impl({
 	(void)locale;
 	return isalnum(ch);
-})] isalnum_l:(int ch, __locale_t locale) -> int {
+})][export_alias(__isalnum_l)]
+isalnum_l:(int ch, __locale_t locale) -> int {
 #if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
 #include <hybrid/byteorder.h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -519,7 +527,8 @@ __SYSDECL_BEGIN
 [ATTR_CONST][ATTR_WUNUSED][libc_impl({
 	(void)locale;
 	return ispunct(ch);
-})] ispunct_l:(int ch, __locale_t locale) -> int {
+})][export_alias(__ispunct_l)]
+ispunct_l:(int ch, __locale_t locale) -> int {
 #if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
 #include <hybrid/byteorder.h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -540,7 +549,8 @@ __SYSDECL_BEGIN
 [ATTR_CONST][ATTR_WUNUSED][libc_impl({
 	(void)locale;
 	return isgraph(ch);
-})] isgraph_l:(int ch, __locale_t locale) -> int {
+})][export_alias(__isgraph_l)]
+isgraph_l:(int ch, __locale_t locale) -> int {
 #if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
 #include <hybrid/byteorder.h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -561,7 +571,8 @@ __SYSDECL_BEGIN
 [ATTR_CONST][ATTR_WUNUSED][libc_impl({
 	(void)locale;
 	return isprint(ch);
-})] isprint_l:(int ch, __locale_t locale) -> int {
+})][export_alias(__isprint_l)]
+isprint_l:(int ch, __locale_t locale) -> int {
 #if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
 #include <hybrid/byteorder.h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -582,7 +593,8 @@ __SYSDECL_BEGIN
 [ATTR_CONST][ATTR_WUNUSED][libc_impl({
 	(void)locale;
 	return isblank(ch);
-})] isblank_l:(int ch, __locale_t locale) -> int {
+})][export_alias(__isblank_l)]
+isblank_l:(int ch, __locale_t locale) -> int {
 #if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
 #include <hybrid/byteorder.h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -599,12 +611,16 @@ __SYSDECL_BEGIN
 }
 
 
-[ATTR_CONST][ATTR_WUNUSED] tolower_l:(int ch, __locale_t locale) -> int {
+[ATTR_CONST][ATTR_WUNUSED]
+[export_alias(_tolower_l, __tolower_l)]
+tolower_l:(int ch, __locale_t locale) -> int {
 	/* TODO: GLC has a variant for this! */
 	(void)locale;
 	return tolower(ch);
 }
-[ATTR_CONST][ATTR_WUNUSED] toupper_l:(int ch, __locale_t locale) -> int {
+[ATTR_CONST][ATTR_WUNUSED]
+[export_alias(_toupper_l, __toupper_l)]
+toupper_l:(int ch, __locale_t locale) -> int {
 	/* TODO: GLC has a variant for this! */
 	(void)locale;
 	return toupper(ch);
@@ -685,10 +701,10 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED, __UINT16_TYPE__ const 
 #ifndef __NO_XBLOCK
 #if defined(__CRT_HAVE___ctype_tolower_loc)
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED, __INT32_TYPE__ const **, __NOTHROW, __ctype_tolower_loc, (void), ())
-#endif
+#endif /* __CRT_HAVE___ctype_tolower_loc */
 #if defined(__CRT_HAVE___ctype_toupper_loc)
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED, __INT32_TYPE__ const **, __NOTHROW, __ctype_toupper_loc, (void), ())
-#endif
+#endif /* __CRT_HAVE___ctype_toupper_loc */
 #endif /* !__NO_XBLOCK */
 __NAMESPACE_INT_END
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -753,10 +769,10 @@ __NAMESPACE_INT_END
 #ifndef __NO_XBLOCK
 #if defined(__CRT_HAVE___ctype_tolower_loc)
 #define __inline_tolower(ch)  __XBLOCK({ int __tol_ch = (ch); __XRETURN __tol_ch >= -128 && __tol_ch < 256 ? (*__ctype_tolower_loc())[__tol_ch] : __tol_ch; })
-#endif
+#endif /* __CRT_HAVE___ctype_tolower_loc */
 #if defined(__CRT_HAVE___ctype_toupper_loc)
 #define __inline_toupper(ch)  __XBLOCK({ int __tol_ch = (ch); __XRETURN __tol_ch >= -128 && __tol_ch < 256 ? (*__ctype_toupper_loc())[__tol_ch] : __tol_ch; })
-#endif
+#endif /* __CRT_HAVE___ctype_toupper_loc */
 #endif /* !__NO_XBLOCK */
 #elif defined(__CRT_CYG) && defined(__CRT_HAVE___locale_ctype_ptr)  /* ---- CYGWIN */
 __NAMESPACE_INT_BEGIN

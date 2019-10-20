@@ -1935,7 +1935,7 @@ NOTHROW_NCX(LIBCCALL libc__beep)(unsigned int freq,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xddc9f4d7]]]*/
+/*[[[start:exports,hash:CRC-32=0x9e97d8b3]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(getenv, libc_getenv);
 DEFINE_PUBLIC_WEAK_ALIAS(system, libc_system);
 DEFINE_PUBLIC_WEAK_ALIAS(abort, libc_abort);
@@ -1991,6 +1991,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(frealpathat, libc_frealpathat);
 DEFINE_PUBLIC_WEAK_ALIAS(setenv, libc_setenv);
 DEFINE_PUBLIC_WEAK_ALIAS(unsetenv, libc_unsetenv);
 DEFINE_PUBLIC_WEAK_ALIAS(mktemp, libc_mktemp);
+DEFINE_PUBLIC_WEAK_ALIAS(__mktemp, libc_mktemp);
 DEFINE_PUBLIC_WEAK_ALIAS(mkstemp, libc_mkstemp);
 DEFINE_PUBLIC_WEAK_ALIAS(mkdtemp, libc_mkdtemp);
 DEFINE_PUBLIC_WEAK_ALIAS(setkey, libc_setkey);
@@ -1999,6 +2000,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(unlockpt, libc_unlockpt);
 DEFINE_PUBLIC_WEAK_ALIAS(ptsname, libc_ptsname);
 DEFINE_PUBLIC_WEAK_ALIAS(posix_openpt, libc_posix_openpt);
 DEFINE_PUBLIC_WEAK_ALIAS(secure_getenv, libc_secure_getenv);
+DEFINE_PUBLIC_WEAK_ALIAS(__secure_getenv, libc_secure_getenv);
 DEFINE_PUBLIC_WEAK_ALIAS(ptsname_r, libc_ptsname_r);
 DEFINE_PUBLIC_WEAK_ALIAS(getpt, libc_getpt);
 DEFINE_PUBLIC_WEAK_ALIAS(canonicalize_file_name, libc_canonicalize_file_name);

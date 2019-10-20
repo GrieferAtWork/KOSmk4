@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf48e0eb4 */
+/* HASH CRC-32:0x441f46b3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,9 @@
 #if defined(__CRT_HAVE_clock_settime)
 /* Set clock CLOCK_ID to value TP */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_settime32,(__clockid_t __clock_id, struct __timespec32 const *__tp),clock_settime,(__clock_id,__tp))
+#elif defined(__CRT_HAVE___clock_settime)
+/* Set clock CLOCK_ID to value TP */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_settime32,(__clockid_t __clock_id, struct __timespec32 const *__tp),__clock_settime,(__clock_id,__tp))
 #else /* LIBC: clock_settime */
 #undef ____localdep_clock_settime32_defined
 #endif /* clock_settime32... */
@@ -40,7 +43,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_settime64,(__
 #elif defined(__CRT_HAVE_clock_settime) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Set clock CLOCK_ID to value TP */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_settime64,(__clockid_t __clock_id, struct __timespec64 const *__tp),clock_settime,(__clock_id,__tp))
-#elif defined(__CRT_HAVE_clock_settime)
+#elif defined(__CRT_HAVE_clock_settime) || defined(__CRT_HAVE___clock_settime)
 #include <local/time/clock_settime64.h>
 /* Set clock CLOCK_ID to value TP */
 #define __localdep_clock_settime64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(clock_settime64))
@@ -54,7 +57,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(clock_settime) __ATTR_NONNULL((2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(clock_settime))(__clockid_t __clock_id,
                                                            struct __TM_TYPE(timespec) const *__tp) {
-#line 1121 "kos/src/libc/magic/time.c"
+#line 1125 "kos/src/libc/magic/time.c"
 #ifdef __CRT_HAVE_clock_settime
 	struct __timespec32 __tp32;
 	__tp32.tv_sec  = (__time32_t)__tp->tv_sec;

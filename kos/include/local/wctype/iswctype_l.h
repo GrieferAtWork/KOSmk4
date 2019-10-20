@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4dd8820e */
+/* HASH CRC-32:0xd67e91e8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,8 @@
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswctype,(__WINT_TYPE__ __wc, wctype_t __desc),iswctype,(__wc,__desc))
 #elif defined(__CRT_HAVE_is_wctype)
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswctype,(__WINT_TYPE__ __wc, wctype_t __desc),is_wctype,(__wc,__desc))
+#elif defined(__CRT_HAVE___iswctype)
+__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswctype,(__WINT_TYPE__ __wc, wctype_t __desc),__iswctype,(__wc,__desc))
 #else /* LIBC: iswctype */
 #include <local/wctype/iswctype.h>
 #define __localdep_iswctype (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswctype))

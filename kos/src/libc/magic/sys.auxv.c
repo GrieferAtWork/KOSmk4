@@ -34,6 +34,7 @@ __SYSDECL_BEGIN
 @@Return the value associated with an Elf*_auxv_t type from the auxv list
 @@passed to the program on startup.  If TYPE was not present in the auxv
 @@list, returns zero and sets errno to ENOENT
+[export_alias(__getauxval)]
 getauxval:(__ULONGPTR_TYPE__ type) -> __ULONGPTR_TYPE__;
 
 %{

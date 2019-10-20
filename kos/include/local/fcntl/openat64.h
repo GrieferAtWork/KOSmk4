@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc150b97 */
+/* HASH CRC-32:0xa4b4790d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(openat64))(__fd_t __dirfd,
                                                        char const *__filename,
                                                        __oflag_t __oflags,
                                                        ...) {
-#line 274 "kos/src/libc/magic/fcntl.c"
+#line 275 "kos/src/libc/magic/fcntl.c"
 	__fd_t __result;
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __oflags);

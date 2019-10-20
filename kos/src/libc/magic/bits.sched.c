@@ -449,7 +449,8 @@ struct sched_param {
 %#if defined(__USE_GNU) || defined(__USE_KOS)
 %typedef int (__LIBCCALL *__clone_func_t)(void *__arg);
 
-[section(.text.crt.sched.access)][vartypes($pid_t,void *,$pid_t)]
+[section(.text.crt.sched.access)]
+[vartypes($pid_t,void *,$pid_t)][export_alias(__clone)]
 clone:([nonnull] __clone_func_t fn, void *child_stack, int flags,
        void *arg, ... /* pid_t *ptid, void *newtls, pid_t *ctid */) -> $pid_t;
 

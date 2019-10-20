@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x84fd437d */
+/* HASH CRC-32:0xb27f8e81 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(sigisemptyset) __ATTR_WUNUSED __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sigisemptyset))(struct __sigset_struct const *__set) {
-#line 278 "kos/src/libc/magic/signal.c"
+#line 280 "kos/src/libc/magic/signal.c"
 	__SIZE_TYPE__ __i;
 	for (__i = 0; __i < sizeof(struct __sigset_struct) / sizeof(__ULONGPTR_TYPE__); ++__i)
 		if (__set->__val[__i])

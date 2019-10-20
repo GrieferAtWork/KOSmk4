@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x20245da */
+/* HASH CRC-32:0x926fc09e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,6 +69,9 @@ struct pollfd {
 #if defined(__CRT_HAVE_poll)
 /* @param timeout: Timeout in milliseconds (or negative for infinity) */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,poll,(struct pollfd *__fds, nfds_t __nfds, int __timeout),(__fds,__nfds,__timeout))
+#elif defined(__CRT_HAVE___poll)
+/* @param timeout: Timeout in milliseconds (or negative for infinity) */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,poll,(struct pollfd *__fds, nfds_t __nfds, int __timeout),__poll,(__fds,__nfds,__timeout))
 #endif /* poll... */
 #ifdef __USE_GNU
 #if defined(__CRT_HAVE_ppoll) && (defined(__USE_TIME_BITS64))

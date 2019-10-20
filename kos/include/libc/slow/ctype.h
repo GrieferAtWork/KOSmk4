@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x783852e8 */
+/* HASH CRC-32:0xe2230725 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -118,6 +118,8 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__libc_slow_isprint,(int _
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __libc_slow_tolower)(int __ch) { return __builtin_tolower(__ch); }
 #elif defined(__CRT_HAVE_tolower)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__libc_slow_tolower,(int __ch),tolower,(__ch))
+#elif defined(__CRT_HAVE__tolower)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__libc_slow_tolower,(int __ch),_tolower,(__ch))
 #else /* LIBC: tolower */
 #include <local/ctype/tolower.h>
 #define __libc_slow_tolower (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tolower))
@@ -126,6 +128,8 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__libc_slow_tolower,(int _
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __libc_slow_toupper)(int __ch) { return __builtin_toupper(__ch); }
 #elif defined(__CRT_HAVE_toupper)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__libc_slow_toupper,(int __ch),toupper,(__ch))
+#elif defined(__CRT_HAVE__toupper)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__libc_slow_toupper,(int __ch),_toupper,(__ch))
 #else /* LIBC: toupper */
 #include <local/ctype/toupper.h>
 #define __libc_slow_toupper (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(toupper))

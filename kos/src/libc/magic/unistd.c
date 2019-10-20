@@ -309,7 +309,8 @@ execlpe:([notnull] char const *__restrict file, char const *args, ... /*, (char 
 @@>> getpid(2)
 @@Return the PID of the calling process (that is the TID of the calling thread group's leader)
 @@THIS_THREAD->LEADER->PID
-[guard][ATTR_WUNUSED][alias(_getpid)] getpid:() -> $pid_t;
+[guard][ATTR_WUNUSED][alias(_getpid)][export_alias(__getpid)]
+getpid:() -> $pid_t;
 
 %
 %#ifdef __USE_KOS
@@ -326,7 +327,8 @@ execlpe:([notnull] char const *__restrict file, char const *args, ... /*, (char 
 %
 @@>> pipe(2)
 @@Create a new pair of connected pipes ([0] = reader, [1] = writer)
-[section(.text.crt.io.access)][noexport][requires($has_function(dos_pipe))]
+[section(.text.crt.io.access)][noexport]
+[requires($has_function(dos_pipe))][export_alias(__pipe)]
 pipe:([notnull] $fd_t pipedes[2]) -> int {
 	return dos_pipe(pipedes, 4096, 0x8000); /* O_BINARY */
 }
@@ -373,12 +375,8 @@ fsync:($fd_t fd) -> int {
 [ATTR_WUNUSED] getpgrp:() -> $pid_t;
 
 %
-@@>> getpgid(2)
-@@Return the ID of the process group associated with `PID's process.
-@@(That is the TID of the leader of the process group of `PID's leader)
-@@THREAD[PID]->LEADER->GROUP_LEADER->PID
-@@When `PID' is ZERO(0), use `gettid()' for it instead
-[ATTR_WUNUSED] __getpgid:($pid_t pid) -> $pid_t = getpgid?;
+[doc_alias(getpgid)][ATTR_WUNUSED][preferred_alias(getpgid)][alias(__getpgid)]
+__getpgid:($pid_t pid) -> $pid_t = getpgid?;
 
 %
 @@>> setpgid(2)
@@ -387,6 +385,7 @@ fsync:($fd_t fd) -> int {
 @@THREAD[PID]->LEADER->GROUP_LEADER = THREAD[PGID]
 @@When `PID' is ZERO(0), use `gettid()' for it instead.
 @@When `PGID' is ZERO(0), use `PID' (after it was substituted) for instead
+[export_alias(__setpgid)]
 setpgid:($pid_t pid, $pid_t pgid) -> int;
 
 %
@@ -452,7 +451,8 @@ setgid:($gid_t gid) -> int;
 @@application image with that of another program that the original
 @@parent can then `wait(2)' for
 [section(.text.crt.sched.access)][crtbuiltin]
-[ATTR_WUNUSED] fork:() -> $pid_t;
+[ATTR_WUNUSED][export_alias(__fork)]
+fork:() -> $pid_t;
 
 
 %[default_impl_section(.text.crt.system.utility)]
@@ -620,7 +620,7 @@ writeall:($fd_t fd, [inp(bufsize)] void const *buf, size_t bufsize) -> ssize_t {
 
 @@>> lseek32(2)
 @@Change the position of the file read/write pointer within a file referred to by `FD'
-[ignore][alias(_lseek)][section(.text.crt.io.seek)]
+[ignore][alias(_lseek, __lseek)][section(.text.crt.io.seek)]
 lseek32:($fd_t fd, $off32_t offset, int whence) -> $off32_t = lseek?;
 
 %
@@ -628,14 +628,14 @@ lseek32:($fd_t fd, $off32_t offset, int whence) -> $off32_t = lseek?;
 @@Change the position of the file read/write pointer within a file referred to by `FD'
 [guard][noexport]
 [if(defined(__USE_FILE_OFFSET64)), preferred_alias(lseek64, _lseeki64)]
-[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(lseek, _lseek)]
+[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(lseek, _lseek, __lseek)]
 [alias_args(lseek64, _lseeki64:($fd_t fd, $off64_t offset, int whence) -> $off64_t)]
-[alias_args(lseek, _lseek:($fd_t fd, $off32_t offset, int whence) -> $off32_t)]
-[requires(defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek))]
-[dependency_string(defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE__lseeki64))]
-[section(.text.crt.io.seek)]
+[alias_args(lseek, _lseek, __lseek:($fd_t fd, $off32_t offset, int whence) -> $off32_t)]
+[requires(defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek))]
+[dependency_string(defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE__lseeki64))]
+[section(.text.crt.io.seek)][alternate_name(__lseek)]
 lseek:($fd_t fd, $off_t offset, int whence) -> $off_t {
-#if defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek)
+#if defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)
 	return lseek32(fd, ($off32_t)offset, whence);
 #else
 	return lseek64(fd, ($off64_t)offset, whence);
@@ -656,7 +656,8 @@ isatty:($fd_t fd) -> int;
 @@@return: NEWFD: Returns the new handle upon success.
 @@Duplicate a file referred to by `OLDFD' into `NEWFD'
 [section(.text.crt.io.access)]
-[guard][alias(_dup2)] dup2:($fd_t oldfd, $fd_t newfd) -> $fd_t;
+[guard][alias(_dup2)][export_alias(__dup2)]
+dup2:($fd_t oldfd, $fd_t newfd) -> $fd_t;
 
 %
 @@>> dup(2)
@@ -669,7 +670,8 @@ isatty:($fd_t fd) -> int;
 @@>> close(2)
 @@Close a file handle
 [section(.text.crt.io.access)]
-[guard][alias(_close)] close:($fd_t fd) -> int;
+[guard][alias(_close)][export_alias(__close)]
+close:($fd_t fd) -> int;
 
 %
 @@>> access(2)
@@ -802,7 +804,7 @@ eaccess:([notnull] char const *file, int type) -> int = euidaccess;
 @@>> lseek64(2)
 @@Change the position of the file read/write pointer within a file referred to by `FD'
 [off64_variant_of(lseek)][alias(_lseeki64)][noexport][requires($has_function(lseek32))]
-[dependency_string(defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek))]
+[dependency_string(defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek))]
 [section(.text.crt.io.large.seek)]
 lseek64:($fd_t fd, $off64_t offset, int whence) -> $off64_t {
 	return lseek32(fd, (__off32_t)offset, whence);
@@ -849,7 +851,7 @@ lseek64:($fd_t fd, $off64_t offset, int whence) -> $off64_t {
 )][noexport]
 [if(defined(__USE_FILE_OFFSET64)), preferred_alias(pread64)]
 [if(!defined(__USE_FILE_OFFSET64)), preferred_alias(pread)]
-[requires(defined(__CRT_HAVE_pread64) || ((defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE__lseeki64))))]
+[requires(defined(__CRT_HAVE_pread64) || ((defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE__lseeki64))))]
 [section(.text.crt.io.read)]
 pread:($fd_t fd, [outp(bufsize)] void *buf, size_t bufsize, __PIO_OFFSET offset) -> ssize_t {
 #ifdef __CRT_HAVE_pread64
@@ -895,7 +897,7 @@ pread:($fd_t fd, [outp(bufsize)] void *buf, size_t bufsize, __PIO_OFFSET offset)
 [if(defined(__USE_FILE_OFFSET64)), preferred_alias(pwrite64)]
 [if(!defined(__USE_FILE_OFFSET64)), preferred_alias(pwrite)]
 [section(.text.crt.io.write)]
-[requires(defined(__CRT_HAVE_pwrite64) || ((defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE__lseeki64))))]
+[requires(defined(__CRT_HAVE_pwrite64) || ((defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE__lseeki64))))]
 pwrite:($fd_t fd, [inp(bufsize)] void const *buf, size_t bufsize, __PIO_OFFSET offset) -> ssize_t {
 #ifdef __CRT_HAVE_pwrite64
 	return pwrite64(fd, buf, bufsize, (__PIO_OFFSET64)offset);
@@ -945,13 +947,15 @@ pwriteall:($fd_t fd, [inp(bufsize)] void const *buf, size_t bufsize, __PIO_OFFSE
 %
 %#ifdef __USE_LARGEFILE64
 
-[section(.text.crt.io.read)][cp][ignore] pread32:($fd_t fd, [outp(bufsize)] void *buf, size_t bufsize, $pos32_t offset) -> ssize_t = pread?;
-[section(.text.crt.io.write)][cp][ignore] pwrite32:($fd_t fd, [inp(bufsize)] void const *buf, size_t bufsize, $pos32_t offset) -> ssize_t = pwrite?;
+[section(.text.crt.io.read)][cp][ignore]
+pread32:($fd_t fd, [outp(bufsize)] void *buf, size_t bufsize, $pos32_t offset) -> ssize_t = pread?;
+[section(.text.crt.io.write)][cp][ignore]
+pwrite32:($fd_t fd, [inp(bufsize)] void const *buf, size_t bufsize, $pos32_t offset) -> ssize_t = pwrite?;
 
 @@>> pread64(2)
 @@Read data from a file at a specific offset
-[off64_variant_of(pread)][cp][noexport][section(.text.crt.io.large.read)]
-[requires(defined(__CRT_HAVE_pread) || ((defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE__lseeki64))))]
+[off64_variant_of(pread)][cp][noexport][section(.text.crt.io.large.read)][export_alias(__pread64)]
+[requires(defined(__CRT_HAVE_pread) || ((defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE__lseeki64))))]
 pread64:($fd_t fd, [outp(bufsize)] void *buf, size_t bufsize, __PIO_OFFSET64 offset) -> ssize_t {
 #if defined(__CRT_HAVE_pread) && ((!defined(__CRT_HAVE__lseeki64) && !defined(__CRT_HAVE_lseek64)) || (!defined(__CRT_HAVE_read) && !defined(__CRT_HAVE__read)))
 	return pread32(fd, buf, bufsize, (pos32_t)offset);
@@ -984,8 +988,8 @@ pread64:($fd_t fd, [outp(bufsize)] void *buf, size_t bufsize, __PIO_OFFSET64 off
 
 @@>> pwrite64(2)
 @@Write data to a file at a specific offset
-[off64_variant_of(pwrite)][cp][noexport][section(.text.crt.io.large.write)]
-[requires(defined(__CRT_HAVE_pread) || ((defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE__lseeki64))))]
+[off64_variant_of(pwrite)][cp][noexport][section(.text.crt.io.large.write)][export_alias(__pwrite64)]
+[requires(defined(__CRT_HAVE_pread) || ((defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE__lseeki64))))]
 pwrite64:($fd_t fd, [inp(bufsize)] void const *buf, size_t bufsize, __PIO_OFFSET64 offset) -> ssize_t {
 #if defined(__CRT_HAVE_pwrite) && ((!defined(__CRT_HAVE__lseeki64) && !defined(__CRT_HAVE_lseek64)) || (!defined(__CRT_HAVE_write) && !defined(__CRT_HAVE__write)))
 	return pwrite32(fd, buf, bufsize, (pos32_t)offset);
@@ -1173,9 +1177,9 @@ ualarm:($useconds_t value, $useconds_t interval) -> $useconds_t;
 @@>> vfork(2)
 @@Same as `fork(2)', but suspend the calling process until the child
 @@process either calls `exit(2)' or one of the many `exec(2)' functions
-[section(.text.crt.sched.access)]
+[section(.text.crt.sched.access)][export_alias(__vfork)]
 [ATTR_RETURNS_TWICE][ATTR_WUNUSED] vfork:() -> $pid_t;
-%#endif
+%#endif /* (__USE_XOPEN_EXTENDED && !__USE_XOPEN2K8) || __USE_MISC */
 
 %
 @@>> fchown(2)
@@ -1195,7 +1199,7 @@ ualarm:($useconds_t value, $useconds_t interval) -> $useconds_t;
 @@(That is the TID of the leader of the process group of `PID's leader)
 @@THREAD[PID]->LEADER->GROUP_LEADER->PID
 @@When `PID' is ZERO(0), use `gettid()' for it instead
-[section(.text.crt.sched.user)]
+[section(.text.crt.sched.user)][export_alias(__getpgid)]
 [ATTR_WUNUSED] getpgid:($pid_t pid) -> $pid_t;
 
 %
@@ -1415,7 +1419,7 @@ setregid:($gid_t rgid, $gid_t egid) -> int;
 @@>> getpagesize(3)
 @@Return the size of a PAGE (in bytes)
 [section(.text.crt.system.configuration)]
-[ATTR_CONST][ATTR_WUNUSED]
+[ATTR_CONST][ATTR_WUNUSED][export_alias(__getpagesize)]
 [dependency_include(<hybrid/__limits.h>)]
 getpagesize:() -> int {
 #ifdef __SIZEOF_PAGE__
@@ -1668,7 +1672,7 @@ ftruncate64:($fd_t fd, __PIO_OFFSET64 length) -> int {
 @@Change the program break, allowing for a rudimentary implementation of a heap.
 @@It is recommended to use the much more advanced functions found in <sys/mman.h> instead
 [section(.text.crt.heap.utility)] brk:(void *addr) -> int;
-[section(.text.crt.heap.utility)] sbrk:(intptr_t delta) -> void *;
+[section(.text.crt.heap.utility)][export_alias(__sbrk)] sbrk:(intptr_t delta) -> void *;
 %#endif
 
 %

@@ -1288,7 +1288,7 @@ frealpathat:($fd_t dirfd, [nonnull] char const *filename,
 %#if defined(__USE_MISC) || \
 %   (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K8))
 %[default_impl_section(.text.crt.fs.utility)]
-[guard][alias(_mktemp)][ATTR_NONNULL((1))]
+[guard][alias(_mktemp)][ATTR_NONNULL((1))][export_alias(__mktemp)]
 mktemp:(char *template_) -> char *;
 %#endif
 
@@ -1378,7 +1378,7 @@ unlockpt:($fd_t fd) -> int;
 
 %#ifdef __USE_GNU
 %[default_impl_section(.text.crt.unicode.static.convert)]
-[ATTR_NONNULL((1))][alias(_strtol_l)]
+[ATTR_NONNULL((1))][alias(_strtol_l)][export_alias(__strtol_l)]
 [if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias(strtoll_l, _strtoll_l, strtoq_l)]
 [if(__SIZEOF_LONG__ == 4), alias(strto32_l)]
 [if(__SIZEOF_LONG__ == 8), alias(strto64_l)]
@@ -1387,7 +1387,7 @@ strtol_l:(char const *__restrict nptr, char **endptr, int base, $locale_t locale
 	return strtol(nptr, endptr, base);
 }
 
-[ATTR_NONNULL((1))][alias(_strtoul_l)]
+[ATTR_NONNULL((1))][alias(_strtoul_l)][export_alias(__strtoul_l)]
 [if(__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__), alias(strtoull_l, _strtoll_l, strtouq_l)]
 [if(__SIZEOF_LONG__ == 4), alias(strtou32_l)]
 [if(__SIZEOF_LONG__ == 8), alias(strtou64_l)]
@@ -1397,7 +1397,7 @@ strtoul_l:(char const *__restrict nptr, char **endptr, int base, $locale_t local
 }
 
 %#ifdef __LONGLONG
-[ATTR_NONNULL((1))][alias(_strtoll_l, strtoq_l)]
+[ATTR_NONNULL((1))][alias(_strtoll_l, strtoq_l)][export_alias(__strtoll_l)]
 [if(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias(strtol_l, _strtol_l)]
 [if(__SIZEOF_LONG_LONG__ == 8), alias(strto64_l)]
 [if(__SIZEOF_LONG_LONG__ == 4), alias(strto32_l)]
@@ -1406,7 +1406,7 @@ strtoll_l:(char const *__restrict nptr, char **endptr, int base, $locale_t local
 	return strtoll(nptr, endptr, base);
 }
 
-[ATTR_NONNULL((1))][alias(_strtoull_l, strtouq_l)]
+[ATTR_NONNULL((1))][alias(_strtoull_l, strtouq_l)][export_alias(__strtoull_l)]
 [if(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias(strtoul_l, _strtoul_l)]
 [if(__SIZEOF_LONG_LONG__ == 8), alias(strtou64_l)]
 [if(__SIZEOF_LONG_LONG__ == 4), alias(strtou32_l)]
@@ -1417,20 +1417,20 @@ strtoull_l:(char const *__restrict nptr, char **endptr, int base, $locale_t loca
 %#endif /* __LONGLONG */
 
 %#ifndef __NO_FPU
-[alias(_strtod_l)][ATTR_NONNULL((1))]
+[alias(_strtod_l)][ATTR_NONNULL((1))][export_alias(__strtod_l)]
 [if(__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__), alias(strtold_l, _strtold_l)]
 strtod_l:(char const *__restrict nptr, char **endptr, $locale_t locale) -> double {
 	(void)locale;
 	return strtod(nptr, endptr);
 }
 
-[alias(_strtof_l)][ATTR_NONNULL((1))]
+[alias(_strtof_l)][ATTR_NONNULL((1))][export_alias(__strtof_l)]
 strtof_l:(char const *__restrict nptr, char **endptr, $locale_t locale) -> float {
 	(void)locale;
 	return strtof(nptr, endptr);
 }
 %#ifdef __COMPILER_HAVE_LONGDOUBLE
-[alias(_strtold_l)][ATTR_NONNULL((1))]
+[alias(_strtold_l)][ATTR_NONNULL((1))][export_alias(__strtold_l)]
 [if(__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__), alias(strtod_l, _strtod_l)]
 strtold_l:(char const *__restrict nptr, char **endptr, $locale_t locale) -> long double {
 	(void)locale;
@@ -1440,7 +1440,7 @@ strtold_l:(char const *__restrict nptr, char **endptr, $locale_t locale) -> long
 %#endif /* !__NO_FPU */
 
 %[default_impl_section(.text.crt.fs.environ)]
-[alias(getenv)][ATTR_WUNUSED][ATTR_NONNULL((1))]
+[alias(getenv)][ATTR_WUNUSED][ATTR_NONNULL((1))][export_alias(__secure_getenv)]
 secure_getenv:(char const *varname) -> char *;
 
 %[default_impl_section(.text.crt.io.tty)]

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x265b72d7 */
+/* HASH CRC-32:0xbdcd2c1b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,8 @@
 __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towupper_l,(__WINT_TYPE__ __wc, __locale_t __locale),towupper_l,(__wc,__locale))
 #elif defined(__CRT_HAVE__towupper_l)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towupper_l,(__WINT_TYPE__ __wc, __locale_t __locale),_towupper_l,(__wc,__locale))
+#elif defined(__CRT_HAVE___towupper_l)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towupper_l,(__WINT_TYPE__ __wc, __locale_t __locale),__towupper_l,(__wc,__locale))
 #else /* LIBC: towupper_l */
 #include <local/wctype/towupper_l.h>
 #define __localdep_towupper_l (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(towupper_l))

@@ -75,10 +75,13 @@ NOTHROW_NCX(LIBCCALL libc_backtrace_symbols_fd)(void *const *array,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x2f4cb626]]]*/
+/*[[[start:exports,hash:CRC-32=0x7322107e]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(backtrace, libc_backtrace);
+DEFINE_PUBLIC_WEAK_ALIAS(__backtrace, libc_backtrace);
 DEFINE_PUBLIC_WEAK_ALIAS(backtrace_symbols, libc_backtrace_symbols);
+DEFINE_PUBLIC_WEAK_ALIAS(__backtrace_symbols, libc_backtrace_symbols);
 DEFINE_PUBLIC_WEAK_ALIAS(backtrace_symbols_fd, libc_backtrace_symbols_fd);
+DEFINE_PUBLIC_WEAK_ALIAS(__backtrace_symbols_fd, libc_backtrace_symbols_fd);
 /*[[[end:exports]]]*/
 
 DECL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x58526a2f */
+/* HASH CRC-32:0xa2de59f2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -82,6 +82,9 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_NONNULL((1)),struct tm *,__N
 #if defined(__CRT_HAVE_gmtime_r)
 /* Return the `struct tm' representation of *TIMER in UTC, using *TP to store the result */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),struct tm *,__NOTHROW_NCX,__localdep_gmtime_r,(__TM_TYPE(time) const *__restrict __timer, struct tm *__restrict __tp),gmtime_r,(__timer,__tp))
+#elif defined(__CRT_HAVE___gmtime_r)
+/* Return the `struct tm' representation of *TIMER in UTC, using *TP to store the result */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),struct tm *,__NOTHROW_NCX,__localdep_gmtime_r,(__TM_TYPE(time) const *__restrict __timer, struct tm *__restrict __tp),__gmtime_r,(__timer,__tp))
 #else /* LIBC: gmtime_r */
 #include <local/time/gmtime_r.h>
 /* Return the `struct tm' representation of *TIMER in UTC, using *TP to store the result */

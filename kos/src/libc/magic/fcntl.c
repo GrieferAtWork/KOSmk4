@@ -182,6 +182,7 @@ fallocate64:($fd_t fd, int mode, $off64_t offset, $off64_t length) -> int {
 
 [vartypes(void *)][guard]
 [decl_include(<bits/types.h>)]
+[export_alias(__fcntl)]
 fcntl:($fd_t fd, int cmd, ...) -> __STDC_INT_AS_SSIZE_T;
 
 %[default_impl_section(.text.crt.io.access)]
@@ -189,17 +190,17 @@ fcntl:($fd_t fd, int cmd, ...) -> __STDC_INT_AS_SSIZE_T;
 [cp][guard][ATTR_WUNUSED][noexport][vartypes($mode_t)]
 [if(defined(__USE_FILE_OFFSET64)), preferred_alias(open64)]
 [if(!defined(__USE_FILE_OFFSET64)), preferred_alias(open)]
-[decl_include(<bits/types.h>)]
-[alias(_open)][requires(defined(__CRT_HAVE_open64) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat) || defined(__CRT_HAVE_openat64))))]
+[decl_include(<bits/types.h>)][export_alias(__open)][alias(_open)]
+[requires(defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat) || defined(__CRT_HAVE_openat64))))]
 open:([nonnull] char const *filename, $oflag_t oflags, ...) -> $fd_t {
 	$fd_t result;
 	va_list args;
 	va_start(args, oflags);
-#ifdef __CRT_HAVE_open64
+#if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64)
 	result = open64(filename, oflags, va_arg(args, mode_t));
-#else
+#else /* __CRT_HAVE_open64 || __CRT_HAVE___open64 */
 	result = openat(__CRT_AT_FDCWD, filename, oflags, va_arg(args, mode_t));
-#endif
+#endif /* !__CRT_HAVE_open64 && !__CRT_HAVE___open64 */
 	va_end(args);
 	return result;
 }
@@ -216,7 +217,7 @@ creat:([nonnull] char const *filename, $mode_t mode) -> $fd_t {
 
 %
 %#ifdef __USE_LARGEFILE64
-[cp][noexport][vartypes($mode_t)]
+[cp][noexport][vartypes($mode_t)][export_alias(__open64)]
 [ATTR_WUNUSED][largefile64_variant_of(open)]
 [if(!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0), alias(_open)]
 [requires(defined(__CRT_HAVE_open) || defined(__CRT_HAVE__open))]

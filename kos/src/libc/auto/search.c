@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbb77c7d9 */
+/* HASH CRC-32:0x120b535 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -228,7 +228,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.search.tfind") void *
 NOTHROW_NCX(LIBCCALL libc_tfind)(void const *key,
                                  void *const *vrootp,
                                  __compar_fn_t compar) {
-#line 499 "kos/src/libc/magic/search.c"
+#line 500 "kos/src/libc/magic/search.c"
 	typedef struct node_struct {
 		void const         *key;
 		struct node_struct *left_node;
@@ -257,7 +257,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.search.trecurse") void
 NOTHROW_NCX(LIBCCALL libc_trecurse)(void const *root,
                                     __action_fn_t action,
                                     int level) {
-#line 713 "kos/src/libc/magic/search.c"
+#line 714 "kos/src/libc/magic/search.c"
 	void *l, *r;
 	l = ((void **)root)[1];
 	r = ((void **)root)[2];
@@ -278,7 +278,7 @@ NOTHROW_NCX(LIBCCALL libc_trecurse)(void const *root,
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.utility.search.twalk") void
 NOTHROW_NCX(LIBCCALL libc_twalk)(void const *root,
                                  __action_fn_t action) {
-#line 731 "kos/src/libc/magic/search.c"
+#line 733 "kos/src/libc/magic/search.c"
 	if (root && action)
 		libc_trecurse(root, action, 0);
 }
@@ -290,7 +290,7 @@ NOTHROW_NCX(LIBCCALL libc_lfind)(void const *key,
                                  size_t *nmemb,
                                  size_t size,
                                  __compar_fn_t compar) {
-#line 772 "kos/src/libc/magic/search.c"
+#line 774 "kos/src/libc/magic/search.c"
 	size_t i, count = *nmemb;
 	void const *result = base;
 	for (i = 0; i < count; ++i) {
@@ -309,7 +309,7 @@ NOTHROW_NCX(LIBCCALL libc_lsearch)(void const *key,
                                    size_t *nmemb,
                                    size_t size,
                                    __compar_fn_t compar) {
-#line 785 "kos/src/libc/magic/search.c"
+#line 787 "kos/src/libc/magic/search.c"
 	void *result;
 	result = libc_lfind(key, base, nmemb, size, compar);
 	if (result == NULL) {
@@ -325,7 +325,9 @@ DEFINE_PUBLIC_WEAK_ALIAS(insque, libc_insque);
 DEFINE_PUBLIC_WEAK_ALIAS(remque, libc_remque);
 DEFINE_PUBLIC_WEAK_ALIAS(hsearch_r, libc_hsearch_r);
 DEFINE_PUBLIC_WEAK_ALIAS(tfind, libc_tfind);
+DEFINE_PUBLIC_WEAK_ALIAS(__tfind, libc_tfind);
 DEFINE_PUBLIC_WEAK_ALIAS(twalk, libc_twalk);
+DEFINE_PUBLIC_WEAK_ALIAS(__twalk, libc_twalk);
 DEFINE_PUBLIC_WEAK_ALIAS(lfind, libc_lfind);
 DEFINE_PUBLIC_WEAK_ALIAS(lsearch, libc_lsearch);
 #endif /* !__KERNEL__ */

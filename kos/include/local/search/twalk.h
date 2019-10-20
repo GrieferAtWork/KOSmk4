@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd2e43390 */
+/* HASH CRC-32:0x48465957 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(twalk) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(twalk))(void const *__root,
                                                    __action_fn_t __action) {
-#line 731 "kos/src/libc/magic/search.c"
+#line 733 "kos/src/libc/magic/search.c"
 	if (__root && __action)
 		__localdep_trecurse(__root, __action, 0);
 }

@@ -23,7 +23,7 @@ chdir(headof(__FILE__));
 
 
 local names = HashSet();
-for (local l: File.open("../../include/i386-kos/crt-features/crt-kos.h")) {
+for (local l: File.open("../../include/i386-kos/crt-features/crt-kos32.h")) {
 	local n;
 	try n = l.scanf("#define __CRT_HAVE_%[^ ]")...;
 	catch (...)

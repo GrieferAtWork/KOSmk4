@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x57f6b05d */
+/* HASH CRC-32:0x4549dbe4 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -240,6 +240,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(hdestroy_r, __FORCELOCAL void __NOTHROW_NCX(__LI
 /* Search for an entry matching the given KEY in the tree
  * pointed to by *ROOTP and insert a new element if not found */
 __CDECLARE(,void *,__NOTHROW_NCX,tsearch,(void const *__key, void **__vrootp, __compar_fn_t __compar),(__key,__vrootp,__compar))
+#elif defined(__CRT_HAVE___tsearch)
+/* Search for an entry matching the given KEY in the tree
+ * pointed to by *ROOTP and insert a new element if not found */
+__CREDIRECT(,void *,__NOTHROW_NCX,tsearch,(void const *__key, void **__vrootp, __compar_fn_t __compar),__tsearch,(__key,__vrootp,__compar))
 #elif (defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc)) || (__has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)) || defined(__CRT_HAVE_malloc)
 #include <local/search/tsearch.h>
 /* Search for an entry matching the given KEY in the tree
@@ -250,6 +254,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(tsearch, __FORCELOCAL void *__NOTHROW_NCX(__LIBC
 /* Search for an entry matching the given KEY in the tree pointed
  * to by *ROOTP. If no matching entry is available return NULL */
 __CDECLARE(,void *,__NOTHROW_NCX,tfind,(void const *__key, void *const *__vrootp, __compar_fn_t __compar),(__key,__vrootp,__compar))
+#elif defined(__CRT_HAVE___tfind)
+/* Search for an entry matching the given KEY in the tree pointed
+ * to by *ROOTP. If no matching entry is available return NULL */
+__CREDIRECT(,void *,__NOTHROW_NCX,tfind,(void const *__key, void *const *__vrootp, __compar_fn_t __compar),__tfind,(__key,__vrootp,__compar))
 #else /* LIBC: tfind */
 #include <local/search/tfind.h>
 /* Search for an entry matching the given KEY in the tree pointed
@@ -259,6 +267,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(tfind, __FORCELOCAL void *__NOTHROW_NCX(__LIBCCA
 #if defined(__CRT_HAVE_tdelete)
 /* Remove the element matching KEY from the tree pointed to by *ROOTP */
 __CDECLARE(,void *,__NOTHROW_NCX,tdelete,(void const *__restrict __key, void **__restrict __vrootp, __compar_fn_t __compar),(__key,__vrootp,__compar))
+#elif defined(__CRT_HAVE___tdelete)
+/* Remove the element matching KEY from the tree pointed to by *ROOTP */
+__CREDIRECT(,void *,__NOTHROW_NCX,tdelete,(void const *__restrict __key, void **__restrict __vrootp, __compar_fn_t __compar),__tdelete,(__key,__vrootp,__compar))
 #elif (__has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 #include <local/search/tdelete.h>
 /* Remove the element matching KEY from the tree pointed to by *ROOTP */
@@ -271,6 +282,9 @@ typedef void (__LIBCCALL *__action_fn_t)(void const *nodep, VISIT value, int lev
 #if defined(__CRT_HAVE_twalk)
 /* Walk through the whole tree and call the ACTION callback for every node or leaf */
 __CDECLARE_VOID(,__NOTHROW_NCX,twalk,(void const *__root, __action_fn_t __action),(__root,__action))
+#elif defined(__CRT_HAVE___twalk)
+/* Walk through the whole tree and call the ACTION callback for every node or leaf */
+__CREDIRECT_VOID(,__NOTHROW_NCX,twalk,(void const *__root, __action_fn_t __action),__twalk,(__root,__action))
 #else /* LIBC: twalk */
 #include <local/search/twalk.h>
 /* Walk through the whole tree and call the ACTION callback for every node or leaf */

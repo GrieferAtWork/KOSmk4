@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9c488d23 */
+/* HASH CRC-32:0xfe84c0cb */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,9 +61,11 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_wtruncate32,(__WCHAR_TYPE__ const *__f
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),open64,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_open) && (!defined(__USE_FILE_OFFSET64))
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),open,(__filename,__oflags),__oflags,1,(__mode_t))
+#elif defined(__CRT_HAVE___open)
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),__open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE__open)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open,(char const *__filename, __oflag_t __oflags),_open,(__filename,__oflags),__oflags,1,(__mode_t))
-#elif (defined(__CRT_HAVE_open64) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat) || defined(__CRT_HAVE_openat64))))
+#elif (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat) || defined(__CRT_HAVE_openat64))))
 #include <local/fcntl/open.h>
 #define __localdep_open (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(open))
 #else /* CUSTOM: open */
@@ -119,6 +121,10 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),close,(__fd))
 /* >> close(2)
  * Close a file handle */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),_close,(__fd))
+#elif defined(__CRT_HAVE___close)
+/* >> close(2)
+ * Close a file handle */
+__CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),__close,(__fd))
 #else /* LIBC: close */
 #undef ____localdep_close_defined
 #endif /* close... */
@@ -139,7 +145,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wtruncate) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wtruncate))(__WCHAR_TYPE__ const *__file,
                                                        __PIO_OFFSET __length) {
-#line 1253 "kos/src/libc/magic/unistd.c"
+#line 1257 "kos/src/libc/magic/unistd.c"
 #if defined(__CRT_HAVE_wtruncate64)
 	return __localdep_wtruncate64(__file, (__PIO_OFFSET64)__length);
 #elif defined(__CRT_HAVE_wtruncate)

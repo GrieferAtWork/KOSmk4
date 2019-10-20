@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xed170758 */
+/* HASH CRC-32:0xfd65dc70 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,7 +64,7 @@ __LOCAL_LIBC(lockf) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(lockf))(__fd_t __fd,
                                                    int __cmd,
                                                    __FS_TYPE(off) __length) {
-#line 388 "kos/src/libc/magic/fcntl.c"
+#line 389 "kos/src/libc/magic/fcntl.c"
 #ifdef __CRT_HAVE_lockf64
 	return __localdep_lockf64(__fd, __cmd, (__off64_t)__length);
 #elif defined(__CRT_HAVE_lockf)

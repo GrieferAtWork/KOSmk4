@@ -239,8 +239,9 @@ not_found:
 
 
 
-/*[[[start:exports,hash:CRC-32=0xde6b8304]]]*/
+/*[[[start:exports,hash:CRC-32=0x987e790e]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(getauxval, libc_getauxval);
+DEFINE_PUBLIC_WEAK_ALIAS(__getauxval, libc_getauxval);
 /*[[[end:exports]]]*/
 
 DECL_END

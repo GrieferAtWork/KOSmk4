@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b2d8a30 */
+/* HASH CRC-32:0x4970e95c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -487,8 +487,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(vsc32printf, __FORCELOCAL __ATTR_LIBC_WPRINTF(3,
 #endif /* vsc32printf... */
 #if defined(__CRT_HAVE_swprintf) && (__SIZEOF_WCHAR_T__ == 2) && !defined(__NO_ASMNAME)
 __LIBC __ATTR_LIBC_WPRINTF(3, 4) __ATTR_NONNULL((1, 3)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL sc16printf)(char16_t *__restrict __buf, size_t __buflen, char16_t const *__restrict __format, ...) __CASMNAME("swprintf");
+#elif defined(__CRT_HAVE__swprintf) && (__SIZEOF_WCHAR_T__ == 2) && !defined(__NO_ASMNAME)
+__LIBC __ATTR_LIBC_WPRINTF(3, 4) __ATTR_NONNULL((1, 3)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL sc16printf)(char16_t *__restrict __buf, size_t __buflen, char16_t const *__restrict __format, ...) __CASMNAME("_swprintf");
+#elif defined(__CRT_HAVE_DOS$_swprintf) && !defined(__NO_ASMNAME)
+__LIBC __ATTR_LIBC_WPRINTF(3, 4) __ATTR_NONNULL((1, 3)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBDCALL sc16printf)(char16_t *__restrict __buf, size_t __buflen, char16_t const *__restrict __format, ...) __CASMNAME_DOS("_swprintf");
 #elif defined(__CRT_HAVE_DOS$swprintf) && !defined(__NO_ASMNAME)
 __LIBC __ATTR_LIBC_WPRINTF(3, 4) __ATTR_NONNULL((1, 3)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBDCALL sc16printf)(char16_t *__restrict __buf, size_t __buflen, char16_t const *__restrict __format, ...) __CASMNAME_DOS("swprintf");
+#elif defined(__CRT_HAVE_DOS$_swprintf) && !defined(__NO_ASMNAME)
+__LIBC __ATTR_LIBC_WPRINTF(3, 4) __ATTR_NONNULL((1, 3)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBDCALL sc16printf)(char16_t *__restrict __buf, size_t __buflen, char16_t const *__restrict __format, ...) __CASMNAME_DOS("_swprintf");
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/swprintf.h>
 #define sc16printf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(swprintf))
@@ -502,6 +508,8 @@ __NAMESPACE_LOCAL_USING(sc16printf)
 #endif /* sc16printf... */
 #if defined(__CRT_HAVE_swprintf) && (__SIZEOF_WCHAR_T__ == 4) && !defined(__NO_ASMNAME)
 __LIBC __ATTR_LIBC_WPRINTF(3, 4) __ATTR_NONNULL((1, 3)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL sc32printf)(char32_t *__restrict __buf, size_t __buflen, char32_t const *__restrict __format, ...) __CASMNAME("swprintf");
+#elif defined(__CRT_HAVE__swprintf) && (__SIZEOF_WCHAR_T__ == 4) && !defined(__NO_ASMNAME)
+__LIBC __ATTR_LIBC_WPRINTF(3, 4) __ATTR_NONNULL((1, 3)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL sc32printf)(char32_t *__restrict __buf, size_t __buflen, char32_t const *__restrict __format, ...) __CASMNAME("_swprintf");
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/swprintf.h>
 #define sc32printf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(swprintf))

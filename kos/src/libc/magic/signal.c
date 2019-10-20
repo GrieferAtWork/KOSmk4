@@ -137,11 +137,11 @@ typedef __size_t size_t;
 [std][dos_variant] raise:(int signo) -> int;
 
 @@@param signo: One of `SIG*'
-__sysv_signal:(int signo, $sighandler_t handler) -> $sighandler_t = sysv_signal?;
+__sysv_signal:(int signo, $sighandler_t handler) -> $sighandler_t = sysv_signal;
 
 %#ifdef __USE_GNU
 @@@param signo: One of `SIG*'
-sysv_signal:(int signo, $sighandler_t handler) -> $sighandler_t;
+[alias(__sysv_signal)] sysv_signal:(int signo, $sighandler_t handler) -> $sighandler_t;
 %#endif /* __USE_GNU */
 
 
@@ -262,9 +262,11 @@ sigismember:([nonnull] sigset_t const *set, int signo) -> int {
 @@@param how: One of `SIG_BLOCK', `SIG_UNBLOCK' or `SIG_SETMASK'
 sigprocmask:(int how, sigset_t const *__restrict set, sigset_t *__restrict oset) -> int;
 
-[cp] sigsuspend:([nonnull] sigset_t const *set) -> int;
+[cp][export_alias(__sigsuspend)]
+sigsuspend:([nonnull] sigset_t const *set) -> int;
 
 @@@param signo: One of `SIG*'
+[export_alias(__sigaction)]
 sigaction:(int signo, struct sigaction const *__restrict act, struct sigaction *__restrict oact) -> int;
 
 sigpending:([nonnull] sigset_t *set) -> int;

@@ -325,6 +325,7 @@ munlockall:() -> int;
 %#ifdef __USE_MISC
 
 [noexport]
+[export_alias(__madvise)]
 madvise:([nonnull] void *addr, size_t len, int advice) -> int {
 	/* Implement as a no-op, since this function is merely meant as a hint */
 	(void)addr;

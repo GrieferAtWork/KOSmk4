@@ -453,11 +453,14 @@ NOTHROW_RPC(LIBCCALL libc_lockf64)(fd_t fd,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xf1d35e13]]]*/
+/*[[[start:exports,hash:CRC-32=0xae5665fc]]]*/
 #undef fcntl
+#undef __fcntl
 #undef open
+#undef __open
 #undef _open
 #undef open64
+#undef __open64
 #undef openat
 #undef openat64
 DEFINE_PUBLIC_WEAK_ALIAS(readahead, libc_readahead);
@@ -470,11 +473,14 @@ DEFINE_PUBLIC_WEAK_ALIAS(open_by_handle_at, libc_open_by_handle_at);
 DEFINE_PUBLIC_WEAK_ALIAS(fallocate, libc_fallocate);
 DEFINE_PUBLIC_WEAK_ALIAS(fallocate64, libc_fallocate64);
 DEFINE_PUBLIC_WEAK_ALIAS(fcntl, libc_fcntl);
+DEFINE_PUBLIC_WEAK_ALIAS(__fcntl, libc_fcntl);
 DEFINE_PUBLIC_WEAK_ALIAS(open, libc_open);
+DEFINE_PUBLIC_WEAK_ALIAS(__open, libc_open);
 DEFINE_PUBLIC_WEAK_ALIAS(_open, libc_open);
 DEFINE_PUBLIC_WEAK_ALIAS(creat, libc_creat);
 DEFINE_PUBLIC_WEAK_ALIAS(_creat, libc_creat);
 DEFINE_PUBLIC_WEAK_ALIAS(open64, libc_open64);
+DEFINE_PUBLIC_WEAK_ALIAS(__open64, libc_open64);
 DEFINE_PUBLIC_WEAK_ALIAS(creat64, libc_creat64);
 DEFINE_PUBLIC_WEAK_ALIAS(openat, libc_openat);
 DEFINE_PUBLIC_WEAK_ALIAS(openat64, libc_openat64);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xee0814e4 */
+/* HASH CRC-32:0xca6d04e0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -146,6 +146,11 @@ struct mmsghdr {
  * protocol PROTOCOL.  If PROTOCOL is zero, one is chosen automatically.
  * Returns a file descriptor for the new socket, or -1 for errors */
 __CDECLARE(__ATTR_WUNUSED,__fd_t,__NOTHROW_NCX,socket,(int __domain, int __type, int __protocol),(__domain,__type,__protocol))
+#elif defined(__CRT_HAVE___socket)
+/* Create a new socket of type TYPE in domain DOMAIN, using
+ * protocol PROTOCOL.  If PROTOCOL is zero, one is chosen automatically.
+ * Returns a file descriptor for the new socket, or -1 for errors */
+__CREDIRECT(__ATTR_WUNUSED,__fd_t,__NOTHROW_NCX,socket,(int __domain, int __type, int __protocol),__socket,(__domain,__type,__protocol))
 #endif /* socket... */
 #if defined(__CRT_HAVE_socketpair)
 /* Create two new sockets, of type TYPE in domain DOMAIN and using
@@ -168,6 +173,12 @@ __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getsockname,(__fd_t __sockfd, _
  * and the only address from which to accept transmissions.
  * Return 0 on success, -1 for errors */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,connect,(__fd_t __sockfd, __CONST_SOCKADDR_ARG __addr, socklen_t __addr_len),(__sockfd,__addr,__addr_len))
+#elif defined(__CRT_HAVE___connect)
+/* Open a connection on socket FD to peer at ADDR (which LEN bytes long).
+ * For connectionless socket types, just set the default address to send to
+ * and the only address from which to accept transmissions.
+ * Return 0 on success, -1 for errors */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,connect,(__fd_t __sockfd, __CONST_SOCKADDR_ARG __addr, socklen_t __addr_len),__connect,(__sockfd,__addr,__addr_len))
 #endif /* connect... */
 #if defined(__CRT_HAVE_getpeername)
 /* Put the address of the peer connected to socket FD into *ADDR
@@ -177,11 +188,18 @@ __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getpeername,(__fd_t __sockfd, _
 #if defined(__CRT_HAVE_send)
 /* Send BUFSIZE bytes of BUF to socket FD.  Returns the number sent or -1 */
 __CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,send,(__fd_t __sockfd, void const *__buf, size_t __bufsize, int __flags),(__sockfd,__buf,__bufsize,__flags))
+#elif defined(__CRT_HAVE___send)
+/* Send BUFSIZE bytes of BUF to socket FD.  Returns the number sent or -1 */
+__CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,send,(__fd_t __sockfd, void const *__buf, size_t __bufsize, int __flags),__send,(__sockfd,__buf,__bufsize,__flags))
 #endif /* send... */
 #if defined(__CRT_HAVE_recv)
 /* Read BUFSIZE bytes into BUF from socket FD.
  * Returns the number read or -1 for errors */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,recv,(__fd_t __sockfd, void *__buf, size_t __bufsize, int __flags),(__sockfd,__buf,__bufsize,__flags))
+#elif defined(__CRT_HAVE___recv)
+/* Read BUFSIZE bytes into BUF from socket FD.
+ * Returns the number read or -1 for errors */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,recv,(__fd_t __sockfd, void *__buf, size_t __bufsize, int __flags),__recv,(__sockfd,__buf,__bufsize,__flags))
 #endif /* recv... */
 #if defined(__CRT_HAVE_sendto)
 /* Send BUFSIZE bytes of BUF on socket FD to peer at address ADDR
@@ -250,6 +268,10 @@ __CDECLARE(__ATTR_NONNULL((2)),__fd_t,__NOTHROW_RPC,accept4,(__fd_t __sockfd, __
 /* Send a VLEN messages as described by VMESSAGES to socket FD.
  * Returns the number of datagrams successfully written or -1 for errors */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,sendmmsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, unsigned int __vlen, int __flags),(__sockfd,__vmessages,__vlen,__flags))
+#elif defined(__CRT_HAVE___sendmmsg)
+/* Send a VLEN messages as described by VMESSAGES to socket FD.
+ * Returns the number of datagrams successfully written or -1 for errors */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,sendmmsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, unsigned int __vlen, int __flags),__sendmmsg,(__sockfd,__vmessages,__vlen,__flags))
 #endif /* sendmmsg... */
 #if defined(__CRT_HAVE_recvmmsg64) && (defined(__USE_TIME_BITS64))
 /* Receive up to VLEN messages as described by VMESSAGES from socket FD.

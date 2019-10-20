@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x72ba8052 */
+/* HASH CRC-32:0xd43759ac */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __LOCAL_LIBC(strptime) __ATTR_NONNULL((1, 2, 3)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strptime))(char const *__restrict __s,
                                                       char const *__restrict __format,
                                                       struct tm *__restrict __tp) {
-#line 1499 "kos/src/libc/magic/time.c"
+#line 1505 "kos/src/libc/magic/time.c"
 #if defined(__CRT_HAVE_strptime_l) && !defined(__BUILDING_LIBC)
 	return __localdep_crt_strptime_l(__s, __format, __tp, __NULLPTR);
 #else

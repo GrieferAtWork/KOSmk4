@@ -52,13 +52,14 @@ __SYSDECL_BEGIN
 }
 
 @@Return information about the filesystem on which FILE resides
-[if(!defined(__USE_FILE_OFFSET64)),preferred_alias(statfs)]
-[if(defined(__USE_FILE_OFFSET64)),preferred_alias(statfs64)]
+[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(statfs, __statfs)]
+[if(defined(__USE_FILE_OFFSET64)), preferred_alias(statfs64)]
+[alternate_name(__statfs)]
 statfs:([nonnull] char const *file, [nonnull] struct statfs *buf) -> int;
 
 @@Return information about the filesystem containing the file FILDES refers to
-[if(!defined(__USE_FILE_OFFSET64)),preferred_alias(fstatfs)]
-[if(defined(__USE_FILE_OFFSET64)),preferred_alias(fstatfs64)]
+[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(fstatfs)]
+[if(defined(__USE_FILE_OFFSET64)), preferred_alias(fstatfs64)]
 fstatfs:($fd_t filedes, [nonnull] struct statfs *buf) -> int;
 
 %

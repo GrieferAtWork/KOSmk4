@@ -136,7 +136,8 @@ struct mmsghdr {
 @@Create a new socket of type TYPE in domain DOMAIN, using
 @@protocol PROTOCOL.  If PROTOCOL is zero, one is chosen automatically.
 @@Returns a file descriptor for the new socket, or -1 for errors
-[ATTR_WUNUSED] socket:(int domain, int type, int protocol) -> $fd_t;
+[ATTR_WUNUSED][export_alias(__socket)]
+socket:(int domain, int type, int protocol) -> $fd_t;
 
 @@Create two new sockets, of type TYPE in domain DOMAIN and using
 @@protocol PROTOCOL, which are connected to each other, and put file
@@ -154,18 +155,21 @@ getsockname:($fd_t sockfd, [outp(*addr_len)] __SOCKADDR_ARG addr, socklen_t *__r
 @@For connectionless socket types, just set the default address to send to
 @@and the only address from which to accept transmissions.
 @@Return 0 on success, -1 for errors
-[cp] connect:($fd_t sockfd, [inp(addr_len)] __CONST_SOCKADDR_ARG addr, socklen_t addr_len) -> int;
+[cp][export_alias(__connect)]
+connect:($fd_t sockfd, [inp(addr_len)] __CONST_SOCKADDR_ARG addr, socklen_t addr_len) -> int;
 
 @@Put the address of the peer connected to socket FD into *ADDR
 @@(which is *LEN bytes long), and its actual length into *LEN
 getpeername:($fd_t sockfd, [outp(*addr_len)] __SOCKADDR_ARG addr, socklen_t *__restrict addr_len) -> int;
 
 @@Send BUFSIZE bytes of BUF to socket FD.  Returns the number sent or -1
-[cp] send:($fd_t sockfd, [inp(bufsize)] void const *buf, size_t bufsize, int flags) -> ssize_t;
+[cp][export_alias(__send)]
+send:($fd_t sockfd, [inp(bufsize)] void const *buf, size_t bufsize, int flags) -> ssize_t;
 
 @@Read BUFSIZE bytes into BUF from socket FD.
 @@Returns the number read or -1 for errors
-[cp][ATTR_WUNUSED] recv:($fd_t sockfd, [outp(bufsize)] void *buf, size_t bufsize, int flags) -> ssize_t;
+[cp][ATTR_WUNUSED][export_alias(__recv)]
+recv:($fd_t sockfd, [outp(bufsize)] void *buf, size_t bufsize, int flags) -> ssize_t;
 
 @@Send BUFSIZE bytes of BUF on socket FD to peer at address ADDR
 @@(which is ADDR_LEN bytes long). Returns the number sent, or -1 for errors.
@@ -225,7 +229,8 @@ shutdown:($fd_t sockfd, int how) -> int;
 
 @@Send a VLEN messages as described by VMESSAGES to socket FD.
 @@Returns the number of datagrams successfully written or -1 for errors
-[cp] sendmmsg:($fd_t sockfd, [nonnull] struct mmsghdr *vmessages, unsigned int vlen, int flags) -> int;
+[cp][export_alias(__sendmmsg)]
+sendmmsg:($fd_t sockfd, [nonnull] struct mmsghdr *vmessages, unsigned int vlen, int flags) -> int;
 
 [cp][ignore][doc_alias(recvmmsg)]
 recvmmsg32:($fd_t sockfd, [inp(vlen)] struct mmsghdr *vmessages, unsigned int vlen,

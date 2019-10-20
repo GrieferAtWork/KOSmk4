@@ -557,7 +557,7 @@ __NAMESPACE_LOCAL_END
 
 @@Similar to `strftime' but take the information from
 @@the provided locale and not the global locale
-[ignore][alias(_strftime_l)]
+[ignore][alias(_strftime_l)][export_alias(__strftime_l)]
 crt_strftime_l:([outp(bufsize)] char *__restrict buf, size_t bufsize,
                 [nonnull] char const *__restrict format,
                 [nonnull] struct tm const *__restrict tp,
@@ -1015,7 +1015,7 @@ timelocal64:([nonnull] struct tm *tp) -> $time64_t = mktime64;
 %
 %#ifdef __USE_POSIX199309
 
-[ignore][cp][doc_alias(nanosleep)]
+[ignore][cp][doc_alias(nanosleep)][export_alias(__nanosleep)]
 nanosleep32:([nonnull] struct timespec const *requested_time,
              [nullable] struct $timespec32 *remaining) -> int = nanosleep?;
 
@@ -1023,8 +1023,9 @@ nanosleep32:([nonnull] struct timespec const *requested_time,
 [if(defined(__USE_TIME_BITS64)), preferred_alias(nanosleep64)]
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(nanosleep)]
 [requires(defined(__CRT_HAVE_nanosleep) || defined(__CRT_HAVE_nanosleep64))]
-[cp] nanosleep:([nonnull] struct timespec const *requested_time,
-                [nullable] struct timespec *remaining) -> int {
+[cp][export_alias(__nanosleep)]
+nanosleep:([nonnull] struct timespec const *requested_time,
+           [nullable] struct timespec *remaining) -> int {
 #ifdef __CRT_HAVE_nanosleep
 	int result;
 	struct @__timespec32@ req32, rem32;
@@ -1050,13 +1051,14 @@ nanosleep32:([nonnull] struct timespec const *requested_time,
 #endif
 }
 
-[doc_alias(clock_getres)][ignore]
+[doc_alias(clock_getres)][ignore][alias(__clock_getres)]
 clock_getres32:(clockid_t clock_id, [nonnull] struct $timespec32 *res) -> int = clock_getres?;
 
 @@Get resolution of clock CLOCK_ID
 [if(defined(__USE_TIME_BITS64)), preferred_alias(clock_getres64)]
-[if(!defined(__USE_TIME_BITS64)), preferred_alias(clock_getres)]
+[if(!defined(__USE_TIME_BITS64)), preferred_alias(clock_getres, __clock_getres)]
 [requires(defined(__CRT_HAVE_clock_getres) || defined(__CRT_HAVE_clock_getres64))]
+[alternate_name(__clock_getres)]
 clock_getres:(clockid_t clock_id, [nonnull] struct timespec *res) -> int {
 #ifdef __CRT_HAVE_clock_getres
 	int result;
@@ -1079,13 +1081,14 @@ clock_getres:(clockid_t clock_id, [nonnull] struct timespec *res) -> int {
 #endif
 }
 
-[ignore][doc_alias(clock_gettime)]
+[ignore][doc_alias(clock_gettime)][alias(__clock_gettime)]
 clock_gettime32:(clockid_t clock_id, [nonnull] struct $timespec32 *tp) -> int = clock_gettime?;
 
 @@Get current value of clock CLOCK_ID and store it in TP
 [if(defined(__USE_TIME_BITS64)), preferred_alias(clock_gettime64)]
-[if(!defined(__USE_TIME_BITS64)), preferred_alias(clock_gettime)]
+[if(!defined(__USE_TIME_BITS64)), preferred_alias(clock_gettime, __clock_gettime)]
 [requires(defined(__CRT_HAVE_clock_gettime) || defined(__CRT_HAVE_clock_gettime64))]
+[alternate_name(__clock_gettime)]
 clock_gettime:(clockid_t clock_id, [nonnull] struct timespec *tp) -> int {
 #ifdef __CRT_HAVE_clock_gettime
 	int result;
@@ -1110,13 +1113,14 @@ clock_gettime:(clockid_t clock_id, [nonnull] struct timespec *tp) -> int {
 
 
 
-[ignore][doc_alias(clock_settime)]
+[ignore][doc_alias(clock_settime)][alias(__clock_settime)]
 clock_settime32:(clockid_t clock_id, [nonnull] struct $timespec32 const *tp) -> int = clock_settime?;
 
 @@Set clock CLOCK_ID to value TP
 [if(defined(__USE_TIME_BITS64)), preferred_alias(clock_settime64)]
-[if(!defined(__USE_TIME_BITS64)), preferred_alias(clock_settime)]
+[if(!defined(__USE_TIME_BITS64)), preferred_alias(clock_settime, __clock_settime)]
 [requires(defined(__CRT_HAVE_clock_settime) || defined(__CRT_HAVE_clock_settime64))]
+[alternate_name(__clock_settime)]
 clock_settime:(clockid_t clock_id, [nonnull] struct timespec const *tp) -> int {
 #ifdef __CRT_HAVE_clock_settime
 	struct @__timespec32@ tp32;
@@ -1229,15 +1233,16 @@ timer_getoverrun:(timer_t timerid) -> int;
 
 %
 %#ifdef __USE_XOPEN2K
-[ignore][cp][doc_alias(clock_nanosleep)]
+[ignore][cp][doc_alias(clock_nanosleep)][alias(__clock_nanosleep)]
 clock_nanosleep32:(clockid_t clock_id, int flags,
                    [nonnull] struct $timespec32 const *__restrict requested_time,
                    [nullable] struct $timespec32 *remaining) -> int = clock_nanosleep?;
 
 @@High-resolution sleep with the specified clock
 [if(defined(__USE_TIME_BITS64)), preferred_alias(clock_nanosleep64)]
-[if(!defined(__USE_TIME_BITS64)), preferred_alias(clock_nanosleep)]
+[if(!defined(__USE_TIME_BITS64)), preferred_alias(clock_nanosleep, __clock_nanosleep)]
 [requires(defined(__CRT_HAVE_clock_nanosleep) || defined(__CRT_HAVE_clock_nanosleep64))]
+[alternate_name(__clock_nanosleep)]
 [cp] clock_nanosleep:(clockid_t clock_id, int flags,
                       [notnull] struct timespec const *__restrict requested_time,
                       [nullable] struct timespec *remaining) -> int {
@@ -1267,6 +1272,7 @@ clock_nanosleep32:(clockid_t clock_id, int flags,
 }
 
 @@Return clock ID for CPU-time clock
+[export_alias(__clock_getcpuclockid)]
 clock_getcpuclockid:(pid_t pid, clockid_t *clock_id) -> int;
 %#endif /* __USE_XOPEN2K */
 
@@ -1471,7 +1477,7 @@ struct tm {
 };
 #endif /* !__std_tm_defined */
 #endif /* !__tm_defined */
-)][alias(_strftime_l)]
+)][alias(_strftime_l)][export_alias(__strftime_l)]
 strftime_l:([outp(bufsize)] char *__restrict buf, size_t bufsize,
             [nonnull] char const *__restrict format,
             [nonnull] struct tm const *__restrict tp, $locale_t locale) -> size_t {
@@ -1530,7 +1536,7 @@ getdate_r:([nonnull] char const *__restrict string,
 %#ifdef __USE_POSIX
 
 @@Return the `struct tm' representation of *TIMER in UTC, using *TP to store the result
-[libc_impl({
+[export_alias(__gmtime_r)][libc_impl({
 	time64_t tm64 = (time64_t)*timer;
 	return gmtime64_r(&tm64, tp);
 })] gmtime_r:([nonnull] time_t const *__restrict timer, [nonnull] struct tm *__restrict tp) -> struct tm * {

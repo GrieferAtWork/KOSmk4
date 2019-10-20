@@ -199,8 +199,8 @@ futime64:($fd_t fd, [nullable] struct utimbuf64 const *file_times) -> int {
 %#endif /* !__wchar_t_defined */
 
 [cp][noexport][nocrt]
-[if(defined(__USE_TIME_BITS64)),preferred_alias(utime64,_utime64)]
-[if(!defined(__USE_TIME_BITS64)),preferred_alias(utime,_utime32)]
+[if(defined(__USE_TIME_BITS64)),preferred_alias(utime64, _utime64)]
+[if(!defined(__USE_TIME_BITS64)),preferred_alias(utime, _utime32)]
 _utime:([notnull] char const *filename, [nullable] struct _utimbuf __KOS_FIXED_CONST *file_times) -> int = utime;
 
 [cp]

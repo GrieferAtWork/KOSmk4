@@ -238,9 +238,11 @@ NOTHROW_NCX(LIBCCALL libc_detach)(pid_t pid)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xab4f5564]]]*/
+/*[[[start:exports,hash:CRC-32=0xcd64ad8f]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(wait, libc_wait);
+DEFINE_PUBLIC_WEAK_ALIAS(__wait, libc_wait);
 DEFINE_PUBLIC_WEAK_ALIAS(waitpid, libc_waitpid);
+DEFINE_PUBLIC_WEAK_ALIAS(__waitpid, libc_waitpid);
 DEFINE_PUBLIC_WEAK_ALIAS(waitid, libc_waitid);
 DEFINE_PUBLIC_WEAK_ALIAS(wait3, libc_wait3);
 DEFINE_PUBLIC_WEAK_ALIAS(wait4, libc_wait4);

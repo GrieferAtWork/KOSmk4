@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x507dd08a */
+/* HASH CRC-32:0xb767e276 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -444,6 +444,8 @@ struct sched_param {
 typedef int (__LIBCCALL *__clone_func_t)(void *__arg);
 #if defined(__CRT_HAVE_clone)
 __LIBC __ATTR_NONNULL((1)) __pid_t __NOTHROW_NCX(__VLIBCCALL clone)(__clone_func_t __fn, void *__child_stack, int __flags, void *__arg, ... /* pid_t *ptid, void *newtls, pid_t *ctid */) __CASMNAME_SAME("clone");
+#elif defined(__CRT_HAVE___clone)
+__CVREDIRECT(__ATTR_NONNULL((1)),__pid_t,__NOTHROW_NCX,clone,(__clone_func_t __fn, void *__child_stack, int __flags, void *__arg),__clone,(__fn,__child_stack,__flags,__arg),__arg,3,(__pid_t,void *,__pid_t))
 #endif /* clone... */
 #if defined(__CRT_HAVE_unshare)
 /* >> unshare(2)

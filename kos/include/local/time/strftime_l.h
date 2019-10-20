@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1b6b8f53 */
+/* HASH CRC-32:0x71d13ca2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -82,7 +82,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strftime_l))(char *__restrict __buf,
                                                         char const *__restrict __format,
                                                         struct tm const *__restrict __tp,
                                                         __locale_t __locale) {
-#line 1478 "kos/src/libc/magic/time.c"
+#line 1484 "kos/src/libc/magic/time.c"
 	(void)__locale;
 	return __localdep_strftime(__buf, __bufsize, __format, __tp);
 }

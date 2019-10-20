@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe6042925 */
+/* HASH CRC-32:0x7a8d674c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_clock_settime64_defined
-#if defined(__CRT_HAVE_clock_settime)
+#if (defined(__CRT_HAVE_clock_settime) || defined(__CRT_HAVE___clock_settime))
 #define __local_clock_settime64_defined 1
 /* Dependency: "clock_settime32" from "time" */
 #ifndef ____localdep_clock_settime32_defined
@@ -26,6 +26,9 @@
 #if defined(__CRT_HAVE_clock_settime)
 /* Set clock CLOCK_ID to value TP */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_settime32,(__clockid_t __clock_id, struct __timespec32 const *__tp),clock_settime,(__clock_id,__tp))
+#elif defined(__CRT_HAVE___clock_settime)
+/* Set clock CLOCK_ID to value TP */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_settime32,(__clockid_t __clock_id, struct __timespec32 const *__tp),__clock_settime,(__clock_id,__tp))
 #else /* LIBC: clock_settime */
 #undef ____localdep_clock_settime32_defined
 #endif /* clock_settime32... */
@@ -36,12 +39,12 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(clock_settime64) __ATTR_NONNULL((2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(clock_settime64))(__clockid_t __clock_id,
                                                              struct __timespec64 const *__tp) {
-#line 1316 "kos/src/libc/magic/time.c"
+#line 1322 "kos/src/libc/magic/time.c"
 	struct __timespec32 __tp32;
 	__tp32.tv_sec  = (__time32_t)__tp->tv_sec;
 	__tp32.tv_nsec = __tp->tv_nsec;
 	return __localdep_clock_settime32(__clock_id, &__tp32);
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_clock_settime) */
+#endif /* (defined(__CRT_HAVE_clock_settime) || defined(__CRT_HAVE___clock_settime)) */
 #endif /* !__local_clock_settime64_defined */

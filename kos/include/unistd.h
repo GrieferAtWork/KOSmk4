@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c1ec664 */
+/* HASH CRC-32:0xc92f71ed */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -435,6 +435,11 @@ __CDECLARE(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,getpid,(void),())
  * Return the PID of the calling process (that is the TID of the calling thread group's leader)
  * THIS_THREAD->LEADER->PID */
 __CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,getpid,(void),_getpid,())
+#elif defined(__CRT_HAVE___getpid)
+/* >> getpid(2)
+ * Return the PID of the calling process (that is the TID of the calling thread group's leader)
+ * THIS_THREAD->LEADER->PID */
+__CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,getpid,(void),__getpid,())
 #else /* LIBC: getpid */
 #undef __getpid_defined
 #endif /* getpid... */
@@ -458,6 +463,10 @@ __CDECLARE(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,gettid,(void),())
 /* >> pipe(2)
  * Create a new pair of connected pipes ([0] = reader, [1] = writer) */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pipe,(__fd_t __pipedes[2]),(__pipedes))
+#elif defined(__CRT_HAVE___pipe)
+/* >> pipe(2)
+ * Create a new pair of connected pipes ([0] = reader, [1] = writer) */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pipe,(__fd_t __pipedes[2]),__pipe,(__pipedes))
 #elif defined(__CRT_HAVE__pipe)
 #include <local/unistd/pipe.h>
 /* >> pipe(2)
@@ -527,6 +536,13 @@ __CDECLARE(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,getpgrp,(void),())
  * THREAD[PID]->LEADER->GROUP_LEADER->PID
  * When `PID' is ZERO(0), use `gettid()' for it instead */
 __CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__getpgid,(__pid_t __pid),getpgid,(__pid))
+#elif defined(__CRT_HAVE___getpgid)
+/* >> getpgid(2)
+ * Return the ID of the process group associated with `PID's process.
+ * (That is the TID of the leader of the process group of `PID's leader)
+ * THREAD[PID]->LEADER->GROUP_LEADER->PID
+ * When `PID' is ZERO(0), use `gettid()' for it instead */
+__CDECLARE(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__getpgid,(__pid_t __pid),(__pid))
 #endif /* __getpgid... */
 
 #if defined(__CRT_HAVE_setpgid)
@@ -537,6 +553,14 @@ __CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,__getpgid,(__pid_t __pid),getpg
  * When `PID' is ZERO(0), use `gettid()' for it instead.
  * When `PGID' is ZERO(0), use `PID' (after it was substituted) for instead */
 __CDECLARE(,int,__NOTHROW_NCX,setpgid,(__pid_t __pid, __pid_t __pgid),(__pid,__pgid))
+#elif defined(__CRT_HAVE___setpgid)
+/* >> setpgid(2)
+ * Change the ID of the process group associated with `PID's process.
+ * (That is the TID of the leader of the process group of `PID's leader)
+ * THREAD[PID]->LEADER->GROUP_LEADER = THREAD[PGID]
+ * When `PID' is ZERO(0), use `gettid()' for it instead.
+ * When `PGID' is ZERO(0), use `PID' (after it was substituted) for instead */
+__CREDIRECT(,int,__NOTHROW_NCX,setpgid,(__pid_t __pid, __pid_t __pgid),__setpgid,(__pid,__pgid))
 #endif /* setpgid... */
 
 #if defined(__CRT_HAVE_setsid)
@@ -617,6 +641,16 @@ __FORCELOCAL __ATTR_WUNUSED __pid_t __NOTHROW_NCX(__LIBCCALL fork)(void) { retur
  * application image with that of another program that the original
  * parent can then `wait(2)' for */
 __CDECLARE(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,fork,(void),())
+#elif defined(__CRT_HAVE___fork)
+/* >> fork(2)
+ * Clone the calling thread into a second process and return twice, once
+ * in the parent process where this function returns the (non-zero) PID
+ * of the forked child process, and a second time in the child process
+ * itself, where ZERO(0) is returned.
+ * The child then usually proceeds by calling `exec(2)' to replace its
+ * application image with that of another program that the original
+ * parent can then `wait(2)' for */
+__CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,fork,(void),__fork,())
 #endif /* fork... */
 
 #if defined(__CRT_HAVE_alarm)
@@ -769,7 +803,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,write,(__fd_t __fd, void c
  * the file descriptor by the amount of data that had already been loaded. - Errors
  * during this phase are silently ignored and don't cause `errno' to change */
 __CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,readall,(__fd_t __fd, void *__buf, size_t __bufsize),(__fd,__buf,__bufsize))
-#elif (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE__lseeki64))
+#elif (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE__lseeki64))
 #include <local/unistd/readall.h>
 /* >> readall(3)
  * Same as `read(2)', however keep on reading until `read()' indicates EOF (causing
@@ -791,7 +825,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(readall, __FORCELOCAL __ATTR_NONNULL((2)) ssize_
  * `writeall()' to immediately return `0') or the entirety of the given buffer has been
  * written (in which case `bufsize' is returned). */
 __CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,writeall,(__fd_t __fd, void const *__buf, size_t __bufsize),(__fd,__buf,__bufsize))
-#elif (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE__lseeki64))
+#elif (defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE__lseeki64))
 #include <local/unistd/writeall.h>
 /* >> writeall(3)
  * Same as `write(2)', however keep on writing until `write()' indicates EOF (causing
@@ -822,7 +856,11 @@ __CDECLARE(,__off32_t,__NOTHROW_NCX,lseek,(__fd_t __fd, __off32_t __offset, int 
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __CREDIRECT(,__off32_t,__NOTHROW_NCX,lseek,(__fd_t __fd, __off32_t __offset, int __whence),_lseek,(__fd,__offset,__whence))
-#elif (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek))
+#elif defined(__CRT_HAVE___lseek) && (!defined(__USE_FILE_OFFSET64))
+/* >> lseek(2)
+ * Change the position of the file read/write pointer within a file referred to by `FD' */
+__CREDIRECT(,__off32_t,__NOTHROW_NCX,lseek,(__fd_t __fd, __off32_t __offset, int __whence),__lseek,(__fd,__offset,__whence))
+#elif (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek))
 #include <local/unistd/lseek.h>
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
@@ -863,6 +901,11 @@ __CDECLARE(,__fd_t,__NOTHROW_NCX,dup2,(__fd_t __oldfd, __fd_t __newfd),(__oldfd,
  * @return: NEWFD: Returns the new handle upon success.
  * Duplicate a file referred to by `OLDFD' into `NEWFD' */
 __CREDIRECT(,__fd_t,__NOTHROW_NCX,dup2,(__fd_t __oldfd, __fd_t __newfd),_dup2,(__oldfd,__newfd))
+#elif defined(__CRT_HAVE___dup2)
+/* >> dup2(2)
+ * @return: NEWFD: Returns the new handle upon success.
+ * Duplicate a file referred to by `OLDFD' into `NEWFD' */
+__CREDIRECT(,__fd_t,__NOTHROW_NCX,dup2,(__fd_t __oldfd, __fd_t __newfd),__dup2,(__oldfd,__newfd))
 #else /* LIBC: dup2 */
 #undef __dup2_defined
 #endif /* dup2... */
@@ -890,6 +933,10 @@ __CDECLARE(,int,__NOTHROW_NCX,close,(__fd_t __fd),(__fd))
 /* >> close(2)
  * Close a file handle */
 __CREDIRECT(,int,__NOTHROW_NCX,close,(__fd_t __fd),_close,(__fd))
+#elif defined(__CRT_HAVE___close)
+/* >> close(2)
+ * Close a file handle */
+__CREDIRECT(,int,__NOTHROW_NCX,close,(__fd_t __fd),__close,(__fd))
 #else /* LIBC: close */
 #undef __close_defined
 #endif /* close... */
@@ -1100,7 +1147,7 @@ __CREDIRECT(,__off64_t,__NOTHROW_NCX,lseek64,(__fd_t __fd, __off64_t __offset, i
 /* >> lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __CREDIRECT(,__off64_t,__NOTHROW_NCX,lseek64,(__fd_t __fd, __off64_t __offset, int __whence),_lseeki64,(__fd,__offset,__whence))
-#elif defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek)
+#elif defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)
 #include <local/unistd/lseek64.h>
 /* >> lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
@@ -1128,7 +1175,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,pread,(__fd_t __fd, void *
 /* >> pread(2)
  * Read data from a file at a specific offset */
 __CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,pread,(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET __offset),(__fd,__buf,__bufsize,__offset))
-#elif (defined(__CRT_HAVE_pread64) || ((defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE__lseeki64))))
+#elif (defined(__CRT_HAVE_pread64) || ((defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE__lseeki64))))
 #include <local/unistd/pread.h>
 /* >> pread(2)
  * Read data from a file at a specific offset */
@@ -1142,7 +1189,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,pwrite,(__fd_t __fd, void 
 /* >> pwrite(2)
  * Write data to a file at a specific offset */
 __CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,pwrite,(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET __offset),(__fd,__buf,__bufsize,__offset))
-#elif (defined(__CRT_HAVE_pwrite64) || ((defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE__lseeki64))))
+#elif (defined(__CRT_HAVE_pwrite64) || ((defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE__lseeki64))))
 #include <local/unistd/pwrite.h>
 /* >> pwrite(2)
  * Write data to a file at a specific offset */
@@ -1158,7 +1205,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,preadall,(__fd_t __fd, voi
 /* >> preadall(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
 __CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,preadall,(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET __offset),(__fd,__buf,__bufsize,__offset))
-#elif (defined(__CRT_HAVE_pread) || ((defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE__lseeki64)))) || defined(__CRT_HAVE_pread64) || (defined(__CRT_HAVE_pread) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || defined(__CRT_HAVE_preadall64) || (defined(__CRT_HAVE_preadall) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+#elif (defined(__CRT_HAVE_pread) || ((defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE__lseeki64)))) || defined(__CRT_HAVE_pread64) || (defined(__CRT_HAVE_pread) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || defined(__CRT_HAVE___pread64) || defined(__CRT_HAVE_preadall64) || (defined(__CRT_HAVE_preadall) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 #include <local/unistd/preadall.h>
 /* >> preadall(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
@@ -1172,7 +1219,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,pwriteall,(__fd_t __fd, vo
 /* >> pwriteall(3)
  * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
 __CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,pwriteall,(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET __offset),(__fd,__buf,__bufsize,__offset))
-#elif (defined(__CRT_HAVE_pread) || ((defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE__lseeki64)))) || defined(__CRT_HAVE_pwrite64) || (defined(__CRT_HAVE_pwrite) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || defined(__CRT_HAVE_pwriteall64) || (defined(__CRT_HAVE_pwriteall) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+#elif (defined(__CRT_HAVE_pread) || ((defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE__lseeki64)))) || defined(__CRT_HAVE_pwrite64) || (defined(__CRT_HAVE_pwrite) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || defined(__CRT_HAVE___pwrite64) || defined(__CRT_HAVE_pwriteall64) || (defined(__CRT_HAVE_pwriteall) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 #include <local/unistd/pwriteall.h>
 /* >> pwriteall(3)
  * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
@@ -1189,7 +1236,11 @@ __CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,pread64,(__fd_t __fd, void 
 /* >> pread64(2)
  * Read data from a file at a specific offset */
 __CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,pread64,(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET64 __offset),pread,(__fd,__buf,__bufsize,__offset))
-#elif (defined(__CRT_HAVE_pread) || ((defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE__lseeki64))))
+#elif defined(__CRT_HAVE___pread64)
+/* >> pread64(2)
+ * Read data from a file at a specific offset */
+__CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,pread64,(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET64 __offset),__pread64,(__fd,__buf,__bufsize,__offset))
+#elif (defined(__CRT_HAVE_pread) || ((defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE__lseeki64))))
 #include <local/unistd/pread64.h>
 /* >> pread64(2)
  * Read data from a file at a specific offset */
@@ -1203,7 +1254,11 @@ __CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,pwrite64,(__fd_t __fd, void
 /* >> pwrite64(2)
  * Write data to a file at a specific offset */
 __CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,pwrite64,(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET64 __offset),pwrite,(__fd,__buf,__bufsize,__offset))
-#elif (defined(__CRT_HAVE_pread) || ((defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE__lseeki64))))
+#elif defined(__CRT_HAVE___pwrite64)
+/* >> pwrite64(2)
+ * Write data to a file at a specific offset */
+__CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,pwrite64,(__fd_t __fd, void const *__buf, size_t __bufsize, __PIO_OFFSET64 __offset),__pwrite64,(__fd,__buf,__bufsize,__offset))
+#elif (defined(__CRT_HAVE_pread) || ((defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE__lseeki64))))
 #include <local/unistd/pwrite64.h>
 /* >> pwrite64(2)
  * Write data to a file at a specific offset */
@@ -1219,7 +1274,7 @@ __CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,preadall64,(__fd_t __fd, vo
 /* >> preadall64(3)
  * Same as `readall(3)', but using `pread64(2)' instead of `read()' */
 __CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,preadall64,(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET64 __offset),preadall,(__fd,__buf,__bufsize,__offset))
-#elif (defined(__CRT_HAVE_pread) || ((defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE__lseeki64)))) || defined(__CRT_HAVE_pread64) || (defined(__CRT_HAVE_pread) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+#elif (defined(__CRT_HAVE_pread) || ((defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE__lseeki64)))) || defined(__CRT_HAVE_pread64) || (defined(__CRT_HAVE_pread) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || defined(__CRT_HAVE___pread64)
 #include <local/unistd/preadall64.h>
 /* >> preadall64(3)
  * Same as `readall(3)', but using `pread64(2)' instead of `read()' */
@@ -1233,7 +1288,7 @@ __CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,pwriteall64,(__fd_t __fd, v
 /* >> pwriteall64(3)
  * Same as `writeall(3)', but using `pwrite64(2)' instead of `write()' */
 __CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,pwriteall64,(__fd_t __fd, void *__buf, size_t __bufsize, __PIO_OFFSET64 __offset),pwriteall,(__fd,__buf,__bufsize,__offset))
-#elif (defined(__CRT_HAVE_pread) || ((defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE__lseeki64)))) || defined(__CRT_HAVE_pwrite64) || (defined(__CRT_HAVE_pwrite) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+#elif (defined(__CRT_HAVE_pread) || ((defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE__lseeki64)))) || defined(__CRT_HAVE_pwrite64) || (defined(__CRT_HAVE_pwrite) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || defined(__CRT_HAVE___pwrite64)
 #include <local/unistd/pwriteall64.h>
 /* >> pwriteall64(3)
  * Same as `writeall(3)', but using `pwrite64(2)' instead of `write()' */
@@ -1273,13 +1328,13 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p_
 #endif /* !__environ_defined */
 #if defined(__CRT_HAVE_pipe2)
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pipe2,(__fd_t __pipedes[2], __oflag_t __flags),(__pipedes,__flags))
-#elif defined(__CRT_HAVE__pipe) || defined(__CRT_HAVE_pipe)
+#elif defined(__CRT_HAVE__pipe) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe)
 #include <local/unistd/pipe2.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(pipe2, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL pipe2)(__fd_t __pipedes[2], __oflag_t __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pipe2))(__pipedes, __flags); })
 #endif /* pipe2... */
 #if defined(__CRT_HAVE_dup3)
 __CDECLARE(,__fd_t,__NOTHROW_NCX,dup3,(__fd_t __oldfd, __fd_t __newfd, __oflag_t __flags),(__oldfd,__newfd,__flags))
-#elif defined(__CRT_HAVE_dup2) || defined(__CRT_HAVE__dup2)
+#elif defined(__CRT_HAVE_dup2) || defined(__CRT_HAVE__dup2) || defined(__CRT_HAVE___dup2)
 #include <local/unistd/dup3.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(dup3, __FORCELOCAL __fd_t __NOTHROW_NCX(__LIBCCALL dup3)(__fd_t __oldfd, __fd_t __newfd, __oflag_t __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dup3))(__oldfd, __newfd, __flags); })
 #endif /* dup3... */
@@ -1336,8 +1391,13 @@ __CDECLARE(,__useconds_t,__NOTHROW_NCX,ualarm,(__useconds_t __value, __useconds_
  * Same as `fork(2)', but suspend the calling process until the child
  * process either calls `exit(2)' or one of the many `exec(2)' functions */
 __CDECLARE(__ATTR_RETURNS_TWICE __ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,vfork,(void),())
+#elif defined(__CRT_HAVE___vfork)
+/* >> vfork(2)
+ * Same as `fork(2)', but suspend the calling process until the child
+ * process either calls `exit(2)' or one of the many `exec(2)' functions */
+__CREDIRECT(__ATTR_RETURNS_TWICE __ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,vfork,(void),__vfork,())
 #endif /* vfork... */
-#endif
+#endif /* (__USE_XOPEN_EXTENDED && !__USE_XOPEN2K8) || __USE_MISC */
 
 #if defined(__CRT_HAVE_fchown)
 /* >> fchown(2)
@@ -1358,6 +1418,13 @@ __CDECLARE(,int,__NOTHROW_RPC,fchdir,(__fd_t __fd),(__fd))
  * THREAD[PID]->LEADER->GROUP_LEADER->PID
  * When `PID' is ZERO(0), use `gettid()' for it instead */
 __CDECLARE(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,getpgid,(__pid_t __pid),(__pid))
+#elif defined(__CRT_HAVE___getpgid)
+/* >> getpgid(2)
+ * Return the ID of the process group associated with `PID's process.
+ * (That is the TID of the leader of the process group of `PID's leader)
+ * THREAD[PID]->LEADER->GROUP_LEADER->PID
+ * When `PID' is ZERO(0), use `gettid()' for it instead */
+__CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,getpgid,(__pid_t __pid),__getpgid,(__pid))
 #endif /* getpgid... */
 
 #if defined(__CRT_HAVE_getsid)
@@ -1573,6 +1640,10 @@ __CDECLARE(__ATTR_WUNUSED,long int,__NOTHROW_NCX,gethostid,(void),())
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,getpagesize,(void),())
+#elif defined(__CRT_HAVE___getpagesize)
+/* >> getpagesize(3)
+ * Return the size of a PAGE (in bytes) */
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,getpagesize,(void),__getpagesize,())
 #else /* LIBC: getpagesize */
 #include <local/unistd/getpagesize.h>
 /* >> getpagesize(3)
@@ -1833,6 +1904,8 @@ __CDECLARE(,int,__NOTHROW_NCX,brk,(void *__addr),(__addr))
 #endif /* brk... */
 #if defined(__CRT_HAVE_sbrk)
 __CDECLARE(,void *,__NOTHROW_NCX,sbrk,(intptr_t __delta),(__delta))
+#elif defined(__CRT_HAVE___sbrk)
+__CREDIRECT(,void *,__NOTHROW_NCX,sbrk,(intptr_t __delta),__sbrk,(__delta))
 #endif /* sbrk... */
 #endif
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcdb30e67 */
+/* HASH CRC-32:0x5d030b31 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_preadall64_defined
-#if ((defined(__CRT_HAVE_pread) || ((defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE__lseeki64)))) || defined(__CRT_HAVE_pread64) || (defined(__CRT_HAVE_pread) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__))
+#if ((defined(__CRT_HAVE_pread) || ((defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE__lseeki64)))) || defined(__CRT_HAVE_pread64) || (defined(__CRT_HAVE_pread) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || defined(__CRT_HAVE___pread64))
 #define __local_preadall64_defined 1
 /* Dependency: "pread64" from "unistd" */
 #ifndef ____localdep_pread64_defined
@@ -31,7 +31,11 @@ __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pread64,
 /* >> pread64(2)
  * Read data from a file at a specific offset */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pread64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __PIO_OFFSET64 __offset),pread,(__fd,__buf,__bufsize,__offset))
-#elif (defined(__CRT_HAVE_pread) || ((defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE__lseeki64))))
+#elif defined(__CRT_HAVE___pread64)
+/* >> pread64(2)
+ * Read data from a file at a specific offset */
+__CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pread64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __PIO_OFFSET64 __offset),__pread64,(__fd,__buf,__bufsize,__offset))
+#elif (defined(__CRT_HAVE_pread) || ((defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE__lseeki64))))
 #include <local/unistd/pread64.h>
 /* >> pread64(2)
  * Read data from a file at a specific offset */
@@ -49,7 +53,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(preadall64))(__fd_t __fd,
                                                         void *__buf,
                                                         __SIZE_TYPE__ __bufsize,
                                                         __PIO_OFFSET64 __offset) {
-#line 1025 "kos/src/libc/magic/unistd.c"
+#line 1029 "kos/src/libc/magic/unistd.c"
 	__SSIZE_TYPE__ __result, __temp;
 	__result = __localdep_pread64(__fd, __buf, __bufsize, __offset);
 	if (__result > 0 && (__SIZE_TYPE__)__result < __bufsize) {
@@ -71,5 +75,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(preadall64))(__fd_t __fd,
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((defined(__CRT_HAVE_pread) || ((defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE__lseeki64)))) || defined(__CRT_HAVE_pread64) || (defined(__CRT_HAVE_pread) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) */
+#endif /* ((defined(__CRT_HAVE_pread) || ((defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE__lseeki64)))) || defined(__CRT_HAVE_pread64) || (defined(__CRT_HAVE_pread) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || defined(__CRT_HAVE___pread64)) */
 #endif /* !__local_preadall64_defined */

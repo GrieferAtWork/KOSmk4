@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe9f2247e */
+/* HASH CRC-32:0x9982a9e1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -76,6 +76,10 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getrlimit,(__rlimit_resource_t
 /* Put the soft and hard limits for RESOURCE in *RLIMITS.
  * Returns 0 if successful, -1 if not (and sets errno) */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getrlimit,(__rlimit_resource_t __resource, struct rlimit *__rlimits),(__resource,__rlimits))
+#elif defined(__CRT_HAVE___getrlimit) && (!defined(__USE_FILE_OFFSET64))
+/* Put the soft and hard limits for RESOURCE in *RLIMITS.
+ * Returns 0 if successful, -1 if not (and sets errno) */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getrlimit,(__rlimit_resource_t __resource, struct rlimit *__rlimits),__getrlimit,(__resource,__rlimits))
 #endif /* getrlimit... */
 #if defined(__CRT_HAVE_setrlimit64) && (defined(__USE_FILE_OFFSET64))
 /* Set the soft and hard limits for RESOURCE to *RLIMITS.

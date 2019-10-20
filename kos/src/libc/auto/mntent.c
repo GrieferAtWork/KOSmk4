@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd1bde055 */
+/* HASH CRC-32:0xd2c012fe */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ INTERN WUNUSED ATTR_PURE
 ATTR_WEAK ATTR_SECTION(".text.crt.database.mntent.hasmntopt") char *
 NOTHROW_NCX(LIBCCALL libc_hasmntopt)(struct mntent const *mnt,
                                      char const *opt) {
-#line 117 "kos/src/libc/magic/mntent.c"
+#line 120 "kos/src/libc/magic/mntent.c"
 	char *str;
 	if likely(mnt && opt && (str = mnt->mnt_opts) != NULL) {
 		size_t optlen = libc_strlen(opt);

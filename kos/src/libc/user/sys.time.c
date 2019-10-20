@@ -401,8 +401,9 @@ NOTHROW_NCX(LIBCCALL libc_futimesat64)(fd_t fd,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x4df9c20d]]]*/
+/*[[[start:exports,hash:CRC-32=0x993d443a]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(gettimeofday, libc_gettimeofday);
+DEFINE_PUBLIC_WEAK_ALIAS(__gettimeofday, libc_gettimeofday);
 DEFINE_PUBLIC_WEAK_ALIAS(getitimer, libc_getitimer);
 DEFINE_PUBLIC_WEAK_ALIAS(setitimer, libc_setitimer);
 DEFINE_PUBLIC_WEAK_ALIAS(utimes, libc_utimes);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3a1f9e78 */
+/* HASH CRC-32:0x5ae08e44 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,16 +56,28 @@ __SYSDECL_BEGIN
 /* Store up to SIZE return address of the current program state
  * in ARRAY and return the exact number of values stored */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,backtrace,(void **__array, int __size),(__array,__size))
+#elif defined(__CRT_HAVE___backtrace)
+/* Store up to SIZE return address of the current program state
+ * in ARRAY and return the exact number of values stored */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,backtrace,(void **__array, int __size),__backtrace,(__array,__size))
 #endif /* backtrace... */
 #if defined(__CRT_HAVE_backtrace_symbols)
 /* Return names of functions from the backtrace list
  * in ARRAY in a newly malloc()ed memory block */
 __CDECLARE(__ATTR_NONNULL((1)),char **,__NOTHROW_NCX,backtrace_symbols,(void *const *__array, int __size),(__array,__size))
+#elif defined(__CRT_HAVE___backtrace_symbols)
+/* Return names of functions from the backtrace list
+ * in ARRAY in a newly malloc()ed memory block */
+__CREDIRECT(__ATTR_NONNULL((1)),char **,__NOTHROW_NCX,backtrace_symbols,(void *const *__array, int __size),__backtrace_symbols,(__array,__size))
 #endif /* backtrace_symbols... */
 #if defined(__CRT_HAVE_backtrace_symbols_fd)
 /* This function is similar to backtrace_symbols()
  * but it writes the result immediately to a file */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,backtrace_symbols_fd,(void *const *__array, int __size, __fd_t __fd),(__array,__size,__fd))
+#elif defined(__CRT_HAVE___backtrace_symbols_fd)
+/* This function is similar to backtrace_symbols()
+ * but it writes the result immediately to a file */
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,backtrace_symbols_fd,(void *const *__array, int __size, __fd_t __fd),__backtrace_symbols_fd,(__array,__size,__fd))
 #endif /* backtrace_symbols_fd... */
 #endif /* __CC__ */
 

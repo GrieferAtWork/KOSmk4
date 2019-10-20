@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6cfed33 */
+/* HASH CRC-32:0xaf82bc8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,8 @@
 __CREDIRECT(__ATTR_NONNULL((1)),float,__NOTHROW_NCX,__localdep_strtof_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),strtof_l,(__nptr,__endptr,__locale))
 #elif defined(__CRT_HAVE__strtof_l)
 __CREDIRECT(__ATTR_NONNULL((1)),float,__NOTHROW_NCX,__localdep_strtof_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),_strtof_l,(__nptr,__endptr,__locale))
+#elif defined(__CRT_HAVE___strtof_l)
+__CREDIRECT(__ATTR_NONNULL((1)),float,__NOTHROW_NCX,__localdep_strtof_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),__strtof_l,(__nptr,__endptr,__locale))
 #else /* LIBC: strtof_l */
 #include <local/stdlib/strtof_l.h>
 #define __localdep_strtof_l (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtof_l))

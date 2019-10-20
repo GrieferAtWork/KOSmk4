@@ -107,12 +107,15 @@ NOTHROW_RPC_NOKOS(LIBCCALL libc_endmntent)(FILE *stream)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xdeeeebf0]]]*/
+/*[[[start:exports,hash:CRC-32=0x7f9d24d1]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(setmntent, libc_setmntent);
+DEFINE_PUBLIC_WEAK_ALIAS(__setmntent, libc_setmntent);
 DEFINE_PUBLIC_WEAK_ALIAS(getmntent, libc_getmntent);
 DEFINE_PUBLIC_WEAK_ALIAS(getmntent_r, libc_getmntent_r);
+DEFINE_PUBLIC_WEAK_ALIAS(__getmntent_r, libc_getmntent_r);
 DEFINE_PUBLIC_WEAK_ALIAS(addmntent, libc_addmntent);
 DEFINE_PUBLIC_WEAK_ALIAS(endmntent, libc_endmntent);
+DEFINE_PUBLIC_WEAK_ALIAS(__endmntent, libc_endmntent);
 /*[[[end:exports]]]*/
 
 DECL_END

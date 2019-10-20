@@ -501,15 +501,19 @@ NOTHROW_NCX(LIBCCALL libc_isfdtype)(fd_t fd,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x99dcc097]]]*/
+/*[[[start:exports,hash:CRC-32=0x363de1ba]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(socket, libc_socket);
+DEFINE_PUBLIC_WEAK_ALIAS(__socket, libc_socket);
 DEFINE_PUBLIC_WEAK_ALIAS(socketpair, libc_socketpair);
 DEFINE_PUBLIC_WEAK_ALIAS(bind, libc_bind);
 DEFINE_PUBLIC_WEAK_ALIAS(getsockname, libc_getsockname);
 DEFINE_PUBLIC_WEAK_ALIAS(connect, libc_connect);
+DEFINE_PUBLIC_WEAK_ALIAS(__connect, libc_connect);
 DEFINE_PUBLIC_WEAK_ALIAS(getpeername, libc_getpeername);
 DEFINE_PUBLIC_WEAK_ALIAS(send, libc_send);
+DEFINE_PUBLIC_WEAK_ALIAS(__send, libc_send);
 DEFINE_PUBLIC_WEAK_ALIAS(recv, libc_recv);
+DEFINE_PUBLIC_WEAK_ALIAS(__recv, libc_recv);
 DEFINE_PUBLIC_WEAK_ALIAS(sendto, libc_sendto);
 DEFINE_PUBLIC_WEAK_ALIAS(recvfrom, libc_recvfrom);
 DEFINE_PUBLIC_WEAK_ALIAS(sendmsg, libc_sendmsg);
@@ -521,6 +525,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(accept, libc_accept);
 DEFINE_PUBLIC_WEAK_ALIAS(shutdown, libc_shutdown);
 DEFINE_PUBLIC_WEAK_ALIAS(accept4, libc_accept4);
 DEFINE_PUBLIC_WEAK_ALIAS(sendmmsg, libc_sendmmsg);
+DEFINE_PUBLIC_WEAK_ALIAS(__sendmmsg, libc_sendmmsg);
 DEFINE_PUBLIC_WEAK_ALIAS(recvmmsg, libc_recvmmsg);
 DEFINE_PUBLIC_WEAK_ALIAS(recvmmsg64, libc_recvmmsg64);
 DEFINE_PUBLIC_WEAK_ALIAS(sockatmark, libc_sockatmark);

@@ -80,9 +80,9 @@ typedef __cpu_set_t    cpu_set_t;
 
 %[default_impl_section(.text.crt.sched.param)]
 sched_setparam:($pid_t pid, struct sched_param const *param) -> int;
-sched_getparam:($pid_t pid, struct sched_param *param) -> int;
-sched_setscheduler:($pid_t pid, int policy, struct sched_param const *param) -> int;
-sched_getscheduler:($pid_t pid) -> int;
+[export_alias(__sched_getparam)] sched_getparam:($pid_t pid, struct sched_param *param) -> int;
+[export_alias(__sched_setscheduler)] sched_setscheduler:($pid_t pid, int policy, struct sched_param const *param) -> int;
+[export_alias(__sched_getscheduler)] sched_getscheduler:($pid_t pid) -> int;
 
 %[default_impl_section(.text.crt.sched.thread)]
 %
@@ -90,11 +90,11 @@ sched_getscheduler:($pid_t pid) -> int;
 @@@return: 1: Another thread was executed prior to the function returning
 @@            The thread may not necessarily be apart of the calling process
 @@@return: 0: The function returned immediately when no other thread was executed
-[alias(pthread_yield)] sched_yield:() -> int;
+[alias(pthread_yield)][export_alias(__sched_yield)] sched_yield:() -> int;
 
 %[default_impl_section(.text.crt.sched.param)]
-sched_get_priority_max:(int algorithm) -> int;
-sched_get_priority_min:(int algorithm) -> int;
+[export_alias(__sched_get_priority_max)] sched_get_priority_max:(int algorithm) -> int;
+[export_alias(__sched_get_priority_min)] sched_get_priority_min:(int algorithm) -> int;
 
 sched_setaffinity:($pid_t pid, $size_t cpusetsize, cpu_set_t const *cpuset) -> int;
 sched_getaffinity:($pid_t pid, $size_t cpusetsize, cpu_set_t *cpuset) -> int;

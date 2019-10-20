@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x33fd25fc */
+/* HASH CRC-32:0x5af4a2a8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,8 @@
 __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE,int,__NOTHROW_NCX,__localdep_iswalnum_l,(__WINT_TYPE__ __wc, __locale_t __locale),iswalnum_l,(__wc,__locale))
 #elif defined(__CRT_HAVE__iswalnum_l)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE,int,__NOTHROW_NCX,__localdep_iswalnum_l,(__WINT_TYPE__ __wc, __locale_t __locale),_iswalnum_l,(__wc,__locale))
+#elif defined(__CRT_HAVE___iswalnum_l)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE,int,__NOTHROW_NCX,__localdep_iswalnum_l,(__WINT_TYPE__ __wc, __locale_t __locale),__iswalnum_l,(__wc,__locale))
 #else /* LIBC: iswalnum_l */
 #include <local/wctype/iswalnum_l.h>
 #define __localdep_iswalnum_l (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswalnum_l))

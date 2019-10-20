@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb46a553b */
+/* HASH CRC-32:0x2b87d4ae */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ DECL_BEGIN
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.system.configuration.getpagesize") int
 NOTHROW_NCX(LIBCCALL libc_getpagesize)(void) {
-#line 1421 "kos/src/libc/magic/unistd.c"
+#line 1425 "kos/src/libc/magic/unistd.c"
 #ifdef __SIZEOF_PAGE__
 	return __SIZEOF_PAGE__;
 #else
@@ -45,7 +45,7 @@ NOTHROW_NCX(LIBCCALL libc_getpagesize)(void) {
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.system.configuration.getdtablesize") int
 NOTHROW_NCX(LIBCCALL libc_getdtablesize)(void) {
-#line 1432 "kos/src/libc/magic/unistd.c"
+#line 1436 "kos/src/libc/magic/unistd.c"
 #if defined(__KOS__)
 	return 0x7fffffff; /* INT_MAX */
 #elif defined(__linux__) || defined(__linux) || defined(linux)
@@ -63,7 +63,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.swab") void
 NOTHROW_NCX(LIBCCALL libc_swab)(void const *__restrict from,
                                 void *__restrict to,
                                 int n_bytes) {
-#line 1695 "kos/src/libc/magic/unistd.c"
+#line 1699 "kos/src/libc/magic/unistd.c"
 	n_bytes &= ~1;
 	while (n_bytes >= 2) {
 		byte_t a, b;
@@ -77,6 +77,7 @@ NOTHROW_NCX(LIBCCALL libc_swab)(void const *__restrict from,
 #endif /* !__KERNEL__ */
 #ifndef __KERNEL__
 DEFINE_PUBLIC_WEAK_ALIAS(getpagesize, libc_getpagesize);
+DEFINE_PUBLIC_WEAK_ALIAS(__getpagesize, libc_getpagesize);
 DEFINE_PUBLIC_WEAK_ALIAS(getdtablesize, libc_getdtablesize);
 DEFINE_PUBLIC_WEAK_ALIAS(swab, libc_swab);
 DEFINE_PUBLIC_WEAK_ALIAS(_swab, libc_swab);

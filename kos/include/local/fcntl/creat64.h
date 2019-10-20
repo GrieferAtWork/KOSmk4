@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5686e471 */
+/* HASH CRC-32:0x967e03aa */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,8 @@
 #define ____localdep_open64_defined 1
 #if defined(__CRT_HAVE_open64)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open64,(char const *__filename, __oflag_t __oflags),open64,(__filename,__oflags),__oflags,1,(__mode_t))
+#elif defined(__CRT_HAVE___open64)
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open64,(char const *__filename, __oflag_t __oflags),__open64,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_open) && (!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open64,(char const *__filename, __oflag_t __oflags),open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE__open) && (!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0)
@@ -44,7 +46,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(creat64) __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(creat64))(char const *__filename,
                                                      __mode_t __mode) {
-#line 245 "kos/src/libc/magic/fcntl.c"
+#line 246 "kos/src/libc/magic/fcntl.c"
 	return __localdep_open64(__filename, O_CREAT|O_WRONLY|O_TRUNC, __mode);
 }
 __NAMESPACE_LOCAL_END

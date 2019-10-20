@@ -117,13 +117,17 @@ NOTHROW_NCX(LIBCCALL libc_uselocale)(locale_t dataset)
 
 
 
-/*[[[start:exports,hash:CRC-32=0x3795ec3b]]]*/
+/*[[[start:exports,hash:CRC-32=0xf248928a]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(setlocale, libc_setlocale);
 DEFINE_PUBLIC_WEAK_ALIAS(localeconv, libc_localeconv);
 DEFINE_PUBLIC_WEAK_ALIAS(newlocale, libc_newlocale);
+DEFINE_PUBLIC_WEAK_ALIAS(__newlocale, libc_newlocale);
 DEFINE_PUBLIC_WEAK_ALIAS(duplocale, libc_duplocale);
+DEFINE_PUBLIC_WEAK_ALIAS(__duplocale, libc_duplocale);
 DEFINE_PUBLIC_WEAK_ALIAS(freelocale, libc_freelocale);
+DEFINE_PUBLIC_WEAK_ALIAS(__freelocale, libc_freelocale);
 DEFINE_PUBLIC_WEAK_ALIAS(uselocale, libc_uselocale);
+DEFINE_PUBLIC_WEAK_ALIAS(__uselocale, libc_uselocale);
 /*[[[end:exports]]]*/
 
 DECL_END

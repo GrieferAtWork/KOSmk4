@@ -68,7 +68,7 @@ typedef int __priority_which_t;
 @@Put the soft and hard limits for RESOURCE in *RLIMITS.
 @@Returns 0 if successful, -1 if not (and sets errno)
 [if(defined(__USE_FILE_OFFSET64)),preferred_alias(getrlimit64)]
-[if(!defined(__USE_FILE_OFFSET64)),preferred_alias(getrlimit)]
+[if(!defined(__USE_FILE_OFFSET64)),preferred_alias(getrlimit, __getrlimit)]
 getrlimit:(__rlimit_resource_t resource, [nonnull] struct rlimit *rlimits) -> int;
 
 @@Set the soft and hard limits for RESOURCE to *RLIMITS.

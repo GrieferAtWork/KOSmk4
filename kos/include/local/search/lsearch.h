@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x179325f */
+/* HASH CRC-32:0x390fba28 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,7 +60,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lsearch))(void const *__key,
                                                      __SIZE_TYPE__ *__nmemb,
                                                      __SIZE_TYPE__ __size,
                                                      __compar_fn_t __compar) {
-#line 785 "kos/src/libc/magic/search.c"
+#line 787 "kos/src/libc/magic/search.c"
 	void *__result;
 	__result = __localdep_lfind(__key, __base, __nmemb, __size, __compar);
 	if (__result == __NULLPTR) {

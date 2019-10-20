@@ -117,8 +117,9 @@ NOTHROW_RPC(LIBCCALL libc_pselect64)(__STDC_INT_AS_SIZE_T nfds,
 
 
 
-/*[[[start:exports,hash:CRC-32=0xf218c17f]]]*/
+/*[[[start:exports,hash:CRC-32=0x38e4cd60]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(select, libc_select);
+DEFINE_PUBLIC_WEAK_ALIAS(__select, libc_select);
 DEFINE_PUBLIC_WEAK_ALIAS(pselect, libc_pselect);
 DEFINE_PUBLIC_WEAK_ALIAS(select64, libc_select64);
 DEFINE_PUBLIC_WEAK_ALIAS(pselect64, libc_pselect64);

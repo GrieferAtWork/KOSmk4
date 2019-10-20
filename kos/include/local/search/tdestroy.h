@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x11565f9a */
+/* HASH CRC-32:0x46d2bf3e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(tdestroy) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tdestroy))(void *__root,
                                                       __free_fn_t __freefct) {
-#line 745 "kos/src/libc/magic/search.c"
+#line 747 "kos/src/libc/magic/search.c"
 __again:
 	if (__root) {
 		void *__l, *__r;

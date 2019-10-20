@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcef98870 */
+/* HASH CRC-32:0xd0d3fcc1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_open_defined
-#if (defined(__CRT_HAVE_open64) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat) || defined(__CRT_HAVE_openat64))))
+#if (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat) || defined(__CRT_HAVE_openat64))))
 #define __local_open_defined 1
 #include <bits/types.h>
 #include <bits/types.h>
@@ -27,6 +27,8 @@
 #define ____localdep_open64_defined 1
 #if defined(__CRT_HAVE_open64)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open64,(char const *__filename, __oflag_t __oflags),open64,(__filename,__oflags),__oflags,1,(__mode_t))
+#elif defined(__CRT_HAVE___open64)
+__CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open64,(char const *__filename, __oflag_t __oflags),__open64,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_open) && (!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open64,(char const *__filename, __oflag_t __oflags),open,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE__open) && (!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0)
@@ -59,18 +61,18 @@ __LOCAL_LIBC(open) __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t
 __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(open))(char const *__filename,
                                                    __oflag_t __oflags,
                                                    ...) {
-#line 195 "kos/src/libc/magic/fcntl.c"
+#line 196 "kos/src/libc/magic/fcntl.c"
 	__fd_t __result;
 	__builtin_va_list __args;
 	__builtin_va_start(__args, __oflags);
-#ifdef __CRT_HAVE_open64
+#if defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64)
 	__result = __localdep_open64(__filename, __oflags, __builtin_va_arg(__args, __mode_t));
-#else
+#else /* __CRT_HAVE_open64 || __CRT_HAVE___open64 */
 	__result = __localdep_openat(__CRT_AT_FDCWD, __filename, __oflags, __builtin_va_arg(__args, __mode_t));
-#endif
+#endif /* !__CRT_HAVE_open64 && !__CRT_HAVE___open64 */
 	__builtin_va_end(__args);
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_open64) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat) || defined(__CRT_HAVE_openat64)))) */
+#endif /* (defined(__CRT_HAVE_open64) || defined(__CRT_HAVE___open64) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_openat) || defined(__CRT_HAVE_openat64)))) */
 #endif /* !__local_open_defined */

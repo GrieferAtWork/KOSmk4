@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa59f3810 */
+/* HASH CRC-32:0xcdd7ae09 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_setmode_defined
-#if defined(__CRT_HAVE_fcntl) && (defined(__KOS__) || defined(__linux__))
+#if (defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl)) && (defined(__KOS__) || defined(__linux__))
 #define __local_setmode_defined 1
 #include <bits/types.h>
 #include <bits/types.h>
@@ -27,6 +27,8 @@
 #define ____localdep_fcntl_defined 1
 #if defined(__CRT_HAVE_fcntl)
 __CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_fcntl,(__fd_t __fd, int __cmd),fcntl,(__fd,__cmd),__cmd,1,(void *))
+#elif defined(__CRT_HAVE___fcntl)
+__CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_fcntl,(__fd_t __fd, int __cmd),__fcntl,(__fd,__cmd),__cmd,1,(void *))
 #else /* LIBC: fcntl */
 #undef ____localdep_fcntl_defined
 #endif /* fcntl... */
@@ -48,5 +50,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(setmode))(__fd_t __fd,
 #endif
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_fcntl) && (defined(__KOS__) || defined(__linux__)) */
+#endif /* (defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl)) && (defined(__KOS__) || defined(__linux__)) */
 #endif /* !__local_setmode_defined */

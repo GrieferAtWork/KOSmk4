@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe65605b0 */
+/* HASH CRC-32:0x452c4b6d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -94,7 +94,7 @@ NOTHROW_NCX(LIBCCALL libc_sigismember)(sigset_t const *set,
 INTERN WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.sigisemptyset") int
 NOTHROW_NCX(LIBCCALL libc_sigisemptyset)(sigset_t const *set) {
-#line 278 "kos/src/libc/magic/signal.c"
+#line 280 "kos/src/libc/magic/signal.c"
 	size_t i;
 	for (i = 0; i < sizeof(sigset_t) / sizeof(__ULONGPTR_TYPE__); ++i)
 		if (set->__val[i])
@@ -108,7 +108,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.sigandset") int
 NOTHROW_NCX(LIBCCALL libc_sigandset)(sigset_t *set,
                                      sigset_t const *left,
                                      sigset_t const *right) {
-#line 288 "kos/src/libc/magic/signal.c"
+#line 290 "kos/src/libc/magic/signal.c"
 	size_t i;
 	for (i = 0; i < sizeof(__sigset_t) / sizeof(__ULONGPTR_TYPE__); ++i)
 		set->__val[i] = left->__val[i] & right->__val[i];
@@ -121,7 +121,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.sigorset") int
 NOTHROW_NCX(LIBCCALL libc_sigorset)(sigset_t *set,
                                     sigset_t const *left,
                                     sigset_t const *right) {
-#line 298 "kos/src/libc/magic/signal.c"
+#line 300 "kos/src/libc/magic/signal.c"
 	size_t i;
 	for (i = 0; i < sizeof(__sigset_t) / sizeof(__ULONGPTR_TYPE__); ++i)
 		set->__val[i] = left->__val[i] | right->__val[i];

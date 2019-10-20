@@ -73,7 +73,8 @@ typedef __sigset_t sigset_t;
 }
 
 @@@param timeout: Timeout in milliseconds (or negative for infinity)
-[cp] poll:([inp(nfds)] struct pollfd *fds, nfds_t nfds, int timeout) -> int;
+[export_alias(__poll)][cp]
+poll:([inp(nfds)] struct pollfd *fds, nfds_t nfds, int timeout) -> int;
 
 %#ifdef __USE_GNU
 

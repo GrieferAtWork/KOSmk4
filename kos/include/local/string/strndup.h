@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x433c0cd */
+/* HASH CRC-32:0x6d9a3378 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,6 +65,9 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_MALLOC __ATTR_ALLO
 #elif defined(__CRT_HAVE_mempcpy)
 /* Same as `memcpy', but return `DST+N_BYTES', rather than `DST' */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),mempcpy,(__dst,__src,__n_bytes))
+#elif defined(__CRT_HAVE___mempcpy)
+/* Same as `memcpy', but return `DST+N_BYTES', rather than `DST' */
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_mempcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),__mempcpy,(__dst,__src,__n_bytes))
 #else /* LIBC: mempcpy */
 #include <local/string/mempcpy.h>
 /* Same as `memcpy', but return `DST+N_BYTES', rather than `DST' */

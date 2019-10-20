@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c916551 */
+/* HASH CRC-32:0x5e984c20 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.bzero") void
 NOTHROW_NCX(LIBCCALL libc_bzero)(void *__restrict dst,
                                  size_t num_bytes) {
-#line 43 "kos/src/libc/magic/strings.c"
+#line 44 "kos/src/libc/magic/strings.c"
 	memset(dst, 0, num_bytes);
 }
 
@@ -50,7 +50,7 @@ INTERN NONNULL((1)) WUNUSED ATTR_PURE
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.index") char *
 NOTHROW_NCX(LIBCCALL libc_index)(char const *__restrict haystack,
                                  int needle) {
-#line 55 "kos/src/libc/magic/strings.c"
+#line 56 "kos/src/libc/magic/strings.c"
 	for (; *haystack; ++haystack) {
 		if (*haystack == needle)
 			return (char *)haystack;
@@ -64,7 +64,7 @@ INTERN NONNULL((1)) WUNUSED ATTR_PURE
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.rindex") char *
 NOTHROW_NCX(LIBCCALL libc_rindex)(char const *__restrict haystack,
                                   int needle) {
-#line 69 "kos/src/libc/magic/strings.c"
+#line 70 "kos/src/libc/magic/strings.c"
 	char const *result = NULL;
 	for (; *haystack; ++haystack) {
 		if (*haystack == needle)

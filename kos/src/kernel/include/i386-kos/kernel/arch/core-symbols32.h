@@ -1002,10 +1002,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak json_parser_leavearray; .long json_parser_leavearray
 	.reloc ., R_386_SIZE32, json_parser_leavearray; .long 0
 	.long 0x49d20f9
-	.long 0 /* index: 250 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname250 /* index: 250 */
+	.weak vsnprintf; .long vsnprintf
+	.reloc ., R_386_SIZE32, vsnprintf; .long 0
+	.long 0x5789806
 	.long 0 /* index: 251 */
 	.long 0
 	.long 0
@@ -1483,9 +1483,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, x86_vm86_outb; .long 0
 	.long 0x1a01d2
 	.long .Lname370 /* index: 370 */
-	.weak rawmemchr; .long rawmemchr
-	.reloc ., R_386_SIZE32, rawmemchr; .long 0
-	.long 0xe3c4172
+	.weak __rawmemchr; .long __rawmemchr
+	.reloc ., R_386_SIZE32, __rawmemchr; .long 0
+	.long 0xe5f5172
 	.long .Lname371 /* index: 371 */
 	.weak sys_getdrives; .long sys_getdrives
 	.reloc ., R_386_SIZE32, sys_getdrives; .long 0
@@ -8219,9 +8219,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, block_device_awrite; .long 0
 	.long 0x677e805
 	.long .Lname2054 /* index: 2054 */
-	.weak vsnprintf; .long vsnprintf
-	.reloc ., R_386_SIZE32, vsnprintf; .long 0
-	.long 0x5789806
+	.weak __vsnprintf; .long __vsnprintf
+	.reloc ., R_386_SIZE32, __vsnprintf; .long 0
+	.long 0x51da806
 	.long 0 /* index: 2055 */
 	.long 0
 	.long 0
@@ -8886,10 +8886,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak json_writer_putbool; .long json_writer_putbool
 	.reloc ., R_386_SIZE32, json_writer_putbool; .long 0
 	.long 0xd6618ac
-	.long 0 /* index: 2221 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2221 /* index: 2221 */
+	.weak rawmemchr; .long rawmemchr
+	.reloc ., R_386_SIZE32, rawmemchr; .long 0
+	.long 0xe3c4172
 	.long 0 /* index: 2222 */
 	.long 0
 	.long 0
@@ -15462,10 +15462,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak json_parser_findindex; .long json_parser_findindex
 	.reloc ., R_386_SIZE32, json_parser_findindex; .long 0
 	.long 0xb2e0f18
-	.long 0 /* index: 3865 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname3865 /* index: 3865 */
+	.weak __mempcpy; .long __mempcpy
+	.reloc ., R_386_SIZE32, __mempcpy; .long 0
+	.long 0x3c40f19
 	.long .Lname3866 /* index: 3866 */
 	.weak vio_addb; .long vio_addb
 	.reloc ., R_386_SIZE32, vio_addb; .long 0
@@ -16642,6 +16642,8 @@ END(kernel_symbol_table)
 	.string "directory_entry_hash"
 .Lname249:
 	.string "json_parser_leavearray"
+.Lname250:
+	.string "vsnprintf"
 .Lname255:
 	.string "debug_sections_addr2line"
 .Lname260:
@@ -16747,7 +16749,7 @@ END(kernel_symbol_table)
 .Lname369:
 	.string "x86_vm86_outb"
 .Lname370:
-	.string "rawmemchr"
+	.string "__rawmemchr"
 .Lname371:
 	.string "sys_getdrives"
 .Lname373:
@@ -18485,7 +18487,7 @@ END(kernel_symbol_table)
 .Lname2053:
 	.string "block_device_awrite"
 .Lname2054:
-	.string "vsnprintf"
+	.string "__vsnprintf"
 .Lname2060:
 	.string "terminal_poll_iread"
 .Lname2068:
@@ -18648,6 +18650,8 @@ END(kernel_symbol_table)
 	.string "sys_linux_oldlstat"
 .Lname2220:
 	.string "json_writer_putbool"
+.Lname2221:
+	.string "rawmemchr"
 .Lname2223:
 	.string "path_lock_end"
 .Lname2227:
@@ -20400,6 +20404,8 @@ END(kernel_symbol_table)
 	.string "debuginfo_cu_parser_nextsibling"
 .Lname3864:
 	.string "json_parser_findindex"
+.Lname3865:
+	.string "__mempcpy"
 .Lname3866:
 	.string "vio_addb"
 .Lname3868:

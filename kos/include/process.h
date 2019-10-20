@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8043d7b1 */
+/* HASH CRC-32:0x6405a9f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -543,6 +543,11 @@ __CDECLARE(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,getpid,(void),())
  * Return the PID of the calling process (that is the TID of the calling thread group's leader)
  * THIS_THREAD->LEADER->PID */
 __CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,getpid,(void),_getpid,())
+#elif defined(__CRT_HAVE___getpid)
+/* >> getpid(2)
+ * Return the PID of the calling process (that is the TID of the calling thread group's leader)
+ * THIS_THREAD->LEADER->PID */
+__CREDIRECT(__ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,getpid,(void),__getpid,())
 #else /* LIBC: getpid */
 #undef __getpid_defined
 #endif /* getpid... */

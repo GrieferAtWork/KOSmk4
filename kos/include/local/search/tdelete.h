@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xae277045 */
+/* HASH CRC-32:0x3a24ff1f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,7 +64,7 @@ __LOCAL_LIBC(tdelete) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tdelete))(void const *__restrict __key,
                                                      void **__restrict __vrootp,
                                                      __compar_fn_t __compar) {
-#line 525 "kos/src/libc/magic/search.c"
+#line 526 "kos/src/libc/magic/search.c"
 	typedef struct __node_struct {
 		void const         *__key;
 		struct __node_struct *__left_node;

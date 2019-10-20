@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe72ec8ca */
+/* HASH CRC-32:0x83a69e92 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_dup3_defined
-#if (defined(__CRT_HAVE_dup2) || defined(__CRT_HAVE__dup2))
+#if (defined(__CRT_HAVE_dup2) || defined(__CRT_HAVE__dup2) || defined(__CRT_HAVE___dup2))
 #define __local_dup3_defined 1
 /* Dependency: "dup2" */
 #ifndef ____localdep_dup2_defined
@@ -33,6 +33,11 @@ __CREDIRECT(,__fd_t,__NOTHROW_NCX,__localdep_dup2,(__fd_t __oldfd, __fd_t __newf
  * @return: NEWFD: Returns the new handle upon success.
  * Duplicate a file referred to by `OLDFD' into `NEWFD' */
 __CREDIRECT(,__fd_t,__NOTHROW_NCX,__localdep_dup2,(__fd_t __oldfd, __fd_t __newfd),_dup2,(__oldfd,__newfd))
+#elif defined(__CRT_HAVE___dup2)
+/* >> dup2(2)
+ * @return: NEWFD: Returns the new handle upon success.
+ * Duplicate a file referred to by `OLDFD' into `NEWFD' */
+__CREDIRECT(,__fd_t,__NOTHROW_NCX,__localdep_dup2,(__fd_t __oldfd, __fd_t __newfd),__dup2,(__oldfd,__newfd))
 #else /* LIBC: dup2 */
 #undef ____localdep_dup2_defined
 #endif /* dup2... */
@@ -43,9 +48,9 @@ __LOCAL_LIBC(dup3) __fd_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dup3))(__fd_t __oldfd,
                                                   __fd_t __newfd,
                                                   __oflag_t __flags) {
-#line 1120 "kos/src/libc/magic/unistd.c"
+#line 1124 "kos/src/libc/magic/unistd.c"
 	return __newfd != __oldfd ? __localdep_dup2(__oldfd, __newfd) : -1;
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_dup2) || defined(__CRT_HAVE__dup2)) */
+#endif /* (defined(__CRT_HAVE_dup2) || defined(__CRT_HAVE__dup2) || defined(__CRT_HAVE___dup2)) */
 #endif /* !__local_dup3_defined */

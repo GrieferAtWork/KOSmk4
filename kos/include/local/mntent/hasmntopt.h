@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x60c31ba0 */
+/* HASH CRC-32:0x6dca91f6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -73,7 +73,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(hasmntopt) __ATTR_WUNUSED __ATTR_PURE char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hasmntopt))(struct mntent const *__mnt,
                                                        char const *__opt) {
-#line 117 "kos/src/libc/magic/mntent.c"
+#line 120 "kos/src/libc/magic/mntent.c"
 	char *__str;
 	if __likely(__mnt && __opt && (__str = __mnt->mnt_opts) != __NULLPTR) {
 		__SIZE_TYPE__ __optlen = __localdep_strlen(__opt);

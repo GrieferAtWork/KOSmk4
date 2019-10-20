@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f165f0f */
+/* HASH CRC-32:0xf5c60787 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -123,6 +123,13 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,gettimeofday,(struct timeval *
  * NOTE: This form of timezone information is obsolete.
  * Use the functions and variables declared in <time.h> instead */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,gettimeofday,(struct timeval *__restrict __tv, __timezone_ptr_t __tz),(__tv,__tz))
+#elif defined(__CRT_HAVE___gettimeofday) && (!defined(__USE_TIME_BITS64))
+/* Get the current time of day and timezone information,
+ * putting it into *TV and *TZ.  If TZ is NULL, *TZ is not filled.
+ * Returns 0 on success, -1 on errors.
+ * NOTE: This form of timezone information is obsolete.
+ * Use the functions and variables declared in <time.h> instead */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,gettimeofday,(struct timeval *__restrict __tv, __timezone_ptr_t __tz),__gettimeofday,(__tv,__tz))
 #elif (defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE_gettimeofday64))
 #include <local/sys.time/gettimeofday.h>
 /* Get the current time of day and timezone information,
@@ -266,7 +273,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,gettimeofday64,(struct timeval6
  * NOTE: This form of timezone information is obsolete.
  * Use the functions and variables declared in <time.h> instead */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,gettimeofday64,(struct timeval64 *__restrict __tv, __timezone_ptr_t __tz),gettimeofday,(__tv,__tz))
-#elif defined(__CRT_HAVE_gettimeofday)
+#elif defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday)
 #include <local/sys.time/gettimeofday64.h>
 /* Get the current time of day and timezone information,
  * putting it into *TV and *TZ.  If TZ is NULL, *TZ is not filled.

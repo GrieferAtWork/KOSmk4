@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5ac9d02a */
+/* HASH CRC-32:0x3af5a0c0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -264,7 +264,7 @@ __CDECLARE(__ATTR_NONNULL((2)),size_t,,Write,(__fd_t __fd, void const *__buf, si
  * the file descriptor by the amount of data that had already been loaded. - Errors
  * during this phase are silently ignored and don't cause `errno' to change */
 __CDECLARE(__ATTR_NONNULL((2)),size_t,,ReadAll,(__fd_t __fd, void *__buf, size_t __bufsize),(__fd,__buf,__bufsize)) __THROWS(...)
-#elif defined(__CRT_HAVE_Read) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE__lseeki64))
+#elif defined(__CRT_HAVE_Read) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE__lseeki64))
 #include <local/kos.unistd/ReadAll.h>
 /* >> readall(3)
  * Same as `read(2)', however keep on reading until `read()' indicates EOF (causing
@@ -448,7 +448,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),size_t,,PReadAll,(__fd_t __fd, void *__buf, size
 /* >> preadall(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
 __CDECLARE(__ATTR_NONNULL((2)),size_t,,PReadAll,(__fd_t __fd, void *__buf, size_t __bufsize, pos_t __offset),(__fd,__buf,__bufsize,__offset)) __THROWS(...)
-#elif (defined(__CRT_HAVE_pread) || ((defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE__lseeki64)))) || defined(__CRT_HAVE_pread64) || (defined(__CRT_HAVE_pread) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || defined(__CRT_HAVE_preadall64) || (defined(__CRT_HAVE_preadall) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+#elif (defined(__CRT_HAVE_pread) || ((defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read)) && (defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) || defined(__CRT_HAVE__lseeki64)))) || defined(__CRT_HAVE_pread64) || (defined(__CRT_HAVE_pread) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || defined(__CRT_HAVE___pread64) || defined(__CRT_HAVE_preadall64) || (defined(__CRT_HAVE_preadall) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 #include <local/kos.unistd/PReadAll.h>
 /* >> preadall(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */

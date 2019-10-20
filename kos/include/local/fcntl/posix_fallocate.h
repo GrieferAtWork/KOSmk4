@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3135fbe8 */
+/* HASH CRC-32:0x68186061 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -49,7 +49,7 @@ __LOCAL_LIBC(posix_fallocate) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_fallocate))(__fd_t __fd,
                                                              __FS_TYPE(off) __offset,
                                                              __FS_TYPE(off) __length) {
-#line 324 "kos/src/libc/magic/fcntl.c"
+#line 325 "kos/src/libc/magic/fcntl.c"
 #ifdef __CRT_HAVE_posix_fallocate64
 	return __localdep_posix_fallocate64(__fd, (__off64_t)__offset, (__off64_t)__length);
 #elif defined(__CRT_HAVE_posix_fallocate)

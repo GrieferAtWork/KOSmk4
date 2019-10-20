@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x87cce5c5 */
+/* HASH CRC-32:0x4aa8e266 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -333,6 +333,8 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,shm_unlink,(char const *__name)
 #ifdef __USE_MISC
 #if defined(__CRT_HAVE_madvise)
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,madvise,(void *__addr, size_t __len, int __advice),(__addr,__len,__advice))
+#elif defined(__CRT_HAVE___madvise)
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,madvise,(void *__addr, size_t __len, int __advice),__madvise,(__addr,__len,__advice))
 #else /* LIBC: madvise */
 #include <local/sys.mman/madvise.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(madvise, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL madvise)(void *__addr, size_t __len, int __advice) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(madvise))(__addr, __len, __advice); })

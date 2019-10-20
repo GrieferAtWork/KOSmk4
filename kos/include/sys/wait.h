@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3d6f175d */
+/* HASH CRC-32:0x6d38af9c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -107,6 +107,9 @@ typedef union {
 #if defined(__CRT_HAVE_wait)
 /* Wait for any child process (same as `waitpid(-1, STAT_LOC, 0);') */
 __CDECLARE(,__pid_t,__NOTHROW_RPC,wait,(__WAIT_STATUS __stat_loc),(__stat_loc))
+#elif defined(__CRT_HAVE___wait)
+/* Wait for any child process (same as `waitpid(-1, STAT_LOC, 0);') */
+__CREDIRECT(,__pid_t,__NOTHROW_RPC,wait,(__WAIT_STATUS __stat_loc),__wait,(__stat_loc))
 #endif /* wait... */
 #if defined(__CRT_HAVE_waitpid)
 /* Wait for a child process:
@@ -116,6 +119,14 @@ __CDECLARE(,__pid_t,__NOTHROW_RPC,wait,(__WAIT_STATUS __stat_loc),(__stat_loc))
  *  - `pid > 0':   Wait for the child whose process ID is equal to `PID'
  * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 __CDECLARE(,__pid_t,__NOTHROW_RPC,waitpid,(__pid_t __pid, __WAIT_STATUS __stat_loc, int __options),(__pid,__stat_loc,__options))
+#elif defined(__CRT_HAVE___waitpid)
+/* Wait for a child process:
+ *  - `pid < -1':  Wait for any child process whose process group ID is `-PID'
+ *  - `pid == -1': Wait for any child process
+ *  - `pid == 0':  Wait for any child process whose process group ID is that of the caller
+ *  - `pid > 0':   Wait for the child whose process ID is equal to `PID'
+ * @param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
+__CREDIRECT(,__pid_t,__NOTHROW_RPC,waitpid,(__pid_t __pid, __WAIT_STATUS __stat_loc, int __options),__waitpid,(__pid,__stat_loc,__options))
 #endif /* waitpid... */
 
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)

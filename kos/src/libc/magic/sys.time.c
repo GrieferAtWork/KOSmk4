@@ -100,7 +100,7 @@ typedef void *__restrict __timezone_ptr_t;
 
 }
 
-[ignore][section(.text.crt.time)][doc_alias(gettimeofday)]
+[ignore][section(.text.crt.time)][doc_alias(gettimeofday)][alias(__gettimeofday)]
 gettimeofday32:([nonnull] struct __timeval32 *__restrict tv,
                 [nullable] __timezone_ptr_t tz) -> int = gettimeofday?;
 
@@ -137,9 +137,9 @@ futimes32:($fd_t fd, [nullable] struct __timeval32 const tvp[2]) -> int = futime
 @@Returns 0 on success, -1 on errors.
 @@NOTE: This form of timezone information is obsolete.
 @@Use the functions and variables declared in <time.h> instead
-[section(.text.crt.time)]
+[section(.text.crt.time)][alternate_name(__gettimeofday)]
 [if(defined(__USE_TIME_BITS64)), preferred_alias(gettimeofday64)]
-[if(!defined(__USE_TIME_BITS64)), preferred_alias(gettimeofday)]
+[if(!defined(__USE_TIME_BITS64)), preferred_alias(gettimeofday, __gettimeofday)]
 [requires(defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE_gettimeofday64))]
 gettimeofday:([nonnull] struct timeval *__restrict tv, [nullable] __timezone_ptr_t tz) -> int {
 #ifdef __CRT_HAVE_gettimeofday

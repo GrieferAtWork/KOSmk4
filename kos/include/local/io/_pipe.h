@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc417c2e */
+/* HASH CRC-32:0x6d926ca5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__pipe_defined
-#if (defined(__CRT_HAVE__pipe) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE_pipe2))
+#if (defined(__CRT_HAVE__pipe) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE_pipe2))
 #define __local__pipe_defined 1
 #include <bits/types.h>
 /* Dependency: "pipe2" from "unistd" */
@@ -26,7 +26,7 @@
 #define ____localdep_pipe2_defined 1
 #if defined(__CRT_HAVE_pipe2)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pipe2,(__fd_t __pipedes[2], __oflag_t __flags),pipe2,(__pipedes,__flags))
-#elif defined(__CRT_HAVE__pipe) || defined(__CRT_HAVE_pipe)
+#elif defined(__CRT_HAVE__pipe) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe)
 #include <local/unistd/pipe2.h>
 #define __localdep_pipe2 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pipe2))
 #else /* CUSTOM: pipe2 */
@@ -44,5 +44,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_pipe))(__fd_t __pipedes[2],
 	return __localdep_pipe2(__pipedes, __textmode);
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE__pipe) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE_pipe2)) */
+#endif /* (defined(__CRT_HAVE__pipe) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE_pipe2)) */
 #endif /* !__local__pipe_defined */

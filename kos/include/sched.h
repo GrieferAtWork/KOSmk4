@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9725aad7 */
+/* HASH CRC-32:0x1045c5a1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -80,12 +80,18 @@ __CDECLARE(,int,__NOTHROW_NCX,sched_setparam,(__pid_t __pid, struct sched_param 
 #endif /* sched_setparam... */
 #if defined(__CRT_HAVE_sched_getparam)
 __CDECLARE(,int,__NOTHROW_NCX,sched_getparam,(__pid_t __pid, struct sched_param *__param),(__pid,__param))
+#elif defined(__CRT_HAVE___sched_getparam)
+__CREDIRECT(,int,__NOTHROW_NCX,sched_getparam,(__pid_t __pid, struct sched_param *__param),__sched_getparam,(__pid,__param))
 #endif /* sched_getparam... */
 #if defined(__CRT_HAVE_sched_setscheduler)
 __CDECLARE(,int,__NOTHROW_NCX,sched_setscheduler,(__pid_t __pid, int __policy, struct sched_param const *__param),(__pid,__policy,__param))
+#elif defined(__CRT_HAVE___sched_setscheduler)
+__CREDIRECT(,int,__NOTHROW_NCX,sched_setscheduler,(__pid_t __pid, int __policy, struct sched_param const *__param),__sched_setscheduler,(__pid,__policy,__param))
 #endif /* sched_setscheduler... */
 #if defined(__CRT_HAVE_sched_getscheduler)
 __CDECLARE(,int,__NOTHROW_NCX,sched_getscheduler,(__pid_t __pid),(__pid))
+#elif defined(__CRT_HAVE___sched_getscheduler)
+__CREDIRECT(,int,__NOTHROW_NCX,sched_getscheduler,(__pid_t __pid),__sched_getscheduler,(__pid))
 #endif /* sched_getscheduler... */
 
 #if defined(__CRT_HAVE_sched_yield)
@@ -98,12 +104,21 @@ __CDECLARE(,int,__NOTHROW_NCX,sched_yield,(void),())
  *             The thread may not necessarily be apart of the calling process
  * @return: 0: The function returned immediately when no other thread was executed */
 __CREDIRECT(,int,__NOTHROW_NCX,sched_yield,(void),pthread_yield,())
+#elif defined(__CRT_HAVE___sched_yield)
+/* @return: 1: Another thread was executed prior to the function returning
+ *             The thread may not necessarily be apart of the calling process
+ * @return: 0: The function returned immediately when no other thread was executed */
+__CREDIRECT(,int,__NOTHROW_NCX,sched_yield,(void),__sched_yield,())
 #endif /* sched_yield... */
 #if defined(__CRT_HAVE_sched_get_priority_max)
 __CDECLARE(,int,__NOTHROW_NCX,sched_get_priority_max,(int __algorithm),(__algorithm))
+#elif defined(__CRT_HAVE___sched_get_priority_max)
+__CREDIRECT(,int,__NOTHROW_NCX,sched_get_priority_max,(int __algorithm),__sched_get_priority_max,(__algorithm))
 #endif /* sched_get_priority_max... */
 #if defined(__CRT_HAVE_sched_get_priority_min)
 __CDECLARE(,int,__NOTHROW_NCX,sched_get_priority_min,(int __algorithm),(__algorithm))
+#elif defined(__CRT_HAVE___sched_get_priority_min)
+__CREDIRECT(,int,__NOTHROW_NCX,sched_get_priority_min,(int __algorithm),__sched_get_priority_min,(__algorithm))
 #endif /* sched_get_priority_min... */
 #if defined(__CRT_HAVE_sched_setaffinity)
 __CDECLARE(,int,__NOTHROW_NCX,sched_setaffinity,(__pid_t __pid, __SIZE_TYPE__ __cpusetsize, cpu_set_t const *__cpuset),(__pid,__cpusetsize,__cpuset))

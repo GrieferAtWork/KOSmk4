@@ -402,31 +402,31 @@ strnlen:([nonnull] char const *__restrict string, size_t maxlen) -> size_t {
 %#ifdef __USE_XOPEN2K8
 
 @@Same as `mempcpy(DST, SRC, (strlen(SRC) + 1) * sizeof(char)) - 1´
-[ATTR_RETNONNULL][crtbuiltin]
+[ATTR_RETNONNULL][crtbuiltin][alias(__stpcpy)]
 stpcpy:([nonnull] char *__restrict buf, [nonnull] char const *__restrict src) -> char * {
 	return (char *)mempcpy(buf, src, (strlen(src) + 1) * sizeof(char)) - 1;
 }
-[ATTR_RETNONNULL][crtbuiltin]
+[ATTR_RETNONNULL][crtbuiltin][alias(__stpncpy)]
 stpncpy:([nonnull] char *__restrict buf, [nonnull] char const *__restrict src, size_t buflen) -> char * {
 	size_t srclen = strnlen(src, buflen);
 	memcpy(buf, src, srclen * sizeof(char));
 	memset(buf+srclen, '\0', (size_t)(buflen - srclen) * sizeof(char));
 	return buf + srclen;
 }
-[noexport][ATTR_RETNONNULL]
+[ATTR_RETNONNULL]
 __stpcpy:([nonnull] char *__restrict buf, [nonnull] char const *__restrict src) -> char * = stpcpy;
-[noexport][ATTR_RETNONNULL]
+[ATTR_RETNONNULL]
 __stpncpy:([nonnull] char *__restrict buf, [nonnull] char const *__restrict src, size_t buflen) -> char * = stpncpy;
 
 [alias(_strcoll_l)][ATTR_WUNUSED][ATTR_PURE]
-[section(.text.crt.unicode.locale.memory)]
+[section(.text.crt.unicode.locale.memory)][export_alias(__strcoll_l)]
 strcoll_l:([nonnull] char const *s1, [nonnull] char const *s2, $locale_t locale) -> int {
 	(void)locale;
 	return strcoll(s1, s2);
 }
 
 [alias(_strxfrm_l)][requires($has_function(strxfrm))]
-[section(.text.crt.unicode.locale.memory)]
+[section(.text.crt.unicode.locale.memory)][export_alias(__strxfrm_l)]
 strxfrm_l:(char *dst, [nonnull] char const *__restrict src,
            size_t maxlen, $locale_t locale) -> size_t {
 	(void)locale;
@@ -443,7 +443,7 @@ strerror_l:(int errnum, $locale_t locale) -> char * {
 
 [requires($has_function(malloc))][ATTR_WUNUSED]
 [ATTR_MALL_DEFAULT_ALIGNED][ATTR_MALLOC]
-[section(.text.crt.heap.strdup)][crtbuiltin]
+[section(.text.crt.heap.strdup)][crtbuiltin][export_alias(__strndup)]
 strndup:([nonnull] char const *__restrict string, size_t max_chars) -> char * %{auto_block(any({
 	size_t resultlen = strnlen(string, max_chars);
 	char *result = (char *)malloc((resultlen + 1) * sizeof(char));
@@ -478,7 +478,7 @@ strdup:([nonnull] char const *__restrict string) -> char * %{auto_block(any({
 #ifdef __USE_POSIX
 }
 
-[alias(strtok_s)]
+[alias(strtok_s, __strtok_r)]
 strtok_r:(char *string, [nonnull] char const *delim, [nonnull] char **__restrict save_ptr) -> char * {
 	char *end;
 	if (!string)
@@ -523,7 +523,7 @@ memrchr:([nonnull] void const *__restrict haystack, int needle, size_t n_bytes) 
 
 
 @@Same as `memchr' with a search limit of `(size_t)-1'
-[kernel][ATTR_RETNONNULL][ATTR_WUNUSED][ATTR_PURE]
+[kernel][ATTR_RETNONNULL][ATTR_WUNUSED][ATTR_PURE][export_alias(__rawmemchr)]
 rawmemchr:([nonnull] void const *__restrict haystack, int needle) -> void *
 	[([nonnull] void *__restrict haystack, int needle) -> void *]
 	[([nonnull] void const *__restrict haystack, int needle) -> void const *]
@@ -594,7 +594,7 @@ basename:([nullable] char const *filename) -> char *
 
 @@Same as `strstr', but ignore casing
 [ATTR_WUNUSED][ATTR_PURE]
-[section(.text.crt.unicode.static.memory)]
+[section(.text.crt.unicode.static.memory)][export_alias(__strcasestr)]
 strcasestr:([nonnull] char const *haystack, [nonnull] char const *needle) -> char *
 	[([nonnull] char *haystack, [nonnull] char const *needle) -> char *]
 	[([nonnull] char const *haystack, [nonnull] char const *needle) -> char const *]
@@ -629,7 +629,7 @@ memmem:([nonnull] void const *haystack, size_t haystacklen, [nonnull] void const
 	return NULL;
 }
 
-[ATTR_WUNUSED][ATTR_PURE]
+[ATTR_WUNUSED][ATTR_PURE][alias(__strverscmp)]
 strverscmp:([nonnull] char const *s1, [nonnull] char const *s2) -> int {
 	char const *s1_start = s1;
 	char c1, c2;
@@ -680,7 +680,7 @@ strverscmp:([nonnull] char const *s1, [nonnull] char const *s2) -> int {
 __mempcpy:([nonnull] void *__restrict dst, [nonnull] void const *__restrict src, size_t n_bytes) -> void * = mempcpy;
 
 @@Same as `memcpy', but return `DST+N_BYTES', rather than `DST'
-[libc][kernel][fast][ATTR_RETNONNULL][nobuiltin]
+[libc][kernel][fast][ATTR_RETNONNULL][nobuiltin][export_alias(__mempcpy)]
 mempcpy:([nonnull] void *__restrict dst, [nonnull] void const *__restrict src, size_t n_bytes) -> void * {
 	byte_t *pdst = (byte_t *)dst;
 	byte_t *psrc = (byte_t *)src;
@@ -714,13 +714,13 @@ memfrob:([nonnull] void *buf, size_t num_bytes) -> void * {
 
 
 [guard][alias(_stricmp_l)][ATTR_WUNUSED][ATTR_PURE]
-[section(.text.crt.unicode.locale.memory)]
+[section(.text.crt.unicode.locale.memory)][export_alias(__strcasecmp_l)]
 strcasecmp_l:([nonnull] char const *s1, [nonnull] char const *s2, $locale_t locale) -> int {
 	(void)locale;
 	return strcasecmp(s1, s2);
 }
 [guard][alias(_strnicmp_l, _strncmpi_l)][ATTR_WUNUSED][ATTR_PURE]
-[section(.text.crt.unicode.locale.memory)]
+[section(.text.crt.unicode.locale.memory)][export_alias(__strncasecmp_l)]
 strncasecmp_l:([nonnull] char const *s1, [nonnull] char const *s2, size_t maxlen, $locale_t locale) -> int {
 	(void)locale;
 	return strncasecmp(s1, s2, maxlen);
@@ -759,7 +759,7 @@ strsep:([nonnull] char **__restrict stringp,
 %[insert:extern(index)]
 %[insert:extern(rindex)]
 
-[guard][alias(_stricmp, _strcmpi, stricmp, strcmpi)]
+[guard][alias(_stricmp, _strcmpi, stricmp, strcmpi)][export_alias(__strcasecmp)]
 [ATTR_WUNUSED][ATTR_PURE][section(.text.crt.unicode.static.memory)][crtbuiltin]
 strcasecmp:([nonnull] char const *s1, [nonnull] char const *s2) -> int {
 	char c1, c2;
@@ -786,7 +786,7 @@ strncasecmp:([nonnull] char const *s1, [nonnull] char const *s2, size_t maxlen) 
 [ATTR_WUNUSED][ATTR_CONST][nothrow]
 [dependency_prefix(
 #include <hybrid/__bit.h>
-)][crtbuiltin]
+)][crtbuiltin][export_alias(__ffs)]
 ffs:(int i) -> __STDC_INT_AS_SIZE_T {
 	return (__STDC_INT_AS_SIZE_T)__hybrid_ffs((unsigned int)i);
 }
@@ -4080,7 +4080,7 @@ strncasecoll_l:([nonnull] char const *s1, [nonnull] char const *s2, size_t maxle
 	return strncasecoll(s1, s2, maxlen);
 }
 
-[alias(_strlwr_l)][ATTR_RETNONNULL]
+[export_alias(_strlwr_l)][ATTR_RETNONNULL]
 [section(.text.crt.unicode.locale.memory)]
 strlwr_l:([nonnull] char *__restrict str, $locale_t locale) -> char * {
 	char *iter, ch;
@@ -4088,7 +4088,7 @@ strlwr_l:([nonnull] char *__restrict str, $locale_t locale) -> char * {
 		*iter = tolower_l(ch, locale);
 	return str;
 }
-[alias(_strupr_l)][ATTR_RETNONNULL]
+[export_alias(_strupr_l)][ATTR_RETNONNULL]
 [section(.text.crt.unicode.locale.memory)]
 strupr_l:([nonnull] char *__restrict str, $locale_t locale) -> char * {
 	char *iter, ch;
@@ -4171,7 +4171,7 @@ memrevq:([nonnull] void *__restrict base, size_t n_qwords) -> $uint64_t * {
 
 #if defined(__USE_KOS) || defined(__USE_DOS)
 }
-[alias(_strlwr)][ATTR_RETNONNULL]
+[export_alias(_strlwr)][ATTR_RETNONNULL]
 [section(.text.crt.unicode.static.memory)]
 strlwr:([nonnull] char *__restrict str) -> char * {
 	char *iter, ch;
@@ -4179,7 +4179,7 @@ strlwr:([nonnull] char *__restrict str) -> char * {
 		*iter = tolower(ch);
 	return str;
 }
-[alias(_strupr)][ATTR_RETNONNULL]
+[export_alias(_strupr)][ATTR_RETNONNULL]
 [section(.text.crt.unicode.static.memory)]
 strupr:([nonnull] char *__restrict str) -> char * {
 	char *iter, ch;
@@ -4187,14 +4187,14 @@ strupr:([nonnull] char *__restrict str) -> char * {
 		*iter = toupper(ch);
 	return str;
 }
-[alias(_strset)][ATTR_RETNONNULL]
+[export_alias(_strset)][ATTR_RETNONNULL]
 strset:([nonnull] char *__restrict str, int ch) -> char * {
 	char *iter;
 	for (iter = str; *iter; ++iter)
 		*iter = (char)ch;
 	return str;
 }
-[alias(_strnset)][ATTR_RETNONNULL]
+[export_alias(_strnset)][ATTR_RETNONNULL]
 strnset:([nonnull] char *__restrict str, int ch, size_t maxlen) -> char * {
 	char *iter;
 	for (iter = str; maxlen-- && *iter; ++iter)

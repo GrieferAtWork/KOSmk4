@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x47796492 */
+/* HASH CRC-32:0xe0202328 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_clock_getres64_defined
-#if defined(__CRT_HAVE_clock_getres)
+#if (defined(__CRT_HAVE_clock_getres) || defined(__CRT_HAVE___clock_getres))
 #define __local_clock_getres64_defined 1
 /* Dependency: "clock_getres32" from "time" */
 #ifndef ____localdep_clock_getres32_defined
@@ -26,6 +26,9 @@
 #if defined(__CRT_HAVE_clock_getres)
 /* Get resolution of clock CLOCK_ID */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_getres32,(__clockid_t __clock_id, struct __timespec32 *__res),clock_getres,(__clock_id,__res))
+#elif defined(__CRT_HAVE___clock_getres)
+/* Get resolution of clock CLOCK_ID */
+__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_getres32,(__clockid_t __clock_id, struct __timespec32 *__res),__clock_getres,(__clock_id,__res))
 #else /* LIBC: clock_getres */
 #undef ____localdep_clock_getres32_defined
 #endif /* clock_getres32... */
@@ -36,7 +39,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(clock_getres64) __ATTR_NONNULL((2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(clock_getres64))(__clockid_t __clock_id,
                                                             struct __timespec64 *__res) {
-#line 1292 "kos/src/libc/magic/time.c"
+#line 1298 "kos/src/libc/magic/time.c"
 	int __result;
 	struct __timespec32 __res32;
 	__result = __localdep_clock_getres32(__clock_id, &__res32);
@@ -47,5 +50,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(clock_getres64))(__clockid_t __clock_
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* defined(__CRT_HAVE_clock_getres) */
+#endif /* (defined(__CRT_HAVE_clock_getres) || defined(__CRT_HAVE___clock_getres)) */
 #endif /* !__local_clock_getres64_defined */

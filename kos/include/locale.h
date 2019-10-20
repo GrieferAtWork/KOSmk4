@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc4833417 */
+/* HASH CRC-32:0x73b32046 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -326,16 +326,30 @@ __NAMESPACE_STD_USING(localeconv)
  * CATEGORY_MASK parameter here uses a single bit for each category,
  * made by OR'ing together LC_*_MASK bits above */
 __CDECLARE(,__locale_t,__NOTHROW_NCX,newlocale,(int __category_mask, char const *__locale, __locale_t __base),(__category_mask,__locale,__base))
+#elif defined(__CRT_HAVE___newlocale)
+/* Return a reference to a data structure representing a set of locale
+ * datasets. Unlike for the CATEGORY parameter for `setlocale' the
+ * CATEGORY_MASK parameter here uses a single bit for each category,
+ * made by OR'ing together LC_*_MASK bits above */
+__CREDIRECT(,__locale_t,__NOTHROW_NCX,newlocale,(int __category_mask, char const *__locale, __locale_t __base),__newlocale,(__category_mask,__locale,__base))
 #endif /* newlocale... */
 #if defined(__CRT_HAVE_duplocale)
 /* Return a duplicate of the set of locale in DATASET.
  * All usage counters are increased if necessary */
 __CDECLARE(,__locale_t,__NOTHROW_NCX,duplocale,(__locale_t __dataset),(__dataset))
+#elif defined(__CRT_HAVE___duplocale)
+/* Return a duplicate of the set of locale in DATASET.
+ * All usage counters are increased if necessary */
+__CREDIRECT(,__locale_t,__NOTHROW_NCX,duplocale,(__locale_t __dataset),__duplocale,(__dataset))
 #endif /* duplocale... */
 #if defined(__CRT_HAVE_freelocale)
 /* Free the data associated with a locale dataset
  * previously returned by a call to `setlocale_r' */
 __CDECLARE_VOID(,__NOTHROW_NCX,freelocale,(__locale_t __dataset),(__dataset))
+#elif defined(__CRT_HAVE___freelocale)
+/* Free the data associated with a locale dataset
+ * previously returned by a call to `setlocale_r' */
+__CREDIRECT_VOID(,__NOTHROW_NCX,freelocale,(__locale_t __dataset),__freelocale,(__dataset))
 #endif /* freelocale... */
 #if defined(__CRT_HAVE_uselocale)
 /* Switch the current thread's locale to DATASET.
@@ -344,6 +358,13 @@ __CDECLARE_VOID(,__NOTHROW_NCX,freelocale,(__locale_t __dataset),(__dataset))
  * for all threads and can also be installed any time, meaning
  * the thread uses the global settings controlled by `setlocale' */
 __CDECLARE(,__locale_t,__NOTHROW_NCX,uselocale,(__locale_t __dataset),(__dataset))
+#elif defined(__CRT_HAVE___uselocale)
+/* Switch the current thread's locale to DATASET.
+ * If DATASET is null, instead just return the current setting.
+ * The special value LC_GLOBAL_LOCALE is the initial setting
+ * for all threads and can also be installed any time, meaning
+ * the thread uses the global settings controlled by `setlocale' */
+__CREDIRECT(,__locale_t,__NOTHROW_NCX,uselocale,(__locale_t __dataset),__uselocale,(__dataset))
 #endif /* uselocale... */
 #endif /* __USE_XOPEN2K8 */
 

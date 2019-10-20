@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd23d0ea */
+/* HASH CRC-32:0xa5cdbeb */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,6 +57,10 @@ __CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_crt
 /* Similar to `strftime' but take the information from
  * the provided locale and not the global locale */
 __CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_crt_strftime_l,(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, struct tm const *__restrict __tp, __locale_t __locale),_strftime_l,(__buf,__bufsize,__format,__tp,__locale))
+#elif defined(__CRT_HAVE___strftime_l)
+/* Similar to `strftime' but take the information from
+ * the provided locale and not the global locale */
+__CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_crt_strftime_l,(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, struct tm const *__restrict __tp, __locale_t __locale),__strftime_l,(__buf,__bufsize,__format,__tp,__locale))
 #else /* LIBC: strftime_l */
 #undef ____localdep_crt_strftime_l_defined
 #endif /* crt_strftime_l... */

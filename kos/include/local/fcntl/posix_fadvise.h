@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x34cc818f */
+/* HASH CRC-32:0xd028d79f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,7 +50,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_fadvise))(__fd_t __fd,
                                                            __FS_TYPE(off) __offset,
                                                            __FS_TYPE(off) __length,
                                                            int __advise) {
-#line 300 "kos/src/libc/magic/fcntl.c"
+#line 301 "kos/src/libc/magic/fcntl.c"
 #ifdef __CRT_HAVE_posix_fadvise64
 	return __localdep_posix_fadvise64(__fd, (__off64_t)__offset, (__off64_t)__length, __advise);
 #elif defined(__CRT_HAVE_posix_fadvise)

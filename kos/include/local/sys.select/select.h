@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe9d1ad17 */
+/* HASH CRC-32:0xa29c535f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_select_defined
-#if (defined(__CRT_HAVE_select) || defined(__CRT_HAVE_select64))
+#if (defined(__CRT_HAVE_select) || defined(__CRT_HAVE___select) || defined(__CRT_HAVE_select64))
 #define __local_select_defined 1
 /* Dependency: "select64" from "sys.select" */
 #ifndef ____localdep_select64_defined
@@ -40,6 +40,8 @@ __CREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_select64,(__STDC_INT
 #define ____localdep_select32_defined 1
 #if defined(__CRT_HAVE_select)
 __CREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_select32,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct __timeval32 *__restrict __timeout),select,(__nfds,__readfds,__writefds,__exceptfds,__timeout))
+#elif defined(__CRT_HAVE___select)
+__CREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_select32,(__STDC_INT_AS_SIZE_T __nfds, fd_set *__restrict __readfds, fd_set *__restrict __writefds, fd_set *__restrict __exceptfds, struct __timeval32 *__restrict __timeout),__select,(__nfds,__readfds,__writefds,__exceptfds,__timeout))
 #else /* LIBC: select */
 #undef ____localdep_select32_defined
 #endif /* select32... */
@@ -52,7 +54,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(select))(__STDC_INT_AS_SIZE_T __nfds,
                                                     fd_set *__restrict __writefds,
                                                     fd_set *__restrict __exceptfds,
                                                     struct __TM_TYPE(timeval) *__restrict __timeout) {
-#line 113 "kos/src/libc/magic/sys.select.c"
+#line 126 "kos/src/libc/magic/sys.select.c"
 #ifdef __CRT_HAVE_select64
 	struct __timeval64 __tmv;
 	if (!__timeout)
@@ -70,5 +72,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(select))(__STDC_INT_AS_SIZE_T __nfds,
 #endif /* !__CRT_HAVE_select64 */
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_select) || defined(__CRT_HAVE_select64)) */
+#endif /* (defined(__CRT_HAVE_select) || defined(__CRT_HAVE___select) || defined(__CRT_HAVE_select64)) */
 #endif /* !__local_select_defined */

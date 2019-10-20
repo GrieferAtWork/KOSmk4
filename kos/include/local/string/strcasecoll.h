@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1d9868a8 */
+/* HASH CRC-32:0x83ab2c34 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,6 +34,8 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,
 __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strcasecmp,(char const *__s1, char const *__s2),stricmp,(__s1,__s2))
 #elif defined(__CRT_HAVE_strcmpi)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strcasecmp,(char const *__s1, char const *__s2),strcmpi,(__s1,__s2))
+#elif defined(__CRT_HAVE___strcasecmp)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strcasecmp,(char const *__s1, char const *__s2),__strcasecmp,(__s1,__s2))
 #else /* LIBC: strcasecmp */
 #include <local/string/strcasecmp.h>
 #define __localdep_strcasecmp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strcasecmp))

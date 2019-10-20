@@ -443,7 +443,7 @@ maybe_split_for_insert:(void **rootp, void **parentp, void **gparentp, int p_r, 
 
 @@Search for an entry matching the given KEY in the tree
 @@pointed to by *ROOTP and insert a new element if not found
-[requires($has_function(malloc))][same_impl]
+[requires($has_function(malloc))][same_impl][export_alias(__tsearch)]
 tsearch:(void const *key, void **vrootp, __compar_fn_t compar) -> void * {
 	typedef struct node_struct {
 		void const         *key;
@@ -495,6 +495,7 @@ tsearch:(void const *key, void **vrootp, __compar_fn_t compar) -> void * {
 
 @@Search for an entry matching the given KEY in the tree pointed
 @@to by *ROOTP. If no matching entry is available return NULL
+[export_alias(__tfind)]
 tfind:(void const *key, void *const *vrootp, __compar_fn_t compar) -> void * {
 	typedef struct node_struct {
 		void const         *key;
@@ -520,7 +521,7 @@ tfind:(void const *key, void *const *vrootp, __compar_fn_t compar) -> void * {
 @@Remove the element matching KEY from the tree pointed to by *ROOTP
 [requires($has_function(free))][same_impl]
 [dependency_include(<hybrid/typecore.h>)]
-[dependency_include(<malloca.h>)]
+[dependency_include(<malloca.h>)][export_alias(__tdelete)]
 tdelete:(void const *__restrict key, void **__restrict vrootp, __compar_fn_t compar) -> void * {
 	typedef struct node_struct {
 		void const         *key;
@@ -727,6 +728,7 @@ trecurse:(void const *root, __action_fn_t action, int level) {
 }
 
 @@Walk through the whole tree and call the ACTION callback for every node or leaf
+[export_alias(__twalk)]
 twalk:(void const *root, __action_fn_t action) {
 	if (root && action)
 		trecurse(root, action, 0);

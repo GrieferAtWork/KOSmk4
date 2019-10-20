@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x791294f1 */
+/* HASH CRC-32:0x18487e7f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -589,6 +589,9 @@ __FORCELOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBC
 #elif defined(__CRT_HAVE_stpcpy)
 /* Same as `mempcpy(DST, SRC, (strlen(SRC) + 1) * sizeof(char)) - 1´ */
 __CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,stpcpy,(char *__restrict __buf, char const *__restrict __src),(__buf,__src))
+#elif defined(__CRT_HAVE___stpcpy)
+/* Same as `mempcpy(DST, SRC, (strlen(SRC) + 1) * sizeof(char)) - 1´ */
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,stpcpy,(char *__restrict __buf, char const *__restrict __src),__stpcpy,(__buf,__src))
 #else /* LIBC: stpcpy */
 #include <local/string/stpcpy.h>
 /* Same as `mempcpy(DST, SRC, (strlen(SRC) + 1) * sizeof(char)) - 1´ */
@@ -598,6 +601,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(stpcpy, __FORCELOCAL __ATTR_RETNONNULL __ATTR_NO
 __FORCELOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL stpncpy)(char *__restrict __buf, char const *__restrict __src, size_t __buflen) { return __builtin_stpncpy(__buf, __src, __buflen); }
 #elif defined(__CRT_HAVE_stpncpy)
 __CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,stpncpy,(char *__restrict __buf, char const *__restrict __src, size_t __buflen),(__buf,__src,__buflen))
+#elif defined(__CRT_HAVE___stpncpy)
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,stpncpy,(char *__restrict __buf, char const *__restrict __src, size_t __buflen),__stpncpy,(__buf,__src,__buflen))
 #else /* LIBC: stpncpy */
 #include <local/string/stpncpy.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(stpncpy, __FORCELOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL stpncpy)(char *__restrict __buf, char const *__restrict __src, size_t __buflen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(stpncpy))(__buf, __src, __buflen); })
@@ -630,6 +635,8 @@ __FORCELOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBC
 __CDECLARE(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,strcoll_l,(char const *__s1, char const *__s2, __locale_t __locale),(__s1,__s2,__locale))
 #elif defined(__CRT_HAVE__strcoll_l)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,strcoll_l,(char const *__s1, char const *__s2, __locale_t __locale),_strcoll_l,(__s1,__s2,__locale))
+#elif defined(__CRT_HAVE___strcoll_l)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,strcoll_l,(char const *__s1, char const *__s2, __locale_t __locale),__strcoll_l,(__s1,__s2,__locale))
 #else /* LIBC: strcoll_l */
 #include <local/string/strcoll_l.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(strcoll_l, __FORCELOCAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL strcoll_l)(char const *__s1, char const *__s2, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strcoll_l))(__s1, __s2, __locale); })
@@ -638,6 +645,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strcoll_l, __FORCELOCAL __ATTR_WUNUSED __ATTR_PU
 __CDECLARE(__ATTR_NONNULL((2)),size_t,__NOTHROW_NCX,strxfrm_l,(char *__dst, char const *__restrict __src, size_t __maxlen, __locale_t __locale),(__dst,__src,__maxlen,__locale))
 #elif defined(__CRT_HAVE__strxfrm_l)
 __CREDIRECT(__ATTR_NONNULL((2)),size_t,__NOTHROW_NCX,strxfrm_l,(char *__dst, char const *__restrict __src, size_t __maxlen, __locale_t __locale),_strxfrm_l,(__dst,__src,__maxlen,__locale))
+#elif defined(__CRT_HAVE___strxfrm_l)
+__CREDIRECT(__ATTR_NONNULL((2)),size_t,__NOTHROW_NCX,strxfrm_l,(char *__dst, char const *__restrict __src, size_t __maxlen, __locale_t __locale),__strxfrm_l,(__dst,__src,__maxlen,__locale))
 #else /* LIBC: strxfrm_l */
 #include <local/string/strxfrm_l.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(strxfrm_l, __FORCELOCAL __ATTR_NONNULL((2)) size_t __NOTHROW_NCX(__LIBCCALL strxfrm_l)(char *__dst, char const *__restrict __src, size_t __maxlen, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strxfrm_l))(__dst, __src, __maxlen, __locale); })
@@ -655,6 +664,8 @@ __CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_NCX,strsignal,(int __signo),(__signo)
 __FORCELOCAL __ATTR_WUNUSED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_MALLOC __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL strndup)(char const *__restrict __string, size_t __max_chars) { return __builtin_strndup(__string, __max_chars); }
 #elif defined(__CRT_HAVE_strndup)
 __CDECLARE(__ATTR_WUNUSED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_MALLOC __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,strndup,(char const *__restrict __string, size_t __max_chars),(__string,__max_chars))
+#elif defined(__CRT_HAVE___strndup)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_MALLOC __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,strndup,(char const *__restrict __string, size_t __max_chars),__strndup,(__string,__max_chars))
 #elif (defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc)) || (__has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)) || defined(__CRT_HAVE_malloc)
 #include <local/string/strndup.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(strndup, __FORCELOCAL __ATTR_WUNUSED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_MALLOC __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL strndup)(char const *__restrict __string, size_t __max_chars) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strndup))(__string, __max_chars); })
@@ -681,6 +692,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strdup, __FORCELOCAL __ATTR_WUNUSED __ATTR_MALL_
 __CDECLARE(__ATTR_NONNULL((2, 3)),char *,__NOTHROW_NCX,strtok_r,(char *__string, char const *__delim, char **__restrict __save_ptr),(__string,__delim,__save_ptr))
 #elif defined(__CRT_HAVE_strtok_s)
 __CREDIRECT(__ATTR_NONNULL((2, 3)),char *,__NOTHROW_NCX,strtok_r,(char *__string, char const *__delim, char **__restrict __save_ptr),strtok_s,(__string,__delim,__save_ptr))
+#elif defined(__CRT_HAVE___strtok_r)
+__CREDIRECT(__ATTR_NONNULL((2, 3)),char *,__NOTHROW_NCX,strtok_r,(char *__string, char const *__delim, char **__restrict __save_ptr),__strtok_r,(__string,__delim,__save_ptr))
 #else /* LIBC: strtok_r */
 #include <local/string/strtok_r.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(strtok_r, __FORCELOCAL __ATTR_NONNULL((2, 3)) char *__NOTHROW_NCX(__LIBCCALL strtok_r)(char *__string, char const *__delim, char **__restrict __save_ptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtok_r))(__string, __delim, __save_ptr); })
@@ -723,6 +736,13 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),voi
 /* Same as `memchr' with a search limit of `(size_t)-1' */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),void const *,__NOTHROW_NCX,rawmemchr,(void const *__restrict __haystack, int __needle),rawmemchr,(__haystack, __needle))
 }
+#elif defined(__CRT_HAVE___rawmemchr)
+extern "C++" {
+/* Same as `memchr' with a search limit of `(size_t)-1' */
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,rawmemchr,(void *__restrict __haystack, int __needle),__rawmemchr,(__haystack, __needle))
+/* Same as `memchr' with a search limit of `(size_t)-1' */
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),void const *,__NOTHROW_NCX,rawmemchr,(void const *__restrict __haystack, int __needle),__rawmemchr,(__haystack, __needle))
+}
 #else /* LIBC: rawmemchr */
 #include <local/string/rawmemchr.h>
 extern "C++" {
@@ -736,6 +756,9 @@ __FORCELOCAL __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) vo
 #if defined(__CRT_HAVE_rawmemchr)
 /* Same as `memchr' with a search limit of `(size_t)-1' */
 __CDECLARE(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,rawmemchr,(void const *__restrict __haystack, int __needle),(__haystack,__needle))
+#elif defined(__CRT_HAVE___rawmemchr)
+/* Same as `memchr' with a search limit of `(size_t)-1' */
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,rawmemchr,(void const *__restrict __haystack, int __needle),__rawmemchr,(__haystack,__needle))
 #else /* LIBC: rawmemchr */
 #include <local/string/rawmemchr.h>
 /* Same as `memchr' with a search limit of `(size_t)-1' */
@@ -801,6 +824,13 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),char *,__NOTHROW_N
 /* Same as `strstr', but ignore casing */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),char const *,__NOTHROW_NCX,strcasestr,(char const *__haystack, char const *__needle),strcasestr,(__haystack, __needle))
 }
+#elif defined(__CRT_HAVE___strcasestr)
+extern "C++" {
+/* Same as `strstr', but ignore casing */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,strcasestr,(char *__haystack, char const *__needle),__strcasestr,(__haystack, __needle))
+/* Same as `strstr', but ignore casing */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),char const *,__NOTHROW_NCX,strcasestr,(char const *__haystack, char const *__needle),__strcasestr,(__haystack, __needle))
+}
 #else /* LIBC: strcasestr */
 #include <local/string/strcasestr.h>
 extern "C++" {
@@ -814,6 +844,9 @@ __FORCELOCAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)) char const *__NOT
 #if defined(__CRT_HAVE_strcasestr)
 /* Same as `strstr', but ignore casing */
 __CDECLARE(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,strcasestr,(char const *__haystack, char const *__needle),(__haystack,__needle))
+#elif defined(__CRT_HAVE___strcasestr)
+/* Same as `strstr', but ignore casing */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,strcasestr,(char const *__haystack, char const *__needle),__strcasestr,(__haystack,__needle))
 #else /* LIBC: strcasestr */
 #include <local/string/strcasestr.h>
 /* Same as `strstr', but ignore casing */
@@ -861,6 +894,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(memmem, __FORCELOCAL __ATTR_WUNUSED __ATTR_PURE 
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRING_H_PROTO */
 #if defined(__CRT_HAVE_strverscmp)
 __CDECLARE(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,strverscmp,(char const *__s1, char const *__s2),(__s1,__s2))
+#elif defined(__CRT_HAVE___strverscmp)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,strverscmp,(char const *__s1, char const *__s2),__strverscmp,(__s1,__s2))
 #else /* LIBC: strverscmp */
 #include <local/string/strverscmp.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(strverscmp, __FORCELOCAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL strverscmp)(char const *__s1, char const *__s2) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strverscmp))(__s1, __s2); })
@@ -885,6 +920,9 @@ __NAMESPACE_FAST_USING_OR_IMPL(mempcpy, __FORCELOCAL __ATTR_RETNONNULL __ATTR_NO
 #elif defined(__CRT_HAVE_mempcpy)
 /* Same as `memcpy', but return `DST+N_BYTES', rather than `DST' */
 __CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,mempcpy,(void *__restrict __dst, void const *__restrict __src, size_t __n_bytes),(__dst,__src,__n_bytes))
+#elif defined(__CRT_HAVE___mempcpy)
+/* Same as `memcpy', but return `DST+N_BYTES', rather than `DST' */
+__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,mempcpy,(void *__restrict __dst, void const *__restrict __src, size_t __n_bytes),__mempcpy,(__dst,__src,__n_bytes))
 #else /* LIBC: mempcpy */
 #include <local/string/mempcpy.h>
 /* Same as `memcpy', but return `DST+N_BYTES', rather than `DST' */
@@ -908,6 +946,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(memfrob, __FORCELOCAL __ATTR_RETNONNULL __ATTR_N
 __CDECLARE(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,strcasecmp_l,(char const *__s1, char const *__s2, __locale_t __locale),(__s1,__s2,__locale))
 #elif defined(__CRT_HAVE__stricmp_l)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,strcasecmp_l,(char const *__s1, char const *__s2, __locale_t __locale),_stricmp_l,(__s1,__s2,__locale))
+#elif defined(__CRT_HAVE___strcasecmp_l)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,strcasecmp_l,(char const *__s1, char const *__s2, __locale_t __locale),__strcasecmp_l,(__s1,__s2,__locale))
 #else /* LIBC: strcasecmp_l */
 #include <local/string/strcasecmp_l.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(strcasecmp_l, __FORCELOCAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL strcasecmp_l)(char const *__s1, char const *__s2, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strcasecmp_l))(__s1, __s2, __locale); })
@@ -921,6 +961,8 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,s
 __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,strncasecmp_l,(char const *__s1, char const *__s2, size_t __maxlen, __locale_t __locale),_strnicmp_l,(__s1,__s2,__maxlen,__locale))
 #elif defined(__CRT_HAVE__strncmpi_l)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,strncasecmp_l,(char const *__s1, char const *__s2, size_t __maxlen, __locale_t __locale),_strncmpi_l,(__s1,__s2,__maxlen,__locale))
+#elif defined(__CRT_HAVE___strncasecmp_l)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,strncasecmp_l,(char const *__s1, char const *__s2, size_t __maxlen, __locale_t __locale),__strncasecmp_l,(__s1,__s2,__maxlen,__locale))
 #else /* LIBC: strncasecmp_l */
 #include <local/string/strncasecmp_l.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(strncasecmp_l, __FORCELOCAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL strncasecmp_l)(char const *__s1, char const *__s2, size_t __maxlen, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strncasecmp_l))(__s1, __s2, __maxlen, __locale); })
@@ -966,6 +1008,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(bcopy, __FORCELOCAL __ATTR_NONNULL((1, 2)) void 
 __FORCELOCAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL bzero)(void *__restrict __dst, size_t __num_bytes) { return __builtin_bzero(__dst, __num_bytes); }
 #elif defined(__CRT_HAVE_bzero)
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,bzero,(void *__restrict __dst, size_t __num_bytes),(__dst,__num_bytes))
+#elif defined(__CRT_HAVE___bzero)
+__CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,bzero,(void *__restrict __dst, size_t __num_bytes),__bzero,(__dst,__num_bytes))
 #else /* LIBC: bzero */
 #include <local/strings/bzero.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(bzero, __FORCELOCAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL bzero)(void *__restrict __dst, size_t __num_bytes) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bzero))(__dst, __num_bytes); })
@@ -1064,6 +1108,8 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,
 __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,strcasecmp,(char const *__s1, char const *__s2),stricmp,(__s1,__s2))
 #elif defined(__CRT_HAVE_strcmpi)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,strcasecmp,(char const *__s1, char const *__s2),strcmpi,(__s1,__s2))
+#elif defined(__CRT_HAVE___strcasecmp)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,strcasecmp,(char const *__s1, char const *__s2),__strcasecmp,(__s1,__s2))
 #else /* LIBC: strcasecmp */
 #include <local/string/strcasecmp.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(strcasecmp, __FORCELOCAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL strcasecmp)(char const *__s1, char const *__s2) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strcasecmp))(__s1, __s2); })
@@ -1092,6 +1138,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strncasecmp, __FORCELOCAL __ATTR_WUNUSED __ATTR_
 __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __STDC_INT_AS_SIZE_T __NOTHROW(__LIBCCALL ffs)(int __i) { return __builtin_ffs(__i); }
 #elif defined(__CRT_HAVE_ffs)
 __CDECLARE(__ATTR_WUNUSED __ATTR_CONST,__STDC_INT_AS_SIZE_T,__NOTHROW,ffs,(int __i),(__i))
+#elif defined(__CRT_HAVE___ffs)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,__STDC_INT_AS_SIZE_T,__NOTHROW,ffs,(int __i),__ffs,(__i))
 #else /* LIBC: ffs */
 #include <local/string/ffs.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(ffs, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __STDC_INT_AS_SIZE_T __NOTHROW(__LIBCCALL ffs)(int __i) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ffs))(__i); })
@@ -1152,20 +1200,20 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(memccpy, __FORCELOCAL __ATTR_NONNULL((1, 2)) voi
 
 #if __has_builtin(__builtin_bzero) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_bzero)
 __FORCELOCAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL __bzero)(void *__restrict __dst, size_t __num_bytes) { return __builtin_bzero(__dst, __num_bytes); }
-#elif defined(__CRT_HAVE___bzero)
-__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__bzero,(void *__restrict __dst, size_t __num_bytes),(__dst,__num_bytes))
 #elif defined(__CRT_HAVE_bzero)
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__bzero,(void *__restrict __dst, size_t __num_bytes),bzero,(__dst,__num_bytes))
+#elif defined(__CRT_HAVE___bzero)
+__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__bzero,(void *__restrict __dst, size_t __num_bytes),(__dst,__num_bytes))
 #else /* LIBC: bzero */
 #include <local/strings/bzero.h>
 __FORCELOCAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL __bzero)(void *__restrict __dst, size_t __num_bytes) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bzero))(__dst, __num_bytes); }
 #endif /* __bzero... */
-#if defined(__CRT_HAVE___strtok_r)
-__CDECLARE(__ATTR_NONNULL((2, 3)),char *,__NOTHROW_NCX,__strtok_r,(char *__string, char const *__delim, char **__restrict __save_ptr),(__string,__delim,__save_ptr))
-#elif defined(__CRT_HAVE_strtok_r)
+#if defined(__CRT_HAVE_strtok_r)
 __CREDIRECT(__ATTR_NONNULL((2, 3)),char *,__NOTHROW_NCX,__strtok_r,(char *__string, char const *__delim, char **__restrict __save_ptr),strtok_r,(__string,__delim,__save_ptr))
 #elif defined(__CRT_HAVE_strtok_s)
 __CREDIRECT(__ATTR_NONNULL((2, 3)),char *,__NOTHROW_NCX,__strtok_r,(char *__string, char const *__delim, char **__restrict __save_ptr),strtok_s,(__string,__delim,__save_ptr))
+#elif defined(__CRT_HAVE___strtok_r)
+__CDECLARE(__ATTR_NONNULL((2, 3)),char *,__NOTHROW_NCX,__strtok_r,(char *__string, char const *__delim, char **__restrict __save_ptr),(__string,__delim,__save_ptr))
 #else /* LIBC: strtok_r */
 #include <local/string/strtok_r.h>
 __FORCELOCAL __ATTR_NONNULL((2, 3)) char *__NOTHROW_NCX(__LIBCCALL __strtok_r)(char *__string, char const *__delim, char **__restrict __save_ptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtok_r))(__string, __delim, __save_ptr); }
@@ -4600,6 +4648,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(strncpy_s, __FORCELOCAL __errno_t __NOTHROW_NCX(
 __CREDIRECT(__ATTR_NONNULL((2, 3)),char *,__NOTHROW_NCX,strtok_s,(char *__string, char const *__delim, char **__restrict __save_ptr),strtok_r,(__string,__delim,__save_ptr))
 #elif defined(__CRT_HAVE_strtok_s)
 __CDECLARE(__ATTR_NONNULL((2, 3)),char *,__NOTHROW_NCX,strtok_s,(char *__string, char const *__delim, char **__restrict __save_ptr),(__string,__delim,__save_ptr))
+#elif defined(__CRT_HAVE___strtok_r)
+__CREDIRECT(__ATTR_NONNULL((2, 3)),char *,__NOTHROW_NCX,strtok_s,(char *__string, char const *__delim, char **__restrict __save_ptr),__strtok_r,(__string,__delim,__save_ptr))
 #else /* LIBC: strtok_r */
 #include <local/string/strtok_r.h>
 __FORCELOCAL __ATTR_NONNULL((2, 3)) char *__NOTHROW_NCX(__LIBCCALL strtok_s)(char *__string, char const *__delim, char **__restrict __save_ptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strtok_r))(__string, __delim, __save_ptr); }
@@ -4629,6 +4679,8 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,
 __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_stricmp,(char const *__s1, char const *__s2),stricmp,(__s1,__s2))
 #elif defined(__CRT_HAVE_strcmpi)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_stricmp,(char const *__s1, char const *__s2),strcmpi,(__s1,__s2))
+#elif defined(__CRT_HAVE___strcasecmp)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_stricmp,(char const *__s1, char const *__s2),__strcasecmp,(__s1,__s2))
 #else /* LIBC: strcasecmp */
 #include <local/string/strcasecmp.h>
 __FORCELOCAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL _stricmp)(char const *__s1, char const *__s2) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strcasecmp))(__s1, __s2); }
@@ -4645,6 +4697,8 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_
 __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_strcmpi,(char const *__s1, char const *__s2),stricmp,(__s1,__s2))
 #elif defined(__CRT_HAVE_strcmpi)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_strcmpi,(char const *__s1, char const *__s2),strcmpi,(__s1,__s2))
+#elif defined(__CRT_HAVE___strcasecmp)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_strcmpi,(char const *__s1, char const *__s2),__strcasecmp,(__s1,__s2))
 #else /* LIBC: strcasecmp */
 #include <local/string/strcasecmp.h>
 __FORCELOCAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL _strcmpi)(char const *__s1, char const *__s2) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strcasecmp))(__s1, __s2); }
@@ -4653,6 +4707,8 @@ __FORCELOCAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX
 __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_stricmp_l,(char const *__s1, char const *__s2, __locale_t __locale),strcasecmp_l,(__s1,__s2,__locale))
 #elif defined(__CRT_HAVE__stricmp_l)
 __CDECLARE(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_stricmp_l,(char const *__s1, char const *__s2, __locale_t __locale),(__s1,__s2,__locale))
+#elif defined(__CRT_HAVE___strcasecmp_l)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_stricmp_l,(char const *__s1, char const *__s2, __locale_t __locale),__strcasecmp_l,(__s1,__s2,__locale))
 #else /* LIBC: strcasecmp_l */
 #include <local/string/strcasecmp_l.h>
 __FORCELOCAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL _stricmp_l)(char const *__s1, char const *__s2, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strcasecmp_l))(__s1, __s2, __locale); }
@@ -4661,6 +4717,8 @@ __FORCELOCAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX
 __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_strcoll_l,(char const *__s1, char const *__s2, __locale_t __locale),strcoll_l,(__s1,__s2,__locale))
 #elif defined(__CRT_HAVE__strcoll_l)
 __CDECLARE(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_strcoll_l,(char const *__s1, char const *__s2, __locale_t __locale),(__s1,__s2,__locale))
+#elif defined(__CRT_HAVE___strcoll_l)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_strcoll_l,(char const *__s1, char const *__s2, __locale_t __locale),__strcoll_l,(__s1,__s2,__locale))
 #else /* LIBC: strcoll_l */
 #include <local/string/strcoll_l.h>
 __FORCELOCAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL _strcoll_l)(char const *__s1, char const *__s2, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strcoll_l))(__s1, __s2, __locale); }
@@ -4783,6 +4841,8 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,
 __CDECLARE(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_strnicmp_l,(char const *__s1, char const *__s2, size_t __maxlen, __locale_t __locale),(__s1,__s2,__maxlen,__locale))
 #elif defined(__CRT_HAVE__strncmpi_l)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_strnicmp_l,(char const *__s1, char const *__s2, size_t __maxlen, __locale_t __locale),_strncmpi_l,(__s1,__s2,__maxlen,__locale))
+#elif defined(__CRT_HAVE___strncasecmp_l)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_strnicmp_l,(char const *__s1, char const *__s2, size_t __maxlen, __locale_t __locale),__strncasecmp_l,(__s1,__s2,__maxlen,__locale))
 #else /* LIBC: strncasecmp_l */
 #include <local/string/strncasecmp_l.h>
 __FORCELOCAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL _strnicmp_l)(char const *__s1, char const *__s2, size_t __maxlen, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strncasecmp_l))(__s1, __s2, __maxlen, __locale); }
@@ -4805,6 +4865,8 @@ __FORCELOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCAL
 __CREDIRECT(__ATTR_NONNULL((2)),size_t,__NOTHROW_NCX,_strxfrm_l,(char *__dst, char const *__restrict __src, size_t __maxlen, __locale_t __locale),strxfrm_l,(__dst,__src,__maxlen,__locale))
 #elif defined(__CRT_HAVE__strxfrm_l)
 __CDECLARE(__ATTR_NONNULL((2)),size_t,__NOTHROW_NCX,_strxfrm_l,(char *__dst, char const *__restrict __src, size_t __maxlen, __locale_t __locale),(__dst,__src,__maxlen,__locale))
+#elif defined(__CRT_HAVE___strxfrm_l)
+__CREDIRECT(__ATTR_NONNULL((2)),size_t,__NOTHROW_NCX,_strxfrm_l,(char *__dst, char const *__restrict __src, size_t __maxlen, __locale_t __locale),__strxfrm_l,(__dst,__src,__maxlen,__locale))
 #else /* LIBC: strxfrm_l */
 #include <local/string/strxfrm_l.h>
 __FORCELOCAL __ATTR_NONNULL((2)) size_t __NOTHROW_NCX(__LIBCCALL _strxfrm_l)(char *__dst, char const *__restrict __src, size_t __maxlen, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strxfrm_l))(__dst, __src, __maxlen, __locale); }
@@ -4821,6 +4883,8 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,
 __CDECLARE(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,stricmp,(char const *__s1, char const *__s2),(__s1,__s2))
 #elif defined(__CRT_HAVE_strcmpi)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,stricmp,(char const *__s1, char const *__s2),strcmpi,(__s1,__s2))
+#elif defined(__CRT_HAVE___strcasecmp)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,stricmp,(char const *__s1, char const *__s2),__strcasecmp,(__s1,__s2))
 #else /* LIBC: strcasecmp */
 #include <local/string/strcasecmp.h>
 __FORCELOCAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL stricmp)(char const *__s1, char const *__s2) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strcasecmp))(__s1, __s2); }
@@ -4837,6 +4901,8 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,
 __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,strcmpi,(char const *__s1, char const *__s2),stricmp,(__s1,__s2))
 #elif defined(__CRT_HAVE_strcmpi)
 __CDECLARE(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,strcmpi,(char const *__s1, char const *__s2),(__s1,__s2))
+#elif defined(__CRT_HAVE___strcasecmp)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,strcmpi,(char const *__s1, char const *__s2),__strcasecmp,(__s1,__s2))
 #else /* LIBC: strcasecmp */
 #include <local/string/strcasecmp.h>
 __FORCELOCAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL strcmpi)(char const *__s1, char const *__s2) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strcasecmp))(__s1, __s2); }
@@ -4879,6 +4945,8 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,
 __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_strncmpi_l,(char const *__s1, char const *__s2, size_t __maxlen, __locale_t __locale),_strnicmp_l,(__s1,__s2,__maxlen,__locale))
 #elif defined(__CRT_HAVE__strncmpi_l)
 __CDECLARE(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_strncmpi_l,(char const *__s1, char const *__s2, size_t __maxlen, __locale_t __locale),(__s1,__s2,__maxlen,__locale))
+#elif defined(__CRT_HAVE___strncasecmp_l)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_strncmpi_l,(char const *__s1, char const *__s2, size_t __maxlen, __locale_t __locale),__strncasecmp_l,(__s1,__s2,__maxlen,__locale))
 #else /* LIBC: strncasecmp_l */
 #include <local/string/strncasecmp_l.h>
 __FORCELOCAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL _strncmpi_l)(char const *__s1, char const *__s2, size_t __maxlen, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strncasecmp_l))(__s1, __s2, __maxlen, __locale); }
@@ -5417,6 +5485,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wcsxfrm, __FORCELOCAL __ATTR_NONNULL((1, 2)) siz
 __CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__NOTHROW_NCX,_wcsxfrm_l,(wchar_t *__dst, wchar_t const *__restrict __src, __SIZE_TYPE__ __maxlen, __locale_t __locale),wcsxfrm_l,(__dst,__src,__maxlen,__locale))
 #elif defined(__CRT_HAVE__wcsxfrm_l)
 __CDECLARE(__ATTR_NONNULL((2)),__SIZE_TYPE__,__NOTHROW_NCX,_wcsxfrm_l,(wchar_t *__dst, wchar_t const *__restrict __src, __SIZE_TYPE__ __maxlen, __locale_t __locale),(__dst,__src,__maxlen,__locale))
+#elif defined(__CRT_HAVE___wcsxfrm_l)
+__CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__NOTHROW_NCX,_wcsxfrm_l,(wchar_t *__dst, wchar_t const *__restrict __src, __SIZE_TYPE__ __maxlen, __locale_t __locale),__wcsxfrm_l,(__dst,__src,__maxlen,__locale))
 #else /* LIBC: wcsxfrm_l */
 #include <local/wchar/wcsxfrm_l.h>
 __FORCELOCAL __ATTR_NONNULL((2)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL _wcsxfrm_l)(wchar_t *__dst, wchar_t const *__restrict __src, __SIZE_TYPE__ __maxlen, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsxfrm_l))(__dst, __src, __maxlen, __locale); }
@@ -5439,6 +5509,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wcscoll, __FORCELOCAL __ATTR_WUNUSED __ATTR_PURE
 __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_wcscoll_l,(wchar_t const *__s1, wchar_t const *__s2, __locale_t __locale),wcscoll_l,(__s1,__s2,__locale))
 #elif defined(__CRT_HAVE__wcscoll_l)
 __CDECLARE(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_wcscoll_l,(wchar_t const *__s1, wchar_t const *__s2, __locale_t __locale),(__s1,__s2,__locale))
+#elif defined(__CRT_HAVE___wcscoll_l)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,_wcscoll_l,(wchar_t const *__s1, wchar_t const *__s2, __locale_t __locale),__wcscoll_l,(__s1,__s2,__locale))
 #else /* LIBC: wcscoll_l */
 #include <local/wchar/wcscoll_l.h>
 __FORCELOCAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL _wcscoll_l)(wchar_t const *__s1, wchar_t const *__s2, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcscoll_l))(__s1, __s2, __locale); }

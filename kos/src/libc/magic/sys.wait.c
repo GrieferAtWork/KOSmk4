@@ -100,7 +100,8 @@ typedef union {
 }
 
 @@Wait for any child process (same as `waitpid(-1, STAT_LOC, 0);')
-[cp] wait:([nullable] __WAIT_STATUS stat_loc) -> $pid_t;
+[cp][export_alias(__wait)]
+wait:([nullable] __WAIT_STATUS stat_loc) -> $pid_t;
 
 @@Wait for a child process:
 @@ - `pid < -1':  Wait for any child process whose process group ID is `-PID'
@@ -108,7 +109,8 @@ typedef union {
 @@ - `pid == 0':  Wait for any child process whose process group ID is that of the caller
 @@ - `pid > 0':   Wait for the child whose process ID is equal to `PID'
 @@@param: options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted)
-[cp] waitpid:($pid_t pid, [nullable] __WAIT_STATUS stat_loc, int options) -> $pid_t;
+[cp][export_alias(__waitpid)]
+waitpid:($pid_t pid, [nullable] __WAIT_STATUS stat_loc, int options) -> $pid_t;
 
 %
 %#if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)

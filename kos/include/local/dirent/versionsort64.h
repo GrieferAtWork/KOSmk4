@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1e044ed */
+/* HASH CRC-32:0x4bc06f4a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,6 +24,8 @@
 #define ____localdep_strverscmp_defined 1
 #if defined(__CRT_HAVE_strverscmp)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strverscmp,(char const *__s1, char const *__s2),strverscmp,(__s1,__s2))
+#elif defined(__CRT_HAVE___strverscmp)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strverscmp,(char const *__s1, char const *__s2),__strverscmp,(__s1,__s2))
 #else /* LIBC: strverscmp */
 #include <local/string/strverscmp.h>
 #define __localdep_strverscmp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strverscmp))

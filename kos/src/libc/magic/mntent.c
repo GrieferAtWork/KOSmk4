@@ -88,7 +88,8 @@ struct mntent {
 
 @@Prepare to begin reading and/or writing mount table
 @@entries from the beginning of FILE.  MODE is as for `fopen'
-[cp] setmntent:([nonnull] char const *file, [nonnull] char const *mode) -> $FILE *;
+[cp][export_alias(__setmntent)]
+setmntent:([nonnull] char const *file, [nonnull] char const *mode) -> $FILE *;
 
 @@Read one mount table entry from STREAM.  Returns a pointer to storage
 @@reused on the next call, or null for EOF or error (use feof/ferror to check)
@@ -97,9 +98,10 @@ struct mntent {
 %
 %#ifdef __USE_MISC
 @@Reentrant version of the above function
-[cp] getmntent_r:([nonnull] $FILE *__restrict stream,
-                  [nonnull] struct mntent *__restrict result,
-                  [inp(bufsize)] char *__restrict buffer, __STDC_INT_AS_SIZE_T bufsize) -> struct mntent *;
+[cp][export_alias(__getmntent_r)]
+getmntent_r:([nonnull] $FILE *__restrict stream,
+             [nonnull] struct mntent *__restrict result,
+             [inp(bufsize)] char *__restrict buffer, __STDC_INT_AS_SIZE_T bufsize) -> struct mntent *;
 %#endif /* __USE_MISC */
 
 %
@@ -108,7 +110,8 @@ struct mntent {
 [cp] addmntent:([nonnull] $FILE *__restrict stream, [nonnull] struct mntent const *__restrict mnt) -> int;
 
 @@Close a stream opened with `setmntent'
-[cp_nokos][alias(fclose)] endmntent:([nonnull] $FILE *stream) -> int;
+[cp_nokos][alias(fclose)][export_alias(__endmntent)]
+endmntent:([nonnull] $FILE *stream) -> int;
 
 @@Search MNT->mnt_opts for an option matching OPT.
 @@Returns the address of the substring, or null if none found

@@ -320,12 +320,13 @@ NOTHROW_NCX(LIBCCALL libc_strerror_l)(int errnum,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x6095d3d]]]*/
+/*[[[start:exports,hash:CRC-32=0x21cfbba1]]]*/
 #undef strdupf
 DEFINE_PUBLIC_WEAK_ALIAS(strerror, libc_strerror);
 DEFINE_PUBLIC_WEAK_ALIAS(strerror_l, libc_strerror_l);
 DEFINE_PUBLIC_WEAK_ALIAS(strsignal, libc_strsignal);
 DEFINE_PUBLIC_WEAK_ALIAS(strndup, libc_strndup);
+DEFINE_PUBLIC_WEAK_ALIAS(__strndup, libc_strndup);
 DEFINE_PUBLIC_WEAK_ALIAS(strdup, libc_strdup);
 DEFINE_PUBLIC_WEAK_ALIAS(__strdup, libc_strdup);
 DEFINE_PUBLIC_WEAK_ALIAS(_strdup, libc_strdup);

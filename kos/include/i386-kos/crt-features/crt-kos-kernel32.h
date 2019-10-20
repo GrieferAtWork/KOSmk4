@@ -34,14 +34,17 @@
 #define __CRT_HAVE___cxa_end_catch 1
 #define __CRT_HAVE___cxa_rethrow 1
 #define __CRT_HAVE___gxx_personality_v0 1
+#define __CRT_HAVE___mempcpy 1
 #define __CRT_HAVE___predict_update_al 1
 #define __CRT_HAVE___predict_update_ax 1
 #define __CRT_HAVE___predict_update_dl 1
 #define __CRT_HAVE___predict_update_dx 1
 #define __CRT_HAVE___predict_update_eax 1
 #define __CRT_HAVE___predict_update_edx 1
+#define __CRT_HAVE___rawmemchr 1
 #define __CRT_HAVE___stack_chk_fail 1
 #define __CRT_HAVE___stack_chk_guard 1
+#define __CRT_HAVE___vsnprintf 1
 #define __CRT_HAVE___x86_bootcpu_features 1
 #define __CRT_HAVE___x86_bootcpu_idfeatures 1
 #define __CRT_HAVE__bootcpu 1

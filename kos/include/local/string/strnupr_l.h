@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x77f35f44 */
+/* HASH CRC-32:0xbe39e63f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,6 +24,10 @@
 #define ____localdep_toupper_l_defined 1
 #if defined(__CRT_HAVE_toupper_l)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_toupper_l,(int __ch, __locale_t __locale),toupper_l,(__ch,__locale))
+#elif defined(__CRT_HAVE__toupper_l)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_toupper_l,(int __ch, __locale_t __locale),_toupper_l,(__ch,__locale))
+#elif defined(__CRT_HAVE___toupper_l)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_toupper_l,(int __ch, __locale_t __locale),__toupper_l,(__ch,__locale))
 #else /* LIBC: toupper_l */
 #include <local/ctype/toupper_l.h>
 #define __localdep_toupper_l (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(toupper_l))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9055a109 */
+/* HASH CRC-32:0x4ee1a6ff */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,8 @@
 __CREDIRECT(__ATTR_NONNULL((1)),long double,__NOTHROW_NCX,__localdep_strtold_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),strtold_l,(__nptr,__endptr,__locale))
 #elif defined(__CRT_HAVE__strtold_l)
 __CREDIRECT(__ATTR_NONNULL((1)),long double,__NOTHROW_NCX,__localdep_strtold_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),_strtold_l,(__nptr,__endptr,__locale))
+#elif defined(__CRT_HAVE___strtold_l)
+__CREDIRECT(__ATTR_NONNULL((1)),long double,__NOTHROW_NCX,__localdep_strtold_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),__strtold_l,(__nptr,__endptr,__locale))
 #elif defined(__CRT_HAVE_strtod_l) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 __CREDIRECT(__ATTR_NONNULL((1)),long double,__NOTHROW_NCX,__localdep_strtold_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),strtod_l,(__nptr,__endptr,__locale))
 #elif defined(__CRT_HAVE__strtod_l) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)

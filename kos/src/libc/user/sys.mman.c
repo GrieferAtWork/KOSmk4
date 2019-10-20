@@ -326,7 +326,7 @@ NOTHROW_NCX(LIBCCALL libc_remap_file_pages)(void *start,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x76738747]]]*/
+/*[[[start:exports,hash:CRC-32=0xf9f23ecd]]]*/
 #undef mremap
 DEFINE_PUBLIC_WEAK_ALIAS(mmap, libc_mmap);
 DEFINE_PUBLIC_WEAK_ALIAS(munmap, libc_munmap);
@@ -339,6 +339,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(munlockall, libc_munlockall);
 DEFINE_PUBLIC_WEAK_ALIAS(shm_open, libc_shm_open);
 DEFINE_PUBLIC_WEAK_ALIAS(shm_unlink, libc_shm_unlink);
 DEFINE_PUBLIC_WEAK_ALIAS(madvise, libc_madvise);
+DEFINE_PUBLIC_WEAK_ALIAS(__madvise, libc_madvise);
 DEFINE_PUBLIC_WEAK_ALIAS(mincore, libc_mincore);
 DEFINE_PUBLIC_WEAK_ALIAS(mmap64, libc_mmap64);
 DEFINE_PUBLIC_WEAK_ALIAS(posix_madvise, libc_posix_madvise);

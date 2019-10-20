@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaafcc349 */
+/* HASH CRC-32:0x8e1f201b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -93,6 +93,10 @@ struct mntent {
 /* Prepare to begin reading and/or writing mount table
  * entries from the beginning of FILE.  MODE is as for `fopen' */
 __CDECLARE(__ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,setmntent,(char const *__file, char const *__mode),(__file,__mode))
+#elif defined(__CRT_HAVE___setmntent)
+/* Prepare to begin reading and/or writing mount table
+ * entries from the beginning of FILE.  MODE is as for `fopen' */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,setmntent,(char const *__file, char const *__mode),__setmntent,(__file,__mode))
 #endif /* setmntent... */
 #if defined(__CRT_HAVE_getmntent)
 /* Read one mount table entry from STREAM.  Returns a pointer to storage
@@ -104,6 +108,9 @@ __CDECLARE(__ATTR_NONNULL((1)),struct mntent *,__NOTHROW_RPC,getmntent,(__FILE *
 #if defined(__CRT_HAVE_getmntent_r)
 /* Reentrant version of the above function */
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),struct mntent *,__NOTHROW_RPC,getmntent_r,(__FILE *__restrict __stream, struct mntent *__restrict __result, char *__restrict __buffer, __STDC_INT_AS_SIZE_T __bufsize),(__stream,__result,__buffer,__bufsize))
+#elif defined(__CRT_HAVE___getmntent_r)
+/* Reentrant version of the above function */
+__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),struct mntent *,__NOTHROW_RPC,getmntent_r,(__FILE *__restrict __stream, struct mntent *__restrict __result, char *__restrict __buffer, __STDC_INT_AS_SIZE_T __bufsize),__getmntent_r,(__stream,__result,__buffer,__bufsize))
 #endif /* getmntent_r... */
 #endif /* __USE_MISC */
 
@@ -118,6 +125,9 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_NOKOS,endmntent,(__FILE *__stre
 #elif defined(__CRT_HAVE_fclose)
 /* Close a stream opened with `setmntent' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_NOKOS,endmntent,(__FILE *__stream),fclose,(__stream))
+#elif defined(__CRT_HAVE___endmntent)
+/* Close a stream opened with `setmntent' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_NOKOS,endmntent,(__FILE *__stream),__endmntent,(__stream))
 #endif /* endmntent... */
 #if defined(__CRT_HAVE_hasmntopt)
 /* Search MNT->mnt_opts for an option matching OPT.

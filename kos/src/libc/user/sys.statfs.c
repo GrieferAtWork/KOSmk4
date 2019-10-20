@@ -106,8 +106,9 @@ NOTHROW_NCX(LIBCCALL libc_fstatfs64)(fd_t filedes,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x2bbff04f]]]*/
+/*[[[start:exports,hash:CRC-32=0xa2b30c54]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(statfs, libc_statfs);
+DEFINE_PUBLIC_WEAK_ALIAS(__statfs, libc_statfs);
 DEFINE_PUBLIC_WEAK_ALIAS(fstatfs, libc_fstatfs);
 DEFINE_PUBLIC_WEAK_ALIAS(statfs64, libc_statfs64);
 DEFINE_PUBLIC_WEAK_ALIAS(fstatfs64, libc_fstatfs64);

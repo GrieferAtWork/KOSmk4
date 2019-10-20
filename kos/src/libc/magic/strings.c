@@ -38,7 +38,8 @@ typedef __SIZE_TYPE__ size_t;
 bcopy:(void const *src, void *dst, size_t num_bytes) {
 	memmove(dst, src, num_bytes);
 }
-[guard][ATTR_NONNULL((1))][crtbuiltin]
+
+[guard][ATTR_NONNULL((1))][crtbuiltin][export_alias(__bzero)]
 bzero:(void *__restrict dst, size_t num_bytes) {
 	memset(dst, 0, num_bytes);
 }

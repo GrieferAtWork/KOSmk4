@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdf516db8 */
+/* HASH CRC-32:0xae47b453 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,6 +26,8 @@
 __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towlower_l,(__WINT_TYPE__ __wc, __locale_t __locale),towlower_l,(__wc,__locale))
 #elif defined(__CRT_HAVE__towlower_l)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towlower_l,(__WINT_TYPE__ __wc, __locale_t __locale),_towlower_l,(__wc,__locale))
+#elif defined(__CRT_HAVE___towlower_l)
+__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towlower_l,(__WINT_TYPE__ __wc, __locale_t __locale),__towlower_l,(__wc,__locale))
 #else /* LIBC: towlower_l */
 #include <local/wctype/towlower_l.h>
 #define __localdep_towlower_l (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(towlower_l))

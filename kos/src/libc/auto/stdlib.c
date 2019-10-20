@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x52a973b */
+/* HASH CRC-32:0x3cead264 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1829,18 +1829,25 @@ DEFINE_PUBLIC_WEAK_ALIAS(fcvt, libc_fcvt);
 DEFINE_PUBLIC_WEAK_ALIAS(_fcvt, libc_fcvt);
 DEFINE_PUBLIC_WEAK_ALIAS(getsubopt, libc_getsubopt);
 DEFINE_PUBLIC_WEAK_ALIAS(strtol_l, libc_strtol_l);
+DEFINE_PUBLIC_WEAK_ALIAS(__strtol_l, libc_strtol_l);
 DEFINE_PUBLIC_WEAK_ALIAS(_strtol_l, libc_strtol_l);
 DEFINE_PUBLIC_WEAK_ALIAS(strtoul_l, libc_strtoul_l);
+DEFINE_PUBLIC_WEAK_ALIAS(__strtoul_l, libc_strtoul_l);
 DEFINE_PUBLIC_WEAK_ALIAS(_strtoul_l, libc_strtoul_l);
 DEFINE_PUBLIC_WEAK_ALIAS(strtoll_l, libc_strtoll_l);
+DEFINE_PUBLIC_WEAK_ALIAS(__strtoll_l, libc_strtoll_l);
 DEFINE_PUBLIC_WEAK_ALIAS(_strtoll_l, libc_strtoll_l);
 DEFINE_PUBLIC_WEAK_ALIAS(strtoull_l, libc_strtoull_l);
+DEFINE_PUBLIC_WEAK_ALIAS(__strtoull_l, libc_strtoull_l);
 DEFINE_PUBLIC_WEAK_ALIAS(_strtoull_l, libc_strtoull_l);
 DEFINE_PUBLIC_WEAK_ALIAS(strtod_l, libc_strtod_l);
+DEFINE_PUBLIC_WEAK_ALIAS(__strtod_l, libc_strtod_l);
 DEFINE_PUBLIC_WEAK_ALIAS(_strtod_l, libc_strtod_l);
 DEFINE_PUBLIC_WEAK_ALIAS(strtof_l, libc_strtof_l);
+DEFINE_PUBLIC_WEAK_ALIAS(__strtof_l, libc_strtof_l);
 DEFINE_PUBLIC_WEAK_ALIAS(_strtof_l, libc_strtof_l);
 DEFINE_PUBLIC_WEAK_ALIAS(strtold_l, libc_strtold_l);
+DEFINE_PUBLIC_WEAK_ALIAS(__strtold_l, libc_strtold_l);
 DEFINE_PUBLIC_WEAK_ALIAS(_strtold_l, libc_strtold_l);
 DEFINE_PUBLIC_WEAK_ALIAS(_abs64, libc__abs64);
 DEFINE_PUBLIC_WEAK_ALIAS(_atof_l, libc__atof_l);

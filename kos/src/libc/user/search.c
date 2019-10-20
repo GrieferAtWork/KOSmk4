@@ -408,14 +408,16 @@ again:
 
 
 
-/*[[[start:exports,hash:CRC-32=0x14cacea]]]*/
+/*[[[start:exports,hash:CRC-32=0x56b1d76d]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(hsearch, libc_hsearch);
 DEFINE_PUBLIC_WEAK_ALIAS(hcreate, libc_hcreate);
 DEFINE_PUBLIC_WEAK_ALIAS(hdestroy, libc_hdestroy);
 DEFINE_PUBLIC_WEAK_ALIAS(hcreate_r, libc_hcreate_r);
 DEFINE_PUBLIC_WEAK_ALIAS(hdestroy_r, libc_hdestroy_r);
 DEFINE_PUBLIC_WEAK_ALIAS(tsearch, libc_tsearch);
+DEFINE_PUBLIC_WEAK_ALIAS(__tsearch, libc_tsearch);
 DEFINE_PUBLIC_WEAK_ALIAS(tdelete, libc_tdelete);
+DEFINE_PUBLIC_WEAK_ALIAS(__tdelete, libc_tdelete);
 DEFINE_PUBLIC_WEAK_ALIAS(tdestroy, libc_tdestroy);
 /*[[[end:exports]]]*/
 

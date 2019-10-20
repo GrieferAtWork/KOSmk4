@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x84e0ec2e */
+/* HASH CRC-32:0xe684f5cd */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __LOCAL_LIBC(tfind) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tfind))(void const *__key,
                                                    void *const *__vrootp,
                                                    __compar_fn_t __compar) {
-#line 499 "kos/src/libc/magic/search.c"
+#line 500 "kos/src/libc/magic/search.c"
 	typedef struct __node_struct {
 		void const         *__key;
 		struct __node_struct *__left_node;
