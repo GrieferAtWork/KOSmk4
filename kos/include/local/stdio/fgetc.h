@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2e5a5ce2 */
+/* HASH CRC-32:0x4afe3e62 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,7 +51,7 @@ __NAMESPACE_LOCAL_BEGIN
  * returned and the exact cause can be determined by using `ferror' and `feof' */
 __LOCAL_LIBC(fgetc) __ATTR_NONNULL((1)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fgetc))(__FILE *__restrict __stream) __THROWS(...) {
-#line 406 "kos/src/libc/magic/stdio.c"
+#line 410 "kos/src/libc/magic/stdio.c"
 #if defined(__CRT_DOS) && defined(__CRT_HAVE__filbuf) && (!defined(__USE_STDIO_UNLOCKED) || !(defined(__CRT_HAVE_fread) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)))))
 	return --__stream->__f_cnt >= 0 ? (int)((__UINT8_TYPE__)*__stream->__f_ptr++) : __localdep__filbuf(__stream);
 #else

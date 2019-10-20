@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1b30b045 */
+/* HASH CRC-32:0xf0cdaa85 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -79,7 +79,7 @@ __LOCAL_LIBC(getdelim_unlocked) __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 4)) __SSIZE
                                                   __SIZE_TYPE__ *__restrict __pcount,
                                                   int __delimiter,
                                                   __FILE *__restrict __stream) __THROWS(...) {
-#line 1774 "kos/src/libc/magic/stdio.c"
+#line 1779 "kos/src/libc/magic/stdio.c"
 	int __ch;
 	char *__buffer;
 	__SIZE_TYPE__ __bufsize, __result = 0;

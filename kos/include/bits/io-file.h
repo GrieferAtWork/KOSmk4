@@ -39,9 +39,12 @@
 #define __IO_FILE_IOFEOF    0x0800 /* Never used */
 #define __IO_FILE_IOFLRTN   0x1000 /* ??? */
 #define __IO_FILE_IOCTRLZ   0x2000 /* ??? */
-#define __IO_FILE_IOCOMMIT  0x4000 /* ??? */
+#define __IO_FILE_IOCOMMIT  0x4000 /* Invoke fsync() during fflush() */
 #define __IO_FILE_IOLOCKED  0x8000 /* ??? */
 #define __IO_FILE_IOLNIFTYY 0x80000000 /* NOT ORIGINALLY DEFINED IN DOS: Determine 'isatty()' on first access and set `__IO_FILE_IOLNBUF' accordingly. */
+#define __IO_FILE_IOREADING 0x40000000 /* NOT ORIGINALLY DEFINED IN DOS: The buffer is currently being read into and must not be changed or resized. */
+#define __IO_FILE_IOISATTY  0x20000000 /* NOT ORIGINALLY DEFINED IN DOS: The buffer refers to a TTY */
+#define __IO_FILE_IONOTATTY 0x10000000 /* NOT ORIGINALLY DEFINED IN DOS: The buffer doesn't refer to a TTY */
 
 
 #ifdef __CC__
@@ -74,7 +77,7 @@ struct __IO_FILE {
 		/* .if_bufsiz  = */ if_bufsize_,                                                                   \
 		/* .if_exdata  = */ if_exdata_                                                                     \
 	}
-#else
+#else /* __SIZEOF_POINTER__ >= 8 */
 #define __IO_FILE_INIT(if_ptr_, if_cnt_, if_base_, if_flag_, if_fd_, if_charbuf_, if_bufsize_, if_exdata_) \
 	{                                                                                                      \
 		/* .if_ptr     = */ if_ptr_,                                                                       \
@@ -86,22 +89,24 @@ struct __IO_FILE {
 		/* .if_bufsiz  = */ if_bufsize_,                                                                   \
 		/* .if_exdata  = */ if_exdata_                                                                     \
 	}
-#endif
-	__BYTE_TYPE__      *if_ptr;        /* [0..1] Pointer to the next character to-be read. */
-	__UINT32_TYPE__     if_cnt;        /* Amount of characters available in 'if_ptr'.
-	                                    * NOTE: When this value underflows, then the caller
-	                                    *       is responsible for loading more data into 'if_ptr' */
+#endif /* __SIZEOF_POINTER__ < 8 */
+	__BYTE_TYPE__      *if_ptr;        /* [>= if_base][+if_cnt <= if_base + if_bufsiz][lock(if_exdata->io_lock)]
+	                                    * Pointer to the next character to-be read/written.
+	                                    * The absolute in-file position is then `if_exdata->io_fblk + (if_ptr - if_base)' */
+	__UINT32_TYPE__     if_cnt;        /* [lock(if_exdata->io_lock)] The amount of unread, buffered bytes located at `if_ptr'. */
 #if __SIZEOF_POINTER__ >= 8
 	__INT32_TYPE__    __if_pad0;
-#endif
-	__BYTE_TYPE__      *if_base;       /* [0..if_bufsiz][owned_if(__IO_FILE_IOMALLBUF)] Base pointer to the used buffer. */
-	__UINT32_TYPE__     if_flag;       /* Set of `__IO_FILE_IO*' */
-	__INT32_TYPE__      if_fd;         /* [valid_if(!__IO_FILE_IONOFD)] Underlying file descriptor.
+#endif /* __SIZEOF_POINTER__ >= 8 */
+	__BYTE_TYPE__      *if_base;       /* [0..if_bufsiz][owned_if(IO_MALLBUF)][lock(if_exdata->io_lock)]
+	                                    * Allocated buffer. NOTE: This pointer must not be modified when `IO_READING' is set. */
+	__UINT32_TYPE__     if_flag;       /* Set of `IO_*' (aka. `__IO_FILE_IO*') */
+	__INT32_TYPE__      if_fd;         /* [valid_if(!IO_HASVTAB)] Underlying file descriptor.
 	                                    * NOTE: When available, this stream's file pointer is assumed
 	                                    *       to be located at the end of the loaded buffer. */
 	__BYTE_TYPE__       if_charbuf[4]; /* A very small inline-allocated buffer used as fallback for 'if_base' */
-	__UINT32_TYPE__     if_bufsiz;     /* Allocated/available size of the buffer  */
-	struct iofile_data *if_exdata;     /* [1..1][owned] Pointer to some internal data.
+	__UINT32_TYPE__     if_bufsiz;     /* [lock(if_exdata->io_lock)] Total allocated / available buffer size.
+	                                    * NOTE: This pointer must not be modified when `IO_READING' is set. */
+	struct iofile_data *if_exdata;     /* [1..1][owned][const] Pointer to some internal data.
 	                                    * HINT: To fix binary compatibility with DOS, the first byte of
 	                                    *       this structure is a NUL-character, allowing library users
 	                                    *       to interpret this member as a C-string of 0 length. */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x673ee126 */
+/* HASH CRC-32:0xd5976f3d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -82,7 +82,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fsetpos64) __ATTR_NONNULL((1, 2)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fsetpos64))(__FILE *__restrict __stream,
                                           __pos64_t const *__restrict __pos) __THROWS(...) {
-#line 1618 "kos/src/libc/magic/stdio.c"
+#line 1622 "kos/src/libc/magic/stdio.c"
 #if defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE__fseeki64)
 	return __localdep_crt_fseeko64(__stream, (__off64_t)*__pos, SEEK_SET);
 #elif defined(__CRT_HAVE_fsetpos) || defined(__CRT_HAVE_fsetpos_unlocked)

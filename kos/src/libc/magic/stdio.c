@@ -35,6 +35,10 @@
 %[define_ccompat_header(cstdio)]
 
 /* Declare stdio data sections as known, so they are guarantied to get linked properly */
+%[declare_known_section(.data.crt.FILE.core.read)]
+%[declare_known_section(.data.crt.FILE.core.write)]
+%[declare_known_section(.data.crt.FILE.core.seek)]
+%[declare_known_section(.data.crt.FILE.core.utility)]
 %[declare_known_section(.data.crt.FILE.locked.utility)]
 %[declare_known_section(.data.crt.FILE.locked.read.read)]
 %[declare_known_section(.data.crt.FILE.locked.write.write)]
@@ -1741,6 +1745,7 @@ freopen64_unlocked:([nonnull] char const *__restrict filename,
 [stdio_throws][user] ftell_unlocked:([nonnull] $FILE *__restrict stream) -> long int = ftell;
 [stdio_throws][user] ftello_unlocked:([nonnull] $FILE *__restrict stream) -> $off_t = ftello;
 
+%[default_impl_section(.text.crt.FILE.unlocked.write.utility)]
 [stdio_throws][user] flushall_unlocked:() -> int {
 #if defined(__CRT_HAVE_fflush_unlocked) || defined(__CRT_HAVE__fflush_nolock)
 	return fflush_unlocked(NULL);

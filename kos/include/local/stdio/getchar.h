@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b6c2299 */
+/* HASH CRC-32:0x82cb8692 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,7 +66,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Alias for `fgetc(stdin)' */
 __LOCAL_LIBC(getchar) int
 (__LIBCCALL __LIBC_LOCAL_NAME(getchar))(void) __THROWS(...) {
-#line 430 "kos/src/libc/magic/stdio.c"
+#line 434 "kos/src/libc/magic/stdio.c"
 	return __localdep_fgetc(__LOCAL_stdin);
 }
 __NAMESPACE_LOCAL_END

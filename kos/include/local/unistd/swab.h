@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x97a6b850 */
+/* HASH CRC-32:0x53e3ef35 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ __LOCAL_LIBC(swab) __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(swab))(void const *__restrict __from,
                                                   void *__restrict __to,
                                                   int __n_bytes) {
-#line 1630 "kos/src/libc/magic/unistd.c"
+#line 1694 "kos/src/libc/magic/unistd.c"
 	__n_bytes &= ~1;
 	while (__n_bytes >= 2) {
 		__BYTE_TYPE__ __a, __b;

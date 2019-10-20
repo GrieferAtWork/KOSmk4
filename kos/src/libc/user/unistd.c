@@ -3238,6 +3238,39 @@ NOTHROW_RPC(LIBCCALL libc_readall)(fd_t fd,
 }
 /*[[[end:readall]]]*/
 
+/*[[[head:writeall,hash:CRC-32=0xe900bb7e]]]*/
+/* >> writeall(3)
+ * Same as `write(2)', however keep on writing until `write()' indicates EOF (causing
+ * `writeall()' to immediately return `0') or the entirety of the given buffer has been
+ * written (in which case `bufsize' is returned). */
+INTERN NONNULL((2))
+ATTR_WEAK ATTR_SECTION(".text.crt.io.write.writeall") ssize_t
+NOTHROW_RPC(LIBCCALL libc_writeall)(fd_t fd,
+                                    void const *buf,
+                                    size_t bufsize)
+/*[[[body:writeall]]]*/
+{
+	ssize_t result, temp;
+	result = write(fd, buf, bufsize);
+	if (result > 0 && (size_t)result < bufsize) {
+		/* Keep on writing */
+		for (;;) {
+			temp = write(fd,
+			            (byte_t *)buf + (size_t)result,
+			            bufsize - (size_t)result);
+			if (temp <= 0) {
+				result = temp;
+				break;
+			}
+			result += temp;
+			if ((size_t)result >= bufsize)
+				break;
+		}
+	}
+	return result;
+}
+/*[[[end:writeall]]]*/
+
 /*[[[head:preadall,hash:CRC-32=0xf7b0976c]]]*/
 /* >> preadall(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
@@ -3249,7 +3282,25 @@ NOTHROW_RPC(LIBCCALL libc_preadall)(fd_t fd,
                                     __PIO_OFFSET offset)
 /*[[[body:preadall]]]*/
 {
-	return preadall64(fd, buf, bufsize, (pos64_t)offset);
+	ssize_t result, temp;
+	result = pread(fd, buf, bufsize, offset);
+	if (result > 0 && (size_t)result < bufsize) {
+		/* Keep on reading */
+		for (;;) {
+			temp = pread(fd,
+			             (byte_t *)buf + (size_t)result,
+			             bufsize - (size_t)result,
+			             offset + (size_t)result);
+			if (temp <= 0) {
+				result = temp;
+				break;
+			}
+			result += temp;
+			if ((size_t)result >= bufsize)
+				break;
+		}
+	}
+	return result;
 }
 /*[[[end:preadall]]]*/
 
@@ -3289,6 +3340,76 @@ NOTHROW_RPC(LIBCCALL libc_preadall64)(fd_t fd,
 }
 #endif /* MAGIC:alias */
 /*[[[end:preadall64]]]*/
+
+/*[[[head:pwriteall,hash:CRC-32=0x479d8caf]]]*/
+/* >> pwriteall(3)
+ * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
+INTERN NONNULL((2))
+ATTR_WEAK ATTR_SECTION(".text.crt.io.write.pwriteall") ssize_t
+NOTHROW_RPC(LIBCCALL libc_pwriteall)(fd_t fd,
+                                     void const *buf,
+                                     size_t bufsize,
+                                     __PIO_OFFSET offset)
+/*[[[body:pwriteall]]]*/
+{
+	ssize_t result, temp;
+	result = pwrite(fd, buf, bufsize, offset);
+	if (result > 0 && (size_t)result < bufsize) {
+		/* Keep on writing */
+		for (;;) {
+			temp = pwrite(fd,
+			              (byte_t *)buf + (size_t)result,
+			              bufsize - (size_t)result,
+			              offset + (size_t)result);
+			if (temp <= 0) {
+				result = temp;
+				break;
+			}
+			result += temp;
+			if ((size_t)result >= bufsize)
+				break;
+		}
+	}
+	return result;
+}
+/*[[[end:pwriteall]]]*/
+
+/*[[[head:pwriteall64,hash:CRC-32=0xb0fad903]]]*/
+/* >> pwriteall64(3)
+ * Same as `writeall(3)', but using `pwrite64(2)' instead of `write()' */
+#if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+DEFINE_INTERN_ALIAS(libc_pwriteall64, libc_pwriteall);
+#else
+INTERN NONNULL((2))
+ATTR_WEAK ATTR_SECTION(".text.crt.io.large.write.pwriteall64") ssize_t
+NOTHROW_RPC(LIBCCALL libc_pwriteall64)(fd_t fd,
+                                       void *buf,
+                                       size_t bufsize,
+                                       __PIO_OFFSET64 offset)
+/*[[[body:pwriteall64]]]*/
+{
+	ssize_t result, temp;
+	result = pwrite64(fd, buf, bufsize, offset);
+	if (result > 0 && (size_t)result < bufsize) {
+		/* Keep on writing */
+		for (;;) {
+			temp = pwrite64(fd,
+			                (byte_t *)buf + (size_t)result,
+			                bufsize - (size_t)result,
+			                offset + (size_t)result);
+			if (temp <= 0) {
+				result = temp;
+				break;
+			}
+			result += temp;
+			if ((size_t)result >= bufsize)
+				break;
+		}
+	}
+	return result;
+}
+#endif /* MAGIC:alias */
+/*[[[end:pwriteall64]]]*/
 
 #if !defined(__OPTIMIZE_SIZE__) && \
     !defined(__NO_ATTR_THREAD)
@@ -3404,7 +3525,7 @@ NOTHROW_NCX(LIBCCALL libc_ctermid_r)(char *s)
 
 
 
-/*[[[start:exports,hash:CRC-32=0xc035ab60]]]*/
+/*[[[start:exports,hash:CRC-32=0x7bb17b6f]]]*/
 #undef execl
 #undef _execl
 #undef execle
@@ -3468,6 +3589,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(write, libc_write);
 DEFINE_PUBLIC_WEAK_ALIAS(__write, libc_write);
 DEFINE_PUBLIC_WEAK_ALIAS(_write, libc_write);
 DEFINE_PUBLIC_WEAK_ALIAS(readall, libc_readall);
+DEFINE_PUBLIC_WEAK_ALIAS(writeall, libc_writeall);
 DEFINE_PUBLIC_WEAK_ALIAS(lseek, libc_lseek);
 DEFINE_PUBLIC_WEAK_ALIAS(isatty, libc_isatty);
 DEFINE_PUBLIC_WEAK_ALIAS(_isatty, libc_isatty);
@@ -3499,9 +3621,11 @@ DEFINE_PUBLIC_WEAK_ALIAS(_lseeki64, libc_lseek64);
 DEFINE_PUBLIC_WEAK_ALIAS(pread, libc_pread);
 DEFINE_PUBLIC_WEAK_ALIAS(pwrite, libc_pwrite);
 DEFINE_PUBLIC_WEAK_ALIAS(preadall, libc_preadall);
+DEFINE_PUBLIC_WEAK_ALIAS(pwriteall, libc_pwriteall);
 DEFINE_PUBLIC_WEAK_ALIAS(pread64, libc_pread64);
 DEFINE_PUBLIC_WEAK_ALIAS(pwrite64, libc_pwrite64);
 DEFINE_PUBLIC_WEAK_ALIAS(preadall64, libc_preadall64);
+DEFINE_PUBLIC_WEAK_ALIAS(pwriteall64, libc_pwriteall64);
 DEFINE_PUBLIC_WEAK_ALIAS(pipe2, libc_pipe2);
 DEFINE_PUBLIC_WEAK_ALIAS(dup3, libc_dup3);
 DEFINE_PUBLIC_WEAK_ALIAS(get_current_dir_name, libc_get_current_dir_name);

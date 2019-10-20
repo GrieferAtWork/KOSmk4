@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb93a653d */
+/* HASH CRC-32:0x208ea00b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(rename) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(rename))(char const *__oldname,
                                                     char const *__newname_or_path) {
-#line 332 "kos/src/libc/magic/stdio.c"
+#line 336 "kos/src/libc/magic/stdio.c"
 	return __localdep_renameat(__CRT_AT_FDCWD, __oldname, __CRT_AT_FDCWD, __newname_or_path);
 }
 __NAMESPACE_LOCAL_END

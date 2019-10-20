@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b051084 */
+/* HASH CRC-32:0x35c620c1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Change the given `STREAM' to become line-buffered */
 __LOCAL_LIBC(setlinebuf) __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(setlinebuf))(__FILE *__restrict __stream) {
-#line 1072 "kos/src/libc/magic/stdio.c"
+#line 1076 "kos/src/libc/magic/stdio.c"
 	__localdep_setvbuf(__stream, __NULLPTR, ___IOLBF, 0);
 }
 __NAMESPACE_LOCAL_END

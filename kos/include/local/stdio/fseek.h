@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9a6eb26c */
+/* HASH CRC-32:0x75153ed8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,7 +57,7 @@ __LOCAL_LIBC(fseek) __ATTR_NONNULL((1)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fseek))(__FILE *__restrict __stream,
                                       long int __off,
                                       int __whence) __THROWS(...) {
-#line 612 "kos/src/libc/magic/stdio.c"
+#line 616 "kos/src/libc/magic/stdio.c"
 #if __SIZEOF_LONG__ == 8 && (defined(__CRT_HAVE_fseeko64) || defined(__CRT_HAVE__fseeki64) || (defined(__USE_STDIO_UNLOCKED) && defined(__CRT_HAVE_fseeko64_unlocked)))
 	return __localdep_crt_fseeko64(__stream, (__off64_t)__off, __whence);
 #elif defined(__CRT_HAVE_fseeko) || (defined(__USE_STDIO_UNLOCKED) && defined(__CRT_HAVE_fseeko_unlocked))

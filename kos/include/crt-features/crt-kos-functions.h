@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xde4faeb5 */
+/* HASH CRC-32:0x29f65e62 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1592,6 +1592,8 @@ __CRT_FUNCTION(putw_unlocked,0,(),2,(int,w,FILE *__restrict,stream),int)
 __CRT_FUNCTION(pvalloc,0,(),1,(size_t,n_bytes),void *)
 __CRT_FUNCTION(pwrite,0,(),4,(fd_t,fd,void const *,buf,size_t,bufsize,__PIO_OFFSET,offset),ssize_t)
 __CRT_FUNCTION(pwrite64,1,(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__,pwrite),4,(fd_t,fd,void const *,buf,size_t,bufsize,__PIO_OFFSET64,offset),ssize_t)
+__CRT_FUNCTION(pwriteall,0,(),4,(fd_t,fd,void const *,buf,size_t,bufsize,__PIO_OFFSET,offset),ssize_t)
+__CRT_FUNCTION(pwriteall64,1,(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__,pwriteall),4,(fd_t,fd,void *,buf,size_t,bufsize,__PIO_OFFSET64,offset),ssize_t)
 __CRT_FUNCTION(pwritev,0,(),4,(fd_t,fd,struct iovec const *,iovec,__STDC_INT_AS_SIZE_T,count,off_t,offset),ssize_t)
 __CRT_FUNCTION(pwritev64,1,(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__,pwritev),4,(fd_t,fd,struct iovec const *,iovec,__STDC_INT_AS_SIZE_T,count,off64_t,offset),ssize_t)
 __CRT_FUNCTION(qecvt,0,(),4,(long double,val,int,ndigit,int *__restrict,decptr,int *__restrict,sign),char *)
@@ -2191,6 +2193,7 @@ __CRT_FUNCTION(wildstrcasecmp,0,(),2,(char const *,pattern,char const *,string),
 __CRT_FUNCTION(wildstrcasecmp_l,0,(),3,(char const *,pattern,char const *,string,locale_t,locale),int)
 __CRT_FUNCTION(wildstrcmp,0,(),2,(char const *,pattern,char const *,string),int)
 __CRT_FUNCTION(write,0,(),3,(fd_t,fd,void const *,buf,size_t,bufsize),ssize_t)
+__CRT_FUNCTION(writeall,0,(),3,(fd_t,fd,void const *,buf,size_t,bufsize),ssize_t)
 __CRT_FUNCTION(writev,0,(),3,(fd_t,fd,struct iovec const *,iovec,__STDC_INT_AS_SIZE_T,count),ssize_t)
 __CRT_FUNCTION(y0,0,(),1,(double,x),double)
 __CRT_FUNCTION(y0f,0,(),1,(float,x),float)

@@ -565,23 +565,51 @@ readall:($fd_t fd, [outp(bufsize)] void *buf, size_t bufsize) -> ssize_t {
 		/* Keep on reading */
 		for (;;) {
 			temp = read(fd,
-			           (byte_t *)buf + (size_t)result,
+			            (byte_t *)buf + (size_t)result,
 			            bufsize - (size_t)result);
 			if (temp <= 0) {
 #ifdef @__errno@
 				int old_error = @__errno@;
-#endif
+#endif /* __errno */
 				/* Try to un-read data that had already been loaded. */
 				lseek(fd, -(off_t)(pos_t)result, SEEK_CUR);
 #ifdef @__errno@
 				@__errno@ = old_error;
-#endif
+#endif /* __errno */
 				result = temp;
 				break;
 			}
 			result += temp;
 			if ((size_t)result >= bufsize)
-			break;
+				break;
+		}
+	}
+	return result;
+}
+
+@@>> writeall(3)
+@@Same as `write(2)', however keep on writing until `write()' indicates EOF (causing
+@@`writeall()' to immediately return `0') or the entirety of the given buffer has been
+@@written (in which case `bufsize' is returned).
+[cp][guard][section(.text.crt.io.write)]
+[requires($has_function(write) && $has_function(lseek))]
+[dependency_include(<parts/errno.h>)]
+writeall:($fd_t fd, [inp(bufsize)] void const *buf, size_t bufsize) -> ssize_t {
+	ssize_t result, temp;
+	result = write(fd, buf, bufsize);
+	if (result > 0 && (size_t)result < bufsize) {
+		/* Keep on writing */
+		for (;;) {
+			temp = write(fd,
+			             (byte_t *)buf + (size_t)result,
+			             bufsize - (size_t)result);
+			if (temp <= 0) {
+				result = temp;
+				break;
+			}
+			result += temp;
+			if ((size_t)result >= bufsize)
+				break;
 		}
 	}
 	return result;
@@ -898,6 +926,17 @@ pwrite:($fd_t fd, [inp(bufsize)] void const *buf, size_t bufsize, __PIO_OFFSET o
 preadall:($fd_t fd, [outp(bufsize)] void *buf, size_t bufsize, __PIO_OFFSET offset) -> ssize_t {
 	return preadall64(fd, buf, bufsize, (__PIO_OFFSET64)offset);
 }
+
+@@>> pwriteall(3)
+@@Same as `writeall(3)', but using `pwrite(2)' instead of `write()'
+[if(defined(__USE_FILE_OFFSET64)), preferred_alias(pwriteall64)]
+[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(pwriteall)]
+[requires($has_function(pwriteall64))]
+[dependency_include(<parts/errno.h>)]
+[cp][section(.text.crt.io.write)]
+pwriteall:($fd_t fd, [inp(bufsize)] void const *buf, size_t bufsize, __PIO_OFFSET offset) -> ssize_t {
+	return pwriteall64(fd, buf, bufsize, (__PIO_OFFSET64)offset);
+}
 %#endif /* __USE_KOS */
 
 
@@ -988,9 +1027,34 @@ preadall64:($fd_t fd, [inp(bufsize)] void *buf, size_t bufsize, __PIO_OFFSET64 o
 		/* Keep on reading */
 		for (;;) {
 			temp = pread64(fd,
-			              (byte_t *)buf + (size_t)result,
+			               (byte_t *)buf + (size_t)result,
 			               bufsize - (size_t)result,
 			               offset + (size_t)result);
+			if (temp <= 0) {
+				result = temp;
+				break;
+			}
+			result += temp;
+			if ((size_t)result >= bufsize)
+				break;
+		}
+	}
+	return result;
+}
+
+@@>> pwriteall64(3)
+@@Same as `writeall(3)', but using `pwrite64(2)' instead of `write()'
+[off64_variant_of(pwriteall)][cp][requires($has_function(pwrite64))][section(.text.crt.io.large.write)]
+pwriteall64:($fd_t fd, [inp(bufsize)] void *buf, size_t bufsize, __PIO_OFFSET64 offset) -> ssize_t {
+	ssize_t result, temp;
+	result = pwrite64(fd, buf, bufsize, offset);
+	if (result > 0 && (size_t)result < bufsize) {
+		/* Keep on writing */
+		for (;;) {
+			temp = pwrite64(fd,
+			                (byte_t *)buf + (size_t)result,
+			                bufsize - (size_t)result,
+			                offset + (size_t)result);
 			if (temp <= 0) {
 				result = temp;
 				break;

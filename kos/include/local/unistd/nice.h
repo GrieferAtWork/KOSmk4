@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc271ec2d */
+/* HASH CRC-32:0xee2931e9 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(nice) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(nice))(int __inc) {
-#line 1274 "kos/src/libc/magic/unistd.c"
+#line 1338 "kos/src/libc/magic/unistd.c"
 	(void)__inc;
 	/* It should be sufficient to emulate this is a no-op. */
 	return 0;

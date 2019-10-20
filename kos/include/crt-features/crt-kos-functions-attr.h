@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd542dab7 */
+/* HASH CRC-32:0x43354ca8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3397,6 +3397,8 @@
 #define __CRT_ATTR_NOTHROW_RPC_pwrite 1
 #define __CRT_ATTR_NOTHROW_RPC_pwrite32 1
 #define __CRT_ATTR_NOTHROW_RPC_pwrite64 1
+#define __CRT_ATTR_NOTHROW_RPC_pwriteall 1
+#define __CRT_ATTR_NOTHROW_RPC_pwriteall64 1
 #define __CRT_ATTR_NOTHROW_RPC_pwritev 1
 #define __CRT_ATTR_NOTHROW_RPC_pwritev32 1
 #define __CRT_ATTR_NOTHROW_RPC_pwritev64 1
@@ -3547,6 +3549,7 @@
 #define __CRT_ATTR_NOTHROW_RPC_wreadlink 1
 #define __CRT_ATTR_NOTHROW_RPC_wreadlinkat 1
 #define __CRT_ATTR_NOTHROW_RPC_write 1
+#define __CRT_ATTR_NOTHROW_RPC_writeall 1
 #define __CRT_ATTR_NOTHROW_RPC_writev 1
 #define __CRT_ATTR_NOTHROW_RPC_wrmdir 1
 #define __CRT_ATTR_NOTHROW_RPC_wspawnl 1

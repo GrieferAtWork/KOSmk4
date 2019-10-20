@@ -71,6 +71,10 @@
 	.io.read* .io.large.read*  \
 	.io.write* .io.large.write*       # Keep basic read/write functions intermingled
 	.io.access*                       # I/O accessor functions (open(), close(), etc.)
+	.FILE.core.read*
+	.FILE.core.write*
+	.FILE.core.utility*
+	.FILE.core*
 	.FILE.locked.access*
 	.FILE.locked.read.read*
 	.FILE.locked.read.scanf*
@@ -188,6 +192,10 @@
 	CB(PREFIX.heap.utility.*) \
 	CB(PREFIX.io.large.read.* PREFIX.io.large.write.* PREFIX.io.read.* PREFIX.io.write.*) \
 	CB(PREFIX.io.access.*) \
+	CB(PREFIX.FILE.core.read.*) \
+	CB(PREFIX.FILE.core.write.*) \
+	CB(PREFIX.FILE.core.utility.*) \
+	CB(PREFIX.FILE.core.seek.*) \
 	CB(PREFIX.FILE.locked.access.*) \
 	CB(PREFIX.FILE.locked.read.read.*) \
 	CB(PREFIX.FILE.locked.read.scanf.*) \

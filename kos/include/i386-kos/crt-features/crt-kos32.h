@@ -2565,6 +2565,8 @@
 #define __CRT_HAVE_pvalloc 1
 #define __CRT_HAVE_pwrite 1
 #define __CRT_HAVE_pwrite64 1
+#define __CRT_HAVE_pwriteall 1
+#define __CRT_HAVE_pwriteall64 1
 #define __CRT_HAVE_pwritev 1
 #define __CRT_HAVE_pwritev64 1
 #define __CRT_HAVE_qecvt 1
@@ -4085,6 +4087,7 @@
 #define __CRT_HAVE_wreadlink 1
 #define __CRT_HAVE_wreadlinkat 1
 #define __CRT_HAVE_write 1
+#define __CRT_HAVE_writeall 1
 #define __CRT_HAVE_writev 1
 #define __CRT_HAVE_wrmdir 1
 #define __CRT_HAVE_wscanf 1

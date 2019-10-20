@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x678935da */
+/* HASH CRC-32:0x2622487e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -189,6 +189,11 @@ INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_write)(fd_t fd, void const
  * the file descriptor by the amount of data that had already been loaded. - Errors
  * during this phase are silently ignored and don't cause `errno' to change */
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_readall)(fd_t fd, void *buf, size_t bufsize);
+/* >> writeall(3)
+ * Same as `write(2)', however keep on writing until `write()' indicates EOF (causing
+ * `writeall()' to immediately return `0') or the entirety of the given buffer has been
+ * written (in which case `bufsize' is returned). */
+INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_writeall)(fd_t fd, void const *buf, size_t bufsize);
 /* >> lseek(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 INTDEF off_t NOTHROW_NCX(LIBCCALL libc_lseek)(fd_t fd, off_t offset, int whence);
@@ -270,6 +275,9 @@ INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_pwrite)(fd_t fd, void cons
 /* >> preadall(3)
  * Same as `readall(3)', but using `pread(2)' instead of `read()' */
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_preadall)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET offset);
+/* >> pwriteall(3)
+ * Same as `writeall(3)', but using `pwrite(2)' instead of `write()' */
+INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_pwriteall)(fd_t fd, void const *buf, size_t bufsize, __PIO_OFFSET offset);
 /* >> pread64(2)
  * Read data from a file at a specific offset */
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_pread64)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET64 offset);
@@ -279,6 +287,9 @@ INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_pwrite64)(fd_t fd, void co
 /* >> preadall64(3)
  * Same as `readall(3)', but using `pread64(2)' instead of `read()' */
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_preadall64)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET64 offset);
+/* >> pwriteall64(3)
+ * Same as `writeall(3)', but using `pwrite64(2)' instead of `write()' */
+INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_pwriteall64)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET64 offset);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_pipe2)(fd_t pipedes[2], oflag_t flags);
 INTDEF fd_t NOTHROW_NCX(LIBCCALL libc_dup3)(fd_t oldfd, fd_t newfd, oflag_t flags);
 INTDEF WUNUSED ATTR_MALLOC char *NOTHROW_RPC(LIBCCALL libc_get_current_dir_name)(void);

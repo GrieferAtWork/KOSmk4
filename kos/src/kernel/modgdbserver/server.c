@@ -874,7 +874,7 @@ again_handle_questionmark:
 		} else {
 			/* Make sure that everything is stopped. */
 			GDBThread_StopAllCpus();
-			/* Nothing was stopped in particular, but GDB still want's ~something~ to be stopped. */
+			/* Nothing was stopped in particular, but GDB still wants ~something~ to be stopped. */
 			if (GDBServer_CreateMissingAsyncStopNotificationForSomeThread())
 				goto again_handle_questionmark;
 			/* Shouldn't really get here, but tell GDB 

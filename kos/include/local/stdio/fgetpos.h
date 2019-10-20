@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfe308608 */
+/* HASH CRC-32:0xd4e2bce7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -97,7 +97,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fgetpos) __ATTR_NONNULL((1, 2)) int
 (__LIBCCALL __LIBC_LOCAL_NAME(fgetpos))(__FILE *__restrict __stream,
                                         __FS_TYPE(pos) *__restrict __pos) __THROWS(...) {
-#line 721 "kos/src/libc/magic/stdio.c"
+#line 725 "kos/src/libc/magic/stdio.c"
 #if defined(__USE_FILE_OFFSET64) && (defined(__CRT_HAVE_ftello64) || defined(__CRT_HAVE__ftelli64) || (defined(__USE_STDIO_UNLOCKED) && defined(__CRT_HAVE_ftello64_unlocked)))
 	return (__INT32_TYPE__)(*__pos = (__FS_TYPE(pos))__localdep_crt_ftello64(__stream)) < 0 ? -1 : 0;
 #elif defined(__CRT_HAVE_fgetpos) || (defined(__USE_STDIO_UNLOCKED) && defined(__CRT_HAVE_fgetpos_unlocked))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xccb2b63c */
+/* HASH CRC-32:0xb3339d5f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,7 +53,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(setbuf) __ATTR_NONNULL((1)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(setbuf))(__FILE *__restrict __stream,
                                                     char *__restrict __buf) {
-#line 386 "kos/src/libc/magic/stdio.c"
+#line 390 "kos/src/libc/magic/stdio.c"
 	__localdep_setvbuf(__stream, __buf,
 	        __buf ? ___IOFBF : ___IONBF,
 	        __buf ? __BUFSIZ : 0);

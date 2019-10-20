@@ -80,74 +80,118 @@ DECL_BEGIN
 #define __BUFSIZ BUFSIZ
 
 
-#define IO_R       __IO_FILE_IOR       /* The current buffer was read from disk (Undefined when 'if_cnt == 0'). */
-#define IO_W       __IO_FILE_IOW       /* The current buffer has changed since being read. */
-#define IO_NBF     __IO_FILE_IONBF     /* ??? */
-#define IO_MALLBUF __IO_FILE_IOMALLBUF /* The buffer was allocated internally. */
-#define IO_EOF     __IO_FILE_IOEOF     /* Set when the file pointed to by 'if_fd' has been exhausted. */
-#define IO_ERR     __IO_FILE_IOERR     /* Set when an I/O error occurred. */
-#define IO_NOFD    __IO_FILE_IONOFD    /* The file acts as output to buffer only. - 'if_fd' is not valid. (Currently ignored when loading/flushing data) */
-#define IO_RW      __IO_FILE_IORW      /* The file was opened for read+write permissions ('+' flag) */
-#define IO_USERBUF __IO_FILE_IOUSERBUF /* The buffer was given by the user. */
-#define IO_LNBUF   __IO_FILE_IOLNBUF   /* NOT ORIGINALLY DEFINED IN DOS: Use line-buffering. */
-#define IO_SETVBUF __IO_FILE_IOSETVBUF /* ??? */
-#define IO_FEOF    __IO_FILE_IOFEOF    /* Never used */
-#define IO_FLRTN   __IO_FILE_IOFLRTN   /* ??? */
-#define IO_CTRLZ   __IO_FILE_IOCTRLZ   /* ??? */
-#define IO_COMMIT  __IO_FILE_IOCOMMIT  /* ??? */
-#define IO_LOCKED  __IO_FILE_IOLOCKED  /* ??? */
-#define IO_LNIFTYY __IO_FILE_IOLNIFTYY /* NOT ORIGINALLY DEFINED IN DOS: Determine 'isatty()' on first access and set `__IO_FILE_IOLNBUF' accordingly. */
+#define IO_RW           __IO_FILE_IORW      /* The file was opened for read+write permissions ('+' flag) */
+#define IO_MALLBUF      __IO_FILE_IOMALLBUF /* The buffer was allocated internally. */
+#define IO_READING      __IO_FILE_IOREADING /* The buffer can be used for reading and writing. */
+#define IO_FSYNC        __IO_FILE_IOCOMMIT  /* Also synchronize the underlying file after flushing the buffer. */
+#define IO_NODYNSCALE   __IO_FILE_IOUSERBUF /* The buffer is not allowed to dynamically change its buffer size. */
+#define IO_LNBUF        __IO_FILE_IOLNBUF   /* The buffer is line-buffered, meaning that it will
+                                             * flush its data whenever a line-feed is printed.
+                                             * Additionally if the `IO_ISATTY' flag is set,
+                                             * attempting to read from a line-buffered file will cause
+                                             * all other existing line-buffered files to be synchronized
+                                             * first. This is done to ensure that interactive files are
+                                             * always up-to-date before data is read from one of them. */
+#define IO_LNIFTYY      __IO_FILE_IOLNIFTYY /* Automatically set/delete the `IO_LNBUF' and
+                                             * `IO_ISATTY' flags, and add/remove the file from
+                                             * `fb_ttys' the next time this comes into question. To determine
+                                             * this, the pointed-to file is tested for being a TTY device
+                                             * using `DeeFile_IsAtty(fb_file)'.
+                                             * HINT: This flag is set for all newly created buffers by default. */
+#define IO_ISATTY       __IO_FILE_IOISATTY  /* This buffer refers to a TTY device. */
+#define IO_NOTATTY      __IO_FILE_IONOTATTY /* This buffer does not refer to a TTY device. */
+#define IO_HASVTAB      __IO_FILE_IONOFD    /* The file uses a V-table, rather than a file descriptor. */
 
-struct iofile_data {
-	uintptr_t                  io_zero; /* Always ZERO(0). - Required for binary compatibility with DOS. */
-	struct atomic_owner_rwlock io_lock; /* Lock for the file. */
-	pos64_t                    io_pos;  /* The current in-file position of 'if_fd' */
-	size_t                     io_read; /* The amount of bytes within the currently loaded buffer that were read from disk.
-	                                     * When `IO_R' is set, `io_pos' is located within the buffer at 'if_base+io_read' */
-	LLIST_NODE(FILE)           io_link; /* [lock(libc_ffiles_lock)][0..1] Entry in the global chain of open files. (Used by `fcloseall()', as well as flushing all open files during `exit()') */
-	LLIST_NODE(FILE)           io_lnch; /* [lock(libc_flnchg_lock)][0..1] Chain of line-buffered file that have changed and must be flushed before another line-buffered file is read.
-	                                     * NOTE: The standard streams stdin, stdout and stderr are not apart of this list! */
-	//mbstate_t                io_mbs;  /* MB State used for translating unicode data. */
+/* Flags not defined by deemon, but required by the C standard. */
+#define IO_EOF          __IO_FILE_IOEOF /* Set when the file pointed to by 'if_fd' has been exhausted. */
+#define IO_ERR          __IO_FILE_IOERR /* Set when an I/O error occurred. */
+
+
+
+/* NOTE: The KOS FILE type is derived from deemon's FileBuffer type.
+ *       Flags re-appear using the following map:
+ *          ~FILE_BUFFER_FSTATICBUF     <---> IO_MALLBUF
+ *          ~FILE_BUFFER_FREADONLY      <---> IO_RW
+ *          FILE_BUFFER_FSYNC           <---> IO_FSYNC
+ *          FILE_BUFFER_FREADING        <---> IO_READING
+ *          FILE_BUFFER_FNODYNSCALE     <---> IO_NODYNSCALE
+ *          FILE_BUFFER_FLNBUF          <---> IO_LNBUF
+ *          FILE_BUFFER_FLNIFTTY        <---> IO_LNIFTYY
+ *          FILE_BUFFER_FISATTY         <---> IO_ISATTY
+ *          FILE_BUFFER_FNOTATTY        <---> IO_NOTATTY
+ *       Members re-appear using the following map:
+ *          fb_lock  <---> if_exdata->io_lock
+ *          fb_file  <---> IO_HASVTAB: if_exdata->io_vtab + if_exdata->io_magi
+ *                        !IO_HASVTAB: if_fd
+ *          fb_ptr   <---> if_ptr
+ *          fb_cnt   <---> if_cnt
+ *          fb_chng  <---> if_exdata->io_chng
+ *          fb_chsz  <---> if_exdata->io_chsz
+ *          fb_base  <---> if_base
+ *          fb_size  <---> if_bufsiz
+ *          fb_ttych <---> if_exdata->io_lnch
+ *          fb_fblk  <---> if_exdata->io_fblk
+ *          fb_fpos  <---> if_exdata->io_fpos
+ *          fb_flag  <---> if_flag
+ */
+
+struct iofile_data_novtab {
+	uintptr_t                  io_zero;   /* Always ZERO(0). - Required for binary compatibility with DOS. */
+	__WEAK refcnt_t            io_refcnt; /* Reference counter. */
+	struct atomic_owner_rwlock io_lock;   /* Lock for the file. */
+	byte_t                    *io_chng;   /* [>= :if_base][+io_chsz <= :if_base + :if_bufsiz]
+	                                       * [valid_if(io_chsz != 0)][lock(fb_lock)]
+	                                       * Pointer to the first character that was
+	                                       * changed since the buffer had been loaded. */
+	size_t                     io_chsz;   /* [lock(fb_lock)] Amount of bytes that were changed. */
+	LLIST_NODE(FILE)           io_lnch;   /* [lock(changed_linebuffered_files_lock)][0..1] Chain of line-buffered file that have changed and must be flushed before another line-buffered file is read. */
+	LLIST_NODE(FILE)           io_link;   /* [lock(all_files_lock)][0..1] Entry in the global chain of open files. (Used by `fcloseall()', as well as flushing all open files during `exit()') */
+	uintptr_t                  io_fver;   /* [lock(flushall_lock)] Last time that this file was flushed because of a global flush. */
+	pos64_t                    io_fblk;   /* The starting address of the data block currently stored in `if_base'. */
+	pos64_t                    io_fpos;   /* The current (assumed) position within the underlying file stream. */
+#undef IOFILE_HAVE_MBS
+//	mbstate_t                  io_mbs;    /* MB State used for translating unicode data. */
+};
+#define IOFILE_DATA_NOVTAB_INIT()                    \
+	{                                                \
+		/* .io_refcnt = */ 2,                        \
+		/* .io_zero   = */ 0,                        \
+		/* .io_lock   = */ ATOMIC_OWNER_RWLOCK_INIT, \
+		/* .io_chng   = */ NULL,                     \
+		/* .io_chsz   = */ 0,                        \
+		/* .io_lnch   = */ LLIST_INITNODE,           \
+		/* .io_link   = */ LLIST_INITNODE,           \
+		/* .io_fblk   = */ 0,                        \
+		/* .io_fpos   = */ 0                         \
+	}
+
+struct iofile_data: iofile_data_novtab {
+	/* All of the following fields only exist when `IO_HASVTAB' is set. */
+	cookie_io_functions_t      io_vtab; /* [const] File buffer */
+	void                      *io_magi; /* [const] Magic cook */
 };
 
 
-PRIVATE ATTR_SECTION(".data.crt.FILE.locked.read.read.io_stdin") struct iofile_data io_stdin = {
-	/* .io_zero = */ 0,
-	/* .io_lock = */ ATOMIC_OWNER_RWLOCK_INIT,
-	/* .io_pos  = */ 0,
-	/* .io_read = */ 0,
-	/* .io_link = */ LLIST_INITNODE,
-	/* .io_lnch = */ LLIST_INITNODE,
-};
-PRIVATE ATTR_SECTION(".data.crt.FILE.locked.write.write.io_stdout") struct iofile_data io_stdout = {
-	/* .io_zero = */ 0,
-	/* .io_lock = */ ATOMIC_OWNER_RWLOCK_INIT,
-	/* .io_pos  = */ 0,
-	/* .io_read = */ 0,
-	/* .io_link = */ LLIST_INITNODE,
-	/* .io_lnch = */ LLIST_INITNODE,
-};
-PRIVATE ATTR_SECTION(".data.crt.FILE.locked.write.write.io_stderr") struct iofile_data io_stderr = {
-	/* .io_zero = */ 0,
-	/* .io_lock = */ ATOMIC_OWNER_RWLOCK_INIT,
-	/* .io_pos  = */ 0,
-	/* .io_read = */ 0,
-	/* .io_link = */ LLIST_INITNODE,
-	/* .io_lnch = */ LLIST_INITNODE,
+
+PRIVATE ATTR_SECTION(".data.crt.FILE.locked.utility.std_files_io") 
+struct iofile_data_novtab std_files_io[3] = {
+	/* [0] = */ IOFILE_DATA_NOVTAB_INIT(),
+	/* [1] = */ IOFILE_DATA_NOVTAB_INIT(),
+	/* [2] = */ IOFILE_DATA_NOVTAB_INIT()
 };
 
-INTERN ATTR_SECTION(".data.crt.FILE.locked.utility.std_files") FILE libc_std_files[3] = {
-	/* [0] = */ __IO_FILE_INIT(NULL, 0, NULL, IO_LNBUF, STDIN_FILENO, { 0 }, 0, &io_stdin),
-	/* [1] = */ __IO_FILE_INIT(NULL, 0, NULL, IO_LNIFTYY, STDOUT_FILENO, { 0 }, 0, &io_stdout),
-	/* [2] = */ __IO_FILE_INIT(NULL, 0, NULL, IO_LNIFTYY, STDERR_FILENO, { 0 }, 0, &io_stderr),
+INTERN ATTR_SECTION(".data.crt.FILE.locked.utility.std_files") FILE std_files[3] = {
+	/* [0] = */ __IO_FILE_INIT(NULL, 0, NULL, IO_LNBUF, STDIN_FILENO, { 0 }, 0, (struct iofile_data *)&std_files_io[0]),
+	/* [1] = */ __IO_FILE_INIT(NULL, 0, NULL, IO_RW | IO_LNIFTYY, STDOUT_FILENO, { 0 }, 0, (struct iofile_data *)&std_files_io[1]),
+	/* [2] = */ __IO_FILE_INIT(NULL, 0, NULL, IO_RW | IO_LNIFTYY, STDERR_FILENO, { 0 }, 0, (struct iofile_data *)&std_files_io[2]),
 };
 
 #undef stdin
 #undef stdout
 #undef stderr
-PUBLIC ATTR_SECTION(".data.crt.FILE.locked.read.read.stdin")    FILE *stdin  = &libc_std_files[0];
-PUBLIC ATTR_SECTION(".data.crt.FILE.locked.write.write.stdout") FILE *stdout = &libc_std_files[1];
-PUBLIC ATTR_SECTION(".data.crt.FILE.locked.write.write.stderr") FILE *stderr = &libc_std_files[2];
+PUBLIC ATTR_SECTION(".data.crt.FILE.locked.read.read.stdin")    FILE *stdin  = &std_files[0];
+PUBLIC ATTR_SECTION(".data.crt.FILE.locked.write.write.stdout") FILE *stdout = &std_files[1];
+PUBLIC ATTR_SECTION(".data.crt.FILE.locked.write.write.stderr") FILE *stderr = &std_files[2];
 
 DEFINE_NOREL_GLOBAL_META(FILE *, stdin, ".crt.FILE.locked.read.read.stdin");
 DEFINE_NOREL_GLOBAL_META(FILE *, stdout, ".crt.FILE.locked.write.write.stdout");
@@ -157,20 +201,14 @@ DEFINE_NOREL_GLOBAL_META(FILE *, stderr, ".crt.FILE.locked.write.write.stderr");
 #define stderr GET_NOREL_GLOBAL(stderr)
 
 
-INTERN DEFINE_ATOMIC_RWLOCK(libc_ffiles_lock);
-INTERN DEFINE_ATOMIC_RWLOCK(libc_flnchg_lock);
-INTERN LLIST(FILE) libc_ffiles = LLIST_INIT;
-INTERN LLIST(FILE) libc_flnchg = LLIST_INIT;
-
-#define FEOF(self)      ((self)->if_flag&IO_EOF)
-#define FERROR(self)    ((self)->if_flag&IO_ERR)
-#define FSETERROR(self) ((self)->if_flag|=IO_ERR)
-#define FCLEARERR(self) ((self)->if_flag&=~IO_ERR)
+#define FEOF(self)      ((self)->if_flag & IO_EOF)
+#define FERROR(self)    ((self)->if_flag & IO_ERR)
+#define FSETERROR(self) ((self)->if_flag |= IO_ERR)
+#define FCLEARERR(self) ((self)->if_flag &= ~(IO_ERR | IO_EOF))
 
 #define IOBUF_MAX                8192
 #define IOBUF_MIN                512
 #define IOBUF_RELOCATE_THRESHOLD 2048 /* When >= this amount of bytes are unused in the buffer, free them. */
-
 
 #define file_reading(x)     atomic_owner_rwlock_reading(&(x)->if_exdata->io_lock)
 #define file_writing(x)     atomic_owner_rwlock_writing(&(x)->if_exdata->io_lock)
@@ -184,786 +222,1537 @@ INTERN LLIST(FILE) libc_flnchg = LLIST_INIT;
 #define file_endread(x)     atomic_owner_rwlock_endread(&(x)->if_exdata->io_lock)
 #define file_endwrite(x)    atomic_owner_rwlock_endwrite(&(x)->if_exdata->io_lock)
 
-#if 0
-/* Lockless */
-#undef file_reading
-#undef file_writing
-#undef file_tryread
-#undef file_trywrite
-#undef file_tryupgrade
-#undef file_read
-#undef file_write
-#undef file_upgrade
-#undef file_downgrade
-#undef file_endread
-#undef file_endwrite
-#define file_reading(x)           1
-#define file_writing(x)           1
-#define file_tryread(x)           1
-#define file_trywrite(x)          1
-#define file_tryupgrade(x)        1
-#define file_read(x)        (void)0
-#define file_write(x)       (void)0
-#define file_upgrade(x)     (void)0
-#define file_downgrade(x)   (void)0
-#define file_endread(x)     (void)0
-#define file_endwrite(x)    (void)0
-#endif
 
+/* [0..1][lock(all_files_lock)] Chain of all files.
+ * NOTE: This chain excludes the initial stdin, stdout and stderr streams! */
+PRIVATE ATTR_SECTION(".bss.crt.FILE.core.utility.all_files")
+FILE *all_files = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.FILE.core.utility.all_files_lock")
+struct atomic_rwlock all_files_lock = ATOMIC_RWLOCK_INIT;
 
-/* Low-level read/write/seek/tell implementation. */
-INTDEF size_t NOTHROW_NCX(LIBCCALL libc_fdoread)(void *__restrict buf, size_t size, FILE *__restrict self);
-INTDEF size_t NOTHROW_NCX(LIBCCALL libc_fdowrite)(void const *__restrict buf, size_t size, FILE *__restrict self);
-INTDEF int NOTHROW_NCX(LIBCCALL libc_fdoflush)(FILE *__restrict self);
-INTDEF pos64_t NOTHROW_NCX(LIBCCALL libc_fdotell)(FILE *__restrict self);
-INTDEF int NOTHROW_NCX(LIBCCALL libc_fdoseek)(FILE *__restrict self, off64_t off, int whence);
-INTDEF int NOTHROW_NCX(LIBCCALL libc_dosetvbuf)(FILE *__restrict self, char *__restrict buf, int modes, size_t n);
-INTDEF int NOTHROW_NCX(LIBCCALL libc_doungetc)(int c, FILE *__restrict self);
-/* Try to fill unused buffer memory with new data, allocating a new buffer if none was available before. */
-INTDEF int NOTHROW_NCX(LIBCCALL libc_doffill)(FILE *__restrict self);
-
-/* Flush all line-buffered file streams that have changed.
- * This function is called before data is read from a
- * line-buffered source 'sender' that is already write-locked. */
-INTDEF void NOTHROW_NCX(LIBCCALL libc_flush_changed_lnbuf_files)(FILE *__restrict sender);
-
-/* All all user-defined input streams, not including stdin, stdout or stderr.
- * NOTE: Errors that may occur during this act are ignored, so-as to
- *       ensure that attempts at flushing later files are always made. */
-INTDEF void NOTHROW_NCX(LIBCCALL libc_flushall_nostd)(void);
-/* Same as `libc_flushall_nostd', but also flush standard streams. */
-//INTDEF void LIBCCALL libc_flushall(void);
-
-
-
-
-
-
-
-/*  */
-
-
-
-INTERN void LIBCCALL
-libc_flush_changed_lnbuf_files(FILE *__restrict sender) {
-	while (ATOMIC_READ(libc_flnchg)) {
-		FILE *flush_file;
-		atomic_rwlock_read(&libc_flnchg_lock);
-		COMPILER_READ_BARRIER();
-		if (!libc_flnchg) {
-			atomic_rwlock_endread(&libc_flnchg_lock);
-			break;
-		}
-		if (!atomic_rwlock_upgrade(&libc_flnchg_lock) &&
-		    !ATOMIC_READ(libc_flnchg)) {
-			atomic_rwlock_endwrite(&libc_flnchg_lock);
-			break;
-		}
-		flush_file = libc_flnchg;
-		if (flush_file != sender && !file_trywrite(flush_file)) {
-			atomic_rwlock_endwrite(&libc_flnchg_lock);
-			continue;
-		}
-		/* Unlink the file from the list of changed streams. */
-		LLIST_UNLINK(flush_file, if_exdata->io_lnch);
-		atomic_rwlock_endwrite(&libc_flnchg_lock);
-		/* Flush the file. */
-		libc_fdoflush(flush_file);
-		if (flush_file != sender)
-			file_endwrite(flush_file);
-	}
+/* Add the given file to the set of all files */
+PRIVATE ATTR_SECTION(".text.crt.FILE.core.utility.allfiles_insert")
+NONNULL((1)) void LIBCCALL allfiles_insert(FILE *__restrict self) {
+	atomic_rwlock_write(&all_files_lock);
+	LLIST_INSERT(all_files, self, if_exdata->io_link);
+	assert(LLIST_ISBOUND(self, if_exdata->io_link));
+	atomic_rwlock_endwrite(&all_files_lock);
 }
 
-LOCAL void LIBCCALL
-libc_fchecktty(FILE *__restrict self) {
-	if (self->if_flag & IO_LNIFTYY) {
-		self->if_flag &= ~IO_LNIFTYY;
-		if (isatty(self->if_fd)) {
-			syslog(LOG_DEBUG, "[LIBC] Stream handle %d is a tty\n", self->if_fd);
-			self->if_flag |= IO_LNBUF;
-		}
-	}
+/* Remove the given file from the set of all files */
+PRIVATE ATTR_SECTION(".text.crt.FILE.core.utility.allfiles_remove")
+NONNULL((1)) void LIBCCALL allfiles_remove(FILE *__restrict self) {
+	atomic_rwlock_write(&all_files_lock);
+	assert(LLIST_ISBOUND(self, if_exdata->io_link));
+	LLIST_REMOVE(self, if_exdata->io_link);
+	atomic_rwlock_endwrite(&all_files_lock);
 }
 
 
-INTERN size_t LIBCCALL
-libc_fdoread(void *__restrict buf, size_t size, FILE *__restrict self) {
-	size_t result, part, minsize;
-	unsigned char *buffer;
-	ssize_t temp;
+/* [0..1][lock(changed_linebuffered_files_lock)] Chain of tty-buffers. */
+PRIVATE ATTR_SECTION(".bss.crt.FILE.core.write.changed_linebuffered_files")
+FILE *changed_linebuffered_files = NULL;
+PRIVATE ATTR_SECTION(".bss.crt.FILE.core.write.changed_linebuffered_files_lock")
+struct atomic_rwlock changed_linebuffered_files_lock = ATOMIC_RWLOCK_INIT;
 
-	/* Read data from the loaded buffer. */
-	result = MIN(self->if_cnt, size);
-	memcpy(buf, self->if_ptr, result);
-	self->if_ptr += result;
-	self->if_cnt -= result;
-	size -= result;
-	if (!size)
-		goto end;
-	buf = (byte_t *)buf + result;
-	libc_fchecktty(self);
+/* Add the given file to the set of changed line-buffered files */
+PRIVATE ATTR_SECTION(".text.crt.FILE.core.write.changed_linebuffered_insert")
+NONNULL((1)) void LIBCCALL changed_linebuffered_insert(FILE *__restrict self) {
+	atomic_rwlock_write(&changed_linebuffered_files_lock);
+	if (!LLIST_ISBOUND(self, if_exdata->io_lnch))
+		LLIST_INSERT(changed_linebuffered_files, self, if_exdata->io_lnch);
+	assert(LLIST_ISBOUND(self, if_exdata->io_lnch));
+	atomic_rwlock_endwrite(&changed_linebuffered_files_lock);
+}
 
-	/* Read everything that is too large directly. */
-#if !(IOBUF_MAX & (IOBUF_MAX - 1))
-	part = size & ~(IOBUF_MAX - 1);
-#else
-	part = (size / IOBUF_MAX) * IOBUF_MAX;
-#endif
-	if (part) {
-		if (self->if_flag & IO_LNBUF)
-			libc_flush_changed_lnbuf_files(self);
-		temp = read(self->if_fd, buf, part);
-		if (temp <= 0)
-			goto err;
-		self->if_exdata->io_pos += temp;
-		result += temp;
-		size -= temp;
-		if (!size)
-			goto end;
-		buf = (byte_t *)buf + temp;
+/* Remove the given file from the set of changed line-buffered files */
+PRIVATE ATTR_SECTION(".text.crt.FILE.core.write.changed_linebuffered_remove")
+NONNULL((1)) void LIBCCALL changed_linebuffered_remove(FILE *__restrict self) {
+	atomic_rwlock_write(&changed_linebuffered_files_lock);
+	if (LLIST_ISBOUND(self, if_exdata->io_lnch)) {
+		LLIST_REMOVE(self, if_exdata->io_lnch);
+		LLIST_UNBIND(self, if_exdata->io_lnch);
 	}
-	assert(size);
-	assert(!self->if_cnt);
-	if (self->if_flag & IO_USERBUF) {
-		/* Read all data that doesn't fit into the buffer directly. */
-part_again:
-		if (!self->if_bufsiz)
-			part = size;
-		else {
-			part = (size / self->if_bufsiz) * self->if_bufsiz;
-		}
-		if (part) {
-			if (self->if_flag & IO_LNBUF)
-				libc_flush_changed_lnbuf_files(self);
-			temp = read(self->if_fd,
-			            buf,
-			            part);
-			if (temp <= 0)
-				goto err;
-			buf = (byte_t *)buf + temp;
-			size -= temp;
-			if ((size_t)temp != part)
-				goto part_again;
-		}
-		if (!size)
-			goto end;
+	atomic_rwlock_endwrite(&changed_linebuffered_files_lock);
+}
 
-		/* Fill the buffer. */
-		assert(self->if_bufsiz);
-		if (self->if_flag & IO_LNBUF)
-			libc_flush_changed_lnbuf_files(self);
-		temp = read(self->if_fd,
-		            self->if_base,
-		            self->if_bufsiz);
-		if (temp <= 0)
-			goto err;
-		self->if_ptr             = self->if_base;
-		self->if_cnt             = (size_t)temp;
-		self->if_exdata->io_read = (size_t)temp;
-		self->if_flag |= IO_R;
-		self->if_flag &= ~IO_W;
-		goto load_buffer;
+/* Low-level file read operation. */
+PRIVATE ATTR_SECTION(".text.crt.FILE.core.read.file_system_read")
+NONNULL((1)) ssize_t LIBCCALL file_system_read(FILE *__restrict self,
+                                               void *buf, size_t num_bytes) {
+	ssize_t result;
+	if (self->if_flag & IO_HASVTAB) {
+		struct iofile_data *ex;
+		ex = self->if_exdata;
+		result = (*ex->io_vtab.read)(ex->io_magi, (char *)buf, num_bytes);
+	} else {
+		result = read(self->if_fd, buf, num_bytes);
 	}
-
-	/* Allocate/Re-allocate a buffer of sufficient size. */
-	minsize = CEIL_ALIGN(size, IOBUF_MIN);
-	buffer  = self->if_base;
-	if (minsize > self->if_bufsiz) {
-		/* Must allocate more memory. */
-		buffer = (unsigned char *)realloc(buffer, minsize);
-		if unlikely(!buffer)
-			goto direct_io;
-		self->if_base   = buffer;
-		self->if_bufsiz = minsize;
-		self->if_flag |= IO_MALLBUF;
-	} else if ((self->if_bufsiz - minsize) >=
-	           IOBUF_RELOCATE_THRESHOLD) {
-		/* Try to free unused data. */
-		assert(self->if_flag & IO_MALLBUF);
-		buffer = (unsigned char *)realloc(buffer, minsize);
-		if unlikely(!buffer) {
-			buffer = self->if_base;
-			goto fill_buffer;
-		}
-		self->if_base   = buffer;
-		self->if_bufsiz = minsize;
-	}
-fill_buffer:
-	/* Read data into the buffer. */
-	assert(minsize);
-	if (self->if_flag & IO_LNBUF)
-		libc_flush_changed_lnbuf_files(self);
-	temp = read(self->if_fd, buffer, minsize);
-	if (temp <= 0)
-		goto err;
-	self->if_exdata->io_read = (size_t)temp;
-	self->if_exdata->io_pos += (size_t)temp;
-	self->if_cnt = (size_t)temp;
-	self->if_ptr = buffer;
-	self->if_flag |= IO_R;
-	self->if_flag &= ~IO_W;
-load_buffer:
-	part = MIN((size_t)temp, size);
-	/* Copy data out of the buffer. */
-	memcpy(buf, self->if_ptr, part);
-	self->if_ptr += part;
-	self->if_cnt -= part;
-	result += part;
-end:
-	/* Update the EOF flag according to the result. */
 	return result;
-direct_io:
-	/* Read the remainder using direct I/O. */
-	if (self->if_flag & IO_LNBUF)
-		libc_flush_changed_lnbuf_files(self);
-	temp = read(self->if_fd, buf, size);
-	if (temp <= 0)
-		goto err;
-	result += temp;
-	self->if_exdata->io_pos += temp;
-	goto end;
-err:
-	if (temp == 0) {
-		self->if_flag |= IO_EOF;
-		return result;
-	}
-	self->if_flag |= IO_ERR;
-	return 0;
 }
 
-INTERN int LIBCCALL
-libc_fdoflush(FILE *__restrict self) {
-	ssize_t temp;
-	unsigned char *write_pointer;
-	size_t write_size;
-	/* Don't do anything if the buffer hasn't changed, or doesn't have a handle. */
-	if (!(self->if_flag & IO_W) || (self->if_flag & IO_NOFD))
-		return 0;
-	/* If the input buffer was read before, we must seek
-	 * backwards to get back to where it was read from. */
-	if ((self->if_flag & IO_R) && self->if_exdata->io_read) {
-		off64_t pos = lseek64(self->if_fd,
-		                      -(ssize_t)self->if_exdata->io_read,
-		                      SEEK_CUR);
-		if (pos < 0)
-			goto err;
-		self->if_exdata->io_pos = (pos64_t)pos;
-	}
-	/* Write the entirety of the current buffer up until the current R/W position. */
-	write_pointer = self->if_base;
-	write_size = (size_t)((uintptr_t)self->if_ptr -
-	                      (uintptr_t)write_pointer);
-	assertf(write_size <= self->if_bufsiz, "Invalid file layout (ptr: %p; buf: %p...%p)",
-	        self->if_ptr, self->if_base, self->if_base + self->if_bufsiz - 1);
-	while (write_size) {
-		temp = write(self->if_fd, write_pointer, write_size);
-		if (temp < 0)
-			goto err;
-		if (!temp) {
-			self->if_flag |= IO_EOF;
-			self->if_exdata->io_pos = (size_t)(write_pointer - self->if_base);
-			self->if_ptr            = write_pointer;
-			self->if_cnt            = 0;
-			return 0; /* XXX: Is this correct? */
-		}
-		write_pointer += temp;
-		write_size -= temp;
-	}
-	if (self->if_flag & IO_LNBUF) {
-		atomic_rwlock_write(&libc_flnchg_lock);
-		if (LLIST_ISBOUND(self, if_exdata->io_lnch))
-			LLIST_UNLINK(self, if_exdata->io_lnch);
-		atomic_rwlock_endwrite(&libc_flnchg_lock);
-	}
-	/* Delete the changed and EOF flags. */
-	self->if_flag &= ~(IO_EOF | IO_W | IO_R);
-	/* Mark the buffer as empty. */
-	self->if_exdata->io_read = 0;
-	self->if_ptr             = self->if_base;
-	self->if_cnt             = 0;
-	return 0;
-err:
-	self->if_flag |= IO_ERR;
-	return -1;
-}
-
-INTERN int LIBCCALL
-libc_doffill(FILE *__restrict self) {
-	size_t avail;
-	ssize_t temp;
-	avail = (self->if_base + self->if_bufsiz) -
-	        (self->if_ptr + self->if_cnt);
-	if (!avail) {
-		if (!self->if_bufsiz &&
-		    !(self->if_flag & IO_USERBUF)) {
-			avail = IOBUF_MIN;
-			/* Allocate an initial buffer. */
-			do {
-				self->if_base = (unsigned char *)malloc(avail);
-			} while (unlikely(!self->if_base) && (avail /= 2) != 0);
-			if unlikely(!self->if_base)
-				goto err;
-			self->if_ptr    = self->if_base;
-			self->if_bufsiz = avail;
-		} else {
-			/* Don't do anything if no data needs to be read. */
-			return 0;
-		}
-	}
-	assert(avail);
-	libc_fchecktty(self);
-	if (self->if_flag & IO_LNBUF)
-		libc_flush_changed_lnbuf_files(self);
-	/* Read more data. */
-	temp = read(self->if_fd,
-	            self->if_ptr + self->if_cnt,
-	            avail);
-	if (temp <= 0) {
-		if (temp)
-			goto err;
-		/* Handle EOF. (We don't signal it unless no more data can be read) */
-		if (!self->if_cnt) {
-			self->if_flag |= IO_EOF;
-			return -1;
-		}
+/* Low-level file write operation. */
+PRIVATE ATTR_SECTION(".text.crt.FILE.core.write.file_system_write")
+NONNULL((1)) ssize_t LIBCCALL file_system_write(FILE *__restrict self,
+                                                void const *buf, size_t num_bytes) {
+	ssize_t result;
+	if (self->if_flag & IO_HASVTAB) {
+		struct iofile_data *ex;
+		ex = self->if_exdata;
+		result = (*ex->io_vtab.write)(ex->io_magi, (char const *)buf, num_bytes);
 	} else {
-		/* Update the file to mirror newly available data. */
-		self->if_flag &= ~(IO_EOF);
-		self->if_cnt += temp;
-		self->if_exdata->io_read += temp;
-		self->if_exdata->io_pos += temp;
+		result = write(self->if_fd, buf, num_bytes);
 	}
-	return 0;
-err:
-	self->if_flag |= IO_ERR;
-	return -1;
+	return result;
 }
 
-LOCAL void LIBCCALL
-libc_fmarkchanged(FILE *__restrict self) {
-	if (self->if_flag & IO_W)
-		return;
-	self->if_flag |= IO_W;
-	if (self->if_flag & IO_LNBUF) {
-		atomic_rwlock_write(&libc_flnchg_lock);
-		if (!LLIST_ISBOUND(self, if_exdata->io_lnch))
-			LLIST_INSERT(libc_flnchg, self, if_exdata->io_lnch);
-		atomic_rwlock_endwrite(&libc_flnchg_lock);
-	}
-}
-
-INTERN size_t LIBCCALL
-libc_fdowrite(void const *__restrict buf, size_t size, FILE *__restrict self) {
-	/* TODO: This function barely holds together!
-	 *       Get rid of it and port `deemon200:buffer_write_nolock()' */
-	size_t result = 0, part, minsize;
-	unsigned char *buffer;
-	ssize_t temp;
-	if unlikely(!size)
-		goto end;
-	libc_fchecktty(self);
-buffer_write_more:
-	/* Write data to buffer. */
-	assert(self->if_ptr >= self->if_base);
-	assert(self->if_ptr <= self->if_base + self->if_bufsiz);
-	part = MIN((size_t)((self->if_base + self->if_bufsiz) - self->if_ptr), size);
-	if (part) {
-		memcpy(self->if_ptr, buf, part);
-		self->if_ptr += part;
-		libc_fmarkchanged(self);
-		if (OVERFLOW_USUB(self->if_cnt, part, &self->if_cnt))
-			self->if_cnt = 0;
-		result += part;
-		size -= part;
-		/* Flush the buffer if it is line-buffered. */
-		if (self->if_flag & IO_LNBUF &&
-		    memchr(buf, '\n', part)) {
-			if (libc_fdoflush(self))
-				return 0;
-			/* With the buffer now empty, we must write more data to it. */
-			if (!size)
-				goto end;
-			buf = (byte_t *)buf + part;
-			goto buffer_write_more;
-		}
-		if (!size)
-			goto end;
-		buf = (byte_t *)buf + part;
-	}
-	assert(!self->if_cnt);
-	assert(self->if_ptr == self->if_base + self->if_bufsiz);
-
-	/* Use direct I/O for anything that doesn't fit into the buffer. */
-part_again:
-	if (self->if_flag & IO_USERBUF) {
-		if (!self->if_bufsiz)
-			part = size;
-		else {
-			part = (size / self->if_bufsiz) * self->if_bufsiz;
-		}
-	} else {
-		part = (size / IOBUF_MAX) * IOBUF_MAX;
-	}
-	/* Special case: if the last part contains line-feeds in a
-	 *               line-buffered file, use direct I/O for that part as well. */
-	if (self->if_flag & IO_LNBUF &&
-	    memchr((byte_t *)buf + part, '\n', size - part))
-		part = size;
-	if (part) {
-		/* Flush the buffer before performing direct I/O to preserve write order. */
-		if (libc_fdoflush(self))
-			return 0;
-		assert(part <= size);
-		temp = write(self->if_fd, buf, part);
-		if (temp <= 0)
-			goto err_or_eof;
-		assert((size_t)temp <= part);
-		self->if_exdata->io_pos += (size_t)temp;
-		result += (size_t)temp;
-		size -= (size_t)temp;
-		if (!size)
-			goto end;
-		buf = (byte_t *)buf + temp;
-		if ((size_t)temp < part)
-			goto part_again;
-	}
-	/* Write the remainder to the buffer.
-	 * NOTE: we've already confirmed that it doesn't contain a line-feed. */
-	assert(!(self->if_flag & IO_R));
-	assert(!(self->if_flag & IO_LNBUF) || !memchr(buf, '\n', size));
-	buffer = self->if_base;
-	if (!(self->if_flag & IO_USERBUF)) {
-		if (libc_fdoflush(self))
-			return 0;
-		/* Make sure the buffer is of sufficient size. */
-		minsize = CEIL_ALIGN(size, IOBUF_MIN);
-		if (minsize > self->if_bufsiz) {
-			buffer = (unsigned char *)realloc(buffer, minsize);
-			if unlikely(!buffer)
-				goto direct_io;
-			self->if_base   = buffer;
-			self->if_bufsiz = minsize;
-			self->if_flag |= IO_MALLBUF;
-		} else if ((self->if_bufsiz - minsize) >=
-		           IOBUF_RELOCATE_THRESHOLD) {
-			/* Try to free unused data. */
-			assert(self->if_flag & IO_MALLBUF);
-			buffer = (unsigned char *)realloc(buffer, minsize);
-			if unlikely(!buffer) {
-				buffer = self->if_base;
-				goto fill_buffer;
+LOCAL ATTR_SECTION(".text.crt.FILE.core.write.file_system_writeall_vt")
+NONNULL((1)) ssize_t LIBCCALL file_system_writeall_vt(FILE *__restrict self,
+                                                      void const *buf, size_t num_bytes) {
+	ssize_t result, temp;
+	struct iofile_data *ex;
+	ex = self->if_exdata;
+	result = (*ex->io_vtab.write)(ex->io_magi, (char const *)buf, num_bytes);
+	if (result > 0 && (size_t)result < num_bytes) {
+		/* Keep on writing */
+		for (;;) {
+			temp = (*ex->io_vtab.write)(ex->io_magi,
+			                            (char const *)((byte_t *)buf + (size_t)result),
+			                            num_bytes - (size_t)result);
+			if (temp <= 0) {
+				result = temp;
+				break;
 			}
-			self->if_base   = buffer;
-			self->if_bufsiz = minsize;
+			result += temp;
+			if ((size_t)result >= num_bytes)
+				break;
 		}
 	}
-fill_buffer:
-	assert(size != 0);
-	assert(size <= self->if_bufsiz);
-	assert(buffer == self->if_base);
-	memcpy(buffer, buf, size);
-	self->if_ptr = buffer + size;
-	assert(!self->if_cnt);
-	result += size;
-	libc_fmarkchanged(self);
-end:
 	return result;
-direct_io:
-	/* Read the remainder using direct I/O. */
-	temp = write(self->if_fd, buf, size);
-	if (temp <= 0)
-		goto err_or_eof;
-	result                  += temp;
-	self->if_exdata->io_pos += temp;
-	if ((size_t)temp < size) {
-		size -= (size_t)temp;
-		buf = (byte_t *)buf + (size_t)temp;
-		goto direct_io;
-	}
-	goto end;
-err_or_eof:
-	if (temp == 0) {
-		self->if_flag |= IO_EOF;
+}
+
+PRIVATE ATTR_SECTION(".text.crt.FILE.core.write.file_system_writeall")
+NONNULL((1)) ssize_t LIBCCALL file_system_writeall(FILE *__restrict self,
+                                                   void const *buf, size_t num_bytes) {
+	ssize_t result;
+	if (self->if_flag & IO_HASVTAB) {
+		result = file_system_writeall_vt(self, buf, num_bytes);
 	} else {
-		self->if_flag |= IO_ERR;
+		result = writeall(self->if_fd, buf, num_bytes);
 	}
-	return 0;
-}
-
-INTERN pos64_t LIBCCALL
-libc_fdotell(FILE *__restrict self) {
-	pos64_t result = self->if_exdata->io_pos;
-	if (self->if_flag & IO_R)
-		result -= self->if_exdata->io_read;
-	result += (size_t)(self->if_ptr - self->if_base);
 	return result;
 }
 
-INTERN int LIBCCALL
-libc_fdoseek(FILE *__restrict self, off64_t off, int whence) {
-	off64_t new_pos;
-	if ((whence == SEEK_SET || whence == SEEK_CUR) &&
-	    off <= (ssize_t)(((size_t)-1) / 2)) {
-		uintptr_t new_ptr;
-		off64_t seek_offset = off;
-		/* Special optimizations for seeking in-buffer. */
-		if (whence == SEEK_SET)
-			seek_offset = (off64_t)((pos64_t)off - libc_fdotell(self));
-		if (!__builtin_add_overflow((uintptr_t)self->if_ptr,
-		                            (uintptr_t)seek_offset,
-		                            &new_ptr) &&
-#if __SIZEOF_KERNEL_OFF_T__ > __SIZEOF_POINTER__
-		    seek_offset < (off64_t)(uintptr_t)-1 &&
-#endif
-		    (uintptr_t)new_ptr >= (uintptr_t)self->if_base &&
-		    (uintptr_t)new_ptr < (uintptr_t)self->if_ptr + self->if_cnt) {
-			/* All right! - Successful seek within the currently loaded buffer. */
-			self->if_ptr = (unsigned char *)new_ptr;
-			self->if_cnt += ((uintptr_t)self->if_ptr -
-			                 (uintptr_t)new_ptr);
-			return 0;
+/* Low-level file seek operation. */
+PRIVATE ATTR_SECTION(".text.crt.FILE.core.seek.file_system_seek")
+NONNULL((1)) off64_t LIBCCALL file_system_seek(FILE *__restrict self,
+                                               off64_t offset, int whence) {
+	off64_t result;
+	if (self->if_flag & IO_HASVTAB) {
+		struct iofile_data *ex;
+		ex     = self->if_exdata;
+		result = offset;
+		if ((*ex->io_vtab.seek)(ex->io_magi, &result, whence))
+			result = -1;
+	} else {
+		result = lseek64(self->if_fd, offset, whence);
+	}
+	return result;
+}
+
+/* Low-level file close operation. */
+PRIVATE ATTR_SECTION(".text.crt.FILE.core.utility.file_system_close")
+NONNULL((1)) int LIBCCALL file_system_close(FILE *__restrict self) {
+	int result;
+	if (self->if_flag & IO_HASVTAB) {
+		struct iofile_data *ex;
+		ex     = self->if_exdata;
+		result = (*ex->io_vtab.close)(ex->io_magi);
+	} else {
+		result = close(self->if_fd);
+	}
+	return result;
+}
+
+/* Low-level file sync operation. */
+PRIVATE ATTR_SECTION(".text.crt.FILE.core.write.file_system_sync")
+NONNULL((1)) int LIBCCALL file_system_sync(FILE *__restrict self) {
+	int result;
+	if (self->if_flag & IO_HASVTAB) {
+		result = 0; /* No-op */
+	} else {
+		result = fsync(self->if_fd);
+	}
+	return result;
+}
+
+/* Low-level file truncate operation. */
+PRIVATE ATTR_SECTION(".text.crt.FILE.core.write.file_system_sync")
+NONNULL((1)) int LIBCCALL file_system_trunc(FILE *__restrict self, pos64_t new_size) {
+	int result;
+	if (self->if_flag & IO_HASVTAB) {
+		/* Not allowed for VTABLE files. */
+		libc_seterrno(EPERM);
+		result = -1;
+	} else {
+		result = ftruncate64(self->if_fd, new_size);
+	}
+	return result;
+}
+
+/* Determine if `self' is a TTY */
+PRIVATE ATTR_SECTION(".text.crt.FILE.core.utility.file_determine_isatty")
+NONNULL((1)) void LIBCCALL file_determine_isatty(FILE *__restrict self) {
+	uint32_t flags = self->if_flag;
+	if (!(flags & (IO_NOTATTY | IO_ISATTY))) {
+		if (flags & IO_HASVTAB) {
+			flags |= IO_NOTATTY;
+		} else {
+			int is_a_tty;
+			is_a_tty = isatty(self->if_fd);
+			flags |= is_a_tty ? IO_ISATTY : IO_NOTATTY;
 		}
+		self->if_flag = flags;
 	}
-	/* Flush the currently active buffer. */
-	if (libc_fdoflush(self))
-		goto err;
-
-	if (whence == SEEK_CUR) {
-		/* Must adjust for the underlying descriptor position. */
-		if (self->if_flag & IO_R)
-			off -= self->if_exdata->io_read;
-		off += (size_t)(self->if_ptr - self->if_base);
+	if (flags & IO_LNIFTYY) {
+		self->if_flag &= ~IO_LNIFTYY;
+		/* Set the line-buffered flag if it is a TTY. */
+		if (flags & IO_ISATTY)
+			self->if_flag |= IO_LNBUF;
 	}
-
-	/* Mark the file buffer as empty. */
-	self->if_exdata->io_read = 0;
-	self->if_ptr             = self->if_base;
-	self->if_cnt             = 0;
-	self->if_flag &= ~(IO_R | IO_W);
-
-	/* Invoke the underlying stream descriptor. */
-	new_pos = lseek64(self->if_fd, off, whence);
-
-	/* Update the stored stream pointer. */
-	if (new_pos < 0)
-		self->if_flag |= IO_ERR;
-	else {
-		self->if_exdata->io_pos = (pos64_t)new_pos;
-	}
-	return 0;
-err:
-	return -1;
 }
 
 
-#define DOS_IOFBF 0x0000 /* Fully buffered. */
-#define DOS_IOLBF 0x0040 /* Line buffered. */
-#define DOS_IONBF 0x0004 /* No buffering. */
+PRIVATE ATTR_SECTION(".text.crt.FILE.core.utility.file_buffer_realloc") byte_t *LIBCCALL
+file_buffer_realloc(FILE *__restrict self, size_t new_size) {
+	if (!(self->if_flag & IO_MALLBUF))
+		return (byte_t *)malloc(new_size);
+	assert(!(self->if_flag & IO_READING));
+	return (byte_t *)realloc(self->if_base, new_size);
+}
 
 
-INTERN int LIBCCALL
-libc_dosetvbuf(FILE *__restrict self, char *__restrict buf, int modes, size_t n) {
-	/* Start out by flushing everything. */
-	if (libc_fdoflush(self))
-		return -1;
-
-	/* Mark the file buffer as empty and delete special flags. */
-	self->if_exdata->io_read = 0;
-	self->if_ptr             = self->if_base;
-	self->if_cnt             = 0;
-	self->if_flag &= ~(IO_R | IO_W | IO_LNBUF | IO_LNIFTYY);
-
-	if (modes == _IONBF || modes == DOS_IONBF) {
-		/* Don't use any buffer. */
+/* Change the operations mode of a given buffer. */
+PRIVATE ATTR_SECTION(".text.crt.FILE.core.utility.file_setmode")
+WUNUSED NONNULL((1)) int LIBCCALL file_setmode(FILE *__restrict self,
+                                               void *buf, int mode, size_t size) {
+	/* Convert DOS names. */
+	if unlikely(mode == 0x0040)
+		mode = _IOLBF;
+	if unlikely(mode == 0x0004)
+		mode = _IONBF;
+	/* Translate buffer mode into file flags. */
+	if (mode == _IONBF)
+		mode = IO_NODYNSCALE;
+	else if (mode == _IOFBF)
+		mode = 0;
+	else {
+		mode = IO_LNBUF;
+	}
+	/* Set new file flags. */
+	self->if_flag &= ~(IO_NODYNSCALE | IO_LNBUF | IO_LNIFTYY);
+	self->if_flag |= mode;
+	self->if_exdata->io_chsz = 0;
+	if (!size) {
+		if (!(self->if_flag & IO_NODYNSCALE)) {
+			if (self->if_flag & IO_READING)
+				goto err_cannot_resize;
+			/* Resize-to-zero. */
+			if (self->if_flag & IO_MALLBUF)
+				free(self->if_base);
+			self->if_ptr    = (uint8_t *)NULL + (self->if_ptr - self->if_base);
+			self->if_cnt    = 0;
+			self->if_bufsiz = 0;
+			self->if_base   = NULL;
+		} else {
+			/* Dynamically scaled buffer. */
+		}
+	} else if (buf != NULL) {
+		size_t bufoff;
+		if (buf == self->if_base &&
+		    size == self->if_bufsiz)
+			goto done; /* Unchanged. */
+		/* User-defined buffer. */
+		if (self->if_flag & IO_READING)
+			goto err_cannot_resize;
+		/* Check how we should update the base-pointer. */
+		bufoff = (size_t)(self->if_ptr - self->if_base);
+		if (bufoff >= size) {
+			/* Clear the available-buffer now that
+			 * it has been truncated to ZERO(0). */
+			self->if_cnt = 0;
+		} else {
+			size_t minsiz = (size_t)((self->if_base + size) - self->if_ptr);
+			/* Truncate the available-buffer. */
+			if (self->if_cnt > minsiz)
+				self->if_cnt = minsiz;
+			/* Copy data into the new buffer. */
+			memcpy(buf, self->if_base, self->if_cnt);
+		}
 		if (self->if_flag & IO_MALLBUF)
 			free(self->if_base);
-		self->if_bufsiz = 0;
-		self->if_ptr    = NULL;
-		self->if_base   = NULL;
-		return 0;
-	}
-
-	if (modes == _IOLBF || modes == DOS_IOLBF) {
-		self->if_flag |= IO_LNBUF;
-		/* Passing ZERO(0) for 'n' here causes the previous buffer to be kept. */
-		if (!n)
-			return 0;
-	} else if (modes != _IOFBF
-#if DOS_IOFBF != _IOFBF
-	           && modes != DOS_IOFBF
-#endif
-	           ) {
-inval:
-		return (int)libc_seterrno(EINVAL);
-	}
-
-	/* Allocate/use the given buffer. */
-	if (n < 2)
-		goto inval;
-#if __SIZEOF_SIZE_T__ > 4
-	if (n > (u32)-1 && n != (size_t)-1)
-		goto inval;
-#endif
-	if (!buf) {
-		/* Dynamically allocate a buffer. */
-		if (self->if_flag & IO_MALLBUF) {
-			/* (re-)allocate an existing buffer. */
-			buf = (char *)self->if_base;
-			/* Make sure the buffer's size has actually changed.
-			 * NOTE: As an extension, we accept `(size_t)-1' to keep the old buffer size. */
-			if (n == (size_t)-1)
-				n = (size_t)self->if_bufsiz;
-			else if ((size_t)self->if_bufsiz != n) {
-				buf = (char *)realloc(buf, n);
-				if unlikely(!buf)
-					return -1;
-			}
+		/* Relocate pointers. */
+		self->if_ptr    = (byte_t *)buf + (self->if_ptr - self->if_base);
+		self->if_base   = (byte_t *)buf;
+		self->if_bufsiz = size;
+	} else if (size != self->if_bufsiz) {
+		size_t bufoff;
+		byte_t *new_buffer;
+		if (self->if_flag & IO_READING)
+			goto err_cannot_resize;
+		new_buffer = file_buffer_realloc(self, size);
+		if unlikely(!new_buffer)
+			goto err;
+		/* Figure out where pointers are located at and update them. */
+		bufoff = (size_t)(self->if_ptr - self->if_base);
+		if (bufoff >= size) {
+			/* Clear the available-buffer now that
+			 * it has been truncated to ZERO(0). */
+			self->if_cnt = 0;
 		} else {
-			/* To go with the special behavior for (size_t)-1 above,
-			 * here that value indicates a max-length buffer as would be allocated regularly. */
-			if (n == (size_t)-1)
-				n = IOBUF_MAX;
-			buf = (char *)malloc(n);
-			if unlikely(!buf)
-				return -1;
-			self->if_flag |= IO_MALLBUF;
+			size_t minsiz = (size_t)((self->if_base + size) - self->if_ptr);
+			/* Truncate the available-buffer. */
+			if (self->if_cnt > minsiz)
+				self->if_cnt = minsiz;
 		}
-	} else {
-		/* Mark the buffer as being fixed-length, thus preventing it from being re-allocated. */
-		self->if_flag |= IO_USERBUF;
-	}
-
-	/* Install the given buffer. */
-	self->if_ptr    = (unsigned char *)buf;
-	self->if_base   = (unsigned char *)buf;
-	self->if_bufsiz = (u32)n;
-
-	return 0;
-}
-
-INTERN int LIBCCALL libc_doungetc(int c, FILE *__restrict self) {
-	pos_t buffer_start;
-	if (self->if_ptr != self->if_base) {
-		/* Simple case: we're not at the start of the buffer. */
-		if (self->if_flag & IO_R &&
-		    self->if_ptr[-1] != (char)c)
-			libc_fmarkchanged(self);
-		*--self->if_ptr = (char)c;
-		++self->if_cnt;
-		return c;
-	}
-	/* Make sure we're not going too far back. */
-	buffer_start = self->if_exdata->io_pos;
-	if (self->if_flag & IO_R)
-		buffer_start -= self->if_exdata->io_read;
-	if (!buffer_start)
-		return EOF;
-
-	/* This is where it gets complicated... */
-	assert(self->if_ptr == self->if_base);
-	assert(self->if_cnt <= self->if_bufsiz);
-	if (self->if_cnt != self->if_bufsiz) {
-insert_front:
-		/* We can shift the entire buffer. */
-		assert(self->if_exdata->io_read <= self->if_bufsiz);
-		memmove(self->if_base + 1, self->if_base,
-		        self->if_exdata->io_read);
-		/* Update the file to make it look like it was read
-		 * one byte before where it was really read at. */
-		--self->if_exdata->io_pos;
-		++self->if_exdata->io_read;
-		++self->if_cnt;
-	} else {
-		unsigned char *new_buffer;
-		size_t new_size;
-		if (self->if_flag & IO_USERBUF)
-			return -1;
-		/* If the current buffer isn't user-given, we can simply allocate more. */
-		new_size = CEIL_ALIGN(self->if_bufsiz + 1, IOBUF_MIN);
-#if __SIZEOF_SIZE_T__ > 4
-		if
-			unlikely(new_size > (size_t)(u32)-1)
-		return -1;
-#endif
-realloc_again:
-		new_buffer = (unsigned char *)realloc(self->if_base, new_size);
-		if (!new_buffer) {
-			if (new_size != self->if_bufsiz + 1) {
-				new_size = self->if_bufsiz + 1;
-				goto realloc_again;
-			}
-			return -1;
-		}
-		/* Update buffer points. */
-		self->if_ptr    = new_buffer;
+		/* Relocate pointers. */
+		self->if_ptr    = new_buffer + (self->if_ptr - self->if_base);
 		self->if_base   = new_buffer;
-		self->if_bufsiz = new_size;
-		assert(self->if_cnt < self->if_bufsiz);
-		goto insert_front;
+		self->if_bufsiz = size;
+		self->if_flag  |= IO_MALLBUF;
 	}
-
-	*self->if_base = (char)c;
-	if (self->if_flag & IO_R)
-		self->if_flag |= IO_R;
-	return c;
+	self->if_exdata->io_chng = self->if_base;
+done:
+	return 0;
+err_cannot_resize:
+	/* This can happen if the function is called from a FILE cookie. */
+	libc_seterrno(EWOULDBLOCK);
+err:
+	return -1;
 }
 
-INTERN void LIBCCALL libc_flushall_nostd(void) {
-	FILE *iter;
-	atomic_rwlock_read(&libc_ffiles_lock);
-	LLIST_FOREACH(iter, libc_ffiles, if_exdata->io_link) {
-		file_write(iter);
-		libc_fdoflush(iter);
-		file_endwrite(iter);
+PRIVATE ATTR_SECTION(".text.crt.FILE.core.write.file_sync")
+int LIBCCALL file_sync(FILE *__restrict self) {
+	pos64_t abs_chngpos;
+	size_t changed_size;
+	ssize_t temp;
+	uint32_t old_flags;
+	struct iofile_data *ex;
+	assert(self);
+	ex = self->if_exdata;
+	assert(ex);
+again:
+	changed_size = ex->io_chsz;
+	if (!changed_size)
+		goto done;
+	abs_chngpos = ex->io_fblk;
+	abs_chngpos += (ex->io_chng - self->if_base);
+	if (abs_chngpos != ex->io_fpos) {
+		off64_t new_pos;
+		/* Seek to the position where we need to change stuff. */
+		new_pos = file_system_seek(self, (off64_t)abs_chngpos, SEEK_SET);
+		if unlikely(new_pos == (off64_t)-1)
+			goto err;
+		ex->io_fpos = (pos64_t)new_pos;
+		/* Since the buffer may have changed, we need to start over. */
+		goto again;
 	}
-	atomic_rwlock_endread(&libc_ffiles_lock);
+	/* Write all changed data. */
+	old_flags = self->if_flag;
+	self->if_flag |= IO_READING;
+	COMPILER_BARRIER();
+	temp = file_system_writeall(self,
+	                            ex->io_chng,
+	                            changed_size);
+	COMPILER_BARRIER();
+	self->if_flag &= ~IO_READING;
+	self->if_flag |= old_flags & IO_READING;
+	if unlikely(temp < 0)
+		goto err;
+	if (changed_size == ex->io_chsz &&
+	    abs_chngpos == ex->io_fblk + (ex->io_chng - self->if_base)) {
+		/* Data was synchronized. */
+		ex->io_chsz = 0;
+		ex->io_fpos += changed_size;
+		self->if_ptr = ex->io_chng + changed_size;
+
+		/* Remove the file from the chain of changed, line-buffered files. */
+		changed_linebuffered_remove(self);
+
+		/* Also synchronize the underlying file. */
+		if (self->if_flag & IO_FSYNC) {
+			int error;
+			error = file_system_sync(self);
+			if (error != 0)
+				return error;
+		}
+	}
+done:
+	return 0;
+err:
+	self->if_flag |= IO_ERR;
+	return -1;
 }
 
-INTERN void LIBCCALL libc_flushall_nostd_unlocked(void) {
-	FILE *iter;
-	LLIST_FOREACH(iter, libc_ffiles, if_exdata->io_link) {
-		libc_fdoflush(iter);
-	}
-}
-
-PRIVATE void LIBCCALL
-libc_flushstdstream(FILE *self) {
-	if (!self)
-		return;
+PRIVATE ATTR_SECTION(".text.crt.FILE.locked.write.utility.file_sync_locked")
+int LIBCCALL file_sync_locked(FILE *__restrict self) {
+	int result;
 	file_write(self);
-	libc_fdoflush(self);
+	result = file_sync(self);
 	file_endwrite(self);
+	return result;
 }
 
-PRIVATE void LIBCCALL
-libc_flushstdstream_unlocked(FILE *self) {
-	if (!self)
+LOCAL ATTR_SECTION(".text.crt.FILE.core.utility.file_tryincref")
+WUNUSED bool LIBCCALL file_tryincref(FILE *__restrict self) {
+	refcnt_t refcnt;
+	struct iofile_data *ex;
+	assert(self);
+	ex = self->if_exdata;
+	assert(ex);
+	do {
+		refcnt = ATOMIC_READ(ex->io_refcnt);
+		if unlikely(refcnt == 0)
+			return false;
+	} while (!ATOMIC_CMPXCH_WEAK(ex->io_refcnt, refcnt, refcnt + 1));
+	return true;
+}
+
+LOCAL ATTR_SECTION(".text.crt.FILE.core.utility.file_incref")
+void LIBCCALL file_incref(FILE *__restrict self) {
+#ifdef NDEBUG
+	struct iofile_data *ex;
+	assert(self);
+	ex = self->if_exdata;
+	assert(ex);
+	ATOMIC_FETCHINC(ex->io_refcnt);
+#else /* NDEBUG */
+	bool ok;
+	ok = file_tryincref(self);
+	assert(ok);
+#endif /* !NDEBUG */
+}
+
+PRIVATE ATTR_SECTION(".text.crt.FILE.core.utility.file_decref")
+void LIBCCALL file_decref(FILE *__restrict self) {
+	refcnt_t refcnt;
+	struct iofile_data *ex;
+	assert(self);
+	ex = self->if_exdata;
+	assert(ex);
+	refcnt = ATOMIC_FETCHDEC(ex->io_refcnt);
+	assert(refcnt != 0);
+	if (refcnt == 1) {
+		/* Last reference -> This file has to go away! */
+		assert(!(self >= std_files &&
+		         self < COMPILER_ENDOF(std_files)));
+		assert(!(ex >= std_files_io &&
+		         ex < COMPILER_ENDOF(std_files_io)));
+		assert(!atomic_owner_rwlock_reading(&ex->io_lock));
+		assert(!(self->if_flag & IO_READING));
+		if (ex->io_chsz != 0) {
+			/* The file still contains some changed data.
+			 * -> Try to flush data data. */
+			atomic_owner_rwlock_init_read(&ex->io_lock);
+			ATOMIC_WRITE(ex->io_refcnt, 1);
+			/* NOTE: Errors during this sync are ignored! */
+			file_sync(self);
+			atomic_owner_rwlock_endread(&ex->io_lock);
+			refcnt = ATOMIC_FETCHDEC(ex->io_refcnt);
+			assert(refcnt != 0);
+			if (refcnt != 1)
+				return; /* The file was revived. */
+		}
+		assert(!atomic_owner_rwlock_reading(&ex->io_lock));
+		assert(!(self->if_flag & IO_READING));
+		/* Close the underlying file. */
+		if (self->if_flag & IO_HASVTAB) {
+			errno_t saved_errno;
+			/* In this case, we have to be careful in case the file gets revived. */
+			atomic_owner_rwlock_init_read(&ex->io_lock);
+			ATOMIC_WRITE(ex->io_refcnt, 1);
+			saved_errno = libc_geterrno_safe();
+			/* NOTE: Errors during this close are ignored! */
+			(*ex->io_vtab.close)(ex->io_magi);
+			libc_seterrno(saved_errno);
+			atomic_owner_rwlock_endread(&ex->io_lock);
+			refcnt = ATOMIC_FETCHDEC(ex->io_refcnt);
+			assert(refcnt != 0);
+			if (refcnt != 1)
+				return; /* The file was revived. */
+		} else {
+			sys_close(self->if_fd);
+		}
+		assert(!atomic_owner_rwlock_reading(&ex->io_lock));
+		assert(!(self->if_flag & IO_READING));
+		/* Make sure that the file is no longer accessible through the global file lists. */
+		if (LLIST_ISBOUND(self, if_exdata->io_lnch))
+			changed_linebuffered_remove(self);
+		allfiles_remove(self);
+		/* Free a heap-allocated buffer. */
+		if (self->if_flag & IO_MALLBUF)
+			free(self->if_base);
+#if 1 /* This is always the case... */
+		assert(ex == (struct iofile_data *)(self + 1));
+#else
+		if (ex != (struct iofile_data *)(self + 1))
+			free(ex);
+#endif
+		free(self);
+	}
+}
+
+
+/* Synchronize unwritten data of all line-buffered files. */
+PRIVATE ATTR_SECTION(".text.crt.FILE.core.write.file_sync_lnfiles")
+void LIBCCALL file_sync_lnfiles(void) {
+	while (ATOMIC_READ(changed_linebuffered_files) != NULL) {
+		FILE *fp;
+		atomic_rwlock_write(&changed_linebuffered_files_lock);
+		fp = changed_linebuffered_files;
+		for (;;) {
+			if unlikely(!fp) {
+				atomic_rwlock_endwrite(&changed_linebuffered_files_lock);
+				goto done;
+			}
+			assert(LLIST_ISBOUND(fp, if_exdata->io_lnch));
+			if (file_tryincref(fp))
+				break;
+			fp = LLIST_NEXT(fp, if_exdata->io_lnch);
+		}
+		/* Remove the file from the chain of changed line-buffered files. */
+		assert(LLIST_ISBOUND(fp, if_exdata->io_lnch));
+		LLIST_REMOVE(fp, if_exdata->io_lnch);
+		LLIST_UNBIND(fp, if_exdata->io_lnch);
+		atomic_rwlock_endwrite(&changed_linebuffered_files_lock);
+		/* Synchronize this buffer. */
+		file_write(fp);
+		file_sync(fp);
+		file_endwrite(fp);
+		file_decref(fp);
+	}
+done:
+	;
+}
+
+PRIVATE ATTR_SECTION(".text.crt.FILE.locked.write.utility.file_do_syncall_locked")
+void LIBCCALL file_do_syncall_locked(uintptr_t version) {
+	for (;;) {
+		FILE *fp, *next_fp;
+		atomic_rwlock_read(&all_files_lock);
+		fp = all_files;
+		while (fp &&
+		       fp->if_exdata->io_fver == version &&
+		       !file_tryincref(fp))
+			fp = LLIST_NEXT(fp, if_exdata->io_link);
+		atomic_rwlock_endread(&all_files_lock);
+		if (!fp)
+			break;
+do_flush_fp:
+		file_write(fp);
+		fp->if_exdata->io_fver = version;
+		file_sync(fp);
+		file_endwrite(fp);
+		atomic_rwlock_read(&all_files_lock);
+		next_fp = LLIST_NEXT(fp, if_exdata->io_link);
+		while (next_fp &&
+		       next_fp->if_exdata->io_fver == version &&
+		       !file_tryincref(next_fp))
+			next_fp = LLIST_NEXT(next_fp, if_exdata->io_link);
+		atomic_rwlock_endread(&all_files_lock);
+		file_decref(fp);
+		if (!next_fp)
+			continue; /* Do another full scan for changed files. */
+		fp = next_fp;
+		goto do_flush_fp;
+	}
+}
+
+PRIVATE ATTR_SECTION(".text.crt.FILE.unlocked.write.utility.file_do_syncall_unlocked")
+void LIBCCALL file_do_syncall_unlocked(uintptr_t version) {
+	for (;;) {
+		FILE *fp, *next_fp;
+		atomic_rwlock_read(&all_files_lock);
+		fp = all_files;
+		while (fp &&
+		       fp->if_exdata->io_fver == version &&
+		       !file_tryincref(fp))
+			fp = LLIST_NEXT(fp, if_exdata->io_link);
+		atomic_rwlock_endread(&all_files_lock);
+		if (!fp)
+			break;
+do_flush_fp:
+		fp->if_exdata->io_fver = version;
+		file_sync(fp);
+		atomic_rwlock_read(&all_files_lock);
+		next_fp = LLIST_NEXT(fp, if_exdata->io_link);
+		while (next_fp &&
+		       next_fp->if_exdata->io_fver == version &&
+		       !file_tryincref(next_fp))
+			next_fp = LLIST_NEXT(next_fp, if_exdata->io_link);
+		atomic_rwlock_endread(&all_files_lock);
+		file_decref(fp);
+		if (!next_fp)
+			continue; /* Do another full scan for changed files. */
+		fp = next_fp;
+		goto do_flush_fp;
+	}
+}
+
+
+PRIVATE ATTR_SECTION(".bss.crt.FILE.core.write.flushall_lock")
+struct atomic_owner_rwlock flushall_lock = ATOMIC_OWNER_RWLOCK_INIT;
+PRIVATE ATTR_SECTION(".bss.crt.FILE.core.write.flushall_version")
+uintptr_t flushall_version = 0;
+PRIVATE ATTR_SECTION(".bss.crt.FILE.core.write.flushall_must_restart")
+bool flushall_must_restart = false;
+
+PRIVATE ATTR_SECTION(".text.crt.FILE.locked.write.utility.file_syncall_locked")
+void LIBCCALL file_syncall_locked(void) {
+	/* Check for recursion (as is possible due to file cookies) */
+	if (atomic_owner_rwlock_writing(&flushall_lock)) {
+		/* Don't allow recursion, but solve the problem by re-starting the flush operation. */
+		flushall_must_restart = true;
 		return;
-	libc_fdoflush(self);
+	}
+	atomic_owner_rwlock_write(&flushall_lock);
+	do {
+		flushall_must_restart = false;
+		file_do_syncall_locked(flushall_version++);
+	} while (flushall_must_restart);
+	atomic_owner_rwlock_endwrite(&flushall_lock);
+}
+
+PRIVATE ATTR_SECTION(".text.crt.FILE.unlocked.write.utility.file_syncall_unlocked")
+void LIBCCALL file_syncall_unlocked(void) {
+	/* Check for recursion (as is possible due to file cookies) */
+	if (atomic_owner_rwlock_writing(&flushall_lock)) {
+		/* Don't allow recursion, but solve the problem by re-starting the flush operation. */
+		flushall_must_restart = true;
+		return;
+	}
+	atomic_owner_rwlock_write(&flushall_lock);
+	do {
+		flushall_must_restart = false;
+		file_do_syncall_unlocked(flushall_version++);
+	} while (flushall_must_restart);
+	atomic_owner_rwlock_endwrite(&flushall_lock);
 }
 
 
-#undef flushall
-#undef _flushall
-#undef libc__flushall
+/* High-level, common read-from-file function. */
+PRIVATE ATTR_SECTION(".text.crt.FILE.core.read.file_readdata")
+NONNULL((1)) size_t LIBCCALL file_readdata(FILE *__restrict self,
+                                           void *buf, size_t num_bytes) {
+	ssize_t read_size;
+	size_t result = 0;
+	size_t bufavail;
+	uint32_t old_flags;
+	pos64_t next_data;
+	uint8_t *new_buffer;
+	bool did_read_data = false;
+	struct iofile_data *ex;
+	assert(self);
+	ex = self->if_exdata;
+	assert(ex);
+again:
+	bufavail = self->if_cnt;
+	if likely(bufavail) {
+read_from_buffer:
+		if (bufavail > num_bytes)
+			bufavail = num_bytes;
+		memcpy(buf, self->if_ptr, bufavail);
+		/* Update buf pointers. */
+		self->if_cnt -= bufavail;
+		self->if_ptr += bufavail;
+		result += bufavail;
+		num_bytes -= bufavail;
+		if (!num_bytes)
+			goto done_noeof;
+		/* Make sure that we only invoke read() on the underlying
+		 * file once, so-as to ensure that we don't start blocking
+		 * because the underlying file is pipe-like and now empty,
+		 * before the caller got a chance to process the data that
+		 * we _did_ manage to extract! */
+		if (did_read_data)
+			goto done;
+		buf = (byte_t *)buf + bufavail;
+	}
+	/* The buf is empty and must be re-filled. */
+	/* First off: Flush any changes that had been made. */
+	COMPILER_BARRIER();
+	if (file_sync(self))
+		goto err;
+	if (self->if_flag & IO_LNIFTYY)
+		file_determine_isatty(self);
+	COMPILER_BARRIER();
+	ex->io_chng = self->if_base;
+	ex->io_chsz = 0;
+	/* Unlikely: But can happen due to recursive callbacks. */
+	if unlikely(self->if_cnt)
+		goto read_from_buffer;
 
-DEFINE_PUBLIC_ALIAS(_flushall, libc_doflushall);
-DEFINE_PUBLIC_ALIAS(flushall, libc_doflushall);
-DEFINE_INTERN_ALIAS(libc__flushall, libc_doflushall);
-INTERN int LIBCCALL libc_doflushall(void) {
-	libc_flushstdstream(stdin);
-	libc_flushstdstream(stdout);
-	libc_flushstdstream(stderr);
-	/* Finally, flush all non-standard streams. */
-	libc_flushall_nostd();
+	/* If we're a TTY buf, flush all other TTY buffers before reading. */
+	if (self->if_flag & IO_LNBUF) {
+		COMPILER_BARRIER();
+		file_sync_lnfiles();
+		COMPILER_BARRIER();
+		if unlikely(self->if_cnt)
+			goto read_from_buffer;
+		ex->io_chng = self->if_base;
+		ex->io_chsz = 0;
+	}
+
+	/* Determine where the next block of data is. */
+	next_data = ex->io_fblk + (self->if_ptr - self->if_base);
+
+	/* If no buf had been allocated, allocate one now. */
+	if unlikely(!self->if_bufsiz) {
+		/* Start out with the smallest size. */
+		size_t initial_bufsize;
+		if unlikely(self->if_flag & IO_NODYNSCALE) {
+			/* Dynamic scaling is disabled. Must forward the read() to the underlying file. */
+read_through:
+			if (next_data != ex->io_fpos) {
+				/* Seek in the underlying file to get where we need to go. */
+				off64_t new_pos;
+				COMPILER_BARRIER();
+				new_pos = file_system_seek(self, (off64_t)next_data, SEEK_SET);
+				COMPILER_BARRIER();
+				if unlikely(new_pos < 0)
+					goto err;
+				ex->io_fpos = next_data;
+				goto again; /* Must start over because of recursive callbacks. */
+			}
+			COMPILER_BARRIER();
+			read_size = file_system_read(self, buf, num_bytes);
+			COMPILER_BARRIER();
+			if unlikely(read_size < 0)
+				goto err;
+			ex->io_fpos = next_data + num_bytes;
+			result += (size_t)read_size;
+			num_bytes -= (size_t)read_size;
+			goto done;
+		}
+		if (num_bytes >= IOBUF_MAX)
+			goto read_through;
+		initial_bufsize = num_bytes;
+		if (initial_bufsize < IOBUF_MIN)
+			initial_bufsize = IOBUF_MIN;
+		new_buffer = file_buffer_realloc(self, initial_bufsize);
+		if unlikely(!new_buffer)
+			goto read_through;
+		self->if_base   = new_buffer;
+		self->if_bufsiz = initial_bufsize;
+		self->if_flag  |= IO_MALLBUF;
+	} else if (num_bytes >= self->if_bufsiz) {
+		/* The caller wants at least as much as this buf could even handle.
+		 * Upscale the buf, or use load data using read-through mode. */
+		if (self->if_flag & (IO_NODYNSCALE | IO_READING))
+			goto read_through;
+		if (num_bytes > IOBUF_MAX)
+			goto read_through;
+		/* Upscale the buf. */
+		new_buffer = file_buffer_realloc(self, num_bytes);
+		/* If the allocation failed, also use read-through mode. */
+		if unlikely(!new_buffer)
+			goto read_through;
+		self->if_base   = new_buffer;
+		self->if_bufsiz = num_bytes;
+		self->if_flag  |= IO_MALLBUF;
+	}
+
+	self->if_ptr = self->if_base;
+	ex->io_chng  = self->if_base;
+	ex->io_fblk  = next_data;
+	assert(self->if_cnt == 0);
+	assert(ex->io_chsz == 0);
+	assert(self->if_bufsiz != 0);
+	if (next_data != ex->io_fpos) {
+		/* Seek in the underlying file to get where we need to go. */
+		off64_t new_pos;
+		COMPILER_BARRIER();
+		new_pos = file_system_seek(self, (off64_t)next_data, SEEK_SET);
+		COMPILER_BARRIER();
+		if unlikely(new_pos < 0)
+			goto err;
+		ex->io_fpos = next_data;
+		goto again; /* Must start over because of recursive callbacks. */
+	}
+
+	/* Actually read the data. */
+	new_buffer = self->if_base;
+	old_flags  = self->if_flag;
+	self->if_flag |= IO_READING;
+	COMPILER_BARRIER();
+	read_size = file_system_read(self,
+	                             self->if_base,
+	                             self->if_bufsiz);
+	COMPILER_BARRIER();
+	self->if_flag &= ~IO_READING;
+	self->if_flag |= old_flags & IO_READING;
+	if unlikely(read_size < 0)
+		goto err;
+	if unlikely(read_size == 0)
+		goto done;
+	ex->io_fpos   = next_data + (size_t)read_size;
+	self->if_ptr  = self->if_base;
+	self->if_cnt  = (size_t)read_size;
+	did_read_data = true;
+	goto again;
+done:
+	if (num_bytes != 0)
+		self->if_flag |= IO_EOF;
+done_noeof:
+	return result;
+err:
+	self->if_flag |= IO_ERR;
 	return 0;
 }
 
 
 
+/* High-level, common write-to-file function. */
+PRIVATE ATTR_SECTION(".text.crt.FILE.core.write.file_writedata")
+NONNULL((1)) size_t LIBCCALL file_writedata(FILE *__restrict self,
+                                            void const *buf, size_t num_bytes) {
+	size_t result = 0;
+	size_t new_bufsize;
+	size_t bufavail;
+	uint8_t *new_buffer;
+	struct iofile_data *ex;
+	assert(self);
+	ex = self->if_exdata;
+	assert(ex);
+	/* Check to make sure that this file is writable. */
+	if (!(self->if_flag & IO_RW)) {
+		libc_seterrno(EPERM);
+		goto err;
+	}
+	if (self->if_flag & IO_LNIFTYY)
+		file_determine_isatty(self);
+again:
+	/* Fill available buf. */
+	bufavail = (self->if_base + self->if_bufsiz) - self->if_ptr;
+	if likely(bufavail) {
+		if (bufavail > num_bytes)
+			bufavail = num_bytes;
+		if unlikely(!bufavail)
+			goto done_noeof;
+		memcpy(self->if_ptr, buf, bufavail);
+		result += bufavail;
+		/* Update the changed file-area. */
+		if (!ex->io_chsz) {
+			ex->io_chng = self->if_ptr;
+			ex->io_chsz = bufavail;
+		} else {
+			if (ex->io_chng > self->if_ptr) {
+				ex->io_chsz += (size_t)(ex->io_chng - self->if_ptr);
+				ex->io_chng = self->if_ptr;
+			}
+			if (ex->io_chng + ex->io_chsz < self->if_ptr + bufavail)
+				ex->io_chsz = (size_t)((self->if_ptr + bufavail) - ex->io_chng);
+		}
+		/* If this is a line-buffered file, add it to the chain of changed ones. */
+		if (self->if_flag & IO_LNBUF)
+			changed_linebuffered_insert(self);
+
+		/* Update the file pointer. */
+		self->if_ptr += bufavail;
+		if (self->if_cnt >= bufavail)
+			self->if_cnt -= bufavail;
+		else {
+			self->if_cnt = 0;
+		}
+		/* When operating in line-buffered mode, check
+		 * if there was a linefeed in what we just wrote. */
+		if ((self->if_flag & IO_LNBUF) &&
+		    (memchr(buf, '\n', num_bytes) ||
+		     memchr(buf, '\r', num_bytes))) {
+			/* Flush all line-buffered files. */
+			file_sync_lnfiles();
+			/* Flush this file. */
+			COMPILER_BARRIER();
+			if ((self->if_flag & IO_ERR) || file_sync(self))
+				goto err0;
+			COMPILER_BARRIER();
+			num_bytes -= bufavail;
+			if (!num_bytes)
+				goto done;
+			buf = (byte_t *)buf + bufavail;
+			goto again;
+		}
+
+		num_bytes -= bufavail;
+		if (!num_bytes)
+			goto done;
+		buf = (byte_t *)buf + bufavail;
+	}
+	/* No more buf available.
+	 * Either we must flush the buf, or we must extend it. */
+	if (self->if_bufsiz >= IOBUF_MAX ||
+	    (self->if_flag & (IO_NODYNSCALE | IO_READING))) {
+		/* Buffer is too large or cannot be relocated.
+		 * >> Therefor, we must flush it, then try again. */
+		if (self->if_flag & IO_LNBUF)
+			file_sync_lnfiles();
+		COMPILER_BARRIER();
+		if ((self->if_flag & IO_ERR) || file_sync(self))
+			goto err0;
+		COMPILER_BARRIER();
+		ex->io_chng = self->if_base;
+		ex->io_chsz = 0;
+		/* Check for special case: If the buf is fixed to zero-length,
+		 *                         we must act as a write-through buf. */
+		if (!self->if_bufsiz) {
+			ssize_t temp;
+do_writethrough:
+			COMPILER_BARRIER();
+			temp = file_system_write(self, buf, num_bytes);
+			COMPILER_BARRIER();
+			if unlikely(temp < 0)
+				goto err;
+			result += (size_t)temp;
+			num_bytes -= (size_t)temp;
+			goto done;
+		}
+		/* If there is no more available buf to-be read,
+		 * reset the file pointer and change to the next chunk. */
+		if (!self->if_cnt) {
+			ex->io_fblk += (size_t)(self->if_ptr - self->if_base);
+			self->if_ptr = self->if_base;
+		}
+		goto again;
+	}
+
+	/* Extend the buf */
+	new_bufsize = self->if_bufsiz * 2;
+	if (new_bufsize < IOBUF_MIN)
+		new_bufsize = IOBUF_MIN;
+	new_buffer = file_buffer_realloc(self, new_bufsize);
+	if unlikely(!new_buffer) {
+		/* Buffer relocation failed. - sync() + operate in write-through mode as fallback. */
+		if (self->if_flag & IO_LNBUF)
+			file_sync_lnfiles();
+		COMPILER_BARRIER();
+		if ((self->if_flag & IO_ERR) || file_sync(self))
+			goto err0;
+		COMPILER_BARRIER();
+		ex->io_chng = self->if_base;
+		ex->io_chsz = 0;
+		goto do_writethrough;
+	}
+	/* Install the new buf. */
+	self->if_ptr    = new_buffer + (self->if_ptr - self->if_base);
+	ex->io_chng     = new_buffer + (ex->io_chng - self->if_base);
+	self->if_bufsiz = new_bufsize;
+	self->if_base   = new_buffer;
+	self->if_flag  |= IO_MALLBUF;
+	/* Go back and use the new buf. */
+	goto again;
+done:
+	if (num_bytes != 0)
+		self->if_flag |= IO_EOF;
+done_noeof:
+	return result;
+err:
+	self->if_flag |= IO_ERR;
+err0:
+	return 0;
+}
+
+PRIVATE ATTR_SECTION(".text.crt.FILE.core.write.file_writedata")
+NONNULL((1)) pos64_t LIBCCALL file_seek(FILE *__restrict self,
+                                        off64_t off, int whence) {
+	pos64_t result;
+	struct iofile_data *ex;
+	assert(self);
+	ex = self->if_exdata;
+	assert(ex);
+	self->if_flag &= ~IO_EOF;
+	if (whence == SEEK_SET || whence == SEEK_CUR) {
+		pos64_t old_abspos;
+		pos64_t new_abspos;
+		uint8_t *new_pos;
+		/* For these modes, we can calculate the new position,
+		 * allowing for in-buffer seek, as well as delayed seek. */
+		old_abspos = ex->io_fblk;
+		old_abspos += (self->if_ptr - self->if_base);
+		if (whence == SEEK_SET)
+			new_abspos = (pos64_t)off;
+		else {
+			/* Special case: position-query */
+			if (off == 0)
+				return old_abspos;
+			new_abspos = old_abspos + off;
+		}
+		if unlikely(new_abspos >= INT64_MAX) {
+			libc_seterrno(ERANGE);
+			goto err;
+		}
+		if (new_abspos < old_abspos)
+			goto full_seek;
+#if __SIZEOF_POINTER__ < 8
+		if ((new_abspos - old_abspos) >= SIZE_MAX)
+			goto full_seek;
+#endif /* __SIZEOF_POINTER__ < 8 */
+		/* Seek-ahead-in-buffer. */
+		new_pos = self->if_base + (size_t)(new_abspos - ex->io_fblk);
+#if __SIZEOF_POINTER__ < 8
+		if (new_pos < self->if_base)
+			goto full_seek;
+#endif /* __SIZEOF_POINTER__ < 8 */
+		/* Truncate the read buffer */
+		if (new_pos < self->if_ptr) {
+			/* Seek below the current pointer (but we don't
+			 * remember how much was actually read there, so
+			 * we simply truncate the buffer fully) */
+			self->if_cnt = 0;
+		} else {
+			size_t skipsz = (size_t)(new_pos - self->if_ptr);
+			if (self->if_cnt >= skipsz)
+				self->if_cnt -= skipsz;
+			else {
+				self->if_cnt = 0;
+			}
+		}
+		self->if_ptr = new_pos;
+		return new_abspos;
+	}
+full_seek:
+	if (self->if_flag & IO_LNIFTYY)
+		file_determine_isatty(self);
+	if (self->if_flag & IO_LNBUF)
+		file_sync_lnfiles();
+	/* Synchronize the buffer. */
+	COMPILER_BARRIER();
+	if ((self->if_flag & IO_ERR) || file_sync(self))
+		goto err0;
+	COMPILER_BARRIER();
+	ex->io_chng = self->if_base;
+	ex->io_chsz = 0;
+	COMPILER_BARRIER();
+
+	/* Do a full seek using the underlying file. */
+	result = (pos64_t)file_system_seek(self, off, whence);
+	if unlikely((off64_t)result < 0)
+		goto err;
+	COMPILER_BARRIER();
+
+	/* Clear the buffer and set the new file pointer. */
+	ex->io_fblk  = result;
+	ex->io_fpos  = result;
+	self->if_cnt = 0;
+	self->if_ptr = self->if_base;
+	ex->io_chng  = self->if_base;
+	ex->io_chsz  = 0;
+	return result;
+err:
+	self->if_flag |= IO_ERR;
+err0:
+	return (pos64_t)-1;
+}
 
 
+PRIVATE ATTR_SECTION(".text.crt.FILE.core.read.file_getc")
+WUNUSED NONNULL((1)) int LIBCCALL file_getc(FILE *__restrict self) {
+	uint8_t *new_buffer;
+	ssize_t read_size;
+	uint32_t old_flags;
+	int result;
+	pos64_t next_data;
+	struct iofile_data *ex;
+	assert(self);
+again:
+	if (self->if_cnt) {
+read_from_buffer:
+		/* Simple case: we can read from the active buffer. */
+		result = (int)(unsigned int)(unsigned char)*self->if_ptr++;
+		--self->if_cnt;
+		goto done;
+	}
+	ex = self->if_exdata;
+	assert(ex);
+	/* The buffer is empty and must be re-filled. */
+	/* First off: Flush any changes that had been made. */
+	COMPILER_BARRIER();
+	if (file_sync(self))
+		goto err0;
+	COMPILER_BARRIER();
+	ex->io_chng = self->if_base;
+	ex->io_chsz = 0;
+	/* Unlikely: But can happen due to recursive callbacks. */
+	if unlikely(self->if_cnt)
+		goto read_from_buffer;
 
+	/* If we're a TTY buffer, flush all other TTY buffers before reading. */
+	if (self->if_flag & IO_LNIFTYY)
+		file_determine_isatty(self);
+	if (self->if_flag & IO_LNBUF) {
+		COMPILER_BARRIER();
+		file_sync_lnfiles();
+		COMPILER_BARRIER();
+		if unlikely(self->if_cnt)
+			goto read_from_buffer;
+		ex->io_chng = self->if_base;
+		ex->io_chsz = 0;
+	}
+
+	/* Determine where the next block of data is. */
+	next_data = ex->io_fblk + (self->if_ptr - self->if_base);
+
+	/* If no buffer had been allocated, allocate one now. */
+	if unlikely(!self->if_bufsiz) {
+		if unlikely(self->if_flag & IO_NODYNSCALE) {
+			byte_t buf[1];
+			/* Dynamic scaling is disabled. Must forward the getc() to the underlying file. */
+read_through:
+			if (next_data != ex->io_fpos) {
+				/* Seek in the underlying file to get where we need to go. */
+				off64_t new_pos;
+				COMPILER_BARRIER();
+				new_pos = file_system_seek(self, (off64_t)next_data, SEEK_SET);
+				COMPILER_BARRIER();
+				if unlikely(new_pos < 0)
+					goto err;
+				ex->io_fpos = next_data;
+				goto again; /* Must start over because of recursive callbacks. */
+			}
+			COMPILER_BARRIER();
+			read_size = file_system_read(self, buf, 1);
+			COMPILER_BARRIER();
+			if unlikely(read_size < 0)
+				goto err;
+			if (!read_size) {
+				self->if_flag |= IO_EOF;
+				result = EOF;
+			} else {
+				result = (int)(unsigned int)(unsigned char)buf[0];
+				/* Set the file and block address. */
+				ex->io_fpos = next_data + 1;
+				ex->io_fblk = next_data + 1;
+			}
+			goto done;
+		}
+			/* Start out with the smallest size. */
+		new_buffer = file_buffer_realloc(self, IOBUF_MIN);
+		if unlikely(!new_buffer)
+			goto read_through;
+		self->if_base   = new_buffer;
+		self->if_bufsiz = IOBUF_MIN;
+	} else {
+		if (self->if_bufsiz < IOBUF_MIN &&
+		    !(self->if_flag & (IO_NODYNSCALE | IO_READING))) {
+			/* Upscale the buffer. */
+			new_buffer = file_buffer_realloc(self, IOBUF_MIN);
+			if unlikely(!new_buffer)
+				goto read_through;
+			self->if_base   = new_buffer;
+			self->if_bufsiz = IOBUF_MIN;
+			self->if_flag  |= IO_MALLBUF;
+		}
+	}
+
+	self->if_ptr = self->if_base;
+	ex->io_chng  = self->if_base;
+	ex->io_fblk  = next_data;
+	assert(self->if_cnt == 0);
+	assert(ex->io_chsz == 0);
+	assert(self->if_bufsiz != 0);
+	if (next_data != ex->io_fpos) {
+		/* Seek in the underlying file to get where we need to go. */
+		off64_t new_pos;
+		COMPILER_BARRIER();
+		new_pos = file_system_seek(self, (off64_t)next_data, SEEK_SET);
+		COMPILER_BARRIER();
+		if unlikely(new_pos < 0)
+			goto err;
+		ex->io_fpos = next_data;
+		goto again; /* Must start over because of recursive callbacks. */
+	}
+
+	/* Actually read the data. */
+	new_buffer = self->if_base;
+	old_flags  = self->if_flag;
+	self->if_flag |= IO_READING;
+	COMPILER_BARRIER();
+	read_size = file_system_read(self,
+	                             self->if_base,
+	                             self->if_bufsiz);
+	COMPILER_BARRIER();
+	self->if_flag &= ~IO_READING;
+	self->if_flag |= old_flags & IO_READING;
+	if unlikely(read_size < 0)
+		goto err;
+	if unlikely(self->if_cnt)
+		goto read_from_buffer;
+	if unlikely(ex->io_chsz)
+		goto again;
+	ex->io_fpos = next_data + (size_t)read_size;
+	/* Check for special case: EOF reached. */
+	if (!read_size) {
+		result = EOF;
+		self->if_flag |= IO_EOF;
+	} else {
+		self->if_cnt = read_size - 1;
+		self->if_ptr = self->if_base + 1;
+		result = (int)(unsigned int)(unsigned char)*self->if_base;
+	}
+done:
+	return result;
+err:
+	self->if_flag |= IO_ERR;
+err0:
+	result = EOF;
+	goto done;
+}
+
+PRIVATE ATTR_SECTION(".text.crt.FILE.core.read.file_ungetc")
+WUNUSED NONNULL((1)) int LIBCCALL file_ungetc(FILE *__restrict self, unsigned char ch) {
+	uint8_t *new_buffer;
+	size_t new_bufsize, inc_size;
+	struct iofile_data *ex;
+	assert(self);
+	/* Simple case: unget() the character. */
+	if (self->if_ptr != self->if_base)
+		goto unget_in_buffer;
+	/* The buffer is already full. - Try to resize it, then insert at the front. */
+	if (self->if_flag & IO_READING)
+		goto eof;
+	if (self->if_flag & IO_NODYNSCALE) {
+		/* Check for special case: Even when dynscale is disabled,
+		 * still allow for an unget buffer of at least a single byte. */
+		if (self->if_bufsiz != 0)
+			goto eof;
+	}
+	ex = self->if_exdata;
+	assert(ex);
+	/* If the current block cannot be further extended, that's an EOF. */
+	if (!ex->io_fblk)
+		goto eof;
+	inc_size = self->if_bufsiz;
+	/* Determine the minimum buffer size. */
+	if unlikely(!inc_size)
+		inc_size = (self->if_flag & IO_NODYNSCALE) ? 1 : IOBUF_MIN;
+	if ((pos64_t)inc_size > ex->io_fblk)
+		inc_size = (size_t)ex->io_fblk;
+	new_bufsize = self->if_bufsiz + inc_size;
+	new_buffer  = file_buffer_realloc(self, new_bufsize);
+	if unlikely(!new_buffer) {
+		inc_size    = 1;
+		new_bufsize = self->if_bufsiz + 1;
+		new_buffer  = file_buffer_realloc(self, new_bufsize);
+		if unlikely(!new_buffer)
+			goto err;
+	}
+	assert(new_bufsize > self->if_bufsiz);
+	/* Install the new buffer. */
+	self->if_ptr = new_buffer + (self->if_ptr - self->if_base) + inc_size;
+	if (ex->io_chsz)
+		ex->io_chng = new_buffer + (ex->io_chng - self->if_base) + inc_size;
+	ex->io_fblk -= inc_size;
+	self->if_base   = new_buffer;
+	self->if_bufsiz = new_bufsize;
+	self->if_flag  |= IO_MALLBUF;
+	assert(self->if_ptr != self->if_base);
+	/* Finally, insert the character into the buffer. */
+unget_in_buffer:
+	*--self->if_ptr = (uint8_t)(unsigned char)(unsigned int)ch;
+	++self->if_cnt;
+	return (int)(unsigned int)ch;
+eof:
+	self->if_flag |= IO_EOF;
+	return EOF;
+err:
+	self->if_flag |= IO_ERR;
+	return EOF;
+}
+
+
+#if 0 /* TODO: Add an extension the likes of `fftruncate()' / `fftruncate64()' */
+PRIVATE ATTR_SECTION(".text.crt.FILE.core.write.file_truncate")
+WUNUSED NONNULL((1)) int LIBCCALL file_truncate(FILE *__restrict self,
+                                                pos64_t new_size) {
+	pos64_t abs_pos, abs_end;
+	struct iofile_data *ex;
+	assert(self);
+	/* Synchronize the buffer. */
+	if unlikely(file_sync(self))
+		goto err0;
+	ex = self->if_exdata;
+	assert(ex);
+	ex->io_chng = self->if_base;
+	ex->io_chsz = 0;
+	abs_pos     = ex->io_fblk + (self->if_ptr - self->if_base);
+	abs_end     = abs_pos + self->if_cnt;
+	if (new_size < abs_pos) {
+		/* Truncate to get rid of the current buffer. */
+		self->if_cnt = 0;
+	} else if (new_size < abs_end) {
+		/* Truncate the current buffer. */
+		self->if_cnt = (size_t)(new_size - abs_pos);
+	}
+	/* With data flushed and the loaded buffer
+	 * truncated, truncate the underlying file. */
+	COMPILER_BARRIER();
+	if (file_system_trunc(self, new_size))
+		goto err;
+	COMPILER_BARRIER();
+	return 0;
+err:
+	self->if_flag |= IO_ERR;
+err0:
+	return -1;
+}
+#endif
+
+
+struct open_option {
+	char     name[11]; /* Name. */
+#define OPEN_EXFLAG_FNORMAL 0x00
+#define OPEN_EXFLAG_FTEXT   0x01 /* Wrap the file in a text-file wrapper that
+	                              * automatically converts its encoding to UTF-8. */
+#define OPEN_EXFLAG_FNOBUF  0x02 /* Open the file without wrapping it inside a buffer. */
+	uint8_t  exflg;   /* Extended flags (Set of `OPEN_EXFLAG_F*'). */
+	oflag_t  mask;    /* Mask of flags which, when already set, causes the format to become invalid. */
+	oflag_t  flag;    /* Flags. (or-ed with the flags after `mask' is checked) */
+};
+
+#ifndef O_XREAD
+#define O_XREAD 0
+#endif /* !O_XREAD */
+
+#ifndef O_XWRITE
+#define O_XWRITE 0
+#endif /* !O_XWRITE */
+
+#ifndef O_HIDDEN
+#define O_HIDDEN 0
+#endif /* !O_HIDDEN */
+
+/* Open options are parsed from a comma-separated
+ * string passed as second argument to file.open:
+ * >> file.open("foo.txt","w+");                    // STD-C mode name.
+ * >> file.open("foo.txt","text,RW,T,C");           // Extended form.
+ * >> file.open("foo.txt","text,rdwr,trunc,creat"); // Long form.
+ */
+#define BASEMODE_MASK (O_ACCMODE | O_CREAT | O_EXCL | O_TRUNC | O_APPEND)
+PRIVATE ATTR_SECTION(".rodata.crt.FILE.core.utility.open_options")
+struct open_option const open_options[] = {
+	/* Short flag names. */
+	{ "R", OPEN_EXFLAG_FNORMAL, O_ACCMODE, O_RDONLY },
+	{ "W", OPEN_EXFLAG_FNORMAL, O_ACCMODE, O_WRONLY },
+	{ "RW", OPEN_EXFLAG_FNORMAL, O_ACCMODE, O_RDWR },
+	{ "C", OPEN_EXFLAG_FNORMAL, O_CREAT, O_CREAT },
+	{ "X", OPEN_EXFLAG_FNORMAL, O_EXCL, O_EXCL },
+	{ "T", OPEN_EXFLAG_FNORMAL, O_TRUNC, O_TRUNC },
+	{ "A", OPEN_EXFLAG_FNORMAL, O_APPEND, O_APPEND },
+	{ "NB", OPEN_EXFLAG_FNORMAL, O_NONBLOCK, O_NONBLOCK },
+	{ "S", OPEN_EXFLAG_FNORMAL, O_SYNC, O_SYNC },
+	{ "D", OPEN_EXFLAG_FNOBUF, O_DIRECT, O_DIRECT },
+	{ "NF", OPEN_EXFLAG_FNORMAL, O_NOFOLLOW, O_NOFOLLOW },
+	{ "NA", OPEN_EXFLAG_FNORMAL, O_NOATIME, O_NOATIME },
+	{ "CE", OPEN_EXFLAG_FNORMAL, O_CLOEXEC, O_CLOEXEC },
+	{ "XR", OPEN_EXFLAG_FNORMAL, O_XREAD, O_XREAD },
+	{ "XW", OPEN_EXFLAG_FNORMAL, O_XWRITE, O_XWRITE },
+	{ "H", OPEN_EXFLAG_FNORMAL, O_HIDDEN, O_HIDDEN },
+	/* Flags by name. */
+	{ "rdonly", OPEN_EXFLAG_FNORMAL, O_ACCMODE, O_RDONLY },
+	{ "wronly", OPEN_EXFLAG_FNORMAL, O_ACCMODE, O_WRONLY },
+	{ "rdwr", OPEN_EXFLAG_FNORMAL, O_ACCMODE, O_RDWR },
+	{ "creat", OPEN_EXFLAG_FNORMAL, O_CREAT, O_CREAT },
+	{ "excl", OPEN_EXFLAG_FNORMAL, O_EXCL, O_EXCL },
+	{ "trunc", OPEN_EXFLAG_FNORMAL, O_TRUNC, O_TRUNC },
+	{ "append", OPEN_EXFLAG_FNORMAL, O_APPEND, O_APPEND },
+	{ "nonblock", OPEN_EXFLAG_FNORMAL, O_NONBLOCK, O_NONBLOCK },
+	{ "sync", OPEN_EXFLAG_FNORMAL, O_SYNC, O_SYNC },
+	{ "direct", OPEN_EXFLAG_FNOBUF, O_DIRECT, O_DIRECT },
+	{ "nofollow", OPEN_EXFLAG_FNORMAL, O_NOFOLLOW, O_NOFOLLOW },
+	{ "noatime", OPEN_EXFLAG_FNORMAL, O_NOATIME, O_NOATIME },
+	{ "cloexec", OPEN_EXFLAG_FNORMAL, O_CLOEXEC, O_CLOEXEC },
+	{ "xread", OPEN_EXFLAG_FNORMAL, O_XREAD, O_XREAD },
+	{ "xwrite", OPEN_EXFLAG_FNORMAL, O_XWRITE, O_XWRITE },
+	{ "hidden", OPEN_EXFLAG_FNORMAL, O_HIDDEN, O_HIDDEN },
+	/* Extended flag names. */
+	{ "binary", OPEN_EXFLAG_FNORMAL, 0, 0 },
+	{ "text", OPEN_EXFLAG_FTEXT, 0, 0 },
+	{ "nobuf", OPEN_EXFLAG_FNOBUF, 0, 0 },
+};
+
+
+/* @param: poflags: When non-NULL, filled with `O_*'
+ * @return: * :     Set of `IO_*' */
+PRIVATE ATTR_SECTION(".text.crt.FILE.core.utility.file_evalmode")
+WUNUSED uint32_t LIBCCALL file_evalmode(char const *modes,
+                                        oflag_t *poflags) {
+	/* IO_LNIFTYY: Check if the stream handle is a tty
+	 *             the first time it is read from. */
+	uint32_t result = IO_LNIFTYY;
+	oflag_t oflags = O_RDONLY;
+	if (modes) {
+		unsigned int flags = 0;
+		for (;;) {
+			bool open_binary;
+			unsigned int i;
+			size_t optlen;
+			char const *next = strchr(modes, ',');
+			if (!next)
+				next = modes + strlen(modes);
+			optlen = (size_t)(next - modes);
+			if (optlen < COMPILER_LENOF(open_options[0].name)) {
+				for (i = 0; i < COMPILER_LENOF(open_options); ++i) {
+					if (open_options[i].name[optlen])
+						continue;
+					if (memcmp(open_options[i].name, modes, optlen * sizeof(char)) != 0)
+						continue;
+					if (oflags & open_options[i].mask)
+						goto err_invalid_oflags; /* Check illegal old flags. */
+					/* Apply new flags. */
+					flags |= open_options[i].exflg;
+					oflags |= open_options[i].flag;
+					goto found_option;
+				}
+			}
+			/* Check for an STD-C conforming open mode. */
+			if (!optlen)
+				goto err_invalid_oflags;
+			if (oflags & BASEMODE_MASK)
+				goto err_invalid_oflags;
+			open_binary = false;
+			if (*modes == 'r') {
+				oflags |= O_RDONLY;
+			} else if (*modes == 'w') {
+				oflags |= O_WRONLY | O_TRUNC | O_CREAT;
+			} else if (*modes == 'a') {
+				oflags |= O_WRONLY | O_APPEND | O_CREAT;
+			} else {
+				goto err_invalid_oflags;
+			}
+			if (*++modes == 'b') {
+				++modes;
+				open_binary = true;
+			}
+			if (*modes == '+') {
+				++modes;
+				oflags &= ~O_ACCMODE;
+				oflags |= O_RDWR;
+			}
+			if (*modes == 'b' && !open_binary) {
+				++modes;
+				open_binary = true;
+			}
+			if (*modes == 'x' &&
+			    (oflags & (O_TRUNC | O_CREAT)) == (O_TRUNC | O_CREAT)) {
+				++modes;
+				oflags |= O_EXCL;
+			}
+			if (*modes == 't' && !open_binary)
+				++modes; /* Accept a trailing `t', as suggested by STD-C */
+			if (modes != next)
+				goto err_invalid_oflags;
+			if (!open_binary)
+				flags |= OPEN_EXFLAG_FTEXT;
+err_invalid_oflags:
+found_option:
+			if (!*next)
+				break;
+			modes = next + 1;
+		}
+		if ((oflags & O_ACCMODE) != O_RDONLY)
+			result |= IO_RW; /* Writable! */
+		if (flags & OPEN_EXFLAG_FTEXT) {
+			/* Open a text-file? */
+		}
+		if (flags & OPEN_EXFLAG_FNOBUF) {
+			/* Disable buffering. */
+			result |= IO_NODYNSCALE;
+			result &= ~IO_LNIFTYY;
+		}
+	}
+	if (poflags)
+		*poflags = oflags;
+	return result;
+}
+
+
+PRIVATE ATTR_SECTION(".text.crt.FILE.core.utility.file_openfd")
+WUNUSED FILE *LIBCCALL file_openfd(fd_t fd, uint32_t flags) {
+	FILE *result;
+	struct iofile_data *ex;
+	result = (FILE *)calloc(1,
+	                        sizeof(FILE) +
+	                        sizeof(struct iofile_data_novtab));
+	if unlikely(!result)
+		goto done;
+	ex = (struct iofile_data *)(result + 1);
+	result->if_exdata = ex;
+	result->if_fd     = fd; /* Inherit reference */
+	atomic_owner_rwlock_cinit(&ex->io_lock);
+	assert(ex->io_zero == 0);
+	ex->io_refcnt = 1;
+	result->if_flag = flags;
+	/* Insert the new file stream into the global list of them. */
+	allfiles_insert(result);
+done:
+	return result;
+}
+
+
+PRIVATE ATTR_SECTION(".text.crt.FILE.core.utility.file_openfd")
+WUNUSED FILE *LIBCCALL file_reopenfd(FILE *__restrict self,
+                                     fd_t fd, uint32_t flags) {
+	struct iofile_data *ex;
+	if unlikely(self->if_flag & IO_READING) {
+		/* reopen() isn't allowed from within a cookie function. */
+		libc_seterrno(EPERM);
+		return NULL;
+	}
+	if (file_sync(self))
+		return NULL;
+	if (LLIST_ISBOUND(self, if_exdata->io_lnch))
+		changed_linebuffered_remove(self);
+	file_system_close(self);
+	self->if_flag = flags;
+	self->if_fd   = fd;
+	self->if_ptr  = self->if_base;
+	self->if_cnt  = 0;
+	ex = self->if_exdata;
+	assert(ex);
+	ex->io_chng = self->if_base;
+	ex->io_chsz = 0;
+	ex->io_fblk = 0;
+	ex->io_fpos = 0;
+#ifdef IOFILE_HAVE_MBS
+	ex->io_mbs.__word = 0;
+#endif /* IOFILE_HAVE_MBS */
+	return self;
+}
+
+
+PRIVATE ATTR_SECTION(".text.crt.FILE.core.utility.file_openfd")
+WUNUSED FILE *LIBCCALL file_opencookie(cookie_io_functions_t const *__restrict io,
+                                       void *magic, uint32_t flags) {
+	FILE *result;
+	struct iofile_data *ex;
+	result = (FILE *)calloc(1,
+	                        sizeof(FILE) +
+	                        sizeof(struct iofile_data));
+	if unlikely(!result)
+		goto done;
+	ex = (struct iofile_data *)(result + 1);
+	result->if_exdata = ex;
+	atomic_owner_rwlock_cinit(&ex->io_lock);
+	assert(ex->io_zero == 0);
+	ex->io_refcnt = 1;
+	/* Check if the stream handle is a tty the first time it is read from. */
+	result->if_flag = IO_HASVTAB | flags;
+	ex->io_magi = magic;
+	memcpy(&ex->io_vtab, io, sizeof(cookie_io_functions_t));
+	/* Insert the new file stream into the global list of them. */
+	allfiles_insert(result);
+done:
+	return result;
+}
 
 
 
@@ -971,15 +1760,32 @@ INTERN int LIBCCALL libc_doflushall(void) {
 /*[[[start:implementation]]]*/
 
 
+#undef libc_flushall
+DEFINE_PUBLIC_ALIAS(_flushall, libc_flushall);
+DEFINE_PUBLIC_ALIAS(flushall, libc_flushall);
+DEFINE_INTERN_ALIAS(libc__flushall, libc_flushall);
+INTERN ATTR_SECTION(".text.crt.FILE.locked.write.utility._flushall")
+int LIBCCALL libc_flushall(void) {
+	/* All all streams opened by the user. */
+	file_syncall_locked();
+	/* Flush the active STD streams. */
+	file_sync_locked(stdin);
+	file_sync_locked(stdout);
+	file_sync_locked(stderr);
+	return 0;
+}
+
 /*[[[impl:flushall_unlocked]]]*/
 #undef libc_flushall_unlocked
 DEFINE_INTERN_ALIAS(libc_flushall_unlocked, libc_doflushall_unlocked);
-INTERN int LIBCCALL libc_doflushall_unlocked(void) {
-	libc_flushstdstream_unlocked(stdin);
-	libc_flushstdstream_unlocked(stdout);
-	libc_flushstdstream_unlocked(stderr);
-	/* Finally, flush all non-standard streams. */
-	libc_flushall_nostd_unlocked();
+INTERN ATTR_SECTION(".text.crt.FILE.unlocked.write.utility.flushall_unlocked")
+int LIBCCALL libc_flushall_unlocked(void) {
+	/* All all streams opened by the user. */
+	file_syncall_unlocked();
+	/* Flush the active STD streams. */
+	file_sync(stdin);
+	file_sync(stdout);
+	file_sync(stderr);
 	return 0;
 }
 
@@ -1061,7 +1867,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.write.utility.fflush") int
 	if (!stream)
 		return flushall();
 	file_write(stream);
-	result = libc_fdoflush(stream);
+	result = file_sync(stream);
 	file_endwrite(stream);
 	return result;
 }
@@ -1077,7 +1883,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.write.utility.fflush_unlo
 	int result;
 	if (!stream)
 		return flushall_unlocked();
-	result = libc_fdoflush(stream);
+	result = file_sync(stream);
 	return result;
 }
 /*[[[end:fflush_unlocked]]]*/
@@ -1108,7 +1914,10 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.read.read.fread") size_t
 		return 0;
 	}
 	file_write(stream);
-	result = libc_fdoread(buf, total, stream);
+	result = file_readdata(stream, buf, total);
+	/* Unread the last partially read element. */
+	if unlikely(result != total)
+		file_seek(stream, -(result % elemsize), SEEK_CUR);
 	file_endwrite(stream);
 	return result / elemsize;
 }
@@ -1137,7 +1946,10 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.read.read.fread_unlocked") size_
 		FSETERROR(stream);
 		return 0;
 	}
-	result = libc_fdoread(buf, total, stream);
+	result = file_readdata(stream, buf, total);
+	/* Unread the last partially read element. */
+	if unlikely(result != total)
+		file_seek(stream, -(result % elemsize), SEEK_CUR);
 	return result / elemsize;
 }
 /*[[[end:fread_unlocked]]]*/
@@ -1166,10 +1978,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.write.write.fwrite") size_t
 		return 0;
 	}
 	file_write(stream);
-	result = libc_fdowrite(buf, total, stream);
-#if 0
-	libc_fdoflush(stream);
-#endif
+	result = file_writedata(stream, buf, total);
 	file_endwrite(stream);
 	return result / elemsize;
 }
@@ -1198,7 +2007,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.write.printf.fwrite_unlocked") s
 		FSETERROR(stream);
 		return 0;
 	}
-	result = libc_fdowrite(buf, total, stream);
+	result = file_writedata(stream, buf, total);
 	return result / elemsize;
 }
 /*[[[end:fwrite_unlocked]]]*/
@@ -1213,14 +2022,15 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.write.write.file_printer") ssize_t
 		__THROWS(...)
 /*[[[body:file_printer]]]*/
 {
+	FILE *me = (FILE *)arg;
 	ssize_t result;
-	if unlikely(!arg)
+	if unlikely(!me)
 		return 0;
-	file_write((FILE *)arg);
-	result = (ssize_t)libc_fdowrite(data, datalen * sizeof(char), (FILE *)arg);
-	if unlikely(!result && FERROR((FILE *)arg))
+	file_write(me);
+	result = (ssize_t)file_writedata(me, data, datalen * sizeof(char));
+	if unlikely(!result && FERROR(me))
 		result = -1;
-	file_endwrite((FILE *)arg);
+	file_endwrite(me);
 	return result;
 }
 /*[[[end:file_printer]]]*/
@@ -1235,11 +2045,12 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.write.write.file_printer_unlocke
 		__THROWS(...)
 /*[[[body:file_printer_unlocked]]]*/
 {
+	FILE *me = (FILE *)arg;
 	ssize_t result;
-	if unlikely(!arg)
+	if unlikely(!me)
 		return 0;
-	result = (ssize_t)libc_fdowrite(data, datalen * sizeof(char), (FILE *)arg);
-	if unlikely(!result && FERROR((FILE *)arg))
+	result = (ssize_t)file_writedata(me, data, datalen * sizeof(char));
+	if unlikely(!result && FERROR(me))
 		result = -1;
 	return result;
 }
@@ -1258,7 +2069,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.seek.seek.ftell") long int
 	if unlikely(!stream)
 		return (long int)libc_seterrno(EINVAL);
 	file_read(stream);
-	result = (pos64_t)libc_fdotell(stream);
+	result = file_seek(stream, 0, SEEK_CUR);
 	file_endread(stream);
 	if unlikely(result > LONG_MAX)
 		return (long int)libc_seterrno(EOVERFLOW);
@@ -1280,9 +2091,8 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.seek.seek.fseek") int
 	if unlikely(!stream)
 		return (int)libc_seterrno(EINVAL);
 	file_write(stream);
-	result = libc_fdoseek(stream,
-	                      (off64_t)off,
-	                      whence);
+	file_seek(stream, (off64_t)off, whence);
+	result = unlikely(FERROR(stream)) ? -1 : 0;
 	file_endwrite(stream);
 	return result;
 }
@@ -1300,7 +2110,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.seek.seek.ftello") off_t
 	if unlikely(!stream)
 		return (off_t)libc_seterrno(EINVAL);
 	file_read(stream);
-	result = (pos64_t)libc_fdotell(stream);
+	result = file_seek(stream, 0, SEEK_CUR);
 	file_endread(stream);
 	if unlikely(result > INT32_MAX)
 		return (off_t)libc_seterrno(EOVERFLOW);
@@ -1323,7 +2133,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.seek.seek.ftello64") off64_t
 	if unlikely(!stream)
 		return (off64_t)libc_seterrno(EINVAL);
 	file_read(stream);
-	result = (pos64_t)libc_fdotell(stream);
+	result = file_seek(stream, 0, SEEK_CUR);
 	file_endread(stream);
 	if unlikely(result > INT64_MAX)
 		return (off64_t)libc_seterrno(EOVERFLOW);
@@ -1347,9 +2157,8 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.seek.seek.fseeko") int
 	if unlikely(!stream)
 		return (int)libc_seterrno(EINVAL);
 	file_write(stream);
-	result = libc_fdoseek(stream,
-	                      (off64_t)off,
-	                      whence);
+	file_seek(stream, (off64_t)off, whence);
+	result = unlikely(FERROR(stream)) ? -1 : 0;
 	file_endwrite(stream);
 	return result;
 }
@@ -1372,9 +2181,8 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.seek.seek.fseeko64") int
 	if unlikely(!stream)
 		return (int)libc_seterrno(EINVAL);
 	file_write(stream);
-	result = libc_fdoseek(stream,
-	                      off,
-	                      whence);
+	file_seek(stream, (off64_t)off, whence);
+	result = unlikely(FERROR(stream)) ? -1 : 0;
 	file_endwrite(stream);
 	return result;
 }
@@ -1467,7 +2275,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.seek.seek.ftell_unlocked") long 
 	pos64_t result;
 	if unlikely(!stream)
 		return (long int)libc_seterrno(EINVAL);
-	result = (pos64_t)libc_fdotell(stream);
+	result = file_seek(stream, 0, SEEK_CUR);
 	if unlikely(result > LONG_MAX)
 		return (long int)libc_seterrno(EOVERFLOW);
 	return (long int)(off64_t)result;
@@ -1485,7 +2293,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.seek.seek.ftello_unlocked") off_
 	pos64_t result;
 	if unlikely(!stream)
 		return (off_t)libc_seterrno(EINVAL);
-	result = (pos64_t)libc_fdotell(stream);
+	result = file_seek(stream, 0, SEEK_CUR);
 	if unlikely(result > INT32_MAX)
 		return (off_t)libc_seterrno(EOVERFLOW);
 	return (off_t)(pos_t)result;
@@ -1506,7 +2314,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.seek.seek.ftello64_unlocked") of
 	pos64_t result;
 	if unlikely(!stream)
 		return (off64_t)libc_seterrno(EINVAL);
-	result = (pos64_t)libc_fdotell(stream);
+	result = file_seek(stream, 0, SEEK_CUR);
 	if unlikely(result > INT64_MAX)
 		return (off64_t)libc_seterrno(EOVERFLOW);
 	return (off64_t)result;
@@ -1527,9 +2335,8 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.seek.seek.fseek_unlocked") int
 	int result;
 	if unlikely(!stream)
 		return (int)libc_seterrno(EINVAL);
-	result = libc_fdoseek(stream,
-	                      (off64_t)off,
-	                      whence);
+	file_seek(stream, (off64_t)off, whence);
+	result = unlikely(FERROR(stream)) ? -1 : 0;
 	return result;
 }
 /*[[[end:fseek_unlocked]]]*/
@@ -1547,9 +2354,8 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.seek.seek.fseeko_unlocked") int
 	int result;
 	if unlikely(!stream)
 		return (int)libc_seterrno(EINVAL);
-	result = libc_fdoseek(stream,
-	                      (off64_t)off,
-	                      whence);
+	file_seek(stream, (off64_t)off, whence);
+	result = unlikely(FERROR(stream)) ? -1 : 0;
 	return result;
 }
 /*[[[end:fseeko_unlocked]]]*/
@@ -1570,9 +2376,8 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.seek.seek.fseeko64_unlocked") in
 	int result;
 	if unlikely(!stream)
 		return (int)libc_seterrno(EINVAL);
-	result = libc_fdoseek(stream,
-	                      (off64_t)off,
-	                      whence);
+	file_seek(stream, (off64_t)off, whence);
+	result = unlikely(FERROR(stream)) ? -1 : 0;
 	return result;
 }
 #endif /* MAGIC:alias */
@@ -1732,10 +2537,12 @@ NOTHROW_NCX(LIBCCALL libc_ungetc)(int ch,
 /*[[[body:ungetc]]]*/
 {
 	int result;
-	if unlikely(!stream)
-		return (int)libc_seterrno(EINVAL);
+	if unlikely(!stream) {
+		libc_seterrno(EINVAL);
+		return EOF;
+	}
 	file_write(stream);
-	result = libc_doungetc(ch, stream);
+	result = file_ungetc(stream, (unsigned char)(unsigned int)ch);
 	file_endwrite(stream);
 	return result;
 }
@@ -1750,9 +2557,11 @@ NOTHROW_NCX(LIBCCALL libc_ungetc_unlocked)(int ch,
 /*[[[body:ungetc_unlocked]]]*/
 {
 	int result;
-	if unlikely(!stream)
-		return (int)libc_seterrno(EINVAL);
-	result = libc_doungetc(ch, stream);
+	if unlikely(!stream) {
+		libc_seterrno(EINVAL);
+		return EOF;
+	}
+	result = file_ungetc(stream, (unsigned char)(unsigned int)ch);
 	return result;
 }
 /*[[[end:ungetc_unlocked]]]*/
@@ -1767,7 +2576,8 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.seek.utility.rewind") void
 {
 	if likely(stream) {
 		file_write(stream);
-		libc_fdoseek(stream, 0, SEEK_SET);
+		file_seek(stream, 0, SEEK_SET);
+		stream->if_flag &= ~(IO_EOF | IO_ERR);
 		file_endwrite(stream);
 	}
 }
@@ -1781,8 +2591,10 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.seek.utility.rewind_unlocked") v
 		__THROWS(...)
 /*[[[body:rewind_unlocked]]]*/
 {
-	if likely(stream)
-		libc_fdoseek(stream, 0, SEEK_SET);
+	if likely(stream) {
+		file_seek(stream, 0, SEEK_SET);
+		stream->if_flag &= ~(IO_EOF | IO_ERR);
+	}
 }
 /*[[[end:rewind_unlocked]]]*/
 
@@ -1792,10 +2604,12 @@ ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.fisatty") int
 NOTHROW_NCX(LIBCCALL libc_fisatty)(FILE *__restrict stream)
 /*[[[body:fisatty]]]*/
 {
-	fd_t fd = fileno(stream);
-	if unlikely(fd < 0)
+	if unlikely(!stream) {
+		libc_seterrno(EINVAL);
 		return -1;
-	return isatty(fd);
+	}
+	file_determine_isatty(stream);
+	return (stream->if_flag & IO_ISATTY) != 0;
 }
 /*[[[end:fisatty]]]*/
 
@@ -1814,10 +2628,13 @@ NOTHROW_NCX(LIBCCALL libc_setvbuf)(FILE *__restrict stream,
 	if unlikely(!stream)
 		return (int)libc_seterrno(EINVAL);
 	file_write(stream);
-	result = libc_dosetvbuf(stream,
-	                        buf,
-	                        modes,
-	                        bufsize);
+	result = file_sync(stream);
+	if likely(result == 0) {
+		result = file_setmode(stream,
+		                      buf,
+		                      modes,
+		                      bufsize);
+	}
 	file_endwrite(stream);
 	return result;
 }
@@ -1837,10 +2654,13 @@ NOTHROW_NCX(LIBCCALL libc_setvbuf_unlocked)(FILE *__restrict stream,
 	int result;
 	if unlikely(!stream)
 		return (int)libc_seterrno(EINVAL);
-	result = libc_dosetvbuf(stream,
-	                        buf,
-	                        modes,
-	                        bufsize);
+	result = file_sync(stream);
+	if likely(result == 0) {
+		result = file_setmode(stream,
+		                      buf,
+		                      modes,
+		                      bufsize);
+	}
 	return result;
 }
 /*[[[end:setvbuf_unlocked]]]*/
@@ -1983,23 +2803,6 @@ NOTHROW_NCX(LIBCCALL libc_clearerr_s)(FILE *__restrict stream)
 /*[[[end:clearerr_s]]]*/
 
 
-PRIVATE int LIBCCALL
-parse_open_modes(char const *__restrict modes) {
-	int mode = O_RDONLY;
-	if (modes) {
-		for (; *modes; ++modes) {
-			if (*modes == 'r')
-				mode = O_RDONLY;
-			if (*modes == 'w')
-				mode = O_WRONLY | O_CREAT | O_TRUNC;
-			if (*modes == '+')
-				mode &= ~(O_TRUNC | O_ACCMODE), mode |= O_RDWR;
-		}
-	}
-	return mode;
-}
-
-
 /*[[[head:tmpfile,hash:CRC-32=0x64fe2124]]]*/
 /* Create and return a new file-stream for accessing a temporary file for reading/writing */
 INTERN WUNUSED
@@ -2027,10 +2830,13 @@ NOTHROW_RPC(LIBCCALL libc_fopen)(char const *__restrict filename,
 {
 	fd_t fd;
 	FILE *result;
-	fd = open(filename, parse_open_modes(modes), 0644);
+	uint32_t flags;
+	oflag_t oflags;
+	flags = file_evalmode(modes, &oflags);
+	fd    = open(filename, oflags, 0644);
 	if unlikely(fd < 0)
 		return NULL;
-	result = fdopen(fd, modes);
+	result = file_openfd(fd, flags);
 	if unlikely(!result)
 		sys_close(fd);
 	return result;
@@ -2046,25 +2852,11 @@ NOTHROW_NCX(LIBCCALL libc_fdopen)(fd_t fd,
                                   char const *__restrict modes)
 /*[[[body:fdopen]]]*/
 {
-	FILE *result = (FILE *)calloc(1, sizeof(FILE));
-	(void)modes;
-	if unlikely(!result)
-		goto done;
-	result->if_exdata = (struct iofile_data *)calloc(1, sizeof(struct iofile_data));
-	if unlikely(!result->if_exdata)
-		goto err_r;
-	result->if_fd = fd;
-	/* Check if the stream handle is a tty the first time it is read from. */
-	result->if_flag = IO_LNIFTYY;
-	/* Insert the new file stream into the global list of them. */
-	atomic_rwlock_write(&libc_ffiles_lock);
-	LLIST_INSERT(libc_ffiles, result, if_exdata->io_link);
-	atomic_rwlock_endwrite(&libc_ffiles_lock);
-done:
+	FILE *result;
+	uint32_t flags;
+	flags  = file_evalmode(modes, NULL);
+	result = file_openfd(fd, flags);
 	return result;
-err_r:
-	free(result);
-	return NULL;
 }
 /*[[[end:fdopen]]]*/
 
@@ -2076,36 +2868,10 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.access.fclose") int
 		__THROWS(...)
 /*[[[body:fclose]]]*/
 {
-	int result = 0;
 	if unlikely(!stream)
 		return (int)libc_seterrno(EINVAL);
-	libc_fdoflush(stream);
-
-	/* Remove the stream from the global list of known files. */
-	atomic_rwlock_write(&libc_ffiles_lock);
-	if (LLIST_ISBOUND(stream, if_exdata->io_link))
-		LLIST_UNLINK(stream, if_exdata->io_link);
-	atomic_rwlock_endwrite(&libc_ffiles_lock);
-
-	if (!(stream->if_flag & IO_NOFD))
-		sys_close(stream->if_fd);
-
-	/* Free a dynamically allocated buffer. */
-	if (stream->if_flag & IO_MALLBUF)
-		free(stream->if_base);
-
-	/* Make sure not to free one of the STD streams. */
-	if (!(stream >= libc_std_files &&
-	      stream < COMPILER_ENDOF(libc_std_files))) {
-		/* Free extended file data. */
-		free(stream->if_exdata);
-		/* Free the file buffer itself. */
-		free(stream);
-	} else {
-		/* Mark STD streams as not having a handle. */
-		stream->if_flag |= IO_NOFD;
-	}
-	return result;
+	file_decref(stream);
+	return 0;
 }
 /*[[[end:fclose]]]*/
 
@@ -2189,7 +2955,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.utility.fileno") fd_t
 NOTHROW_NCX(LIBCCALL libc_fileno)(FILE *__restrict stream)
 /*[[[body:fileno]]]*/
 {
-	if unlikely(!stream || (stream->if_flag & IO_NOFD))
+	if unlikely(!stream || (stream->if_flag & IO_HASVTAB))
 		return (fd_t)libc_seterrno(EINVAL);
 	return ATOMIC_READ(stream->if_fd);
 }
@@ -2337,13 +3103,15 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.read.getc.fgetc") int
 		__THROWS(...)
 /*[[[body:fgetc]]]*/
 {
-	unsigned char result;
-	return libc_fread(&result,
-	                  sizeof(result),
-	                  1,
-	                  stream) == 1
-	       ? (int)(unsigned int)result
-	       : (int)EOF;
+	int result;
+	if unlikely(!stream) {
+		libc_seterrno(EINVAL);
+		return EOF;
+	}
+	file_write(stream);
+	result = file_getc(stream);
+	file_endwrite(stream);
+	return result;
 }
 /*[[[end:fgetc]]]*/
 
@@ -2355,13 +3123,13 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.read.getc.fgetc_unlocked") int
 		__THROWS(...)
 /*[[[body:fgetc_unlocked]]]*/
 {
-	unsigned char result;
-	return libc_fread_unlocked(&result,
-	                           sizeof(result),
-	                           1,
-	                           stream) == 1
-	       ? (int)(unsigned int)result
-	       : (int)EOF;
+	int result;
+	if unlikely(!stream) {
+		libc_seterrno(EINVAL);
+		return EOF;
+	}
+	result = file_getc(stream);
+	return result;
 }
 /*[[[end:fgetc_unlocked]]]*/
 
@@ -2619,18 +3387,8 @@ NOTHROW_RPC(LIBCCALL libc_popen)(char const *command,
 }
 /*[[[end:popen]]]*/
 
-/*[[[head:pclose,hash:CRC-32=0xe672513b]]]*/
-/* Close a process I/O file `STREAM' */
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.access.pclose") int
-NOTHROW_NCX(LIBCCALL libc_pclose)(FILE *stream)
-/*[[[body:pclose]]]*/
-{
-	CRT_UNIMPLEMENTED("pclose"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
-}
-/*[[[end:pclose]]]*/
+/*[[[impl:pclose]]]*/
+DEFINE_INTERN_ALIAS(libc_pclose, libc_fclose);
 
 /*[[[head:fopencookie,hash:CRC-32=0x3296b325]]]*/
 INTERN WUNUSED NONNULL((2))
@@ -2640,9 +3398,11 @@ NOTHROW_NCX(LIBCCALL libc_fopencookie)(void *__restrict magic_cookie,
                                        cookie_io_functions_t io_funcs)
 /*[[[body:fopencookie]]]*/
 {
-	CRT_UNIMPLEMENTED("fopencookie"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
+	FILE *result;
+	uint32_t flags;
+	flags  = file_evalmode(modes, NULL);
+	result = file_opencookie(&io_funcs, magic_cookie, flags);
+	return result;
 }
 /*[[[end:fopencookie]]]*/
 
@@ -2732,21 +3492,31 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.FILE.utility.fcloseall") int
 	int result = 0;
 	FILE *fp;
 again:
-	atomic_rwlock_write(&libc_ffiles_lock);
-	fp = libc_ffiles;
-	if (fp) {
+	atomic_rwlock_write(&all_files_lock);
+	fp = all_files;
+	while (fp) {
+		if (!file_tryincref(fp)) {
+			fp = LLIST_NEXT(fp, if_exdata->io_link);
+			continue;
+		}
 		LLIST_UNLINK(fp, if_exdata->io_link);
 		LLIST_UNBIND(fp, if_exdata->io_link);
-		atomic_rwlock_endwrite(&libc_ffiles_lock);
-		if unlikely(fclose(fp) != 0)
-			return EOF;
+		atomic_rwlock_endwrite(&all_files_lock);
+		/* !!!WARNING!!!
+		 * This is entirely unsafe, but if you think about it:
+		 * This function could only ever be entirely unsafe! */
+		ATOMIC_WRITE(fp->if_exdata->io_refcnt, 1);
+		file_decref(fp);
 		++result;
 		goto again;
 	}
-	atomic_rwlock_endwrite(&libc_ffiles_lock);
+	atomic_rwlock_endwrite(&all_files_lock);
 	return result;
 }
 /*[[[end:fcloseall]]]*/
+
+
+
 
 /*[[[head:fmemopen,hash:CRC-32=0xe54d8f29]]]*/
 INTERN WUNUSED NONNULL((1, 3))
@@ -2761,6 +3531,7 @@ NOTHROW_NCX(LIBCCALL libc_fmemopen)(void *mem,
 	return NULL;
 }
 /*[[[end:fmemopen]]]*/
+
 
 #if (__SIZEOF_INT__ == __SIZEOF_POINTER__) || \
      defined(__i386__) || defined(__x86_64__)
@@ -3911,10 +4682,15 @@ NOTHROW_RPC(LIBCCALL libc_freopen)(char const *__restrict filename,
 {
 	fd_t fd;
 	FILE *result;
-	fd = open(filename, parse_open_modes(modes), 0644);
+	uint32_t flags;
+	oflag_t oflags;
+	flags = file_evalmode(modes, &oflags);
+	fd    = open(filename, oflags, 0644);
 	if unlikely(fd < 0)
 		return NULL;
-	result = fdreopen(fd, modes, stream);
+	file_write(stream);
+	result = file_reopenfd(stream, fd, flags);
+	file_endwrite(stream);
 	if unlikely(!result)
 		sys_close(fd);
 	return result;
@@ -3932,10 +4708,13 @@ NOTHROW_RPC(LIBCCALL libc_freopen_unlocked)(char const *__restrict filename,
 {
 	fd_t fd;
 	FILE *result;
-	fd = open(filename, parse_open_modes(modes), 0644);
+	uint32_t flags;
+	oflag_t oflags;
+	flags = file_evalmode(modes, &oflags);
+	fd    = open(filename, oflags, 0644);
 	if unlikely(fd < 0)
 		return NULL;
-	result = fdreopen_unlocked(fd, modes, stream);
+	result = file_reopenfd(stream, fd, flags);
 	if unlikely(!result)
 		sys_close(fd);
 	return result;

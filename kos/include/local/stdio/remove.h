@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdba75ba5 */
+/* HASH CRC-32:0x820469ec */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ __NAMESPACE_LOCAL_BEGIN
 /* Remove a file or directory `FILENAME' */
 __LOCAL_LIBC(remove) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(remove))(char const *__filename) {
-#line 324 "kos/src/libc/magic/stdio.c"
+#line 328 "kos/src/libc/magic/stdio.c"
 	return __localdep_removeat(__CRT_AT_FDCWD, __filename);
 }
 __NAMESPACE_LOCAL_END
