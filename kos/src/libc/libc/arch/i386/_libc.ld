@@ -137,6 +137,7 @@ SECTIONS {
 		*(.data.read_mostly .data.hot .data.likely .data.hot.* .data.likely.*)
 		*(.data)
 		ENUMERATE_CRT_SECTIONS(.data)
+		*(.data.local.*) /* Load data objects, as defined by `__LOCAL_LIBC_DATA()' within automatic source files. */
 		*(.data.cold .data.unlikely .data.cold.* .data.unlikely.*)
 //		*(.data.*) /* We need to be able to discard *(.data.DW.ref.*)! */
 	} PHDR(data)
