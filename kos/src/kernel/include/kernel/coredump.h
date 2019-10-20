@@ -114,9 +114,17 @@ FUNDEF NONNULL((1, 2)) void FCALL
 coredump_create_for_signal(struct icpustate *__restrict state,
                            struct __siginfo_struct const *__restrict si);
 
-/* Create a coredump because of the currently thrown exception */
+/* Create a coredump because of the currently thrown exception
+ * @param: originates_from_kernelspace: When true, include the kernel's exception
+ *                                      context and traceback alongside the coredump.
+ *                                      Otherwise, only include user-space information.
+ *                                      This should be true for exceptions thrown within
+ *                                      the kernel through use of `THROW()', but `false'
+ *                                      if the exception being handled was caused by
+ *                                      user-space, such as an E_SEGFAULT */
 FUNDEF NONNULL((1)) void FCALL
-coredump_create_for_exception(struct icpustate *__restrict state);
+coredump_create_for_exception(struct icpustate *__restrict state,
+                              bool originates_from_kernelspace);
 
 
 

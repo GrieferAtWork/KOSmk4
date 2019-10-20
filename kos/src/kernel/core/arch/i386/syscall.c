@@ -119,7 +119,8 @@ NOTHROW(KCALL user_icpu_to_ucpu)(struct icpustate const *__restrict state,
 
 /* Create a coredump because of the currently thrown exception */
 PUBLIC ATTR_NOINLINE NONNULL((1)) void FCALL
-coredump_create_for_exception(struct icpustate *__restrict state) {
+coredump_create_for_exception(struct icpustate *__restrict state,
+                              bool originates_from_kernelspace) {
 	struct ucpustate ust;
 	struct exception_data error;
 	struct exception_info *info = error_info();
@@ -128,24 +129,38 @@ coredump_create_for_exception(struct icpustate *__restrict state) {
 	memcpy(&error, &info->ei_data, sizeof(struct exception_data));
 	user_icpu_to_ucpu(state, &ust);
 	has_si = error_as_signal(&error, &si);
-#if EXCEPT_BACKTRACE_SIZE != 0
-	{
-		size_t i;
-		for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i) {
-			if (info->ei_trace[i] == NULL)
-				break;
-		}
+	if (!originates_from_kernelspace) {
+		/* If the exception doesn't originate from kernel-space, such
+		 * as an E_SEGFAULT propagated by `x86_unwind_interrupt()', then
+		 * we mustn't include whatever information is still dangling in
+		 * the kernel's exception state descriptor (because that info will
+		 * still refer to the previous thrown exception, and not the current
+		 * one)
+		 * Also: The current exception doesn't actually have a kernel side. */
 		coredump_create(&ust, NULL, 0, &ust,
-		                info->ei_trace, i, &info->ei_state,
+		                NULL, 0, NULL,
 		                &error, has_si ? &si : NULL,
 		                UNWIND_DISABLED);
-	}
+	} else {
+#if EXCEPT_BACKTRACE_SIZE != 0
+		{
+			size_t i;
+			for (i = 0; i < EXCEPT_BACKTRACE_SIZE; ++i) {
+				if (info->ei_trace[i] == NULL)
+					break;
+			}
+			coredump_create(&ust, NULL, 0, &ust,
+			                info->ei_trace, i, &info->ei_state,
+			                &error, has_si ? &si : NULL,
+			                UNWIND_DISABLED);
+		}
 #else /* EXCEPT_BACKTRACE_SIZE != 0 */
-	coredump_create(&ust, NULL, 0, &ust,
-	                NULL, 0, &info->ei_state,
-	                &error, has_si ? &si : NULL,
-	                UNWIND_DISABLED);
+		coredump_create(&ust, NULL, 0, &ust,
+		                NULL, 0, &info->ei_state,
+		                &error, has_si ? &si : NULL,
+		                UNWIND_DISABLED);
 #endif /* EXCEPT_BACKTRACE_SIZE == 0 */
+	}
 }
 
 /* Create a coredump because of the given signal `si' */
@@ -244,7 +259,10 @@ again_gethand:
 	case KERNEL_SIG_CORE:
 		xdecref_unlikely(action.sa_mask);
 		if (derived_from_exception) {
-			coredump_create_for_exception(state);
+			/* If we've gotten here because of a system call, then we can assume that
+			 * the exception does have a kernel-space side, and thus we must include
+			 * information about that exception's origin. */
+			coredump_create_for_exception(state, reason == TASK_RPC_REASON_SYSCALL);
 		} else {
 			coredump_create_for_signal(state, siginfo);
 		}
@@ -481,7 +499,10 @@ NOTHROW(FCALL x86_propagate_userspace_exception)(struct icpustate *__restrict st
 	} EXCEPT {
 	}
 terminate_app:
-	coredump_create_for_exception(state);
+	/* If we've gotten here because of a system call, then we can assume that
+	 * the exception does have a kernel-space side, and thus we must include
+	 * information about that exception's origin. */
+	coredump_create_for_exception(state, reason == TASK_RPC_REASON_SYSCALL);
 	process_exit(W_EXITCODE(1, 0));
 return_new_state:
 	/* Delete the currently set exception. */
