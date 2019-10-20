@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x13382ad */
+/* HASH CRC-32:0x6b9b6f4 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -379,7 +379,6 @@
 #define __CRT_STUB_obstack_vprintf 1
 #define __CRT_STUB_on_exit 1
 #define __CRT_STUB_onexit 1
-#define __CRT_STUB_open_memstream 1
 #define __CRT_STUB_open_wmemstream 1
 #define __CRT_STUB_openlog 1
 #define __CRT_STUB_pathconf 1

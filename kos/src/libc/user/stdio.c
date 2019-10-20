@@ -1187,7 +1187,7 @@ NONNULL((1)) pos64_t LIBCCALL file_seek(FILE *__restrict self,
 			new_abspos = old_abspos + off;
 		}
 		if unlikely(new_abspos >= INT64_MAX) {
-			libc_seterrno(ERANGE);
+			libc_seterrno(EOVERFLOW);
 			goto err;
 		}
 		if (new_abspos < old_abspos)
@@ -1743,7 +1743,7 @@ WUNUSED FILE *LIBCCALL file_opencookie(cookie_io_functions_t const *__restrict i
 	assert(ex->io_zero == 0);
 	ex->io_refcnt = 1;
 	/* Check if the stream handle is a tty the first time it is read from. */
-	result->if_flag = IO_HASVTAB | flags;
+	result->if_flag = IO_HASVTAB | IO_NOTATTY | (flags & ~IO_LNIFTYY);
 	ex->io_magi = magic;
 	memcpy(&ex->io_vtab, io, sizeof(cookie_io_functions_t));
 	/* Insert the new file stream into the global list of them. */
@@ -3654,13 +3654,13 @@ int LIBCCALL memopen_seek(void *cookie, off64_t *pos, int whence) {
 	case SEEK_CUR:
 		newpos += (size_t)(me->moc_cur - me->moc_base);
 		if ((off64_t)newpos < 0)
-			newpos = 0;
+			goto err_EOVERFLOW;
 		break;
 
 	case SEEK_END:
 		newpos += maxlen;
 		if ((off64_t)newpos < 0)
-			newpos = 0;
+			goto err_EOVERFLOW;
 		break;
 
 	default:
@@ -3672,6 +3672,9 @@ int LIBCCALL memopen_seek(void *cookie, off64_t *pos, int whence) {
 	me->moc_cur = me->moc_base + (size_t)newpos;
 	*pos = (off64_t)newpos;
 	return 0;
+err_EOVERFLOW:
+	libc_seterrno(EOVERFLOW);
+	return -1;
 }
 
 PRIVATE ATTR_SECTION(".text.crt.FILE.utility.memopen.close")
@@ -3757,6 +3760,111 @@ NOTHROW_NCX(VLIBCCALL libc_obstack_printf)(struct obstack *__restrict obstack_,
 }
 /*[[[end:obstack_printf]]]*/
 
+
+
+struct memstream_file {
+	byte_t **mf_pbase; /* Pointer to the user-defined base field. */
+	size_t  *mf_psize; /* Pointer to the user-defined size field. */
+	byte_t  *mf_base;  /* [0..1][owned] Allocated base pointer. */
+	byte_t  *mf_ptr;   /* [0..1] Current read/write pointer (May be located beyond `mf_end'; allocated lazily during writes). */
+	byte_t  *mf_end;   /* [0..1] Allocated buffer end pointer. */
+};
+
+PRIVATE ATTR_SECTION(".text.crt.FILE.utility.memstream.read")
+ssize_t LIBCCALL memstream_read(void *cookie, char *buf, size_t num_bytes) {
+	struct memstream_file *me;
+	me = (struct memstream_file *)cookie;
+	size_t maxread = me->mf_end - me->mf_ptr;
+	if (maxread > num_bytes)
+		maxread = num_bytes;
+	libc_memcpy(buf, me->mf_ptr, maxread);
+	me->mf_ptr += maxread;
+	return (ssize_t)maxread;
+}
+
+PRIVATE ATTR_SECTION(".text.crt.FILE.utility.memstream.write")
+ssize_t LIBCCALL memstream_write(void *cookie, char const *buf, size_t num_bytes) {
+	struct memstream_file *me;
+	size_t new_alloc, result = 0;
+	byte_t *new_buffer;
+	me = (struct memstream_file *)cookie;
+	if likely(me->mf_ptr < me->mf_end) {
+		result = me->mf_end - me->mf_ptr;
+		if (result > num_bytes)
+			result = num_bytes;
+		libc_memcpy(me->mf_ptr, buf, num_bytes);
+		me->mf_ptr += result;
+		buf += result;
+		num_bytes -= result;
+	}
+	if (!num_bytes)
+		goto done;
+	/* Allocate more memory. */
+	new_alloc = (size_t)(me->mf_ptr - me->mf_base);
+	if unlikely(OVERFLOW_UADD(new_alloc, num_bytes, &new_alloc))
+		goto err_EOVERFLOW;
+	new_buffer = (byte_t *)realloc(me->mf_base,
+	                               (new_alloc + 1) * sizeof(char));
+	if unlikely(!new_buffer)
+		goto err;
+	me->mf_ptr  = new_buffer + (me->mf_ptr - me->mf_base);
+	me->mf_base = new_buffer;
+	me->mf_end  = new_buffer + new_alloc;
+	/* Copy data into the new portion of the buf. */
+	memcpy(me->mf_ptr, buf, num_bytes);
+	*me->mf_end = 0; /* NUL-termination. */
+	result += num_bytes;
+	/* Update the user-given pointer locations with buf parameters. */
+	*me->mf_pbase = me->mf_base;
+	*me->mf_psize = (size_t)(me->mf_end - me->mf_base);
+done:
+	return (ssize_t)result;
+err_EOVERFLOW:
+	libc_seterrno(EOVERFLOW);
+err:
+	return -1;
+}
+
+PRIVATE ATTR_SECTION(".text.crt.FILE.utility.memstream.seek")
+int LIBCCALL memstream_seek(void *cookie, off64_t *offset, int whence) {
+	struct memstream_file *me;
+	off64_t new_pos;
+	me = (struct memstream_file *)cookie;
+	new_pos = (size_t)(me->mf_ptr - me->mf_base);
+	switch (whence) {
+
+	case SEEK_SET:
+		new_pos = *offset;
+		break;
+
+	case SEEK_CUR:
+		new_pos += *offset;
+		break;
+
+	case SEEK_END:
+		new_pos = (size_t)(me->mf_end - me->mf_base) - *offset;
+		break;
+
+	default:
+		libc_seterrno(EINVAL);
+		return -1;
+	}
+	if unlikely(new_pos < 0)
+		goto err_EOVERFLOW;
+	me->mf_ptr = me->mf_base + (size_t)new_pos;
+	*offset      = (off64_t)new_pos;
+	return 0;
+err_EOVERFLOW:
+	libc_seterrno(EOVERFLOW);
+	return -1;
+}
+
+PRIVATE ATTR_SECTION(".text.crt.FILE.utility.memstream.close")
+int LIBCCALL memstream_close(void *cookie) {
+	free(cookie);
+	return 0;
+}
+
 /*[[[head:open_memstream,hash:CRC-32=0x88256706]]]*/
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.access.open_memstream") FILE *
@@ -3764,9 +3872,25 @@ NOTHROW_NCX(LIBCCALL libc_open_memstream)(char **bufloc,
                                           size_t *sizeloc)
 /*[[[body:open_memstream]]]*/
 {
-	CRT_UNIMPLEMENTED("open_memstream"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return NULL;
+	FILE *result;
+	cookie_io_functions_t cookies;
+	struct memstream_file *magic;
+	magic = (struct memstream_file *)malloc(sizeof(struct memstream_file));
+	if unlikely(!magic)
+		return NULL;
+	magic->mf_pbase = (byte_t **)bufloc;
+	magic->mf_psize = sizeloc;
+	magic->mf_base  = NULL;
+	magic->mf_ptr   = NULL;
+	magic->mf_end   = NULL;
+	cookies.read    = &memstream_read;
+	cookies.write   = &memstream_write;
+	cookies.seek    = &memstream_seek;
+	cookies.close   = &memstream_close;
+	result = file_opencookie(&cookies, magic, IO_RW);
+	if unlikely(!result)
+		free(magic);
+	return result;
 }
 /*[[[end:open_memstream]]]*/
 
