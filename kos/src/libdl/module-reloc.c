@@ -28,10 +28,10 @@
 #include <kos/process.h>
 #include <kos/syscalls.h>
 
+#include <elf.h>
 #include <stdlib.h>
 #include <string.h>
 #include <syslog.h>
-#include <elf.h>
 
 DECL_BEGIN
 

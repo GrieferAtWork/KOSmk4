@@ -44,11 +44,7 @@ __SYSDECL_BEGIN
 
 
 #ifdef __CC__
-#ifdef __x86_64__
 typedef __HYBRID_FUNCPTR32(void,__ATTR_CDECL,__sighandler32_t,(int __signo));
-#else /* __x86_64__ */
-typedef __HYBRID_FUNCPTR32(void,,__sighandler32_t,(int __signo));
-#endif /* !__x86_64__ */
 
 #ifdef __USE_POSIX199309
 #ifdef __x86_64__

@@ -43,11 +43,7 @@ __SYSDECL_BEGIN
 
 
 #ifdef __CC__
-#ifdef __x86_64__
-typedef __HYBRID_FUNCPTR64(void, __ATTR_SYSVABI, __sighandler64_t, (int __signo));
-#else /* __x86_64__ */
-typedef __HYBRID_FUNCPTR64(void, , __sighandler64_t, (int __signo));
-#endif /* !__x86_64__ */
+typedef __HYBRID_FUNCPTR64(void,__ATTR_SYSVABI,__sighandler64_t,(int __signo));
 
 #ifdef __USE_POSIX199309
 #ifdef __x86_64__

@@ -32,9 +32,10 @@
 #include <kos/sysctl.h>
 #include <kos/types.h>
 
-#include <format-printer.h>
-#include <ctype.h>
+#include <asm/intrin.h>
 #include <assert.h>
+#include <ctype.h>
+#include <format-printer.h>
 #include <malloc.h>
 #include <signal.h>
 #include <stdint.h>
@@ -42,6 +43,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <syslog.h>
 
 DECL_BEGIN
 
@@ -65,6 +67,25 @@ int main_environ(int argc, char *argv[], char *envp[]) {
 /************************************************************************/
 int main_ctype(int argc, char *argv[], char *envp[]) {
 	assert(isalpha('s'));
+	return 0;
+}
+/************************************************************************/
+
+
+
+
+
+/************************************************************************/
+PRIVATE void myhand(int signo) {
+	syslog(LOG_DEBUG, "myhand(%d)\n", signo);
+	syslog(LOG_DEBUG, "myhand(%d)\n", signo);
+	syslog(LOG_DEBUG, "myhand(%d)\n", signo);
+}
+
+int main_signal(int argc, char *argv[], char *envp[]) {
+	syslog(LOG_DEBUG, "sp:%p\n", __rdsp());
+	signal(SIGUSR1, &myhand);
+	raise(SIGUSR1);
 	return 0;
 }
 /************************************************************************/
@@ -147,6 +168,7 @@ PRIVATE DEF defs[] = {
 	{ "environ", &main_environ },
 	{ "dprint", &main_dprint },
 	{ "ctype", &main_ctype },
+	{ "signal", &main_signal },
 	{ NULL, NULL },
 };
 

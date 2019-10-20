@@ -324,7 +324,7 @@ sighand_raise_signal(struct icpustate *__restrict state,
 		 * >>     movl  $SYS_sigreturn, %eax
 		 * >>     int   $0x80
 		 */
-		/* NOTE: This assembly block must be pointer-aligned! */
+		/* NOTE: This assembly block's size must be pointer-aligned! */
 		PRIVATE byte_t const sigreturn_invoke_assembly[] = {
 			/* movl  $SYS_sigreturn, %eax */
 			0xb8,
@@ -349,15 +349,15 @@ sighand_raise_signal(struct icpustate *__restrict state,
 	if (action->sa_flags & SIGACTION_SA_SIGINFO) {
 		usp -= 4 * sizeof(u32);
 		validate_writable(usp, 4 * sizeof(u32));
-		((u32 *)usp)[0] = (u32)signo;                    /* int signo */
-		((u32 *)usp)[1] = (u32)(uintptr_t)user_siginfo;  /* siginfo32_t *info */
-		((u32 *)usp)[2] = (u32)(uintptr_t)user_ucontext; /* struct ucontext32 *ctx */
-		((u32 *)usp)[3] = (u32)user_rstor;               /* Return address */
+		((u32 *)usp)[0] = (u32)user_rstor;               /* Return address */
+		((u32 *)usp)[1] = (u32)signo;                    /* int signo */
+		((u32 *)usp)[2] = (u32)(uintptr_t)user_siginfo;  /* siginfo32_t *info */
+		((u32 *)usp)[3] = (u32)(uintptr_t)user_ucontext; /* struct ucontext32 *ctx */
 	} else {
 		usp -= 2 * sizeof(u32);
 		validate_writable(usp, 2 * sizeof(u32));
-		((u32 *)usp)[0] = (u32)signo;      /* int signo */
-		((u32 *)usp)[1] = (u32)user_rstor; /* Return address */
+		((u32 *)usp)[0] = (u32)user_rstor; /* Return address */
+		((u32 *)usp)[1] = (u32)signo;      /* int signo */
 	}
 
 	/* Setup the user-space to-be invoked with the following register state:
