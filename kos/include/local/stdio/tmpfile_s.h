@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf2589b32 */
+/* HASH CRC-32:0xdafdbeee */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ __CREDIRECT(__ATTR_WUNUSED,__FILE *,__NOTHROW_RPC,__localdep_tmpfile,(void),tmpf
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(tmpfile_s) __ATTR_NONNULL((1)) __errno_t
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(tmpfile_s))(__FILE **__pstream) {
-#line 2455 "kos/src/libc/magic/stdio.c"
+#line 2568 "kos/src/libc/magic/stdio.c"
 	if (!__pstream)
 		return __EINVAL;
 	*__pstream = __localdep_tmpfile();

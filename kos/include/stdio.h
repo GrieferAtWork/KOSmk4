@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x35805baf */
+/* HASH CRC-32:0xcfd10ece */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2540,6 +2540,67 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,fisatty,(__FILE 
 #include <local/stdio/fisatty.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(fisatty, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL fisatty)(__FILE *__restrict __stream) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fisatty))(__stream); })
 #endif /* fisatty... */
+#ifndef __PIO_OFFSET
+#ifdef __USE_KOS
+#define __PIO_OFFSET     __FS_TYPE(pos)
+#define __PIO_OFFSET64   __pos64_t
+#else /* __USE_KOS */
+#define __PIO_OFFSET     __FS_TYPE(off)
+#define __PIO_OFFSET64   __off64_t
+#endif /* !__USE_KOS */
+#endif /* !__PIO_OFFSET */
+#if defined(__CRT_HAVE_fftruncate64_unlocked) && (defined(__USE_STDIO_UNLOCKED) && defined(__USE_FILE_OFFSET64))
+/* >> fftruncate(3)
+ * Truncate the given file `STREAM' to a length of `LENGTH' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fftruncate,(__FILE *__restrict __stream, __PIO_OFFSET __length),fftruncate64_unlocked,(__stream,__length)) __THROWS(...)
+#elif defined(__CRT_HAVE_fftruncate_unlocked) && (defined(__USE_STDIO_UNLOCKED) && !defined(__USE_FILE_OFFSET64))
+/* >> fftruncate(3)
+ * Truncate the given file `STREAM' to a length of `LENGTH' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fftruncate,(__FILE *__restrict __stream, __PIO_OFFSET __length),fftruncate_unlocked,(__stream,__length)) __THROWS(...)
+#elif defined(__CRT_HAVE_fftruncate64) && (defined(__USE_FILE_OFFSET64))
+/* >> fftruncate(3)
+ * Truncate the given file `STREAM' to a length of `LENGTH' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fftruncate,(__FILE *__restrict __stream, __PIO_OFFSET __length),fftruncate64,(__stream,__length)) __THROWS(...)
+#elif defined(__CRT_HAVE_fftruncate) && (!defined(__USE_FILE_OFFSET64))
+/* >> fftruncate(3)
+ * Truncate the given file `STREAM' to a length of `LENGTH' */
+__CDECLARE(__ATTR_NONNULL((1)),int,,fftruncate,(__FILE *__restrict __stream, __PIO_OFFSET __length),(__stream,__length)) __THROWS(...)
+#elif defined(__CRT_HAVE_fftruncate64_unlocked) && (defined(__USE_FILE_OFFSET64))
+/* >> fftruncate(3)
+ * Truncate the given file `STREAM' to a length of `LENGTH' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fftruncate,(__FILE *__restrict __stream, __PIO_OFFSET __length),fftruncate64_unlocked,(__stream,__length)) __THROWS(...)
+#elif defined(__CRT_HAVE_fftruncate_unlocked) && (!defined(__USE_FILE_OFFSET64))
+/* >> fftruncate(3)
+ * Truncate the given file `STREAM' to a length of `LENGTH' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fftruncate,(__FILE *__restrict __stream, __PIO_OFFSET __length),fftruncate_unlocked,(__stream,__length)) __THROWS(...)
+#elif ((defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE__chsize) || defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s)) || (defined(__CRT_HAVE_ftruncate64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_ftruncate) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__chsize) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_chsize) && !defined(__USE_FILE_OFFSET64)) || defined(__CRT_HAVE__chsize_s)) && (defined(__CRT_HAVE_fileno) || defined(__CRT_HAVE__fileno) || defined(__CRT_HAVE_fileno_unlocked))
+#include <local/stdio/fftruncate.h>
+/* >> fftruncate(3)
+ * Truncate the given file `STREAM' to a length of `LENGTH' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(fftruncate, __FORCELOCAL __ATTR_NONNULL((1)) int (__LIBCCALL fftruncate)(__FILE *__restrict __stream, __PIO_OFFSET __length) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fftruncate))(__stream, __length); })
+#endif /* fftruncate... */
+#if defined(__CRT_HAVE_fftruncate64_unlocked) && (defined(__USE_FILE_OFFSET64))
+/* >> fftruncate_unlocked(3)
+ * Same as `fftruncate()', but don't acquire a lock to the file */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fftruncate_unlocked,(__FILE *__restrict __stream, __PIO_OFFSET __length),fftruncate64_unlocked,(__stream,__length)) __THROWS(...)
+#elif defined(__CRT_HAVE_fftruncate_unlocked) && (!defined(__USE_FILE_OFFSET64))
+/* >> fftruncate_unlocked(3)
+ * Same as `fftruncate()', but don't acquire a lock to the file */
+__CDECLARE(__ATTR_NONNULL((1)),int,,fftruncate_unlocked,(__FILE *__restrict __stream, __PIO_OFFSET __length),(__stream,__length)) __THROWS(...)
+#elif defined(__CRT_HAVE_fftruncate64) && (defined(__USE_FILE_OFFSET64))
+/* >> fftruncate_unlocked(3)
+ * Same as `fftruncate()', but don't acquire a lock to the file */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fftruncate_unlocked,(__FILE *__restrict __stream, __PIO_OFFSET __length),fftruncate64,(__stream,__length)) __THROWS(...)
+#elif defined(__CRT_HAVE_fftruncate) && (!defined(__USE_FILE_OFFSET64))
+/* >> fftruncate_unlocked(3)
+ * Same as `fftruncate()', but don't acquire a lock to the file */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fftruncate_unlocked,(__FILE *__restrict __stream, __PIO_OFFSET __length),fftruncate,(__stream,__length)) __THROWS(...)
+#elif ((defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE__chsize) || defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s)) || (defined(__CRT_HAVE_ftruncate64) && defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_ftruncate) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE__chsize) && !defined(__USE_FILE_OFFSET64)) || (defined(__CRT_HAVE_chsize) && !defined(__USE_FILE_OFFSET64)) || defined(__CRT_HAVE__chsize_s)) && (defined(__CRT_HAVE_fileno_unlocked) || defined(__CRT_HAVE__fileno) || defined(__CRT_HAVE_fileno))
+#include <local/stdio/fftruncate_unlocked.h>
+/* >> fftruncate_unlocked(3)
+ * Same as `fftruncate()', but don't acquire a lock to the file */
+__NAMESPACE_LOCAL_USING_OR_IMPL(fftruncate_unlocked, __FORCELOCAL __ATTR_NONNULL((1)) int (__LIBCCALL fftruncate_unlocked)(__FILE *__restrict __stream, __PIO_OFFSET __length) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fftruncate_unlocked))(__stream, __length); })
+#endif /* fftruncate_unlocked... */
 #if __has_builtin(__builtin_puts_unlocked) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_puts_unlocked)
 __FORCELOCAL __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T (__LIBCCALL puts_unlocked)(char const *__restrict __string) __THROWS(...) { return __builtin_puts_unlocked(__string); }
 #elif defined(__CRT_HAVE_puts_unlocked)
@@ -2608,6 +2669,46 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,,fsetpos64_unlocked,(__FILE *__restrict _
 /* 64-bit variant of `fsetpos' */
 __FORCELOCAL __ATTR_NONNULL((1, 2)) int (__LIBCCALL fsetpos64_unlocked)(__FILE *__restrict __stream, fpos64_t const *__restrict __pos) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fsetpos64))(__stream, __pos); }
 #endif /* fsetpos64_unlocked... */
+#if defined(__CRT_HAVE_fftruncate64_unlocked) && (defined(__USE_STDIO_UNLOCKED))
+/* >> fftruncate64(3)
+ * Truncate the given file `STREAM' to a length of `LENGTH' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fftruncate64,(__FILE *__restrict __stream, __PIO_OFFSET64 __length),fftruncate64_unlocked,(__stream,__length)) __THROWS(...)
+#elif defined(__CRT_HAVE_fftruncate64)
+/* >> fftruncate64(3)
+ * Truncate the given file `STREAM' to a length of `LENGTH' */
+__CDECLARE(__ATTR_NONNULL((1)),int,,fftruncate64,(__FILE *__restrict __stream, __PIO_OFFSET64 __length),(__stream,__length)) __THROWS(...)
+#elif defined(__CRT_HAVE_fftruncate) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+/* >> fftruncate64(3)
+ * Truncate the given file `STREAM' to a length of `LENGTH' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fftruncate64,(__FILE *__restrict __stream, __PIO_OFFSET64 __length),fftruncate,(__stream,__length)) __THROWS(...)
+#elif defined(__CRT_HAVE_fftruncate64_unlocked)
+/* >> fftruncate64(3)
+ * Truncate the given file `STREAM' to a length of `LENGTH' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fftruncate64,(__FILE *__restrict __stream, __PIO_OFFSET64 __length),fftruncate64_unlocked,(__stream,__length)) __THROWS(...)
+#elif ((defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE__chsize)) || defined(__CRT_HAVE_ftruncate64) || (defined(__CRT_HAVE_ftruncate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || defined(__CRT_HAVE__chsize_s)) && (defined(__CRT_HAVE_fileno) || defined(__CRT_HAVE__fileno) || defined(__CRT_HAVE_fileno_unlocked))
+#include <local/stdio/fftruncate64.h>
+/* >> fftruncate64(3)
+ * Truncate the given file `STREAM' to a length of `LENGTH' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(fftruncate64, __FORCELOCAL __ATTR_NONNULL((1)) int (__LIBCCALL fftruncate64)(__FILE *__restrict __stream, __PIO_OFFSET64 __length) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fftruncate64))(__stream, __length); })
+#endif /* fftruncate64... */
+#if defined(__CRT_HAVE_fftruncate64_unlocked)
+/* >> fftruncate64_unlocked(3)
+ * Truncate the given file `STREAM' to a length of `LENGTH' */
+__CDECLARE(__ATTR_NONNULL((1)),int,,fftruncate64_unlocked,(__FILE *__restrict __stream, __PIO_OFFSET64 __length),(__stream,__length)) __THROWS(...)
+#elif defined(__CRT_HAVE_fftruncate_unlocked) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
+/* >> fftruncate64_unlocked(3)
+ * Truncate the given file `STREAM' to a length of `LENGTH' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fftruncate64_unlocked,(__FILE *__restrict __stream, __PIO_OFFSET64 __length),fftruncate_unlocked,(__stream,__length)) __THROWS(...)
+#elif defined(__CRT_HAVE_fftruncate64)
+/* >> fftruncate64_unlocked(3)
+ * Truncate the given file `STREAM' to a length of `LENGTH' */
+__CREDIRECT(__ATTR_NONNULL((1)),int,,fftruncate64_unlocked,(__FILE *__restrict __stream, __PIO_OFFSET64 __length),fftruncate64,(__stream,__length)) __THROWS(...)
+#elif ((defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE__chsize)) || defined(__CRT_HAVE_ftruncate64) || (defined(__CRT_HAVE_ftruncate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || defined(__CRT_HAVE__chsize_s)) && (defined(__CRT_HAVE_fileno_unlocked) || defined(__CRT_HAVE__fileno) || defined(__CRT_HAVE_fileno))
+#include <local/stdio/fftruncate64_unlocked.h>
+/* >> fftruncate64_unlocked(3)
+ * Truncate the given file `STREAM' to a length of `LENGTH' */
+__NAMESPACE_LOCAL_USING_OR_IMPL(fftruncate64_unlocked, __FORCELOCAL __ATTR_NONNULL((1)) int (__LIBCCALL fftruncate64_unlocked)(__FILE *__restrict __stream, __PIO_OFFSET64 __length) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fftruncate64_unlocked))(__stream, __length); })
+#endif /* fftruncate64_unlocked... */
 #endif /* __USE_LARGEFILE64 */
 #if defined(__CRT_HAVE_vfprintf_unlocked)
 __CDECLARE(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,,vfprintf_unlocked,(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args),(__stream,__format,__args)) __THROWS(...)

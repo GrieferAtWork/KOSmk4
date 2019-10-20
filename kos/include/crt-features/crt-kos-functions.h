@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x29f65e62 */
+/* HASH CRC-32:0xc1003acb */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -603,6 +603,10 @@ __CRT_FUNCTION(fflush_unlocked,0,(),1,(FILE *,stream),int)
 __CRT_FUNCTION(ffs,0,(),1,(int,i),__STDC_INT_AS_SIZE_T)
 __CRT_FUNCTION(ffsl,0,(),1,(long,i),__STDC_INT_AS_SIZE_T)
 __CRT_FUNCTION(ffsll,0,(),1,(__LONGLONG,i),__STDC_INT_AS_SIZE_T)
+__CRT_FUNCTION(fftruncate,0,(),2,(FILE *__restrict,stream,__PIO_OFFSET,length),int)
+__CRT_FUNCTION(fftruncate64,1,(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__,fftruncate),2,(FILE *__restrict,stream,__PIO_OFFSET64,length),int)
+__CRT_FUNCTION(fftruncate64_unlocked,1,(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__,fftruncate_unlocked),2,(FILE *__restrict,stream,__PIO_OFFSET64,length),int)
+__CRT_FUNCTION(fftruncate_unlocked,0,(),2,(FILE *__restrict,stream,__PIO_OFFSET,length),int)
 __CRT_FUNCTION(fgetc,0,(),1,(FILE *__restrict,stream),int)
 __CRT_FUNCTION(fgetc_unlocked,0,(),1,(FILE *__restrict,stream),int)
 __CRT_FUNCTION(fgetgrent,0,(),1,(FILE *__restrict,stream),struct group *)

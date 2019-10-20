@@ -43,7 +43,7 @@
 #endif /* __CRT_GLC || __CRT_KOS || __CRT_KOS_KERNEL */
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K)
 #include <bits/environments.h>
-#endif
+#endif /* __USE_UNIX98 || __USE_XOPEN2K */
 
 __SYSDECL_BEGIN
 
@@ -58,6 +58,7 @@ __SYSDECL_BEGIN
 #else
 #   define _POSIX_VERSION    199009L
 #endif
+
 #ifdef __USE_XOPEN2K8
 #   define __POSIX2_THIS_VERSION    200809L
 #elif defined(__USE_XOPEN2K)
@@ -110,7 +111,7 @@ __SYSDECL_BEGIN
 #   define SEEK_DATA 3 /* Seek to next data.  */
 #   define SEEK_HOLE 4 /* Seek to next hole.  */
 #endif /* __USE_GNU && (__CRT_KOS || __CRT_GLC) */
-#endif
+#endif /* !SEEK_SET */
 
 #ifdef __USE_MISC
 #ifndef L_SET
@@ -119,7 +120,7 @@ __SYSDECL_BEGIN
 #   define L_INCR SEEK_CUR
 #   define L_XTND SEEK_END
 #endif /* !L_SET */
-#endif
+#endif /* __USE_MISC */
 
 #ifdef __CC__
 #ifndef __ssize_t_defined
@@ -815,10 +816,10 @@ lseek64:($fd_t fd, $off64_t offset, int whence) -> $off64_t {
 %#ifdef __USE_KOS
 %#define __PIO_OFFSET     __FS_TYPE(pos)
 %#define __PIO_OFFSET64   __pos64_t
-%#else
+%#else /* __USE_KOS */
 %#define __PIO_OFFSET     __FS_TYPE(off)
 %#define __PIO_OFFSET64   __off64_t
-%#endif
+%#endif /* !__USE_KOS */
 %#endif /* !__PIO_OFFSET */
 
 
@@ -830,10 +831,10 @@ lseek64:($fd_t fd, $off64_t offset, int whence) -> $off64_t {
 #ifdef __USE_KOS
 #define __PIO_OFFSET     __FS_TYPE(pos)
 #define __PIO_OFFSET64   __pos64_t
-#else
+#else /* __USE_KOS */
 #define __PIO_OFFSET     __FS_TYPE(off)
 #define __PIO_OFFSET64   __off64_t
-#endif
+#endif /* !__USE_KOS */
 #endif /* !__PIO_OFFSET */
 )][impl_prefix(
 #ifndef SEEK_SET
@@ -844,7 +845,7 @@ lseek64:($fd_t fd, $off64_t offset, int whence) -> $off64_t {
 #   define SEEK_DATA 3 /* Seek to next data.  */
 #   define SEEK_HOLE 4 /* Seek to next hole.  */
 #endif /* __USE_GNU && (__CRT_KOS || __CRT_GLC) */
-#endif
+#endif /* !SEEK_SET */
 )][noexport]
 [if(defined(__USE_FILE_OFFSET64)), preferred_alias(pread64)]
 [if(!defined(__USE_FILE_OFFSET64)), preferred_alias(pread)]
@@ -1223,10 +1224,10 @@ lchown:([notnull] char const *file, $uid_t owner, $gid_t group) -> int {
 #ifdef __USE_KOS
 #define __PIO_OFFSET     __FS_TYPE(pos)
 #define __PIO_OFFSET64   __pos64_t
-#else
+#else /* __USE_KOS */
 #define __PIO_OFFSET     __FS_TYPE(off)
 #define __PIO_OFFSET64   __off64_t
-#endif
+#endif /* !__USE_KOS */
 #endif /* !__PIO_OFFSET */
 }
 
@@ -1238,10 +1239,10 @@ lchown:([notnull] char const *file, $uid_t owner, $gid_t group) -> int {
 #ifdef __USE_KOS
 #define __PIO_OFFSET     __FS_TYPE(pos)
 #define __PIO_OFFSET64   __pos64_t
-#else
+#else /* __USE_KOS */
 #define __PIO_OFFSET     __FS_TYPE(off)
 #define __PIO_OFFSET64   __off64_t
-#endif
+#endif /* !__USE_KOS */
 #endif /* !__PIO_OFFSET */
 )][noexport]
 [if(defined(__USE_FILE_OFFSET64)), preferred_alias(truncate64)]
@@ -1283,10 +1284,10 @@ truncate:([notnull] char const *file, __PIO_OFFSET length) -> int {
 #ifdef __USE_KOS
 #define __PIO_OFFSET     __FS_TYPE(pos)
 #define __PIO_OFFSET64   __pos64_t
-#else
+#else /* __USE_KOS */
 #define __PIO_OFFSET     __FS_TYPE(off)
 #define __PIO_OFFSET64   __off64_t
-#endif
+#endif /* !__USE_KOS */
 #endif /* !__PIO_OFFSET */
 )][noexport]
 [section(.text.crt.fs.modify)]
@@ -1646,10 +1647,10 @@ ftruncate:($fd_t fd, __PIO_OFFSET length) -> int {
 #ifdef __USE_KOS
 #define __PIO_OFFSET     __FS_TYPE(pos)
 #define __PIO_OFFSET64   __pos64_t
-#else
+#else /* __USE_KOS */
 #define __PIO_OFFSET     __FS_TYPE(off)
 #define __PIO_OFFSET64   __off64_t
-#endif
+#endif /* !__USE_KOS */
 #endif /* !__PIO_OFFSET */
 )][alias(_chsize_s)][noexport]
 [requires(defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE__chsize))]
@@ -1768,13 +1769,13 @@ __SYSDECL_END
 #ifdef __USE_KOS
 #if defined(_WCHAR_H) && !defined(_PARTS_WCHAR_UNISTD_H)
 #include <parts/wchar/unistd.h>
-#endif
+#endif /* _WCHAR_H && !_PARTS_WCHAR_UNISTD_H */
 #endif /* __USE_KOS */
 
 #ifdef __USE_UTF
 #if defined(_UCHAR_H) && !defined(_PARTS_UCHAR_UNISTD_H)
 #include <parts/uchar/unistd.h>
-#endif
+#endif /* _UCHAR_H && !_PARTS_UCHAR_UNISTD_H */
 #endif /* __USE_UTF */
 
 }

@@ -1835,6 +1835,72 @@ fisatty:([nonnull] $FILE *__restrict stream) -> int {
 	return isatty(fileno(stream));
 }
 
+%#ifndef __PIO_OFFSET
+%#ifdef __USE_KOS
+%#define __PIO_OFFSET     __FS_TYPE(pos)
+%#define __PIO_OFFSET64   __pos64_t
+%#else /* __USE_KOS */
+%#define __PIO_OFFSET     __FS_TYPE(off)
+%#define __PIO_OFFSET64   __off64_t
+%#endif /* !__USE_KOS */
+%#endif /* !__PIO_OFFSET */
+
+
+@@>> fftruncate(3)
+@@Truncate the given file `STREAM' to a length of `LENGTH'
+[if(defined(__USE_STDIO_UNLOCKED) && defined(__USE_FILE_OFFSET64)), preferred_alias(fftruncate64_unlocked)]
+[if(defined(__USE_STDIO_UNLOCKED) && !defined(__USE_FILE_OFFSET64)), preferred_alias(fftruncate_unlocked)]
+[if(defined(__USE_FILE_OFFSET64)), preferred_alias(fftruncate64)]
+[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(fftruncate)]
+[if(defined(__USE_FILE_OFFSET64)), preferred_alias(fftruncate64_unlocked)]
+[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(fftruncate_unlocked)]
+[requires($has_function(ftruncate) && $has_function(fileno))]
+[section(.text.crt.FILE.locked.utility)][impl_prefix(
+#ifndef __PIO_OFFSET
+#ifdef __USE_KOS
+#define __PIO_OFFSET     __FS_TYPE(pos)
+#define __PIO_OFFSET64   __pos64_t
+#else /* __USE_KOS */
+#define __PIO_OFFSET     __FS_TYPE(off)
+#define __PIO_OFFSET64   __off64_t
+#endif /* !__USE_KOS */
+#endif /* !__PIO_OFFSET */
+)][noexport][cp_stdio]
+fftruncate:([nonnull] $FILE *__restrict stream, __PIO_OFFSET length) -> int {
+	int result = -1;
+	fd_t fd = fileno(stream);
+	if likely(fd >= 0)
+		result = ftruncate(fd, length);
+	return result;
+}
+
+@@>> fftruncate_unlocked(3)
+@@Same as `fftruncate()', but don't acquire a lock to the file
+[if(defined(__USE_FILE_OFFSET64)), preferred_alias(fftruncate64_unlocked)]
+[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(fftruncate_unlocked)]
+[if(defined(__USE_FILE_OFFSET64)), preferred_alias(fftruncate64)]
+[if(!defined(__USE_FILE_OFFSET64)), preferred_alias(fftruncate)]
+[requires($has_function(ftruncate) && $has_function(fileno_unlocked))]
+[section(.text.crt.FILE.unlocked.utility)][impl_prefix(
+#ifndef __PIO_OFFSET
+#ifdef __USE_KOS
+#define __PIO_OFFSET     __FS_TYPE(pos)
+#define __PIO_OFFSET64   __pos64_t
+#else /* __USE_KOS */
+#define __PIO_OFFSET     __FS_TYPE(off)
+#define __PIO_OFFSET64   __off64_t
+#endif /* !__USE_KOS */
+#endif /* !__PIO_OFFSET */
+)][noexport][cp_stdio]
+fftruncate_unlocked:([nonnull] $FILE *__restrict stream, __PIO_OFFSET length) -> int {
+	int result = -1;
+	fd_t fd = fileno_unlocked(stream);
+	if likely(fd >= 0)
+		result = ftruncate(fd, length);
+	return result;
+}
+
+
 [cp_stdio][user][crtbuiltin][section(.text.crt.FILE.unlocked.write.write)]
 [same_impl][alias(puts)][dependency_include(<local/stdstreams.h>)]
 [requires(!defined(__NO_STDSTREAMS) && $has_function(fputs_unlocked))]
@@ -1869,6 +1935,53 @@ fgetpos64_unlocked:([nonnull] $FILE *__restrict stream, [nonnull] fpos64_t *__re
 [off64_variant_of(fsetpos_unlocked)]
 [stdio_throws][user][section(.text.crt.FILE.unlocked.seek.pos)]
 fsetpos64_unlocked:([nonnull] $FILE *__restrict stream, [nonnull] fpos64_t const *__restrict pos) -> int = fsetpos64;
+
+@@>> fftruncate64(3)
+@@Truncate the given file `STREAM' to a length of `LENGTH'
+[off64_variant_of(fftruncate)][alias(fftruncate64_unlocked)]
+[if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(fftruncate64_unlocked)]
+[requires($has_function(ftruncate64) && $has_function(fileno))]
+[section(.text.crt.FILE.locked.utility)][impl_prefix(
+#ifndef __PIO_OFFSET
+#ifdef __USE_KOS
+#define __PIO_OFFSET     __FS_TYPE(pos)
+#define __PIO_OFFSET64   __pos64_t
+#else /* __USE_KOS */
+#define __PIO_OFFSET     __FS_TYPE(off)
+#define __PIO_OFFSET64   __off64_t
+#endif /* !__USE_KOS */
+#endif /* !__PIO_OFFSET */
+)][noexport][cp_stdio]
+fftruncate64:([nonnull] $FILE *__restrict stream, __PIO_OFFSET64 length) -> int {
+	int result = -1;
+	fd_t fd = fileno(stream);
+	if likely(fd >= 0)
+		result = ftruncate64(fd, length);
+	return result;
+}
+
+@@>> fftruncate64_unlocked(3)
+@@Truncate the given file `STREAM' to a length of `LENGTH'
+[off64_variant_of(fftruncate_unlocked)][alias(fftruncate64)]
+[requires($has_function(ftruncate64) && $has_function(fileno_unlocked))]
+[section(.text.crt.FILE.unlocked.utility)][impl_prefix(
+#ifndef __PIO_OFFSET
+#ifdef __USE_KOS
+#define __PIO_OFFSET     __FS_TYPE(pos)
+#define __PIO_OFFSET64   __pos64_t
+#else /* __USE_KOS */
+#define __PIO_OFFSET     __FS_TYPE(off)
+#define __PIO_OFFSET64   __off64_t
+#endif /* !__USE_KOS */
+#endif /* !__PIO_OFFSET */
+)][noexport][cp_stdio]
+fftruncate64_unlocked:([nonnull] $FILE *__restrict stream, __PIO_OFFSET64 length) -> int {
+	int result = -1;
+	fd_t fd = fileno_unlocked(stream);
+	if likely(fd >= 0)
+		result = ftruncate64(fd, length);
+	return result;
+}
 
 %#endif /* __USE_LARGEFILE64 */
 

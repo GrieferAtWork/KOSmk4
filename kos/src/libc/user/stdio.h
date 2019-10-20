@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2a902bd2 */
+/* HASH CRC-32:0x834f3aa8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -248,6 +248,12 @@ INTDEF WUNUSED NONNULL((1, 2, 3)) ssize_t (LIBCCALL libc_getline_unlocked)(char 
 /* Rewind the current in-file position of `STREAM' to its starting position */
 INTDEF NONNULL((1)) void (LIBCCALL libc_rewind_unlocked)(FILE *__restrict stream) __THROWS(...);
 INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_fisatty)(FILE *__restrict stream);
+/* >> fftruncate(3)
+ * Truncate the given file `STREAM' to a length of `LENGTH' */
+INTDEF NONNULL((1)) int (LIBCCALL libc_fftruncate)(FILE *__restrict stream, __PIO_OFFSET length) __THROWS(...);
+/* >> fftruncate_unlocked(3)
+ * Same as `fftruncate()', but don't acquire a lock to the file */
+INTDEF NONNULL((1)) int (LIBCCALL libc_fftruncate_unlocked)(FILE *__restrict stream, __PIO_OFFSET length) __THROWS(...);
 INTDEF NONNULL((1)) __STDC_INT_AS_SSIZE_T (LIBCCALL libc_puts_unlocked)(char const *__restrict string) __THROWS(...);
 /* 64-bit variant of `fseeko' */
 INTDEF NONNULL((1)) int (LIBCCALL libc_fseeko64_unlocked)(FILE *__restrict stream, off64_t off, int whence) __THROWS(...);
@@ -257,6 +263,12 @@ INTDEF WUNUSED NONNULL((1)) off64_t (LIBCCALL libc_ftello64_unlocked)(FILE *__re
 INTDEF NONNULL((1, 2)) int (LIBCCALL libc_fgetpos64_unlocked)(FILE *__restrict stream, fpos64_t *__restrict pos) __THROWS(...);
 /* 64-bit variant of `fsetpos' */
 INTDEF NONNULL((1, 2)) int (LIBCCALL libc_fsetpos64_unlocked)(FILE *__restrict stream, fpos64_t const *__restrict pos) __THROWS(...);
+/* >> fftruncate64(3)
+ * Truncate the given file `STREAM' to a length of `LENGTH' */
+INTDEF NONNULL((1)) int (LIBCCALL libc_fftruncate64)(FILE *__restrict stream, __PIO_OFFSET64 length) __THROWS(...);
+/* >> fftruncate64_unlocked(3)
+ * Truncate the given file `STREAM' to a length of `LENGTH' */
+INTDEF NONNULL((1)) int (LIBCCALL libc_fftruncate64_unlocked)(FILE *__restrict stream, __PIO_OFFSET64 length) __THROWS(...);
 INTDEF ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (LIBCCALL libc_vfprintf_unlocked)(FILE *__restrict stream, char const *__restrict format, va_list args) __THROWS(...);
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb97ba95e */
+/* HASH CRC-32:0x56e491c9 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __CREDIRECT(,__WCHAR_TYPE__ *,__NOTHROW_RPC,__localdep_wgetcwd,(__WCHAR_TYPE__ *
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wget_current_dir_name) __ATTR_WUNUSED __ATTR_MALLOC __WCHAR_TYPE__ *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wget_current_dir_name))(void) {
-#line 1126 "kos/src/libc/magic/unistd.c"
+#line 1127 "kos/src/libc/magic/unistd.c"
 	return __localdep_wgetcwd(__NULLPTR, 0);
 }
 __NAMESPACE_LOCAL_END

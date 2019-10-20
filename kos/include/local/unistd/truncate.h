@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x50a4ada8 */
+/* HASH CRC-32:0x777011b9 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -129,17 +129,17 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __USE_KOS
 #define __PIO_OFFSET     __FS_TYPE(pos)
 #define __PIO_OFFSET64   __pos64_t
-#else
+#else /* __USE_KOS */
 #define __PIO_OFFSET     __FS_TYPE(off)
 #define __PIO_OFFSET64   __off64_t
-#endif
+#endif /* !__USE_KOS */
 #endif /* !__PIO_OFFSET */
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __LOCAL_LIBC(truncate) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(truncate))(char const *__file,
                                                       __PIO_OFFSET __length) {
-#line 1252 "kos/src/libc/magic/unistd.c"
+#line 1253 "kos/src/libc/magic/unistd.c"
 #if defined(__CRT_HAVE_truncate64)
 	return __localdep_truncate64(__file, (__PIO_OFFSET64)__length);
 #elif defined(__CRT_HAVE_truncate)

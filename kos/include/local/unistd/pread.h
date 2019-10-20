@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa8efd29c */
+/* HASH CRC-32:0xe2604bea */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -98,10 +98,10 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __USE_KOS
 #define __PIO_OFFSET     __FS_TYPE(pos)
 #define __PIO_OFFSET64   __pos64_t
-#else
+#else /* __USE_KOS */
 #define __PIO_OFFSET     __FS_TYPE(off)
 #define __PIO_OFFSET64   __off64_t
-#endif
+#endif /* !__USE_KOS */
 #endif /* !__PIO_OFFSET */
 
 #ifndef 0
@@ -112,7 +112,7 @@ __NAMESPACE_LOCAL_BEGIN
 #   define SEEK_DATA 3 /* Seek to next data.  */
 #   define SEEK_HOLE 4 /* Seek to next hole.  */
 #endif /* __USE_GNU && (__CRT_KOS || __CRT_GLC) */
-#endif
+#endif /* !SEEK_SET */
 /* >> pread(2)
  * Read data from a file at a specific offset */
 __LOCAL_LIBC(pread) __ATTR_NONNULL((2)) __SSIZE_TYPE__
@@ -120,7 +120,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pread))(__fd_t __fd,
                                                    void *__buf,
                                                    __SIZE_TYPE__ __bufsize,
                                                    __PIO_OFFSET __offset) {
-#line 854 "kos/src/libc/magic/unistd.c"
+#line 855 "kos/src/libc/magic/unistd.c"
 #ifdef __CRT_HAVE_pread64
 	return __localdep_pread64(__fd, __buf, __bufsize, (__PIO_OFFSET64)__offset);
 #else

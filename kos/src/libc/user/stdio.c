@@ -1469,7 +1469,6 @@ err:
 }
 
 
-#if 0 /* TODO: Add an extension the likes of `fftruncate()' / `fftruncate64()' */
 PRIVATE ATTR_SECTION(".text.crt.FILE.core.write.file_truncate")
 WUNUSED NONNULL((1)) int LIBCCALL file_truncate(FILE *__restrict self,
                                                 pos64_t new_size) {
@@ -1504,7 +1503,6 @@ err:
 err0:
 	return -1;
 }
-#endif
 
 
 struct open_option {
@@ -2612,6 +2610,98 @@ NOTHROW_NCX(LIBCCALL libc_fisatty)(FILE *__restrict stream)
 	return (stream->if_flag & IO_ISATTY) != 0;
 }
 /*[[[end:fisatty]]]*/
+
+/*[[[head:fftruncate,hash:CRC-32=0xe4d5e5ca]]]*/
+/* >> fftruncate(3)
+ * Truncate the given file `STREAM' to a length of `LENGTH' */
+INTERN NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.utility.fftruncate") int
+(LIBCCALL libc_fftruncate)(FILE *__restrict stream,
+                           __PIO_OFFSET length)
+		__THROWS(...)
+/*[[[body:fftruncate]]]*/
+{
+	int result;
+	if unlikely(!stream) {
+		libc_seterrno(EINVAL);
+		return -1;
+	}
+	file_write(stream);
+	result = file_truncate(stream, (pos64_t)length);
+	file_endwrite(stream);
+	return result;
+}
+/*[[[end:fftruncate]]]*/
+
+/*[[[head:fftruncate_unlocked,hash:CRC-32=0x3e7de05c]]]*/
+/* >> fftruncate_unlocked(3)
+ * Same as `fftruncate()', but don't acquire a lock to the file */
+INTERN NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.utility.fftruncate_unlocked") int
+(LIBCCALL libc_fftruncate_unlocked)(FILE *__restrict stream,
+                                    __PIO_OFFSET length)
+		__THROWS(...)
+/*[[[body:fftruncate_unlocked]]]*/
+{
+	int result;
+	if unlikely(!stream) {
+		libc_seterrno(EINVAL);
+		return -1;
+	}
+	result = file_truncate(stream, (pos64_t)length);
+	return result;
+}
+/*[[[end:fftruncate_unlocked]]]*/
+
+/*[[[head:fftruncate64,hash:CRC-32=0x2823a266]]]*/
+/* >> fftruncate64(3)
+ * Truncate the given file `STREAM' to a length of `LENGTH' */
+#if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+DEFINE_INTERN_ALIAS(libc_fftruncate64, libc_fftruncate);
+#else
+INTERN NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.utility.fftruncate64") int
+(LIBCCALL libc_fftruncate64)(FILE *__restrict stream,
+                             __PIO_OFFSET64 length)
+		__THROWS(...)
+/*[[[body:fftruncate64]]]*/
+{
+	int result;
+	if unlikely(!stream) {
+		libc_seterrno(EINVAL);
+		return -1;
+	}
+	file_write(stream);
+	result = file_truncate(stream, (pos64_t)length);
+	file_endwrite(stream);
+	return result;
+}
+#endif /* MAGIC:alias */
+/*[[[end:fftruncate64]]]*/
+
+/*[[[head:fftruncate64_unlocked,hash:CRC-32=0x3e678d0b]]]*/
+/* >> fftruncate64_unlocked(3)
+ * Truncate the given file `STREAM' to a length of `LENGTH' */
+#if __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__
+DEFINE_INTERN_ALIAS(libc_fftruncate64_unlocked, libc_fftruncate_unlocked);
+#else
+INTERN NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.utility.fftruncate64_unlocked") int
+(LIBCCALL libc_fftruncate64_unlocked)(FILE *__restrict stream,
+                                      __PIO_OFFSET64 length)
+		__THROWS(...)
+/*[[[body:fftruncate64_unlocked]]]*/
+{
+	int result;
+	if unlikely(!stream) {
+		libc_seterrno(EINVAL);
+		return -1;
+	}
+	result = file_truncate(stream, (pos64_t)length);
+	return result;
+}
+#endif /* MAGIC:alias */
+/*[[[end:fftruncate64_unlocked]]]*/
 
 /*[[[head:setvbuf,hash:CRC-32=0x821d8c5b]]]*/
 /* Set the buffer and buffer-mode to-be used by the given `STREAM'
@@ -4721,6 +4811,7 @@ NOTHROW_RPC(LIBCCALL libc_freopen_unlocked)(char const *__restrict filename,
 }
 /*[[[end:freopen_unlocked]]]*/
 
+
 /*[[[impl:fopen64]]]*/
 /*[[[impl:freopen64]]]*/
 /*[[[impl:freopen64_unlocked]]]*/
@@ -4738,7 +4829,7 @@ DEFINE_INTERN_ALIAS(libc_ferror_unlocked, libc_ferror);
 
 
 
-/*[[[start:exports,hash:CRC-32=0x1aca4f58]]]*/
+/*[[[start:exports,hash:CRC-32=0x180419b1]]]*/
 #undef fprintf
 #undef fprintf_unlocked
 #undef fprintf_s
@@ -4946,11 +5037,15 @@ DEFINE_PUBLIC_WEAK_ALIAS(getdelim_unlocked, libc_getdelim_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(getline_unlocked, libc_getline_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(rewind_unlocked, libc_rewind_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(fisatty, libc_fisatty);
+DEFINE_PUBLIC_WEAK_ALIAS(fftruncate, libc_fftruncate);
+DEFINE_PUBLIC_WEAK_ALIAS(fftruncate_unlocked, libc_fftruncate_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(puts_unlocked, libc_puts_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(fseeko64_unlocked, libc_fseeko64_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(ftello64_unlocked, libc_ftello64_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(fgetpos64_unlocked, libc_fgetpos64_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(fsetpos64_unlocked, libc_fsetpos64_unlocked);
+DEFINE_PUBLIC_WEAK_ALIAS(fftruncate64, libc_fftruncate64);
+DEFINE_PUBLIC_WEAK_ALIAS(fftruncate64_unlocked, libc_fftruncate64_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(vfprintf_unlocked, libc_vfprintf_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(fprintf_unlocked, libc_fprintf_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(vprintf_unlocked, libc_vprintf_unlocked);

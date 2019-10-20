@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf30cd91 */
+/* HASH CRC-32:0x3c1ec664 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@
 #endif /* __CRT_GLC || __CRT_KOS || __CRT_KOS_KERNEL */
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K)
 #include <bits/environments.h>
-#endif
+#endif /* __USE_UNIX98 || __USE_XOPEN2K */
 
 __SYSDECL_BEGIN
 
@@ -53,6 +53,7 @@ __SYSDECL_BEGIN
 #else
 #   define _POSIX_VERSION    199009L
 #endif
+
 #ifdef __USE_XOPEN2K8
 #   define __POSIX2_THIS_VERSION    200809L
 #elif defined(__USE_XOPEN2K)
@@ -105,7 +106,7 @@ __SYSDECL_BEGIN
 #   define SEEK_DATA 3 /* Seek to next data.  */
 #   define SEEK_HOLE 4 /* Seek to next hole.  */
 #endif /* __USE_GNU && (__CRT_KOS || __CRT_GLC) */
-#endif
+#endif /* !SEEK_SET */
 
 #ifdef __USE_MISC
 #ifndef L_SET
@@ -114,7 +115,7 @@ __SYSDECL_BEGIN
 #   define L_INCR SEEK_CUR
 #   define L_XTND SEEK_END
 #endif /* !L_SET */
-#endif
+#endif /* __USE_MISC */
 
 #ifdef __CC__
 #ifndef __ssize_t_defined
@@ -1113,10 +1114,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lseek64, __FORCELOCAL __off64_t __NOTHROW_NCX(__
 #ifdef __USE_KOS
 #define __PIO_OFFSET     __FS_TYPE(pos)
 #define __PIO_OFFSET64   __pos64_t
-#else
+#else /* __USE_KOS */
 #define __PIO_OFFSET     __FS_TYPE(off)
 #define __PIO_OFFSET64   __off64_t
-#endif
+#endif /* !__USE_KOS */
 #endif /* !__PIO_OFFSET */
 
 #if defined(__CRT_HAVE_pread64) && (defined(__USE_FILE_OFFSET64))
@@ -1384,10 +1385,10 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lchown, __FORCELOCAL __ATTR_NONNULL((1)) int __N
 #ifdef __USE_KOS
 #define __PIO_OFFSET     __FS_TYPE(pos)
 #define __PIO_OFFSET64   __pos64_t
-#else
+#else /* __USE_KOS */
 #define __PIO_OFFSET     __FS_TYPE(off)
 #define __PIO_OFFSET64   __off64_t
-#endif
+#endif /* !__USE_KOS */
 #endif /* !__PIO_OFFSET */
 
 #if defined(__CRT_HAVE_truncate64) && (defined(__USE_FILE_OFFSET64))
@@ -2002,13 +2003,13 @@ __SYSDECL_END
 #ifdef __USE_KOS
 #if defined(_WCHAR_H) && !defined(_PARTS_WCHAR_UNISTD_H)
 #include <parts/wchar/unistd.h>
-#endif
+#endif /* _WCHAR_H && !_PARTS_WCHAR_UNISTD_H */
 #endif /* __USE_KOS */
 
 #ifdef __USE_UTF
 #if defined(_UCHAR_H) && !defined(_PARTS_UCHAR_UNISTD_H)
 #include <parts/uchar/unistd.h>
-#endif
+#endif /* _UCHAR_H && !_PARTS_UCHAR_UNISTD_H */
 #endif /* __USE_UTF */
 
 #endif /* !_UNISTD_H */

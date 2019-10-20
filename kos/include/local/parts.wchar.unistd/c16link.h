@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x19a59d9f */
+/* HASH CRC-32:0x173e4853 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c16link) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(c16link))(__CHAR16_TYPE__ const *__from,
                                                      __CHAR16_TYPE__ const *__to) {
-#line 528 "kos/src/libc/magic/unistd.c"
+#line 529 "kos/src/libc/magic/unistd.c"
 	/* TODO: Header-implementation for `link()' on DOS (using the windows API) */
 	return __localdep_c16linkat(__CRT_AT_FDCWD, __from, __CRT_AT_FDCWD, __to, 0);
 }

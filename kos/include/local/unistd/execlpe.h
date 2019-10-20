@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x78f43da8 */
+/* HASH CRC-32:0xf60037f2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,7 +52,7 @@ __LOCAL_LIBC(execlpe) __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(execlpe))(char const *__restrict __file,
                                                       char const *__args,
                                                       ... /*, (char *)NULL, (char **)environ*/) {
-#line 301 "kos/src/libc/magic/unistd.c"
+#line 302 "kos/src/libc/magic/unistd.c"
 	__REDIRECT_EXECLE(char, __localdep_execvp, __file, __args)
 }
 __NAMESPACE_LOCAL_END

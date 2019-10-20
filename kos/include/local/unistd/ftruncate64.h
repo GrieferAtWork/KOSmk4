@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7ebd584c */
+/* HASH CRC-32:0x52849fb7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,17 +37,17 @@ __NAMESPACE_LOCAL_BEGIN
 #ifdef __USE_KOS
 #define __PIO_OFFSET     __FS_TYPE(pos)
 #define __PIO_OFFSET64   __pos64_t
-#else
+#else /* __USE_KOS */
 #define __PIO_OFFSET     __FS_TYPE(off)
 #define __PIO_OFFSET64   __off64_t
-#endif
+#endif /* !__USE_KOS */
 #endif /* !__PIO_OFFSET */
 /* >> ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __LOCAL_LIBC(ftruncate64) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ftruncate64))(__fd_t __fd,
                                                          __PIO_OFFSET64 __length) {
-#line 1658 "kos/src/libc/magic/unistd.c"
+#line 1659 "kos/src/libc/magic/unistd.c"
 	return __localdep_ftruncate32(__fd, (__pos32_t)__length);
 }
 __NAMESPACE_LOCAL_END

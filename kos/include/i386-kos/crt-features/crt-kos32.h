@@ -1458,6 +1458,10 @@
 #define __CRT_HAVE_ffs 1
 #define __CRT_HAVE_ffsl 1
 #define __CRT_HAVE_ffsll 1
+#define __CRT_HAVE_fftruncate 1
+#define __CRT_HAVE_fftruncate64 1
+#define __CRT_HAVE_fftruncate64_unlocked 1
+#define __CRT_HAVE_fftruncate_unlocked 1
 #define __CRT_HAVE_fgetc 1
 #define __CRT_HAVE_fgetc_unlocked 1
 #define __CRT_HAVE_fgetgrent 1
