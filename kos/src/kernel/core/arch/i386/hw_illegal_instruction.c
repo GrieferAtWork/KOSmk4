@@ -743,7 +743,18 @@ x86_cirq_06(struct icpustate *__restrict state) {
 				if (mod.mi_type != MODRM_REGISTER)
 					goto e_bad_operand_addrmode;
 #ifndef __x86_64__
-				WR_RMREGL(get_user_fsbase());
+				{
+					u16 myfs = state->ics_fs16 & ~3;
+					u32 base;
+					if (myfs == SEGMENT_USER_FSBASE) {
+						base = get_user_fsbase();
+					} else if (myfs == SEGMENT_USER_GSBASE) {
+						base = get_user_gsbase();
+					} else {
+						base = 0;
+					}
+					WR_RMREGL(base);
+				}
 #else /* !__x86_64__ */
 				{
 					LOHI64 temp;
@@ -784,7 +795,18 @@ x86_cirq_06(struct icpustate *__restrict state) {
 				if (mod.mi_type != MODRM_REGISTER)
 					goto e_bad_operand_addrmode;
 #ifndef __x86_64__
-				WR_RMREGL(get_user_gsbase());
+				{
+					u16 mygs = __rdgs() & ~3;
+					u32 base;
+					if (mygs == SEGMENT_USER_GSBASE) {
+						base = get_user_gsbase();
+					} else if (mygs == SEGMENT_USER_FSBASE) {
+						base = get_user_fsbase();
+					} else {
+						base = 0;
+					}
+					WR_RMREGL(base);
+				}
 #else /* !__x86_64__ */
 				{
 					LOHI64 temp;
@@ -819,9 +841,26 @@ x86_cirq_06(struct icpustate *__restrict state) {
 					goto generic_illegal_instruction;
 				if (mod.mi_type != MODRM_REGISTER)
 					goto e_bad_operand_addrmode;
-				/* XXX: Check if `%fs == SEGMENT_USER_FSBASE_RPL' */
 #ifndef __x86_64__
-				set_user_fsbase(RD_RMREGL());
+				{
+					u16 myfs = state->ics_fs16 & ~3;
+					u32 val  = RD_RMREGL();
+					/* Check which segment `%fs' actually refers to */
+					if (myfs == SEGMENT_USER_FSBASE)
+						set_user_fsbase(val);
+					else if (myfs == SEGMENT_USER_GSBASE) {
+						set_user_gsbase(val);
+						update_user_fsbase(); /* Force a segment reload */
+					} else {
+						/* Don't allow user-space to set the bases of any other segment.
+						 * As such, throw an exception indicating a privileged register (which SOME_SEGMENT.base is) */
+						PERTASK_SET(_this_exception_info.ei_code, (error_code_t)ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
+						PERTASK_SET(_this_exception_info.ei_data.e_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV);
+						PERTASK_SET(_this_exception_info.ei_data.e_pointers[2], (uintptr_t)X86_REGISTER_SEGMENT_FS);
+						PERTASK_SET(_this_exception_info.ei_data.e_pointers[3], (uintptr_t)val);
+						goto set_generic_illegal_instruction;
+					}
+				}
 #else /* !__x86_64__ */
 				{
 					LOHI64 temp;
@@ -842,7 +881,25 @@ x86_cirq_06(struct icpustate *__restrict state) {
 					goto e_bad_operand_addrmode;
 				/* XXX: Check if `%gs == SEGMENT_USER_GSBASE_RPL' */
 #ifndef __x86_64__
-				set_user_gsbase(RD_RMREGL());
+				/* Check which segment `%gs' actually refers to */
+				{
+					u16 mygs = __rdgs() & ~3;
+					u32 val = RD_RMREGL();
+					if (mygs == SEGMENT_USER_GSBASE)
+						set_user_gsbase(val);
+					else if (mygs == SEGMENT_USER_FSBASE) {
+						set_user_fsbase(val);
+						update_user_gsbase(); /* Force a segment reload */
+					} else {
+						/* Don't allow user-space to set the bases of any other segment.
+						 * As such, throw an exception indicating a privileged register (which SOME_SEGMENT.base is) */
+						PERTASK_SET(_this_exception_info.ei_code, (error_code_t)ERROR_CODEOF(E_ILLEGAL_INSTRUCTION_REGISTER));
+						PERTASK_SET(_this_exception_info.ei_data.e_pointers[1], (uintptr_t)E_ILLEGAL_INSTRUCTION_REGISTER_WRPRV);
+						PERTASK_SET(_this_exception_info.ei_data.e_pointers[2], (uintptr_t)X86_REGISTER_SEGMENT_GS);
+						PERTASK_SET(_this_exception_info.ei_data.e_pointers[3], (uintptr_t)val);
+						goto set_generic_illegal_instruction;
+					}
+				}
 #else /* !__x86_64__ */
 				{
 					LOHI64 temp;

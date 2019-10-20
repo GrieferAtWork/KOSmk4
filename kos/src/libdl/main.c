@@ -193,7 +193,6 @@ linker_main(struct process_rtld_elf *__restrict info,
 		if unlikely(!tls)
 			goto err;
 		WR_TLS_BASE_REGISTER(tls);
-		assert(RD_TLS_BASE_REGISTER_S() == tls);
 		assert(RD_TLS_BASE_REGISTER() == tls);
 	}
 	assert(DlModule_GlobalList == base_module);

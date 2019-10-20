@@ -48,6 +48,7 @@ DATDEF ATTR_PERTASK uintptr_t const x86_this_kernel_sp0;
 FORCELOCAL WUNUSED uintptr_t KCALL get_user_fsbase(void) {
 	return (uintptr_t)__rdfsbase();
 }
+
 FORCELOCAL void KCALL set_user_fsbase(uintptr_t value) {
 	__wrfsbase((void *)value);
 }
@@ -83,37 +84,73 @@ DATDEF ATTR_PERTASK uintptr_t x86_this_user_gsbase;
 FORCELOCAL WUNUSED uintptr_t KCALL get_user_fsbase(void) {
 	return PERTASK_GET(x86_this_user_fsbase);
 }
+
 FORCELOCAL void KCALL set_user_fsbase(uintptr_t value) {
 	PERTASK_SET(x86_this_user_fsbase, value);
 	segment_wrbaseX(&PERCPU(x86_cpugdt[SEGMENT_INDEX(SEGMENT_USER_FSBASE)]), value);
+#ifndef SEGMENT_KERNEL_FSBASE
+	{
+		__register uintptr_t temp;
+		/* Reload the FS register, which likely wouldn't be done without this. */
+		__asm__ __volatile__("movw %%fs, %w0\n\t"
+		                     "movw %w0, %%fs"
+		                     : "=&r" (temp)
+		                     :
+		                     : "memory");
+	}
+#endif /* !SEGMENT_KERNEL_FSBASE */
 }
+
 FORCELOCAL void KCALL update_user_fsbase(void) {
-	segment_wrbaseX(&PERCPU(x86_cpugdt[SEGMENT_INDEX(SEGMENT_USER_FSBASE)]), PERTASK_GET(x86_this_user_fsbase));
+	segment_wrbaseX(&PERCPU(x86_cpugdt[SEGMENT_INDEX(SEGMENT_USER_FSBASE)]),
+	                PERTASK_GET(x86_this_user_fsbase));
+#ifndef SEGMENT_KERNEL_FSBASE
+	{
+		__register uintptr_t temp;
+		/* Reload the FS register, which likely wouldn't be done without this. */
+		__asm__ __volatile__("movw %%fs, %w0\n\t"
+		                     "movw %w0, %%fs"
+		                     : "=&r" (temp)
+		                     :
+		                     : "memory");
+	}
+#endif /* !SEGMENT_KERNEL_FSBASE */
 }
+
 FORCELOCAL WUNUSED uintptr_t KCALL get_user_gsbase(void) {
 	return PERTASK_GET(x86_this_user_gsbase);
 }
+
 FORCELOCAL void KCALL set_user_gsbase(uintptr_t value) {
-	__register uintptr_t temp;
 	PERTASK_SET(x86_this_user_gsbase, value);
 	segment_wrbaseX(&PERCPU(x86_cpugdt[SEGMENT_INDEX(SEGMENT_USER_GSBASE)]), value);
-	/* Reload the GS register, which likely wouldn't be done without this. */
-	__asm__ __volatile__("movw %%gs, %w0\n\t"
-	                     "movw %w0, %%gs"
-	                     : "=&r" (temp)
-	                     :
-	                     : "memory");
+#ifndef SEGMENT_KERNEL_GSBASE
+	{
+		/* Reload the GS register, which likely wouldn't be done without this. */
+		__register uintptr_t temp;
+		__asm__ __volatile__("movw %%gs, %w0\n\t"
+		                     "movw %w0, %%gs"
+		                     : "=&r" (temp)
+		                     :
+		                     : "memory");
+	}
+#endif /* !SEGMENT_KERNEL_GSBASE */
 }
+
 FORCELOCAL void KCALL update_user_gsbase(void) {
-	__register uintptr_t temp;
 	segment_wrbaseX(&PERCPU(x86_cpugdt[SEGMENT_INDEX(SEGMENT_USER_GSBASE)]),
 	                PERTASK_GET(x86_this_user_gsbase));
-	/* Reload the GS register, which likely wouldn't be done without this. */
-	__asm__ __volatile__("movw %%gs, %w0\n\t"
-	                     "movw %w0, %%gs"
-	                     : "=&r" (temp)
-	                     :
-	                     : "memory");
+#ifndef SEGMENT_KERNEL_GSBASE
+	{
+		/* Reload the GS register, which likely wouldn't be done without this. */
+		__register uintptr_t temp;
+		__asm__ __volatile__("movw %%gs, %w0\n\t"
+		                     "movw %w0, %%gs"
+		                     : "=&r" (temp)
+		                     :
+		                     : "memory");
+	}
+#endif /* !SEGMENT_KERNEL_GSBASE */
 }
 #endif /* !__x86_64__ */
 
