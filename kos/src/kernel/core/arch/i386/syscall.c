@@ -97,6 +97,16 @@ NOTHROW(FCALL process_exit)(int reason) {
 	task_exit(reason);
 }
 
+LOCAL ATTR_NORETURN void
+NOTHROW(FCALL process_exit_for_exception_after_coredump)(void) {
+	siginfo_t si;
+	/* Try to translate the current exception into a signal, so that we
+	 * can use that signal code as reason for why the process has exited. */
+	if (!error_as_signal(error_data(), &si))
+		si.si_signo = SIGILL;
+	process_exit(W_EXITCODE(1, si.si_signo) | WCOREFLAG);
+}
+
 LOCAL NOBLOCK void
 NOTHROW(KCALL user_icpu_to_ucpu)(struct icpustate const *__restrict state,
                                  struct ucpustate *__restrict ust) {
@@ -503,7 +513,7 @@ terminate_app:
 	 * the exception does have a kernel-space side, and thus we must include
 	 * information about that exception's origin. */
 	coredump_create_for_exception(state, reason == TASK_RPC_REASON_SYSCALL);
-	process_exit(W_EXITCODE(1, 0));
+	process_exit_for_exception_after_coredump();
 return_new_state:
 	/* Delete the currently set exception. */
 	PERTASK_SET(_this_exception_info.ei_code,
