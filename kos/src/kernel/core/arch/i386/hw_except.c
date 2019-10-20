@@ -30,12 +30,14 @@
 #include <kernel/types.h>
 #include <kernel/user.h>
 #include <sched/task.h>
-#include <kos/kernel/segment.h>
 
 #include <asm/cpu-flags.h>
 #include <asm/intrin.h>
 #include <asm/registers.h>
 #include <kos/kernel/cpu-state.h>
+#include <kos/kernel/segment.h>
+
+#include <assert.h>
 
 DECL_BEGIN
 
@@ -175,7 +177,6 @@ PRIVATE u16 const x86_icpustate_8bit_offsets[] = {
 };
 
 #ifdef __x86_64__
-
 PRIVATE u16 const x86_icpustate_64bit_offsets[] = {
 	[R_EAX] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RAX, /* %rax */
 	[R_ECX] = OFFSET_ICPUSTATE_GPREGSNSP + OFFSET_GPREGSNSP_RCX, /* %rcx */
@@ -197,10 +198,10 @@ PRIVATE u16 const x86_icpustate_64bit_offsets[] = {
 
 #define ACCESS_GPREG(state,regno) (*(u64 *)((byte_t *)(state) + x86_icpustate_64bit_offsets[(regno) & 0xf]))
 #define EFFECTIVE_REGNO(regno)     ((regno) & 0xf)
-#else
+#else /* __x86_64__ */
 #define ACCESS_GPREG(state,regno) (((u32 *)&(state)->ics_gpregs)[7-(regno)])
 #define EFFECTIVE_REGNO(regno)      (regno)
-#endif
+#endif /* !__x86_64__ */
 
 
 /* @param: regno: One of `R_*' */
@@ -209,6 +210,7 @@ NOTHROW(FCALL x86_icpustate_get8)(struct icpustate *__restrict state, u8 regno) 
 	assert(regno < COMPILER_LENOF(x86_icpustate_8bit_offsets));
 	return *(u8 *)((byte_t *)state + x86_icpustate_8bit_offsets[regno]);
 }
+
 INTERN WUNUSED u16
 NOTHROW(FCALL x86_icpustate_get16)(struct icpustate *__restrict state, u8 regno) {
 #ifndef __x86_64__
@@ -217,6 +219,7 @@ NOTHROW(FCALL x86_icpustate_get16)(struct icpustate *__restrict state, u8 regno)
 #endif /* !__x86_64__ */
 	return *(u16 *)&ACCESS_GPREG(state, regno);
 }
+
 INTERN WUNUSED u32
 NOTHROW(FCALL x86_icpustate_get32)(struct icpustate *__restrict state, u8 regno) {
 #ifndef __x86_64__
@@ -366,9 +369,9 @@ NOTHROW(KCALL x86_decode_modrmgetmem)(struct icpustate *__restrict state,
 
 #ifdef __x86_64__
 #define IRREGS(state) (&(state)->ics_irregs)
-#else
+#else /* __x86_64__ */
 #define IRREGS(state) (&(state)->ics_irregs_k)
-#endif
+#endif /* !__x86_64__ */
 
 INTERN u8 KCALL
 modrm_getrmb(struct icpustate *__restrict state,
@@ -498,12 +501,12 @@ INTERN u32
                                byte_t **__restrict ptext,
                                op_flag_t *__restrict pflags)
 		THROWS(E_SEGFAULT, E_ILLEGAL_INSTRUCTION)
-#else
+#else /* __x86_64__ */
 INTERN u32
 (KCALL x86_decode_instruction)(byte_t **__restrict ptext,
                                op_flag_t *__restrict pflags)
 		THROWS(E_SEGFAULT)
-#endif
+#endif /* !__x86_64__ */
 {
 	u32 result;
 	byte_t *text = *ptext;

@@ -248,7 +248,7 @@ again_gethand:
 		} else {
 			coredump_create_for_signal(state, siginfo);
 		}
-		process_exit(W_EXITCODE(1, siginfo->si_signo));
+		process_exit(W_EXITCODE(1, siginfo->si_signo) | WCOREFLAG);
 
 	case KERNEL_SIG_TERM:
 		xdecref_unlikely(action.sa_mask);

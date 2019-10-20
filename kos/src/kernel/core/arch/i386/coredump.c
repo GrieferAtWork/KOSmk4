@@ -37,6 +37,7 @@
 #include <kos/except-inval.h>
 #include <kos/kernel/cpu-state.h>
 #include <kos/kernel/cpu-state32.h>
+#include <sys/wait.h>
 
 #include <malloca.h>
 #include <stddef.h>
@@ -143,6 +144,7 @@ coredump32_impl(struct icpustate *__restrict return_state,
                 syscall_ulong_t unwind_error) {
 	struct ucpustate curr_ustate, orig_ustate;
 	void **utb_vector;
+	unsigned int signo = SIGILL;
 	validate_readable_opt(exception,
 	                      unwind_error == UNWIND_SUCCESS ? sizeof(exception_data32)
 	                                                     : sizeof(siginfo32_t));
@@ -209,6 +211,7 @@ coredump32_impl(struct icpustate *__restrict return_state,
 			memcpy(&si, (siginfo32_t *)exception, sizeof(siginfo_t));
 #endif /* !__x86_64__ */
 			COMPILER_READ_BARRIER();
+			signo = si.si_signo;
 			coredump_create(&curr_ustate,
 			                utb_vector,
 			                traceback_length,
@@ -231,6 +234,8 @@ coredump32_impl(struct icpustate *__restrict return_state,
 #endif /* !__x86_64__ */
 			COMPILER_READ_BARRIER();
 			has_signal = error_as_signal(&exc, &si);
+			if (has_signal)
+				signo = si.si_signo;
 			coredump_create(&curr_ustate,
 			                utb_vector,
 			                traceback_length,
@@ -250,6 +255,8 @@ coredump32_impl(struct icpustate *__restrict return_state,
 	}
 	if (utb_vector)
 		freea(utb_vector);
+	THROW(E_EXIT_PROCESS,
+	      W_EXITCODE(1, signo & 0x7f) | WCOREFLAG);
 	return return_state;
 }
 
