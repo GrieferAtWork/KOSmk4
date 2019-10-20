@@ -23,95 +23,138 @@
 
 #include <__stdinc.h>
 
+#include <bits/termios.h>   /* BRKINT, ISTRIP, ... */
+#include <bits/posix_opt.h> /* _POSIX_VDISABLE */
+
 __SYSDECL_BEGIN
 
-/*-
- * Copyright (c) 1982, 1986, 1993
- *    The Regents of the University of California.  All rights reserved.
- * (c) UNIX System Laboratories, Inc.
- * All or some portions of this file are derived from material licensed
- * to the University of California by American Telephone and Telegraph
- * Co. or Unix System Laboratories, Inc. and are reproduced herein with
- * the permission of UNIX System Laboratories, Inc.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 4. Neither the name of the University nor the names of its contributors
- *    may be used to endorse or promote products derived from this software
- *    without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- *
- *    @(#)ttydefaults.h    8.4 (Berkeley) 1/21/94
- */
+#ifndef ECHOKE
+#define ECHOKE  0004000 /* If ICANON is also set, KILL is echoed by erasing each character on the line, as specified by ECHOE and ECHOPRT */
+#endif /* !ECHOKE */
+#ifndef ECHOCTL
+#define ECHOCTL 0001000 /* If ECHO is also set, terminal special characters other than TAB(\t), NL(\n),
+                         * START, and STOP are echoed as ^X, where X is the character with ASCII code
+                         * 0x40 greater than the special character. For example, character 0x08 (BS)
+                         * is echoed as ^H */
+#endif /* !ECHOCTL */
 
-/* Defaults on "first" open. */
-#define TTYDEF_IFLAG (BRKINT|ISTRIP|ICRNL|IMAXBEL|IXON|IXANY)
-#define TTYDEF_OFLAG (OPOST|ONLCR|XTABS)
-#define TTYDEF_LFLAG (ECHO|ICANON|ISIG|IEXTEN|ECHOE|ECHOKE|ECHOCTL)
-#define TTYDEF_CFLAG (CREAD|CS7|PARENB|HUPCL)
+/* Defaults on values for `c_iflag', `c_oflag', `c_cflag' and `c_lflag'. */
+#define TTYDEF_IFLAG                                                                  \
+	(BRKINT /*| ISTRIP /* Don't turn this on by default... - Ever heard of unicode?*/ \
+	 | ICRNL | IMAXBEL | IXON | IXANY | IUTF8 /* Turn on UTF-8 support by default! */)
+#define TTYDEF_OFLAG                                                                    \
+	(OPOST /*| ONLCR /* Don't turn this on by default. libansitty doesn't need this! */ \
+	 /*| XTABS /* Not needed (apparently this converts tabs to spaces, though I have    \
+	            * no idea how termios should know how many spaces...) */)
+#define TTYDEF_LFLAG                                            \
+	(ECHO | ICANON | ISIG | IEXTEN | ECHOE | ECHOKE | ECHOCTL | \
+	 /* These last two, linux doesn't enable by default,        \
+	  * but I see no reason why one shouldn't! */               \
+	 ECHOK | TOSTOP)
+#define TTYDEF_CFLAG                                                                       \
+	(CREAD | CS8 /* | CS7 /* Get with the times! Characters are now 8-bit! Unicode FTW! */ \
+	 | PARENB | HUPCL)
 #define TTYDEF_SPEED (B9600)
 
 /* Control Character Defaults */
-#define CTRL(x)    (x&037)
-#define CEOF        CTRL('d')
-#ifdef _POSIX_VDISABLE
-#   define CEOL     _POSIX_VDISABLE
-#else
-#   define CEOL     '\0'
-#endif
-#define CERASE      0177
-#define CINTR       CTRL('c')
-#ifdef _POSIX_VDISABLE
-#   define CSTATUS  _POSIX_VDISABLE
-#else
-#   define CSTATUS  '\0'
-#endif
-#define CKILL       CTRL('u')
-#define CMIN        1
-#define CQUIT       034        /* FS, ^\ */
-#define CSUSP       CTRL('z')
-#define CTIME       0
-#define CDSUSP      CTRL('y')
-#define CSTART      CTRL('q')
-#define CSTOP       CTRL('s')
-#define CLNEXT      CTRL('v')
-#define CDISCARD    CTRL('o')
-#define CWERASE     CTRL('w')
-#define CREPRINT    CTRL('r')
+#define CTRL(x)     ((x) & 037)
+#ifdef VDISCARD
+#define CDISCARD    CTRL('o') /* VDISCARD (Unsupported) */
+#endif /* VDISCARD */
+#ifdef VDSUSP
+#define CDSUSP      CTRL('y') /* VDSUSP */
+#endif /* VDSUSP */
+#ifdef VEOF
+#define CEOF        CTRL('d') /* VEOF */
+#endif /* VEOF */
+#ifdef VEOL
+#define CEOL        _POSIX_VDISABLE
+#endif /* VEOL */
+#ifdef VEOL2
+#define CEOL2       _POSIX_VDISABLE
+#endif /* VEOL2 */
+#ifdef VERASE
+#define CERASE      CTRL('h') /* VERASE (== 8; == '\b') */
+#endif /* VERASE */
+#ifdef VINTR
+#define CINTR       CTRL('c') /* VINTR */
+#endif /* VINTR */
+#ifdef VKILL
+#define CKILL       CTRL('u') /* VKILL */
+#endif /* VKILL */
+#ifdef VLNEXT
+#define CLNEXT      CTRL('v') /* VLNEXT */
+#endif /* VLNEXT */
+#ifdef VMIN
+#define CMIN        1         /* VMIN */
+#endif /* VMIN */
+#ifdef VQUIT
+#define CQUIT       CTRL('\\')/* VQUIT */
+#endif /* VQUIT */
+#ifdef VREPRINT
+#define CREPRINT    CTRL('r') /* VREPRINT */
+#endif /* VREPRINT */
+#ifdef VSTART
+#define CSTART      CTRL('q') /* VSTART */
+#endif /* VSTART */
+#ifdef VSTATUS
+#define CSTATUS     CTRL('t') /* VSTATUS (Unsupported) */
+#endif /* VSTATUS */
+#ifdef VSTOP
+#define CSTOP       CTRL('s') /* VSTOP */
+#endif /* VSTOP */
+#ifdef VSUSP
+#define CSUSP       CTRL('z') /* VSUSP */
+#endif /* VSUSP */
+#ifdef VSWTCH
+#define CSWTCH      _POSIX_VDISABLE /* VSWTCH */
+#endif /* VSWTCH */
+#ifdef VTIME
+#define CTIME       0         /* VTIME */
+#endif /* VTIME */
+#ifdef VWERASE
+#define CWERASE     CTRL('w') /* VWERASE */
+#endif /* VWERASE */
+
+/* Some aliases... */
+#ifdef CEOF
 #define CEOT        CEOF
-
+#endif /* CEOF */
+#ifdef CEOL
 #define CBRK        CEOL
+#endif /* CEOL */
+#ifdef CREPRINT
 #define CRPRNT      CREPRINT
+#endif /* CREPRINT */
+#ifdef CDISCARD
 #define CFLUSH      CDISCARD
-
-__SYSDECL_END
-
-#endif /* !_SYS_TTYDEFAULTS_H */
+#endif /* CDISCARD */
 
 /* #define TTYDEFCHARS to include an array of default control characters. */
 #ifdef TTYDEFCHARS
 #undef TTYDEFCHARS
-cc_t ttydefchars[NCCS] = {
-	CEOF,CEOL,CEOL,CERASE,CWERASE,CKILL,CREPRINT,
-	_POSIX_VDISABLE,CINTR,CQUIT,CSUSP,CDSUSP,CSTART,CSTOP,
-	CLNEXT,CDISCARD,CMIN,CTIME,CSTATUS,_POSIX_VDISABLE
+__PRIVATE cc_t ttydefchars[NCCS] = {
+	/* [VINTR]    = */CINTR,
+	/* [VQUIT]    = */CQUIT,
+	/* [VERASE]   = */CERASE,
+	/* [VKILL]    = */CKILL,
+	/* [VEOF]     = */CEOF,
+	/* [VTIME]    = */CTIME,
+	/* [VMIN]     = */CMIN,
+	/* [VSWTCH]   = */CSWTCH,
+	/* [VSTART]   = */CSTART,
+	/* [VSTOP]    = */CSTOP,
+	/* [VSUSP]    = */CSUSP,
+	/* [VEOL]     = */CEOL,
+	/* [VREPRINT] = */CREPRINT,
+	/* [VDISCARD] = */CDISCARD,
+	/* [VWERASE]  = */CWERASE,
+	/* [VLNEXT]   = */CLNEXT,
+	/* [VEOL2]    = */CEOL2,
 };
-#endif
+#endif /* TTYDEFCHARS */
+
+__SYSDECL_END
+
+#endif /* !_SYS_TTYDEFAULTS_H */
 

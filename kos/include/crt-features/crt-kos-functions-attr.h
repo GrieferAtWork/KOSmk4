@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f142c8e */
+/* HASH CRC-32:0xd542dab7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1468,6 +1468,7 @@
 #define __CRT_ATTR_NOTHROW_NCX_cfgetispeed 1
 #define __CRT_ATTR_NOTHROW_NCX_cfgetospeed 1
 #define __CRT_ATTR_NOTHROW_NCX_cfmakeraw 1
+#define __CRT_ATTR_NOTHROW_NCX_cfmakesane 1
 #define __CRT_ATTR_NOTHROW_NCX_cfree 1
 #define __CRT_ATTR_NOTHROW_NCX_cfsetispeed 1
 #define __CRT_ATTR_NOTHROW_NCX_cfsetospeed 1
@@ -2550,6 +2551,7 @@
 #define __CRT_ATTR_NOTHROW_NCX_tcsendbreak 1
 #define __CRT_ATTR_NOTHROW_NCX_tcsetattr 1
 #define __CRT_ATTR_NOTHROW_NCX_tcsetpgrp 1
+#define __CRT_ATTR_NOTHROW_NCX_tcsetsid 1
 #define __CRT_ATTR_NOTHROW_NCX_tdelete 1
 #define __CRT_ATTR_NOTHROW_NCX_tdestroy 1
 #define __CRT_ATTR_NOTHROW_NCX_tell 1

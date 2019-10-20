@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x43cd927d */
+/* HASH CRC-32:0xb096e7f8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,13 @@ INTDEF WUNUSED NONNULL((1)) speed_t NOTHROW_NCX(LIBCCALL libc_cfgetispeed)(struc
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_cfsetospeed)(struct termios *__restrict termios_p, speed_t speed);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_cfsetispeed)(struct termios *__restrict termios_p, speed_t speed);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_cfsetspeed)(struct termios *__restrict termios_p, speed_t speed);
+/* Set ~raw~ mode for the given `termios_p' (in/out; meaning that `termios_p' must already be initialized)
+ * This entails the CANON and all control characters being disabled, as well as
+ * any sort of input/output text processing no longer taking place. */
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_cfmakeraw)(struct termios *__restrict termios_p);
+/* Set ~sane~ mode for the given `termios_p' (out-only; meaning that `termios_p' gets initialized by this function)
+ * Sane here refers to setting all values to their defaults, as they are defined in <sys/ttydefaults.h> */
+INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_cfmakesane)(struct termios *__restrict termios_p);
 #endif /* !__KERNEL__ */
 
 DECL_END

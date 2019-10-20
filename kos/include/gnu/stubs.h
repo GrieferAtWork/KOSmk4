@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7fc7bbf8 */
+/* HASH CRC-32:0x99b5459f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -536,16 +536,8 @@
 #define __stub_seed48 1
 #define __stub_seed48_r 1
 #define __stub_sem_close 1
-#define __stub_sem_destroy 1
-#define __stub_sem_getvalue 1
-#define __stub_sem_init 1
 #define __stub_sem_open 1
-#define __stub_sem_post 1
-#define __stub_sem_timedwait 1
-#define __stub_sem_timedwait64 1
-#define __stub_sem_trywait 1
 #define __stub_sem_unlink 1
-#define __stub_sem_wait 1
 #define __stub_semctl 1
 #define __stub_semget 1
 #define __stub_semop 1
@@ -607,6 +599,7 @@
 #define __stub_swapcontext 1
 #define __stub_tan 1
 #define __stub_tanh 1
+#define __stub_tcsetsid 1
 #define __stub_tempnam 1
 #define __stub_tgamma 1
 #define __stub_timespec_get 1

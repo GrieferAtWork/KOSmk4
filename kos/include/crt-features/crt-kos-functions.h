@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcd1dd9a8 */
+/* HASH CRC-32:0xde4faeb5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -435,6 +435,7 @@ __CRT_FUNCTION(ceill,0,(),1,(long double,x),long double)
 __CRT_FUNCTION(cfgetispeed,0,(),1,(struct termios const *__restrict,termios_p),speed_t)
 __CRT_FUNCTION(cfgetospeed,0,(),1,(struct termios const *__restrict,termios_p),speed_t)
 __CRT_FUNCTION(cfmakeraw,0,(),1,(struct termios *__restrict,termios_p),void)
+__CRT_FUNCTION(cfmakesane,0,(),1,(struct termios *__restrict,termios_p),void)
 __CRT_FUNCTION(cfree,0,(),1,(void *__restrict,mallptr),void)
 __CRT_FUNCTION(cfsetispeed,0,(),2,(struct termios *__restrict,termios_p,speed_t,speed),int)
 __CRT_FUNCTION(cfsetospeed,0,(),2,(struct termios *__restrict,termios_p,speed_t,speed),int)
@@ -2037,6 +2038,7 @@ __CRT_FUNCTION(tcgetsid,0,(),1,(fd_t,fd),pid_t)
 __CRT_FUNCTION(tcsendbreak,0,(),2,(fd_t,fd,int,duration),int)
 __CRT_FUNCTION(tcsetattr,0,(),3,(fd_t,fd,int,optional_actions,struct termios const *__restrict,termios_p),int)
 __CRT_FUNCTION(tcsetpgrp,0,(),2,(fd_t,fd,pid_t,pgrp_id),int)
+__CRT_FUNCTION(tcsetsid,0,(),2,(fd_t,fd,pid_t,pid),int)
 __CRT_FUNCTION(tdelete,0,(),3,(void const *__restrict,key,void **__restrict,vrootp,__compar_fn_t,compar),void *)
 __CRT_FUNCTION(tdestroy,0,(),2,(void *,root,__free_fn_t,freefct),void)
 __CRT_FUNCTION(tee,0,(),4,(fd_t,fdin,fd_t,fdout,size_t,length,unsigned int,flags),ssize_t)

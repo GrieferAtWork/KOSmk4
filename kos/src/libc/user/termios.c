@@ -20,8 +20,13 @@
 #define GUARD_LIBC_USER_TERMIOS_C 1
 
 #include "../api.h"
-#include "termios.h"
+/**/
+
 #include <sys/ioctl.h>
+
+#include <unistd.h>
+
+#include "termios.h"
 
 DECL_BEGIN
 
@@ -124,11 +129,28 @@ NOTHROW_NCX(LIBCCALL libc_tcgetsid)(fd_t fd)
 }
 /*[[[end:tcgetsid]]]*/
 
+/*[[[head:tcsetsid,hash:CRC-32=0xfb4658fe]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.tcsetsid") int
+NOTHROW_NCX(LIBCCALL libc_tcsetsid)(fd_t fd,
+                                    pid_t pid)
+/*[[[body:tcsetsid]]]*/
+{
+	int result;
+	if (pid != getsid(0)) {
+		libc_seterrno(EINVAL);
+		result = -1;
+	} else {
+		result = ioctl(fd, TIOCSCTTY, NULL);
+	}
+	return result;
+}
+/*[[[end:tcsetsid]]]*/
+
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0xc0266508]]]*/
+/*[[[start:exports,hash:CRC-32=0x81c01dea]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(tcgetattr, libc_tcgetattr);
 DEFINE_PUBLIC_WEAK_ALIAS(tcsetattr, libc_tcsetattr);
 DEFINE_PUBLIC_WEAK_ALIAS(tcsendbreak, libc_tcsendbreak);
@@ -136,6 +158,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(tcdrain, libc_tcdrain);
 DEFINE_PUBLIC_WEAK_ALIAS(tcflush, libc_tcflush);
 DEFINE_PUBLIC_WEAK_ALIAS(tcflow, libc_tcflow);
 DEFINE_PUBLIC_WEAK_ALIAS(tcgetsid, libc_tcgetsid);
+DEFINE_PUBLIC_WEAK_ALIAS(tcsetsid, libc_tcsetsid);
 /*[[[end:exports]]]*/
 
 DECL_END

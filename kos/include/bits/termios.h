@@ -145,18 +145,18 @@ struct termios2 {
 #   define FFDLY    0100000 /* ??? */
 #   define   FF0    0000000 /* ??? */
 #   define   FF1    0100000 /* ??? */
-#endif
+#endif /* __USE_MISC || __USE_XOPEN */
 #define VTDLY       0040000 /* ??? */
 #define   VT0       0000000 /* ??? */
 #define   VT1       0040000 /* ??? */
 #ifdef __USE_MISC
-#   define XTABS    0014000 /* ??? */
-#endif
+#define XTABS       0014000 /* ??? */
+#endif /* __USE_MISC */
 
 /* c_cflag bit meaning */
 #ifdef __USE_MISC
-#   define CBAUD    0010017
-#endif
+#define CBAUD     0010017
+#endif /* __USE_MISC */
 #define B0        0000000 /* hang up */
 #define B50       0000001
 #define B75       0000002
@@ -174,9 +174,9 @@ struct termios2 {
 #define B19200    0000016
 #define B38400    0000017
 #ifdef __USE_MISC
-#   define EXTA   B19200
-#   define EXTB   B38400
-#endif
+#define EXTA      B19200
+#define EXTB      B38400
+#endif /* __USE_MISC */
 #define CSIZE     0000060
 #define   CS5     0000000
 #define   CS6     0000020
@@ -189,8 +189,8 @@ struct termios2 {
 #define HUPCL     0002000
 #define CLOCAL    0004000
 #ifdef __USE_MISC
-#   define CBAUDEX 0010000
-#endif
+#define CBAUDEX   0010000
+#endif /* __USE_MISC */
 #define B57600    0010001
 #define B115200   0010002
 #define B230400   0010003
@@ -208,19 +208,19 @@ struct termios2 {
 #define B4000000  0010017
 #define __MAX_BAUD B4000000
 #ifdef __USE_MISC
-#   define CIBAUD  002003600000 /* input baud rate (not used) */
-#   define CMSPAR  010000000000 /* mark or space (stick) parity */
-#   define CRTSCTS 020000000000 /* flow control */
-#endif
+#define CIBAUD    002003600000 /* input baud rate (not used) */
+#define CMSPAR    010000000000 /* mark or space (stick) parity */
+#define CRTSCTS   020000000000 /* flow control */
+#endif /* __USE_MISC */
 
 /* c_lflag bits */
 #define ISIG        0000001 /* When any of the characters INTR, QUIT, SUSP, or DSUSP are received, generate the corresponding signal. */
 #define ICANON      0000002 /* Enable canonical mode */
 #if defined(__USE_MISC) || defined(__USE_XOPEN)
-#   define XCASE    0000004 /* If ICANON is also set, terminal is uppercase only. Input is converted to lowercase,
+#define XCASE       0000004 /* If ICANON is also set, terminal is uppercase only. Input is converted to lowercase,
                              * except for characters preceded by \. On output, uppercase characters are preceded
                              * by \ and lowercase characters are converted to uppercase. */
-#endif
+#endif /* __USE_MISC || __USE_XOPEN */
 #define ECHO        0000010 /* Echo input characters */
 #define ECHOE       0000020 /* If ICANON is also set, the VERASE character erases the preceding input character, and VWERASE erases the preceding word */
 #define ECHOK       0000040 /* If ICANON is also set, the VKILL character erases the current line */
@@ -248,8 +248,8 @@ struct termios2 {
                              * EOL2, LNEXT, REPRINT, WERASE to be interpreted, and for the
                              * IUCLC flag to be effective */
 #ifdef __USE_MISC
-#   define EXTPROC  0200000 /* ??? */
-#endif
+#define EXTPROC     0200000 /* ??? */
+#endif /* __USE_MISC */
 #define __IERASING        04000000 /* Status bit for `ECHOPRT' */
 #define __IXCASEING      010000000 /* Status bit for `XCASE' */
 #define __IEOFING        020000000 /* Status bit for a pending `VEOF' character

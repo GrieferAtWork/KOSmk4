@@ -93,23 +93,23 @@ __IMPDEF __ATTR_NONNULL((1)) int __NOTHROW_NCX(__DLFCN_CALL dlclose)(void *__han
 __IMPDEF __ATTR_WUNUSED __ATTR_NONNULL((2)) void *__NOTHROW_NCX(__DLFCN_CALL dlsym)(void *__handle, char const *__restrict __symbol_name);
 __IMPDEF char *__NOTHROW_NCX(__DLFCN_CALL dlerror)(void);
 
-#ifdef _BSD_SOURCE
+#ifdef __USE_BSD
 struct __dlfunc_arg { int __dlfunc_dummy; };
 typedef void (*dlfunc_t)(struct __dlfunc_arg);
 /* Alias for `dlsym()' that allows the return value to be cases to a function prototype. */
 __REDIRECT(__IMPDEF,__ATTR_WUNUSED,dlfunc_t,__NOTHROW_NCX,__DLFCN_CALL,
            dlfunc,(void *__handle, char const *__restrict __symbol_name),dlsym,(__handle, __symbol_name))
-#endif /* _BSD_SOURCE */
+#endif /* __USE_BSD */
 
 /* BSD also has a function `fdlopen()' that does the same as our's does. */
-#if (defined(__USE_KOS) || defined(_BSD_SOURCE)) && defined(__KOS__)
+#if (defined(__USE_KOS) || defined(__USE_BSD)) && defined(__KOS__)
 #if __KOS_VERSION__ >= 400
 /* Open a library, given a file descriptor previously acquired by `open()'
  * NOTE: This function will inherit the given `FD' on success.
  * @param: MODE: Set of `RTLD_*' */
 __REDIRECT(__IMPDEF,__ATTR_WUNUSED,void *,__NOTHROW_NCX,__DLFCN_CALL,fdlopen,(/*inherit(on_success)*/__fd_t __fd, int __mode),dlfopen,(__fd,__mode))
 #endif /* __KOS_VERSION__ >= 400 */
-#endif /* (__USE_KOS || _BSD_SOURCE) && __KOS__ */
+#endif /* (__USE_KOS || __USE_BSD) && __KOS__ */
 
 
 #if defined(__USE_KOS) && defined(__KOS__)

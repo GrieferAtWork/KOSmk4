@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe02cf5ee */
+/* HASH CRC-32:0x9835080 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,6 +35,7 @@ INTDEF int NOTHROW_RPC(LIBCCALL libc_tcdrain)(fd_t fd);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_tcflush)(fd_t fd, int queue_selector);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_tcflow)(fd_t fd, int action);
 INTDEF pid_t NOTHROW_NCX(LIBCCALL libc_tcgetsid)(fd_t fd);
+INTDEF int NOTHROW_NCX(LIBCCALL libc_tcsetsid)(fd_t fd, pid_t pid);
 
 DECL_END
 

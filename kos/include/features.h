@@ -128,6 +128,14 @@
 #define __USE_TIME_BITS64 1
 #endif
 
+#ifdef _BSD_SOURCE
+#define __USE_BSD 1
+/* BSD name (not used in headers, but may be checked by
+ * applications as a sort-of ACK that the system headers
+ * have understood the _BSD_SOURCE request) */
+#define __BSD_VISIBLE 1
+#endif /* _BSD_SOURCE */
+
 #if (defined(_BSD_SOURCE) || defined(_SVID_SOURCE)) && \
     !defined(_DEFAULT_SOURCE)
 #undef  _DEFAULT_SOURCE

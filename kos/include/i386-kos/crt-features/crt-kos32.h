@@ -1244,6 +1244,7 @@
 #define __CRT_HAVE_cfgetispeed 1
 #define __CRT_HAVE_cfgetospeed 1
 #define __CRT_HAVE_cfmakeraw 1
+#define __CRT_HAVE_cfmakesane 1
 #define __CRT_HAVE_cfree 1
 #define __CRT_HAVE_cfsetispeed 1
 #define __CRT_HAVE_cfsetospeed 1
@@ -3762,6 +3763,7 @@
 #define __CRT_HAVE_tcsendbreak 1
 #define __CRT_HAVE_tcsetattr 1
 #define __CRT_HAVE_tcsetpgrp 1
+#define __CRT_HAVE_tcsetsid 1
 #define __CRT_HAVE_tdelete 1
 #define __CRT_HAVE_tdestroy 1
 #define __CRT_HAVE_tee 1

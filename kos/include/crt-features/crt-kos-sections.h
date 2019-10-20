@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x43ba3ad6 */
+/* HASH CRC-32:0xa9e67bcb */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1894,6 +1894,7 @@
 #define __CRT_SECTION_cfgetispeed                           __CRT_SECTINFO_io_tty                                   /* .text.crt.io.tty.cfgetispeed */
 #define __CRT_SECTION_cfgetospeed                           __CRT_SECTINFO_io_tty                                   /* .text.crt.io.tty.cfgetospeed */
 #define __CRT_SECTION_cfmakeraw                             __CRT_SECTINFO_io_tty                                   /* .text.crt.io.tty.cfmakeraw */
+#define __CRT_SECTION_cfmakesane                            __CRT_SECTINFO_io_tty                                   /* .text.crt.io.tty.cfmakesane */
 #define __CRT_SECTION_cfsetispeed                           __CRT_SECTINFO_io_tty                                   /* .text.crt.io.tty.cfsetispeed */
 #define __CRT_SECTION_cfsetospeed                           __CRT_SECTINFO_io_tty                                   /* .text.crt.io.tty.cfsetospeed */
 #define __CRT_SECTION_cfsetspeed                            __CRT_SECTINFO_io_tty                                   /* .text.crt.io.tty.cfsetspeed */
@@ -1924,6 +1925,7 @@
 #define __CRT_SECTION_tcsendbreak                           __CRT_SECTINFO_io_tty                                   /* .text.crt.io.tty.tcsendbreak */
 #define __CRT_SECTION_tcsetattr                             __CRT_SECTINFO_io_tty                                   /* .text.crt.io.tty.tcsetattr */
 #define __CRT_SECTION_tcsetpgrp                             __CRT_SECTINFO_io_tty                                   /* .text.crt.io.tty.tcsetpgrp */
+#define __CRT_SECTION_tcsetsid                              __CRT_SECTINFO_io_tty                                   /* .text.crt.io.tty.tcsetsid */
 #define __CRT_SECTION_ttyname                               __CRT_SECTINFO_io_tty                                   /* .text.crt.io.tty.ttyname */
 #define __CRT_SECTION_ttyname_r                             __CRT_SECTINFO_io_tty                                   /* .text.crt.io.tty.ttyname_r */
 #define __CRT_SECTION_ttyslot                               __CRT_SECTINFO_io_tty                                   /* .text.crt.io.tty.ttyslot */

@@ -65,26 +65,7 @@ PRIVATE void console_set_fgproc(void) {
 /* Reset the termios of /dev/console to sane values */
 PRIVATE void console_sane_ios(void) {
 	struct termios ios;
-	memset(&ios, 0, sizeof(ios));
-	ios.c_iflag = (ICRNL | BRKINT | IXON | IMAXBEL | IUTF8);
-	ios.c_oflag = (OPOST);
-	ios.c_lflag = (ISIG | ICANON | ECHO | ECHOE | ECHOK |
-	               TOSTOP | ECHOCTL | ECHOKE | IEXTEN);
-	ios.c_cflag = (CREAD);
-#define CTRL_CODE(x) ((x)-64)            /* ^x */
-	ios.c_cc[VMIN]     = 1;              /*  */
-	ios.c_cc[VEOF]     = CTRL_CODE('D'); /* ^D. */
-	ios.c_cc[VERASE]   = '\b';
-	ios.c_cc[VINTR]    = CTRL_CODE('C');  /* ^C. */
-	ios.c_cc[VKILL]    = CTRL_CODE('U');  /* ^U. */
-	ios.c_cc[VQUIT]    = CTRL_CODE('\\'); /* ^\ */
-	ios.c_cc[VSTART]   = CTRL_CODE('Q');  /* ^Q. */
-	ios.c_cc[VSTOP]    = CTRL_CODE('S');  /* ^S. */
-	ios.c_cc[VSUSP]    = CTRL_CODE('Z');  /* ^Z. */
-	ios.c_cc[VWERASE]  = CTRL_CODE('W');  /* ^W. */
-	ios.c_cc[VLNEXT]   = CTRL_CODE('V');  /* ^V. */
-	ios.c_cc[VREPRINT] = CTRL_CODE('R');  /* ^R. */
-#undef CTRL_CODE
+	cfmakesane(&ios);
 	tcsetattr(STDIN_FILENO, TCSADRAIN, &ios);
 }
 

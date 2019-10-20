@@ -25,16 +25,20 @@
 /**/
 
 #include <hybrid/compiler.h>
+
 #include <hybrid/atomic.h>
 
-#include <string.h>
-#include <ctype.h>
-#include <assert.h>
-#include <signal.h>
-#include <unicode.h>
 #include <kos/except.h>
-#include <libterm/termio.h>
+
+#include <assert.h>
+#include <ctype.h>
+#include <signal.h>
+#include <string.h>
+#include <termios.h>
+#include <unicode.h>
+
 #include <libbuffer/linebuffer.h>
+#include <libterm/termio.h>
 
 #include "termio.h"
 
@@ -80,26 +84,8 @@ NOTHROW_NCX(CC libterminal_init)(struct terminal *__restrict self,
 	linebuffer_init(&self->t_canon);
 	linebuffer_init(&self->t_opend);
 	linebuffer_init(&self->t_ipend);
-	memset(&self->t_ios, 0, sizeof(self->t_ios));
-	self->t_ios.c_iflag = (ICRNL | BRKINT | IXON | IMAXBEL | IUTF8);
-	self->t_ios.c_oflag = (OPOST);
-	self->t_ios.c_lflag = (ISIG | ICANON | ECHO | ECHOE | ECHOK |
-	                       TOSTOP | ECHOCTL | ECHOKE | IEXTEN);
-	self->t_ios.c_cflag = (CREAD);
-#define CTRL_CODE(x) ((x)-64)                     /* ^x */
-	self->t_ios.c_cc[VMIN]     = 1;               /*  */
-	self->t_ios.c_cc[VEOF]     = CTRL_CODE('D');  /* ^D. */
-	self->t_ios.c_cc[VERASE]   = '\b';
-	self->t_ios.c_cc[VINTR]    = CTRL_CODE('C');  /* ^C. */
-	self->t_ios.c_cc[VKILL]    = CTRL_CODE('U');  /* ^U. */
-	self->t_ios.c_cc[VQUIT]    = CTRL_CODE('\\'); /* ^\ */
-	self->t_ios.c_cc[VSTART]   = CTRL_CODE('Q');  /* ^Q. */
-	self->t_ios.c_cc[VSTOP]    = CTRL_CODE('S');  /* ^S. */
-	self->t_ios.c_cc[VSUSP]    = CTRL_CODE('Z');  /* ^Z. */
-	self->t_ios.c_cc[VWERASE]  = CTRL_CODE('W');  /* ^W. */
-	self->t_ios.c_cc[VLNEXT]   = CTRL_CODE('V');  /* ^V. */
-	self->t_ios.c_cc[VREPRINT] = CTRL_CODE('R');  /* ^R. */
-#undef CTRL_CODE
+	/* Initialize the IOS to default values. */
+	cfmakesane(&self->t_ios);
 }
 
 
@@ -557,6 +543,8 @@ libterminal_do_iwrite_controlled(struct terminal *__restrict self,
 			byte_t ch = *iter;
 			assert((size_t)result == (size_t)(flush_start - (byte_t *)src));
 			/* Canon control characters (COMMIT, ERASE, etc.) */
+			if (ch == _POSIX_VDISABLE)
+				continue; /* Don't enable this. */
 			if (ch == '\n' ||
 			    ch == self->t_ios.c_cc[VEOL] ||
 			    ch == self->t_ios.c_cc[VEOL2]) {
@@ -865,7 +853,9 @@ libterminal_do_iwrite_formatted(struct terminal *__restrict self,
 		/* If any input is given (which was tested above), support the IXANY
 		 * flag which will restore output whenever any input is typed out. */
 		assert(num_bytes);
-		if ((iflag & IXANY) && (ATOMIC_FETCHAND(self->t_ios.c_iflag, ~IXOFF) & IXOFF)) {
+		if ((iflag & IXANY) &&
+		    (ATOMIC_READ(self->t_ios.c_iflag) & IXOFF) != 0 &&
+		    (ATOMIC_FETCHAND(self->t_ios.c_iflag, ~IXOFF) & IXOFF) != 0) {
 			temp = libterminal_flush_obuf(self, mode, lflag);
 			if unlikely(temp < 0)
 				goto err;

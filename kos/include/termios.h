@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2cd8af63 */
+/* HASH CRC-32:0x7951d842 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,9 +35,9 @@
 #include <bits/types.h>
 #endif /* __USE_UNIX98 || __USE_XOPEN2K8 */
 
-#ifdef __USE_MISC
+#if defined(__USE_MISC) || defined(__USE_KOS) || defined(__USE_BSD)
 #include <sys/ttydefaults.h>
-#endif /* __USE_MISC */
+#endif /* __USE_MISC || __USE_KOS || __USE_BSD */
 
 __SYSDECL_BEGIN
 
@@ -99,6 +99,12 @@ __CDECLARE(,__pid_t,__NOTHROW_NCX,tcgetsid,(__fd_t __fd),(__fd))
 #endif /* tcgetsid... */
 #endif /* __USE_UNIX98 || __USE_XOPEN2K8 */
 
+#if defined(__USE_BSD)
+#if defined(__CRT_HAVE_tcsetsid)
+__CDECLARE(,int,__NOTHROW_NCX,tcsetsid,(__fd_t __fd, __pid_t __pid),(__fd,__pid))
+#endif /* tcsetsid... */
+#endif /* __USE_BSD */
+
 #ifdef __USE_MISC
 #if defined(__CRT_HAVE_cfsetspeed)
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,cfsetspeed,(struct termios *__restrict __termios_p, speed_t __speed),(__termios_p,__speed))
@@ -107,12 +113,31 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,cfsetspeed,(struct termios *__r
 __NAMESPACE_LOCAL_USING_OR_IMPL(cfsetspeed, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL cfsetspeed)(struct termios *__restrict __termios_p, speed_t __speed) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cfsetspeed))(__termios_p, __speed); })
 #endif /* cfsetspeed... */
 #if defined(__CRT_HAVE_cfmakeraw)
+/* Set ~raw~ mode for the given `termios_p' (in/out; meaning that `termios_p' must already be initialized)
+ * This entails the CANON and all control characters being disabled, as well as
+ * any sort of input/output text processing no longer taking place. */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,cfmakeraw,(struct termios *__restrict __termios_p),(__termios_p))
 #else /* LIBC: cfmakeraw */
 #include <local/termios/cfmakeraw.h>
+/* Set ~raw~ mode for the given `termios_p' (in/out; meaning that `termios_p' must already be initialized)
+ * This entails the CANON and all control characters being disabled, as well as
+ * any sort of input/output text processing no longer taking place. */
 __NAMESPACE_LOCAL_USING_OR_IMPL(cfmakeraw, __FORCELOCAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL cfmakeraw)(struct termios *__restrict __termios_p) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cfmakeraw))(__termios_p); })
 #endif /* cfmakeraw... */
 #endif /* __USE_MISC */
+
+#if defined(__USE_KOS) || defined(__USE_BSD)
+#if defined(__CRT_HAVE_cfmakesane)
+/* Set ~sane~ mode for the given `termios_p' (out-only; meaning that `termios_p' gets initialized by this function)
+ * Sane here refers to setting all values to their defaults, as they are defined in <sys/ttydefaults.h> */
+__CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,cfmakesane,(struct termios *__restrict __termios_p),(__termios_p))
+#else /* LIBC: cfmakesane */
+#include <local/termios/cfmakesane.h>
+/* Set ~sane~ mode for the given `termios_p' (out-only; meaning that `termios_p' gets initialized by this function)
+ * Sane here refers to setting all values to their defaults, as they are defined in <sys/ttydefaults.h> */
+__NAMESPACE_LOCAL_USING_OR_IMPL(cfmakesane, __FORCELOCAL __ATTR_NONNULL((1)) void __NOTHROW_NCX(__LIBCCALL cfmakesane)(struct termios *__restrict __termios_p) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cfmakesane))(__termios_p); })
+#endif /* cfmakesane... */
+#endif /* __USE_KOS || __USE_BSD */
 #endif /* __CC__ */
 
 #ifdef __USE_MISC

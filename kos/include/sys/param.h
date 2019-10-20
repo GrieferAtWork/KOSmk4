@@ -20,12 +20,15 @@
 #define _SYS_PARAM_H 1
 
 #include <__stdinc.h>
+
+#include <hybrid/minmax.h> /* MIN(), MAX() */
+
 #include <bits/param.h>
+#include <sys/types.h>
+
 #include <endian.h>
 #include <limits.h>
 #include <signal.h>
-#include <sys/types.h>
-#include <hybrid/minmax.h>
 
 __SYSDECL_BEGIN
 
