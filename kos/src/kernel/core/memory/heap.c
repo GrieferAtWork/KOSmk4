@@ -62,7 +62,7 @@
 
 DECL_BEGIN
 
-STATIC_ASSERT(SIZEOF_MFREE == offsetof(struct mfree,mf_data));
+STATIC_ASSERT(SIZEOF_MFREE == offsetof(struct mfree, mf_data));
 
 #if defined(NDEBUG) || 0
 #define heap_validate(heap)    (void)0
@@ -215,14 +215,14 @@ DEFINE_VALIDATABLE_HEAP(kernel_default_heap);
 DEFINE_VALIDATABLE_HEAP(kernel_locked_heap);
 PUBLIC struct heap kernel_heaps[__GFP_HEAPCOUNT] = {
 	/* Define the controller structures for the builtin kernel heaps. */
-	/* [GFP_NORMAL] = */HEAP_INIT(DEFAULT_OVERALLOC,
-	                              DEFAULT_FREETHRESH,
-	                             (vm_vpage_t)HINT_GETADDR(KERNEL_VMHINT_HEAP),
-	                              HINT_GETMODE(KERNEL_VMHINT_HEAP)),
-	/* [GFP_LOCKED] = */HEAP_INIT(DEFAULT_OVERALLOC,
-	                              DEFAULT_FREETHRESH,
-	                             (vm_vpage_t)HINT_GETADDR(KERNEL_VMHINT_LHEAP),
-	                              HINT_GETMODE(KERNEL_VMHINT_LHEAP)),
+	/* [GFP_NORMAL] = */ HEAP_INIT(DEFAULT_OVERALLOC,
+	                               DEFAULT_FREETHRESH,
+	                               (vm_vpage_t)HINT_GETADDR(KERNEL_VMHINT_HEAP),
+	                               HINT_GETMODE(KERNEL_VMHINT_HEAP)),
+	/* [GFP_LOCKED] = */ HEAP_INIT(DEFAULT_OVERALLOC,
+	                               DEFAULT_FREETHRESH,
+	                               (vm_vpage_t)HINT_GETADDR(KERNEL_VMHINT_LHEAP),
+	                               HINT_GETMODE(KERNEL_VMHINT_LHEAP)),
 };
 
 

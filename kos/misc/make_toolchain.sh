@@ -10,9 +10,13 @@
 ##################
 
 
-# TODO: Option to install bochs (from source; with patched `load32bitOShack')
+# TODO: Option to install bochs?
 # TODO: Option to install qemu?
 
+# Don't use the latest patch, but this very specific one that
+# should be usable to drive the entirety of the KOS toolchain.
+#     v -- Fix some problems with File.Buffer
+DEEMON_VERSION="f5a147bfb512d95a414a18fa4ace4426fe19aa71"
 
 MAKE_PARALLEL_COUNT=$(grep -c ^processor /proc/cpuinfo)
 
@@ -265,10 +269,6 @@ if ! which deemon > /dev/null 2>&1; then
 		echo "    Found deemon in '$KOS_BINUTILS/deemon'"
 	else
 		echo "    Deemon is missing (now downloading, configuring and building a local copy)"
-		# Don't use the latest patch, but this very specific one that
-		# should be usable to drive the entirety of the KOS toolchain.
-		#     v -- Fix integer underflow in Bytes.replace and similar functions
-		DEEMON_VERSION="9612b819bac30290ea2b8480a77eebe9d6e1df30"
 		if ! [ -f "$KOS_BINUTILS/deemon/configure" ]; then
 			require_program git
 			rm -rf "$KOS_BINUTILS/deemon" > /dev/null 2>&1

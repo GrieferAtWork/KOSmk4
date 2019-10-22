@@ -30,23 +30,11 @@ import * from errors;
 import * from ..libmagic;
 import OPT_LINK_OUTPUT from .c;
 
-local function file_getcu(fp: File): int {
-	local result = fp.getc();
-	if (result < 0)
-		result = 256 + result;
-	return result;
-}
 local function file_read2le(fp: File): int {
-	local result = file_getcu(fp);
-	result = result | file_getcu(fp) << 8;
-	return result;
+	return int.frombytes(fp.read(2), "little", false);
 }
 local function file_read4le(fp: File): int {
-	local result = file_getcu(fp);
-	result = result | file_getcu(fp) << 8;
-	result = result | file_getcu(fp) << 16;
-	result = result | file_getcu(fp) << 24;
-	return result;
+	return int.frombytes(fp.read(4), "little", false);
 }
 local function file_write4le(fp: File, v: int) {
 	fp.write(v.tobytes(4, "little", false));
