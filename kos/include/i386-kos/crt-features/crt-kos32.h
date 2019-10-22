@@ -495,6 +495,7 @@
 #define __CRT_HAVE___clock_gettime 1
 #define __CRT_HAVE___clock_nanosleep 1
 #define __CRT_HAVE___clock_settime 1
+#define __CRT_HAVE___clone 1
 #define __CRT_HAVE___close 1
 #define __CRT_HAVE___connect 1
 #define __CRT_HAVE___control87_2 1
@@ -838,6 +839,7 @@
 #define __CRT_HAVE___strtoll_l 1
 #define __CRT_HAVE___strtoul_l 1
 #define __CRT_HAVE___strtoull_l 1
+#define __CRT_HAVE___strverscmp 1
 #define __CRT_HAVE___strxfrm_l 1
 #define __CRT_HAVE___sys_errlist 1
 #define __CRT_HAVE___sys_nerr 1

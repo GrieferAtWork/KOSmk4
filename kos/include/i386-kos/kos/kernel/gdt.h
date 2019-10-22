@@ -41,7 +41,7 @@ __SYSDECL_BEGIN
 #define SEGMENT_NULL            0x0000 /* NULL-segment. */
 #define SEGMENT_KERNEL_CODE     0x0008 /* Ring #0 code segment (%cs) */
 #define SEGMENT_KERNEL_DATA     0x0010 /* Ring #0 data segment (%ss)
-                                        * NOTE: For %ds and %fs, `SEGMENT_USER_DATA' is re-used, so-as to reduce
+                                        * NOTE: For %ds and %es, `SEGMENT_USER_DATA' is re-used, so-as to reduce
                                         *       the number of required segment changes during interrupts/syscalls.
                                         *       However, this also means that user-space isn't allowed to change the
                                         *       base addresses of these segments, but only allowed to change those of

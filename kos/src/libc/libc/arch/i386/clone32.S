@@ -77,6 +77,7 @@ INTERN_FUNCTION(libc_clone)
 END(libc_clone)
 
 DEFINE_PUBLIC_ALIAS(clone, libc_clone)
+DEFINE_PUBLIC_ALIAS(__clone, libc_clone)
 
 
 

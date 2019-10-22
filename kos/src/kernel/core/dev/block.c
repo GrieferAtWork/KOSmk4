@@ -565,6 +565,8 @@ block_device_unregister(struct basic_block_device *__restrict self)
 		THROWS(E_WOULDBLOCK) {
 	bool result = false;
 	struct basic_block_device *pop_dev;
+	/* FIXME: Running `partprobe /dev/hda' causes the a soft-lock where the
+	 *        kernel will continuously print `Removing block-device `/dev/hda1'' */
 	printk(KERN_INFO "[blk] Removing block-device `/dev/%s'\n", self->bd_name);
 	if likely(self->bd_devlink.a_vaddr != DEV_UNSET) {
 		sync_write(&block_device_lock);

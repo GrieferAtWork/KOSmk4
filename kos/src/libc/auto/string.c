@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f697842 */
+/* HASH CRC-32:0x16722000 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3505,6 +3505,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(basename, libc_basename);
 DEFINE_PUBLIC_WEAK_ALIAS(strcasestr, libc_strcasestr);
 DEFINE_PUBLIC_WEAK_ALIAS(__strcasestr, libc_strcasestr);
 DEFINE_PUBLIC_WEAK_ALIAS(strverscmp, libc_strverscmp);
+DEFINE_PUBLIC_WEAK_ALIAS(__strverscmp, libc_strverscmp);
 DEFINE_PUBLIC_WEAK_ALIAS(strfry, libc_strfry);
 DEFINE_PUBLIC_WEAK_ALIAS(memfrob, libc_memfrob);
 DEFINE_PUBLIC_WEAK_ALIAS(strcasecmp_l, libc_strcasecmp_l);

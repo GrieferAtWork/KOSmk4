@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x96bde123 */
+/* HASH CRC-32:0x1469e3d1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,14 +39,14 @@
 #define __ERROR_REGISTER_STATE_TYPE_WRSP(x,value)                ((x).kcs_gpregs.gp_rsp=(value))
 #define __ERROR_REGISTER_STATE_TYPE_RD_UNWIND_EXCEPTION(x)       ((x).kcs_gpregs.gp_rax)
 #define __ERROR_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(x,value) ((x).kcs_gpregs.gp_rax=(value))
-#else
+#else /* __x86_64__ */
 #define __ERROR_REGISTER_STATE_TYPE_RDPC(x)                      ((x).kcs_eip)
 #define __ERROR_REGISTER_STATE_TYPE_WRPC(x,value)                ((x).kcs_eip=(value))
 #define __ERROR_REGISTER_STATE_TYPE_RDSP(x)                      ((x).kcs_gpregs.gp_esp)
 #define __ERROR_REGISTER_STATE_TYPE_WRSP(x,value)                ((x).kcs_gpregs.gp_esp=(value))
 #define __ERROR_REGISTER_STATE_TYPE_RD_UNWIND_EXCEPTION(x)       ((x).kcs_gpregs.gp_eax)
 #define __ERROR_REGISTER_STATE_TYPE_WR_UNWIND_EXCEPTION(x,value) ((x).kcs_gpregs.gp_eax=(value))
-#endif
+#endif /* !__x86_64__ */
 
 
 /* System exception classes.

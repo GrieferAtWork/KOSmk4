@@ -629,7 +629,7 @@ memmem:([nonnull] void const *haystack, size_t haystacklen, [nonnull] void const
 	return NULL;
 }
 
-[ATTR_WUNUSED][ATTR_PURE][alias(__strverscmp)]
+[ATTR_WUNUSED][ATTR_PURE][export_alias(__strverscmp)]
 strverscmp:([nonnull] char const *s1, [nonnull] char const *s2) -> int {
 	char const *s1_start = s1;
 	char c1, c2;

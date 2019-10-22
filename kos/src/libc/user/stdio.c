@@ -54,7 +54,6 @@
 
 DECL_BEGIN
 
-
 #define libc__vscanf_s_l     libc__vscanf_l
 #define libc__vprintf_s_l    libc__vprintf_l
 #define libc__vfprintf_s_l   libc__vfprintf_l
@@ -2918,6 +2917,8 @@ NOTHROW_RPC(LIBCCALL libc_fopen)(char const *__restrict filename,
                                  char const *__restrict modes)
 /*[[[body:fopen]]]*/
 {
+	/* TODO: (re-)add extension functions `fopenat()' and `fopenat64()'
+	 *       that allow for the specification of `dfd' and `atflags' */
 	fd_t fd;
 	FILE *result;
 	uint32_t flags;
