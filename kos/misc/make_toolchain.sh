@@ -514,7 +514,8 @@ fi
 
 
 echo "Check if $GCC_VERSION:libstdc++ needs to be built"
-if ! [ -f "$PREFIX/$TARGET/lib/libstdc++.so.$LIBSTDCXX_VERSION_FULL" ]; then
+if ! [ -f "$PREFIX/$TARGET/lib/libstdc++.so.$LIBSTDCXX_VERSION_FULL" ] || \
+   ! [ -f "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/vector" ]; then
 	# When building libstdc++ for i386/x86_64, with the other libstdc++ already
 	# having had its headers installed, we must manually backup the arch-specific
 	# portion of the existing libstdc++ installation, as the make process might
