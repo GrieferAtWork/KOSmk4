@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x85c24138 */
+/* HASH CRC-32:0xdd88f935 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,6 +53,11 @@ typedef int errno_t;
 #define __size_t_defined 1
 typedef __size_t size_t;
 #endif /* !__size_t_defined */
+
+#ifndef __ssize_t_defined
+#define __ssize_t_defined 1
+typedef __ssize_t ssize_t;
+#endif /* !__ssize_t_defined */
 
 #ifndef __intptr_t_defined
 #define __intptr_t_defined 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6d926ca5 */
+/* HASH CRC-32:0x5a211c16 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __LOCAL_LIBC(_pipe) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_pipe))(__fd_t __pipedes[2],
                                                    __UINT32_TYPE__ __pipesize,
                                                    __oflag_t __textmode) {
-#line 218 "kos/src/libc/magic/io.c"
+#line 223 "kos/src/libc/magic/io.c"
 	(void)__pipesize;
 	return __localdep_pipe2(__pipedes, __textmode);
 }

@@ -53,6 +53,11 @@ typedef int errno_t;
 typedef __size_t size_t;
 #endif /* !__size_t_defined */
 
+#ifndef __ssize_t_defined
+#define __ssize_t_defined 1
+typedef __ssize_t ssize_t;
+#endif /* !__ssize_t_defined */
+
 #ifndef __intptr_t_defined
 #define __intptr_t_defined 1
 typedef __intptr_t intptr_t;

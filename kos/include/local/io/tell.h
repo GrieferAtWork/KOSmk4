@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc89b4913 */
+/* HASH CRC-32:0xec30ac1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __CREDIRECT(,__LONG32_TYPE__,__NOTHROW_NCX,__localdep__lseek,(__fd_t __fd, __LON
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(tell) __ATTR_WUNUSED __LONG32_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(tell))(__fd_t __fd) {
-#line 352 "kos/src/libc/magic/io.c"
+#line 357 "kos/src/libc/magic/io.c"
 	return __localdep__lseek(__fd, 0, 1);
 }
 __NAMESPACE_LOCAL_END
