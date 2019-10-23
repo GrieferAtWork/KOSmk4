@@ -329,7 +329,7 @@ wcscat:([nonnull] wchar_t *__restrict buf, [nonnull] wchar_t const *__restrict s
 [section({.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory})]
 wcsncat:([nonnull] wchar_t *__restrict buf,
          [inp(wcsnlen(src, buflen))] wchar_t const *__restrict src,
-         size_t buflen) -> wchar_t * {
+         $size_t buflen) -> wchar_t * {
 	size_t srclen = wcsnlen(src, buflen);
 	wchar_t *dst = wcsend(buf);
 	wmemcpy(dst, src, srclen);
@@ -341,7 +341,7 @@ wcsncat:([nonnull] wchar_t *__restrict buf,
 [section({.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory})]
 wcsncpy:([nonnull] wchar_t *__restrict buf,
          [inp(wcsnlen(src, buflen))] wchar_t const *__restrict src,
-         size_t buflen) -> wchar_t * {
+         $size_t buflen) -> wchar_t * {
 	size_t srclen = wcsnlen(src, buflen);
 	wmemcpy(buf, src, srclen);
 	wmemset(buf+srclen, '\0', buflen - srclen);
@@ -355,7 +355,7 @@ wcscmp:([nonnull] wchar_t const *s1, [nonnull] wchar_t const *s2) -> int %{copy(
 
 [std][std_guard][ATTR_WUNUSED][ATTR_PURE][wchar]
 [section({.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory})]
-wcsncmp:([nonnull] wchar_t const *s1, [nonnull] wchar_t const *s2, size_t maxlen) -> int %{copy(%auto, str2wcs)}
+wcsncmp:([nonnull] wchar_t const *s1, [nonnull] wchar_t const *s2, $size_t maxlen) -> int %{copy(%auto, str2wcs)}
 
 [std][std_guard][ATTR_WUNUSED][ATTR_PURE][wchar]
 [section({.text.crt.wchar.unicode.static.memory|.text.crt.dos.wchar.unicode.static.memory})]
@@ -363,7 +363,7 @@ wcscoll:([nonnull] wchar_t const *s1, [nonnull] wchar_t const *s2) -> int %{copy
 
 [std][std_guard][wchar]
 [section({.text.crt.wchar.unicode.static.memory|.text.crt.dos.wchar.unicode.static.memory})]
-wcsxfrm:([nonnull] wchar_t *dst, [inp(maxlen)] wchar_t const *__restrict src, size_t maxlen) -> size_t %{copy(%auto, str2wcs)}
+wcsxfrm:([nonnull] wchar_t *dst, [inp(maxlen)] wchar_t const *__restrict src, $size_t maxlen) -> $size_t %{copy(%auto, str2wcs)}
 
 
 %[default_impl_section({.text.crt.wchar.FILE.locked.read.getc|.text.crt.dos.wchar.FILE.locked.read.getc})]
@@ -483,12 +483,12 @@ wcstok:([nullable] wchar_t *string,
 %(std)#endif
 
 [std][std_guard][ATTR_WUNUSED][ATTR_PURE][wchar]
-wcslen:([nonnull] wchar_t const *__restrict string) -> size_t %{copy(%auto, str2wcs)}
+wcslen:([nonnull] wchar_t const *__restrict string) -> $size_t %{copy(%auto, str2wcs)}
 
 [std][std_guard][ATTR_WUNUSED][ATTR_PURE][wchar]
-wcsspn:([nonnull] wchar_t const *haystack, [nonnull] wchar_t const *accept) -> size_t %{copy(%auto, str2wcs)}
+wcsspn:([nonnull] wchar_t const *haystack, [nonnull] wchar_t const *accept) -> $size_t %{copy(%auto, str2wcs)}
 [std][std_guard][ATTR_WUNUSED][ATTR_PURE][wchar]
-wcscspn:([nonnull] wchar_t const *haystack, [nonnull] wchar_t const *reject) -> size_t %{copy(%auto, str2wcs)}
+wcscspn:([nonnull] wchar_t const *haystack, [nonnull] wchar_t const *reject) -> $size_t %{copy(%auto, str2wcs)}
 
 [std][std_guard][ATTR_WUNUSED][ATTR_PURE][wchar]
 wcschr:([nonnull] wchar_t const *__restrict haystack, wchar_t needle) -> wchar_t *
@@ -1501,7 +1501,7 @@ wcscat_s:(wchar_t *dst, $size_t dstsize, wchar_t const *src) -> $errno_t
 
 [dependency_include(<parts/errno.h>)][wchar]
 [section(.text.crt.dos.wchar.string.memory)][guard]
-wcscpy_s:(wchar_t *dst, rsize_t dstsize, wchar_t const *src) -> $errno_t
+wcscpy_s:(wchar_t *dst, $rsize_t dstsize, wchar_t const *src) -> $errno_t
 	%{copy(%auto, str2wcs)}
 
 %{
@@ -1515,11 +1515,11 @@ __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL wcsnlen_s)(wchar_t const *__str, __SIZE_T
 }
 
 [section(.text.crt.dos.wchar.string.memory)][wchar][guard]
-wcsncat_s:(wchar_t *dst, rsize_t dstsize, wchar_t const *src, rsize_t maxlen) -> $errno_t
+wcsncat_s:(wchar_t *dst, $rsize_t dstsize, wchar_t const *src, $rsize_t maxlen) -> $errno_t
 	%{copy(%auto, str2wcs)}
 
 [section(.text.crt.dos.wchar.string.memory)][wchar][guard]
-wcsncpy_s:(wchar_t *dst, rsize_t dstsize, wchar_t const *src, rsize_t maxlen) -> $errno_t
+wcsncpy_s:(wchar_t *dst, $rsize_t dstsize, wchar_t const *src, $rsize_t maxlen) -> $errno_t
 	%{copy(%auto, str2wcs)}
 
 [ATTR_NONNULL((2, 3))][wchar][noexport][nouser]

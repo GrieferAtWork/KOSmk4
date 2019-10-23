@@ -16,8 +16,7 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#define _KOS_SOURCE 1
-#define _GNU_SOURCE 1
+#define _ALL_SOURCE 1
 #define _DOS_SOURCE_CLEAN 1
 
 /* This file is used to make sure that C/C++ header pairs
@@ -55,6 +54,8 @@
 #include <cwchar>
 #include <cwctype>
 
+
+
 /* Include the original C headers afterwards */
 #include <assert.h>
 #include <ctype.h>
@@ -80,4 +81,3 @@
 #include <uchar.h>
 #include <wchar.h>
 #include <wctype.h>
-

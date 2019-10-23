@@ -121,15 +121,6 @@
 #endif /* (__STDC_WANT_SECURE_LIB__+0) != 0 */
 #endif
 
-/* You may `#define _DOS_SOURCE_CLEAN 1' alongside `_DOS_SOURCE' in order
- * to exclude select symbol definitions done by DOS that were only there
- * in order to pollute the global namespace (e.g. `typedef ... size_t;' in <crtdefs.h>) */
-#ifdef __USE_DOS
-#ifdef _DOS_SOURCE_CLEAN
-#define __USE_DOS_CLEAN 1
-#endif /* _DOS_SOURCE_CLEAN */
-#endif /* __USE_DOS */
-
 /* 64-bit time_t extensions for KOS
  * (By the time of this writing, but I'm guessing by 2038 this'll be
  *  similar to what glibc will have to do if it doesn't wan'na roll over) */
@@ -427,6 +418,14 @@
 #define __USE_UTF 1
 #endif /* _ALL_SOURCE */
 
+/* You may `#define _DOS_SOURCE_CLEAN 1' alongside `_DOS_SOURCE' in order
+ * to exclude select symbol definitions done by DOS that were only there
+ * in order to pollute the global namespace (e.g. `typedef ... size_t;' in <crtdefs.h>) */
+#ifdef __USE_DOS
+#ifdef _DOS_SOURCE_CLEAN
+#define __USE_DOS_CLEAN 1
+#endif /* _DOS_SOURCE_CLEAN */
+#endif /* __USE_DOS */
 
 
 #if !defined(__KERNEL__) || !defined(__KOS__)

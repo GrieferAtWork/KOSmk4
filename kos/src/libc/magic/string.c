@@ -4319,7 +4319,7 @@ strcat_s:(char *dst, $size_t dstsize, char const *src) -> $errno_t {
 
 %{
 __LOCAL __ATTR_WUNUSED __ATTR_PURE
-size_t __NOTHROW_NCX(__LIBCCALL strnlen_s)(char const *__str, size_t __maxlen) {
+__SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL strnlen_s)(char const *__str, __SIZE_TYPE__ __maxlen) {
 	return __str ? strnlen(__str, __maxlen) : 0;
 }
 }
@@ -4587,7 +4587,7 @@ _strnset_s:(char *__restrict buf, $size_t buflen, int ch, $size_t maxlen) -> $er
 #ifndef __wcsnlen_s_defined
 #define __wcsnlen_s_defined 1
 __LOCAL __ATTR_WUNUSED __ATTR_PURE
-size_t __NOTHROW_NCX((__LIBCCALL wcsnlen_s)(wchar_t const *__str, size_t __maxlen)) {
+__SIZE_TYPE__ __NOTHROW_NCX((__LIBCCALL wcsnlen_s)(wchar_t const *__str, __SIZE_TYPE__ __maxlen)) {
 	return __str ? wcsnlen(__str, __maxlen) : 0;
 }
 #endif /* !__wcsnlen_s_defined */
