@@ -35,6 +35,7 @@ final global FIX_EXTENSIONS = {
 	"bxrc",
 	"ld",
 	"def",
+	"sh",
 };
 
 function fixFile(filename: string) {
