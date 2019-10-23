@@ -359,7 +359,7 @@ global final ELF_DIHACK: Step = Step(
 	},
 	run: ELF_DIHACK_run,
 	tostr: ELF_DIHACK_tostr,
-//	getRequiredFiles: ELF_DIHACK_getRequiredFiles,
+	getRequiredFiles: ELF_DIHACK_getRequiredFiles,
 	getModifiedOutputFiles: ELF_DIHACK_getRequiredFiles,
 );
 

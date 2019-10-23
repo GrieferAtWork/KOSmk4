@@ -1515,8 +1515,10 @@ function buildGroupsWithStepFilter(
 		toolchain: Toolchain, groups: {Group...},
 		filterStep: {(bool,string)...} = none, maxParallelSteps: int = 8) {
 	local steps, recheck = orderGroups(toolchain, groups)...;
-	if (filterStep !is none)
+	if (filterStep !is none) {
 		steps = filterStepsWithCallbackWithDepdendencies(steps, filterStep);
+		recheck = filterStepsWithCallbackWithDepdendencies(recheck, filterStep);
+	}
 	executeBuildSteps(steps, recheck, maxParallelSteps);
 }
 
