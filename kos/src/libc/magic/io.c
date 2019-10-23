@@ -20,11 +20,6 @@
 %[define_replacement(fd_t = __fd_t)]
 %[define_replacement(oflag_t = __oflag_t)]
 
-//%(auto_libc_source)#ifndef __KERNEL__
-//%(auto_libc_source)#include "../user/unistd.h"
-//%(auto_libc_source)#include "../user/sys.stat.h"
-//%(auto_libc_source)#endif
-
 %{
 #include <features.h>
 #include <hybrid/typecore.h>
@@ -296,13 +291,13 @@ _open_osfhandle:(intptr_t osfd, $oflag_t flags) -> $fd_t {
 setmode:($fd_t fd, $oflag_t mode) -> $oflag_t {
 #ifdef __KOS__
 	return fcntl(fd, 5163, mode); /* F_SETFL_XCH */
-#else
+#else /* __KOS__ */
 	oflag_t result;
 	result = fcntl(fd, 3); /* F_GETFL */
 	if unlikely(result < 0)
 		return -1;
 	return fcntl(fd, 4, mode); /* F_SETFL */
-#endif
+#endif /* !__KOS__ */
 }
 
 
@@ -425,19 +420,19 @@ struct __finddata64_t {
 }%[pop_macro]%{
 
 #ifdef __USE_TIME_BITS64
-#define _finddata_t                   _finddata64i32_t
-#define _finddatai64_t                __finddata64_t
-#define _findfirst(filename, finddata)     _findfirst64i32(filename, finddata)
-#define _findnext(findfd, finddata)    _findnext64i32(findfd, finddata)
-#define _findfirsti64(filename, finddata)  _findfirst64(filename, finddata)
-#define _findnexti64(findfd, finddata) _findnext64(findfd, finddata)
+#define _finddata_t                       _finddata64i32_t
+#define _finddatai64_t                    __finddata64_t
+#define _findfirst(filename, finddata)    _findfirst64i32(filename, finddata)
+#define _findnext(findfd, finddata)       _findnext64i32(findfd, finddata)
+#define _findfirsti64(filename, finddata) _findfirst64(filename, finddata)
+#define _findnexti64(findfd, finddata)    _findnext64(findfd, finddata)
 #else /* __USE_TIME_BITS64 */
-#define _finddata_t                   _finddata32_t
-#define _finddatai64_t                _finddata32i64_t
-#define _findfirst(filename, finddata)     _findfirst32(filename, finddata)
-#define _findnext(findfd, finddata)    _findnext32(findfd, finddata)
-#define _findfirsti64(filename, finddata)  _findfirst32i64(filename, finddata)
-#define _findnexti64(findfd, finddata) _findnext32i64(findfd, finddata)
+#define _finddata_t                       _finddata32_t
+#define _finddatai64_t                    _finddata32i64_t
+#define _findfirst(filename, finddata)    _findfirst32(filename, finddata)
+#define _findnext(findfd, finddata)       _findnext32(findfd, finddata)
+#define _findfirsti64(filename, finddata) _findfirst32i64(filename, finddata)
+#define _findnexti64(findfd, finddata)    _findnext32i64(findfd, finddata)
 #endif /* !__USE_TIME_BITS64 */
 #endif /* !_FINDDATA_T_DEFINED */
 
@@ -448,7 +443,7 @@ __SYSDECL_END
 #ifdef __USE_UTF
 #if defined(_UCHAR_H) && !defined(_PARTS_UCHAR_IO_H)
 #include <parts/uchar/io.h>
-#endif
+#endif /* _UCHAR_H && !_PARTS_UCHAR_IO_H */
 #endif /* __USE_UTF */
 
 }

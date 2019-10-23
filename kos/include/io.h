@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdd88f935 */
+/* HASH CRC-32:0x90cd3471 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -860,19 +860,19 @@ struct __finddata64_t {
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
 #ifdef __USE_TIME_BITS64
-#define _finddata_t                   _finddata64i32_t
-#define _finddatai64_t                __finddata64_t
-#define _findfirst(filename, finddata)     _findfirst64i32(filename, finddata)
-#define _findnext(findfd, finddata)    _findnext64i32(findfd, finddata)
-#define _findfirsti64(filename, finddata)  _findfirst64(filename, finddata)
-#define _findnexti64(findfd, finddata) _findnext64(findfd, finddata)
+#define _finddata_t                       _finddata64i32_t
+#define _finddatai64_t                    __finddata64_t
+#define _findfirst(filename, finddata)    _findfirst64i32(filename, finddata)
+#define _findnext(findfd, finddata)       _findnext64i32(findfd, finddata)
+#define _findfirsti64(filename, finddata) _findfirst64(filename, finddata)
+#define _findnexti64(findfd, finddata)    _findnext64(findfd, finddata)
 #else /* __USE_TIME_BITS64 */
-#define _finddata_t                   _finddata32_t
-#define _finddatai64_t                _finddata32i64_t
-#define _findfirst(filename, finddata)     _findfirst32(filename, finddata)
-#define _findnext(findfd, finddata)    _findnext32(findfd, finddata)
-#define _findfirsti64(filename, finddata)  _findfirst32i64(filename, finddata)
-#define _findnexti64(findfd, finddata) _findnext32i64(findfd, finddata)
+#define _finddata_t                       _finddata32_t
+#define _finddatai64_t                    _finddata32i64_t
+#define _findfirst(filename, finddata)    _findfirst32(filename, finddata)
+#define _findnext(findfd, finddata)       _findnext32(findfd, finddata)
+#define _findfirsti64(filename, finddata) _findfirst32i64(filename, finddata)
+#define _findnexti64(findfd, finddata)    _findnext32i64(findfd, finddata)
 #endif /* !__USE_TIME_BITS64 */
 #endif /* !_FINDDATA_T_DEFINED */
 
@@ -883,7 +883,7 @@ __SYSDECL_END
 #ifdef __USE_UTF
 #if defined(_UCHAR_H) && !defined(_PARTS_UCHAR_IO_H)
 #include <parts/uchar/io.h>
-#endif
+#endif /* _UCHAR_H && !_PARTS_UCHAR_IO_H */
 #endif /* __USE_UTF */
 
 #endif /* !_IO_H */

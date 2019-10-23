@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd2132552 */
+/* HASH CRC-32:0x9eceeb04 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ DECL_BEGIN
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted._get_osfhandle") intptr_t
 NOTHROW_NCX(LIBCCALL libc__get_osfhandle)(fd_t fd) {
-#line 276 "kos/src/libc/magic/io.c"
+#line 271 "kos/src/libc/magic/io.c"
 	return (intptr_t)fd;
 }
 
@@ -41,7 +41,7 @@ INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted._open_osfhandle") fd_t
 NOTHROW_NCX(LIBCCALL libc__open_osfhandle)(intptr_t osfd,
                                            oflag_t flags) {
-#line 283 "kos/src/libc/magic/io.c"
+#line 278 "kos/src/libc/magic/io.c"
 	(void)flags;
 	return (fd_t)osfd;
 }

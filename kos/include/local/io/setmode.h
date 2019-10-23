@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x280be6d1 */
+/* HASH CRC-32:0x850c761a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,16 +38,16 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(setmode) __oflag_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(setmode))(__fd_t __fd,
                                                      __oflag_t __mode) {
-#line 297 "kos/src/libc/magic/io.c"
+#line 292 "kos/src/libc/magic/io.c"
 #ifdef __KOS__
 	return __localdep_fcntl(__fd, 5163, __mode); /* F_SETFL_XCH */
-#else
+#else /* __KOS__ */
 	__oflag_t __result;
 	__result = __localdep_fcntl(__fd, 3); /* F_GETFL */
 	if __unlikely(__result < 0)
 		return -1;
 	return __localdep_fcntl(__fd, 4, __mode); /* F_SETFL */
-#endif
+#endif /* !__KOS__ */
 }
 __NAMESPACE_LOCAL_END
 #endif /* (defined(__CRT_HAVE_fcntl) || defined(__CRT_HAVE___fcntl)) && (defined(__KOS__) || defined(__linux__)) */
