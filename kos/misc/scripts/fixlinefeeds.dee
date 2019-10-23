@@ -36,6 +36,7 @@ final global FIX_EXTENSIONS = {
 	"ld",
 	"def",
 	"sh",
+	"patch",
 };
 
 function fixFile(filename: string) {
