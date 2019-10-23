@@ -47,6 +47,51 @@
 
 DECL_BEGIN
 
+/* TODO: Add support for `pthread_num_processors_np()' */
+
+/* TODO: `__CORRECT_ISO_CPP_MATH_H_PROTO' interferes with libstdc++'s autoconf detection... */
+/* TODO: libstdc++ doesn't detect `HAVE_ISWBLANK' properly */
+/* TODO: libstdc++ doesn't detect `HAVE_LINK' properly */
+/* TODO: libstdc++ doesn't detect `HAVE_LINUX_FUTEX' properly */
+/* TODO: libstdc++ doesn't detect `HAVE_POLL' properly */
+/* TODO: libstdc++ doesn't detect `HAVE_READLINK' properly */
+/* TODO: libstdc++ doesn't detect `HAVE_SETENV' properly */
+/* TODO: libstdc++ doesn't detect `HAVE_STDALIGN_H' properly */
+/* TODO: libstdc++ doesn't detect `HAVE_STDBOOL_H' properly */
+/* TODO: libstdc++ doesn't detect `HAVE_STRERROR_L' properly */
+/* TODO: libstdc++ doesn't detect `HAVE_STRUCT_DIRENT_D_TYPE' properly */
+/* TODO: libstdc++ doesn't detect `HAVE_STRXFRM_L' properly */
+/* TODO: libstdc++ doesn't detect `HAVE_SYMLINK' properly */
+/* TODO: libstdc++ doesn't detect `HAVE_SYS_RESOURCE_H' properly */
+/* TODO: libstdc++ doesn't detect `HAVE_S_IFREG' properly */
+/* TODO: libstdc++ doesn't detect `HAVE_TRUNCATE' properly */
+/* TODO: libstdc++ doesn't detect `HAVE_VFWSCANF' properly */
+/* TODO: libstdc++ doesn't detect `HAVE_VSWSCANF' properly */
+/* TODO: libstdc++ doesn't detect `HAVE_VWSCANF' properly */
+/* TODO: libstdc++ doesn't detect `HAVE_WCSTOF' properly */
+/* TODO: libstdc++ doesn't detect `HAVE__WFOPEN' properly */
+/* TODO: libstdc++ doesn't detect `USE_FCHMOD' properly */
+/* TODO: libstdc++ doesn't detect `USE_FCHMODAT' properly */
+/* TODO: libstdc++ doesn't detect `USE_LFS' properly */
+/* TODO: libstdc++ doesn't detect `USE_LSTAT' properly */
+/* TODO: libstdc++ doesn't detect `USE_NANOSLEEP' properly */
+/* TODO: libstdc++ doesn't detect `USE_REALPATH' properly */
+/* TODO: libstdc++ doesn't detect `USE_SCHED_YIELD' properly */
+/* TODO: libstdc++ doesn't detect `USE_ST_MTIM' properly */
+/* TODO: libstdc++ doesn't detect `USE_UTIME' properly */
+/* TODO: libstdc++ doesn't detect `USE_UTIMENSAT' properly */
+/* TODO: libstdc++ doesn't detect `machine/endian.h' */
+/* TODO: Add support for `HAVE___CXA_THREAD_ATEXIT' */
+/* TODO: Add system header <sys/machine.h> */
+/* TODO: Add system header <sys/sdt.h> */
+/* TODO: Add system header <fenv.h> */
+/* TODO: Add system header <fp.h> */
+/* TODO: Add system header <libintl.h> */
+/* TODO: Add system header <nan.h> */
+/* TODO: Add system header <ftw.h> */
+
+
+
 /************************************************************************/
 int main_environ(int argc, char *argv[], char *envp[]) {
 	printf("$PATH: %q\n", getenv("PATH"));
