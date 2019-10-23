@@ -19,10 +19,13 @@
 #ifndef _INC_CRTDEFS
 #define _INC_CRTDEFS 1
 
+#include "__crt.h"
 #include "__stdinc.h"
-#include <__crt.h>
+
 #include <features.h>
+
 #include <hybrid/typecore.h>
+
 #include <sal.h>
 #include <vadefs.h>
 
@@ -268,6 +271,7 @@ __SYSDECL_BEGIN
 #define _CRT_NONSTDC_DEPRECATE(x)
 #endif /* !_CRT_NONSTDC_DEPRECATE */
 
+#ifndef __USE_DOS_CLEAN
 #ifndef _SIZE_T_DEFINED
 #define _SIZE_T_DEFINED 1
 #endif /* !_SIZE_T_DEFINED */
@@ -341,6 +345,7 @@ typedef __builtin_va_list va_list;
 typedef int errno_t;
 #endif /* !__errno_t_defined */
 #endif /* !_ERRNO_T_DEFINED */
+#endif /* !__USE_DOS_CLEAN */
 
 #ifndef _TIME32_T_DEFINED
 #define _TIME32_T_DEFINED 1
@@ -359,6 +364,7 @@ typedef __INT64_TYPE__ __time64_t;
 #endif /* !_TIME64_T_DEFINED */
 
 
+#ifndef __USE_DOS_CLEAN
 #undef _USE_32BIT_TIME_T
 #ifndef __USE_TIME_BITS64
 #define _USE_32BIT_TIME_T 1
@@ -375,6 +381,7 @@ typedef __time64_t time_t;
 #endif /* _USE_32BIT_TIME_T */
 #endif /* !__time_t_defined */
 #endif /* !_TIME_T_DEFINED */
+#endif /* !__USE_DOS_CLEAN */
 
 #ifndef _CONST_RETURN
 #ifdef __cplusplus

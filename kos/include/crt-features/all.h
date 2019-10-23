@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x66882c41 */
+/* HASH CRC-32:0xb1353a2f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1577,10 +1577,24 @@
 #define __CRT_HAVE_fdreopen64 1
 #define __CRT_HAVE_fdreopen64_unlocked 1
 #define __CRT_HAVE_fdreopen_unlocked 1
+#define __CRT_HAVE_feclearexcept 1
+#define __CRT_HAVE_fedisableexcept 1
+#define __CRT_HAVE_feenableexcept 1
+#define __CRT_HAVE_fegetenv 1
+#define __CRT_HAVE_fegetexcept 1
+#define __CRT_HAVE_fegetexceptflag 1
+#define __CRT_HAVE_fegetround 1
+#define __CRT_HAVE_feholdexcept 1
 #define __CRT_HAVE_feof 1
 #define __CRT_HAVE_feof_unlocked 1
+#define __CRT_HAVE_feraiseexcept 1
 #define __CRT_HAVE_ferror 1
 #define __CRT_HAVE_ferror_unlocked 1
+#define __CRT_HAVE_fesetenv 1
+#define __CRT_HAVE_fesetexceptflag 1
+#define __CRT_HAVE_fesetround 1
+#define __CRT_HAVE_fetestexcept 1
+#define __CRT_HAVE_feupdateenv 1
 #define __CRT_HAVE_fexecve 1
 #define __CRT_HAVE_fflush 1
 #define __CRT_HAVE_fflush_unlocked 1

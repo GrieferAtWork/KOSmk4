@@ -19,14 +19,20 @@
 #ifndef _STDARG_H
 #define _STDARG_H 1
 
-#include "__stdinc.h"
-#if defined(_CXX_CSTDARG) && !defined(__CXX_SYSTEM_HEADER)
-/* Import all symbols into the global namespace when re-including "stdarg.h" after "cstdarg" */
+#ifdef _CXX_STDONLY_CSTDARG
+#ifdef __CXX_SYSTEM_HEADER
+#undef _STDARG_H /* Allow the C-header to be re-included to import all std::-symbols into the global namespace. */
+#else /* __CXX_SYSTEM_HEADER */
+/* Import all symbols into the global namespace when re-including "ctype.h" after "cctype" */
 #ifndef __va_list_defined
 #define __va_list_defined 1
 __NAMESPACE_STD_USING(va_list)
 #endif /* !__va_list_defined */
-#else /* _CXX_CSTDARG && !__CXX_SYSTEM_HEADER */
+#undef _CXX_STDONLY_CSTDARG
+#endif /* !__CXX_SYSTEM_HEADER */
+#else /* _CXX_STDONLY_CSTDARG */
+
+#include "__stdinc.h"
 #include <features.h>
 
 __SYSDECL_BEGIN
@@ -59,5 +65,9 @@ __NAMESPACE_STD_USING(va_list)
 
 __SYSDECL_END
 
-#endif /* !_CXX_CSTDARG || __CXX_SYSTEM_HEADER */
+#ifdef __CXX_SYSTEM_HEADER
+#define _CXX_STDONLY_CSTDARG 1
+#undef _STDARG_H
+#endif /* __CXX_SYSTEM_HEADER */
+#endif /* !_CXX_STDONLY_CSTDARG */
 #endif /* !_STDARG_H */

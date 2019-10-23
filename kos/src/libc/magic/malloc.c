@@ -44,48 +44,10 @@ typedef __SIZE_TYPE__ size_t;
 }
 
 %[insert:std]
-
-[ignore][ATTR_WUNUSED][ATTR_MALL_DEFAULT_ALIGNED][ATTR_MALLOC][ATTR_ALLOC_SIZE((1, 2))]
-crt_calloc:(size_t count, size_t n_bytes) -> void * = calloc?;
-
-[std_guard][std][libc][ATTR_WUNUSED]
-[ATTR_MALL_DEFAULT_ALIGNED][ATTR_MALLOC]
-[ATTR_ALLOC_SIZE((1))][noexport][crtbuiltin]
-[requires(defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || $has_function(memalign))]
-malloc:(size_t n_bytes) -> void * {
-#ifdef __CRT_HAVE_calloc
-	return crt_calloc(1, n_bytes);
-#elif defined(__CRT_HAVE_realloc)
-	return realloc(NULL, n_bytes);
-#else
-	return memalign(__LIBC_MALLOC_ALIGNMENT, n_bytes);
-#endif
-}
-
-[std_guard][std][libc]
-[requires($has_function(malloc))]
-[dependency_include(<hybrid/__overflow.h>)]
-[ATTR_WUNUSED][ATTR_MALL_DEFAULT_ALIGNED][ATTR_MALLOC]
-[ATTR_ALLOC_SIZE((1, 2))][crtbuiltin]
-calloc:(size_t count, size_t n_bytes) -> void * {
-	void *result;
-	size_t total_bytes;
-	if (__hybrid_overflow_umul(count, n_bytes, &total_bytes))
-		return NULL;
-	result = malloc(total_bytes);
-	if __likely(result)
-		memset(result, 0, total_bytes);
-	return result;
-}
-
-[std_guard][std][libc]
-[ATTR_WUNUSED][ATTR_MALL_DEFAULT_ALIGNED]
-[ATTR_MALLOC][ATTR_ALLOC_SIZE((2))][crtbuiltin]
-realloc:(void *mallptr, size_t n_bytes) -> void *;
-
-[std_guard][std][libc][alias(cfree)][crtbuiltin]
-free:(void *mallptr) -> void;
-
+%[insert:extern(malloc)]
+%[insert:extern(calloc)]
+%[insert:extern(realloc)]
+%[insert:extern(free)]
 
 
 
@@ -123,14 +85,14 @@ pvalloc:(size_t n_bytes) -> void *;
 [requires($has_function(memalign))]
 [dependency_include(<hybrid/__limits.h>)]
 [section(.text.crt.heap.rare_helpers)]
-valloc:(size_t n_bytes) -> void * {
+valloc:($size_t n_bytes) -> void * {
 	return memalign(getpagesize(), n_bytes);
 }
 
 [dependency_include(<parts/errno.h>)]
 [requires($has_function(memalign))][noexport][guard]
 [section(.text.crt.heap.rare_helpers)][crtbuiltin]
-posix_memalign:([nonnull] void **__restrict pp, size_t alignment, size_t n_bytes) -> int {
+posix_memalign:([nonnull] void **__restrict pp, $size_t alignment, $size_t n_bytes) -> int {
 	void *result;
 	size_t d = alignment / sizeof(void *);
 	size_t r = alignment % sizeof(void *);

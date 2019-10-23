@@ -22,10 +22,12 @@
 #ifdef __CXX_SYSTEM_HEADER
 #include "stdint.h"
 #else /* __CXX_SYSTEM_HEADER */
+#include "features.h"
+#ifndef __USE_BROKEN_CCOMPAT
 #define __CXX_SYSTEM_HEADER 1
+#endif /* !__USE_BROKEN_CCOMPAT */
 #include "stdint.h"
 #undef __CXX_SYSTEM_HEADER
 #endif /* !__CXX_SYSTEM_HEADER */
-#undef _STDINT_H /* Allow the C-header to be re-included to re-import all std-symbols into the global namespace. */
 #endif /* !_STDINT_H */
 #endif /* !_CXX_CSTDINT */

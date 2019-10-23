@@ -22,6 +22,8 @@
 #include "../api.h"
 /**/
 
+#include "malloc.h"
+#include "stdlib.h"
 #include "stdio.h"
 
 #include <hybrid/align.h>

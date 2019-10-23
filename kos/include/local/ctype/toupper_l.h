@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x76d93ef */
+/* HASH CRC-32:0x8168943a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(toupper_l) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(toupper_l))(int __ch,
                                                        __locale_t __locale) {
-#line 624 "kos/src/libc/magic/ctype.c"
+#line 605 "kos/src/libc/magic/ctype.c"
 	/* TODO: GLC has a variant for this! */
 	(void)__locale;
 	return __localdep_toupper(__ch);

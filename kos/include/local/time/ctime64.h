@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd63d2820 */
+/* HASH CRC-32:0x882e3c12 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,10 +41,10 @@ __NAMESPACE_LOCAL_END
 #define ____localdep_ctime32_defined 1
 #if defined(__CRT_HAVE_ctime)
 /* Equivalent to `asctime (localtime (timer))' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_ctime32,(__TM_TYPE(time) const *__timer),ctime,(__timer))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_ctime32,(__time32_t const *__timer),ctime,(__timer))
 #elif defined(__CRT_HAVE__ctime32)
 /* Equivalent to `asctime (localtime (timer))' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_ctime32,(__TM_TYPE(time) const *__timer),_ctime32,(__timer))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_ctime32,(__time32_t const *__timer),_ctime32,(__timer))
 #else /* LIBC: ctime */
 #undef ____localdep_ctime32_defined
 #endif /* ctime32... */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc636922e */
+/* HASH CRC-32:0x51a5764 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,10 +59,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timegm64))(struct tm *__tp) {
 #line 998 "kos/src/libc/magic/time.c"
 #if defined(__CRT_HAVE_timegm) && !defined(__BUILDING_LIBC)
 	return (__time64_t)__localdep_timegm32(__tp);
-#else
+#else /* __CRT_HAVE_timegm && !__BUILDING_LIBC */
 	/* TODO: Timezones */
 	return __localdep_mktime64(__tp);
-#endif
+#endif /* !__CRT_HAVE_timegm || __BUILDING_LIBC */
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_timegm64_defined */

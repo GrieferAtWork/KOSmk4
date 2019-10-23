@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd06534ce */
+/* HASH CRC-32:0xb931d5e3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,8 +20,18 @@
 #ifndef _FLOAT_H
 #define _FLOAT_H 1
 
-#include <__stdinc.h>
-#include <__crt.h>
+#ifdef _CXX_STDONLY_CFLOAT
+#ifdef __CXX_SYSTEM_HEADER
+#undef _FLOAT_H /* Allow the C-header to be re-included to import all std::-symbols into the global namespace. */
+#else /* __CXX_SYSTEM_HEADER */
+/* Import all symbols into the global namespace when re-including "float.h" after "cfloat" */
+#ifndef __NO_FPU
+#endif /* !__NO_FPU */
+#undef _CXX_STDONLY_CFLOAT
+#endif /* !__CXX_SYSTEM_HEADER */
+#else /* _CXX_STDONLY_CFLOAT */
+#include "__stdinc.h"
+#include "__crt.h"
 
 #ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
 #pragma GCC system_header
@@ -97,10 +107,10 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 #define LDBL_MIN         __LDBL_MIN__
 #define FLT_ROUNDS       1
 
-#ifdef __USE_ISOC99
+#if defined(__USE_ISOC99) || defined(__USE_ISOCXX11)
 #define FLT_EVAL_METHOD  __FLT_EVAL_METHOD__
 #define DECIMAL_DIG      __DECIMAL_DIG__
-#endif /* __USE_ISOC99 */
+#endif /* __USE_ISOC99 || __USE_ISOCXX11 */
 
 #ifdef __USE_ISOC11
 #define FLT_DECIMAL_DIG  __FLT_DECIMAL_DIG__
@@ -435,4 +445,9 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,fpreset,(void),_fpreset,())
 __SYSDECL_END
 
 #endif /* !__NO_FPU */
+#ifdef __CXX_SYSTEM_HEADER
+#define _CXX_STDONLY_CFLOAT 1
+#undef _FLOAT_H
+#endif /* __CXX_SYSTEM_HEADER */
+#endif /* !_CXX_STDONLY_CFLOAT */
 #endif /* !_FLOAT_H */

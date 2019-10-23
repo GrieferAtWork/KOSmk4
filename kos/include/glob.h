@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xff9461d3 */
+/* HASH CRC-32:0x9077a70e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,8 +20,8 @@
 #ifndef _GLOB_H
 #define _GLOB_H 1
 
-#include <__stdinc.h>
-#include <__crt.h>
+#include "__stdinc.h"
+#include "__crt.h"
 
 #ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
 #pragma GCC system_header

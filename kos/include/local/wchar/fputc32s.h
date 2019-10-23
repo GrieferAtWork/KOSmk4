@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe639cf56 */
+/* HASH CRC-32:0x3c8be6b9 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,7 +69,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fputc32s) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 (__LIBCCALL __LIBC_LOCAL_NAME(fputc32s))(__CHAR32_TYPE__ const *__restrict __string,
                                          __FILE *__restrict __stream) __THROWS(...) {
-#line 451 "kos/src/libc/magic/wchar.c"
+#line 455 "kos/src/libc/magic/wchar.c"
 	__STDC_INT_AS_SIZE_T __result;
 	__result = __localdep_file_c32printer(__stream, __string, __localdep_c32len(__string));
 	return __result;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x15378283 */
+/* HASH CRC-32:0x4c887274 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,25 +20,11 @@
 #ifndef _CTYPE_H
 #define _CTYPE_H 1
 
-#include <__stdinc.h>
-#if defined(_CXX_CCTYPE) && !defined(__CXX_SYSTEM_HEADER)
+#ifdef _CXX_STDONLY_CCTYPE
+#ifdef __CXX_SYSTEM_HEADER
+#undef _CTYPE_H /* Allow the C-header to be re-included to import all std::-symbols into the global namespace. */
+#else /* __CXX_SYSTEM_HEADER */
 /* Import all symbols into the global namespace when re-including "ctype.h" after "cctype" */
-#undef isalnum
-#undef isalpha
-#undef isupper
-#undef islower
-#undef isdigit
-#undef isxdigit
-#undef isspace
-#undef ispunct
-#undef isprint
-#undef isgraph
-#undef iscntrl
-#ifdef __USE_ISOC99
-#undef isblank
-#endif /* __USE_ISOC99 */
-#undef tolower
-#undef toupper
 __NAMESPACE_STD_USING(iscntrl)
 __NAMESPACE_STD_USING(isspace)
 __NAMESPACE_STD_USING(isupper)
@@ -53,8 +39,11 @@ __NAMESPACE_STD_USING(isprint)
 __NAMESPACE_STD_USING(tolower)
 __NAMESPACE_STD_USING(toupper)
 __NAMESPACE_STD_USING(isblank)
-#else /* _CXX_CCTYPE && !__CXX_SYSTEM_HEADER */
-#include <__crt.h>
+#undef _CXX_STDONLY_CCTYPE
+#endif /* !__CXX_SYSTEM_HEADER */
+#else /* _CXX_STDONLY_CCTYPE */
+#include "__stdinc.h"
+#include "__crt.h"
 
 #ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
 #pragma GCC system_header
@@ -710,5 +699,9 @@ __NAMESPACE_INT_END
 
 __SYSDECL_END
 
-#endif /* !_CXX_CCTYPE || __CXX_SYSTEM_HEADER */
+#ifdef __CXX_SYSTEM_HEADER
+#define _CXX_STDONLY_CCTYPE 1
+#undef _CTYPE_H
+#endif /* __CXX_SYSTEM_HEADER */
+#endif /* !_CXX_STDONLY_CCTYPE */
 #endif /* !_CTYPE_H */

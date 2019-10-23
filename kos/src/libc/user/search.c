@@ -22,6 +22,7 @@
 #include "../api.h"
 #include "search.h"
 #include "malloc.h"
+#include "stdlib.h"
 
 #include <string.h>
 #include <malloca.h>

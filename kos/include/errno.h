@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb4382654 */
+/* HASH CRC-32:0x2d95b65c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,8 +20,8 @@
 #ifndef _ERRNO_H
 #define _ERRNO_H 1
 
-#include <__stdinc.h>
-#include <__crt.h>
+#include "__stdinc.h"
+#include "__crt.h"
 
 #ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
 #pragma GCC system_header

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x344b24c3 */
+/* HASH CRC-32:0x47107c79 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(iswupper_l) __ATTR_WUNUSED __ATTR_PURE int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(iswupper_l))(__WINT_TYPE__ __wc,
                                                         __locale_t __locale) {
-#line 273 "kos/src/libc/magic/wctype.c"
+#line 274 "kos/src/libc/magic/wctype.c"
 	(void)__locale;
 	return __localdep_iswupper(__wc);
 }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb38a6b36 */
+/* HASH CRC-32:0x855e739e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -44,7 +44,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_isprime,(unsigned int __number),isprim
 #endif /* isprime... */
 #endif /* !____localdep_isprime_defined */
 
-/* Dependency: "calloc" from "malloc" */
+/* Dependency: "calloc" from "stdlib" */
 #ifndef ____localdep_calloc_defined
 #define ____localdep_calloc_defined 1
 #ifdef __std___localdep_calloc_defined
@@ -54,7 +54,7 @@ __FORCELOCAL __ATTR_WUNUSED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_MALLOC __ATTR_ALL
 #elif defined(__CRT_HAVE_calloc)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_MALLOC __ATTR_ALLOC_SIZE((1, 2)),void *,__NOTHROW_NCX,__localdep_calloc,(__SIZE_TYPE__ __count, __SIZE_TYPE__ __n_bytes),calloc,(__count,__n_bytes))
 #elif (defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc)) || (__has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)) || defined(__CRT_HAVE_malloc)
-#include <local/malloc/calloc.h>
+#include <local/stdlib/calloc.h>
 #define __localdep_calloc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(calloc))
 #else /* CUSTOM: calloc */
 #undef ____localdep_calloc_defined

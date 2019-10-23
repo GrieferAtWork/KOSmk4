@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa042d7a2 */
+/* HASH CRC-32:0xa9825bbc */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,8 +20,8 @@
 #ifndef _PTHREAD_H
 #define _PTHREAD_H 1
 
-#include <__stdinc.h>
-#include <__crt.h>
+#include "__stdinc.h"
+#include "__crt.h"
 #include <kos/anno.h>
 
 #ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER

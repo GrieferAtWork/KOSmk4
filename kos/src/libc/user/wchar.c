@@ -28,6 +28,7 @@
 #include "malloc.h"
 #include "string.h"
 #include "stdio.h"
+#include "stdlib.h"
 #include <uchar.h>
 #include <stdio.h>
 #include <string.h>

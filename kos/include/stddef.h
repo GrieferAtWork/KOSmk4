@@ -19,9 +19,11 @@
 #ifndef _STDDEF_H
 #define _STDDEF_H 1
 
-#include "__stdinc.h"
-#if defined(_CXX_CSTDDEF) && !defined(__CXX_SYSTEM_HEADER)
-/* Import all symbols into the global namespace when re-including "stddef.h" after "cstddef" */
+#ifdef _CXX_STDONLY_CSTDDEF
+#ifdef __CXX_SYSTEM_HEADER
+#undef _STDDEF_H /* Allow the C-header to be re-included to import all std::-symbols into the global namespace. */
+#else /* __CXX_SYSTEM_HEADER */
+/* Import all symbols into the global namespace when re-including "ctype.h" after "cctype" */
 #ifndef __ptrdiff_t_defined
 #define __ptrdiff_t_defined 1
 __NAMESPACE_STD_USING(ptrdiff_t)
@@ -34,13 +36,16 @@ __NAMESPACE_STD_USING(size_t)
 #define __max_align_t_defined 1
 __NAMESPACE_STD_USING(max_align_t)
 #endif /* !__max_align_t_defined */
-#else /* _CXX_CSTDDEF && !__CXX_SYSTEM_HEADER */
+#undef _CXX_STDONLY_CSTDDEF
+#endif /* !__CXX_SYSTEM_HEADER */
+#else /* _CXX_STDONLY_CSTDDEF */
+
+#include "__stdinc.h"
 #include <features.h>
 #include <hybrid/typecore.h>
 #ifdef __cplusplus
 #include <__stdcxx.h>
 #endif /* __cplusplus */
-
 
 __SYSDECL_BEGIN
 
@@ -118,5 +123,9 @@ typedef __WCHAR_TYPE__ wchar_t;
 
 __SYSDECL_END
 
-#endif /* !_CXX_CSTDDEF || __CXX_SYSTEM_HEADER */
+#ifdef __CXX_SYSTEM_HEADER
+#define _CXX_STDONLY_CSTDDEF 1
+#undef _STDDEF_H
+#endif /* __CXX_SYSTEM_HEADER */
+#endif /* !_CXX_STDONLY_CSTDDEF */
 #endif /* !_STDDEF_H */

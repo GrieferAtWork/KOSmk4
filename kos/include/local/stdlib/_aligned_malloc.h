@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7eaf8493 */
+/* HASH CRC-32:0xaaa59978 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,7 +20,7 @@
 #ifndef __local__aligned_malloc_defined
 #if ((defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc)) || (__has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)) || defined(__CRT_HAVE_malloc))
 #define __local__aligned_malloc_defined 1
-/* Dependency: "malloc" from "malloc" */
+/* Dependency: "malloc" from "stdlib" */
 #ifndef ____localdep_malloc_defined
 #define ____localdep_malloc_defined 1
 #ifdef __std___localdep_malloc_defined
@@ -30,7 +30,7 @@ __FORCELOCAL __ATTR_WUNUSED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_MALLOC __ATTR_ALL
 #elif defined(__CRT_HAVE_malloc)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_MALLOC __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,__localdep_malloc,(__SIZE_TYPE__ __n_bytes),malloc,(__n_bytes))
 #elif (defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc))
-#include <local/malloc/malloc.h>
+#include <local/stdlib/malloc.h>
 #define __localdep_malloc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(malloc))
 #else /* CUSTOM: malloc */
 #undef ____localdep_malloc_defined
@@ -41,7 +41,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(_aligned_malloc) __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(2) __ATTR_ALLOC_SIZE((1)) __ATTR_MALLOC void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_aligned_malloc))(__SIZE_TYPE__ __num_bytes,
                                                              __SIZE_TYPE__ __min_alignment) {
-#line 2197 "kos/src/libc/magic/stdlib.c"
+#line 2277 "kos/src/libc/magic/stdlib.c"
 	void *__result = __localdep_malloc(__num_bytes + 2 * sizeof(void *) + __min_alignment - 1);
 	if (__result) {
 		void *__base = (void *)(((__UINTPTR_TYPE__)__result + (__min_alignment - 1)) & ~(__min_alignment - 1));

@@ -17,6 +17,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
+%[define_ccompat_header(cfloat)]
 %[define_replacement(errno_t = __errno_t)]
 %[default_impl_section(.text.crt.math.float)]
 
@@ -91,10 +92,10 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 #define LDBL_MIN         __LDBL_MIN__
 #define FLT_ROUNDS       1
 
-#ifdef __USE_ISOC99
+#if defined(__USE_ISOC99) || defined(__USE_ISOCXX11)
 #define FLT_EVAL_METHOD  __FLT_EVAL_METHOD__
 #define DECIMAL_DIG      __DECIMAL_DIG__
-#endif /* __USE_ISOC99 */
+#endif /* __USE_ISOC99 || __USE_ISOCXX11 */
 
 #ifdef __USE_ISOC11
 #define FLT_DECIMAL_DIG  __FLT_DECIMAL_DIG__

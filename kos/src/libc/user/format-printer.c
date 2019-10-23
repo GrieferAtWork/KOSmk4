@@ -22,6 +22,7 @@
 #include "../api.h"
 #include "format-printer.h"
 #include "malloc.h"
+#include "stdlib.h"
 #include <string.h>
 
 DECL_BEGIN

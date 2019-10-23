@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe9283c4b */
+/* HASH CRC-32:0xccd6eb58 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,8 +20,10 @@
 #ifndef _INTTYPES_H
 #define _INTTYPES_H 1
 
-#include <__stdinc.h>
-#if defined(_CXX_CINTTYPES) && !defined(__CXX_SYSTEM_HEADER)
+#ifdef _CXX_STDONLY_CINTTYPES
+#ifdef __CXX_SYSTEM_HEADER
+#undef _INTTYPES_H /* Allow the C-header to be re-included to import all std::-symbols into the global namespace. */
+#else /* __CXX_SYSTEM_HEADER */
 /* Import all symbols into the global namespace when re-including "inttypes.h" after "cinttypes" */
 #ifndef __imaxdiv_t_defined
 #define __imaxdiv_t_defined 1
@@ -33,8 +35,11 @@ __NAMESPACE_STD_USING(strtoimax)
 __NAMESPACE_STD_USING(strtoumax)
 __NAMESPACE_STD_USING(wcstoimax)
 __NAMESPACE_STD_USING(wcstoumax)
-#else /* _CXX_CINTTYPES && !__CXX_SYSTEM_HEADER */
-#include <__crt.h>
+#undef _CXX_STDONLY_CINTTYPES
+#endif /* !__CXX_SYSTEM_HEADER */
+#else /* _CXX_STDONLY_CINTTYPES */
+#include "__stdinc.h"
+#include "__crt.h"
 
 #ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
 #pragma GCC system_header
@@ -55,12 +60,12 @@ __SYSDECL_BEGIN
 #endif
 
 #if __SIZEOF_LONG__ == 8
-#   define __PRI64_PREFIX  "l"
-#   define __PRIPTR_PREFIX "l"
-#else
-#   define __PRI64_PREFIX  "ll"
-#   define __PRIPTR_PREFIX
-#endif
+#define __PRI64_PREFIX  "l"
+#define __PRIPTR_PREFIX "l"
+#else /* __SIZEOF_LONG__ == 8 */
+#define __PRI64_PREFIX  "ll"
+#define __PRIPTR_PREFIX
+#endif /* __SIZEOF_LONG__ != 8 */
 
 #define PRId8          "d"
 #define PRId16         "d"
@@ -220,30 +225,26 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 
-#ifndef __std_imaxdiv_t_defined
-#define __std_imaxdiv_t_defined 1
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma push_macro("quot")
 #pragma push_macro("rem")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 #undef quot
 #undef rem
-
-__NAMESPACE_STD_BEGIN
-#ifdef __imaxdiv_t_defined
-__NAMESPACE_GLB_USING(imaxdiv_t)
-#else /* __imaxdiv_t_defined */
-typedef struct {
+struct __imaxdiv_struct {
 	__INTMAX_TYPE__ quot; /* Quotient. */
 	__INTMAX_TYPE__ rem;  /* Remainder. */
-} imaxdiv_t;
-#endif /* !__imaxdiv_t_defined */
-__NAMESPACE_STD_END
-
+};
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma pop_macro("rem")
 #pragma pop_macro("quot")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
+
+#ifndef __std_imaxdiv_t_defined
+#define __std_imaxdiv_t_defined 1
+__NAMESPACE_STD_BEGIN
+typedef struct __imaxdiv_struct imaxdiv_t;
+__NAMESPACE_STD_END
 #endif /* !__std_imaxdiv_t_defined */
 
 #ifndef __CXX_SYSTEM_HEADER
@@ -556,8 +557,12 @@ __SYSDECL_END
 #ifdef __USE_UTF
 #if defined(_UCHAR_H) && !defined(_PARTS_UCHAR_INTTYPES_H)
 #include <parts/uchar/inttypes.h>
-#endif
+#endif /* _UCHAR_H && !_PARTS_UCHAR_INTTYPES_H */
 #endif /* __USE_UTF */
 
-#endif /* !_CXX_CINTTYPES || __CXX_SYSTEM_HEADER */
+#ifdef __CXX_SYSTEM_HEADER
+#define _CXX_STDONLY_CINTTYPES 1
+#undef _INTTYPES_H
+#endif /* __CXX_SYSTEM_HEADER */
+#endif /* !_CXX_STDONLY_CINTTYPES */
 #endif /* !_INTTYPES_H */

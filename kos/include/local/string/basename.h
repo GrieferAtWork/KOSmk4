@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc7760d73 */
+/* HASH CRC-32:0x1d5f1711 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,10 +31,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(basename))(char const *__filename) {
 #ifdef ___WIN32
 		if (__ch == '/' || __ch == '\\')
 			__result = __iter;
-#else
+#else /* _WIN32 */
 		if (__ch == '/')
 			__result = __iter;
-#endif
+#endif /* !_WIN32 */
 	} while (__ch);
 	if __unlikely(!__result)
 		return (char *)__filename; /* Path doesn't contain '/'. */
@@ -44,20 +44,20 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(basename))(char const *__filename) {
 #ifdef ___WIN32
 	while (__iter != __filename && (__iter[-1] == '/' || __iter[-1] == '\\'))
 		--__iter;
-#else
+#else /* _WIN32 */
 	while (__iter != __filename && __iter[-1] == '/')
 		--__iter;
-#endif
+#endif /* !_WIN32 */
 	if (__iter == __filename)
 		return __result-1; /* Only `'/'"-characters. */
 	//*iter = '\0'; /* Trim all ending `'/'"-characters. */
 #ifdef ___WIN32
 	while (__iter != __filename && (__iter[-1] != '/' || __iter[-1] != '\\'))
 		--__iter; /* Scan until the previous '/'. */
-#else
+#else /* _WIN32 */
 	while (__iter != __filename && __iter[-1] != '/')
 		--__iter; /* Scan until the previous '/'. */
-#endif
+#endif /* !_WIN32 */
 	return __iter; /* Returns string after previous '/'. */
 }
 __NAMESPACE_LOCAL_END

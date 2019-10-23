@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5e6a04a4 */
+/* HASH CRC-32:0xfca966f3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,11 +20,11 @@
 #ifndef __local_ldiv_defined
 #define __local_ldiv_defined 1
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(ldiv) __ATTR_CONST __ATTR_WUNUSED ldiv_t
+__LOCAL_LIBC(ldiv) __ATTR_CONST __ATTR_WUNUSED struct __ldiv_struct
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ldiv))(long __numer,
                                                   long __denom) {
-#line 462 "kos/src/libc/magic/stdlib.c"
-	ldiv_t __result;
+#line 470 "kos/src/libc/magic/stdlib.c"
+	struct __ldiv_struct __result;
 	__result.quot = __numer / __denom;
 	__result.rem  = __numer % __denom;
 	return __result;

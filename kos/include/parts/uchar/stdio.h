@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4970e95c */
+/* HASH CRC-32:0xd093d4c6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,32 +64,32 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(getchar32, __FORCELOCAL wint_t __NOTHROW_NCX(__L
 #endif /* LIBC: getchar32 */
 #endif /* getchar32... */
 #if defined(__CRT_HAVE_fgetwc) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_NONNULL((1)),wint_t,__NOTHROW_NCX,fgetc16,(__FILE *__restrict __stream),fgetwc,(__stream))
+__CREDIRECT(__ATTR_NONNULL((1)),wint_t,__NOTHROW_NCX,fgetc16,(FILE *__restrict __stream),fgetwc,(__stream))
 #elif defined(__CRT_HAVE_getwc) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_NONNULL((1)),wint_t,__NOTHROW_NCX,fgetc16,(__FILE *__restrict __stream),getwc,(__stream))
+__CREDIRECT(__ATTR_NONNULL((1)),wint_t,__NOTHROW_NCX,fgetc16,(FILE *__restrict __stream),getwc,(__stream))
 #elif defined(__CRT_HAVE_DOS$getwc)
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),wint_t,__NOTHROW_NCX,fgetc16,(__FILE *__restrict __stream),getwc,(__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),wint_t,__NOTHROW_NCX,fgetc16,(FILE *__restrict __stream),getwc,(__stream))
 #elif defined(__CRT_HAVE_DOS$fgetwc)
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),wint_t,__NOTHROW_NCX,fgetc16,(__FILE *__restrict __stream),fgetwc,(__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),wint_t,__NOTHROW_NCX,fgetc16,(FILE *__restrict __stream),fgetwc,(__stream))
 #endif /* fgetc16... */
 #if defined(__CRT_HAVE_fgetwc) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_NONNULL((1)),wint_t,__NOTHROW_NCX,fgetc32,(__FILE *__restrict __stream),fgetwc,(__stream))
+__CREDIRECT(__ATTR_NONNULL((1)),wint_t,__NOTHROW_NCX,fgetc32,(FILE *__restrict __stream),fgetwc,(__stream))
 #elif defined(__CRT_HAVE_getwc) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_NONNULL((1)),wint_t,__NOTHROW_NCX,fgetc32,(__FILE *__restrict __stream),getwc,(__stream))
+__CREDIRECT(__ATTR_NONNULL((1)),wint_t,__NOTHROW_NCX,fgetc32,(FILE *__restrict __stream),getwc,(__stream))
 #endif /* fgetc32... */
 #if defined(__CRT_HAVE_getwc) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_NONNULL((1)),wint_t,__NOTHROW_NCX,getc16,(__FILE *__restrict __stream),getwc,(__stream))
+__CREDIRECT(__ATTR_NONNULL((1)),wint_t,__NOTHROW_NCX,getc16,(FILE *__restrict __stream),getwc,(__stream))
 #elif defined(__CRT_HAVE_fgetwc) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_NONNULL((1)),wint_t,__NOTHROW_NCX,getc16,(__FILE *__restrict __stream),fgetwc,(__stream))
+__CREDIRECT(__ATTR_NONNULL((1)),wint_t,__NOTHROW_NCX,getc16,(FILE *__restrict __stream),fgetwc,(__stream))
 #elif defined(__CRT_HAVE_DOS$fgetwc)
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),wint_t,__NOTHROW_NCX,getc16,(__FILE *__restrict __stream),fgetwc,(__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),wint_t,__NOTHROW_NCX,getc16,(FILE *__restrict __stream),fgetwc,(__stream))
 #elif defined(__CRT_HAVE_DOS$getwc)
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),wint_t,__NOTHROW_NCX,getc16,(__FILE *__restrict __stream),getwc,(__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),wint_t,__NOTHROW_NCX,getc16,(FILE *__restrict __stream),getwc,(__stream))
 #endif /* getc16... */
 #if defined(__CRT_HAVE_getwc) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_NONNULL((1)),wint_t,__NOTHROW_NCX,getc32,(__FILE *__restrict __stream),getwc,(__stream))
+__CREDIRECT(__ATTR_NONNULL((1)),wint_t,__NOTHROW_NCX,getc32,(FILE *__restrict __stream),getwc,(__stream))
 #elif defined(__CRT_HAVE_fgetwc) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_NONNULL((1)),wint_t,__NOTHROW_NCX,getc32,(__FILE *__restrict __stream),fgetwc,(__stream))
+__CREDIRECT(__ATTR_NONNULL((1)),wint_t,__NOTHROW_NCX,getc32,(FILE *__restrict __stream),fgetwc,(__stream))
 #endif /* getc32... */
 #if defined(__CRT_HAVE_putwchar) && (__SIZEOF_WCHAR_T__ == 2)
 __CREDIRECT(,wint_t,__NOTHROW_NCX,putchar16,(char16_t __wc),putwchar,(__wc))
@@ -116,155 +116,155 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(putchar32, __FORCELOCAL wint_t __NOTHROW_NCX(__L
 #endif /* LIBC: putchar32 */
 #endif /* putchar32... */
 #if defined(__CRT_HAVE_fputwc) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,fputc16,(char16_t __wc, __FILE *__stream),fputwc,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,fputc16,(char16_t __wc, FILE *__stream),fputwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_putwc) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,fputc16,(char16_t __wc, __FILE *__stream),putwc,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,fputc16,(char16_t __wc, FILE *__stream),putwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_DOS$putwc)
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,fputc16,(char16_t __wc, __FILE *__stream),putwc,(__wc,__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,fputc16,(char16_t __wc, FILE *__stream),putwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_DOS$fputwc)
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,fputc16,(char16_t __wc, __FILE *__stream),fputwc,(__wc,__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,fputc16,(char16_t __wc, FILE *__stream),fputwc,(__wc,__stream))
 #endif /* fputc16... */
 #if defined(__CRT_HAVE_fputwc) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,fputc32,(char32_t __wc, __FILE *__stream),fputwc,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,fputc32,(char32_t __wc, FILE *__stream),fputwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_putwc) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,fputc32,(char32_t __wc, __FILE *__stream),putwc,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,fputc32,(char32_t __wc, FILE *__stream),putwc,(__wc,__stream))
 #endif /* fputc32... */
 #if defined(__CRT_HAVE_putwc) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,putc16,(char16_t __wc, __FILE *__stream),putwc,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,putc16,(char16_t __wc, FILE *__stream),putwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_fputwc) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,putc16,(char16_t __wc, __FILE *__stream),fputwc,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,putc16,(char16_t __wc, FILE *__stream),fputwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_DOS$fputwc)
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,putc16,(char16_t __wc, __FILE *__stream),fputwc,(__wc,__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,putc16,(char16_t __wc, FILE *__stream),fputwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_DOS$putwc)
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,putc16,(char16_t __wc, __FILE *__stream),putwc,(__wc,__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,putc16,(char16_t __wc, FILE *__stream),putwc,(__wc,__stream))
 #endif /* putc16... */
 #if defined(__CRT_HAVE_putwc) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,putc32,(char32_t __wc, __FILE *__stream),putwc,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,putc32,(char32_t __wc, FILE *__stream),putwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_fputwc) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,putc32,(char32_t __wc, __FILE *__stream),fputwc,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,putc32,(char32_t __wc, FILE *__stream),fputwc,(__wc,__stream))
 #endif /* putc32... */
 #if defined(__CRT_HAVE_fgetws) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char16_t *,__NOTHROW_NCX,fgetc16s,(char16_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgetws,(__buf,__bufsize,__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char16_t *,__NOTHROW_NCX,fgetc16s,(char16_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, FILE *__restrict __stream),fgetws,(__buf,__bufsize,__stream))
 #elif defined(__CRT_HAVE_fgetws_unlocked) && (defined(__USE_STDIO_UNLOCKED) && (__SIZEOF_WCHAR_T__ == 2))
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char16_t *,__NOTHROW_NCX,fgetc16s,(char16_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgetws_unlocked,(__buf,__bufsize,__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char16_t *,__NOTHROW_NCX,fgetc16s,(char16_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, FILE *__restrict __stream),fgetws_unlocked,(__buf,__bufsize,__stream))
 #elif defined(__CRT_HAVE__fgetws_nolock) && (defined(__USE_STDIO_UNLOCKED) && (__SIZEOF_WCHAR_T__ == 2))
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char16_t *,__NOTHROW_NCX,fgetc16s,(char16_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),_fgetws_nolock,(__buf,__bufsize,__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char16_t *,__NOTHROW_NCX,fgetc16s,(char16_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, FILE *__restrict __stream),_fgetws_nolock,(__buf,__bufsize,__stream))
 #elif defined(__CRT_HAVE_DOS$fgetws_unlocked) && (defined(__USE_STDIO_UNLOCKED))
-__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char16_t *,__NOTHROW_NCX,fgetc16s,(char16_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgetws_unlocked,(__buf,__bufsize,__stream))
+__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char16_t *,__NOTHROW_NCX,fgetc16s,(char16_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, FILE *__restrict __stream),fgetws_unlocked,(__buf,__bufsize,__stream))
 #elif defined(__CRT_HAVE_DOS$_fgetws_nolock) && (defined(__USE_STDIO_UNLOCKED))
-__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char16_t *,__NOTHROW_NCX,fgetc16s,(char16_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),_fgetws_nolock,(__buf,__bufsize,__stream))
+__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char16_t *,__NOTHROW_NCX,fgetc16s,(char16_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, FILE *__restrict __stream),_fgetws_nolock,(__buf,__bufsize,__stream))
 #elif defined(__CRT_HAVE_fgetws_unlocked) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char16_t *,__NOTHROW_NCX,fgetc16s,(char16_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgetws_unlocked,(__buf,__bufsize,__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char16_t *,__NOTHROW_NCX,fgetc16s,(char16_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, FILE *__restrict __stream),fgetws_unlocked,(__buf,__bufsize,__stream))
 #elif defined(__CRT_HAVE__fgetws_nolock) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char16_t *,__NOTHROW_NCX,fgetc16s,(char16_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),_fgetws_nolock,(__buf,__bufsize,__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char16_t *,__NOTHROW_NCX,fgetc16s,(char16_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, FILE *__restrict __stream),_fgetws_nolock,(__buf,__bufsize,__stream))
 #elif defined(__CRT_HAVE_DOS$fgetws_unlocked)
-__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char16_t *,__NOTHROW_NCX,fgetc16s,(char16_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgetws_unlocked,(__buf,__bufsize,__stream))
+__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char16_t *,__NOTHROW_NCX,fgetc16s,(char16_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, FILE *__restrict __stream),fgetws_unlocked,(__buf,__bufsize,__stream))
 #elif defined(__CRT_HAVE_DOS$_fgetws_nolock)
-__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char16_t *,__NOTHROW_NCX,fgetc16s,(char16_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),_fgetws_nolock,(__buf,__bufsize,__stream))
+__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char16_t *,__NOTHROW_NCX,fgetc16s,(char16_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, FILE *__restrict __stream),_fgetws_nolock,(__buf,__bufsize,__stream))
 #elif defined(__CRT_HAVE_DOS$fgetws)
-__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char16_t *,__NOTHROW_NCX,fgetc16s,(char16_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgetws,(__buf,__bufsize,__stream))
+__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char16_t *,__NOTHROW_NCX,fgetc16s,(char16_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, FILE *__restrict __stream),fgetws,(__buf,__bufsize,__stream))
 #elif (defined(__CRT_HAVE_fgetwc) || defined(__CRT_HAVE_getwc)) && (defined(__CRT_HAVE_ungetwc) || defined(__CRT_HAVE_ungetwc_unlocked)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE_ferror_unlocked))
 #if __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/fgetws.h>
-__FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) char16_t *__NOTHROW_NCX(__LIBCCALL fgetc16s)(char16_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream) { return (char16_t *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fgetws))((__WCHAR_TYPE__ *)__buf, __bufsize, __stream); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) char16_t *__NOTHROW_NCX(__LIBCCALL fgetc16s)(char16_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, FILE *__restrict __stream) { return (char16_t *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fgetws))((__WCHAR_TYPE__ *)__buf, __bufsize, __stream); }
 #else /* LIBC: fgetc16s */
 #include <local/wchar/fgetc16s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(fgetc16s, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) char16_t *__NOTHROW_NCX(__LIBCCALL fgetc16s)(char16_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fgetc16s))(__buf, __bufsize, __stream); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fgetc16s, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) char16_t *__NOTHROW_NCX(__LIBCCALL fgetc16s)(char16_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, FILE *__restrict __stream) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fgetc16s))(__buf, __bufsize, __stream); })
 #endif /* LIBC: fgetc16s */
 #endif /* fgetc16s... */
 #if defined(__CRT_HAVE_fgetws) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char32_t *,__NOTHROW_NCX,fgetc32s,(char32_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgetws,(__buf,__bufsize,__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char32_t *,__NOTHROW_NCX,fgetc32s,(char32_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, FILE *__restrict __stream),fgetws,(__buf,__bufsize,__stream))
 #elif defined(__CRT_HAVE_fgetws_unlocked) && (defined(__USE_STDIO_UNLOCKED) && (__SIZEOF_WCHAR_T__ == 4))
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char32_t *,__NOTHROW_NCX,fgetc32s,(char32_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgetws_unlocked,(__buf,__bufsize,__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char32_t *,__NOTHROW_NCX,fgetc32s,(char32_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, FILE *__restrict __stream),fgetws_unlocked,(__buf,__bufsize,__stream))
 #elif defined(__CRT_HAVE__fgetws_nolock) && (defined(__USE_STDIO_UNLOCKED) && (__SIZEOF_WCHAR_T__ == 4))
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char32_t *,__NOTHROW_NCX,fgetc32s,(char32_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),_fgetws_nolock,(__buf,__bufsize,__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char32_t *,__NOTHROW_NCX,fgetc32s,(char32_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, FILE *__restrict __stream),_fgetws_nolock,(__buf,__bufsize,__stream))
 #elif defined(__CRT_HAVE_fgetws_unlocked) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char32_t *,__NOTHROW_NCX,fgetc32s,(char32_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgetws_unlocked,(__buf,__bufsize,__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char32_t *,__NOTHROW_NCX,fgetc32s,(char32_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, FILE *__restrict __stream),fgetws_unlocked,(__buf,__bufsize,__stream))
 #elif defined(__CRT_HAVE__fgetws_nolock) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char32_t *,__NOTHROW_NCX,fgetc32s,(char32_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),_fgetws_nolock,(__buf,__bufsize,__stream))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char32_t *,__NOTHROW_NCX,fgetc32s,(char32_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, FILE *__restrict __stream),_fgetws_nolock,(__buf,__bufsize,__stream))
 #elif (defined(__CRT_HAVE_fgetwc) || defined(__CRT_HAVE_getwc)) && (defined(__CRT_HAVE_ungetwc) || defined(__CRT_HAVE_ungetwc_unlocked)) && (defined(__CRT_HAVE_ferror) || defined(__CRT_HAVE_ferror_unlocked))
 #if __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/fgetws.h>
-__FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) char32_t *__NOTHROW_NCX(__LIBCCALL fgetc32s)(char32_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream) { return (char32_t *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fgetws))((__WCHAR_TYPE__ *)__buf, __bufsize, __stream); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) char32_t *__NOTHROW_NCX(__LIBCCALL fgetc32s)(char32_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, FILE *__restrict __stream) { return (char32_t *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fgetws))((__WCHAR_TYPE__ *)__buf, __bufsize, __stream); }
 #else /* LIBC: fgetc32s */
 #include <local/wchar/fgetc32s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(fgetc32s, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) char32_t *__NOTHROW_NCX(__LIBCCALL fgetc32s)(char32_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fgetc32s))(__buf, __bufsize, __stream); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fgetc32s, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) char32_t *__NOTHROW_NCX(__LIBCCALL fgetc32s)(char32_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, FILE *__restrict __stream) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fgetc32s))(__buf, __bufsize, __stream); })
 #endif /* LIBC: fgetc32s */
 #endif /* fgetc32s... */
 #if defined(__CRT_HAVE_fputws) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,fputc16s,(char16_t const *__restrict __string, __FILE *__restrict __stream),fputws,(__string,__stream))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,fputc16s,(char16_t const *__restrict __string, FILE *__restrict __stream),fputws,(__string,__stream))
 #elif defined(__CRT_HAVE_fputws_unlocked) && (defined(__USE_STDIO_UNLOCKED) && (__SIZEOF_WCHAR_T__ == 2))
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,fputc16s,(char16_t const *__restrict __string, __FILE *__restrict __stream),fputws_unlocked,(__string,__stream))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,fputc16s,(char16_t const *__restrict __string, FILE *__restrict __stream),fputws_unlocked,(__string,__stream))
 #elif defined(__CRT_HAVE__fputws_nolock) && (defined(__USE_STDIO_UNLOCKED) && (__SIZEOF_WCHAR_T__ == 2))
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,fputc16s,(char16_t const *__restrict __string, __FILE *__restrict __stream),_fputws_nolock,(__string,__stream))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,fputc16s,(char16_t const *__restrict __string, FILE *__restrict __stream),_fputws_nolock,(__string,__stream))
 #elif defined(__CRT_HAVE_DOS$fputws_unlocked) && (defined(__USE_STDIO_UNLOCKED))
-__CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,fputc16s,(char16_t const *__restrict __string, __FILE *__restrict __stream),fputws_unlocked,(__string,__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,fputc16s,(char16_t const *__restrict __string, FILE *__restrict __stream),fputws_unlocked,(__string,__stream))
 #elif defined(__CRT_HAVE_DOS$_fputws_nolock) && (defined(__USE_STDIO_UNLOCKED))
-__CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,fputc16s,(char16_t const *__restrict __string, __FILE *__restrict __stream),_fputws_nolock,(__string,__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,fputc16s,(char16_t const *__restrict __string, FILE *__restrict __stream),_fputws_nolock,(__string,__stream))
 #elif defined(__CRT_HAVE_fputws_unlocked) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,fputc16s,(char16_t const *__restrict __string, __FILE *__restrict __stream),fputws_unlocked,(__string,__stream))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,fputc16s,(char16_t const *__restrict __string, FILE *__restrict __stream),fputws_unlocked,(__string,__stream))
 #elif defined(__CRT_HAVE__fputws_nolock) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,fputc16s,(char16_t const *__restrict __string, __FILE *__restrict __stream),_fputws_nolock,(__string,__stream))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,fputc16s,(char16_t const *__restrict __string, FILE *__restrict __stream),_fputws_nolock,(__string,__stream))
 #elif defined(__CRT_HAVE_DOS$fputws_unlocked)
-__CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,fputc16s,(char16_t const *__restrict __string, __FILE *__restrict __stream),fputws_unlocked,(__string,__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,fputc16s,(char16_t const *__restrict __string, FILE *__restrict __stream),fputws_unlocked,(__string,__stream))
 #elif defined(__CRT_HAVE_DOS$_fputws_nolock)
-__CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,fputc16s,(char16_t const *__restrict __string, __FILE *__restrict __stream),_fputws_nolock,(__string,__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,fputc16s,(char16_t const *__restrict __string, FILE *__restrict __stream),_fputws_nolock,(__string,__stream))
 #elif defined(__CRT_HAVE_DOS$fputws)
-__CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,fputc16s,(char16_t const *__restrict __string, __FILE *__restrict __stream),fputws,(__string,__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,fputc16s,(char16_t const *__restrict __string, FILE *__restrict __stream),fputws,(__string,__stream))
 #elif defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked)
 #if __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/fputws.h>
-__FORCELOCAL __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL fputc16s)(char16_t const *__restrict __string, __FILE *__restrict __stream) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fputws))((__WCHAR_TYPE__ const *)__string, __stream); }
+__FORCELOCAL __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL fputc16s)(char16_t const *__restrict __string, FILE *__restrict __stream) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fputws))((__WCHAR_TYPE__ const *)__string, __stream); }
 #else /* LIBC: fputc16s */
 #include <local/wchar/fputc16s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(fputc16s, __FORCELOCAL __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL fputc16s)(char16_t const *__restrict __string, __FILE *__restrict __stream) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fputc16s))(__string, __stream); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fputc16s, __FORCELOCAL __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL fputc16s)(char16_t const *__restrict __string, FILE *__restrict __stream) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fputc16s))(__string, __stream); })
 #endif /* LIBC: fputc16s */
 #endif /* fputc16s... */
 #if defined(__CRT_HAVE_fputws) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,fputc32s,(char32_t const *__restrict __string, __FILE *__restrict __stream),fputws,(__string,__stream))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,fputc32s,(char32_t const *__restrict __string, FILE *__restrict __stream),fputws,(__string,__stream))
 #elif defined(__CRT_HAVE_fputws_unlocked) && (defined(__USE_STDIO_UNLOCKED) && (__SIZEOF_WCHAR_T__ == 4))
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,fputc32s,(char32_t const *__restrict __string, __FILE *__restrict __stream),fputws_unlocked,(__string,__stream))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,fputc32s,(char32_t const *__restrict __string, FILE *__restrict __stream),fputws_unlocked,(__string,__stream))
 #elif defined(__CRT_HAVE__fputws_nolock) && (defined(__USE_STDIO_UNLOCKED) && (__SIZEOF_WCHAR_T__ == 4))
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,fputc32s,(char32_t const *__restrict __string, __FILE *__restrict __stream),_fputws_nolock,(__string,__stream))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,fputc32s,(char32_t const *__restrict __string, FILE *__restrict __stream),_fputws_nolock,(__string,__stream))
 #elif defined(__CRT_HAVE_fputws_unlocked) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,fputc32s,(char32_t const *__restrict __string, __FILE *__restrict __stream),fputws_unlocked,(__string,__stream))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,fputc32s,(char32_t const *__restrict __string, FILE *__restrict __stream),fputws_unlocked,(__string,__stream))
 #elif defined(__CRT_HAVE__fputws_nolock) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,fputc32s,(char32_t const *__restrict __string, __FILE *__restrict __stream),_fputws_nolock,(__string,__stream))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,fputc32s,(char32_t const *__restrict __string, FILE *__restrict __stream),_fputws_nolock,(__string,__stream))
 #elif defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked)
 #if __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/fputws.h>
-__FORCELOCAL __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL fputc32s)(char32_t const *__restrict __string, __FILE *__restrict __stream) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fputws))((__WCHAR_TYPE__ const *)__string, __stream); }
+__FORCELOCAL __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL fputc32s)(char32_t const *__restrict __string, FILE *__restrict __stream) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fputws))((__WCHAR_TYPE__ const *)__string, __stream); }
 #else /* LIBC: fputc32s */
 #include <local/wchar/fputc32s.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(fputc32s, __FORCELOCAL __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL fputc32s)(char32_t const *__restrict __string, __FILE *__restrict __stream) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fputc32s))(__string, __stream); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fputc32s, __FORCELOCAL __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL fputc32s)(char32_t const *__restrict __string, FILE *__restrict __stream) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fputc32s))(__string, __stream); })
 #endif /* LIBC: fputc32s */
 #endif /* fputc32s... */
 #if defined(__CRT_HAVE_ungetwc) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,ungetc16,(wint_t __wc, __FILE *__stream),ungetwc,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,ungetc16,(wint_t __wc, FILE *__stream),ungetwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_ungetwc_unlocked) && (defined(__USE_STDIO_UNLOCKED) && (__SIZEOF_WCHAR_T__ == 2))
-__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,ungetc16,(wint_t __wc, __FILE *__stream),ungetwc_unlocked,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,ungetc16,(wint_t __wc, FILE *__stream),ungetwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE_DOS$ungetwc_unlocked) && (defined(__USE_STDIO_UNLOCKED))
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,ungetc16,(wint_t __wc, __FILE *__stream),ungetwc_unlocked,(__wc,__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,ungetc16,(wint_t __wc, FILE *__stream),ungetwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE_ungetwc_unlocked) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,ungetc16,(wint_t __wc, __FILE *__stream),ungetwc_unlocked,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,ungetc16,(wint_t __wc, FILE *__stream),ungetwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE_DOS$ungetwc_unlocked)
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,ungetc16,(wint_t __wc, __FILE *__stream),ungetwc_unlocked,(__wc,__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,ungetc16,(wint_t __wc, FILE *__stream),ungetwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE_DOS$ungetwc)
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,ungetc16,(wint_t __wc, __FILE *__stream),ungetwc,(__wc,__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,ungetc16,(wint_t __wc, FILE *__stream),ungetwc,(__wc,__stream))
 #endif /* ungetc16... */
 #if defined(__CRT_HAVE_ungetwc) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,ungetc32,(wint_t __wc, __FILE *__stream),ungetwc,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,ungetc32,(wint_t __wc, FILE *__stream),ungetwc,(__wc,__stream))
 #elif defined(__CRT_HAVE_ungetwc_unlocked) && (defined(__USE_STDIO_UNLOCKED) && (__SIZEOF_WCHAR_T__ == 4))
-__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,ungetc32,(wint_t __wc, __FILE *__stream),ungetwc_unlocked,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,ungetc32,(wint_t __wc, FILE *__stream),ungetwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE_ungetwc_unlocked) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,ungetc32,(wint_t __wc, __FILE *__stream),ungetwc_unlocked,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,ungetc32,(wint_t __wc, FILE *__stream),ungetwc_unlocked,(__wc,__stream))
 #endif /* ungetc32... */
 
 #if defined(__USE_ISOC95) || defined(__USE_UNIX98) || defined(__USE_DOS)
 #if defined(__CRT_HAVE_fwprintf) && (__SIZEOF_WCHAR_T__ == 2) && !defined(__NO_ASMNAME)
-__LIBC __ATTR_LIBC_WPRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL fc16printf)(__FILE *__restrict __stream, char16_t const *__restrict __format, ...) __CASMNAME("fwprintf");
+__LIBC __ATTR_LIBC_WPRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL fc16printf)(FILE *__restrict __stream, char16_t const *__restrict __format, ...) __CASMNAME("fwprintf");
 #elif defined(__CRT_HAVE_DOS$fwprintf) && !defined(__NO_ASMNAME)
-__LIBC __ATTR_LIBC_WPRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBDCALL fc16printf)(__FILE *__restrict __stream, char16_t const *__restrict __format, ...) __CASMNAME_DOS("fwprintf");
+__LIBC __ATTR_LIBC_WPRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBDCALL fc16printf)(FILE *__restrict __stream, char16_t const *__restrict __format, ...) __CASMNAME_DOS("fwprintf");
 #elif defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_vfwprintf)
 #if __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/fwprintf.h>
@@ -279,7 +279,7 @@ __NAMESPACE_LOCAL_USING(fc16printf)
 #endif /* LIBC: fc16printf */
 #endif /* fc16printf... */
 #if defined(__CRT_HAVE_fwprintf) && (__SIZEOF_WCHAR_T__ == 4) && !defined(__NO_ASMNAME)
-__LIBC __ATTR_LIBC_WPRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL fc32printf)(__FILE *__restrict __stream, char32_t const *__restrict __format, ...) __CASMNAME("fwprintf");
+__LIBC __ATTR_LIBC_WPRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL fc32printf)(FILE *__restrict __stream, char32_t const *__restrict __format, ...) __CASMNAME("fwprintf");
 #elif defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_vfwprintf)
 #if __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/fwprintf.h>
@@ -294,27 +294,27 @@ __NAMESPACE_LOCAL_USING(fc32printf)
 #endif /* LIBC: fc32printf */
 #endif /* fc32printf... */
 #if defined(__CRT_HAVE_vfwprintf) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_LIBC_WPRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,vfc16printf,(__FILE *__restrict __stream, char16_t const *__restrict __format, __builtin_va_list __args),vfwprintf,(__stream,__format,__args))
+__CREDIRECT(__ATTR_LIBC_WPRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,vfc16printf,(FILE *__restrict __stream, char16_t const *__restrict __format, __builtin_va_list __args),vfwprintf,(__stream,__format,__args))
 #elif defined(__CRT_HAVE_DOS$vfwprintf)
-__CREDIRECT_DOS(__ATTR_LIBC_WPRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,vfc16printf,(__FILE *__restrict __stream, char16_t const *__restrict __format, __builtin_va_list __args),vfwprintf,(__stream,__format,__args))
+__CREDIRECT_DOS(__ATTR_LIBC_WPRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,vfc16printf,(FILE *__restrict __stream, char16_t const *__restrict __format, __builtin_va_list __args),vfwprintf,(__stream,__format,__args))
 #elif defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked)
 #if __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/vfwprintf.h>
-__FORCELOCAL __ATTR_LIBC_WPRINTF(2, 0) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL vfc16printf)(__FILE *__restrict __stream, char16_t const *__restrict __format, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vfwprintf))(__stream, (__WCHAR_TYPE__ const *)__format, __args); }
+__FORCELOCAL __ATTR_LIBC_WPRINTF(2, 0) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL vfc16printf)(FILE *__restrict __stream, char16_t const *__restrict __format, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vfwprintf))(__stream, (__WCHAR_TYPE__ const *)__format, __args); }
 #else /* LIBC: vfc16printf */
 #include <local/wchar/vfc16printf.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(vfc16printf, __FORCELOCAL __ATTR_LIBC_WPRINTF(2, 0) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL vfc16printf)(__FILE *__restrict __stream, char16_t const *__restrict __format, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vfc16printf))(__stream, __format, __args); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(vfc16printf, __FORCELOCAL __ATTR_LIBC_WPRINTF(2, 0) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL vfc16printf)(FILE *__restrict __stream, char16_t const *__restrict __format, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vfc16printf))(__stream, __format, __args); })
 #endif /* LIBC: vfc16printf */
 #endif /* vfc16printf... */
 #if defined(__CRT_HAVE_vfwprintf) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_LIBC_WPRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,vfc32printf,(__FILE *__restrict __stream, char32_t const *__restrict __format, __builtin_va_list __args),vfwprintf,(__stream,__format,__args))
+__CREDIRECT(__ATTR_LIBC_WPRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,vfc32printf,(FILE *__restrict __stream, char32_t const *__restrict __format, __builtin_va_list __args),vfwprintf,(__stream,__format,__args))
 #elif defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked)
 #if __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/vfwprintf.h>
-__FORCELOCAL __ATTR_LIBC_WPRINTF(2, 0) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL vfc32printf)(__FILE *__restrict __stream, char32_t const *__restrict __format, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vfwprintf))(__stream, (__WCHAR_TYPE__ const *)__format, __args); }
+__FORCELOCAL __ATTR_LIBC_WPRINTF(2, 0) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL vfc32printf)(FILE *__restrict __stream, char32_t const *__restrict __format, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vfwprintf))(__stream, (__WCHAR_TYPE__ const *)__format, __args); }
 #else /* LIBC: vfc32printf */
 #include <local/wchar/vfc32printf.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(vfc32printf, __FORCELOCAL __ATTR_LIBC_WPRINTF(2, 0) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL vfc32printf)(__FILE *__restrict __stream, char32_t const *__restrict __format, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vfc32printf))(__stream, __format, __args); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(vfc32printf, __FORCELOCAL __ATTR_LIBC_WPRINTF(2, 0) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL vfc32printf)(FILE *__restrict __stream, char32_t const *__restrict __format, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vfc32printf))(__stream, __format, __args); })
 #endif /* LIBC: vfc32printf */
 #endif /* vfc32printf... */
 #if defined(__CRT_HAVE_wprintf) && (__SIZEOF_WCHAR_T__ == 2) && !defined(__NO_ASMNAME)
@@ -374,9 +374,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(vc32printf, __FORCELOCAL __ATTR_LIBC_WPRINTF(1, 
 #endif /* LIBC: vc32printf */
 #endif /* vc32printf... */
 #if defined(__CRT_HAVE_fwscanf) && (__SIZEOF_WCHAR_T__ == 2) && !defined(__NO_ASMNAME)
-__LIBC __ATTR_LIBC_WSCANF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL fc16scanf)(__FILE *__restrict __stream, char16_t const *__restrict __format, ...) __CASMNAME("fwscanf");
+__LIBC __ATTR_LIBC_WSCANF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL fc16scanf)(FILE *__restrict __stream, char16_t const *__restrict __format, ...) __CASMNAME("fwscanf");
 #elif defined(__CRT_HAVE_DOS$fwscanf) && !defined(__NO_ASMNAME)
-__LIBC __ATTR_LIBC_WSCANF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBDCALL fc16scanf)(__FILE *__restrict __stream, char16_t const *__restrict __format, ...) __CASMNAME_DOS("fwscanf");
+__LIBC __ATTR_LIBC_WSCANF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBDCALL fc16scanf)(FILE *__restrict __stream, char16_t const *__restrict __format, ...) __CASMNAME_DOS("fwscanf");
 #elif defined(__CRT_HAVE_vfwscanf)
 #if __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/fwscanf.h>
@@ -391,7 +391,7 @@ __NAMESPACE_LOCAL_USING(fc16scanf)
 #endif /* LIBC: fc16scanf */
 #endif /* fc16scanf... */
 #if defined(__CRT_HAVE_fwscanf) && (__SIZEOF_WCHAR_T__ == 4) && !defined(__NO_ASMNAME)
-__LIBC __ATTR_LIBC_WSCANF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL fc32scanf)(__FILE *__restrict __stream, char32_t const *__restrict __format, ...) __CASMNAME("fwscanf");
+__LIBC __ATTR_LIBC_WSCANF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL fc32scanf)(FILE *__restrict __stream, char32_t const *__restrict __format, ...) __CASMNAME("fwscanf");
 #elif defined(__CRT_HAVE_vfwscanf)
 #if __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/fwscanf.h>
@@ -525,12 +525,12 @@ __NAMESPACE_LOCAL_USING(sc32printf)
 
 #ifdef __USE_ISOC99
 #if defined(__CRT_HAVE_vfwscanf) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,vfc16scanf,(__FILE *__restrict __stream, char16_t const *__restrict __format, __builtin_va_list __args),vfwscanf,(__stream,__format,__args))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,vfc16scanf,(FILE *__restrict __stream, char16_t const *__restrict __format, __builtin_va_list __args),vfwscanf,(__stream,__format,__args))
 #elif defined(__CRT_HAVE_DOS$vfwscanf)
-__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,vfc16scanf,(__FILE *__restrict __stream, char16_t const *__restrict __format, __builtin_va_list __args),vfwscanf,(__stream,__format,__args))
+__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,vfc16scanf,(FILE *__restrict __stream, char16_t const *__restrict __format, __builtin_va_list __args),vfwscanf,(__stream,__format,__args))
 #endif /* vfc16scanf... */
 #if defined(__CRT_HAVE_vfwscanf) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,vfc32scanf,(__FILE *__restrict __stream, char32_t const *__restrict __format, __builtin_va_list __args),vfwscanf,(__stream,__format,__args))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_WSCANF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,vfc32scanf,(FILE *__restrict __stream, char32_t const *__restrict __format, __builtin_va_list __args),vfwscanf,(__stream,__format,__args))
 #endif /* vfc32scanf... */
 #if defined(__CRT_HAVE_vwscanf) && (__SIZEOF_WCHAR_T__ == 2)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_LIBC_WSCANF(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,vc16scanf,(char16_t const *__restrict __format, __builtin_va_list __args),vwscanf,(__format,__args))
@@ -580,132 +580,132 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(vsc32scanf, __FORCELOCAL __ATTR_WUNUSED __ATTR_L
 
 #ifdef __USE_GNU
 #if defined(__CRT_HAVE_getwchar_unlocked) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(,wint_t,__NOTHROW_NCX,getchar16_unlocked,(void),getwchar_unlocked,())
+__CREDIRECT(,__WINT_TYPE__,__NOTHROW_NCX,getchar16_unlocked,(void),getwchar_unlocked,())
 #elif defined(__CRT_HAVE__getwchar_nolock) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(,wint_t,__NOTHROW_NCX,getchar16_unlocked,(void),_getwchar_nolock,())
+__CREDIRECT(,__WINT_TYPE__,__NOTHROW_NCX,getchar16_unlocked,(void),_getwchar_nolock,())
 #elif defined(__CRT_HAVE_DOS$_getwchar_nolock)
-__CREDIRECT_DOS(,wint_t,__NOTHROW_NCX,getchar16_unlocked,(void),_getwchar_nolock,())
+__CREDIRECT_DOS(,__WINT_TYPE__,__NOTHROW_NCX,getchar16_unlocked,(void),_getwchar_nolock,())
 #elif defined(__CRT_HAVE_DOS$getwchar_unlocked)
-__CREDIRECT_DOS(,wint_t,__NOTHROW_NCX,getchar16_unlocked,(void),getwchar_unlocked,())
+__CREDIRECT_DOS(,__WINT_TYPE__,__NOTHROW_NCX,getchar16_unlocked,(void),getwchar_unlocked,())
 #elif (defined(__CRT_HAVE_fgetwc_unlocked) || defined(__CRT_HAVE__fgetwc_nolock)) && !defined(__NO_STDSTREAMS)
 #if __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/getwchar_unlocked.h>
-__FORCELOCAL wint_t __NOTHROW_NCX(__LIBCCALL getchar16_unlocked)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getwchar_unlocked))(); }
+__FORCELOCAL __WINT_TYPE__ __NOTHROW_NCX(__LIBCCALL getchar16_unlocked)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getwchar_unlocked))(); }
 #else /* LIBC: getchar16_unlocked */
 #include <local/wchar/getchar16_unlocked.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(getchar16_unlocked, __FORCELOCAL wint_t __NOTHROW_NCX(__LIBCCALL getchar16_unlocked)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getchar16_unlocked))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(getchar16_unlocked, __FORCELOCAL __WINT_TYPE__ __NOTHROW_NCX(__LIBCCALL getchar16_unlocked)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getchar16_unlocked))(); })
 #endif /* LIBC: getchar16_unlocked */
 #endif /* getchar16_unlocked... */
 #if defined(__CRT_HAVE_getwchar_unlocked) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(,wint_t,__NOTHROW_NCX,getchar32_unlocked,(void),getwchar_unlocked,())
+__CREDIRECT(,__WINT_TYPE__,__NOTHROW_NCX,getchar32_unlocked,(void),getwchar_unlocked,())
 #elif defined(__CRT_HAVE__getwchar_nolock) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(,wint_t,__NOTHROW_NCX,getchar32_unlocked,(void),_getwchar_nolock,())
+__CREDIRECT(,__WINT_TYPE__,__NOTHROW_NCX,getchar32_unlocked,(void),_getwchar_nolock,())
 #elif (defined(__CRT_HAVE_fgetwc_unlocked) || defined(__CRT_HAVE__fgetwc_nolock)) && !defined(__NO_STDSTREAMS)
 #if __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/getwchar_unlocked.h>
-__FORCELOCAL wint_t __NOTHROW_NCX(__LIBCCALL getchar32_unlocked)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getwchar_unlocked))(); }
+__FORCELOCAL __WINT_TYPE__ __NOTHROW_NCX(__LIBCCALL getchar32_unlocked)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getwchar_unlocked))(); }
 #else /* LIBC: getchar32_unlocked */
 #include <local/wchar/getchar32_unlocked.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(getchar32_unlocked, __FORCELOCAL wint_t __NOTHROW_NCX(__LIBCCALL getchar32_unlocked)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getchar32_unlocked))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(getchar32_unlocked, __FORCELOCAL __WINT_TYPE__ __NOTHROW_NCX(__LIBCCALL getchar32_unlocked)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(getchar32_unlocked))(); })
 #endif /* LIBC: getchar32_unlocked */
 #endif /* getchar32_unlocked... */
 #if defined(__CRT_HAVE_putwchar_unlocked) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(,wint_t,__NOTHROW_NCX,putchar16_unlocked,(char16_t __wc),putwchar_unlocked,(__wc))
+__CREDIRECT(,__WINT_TYPE__,__NOTHROW_NCX,putchar16_unlocked,(char16_t __wc),putwchar_unlocked,(__wc))
 #elif defined(__CRT_HAVE__putwchar_nolock) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(,wint_t,__NOTHROW_NCX,putchar16_unlocked,(char16_t __wc),_putwchar_nolock,(__wc))
+__CREDIRECT(,__WINT_TYPE__,__NOTHROW_NCX,putchar16_unlocked,(char16_t __wc),_putwchar_nolock,(__wc))
 #elif defined(__CRT_HAVE_DOS$_putwchar_nolock)
-__CREDIRECT_DOS(,wint_t,__NOTHROW_NCX,putchar16_unlocked,(char16_t __wc),_putwchar_nolock,(__wc))
+__CREDIRECT_DOS(,__WINT_TYPE__,__NOTHROW_NCX,putchar16_unlocked,(char16_t __wc),_putwchar_nolock,(__wc))
 #elif defined(__CRT_HAVE_DOS$putwchar_unlocked)
-__CREDIRECT_DOS(,wint_t,__NOTHROW_NCX,putchar16_unlocked,(char16_t __wc),putwchar_unlocked,(__wc))
+__CREDIRECT_DOS(,__WINT_TYPE__,__NOTHROW_NCX,putchar16_unlocked,(char16_t __wc),putwchar_unlocked,(__wc))
 #elif (defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE__fputwc_nolock)) && !defined(__NO_STDSTREAMS)
 #if __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/putwchar_unlocked.h>
-__FORCELOCAL wint_t __NOTHROW_NCX(__LIBCCALL putchar16_unlocked)(char16_t __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(putwchar_unlocked))((__WCHAR_TYPE__)__wc); }
+__FORCELOCAL __WINT_TYPE__ __NOTHROW_NCX(__LIBCCALL putchar16_unlocked)(char16_t __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(putwchar_unlocked))((__WCHAR_TYPE__)__wc); }
 #else /* LIBC: putchar16_unlocked */
 #include <local/wchar/putchar16_unlocked.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(putchar16_unlocked, __FORCELOCAL wint_t __NOTHROW_NCX(__LIBCCALL putchar16_unlocked)(char16_t __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(putchar16_unlocked))(__wc); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(putchar16_unlocked, __FORCELOCAL __WINT_TYPE__ __NOTHROW_NCX(__LIBCCALL putchar16_unlocked)(char16_t __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(putchar16_unlocked))(__wc); })
 #endif /* LIBC: putchar16_unlocked */
 #endif /* putchar16_unlocked... */
 #if defined(__CRT_HAVE_putwchar_unlocked) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(,wint_t,__NOTHROW_NCX,putchar32_unlocked,(char32_t __wc),putwchar_unlocked,(__wc))
+__CREDIRECT(,__WINT_TYPE__,__NOTHROW_NCX,putchar32_unlocked,(char32_t __wc),putwchar_unlocked,(__wc))
 #elif defined(__CRT_HAVE__putwchar_nolock) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(,wint_t,__NOTHROW_NCX,putchar32_unlocked,(char32_t __wc),_putwchar_nolock,(__wc))
+__CREDIRECT(,__WINT_TYPE__,__NOTHROW_NCX,putchar32_unlocked,(char32_t __wc),_putwchar_nolock,(__wc))
 #elif (defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE__fputwc_nolock)) && !defined(__NO_STDSTREAMS)
 #if __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/putwchar_unlocked.h>
-__FORCELOCAL wint_t __NOTHROW_NCX(__LIBCCALL putchar32_unlocked)(char32_t __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(putwchar_unlocked))((__WCHAR_TYPE__)__wc); }
+__FORCELOCAL __WINT_TYPE__ __NOTHROW_NCX(__LIBCCALL putchar32_unlocked)(char32_t __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(putwchar_unlocked))((__WCHAR_TYPE__)__wc); }
 #else /* LIBC: putchar32_unlocked */
 #include <local/wchar/putchar32_unlocked.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(putchar32_unlocked, __FORCELOCAL wint_t __NOTHROW_NCX(__LIBCCALL putchar32_unlocked)(char32_t __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(putchar32_unlocked))(__wc); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(putchar32_unlocked, __FORCELOCAL __WINT_TYPE__ __NOTHROW_NCX(__LIBCCALL putchar32_unlocked)(char32_t __wc) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(putchar32_unlocked))(__wc); })
 #endif /* LIBC: putchar32_unlocked */
 #endif /* putchar32_unlocked... */
 #if defined(__CRT_HAVE_getwc_unlocked) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_NONNULL((1)),wint_t,__NOTHROW_NCX,getc16_unlocked,(__FILE *__restrict __stream),getwc_unlocked,(__stream))
+__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__NOTHROW_NCX,getc16_unlocked,(__FILE *__restrict __stream),getwc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_fgetwc_unlocked) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_NONNULL((1)),wint_t,__NOTHROW_NCX,getc16_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
+__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__NOTHROW_NCX,getc16_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
 #elif defined(__CRT_HAVE__fgetwc_nolock) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_NONNULL((1)),wint_t,__NOTHROW_NCX,getc16_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
+__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__NOTHROW_NCX,getc16_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
 #elif defined(__CRT_HAVE_DOS$fgetwc_unlocked)
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),wint_t,__NOTHROW_NCX,getc16_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),__WINT_TYPE__,__NOTHROW_NCX,getc16_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_DOS$_fgetwc_nolock)
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),wint_t,__NOTHROW_NCX,getc16_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),__WINT_TYPE__,__NOTHROW_NCX,getc16_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
 #elif defined(__CRT_HAVE_DOS$getwc_unlocked)
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),wint_t,__NOTHROW_NCX,getc16_unlocked,(__FILE *__restrict __stream),getwc_unlocked,(__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),__WINT_TYPE__,__NOTHROW_NCX,getc16_unlocked,(__FILE *__restrict __stream),getwc_unlocked,(__stream))
 #endif /* getc16_unlocked... */
 #if defined(__CRT_HAVE_getwc_unlocked) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_NONNULL((1)),wint_t,__NOTHROW_NCX,getc32_unlocked,(__FILE *__restrict __stream),getwc_unlocked,(__stream))
+__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__NOTHROW_NCX,getc32_unlocked,(__FILE *__restrict __stream),getwc_unlocked,(__stream))
 #elif defined(__CRT_HAVE_fgetwc_unlocked) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_NONNULL((1)),wint_t,__NOTHROW_NCX,getc32_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
+__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__NOTHROW_NCX,getc32_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
 #elif defined(__CRT_HAVE__fgetwc_nolock) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_NONNULL((1)),wint_t,__NOTHROW_NCX,getc32_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
+__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__NOTHROW_NCX,getc32_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
 #endif /* getc32_unlocked... */
 #if defined(__CRT_HAVE_fgetwc_unlocked) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_NONNULL((1)),wint_t,__NOTHROW_NCX,fgetc16_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
+__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__NOTHROW_NCX,fgetc16_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
 #elif defined(__CRT_HAVE__fgetwc_nolock) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_NONNULL((1)),wint_t,__NOTHROW_NCX,fgetc16_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
+__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__NOTHROW_NCX,fgetc16_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
 #elif defined(__CRT_HAVE_DOS$_fgetwc_nolock)
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),wint_t,__NOTHROW_NCX,fgetc16_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),__WINT_TYPE__,__NOTHROW_NCX,fgetc16_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
 #elif defined(__CRT_HAVE_DOS$fgetwc_unlocked)
-__CREDIRECT_DOS(__ATTR_NONNULL((1)),wint_t,__NOTHROW_NCX,fgetc16_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),__WINT_TYPE__,__NOTHROW_NCX,fgetc16_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
 #endif /* fgetc16_unlocked... */
 #if defined(__CRT_HAVE_fgetwc_unlocked) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_NONNULL((1)),wint_t,__NOTHROW_NCX,fgetc32_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
+__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__NOTHROW_NCX,fgetc32_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
 #elif defined(__CRT_HAVE__fgetwc_nolock) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_NONNULL((1)),wint_t,__NOTHROW_NCX,fgetc32_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
+__CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__NOTHROW_NCX,fgetc32_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
 #endif /* fgetc32_unlocked... */
 #if defined(__CRT_HAVE_putwc_unlocked) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,putc16_unlocked,(char16_t __wc, __FILE *__restrict __stream),putwc_unlocked,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,putc16_unlocked,(char16_t __wc, __FILE *__restrict __stream),putwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE_fputwc_unlocked) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,putc16_unlocked,(char16_t __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,putc16_unlocked,(char16_t __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE__fputwc_nolock) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,putc16_unlocked,(char16_t __wc, __FILE *__restrict __stream),_fputwc_nolock,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,putc16_unlocked,(char16_t __wc, __FILE *__restrict __stream),_fputwc_nolock,(__wc,__stream))
 #elif defined(__CRT_HAVE_DOS$fputwc_unlocked)
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,putc16_unlocked,(char16_t __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,putc16_unlocked,(char16_t __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE_DOS$_fputwc_nolock)
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,putc16_unlocked,(char16_t __wc, __FILE *__restrict __stream),_fputwc_nolock,(__wc,__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,putc16_unlocked,(char16_t __wc, __FILE *__restrict __stream),_fputwc_nolock,(__wc,__stream))
 #elif defined(__CRT_HAVE_DOS$putwc_unlocked)
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,putc16_unlocked,(char16_t __wc, __FILE *__restrict __stream),putwc_unlocked,(__wc,__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,putc16_unlocked,(char16_t __wc, __FILE *__restrict __stream),putwc_unlocked,(__wc,__stream))
 #endif /* putc16_unlocked... */
 #if defined(__CRT_HAVE_putwc_unlocked) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,putc32_unlocked,(char32_t __wc, __FILE *__restrict __stream),putwc_unlocked,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,putc32_unlocked,(char32_t __wc, __FILE *__restrict __stream),putwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE_fputwc_unlocked) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,putc32_unlocked,(char32_t __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,putc32_unlocked,(char32_t __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE__fputwc_nolock) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,putc32_unlocked,(char32_t __wc, __FILE *__restrict __stream),_fputwc_nolock,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,putc32_unlocked,(char32_t __wc, __FILE *__restrict __stream),_fputwc_nolock,(__wc,__stream))
 #endif /* putc32_unlocked... */
 #if defined(__CRT_HAVE_fputwc_unlocked) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,fputc16_unlocked,(char16_t __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,fputc16_unlocked,(char16_t __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE__fputwc_nolock) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,fputc16_unlocked,(char16_t __wc, __FILE *__restrict __stream),_fputwc_nolock,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,fputc16_unlocked,(char16_t __wc, __FILE *__restrict __stream),_fputwc_nolock,(__wc,__stream))
 #elif defined(__CRT_HAVE_DOS$_fputwc_nolock)
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,fputc16_unlocked,(char16_t __wc, __FILE *__restrict __stream),_fputwc_nolock,(__wc,__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,fputc16_unlocked,(char16_t __wc, __FILE *__restrict __stream),_fputwc_nolock,(__wc,__stream))
 #elif defined(__CRT_HAVE_DOS$fputwc_unlocked)
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,fputc16_unlocked,(char16_t __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,fputc16_unlocked,(char16_t __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
 #endif /* fputc16_unlocked... */
 #if defined(__CRT_HAVE_fputwc_unlocked) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,fputc32_unlocked,(char32_t __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,fputc32_unlocked,(char32_t __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
 #elif defined(__CRT_HAVE__fputwc_nolock) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,fputc32_unlocked,(char32_t __wc, __FILE *__restrict __stream),_fputwc_nolock,(__wc,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,fputc32_unlocked,(char32_t __wc, __FILE *__restrict __stream),_fputwc_nolock,(__wc,__stream))
 #endif /* fputc32_unlocked... */
 #if defined(__CRT_HAVE_fgetws_unlocked) && (__SIZEOF_WCHAR_T__ == 2)
 __CREDIRECT(__ATTR_NONNULL((1, 3)),char16_t *,__NOTHROW_NCX,fgetc16s_unlocked,(char16_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgetws_unlocked,(__buf,__bufsize,__stream))
@@ -877,18 +877,18 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(file_c32printer_unlocked, __FORCELOCAL __ATTR_NO
 #endif /* LIBC: file_c32printer_unlocked */
 #endif /* file_c32printer_unlocked... */
 #if defined(__CRT_HAVE_ungetwc_unlocked) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,ungetc16_unlocked,(wint_t __ch, __FILE *__restrict __stream),ungetwc_unlocked,(__ch,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,ungetc16_unlocked,(__WINT_TYPE__ __ch, __FILE *__restrict __stream),ungetwc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE_ungetwc) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,ungetc16_unlocked,(wint_t __ch, __FILE *__restrict __stream),ungetwc,(__ch,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,ungetc16_unlocked,(__WINT_TYPE__ __ch, __FILE *__restrict __stream),ungetwc,(__ch,__stream))
 #elif defined(__CRT_HAVE_DOS$ungetwc)
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,ungetc16_unlocked,(wint_t __ch, __FILE *__restrict __stream),ungetwc,(__ch,__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,ungetc16_unlocked,(__WINT_TYPE__ __ch, __FILE *__restrict __stream),ungetwc,(__ch,__stream))
 #elif defined(__CRT_HAVE_DOS$ungetwc_unlocked)
-__CREDIRECT_DOS(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,ungetc16_unlocked,(wint_t __ch, __FILE *__restrict __stream),ungetwc_unlocked,(__ch,__stream))
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,ungetc16_unlocked,(__WINT_TYPE__ __ch, __FILE *__restrict __stream),ungetwc_unlocked,(__ch,__stream))
 #endif /* ungetc16_unlocked... */
 #if defined(__CRT_HAVE_ungetwc_unlocked) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,ungetc32_unlocked,(wint_t __ch, __FILE *__restrict __stream),ungetwc_unlocked,(__ch,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,ungetc32_unlocked,(__WINT_TYPE__ __ch, __FILE *__restrict __stream),ungetwc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE_ungetwc) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_NONNULL((2)),wint_t,__NOTHROW_NCX,ungetc32_unlocked,(wint_t __ch, __FILE *__restrict __stream),ungetwc,(__ch,__stream))
+__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,ungetc32_unlocked,(__WINT_TYPE__ __ch, __FILE *__restrict __stream),ungetwc,(__ch,__stream))
 #endif /* ungetc32_unlocked... */
 #if defined(__CRT_HAVE_vfwprintf_unlocked) && (__SIZEOF_WCHAR_T__ == 2)
 __CREDIRECT(__ATTR_LIBC_WPRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,vfc16printf_unlocked,(__FILE *__restrict __stream, char16_t const *__restrict __format, __builtin_va_list __args),vfwprintf_unlocked,(__stream,__format,__args))

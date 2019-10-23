@@ -145,6 +145,9 @@ function key_std_guard(x) {
 function key_cxx_guard(x) {
 	return "_CXX_{}".format({ key_sanitize_for_guard(x) });
 }
+function key_cxx_stdonly_guard(x) {
+	return "_CXX_STDONLY_{}".format({ key_sanitize_for_guard(x) });
+}
 function key_libc_auto_header_guard(x) {
 	return "GUARD_LIBC_AUTO_{}_H".format({ key_sanitize_for_guard(x) });
 }
@@ -830,8 +833,8 @@ function replaceDocKeywordWords(docstring: string, replace: Callable, env: {stri
 global components: {string: {Function...}};
 global functions: {string: Function};
 global function_body_conversions: {string: {string: Callable}} = Dict();
-@@Map for c-header to c++-header ("string.h" : ("cstring", "_CXX_CCTYPE"))
-global ccompat_cpp_headers: {string:  string} = Dict();
+@@Map for c-header to c++-header ("string.h" : ("cstring", "_CXX_CCTYPE", "_CXX_STDONLY_CCTYPE"))
+global ccompat_cpp_headers: {string: (string, string, string)} = Dict();
 global functions_prototypes;
 global known_libc_sections;
 global unimplemented_functions;
@@ -1276,13 +1279,16 @@ got_section_prefix:
 					if (directive[defend + 1:].strip() != "")
 						err(directive_begin, "Trailing text after `%[define_ccompat_header(...)': " + repr directive[defend:].strip());
 					local cpp_header_name = directive[1:defend].strip();
-					local cpp_header_name,none,guard = cpp_header_name.partition(",")...;
+					local cpp_header_name, none, guard = cpp_header_name.partition(",")...;
+					local guard, none, std_only_guard = guard.partition(",")...;
 					cpp_header_name = cpp_header_name.strip();
 					guard = guard.strip();
 					if (!guard)
 						guard = key_cxx_guard(cpp_header_name);
+					if (!std_only_guard)
+						std_only_guard = key_cxx_stdonly_guard(cpp_header_name);
 					local header_name = fs.fileof(filename).replace(".", "/") + ".h";
-					ccompat_cpp_headers[header_name] = (cpp_header_name, guard);
+					ccompat_cpp_headers[header_name] = (cpp_header_name, guard, std_only_guard);
 				} else if (directive.startswith("default_impl_section")) {
 					directive = directive[#"default_impl_section":].lstrip();
 					if (!directive.startswith("("))
@@ -5873,11 +5879,13 @@ function generateCCompatCxxHeader(
 		fp << "#ifdef __CXX_SYSTEM_HEADER\n";
 		fp << "#include " << repr(cHeaderNameForInclude) << "\n";
 		fp << "#else /* __CXX_SYSTEM_HEADER */\n";
+		fp << "#include \"features.h\"\n";
+		fp << "#ifndef __USE_BROKEN_CCOMPAT\n";
 		fp << "#define __CXX_SYSTEM_HEADER 1\n";
+		fp << "#endif /* !__USE_BROKEN_CCOMPAT */\n";
 		fp << "#include " << repr(cHeaderNameForInclude) << "\n";
 		fp << "#undef __CXX_SYSTEM_HEADER\n";
 		fp << "#endif /* !__CXX_SYSTEM_HEADER */\n";
-		fp << "#undef " << cHeaderGuard << " /* Allow the C-header to be re-included to re-import all std-symbols into the global namespace. */\n";
 		fp << "#endif /* !" << cHeaderGuard << " */\n";
 		fp << "#endif /* !" << cxxHeaderGuard << " */\n";
 	});
@@ -5904,17 +5912,26 @@ function write_std_header(fp, comnam, funcs) {
 	fp << copyright << "\n"
 	      "#ifndef " << guard_name << "\n"
 	      "#define " << guard_name << " 1\n"
-	      "\n"
-	      "#include <__stdinc.h>\n";
+	      "\n";
 	local headerName = comnam.replace(".", "/") + ".h";
 	local ccompat = ccompat_cpp_headers.get(headerName);
 	if (ccompat !is none) {
-		local cppHeaderName, guard = ccompat...;
+		local cppHeaderName, cppGuard, cStdOnlyDefinedGuard = ccompat...;
 		/* Generate the c++ header */
 		generateCCompatCxxHeader(
 			"include/" + cppHeaderName,
-			"include/" + headerName, guard, guard_name);
-		fp << "#if defined(" << guard << ") && !defined(__CXX_SYSTEM_HEADER)\n";
+			"include/" + headerName, cppGuard, guard_name);
+		fp << "#ifdef " << cStdOnlyDefinedGuard << "\n";
+		/* Only std:: symbols have been defined.
+		 * If we're included from a c++ header, don't do anything.
+		 * Otherwise, export all std:: symbols into the global namespace. */
+		fp << "#ifdef __CXX_SYSTEM_HEADER\n";
+		/* Make sure our header can be re-#included as <headerName>
+		 * at which point all symbols that are currently std::-only will
+		 * appear in the global namespace. */
+		fp << "#undef " << guard_name << " /* Allow the C-header to be re-included to import all std::-symbols into the global namespace. */\n";
+		fp << "#else /* __CXX_SYSTEM_HEADER */\n";
+		/* Expose all std:: symbols within the global namespace. */
 		fp << "/* Import all symbols into the global namespace when re-including "
 		   << repr(headerName) << " after " << repr(cppHeaderName) << " */\n";
 		for (local f: funcs) {
@@ -5931,9 +5948,17 @@ function write_std_header(fp, comnam, funcs) {
 					fp << f.string;
 			}
 		}
-		fp << "#else /* " << guard << " && !__CXX_SYSTEM_HEADER */\n";
+		fp << "#undef " << cStdOnlyDefinedGuard << "\n";
+		fp << "#endif /* !__CXX_SYSTEM_HEADER */\n";
+		fp << "#else /* " << cStdOnlyDefinedGuard << " */\n";
 	}
-	fp << "#include <__crt.h>\n";
+	if ("/" in headerName) {
+		fp << "#include <__stdinc.h>\n";
+		fp << "#include <__crt.h>\n";
+	} else {
+		fp << "#include \"__stdinc.h\"\n";
+		fp << "#include \"__crt.h\"\n";
+	}
 	local needKosAnno = false;
 	for (local f: funcs) {
 		local is_extern = false;
@@ -6058,8 +6083,19 @@ function write_std_header(fp, comnam, funcs) {
 			}
 		}
 	}
-	if (ccompat !is none)
-		fp << "#endif /* !" << ccompat[1] << " || __CXX_SYSTEM_HEADER */\n";
+	if (ccompat !is none) {
+		fp << "#ifdef __CXX_SYSTEM_HEADER\n";
+		/* Allow our header to be re-included in the future in order
+		 * to export all of our std:: symbols into the global namespace.
+		 * In order for this to happen, the #include-site simply has to
+		 * make sure that `__CXX_SYSTEM_HEADER' isn't defined. If we're
+		 * included while it is still defined, that inclusion will be
+		 * a no-op! */
+		fp << "#define " << ccompat[2] << " 1\n";
+		fp << "#undef " << guard_name << "\n";
+		fp << "#endif /* __CXX_SYSTEM_HEADER */\n";
+		fp << "#endif /* !" << ccompat[2] << " */\n";
+	}
 	fp << "#endif /* !" << guard_name << " */\n";
 }
 

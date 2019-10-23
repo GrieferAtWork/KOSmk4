@@ -122,12 +122,27 @@ typedef __sighandler_t sighandler_t;
 typedef __sighandler_t sig_t;
 #endif /* __USE_MISC */
 
+}%(c, ccompat){
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
+}%{
+#ifndef __std_size_t_defined
+#define __std_size_t_defined 1
+__NAMESPACE_STD_BEGIN
+typedef __SIZE_TYPE__ size_t;
+__NAMESPACE_STD_END
+#endif /* !__std_size_t_defined */
+
+#ifndef __CXX_SYSTEM_HEADER
+}%(c, ccompat){
 #ifndef __size_t_defined
 #define __size_t_defined 1
-typedef __size_t size_t;
+__NAMESPACE_STD_USING(size_t)
 #endif /* !__size_t_defined */
+}%{
+#endif /* !__CXX_SYSTEM_HEADER */
+}%(c, ccompat){
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K8 */
+}%{
 
 }
 

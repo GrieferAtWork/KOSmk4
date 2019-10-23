@@ -62,9 +62,9 @@ __SYSDECL_BEGIN
 
 #ifndef WEOF
 #if __SIZEOF_WCHAR_T__ == 4
-#define WEOF             0xffffffffu
+#define WEOF 0xffffffffu
 #else /* __SIZEOF_WCHAR_T__ == 4 */
-#define WEOF    (wint_t)(0xffff)
+#define WEOF (__CCAST(__WINT_TYPE__) 0xffff)
 #endif /* __SIZEOF_WCHAR_T__ != 4 */
 #endif /* !WEOF */
 
@@ -153,12 +153,16 @@ typedef __WINT_TYPE__ wint_t;
 #endif /* !__std_wint_t_defined */
 __NAMESPACE_STD_END
 
-#ifndef __CXX_SYSTEM_HEADER
-}%(c, ccompat){
+/* Always pull `struct tm' into the global namespace to work around
+ * problems with function prototypes making use of it while it's
+ * already defined in the std:: namespace. */
 #ifndef __tm_defined
 #define __tm_defined 1
 __NAMESPACE_STD_USING(tm)
 #endif /* !__tm_defined */
+
+#ifndef __CXX_SYSTEM_HEADER
+}%(c, ccompat){
 #ifndef __size_t_defined
 #define __size_t_defined 1
 __NAMESPACE_STD_USING(size_t)
@@ -369,8 +373,8 @@ wcsxfrm:([nonnull] wchar_t *dst, [inp(maxlen)] wchar_t const *__restrict src, si
 getwchar:() -> wint_t {
 	return fgetwc(@__LOCAL_stdin@);
 }
-[cp_stdio][std][std_guard][wchar][alias(getwc)] fgetwc:([nonnull] $FILE *__restrict stream) -> wint_t;
-[cp_stdio][std][std_guard][wchar] getwc:([nonnull] $FILE *__restrict stream) -> wint_t = fgetwc;
+[cp_stdio][std][std_guard][wchar][alias(getwc)] fgetwc:([nonnull] FILE *__restrict stream) -> wint_t;
+[cp_stdio][std][std_guard][wchar] getwc:([nonnull] FILE *__restrict stream) -> wint_t = fgetwc;
 
 [section({.text.crt.wchar.FILE.locked.write.putc|.text.crt.dos.wchar.FILE.locked.write.putc})]
 [cp_stdio][std][std_guard][wchar][requires_include(<__crt.h>)]
@@ -382,11 +386,11 @@ putwchar:(wchar_t wc) -> wint_t {
 
 [section({.text.crt.wchar.FILE.locked.write.putc|.text.crt.dos.wchar.FILE.locked.write.putc})]
 [cp_stdio][std][std_guard][wchar][alias(putwc)]
-fputwc:(wchar_t wc, [nonnull] $FILE *stream) -> wint_t;
+fputwc:(wchar_t wc, [nonnull] FILE *stream) -> wint_t;
 
 [section({.text.crt.wchar.FILE.locked.write.putc|.text.crt.dos.wchar.FILE.locked.write.putc})]
 [cp_stdio][std][std_guard][wchar]
-putwc:(wchar_t wc, [nonnull] $FILE *stream) -> wint_t = fputwc;
+putwc:(wchar_t wc, [nonnull] FILE *stream) -> wint_t = fputwc;
 
 
 
@@ -397,13 +401,13 @@ putwc:(wchar_t wc, [nonnull] $FILE *stream) -> wint_t = fputwc;
 [dependency_include(<parts/errno.h>)][same_impl][impl_prefix(
 #ifndef @__WEOF@
 #if __SIZEOF_WCHAR_T__ == 4
-#define @__WEOF@             0xffffffffu
+#define @__WEOF@ 0xffffffffu
 #else /* __SIZEOF_WCHAR_T__ == 4 */
-#define @__WEOF@    (wint_t)(0xffff)
+#define @__WEOF@ (__CCAST(__WINT_TYPE__) 0xffff)
 #endif /* __SIZEOF_WCHAR_T__ != 4 */
-#endif
+#endif /* !__WEOF */
 )]
-fgetws:([outp(bufsize)] wchar_t *__restrict buf, __STDC_INT_AS_SIZE_T bufsize, [notnull] $FILE *__restrict stream) -> wchar_t * {
+fgetws:([outp(bufsize)] wchar_t *__restrict buf, __STDC_INT_AS_SIZE_T bufsize, [notnull] FILE *__restrict stream) -> wchar_t * {
 	size_t n;
 	if unlikely(!buf || !bufsize) {
 		/* The buffer cannot be empty! */
@@ -447,7 +451,7 @@ fgetws:([outp(bufsize)] wchar_t *__restrict buf, __STDC_INT_AS_SIZE_T bufsize, [
 [cp_stdio][std][std_guard][wchar][same_impl]
 [requires($has_function(file_wprinter))][alias(fputws_unlocked, _fputws_nolock)]
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(fputws_unlocked, _fputws_nolock)]
-fputws:([nonnull] wchar_t const *__restrict string, [nonnull] $FILE *__restrict stream) -> __STDC_INT_AS_SIZE_T {
+fputws:([nonnull] wchar_t const *__restrict string, [nonnull] FILE *__restrict stream) -> __STDC_INT_AS_SIZE_T {
 	__STDC_INT_AS_SIZE_T result;
 	result = file_wprinter(stream, string, wcslen(string));
 	return result;
@@ -456,7 +460,7 @@ fputws:([nonnull] wchar_t const *__restrict string, [nonnull] $FILE *__restrict 
 [section({.text.crt.wchar.FILE.locked.write.putc|.text.crt.dos.wchar.FILE.locked.write.putc})]
 [std][std_guard][wchar][alias(ungetwc_unlocked)]
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(ungetwc_unlocked)]
-ungetwc:(wint_t wc, [nonnull] $FILE *stream) -> wint_t;
+ungetwc:(wint_t wc, [nonnull] FILE *stream) -> wint_t;
 
 [section({.text.crt.wchar.unicode.static.format.strftime|.text.crt.dos.wchar.unicode.static.format.strftime})]
 [std][std_guard][wchar][same_impl]
@@ -529,7 +533,7 @@ wmemchr:([inp(num_chars)] wchar_t const *__restrict haystack, wchar_t needle, si
 %(std)#if defined(__USE_ISOC95) || defined(__USE_UNIX98)
 [std][std_guard]
 [section({.text.crt.wchar.FILE.locked.utility|.text.crt.dos.wchar.FILE.locked.utility})]
-fwide:([nonnull] $FILE *fp, int mode) -> int {
+fwide:([nonnull] FILE *fp, int mode) -> int {
 	return 0;
 }
 %(std)#endif /* __USE_ISOC95 || __USE_UNIX98 */
@@ -538,12 +542,12 @@ fwide:([nonnull] $FILE *fp, int mode) -> int {
 %(std)#if defined(__USE_ISOC95) || defined(__USE_UNIX98) || defined(__USE_DOS)
 [cp_stdio][std][std_guard][ATTR_LIBC_WPRINTF(2, 3)][wchar]
 [section({.text.crt.wchar.FILE.locked.write.printf|.text.crt.dos.wchar.FILE.locked.write.printf})]
-fwprintf:([nonnull] $FILE *__restrict stream, [nonnull] wchar_t const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T
+fwprintf:([nonnull] FILE *__restrict stream, [nonnull] wchar_t const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T
 	%{auto_block(printf(vfwprintf))}
 
 [cp_stdio][std][std_guard][ATTR_LIBC_WPRINTF(2, 0)][wchar][requires($has_function(file_wprinter))]
 [section({.text.crt.wchar.FILE.locked.write.printf|.text.crt.dos.wchar.FILE.locked.write.printf})][same_impl]
-vfwprintf:([nonnull] $FILE *__restrict stream, [nonnull] wchar_t const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T {
+vfwprintf:([nonnull] FILE *__restrict stream, [nonnull] wchar_t const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T {
 	return (__STDC_INT_AS_SSIZE_T)format_vwprintf(&file_wprinter, stream, format, args);
 }
 
@@ -563,7 +567,7 @@ vwprintf:([nonnull] wchar_t const *__restrict format, $va_list args) -> __STDC_I
 
 [cp_stdio][std][std_guard][ATTR_LIBC_WSCANF(2, 3)][wchar]
 [section({.text.crt.wchar.FILE.locked.read.scanf|.text.crt.dos.wchar.FILE.locked.read.scanf})]
-fwscanf:([nonnull] $FILE *__restrict stream, [nonnull] wchar_t const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T
+fwscanf:([nonnull] FILE *__restrict stream, [nonnull] wchar_t const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T
 	%{auto_block(printf(vfwscanf))}
 [cp_stdio][std][std_guard][ATTR_LIBC_WSCANF(1, 2)][wchar]
 [section({.text.crt.wchar.FILE.locked.read.scanf|.text.crt.dos.wchar.FILE.locked.read.scanf})]
@@ -622,7 +626,7 @@ wcstoull:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr,
 
 %[default_impl_section({.text.crt.wchar.FILE.locked.read.scanf|.text.crt.dos.wchar.FILE.locked.read.scanf})]
 [cp_stdio][std][std_guard][ATTR_WUNUSED][ATTR_LIBC_WSCANF(2, 0)][wchar]
-vfwscanf:([nonnull] $FILE *__restrict stream, [nonnull] wchar_t const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T;
+vfwscanf:([nonnull] FILE *__restrict stream, [nonnull] wchar_t const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T;
 /* TODO: format_scanf() implementation for `vfwscanf'! */
 
 [cp_stdio][std][std_guard][ATTR_WUNUSED][ATTR_LIBC_WSCANF(1, 0)]
@@ -774,11 +778,6 @@ wcswidth:([inp(num_chars)] wchar_t const *__restrict string, $size_t num_chars) 
 
 %
 %#if defined(__USE_XOPEN) || defined(__USE_DOS)
-%#ifndef __wint_t_defined
-%#define __wint_t_defined 1
-%__NAMESPACE_STD_USING(wint_t)
-%#endif /* !__wint_t_defined */
-
 
 @@Search for a given `NEEDLE' appearing as a sub-string within `HAYSTACK'
 @@If no such needle exists, return `NULL'
@@ -888,32 +887,32 @@ wcstold_l:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr
 [cp_stdio][alias(_getwchar_nolock)][requires_include(<__crt.h>)][wchar]
 [requires($has_function(fgetwc_unlocked) && !defined(__NO_STDSTREAMS))][same_impl]
 [section({.text.crt.wchar.FILE.unlocked.read.getc|.text.crt.dos.wchar.FILE.unlocked.read.getc})]
-getwchar_unlocked:() -> wint_t {
+getwchar_unlocked:() -> $wint_t {
 	return fgetwc_unlocked(@__LOCAL_stdin@);
 }
 
 [cp_stdio][alias(_putwchar_nolock)][requires_include(<__crt.h>)][wchar]
 [requires($has_function(fputwc_unlocked) && !defined(__NO_STDSTREAMS))][same_impl]
 [section({.text.crt.wchar.FILE.unlocked.write.putc|.text.crt.dos.wchar.FILE.unlocked.write.putc})]
-putwchar_unlocked:(wchar_t wc) -> wint_t {
+putwchar_unlocked:(wchar_t wc) -> $wint_t {
 	return fputwc_unlocked(wc, @__LOCAL_stdin@);
 }
 
 [cp_stdio][alias(fgetwc_unlocked, _fgetwc_nolock)][wchar]
 [section({.text.crt.wchar.FILE.unlocked.read.getc|.text.crt.dos.wchar.FILE.unlocked.read.getc})]
-getwc_unlocked:([notnull] $FILE *__restrict stream) -> wint_t = fgetwc_unlocked;
+getwc_unlocked:([notnull] $FILE *__restrict stream) -> $wint_t = fgetwc_unlocked;
 
 [cp_stdio][alias(fputwc_unlocked, _fputwc_nolock)][wchar]
 [section({.text.crt.wchar.FILE.unlocked.write.putc|.text.crt.dos.wchar.FILE.unlocked.write.putc})]
-putwc_unlocked:(wchar_t wc, [notnull] $FILE *__restrict stream) -> wint_t = fputwc_unlocked;
+putwc_unlocked:(wchar_t wc, [notnull] $FILE *__restrict stream) -> $wint_t = fputwc_unlocked;
 
 [cp_stdio][alias(_fgetwc_nolock)][wchar]
 [section({.text.crt.wchar.FILE.unlocked.read.getc|.text.crt.dos.wchar.FILE.unlocked.read.getc})]
-fgetwc_unlocked:([notnull] $FILE *__restrict stream) -> wint_t;
+fgetwc_unlocked:([notnull] $FILE *__restrict stream) -> $wint_t;
 
 [cp_stdio][alias(_fputwc_nolock)][wchar]
 [section({.text.crt.wchar.FILE.unlocked.write.putc|.text.crt.dos.wchar.FILE.unlocked.write.putc})]
-fputwc_unlocked:(wchar_t wc, [notnull] $FILE *__restrict stream) -> wint_t;
+fputwc_unlocked:(wchar_t wc, [notnull] $FILE *__restrict stream) -> $wint_t;
 
 [cp_stdio][alias(fgetws)][alias(_fgetws_nolock)][wchar][dependency_include(<parts/errno.h>)][same_impl]
 [section({.text.crt.wchar.FILE.unlocked.read.read|.text.crt.dos.wchar.FILE.unlocked.read.read})]
@@ -921,11 +920,11 @@ fputwc_unlocked:(wchar_t wc, [notnull] $FILE *__restrict stream) -> wint_t;
 [impl_prefix(
 #ifndef @__WEOF@
 #if __SIZEOF_WCHAR_T__ == 4
-#define @__WEOF@             0xffffffffu
+#define @__WEOF@ 0xffffffffu
 #else /* __SIZEOF_WCHAR_T__ == 4 */
-#define @__WEOF@    (wint_t)(0xffff)
+#define @__WEOF@ (__CCAST(__WINT_TYPE__) 0xffff)
 #endif /* __SIZEOF_WCHAR_T__ != 4 */
-#endif
+#endif /* !__WEOF */
 )]
 fgetws_unlocked:([outp(bufsize)] wchar_t *__restrict buf, __STDC_INT_AS_SIZE_T bufsize, [notnull] $FILE *__restrict stream) -> wchar_t * {
 	$size_t n;
@@ -1003,11 +1002,11 @@ wcsftime_l:([outp(maxsize)] wchar_t *__restrict buf, $size_t maxsize,
 [impl_prefix(
 #ifndef @__WEOF@
 #if __SIZEOF_WCHAR_T__ == 4
-#define @__WEOF@             0xffffffffu
+#define @__WEOF@ 0xffffffffu
 #else /* __SIZEOF_WCHAR_T__ == 4 */
-#define @__WEOF@    (wint_t)(0xffff)
+#define @__WEOF@ (__CCAST(__WINT_TYPE__) 0xffff)
 #endif /* __SIZEOF_WCHAR_T__ != 4 */
-#endif
+#endif /* !__WEOF */
 )][wchar]
 file_wprinter:([nonnull] void *arg, [inp(datalen)] wchar_t const *__restrict data, $size_t datalen) -> $ssize_t {
 	$size_t i;
@@ -1025,11 +1024,11 @@ file_wprinter:([nonnull] void *arg, [inp(datalen)] wchar_t const *__restrict dat
 [impl_prefix(
 #ifndef @__WEOF@
 #if __SIZEOF_WCHAR_T__ == 4
-#define @__WEOF@             0xffffffffu
+#define @__WEOF@ 0xffffffffu
 #else /* __SIZEOF_WCHAR_T__ == 4 */
-#define @__WEOF@    (wint_t)(0xffff)
+#define @__WEOF@ (__CCAST(__WINT_TYPE__) 0xffff)
 #endif /* __SIZEOF_WCHAR_T__ != 4 */
-#endif
+#endif /* !__WEOF */
 )][wchar]
 file_wprinter_unlocked:([nonnull] void *arg, [inp(datalen)] wchar_t const *__restrict data, $size_t datalen) -> $ssize_t {
 	$size_t i;
@@ -1042,7 +1041,7 @@ file_wprinter_unlocked:([nonnull] void *arg, [inp(datalen)] wchar_t const *__res
 
 
 [wchar][user][section({.text.crt.wchar.FILE.unlocked.write.putc|.text.crt.dos.wchar.FILE.unlocked.write.putc})]
-ungetwc_unlocked:(wint_t ch, [nonnull] $FILE *__restrict stream) -> wint_t = ungetwc;
+ungetwc_unlocked:($wint_t ch, [nonnull] $FILE *__restrict stream) -> $wint_t = ungetwc;
 
 [cp_stdio][ATTR_LIBC_WPRINTF(2, 0)][wchar][requires($has_function(file_wprinter_unlocked))]
 [section({.text.crt.wchar.FILE.unlocked.write.printf|.text.crt.dos.wchar.FILE.unlocked.write.printf})][same_impl]

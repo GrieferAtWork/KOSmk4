@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc52f8249 */
+/* HASH CRC-32:0xfb0926eb */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,13 +51,13 @@ struct tm {
 #define ____localdep_mktime32_defined 1
 #if defined(__CRT_HAVE_mktime)
 /* Return the `time_t' representation of TP and normalize TP */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__TM_TYPE(time),__NOTHROW_NCX,__localdep_mktime32,(struct tm __KOS_FIXED_CONST *__tp),mktime,(__tp))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_mktime32,(struct tm __KOS_FIXED_CONST *__tp),mktime,(__tp))
 #elif defined(__CRT_HAVE__mktime32)
 /* Return the `time_t' representation of TP and normalize TP */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__TM_TYPE(time),__NOTHROW_NCX,__localdep_mktime32,(struct tm __KOS_FIXED_CONST *__tp),_mktime32,(__tp))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_mktime32,(struct tm __KOS_FIXED_CONST *__tp),_mktime32,(__tp))
 #elif defined(__CRT_HAVE_timelocal)
 /* Return the `time_t' representation of TP and normalize TP */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__TM_TYPE(time),__NOTHROW_NCX,__localdep_mktime32,(struct tm __KOS_FIXED_CONST *__tp),timelocal,(__tp))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_mktime32,(struct tm __KOS_FIXED_CONST *__tp),timelocal,(__tp))
 #else /* LIBC: mktime */
 #undef ____localdep_mktime32_defined
 #endif /* mktime32... */

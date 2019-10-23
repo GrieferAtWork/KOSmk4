@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x77b01b94 */
+/* HASH CRC-32:0x69f8d8eb */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,8 +22,8 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(towctrans) __ATTR_WUNUSED __WINT_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(towctrans))(__WINT_TYPE__ __wc,
-                                                       wctrans_t __desc) {
-#line 162 "kos/src/libc/magic/wctype.c"
+                                                       __wctrans_t __desc) {
+#line 171 "kos/src/libc/magic/wctype.c"
 	/* TODO */
 	return 0;
 }

@@ -243,7 +243,7 @@
 	CB(PREFIX.application.options.*) \
 	CB(PREFIX.io.tty.*) \
 	CB(PREFIX.random.*) \
-	CB(PREFIX.math.float.* PREFIX.math.math.* PREFIX.math.utility.*) \
+	CB(PREFIX.math.fenv.* PREFIX.math.float.* PREFIX.math.math.* PREFIX.math.utility.*) \
 	CB(PREFIX.fs.modify_time.* PREFIX.fs.mount.* PREFIX.fs.swap.*) \
 	CB(PREFIX.fs.statfs.statvfs.* PREFIX.fs.statfs.statfs.*) \
 	CB(PREFIX.timer.*) \

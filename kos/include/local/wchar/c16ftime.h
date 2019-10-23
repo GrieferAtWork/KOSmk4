@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaef4fe9f */
+/* HASH CRC-32:0xcc8262e4 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(c16ftime))(__CHAR16_TYPE__ *__restric
                                                       __SIZE_TYPE__ __buflen,
                                                       __CHAR16_TYPE__ const *__restrict __format,
                                                       struct tm const *__restrict __tp) {
-#line 466 "kos/src/libc/magic/wchar.c"
+#line 470 "kos/src/libc/magic/wchar.c"
 	/* TODO */
 	return 0;
 }

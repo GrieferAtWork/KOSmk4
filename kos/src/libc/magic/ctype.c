@@ -35,25 +35,6 @@
 %[define_str2wcs_replacement(iscntrl  = iswcntrl)]
 %[define_str2wcs_replacement(isblank  = iswblank)]
 
-%(ccompat){
-#undef isalnum
-#undef isalpha
-#undef isupper
-#undef islower
-#undef isdigit
-#undef isxdigit
-#undef isspace
-#undef ispunct
-#undef isprint
-#undef isgraph
-#undef iscntrl
-#ifdef __USE_ISOC99
-#undef isblank
-#endif /* __USE_ISOC99 */
-#undef tolower
-#undef toupper
-}
-
 
 %{
 #include <features.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd57339fd */
+/* HASH CRC-32:0xc192cdaf */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,17 +36,17 @@ __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,,__localdep_fputwc_unlocked,(__WCH
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __WEOF
 #if __SIZEOF_WCHAR_T__ == 4
-#define __WEOF             0xffffffffu
+#define __WEOF 0xffffffffu
 #else /* __SIZEOF_WCHAR_T__ == 4 */
-#define __WEOF    (__WINT_TYPE__)(0xffff)
+#define __WEOF (__CCAST(__WINT_TYPE__) 0xffff)
 #endif /* __SIZEOF_WCHAR_T__ != 4 */
-#endif
+#endif /* !__WEOF */
 /* Same as `file_wprinter()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
 __LOCAL_LIBC(file_wprinter_unlocked) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(file_wprinter_unlocked))(void *__arg,
                                                        __WCHAR_TYPE__ const *__restrict __data,
                                                        __SIZE_TYPE__ __datalen) __THROWS(...) {
-#line 1035 "kos/src/libc/magic/wchar.c"
+#line 1034 "kos/src/libc/magic/wchar.c"
 	__SIZE_TYPE__ __i;
 	for (__i = 0; __i < __datalen; ++__i) {
 		if (__localdep_fputwc_unlocked(__data[__i], (__FILE *)__arg) == __WEOF)

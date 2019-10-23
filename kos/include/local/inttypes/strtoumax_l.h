@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe58be3f1 */
+/* HASH CRC-32:0xc109c69e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strtoumax_l))(char const *__restrict 
                                                          char **__endptr,
                                                          int __base,
                                                          __locale_t __locale) {
-#line 331 "kos/src/libc/magic/inttypes.c"
+#line 329 "kos/src/libc/magic/inttypes.c"
 	(void)__locale;
 	return __localdep_strtoumax(__nptr, __endptr, __base);
 }

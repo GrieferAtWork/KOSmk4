@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x43354ca8 */
+/* HASH CRC-32:0xa39f6871 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -354,6 +354,14 @@
 #define __CRT_ATTR_NOTHROW_fdim 1
 #define __CRT_ATTR_NOTHROW_fdimf 1
 #define __CRT_ATTR_NOTHROW_fdiml 1
+#define __CRT_ATTR_NOTHROW_feclearexcept 1
+#define __CRT_ATTR_NOTHROW_fedisableexcept 1
+#define __CRT_ATTR_NOTHROW_feenableexcept 1
+#define __CRT_ATTR_NOTHROW_fegetexcept 1
+#define __CRT_ATTR_NOTHROW_fegetround 1
+#define __CRT_ATTR_NOTHROW_feraiseexcept 1
+#define __CRT_ATTR_NOTHROW_fesetround 1
+#define __CRT_ATTR_NOTHROW_fetestexcept 1
 #define __CRT_ATTR_NOTHROW_ffs 1
 #define __CRT_ATTR_NOTHROW_ffsl 1
 #define __CRT_ATTR_NOTHROW_ffsll 1
@@ -1580,10 +1588,16 @@
 #define __CRT_ATTR_NOTHROW_NCX_fcvt_r 1
 #define __CRT_ATTR_NOTHROW_NCX_fdopen 1
 #define __CRT_ATTR_NOTHROW_NCX_fdopendir 1
+#define __CRT_ATTR_NOTHROW_NCX_fegetenv 1
+#define __CRT_ATTR_NOTHROW_NCX_fegetexceptflag 1
+#define __CRT_ATTR_NOTHROW_NCX_feholdexcept 1
 #define __CRT_ATTR_NOTHROW_NCX_feof 1
 #define __CRT_ATTR_NOTHROW_NCX_feof_unlocked 1
 #define __CRT_ATTR_NOTHROW_NCX_ferror 1
 #define __CRT_ATTR_NOTHROW_NCX_ferror_unlocked 1
+#define __CRT_ATTR_NOTHROW_NCX_fesetenv 1
+#define __CRT_ATTR_NOTHROW_NCX_fesetexceptflag 1
+#define __CRT_ATTR_NOTHROW_NCX_feupdateenv 1
 #define __CRT_ATTR_NOTHROW_NCX_fgetc16 1
 #define __CRT_ATTR_NOTHROW_NCX_fgetc16_unlocked 1
 #define __CRT_ATTR_NOTHROW_NCX_fgetc16s 1
@@ -3834,6 +3848,7 @@
 #define __CRT_ATTR_PURE_c32toimax 1
 #define __CRT_ATTR_PURE_c32toumax 1
 #define __CRT_ATTR_PURE_c32verscmp 1
+#define __CRT_ATTR_PURE_fegetround 1
 #define __CRT_ATTR_PURE_fnmatch 1
 #define __CRT_ATTR_PURE_fuzzy_c16casecmp 1
 #define __CRT_ATTR_PURE_fuzzy_c16casecmp_l 1

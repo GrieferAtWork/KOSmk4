@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xffb7b4ff */
+/* HASH CRC-32:0xf45169f2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,13 +23,13 @@
 #ifndef ____localdep_div_defined
 #define ____localdep_div_defined 1
 #if defined(__CRT_HAVE_div)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,div_t,__NOTHROW_NCX,__localdep_div,(int __numer, int __denom),div,(__numer,__denom))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __div_struct,__NOTHROW_NCX,__localdep_div,(int __numer, int __denom),div,(__numer,__denom))
 #elif defined(__CRT_HAVE_ldiv) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,div_t,__NOTHROW_NCX,__localdep_div,(int __numer, int __denom),ldiv,(__numer,__denom))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __div_struct,__NOTHROW_NCX,__localdep_div,(int __numer, int __denom),ldiv,(__numer,__denom))
 #elif defined(__CRT_HAVE_lldiv) && (__SIZEOF_INT__ == __SIZEOF_LONG_LONG__)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,div_t,__NOTHROW_NCX,__localdep_div,(int __numer, int __denom),lldiv,(__numer,__denom))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __div_struct,__NOTHROW_NCX,__localdep_div,(int __numer, int __denom),lldiv,(__numer,__denom))
 #elif defined(__CRT_HAVE_imaxdiv) && (__SIZEOF_INT__ == __SIZEOF_INTMAX_T__)
-__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,div_t,__NOTHROW_NCX,__localdep_div,(int __numer, int __denom),imaxdiv,(__numer,__denom))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __div_struct,__NOTHROW_NCX,__localdep_div,(int __numer, int __denom),imaxdiv,(__numer,__denom))
 #else /* LIBC: div */
 #include <local/stdlib/div.h>
 #define __localdep_div (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(div))

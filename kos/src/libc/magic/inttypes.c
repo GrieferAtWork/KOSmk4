@@ -38,12 +38,12 @@ __SYSDECL_BEGIN
 #endif
 
 #if __SIZEOF_LONG__ == 8
-#   define __PRI64_PREFIX  "l"
-#   define __PRIPTR_PREFIX "l"
-#else
-#   define __PRI64_PREFIX  "ll"
-#   define __PRIPTR_PREFIX
-#endif
+#define __PRI64_PREFIX  "l"
+#define __PRIPTR_PREFIX "l"
+#else /* __SIZEOF_LONG__ == 8 */
+#define __PRI64_PREFIX  "ll"
+#define __PRIPTR_PREFIX
+#endif /* __SIZEOF_LONG__ != 8 */
 
 #define PRId8          "d"
 #define PRId16         "d"
@@ -203,22 +203,20 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 
-#ifndef __std_imaxdiv_t_defined
-#define __std_imaxdiv_t_defined 1
 }%[push_macro @undef { quot rem }]%{
-
-__NAMESPACE_STD_BEGIN
-#ifdef __imaxdiv_t_defined
-__NAMESPACE_GLB_USING(imaxdiv_t)
-#else /* __imaxdiv_t_defined */
-typedef struct {
+struct __imaxdiv_struct {
 	__INTMAX_TYPE__ quot; /* Quotient. */
 	__INTMAX_TYPE__ rem;  /* Remainder. */
-} imaxdiv_t;
-#endif /* !__imaxdiv_t_defined */
-__NAMESPACE_STD_END
+};
+}%[pop_macro]
+%[define_replacement(imaxdiv_t = struct __imaxdiv_struct)]
+%{
 
-}%[pop_macro]%{
+#ifndef __std_imaxdiv_t_defined
+#define __std_imaxdiv_t_defined 1
+__NAMESPACE_STD_BEGIN
+typedef struct __imaxdiv_struct imaxdiv_t;
+__NAMESPACE_STD_END
 #endif /* !__std_imaxdiv_t_defined */
 
 #ifndef __CXX_SYSTEM_HEADER
@@ -246,7 +244,7 @@ __NAMESPACE_STD_USING(imaxdiv_t)
 
 [std][section(.text.crt.math.utility)]
 [ATTR_CONST][nothrow] imaxdiv:($intmax_t numer, $intmax_t denom) -> imaxdiv_t {
-	@imaxdiv_t@ result;
+	imaxdiv_t result;
 	result.@quot@ = numer / denom;
 	result.@rem@  = numer % denom;
 	return result;
@@ -261,9 +259,9 @@ __NAMESPACE_STD_USING(imaxdiv_t)
 strtoimax:([nonnull] char const *__restrict nptr, char **endptr, int base) -> $intmax_t {
 #if __SIZEOF_INTMAX_T__ <= 4
 	return (intmax_t)strto32(nptr, endptr, base);
-#else
+#else /* __SIZEOF_INTMAX_T__ <= 4 */
 	return (intmax_t)strto64(nptr, endptr, base);
-#endif
+#endif /* __SIZEOF_INTMAX_T__ > 4 */
 }
 
 
@@ -275,9 +273,9 @@ strtoimax:([nonnull] char const *__restrict nptr, char **endptr, int base) -> $i
 strtoumax:([nonnull] char const *__restrict nptr, char ** endptr, int base) -> $uintmax_t {
 #if __SIZEOF_INTMAX_T__ <= 4
 	return (uintmax_t)strtou32(nptr, endptr, base);
-#else
+#else /* __SIZEOF_INTMAX_T__ <= 4 */
 	return (uintmax_t)strtou64(nptr, endptr, base);
-#endif
+#endif /* __SIZEOF_INTMAX_T__ > 4 */
 }
 
 
@@ -376,7 +374,7 @@ __SYSDECL_END
 #ifdef __USE_UTF
 #if defined(_UCHAR_H) && !defined(_PARTS_UCHAR_INTTYPES_H)
 #include <parts/uchar/inttypes.h>
-#endif
+#endif /* _UCHAR_H && !_PARTS_UCHAR_INTTYPES_H */
 #endif /* __USE_UTF */
 
 }

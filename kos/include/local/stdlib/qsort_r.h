@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf142357 */
+/* HASH CRC-32:0x55dc3a60 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ __LOCAL_LIBC(qsort_r) __ATTR_NONNULL((1, 4)) void
                                         __SIZE_TYPE__ __item_size,
                                         __compar_d_fn_t __cmp,
                                         void *__arg) __THROWS(...) {
-#line 209 "kos/src/libc/magic/stdlib.c"
+#line 217 "kos/src/libc/magic/stdlib.c"
 	/* DISCALIMER: The qsort() implementation below has been taken directly
 	 *             from glibc (`/stdlib/qsort.c'), before being retuned and
 	 *             formatted to best work with KOS.

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x16722000 */
+/* HASH CRC-32:0x52b0c8fc */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1344,10 +1344,10 @@ NOTHROW_NCX(LIBCCALL libc_basename)(char const *filename) {
 #ifdef _WIN32
 		if (ch == '/' || ch == '\\')
 			result = iter;
-#else
+#else /* _WIN32 */
 		if (ch == '/')
 			result = iter;
-#endif
+#endif /* !_WIN32 */
 	} while (ch);
 	if unlikely(!result)
 		return (char *)filename; /* Path doesn't contain '/'. */
@@ -1357,20 +1357,20 @@ NOTHROW_NCX(LIBCCALL libc_basename)(char const *filename) {
 #ifdef _WIN32
 	while (iter != filename && (iter[-1] == '/' || iter[-1] == '\\'))
 		--iter;
-#else
+#else /* _WIN32 */
 	while (iter != filename && iter[-1] == '/')
 		--iter;
-#endif
+#endif /* !_WIN32 */
 	if (iter == filename)
 		return result-1; /* Only `'/'"-characters. */
 	//*iter = '\0'; /* Trim all ending `'/'"-characters. */
 #ifdef _WIN32
 	while (iter != filename && (iter[-1] != '/' || iter[-1] != '\\'))
 		--iter; /* Scan until the previous '/'. */
-#else
+#else /* _WIN32 */
 	while (iter != filename && iter[-1] != '/')
 		--iter; /* Scan until the previous '/'. */
-#endif
+#endif /* !_WIN32 */
 	return iter; /* Returns string after previous '/'. */
 }
 

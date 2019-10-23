@@ -65,6 +65,22 @@
 #endif
 
 
+/* libstdc++ sucks and does stuff like this:
+ * >> #include <cstddef>
+ * >> ...
+ * >> size_t foo;
+ * This is wrong, since `size_t' may not appear in the global namespace,
+ * but only within the std:: namespace. I tried to fix this by patching
+ * its source, but after realizing how often it does this, I just gave
+ * up and made this */
+#if defined(_BROKEN_CCOMPAT_SOURCE) || defined(_GLIBCXX_SHARED)
+#undef __USE_BROKEN_CCOMPAT
+#define __USE_BROKEN_CCOMPAT 1
+#endif
+
+
+
+
 #ifdef _KOS_SOURCE
 #define __USE_KOS 1
 #define __USE_STRING_BWLQ 1
@@ -104,6 +120,15 @@
 #define __USE_DOS_SLIB 1
 #endif /* (__STDC_WANT_SECURE_LIB__+0) != 0 */
 #endif
+
+/* You may `#define _DOS_SOURCE_CLEAN 1' alongside `_DOS_SOURCE' in order
+ * to exclude select symbol definitions done by DOS that were only there
+ * in order to pollute the global namespace (e.g. `typedef ... size_t;' in <crtdefs.h>) */
+#ifdef __USE_DOS
+#ifdef _DOS_SOURCE_CLEAN
+#define __USE_DOS_CLEAN 1
+#endif /* _DOS_SOURCE_CLEAN */
+#endif /* __USE_DOS */
 
 /* 64-bit time_t extensions for KOS
  * (By the time of this writing, but I'm guessing by 2038 this'll be
@@ -205,12 +230,13 @@
 #if defined(__cplusplus) && \
   (!defined(__GNUC__) || __GCC_VERSION(4,4,0))
 /* Enable proper C++ prototype declarations. */
-#define __CORRECT_ISO_CPP_STRING_H_PROTO  1
-#define __CORRECT_ISO_CPP_STRINGS_H_PROTO 1
-#define __CORRECT_ISO_CPP_WCHAR_H_PROTO   1
-#define __CORRECT_ISO_CPP_STDLIB_H_PROTO  1
-#define __CORRECT_ISO_CPP_UNICODE_H_PROTO 1
-#define __CORRECT_ISO_CPP_MATH_H_PROTO    1
+#define __CORRECT_ISO_CPP_STRING_H_PROTO    1
+#define __CORRECT_ISO_CPP_STRINGS_H_PROTO   1
+#define __CORRECT_ISO_CPP_WCHAR_H_PROTO     1
+#define __CORRECT_ISO_CPP_STDLIB_H_PROTO    1
+#define __CORRECT_ISO_CPP_UNICODE_H_PROTO   1
+#define __CORRECT_ISO_CPP_MATH_H_PROTO      1
+#define __CORRECT_ISO_CPP11_MATH_H_PROTO_FP 1
 #endif
 
 #ifdef _DEFAULT_SOURCE

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x58ee47f6 */
+/* HASH CRC-32:0x2659d348 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,10 +28,6 @@
 
 DECL_BEGIN
 
-INTDEF WUNUSED ATTR_MALL_DEFAULT_ALIGNED ATTR_MALLOC ATTR_ALLOC_SIZE((1)) void *NOTHROW_NCX(LIBCCALL libc_malloc)(size_t n_bytes);
-INTDEF WUNUSED ATTR_MALL_DEFAULT_ALIGNED ATTR_MALLOC ATTR_ALLOC_SIZE((1, 2)) void *NOTHROW_NCX(LIBCCALL libc_calloc)(size_t count, size_t n_bytes);
-INTDEF WUNUSED ATTR_MALL_DEFAULT_ALIGNED ATTR_MALLOC ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(LIBCCALL libc_realloc)(void *mallptr, size_t n_bytes);
-INTDEF void NOTHROW_NCX(LIBCCALL libc_free)(void *mallptr);
 /* @EXCEPT: `realloc_in_place()' will return `NULL' if the reallocation isn't
  *           possible due to the requested memory above `MALLPTR' already being
  *           in use. However, an `E_BADALLOC' exception is thrown if insufficient

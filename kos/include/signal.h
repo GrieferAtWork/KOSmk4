@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7c612425 */
+/* HASH CRC-32:0x826d04d4 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,13 +20,21 @@
 #ifndef _SIGNAL_H
 #define _SIGNAL_H 1
 
-#include <__stdinc.h>
-#if defined(_CXX_CSIGNAL) && !defined(__CXX_SYSTEM_HEADER)
+#ifdef _CXX_STDONLY_CSIGNAL
+#ifdef __CXX_SYSTEM_HEADER
+#undef _SIGNAL_H /* Allow the C-header to be re-included to import all std::-symbols into the global namespace. */
+#else /* __CXX_SYSTEM_HEADER */
 /* Import all symbols into the global namespace when re-including "signal.h" after "csignal" */
 #ifndef __sig_atomic_t_defined
 #define __sig_atomic_t_defined 1
 __NAMESPACE_STD_USING(sig_atomic_t)
 #endif /* !__sig_atomic_t_defined */
+#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
+#ifndef __size_t_defined
+#define __size_t_defined 1
+__NAMESPACE_STD_USING(size_t)
+#endif /* !__size_t_defined */
+#endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K8 */
 #if !defined(__raise_defined) && defined(__std_raise_defined)
 #define __raise_defined 1
 __NAMESPACE_STD_USING(raise)
@@ -35,8 +43,11 @@ __NAMESPACE_STD_USING(raise)
 #define __signal_defined 1
 __NAMESPACE_STD_USING(signal)
 #endif /* !__signal_defined && !__std_signal_defined */
-#else /* _CXX_CSIGNAL && !__CXX_SYSTEM_HEADER */
-#include <__crt.h>
+#undef _CXX_STDONLY_CSIGNAL
+#endif /* !__CXX_SYSTEM_HEADER */
+#else /* _CXX_STDONLY_CSIGNAL */
+#include "__stdinc.h"
+#include "__crt.h"
 
 #ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
 #pragma GCC system_header
@@ -125,10 +136,19 @@ typedef __sighandler_t sig_t;
 #endif /* __USE_MISC */
 
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K8)
+#ifndef __std_size_t_defined
+#define __std_size_t_defined 1
+__NAMESPACE_STD_BEGIN
+typedef __SIZE_TYPE__ size_t;
+__NAMESPACE_STD_END
+#endif /* !__std_size_t_defined */
+
+#ifndef __CXX_SYSTEM_HEADER
 #ifndef __size_t_defined
 #define __size_t_defined 1
-typedef __size_t size_t;
+__NAMESPACE_STD_USING(size_t)
 #endif /* !__size_t_defined */
+#endif /* !__CXX_SYSTEM_HEADER */
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K8 */
 
 __NAMESPACE_STD_BEGIN
@@ -450,5 +470,9 @@ __CDECLARE(,int,__NOTHROW_NCX,__libc_current_sigrtmax,(void),())
 
 __SYSDECL_END
 
-#endif /* !_CXX_CSIGNAL || __CXX_SYSTEM_HEADER */
+#ifdef __CXX_SYSTEM_HEADER
+#define _CXX_STDONLY_CSIGNAL 1
+#undef _SIGNAL_H
+#endif /* __CXX_SYSTEM_HEADER */
+#endif /* !_CXX_STDONLY_CSIGNAL */
 #endif /* !_SIGNAL_H */

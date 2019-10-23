@@ -7008,6 +7008,28 @@ diff -Naur gcc-9.1.0-orig/libstdc++-v3/include/Makefile.in gcc-9.1.0/libstdc++-v
  sbindir = @sbindir@
  sharedstatedir = @sharedstatedir@
  srcdir = @srcdir@
+diff -Naur gcc-9.1.0-orig/libstdc++-v3/include/tr1/cctype gcc-9.1.0/libstdc++-v3/include/tr1/cctype
+--- gcc-9.1.0-orig/libstdc++-v3/include/tr1/cctype	2019-01-01 13:31:55.000000000 +0100
++++ gcc-9.1.0/libstdc++-v3/include/tr1/cctype	2019-10-23 16:20:26.279899600 +0200
+@@ -31,6 +31,7 @@
+ 
+ #include <bits/c++config.h>
+ #include <cctype>
++#include <ctype.h>
+ 
+ #ifdef _GLIBCXX_USE_C99_CTYPE_TR1
+ 
+diff -Naur gcc-9.1.0-orig/libstdc++-v3/include/tr1/cmath gcc-9.1.0/libstdc++-v3/include/tr1/cmath
+--- gcc-9.1.0-orig/libstdc++-v3/include/tr1/cmath	2019-01-01 13:31:55.000000000 +0100
++++ gcc-9.1.0/libstdc++-v3/include/tr1/cmath	2019-10-23 16:20:33.450832700 +0200
+@@ -32,6 +32,7 @@
+ #pragma GCC system_header
+ 
+ #include <cmath>
++#include <math.h>
+ 
+ #ifdef _GLIBCXX_USE_C99_MATH_TR1
+ 
 diff -Naur gcc-9.1.0-orig/libstdc++-v3/libsupc++/Makefile.in gcc-9.1.0/libstdc++-v3/libsupc++/Makefile.in
 --- gcc-9.1.0-orig/libstdc++-v3/libsupc++/Makefile.in	2019-02-27 12:25:44.000000000 +0100
 +++ gcc-9.1.0/libstdc++-v3/libsupc++/Makefile.in	2019-07-16 11:04:47.486455200 +0200

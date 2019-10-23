@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c371d5e */
+/* HASH CRC-32:0xeb5560b5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,17 +36,17 @@ __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_fputc32,(
 __NAMESPACE_LOCAL_BEGIN
 #ifndef __WEOF
 #if 4 == 4
-#define __WEOF             0xffffffffu
+#define __WEOF 0xffffffffu
 #else /* __SIZEOF_WCHAR_T__ == 4 */
-#define __WEOF    (__WINT_TYPE__)(0xffff)
+#define __WEOF (__CCAST(__WINT_TYPE__) 0xffff)
 #endif /* __SIZEOF_WCHAR_T__ != 4 */
-#endif
+#endif /* !__WEOF */
 /* For use with `format_printf()' and friends: Prints to a `FILE *' closure argument */
 __LOCAL_LIBC(file_c32printer) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(file_c32printer))(void *__arg,
                                                 __CHAR32_TYPE__ const *__restrict __data,
                                                 __SIZE_TYPE__ __datalen) __THROWS(...) {
-#line 1013 "kos/src/libc/magic/wchar.c"
+#line 1012 "kos/src/libc/magic/wchar.c"
 	__SIZE_TYPE__ __i;
 	for (__i = 0; __i < __datalen; ++__i) {
 		if (__localdep_fputc32(__data[__i], (__FILE *)__arg) == __WEOF)

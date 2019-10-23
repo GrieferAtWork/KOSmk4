@@ -32,6 +32,11 @@ MTOOLS_VERSION_NUMBER="4.0.23"
 # The KOS configuration used for generating libc/libm/crt0 for libgcc_s and libstdc++
 KOS_CONFIG_FOR_LINKING="nOD"
 KOS_VALID_BUILD_CONFIGS="OD nOD OnD nOnD"
+CXX_COMPAT_HEADER_NAMES="\
+assert ctype errno fenv float inttypes iso646 limits locale math setjmp \
+signal stdalign stdarg stdbool stddef stdint stdio stdlib string time \
+uchar wchar wctype"
+#CXX_COMPAT_HEADER_NAMES="$CXX_COMPAT_HEADER_NAMES tgmath complex"
 
 
 BINUTILS_VERSION="binutils-${BINUTILS_VERSION_NUMBER}"
@@ -547,7 +552,30 @@ if ! [ -f "$PREFIX/$TARGET/lib/libstdc++.so.$LIBSTDCXX_VERSION_FULL" ] || \
 		--config="$KOS_CONFIG_FOR_LINKING"
 	echo "    Making $GCC_VERSION:libstdc++"
 	cmd cd "$PREFIX/gcc"
-	cmd make -j $MAKE_PARALLEL_COUNT all-target-libstdc++-v3
+	if ! make -j $MAKE_PARALLEL_COUNT all-target-libstdc++-v3; then
+		# Yet another place where we need to be hacky with fixing up headers
+		# This time around, it's libstdc++ that only half-heartedly understands
+		# the fact that KOS's system headers already define c++ functions, and
+		# already place all of the required function prototypes into the `std'
+		# namespace
+		# To fix this, delete libstdc++'s problematic headers and replace then
+		# symlinks to KOS's (actually working ~wow!~) headers.
+		# Sadly, we can only do this once the make already failed once, since
+		# the headers only get created for the first time by said make command!
+
+		# $1: header name (e.g. `stdlib')
+		use_real_header() {
+			unlink "$PREFIX/gcc/$TARGET/libstdc++-v3/include/c$1" > /dev/null 2>&1
+			unlink "$PREFIX/gcc/$TARGET/libstdc++-v3/include/$1.h" > /dev/null 2>&1
+			cmd ln -s "$KOS_ROOT/kos/include/c$1" "$PREFIX/gcc/$TARGET/libstdc++-v3/include/c$1"
+			cmd ln -s "$KOS_ROOT/kos/include/$1.h" "$PREFIX/gcc/$TARGET/libstdc++-v3/include/$1.h"
+		}
+		echo "Fixup libstdc++ build-time headers"
+		for HEADER_NAME in $(echo $CXX_COMPAT_HEADER_NAMES); do
+			use_real_header $HEADER_NAME
+		done
+		cmd make -j $MAKE_PARALLEL_COUNT all-target-libstdc++-v3
+	fi
 	cmd make -j $MAKE_PARALLEL_COUNT install-target-libstdc++-v3
 	remove_bad_fixinclude
 	cmd cd "$KOS_BINUTILS"
@@ -610,59 +638,10 @@ done
 
 # Installing libstdc++ leaves behind a bunch of unwanted overrides for system headers which
 # we're already providing ourself. - Just remove those headers
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/cassert"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/assert.h"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/cctype"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/ctype.h"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/cerrno"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/errno.h"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/cfenv"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/fenv.h"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/cfloat"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/float.h"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/cinttypes"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/inttypes.h"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/ciso646"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/iso646.h"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/climits"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/limits.h"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/clocale"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/locale.h"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/cmath"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/math.h"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/csetjmp"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/setjmp.h"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/csignal"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/signal.h"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/cstdalign"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/stdalign.h"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/cstdarg"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/stdarg.h"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/cstdbool"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/stdbool.h"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/cstddef"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/stddef.h"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/cstdint"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/stdint.h"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/cstdio"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/stdio.h"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/cstdlib"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/stdlib.h"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/cstring"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/string.h"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/ctime"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/time.h"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/cuchar"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/uchar.h"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/cwchar"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/wchar.h"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/cwctype"
-delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/wctype.h"
-
-#delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/ctgmath"
-#delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/tgmath.h"
-#delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/ccomplex"
-#delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/complex.h"
+for HEADER_NAME in $(echo $CXX_COMPAT_HEADER_NAMES); do
+	delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/c$HEADER_NAME"
+	delete_header_file "$PREFIX/$TARGET/include/c++/$GCC_VERSION_NUMBER/$HEADER_NAME.h"
+done
 
 
 # $1: .patch file

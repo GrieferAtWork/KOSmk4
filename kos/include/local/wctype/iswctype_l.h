@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd67e91e8 */
+/* HASH CRC-32:0xd8581454 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,11 +23,11 @@
 #ifndef ____localdep_iswctype_defined
 #define ____localdep_iswctype_defined 1
 #if defined(__CRT_HAVE_iswctype)
-__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswctype,(__WINT_TYPE__ __wc, wctype_t __desc),iswctype,(__wc,__desc))
+__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswctype,(__WINT_TYPE__ __wc, __WCTYPE_TYPE__ __desc),iswctype,(__wc,__desc))
 #elif defined(__CRT_HAVE_is_wctype)
-__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswctype,(__WINT_TYPE__ __wc, wctype_t __desc),is_wctype,(__wc,__desc))
+__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswctype,(__WINT_TYPE__ __wc, __WCTYPE_TYPE__ __desc),is_wctype,(__wc,__desc))
 #elif defined(__CRT_HAVE___iswctype)
-__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswctype,(__WINT_TYPE__ __wc, wctype_t __desc),__iswctype,(__wc,__desc))
+__CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswctype,(__WINT_TYPE__ __wc, __WCTYPE_TYPE__ __desc),__iswctype,(__wc,__desc))
 #else /* LIBC: iswctype */
 #include <local/wctype/iswctype.h>
 #define __localdep_iswctype (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswctype))
@@ -37,9 +37,9 @@ __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswctype,(__WINT_TYPE__ 
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(iswctype_l) __ATTR_WUNUSED __ATTR_PURE int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(iswctype_l))(__WINT_TYPE__ __wc,
-                                                        wctype_t __type,
+                                                        __WCTYPE_TYPE__ __type,
                                                         __locale_t __locale) {
-#line 291 "kos/src/libc/magic/wctype.c"
+#line 292 "kos/src/libc/magic/wctype.c"
 	(void)__locale;
 	return __localdep_iswctype(__wc, __type);
 }

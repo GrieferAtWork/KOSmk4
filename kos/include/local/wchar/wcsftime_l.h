@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5e90fab8 */
+/* HASH CRC-32:0xb0bc2a5f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsftime_l))(__WCHAR_TYPE__ *__restri
                                                         __WCHAR_TYPE__ const *__restrict __format,
                                                         struct tm const *__restrict __tp,
                                                         __locale_t __locale) {
-#line 982 "kos/src/libc/magic/wchar.c"
+#line 981 "kos/src/libc/magic/wchar.c"
 	(void)__locale;
 	return __localdep_wcsftime(__buf, __maxsize, __format, __tp);
 }

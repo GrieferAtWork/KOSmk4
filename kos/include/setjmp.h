@@ -19,9 +19,11 @@
 #ifndef _SETJMP_H
 #define _SETJMP_H 1
 
-#include <__stdinc.h>
-#if defined(_CXX_CSETJMP) && !defined(__CXX_SYSTEM_HEADER)
-/* Import all symbols into the global namespace when re-including "setjmp.h" after "csetjmp" */
+#ifdef _CXX_STDONLY_CSETJMP
+#ifdef __CXX_SYSTEM_HEADER
+#undef _SETJMP_H /* Allow the C-header to be re-included to import all std::-symbols into the global namespace. */
+#else /* __CXX_SYSTEM_HEADER */
+/* Import all symbols into the global namespace when re-including "ctype.h" after "cctype" */
 #ifndef __jmp_buf_defined
 #define __jmp_buf_defined 1
 __NAMESPACE_STD_USING(jmp_buf)
@@ -34,8 +36,12 @@ __NAMESPACE_STD_USING(setjmp)
 #define __longjmp_defined 1
 __NAMESPACE_STD_USING(longjmp)
 #endif /* __std_longjmp_defined && !__longjmp_defined */
-#else /* _CXX_CSETJMP && !__CXX_SYSTEM_HEADER */
-#include <__crt.h>
+#undef _CXX_STDONLY_CSETJMP
+#endif /* !__CXX_SYSTEM_HEADER */
+#else /* _CXX_STDONLY_CSETJMP */
+
+#include "__stdinc.h"
+#include "__crt.h"
 #include <features.h>
 #include <bits/setjmp.h>
 #include <bits/sigset.h>
@@ -78,9 +84,9 @@ __NAMESPACE_GLB_USING(longjmp)
 __CDECLARE_VOID(__ATTR_NORETURN,__NOTHROW_NCX,__fast_longjmp,(jmp_buf __buf, int __sig),(__buf,__sig))
 __CREDIRECT_VOID(__ATTR_NORETURN,__NOTHROW_NCX,__slow_longjmp,(jmp_buf __buf, int __sig),longjmp,(__buf,__sig))
 __FORCELOCAL __ATTR_NORETURN void __NOTHROW_NCX(__LIBCCALL longjmp)(jmp_buf __buf, int __sig) {
-	return __builtin_constant_p(__sig != 0) && (__sig != 0)
-	       ? __fast_longjmp(__buf, __sig)
-	       : __slow_longjmp(__buf, __sig);
+	if (__builtin_constant_p(__sig != 0) && (__sig != 0))
+		__fast_longjmp(__buf, __sig);
+	__slow_longjmp(__buf, __sig);
 }
 #else /* __CRT_HAVE___fast_longjmp */
 __CDECLARE_VOID(__ATTR_NORETURN,__NOTHROW_NCX,longjmp,(jmp_buf __buf, int __sig),(__buf,__sig))
@@ -148,5 +154,9 @@ typedef struct __jmp_buf sigjmp_buf[1];
 
 __SYSDECL_END
 
-#endif /* !_CXX_CSETJMP || __CXX_SYSTEM_HEADER */
+#ifdef __CXX_SYSTEM_HEADER
+#define _CXX_STDONLY_CSETJMP 1
+#undef _SETJMP_H
+#endif /* __CXX_SYSTEM_HEADER */
+#endif /* !_CXX_STDONLY_CSETJMP */
 #endif /* !_SETJMP_H */

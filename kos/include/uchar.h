@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x36552a9c */
+/* HASH CRC-32:0x115eda3c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,8 +20,10 @@
 #ifndef _UCHAR_H
 #define _UCHAR_H 1
 
-#include <__stdinc.h>
-#if defined(_CXX_CUCHAR) && !defined(__CXX_SYSTEM_HEADER)
+#ifdef _CXX_STDONLY_CUCHAR
+#ifdef __CXX_SYSTEM_HEADER
+#undef _UCHAR_H /* Allow the C-header to be re-included to import all std::-symbols into the global namespace. */
+#else /* __CXX_SYSTEM_HEADER */
 /* Import all symbols into the global namespace when re-including "uchar.h" after "cuchar" */
 #ifndef __mbstate_t_defined
 #define __mbstate_t_defined 1
@@ -35,8 +37,11 @@ __NAMESPACE_STD_USING(mbrtoc16)
 __NAMESPACE_STD_USING(mbrtoc32)
 __NAMESPACE_STD_USING(c16rtomb)
 __NAMESPACE_STD_USING(c32rtomb)
-#else /* _CXX_CUCHAR && !__CXX_SYSTEM_HEADER */
-#include <__crt.h>
+#undef _CXX_STDONLY_CUCHAR
+#endif /* !__CXX_SYSTEM_HEADER */
+#else /* _CXX_STDONLY_CUCHAR */
+#include "__stdinc.h"
+#include "__crt.h"
 
 #ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
 #pragma GCC system_header
@@ -190,5 +195,9 @@ __SYSDECL_END
 
 #endif /* __USE_UTF */
 
-#endif /* !_CXX_CUCHAR || __CXX_SYSTEM_HEADER */
+#ifdef __CXX_SYSTEM_HEADER
+#define _CXX_STDONLY_CUCHAR 1
+#undef _UCHAR_H
+#endif /* __CXX_SYSTEM_HEADER */
+#endif /* !_CXX_STDONLY_CUCHAR */
 #endif /* !_UCHAR_H */

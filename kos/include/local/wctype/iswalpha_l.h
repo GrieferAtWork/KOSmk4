@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4a0dd4ab */
+/* HASH CRC-32:0x7bf42ce9 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(iswalpha_l) __ATTR_WUNUSED __ATTR_PURE int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(iswalpha_l))(__WINT_TYPE__ __wc,
                                                         __locale_t __locale) {
-#line 225 "kos/src/libc/magic/wctype.c"
+#line 226 "kos/src/libc/magic/wctype.c"
 	(void)__locale;
 	return __localdep_iswalpha(__wc);
 }

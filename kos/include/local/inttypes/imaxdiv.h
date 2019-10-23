@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb6c78fa7 */
+/* HASH CRC-32:0xb30e5431 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,11 +20,11 @@
 #ifndef __local_imaxdiv_defined
 #define __local_imaxdiv_defined 1
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(imaxdiv) __ATTR_CONST imaxdiv_t
+__LOCAL_LIBC(imaxdiv) __ATTR_CONST struct __imaxdiv_struct
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(imaxdiv))(__INTMAX_TYPE__ __numer,
                                                  __INTMAX_TYPE__ __denom) {
-#line 249 "kos/src/libc/magic/inttypes.c"
-	imaxdiv_t __result;
+#line 247 "kos/src/libc/magic/inttypes.c"
+	struct __imaxdiv_struct __result;
 	__result.quot = __numer / __denom;
 	__result.rem  = __numer % __denom;
 	return __result;

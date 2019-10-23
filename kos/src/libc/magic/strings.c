@@ -35,17 +35,17 @@ typedef __SIZE_TYPE__ size_t;
 }
 
 [guard][ATTR_NONNULL((1, 2))][crtbuiltin]
-bcopy:(void const *src, void *dst, size_t num_bytes) {
+bcopy:(void const *src, void *dst, $size_t num_bytes) {
 	memmove(dst, src, num_bytes);
 }
 
 [guard][ATTR_NONNULL((1))][crtbuiltin][export_alias(__bzero)]
-bzero:(void *__restrict dst, size_t num_bytes) {
+bzero:(void *__restrict dst, $size_t num_bytes) {
 	memset(dst, 0, num_bytes);
 }
 
 [guard][ATTR_WUNUSED][ATTR_PURE][ATTR_NONNULL((1, 2))][crtbuiltin]
-bcmp:(void const *s1, void const *s2, size_t num_bytes) -> int = memcmp;
+bcmp:(void const *s1, void const *s2, $size_t num_bytes) -> int = memcmp;
 
 
 [guard][ATTR_NONNULL((1))][ATTR_WUNUSED][ATTR_PURE][crtbuiltin]

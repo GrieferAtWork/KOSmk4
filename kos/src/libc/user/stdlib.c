@@ -1931,6 +1931,11 @@ NOTHROW_NCX(LIBCCALL libc__beep)(unsigned int freq,
 }
 /*[[[end:_beep]]]*/
 
+/*[[[skip:malloc]]]*/
+/*[[[skip:free]]]*/
+/*[[[skip:calloc]]]*/
+/*[[[skip:realloc]]]*/
+
 /*[[[end:implementation]]]*/
 
 

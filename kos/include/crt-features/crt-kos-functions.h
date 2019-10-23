@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc1003acb */
+/* HASH CRC-32:0xff8ee651 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -595,8 +595,22 @@ __CRT_FUNCTION(fdopen,0,(),2,(fd_t,fd,char const *__restrict,modes),FILE *)
 __CRT_FUNCTION(fdopendir,0,(),1,(fd_t,fd),DIR *)
 __CRT_FUNCTION(fdreopen,0,(),3,(fd_t,fd,char const *__restrict,modes,FILE *__restrict,stream),FILE *)
 __CRT_FUNCTION(fdreopen_unlocked,0,(),3,(fd_t,fd,char const *__restrict,modes,FILE *__restrict,stream),FILE *)
+__CRT_FUNCTION(feclearexcept,0,(),1,(int,excepts),int)
+__CRT_FUNCTION(fedisableexcept,0,(),1,(int,excepts),int)
+__CRT_FUNCTION(feenableexcept,0,(),1,(int,excepts),int)
+__CRT_FUNCTION(fegetenv,0,(),1,(fenv_t *,envp),int)
+__CRT_FUNCTION(fegetexcept,0,(),0,(),int)
+__CRT_FUNCTION(fegetexceptflag,0,(),2,(fexcept_t *,flagp,int,excepts),int)
+__CRT_FUNCTION(fegetround,0,(),0,(),int)
+__CRT_FUNCTION(feholdexcept,0,(),1,(fenv_t *,envp),int)
 __CRT_FUNCTION(feof,0,(),1,(FILE *__restrict,stream),int)
+__CRT_FUNCTION(feraiseexcept,0,(),1,(int,excepts),int)
 __CRT_FUNCTION(ferror,0,(),1,(FILE *__restrict,stream),int)
+__CRT_FUNCTION(fesetenv,0,(),1,(fenv_t const *,envp),int)
+__CRT_FUNCTION(fesetexceptflag,0,(),2,(fexcept_t const *,flagp,int,excepts),int)
+__CRT_FUNCTION(fesetround,0,(),1,(int,rounding_direction),int)
+__CRT_FUNCTION(fetestexcept,0,(),1,(int,excepts),int)
+__CRT_FUNCTION(feupdateenv,0,(),1,(fenv_t const *,envp),int)
 __CRT_FUNCTION(fexecve,0,(),3,(fd_t,fd,__TARGV,,__TENVP,),int)
 __CRT_FUNCTION(fflush,0,(),1,(FILE *,stream),int)
 __CRT_FUNCTION(fflush_unlocked,0,(),1,(FILE *,stream),int)

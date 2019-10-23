@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x29dd7364 */
+/* HASH CRC-32:0xd3f3e027 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep___loca
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(isblank) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(isblank))(int __ch) {
-#line 330 "kos/src/libc/magic/ctype.c"
+#line 311 "kos/src/libc/magic/ctype.c"
 #if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
 #include <__hybrid/__byteorder.__h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__

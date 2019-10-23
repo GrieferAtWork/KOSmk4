@@ -19,8 +19,10 @@
 #ifndef _STDINT_H
 #define _STDINT_H 1
 
-#include "__stdinc.h"
-#if defined(_CXX_CSTDINT) && !defined(__CXX_SYSTEM_HEADER)
+#ifdef _CXX_STDONLY_CSTDINT
+#ifdef __CXX_SYSTEM_HEADER
+#undef _STDINT_H /* Allow the C-header to be re-included to import all std::-symbols into the global namespace. */
+#else /* __CXX_SYSTEM_HEADER */
 /* Import all symbols into the global namespace when re-including "stdint.h" after "cstdint" */
 #ifndef __intmax_t_defined
 #define __intmax_t_defined 1
@@ -80,7 +82,11 @@ __NAMESPACE_STD_USING(intptr_t)
 #define __uintptr_t_defined 1
 __NAMESPACE_STD_USING(uintptr_t)
 #endif /* !__uintptr_t_defined */
-#else /* _CXX_CSTDINT && !__CXX_SYSTEM_HEADER */
+#undef _CXX_STDONLY_CSTDINT
+#endif /* !__CXX_SYSTEM_HEADER */
+#else /* _CXX_STDONLY_CSTDINT */
+
+#include "__stdinc.h"
 #include <hybrid/limitcore.h>
 #include <hybrid/typecore.h>
 
@@ -96,17 +102,17 @@ typedef __UINTMAX_TYPE__ uintmax_t;
 
 #ifndef __std_int8_t_defined
 #define __std_int8_t_defined 1
-typedef __INT8_TYPE__ int8_t;
-typedef __INT16_TYPE__ int16_t;
-typedef __INT32_TYPE__ int32_t;
+typedef __INT8_TYPE__   int8_t;
+typedef __INT16_TYPE__  int16_t;
+typedef __INT32_TYPE__  int32_t;
 #ifdef __INT64_TYPE__
-typedef __INT64_TYPE__ int64_t;
+typedef __INT64_TYPE__  int64_t;
 #endif /* __INT64_TYPE__ */
 #endif /* !__std_int8_t_defined */
 
 #ifndef __std_uint8_t_defined
 #define __std_uint8_t_defined 1
-typedef __UINT8_TYPE__ uint8_t;
+typedef __UINT8_TYPE__  uint8_t;
 typedef __UINT16_TYPE__ uint16_t;
 typedef __UINT32_TYPE__ uint32_t;
 #ifdef __UINT64_TYPE__
@@ -128,24 +134,24 @@ typedef __UINT_LEAST64_TYPE__ uint_least64_t;
 
 #ifndef __std_int_fast8_t_defined
 #define __std_int_fast8_t_defined 1
-typedef __INT_FAST8_TYPE__   int_fast8_t;
-typedef __INT_FAST16_TYPE__  int_fast16_t;
-typedef __INT_FAST32_TYPE__  int_fast32_t;
-typedef __INT_FAST64_TYPE__  int_fast64_t;
-typedef __UINT_FAST8_TYPE__  uint_fast8_t;
-typedef __UINT_FAST16_TYPE__ uint_fast16_t;
-typedef __UINT_FAST32_TYPE__ uint_fast32_t;
-typedef __UINT_FAST64_TYPE__ uint_fast64_t;
+typedef __INT_FAST8_TYPE__    int_fast8_t;
+typedef __INT_FAST16_TYPE__   int_fast16_t;
+typedef __INT_FAST32_TYPE__   int_fast32_t;
+typedef __INT_FAST64_TYPE__   int_fast64_t;
+typedef __UINT_FAST8_TYPE__   uint_fast8_t;
+typedef __UINT_FAST16_TYPE__  uint_fast16_t;
+typedef __UINT_FAST32_TYPE__  uint_fast32_t;
+typedef __UINT_FAST64_TYPE__  uint_fast64_t;
 #endif /* !__std_int_fast8_t_defined */
 
 #ifndef __std_intptr_t_defined
 #define __std_intptr_t_defined 1
-typedef __INTPTR_TYPE__       intptr_t;
+typedef __INTPTR_TYPE__  intptr_t;
 #endif /* !__std_intptr_t_defined */
 
 #ifndef __std_uintptr_t_defined
 #define __std_uintptr_t_defined 1
-typedef __UINTPTR_TYPE__      uintptr_t;
+typedef __UINTPTR_TYPE__ uintptr_t;
 #endif /* !__std_uintptr_t_defined */
 
 __NAMESPACE_STD_END
@@ -281,7 +287,7 @@ __SYSDECL_END
 #   define UINT16_C(x)       __UINT16_C(x)
 #   define UINT32_C(x)       __UINT32_C(x)
 #   define UINT64_C(x)       __UINT64_C(x)
-#else
+#else /* __CC__ */
 #   define INTMAX_C(x)       x
 #   define UINTMAX_C(x)      x
 #   define INT8_C(x)         x
@@ -292,7 +298,11 @@ __SYSDECL_END
 #   define UINT16_C(x)       x
 #   define UINT32_C(x)       x
 #   define UINT64_C(x)       x
-#endif
+#endif /* !__CC__ */
 
-#endif /* !_CXX_CSTDINT || __CXX_SYSTEM_HEADER */
+#ifdef __CXX_SYSTEM_HEADER
+#define _CXX_STDONLY_CSTDINT 1
+#undef _STDINT_H
+#endif /* __CXX_SYSTEM_HEADER */
+#endif /* !_CXX_STDONLY_CSTDINT */
 #endif /* !_STDINT_H */

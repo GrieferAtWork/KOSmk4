@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x250d80d3 */
+/* HASH CRC-32:0x321499ad */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(bsearch_r))(void const *__pkey,
                                                        __SIZE_TYPE__ __item_size,
                                                        __compar_d_fn_t __cmp,
                                                        void *__arg) {
-#line 360 "kos/src/libc/magic/stdlib.c"
+#line 368 "kos/src/libc/magic/stdlib.c"
 	/* Optimize this function with the (allowed) assumption that `pbase' is sorted according to:
 	 * >> qsort_r(pbase, item_count, item_size, cmp, arg); */
 	__SIZE_TYPE__ __lo, __hi;

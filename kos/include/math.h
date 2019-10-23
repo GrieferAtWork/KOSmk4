@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb363673f */
+/* HASH CRC-32:0x86e82ed7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,8 +20,10 @@
 #ifndef _MATH_H
 #define _MATH_H 1
 
-#include <__stdinc.h>
-#if defined(_CXX_CMATH) && !defined(__CXX_SYSTEM_HEADER)
+#ifdef _CXX_STDONLY_CMATH
+#ifdef __CXX_SYSTEM_HEADER
+#undef _MATH_H /* Allow the C-header to be re-included to import all std::-symbols into the global namespace. */
+#else /* __CXX_SYSTEM_HEADER */
 /* Import all symbols into the global namespace when re-including "math.h" after "cmath" */
 #ifndef __NO_FPU
 #if !defined(__acos_defined) && defined(__std_acos_defined)
@@ -591,9 +593,48 @@ __NAMESPACE_STD_USING(fmal)
 __NAMESPACE_STD_USING(llrintl)
 #endif /* !__llrintl_defined && !__std_llrintl_defined */
 __NAMESPACE_STD_USING(llroundl)
+#ifdef __std_fpclassify_defined
+__NAMESPACE_STD_USING(fpclassify)
+#endif /* __std_fpclassify_defined */
+#ifdef __std_signbit_defined
+__NAMESPACE_STD_USING(signbit)
+#endif /* __std_signbit_defined */
+#ifdef __std_isnormal_defined
+__NAMESPACE_STD_USING(isnormal)
+#endif /* __std_isnormal_defined */
+#ifdef __std_isfinite_defined
+__NAMESPACE_STD_USING(isfinite)
+#endif /* __std_isfinite_defined */
+#ifdef __std_isnan_defined
+__NAMESPACE_STD_USING(isnan)
+#endif /* __std_isnan_defined */
+#ifdef __std_isinf_defined
+__NAMESPACE_STD_USING(isinf)
+#endif /* __std_isinf_defined */
+#ifdef __std_isunordered_defined
+__NAMESPACE_STD_USING(isunordered)
+#endif /* __std_isunordered_defined */
+#ifdef __std_isgreater_defined
+__NAMESPACE_STD_USING(isgreater)
+#endif /* __std_isgreater_defined */
+#ifdef __std_isgreaterequal_defined
+__NAMESPACE_STD_USING(isgreaterequal)
+#endif /* __std_isgreaterequal_defined */
+#ifdef __std_isless_defined
+__NAMESPACE_STD_USING(isless)
+#endif /* __std_isless_defined */
+#ifdef __std_islessequal_defined
+__NAMESPACE_STD_USING(islessequal)
+#endif /* __std_islessequal_defined */
+#ifdef __std_islessgreater_defined
+__NAMESPACE_STD_USING(islessgreater)
+#endif /* __std_islessgreater_defined */
 #endif /* !__NO_FPU */
-#else /* _CXX_CMATH && !__CXX_SYSTEM_HEADER */
-#include <__crt.h>
+#undef _CXX_STDONLY_CMATH
+#endif /* !__CXX_SYSTEM_HEADER */
+#else /* _CXX_STDONLY_CMATH */
+#include "__stdinc.h"
+#include "__crt.h"
 
 #ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
 #pragma GCC system_header
@@ -7346,7 +7387,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pow10l, __FORCELOCAL __ATTR_WUNUSED long double 
 #endif /* __USE_GNU */
 
 #ifdef __USE_MISC
-#if !defined(__cplusplus) || __cplusplus < 201103L /* isinf conflicts with C++11. */
+#if !defined(__cplusplus) || !defined(__CORRECT_ISO_CPP11_MATH_H_PROTO_FP) /* isinf conflicts with C++11. */
 #if __has_builtin(__builtin_isinf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isinf)
 /* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
 __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL isinf)(double __val) { return __builtin_isinf(__val); }
@@ -7361,7 +7402,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,isinf,(double __val),__isi
 /* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
 __NAMESPACE_LOCAL_USING_OR_IMPL(isinf, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL isinf)(double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isinf))(__val); })
 #endif /* isinf... */
-#endif
+#endif /* !__cplusplus || !__CORRECT_ISO_CPP11_MATH_H_PROTO_FP */
 #if __has_builtin(__builtin_isinff) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isinff)
 __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL isinff)(float __val) { return __builtin_isinff(__val); }
 #elif defined(__CRT_HAVE_isinff)
@@ -7522,7 +7563,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(significandl, __FORCELOCAL __ATTR_WUNUSED long d
 #endif /* __USE_MISC */
 
 #if defined(__USE_MISC) || (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K))
-#if !defined(__cplusplus) || __cplusplus < 201103L /* isnan conflicts with C++11. */
+#if !defined(__cplusplus) || !defined(__CORRECT_ISO_CPP11_MATH_H_PROTO_FP) /* isnan conflicts with C++11. */
 #if __has_builtin(__builtin_isnan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isnan)
 /* Return nonzero if VALUE is not a number */
 __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL isnan)(double __val) { return __builtin_isnan(__val); }
@@ -7540,7 +7581,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,isnan,(double __val),_isna
 /* Return nonzero if VALUE is not a number */
 __NAMESPACE_LOCAL_USING_OR_IMPL(isnan, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL isnan)(double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isnan))(__val); })
 #endif /* isnan... */
-#endif
+#endif /* !cplusplus || !__CORRECT_ISO_CPP11_MATH_H_PROTO_FP */
 #if __has_builtin(__builtin_isnanf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isnanf)
 __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL isnanf)(float __val) { return __builtin_isnanf(__val); }
 #elif defined(__CRT_HAVE_isnanf)
@@ -11181,36 +11222,36 @@ __LIBC int (signgam);
 
 #ifdef __COMPILER_HAVE_C11_GENERIC
 #ifdef __COMPILER_HAVE_LONGDOUBLE
-#define __FPFUNC(x, f, d, l)     _Generic(x, float: f(x), double: d(x), default: l(x))
-#define __FPFUNC2(x, y, f, d, l)  _Generic((x)+(y), float: f(x, y), double: d(x, y), default: l(x, y))
+#define __FPFUNC(x, f, d, l)      _Generic(x, float: f(x), double: d(x), default: l(x))
+#define __FPFUNC2(x, y, f, d, l)  _Generic((x) + (y), float: f(x, y), double: d(x, y), default: l(x, y))
 #else /* __COMPILER_HAVE_LONGDOUBLE */
-#define __FPFUNC(x, f, d, l)     _Generic(x, float: f(x), default: d(x))
-#define __FPFUNC2(x, y, f, d, l)  _Generic((x)+(y), float: f(x, y), default: d(x, y))
+#define __FPFUNC(x, f, d, l)      _Generic(x, float: f(x), default: d(x))
+#define __FPFUNC2(x, y, f, d, l)  _Generic((x) + (y), float: f(x, y), default: d(x, y))
 #endif /* !__COMPILER_HAVE_LONGDOUBLE */
 #elif !defined(__NO_builtin_choose_expr) && \
       !defined(__NO_builtin_types_compatible_p) && \
        defined(__COMPILER_HAVE_TYPEOF)
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #define __FPFUNC(x, f, d, l) \
-	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((x)+(float)0), float), f(x), \
-	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((x)+(double)0), double), d(x), l(x)))
+	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((x) + (float)0), float), f(x), \
+	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((x) + (double)0), double), d(x), l(x)))
 #define __FPFUNC2(x, y, f, d, l) \
-	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((x)+(y)+(float)0), float), f(x, y), \
-	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((x)+(y)+(double)0), double), d(x, y), l(x, y)))
+	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((x) + (y) + (float)0), float), f(x, y), \
+	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((x) + (y) + (double)0), double), d(x, y), l(x, y)))
 #else /* __COMPILER_HAVE_LONGDOUBLE */
 #define __FPFUNC(x, f, d, l) \
-	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((x)+(float)0), float), f(x), d(x))
+	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((x) + (float)0), float), f(x), d(x))
 #define __FPFUNC2(x, y, f, d, l) \
-	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((x)+(y)+(float)0), float), f(x, y), d(x, y))
+	__builtin_choose_expr(__builtin_types_compatible_p(__typeof__((x) + (y) + (float)0), float), f(x, y), d(x, y))
 #endif /* !__COMPILER_HAVE_LONGDOUBLE */
 #elif defined(__COMPILER_HAVE_LONGDOUBLE)
-#define __FPFUNC(x, f, d, l)     (sizeof((x)+(float)0) == sizeof(float) ? f((float)(x)) : \
-                                  sizeof((x)+(double)0) == sizeof(double) ? d((double)(x)) : l((long double)(x)))
-#define __FPFUNC2(x, y, f, d, l) (sizeof((x)+(y)+(float)0) == sizeof(float) ? f((float)(x), (float)(y)) : \
-                                  sizeof((x)+(y)+(double)0) == sizeof(double) ? d((double)(x), (double)(y)) : l((long double)(x), (long double)(y)))
+#define __FPFUNC(x, f, d, l)     (sizeof((x) + (float)0) == sizeof(float) ? f((float)(x)) : \
+                                  sizeof((x) + (double)0) == sizeof(double) ? d((double)(x)) : l((long double)(x)))
+#define __FPFUNC2(x, y, f, d, l) (sizeof((x) + (y) + (float)0) == sizeof(float) ? f((float)(x), (float)(y)) : \
+                                  sizeof((x) + (y) + (double)0) == sizeof(double) ? d((double)(x), (double)(y)) : l((long double)(x), (long double)(y)))
 #else
-#define __FPFUNC(x, f, d, l)     (sizeof((x)+(float)0) == sizeof(float) ? f((float)(x)) : d((double)(x)))
-#define __FPFUNC2(x, y, f, d, l) (sizeof((x)+(y)+(float)0) == sizeof(float) ? f((float)(x), (float)(y)) : d((double)(x), (double)(y)))
+#define __FPFUNC(x, f, d, l)     (sizeof((x) + (float)0) == sizeof(float) ? f((float)(x)) : d((double)(x)))
+#define __FPFUNC2(x, y, f, d, l) (sizeof((x) + (y) + (float)0) == sizeof(float) ? f((float)(x), (float)(y)) : d((double)(x), (double)(y)))
 #endif
 
 #ifdef __USE_ISOC99
@@ -11282,24 +11323,24 @@ enum {
     __has_builtin(__builtin_signbit) && \
     __has_builtin(__builtin_signbitl)
 #define signbit(x) __FPFUNC(x, __builtin_signbitf, __builtin_signbit, __builtin_signbitl)
-#endif
+#endif /* __builtin_signbitf && __builtin_signbit && __builtin_signbitl */
 #ifndef __SUPPORT_SNAN__
 #if __has_builtin(__builtin_fpclassify)
 #define fpclassify(x) __builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, x)
-#endif
+#endif /* __builtin_fpclassify */
 #if __has_builtin(__builtin_isfinite)
 #define isfinite(x)   __builtin_isfinite(x)
-#endif
+#endif /* __builtin_isfinite */
 #if __has_builtin(__builtin_isnormal)
 #define isnormal(x)   __builtin_isnormal(x)
-#endif
+#endif /* __builtin_isnormal */
 #if __has_builtin(__builtin_isnan)
 #define isnan(x)      __builtin_isnan(x)
-#endif
+#endif /* __builtin_isnan */
 #if __has_builtin(__builtin_isinf_sign)
 #define isinf(x)      __builtin_isinf_sign(x)
-#endif
-#endif
+#endif /* __builtin_isinf_sign */
+#endif /* !__SUPPORT_SNAN__ */
 #endif /* !__OPTIMIZE_SIZE__ */
 
 #ifndef fpclassify
@@ -11418,6 +11459,187 @@ enum {
 
 
 
+#if defined(__cplusplus) && defined(__CORRECT_ISO_CPP11_MATH_H_PROTO_FP)
+/* Libstdc++ headers need us to define these as functions when also
+ * defining `__CORRECT_ISO_CPP11_MATH_H_PROTO_FP', which we need to
+ * do in order to get it to stop re-declaring other functions such
+ * as `acosh'... *ugh* */
+__NAMESPACE_STD_BEGIN
+extern "C++" {
+#ifdef fpclassify
+#ifndef __std_fpclassify_defined
+#define __std_fpclassify_defined 1
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL fpclassify)(float __x) { return fpclassify(__x); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL fpclassify)(double __x) { return fpclassify(__x); }
+#ifdef __COMPILER_HAVE_LONGDOUBLE
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL fpclassify)(long double __x) { return fpclassify(__x); }
+#endif /* __COMPILER_HAVE_LONGDOUBLE */
+#endif /* !__std_fpclassify_defined */
+#undef fpclassify
+#endif /* fpclassify */
+#ifdef signbit
+#ifndef __std_signbit_defined
+#define __std_signbit_defined 1
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL signbit)(float __x) { return signbit(__x); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL signbit)(double __x) { return signbit(__x); }
+#ifdef __COMPILER_HAVE_LONGDOUBLE
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL signbit)(long double __x) { return signbit(__x); }
+#endif /* __COMPILER_HAVE_LONGDOUBLE */
+#endif /* !__std_signbit_defined */
+#undef signbit
+#endif /* signbit */
+#ifdef isnormal
+#ifndef __std_isnormal_defined
+#define __std_isnormal_defined 1
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isnormal)(float __x) { return isnormal(__x); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isnormal)(double __x) { return isnormal(__x); }
+#ifdef __COMPILER_HAVE_LONGDOUBLE
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isnormal)(long double __x) { return isnormal(__x); }
+#endif /* __COMPILER_HAVE_LONGDOUBLE */
+#endif /* !__std_isnormal_defined */
+#undef isnormal
+#endif /* isnormal */
+#ifdef isfinite
+#ifndef __std_isfinite_defined
+#define __std_isfinite_defined 1
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isfinite)(float __x) { return isfinite(__x); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isfinite)(double __x) { return isfinite(__x); }
+#ifdef __COMPILER_HAVE_LONGDOUBLE
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isfinite)(long double __x) { return isfinite(__x); }
+#endif /* __COMPILER_HAVE_LONGDOUBLE */
+#endif /* !__std_isfinite_defined */
+#undef isfinite
+#endif /* isfinite */
+#ifdef isnan
+#ifndef __std_isnan_defined
+#define __std_isnan_defined 1
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isnan)(float __x) { return isnan(__x); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isnan)(double __x) { return isnan(__x); }
+#ifdef __COMPILER_HAVE_LONGDOUBLE
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isnan)(long double __x) { return isnan(__x); }
+#endif /* __COMPILER_HAVE_LONGDOUBLE */
+#endif /* !__std_isnan_defined */
+#undef isnan
+#endif /* isnan */
+#ifdef isinf
+#ifndef __std_isinf_defined
+#define __std_isinf_defined 1
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isinf)(float __x) { return isinf(__x); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isinf)(double __x) { return isinf(__x); }
+#ifdef __COMPILER_HAVE_LONGDOUBLE
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isinf)(long double __x) { return isinf(__x); }
+#endif /* __COMPILER_HAVE_LONGDOUBLE */
+#endif /* !__std_isinf_defined */
+#undef isinf
+#endif /* isinf */
+#ifdef isunordered
+#ifndef __std_isunordered_defined
+#define __std_isunordered_defined 1
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isunordered)(float __x, float __y) { return isunordered(__x, __y); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isunordered)(double __x, double __y) { return isunordered(__x, __y); }
+#ifdef __COMPILER_HAVE_LONGDOUBLE
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isunordered)(long double __x, long double __y) { return isunordered(__x, __y); }
+#endif /* __COMPILER_HAVE_LONGDOUBLE */
+#endif /* !__std_isunordered_defined */
+#undef isunordered
+#endif /* isunordered */
+#ifdef isgreater
+#ifndef __std_isgreater_defined
+#define __std_isgreater_defined 1
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isgreater)(float __x, float __y) { return isgreater(__x, __y); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isgreater)(double __x, double __y) { return isgreater(__x, __y); }
+#ifdef __COMPILER_HAVE_LONGDOUBLE
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isgreater)(long double __x, long double __y) { return isgreater(__x, __y); }
+#endif /* __COMPILER_HAVE_LONGDOUBLE */
+#endif /* !__std_isgreater_defined */
+#undef isgreater
+#endif /* isgreater */
+#ifdef isgreaterequal
+#ifndef __std_isgreaterequal_defined
+#define __std_isgreaterequal_defined 1
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isgreaterequal)(float __x, float __y) { return isgreaterequal(__x, __y); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isgreaterequal)(double __x, double __y) { return isgreaterequal(__x, __y); }
+#ifdef __COMPILER_HAVE_LONGDOUBLE
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isgreaterequal)(long double __x, long double __y) { return isgreaterequal(__x, __y); }
+#endif /* __COMPILER_HAVE_LONGDOUBLE */
+#endif /* !__std_isgreaterequal_defined */
+#undef isgreaterequal
+#endif /* isgreaterequal */
+#ifdef isless
+#ifndef __std_isless_defined
+#define __std_isless_defined 1
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isless)(float __x, float __y) { return isless(__x, __y); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isless)(double __x, double __y) { return isless(__x, __y); }
+#ifdef __COMPILER_HAVE_LONGDOUBLE
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL isless)(long double __x, long double __y) { return isless(__x, __y); }
+#endif /* __COMPILER_HAVE_LONGDOUBLE */
+#endif /* !__std_isless_defined */
+#undef isless
+#endif /* isless */
+#ifdef islessequal
+#ifndef __std_islessequal_defined
+#define __std_islessequal_defined 1
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL islessequal)(float __x, float __y) { return islessequal(__x, __y); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL islessequal)(double __x, double __y) { return islessequal(__x, __y); }
+#ifdef __COMPILER_HAVE_LONGDOUBLE
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL islessequal)(long double __x, long double __y) { return islessequal(__x, __y); }
+#endif /* __COMPILER_HAVE_LONGDOUBLE */
+#endif /* !__std_islessequal_defined */
+#undef islessequal
+#endif /* islessequal */
+#ifdef islessgreater
+#ifndef __std_islessgreater_defined
+#define __std_islessgreater_defined 1
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL islessgreater)(float __x, float __y) { return islessgreater(__x, __y); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL islessgreater)(double __x, double __y) { return islessgreater(__x, __y); }
+#ifdef __COMPILER_HAVE_LONGDOUBLE
+__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL islessgreater)(long double __x, long double __y) { return islessgreater(__x, __y); }
+#endif /* __COMPILER_HAVE_LONGDOUBLE */
+#endif /* !__std_islessgreater_defined */
+#undef islessgreater
+#endif /* islessgreater */
+} /* extern "C++" */
+__NAMESPACE_STD_END
+#ifndef __CXX_SYSTEM_HEADER
+#ifdef __std_fpclassify_defined
+__NAMESPACE_STD_USING(fpclassify)
+#endif /* __std_fpclassify_defined */
+#ifdef __std_signbit_defined
+__NAMESPACE_STD_USING(signbit)
+#endif /* __std_signbit_defined */
+#ifdef __std_isnormal_defined
+__NAMESPACE_STD_USING(isnormal)
+#endif /* __std_isnormal_defined */
+#ifdef __std_isfinite_defined
+__NAMESPACE_STD_USING(isfinite)
+#endif /* __std_isfinite_defined */
+#ifdef __std_isnan_defined
+__NAMESPACE_STD_USING(isnan)
+#endif /* __std_isnan_defined */
+#ifdef __std_isinf_defined
+__NAMESPACE_STD_USING(isinf)
+#endif /* __std_isinf_defined */
+#ifdef __std_isunordered_defined
+__NAMESPACE_STD_USING(isunordered)
+#endif /* __std_isunordered_defined */
+#ifdef __std_isgreater_defined
+__NAMESPACE_STD_USING(isgreater)
+#endif /* __std_isgreater_defined */
+#ifdef __std_isgreaterequal_defined
+__NAMESPACE_STD_USING(isgreaterequal)
+#endif /* __std_isgreaterequal_defined */
+#ifdef __std_isless_defined
+__NAMESPACE_STD_USING(isless)
+#endif /* __std_isless_defined */
+#ifdef __std_islessequal_defined
+__NAMESPACE_STD_USING(islessequal)
+#endif /* __std_islessequal_defined */
+#ifdef __std_islessgreater_defined
+__NAMESPACE_STD_USING(islessgreater)
+#endif /* __std_islessgreater_defined */
+#endif /* !__CXX_SYSTEM_HEADER */
+#endif /* __cplusplus && __CORRECT_ISO_CPP11_MATH_H_PROTO_FP */
+
 /* Bitmasks for the math_errhandling macro. */
 #define MATH_ERRNO     1 /* errno set by math functions. */
 #define MATH_ERREXCEPT 2 /* Exceptions raised by math functions. */
@@ -11425,8 +11647,8 @@ enum {
 /* By default all functions support both errno and exception handling.
  * In gcc's fast math mode and if inline functions are defined this might not be true. */
 #ifndef __FAST_MATH__
-#define math_errhandling    (MATH_ERRNO|MATH_ERREXCEPT)
-#endif
+#define math_errhandling (MATH_ERRNO | MATH_ERREXCEPT)
+#endif /* !__FAST_MATH__ */
 #endif /* __USE_ISOC99 */
 
 
@@ -11514,9 +11736,9 @@ struct exception
 
 #ifdef __CRT_HAVE_matherr
 #ifdef __cplusplus
-__CDECLARE(, int, __NOTHROW, matherr, (struct __exception *__exc), (__exc))
+__CDECLARE(,int,__NOTHROW,matherr,(struct __exception *__exc),(__exc))
 #else /* __cplusplus */
-__CDECLARE(, int, __NOTHROW, matherr, (struct exception *__exc), (__exc))
+__CDECLARE(,int,__NOTHROW,matherr,(struct exception *__exc),(__exc))
 #ifdef __COMPILER_HAVE_PRAGMA_PUSHMACRO
 #pragma pop_macro("exception")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
@@ -11548,5 +11770,9 @@ __CDECLARE(, int, __NOTHROW, matherr, (struct exception *__exc), (__exc))
 __SYSDECL_END
 
 #endif /* !__NO_FPU */
-#endif /* !_CXX_CMATH || __CXX_SYSTEM_HEADER */
+#ifdef __CXX_SYSTEM_HEADER
+#define _CXX_STDONLY_CMATH 1
+#undef _MATH_H
+#endif /* __CXX_SYSTEM_HEADER */
+#endif /* !_CXX_STDONLY_CMATH */
 #endif /* !_MATH_H */

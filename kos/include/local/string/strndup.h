@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6d9a3378 */
+/* HASH CRC-32:0x71415e61 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHR
 #endif /* strnlen... */
 #endif /* !____localdep_strnlen_defined */
 
-/* Dependency: "malloc" from "malloc" */
+/* Dependency: "malloc" from "stdlib" */
 #ifndef ____localdep_malloc_defined
 #define ____localdep_malloc_defined 1
 #ifdef __std___localdep_malloc_defined
@@ -49,7 +49,7 @@ __FORCELOCAL __ATTR_WUNUSED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_MALLOC __ATTR_ALL
 #elif defined(__CRT_HAVE_malloc)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_MALLOC __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,__localdep_malloc,(__SIZE_TYPE__ __n_bytes),malloc,(__n_bytes))
 #elif (defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc))
-#include <local/malloc/malloc.h>
+#include <local/stdlib/malloc.h>
 #define __localdep_malloc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(malloc))
 #else /* CUSTOM: malloc */
 #undef ____localdep_malloc_defined

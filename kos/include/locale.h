@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x73b32046 */
+/* HASH CRC-32:0xd83cc3da */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,8 +20,10 @@
 #ifndef _LOCALE_H
 #define _LOCALE_H 1
 
-#include <__stdinc.h>
-#if defined(_CXX_CLOCALE) && !defined(__CXX_SYSTEM_HEADER)
+#ifdef _CXX_STDONLY_CLOCALE
+#ifdef __CXX_SYSTEM_HEADER
+#undef _LOCALE_H /* Allow the C-header to be re-included to import all std::-symbols into the global namespace. */
+#else /* __CXX_SYSTEM_HEADER */
 /* Import all symbols into the global namespace when re-including "locale.h" after "clocale" */
 #ifndef __lconv_defined
 #define __lconv_defined 1
@@ -35,8 +37,11 @@ __NAMESPACE_STD_USING(setlocale)
 #define __localeconv_defined 1
 __NAMESPACE_STD_USING(localeconv)
 #endif /* !__localeconv_defined && !__std_localeconv_defined */
-#else /* _CXX_CLOCALE && !__CXX_SYSTEM_HEADER */
-#include <__crt.h>
+#undef _CXX_STDONLY_CLOCALE
+#endif /* !__CXX_SYSTEM_HEADER */
+#else /* _CXX_STDONLY_CLOCALE */
+#include "__stdinc.h"
+#include "__crt.h"
 
 #ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER
 #pragma GCC system_header
@@ -372,5 +377,9 @@ __CREDIRECT(,__locale_t,__NOTHROW_NCX,uselocale,(__locale_t __dataset),__useloca
 
 __SYSDECL_END
 
-#endif /* !_CXX_CLOCALE || __CXX_SYSTEM_HEADER */
+#ifdef __CXX_SYSTEM_HEADER
+#define _CXX_STDONLY_CLOCALE 1
+#undef _LOCALE_H
+#endif /* __CXX_SYSTEM_HEADER */
+#endif /* !_CXX_STDONLY_CLOCALE */
 #endif /* !_LOCALE_H */

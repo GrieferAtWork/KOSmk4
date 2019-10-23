@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x47a8aa4a */
+/* HASH CRC-32:0x34f3f2f0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,7 +36,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(towlower_l) __ATTR_WUNUSED __ATTR_PURE __WINT_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(towlower_l))(__WINT_TYPE__ __wc,
                                                         __locale_t __locale) {
-#line 303 "kos/src/libc/magic/wctype.c"
+#line 304 "kos/src/libc/magic/wctype.c"
 	(void)__locale;
 	return __localdep_towlower(__wc);
 }

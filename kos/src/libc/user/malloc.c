@@ -34,12 +34,8 @@ DECL_BEGIN
 /*[[[skip:valloc]]]*/
 /*[[[skip:realloc_in_place]]]*/
 /*[[[skip:posix_memalign]]]*/
-/*[[[skip:malloc]]]*/
-/*[[[skip:free]]]*/
 /*[[[skip:memalign]]]*/
-/*[[[skip:calloc]]]*/
 /*[[[skip:pvalloc]]]*/
-/*[[[skip:realloc]]]*/
 /*[[[skip:malloc_usable_size]]]*/
 /*[[[skip:cfree]]]*/
 

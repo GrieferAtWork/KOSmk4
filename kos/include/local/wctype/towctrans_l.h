@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25a28bef */
+/* HASH CRC-32:0x7f824beb */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,9 +25,9 @@
 #ifdef __std___localdep_towctrans_defined
 __NAMESPACE_STD_USING(__localdep_towctrans)
 #elif defined(__CRT_HAVE_towctrans)
-__CREDIRECT(__ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towctrans,(__WINT_TYPE__ __wc, wctrans_t __desc),towctrans,(__wc,__desc))
+__CREDIRECT(__ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towctrans,(__WINT_TYPE__ __wc, __wctrans_t __desc),towctrans,(__wc,__desc))
 #elif defined(__CRT_HAVE___towctrans)
-__CREDIRECT(__ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towctrans,(__WINT_TYPE__ __wc, wctrans_t __desc),__towctrans,(__wc,__desc))
+__CREDIRECT(__ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towctrans,(__WINT_TYPE__ __wc, __wctrans_t __desc),__towctrans,(__wc,__desc))
 #else /* LIBC: towctrans */
 #include <local/wctype/towctrans.h>
 #define __localdep_towctrans (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(towctrans))
@@ -37,9 +37,9 @@ __CREDIRECT(__ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towctrans,(__W
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(towctrans_l) __ATTR_WUNUSED __WINT_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(towctrans_l))(__WINT_TYPE__ __wc,
-                                                         wctrans_t __desc,
+                                                         __wctrans_t __desc,
                                                          __locale_t __locale) {
-#line 322 "kos/src/libc/magic/wctype.c"
+#line 323 "kos/src/libc/magic/wctype.c"
 	(void)__locale;
 	return __localdep_towctrans(__wc, __desc);
 }

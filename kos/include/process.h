@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6405a9f */
+/* HASH CRC-32:0x774f0326 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,8 +20,8 @@
 #ifndef _PROCESS_H
 #define _PROCESS_H 1
 
-#include <__stdinc.h>
-#include <__crt.h>
+#include "__stdinc.h"
+#include "__crt.h"
 #include <kos/anno.h>
 
 #ifdef __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER

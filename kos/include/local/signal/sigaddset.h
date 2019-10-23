@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfba1ca1d */
+/* HASH CRC-32:0xe64a5ba3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(sigaddset) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sigaddset))(struct __sigset_struct *__set,
                                                        int __signo) {
-#line 238 "kos/src/libc/magic/signal.c"
+#line 253 "kos/src/libc/magic/signal.c"
 	__ULONGPTR_TYPE__ __mask = __sigmask(__signo);
 	__ULONGPTR_TYPE__ __word = __sigword(__signo);
 	__set->__val[__word] |= __mask;

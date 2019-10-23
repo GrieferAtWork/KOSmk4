@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x82d32cc3 */
+/* HASH CRC-32:0xbf50d95 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -67,7 +67,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(clock_gettime))(__clockid_t __clock_i
 		__tp->tv_nsec = __res32.tv_nsec;
 	}
 	return __result;
-#else
+#else /* __CRT_HAVE_clock_gettime */
 	int __result;
 	struct __timespec64 __res64;
 	__result = __localdep_clock_gettime64(__clock_id, &__res64);
@@ -76,7 +76,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(clock_gettime))(__clockid_t __clock_i
 		__tp->tv_nsec = __res64.tv_nsec;
 	}
 	return __result;
-#endif
+#endif /* !__CRT_HAVE_clock_gettime */
 }
 __NAMESPACE_LOCAL_END
 #endif /* (defined(__CRT_HAVE_clock_gettime) || defined(__CRT_HAVE_clock_gettime64)) */

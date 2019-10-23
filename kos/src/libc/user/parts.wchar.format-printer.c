@@ -23,6 +23,7 @@
 #include "parts.wchar.format-printer.h"
 #include "malloc.h"
 #include "string.h"
+#include "stdlib.h"
 #include <string.h>
 
 DECL_BEGIN
