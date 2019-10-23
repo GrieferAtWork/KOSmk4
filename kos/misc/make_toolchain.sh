@@ -519,7 +519,7 @@ if ! [ -f "$PREFIX/$TARGET/lib/libstdc++.so.$LIBSTDCXX_VERSION_FULL" ]; then
 	# having had its headers installed, we must manually backup the arch-specific
 	# portion of the existing libstdc++ installation, as the make process might
 	# otherwise interfere with it. (We do however restore it later...)
-	local OTHER_TOOLCHAIN=""
+	OTHER_TOOLCHAIN=""
 	if [ $TARGET_NAME == "i386" ] || [ $TARGET_NAME == "x86_64" ]; then
 		if [ $TARGET_NAME == "i386" ]; then
 			OTHER_TOOLCHAIN="x86_64-kos"
@@ -538,6 +538,8 @@ if ! [ -f "$PREFIX/$TARGET/lib/libstdc++.so.$LIBSTDCXX_VERSION_FULL" ]; then
 	echo "    Making libc.so and libm.so for $GCC_VERSION:libstdc++"
 	cmd cd "$KOS_ROOT"
 	cmd deemon "magic.dee" \
+		--gen="bin/$NAME-$KOS_CONFIG_FOR_LINKING/lib/crt0.o" \
+		--gen="bin/$NAME-$KOS_CONFIG_FOR_LINKING/lib/crt0S.o" \
 		--gen="bin/$NAME-$KOS_CONFIG_FOR_LINKING/lib/libc.so" \
 		--gen="bin/$NAME-$KOS_CONFIG_FOR_LINKING/lib/libm.so" \
 		--target="$TARGET_NAME" \
