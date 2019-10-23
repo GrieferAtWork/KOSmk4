@@ -558,16 +558,23 @@ if ! [ -f "$PREFIX/$TARGET/lib/libstdc++.so.$LIBSTDCXX_VERSION_FULL" ] || \
 		# the fact that KOS's system headers already define c++ functions, and
 		# already place all of the required function prototypes into the `std'
 		# namespace
+		# e.g.: libstdc++ does understand `__CORRECT_ISO_CPP_STRING_H_PROTO',
+		#       but doesn't understand us defining the c++ math functions
+		#       for `isnan()', `isinf()', etc.
 		# To fix this, delete libstdc++'s problematic headers and replace then
-		# symlinks to KOS's (actually working ~wow!~) headers.
+		# with symlinks to KOS's (actually working ~wow!~) headers.
 		# Sadly, we can only do this once the make already failed once, since
-		# the headers only get created for the first time by said make command!
+		# the framework surrounding those headers only gets created by said
+		# make command!
+		# Even more importantly, libstdc++ need `__USE_BROKEN_CCOMPAT' (s.a. <features.h>)
 
 		# $1: header name (e.g. `stdlib')
 		use_real_header() {
+			echo "    Link real header for '$PREFIX/gcc/$TARGET/libstdc++-v3/include/c$1'"
 			unlink "$PREFIX/gcc/$TARGET/libstdc++-v3/include/c$1" > /dev/null 2>&1
-			unlink "$PREFIX/gcc/$TARGET/libstdc++-v3/include/$1.h" > /dev/null 2>&1
 			cmd ln -s "$KOS_ROOT/kos/include/c$1" "$PREFIX/gcc/$TARGET/libstdc++-v3/include/c$1"
+			echo "    Link real header for '$PREFIX/gcc/$TARGET/libstdc++-v3/include/$1.h'"
+			unlink "$PREFIX/gcc/$TARGET/libstdc++-v3/include/$1.h" > /dev/null 2>&1
 			cmd ln -s "$KOS_ROOT/kos/include/$1.h" "$PREFIX/gcc/$TARGET/libstdc++-v3/include/$1.h"
 		}
 		echo "Fixup libstdc++ build-time headers"

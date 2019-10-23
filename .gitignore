@@ -12,6 +12,7 @@
 /qemu-events
 /asm.S
 /kos/include/i386-kos/c++
+/kos/include/i386-kos/c++-backup-*
 __ice__
 *.dec
 *.latest
