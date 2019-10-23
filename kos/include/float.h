@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb931d5e3 */
+/* HASH CRC-32:0xf409b874 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -387,15 +387,15 @@ __CDECLARE_VOID(,__NOTHROW_NCX,fpreset,(void),())
 __CREDIRECT_VOID(,__NOTHROW_NCX,fpreset,(void),_fpreset,())
 #endif /* fpreset... */
 
-#define clear87            _clear87
-#define status87           _status87
-#define control87          _control87
+#define clear87   _clear87
+#define status87  _status87
+#define control87 _control87
 #endif /* __CC__ */
 
-#define DBL_RADIX          _DBL_RADIX
-#define DBL_ROUNDS         _DBL_ROUNDS
-#define LDBL_RADIX         _LDBL_RADIX
-#define LDBL_ROUNDS        _LDBL_ROUNDS
+#define DBL_RADIX          FLT_RADIX
+#define DBL_ROUNDS         FLT_ROUNDS
+#define LDBL_RADIX         FLT_RADIX
+#define LDBL_ROUNDS        FLT_ROUNDS
 #define EM_AMBIGUIOUS      _EM_AMBIGUOUS
 #define EM_AMBIGUOUS       _EM_AMBIGUOUS
 #define MCW_EM             _MCW_EM
