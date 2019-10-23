@@ -7008,6 +7008,17 @@ diff -Naur gcc-9.1.0-orig/libstdc++-v3/include/Makefile.in gcc-9.1.0/libstdc++-v
  sbindir = @sbindir@
  sharedstatedir = @sharedstatedir@
  srcdir = @srcdir@
+diff -Naur gcc-9.1.0-orig/libstdc++-v3/include/ext/ropeimpl.h gcc-9.1.0/libstdc++-v3/include/ext/ropeimpl.h
+--- gcc-9.1.0-orig/libstdc++-v3/include/ext/ropeimpl.h	2019-01-01 13:31:55.000000000 +0100
++++ gcc-9.1.0/libstdc++-v3/include/ext/ropeimpl.h	2019-10-23 17:35:49.739070600 +0200
+@@ -53,6 +53,7 @@
+ _GLIBCXX_BEGIN_NAMESPACE_VERSION
+ 
+   using std::size_t;
++  using std::putchar;
+   using std::printf;
+   using std::basic_ostream;
+   using std::__throw_length_error;
 diff -Naur gcc-9.1.0-orig/libstdc++-v3/include/tr1/cctype gcc-9.1.0/libstdc++-v3/include/tr1/cctype
 --- gcc-9.1.0-orig/libstdc++-v3/include/tr1/cctype	2019-01-01 13:31:55.000000000 +0100
 +++ gcc-9.1.0/libstdc++-v3/include/tr1/cctype	2019-10-23 16:20:26.279899600 +0200
