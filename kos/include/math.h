@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x86e82ed7 */
+/* HASH CRC-32:0xef1fa75a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -82,6 +82,7 @@ __NAMESPACE_STD_USING(sinf)
 #define __tanf_defined 1
 __NAMESPACE_STD_USING(tanf)
 #endif /* !__tanf_defined && !__std_tanf_defined */
+#ifdef __COMPILER_HAVE_LONGDOUBLE
 #if !defined(__acosl_defined) && defined(__std_acosl_defined)
 #define __acosl_defined 1
 __NAMESPACE_STD_USING(acosl)
@@ -110,6 +111,7 @@ __NAMESPACE_STD_USING(sinl)
 #define __tanl_defined 1
 __NAMESPACE_STD_USING(tanl)
 #endif /* !__tanl_defined && !__std_tanl_defined */
+#endif /* __COMPILER_HAVE_LONGDOUBLE */
 #if !defined(__cosh_defined) && defined(__std_cosh_defined)
 #define __cosh_defined 1
 __NAMESPACE_STD_USING(cosh)
@@ -134,6 +136,7 @@ __NAMESPACE_STD_USING(sinhf)
 #define __tanhf_defined 1
 __NAMESPACE_STD_USING(tanhf)
 #endif /* !__tanhf_defined && !__std_tanhf_defined */
+#ifdef __COMPILER_HAVE_LONGDOUBLE
 #if !defined(__coshl_defined) && defined(__std_coshl_defined)
 #define __coshl_defined 1
 __NAMESPACE_STD_USING(coshl)
@@ -146,6 +149,8 @@ __NAMESPACE_STD_USING(sinhl)
 #define __tanhl_defined 1
 __NAMESPACE_STD_USING(tanhl)
 #endif /* !__tanhl_defined && !__std_tanhl_defined */
+#endif /* __COMPILER_HAVE_LONGDOUBLE */
+#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
 #if !defined(__acosh_defined) && defined(__std_acosh_defined)
 #define __acosh_defined 1
 __NAMESPACE_STD_USING(acosh)
@@ -170,6 +175,7 @@ __NAMESPACE_STD_USING(asinhf)
 #define __atanhf_defined 1
 __NAMESPACE_STD_USING(atanhf)
 #endif /* !__atanhf_defined && !__std_atanhf_defined */
+#ifdef __COMPILER_HAVE_LONGDOUBLE
 #if !defined(__acoshl_defined) && defined(__std_acoshl_defined)
 #define __acoshl_defined 1
 __NAMESPACE_STD_USING(acoshl)
@@ -182,6 +188,8 @@ __NAMESPACE_STD_USING(asinhl)
 #define __atanhl_defined 1
 __NAMESPACE_STD_USING(atanhl)
 #endif /* !__atanhl_defined && !__std_atanhl_defined */
+#endif /* __COMPILER_HAVE_LONGDOUBLE */
+#endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
 #if !defined(__exp_defined) && defined(__std_exp_defined)
 #define __exp_defined 1
 __NAMESPACE_STD_USING(exp)
@@ -230,6 +238,7 @@ __NAMESPACE_STD_USING(log10f)
 #define __modff_defined 1
 __NAMESPACE_STD_USING(modff)
 #endif /* !__modff_defined && !__std_modff_defined */
+#ifdef __COMPILER_HAVE_LONGDOUBLE
 #if !defined(__expl_defined) && defined(__std_expl_defined)
 #define __expl_defined 1
 __NAMESPACE_STD_USING(expl)
@@ -254,6 +263,8 @@ __NAMESPACE_STD_USING(log10l)
 #define __modfl_defined 1
 __NAMESPACE_STD_USING(modfl)
 #endif /* !__modfl_defined && !__std_modfl_defined */
+#endif /* __COMPILER_HAVE_LONGDOUBLE */
+#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
 #if !defined(__expm1_defined) && defined(__std_expm1_defined)
 #define __expm1_defined 1
 __NAMESPACE_STD_USING(expm1)
@@ -278,6 +289,7 @@ __NAMESPACE_STD_USING(log1pf)
 #define __logbf_defined 1
 __NAMESPACE_STD_USING(logbf)
 #endif /* !__logbf_defined && !__std_logbf_defined */
+#ifdef __COMPILER_HAVE_LONGDOUBLE
 #if !defined(__expm1l_defined) && defined(__std_expm1l_defined)
 #define __expm1l_defined 1
 __NAMESPACE_STD_USING(expm1l)
@@ -290,6 +302,9 @@ __NAMESPACE_STD_USING(log1pl)
 #define __logbl_defined 1
 __NAMESPACE_STD_USING(logbl)
 #endif /* !__logbl_defined && !__std_logbl_defined */
+#endif /* __COMPILER_HAVE_LONGDOUBLE */
+#endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
+#ifdef __USE_ISOC99
 #if !defined(__exp2_defined) && defined(__std_exp2_defined)
 #define __exp2_defined 1
 __NAMESPACE_STD_USING(exp2)
@@ -306,6 +321,7 @@ __NAMESPACE_STD_USING(exp2f)
 #define __log2f_defined 1
 __NAMESPACE_STD_USING(log2f)
 #endif /* !__log2f_defined && !__std_log2f_defined */
+#ifdef __COMPILER_HAVE_LONGDOUBLE
 #if !defined(__exp2l_defined) && defined(__std_exp2l_defined)
 #define __exp2l_defined 1
 __NAMESPACE_STD_USING(exp2l)
@@ -314,6 +330,8 @@ __NAMESPACE_STD_USING(exp2l)
 #define __log2l_defined 1
 __NAMESPACE_STD_USING(log2l)
 #endif /* !__log2l_defined && !__std_log2l_defined */
+#endif /* __COMPILER_HAVE_LONGDOUBLE */
+#endif /* __USE_ISOC99 */
 #if !defined(__pow_defined) && defined(__std_pow_defined)
 #define __pow_defined 1
 __NAMESPACE_STD_USING(pow)
@@ -330,6 +348,7 @@ __NAMESPACE_STD_USING(powf)
 #define __sqrtf_defined 1
 __NAMESPACE_STD_USING(sqrtf)
 #endif /* !__sqrtf_defined && !__std_sqrtf_defined */
+#ifdef __COMPILER_HAVE_LONGDOUBLE
 #if !defined(__powl_defined) && defined(__std_powl_defined)
 #define __powl_defined 1
 __NAMESPACE_STD_USING(powl)
@@ -338,6 +357,8 @@ __NAMESPACE_STD_USING(powl)
 #define __sqrtl_defined 1
 __NAMESPACE_STD_USING(sqrtl)
 #endif /* !__sqrtl_defined && !__std_sqrtl_defined */
+#endif /* __COMPILER_HAVE_LONGDOUBLE */
+#if defined(__USE_XOPEN) || defined(__USE_ISOC99)
 #if !defined(__hypot_defined) && defined(__std_hypot_defined)
 #define __hypot_defined 1
 __NAMESPACE_STD_USING(hypot)
@@ -346,10 +367,14 @@ __NAMESPACE_STD_USING(hypot)
 #define __hypotf_defined 1
 __NAMESPACE_STD_USING(hypotf)
 #endif /* !__hypotf_defined && !__std_hypotf_defined */
+#ifdef __COMPILER_HAVE_LONGDOUBLE
 #if !defined(__hypotl_defined) && defined(__std_hypotl_defined)
 #define __hypotl_defined 1
 __NAMESPACE_STD_USING(hypotl)
 #endif /* !__hypotl_defined && !__std_hypotl_defined */
+#endif /* __COMPILER_HAVE_LONGDOUBLE */
+#endif /* __USE_XOPEN || __USE_ISOC99 */
+#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
 #if !defined(__cbrt_defined) && defined(__std_cbrt_defined)
 #define __cbrt_defined 1
 __NAMESPACE_STD_USING(cbrt)
@@ -358,10 +383,13 @@ __NAMESPACE_STD_USING(cbrt)
 #define __cbrtf_defined 1
 __NAMESPACE_STD_USING(cbrtf)
 #endif /* !__cbrtf_defined && !__std_cbrtf_defined */
+#ifdef __COMPILER_HAVE_LONGDOUBLE
 #if !defined(__cbrtl_defined) && defined(__std_cbrtl_defined)
 #define __cbrtl_defined 1
 __NAMESPACE_STD_USING(cbrtl)
 #endif /* !__cbrtl_defined && !__std_cbrtl_defined */
+#endif /* __COMPILER_HAVE_LONGDOUBLE */
+#endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
 __NAMESPACE_STD_USING(ceil)
 __NAMESPACE_STD_USING(fabs)
 __NAMESPACE_STD_USING(floor)
@@ -376,6 +404,7 @@ __NAMESPACE_STD_USING(floorf)
 #define __fmodf_defined 1
 __NAMESPACE_STD_USING(fmodf)
 #endif /* !__fmodf_defined && !__std_fmodf_defined */
+#ifdef __COMPILER_HAVE_LONGDOUBLE
 __NAMESPACE_STD_USING(ceill)
 __NAMESPACE_STD_USING(fabsl)
 __NAMESPACE_STD_USING(floorl)
@@ -383,12 +412,18 @@ __NAMESPACE_STD_USING(floorl)
 #define __fmodl_defined 1
 __NAMESPACE_STD_USING(fmodl)
 #endif /* !__fmodl_defined && !__std_fmodl_defined */
+#endif /* __COMPILER_HAVE_LONGDOUBLE */
+#ifdef __USE_ISOC99
 __NAMESPACE_STD_USING(copysign)
 __NAMESPACE_STD_USING(nan)
 __NAMESPACE_STD_USING(copysignf)
 __NAMESPACE_STD_USING(nanf)
+#ifdef __COMPILER_HAVE_LONGDOUBLE
 __NAMESPACE_STD_USING(copysignl)
 __NAMESPACE_STD_USING(nanl)
+#endif /* __COMPILER_HAVE_LONGDOUBLE */
+#endif /* __USE_ISOC99 */
+#if defined(__USE_XOPEN) || defined(__USE_ISOC99)
 #if !defined(__erf_defined) && defined(__std_erf_defined)
 #define __erf_defined 1
 __NAMESPACE_STD_USING(erf)
@@ -413,6 +448,7 @@ __NAMESPACE_STD_USING(erfcf)
 #define __lgammaf_defined 1
 __NAMESPACE_STD_USING(lgammaf)
 #endif /* !__lgammaf_defined && !__std_lgammaf_defined */
+#ifdef __COMPILER_HAVE_LONGDOUBLE
 #if !defined(__erfl_defined) && defined(__std_erfl_defined)
 #define __erfl_defined 1
 __NAMESPACE_STD_USING(erfl)
@@ -425,6 +461,9 @@ __NAMESPACE_STD_USING(erfcl)
 #define __lgammal_defined 1
 __NAMESPACE_STD_USING(lgammal)
 #endif /* !__lgammal_defined && !__std_lgammal_defined */
+#endif /* __COMPILER_HAVE_LONGDOUBLE */
+#endif /* __USE_XOPEN || __USE_ISOC99 */
+#ifdef __USE_ISOC99
 #if !defined(__tgamma_defined) && defined(__std_tgamma_defined)
 #define __tgamma_defined 1
 __NAMESPACE_STD_USING(tgamma)
@@ -433,10 +472,14 @@ __NAMESPACE_STD_USING(tgamma)
 #define __tgammaf_defined 1
 __NAMESPACE_STD_USING(tgammaf)
 #endif /* !__tgammaf_defined && !__std_tgammaf_defined */
+#ifdef __COMPILER_HAVE_LONGDOUBLE
 #if !defined(__tgammal_defined) && defined(__std_tgammal_defined)
 #define __tgammal_defined 1
 __NAMESPACE_STD_USING(tgammal)
 #endif /* !__tgammal_defined && !__std_tgammal_defined */
+#endif /* __COMPILER_HAVE_LONGDOUBLE */
+#endif /* __USE_ISOC99 */
+#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
 #if !defined(__rint_defined) && defined(__std_rint_defined)
 #define __rint_defined 1
 __NAMESPACE_STD_USING(rint)
@@ -469,6 +512,7 @@ __NAMESPACE_STD_USING(remainderf)
 #define __ilogbf_defined 1
 __NAMESPACE_STD_USING(ilogbf)
 #endif /* !__ilogbf_defined && !__std_ilogbf_defined */
+#ifdef __COMPILER_HAVE_LONGDOUBLE
 #if !defined(__rintl_defined) && defined(__std_rintl_defined)
 #define __rintl_defined 1
 __NAMESPACE_STD_USING(rintl)
@@ -485,6 +529,9 @@ __NAMESPACE_STD_USING(remainderl)
 #define __ilogbl_defined 1
 __NAMESPACE_STD_USING(ilogbl)
 #endif /* !__ilogbl_defined && !__std_ilogbl_defined */
+#endif /* __COMPILER_HAVE_LONGDOUBLE */
+#endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
+#ifdef __USE_ISOC99
 #if !defined(__nexttoward_defined) && defined(__std_nexttoward_defined)
 #define __nexttoward_defined 1
 __NAMESPACE_STD_USING(nexttoward)
@@ -516,11 +563,13 @@ __NAMESPACE_STD_USING(fdim)
 __NAMESPACE_STD_USING(fmax)
 __NAMESPACE_STD_USING(fmin)
 __NAMESPACE_STD_USING(fma)
+#ifdef __COMPILER_HAVE_LONGLONG
 #if !defined(__llrint_defined) && defined(__std_llrint_defined)
 #define __llrint_defined 1
 __NAMESPACE_STD_USING(llrint)
 #endif /* !__llrint_defined && !__std_llrint_defined */
 __NAMESPACE_STD_USING(llround)
+#endif /* __COMPILER_HAVE_LONGLONG */
 #if !defined(__nexttowardf_defined) && defined(__std_nexttowardf_defined)
 #define __nexttowardf_defined 1
 __NAMESPACE_STD_USING(nexttowardf)
@@ -552,11 +601,14 @@ __NAMESPACE_STD_USING(fdimf)
 __NAMESPACE_STD_USING(fmaxf)
 __NAMESPACE_STD_USING(fminf)
 __NAMESPACE_STD_USING(fmaf)
+#ifdef __COMPILER_HAVE_LONGLONG
 #if !defined(__llrintf_defined) && defined(__std_llrintf_defined)
 #define __llrintf_defined 1
 __NAMESPACE_STD_USING(llrintf)
 #endif /* !__llrintf_defined && !__std_llrintf_defined */
 __NAMESPACE_STD_USING(llroundf)
+#endif /* __COMPILER_HAVE_LONGLONG */
+#ifdef __COMPILER_HAVE_LONGDOUBLE
 #if !defined(__nexttowardl_defined) && defined(__std_nexttowardl_defined)
 #define __nexttowardl_defined 1
 __NAMESPACE_STD_USING(nexttowardl)
@@ -588,11 +640,15 @@ __NAMESPACE_STD_USING(fdiml)
 __NAMESPACE_STD_USING(fmaxl)
 __NAMESPACE_STD_USING(fminl)
 __NAMESPACE_STD_USING(fmal)
+#ifdef __COMPILER_HAVE_LONGLONG
 #if !defined(__llrintl_defined) && defined(__std_llrintl_defined)
 #define __llrintl_defined 1
 __NAMESPACE_STD_USING(llrintl)
 #endif /* !__llrintl_defined && !__std_llrintl_defined */
 __NAMESPACE_STD_USING(llroundl)
+#endif /* __COMPILER_HAVE_LONGLONG */
+#endif /* __COMPILER_HAVE_LONGDOUBLE */
+#endif /* __USE_ISOC99 */
 #ifdef __std_fpclassify_defined
 __NAMESPACE_STD_USING(fpclassify)
 #endif /* __std_fpclassify_defined */

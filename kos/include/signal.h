@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe2fe97e0 */
+/* HASH CRC-32:0xd84edce2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,9 +62,9 @@ __NAMESPACE_STD_USING(signal)
 #include <bits/timespec.h>
 #endif /* __USE_POSIX199309 */
 
-#if defined(__USE_POSIX199309) || defined(__USE_XOPEN_EXTENDED)
+#if defined(__USE_POSIX199309) || defined(__USE_XOPEN_EXTENDED) || defined(__USE_KOS)
 #include <bits/siginfo.h>
-#endif /* __USE_POSIX199309 || __USE_XOPEN_EXTENDED */
+#endif /* __USE_POSIX199309 || __USE_XOPEN_EXTENDED || __USE_KOS */
 
 #ifdef __USE_POSIX
 #include <bits/sigaction.h>

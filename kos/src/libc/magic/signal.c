@@ -47,9 +47,9 @@ typedef __sighandler_t sighandler_t;
 #include <bits/timespec.h>
 #endif /* __USE_POSIX199309 */
 
-#if defined(__USE_POSIX199309) || defined(__USE_XOPEN_EXTENDED)
+#if defined(__USE_POSIX199309) || defined(__USE_XOPEN_EXTENDED) || defined(__USE_KOS)
 #include <bits/siginfo.h>
-#endif /* __USE_POSIX199309 || __USE_XOPEN_EXTENDED */
+#endif /* __USE_POSIX199309 || __USE_XOPEN_EXTENDED || __USE_KOS */
 
 #ifdef __USE_POSIX
 #include <bits/sigaction.h>

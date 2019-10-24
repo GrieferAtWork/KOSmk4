@@ -47,7 +47,7 @@
 #endif /* __USE_DOS */
 #ifdef __USE_GNU
 #include <xlocale.h>
-#endif
+#endif /* __USE_GNU */
 
 __SYSDECL_BEGIN
 
@@ -67,7 +67,6 @@ __SYSDECL_BEGIN
 #define EXIT_FAILURE 1
 
 #ifdef __CC__
-
 
 #ifndef __std_size_t_defined
 #define __std_size_t_defined 1
@@ -92,7 +91,7 @@ typedef __WCHAR_TYPE__ wchar_t;
 
 #ifndef NULL
 #define NULL __NULLPTR
-#endif
+#endif /* !NULL */
 
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)
 #ifndef __WAIT_MACROS_DEFINED
@@ -452,7 +451,7 @@ labs:(long x) -> long {
 	return x < 0 ? -x : x;
 }
 
-%(std, c)#ifdef __USE_ISOC99
+%(std, c, ccompat)#ifdef __USE_ISOC99
 [ATTR_CONST][ATTR_WUNUSED][nothrow][std][crtbuiltin]
 [if(__SIZEOF_LONG_LONG__ == __SIZEOF_INT__), alias(abs)]
 [if(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias(labs)]
@@ -460,7 +459,7 @@ labs:(long x) -> long {
 llabs:(__LONGLONG x) -> __LONGLONG {
 	return x < 0 ? -x : x;
 }
-%(std, c)#endif /* __USE_ISOC99 */
+%(std, c, ccompat)#endif /* __USE_ISOC99 */
 
 [ATTR_CONST][ATTR_WUNUSED][std]
 [if(__SIZEOF_LONG__ == __SIZEOF_INT__), alias(div)]
@@ -473,7 +472,7 @@ ldiv:(long numer, long denom) -> ldiv_t {
 	return result;
 }
 
-%(std, c)#ifdef __USE_ISOC99
+%(std, c, ccompat)#ifdef __USE_ISOC99
 [ATTR_CONST][ATTR_WUNUSED][std]
 [if(__SIZEOF_LONG_LONG__ == __SIZEOF_INT__), alias(div)]
 [if(__SIZEOF_LONG_LONG__ == __SIZEOF_LONG__), alias(ldiv)]
@@ -484,7 +483,7 @@ lldiv:(__LONGLONG numer, __LONGLONG denom) -> lldiv_t {
 	result.@rem@  = numer % denom;
 	return result;
 }
-%(std, c)#endif /* __USE_ISOC99 */
+%(std, c, ccompat)#endif /* __USE_ISOC99 */
 
 %(std)#if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STDLIB_H_PROTO)
 %(std){
@@ -653,19 +652,16 @@ system:([nullable] char const *__restrict command) -> int;
 
 %[default_impl_section(.text.crt.sched.process)]
 %(std)typedef void (*__LIBCCALL __atexit_func_t)(void);
-%#ifndef __CXX_SYSTEM_HEADER
-%__NAMESPACE_STD_USING(__atexit_func_t)
-%#endif /* !__CXX_SYSTEM_HEADER */
 [std][alias(at_quick_exit)] atexit:(__atexit_func_t func) -> int;
-%(std, c)#if defined(__USE_ISOC11) || defined(__USE_ISOCXX11)
+%(std, c, ccompat)#if defined(__USE_ISOC11) || defined(__USE_ISOCXX11)
 [std][alias(exit)][alias(_exit)][alias(_Exit)][ATTR_NORETURN][throws] quick_exit:(int status);
 [std][alias(atexit)] at_quick_exit:(__atexit_func_t func) -> int;
-%(std, c)#endif /* __USE_ISOC11 || __USE_ISOCXX11 */
-%(std, c)#ifdef __USE_ISOC99
+%(std, c, ccompat)#endif /* __USE_ISOC11 || __USE_ISOCXX11 */
+%(std, c, ccompat)#ifdef __USE_ISOC99
 [std][alias(_exit)][alias(quick_exit)][alias(exit)]
 [section(.text.crt.application.exit)]
 [crtbuiltin][ATTR_NORETURN][throws()] _Exit:(int status);
-%(std, c)#endif /* __USE_ISOC99 */
+%(std, c, ccompat)#endif /* __USE_ISOC99 */
 
 %[default_impl_section(.text.crt.heap.malloc)]
 [ignore][ATTR_WUNUSED][ATTR_MALL_DEFAULT_ALIGNED][ATTR_MALLOC][ATTR_ALLOC_SIZE((1, 2))]

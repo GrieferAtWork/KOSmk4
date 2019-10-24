@@ -135,7 +135,7 @@ __SYSDECL_BEGIN
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__cosf)][nothrow][crtbuiltin] cosf:(float x) -> float %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__sinf)][nothrow][crtbuiltin] sinf:(float x) -> float %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__tanf)][nothrow][crtbuiltin] tanf:(float x) -> float %{auto_block(math)}
-%(std, c)#ifdef __COMPILER_HAVE_LONGDOUBLE
+%(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__acosl)][nothrow][crtbuiltin] acosl:(long double x) -> long double %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__asinl)][nothrow][crtbuiltin] asinl:(long double x) -> long double %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__atanl)][nothrow][crtbuiltin] atanl:(long double x) -> long double %{auto_block(math)}
@@ -143,7 +143,7 @@ __SYSDECL_BEGIN
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__cosl)][nothrow][crtbuiltin] cosl:(long double x) -> long double %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__sinl)][nothrow][crtbuiltin] sinl:(long double x) -> long double %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__tanl)][nothrow][crtbuiltin] tanl:(long double x) -> long double %{auto_block(math)}
-%(std, c)#endif /* __COMPILER_HAVE_LONGDOUBLE */
+%(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 %(std, c)
 %(std, c)/* Hyperbolic functions. */
@@ -163,14 +163,14 @@ __SYSDECL_BEGIN
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__coshf)][nothrow][crtbuiltin] coshf:(float x) -> float %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__sinhf)][nothrow][crtbuiltin] sinhf:(float x) -> float %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__tanhf)][nothrow][crtbuiltin] tanhf:(float x) -> float %{auto_block(math)}
-%(std, c)#ifdef __COMPILER_HAVE_LONGDOUBLE
+%(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__coshl)][nothrow][crtbuiltin] coshl:(long double x) -> long double %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__sinhl)][nothrow][crtbuiltin] sinhl:(long double x) -> long double %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__tanhl)][nothrow][crtbuiltin] tanhl:(long double x) -> long double %{auto_block(math)}
-%(std, c)#endif /* __COMPILER_HAVE_LONGDOUBLE */
+%(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 %(std, c)
-%(std, c)#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
+%(std, c, ccompat)#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
 @@Hyperbolic arc cosine of X
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__acosh)][nothrow]
 [crtbuiltin] acosh:(double x) -> double;
@@ -186,12 +186,12 @@ __SYSDECL_BEGIN
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__acoshf)][nothrow][crtbuiltin] acoshf:(float x) -> float %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__asinhf)][nothrow][crtbuiltin] asinhf:(float x) -> float %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__atanhf)][nothrow][crtbuiltin] atanhf:(float x) -> float %{auto_block(math)}
-%(std, c)#ifdef __COMPILER_HAVE_LONGDOUBLE
+%(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__acoshl)][nothrow][crtbuiltin] acoshl:(long double x) -> long double %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__asinhl)][nothrow][crtbuiltin] asinhl:(long double x) -> long double %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__atanhl)][nothrow][crtbuiltin] atanhl:(long double x) -> long double %{auto_block(math)}
-%(std, c)#endif /* __COMPILER_HAVE_LONGDOUBLE */
-%(std, c)#endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
+%(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
+%(std, c, ccompat)#endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
 
 %(std, c)
 %(std, c)/* Exponential and logarithmic functions. */
@@ -240,7 +240,7 @@ modff:(float x, [nonnull] float *iptr) -> float
 	*iptr  = (float)ipart;
 	return result;
 }))}
-%(std, c)#ifdef __COMPILER_HAVE_LONGDOUBLE
+%(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
 [attribute(@__DECL_SIMD_expl@)][decl_include(<bits/math-vector.h>)]
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__expl)][nothrow][crtbuiltin] expl:(long double x) -> long double %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__frexpl)][crtbuiltin] frexpl:(long double x, int *pexponent) -> long double %{auto_block(math)}
@@ -259,10 +259,10 @@ modfl:(long double x, [nonnull] long double *iptr) -> long double
 	*iptr  = (long double)ipart;
 	return result;
 }))}
-%(std, c)#endif /* __COMPILER_HAVE_LONGDOUBLE */
+%(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 %(std, c)
-%(std, c)#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
+%(std, c, ccompat)#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
 @@Return exp(X) - 1
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__expm1)][nothrow][crtbuiltin] expm1:(double x) -> double;
 
@@ -275,15 +275,15 @@ modfl:(long double x, [nonnull] long double *iptr) -> long double
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__expm1f)][nothrow][crtbuiltin] expm1f:(float x) -> float %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__log1pf)][nothrow][crtbuiltin] log1pf:(float x) -> float %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__logbf)][nothrow][crtbuiltin] logbf:(float x) -> float %{auto_block(math)}
-%(std, c)#ifdef __COMPILER_HAVE_LONGDOUBLE
+%(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__expm1l)][nothrow][crtbuiltin] expm1l:(long double x) -> long double %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__log1pl)][nothrow][crtbuiltin] log1pl:(long double x) -> long double %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__logbl)][nothrow][crtbuiltin] logbl:(long double x) -> long double %{auto_block(math)}
-%(std, c)#endif /* __COMPILER_HAVE_LONGDOUBLE */
-%(std, c)#endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
+%(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
+%(std, c, ccompat)#endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
 
 %(std, c)
-%(std, c)#ifdef __USE_ISOC99
+%(std, c, ccompat)#ifdef __USE_ISOC99
 @@Compute base-2 exponential of X
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__exp2)][nothrow][crtbuiltin] exp2:(double x) -> double;
 
@@ -292,11 +292,11 @@ modfl:(long double x, [nonnull] long double *iptr) -> long double
 
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__exp2f)][nothrow][crtbuiltin] exp2f:(float x) -> float %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__log2f)][nothrow][crtbuiltin] log2f:(float x) -> float %{auto_block(math)}
-%(std, c)#ifdef __COMPILER_HAVE_LONGDOUBLE
+%(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__exp2l)][nothrow][crtbuiltin] exp2l:(long double x) -> long double %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__log2l)][nothrow][crtbuiltin] log2l:(long double x) -> long double %{auto_block(math)}
-%(std, c)#endif /* __COMPILER_HAVE_LONGDOUBLE */
-%(std, c)#endif /* __USE_ISOC99 */
+%(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
+%(std, c, ccompat)#endif /* __USE_ISOC99 */
 
 %(std, c)
 %(std, c)/* Power functions. */
@@ -310,31 +310,31 @@ modfl:(long double x, [nonnull] long double *iptr) -> long double
 [attribute(@__DECL_SIMD_powf@)][decl_include(<bits/math-vector.h>)]
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__powf)][nothrow][crtbuiltin] powf:(float x, float y) -> float %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__sqrtf)][nothrow][crtbuiltin] sqrtf:(float x) -> float %{auto_block(math)}
-%(std, c)#ifdef __COMPILER_HAVE_LONGDOUBLE
+%(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
 [attribute(@__DECL_SIMD_powl@)][decl_include(<bits/math-vector.h>)]
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__powl)][nothrow][crtbuiltin] powl:(long double x, long double y) -> long double %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__sqrtl)][nothrow][crtbuiltin] sqrtl:(long double x) -> long double %{auto_block(math)}
-%(std, c)#endif /* __COMPILER_HAVE_LONGDOUBLE */
+%(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 %(std, c)
-%(std, c)#if defined(__USE_XOPEN) || defined(__USE_ISOC99)
+%(std, c, ccompat)#if defined(__USE_XOPEN) || defined(__USE_ISOC99)
 @@Return `sqrt(X*X + Y*Y)'
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__hypot)][nothrow][crtbuiltin] hypot:(double x, double y) -> double;
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__hypotf)][nothrow][crtbuiltin] hypotf:(float x, float y) -> float %{auto_block(math)}
-%(std, c)#ifdef __COMPILER_HAVE_LONGDOUBLE
+%(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
 [std][ATTR_WUNUSED][ATTR_MCONST][alias(__hypotl)][nothrow][crtbuiltin] hypotl:(long double x, long double y) -> long double %{auto_block(math)}
-%(std, c)#endif /* __COMPILER_HAVE_LONGDOUBLE */
-%(std, c)#endif /* __USE_XOPEN || __USE_ISOC99 */
+%(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
+%(std, c, ccompat)#endif /* __USE_XOPEN || __USE_ISOC99 */
 
 %(std, c)
-%(std, c)#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
+%(std, c, ccompat)#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
 @@Return the cube root of X
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__cbrt)][crtbuiltin] cbrt:(double x) -> double;
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__cbrtf)][crtbuiltin] cbrtf:(float x) -> float %{auto_block(math)}
-%(std, c)#ifdef __COMPILER_HAVE_LONGDOUBLE
+%(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__cbrtl)][crtbuiltin] cbrtl:(long double x) -> long double %{auto_block(math)}
-%(std, c)#endif /* __COMPILER_HAVE_LONGDOUBLE */
-%(std, c)#endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
+%(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
+%(std, c, ccompat)#endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
 
 %(std, c)
 %(std, c)/* Nearest integer, absolute value, and remainder functions. */
@@ -375,16 +375,16 @@ fmod:(double x, double y) -> double;
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fabsf)][crtbuiltin] fabsf:(float x) -> float %{copy(%auto, math)}
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__floorf)][crtbuiltin] floorf:(float x) -> float %{copy(%auto, math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__fmodf)][crtbuiltin] fmodf:(float x, float y) -> float %{auto_block(math)}
-%(std, c)#ifdef __COMPILER_HAVE_LONGDOUBLE
+%(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__ceill)][crtbuiltin] ceill:(long double x) -> long double %{copy(%auto, math)}
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fabsl)][crtbuiltin] fabsl:(long double x) -> long double %{copy(%auto, math)}
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__floorl)][crtbuiltin] floorl:(long double x) -> long double %{copy(%auto, math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__fmodl)][crtbuiltin] fmodl:(long double x, long double y) -> long double %{auto_block(math)}
-%(std, c)#endif /* __COMPILER_HAVE_LONGDOUBLE */
+%(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 
 %(std, c)
-%(std, c)#ifdef __USE_ISOC99
+%(std, c, ccompat)#ifdef __USE_ISOC99
 @@Return X with its signed changed to Y's
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__copysign, _copysign)]
 [crtbuiltin] copysign:(double num, double sign) -> double {
@@ -403,15 +403,15 @@ fmod:(double x, double y) -> double;
 
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__copysignf)][crtbuiltin] copysignf:(float num, float sign) -> float %{copy(%auto, math)}
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__nanf)][crtbuiltin] nanf:(char const *tagb) -> float %{copy(%auto, math)}
-%(std, c)#ifdef __COMPILER_HAVE_LONGDOUBLE
+%(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__copysignl)][crtbuiltin] copysignl:(long double num, long double sign) -> long double %{copy(%auto, math)}
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__nanl)][crtbuiltin] nanl:(char const *tagb) -> long double %{copy(%auto, math)}
-%(std, c)#endif /* __COMPILER_HAVE_LONGDOUBLE */
-%(std, c)#endif /* __USE_ISOC99 */
+%(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
+%(std, c, ccompat)#endif /* __USE_ISOC99 */
 
 %(std, c)
 %(std, c)/* Error and gamma functions. */
-%(std, c)#if defined(__USE_XOPEN) || defined(__USE_ISOC99)
+%(std, c, ccompat)#if defined(__USE_XOPEN) || defined(__USE_ISOC99)
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__erf)][crtbuiltin] erf:(double x) -> double;
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__erfc)][crtbuiltin] erfc:(double x) -> double;
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__lgamma, __gamma, gamma)][crtbuiltin] lgamma:(double x) -> double;
@@ -419,24 +419,24 @@ fmod:(double x, double y) -> double;
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__erff)][crtbuiltin] erff:(float x) -> float %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__erfcf)][crtbuiltin] erfcf:(float x) -> float %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__lgammaf, __gammaf, gammaf)][crtbuiltin] lgammaf:(float x) -> float %{auto_block(math)}
-%(std, c)#ifdef __COMPILER_HAVE_LONGDOUBLE
+%(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__erfl)][crtbuiltin] erfl:(long double x) -> long double %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__erfcl)][crtbuiltin] erfcl:(long double x) -> long double %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__lgammal, __gammal, gammal)][crtbuiltin] lgammal:(long double x) -> long double %{auto_block(math)}
-%(std, c)#endif /* __COMPILER_HAVE_LONGDOUBLE */
-%(std, c)#endif /* __USE_XOPEN || __USE_ISOC99 */
+%(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
+%(std, c, ccompat)#endif /* __USE_XOPEN || __USE_ISOC99 */
 
-%(std, c)#ifdef __USE_ISOC99
+%(std, c, ccompat)#ifdef __USE_ISOC99
 @@True gamma function
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__tgamma)][crtbuiltin] tgamma:(double x) -> double;
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__tgammaf)][crtbuiltin] tgammaf:(float x) -> float %{auto_block(math)}
-%(std, c)#ifdef __COMPILER_HAVE_LONGDOUBLE
+%(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__tgammal)][crtbuiltin] tgammal:(long double x) -> long double %{auto_block(math)}
-%(std, c)#endif /* __COMPILER_HAVE_LONGDOUBLE */
-%(std, c)#endif /* __USE_ISOC99 */
+%(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
+%(std, c, ccompat)#endif /* __USE_ISOC99 */
 
 %(std, c)
-%(std, c)#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
+%(std, c, ccompat)#if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
 @@Return the integer nearest X in the direction of the prevailing rounding mode
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__rint)][crtbuiltin] rint:(double x) -> double;
 
@@ -453,16 +453,16 @@ fmod:(double x, double y) -> double;
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__nextafterf)][crtbuiltin] nextafterf:(float x, float y) -> float %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__remainderf)][crtbuiltin] remainderf:(float x, float y) -> float %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__ilogbf)][crtbuiltin] ilogbf:(float x) -> int %{auto_block(math)}
-%(std, c)#ifdef __COMPILER_HAVE_LONGDOUBLE
+%(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__rintl)][crtbuiltin] rintl:(long double x) -> long double %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__nextafterl)][crtbuiltin] nextafterl:(long double x, long double y) -> long double %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__remainderl)][crtbuiltin] remainderl:(long double x, long double y) -> long double %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__ilogbl)][crtbuiltin] ilogbl:(long double x) -> int %{auto_block(math)}
-%(std, c)#endif /* __COMPILER_HAVE_LONGDOUBLE */
-%(std, c)#endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
+%(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
+%(std, c, ccompat)#endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
 
 %(std, c)
-%(std, c)#ifdef __USE_ISOC99
+%(std, c, ccompat)#ifdef __USE_ISOC99
 
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__nexttoward)][crtbuiltin]
 nexttoward:(double x, long double y) -> double;
@@ -545,7 +545,7 @@ fdim:(double x, double y) -> double {
 	return (x * y) + z;
 }
 
-%(std, c)#ifdef __COMPILER_HAVE_LONGLONG
+%(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGLONG
 @@Round X to nearest integral value according to current rounding direction
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__llrint)][crtbuiltin]
 llrint:(double x) -> __LONGLONG;
@@ -555,7 +555,7 @@ llrint:(double x) -> __LONGLONG;
 llround:(double x) -> __LONGLONG {
 	return (__LONGLONG)round(x);
 }
-%(std, c)#endif /* __COMPILER_HAVE_LONGLONG */
+%(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGLONG */
 
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__nexttowardf)][crtbuiltin] nexttowardf:(float x, long double y) -> float %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__scalbnf)][crtbuiltin] scalbnf:(float x, int n) -> float %{auto_block(math)}
@@ -570,11 +570,11 @@ llround:(double x) -> __LONGLONG {
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fmaxf)][crtbuiltin] fmaxf:(float x, float y) -> float %{copy(%auto, double2float)}
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fminf)][crtbuiltin] fminf:(float x, float y) -> float %{copy(%auto, double2float)}
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fmaf)][crtbuiltin] fmaf:(float x, float y, float z) -> float %{copy(%auto, double2float)}
-%(std, c)#ifdef __COMPILER_HAVE_LONGLONG
+%(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGLONG
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__llrintf)][crtbuiltin] llrintf:(float x) -> __LONGLONG %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__llroundf)][crtbuiltin] llroundf:(float x) -> __LONGLONG %{copy(%auto, math)}
-%(std, c)#endif /* __COMPILER_HAVE_LONGLONG */
-%(std, c)#ifdef __COMPILER_HAVE_LONGDOUBLE
+%(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGLONG */
+%(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGDOUBLE
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__nexttowardl)][crtbuiltin] nexttowardl:(long double x, long double y) -> long double %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__scalbnl)][crtbuiltin] scalbnl:(long double x, int n) -> long double %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__scalblnl)][crtbuiltin] scalblnl:(long double x, long int n) -> long double %{auto_block(math)}
@@ -588,12 +588,12 @@ llround:(double x) -> __LONGLONG {
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fmaxl)][crtbuiltin] fmaxl:(long double x, long double y) -> long double %{copy(%auto, math)}
 [std][ATTR_WUNUSED][ATTR_CONST][nothrow][alias(__fminl)][crtbuiltin] fminl:(long double x, long double y) -> long double %{copy(%auto, math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__fmal)][crtbuiltin] fmal:(long double x, long double y, long double z) -> long double %{copy(%auto, math)}
-%(std, c)#ifdef __COMPILER_HAVE_LONGLONG
+%(std, c, ccompat)#ifdef __COMPILER_HAVE_LONGLONG
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__llrintl)][crtbuiltin] llrintl:(long double x) -> __LONGLONG %{auto_block(math)}
 [std][ATTR_WUNUSED][ATTR_MCONST][nothrow][alias(__llroundl)][crtbuiltin] llroundl:(long double x) -> __LONGLONG %{copy(%auto, math)}
-%(std, c)#endif /* __COMPILER_HAVE_LONGLONG */
-%(std, c)#endif /* __COMPILER_HAVE_LONGDOUBLE */
-%(std, c)#endif /* __USE_ISOC99 */
+%(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGLONG */
+%(std, c, ccompat)#endif /* __COMPILER_HAVE_LONGDOUBLE */
+%(std, c, ccompat)#endif /* __USE_ISOC99 */
 
 
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2c4c4129 */
+/* HASH CRC-32:0x279a88c6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,9 +46,13 @@ __NAMESPACE_STD_USING(lldiv_t)
 __NAMESPACE_STD_USING(qsort)
 __NAMESPACE_STD_USING(bsearch)
 __NAMESPACE_STD_USING(labs)
+#ifdef __USE_ISOC99
 __NAMESPACE_STD_USING(llabs)
+#endif /* __USE_ISOC99 */
 __NAMESPACE_STD_USING(ldiv)
+#ifdef __USE_ISOC99
 __NAMESPACE_STD_USING(lldiv)
+#endif /* __USE_ISOC99 */
 __NAMESPACE_STD_USING(abs)
 __NAMESPACE_STD_USING(div)
 #if !defined(__getenv_defined) && defined(__std_getenv_defined)
@@ -76,6 +80,7 @@ __NAMESPACE_STD_USING(exit)
 #define __atexit_defined 1
 __NAMESPACE_STD_USING(atexit)
 #endif /* !__atexit_defined && !__std_atexit_defined */
+#if defined(__USE_ISOC11) || defined(__USE_ISOCXX11)
 #if !defined(__quick_exit_defined) && defined(__std_quick_exit_defined)
 #define __quick_exit_defined 1
 __NAMESPACE_STD_USING(quick_exit)
@@ -84,10 +89,13 @@ __NAMESPACE_STD_USING(quick_exit)
 #define __at_quick_exit_defined 1
 __NAMESPACE_STD_USING(at_quick_exit)
 #endif /* !__at_quick_exit_defined && !__std_at_quick_exit_defined */
+#endif /* __USE_ISOC11 || __USE_ISOCXX11 */
+#ifdef __USE_ISOC99
 #if !defined(___Exit_defined) && defined(__std__Exit_defined)
 #define ___Exit_defined 1
 __NAMESPACE_STD_USING(_Exit)
 #endif /* !___Exit_defined && !__std__Exit_defined */
+#endif /* __USE_ISOC99 */
 #if !defined(__malloc_defined) && defined(__std_malloc_defined)
 #define __malloc_defined 1
 __NAMESPACE_STD_USING(malloc)
@@ -158,7 +166,7 @@ __NAMESPACE_STD_USING(aligned_alloc)
 #endif /* __USE_DOS */
 #ifdef __USE_GNU
 #include <xlocale.h>
-#endif
+#endif /* __USE_GNU */
 
 __SYSDECL_BEGIN
 
@@ -178,7 +186,6 @@ __SYSDECL_BEGIN
 #define EXIT_FAILURE 1
 
 #ifdef __CC__
-
 
 #ifndef __std_size_t_defined
 #define __std_size_t_defined 1
@@ -201,7 +208,7 @@ typedef __WCHAR_TYPE__ wchar_t;
 
 #ifndef NULL
 #define NULL __NULLPTR
-#endif
+#endif /* !NULL */
 
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K8)
 #ifndef __WAIT_MACROS_DEFINED
@@ -1044,11 +1051,6 @@ __NAMESPACE_STD_USING(abort)
 #define __exit_defined 1
 __NAMESPACE_STD_USING(exit)
 #endif /* !__exit_defined && !__std_exit_defined */
-#endif /* !__CXX_SYSTEM_HEADER */
-#ifndef __CXX_SYSTEM_HEADER
-__NAMESPACE_STD_USING(__atexit_func_t)
-#endif /* !__CXX_SYSTEM_HEADER */
-#ifndef __CXX_SYSTEM_HEADER
 #if !defined(__atexit_defined) && defined(__std_atexit_defined)
 #define __atexit_defined 1
 __NAMESPACE_STD_USING(atexit)

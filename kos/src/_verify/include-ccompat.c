@@ -18,6 +18,7 @@
  */
 #define _ALL_SOURCE 1
 #define _DOS_SOURCE_CLEAN 1
+#define _ISOC_PURE_SOURCE 1
 
 /* This file is used to make sure that C/C++ header pairs
  * function properly, especially when faced with prototypes
