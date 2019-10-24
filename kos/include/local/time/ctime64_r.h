@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x66845de0 */
+/* HASH CRC-32:0xdf82b049 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,15 @@
  */
 #ifndef __local_ctime64_r_defined
 #define __local_ctime64_r_defined 1
-#ifndef __tm_defined
-#define __tm_defined 1
-#ifdef __std_tm_defined
-__NAMESPACE_STD_USING(tm)
-#else /* __std_tm_defined */
-struct tm {
+#ifndef __STRUCT_TM
+#ifdef __tm_defined
+#define __STRUCT_TM struct __NAMESPACE_STD_SYM tm
+#else /* __tm_defined */
+#define __STRUCT_TM struct __NAMESPACE_STD_SYM __NAMESPACE_STD_SYM tm
+#ifndef __std_tm_defined
+#define __std_tm_defined 1
+__NAMESPACE_STD_BEGIN
+struct __NAMESPACE_STD_SYM tm {
 	int         tm_sec;      /* seconds [0, 61]. */
 	int         tm_min;      /* minutes [0, 59]. */
 	int         tm_hour;     /* hour [0, 23]. */
@@ -44,8 +47,10 @@ struct tm {
 #endif /* !__USE_MISC */
 #endif /* !... */
 };
+__NAMESPACE_STD_END
 #endif /* !__std_tm_defined */
 #endif /* !__tm_defined */
+#endif /* !__STRUCT_TM */
 /* Dependency: "dos_ctime64_s" from "time" */
 #ifndef ____localdep_dos_ctime64_s_defined
 #define ____localdep_dos_ctime64_s_defined 1
@@ -67,7 +72,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,__localdep_dos_ctime6
 #if defined(__CRT_HAVE_asctime_r)
 /* Return in BUF a string of the form "Day Mon dd hh:mm:ss yyyy\n"
  * that is the representation of TP in this format */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_asctime_r,(struct tm const *__restrict __tp, char __buf[26]),asctime_r,(__tp,__buf))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_asctime_r,(__STRUCT_TM const *__restrict __tp, char __buf[26]),asctime_r,(__tp,__buf))
 #else /* LIBC: asctime_r */
 #include <local/time/asctime_r.h>
 /* Return in BUF a string of the form "Day Mon dd hh:mm:ss yyyy\n"
@@ -81,10 +86,10 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_asctime_r,(st
 #define ____localdep_localtime64_r_defined 1
 #if defined(__CRT_HAVE_localtime64_r)
 /* Return the `struct tm' representation of *TIMER in local time, using *TP to store the result */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),struct tm *,__NOTHROW_NCX,__localdep_localtime64_r,(__time64_t const *__restrict __timer, struct tm *__restrict __tp),localtime64_r,(__timer,__tp))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__STRUCT_TM *,__NOTHROW_NCX,__localdep_localtime64_r,(__time64_t const *__restrict __timer, __STRUCT_TM *__restrict __tp),localtime64_r,(__timer,__tp))
 #elif defined(__CRT_HAVE_localtime_r) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Return the `struct tm' representation of *TIMER in local time, using *TP to store the result */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),struct tm *,__NOTHROW_NCX,__localdep_localtime64_r,(__time64_t const *__restrict __timer, struct tm *__restrict __tp),localtime_r,(__timer,__tp))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__STRUCT_TM *,__NOTHROW_NCX,__localdep_localtime64_r,(__time64_t const *__restrict __timer, __STRUCT_TM *__restrict __tp),localtime_r,(__timer,__tp))
 #else /* LIBC: localtime64_r */
 #include <local/time/localtime64_r.h>
 /* Return the `struct tm' representation of *TIMER in local time, using *TP to store the result */
@@ -97,11 +102,15 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(ctime64_r) __ATTR_NONNULL((1, 2)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ctime64_r))(__time64_t const *__restrict __timer,
                                                        char __buf[26]) {
-#line 1764 "kos/src/libc/magic/time.c"
+#line 1579 "kos/src/libc/magic/time.c"
 #if defined(__CRT_HAVE__ctime32_s) || defined(__CRT_HAVE__ctime64_s)
 	return __localdep_dos_ctime64_s(__buf, 26, __timer) ? __NULLPTR : __buf;
 #else
+#ifdef __std_tm_defined
+	struct __NAMESPACE_STD_SYM tm __ltm;
+#else /* __std_tm_defined */
 	struct tm __ltm;
+#endif /* !__std_tm_defined */
 	return __localdep_asctime_r(__localdep_localtime64_r(__timer, &__ltm), __buf);
 #endif
 }

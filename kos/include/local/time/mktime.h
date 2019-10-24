@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc4d821b5 */
+/* HASH CRC-32:0x4b575de8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,15 @@
  */
 #ifndef __local_mktime_defined
 #define __local_mktime_defined 1
-#ifndef __tm_defined
-#define __tm_defined 1
-#ifdef __std_tm_defined
-__NAMESPACE_STD_USING(tm)
-#else /* __std_tm_defined */
-struct tm {
+#ifndef __STRUCT_TM
+#ifdef __tm_defined
+#define __STRUCT_TM struct __NAMESPACE_STD_SYM tm
+#else /* __tm_defined */
+#define __STRUCT_TM struct __NAMESPACE_STD_SYM __NAMESPACE_STD_SYM tm
+#ifndef __std_tm_defined
+#define __std_tm_defined 1
+__NAMESPACE_STD_BEGIN
+struct __NAMESPACE_STD_SYM tm {
 	int         tm_sec;      /* seconds [0, 61]. */
 	int         tm_min;      /* minutes [0, 59]. */
 	int         tm_hour;     /* hour [0, 23]. */
@@ -44,23 +47,25 @@ struct tm {
 #endif /* !__USE_MISC */
 #endif /* !... */
 };
+__NAMESPACE_STD_END
 #endif /* !__std_tm_defined */
 #endif /* !__tm_defined */
+#endif /* !__STRUCT_TM */
 /* Dependency: "mktime64" from "time" */
 #ifndef ____localdep_mktime64_defined
 #define ____localdep_mktime64_defined 1
 #if defined(__CRT_HAVE_mktime64)
 /* Return the `time_t' representation of TP and normalize TP */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),__time64_t,__NOTHROW_NCX,__localdep_mktime64,(struct tm __KOS_FIXED_CONST *__tp),mktime64,(__tp))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),__time64_t,__NOTHROW_NCX,__localdep_mktime64,(__STRUCT_TM __KOS_FIXED_CONST *__tp),mktime64,(__tp))
 #elif defined(__CRT_HAVE_mktime) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* Return the `time_t' representation of TP and normalize TP */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),__time64_t,__NOTHROW_NCX,__localdep_mktime64,(struct tm __KOS_FIXED_CONST *__tp),mktime,(__tp))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),__time64_t,__NOTHROW_NCX,__localdep_mktime64,(__STRUCT_TM __KOS_FIXED_CONST *__tp),mktime,(__tp))
 #elif defined(__CRT_HAVE__mktime64)
 /* Return the `time_t' representation of TP and normalize TP */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),__time64_t,__NOTHROW_NCX,__localdep_mktime64,(struct tm __KOS_FIXED_CONST *__tp),_mktime64,(__tp))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),__time64_t,__NOTHROW_NCX,__localdep_mktime64,(__STRUCT_TM __KOS_FIXED_CONST *__tp),_mktime64,(__tp))
 #elif defined(__CRT_HAVE_timelocal64)
 /* Return the `time_t' representation of TP and normalize TP */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),__time64_t,__NOTHROW_NCX,__localdep_mktime64,(struct tm __KOS_FIXED_CONST *__tp),timelocal64,(__tp))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),__time64_t,__NOTHROW_NCX,__localdep_mktime64,(__STRUCT_TM __KOS_FIXED_CONST *__tp),timelocal64,(__tp))
 #else /* LIBC: mktime64 */
 #include <local/time/mktime64.h>
 /* Return the `time_t' representation of TP and normalize TP */
@@ -73,13 +78,13 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),__time64_t,__NOTHROW_
 #define ____localdep_mktime32_defined 1
 #if defined(__CRT_HAVE_mktime)
 /* Return the `time_t' representation of TP and normalize TP */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_mktime32,(struct tm __KOS_FIXED_CONST *__tp),mktime,(__tp))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_mktime32,(__STRUCT_TM __KOS_FIXED_CONST *__tp),mktime,(__tp))
 #elif defined(__CRT_HAVE__mktime32)
 /* Return the `time_t' representation of TP and normalize TP */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_mktime32,(struct tm __KOS_FIXED_CONST *__tp),_mktime32,(__tp))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_mktime32,(__STRUCT_TM __KOS_FIXED_CONST *__tp),_mktime32,(__tp))
 #elif defined(__CRT_HAVE_timelocal)
 /* Return the `time_t' representation of TP and normalize TP */
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_mktime32,(struct tm __KOS_FIXED_CONST *__tp),timelocal,(__tp))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_mktime32,(__STRUCT_TM __KOS_FIXED_CONST *__tp),timelocal,(__tp))
 #else /* LIBC: mktime */
 #undef ____localdep_mktime32_defined
 #endif /* mktime32... */
@@ -91,8 +96,8 @@ __NAMESPACE_LOCAL_BEGIN
 #endif /* !__yearstodays */
 /* Return the `time_t' representation of TP and normalize TP */
 __LOCAL_LIBC(mktime) __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) __TM_TYPE(time)
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mktime))(struct tm __KOS_FIXED_CONST *__tp) {
-#line 421 "kos/src/libc/magic/time.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mktime))(__STRUCT_TM __KOS_FIXED_CONST *__tp) {
+#line 439 "kos/src/libc/magic/time.c"
 #if defined(__CRT_HAVE_mktime64) || defined(__CRT_HAVE__mktime64)
 	return (__TM_TYPE(time))__localdep_mktime64(__tp);
 #elif defined(__CRT_HAVE_mktime) || defined(__CRT_HAVE__mktime32)

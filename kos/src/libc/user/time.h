@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd55919cd */
+/* HASH CRC-32:0xbedfe5bf */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -84,13 +84,13 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_timespec_get)(struct timespec 
  * representing the value.  The templates from the file identified by
  * the environment variable DATEMSK are used.  In case of an error
  * `getdate_err' is set */
-INTDEF NONNULL((1)) struct tm *NOTHROW_NCX(LIBCCALL libc_getdate)(const char *string);
+INTDEF NONNULL((1)) __STRUCT_TM *NOTHROW_NCX(LIBCCALL libc_getdate)(const char *string);
 /* Since `getdate' is not reentrant because of the use of `getdate_err'
  * and the static buffer to return the result in, we provide a thread-safe
  * variant.  The functionality is the same.  The result is returned in
  * the buffer pointed to by RESBUFP and in case of an error the return
  * value is != 0 with the same values as given above for `getdate_err'. */
-INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_getdate_r)(const char *__restrict string, struct tm *__restrict resbufp);
+INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_getdate_r)(const char *__restrict string, __STRUCT_TM *__restrict resbufp);
 INTDEF char *libc_tzname[2];
 INTDEF int libc_daylight;
 INTDEF __LONGPTR_TYPE__ libc_timezone;

@@ -153,16 +153,18 @@ typedef __WINT_TYPE__ wint_t;
 #endif /* !__std_wint_t_defined */
 __NAMESPACE_STD_END
 
-/* Always pull `struct tm' into the global namespace to work around
- * problems with function prototypes making use of it while it's
- * already defined in the std:: namespace. */
-#ifndef __tm_defined
-#define __tm_defined 1
-__NAMESPACE_STD_USING(tm)
-#endif /* !__tm_defined */
+#ifndef __STRUCT_TM
+#define __STRUCT_TM struct __NAMESPACE_STD_SYM tm
+#endif /* !__STRUCT_TM */
 
 #ifndef __CXX_SYSTEM_HEADER
 }%(c, ccompat){
+#ifndef __tm_defined
+#define __tm_defined 1
+#undef __STRUCT_TM
+#define __STRUCT_TM struct tm
+__NAMESPACE_STD_USING(tm)
+#endif /* !__tm_defined */
 #ifndef __size_t_defined
 #define __size_t_defined 1
 __NAMESPACE_STD_USING(size_t)
@@ -973,11 +975,11 @@ fputws_unlocked:([notnull] wchar_t const *__restrict string, [notnull] $FILE *__
 }
 
 
-[wchar][same_impl][export_alias(__wcsftime_l)]
+[wchar][same_impl][export_alias(__wcsftime_l)][dependency_prefix(DEFINE_STRUCT_TM)]
 [section({.text.crt.wchar.unicode.locale.format.strftime|.text.crt.dos.wchar.unicode.locale.format.strftime})]
 wcsftime_l:([outp(maxsize)] wchar_t *__restrict buf, $size_t maxsize,
             [notnull] wchar_t const *__restrict format,
-            [notnull] struct tm const *__restrict tp, $locale_t locale) -> $size_t {
+            [notnull] __STRUCT_TM const *__restrict tp, $locale_t locale) -> $size_t {
 	(void)locale;
 	return wcsftime(buf, maxsize, format, tp);
 }

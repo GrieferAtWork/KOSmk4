@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3b4bb652 */
+/* HASH CRC-32:0x7808d6b9 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 #if defined(__CRT_HAVE_asctime_r)
 /* Return in BUF a string of the form "Day Mon dd hh:mm:ss yyyy\n"
  * that is the representation of TP in this format */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_asctime_r,(struct tm const *__restrict __tp, char __buf[26]),asctime_r,(__tp,__buf))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_asctime_r,(__STRUCT_TM const *__restrict __tp, char __buf[26]),asctime_r,(__tp,__buf))
 #else /* LIBC: asctime_r */
 #include <local/time/asctime_r.h>
 /* Return in BUF a string of the form "Day Mon dd hh:mm:ss yyyy\n"
@@ -39,8 +39,8 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(asctime_s) __ATTR_NONNULL((1, 3)) __errno_t
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(asctime_s))(char *__restrict __buf,
                                                        __SIZE_TYPE__ __buflen,
-                                                       struct tm const *__restrict __tp) {
-#line 640 "kos/src/libc/magic/time.c"
+                                                       struct __NAMESPACE_STD_SYM tm const *__restrict __tp) {
+#line 616 "kos/src/libc/magic/time.c"
 	if (__buflen < 26)
 		return __ERANGE;
 	__localdep_asctime_r(__tp, __buf);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x71d13ca2 */
+/* HASH CRC-32:0x2458f550 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,15 @@
  */
 #ifndef __local_strftime_l_defined
 #define __local_strftime_l_defined 1
-#ifndef __tm_defined
-#define __tm_defined 1
-#ifdef __std_tm_defined
-__NAMESPACE_STD_USING(tm)
-#else /* __std_tm_defined */
-struct tm {
+#ifndef __STRUCT_TM
+#ifdef __tm_defined
+#define __STRUCT_TM struct __NAMESPACE_STD_SYM tm
+#else /* __tm_defined */
+#define __STRUCT_TM struct __NAMESPACE_STD_SYM __NAMESPACE_STD_SYM tm
+#ifndef __std_tm_defined
+#define __std_tm_defined 1
+__NAMESPACE_STD_BEGIN
+struct __NAMESPACE_STD_SYM tm {
 	int         tm_sec;      /* seconds [0, 61]. */
 	int         tm_min;      /* minutes [0, 59]. */
 	int         tm_hour;     /* hour [0, 23]. */
@@ -44,8 +47,10 @@ struct tm {
 #endif /* !__USE_MISC */
 #endif /* !... */
 };
+__NAMESPACE_STD_END
 #endif /* !__std_tm_defined */
 #endif /* !__tm_defined */
+#endif /* !__STRUCT_TM */
 /* Dependency: "strftime" from "time" */
 #ifndef ____localdep_strftime_defined
 #define ____localdep_strftime_defined 1
@@ -53,17 +58,17 @@ struct tm {
 /* Format TP into S according to FORMAT.
  * Write no more than MAXSIZE characters and return the number
  * of characters written, or 0 if it would exceed MAXSIZE */
-__FORCELOCAL __ATTR_NONNULL((1, 3, 4)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL __localdep_strftime)(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, struct tm const *__restrict __tp) { return __builtin_strftime(__buf, __bufsize, __format, __tp); }
+__FORCELOCAL __ATTR_NONNULL((1, 3, 4)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL __localdep_strftime)(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, __STRUCT_TM const *__restrict __tp) { return __builtin_strftime(__buf, __bufsize, __format, __tp); }
 #elif defined(__CRT_HAVE_strftime)
 /* Format TP into S according to FORMAT.
  * Write no more than MAXSIZE characters and return the number
  * of characters written, or 0 if it would exceed MAXSIZE */
-__CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strftime,(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, struct tm const *__restrict __tp),strftime,(__buf,__bufsize,__format,__tp))
+__CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strftime,(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, __STRUCT_TM const *__restrict __tp),strftime,(__buf,__bufsize,__format,__tp))
 #elif defined(__CRT_HAVE__Strftime)
 /* Format TP into S according to FORMAT.
  * Write no more than MAXSIZE characters and return the number
  * of characters written, or 0 if it would exceed MAXSIZE */
-__CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strftime,(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, struct tm const *__restrict __tp),_Strftime,(__buf,__bufsize,__format,__tp))
+__CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strftime,(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, __STRUCT_TM const *__restrict __tp),_Strftime,(__buf,__bufsize,__format,__tp))
 #else /* LIBC: strftime */
 #include <local/time/strftime.h>
 /* Format TP into S according to FORMAT.
@@ -80,9 +85,9 @@ __LOCAL_LIBC(strftime_l) __ATTR_NONNULL((1, 3, 4)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strftime_l))(char *__restrict __buf,
                                                         __SIZE_TYPE__ __bufsize,
                                                         char const *__restrict __format,
-                                                        struct tm const *__restrict __tp,
+                                                        __STRUCT_TM const *__restrict __tp,
                                                         __locale_t __locale) {
-#line 1484 "kos/src/libc/magic/time.c"
+#line 1373 "kos/src/libc/magic/time.c"
 	(void)__locale;
 	return __localdep_strftime(__buf, __bufsize, __format, __tp);
 }

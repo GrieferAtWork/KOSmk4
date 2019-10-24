@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa5cdbeb */
+/* HASH CRC-32:0x815bb68a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,15 @@
  */
 #ifndef __local_strftime_defined
 #define __local_strftime_defined 1
-#ifndef __tm_defined
-#define __tm_defined 1
-#ifdef __std_tm_defined
-__NAMESPACE_STD_USING(tm)
-#else /* __std_tm_defined */
-struct tm {
+#ifndef __STRUCT_TM
+#ifdef __tm_defined
+#define __STRUCT_TM struct __NAMESPACE_STD_SYM tm
+#else /* __tm_defined */
+#define __STRUCT_TM struct __NAMESPACE_STD_SYM __NAMESPACE_STD_SYM tm
+#ifndef __std_tm_defined
+#define __std_tm_defined 1
+__NAMESPACE_STD_BEGIN
+struct __NAMESPACE_STD_SYM tm {
 	int         tm_sec;      /* seconds [0, 61]. */
 	int         tm_min;      /* minutes [0, 59]. */
 	int         tm_hour;     /* hour [0, 23]. */
@@ -44,23 +47,25 @@ struct tm {
 #endif /* !__USE_MISC */
 #endif /* !... */
 };
+__NAMESPACE_STD_END
 #endif /* !__std_tm_defined */
 #endif /* !__tm_defined */
+#endif /* !__STRUCT_TM */
 /* Dependency: "crt_strftime_l" from "time" */
 #ifndef ____localdep_crt_strftime_l_defined
 #define ____localdep_crt_strftime_l_defined 1
 #if defined(__CRT_HAVE_strftime_l)
 /* Similar to `strftime' but take the information from
  * the provided locale and not the global locale */
-__CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_crt_strftime_l,(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, struct tm const *__restrict __tp, __locale_t __locale),strftime_l,(__buf,__bufsize,__format,__tp,__locale))
+__CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_crt_strftime_l,(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, __STRUCT_TM const *__restrict __tp, __locale_t __locale),strftime_l,(__buf,__bufsize,__format,__tp,__locale))
 #elif defined(__CRT_HAVE__strftime_l)
 /* Similar to `strftime' but take the information from
  * the provided locale and not the global locale */
-__CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_crt_strftime_l,(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, struct tm const *__restrict __tp, __locale_t __locale),_strftime_l,(__buf,__bufsize,__format,__tp,__locale))
+__CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_crt_strftime_l,(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, __STRUCT_TM const *__restrict __tp, __locale_t __locale),_strftime_l,(__buf,__bufsize,__format,__tp,__locale))
 #elif defined(__CRT_HAVE___strftime_l)
 /* Similar to `strftime' but take the information from
  * the provided locale and not the global locale */
-__CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_crt_strftime_l,(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, struct tm const *__restrict __tp, __locale_t __locale),__strftime_l,(__buf,__bufsize,__format,__tp,__locale))
+__CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_crt_strftime_l,(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, __STRUCT_TM const *__restrict __tp, __locale_t __locale),__strftime_l,(__buf,__bufsize,__format,__tp,__locale))
 #else /* LIBC: strftime_l */
 #undef ____localdep_crt_strftime_l_defined
 #endif /* crt_strftime_l... */
@@ -74,8 +79,8 @@ __LOCAL_LIBC(strftime) __ATTR_NONNULL((1, 3, 4)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strftime))(char *__restrict __buf,
                                                       __SIZE_TYPE__ __bufsize,
                                                       char const *__restrict __format,
-                                                      struct tm const *__restrict __tp) {
-#line 601 "kos/src/libc/magic/time.c"
+                                                      __STRUCT_TM const *__restrict __tp) {
+#line 574 "kos/src/libc/magic/time.c"
 #if (defined(__CRT_HAVE_strftime_l) || defined(__CRT_HAVE__strftime_l)) && !defined(__BUILDING_LIBC)
 	return __localdep_crt_strftime_l(__buf, __bufsize, __format, __tp, __NULLPTR);
 #else

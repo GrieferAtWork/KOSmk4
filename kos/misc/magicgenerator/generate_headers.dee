@@ -412,9 +412,9 @@ function split_words(
 		}
 		return exec(expr, globals: used_env);
 	}
-
 	for (;;) {
-		if (i >= length) break;
+		if (i >= length)
+			break;
 		local tok_start = i;
 		if (text.issymstrt(i)) {
 			do ++i;
@@ -1237,12 +1237,6 @@ function parse_functions(filename: string, text: string): {string | Function...}
 					}
 					extern_name = extern_name.substr(1, #extern_name-1).strip();
 					yield FunctionAlias(extern_name);
-				} else if (directive.startswith("define ")) {
-					directive = directive[#"define ":].lstrip();
-					local macro_name, none, macro_text = directive.partition(" ")...;
-					macro_name = macro_name.rstrip();
-					macro_text = macro_text.lstrip();
-					macros[macro_name] = macro_text;
 				} else if (directive.startswith("declare_known_section")) {
 					directive = directive[#"declare_known_section":].lstrip();
 					if (!directive.startswith("("))
@@ -1825,6 +1819,27 @@ again_enum_name:
 						tempfp << "#endif /* !__" << guard_name << "_defined */\n";
 					}
 					yield IntermediateString(tempfp.string, group_list);
+				} else if (directive.startswith("define")) {
+					directive = directive[#"define":].lstrip();
+					if (!directive.startswith("("))
+						err(directive_begin, "Expected `(' after `%[define' in " + repr directive);
+					local defend = directive.findmatch("(", ")", 1);
+					if (defend < 0)
+						err(directive_begin, "Missing `)' after `%[define" + repr directive + "'");
+					if (directive[defend + 1:].strip() != "")
+						err(directive_begin, "Trailing text after `%[define(...)': " + repr directive[defend:].strip());
+					directive = directive[1:defend].strip();
+					local macro_name, none, macro_text = directive.partition("=")...;
+					macro_name = macro_name.rstrip();
+					macro_text = macro_text.lstrip();
+					if (macro_name in macros) {
+						local o = macros[macro_name];
+						if (o != macro_text)
+							err(directive_begin, "Macro {!r} re-defined (old: {!r}, new: {!r})"
+								.format({ macro_name, o, macro_text }));
+					} else {
+						macros[macro_name] = macro_text;
+					}
 				} else {
 					err(directive_begin, "Unknown directive: " + repr directive);
 				}

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe3bc88fe */
+/* HASH CRC-32:0xa64621c2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_END
 #if defined(__CRT_HAVE_asctime_r)
 /* Return in BUF a string of the form "Day Mon dd hh:mm:ss yyyy\n"
  * that is the representation of TP in this format */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_asctime_r,(struct tm const *__restrict __tp, char __buf[26]),asctime_r,(__tp,__buf))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_asctime_r,(__STRUCT_TM const *__restrict __tp, char __buf[26]),asctime_r,(__tp,__buf))
 #else /* LIBC: asctime_r */
 #include <local/time/asctime_r.h>
 /* Return in BUF a string of the form "Day Mon dd hh:mm:ss yyyy\n"
@@ -55,8 +55,8 @@ __NAMESPACE_LOCAL_BEGIN
 /* Return a string of the form "Day Mon dd hh:mm:ss yyyy\n"
  * that is the representation of TP in this format */
 __LOCAL_LIBC(asctime) __ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(asctime))(struct tm const *__tp) {
-#line 631 "kos/src/libc/magic/time.c"
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(asctime))(struct __NAMESPACE_STD_SYM tm const *__tp) {
+#line 607 "kos/src/libc/magic/time.c"
 	return __localdep_asctime_r(__tp, __NAMESPACE_LOCAL_SYM __ctime_buf);
 }
 __NAMESPACE_LOCAL_END

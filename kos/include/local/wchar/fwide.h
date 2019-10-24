@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc718a390 */
+/* HASH CRC-32:0x7098db13 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(fwide) __ATTR_NONNULL((1)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fwide))(__FILE *__fp,
                                                    int __mode) {
-#line 537 "kos/src/libc/magic/wchar.c"
+#line 539 "kos/src/libc/magic/wchar.c"
 	return 0;
 }
 __NAMESPACE_LOCAL_END

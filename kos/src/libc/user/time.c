@@ -97,13 +97,13 @@ NOTHROW_NCX(LIBCCALL libc_clock)(void)
 }
 /*[[[end:clock]]]*/
 
-/*[[[head:getdate,hash:CRC-32=0x398178c7]]]*/
+/*[[[head:getdate,hash:CRC-32=0x91989807]]]*/
 /* Parse the given string as a date specification and return a value
  * representing the value.  The templates from the file identified by
  * the environment variable DATEMSK are used.  In case of an error
  * `getdate_err' is set */
 INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.time.getdate") struct tm *
+ATTR_WEAK ATTR_SECTION(".text.crt.time.getdate") __STRUCT_TM *
 NOTHROW_NCX(LIBCCALL libc_getdate)(const char *string)
 /*[[[body:getdate]]]*/
 {
@@ -113,7 +113,7 @@ NOTHROW_NCX(LIBCCALL libc_getdate)(const char *string)
 }
 /*[[[end:getdate]]]*/
 
-/*[[[head:getdate_r,hash:CRC-32=0x1e426bfb]]]*/
+/*[[[head:getdate_r,hash:CRC-32=0x300334e2]]]*/
 /* Since `getdate' is not reentrant because of the use of `getdate_err'
  * and the static buffer to return the result in, we provide a thread-safe
  * variant.  The functionality is the same.  The result is returned in
@@ -122,7 +122,7 @@ NOTHROW_NCX(LIBCCALL libc_getdate)(const char *string)
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.time.getdate_r") int
 NOTHROW_NCX(LIBCCALL libc_getdate_r)(const char *__restrict string,
-                                     struct tm *__restrict resbufp)
+                                     __STRUCT_TM *__restrict resbufp)
 /*[[[body:getdate_r]]]*/
 {
 	CRT_UNIMPLEMENTED("getdate_r"); /* TODO */

@@ -99,7 +99,7 @@
 #   define __flexarr    []
 #elif defined(__GNUC__)
 #   define __flexarr    [0]
-#elif defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+#elif defined(__STDC_VERSION__) && __STDC_VERSION__+0 >= 199901L
 #   define __flexarr    []
 #else
 #   define __flexarr    [1]
@@ -175,13 +175,14 @@
 #endif
 #   define __glibc_unlikely(cond)    __unlikely(cond)
 #   define __glibc_likely(cond)      __likely(cond)
-#if (!defined(_Noreturn) && (defined(__STDC_VERSION__) ? __STDC_VERSION__ : 0) < 201112 &&  !__GNUC_PREREQ(4,7))
-#   define _Noreturn __ATTR_NORETURN
+#if (!defined(_Noreturn) && \
+     (defined(__STDC_VERSION__) ? __STDC_VERSION__+0 : 0) < 201112 && !__GNUC_PREREQ(4, 7))
+#define _Noreturn __ATTR_NORETURN
 #endif
 #if (!defined(_Static_assert) && !defined(__cplusplus) \
-     && (defined(__STDC_VERSION__) ? __STDC_VERSION__ : 0) < 201112 \
-     && (!__GNUC_PREREQ(4,6) || defined __STRICT_ANSI__))
-#   define _Static_assert(expr,diagnostic) __STATIC_ASSERT(expr)
+     && (defined(__STDC_VERSION__) ? __STDC_VERSION__+0 : 0) < 201112 \
+     && (!__GNUC_PREREQ(4,6) || defined(__STRICT_ANSI__)))
+#define _Static_assert(expr, diagnostic) __STATIC_ASSERT(expr)
 #endif
 
 #include <bits/wordsize.h>

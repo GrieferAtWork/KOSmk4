@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf3c01dcf */
+/* HASH CRC-32:0xb493d05 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,12 +19,15 @@
  */
 #ifndef __local_asctime_r_defined
 #define __local_asctime_r_defined 1
-#ifndef __tm_defined
-#define __tm_defined 1
-#ifdef __std_tm_defined
-__NAMESPACE_STD_USING(tm)
-#else /* __std_tm_defined */
-struct tm {
+#ifndef __STRUCT_TM
+#ifdef __tm_defined
+#define __STRUCT_TM struct __NAMESPACE_STD_SYM tm
+#else /* __tm_defined */
+#define __STRUCT_TM struct __NAMESPACE_STD_SYM __NAMESPACE_STD_SYM tm
+#ifndef __std_tm_defined
+#define __std_tm_defined 1
+__NAMESPACE_STD_BEGIN
+struct __NAMESPACE_STD_SYM tm {
 	int         tm_sec;      /* seconds [0, 61]. */
 	int         tm_min;      /* minutes [0, 59]. */
 	int         tm_hour;     /* hour [0, 23]. */
@@ -44,8 +47,11 @@ struct tm {
 #endif /* !__USE_MISC */
 #endif /* !... */
 };
+__NAMESPACE_STD_END
 #endif /* !__std_tm_defined */
 #endif /* !__tm_defined */
+#endif /* !__STRUCT_TM */
+
 #ifndef __LIBC_TIME_ABBR_WDAY_NAMES_DEFINED
 #define __LIBC_TIME_ABBR_WDAY_NAMES_DEFINED 1
 #if (!defined(__CRT_HAVE__asctime32_s) && !defined(__CRT_HAVE__asctime64_s)) || \
@@ -82,7 +88,9 @@ __NAMESPACE_LOCAL_END
 #ifndef ____localdep_crt_asctime_s_defined
 #define ____localdep_crt_asctime_s_defined 1
 #if defined(__CRT_HAVE_asctime_s)
-__CREDIRECT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,__localdep_crt_asctime_s,(char *__restrict __buf, __SIZE_TYPE__ __buflen, struct tm const *__restrict __tp),asctime_s,(__buf,__buflen,__tp))
+/* Return in BUF a string of the form "Day Mon dd hh:mm:ss yyyy\n"
+ * that is the representation of TP in this format */
+__CREDIRECT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,__localdep_crt_asctime_s,(char *__restrict __buf, __SIZE_TYPE__ __buflen, __STRUCT_TM const *__restrict __tp),asctime_s,(__buf,__buflen,__tp))
 #else /* LIBC: asctime_s */
 #undef ____localdep_crt_asctime_s_defined
 #endif /* crt_asctime_s... */
@@ -111,9 +119,9 @@ __NAMESPACE_LOCAL_BEGIN
 /* Return in BUF a string of the form "Day Mon dd hh:mm:ss yyyy\n"
  * that is the representation of TP in this format */
 __LOCAL_LIBC(asctime_r) __ATTR_NONNULL((1, 2)) char *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(asctime_r))(struct tm const *__restrict __tp,
+__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(asctime_r))(__STRUCT_TM const *__restrict __tp,
                                                        char __buf[26]) {
-#line 1840 "kos/src/libc/magic/time.c"
+#line 1633 "kos/src/libc/magic/time.c"
 #if defined(__CRT_HAVE_asctime_s) && !defined(__BUILDING_LIBC)
 	return __localdep_crt_asctime_s(__buf, 26, __tp) ? __NULLPTR : __buf;
 #else

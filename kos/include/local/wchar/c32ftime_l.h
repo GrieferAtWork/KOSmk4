@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb863ddb3 */
+/* HASH CRC-32:0x2a84895e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,11 +19,43 @@
  */
 #ifndef __local_c32ftime_l_defined
 #define __local_c32ftime_l_defined 1
+#ifndef __STRUCT_TM
+#ifdef __tm_defined
+#define __STRUCT_TM struct __NAMESPACE_STD_SYM tm
+#else /* __tm_defined */
+#define __STRUCT_TM struct __NAMESPACE_STD_SYM __NAMESPACE_STD_SYM tm
+#ifndef __std_tm_defined
+#define __std_tm_defined 1
+__NAMESPACE_STD_BEGIN
+struct __NAMESPACE_STD_SYM tm {
+	int         tm_sec;      /* seconds [0, 61]. */
+	int         tm_min;      /* minutes [0, 59]. */
+	int         tm_hour;     /* hour [0, 23]. */
+	int         tm_mday;     /* day of month [1, 31]. */
+	int         tm_mon;      /* month of year [0, 11]. */
+	int         tm_year;     /* years since 1900. */
+	int         tm_wday;     /* day of week [0, 6] (Sunday = 0). */
+	int         tm_yday;     /* day of year [0, 365]. */
+	int         tm_isdst;    /* daylight savings flag. */
+#if defined(__CRT_GLC)
+#ifdef __USE_MISC
+	long int    tm_gmtoff;   /* Seconds east of UTC. */
+	char const *tm_zone;     /* Timezone abbreviation. */
+#else /* __USE_MISC */
+	long int    __tm_gmtoff; /* Seconds east of UTC. */
+	char const *__tm_zone;   /* Timezone abbreviation. */
+#endif /* !__USE_MISC */
+#endif /* !... */
+};
+__NAMESPACE_STD_END
+#endif /* !__std_tm_defined */
+#endif /* !__tm_defined */
+#endif /* !__STRUCT_TM */
 /* Dependency: "wcsftime" from "wchar" */
 #ifndef ____localdep_c32ftime_defined
 #define ____localdep_c32ftime_defined 1
 #if defined(__CRT_HAVE_wcsftime) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32ftime,(__CHAR32_TYPE__ *__restrict __buf, __SIZE_TYPE__ __buflen, __CHAR32_TYPE__ const *__restrict __format, struct tm const *__restrict __tp),wcsftime,(__buf,__buflen,__format,__tp))
+__CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_c32ftime,(__CHAR32_TYPE__ *__restrict __buf, __SIZE_TYPE__ __buflen, __CHAR32_TYPE__ const *__restrict __format, struct __NAMESPACE_STD_SYM tm const *__restrict __tp),wcsftime,(__buf,__buflen,__format,__tp))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/wcsftime.h>
 #define __localdep_c32ftime(buf, buflen, format, tp) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsftime))((__WCHAR_TYPE__ *)(buf), buflen, (__WCHAR_TYPE__ const *)(format), tp)
@@ -38,9 +70,9 @@ __LOCAL_LIBC(c32ftime_l) __ATTR_NONNULL((1, 3, 4)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(c32ftime_l))(__CHAR32_TYPE__ *__restrict __buf,
                                                         __SIZE_TYPE__ __maxsize,
                                                         __CHAR32_TYPE__ const *__restrict __format,
-                                                        struct tm const *__restrict __tp,
+                                                        __STRUCT_TM const *__restrict __tp,
                                                         __locale_t __locale) {
-#line 981 "kos/src/libc/magic/wchar.c"
+#line 983 "kos/src/libc/magic/wchar.c"
 	(void)__locale;
 	return __localdep_c32ftime(__buf, __maxsize, __format, __tp);
 }

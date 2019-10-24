@@ -61,12 +61,12 @@ __SYSDECL_BEGIN
 #endif /* !CLOCKS_PER_SEC */
 
 #if (!defined(__STRICT_ANSI__) || defined(__USE_POSIX)) && \
-     !defined(__USE_XOPEN2K) && defined(__CC__)
+     !defined(__USE_XOPEN2K) && defined(__CC__) && !defined(__USE_ISOC_PURE)
 #ifdef __CRT_HAVE___sysconf
-__CDECLARE(__WUNUSED,long int,__NOTHROW,__sysconf,(int __confno),(__confno))
+__CDECLARE(__ATTR_WUNUSED,long int,__NOTHROW,__sysconf,(int __confno),(__confno))
 #define CLK_TCK ((__typedef_clock_t)__sysconf(2))
 #elif defined(__CRT_HAVE_sysconf)
-__CREDIRECT(__WUNUSED,long int,__NOTHROW,__sysconf,(int __confno),sysconf,(__confno))
+__CREDIRECT(__ATTR_WUNUSED,long int,__NOTHROW,__sysconf,(int __confno),sysconf,(__confno))
 #define CLK_TCK ((__typedef_clock_t)__sysconf(2))
 #else
 #define CLK_TCK   CLOCKS_PER_SEC
@@ -111,7 +111,7 @@ __CREDIRECT(__WUNUSED,long int,__NOTHROW,__sysconf,(int __confno),sysconf,(__con
 #ifndef TIMER_ABSTIME
 #define TIMER_ABSTIME            1 /* Flag to indicate time is absolute. */
 #endif /* !TIMER_ABSTIME */
-#endif
+#endif /* __USE_POSIX199309 */
 
 #ifdef __CC__
 #ifdef __USE_GNU

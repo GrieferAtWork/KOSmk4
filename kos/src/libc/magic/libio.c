@@ -55,20 +55,22 @@
 
 #ifndef EOF
 #define EOF (-1)
-#endif
+#endif /* !EOF */
 
 #ifndef NULL
 #define NULL __NULLPTR
-#endif
+#endif /* !NULL */
 
 __SYSDECL_BEGIN
 
 #ifdef __CC__
 
+#ifndef __USE_ISOC_PURE
 #ifndef __wint_t_defined
 #define __wint_t_defined 1
 typedef __WINT_TYPE__ wint_t;
 #endif /* !__wint_t_defined */
+#endif /* !__USE_ISOC_PURE */
 
 /* Functions to do I/O and file management for a stream. */
 

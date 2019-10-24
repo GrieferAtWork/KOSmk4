@@ -35,7 +35,10 @@
 #define __SIZEOF_SIGACTION           __SIZEOF_SIGACTION64
 #define __ALIGNOF_SIGACTION          __ALIGNOF_SIGACTION64
 #define sigaction64       sigaction
+#ifndef ____sighandler_t_defined
+#define ____sighandler_t_defined 1
 #define __sighandler64_t  __sighandler_t
+#endif /* !____sighandler_t_defined */
 #endif /* __x86_64__ && !__CRT_CYG_PRIMARY */
 
 

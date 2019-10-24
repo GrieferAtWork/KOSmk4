@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb69e8d62 */
+/* HASH CRC-32:0x9aafe955 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,6 +35,12 @@ __NAMESPACE_STD_USING(mbstate_t)
 __NAMESPACE_STD_USING(FILE)
 #endif /* !__FILE_defined */
 #endif /* __USE_UNIX98 || __USE_XOPEN2K || __USE_DOS */
+#ifndef __tm_defined
+#define __tm_defined 1
+#undef __STRUCT_TM
+#define __STRUCT_TM struct tm
+__NAMESPACE_STD_USING(tm)
+#endif /* !__tm_defined */
 #ifndef __size_t_defined
 #define __size_t_defined 1
 __NAMESPACE_STD_USING(size_t)
@@ -356,15 +362,17 @@ typedef __WINT_TYPE__ wint_t;
 #endif /* !__std_wint_t_defined */
 __NAMESPACE_STD_END
 
-/* Always pull `struct tm' into the global namespace to work around
- * problems with function prototypes making use of it while it's
- * already defined in the std:: namespace. */
-#ifndef __tm_defined
-#define __tm_defined 1
-__NAMESPACE_STD_USING(tm)
-#endif /* !__tm_defined */
+#ifndef __STRUCT_TM
+#define __STRUCT_TM struct __NAMESPACE_STD_SYM tm
+#endif /* !__STRUCT_TM */
 
 #ifndef __CXX_SYSTEM_HEADER
+#ifndef __tm_defined
+#define __tm_defined 1
+#undef __STRUCT_TM
+#define __STRUCT_TM struct tm
+__NAMESPACE_STD_USING(tm)
+#endif /* !__tm_defined */
 #ifndef __size_t_defined
 #define __size_t_defined 1
 __NAMESPACE_STD_USING(size_t)
@@ -2005,12 +2013,12 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,,fputws_unlocked,(wchar_
 __NAMESPACE_LOCAL_USING_OR_IMPL(fputws_unlocked, __FORCELOCAL __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T (__LIBCCALL fputws_unlocked)(wchar_t const *__restrict __string, __FILE *__restrict __stream) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fputws_unlocked))(__string, __stream); })
 #endif /* fputws_unlocked... */
 #if defined(__CRT_HAVE_wcsftime_l)
-__CDECLARE(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,wcsftime_l,(wchar_t *__restrict __buf, __SIZE_TYPE__ __maxsize, wchar_t const *__restrict __format, struct tm const *__restrict __tp, __locale_t __locale),(__buf,__maxsize,__format,__tp,__locale))
+__CDECLARE(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,wcsftime_l,(wchar_t *__restrict __buf, __SIZE_TYPE__ __maxsize, wchar_t const *__restrict __format, __STRUCT_TM const *__restrict __tp, __locale_t __locale),(__buf,__maxsize,__format,__tp,__locale))
 #elif defined(__CRT_HAVE___wcsftime_l)
-__CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,wcsftime_l,(wchar_t *__restrict __buf, __SIZE_TYPE__ __maxsize, wchar_t const *__restrict __format, struct tm const *__restrict __tp, __locale_t __locale),__wcsftime_l,(__buf,__maxsize,__format,__tp,__locale))
+__CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,wcsftime_l,(wchar_t *__restrict __buf, __SIZE_TYPE__ __maxsize, wchar_t const *__restrict __format, __STRUCT_TM const *__restrict __tp, __locale_t __locale),__wcsftime_l,(__buf,__maxsize,__format,__tp,__locale))
 #else /* LIBC: wcsftime_l */
 #include <local/wchar/wcsftime_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(wcsftime_l, __FORCELOCAL __ATTR_NONNULL((1, 3, 4)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL wcsftime_l)(wchar_t *__restrict __buf, __SIZE_TYPE__ __maxsize, wchar_t const *__restrict __format, struct tm const *__restrict __tp, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsftime_l))(__buf, __maxsize, __format, __tp, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(wcsftime_l, __FORCELOCAL __ATTR_NONNULL((1, 3, 4)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL wcsftime_l)(wchar_t *__restrict __buf, __SIZE_TYPE__ __maxsize, wchar_t const *__restrict __format, __STRUCT_TM const *__restrict __tp, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsftime_l))(__buf, __maxsize, __format, __tp, __locale); })
 #endif /* wcsftime_l... */
 #endif /* __USE_GNU */
 

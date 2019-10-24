@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x37a6ce12 */
+/* HASH CRC-32:0x40e1f430 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -50,7 +50,7 @@ __LOCAL_LIBC(sigtimedwait) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(sigtimedwait))(struct __sigset_struct const *__restrict __set,
                                                           siginfo_t *__restrict __info,
                                                           struct __TM_TYPE(timespec) const *__timeout) {
-#line 335 "kos/src/libc/magic/signal.c"
+#line 340 "kos/src/libc/magic/signal.c"
 #ifdef __CRT_HAVE_sigtimedwait64
 	struct __timespec64 __tmv;
 	if (!__timeout)

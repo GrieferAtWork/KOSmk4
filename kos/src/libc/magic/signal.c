@@ -108,6 +108,11 @@ typedef __uid_t uid_t;
 #endif /* !__uid_t_defined */
 #endif /* __USE_XOPEN || __USE_XOPEN2K */
 
+#ifndef ____sighandler_t_defined
+#define ____sighandler_t_defined 1
+typedef void (__LIBCCALL *__sighandler_t)(int __signo);
+#endif /* !____sighandler_t_defined */
+
 #ifdef __USE_GNU
 #ifndef __sighandler_t_defined
 #define __sighandler_t_defined 1

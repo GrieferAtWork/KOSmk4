@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x521b0a9e */
+/* HASH CRC-32:0x46345a96 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,32 +62,32 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32ftime, __FORCELOCAL __ATTR_NONNULL((1, 3, 4))
 
 #ifdef __USE_GNU
 #if defined(__CRT_HAVE_wcsftime_l) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,c16ftime_l,(char16_t *__restrict __buf, __SIZE_TYPE__ __maxsize, char16_t const *__restrict __format, struct tm const *__restrict __tp, __locale_t __locale),wcsftime_l,(__buf,__maxsize,__format,__tp,__locale))
+__CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,c16ftime_l,(char16_t *__restrict __buf, __SIZE_TYPE__ __maxsize, char16_t const *__restrict __format, __STRUCT_TM const *__restrict __tp, __locale_t __locale),wcsftime_l,(__buf,__maxsize,__format,__tp,__locale))
 #elif defined(__CRT_HAVE___wcsftime_l) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,c16ftime_l,(char16_t *__restrict __buf, __SIZE_TYPE__ __maxsize, char16_t const *__restrict __format, struct tm const *__restrict __tp, __locale_t __locale),__wcsftime_l,(__buf,__maxsize,__format,__tp,__locale))
+__CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,c16ftime_l,(char16_t *__restrict __buf, __SIZE_TYPE__ __maxsize, char16_t const *__restrict __format, __STRUCT_TM const *__restrict __tp, __locale_t __locale),__wcsftime_l,(__buf,__maxsize,__format,__tp,__locale))
 #elif defined(__CRT_HAVE_DOS$__wcsftime_l)
-__CREDIRECT_DOS(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,c16ftime_l,(char16_t *__restrict __buf, __SIZE_TYPE__ __maxsize, char16_t const *__restrict __format, struct tm const *__restrict __tp, __locale_t __locale),__wcsftime_l,(__buf,__maxsize,__format,__tp,__locale))
+__CREDIRECT_DOS(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,c16ftime_l,(char16_t *__restrict __buf, __SIZE_TYPE__ __maxsize, char16_t const *__restrict __format, __STRUCT_TM const *__restrict __tp, __locale_t __locale),__wcsftime_l,(__buf,__maxsize,__format,__tp,__locale))
 #elif defined(__CRT_HAVE_DOS$wcsftime_l)
-__CREDIRECT_DOS(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,c16ftime_l,(char16_t *__restrict __buf, __SIZE_TYPE__ __maxsize, char16_t const *__restrict __format, struct tm const *__restrict __tp, __locale_t __locale),wcsftime_l,(__buf,__maxsize,__format,__tp,__locale))
+__CREDIRECT_DOS(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,c16ftime_l,(char16_t *__restrict __buf, __SIZE_TYPE__ __maxsize, char16_t const *__restrict __format, __STRUCT_TM const *__restrict __tp, __locale_t __locale),wcsftime_l,(__buf,__maxsize,__format,__tp,__locale))
 #elif defined(__CRT_HAVE_DOS$__wcsftime_l)
-__CREDIRECT_DOS(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,c16ftime_l,(char16_t *__restrict __buf, __SIZE_TYPE__ __maxsize, char16_t const *__restrict __format, struct tm const *__restrict __tp, __locale_t __locale),__wcsftime_l,(__buf,__maxsize,__format,__tp,__locale))
+__CREDIRECT_DOS(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,c16ftime_l,(char16_t *__restrict __buf, __SIZE_TYPE__ __maxsize, char16_t const *__restrict __format, __STRUCT_TM const *__restrict __tp, __locale_t __locale),__wcsftime_l,(__buf,__maxsize,__format,__tp,__locale))
 #elif __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/wcsftime_l.h>
-__FORCELOCAL __ATTR_NONNULL((1, 3, 4)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL c16ftime_l)(char16_t *__restrict __buf, __SIZE_TYPE__ __maxsize, char16_t const *__restrict __format, struct tm const *__restrict __tp, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsftime_l))((__WCHAR_TYPE__ *)__buf, __maxsize, (__WCHAR_TYPE__ const *)__format, __tp, __locale); }
+__FORCELOCAL __ATTR_NONNULL((1, 3, 4)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL c16ftime_l)(char16_t *__restrict __buf, __SIZE_TYPE__ __maxsize, char16_t const *__restrict __format, __STRUCT_TM const *__restrict __tp, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsftime_l))((__WCHAR_TYPE__ *)__buf, __maxsize, (__WCHAR_TYPE__ const *)__format, __tp, __locale); }
 #else /* LIBC: c16ftime_l */
 #include <local/wchar/c16ftime_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(c16ftime_l, __FORCELOCAL __ATTR_NONNULL((1, 3, 4)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL c16ftime_l)(char16_t *__restrict __buf, __SIZE_TYPE__ __maxsize, char16_t const *__restrict __format, struct tm const *__restrict __tp, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16ftime_l))(__buf, __maxsize, __format, __tp, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(c16ftime_l, __FORCELOCAL __ATTR_NONNULL((1, 3, 4)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL c16ftime_l)(char16_t *__restrict __buf, __SIZE_TYPE__ __maxsize, char16_t const *__restrict __format, __STRUCT_TM const *__restrict __tp, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16ftime_l))(__buf, __maxsize, __format, __tp, __locale); })
 #endif /* c16ftime_l... */
 #if defined(__CRT_HAVE_wcsftime_l) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,c32ftime_l,(char32_t *__restrict __buf, __SIZE_TYPE__ __maxsize, char32_t const *__restrict __format, struct tm const *__restrict __tp, __locale_t __locale),wcsftime_l,(__buf,__maxsize,__format,__tp,__locale))
+__CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,c32ftime_l,(char32_t *__restrict __buf, __SIZE_TYPE__ __maxsize, char32_t const *__restrict __format, __STRUCT_TM const *__restrict __tp, __locale_t __locale),wcsftime_l,(__buf,__maxsize,__format,__tp,__locale))
 #elif defined(__CRT_HAVE___wcsftime_l) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,c32ftime_l,(char32_t *__restrict __buf, __SIZE_TYPE__ __maxsize, char32_t const *__restrict __format, struct tm const *__restrict __tp, __locale_t __locale),__wcsftime_l,(__buf,__maxsize,__format,__tp,__locale))
+__CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,c32ftime_l,(char32_t *__restrict __buf, __SIZE_TYPE__ __maxsize, char32_t const *__restrict __format, __STRUCT_TM const *__restrict __tp, __locale_t __locale),__wcsftime_l,(__buf,__maxsize,__format,__tp,__locale))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/wcsftime_l.h>
-__FORCELOCAL __ATTR_NONNULL((1, 3, 4)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL c32ftime_l)(char32_t *__restrict __buf, __SIZE_TYPE__ __maxsize, char32_t const *__restrict __format, struct tm const *__restrict __tp, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsftime_l))((__WCHAR_TYPE__ *)__buf, __maxsize, (__WCHAR_TYPE__ const *)__format, __tp, __locale); }
+__FORCELOCAL __ATTR_NONNULL((1, 3, 4)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL c32ftime_l)(char32_t *__restrict __buf, __SIZE_TYPE__ __maxsize, char32_t const *__restrict __format, __STRUCT_TM const *__restrict __tp, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsftime_l))((__WCHAR_TYPE__ *)__buf, __maxsize, (__WCHAR_TYPE__ const *)__format, __tp, __locale); }
 #else /* LIBC: c32ftime_l */
 #include <local/wchar/c32ftime_l.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(c32ftime_l, __FORCELOCAL __ATTR_NONNULL((1, 3, 4)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL c32ftime_l)(char32_t *__restrict __buf, __SIZE_TYPE__ __maxsize, char32_t const *__restrict __format, struct tm const *__restrict __tp, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32ftime_l))(__buf, __maxsize, __format, __tp, __locale); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(c32ftime_l, __FORCELOCAL __ATTR_NONNULL((1, 3, 4)) __SIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL c32ftime_l)(char32_t *__restrict __buf, __SIZE_TYPE__ __maxsize, char32_t const *__restrict __format, __STRUCT_TM const *__restrict __tp, __locale_t __locale) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32ftime_l))(__buf, __maxsize, __format, __tp, __locale); })
 #endif /* c32ftime_l... */
 #endif /* __USE_GNU */
 

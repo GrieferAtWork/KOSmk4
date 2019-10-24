@@ -667,12 +667,12 @@ unicode_readutf16_swap_rev_n:([nonnull] /*utf-16*/$char16_t const **__restrict p
 
 
 
-%[define UTF8_1BYTE_MAX   ((uint32_t)1 << 7)-1]
-%[define UTF8_2BYTE_MAX   ((uint32_t)1 << 11)-1]
-%[define UTF8_3BYTE_MAX   ((uint32_t)1 << 16)-1]
-%[define UTF8_4BYTE_MAX   ((uint32_t)1 << 21)-1]
-%[define UTF8_5BYTE_MAX   ((uint32_t)1 << 26)-1]
-%[define UTF8_6BYTE_MAX   ((uint32_t)1 << 31)-1]
+%[define(UTF8_1BYTE_MAX = ((uint32_t)1 << 7)-1)]
+%[define(UTF8_2BYTE_MAX = ((uint32_t)1 << 11)-1)]
+%[define(UTF8_3BYTE_MAX = ((uint32_t)1 << 16)-1)]
+%[define(UTF8_4BYTE_MAX = ((uint32_t)1 << 21)-1)]
+%[define(UTF8_5BYTE_MAX = ((uint32_t)1 << 26)-1)]
+%[define(UTF8_6BYTE_MAX = ((uint32_t)1 << 31)-1)]
 
 %
 @@Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
@@ -718,11 +718,11 @@ unicode_writeutf8:([nonnull] /*utf-8*/ char *__restrict dst, $char32_t ch) -> ch
 	return dst;
 }
 
-%[define UTF16_HIGH_SURROGATE_MIN 0xd800]
-%[define UTF16_HIGH_SURROGATE_MAX 0xdbff]
-%[define UTF16_LOW_SURROGATE_MIN  0xdc00]
-%[define UTF16_LOW_SURROGATE_MAX  0xdfff]
-%[define UTF16_SURROGATE_SHIFT    0x10000]
+%[define(UTF16_HIGH_SURROGATE_MIN = 0xd800)]
+%[define(UTF16_HIGH_SURROGATE_MAX = 0xdbff)]
+%[define(UTF16_LOW_SURROGATE_MIN  = 0xdc00)]
+%[define(UTF16_LOW_SURROGATE_MAX  = 0xdfff)]
+%[define(UTF16_SURROGATE_SHIFT    = 0x10000)]
 
 %
 @@Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
@@ -1350,7 +1350,7 @@ done:
 
 
 
-%[define __UNICODE_FORMAT_XTOY_BUFSIZE 64]
+%[define(__UNICODE_FORMAT_XTOY_BUFSIZE = 64)]
 
 
 %{

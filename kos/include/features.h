@@ -38,8 +38,27 @@
 //#undef __USE_CTYPE_MACROS
 
 
+/* Don't implicitly expose any system functionality that isn't
+ * strictly sanctioned by the C/C++ standard in C standard headers.
+ * Headers that aren't mentioned by the C/C++ standards continue
+ * to behave normally, and any symbol that starts with `__' also
+ * isn't necessarily affected.
+ * -> This functionality is mainly intended to get an idea of how
+ *    C-standard compliant some given application source actually
+ *    is, as well as aid in putting together configure tests.
+ * NOTE: Any source file using this should also make sure that
+ *       no other *_SOURCE macro gets defined, since other macros
+ *       may once again manually enable functionality that was
+ *       originally disabled by this option. */
+#ifdef _ISOC_PURE_SOURCE
+#undef __USE_ISOC_PURE
+#define __USE_ISOC_PURE 1
+#endif /* _ISOC_PURE_SOURCE */
+
+
 
 #if defined(__cplusplus) && !defined(_NO_IMPLICIT_GNU_SOURCE) && \
+   !defined(__USE_ISOC_PURE) && \
    (defined(__GNUC__) || __has_include(<bits/vector.tcc>))
 /* Hacky work-around to satisfy header requirements for libstdc++
  * And before you say that this is a bad way of doing it, know that
@@ -101,7 +120,7 @@
 #endif /* _KOS_SOURCE */
 
 #if defined(_KOS_KERNEL_SOURCE) || \
-   (defined(__KOS__) && defined(__KERNEL__))
+   (defined(__KOS__) && defined(__KERNEL__) && !defined(__USE_ISOC_PURE))
 #define __USE_KOS_KERNEL 1
 #endif /* _KOS_KERNEL_SOURCE || (__KOS__ && __KERNEL__) */
 
@@ -124,7 +143,7 @@
 #define __USE_DOS 1
 #define __USE_DOS_SLIB 1
 #endif /* (_DOS_SOURCE+0) != 0 */
-#elif defined(_MSC_VER)
+#elif defined(_MSC_VER) && !defined(__USE_ISOC_PURE)
 #define __USE_DOS 1
 #ifndef __STDC_WANT_SECURE_LIB__
 #define __STDC_WANT_SECURE_LIB__ 1
@@ -194,8 +213,9 @@
 #define _ATFILE_SOURCE 1
 #endif /* _GNU_SOURCE */
 
-#if (defined(_DEFAULT_SOURCE) || (!defined(__STRICT_ANSI__) && !defined(_ISOC99_SOURCE) && \
-    !defined(_POSIX_SOURCE) && !defined(_POSIX_C_SOURCE) && !defined(_XOPEN_SOURCE)))
+#if !defined(_DEFAULT_SOURCE) && !defined(__USE_ISOC_PURE) && \
+   (!defined(__STRICT_ANSI__) && !defined(_ISOC99_SOURCE) && \
+    !defined(_POSIX_SOURCE) && !defined(_POSIX_C_SOURCE) && !defined(_XOPEN_SOURCE))
 #undef  _DEFAULT_SOURCE
 #define _DEFAULT_SOURCE 1
 #endif
@@ -243,7 +263,7 @@
 #define __CORRECT_ISO_CPP11_MATH_H_PROTO_FP 1
 #endif
 
-#ifdef _DEFAULT_SOURCE
+#if defined(_DEFAULT_SOURCE) && !defined(__USE_ISOC_PURE)
 #if !defined(_POSIX_SOURCE) && !defined(_POSIX_C_SOURCE)
 #define __USE_POSIX_IMPLICITLY 1
 #endif /* !_POSIX_SOURCE && !_POSIX_C_SOURCE */
@@ -251,11 +271,12 @@
 #define _POSIX_SOURCE 1
 #undef  _POSIX_C_SOURCE
 #define _POSIX_C_SOURCE 200809L
-#endif /* _DEFAULT_SOURCE */
+#endif /* _DEFAULT_SOURCE && !__USE_ISOC_PURE */
 
 #if (!defined(__STRICT_ANSI__) || \
      (defined(_XOPEN_SOURCE) && _XOPEN_SOURCE+0 >= 500)) && \
-     !defined(_POSIX_SOURCE) && !defined(_POSIX_C_SOURCE)
+     !defined(_POSIX_SOURCE) && !defined(_POSIX_C_SOURCE) && \
+     !defined(__USE_ISOC_PURE)
 #define _POSIX_SOURCE 1
 #if defined(_XOPEN_SOURCE) && _XOPEN_SOURCE+0 < 500
 #define _POSIX_C_SOURCE 2
@@ -331,9 +352,11 @@
 #ifdef _LARGEFILE_SOURCE
 #define __USE_LARGEFILE 1
 #endif /* _LARGEFILE_SOURCE */
+
 #ifdef _LARGEFILE64_SOURCE
 #define __USE_LARGEFILE64 1
 #endif /* _LARGEFILE64_SOURCE */
+
 #ifdef _FILE_OFFSET_BITS
 #if (_FILE_OFFSET_BITS+0) == 64
 #define __USE_FILE_OFFSET64 1
@@ -341,15 +364,19 @@
 #elif defined(__USE_KOS_KERNEL)
 #define __USE_FILE_OFFSET64 1
 #endif
+
 #ifdef _DEFAULT_SOURCE
 #define __USE_MISC 1
 #endif /* _DEFAULT_SOURCE */
+
 #ifdef _ATFILE_SOURCE
 #define __USE_ATFILE 1
 #endif /* _ATFILE_SOURCE */
+
 #ifdef _GNU_SOURCE
 #define __USE_GNU 1
 #endif /* _GNU_SOURCE */
+
 #if (defined(_REENTRANT) || defined(_THREAD_SAFE)) || \
     (defined(__CRT_CYG) && defined(__DYNAMIC_REENT__) && !defined(__SINGLE_THREAD__))
 #define __USE_REENTRANT 1
@@ -396,6 +423,7 @@
 #undef __USE_GNU
 #undef __USE_REENTRANT
 #undef __USE_UTF
+#undef __USE_ISOC_PURE
 
 #define __USE_KOS 1
 #define __USE_STRING_BWLQ 1
