@@ -1612,8 +1612,8 @@ NOTHROW_NCX(LIBCCALL libc___p___initenv)(void)
 }
 /*[[[end:__p___initenv]]]*/
 
-/*[[[head:_aligned_malloc,hash:CRC-32=0x7246fa86]]]*/
-INTERN WUNUSED ATTR_ALLOC_ALIGN(2) ATTR_ALLOC_SIZE((1)) ATTR_MALLOC
+/*[[[head:_aligned_malloc,hash:CRC-32=0x334ee294]]]*/
+INTERN WUNUSED ATTR_MALLOC ATTR_ALLOC_ALIGN(2) ATTR_ALLOC_SIZE((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap._aligned_malloc") void *
 NOTHROW_NCX(LIBCCALL libc__aligned_malloc)(size_t num_bytes,
                                            size_t min_alignment)
@@ -1784,8 +1784,8 @@ NOTHROW_NCX(LIBCCALL libc__get_doserrno)(u32 *perr)
 }
 /*[[[end:_get_doserrno]]]*/
 
-/*[[[head:_aligned_offset_malloc,hash:CRC-32=0xbced8de5]]]*/
-INTERN WUNUSED ATTR_ALLOC_ALIGN(1) ATTR_MALLOC
+/*[[[head:_aligned_offset_malloc,hash:CRC-32=0x5b2f2251]]]*/
+INTERN WUNUSED ATTR_MALLOC ATTR_ALLOC_SIZE((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap._aligned_offset_malloc") void *
 NOTHROW_NCX(LIBCCALL libc__aligned_offset_malloc)(size_t num_bytes,
                                                   size_t min_alignment,

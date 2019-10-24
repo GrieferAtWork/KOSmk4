@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x55cbeb85 */
+/* HASH CRC-32:0xc4e7e5e8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -152,8 +152,8 @@ INTDEF NONNULL((1, 2, 3)) errno_t NOTHROW_NCX(LIBCCALL libc__dupenv_s)(char **__
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_rand_s)(unsigned int *__restrict randval);
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd_rand_s)(unsigned int *__restrict randval);
 INTDEF WUNUSED ATTR_MALL_DEFAULT_ALIGNED ATTR_ALLOC_SIZE((2, 3)) void *NOTHROW_NCX(LIBCCALL libc__recalloc)(void *mptr, size_t count, size_t num_bytes);
-INTDEF WUNUSED ATTR_ALLOC_ALIGN(2) ATTR_ALLOC_SIZE((1)) ATTR_MALLOC void *NOTHROW_NCX(LIBCCALL libc__aligned_malloc)(size_t num_bytes, size_t min_alignment);
-INTDEF WUNUSED ATTR_ALLOC_ALIGN(1) ATTR_MALLOC void *NOTHROW_NCX(LIBCCALL libc__aligned_offset_malloc)(size_t num_bytes, size_t min_alignment, size_t offset);
+INTDEF WUNUSED ATTR_MALLOC ATTR_ALLOC_ALIGN(2) ATTR_ALLOC_SIZE((1)) void *NOTHROW_NCX(LIBCCALL libc__aligned_malloc)(size_t num_bytes, size_t min_alignment);
+INTDEF WUNUSED ATTR_MALLOC ATTR_ALLOC_SIZE((1)) void *NOTHROW_NCX(LIBCCALL libc__aligned_offset_malloc)(size_t num_bytes, size_t min_alignment, size_t offset);
 INTDEF WUNUSED ATTR_ALLOC_ALIGN(3) ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(LIBCCALL libc__aligned_realloc)(void *mptr, size_t newsize, size_t min_alignment);
 INTDEF WUNUSED ATTR_ALLOC_ALIGN(4) ATTR_ALLOC_SIZE((2, 3)) void *NOTHROW_NCX(LIBCCALL libc__aligned_recalloc)(void *mptr, size_t count, size_t num_bytes, size_t min_alignment);
 INTDEF WUNUSED ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(LIBCCALL libc__aligned_offset_realloc)(void *mptr, size_t newsize, size_t min_alignment, size_t offset);

@@ -2312,13 +2312,14 @@ wcstombs_s:([nonnull] $size_t *presult,
 %/* DOS malloc extensions */
 %[default_impl_section(.text.crt.dos.heap)]
 
-[ATTR_WUNUSED][ATTR_MALL_DEFAULT_ALIGNED][ATTR_ALLOC_SIZE((2, 3))]
-_recalloc:(void *mptr, $size_t count, $size_t num_bytes) -> void *;
+_recalloc:(void *mptr, $size_t count, $size_t num_bytes)
+	-> [realloc(mptr, count * num_bytes)] void *;
 /* TODO: Emulate _recalloc() with realloc() + malloc_usable_size() */
 
 [requires($has_function(malloc))]
-[ATTR_WUNUSED][ATTR_ALLOC_ALIGN(2)][ATTR_ALLOC_SIZE((1))][ATTR_MALLOC]
-_aligned_malloc:($size_t num_bytes, $size_t min_alignment) -> void * {
+_aligned_malloc:($size_t num_bytes, $size_t min_alignment)
+	-> [memalign(min_alignment, num_bytes)] void *
+{
 	void *result = malloc(num_bytes + 2 * sizeof(void *) + min_alignment - 1);
 	if (result) {
 		void *base = (void *)(((uintptr_t)result + (min_alignment - 1)) & ~(min_alignment - 1));
@@ -2330,8 +2331,9 @@ _aligned_malloc:($size_t num_bytes, $size_t min_alignment) -> void * {
 }
 
 [requires($has_function(malloc))]
-[ATTR_WUNUSED][ATTR_ALLOC_ALIGN(1)][ATTR_MALLOC]
-_aligned_offset_malloc:($size_t num_bytes, $size_t min_alignment, $size_t offset) -> void * {
+_aligned_offset_malloc:($size_t num_bytes, $size_t min_alignment, $size_t offset)
+	-> [malloc_unaligned(num_bytes)] void *
+{
 	void *result;
 	offset &= (min_alignment - 1);
 	result = malloc(num_bytes + 2 * sizeof(void *) + min_alignment - 1 + (min_alignment - offset));
@@ -2344,9 +2346,10 @@ _aligned_offset_malloc:($size_t num_bytes, $size_t min_alignment, $size_t offset
 	return result;
 }
 
-[ATTR_WUNUSED][ATTR_ALLOC_ALIGN(3)][ATTR_ALLOC_SIZE((2))]
 [requires($has_function(_aligned_malloc) && $has_function(_aligned_free) && $has_function(_aligned_msize))]
-_aligned_realloc:(void *mptr, $size_t newsize, $size_t min_alignment) -> void * {
+_aligned_realloc:(void *mptr, $size_t newsize, $size_t min_alignment)
+	-> [realign(mptr, min_alignment, newsize)] void *
+{
 	void *result;
 	result = _aligned_malloc(newsize, min_alignment);
 	if (result && mptr) {
@@ -2359,9 +2362,10 @@ _aligned_realloc:(void *mptr, $size_t newsize, $size_t min_alignment) -> void * 
 	return result;
 }
 
-[ATTR_WUNUSED][ATTR_ALLOC_ALIGN(4)][ATTR_ALLOC_SIZE((2, 3))]
 [requires($has_function(_aligned_malloc) && $has_function(_aligned_free) && $has_function(_aligned_msize))]
-_aligned_recalloc:(void *mptr, $size_t count, $size_t num_bytes, $size_t min_alignment) -> void * {
+_aligned_recalloc:(void *mptr, $size_t count, $size_t num_bytes, $size_t min_alignment)
+	-> [realign(mptr, min_alignment, count * num_bytes)] void *
+{
 	void *result;
 	num_bytes *= count;
 	result = _aligned_malloc(num_bytes, min_alignment);
@@ -2376,9 +2380,10 @@ _aligned_recalloc:(void *mptr, $size_t count, $size_t num_bytes, $size_t min_ali
 	return result;
 }
 
-[ATTR_WUNUSED][ATTR_ALLOC_SIZE((2))]
 [requires($has_function(_aligned_offset_malloc) && $has_function(_aligned_free) && $has_function(_aligned_msize))]
-_aligned_offset_realloc:(void *mptr, $size_t newsize, $size_t min_alignment, $size_t offset) -> void * {
+_aligned_offset_realloc:(void *mptr, $size_t newsize, $size_t min_alignment, $size_t offset)
+	-> [realloc_unaligned(mptr, newsize)] void *
+{
 	void *result;
 	result = _aligned_offset_malloc(newsize, min_alignment, offset);
 	if (result) {
@@ -2391,9 +2396,10 @@ _aligned_offset_realloc:(void *mptr, $size_t newsize, $size_t min_alignment, $si
 	return result;
 }
 
-[ATTR_WUNUSED][ATTR_ALLOC_SIZE((2, 3))]
 [requires($has_function(_aligned_offset_malloc) && $has_function(_aligned_free) && $has_function(_aligned_msize))]
-_aligned_offset_recalloc:(void *mptr, $size_t count, $size_t num_bytes, $size_t min_alignment, $size_t offset) -> void * {
+_aligned_offset_recalloc:(void *mptr, $size_t count, $size_t num_bytes, $size_t min_alignment, $size_t offset)
+	-> [realloc_unaligned(mptr, count * num_bytes)] void *
+{
 	void *result;
 	num_bytes *= count;
 	result = _aligned_offset_malloc(num_bytes, min_alignment, offset);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb9ef1de9 */
+/* HASH CRC-32:0xd1b40a0a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@
 #ifndef ____localdep__aligned_offset_malloc_defined
 #define ____localdep__aligned_offset_malloc_defined 1
 #if defined(__CRT_HAVE__aligned_offset_malloc)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1) __ATTR_MALLOC,void *,__NOTHROW_NCX,__localdep__aligned_offset_malloc,(__SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset),_aligned_offset_malloc,(__num_bytes,__min_alignment,__offset))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_MALLOC __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,__localdep__aligned_offset_malloc,(__SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset),_aligned_offset_malloc,(__num_bytes,__min_alignment,__offset))
 #elif (defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc)) || (__has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)) || defined(__CRT_HAVE_malloc)
 #include <local/stdlib/_aligned_offset_malloc.h>
 #define __localdep__aligned_offset_malloc (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_aligned_offset_malloc))
@@ -85,7 +85,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_aligned_offset_realloc))(void *__mpt
                                                                      __SIZE_TYPE__ __newsize,
                                                                      __SIZE_TYPE__ __min_alignment,
                                                                      __SIZE_TYPE__ __offset) {
-#line 2382 "kos/src/libc/magic/stdlib.c"
+#line 2387 "kos/src/libc/magic/stdlib.c"
 	void *__result;
 	__result = __localdep__aligned_offset_malloc(__newsize, __min_alignment, __offset);
 	if (__result) {

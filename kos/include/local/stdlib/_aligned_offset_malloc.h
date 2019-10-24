@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf77e4677 */
+/* HASH CRC-32:0xcb3cd007 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,11 +38,11 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_MALLOC __ATTR_ALLO
 #endif /* !____localdep_malloc_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_aligned_offset_malloc) __ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1) __ATTR_MALLOC void *
+__LOCAL_LIBC(_aligned_offset_malloc) __ATTR_WUNUSED __ATTR_MALLOC __ATTR_ALLOC_SIZE((1)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_aligned_offset_malloc))(__SIZE_TYPE__ __num_bytes,
                                                                     __SIZE_TYPE__ __min_alignment,
                                                                     __SIZE_TYPE__ __offset) {
-#line 2335 "kos/src/libc/magic/stdlib.c"
+#line 2337 "kos/src/libc/magic/stdlib.c"
 	void *__result;
 	__offset &= (__min_alignment - 1);
 	__result = __localdep_malloc(__num_bytes + 2 * sizeof(void *) + __min_alignment - 1 + (__min_alignment - __offset));

@@ -728,9 +728,123 @@ function split_variable_name(s: string): (string, string) {
 }
 
 
+@@Parse special annotations applied to a function return type
+@@@param: args: A list of (typ, name) for each argument taken
+function parse_return_type_annotations(return_type: string,
+		args: {(string, string)...},
+		function_attr: List with string = none, file: string = none, line: int = none): string {
+	function err(message: string) {
+		print getFilenameForLog(file),;
+		print "(",;
+		print line,;
+		print ") : Error :", message;
+		throw Error(message);
+	}
+	return_type = return_type.strip();
+	while (return_type.startswith("[")) {
+		local e = return_type.findmatch("[", "]", 1);
+		if (e < 0)
+			break;
+		local attr = return_type[1:e].strip();
+		return_type = return_type[e + 1:].lstrip();
+		if (attr in ["nonnull", "notnull"] || attr.replace(" ", "") in ["1..1"]) {
+			if ("ATTR_RETNONNULL" in function_attr)
+				err("Duplicate attribute: ATTR_RETNONNULL");
+			function_attr.append("ATTR_RETNONNULL");
+		} else if (attr in ["nullable"] || attr.replace(" ", "") in ["0..1"]) {
+			;
+		} else if (attr in ["wunused"]) {
+			if ("ATTR_WUNUSED" in function_attr)
+				err("Duplicate attribute: ATTR_WUNUSED");
+			function_attr.append("ATTR_WUNUSED");
+		} else if (attr in ["restrict"]) {
+			if ("ATTR_MALLOC" in function_attr)
+				err("Duplicate attribute: ATTR_MALLOC");
+			function_attr.append("ATTR_MALLOC");
+		} else if (attr.startswith("malloc") || attr.startswith("realloc") ||
+		           attr.startswith("realign") || attr.startswith("memalign")) {
+			local is_memalign = attr.startswith("memalign");
+			local is_realloc = attr.startswith("realloc");
+			local is_realign = attr.startswith("realign");
+			local argslist = attr[(is_memalign ? 8 : (is_realloc || is_realign) ? 7 : 6):].lstrip();
+			local is_unaligned = argslist.startswith("_unaligned");
+			if (is_unaligned)
+				argslist = argslist[10:];
+			if ("ATTR_WUNUSED" !in function_attr)
+				function_attr.append("ATTR_WUNUSED");
+			if (!is_realloc && !is_realign) {
+				if ("ATTR_MALLOC" in function_attr)
+					err("Duplicate attribute: ATTR_MALLOC");
+				function_attr.append("ATTR_MALLOC");
+			} else {
+				if ("ATTR_MALLOC" in function_attr)
+					err("realloc()-like functions mustn't be declared with `ATTR_MALLOC'");
+			}
+			if (argslist.startswith("(") && argslist.endswith(")")) {
+				argslist = argslist[1:-1];
+				if (is_realloc || is_realign) {
+					/* First argument is the pointer that gets reallocated */
+					argslist = argslist.partition(",")[2];
+					argslist = argslist.strip();
+				}
+				if (is_memalign || is_realign) {
+					local alignment;
+					alignment, none, argslist = argslist.partition(",")...;
+					alignment = alignment.strip();
+					argslist = argslist.strip();
+					/* Check the argument list for an argument with the same name as `alignment'.
+					 * If it's not one of them, assume a fixed alignment annotation. */
+					local alignment_argi = none;
+					import enumerate from util;
+					for (local i, data: enumerate(args)) {
+						if (alignment == data[1]) {
+							alignment_argi = i;
+							break;
+						}
+					}
+					if (alignment_argi !is none) {
+						function_attr.append("ATTR_ALLOC_ALIGN({})".format({ alignment_argi + 1 }));
+					} else {
+						function_attr.append("ATTR_ASSUME_ALIGNED({})".format({ alignment }));
+					}
+				} else if (!is_unaligned) {
+					/* Non-aligning functions get the default mall-alignment attribute */
+					function_attr.append("ATTR_MALL_DEFAULT_ALIGNED");
+				}
+				/* Parse the second argument, which is the name of the argument
+				 * that describes the size of the data blob returned by the function.
+				 * Optionally, more than once argument may be specified like this:
+				 * >> calloc(size_t count, size_t num_bytes) -> [malloc(count * num_bytes)] void *; */
+				local count_arg_indices = [];
+				for (local n: argslist.split("*")) {
+					n = n.strip();
+					for (local i = 0;; ++i) {
+						if (i >= #args)
+							err("Unknown argument: {!r}".format({ n }));
+						local an = args[i][1];
+						if (an == n) {
+							count_arg_indices.append(i);
+							break;
+						}
+					}
+				}
+				if (count_arg_indices) {
+					function_attr.append("ATTR_ALLOC_SIZE(({}))"
+						.format({ ", ".join(count_arg_indices.each + 1) }));
+				}
+			} else if (argslist) {
+				err("Unrecognized text after `[malloc' or `[memalign': " + repr(argslist));
+			}
+		} else {
+			err("Unknown return-type attribute " + repr(attr));
+		}
+	}
+	return return_type;
+}
+
 @@Split a given argument list into the individual type+name
 function split_argument_list(l: string,
-	attr: List with string = none, file: string = none, line: int = none)
+	function_attr: List with string = none, file: string = none, line: int = none)
 		: {(string, string)...} {
 	l = l.strip();
 	if (l == "void")
@@ -740,10 +854,10 @@ function split_argument_list(l: string,
 	for (local arg: split_argument_list_args(l)) {
 		local typ, nam = split_variable_name(arg.strip())...;
 		while (typ.startswith("[")) {
-			local e = typ.find("]", 1);
+			local e = typ.findmatch("[", "]", 1);
 			if (e < 0)
 				break;
-			local attr = typ[1:e];
+			local attr = typ[1:e].strip();
 			typ = typ[e + 1:].lstrip();
 			if (attr in ["nonnull", "notnull"] || attr.replace(" ", "") in ["1..1"]) {
 add_nonnull:
@@ -775,7 +889,7 @@ add_nonnull:
 		++i;
 	}
 	if (non_null_arguments)
-		attr.append("ATTR_NONNULL(({}))".format({ ", ".join(non_null_arguments) }));
+		function_attr.append("ATTR_NONNULL(({}))".format({ ", ".join(non_null_arguments) }));
 }
 
 @@Scan the given docstring for `...' patterns and replace these sections with `replace(...)'
@@ -2213,7 +2327,9 @@ again_enum_name:
 						//err(tag_start, "Missing return type in " + repr(arglist));
 						tail = "void";
 					}
-					local pck = (Tuple(split_argument_list(arglist)), tail);
+					arglist = Tuple(split_argument_list(arglist));
+					tail = parse_return_type_annotations(tail, arglist);
+					local pck = (arglist, tail);
 					for (local x: name.split(","))
 						alias_args[x.strip()] = pck;
 				}	break;
@@ -2370,9 +2486,37 @@ again_enum_name:
 				if (i < 0 || (l >= 0 && l < i)) i = l;
 				if (i < 0) err(return_type_start, "Expected `;', `{', `%' or `=' after return type");
 				local inner_end = text.find("[", return_type_start, i);
-				if (inner_end >= 0)
+				if (inner_end >= 0) {
+					for (;;) {
+						local temp = inner_end + 1;
+						while (temp < i && text.isspace(temp))
+							++temp;
+						if (temp >= i) {
+							inner_end = i;
+							break;
+						}
+						if (text[temp] == "(")
+							break;
+						inner_end = text.findmatch("[", "]", temp, i);
+						if (inner_end < 0) {
+							inner_end = i;
+							break;
+						}
+						++inner_end;
+						while (inner_end < #text && text.isspace(temp))
+							++inner_end;
+					}
 					i = inner_end;
+				}
 				return_type = text.substr(return_type_start, i).strip();
+				if (return_type.startswith("[")) {
+					local myline = text.count("\n", 0, argument_list_start) + 1;
+					local arglist = Tuple(split_argument_list(
+						argument_list, none, filename, myline));
+					return_type = parse_return_type_annotations(
+						return_type, arglist,
+						function_attributes, filename, myline);
+				}
 			}
 			local ch = text[i];
 			while (ch == "[") {
@@ -2407,6 +2551,7 @@ again_enum_name:
 					overload_return_type = "void";
 				}
 				overload_argument_list = Tuple(split_argument_list(overload_argument_list));
+				overload_return_type = parse_return_type_annotations(overload_return_type, overload_argument_list);
 				extended_overloads.append((overload_argument_list, overload_return_type));
 				ch = text[i];
 			}
