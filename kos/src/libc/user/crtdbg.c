@@ -363,17 +363,6 @@ NOTHROW_NCX(LIBCCALL libc__msize_dbg)(void *ptr,
 }
 /*[[[end:_msize_dbg]]]*/
 
-/*[[[head:_aligned_msize_dbg,hash:CRC-32=0x60843d59]]]*/
-INTERN WUNUSED NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._aligned_msize_dbg") size_t
-NOTHROW_NCX(LIBCCALL libc__aligned_msize_dbg)(void *ptr,
-                                              size_t min_alignment,
-                                              size_t offset)
-/*[[[body:_aligned_msize_dbg]]]*/
-/*AUTO*/{
-	return libc__aligned_msize(ptr, min_alignment, offset);
-}
-/*[[[end:_aligned_msize_dbg]]]*/
 
 /*[[[head:_aligned_malloc_dbg,hash:CRC-32=0x37f97f78]]]*/
 INTERN ATTR_MALLOC ATTR_ALLOC_SIZE((1)) ATTR_ALLOC_ALIGN(2) WUNUSED
@@ -532,25 +521,6 @@ NOTHROW_NCX(LIBCCALL libc__tempnam_dbg)(char const *dir_name,
 }
 /*[[[end:_tempnam_dbg]]]*/
 
-/*[[[head:_wtempnam_dbg,hash:CRC-32=0xac13057c]]]*/
-INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._wtempnam_dbg") __WCHAR16_TYPE__ *
-NOTHROW_NCX(LIBCCALL libc__wtempnam_dbg)(__WCHAR16_TYPE__ const *dir_name,
-                                         __WCHAR16_TYPE__ const *file_prefix,
-                                         int block_type,
-                                         char const *filename,
-                                         int line)
-/*[[[body:_wtempnam_dbg]]]*/
-/*AUTO*/{
-	(void)block_type;
-	(void)filename;
-	(void)line;
-	(void)dir_name;
-	(void)file_prefix;
-	/* TODO: c16tempnam() */
-	return NULL;
-}
-/*[[[end:_wtempnam_dbg]]]*/
 
 /*[[[head:_fullpath_dbg,hash:CRC-32=0x260ef7af]]]*/
 INTERN WUNUSED NONNULL((2))
@@ -570,27 +540,6 @@ NOTHROW_NCX(LIBCCALL libc__fullpath_dbg)(char *full_path,
 }
 /*[[[end:_fullpath_dbg]]]*/
 
-/*[[[head:_wfullpath_dbg,hash:CRC-32=0x6126a314]]]*/
-INTERN WUNUSED NONNULL((2))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._wfullpath_dbg") __WCHAR16_TYPE__ *
-NOTHROW_NCX(LIBCCALL libc__wfullpath_dbg)(__WCHAR16_TYPE__ *full_path,
-                                          __WCHAR16_TYPE__ const *path,
-                                          size_t buflen,
-                                          int block_type,
-                                          char const *filename,
-                                          int line)
-/*[[[body:_wfullpath_dbg]]]*/
-/*AUTO*/{
-	(void)block_type;
-	(void)filename;
-	(void)line;
-	(void)full_path;
-	(void)path;
-	(void)buflen;
-	/* TODO: c16fullpath() */
-	return NULL;
-}
-/*[[[end:_wfullpath_dbg]]]*/
 
 /*[[[head:_getcwd_dbg,hash:CRC-32=0xe4435ad2]]]*/
 INTERN WUNUSED
@@ -646,30 +595,6 @@ NOTHROW_NCX(LIBCCALL libc__getdcwd_dbg)(int driveno,
 
 //DEFINE_PUBLIC_ALIAS("\"?_CrtDbgReportW@@YAHHPEBGH00ZZ\"", libc__wgetdcwd_dbg);
 
-/*[[[head:_wgetdcwd_dbg,hash:CRC-32=0x95311116]]]*/
-INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._wgetdcwd_dbg") __WCHAR16_TYPE__ *
-NOTHROW_NCX(LIBCCALL libc__wgetdcwd_dbg)(int driveno,
-                                         __WCHAR16_TYPE__ *buf,
-                                         __STDC_INT_AS_SIZE_T buflen,
-                                         int block_type,
-                                         char const *filename,
-                                         int line)
-/*[[[body:_wgetdcwd_dbg]]]*/
-/*AUTO*/{
-	(void)block_type;
-	(void)filename;
-	(void)line;
-	(void)driveno;
-	(void)buf;
-	(void)buflen;
-	/* TODO: c16getdcwd() */
-	return NULL;
-}
-/*[[[end:_wgetdcwd_dbg]]]*/
-
-
-
 /*[[[head:_dupenv_s_dbg,hash:CRC-32=0x1db97b3c]]]*/
 INTERN _Check_return_wat_ NONNULL((3))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._dupenv_s_dbg") errno_t
@@ -688,29 +613,6 @@ NOTHROW_NCX(LIBCCALL libc__dupenv_s_dbg)(char **pbuf,
 }
 /*[[[end:_dupenv_s_dbg]]]*/
 
-/*[[[head:_wdupenv_s_dbg,hash:CRC-32=0xf6612605]]]*/
-INTERN _Check_return_wat_ NONNULL((3))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._wdupenv_s_dbg") errno_t
-NOTHROW_NCX(LIBCCALL libc__wdupenv_s_dbg)(__WCHAR16_TYPE__ **pbuf,
-                                          size_t *pbuflen,
-                                          __WCHAR16_TYPE__ const *varname,
-                                          int block_type,
-                                          char const *filename,
-                                          int line)
-/*[[[body:_wdupenv_s_dbg]]]*/
-/*AUTO*/{
-	(void)block_type;
-	(void)filename;
-	(void)line;
-	(void)pbuf;
-	(void)pbuflen;
-	(void)varname;
-	/* TODO: c16dupenv_s() */
-	return 1;
-}
-/*[[[end:_wdupenv_s_dbg]]]*/
-
-
 /*[[[head:_CrtSetDbgFlag,hash:CRC-32=0x66336d1c]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._CrtSetDbgFlag") int
 NOTHROW_NCX(LIBCCALL libc__CrtSetDbgFlag)(int new_flag)
@@ -724,150 +626,12 @@ NOTHROW_NCX(LIBCCALL libc__CrtSetDbgFlag)(int new_flag)
 }
 /*[[[end:_CrtSetDbgFlag]]]*/
 
-/*[[[head:_CrtDoForAllClientObjects,hash:CRC-32=0x3dee3eff]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._CrtDoForAllClientObjects") void
-NOTHROW_NCX(LIBCCALL libc__CrtDoForAllClientObjects)(_PFNCRTDOFORALLCLIENTOBJECTS pfn,
-                                                     void *context)
-/*[[[body:_CrtDoForAllClientObjects]]]*/
-/*AUTO*/{
-	(void)pfn;
-	(void)context;
-}
-/*[[[end:_CrtDoForAllClientObjects]]]*/
-
-/*[[[head:_CrtIsValidPointer,hash:CRC-32=0xdc132825]]]*/
-INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._CrtIsValidPointer") int
-NOTHROW_NCX(LIBCCALL libc__CrtIsValidPointer)(void const *ptr,
-                                              __STDC_UINT_AS_SIZE_T num_bytes,
-                                              int writable)
-/*[[[body:_CrtIsValidPointer]]]*/
-/*AUTO*/{
-	(void)num_bytes;
-	(void)writable;
-	return ptr != NULL;
-}
-/*[[[end:_CrtIsValidPointer]]]*/
-
-/*[[[head:_CrtIsValidHeapPointer,hash:CRC-32=0x16ac9ef6]]]*/
-INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._CrtIsValidHeapPointer") int
-NOTHROW_NCX(LIBCCALL libc__CrtIsValidHeapPointer)(void const *heap_ptr)
-/*[[[body:_CrtIsValidHeapPointer]]]*/
-/*AUTO*/{
-	return heap_ptr != NULL;
-}
-/*[[[end:_CrtIsValidHeapPointer]]]*/
-
-/*[[[head:_CrtIsMemoryBlock,hash:CRC-32=0x79d06938]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._CrtIsMemoryBlock") int
-NOTHROW_NCX(LIBCCALL libc__CrtIsMemoryBlock)(void const *ptr,
-                                             __STDC_UINT_AS_SIZE_T num_bytes,
-                                             __LONG32_TYPE__ *prequest_number,
-                                             char **filename,
-                                             int *line)
-/*[[[body:_CrtIsMemoryBlock]]]*/
-/*AUTO*/{
-	(void)ptr;
-	(void)num_bytes;
-	if (prequest_number)
-		*prequest_number = 0;
-	if (filename)
-		*filename = NULL;
-	if (line)
-		*line = 0;
-	return 0;
-}
-/*[[[end:_CrtIsMemoryBlock]]]*/
-
-/*[[[head:_CrtReportBlockType,hash:CRC-32=0xb81ea0eb]]]*/
-INTERN WUNUSED
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._CrtReportBlockType") int
-NOTHROW_NCX(LIBCCALL libc__CrtReportBlockType)(void const *ptr)
-/*[[[body:_CrtReportBlockType]]]*/
-/*AUTO*/{
-	return ptr ? 1 /*_NORMAL_BLOCK*/ : 0 /*_FREE_BLOCK*/;
-}
-/*[[[end:_CrtReportBlockType]]]*/
-
-/*[[[head:_CrtMemCheckpoint,hash:CRC-32=0x6c53f5f9]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._CrtMemCheckpoint") void
-NOTHROW_NCX(LIBCCALL libc__CrtMemCheckpoint)(/*out*/ _CrtMemState *state)
-/*[[[body:_CrtMemCheckpoint]]]*/
-/*AUTO*/{
-	memset(state, 0, sizeof(*state));
-}
-/*[[[end:_CrtMemCheckpoint]]]*/
-
-/*[[[head:_CrtMemDifference,hash:CRC-32=0xde9d21be]]]*/
-INTERN NONNULL((1, 2, 3))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._CrtMemDifference") int
-NOTHROW_NCX(LIBCCALL libc__CrtMemDifference)(/*out*/ _CrtMemState *state,
-                                             _CrtMemState const *old_state,
-                                             _CrtMemState const *new_state)
-/*[[[body:_CrtMemDifference]]]*/
-/*AUTO*/{
-	(void)old_state;
-	(void)new_state;
-	memset(state, 0, sizeof(*state));
-	return 0;
-}
-/*[[[end:_CrtMemDifference]]]*/
-
-/*[[[head:_CrtMemDumpAllObjectsSince,hash:CRC-32=0x420dbf8d]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._CrtMemDumpAllObjectsSince") void
-NOTHROW_NCX(LIBCCALL libc__CrtMemDumpAllObjectsSince)(_CrtMemState const *state)
-/*[[[body:_CrtMemDumpAllObjectsSince]]]*/
-/*AUTO*/{
-	(void)state;
-}
-/*[[[end:_CrtMemDumpAllObjectsSince]]]*/
-
-/*[[[head:_CrtMemDumpStatistics,hash:CRC-32=0xf8af79c1]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._CrtMemDumpStatistics") void
-NOTHROW_NCX(LIBCCALL libc__CrtMemDumpStatistics)(_CrtMemState const *state)
-/*[[[body:_CrtMemDumpStatistics]]]*/
-/*AUTO*/{
-	(void)state;
-}
-/*[[[end:_CrtMemDumpStatistics]]]*/
-
-/*[[[head:_CrtDumpMemoryLeaks,hash:CRC-32=0xdffd00d6]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._CrtDumpMemoryLeaks") int
-NOTHROW_NCX(LIBCCALL libc__CrtDumpMemoryLeaks)(void)
-/*[[[body:_CrtDumpMemoryLeaks]]]*/
-/*AUTO*/{
-	return 0;
-}
-/*[[[end:_CrtDumpMemoryLeaks]]]*/
-
-/*[[[head:_CrtSetCheckCount,hash:CRC-32=0xf1df802]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._CrtSetCheckCount") int
-NOTHROW_NCX(LIBCCALL libc__CrtSetCheckCount)(int check_count)
-/*[[[body:_CrtSetCheckCount]]]*/
-/*AUTO*/{
-	return 0;
-}
-/*[[[end:_CrtSetCheckCount]]]*/
-
-/*[[[head:_CrtGetCheckCount,hash:CRC-32=0x41231bce]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._CrtGetCheckCount") int
-NOTHROW_NCX(LIBCCALL libc__CrtGetCheckCount)(void)
-/*[[[body:_CrtGetCheckCount]]]*/
-/*AUTO*/{
-	return 0;
-}
-/*[[[end:_CrtGetCheckCount]]]*/
 
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0xdb65aba9]]]*/
+/*[[[start:exports,hash:CRC-32=0xf9884bac]]]*/
 #undef _CrtDbgReport
 #undef _CrtDbgReportW
 DEFINE_PUBLIC_WEAK_ALIAS(__p__crtAssertBusy, libc___p__crtAssertBusy);
@@ -896,7 +660,6 @@ DEFINE_PUBLIC_WEAK_ALIAS(_recalloc_dbg, libc__recalloc_dbg);
 DEFINE_PUBLIC_WEAK_ALIAS(_expand_dbg, libc__expand_dbg);
 DEFINE_PUBLIC_WEAK_ALIAS(_free_dbg, libc__free_dbg);
 DEFINE_PUBLIC_WEAK_ALIAS(_msize_dbg, libc__msize_dbg);
-DEFINE_PUBLIC_WEAK_ALIAS(_aligned_msize_dbg, libc__aligned_msize_dbg);
 DEFINE_PUBLIC_WEAK_ALIAS(_aligned_malloc_dbg, libc__aligned_malloc_dbg);
 DEFINE_PUBLIC_WEAK_ALIAS(_aligned_realloc_dbg, libc__aligned_realloc_dbg);
 DEFINE_PUBLIC_WEAK_ALIAS(_aligned_recalloc_dbg, libc__aligned_recalloc_dbg);
@@ -907,29 +670,12 @@ DEFINE_PUBLIC_WEAK_ALIAS(_aligned_free_dbg, libc__aligned_free_dbg);
 DEFINE_PUBLIC_WEAK_ALIAS(_strdup_dbg, libc__strdup_dbg);
 DEFINE_PUBLIC_WEAK_ALIAS(_wcsdup_dbg, libc__wcsdup_dbg);
 DEFINE_PUBLIC_WEAK_ALIAS(_tempnam_dbg, libc__tempnam_dbg);
-DEFINE_PUBLIC_WEAK_ALIAS(_wtempnam_dbg, libc__wtempnam_dbg);
 DEFINE_PUBLIC_WEAK_ALIAS(_fullpath_dbg, libc__fullpath_dbg);
-DEFINE_PUBLIC_WEAK_ALIAS(_wfullpath_dbg, libc__wfullpath_dbg);
 DEFINE_PUBLIC_WEAK_ALIAS(_getcwd_dbg, libc__getcwd_dbg);
 DEFINE_PUBLIC_WEAK_ALIAS(_wgetcwd_dbg, libc__wgetcwd_dbg);
 DEFINE_PUBLIC_WEAK_ALIAS(_getdcwd_dbg, libc__getdcwd_dbg);
 DEFINE_PUBLIC_WEAK_ALIAS(_getdcwd_lk_dbg, libc__getdcwd_dbg);
-DEFINE_PUBLIC_WEAK_ALIAS(_wgetdcwd_dbg, libc__wgetdcwd_dbg);
-DEFINE_PUBLIC_WEAK_ALIAS(_wgetdcwd_lk_dbg, libc__wgetdcwd_dbg);
 DEFINE_PUBLIC_WEAK_ALIAS(_dupenv_s_dbg, libc__dupenv_s_dbg);
-DEFINE_PUBLIC_WEAK_ALIAS(_wdupenv_s_dbg, libc__wdupenv_s_dbg);
-DEFINE_PUBLIC_WEAK_ALIAS(_CrtDoForAllClientObjects, libc__CrtDoForAllClientObjects);
-DEFINE_PUBLIC_WEAK_ALIAS(_CrtIsValidPointer, libc__CrtIsValidPointer);
-DEFINE_PUBLIC_WEAK_ALIAS(_CrtIsValidHeapPointer, libc__CrtIsValidHeapPointer);
-DEFINE_PUBLIC_WEAK_ALIAS(_CrtIsMemoryBlock, libc__CrtIsMemoryBlock);
-DEFINE_PUBLIC_WEAK_ALIAS(_CrtReportBlockType, libc__CrtReportBlockType);
-DEFINE_PUBLIC_WEAK_ALIAS(_CrtMemCheckpoint, libc__CrtMemCheckpoint);
-DEFINE_PUBLIC_WEAK_ALIAS(_CrtMemDifference, libc__CrtMemDifference);
-DEFINE_PUBLIC_WEAK_ALIAS(_CrtMemDumpAllObjectsSince, libc__CrtMemDumpAllObjectsSince);
-DEFINE_PUBLIC_WEAK_ALIAS(_CrtMemDumpStatistics, libc__CrtMemDumpStatistics);
-DEFINE_PUBLIC_WEAK_ALIAS(_CrtDumpMemoryLeaks, libc__CrtDumpMemoryLeaks);
-DEFINE_PUBLIC_WEAK_ALIAS(_CrtSetCheckCount, libc__CrtSetCheckCount);
-DEFINE_PUBLIC_WEAK_ALIAS(_CrtGetCheckCount, libc__CrtGetCheckCount);
 /*[[[end:exports]]]*/
 
 DECL_END
