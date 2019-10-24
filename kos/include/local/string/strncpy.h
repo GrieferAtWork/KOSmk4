@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc10a9c1 */
+/* HASH CRC-32:0x8c0e056f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,14 +42,17 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHR
 #ifndef ____localdep_memcpy_defined
 #define ____localdep_memcpy_defined 1
 #if defined(__fast_memcpy_defined)
-/* Copy memory between non-overlapping memory blocks. */
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
 #define __localdep_memcpy (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpy))
 #elif defined(__CRT_HAVE_memcpy)
-/* Copy memory between non-overlapping memory blocks. */
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),memcpy,(__dst,__src,__n_bytes))
 #else /* LIBC: memcpy */
 #include <local/string/memcpy.h>
-/* Copy memory between non-overlapping memory blocks. */
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
 #define __localdep_memcpy (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpy))
 #endif /* memcpy... */
 #endif /* !____localdep_memcpy_defined */
@@ -58,14 +61,17 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__loca
 #ifndef ____localdep_memset_defined
 #define ____localdep_memset_defined 1
 #if defined(__fast_memset_defined)
-/* Fill memory with a given byte */
+/* Fill memory with a given byte
+ * @return: * : Always re-returns `dst' */
 #define __localdep_memset (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memset))
 #elif defined(__CRT_HAVE_memset)
-/* Fill memory with a given byte */
+/* Fill memory with a given byte
+ * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memset,(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes),memset,(__dst,__byte,__n_bytes))
 #else /* LIBC: memset */
 #include <local/string/memset.h>
-/* Fill memory with a given byte */
+/* Fill memory with a given byte
+ * @return: * : Always re-returns `dst' */
 #define __localdep_memset (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memset))
 #endif /* memset... */
 #endif /* !____localdep_memset_defined */
@@ -75,7 +81,7 @@ __LOCAL_LIBC(strncpy) __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strncpy))(char *__restrict __buf,
                                                      char const *__restrict __src,
                                                      __SIZE_TYPE__ __buflen) {
-#line 291 "kos/src/libc/magic/string.c"
+#line 297 "kos/src/libc/magic/string.c"
 	__SIZE_TYPE__ __srclen = __localdep_strnlen(__src, __buflen);
 	__localdep_memcpy(__buf, __src, __srclen * sizeof(char));
 	__localdep_memset(__buf+__srclen, '\0', (__buflen - __srclen) * sizeof(char));

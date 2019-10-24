@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa8776575 */
+/* HASH CRC-32:0xb3f436e4 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,14 +61,17 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_MALLOC __ATTR_ALLO
 #ifndef ____localdep_memcpy_defined
 #define ____localdep_memcpy_defined 1
 #if defined(__fast_memcpy_defined)
-/* Copy memory between non-overlapping memory blocks. */
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
 #define __localdep_memcpy (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpy))
 #elif defined(__CRT_HAVE_memcpy)
-/* Copy memory between non-overlapping memory blocks. */
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),memcpy,(__dst,__src,__n_bytes))
 #else /* LIBC: memcpy */
 #include <local/string/memcpy.h>
-/* Copy memory between non-overlapping memory blocks. */
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
 #define __localdep_memcpy (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpy))
 #endif /* memcpy... */
 #endif /* !____localdep_memcpy_defined */
@@ -76,7 +79,7 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__loca
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(c32dup) __ATTR_WUNUSED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_MALLOC __ATTR_NONNULL((1)) __CHAR32_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(c32dup))(__CHAR32_TYPE__ const *__restrict __string) {
-#line 469 "kos/src/libc/magic/string.c"
+#line 475 "kos/src/libc/magic/string.c"
 	__SIZE_TYPE__ __resultsize = (__localdep_c32len(__string) + 1) * sizeof(__CHAR32_TYPE__);
 	__CHAR32_TYPE__ *__result = (__CHAR32_TYPE__ *)__localdep_malloc(__resultsize);
 	if __likely(__result)

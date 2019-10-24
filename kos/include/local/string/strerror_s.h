@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7780cbd9 */
+/* HASH CRC-32:0xcbe8a609 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ __LIBC __ATTR_WUNUSED __ATTR_CONST int *(__LIBCCALL __sys_nerr)(void);
 #endif /* !___local_sys_errlist_defined */
 __LOCAL_LIBC(strerror_s) __ATTR_WUNUSED __ATTR_CONST char const *
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(strerror_s))(int __errnum) {
-#line 2441 "kos/src/libc/magic/string.c"
+#line 2447 "kos/src/libc/magic/string.c"
 #if defined(__CRT_HAVE__sys_errlist) && defined(__CRT_HAVE__sys_nerr)
 	return (unsigned int)__errnum < (unsigned int)_sys_nerr ? _sys_errlist[__errnum] : __NULLPTR;
 #elif defined(__CRT_HAVE___sys_errlist) && defined(__CRT_HAVE___sys_nerr)

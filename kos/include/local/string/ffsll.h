@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcfd3e315 */
+/* HASH CRC-32:0xf481160d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(ffsll) __ATTR_WUNUSED __ATTR_CONST __STDC_INT_AS_SIZE_T
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ffsll))(__LONGLONG __i) {
-#line 821 "kos/src/libc/magic/string.c"
+#line 827 "kos/src/libc/magic/string.c"
 	return (__STDC_INT_AS_SIZE_T)__hybrid_ffs((__ULONGLONG)__i);
 }
 __NAMESPACE_LOCAL_END

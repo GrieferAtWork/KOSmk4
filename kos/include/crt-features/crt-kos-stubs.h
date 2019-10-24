@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x766ff0f1 */
+/* HASH CRC-32:0x53776a62 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,6 +19,21 @@
  */
 #define __CRT_STUB_FPathConf 1
 #define __CRT_STUB_PathConf 1
+#define __CRT_STUB__CrtDbgBreak 1
+#define __CRT_STUB__CrtDbgReport 1
+#define __CRT_STUB__CrtDbgReportW 1
+#define __CRT_STUB__CrtGetAllocHook 1
+#define __CRT_STUB__CrtGetDumpClient 1
+#define __CRT_STUB__CrtGetReportHook 1
+#define __CRT_STUB__CrtSetAllocHook 1
+#define __CRT_STUB__CrtSetBreakAlloc 1
+#define __CRT_STUB__CrtSetDebugFillThreshold 1
+#define __CRT_STUB__CrtSetDumpClient 1
+#define __CRT_STUB__CrtSetReportFile 1
+#define __CRT_STUB__CrtSetReportHook 1
+#define __CRT_STUB__CrtSetReportHook2 1
+#define __CRT_STUB__CrtSetReportHookW2 1
+#define __CRT_STUB__CrtSetReportMode 1
 #define __CRT_STUB___control87_2 1
 #define __CRT_STUB___doserrno 1
 #define __CRT_STUB___fpclassify 1
@@ -29,6 +44,9 @@
 #define __CRT_STUB___locale_ctype_ptr_l 1
 #define __CRT_STUB___p___wargv 1
 #define __CRT_STUB___p___winitenv 1
+#define __CRT_STUB___p__crtAssertBusy 1
+#define __CRT_STUB___p__crtBreakAlloc 1
+#define __CRT_STUB___p__crtDbgFlag 1
 #define __CRT_STUB___p__wenviron 1
 #define __CRT_STUB___p__wpgmptr 1
 #define __CRT_STUB___pthread_register_cancel 1

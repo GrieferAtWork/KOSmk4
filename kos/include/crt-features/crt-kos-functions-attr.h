@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa39f6871 */
+/* HASH CRC-32:0x84482416 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -577,6 +577,35 @@
 #define __CRT_ATTR_NOTHROW_NCX_SetResGid 1
 #define __CRT_ATTR_NOTHROW_NCX_SetResUid 1
 #define __CRT_ATTR_NOTHROW_NCX_Valloc 1
+#define __CRT_ATTR_NOTHROW_NCX__CrtCheckMemory 1
+#define __CRT_ATTR_NOTHROW_NCX__CrtDbgBreak 1
+#define __CRT_ATTR_NOTHROW_NCX__CrtDbgReport 1
+#define __CRT_ATTR_NOTHROW_NCX__CrtDbgReportW 1
+#define __CRT_ATTR_NOTHROW_NCX__CrtDoForAllClientObjects 1
+#define __CRT_ATTR_NOTHROW_NCX__CrtDumpMemoryLeaks 1
+#define __CRT_ATTR_NOTHROW_NCX__CrtGetAllocHook 1
+#define __CRT_ATTR_NOTHROW_NCX__CrtGetCheckCount 1
+#define __CRT_ATTR_NOTHROW_NCX__CrtGetDumpClient 1
+#define __CRT_ATTR_NOTHROW_NCX__CrtGetReportHook 1
+#define __CRT_ATTR_NOTHROW_NCX__CrtIsMemoryBlock 1
+#define __CRT_ATTR_NOTHROW_NCX__CrtIsValidHeapPointer 1
+#define __CRT_ATTR_NOTHROW_NCX__CrtIsValidPointer 1
+#define __CRT_ATTR_NOTHROW_NCX__CrtMemCheckpoint 1
+#define __CRT_ATTR_NOTHROW_NCX__CrtMemDifference 1
+#define __CRT_ATTR_NOTHROW_NCX__CrtMemDumpAllObjectsSince 1
+#define __CRT_ATTR_NOTHROW_NCX__CrtMemDumpStatistics 1
+#define __CRT_ATTR_NOTHROW_NCX__CrtReportBlockType 1
+#define __CRT_ATTR_NOTHROW_NCX__CrtSetAllocHook 1
+#define __CRT_ATTR_NOTHROW_NCX__CrtSetBreakAlloc 1
+#define __CRT_ATTR_NOTHROW_NCX__CrtSetCheckCount 1
+#define __CRT_ATTR_NOTHROW_NCX__CrtSetDbgFlag 1
+#define __CRT_ATTR_NOTHROW_NCX__CrtSetDebugFillThreshold 1
+#define __CRT_ATTR_NOTHROW_NCX__CrtSetDumpClient 1
+#define __CRT_ATTR_NOTHROW_NCX__CrtSetReportFile 1
+#define __CRT_ATTR_NOTHROW_NCX__CrtSetReportHook 1
+#define __CRT_ATTR_NOTHROW_NCX__CrtSetReportHook2 1
+#define __CRT_ATTR_NOTHROW_NCX__CrtSetReportHookW2 1
+#define __CRT_ATTR_NOTHROW_NCX__CrtSetReportMode 1
 #define __CRT_ATTR_NOTHROW_NCX___acos 1
 #define __CRT_ATTR_NOTHROW_NCX___acosf 1
 #define __CRT_ATTR_NOTHROW_NCX___acosh 1
@@ -769,6 +798,9 @@
 #define __CRT_ATTR_NOTHROW_NCX___p___initenv 1
 #define __CRT_ATTR_NOTHROW_NCX___p___wargv 1
 #define __CRT_ATTR_NOTHROW_NCX___p___winitenv 1
+#define __CRT_ATTR_NOTHROW_NCX___p__crtAssertBusy 1
+#define __CRT_ATTR_NOTHROW_NCX___p__crtBreakAlloc 1
+#define __CRT_ATTR_NOTHROW_NCX___p__crtDbgFlag 1
 #define __CRT_ATTR_NOTHROW_NCX___p__pgmptr 1
 #define __CRT_ATTR_NOTHROW_NCX___p__wenviron 1
 #define __CRT_ATTR_NOTHROW_NCX___p__wpgmptr 1
@@ -850,13 +882,21 @@
 #define __CRT_ATTR_NOTHROW_NCX___ynf 1
 #define __CRT_ATTR_NOTHROW_NCX___ynl 1
 #define __CRT_ATTR_NOTHROW_NCX__aligned_free 1
+#define __CRT_ATTR_NOTHROW_NCX__aligned_free_dbg 1
 #define __CRT_ATTR_NOTHROW_NCX__aligned_malloc 1
+#define __CRT_ATTR_NOTHROW_NCX__aligned_malloc_dbg 1
 #define __CRT_ATTR_NOTHROW_NCX__aligned_msize 1
+#define __CRT_ATTR_NOTHROW_NCX__aligned_msize_dbg 1
 #define __CRT_ATTR_NOTHROW_NCX__aligned_offset_malloc 1
+#define __CRT_ATTR_NOTHROW_NCX__aligned_offset_malloc_dbg 1
 #define __CRT_ATTR_NOTHROW_NCX__aligned_offset_realloc 1
+#define __CRT_ATTR_NOTHROW_NCX__aligned_offset_realloc_dbg 1
 #define __CRT_ATTR_NOTHROW_NCX__aligned_offset_recalloc 1
+#define __CRT_ATTR_NOTHROW_NCX__aligned_offset_recalloc_dbg 1
 #define __CRT_ATTR_NOTHROW_NCX__aligned_realloc 1
+#define __CRT_ATTR_NOTHROW_NCX__aligned_realloc_dbg 1
 #define __CRT_ATTR_NOTHROW_NCX__aligned_recalloc 1
+#define __CRT_ATTR_NOTHROW_NCX__aligned_recalloc_dbg 1
 #define __CRT_ATTR_NOTHROW_NCX__atodbl 1
 #define __CRT_ATTR_NOTHROW_NCX__atodbl_l 1
 #define __CRT_ATTR_NOTHROW_NCX__atof_l 1
@@ -875,6 +915,7 @@
 #define __CRT_ATTR_NOTHROW_NCX__byteswap_uint64 1
 #define __CRT_ATTR_NOTHROW_NCX__byteswap_ulong 1
 #define __CRT_ATTR_NOTHROW_NCX__byteswap_ushort 1
+#define __CRT_ATTR_NOTHROW_NCX__calloc_dbg 1
 #define __CRT_ATTR_NOTHROW_NCX__chsize 1
 #define __CRT_ATTR_NOTHROW_NCX__chsize_s 1
 #define __CRT_ATTR_NOTHROW_NCX__clearfp 1
@@ -888,6 +929,7 @@
 #define __CRT_ATTR_NOTHROW_NCX__dup 1
 #define __CRT_ATTR_NOTHROW_NCX__dup2 1
 #define __CRT_ATTR_NOTHROW_NCX__dupenv_s 1
+#define __CRT_ATTR_NOTHROW_NCX__dupenv_s_dbg 1
 #define __CRT_ATTR_NOTHROW_NCX__ecvt 1
 #define __CRT_ATTR_NOTHROW_NCX__ecvt_s 1
 #define __CRT_ATTR_NOTHROW_NCX__endthread 1
@@ -901,6 +943,7 @@
 #define __CRT_ATTR_NOTHROW_NCX__execve 1
 #define __CRT_ATTR_NOTHROW_NCX__execvp 1
 #define __CRT_ATTR_NOTHROW_NCX__execvpe 1
+#define __CRT_ATTR_NOTHROW_NCX__expand_dbg 1
 #define __CRT_ATTR_NOTHROW_NCX__fcloseall 1
 #define __CRT_ATTR_NOTHROW_NCX__fcvt 1
 #define __CRT_ATTR_NOTHROW_NCX__fcvt_s 1
@@ -914,6 +957,7 @@
 #define __CRT_ATTR_NOTHROW_NCX__finite 1
 #define __CRT_ATTR_NOTHROW_NCX__fpreset 1
 #define __CRT_ATTR_NOTHROW_NCX__fputchar 1
+#define __CRT_ATTR_NOTHROW_NCX__free_dbg 1
 #define __CRT_ATTR_NOTHROW_NCX__fseeki64 1
 #define __CRT_ATTR_NOTHROW_NCX__fstat32 1
 #define __CRT_ATTR_NOTHROW_NCX__fstat32i64 1
@@ -924,12 +968,16 @@
 #define __CRT_ATTR_NOTHROW_NCX__ftime32_s 1
 #define __CRT_ATTR_NOTHROW_NCX__ftime64 1
 #define __CRT_ATTR_NOTHROW_NCX__ftime64_s 1
+#define __CRT_ATTR_NOTHROW_NCX__fullpath_dbg 1
 #define __CRT_ATTR_NOTHROW_NCX__gcvt 1
 #define __CRT_ATTR_NOTHROW_NCX__gcvt_s 1
 #define __CRT_ATTR_NOTHROW_NCX__get_doserrno 1
 #define __CRT_ATTR_NOTHROW_NCX__get_osfhandle 1
 #define __CRT_ATTR_NOTHROW_NCX__get_output_format 1
 #define __CRT_ATTR_NOTHROW_NCX__get_printf_count_output 1
+#define __CRT_ATTR_NOTHROW_NCX__getcwd_dbg 1
+#define __CRT_ATTR_NOTHROW_NCX__getdcwd_dbg 1
+#define __CRT_ATTR_NOTHROW_NCX__getdcwd_lk_dbg 1
 #define __CRT_ATTR_NOTHROW_NCX__getmaxstdio 1
 #define __CRT_ATTR_NOTHROW_NCX__getpid 1
 #define __CRT_ATTR_NOTHROW_NCX__getw 1
@@ -965,6 +1013,7 @@
 #define __CRT_ATTR_NOTHROW_NCX__ltoa_s 1
 #define __CRT_ATTR_NOTHROW_NCX__makepath 1
 #define __CRT_ATTR_NOTHROW_NCX__makepath_s 1
+#define __CRT_ATTR_NOTHROW_NCX__malloc_dbg 1
 #define __CRT_ATTR_NOTHROW_NCX__mblen_l 1
 #define __CRT_ATTR_NOTHROW_NCX__mbstowcs_l 1
 #define __CRT_ATTR_NOTHROW_NCX__mbstowcs_s 1
@@ -979,6 +1028,7 @@
 #define __CRT_ATTR_NOTHROW_NCX__memicmp_l 1
 #define __CRT_ATTR_NOTHROW_NCX__mktemp_s 1
 #define __CRT_ATTR_NOTHROW_NCX__msize 1
+#define __CRT_ATTR_NOTHROW_NCX__msize_dbg 1
 #define __CRT_ATTR_NOTHROW_NCX__nextafter 1
 #define __CRT_ATTR_NOTHROW_NCX__onexit 1
 #define __CRT_ATTR_NOTHROW_NCX__open_osfhandle 1
@@ -988,7 +1038,9 @@
 #define __CRT_ATTR_NOTHROW_NCX__putenv 1
 #define __CRT_ATTR_NOTHROW_NCX__putenv_s 1
 #define __CRT_ATTR_NOTHROW_NCX__putw 1
+#define __CRT_ATTR_NOTHROW_NCX__realloc_dbg 1
 #define __CRT_ATTR_NOTHROW_NCX__recalloc 1
+#define __CRT_ATTR_NOTHROW_NCX__recalloc_dbg 1
 #define __CRT_ATTR_NOTHROW_NCX__scalb 1
 #define __CRT_ATTR_NOTHROW_NCX__scalbf 1
 #define __CRT_ATTR_NOTHROW_NCX__scprintf 1
@@ -1036,6 +1088,7 @@
 #define __CRT_ATTR_NOTHROW_NCX__strcmpi 1
 #define __CRT_ATTR_NOTHROW_NCX__strcoll_l 1
 #define __CRT_ATTR_NOTHROW_NCX__strdup 1
+#define __CRT_ATTR_NOTHROW_NCX__strdup_dbg 1
 #define __CRT_ATTR_NOTHROW_NCX__stricmp 1
 #define __CRT_ATTR_NOTHROW_NCX__stricmp_l 1
 #define __CRT_ATTR_NOTHROW_NCX__stricoll 1
@@ -1073,6 +1126,7 @@
 #define __CRT_ATTR_NOTHROW_NCX__tell 1
 #define __CRT_ATTR_NOTHROW_NCX__telli64 1
 #define __CRT_ATTR_NOTHROW_NCX__tempnam 1
+#define __CRT_ATTR_NOTHROW_NCX__tempnam_dbg 1
 #define __CRT_ATTR_NOTHROW_NCX__towlower_l 1
 #define __CRT_ATTR_NOTHROW_NCX__towupper_l 1
 #define __CRT_ATTR_NOTHROW_NCX__ui64toa 1
@@ -1108,6 +1162,7 @@
 #define __CRT_ATTR_NOTHROW_NCX__vsscanf_s_l 1
 #define __CRT_ATTR_NOTHROW_NCX__wcscoll_l 1
 #define __CRT_ATTR_NOTHROW_NCX__wcsdup 1
+#define __CRT_ATTR_NOTHROW_NCX__wcsdup_dbg 1
 #define __CRT_ATTR_NOTHROW_NCX__wcserror 1
 #define __CRT_ATTR_NOTHROW_NCX__wcserror_s 1
 #define __CRT_ATTR_NOTHROW_NCX__wcsicmp 1
@@ -1140,6 +1195,7 @@
 #define __CRT_ATTR_NOTHROW_NCX__wcsxfrm_l 1
 #define __CRT_ATTR_NOTHROW_NCX__wctomb_l 1
 #define __CRT_ATTR_NOTHROW_NCX__wctomb_s_l 1
+#define __CRT_ATTR_NOTHROW_NCX__wdupenv_s_dbg 1
 #define __CRT_ATTR_NOTHROW_NCX__wexecl 1
 #define __CRT_ATTR_NOTHROW_NCX__wexecle 1
 #define __CRT_ATTR_NOTHROW_NCX__wexeclp 1
@@ -1148,6 +1204,10 @@
 #define __CRT_ATTR_NOTHROW_NCX__wexecve 1
 #define __CRT_ATTR_NOTHROW_NCX__wexecvp 1
 #define __CRT_ATTR_NOTHROW_NCX__wexecvpe 1
+#define __CRT_ATTR_NOTHROW_NCX__wfullpath_dbg 1
+#define __CRT_ATTR_NOTHROW_NCX__wgetcwd_dbg 1
+#define __CRT_ATTR_NOTHROW_NCX__wgetdcwd_dbg 1
+#define __CRT_ATTR_NOTHROW_NCX__wgetdcwd_lk_dbg 1
 #define __CRT_ATTR_NOTHROW_NCX__wspawnl 1
 #define __CRT_ATTR_NOTHROW_NCX__wspawnle 1
 #define __CRT_ATTR_NOTHROW_NCX__wspawnlp 1
@@ -1161,6 +1221,7 @@
 #define __CRT_ATTR_NOTHROW_NCX__wstat64 1
 #define __CRT_ATTR_NOTHROW_NCX__wstat64i32 1
 #define __CRT_ATTR_NOTHROW_NCX__wsystem 1
+#define __CRT_ATTR_NOTHROW_NCX__wtempnam_dbg 1
 #define __CRT_ATTR_NOTHROW_NCX_a64l 1
 #define __CRT_ATTR_NOTHROW_NCX_adjtime 1
 #define __CRT_ATTR_NOTHROW_NCX_adjtime32 1

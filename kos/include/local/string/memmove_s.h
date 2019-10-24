@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdc252df2 */
+/* HASH CRC-32:0x1222d9af */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,14 +27,17 @@
 #ifndef ____localdep_memmove_defined
 #define ____localdep_memmove_defined 1
 #if defined(__fast_memmove_defined)
-/* Move memory between potentially overlapping memory blocks. */
+/* Move memory between potentially overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
 #define __localdep_memmove (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmove))
 #elif defined(__CRT_HAVE_memmove)
-/* Move memory between potentially overlapping memory blocks. */
+/* Move memory between potentially overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memmove,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),memmove,(__dst,__src,__n_bytes))
 #else /* LIBC: memmove */
 #include <local/string/memmove.h>
-/* Move memory between potentially overlapping memory blocks. */
+/* Move memory between potentially overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
 #define __localdep_memmove (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmove))
 #endif /* memmove... */
 #endif /* !____localdep_memmove_defined */
@@ -45,7 +48,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memmove_s))(void *__dst,
                                                        __SIZE_TYPE__ __dstlength,
                                                        void const *__src,
                                                        __SIZE_TYPE__ __srclength) {
-#line 4269 "kos/src/libc/magic/string.c"
+#line 4275 "kos/src/libc/magic/string.c"
 
 	if (!__srclength)
 		return 0;

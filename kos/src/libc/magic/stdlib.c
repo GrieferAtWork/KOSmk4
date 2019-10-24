@@ -703,7 +703,7 @@ calloc:(size_t count, size_t n_bytes) -> void * {
 
 [std_guard][std][libc]
 [ATTR_WUNUSED][ATTR_MALL_DEFAULT_ALIGNED]
-[ATTR_MALLOC][ATTR_ALLOC_SIZE((2))][crtbuiltin]
+[ATTR_ALLOC_SIZE((2))][crtbuiltin]
 realloc:(void *mallptr, size_t n_bytes) -> void *;
 
 [std_guard][std][libc][alias(cfree)][crtbuiltin]

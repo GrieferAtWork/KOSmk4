@@ -48,6 +48,7 @@
 DECL_BEGIN
 
 /* TODO: Add support for `pthread_num_processors_np()' */
+/* TODO: Add support for `int ungetchar(int ch)' (same as `ungetc(ch, stdin)') */
 
 /* TODO: `__CORRECT_ISO_CPP_MATH_H_PROTO' interferes with libstdc++'s autoconf detection... */
 /* TODO: libstdc++ doesn't detect `HAVE_ISWBLANK' properly */

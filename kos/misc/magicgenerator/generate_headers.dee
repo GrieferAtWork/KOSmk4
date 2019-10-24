@@ -1909,6 +1909,8 @@ again_enum_name:
 						err(tag_start, "The `export_alias' tag cannot be used conditionally");
 					for (local x: get_tag_operand().split(",")) {
 						x = x.strip();
+						if ("?" in x || "@" in x)
+							continue; /* Ignore (for now...) */
 						if (x !in alternate_names)
 							alternate_names.append(x);
 						aliases.append(("", x));
@@ -2163,12 +2165,18 @@ again_enum_name:
 					nocrt = true;
 					break;
 				case "alias":       /* [alias(foo)] Define the name of an alias of the function */
-					for (local x: get_tag_operand().split(","))
+					for (local x: get_tag_operand().split(",")) {
+						if ("?" in x || "@" in x)
+							continue; /* Ignore (for now...) */
 						aliases.append((" && ".join(conditions), x.strip()));
+					}
 					break;
 				case "preferred_alias":
-					for (local x: get_tag_operand().split(","))
+					for (local x: get_tag_operand().split(",")) {
+						if ("?" in x || "@" in x)
+							continue; /* Ignore (for now...) */
 						preferred_aliases.append((" && ".join(conditions), x.strip()));
+					}
 					break;
 				case "alias_args": {
 					local op = get_tag_operand();

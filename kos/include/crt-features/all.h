@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb1353a2f */
+/* HASH CRC-32:0x6ae215ad */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -414,6 +414,35 @@
 #define __CRT_HAVE_VFork 1
 #define __CRT_HAVE_Valloc 1
 #define __CRT_HAVE_Write 1
+#define __CRT_HAVE__CrtCheckMemory 1
+#define __CRT_HAVE__CrtDbgBreak 1
+#define __CRT_HAVE__CrtDbgReport 1
+#define __CRT_HAVE__CrtDbgReportW 1
+#define __CRT_HAVE__CrtDoForAllClientObjects 1
+#define __CRT_HAVE__CrtDumpMemoryLeaks 1
+#define __CRT_HAVE__CrtGetAllocHook 1
+#define __CRT_HAVE__CrtGetCheckCount 1
+#define __CRT_HAVE__CrtGetDumpClient 1
+#define __CRT_HAVE__CrtGetReportHook 1
+#define __CRT_HAVE__CrtIsMemoryBlock 1
+#define __CRT_HAVE__CrtIsValidHeapPointer 1
+#define __CRT_HAVE__CrtIsValidPointer 1
+#define __CRT_HAVE__CrtMemCheckpoint 1
+#define __CRT_HAVE__CrtMemDifference 1
+#define __CRT_HAVE__CrtMemDumpAllObjectsSince 1
+#define __CRT_HAVE__CrtMemDumpStatistics 1
+#define __CRT_HAVE__CrtReportBlockType 1
+#define __CRT_HAVE__CrtSetAllocHook 1
+#define __CRT_HAVE__CrtSetBreakAlloc 1
+#define __CRT_HAVE__CrtSetCheckCount 1
+#define __CRT_HAVE__CrtSetDbgFlag 1
+#define __CRT_HAVE__CrtSetDebugFillThreshold 1
+#define __CRT_HAVE__CrtSetDumpClient 1
+#define __CRT_HAVE__CrtSetReportFile 1
+#define __CRT_HAVE__CrtSetReportHook 1
+#define __CRT_HAVE__CrtSetReportHook2 1
+#define __CRT_HAVE__CrtSetReportHookW2 1
+#define __CRT_HAVE__CrtSetReportMode 1
 #define __CRT_HAVE__Exit 1
 #define __CRT_HAVE__IO_feof 1
 #define __CRT_HAVE__IO_getc 1
@@ -677,6 +706,9 @@
 #define __CRT_HAVE___p___initenv 1
 #define __CRT_HAVE___p___wargv 1
 #define __CRT_HAVE___p___winitenv 1
+#define __CRT_HAVE___p__crtAssertBusy 1
+#define __CRT_HAVE___p__crtBreakAlloc 1
+#define __CRT_HAVE___p__crtDbgFlag 1
 #define __CRT_HAVE___p__pgmptr 1
 #define __CRT_HAVE___p__wenviron 1
 #define __CRT_HAVE___p__wpgmptr 1
@@ -847,13 +879,21 @@
 #define __CRT_HAVE__access 1
 #define __CRT_HAVE__access_s 1
 #define __CRT_HAVE__aligned_free 1
+#define __CRT_HAVE__aligned_free_dbg 1
 #define __CRT_HAVE__aligned_malloc 1
+#define __CRT_HAVE__aligned_malloc_dbg 1
 #define __CRT_HAVE__aligned_msize 1
+#define __CRT_HAVE__aligned_msize_dbg 1
 #define __CRT_HAVE__aligned_offset_malloc 1
+#define __CRT_HAVE__aligned_offset_malloc_dbg 1
 #define __CRT_HAVE__aligned_offset_realloc 1
+#define __CRT_HAVE__aligned_offset_realloc_dbg 1
 #define __CRT_HAVE__aligned_offset_recalloc 1
+#define __CRT_HAVE__aligned_offset_recalloc_dbg 1
 #define __CRT_HAVE__aligned_realloc 1
+#define __CRT_HAVE__aligned_realloc_dbg 1
 #define __CRT_HAVE__aligned_recalloc 1
+#define __CRT_HAVE__aligned_recalloc_dbg 1
 #define __CRT_HAVE__atodbl 1
 #define __CRT_HAVE__atodbl_l 1
 #define __CRT_HAVE__atof_l 1
@@ -873,6 +913,7 @@
 #define __CRT_HAVE__byteswap_ulong 1
 #define __CRT_HAVE__byteswap_ushort 1
 #define __CRT_HAVE__c_exit 1
+#define __CRT_HAVE__calloc_dbg 1
 #define __CRT_HAVE__cexit 1
 #define __CRT_HAVE__chdir 1
 #define __CRT_HAVE__chdrive 1
@@ -901,6 +942,7 @@
 #define __CRT_HAVE__dup 1
 #define __CRT_HAVE__dup2 1
 #define __CRT_HAVE__dupenv_s 1
+#define __CRT_HAVE__dupenv_s_dbg 1
 #define __CRT_HAVE__ecvt 1
 #define __CRT_HAVE__ecvt_s 1
 #define __CRT_HAVE__endthread 1
@@ -917,6 +959,7 @@
 #define __CRT_HAVE__execvpe 1
 #define __CRT_HAVE__exit 1
 #define __CRT_HAVE__expand 1
+#define __CRT_HAVE__expand_dbg 1
 #define __CRT_HAVE__fclose_nolock 1
 #define __CRT_HAVE__fcloseall 1
 #define __CRT_HAVE__fcvt 1
@@ -960,6 +1003,7 @@
 #define __CRT_HAVE__fputws_nolock 1
 #define __CRT_HAVE__fread_nolock 1
 #define __CRT_HAVE__fread_nolock_s 1
+#define __CRT_HAVE__free_dbg 1
 #define __CRT_HAVE__fscanf_l 1
 #define __CRT_HAVE__fscanf_s_l 1
 #define __CRT_HAVE__fseek_nolock 1
@@ -980,6 +1024,7 @@
 #define __CRT_HAVE__ftime64 1
 #define __CRT_HAVE__ftime64_s 1
 #define __CRT_HAVE__fullpath 1
+#define __CRT_HAVE__fullpath_dbg 1
 #define __CRT_HAVE__futime32 1
 #define __CRT_HAVE__futime64 1
 #define __CRT_HAVE__fwrite_nolock 1
@@ -990,7 +1035,10 @@
 #define __CRT_HAVE__get_output_format 1
 #define __CRT_HAVE__get_printf_count_output 1
 #define __CRT_HAVE__getcwd 1
+#define __CRT_HAVE__getcwd_dbg 1
 #define __CRT_HAVE__getdcwd 1
+#define __CRT_HAVE__getdcwd_dbg 1
+#define __CRT_HAVE__getdcwd_lk_dbg 1
 #define __CRT_HAVE__getdiskfree 1
 #define __CRT_HAVE__getdllprocaddr 1
 #define __CRT_HAVE__getdrive 1
@@ -1047,6 +1095,7 @@
 #define __CRT_HAVE__ltoa_s 1
 #define __CRT_HAVE__makepath 1
 #define __CRT_HAVE__makepath_s 1
+#define __CRT_HAVE__malloc_dbg 1
 #define __CRT_HAVE__mblen_l 1
 #define __CRT_HAVE__mbstowcs_l 1
 #define __CRT_HAVE__mbstowcs_s 1
@@ -1065,6 +1114,7 @@
 #define __CRT_HAVE__mktime32 1
 #define __CRT_HAVE__mktime64 1
 #define __CRT_HAVE__msize 1
+#define __CRT_HAVE__msize_dbg 1
 #define __CRT_HAVE__nextafter 1
 #define __CRT_HAVE__onexit 1
 #define __CRT_HAVE__open 1
@@ -1081,7 +1131,9 @@
 #define __CRT_HAVE__putw 1
 #define __CRT_HAVE__putwchar_nolock 1
 #define __CRT_HAVE__read 1
+#define __CRT_HAVE__realloc_dbg 1
 #define __CRT_HAVE__recalloc 1
+#define __CRT_HAVE__recalloc_dbg 1
 #define __CRT_HAVE__rmdir 1
 #define __CRT_HAVE__rmtmp 1
 #define __CRT_HAVE__rotl 1
@@ -1147,6 +1199,7 @@
 #define __CRT_HAVE__strcmpi 1
 #define __CRT_HAVE__strcoll_l 1
 #define __CRT_HAVE__strdup 1
+#define __CRT_HAVE__strdup_dbg 1
 #define __CRT_HAVE__strerror 1
 #define __CRT_HAVE__strerror_s 1
 #define __CRT_HAVE__strftime_l 1
@@ -1195,6 +1248,7 @@
 #define __CRT_HAVE__tell 1
 #define __CRT_HAVE__telli64 1
 #define __CRT_HAVE__tempnam 1
+#define __CRT_HAVE__tempnam_dbg 1
 #define __CRT_HAVE__time32 1
 #define __CRT_HAVE__time64 1
 #define __CRT_HAVE__tolower 1
@@ -1257,6 +1311,7 @@
 #define __CRT_HAVE__wcscmp_l 1
 #define __CRT_HAVE__wcscoll_l 1
 #define __CRT_HAVE__wcsdup 1
+#define __CRT_HAVE__wcsdup_dbg 1
 #define __CRT_HAVE__wcserror 1
 #define __CRT_HAVE__wcserror_s 1
 #define __CRT_HAVE__wcsicmp 1
@@ -1306,6 +1361,7 @@
 #define __CRT_HAVE__wcsxfrm_l 1
 #define __CRT_HAVE__wctomb_l 1
 #define __CRT_HAVE__wctomb_s_l 1
+#define __CRT_HAVE__wdupenv_s_dbg 1
 #define __CRT_HAVE__wexecl 1
 #define __CRT_HAVE__wexecle 1
 #define __CRT_HAVE__wexeclp 1
@@ -1314,7 +1370,11 @@
 #define __CRT_HAVE__wexecve 1
 #define __CRT_HAVE__wexecvp 1
 #define __CRT_HAVE__wexecvpe 1
+#define __CRT_HAVE__wfullpath_dbg 1
 #define __CRT_HAVE__wgetcwd 1
+#define __CRT_HAVE__wgetcwd_dbg 1
+#define __CRT_HAVE__wgetdcwd_dbg 1
+#define __CRT_HAVE__wgetdcwd_lk_dbg 1
 #define __CRT_HAVE__wperror 1
 #define __CRT_HAVE__write 1
 #define __CRT_HAVE__wrmdir 1
@@ -1331,6 +1391,7 @@
 #define __CRT_HAVE__wstat64 1
 #define __CRT_HAVE__wstat64i32 1
 #define __CRT_HAVE__wsystem 1
+#define __CRT_HAVE__wtempnam_dbg 1
 #define __CRT_HAVE__wunlink 1
 #define __CRT_HAVE__wutime32 1
 #define __CRT_HAVE__wutime64 1
@@ -1397,6 +1458,8 @@
 #define __CRT_HAVE_bsearch_s 1
 #define __CRT_HAVE_btowc 1
 #define __CRT_HAVE_bzero 1
+#define __CRT_HAVE_c16dup 1
+#define __CRT_HAVE_c16getcwd 1
 #define __CRT_HAVE_c16rtomb 1
 #define __CRT_HAVE_c32rtomb 1
 #define __CRT_HAVE_calloc 1

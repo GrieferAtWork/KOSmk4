@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdf27d9d1 */
+/* HASH CRC-32:0xb2db883c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -36,13 +36,19 @@ typedef int errno_t;
 typedef size_t rsize_t;
 #endif /* !__rsize_t_defined */
 
-/* Copy memory between non-overlapping memory blocks. */
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
 INTDEF ATTR_RETNONNULL NONNULL((1, 2)) void *NOTHROW_NCX(LIBCCALL libc_memcpy)(void *__restrict dst, void const *__restrict src, size_t n_bytes);
-/* Move memory between potentially overlapping memory blocks. */
+/* Move memory between potentially overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
 INTDEF ATTR_RETNONNULL NONNULL((1, 2)) void *NOTHROW_NCX(LIBCCALL libc_memmove)(void *dst, void const *src, size_t n_bytes);
-/* Fill memory with a given byte */
+/* Fill memory with a given byte
+ * @return: * : Always re-returns `dst' */
 INTDEF ATTR_RETNONNULL NONNULL((1)) void *NOTHROW_NCX(LIBCCALL libc_memset)(void *__restrict dst, int byte, size_t n_bytes);
-/* Compare memory buffers and return the difference of the first non-matching byte */
+/* Compare memory buffers and return the difference of the first non-matching byte
+ * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
+ * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+ * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
 INTDEF WUNUSED ATTR_PURE NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_memcmp)(void const *s1, void const *s2, size_t n_bytes);
 /* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
 INTDEF WUNUSED ATTR_PURE NONNULL((1)) void *NOTHROW_NCX(LIBCCALL libc_memchr)(void const *__restrict haystack, int needle, size_t n_bytes);

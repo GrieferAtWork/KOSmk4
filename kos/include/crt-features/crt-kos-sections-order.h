@@ -300,7 +300,7 @@
 	CB(PREFIX.dos.application.init.*) \
 	CB(PREFIX.dos.sched.thread.*) \
 	CB(PREFIX.dos.sched.signal.*) \
-	CB(PREFIX.dos.heap.*) \
+	CB(PREFIX.dos.heap.debug_malloc.* PREFIX.dos.heap.*) \
 	CB(PREFIX.dos.FILE.locked.access.*) \
 	CB(PREFIX.dos.FILE.locked.read.read.*) \
 	CB(PREFIX.dos.FILE.locked.read.scanf.*) \

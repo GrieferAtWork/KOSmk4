@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa187b367 */
+/* HASH CRC-32:0x94d4ff9b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,31 +28,43 @@
 #include "slow/string.h"
 
 #ifdef __fast_memcpy_defined
-/* Copy memory between non-overlapping memory blocks. */
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
 #define __libc_memcpy (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpy))
 #else /* __fast_memcpy_defined */
-/* Copy memory between non-overlapping memory blocks. */
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
 #define __libc_memcpy __libc_slow_memcpy
 #endif /* !__fast_memcpy_defined */
 #ifdef __fast_memmove_defined
-/* Move memory between potentially overlapping memory blocks. */
+/* Move memory between potentially overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
 #define __libc_memmove (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmove))
 #else /* __fast_memmove_defined */
-/* Move memory between potentially overlapping memory blocks. */
+/* Move memory between potentially overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
 #define __libc_memmove __libc_slow_memmove
 #endif /* !__fast_memmove_defined */
 #ifdef __fast_memset_defined
-/* Fill memory with a given byte */
+/* Fill memory with a given byte
+ * @return: * : Always re-returns `dst' */
 #define __libc_memset (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memset))
 #else /* __fast_memset_defined */
-/* Fill memory with a given byte */
+/* Fill memory with a given byte
+ * @return: * : Always re-returns `dst' */
 #define __libc_memset __libc_slow_memset
 #endif /* !__fast_memset_defined */
 #ifdef __fast_memcmp_defined
-/* Compare memory buffers and return the difference of the first non-matching byte */
+/* Compare memory buffers and return the difference of the first non-matching byte
+ * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
+ * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+ * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
 #define __libc_memcmp (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmp))
 #else /* __fast_memcmp_defined */
-/* Compare memory buffers and return the difference of the first non-matching byte */
+/* Compare memory buffers and return the difference of the first non-matching byte
+ * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
+ * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+ * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
 #define __libc_memcmp __libc_slow_memcmp
 #endif /* !__fast_memcmp_defined */
 #ifdef __fast_memchr_defined

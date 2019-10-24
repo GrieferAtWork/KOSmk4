@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x52080a6e */
+/* HASH CRC-32:0xf486cd2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(strcmp) __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strcmp))(char const *__s1,
                                                     char const *__s2) {
-#line 238 "kos/src/libc/magic/string.c"
+#line 244 "kos/src/libc/magic/string.c"
 	char __c1, __c2;
 	do {
 		if __unlikely((__c1 = *__s1++) != (__c2 = *__s2++))

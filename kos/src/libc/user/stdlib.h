@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e50e661 */
+/* HASH CRC-32:0x2fc9b9e7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_at_quick_exit)(__atexit_func_t func);
 INTDEF ATTR_NORETURN void (LIBCCALL libc__Exit)(int status);
 INTDEF WUNUSED ATTR_MALL_DEFAULT_ALIGNED ATTR_MALLOC ATTR_ALLOC_SIZE((1)) void *NOTHROW_NCX(LIBCCALL libc_malloc)(size_t n_bytes);
 INTDEF WUNUSED ATTR_MALL_DEFAULT_ALIGNED ATTR_MALLOC ATTR_ALLOC_SIZE((1, 2)) void *NOTHROW_NCX(LIBCCALL libc_calloc)(size_t count, size_t n_bytes);
-INTDEF WUNUSED ATTR_MALL_DEFAULT_ALIGNED ATTR_MALLOC ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(LIBCCALL libc_realloc)(void *mallptr, size_t n_bytes);
+INTDEF WUNUSED ATTR_MALL_DEFAULT_ALIGNED ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(LIBCCALL libc_realloc)(void *mallptr, size_t n_bytes);
 INTDEF void NOTHROW_NCX(LIBCCALL libc_free)(void *mallptr);
 INTDEF void NOTHROW(LIBCCALL libc_srand)(long seed);
 INTDEF int NOTHROW(LIBCCALL libc_rand)(void);

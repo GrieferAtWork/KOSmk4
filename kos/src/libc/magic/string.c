@@ -33,11 +33,11 @@
 #endif /* __USE_KOS */
 #if defined(__USE_XOPEN2K8) || defined(__USE_DOS)
 #include <xlocale.h>
-#endif
+#endif /* __USE_XOPEN2K8 || __USE_DOS */
 #ifdef __USE_DOS
 #include <parts/errno.h>
 #include <crtdefs.h>
-#endif
+#endif /* __USE_DOS */
 
 __SYSDECL_BEGIN
 
@@ -59,7 +59,7 @@ __NAMESPACE_STD_USING(size_t)
 
 #ifndef NULL
 #define NULL __NULLPTR
-#endif
+#endif /* !NULL */
 
 /* Memory functions (An optional `[b|w|l|q]' suffix is a kos extension):
  *   [std] memcmp[b|w|l|q]      - Compare memory buffers and return the difference of the first non-matching byte/word/dword/qword
@@ -133,6 +133,7 @@ typedef size_t rsize_t;
 
 
 @@Copy memory between non-overlapping memory blocks.
+@@@return: * : Always re-returns `dst'
 [nobuiltin][fast][libc][kernel][std][ATTR_RETNONNULL]
 memcpy:([nonnull] void *__restrict dst, [nonnull] void const *__restrict src, size_t n_bytes) -> void * {
 	byte_t *pdst = (byte_t *)dst;
@@ -143,6 +144,7 @@ memcpy:([nonnull] void *__restrict dst, [nonnull] void const *__restrict src, si
 }
 
 @@Move memory between potentially overlapping memory blocks.
+@@@return: * : Always re-returns `dst'
 [fast][libc][kernel][std][ATTR_RETNONNULL][nobuiltin]
 memmove:([nonnull] void *dst, [nonnull] void const *src, size_t n_bytes) -> void * {
 	byte_t *pdst, *psrc;
@@ -161,6 +163,7 @@ memmove:([nonnull] void *dst, [nonnull] void const *src, size_t n_bytes) -> void
 }
 
 @@Fill memory with a given byte
+@@@return: * : Always re-returns `dst'
 [fast][libc][kernel][std][ATTR_RETNONNULL][nobuiltin]
 memset:([nonnull] void *__restrict dst, int byte, size_t n_bytes) -> void * {
 	byte_t *pdst = (byte_t *)dst;
@@ -170,6 +173,9 @@ memset:([nonnull] void *__restrict dst, int byte, size_t n_bytes) -> void * {
 }
 
 @@Compare memory buffers and return the difference of the first non-matching byte
+@@@return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
+@@@return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+@@@return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes'
 [fast][libc][kernel][alias(bcmp)][std]
 [ATTR_WUNUSED][ATTR_PURE][nobuiltin]
 memcmp:([nonnull] void const *s1, [nonnull] void const *s2, size_t n_bytes) -> int {

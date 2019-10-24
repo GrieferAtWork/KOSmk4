@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4f9f99f8 */
+/* HASH CRC-32:0x2c4c4129 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -762,9 +762,9 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(calloc, __FORCELOCAL __ATTR_WUNUSED __ATTR_MALL_
 #ifdef __realloc_defined
 __NAMESPACE_GLB_USING(realloc)
 #elif __has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_realloc)
-__FORCELOCAL __ATTR_WUNUSED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_MALLOC __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBCCALL realloc)(void *__mallptr, size_t __n_bytes) { return __builtin_realloc(__mallptr, __n_bytes); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBCCALL realloc)(void *__mallptr, size_t __n_bytes) { return __builtin_realloc(__mallptr, __n_bytes); }
 #elif defined(__CRT_HAVE_realloc)
-__CDECLARE(__ATTR_WUNUSED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_MALLOC __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,realloc,(void *__mallptr, size_t __n_bytes),(__mallptr,__n_bytes))
+__CDECLARE(__ATTR_WUNUSED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,realloc,(void *__mallptr, size_t __n_bytes),(__mallptr,__n_bytes))
 #else /* LIBC: realloc */
 #undef __std_realloc_defined
 #endif /* realloc... */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9210df9f */
+/* HASH CRC-32:0x41eebc4d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,10 @@ DECL_BEGIN
 #ifndef __KERNEL__
 INTDEF NONNULL((1, 2)) void NOTHROW_NCX(LIBCCALL libc_bcopy)(void const *src, void *dst, size_t num_bytes);
 INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_bzero)(void *__restrict dst, size_t num_bytes);
-/* Compare memory buffers and return the difference of the first non-matching byte */
+/* Compare memory buffers and return the difference of the first non-matching byte
+ * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
+ * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+ * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
 #define libc_bcmp libc_memcmp
 INTDEF NONNULL((1)) WUNUSED ATTR_PURE char *NOTHROW_NCX(LIBCCALL libc_index)(char const *__restrict haystack, int needle);
 INTDEF NONNULL((1)) WUNUSED ATTR_PURE char *NOTHROW_NCX(LIBCCALL libc_rindex)(char const *__restrict haystack, int needle);

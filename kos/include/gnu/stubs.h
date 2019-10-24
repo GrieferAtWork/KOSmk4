@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3d578791 */
+/* HASH CRC-32:0xc3217460 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,6 +19,21 @@
  */
 #define __stub_FPathConf 1
 #define __stub_PathConf 1
+#define __stub__CrtDbgBreak 1
+#define __stub__CrtDbgReport 1
+#define __stub__CrtDbgReportW 1
+#define __stub__CrtGetAllocHook 1
+#define __stub__CrtGetDumpClient 1
+#define __stub__CrtGetReportHook 1
+#define __stub__CrtSetAllocHook 1
+#define __stub__CrtSetBreakAlloc 1
+#define __stub__CrtSetDebugFillThreshold 1
+#define __stub__CrtSetDumpClient 1
+#define __stub__CrtSetReportFile 1
+#define __stub__CrtSetReportHook 1
+#define __stub__CrtSetReportHook2 1
+#define __stub__CrtSetReportHookW2 1
+#define __stub__CrtSetReportMode 1
 #define __stub___control87_2 1
 #define __stub___doserrno 1
 #define __stub___fpclassify 1
@@ -29,6 +44,9 @@
 #define __stub___locale_ctype_ptr_l 1
 #define __stub___p___wargv 1
 #define __stub___p___winitenv 1
+#define __stub___p__crtAssertBusy 1
+#define __stub___p__crtBreakAlloc 1
+#define __stub___p__crtDbgFlag 1
 #define __stub___p__wenviron 1
 #define __stub___p__wpgmptr 1
 #define __stub___pthread_register_cancel 1

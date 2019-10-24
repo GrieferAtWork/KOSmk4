@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7ffda905 */
+/* HASH CRC-32:0x60357dda */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,11 +72,11 @@ __NAMESPACE_STD_USING(strerror)
 #endif /* __USE_KOS */
 #if defined(__USE_XOPEN2K8) || defined(__USE_DOS)
 #include <xlocale.h>
-#endif
+#endif /* __USE_XOPEN2K8 || __USE_DOS */
 #ifdef __USE_DOS
 #include <parts/errno.h>
 #include <crtdefs.h>
-#endif
+#endif /* __USE_DOS */
 
 __SYSDECL_BEGIN
 
@@ -96,7 +96,7 @@ __NAMESPACE_STD_USING(size_t)
 
 #ifndef NULL
 #define NULL __NULLPTR
-#endif
+#endif /* !NULL */
 
 /* Memory functions (An optional `[b|w|l|q]' suffix is a kos extension):
  *   [std] memcmp[b|w|l|q]      - Compare memory buffers and return the difference of the first non-matching byte/word/dword/qword
@@ -153,58 +153,79 @@ __NAMESPACE_STD_USING(size_t)
  */
 __NAMESPACE_STD_BEGIN
 #if defined(__fast_memcpy_defined)
-/* Copy memory between non-overlapping memory blocks. */
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
 __NAMESPACE_FAST_USING_OR_IMPL(memcpy, __FORCELOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL memcpy)(void *__restrict __dst, void const *__restrict __src, size_t __n_bytes) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpy))(__dst, __src, __n_bytes); })
 #elif defined(__CRT_HAVE_memcpy)
-/* Copy memory between non-overlapping memory blocks. */
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
 __CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,memcpy,(void *__restrict __dst, void const *__restrict __src, size_t __n_bytes),(__dst,__src,__n_bytes))
 #else /* LIBC: memcpy */
 __NAMESPACE_STD_END
 #include <local/string/memcpy.h>
 __NAMESPACE_STD_BEGIN
-/* Copy memory between non-overlapping memory blocks. */
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(memcpy, __FORCELOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL memcpy)(void *__restrict __dst, void const *__restrict __src, size_t __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpy))(__dst, __src, __n_bytes); })
 #endif /* memcpy... */
 #if defined(__fast_memmove_defined)
-/* Move memory between potentially overlapping memory blocks. */
+/* Move memory between potentially overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
 __NAMESPACE_FAST_USING_OR_IMPL(memmove, __FORCELOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL memmove)(void *__dst, void const *__src, size_t __n_bytes) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmove))(__dst, __src, __n_bytes); })
 #elif defined(__CRT_HAVE_memmove)
-/* Move memory between potentially overlapping memory blocks. */
+/* Move memory between potentially overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
 __CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,memmove,(void *__dst, void const *__src, size_t __n_bytes),(__dst,__src,__n_bytes))
 #else /* LIBC: memmove */
 __NAMESPACE_STD_END
 #include <local/string/memmove.h>
 __NAMESPACE_STD_BEGIN
-/* Move memory between potentially overlapping memory blocks. */
+/* Move memory between potentially overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(memmove, __FORCELOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *__NOTHROW_NCX(__LIBCCALL memmove)(void *__dst, void const *__src, size_t __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmove))(__dst, __src, __n_bytes); })
 #endif /* memmove... */
 #if defined(__fast_memset_defined)
-/* Fill memory with a given byte */
+/* Fill memory with a given byte
+ * @return: * : Always re-returns `dst' */
 __NAMESPACE_FAST_USING_OR_IMPL(memset, __FORCELOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) void *__NOTHROW_NCX(__LIBCCALL memset)(void *__restrict __dst, int __byte, size_t __n_bytes) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memset))(__dst, __byte, __n_bytes); })
 #elif defined(__CRT_HAVE_memset)
-/* Fill memory with a given byte */
+/* Fill memory with a given byte
+ * @return: * : Always re-returns `dst' */
 __CDECLARE(__ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,memset,(void *__restrict __dst, int __byte, size_t __n_bytes),(__dst,__byte,__n_bytes))
 #else /* LIBC: memset */
 __NAMESPACE_STD_END
 #include <local/string/memset.h>
 __NAMESPACE_STD_BEGIN
-/* Fill memory with a given byte */
+/* Fill memory with a given byte
+ * @return: * : Always re-returns `dst' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(memset, __FORCELOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1)) void *__NOTHROW_NCX(__LIBCCALL memset)(void *__restrict __dst, int __byte, size_t __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memset))(__dst, __byte, __n_bytes); })
 #endif /* memset... */
 #if defined(__fast_memcmp_defined)
-/* Compare memory buffers and return the difference of the first non-matching byte */
+/* Compare memory buffers and return the difference of the first non-matching byte
+ * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
+ * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+ * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
 __NAMESPACE_FAST_USING_OR_IMPL(memcmp, __FORCELOCAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL memcmp)(void const *__s1, void const *__s2, size_t __n_bytes) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmp))(__s1, __s2, __n_bytes); })
 #elif defined(__CRT_HAVE_memcmp)
-/* Compare memory buffers and return the difference of the first non-matching byte */
+/* Compare memory buffers and return the difference of the first non-matching byte
+ * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
+ * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+ * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,memcmp,(void const *__s1, void const *__s2, size_t __n_bytes),(__s1,__s2,__n_bytes))
 #elif defined(__CRT_HAVE_bcmp)
-/* Compare memory buffers and return the difference of the first non-matching byte */
+/* Compare memory buffers and return the difference of the first non-matching byte
+ * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
+ * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+ * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,memcmp,(void const *__s1, void const *__s2, size_t __n_bytes),bcmp,(__s1,__s2,__n_bytes))
 #else /* LIBC: memcmp */
 __NAMESPACE_STD_END
 #include <local/string/memcmp.h>
 __NAMESPACE_STD_BEGIN
-/* Compare memory buffers and return the difference of the first non-matching byte */
+/* Compare memory buffers and return the difference of the first non-matching byte
+ * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
+ * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+ * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(memcmp, __FORCELOCAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL memcmp)(void const *__s1, void const *__s2, size_t __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcmp))(__s1, __s2, __n_bytes); })
 #endif /* memcmp... */
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRING_H_PROTO)
@@ -1023,17 +1044,29 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(bzero, __FORCELOCAL __ATTR_NONNULL((1)) void __N
 #ifndef __bcmp_defined
 #define __bcmp_defined 1
 #if defined(__fast_memcmp_defined)
-/* Compare memory buffers and return the difference of the first non-matching byte */
+/* Compare memory buffers and return the difference of the first non-matching byte
+ * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
+ * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+ * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
 __FORCELOCAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL bcmp)(void const *__s1, void const *__s2, __SIZE_TYPE__ __num_bytes) { return (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmp))(__s1, __s2, __num_bytes); }
 #elif defined(__CRT_HAVE_bcmp)
-/* Compare memory buffers and return the difference of the first non-matching byte */
+/* Compare memory buffers and return the difference of the first non-matching byte
+ * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
+ * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+ * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
 __CDECLARE(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,bcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __num_bytes),(__s1,__s2,__num_bytes))
 #elif defined(__CRT_HAVE_memcmp)
-/* Compare memory buffers and return the difference of the first non-matching byte */
+/* Compare memory buffers and return the difference of the first non-matching byte
+ * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
+ * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+ * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,bcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __num_bytes),memcmp,(__s1,__s2,__num_bytes))
 #else /* LIBC: memcmp */
 #include <local/string/memcmp.h>
-/* Compare memory buffers and return the difference of the first non-matching byte */
+/* Compare memory buffers and return the difference of the first non-matching byte
+ * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
+ * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+ * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
 __FORCELOCAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX(__LIBCCALL bcmp)(void const *__s1, void const *__s2, __SIZE_TYPE__ __num_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcmp))(__s1, __s2, __num_bytes); }
 #endif /* bcmp... */
 #endif /* !__bcmp_defined */

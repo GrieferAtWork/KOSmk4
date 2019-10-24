@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa5553c70 */
+/* HASH CRC-32:0xb463f4ec */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -82,14 +82,17 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__ *,__NOTHROW
 #ifndef ____localdep_memcpy_defined
 #define ____localdep_memcpy_defined 1
 #if defined(__fast_memcpy_defined)
-/* Copy memory between non-overlapping memory blocks. */
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
 #define __localdep_memcpy (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpy))
 #elif defined(__CRT_HAVE_memcpy)
-/* Copy memory between non-overlapping memory blocks. */
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),memcpy,(__dst,__src,__n_bytes))
 #else /* LIBC: memcpy */
 #include <local/string/memcpy.h>
-/* Copy memory between non-overlapping memory blocks. */
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
 #define __localdep_memcpy (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpy))
 #endif /* memcpy... */
 #endif /* !____localdep_memcpy_defined */
@@ -100,7 +103,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fuzzy_memcmpl))(void const *__s1,
                                                            __SIZE_TYPE__ __s1_dwords,
                                                            void const *__s2,
                                                            __SIZE_TYPE__ __s2_dwords) {
-#line 3919 "kos/src/libc/magic/string.c"
+#line 3925 "kos/src/libc/magic/string.c"
 	__SIZE_TYPE__ *__v0, *__v1, __i, __j, __cost, __temp;
 	if __unlikely(!__s1_dwords)
 		return __s2_dwords;

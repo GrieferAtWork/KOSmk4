@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d5c7f2 */
+/* HASH CRC-32:0x27a5ccdc */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,14 +26,17 @@
 #ifndef ____localdep_memset_defined
 #define ____localdep_memset_defined 1
 #if defined(__fast_memset_defined)
-/* Fill memory with a given byte */
+/* Fill memory with a given byte
+ * @return: * : Always re-returns `dst' */
 #define __localdep_memset (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memset))
 #elif defined(__CRT_HAVE_memset)
-/* Fill memory with a given byte */
+/* Fill memory with a given byte
+ * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memset,(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes),memset,(__dst,__byte,__n_bytes))
 #else /* LIBC: memset */
 #include <local/string/memset.h>
-/* Fill memory with a given byte */
+/* Fill memory with a given byte
+ * @return: * : Always re-returns `dst' */
 #define __localdep_memset (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memset))
 #endif /* memset... */
 #endif /* !____localdep_memset_defined */
@@ -44,7 +47,7 @@ __LOCAL_LIBC(mempset) __ATTR_RETNONNULL __ATTR_NONNULL((1)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempset))(void *__restrict __dst,
                                                      int __byte,
                                                      __SIZE_TYPE__ __n_bytes) {
-#line 2181 "kos/src/libc/magic/string.c"
+#line 2187 "kos/src/libc/magic/string.c"
 	return (void *)((__BYTE_TYPE__ *)__localdep_memset(__dst, __byte, __n_bytes) + __n_bytes);
 }
 __NAMESPACE_LOCAL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb221c967 */
+/* HASH CRC-32:0x58fafe2b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,38 +27,53 @@
 __SYSDECL_BEGIN
 
 #if defined(__CRT_HAVE_memcpy)
-/* Copy memory between non-overlapping memory blocks. */
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__libc_slow_memcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),memcpy,(__dst,__src,__n_bytes))
 #else /* LIBC: memcpy */
 #include <local/string/memcpy.h>
-/* Copy memory between non-overlapping memory blocks. */
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
 #define __libc_slow_memcpy (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpy))
 #endif /* memcpy... */
 #if defined(__CRT_HAVE_memmove)
-/* Move memory between potentially overlapping memory blocks. */
+/* Move memory between potentially overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__libc_slow_memmove,(void *__dst, void const *__src, __SIZE_TYPE__ __n_bytes),memmove,(__dst,__src,__n_bytes))
 #else /* LIBC: memmove */
 #include <local/string/memmove.h>
-/* Move memory between potentially overlapping memory blocks. */
+/* Move memory between potentially overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
 #define __libc_slow_memmove (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmove))
 #endif /* memmove... */
 #if defined(__CRT_HAVE_memset)
-/* Fill memory with a given byte */
+/* Fill memory with a given byte
+ * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__libc_slow_memset,(void *__restrict __dst, int __byte, __SIZE_TYPE__ __n_bytes),memset,(__dst,__byte,__n_bytes))
 #else /* LIBC: memset */
 #include <local/string/memset.h>
-/* Fill memory with a given byte */
+/* Fill memory with a given byte
+ * @return: * : Always re-returns `dst' */
 #define __libc_slow_memset (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memset))
 #endif /* memset... */
 #if defined(__CRT_HAVE_memcmp)
-/* Compare memory buffers and return the difference of the first non-matching byte */
+/* Compare memory buffers and return the difference of the first non-matching byte
+ * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
+ * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+ * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__libc_slow_memcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),memcmp,(__s1,__s2,__n_bytes))
 #elif defined(__CRT_HAVE_bcmp)
-/* Compare memory buffers and return the difference of the first non-matching byte */
+/* Compare memory buffers and return the difference of the first non-matching byte
+ * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
+ * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+ * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__libc_slow_memcmp,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes),bcmp,(__s1,__s2,__n_bytes))
 #else /* LIBC: memcmp */
 #include <local/string/memcmp.h>
-/* Compare memory buffers and return the difference of the first non-matching byte */
+/* Compare memory buffers and return the difference of the first non-matching byte
+ * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
+ * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
+ * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
 #define __libc_slow_memcmp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcmp))
 #endif /* memcmp... */
 #if defined(__CRT_HAVE_memchr)

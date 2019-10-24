@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1cb92676 */
+/* HASH CRC-32:0x1eaf4653 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,14 +55,17 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHR
 #ifndef ____localdep_memcpy_defined
 #define ____localdep_memcpy_defined 1
 #if defined(__fast_memcpy_defined)
-/* Copy memory between non-overlapping memory blocks. */
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
 #define __localdep_memcpy (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpy))
 #elif defined(__CRT_HAVE_memcpy)
-/* Copy memory between non-overlapping memory blocks. */
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),memcpy,(__dst,__src,__n_bytes))
 #else /* LIBC: memcpy */
 #include <local/string/memcpy.h>
-/* Copy memory between non-overlapping memory blocks. */
+/* Copy memory between non-overlapping memory blocks.
+ * @return: * : Always re-returns `dst' */
 #define __localdep_memcpy (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcpy))
 #endif /* memcpy... */
 #endif /* !____localdep_memcpy_defined */
@@ -72,7 +75,7 @@ __LOCAL_LIBC(strlcat) __ATTR_NONNULL((1, 2)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strlcat))(char *__restrict __dst,
                                                      char const *__restrict __src,
                                                      __SIZE_TYPE__ __bufsize) {
-#line 827 "kos/src/libc/magic/string.c"
+#line 833 "kos/src/libc/magic/string.c"
 	__SIZE_TYPE__ __result = __localdep_strlen(__src);
 	char *__new_dst = __dst + __localdep_strnlen(__dst, __bufsize);
 	__SIZE_TYPE__ __copy_size;
