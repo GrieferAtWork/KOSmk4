@@ -1692,10 +1692,9 @@ ftruncate64:($fd_t fd, __PIO_OFFSET64 length) -> int {
 @@Copy `n_bytes & ~1' (FLOOR_ALIGN(n_bytes, 2)) from `from' to `to',
 @@exchanging the order of even and odd bytes ("123456" --> "214365")
 @@When `n_bytes <= 1', don't do anything and return immediately
-[alias(_swab)][guard]
-[section(.text.crt.string.memory)]
+[alias(_swab)][guard][section(.text.crt.string.memory)]
 swab:([nonnull] void const *__restrict from,
-      [nonnull] void *__restrict to, int n_bytes) {
+      [nonnull] void *__restrict to, __STDC_INT_AS_SSIZE_T n_bytes) {
 	n_bytes &= ~1;
 	while (n_bytes >= 2) {
 		byte_t a, b;

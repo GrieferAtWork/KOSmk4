@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6dbd56fb */
+/* HASH CRC-32:0xe4157fd5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,7 +51,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_timerfd_gettime64,(
 
 __NAMESPACE_LOCAL_BEGIN
 /* Return the next expiration time of UFD */
-__LOCAL_LIBC(timerfd_gettime) __ATTR_NONNULL((2)) __ATTR_NONNULL((2)) int
+__LOCAL_LIBC(timerfd_gettime) __ATTR_NONNULL((2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(timerfd_gettime))(__fd_t __ufd,
                                                              struct itimerspec *__restrict __otmr) {
 #line 123 "kos/src/libc/magic/sys.timerfd.c"

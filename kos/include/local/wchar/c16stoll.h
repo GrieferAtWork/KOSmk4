@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd367a55d */
+/* HASH CRC-32:0xf25f5ba6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,12 +56,12 @@ __LOCAL_LIBC(c16stoll) __ATTR_NONNULL((1)) __LONGLONG
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(c16stoll))(__CHAR16_TYPE__ const *__restrict __nptr,
                                                       __CHAR16_TYPE__ **__endptr,
                                                       int __base) {
-#line 819 "kos/src/libc/magic/stdlib.c"
+#line 816 "kos/src/libc/magic/stdlib.c"
 #if __SIZEOF_LONG_LONG__ <= 4
 	return (__LONGLONG)__localdep_c16sto32(__nptr, __endptr, __base);
-#else
+#else /* __SIZEOF_LONG_LONG__ <= 4 */
 	return (__LONGLONG)__localdep_c16sto64(__nptr, __endptr, __base);
-#endif
+#endif /* __SIZEOF_LONG_LONG__ > 4 */
 }
 __NAMESPACE_LOCAL_END
 #endif /* !__local_c16stoll_defined */

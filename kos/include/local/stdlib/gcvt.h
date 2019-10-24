@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8eb8a834 */
+/* HASH CRC-32:0xcba9419 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,7 +43,7 @@ __LOCAL_LIBC(gcvt) __ATTR_WUNUSED __ATTR_NONNULL((3)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(gcvt))(double __val,
                                                   int __ndigit,
                                                   char *__buf) {
-#line 1009 "kos/src/libc/magic/stdlib.c"
+#line 1005 "kos/src/libc/magic/stdlib.c"
 #ifndef __DBL_NDIGIT_MAX
 #if __DBL_MANT_DIG__ == 53
 #define __DBL_NDIGIT_MAX 17
@@ -55,7 +55,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(gcvt))(double __val,
 	/* ceil (M_LN2 / M_LN10 * DBL_MANT_DIG + 1.0) */
 #define __DBL_NDIGIT_MAX (__DBL_MANT_DIG__ / 4)
 #endif
-#endif
+#endif /* !LDBG_NDIGIT_MAX */
 	if (__ndigit > __DBL_NDIGIT_MAX)
 		__ndigit = __DBL_NDIGIT_MAX;
 	__localdep_sprintf(__buf, "%.*g", __ndigit, __val);

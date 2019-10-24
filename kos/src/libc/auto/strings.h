@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x41eebc4d */
+/* HASH CRC-32:0xed889ed */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,8 +35,8 @@ INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_bzero)(void *__restrict dst, 
  * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
  * @return:  > 0: `s1...+=n_bytes'  > `s2...+=n_bytes' */
 #define libc_bcmp libc_memcmp
-INTDEF NONNULL((1)) WUNUSED ATTR_PURE char *NOTHROW_NCX(LIBCCALL libc_index)(char const *__restrict haystack, int needle);
-INTDEF NONNULL((1)) WUNUSED ATTR_PURE char *NOTHROW_NCX(LIBCCALL libc_rindex)(char const *__restrict haystack, int needle);
+INTDEF WUNUSED ATTR_PURE NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_index)(char const *__restrict haystack, int needle);
+INTDEF WUNUSED ATTR_PURE NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_rindex)(char const *__restrict haystack, int needle);
 #endif /* !__KERNEL__ */
 
 DECL_END

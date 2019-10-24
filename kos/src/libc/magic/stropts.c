@@ -83,10 +83,10 @@ typedef __t_uscalar_t t_uscalar_t;
 [cp] putpmsg:($fd_t fildes, struct strbuf const *ctlptr, struct strbuf const *dataptr, int band, int flags) -> int;
 
 @@Attach a STREAMS-based file descriptor FILDES to a file PATH in the file system name space
-[cp_kos][ATTR_NONNULL((2))] fattach:($fd_t fildes, char const *__restrict path) -> int;
+[cp_kos] fattach:($fd_t fildes, [nonnull] char const *__restrict path) -> int;
 
 @@Detach a name PATH from a STREAMS-based file descriptor
-[cp_kos][ATTR_NONNULL((1))] fdetach:(char const *__restrict path) -> int;
+[cp_kos] fdetach:([nonnull] char const *__restrict path) -> int;
 
 
 %{

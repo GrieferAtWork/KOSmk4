@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7a37f4d2 */
+/* HASH CRC-32:0x39c215f5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #ifndef ____localdep__mbstrlen_defined
 #define ____localdep__mbstrlen_defined 1
 #if defined(__CRT_HAVE__mbstrlen)
-__CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)) __ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep__mbstrlen,(char const *__str),_mbstrlen,(__str))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep__mbstrlen,(char const *__str),_mbstrlen,(__str))
 #else /* LIBC: _mbstrlen */
 #include <local/stdlib/_mbstrlen.h>
 #define __localdep__mbstrlen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_mbstrlen))
@@ -31,10 +31,10 @@ __CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)) __ATTR_WUNUSED,__SIZE_TYPE__,__NOTHR
 #endif /* !____localdep__mbstrlen_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_mbstrlen_l) __ATTR_PURE __ATTR_NONNULL((1)) __ATTR_WUNUSED __SIZE_TYPE__
+__LOCAL_LIBC(_mbstrlen_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbstrlen_l))(char const *__str,
                                                          __locale_t __locale) {
-#line 2133 "kos/src/libc/magic/stdlib.c"
+#line 2159 "kos/src/libc/magic/stdlib.c"
 	(void)__locale;
 	return __localdep__mbstrlen(__str);
 }

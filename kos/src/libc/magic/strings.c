@@ -34,24 +34,26 @@ typedef __SIZE_TYPE__ size_t;
 #if defined(__USE_MISC) || !defined(__USE_XOPEN2K8)
 }
 
-[guard][ATTR_NONNULL((1, 2))][crtbuiltin]
-bcopy:(void const *src, void *dst, $size_t num_bytes) {
+[guard][crtbuiltin]
+bcopy:([nonnull] void const *src,
+       [nonnull] void *dst, $size_t num_bytes) {
 	memmove(dst, src, num_bytes);
 }
 
-[guard][ATTR_NONNULL((1))][crtbuiltin][export_alias(__bzero)]
-bzero:(void *__restrict dst, $size_t num_bytes) {
+[guard][crtbuiltin][export_alias(__bzero)]
+bzero:([nonnull] void *__restrict dst, $size_t num_bytes) {
 	memset(dst, 0, num_bytes);
 }
 
-[guard][ATTR_WUNUSED][ATTR_PURE][ATTR_NONNULL((1, 2))][crtbuiltin]
-bcmp:(void const *s1, void const *s2, $size_t num_bytes) -> int = memcmp;
+[guard][ATTR_WUNUSED][ATTR_PURE][crtbuiltin]
+bcmp:([nonnull] void const *s1,
+      [nonnull] void const *s2, $size_t num_bytes) -> int = memcmp;
 
 
-[guard][ATTR_NONNULL((1))][ATTR_WUNUSED][ATTR_PURE][crtbuiltin]
-index:(char const *__restrict haystack, int needle) -> char *
-	[(char *__restrict haystack, int needle) -> char *]
-	[(char const *__restrict haystack, int needle) -> char const *]
+[guard][ATTR_WUNUSED][ATTR_PURE][crtbuiltin]
+index:([nonnull] char const *__restrict haystack, int needle) -> char *
+	[([nonnull] char *__restrict haystack, int needle) -> char *]
+	[([nonnull] char const *__restrict haystack, int needle) -> char const *]
 {
 	for (; *haystack; ++haystack) {
 		if (*haystack == needle)
@@ -62,10 +64,10 @@ index:(char const *__restrict haystack, int needle) -> char *
 	return NULL;
 }
 
-[guard][ATTR_NONNULL((1))][ATTR_WUNUSED][ATTR_PURE][crtbuiltin]
-rindex:(char const *__restrict haystack, int needle) -> char *
-	[(char *__restrict haystack, int needle) -> char *]
-	[(char const *__restrict haystack, int needle) -> char const *]
+[guard][ATTR_WUNUSED][ATTR_PURE][crtbuiltin]
+rindex:([nonnull] char const *__restrict haystack, int needle) -> char *
+	[([nonnull] char *__restrict haystack, int needle) -> char *]
+	[([nonnull] char const *__restrict haystack, int needle) -> char const *]
 {
 	char const *result = NULL;
 	for (; *haystack; ++haystack) {

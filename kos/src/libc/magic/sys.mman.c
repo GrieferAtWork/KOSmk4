@@ -351,8 +351,8 @@ mmap64:(void *addr, size_t len, int prot, int flags, $fd_t fd, $off64_t offset) 
 %
 %#ifdef __USE_XOPEN2K
 
-[noexport][ATTR_NONNULL((1))]
-posix_madvise:(void *addr, size_t len, int advice) -> int {
+[noexport]
+posix_madvise:([nonnull] void *addr, size_t len, int advice) -> int {
 	/* Implement as a no-op, since this function is merely meant as a hint */
 	(void)addr;
 	(void)len;

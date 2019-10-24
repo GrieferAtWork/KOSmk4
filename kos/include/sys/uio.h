@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d1816fb */
+/* HASH CRC-32:0xd561a276 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,10 +46,10 @@ __CDECLARE(,ssize_t,__NOTHROW_RPC,process_vm_writev,(__pid_t __pid, struct iovec
 #endif /* __USE_GNU */
 
 #if defined(__CRT_HAVE_readv)
-__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)) __ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,readv,(__fd_t __fd, struct iovec const *__iovec, __STDC_INT_AS_SIZE_T __count),(__fd,__iovec,__count))
+__CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,readv,(__fd_t __fd, struct iovec const *__iovec, __STDC_INT_AS_SIZE_T __count),(__fd,__iovec,__count))
 #endif /* readv... */
 #if defined(__CRT_HAVE_writev)
-__CDECLARE(__ATTR_NONNULL((2)) __ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,writev,(__fd_t __fd, struct iovec const *__iovec, __STDC_INT_AS_SIZE_T __count),(__fd,__iovec,__count))
+__CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,writev,(__fd_t __fd, struct iovec const *__iovec, __STDC_INT_AS_SIZE_T __count),(__fd,__iovec,__count))
 #endif /* writev... */
 
 #ifdef __USE_MISC

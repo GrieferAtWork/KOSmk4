@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1d0bb7e2 */
+/* HASH CRC-32:0xf17e6e0d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@ typedef int (__LIBCCALL *__dos_compar_d_fn_t)(void *__arg, void const *__a, void
 #ifndef ____localdep_bsearch_r_defined
 #define ____localdep_bsearch_r_defined 1
 #if defined(__CRT_HAVE_bsearch_r)
-__CREDIRECT(__ATTR_NONNULL((1, 2, 5)) __ATTR_WUNUSED,void *,__NOTHROW_NCX,__localdep_bsearch_r,(void const *__pkey, void const *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_d_fn_t __cmp, void *__arg),bsearch_r,(__pkey,__pbase,__item_count,__item_size,__cmp,__arg))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)),void *,__NOTHROW_NCX,__localdep_bsearch_r,(void const *__pkey, void const *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_d_fn_t __cmp, void *__arg),bsearch_r,(__pkey,__pbase,__item_count,__item_size,__cmp,__arg))
 #else /* LIBC: bsearch_r */
 #include <local/stdlib/bsearch_r.h>
 #define __localdep_bsearch_r (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(bsearch_r))
@@ -49,14 +49,14 @@ __PRIVATE int (__LIBCCALL __invoke_compare_helper_s)(void const *__a, void const
 	return (*((struct __invoke_compare_helper_s_data *)__arg)->__fun)(((struct __invoke_compare_helper_s_data *)__arg)->__arg, __a, __b);
 }
 #endif /* !____invoke_compare_helper_defined */
-__LOCAL_LIBC(bsearch_s) __ATTR_NONNULL((1, 2, 5)) __ATTR_WUNUSED void *
+__LOCAL_LIBC(bsearch_s) __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(bsearch_s))(void const *__key,
                                                        void const *__base,
                                                        __SIZE_TYPE__ __nmemb,
                                                        __SIZE_TYPE__ __size,
                                                        __dos_compar_d_fn_t __compar,
                                                        void *__arg) {
-#line 1871 "kos/src/libc/magic/stdlib.c"
+#line 1893 "kos/src/libc/magic/stdlib.c"
 	struct __invoke_compare_helper_s_data __data;
 	__data.__fun = __compar;
 	__data.__arg = __arg;

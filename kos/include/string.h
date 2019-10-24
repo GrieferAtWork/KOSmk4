@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd934f72a */
+/* HASH CRC-32:0x41a8e6ed */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1127,29 +1127,29 @@ __FORCELOCAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRINGS_H_PROTO)
 #if __has_builtin(__builtin_index) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_index)
 extern "C++" {
-__FORCELOCAL __ATTR_NONNULL((1)) __ATTR_WUNUSED __ATTR_PURE char *__NOTHROW_NCX(__LIBCCALL index)(char *__restrict __haystack, int __needle) { return __builtin_index(__haystack, __needle); }
-__FORCELOCAL __ATTR_NONNULL((1)) __ATTR_WUNUSED __ATTR_PURE char const *__NOTHROW_NCX(__LIBCCALL index)(char const *__restrict __haystack, int __needle) { return __builtin_index(__haystack, __needle); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL index)(char *__restrict __haystack, int __needle) { return __builtin_index(__haystack, __needle); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) char const *__NOTHROW_NCX(__LIBCCALL index)(char const *__restrict __haystack, int __needle) { return __builtin_index(__haystack, __needle); }
 }
 #elif defined(__CRT_HAVE_index)
 extern "C++" {
-__CREDIRECT(__ATTR_NONNULL((1)) __ATTR_WUNUSED __ATTR_PURE,char *,__NOTHROW_NCX,index,(char *__restrict __haystack, int __needle),index,(__haystack, __needle))
-__CREDIRECT(__ATTR_NONNULL((1)) __ATTR_WUNUSED __ATTR_PURE,char const *,__NOTHROW_NCX,index,(char const *__restrict __haystack, int __needle),index,(__haystack, __needle))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,index,(char *__restrict __haystack, int __needle),index,(__haystack, __needle))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),char const *,__NOTHROW_NCX,index,(char const *__restrict __haystack, int __needle),index,(__haystack, __needle))
 }
 #else /* LIBC: index */
 #include <local/strings/index.h>
 extern "C++" {
-__FORCELOCAL __ATTR_NONNULL((1)) __ATTR_WUNUSED __ATTR_PURE char *__NOTHROW_NCX(__LIBCCALL index)(char *__restrict __haystack, int __needle) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(index))(__haystack, __needle); }
-__FORCELOCAL __ATTR_NONNULL((1)) __ATTR_WUNUSED __ATTR_PURE char const *__NOTHROW_NCX(__LIBCCALL index)(char const *__restrict __haystack, int __needle) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(index))(__haystack, __needle); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL index)(char *__restrict __haystack, int __needle) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(index))(__haystack, __needle); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) char const *__NOTHROW_NCX(__LIBCCALL index)(char const *__restrict __haystack, int __needle) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(index))(__haystack, __needle); }
 }
 #endif /* index... */
 #else /* __cplusplus && __CORRECT_ISO_CPP_STRINGS_H_PROTO */
 #if __has_builtin(__builtin_index) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_index)
-__FORCELOCAL __ATTR_NONNULL((1)) __ATTR_WUNUSED __ATTR_PURE char *__NOTHROW_NCX(__LIBCCALL index)(char const *__restrict __haystack, int __needle) { return __builtin_index(__haystack, __needle); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL index)(char const *__restrict __haystack, int __needle) { return __builtin_index(__haystack, __needle); }
 #elif defined(__CRT_HAVE_index)
-__CDECLARE(__ATTR_NONNULL((1)) __ATTR_WUNUSED __ATTR_PURE,char *,__NOTHROW_NCX,index,(char const *__restrict __haystack, int __needle),(__haystack,__needle))
+__CDECLARE(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,index,(char const *__restrict __haystack, int __needle),(__haystack,__needle))
 #else /* LIBC: index */
 #include <local/strings/index.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(index, __FORCELOCAL __ATTR_NONNULL((1)) __ATTR_WUNUSED __ATTR_PURE char *__NOTHROW_NCX(__LIBCCALL index)(char const *__restrict __haystack, int __needle) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(index))(__haystack, __needle); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(index, __FORCELOCAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL index)(char const *__restrict __haystack, int __needle) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(index))(__haystack, __needle); })
 #endif /* index... */
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRINGS_H_PROTO */
 #endif /* !__index_defined */
@@ -1158,29 +1158,29 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(index, __FORCELOCAL __ATTR_NONNULL((1)) __ATTR_W
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_STRINGS_H_PROTO)
 #if __has_builtin(__builtin_rindex) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_rindex)
 extern "C++" {
-__FORCELOCAL __ATTR_NONNULL((1)) __ATTR_WUNUSED __ATTR_PURE char *__NOTHROW_NCX(__LIBCCALL rindex)(char *__restrict __haystack, int __needle) { return __builtin_rindex(__haystack, __needle); }
-__FORCELOCAL __ATTR_NONNULL((1)) __ATTR_WUNUSED __ATTR_PURE char const *__NOTHROW_NCX(__LIBCCALL rindex)(char const *__restrict __haystack, int __needle) { return __builtin_rindex(__haystack, __needle); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL rindex)(char *__restrict __haystack, int __needle) { return __builtin_rindex(__haystack, __needle); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) char const *__NOTHROW_NCX(__LIBCCALL rindex)(char const *__restrict __haystack, int __needle) { return __builtin_rindex(__haystack, __needle); }
 }
 #elif defined(__CRT_HAVE_rindex)
 extern "C++" {
-__CREDIRECT(__ATTR_NONNULL((1)) __ATTR_WUNUSED __ATTR_PURE,char *,__NOTHROW_NCX,rindex,(char *__restrict __haystack, int __needle),rindex,(__haystack, __needle))
-__CREDIRECT(__ATTR_NONNULL((1)) __ATTR_WUNUSED __ATTR_PURE,char const *,__NOTHROW_NCX,rindex,(char const *__restrict __haystack, int __needle),rindex,(__haystack, __needle))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,rindex,(char *__restrict __haystack, int __needle),rindex,(__haystack, __needle))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),char const *,__NOTHROW_NCX,rindex,(char const *__restrict __haystack, int __needle),rindex,(__haystack, __needle))
 }
 #else /* LIBC: rindex */
 #include <local/strings/rindex.h>
 extern "C++" {
-__FORCELOCAL __ATTR_NONNULL((1)) __ATTR_WUNUSED __ATTR_PURE char *__NOTHROW_NCX(__LIBCCALL rindex)(char *__restrict __haystack, int __needle) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rindex))(__haystack, __needle); }
-__FORCELOCAL __ATTR_NONNULL((1)) __ATTR_WUNUSED __ATTR_PURE char const *__NOTHROW_NCX(__LIBCCALL rindex)(char const *__restrict __haystack, int __needle) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rindex))(__haystack, __needle); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL rindex)(char *__restrict __haystack, int __needle) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rindex))(__haystack, __needle); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) char const *__NOTHROW_NCX(__LIBCCALL rindex)(char const *__restrict __haystack, int __needle) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rindex))(__haystack, __needle); }
 }
 #endif /* rindex... */
 #else /* __cplusplus && __CORRECT_ISO_CPP_STRINGS_H_PROTO */
 #if __has_builtin(__builtin_rindex) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_rindex)
-__FORCELOCAL __ATTR_NONNULL((1)) __ATTR_WUNUSED __ATTR_PURE char *__NOTHROW_NCX(__LIBCCALL rindex)(char const *__restrict __haystack, int __needle) { return __builtin_rindex(__haystack, __needle); }
+__FORCELOCAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL rindex)(char const *__restrict __haystack, int __needle) { return __builtin_rindex(__haystack, __needle); }
 #elif defined(__CRT_HAVE_rindex)
-__CDECLARE(__ATTR_NONNULL((1)) __ATTR_WUNUSED __ATTR_PURE,char *,__NOTHROW_NCX,rindex,(char const *__restrict __haystack, int __needle),(__haystack,__needle))
+__CDECLARE(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,rindex,(char const *__restrict __haystack, int __needle),(__haystack,__needle))
 #else /* LIBC: rindex */
 #include <local/strings/rindex.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(rindex, __FORCELOCAL __ATTR_NONNULL((1)) __ATTR_WUNUSED __ATTR_PURE char *__NOTHROW_NCX(__LIBCCALL rindex)(char const *__restrict __haystack, int __needle) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rindex))(__haystack, __needle); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(rindex, __FORCELOCAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL rindex)(char const *__restrict __haystack, int __needle) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rindex))(__haystack, __needle); })
 #endif /* rindex... */
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_STRINGS_H_PROTO */
 #endif /* !__rindex_defined */
@@ -5153,10 +5153,10 @@ __FORCELOCAL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)) int __NOTHROW_NCX
 #define _WSTRING_DEFINED 1
 #ifndef ___wcsdup_defined
 #define ___wcsdup_defined 1
-#if defined(__CRT_HAVE__wcsdup)
-__CDECLARE(__ATTR_WUNUSED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_MALLOC __ATTR_NONNULL((1)),wchar_t *,__NOTHROW_NCX,_wcsdup,(wchar_t const *__restrict __string),(__string))
-#elif defined(__CRT_HAVE_wcsdup)
+#if defined(__CRT_HAVE_wcsdup)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_MALLOC __ATTR_NONNULL((1)),wchar_t *,__NOTHROW_NCX,_wcsdup,(wchar_t const *__restrict __string),wcsdup,(__string))
+#elif defined(__CRT_HAVE__wcsdup)
+__CDECLARE(__ATTR_WUNUSED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_MALLOC __ATTR_NONNULL((1)),wchar_t *,__NOTHROW_NCX,_wcsdup,(wchar_t const *__restrict __string),(__string))
 #elif (defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc)) || (__has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)) || defined(__CRT_HAVE_malloc)
 #include <local/wchar/wcsdup.h>
 __FORCELOCAL __ATTR_WUNUSED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_MALLOC __ATTR_NONNULL((1)) wchar_t *__NOTHROW_NCX(__LIBCCALL _wcsdup)(wchar_t const *__restrict __string) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsdup))(__string); }

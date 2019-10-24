@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xad5a4c98 */
+/* HASH CRC-32:0x2aa391f8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 typedef int (__LIBCCALL *__compar_d_fn_t)(void const *__a, void const *__b, void *__arg);
 #endif /* !__compar_d_fn_t_defined */
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(bsearch_r) __ATTR_NONNULL((1, 2, 5)) __ATTR_WUNUSED void *
+__LOCAL_LIBC(bsearch_r) __ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(bsearch_r))(void const *__pkey,
                                                        void const *__pbase,
                                                        __SIZE_TYPE__ __item_count,

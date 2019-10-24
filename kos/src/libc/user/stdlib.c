@@ -725,8 +725,9 @@ ATTR_WEAK ATTR_SECTION(".text.crt.application.exit.exit") void
 }
 /*[[[end:exit]]]*/
 
-/*[[[head:atexit,hash:CRC-32=0xf1fa049c]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.process.atexit") int
+/*[[[head:atexit,hash:CRC-32=0x7b9caa0b]]]*/
+INTERN NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.sched.process.atexit") int
 NOTHROW_NCX(LIBCCALL libc_atexit)(__atexit_func_t func)
 /*[[[body:atexit]]]*/
 {
@@ -749,8 +750,9 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.process.quick_exit") void
 }
 /*[[[end:quick_exit]]]*/
 
-/*[[[head:at_quick_exit,hash:CRC-32=0xbdae1600]]]*/
-INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.process.at_quick_exit") int
+/*[[[head:at_quick_exit,hash:CRC-32=0x8671a9ef]]]*/
+INTERN NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.sched.process.at_quick_exit") int
 NOTHROW_NCX(LIBCCALL libc_at_quick_exit)(__atexit_func_t func)
 /*[[[body:at_quick_exit]]]*/
 {
@@ -783,8 +785,8 @@ NOTHROW_NCX(LIBCCALL libc_drand48_r)(struct drand48_data *__restrict buffer,
 }
 /*[[[end:drand48_r]]]*/
 
-/*[[[head:erand48_r,hash:CRC-32=0x568a12c8]]]*/
-INTERN NONNULL((1, 2))
+/*[[[head:erand48_r,hash:CRC-32=0x241699f9]]]*/
+INTERN NONNULL((1, 2, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.random.erand48_r") int
 NOTHROW_NCX(LIBCCALL libc_erand48_r)(unsigned short xsubi[3],
                                      struct drand48_data *__restrict buffer,
@@ -810,8 +812,8 @@ NOTHROW_NCX(LIBCCALL libc_lrand48_r)(struct drand48_data *__restrict buffer,
 }
 /*[[[end:lrand48_r]]]*/
 
-/*[[[head:nrand48_r,hash:CRC-32=0x643efa26]]]*/
-INTERN NONNULL((1, 2))
+/*[[[head:nrand48_r,hash:CRC-32=0xec488ce6]]]*/
+INTERN NONNULL((1, 2, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.random.nrand48_r") int
 NOTHROW_NCX(LIBCCALL libc_nrand48_r)(unsigned short xsubi[3],
                                      struct drand48_data *__restrict buffer,
@@ -837,8 +839,8 @@ NOTHROW_NCX(LIBCCALL libc_mrand48_r)(struct drand48_data *__restrict buffer,
 }
 /*[[[end:mrand48_r]]]*/
 
-/*[[[head:jrand48_r,hash:CRC-32=0x497e4459]]]*/
-INTERN NONNULL((1, 2))
+/*[[[head:jrand48_r,hash:CRC-32=0xc1083299]]]*/
+INTERN NONNULL((1, 2, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.random.jrand48_r") int
 NOTHROW_NCX(LIBCCALL libc_jrand48_r)(unsigned short xsubi[3],
                                      struct drand48_data *__restrict buffer,

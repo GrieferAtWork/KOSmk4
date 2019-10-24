@@ -1489,10 +1489,7 @@ wildwcscasecmp_l:([nonnull] wchar_t const *pattern, [nonnull] wchar_t const *str
 %#ifndef _WSTRING_DEFINED
 %#define _WSTRING_DEFINED 1
 
-[ATTR_WUNUSED][wchar]
-[ATTR_MALL_DEFAULT_ALIGNED][ATTR_MALLOC][ATTR_NONNULL((1))][guard]
-[section({.text.crt.wchar.heap.strdup|.text.crt.dos.wchar.heap.strdup})]
-_wcsdup:(wchar_t const *__restrict string) -> wchar_t * = wcsdup;
+[guard][attribute(*)][alias(*)] _wcsdup:(*) = wcsdup;
 
 %
 %#ifdef __USE_DOS_SLIB

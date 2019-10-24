@@ -110,7 +110,7 @@ ppoll:([inp(nfds)] struct pollfd *fds, nfds_t nfds,
 %
 %#ifdef __USE_TIME64
 [time64_variant_of(ppoll)]
-[cp][ATTR_NONNULL((1))][noexport][requires($has_function(ppoll32))]
+[cp][noexport][requires($has_function(ppoll32))]
 ppoll64:([inp(nfds)] struct pollfd *fds, nfds_t nfds,
          [nullable] struct timespec64 const *timeout,
          [nullable] $sigset_t const *ss) -> int {

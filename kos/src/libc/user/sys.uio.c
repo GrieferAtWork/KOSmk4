@@ -63,8 +63,8 @@ NOTHROW_RPC(LIBCCALL libc_process_vm_writev)(pid_t pid,
 }
 /*[[[end:process_vm_writev]]]*/
 
-/*[[[head:readv,hash:CRC-32=0x47681edd]]]*/
-INTERN WUNUSED NONNULL((2)) NONNULL((2))
+/*[[[head:readv,hash:CRC-32=0x5f7cbecc]]]*/
+INTERN WUNUSED NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.readv") ssize_t
 NOTHROW_RPC(LIBCCALL libc_readv)(fd_t fd,
                                  struct iovec const *iovec,
@@ -77,8 +77,8 @@ NOTHROW_RPC(LIBCCALL libc_readv)(fd_t fd,
 }
 /*[[[end:readv]]]*/
 
-/*[[[head:writev,hash:CRC-32=0x42b657ab]]]*/
-INTERN NONNULL((2)) NONNULL((2))
+/*[[[head:writev,hash:CRC-32=0xa3de15d4]]]*/
+INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.writev") ssize_t
 NOTHROW_RPC(LIBCCALL libc_writev)(fd_t fd,
                                   struct iovec const *iovec,

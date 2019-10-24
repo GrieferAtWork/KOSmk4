@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x95555190 */
+/* HASH CRC-32:0x1220317e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,10 +20,10 @@
 #ifndef __local__mbstrnlen_defined
 #define __local__mbstrnlen_defined 1
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_mbstrnlen) __ATTR_PURE __ATTR_NONNULL((1)) __ATTR_WUNUSED __SIZE_TYPE__
+__LOCAL_LIBC(_mbstrnlen) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_mbstrnlen))(char const *__str,
                                                         __SIZE_TYPE__ __maxlen) {
-#line 2127 "kos/src/libc/magic/stdlib.c"
+#line 2153 "kos/src/libc/magic/stdlib.c"
 	/* TODO */
 	return 0;
 }

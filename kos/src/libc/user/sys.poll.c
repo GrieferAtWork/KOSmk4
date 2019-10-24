@@ -65,11 +65,11 @@ NOTHROW_RPC(LIBCCALL libc_ppoll)(struct pollfd *fds,
 }
 /*[[[end:ppoll]]]*/
 
-/*[[[head:ppoll64,hash:CRC-32=0xe7db7d72]]]*/
+/*[[[head:ppoll64,hash:CRC-32=0x9297f185]]]*/
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_ppoll64, libc_ppoll);
 #else
-INTERN NONNULL((1)) NONNULL((1))
+INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.io.poll.ppoll64") int
 NOTHROW_RPC(LIBCCALL libc_ppoll64)(struct pollfd *fds,
                                    nfds_t nfds,

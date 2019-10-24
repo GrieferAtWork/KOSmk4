@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x85b09233 */
+/* HASH CRC-32:0xe2ea17a7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,9 +34,9 @@ INTDEF ATTR_LEAF NONNULL((1)) uint64_t NOTHROW_NCX(LIBCCALL libc_strtou64)(char 
 INTDEF ATTR_LEAF NONNULL((1)) int64_t NOTHROW_NCX(LIBCCALL libc_strto64)(char const *__restrict nptr, char **endptr, int base);
 #ifndef __KERNEL__
 INTDEF NONNULL((1, 4)) void (LIBCCALL libc_qsort_r)(void *pbase, size_t item_count, size_t item_size, __compar_d_fn_t cmp, void *arg) __THROWS(...);
-INTDEF NONNULL((1, 2, 5)) WUNUSED void *NOTHROW_NCX(LIBCCALL libc_bsearch_r)(void const *pkey, void const *pbase, size_t item_count, size_t item_size, __compar_d_fn_t cmp, void *arg);
+INTDEF WUNUSED NONNULL((1, 2, 5)) void *NOTHROW_NCX(LIBCCALL libc_bsearch_r)(void const *pkey, void const *pbase, size_t item_count, size_t item_size, __compar_d_fn_t cmp, void *arg);
 INTDEF NONNULL((1, 4)) void (LIBCCALL libc_qsort)(void *pbase, size_t item_count, size_t item_size, __compar_fn_t cmp) __THROWS(...);
-INTDEF NONNULL((1, 2, 5)) WUNUSED void *NOTHROW_NCX(LIBCCALL libc_bsearch)(void const *pkey, void const *pbase, size_t item_count, size_t item_size, __compar_fn_t cmp);
+INTDEF WUNUSED NONNULL((1, 2, 5)) void *NOTHROW_NCX(LIBCCALL libc_bsearch)(void const *pkey, void const *pbase, size_t item_count, size_t item_size, __compar_fn_t cmp);
 INTDEF ATTR_CONST WUNUSED long NOTHROW(LIBCCALL libc_labs)(long x);
 INTDEF ATTR_CONST WUNUSED __LONGLONG NOTHROW(LIBCCALL libc_llabs)(__LONGLONG x);
 INTDEF ATTR_CONST WUNUSED ldiv_t NOTHROW_NCX(LIBCCALL libc_ldiv)(long numer, long denom);
@@ -54,9 +54,9 @@ INTDEF size_t NOTHROW_NCX(LIBCCALL libc_wcstombs)(char *__restrict s, char32_t c
 INTDEF size_t NOTHROW_NCX(LIBDCALL libd_wcstombs)(char *__restrict s, char16_t const *__restrict pwcs, size_t n);
 INTDEF void NOTHROW(LIBCCALL libc_srand)(long seed);
 INTDEF int NOTHROW(LIBCCALL libc_rand)(void);
-INTDEF ATTR_PURE NONNULL((1)) WUNUSED int NOTHROW_NCX(LIBCCALL libc_atoi)(char const *__restrict nptr);
-INTDEF ATTR_PURE NONNULL((1)) WUNUSED long NOTHROW_NCX(LIBCCALL libc_atol)(char const *__restrict nptr);
-INTDEF ATTR_PURE NONNULL((1)) WUNUSED __LONGLONG NOTHROW_NCX(LIBCCALL libc_atoll)(char const *__restrict nptr);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_atoi)(char const *__restrict nptr);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) long NOTHROW_NCX(LIBCCALL libc_atol)(char const *__restrict nptr);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) __LONGLONG NOTHROW_NCX(LIBCCALL libc_atoll)(char const *__restrict nptr);
 INTDEF ATTR_LEAF NONNULL((1)) unsigned long NOTHROW_NCX(LIBCCALL libc_strtoul)(char const *__restrict nptr, char **endptr, int base);
 INTDEF ATTR_LEAF NONNULL((1)) long NOTHROW_NCX(LIBCCALL libc_strtol)(char const *__restrict nptr, char **endptr, int base);
 INTDEF ATTR_LEAF NONNULL((1)) __ULONGLONG NOTHROW_NCX(LIBCCALL libc_strtoull)(char const *__restrict nptr, char **endptr, int base);
@@ -96,7 +96,7 @@ INTDEF WUNUSED ATTR_PURE NONNULL((1)) __LONGLONG NOTHROW_NCX(LIBCCALL libc__atol
 INTDEF ATTR_CONST WUNUSED u16 NOTHROW_NCX(LIBCCALL libc__byteswap_ushort)(u16 val);
 INTDEF ATTR_CONST WUNUSED u32 NOTHROW_NCX(LIBCCALL libc__byteswap_ulong)(u32 val);
 INTDEF ATTR_CONST WUNUSED u64 NOTHROW_NCX(LIBCCALL libc__byteswap_uint64)(u64 val);
-INTDEF NONNULL((1, 2, 5)) WUNUSED void *NOTHROW_NCX(LIBCCALL libc_bsearch_s)(void const *key, void const *base, size_t nmemb, size_t size, __dos_compar_d_fn_t compar, void *arg);
+INTDEF WUNUSED NONNULL((1, 2, 5)) void *NOTHROW_NCX(LIBCCALL libc_bsearch_s)(void const *key, void const *base, size_t nmemb, size_t size, __dos_compar_d_fn_t compar, void *arg);
 INTDEF NONNULL((1, 4)) void NOTHROW_NCX(LIBCCALL libc_qsort_s)(void *base, size_t nmemb, size_t size, __dos_compar_d_fn_t compar, void *arg);
 #define libc__itoa libc_itoa
 #define libc__ltoa libc_ltoa
@@ -112,13 +112,13 @@ INTDEF NONNULL((2)) errno_t NOTHROW_NCX(LIBCCALL libc__ui64toa_s)(u64 val, char 
 #define libc__strtoui64 libc_strtou64
 #define libc__strtoi64_l libc_strto64_l
 #define libc__strtoui64_l libc_strtou64_l
-INTDEF ATTR_PURE NONNULL((1)) WUNUSED s64 NOTHROW_NCX(LIBCCALL libc__atoi64)(char const *__restrict nptr);
-INTDEF ATTR_PURE NONNULL((1)) WUNUSED s64 NOTHROW_NCX(LIBCCALL libc__atoi64_l)(char const *__restrict nptr, locale_t locale);
-INTDEF ATTR_PURE NONNULL((1)) WUNUSED size_t NOTHROW_NCX(LIBCCALL libc__mbstrlen)(char const *str);
-INTDEF ATTR_PURE NONNULL((1)) WUNUSED size_t NOTHROW_NCX(LIBCCALL libc__mbstrnlen)(char const *str, size_t maxlen);
-INTDEF ATTR_PURE NONNULL((1)) WUNUSED size_t NOTHROW_NCX(LIBCCALL libc__mbstrlen_l)(char const *str, locale_t locale);
-INTDEF ATTR_PURE NONNULL((1)) WUNUSED size_t NOTHROW_NCX(LIBCCALL libc__mbstrnlen_l)(char const *str, size_t maxlen, locale_t locale);
-INTDEF ATTR_PURE NONNULL((1)) WUNUSED int NOTHROW_NCX(LIBCCALL libc__mblen_l)(char const *str, size_t maxlen, locale_t locale);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) s64 NOTHROW_NCX(LIBCCALL libc__atoi64)(char const *__restrict nptr);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) s64 NOTHROW_NCX(LIBCCALL libc__atoi64_l)(char const *__restrict nptr, locale_t locale);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc__mbstrlen)(char const *str);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc__mbstrnlen)(char const *str, size_t maxlen);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc__mbstrlen_l)(char const *str, locale_t locale);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc__mbstrnlen_l)(char const *str, size_t maxlen, locale_t locale);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc__mblen_l)(char const *str, size_t maxlen, locale_t locale);
 INTDEF int NOTHROW_NCX(LIBCCALL libc__mbtowc_l)(char32_t *dst, char const *src, size_t srclen, locale_t locale);
 INTDEF int NOTHROW_NCX(LIBDCALL libd__mbtowc_l)(char16_t *dst, char const *src, size_t srclen, locale_t locale);
 INTDEF size_t NOTHROW_NCX(LIBCCALL libc__mbstowcs_l)(char32_t *buf, char const *src, size_t maxlen, locale_t locale);

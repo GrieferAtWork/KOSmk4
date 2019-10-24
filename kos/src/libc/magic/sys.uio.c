@@ -53,10 +53,10 @@ process_vm_writev:($pid_t pid,
 %#endif /* __USE_GNU */
 
 %
-[cp][ATTR_WUNUSED][ATTR_NONNULL((2))]
+[cp][ATTR_WUNUSED]
 readv:($fd_t fd, [inp(count)] struct iovec const *iovec, __STDC_INT_AS_SIZE_T count) -> ssize_t;
 
-[cp][ATTR_NONNULL((2))]
+[cp]
 writev:($fd_t fd, [inp(count)] struct iovec const *iovec, __STDC_INT_AS_SIZE_T count) -> ssize_t;
 
 

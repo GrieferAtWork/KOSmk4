@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x67f75420 */
+/* HASH CRC-32:0x13015d70 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ typedef __sigset_t sigset_t;
 /* @param timeout: Timeout in milliseconds (or negative for infinity) */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_poll)(struct pollfd *fds, nfds_t nfds, int timeout);
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_ppoll)(struct pollfd *fds, nfds_t nfds, struct timespec const *timeout, sigset_t const *ss);
-INTDEF NONNULL((1)) NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_ppoll64)(struct pollfd *fds, nfds_t nfds, struct timespec64 const *timeout, sigset_t const *ss);
+INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_ppoll64)(struct pollfd *fds, nfds_t nfds, struct timespec64 const *timeout, sigset_t const *ss);
 
 DECL_END
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x89e3ac4a */
+/* HASH CRC-32:0xdbbbbe1a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ INTDEF fd_t NOTHROW(LIBCCALL libc_timerfd_create)(clockid_t clock_id, int flags)
  * is absolute. Optionally return the old expiration time in OTMR */
 INTDEF NONNULL((3)) int NOTHROW_NCX(LIBCCALL libc_timerfd_settime)(fd_t ufd, int flags, struct itimerspec const *utmr, struct itimerspec *otmr);
 /* Return the next expiration time of UFD */
-INTDEF NONNULL((2)) NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_timerfd_gettime)(fd_t ufd, struct itimerspec *__restrict otmr);
+INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_timerfd_gettime)(fd_t ufd, struct itimerspec *__restrict otmr);
 /* Set next expiration time of interval timer source UFD to UTMR.
  * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout utmr
  * is absolute. Optionally return the old expiration time in OTMR */

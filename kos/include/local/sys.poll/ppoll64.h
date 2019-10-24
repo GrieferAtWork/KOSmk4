@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc486b225 */
+/* HASH CRC-32:0x76f73618 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_ppoll32,(struct pol
 #endif /* !____localdep_ppoll32_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(ppoll64) __ATTR_NONNULL((1)) __ATTR_NONNULL((1)) int
+__LOCAL_LIBC(ppoll64) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(ppoll64))(struct pollfd *__fds,
                                                      __UINTPTR_TYPE__ __nfds,
                                                      struct __timespec64 const *__timeout,

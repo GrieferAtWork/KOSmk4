@@ -62,9 +62,9 @@ NOTHROW_NCX(LIBCCALL libc_timerfd_settime)(fd_t ufd,
 }
 /*[[[end:timerfd_settime]]]*/
 
-/*[[[head:timerfd_gettime,hash:CRC-32=0x31437c4c]]]*/
+/*[[[head:timerfd_gettime,hash:CRC-32=0x3c5cb1be]]]*/
 /* Return the next expiration time of UFD */
-INTERN NONNULL((2)) NONNULL((2))
+INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.timer.timerfd_gettime") int
 NOTHROW_NCX(LIBCCALL libc_timerfd_gettime)(fd_t ufd,
                                            struct itimerspec *__restrict otmr)

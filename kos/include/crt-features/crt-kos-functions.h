@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xad66513e */
+/* HASH CRC-32:0xfdf16cec */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2086,7 +2086,7 @@ __CRT_FUNCTION(strverscmp,0,(),2,(char const *,s1,char const *,s2),int)
 __CRT_FUNCTION(strxfrm,0,(),3,(char *,dst,char const *__restrict,src,size_t,maxlen),size_t)
 __CRT_FUNCTION(strxfrm_l,0,(),4,(char *,dst,char const *__restrict,src,size_t,maxlen,locale_t,locale),size_t)
 __CRT_FUNCTION(stty,0,(),2,(fd_t,fd,struct sgttyb const *,params),int)
-__CRT_FUNCTION(swab,0,(),3,(void const *__restrict,from,void *__restrict,to,int,n_bytes),void)
+__CRT_FUNCTION(swab,0,(),3,(void const *__restrict,from,void *__restrict,to,__STDC_INT_AS_SSIZE_T,n_bytes),void)
 __CRT_FUNCTION(swapcontext,0,(),2,(ucontext_t *__restrict,oucp,ucontext_t const *__restrict,ucp),int)
 __CRT_FUNCTION(swapoff,0,(),1,(char const *,path),int)
 __CRT_FUNCTION(swapon,0,(),2,(char const *,path,int,swapflags),int)
@@ -2680,7 +2680,7 @@ __CRT_FAKE_FUNCTION(_strtoul_l,0,(),4,(char const *__restrict,nptr,char **,endpt
 __CRT_FAKE_FUNCTION(_strtoull_l,0,(),4,(char const *__restrict,nptr,char **,endptr,int,base,locale_t,locale),__ULONGLONG)
 __CRT_FAKE_FUNCTION(_strtoumax_l,0,(),4,(char const *__restrict,nptr,char **,endptr,int,base,locale_t,locale),uintmax_t)
 __CRT_FAKE_FUNCTION(_strxfrm_l,0,(),4,(char *,dst,char const *__restrict,src,size_t,maxlen,locale_t,locale),size_t)
-__CRT_FAKE_FUNCTION(_swab,0,(),3,(void const *__restrict,from,void *__restrict,to,int,n_bytes),void)
+__CRT_FAKE_FUNCTION(_swab,0,(),3,(void const *__restrict,from,void *__restrict,to,__STDC_INT_AS_SSIZE_T,n_bytes),void)
 __CRT_FAKE_FUNCTION(_tell,0,(),1,(fd_t,fd),__LONG32_TYPE__)
 __CRT_FAKE_FUNCTION(_tempnam,0,(),2,(char const *,dir,char const *,pfx),char *)
 __CRT_FAKE_FUNCTION(_towlower_l,0,(),2,(wint_t,wc,locale_t,locale),wint_t)

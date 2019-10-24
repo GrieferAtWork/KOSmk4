@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5e984c20 */
+/* HASH CRC-32:0x378eaf5b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.bcopy") void
 NOTHROW_NCX(LIBCCALL libc_bcopy)(void const *src,
                                  void *dst,
                                  size_t num_bytes) {
-#line 39 "kos/src/libc/magic/strings.c"
+#line 40 "kos/src/libc/magic/strings.c"
 	memmove(dst, src, num_bytes);
 }
 
@@ -42,15 +42,15 @@ INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.bzero") void
 NOTHROW_NCX(LIBCCALL libc_bzero)(void *__restrict dst,
                                  size_t num_bytes) {
-#line 44 "kos/src/libc/magic/strings.c"
+#line 45 "kos/src/libc/magic/strings.c"
 	memset(dst, 0, num_bytes);
 }
 
-INTERN NONNULL((1)) WUNUSED ATTR_PURE
+INTERN WUNUSED ATTR_PURE NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.index") char *
 NOTHROW_NCX(LIBCCALL libc_index)(char const *__restrict haystack,
                                  int needle) {
-#line 56 "kos/src/libc/magic/strings.c"
+#line 58 "kos/src/libc/magic/strings.c"
 	for (; *haystack; ++haystack) {
 		if (*haystack == needle)
 			return (char *)haystack;
@@ -60,11 +60,11 @@ NOTHROW_NCX(LIBCCALL libc_index)(char const *__restrict haystack,
 	return NULL;
 }
 
-INTERN NONNULL((1)) WUNUSED ATTR_PURE
+INTERN WUNUSED ATTR_PURE NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.rindex") char *
 NOTHROW_NCX(LIBCCALL libc_rindex)(char const *__restrict haystack,
                                   int needle) {
-#line 70 "kos/src/libc/magic/strings.c"
+#line 72 "kos/src/libc/magic/strings.c"
 	char const *result = NULL;
 	for (; *haystack; ++haystack) {
 		if (*haystack == needle)

@@ -117,7 +117,7 @@ timerfd_settime:($fd_t ufd, int flags,
 
 @@Return the next expiration time of UFD
 [if(defined(__USE_TIME_BITS64)),preferred_alias(timerfd_gettime64)]
-[if(!defined(__USE_TIME_BITS64)),preferred_alias(timerfd_gettime)][ATTR_NONNULL((2))]
+[if(!defined(__USE_TIME_BITS64)),preferred_alias(timerfd_gettime)]
 [requires(defined(__CRT_HAVE_timerfd_gettime) || defined(__CRT_HAVE_timerfd_gettime64))]
 timerfd_gettime:($fd_t ufd, [nonnull] struct itimerspec *__restrict otmr) -> int {
 #ifdef __CRT_HAVE_timer_settime

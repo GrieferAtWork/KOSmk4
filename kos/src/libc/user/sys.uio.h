@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb4970ef6 */
+/* HASH CRC-32:0x4cefa59a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,8 +29,8 @@ DECL_BEGIN
 
 INTDEF WUNUSED ssize_t NOTHROW_RPC(LIBCCALL libc_process_vm_readv)(pid_t pid, struct iovec const *llocal_iov, unsigned long int liovcnt, struct iovec const *remote_iov, unsigned long int riovcnt, unsigned long int flags);
 INTDEF ssize_t NOTHROW_RPC(LIBCCALL libc_process_vm_writev)(pid_t pid, struct iovec const *local_iov, unsigned long int liovcnt, struct iovec const *remote_iov, unsigned long int riovcnt, unsigned long int flags);
-INTDEF WUNUSED NONNULL((2)) NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_readv)(fd_t fd, struct iovec const *iovec, __STDC_INT_AS_SIZE_T count);
-INTDEF NONNULL((2)) NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_writev)(fd_t fd, struct iovec const *iovec, __STDC_INT_AS_SIZE_T count);
+INTDEF WUNUSED NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_readv)(fd_t fd, struct iovec const *iovec, __STDC_INT_AS_SIZE_T count);
+INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_writev)(fd_t fd, struct iovec const *iovec, __STDC_INT_AS_SIZE_T count);
 INTDEF WUNUSED NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_preadv)(fd_t fd, struct iovec const *iovec, __STDC_INT_AS_SIZE_T count, off_t offset);
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_pwritev)(fd_t fd, struct iovec const *iovec, __STDC_INT_AS_SIZE_T count, off_t offset);
 INTDEF WUNUSED NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_preadv64)(fd_t fd, struct iovec const *iovec, __STDC_INT_AS_SIZE_T count, off64_t offset);
