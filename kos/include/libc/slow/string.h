@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x58fafe2b */
+/* HASH CRC-32:0xb27d30e6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -133,16 +133,33 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,
 /* Descendingly search for `NEEDLE', starting at `HAYSTACK+N_BYTES'. - Return `NULL' if `NEEDLE' wasn't found. */
 #define __libc_slow_memrchr (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrchr))
 #endif /* memrchr... */
-#if defined(__CRT_HAVE_memmem)
-/* Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
+#if defined(__CRT_HAVE_memmem0) && (defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL))
+/* Return the first address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
  * If no such sub-string exists, return `NULL' instead.
- * When `needlelen' is ZERO(0), also return `NULL' unconditionally. */
+ * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
+ * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
+ * #else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
+ * When `needlelen' is ZERO(0), re-return `haystack' unconditionally.
+ * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 3)),void *,__NOTHROW_NCX,__libc_slow_memmem,(void const *__haystack, __SIZE_TYPE__ __haystacklen, void const *__needle, __SIZE_TYPE__ __needlelen),memmem0,(__haystack,__haystacklen,__needle,__needlelen))
+#elif defined(__CRT_HAVE_memmem) && (!defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL))
+/* Return the first address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
+ * If no such sub-string exists, return `NULL' instead.
+ * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
+ * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
+ * #else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
+ * When `needlelen' is ZERO(0), re-return `haystack' unconditionally.
+ * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 3)),void *,__NOTHROW_NCX,__libc_slow_memmem,(void const *__haystack, __SIZE_TYPE__ __haystacklen, void const *__needle, __SIZE_TYPE__ __needlelen),memmem,(__haystack,__haystacklen,__needle,__needlelen))
 #else /* LIBC: memmem */
 #include <local/string/memmem.h>
-/* Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
+/* Return the first address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
  * If no such sub-string exists, return `NULL' instead.
- * When `needlelen' is ZERO(0), also return `NULL' unconditionally. */
+ * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
+ * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
+ * #else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
+ * When `needlelen' is ZERO(0), re-return `haystack' unconditionally.
+ * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
 #define __libc_slow_memmem (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memmem))
 #endif /* memmem... */
 #if defined(__CRT_HAVE_mempcpy)
@@ -546,6 +563,35 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHR
 /* Same as `memrend', but return the offset from `HAYSTACK', rather than the actual address. */
 #define __libc_slow_memrlen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrlen))
 #endif /* memrlen... */
+#if defined(__CRT_HAVE_memrmem0) && (defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL))
+/* Return the last address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
+ * If no such sub-string exists, return `NULL' instead.
+ * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
+ * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
+ * #else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
+ * When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally.
+ * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 3)),void *,__NOTHROW_NCX,__libc_slow_memrmem,(void const *__haystack, __SIZE_TYPE__ __haystacklen, void const *__needle, __SIZE_TYPE__ __needlelen),memrmem0,(__haystack,__haystacklen,__needle,__needlelen))
+#elif defined(__CRT_HAVE_memrmem) && (!defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL))
+/* Return the last address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
+ * If no such sub-string exists, return `NULL' instead.
+ * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
+ * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
+ * #else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
+ * When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally.
+ * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
+__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 3)),void *,__NOTHROW_NCX,__libc_slow_memrmem,(void const *__haystack, __SIZE_TYPE__ __haystacklen, void const *__needle, __SIZE_TYPE__ __needlelen),memrmem,(__haystack,__haystacklen,__needle,__needlelen))
+#else /* LIBC: memrmem */
+#include <local/string/memrmem.h>
+/* Return the last address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
+ * If no such sub-string exists, return `NULL' instead.
+ * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
+ * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
+ * #else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
+ * When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally.
+ * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
+#define __libc_slow_memrmem (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrmem))
+#endif /* memrmem... */
 #if defined(__CRT_HAVE_mempatw)
 /* Same as `memsetw', but repeat a 2-byte pattern on aligned addresses. */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__libc_slow_mempatw,(void *__restrict __dst, __UINT16_TYPE__ __pattern, __SIZE_TYPE__ __n_bytes),mempatw,(__dst,__pattern,__n_bytes))

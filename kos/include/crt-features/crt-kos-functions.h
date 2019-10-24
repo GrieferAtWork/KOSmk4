@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f85785f */
+/* HASH CRC-32:0x41a6ab9e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1363,6 +1363,7 @@ __CRT_FUNCTION(memrlen,0,(),3,(void const *__restrict,haystack,int,needle,size_t
 __CRT_FUNCTION(memrlenl,0,(),3,(void const *__restrict,haystack,uint32_t,dword,size_t,n_dwords),size_t)
 __CRT_FUNCTION(memrlenq,0,(),3,(void const *__restrict,haystack,uint64_t,qword,size_t,n_qwords),size_t)
 __CRT_FUNCTION(memrlenw,0,(),3,(void const *__restrict,haystack,uint16_t,word,size_t,n_words),size_t)
+__CRT_FUNCTION(memrmem,0,(),4,(void const *,haystack,size_t,haystacklen,void const *,needle,size_t,needlelen),void *)
 __CRT_FUNCTION(memrxchr,0,(),3,(void const *__restrict,haystack,int,needle,size_t,n_bytes),void *)
 __CRT_FUNCTION(memrxchrl,0,(),3,(void const *__restrict,haystack,uint32_t,dword,size_t,n_dwords),uint32_t *)
 __CRT_FUNCTION(memrxchrq,0,(),3,(void const *__restrict,haystack,uint64_t,qword,size_t,n_qwords),uint64_t *)

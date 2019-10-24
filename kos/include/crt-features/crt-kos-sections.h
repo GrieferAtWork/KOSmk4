@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x152507fb */
+/* HASH CRC-32:0xb93c0918 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2880,6 +2880,7 @@
 #define __CRT_SECTION_memrlenl                              __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.memrlenl */
 #define __CRT_SECTION_memrlenq                              __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.memrlenq */
 #define __CRT_SECTION_memrlenw                              __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.memrlenw */
+#define __CRT_SECTION_memrmem                               __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.memrmem */
 #define __CRT_SECTION_memrxchr                              __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.memrxchr */
 #define __CRT_SECTION_memrxchrl                             __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.memrxchrl */
 #define __CRT_SECTION_memrxchrq                             __CRT_SECTINFO_string_memory                            /* .text.crt.string.memory.memrxchrq */

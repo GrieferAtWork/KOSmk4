@@ -2449,6 +2449,7 @@
 #define __CRT_HAVE_memlenq 1
 #define __CRT_HAVE_memlenw 1
 #define __CRT_HAVE_memmem 1
+#define __CRT_HAVE_memmem0 1
 #define __CRT_HAVE_memmove 1
 #define __CRT_HAVE_memmove_s 1
 #define __CRT_HAVE_memmovel 1
@@ -2485,6 +2486,8 @@
 #define __CRT_HAVE_memrlenl 1
 #define __CRT_HAVE_memrlenq 1
 #define __CRT_HAVE_memrlenw 1
+#define __CRT_HAVE_memrmem 1
+#define __CRT_HAVE_memrmem0 1
 #define __CRT_HAVE_memrxchr 1
 #define __CRT_HAVE_memrxchrl 1
 #define __CRT_HAVE_memrxchrq 1

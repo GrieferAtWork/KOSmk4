@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ae215ad */
+/* HASH CRC-32:0xfe384974 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2439,6 +2439,7 @@
 #define __CRT_HAVE_memlenq 1
 #define __CRT_HAVE_memlenw 1
 #define __CRT_HAVE_memmem 1
+#define __CRT_HAVE_memmem0 1
 #define __CRT_HAVE_memmove 1
 #define __CRT_HAVE_memmove_s 1
 #define __CRT_HAVE_memmoveb 1
@@ -2484,6 +2485,8 @@
 #define __CRT_HAVE_memrlenl 1
 #define __CRT_HAVE_memrlenq 1
 #define __CRT_HAVE_memrlenw 1
+#define __CRT_HAVE_memrmem 1
+#define __CRT_HAVE_memrmem0 1
 #define __CRT_HAVE_memrxchr 1
 #define __CRT_HAVE_memrxchrb 1
 #define __CRT_HAVE_memrxchrl 1

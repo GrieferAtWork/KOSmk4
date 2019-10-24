@@ -612,17 +612,30 @@ strcasestr:([nonnull] char const *haystack, [nonnull] char const *needle) -> cha
 	return NULL;
 }
 
-@@Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
+@@Return the first address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
 @@If no such sub-string exists, return `NULL' instead.
+@@#ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
 @@When `needlelen' is ZERO(0), also return `NULL' unconditionally.
-[libc][kernel][ATTR_WUNUSED][ATTR_PURE]
+@@#else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
+@@When `needlelen' is ZERO(0), re-return `haystack' unconditionally.
+@@#endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
+[libc][ATTR_WUNUSED][ATTR_PURE][impl_include(<features.h>)]
+[if(defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias(memmem0)]
+[if(!defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias(memmem)]
 memmem:([nonnull] void const *haystack, $size_t haystacklen, [nonnull] void const *needle, $size_t needlelen) -> void *
 	[([nonnull] void *haystack, $size_t haystacklen, [nonnull] void const *needle, $size_t needlelen) -> void *]
 	[([nonnull] void const *haystack, $size_t haystacklen, [nonnull] void const *needle, $size_t needlelen) -> void const *]
 {
 	byte_t *candidate, marker;
+#if defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL) && !defined(__BUILDING_LIBC)
 	if unlikely(!needlelen || needlelen > haystacklen)
 		return NULL;
+#else /* __USE_MEMMEM_EMPTY_NEEDLE_NULL && !__BUILDING_LIBC */
+	if unlikely(!needlelen)
+		return (void *)haystack;
+	if unlikely(needlelen > haystacklen)
+		return NULL;
+#endif /* !__USE_MEMMEM_EMPTY_NEEDLE_NULL || __BUILDING_LIBC */
 	haystacklen -= (needlelen - 1);
 	marker       = *(byte_t *)needle;
 	while ((candidate = (byte_t *)memchr(haystack, marker, haystacklen)) != NULL) {
@@ -2287,6 +2300,42 @@ rawmemlen:([nonnull] void const *__restrict haystack, int needle) -> $size_t {
 rawmemrlen:([nonnull] void const *__restrict haystack, int needle) -> $size_t {
 	return (size_t)((byte_t *)rawmemrchr(haystack, needle) - (byte_t *)haystack);
 }
+
+
+@@Return the last address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
+@@If no such sub-string exists, return `NULL' instead.
+@@#ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
+@@When `needlelen' is ZERO(0), also return `NULL' unconditionally.
+@@#else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
+@@When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally.
+@@#endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
+[libc][ATTR_WUNUSED][ATTR_PURE][impl_include(<features.h>)]
+[if(defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias(memrmem0)]
+[if(!defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL)), preferred_alias(memrmem)]
+memrmem:([nonnull] void const *haystack, $size_t haystacklen, [nonnull] void const *needle, $size_t needlelen) -> void *
+	[([nonnull] void *haystack, $size_t haystacklen, [nonnull] void const *needle, $size_t needlelen) -> void *]
+	[([nonnull] void const *haystack, $size_t haystacklen, [nonnull] void const *needle, $size_t needlelen) -> void const *]
+{
+	byte_t *candidate, marker;
+#if defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL) && !defined(__BUILDING_LIBC)
+	if unlikely(!needlelen || needlelen > haystacklen)
+		return NULL;
+#else /* __USE_MEMMEM_EMPTY_NEEDLE_NULL && !__BUILDING_LIBC */
+	if unlikely(!needlelen)
+		return (byte_t *)haystack + haystacklen;
+	if unlikely(needlelen > haystacklen)
+		return NULL;
+#endif /* !__USE_MEMMEM_EMPTY_NEEDLE_NULL || __BUILDING_LIBC */
+	haystacklen -= needlelen - 1;
+	marker = *(uint8_t *)needle;
+	while ((candidate = (byte_t *)memrchr(haystack, marker, haystacklen)) != NULL) {
+		if (memcmp(candidate, needle, needlelen) == 0)
+			return (void *)candidate;
+		haystacklen = (size_t)(candidate - (byte_t *)haystack);
+	}
+	return NULL;
+}
+
 
 @@Same as `memsetb', but repeat a 1-byte pattern on aligned addresses.
 [noexport][ATTR_RETNONNULL]

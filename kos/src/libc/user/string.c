@@ -36,6 +36,45 @@
 DECL_BEGIN
 
 
+DEFINE_PUBLIC_ALIAS(memmem0, libc_memmem0);
+INTERN WUNUSED ATTR_PURE NONNULL((1, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memmem0") void *
+NOTHROW_NCX(LIBCCALL libc_memmem0)(void const *haystack, size_t haystacklen,
+                                   void const *needle, size_t needlelen) {
+	byte_t *candidate, marker;
+	if unlikely(!needlelen || needlelen > haystacklen)
+		return NULL;
+	haystacklen -= (needlelen - 1);
+	marker       = *(byte_t *)needle;
+	while ((candidate = (byte_t *)memchr(haystack, marker, haystacklen)) != NULL) {
+		if (memcmp(candidate, needle, needlelen) == 0)
+			return (void *)candidate;
+		++candidate;
+		haystacklen = ((byte_t *)haystack + haystacklen) - candidate;
+		haystack    = (void const *)candidate;
+	}
+	return NULL;
+}
+
+DEFINE_PUBLIC_ALIAS(memrmem0, libc_memrmem0);
+INTERN WUNUSED ATTR_PURE NONNULL((1, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memrmem0") void *
+NOTHROW_NCX(LIBCCALL libc_memrmem0)(void const *haystack, size_t haystacklen,
+                                    void const *needle, size_t needlelen) {
+	byte_t *candidate, marker;
+	if unlikely(!needlelen || needlelen > haystacklen)
+		return NULL;
+	haystacklen -= needlelen - 1;
+	marker = *(uint8_t *)needle;
+	while ((candidate = (byte_t *)memrchr(haystack, marker, haystacklen)) != NULL) {
+		if (memcmp(candidate, needle, needlelen) == 0)
+			return (void *)candidate;
+		haystacklen = (size_t)(candidate - (byte_t *)haystack);
+	}
+	return NULL;
+}
+
+
 /*[[[start:implementation]]]*/
 
 /*[[[head:strdup,hash:CRC-32=0xb1c886cb]]]*/

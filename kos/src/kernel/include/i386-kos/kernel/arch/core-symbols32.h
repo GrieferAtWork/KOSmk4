@@ -3830,10 +3830,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long .Lname957 /* index: 957 */
-	.weak memmem; .long memmem
-	.reloc ., R_386_SIZE32, memmem; .long 0
-	.long 0x73c43bd
+	.long 0 /* index: 957 */
+	.long 0
+	.long 0
+	.long 0
 	.long 0 /* index: 958 */
 	.long 0
 	.long 0
@@ -17384,8 +17384,6 @@ END(kernel_symbol_table)
 	.string "path_lock_tryupgrade"
 .Lname953:
 	.string "vm_datablock_locatepart"
-.Lname957:
-	.string "memmem"
 .Lname959:
 	.string "kernel_panic_icpustate"
 .Lname961:

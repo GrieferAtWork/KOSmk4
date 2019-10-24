@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x94d4ff9b */
+/* HASH CRC-32:0x96c78251 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -88,9 +88,13 @@
 #define __libc_strnlen __libc_slow_strnlen
 /* Descendingly search for `NEEDLE', starting at `HAYSTACK+N_BYTES'. - Return `NULL' if `NEEDLE' wasn't found. */
 #define __libc_memrchr __libc_slow_memrchr
-/* Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
+/* Return the first address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
  * If no such sub-string exists, return `NULL' instead.
- * When `needlelen' is ZERO(0), also return `NULL' unconditionally. */
+ * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
+ * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
+ * #else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
+ * When `needlelen' is ZERO(0), re-return `haystack' unconditionally.
+ * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
 #define __libc_memmem __libc_slow_memmem
 #ifdef __fast_mempcpy_defined
 /* Same as `memcpy', but return `DST+N_BYTES', rather than `DST' */
@@ -404,6 +408,14 @@
 /* Same as `memrend', but return the offset from `HAYSTACK', rather than the actual address. */
 #define __libc_memrlen __libc_slow_memrlen
 #endif /* !__fast_memrlen_defined */
+/* Return the last address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
+ * If no such sub-string exists, return `NULL' instead.
+ * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
+ * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
+ * #else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
+ * When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally.
+ * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
+#define __libc_memrmem __libc_slow_memrmem
 #ifdef __fast_mempatw_defined
 /* Same as `memsetw', but repeat a 2-byte pattern on aligned addresses. */
 #define __libc_mempatw (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempatw))

@@ -856,7 +856,6 @@
 #define __CRT_HAVE_memlenl 1
 #define __CRT_HAVE_memlenq 1
 #define __CRT_HAVE_memlenw 1
-#define __CRT_HAVE_memmem 1
 #define __CRT_HAVE_memmove 1
 #define __CRT_HAVE_memmovel 1
 #define __CRT_HAVE_memmoveq 1

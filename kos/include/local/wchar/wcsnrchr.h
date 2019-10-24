@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd0283b3d */
+/* HASH CRC-32:0xf8a00c2f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@ __LOCAL_LIBC(wcsnrchr) __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) __WCHAR_TY
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsnrchr))(__WCHAR_TYPE__ const *__restrict __haystack,
                                                       __WCHAR_TYPE__ __needle,
                                                       __SIZE_TYPE__ __maxlen) {
-#line 2115 "kos/src/libc/magic/string.c"
+#line 2128 "kos/src/libc/magic/string.c"
 	__WCHAR_TYPE__ const *__result = __NULLPTR;
 	for (; __maxlen-- && *__haystack; ++__haystack)
 		if __unlikely((__WCHAR_TYPE__)*__haystack == (__WCHAR_TYPE__)__needle)

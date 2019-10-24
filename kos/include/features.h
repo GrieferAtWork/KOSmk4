@@ -78,6 +78,19 @@
 #define __USE_BROKEN_CCOMPAT 1
 #endif
 
+/* When exposed in headers, the behavior of memmem() and memrmem()
+ * differs from the behavior found in glibc's implementation (of memmem())
+ * #define _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE  (kos-specific)
+ *    -> memmem() or memrmem() is called with `needlelen' set to ZERO(0), return `NULL'
+ * #undef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE  (glibc-compatible)
+ *    -> memmem() or memrmem() is called with `needlelen' set to ZERO(0), return:
+ *       memmem():  `haystack'
+ *       memrmem(): `haystack + haystacklen'
+ */
+#ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
+#undef __USE_MEMMEM_EMPTY_NEEDLE_NULL
+#define __USE_MEMMEM_EMPTY_NEEDLE_NULL 1
+#endif /* _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
 
 
 

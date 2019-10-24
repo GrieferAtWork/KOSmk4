@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb2db883c */
+/* HASH CRC-32:0xbb5d4274 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,10 +64,6 @@ INTDEF WUNUSED ATTR_PURE NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_strnlen)(
 INTDEF WUNUSED ATTR_PURE NONNULL((1)) void *NOTHROW_NCX(LIBCCALL libc_memrchr)(void const *__restrict haystack, int needle, size_t n_bytes);
 /* Same as `memchr' with a search limit of `(size_t)-1' */
 INTDEF ATTR_RETNONNULL WUNUSED ATTR_PURE NONNULL((1)) void *NOTHROW_NCX(LIBCCALL libc_rawmemchr)(void const *__restrict haystack, int needle);
-/* Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
- * If no such sub-string exists, return `NULL' instead.
- * When `needlelen' is ZERO(0), also return `NULL' unconditionally. */
-INTDEF WUNUSED ATTR_PURE NONNULL((1, 3)) void *NOTHROW_NCX(LIBCCALL libc_memmem)(void const *haystack, size_t haystacklen, void const *needle, size_t needlelen);
 /* Same as `memcpy', but return `DST+N_BYTES', rather than `DST' */
 INTDEF ATTR_RETNONNULL NONNULL((1, 2)) void *NOTHROW_NCX(LIBCCALL libc_mempcpy)(void *__restrict dst, void const *__restrict src, size_t n_bytes);
 /* Copy memory between non-overlapping memory blocks. */
@@ -232,6 +228,14 @@ INTDEF WUNUSED ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_strc
 INTDEF WUNUSED ATTR_PURE char *NOTHROW_NCX(LIBCCALL libc_basename)(char const *filename);
 /* Same as `strstr', but ignore casing */
 INTDEF WUNUSED ATTR_PURE NONNULL((1, 2)) char *NOTHROW_NCX(LIBCCALL libc_strcasestr)(char const *haystack, char const *needle);
+/* Return the first address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
+ * If no such sub-string exists, return `NULL' instead.
+ * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
+ * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
+ * #else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
+ * When `needlelen' is ZERO(0), re-return `haystack' unconditionally.
+ * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
+INTDEF WUNUSED ATTR_PURE NONNULL((1, 3)) void *NOTHROW_NCX(LIBCCALL libc_memmem)(void const *haystack, size_t haystacklen, void const *needle, size_t needlelen);
 INTDEF WUNUSED ATTR_PURE NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_strverscmp)(char const *s1, char const *s2);
 INTDEF ATTR_RETNONNULL NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_strfry)(char *__restrict string);
 INTDEF ATTR_RETNONNULL NONNULL((1)) void *NOTHROW_NCX(LIBCCALL libc_memfrob)(void *buf, size_t num_bytes);
@@ -346,6 +350,14 @@ INTDEF WUNUSED ATTR_PURE NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_strroff)(
 INTDEF WUNUSED ATTR_PURE NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_strnoff)(char const *__restrict haystack, int needle, size_t maxlen);
 /* Same as `strnrchrnul', but return the offset from `STR', rather than the actual address */
 INTDEF WUNUSED ATTR_PURE NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc_strnroff)(char const *__restrict haystack, int needle, size_t maxlen);
+/* Return the last address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
+ * If no such sub-string exists, return `NULL' instead.
+ * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
+ * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
+ * #else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
+ * When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally.
+ * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
+INTDEF WUNUSED ATTR_PURE NONNULL((1, 3)) void *NOTHROW_NCX(LIBCCALL libc_memrmem)(void const *haystack, size_t haystacklen, void const *needle, size_t needlelen);
 INTDEF WUNUSED ATTR_PURE NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_memcasecmp)(void const *s1, void const *s2, size_t n_bytes);
 /* Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
  * During comprisons, casing of character is ignored (s.a. `memmem()')
