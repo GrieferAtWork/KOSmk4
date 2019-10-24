@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd1ce6df5 */
+/* HASH CRC-32:0xfb60e231 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ecvt))(double __val,
                                                   int __ndigit,
                                                   int *__restrict __decptr,
                                                   int *__restrict __sign) {
-#line 1383 "kos/src/libc/magic/stdlib.c"
+#line 1396 "kos/src/libc/magic/stdlib.c"
 	if (__localdep_ecvt_r(__val, __ndigit, __decptr, __sign, __NAMESPACE_LOCAL_SYM __qcvt_buffer, sizeof(__NAMESPACE_LOCAL_SYM __qcvt_buffer)))
 		return __NULLPTR;
 	return __NAMESPACE_LOCAL_SYM __qcvt_buffer;

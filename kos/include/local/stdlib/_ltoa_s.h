@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x28ced01f */
+/* HASH CRC-32:0x89030d11 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ltoa_s))(long __val,
                                                      char *__buf,
                                                      __SIZE_TYPE__ __bufsize,
                                                      int __radix) {
-#line 1947 "kos/src/libc/magic/stdlib.c"
+#line 1960 "kos/src/libc/magic/stdlib.c"
 	char *__p;
 	long __temp;
 	if (__radix < 2)

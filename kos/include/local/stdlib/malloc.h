@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7116a9ea */
+/* HASH CRC-32:0x387e6c51 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,7 +62,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1) __ATTR_ALLOC_SIZE((2)) __ATTR_M
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(malloc) __ATTR_WUNUSED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_MALLOC __ATTR_ALLOC_SIZE((1)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(malloc))(__SIZE_TYPE__ __n_bytes) {
-#line 675 "kos/src/libc/magic/stdlib.c"
+#line 688 "kos/src/libc/magic/stdlib.c"
 #ifdef __CRT_HAVE_calloc
 	return __localdep_crt_calloc(1, __n_bytes);
 #elif defined(__CRT_HAVE_realloc)

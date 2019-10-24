@@ -197,6 +197,11 @@ typedef __compar_fn_t comparison_fn_t;
 #endif /* __USE_GNU */
 #endif /* __COMPAR_FN_T */
 
+#ifndef ____atexit_func_t_defined
+#define ____atexit_func_t_defined 1
+typedef void (*__LIBCCALL __atexit_func_t)(void);
+#endif /* !____atexit_func_t_defined */
+
 #ifdef __USE_GNU
 #ifndef __compar_d_fn_t_defined
 #define __compar_d_fn_t_defined 1
@@ -650,11 +655,19 @@ system:([nullable] char const *__restrict command) -> int;
 [crtbuiltin][std][std_guard][alias(quick_exit)][alias(_exit)][alias(_Exit)][ATTR_NORETURN]
 [throws] exit:(int status);
 
+%[define(DEFINE_ATEXIT_FUNC_T =
+#ifndef ____atexit_func_t_defined
+#define ____atexit_func_t_defined 1
+typedef void (*__LIBCCALL __atexit_func_t)(void);
+#endif /* !____atexit_func_t_defined */
+)]
+
 %[default_impl_section(.text.crt.sched.process)]
-%(std)typedef void (*__LIBCCALL __atexit_func_t)(void);
+[dependency_prefix(DEFINE_ATEXIT_FUNC_T)]
 [std][alias(at_quick_exit)] atexit:(__atexit_func_t func) -> int;
 %(std, c, ccompat)#if defined(__USE_ISOC11) || defined(__USE_ISOCXX11)
 [std][alias(exit)][alias(_exit)][alias(_Exit)][ATTR_NORETURN][throws] quick_exit:(int status);
+[dependency_prefix(DEFINE_ATEXIT_FUNC_T)]
 [std][alias(atexit)] at_quick_exit:(__atexit_func_t func) -> int;
 %(std, c, ccompat)#endif /* __USE_ISOC11 || __USE_ISOCXX11 */
 %(std, c, ccompat)#ifdef __USE_ISOC99

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2e4aa6e2 */
+/* HASH CRC-32:0x9cf647d2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(mblen) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mblen))(char const *__s,
                                                    __SIZE_TYPE__ __n) {
-#line 618 "kos/src/libc/magic/stdlib.c"
+#line 623 "kos/src/libc/magic/stdlib.c"
 	/* TODO */
 	return 0;
 }

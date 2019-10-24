@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x279a88c6 */
+/* HASH CRC-32:0xaa9e28a3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -315,6 +315,11 @@ typedef int (__LIBCCALL *__compar_fn_t)(void const *__a, void const *__b);
 typedef __compar_fn_t comparison_fn_t;
 #endif /* __USE_GNU */
 #endif /* __COMPAR_FN_T */
+
+#ifndef ____atexit_func_t_defined
+#define ____atexit_func_t_defined 1
+typedef void (*__LIBCCALL __atexit_func_t)(void);
+#endif /* !____atexit_func_t_defined */
 
 #ifdef __USE_GNU
 #ifndef __compar_d_fn_t_defined
@@ -675,7 +680,6 @@ __CREDIRECT_VOID(__ATTR_NORETURN,,exit,(int __status),_Exit,(__status)) __THROWS
 #undef __std_exit_defined
 #endif /* exit... */
 #endif /* !__std_exit_defined */
-typedef void (*__LIBCCALL __atexit_func_t)(void);
 #ifndef __std_atexit_defined
 #define __std_atexit_defined 1
 #if defined(__CRT_HAVE_atexit)

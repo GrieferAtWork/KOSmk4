@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x52cb69e8 */
+/* HASH CRC-32:0x40cec653 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@ __LOCAL_LIBC(qsort) __ATTR_NONNULL((1, 4)) void
                                       __SIZE_TYPE__ __item_count,
                                       __SIZE_TYPE__ __item_size,
                                       __compar_fn_t __cmp) __THROWS(...) {
-#line 424 "kos/src/libc/magic/stdlib.c"
+#line 429 "kos/src/libc/magic/stdlib.c"
 	__localdep_qsort_r(__pbase, __item_count, __item_size, &__invoke_compare_helper, (void *)__cmp);
 }
 __NAMESPACE_LOCAL_END
