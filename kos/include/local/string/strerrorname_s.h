@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x345548c4 */
+/* HASH CRC-32:0x9132dad2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #define __local_strerrorname_s_defined 1
 #include <parts/errno.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(strerrorname_s) __ATTR_WUNUSED __ATTR_CONST char const *
+__LOCAL_LIBC(strerrorname_s) __ATTR_CONST __ATTR_WUNUSED char const *
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(strerrorname_s))(int __errnum) {
 #line 2942 "kos/src/libc/magic/string.c"
 	char const *__result;

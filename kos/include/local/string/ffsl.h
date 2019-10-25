@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf3422dd3 */
+/* HASH CRC-32:0xac5cae87 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #define __local_ffsl_defined 1
 #include <hybrid/__bit.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(ffsl) __ATTR_WUNUSED __ATTR_CONST __STDC_INT_AS_SIZE_T
+__LOCAL_LIBC(ffsl) __ATTR_CONST __ATTR_WUNUSED __STDC_INT_AS_SIZE_T
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ffsl))(long __i) {
 #line 832 "kos/src/libc/magic/string.c"
 	return (__STDC_INT_AS_SIZE_T)__hybrid_ffs((unsigned long)__i);

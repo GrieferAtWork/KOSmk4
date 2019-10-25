@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc6e80320 */
+/* HASH CRC-32:0xb8aab186 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #define __local_fmaf_defined 1
 __NAMESPACE_LOCAL_BEGIN
 /* Multiply-add function computed as a ternary operation */
-__LOCAL_LIBC(fmaf) __ATTR_WUNUSED __ATTR_CONST float
+__LOCAL_LIBC(fmaf) __ATTR_CONST __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fmaf))(float __x,
                                               float __y,
                                               float __z) {

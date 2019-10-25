@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2622487e */
+/* HASH CRC-32:0x8b5c96b1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -292,7 +292,7 @@ INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_preadall64)(fd_t fd, void 
 INTDEF NONNULL((2)) ssize_t NOTHROW_RPC(LIBCCALL libc_pwriteall64)(fd_t fd, void *buf, size_t bufsize, __PIO_OFFSET64 offset);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_pipe2)(fd_t pipedes[2], oflag_t flags);
 INTDEF fd_t NOTHROW_NCX(LIBCCALL libc_dup3)(fd_t oldfd, fd_t newfd, oflag_t flags);
-INTDEF WUNUSED ATTR_MALLOC char *NOTHROW_RPC(LIBCCALL libc_get_current_dir_name)(void);
+INTDEF ATTR_MALLOC WUNUSED char *NOTHROW_RPC(LIBCCALL libc_get_current_dir_name)(void);
 INTDEF int NOTHROW_RPC(LIBCCALL libc_syncfs)(fd_t fd);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_group_member)(gid_t gid);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_getresuid)(uid_t *ruid, uid_t *euid, uid_t *suid);
@@ -303,7 +303,7 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_setresgid)(gid_t rgid, gid_t egid, gid_t sg
 INTDEF void NOTHROW_RPC(LIBCCALL libc___crtSleep)(__UINT32_TYPE__ msecs);
 /* Sleep for `useconds' microseconds (1/1.000.000 seconds) */
 INTDEF int NOTHROW_RPC(LIBCCALL libc_usleep)(useconds_t useconds);
-INTDEF ATTR_DEPRECATED("Use getcwd()") NONNULL((1)) char *NOTHROW_RPC(LIBCCALL libc_getwd)(char *buf);
+INTDEF NONNULL((1)) ATTR_DEPRECATED("Use getcwd()") char *NOTHROW_RPC(LIBCCALL libc_getwd)(char *buf);
 INTDEF useconds_t NOTHROW_NCX(LIBCCALL libc_ualarm)(useconds_t value, useconds_t interval);
 /* >> vfork(2)
  * Same as `fork(2)', but suspend the calling process until the child

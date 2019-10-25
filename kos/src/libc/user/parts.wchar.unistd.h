@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x941a30 */
+/* HASH CRC-32:0x9b7505d6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -101,8 +101,8 @@ INTDEF WUNUSED NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_weuidaccess)(char32_t 
  * @param: TYPE: Set of `X_OK|W_OK|R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE', using the effective filesystem ids */
 INTDEF WUNUSED NONNULL((1)) int NOTHROW_RPC(LIBDCALL libd_weuidaccess)(char16_t const *file, int type);
-INTDEF WUNUSED ATTR_MALLOC char32_t *NOTHROW_RPC(LIBCCALL libc_wget_current_dir_name)(void);
-INTDEF WUNUSED ATTR_MALLOC char16_t *NOTHROW_RPC(LIBDCALL libd_wget_current_dir_name)(void);
+INTDEF ATTR_MALLOC WUNUSED char32_t *NOTHROW_RPC(LIBCCALL libc_wget_current_dir_name)(void);
+INTDEF ATTR_MALLOC WUNUSED char16_t *NOTHROW_RPC(LIBDCALL libd_wget_current_dir_name)(void);
 /* >> wfaccessat(2)
  * @param: TYPE: Set of `X_OK|W_OK|R_OK'
  * Test for access to the specified file `DFD:FILE', testing for `TYPE' */

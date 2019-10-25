@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4db1fe5c */
+/* HASH CRC-32:0x57d2f4c7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ DECL_BEGIN
 #ifndef __KERNEL__
 /* Search MNT->mnt_opts for an option matching OPT.
  * Returns the address of the substring, or null if none found */
-INTDEF WUNUSED ATTR_PURE char *NOTHROW_NCX(LIBCCALL libc_hasmntopt)(struct mntent const *mnt, char const *opt);
+INTDEF ATTR_PURE WUNUSED char *NOTHROW_NCX(LIBCCALL libc_hasmntopt)(struct mntent const *mnt, char const *opt);
 #endif /* !__KERNEL__ */
 
 DECL_END

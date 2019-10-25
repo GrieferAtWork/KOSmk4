@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf1b8405f */
+/* HASH CRC-32:0xb04180ee */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,7 +20,7 @@
 #ifndef __local__chgsign_defined
 #define __local__chgsign_defined 1
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_chgsign) __ATTR_WUNUSED __ATTR_CONST double
+__LOCAL_LIBC(_chgsign) __ATTR_CONST __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(_chgsign))(double __x) {
 #line 235 "kos/src/libc/magic/float.c"
 	return -__x;

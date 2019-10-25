@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xacc8ca42 */
+/* HASH CRC-32:0x5dc3f398 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -220,7 +220,7 @@ INTDEF WUNUSED long double NOTHROW(LIBCCALL libc_tgammal)(long double x);
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_rint)(double x);
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-INTDEF WUNUSED ATTR_CONST double NOTHROW(LIBCCALL libc_nextafter)(double x, double y);
+INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_nextafter)(double x, double y);
 /* Return the remainder of integer divison X / Y with infinite precision */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_remainder)(double x, double y);
 /* Return the binary exponent of X, which must be nonzero */
@@ -228,7 +228,7 @@ INTDEF WUNUSED int NOTHROW(LIBCCALL libc_ilogb)(double x);
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
 INTDEF WUNUSED float NOTHROW(LIBCCALL libc_rintf)(float x);
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-INTDEF WUNUSED ATTR_CONST float NOTHROW(LIBCCALL libc_nextafterf)(float x, float y);
+INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_nextafterf)(float x, float y);
 /* Return the remainder of integer divison X / Y with infinite precision */
 INTDEF WUNUSED float NOTHROW(LIBCCALL libc_remainderf)(float x, float y);
 /* Return the binary exponent of X, which must be nonzero */
@@ -236,12 +236,12 @@ INTDEF WUNUSED int NOTHROW(LIBCCALL libc_ilogbf)(float x);
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
 INTDEF WUNUSED long double NOTHROW(LIBCCALL libc_rintl)(long double x);
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-INTDEF WUNUSED ATTR_CONST long double NOTHROW(LIBCCALL libc_nextafterl)(long double x, long double y);
+INTDEF ATTR_CONST WUNUSED long double NOTHROW(LIBCCALL libc_nextafterl)(long double x, long double y);
 /* Return the remainder of integer divison X / Y with infinite precision */
 INTDEF WUNUSED long double NOTHROW(LIBCCALL libc_remainderl)(long double x, long double y);
 /* Return the binary exponent of X, which must be nonzero */
 INTDEF WUNUSED int NOTHROW(LIBCCALL libc_ilogbl)(long double x);
-INTDEF WUNUSED ATTR_CONST double NOTHROW(LIBCCALL libc_nexttoward)(double x, long double y);
+INTDEF ATTR_CONST WUNUSED double NOTHROW(LIBCCALL libc_nexttoward)(double x, long double y);
 /* Return X times (2 to the Nth power) */
 INTDEF WUNUSED double NOTHROW(LIBCCALL libc_scalbn)(double x, int n);
 /* Return X times (2 to the Nth power) */
@@ -257,7 +257,7 @@ INTDEF WUNUSED double NOTHROW(LIBCCALL libc_remquo)(double x, double y, int *pqu
 INTDEF WUNUSED long int NOTHROW(LIBCCALL libc_lrint)(double x);
 /* Round X to nearest integral value according to current rounding direction */
 INTDEF WUNUSED __LONGLONG NOTHROW(LIBCCALL libc_llrint)(double x);
-INTDEF WUNUSED ATTR_CONST float NOTHROW(LIBCCALL libc_nexttowardf)(float x, long double y);
+INTDEF ATTR_CONST WUNUSED float NOTHROW(LIBCCALL libc_nexttowardf)(float x, long double y);
 /* Return X times (2 to the Nth power) */
 INTDEF WUNUSED float NOTHROW(LIBCCALL libc_scalbnf)(float x, int n);
 /* Return X times (2 to the Nth power) */
@@ -273,7 +273,7 @@ INTDEF WUNUSED float NOTHROW(LIBCCALL libc_remquof)(float x, float y, int *pquo)
 INTDEF WUNUSED long int NOTHROW(LIBCCALL libc_lrintf)(float x);
 /* Round X to nearest integral value according to current rounding direction */
 INTDEF WUNUSED __LONGLONG NOTHROW(LIBCCALL libc_llrintf)(float x);
-INTDEF WUNUSED ATTR_CONST long double NOTHROW(LIBCCALL libc_nexttowardl)(long double x, long double y);
+INTDEF ATTR_CONST WUNUSED long double NOTHROW(LIBCCALL libc_nexttowardl)(long double x, long double y);
 /* Return X times (2 to the Nth power) */
 INTDEF WUNUSED long double NOTHROW(LIBCCALL libc_scalbnl)(long double x, int n);
 /* Return X times (2 to the Nth power) */
@@ -355,15 +355,15 @@ INTDEF WUNUSED double NOTHROW(LIBCCALL libc_scalb)(double x, double n);
 INTDEF WUNUSED float NOTHROW(LIBCCALL libc_scalbf)(float x, float n);
 /* Return X times (2 to the Nth power) */
 INTDEF WUNUSED long double NOTHROW(LIBCCALL libc_scalbl)(long double x, long double n);
-INTDEF WUNUSED ATTR_CONST int NOTHROW(LIBCCALL libc___fpclassify)(double val);
-INTDEF WUNUSED ATTR_CONST int NOTHROW(LIBCCALL libc___signbit)(double val);
-INTDEF WUNUSED ATTR_CONST int NOTHROW(LIBCCALL libc___fpclassifyf)(float val);
-INTDEF WUNUSED ATTR_CONST int NOTHROW(LIBCCALL libc___signbitf)(float val);
-INTDEF WUNUSED ATTR_CONST int NOTHROW(LIBCCALL libc___fpclassifyl)(long double val);
-INTDEF WUNUSED ATTR_CONST int NOTHROW(LIBCCALL libc___signbitl)(long double val);
-INTDEF WUNUSED ATTR_CONST int NOTHROW(LIBCCALL libc___issignaling)(double val);
-INTDEF WUNUSED ATTR_CONST int NOTHROW(LIBCCALL libc___issignalingf)(float val);
-INTDEF WUNUSED ATTR_CONST int NOTHROW(LIBCCALL libc___issignalingl)(long double val);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc___fpclassify)(double val);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc___signbit)(double val);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc___fpclassifyf)(float val);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc___signbitf)(float val);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc___fpclassifyl)(long double val);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc___signbitl)(long double val);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc___issignaling)(double val);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc___issignalingf)(float val);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc___issignalingl)(long double val);
 
 DECL_END
 

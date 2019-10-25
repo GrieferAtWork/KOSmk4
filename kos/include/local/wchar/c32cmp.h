@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xddd7cd10 */
+/* HASH CRC-32:0x8db13c96 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #define __local_c32cmp_defined 1
 __NAMESPACE_LOCAL_BEGIN
 /* Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
-__LOCAL_LIBC(c32cmp) __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)) int
+__LOCAL_LIBC(c32cmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(c32cmp))(__CHAR32_TYPE__ const *__s1,
                                                     __CHAR32_TYPE__ const *__s2) {
 #line 244 "kos/src/libc/magic/string.c"

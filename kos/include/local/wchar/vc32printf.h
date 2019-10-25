@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5ca72ae */
+/* HASH CRC-32:0x56dffed2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@
 #ifndef ____localdep_vfc32printf_defined
 #define ____localdep_vfc32printf_defined 1
 #if defined(__CRT_HAVE_vfwprintf) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_LIBC_WPRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vfc32printf,(__FILE *__restrict __stream, __CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwprintf,(__stream,__format,__args))
+__CREDIRECT(__ATTR_NONNULL((1, 2)) __ATTR_LIBC_WPRINTF(2, 0),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vfc32printf,(__FILE *__restrict __stream, __CHAR32_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwprintf,(__stream,__format,__args))
 #elif defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked)
 #if __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/vfwprintf.h>
@@ -42,7 +42,7 @@ __CREDIRECT(__ATTR_LIBC_WPRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_
 #endif /* !____localdep_vfc32printf_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(vc32printf) __ATTR_LIBC_WPRINTF(1, 0) __ATTR_NONNULL((1)) __STDC_INT_AS_SIZE_T
+__LOCAL_LIBC(vc32printf) __ATTR_NONNULL((1)) __ATTR_LIBC_WPRINTF(1, 0) __STDC_INT_AS_SIZE_T
 (__LIBCCALL __LIBC_LOCAL_NAME(vc32printf))(__CHAR32_TYPE__ const *__restrict __format,
                                            __builtin_va_list __args) __THROWS(...) {
 #line 567 "kos/src/libc/magic/wchar.c"

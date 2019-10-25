@@ -844,7 +844,8 @@ function parse_return_type_annotations(return_type: string,
 
 @@Split a given argument list into the individual type+name
 function split_argument_list(l: string,
-	function_attr: List with string = none, file: string = none, line: int = none)
+		function_attr: List with string = none,
+		file: string = none, line: int = none)
 		: {(string, string)...} {
 	l = l.strip();
 	if (l == "void")
@@ -891,6 +892,19 @@ add_nonnull:
 	if (non_null_arguments)
 		function_attr.append("ATTR_NONNULL(({}))".format({ ", ".join(non_null_arguments) }));
 }
+
+@@Sort function attributes
+function sortFunctionAttributes(attr: List with string) {
+	import predlo2key from functools;
+	local a = List(attr.filter([](x) -> "(" !in x));
+	local b = List(attr.filter([](x) -> "(" in x));
+	a.sort();
+	b.sort();
+	attr.clear();
+	attr.extend(a);
+	attr.extend(b);
+}
+
 
 @@Scan the given docstring for `...' patterns and replace these sections with `replace(...)'
 @@The given @replace is called as @replace(fp: file, text: string) and should write the new
@@ -2852,6 +2866,7 @@ again_enum_name:
 			fun.args = Tuple(split_argument_list(
 				argument_list, function_attributes,
 				filename, text.count("\n", 0, argument_list_start) + 1));
+			sortFunctionAttributes(function_attributes);
 			fun.attr_tags = function_attributes;
 			fun.alias_args = alias_args;
 			fun.return_type = return_type;

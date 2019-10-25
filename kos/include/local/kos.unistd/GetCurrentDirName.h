@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2298f13c */
+/* HASH CRC-32:0xa49c5835 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ __CREDIRECT(,char *,,__localdep_GetCwd,(char *__buf, __SIZE_TYPE__ __bufsize),Ge
 #endif /* !____localdep_GetCwd_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(GetCurrentDirName) __ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_MALLOC char *
+__LOCAL_LIBC(GetCurrentDirName) __ATTR_MALLOC __ATTR_RETNONNULL __ATTR_WUNUSED char *
 (__LIBCCALL __LIBC_LOCAL_NAME(GetCurrentDirName))(void) __THROWS(...) {
 #line 397 "kos/src/libc/magic/kos.unistd.c"
 	return __localdep_GetCwd(__NULLPTR, 0);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcd87d242 */
+/* HASH CRC-32:0x16e25a90 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,13 +24,13 @@
 #define ____localdep_roundl_defined 1
 #if __has_builtin(__builtin_roundl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_roundl)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL __localdep_roundl)(long double __x) { return __builtin_roundl(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __localdep_roundl)(long double __x) { return __builtin_roundl(__x); }
 #elif defined(__CRT_HAVE_roundl)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,__localdep_roundl,(long double __x),roundl,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,__localdep_roundl,(long double __x),roundl,(__x))
 #elif defined(__CRT_HAVE___roundl)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,__localdep_roundl,(long double __x),__roundl,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,__localdep_roundl,(long double __x),__roundl,(__x))
 #else /* LIBC: roundl */
 #include <local/math/roundl.h>
 /* Round X to nearest integral value, rounding halfway cases away from zero */
@@ -40,7 +40,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,__localdep_roundl,
 
 __NAMESPACE_LOCAL_BEGIN
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__LOCAL_LIBC(lroundl) __ATTR_WUNUSED __ATTR_CONST long int
+__LOCAL_LIBC(lroundl) __ATTR_CONST __ATTR_WUNUSED long int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(lroundl))(long double __x) {
 #line 521 "kos/src/libc/magic/math.c"
 	return (long int)__localdep_roundl(__x);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5c9e6910 */
+/* HASH CRC-32:0x13a6ae7c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #define __local_wcsnrchrnul_defined 1
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `wcsnrchr', but return `STR-1', rather than `NULL' if `NEEDLE' wasn't found. */
-__LOCAL_LIBC(wcsnrchrnul) __ATTR_WUNUSED __ATTR_PURE __ATTR_RETNONNULL __ATTR_NONNULL((1)) __WCHAR_TYPE__ *
+__LOCAL_LIBC(wcsnrchrnul) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsnrchrnul))(__WCHAR_TYPE__ const *__restrict __haystack,
                                                          __WCHAR_TYPE__ __needle,
                                                          __SIZE_TYPE__ __maxlen) {

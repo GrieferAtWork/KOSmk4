@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x112202c0 */
+/* HASH CRC-32:0x9ee1ec51 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #define __local_c16nchrnul_defined 1
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `c16nchr', but return `c16nend(STR, MAX_CHARS)', rather than `NULL' if `NEEDLE' wasn't found. */
-__LOCAL_LIBC(c16nchrnul) __ATTR_WUNUSED __ATTR_PURE __ATTR_RETNONNULL __ATTR_NONNULL((1)) __CHAR16_TYPE__ *
+__LOCAL_LIBC(c16nchrnul) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) __CHAR16_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(c16nchrnul))(__CHAR16_TYPE__ const *__restrict __haystack,
                                                         __CHAR16_TYPE__ __needle,
                                                         __SIZE_TYPE__ __maxlen) {

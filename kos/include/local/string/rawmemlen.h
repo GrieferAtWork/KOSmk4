@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe00ee132 */
+/* HASH CRC-32:0xe8a57480 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,10 +24,10 @@
 #define ____localdep_rawmemchr_defined 1
 #if defined(__CRT_HAVE_rawmemchr)
 /* Same as `memchr' with a search limit of `(size_t)-1' */
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_rawmemchr,(void const *__restrict __haystack, int __needle),rawmemchr,(__haystack,__needle))
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_rawmemchr,(void const *__restrict __haystack, int __needle),rawmemchr,(__haystack,__needle))
 #elif defined(__CRT_HAVE___rawmemchr)
 /* Same as `memchr' with a search limit of `(size_t)-1' */
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_rawmemchr,(void const *__restrict __haystack, int __needle),__rawmemchr,(__haystack,__needle))
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_rawmemchr,(void const *__restrict __haystack, int __needle),__rawmemchr,(__haystack,__needle))
 #else /* LIBC: rawmemchr */
 #include <local/string/rawmemchr.h>
 /* Same as `memchr' with a search limit of `(size_t)-1' */
@@ -37,7 +37,7 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),voi
 
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `rawmemchr', but return the offset from `HAYSTACK', rather than the actual address. */
-__LOCAL_LIBC(rawmemlen) __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) __SIZE_TYPE__
+__LOCAL_LIBC(rawmemlen) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(rawmemlen))(void const *__restrict __haystack,
                                                        int __needle) {
 #line 2295 "kos/src/libc/magic/string.c"

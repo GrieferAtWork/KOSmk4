@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x73fa829a */
+/* HASH CRC-32:0xf2b5f200 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #include <bits/nan.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Return nonzero if VALUE is not a number */
-__LOCAL_LIBC(isnan) __ATTR_WUNUSED __ATTR_CONST int
+__LOCAL_LIBC(isnan) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(isnan))(double __val) {
 #line 858 "kos/src/libc/magic/math.c"
 	return __val == (double)NAN;

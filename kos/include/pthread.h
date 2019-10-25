@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa9825bbc */
+/* HASH CRC-32:0xa860e592 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -420,7 +420,7 @@ __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,pthread_setname_np,(pthread_t _
 #if defined(__CRT_HAVE_pthread_gettid_np)
 /* Return the TID of the given `target_thread'
  * If the given `target_thread' has already terminated, 0 is returned */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,__pid_t,__NOTHROW_NCX,pthread_gettid_np,(pthread_t __target_thread),(__target_thread))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__pid_t,__NOTHROW_NCX,pthread_gettid_np,(pthread_t __target_thread),(__target_thread))
 #else /* LIBC: pthread_gettid_np */
 #undef __pthread_gettid_np_defined
 #endif /* pthread_gettid_np... */
@@ -719,7 +719,7 @@ __CDECLARE_VOID(__cleanup_fct_attribute __ATTR_NONNULL((1)),__NOTHROW_NCX,__pthr
 #endif /* __USE_GNU */
 #if defined(__CRT_HAVE___pthread_unwind_next)
 /* Internal interface to initiate cleanup */
-__CDECLARE_VOID(__ATTR_WEAK __cleanup_fct_attribute __ATTR_NORETURN __ATTR_NONNULL((1)),__NOTHROW_NCX,__pthread_unwind_next,(__pthread_unwind_buf_t *__buf),(__buf))
+__CDECLARE_VOID(__cleanup_fct_attribute __ATTR_NORETURN __ATTR_WEAK __ATTR_NONNULL((1)),__NOTHROW_NCX,__pthread_unwind_next,(__pthread_unwind_buf_t *__buf),(__buf))
 #endif /* __pthread_unwind_next... */
 #endif /* !__GNUC__ || !__EXCEPTIONS */
 

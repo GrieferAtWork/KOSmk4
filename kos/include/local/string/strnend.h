@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1588074e */
+/* HASH CRC-32:0x4b6f05bb */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #define __local_strnend_defined 1
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `STR+strnlen(STR, MAX_CHARS)' */
-__LOCAL_LIBC(strnend) __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) char *
+__LOCAL_LIBC(strnend) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strnend))(char const *__restrict __string,
                                                      __SIZE_TYPE__ __maxlen) {
 #line 2105 "kos/src/libc/magic/string.c"

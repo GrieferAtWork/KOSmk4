@@ -1218,9 +1218,9 @@ NOTHROW(LIBCCALL libc_rint)(double x)
 }
 /*[[[end:rint]]]*/
 
-/*[[[head:nextafter,hash:CRC-32=0x9e3a1684]]]*/
+/*[[[head:nextafter,hash:CRC-32=0x13f8d9c8]]]*/
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.nextafter") double
 NOTHROW(LIBCCALL libc_nextafter)(double x,
                                  double y)
@@ -1270,9 +1270,9 @@ NOTHROW(LIBCCALL libc_rintf)(float x)
 }
 /*[[[end:rintf]]]*/
 
-/*[[[head:nextafterf,hash:CRC-32=0xb8a2021e]]]*/
+/*[[[head:nextafterf,hash:CRC-32=0x3560cd52]]]*/
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.nextafterf") float
 NOTHROW(LIBCCALL libc_nextafterf)(float x,
                                   float y)
@@ -1316,9 +1316,9 @@ NOTHROW(LIBCCALL libc_rintl)(long double x)
 }
 /*[[[end:rintl]]]*/
 
-/*[[[head:nextafterl,hash:CRC-32=0x638ab989]]]*/
+/*[[[head:nextafterl,hash:CRC-32=0xa31c91f0]]]*/
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.nextafterl") long double
 NOTHROW(LIBCCALL libc_nextafterl)(long double x,
                                   long double y)
@@ -1351,8 +1351,8 @@ NOTHROW(LIBCCALL libc_ilogbl)(long double x)
 }
 /*[[[end:ilogbl]]]*/
 
-/*[[[head:nexttoward,hash:CRC-32=0xc4b43d11]]]*/
-INTERN WUNUSED ATTR_CONST
+/*[[[head:nexttoward,hash:CRC-32=0x9585ce4d]]]*/
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.nexttoward") double
 NOTHROW(LIBCCALL libc_nexttoward)(double x,
                                   long double y)
@@ -1453,8 +1453,8 @@ NOTHROW(LIBCCALL libc_llrint)(double x)
 /*[[[end:llrint]]]*/
 
 
-/*[[[head:nexttowardf,hash:CRC-32=0x28611d7b]]]*/
-INTERN WUNUSED ATTR_CONST
+/*[[[head:nexttowardf,hash:CRC-32=0x4aed3157]]]*/
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.nexttowardf") float
 NOTHROW(LIBCCALL libc_nexttowardf)(float x,
                                    long double y)
@@ -1541,8 +1541,8 @@ NOTHROW(LIBCCALL libc_llrintf)(float x)
 /*[[[end:llrintf]]]*/
 
 
-/*[[[head:nexttowardl,hash:CRC-32=0x168ad0db]]]*/
-INTERN WUNUSED ATTR_CONST
+/*[[[head:nexttowardl,hash:CRC-32=0x99b1b1f]]]*/
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.nexttowardl") long double
 NOTHROW(LIBCCALL libc_nexttowardl)(long double x,
                                    long double y)
@@ -2098,8 +2098,8 @@ NOTHROW(LIBCCALL libc_scalbl)(long double x,
 }
 /*[[[end:scalbl]]]*/
 
-/*[[[head:__fpclassify,hash:CRC-32=0xd8365cbe]]]*/
-INTERN WUNUSED ATTR_CONST
+/*[[[head:__fpclassify,hash:CRC-32=0x26882c0b]]]*/
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.__fpclassify") int
 NOTHROW(LIBCCALL libc___fpclassify)(double val)
 /*[[[body:__fpclassify]]]*/
@@ -2110,8 +2110,8 @@ NOTHROW(LIBCCALL libc___fpclassify)(double val)
 }
 /*[[[end:__fpclassify]]]*/
 
-/*[[[head:__signbit,hash:CRC-32=0x997a356]]]*/
-INTERN WUNUSED ATTR_CONST
+/*[[[head:__signbit,hash:CRC-32=0x54612ad2]]]*/
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.__signbit") int
 NOTHROW(LIBCCALL libc___signbit)(double val)
 /*[[[body:__signbit]]]*/
@@ -2122,8 +2122,8 @@ NOTHROW(LIBCCALL libc___signbit)(double val)
 }
 /*[[[end:__signbit]]]*/
 
-/*[[[head:__fpclassifyf,hash:CRC-32=0xf2e8b96a]]]*/
-INTERN WUNUSED ATTR_CONST
+/*[[[head:__fpclassifyf,hash:CRC-32=0x491d4019]]]*/
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.__fpclassifyf") int
 NOTHROW(LIBCCALL libc___fpclassifyf)(float val)
 /*[[[body:__fpclassifyf]]]*/
@@ -2132,8 +2132,8 @@ NOTHROW(LIBCCALL libc___fpclassifyf)(float val)
 }
 /*[[[end:__fpclassifyf]]]*/
 
-/*[[[head:__signbitf,hash:CRC-32=0x1b8ce9db]]]*/
-INTERN WUNUSED ATTR_CONST
+/*[[[head:__signbitf,hash:CRC-32=0xf104586b]]]*/
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.__signbitf") int
 NOTHROW(LIBCCALL libc___signbitf)(float val)
 /*[[[body:__signbitf]]]*/
@@ -2142,8 +2142,8 @@ NOTHROW(LIBCCALL libc___signbitf)(float val)
 }
 /*[[[end:__signbitf]]]*/
 
-/*[[[head:__fpclassifyl,hash:CRC-32=0xc3538acd]]]*/
-INTERN WUNUSED ATTR_CONST
+/*[[[head:__fpclassifyl,hash:CRC-32=0x737230ea]]]*/
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.__fpclassifyl") int
 NOTHROW(LIBCCALL libc___fpclassifyl)(long double val)
 /*[[[body:__fpclassifyl]]]*/
@@ -2152,8 +2152,8 @@ NOTHROW(LIBCCALL libc___fpclassifyl)(long double val)
 }
 /*[[[end:__fpclassifyl]]]*/
 
-/*[[[head:__signbitl,hash:CRC-32=0x359698d4]]]*/
-INTERN WUNUSED ATTR_CONST
+/*[[[head:__signbitl,hash:CRC-32=0x8e6361a7]]]*/
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.__signbitl") int
 NOTHROW(LIBCCALL libc___signbitl)(long double val)
 /*[[[body:__signbitl]]]*/
@@ -2162,8 +2162,8 @@ NOTHROW(LIBCCALL libc___signbitl)(long double val)
 }
 /*[[[end:__signbitl]]]*/
 
-/*[[[head:__issignaling,hash:CRC-32=0x2d1c1f8d]]]*/
-INTERN WUNUSED ATTR_CONST
+/*[[[head:__issignaling,hash:CRC-32=0xe4abcaf2]]]*/
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.__issignaling") int
 NOTHROW(LIBCCALL libc___issignaling)(double val)
 /*[[[body:__issignaling]]]*/
@@ -2174,8 +2174,8 @@ NOTHROW(LIBCCALL libc___issignaling)(double val)
 }
 /*[[[end:__issignaling]]]*/
 
-/*[[[head:__issignalingf,hash:CRC-32=0xa618c794]]]*/
-INTERN WUNUSED ATTR_CONST
+/*[[[head:__issignalingf,hash:CRC-32=0x666b1cec]]]*/
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.__issignalingf") int
 NOTHROW(LIBCCALL libc___issignalingf)(float val)
 /*[[[body:__issignalingf]]]*/
@@ -2184,8 +2184,8 @@ NOTHROW(LIBCCALL libc___issignalingf)(float val)
 }
 /*[[[end:__issignalingf]]]*/
 
-/*[[[head:__issignalingl,hash:CRC-32=0xe3261523]]]*/
-INTERN WUNUSED ATTR_CONST
+/*[[[head:__issignalingl,hash:CRC-32=0x12574df5]]]*/
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.__issignalingl") int
 NOTHROW(LIBCCALL libc___issignalingl)(long double val)
 /*[[[body:__issignalingl]]]*/

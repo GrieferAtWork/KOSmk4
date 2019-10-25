@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa64621c2 */
+/* HASH CRC-32:0x5dc2ce5b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,7 +54,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_asctime_r,(__
 __NAMESPACE_LOCAL_BEGIN
 /* Return a string of the form "Day Mon dd hh:mm:ss yyyy\n"
  * that is the representation of TP in this format */
-__LOCAL_LIBC(asctime) __ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *
+__LOCAL_LIBC(asctime) __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(asctime))(struct __NAMESPACE_STD_SYM tm const *__tp) {
 #line 607 "kos/src/libc/magic/time.c"
 	return __localdep_asctime_r(__tp, __NAMESPACE_LOCAL_SYM __ctime_buf);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2c445506 */
+/* HASH CRC-32:0x96c93315 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #include <bits/nan.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Return representation of qNaN for double type */
-__LOCAL_LIBC(nanl) __ATTR_WUNUSED __ATTR_CONST long double
+__LOCAL_LIBC(nanl) __ATTR_CONST __ATTR_WUNUSED long double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(nanl))(char const *__tagb) {
 #line 400 "kos/src/libc/magic/math.c"
 	(void)__tagb;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfcac63a0 */
+/* HASH CRC-32:0xbae73cf1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,7 +20,7 @@
 #ifndef __local_wcspbrk_defined
 #define __local_wcspbrk_defined 1
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(wcspbrk) __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)) __WCHAR_TYPE__ *
+__LOCAL_LIBC(wcspbrk) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcspbrk))(__WCHAR_TYPE__ const *__haystack,
                                                      __WCHAR_TYPE__ const *__accept) {
 #line 337 "kos/src/libc/magic/string.c"

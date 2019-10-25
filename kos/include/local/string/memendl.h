@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf37fa95e */
+/* HASH CRC-32:0x7f12e9a9 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #define __local_memendl_defined 1
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memchrl', but return `HAYSTACK+N_DWORDS', rather than `NULL' if `NEEDLE' wasn't found. */
-__LOCAL_LIBC(memendl) __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) __UINT32_TYPE__ *
+__LOCAL_LIBC(memendl) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memendl))(void const *__restrict __haystack,
                                                      __UINT32_TYPE__ __dword,
                                                      __SIZE_TYPE__ __n_bytes) {

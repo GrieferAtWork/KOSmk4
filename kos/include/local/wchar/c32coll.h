@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3fd24780 */
+/* HASH CRC-32:0xcca0c0c5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #define ____localdep_c32cmp_defined 1
 #if defined(__CRT_HAVE_wcscmp) && (__SIZEOF_WCHAR_T__ == 4)
 /* Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_c32cmp,(__CHAR32_TYPE__ const *__s1, __CHAR32_TYPE__ const *__s2),wcscmp,(__s1,__s2))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_c32cmp,(__CHAR32_TYPE__ const *__s1, __CHAR32_TYPE__ const *__s2),wcscmp,(__s1,__s2))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/wcscmp.h>
 /* Compare 2 strings and return the difference of the first non-matching character, or `0' if they are identical */
@@ -37,7 +37,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,
 #endif /* !____localdep_c32cmp_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(c32coll) __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)) int
+__LOCAL_LIBC(c32coll) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(c32coll))(__CHAR32_TYPE__ const *__s1,
                                                      __CHAR32_TYPE__ const *__s2) {
 #line 360 "kos/src/libc/magic/string.c"

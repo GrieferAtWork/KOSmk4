@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x49f5b0dc */
+/* HASH CRC-32:0xc7141fad */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,14 +24,14 @@
 #ifndef ____localdep__recalloc_defined
 #define ____localdep__recalloc_defined 1
 #if defined(__CRT_HAVE__recalloc)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,__localdep__recalloc,(void *__mptr, __SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes),_recalloc,(__mptr,__count,__num_bytes))
+__CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,__localdep__recalloc,(void *__mptr, __SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes),_recalloc,(__mptr,__count,__num_bytes))
 #else /* LIBC: _recalloc */
 #undef ____localdep__recalloc_defined
 #endif /* _recalloc... */
 #endif /* !____localdep__recalloc_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_recalloc_dbg) __ATTR_ALLOC_SIZE((2, 3)) __ATTR_WUNUSED void *
+__LOCAL_LIBC(_recalloc_dbg) __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_recalloc_dbg))(void *__ptr,
                                                            __SIZE_TYPE__ __count,
                                                            __SIZE_TYPE__ __num_bytes,

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3e9dd27c */
+/* HASH CRC-32:0x2056c067 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #define ____localdep_memrxendq_defined 1
 #if defined(__CRT_HAVE_memrxendq)
 /* Same as `memrendq', but search for non-matching locations. */
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memrxendq,(void const *__restrict __haystack, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords),memrxendq,(__haystack,__qword,__n_qwords))
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT64_TYPE__ *,__NOTHROW_NCX,__localdep_memrxendq,(void const *__restrict __haystack, __UINT64_TYPE__ __qword, __SIZE_TYPE__ __n_qwords),memrxendq,(__haystack,__qword,__n_qwords))
 #else /* LIBC: memrxendq */
 #include <local/string/memrxendq.h>
 /* Same as `memrendq', but search for non-matching locations. */
@@ -34,7 +34,7 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),__U
 
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memrlenq', but search for non-matching locations. */
-__LOCAL_LIBC(memrxlenq) __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) __SIZE_TYPE__
+__LOCAL_LIBC(memrxlenq) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memrxlenq))(void const *__restrict __haystack,
                                                        __UINT64_TYPE__ __qword,
                                                        __SIZE_TYPE__ __n_qwords) {

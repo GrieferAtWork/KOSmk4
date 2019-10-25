@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdca30737 */
+/* HASH CRC-32:0x4a636ebe */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ DECL_BEGIN
 #ifndef __KERNEL__
 #include <hybrid/typecore.h>
 /* Smallest integral value not less than X */
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.ceil") double
 NOTHROW(LIBCCALL libc_ceil)(double x) {
 #line 346 "kos/src/libc/magic/math.c"
@@ -42,7 +42,7 @@ NOTHROW(LIBCCALL libc_ceil)(double x) {
 }
 
 /* Absolute value of X */
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fabs") double
 NOTHROW(LIBCCALL libc_fabs)(double x) {
 #line 356 "kos/src/libc/magic/math.c"
@@ -51,7 +51,7 @@ NOTHROW(LIBCCALL libc_fabs)(double x) {
 
 #include <hybrid/typecore.h>
 /* Largest integer not greater than X */
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.floor") double
 NOTHROW(LIBCCALL libc_floor)(double x) {
 #line 363 "kos/src/libc/magic/math.c"
@@ -64,7 +64,7 @@ NOTHROW(LIBCCALL libc_floor)(double x) {
 
 #include <hybrid/typecore.h>
 /* Smallest integral value not less than X */
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.ceilf") float
 NOTHROW(LIBCCALL libc_ceilf)(float x) {
 #line 346 "kos/src/libc/magic/math.c"
@@ -76,7 +76,7 @@ NOTHROW(LIBCCALL libc_ceilf)(float x) {
 }
 
 /* Absolute value of X */
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fabsf") float
 NOTHROW(LIBCCALL libc_fabsf)(float x) {
 #line 356 "kos/src/libc/magic/math.c"
@@ -85,7 +85,7 @@ NOTHROW(LIBCCALL libc_fabsf)(float x) {
 
 #include <hybrid/typecore.h>
 /* Largest integer not greater than X */
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.floorf") float
 NOTHROW(LIBCCALL libc_floorf)(float x) {
 #line 363 "kos/src/libc/magic/math.c"
@@ -98,7 +98,7 @@ NOTHROW(LIBCCALL libc_floorf)(float x) {
 
 #include <hybrid/typecore.h>
 /* Smallest integral value not less than X */
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.ceill") long double
 NOTHROW(LIBCCALL libc_ceill)(long double x) {
 #line 346 "kos/src/libc/magic/math.c"
@@ -110,7 +110,7 @@ NOTHROW(LIBCCALL libc_ceill)(long double x) {
 }
 
 /* Absolute value of X */
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fabsl") long double
 NOTHROW(LIBCCALL libc_fabsl)(long double x) {
 #line 356 "kos/src/libc/magic/math.c"
@@ -119,7 +119,7 @@ NOTHROW(LIBCCALL libc_fabsl)(long double x) {
 
 #include <hybrid/typecore.h>
 /* Largest integer not greater than X */
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.floorl") long double
 NOTHROW(LIBCCALL libc_floorl)(long double x) {
 #line 363 "kos/src/libc/magic/math.c"
@@ -131,7 +131,7 @@ NOTHROW(LIBCCALL libc_floorl)(long double x) {
 }
 
 /* Return X with its signed changed to Y's */
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.copysign") double
 NOTHROW(LIBCCALL libc_copysign)(double num,
                                 double sign) {
@@ -143,7 +143,7 @@ NOTHROW(LIBCCALL libc_copysign)(double num,
 
 #include <bits/nan.h>
 /* Return representation of qNaN for double type */
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.nan") double
 NOTHROW(LIBCCALL libc_nan)(char const *tagb) {
 #line 400 "kos/src/libc/magic/math.c"
@@ -152,7 +152,7 @@ NOTHROW(LIBCCALL libc_nan)(char const *tagb) {
 }
 
 /* Return X with its signed changed to Y's */
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.copysignf") float
 NOTHROW(LIBCCALL libc_copysignf)(float num,
                                  float sign) {
@@ -164,7 +164,7 @@ NOTHROW(LIBCCALL libc_copysignf)(float num,
 
 #include <bits/nan.h>
 /* Return representation of qNaN for double type */
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.nanf") float
 NOTHROW(LIBCCALL libc_nanf)(char const *tagb) {
 #line 400 "kos/src/libc/magic/math.c"
@@ -173,7 +173,7 @@ NOTHROW(LIBCCALL libc_nanf)(char const *tagb) {
 }
 
 /* Return X with its signed changed to Y's */
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.copysignl") long double
 NOTHROW(LIBCCALL libc_copysignl)(long double num,
                                  long double sign) {
@@ -185,7 +185,7 @@ NOTHROW(LIBCCALL libc_copysignl)(long double num,
 
 #include <bits/nan.h>
 /* Return representation of qNaN for double type */
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.nanl") long double
 NOTHROW(LIBCCALL libc_nanl)(char const *tagb) {
 #line 400 "kos/src/libc/magic/math.c"
@@ -195,7 +195,7 @@ NOTHROW(LIBCCALL libc_nanl)(char const *tagb) {
 
 #include <hybrid/typecore.h>
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.round") double
 NOTHROW(LIBCCALL libc_round)(double x) {
 #line 487 "kos/src/libc/magic/math.c"
@@ -216,7 +216,7 @@ NOTHROW(LIBCCALL libc_round)(double x) {
 #include <hybrid/typecore.h>
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.trunc") double
 NOTHROW(LIBCCALL libc_trunc)(double x) {
 #line 506 "kos/src/libc/magic/math.c"
@@ -224,7 +224,7 @@ NOTHROW(LIBCCALL libc_trunc)(double x) {
 }
 
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lround") long int
 NOTHROW(LIBCCALL libc_lround)(double x) {
 #line 521 "kos/src/libc/magic/math.c"
@@ -232,7 +232,7 @@ NOTHROW(LIBCCALL libc_lround)(double x) {
 }
 
 /* Return positive difference between X and Y */
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fdim") double
 NOTHROW(LIBCCALL libc_fdim)(double x,
                             double y) {
@@ -241,7 +241,7 @@ NOTHROW(LIBCCALL libc_fdim)(double x,
 }
 
 /* Return maximum numeric value from X and Y */
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fmax") double
 NOTHROW(LIBCCALL libc_fmax)(double x,
                             double y) {
@@ -250,7 +250,7 @@ NOTHROW(LIBCCALL libc_fmax)(double x,
 }
 
 /* Return minimum numeric value from X and Y */
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fmin") double
 NOTHROW(LIBCCALL libc_fmin)(double x,
                             double y) {
@@ -259,7 +259,7 @@ NOTHROW(LIBCCALL libc_fmin)(double x,
 }
 
 /* Multiply-add function computed as a ternary operation */
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fma") double
 NOTHROW(LIBCCALL libc_fma)(double x,
                            double y,
@@ -278,7 +278,7 @@ NOTHROW(LIBCCALL libc_llround)(double x) {
 
 #include <hybrid/typecore.h>
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.roundf") float
 NOTHROW(LIBCCALL libc_roundf)(float x) {
 #line 487 "kos/src/libc/magic/math.c"
@@ -299,7 +299,7 @@ NOTHROW(LIBCCALL libc_roundf)(float x) {
 #include <hybrid/typecore.h>
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.truncf") float
 NOTHROW(LIBCCALL libc_truncf)(float x) {
 #line 506 "kos/src/libc/magic/math.c"
@@ -307,7 +307,7 @@ NOTHROW(LIBCCALL libc_truncf)(float x) {
 }
 
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lroundf") long int
 NOTHROW(LIBCCALL libc_lroundf)(float x) {
 #line 521 "kos/src/libc/magic/math.c"
@@ -315,7 +315,7 @@ NOTHROW(LIBCCALL libc_lroundf)(float x) {
 }
 
 /* Return positive difference between X and Y */
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fdimf") float
 NOTHROW(LIBCCALL libc_fdimf)(float x,
                              float y) {
@@ -324,7 +324,7 @@ NOTHROW(LIBCCALL libc_fdimf)(float x,
 }
 
 /* Return maximum numeric value from X and Y */
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fmaxf") float
 NOTHROW(LIBCCALL libc_fmaxf)(float x,
                              float y) {
@@ -333,7 +333,7 @@ NOTHROW(LIBCCALL libc_fmaxf)(float x,
 }
 
 /* Return minimum numeric value from X and Y */
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fminf") float
 NOTHROW(LIBCCALL libc_fminf)(float x,
                              float y) {
@@ -342,7 +342,7 @@ NOTHROW(LIBCCALL libc_fminf)(float x,
 }
 
 /* Multiply-add function computed as a ternary operation */
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fmaf") float
 NOTHROW(LIBCCALL libc_fmaf)(float x,
                             float y,
@@ -361,7 +361,7 @@ NOTHROW(LIBCCALL libc_llroundf)(float x) {
 
 #include <hybrid/typecore.h>
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.roundl") long double
 NOTHROW(LIBCCALL libc_roundl)(long double x) {
 #line 487 "kos/src/libc/magic/math.c"
@@ -382,7 +382,7 @@ NOTHROW(LIBCCALL libc_roundl)(long double x) {
 #include <hybrid/typecore.h>
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.truncl") long double
 NOTHROW(LIBCCALL libc_truncl)(long double x) {
 #line 506 "kos/src/libc/magic/math.c"
@@ -390,7 +390,7 @@ NOTHROW(LIBCCALL libc_truncl)(long double x) {
 }
 
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.lroundl") long int
 NOTHROW(LIBCCALL libc_lroundl)(long double x) {
 #line 521 "kos/src/libc/magic/math.c"
@@ -398,7 +398,7 @@ NOTHROW(LIBCCALL libc_lroundl)(long double x) {
 }
 
 /* Return positive difference between X and Y */
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fdiml") long double
 NOTHROW(LIBCCALL libc_fdiml)(long double x,
                              long double y) {
@@ -407,7 +407,7 @@ NOTHROW(LIBCCALL libc_fdiml)(long double x,
 }
 
 /* Return maximum numeric value from X and Y */
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fmaxl") long double
 NOTHROW(LIBCCALL libc_fmaxl)(long double x,
                              long double y) {
@@ -416,7 +416,7 @@ NOTHROW(LIBCCALL libc_fmaxl)(long double x,
 }
 
 /* Return minimum numeric value from X and Y */
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.fminl") long double
 NOTHROW(LIBCCALL libc_fminl)(long double x,
                              long double y) {
@@ -444,7 +444,7 @@ NOTHROW(LIBCCALL libc_llroundl)(long double x) {
 
 #include <bits/huge_val.h>
 /* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.isinf") int
 NOTHROW(LIBCCALL libc_isinf)(double val) {
 #line 802 "kos/src/libc/magic/math.c"
@@ -452,7 +452,7 @@ NOTHROW(LIBCCALL libc_isinf)(double val) {
 }
 
 #include <bits/huge_valf.h>
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.isinff") int
 NOTHROW(LIBCCALL libc_isinff)(float val) {
 #line 808 "kos/src/libc/magic/math.c"
@@ -460,7 +460,7 @@ NOTHROW(LIBCCALL libc_isinff)(float val) {
 }
 
 #include <bits/huge_vall.h>
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.isinfl") int
 NOTHROW(LIBCCALL libc_isinfl)(long double val) {
 #line 815 "kos/src/libc/magic/math.c"
@@ -468,21 +468,21 @@ NOTHROW(LIBCCALL libc_isinfl)(long double val) {
 }
 
 /* Return nonzero if VALUE is finite and not NaN */
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.finite") int
 NOTHROW(LIBCCALL libc_finite)(double val) {
 #line 822 "kos/src/libc/magic/math.c"
 	return !libc_isinf(val) && !libc_isnan(val);
 }
 
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.finitef") int
 NOTHROW(LIBCCALL libc_finitef)(float val) {
 #line 833 "kos/src/libc/magic/math.c"
 	return !libc_isinff(val) && !libc_isnanf(val);
 }
 
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.finitel") int
 NOTHROW(LIBCCALL libc_finitel)(long double val) {
 #line 843 "kos/src/libc/magic/math.c"
@@ -491,7 +491,7 @@ NOTHROW(LIBCCALL libc_finitel)(long double val) {
 
 #include <bits/nan.h>
 /* Return nonzero if VALUE is not a number */
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.isnan") int
 NOTHROW(LIBCCALL libc_isnan)(double val) {
 #line 858 "kos/src/libc/magic/math.c"
@@ -499,7 +499,7 @@ NOTHROW(LIBCCALL libc_isnan)(double val) {
 }
 
 #include <bits/nan.h>
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.isnanf") int
 NOTHROW(LIBCCALL libc_isnanf)(float val) {
 #line 864 "kos/src/libc/magic/math.c"
@@ -507,7 +507,7 @@ NOTHROW(LIBCCALL libc_isnanf)(float val) {
 }
 
 #include <bits/nan.h>
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.math.isnanl") int
 NOTHROW(LIBCCALL libc_isnanl)(long double val) {
 #line 871 "kos/src/libc/magic/math.c"

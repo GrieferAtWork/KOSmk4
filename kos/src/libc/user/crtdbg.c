@@ -255,8 +255,8 @@ NOTHROW_NCX(LIBCCALL libc__CrtSetBreakAlloc)(__LONG32_TYPE__ break_alloc)
 }
 /*[[[end:_CrtSetBreakAlloc]]]*/
 
-/*[[[head:_malloc_dbg,hash:CRC-32=0xad4ddad]]]*/
-INTERN ATTR_MALLOC ATTR_ALLOC_SIZE((1)) WUNUSED
+/*[[[head:_malloc_dbg,hash:CRC-32=0xc51cdf7e]]]*/
+INTERN ATTR_MALLOC WUNUSED ATTR_ALLOC_SIZE((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._malloc_dbg") void *
 NOTHROW_NCX(LIBCCALL libc__malloc_dbg)(size_t num_bytes,
                                        int block_type,
@@ -271,8 +271,8 @@ NOTHROW_NCX(LIBCCALL libc__malloc_dbg)(size_t num_bytes,
 }
 /*[[[end:_malloc_dbg]]]*/
 
-/*[[[head:_calloc_dbg,hash:CRC-32=0xd47b055d]]]*/
-INTERN ATTR_MALLOC ATTR_ALLOC_SIZE((1, 2)) WUNUSED
+/*[[[head:_calloc_dbg,hash:CRC-32=0x36a131f9]]]*/
+INTERN ATTR_MALLOC WUNUSED ATTR_ALLOC_SIZE((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._calloc_dbg") void *
 NOTHROW_NCX(LIBCCALL libc__calloc_dbg)(size_t count,
                                        size_t num_bytes,
@@ -288,8 +288,8 @@ NOTHROW_NCX(LIBCCALL libc__calloc_dbg)(size_t count,
 }
 /*[[[end:_calloc_dbg]]]*/
 
-/*[[[head:_realloc_dbg,hash:CRC-32=0xf3f1f571]]]*/
-INTERN ATTR_ALLOC_SIZE((2)) WUNUSED
+/*[[[head:_realloc_dbg,hash:CRC-32=0xc9ec3dc2]]]*/
+INTERN WUNUSED ATTR_ALLOC_SIZE((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._realloc_dbg") void *
 NOTHROW_NCX(LIBCCALL libc__realloc_dbg)(void *ptr,
                                         size_t num_bytes,
@@ -305,8 +305,8 @@ NOTHROW_NCX(LIBCCALL libc__realloc_dbg)(void *ptr,
 }
 /*[[[end:_realloc_dbg]]]*/
 
-/*[[[head:_recalloc_dbg,hash:CRC-32=0x20886307]]]*/
-INTERN ATTR_ALLOC_SIZE((2, 3)) WUNUSED
+/*[[[head:_recalloc_dbg,hash:CRC-32=0x54044ac6]]]*/
+INTERN WUNUSED ATTR_ALLOC_SIZE((2, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._recalloc_dbg") void *
 NOTHROW_NCX(LIBCCALL libc__recalloc_dbg)(void *ptr,
                                          size_t count,
@@ -323,8 +323,8 @@ NOTHROW_NCX(LIBCCALL libc__recalloc_dbg)(void *ptr,
 }
 /*[[[end:_recalloc_dbg]]]*/
 
-/*[[[head:_expand_dbg,hash:CRC-32=0xc1dfc3d]]]*/
-INTERN ATTR_ALLOC_SIZE((2)) WUNUSED NONNULL((1))
+/*[[[head:_expand_dbg,hash:CRC-32=0x266a03f4]]]*/
+INTERN WUNUSED NONNULL((1)) ATTR_ALLOC_SIZE((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._expand_dbg") void *
 NOTHROW_NCX(LIBCCALL libc__expand_dbg)(void *ptr,
                                        size_t num_bytes,
@@ -364,8 +364,8 @@ NOTHROW_NCX(LIBCCALL libc__msize_dbg)(void *ptr,
 /*[[[end:_msize_dbg]]]*/
 
 
-/*[[[head:_aligned_malloc_dbg,hash:CRC-32=0x37f97f78]]]*/
-INTERN ATTR_MALLOC ATTR_ALLOC_SIZE((1)) ATTR_ALLOC_ALIGN(2) WUNUSED
+/*[[[head:_aligned_malloc_dbg,hash:CRC-32=0x1d1b470d]]]*/
+INTERN ATTR_MALLOC WUNUSED ATTR_ALLOC_SIZE((1)) ATTR_ALLOC_ALIGN(2)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._aligned_malloc_dbg") void *
 NOTHROW_NCX(LIBCCALL libc__aligned_malloc_dbg)(size_t num_bytes,
                                                size_t min_alignment,
@@ -379,8 +379,8 @@ NOTHROW_NCX(LIBCCALL libc__aligned_malloc_dbg)(size_t num_bytes,
 }
 /*[[[end:_aligned_malloc_dbg]]]*/
 
-/*[[[head:_aligned_realloc_dbg,hash:CRC-32=0x74905bdb]]]*/
-INTERN ATTR_ALLOC_SIZE((2)) ATTR_ALLOC_ALIGN(3) WUNUSED
+/*[[[head:_aligned_realloc_dbg,hash:CRC-32=0xa820728c]]]*/
+INTERN WUNUSED ATTR_ALLOC_SIZE((2)) ATTR_ALLOC_ALIGN(3)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._aligned_realloc_dbg") void *
 NOTHROW_NCX(LIBCCALL libc__aligned_realloc_dbg)(void *ptr,
                                                 size_t num_bytes,
@@ -395,8 +395,8 @@ NOTHROW_NCX(LIBCCALL libc__aligned_realloc_dbg)(void *ptr,
 }
 /*[[[end:_aligned_realloc_dbg]]]*/
 
-/*[[[head:_aligned_recalloc_dbg,hash:CRC-32=0xefd0e33]]]*/
-INTERN ATTR_ALLOC_SIZE((2, 3)) ATTR_ALLOC_ALIGN(4) WUNUSED
+/*[[[head:_aligned_recalloc_dbg,hash:CRC-32=0x2265bf66]]]*/
+INTERN WUNUSED ATTR_ALLOC_SIZE((2, 3)) ATTR_ALLOC_ALIGN(4)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._aligned_recalloc_dbg") void *
 NOTHROW_NCX(LIBCCALL libc__aligned_recalloc_dbg)(void *ptr,
                                                  size_t count,
@@ -412,8 +412,8 @@ NOTHROW_NCX(LIBCCALL libc__aligned_recalloc_dbg)(void *ptr,
 }
 /*[[[end:_aligned_recalloc_dbg]]]*/
 
-/*[[[head:_aligned_offset_malloc_dbg,hash:CRC-32=0x63ef36a3]]]*/
-INTERN ATTR_MALLOC ATTR_ALLOC_SIZE((1)) WUNUSED
+/*[[[head:_aligned_offset_malloc_dbg,hash:CRC-32=0x9464676d]]]*/
+INTERN ATTR_MALLOC WUNUSED ATTR_ALLOC_SIZE((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._aligned_offset_malloc_dbg") void *
 NOTHROW_NCX(LIBCCALL libc__aligned_offset_malloc_dbg)(size_t num_bytes,
                                                       size_t min_alignment,
@@ -428,8 +428,8 @@ NOTHROW_NCX(LIBCCALL libc__aligned_offset_malloc_dbg)(size_t num_bytes,
 }
 /*[[[end:_aligned_offset_malloc_dbg]]]*/
 
-/*[[[head:_aligned_offset_realloc_dbg,hash:CRC-32=0x60ce2279]]]*/
-INTERN ATTR_ALLOC_SIZE((2)) WUNUSED
+/*[[[head:_aligned_offset_realloc_dbg,hash:CRC-32=0x82bd13ae]]]*/
+INTERN WUNUSED ATTR_ALLOC_SIZE((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._aligned_offset_realloc_dbg") void *
 NOTHROW_NCX(LIBCCALL libc__aligned_offset_realloc_dbg)(void *ptr,
                                                        size_t num_bytes,
@@ -445,8 +445,8 @@ NOTHROW_NCX(LIBCCALL libc__aligned_offset_realloc_dbg)(void *ptr,
 }
 /*[[[end:_aligned_offset_realloc_dbg]]]*/
 
-/*[[[head:_aligned_offset_recalloc_dbg,hash:CRC-32=0xde0ec6a0]]]*/
-INTERN ATTR_ALLOC_SIZE((2, 3)) WUNUSED
+/*[[[head:_aligned_offset_recalloc_dbg,hash:CRC-32=0xb7e2f1f0]]]*/
+INTERN WUNUSED ATTR_ALLOC_SIZE((2, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.heap.debug_malloc._aligned_offset_recalloc_dbg") void *
 NOTHROW_NCX(LIBCCALL libc__aligned_offset_recalloc_dbg)(void *ptr,
                                                         size_t count,

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6a6aa3fc */
+/* HASH CRC-32:0xec1d20bb */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,9 +23,9 @@
 #ifndef ____localdep_iswdigit_defined
 #define ____localdep_iswdigit_defined 1
 #if __has_builtin(__builtin_iswdigit) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswdigit)
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL __localdep_iswdigit)(__WINT_TYPE__ __wc) { return __builtin_iswdigit(__wc); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_iswdigit)(__WINT_TYPE__ __wc) { return __builtin_iswdigit(__wc); }
 #elif defined(__CRT_HAVE_iswdigit)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__localdep_iswdigit,(__WINT_TYPE__ __wc),iswdigit,(__wc))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswdigit,(__WINT_TYPE__ __wc),iswdigit,(__wc))
 #else /* LIBC: iswdigit */
 #include <local/wctype/iswdigit.h>
 #define __localdep_iswdigit (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswdigit))
@@ -33,7 +33,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__localdep_iswdigit,(__WIN
 #endif /* !____localdep_iswdigit_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(iswdigit_l) __ATTR_WUNUSED __ATTR_PURE int
+__LOCAL_LIBC(iswdigit_l) __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(iswdigit_l))(__WINT_TYPE__ __wc,
                                                         __locale_t __locale) {
 #line 238 "kos/src/libc/magic/wctype.c"

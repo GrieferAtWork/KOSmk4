@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5384e47b */
+/* HASH CRC-32:0x3f7509fa */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ DECL_BEGIN
 
 #ifndef __KERNEL__
 /* Return the difference between TIME1 and TIME0 */
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.time.difftime") double
 NOTHROW_NCX(LIBCCALL libc_difftime)(time_t time1,
                                     time_t time0) {
@@ -74,7 +74,7 @@ __NAMESPACE_STD_END
 #define __yearstodays(n_years) (((146097*(n_years))/400)/*-1*/) /* rounding error? */
 #endif /* !__yearstodays */
 /* Return the `time_t' representation of TP and normalize TP */
-INTERN WUNUSED ATTR_PURE NONNULL((1))
+INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.time.mktime") time_t
 NOTHROW_NCX(LIBCCALL libc_mktime)(__STRUCT_TM __KOS_FIXED_CONST *tp) {
 #line 439 "kos/src/libc/magic/time.c"
@@ -112,7 +112,7 @@ __NAMESPACE_LOCAL_END
 #endif
 #endif /* !__LIBC_CTIME_BUFFER_DEFINED */
 /* Equivalent to `asctime (localtime (timer))' */
-INTERN WUNUSED ATTR_RETNONNULL NONNULL((1))
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.time.ctime") char *
 NOTHROW_NCX(LIBCCALL libc_ctime)(time_t const *timer) {
 #line 488 "kos/src/libc/magic/time.c"
@@ -179,7 +179,7 @@ __NAMESPACE_LOCAL_END
 #endif /* !__LIBC_GMTIME_BUFFER_DEFINED */
 /* Return the `struct tm' representation of *TIMER
  * in Universal Coordinated Time (aka Greenwich Mean Time) */
-INTERN WUNUSED ATTR_RETNONNULL NONNULL((1))
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.time.gmtime") struct tm *
 NOTHROW_NCX(LIBCCALL libc_gmtime)(time_t const *timer) {
 #line 529 "kos/src/libc/magic/time.c"
@@ -245,7 +245,7 @@ __NAMESPACE_LOCAL_END
 #endif
 #endif /* !__LIBC_GMTIME_BUFFER_DEFINED */
 /* Return the `struct tm' representation of *TIMER in the local timezone */
-INTERN WUNUSED ATTR_RETNONNULL NONNULL((1))
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.time.localtime") struct tm *
 NOTHROW_NCX(LIBCCALL libc_localtime)(time_t const *timer) {
 #line 546 "kos/src/libc/magic/time.c"
@@ -329,7 +329,7 @@ __NAMESPACE_LOCAL_END
 #endif /* !__LIBC_CTIME_BUFFER_DEFINED */
 /* Return a string of the form "Day Mon dd hh:mm:ss yyyy\n"
  * that is the representation of TP in this format */
-INTERN WUNUSED ATTR_RETNONNULL NONNULL((1))
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.time.asctime") char *
 NOTHROW_NCX(LIBCCALL libc_asctime)(struct tm const *tp) {
 #line 607 "kos/src/libc/magic/time.c"
@@ -353,7 +353,7 @@ NOTHROW_NCX(LIBCCALL libc_asctime_s)(char *__restrict buf,
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_difftime64, libc_difftime);
 #else
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.time.difftime64") double
 NOTHROW_NCX(LIBCCALL libc_difftime64)(time64_t time1,
                                       time64_t time0) {
@@ -405,7 +405,7 @@ __NAMESPACE_STD_END
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_mktime64, libc_mktime);
 #else
-INTERN WUNUSED ATTR_PURE NONNULL((1))
+INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.time.mktime64") time64_t
 NOTHROW_NCX(LIBCCALL libc_mktime64)(__STRUCT_TM __KOS_FIXED_CONST *tp) {
 #line 658 "kos/src/libc/magic/time.c"
@@ -445,7 +445,7 @@ __NAMESPACE_LOCAL_END
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_ctime64, libc_ctime);
 #else
-INTERN WUNUSED ATTR_RETNONNULL NONNULL((1))
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.time.ctime64") char *
 NOTHROW_NCX(LIBCCALL libc_ctime64)(time64_t const *timer) {
 #line 692 "kos/src/libc/magic/time.c"
@@ -513,7 +513,7 @@ __NAMESPACE_LOCAL_END
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_gmtime64, libc_gmtime);
 #else
-INTERN WUNUSED ATTR_RETNONNULL NONNULL((1))
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.time.gmtime64") __STRUCT_TM *
 NOTHROW_NCX(LIBCCALL libc_gmtime64)(time64_t const *timer) {
 #line 703 "kos/src/libc/magic/time.c"
@@ -580,7 +580,7 @@ __NAMESPACE_LOCAL_END
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_localtime64, libc_localtime);
 #else
-INTERN WUNUSED ATTR_RETNONNULL NONNULL((1))
+INTERN ATTR_RETNONNULL WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.time.localtime64") __STRUCT_TM *
 NOTHROW_NCX(LIBCCALL libc_localtime64)(time64_t const *timer) {
 #line 715 "kos/src/libc/magic/time.c"
@@ -626,7 +626,7 @@ __NAMESPACE_STD_END
 #endif /* !__tm_defined */
 #endif /* !__STRUCT_TM */
 /* Like `mktime', but for TP represents Universal Time, not local time */
-INTERN WUNUSED ATTR_PURE NONNULL((1))
+INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.time.timegm") time_t
 NOTHROW_NCX(LIBCCALL libc_timegm)(__STRUCT_TM *tp) {
 #line 877 "kos/src/libc/magic/time.c"
@@ -682,7 +682,7 @@ __NAMESPACE_STD_END
 #if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
 DEFINE_INTERN_ALIAS(libc_timegm64, libc_timegm);
 #else
-INTERN WUNUSED ATTR_PURE NONNULL((1))
+INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.time.timegm64") time64_t
 NOTHROW_NCX(LIBCCALL libc_timegm64)(__STRUCT_TM *tp) {
 #line 912 "kos/src/libc/magic/time.c"

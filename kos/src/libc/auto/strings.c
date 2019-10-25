@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x378eaf5b */
+/* HASH CRC-32:0x8e48233d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ NOTHROW_NCX(LIBCCALL libc_bzero)(void *__restrict dst,
 	memset(dst, 0, num_bytes);
 }
 
-INTERN WUNUSED ATTR_PURE NONNULL((1))
+INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.index") char *
 NOTHROW_NCX(LIBCCALL libc_index)(char const *__restrict haystack,
                                  int needle) {
@@ -60,7 +60,7 @@ NOTHROW_NCX(LIBCCALL libc_index)(char const *__restrict haystack,
 	return NULL;
 }
 
-INTERN WUNUSED ATTR_PURE NONNULL((1))
+INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.rindex") char *
 NOTHROW_NCX(LIBCCALL libc_rindex)(char const *__restrict haystack,
                                   int needle) {

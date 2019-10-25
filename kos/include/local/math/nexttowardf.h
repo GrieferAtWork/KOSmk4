@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdd76a4a3 */
+/* HASH CRC-32:0x5c3b4557 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,18 +24,18 @@
 #ifndef ____localdep_nexttoward_defined
 #define ____localdep_nexttoward_defined 1
 #if __has_builtin(__builtin_nexttoward) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nexttoward)
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL __localdep_nexttoward)(double __x, long double __y) { return __builtin_nexttoward(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_nexttoward)(double __x, long double __y) { return __builtin_nexttoward(__x, __y); }
 #elif defined(__CRT_HAVE_nexttoward)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,__localdep_nexttoward,(double __x, long double __y),nexttoward,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_nexttoward,(double __x, long double __y),nexttoward,(__x,__y))
 #elif defined(__CRT_HAVE___nexttoward)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,__localdep_nexttoward,(double __x, long double __y),__nexttoward,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_nexttoward,(double __x, long double __y),__nexttoward,(__x,__y))
 #else /* LIBC: nexttoward */
 #undef ____localdep_nexttoward_defined
 #endif /* nexttoward... */
 #endif /* !____localdep_nexttoward_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(nexttowardf) __ATTR_WUNUSED __ATTR_CONST float
+__LOCAL_LIBC(nexttowardf) __ATTR_CONST __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(nexttowardf))(float __x,
                                                      long double __y) {
 #line 561 "kos/src/libc/magic/math.c"

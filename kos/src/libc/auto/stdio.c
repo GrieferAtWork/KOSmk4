@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1d159833 */
+/* HASH CRC-32:0x804b429e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@ DECL_BEGIN
 
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Return the number of written characters, excluding a trailing NUL-character */
-INTERN ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2))
+INTERN NONNULL((1, 2)) ATTR_LIBC_PRINTF(2, 0)
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.format.printf.vsprintf") __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBCCALL libc_vsprintf)(char *__restrict dest,
                                     char const *__restrict format,
@@ -49,7 +49,7 @@ NOTHROW_NCX(LIBCCALL libc_vsprintf)(char *__restrict dest,
 
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Return the number of written characters, excluding a trailing NUL-character */
-INTERN ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2))
+INTERN NONNULL((1, 2)) ATTR_LIBC_PRINTF(2, 3)
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.format.printf.sprintf") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc_sprintf)(char *__restrict buf,
                                     char const *__restrict format,
@@ -72,7 +72,7 @@ struct __format_snprintf_data {
 #endif /* !____format_snprintf_data_defined */
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Always return the REQUIRED buffer size (excluding a trailing NUL-character), and never write more than `BUFLEN' characters to `BUF' */
-INTERN ATTR_LIBC_PRINTF(3, 0) NONNULL((3))
+INTERN NONNULL((3)) ATTR_LIBC_PRINTF(3, 0)
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.format.printf.vsnprintf") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc_vsnprintf)(char *__restrict buf,
                                      size_t buflen,
@@ -94,7 +94,7 @@ NOTHROW_NCX(LIBCCALL libc_vsnprintf)(char *__restrict buf,
 
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Always return the REQUIRED buffer size (excluding a trailing NUL-character), and never write more than `BUFLEN' characters to `BUF' */
-INTERN ATTR_LIBC_PRINTF(3, 4) NONNULL((3))
+INTERN NONNULL((3)) ATTR_LIBC_PRINTF(3, 4)
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.format.printf.snprintf") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc_snprintf)(char *__restrict buf,
                                      size_t buflen,
@@ -135,7 +135,7 @@ __LOCAL_LIBC(vsscanf_ungetc) __SSIZE_TYPE__ (__LIBCCALL __vsscanf_ungetc)(void *
 }
 /* Scan data from a given `INPUT' string, following `FORMAT'
  * Return the number of successfully scanned data items */
-INTERN ATTR_LIBC_SCANF(2, 0) WUNUSED NONNULL((1, 2))
+INTERN WUNUSED NONNULL((1, 2)) ATTR_LIBC_SCANF(2, 0)
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.format.scanf.vsscanf") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc_vsscanf)(char const *__restrict input,
                                    char const *__restrict format,
@@ -146,7 +146,7 @@ NOTHROW_NCX(LIBCCALL libc_vsscanf)(char const *__restrict input,
 
 /* Scan data from a given `INPUT' string, following `FORMAT'
  * Return the number of successfully scanned data items */
-INTERN ATTR_LIBC_SCANF(2, 3) NONNULL((1, 2))
+INTERN NONNULL((1, 2)) ATTR_LIBC_SCANF(2, 3)
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.format.scanf.sscanf") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc_sscanf)(char const *__restrict input,
                                    char const *__restrict format,
@@ -180,7 +180,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.FILE.locked.write.utility._flushall
 #endif
 }
 
-INTERN ATTR_LIBC_SCANF(2, 4) WUNUSED NONNULL((1, 2))
+INTERN WUNUSED NONNULL((1, 2)) ATTR_LIBC_SCANF(2, 4)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.scanf._vsscanf_l") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc__vsscanf_l)(char const *__restrict input,
                                       char const *__restrict format,
@@ -214,7 +214,7 @@ __LOCAL_LIBC(vsnscanf_ungetc) __SSIZE_TYPE__ (__LIBCCALL __vsnscanf_ungetc)(void
 	libc_unicode_readutf8_rev(&((struct __vsnscanf_data *)__arg)->__ptr);
 	return 0;
 }
-INTERN WUNUSED ATTR_LIBC_SCANF(3, 4) NONNULL((1, 3))
+INTERN WUNUSED NONNULL((1, 3)) ATTR_LIBC_SCANF(3, 4)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.format.scanf._vsnscanf") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc__vsnscanf)(char const *__restrict input,
                                      size_t inputlen,
@@ -227,7 +227,7 @@ NOTHROW_NCX(LIBCCALL libc__vsnscanf)(char const *__restrict input,
 	return libc_format_vscanf(&__vsnscanf_getc, &__vsnscanf_ungetc, (void *)&data, format, args);
 }
 
-INTERN ATTR_LIBC_SCANF(3, 5) NONNULL((1, 3))
+INTERN NONNULL((1, 3)) ATTR_LIBC_SCANF(3, 5)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.scanf._vsnscanf_l") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc__vsnscanf_l)(char const *__restrict input,
                                        size_t inputlen,
@@ -239,7 +239,7 @@ NOTHROW_NCX(LIBCCALL libc__vsnscanf_l)(char const *__restrict input,
 	return libc__vsnscanf(input, inputlen, format, args);
 }
 
-INTERN ATTR_LIBC_SCANF(3, 4) NONNULL((1, 3))
+INTERN NONNULL((1, 3)) ATTR_LIBC_SCANF(3, 4)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.format.scanf._snscanf") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc__snscanf)(char const *__restrict input,
                                      size_t inputlen,
@@ -254,7 +254,7 @@ NOTHROW_NCX(VLIBCCALL libc__snscanf)(char const *__restrict input,
 	return result;
 }
 
-INTERN ATTR_LIBC_SCANF(3, 5) NONNULL((1, 3))
+INTERN NONNULL((1, 3)) ATTR_LIBC_SCANF(3, 5)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.scanf._snscanf_l") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc__snscanf_l)(char const *__restrict input,
                                        size_t inputlen,
@@ -270,7 +270,7 @@ NOTHROW_NCX(VLIBCCALL libc__snscanf_l)(char const *__restrict input,
 	return result;
 }
 
-INTERN ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2))
+INTERN NONNULL((1, 2)) ATTR_LIBC_PRINTF(2, 0)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._vsprintf_l") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc__vsprintf_l)(char *__restrict buf,
                                        char const *__restrict format,
@@ -281,7 +281,7 @@ NOTHROW_NCX(LIBCCALL libc__vsprintf_l)(char *__restrict buf,
 	return libc_vsprintf(buf, format, args);
 }
 
-INTERN ATTR_LIBC_PRINTF_P(3, 0) NONNULL((3))
+INTERN NONNULL((3)) ATTR_LIBC_PRINTF_P(3, 0)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.format.printf._vsprintf_p") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc__vsprintf_p)(char *__restrict buf,
                                        size_t bufsize,
@@ -296,7 +296,7 @@ NOTHROW_NCX(LIBCCALL libc__vsprintf_p)(char *__restrict buf,
 	return 0;
 }
 
-INTERN ATTR_LIBC_PRINTF_P(3, 0) NONNULL((3))
+INTERN NONNULL((3)) ATTR_LIBC_PRINTF_P(3, 0)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._vsprintf_p_l") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc__vsprintf_p_l)(char *__restrict buf,
                                          size_t bufsize,
@@ -308,7 +308,7 @@ NOTHROW_NCX(LIBCCALL libc__vsprintf_p_l)(char *__restrict buf,
 	return libc__vsprintf_p(buf, bufsize, format, args);
 }
 
-INTERN ATTR_LIBC_PRINTF(2, 4) NONNULL((1, 2))
+INTERN NONNULL((1, 2)) ATTR_LIBC_PRINTF(2, 4)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._sprintf_l") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc__sprintf_l)(char *__restrict buf,
                                        char const *__restrict format,
@@ -323,7 +323,7 @@ NOTHROW_NCX(VLIBCCALL libc__sprintf_l)(char *__restrict buf,
 	return result;
 }
 
-INTERN ATTR_LIBC_PRINTF(3, 5) NONNULL((3))
+INTERN NONNULL((3)) ATTR_LIBC_PRINTF(3, 5)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._sprintf_s_l") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc__sprintf_s_l)(char *__restrict buf,
                                          size_t bufsize,
@@ -339,7 +339,7 @@ NOTHROW_NCX(VLIBCCALL libc__sprintf_s_l)(char *__restrict buf,
 	return result;
 }
 
-INTERN ATTR_LIBC_PRINTF_P(3, 4) NONNULL((3))
+INTERN NONNULL((3)) ATTR_LIBC_PRINTF_P(3, 4)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._sprintf_p") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc__sprintf_p)(char *__restrict buf,
                                        size_t bufsize,
@@ -354,7 +354,7 @@ NOTHROW_NCX(VLIBCCALL libc__sprintf_p)(char *__restrict buf,
 	return result;
 }
 
-INTERN ATTR_LIBC_PRINTF_P(3, 5) NONNULL((3))
+INTERN NONNULL((3)) ATTR_LIBC_PRINTF_P(3, 5)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._sprintf_p_l") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc__sprintf_p_l)(char *__restrict buf,
                                          size_t bufsize,
@@ -370,7 +370,7 @@ NOTHROW_NCX(VLIBCCALL libc__sprintf_p_l)(char *__restrict buf,
 	return result;
 }
 
-INTERN ATTR_LIBC_PRINTF(1, 0) WUNUSED NONNULL((1))
+INTERN WUNUSED NONNULL((1)) ATTR_LIBC_PRINTF(1, 0)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.format.printf._vscprintf") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc__vscprintf)(char const *__restrict format,
                                       va_list args) {
@@ -378,7 +378,7 @@ NOTHROW_NCX(LIBCCALL libc__vscprintf)(char const *__restrict format,
 	return libc_vsnprintf(NULL, 0, format, args);
 }
 
-INTERN ATTR_LIBC_PRINTF(1, 2) WUNUSED NONNULL((1))
+INTERN WUNUSED NONNULL((1)) ATTR_LIBC_PRINTF(1, 2)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.format.printf._scprintf") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc__scprintf)(char const *__restrict format,
                                       ...) {
@@ -391,7 +391,7 @@ NOTHROW_NCX(VLIBCCALL libc__scprintf)(char const *__restrict format,
 	return result;
 }
 
-INTERN ATTR_LIBC_PRINTF(1, 0) WUNUSED NONNULL((1))
+INTERN WUNUSED NONNULL((1)) ATTR_LIBC_PRINTF(1, 0)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._vscprintf_l") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc__vscprintf_l)(char const *__restrict format,
                                         locale_t locale,
@@ -401,7 +401,7 @@ NOTHROW_NCX(LIBCCALL libc__vscprintf_l)(char const *__restrict format,
 	return libc__vscprintf(format, args);
 }
 
-INTERN ATTR_LIBC_PRINTF_P(1, 0) WUNUSED NONNULL((1))
+INTERN WUNUSED NONNULL((1)) ATTR_LIBC_PRINTF_P(1, 0)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.format.printf._vscprintf_p") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc__vscprintf_p)(char const *__restrict format,
                                         va_list args) {
@@ -412,7 +412,7 @@ NOTHROW_NCX(LIBCCALL libc__vscprintf_p)(char const *__restrict format,
 	return 0;
 }
 
-INTERN ATTR_LIBC_PRINTF_P(1, 0) WUNUSED NONNULL((1))
+INTERN WUNUSED NONNULL((1)) ATTR_LIBC_PRINTF_P(1, 0)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._vscprintf_p_l") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc__vscprintf_p_l)(char const *__restrict format,
                                           locale_t locale,
@@ -422,7 +422,7 @@ NOTHROW_NCX(LIBCCALL libc__vscprintf_p_l)(char const *__restrict format,
 	return libc__vscprintf_p(format, args);
 }
 
-INTERN ATTR_LIBC_PRINTF(1, 3) WUNUSED NONNULL((1))
+INTERN WUNUSED NONNULL((1)) ATTR_LIBC_PRINTF(1, 3)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._scprintf_l") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc__scprintf_l)(char const *__restrict format,
                                         locale_t locale,
@@ -436,7 +436,7 @@ NOTHROW_NCX(VLIBCCALL libc__scprintf_l)(char const *__restrict format,
 	return result;
 }
 
-INTERN ATTR_LIBC_PRINTF_P(1, 2) WUNUSED NONNULL((1))
+INTERN WUNUSED NONNULL((1)) ATTR_LIBC_PRINTF_P(1, 2)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.format.printf._scprintf_p") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc__scprintf_p)(char const *__restrict format,
                                         ...) {
@@ -449,7 +449,7 @@ NOTHROW_NCX(VLIBCCALL libc__scprintf_p)(char const *__restrict format,
 	return result;
 }
 
-INTERN ATTR_LIBC_PRINTF_P(1, 3) WUNUSED NONNULL((1))
+INTERN WUNUSED NONNULL((1)) ATTR_LIBC_PRINTF_P(1, 3)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._scprintf_p_l") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc__scprintf_p_l)(char const *__restrict format,
                                           locale_t locale,
@@ -464,7 +464,7 @@ NOTHROW_NCX(VLIBCCALL libc__scprintf_p_l)(char const *__restrict format,
 }
 
 /* WARNING: This function returns the number of written character. - Not the required buffer size! */
-INTERN ATTR_LIBC_PRINTF(3, 0) NONNULL((3))
+INTERN NONNULL((3)) ATTR_LIBC_PRINTF(3, 0)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.format.printf._vsnprintf") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc__vsnprintf)(char *__restrict buf,
                                       size_t bufsize,
@@ -478,7 +478,7 @@ NOTHROW_NCX(LIBCCALL libc__vsnprintf)(char *__restrict buf,
 	return result;
 }
 
-INTERN ATTR_LIBC_PRINTF(3, 0) NONNULL((3))
+INTERN NONNULL((3)) ATTR_LIBC_PRINTF(3, 0)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._vsnprintf_l") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc__vsnprintf_l)(char *__restrict buf,
                                         size_t bufsize,
@@ -490,7 +490,7 @@ NOTHROW_NCX(LIBCCALL libc__vsnprintf_l)(char *__restrict buf,
 	return libc__vsnprintf(buf, bufsize, format, args);
 }
 
-INTERN ATTR_LIBC_PRINTF(4, 0) NONNULL((4))
+INTERN NONNULL((4)) ATTR_LIBC_PRINTF(4, 0)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.format.printf._vsnprintf_s") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc__vsnprintf_s)(char *__restrict buf,
                                         size_t bufsize,
@@ -502,7 +502,7 @@ NOTHROW_NCX(LIBCCALL libc__vsnprintf_s)(char *__restrict buf,
 	return libc__vsnprintf(buf, bufsize, format, args);
 }
 
-INTERN ATTR_LIBC_PRINTF(4, 0) NONNULL((4))
+INTERN NONNULL((4)) ATTR_LIBC_PRINTF(4, 0)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._vsnprintf_s_l") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc__vsnprintf_s_l)(char *__restrict buf,
                                           size_t bufsize,
@@ -516,7 +516,7 @@ NOTHROW_NCX(LIBCCALL libc__vsnprintf_s_l)(char *__restrict buf,
 	return libc__vsnprintf(buf, bufsize, format, args);
 }
 
-INTERN ATTR_LIBC_PRINTF(3, 4) NONNULL((3))
+INTERN NONNULL((3)) ATTR_LIBC_PRINTF(3, 4)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.format.printf._snprintf") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc__snprintf)(char *__restrict buf,
                                       size_t bufsize,
@@ -531,7 +531,7 @@ NOTHROW_NCX(VLIBCCALL libc__snprintf)(char *__restrict buf,
 	return result;
 }
 
-INTERN ATTR_LIBC_PRINTF(3, 5) NONNULL((3))
+INTERN NONNULL((3)) ATTR_LIBC_PRINTF(3, 5)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._snprintf_l") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc__snprintf_l)(char *__restrict buf,
                                         size_t bufsize,
@@ -547,7 +547,7 @@ NOTHROW_NCX(VLIBCCALL libc__snprintf_l)(char *__restrict buf,
 	return result;
 }
 
-INTERN ATTR_LIBC_PRINTF(3, 4) NONNULL((3))
+INTERN NONNULL((3)) ATTR_LIBC_PRINTF(3, 4)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.format.printf._snprintf_c") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc__snprintf_c)(char *__restrict buf,
                                         size_t bufsize,
@@ -562,7 +562,7 @@ NOTHROW_NCX(VLIBCCALL libc__snprintf_c)(char *__restrict buf,
 	return result;
 }
 
-INTERN ATTR_LIBC_PRINTF(3, 5) NONNULL((3))
+INTERN NONNULL((3)) ATTR_LIBC_PRINTF(3, 5)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._snprintf_c_l") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc__snprintf_c_l)(char *__restrict buf,
                                           size_t bufsize,
@@ -578,7 +578,7 @@ NOTHROW_NCX(VLIBCCALL libc__snprintf_c_l)(char *__restrict buf,
 	return result;
 }
 
-INTERN ATTR_LIBC_PRINTF(4, 5) NONNULL((4))
+INTERN NONNULL((4)) ATTR_LIBC_PRINTF(4, 5)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.format.printf._snprintf_s") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc__snprintf_s)(char *__restrict buf,
                                         size_t bufsize,
@@ -594,7 +594,7 @@ NOTHROW_NCX(VLIBCCALL libc__snprintf_s)(char *__restrict buf,
 	return result;
 }
 
-INTERN ATTR_LIBC_PRINTF(4, 6) NONNULL((4))
+INTERN NONNULL((4)) ATTR_LIBC_PRINTF(4, 6)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._snprintf_s_l") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc__snprintf_s_l)(char *__restrict buf,
                                           size_t bufsize,

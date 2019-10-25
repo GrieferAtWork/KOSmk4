@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x667d1b94 */
+/* HASH CRC-32:0x700cdb7b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@
 #define ____localdep_Malloc_defined 1
 #if defined(__CRT_HAVE_Malloc)
 /* @throws: E_BADALLOC: ... */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_MALLOC __ATTR_RETNONNULL __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,__localdep_Malloc,(__SIZE_TYPE__ __n_bytes),Malloc,(__n_bytes))
+__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,__localdep_Malloc,(__SIZE_TYPE__ __n_bytes),Malloc,(__n_bytes))
 #else /* LIBC: Malloc */
 #undef ____localdep_Malloc_defined
 #endif /* Malloc... */
@@ -55,10 +55,10 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__loca
 
 __NAMESPACE_LOCAL_BEGIN
 /* @throws: E_BADALLOC: ... */
-__LOCAL_LIBC(Memdup) __ATTR_WUNUSED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_ALLOC_SIZE((2)) __ATTR_MALLOC __ATTR_RETNONNULL __ATTR_NONNULL((1)) void *
+__LOCAL_LIBC(Memdup) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_ALLOC_SIZE((2)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(Memdup))(void const *__restrict __ptr,
                                                     __SIZE_TYPE__ __n_bytes) {
-#line 77 "kos/src/libc/magic/kos.malloc.c"
+#line 75 "kos/src/libc/magic/kos.malloc.c"
 	void *__result;
 	__result = __localdep_Malloc(__n_bytes);
 	__localdep_memcpy(__result, __ptr, __n_bytes);

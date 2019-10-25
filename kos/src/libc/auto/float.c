@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x839fa14f */
+/* HASH CRC-32:0xc2c97c37 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.float._chgsign") double
 NOTHROW(LIBCCALL libc__chgsign)(double x) {
 #line 235 "kos/src/libc/magic/float.c"

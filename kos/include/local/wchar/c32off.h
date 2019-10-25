@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe9aa7cdb */
+/* HASH CRC-32:0x21e1bf7b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__N
 
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `c32chrnul', but return the offset from `STR', rather than the actual address */
-__LOCAL_LIBC(c32off) __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) __SIZE_TYPE__
+__LOCAL_LIBC(c32off) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(c32off))(__CHAR32_TYPE__ const *__restrict __haystack,
                                                     __CHAR32_TYPE__ __needle) {
 #line 2175 "kos/src/libc/magic/string.c"

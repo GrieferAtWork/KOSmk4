@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd2c012fe */
+/* HASH CRC-32:0x7ec95364 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@ DECL_BEGIN
 #ifndef __KERNEL__
 /* Search MNT->mnt_opts for an option matching OPT.
  * Returns the address of the substring, or null if none found */
-INTERN WUNUSED ATTR_PURE
+INTERN ATTR_PURE WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.database.mntent.hasmntopt") char *
 NOTHROW_NCX(LIBCCALL libc_hasmntopt)(struct mntent const *mnt,
                                      char const *opt) {

@@ -31,9 +31,7 @@ __SYSDECL_BEGIN
 
 
 @@@throws: E_BADALLOC: ...
-[ATTR_WUNUSED][ATTR_MALL_DEFAULT_ALIGNED][ATTR_MALLOC]
-[ATTR_RETNONNULL][ATTR_ALLOC_SIZE((1))]
-Malloc:(size_t n_bytes) -> void *;
+Malloc:(size_t n_bytes) -> [nonnull][malloc(n_bytes)] void *;
 
 @@@throws: E_BADALLOC: ...
 [ATTR_WUNUSED][ATTR_MALL_DEFAULT_ALIGNED][ATTR_MALLOC]

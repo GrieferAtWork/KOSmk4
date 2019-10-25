@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x93cc6e9c */
+/* HASH CRC-32:0x967a5f3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,16 +25,16 @@
 #define ____localdep_nextafter_defined 1
 #if __has_builtin(__builtin_nextafter) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nextafter)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL __localdep_nextafter)(double __x, double __y) { return __builtin_nextafter(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_nextafter)(double __x, double __y) { return __builtin_nextafter(__x, __y); }
 #elif defined(__CRT_HAVE_nextafter)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,__localdep_nextafter,(double __x, double __y),nextafter,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_nextafter,(double __x, double __y),nextafter,(__x,__y))
 #elif defined(__CRT_HAVE___nextafter)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,__localdep_nextafter,(double __x, double __y),__nextafter,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_nextafter,(double __x, double __y),__nextafter,(__x,__y))
 #elif defined(__CRT_HAVE__nextafter)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,__localdep_nextafter,(double __x, double __y),_nextafter,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_nextafter,(double __x, double __y),_nextafter,(__x,__y))
 #else /* LIBC: nextafter */
 #undef ____localdep_nextafter_defined
 #endif /* nextafter... */
@@ -42,7 +42,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,__localdep_nextafter,(d
 
 __NAMESPACE_LOCAL_BEGIN
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__LOCAL_LIBC(nextafterf) __ATTR_WUNUSED __ATTR_CONST float
+__LOCAL_LIBC(nextafterf) __ATTR_CONST __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(nextafterf))(float __x,
                                                     float __y) {
 #line 454 "kos/src/libc/magic/math.c"

@@ -33,7 +33,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:format_aprintf_pack,hash:CRC-32=0x7ece4f73]]]*/
+/*[[[head:format_aprintf_pack,hash:CRC-32=0x9b90612d]]]*/
 /* Pack and finalize a given aprintf format printer
  * Together with `format_aprintf_printer()', the aprintf
  * format printer sub-system should be used as follows:
@@ -54,7 +54,7 @@ DECL_BEGIN
  *                  but may differ from `strlen(return)' when NUL characters were
  *                  printed to the aprintf-printer at one point.
  *                  (e.g. `format_aprintf_printer(&my_printer, "\0", 1)') */
-INTERN WUNUSED ATTR_MALL_DEFAULT_ALIGNED ATTR_MALLOC NONNULL((1))
+INTERN ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.format.format_aprintf_pack") char *
 NOTHROW_NCX(LIBCCALL libc_format_aprintf_pack)(struct format_aprintf_data *__restrict self,
                                                size_t *pstrlen)

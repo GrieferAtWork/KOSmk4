@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3b7af8d0 */
+/* HASH CRC-32:0xb8d225b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #define __local_memrxendl_defined 1
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memrendl', but search for non-matching locations. */
-__LOCAL_LIBC(memrxendl) __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) __UINT32_TYPE__ *
+__LOCAL_LIBC(memrxendl) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memrxendl))(void const *__restrict __haystack,
                                                        __UINT32_TYPE__ __dword,
                                                        __SIZE_TYPE__ __n_dwords) {

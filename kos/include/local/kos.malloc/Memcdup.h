@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4f667cfc */
+/* HASH CRC-32:0x4a583291 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@
 #define __localdep_memchr (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memchr))
 #elif defined(__CRT_HAVE_memchr)
 /* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memchr,(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),memchr,(__haystack,__needle,__n_bytes))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memchr,(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),memchr,(__haystack,__needle,__n_bytes))
 #else /* LIBC: memchr */
 #include <local/string/memchr.h>
 /* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
@@ -44,7 +44,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,
 #define ____localdep_Memdup_defined 1
 #if defined(__CRT_HAVE_Memdup)
 /* @throws: E_BADALLOC: ... */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_ALLOC_SIZE((2)) __ATTR_MALLOC __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_Memdup,(void const *__restrict __ptr, __SIZE_TYPE__ __n_bytes),Memdup,(__ptr,__n_bytes))
+__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_Memdup,(void const *__restrict __ptr, __SIZE_TYPE__ __n_bytes),Memdup,(__ptr,__n_bytes))
 #elif defined(__CRT_HAVE_Malloc)
 #include <local/kos.malloc/Memdup.h>
 /* @throws: E_BADALLOC: ... */
@@ -56,11 +56,11 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_ALLOC_SIZE((2)) __
 
 __NAMESPACE_LOCAL_BEGIN
 /* @throws: E_BADALLOC: ... */
-__LOCAL_LIBC(Memcdup) __ATTR_WUNUSED __ATTR_MALL_DEFAULT_ALIGNED __ATTR_ALLOC_SIZE((2)) __ATTR_MALLOC __ATTR_RETNONNULL __ATTR_NONNULL((1)) void *
+__LOCAL_LIBC(Memcdup) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_ALLOC_SIZE((2)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(Memcdup))(void const *__restrict __ptr,
                                                      int __needle,
                                                      __SIZE_TYPE__ __n_bytes) {
-#line 88 "kos/src/libc/magic/kos.malloc.c"
+#line 86 "kos/src/libc/magic/kos.malloc.c"
 	if __likely(__n_bytes) {
 		void const *__endaddr;
 		__endaddr = __localdep_memchr(__ptr, __needle, __n_bytes - 1);

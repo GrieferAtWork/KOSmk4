@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8cd53163 */
+/* HASH CRC-32:0xc2871bab */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 #ifdef __std___localdep_wcsspn_defined
 __NAMESPACE_STD_USING(__localdep_wcsspn)
 #elif defined(__CRT_HAVE_wcsspn)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsspn,(__WCHAR_TYPE__ const *__haystack, __WCHAR_TYPE__ const *__accept),wcsspn,(__haystack,__accept))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsspn,(__WCHAR_TYPE__ const *__haystack, __WCHAR_TYPE__ const *__accept),wcsspn,(__haystack,__accept))
 #else /* LIBC: wcsspn */
 #include <local/wchar/wcsspn.h>
 #define __localdep_wcsspn (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcsspn))
@@ -38,7 +38,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NO
 #ifdef __std___localdep_wcscspn_defined
 __NAMESPACE_STD_USING(__localdep_wcscspn)
 #elif defined(__CRT_HAVE_wcscspn)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcscspn,(__WCHAR_TYPE__ const *__haystack, __WCHAR_TYPE__ const *__reject),wcscspn,(__haystack,__reject))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcscspn,(__WCHAR_TYPE__ const *__haystack, __WCHAR_TYPE__ const *__reject),wcscspn,(__haystack,__reject))
 #else /* LIBC: wcscspn */
 #include <local/wchar/wcscspn.h>
 #define __localdep_wcscspn (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcscspn))

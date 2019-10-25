@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x60e6f816 */
+/* HASH CRC-32:0xe6917b51 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,9 +25,9 @@
 #ifdef __std___localdep_iswblank_defined
 __NAMESPACE_STD_USING(__localdep_iswblank)
 #elif __has_builtin(__builtin_iswblank) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswblank)
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL __localdep_iswblank)(__WINT_TYPE__ __wc) { return __builtin_iswblank(__wc); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_iswblank)(__WINT_TYPE__ __wc) { return __builtin_iswblank(__wc); }
 #elif defined(__CRT_HAVE_iswblank)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__localdep_iswblank,(__WINT_TYPE__ __wc),iswblank,(__wc))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswblank,(__WINT_TYPE__ __wc),iswblank,(__wc))
 #else /* LIBC: iswblank */
 #include <local/wctype/iswblank.h>
 #define __localdep_iswblank (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswblank))
@@ -35,7 +35,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__localdep_iswblank,(__WIN
 #endif /* !____localdep_iswblank_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(iswblank_l) __ATTR_WUNUSED __ATTR_PURE int
+__LOCAL_LIBC(iswblank_l) __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(iswblank_l))(__WINT_TYPE__ __wc,
                                                         __locale_t __locale) {
 #line 286 "kos/src/libc/magic/wctype.c"

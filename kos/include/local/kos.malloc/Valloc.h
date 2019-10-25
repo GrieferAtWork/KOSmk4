@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbc386d92 */
+/* HASH CRC-32:0x6b5a3ce8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 #define ____localdep_Memalign_defined 1
 #if defined(__CRT_HAVE_Memalign)
 /* @throws: E_BADALLOC: ... */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_ALLOC_ALIGN(1) __ATTR_ALLOC_SIZE((2)) __ATTR_MALLOC __ATTR_RETNONNULL,void *,__NOTHROW_NCX,__localdep_Memalign,(__SIZE_TYPE__ __alignment, __SIZE_TYPE__ __n_bytes),Memalign,(__alignment,__n_bytes))
+__CREDIRECT(__ATTR_MALLOC __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_ALIGN(1),void *,__NOTHROW_NCX,__localdep_Memalign,(__SIZE_TYPE__ __alignment, __SIZE_TYPE__ __n_bytes),Memalign,(__alignment,__n_bytes))
 #else /* LIBC: Memalign */
 #undef ____localdep_Memalign_defined
 #endif /* Memalign... */
@@ -53,9 +53,9 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_getpagesize
 
 __NAMESPACE_LOCAL_BEGIN
 /* @throws: E_BADALLOC: ... */
-__LOCAL_LIBC(Valloc) __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_MALL_PAGEALIGNED __ATTR_ALLOC_SIZE((1)) void *
+__LOCAL_LIBC(Valloc) __ATTR_MALL_PAGEALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(Valloc))(__SIZE_TYPE__ __n_bytes) {
-#line 66 "kos/src/libc/magic/kos.malloc.c"
+#line 64 "kos/src/libc/magic/kos.malloc.c"
 	return __localdep_Memalign(__localdep_getpagesize(), __n_bytes);
 }
 __NAMESPACE_LOCAL_END

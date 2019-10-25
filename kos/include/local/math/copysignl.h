@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6b256d61 */
+/* HASH CRC-32:0xc00d8b96 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #define __local_copysignl_defined 1
 __NAMESPACE_LOCAL_BEGIN
 /* Return X with its signed changed to Y's */
-__LOCAL_LIBC(copysignl) __ATTR_WUNUSED __ATTR_CONST long double
+__LOCAL_LIBC(copysignl) __ATTR_CONST __ATTR_WUNUSED long double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(copysignl))(long double __num,
                                                    long double __sign) {
 #line 391 "kos/src/libc/magic/math.c"

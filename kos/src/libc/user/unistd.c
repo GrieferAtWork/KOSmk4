@@ -1271,8 +1271,8 @@ NOTHROW_NCX(LIBCCALL libc_dup3)(fd_t oldfd,
 }
 /*[[[end:dup3]]]*/
 
-/*[[[head:get_current_dir_name,hash:CRC-32=0xbcf67a29]]]*/
-INTERN WUNUSED ATTR_MALLOC
+/*[[[head:get_current_dir_name,hash:CRC-32=0x7bdda17d]]]*/
+INTERN ATTR_MALLOC WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.basic_property.get_current_dir_name") char *
 NOTHROW_RPC(LIBCCALL libc_get_current_dir_name)(void)
 /*[[[body:get_current_dir_name]]]*/
@@ -1387,8 +1387,8 @@ NOTHROW_RPC(LIBCCALL libc_usleep)(useconds_t useconds)
 }
 /*[[[end:usleep]]]*/
 
-/*[[[head:getwd,hash:CRC-32=0x97252e05]]]*/
-INTERN ATTR_DEPRECATED("Use getcwd()") NONNULL((1))
+/*[[[head:getwd,hash:CRC-32=0x65bd7dfc]]]*/
+INTERN NONNULL((1)) ATTR_DEPRECATED("Use getcwd()")
 ATTR_WEAK ATTR_SECTION(".text.crt.fs.basic_property.getwd") char *
 NOTHROW_RPC(LIBCCALL libc_getwd)(char *buf)
 /*[[[body:getwd]]]*/

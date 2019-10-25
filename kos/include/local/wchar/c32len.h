@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d97f1fd */
+/* HASH CRC-32:0xc932a5c7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #define ____localdep_c32end_defined 1
 #if defined(__CRT_HAVE_wcsend) && (__SIZEOF_WCHAR_T__ == 4)
 /* Same as `STR+c32len(STR)' */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_RETNONNULL __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_c32end,(__CHAR32_TYPE__ const *__restrict __string),wcsend,(__string))
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR32_TYPE__ *,__NOTHROW_NCX,__localdep_c32end,(__CHAR32_TYPE__ const *__restrict __string),wcsend,(__string))
 #elif __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/wcsend.h>
 /* Same as `STR+c32len(STR)' */
@@ -38,7 +38,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_RETNONNULL __ATTR_NONNULL((1)),__C
 
 __NAMESPACE_LOCAL_BEGIN
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
-__LOCAL_LIBC(c32len) __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) __SIZE_TYPE__
+__LOCAL_LIBC(c32len) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(c32len))(__CHAR32_TYPE__ const *__restrict __string) {
 #line 212 "kos/src/libc/magic/string.c"
 	return (__SIZE_TYPE__)(__localdep_c32end(__string) - __string);

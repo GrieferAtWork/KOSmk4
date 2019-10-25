@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xced0e9f5 */
+/* HASH CRC-32:0x2d2af92f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,7 +55,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),char *,,__localdep_fgets,(char
 #endif /* !____localdep_fgets_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(gets) __ATTR_WUNUSED __ATTR_DEPRECATED("No buffer size checks (use `fgets' instead)") __ATTR_NONNULL((1)) char *
+__LOCAL_LIBC(gets) __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_DEPRECATED("No buffer size checks (use `fgets' instead)") char *
 (__LIBCCALL __LIBC_LOCAL_NAME(gets))(char *__restrict __buf) __THROWS(...) {
 #line 888 "kos/src/libc/magic/stdio.c"
 	return __localdep_fgets(__buf, __INT_MAX__, __LOCAL_stdin);

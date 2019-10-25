@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4eee36c8 */
+/* HASH CRC-32:0xc899b58f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,9 +23,9 @@
 #ifndef ____localdep_iswlower_defined
 #define ____localdep_iswlower_defined 1
 #if __has_builtin(__builtin_iswlower) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswlower)
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL __localdep_iswlower)(__WINT_TYPE__ __wc) { return __builtin_iswlower(__wc); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_iswlower)(__WINT_TYPE__ __wc) { return __builtin_iswlower(__wc); }
 #elif defined(__CRT_HAVE_iswlower)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__localdep_iswlower,(__WINT_TYPE__ __wc),iswlower,(__wc))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswlower,(__WINT_TYPE__ __wc),iswlower,(__wc))
 #else /* LIBC: iswlower */
 #include <local/wctype/iswlower.h>
 #define __localdep_iswlower (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswlower))
@@ -33,7 +33,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__localdep_iswlower,(__WIN
 #endif /* !____localdep_iswlower_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(iswlower_l) __ATTR_WUNUSED __ATTR_PURE int
+__LOCAL_LIBC(iswlower_l) __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(iswlower_l))(__WINT_TYPE__ __wc,
                                                         __locale_t __locale) {
 #line 250 "kos/src/libc/magic/wctype.c"

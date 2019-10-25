@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1e65d9c8 */
+/* HASH CRC-32:0x3334bde5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #define __local_fmaxf_defined 1
 __NAMESPACE_LOCAL_BEGIN
 /* Return maximum numeric value from X and Y */
-__LOCAL_LIBC(fmaxf) __ATTR_WUNUSED __ATTR_CONST float
+__LOCAL_LIBC(fmaxf) __ATTR_CONST __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fmaxf))(float __x,
                                                float __y) {
 #line 533 "kos/src/libc/magic/math.c"

@@ -34,7 +34,7 @@ DECL_BEGIN
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:format_waprintf_pack,hash:CRC-32=0x9234ff1d]]]*/
+/*[[[head:format_waprintf_pack,hash:CRC-32=0x407f357e]]]*/
 /* Pack and finalize a given aprintf format printer
  * Together with `format_waprintf_printer()', the aprintf
  * format printer sub-system should be used as follows:
@@ -55,7 +55,7 @@ DECL_BEGIN
  *                  but may differ from `wcslen(return)' when NUL characters were
  *                  printed to the waprintf-printer at one point.
  *                  (e.g. `format_waprintf_printer(&my_printer, L"\0", 1)') */
-INTERN WUNUSED ATTR_MALL_DEFAULT_ALIGNED ATTR_MALLOC NONNULL((1))
+INTERN ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.string.format.format_waprintf_pack") char32_t *
 NOTHROW_NCX(LIBCCALL libc_format_waprintf_pack)(struct format_c32aprintf_data *__restrict self,
                                                 size_t *pstrlen)
@@ -102,7 +102,7 @@ NOTHROW_NCX(LIBCCALL libc_format_waprintf_pack)(struct format_c32aprintf_data *_
 }
 /*[[[end:format_waprintf_pack]]]*/
 
-/*[[[head:DOS$format_waprintf_pack,hash:CRC-32=0xa462da39]]]*/
+/*[[[head:DOS$format_waprintf_pack,hash:CRC-32=0x6a99b474]]]*/
 /* Pack and finalize a given aprintf format printer
  * Together with `format_waprintf_printer()', the aprintf
  * format printer sub-system should be used as follows:
@@ -123,7 +123,7 @@ NOTHROW_NCX(LIBCCALL libc_format_waprintf_pack)(struct format_c32aprintf_data *_
  *                  but may differ from `wcslen(return)' when NUL characters were
  *                  printed to the waprintf-printer at one point.
  *                  (e.g. `format_waprintf_printer(&my_printer, L"\0", 1)') */
-INTERN WUNUSED ATTR_MALL_DEFAULT_ALIGNED ATTR_MALLOC NONNULL((1))
+INTERN ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.string.format.format_waprintf_pack") char16_t *
 NOTHROW_NCX(LIBDCALL libd_format_waprintf_pack)(struct format_c16aprintf_data *__restrict self,
                                                 size_t *pstrlen)

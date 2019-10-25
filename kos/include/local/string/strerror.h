@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7a29c1ad */
+/* HASH CRC-32:0x8a2ebbaf */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #ifndef ____localdep_strerror_s_defined
 #define ____localdep_strerror_s_defined 1
 #if defined(__CRT_HAVE_strerror_s)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,char const *,__NOTHROW,__localdep_strerror_s,(int __errnum),strerror_s,(__errnum))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_strerror_s,(int __errnum),strerror_s,(__errnum))
 #else /* LIBC: strerror_s */
 #include <local/string/strerror_s.h>
 #define __localdep_strerror_s (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strerror_s))
@@ -49,11 +49,11 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__loca
 #if __has_builtin(__builtin_sprintf) && __has_builtin(__builtin_va_arg_pack) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sprintf)
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Return the number of written characters, excluding a trailing NUL-character */
-__FORCELOCAL __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL __localdep_sprintf)(char *__restrict __buf, char const *__restrict __format, ...) { return __builtin_sprintf(__buf, __format, __builtin_va_arg_pack()); }
+__FORCELOCAL __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL __localdep_sprintf)(char *__restrict __buf, char const *__restrict __format, ...) { return __builtin_sprintf(__buf, __format, __builtin_va_arg_pack()); }
 #elif defined(__CRT_HAVE_sprintf) && !defined(__NO_ASMNAME)
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Return the number of written characters, excluding a trailing NUL-character */
-__LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL __localdep_sprintf)(char *__restrict __buf, char const *__restrict __format, ...) __CASMNAME("sprintf");
+__LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL __localdep_sprintf)(char *__restrict __buf, char const *__restrict __format, ...) __CASMNAME("sprintf");
 #else /* LIBC: sprintf */
 #include <local/stdio/sprintf.h>
 /* Print a formatted string to a given in-member string buffer `BUF'
@@ -64,7 +64,7 @@ __LIBC __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T __NO
 
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC_DATA(__strerror_buf) char __strerror_buf[64] = { 0 };
-__LOCAL_LIBC(strerror) __ATTR_WUNUSED __ATTR_RETNONNULL char *
+__LOCAL_LIBC(strerror) __ATTR_RETNONNULL __ATTR_WUNUSED char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strerror))(int __errnum) {
 #line 375 "kos/src/libc/magic/string.c"
 	char *__result = __strerror_buf;

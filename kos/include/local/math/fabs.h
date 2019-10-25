@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc27c0b07 */
+/* HASH CRC-32:0x331a5cd3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #define __local_fabs_defined 1
 __NAMESPACE_LOCAL_BEGIN
 /* Absolute value of X */
-__LOCAL_LIBC(fabs) __ATTR_WUNUSED __ATTR_CONST double
+__LOCAL_LIBC(fabs) __ATTR_CONST __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fabs))(double __x) {
 #line 356 "kos/src/libc/magic/math.c"
 	return __x < 0 ? -__x : __x;

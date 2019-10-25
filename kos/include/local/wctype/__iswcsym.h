@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x48d4f352 */
+/* HASH CRC-32:0x649d4f64 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,9 +23,9 @@
 #ifndef ____localdep_iswalnum_defined
 #define ____localdep_iswalnum_defined 1
 #if __has_builtin(__builtin_iswalnum) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswalnum)
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL __localdep_iswalnum)(__WINT_TYPE__ __wc) { return __builtin_iswalnum(__wc); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_iswalnum)(__WINT_TYPE__ __wc) { return __builtin_iswalnum(__wc); }
 #elif defined(__CRT_HAVE_iswalnum)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__localdep_iswalnum,(__WINT_TYPE__ __wc),iswalnum,(__wc))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswalnum,(__WINT_TYPE__ __wc),iswalnum,(__wc))
 #else /* LIBC: iswalnum */
 #include <local/wctype/iswalnum.h>
 #define __localdep_iswalnum (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswalnum))
@@ -33,7 +33,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__localdep_iswalnum,(__WIN
 #endif /* !____localdep_iswalnum_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(__iswcsym) __ATTR_WUNUSED __ATTR_CONST int
+__LOCAL_LIBC(__iswcsym) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(__iswcsym))(__WINT_TYPE__ __wc) {
 #line 376 "kos/src/libc/magic/wctype.c"
 	return __localdep_iswalnum(__wc) || __wc == '_' || __wc == '$';

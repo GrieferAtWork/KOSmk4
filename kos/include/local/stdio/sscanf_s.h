@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8ac6555a */
+/* HASH CRC-32:0xdcd26ce4 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,14 +24,14 @@
 #ifndef ____localdep_vsscanf_s_defined
 #define ____localdep_vsscanf_s_defined 1
 #if defined(__CRT_HAVE_vsscanf_s)
-__CREDIRECT(__ATTR_LIBC_PRINTF(2, 0) __ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vsscanf_s,(char const *__restrict __input, char const *__restrict __format, __builtin_va_list __args),vsscanf_s,(__input,__format,__args))
+__CREDIRECT(__ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 0),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep_vsscanf_s,(char const *__restrict __input, char const *__restrict __format, __builtin_va_list __args),vsscanf_s,(__input,__format,__args))
 #else /* LIBC: vsscanf_s */
 #undef ____localdep_vsscanf_s_defined
 #endif /* vsscanf_s... */
 #endif /* !____localdep_vsscanf_s_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(sscanf_s) __ATTR_LIBC_PRINTF(2, 3) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
+__LOCAL_LIBC(sscanf_s) __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SIZE_T
 __NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(sscanf_s))(char const *__restrict __input,
                                                        char const *__restrict __format,
                                                        ...) {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e9fdbb5 */
+/* HASH CRC-32:0x71792499 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,13 +24,13 @@
 #define ____localdep_round_defined 1
 #if __has_builtin(__builtin_round) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_round)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL __localdep_round)(double __x) { return __builtin_round(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_round)(double __x) { return __builtin_round(__x); }
 #elif defined(__CRT_HAVE_round)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,__localdep_round,(double __x),round,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_round,(double __x),round,(__x))
 #elif defined(__CRT_HAVE___round)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,__localdep_round,(double __x),__round,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_round,(double __x),__round,(__x))
 #else /* LIBC: round */
 #include <local/math/round.h>
 /* Round X to nearest integral value, rounding halfway cases away from zero */
@@ -40,7 +40,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,__localdep_round,(doubl
 
 __NAMESPACE_LOCAL_BEGIN
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__LOCAL_LIBC(lround) __ATTR_WUNUSED __ATTR_CONST long int
+__LOCAL_LIBC(lround) __ATTR_CONST __ATTR_WUNUSED long int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(lround))(double __x) {
 #line 521 "kos/src/libc/magic/math.c"
 	return (long int)__localdep_round(__x);

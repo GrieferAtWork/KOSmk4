@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1d7aaf68 */
+/* HASH CRC-32:0x9b0d2c2f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,9 +23,9 @@
 #ifndef ____localdep_iswcntrl_defined
 #define ____localdep_iswcntrl_defined 1
 #if __has_builtin(__builtin_iswcntrl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswcntrl)
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL __localdep_iswcntrl)(__WINT_TYPE__ __wc) { return __builtin_iswcntrl(__wc); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_iswcntrl)(__WINT_TYPE__ __wc) { return __builtin_iswcntrl(__wc); }
 #elif defined(__CRT_HAVE_iswcntrl)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__localdep_iswcntrl,(__WINT_TYPE__ __wc),iswcntrl,(__wc))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswcntrl,(__WINT_TYPE__ __wc),iswcntrl,(__wc))
 #else /* LIBC: iswcntrl */
 #include <local/wctype/iswcntrl.h>
 #define __localdep_iswcntrl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswcntrl))
@@ -33,7 +33,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__localdep_iswcntrl,(__WIN
 #endif /* !____localdep_iswcntrl_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(iswcntrl_l) __ATTR_WUNUSED __ATTR_PURE int
+__LOCAL_LIBC(iswcntrl_l) __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(iswcntrl_l))(__WINT_TYPE__ __wc,
                                                         __locale_t __locale) {
 #line 232 "kos/src/libc/magic/wctype.c"

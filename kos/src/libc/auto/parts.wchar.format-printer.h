@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb839da09 */
+/* HASH CRC-32:0x5468113c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -172,7 +172,7 @@ INTDEF NONNULL((1)) ssize_t NOTHROW_NCX(LIBDCALL libd_format_whexdump)(pc16forma
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
-INTDEF ATTR_LIBC_PRINTF(3, 0) NONNULL((1, 3)) ssize_t NOTHROW_NCX(LIBCCALL libc_format_vwprintf)(pc32formatprinter printer, void *arg, char32_t const *__restrict format, __builtin_va_list args);
+INTDEF NONNULL((1, 3)) ATTR_LIBC_PRINTF(3, 0) ssize_t NOTHROW_NCX(LIBCCALL libc_format_vwprintf)(pc32formatprinter printer, void *arg, char32_t const *__restrict format, __builtin_va_list args);
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings
@@ -260,7 +260,7 @@ INTDEF ATTR_LIBC_PRINTF(3, 0) NONNULL((1, 3)) ssize_t NOTHROW_NCX(LIBCCALL libc_
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
-INTDEF ATTR_LIBC_PRINTF(3, 0) NONNULL((1, 3)) ssize_t NOTHROW_NCX(LIBDCALL libd_format_vwprintf)(pc16formatprinter printer, void *arg, char16_t const *__restrict format, __builtin_va_list args);
+INTDEF NONNULL((1, 3)) ATTR_LIBC_PRINTF(3, 0) ssize_t NOTHROW_NCX(LIBDCALL libd_format_vwprintf)(pc16formatprinter printer, void *arg, char16_t const *__restrict format, __builtin_va_list args);
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings
@@ -348,7 +348,7 @@ INTDEF ATTR_LIBC_PRINTF(3, 0) NONNULL((1, 3)) ssize_t NOTHROW_NCX(LIBDCALL libd_
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
-INTDEF ATTR_LIBC_PRINTF(3, 4) NONNULL((1, 3)) ssize_t NOTHROW_NCX(VLIBCCALL libc_format_wprintf)(pc32formatprinter printer, void *arg, char32_t const *__restrict format, ...);
+INTDEF NONNULL((1, 3)) ATTR_LIBC_PRINTF(3, 4) ssize_t NOTHROW_NCX(VLIBCCALL libc_format_wprintf)(pc32formatprinter printer, void *arg, char32_t const *__restrict format, ...);
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings
@@ -436,7 +436,7 @@ INTDEF ATTR_LIBC_PRINTF(3, 4) NONNULL((1, 3)) ssize_t NOTHROW_NCX(VLIBCCALL libc
  *                      increasing the buffer when it gets filled completely.
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
-INTDEF ATTR_LIBC_PRINTF(3, 4) NONNULL((1, 3)) ssize_t NOTHROW_NCX(VLIBDCALL libd_format_wprintf)(pc16formatprinter printer, void *arg, char16_t const *__restrict format, ...);
+INTDEF NONNULL((1, 3)) ATTR_LIBC_PRINTF(3, 4) ssize_t NOTHROW_NCX(VLIBDCALL libd_format_wprintf)(pc16formatprinter printer, void *arg, char16_t const *__restrict format, ...);
 /* Format-printer implementation for printing to a string buffer like `wsprintf' would
  * WARNING: No trailing NUL-character is implicitly appended */
 INTDEF NONNULL((1, 2)) ssize_t NOTHROW_NCX(LIBCCALL libc_format_wsprintf_printer)(/*wchar_t ***/void *arg, char32_t const *__restrict data, size_t datalen);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xda05d1fe */
+/* HASH CRC-32:0xfffc8b1e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #ifndef ____localdep__vsnscanf_l_defined
 #define ____localdep__vsnscanf_l_defined 1
 #if defined(__CRT_HAVE__vsnscanf_l)
-__CREDIRECT(__ATTR_LIBC_SCANF(3, 5) __ATTR_NONNULL((1, 3)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep__vsnscanf_l,(char const *__restrict __input, __SIZE_TYPE__ __inputlen, char const *__restrict __format, __locale_t __locale, __builtin_va_list __args),_vsnscanf_l,(__input,__inputlen,__format,__locale,__args))
+__CREDIRECT(__ATTR_NONNULL((1, 3)) __ATTR_LIBC_SCANF(3, 5),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep__vsnscanf_l,(char const *__restrict __input, __SIZE_TYPE__ __inputlen, char const *__restrict __format, __locale_t __locale, __builtin_va_list __args),_vsnscanf_l,(__input,__inputlen,__format,__locale,__args))
 #else /* LIBC: _vsnscanf_l */
 #include <local/stdio/_vsnscanf_l.h>
 #define __localdep__vsnscanf_l (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_vsnscanf_l))
@@ -32,7 +32,7 @@ __CREDIRECT(__ATTR_LIBC_SCANF(3, 5) __ATTR_NONNULL((1, 3)),__STDC_INT_AS_SIZE_T,
 #endif /* !____localdep__vsnscanf_l_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_snscanf_l) __ATTR_LIBC_SCANF(3, 5) __ATTR_NONNULL((1, 3)) __STDC_INT_AS_SIZE_T
+__LOCAL_LIBC(_snscanf_l) __ATTR_NONNULL((1, 3)) __ATTR_LIBC_SCANF(3, 5) __STDC_INT_AS_SIZE_T
 __NOTHROW_NCX(__VLIBCCALL __LIBC_LOCAL_NAME(_snscanf_l))(char const *__restrict __input,
                                                          __SIZE_TYPE__ __inputlen,
                                                          char const *__restrict __format,

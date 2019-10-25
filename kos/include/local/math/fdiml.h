@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbc05b018 */
+/* HASH CRC-32:0xe5e9ca59 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,13 +24,13 @@
 #define ____localdep_fabsl_defined 1
 #if __has_builtin(__builtin_fabsl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fabsl)
 /* Absolute value of X */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL __localdep_fabsl)(long double __x) { return __builtin_fabsl(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __localdep_fabsl)(long double __x) { return __builtin_fabsl(__x); }
 #elif defined(__CRT_HAVE_fabsl)
 /* Absolute value of X */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,__localdep_fabsl,(long double __x),fabsl,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,__localdep_fabsl,(long double __x),fabsl,(__x))
 #elif defined(__CRT_HAVE___fabsl)
 /* Absolute value of X */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,__localdep_fabsl,(long double __x),__fabsl,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,__localdep_fabsl,(long double __x),__fabsl,(__x))
 #else /* LIBC: fabsl */
 #include <local/math/fabsl.h>
 /* Absolute value of X */
@@ -40,7 +40,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,__localdep_fabsl,(
 
 __NAMESPACE_LOCAL_BEGIN
 /* Return positive difference between X and Y */
-__LOCAL_LIBC(fdiml) __ATTR_WUNUSED __ATTR_CONST long double
+__LOCAL_LIBC(fdiml) __ATTR_CONST __ATTR_WUNUSED long double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fdiml))(long double __x,
                                                long double __y) {
 #line 527 "kos/src/libc/magic/math.c"

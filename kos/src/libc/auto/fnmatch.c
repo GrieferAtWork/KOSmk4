@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x63c654f0 */
+/* HASH CRC-32:0x2f4ff55 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,7 +31,7 @@ DECL_BEGIN
 #ifndef __KERNEL__
 /* Match NAME against the filename pattern PATTERN,
  * returning zero if it matches, FNM_NOMATCH if not */
-INTERN WUNUSED ATTR_PURE NONNULL((1, 2))
+INTERN ATTR_PURE WUNUSED NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.match.fnmatch") int
 NOTHROW_NCX(LIBCCALL libc_fnmatch)(char const *pattern,
                                    char const *name,

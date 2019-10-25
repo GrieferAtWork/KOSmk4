@@ -3094,10 +3094,10 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.write.write.fputs_unlocked") __S
 }
 /*[[[end:fputs_unlocked]]]*/
 
-/*[[[head:vfprintf,hash:CRC-32=0xd063ada8]]]*/
+/*[[[head:vfprintf,hash:CRC-32=0x708180a7]]]*/
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */
-INTERN ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2))
+INTERN NONNULL((1, 2)) ATTR_LIBC_PRINTF(2, 0)
 ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.write.printf.vfprintf") __STDC_INT_AS_SSIZE_T
 (LIBCCALL libc_vfprintf)(FILE *__restrict stream,
                          char const *__restrict format,
@@ -3109,8 +3109,8 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.write.printf.vfprintf") __STDC_INT
 }
 /*[[[end:vfprintf]]]*/
 
-/*[[[head:vfprintf_unlocked,hash:CRC-32=0x3fe4634e]]]*/
-INTERN ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2))
+/*[[[head:vfprintf_unlocked,hash:CRC-32=0x595e72d9]]]*/
+INTERN NONNULL((1, 2)) ATTR_LIBC_PRINTF(2, 0)
 ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.write.printf.vfprintf_unlocked") __STDC_INT_AS_SSIZE_T
 (LIBCCALL libc_vfprintf_unlocked)(FILE *__restrict stream,
                                   char const *__restrict format,
@@ -3143,10 +3143,10 @@ PRIVATE ssize_t LIBCCALL vfscanf_getc_unlocked(void *arg) {
 
 #endif /* __SIZEOF_SIZE_T__ != __SIZEOF_INT__ */
 
-/*[[[head:vfscanf,hash:CRC-32=0x7a349a29]]]*/
+/*[[[head:vfscanf,hash:CRC-32=0x6d8ebbce]]]*/
 /* Scan data from `STREAM', following `FORMAT'
  * Return the number of successfully scanned data items */
-INTERN ATTR_LIBC_SCANF(2, 0) WUNUSED NONNULL((1, 2))
+INTERN WUNUSED NONNULL((1, 2)) ATTR_LIBC_SCANF(2, 0)
 ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.read.scanf.vfscanf") __STDC_INT_AS_SIZE_T
 (LIBCCALL libc_vfscanf)(FILE *__restrict stream,
                         char const *__restrict format,
@@ -3162,10 +3162,10 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.read.scanf.vfscanf") __STDC_INT_AS
 }
 /*[[[end:vfscanf]]]*/
 
-/*[[[head:vfscanf_unlocked,hash:CRC-32=0x989f3b3a]]]*/
+/*[[[head:vfscanf_unlocked,hash:CRC-32=0x3e3d5bc4]]]*/
 /* Scan data from `STREAM', following `FORMAT'
  * Return the number of successfully scanned data items */
-INTERN ATTR_LIBC_SCANF(2, 0) WUNUSED NONNULL((1, 2))
+INTERN WUNUSED NONNULL((1, 2)) ATTR_LIBC_SCANF(2, 0)
 ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.read.scanf.vfscanf_unlocked") __STDC_INT_AS_SIZE_T
 (LIBCCALL libc_vfscanf_unlocked)(FILE *__restrict stream,
                                  char const *__restrict format,
@@ -3511,9 +3511,9 @@ NOTHROW_NCX(LIBCCALL libc_tmpnam_r)(char *buf)
 }
 /*[[[end:tmpnam_r]]]*/
 
-/*[[[head:vasprintf,hash:CRC-32=0xe2f68820]]]*/
+/*[[[head:vasprintf,hash:CRC-32=0x65a2c31f]]]*/
 /* Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR' */
-INTERN ATTR_LIBC_PRINTF(2, 3) WUNUSED NONNULL((1, 2))
+INTERN WUNUSED NONNULL((1, 2)) ATTR_LIBC_PRINTF(2, 3)
 ATTR_WEAK ATTR_SECTION(".text.crt.heap.strdup.vasprintf") __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(LIBCCALL libc_vasprintf)(char **__restrict pstr,
                                      char const *__restrict format,
@@ -3731,8 +3731,8 @@ ssize_t LIBCCALL __vdprintf_printer(void *arg, char const *__restrict data, size
 }
 #endif
 
-/*[[[head:vdprintf,hash:CRC-32=0xbcbc0d24]]]*/
-INTERN ATTR_LIBC_PRINTF(2, 0) NONNULL((2))
+/*[[[head:vdprintf,hash:CRC-32=0x968bf0aa]]]*/
+INTERN NONNULL((2)) ATTR_LIBC_PRINTF(2, 0)
 ATTR_WEAK ATTR_SECTION(".text.crt.io.write.vdprintf") __STDC_INT_AS_SSIZE_T
 NOTHROW_RPC(LIBCCALL libc_vdprintf)(fd_t fd,
                                     char const *__restrict format,
@@ -3746,8 +3746,8 @@ NOTHROW_RPC(LIBCCALL libc_vdprintf)(fd_t fd,
 }
 /*[[[end:vdprintf]]]*/
 
-/*[[[head:obstack_printf,hash:CRC-32=0x48b07b1d]]]*/
-INTERN ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2))
+/*[[[head:obstack_printf,hash:CRC-32=0x25ecf132]]]*/
+INTERN NONNULL((1, 2)) ATTR_LIBC_PRINTF(2, 3)
 ATTR_WEAK ATTR_SECTION(".text.crt.obstack.obstack_printf") int
 NOTHROW_NCX(VLIBCCALL libc_obstack_printf)(struct obstack *__restrict obstack_,
                                            char const *__restrict format,
@@ -4007,10 +4007,10 @@ NOTHROW_RPC(LIBCCALL libc__rmtmp)(void)
 
 
 
-/*[[[head:fprintf,hash:CRC-32=0x8bd1d230]]]*/
+/*[[[head:fprintf,hash:CRC-32=0x564f388d]]]*/
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */
-INTERN ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2))
+INTERN NONNULL((1, 2)) ATTR_LIBC_PRINTF(2, 3)
 ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.write.printf.fprintf") __STDC_INT_AS_SSIZE_T
 (VLIBCCALL libc_fprintf)(FILE *__restrict stream,
                          char const *__restrict format,
@@ -4030,8 +4030,8 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.write.printf.fprintf") __STDC_INT_
 
 
 
-/*[[[head:obstack_vprintf,hash:CRC-32=0x4e0b1367]]]*/
-INTERN ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2))
+/*[[[head:obstack_vprintf,hash:CRC-32=0x9f26c855]]]*/
+INTERN NONNULL((1, 2)) ATTR_LIBC_PRINTF(2, 0)
 ATTR_WEAK ATTR_SECTION(".text.crt.obstack.obstack_vprintf") int
 NOTHROW_NCX(LIBCCALL libc_obstack_vprintf)(struct obstack *__restrict obstack_,
                                            char const *__restrict format,
@@ -4044,8 +4044,8 @@ NOTHROW_NCX(LIBCCALL libc_obstack_vprintf)(struct obstack *__restrict obstack_,
 }
 /*[[[end:obstack_vprintf]]]*/
 
-/*[[[head:gets,hash:CRC-32=0x30db37f2]]]*/
-INTERN WUNUSED ATTR_DEPRECATED("No buffer size checks (use `fgets' instead)") NONNULL((1))
+/*[[[head:gets,hash:CRC-32=0x27d0026c]]]*/
+INTERN WUNUSED NONNULL((1)) ATTR_DEPRECATED("No buffer size checks (use `fgets' instead)")
 ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.read.read.gets") char *
 (LIBCCALL libc_gets)(char *__restrict buf)
 		__THROWS(...)
@@ -4055,9 +4055,9 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.read.read.gets") char *
 }
 /*[[[end:gets]]]*/
 
-/*[[[head:asprintf,hash:CRC-32=0x395d9cd7]]]*/
+/*[[[head:asprintf,hash:CRC-32=0xd7f9b283]]]*/
 /* Print the given `FORMAT' into a newly allocated, heap-allocated string which is then stored in `*PSTR' */
-INTERN ATTR_LIBC_PRINTF(2, 3) WUNUSED NONNULL((1, 2))
+INTERN WUNUSED NONNULL((1, 2)) ATTR_LIBC_PRINTF(2, 3)
 ATTR_WEAK ATTR_SECTION(".text.crt.heap.strdup.asprintf") __STDC_INT_AS_SSIZE_T
 NOTHROW_NCX(VLIBCCALL libc_asprintf)(char **__restrict pstr,
                                      char const *__restrict format,
@@ -4073,10 +4073,10 @@ NOTHROW_NCX(VLIBCCALL libc_asprintf)(char **__restrict pstr,
 }
 /*[[[end:asprintf]]]*/
 
-/*[[[head:scanf,hash:CRC-32=0xea9040a9]]]*/
+/*[[[head:scanf,hash:CRC-32=0xa79122b2]]]*/
 /* Scan data from `stdin', following `FORMAT'
  * Return the number of successfully scanned data items */
-INTERN ATTR_LIBC_SCANF(1, 2) WUNUSED NONNULL((1))
+INTERN WUNUSED NONNULL((1)) ATTR_LIBC_SCANF(1, 2)
 ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.read.scanf.scanf") __STDC_INT_AS_SIZE_T
 (VLIBCCALL libc_scanf)(char const *__restrict format,
                        ...)
@@ -4160,8 +4160,8 @@ NOTHROW_NCX(LIBCCALL libc_tmpnam_s)(char *__restrict buf,
 }
 /*[[[end:tmpnam_s]]]*/
 
-/*[[[head:sscanf_s,hash:CRC-32=0x717bc8c0]]]*/
-INTERN ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2))
+/*[[[head:sscanf_s,hash:CRC-32=0xd4bed1e0]]]*/
+INTERN NONNULL((1, 2)) ATTR_LIBC_PRINTF(2, 3)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.format.scanf.sscanf_s") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc_sscanf_s)(char const *__restrict input,
                                      char const *__restrict format,
@@ -4184,10 +4184,10 @@ DEFINE_INTERN_ALIAS(libc_fscanf_s, libc_fscanf);
 
 
 
-/*[[[head:printf,hash:CRC-32=0x86bab05b]]]*/
+/*[[[head:printf,hash:CRC-32=0x3aa1a184]]]*/
 /* Print data to `stdout', following `FORMAT'
  * Return the number of successfully printed bytes */
-INTERN ATTR_LIBC_PRINTF(1, 2) NONNULL((1))
+INTERN NONNULL((1)) ATTR_LIBC_PRINTF(1, 2)
 ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.write.printf.printf") __STDC_INT_AS_SSIZE_T
 (VLIBCCALL libc_printf)(char const *__restrict format,
                         ...)
@@ -4203,8 +4203,8 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.write.printf.printf") __STDC_INT_A
 }
 /*[[[end:printf]]]*/
 
-/*[[[head:dprintf,hash:CRC-32=0x3b5d3b44]]]*/
-INTERN ATTR_LIBC_PRINTF(2, 3) NONNULL((2))
+/*[[[head:dprintf,hash:CRC-32=0xad1c4291]]]*/
+INTERN NONNULL((2)) ATTR_LIBC_PRINTF(2, 3)
 ATTR_WEAK ATTR_SECTION(".text.crt.io.write.dprintf") __STDC_INT_AS_SSIZE_T
 NOTHROW_RPC(VLIBCCALL libc_dprintf)(fd_t fd,
                                     char const *__restrict format,
@@ -4222,8 +4222,8 @@ NOTHROW_RPC(VLIBCCALL libc_dprintf)(fd_t fd,
 
 
 
-/*[[[head:vsnprintf_s,hash:CRC-32=0x375ea5b0]]]*/
-INTERN ATTR_LIBC_PRINTF(4, 0) NONNULL((4))
+/*[[[head:vsnprintf_s,hash:CRC-32=0x8b659769]]]*/
+INTERN NONNULL((4)) ATTR_LIBC_PRINTF(4, 0)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.format.printf.vsnprintf_s") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc_vsnprintf_s)(char *__restrict buf,
                                        size_t bufsize,
@@ -4328,8 +4328,8 @@ DEFINE_INTERN_ALIAS(libc_vfscanf_s, libc_vfscanf);
 DEFINE_INTERN_ALIAS(libc_scanf_s, libc_scanf);
 
 
-/*[[[head:_vfprintf_p,hash:CRC-32=0xe4e6249d]]]*/
-INTERN ATTR_LIBC_PRINTF_P(2, 0) NONNULL((1, 2))
+/*[[[head:_vfprintf_p,hash:CRC-32=0x9eff5c68]]]*/
+INTERN NONNULL((1, 2)) ATTR_LIBC_PRINTF_P(2, 0)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.format.printf._vfprintf_p") __STDC_INT_AS_SIZE_T
 (LIBCCALL libc__vfprintf_p)(FILE *__restrict stream,
                             char const *__restrict format,
@@ -4345,8 +4345,8 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.format.printf._vfprintf_p")
 }
 /*[[[end:_vfprintf_p]]]*/
 
-/*[[[head:_vprintf_p,hash:CRC-32=0xec75bea0]]]*/
-INTERN ATTR_LIBC_PRINTF_P(1, 0) NONNULL((1))
+/*[[[head:_vprintf_p,hash:CRC-32=0x61ec7691]]]*/
+INTERN NONNULL((1)) ATTR_LIBC_PRINTF_P(1, 0)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.format.printf._vprintf_p") __STDC_INT_AS_SIZE_T
 (LIBCCALL libc__vprintf_p)(char const *__restrict format,
                            va_list args)
@@ -4357,8 +4357,8 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.format.printf._vprintf_p") 
 }
 /*[[[end:_vprintf_p]]]*/
 
-/*[[[head:_fprintf_p,hash:CRC-32=0x63f90ba0]]]*/
-INTERN ATTR_LIBC_PRINTF_P(2, 3) NONNULL((1, 2))
+/*[[[head:_fprintf_p,hash:CRC-32=0x7c8d8dbb]]]*/
+INTERN NONNULL((1, 2)) ATTR_LIBC_PRINTF_P(2, 3)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.format.printf._fprintf_p") __STDC_INT_AS_SIZE_T
 (VLIBCCALL libc__fprintf_p)(FILE *__restrict stream,
                             char const *__restrict format,
@@ -4375,10 +4375,10 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.format.printf._fprintf_p") 
 }
 /*[[[end:_fprintf_p]]]*/
 
-/*[[[head:fscanf,hash:CRC-32=0x9e85dfcd]]]*/
+/*[[[head:fscanf,hash:CRC-32=0x1b267142]]]*/
 /* Scan data from `STREAM', following `FORMAT'
  * Return the number of successfully scanned data items */
-INTERN ATTR_LIBC_SCANF(2, 3) WUNUSED NONNULL((1, 2))
+INTERN WUNUSED NONNULL((1, 2)) ATTR_LIBC_SCANF(2, 3)
 ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.read.scanf.fscanf") __STDC_INT_AS_SIZE_T
 (VLIBCCALL libc_fscanf)(FILE *__restrict stream,
                         char const *__restrict format,
@@ -4395,8 +4395,8 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.read.scanf.fscanf") __STDC_INT_AS_
 }
 /*[[[end:fscanf]]]*/
 
-/*[[[head:_printf_p,hash:CRC-32=0xd1f5d6a3]]]*/
-INTERN ATTR_LIBC_PRINTF_P(1, 2) NONNULL((1))
+/*[[[head:_printf_p,hash:CRC-32=0x7b7fc668]]]*/
+INTERN NONNULL((1)) ATTR_LIBC_PRINTF_P(1, 2)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.format.printf._printf_p") __STDC_INT_AS_SIZE_T
 (VLIBCCALL libc__printf_p)(char const *__restrict format,
                            ...)
@@ -4416,8 +4416,8 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.format.printf._printf_p") _
 
 
 
-/*[[[head:_vprintf_l,hash:CRC-32=0xcd8c41fa]]]*/
-INTERN ATTR_LIBC_PRINTF(1, 0) NONNULL((1))
+/*[[[head:_vprintf_l,hash:CRC-32=0x6a0cd871]]]*/
+INTERN NONNULL((1)) ATTR_LIBC_PRINTF(1, 0)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._vprintf_l") __STDC_INT_AS_SIZE_T
 (LIBCCALL libc__vprintf_l)(char const *__restrict format,
                            locale_t locale,
@@ -4430,8 +4430,8 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._vprintf_l") 
 }
 /*[[[end:_vprintf_l]]]*/
 
-/*[[[head:_fprintf_s_l,hash:CRC-32=0x309bfa15]]]*/
-INTERN ATTR_LIBC_PRINTF(2, 4) NONNULL((1, 2))
+/*[[[head:_fprintf_s_l,hash:CRC-32=0x437ea981]]]*/
+INTERN NONNULL((1, 2)) ATTR_LIBC_PRINTF(2, 4)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._fprintf_s_l") __STDC_INT_AS_SIZE_T
 (VLIBCCALL libc__fprintf_s_l)(FILE *__restrict stream,
                               char const *__restrict format,
@@ -4449,8 +4449,8 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._fprintf_s_l"
 }
 /*[[[end:_fprintf_s_l]]]*/
 
-/*[[[head:_vscanf_l,hash:CRC-32=0x93d46fa6]]]*/
-INTERN ATTR_LIBC_SCANF(1, 3) WUNUSED NONNULL((1))
+/*[[[head:_vscanf_l,hash:CRC-32=0x11803979]]]*/
+INTERN WUNUSED NONNULL((1)) ATTR_LIBC_SCANF(1, 3)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.FILE.locked.read.scanf._vscanf_l") __STDC_INT_AS_SIZE_T
 (LIBCCALL libc__vscanf_l)(char const *__restrict format,
                           locale_t locale,
@@ -4463,8 +4463,8 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.FILE.locked.read.scanf._vscanf_l") __STDC_
 }
 /*[[[end:_vscanf_l]]]*/
 
-/*[[[head:_vfscanf_l,hash:CRC-32=0xf067c730]]]*/
-INTERN ATTR_LIBC_SCANF(2, 4) WUNUSED NONNULL((1, 2))
+/*[[[head:_vfscanf_l,hash:CRC-32=0xf61f5df]]]*/
+INTERN WUNUSED NONNULL((1, 2)) ATTR_LIBC_SCANF(2, 4)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.FILE.locked.read.scanf._vfscanf_l") __STDC_INT_AS_SIZE_T
 (LIBCCALL libc__vfscanf_l)(FILE *__restrict stream,
                            char const *__restrict format,
@@ -4478,8 +4478,8 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.FILE.locked.read.scanf._vfscanf_l") __STDC
 }
 /*[[[end:_vfscanf_l]]]*/
 
-/*[[[head:_fscanf_l,hash:CRC-32=0xe92ae07e]]]*/
-INTERN ATTR_LIBC_SCANF(2, 4) NONNULL((1, 2))
+/*[[[head:_fscanf_l,hash:CRC-32=0xfd2e3a7a]]]*/
+INTERN NONNULL((1, 2)) ATTR_LIBC_SCANF(2, 4)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.FILE.locked.read.scanf._fscanf_l") __STDC_INT_AS_SIZE_T
 (VLIBCCALL libc__fscanf_l)(FILE *__restrict stream,
                            char const *__restrict format,
@@ -4497,8 +4497,8 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.FILE.locked.read.scanf._fscanf_l") __STDC_
 }
 /*[[[end:_fscanf_l]]]*/
 
-/*[[[head:_scanf_l,hash:CRC-32=0x23c6499d]]]*/
-INTERN ATTR_LIBC_SCANF(1, 3) NONNULL((1))
+/*[[[head:_scanf_l,hash:CRC-32=0xe4177f21]]]*/
+INTERN NONNULL((1)) ATTR_LIBC_SCANF(1, 3)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.FILE.locked.read.scanf._scanf_l") __STDC_INT_AS_SIZE_T
 (VLIBCCALL libc__scanf_l)(char const *__restrict format,
                           locale_t locale,
@@ -4515,8 +4515,8 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.FILE.locked.read.scanf._scanf_l") __STDC_I
 }
 /*[[[end:_scanf_l]]]*/
 
-/*[[[head:_vprintf_p_l,hash:CRC-32=0x9f916dab]]]*/
-INTERN ATTR_LIBC_PRINTF_P(1, 0) NONNULL((1))
+/*[[[head:_vprintf_p_l,hash:CRC-32=0xdd39d17]]]*/
+INTERN NONNULL((1)) ATTR_LIBC_PRINTF_P(1, 0)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._vprintf_p_l") __STDC_INT_AS_SIZE_T
 (LIBCCALL libc__vprintf_p_l)(char const *__restrict format,
                              locale_t locale,
@@ -4529,8 +4529,8 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._vprintf_p_l"
 }
 /*[[[end:_vprintf_p_l]]]*/
 
-/*[[[head:_printf_p_l,hash:CRC-32=0x7164bfa9]]]*/
-INTERN ATTR_LIBC_PRINTF_P(1, 3) NONNULL((1))
+/*[[[head:_printf_p_l,hash:CRC-32=0x9f582be8]]]*/
+INTERN NONNULL((1)) ATTR_LIBC_PRINTF_P(1, 3)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._printf_p_l") __STDC_INT_AS_SIZE_T
 (VLIBCCALL libc__printf_p_l)(char const *__restrict format,
                              locale_t locale,
@@ -4547,8 +4547,8 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._printf_p_l")
 }
 /*[[[end:_printf_p_l]]]*/
 
-/*[[[head:_printf_s_l,hash:CRC-32=0x6cb56a47]]]*/
-INTERN ATTR_LIBC_PRINTF(1, 3) NONNULL((1))
+/*[[[head:_printf_s_l,hash:CRC-32=0x2d158efe]]]*/
+INTERN NONNULL((1)) ATTR_LIBC_PRINTF(1, 3)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._printf_s_l") __STDC_INT_AS_SIZE_T
 (VLIBCCALL libc__printf_s_l)(char const *__restrict format,
                              locale_t locale,
@@ -4565,8 +4565,8 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._printf_s_l")
 }
 /*[[[end:_printf_s_l]]]*/
 
-/*[[[head:_printf_l,hash:CRC-32=0x858dac0d]]]*/
-INTERN ATTR_LIBC_PRINTF(1, 3) NONNULL((1))
+/*[[[head:_printf_l,hash:CRC-32=0x57213e26]]]*/
+INTERN NONNULL((1)) ATTR_LIBC_PRINTF(1, 3)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._printf_l") __STDC_INT_AS_SIZE_T
 (VLIBCCALL libc__printf_l)(char const *__restrict format,
                            locale_t locale,
@@ -4583,8 +4583,8 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._printf_l") _
 }
 /*[[[end:_printf_l]]]*/
 
-/*[[[head:_vfprintf_l,hash:CRC-32=0x3f758a0c]]]*/
-INTERN ATTR_LIBC_PRINTF(2, 0) NONNULL((1, 2))
+/*[[[head:_vfprintf_l,hash:CRC-32=0xcf6a367b]]]*/
+INTERN NONNULL((1, 2)) ATTR_LIBC_PRINTF(2, 0)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._vfprintf_l") __STDC_INT_AS_SIZE_T
 (LIBCCALL libc__vfprintf_l)(FILE *__restrict stream,
                             char const *__restrict format,
@@ -4598,8 +4598,8 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._vfprintf_l")
 }
 /*[[[end:_vfprintf_l]]]*/
 
-/*[[[head:_fprintf_p_l,hash:CRC-32=0x9e256062]]]*/
-INTERN ATTR_LIBC_PRINTF_P(2, 4) NONNULL((1, 2))
+/*[[[head:_fprintf_p_l,hash:CRC-32=0x3e3d0528]]]*/
+INTERN NONNULL((1, 2)) ATTR_LIBC_PRINTF_P(2, 4)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._fprintf_p_l") __STDC_INT_AS_SIZE_T
 (VLIBCCALL libc__fprintf_p_l)(FILE *__restrict stream,
                               char const *__restrict format,
@@ -4617,8 +4617,8 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._fprintf_p_l"
 }
 /*[[[end:_fprintf_p_l]]]*/
 
-/*[[[head:_vfprintf_p_l,hash:CRC-32=0xca3ea1c0]]]*/
-INTERN ATTR_LIBC_PRINTF_P(2, 0) NONNULL((1, 2))
+/*[[[head:_vfprintf_p_l,hash:CRC-32=0x53a80b17]]]*/
+INTERN NONNULL((1, 2)) ATTR_LIBC_PRINTF_P(2, 0)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._vfprintf_p_l") __STDC_INT_AS_SIZE_T
 (LIBCCALL libc__vfprintf_p_l)(FILE *__restrict stream,
                               char const *__restrict format,
@@ -4632,8 +4632,8 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._vfprintf_p_l
 }
 /*[[[end:_vfprintf_p_l]]]*/
 
-/*[[[head:_fprintf_l,hash:CRC-32=0xc1313a5e]]]*/
-INTERN ATTR_LIBC_PRINTF(2, 4) NONNULL((1, 2))
+/*[[[head:_fprintf_l,hash:CRC-32=0x6b013e01]]]*/
+INTERN NONNULL((1, 2)) ATTR_LIBC_PRINTF(2, 4)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._fprintf_l") __STDC_INT_AS_SIZE_T
 (VLIBCCALL libc__fprintf_l)(FILE *__restrict stream,
                             char const *__restrict format,
@@ -4651,10 +4651,10 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.format.printf._fprintf_l") 
 }
 /*[[[end:_fprintf_l]]]*/
 
-/*[[[head:vscanf,hash:CRC-32=0x9c6e3257]]]*/
+/*[[[head:vscanf,hash:CRC-32=0xa6014574]]]*/
 /* Scan data from `stdin', following `FORMAT'
  * Return the number of successfully scanned data items */
-INTERN ATTR_LIBC_SCANF(1, 0) WUNUSED NONNULL((1))
+INTERN WUNUSED NONNULL((1)) ATTR_LIBC_SCANF(1, 0)
 ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.read.scanf.vscanf") __STDC_INT_AS_SIZE_T
 (LIBCCALL libc_vscanf)(char const *__restrict format,
                        va_list args)
@@ -4665,10 +4665,10 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.read.scanf.vscanf") __STDC_INT_AS_
 }
 /*[[[end:vscanf]]]*/
 
-/*[[[head:vscanf_unlocked,hash:CRC-32=0xd6d9ecf4]]]*/
+/*[[[head:vscanf_unlocked,hash:CRC-32=0x8a5ebd19]]]*/
 /* Scan data from `stdin', following `FORMAT'
  * Return the number of successfully scanned data items */
-INTERN ATTR_LIBC_SCANF(1, 0) WUNUSED NONNULL((1))
+INTERN WUNUSED NONNULL((1)) ATTR_LIBC_SCANF(1, 0)
 ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.read.scanf.vscanf_unlocked") __STDC_INT_AS_SIZE_T
 (LIBCCALL libc_vscanf_unlocked)(char const *__restrict format,
                                 va_list args)
@@ -4679,10 +4679,10 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.read.scanf.vscanf_unlocked") __S
 }
 /*[[[end:vscanf_unlocked]]]*/
 
-/*[[[head:vprintf,hash:CRC-32=0x9148134b]]]*/
+/*[[[head:vprintf,hash:CRC-32=0x6ef4310b]]]*/
 /* Print data to `stdout', following `FORMAT'
  * Return the number of successfully printed bytes */
-INTERN ATTR_LIBC_PRINTF(1, 0) NONNULL((1))
+INTERN NONNULL((1)) ATTR_LIBC_PRINTF(1, 0)
 ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.write.printf.vprintf") __STDC_INT_AS_SSIZE_T
 (LIBCCALL libc_vprintf)(char const *__restrict format,
                         va_list args)
@@ -4694,10 +4694,10 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.write.printf.vprintf") __STDC_INT_
 /*[[[end:vprintf]]]*/
 
 
-/*[[[head:vprintf_unlocked,hash:CRC-32=0x6e03ee80]]]*/
+/*[[[head:vprintf_unlocked,hash:CRC-32=0xcc7c8be1]]]*/
 /* Print data to `stdout', following `FORMAT'
  * Return the number of successfully printed bytes */
-INTERN ATTR_LIBC_PRINTF(1, 0) NONNULL((1))
+INTERN NONNULL((1)) ATTR_LIBC_PRINTF(1, 0)
 ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.write.printf.vprintf_unlocked") __STDC_INT_AS_SSIZE_T
 (LIBCCALL libc_vprintf_unlocked)(char const *__restrict format,
                                  va_list args)
@@ -4708,10 +4708,10 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.write.printf.vprintf_unlocked") 
 }
 /*[[[end:vprintf_unlocked]]]*/
 
-/*[[[head:printf_unlocked,hash:CRC-32=0x7e5d911c]]]*/
+/*[[[head:printf_unlocked,hash:CRC-32=0x28b7702]]]*/
 /* Print data to `stdout', following `FORMAT'
  * Return the number of successfully printed bytes */
-INTERN ATTR_LIBC_PRINTF(1, 2) NONNULL((1))
+INTERN NONNULL((1)) ATTR_LIBC_PRINTF(1, 2)
 ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.write.printf.printf_unlocked") __STDC_INT_AS_SSIZE_T
 (VLIBCCALL libc_printf_unlocked)(char const *__restrict format,
                                  ...)
@@ -4727,10 +4727,10 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.write.printf.printf_unlocked") _
 }
 /*[[[end:printf_unlocked]]]*/
 
-/*[[[head:fprintf_unlocked,hash:CRC-32=0xea4957fa]]]*/
+/*[[[head:fprintf_unlocked,hash:CRC-32=0x1e352680]]]*/
 /* Print data to `STREAM', following `FORMAT'
  * Return the number of successfully printed bytes */
-INTERN ATTR_LIBC_PRINTF(2, 3) NONNULL((1, 2))
+INTERN NONNULL((1, 2)) ATTR_LIBC_PRINTF(2, 3)
 ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.write.printf.fprintf_unlocked") __STDC_INT_AS_SSIZE_T
 (VLIBCCALL libc_fprintf_unlocked)(FILE *__restrict stream,
                                   char const *__restrict format,
@@ -4747,10 +4747,10 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.write.printf.fprintf_unlocked") 
 }
 /*[[[end:fprintf_unlocked]]]*/
 
-/*[[[head:fscanf_unlocked,hash:CRC-32=0x671f752d]]]*/
+/*[[[head:fscanf_unlocked,hash:CRC-32=0x2f63a784]]]*/
 /* Scan data from `STREAM', following `FORMAT'
  * Return the number of successfully scanned data items */
-INTERN ATTR_LIBC_SCANF(2, 3) WUNUSED NONNULL((1, 2))
+INTERN WUNUSED NONNULL((1, 2)) ATTR_LIBC_SCANF(2, 3)
 ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.read.scanf.fscanf_unlocked") __STDC_INT_AS_SIZE_T
 (VLIBCCALL libc_fscanf_unlocked)(FILE *__restrict stream,
                                  char const *__restrict format,
@@ -4767,10 +4767,10 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.read.scanf.fscanf_unlocked") __S
 }
 /*[[[end:fscanf_unlocked]]]*/
 
-/*[[[head:scanf_unlocked,hash:CRC-32=0x7c923fca]]]*/
+/*[[[head:scanf_unlocked,hash:CRC-32=0x9bd3634c]]]*/
 /* Scan data from `stdin', following `FORMAT'
  * Return the number of successfully scanned data items */
-INTERN ATTR_LIBC_SCANF(1, 2) WUNUSED NONNULL((1))
+INTERN WUNUSED NONNULL((1)) ATTR_LIBC_SCANF(1, 2)
 ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.read.scanf.scanf_unlocked") __STDC_INT_AS_SIZE_T
 (VLIBCCALL libc_scanf_unlocked)(char const *__restrict format,
                                 ...)

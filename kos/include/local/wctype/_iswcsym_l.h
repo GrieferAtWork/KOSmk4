@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3440343a */
+/* HASH CRC-32:0xf64536e8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,11 +23,11 @@
 #ifndef ____localdep_iswalnum_l_defined
 #define ____localdep_iswalnum_l_defined 1
 #if defined(__CRT_HAVE_iswalnum_l)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE,int,__NOTHROW_NCX,__localdep_iswalnum_l,(__WINT_TYPE__ __wc, __locale_t __locale),iswalnum_l,(__wc,__locale))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswalnum_l,(__WINT_TYPE__ __wc, __locale_t __locale),iswalnum_l,(__wc,__locale))
 #elif defined(__CRT_HAVE__iswalnum_l)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE,int,__NOTHROW_NCX,__localdep_iswalnum_l,(__WINT_TYPE__ __wc, __locale_t __locale),_iswalnum_l,(__wc,__locale))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswalnum_l,(__WINT_TYPE__ __wc, __locale_t __locale),_iswalnum_l,(__wc,__locale))
 #elif defined(__CRT_HAVE___iswalnum_l)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE,int,__NOTHROW_NCX,__localdep_iswalnum_l,(__WINT_TYPE__ __wc, __locale_t __locale),__iswalnum_l,(__wc,__locale))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswalnum_l,(__WINT_TYPE__ __wc, __locale_t __locale),__iswalnum_l,(__wc,__locale))
 #else /* LIBC: iswalnum_l */
 #include <local/wctype/iswalnum_l.h>
 #define __localdep_iswalnum_l (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswalnum_l))
@@ -35,7 +35,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE,int,__NOTHROW_NCX,__localdep_iswalnum_l,(
 #endif /* !____localdep_iswalnum_l_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_iswcsym_l) __ATTR_WUNUSED __ATTR_PURE int
+__LOCAL_LIBC(_iswcsym_l) __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_iswcsym_l))(__WINT_TYPE__ __wc,
                                                         __locale_t __locale) {
 #line 387 "kos/src/libc/magic/wctype.c"

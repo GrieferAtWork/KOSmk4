@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d6ec492 */
+/* HASH CRC-32:0x2fad2a97 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,15 +23,15 @@
 #ifndef ____localdep_isinfl_defined
 #define ____localdep_isinfl_defined 1
 #if __has_builtin(__builtin_isinfl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isinfl)
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL __localdep_isinfl)(long double __val) { return __builtin_isinfl(__val); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_isinfl)(long double __val) { return __builtin_isinfl(__val); }
 #elif defined(__CRT_HAVE_isinfl)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__localdep_isinfl,(long double __val),isinfl,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isinfl,(long double __val),isinfl,(__val))
 #elif defined(__CRT_HAVE___isinfl)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__localdep_isinfl,(long double __val),__isinfl,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isinfl,(long double __val),__isinfl,(__val))
 #elif defined(__CRT_HAVE___isinf) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__localdep_isinfl,(long double __val),__isinf,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isinfl,(long double __val),__isinf,(__val))
 #elif defined(__CRT_HAVE_isinf) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__localdep_isinfl,(long double __val),isinf,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isinfl,(long double __val),isinf,(__val))
 #else /* LIBC: isinfl */
 #include <local/math/isinfl.h>
 #define __localdep_isinfl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isinfl))
@@ -42,17 +42,17 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__localdep_isinfl,(long do
 #ifndef ____localdep_isnanl_defined
 #define ____localdep_isnanl_defined 1
 #if __has_builtin(__builtin_isnanl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isnanl)
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL __localdep_isnanl)(long double __val) { return __builtin_isnanl(__val); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_isnanl)(long double __val) { return __builtin_isnanl(__val); }
 #elif defined(__CRT_HAVE_isnanl)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__localdep_isnanl,(long double __val),isnanl,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnanl,(long double __val),isnanl,(__val))
 #elif defined(__CRT_HAVE___isnanl)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__localdep_isnanl,(long double __val),__isnanl,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnanl,(long double __val),__isnanl,(__val))
 #elif defined(__CRT_HAVE___isnan) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__localdep_isnanl,(long double __val),__isnan,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnanl,(long double __val),__isnan,(__val))
 #elif defined(__CRT_HAVE__isnan) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__localdep_isnanl,(long double __val),_isnan,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnanl,(long double __val),_isnan,(__val))
 #elif defined(__CRT_HAVE_isnan) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__localdep_isnanl,(long double __val),isnan,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_isnanl,(long double __val),isnan,(__val))
 #else /* LIBC: isnanl */
 #include <local/math/isnanl.h>
 #define __localdep_isnanl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isnanl))
@@ -60,7 +60,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__localdep_isnanl,(long do
 #endif /* !____localdep_isnanl_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(finitel) __ATTR_WUNUSED __ATTR_CONST int
+__LOCAL_LIBC(finitel) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(finitel))(long double __val) {
 #line 843 "kos/src/libc/magic/math.c"
 	return !__localdep_isinfl(__val) && !__localdep_isnanl(__val);

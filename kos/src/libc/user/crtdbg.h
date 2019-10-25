@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa57e7f14 */
+/* HASH CRC-32:0x1aa27498 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,19 +47,19 @@ INTDEF int NOTHROW_NCX(VLIBCCALL libc__CrtDbgReport)(int report_type, char const
 INTDEF int NOTHROW_NCX(VLIBCCALL libc__CrtDbgReportW)(int report_type, __WCHAR16_TYPE__ const *filename, int line, __WCHAR16_TYPE__ const *module_name, __WCHAR16_TYPE__ const *format, ...);
 INTDEF void NOTHROW_NCX(LIBCCALL libc__CrtDbgBreak)(void);
 INTDEF __LONG32_TYPE__ NOTHROW_NCX(LIBCCALL libc__CrtSetBreakAlloc)(__LONG32_TYPE__ break_alloc);
-INTDEF ATTR_MALLOC ATTR_ALLOC_SIZE((1)) WUNUSED void *NOTHROW_NCX(LIBCCALL libc__malloc_dbg)(size_t num_bytes, int block_type, char const *filename, int line);
-INTDEF ATTR_MALLOC ATTR_ALLOC_SIZE((1, 2)) WUNUSED void *NOTHROW_NCX(LIBCCALL libc__calloc_dbg)(size_t count, size_t num_bytes, int block_type, char const *filename, int line);
-INTDEF ATTR_ALLOC_SIZE((2)) WUNUSED void *NOTHROW_NCX(LIBCCALL libc__realloc_dbg)(void *ptr, size_t num_bytes, int block_type, char const *filename, int line);
-INTDEF ATTR_ALLOC_SIZE((2, 3)) WUNUSED void *NOTHROW_NCX(LIBCCALL libc__recalloc_dbg)(void *ptr, size_t count, size_t num_bytes, int block_type, char const *filename, int line);
-INTDEF ATTR_ALLOC_SIZE((2)) WUNUSED NONNULL((1)) void *NOTHROW_NCX(LIBCCALL libc__expand_dbg)(void *ptr, size_t num_bytes, int block_type, char const *filename, int line);
+INTDEF ATTR_MALLOC WUNUSED ATTR_ALLOC_SIZE((1)) void *NOTHROW_NCX(LIBCCALL libc__malloc_dbg)(size_t num_bytes, int block_type, char const *filename, int line);
+INTDEF ATTR_MALLOC WUNUSED ATTR_ALLOC_SIZE((1, 2)) void *NOTHROW_NCX(LIBCCALL libc__calloc_dbg)(size_t count, size_t num_bytes, int block_type, char const *filename, int line);
+INTDEF WUNUSED ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(LIBCCALL libc__realloc_dbg)(void *ptr, size_t num_bytes, int block_type, char const *filename, int line);
+INTDEF WUNUSED ATTR_ALLOC_SIZE((2, 3)) void *NOTHROW_NCX(LIBCCALL libc__recalloc_dbg)(void *ptr, size_t count, size_t num_bytes, int block_type, char const *filename, int line);
+INTDEF WUNUSED NONNULL((1)) ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(LIBCCALL libc__expand_dbg)(void *ptr, size_t num_bytes, int block_type, char const *filename, int line);
 INTDEF void NOTHROW_NCX(LIBCCALL libc__free_dbg)(void *ptr, int block_type);
 INTDEF WUNUSED NONNULL((1)) size_t NOTHROW_NCX(LIBCCALL libc__msize_dbg)(void *ptr, int block_type);
-INTDEF ATTR_MALLOC ATTR_ALLOC_SIZE((1)) ATTR_ALLOC_ALIGN(2) WUNUSED void *NOTHROW_NCX(LIBCCALL libc__aligned_malloc_dbg)(size_t num_bytes, size_t min_alignment, char const *filename, int line);
-INTDEF ATTR_ALLOC_SIZE((2)) ATTR_ALLOC_ALIGN(3) WUNUSED void *NOTHROW_NCX(LIBCCALL libc__aligned_realloc_dbg)(void *ptr, size_t num_bytes, size_t min_alignment, char const *filename, int line);
-INTDEF ATTR_ALLOC_SIZE((2, 3)) ATTR_ALLOC_ALIGN(4) WUNUSED void *NOTHROW_NCX(LIBCCALL libc__aligned_recalloc_dbg)(void *ptr, size_t count, size_t num_bytes, size_t min_alignment, char const *filename, int line);
-INTDEF ATTR_MALLOC ATTR_ALLOC_SIZE((1)) WUNUSED void *NOTHROW_NCX(LIBCCALL libc__aligned_offset_malloc_dbg)(size_t num_bytes, size_t min_alignment, size_t offset, char const *filename, int line);
-INTDEF ATTR_ALLOC_SIZE((2)) WUNUSED void *NOTHROW_NCX(LIBCCALL libc__aligned_offset_realloc_dbg)(void *ptr, size_t num_bytes, size_t min_alignment, size_t offset, char const *filename, int line);
-INTDEF ATTR_ALLOC_SIZE((2, 3)) WUNUSED void *NOTHROW_NCX(LIBCCALL libc__aligned_offset_recalloc_dbg)(void *ptr, size_t count, size_t num_bytes, size_t min_alignment, size_t offset, char const *filename, int line);
+INTDEF ATTR_MALLOC WUNUSED ATTR_ALLOC_SIZE((1)) ATTR_ALLOC_ALIGN(2) void *NOTHROW_NCX(LIBCCALL libc__aligned_malloc_dbg)(size_t num_bytes, size_t min_alignment, char const *filename, int line);
+INTDEF WUNUSED ATTR_ALLOC_SIZE((2)) ATTR_ALLOC_ALIGN(3) void *NOTHROW_NCX(LIBCCALL libc__aligned_realloc_dbg)(void *ptr, size_t num_bytes, size_t min_alignment, char const *filename, int line);
+INTDEF WUNUSED ATTR_ALLOC_SIZE((2, 3)) ATTR_ALLOC_ALIGN(4) void *NOTHROW_NCX(LIBCCALL libc__aligned_recalloc_dbg)(void *ptr, size_t count, size_t num_bytes, size_t min_alignment, char const *filename, int line);
+INTDEF ATTR_MALLOC WUNUSED ATTR_ALLOC_SIZE((1)) void *NOTHROW_NCX(LIBCCALL libc__aligned_offset_malloc_dbg)(size_t num_bytes, size_t min_alignment, size_t offset, char const *filename, int line);
+INTDEF WUNUSED ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(LIBCCALL libc__aligned_offset_realloc_dbg)(void *ptr, size_t num_bytes, size_t min_alignment, size_t offset, char const *filename, int line);
+INTDEF WUNUSED ATTR_ALLOC_SIZE((2, 3)) void *NOTHROW_NCX(LIBCCALL libc__aligned_offset_recalloc_dbg)(void *ptr, size_t count, size_t num_bytes, size_t min_alignment, size_t offset, char const *filename, int line);
 INTDEF void NOTHROW_NCX(LIBCCALL libc__aligned_free_dbg)(void *ptr);
 INTDEF ATTR_MALLOC WUNUSED char *NOTHROW_NCX(LIBCCALL libc__strdup_dbg)(char const *string, int block_type, char const *filename, int line);
 INTDEF WUNUSED __WCHAR16_TYPE__ *NOTHROW_NCX(LIBCCALL libc__wcsdup_dbg)(__WCHAR16_TYPE__ const *string, int block_type, char const *filename, int line);

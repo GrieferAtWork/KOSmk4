@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3ce55e65 */
+/* HASH CRC-32:0x39719ac6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,7 +20,7 @@
 #ifndef __local_wildstrcmp_defined
 #define __local_wildstrcmp_defined 1
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(wildstrcmp) __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)) int
+__LOCAL_LIBC(wildstrcmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wildstrcmp))(char const *__pattern,
                                                         char const *__string) {
 #line 3567 "kos/src/libc/magic/string.c"

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x93f3ec9f */
+/* HASH CRC-32:0x9b6e1526 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #include <bits/huge_val.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
-__LOCAL_LIBC(isinf) __ATTR_WUNUSED __ATTR_CONST int
+__LOCAL_LIBC(isinf) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(isinf))(double __val) {
 #line 802 "kos/src/libc/magic/math.c"
 	return __val == HUGE_VAL;

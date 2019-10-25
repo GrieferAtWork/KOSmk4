@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x68ecd42f */
+/* HASH CRC-32:0xeb9a480 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #define __local_isnanl_defined 1
 #include <bits/nan.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(isnanl) __ATTR_WUNUSED __ATTR_CONST int
+__LOCAL_LIBC(isnanl) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(isnanl))(long double __val) {
 #line 871 "kos/src/libc/magic/math.c"
 	return __val == (long double)NAN;

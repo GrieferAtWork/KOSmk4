@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbd816c62 */
+/* HASH CRC-32:0x77b11009 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Smallest integral value not less than X */
-__LOCAL_LIBC(ceilf) __ATTR_WUNUSED __ATTR_CONST float
+__LOCAL_LIBC(ceilf) __ATTR_CONST __ATTR_WUNUSED float
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ceilf))(float __x) {
 #line 346 "kos/src/libc/magic/math.c"
 	float __result;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf510d8f */
+/* HASH CRC-32:0xc33a623e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 __NAMESPACE_STD_USING(__localdep_wcsncmp)
 #elif defined(__CRT_HAVE_wcsncmp)
 /* Same as `wcscmp', but compare at most `MAXLEN' characters from either string */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcsncmp,(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen),wcsncmp,(__s1,__s2,__maxlen))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcsncmp,(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2, __SIZE_TYPE__ __maxlen),wcsncmp,(__s1,__s2,__maxlen))
 #else /* LIBC: wcsncmp */
 #include <local/wchar/wcsncmp.h>
 /* Same as `wcscmp', but compare at most `MAXLEN' characters from either string */
@@ -35,7 +35,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,
 #endif /* !____localdep_wcsncmp_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(wcsncoll) __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)) int
+__LOCAL_LIBC(wcsncoll) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcsncoll))(__WCHAR_TYPE__ const *__s1,
                                                       __WCHAR_TYPE__ const *__s2,
                                                       __SIZE_TYPE__ __maxlen) {

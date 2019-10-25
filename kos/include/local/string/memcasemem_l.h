@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5af0ac7d */
+/* HASH CRC-32:0x83d25cd */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,9 +23,9 @@
 #ifndef ____localdep_memcasecmp_l_defined
 #define ____localdep_memcasecmp_l_defined 1
 #if defined(__CRT_HAVE_memcasecmp_l)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcasecmp_l,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes, __locale_t __locale),memcasecmp_l,(__s1,__s2,__n_bytes,__locale))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcasecmp_l,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes, __locale_t __locale),memcasecmp_l,(__s1,__s2,__n_bytes,__locale))
 #elif defined(__CRT_HAVE__memicmp_l)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcasecmp_l,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes, __locale_t __locale),_memicmp_l,(__s1,__s2,__n_bytes,__locale))
+__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcasecmp_l,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes, __locale_t __locale),_memicmp_l,(__s1,__s2,__n_bytes,__locale))
 #else /* LIBC: memcasecmp_l */
 #include <local/string/memcasecmp_l.h>
 #define __localdep_memcasecmp_l (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcasecmp_l))
@@ -33,7 +33,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,
 #endif /* !____localdep_memcasecmp_l_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(memcasemem_l) __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 3)) void *
+__LOCAL_LIBC(memcasemem_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcasemem_l))(void const *__haystack,
                                                           __SIZE_TYPE__ __haystacklen,
                                                           void const *__needle,

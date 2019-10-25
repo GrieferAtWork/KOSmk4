@@ -163,11 +163,11 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.Execl") void
 }
 /*[[[end:Execl]]]*/
 
-/*[[[head:Execle,hash:CRC-32=0x15c230bd]]]*/
+/*[[[head:Execle,hash:CRC-32=0xa317214e]]]*/
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinal */
-INTERN ATTR_SENTINEL_O(1) ATTR_NORETURN NONNULL((1))
+INTERN ATTR_NORETURN ATTR_SENTINEL_O(1) NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.Execle") void
 (VLIBCCALL libc_Execle)(char const *__restrict path,
                         char const *args,
@@ -225,11 +225,11 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.Execpl") void
 }
 /*[[[end:Execpl]]]*/
 
-/*[[[head:Execlpe,hash:CRC-32=0xd60d5309]]]*/
+/*[[[head:Execlpe,hash:CRC-32=0x817704e4]]]*/
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinal */
-INTERN ATTR_SENTINEL_O(1) ATTR_NORETURN NONNULL((1))
+INTERN ATTR_NORETURN ATTR_SENTINEL_O(1) NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.exec.exec.Execlpe") void
 (VLIBCCALL libc_Execlpe)(char const *__restrict file,
                          char const *args,
@@ -482,8 +482,8 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.io.large.read.PReadAll64") size_t
 #endif /* MAGIC:alias */
 /*[[[end:PReadAll64]]]*/
 
-/*[[[head:GetCurrentDirName,hash:CRC-32=0x1e38de7]]]*/
-INTERN WUNUSED ATTR_RETNONNULL ATTR_MALLOC
+/*[[[head:GetCurrentDirName,hash:CRC-32=0x9130d870]]]*/
+INTERN ATTR_MALLOC ATTR_RETNONNULL WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.basic_property.GetCurrentDirName") char *
 (LIBCCALL libc_GetCurrentDirName)(void)
 		__THROWS(...)

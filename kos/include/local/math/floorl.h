@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe9fc4cbe */
+/* HASH CRC-32:0x445e2ac9 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Largest integer not greater than X */
-__LOCAL_LIBC(floorl) __ATTR_WUNUSED __ATTR_CONST long double
+__LOCAL_LIBC(floorl) __ATTR_CONST __ATTR_WUNUSED long double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(floorl))(long double __x) {
 #line 363 "kos/src/libc/magic/math.c"
 	long double __result;

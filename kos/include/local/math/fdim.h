@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xee8c60ae */
+/* HASH CRC-32:0x556098df */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,13 +24,13 @@
 #define ____localdep_fabs_defined 1
 #if __has_builtin(__builtin_fabs) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fabs)
 /* Absolute value of X */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL __localdep_fabs)(double __x) { return __builtin_fabs(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __localdep_fabs)(double __x) { return __builtin_fabs(__x); }
 #elif defined(__CRT_HAVE_fabs)
 /* Absolute value of X */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,__localdep_fabs,(double __x),fabs,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_fabs,(double __x),fabs,(__x))
 #elif defined(__CRT_HAVE___fabs)
 /* Absolute value of X */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,__localdep_fabs,(double __x),__fabs,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_fabs,(double __x),__fabs,(__x))
 #else /* LIBC: fabs */
 #include <local/math/fabs.h>
 /* Absolute value of X */
@@ -40,7 +40,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,__localdep_fabs,(double
 
 __NAMESPACE_LOCAL_BEGIN
 /* Return positive difference between X and Y */
-__LOCAL_LIBC(fdim) __ATTR_WUNUSED __ATTR_CONST double
+__LOCAL_LIBC(fdim) __ATTR_CONST __ATTR_WUNUSED double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fdim))(double __x,
                                               double __y) {
 #line 527 "kos/src/libc/magic/math.c"

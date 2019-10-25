@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe419edf6 */
+/* HASH CRC-32:0xa47fe985 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,__loca
 #endif /* !____localdep__aligned_offset_recalloc_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_aligned_offset_recalloc_dbg) __ATTR_ALLOC_SIZE((2, 3)) __ATTR_WUNUSED void *
+__LOCAL_LIBC(_aligned_offset_recalloc_dbg) __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_aligned_offset_recalloc_dbg))(void *__ptr,
                                                                           __SIZE_TYPE__ __count,
                                                                           __SIZE_TYPE__ __num_bytes,

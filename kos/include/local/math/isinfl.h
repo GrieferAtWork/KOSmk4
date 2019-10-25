@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb0509792 */
+/* HASH CRC-32:0x19876b48 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #define __local_isinfl_defined 1
 #include <bits/huge_vall.h>
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(isinfl) __ATTR_WUNUSED __ATTR_CONST int
+__LOCAL_LIBC(isinfl) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(isinfl))(long double __val) {
 #line 815 "kos/src/libc/magic/math.c"
 	return __val == HUGE_VALL;

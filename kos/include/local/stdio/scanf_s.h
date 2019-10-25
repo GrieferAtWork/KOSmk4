@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc067bd5 */
+/* HASH CRC-32:0x82243a27 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,14 +25,14 @@
 #ifndef ____localdep_vscanf_s_defined
 #define ____localdep_vscanf_s_defined 1
 #if defined(__CRT_HAVE_vscanf_s)
-__CREDIRECT(__ATTR_LIBC_PRINTF(1, 0) __ATTR_NONNULL((1)),__STDC_INT_AS_SIZE_T,,__localdep_vscanf_s,(char const *__restrict __format, __builtin_va_list __args),vscanf_s,(__format,__args)) __THROWS(...)
+__CREDIRECT(__ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 0),__STDC_INT_AS_SIZE_T,,__localdep_vscanf_s,(char const *__restrict __format, __builtin_va_list __args),vscanf_s,(__format,__args)) __THROWS(...)
 #else /* LIBC: vscanf_s */
 #undef ____localdep_vscanf_s_defined
 #endif /* vscanf_s... */
 #endif /* !____localdep_vscanf_s_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(scanf_s) __ATTR_LIBC_PRINTF(1, 2) __ATTR_NONNULL((1)) __STDC_INT_AS_SIZE_T
+__LOCAL_LIBC(scanf_s) __ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 2) __STDC_INT_AS_SIZE_T
 (__VLIBCCALL __LIBC_LOCAL_NAME(scanf_s))(char const *__restrict __format,
                                          ...) __THROWS(...) {
 #line 2609 "kos/src/libc/magic/stdio.c"

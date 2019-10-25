@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc9c50fd3 */
+/* HASH CRC-32:0x1438b582 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,40 +28,40 @@
 DECL_BEGIN
 
 #ifndef __KERNEL__
-INTDEF WUNUSED ATTR_CONST int NOTHROW(LIBCCALL libc_iswalnum)(wint_t wc);
-INTDEF WUNUSED ATTR_CONST int NOTHROW(LIBCCALL libc_iswalpha)(wint_t wc);
-INTDEF WUNUSED ATTR_CONST int NOTHROW(LIBCCALL libc_iswcntrl)(wint_t wc);
-INTDEF WUNUSED ATTR_CONST int NOTHROW(LIBCCALL libc_iswdigit)(wint_t wc);
-INTDEF WUNUSED ATTR_CONST int NOTHROW(LIBCCALL libc_iswgraph)(wint_t wc);
-INTDEF WUNUSED ATTR_CONST int NOTHROW(LIBCCALL libc_iswlower)(wint_t wc);
-INTDEF WUNUSED ATTR_CONST int NOTHROW(LIBCCALL libc_iswprint)(wint_t wc);
-INTDEF WUNUSED ATTR_CONST int NOTHROW(LIBCCALL libc_iswpunct)(wint_t wc);
-INTDEF WUNUSED ATTR_CONST int NOTHROW(LIBCCALL libc_iswspace)(wint_t wc);
-INTDEF WUNUSED ATTR_CONST int NOTHROW(LIBCCALL libc_iswupper)(wint_t wc);
-INTDEF WUNUSED ATTR_CONST int NOTHROW(LIBCCALL libc_iswxdigit)(wint_t wc);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_iswalnum)(wint_t wc);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_iswalpha)(wint_t wc);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_iswcntrl)(wint_t wc);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_iswdigit)(wint_t wc);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_iswgraph)(wint_t wc);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_iswlower)(wint_t wc);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_iswprint)(wint_t wc);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_iswpunct)(wint_t wc);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_iswspace)(wint_t wc);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_iswupper)(wint_t wc);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_iswxdigit)(wint_t wc);
 INTDEF WUNUSED NONNULL((1)) wctrans_t NOTHROW_NCX(LIBCCALL libc_wctrans)(char const *prop);
 INTDEF WUNUSED wint_t NOTHROW_NCX(LIBCCALL libc_towctrans)(wint_t wc, wctrans_t desc);
 INTDEF WUNUSED NONNULL((1)) wctype_t NOTHROW_NCX(LIBCCALL libc_wctype)(char const *prop);
 INTDEF WUNUSED int NOTHROW_NCX(LIBCCALL libc_iswctype)(wint_t wc, wctype_t desc);
-INTDEF WUNUSED ATTR_CONST int NOTHROW(LIBCCALL libc_iswblank)(wint_t wc);
-INTDEF WUNUSED ATTR_CONST wint_t NOTHROW(LIBCCALL libc_towlower)(wint_t wc);
-INTDEF WUNUSED ATTR_CONST wint_t NOTHROW(LIBCCALL libc_towupper)(wint_t wc);
-INTDEF WUNUSED ATTR_CONST int NOTHROW(LIBCCALL libc_iswascii)(wint_t wc);
-INTDEF WUNUSED ATTR_PURE int NOTHROW_NCX(LIBCCALL libc_iswalnum_l)(wint_t wc, locale_t locale);
-INTDEF WUNUSED ATTR_PURE int NOTHROW_NCX(LIBCCALL libc_iswalpha_l)(wint_t wc, locale_t locale);
-INTDEF WUNUSED ATTR_PURE int NOTHROW_NCX(LIBCCALL libc_iswcntrl_l)(wint_t wc, locale_t locale);
-INTDEF WUNUSED ATTR_PURE int NOTHROW_NCX(LIBCCALL libc_iswdigit_l)(wint_t wc, locale_t locale);
-INTDEF WUNUSED ATTR_PURE int NOTHROW_NCX(LIBCCALL libc_iswgraph_l)(wint_t wc, locale_t locale);
-INTDEF WUNUSED ATTR_PURE int NOTHROW_NCX(LIBCCALL libc_iswlower_l)(wint_t wc, locale_t locale);
-INTDEF WUNUSED ATTR_PURE int NOTHROW_NCX(LIBCCALL libc_iswprint_l)(wint_t wc, locale_t locale);
-INTDEF WUNUSED ATTR_PURE int NOTHROW_NCX(LIBCCALL libc_iswpunct_l)(wint_t wc, locale_t locale);
-INTDEF WUNUSED ATTR_PURE int NOTHROW_NCX(LIBCCALL libc_iswspace_l)(wint_t wc, locale_t locale);
-INTDEF WUNUSED ATTR_PURE int NOTHROW_NCX(LIBCCALL libc_iswupper_l)(wint_t wc, locale_t locale);
-INTDEF WUNUSED ATTR_PURE int NOTHROW_NCX(LIBCCALL libc_iswxdigit_l)(wint_t wc, locale_t locale);
-INTDEF WUNUSED ATTR_PURE int NOTHROW_NCX(LIBCCALL libc_iswblank_l)(wint_t wc, locale_t locale);
-INTDEF WUNUSED ATTR_PURE int NOTHROW_NCX(LIBCCALL libc_iswctype_l)(wint_t wc, wctype_t type, locale_t locale);
-INTDEF WUNUSED ATTR_PURE wint_t NOTHROW_NCX(LIBCCALL libc_towupper_l)(wint_t wc, locale_t locale);
-INTDEF WUNUSED ATTR_PURE wint_t NOTHROW_NCX(LIBCCALL libc_towlower_l)(wint_t wc, locale_t locale);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_iswblank)(wint_t wc);
+INTDEF ATTR_CONST WUNUSED wint_t NOTHROW(LIBCCALL libc_towlower)(wint_t wc);
+INTDEF ATTR_CONST WUNUSED wint_t NOTHROW(LIBCCALL libc_towupper)(wint_t wc);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc_iswascii)(wint_t wc);
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc_iswalnum_l)(wint_t wc, locale_t locale);
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc_iswalpha_l)(wint_t wc, locale_t locale);
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc_iswcntrl_l)(wint_t wc, locale_t locale);
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc_iswdigit_l)(wint_t wc, locale_t locale);
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc_iswgraph_l)(wint_t wc, locale_t locale);
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc_iswlower_l)(wint_t wc, locale_t locale);
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc_iswprint_l)(wint_t wc, locale_t locale);
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc_iswpunct_l)(wint_t wc, locale_t locale);
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc_iswspace_l)(wint_t wc, locale_t locale);
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc_iswupper_l)(wint_t wc, locale_t locale);
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc_iswxdigit_l)(wint_t wc, locale_t locale);
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc_iswblank_l)(wint_t wc, locale_t locale);
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc_iswctype_l)(wint_t wc, wctype_t type, locale_t locale);
+INTDEF ATTR_PURE WUNUSED wint_t NOTHROW_NCX(LIBCCALL libc_towupper_l)(wint_t wc, locale_t locale);
+INTDEF ATTR_PURE WUNUSED wint_t NOTHROW_NCX(LIBCCALL libc_towlower_l)(wint_t wc, locale_t locale);
 INTDEF WUNUSED NONNULL((1)) wctype_t NOTHROW_NCX(LIBCCALL libc_wctype_l)(char const *prop, locale_t locale);
 INTDEF WUNUSED NONNULL((1)) wctrans_t NOTHROW_NCX(LIBCCALL libc_wctrans_l)(char const *prop, locale_t locale);
 INTDEF WUNUSED wint_t NOTHROW_NCX(LIBCCALL libc_towctrans_l)(wint_t wc, wctrans_t desc, locale_t locale);
@@ -81,12 +81,12 @@ INTDEF WUNUSED wint_t NOTHROW_NCX(LIBCCALL libc_towctrans_l)(wint_t wc, wctrans_
 #define libc__towlower_l libc_towlower_l
 #define libc__iswctype_l libc_iswctype_l
 #define libc_is_wctype libc_iswctype
-INTDEF WUNUSED ATTR_CONST int NOTHROW_NCX(LIBCCALL libc_isleadbyte)(int wc);
-INTDEF WUNUSED ATTR_PURE int NOTHROW_NCX(LIBCCALL libc__isleadbyte_l)(int wc, locale_t locale);
-INTDEF WUNUSED ATTR_CONST int NOTHROW_NCX(LIBCCALL libc___iswcsymf)(wint_t wc);
-INTDEF WUNUSED ATTR_CONST int NOTHROW_NCX(LIBCCALL libc___iswcsym)(wint_t wc);
-INTDEF WUNUSED ATTR_PURE int NOTHROW_NCX(LIBCCALL libc__iswcsymf_l)(wint_t wc, locale_t locale);
-INTDEF WUNUSED ATTR_PURE int NOTHROW_NCX(LIBCCALL libc__iswcsym_l)(wint_t wc, locale_t locale);
+INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc_isleadbyte)(int wc);
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc__isleadbyte_l)(int wc, locale_t locale);
+INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc___iswcsymf)(wint_t wc);
+INTDEF ATTR_CONST WUNUSED int NOTHROW_NCX(LIBCCALL libc___iswcsym)(wint_t wc);
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc__iswcsymf_l)(wint_t wc, locale_t locale);
+INTDEF ATTR_PURE WUNUSED int NOTHROW_NCX(LIBCCALL libc__iswcsym_l)(wint_t wc, locale_t locale);
 #endif /* !__KERNEL__ */
 
 DECL_END

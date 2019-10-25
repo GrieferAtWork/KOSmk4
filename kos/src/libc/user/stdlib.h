@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc4e7e5e8 */
+/* HASH CRC-32:0x335e5101 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,9 +37,9 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_atexit)(__atexit_func_t func);
 INTDEF ATTR_NORETURN void (LIBCCALL libc_quick_exit)(int status) __THROWS(...);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_at_quick_exit)(__atexit_func_t func);
 INTDEF ATTR_NORETURN void (LIBCCALL libc__Exit)(int status);
-INTDEF WUNUSED ATTR_MALL_DEFAULT_ALIGNED ATTR_MALLOC ATTR_ALLOC_SIZE((1)) void *NOTHROW_NCX(LIBCCALL libc_malloc)(size_t n_bytes);
-INTDEF WUNUSED ATTR_MALL_DEFAULT_ALIGNED ATTR_MALLOC ATTR_ALLOC_SIZE((1, 2)) void *NOTHROW_NCX(LIBCCALL libc_calloc)(size_t count, size_t n_bytes);
-INTDEF WUNUSED ATTR_MALL_DEFAULT_ALIGNED ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(LIBCCALL libc_realloc)(void *mallptr, size_t n_bytes);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((1)) void *NOTHROW_NCX(LIBCCALL libc_malloc)(size_t n_bytes);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((1, 2)) void *NOTHROW_NCX(LIBCCALL libc_calloc)(size_t count, size_t n_bytes);
+INTDEF ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(LIBCCALL libc_realloc)(void *mallptr, size_t n_bytes);
 INTDEF void NOTHROW_NCX(LIBCCALL libc_free)(void *mallptr);
 INTDEF void NOTHROW(LIBCCALL libc_srand)(long seed);
 INTDEF int NOTHROW(LIBCCALL libc_rand)(void);
@@ -78,7 +78,7 @@ INTDEF void NOTHROW_NCX(LIBCCALL libc_srandom)(unsigned int seed);
 INTDEF NONNULL((2)) char *NOTHROW_NCX(LIBCCALL libc_initstate)(unsigned int seed, char *statebuf, size_t statelen);
 INTDEF NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_setstate)(char *statebuf);
 INTDEF WUNUSED char *NOTHROW_NCX(LIBCCALL libc_l64a)(long n);
-INTDEF WUNUSED ATTR_PURE NONNULL((1)) long NOTHROW_NCX(LIBCCALL libc_a64l)(char const *s);
+INTDEF ATTR_PURE WUNUSED NONNULL((1)) long NOTHROW_NCX(LIBCCALL libc_a64l)(char const *s);
 /* Load the filesystem location of a given file handle.
  * This function behaves similar to `readlink()', but will also function for
  * non-symlink paths, as well as always return an absolute (unambiguous) path
@@ -128,19 +128,19 @@ INTDEF WUNUSED NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_mkostemp)(char *templa
 INTDEF WUNUSED NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_mkostemps)(char *template_, int suffixlen, int flags);
 INTDEF WUNUSED NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_mkostemp64)(char *template_, int flags);
 INTDEF WUNUSED NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_mkostemps64)(char *template_, int suffixlen, int flags);
-INTDEF WUNUSED ATTR_CONST errno_t *NOTHROW_NCX(LIBCCALL libc___errno_location)(void);
+INTDEF ATTR_CONST WUNUSED errno_t *NOTHROW_NCX(LIBCCALL libc___errno_location)(void);
 INTDEF ATTR_CONST u32 *NOTHROW_NCX(LIBCCALL libc___doserrno)(void);
 INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__get_doserrno)(u32 *perr);
 INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__set_doserrno)(u32 err);
-INTDEF ATTR_RETNONNULL ATTR_CONST int *NOTHROW_NCX(LIBCCALL libc___p___argc)(void);
-INTDEF ATTR_RETNONNULL ATTR_CONST char ***NOTHROW_NCX(LIBCCALL libc___p___argv)(void);
-INTDEF ATTR_RETNONNULL ATTR_CONST char **NOTHROW_NCX(LIBCCALL libc___p__pgmptr)(void);
-INTDEF ATTR_RETNONNULL ATTR_CONST char32_t ***NOTHROW_NCX(LIBCCALL libc___p___wargv)(void);
-INTDEF ATTR_RETNONNULL ATTR_CONST char16_t ***NOTHROW_NCX(LIBDCALL libd___p___wargv)(void);
-INTDEF ATTR_RETNONNULL ATTR_CONST char32_t ***NOTHROW_NCX(LIBCCALL libc___p__wenviron)(void);
-INTDEF ATTR_RETNONNULL ATTR_CONST char16_t ***NOTHROW_NCX(LIBDCALL libd___p__wenviron)(void);
-INTDEF ATTR_RETNONNULL ATTR_CONST char32_t **NOTHROW_NCX(LIBCCALL libc___p__wpgmptr)(void);
-INTDEF ATTR_RETNONNULL ATTR_CONST char16_t **NOTHROW_NCX(LIBDCALL libd___p__wpgmptr)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL int *NOTHROW_NCX(LIBCCALL libc___p___argc)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL char ***NOTHROW_NCX(LIBCCALL libc___p___argv)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL char **NOTHROW_NCX(LIBCCALL libc___p__pgmptr)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL char32_t ***NOTHROW_NCX(LIBCCALL libc___p___wargv)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL char16_t ***NOTHROW_NCX(LIBDCALL libd___p___wargv)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL char32_t ***NOTHROW_NCX(LIBCCALL libc___p__wenviron)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL char16_t ***NOTHROW_NCX(LIBDCALL libd___p__wenviron)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL char32_t **NOTHROW_NCX(LIBCCALL libc___p__wpgmptr)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL char16_t **NOTHROW_NCX(LIBDCALL libd___p__wpgmptr)(void);
 /* Access to the initial environment block */
 INTDEF ATTR_CONST char ***NOTHROW_NCX(LIBCCALL libc___p___initenv)(void);
 /* Access to the initial environment block */
@@ -151,11 +151,11 @@ INTDEF NONNULL((1, 2, 4)) errno_t NOTHROW_NCX(LIBCCALL libc_getenv_s)(size_t *ps
 INTDEF NONNULL((1, 2, 3)) errno_t NOTHROW_NCX(LIBCCALL libc__dupenv_s)(char **__restrict pbuf, size_t *pbuflen, char const *varname);
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc_rand_s)(unsigned int *__restrict randval);
 INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd_rand_s)(unsigned int *__restrict randval);
-INTDEF WUNUSED ATTR_MALL_DEFAULT_ALIGNED ATTR_ALLOC_SIZE((2, 3)) void *NOTHROW_NCX(LIBCCALL libc__recalloc)(void *mptr, size_t count, size_t num_bytes);
-INTDEF WUNUSED ATTR_MALLOC ATTR_ALLOC_ALIGN(2) ATTR_ALLOC_SIZE((1)) void *NOTHROW_NCX(LIBCCALL libc__aligned_malloc)(size_t num_bytes, size_t min_alignment);
-INTDEF WUNUSED ATTR_MALLOC ATTR_ALLOC_SIZE((1)) void *NOTHROW_NCX(LIBCCALL libc__aligned_offset_malloc)(size_t num_bytes, size_t min_alignment, size_t offset);
-INTDEF WUNUSED ATTR_ALLOC_ALIGN(3) ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(LIBCCALL libc__aligned_realloc)(void *mptr, size_t newsize, size_t min_alignment);
-INTDEF WUNUSED ATTR_ALLOC_ALIGN(4) ATTR_ALLOC_SIZE((2, 3)) void *NOTHROW_NCX(LIBCCALL libc__aligned_recalloc)(void *mptr, size_t count, size_t num_bytes, size_t min_alignment);
+INTDEF ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_ALLOC_SIZE((2, 3)) void *NOTHROW_NCX(LIBCCALL libc__recalloc)(void *mptr, size_t count, size_t num_bytes);
+INTDEF ATTR_MALLOC WUNUSED ATTR_ALLOC_SIZE((1)) ATTR_ALLOC_ALIGN(2) void *NOTHROW_NCX(LIBCCALL libc__aligned_malloc)(size_t num_bytes, size_t min_alignment);
+INTDEF ATTR_MALLOC WUNUSED ATTR_ALLOC_SIZE((1)) void *NOTHROW_NCX(LIBCCALL libc__aligned_offset_malloc)(size_t num_bytes, size_t min_alignment, size_t offset);
+INTDEF WUNUSED ATTR_ALLOC_SIZE((2)) ATTR_ALLOC_ALIGN(3) void *NOTHROW_NCX(LIBCCALL libc__aligned_realloc)(void *mptr, size_t newsize, size_t min_alignment);
+INTDEF WUNUSED ATTR_ALLOC_SIZE((2, 3)) ATTR_ALLOC_ALIGN(4) void *NOTHROW_NCX(LIBCCALL libc__aligned_recalloc)(void *mptr, size_t count, size_t num_bytes, size_t min_alignment);
 INTDEF WUNUSED ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(LIBCCALL libc__aligned_offset_realloc)(void *mptr, size_t newsize, size_t min_alignment, size_t offset);
 INTDEF WUNUSED ATTR_ALLOC_SIZE((2, 3)) void *NOTHROW_NCX(LIBCCALL libc__aligned_offset_recalloc)(void *mptr, size_t count, size_t num_bytes, size_t min_alignment, size_t offset);
 INTDEF void NOTHROW_NCX(LIBCCALL libc__aligned_free)(void *mptr);

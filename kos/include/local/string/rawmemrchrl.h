@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf6dcf30f */
+/* HASH CRC-32:0x6e794f44 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #define __local_rawmemrchrl_defined 1
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memrchrl' without a search limit, starting at `(byte_t *)HAYSTACK-4' */
-__LOCAL_LIBC(rawmemrchrl) __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) __UINT32_TYPE__ *
+__LOCAL_LIBC(rawmemrchrl) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) __UINT32_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(rawmemrchrl))(void const *__restrict __haystack,
                                                          __UINT32_TYPE__ __dword) {
 #line 1205 "kos/src/libc/magic/string.c"

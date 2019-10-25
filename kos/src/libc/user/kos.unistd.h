@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa7513147 */
+/* HASH CRC-32:0x5740ebb0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,7 @@ INTDEF ATTR_SENTINEL ATTR_NORETURN NONNULL((1)) void (VLIBCCALL libc_Execl)(char
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinal */
-INTDEF ATTR_SENTINEL_O(1) ATTR_NORETURN NONNULL((1)) void (VLIBCCALL libc_Execle)(char const *__restrict path, char const *args, ... /*, (char *)NULL, (char **)environ*/) __THROWS(...);
+INTDEF ATTR_NORETURN ATTR_SENTINEL_O(1) NONNULL((1)) void (VLIBCCALL libc_Execle)(char const *__restrict path, char const *args, ... /*, (char *)NULL, (char **)environ*/) __THROWS(...);
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
@@ -56,7 +56,7 @@ INTDEF ATTR_SENTINEL ATTR_NORETURN NONNULL((1)) void (VLIBCCALL libc_Execpl)(cha
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinal */
-INTDEF ATTR_SENTINEL_O(1) ATTR_NORETURN NONNULL((1)) void (VLIBCCALL libc_Execlpe)(char const *__restrict file, char const *args, ... /*, (char *)NULL, (char **)environ*/) __THROWS(...);
+INTDEF ATTR_NORETURN ATTR_SENTINEL_O(1) NONNULL((1)) void (VLIBCCALL libc_Execlpe)(char const *__restrict file, char const *args, ... /*, (char *)NULL, (char **)environ*/) __THROWS(...);
 /* >> pipe(2)
  * Create a new pair of connected pipes ([0] = reader, [1] = writer) */
 INTDEF NONNULL((1)) void (LIBCCALL libc_Pipe)(fd_t pipedes[2]) __THROWS(...);
@@ -197,7 +197,7 @@ INTDEF NONNULL((2)) size_t (LIBCCALL libc_PWrite64)(fd_t fd, void *buf, size_t b
 INTDEF NONNULL((2)) size_t (LIBCCALL libc_PReadAll64)(fd_t fd, void *buf, size_t bufsize, pos64_t offset) __THROWS(...);
 INTDEF NONNULL((1)) void (LIBCCALL libc_Pipe2)(fd_t pipedes[2], oflag_t flags) __THROWS(...);
 INTDEF fd_t (LIBCCALL libc_Dup3)(fd_t oldfd, fd_t newfd, oflag_t flags) __THROWS(...);
-INTDEF WUNUSED ATTR_RETNONNULL ATTR_MALLOC char *(LIBCCALL libc_GetCurrentDirName)(void) __THROWS(...);
+INTDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED char *(LIBCCALL libc_GetCurrentDirName)(void) __THROWS(...);
 INTDEF void (LIBCCALL libc_SyncFs)(fd_t fd) __THROWS(...);
 INTDEF void NOTHROW_NCX(LIBCCALL libc_GetResUid)(uid_t *ruid, uid_t *euid, uid_t *suid);
 INTDEF void NOTHROW_NCX(LIBCCALL libc_GetResGid)(gid_t *rgid, gid_t *egid, gid_t *sgid);
@@ -206,7 +206,7 @@ INTDEF void NOTHROW_NCX(LIBCCALL libc_SetResGid)(gid_t rgid, gid_t egid, gid_t s
 /* >> vfork(2)
  * Same as `fork(2)', but suspend the calling process until the child
  * process either calls `exit(2)' or one of the many `exec(2)' functions */
-INTDEF ATTR_RETURNS_TWICE WUNUSED pid_t (LIBCCALL libc_VFork)(void) __THROWS(...);
+INTDEF WUNUSED ATTR_RETURNS_TWICE pid_t (LIBCCALL libc_VFork)(void) __THROWS(...);
 /* >> fchown(2)
  * Change the ownership of a given `FD' to `GROUP:OWNER' */
 INTDEF void (LIBCCALL libc_FChown)(fd_t fd, uid_t owner, gid_t group) __THROWS(...);

@@ -77,8 +77,8 @@ NOTHROW_NCX(LIBCCALL libc_memrmem0)(void const *haystack, size_t haystacklen,
 
 /*[[[start:implementation]]]*/
 
-/*[[[head:strdup,hash:CRC-32=0xb1c886cb]]]*/
-INTERN WUNUSED ATTR_MALL_DEFAULT_ALIGNED ATTR_MALLOC NONNULL((1))
+/*[[[head:strdup,hash:CRC-32=0xa5b692b4]]]*/
+INTERN ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.heap.strdup.strdup") char *
 NOTHROW_NCX(LIBCCALL libc_strdup)(char const *__restrict string)
 /*[[[body:strdup]]]*/
@@ -91,8 +91,8 @@ NOTHROW_NCX(LIBCCALL libc_strdup)(char const *__restrict string)
 }
 /*[[[end:strdup]]]*/
 
-/*[[[head:strndup,hash:CRC-32=0xcaa7a55f]]]*/
-INTERN WUNUSED ATTR_MALL_DEFAULT_ALIGNED ATTR_MALLOC NONNULL((1))
+/*[[[head:strndup,hash:CRC-32=0x3496e51d]]]*/
+INTERN ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.heap.strdup.strndup") char *
 NOTHROW_NCX(LIBCCALL libc_strndup)(char const *__restrict string,
                                    size_t max_chars)
@@ -118,8 +118,8 @@ PRIVATE ATTR_SECTION(".rodata.crt.errno.strsignal.unknown_error_format") char co
 /*[[[skip:strerrorname_s]]]*/
 
 
-/*[[[head:strerror,hash:CRC-32=0x5febe1d5]]]*/
-INTERN WUNUSED ATTR_RETNONNULL
+/*[[[head:strerror,hash:CRC-32=0x48cde331]]]*/
+INTERN ATTR_RETNONNULL WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.errno.strerror") char *
 NOTHROW_NCX(LIBCCALL libc_strerror)(int errnum)
 /*[[[body:strerror]]]*/
@@ -148,8 +148,8 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED __ATTR_RETNONNULL,char const *const *,__N
 #define sys_siglist   __p_sys_siglist()
 #endif /* !sys_siglist */
 
-/*[[[head:strsignal_s,hash:CRC-32=0xfa78e701]]]*/
-INTERN WUNUSED ATTR_CONST
+/*[[[head:strsignal_s,hash:CRC-32=0x3a0b3c79]]]*/
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.errno.strsignal_s") char const *
 NOTHROW(LIBCCALL libc_strsignal_s)(int signum)
 /*[[[body:strsignal_s]]]*/
@@ -241,9 +241,9 @@ NOTHROW_NCX(LIBCCALL libc___xpg_strerror_r)(int errnum,
 }
 
 
-/*[[[head:vstrdupf,hash:CRC-32=0x2baa3863]]]*/
+/*[[[head:vstrdupf,hash:CRC-32=0xd3df0780]]]*/
 /* Print the given `FORMAT' into a newly allocated, heap-allocated string */
-INTERN WUNUSED ATTR_MALL_DEFAULT_ALIGNED ATTR_MALLOC ATTR_LIBC_PRINTF(1, 0)
+INTERN ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_LIBC_PRINTF(1, 0)
 ATTR_WEAK ATTR_SECTION(".text.crt.heap.strdup.vstrdupf") char *
 NOTHROW_NCX(LIBCCALL libc_vstrdupf)(char const *__restrict format,
                                     va_list args)
@@ -254,9 +254,9 @@ NOTHROW_NCX(LIBCCALL libc_vstrdupf)(char const *__restrict format,
 }
 /*[[[end:vstrdupf]]]*/
 
-/*[[[head:strdupf,hash:CRC-32=0xe2953fe2]]]*/
+/*[[[head:strdupf,hash:CRC-32=0x7ce0b7a]]]*/
 /* Print the given `FORMAT' into a newly allocated, heap-allocated string */
-INTERN WUNUSED ATTR_MALL_DEFAULT_ALIGNED ATTR_MALLOC ATTR_LIBC_PRINTF(1, 0)
+INTERN ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED WUNUSED ATTR_LIBC_PRINTF(1, 0)
 ATTR_WEAK ATTR_SECTION(".text.crt.heap.strdup.strdupf") char *
 NOTHROW_NCX(VLIBCCALL libc_strdupf)(char const *__restrict format,
                                     ...)

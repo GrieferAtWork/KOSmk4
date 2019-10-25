@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6680c6b1 */
+/* HASH CRC-32:0x423f2a2f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,16 +24,16 @@
 #ifndef ____localdep___signbit_defined
 #define ____localdep___signbit_defined 1
 #if defined(__CRT_HAVE___signbit)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__localdep___signbit,(double __val),__signbit,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___signbit,(double __val),__signbit,(__val))
 #elif defined(__CRT_HAVE__dsign)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__localdep___signbit,(double __val),_dsign,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___signbit,(double __val),_dsign,(__val))
 #else /* LIBC: __signbit */
 #undef ____localdep___signbit_defined
 #endif /* __signbit... */
 #endif /* !____localdep___signbit_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(__signbitf) __ATTR_WUNUSED __ATTR_CONST int
+__LOCAL_LIBC(__signbitf) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(__signbitf))(float __val) {
 #line 1310 "kos/src/libc/magic/math.c"
 	return (int)__localdep___signbit((double)__val);

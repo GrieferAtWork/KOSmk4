@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe9f13972 */
+/* HASH CRC-32:0xf3a39d03 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #define ____localdep_rawmemrchrl_defined 1
 #if defined(__CRT_HAVE_rawmemrchrl)
 /* Same as `memrchrl' without a search limit, starting at `(byte_t *)HAYSTACK-4' */
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_rawmemrchrl,(void const *__restrict __haystack, __UINT32_TYPE__ __dword),rawmemrchrl,(__haystack,__dword))
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_rawmemrchrl,(void const *__restrict __haystack, __UINT32_TYPE__ __dword),rawmemrchrl,(__haystack,__dword))
 #else /* LIBC: rawmemrchrl */
 #include <local/string/rawmemrchrl.h>
 /* Same as `memrchrl' without a search limit, starting at `(byte_t *)HAYSTACK-4' */
@@ -34,7 +34,7 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)),__U
 
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `rawmemrchrl', but return the offset from `HAYSTACK', rather than the actual address. */
-__LOCAL_LIBC(rawmemrlenl) __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) __SIZE_TYPE__
+__LOCAL_LIBC(rawmemrlenl) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(rawmemrlenl))(void const *__restrict __haystack,
                                                          __UINT32_TYPE__ __dword) {
 #line 1350 "kos/src/libc/magic/string.c"

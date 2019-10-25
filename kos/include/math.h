@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xef1fa75a */
+/* HASH CRC-32:0xbe9b0fc8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2580,51 +2580,51 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(cbrtl, __FORCELOCAL __ATTR_WUNUSED long double _
 /* Nearest integer, absolute value, and remainder functions. */
 #if __has_builtin(__builtin_ceil) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ceil)
 /* Smallest integral value not less than X */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL ceil)(double __x) { return __builtin_ceil(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL ceil)(double __x) { return __builtin_ceil(__x); }
 #elif defined(__CRT_HAVE_ceil)
 /* Smallest integral value not less than X */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,ceil,(double __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,ceil,(double __x),(__x))
 #elif defined(__CRT_HAVE___ceil)
 /* Smallest integral value not less than X */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,ceil,(double __x),__ceil,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,ceil,(double __x),__ceil,(__x))
 #else /* LIBC: ceil */
 __NAMESPACE_STD_END
 #include <local/math/ceil.h>
 __NAMESPACE_STD_BEGIN
 /* Smallest integral value not less than X */
-__NAMESPACE_LOCAL_USING_OR_IMPL(ceil, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL ceil)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ceil))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(ceil, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL ceil)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ceil))(__x); })
 #endif /* ceil... */
 #if __has_builtin(__builtin_fabs) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fabs)
 /* Absolute value of X */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL fabs)(double __x) { return __builtin_fabs(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL fabs)(double __x) { return __builtin_fabs(__x); }
 #elif defined(__CRT_HAVE_fabs)
 /* Absolute value of X */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,fabs,(double __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,fabs,(double __x),(__x))
 #elif defined(__CRT_HAVE___fabs)
 /* Absolute value of X */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,fabs,(double __x),__fabs,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,fabs,(double __x),__fabs,(__x))
 #else /* LIBC: fabs */
 __NAMESPACE_STD_END
 #include <local/math/fabs.h>
 __NAMESPACE_STD_BEGIN
 /* Absolute value of X */
-__NAMESPACE_LOCAL_USING_OR_IMPL(fabs, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL fabs)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fabs))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fabs, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL fabs)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fabs))(__x); })
 #endif /* fabs... */
 #if __has_builtin(__builtin_floor) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_floor)
 /* Largest integer not greater than X */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL floor)(double __x) { return __builtin_floor(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL floor)(double __x) { return __builtin_floor(__x); }
 #elif defined(__CRT_HAVE_floor)
 /* Largest integer not greater than X */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,floor,(double __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,floor,(double __x),(__x))
 #elif defined(__CRT_HAVE___floor)
 /* Largest integer not greater than X */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,floor,(double __x),__floor,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,floor,(double __x),__floor,(__x))
 #else /* LIBC: floor */
 __NAMESPACE_STD_END
 #include <local/math/floor.h>
 __NAMESPACE_STD_BEGIN
 /* Largest integer not greater than X */
-__NAMESPACE_LOCAL_USING_OR_IMPL(floor, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL floor)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(floor))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(floor, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL floor)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(floor))(__x); })
 #endif /* floor... */
 #ifndef __std_fmod_defined
 #define __std_fmod_defined 1
@@ -2643,51 +2643,51 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,fmod,(double __x, double __y),__fmod
 #endif /* !__std_fmod_defined */
 #if __has_builtin(__builtin_ceilf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ceilf)
 /* Smallest integral value not less than X */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL ceilf)(float __x) { return __builtin_ceilf(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL ceilf)(float __x) { return __builtin_ceilf(__x); }
 #elif defined(__CRT_HAVE_ceilf)
 /* Smallest integral value not less than X */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,ceilf,(float __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,ceilf,(float __x),(__x))
 #elif defined(__CRT_HAVE___ceilf)
 /* Smallest integral value not less than X */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,ceilf,(float __x),__ceilf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,ceilf,(float __x),__ceilf,(__x))
 #else /* LIBC: ceilf */
 __NAMESPACE_STD_END
 #include <local/math/ceilf.h>
 __NAMESPACE_STD_BEGIN
 /* Smallest integral value not less than X */
-__NAMESPACE_LOCAL_USING_OR_IMPL(ceilf, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL ceilf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ceilf))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(ceilf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL ceilf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ceilf))(__x); })
 #endif /* ceilf... */
 #if __has_builtin(__builtin_fabsf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fabsf)
 /* Absolute value of X */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL fabsf)(float __x) { return __builtin_fabsf(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL fabsf)(float __x) { return __builtin_fabsf(__x); }
 #elif defined(__CRT_HAVE_fabsf)
 /* Absolute value of X */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,fabsf,(float __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,fabsf,(float __x),(__x))
 #elif defined(__CRT_HAVE___fabsf)
 /* Absolute value of X */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,fabsf,(float __x),__fabsf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,fabsf,(float __x),__fabsf,(__x))
 #else /* LIBC: fabsf */
 __NAMESPACE_STD_END
 #include <local/math/fabsf.h>
 __NAMESPACE_STD_BEGIN
 /* Absolute value of X */
-__NAMESPACE_LOCAL_USING_OR_IMPL(fabsf, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL fabsf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fabsf))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fabsf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL fabsf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fabsf))(__x); })
 #endif /* fabsf... */
 #if __has_builtin(__builtin_floorf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_floorf)
 /* Largest integer not greater than X */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL floorf)(float __x) { return __builtin_floorf(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL floorf)(float __x) { return __builtin_floorf(__x); }
 #elif defined(__CRT_HAVE_floorf)
 /* Largest integer not greater than X */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,floorf,(float __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,floorf,(float __x),(__x))
 #elif defined(__CRT_HAVE___floorf)
 /* Largest integer not greater than X */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,floorf,(float __x),__floorf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,floorf,(float __x),__floorf,(__x))
 #else /* LIBC: floorf */
 __NAMESPACE_STD_END
 #include <local/math/floorf.h>
 __NAMESPACE_STD_BEGIN
 /* Largest integer not greater than X */
-__NAMESPACE_LOCAL_USING_OR_IMPL(floorf, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL floorf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(floorf))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(floorf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL floorf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(floorf))(__x); })
 #endif /* floorf... */
 #ifndef __std_fmodf_defined
 #define __std_fmodf_defined 1
@@ -2713,51 +2713,51 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fmodf, __FORCELOCAL __ATTR_WUNUSED float __NOTHR
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_ceill) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ceill)
 /* Smallest integral value not less than X */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL ceill)(long double __x) { return __builtin_ceill(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL ceill)(long double __x) { return __builtin_ceill(__x); }
 #elif defined(__CRT_HAVE_ceill)
 /* Smallest integral value not less than X */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,ceill,(long double __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,ceill,(long double __x),(__x))
 #elif defined(__CRT_HAVE___ceill)
 /* Smallest integral value not less than X */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,ceill,(long double __x),__ceill,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,ceill,(long double __x),__ceill,(__x))
 #else /* LIBC: ceill */
 __NAMESPACE_STD_END
 #include <local/math/ceill.h>
 __NAMESPACE_STD_BEGIN
 /* Smallest integral value not less than X */
-__NAMESPACE_LOCAL_USING_OR_IMPL(ceill, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL ceill)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ceill))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(ceill, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL ceill)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ceill))(__x); })
 #endif /* ceill... */
 #if __has_builtin(__builtin_fabsl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fabsl)
 /* Absolute value of X */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL fabsl)(long double __x) { return __builtin_fabsl(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL fabsl)(long double __x) { return __builtin_fabsl(__x); }
 #elif defined(__CRT_HAVE_fabsl)
 /* Absolute value of X */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,fabsl,(long double __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,fabsl,(long double __x),(__x))
 #elif defined(__CRT_HAVE___fabsl)
 /* Absolute value of X */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,fabsl,(long double __x),__fabsl,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,fabsl,(long double __x),__fabsl,(__x))
 #else /* LIBC: fabsl */
 __NAMESPACE_STD_END
 #include <local/math/fabsl.h>
 __NAMESPACE_STD_BEGIN
 /* Absolute value of X */
-__NAMESPACE_LOCAL_USING_OR_IMPL(fabsl, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL fabsl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fabsl))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fabsl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL fabsl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fabsl))(__x); })
 #endif /* fabsl... */
 #if __has_builtin(__builtin_floorl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_floorl)
 /* Largest integer not greater than X */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL floorl)(long double __x) { return __builtin_floorl(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL floorl)(long double __x) { return __builtin_floorl(__x); }
 #elif defined(__CRT_HAVE_floorl)
 /* Largest integer not greater than X */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,floorl,(long double __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,floorl,(long double __x),(__x))
 #elif defined(__CRT_HAVE___floorl)
 /* Largest integer not greater than X */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,floorl,(long double __x),__floorl,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,floorl,(long double __x),__floorl,(__x))
 #else /* LIBC: floorl */
 __NAMESPACE_STD_END
 #include <local/math/floorl.h>
 __NAMESPACE_STD_BEGIN
 /* Largest integer not greater than X */
-__NAMESPACE_LOCAL_USING_OR_IMPL(floorl, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL floorl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(floorl))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(floorl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL floorl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(floorl))(__x); })
 #endif /* floorl... */
 #ifndef __std_fmodl_defined
 #define __std_fmodl_defined 1
@@ -2791,103 +2791,103 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fmodl, __FORCELOCAL __ATTR_WUNUSED long double _
 #ifdef __USE_ISOC99
 #if __has_builtin(__builtin_copysign) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_copysign)
 /* Return X with its signed changed to Y's */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL copysign)(double __num, double __sign) { return __builtin_copysign(__num, __sign); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL copysign)(double __num, double __sign) { return __builtin_copysign(__num, __sign); }
 #elif defined(__CRT_HAVE_copysign)
 /* Return X with its signed changed to Y's */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,copysign,(double __num, double __sign),(__num,__sign))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,copysign,(double __num, double __sign),(__num,__sign))
 #elif defined(__CRT_HAVE___copysign)
 /* Return X with its signed changed to Y's */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,copysign,(double __num, double __sign),__copysign,(__num,__sign))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,copysign,(double __num, double __sign),__copysign,(__num,__sign))
 #elif defined(__CRT_HAVE__copysign)
 /* Return X with its signed changed to Y's */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,copysign,(double __num, double __sign),_copysign,(__num,__sign))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,copysign,(double __num, double __sign),_copysign,(__num,__sign))
 #else /* LIBC: copysign */
 __NAMESPACE_STD_END
 #include <local/math/copysign.h>
 __NAMESPACE_STD_BEGIN
 /* Return X with its signed changed to Y's */
-__NAMESPACE_LOCAL_USING_OR_IMPL(copysign, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL copysign)(double __num, double __sign) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(copysign))(__num, __sign); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(copysign, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL copysign)(double __num, double __sign) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(copysign))(__num, __sign); })
 #endif /* copysign... */
 #if __has_builtin(__builtin_nan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nan)
 /* Return representation of qNaN for double type */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL nan)(char const *__tagb) { return __builtin_nan(__tagb); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL nan)(char const *__tagb) { return __builtin_nan(__tagb); }
 #elif defined(__CRT_HAVE_nan)
 /* Return representation of qNaN for double type */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,nan,(char const *__tagb),(__tagb))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,nan,(char const *__tagb),(__tagb))
 #elif defined(__CRT_HAVE___nan)
 /* Return representation of qNaN for double type */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,nan,(char const *__tagb),__nan,(__tagb))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,nan,(char const *__tagb),__nan,(__tagb))
 #else /* LIBC: nan */
 __NAMESPACE_STD_END
 #include <local/math/nan.h>
 __NAMESPACE_STD_BEGIN
 /* Return representation of qNaN for double type */
-__NAMESPACE_LOCAL_USING_OR_IMPL(nan, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL nan)(char const *__tagb) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nan))(__tagb); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(nan, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL nan)(char const *__tagb) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nan))(__tagb); })
 #endif /* nan... */
 #if __has_builtin(__builtin_copysignf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_copysignf)
 /* Return X with its signed changed to Y's */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL copysignf)(float __num, float __sign) { return __builtin_copysignf(__num, __sign); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL copysignf)(float __num, float __sign) { return __builtin_copysignf(__num, __sign); }
 #elif defined(__CRT_HAVE_copysignf)
 /* Return X with its signed changed to Y's */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,copysignf,(float __num, float __sign),(__num,__sign))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,copysignf,(float __num, float __sign),(__num,__sign))
 #elif defined(__CRT_HAVE___copysignf)
 /* Return X with its signed changed to Y's */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,copysignf,(float __num, float __sign),__copysignf,(__num,__sign))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,copysignf,(float __num, float __sign),__copysignf,(__num,__sign))
 #else /* LIBC: copysignf */
 __NAMESPACE_STD_END
 #include <local/math/copysignf.h>
 __NAMESPACE_STD_BEGIN
 /* Return X with its signed changed to Y's */
-__NAMESPACE_LOCAL_USING_OR_IMPL(copysignf, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL copysignf)(float __num, float __sign) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(copysignf))(__num, __sign); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(copysignf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL copysignf)(float __num, float __sign) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(copysignf))(__num, __sign); })
 #endif /* copysignf... */
 #if __has_builtin(__builtin_nanf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nanf)
 /* Return representation of qNaN for double type */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL nanf)(char const *__tagb) { return __builtin_nanf(__tagb); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL nanf)(char const *__tagb) { return __builtin_nanf(__tagb); }
 #elif defined(__CRT_HAVE_nanf)
 /* Return representation of qNaN for double type */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,nanf,(char const *__tagb),(__tagb))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,nanf,(char const *__tagb),(__tagb))
 #elif defined(__CRT_HAVE___nanf)
 /* Return representation of qNaN for double type */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,nanf,(char const *__tagb),__nanf,(__tagb))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,nanf,(char const *__tagb),__nanf,(__tagb))
 #else /* LIBC: nanf */
 __NAMESPACE_STD_END
 #include <local/math/nanf.h>
 __NAMESPACE_STD_BEGIN
 /* Return representation of qNaN for double type */
-__NAMESPACE_LOCAL_USING_OR_IMPL(nanf, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL nanf)(char const *__tagb) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nanf))(__tagb); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(nanf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL nanf)(char const *__tagb) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nanf))(__tagb); })
 #endif /* nanf... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_copysignl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_copysignl)
 /* Return X with its signed changed to Y's */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL copysignl)(long double __num, long double __sign) { return __builtin_copysignl(__num, __sign); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL copysignl)(long double __num, long double __sign) { return __builtin_copysignl(__num, __sign); }
 #elif defined(__CRT_HAVE_copysignl)
 /* Return X with its signed changed to Y's */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,copysignl,(long double __num, long double __sign),(__num,__sign))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,copysignl,(long double __num, long double __sign),(__num,__sign))
 #elif defined(__CRT_HAVE___copysignl)
 /* Return X with its signed changed to Y's */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,copysignl,(long double __num, long double __sign),__copysignl,(__num,__sign))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,copysignl,(long double __num, long double __sign),__copysignl,(__num,__sign))
 #else /* LIBC: copysignl */
 __NAMESPACE_STD_END
 #include <local/math/copysignl.h>
 __NAMESPACE_STD_BEGIN
 /* Return X with its signed changed to Y's */
-__NAMESPACE_LOCAL_USING_OR_IMPL(copysignl, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL copysignl)(long double __num, long double __sign) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(copysignl))(__num, __sign); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(copysignl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL copysignl)(long double __num, long double __sign) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(copysignl))(__num, __sign); })
 #endif /* copysignl... */
 #if __has_builtin(__builtin_nanl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nanl)
 /* Return representation of qNaN for double type */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL nanl)(char const *__tagb) { return __builtin_nanl(__tagb); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL nanl)(char const *__tagb) { return __builtin_nanl(__tagb); }
 #elif defined(__CRT_HAVE_nanl)
 /* Return representation of qNaN for double type */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,nanl,(char const *__tagb),(__tagb))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,nanl,(char const *__tagb),(__tagb))
 #elif defined(__CRT_HAVE___nanl)
 /* Return representation of qNaN for double type */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,nanl,(char const *__tagb),__nanl,(__tagb))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,nanl,(char const *__tagb),__nanl,(__tagb))
 #else /* LIBC: nanl */
 __NAMESPACE_STD_END
 #include <local/math/nanl.h>
 __NAMESPACE_STD_BEGIN
 /* Return representation of qNaN for double type */
-__NAMESPACE_LOCAL_USING_OR_IMPL(nanl, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL nanl)(char const *__tagb) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nanl))(__tagb); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(nanl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL nanl)(char const *__tagb) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nanl))(__tagb); })
 #endif /* nanl... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_ISOC99 */
@@ -3151,16 +3151,16 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,rint,(double __x),__rint,(__x))
 #define __std_nextafter_defined 1
 #if __has_builtin(__builtin_nextafter) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nextafter)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL nextafter)(double __x, double __y) { return __builtin_nextafter(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL nextafter)(double __x, double __y) { return __builtin_nextafter(__x, __y); }
 #elif defined(__CRT_HAVE_nextafter)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,nextafter,(double __x, double __y),(__x,__y))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,nextafter,(double __x, double __y),(__x,__y))
 #elif defined(__CRT_HAVE___nextafter)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,nextafter,(double __x, double __y),__nextafter,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,nextafter,(double __x, double __y),__nextafter,(__x,__y))
 #elif defined(__CRT_HAVE__nextafter)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,nextafter,(double __x, double __y),_nextafter,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,nextafter,(double __x, double __y),_nextafter,(__x,__y))
 #else /* LIBC: nextafter */
 #undef __std_nextafter_defined
 #endif /* nextafter... */
@@ -3220,19 +3220,19 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(rintf, __FORCELOCAL __ATTR_WUNUSED float __NOTHR
 #define __std_nextafterf_defined 1
 #if __has_builtin(__builtin_nextafterf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nextafterf)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL nextafterf)(float __x, float __y) { return __builtin_nextafterf(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL nextafterf)(float __x, float __y) { return __builtin_nextafterf(__x, __y); }
 #elif defined(__CRT_HAVE_nextafterf)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,nextafterf,(float __x, float __y),(__x,__y))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,nextafterf,(float __x, float __y),(__x,__y))
 #elif defined(__CRT_HAVE___nextafterf)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,nextafterf,(float __x, float __y),__nextafterf,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,nextafterf,(float __x, float __y),__nextafterf,(__x,__y))
 #elif (__has_builtin(__builtin_nextafter) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nextafter)) || defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter)
 __NAMESPACE_STD_END
 #include <local/math/nextafterf.h>
 __NAMESPACE_STD_BEGIN
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__NAMESPACE_LOCAL_USING_OR_IMPL(nextafterf, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL nextafterf)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextafterf))(__x, __y); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(nextafterf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL nextafterf)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextafterf))(__x, __y); })
 #else /* CUSTOM: nextafterf */
 #undef __std_nextafterf_defined
 #endif /* nextafterf... */
@@ -3311,25 +3311,25 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(rintl, __FORCELOCAL __ATTR_WUNUSED long double _
 #define __std_nextafterl_defined 1
 #if __has_builtin(__builtin_nextafterl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nextafterl)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL nextafterl)(long double __x, long double __y) { return __builtin_nextafterl(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL nextafterl)(long double __x, long double __y) { return __builtin_nextafterl(__x, __y); }
 #elif defined(__CRT_HAVE_nextafterl)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,nextafterl,(long double __x, long double __y),(__x,__y))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,nextafterl,(long double __x, long double __y),(__x,__y))
 #elif defined(__CRT_HAVE___nextafterl)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,nextafterl,(long double __x, long double __y),__nextafterl,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,nextafterl,(long double __x, long double __y),__nextafterl,(__x,__y))
 #elif defined(__CRT_HAVE_nextafter) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,nextafterl,(long double __x, long double __y),nextafter,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,nextafterl,(long double __x, long double __y),nextafter,(__x,__y))
 #elif defined(__CRT_HAVE___nextafter) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,nextafterl,(long double __x, long double __y),__nextafter,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,nextafterl,(long double __x, long double __y),__nextafter,(__x,__y))
 #elif (__has_builtin(__builtin_nextafter) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nextafter)) || defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter)
 __NAMESPACE_STD_END
 #include <local/math/nextafterl.h>
 __NAMESPACE_STD_BEGIN
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__NAMESPACE_LOCAL_USING_OR_IMPL(nextafterl, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL nextafterl)(long double __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextafterl))(__x, __y); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(nextafterl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL nextafterl)(long double __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextafterl))(__x, __y); })
 #else /* CUSTOM: nextafterl */
 #undef __std_nextafterl_defined
 #endif /* nextafterl... */
@@ -3395,11 +3395,11 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ilogbl, __FORCELOCAL __ATTR_WUNUSED int __NOTHRO
 #ifndef __std_nexttoward_defined
 #define __std_nexttoward_defined 1
 #if __has_builtin(__builtin_nexttoward) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nexttoward)
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL nexttoward)(double __x, long double __y) { return __builtin_nexttoward(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL nexttoward)(double __x, long double __y) { return __builtin_nexttoward(__x, __y); }
 #elif defined(__CRT_HAVE_nexttoward)
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,nexttoward,(double __x, long double __y),(__x,__y))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,nexttoward,(double __x, long double __y),(__x,__y))
 #elif defined(__CRT_HAVE___nexttoward)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,nexttoward,(double __x, long double __y),__nexttoward,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,nexttoward,(double __x, long double __y),__nexttoward,(__x,__y))
 #else /* LIBC: nexttoward */
 #undef __std_nexttoward_defined
 #endif /* nexttoward... */
@@ -3454,39 +3454,39 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,nearbyint,(double __x),__nearbyint,(
 #endif /* !__std_nearbyint_defined */
 #if __has_builtin(__builtin_round) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_round)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL round)(double __x) { return __builtin_round(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL round)(double __x) { return __builtin_round(__x); }
 #elif defined(__CRT_HAVE_round)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,round,(double __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,round,(double __x),(__x))
 #elif defined(__CRT_HAVE___round)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,round,(double __x),__round,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,round,(double __x),__round,(__x))
 #else /* LIBC: round */
 __NAMESPACE_STD_END
 #include <local/math/round.h>
 __NAMESPACE_STD_BEGIN
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__NAMESPACE_LOCAL_USING_OR_IMPL(round, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL round)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(round))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(round, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL round)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(round))(__x); })
 #endif /* round... */
 #if __has_builtin(__builtin_trunc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_trunc)
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL trunc)(double __x) { return __builtin_trunc(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL trunc)(double __x) { return __builtin_trunc(__x); }
 #elif defined(__CRT_HAVE_trunc)
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,trunc,(double __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,trunc,(double __x),(__x))
 #elif defined(__CRT_HAVE___trunc)
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,trunc,(double __x),__trunc,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,trunc,(double __x),__trunc,(__x))
 #else /* LIBC: trunc */
 __NAMESPACE_STD_END
 #include <local/math/trunc.h>
 __NAMESPACE_STD_BEGIN
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
-__NAMESPACE_LOCAL_USING_OR_IMPL(trunc, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL trunc)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(trunc))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(trunc, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL trunc)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(trunc))(__x); })
 #endif /* trunc... */
 #ifndef __std_remquo_defined
 #define __std_remquo_defined 1
@@ -3526,83 +3526,83 @@ __CREDIRECT(__ATTR_WUNUSED,long int,__NOTHROW,lrint,(double __x),__lrint,(__x))
 #endif /* !__std_lrint_defined */
 #if __has_builtin(__builtin_lround) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lround)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long int __NOTHROW(__LIBCCALL lround)(double __x) { return __builtin_lround(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long int __NOTHROW(__LIBCCALL lround)(double __x) { return __builtin_lround(__x); }
 #elif defined(__CRT_HAVE_lround)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,long int,__NOTHROW,lround,(double __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lround,(double __x),(__x))
 #elif defined(__CRT_HAVE___lround)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long int,__NOTHROW,lround,(double __x),__lround,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lround,(double __x),__lround,(__x))
 #else /* LIBC: lround */
 __NAMESPACE_STD_END
 #include <local/math/lround.h>
 __NAMESPACE_STD_BEGIN
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__NAMESPACE_LOCAL_USING_OR_IMPL(lround, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long int __NOTHROW(__LIBCCALL lround)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lround))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(lround, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long int __NOTHROW(__LIBCCALL lround)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lround))(__x); })
 #endif /* lround... */
 #if __has_builtin(__builtin_fdim) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fdim)
 /* Return positive difference between X and Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL fdim)(double __x, double __y) { return __builtin_fdim(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL fdim)(double __x, double __y) { return __builtin_fdim(__x, __y); }
 #elif defined(__CRT_HAVE_fdim)
 /* Return positive difference between X and Y */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,fdim,(double __x, double __y),(__x,__y))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,fdim,(double __x, double __y),(__x,__y))
 #elif defined(__CRT_HAVE___fdim)
 /* Return positive difference between X and Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,fdim,(double __x, double __y),__fdim,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,fdim,(double __x, double __y),__fdim,(__x,__y))
 #else /* LIBC: fdim */
 __NAMESPACE_STD_END
 #include <local/math/fdim.h>
 __NAMESPACE_STD_BEGIN
 /* Return positive difference between X and Y */
-__NAMESPACE_LOCAL_USING_OR_IMPL(fdim, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL fdim)(double __x, double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fdim))(__x, __y); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fdim, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL fdim)(double __x, double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fdim))(__x, __y); })
 #endif /* fdim... */
 #if __has_builtin(__builtin_fmax) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fmax)
 /* Return maximum numeric value from X and Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL fmax)(double __x, double __y) { return __builtin_fmax(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL fmax)(double __x, double __y) { return __builtin_fmax(__x, __y); }
 #elif defined(__CRT_HAVE_fmax)
 /* Return maximum numeric value from X and Y */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,fmax,(double __x, double __y),(__x,__y))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,fmax,(double __x, double __y),(__x,__y))
 #elif defined(__CRT_HAVE___fmax)
 /* Return maximum numeric value from X and Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,fmax,(double __x, double __y),__fmax,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,fmax,(double __x, double __y),__fmax,(__x,__y))
 #else /* LIBC: fmax */
 __NAMESPACE_STD_END
 #include <local/math/fmax.h>
 __NAMESPACE_STD_BEGIN
 /* Return maximum numeric value from X and Y */
-__NAMESPACE_LOCAL_USING_OR_IMPL(fmax, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL fmax)(double __x, double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmax))(__x, __y); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fmax, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL fmax)(double __x, double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmax))(__x, __y); })
 #endif /* fmax... */
 #if __has_builtin(__builtin_fmin) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fmin)
 /* Return minimum numeric value from X and Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL fmin)(double __x, double __y) { return __builtin_fmin(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL fmin)(double __x, double __y) { return __builtin_fmin(__x, __y); }
 #elif defined(__CRT_HAVE_fmin)
 /* Return minimum numeric value from X and Y */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,fmin,(double __x, double __y),(__x,__y))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,fmin,(double __x, double __y),(__x,__y))
 #elif defined(__CRT_HAVE___fmin)
 /* Return minimum numeric value from X and Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,fmin,(double __x, double __y),__fmin,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,fmin,(double __x, double __y),__fmin,(__x,__y))
 #else /* LIBC: fmin */
 __NAMESPACE_STD_END
 #include <local/math/fmin.h>
 __NAMESPACE_STD_BEGIN
 /* Return minimum numeric value from X and Y */
-__NAMESPACE_LOCAL_USING_OR_IMPL(fmin, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL fmin)(double __x, double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmin))(__x, __y); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fmin, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL fmin)(double __x, double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmin))(__x, __y); })
 #endif /* fmin... */
 #if __has_builtin(__builtin_fma) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fma)
 /* Multiply-add function computed as a ternary operation */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL fma)(double __x, double __y, double __z) { return __builtin_fma(__x, __y, __z); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL fma)(double __x, double __y, double __z) { return __builtin_fma(__x, __y, __z); }
 #elif defined(__CRT_HAVE_fma)
 /* Multiply-add function computed as a ternary operation */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,fma,(double __x, double __y, double __z),(__x,__y,__z))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,fma,(double __x, double __y, double __z),(__x,__y,__z))
 #elif defined(__CRT_HAVE___fma)
 /* Multiply-add function computed as a ternary operation */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,fma,(double __x, double __y, double __z),__fma,(__x,__y,__z))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,fma,(double __x, double __y, double __z),__fma,(__x,__y,__z))
 #else /* LIBC: fma */
 __NAMESPACE_STD_END
 #include <local/math/fma.h>
 __NAMESPACE_STD_BEGIN
 /* Multiply-add function computed as a ternary operation */
-__NAMESPACE_LOCAL_USING_OR_IMPL(fma, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL fma)(double __x, double __y, double __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fma))(__x, __y, __z); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fma, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL fma)(double __x, double __y, double __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fma))(__x, __y, __z); })
 #endif /* fma... */
 #ifdef __COMPILER_HAVE_LONGLONG
 #ifndef __std_llrint_defined
@@ -3640,16 +3640,16 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(llround, __FORCELOCAL __ATTR_WUNUSED __LONGLONG 
 #ifndef __std_nexttowardf_defined
 #define __std_nexttowardf_defined 1
 #if __has_builtin(__builtin_nexttowardf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nexttowardf)
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL nexttowardf)(float __x, long double __y) { return __builtin_nexttowardf(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL nexttowardf)(float __x, long double __y) { return __builtin_nexttowardf(__x, __y); }
 #elif defined(__CRT_HAVE_nexttowardf)
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,nexttowardf,(float __x, long double __y),(__x,__y))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,nexttowardf,(float __x, long double __y),(__x,__y))
 #elif defined(__CRT_HAVE___nexttowardf)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,nexttowardf,(float __x, long double __y),__nexttowardf,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,nexttowardf,(float __x, long double __y),__nexttowardf,(__x,__y))
 #elif (__has_builtin(__builtin_nexttoward) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nexttoward)) || defined(__CRT_HAVE_nexttoward) || defined(__CRT_HAVE___nexttoward)
 __NAMESPACE_STD_END
 #include <local/math/nexttowardf.h>
 __NAMESPACE_STD_BEGIN
-__NAMESPACE_LOCAL_USING_OR_IMPL(nexttowardf, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL nexttowardf)(float __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nexttowardf))(__x, __y); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(nexttowardf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL nexttowardf)(float __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nexttowardf))(__x, __y); })
 #else /* CUSTOM: nexttowardf */
 #undef __std_nexttowardf_defined
 #endif /* nexttowardf... */
@@ -3723,39 +3723,39 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(nearbyintf, __FORCELOCAL __ATTR_WUNUSED float __
 #endif /* !__std_nearbyintf_defined */
 #if __has_builtin(__builtin_roundf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_roundf)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL roundf)(float __x) { return __builtin_roundf(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL roundf)(float __x) { return __builtin_roundf(__x); }
 #elif defined(__CRT_HAVE_roundf)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,roundf,(float __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,roundf,(float __x),(__x))
 #elif defined(__CRT_HAVE___roundf)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,roundf,(float __x),__roundf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,roundf,(float __x),__roundf,(__x))
 #else /* LIBC: roundf */
 __NAMESPACE_STD_END
 #include <local/math/roundf.h>
 __NAMESPACE_STD_BEGIN
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__NAMESPACE_LOCAL_USING_OR_IMPL(roundf, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL roundf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(roundf))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(roundf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL roundf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(roundf))(__x); })
 #endif /* roundf... */
 #if __has_builtin(__builtin_truncf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_truncf)
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL truncf)(float __x) { return __builtin_truncf(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL truncf)(float __x) { return __builtin_truncf(__x); }
 #elif defined(__CRT_HAVE_truncf)
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,truncf,(float __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,truncf,(float __x),(__x))
 #elif defined(__CRT_HAVE___truncf)
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,truncf,(float __x),__truncf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,truncf,(float __x),__truncf,(__x))
 #else /* LIBC: truncf */
 __NAMESPACE_STD_END
 #include <local/math/truncf.h>
 __NAMESPACE_STD_BEGIN
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
-__NAMESPACE_LOCAL_USING_OR_IMPL(truncf, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL truncf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(truncf))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(truncf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL truncf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(truncf))(__x); })
 #endif /* truncf... */
 #ifndef __std_remquof_defined
 #define __std_remquof_defined 1
@@ -3809,83 +3809,83 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lrintf, __FORCELOCAL __ATTR_WUNUSED long int __N
 #endif /* !__std_lrintf_defined */
 #if __has_builtin(__builtin_lroundf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lroundf)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long int __NOTHROW(__LIBCCALL lroundf)(float __x) { return __builtin_lroundf(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long int __NOTHROW(__LIBCCALL lroundf)(float __x) { return __builtin_lroundf(__x); }
 #elif defined(__CRT_HAVE_lroundf)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,long int,__NOTHROW,lroundf,(float __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lroundf,(float __x),(__x))
 #elif defined(__CRT_HAVE___lroundf)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long int,__NOTHROW,lroundf,(float __x),__lroundf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lroundf,(float __x),__lroundf,(__x))
 #else /* LIBC: lroundf */
 __NAMESPACE_STD_END
 #include <local/math/lroundf.h>
 __NAMESPACE_STD_BEGIN
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__NAMESPACE_LOCAL_USING_OR_IMPL(lroundf, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long int __NOTHROW(__LIBCCALL lroundf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lroundf))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(lroundf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long int __NOTHROW(__LIBCCALL lroundf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lroundf))(__x); })
 #endif /* lroundf... */
 #if __has_builtin(__builtin_fdimf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fdimf)
 /* Return positive difference between X and Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL fdimf)(float __x, float __y) { return __builtin_fdimf(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL fdimf)(float __x, float __y) { return __builtin_fdimf(__x, __y); }
 #elif defined(__CRT_HAVE_fdimf)
 /* Return positive difference between X and Y */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,fdimf,(float __x, float __y),(__x,__y))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,fdimf,(float __x, float __y),(__x,__y))
 #elif defined(__CRT_HAVE___fdimf)
 /* Return positive difference between X and Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,fdimf,(float __x, float __y),__fdimf,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,fdimf,(float __x, float __y),__fdimf,(__x,__y))
 #else /* LIBC: fdimf */
 __NAMESPACE_STD_END
 #include <local/math/fdimf.h>
 __NAMESPACE_STD_BEGIN
 /* Return positive difference between X and Y */
-__NAMESPACE_LOCAL_USING_OR_IMPL(fdimf, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL fdimf)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fdimf))(__x, __y); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fdimf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL fdimf)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fdimf))(__x, __y); })
 #endif /* fdimf... */
 #if __has_builtin(__builtin_fmaxf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fmaxf)
 /* Return maximum numeric value from X and Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL fmaxf)(float __x, float __y) { return __builtin_fmaxf(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL fmaxf)(float __x, float __y) { return __builtin_fmaxf(__x, __y); }
 #elif defined(__CRT_HAVE_fmaxf)
 /* Return maximum numeric value from X and Y */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,fmaxf,(float __x, float __y),(__x,__y))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,fmaxf,(float __x, float __y),(__x,__y))
 #elif defined(__CRT_HAVE___fmaxf)
 /* Return maximum numeric value from X and Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,fmaxf,(float __x, float __y),__fmaxf,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,fmaxf,(float __x, float __y),__fmaxf,(__x,__y))
 #else /* LIBC: fmaxf */
 __NAMESPACE_STD_END
 #include <local/math/fmaxf.h>
 __NAMESPACE_STD_BEGIN
 /* Return maximum numeric value from X and Y */
-__NAMESPACE_LOCAL_USING_OR_IMPL(fmaxf, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL fmaxf)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmaxf))(__x, __y); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fmaxf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL fmaxf)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmaxf))(__x, __y); })
 #endif /* fmaxf... */
 #if __has_builtin(__builtin_fminf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fminf)
 /* Return minimum numeric value from X and Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL fminf)(float __x, float __y) { return __builtin_fminf(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL fminf)(float __x, float __y) { return __builtin_fminf(__x, __y); }
 #elif defined(__CRT_HAVE_fminf)
 /* Return minimum numeric value from X and Y */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,fminf,(float __x, float __y),(__x,__y))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,fminf,(float __x, float __y),(__x,__y))
 #elif defined(__CRT_HAVE___fminf)
 /* Return minimum numeric value from X and Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,fminf,(float __x, float __y),__fminf,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,fminf,(float __x, float __y),__fminf,(__x,__y))
 #else /* LIBC: fminf */
 __NAMESPACE_STD_END
 #include <local/math/fminf.h>
 __NAMESPACE_STD_BEGIN
 /* Return minimum numeric value from X and Y */
-__NAMESPACE_LOCAL_USING_OR_IMPL(fminf, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL fminf)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fminf))(__x, __y); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fminf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL fminf)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fminf))(__x, __y); })
 #endif /* fminf... */
 #if __has_builtin(__builtin_fmaf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fmaf)
 /* Multiply-add function computed as a ternary operation */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL fmaf)(float __x, float __y, float __z) { return __builtin_fmaf(__x, __y, __z); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL fmaf)(float __x, float __y, float __z) { return __builtin_fmaf(__x, __y, __z); }
 #elif defined(__CRT_HAVE_fmaf)
 /* Multiply-add function computed as a ternary operation */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,fmaf,(float __x, float __y, float __z),(__x,__y,__z))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,fmaf,(float __x, float __y, float __z),(__x,__y,__z))
 #elif defined(__CRT_HAVE___fmaf)
 /* Multiply-add function computed as a ternary operation */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,fmaf,(float __x, float __y, float __z),__fmaf,(__x,__y,__z))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,fmaf,(float __x, float __y, float __z),__fmaf,(__x,__y,__z))
 #else /* LIBC: fmaf */
 __NAMESPACE_STD_END
 #include <local/math/fmaf.h>
 __NAMESPACE_STD_BEGIN
 /* Multiply-add function computed as a ternary operation */
-__NAMESPACE_LOCAL_USING_OR_IMPL(fmaf, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL fmaf)(float __x, float __y, float __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmaf))(__x, __y, __z); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fmaf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL fmaf)(float __x, float __y, float __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmaf))(__x, __y, __z); })
 #endif /* fmaf... */
 #ifdef __COMPILER_HAVE_LONGLONG
 #ifndef __std_llrintf_defined
@@ -3930,20 +3930,20 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(llroundf, __FORCELOCAL __ATTR_WUNUSED __LONGLONG
 #ifndef __std_nexttowardl_defined
 #define __std_nexttowardl_defined 1
 #if __has_builtin(__builtin_nexttowardl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nexttowardl)
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL nexttowardl)(long double __x, long double __y) { return __builtin_nexttowardl(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL nexttowardl)(long double __x, long double __y) { return __builtin_nexttowardl(__x, __y); }
 #elif defined(__CRT_HAVE_nexttowardl)
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,nexttowardl,(long double __x, long double __y),(__x,__y))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,nexttowardl,(long double __x, long double __y),(__x,__y))
 #elif defined(__CRT_HAVE___nexttowardl)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,nexttowardl,(long double __x, long double __y),__nexttowardl,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,nexttowardl,(long double __x, long double __y),__nexttowardl,(__x,__y))
 #elif defined(__CRT_HAVE_nexttoward) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,nexttowardl,(long double __x, long double __y),nexttoward,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,nexttowardl,(long double __x, long double __y),nexttoward,(__x,__y))
 #elif defined(__CRT_HAVE___nexttoward) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,nexttowardl,(long double __x, long double __y),__nexttoward,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,nexttowardl,(long double __x, long double __y),__nexttoward,(__x,__y))
 #elif (__has_builtin(__builtin_nexttoward) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nexttoward)) || defined(__CRT_HAVE_nexttoward) || defined(__CRT_HAVE___nexttoward)
 __NAMESPACE_STD_END
 #include <local/math/nexttowardl.h>
 __NAMESPACE_STD_BEGIN
-__NAMESPACE_LOCAL_USING_OR_IMPL(nexttowardl, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL nexttowardl)(long double __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nexttowardl))(__x, __y); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(nexttowardl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL nexttowardl)(long double __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nexttowardl))(__x, __y); })
 #else /* CUSTOM: nexttowardl */
 #undef __std_nexttowardl_defined
 #endif /* nexttowardl... */
@@ -4037,39 +4037,39 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(nearbyintl, __FORCELOCAL __ATTR_WUNUSED long dou
 #endif /* !__std_nearbyintl_defined */
 #if __has_builtin(__builtin_roundl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_roundl)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL roundl)(long double __x) { return __builtin_roundl(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL roundl)(long double __x) { return __builtin_roundl(__x); }
 #elif defined(__CRT_HAVE_roundl)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,roundl,(long double __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,roundl,(long double __x),(__x))
 #elif defined(__CRT_HAVE___roundl)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,roundl,(long double __x),__roundl,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,roundl,(long double __x),__roundl,(__x))
 #else /* LIBC: roundl */
 __NAMESPACE_STD_END
 #include <local/math/roundl.h>
 __NAMESPACE_STD_BEGIN
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__NAMESPACE_LOCAL_USING_OR_IMPL(roundl, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL roundl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(roundl))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(roundl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL roundl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(roundl))(__x); })
 #endif /* roundl... */
 #if __has_builtin(__builtin_truncl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_truncl)
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL truncl)(long double __x) { return __builtin_truncl(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL truncl)(long double __x) { return __builtin_truncl(__x); }
 #elif defined(__CRT_HAVE_truncl)
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,truncl,(long double __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,truncl,(long double __x),(__x))
 #elif defined(__CRT_HAVE___truncl)
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,truncl,(long double __x),__truncl,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,truncl,(long double __x),__truncl,(__x))
 #else /* LIBC: truncl */
 __NAMESPACE_STD_END
 #include <local/math/truncl.h>
 __NAMESPACE_STD_BEGIN
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
-__NAMESPACE_LOCAL_USING_OR_IMPL(truncl, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL truncl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(truncl))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(truncl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL truncl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(truncl))(__x); })
 #endif /* truncl... */
 #ifndef __std_remquol_defined
 #define __std_remquol_defined 1
@@ -4139,67 +4139,67 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lrintl, __FORCELOCAL __ATTR_WUNUSED long int __N
 #endif /* !__std_lrintl_defined */
 #if __has_builtin(__builtin_lroundl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lroundl)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long int __NOTHROW(__LIBCCALL lroundl)(long double __x) { return __builtin_lroundl(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long int __NOTHROW(__LIBCCALL lroundl)(long double __x) { return __builtin_lroundl(__x); }
 #elif defined(__CRT_HAVE_lroundl)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,long int,__NOTHROW,lroundl,(long double __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lroundl,(long double __x),(__x))
 #elif defined(__CRT_HAVE___lroundl)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long int,__NOTHROW,lroundl,(long double __x),__lroundl,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lroundl,(long double __x),__lroundl,(__x))
 #else /* LIBC: lroundl */
 __NAMESPACE_STD_END
 #include <local/math/lroundl.h>
 __NAMESPACE_STD_BEGIN
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__NAMESPACE_LOCAL_USING_OR_IMPL(lroundl, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long int __NOTHROW(__LIBCCALL lroundl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lroundl))(__x); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(lroundl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long int __NOTHROW(__LIBCCALL lroundl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lroundl))(__x); })
 #endif /* lroundl... */
 #if __has_builtin(__builtin_fdiml) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fdiml)
 /* Return positive difference between X and Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL fdiml)(long double __x, long double __y) { return __builtin_fdiml(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL fdiml)(long double __x, long double __y) { return __builtin_fdiml(__x, __y); }
 #elif defined(__CRT_HAVE_fdiml)
 /* Return positive difference between X and Y */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,fdiml,(long double __x, long double __y),(__x,__y))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,fdiml,(long double __x, long double __y),(__x,__y))
 #elif defined(__CRT_HAVE___fdiml)
 /* Return positive difference between X and Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,fdiml,(long double __x, long double __y),__fdiml,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,fdiml,(long double __x, long double __y),__fdiml,(__x,__y))
 #else /* LIBC: fdiml */
 __NAMESPACE_STD_END
 #include <local/math/fdiml.h>
 __NAMESPACE_STD_BEGIN
 /* Return positive difference between X and Y */
-__NAMESPACE_LOCAL_USING_OR_IMPL(fdiml, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL fdiml)(long double __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fdiml))(__x, __y); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fdiml, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL fdiml)(long double __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fdiml))(__x, __y); })
 #endif /* fdiml... */
 #if __has_builtin(__builtin_fmaxl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fmaxl)
 /* Return maximum numeric value from X and Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL fmaxl)(long double __x, long double __y) { return __builtin_fmaxl(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL fmaxl)(long double __x, long double __y) { return __builtin_fmaxl(__x, __y); }
 #elif defined(__CRT_HAVE_fmaxl)
 /* Return maximum numeric value from X and Y */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,fmaxl,(long double __x, long double __y),(__x,__y))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,fmaxl,(long double __x, long double __y),(__x,__y))
 #elif defined(__CRT_HAVE___fmaxl)
 /* Return maximum numeric value from X and Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,fmaxl,(long double __x, long double __y),__fmaxl,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,fmaxl,(long double __x, long double __y),__fmaxl,(__x,__y))
 #else /* LIBC: fmaxl */
 __NAMESPACE_STD_END
 #include <local/math/fmaxl.h>
 __NAMESPACE_STD_BEGIN
 /* Return maximum numeric value from X and Y */
-__NAMESPACE_LOCAL_USING_OR_IMPL(fmaxl, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL fmaxl)(long double __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmaxl))(__x, __y); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fmaxl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL fmaxl)(long double __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmaxl))(__x, __y); })
 #endif /* fmaxl... */
 #if __has_builtin(__builtin_fminl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fminl)
 /* Return minimum numeric value from X and Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL fminl)(long double __x, long double __y) { return __builtin_fminl(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL fminl)(long double __x, long double __y) { return __builtin_fminl(__x, __y); }
 #elif defined(__CRT_HAVE_fminl)
 /* Return minimum numeric value from X and Y */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,fminl,(long double __x, long double __y),(__x,__y))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,fminl,(long double __x, long double __y),(__x,__y))
 #elif defined(__CRT_HAVE___fminl)
 /* Return minimum numeric value from X and Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,fminl,(long double __x, long double __y),__fminl,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,fminl,(long double __x, long double __y),__fminl,(__x,__y))
 #else /* LIBC: fminl */
 __NAMESPACE_STD_END
 #include <local/math/fminl.h>
 __NAMESPACE_STD_BEGIN
 /* Return minimum numeric value from X and Y */
-__NAMESPACE_LOCAL_USING_OR_IMPL(fminl, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL fminl)(long double __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fminl))(__x, __y); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(fminl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL fminl)(long double __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fminl))(__x, __y); })
 #endif /* fminl... */
 #if __has_builtin(__builtin_fmal) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fmal)
 /* Multiply-add function computed as a ternary operation */
@@ -4592,13 +4592,13 @@ __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL sqrt)(float __x) { return
 #endif /* sqrt... */
 #if __has_builtin(__builtin_ceilf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ceilf)
 /* Smallest integral value not less than X */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL ceil)(float __x) { return __builtin_ceilf(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL ceil)(float __x) { return __builtin_ceilf(__x); }
 #elif defined(__CRT_HAVE_ceilf)
 /* Smallest integral value not less than X */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,ceil,(float __x),ceilf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,ceil,(float __x),ceilf,(__x))
 #elif defined(__CRT_HAVE___ceilf)
 /* Smallest integral value not less than X */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,ceil,(float __x),__ceilf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,ceil,(float __x),__ceilf,(__x))
 #else /* LIBC: ceilf */
 } /* extern "C++" { */
 __NAMESPACE_STD_END
@@ -4606,17 +4606,17 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Smallest integral value not less than X */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL ceil)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ceilf))(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL ceil)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ceilf))(__x); }
 #endif /* ceil... */
 #if __has_builtin(__builtin_fabsf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fabsf)
 /* Absolute value of X */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL fabs)(float __x) { return __builtin_fabsf(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL fabs)(float __x) { return __builtin_fabsf(__x); }
 #elif defined(__CRT_HAVE_fabsf)
 /* Absolute value of X */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,fabs,(float __x),fabsf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,fabs,(float __x),fabsf,(__x))
 #elif defined(__CRT_HAVE___fabsf)
 /* Absolute value of X */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,fabs,(float __x),__fabsf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,fabs,(float __x),__fabsf,(__x))
 #else /* LIBC: fabsf */
 } /* extern "C++" { */
 __NAMESPACE_STD_END
@@ -4624,17 +4624,17 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Absolute value of X */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL fabs)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fabsf))(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL fabs)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fabsf))(__x); }
 #endif /* fabs... */
 #if __has_builtin(__builtin_floorf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_floorf)
 /* Largest integer not greater than X */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL floor)(float __x) { return __builtin_floorf(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL floor)(float __x) { return __builtin_floorf(__x); }
 #elif defined(__CRT_HAVE_floorf)
 /* Largest integer not greater than X */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,floor,(float __x),floorf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,floor,(float __x),floorf,(__x))
 #elif defined(__CRT_HAVE___floorf)
 /* Largest integer not greater than X */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,floor,(float __x),__floorf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,floor,(float __x),__floorf,(__x))
 #else /* LIBC: floorf */
 } /* extern "C++" { */
 __NAMESPACE_STD_END
@@ -4642,7 +4642,7 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Largest integer not greater than X */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL floor)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(floorf))(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL floor)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(floorf))(__x); }
 #endif /* floor... */
 #if __has_builtin(__builtin_fmodf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fmodf)
 /* Floating-point modulo remainder of X/Y */
@@ -5097,13 +5097,13 @@ __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL sqrt)(long double _
 #endif /* sqrt... */
 #if __has_builtin(__builtin_ceill) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ceill)
 /* Smallest integral value not less than X */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL ceil)(long double __x) { return __builtin_ceill(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL ceil)(long double __x) { return __builtin_ceill(__x); }
 #elif defined(__CRT_HAVE_ceill)
 /* Smallest integral value not less than X */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,ceil,(long double __x),ceill,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,ceil,(long double __x),ceill,(__x))
 #elif defined(__CRT_HAVE___ceill)
 /* Smallest integral value not less than X */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,ceil,(long double __x),__ceill,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,ceil,(long double __x),__ceill,(__x))
 #else /* LIBC: ceill */
 } /* extern "C++" { */
 __NAMESPACE_STD_END
@@ -5111,17 +5111,17 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Smallest integral value not less than X */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL ceil)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ceill))(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL ceil)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ceill))(__x); }
 #endif /* ceil... */
 #if __has_builtin(__builtin_fabsl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fabsl)
 /* Absolute value of X */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL fabs)(long double __x) { return __builtin_fabsl(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL fabs)(long double __x) { return __builtin_fabsl(__x); }
 #elif defined(__CRT_HAVE_fabsl)
 /* Absolute value of X */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,fabs,(long double __x),fabsl,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,fabs,(long double __x),fabsl,(__x))
 #elif defined(__CRT_HAVE___fabsl)
 /* Absolute value of X */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,fabs,(long double __x),__fabsl,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,fabs,(long double __x),__fabsl,(__x))
 #else /* LIBC: fabsl */
 } /* extern "C++" { */
 __NAMESPACE_STD_END
@@ -5129,17 +5129,17 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Absolute value of X */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL fabs)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fabsl))(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL fabs)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fabsl))(__x); }
 #endif /* fabs... */
 #if __has_builtin(__builtin_floorl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_floorl)
 /* Largest integer not greater than X */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL floor)(long double __x) { return __builtin_floorl(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL floor)(long double __x) { return __builtin_floorl(__x); }
 #elif defined(__CRT_HAVE_floorl)
 /* Largest integer not greater than X */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,floor,(long double __x),floorl,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,floor,(long double __x),floorl,(__x))
 #elif defined(__CRT_HAVE___floorl)
 /* Largest integer not greater than X */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,floor,(long double __x),__floorl,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,floor,(long double __x),__floorl,(__x))
 #else /* LIBC: floorl */
 } /* extern "C++" { */
 __NAMESPACE_STD_END
@@ -5147,7 +5147,7 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Largest integer not greater than X */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL floor)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(floorl))(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL floor)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(floorl))(__x); }
 #endif /* floor... */
 #if __has_builtin(__builtin_fmodl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fmodl)
 /* Floating-point modulo remainder of X/Y */
@@ -5321,13 +5321,13 @@ __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL rint)(float __x) { return
 #endif /* rint... */
 #if __has_builtin(__builtin_nextafterf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nextafterf)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL nextafter)(float __x, float __y) { return __builtin_nextafterf(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL nextafter)(float __x, float __y) { return __builtin_nextafterf(__x, __y); }
 #elif defined(__CRT_HAVE_nextafterf)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,nextafter,(float __x, float __y),nextafterf,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,nextafter,(float __x, float __y),nextafterf,(__x,__y))
 #elif defined(__CRT_HAVE___nextafterf)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,nextafter,(float __x, float __y),__nextafterf,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,nextafter,(float __x, float __y),__nextafterf,(__x,__y))
 #elif (__has_builtin(__builtin_nextafter) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nextafter)) || defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
@@ -5335,7 +5335,7 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL nextafter)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextafterf))(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL nextafter)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextafterf))(__x, __y); }
 #endif /* nextafter... */
 #if __has_builtin(__builtin_remainderf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remainderf)
 /* Return the remainder of integer divison X / Y with infinite precision */
@@ -5568,19 +5568,19 @@ __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL rint)(long double _
 #endif /* rint... */
 #if __has_builtin(__builtin_nextafterl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nextafterl)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL nextafter)(long double __x, long double __y) { return __builtin_nextafterl(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL nextafter)(long double __x, long double __y) { return __builtin_nextafterl(__x, __y); }
 #elif defined(__CRT_HAVE_nextafterl)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,nextafter,(long double __x, long double __y),nextafterl,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,nextafter,(long double __x, long double __y),nextafterl,(__x,__y))
 #elif defined(__CRT_HAVE___nextafterl)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,nextafter,(long double __x, long double __y),__nextafterl,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,nextafter,(long double __x, long double __y),__nextafterl,(__x,__y))
 #elif defined(__CRT_HAVE_nextafter) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,nextafter,(long double __x, long double __y),(__x,__y))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,nextafter,(long double __x, long double __y),(__x,__y))
 #elif defined(__CRT_HAVE___nextafter) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,nextafter,(long double __x, long double __y),__nextafter,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,nextafter,(long double __x, long double __y),__nextafter,(__x,__y))
 #elif (__has_builtin(__builtin_nextafter) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nextafter)) || defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
@@ -5588,7 +5588,7 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL nextafter)(long double __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextafterl))(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL nextafter)(long double __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextafterl))(__x, __y); }
 #endif /* nextafter... */
 #if __has_builtin(__builtin_remainderl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remainderl)
 /* Return the remainder of integer divison X / Y with infinite precision */
@@ -5679,13 +5679,13 @@ __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL log2)(float __x) { return
 #endif /* log2... */
 #if __has_builtin(__builtin_copysignf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_copysignf)
 /* Return X with its signed changed to Y's */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL copysign)(float __num, float __sign) { return __builtin_copysignf(__num, __sign); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL copysign)(float __num, float __sign) { return __builtin_copysignf(__num, __sign); }
 #elif defined(__CRT_HAVE_copysignf)
 /* Return X with its signed changed to Y's */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,copysign,(float __num, float __sign),copysignf,(__num,__sign))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,copysign,(float __num, float __sign),copysignf,(__num,__sign))
 #elif defined(__CRT_HAVE___copysignf)
 /* Return X with its signed changed to Y's */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,copysign,(float __num, float __sign),__copysignf,(__num,__sign))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,copysign,(float __num, float __sign),__copysignf,(__num,__sign))
 #else /* LIBC: copysignf */
 } /* extern "C++" { */
 __NAMESPACE_STD_END
@@ -5693,7 +5693,7 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Return X with its signed changed to Y's */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL copysign)(float __num, float __sign) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(copysignf))(__num, __sign); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL copysign)(float __num, float __sign) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(copysignf))(__num, __sign); }
 #endif /* copysign... */
 #if __has_builtin(__builtin_tgammaf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tgammaf)
 /* True gamma function */
@@ -5714,18 +5714,18 @@ extern "C++" {
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL tgamma)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tgammaf))(__x); }
 #endif /* tgamma... */
 #if __has_builtin(__builtin_nexttowardf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nexttowardf)
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL nexttoward)(float __x, long double __y) { return __builtin_nexttowardf(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL nexttoward)(float __x, long double __y) { return __builtin_nexttowardf(__x, __y); }
 #elif defined(__CRT_HAVE_nexttowardf)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,nexttoward,(float __x, long double __y),nexttowardf,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,nexttoward,(float __x, long double __y),nexttowardf,(__x,__y))
 #elif defined(__CRT_HAVE___nexttowardf)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,nexttoward,(float __x, long double __y),__nexttowardf,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,nexttoward,(float __x, long double __y),__nexttowardf,(__x,__y))
 #elif (__has_builtin(__builtin_nexttoward) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nexttoward)) || defined(__CRT_HAVE_nexttoward) || defined(__CRT_HAVE___nexttoward)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/nexttowardf.h>
 __NAMESPACE_STD_BEGIN
 extern "C++" {
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL nexttoward)(float __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nexttowardf))(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL nexttoward)(float __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nexttowardf))(__x, __y); }
 #endif /* nexttoward... */
 #if __has_builtin(__builtin_scalbnf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalbnf)
 /* Return X times (2 to the Nth power) */
@@ -5787,13 +5787,13 @@ __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL nearbyint)(float __x) { r
 #endif /* nearbyint... */
 #if __has_builtin(__builtin_roundf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_roundf)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL round)(float __x) { return __builtin_roundf(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL round)(float __x) { return __builtin_roundf(__x); }
 #elif defined(__CRT_HAVE_roundf)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,round,(float __x),roundf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,round,(float __x),roundf,(__x))
 #elif defined(__CRT_HAVE___roundf)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,round,(float __x),__roundf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,round,(float __x),__roundf,(__x))
 #else /* LIBC: roundf */
 } /* extern "C++" { */
 __NAMESPACE_STD_END
@@ -5801,20 +5801,20 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL round)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(roundf))(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL round)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(roundf))(__x); }
 #endif /* round... */
 #if __has_builtin(__builtin_truncf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_truncf)
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL trunc)(float __x) { return __builtin_truncf(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL trunc)(float __x) { return __builtin_truncf(__x); }
 #elif defined(__CRT_HAVE_truncf)
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,trunc,(float __x),truncf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,trunc,(float __x),truncf,(__x))
 #elif defined(__CRT_HAVE___truncf)
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,trunc,(float __x),__truncf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,trunc,(float __x),__truncf,(__x))
 #else /* LIBC: truncf */
 } /* extern "C++" { */
 __NAMESPACE_STD_END
@@ -5823,7 +5823,7 @@ __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL trunc)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(truncf))(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL trunc)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(truncf))(__x); }
 #endif /* trunc... */
 #if __has_builtin(__builtin_remquof) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remquof)
 /* Compute remainder of X and Y and put in *QUO a value with sign
@@ -5871,13 +5871,13 @@ __FORCELOCAL __ATTR_WUNUSED long int __NOTHROW(__LIBCCALL lrint)(float __x) { re
 #endif /* lrint... */
 #if __has_builtin(__builtin_lroundf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lroundf)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long int __NOTHROW(__LIBCCALL lround)(float __x) { return __builtin_lroundf(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long int __NOTHROW(__LIBCCALL lround)(float __x) { return __builtin_lroundf(__x); }
 #elif defined(__CRT_HAVE_lroundf)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long int,__NOTHROW,lround,(float __x),lroundf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lround,(float __x),lroundf,(__x))
 #elif defined(__CRT_HAVE___lroundf)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long int,__NOTHROW,lround,(float __x),__lroundf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lround,(float __x),__lroundf,(__x))
 #else /* LIBC: lroundf */
 } /* extern "C++" { */
 __NAMESPACE_STD_END
@@ -5885,17 +5885,17 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long int __NOTHROW(__LIBCCALL lround)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lroundf))(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long int __NOTHROW(__LIBCCALL lround)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lroundf))(__x); }
 #endif /* lround... */
 #if __has_builtin(__builtin_fdimf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fdimf)
 /* Return positive difference between X and Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL fdim)(float __x, float __y) { return __builtin_fdimf(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL fdim)(float __x, float __y) { return __builtin_fdimf(__x, __y); }
 #elif defined(__CRT_HAVE_fdimf)
 /* Return positive difference between X and Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,fdim,(float __x, float __y),fdimf,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,fdim,(float __x, float __y),fdimf,(__x,__y))
 #elif defined(__CRT_HAVE___fdimf)
 /* Return positive difference between X and Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,fdim,(float __x, float __y),__fdimf,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,fdim,(float __x, float __y),__fdimf,(__x,__y))
 #else /* LIBC: fdimf */
 } /* extern "C++" { */
 __NAMESPACE_STD_END
@@ -5903,17 +5903,17 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Return positive difference between X and Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL fdim)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fdimf))(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL fdim)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fdimf))(__x, __y); }
 #endif /* fdim... */
 #if __has_builtin(__builtin_fmaxf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fmaxf)
 /* Return maximum numeric value from X and Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL fmax)(float __x, float __y) { return __builtin_fmaxf(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL fmax)(float __x, float __y) { return __builtin_fmaxf(__x, __y); }
 #elif defined(__CRT_HAVE_fmaxf)
 /* Return maximum numeric value from X and Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,fmax,(float __x, float __y),fmaxf,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,fmax,(float __x, float __y),fmaxf,(__x,__y))
 #elif defined(__CRT_HAVE___fmaxf)
 /* Return maximum numeric value from X and Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,fmax,(float __x, float __y),__fmaxf,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,fmax,(float __x, float __y),__fmaxf,(__x,__y))
 #else /* LIBC: fmaxf */
 } /* extern "C++" { */
 __NAMESPACE_STD_END
@@ -5921,17 +5921,17 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Return maximum numeric value from X and Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL fmax)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmaxf))(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL fmax)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmaxf))(__x, __y); }
 #endif /* fmax... */
 #if __has_builtin(__builtin_fminf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fminf)
 /* Return minimum numeric value from X and Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL fmin)(float __x, float __y) { return __builtin_fminf(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL fmin)(float __x, float __y) { return __builtin_fminf(__x, __y); }
 #elif defined(__CRT_HAVE_fminf)
 /* Return minimum numeric value from X and Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,fmin,(float __x, float __y),fminf,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,fmin,(float __x, float __y),fminf,(__x,__y))
 #elif defined(__CRT_HAVE___fminf)
 /* Return minimum numeric value from X and Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,fmin,(float __x, float __y),__fminf,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,fmin,(float __x, float __y),__fminf,(__x,__y))
 #else /* LIBC: fminf */
 } /* extern "C++" { */
 __NAMESPACE_STD_END
@@ -5939,17 +5939,17 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Return minimum numeric value from X and Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL fmin)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fminf))(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL fmin)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fminf))(__x, __y); }
 #endif /* fmin... */
 #if __has_builtin(__builtin_fmaf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fmaf)
 /* Multiply-add function computed as a ternary operation */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL fma)(float __x, float __y, float __z) { return __builtin_fmaf(__x, __y, __z); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL fma)(float __x, float __y, float __z) { return __builtin_fmaf(__x, __y, __z); }
 #elif defined(__CRT_HAVE_fmaf)
 /* Multiply-add function computed as a ternary operation */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,fma,(float __x, float __y, float __z),fmaf,(__x,__y,__z))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,fma,(float __x, float __y, float __z),fmaf,(__x,__y,__z))
 #elif defined(__CRT_HAVE___fmaf)
 /* Multiply-add function computed as a ternary operation */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,fma,(float __x, float __y, float __z),__fmaf,(__x,__y,__z))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,fma,(float __x, float __y, float __z),__fmaf,(__x,__y,__z))
 #else /* LIBC: fmaf */
 } /* extern "C++" { */
 __NAMESPACE_STD_END
@@ -5957,7 +5957,7 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Multiply-add function computed as a ternary operation */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL fma)(float __x, float __y, float __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmaf))(__x, __y, __z); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL fma)(float __x, float __y, float __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmaf))(__x, __y, __z); }
 #endif /* fma... */
 #ifdef __COMPILER_HAVE_LONGLONG
 #if __has_builtin(__builtin_llrintf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_llrintf)
@@ -6048,13 +6048,13 @@ __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL log2)(long double _
 #endif /* log2... */
 #if __has_builtin(__builtin_copysignl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_copysignl)
 /* Return X with its signed changed to Y's */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL copysign)(long double __num, long double __sign) { return __builtin_copysignl(__num, __sign); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL copysign)(long double __num, long double __sign) { return __builtin_copysignl(__num, __sign); }
 #elif defined(__CRT_HAVE_copysignl)
 /* Return X with its signed changed to Y's */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,copysign,(long double __num, long double __sign),copysignl,(__num,__sign))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,copysign,(long double __num, long double __sign),copysignl,(__num,__sign))
 #elif defined(__CRT_HAVE___copysignl)
 /* Return X with its signed changed to Y's */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,copysign,(long double __num, long double __sign),__copysignl,(__num,__sign))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,copysign,(long double __num, long double __sign),__copysignl,(__num,__sign))
 #else /* LIBC: copysignl */
 } /* extern "C++" { */
 __NAMESPACE_STD_END
@@ -6062,7 +6062,7 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Return X with its signed changed to Y's */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL copysign)(long double __num, long double __sign) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(copysignl))(__num, __sign); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL copysign)(long double __num, long double __sign) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(copysignl))(__num, __sign); }
 #endif /* copysign... */
 #if __has_builtin(__builtin_tgammal) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tgammal)
 /* True gamma function */
@@ -6089,22 +6089,22 @@ extern "C++" {
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL tgamma)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tgammal))(__x); }
 #endif /* tgamma... */
 #if __has_builtin(__builtin_nexttowardl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nexttowardl)
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL nexttoward)(long double __x, long double __y) { return __builtin_nexttowardl(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL nexttoward)(long double __x, long double __y) { return __builtin_nexttowardl(__x, __y); }
 #elif defined(__CRT_HAVE_nexttowardl)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,nexttoward,(long double __x, long double __y),nexttowardl,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,nexttoward,(long double __x, long double __y),nexttowardl,(__x,__y))
 #elif defined(__CRT_HAVE___nexttowardl)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,nexttoward,(long double __x, long double __y),__nexttowardl,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,nexttoward,(long double __x, long double __y),__nexttowardl,(__x,__y))
 #elif defined(__CRT_HAVE_nexttoward) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,nexttoward,(long double __x, long double __y),(__x,__y))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,nexttoward,(long double __x, long double __y),(__x,__y))
 #elif defined(__CRT_HAVE___nexttoward) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,nexttoward,(long double __x, long double __y),__nexttoward,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,nexttoward,(long double __x, long double __y),__nexttoward,(__x,__y))
 #elif (__has_builtin(__builtin_nexttoward) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nexttoward)) || defined(__CRT_HAVE_nexttoward) || defined(__CRT_HAVE___nexttoward)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/nexttowardl.h>
 __NAMESPACE_STD_BEGIN
 extern "C++" {
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL nexttoward)(long double __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nexttowardl))(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL nexttoward)(long double __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nexttowardl))(__x, __y); }
 #endif /* nexttoward... */
 #if __has_builtin(__builtin_scalbnl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalbnl)
 /* Return X times (2 to the Nth power) */
@@ -6186,13 +6186,13 @@ __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL nearbyint)(long dou
 #endif /* nearbyint... */
 #if __has_builtin(__builtin_roundl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_roundl)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL round)(long double __x) { return __builtin_roundl(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL round)(long double __x) { return __builtin_roundl(__x); }
 #elif defined(__CRT_HAVE_roundl)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,round,(long double __x),roundl,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,round,(long double __x),roundl,(__x))
 #elif defined(__CRT_HAVE___roundl)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,round,(long double __x),__roundl,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,round,(long double __x),__roundl,(__x))
 #else /* LIBC: roundl */
 } /* extern "C++" { */
 __NAMESPACE_STD_END
@@ -6200,20 +6200,20 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL round)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(roundl))(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL round)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(roundl))(__x); }
 #endif /* round... */
 #if __has_builtin(__builtin_truncl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_truncl)
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL trunc)(long double __x) { return __builtin_truncl(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL trunc)(long double __x) { return __builtin_truncl(__x); }
 #elif defined(__CRT_HAVE_truncl)
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,trunc,(long double __x),truncl,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,trunc,(long double __x),truncl,(__x))
 #elif defined(__CRT_HAVE___truncl)
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,trunc,(long double __x),__truncl,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,trunc,(long double __x),__truncl,(__x))
 #else /* LIBC: truncl */
 } /* extern "C++" { */
 __NAMESPACE_STD_END
@@ -6222,7 +6222,7 @@ __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL trunc)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(truncl))(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL trunc)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(truncl))(__x); }
 #endif /* trunc... */
 #if __has_builtin(__builtin_remquol) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remquol)
 /* Compute remainder of X and Y and put in *QUO a value with sign
@@ -6286,13 +6286,13 @@ __FORCELOCAL __ATTR_WUNUSED long int __NOTHROW(__LIBCCALL lrint)(long double __x
 #endif /* lrint... */
 #if __has_builtin(__builtin_lroundl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lroundl)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long int __NOTHROW(__LIBCCALL lround)(long double __x) { return __builtin_lroundl(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long int __NOTHROW(__LIBCCALL lround)(long double __x) { return __builtin_lroundl(__x); }
 #elif defined(__CRT_HAVE_lroundl)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long int,__NOTHROW,lround,(long double __x),lroundl,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lround,(long double __x),lroundl,(__x))
 #elif defined(__CRT_HAVE___lroundl)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long int,__NOTHROW,lround,(long double __x),__lroundl,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,lround,(long double __x),__lroundl,(__x))
 #else /* LIBC: lroundl */
 } /* extern "C++" { */
 __NAMESPACE_STD_END
@@ -6300,17 +6300,17 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long int __NOTHROW(__LIBCCALL lround)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lroundl))(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long int __NOTHROW(__LIBCCALL lround)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lroundl))(__x); }
 #endif /* lround... */
 #if __has_builtin(__builtin_fdiml) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fdiml)
 /* Return positive difference between X and Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL fdim)(long double __x, long double __y) { return __builtin_fdiml(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL fdim)(long double __x, long double __y) { return __builtin_fdiml(__x, __y); }
 #elif defined(__CRT_HAVE_fdiml)
 /* Return positive difference between X and Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,fdim,(long double __x, long double __y),fdiml,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,fdim,(long double __x, long double __y),fdiml,(__x,__y))
 #elif defined(__CRT_HAVE___fdiml)
 /* Return positive difference between X and Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,fdim,(long double __x, long double __y),__fdiml,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,fdim,(long double __x, long double __y),__fdiml,(__x,__y))
 #else /* LIBC: fdiml */
 } /* extern "C++" { */
 __NAMESPACE_STD_END
@@ -6318,17 +6318,17 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Return positive difference between X and Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL fdim)(long double __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fdiml))(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL fdim)(long double __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fdiml))(__x, __y); }
 #endif /* fdim... */
 #if __has_builtin(__builtin_fmaxl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fmaxl)
 /* Return maximum numeric value from X and Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL fmax)(long double __x, long double __y) { return __builtin_fmaxl(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL fmax)(long double __x, long double __y) { return __builtin_fmaxl(__x, __y); }
 #elif defined(__CRT_HAVE_fmaxl)
 /* Return maximum numeric value from X and Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,fmax,(long double __x, long double __y),fmaxl,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,fmax,(long double __x, long double __y),fmaxl,(__x,__y))
 #elif defined(__CRT_HAVE___fmaxl)
 /* Return maximum numeric value from X and Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,fmax,(long double __x, long double __y),__fmaxl,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,fmax,(long double __x, long double __y),__fmaxl,(__x,__y))
 #else /* LIBC: fmaxl */
 } /* extern "C++" { */
 __NAMESPACE_STD_END
@@ -6336,17 +6336,17 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Return maximum numeric value from X and Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL fmax)(long double __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmaxl))(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL fmax)(long double __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmaxl))(__x, __y); }
 #endif /* fmax... */
 #if __has_builtin(__builtin_fminl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fminl)
 /* Return minimum numeric value from X and Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL fmin)(long double __x, long double __y) { return __builtin_fminl(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL fmin)(long double __x, long double __y) { return __builtin_fminl(__x, __y); }
 #elif defined(__CRT_HAVE_fminl)
 /* Return minimum numeric value from X and Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,fmin,(long double __x, long double __y),fminl,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,fmin,(long double __x, long double __y),fminl,(__x,__y))
 #elif defined(__CRT_HAVE___fminl)
 /* Return minimum numeric value from X and Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,fmin,(long double __x, long double __y),__fminl,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,fmin,(long double __x, long double __y),__fminl,(__x,__y))
 #else /* LIBC: fminl */
 } /* extern "C++" { */
 __NAMESPACE_STD_END
@@ -6354,7 +6354,7 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 extern "C++" {
 /* Return minimum numeric value from X and Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL fmin)(long double __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fminl))(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL fmin)(long double __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fminl))(__x, __y); }
 #endif /* fmin... */
 #if __has_builtin(__builtin_fmal) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fmal)
 /* Multiply-add function computed as a ternary operation */
@@ -7446,61 +7446,61 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(pow10l, __FORCELOCAL __ATTR_WUNUSED long double 
 #if !defined(__cplusplus) || !defined(__CORRECT_ISO_CPP11_MATH_H_PROTO_FP) /* isinf conflicts with C++11. */
 #if __has_builtin(__builtin_isinf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isinf)
 /* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL isinf)(double __val) { return __builtin_isinf(__val); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isinf)(double __val) { return __builtin_isinf(__val); }
 #elif defined(__CRT_HAVE_isinf)
 /* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,isinf,(double __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isinf,(double __val),(__val))
 #elif defined(__CRT_HAVE___isinf)
 /* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,isinf,(double __val),__isinf,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isinf,(double __val),__isinf,(__val))
 #else /* LIBC: isinf */
 #include <local/math/isinf.h>
 /* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
-__NAMESPACE_LOCAL_USING_OR_IMPL(isinf, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL isinf)(double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isinf))(__val); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(isinf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isinf)(double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isinf))(__val); })
 #endif /* isinf... */
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP11_MATH_H_PROTO_FP */
 #if __has_builtin(__builtin_isinff) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isinff)
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL isinff)(float __val) { return __builtin_isinff(__val); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isinff)(float __val) { return __builtin_isinff(__val); }
 #elif defined(__CRT_HAVE_isinff)
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,isinff,(float __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isinff,(float __val),(__val))
 #elif defined(__CRT_HAVE___isinff)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,isinff,(float __val),__isinff,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isinff,(float __val),__isinff,(__val))
 #else /* LIBC: isinff */
 #include <local/math/isinff.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(isinff, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL isinff)(float __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isinff))(__val); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(isinff, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isinff)(float __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isinff))(__val); })
 #endif /* isinff... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_isinfl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isinfl)
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL isinfl)(long double __val) { return __builtin_isinfl(__val); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isinfl)(long double __val) { return __builtin_isinfl(__val); }
 #elif defined(__CRT_HAVE_isinfl)
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,isinfl,(long double __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isinfl,(long double __val),(__val))
 #elif defined(__CRT_HAVE___isinfl)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,isinfl,(long double __val),__isinfl,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isinfl,(long double __val),__isinfl,(__val))
 #elif defined(__CRT_HAVE___isinf) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,isinfl,(long double __val),__isinf,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isinfl,(long double __val),__isinf,(__val))
 #elif defined(__CRT_HAVE_isinf) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,isinfl,(long double __val),isinf,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isinfl,(long double __val),isinf,(__val))
 #else /* LIBC: isinfl */
 #include <local/math/isinfl.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(isinfl, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL isinfl)(long double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isinfl))(__val); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(isinfl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isinfl)(long double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isinfl))(__val); })
 #endif /* isinfl... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #if __has_builtin(__builtin_finite) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_finite)
 /* Return nonzero if VALUE is finite and not NaN */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL finite)(double __val) { return __builtin_finite(__val); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL finite)(double __val) { return __builtin_finite(__val); }
 #elif defined(__CRT_HAVE_finite)
 /* Return nonzero if VALUE is finite and not NaN */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,finite,(double __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,finite,(double __val),(__val))
 #elif defined(__CRT_HAVE___finite)
 /* Return nonzero if VALUE is finite and not NaN */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,finite,(double __val),__finite,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,finite,(double __val),__finite,(__val))
 #elif defined(__CRT_HAVE__finite)
 /* Return nonzero if VALUE is finite and not NaN */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,finite,(double __val),_finite,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,finite,(double __val),_finite,(__val))
 #else /* LIBC: finite */
 #include <local/math/finite.h>
 /* Return nonzero if VALUE is finite and not NaN */
-__NAMESPACE_LOCAL_USING_OR_IMPL(finite, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL finite)(double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(finite))(__val); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(finite, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL finite)(double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(finite))(__val); })
 #endif /* finite... */
 #if __has_builtin(__builtin_drem) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_drem)
 /* Return the remainder of X/Y */
@@ -7523,14 +7523,14 @@ __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,significand,(double __x),(__x))
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,significand,(double __x),__significand,(__x))
 #endif /* significand... */
 #if __has_builtin(__builtin_finitef) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_finitef)
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL finitef)(float __val) { return __builtin_finitef(__val); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL finitef)(float __val) { return __builtin_finitef(__val); }
 #elif defined(__CRT_HAVE_finitef)
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,finitef,(float __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,finitef,(float __val),(__val))
 #elif defined(__CRT_HAVE___finitef)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,finitef,(float __val),__finitef,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,finitef,(float __val),__finitef,(__val))
 #else /* LIBC: finitef */
 #include <local/math/finitef.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(finitef, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL finitef)(float __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(finitef))(__val); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(finitef, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL finitef)(float __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(finitef))(__val); })
 #endif /* finitef... */
 #if __has_builtin(__builtin_dremf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_dremf)
 /* Return the remainder of X/Y */
@@ -7562,18 +7562,18 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(significandf, __FORCELOCAL __ATTR_WUNUSED float 
 #endif /* significandf... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_finitel) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_finitel)
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL finitel)(long double __val) { return __builtin_finitel(__val); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL finitel)(long double __val) { return __builtin_finitel(__val); }
 #elif defined(__CRT_HAVE_finitel)
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,finitel,(long double __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,finitel,(long double __val),(__val))
 #elif defined(__CRT_HAVE___finitel)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,finitel,(long double __val),__finitel,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,finitel,(long double __val),__finitel,(__val))
 #elif defined(__CRT_HAVE___finite) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,finitel,(long double __val),__finite,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,finitel,(long double __val),__finite,(__val))
 #elif defined(__CRT_HAVE_finite) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,finitel,(long double __val),finite,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,finitel,(long double __val),finite,(__val))
 #else /* LIBC: finitel */
 #include <local/math/finitel.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(finitel, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL finitel)(long double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(finitel))(__val); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(finitel, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL finitel)(long double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(finitel))(__val); })
 #endif /* finitel... */
 #if __has_builtin(__builtin_dreml) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_dreml)
 /* Return the remainder of X/Y */
@@ -7622,48 +7622,48 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(significandl, __FORCELOCAL __ATTR_WUNUSED long d
 #if !defined(__cplusplus) || !defined(__CORRECT_ISO_CPP11_MATH_H_PROTO_FP) /* isnan conflicts with C++11. */
 #if __has_builtin(__builtin_isnan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isnan)
 /* Return nonzero if VALUE is not a number */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL isnan)(double __val) { return __builtin_isnan(__val); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isnan)(double __val) { return __builtin_isnan(__val); }
 #elif defined(__CRT_HAVE_isnan)
 /* Return nonzero if VALUE is not a number */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,isnan,(double __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isnan,(double __val),(__val))
 #elif defined(__CRT_HAVE___isnan)
 /* Return nonzero if VALUE is not a number */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,isnan,(double __val),__isnan,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isnan,(double __val),__isnan,(__val))
 #elif defined(__CRT_HAVE__isnan)
 /* Return nonzero if VALUE is not a number */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,isnan,(double __val),_isnan,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isnan,(double __val),_isnan,(__val))
 #else /* LIBC: isnan */
 #include <local/math/isnan.h>
 /* Return nonzero if VALUE is not a number */
-__NAMESPACE_LOCAL_USING_OR_IMPL(isnan, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL isnan)(double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isnan))(__val); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(isnan, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isnan)(double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isnan))(__val); })
 #endif /* isnan... */
 #endif /* !cplusplus || !__CORRECT_ISO_CPP11_MATH_H_PROTO_FP */
 #if __has_builtin(__builtin_isnanf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isnanf)
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL isnanf)(float __val) { return __builtin_isnanf(__val); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isnanf)(float __val) { return __builtin_isnanf(__val); }
 #elif defined(__CRT_HAVE_isnanf)
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,isnanf,(float __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isnanf,(float __val),(__val))
 #elif defined(__CRT_HAVE___isnanf)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,isnanf,(float __val),__isnanf,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isnanf,(float __val),__isnanf,(__val))
 #else /* LIBC: isnanf */
 #include <local/math/isnanf.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(isnanf, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL isnanf)(float __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isnanf))(__val); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(isnanf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isnanf)(float __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isnanf))(__val); })
 #endif /* isnanf... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_isnanl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isnanl)
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL isnanl)(long double __val) { return __builtin_isnanl(__val); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isnanl)(long double __val) { return __builtin_isnanl(__val); }
 #elif defined(__CRT_HAVE_isnanl)
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,isnanl,(long double __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isnanl,(long double __val),(__val))
 #elif defined(__CRT_HAVE___isnanl)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,isnanl,(long double __val),__isnanl,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isnanl,(long double __val),__isnanl,(__val))
 #elif defined(__CRT_HAVE___isnan) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,isnanl,(long double __val),__isnan,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isnanl,(long double __val),__isnan,(__val))
 #elif defined(__CRT_HAVE__isnan) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,isnanl,(long double __val),_isnan,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isnanl,(long double __val),_isnan,(__val))
 #elif defined(__CRT_HAVE_isnan) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,isnanl,(long double __val),isnan,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,isnanl,(long double __val),isnan,(__val))
 #else /* LIBC: isnanl */
 #include <local/math/isnanl.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(isnanl, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL isnanl)(long double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isnanl))(__val); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(isnanl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL isnanl)(long double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isnanl))(__val); })
 #endif /* isnanl... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_MISC || (__USE_XOPEN && !__USE_XOPEN2K) */
@@ -9356,45 +9356,45 @@ __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __cbrtl)(long doubl
 #endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
 #if __has_builtin(__builtin_ceil) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ceil)
 /* Smallest integral value not less than X */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL __ceil)(double __x) { return __builtin_ceil(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __ceil)(double __x) { return __builtin_ceil(__x); }
 #elif defined(__CRT_HAVE_ceil)
 /* Smallest integral value not less than X */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,__ceil,(double __x),ceil,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__ceil,(double __x),ceil,(__x))
 #elif defined(__CRT_HAVE___ceil)
 /* Smallest integral value not less than X */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,__ceil,(double __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__ceil,(double __x),(__x))
 #else /* LIBC: ceil */
 #include <local/math/ceil.h>
 /* Smallest integral value not less than X */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL __ceil)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ceil))(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __ceil)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ceil))(__x); }
 #endif /* __ceil... */
 #if __has_builtin(__builtin_fabs) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fabs)
 /* Absolute value of X */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL __fabs)(double __x) { return __builtin_fabs(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __fabs)(double __x) { return __builtin_fabs(__x); }
 #elif defined(__CRT_HAVE_fabs)
 /* Absolute value of X */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,__fabs,(double __x),fabs,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__fabs,(double __x),fabs,(__x))
 #elif defined(__CRT_HAVE___fabs)
 /* Absolute value of X */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,__fabs,(double __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__fabs,(double __x),(__x))
 #else /* LIBC: fabs */
 #include <local/math/fabs.h>
 /* Absolute value of X */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL __fabs)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fabs))(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __fabs)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fabs))(__x); }
 #endif /* __fabs... */
 #if __has_builtin(__builtin_floor) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_floor)
 /* Largest integer not greater than X */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL __floor)(double __x) { return __builtin_floor(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __floor)(double __x) { return __builtin_floor(__x); }
 #elif defined(__CRT_HAVE_floor)
 /* Largest integer not greater than X */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,__floor,(double __x),floor,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__floor,(double __x),floor,(__x))
 #elif defined(__CRT_HAVE___floor)
 /* Largest integer not greater than X */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,__floor,(double __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__floor,(double __x),(__x))
 #else /* LIBC: floor */
 #include <local/math/floor.h>
 /* Largest integer not greater than X */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL __floor)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(floor))(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __floor)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(floor))(__x); }
 #endif /* __floor... */
 #if defined(__CRT_HAVE___fmod)
 /* Floating-point modulo remainder of X/Y */
@@ -9405,76 +9405,76 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__fmod,(double __x, double __y),fmod
 #endif /* __fmod... */
 #if __has_builtin(__builtin_isinf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isinf)
 /* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL __isinf)(double __val) { return __builtin_isinf(__val); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __isinf)(double __val) { return __builtin_isinf(__val); }
 #elif defined(__CRT_HAVE_isinf)
 /* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__isinf,(double __val),isinf,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isinf,(double __val),isinf,(__val))
 #elif defined(__CRT_HAVE___isinf)
 /* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__isinf,(double __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isinf,(double __val),(__val))
 #else /* LIBC: isinf */
 #include <local/math/isinf.h>
 /* Return 0 if VALUE is finite or NaN, +1 if it is +Infinity, -1 if it is -Infinity */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL __isinf)(double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isinf))(__val); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __isinf)(double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isinf))(__val); }
 #endif /* __isinf... */
 #if __has_builtin(__builtin_finite) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_finite)
 /* Return nonzero if VALUE is finite and not NaN */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL __finite)(double __val) { return __builtin_finite(__val); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __finite)(double __val) { return __builtin_finite(__val); }
 #elif defined(__CRT_HAVE_finite)
 /* Return nonzero if VALUE is finite and not NaN */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__finite,(double __val),finite,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__finite,(double __val),finite,(__val))
 #elif defined(__CRT_HAVE___finite)
 /* Return nonzero if VALUE is finite and not NaN */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__finite,(double __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__finite,(double __val),(__val))
 #elif defined(__CRT_HAVE__finite)
 /* Return nonzero if VALUE is finite and not NaN */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__finite,(double __val),_finite,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__finite,(double __val),_finite,(__val))
 #else /* LIBC: finite */
 #include <local/math/finite.h>
 /* Return nonzero if VALUE is finite and not NaN */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL __finite)(double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(finite))(__val); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __finite)(double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(finite))(__val); }
 #endif /* __finite... */
 #if __has_builtin(__builtin_ceilf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ceilf)
 /* Smallest integral value not less than X */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL __ceilf)(float __x) { return __builtin_ceilf(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __ceilf)(float __x) { return __builtin_ceilf(__x); }
 #elif defined(__CRT_HAVE_ceilf)
 /* Smallest integral value not less than X */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,__ceilf,(float __x),ceilf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__ceilf,(float __x),ceilf,(__x))
 #elif defined(__CRT_HAVE___ceilf)
 /* Smallest integral value not less than X */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,__ceilf,(float __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__ceilf,(float __x),(__x))
 #else /* LIBC: ceilf */
 #include <local/math/ceilf.h>
 /* Smallest integral value not less than X */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL __ceilf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ceilf))(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __ceilf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ceilf))(__x); }
 #endif /* __ceilf... */
 #if __has_builtin(__builtin_fabsf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fabsf)
 /* Absolute value of X */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL __fabsf)(float __x) { return __builtin_fabsf(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __fabsf)(float __x) { return __builtin_fabsf(__x); }
 #elif defined(__CRT_HAVE_fabsf)
 /* Absolute value of X */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,__fabsf,(float __x),fabsf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__fabsf,(float __x),fabsf,(__x))
 #elif defined(__CRT_HAVE___fabsf)
 /* Absolute value of X */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,__fabsf,(float __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__fabsf,(float __x),(__x))
 #else /* LIBC: fabsf */
 #include <local/math/fabsf.h>
 /* Absolute value of X */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL __fabsf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fabsf))(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __fabsf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fabsf))(__x); }
 #endif /* __fabsf... */
 #if __has_builtin(__builtin_floorf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_floorf)
 /* Largest integer not greater than X */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL __floorf)(float __x) { return __builtin_floorf(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __floorf)(float __x) { return __builtin_floorf(__x); }
 #elif defined(__CRT_HAVE_floorf)
 /* Largest integer not greater than X */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,__floorf,(float __x),floorf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__floorf,(float __x),floorf,(__x))
 #elif defined(__CRT_HAVE___floorf)
 /* Largest integer not greater than X */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,__floorf,(float __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__floorf,(float __x),(__x))
 #else /* LIBC: floorf */
 #include <local/math/floorf.h>
 /* Largest integer not greater than X */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL __floorf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(floorf))(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __floorf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(floorf))(__x); }
 #endif /* __floorf... */
 #if __has_builtin(__builtin_fmodf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fmodf)
 /* Floating-point modulo remainder of X/Y */
@@ -9491,67 +9491,67 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__fmodf,(float __x, float __y),(__x,__
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __fmodf)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmodf))(__x, __y); }
 #endif /* __fmodf... */
 #if __has_builtin(__builtin_isinff) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isinff)
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL __isinff)(float __val) { return __builtin_isinff(__val); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __isinff)(float __val) { return __builtin_isinff(__val); }
 #elif defined(__CRT_HAVE_isinff)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__isinff,(float __val),isinff,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isinff,(float __val),isinff,(__val))
 #elif defined(__CRT_HAVE___isinff)
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__isinff,(float __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isinff,(float __val),(__val))
 #else /* LIBC: isinff */
 #include <local/math/isinff.h>
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL __isinff)(float __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isinff))(__val); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __isinff)(float __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isinff))(__val); }
 #endif /* __isinff... */
 #if __has_builtin(__builtin_finitef) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_finitef)
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL __finitef)(float __val) { return __builtin_finitef(__val); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __finitef)(float __val) { return __builtin_finitef(__val); }
 #elif defined(__CRT_HAVE_finitef)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__finitef,(float __val),finitef,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__finitef,(float __val),finitef,(__val))
 #elif defined(__CRT_HAVE___finitef)
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__finitef,(float __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__finitef,(float __val),(__val))
 #else /* LIBC: finitef */
 #include <local/math/finitef.h>
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL __finitef)(float __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(finitef))(__val); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __finitef)(float __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(finitef))(__val); }
 #endif /* __finitef... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_ceill) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ceill)
 /* Smallest integral value not less than X */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL __ceill)(long double __x) { return __builtin_ceill(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __ceill)(long double __x) { return __builtin_ceill(__x); }
 #elif defined(__CRT_HAVE_ceill)
 /* Smallest integral value not less than X */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,__ceill,(long double __x),ceill,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,__ceill,(long double __x),ceill,(__x))
 #elif defined(__CRT_HAVE___ceill)
 /* Smallest integral value not less than X */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,__ceill,(long double __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,__ceill,(long double __x),(__x))
 #else /* LIBC: ceill */
 #include <local/math/ceill.h>
 /* Smallest integral value not less than X */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL __ceill)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ceill))(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __ceill)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ceill))(__x); }
 #endif /* __ceill... */
 #if __has_builtin(__builtin_fabsl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fabsl)
 /* Absolute value of X */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL __fabsl)(long double __x) { return __builtin_fabsl(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __fabsl)(long double __x) { return __builtin_fabsl(__x); }
 #elif defined(__CRT_HAVE_fabsl)
 /* Absolute value of X */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,__fabsl,(long double __x),fabsl,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,__fabsl,(long double __x),fabsl,(__x))
 #elif defined(__CRT_HAVE___fabsl)
 /* Absolute value of X */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,__fabsl,(long double __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,__fabsl,(long double __x),(__x))
 #else /* LIBC: fabsl */
 #include <local/math/fabsl.h>
 /* Absolute value of X */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL __fabsl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fabsl))(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __fabsl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fabsl))(__x); }
 #endif /* __fabsl... */
 #if __has_builtin(__builtin_floorl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_floorl)
 /* Largest integer not greater than X */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL __floorl)(long double __x) { return __builtin_floorl(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __floorl)(long double __x) { return __builtin_floorl(__x); }
 #elif defined(__CRT_HAVE_floorl)
 /* Largest integer not greater than X */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,__floorl,(long double __x),floorl,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,__floorl,(long double __x),floorl,(__x))
 #elif defined(__CRT_HAVE___floorl)
 /* Largest integer not greater than X */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,__floorl,(long double __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,__floorl,(long double __x),(__x))
 #else /* LIBC: floorl */
 #include <local/math/floorl.h>
 /* Largest integer not greater than X */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL __floorl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(floorl))(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __floorl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(floorl))(__x); }
 #endif /* __floorl... */
 #if __has_builtin(__builtin_fmodl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fmodl)
 /* Floating-point modulo remainder of X/Y */
@@ -9574,32 +9574,32 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__fmodl,(long double __x, long 
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __fmodl)(long double __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmodl))(__x, __y); }
 #endif /* __fmodl... */
 #if __has_builtin(__builtin_isinfl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isinfl)
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL __isinfl)(long double __val) { return __builtin_isinfl(__val); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __isinfl)(long double __val) { return __builtin_isinfl(__val); }
 #elif defined(__CRT_HAVE_isinfl)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__isinfl,(long double __val),isinfl,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isinfl,(long double __val),isinfl,(__val))
 #elif defined(__CRT_HAVE___isinfl)
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__isinfl,(long double __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isinfl,(long double __val),(__val))
 #elif defined(__CRT_HAVE___isinf) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__isinfl,(long double __val),__isinf,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isinfl,(long double __val),__isinf,(__val))
 #elif defined(__CRT_HAVE_isinf) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__isinfl,(long double __val),isinf,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isinfl,(long double __val),isinf,(__val))
 #else /* LIBC: isinfl */
 #include <local/math/isinfl.h>
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL __isinfl)(long double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isinfl))(__val); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __isinfl)(long double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isinfl))(__val); }
 #endif /* __isinfl... */
 #if __has_builtin(__builtin_finitel) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_finitel)
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL __finitel)(long double __val) { return __builtin_finitel(__val); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __finitel)(long double __val) { return __builtin_finitel(__val); }
 #elif defined(__CRT_HAVE_finitel)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__finitel,(long double __val),finitel,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__finitel,(long double __val),finitel,(__val))
 #elif defined(__CRT_HAVE___finitel)
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__finitel,(long double __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__finitel,(long double __val),(__val))
 #elif defined(__CRT_HAVE___finite) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__finitel,(long double __val),__finite,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__finitel,(long double __val),__finite,(__val))
 #elif defined(__CRT_HAVE_finite) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__finitel,(long double __val),finite,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__finitel,(long double __val),finite,(__val))
 #else /* LIBC: finitel */
 #include <local/math/finitel.h>
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL __finitel)(long double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(finitel))(__val); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __finitel)(long double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(finitel))(__val); }
 #endif /* __finitel... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #ifdef __USE_MISC
@@ -9692,138 +9692,138 @@ __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __significandl)(lon
 #ifdef __USE_ISOC99
 #if __has_builtin(__builtin_copysign) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_copysign)
 /* Return X with its signed changed to Y's */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL __copysign)(double __num, double __sign) { return __builtin_copysign(__num, __sign); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __copysign)(double __num, double __sign) { return __builtin_copysign(__num, __sign); }
 #elif defined(__CRT_HAVE_copysign)
 /* Return X with its signed changed to Y's */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,__copysign,(double __num, double __sign),copysign,(__num,__sign))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__copysign,(double __num, double __sign),copysign,(__num,__sign))
 #elif defined(__CRT_HAVE___copysign)
 /* Return X with its signed changed to Y's */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,__copysign,(double __num, double __sign),(__num,__sign))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__copysign,(double __num, double __sign),(__num,__sign))
 #elif defined(__CRT_HAVE__copysign)
 /* Return X with its signed changed to Y's */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,__copysign,(double __num, double __sign),_copysign,(__num,__sign))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__copysign,(double __num, double __sign),_copysign,(__num,__sign))
 #else /* LIBC: copysign */
 #include <local/math/copysign.h>
 /* Return X with its signed changed to Y's */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL __copysign)(double __num, double __sign) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(copysign))(__num, __sign); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __copysign)(double __num, double __sign) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(copysign))(__num, __sign); }
 #endif /* __copysign... */
 #if __has_builtin(__builtin_nan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nan)
 /* Return representation of qNaN for double type */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL __nan)(char const *__tagb) { return __builtin_nan(__tagb); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __nan)(char const *__tagb) { return __builtin_nan(__tagb); }
 #elif defined(__CRT_HAVE_nan)
 /* Return representation of qNaN for double type */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,__nan,(char const *__tagb),nan,(__tagb))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__nan,(char const *__tagb),nan,(__tagb))
 #elif defined(__CRT_HAVE___nan)
 /* Return representation of qNaN for double type */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,__nan,(char const *__tagb),(__tagb))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__nan,(char const *__tagb),(__tagb))
 #else /* LIBC: nan */
 #include <local/math/nan.h>
 /* Return representation of qNaN for double type */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL __nan)(char const *__tagb) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nan))(__tagb); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __nan)(char const *__tagb) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nan))(__tagb); }
 #endif /* __nan... */
 #if __has_builtin(__builtin_copysignf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_copysignf)
 /* Return X with its signed changed to Y's */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL __copysignf)(float __num, float __sign) { return __builtin_copysignf(__num, __sign); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __copysignf)(float __num, float __sign) { return __builtin_copysignf(__num, __sign); }
 #elif defined(__CRT_HAVE_copysignf)
 /* Return X with its signed changed to Y's */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,__copysignf,(float __num, float __sign),copysignf,(__num,__sign))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__copysignf,(float __num, float __sign),copysignf,(__num,__sign))
 #elif defined(__CRT_HAVE___copysignf)
 /* Return X with its signed changed to Y's */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,__copysignf,(float __num, float __sign),(__num,__sign))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__copysignf,(float __num, float __sign),(__num,__sign))
 #else /* LIBC: copysignf */
 #include <local/math/copysignf.h>
 /* Return X with its signed changed to Y's */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL __copysignf)(float __num, float __sign) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(copysignf))(__num, __sign); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __copysignf)(float __num, float __sign) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(copysignf))(__num, __sign); }
 #endif /* __copysignf... */
 #if __has_builtin(__builtin_nanf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nanf)
 /* Return representation of qNaN for double type */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL __nanf)(char const *__tagb) { return __builtin_nanf(__tagb); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __nanf)(char const *__tagb) { return __builtin_nanf(__tagb); }
 #elif defined(__CRT_HAVE_nanf)
 /* Return representation of qNaN for double type */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,__nanf,(char const *__tagb),nanf,(__tagb))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__nanf,(char const *__tagb),nanf,(__tagb))
 #elif defined(__CRT_HAVE___nanf)
 /* Return representation of qNaN for double type */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,__nanf,(char const *__tagb),(__tagb))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__nanf,(char const *__tagb),(__tagb))
 #else /* LIBC: nanf */
 #include <local/math/nanf.h>
 /* Return representation of qNaN for double type */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL __nanf)(char const *__tagb) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nanf))(__tagb); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __nanf)(char const *__tagb) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nanf))(__tagb); }
 #endif /* __nanf... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_copysignl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_copysignl)
 /* Return X with its signed changed to Y's */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL __copysignl)(long double __num, long double __sign) { return __builtin_copysignl(__num, __sign); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __copysignl)(long double __num, long double __sign) { return __builtin_copysignl(__num, __sign); }
 #elif defined(__CRT_HAVE_copysignl)
 /* Return X with its signed changed to Y's */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,__copysignl,(long double __num, long double __sign),copysignl,(__num,__sign))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,__copysignl,(long double __num, long double __sign),copysignl,(__num,__sign))
 #elif defined(__CRT_HAVE___copysignl)
 /* Return X with its signed changed to Y's */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,__copysignl,(long double __num, long double __sign),(__num,__sign))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,__copysignl,(long double __num, long double __sign),(__num,__sign))
 #else /* LIBC: copysignl */
 #include <local/math/copysignl.h>
 /* Return X with its signed changed to Y's */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL __copysignl)(long double __num, long double __sign) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(copysignl))(__num, __sign); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __copysignl)(long double __num, long double __sign) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(copysignl))(__num, __sign); }
 #endif /* __copysignl... */
 #if __has_builtin(__builtin_nanl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nanl)
 /* Return representation of qNaN for double type */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL __nanl)(char const *__tagb) { return __builtin_nanl(__tagb); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __nanl)(char const *__tagb) { return __builtin_nanl(__tagb); }
 #elif defined(__CRT_HAVE_nanl)
 /* Return representation of qNaN for double type */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,__nanl,(char const *__tagb),nanl,(__tagb))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,__nanl,(char const *__tagb),nanl,(__tagb))
 #elif defined(__CRT_HAVE___nanl)
 /* Return representation of qNaN for double type */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,__nanl,(char const *__tagb),(__tagb))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,__nanl,(char const *__tagb),(__tagb))
 #else /* LIBC: nanl */
 #include <local/math/nanl.h>
 /* Return representation of qNaN for double type */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL __nanl)(char const *__tagb) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nanl))(__tagb); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __nanl)(char const *__tagb) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nanl))(__tagb); }
 #endif /* __nanl... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_ISOC99 */
 
 #if __has_builtin(__builtin_isnan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isnan)
 /* Return nonzero if VALUE is not a number */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL __isnan)(double __val) { return __builtin_isnan(__val); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __isnan)(double __val) { return __builtin_isnan(__val); }
 #elif defined(__CRT_HAVE_isnan)
 /* Return nonzero if VALUE is not a number */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__isnan,(double __val),isnan,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isnan,(double __val),isnan,(__val))
 #elif defined(__CRT_HAVE___isnan)
 /* Return nonzero if VALUE is not a number */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__isnan,(double __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isnan,(double __val),(__val))
 #elif defined(__CRT_HAVE__isnan)
 /* Return nonzero if VALUE is not a number */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__isnan,(double __val),_isnan,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isnan,(double __val),_isnan,(__val))
 #else /* LIBC: isnan */
 #include <local/math/isnan.h>
 /* Return nonzero if VALUE is not a number */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL __isnan)(double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isnan))(__val); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __isnan)(double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isnan))(__val); }
 #endif /* __isnan... */
 #if __has_builtin(__builtin_isnanf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isnanf)
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL __isnanf)(float __val) { return __builtin_isnanf(__val); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __isnanf)(float __val) { return __builtin_isnanf(__val); }
 #elif defined(__CRT_HAVE_isnanf)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__isnanf,(float __val),isnanf,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isnanf,(float __val),isnanf,(__val))
 #elif defined(__CRT_HAVE___isnanf)
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__isnanf,(float __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isnanf,(float __val),(__val))
 #else /* LIBC: isnanf */
 #include <local/math/isnanf.h>
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL __isnanf)(float __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isnanf))(__val); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __isnanf)(float __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isnanf))(__val); }
 #endif /* __isnanf... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_isnanl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_isnanl)
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL __isnanl)(long double __val) { return __builtin_isnanl(__val); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __isnanl)(long double __val) { return __builtin_isnanl(__val); }
 #elif defined(__CRT_HAVE_isnanl)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__isnanl,(long double __val),isnanl,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isnanl,(long double __val),isnanl,(__val))
 #elif defined(__CRT_HAVE___isnanl)
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__isnanl,(long double __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isnanl,(long double __val),(__val))
 #elif defined(__CRT_HAVE___isnan) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__isnanl,(long double __val),__isnan,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isnanl,(long double __val),__isnan,(__val))
 #elif defined(__CRT_HAVE__isnan) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__isnanl,(long double __val),_isnan,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isnanl,(long double __val),_isnan,(__val))
 #elif defined(__CRT_HAVE_isnan) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__isnanl,(long double __val),isnan,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__isnanl,(long double __val),isnan,(__val))
 #else /* LIBC: isnanl */
 #include <local/math/isnanl.h>
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL __isnanl)(long double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isnanl))(__val); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __isnanl)(long double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isnanl))(__val); }
 #endif /* __isnanl... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 
@@ -10287,13 +10287,13 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__rint,(double __x),rint,(__x))
 #endif /* __rint... */
 #if defined(__CRT_HAVE___nextafter)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,__nextafter,(double __x, double __y),(__x,__y))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__nextafter,(double __x, double __y),(__x,__y))
 #elif defined(__CRT_HAVE__nextafter)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,__nextafter,(double __x, double __y),_nextafter,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__nextafter,(double __x, double __y),_nextafter,(__x,__y))
 #elif defined(__CRT_HAVE_nextafter)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,__nextafter,(double __x, double __y),nextafter,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__nextafter,(double __x, double __y),nextafter,(__x,__y))
 #endif /* __nextafter... */
 #if defined(__CRT_HAVE___remainder)
 /* Return the remainder of integer divison X / Y with infinite precision */
@@ -10325,17 +10325,17 @@ __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __rintf)(float __x) { ret
 #endif /* __rintf... */
 #if __has_builtin(__builtin_nextafterf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nextafterf)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL __nextafterf)(float __x, float __y) { return __builtin_nextafterf(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __nextafterf)(float __x, float __y) { return __builtin_nextafterf(__x, __y); }
 #elif defined(__CRT_HAVE_nextafterf)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,__nextafterf,(float __x, float __y),nextafterf,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__nextafterf,(float __x, float __y),nextafterf,(__x,__y))
 #elif defined(__CRT_HAVE___nextafterf)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,__nextafterf,(float __x, float __y),(__x,__y))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__nextafterf,(float __x, float __y),(__x,__y))
 #elif (__has_builtin(__builtin_nextafter) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nextafter)) || defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter)
 #include <local/math/nextafterf.h>
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL __nextafterf)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextafterf))(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __nextafterf)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextafterf))(__x, __y); }
 #endif /* __nextafterf... */
 #if __has_builtin(__builtin_remainderf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remainderf)
 /* Return the remainder of integer divison X / Y with infinite precision */
@@ -10388,23 +10388,23 @@ __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __rintl)(long doubl
 #endif /* __rintl... */
 #if __has_builtin(__builtin_nextafterl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nextafterl)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL __nextafterl)(long double __x, long double __y) { return __builtin_nextafterl(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __nextafterl)(long double __x, long double __y) { return __builtin_nextafterl(__x, __y); }
 #elif defined(__CRT_HAVE_nextafterl)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,__nextafterl,(long double __x, long double __y),nextafterl,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,__nextafterl,(long double __x, long double __y),nextafterl,(__x,__y))
 #elif defined(__CRT_HAVE___nextafterl)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,__nextafterl,(long double __x, long double __y),(__x,__y))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,__nextafterl,(long double __x, long double __y),(__x,__y))
 #elif defined(__CRT_HAVE_nextafter) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,__nextafterl,(long double __x, long double __y),nextafter,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,__nextafterl,(long double __x, long double __y),nextafter,(__x,__y))
 #elif defined(__CRT_HAVE___nextafter) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,__nextafterl,(long double __x, long double __y),__nextafter,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,__nextafterl,(long double __x, long double __y),__nextafter,(__x,__y))
 #elif (__has_builtin(__builtin_nextafter) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nextafter)) || defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter)
 #include <local/math/nextafterl.h>
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL __nextafterl)(long double __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextafterl))(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __nextafterl)(long double __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextafterl))(__x, __y); }
 #endif /* __nextafterl... */
 #if __has_builtin(__builtin_remainderl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remainderl)
 /* Return the remainder of integer divison X / Y with infinite precision */
@@ -10451,9 +10451,9 @@ __FORCELOCAL __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __ilogbl)(long double __x) 
 
 #ifdef __USE_ISOC99
 #if defined(__CRT_HAVE___nexttoward)
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,__nexttoward,(double __x, long double __y),(__x,__y))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__nexttoward,(double __x, long double __y),(__x,__y))
 #elif defined(__CRT_HAVE_nexttoward)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,__nexttoward,(double __x, long double __y),nexttoward,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__nexttoward,(double __x, long double __y),nexttoward,(__x,__y))
 #endif /* __nexttoward... */
 #if defined(__CRT_HAVE___scalbn)
 /* Return X times (2 to the Nth power) */
@@ -10480,35 +10480,35 @@ __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__nearbyint,(double __x),nearbyint,(
 #endif /* __nearbyint... */
 #if __has_builtin(__builtin_round) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_round)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL __round)(double __x) { return __builtin_round(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __round)(double __x) { return __builtin_round(__x); }
 #elif defined(__CRT_HAVE_round)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,__round,(double __x),round,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__round,(double __x),round,(__x))
 #elif defined(__CRT_HAVE___round)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,__round,(double __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__round,(double __x),(__x))
 #else /* LIBC: round */
 #include <local/math/round.h>
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL __round)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(round))(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __round)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(round))(__x); }
 #endif /* __round... */
 #if __has_builtin(__builtin_trunc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_trunc)
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL __trunc)(double __x) { return __builtin_trunc(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __trunc)(double __x) { return __builtin_trunc(__x); }
 #elif defined(__CRT_HAVE_trunc)
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,__trunc,(double __x),trunc,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__trunc,(double __x),trunc,(__x))
 #elif defined(__CRT_HAVE___trunc)
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,__trunc,(double __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__trunc,(double __x),(__x))
 #else /* LIBC: trunc */
 #include <local/math/trunc.h>
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL __trunc)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(trunc))(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __trunc)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(trunc))(__x); }
 #endif /* __trunc... */
 #if defined(__CRT_HAVE___remquo)
 /* Compute remainder of X and Y and put in *QUO a value with sign
@@ -10530,83 +10530,83 @@ __CREDIRECT(__ATTR_WUNUSED,long int,__NOTHROW,__lrint,(double __x),lrint,(__x))
 #endif /* __lrint... */
 #if __has_builtin(__builtin_lround) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lround)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long int __NOTHROW(__LIBCCALL __lround)(double __x) { return __builtin_lround(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long int __NOTHROW(__LIBCCALL __lround)(double __x) { return __builtin_lround(__x); }
 #elif defined(__CRT_HAVE_lround)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long int,__NOTHROW,__lround,(double __x),lround,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,__lround,(double __x),lround,(__x))
 #elif defined(__CRT_HAVE___lround)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,long int,__NOTHROW,__lround,(double __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,__lround,(double __x),(__x))
 #else /* LIBC: lround */
 #include <local/math/lround.h>
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long int __NOTHROW(__LIBCCALL __lround)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lround))(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long int __NOTHROW(__LIBCCALL __lround)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lround))(__x); }
 #endif /* __lround... */
 #if __has_builtin(__builtin_fdim) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fdim)
 /* Return positive difference between X and Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL __fdim)(double __x, double __y) { return __builtin_fdim(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __fdim)(double __x, double __y) { return __builtin_fdim(__x, __y); }
 #elif defined(__CRT_HAVE_fdim)
 /* Return positive difference between X and Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,__fdim,(double __x, double __y),fdim,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__fdim,(double __x, double __y),fdim,(__x,__y))
 #elif defined(__CRT_HAVE___fdim)
 /* Return positive difference between X and Y */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,__fdim,(double __x, double __y),(__x,__y))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__fdim,(double __x, double __y),(__x,__y))
 #else /* LIBC: fdim */
 #include <local/math/fdim.h>
 /* Return positive difference between X and Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL __fdim)(double __x, double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fdim))(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __fdim)(double __x, double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fdim))(__x, __y); }
 #endif /* __fdim... */
 #if __has_builtin(__builtin_fmax) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fmax)
 /* Return maximum numeric value from X and Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL __fmax)(double __x, double __y) { return __builtin_fmax(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __fmax)(double __x, double __y) { return __builtin_fmax(__x, __y); }
 #elif defined(__CRT_HAVE_fmax)
 /* Return maximum numeric value from X and Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,__fmax,(double __x, double __y),fmax,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__fmax,(double __x, double __y),fmax,(__x,__y))
 #elif defined(__CRT_HAVE___fmax)
 /* Return maximum numeric value from X and Y */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,__fmax,(double __x, double __y),(__x,__y))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__fmax,(double __x, double __y),(__x,__y))
 #else /* LIBC: fmax */
 #include <local/math/fmax.h>
 /* Return maximum numeric value from X and Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL __fmax)(double __x, double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmax))(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __fmax)(double __x, double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmax))(__x, __y); }
 #endif /* __fmax... */
 #if __has_builtin(__builtin_fmin) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fmin)
 /* Return minimum numeric value from X and Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL __fmin)(double __x, double __y) { return __builtin_fmin(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __fmin)(double __x, double __y) { return __builtin_fmin(__x, __y); }
 #elif defined(__CRT_HAVE_fmin)
 /* Return minimum numeric value from X and Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,__fmin,(double __x, double __y),fmin,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__fmin,(double __x, double __y),fmin,(__x,__y))
 #elif defined(__CRT_HAVE___fmin)
 /* Return minimum numeric value from X and Y */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,__fmin,(double __x, double __y),(__x,__y))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__fmin,(double __x, double __y),(__x,__y))
 #else /* LIBC: fmin */
 #include <local/math/fmin.h>
 /* Return minimum numeric value from X and Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL __fmin)(double __x, double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmin))(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __fmin)(double __x, double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmin))(__x, __y); }
 #endif /* __fmin... */
 #if __has_builtin(__builtin_fma) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fma)
 /* Multiply-add function computed as a ternary operation */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL __fma)(double __x, double __y, double __z) { return __builtin_fma(__x, __y, __z); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __fma)(double __x, double __y, double __z) { return __builtin_fma(__x, __y, __z); }
 #elif defined(__CRT_HAVE_fma)
 /* Multiply-add function computed as a ternary operation */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,__fma,(double __x, double __y, double __z),fma,(__x,__y,__z))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__fma,(double __x, double __y, double __z),fma,(__x,__y,__z))
 #elif defined(__CRT_HAVE___fma)
 /* Multiply-add function computed as a ternary operation */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,double,__NOTHROW,__fma,(double __x, double __y, double __z),(__x,__y,__z))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__fma,(double __x, double __y, double __z),(__x,__y,__z))
 #else /* LIBC: fma */
 #include <local/math/fma.h>
 /* Multiply-add function computed as a ternary operation */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST double __NOTHROW(__LIBCCALL __fma)(double __x, double __y, double __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fma))(__x, __y, __z); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __fma)(double __x, double __y, double __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fma))(__x, __y, __z); }
 #endif /* __fma... */
 #if __has_builtin(__builtin_nexttowardf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nexttowardf)
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL __nexttowardf)(float __x, long double __y) { return __builtin_nexttowardf(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __nexttowardf)(float __x, long double __y) { return __builtin_nexttowardf(__x, __y); }
 #elif defined(__CRT_HAVE_nexttowardf)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,__nexttowardf,(float __x, long double __y),nexttowardf,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__nexttowardf,(float __x, long double __y),nexttowardf,(__x,__y))
 #elif defined(__CRT_HAVE___nexttowardf)
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,__nexttowardf,(float __x, long double __y),(__x,__y))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__nexttowardf,(float __x, long double __y),(__x,__y))
 #elif (__has_builtin(__builtin_nexttoward) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nexttoward)) || defined(__CRT_HAVE_nexttoward) || defined(__CRT_HAVE___nexttoward)
 #include <local/math/nexttowardf.h>
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL __nexttowardf)(float __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nexttowardf))(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __nexttowardf)(float __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nexttowardf))(__x, __y); }
 #endif /* __nexttowardf... */
 #if __has_builtin(__builtin_scalbnf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalbnf)
 /* Return X times (2 to the Nth power) */
@@ -10656,35 +10656,35 @@ __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __nearbyintf)(float __x) 
 #endif /* __nearbyintf... */
 #if __has_builtin(__builtin_roundf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_roundf)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL __roundf)(float __x) { return __builtin_roundf(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __roundf)(float __x) { return __builtin_roundf(__x); }
 #elif defined(__CRT_HAVE_roundf)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,__roundf,(float __x),roundf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__roundf,(float __x),roundf,(__x))
 #elif defined(__CRT_HAVE___roundf)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,__roundf,(float __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__roundf,(float __x),(__x))
 #else /* LIBC: roundf */
 #include <local/math/roundf.h>
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL __roundf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(roundf))(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __roundf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(roundf))(__x); }
 #endif /* __roundf... */
 #if __has_builtin(__builtin_truncf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_truncf)
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL __truncf)(float __x) { return __builtin_truncf(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __truncf)(float __x) { return __builtin_truncf(__x); }
 #elif defined(__CRT_HAVE_truncf)
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,__truncf,(float __x),truncf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__truncf,(float __x),truncf,(__x))
 #elif defined(__CRT_HAVE___truncf)
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,__truncf,(float __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__truncf,(float __x),(__x))
 #else /* LIBC: truncf */
 #include <local/math/truncf.h>
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL __truncf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(truncf))(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __truncf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(truncf))(__x); }
 #endif /* __truncf... */
 #if __has_builtin(__builtin_remquof) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remquof)
 /* Compute remainder of X and Y and put in *QUO a value with sign
@@ -10724,73 +10724,73 @@ __FORCELOCAL __ATTR_WUNUSED long int __NOTHROW(__LIBCCALL __lrintf)(float __x) {
 #endif /* __lrintf... */
 #if __has_builtin(__builtin_lroundf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lroundf)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long int __NOTHROW(__LIBCCALL __lroundf)(float __x) { return __builtin_lroundf(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long int __NOTHROW(__LIBCCALL __lroundf)(float __x) { return __builtin_lroundf(__x); }
 #elif defined(__CRT_HAVE_lroundf)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long int,__NOTHROW,__lroundf,(float __x),lroundf,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,__lroundf,(float __x),lroundf,(__x))
 #elif defined(__CRT_HAVE___lroundf)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,long int,__NOTHROW,__lroundf,(float __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,__lroundf,(float __x),(__x))
 #else /* LIBC: lroundf */
 #include <local/math/lroundf.h>
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long int __NOTHROW(__LIBCCALL __lroundf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lroundf))(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long int __NOTHROW(__LIBCCALL __lroundf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lroundf))(__x); }
 #endif /* __lroundf... */
 #if __has_builtin(__builtin_fdimf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fdimf)
 /* Return positive difference between X and Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL __fdimf)(float __x, float __y) { return __builtin_fdimf(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __fdimf)(float __x, float __y) { return __builtin_fdimf(__x, __y); }
 #elif defined(__CRT_HAVE_fdimf)
 /* Return positive difference between X and Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,__fdimf,(float __x, float __y),fdimf,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__fdimf,(float __x, float __y),fdimf,(__x,__y))
 #elif defined(__CRT_HAVE___fdimf)
 /* Return positive difference between X and Y */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,__fdimf,(float __x, float __y),(__x,__y))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__fdimf,(float __x, float __y),(__x,__y))
 #else /* LIBC: fdimf */
 #include <local/math/fdimf.h>
 /* Return positive difference between X and Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL __fdimf)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fdimf))(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __fdimf)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fdimf))(__x, __y); }
 #endif /* __fdimf... */
 #if __has_builtin(__builtin_fmaxf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fmaxf)
 /* Return maximum numeric value from X and Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL __fmaxf)(float __x, float __y) { return __builtin_fmaxf(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __fmaxf)(float __x, float __y) { return __builtin_fmaxf(__x, __y); }
 #elif defined(__CRT_HAVE_fmaxf)
 /* Return maximum numeric value from X and Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,__fmaxf,(float __x, float __y),fmaxf,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__fmaxf,(float __x, float __y),fmaxf,(__x,__y))
 #elif defined(__CRT_HAVE___fmaxf)
 /* Return maximum numeric value from X and Y */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,__fmaxf,(float __x, float __y),(__x,__y))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__fmaxf,(float __x, float __y),(__x,__y))
 #else /* LIBC: fmaxf */
 #include <local/math/fmaxf.h>
 /* Return maximum numeric value from X and Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL __fmaxf)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmaxf))(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __fmaxf)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmaxf))(__x, __y); }
 #endif /* __fmaxf... */
 #if __has_builtin(__builtin_fminf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fminf)
 /* Return minimum numeric value from X and Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL __fminf)(float __x, float __y) { return __builtin_fminf(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __fminf)(float __x, float __y) { return __builtin_fminf(__x, __y); }
 #elif defined(__CRT_HAVE_fminf)
 /* Return minimum numeric value from X and Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,__fminf,(float __x, float __y),fminf,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__fminf,(float __x, float __y),fminf,(__x,__y))
 #elif defined(__CRT_HAVE___fminf)
 /* Return minimum numeric value from X and Y */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,__fminf,(float __x, float __y),(__x,__y))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__fminf,(float __x, float __y),(__x,__y))
 #else /* LIBC: fminf */
 #include <local/math/fminf.h>
 /* Return minimum numeric value from X and Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL __fminf)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fminf))(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __fminf)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fminf))(__x, __y); }
 #endif /* __fminf... */
 #if __has_builtin(__builtin_fmaf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fmaf)
 /* Multiply-add function computed as a ternary operation */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL __fmaf)(float __x, float __y, float __z) { return __builtin_fmaf(__x, __y, __z); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __fmaf)(float __x, float __y, float __z) { return __builtin_fmaf(__x, __y, __z); }
 #elif defined(__CRT_HAVE_fmaf)
 /* Multiply-add function computed as a ternary operation */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,__fmaf,(float __x, float __y, float __z),fmaf,(__x,__y,__z))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__fmaf,(float __x, float __y, float __z),fmaf,(__x,__y,__z))
 #elif defined(__CRT_HAVE___fmaf)
 /* Multiply-add function computed as a ternary operation */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,float,__NOTHROW,__fmaf,(float __x, float __y, float __z),(__x,__y,__z))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__fmaf,(float __x, float __y, float __z),(__x,__y,__z))
 #else /* LIBC: fmaf */
 #include <local/math/fmaf.h>
 /* Multiply-add function computed as a ternary operation */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST float __NOTHROW(__LIBCCALL __fmaf)(float __x, float __y, float __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmaf))(__x, __y, __z); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __fmaf)(float __x, float __y, float __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmaf))(__x, __y, __z); }
 #endif /* __fmaf... */
 #ifdef __COMPILER_HAVE_LONGLONG
 #if defined(__CRT_HAVE___llrint)
@@ -10845,18 +10845,18 @@ __FORCELOCAL __ATTR_WUNUSED __LONGLONG __NOTHROW(__LIBCCALL __llroundf)(float __
 #endif /* __COMPILER_HAVE_LONGLONG */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if __has_builtin(__builtin_nexttowardl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nexttowardl)
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL __nexttowardl)(long double __x, long double __y) { return __builtin_nexttowardl(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __nexttowardl)(long double __x, long double __y) { return __builtin_nexttowardl(__x, __y); }
 #elif defined(__CRT_HAVE_nexttowardl)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,__nexttowardl,(long double __x, long double __y),nexttowardl,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,__nexttowardl,(long double __x, long double __y),nexttowardl,(__x,__y))
 #elif defined(__CRT_HAVE___nexttowardl)
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,__nexttowardl,(long double __x, long double __y),(__x,__y))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,__nexttowardl,(long double __x, long double __y),(__x,__y))
 #elif defined(__CRT_HAVE_nexttoward) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,__nexttowardl,(long double __x, long double __y),nexttoward,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,__nexttowardl,(long double __x, long double __y),nexttoward,(__x,__y))
 #elif defined(__CRT_HAVE___nexttoward) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,__nexttowardl,(long double __x, long double __y),__nexttoward,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,__nexttowardl,(long double __x, long double __y),__nexttoward,(__x,__y))
 #elif (__has_builtin(__builtin_nexttoward) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nexttoward)) || defined(__CRT_HAVE_nexttoward) || defined(__CRT_HAVE___nexttoward)
 #include <local/math/nexttowardl.h>
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL __nexttowardl)(long double __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nexttowardl))(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __nexttowardl)(long double __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nexttowardl))(__x, __y); }
 #endif /* __nexttowardl... */
 #if __has_builtin(__builtin_scalbnl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalbnl)
 /* Return X times (2 to the Nth power) */
@@ -10926,35 +10926,35 @@ __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __nearbyintl)(long 
 #endif /* __nearbyintl... */
 #if __has_builtin(__builtin_roundl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_roundl)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL __roundl)(long double __x) { return __builtin_roundl(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __roundl)(long double __x) { return __builtin_roundl(__x); }
 #elif defined(__CRT_HAVE_roundl)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,__roundl,(long double __x),roundl,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,__roundl,(long double __x),roundl,(__x))
 #elif defined(__CRT_HAVE___roundl)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,__roundl,(long double __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,__roundl,(long double __x),(__x))
 #else /* LIBC: roundl */
 #include <local/math/roundl.h>
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL __roundl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(roundl))(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __roundl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(roundl))(__x); }
 #endif /* __roundl... */
 #if __has_builtin(__builtin_truncl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_truncl)
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL __truncl)(long double __x) { return __builtin_truncl(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __truncl)(long double __x) { return __builtin_truncl(__x); }
 #elif defined(__CRT_HAVE_truncl)
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,__truncl,(long double __x),truncl,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,__truncl,(long double __x),truncl,(__x))
 #elif defined(__CRT_HAVE___truncl)
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,__truncl,(long double __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,__truncl,(long double __x),(__x))
 #else /* LIBC: truncl */
 #include <local/math/truncl.h>
 /* Round X to the integral value in floating-point
  * format nearest but not larger in magnitude */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL __truncl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(truncl))(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __truncl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(truncl))(__x); }
 #endif /* __truncl... */
 #if __has_builtin(__builtin_remquol) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remquol)
 /* Compute remainder of X and Y and put in *QUO a value with sign
@@ -11010,59 +11010,59 @@ __FORCELOCAL __ATTR_WUNUSED long int __NOTHROW(__LIBCCALL __lrintl)(long double 
 #endif /* __lrintl... */
 #if __has_builtin(__builtin_lroundl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lroundl)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long int __NOTHROW(__LIBCCALL __lroundl)(long double __x) { return __builtin_lroundl(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long int __NOTHROW(__LIBCCALL __lroundl)(long double __x) { return __builtin_lroundl(__x); }
 #elif defined(__CRT_HAVE_lroundl)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long int,__NOTHROW,__lroundl,(long double __x),lroundl,(__x))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,__lroundl,(long double __x),lroundl,(__x))
 #elif defined(__CRT_HAVE___lroundl)
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,long int,__NOTHROW,__lroundl,(long double __x),(__x))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long int,__NOTHROW,__lroundl,(long double __x),(__x))
 #else /* LIBC: lroundl */
 #include <local/math/lroundl.h>
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long int __NOTHROW(__LIBCCALL __lroundl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lroundl))(__x); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long int __NOTHROW(__LIBCCALL __lroundl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lroundl))(__x); }
 #endif /* __lroundl... */
 #if __has_builtin(__builtin_fdiml) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fdiml)
 /* Return positive difference between X and Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL __fdiml)(long double __x, long double __y) { return __builtin_fdiml(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __fdiml)(long double __x, long double __y) { return __builtin_fdiml(__x, __y); }
 #elif defined(__CRT_HAVE_fdiml)
 /* Return positive difference between X and Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,__fdiml,(long double __x, long double __y),fdiml,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,__fdiml,(long double __x, long double __y),fdiml,(__x,__y))
 #elif defined(__CRT_HAVE___fdiml)
 /* Return positive difference between X and Y */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,__fdiml,(long double __x, long double __y),(__x,__y))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,__fdiml,(long double __x, long double __y),(__x,__y))
 #else /* LIBC: fdiml */
 #include <local/math/fdiml.h>
 /* Return positive difference between X and Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL __fdiml)(long double __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fdiml))(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __fdiml)(long double __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fdiml))(__x, __y); }
 #endif /* __fdiml... */
 #if __has_builtin(__builtin_fmaxl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fmaxl)
 /* Return maximum numeric value from X and Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL __fmaxl)(long double __x, long double __y) { return __builtin_fmaxl(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __fmaxl)(long double __x, long double __y) { return __builtin_fmaxl(__x, __y); }
 #elif defined(__CRT_HAVE_fmaxl)
 /* Return maximum numeric value from X and Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,__fmaxl,(long double __x, long double __y),fmaxl,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,__fmaxl,(long double __x, long double __y),fmaxl,(__x,__y))
 #elif defined(__CRT_HAVE___fmaxl)
 /* Return maximum numeric value from X and Y */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,__fmaxl,(long double __x, long double __y),(__x,__y))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,__fmaxl,(long double __x, long double __y),(__x,__y))
 #else /* LIBC: fmaxl */
 #include <local/math/fmaxl.h>
 /* Return maximum numeric value from X and Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL __fmaxl)(long double __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmaxl))(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __fmaxl)(long double __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmaxl))(__x, __y); }
 #endif /* __fmaxl... */
 #if __has_builtin(__builtin_fminl) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fminl)
 /* Return minimum numeric value from X and Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL __fminl)(long double __x, long double __y) { return __builtin_fminl(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __fminl)(long double __x, long double __y) { return __builtin_fminl(__x, __y); }
 #elif defined(__CRT_HAVE_fminl)
 /* Return minimum numeric value from X and Y */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,__fminl,(long double __x, long double __y),fminl,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,__fminl,(long double __x, long double __y),fminl,(__x,__y))
 #elif defined(__CRT_HAVE___fminl)
 /* Return minimum numeric value from X and Y */
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,long double,__NOTHROW,__fminl,(long double __x, long double __y),(__x,__y))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,__fminl,(long double __x, long double __y),(__x,__y))
 #else /* LIBC: fminl */
 #include <local/math/fminl.h>
 /* Return minimum numeric value from X and Y */
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST long double __NOTHROW(__LIBCCALL __fminl)(long double __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fminl))(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __fminl)(long double __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fminl))(__x, __y); }
 #endif /* __fminl... */
 #if __has_builtin(__builtin_fmal) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fmal)
 /* Multiply-add function computed as a ternary operation */
@@ -11179,91 +11179,91 @@ __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __scalbl)(long doub
 /* Floating point classification */
 #ifdef __USE_ISOC99
 #if defined(__CRT_HAVE___fpclassify)
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__fpclassify,(double __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassify,(double __val),(__val))
 #elif defined(__CRT_HAVE__dclass)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__fpclassify,(double __val),_dclass,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassify,(double __val),_dclass,(__val))
 #endif /* __fpclassify... */
 #if defined(__CRT_HAVE___signbit)
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__signbit,(double __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__signbit,(double __val),(__val))
 #elif defined(__CRT_HAVE__dsign)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__signbit,(double __val),_dsign,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__signbit,(double __val),_dsign,(__val))
 #endif /* __signbit... */
 #if defined(__CRT_HAVE___fpclassifyf)
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__fpclassifyf,(float __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassifyf,(float __val),(__val))
 #elif defined(__CRT_HAVE__fdclass)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__fpclassifyf,(float __val),_fdclass,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassifyf,(float __val),_fdclass,(__val))
 #elif defined(__CRT_HAVE___fpclassify) || defined(__CRT_HAVE__dclass)
 #include <local/math/__fpclassifyf.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(__fpclassifyf, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL __fpclassifyf)(float __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__fpclassifyf))(__val); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(__fpclassifyf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __fpclassifyf)(float __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__fpclassifyf))(__val); })
 #endif /* __fpclassifyf... */
 #if defined(__CRT_HAVE___signbitf)
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__signbitf,(float __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__signbitf,(float __val),(__val))
 #elif defined(__CRT_HAVE__fdsign)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__signbitf,(float __val),_fdsign,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__signbitf,(float __val),_fdsign,(__val))
 #elif defined(__CRT_HAVE___signbit) || defined(__CRT_HAVE__dsign)
 #include <local/math/__signbitf.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(__signbitf, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL __signbitf)(float __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__signbitf))(__val); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(__signbitf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __signbitf)(float __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__signbitf))(__val); })
 #endif /* __signbitf... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if defined(__CRT_HAVE___fpclassifyl)
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__fpclassifyl,(long double __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassifyl,(long double __val),(__val))
 #elif defined(__CRT_HAVE__ldclass)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__fpclassifyl,(long double __val),_ldclass,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassifyl,(long double __val),_ldclass,(__val))
 #elif defined(__CRT_HAVE___fpclassify) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__fpclassifyl,(long double __val),__fpclassify,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassifyl,(long double __val),__fpclassify,(__val))
 #elif defined(__CRT_HAVE___fpclassify) || defined(__CRT_HAVE__dclass)
 #include <local/math/__fpclassifyl.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(__fpclassifyl, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL __fpclassifyl)(long double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__fpclassifyl))(__val); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(__fpclassifyl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __fpclassifyl)(long double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__fpclassifyl))(__val); })
 #endif /* __fpclassifyl... */
 #if defined(__CRT_HAVE___signbitl)
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__signbitl,(long double __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__signbitl,(long double __val),(__val))
 #elif defined(__CRT_HAVE__ldsign)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__signbitl,(long double __val),_ldsign,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__signbitl,(long double __val),_ldsign,(__val))
 #elif defined(__CRT_HAVE___signbit) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__signbitl,(long double __val),__signbit,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__signbitl,(long double __val),__signbit,(__val))
 #elif defined(__CRT_HAVE___signbit) || defined(__CRT_HAVE__dsign)
 #include <local/math/__signbitl.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(__signbitl, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL __signbitl)(long double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__signbitl))(__val); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(__signbitl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __signbitl)(long double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__signbitl))(__val); })
 #endif /* __signbitl... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_ISOC99 */
 
 #ifdef __USE_GNU
 #if defined(__CRT_HAVE___issignaling)
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__issignaling,(double __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__issignaling,(double __val),(__val))
 #endif /* __issignaling... */
 #if defined(__CRT_HAVE___issignalingf)
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__issignalingf,(float __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__issignalingf,(float __val),(__val))
 #elif defined(__CRT_HAVE___issignaling)
 #include <local/math/__issignalingf.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(__issignalingf, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL __issignalingf)(float __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__issignalingf))(__val); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(__issignalingf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __issignalingf)(float __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__issignalingf))(__val); })
 #endif /* __issignalingf... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if defined(__CRT_HAVE___issignalingl)
-__CDECLARE(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__issignalingl,(long double __val),(__val))
+__CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__issignalingl,(long double __val),(__val))
 #elif defined(__CRT_HAVE___issignaling) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__issignalingl,(long double __val),__issignaling,(__val))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__issignalingl,(long double __val),__issignaling,(__val))
 #elif defined(__CRT_HAVE___issignaling)
 #include <local/math/__issignalingl.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(__issignalingl, __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL __issignalingl)(long double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__issignalingl))(__val); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(__issignalingl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __issignalingl)(long double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__issignalingl))(__val); })
 #endif /* __issignalingl... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_GNU */
 #if defined(__CRT_HAVE__dpcomp)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW_NCX,__dos_dpcomp,(double __x, double __y),_dpcomp,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__dos_dpcomp,(double __x, double __y),_dpcomp,(__x,__y))
 #endif /* __dos_dpcomp... */
 #if defined(__CRT_HAVE__fdpcomp)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW_NCX,__dos_fdpcomp,(float __x, float __y),_fdpcomp,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__dos_fdpcomp,(float __x, float __y),_fdpcomp,(__x,__y))
 #elif defined(__CRT_HAVE__dpcomp)
 #include <local/math/_fdpcomp.h>
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW_NCX(__LIBCCALL __dos_fdpcomp)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_fdpcomp))(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL __dos_fdpcomp)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_fdpcomp))(__x, __y); }
 #endif /* __dos_fdpcomp... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
 #if defined(__CRT_HAVE__ldpcomp)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW_NCX,__dos_ldpcomp,(long double __x, long double __y),_ldpcomp,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__dos_ldpcomp,(long double __x, long double __y),_ldpcomp,(__x,__y))
 #elif defined(__CRT_HAVE__dpcomp)
 #include <local/math/_ldpcomp.h>
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW_NCX(__LIBCCALL __dos_ldpcomp)(long double __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ldpcomp))(__x, __y); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL __dos_ldpcomp)(long double __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_ldpcomp))(__x, __y); }
 #endif /* __dos_ldpcomp... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa68e1be8 */
+/* HASH CRC-32:0xdf7b655c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #define __local_memrxend_defined 1
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memrend', but search for non-matching locations. */
-__LOCAL_LIBC(memrxend) __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) void *
+__LOCAL_LIBC(memrxend) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memrxend))(void const *__restrict __haystack,
                                                       int __needle,
                                                       __SIZE_TYPE__ __n_bytes) {

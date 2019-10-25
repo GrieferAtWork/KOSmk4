@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1b0298c0 */
+/* HASH CRC-32:0x4c15ca2a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ INTDEF void NOTHROW_NCX(LIBCCALL libc__statusfp2)(uint32_t *x86_stat, uint32_t *
 INTDEF uint32_t NOTHROW_NCX(LIBCCALL libc__control87)(uint32_t newval, uint32_t mask);
 INTDEF int NOTHROW_NCX(LIBCCALL libc___control87_2)(uint32_t newval, uint32_t mask, uint32_t *x86_control_word, uint32_t *sse2_control_word);
 INTDEF int *NOTHROW_NCX(LIBCCALL libc___fpecode)(void);
-INTDEF WUNUSED ATTR_CONST int NOTHROW(LIBCCALL libc__fpclass)(double x);
+INTDEF ATTR_CONST WUNUSED int NOTHROW(LIBCCALL libc__fpclass)(double x);
 INTDEF void NOTHROW_NCX(LIBCCALL libc_fpreset)(void);
 
 DECL_END

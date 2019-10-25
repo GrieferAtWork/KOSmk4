@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf8732e9f */
+/* HASH CRC-32:0xbabd5f9e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 #define ____localdep_strnrchrnul_defined 1
 #if defined(__CRT_HAVE_strnrchrnul)
 /* Same as `strnrchr', but return `STR-1', rather than `NULL' if `NEEDLE' wasn't found. */
-__CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strnrchrnul,(char const *__restrict __haystack, int __needle, __SIZE_TYPE__ __maxlen),strnrchrnul,(__haystack,__needle,__maxlen))
+__CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strnrchrnul,(char const *__restrict __haystack, int __needle, __SIZE_TYPE__ __maxlen),strnrchrnul,(__haystack,__needle,__maxlen))
 #else /* LIBC: strnrchrnul */
 #include <local/string/strnrchrnul.h>
 /* Same as `strnrchr', but return `STR-1', rather than `NULL' if `NEEDLE' wasn't found. */
@@ -34,7 +34,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_PURE __ATTR_RETNONNULL __ATTR_NONNULL((1)),cha
 
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `strnrchrnul', but return the offset from `STR', rather than the actual address */
-__LOCAL_LIBC(strnroff) __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1)) __SIZE_TYPE__
+__LOCAL_LIBC(strnroff) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) __SIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strnroff))(char const *__restrict __haystack,
                                                       int __needle,
                                                       __SIZE_TYPE__ __maxlen) {

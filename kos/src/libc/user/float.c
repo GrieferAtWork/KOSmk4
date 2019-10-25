@@ -144,8 +144,8 @@ NOTHROW_NCX(LIBCCALL libc___fpecode)(void)
 
 
 
-/*[[[head:_fpclass,hash:CRC-32=0x98cf8163]]]*/
-INTERN WUNUSED ATTR_CONST
+/*[[[head:_fpclass,hash:CRC-32=0x32b0ddb6]]]*/
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.math.float._fpclass") int
 NOTHROW(LIBCCALL libc__fpclass)(double x)
 /*[[[body:_fpclass]]]*/

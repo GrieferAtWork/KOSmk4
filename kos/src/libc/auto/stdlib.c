@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f400de4 */
+/* HASH CRC-32:0xa79d39da */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -946,7 +946,7 @@ NOTHROW(LIBCCALL libc__abs64)(__INT64_TYPE__ x) {
 	return x < 0 ? -x : x;
 }
 
-INTERN WUNUSED ATTR_PURE NONNULL((1))
+INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.convert._atof_l") double
 NOTHROW_NCX(LIBCCALL libc__atof_l)(char const *__restrict nptr,
                                    locale_t locale) {
@@ -954,7 +954,7 @@ NOTHROW_NCX(LIBCCALL libc__atof_l)(char const *__restrict nptr,
 	return libc_strtod_l(nptr, NULL, locale);
 }
 
-INTERN WUNUSED ATTR_PURE NONNULL((1))
+INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.convert._atoi_l") int
 NOTHROW_NCX(LIBCCALL libc__atoi_l)(char const *__restrict nptr,
                                    locale_t locale) {
@@ -962,7 +962,7 @@ NOTHROW_NCX(LIBCCALL libc__atoi_l)(char const *__restrict nptr,
 	return (int)libc_strtol_l(nptr, NULL, 10, locale);
 }
 
-INTERN WUNUSED ATTR_PURE NONNULL((1))
+INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.convert._atol_l") long int
 NOTHROW_NCX(LIBCCALL libc__atol_l)(char const *__restrict nptr,
                                    locale_t locale) {
@@ -970,7 +970,7 @@ NOTHROW_NCX(LIBCCALL libc__atol_l)(char const *__restrict nptr,
 	return libc_strtol_l(nptr, NULL, 10, locale);
 }
 
-INTERN WUNUSED ATTR_PURE NONNULL((1))
+INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.convert._atoll_l") __LONGLONG
 NOTHROW_NCX(LIBCCALL libc__atoll_l)(char const *__restrict nptr,
                                     locale_t locale) {

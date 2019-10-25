@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfbd36bd6 */
+/* HASH CRC-32:0xe88ae4b5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,14 +24,14 @@
 #ifndef ____localdep__dpcomp_defined
 #define ____localdep__dpcomp_defined 1
 #if defined(__CRT_HAVE__dpcomp)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW_NCX,__localdep__dpcomp,(double __x, double __y),_dpcomp,(__x,__y))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep__dpcomp,(double __x, double __y),_dpcomp,(__x,__y))
 #else /* LIBC: _dpcomp */
 #undef ____localdep__dpcomp_defined
 #endif /* _dpcomp... */
 #endif /* !____localdep__dpcomp_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(_ldpcomp) __ATTR_WUNUSED __ATTR_CONST int
+__LOCAL_LIBC(_ldpcomp) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ldpcomp))(long double __x,
                                                       long double __y) {
 #line 1328 "kos/src/libc/magic/math.c"

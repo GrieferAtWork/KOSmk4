@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3b34b2ae */
+/* HASH CRC-32:0x1eb41b44 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -146,7 +146,7 @@ __CDECLARE_VOID(,__NOTHROW_RPC,openlog,(char const *__ident, int __option, int _
 __CDECLARE(,int,__NOTHROW_NCX,setlogmask,(int __mask),(__mask))
 #endif /* setlogmask... */
 #if defined(__CRT_HAVE_syslog)
-__LIBC __ATTR_LIBC_PRINTF(2,3) __ATTR_NONNULL((2)) void __NOTHROW_RPC(__VLIBCCALL syslog)(int __level, char const *__format, ...) __CASMNAME_SAME("syslog");
+__LIBC __ATTR_NONNULL((2)) __ATTR_LIBC_PRINTF(2,3) void __NOTHROW_RPC(__VLIBCCALL syslog)(int __level, char const *__format, ...) __CASMNAME_SAME("syslog");
 #elif defined(__CRT_HAVE_syslog_printer) || defined(__CRT_HAVE_vsyslog)
 #include <local/sys.syslog/syslog.h>
 #ifdef __cplusplus
@@ -158,10 +158,10 @@ __NAMESPACE_LOCAL_USING(syslog)
 
 #ifdef __USE_MISC
 #if defined(__CRT_HAVE_vsyslog)
-__CDECLARE_VOID(__ATTR_LIBC_PRINTF(2,0) __ATTR_NONNULL((2)),__NOTHROW_RPC,vsyslog,(int __level, char const *__format, __builtin_va_list __args),(__level,__format,__args))
+__CDECLARE_VOID(__ATTR_NONNULL((2)) __ATTR_LIBC_PRINTF(2,0),__NOTHROW_RPC,vsyslog,(int __level, char const *__format, __builtin_va_list __args),(__level,__format,__args))
 #elif defined(__CRT_HAVE_syslog_printer)
 #include <local/sys.syslog/vsyslog.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(vsyslog, __FORCELOCAL __ATTR_LIBC_PRINTF(2,0) __ATTR_NONNULL((2)) void __NOTHROW_RPC(__LIBCCALL vsyslog)(int __level, char const *__format, __builtin_va_list __args) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vsyslog))(__level, __format, __args); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(vsyslog, __FORCELOCAL __ATTR_NONNULL((2)) __ATTR_LIBC_PRINTF(2,0) void __NOTHROW_RPC(__LIBCCALL vsyslog)(int __level, char const *__format, __builtin_va_list __args) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vsyslog))(__level, __format, __args); })
 #endif /* vsyslog... */
 #endif /* __USE_MISC */
 

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfcfc5731 */
+/* HASH CRC-32:0x29c86993 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,7 +20,7 @@
 #ifndef __local_iswascii_defined
 #define __local_iswascii_defined 1
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(iswascii) __ATTR_WUNUSED __ATTR_CONST int
+__LOCAL_LIBC(iswascii) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(iswascii))(__WINT_TYPE__ __wc) {
 #line 209 "kos/src/libc/magic/wctype.c"
 	return (unsigned int)__wc <= 0x7f;

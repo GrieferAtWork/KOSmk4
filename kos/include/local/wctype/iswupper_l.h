@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x47107c79 */
+/* HASH CRC-32:0xc167ff3e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,9 +23,9 @@
 #ifndef ____localdep_iswupper_defined
 #define ____localdep_iswupper_defined 1
 #if __has_builtin(__builtin_iswupper) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_iswupper)
-__FORCELOCAL __ATTR_WUNUSED __ATTR_CONST int __NOTHROW(__LIBCCALL __localdep_iswupper)(__WINT_TYPE__ __wc) { return __builtin_iswupper(__wc); }
+__FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __localdep_iswupper)(__WINT_TYPE__ __wc) { return __builtin_iswupper(__wc); }
 #elif defined(__CRT_HAVE_iswupper)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__localdep_iswupper,(__WINT_TYPE__ __wc),iswupper,(__wc))
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_iswupper,(__WINT_TYPE__ __wc),iswupper,(__wc))
 #else /* LIBC: iswupper */
 #include <local/wctype/iswupper.h>
 #define __localdep_iswupper (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(iswupper))
@@ -33,7 +33,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int,__NOTHROW,__localdep_iswupper,(__WIN
 #endif /* !____localdep_iswupper_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(iswupper_l) __ATTR_WUNUSED __ATTR_PURE int
+__LOCAL_LIBC(iswupper_l) __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(iswupper_l))(__WINT_TYPE__ __wc,
                                                         __locale_t __locale) {
 #line 274 "kos/src/libc/magic/wctype.c"

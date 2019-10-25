@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3af5a0c0 */
+/* HASH CRC-32:0x8f835bf1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -85,7 +85,7 @@ __NAMESPACE_LOCAL_USING(Execl)
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinal */
-__LIBC __ATTR_SENTINEL_O(1) __ATTR_NORETURN __ATTR_NONNULL((1)) void (__VLIBCCALL Execle)(char const *__restrict __path, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __THROWS(...) __CASMNAME_SAME("Execle");
+__LIBC __ATTR_NORETURN __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) void (__VLIBCCALL Execle)(char const *__restrict __path, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __THROWS(...) __CASMNAME_SAME("Execle");
 #elif defined(__CRT_HAVE_Execve)
 #include <local/kos.unistd/Execle.h>
 #ifdef __cplusplus
@@ -117,7 +117,7 @@ __NAMESPACE_LOCAL_USING(Execpl)
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinal */
-__LIBC __ATTR_SENTINEL_O(1) __ATTR_NORETURN __ATTR_NONNULL((1)) void (__VLIBCCALL Execlpe)(char const *__restrict __file, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __THROWS(...) __CASMNAME_SAME("Execlpe");
+__LIBC __ATTR_NORETURN __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) void (__VLIBCCALL Execlpe)(char const *__restrict __file, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __THROWS(...) __CASMNAME_SAME("Execlpe");
 #elif defined(__CRT_HAVE_Execvpe)
 #include <local/kos.unistd/Execlpe.h>
 #ifdef __cplusplus
@@ -514,10 +514,10 @@ __CDECLARE_VOID(__ATTR_NONNULL((1)),,Pipe2,(__fd_t __pipedes[2], __oflag_t __fla
 __CDECLARE(,__fd_t,,Dup3,(__fd_t __oldfd, __fd_t __newfd, __oflag_t __flags),(__oldfd,__newfd,__flags)) __THROWS(...)
 #endif /* Dup3... */
 #if defined(__CRT_HAVE_GetCurrentDirName)
-__CDECLARE(__ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_MALLOC,char *,,GetCurrentDirName,(void),()) __THROWS(...)
+__CDECLARE(__ATTR_MALLOC __ATTR_RETNONNULL __ATTR_WUNUSED,char *,,GetCurrentDirName,(void),()) __THROWS(...)
 #elif defined(__CRT_HAVE_GetCwd)
 #include <local/kos.unistd/GetCurrentDirName.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(GetCurrentDirName, __FORCELOCAL __ATTR_WUNUSED __ATTR_RETNONNULL __ATTR_MALLOC char *(__LIBCCALL GetCurrentDirName)(void) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(GetCurrentDirName))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(GetCurrentDirName, __FORCELOCAL __ATTR_MALLOC __ATTR_RETNONNULL __ATTR_WUNUSED char *(__LIBCCALL GetCurrentDirName)(void) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(GetCurrentDirName))(); })
 #endif /* GetCurrentDirName... */
 #if defined(__CRT_HAVE_SyncFs)
 __CDECLARE_VOID(,,SyncFs,(__fd_t __fd),(__fd)) __THROWS(...)
@@ -544,7 +544,7 @@ __CDECLARE_VOID(,__NOTHROW_NCX,SetResGid,(__gid_t __rgid, __gid_t __egid, __gid_
 /* >> vfork(2)
  * Same as `fork(2)', but suspend the calling process until the child
  * process either calls `exit(2)' or one of the many `exec(2)' functions */
-__CDECLARE(__ATTR_RETURNS_TWICE __ATTR_WUNUSED,__pid_t,,VFork,(void),()) __THROWS(...)
+__CDECLARE(__ATTR_WUNUSED __ATTR_RETURNS_TWICE,__pid_t,,VFork,(void),()) __THROWS(...)
 #endif /* VFork... */
 #endif
 

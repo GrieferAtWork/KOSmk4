@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc3880000 */
+/* HASH CRC-32:0xf669c580 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -127,7 +127,7 @@ INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_pthread_getname_np)(pthread_t 
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_pthread_setname_np)(pthread_t target_thread, const char *name);
 /* Return the TID of the given `target_thread'
  * If the given `target_thread' has already terminated, 0 is returned */
-INTDEF WUNUSED ATTR_CONST pid_t NOTHROW_NCX(LIBCCALL libc_pthread_gettid_np)(pthread_t target_thread);
+INTDEF ATTR_CONST WUNUSED pid_t NOTHROW_NCX(LIBCCALL libc_pthread_gettid_np)(pthread_t target_thread);
 /* Determine level of concurrency */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_pthread_getconcurrency)(void);
 /* Set new concurrency level to LEVEL */
@@ -162,7 +162,7 @@ INTDEF __cleanup_fct_attribute NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc___pth
 INTDEF __cleanup_fct_attribute NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc___pthread_register_cancel_defer)(__pthread_unwind_buf_t *buf);
 INTDEF __cleanup_fct_attribute NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc___pthread_unregister_cancel_restore)(__pthread_unwind_buf_t *buf);
 /* Internal interface to initiate cleanup */
-INTDEF ATTR_WEAK __cleanup_fct_attribute ATTR_NORETURN NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc___pthread_unwind_next)(__pthread_unwind_buf_t *buf);
+INTDEF __cleanup_fct_attribute ATTR_NORETURN ATTR_WEAK NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc___pthread_unwind_next)(__pthread_unwind_buf_t *buf);
 /* Initialize a mutex */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_pthread_mutex_init)(pthread_mutex_t *mutex, pthread_mutexattr_t const *mutexattr);
 /* Destroy a mutex */

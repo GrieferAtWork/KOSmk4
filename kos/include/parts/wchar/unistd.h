@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x19f4596e */
+/* HASH CRC-32:0xe1f196b0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -170,10 +170,10 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_RPC,weaccess,(wchar
 __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL weaccess)(wchar_t const *__file, int __type) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(weuidaccess))(__file, __type); }
 #endif /* weaccess... */
 #if defined(__CRT_HAVE_wget_current_dir_name)
-__CDECLARE(__ATTR_WUNUSED __ATTR_MALLOC,wchar_t *,__NOTHROW_RPC,wget_current_dir_name,(void),())
+__CDECLARE(__ATTR_MALLOC __ATTR_WUNUSED,wchar_t *,__NOTHROW_RPC,wget_current_dir_name,(void),())
 #elif defined(__CRT_HAVE_wgetcwd) || defined(__CRT_HAVE__wgetcwd)
 #include <local/parts.wchar.unistd/wget_current_dir_name.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(wget_current_dir_name, __FORCELOCAL __ATTR_WUNUSED __ATTR_MALLOC wchar_t *__NOTHROW_RPC(__LIBCCALL wget_current_dir_name)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wget_current_dir_name))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(wget_current_dir_name, __FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED wchar_t *__NOTHROW_RPC(__LIBCCALL wget_current_dir_name)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wget_current_dir_name))(); })
 #endif /* wget_current_dir_name... */
 #endif /* __USE_GNU */
 #ifdef __USE_ATFILE

@@ -1165,8 +1165,8 @@ NOTHROW_RPC(LIBDCALL libd_weuidaccess)(char16_t const *file,
 }
 /*[[[end:DOS$weuidaccess]]]*/
 
-/*[[[head:wget_current_dir_name,hash:CRC-32=0xb9b85ac2]]]*/
-INTERN WUNUSED ATTR_MALLOC
+/*[[[head:wget_current_dir_name,hash:CRC-32=0x6b7d8b33]]]*/
+INTERN ATTR_MALLOC WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.unsorted.wget_current_dir_name") char32_t *
 NOTHROW_RPC(LIBCCALL libc_wget_current_dir_name)(void)
 /*[[[body:wget_current_dir_name]]]*/
@@ -1182,8 +1182,8 @@ NOTHROW_RPC(LIBCCALL libc_wget_current_dir_name)(void)
 }
 /*[[[end:wget_current_dir_name]]]*/
 
-/*[[[head:DOS$wget_current_dir_name,hash:CRC-32=0x1ad11fe4]]]*/
-INTERN WUNUSED ATTR_MALLOC
+/*[[[head:DOS$wget_current_dir_name,hash:CRC-32=0x7610a1d2]]]*/
+INTERN ATTR_MALLOC WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.unsorted.wget_current_dir_name") char16_t *
 NOTHROW_RPC(LIBDCALL libd_wget_current_dir_name)(void)
 /*[[[body:DOS$wget_current_dir_name]]]*/

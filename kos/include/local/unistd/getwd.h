@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa3e4a9f7 */
+/* HASH CRC-32:0xca4747d8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ __CREDIRECT(,char *,__NOTHROW_RPC,__localdep_getcwd,(char *__buf, __SIZE_TYPE__ 
 #endif /* !____localdep_getcwd_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(getwd) __ATTR_DEPRECATED("Use getcwd()") __ATTR_NONNULL((1)) char *
+__LOCAL_LIBC(getwd) __ATTR_NONNULL((1)) __ATTR_DEPRECATED("Use getcwd()") char *
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(getwd))(char *__buf) {
 #line 1170 "kos/src/libc/magic/unistd.c"
 	return __localdep_getcwd(__buf, (__SIZE_TYPE__)-1);

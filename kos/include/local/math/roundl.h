@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbefd89da */
+/* HASH CRC-32:0x65816fc5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 #include <hybrid/typecore.h>
 __NAMESPACE_LOCAL_BEGIN
 /* Round X to nearest integral value, rounding halfway cases away from zero */
-__LOCAL_LIBC(roundl) __ATTR_WUNUSED __ATTR_CONST long double
+__LOCAL_LIBC(roundl) __ATTR_CONST __ATTR_WUNUSED long double
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(roundl))(long double __x) {
 #line 487 "kos/src/libc/magic/math.c"
 	long double __result;

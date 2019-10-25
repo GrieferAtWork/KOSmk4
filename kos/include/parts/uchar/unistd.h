@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x95b5b0ec */
+/* HASH CRC-32:0x4536360f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -367,27 +367,27 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32euidaccess, __FORCELOCAL __ATTR_WUNUSED __ATT
 #endif /* LIBC: c32euidaccess */
 #endif /* c32euidaccess... */
 #if defined(__CRT_HAVE_wget_current_dir_name) && (__SIZEOF_WCHAR_T__ == 2)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_MALLOC,char16_t *,__NOTHROW_RPC,c16get_current_dir_name,(void),wget_current_dir_name,())
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,char16_t *,__NOTHROW_RPC,c16get_current_dir_name,(void),wget_current_dir_name,())
 #elif defined(__CRT_HAVE_DOS$wget_current_dir_name)
-__CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_MALLOC,char16_t *,__NOTHROW_RPC,c16get_current_dir_name,(void),wget_current_dir_name,())
+__CREDIRECT_DOS(__ATTR_MALLOC __ATTR_WUNUSED,char16_t *,__NOTHROW_RPC,c16get_current_dir_name,(void),wget_current_dir_name,())
 #elif defined(__CRT_HAVE_wgetcwd) || defined(__CRT_HAVE__wgetcwd)
 #if __SIZEOF_WCHAR_T__ == 2
 #include <local/parts.wchar.unistd/wget_current_dir_name.h>
-__FORCELOCAL __ATTR_WUNUSED __ATTR_MALLOC char16_t *__NOTHROW_RPC(__LIBCCALL c16get_current_dir_name)(void) { return (char16_t *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wget_current_dir_name))(); }
+__FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED char16_t *__NOTHROW_RPC(__LIBCCALL c16get_current_dir_name)(void) { return (char16_t *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wget_current_dir_name))(); }
 #else /* LIBC: c16get_current_dir_name */
 #include <local/parts.wchar.unistd/c16get_current_dir_name.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(c16get_current_dir_name, __FORCELOCAL __ATTR_WUNUSED __ATTR_MALLOC char16_t *__NOTHROW_RPC(__LIBCCALL c16get_current_dir_name)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16get_current_dir_name))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(c16get_current_dir_name, __FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED char16_t *__NOTHROW_RPC(__LIBCCALL c16get_current_dir_name)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16get_current_dir_name))(); })
 #endif /* LIBC: c16get_current_dir_name */
 #endif /* c16get_current_dir_name... */
 #if defined(__CRT_HAVE_wget_current_dir_name) && (__SIZEOF_WCHAR_T__ == 4)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_MALLOC,char32_t *,__NOTHROW_RPC,c32get_current_dir_name,(void),wget_current_dir_name,())
+__CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,char32_t *,__NOTHROW_RPC,c32get_current_dir_name,(void),wget_current_dir_name,())
 #elif defined(__CRT_HAVE_wgetcwd) || defined(__CRT_HAVE__wgetcwd)
 #if __SIZEOF_WCHAR_T__ == 4
 #include <local/parts.wchar.unistd/wget_current_dir_name.h>
-__FORCELOCAL __ATTR_WUNUSED __ATTR_MALLOC char32_t *__NOTHROW_RPC(__LIBCCALL c32get_current_dir_name)(void) { return (char32_t *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wget_current_dir_name))(); }
+__FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED char32_t *__NOTHROW_RPC(__LIBCCALL c32get_current_dir_name)(void) { return (char32_t *)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wget_current_dir_name))(); }
 #else /* LIBC: c32get_current_dir_name */
 #include <local/parts.wchar.unistd/c32get_current_dir_name.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(c32get_current_dir_name, __FORCELOCAL __ATTR_WUNUSED __ATTR_MALLOC char32_t *__NOTHROW_RPC(__LIBCCALL c32get_current_dir_name)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32get_current_dir_name))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(c32get_current_dir_name, __FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED char32_t *__NOTHROW_RPC(__LIBCCALL c32get_current_dir_name)(void) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32get_current_dir_name))(); })
 #endif /* LIBC: c32get_current_dir_name */
 #endif /* c32get_current_dir_name... */
 #endif /* __USE_GNU */

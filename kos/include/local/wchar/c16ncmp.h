@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x700b418a */
+/* HASH CRC-32:0xd62d3ea4 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,7 +21,7 @@
 #define __local_c16ncmp_defined 1
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `c16cmp', but compare at most `MAXLEN' characters from either string */
-__LOCAL_LIBC(c16ncmp) __ATTR_WUNUSED __ATTR_PURE __ATTR_NONNULL((1, 2)) int
+__LOCAL_LIBC(c16ncmp) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(c16ncmp))(__CHAR16_TYPE__ const *__s1,
                                                      __CHAR16_TYPE__ const *__s2,
                                                      __SIZE_TYPE__ __maxlen) {

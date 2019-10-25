@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbb4fed12 */
+/* HASH CRC-32:0x1a2cb770 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,21 +28,21 @@
 DECL_BEGIN
 
 /* @throws: E_BADALLOC: ... */
-INTDEF WUNUSED ATTR_MALL_DEFAULT_ALIGNED ATTR_MALLOC ATTR_RETNONNULL ATTR_ALLOC_SIZE((1)) void *NOTHROW_NCX(LIBCCALL libc_Malloc)(size_t n_bytes);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ALLOC_SIZE((1)) void *NOTHROW_NCX(LIBCCALL libc_Malloc)(size_t n_bytes);
 /* @throws: E_BADALLOC: ... */
-INTDEF WUNUSED ATTR_MALL_DEFAULT_ALIGNED ATTR_MALLOC ATTR_RETNONNULL ATTR_ALLOC_SIZE((1, 2)) void *NOTHROW_NCX(LIBCCALL libc_Calloc)(size_t count, size_t n_bytes);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ALLOC_SIZE((1, 2)) void *NOTHROW_NCX(LIBCCALL libc_Calloc)(size_t count, size_t n_bytes);
 /* @throws: E_BADALLOC: ... */
-INTDEF WUNUSED ATTR_MALL_DEFAULT_ALIGNED ATTR_MALLOC ATTR_ALLOC_SIZE((2)) ATTR_RETNONNULL void *NOTHROW_NCX(LIBCCALL libc_Realloc)(void *mallptr, size_t n_bytes);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(LIBCCALL libc_Realloc)(void *mallptr, size_t n_bytes);
 /* @throws: E_BADALLOC: ... */
-INTDEF WUNUSED ATTR_ALLOC_ALIGN(1) ATTR_ALLOC_SIZE((2)) ATTR_MALLOC ATTR_RETNONNULL void *NOTHROW_NCX(LIBCCALL libc_Memalign)(size_t alignment, size_t n_bytes);
+INTDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED ATTR_ALLOC_SIZE((2)) ATTR_ALLOC_ALIGN(1) void *NOTHROW_NCX(LIBCCALL libc_Memalign)(size_t alignment, size_t n_bytes);
 /* @throws: E_BADALLOC: ... */
-INTDEF WUNUSED ATTR_MALL_PAGEALIGNED ATTR_ALLOC_SIZE((1)) ATTR_MALLOC ATTR_RETNONNULL void *NOTHROW_NCX(LIBCCALL libc_PValloc)(size_t n_bytes);
+INTDEF ATTR_MALLOC ATTR_MALL_PAGEALIGNED ATTR_RETNONNULL WUNUSED ATTR_ALLOC_SIZE((1)) void *NOTHROW_NCX(LIBCCALL libc_PValloc)(size_t n_bytes);
 /* @throws: E_BADALLOC: ... */
-INTDEF ATTR_RETNONNULL WUNUSED ATTR_MALL_PAGEALIGNED ATTR_ALLOC_SIZE((1)) void *NOTHROW_NCX(LIBCCALL libc_Valloc)(size_t n_bytes);
+INTDEF ATTR_MALL_PAGEALIGNED ATTR_RETNONNULL WUNUSED ATTR_ALLOC_SIZE((1)) void *NOTHROW_NCX(LIBCCALL libc_Valloc)(size_t n_bytes);
 /* @throws: E_BADALLOC: ... */
-INTDEF WUNUSED ATTR_MALL_DEFAULT_ALIGNED ATTR_ALLOC_SIZE((2)) ATTR_MALLOC ATTR_RETNONNULL NONNULL((1)) void *NOTHROW_NCX(LIBCCALL libc_Memdup)(void const *__restrict ptr, size_t n_bytes);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED NONNULL((1)) ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(LIBCCALL libc_Memdup)(void const *__restrict ptr, size_t n_bytes);
 /* @throws: E_BADALLOC: ... */
-INTDEF WUNUSED ATTR_MALL_DEFAULT_ALIGNED ATTR_ALLOC_SIZE((2)) ATTR_MALLOC ATTR_RETNONNULL NONNULL((1)) void *NOTHROW_NCX(LIBCCALL libc_Memcdup)(void const *__restrict ptr, int needle, size_t n_bytes);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED NONNULL((1)) ATTR_ALLOC_SIZE((2)) void *NOTHROW_NCX(LIBCCALL libc_Memcdup)(void const *__restrict ptr, int needle, size_t n_bytes);
 
 DECL_END
 

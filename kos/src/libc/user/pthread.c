@@ -499,10 +499,10 @@ NOTHROW_NCX(LIBCCALL libc_pthread_self)(void)
 }
 /*[[[end:pthread_self]]]*/
 
-/*[[[head:pthread_gettid_np,hash:CRC-32=0x8318e75]]]*/
+/*[[[head:pthread_gettid_np,hash:CRC-32=0xd1a98be0]]]*/
 /* Return the TID of the given `target_thread'
  * If the given `target_thread' has already terminated, 0 is returned */
-INTERN WUNUSED ATTR_CONST
+INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_gettid_np") pid_t
 NOTHROW_NCX(LIBCCALL libc_pthread_gettid_np)(pthread_t target_thread)
 /*[[[body:pthread_gettid_np]]]*/
@@ -1507,9 +1507,9 @@ NOTHROW_NCX(LIBCCALL libc___pthread_unregister_cancel_restore)(__pthread_unwind_
 }
 /*[[[end:__pthread_unregister_cancel_restore]]]*/
 
-/*[[[head:__pthread_unwind_next,hash:CRC-32=0xf285896d]]]*/
+/*[[[head:__pthread_unwind_next,hash:CRC-32=0xb55496c]]]*/
 /* Internal interface to initiate cleanup */
-INTERN ATTR_WEAK __cleanup_fct_attribute ATTR_NORETURN NONNULL((1))
+INTERN __cleanup_fct_attribute ATTR_NORETURN ATTR_WEAK NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.__pthread_unwind_next") void
 NOTHROW_NCX(LIBCCALL libc___pthread_unwind_next)(__pthread_unwind_buf_t *buf)
 /*[[[body:__pthread_unwind_next]]]*/
