@@ -55,8 +55,6 @@
 #include <cwchar>
 #include <cwctype>
 
-
-
 /* Include the original C headers afterwards */
 #include <assert.h>
 #include <ctype.h>

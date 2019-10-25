@@ -22,6 +22,8 @@
 #include <__stdinc.h>
 
 #include <bits/time.h>
+#include <bits/timespec.h>
+#include <bits/timeval.h>
 
 #define _CLOCKS_PER_SEC_ CLOCKS_PER_SEC
 

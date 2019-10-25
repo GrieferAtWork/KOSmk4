@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd84edce2 */
+/* HASH CRC-32:0xce8edf55 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -105,10 +105,12 @@ __NAMESPACE_STD_USING(sig_atomic_t)
 #endif /* !__sig_atomic_t_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 
+#ifdef __USE_POSIX
 #ifndef __sigset_t_defined
 #define __sigset_t_defined 1
 typedef __sigset_t sigset_t;
 #endif /* !__sigset_t_defined */
+#endif /* __USE_POSIX */
 
 #if defined(__USE_XOPEN) || defined(__USE_XOPEN2K)
 #ifndef __pid_t_defined

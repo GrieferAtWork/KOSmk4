@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe46752e5 */
+/* HASH CRC-32:0xead28900 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ DECL_BEGIN
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.sigemptyset") int
 NOTHROW_NCX(LIBCCALL libc_sigemptyset)(sigset_t *set) {
-#line 240 "kos/src/libc/magic/signal.c"
+#line 242 "kos/src/libc/magic/signal.c"
 	size_t cnt;
 	cnt = sizeof(__sigset_t) / sizeof(__ULONGPTR_TYPE__);
 	while (cnt--)
@@ -44,7 +44,7 @@ NOTHROW_NCX(LIBCCALL libc_sigemptyset)(sigset_t *set) {
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.sigfillset") int
 NOTHROW_NCX(LIBCCALL libc_sigfillset)(sigset_t *set) {
-#line 248 "kos/src/libc/magic/signal.c"
+#line 250 "kos/src/libc/magic/signal.c"
 	size_t cnt;
 	cnt = sizeof(__sigset_t) / sizeof(__ULONGPTR_TYPE__);
 	while (cnt--)
@@ -58,7 +58,7 @@ INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.sigaddset") int
 NOTHROW_NCX(LIBCCALL libc_sigaddset)(sigset_t *set,
                                      int signo) {
-#line 258 "kos/src/libc/magic/signal.c"
+#line 260 "kos/src/libc/magic/signal.c"
 	__ULONGPTR_TYPE__ mask = __sigmask(signo);
 	__ULONGPTR_TYPE__ word = __sigword(signo);
 	set->__val[word] |= mask;
@@ -71,7 +71,7 @@ INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.sigdelset") int
 NOTHROW_NCX(LIBCCALL libc_sigdelset)(sigset_t *set,
                                      int signo) {
-#line 267 "kos/src/libc/magic/signal.c"
+#line 269 "kos/src/libc/magic/signal.c"
 	__ULONGPTR_TYPE__ mask = __sigmask(signo);
 	__ULONGPTR_TYPE__ word = __sigword(signo);
 	set->__val[word] &= ~mask;
@@ -84,7 +84,7 @@ INTERN WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.sigismember") int
 NOTHROW_NCX(LIBCCALL libc_sigismember)(sigset_t const *set,
                                        int signo) {
-#line 277 "kos/src/libc/magic/signal.c"
+#line 279 "kos/src/libc/magic/signal.c"
 	__ULONGPTR_TYPE__ mask = __sigmask(signo);
 	__ULONGPTR_TYPE__ word = __sigword(signo);
 	return (set->__val[word] & mask) != 0;
@@ -94,7 +94,7 @@ NOTHROW_NCX(LIBCCALL libc_sigismember)(sigset_t const *set,
 INTERN WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.sigisemptyset") int
 NOTHROW_NCX(LIBCCALL libc_sigisemptyset)(sigset_t const *set) {
-#line 300 "kos/src/libc/magic/signal.c"
+#line 302 "kos/src/libc/magic/signal.c"
 	size_t i;
 	for (i = 0; i < sizeof(sigset_t) / sizeof(__ULONGPTR_TYPE__); ++i)
 		if (set->__val[i])
@@ -108,7 +108,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.sigandset") int
 NOTHROW_NCX(LIBCCALL libc_sigandset)(sigset_t *set,
                                      sigset_t const *left,
                                      sigset_t const *right) {
-#line 310 "kos/src/libc/magic/signal.c"
+#line 312 "kos/src/libc/magic/signal.c"
 	size_t i;
 	for (i = 0; i < sizeof(__sigset_t) / sizeof(__ULONGPTR_TYPE__); ++i)
 		set->__val[i] = left->__val[i] & right->__val[i];
@@ -121,7 +121,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.sched.signal.sigorset") int
 NOTHROW_NCX(LIBCCALL libc_sigorset)(sigset_t *set,
                                     sigset_t const *left,
                                     sigset_t const *right) {
-#line 320 "kos/src/libc/magic/signal.c"
+#line 322 "kos/src/libc/magic/signal.c"
 	size_t i;
 	for (i = 0; i < sizeof(__sigset_t) / sizeof(__ULONGPTR_TYPE__); ++i)
 		set->__val[i] = left->__val[i] | right->__val[i];

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xec568a9e */
+/* HASH CRC-32:0xc0eb96cb */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pselect64))(__STDC_INT_AS_SIZE_T __nf
                                                        fd_set *__restrict __exceptfds,
                                                        struct __timespec64 const *__restrict __timeout,
                                                        struct __sigset_struct const *__restrict __sigmask) {
-#line 188 "kos/src/libc/magic/sys.select.c"
+#line 190 "kos/src/libc/magic/sys.select.c"
 	struct __timespec32 __tms;
 	if (!__timeout)
 		return __localdep_pselect32(__nfds, __readfds, __writefds, __exceptfds, __NULLPTR, __sigmask);

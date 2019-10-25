@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x70856882 */
+/* HASH CRC-32:0x5de92220 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,11 +28,13 @@
 #endif /* __COMPILER_HAVE_PRAGMA_GCC_SYSTEM_HEADER */
 
 #include <features.h>
-#include <bits/types.h>
+
 #include <bits/select.h>
 #include <bits/sigset.h>
+#include <bits/time.h>
 #include <bits/timespec.h> /* struct timespec */
-#include <bits/time.h>     /* struct timeval */
+#include <bits/timeval.h>  /* struct timeval */
+#include <bits/types.h>
 
 __SYSDECL_BEGIN
 

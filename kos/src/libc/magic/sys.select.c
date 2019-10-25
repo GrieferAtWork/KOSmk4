@@ -46,11 +46,13 @@ typedef __sighandler_t sighandler_t;
 
 %{
 #include <features.h>
-#include <bits/types.h>
+
 #include <bits/select.h>
 #include <bits/sigset.h>
+#include <bits/time.h>
 #include <bits/timespec.h> /* struct timespec */
-#include <bits/time.h>     /* struct timeval */
+#include <bits/timeval.h>  /* struct timeval */
+#include <bits/types.h>
 
 __SYSDECL_BEGIN
 

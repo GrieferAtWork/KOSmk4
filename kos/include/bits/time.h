@@ -22,7 +22,6 @@
 #include <__stdinc.h>
 #include <features.h>
 #include <bits/types.h>
-#include <bits/timeval.h>
 
 __SYSDECL_BEGIN
 
