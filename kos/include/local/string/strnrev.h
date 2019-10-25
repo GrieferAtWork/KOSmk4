@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xff1a0356 */
+/* HASH CRC-32:0x32a080d2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 #ifndef ____localdep_memrev_defined
 #define ____localdep_memrev_defined 1
 #if defined(__CRT_HAVE_memrev)
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memrev,(void *__restrict __base, __SIZE_TYPE__ __n_bytes),memrev,(__base,__n_bytes))
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memrev,(void *__restrict __base, __SIZE_TYPE__ __n_bytes),memrev,(__base,__n_bytes))
 #else /* LIBC: memrev */
 #include <local/string/memrev.h>
 #define __localdep_memrev (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memrev))
@@ -47,10 +47,10 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHR
 #endif /* !____localdep_strnlen_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(strnrev) __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *
+__LOCAL_LIBC(strnrev) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strnrev))(char *__restrict __str,
                                                      __SIZE_TYPE__ __maxlen) {
-#line 4097 "kos/src/libc/magic/string.c"
+#line 4223 "kos/src/libc/magic/string.c"
 	return (char *)__localdep_memrev(__str, __localdep_strnlen(__str, __maxlen));
 }
 __NAMESPACE_LOCAL_END

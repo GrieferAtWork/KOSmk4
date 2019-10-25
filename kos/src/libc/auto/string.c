@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x699441d5 */
+/* HASH CRC-32:0x5767e7f1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -31,12 +31,12 @@ DECL_BEGIN
 
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
-INTERN ATTR_RETNONNULL NONNULL((1, 2))
+INTERN ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memcpy") void *
 NOTHROW_NCX(LIBCCALL libc_memcpy)(void *__restrict dst,
                                   void const *__restrict src,
                                   size_t n_bytes) {
-#line 139 "kos/src/libc/magic/string.c"
+#line 141 "kos/src/libc/magic/string.c"
 	byte_t *pdst = (byte_t *)dst;
 	byte_t *psrc = (byte_t *)src;
 	while (n_bytes--)
@@ -46,12 +46,12 @@ NOTHROW_NCX(LIBCCALL libc_memcpy)(void *__restrict dst,
 
 /* Move memory between potentially overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
-INTERN ATTR_RETNONNULL NONNULL((1, 2))
+INTERN ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memmove") void *
 NOTHROW_NCX(LIBCCALL libc_memmove)(void *dst,
                                    void const *src,
                                    size_t n_bytes) {
-#line 150 "kos/src/libc/magic/string.c"
+#line 152 "kos/src/libc/magic/string.c"
 	byte_t *pdst, *psrc;
 	if (dst < src) {
 		pdst = (byte_t *)dst;
@@ -69,12 +69,12 @@ NOTHROW_NCX(LIBCCALL libc_memmove)(void *dst,
 
 /* Fill memory with a given byte
  * @return: * : Always re-returns `dst' */
-INTERN ATTR_RETNONNULL NONNULL((1))
+INTERN ATTR_LEAF ATTR_RETNONNULL NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memset") void *
 NOTHROW_NCX(LIBCCALL libc_memset)(void *__restrict dst,
                                   int byte,
                                   size_t n_bytes) {
-#line 169 "kos/src/libc/magic/string.c"
+#line 171 "kos/src/libc/magic/string.c"
 	byte_t *pdst = (byte_t *)dst;
 	while (n_bytes--)
 		*pdst++ = (byte_t)byte;
@@ -90,7 +90,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memcmp") int
 NOTHROW_NCX(LIBCCALL libc_memcmp)(void const *s1,
                                   void const *s2,
                                   size_t n_bytes) {
-#line 182 "kos/src/libc/magic/string.c"
+#line 183 "kos/src/libc/magic/string.c"
 	byte_t *p1 = (byte_t *)s1;
 	byte_t *p2 = (byte_t *)s2;
 	byte_t v1, v2;
@@ -105,7 +105,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memchr") void *
 NOTHROW_NCX(LIBCCALL libc_memchr)(void const *__restrict haystack,
                                   int needle,
                                   size_t n_bytes) {
-#line 196 "kos/src/libc/magic/string.c"
+#line 197 "kos/src/libc/magic/string.c"
 	byte_t *hay_iter = (byte_t *)haystack;
 	for (; n_bytes--; ++hay_iter) {
 		if unlikely(*hay_iter == (byte_t)needle)
@@ -118,7 +118,7 @@ NOTHROW_NCX(LIBCCALL libc_memchr)(void const *__restrict haystack,
 INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.strlen") size_t
 NOTHROW_NCX(LIBCCALL libc_strlen)(char const *__restrict string) {
-#line 212 "kos/src/libc/magic/string.c"
+#line 213 "kos/src/libc/magic/string.c"
 	return (size_t)(libc_strend(string) - string);
 }
 
@@ -127,7 +127,7 @@ INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.strchr") char *
 NOTHROW_NCX(LIBCCALL libc_strchr)(char const *__restrict haystack,
                                   int needle) {
-#line 222 "kos/src/libc/magic/string.c"
+#line 223 "kos/src/libc/magic/string.c"
 	for (; *haystack; ++haystack)
 		if (*haystack == (char)needle)
 			return (char *)haystack;
@@ -139,7 +139,7 @@ INTERN ATTR_PURE WUNUSED NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.strcmp") int
 NOTHROW_NCX(LIBCCALL libc_strcmp)(char const *s1,
                                   char const *s2) {
-#line 244 "kos/src/libc/magic/string.c"
+#line 245 "kos/src/libc/magic/string.c"
 	char c1, c2;
 	do {
 		if unlikely((c1 = *s1++) != (c2 = *s2++))
@@ -153,7 +153,7 @@ INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.strnlen") size_t
 NOTHROW_NCX(LIBCCALL libc_strnlen)(char const *__restrict string,
                                    size_t maxlen) {
-#line 404 "kos/src/libc/magic/string.c"
+#line 408 "kos/src/libc/magic/string.c"
 	return (size_t)(libc_strnend(string, maxlen) - string);
 }
 
@@ -163,7 +163,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memrchr") void *
 NOTHROW_NCX(LIBCCALL libc_memrchr)(void const *__restrict haystack,
                                    int needle,
                                    size_t n_bytes) {
-#line 522 "kos/src/libc/magic/string.c"
+#line 537 "kos/src/libc/magic/string.c"
 	byte_t *iter = (byte_t *)haystack + n_bytes;
 	while (n_bytes--) {
 		if (*--iter == (byte_t)needle)
@@ -177,7 +177,7 @@ INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.rawmemchr") void *
 NOTHROW_NCX(LIBCCALL libc_rawmemchr)(void const *__restrict haystack,
                                      int needle) {
-#line 537 "kos/src/libc/magic/string.c"
+#line 552 "kos/src/libc/magic/string.c"
 	byte_t *iter = (byte_t *)haystack;
 	for (;; ++iter) {
 		if (*iter == (byte_t)needle)
@@ -187,12 +187,12 @@ NOTHROW_NCX(LIBCCALL libc_rawmemchr)(void const *__restrict haystack,
 }
 
 /* Same as `memcpy', but return `DST+N_BYTES', rather than `DST' */
-INTERN ATTR_RETNONNULL NONNULL((1, 2))
+INTERN ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.mempcpy") void *
 NOTHROW_NCX(LIBCCALL libc_mempcpy)(void *__restrict dst,
                                    void const *__restrict src,
                                    size_t n_bytes) {
-#line 704 "kos/src/libc/magic/string.c"
+#line 719 "kos/src/libc/magic/string.c"
 	byte_t *pdst = (byte_t *)dst;
 	byte_t *psrc = (byte_t *)src;
 	while (n_bytes--)
@@ -201,12 +201,12 @@ NOTHROW_NCX(LIBCCALL libc_mempcpy)(void *__restrict dst,
 }
 
 /* Copy memory between non-overlapping memory blocks. */
-INTERN ATTR_RETNONNULL NONNULL((1, 2))
+INTERN ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memcpyw") uint16_t *
 NOTHROW_NCX(LIBCCALL libc_memcpyw)(void *__restrict dst,
                                    void const *__restrict src,
                                    size_t n_words) {
-#line 912 "kos/src/libc/magic/string.c"
+#line 939 "kos/src/libc/magic/string.c"
 	u16 *pdst = (u16 *)dst;
 	u16 *psrc = (u16 *)src;
 	while (n_words--)
@@ -215,22 +215,22 @@ NOTHROW_NCX(LIBCCALL libc_memcpyw)(void *__restrict dst,
 }
 
 /* Same as `memcpyw', but return `DST+N_WORDS', rather than `DST' */
-INTERN ATTR_RETNONNULL NONNULL((1, 2))
+INTERN ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.mempcpyw") uint16_t *
 NOTHROW_NCX(LIBCCALL libc_mempcpyw)(void *__restrict dst,
                                     void const *__restrict src,
                                     size_t n_words) {
-#line 923 "kos/src/libc/magic/string.c"
+#line 951 "kos/src/libc/magic/string.c"
 	return (u16 *)memcpyw(dst, src, n_words) + n_words;
 }
 
 /* Copy memory between non-overlapping memory blocks. */
-INTERN ATTR_RETNONNULL NONNULL((1, 2))
+INTERN ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memcpyl") uint32_t *
 NOTHROW_NCX(LIBCCALL libc_memcpyl)(void *__restrict dst,
                                    void const *__restrict src,
                                    size_t n_dwords) {
-#line 930 "kos/src/libc/magic/string.c"
+#line 959 "kos/src/libc/magic/string.c"
 	u32 *pdst = (u32 *)dst;
 	u32 *psrc = (u32 *)src;
 	while (n_dwords--)
@@ -239,22 +239,22 @@ NOTHROW_NCX(LIBCCALL libc_memcpyl)(void *__restrict dst,
 }
 
 /* Same as `memcpyl', but return `DST+N_DWORDS', rather than `DST' */
-INTERN ATTR_RETNONNULL NONNULL((1, 2))
+INTERN ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.mempcpyl") uint32_t *
 NOTHROW_NCX(LIBCCALL libc_mempcpyl)(void *__restrict dst,
                                     void const *__restrict src,
                                     size_t n_dwords) {
-#line 941 "kos/src/libc/magic/string.c"
+#line 971 "kos/src/libc/magic/string.c"
 	return (u32 *)memcpyl(dst, src, n_dwords) + n_dwords;
 }
 
 /* Move memory between potentially overlapping memory blocks. */
-INTERN ATTR_RETNONNULL NONNULL((1, 2))
+INTERN ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memmovew") uint16_t *
 NOTHROW_NCX(LIBCCALL libc_memmovew)(void *dst,
                                     void const *src,
                                     size_t n_words) {
-#line 957 "kos/src/libc/magic/string.c"
+#line 992 "kos/src/libc/magic/string.c"
 	u16 *pdst, *psrc;
 	if (dst < src) {
 		psrc = (u16 *)src;
@@ -271,22 +271,22 @@ NOTHROW_NCX(LIBCCALL libc_memmovew)(void *dst,
 }
 
 /* Same as `memmovew', but return `DST+N_WORDS', rather than `DST' */
-INTERN ATTR_RETNONNULL NONNULL((1, 2))
+INTERN ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.mempmovew") uint16_t *
 NOTHROW_NCX(LIBCCALL libc_mempmovew)(void *__restrict dst,
                                      void const *__restrict src,
                                      size_t n_words) {
-#line 975 "kos/src/libc/magic/string.c"
+#line 1012 "kos/src/libc/magic/string.c"
 	return (u16 *)memmovew(dst, src, n_words) + n_words;
 }
 
 /* Move memory between potentially overlapping memory blocks. */
-INTERN ATTR_RETNONNULL NONNULL((1, 2))
+INTERN ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memmovel") uint32_t *
 NOTHROW_NCX(LIBCCALL libc_memmovel)(void *dst,
                                     void const *src,
                                     size_t n_dwords) {
-#line 982 "kos/src/libc/magic/string.c"
+#line 1020 "kos/src/libc/magic/string.c"
 	u32 *pdst, *psrc;
 	if (dst < src) {
 		psrc = (u32 *)src;
@@ -303,22 +303,22 @@ NOTHROW_NCX(LIBCCALL libc_memmovel)(void *dst,
 }
 
 /* Same as `memmovew', but return `DST+N_DWORDS', rather than `DST' */
-INTERN ATTR_RETNONNULL NONNULL((1, 2))
+INTERN ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.mempmovel") uint32_t *
 NOTHROW_NCX(LIBCCALL libc_mempmovel)(void *__restrict dst,
                                      void const *__restrict src,
                                      size_t n_dwords) {
-#line 1000 "kos/src/libc/magic/string.c"
+#line 1040 "kos/src/libc/magic/string.c"
 	return (u32 *)memmovel(dst, src, n_dwords) + n_dwords;
 }
 
 /* Fill memory with a given word */
-INTERN ATTR_RETNONNULL NONNULL((1))
+INTERN ATTR_LEAF ATTR_RETNONNULL NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memsetw") uint16_t *
 NOTHROW_NCX(LIBCCALL libc_memsetw)(void *__restrict dst,
                                    uint16_t word,
                                    size_t n_words) {
-#line 1014 "kos/src/libc/magic/string.c"
+#line 1057 "kos/src/libc/magic/string.c"
 	u16 *pdst = (u16 *)dst;
 	while (n_words--)
 		*pdst++ = word;
@@ -326,22 +326,22 @@ NOTHROW_NCX(LIBCCALL libc_memsetw)(void *__restrict dst,
 }
 
 /* Same as `memsetw', but return `DST+N_WORDS', rather than `DST' */
-INTERN ATTR_RETNONNULL NONNULL((1))
+INTERN ATTR_LEAF ATTR_RETNONNULL NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.mempsetw") uint16_t *
 NOTHROW_NCX(LIBCCALL libc_mempsetw)(void *__restrict dst,
                                     uint16_t word,
                                     size_t n_words) {
-#line 1023 "kos/src/libc/magic/string.c"
+#line 1067 "kos/src/libc/magic/string.c"
 	return (u16 *)memsetw(dst, word, n_words) + n_words;
 }
 
 /* Fill memory with a given dword */
-INTERN ATTR_RETNONNULL NONNULL((1))
+INTERN ATTR_LEAF ATTR_RETNONNULL NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memsetl") uint32_t *
 NOTHROW_NCX(LIBCCALL libc_memsetl)(void *__restrict dst,
                                    uint32_t dword,
                                    size_t n_dwords) {
-#line 1029 "kos/src/libc/magic/string.c"
+#line 1074 "kos/src/libc/magic/string.c"
 	u32 *pdst = (u32 *)dst;
 	while (n_dwords--)
 		*pdst++ = dword;
@@ -349,12 +349,12 @@ NOTHROW_NCX(LIBCCALL libc_memsetl)(void *__restrict dst,
 }
 
 /* Same as `memsetl', but return `DST+N_DWORDS', rather than `DST' */
-INTERN ATTR_RETNONNULL NONNULL((1))
+INTERN ATTR_LEAF ATTR_RETNONNULL NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.mempsetl") uint32_t *
 NOTHROW_NCX(LIBCCALL libc_mempsetl)(void *__restrict dst,
                                     uint32_t dword,
                                     size_t n_dwords) {
-#line 1038 "kos/src/libc/magic/string.c"
+#line 1084 "kos/src/libc/magic/string.c"
 	return (u32 *)memsetl(dst, dword, n_dwords) + n_dwords;
 }
 
@@ -364,7 +364,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memcmpw") int16_t
 NOTHROW_NCX(LIBCCALL libc_memcmpw)(void const *s1,
                                    void const *s2,
                                    size_t n_words) {
-#line 1050 "kos/src/libc/magic/string.c"
+#line 1098 "kos/src/libc/magic/string.c"
 	s16 *p1 = (s16 *)s1;
 	s16 *p2 = (s16 *)s2;
 	s16 v1, v2;
@@ -379,7 +379,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memcmpl") int32_t
 NOTHROW_NCX(LIBCCALL libc_memcmpl)(void const *s1,
                                    void const *s2,
                                    size_t n_dwords) {
-#line 1062 "kos/src/libc/magic/string.c"
+#line 1111 "kos/src/libc/magic/string.c"
 	s32 *p1 = (s32 *)s1;
 	s32 *p2 = (s32 *)s2;
 	s32 v1, v2;
@@ -394,7 +394,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memchrw") uint16_t *
 NOTHROW_NCX(LIBCCALL libc_memchrw)(void const *__restrict haystack,
                                    uint16_t word,
                                    size_t n_words) {
-#line 1084 "kos/src/libc/magic/string.c"
+#line 1132 "kos/src/libc/magic/string.c"
 	u16 *hay_iter = (u16 *)haystack;
 	for (; n_words--; ++hay_iter) {
 		if unlikely(*hay_iter == word)
@@ -409,7 +409,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memchrl") uint32_t *
 NOTHROW_NCX(LIBCCALL libc_memchrl)(void const *__restrict haystack,
                                    uint32_t dword,
                                    size_t n_dwords) {
-#line 1099 "kos/src/libc/magic/string.c"
+#line 1146 "kos/src/libc/magic/string.c"
 	u32 *hay_iter = (u32 *)haystack;
 	for (; n_dwords--; ++hay_iter) {
 		if unlikely(*hay_iter == dword)
@@ -424,7 +424,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memrchrw") uint16_t *
 NOTHROW_NCX(LIBCCALL libc_memrchrw)(void const *__restrict haystack,
                                     uint16_t word,
                                     size_t n_words) {
-#line 1120 "kos/src/libc/magic/string.c"
+#line 1167 "kos/src/libc/magic/string.c"
 	u16 *iter = (u16 *)haystack + n_words;
 	while (n_words--) {
 		if unlikely(*--iter == word)
@@ -439,7 +439,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memrchrl") uint32_t *
 NOTHROW_NCX(LIBCCALL libc_memrchrl)(void const *__restrict haystack,
                                     uint32_t dword,
                                     size_t n_dwords) {
-#line 1134 "kos/src/libc/magic/string.c"
+#line 1181 "kos/src/libc/magic/string.c"
 	u32 *iter = (u32 *)haystack + n_dwords;
 	while (n_dwords--) {
 		if unlikely(*--iter == dword)
@@ -453,7 +453,7 @@ INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.rawmemchrw") uint16_t *
 NOTHROW_NCX(LIBCCALL libc_rawmemchrw)(void const *__restrict haystack,
                                       uint16_t word) {
-#line 1155 "kos/src/libc/magic/string.c"
+#line 1202 "kos/src/libc/magic/string.c"
 	u16 *iter = (u16 *)haystack;
 	for (;; ++iter) {
 		if unlikely(*iter == word)
@@ -467,7 +467,7 @@ INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.rawmemchrl") uint32_t *
 NOTHROW_NCX(LIBCCALL libc_rawmemchrl)(void const *__restrict haystack,
                                       uint32_t dword) {
-#line 1169 "kos/src/libc/magic/string.c"
+#line 1216 "kos/src/libc/magic/string.c"
 	u32 *iter = (u32 *)haystack;
 	for (;; ++iter) {
 		if unlikely(*iter == dword)
@@ -481,7 +481,7 @@ INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.rawmemrchrw") uint16_t *
 NOTHROW_NCX(LIBCCALL libc_rawmemrchrw)(void const *__restrict haystack,
                                        uint16_t word) {
-#line 1191 "kos/src/libc/magic/string.c"
+#line 1238 "kos/src/libc/magic/string.c"
 	u16 *iter = (u16 *)haystack;
 	for (;;) {
 		if unlikely(*--iter == word)
@@ -495,7 +495,7 @@ INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.rawmemrchrl") uint32_t *
 NOTHROW_NCX(LIBCCALL libc_rawmemrchrl)(void const *__restrict haystack,
                                        uint32_t dword) {
-#line 1205 "kos/src/libc/magic/string.c"
+#line 1252 "kos/src/libc/magic/string.c"
 	u32 *iter = (u32 *)haystack;
 	for (;;) {
 		if unlikely(*--iter == dword)
@@ -510,7 +510,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memendw") uint16_t *
 NOTHROW_NCX(LIBCCALL libc_memendw)(void const *__restrict haystack,
                                    uint16_t word,
                                    size_t n_bytes) {
-#line 1227 "kos/src/libc/magic/string.c"
+#line 1274 "kos/src/libc/magic/string.c"
 	u16 *result = (u16 *)haystack;
 	for (; n_bytes--; ++result) {
 		if unlikely(*result == word)
@@ -525,7 +525,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memendl") uint32_t *
 NOTHROW_NCX(LIBCCALL libc_memendl)(void const *__restrict haystack,
                                    uint32_t dword,
                                    size_t n_bytes) {
-#line 1241 "kos/src/libc/magic/string.c"
+#line 1288 "kos/src/libc/magic/string.c"
 	u32 *result = (u32 *)haystack;
 	for (; n_bytes--; ++result) {
 		if unlikely(*result == dword)
@@ -540,7 +540,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memrendw") uint16_t *
 NOTHROW_NCX(LIBCCALL libc_memrendw)(void const *__restrict haystack,
                                     uint16_t word,
                                     size_t n_words) {
-#line 1262 "kos/src/libc/magic/string.c"
+#line 1309 "kos/src/libc/magic/string.c"
 	u16 *result = (u16 *)haystack + n_words;
 	while (n_words--) {
 		if unlikely(*--result == word)
@@ -555,7 +555,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memrendl") uint32_t *
 NOTHROW_NCX(LIBCCALL libc_memrendl)(void const *__restrict haystack,
                                     uint32_t dword,
                                     size_t n_dwords) {
-#line 1276 "kos/src/libc/magic/string.c"
+#line 1323 "kos/src/libc/magic/string.c"
 	u32 *result = (u32 *)haystack + n_dwords;
 	while (n_dwords--) {
 		if unlikely(*--result == dword)
@@ -570,7 +570,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memlenw") size_t
 NOTHROW_NCX(LIBCCALL libc_memlenw)(void const *__restrict haystack,
                                    uint16_t word,
                                    size_t n_words) {
-#line 1293 "kos/src/libc/magic/string.c"
+#line 1340 "kos/src/libc/magic/string.c"
 	return (size_t)(memendw(haystack, word, n_words) - (u16 *)haystack);
 }
 
@@ -580,7 +580,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memlenl") size_t
 NOTHROW_NCX(LIBCCALL libc_memlenl)(void const *__restrict haystack,
                                    uint32_t dword,
                                    size_t n_dwords) {
-#line 1299 "kos/src/libc/magic/string.c"
+#line 1346 "kos/src/libc/magic/string.c"
 	return (size_t)(memendl(haystack, dword, n_dwords) - (u32 *)haystack);
 }
 
@@ -590,7 +590,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memrlenw") size_t
 NOTHROW_NCX(LIBCCALL libc_memrlenw)(void const *__restrict haystack,
                                     uint16_t word,
                                     size_t n_words) {
-#line 1309 "kos/src/libc/magic/string.c"
+#line 1356 "kos/src/libc/magic/string.c"
 	return (size_t)(memrendw(haystack, word, n_words) - (u16 *)haystack);
 }
 
@@ -600,7 +600,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memrlenl") size_t
 NOTHROW_NCX(LIBCCALL libc_memrlenl)(void const *__restrict haystack,
                                     uint32_t dword,
                                     size_t n_dwords) {
-#line 1315 "kos/src/libc/magic/string.c"
+#line 1362 "kos/src/libc/magic/string.c"
 	return (size_t)(memrendl(haystack, dword, n_dwords) - (u32 *)haystack);
 }
 
@@ -609,7 +609,7 @@ INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.rawmemlenw") size_t
 NOTHROW_NCX(LIBCCALL libc_rawmemlenw)(void const *__restrict haystack,
                                       uint16_t word) {
-#line 1327 "kos/src/libc/magic/string.c"
+#line 1374 "kos/src/libc/magic/string.c"
 	return (size_t)(libc_rawmemchrw(haystack, word) - (u16 *)haystack);
 }
 
@@ -618,7 +618,7 @@ INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.rawmemlenl") size_t
 NOTHROW_NCX(LIBCCALL libc_rawmemlenl)(void const *__restrict haystack,
                                       uint32_t dword) {
-#line 1333 "kos/src/libc/magic/string.c"
+#line 1380 "kos/src/libc/magic/string.c"
 	return (size_t)(libc_rawmemchrl(haystack, dword) - (u32 *)haystack);
 }
 
@@ -627,7 +627,7 @@ INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.rawmemrlenw") size_t
 NOTHROW_NCX(LIBCCALL libc_rawmemrlenw)(void const *__restrict haystack,
                                        uint16_t word) {
-#line 1344 "kos/src/libc/magic/string.c"
+#line 1391 "kos/src/libc/magic/string.c"
 	return (size_t)(libc_rawmemrchrw(haystack, word) - (u16 *)haystack);
 }
 
@@ -636,50 +636,50 @@ INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.rawmemrlenl") size_t
 NOTHROW_NCX(LIBCCALL libc_rawmemrlenl)(void const *__restrict haystack,
                                        uint32_t dword) {
-#line 1350 "kos/src/libc/magic/string.c"
+#line 1397 "kos/src/libc/magic/string.c"
 	return (size_t)(libc_rawmemrchrl(haystack, dword) - (u32 *)haystack);
 }
 
 /* Copy memory between non-overlapping memory blocks. */
-INTERN ATTR_RETNONNULL NONNULL((1, 2))
+INTERN ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memcpyq") uint64_t *
 NOTHROW_NCX(LIBCCALL libc_memcpyq)(void *__restrict dst,
                                    void const *__restrict src,
                                    size_t n_qwords) {
-#line 1359 "kos/src/libc/magic/string.c"
+#line 1408 "kos/src/libc/magic/string.c"
 #if __SIZEOF_POINTER__ >= 8
 	u64 *pdst = (u64 *)dst;
 	u64 *psrc = (u64 *)src;
 	while (n_qwords--)
 		*pdst++ = *psrc++;
-#else
+#else /* __SIZEOF_POINTER__ >= 8 */
 	u32 *pdst = (u32 *)dst;
 	u32 *psrc = (u32 *)src;
 	while (n_qwords--) {
 		*pdst++ = *psrc++;
 		*pdst++ = *psrc++;
 	}
-#endif
+#endif /* __SIZEOF_POINTER__ < 8 */
 	return (u64 *)dst;
 }
 
 /* Same as `memcpyq', but return `DST+N_QWORDS', rather than `DST' */
-INTERN ATTR_RETNONNULL NONNULL((1, 2))
+INTERN ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.mempcpyq") uint64_t *
 NOTHROW_NCX(LIBCCALL libc_mempcpyq)(void *__restrict dst,
                                     void const *__restrict src,
                                     size_t n_qwords) {
-#line 1378 "kos/src/libc/magic/string.c"
+#line 1429 "kos/src/libc/magic/string.c"
 	return (u64 *)memcpyq(dst, src, n_qwords) + n_qwords;
 }
 
 /* Move memory between potentially overlapping memory blocks. */
-INTERN ATTR_RETNONNULL NONNULL((1, 2))
+INTERN ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memmoveq") uint64_t *
 NOTHROW_NCX(LIBCCALL libc_memmoveq)(void *dst,
                                     void const *src,
                                     size_t n_qwords) {
-#line 1384 "kos/src/libc/magic/string.c"
+#line 1437 "kos/src/libc/magic/string.c"
 #if __SIZEOF_POINTER__ >= 8
 	u64 *pdst, *psrc;
 	if (dst < src) {
@@ -693,7 +693,7 @@ NOTHROW_NCX(LIBCCALL libc_memmoveq)(void *dst,
 		while (n_qwords--)
 			*--pdst = *--psrc;
 	}
-#else
+#else /* __SIZEOF_POINTER__ >= 8 */
 	u32 *pdst, *psrc;
 	if (dst < src) {
 		psrc = (u32 *)src;
@@ -710,27 +710,27 @@ NOTHROW_NCX(LIBCCALL libc_memmoveq)(void *dst,
 			*--pdst = *--psrc;
 		}
 	}
-#endif
+#endif /* __SIZEOF_POINTER__ < 8 */
 	return (u64 *)dst;
 }
 
 /* Same as `memmovew', but return `DST+N_QWORDS', rather than `DST' */
-INTERN ATTR_RETNONNULL NONNULL((1, 2))
+INTERN ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.mempmoveq") uint64_t *
 NOTHROW_NCX(LIBCCALL libc_mempmoveq)(void *__restrict dst,
                                      void const *__restrict src,
                                      size_t n_qwords) {
-#line 1421 "kos/src/libc/magic/string.c"
+#line 1476 "kos/src/libc/magic/string.c"
 	return (u64 *)memmoveq(dst, src, n_qwords) + n_qwords;
 }
 
 /* Fill memory with a given qword */
-INTERN ATTR_RETNONNULL NONNULL((1))
+INTERN ATTR_LEAF ATTR_RETNONNULL NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memsetq") uint64_t *
 NOTHROW_NCX(LIBCCALL libc_memsetq)(void *__restrict dst,
                                    uint64_t qword,
                                    size_t n_qwords) {
-#line 1427 "kos/src/libc/magic/string.c"
+#line 1483 "kos/src/libc/magic/string.c"
 	u64 *pdst = (u64 *)dst;
 	while (n_qwords--)
 		*pdst++ = qword;
@@ -738,12 +738,12 @@ NOTHROW_NCX(LIBCCALL libc_memsetq)(void *__restrict dst,
 }
 
 /* Same as `memsetq', but return `DST+N_QWORDS', rather than `DST' */
-INTERN ATTR_RETNONNULL NONNULL((1))
+INTERN ATTR_LEAF ATTR_RETNONNULL NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.mempsetq") uint64_t *
 NOTHROW_NCX(LIBCCALL libc_mempsetq)(void *__restrict dst,
                                     uint64_t qword,
                                     size_t n_qwords) {
-#line 1436 "kos/src/libc/magic/string.c"
+#line 1493 "kos/src/libc/magic/string.c"
 	return (u64 *)memsetq(dst, qword, n_qwords) + n_qwords;
 }
 
@@ -753,7 +753,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memcmpq") int64_t
 NOTHROW_NCX(LIBCCALL libc_memcmpq)(void const *s1,
                                    void const *s2,
                                    size_t n_dwords) {
-#line 1442 "kos/src/libc/magic/string.c"
+#line 1500 "kos/src/libc/magic/string.c"
 	s64 *p1 = (s64 *)s1;
 	s64 *p2 = (s64 *)s2;
 	s64 v1, v2;
@@ -768,7 +768,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memchrq") uint64_t *
 NOTHROW_NCX(LIBCCALL libc_memchrq)(void const *__restrict haystack,
                                    uint64_t qword,
                                    size_t n_qwords) {
-#line 1456 "kos/src/libc/magic/string.c"
+#line 1514 "kos/src/libc/magic/string.c"
 	u64 *hay_iter = (u64 *)haystack;
 	for (; n_qwords--; ++hay_iter) {
 		if unlikely(*hay_iter == (u64)qword)
@@ -783,7 +783,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memrchrq") uint64_t *
 NOTHROW_NCX(LIBCCALL libc_memrchrq)(void const *__restrict haystack,
                                     uint64_t qword,
                                     size_t n_qwords) {
-#line 1470 "kos/src/libc/magic/string.c"
+#line 1528 "kos/src/libc/magic/string.c"
 	u64 *iter = (u64 *)haystack + n_qwords;
 	while (n_qwords--) {
 		if unlikely(*--iter == qword)
@@ -797,7 +797,7 @@ INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.rawmemchrq") uint64_t *
 NOTHROW_NCX(LIBCCALL libc_rawmemchrq)(void const *__restrict haystack,
                                       uint64_t qword) {
-#line 1484 "kos/src/libc/magic/string.c"
+#line 1542 "kos/src/libc/magic/string.c"
 	u64 *iter = (u64 *)haystack;
 	for (;; ++iter) {
 		if unlikely(*iter == qword)
@@ -811,7 +811,7 @@ INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.rawmemrchrq") uint64_t *
 NOTHROW_NCX(LIBCCALL libc_rawmemrchrq)(void const *__restrict haystack,
                                        uint64_t qword) {
-#line 1498 "kos/src/libc/magic/string.c"
+#line 1556 "kos/src/libc/magic/string.c"
 	u64 *iter = (u64 *)haystack;
 	for (;;) {
 		if unlikely(*--iter == qword)
@@ -826,7 +826,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memendq") uint64_t *
 NOTHROW_NCX(LIBCCALL libc_memendq)(void const *__restrict haystack,
                                    uint64_t qword,
                                    size_t n_bytes) {
-#line 1512 "kos/src/libc/magic/string.c"
+#line 1570 "kos/src/libc/magic/string.c"
 	u64 *result = (u64 *)haystack;
 	for (; n_bytes--; ++result) {
 		if unlikely(*result == qword)
@@ -841,7 +841,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memrendq") uint64_t *
 NOTHROW_NCX(LIBCCALL libc_memrendq)(void const *__restrict haystack,
                                     uint64_t qword,
                                     size_t n_qwords) {
-#line 1526 "kos/src/libc/magic/string.c"
+#line 1584 "kos/src/libc/magic/string.c"
 	u64 *result = (u64 *)haystack + n_qwords;
 	while (n_qwords--) {
 		if unlikely(*--result == qword)
@@ -856,7 +856,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memlenq") size_t
 NOTHROW_NCX(LIBCCALL libc_memlenq)(void const *__restrict haystack,
                                    uint64_t qword,
                                    size_t n_qwords) {
-#line 1537 "kos/src/libc/magic/string.c"
+#line 1595 "kos/src/libc/magic/string.c"
 	return (size_t)(memendq(haystack, qword, n_qwords) - (u64 *)haystack);
 }
 
@@ -866,7 +866,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memrlenq") size_t
 NOTHROW_NCX(LIBCCALL libc_memrlenq)(void const *__restrict haystack,
                                     uint64_t qword,
                                     size_t n_qwords) {
-#line 1543 "kos/src/libc/magic/string.c"
+#line 1601 "kos/src/libc/magic/string.c"
 	return (size_t)(memrendq(haystack, qword, n_qwords) - (u64 *)haystack);
 }
 
@@ -875,7 +875,7 @@ INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.rawmemlenq") size_t
 NOTHROW_NCX(LIBCCALL libc_rawmemlenq)(void const *__restrict haystack,
                                       uint64_t qword) {
-#line 1549 "kos/src/libc/magic/string.c"
+#line 1607 "kos/src/libc/magic/string.c"
 	return (size_t)(libc_rawmemchrq(haystack, qword) - (u64 *)haystack);
 }
 
@@ -884,26 +884,26 @@ INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.rawmemrlenq") size_t
 NOTHROW_NCX(LIBCCALL libc_rawmemrlenq)(void const *__restrict haystack,
                                        uint64_t qword) {
-#line 1555 "kos/src/libc/magic/string.c"
+#line 1613 "kos/src/libc/magic/string.c"
 	return (size_t)(libc_rawmemrchrq(haystack, qword) - (u64 *)haystack);
 }
 
 /* Same as `STR+strlen(STR)' */
-INTERN ATTR_PURE WUNUSED NONNULL((1))
+INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.strend") char *
 NOTHROW_NCX(LIBCCALL libc_strend)(char const *__restrict string) {
-#line 2094 "kos/src/libc/magic/string.c"
+#line 2152 "kos/src/libc/magic/string.c"
 	while (*string)
 		++string;
 	return (char *)string;
 }
 
 /* Same as `STR+strnlen(STR, MAX_CHARS)' */
-INTERN ATTR_PURE WUNUSED NONNULL((1))
+INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.strnend") char *
 NOTHROW_NCX(LIBCCALL libc_strnend)(char const *__restrict string,
                                    size_t maxlen) {
-#line 2105 "kos/src/libc/magic/string.c"
+#line 2163 "kos/src/libc/magic/string.c"
 	for (; maxlen && *string; ++string, --maxlen)
 		;
 	return (char *)string;
@@ -915,7 +915,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.mempset") void *
 NOTHROW_NCX(LIBCCALL libc_mempset)(void *__restrict dst,
                                    int byte,
                                    size_t n_bytes) {
-#line 2200 "kos/src/libc/magic/string.c"
+#line 2262 "kos/src/libc/magic/string.c"
 	return (void *)((byte_t *)memset(dst, byte, n_bytes) + n_bytes);
 }
 
@@ -925,7 +925,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.mempmove") void *
 NOTHROW_NCX(LIBCCALL libc_mempmove)(void *dst,
                                     void const *src,
                                     size_t n_bytes) {
-#line 2206 "kos/src/libc/magic/string.c"
+#line 2268 "kos/src/libc/magic/string.c"
 	return (void *)((byte_t *)memmove(dst, src, n_bytes) + n_bytes);
 }
 
@@ -934,7 +934,7 @@ INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.rawmemrchr") void *
 NOTHROW_NCX(LIBCCALL libc_rawmemrchr)(void const *__restrict haystack,
                                       int needle) {
-#line 2215 "kos/src/libc/magic/string.c"
+#line 2277 "kos/src/libc/magic/string.c"
 	byte_t *iter = (byte_t *)haystack;
 	for (;;) {
 		if unlikely(*--iter == (byte_t)needle)
@@ -949,7 +949,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memend") void *
 NOTHROW_NCX(LIBCCALL libc_memend)(void const *__restrict haystack,
                                   int needle,
                                   size_t n_bytes) {
-#line 2258 "kos/src/libc/magic/string.c"
+#line 2320 "kos/src/libc/magic/string.c"
 	byte_t *result = (byte_t *)haystack;
 	for (; n_bytes--; ++result) {
 		if unlikely(*result == (byte_t)needle)
@@ -964,7 +964,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memrend") void *
 NOTHROW_NCX(LIBCCALL libc_memrend)(void const *__restrict haystack,
                                    int needle,
                                    size_t n_bytes) {
-#line 2272 "kos/src/libc/magic/string.c"
+#line 2334 "kos/src/libc/magic/string.c"
 	byte_t *result = (byte_t *)haystack + n_bytes;
 	while (n_bytes--) {
 		if unlikely(*--result == (byte_t)needle)
@@ -979,7 +979,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memlen") size_t
 NOTHROW_NCX(LIBCCALL libc_memlen)(void const *__restrict haystack,
                                   int needle,
                                   size_t n_bytes) {
-#line 2283 "kos/src/libc/magic/string.c"
+#line 2345 "kos/src/libc/magic/string.c"
 	return (size_t)((byte_t *)memend(haystack, needle, n_bytes) - (byte_t *)haystack);
 }
 
@@ -989,7 +989,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memrlen") size_t
 NOTHROW_NCX(LIBCCALL libc_memrlen)(void const *__restrict haystack,
                                    int needle,
                                    size_t n_bytes) {
-#line 2289 "kos/src/libc/magic/string.c"
+#line 2351 "kos/src/libc/magic/string.c"
 	return (size_t)((byte_t *)memrend(haystack, needle, n_bytes) - (byte_t *)haystack);
 }
 
@@ -998,7 +998,7 @@ INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.rawmemlen") size_t
 NOTHROW_NCX(LIBCCALL libc_rawmemlen)(void const *__restrict haystack,
                                      int needle) {
-#line 2295 "kos/src/libc/magic/string.c"
+#line 2357 "kos/src/libc/magic/string.c"
 	return (size_t)((byte_t *)libc_rawmemchr(haystack, needle) - (byte_t *)haystack);
 }
 
@@ -1007,7 +1007,7 @@ INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.rawmemrlen") size_t
 NOTHROW_NCX(LIBCCALL libc_rawmemrlen)(void const *__restrict haystack,
                                       int needle) {
-#line 2301 "kos/src/libc/magic/string.c"
+#line 2363 "kos/src/libc/magic/string.c"
 	return (size_t)((byte_t *)libc_rawmemrchr(haystack, needle) - (byte_t *)haystack);
 }
 
@@ -1018,7 +1018,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.mempatw") void *
 NOTHROW_NCX(LIBCCALL libc_mempatw)(void *__restrict dst,
                                    uint16_t pattern,
                                    size_t n_bytes) {
-#line 2349 "kos/src/libc/magic/string.c"
+#line 2411 "kos/src/libc/magic/string.c"
 	byte_t *iter = (byte_t *)dst;
 	if (n_bytes && (uintptr_t)iter & 1) {
 		*iter = __INT16_BYTE(pattern, 1);
@@ -1038,7 +1038,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.mempatl") void *
 NOTHROW_NCX(LIBCCALL libc_mempatl)(void *__restrict dst,
                                    uint32_t pattern,
                                    size_t n_bytes) {
-#line 2366 "kos/src/libc/magic/string.c"
+#line 2427 "kos/src/libc/magic/string.c"
 	byte_t *iter = (byte_t *)dst;
 	for (; n_bytes && (uintptr_t)iter & 3; ++iter, --n_bytes)
 		*iter = __INT32_BYTE(pattern, (uintptr_t)iter & 3);
@@ -1055,7 +1055,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.mempatq") void *
 NOTHROW_NCX(LIBCCALL libc_mempatq)(void *__restrict dst,
                                    uint64_t pattern,
                                    size_t n_bytes) {
-#line 2380 "kos/src/libc/magic/string.c"
+#line 2441 "kos/src/libc/magic/string.c"
 	byte_t *iter = (byte_t *)dst;
 	for (; n_bytes && (uintptr_t)iter & 7; ++iter, --n_bytes)
 		*iter = __INT64_BYTE(pattern, (uintptr_t)iter & 7);
@@ -1071,7 +1071,7 @@ INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.strrchr") char *
 NOTHROW_NCX(LIBCCALL libc_strrchr)(char const *__restrict haystack,
                                    int needle) {
-#line 234 "kos/src/libc/magic/string.c"
+#line 235 "kos/src/libc/magic/string.c"
 	char const *result = NULL;
 	for (; *haystack; ++haystack)
 		if (*haystack == (char)needle)
@@ -1085,7 +1085,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.strncmp") int
 NOTHROW_NCX(LIBCCALL libc_strncmp)(char const *s1,
                                    char const *s2,
                                    size_t maxlen) {
-#line 255 "kos/src/libc/magic/string.c"
+#line 256 "kos/src/libc/magic/string.c"
 	char c1, c2;
 	do {
 		if (!maxlen--)
@@ -1102,7 +1102,7 @@ INTERN ATTR_PURE WUNUSED NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.strstr") char *
 NOTHROW_NCX(LIBCCALL libc_strstr)(char const *haystack,
                                   char const *needle) {
-#line 272 "kos/src/libc/magic/string.c"
+#line 273 "kos/src/libc/magic/string.c"
 	char const *hay2, *ned_iter;
 	char ch, needle_start = *needle++;
 	while ((ch = *haystack++) != '\0') {
@@ -1121,41 +1121,41 @@ miss:
 	return NULL;
 }
 
-INTERN ATTR_RETNONNULL NONNULL((1, 2))
+INTERN ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.strcpy") char *
 NOTHROW_NCX(LIBCCALL libc_strcpy)(char *__restrict buf,
                                   char const *__restrict src) {
-#line 293 "kos/src/libc/magic/string.c"
+#line 294 "kos/src/libc/magic/string.c"
 	return (char *)memcpy(buf, src, (libc_strlen(src) + 1) * sizeof(char));
 }
 
-INTERN ATTR_RETNONNULL NONNULL((1, 2))
+INTERN ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.strncpy") char *
 NOTHROW_NCX(LIBCCALL libc_strncpy)(char *__restrict buf,
                                    char const *__restrict src,
                                    size_t buflen) {
-#line 297 "kos/src/libc/magic/string.c"
+#line 299 "kos/src/libc/magic/string.c"
 	size_t srclen = libc_strnlen(src, buflen);
 	memcpy(buf, src, srclen * sizeof(char));
-	memset(buf+srclen, '\0', (buflen - srclen) * sizeof(char));
+	memset(buf + srclen, '\0', (buflen - srclen) * sizeof(char));
 	return buf;
 }
 
-INTERN ATTR_RETNONNULL NONNULL((1, 2))
+INTERN ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.strcat") char *
 NOTHROW_NCX(LIBCCALL libc_strcat)(char *__restrict buf,
                                   char const *__restrict src) {
-#line 304 "kos/src/libc/magic/string.c"
+#line 307 "kos/src/libc/magic/string.c"
 	memcpy(libc_strend(buf), src, (libc_strlen(src) + 1) * sizeof(char));
 	return buf;
 }
 
-INTERN ATTR_RETNONNULL NONNULL((1, 2))
+INTERN ATTR_LEAF ATTR_RETNONNULL NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.strncat") char *
 NOTHROW_NCX(LIBCCALL libc_strncat)(char *__restrict buf,
                                    char const *__restrict src,
                                    size_t buflen) {
-#line 309 "kos/src/libc/magic/string.c"
+#line 313 "kos/src/libc/magic/string.c"
 	size_t srclen = libc_strnlen(src, buflen);
 	char *dst = libc_strend(buf);
 	memcpy(dst, src, srclen * sizeof(char));
@@ -1167,7 +1167,7 @@ INTERN ATTR_PURE WUNUSED NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.strcspn") size_t
 NOTHROW_NCX(LIBCCALL libc_strcspn)(char const *haystack,
                                    char const *reject) {
-#line 318 "kos/src/libc/magic/string.c"
+#line 322 "kos/src/libc/magic/string.c"
 	char const *iter = haystack;
 	while (*iter && !libc_strchr(reject, *iter))
 		++iter;
@@ -1178,7 +1178,7 @@ INTERN ATTR_PURE WUNUSED NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.strspn") size_t
 NOTHROW_NCX(LIBCCALL libc_strspn)(char const *haystack,
                                   char const *accept) {
-#line 326 "kos/src/libc/magic/string.c"
+#line 330 "kos/src/libc/magic/string.c"
 	char const *iter = haystack;
 	while (libc_strchr(accept, *iter))
 		++iter;
@@ -1189,7 +1189,7 @@ INTERN ATTR_PURE WUNUSED NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.strpbrk") char *
 NOTHROW_NCX(LIBCCALL libc_strpbrk)(char const *haystack,
                                    char const *accept) {
-#line 337 "kos/src/libc/magic/string.c"
+#line 341 "kos/src/libc/magic/string.c"
 	char const *ned_iter;
 	char haych, ch;
 	while ((haych = *haystack++) != '\0') {
@@ -1207,7 +1207,7 @@ INTERN NONNULL((2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.strtok") char *
 NOTHROW_NCX(LIBCCALL libc_strtok)(char *string,
                                   char const *delim) {
-#line 354 "kos/src/libc/magic/string.c"
+#line 358 "kos/src/libc/magic/string.c"
 	return libc_strtok_r(string, delim, &save_ptr);
 }
 
@@ -1215,7 +1215,7 @@ INTERN ATTR_PURE WUNUSED NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.memory.strcoll") int
 NOTHROW_NCX(LIBCCALL libc_strcoll)(char const *s1,
                                    char const *s2) {
-#line 360 "kos/src/libc/magic/string.c"
+#line 364 "kos/src/libc/magic/string.c"
 	return libc_strcmp(s1, s2);
 }
 
@@ -1224,7 +1224,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.memory.strxfrm") size_t
 NOTHROW_NCX(LIBCCALL libc_strxfrm)(char *dst,
                                    char const *__restrict src,
                                    size_t maxlen) {
-#line 365 "kos/src/libc/magic/string.c"
+#line 369 "kos/src/libc/magic/string.c"
 	/* XXX: Implement me */
 	size_t n = libc_strnlen(src, maxlen);
 	memcpy(dst, src, n * sizeof(char));
@@ -1236,7 +1236,7 @@ INTERN ATTR_RETNONNULL NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.stpcpy") char *
 NOTHROW_NCX(LIBCCALL libc_stpcpy)(char *__restrict buf,
                                   char const *__restrict src) {
-#line 413 "kos/src/libc/magic/string.c"
+#line 420 "kos/src/libc/magic/string.c"
 	return (char *)mempcpy(buf, src, (libc_strlen(src) + 1) * sizeof(char)) - 1;
 }
 
@@ -1245,10 +1245,10 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.stpncpy") char *
 NOTHROW_NCX(LIBCCALL libc_stpncpy)(char *__restrict buf,
                                    char const *__restrict src,
                                    size_t buflen) {
-#line 417 "kos/src/libc/magic/string.c"
+#line 429 "kos/src/libc/magic/string.c"
 	size_t srclen = libc_strnlen(src, buflen);
 	memcpy(buf, src, srclen * sizeof(char));
-	memset(buf+srclen, '\0', (size_t)(buflen - srclen) * sizeof(char));
+	memset(buf + srclen, '\0', (size_t)(buflen - srclen) * sizeof(char));
 	return buf + srclen;
 }
 
@@ -1257,7 +1257,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.memory.strcoll_l") int
 NOTHROW_NCX(LIBCCALL libc_strcoll_l)(char const *s1,
                                      char const *s2,
                                      locale_t locale) {
-#line 430 "kos/src/libc/magic/string.c"
+#line 441 "kos/src/libc/magic/string.c"
 	(void)locale;
 	return libc_strcoll(s1, s2);
 }
@@ -1268,17 +1268,17 @@ NOTHROW_NCX(LIBCCALL libc_strxfrm_l)(char *dst,
                                      char const *__restrict src,
                                      size_t maxlen,
                                      locale_t locale) {
-#line 438 "kos/src/libc/magic/string.c"
+#line 449 "kos/src/libc/magic/string.c"
 	(void)locale;
 	return libc_strxfrm(dst, src, maxlen);
 }
 
-INTERN NONNULL((2, 3))
+INTERN ATTR_LEAF NONNULL((2, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.strtok_r") char *
 NOTHROW_NCX(LIBCCALL libc_strtok_r)(char *string,
                                     char const *delim,
                                     char **__restrict save_ptr) {
-#line 489 "kos/src/libc/magic/string.c"
+#line 504 "kos/src/libc/magic/string.c"
 	char *end;
 	if (!string)
 		string = *save_ptr;
@@ -1302,11 +1302,11 @@ NOTHROW_NCX(LIBCCALL libc_strtok_r)(char *string,
 }
 
 /* Same as `strchr', but return `strend(STR)', rather than `NULL' if `NEEDLE' wasn't found. */
-INTERN ATTR_RETNONNULL WUNUSED NONNULL((1))
+INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.strchrnul") char *
 NOTHROW_NCX(LIBCCALL libc_strchrnul)(char const *__restrict haystack,
                                      int needle) {
-#line 551 "kos/src/libc/magic/string.c"
+#line 566 "kos/src/libc/magic/string.c"
 	for (; *haystack; ++haystack)
 		if (*haystack == (char)needle)
 			break;
@@ -1316,7 +1316,7 @@ NOTHROW_NCX(LIBCCALL libc_strchrnul)(char const *__restrict haystack,
 INTERN ATTR_PURE WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.basename") char *
 NOTHROW_NCX(LIBCCALL libc_basename)(char const *filename) {
-#line 562 "kos/src/libc/magic/string.c"
+#line 577 "kos/src/libc/magic/string.c"
 	char ch, *iter = (char *)filename, *result = NULL;
 	if (!filename || !*filename)
 		return (char *)filename;
@@ -1356,11 +1356,11 @@ NOTHROW_NCX(LIBCCALL libc_basename)(char const *filename) {
 }
 
 /* Same as `strstr', but ignore casing */
-INTERN ATTR_PURE WUNUSED NONNULL((1, 2))
+INTERN WUNUSED NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.memory.strcasestr") char *
 NOTHROW_NCX(LIBCCALL libc_strcasestr)(char const *haystack,
                                       char const *needle) {
-#line 608 "kos/src/libc/magic/string.c"
+#line 622 "kos/src/libc/magic/string.c"
 	for (; *haystack; ++haystack) {
 		if (libc_strcasecmp(haystack, needle) == 0)
 			return (char *)haystack;
@@ -1382,7 +1382,7 @@ NOTHROW_NCX(LIBCCALL libc_memmem)(void const *haystack,
                                   size_t haystacklen,
                                   void const *needle,
                                   size_t needlelen) {
-#line 629 "kos/src/libc/magic/string.c"
+#line 643 "kos/src/libc/magic/string.c"
 	byte_t *candidate, marker;
 #if defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL) && !defined(__BUILDING_LIBC)
 	if unlikely(!needlelen || needlelen > haystacklen)
@@ -1409,7 +1409,7 @@ INTERN ATTR_PURE WUNUSED NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.strverscmp") int
 NOTHROW_NCX(LIBCCALL libc_strverscmp)(char const *s1,
                                       char const *s2) {
-#line 653 "kos/src/libc/magic/string.c"
+#line 667 "kos/src/libc/magic/string.c"
 	char const *s1_start = s1;
 	char c1, c2;
 	do {
@@ -1454,10 +1454,10 @@ NOTHROW_NCX(LIBCCALL libc_strverscmp)(char const *s1,
 	return 0;
 }
 
-INTERN ATTR_RETNONNULL NONNULL((1))
+INTERN ATTR_LEAF ATTR_RETNONNULL NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.strfry") char *
 NOTHROW_NCX(LIBCCALL libc_strfry)(char *__restrict string) {
-#line 713 "kos/src/libc/magic/string.c"
+#line 728 "kos/src/libc/magic/string.c"
 	char temp;
 	size_t i, count = libc_strlen(string);
 	for (i = 0; i < count; ++i) {
@@ -1471,43 +1471,43 @@ NOTHROW_NCX(LIBCCALL libc_strfry)(char *__restrict string) {
 	return string;
 }
 
-INTERN ATTR_RETNONNULL NONNULL((1))
+INTERN ATTR_LEAF ATTR_RETNONNULL NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memfrob") void *
 NOTHROW_NCX(LIBCCALL libc_memfrob)(void *buf,
                                    size_t num_bytes) {
-#line 728 "kos/src/libc/magic/string.c"
+#line 743 "kos/src/libc/magic/string.c"
 	byte_t *iter = (byte_t *)buf;
 	while (num_bytes--)
 		*iter++ ^= 42; /* -_-   yeah... */
 	return buf;
 }
 
-INTERN ATTR_PURE WUNUSED NONNULL((1, 2))
+INTERN WUNUSED NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.memory.strcasecmp_l") int
 NOTHROW_NCX(LIBCCALL libc_strcasecmp_l)(char const *s1,
                                         char const *s2,
                                         locale_t locale) {
-#line 738 "kos/src/libc/magic/string.c"
+#line 752 "kos/src/libc/magic/string.c"
 	(void)locale;
 	return libc_strcasecmp(s1, s2);
 }
 
-INTERN ATTR_PURE WUNUSED NONNULL((1, 2))
+INTERN WUNUSED NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.memory.strncasecmp_l") int
 NOTHROW_NCX(LIBCCALL libc_strncasecmp_l)(char const *s1,
                                          char const *s2,
                                          size_t maxlen,
                                          locale_t locale) {
-#line 744 "kos/src/libc/magic/string.c"
+#line 759 "kos/src/libc/magic/string.c"
 	(void)locale;
 	return libc_strncasecmp(s1, s2, maxlen);
 }
 
-INTERN NONNULL((1, 2))
+INTERN ATTR_LEAF NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.strsep") char *
 NOTHROW_NCX(LIBCCALL libc_strsep)(char **__restrict stringp,
                                   char const *__restrict delim) {
-#line 764 "kos/src/libc/magic/string.c"
+#line 780 "kos/src/libc/magic/string.c"
 	char *result, *iter;
 	if (!stringp || (result = *stringp) == NULL || !*result)
 		return NULL;
@@ -1519,11 +1519,11 @@ NOTHROW_NCX(LIBCCALL libc_strsep)(char **__restrict stringp,
 	return result;
 }
 
-INTERN ATTR_PURE WUNUSED NONNULL((1, 2))
+INTERN WUNUSED NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.memory.strcasecmp") int
 NOTHROW_NCX(LIBCCALL libc_strcasecmp)(char const *s1,
                                       char const *s2) {
-#line 784 "kos/src/libc/magic/string.c"
+#line 800 "kos/src/libc/magic/string.c"
 	char c1, c2;
 	do {
 		if ((c1 = *s1++) != (c2 = *s2++) && ((c1 = libc_tolower(c1)) != (c2 = libc_tolower(c2))))
@@ -1532,12 +1532,12 @@ NOTHROW_NCX(LIBCCALL libc_strcasecmp)(char const *s1,
 	return 0;
 }
 
-INTERN ATTR_PURE WUNUSED NONNULL((1, 2))
+INTERN WUNUSED NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.memory.strncasecmp") int
 NOTHROW_NCX(LIBCCALL libc_strncasecmp)(char const *s1,
                                        char const *s2,
                                        size_t maxlen) {
-#line 794 "kos/src/libc/magic/string.c"
+#line 810 "kos/src/libc/magic/string.c"
 	char c1, c2;
 	do {
 		if (!maxlen--)
@@ -1552,7 +1552,7 @@ NOTHROW_NCX(LIBCCALL libc_strncasecmp)(char const *s1,
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.ffs") __STDC_INT_AS_SIZE_T
 NOTHROW(LIBCCALL libc_ffs)(int i) {
-#line 810 "kos/src/libc/magic/string.c"
+#line 826 "kos/src/libc/magic/string.c"
 	return (__STDC_INT_AS_SIZE_T)__hybrid_ffs((unsigned int)i);
 }
 
@@ -1560,7 +1560,7 @@ NOTHROW(LIBCCALL libc_ffs)(int i) {
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.ffsl") __STDC_INT_AS_SIZE_T
 NOTHROW(LIBCCALL libc_ffsl)(long i) {
-#line 832 "kos/src/libc/magic/string.c"
+#line 848 "kos/src/libc/magic/string.c"
 	return (__STDC_INT_AS_SIZE_T)__hybrid_ffs((unsigned long)i);
 }
 
@@ -1568,16 +1568,16 @@ NOTHROW(LIBCCALL libc_ffsl)(long i) {
 INTERN ATTR_CONST WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.ffsll") __STDC_INT_AS_SIZE_T
 NOTHROW(LIBCCALL libc_ffsll)(__LONGLONG i) {
-#line 840 "kos/src/libc/magic/string.c"
+#line 856 "kos/src/libc/magic/string.c"
 	return (__STDC_INT_AS_SIZE_T)__hybrid_ffs((__ULONGLONG)i);
 }
 
-INTERN NONNULL((1, 2))
+INTERN ATTR_LEAF NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.strlcat") size_t
 NOTHROW_NCX(LIBCCALL libc_strlcat)(char *__restrict dst,
                                    char const *__restrict src,
                                    size_t bufsize) {
-#line 846 "kos/src/libc/magic/string.c"
+#line 864 "kos/src/libc/magic/string.c"
 	size_t result = libc_strlen(src);
 	char *new_dst = dst + libc_strnlen(dst, bufsize);
 	size_t copy_size;
@@ -1588,12 +1588,12 @@ NOTHROW_NCX(LIBCCALL libc_strlcat)(char *__restrict dst,
 	return result + (new_dst - dst);
 }
 
-INTERN NONNULL((1, 2))
+INTERN ATTR_LEAF NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.strlcpy") size_t
 NOTHROW_NCX(LIBCCALL libc_strlcpy)(char *__restrict dst,
                                    char const *__restrict src,
                                    size_t bufsize) {
-#line 857 "kos/src/libc/magic/string.c"
+#line 878 "kos/src/libc/magic/string.c"
 	size_t result = libc_strlen(src);
 	size_t copy_size = result < bufsize ? result : bufsize - 1;
 	memcpy(dst, src, copy_size*sizeof(char));
@@ -1601,13 +1601,13 @@ NOTHROW_NCX(LIBCCALL libc_strlcpy)(char *__restrict dst,
 	return result;
 }
 
-INTERN NONNULL((1, 2))
+INTERN ATTR_LEAF NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memccpy") void *
 NOTHROW_NCX(LIBCCALL libc_memccpy)(void *__restrict dst,
                                    void const *__restrict src,
                                    int needle,
                                    size_t num_bytes) {
-#line 873 "kos/src/libc/magic/string.c"
+#line 895 "kos/src/libc/magic/string.c"
 	byte_t *pdst = (byte_t *)dst;
 	byte_t const *psrc = (byte_t const *)src;
 	while (num_bytes--) {
@@ -1623,7 +1623,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memxchr") void *
 NOTHROW_NCX(LIBCCALL libc_memxchr)(void const *__restrict haystack,
                                    int needle,
                                    size_t n_bytes) {
-#line 1573 "kos/src/libc/magic/string.c"
+#line 1631 "kos/src/libc/magic/string.c"
 	byte_t *hay_iter = (byte_t *)haystack;
 	for (; n_bytes--; ++hay_iter) {
 		if unlikely(*hay_iter != (byte_t)needle)
@@ -1638,7 +1638,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memrxchr") void *
 NOTHROW_NCX(LIBCCALL libc_memrxchr)(void const *__restrict haystack,
                                     int needle,
                                     size_t n_bytes) {
-#line 1587 "kos/src/libc/magic/string.c"
+#line 1645 "kos/src/libc/magic/string.c"
 	byte_t *iter = (byte_t *)haystack + n_bytes;
 	while (n_bytes--) {
 		if unlikely(*--iter != (byte_t)needle)
@@ -1652,7 +1652,7 @@ INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.rawmemxchr") void *
 NOTHROW_NCX(LIBCCALL libc_rawmemxchr)(void const *__restrict haystack,
                                       int needle) {
-#line 1602 "kos/src/libc/magic/string.c"
+#line 1660 "kos/src/libc/magic/string.c"
 	byte_t *iter = (byte_t *)haystack;
 	for (;; ++iter) {
 		if unlikely(*iter != (byte_t)needle)
@@ -1666,7 +1666,7 @@ INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.rawmemrxchr") void *
 NOTHROW_NCX(LIBCCALL libc_rawmemrxchr)(void const *__restrict haystack,
                                        int needle) {
-#line 1616 "kos/src/libc/magic/string.c"
+#line 1674 "kos/src/libc/magic/string.c"
 	byte_t *iter = (byte_t *)haystack;
 	for (;;) {
 		if unlikely(*--iter != (byte_t)needle)
@@ -1681,7 +1681,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memxend") void *
 NOTHROW_NCX(LIBCCALL libc_memxend)(void const *__restrict haystack,
                                    int needle,
                                    size_t n_bytes) {
-#line 1630 "kos/src/libc/magic/string.c"
+#line 1688 "kos/src/libc/magic/string.c"
 	byte_t *result = (byte_t *)haystack;
 	for (; n_bytes--; ++result) {
 		if unlikely(*result != (byte_t)needle)
@@ -1696,7 +1696,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memrxend") void *
 NOTHROW_NCX(LIBCCALL libc_memrxend)(void const *__restrict haystack,
                                     int needle,
                                     size_t n_bytes) {
-#line 1644 "kos/src/libc/magic/string.c"
+#line 1702 "kos/src/libc/magic/string.c"
 	byte_t *result = (byte_t *)haystack + n_bytes;
 	while (n_bytes--) {
 		if unlikely(*--result != (byte_t)needle)
@@ -1711,7 +1711,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memxlen") size_t
 NOTHROW_NCX(LIBCCALL libc_memxlen)(void const *__restrict haystack,
                                    int needle,
                                    size_t n_bytes) {
-#line 1655 "kos/src/libc/magic/string.c"
+#line 1713 "kos/src/libc/magic/string.c"
 	return (size_t)((byte_t *)libc_memxend(haystack, needle, n_bytes) - (byte_t *)haystack);
 }
 
@@ -1721,7 +1721,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memrxlen") size_t
 NOTHROW_NCX(LIBCCALL libc_memrxlen)(void const *__restrict haystack,
                                     int needle,
                                     size_t n_bytes) {
-#line 1661 "kos/src/libc/magic/string.c"
+#line 1719 "kos/src/libc/magic/string.c"
 	return (size_t)((byte_t *)libc_memrxend(haystack, needle, n_bytes) - (byte_t *)haystack);
 }
 
@@ -1730,7 +1730,7 @@ INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.rawmemxlen") size_t
 NOTHROW_NCX(LIBCCALL libc_rawmemxlen)(void const *__restrict haystack,
                                       int needle) {
-#line 1667 "kos/src/libc/magic/string.c"
+#line 1725 "kos/src/libc/magic/string.c"
 	return (size_t)((byte_t *)libc_rawmemxchr(haystack, needle) - (byte_t *)haystack);
 }
 
@@ -1739,7 +1739,7 @@ INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.rawmemrxlen") size_t
 NOTHROW_NCX(LIBCCALL libc_rawmemrxlen)(void const *__restrict haystack,
                                        int needle) {
-#line 1673 "kos/src/libc/magic/string.c"
+#line 1731 "kos/src/libc/magic/string.c"
 	return (size_t)((byte_t *)libc_rawmemrxchr(haystack, needle) - (byte_t *)haystack);
 }
 
@@ -1749,7 +1749,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memxchrw") uint16_t *
 NOTHROW_NCX(LIBCCALL libc_memxchrw)(void const *__restrict haystack,
                                     uint16_t word,
                                     size_t n_words) {
-#line 1693 "kos/src/libc/magic/string.c"
+#line 1751 "kos/src/libc/magic/string.c"
 	u16 *hay_iter = (u16 *)haystack;
 	for (; n_words--; ++hay_iter) {
 		if unlikely(*hay_iter != word)
@@ -1764,7 +1764,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memxchrl") uint32_t *
 NOTHROW_NCX(LIBCCALL libc_memxchrl)(void const *__restrict haystack,
                                     uint32_t dword,
                                     size_t n_dwords) {
-#line 1707 "kos/src/libc/magic/string.c"
+#line 1765 "kos/src/libc/magic/string.c"
 	u32 *hay_iter = (u32 *)haystack;
 	for (; n_dwords--; ++hay_iter) {
 		if unlikely(*hay_iter != dword)
@@ -1779,7 +1779,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memrxchrw") uint16_t *
 NOTHROW_NCX(LIBCCALL libc_memrxchrw)(void const *__restrict haystack,
                                      uint16_t word,
                                      size_t n_words) {
-#line 1728 "kos/src/libc/magic/string.c"
+#line 1786 "kos/src/libc/magic/string.c"
 	u16 *iter = (u16 *)haystack + n_words;
 	while (n_words--) {
 		if unlikely(*--iter != word)
@@ -1794,7 +1794,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memrxchrl") uint32_t *
 NOTHROW_NCX(LIBCCALL libc_memrxchrl)(void const *__restrict haystack,
                                      uint32_t dword,
                                      size_t n_dwords) {
-#line 1742 "kos/src/libc/magic/string.c"
+#line 1800 "kos/src/libc/magic/string.c"
 	u32 *iter = (u32 *)haystack + n_dwords;
 	while (n_dwords--) {
 		if unlikely(*--iter != dword)
@@ -1808,7 +1808,7 @@ INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.rawmemxchrw") uint16_t *
 NOTHROW_NCX(LIBCCALL libc_rawmemxchrw)(void const *__restrict haystack,
                                        uint16_t word) {
-#line 1763 "kos/src/libc/magic/string.c"
+#line 1821 "kos/src/libc/magic/string.c"
 	u16 *iter = (u16 *)haystack;
 	for (;; ++iter) {
 		if unlikely(*iter != word)
@@ -1822,7 +1822,7 @@ INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.rawmemxchrl") uint32_t *
 NOTHROW_NCX(LIBCCALL libc_rawmemxchrl)(void const *__restrict haystack,
                                        uint32_t dword) {
-#line 1777 "kos/src/libc/magic/string.c"
+#line 1835 "kos/src/libc/magic/string.c"
 	u32 *iter = (u32 *)haystack;
 	for (;; ++iter) {
 		if unlikely(*iter != dword)
@@ -1836,7 +1836,7 @@ INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.rawmemrxchrw") uint16_t *
 NOTHROW_NCX(LIBCCALL libc_rawmemrxchrw)(void const *__restrict haystack,
                                         uint16_t word) {
-#line 1799 "kos/src/libc/magic/string.c"
+#line 1857 "kos/src/libc/magic/string.c"
 	u16 *iter = (u16 *)haystack;
 	for (;;) {
 		if unlikely(*--iter != word)
@@ -1850,7 +1850,7 @@ INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.rawmemrxchrl") uint32_t *
 NOTHROW_NCX(LIBCCALL libc_rawmemrxchrl)(void const *__restrict haystack,
                                         uint32_t dword) {
-#line 1813 "kos/src/libc/magic/string.c"
+#line 1871 "kos/src/libc/magic/string.c"
 	u32 *iter = (u32 *)haystack;
 	for (;;) {
 		if unlikely(*--iter != dword)
@@ -1865,7 +1865,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memxendw") uint16_t *
 NOTHROW_NCX(LIBCCALL libc_memxendw)(void const *__restrict haystack,
                                     uint16_t word,
                                     size_t n_bytes) {
-#line 1835 "kos/src/libc/magic/string.c"
+#line 1893 "kos/src/libc/magic/string.c"
 	u16 *result = (u16 *)haystack;
 	for (; n_bytes--; ++result) {
 		if unlikely(*result != word)
@@ -1880,7 +1880,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memxendl") uint32_t *
 NOTHROW_NCX(LIBCCALL libc_memxendl)(void const *__restrict haystack,
                                     uint32_t dword,
                                     size_t n_bytes) {
-#line 1849 "kos/src/libc/magic/string.c"
+#line 1907 "kos/src/libc/magic/string.c"
 	u32 *result = (u32 *)haystack;
 	for (; n_bytes--; ++result) {
 		if unlikely(*result != dword)
@@ -1895,7 +1895,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memrxendw") uint16_t *
 NOTHROW_NCX(LIBCCALL libc_memrxendw)(void const *__restrict haystack,
                                      uint16_t word,
                                      size_t n_words) {
-#line 1871 "kos/src/libc/magic/string.c"
+#line 1929 "kos/src/libc/magic/string.c"
 	u16 *result = (u16 *)haystack + n_words;
 	while (n_words--) {
 		if unlikely(*--result != word)
@@ -1910,7 +1910,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memrxendl") uint32_t *
 NOTHROW_NCX(LIBCCALL libc_memrxendl)(void const *__restrict haystack,
                                      uint32_t dword,
                                      size_t n_dwords) {
-#line 1885 "kos/src/libc/magic/string.c"
+#line 1943 "kos/src/libc/magic/string.c"
 	u32 *result = (u32 *)haystack + n_dwords;
 	while (n_dwords--) {
 		if unlikely(*--result != dword)
@@ -1925,7 +1925,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memxlenw") size_t
 NOTHROW_NCX(LIBCCALL libc_memxlenw)(void const *__restrict haystack,
                                     uint16_t word,
                                     size_t n_words) {
-#line 1902 "kos/src/libc/magic/string.c"
+#line 1960 "kos/src/libc/magic/string.c"
 	return (size_t)(libc_memxendw(haystack, word, n_words) - (u16 *)haystack);
 }
 
@@ -1935,7 +1935,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memxlenl") size_t
 NOTHROW_NCX(LIBCCALL libc_memxlenl)(void const *__restrict haystack,
                                     uint32_t dword,
                                     size_t n_dwords) {
-#line 1908 "kos/src/libc/magic/string.c"
+#line 1966 "kos/src/libc/magic/string.c"
 	return (size_t)(libc_memxendl(haystack, dword, n_dwords) - (u32 *)haystack);
 }
 
@@ -1945,7 +1945,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memrxlenw") size_t
 NOTHROW_NCX(LIBCCALL libc_memrxlenw)(void const *__restrict haystack,
                                      uint16_t word,
                                      size_t n_words) {
-#line 1918 "kos/src/libc/magic/string.c"
+#line 1976 "kos/src/libc/magic/string.c"
 	return (size_t)(libc_memrxendw(haystack, word, n_words) - (u16 *)haystack);
 }
 
@@ -1955,7 +1955,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memrxlenl") size_t
 NOTHROW_NCX(LIBCCALL libc_memrxlenl)(void const *__restrict haystack,
                                      uint32_t dword,
                                      size_t n_dwords) {
-#line 1924 "kos/src/libc/magic/string.c"
+#line 1982 "kos/src/libc/magic/string.c"
 	return (size_t)(libc_memrxendl(haystack, dword, n_dwords) - (u32 *)haystack);
 }
 
@@ -1964,7 +1964,7 @@ INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.rawmemxlenw") size_t
 NOTHROW_NCX(LIBCCALL libc_rawmemxlenw)(void const *__restrict haystack,
                                        uint16_t word) {
-#line 1936 "kos/src/libc/magic/string.c"
+#line 1994 "kos/src/libc/magic/string.c"
 	return (size_t)(libc_rawmemxchrw(haystack, word) - (u16 *)haystack);
 }
 
@@ -1973,7 +1973,7 @@ INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.rawmemxlenl") size_t
 NOTHROW_NCX(LIBCCALL libc_rawmemxlenl)(void const *__restrict haystack,
                                        uint32_t dword) {
-#line 1942 "kos/src/libc/magic/string.c"
+#line 2000 "kos/src/libc/magic/string.c"
 	return (size_t)(libc_rawmemxchrl(haystack, dword) - (u32 *)haystack);
 }
 
@@ -1982,7 +1982,7 @@ INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.rawmemrxlenw") size_t
 NOTHROW_NCX(LIBCCALL libc_rawmemrxlenw)(void const *__restrict haystack,
                                         uint16_t word) {
-#line 1953 "kos/src/libc/magic/string.c"
+#line 2011 "kos/src/libc/magic/string.c"
 	return (size_t)(libc_rawmemrxchrw(haystack, word) - (u16 *)haystack);
 }
 
@@ -1991,7 +1991,7 @@ INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.rawmemrxlenl") size_t
 NOTHROW_NCX(LIBCCALL libc_rawmemrxlenl)(void const *__restrict haystack,
                                         uint32_t dword) {
-#line 1959 "kos/src/libc/magic/string.c"
+#line 2017 "kos/src/libc/magic/string.c"
 	return (size_t)(libc_rawmemrxchrl(haystack, dword) - (u32 *)haystack);
 }
 
@@ -2001,7 +2001,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memxchrq") uint64_t *
 NOTHROW_NCX(LIBCCALL libc_memxchrq)(void const *__restrict haystack,
                                     uint64_t qword,
                                     size_t n_qwords) {
-#line 1972 "kos/src/libc/magic/string.c"
+#line 2030 "kos/src/libc/magic/string.c"
 	u64 *hay_iter = (u64 *)haystack;
 	for (; n_qwords--; ++hay_iter) {
 		if unlikely(*hay_iter != (u64)qword)
@@ -2016,7 +2016,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memrxchrq") uint64_t *
 NOTHROW_NCX(LIBCCALL libc_memrxchrq)(void const *__restrict haystack,
                                      uint64_t qword,
                                      size_t n_qwords) {
-#line 1986 "kos/src/libc/magic/string.c"
+#line 2044 "kos/src/libc/magic/string.c"
 	u64 *iter = (u64 *)haystack + n_qwords;
 	while (n_qwords--) {
 		if unlikely(*--iter != qword)
@@ -2030,7 +2030,7 @@ INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.rawmemxchrq") uint64_t *
 NOTHROW_NCX(LIBCCALL libc_rawmemxchrq)(void const *__restrict haystack,
                                        uint64_t qword) {
-#line 2000 "kos/src/libc/magic/string.c"
+#line 2058 "kos/src/libc/magic/string.c"
 	u64 *iter = (u64 *)haystack;
 	for (;; ++iter) {
 		if unlikely(*iter != qword)
@@ -2044,7 +2044,7 @@ INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.rawmemrxchrq") uint64_t *
 NOTHROW_NCX(LIBCCALL libc_rawmemrxchrq)(void const *__restrict haystack,
                                         uint64_t qword) {
-#line 2014 "kos/src/libc/magic/string.c"
+#line 2072 "kos/src/libc/magic/string.c"
 	u64 *iter = (u64 *)haystack;
 	for (;;) {
 		if unlikely(*--iter != qword)
@@ -2059,7 +2059,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memxendq") uint64_t *
 NOTHROW_NCX(LIBCCALL libc_memxendq)(void const *__restrict haystack,
                                     uint64_t qword,
                                     size_t n_bytes) {
-#line 2028 "kos/src/libc/magic/string.c"
+#line 2086 "kos/src/libc/magic/string.c"
 	u64 *result = (u64 *)haystack;
 	for (; n_bytes--; ++result) {
 		if unlikely(*result != qword)
@@ -2074,7 +2074,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memrxendq") uint64_t *
 NOTHROW_NCX(LIBCCALL libc_memrxendq)(void const *__restrict haystack,
                                      uint64_t qword,
                                      size_t n_qwords) {
-#line 2042 "kos/src/libc/magic/string.c"
+#line 2100 "kos/src/libc/magic/string.c"
 	u64 *result = (u64 *)haystack + n_qwords;
 	while (n_qwords--) {
 		if unlikely(*--result != qword)
@@ -2089,7 +2089,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memxlenq") size_t
 NOTHROW_NCX(LIBCCALL libc_memxlenq)(void const *__restrict haystack,
                                     uint64_t qword,
                                     size_t n_qwords) {
-#line 2053 "kos/src/libc/magic/string.c"
+#line 2111 "kos/src/libc/magic/string.c"
 	return (size_t)(libc_memxendq(haystack, qword, n_qwords) - (u64 *)haystack);
 }
 
@@ -2099,7 +2099,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memrxlenq") size_t
 NOTHROW_NCX(LIBCCALL libc_memrxlenq)(void const *__restrict haystack,
                                      uint64_t qword,
                                      size_t n_qwords) {
-#line 2059 "kos/src/libc/magic/string.c"
+#line 2117 "kos/src/libc/magic/string.c"
 	return (size_t)(libc_memrxendq(haystack, qword, n_qwords) - (u64 *)haystack);
 }
 
@@ -2108,7 +2108,7 @@ INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.rawmemxlenq") size_t
 NOTHROW_NCX(LIBCCALL libc_rawmemxlenq)(void const *__restrict haystack,
                                        uint64_t qword) {
-#line 2065 "kos/src/libc/magic/string.c"
+#line 2123 "kos/src/libc/magic/string.c"
 	return (size_t)(libc_rawmemxchrq(haystack, qword) - (u64 *)haystack);
 }
 
@@ -2117,7 +2117,7 @@ INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.rawmemrxlenq") size_t
 NOTHROW_NCX(LIBCCALL libc_rawmemrxlenq)(void const *__restrict haystack,
                                         uint64_t qword) {
-#line 2071 "kos/src/libc/magic/string.c"
+#line 2129 "kos/src/libc/magic/string.c"
 	return (size_t)(libc_rawmemrxchrq(haystack, qword) - (u64 *)haystack);
 }
 
@@ -2127,10 +2127,11 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.strnchr") char *
 NOTHROW_NCX(LIBCCALL libc_strnchr)(char const *__restrict haystack,
                                    int needle,
                                    size_t maxlen) {
-#line 2116 "kos/src/libc/magic/string.c"
-	for (; maxlen-- && *haystack; ++haystack)
+#line 2174 "kos/src/libc/magic/string.c"
+	for (; maxlen-- && *haystack; ++haystack) {
 		if unlikely((unsigned char)*haystack == (unsigned char)needle)
 			return (char *)haystack;
+	}
 	return NULL;
 }
 
@@ -2140,11 +2141,12 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.strnrchr") char *
 NOTHROW_NCX(LIBCCALL libc_strnrchr)(char const *__restrict haystack,
                                     int needle,
                                     size_t maxlen) {
-#line 2128 "kos/src/libc/magic/string.c"
+#line 2187 "kos/src/libc/magic/string.c"
 	char const *result = NULL;
-	for (; maxlen-- && *haystack; ++haystack)
+	for (; maxlen-- && *haystack; ++haystack) {
 		if unlikely((unsigned char)*haystack == (unsigned char)needle)
 			result = haystack;
+	}
 	return (char *)result;
 }
 
@@ -2153,7 +2155,7 @@ INTERN ATTR_PURE ATTR_RETNONNULL WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.strrchrnul") char *
 NOTHROW_NCX(LIBCCALL libc_strrchrnul)(char const *__restrict haystack,
                                       int needle) {
-#line 2141 "kos/src/libc/magic/string.c"
+#line 2201 "kos/src/libc/magic/string.c"
 	char const *result = haystack - 1;
 	do {
 		if unlikely((unsigned char)*haystack == (unsigned char)needle)
@@ -2168,8 +2170,9 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.strnchrnul") char *
 NOTHROW_NCX(LIBCCALL libc_strnchrnul)(char const *__restrict haystack,
                                       int needle,
                                       size_t maxlen) {
-#line 2155 "kos/src/libc/magic/string.c"
-	for (; maxlen-- && *haystack && (unsigned char)*haystack != (unsigned char)needle; ++haystack);
+#line 2215 "kos/src/libc/magic/string.c"
+	for (; maxlen-- && *haystack && (unsigned char)*haystack != (unsigned char)needle; ++haystack)
+		;
 	return (char *)haystack;
 }
 
@@ -2179,11 +2182,12 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.strnrchrnul") char *
 NOTHROW_NCX(LIBCCALL libc_strnrchrnul)(char const *__restrict haystack,
                                        int needle,
                                        size_t maxlen) {
-#line 2165 "kos/src/libc/magic/string.c"
+#line 2226 "kos/src/libc/magic/string.c"
 	char const *result = haystack - 1;
-	for (; maxlen-- && *haystack; ++haystack)
+	for (; maxlen-- && *haystack; ++haystack) {
 		if unlikely((unsigned char)*haystack == (unsigned char)needle)
 			result = haystack;
+	}
 	return (char *)result;
 }
 
@@ -2192,7 +2196,7 @@ INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.stroff") size_t
 NOTHROW_NCX(LIBCCALL libc_stroff)(char const *__restrict haystack,
                                   int needle) {
-#line 2175 "kos/src/libc/magic/string.c"
+#line 2237 "kos/src/libc/magic/string.c"
 	return (size_t)(libc_strchrnul(haystack, needle) - haystack);
 }
 
@@ -2201,7 +2205,7 @@ INTERN ATTR_PURE WUNUSED NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.strroff") size_t
 NOTHROW_NCX(LIBCCALL libc_strroff)(char const *__restrict haystack,
                                    int needle) {
-#line 2181 "kos/src/libc/magic/string.c"
+#line 2243 "kos/src/libc/magic/string.c"
 	return (size_t)(libc_strrchrnul(haystack, needle) - haystack);
 }
 
@@ -2211,7 +2215,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.strnoff") size_t
 NOTHROW_NCX(LIBCCALL libc_strnoff)(char const *__restrict haystack,
                                    int needle,
                                    size_t maxlen) {
-#line 2187 "kos/src/libc/magic/string.c"
+#line 2249 "kos/src/libc/magic/string.c"
 	return (size_t)(libc_strnchrnul(haystack, needle, maxlen) - haystack);
 }
 
@@ -2221,7 +2225,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.strnroff") size_t
 NOTHROW_NCX(LIBCCALL libc_strnroff)(char const *__restrict haystack,
                                     int needle,
                                     size_t maxlen) {
-#line 2193 "kos/src/libc/magic/string.c"
+#line 2255 "kos/src/libc/magic/string.c"
 	return (size_t)(libc_strnrchrnul(haystack, needle, maxlen) - haystack);
 }
 
@@ -2239,7 +2243,7 @@ NOTHROW_NCX(LIBCCALL libc_memrmem)(void const *haystack,
                                    size_t haystacklen,
                                    void const *needle,
                                    size_t needlelen) {
-#line 2319 "kos/src/libc/magic/string.c"
+#line 2381 "kos/src/libc/magic/string.c"
 	byte_t *candidate, marker;
 #if defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL) && !defined(__BUILDING_LIBC)
 	if unlikely(!needlelen || needlelen > haystacklen)
@@ -2260,12 +2264,12 @@ NOTHROW_NCX(LIBCCALL libc_memrmem)(void const *haystack,
 	return NULL;
 }
 
-INTERN ATTR_PURE WUNUSED NONNULL((1, 2))
+INTERN WUNUSED NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.memory.memcasecmp") int
 NOTHROW_NCX(LIBCCALL libc_memcasecmp)(void const *s1,
                                       void const *s2,
                                       size_t n_bytes) {
-#line 2393 "kos/src/libc/magic/string.c"
+#line 2455 "kos/src/libc/magic/string.c"
 	byte_t *p1 = (byte_t *)s1;
 	byte_t *p2 = (byte_t *)s2;
 	byte_t v1, v2;
@@ -2276,21 +2280,33 @@ NOTHROW_NCX(LIBCCALL libc_memcasecmp)(void const *s1,
 	return (int)v1 - (int)v2;
 }
 
+#include <features.h>
 /* Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
  * During comprisons, casing of character is ignored (s.a. `memmem()')
  * If no such sub-string exists, return `NULL' instead.
- * When `needlelen' is ZERO(0), also return `NULL' unconditionally. */
+ * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
+ * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
+ * #else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
+ * When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally.
+ * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
 INTERN ATTR_PURE WUNUSED NONNULL((1, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.memory.memcasemem") void *
 NOTHROW_NCX(LIBCCALL libc_memcasemem)(void const *haystack,
                                       size_t haystacklen,
                                       void const *needle,
                                       size_t needlelen) {
-#line 2414 "kos/src/libc/magic/string.c"
+#line 2482 "kos/src/libc/magic/string.c"
 	byte_t *candidate, marker;
 	byte_t *hayend;
+#if defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL) && !defined(__BUILDING_LIBC)
 	if unlikely(!needlelen || needlelen > haystacklen)
 		return NULL;
+#else /* __USE_MEMMEM_EMPTY_NEEDLE_NULL && !__BUILDING_LIBC */
+	if unlikely(!needlelen)
+		return (byte_t *)haystack + haystacklen;
+	if unlikely(needlelen > haystacklen)
+		return NULL;
+#endif /* !__USE_MEMMEM_EMPTY_NEEDLE_NULL || __BUILDING_LIBC */
 	haystacklen -= (needlelen - 1);
 	marker       = libc_tolower(*(byte_t *)needle);
 	hayend       = (byte_t *)haystack + haystacklen;
@@ -2311,17 +2327,26 @@ got_candidate:
 	return NULL;
 }
 
-INTERN ATTR_PURE WUNUSED NONNULL((1, 2))
+INTERN WUNUSED NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.memory.memcasecmp_l") int
 NOTHROW_NCX(LIBCCALL libc_memcasecmp_l)(void const *s1,
                                         void const *s2,
                                         size_t n_bytes,
                                         locale_t locale) {
-#line 2442 "kos/src/libc/magic/string.c"
+#line 2519 "kos/src/libc/magic/string.c"
 	(void)locale;
 	return libc_memcasecmp(s1, s2, n_bytes);
 }
 
+#include <features.h>
+/* Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
+ * During comprisons, casing of character is ignored using the given `locale' (s.a. `memmem()')
+ * If no such sub-string exists, return `NULL' instead.
+ * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
+ * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
+ * #else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
+ * When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally.
+ * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
 INTERN ATTR_PURE WUNUSED NONNULL((1, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.memory.memcasemem_l") void *
 NOTHROW_NCX(LIBCCALL libc_memcasemem_l)(void const *haystack,
@@ -2329,22 +2354,44 @@ NOTHROW_NCX(LIBCCALL libc_memcasemem_l)(void const *haystack,
                                         void const *needle,
                                         size_t needlelen,
                                         locale_t locale) {
-#line 2451 "kos/src/libc/magic/string.c"
-	byte_t *iter = (byte_t *)haystack;
-	while (haystacklen >= needlelen) {
-		if (libc_memcasecmp_l(iter, needle, needlelen, locale) == 0)
-			return (void *)iter;
-		++iter;
+#line 2540 "kos/src/libc/magic/string.c"
+	byte_t *candidate, marker;
+	byte_t *hayend;
+#if defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL) && !defined(__BUILDING_LIBC)
+	if unlikely(!needlelen || needlelen > haystacklen)
+		return NULL;
+#else /* __USE_MEMMEM_EMPTY_NEEDLE_NULL && !__BUILDING_LIBC */
+	if unlikely(!needlelen)
+		return (byte_t *)haystack + haystacklen;
+	if unlikely(needlelen > haystacklen)
+		return NULL;
+#endif /* !__USE_MEMMEM_EMPTY_NEEDLE_NULL || __BUILDING_LIBC */
+	haystacklen -= (needlelen - 1);
+	marker       = libc_tolower_l(*(byte_t *)needle, locale);
+	hayend       = (byte_t *)haystack + haystacklen;
+	for (;;) {
+		for (candidate = (byte_t *)haystack; candidate < hayend; ++candidate) {
+			byte_t b = *candidate;
+			if (b == marker || libc_tolower_l(b, locale) == marker)
+				goto got_candidate;
+		}
+		break;
+got_candidate:
+		if (libc_memcasecmp_l(candidate, needle, needlelen, locale) == 0)
+			return (void *)candidate;
+		++candidate;
+		haystacklen = ((byte_t *)haystack + haystacklen) - candidate;
+		haystack    = (void const *)candidate;
 	}
 	return NULL;
 }
 
-INTERN ATTR_PURE WUNUSED NONNULL((1, 2))
+INTERN WUNUSED NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.memory.strcasestr_l") char *
 NOTHROW_NCX(LIBCCALL libc_strcasestr_l)(char const *haystack,
                                         char const *needle,
                                         locale_t locale) {
-#line 2465 "kos/src/libc/magic/string.c"
+#line 2576 "kos/src/libc/magic/string.c"
 	for (; *haystack; ++haystack) {
 		if (libc_strcasecmp_l(haystack, needle, locale) == 0)
 			return (char *)haystack;
@@ -2356,7 +2403,7 @@ INTERN ATTR_PURE WUNUSED NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.wildstrcmp") int
 NOTHROW_NCX(LIBCCALL libc_wildstrcmp)(char const *pattern,
                                       char const *string) {
-#line 3567 "kos/src/libc/magic/string.c"
+#line 3679 "kos/src/libc/magic/string.c"
 	char card_post;
 	for (;;) {
 		if (!*string) {
@@ -2398,11 +2445,11 @@ next:
 	return (int)((unsigned char)*string - (unsigned char)*pattern);
 }
 
-INTERN ATTR_PURE WUNUSED NONNULL((1, 2))
+INTERN WUNUSED NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.memory.wildstrcasecmp") int
 NOTHROW_NCX(LIBCCALL libc_wildstrcasecmp)(char const *pattern,
                                           char const *string) {
-#line 3611 "kos/src/libc/magic/string.c"
+#line 3723 "kos/src/libc/magic/string.c"
 	char card_post, pattern_ch, string_ch;
 	for (;;) {
 		if (!*string) {
@@ -2450,53 +2497,53 @@ next:
 }
 
 #include <parts/malloca.h>
-INTERN ATTR_PURE WUNUSED NONNULL((1, 2))
+INTERN WUNUSED NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.fuzzy_strcmp") size_t
 NOTHROW_NCX(LIBCCALL libc_fuzzy_strcmp)(char const *s1,
                                         char const *s2) {
-#line 3661 "kos/src/libc/magic/string.c"
+#line 3772 "kos/src/libc/magic/string.c"
 	return libc_fuzzy_memcmp(s1, libc_strlen(s1), s2, libc_strlen(s2));
 }
 
 #include <parts/malloca.h>
-INTERN ATTR_PURE WUNUSED NONNULL((1, 3))
+INTERN WUNUSED NONNULL((1, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.fuzzy_strncmp") size_t
 NOTHROW_NCX(LIBCCALL libc_fuzzy_strncmp)(char const *s1,
                                          size_t s1_maxlen,
                                          char const *s2,
                                          size_t s2_maxlen) {
-#line 3668 "kos/src/libc/magic/string.c"
+#line 3779 "kos/src/libc/magic/string.c"
 	return libc_fuzzy_memcmp(s1, libc_strnlen(s1, s1_maxlen), s2, libc_strnlen(s2, s2_maxlen));
 }
 
 #include <parts/malloca.h>
-INTERN ATTR_PURE WUNUSED NONNULL((1, 2))
+INTERN WUNUSED NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.memory.fuzzy_strcasecmp") size_t
 NOTHROW_NCX(LIBCCALL libc_fuzzy_strcasecmp)(char const *s1,
                                             char const *s2) {
-#line 3675 "kos/src/libc/magic/string.c"
+#line 3786 "kos/src/libc/magic/string.c"
 	return libc_fuzzy_memcasecmp(s1, libc_strlen(s1), s2, libc_strlen(s2));
 }
 
 #include <parts/malloca.h>
-INTERN ATTR_PURE WUNUSED NONNULL((1, 3))
+INTERN WUNUSED NONNULL((1, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.memory.fuzzy_strncasecmp") size_t
 NOTHROW_NCX(LIBCCALL libc_fuzzy_strncasecmp)(char const *s1,
                                              size_t s1_maxlen,
                                              char const *s2,
                                              size_t s2_maxlen) {
-#line 3682 "kos/src/libc/magic/string.c"
+#line 3794 "kos/src/libc/magic/string.c"
 	return libc_fuzzy_memcasecmp(s1, libc_strnlen(s1, s1_maxlen), s2, libc_strnlen(s2, s2_maxlen));
 }
 
 #include <parts/malloca.h>
-INTERN ATTR_PURE WUNUSED NONNULL((1, 3))
+INTERN WUNUSED NONNULL((1, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.fuzzy_memcmp") size_t
 NOTHROW_NCX(LIBCCALL libc_fuzzy_memcmp)(void const *s1,
                                         size_t s1_bytes,
                                         void const *s2,
                                         size_t s2_bytes) {
-#line 3689 "kos/src/libc/magic/string.c"
+#line 3801 "kos/src/libc/magic/string.c"
 	size_t *v0, *v1, i, j, cost, temp;
 	if unlikely(!s1_bytes)
 		return s2_bytes;
@@ -2508,16 +2555,18 @@ NOTHROW_NCX(LIBCCALL libc_fuzzy_memcmp)(void const *s1,
 	}
 	__malloca_tryhard(v0, (s2_bytes+1)*sizeof(size_t));
 #ifdef __malloca_tryhard_mayfail
-	if unlikely(!v0) return (size_t)-1;
-#endif
+	if unlikely(!v0)
+		return (size_t)-1;
+#endif /* __malloca_tryhard_mayfail */
 	__malloca_tryhard(v1, (s2_bytes+1)*sizeof(size_t));
 #ifdef __malloca_tryhard_mayfail
 	if unlikely(!v1) {
 		__freea(v0);
 		return (size_t)-1;
 	}
-#endif
-	for (i = 0; i < s2_bytes; ++i) v0[i] = i;
+#endif /* __malloca_tryhard_mayfail */
+	for (i = 0; i < s2_bytes; ++i)
+		v0[i] = i;
 	for (i = 0; i < s1_bytes; ++i) {
 		v1[0] = i+1;
 		for (j = 0; j < s2_bytes; j++) {
@@ -2546,13 +2595,13 @@ NOTHROW_NCX(LIBCCALL libc_fuzzy_memcmp)(void const *s1,
 }
 
 #include <parts/malloca.h>
-INTERN ATTR_PURE WUNUSED NONNULL((1, 3))
+INTERN WUNUSED NONNULL((1, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.memory.fuzzy_memcasecmp") size_t
 NOTHROW_NCX(LIBCCALL libc_fuzzy_memcasecmp)(void const *s1,
                                             size_t s1_bytes,
                                             void const *s2,
                                             size_t s2_bytes) {
-#line 3742 "kos/src/libc/magic/string.c"
+#line 3856 "kos/src/libc/magic/string.c"
 	size_t *v0, *v1, i, j, cost, temp;
 	if unlikely(!s1_bytes)
 		return s2_bytes;
@@ -2564,16 +2613,18 @@ NOTHROW_NCX(LIBCCALL libc_fuzzy_memcasecmp)(void const *s1,
 	}
 	__malloca_tryhard(v0, (s2_bytes+1)*sizeof(size_t));
 #ifdef __malloca_tryhard_mayfail
-	if unlikely(!v0) return (size_t)-1;
-#endif
+	if unlikely(!v0)
+		return (size_t)-1;
+#endif /* __malloca_tryhard_mayfail */
 	__malloca_tryhard(v1, (s2_bytes+1)*sizeof(size_t));
 #ifdef __malloca_tryhard_mayfail
 	if unlikely(!v1) {
 		__freea(v0);
 		return (size_t)-1;
 	}
-#endif
-	for (i = 0; i < s2_bytes; ++i) v0[i] = i;
+#endif /* __malloca_tryhard_mayfail */
+	for (i = 0; i < s2_bytes; ++i)
+		v0[i] = i;
 	for (i = 0; i < s1_bytes; ++i) {
 		v1[0] = i+1;
 		for (j = 0; j < s2_bytes; j++) {
@@ -2604,33 +2655,33 @@ NOTHROW_NCX(LIBCCALL libc_fuzzy_memcasecmp)(void const *s1,
 }
 
 #include <parts/malloca.h>
-INTERN ATTR_PURE WUNUSED NONNULL((1, 2))
+INTERN WUNUSED NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.memory.fuzzy_strcasecmp_l") size_t
 NOTHROW_NCX(LIBCCALL libc_fuzzy_strcasecmp_l)(char const *s1,
                                               char const *s2,
                                               locale_t locale) {
-#line 3796 "kos/src/libc/magic/string.c"
+#line 3912 "kos/src/libc/magic/string.c"
 	return libc_fuzzy_memcasecmp_l(s1, libc_strlen(s1), s2, libc_strlen(s2), locale);
 }
 
 #include <parts/malloca.h>
-INTERN ATTR_PURE WUNUSED NONNULL((1, 3))
+INTERN WUNUSED NONNULL((1, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.memory.fuzzy_strncasecmp_l") size_t
 NOTHROW_NCX(LIBCCALL libc_fuzzy_strncasecmp_l)(char const *s1,
                                                size_t s1_maxlen,
                                                char const *s2,
                                                size_t s2_maxlen,
                                                locale_t locale) {
-#line 3802 "kos/src/libc/magic/string.c"
+#line 3919 "kos/src/libc/magic/string.c"
 	return libc_fuzzy_memcasecmp_l(s1, libc_strnlen(s1, s1_maxlen), s2, libc_strnlen(s2, s2_maxlen), locale);
 }
 
-INTERN ATTR_PURE WUNUSED NONNULL((1, 2))
+INTERN WUNUSED NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.memory.wildstrcasecmp_l") int
 NOTHROW_NCX(LIBCCALL libc_wildstrcasecmp_l)(char const *pattern,
                                             char const *string,
                                             locale_t locale) {
-#line 3808 "kos/src/libc/magic/string.c"
+#line 3925 "kos/src/libc/magic/string.c"
 	char card_post, pattern_ch, string_ch;
 	for (;;) {
 		if (!*string) {
@@ -2678,14 +2729,14 @@ next:
 }
 
 #include <parts/malloca.h>
-INTERN ATTR_PURE WUNUSED NONNULL((1, 3))
+INTERN WUNUSED NONNULL((1, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.memory.fuzzy_memcasecmp_l") size_t
 NOTHROW_NCX(LIBCCALL libc_fuzzy_memcasecmp_l)(void const *s1,
                                               size_t s1_bytes,
                                               void const *s2,
                                               size_t s2_bytes,
                                               locale_t locale) {
-#line 3858 "kos/src/libc/magic/string.c"
+#line 3975 "kos/src/libc/magic/string.c"
 	size_t *v0, *v1, i, j, cost, temp;
 	if unlikely(!s1_bytes)
 		return s2_bytes;
@@ -2697,16 +2748,18 @@ NOTHROW_NCX(LIBCCALL libc_fuzzy_memcasecmp_l)(void const *s1,
 	}
 	__malloca_tryhard(v0, (s2_bytes+1)*sizeof(size_t));
 #ifdef __malloca_tryhard_mayfail
-	if unlikely(!v0) return (size_t)-1;
-#endif
+	if unlikely(!v0)
+		return (size_t)-1;
+#endif /* __malloca_tryhard_mayfail */
 	__malloca_tryhard(v1, (s2_bytes+1)*sizeof(size_t));
 #ifdef __malloca_tryhard_mayfail
 	if unlikely(!v1) {
 		__freea(v0);
 		return (size_t)-1;
 	}
-#endif
-	for (i = 0; i < s2_bytes; ++i) v0[i] = i;
+#endif /* __malloca_tryhard_mayfail */
+	for (i = 0; i < s2_bytes; ++i)
+		v0[i] = i;
 	for (i = 0; i < s1_bytes; ++i) {
 		v1[0] = i+1;
 		for (j = 0; j < s2_bytes; j++) {
@@ -2737,13 +2790,13 @@ NOTHROW_NCX(LIBCCALL libc_fuzzy_memcasecmp_l)(void const *s1,
 }
 
 #include <parts/malloca.h>
-INTERN ATTR_PURE WUNUSED NONNULL((1, 3))
+INTERN WUNUSED NONNULL((1, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.fuzzy_memcmpw") size_t
 NOTHROW_NCX(LIBCCALL libc_fuzzy_memcmpw)(void const *s1,
                                          size_t s1_words,
                                          void const *s2,
                                          size_t s2_words) {
-#line 3922 "kos/src/libc/magic/string.c"
+#line 4041 "kos/src/libc/magic/string.c"
 	size_t *v0, *v1, i, j, cost, temp;
 	if unlikely(!s1_words)
 		return s2_words;
@@ -2755,16 +2808,18 @@ NOTHROW_NCX(LIBCCALL libc_fuzzy_memcmpw)(void const *s1,
 	}
 	__malloca_tryhard(v0, (s2_words+1)*sizeof(size_t));
 #ifdef __malloca_tryhard_mayfail
-	if unlikely(!v0) return (size_t)-1;
-#endif
+	if unlikely(!v0)
+		return (size_t)-1;
+#endif /* __malloca_tryhard_mayfail */
 	__malloca_tryhard(v1, (s2_words+1)*sizeof(size_t));
 #ifdef __malloca_tryhard_mayfail
 	if unlikely(!v1) {
 		__freea(v0);
 		return (size_t)-1;
 	}
-#endif
-	for (i = 0; i < s2_words; ++i) v0[i] = i;
+#endif /* __malloca_tryhard_mayfail */
+	for (i = 0; i < s2_words; ++i)
+		v0[i] = i;
 	for (i = 0; i < s1_words; ++i) {
 		v1[0] = i+1;
 		for (j = 0; j < s2_words; j++) {
@@ -2793,13 +2848,13 @@ NOTHROW_NCX(LIBCCALL libc_fuzzy_memcmpw)(void const *s1,
 }
 
 #include <parts/malloca.h>
-INTERN ATTR_PURE WUNUSED NONNULL((1, 3))
+INTERN WUNUSED NONNULL((1, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.fuzzy_memcmpl") size_t
 NOTHROW_NCX(LIBCCALL libc_fuzzy_memcmpl)(void const *s1,
                                          size_t s1_dwords,
                                          void const *s2,
                                          size_t s2_dwords) {
-#line 3974 "kos/src/libc/magic/string.c"
+#line 4095 "kos/src/libc/magic/string.c"
 	size_t *v0, *v1, i, j, cost, temp;
 	if unlikely(!s1_dwords)
 		return s2_dwords;
@@ -2812,15 +2867,16 @@ NOTHROW_NCX(LIBCCALL libc_fuzzy_memcmpl)(void const *s1,
 	__malloca_tryhard(v0, (s2_dwords+1)*sizeof(size_t));
 #ifdef __malloca_tryhard_mayfail
 	if unlikely(!v0) return (size_t)-1;
-#endif
+#endif /* __malloca_tryhard_mayfail */
 	__malloca_tryhard(v1, (s2_dwords+1)*sizeof(size_t));
 #ifdef __malloca_tryhard_mayfail
 	if unlikely(!v1) {
 		__freea(v0);
 		return (size_t)-1;
 	}
-#endif
-	for (i = 0; i < s2_dwords; ++i) v0[i] = i;
+#endif /* __malloca_tryhard_mayfail */
+	for (i = 0; i < s2_dwords; ++i)
+		v0[i] = i;
 	for (i = 0; i < s1_dwords; ++i) {
 		v1[0] = i+1;
 		for (j = 0; j < s2_dwords; j++) {
@@ -2849,13 +2905,13 @@ NOTHROW_NCX(LIBCCALL libc_fuzzy_memcmpl)(void const *s1,
 }
 
 #include <parts/malloca.h>
-INTERN ATTR_PURE WUNUSED NONNULL((1, 3))
+INTERN WUNUSED NONNULL((1, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.fuzzy_memcmpq") size_t
 NOTHROW_NCX(LIBCCALL libc_fuzzy_memcmpq)(void const *s1,
                                          size_t s1_qwords,
                                          void const *s2,
                                          size_t s2_qwords) {
-#line 4027 "kos/src/libc/magic/string.c"
+#line 4149 "kos/src/libc/magic/string.c"
 	size_t *v0, *v1, i, j, cost, temp;
 	if unlikely(!s1_qwords)
 		return s2_qwords;
@@ -2868,15 +2924,16 @@ NOTHROW_NCX(LIBCCALL libc_fuzzy_memcmpq)(void const *s1,
 	__malloca_tryhard(v0, (s2_qwords+1)*sizeof(size_t));
 #ifdef __malloca_tryhard_mayfail
 	if unlikely(!v0) return (size_t)-1;
-#endif
+#endif /* __malloca_tryhard_mayfail */
 	__malloca_tryhard(v1, (s2_qwords+1)*sizeof(size_t));
 #ifdef __malloca_tryhard_mayfail
 	if unlikely(!v1) {
 		__freea(v0);
 		return (size_t)-1;
 	}
-#endif
-	for (i = 0; i < s2_qwords; ++i) v0[i] = i;
+#endif /* __malloca_tryhard_mayfail */
+	for (i = 0; i < s2_qwords; ++i)
+		v0[i] = i;
 	for (i = 0; i < s1_qwords; ++i) {
 		v1[0] = i+1;
 		for (j = 0; j < s2_qwords; j++) {
@@ -2909,7 +2966,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.memory.strncoll") int
 NOTHROW_NCX(LIBCCALL libc_strncoll)(char const *s1,
                                     char const *s2,
                                     size_t maxlen) {
-#line 4083 "kos/src/libc/magic/string.c"
+#line 4206 "kos/src/libc/magic/string.c"
 	return libc_strncmp(s1, s2, maxlen);
 }
 
@@ -2917,7 +2974,7 @@ INTERN ATTR_PURE WUNUSED NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.memory.strcasecoll") int
 NOTHROW_NCX(LIBCCALL libc_strcasecoll)(char const *s1,
                                        char const *s2) {
-#line 4088 "kos/src/libc/magic/string.c"
+#line 4212 "kos/src/libc/magic/string.c"
 	return libc_strcasecmp(s1, s2);
 }
 
@@ -2926,67 +2983,67 @@ ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.memory.strncasecoll") int
 NOTHROW_NCX(LIBCCALL libc_strncasecoll)(char const *s1,
                                         char const *s2,
                                         size_t maxlen) {
-#line 4093 "kos/src/libc/magic/string.c"
+#line 4218 "kos/src/libc/magic/string.c"
 	return libc_strncasecmp(s1, s2, maxlen);
 }
 
-INTERN ATTR_RETNONNULL NONNULL((1))
+INTERN ATTR_LEAF ATTR_RETNONNULL NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.strnrev") char *
 NOTHROW_NCX(LIBCCALL libc_strnrev)(char *__restrict str,
                                    size_t maxlen) {
-#line 4097 "kos/src/libc/magic/string.c"
+#line 4223 "kos/src/libc/magic/string.c"
 	return (char *)libc_memrev(str, libc_strnlen(str, maxlen));
 }
 
-INTERN ATTR_RETNONNULL NONNULL((1))
+INTERN ATTR_LEAF ATTR_RETNONNULL NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.memory.strnlwr") char *
 NOTHROW_NCX(LIBCCALL libc_strnlwr)(char *__restrict str,
                                    size_t maxlen) {
-#line 4103 "kos/src/libc/magic/string.c"
+#line 4228 "kos/src/libc/magic/string.c"
 	char *iter, ch;
 	for (iter = str; maxlen-- && (ch = *iter) != '\0'; ++iter)
 		*iter = libc_tolower(ch);
 	return str;
 }
 
-INTERN ATTR_RETNONNULL NONNULL((1))
+INTERN ATTR_LEAF ATTR_RETNONNULL NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.memory.strnupr") char *
 NOTHROW_NCX(LIBCCALL libc_strnupr)(char *__restrict str,
                                    size_t maxlen) {
-#line 4111 "kos/src/libc/magic/string.c"
+#line 4236 "kos/src/libc/magic/string.c"
 	char *iter, ch;
 	for (iter = str; maxlen-- && (ch = *iter) != '\0'; ++iter)
 		*iter = libc_toupper(ch);
 	return str;
 }
 
-INTERN ATTR_PURE WUNUSED NONNULL((1, 2))
+INTERN WUNUSED NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.memory.strncoll_l") int
 NOTHROW_NCX(LIBCCALL libc_strncoll_l)(char const *s1,
                                       char const *s2,
                                       size_t maxlen,
                                       locale_t locale) {
-#line 4122 "kos/src/libc/magic/string.c"
+#line 4247 "kos/src/libc/magic/string.c"
 	(void)locale;
 	return libc_strncoll(s1, s2, maxlen);
 }
 
-INTERN ATTR_PURE WUNUSED NONNULL((1, 2))
+INTERN WUNUSED NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.memory.strcasecoll_l") int
 NOTHROW_NCX(LIBCCALL libc_strcasecoll_l)(char const *s1,
                                          char const *s2,
                                          locale_t locale) {
-#line 4128 "kos/src/libc/magic/string.c"
+#line 4254 "kos/src/libc/magic/string.c"
 	return libc_strcasecmp_l(s1, s2, locale);
 }
 
-INTERN ATTR_PURE WUNUSED NONNULL((1, 2))
+INTERN WUNUSED NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.memory.strncasecoll_l") int
 NOTHROW_NCX(LIBCCALL libc_strncasecoll_l)(char const *s1,
                                           char const *s2,
                                           size_t maxlen,
                                           locale_t locale) {
-#line 4134 "kos/src/libc/magic/string.c"
+#line 4260 "kos/src/libc/magic/string.c"
 	(void)locale;
 	return libc_strncasecoll(s1, s2, maxlen);
 }
@@ -2995,7 +3052,7 @@ INTERN ATTR_RETNONNULL NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.memory.strlwr_l") char *
 NOTHROW_NCX(LIBCCALL libc_strlwr_l)(char *__restrict str,
                                     locale_t locale) {
-#line 4141 "kos/src/libc/magic/string.c"
+#line 4266 "kos/src/libc/magic/string.c"
 	char *iter, ch;
 	for (iter = str; (ch = *iter) != '\0'; ++iter)
 		*iter = libc_tolower_l(ch, locale);
@@ -3006,7 +3063,7 @@ INTERN ATTR_RETNONNULL NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.memory.strupr_l") char *
 NOTHROW_NCX(LIBCCALL libc_strupr_l)(char *__restrict str,
                                     locale_t locale) {
-#line 4149 "kos/src/libc/magic/string.c"
+#line 4274 "kos/src/libc/magic/string.c"
 	char *iter, ch;
 	for (iter = str; (ch = *iter) != '\0'; ++iter)
 		*iter = libc_toupper_l(ch, locale);
@@ -3018,7 +3075,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.memory.strnlwr_l") char *
 NOTHROW_NCX(LIBCCALL libc_strnlwr_l)(char *__restrict str,
                                      size_t maxlen,
                                      locale_t locale) {
-#line 4157 "kos/src/libc/magic/string.c"
+#line 4282 "kos/src/libc/magic/string.c"
 	char *iter, ch;
 	for (iter = str; maxlen-- && (ch = *iter) != '\0'; ++iter)
 		*iter = libc_tolower_l(ch, locale);
@@ -3030,18 +3087,18 @@ ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.memory.strnupr_l") char *
 NOTHROW_NCX(LIBCCALL libc_strnupr_l)(char *__restrict str,
                                      size_t maxlen,
                                      locale_t locale) {
-#line 4165 "kos/src/libc/magic/string.c"
+#line 4290 "kos/src/libc/magic/string.c"
 	char *iter, ch;
 	for (iter = str; maxlen-- && (ch = *iter) != '\0'; ++iter)
 		*iter = libc_toupper_l(ch, locale);
 	return str;
 }
 
-INTERN ATTR_RETNONNULL NONNULL((1))
+INTERN ATTR_LEAF ATTR_RETNONNULL NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memrev") void *
 NOTHROW_NCX(LIBCCALL libc_memrev)(void *__restrict base,
                                   size_t n_bytes) {
-#line 4172 "kos/src/libc/magic/string.c"
+#line 4298 "kos/src/libc/magic/string.c"
 	byte_t *iter, *end;
 	end = (iter = (byte_t *)base) + n_bytes;
 	while (iter < end) {
@@ -3052,11 +3109,11 @@ NOTHROW_NCX(LIBCCALL libc_memrev)(void *__restrict base,
 	return base;
 }
 
-INTERN ATTR_RETNONNULL NONNULL((1))
+INTERN ATTR_LEAF ATTR_RETNONNULL NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memrevw") uint16_t *
 NOTHROW_NCX(LIBCCALL libc_memrevw)(void *__restrict base,
                                    size_t n_words) {
-#line 4188 "kos/src/libc/magic/string.c"
+#line 4315 "kos/src/libc/magic/string.c"
 	u16 *iter, *end;
 	end = (iter = (u16 *)base) + n_words;
 	while (iter < end) {
@@ -3067,11 +3124,11 @@ NOTHROW_NCX(LIBCCALL libc_memrevw)(void *__restrict base,
 	return (u16 *)base;
 }
 
-INTERN ATTR_RETNONNULL NONNULL((1))
+INTERN ATTR_LEAF ATTR_RETNONNULL NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memrevl") uint32_t *
 NOTHROW_NCX(LIBCCALL libc_memrevl)(void *__restrict base,
                                    size_t n_dwords) {
-#line 4199 "kos/src/libc/magic/string.c"
+#line 4327 "kos/src/libc/magic/string.c"
 	u32 *iter, *end;
 	end = (iter = (u32 *)base) + n_dwords;
 	while (iter < end) {
@@ -3082,11 +3139,11 @@ NOTHROW_NCX(LIBCCALL libc_memrevl)(void *__restrict base,
 	return (u32 *)base;
 }
 
-INTERN ATTR_RETNONNULL NONNULL((1))
+INTERN ATTR_LEAF ATTR_RETNONNULL NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.memrevq") uint64_t *
 NOTHROW_NCX(LIBCCALL libc_memrevq)(void *__restrict base,
                                    size_t n_qwords) {
-#line 4211 "kos/src/libc/magic/string.c"
+#line 4340 "kos/src/libc/magic/string.c"
 	u64 *iter, *end;
 	end = (iter = (u64 *)base) + n_qwords;
 	while (iter < end) {
@@ -3100,7 +3157,7 @@ NOTHROW_NCX(LIBCCALL libc_memrevq)(void *__restrict base,
 INTERN ATTR_RETNONNULL NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.memory.strlwr") char *
 NOTHROW_NCX(LIBCCALL libc_strlwr)(char *__restrict str) {
-#line 4232 "kos/src/libc/magic/string.c"
+#line 4360 "kos/src/libc/magic/string.c"
 	char *iter, ch;
 	for (iter = str; (ch = *iter) != '\0'; ++iter)
 		*iter = libc_tolower(ch);
@@ -3110,40 +3167,40 @@ NOTHROW_NCX(LIBCCALL libc_strlwr)(char *__restrict str) {
 INTERN ATTR_RETNONNULL NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.memory.strupr") char *
 NOTHROW_NCX(LIBCCALL libc_strupr)(char *__restrict str) {
-#line 4240 "kos/src/libc/magic/string.c"
+#line 4367 "kos/src/libc/magic/string.c"
 	char *iter, ch;
 	for (iter = str; (ch = *iter) != '\0'; ++iter)
 		*iter = libc_toupper(ch);
 	return str;
 }
 
-INTERN ATTR_RETNONNULL NONNULL((1))
+INTERN ATTR_LEAF ATTR_RETNONNULL NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.strset") char *
 NOTHROW_NCX(LIBCCALL libc_strset)(char *__restrict str,
                                   int ch) {
-#line 4247 "kos/src/libc/magic/string.c"
+#line 4375 "kos/src/libc/magic/string.c"
 	char *iter;
 	for (iter = str; *iter; ++iter)
 		*iter = (char)ch;
 	return str;
 }
 
-INTERN ATTR_RETNONNULL NONNULL((1))
+INTERN ATTR_LEAF ATTR_RETNONNULL NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.strnset") char *
 NOTHROW_NCX(LIBCCALL libc_strnset)(char *__restrict str,
                                    int ch,
                                    size_t maxlen) {
-#line 4254 "kos/src/libc/magic/string.c"
+#line 4383 "kos/src/libc/magic/string.c"
 	char *iter;
 	for (iter = str; maxlen-- && *iter; ++iter)
 		*iter = (char)ch;
 	return str;
 }
 
-INTERN ATTR_RETNONNULL NONNULL((1))
+INTERN ATTR_LEAF ATTR_RETNONNULL NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.string.memory.strrev") char *
 NOTHROW_NCX(LIBCCALL libc_strrev)(char *__restrict str) {
-#line 4261 "kos/src/libc/magic/string.c"
+#line 4391 "kos/src/libc/magic/string.c"
 	return (char *)libc_memrev(str, libc_strlen(str));
 }
 
@@ -3153,7 +3210,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.dos.string.memory._strset_s") errno_t
 NOTHROW_NCX(LIBCCALL libc__strset_s)(char *dst,
                                      size_t dstsize,
                                      int ch) {
-#line 4278 "kos/src/libc/magic/string.c"
+#line 4408 "kos/src/libc/magic/string.c"
 
 
 	char *p;
@@ -3179,7 +3236,7 @@ NOTHROW_NCX(LIBCCALL libc_memcpy_s)(void *dst,
                                     rsize_t dstlength,
                                     void const *src,
                                     rsize_t srclength) {
-#line 4302 "kos/src/libc/magic/string.c"
+#line 4432 "kos/src/libc/magic/string.c"
 
 
 	if (!srclength)
@@ -3205,7 +3262,7 @@ NOTHROW_NCX(LIBCCALL libc_memmove_s)(void *dst,
                                      rsize_t dstlength,
                                      void const *src,
                                      rsize_t srclength) {
-#line 4324 "kos/src/libc/magic/string.c"
+#line 4454 "kos/src/libc/magic/string.c"
 
 	if (!srclength)
 		return 0;
@@ -3222,7 +3279,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.string.memory.strcpy_s") errno_t
 NOTHROW_NCX(LIBCCALL libc_strcpy_s)(char *dst,
                                     size_t dstsize,
                                     char const *src) {
-#line 4339 "kos/src/libc/magic/string.c"
+#line 4469 "kos/src/libc/magic/string.c"
 
 
 	char *iter;
@@ -3246,7 +3303,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.string.memory.strcat_s") errno_t
 NOTHROW_NCX(LIBCCALL libc_strcat_s)(char *dst,
                                     size_t dstsize,
                                     char const *src) {
-#line 4360 "kos/src/libc/magic/string.c"
+#line 4490 "kos/src/libc/magic/string.c"
 	if (!dst || !src)
 		return __EINVAL;
 	while (dstsize && *dst) {
@@ -3268,7 +3325,7 @@ NOTHROW_NCX(LIBCCALL libc_strncat_s)(char *dst,
                                      rsize_t dstsize,
                                      const char *src,
                                      rsize_t maxlen) {
-#line 4384 "kos/src/libc/magic/string.c"
+#line 4514 "kos/src/libc/magic/string.c"
 
 
 	char *iter;
@@ -3312,7 +3369,7 @@ NOTHROW_NCX(LIBCCALL libc_strncpy_s)(char *dst,
                                      size_t dstsize,
                                      char const *src,
                                      size_t maxlen) {
-#line 4424 "kos/src/libc/magic/string.c"
+#line 4554 "kos/src/libc/magic/string.c"
 
 
 	char *iter;
@@ -3354,7 +3411,7 @@ NOTHROW_NCX(LIBCCALL libc_strncpy_s)(char *dst,
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.memory._strlwr_s") errno_t
 NOTHROW_NCX(LIBCCALL libc__strlwr_s)(char *buf,
                                      size_t buflen) {
-#line 4485 "kos/src/libc/magic/string.c"
+#line 4615 "kos/src/libc/magic/string.c"
 	char *iter, ch;
 	if (buf == NULL)
 		return __EINVAL;
@@ -3368,7 +3425,7 @@ NOTHROW_NCX(LIBCCALL libc__strlwr_s)(char *buf,
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.static.memory._strupr_s") errno_t
 NOTHROW_NCX(LIBCCALL libc__strupr_s)(char *buf,
                                      size_t buflen) {
-#line 4497 "kos/src/libc/magic/string.c"
+#line 4627 "kos/src/libc/magic/string.c"
 	char *iter, ch;
 	if (buf == NULL)
 		return __EINVAL;
@@ -3383,7 +3440,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.memory._strlwr_s_l")
 NOTHROW_NCX(LIBCCALL libc__strlwr_s_l)(char *buf,
                                        size_t buflen,
                                        locale_t locale) {
-#line 4509 "kos/src/libc/magic/string.c"
+#line 4639 "kos/src/libc/magic/string.c"
 	char *iter, ch;
 	if (buf == NULL)
 		return __EINVAL;
@@ -3398,7 +3455,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.unicode.locale.memory._strupr_s_l")
 NOTHROW_NCX(LIBCCALL libc__strupr_s_l)(char *buf,
                                        size_t buflen,
                                        locale_t locale) {
-#line 4521 "kos/src/libc/magic/string.c"
+#line 4651 "kos/src/libc/magic/string.c"
 	char *iter, ch;
 	if (buf == NULL)
 		return __EINVAL;
@@ -3415,7 +3472,7 @@ NOTHROW_NCX(LIBCCALL libc__strnset_s)(char *__restrict buf,
                                       size_t buflen,
                                       int ch,
                                       size_t maxlen) {
-#line 4536 "kos/src/libc/magic/string.c"
+#line 4666 "kos/src/libc/magic/string.c"
 
 
 	char *iter;

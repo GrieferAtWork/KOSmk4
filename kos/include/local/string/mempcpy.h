@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x177714d2 */
+/* HASH CRC-32:0x9d6a9aa */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,11 +21,11 @@
 #define __local_mempcpy_defined 1
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `memcpy', but return `DST+N_BYTES', rather than `DST' */
-__LOCAL_LIBC(mempcpy) __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *
+__LOCAL_LIBC(mempcpy) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mempcpy))(void *__restrict __dst,
                                                      void const *__restrict __src,
                                                      __SIZE_TYPE__ __n_bytes) {
-#line 704 "kos/src/libc/magic/string.c"
+#line 719 "kos/src/libc/magic/string.c"
 	__BYTE_TYPE__ *__pdst = (__BYTE_TYPE__ *)__dst;
 	__BYTE_TYPE__ *__psrc = (__BYTE_TYPE__ *)__src;
 	while (__n_bytes--)

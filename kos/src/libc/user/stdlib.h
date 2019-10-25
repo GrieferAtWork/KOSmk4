@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x335e5101 */
+/* HASH CRC-32:0x51b23474 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -132,15 +132,15 @@ INTDEF ATTR_CONST WUNUSED errno_t *NOTHROW_NCX(LIBCCALL libc___errno_location)(v
 INTDEF ATTR_CONST u32 *NOTHROW_NCX(LIBCCALL libc___doserrno)(void);
 INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__get_doserrno)(u32 *perr);
 INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__set_doserrno)(u32 err);
-INTDEF ATTR_CONST ATTR_RETNONNULL int *NOTHROW_NCX(LIBCCALL libc___p___argc)(void);
-INTDEF ATTR_CONST ATTR_RETNONNULL char ***NOTHROW_NCX(LIBCCALL libc___p___argv)(void);
-INTDEF ATTR_CONST ATTR_RETNONNULL char **NOTHROW_NCX(LIBCCALL libc___p__pgmptr)(void);
-INTDEF ATTR_CONST ATTR_RETNONNULL char32_t ***NOTHROW_NCX(LIBCCALL libc___p___wargv)(void);
-INTDEF ATTR_CONST ATTR_RETNONNULL char16_t ***NOTHROW_NCX(LIBDCALL libd___p___wargv)(void);
-INTDEF ATTR_CONST ATTR_RETNONNULL char32_t ***NOTHROW_NCX(LIBCCALL libc___p__wenviron)(void);
-INTDEF ATTR_CONST ATTR_RETNONNULL char16_t ***NOTHROW_NCX(LIBDCALL libd___p__wenviron)(void);
-INTDEF ATTR_CONST ATTR_RETNONNULL char32_t **NOTHROW_NCX(LIBCCALL libc___p__wpgmptr)(void);
-INTDEF ATTR_CONST ATTR_RETNONNULL char16_t **NOTHROW_NCX(LIBDCALL libd___p__wpgmptr)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED int *NOTHROW_NCX(LIBCCALL libc___p___argc)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char ***NOTHROW_NCX(LIBCCALL libc___p___argv)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char **NOTHROW_NCX(LIBCCALL libc___p__pgmptr)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char32_t ***NOTHROW_NCX(LIBCCALL libc___p___wargv)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t ***NOTHROW_NCX(LIBDCALL libd___p___wargv)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char32_t ***NOTHROW_NCX(LIBCCALL libc___p__wenviron)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t ***NOTHROW_NCX(LIBDCALL libd___p__wenviron)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char32_t **NOTHROW_NCX(LIBCCALL libc___p__wpgmptr)(void);
+INTDEF ATTR_CONST ATTR_RETNONNULL WUNUSED char16_t **NOTHROW_NCX(LIBDCALL libd___p__wpgmptr)(void);
 /* Access to the initial environment block */
 INTDEF ATTR_CONST char ***NOTHROW_NCX(LIBCCALL libc___p___initenv)(void);
 /* Access to the initial environment block */

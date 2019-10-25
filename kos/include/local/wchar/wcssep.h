@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc5435429 */
+/* HASH CRC-32:0x329a3bc9 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wcssep) __ATTR_NONNULL((1, 2)) __WCHAR_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(wcssep))(__WCHAR_TYPE__ **__restrict __stringp,
                                                     __WCHAR_TYPE__ const *__restrict __delim) {
-#line 764 "kos/src/libc/magic/string.c"
+#line 780 "kos/src/libc/magic/string.c"
 	__WCHAR_TYPE__ *__result, *__iter;
 	if (!__stringp || (__result = *__stringp) == __NULLPTR || !*__result)
 		return __NULLPTR;

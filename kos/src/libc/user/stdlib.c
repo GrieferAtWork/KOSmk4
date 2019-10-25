@@ -1549,8 +1549,8 @@ NOTHROW_RPC(LIBCCALL libc_mkostemps64)(char *template_,
 /* `__errno_location' is provided in libc/errno.c */
 /*[[[skip:__errno_location]]]*/
 
-/*[[[head:__p___argc,hash:CRC-32=0x23ae376a]]]*/
-INTERN ATTR_CONST ATTR_RETNONNULL
+/*[[[head:__p___argc,hash:CRC-32=0xb5855cce]]]*/
+INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p___argc") int *
 NOTHROW_NCX(LIBCCALL libc___p___argc)(void)
 /*[[[body:__p___argc]]]*/
@@ -1559,8 +1559,8 @@ NOTHROW_NCX(LIBCCALL libc___p___argc)(void)
 }
 /*[[[end:__p___argc]]]*/
 
-/*[[[head:__p___argv,hash:CRC-32=0xc8bd82c2]]]*/
-INTERN ATTR_CONST ATTR_RETNONNULL
+/*[[[head:__p___argv,hash:CRC-32=0x3c793cc4]]]*/
+INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p___argv") char ***
 NOTHROW_NCX(LIBCCALL libc___p___argv)(void)
 /*[[[body:__p___argv]]]*/
@@ -1569,8 +1569,8 @@ NOTHROW_NCX(LIBCCALL libc___p___argv)(void)
 }
 /*[[[end:__p___argv]]]*/
 
-/*[[[head:__p__pgmptr,hash:CRC-32=0x72dfe149]]]*/
-INTERN ATTR_CONST ATTR_RETNONNULL
+/*[[[head:__p__pgmptr,hash:CRC-32=0x9b4880c2]]]*/
+INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p__pgmptr") char **
 NOTHROW_NCX(LIBCCALL libc___p__pgmptr)(void)
 /*[[[body:__p__pgmptr]]]*/
@@ -1625,8 +1625,8 @@ NOTHROW_NCX(LIBCCALL libc__aligned_malloc)(size_t num_bytes,
 }
 /*[[[end:_aligned_malloc]]]*/
 
-/*[[[head:DOS$__p__wenviron,hash:CRC-32=0xc95110ec]]]*/
-INTERN ATTR_CONST ATTR_RETNONNULL
+/*[[[head:DOS$__p__wenviron,hash:CRC-32=0x2a342ca3]]]*/
+INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p__wenviron") char16_t ***
 NOTHROW_NCX(LIBDCALL libd___p__wenviron)(void)
 /*[[[body:DOS$__p__wenviron]]]*/
@@ -1637,8 +1637,8 @@ NOTHROW_NCX(LIBDCALL libd___p__wenviron)(void)
 }
 /*[[[end:DOS$__p__wenviron]]]*/
 
-/*[[[head:__p__wenviron,hash:CRC-32=0xc6ae7463]]]*/
-INTERN ATTR_CONST ATTR_RETNONNULL
+/*[[[head:__p__wenviron,hash:CRC-32=0x25cb482c]]]*/
+INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p__wenviron") char32_t ***
 NOTHROW_NCX(LIBCCALL libc___p__wenviron)(void)
 /*[[[body:__p__wenviron]]]*/
@@ -1675,8 +1675,8 @@ NOTHROW_NCX(LIBCCALL libc___p___winitenv)(void)
 }
 /*[[[end:__p___winitenv]]]*/
 
-/*[[[head:DOS$__p___wargv,hash:CRC-32=0x278067ca]]]*/
-INTERN ATTR_CONST ATTR_RETNONNULL
+/*[[[head:DOS$__p___wargv,hash:CRC-32=0x15cc90ff]]]*/
+INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p___wargv") char16_t ***
 NOTHROW_NCX(LIBDCALL libd___p___wargv)(void)
 /*[[[body:DOS$__p___wargv]]]*/
@@ -1687,8 +1687,8 @@ NOTHROW_NCX(LIBDCALL libd___p___wargv)(void)
 }
 /*[[[end:DOS$__p___wargv]]]*/
 
-/*[[[head:__p__wpgmptr,hash:CRC-32=0x8cce3a9a]]]*/
-INTERN ATTR_CONST ATTR_RETNONNULL
+/*[[[head:__p__wpgmptr,hash:CRC-32=0xda4fb24e]]]*/
+INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p__wpgmptr") char32_t **
 NOTHROW_NCX(LIBCCALL libc___p__wpgmptr)(void)
 /*[[[body:__p__wpgmptr]]]*/
@@ -1699,8 +1699,8 @@ NOTHROW_NCX(LIBCCALL libc___p__wpgmptr)(void)
 }
 /*[[[end:__p__wpgmptr]]]*/
 
-/*[[[head:DOS$__p__wpgmptr,hash:CRC-32=0xd1f8830d]]]*/
-INTERN ATTR_CONST ATTR_RETNONNULL
+/*[[[head:DOS$__p__wpgmptr,hash:CRC-32=0x87790bd9]]]*/
+INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p__wpgmptr") char16_t **
 NOTHROW_NCX(LIBDCALL libd___p__wpgmptr)(void)
 /*[[[body:DOS$__p__wpgmptr]]]*/
@@ -1761,8 +1761,8 @@ NOTHROW_NCX(LIBCCALL libc___doserrno)(void)
 }
 /*[[[end:__doserrno]]]*/
 
-/*[[[head:__p___wargv,hash:CRC-32=0xb5515e13]]]*/
-INTERN ATTR_CONST ATTR_RETNONNULL
+/*[[[head:__p___wargv,hash:CRC-32=0x871da926]]]*/
+INTERN ATTR_CONST ATTR_RETNONNULL WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.application.init.__p___wargv") char32_t ***
 NOTHROW_NCX(LIBCCALL libc___p___wargv)(void)
 /*[[[body:__p___wargv]]]*/

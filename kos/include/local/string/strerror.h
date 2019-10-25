@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8a2ebbaf */
+/* HASH CRC-32:0x92c74b2d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,9 +34,9 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_strerr
 #ifndef ____localdep_strncpy_defined
 #define ____localdep_strncpy_defined 1
 #if __has_builtin(__builtin_strncpy) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_strncpy)
-__FORCELOCAL __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL __localdep_strncpy)(char *__restrict __buf, char const *__restrict __src, __SIZE_TYPE__ __buflen) { return __builtin_strncpy(__buf, __src, __buflen); }
+__FORCELOCAL __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) char *__NOTHROW_NCX(__LIBCCALL __localdep_strncpy)(char *__restrict __buf, char const *__restrict __src, __SIZE_TYPE__ __buflen) { return __builtin_strncpy(__buf, __src, __buflen); }
 #elif defined(__CRT_HAVE_strncpy)
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_strncpy,(char *__restrict __buf, char const *__restrict __src, __SIZE_TYPE__ __buflen),strncpy,(__buf,__src,__buflen))
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_strncpy,(char *__restrict __buf, char const *__restrict __src, __SIZE_TYPE__ __buflen),strncpy,(__buf,__src,__buflen))
 #else /* LIBC: strncpy */
 #include <local/string/strncpy.h>
 #define __localdep_strncpy (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(strncpy))
@@ -66,7 +66,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC_DATA(__strerror_buf) char __strerror_buf[64] = { 0 };
 __LOCAL_LIBC(strerror) __ATTR_RETNONNULL __ATTR_WUNUSED char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strerror))(int __errnum) {
-#line 375 "kos/src/libc/magic/string.c"
+#line 379 "kos/src/libc/magic/string.c"
 	char *__result = __strerror_buf;
 	char const *__string;
 	__string = __localdep_strerror_s(__errnum);

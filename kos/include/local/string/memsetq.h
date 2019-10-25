@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x86138bf7 */
+/* HASH CRC-32:0x6a0c0bf3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,11 +21,11 @@
 #define __local_memsetq_defined 1
 __NAMESPACE_LOCAL_BEGIN
 /* Fill memory with a given qword */
-__LOCAL_LIBC(memsetq) __ATTR_RETNONNULL __ATTR_NONNULL((1)) __UINT64_TYPE__ *
+__LOCAL_LIBC(memsetq) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __UINT64_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memsetq))(void *__restrict __dst,
                                                      __UINT64_TYPE__ __qword,
                                                      __SIZE_TYPE__ __n_qwords) {
-#line 1427 "kos/src/libc/magic/string.c"
+#line 1483 "kos/src/libc/magic/string.c"
 	__UINT64_TYPE__ *__pdst = (__UINT64_TYPE__ *)__dst;
 	while (__n_qwords--)
 		*__pdst++ = __qword;

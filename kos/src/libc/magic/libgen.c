@@ -29,8 +29,7 @@ __SYSDECL_BEGIN
 }
 
 @@Return directory part of PATH or "." if none is available
-[ATTR_RETNONNULL]
-dirname:(char *path) -> char * {
+dirname:(char *path) -> [nonnull] char * {
 	/* NOTE: This implementation is taken form GLibc */
 	/* dirname - return directory part of PATH.
 	   Copyright (C) 1996-2017 Free Software Foundation, Inc.
@@ -88,8 +87,7 @@ dirname:(char *path) -> char * {
 @@modify its argument. Therefore we normally use the GNU version (in
 @@<string.h>) and only if this header is included make the XPG
 @@version available under the real name
-[ATTR_RETNONNULL]
-__xpg_basename:(char *filename) -> char * {
+__xpg_basename:(char *filename) -> [nonnull] char * {
 	/* NOTE: This implementation is taken form GLibc */
 	/* Return basename of given pathname according to the weird XPG specification.
 	   Copyright (C) 1997-2017 Free Software Foundation, Inc.

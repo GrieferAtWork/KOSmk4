@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x826c5ed9 */
+/* HASH CRC-32:0x2edf2328 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,9 +21,9 @@
 #define __local_strend_defined 1
 __NAMESPACE_LOCAL_BEGIN
 /* Same as `STR+strlen(STR)' */
-__LOCAL_LIBC(strend) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
+__LOCAL_LIBC(strend) __ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) char *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(strend))(char const *__restrict __string) {
-#line 2094 "kos/src/libc/magic/string.c"
+#line 2152 "kos/src/libc/magic/string.c"
 	while (*__string)
 		++__string;
 	return (char *)__string;

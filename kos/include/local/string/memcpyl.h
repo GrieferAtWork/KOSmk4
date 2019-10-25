@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x16d02e1a */
+/* HASH CRC-32:0xf81096c2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,11 +21,11 @@
 #define __local_memcpyl_defined 1
 __NAMESPACE_LOCAL_BEGIN
 /* Copy memory between non-overlapping memory blocks. */
-__LOCAL_LIBC(memcpyl) __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT32_TYPE__ *
+__LOCAL_LIBC(memcpyl) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT32_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcpyl))(void *__restrict __dst,
                                                      void const *__restrict __src,
                                                      __SIZE_TYPE__ __n_dwords) {
-#line 930 "kos/src/libc/magic/string.c"
+#line 959 "kos/src/libc/magic/string.c"
 	__UINT32_TYPE__ *__pdst = (__UINT32_TYPE__ *)__dst;
 	__UINT32_TYPE__ *__psrc = (__UINT32_TYPE__ *)__src;
 	while (__n_dwords--)

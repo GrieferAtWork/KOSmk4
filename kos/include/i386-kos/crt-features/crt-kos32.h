@@ -2421,6 +2421,8 @@
 #define __CRT_HAVE_memcasecmp 1
 #define __CRT_HAVE_memcasecmp_l 1
 #define __CRT_HAVE_memcasemem 1
+#define __CRT_HAVE_memcasemem0 1
+#define __CRT_HAVE_memcasemem0_l 1
 #define __CRT_HAVE_memcasemem_l 1
 #define __CRT_HAVE_memccpy 1
 #define __CRT_HAVE_memcdup 1

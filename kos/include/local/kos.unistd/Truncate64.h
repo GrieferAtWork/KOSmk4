@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x75c94e84 */
+/* HASH CRC-32:0x123edaf2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(Truncate64) __ATTR_NONNULL((1)) void
 (__LIBCCALL __LIBC_LOCAL_NAME(Truncate64))(char const *__file,
                                            __pos64_t __length) __THROWS(...) {
-#line 473 "kos/src/libc/magic/kos.unistd.c"
+#line 472 "kos/src/libc/magic/kos.unistd.c"
 	__localdep_Truncate32(__file, (__pos32_t)__length);
 }
 __NAMESPACE_LOCAL_END

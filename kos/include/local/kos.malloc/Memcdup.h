@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4a583291 */
+/* HASH CRC-32:0x4099a7e4 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,8 +18,9 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_Memcdup_defined
-#if ((defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc)) || (__has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_memdup) || defined(__CRT_HAVE___memdup))
+#if (defined(__CRT_HAVE_Malloc) || defined(__CRT_HAVE_Memdup))
 #define __local_Memcdup_defined 1
+#include <kos/anno.h>
 #ifdef __LIBC_BIND_OPTIMIZATIONS
 #include <optimized/string.h>
 #endif /* __LIBC_BIND_OPTIMIZATIONS */
@@ -44,7 +45,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,
 #define ____localdep_Memdup_defined 1
 #if defined(__CRT_HAVE_Memdup)
 /* @throws: E_BADALLOC: ... */
-__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_Memdup,(void const *__restrict __ptr, __SIZE_TYPE__ __n_bytes),Memdup,(__ptr,__n_bytes))
+__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_ALLOC_SIZE((2)),void *,,__localdep_Memdup,(void const *__restrict __ptr, __SIZE_TYPE__ __num_bytes),Memdup,(__ptr,__num_bytes)) __THROWS(E_BADALLOC)
 #elif defined(__CRT_HAVE_Malloc)
 #include <local/kos.malloc/Memdup.h>
 /* @throws: E_BADALLOC: ... */
@@ -56,19 +57,19 @@ __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_W
 
 __NAMESPACE_LOCAL_BEGIN
 /* @throws: E_BADALLOC: ... */
-__LOCAL_LIBC(Memcdup) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_ALLOC_SIZE((2)) void *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(Memcdup))(void const *__restrict __ptr,
-                                                     int __needle,
-                                                     __SIZE_TYPE__ __n_bytes) {
-#line 86 "kos/src/libc/magic/kos.malloc.c"
-	if __likely(__n_bytes) {
+__LOCAL_LIBC(Memcdup) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) void *
+(__LIBCCALL __LIBC_LOCAL_NAME(Memcdup))(void const *__restrict __ptr,
+                                        int __needle,
+                                        __SIZE_TYPE__ __num_bytes) __THROWS(E_BADALLOC) {
+#line 60 "kos/src/libc/magic/kos.malloc.c"
+	if __likely(__num_bytes) {
 		void const *__endaddr;
-		__endaddr = __localdep_memchr(__ptr, __needle, __n_bytes - 1);
+		__endaddr = __localdep_memchr(__ptr, __needle, __num_bytes - 1);
 		if (__endaddr)
-			__n_bytes = ((__UINTPTR_TYPE__)__endaddr - (__UINTPTR_TYPE__)__ptr) + 1;
+			__num_bytes = ((__UINTPTR_TYPE__)__endaddr - (__UINTPTR_TYPE__)__ptr) + 1;
 	}
-	return __localdep_Memdup(__ptr, __n_bytes);
+	return __localdep_Memdup(__ptr, __num_bytes);
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc)) || (__has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_memdup) || defined(__CRT_HAVE___memdup)) */
+#endif /* (defined(__CRT_HAVE_Malloc) || defined(__CRT_HAVE_Memdup)) */
 #endif /* !__local_Memcdup_defined */

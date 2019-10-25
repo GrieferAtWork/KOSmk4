@@ -20,21 +20,83 @@
 #define GUARD_LIBC_USER_STRING_C 1
 
 #include "../api.h"
-#include "string.h"
+/**/
 
-#include "../libc/errno.h"
-#include "stdio.h"
-#include "malloc.h"
-#include "stdlib.h"
-#include <string.h>
-#include <malloc.h>
-#include <signal.h>
+#include <parts/dos/errno.h>
+
 #include <assert.h>
 #include <errno.h>
-#include <parts/dos/errno.h>
+#include <malloc.h>
+#include <signal.h>
+#include <string.h>
+
+#include "../libc/errno.h"
+#include "malloc.h"
+#include "stdio.h"
+#include "stdlib.h"
+#include "string.h"
 
 DECL_BEGIN
 
+
+DEFINE_PUBLIC_ALIAS(memcasemem0_l, libc_memcasemem0_l);
+INTERN WUNUSED ATTR_PURE NONNULL((1, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.memory.memcasemem0_l") void *
+NOTHROW_NCX(LIBCCALL libc_memcasemem0_l)(void const *haystack, size_t haystacklen,
+                                         void const *needle, size_t needlelen,
+                                         locale_t locale) {
+	byte_t *candidate, marker;
+	byte_t *hayend;
+	if unlikely(!needlelen || needlelen > haystacklen)
+		return NULL;
+	haystacklen -= (needlelen - 1);
+	marker       = tolower_l(*(byte_t *)needle, locale);
+	hayend       = (byte_t *)haystack + haystacklen;
+	for (;;) {
+		for (candidate = (byte_t *)haystack; candidate < hayend; ++candidate) {
+			byte_t b = *candidate;
+			if (b == marker || tolower_l(b, locale) == marker)
+				goto got_candidate;
+		}
+		break;
+got_candidate:
+		if (memcasecmp_l(candidate, needle, needlelen, locale) == 0)
+			return (void *)candidate;
+		++candidate;
+		haystacklen = ((byte_t *)haystack + haystacklen) - candidate;
+		haystack    = (void const *)candidate;
+	}
+	return NULL;
+}
+
+DEFINE_PUBLIC_ALIAS(memcasemem0, libc_memcasemem0);
+INTERN WUNUSED ATTR_PURE NONNULL((1, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.memory.memcasemem0") void *
+NOTHROW_NCX(LIBCCALL libc_memcasemem0)(void const *haystack, size_t haystacklen,
+                                       void const *needle, size_t needlelen) {
+	byte_t *candidate, marker;
+	byte_t *hayend;
+	if unlikely(!needlelen || needlelen > haystacklen)
+		return NULL;
+	haystacklen -= (needlelen - 1);
+	marker       = tolower(*(byte_t *)needle);
+	hayend       = (byte_t *)haystack + haystacklen;
+	for (;;) {
+		for (candidate = (byte_t *)haystack; candidate < hayend; ++candidate) {
+			byte_t b = *candidate;
+			if (b == marker || tolower(b) == marker)
+				goto got_candidate;
+		}
+		break;
+got_candidate:
+		if (memcasecmp(candidate, needle, needlelen) == 0)
+			return (void *)candidate;
+		++candidate;
+		haystacklen = ((byte_t *)haystack + haystacklen) - candidate;
+		haystack    = (void const *)candidate;
+	}
+	return NULL;
+}
 
 DEFINE_PUBLIC_ALIAS(memmem0, libc_memmem0);
 INTERN WUNUSED ATTR_PURE NONNULL((1, 3))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa446a2cb */
+/* HASH CRC-32:0x7a184c7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,24 +21,24 @@
 #define __local_memcpyq_defined 1
 __NAMESPACE_LOCAL_BEGIN
 /* Copy memory between non-overlapping memory blocks. */
-__LOCAL_LIBC(memcpyq) __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *
+__LOCAL_LIBC(memcpyq) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcpyq))(void *__restrict __dst,
                                                      void const *__restrict __src,
                                                      __SIZE_TYPE__ __n_qwords) {
-#line 1359 "kos/src/libc/magic/string.c"
+#line 1408 "kos/src/libc/magic/string.c"
 #if __SIZEOF_POINTER__ >= 8
 	__UINT64_TYPE__ *__pdst = (__UINT64_TYPE__ *)__dst;
 	__UINT64_TYPE__ *__psrc = (__UINT64_TYPE__ *)__src;
 	while (__n_qwords--)
 		*__pdst++ = *__psrc++;
-#else
+#else /* __SIZEOF_POINTER__ >= 8 */
 	__UINT32_TYPE__ *__pdst = (__UINT32_TYPE__ *)__dst;
 	__UINT32_TYPE__ *__psrc = (__UINT32_TYPE__ *)__src;
 	while (__n_qwords--) {
 		*__pdst++ = *__psrc++;
 		*__pdst++ = *__psrc++;
 	}
-#endif
+#endif /* __SIZEOF_POINTER__ < 8 */
 	return (__UINT64_TYPE__ *)__dst;
 }
 __NAMESPACE_LOCAL_END

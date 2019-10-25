@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfdf16cec */
+/* HASH CRC-32:0xb1ed136f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@
  */
 /* Functions defined in headers, and exported from libc */
 #ifdef __CRT_FUNCTION
-__CRT_FUNCTION(Calloc,0,(),2,(size_t,count,size_t,n_bytes),void *)
+__CRT_FUNCTION(Calloc,0,(),2,(size_t,count,size_t,num_bytes),void *)
 __CRT_FUNCTION(ChRoot,0,(),1,(char const *__restrict,path),void)
 __CRT_FUNCTION(Chdir,0,(),1,(char const *,path),void)
 __CRT_FUNCTION(Chmod,0,(),2,(char const *,filename,mode_t,mode),void)
@@ -86,10 +86,10 @@ __CRT_FUNCTION(LStat,0,(),2,(char const *__restrict,filename,struct stat *__rest
 __CRT_FUNCTION(LStat64,0,(),2,(char const *__restrict,filename,struct stat64 *__restrict,buf),void)
 __CRT_FUNCTION(Link,0,(),2,(char const *,from,char const *,to),void)
 __CRT_FUNCTION(LinkAt,0,(),5,(fd_t,fromfd,char const *,from,fd_t,tofd,char const *,to,atflag_t,flags),void)
-__CRT_FUNCTION(Malloc,0,(),1,(size_t,n_bytes),void *)
-__CRT_FUNCTION(Memalign,0,(),2,(size_t,alignment,size_t,n_bytes),void *)
-__CRT_FUNCTION(Memcdup,0,(),3,(void const *__restrict,ptr,int,needle,size_t,n_bytes),void *)
-__CRT_FUNCTION(Memdup,0,(),2,(void const *__restrict,ptr,size_t,n_bytes),void *)
+__CRT_FUNCTION(Malloc,0,(),1,(size_t,num_bytes),void *)
+__CRT_FUNCTION(Memalign,0,(),2,(size_t,alignment,size_t,num_bytes),void *)
+__CRT_FUNCTION(Memcdup,0,(),3,(void const *__restrict,ptr,int,needle,size_t,num_bytes),void *)
+__CRT_FUNCTION(Memdup,0,(),2,(void const *__restrict,ptr,size_t,num_bytes),void *)
 __CRT_FUNCTION(Mkdir,0,(),2,(char const *,pathname,mode_t,mode),void)
 __CRT_FUNCTION(MkdirAt,0,(),3,(fd_t,dirfd,char const *,pathname,mode_t,mode),void)
 __CRT_FUNCTION(Mkfifo,0,(),2,(char const *,fifoname,mode_t,mode),void)
@@ -105,7 +105,7 @@ __CRT_FUNCTION(PRead,0,(),4,(fd_t,fd,void *,buf,size_t,bufsize,pos_t,offset),siz
 __CRT_FUNCTION(PRead64,1,(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__,PRead),4,(fd_t,fd,void *,buf,size_t,bufsize,pos64_t,offset),size_t)
 __CRT_FUNCTION(PReadAll,0,(),4,(fd_t,fd,void *,buf,size_t,bufsize,pos_t,offset),size_t)
 __CRT_FUNCTION(PReadAll64,1,(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__,preadall),4,(fd_t,fd,void *,buf,size_t,bufsize,pos64_t,offset),size_t)
-__CRT_FUNCTION(PValloc,0,(),1,(size_t,n_bytes),void *)
+__CRT_FUNCTION(PValloc,0,(),1,(size_t,num_bytes),void *)
 __CRT_FUNCTION(PWrite,0,(),4,(fd_t,fd,void const *,buf,size_t,bufsize,pos_t,offset),size_t)
 __CRT_FUNCTION(PWrite64,1,(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__,PWrite),4,(fd_t,fd,void *,buf,size_t,bufsize,pos64_t,offset),size_t)
 __CRT_FUNCTION(PathConf,0,(),2,(char const *,path,int,name),long int)
@@ -115,7 +115,7 @@ __CRT_FUNCTION(Read,0,(),3,(fd_t,fd,void *,buf,size_t,bufsize),size_t)
 __CRT_FUNCTION(ReadAll,0,(),3,(fd_t,fd,void *,buf,size_t,bufsize),size_t)
 __CRT_FUNCTION(Readlink,0,(),3,(char const *__restrict,path,char *__restrict,buf,size_t,buflen),size_t)
 __CRT_FUNCTION(ReadlinkAt,0,(),4,(fd_t,dfd,char const *__restrict,path,char *__restrict,buf,size_t,buflen),size_t)
-__CRT_FUNCTION(Realloc,0,(),2,(void *,mallptr,size_t,n_bytes),void *)
+__CRT_FUNCTION(Realloc,0,(),2,(void *,mallptr,size_t,num_bytes),void *)
 __CRT_FUNCTION(Rmdir,0,(),1,(char const *,path),void)
 __CRT_FUNCTION(SetDomainName,0,(),2,(char const *,name,size_t,len),void)
 __CRT_FUNCTION(SetEGid,0,(),1,(gid_t,egid),void)
@@ -144,7 +144,7 @@ __CRT_FUNCTION(UTimensAt64,1,(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__,UTimens
 __CRT_FUNCTION(Unlink,0,(),1,(char const *,file),void)
 __CRT_FUNCTION(UnlinkAt,0,(),3,(fd_t,dfd,char const *,name,atflag_t,flags),void)
 __CRT_FUNCTION(VFork,0,(),0,(),pid_t)
-__CRT_FUNCTION(Valloc,0,(),1,(size_t,n_bytes),void *)
+__CRT_FUNCTION(Valloc,0,(),1,(size_t,num_bytes),void *)
 __CRT_FUNCTION(Write,0,(),3,(fd_t,fd,void const *,buf,size_t,bufsize),size_t)
 __CRT_FUNCTION(_CrtCheckMemory,0,(),0,(),int)
 __CRT_FUNCTION(_CrtDbgBreak,0,(),0,(),void)
@@ -3180,13 +3180,13 @@ __CRT_FAKE_FUNCTION(lstat,0,(),2,(char const *__restrict,filename,struct stat *_
 __CRT_FAKE_FUNCTION(lstat64,0,(),2,(char const *__restrict,filename,struct stat64 *__restrict,buf),int)
 __CRT_FAKE_FUNCTION(memchrb,0,(),3,(void const *__restrict,haystack,int,byte,size_t,n_bytes),uint8_t *)
 __CRT_FAKE_FUNCTION(memcmpb,0,(),3,(void const *,s1,void const *,s2,size_t,n_bytes),int)
-__CRT_FAKE_FUNCTION(memcpyb,0,(),3,(void *__restrict,dst,void const *__restrict,src,size_t,n_words),uint8_t *)
+__CRT_FAKE_FUNCTION(memcpyb,0,(),3,(void *__restrict,dst,void const *__restrict,src,size_t,n_bytes),uint8_t *)
 __CRT_FAKE_FUNCTION(memendb,0,(),3,(void const *__restrict,haystack,int,byte,size_t,n_bytes),uint8_t *)
 __CRT_FAKE_FUNCTION(memicmp,0,(),3,(void const *,s1,void const *,s2,size_t,n_bytes),int)
 __CRT_FAKE_FUNCTION(memlenb,0,(),3,(void const *__restrict,haystack,int,byte,size_t,n_bytes),size_t)
 __CRT_FAKE_FUNCTION(memmoveb,0,(),3,(void *,dst,void const *,src,size_t,n_bytes),uint8_t *)
 __CRT_FAKE_FUNCTION(mempatb,0,(),3,(void *__restrict,dst,int,pattern,size_t,n_bytes),void *)
-__CRT_FAKE_FUNCTION(mempcpyb,0,(),3,(void *__restrict,dst,void const *__restrict,src,size_t,n_words),uint8_t *)
+__CRT_FAKE_FUNCTION(mempcpyb,0,(),3,(void *__restrict,dst,void const *__restrict,src,size_t,n_bytes),uint8_t *)
 __CRT_FAKE_FUNCTION(mempmoveb,0,(),3,(void *,dst,void const *,src,size_t,n_bytes),uint8_t *)
 __CRT_FAKE_FUNCTION(mempsetb,0,(),3,(void *__restrict,dst,int,byte,size_t,n_bytes),uint8_t *)
 __CRT_FAKE_FUNCTION(memrchrb,0,(),3,(void const *__restrict,haystack,int,byte,size_t,n_bytes),uint8_t *)

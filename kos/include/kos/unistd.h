@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f835bf1 */
+/* HASH CRC-32:0x1e289f38 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -514,10 +514,10 @@ __CDECLARE_VOID(__ATTR_NONNULL((1)),,Pipe2,(__fd_t __pipedes[2], __oflag_t __fla
 __CDECLARE(,__fd_t,,Dup3,(__fd_t __oldfd, __fd_t __newfd, __oflag_t __flags),(__oldfd,__newfd,__flags)) __THROWS(...)
 #endif /* Dup3... */
 #if defined(__CRT_HAVE_GetCurrentDirName)
-__CDECLARE(__ATTR_MALLOC __ATTR_RETNONNULL __ATTR_WUNUSED,char *,,GetCurrentDirName,(void),()) __THROWS(...)
+__CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED,char *,,GetCurrentDirName,(void),()) __THROWS(...)
 #elif defined(__CRT_HAVE_GetCwd)
 #include <local/kos.unistd/GetCurrentDirName.h>
-__NAMESPACE_LOCAL_USING_OR_IMPL(GetCurrentDirName, __FORCELOCAL __ATTR_MALLOC __ATTR_RETNONNULL __ATTR_WUNUSED char *(__LIBCCALL GetCurrentDirName)(void) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(GetCurrentDirName))(); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(GetCurrentDirName, __FORCELOCAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED char *(__LIBCCALL GetCurrentDirName)(void) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(GetCurrentDirName))(); })
 #endif /* GetCurrentDirName... */
 #if defined(__CRT_HAVE_SyncFs)
 __CDECLARE_VOID(,,SyncFs,(__fd_t __fd),(__fd)) __THROWS(...)

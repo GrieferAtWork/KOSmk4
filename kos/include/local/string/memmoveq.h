@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e768a9 */
+/* HASH CRC-32:0xdd43a675 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -21,11 +21,11 @@
 #define __local_memmoveq_defined 1
 __NAMESPACE_LOCAL_BEGIN
 /* Move memory between potentially overlapping memory blocks. */
-__LOCAL_LIBC(memmoveq) __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *
+__LOCAL_LIBC(memmoveq) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)) __UINT64_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memmoveq))(void *__dst,
                                                       void const *__src,
                                                       __SIZE_TYPE__ __n_qwords) {
-#line 1384 "kos/src/libc/magic/string.c"
+#line 1437 "kos/src/libc/magic/string.c"
 #if __SIZEOF_POINTER__ >= 8
 	__UINT64_TYPE__ *__pdst, *__psrc;
 	if (__dst < __src) {
@@ -39,7 +39,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memmoveq))(void *__dst,
 		while (__n_qwords--)
 			*--__pdst = *--__psrc;
 	}
-#else
+#else /* __SIZEOF_POINTER__ >= 8 */
 	__UINT32_TYPE__ *__pdst, *__psrc;
 	if (__dst < __src) {
 		__psrc = (__UINT32_TYPE__ *)__src;
@@ -56,7 +56,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memmoveq))(void *__dst,
 			*--__pdst = *--__psrc;
 		}
 	}
-#endif
+#endif /* __SIZEOF_POINTER__ < 8 */
 	return (__UINT64_TYPE__ *)__dst;
 }
 __NAMESPACE_LOCAL_END

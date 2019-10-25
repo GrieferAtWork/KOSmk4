@@ -390,10 +390,9 @@ Pipe2:([notnull] $fd_t pipedes[2], $oflag_t flags);
 Dup3:($fd_t oldfd, $fd_t newfd, $oflag_t flags) -> $fd_t;
 
 [doc_alias(get_current_dir_name)]
-[throws][cp][ATTR_WUNUSED][ATTR_RETNONNULL][ATTR_MALLOC]
-[noexport][requires($has_function(GetCwd))]
+[throws][cp][noexport][requires($has_function(GetCwd))]
 [section(.text.crt.except.fs.basic_property)]
-GetCurrentDirName:() -> char * {
+GetCurrentDirName:() -> [nonnull, malloc(?)] char * {
 	return GetCwd(NULL, 0);
 }
 

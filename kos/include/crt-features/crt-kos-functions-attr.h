@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x303d115f */
+/* HASH CRC-32:0xa0ece4c2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -564,19 +564,11 @@
 
 
 /* ATTR_NOTHROW_NCX */
-#define __CRT_ATTR_NOTHROW_NCX_Calloc 1
 #define __CRT_ATTR_NOTHROW_NCX_Dup 1
 #define __CRT_ATTR_NOTHROW_NCX_GetResGid 1
 #define __CRT_ATTR_NOTHROW_NCX_GetResUid 1
-#define __CRT_ATTR_NOTHROW_NCX_Malloc 1
-#define __CRT_ATTR_NOTHROW_NCX_Memalign 1
-#define __CRT_ATTR_NOTHROW_NCX_Memcdup 1
-#define __CRT_ATTR_NOTHROW_NCX_Memdup 1
-#define __CRT_ATTR_NOTHROW_NCX_PValloc 1
-#define __CRT_ATTR_NOTHROW_NCX_Realloc 1
 #define __CRT_ATTR_NOTHROW_NCX_SetResGid 1
 #define __CRT_ATTR_NOTHROW_NCX_SetResUid 1
-#define __CRT_ATTR_NOTHROW_NCX_Valloc 1
 #define __CRT_ATTR_NOTHROW_NCX__CrtCheckMemory 1
 #define __CRT_ATTR_NOTHROW_NCX__CrtDbgBreak 1
 #define __CRT_ATTR_NOTHROW_NCX__CrtDbgReport 1
@@ -3772,23 +3764,11 @@
 #define __CRT_ATTR_PURE__mbstrlen_l 1
 #define __CRT_ATTR_PURE__mbstrnlen 1
 #define __CRT_ATTR_PURE__mbstrnlen_l 1
-#define __CRT_ATTR_PURE__memicmp 1
-#define __CRT_ATTR_PURE__memicmp_l 1
 #define __CRT_ATTR_PURE__msize 1
-#define __CRT_ATTR_PURE__strcmpi 1
 #define __CRT_ATTR_PURE__strcoll_l 1
-#define __CRT_ATTR_PURE__stricmp 1
-#define __CRT_ATTR_PURE__stricmp_l 1
 #define __CRT_ATTR_PURE__stricoll 1
-#define __CRT_ATTR_PURE__stricoll_l 1
-#define __CRT_ATTR_PURE__strncmpi 1
-#define __CRT_ATTR_PURE__strncmpi_l 1
 #define __CRT_ATTR_PURE__strncoll 1
-#define __CRT_ATTR_PURE__strncoll_l 1
-#define __CRT_ATTR_PURE__strnicmp 1
-#define __CRT_ATTR_PURE__strnicmp_l 1
 #define __CRT_ATTR_PURE__strnicoll 1
-#define __CRT_ATTR_PURE__strnicoll_l 1
 #define __CRT_ATTR_PURE__towlower_l 1
 #define __CRT_ATTR_PURE__towupper_l 1
 #define __CRT_ATTR_PURE__wcscoll_l 1
@@ -3930,19 +3910,6 @@
 #define __CRT_ATTR_PURE_fuzzy_c32ncasecmp 1
 #define __CRT_ATTR_PURE_fuzzy_c32ncasecmp_l 1
 #define __CRT_ATTR_PURE_fuzzy_c32ncmp 1
-#define __CRT_ATTR_PURE_fuzzy_memcasecmp 1
-#define __CRT_ATTR_PURE_fuzzy_memcasecmp_l 1
-#define __CRT_ATTR_PURE_fuzzy_memcmp 1
-#define __CRT_ATTR_PURE_fuzzy_memcmpb 1
-#define __CRT_ATTR_PURE_fuzzy_memcmpl 1
-#define __CRT_ATTR_PURE_fuzzy_memcmpq 1
-#define __CRT_ATTR_PURE_fuzzy_memcmpw 1
-#define __CRT_ATTR_PURE_fuzzy_strcasecmp 1
-#define __CRT_ATTR_PURE_fuzzy_strcasecmp_l 1
-#define __CRT_ATTR_PURE_fuzzy_strcmp 1
-#define __CRT_ATTR_PURE_fuzzy_strncasecmp 1
-#define __CRT_ATTR_PURE_fuzzy_strncasecmp_l 1
-#define __CRT_ATTR_PURE_fuzzy_strncmp 1
 #define __CRT_ATTR_PURE_fuzzy_wcscasecmp 1
 #define __CRT_ATTR_PURE_fuzzy_wcscasecmp_l 1
 #define __CRT_ATTR_PURE_fuzzy_wcscmp 1
@@ -3969,8 +3936,6 @@
 #define __CRT_ATTR_PURE_iswxdigit_l 1
 #define __CRT_ATTR_PURE_malloc_usable_size 1
 #define __CRT_ATTR_PURE_mbsinit 1
-#define __CRT_ATTR_PURE_memcasecmp 1
-#define __CRT_ATTR_PURE_memcasecmp_l 1
 #define __CRT_ATTR_PURE_memcasemem 1
 #define __CRT_ATTR_PURE_memcasemem_l 1
 #define __CRT_ATTR_PURE_memchr 1
@@ -3988,7 +3953,6 @@
 #define __CRT_ATTR_PURE_memendl 1
 #define __CRT_ATTR_PURE_memendq 1
 #define __CRT_ATTR_PURE_memendw 1
-#define __CRT_ATTR_PURE_memicmp 1
 #define __CRT_ATTR_PURE_memlen 1
 #define __CRT_ATTR_PURE_memlenb 1
 #define __CRT_ATTR_PURE_memlenl 1
@@ -4085,33 +4049,21 @@
 #define __CRT_ATTR_PURE_rawmemxlenq 1
 #define __CRT_ATTR_PURE_rawmemxlenw 1
 #define __CRT_ATTR_PURE_rindex 1
-#define __CRT_ATTR_PURE_strcasecmp 1
-#define __CRT_ATTR_PURE_strcasecmp_l 1
 #define __CRT_ATTR_PURE_strcasecoll 1
-#define __CRT_ATTR_PURE_strcasecoll_l 1
-#define __CRT_ATTR_PURE_strcasestr 1
-#define __CRT_ATTR_PURE_strcasestr_l 1
 #define __CRT_ATTR_PURE_strchr 1
+#define __CRT_ATTR_PURE_strchrnul 1
 #define __CRT_ATTR_PURE_strcmp 1
-#define __CRT_ATTR_PURE_strcmpi 1
 #define __CRT_ATTR_PURE_strcoll 1
 #define __CRT_ATTR_PURE_strcoll_l 1
 #define __CRT_ATTR_PURE_strcspn 1
 #define __CRT_ATTR_PURE_strend 1
-#define __CRT_ATTR_PURE_stricmp 1
 #define __CRT_ATTR_PURE_strlen 1
-#define __CRT_ATTR_PURE_strncasecmp 1
-#define __CRT_ATTR_PURE_strncasecmp_l 1
 #define __CRT_ATTR_PURE_strncasecoll 1
-#define __CRT_ATTR_PURE_strncasecoll_l 1
 #define __CRT_ATTR_PURE_strnchr 1
 #define __CRT_ATTR_PURE_strnchrnul 1
 #define __CRT_ATTR_PURE_strncmp 1
-#define __CRT_ATTR_PURE_strncmpi 1
 #define __CRT_ATTR_PURE_strncoll 1
-#define __CRT_ATTR_PURE_strncoll_l 1
 #define __CRT_ATTR_PURE_strnend 1
-#define __CRT_ATTR_PURE_strnicmp 1
 #define __CRT_ATTR_PURE_strnlen 1
 #define __CRT_ATTR_PURE_strnoff 1
 #define __CRT_ATTR_PURE_strnrchr 1
@@ -4196,8 +4148,6 @@
 #define __CRT_ATTR_PURE_wildc32casecmp 1
 #define __CRT_ATTR_PURE_wildc32casecmp_l 1
 #define __CRT_ATTR_PURE_wildc32cmp 1
-#define __CRT_ATTR_PURE_wildstrcasecmp 1
-#define __CRT_ATTR_PURE_wildstrcasecmp_l 1
 #define __CRT_ATTR_PURE_wildstrcmp 1
 #define __CRT_ATTR_PURE_wildwcscasecmp 1
 #define __CRT_ATTR_PURE_wildwcscasecmp_l 1

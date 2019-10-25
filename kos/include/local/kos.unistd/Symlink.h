@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xea0773c2 */
+/* HASH CRC-32:0x5fd1f23b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(Symlink) __ATTR_NONNULL((1, 2)) void
 (__LIBCCALL __LIBC_LOCAL_NAME(Symlink))(char const *__link_text,
                                         char const *__target_path) __THROWS(...) {
-#line 523 "kos/src/libc/magic/kos.unistd.c"
+#line 522 "kos/src/libc/magic/kos.unistd.c"
 	__localdep_SymlinkAt(__link_text, __CRT_AT_FDCWD, __target_path);
 }
 __NAMESPACE_LOCAL_END

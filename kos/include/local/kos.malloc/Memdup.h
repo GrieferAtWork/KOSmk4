@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x700cdb7b */
+/* HASH CRC-32:0xf3032fcc */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,7 @@
 #ifndef __local_Memdup_defined
 #if defined(__CRT_HAVE_Malloc)
 #define __local_Memdup_defined 1
+#include <kos/anno.h>
 #ifdef __LIBC_BIND_OPTIMIZATIONS
 #include <optimized/string.h>
 #endif /* __LIBC_BIND_OPTIMIZATIONS */
@@ -28,7 +29,7 @@
 #define ____localdep_Malloc_defined 1
 #if defined(__CRT_HAVE_Malloc)
 /* @throws: E_BADALLOC: ... */
-__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,__localdep_Malloc,(__SIZE_TYPE__ __n_bytes),Malloc,(__n_bytes))
+__CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,,__localdep_Malloc,(__SIZE_TYPE__ __num_bytes),Malloc,(__num_bytes)) __THROWS(E_BADALLOC)
 #else /* LIBC: Malloc */
 #undef ____localdep_Malloc_defined
 #endif /* Malloc... */
@@ -44,7 +45,7 @@ __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_W
 #elif defined(__CRT_HAVE_memcpy)
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
-__CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),memcpy,(__dst,__src,__n_bytes))
+__CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__localdep_memcpy,(void *__restrict __dst, void const *__restrict __src, __SIZE_TYPE__ __n_bytes),memcpy,(__dst,__src,__n_bytes))
 #else /* LIBC: memcpy */
 #include <local/string/memcpy.h>
 /* Copy memory between non-overlapping memory blocks.
@@ -56,12 +57,12 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHROW_NCX,__loca
 __NAMESPACE_LOCAL_BEGIN
 /* @throws: E_BADALLOC: ... */
 __LOCAL_LIBC(Memdup) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_ALLOC_SIZE((2)) void *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(Memdup))(void const *__restrict __ptr,
-                                                    __SIZE_TYPE__ __n_bytes) {
-#line 75 "kos/src/libc/magic/kos.malloc.c"
+(__LIBCCALL __LIBC_LOCAL_NAME(Memdup))(void const *__restrict __ptr,
+                                       __SIZE_TYPE__ __num_bytes) __THROWS(E_BADALLOC) {
+#line 51 "kos/src/libc/magic/kos.malloc.c"
 	void *__result;
-	__result = __localdep_Malloc(__n_bytes);
-	__localdep_memcpy(__result, __ptr, __n_bytes);
+	__result = __localdep_Malloc(__num_bytes);
+	__localdep_memcpy(__result, __ptr, __num_bytes);
 	return __result;
 }
 __NAMESPACE_LOCAL_END

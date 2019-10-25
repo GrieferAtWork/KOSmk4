@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x324a5775 */
+/* HASH CRC-32:0xcdf8ef98 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,10 +20,10 @@
 #ifndef __local_memrevw_defined
 #define __local_memrevw_defined 1
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(memrevw) __ATTR_RETNONNULL __ATTR_NONNULL((1)) __UINT16_TYPE__ *
+__LOCAL_LIBC(memrevw) __ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)) __UINT16_TYPE__ *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memrevw))(void *__restrict __base,
                                                      __SIZE_TYPE__ __n_words) {
-#line 4188 "kos/src/libc/magic/string.c"
+#line 4315 "kos/src/libc/magic/string.c"
 	__UINT16_TYPE__ *__iter, *__end;
 	__end = (__iter = (__UINT16_TYPE__ *)__base) + __n_words;
 	while (__iter < __end) {

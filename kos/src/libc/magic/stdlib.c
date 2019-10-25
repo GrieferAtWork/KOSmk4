@@ -1728,12 +1728,12 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p_
 }
 
 %[default_impl_section(.text.crt.dos.application.init)]
-[guard][ATTR_RETNONNULL][ATTR_CONST] __p___argc:() -> int *;
-[guard][ATTR_RETNONNULL][ATTR_CONST] __p___argv:() -> char ***;
-[guard][ATTR_RETNONNULL][ATTR_CONST] __p__pgmptr:() -> char **;
-[guard][ATTR_RETNONNULL][ATTR_CONST][wchar] __p___wargv:() -> wchar_t ***;
-[guard][ATTR_RETNONNULL][ATTR_CONST][wchar] __p__wenviron:() -> wchar_t ***;
-[guard][ATTR_RETNONNULL][ATTR_CONST][wchar] __p__wpgmptr:() -> wchar_t **;
+[guard][ATTR_WUNUSED][ATTR_CONST] __p___argc:() -> [nonnull] int *;
+[guard][ATTR_WUNUSED][ATTR_CONST] __p___argv:() -> [nonnull] char ***;
+[guard][ATTR_WUNUSED][ATTR_CONST] __p__pgmptr:() -> [nonnull] char **;
+[guard][ATTR_WUNUSED][ATTR_CONST][wchar] __p___wargv:() -> [nonnull] wchar_t ***;
+[guard][ATTR_WUNUSED][ATTR_CONST][wchar] __p__wenviron:() -> [nonnull] wchar_t ***;
+[guard][ATTR_WUNUSED][ATTR_CONST][wchar] __p__wpgmptr:() -> [nonnull] wchar_t **;
 
 %{
 #ifdef ____p___argc_defined

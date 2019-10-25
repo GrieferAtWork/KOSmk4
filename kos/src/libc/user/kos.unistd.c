@@ -482,8 +482,8 @@ ATTR_WEAK ATTR_SECTION(".text.crt.except.io.large.read.PReadAll64") size_t
 #endif /* MAGIC:alias */
 /*[[[end:PReadAll64]]]*/
 
-/*[[[head:GetCurrentDirName,hash:CRC-32=0x9130d870]]]*/
-INTERN ATTR_MALLOC ATTR_RETNONNULL WUNUSED
+/*[[[head:GetCurrentDirName,hash:CRC-32=0x7906c608]]]*/
+INTERN ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.except.fs.basic_property.GetCurrentDirName") char *
 (LIBCCALL libc_GetCurrentDirName)(void)
 		__THROWS(...)

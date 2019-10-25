@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6b5a3ce8 */
+/* HASH CRC-32:0x311898c9 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,13 +20,13 @@
 #ifndef __local_Valloc_defined
 #if defined(__CRT_HAVE_Memalign)
 #define __local_Valloc_defined 1
-#include <hybrid/__limits.h>
+#include <kos/anno.h>
 /* Dependency: "Memalign" */
 #ifndef ____localdep_Memalign_defined
 #define ____localdep_Memalign_defined 1
 #if defined(__CRT_HAVE_Memalign)
 /* @throws: E_BADALLOC: ... */
-__CREDIRECT(__ATTR_MALLOC __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_ALIGN(1),void *,__NOTHROW_NCX,__localdep_Memalign,(__SIZE_TYPE__ __alignment, __SIZE_TYPE__ __n_bytes),Memalign,(__alignment,__n_bytes))
+__CREDIRECT(__ATTR_MALLOC __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_ALIGN(1),void *,,__localdep_Memalign,(__SIZE_TYPE__ __alignment, __SIZE_TYPE__ __num_bytes),Memalign,(__alignment,__num_bytes)) __THROWS(E_BADALLOC)
 #else /* LIBC: Memalign */
 #undef ____localdep_Memalign_defined
 #endif /* Memalign... */
@@ -53,10 +53,10 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_getpagesize
 
 __NAMESPACE_LOCAL_BEGIN
 /* @throws: E_BADALLOC: ... */
-__LOCAL_LIBC(Valloc) __ATTR_MALL_PAGEALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) void *
-__NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(Valloc))(__SIZE_TYPE__ __n_bytes) {
-#line 64 "kos/src/libc/magic/kos.malloc.c"
-	return __localdep_Memalign(__localdep_getpagesize(), __n_bytes);
+__LOCAL_LIBC(Valloc) __ATTR_MALLOC __ATTR_MALL_PAGEALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)) void *
+(__LIBCCALL __LIBC_LOCAL_NAME(Valloc))(__SIZE_TYPE__ __num_bytes) __THROWS(E_BADALLOC) {
+#line 43 "kos/src/libc/magic/kos.malloc.c"
+	return __localdep_Memalign(__localdep_getpagesize(), __num_bytes);
 }
 __NAMESPACE_LOCAL_END
 #endif /* defined(__CRT_HAVE_Memalign) */

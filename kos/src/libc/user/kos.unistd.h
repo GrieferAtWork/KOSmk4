@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5740ebb0 */
+/* HASH CRC-32:0x804319d3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -197,7 +197,7 @@ INTDEF NONNULL((2)) size_t (LIBCCALL libc_PWrite64)(fd_t fd, void *buf, size_t b
 INTDEF NONNULL((2)) size_t (LIBCCALL libc_PReadAll64)(fd_t fd, void *buf, size_t bufsize, pos64_t offset) __THROWS(...);
 INTDEF NONNULL((1)) void (LIBCCALL libc_Pipe2)(fd_t pipedes[2], oflag_t flags) __THROWS(...);
 INTDEF fd_t (LIBCCALL libc_Dup3)(fd_t oldfd, fd_t newfd, oflag_t flags) __THROWS(...);
-INTDEF ATTR_MALLOC ATTR_RETNONNULL WUNUSED char *(LIBCCALL libc_GetCurrentDirName)(void) __THROWS(...);
+INTDEF ATTR_MALLOC ATTR_MALL_DEFAULT_ALIGNED ATTR_RETNONNULL WUNUSED char *(LIBCCALL libc_GetCurrentDirName)(void) __THROWS(...);
 INTDEF void (LIBCCALL libc_SyncFs)(fd_t fd) __THROWS(...);
 INTDEF void NOTHROW_NCX(LIBCCALL libc_GetResUid)(uid_t *ruid, uid_t *euid, uid_t *suid);
 INTDEF void NOTHROW_NCX(LIBCCALL libc_GetResGid)(gid_t *rgid, gid_t *egid, gid_t *sgid);

@@ -29,67 +29,41 @@ __SYSDECL_BEGIN
 
 %[default_impl_section(.text.crt.except.heap.malloc)]
 
+[throws(E_BADALLOC)] Malloc:(size_t num_bytes) -> [nonnull, malloc(num_bytes)] void *;
+[throws(E_BADALLOC)] Calloc:(size_t count, size_t num_bytes) -> [nonnull, malloc(count * num_bytes)] void *;
+[throws(E_BADALLOC)] Realloc:(void *mallptr, size_t num_bytes) -> [nonnull, realloc(mallptr, num_bytes)] void *;
+[throws(E_BADALLOC)] Memalign:(size_t alignment, size_t num_bytes) -> [nonnull, memalign(alignment, num_bytes)] void *;
 
-@@@throws: E_BADALLOC: ...
-Malloc:(size_t n_bytes) -> [nonnull][malloc(n_bytes)] void *;
+[throws(E_BADALLOC)][section(.text.crt.except.heap.rare_helpers)]
+PValloc:(size_t num_bytes) -> [nonnull, memalign(getpagesize(), num_bytes)] void *;
 
-@@@throws: E_BADALLOC: ...
-[ATTR_WUNUSED][ATTR_MALL_DEFAULT_ALIGNED][ATTR_MALLOC]
-[ATTR_RETNONNULL][ATTR_ALLOC_SIZE((1, 2))]
-Calloc:(size_t count, size_t n_bytes) -> void *;
-
-@@@throws: E_BADALLOC: ...
-[ATTR_WUNUSED][ATTR_MALL_DEFAULT_ALIGNED]
-[ATTR_MALLOC][ATTR_ALLOC_SIZE((2))][ATTR_RETNONNULL]
-Realloc:(void *mallptr, size_t n_bytes) -> void *;
-
-@@@throws: E_BADALLOC: ...
-[ATTR_WUNUSED][ATTR_ALLOC_ALIGN(1)][ATTR_ALLOC_SIZE((2))]
-[ATTR_MALLOC][ATTR_RETNONNULL]
-Memalign:(size_t alignment, size_t n_bytes) -> void *;
-
-@@@throws: E_BADALLOC: ...
-[ATTR_WUNUSED][ATTR_MALL_PAGEALIGNED][ATTR_ALLOC_SIZE((1))]
-[ATTR_MALLOC][ATTR_RETNONNULL]
+[throws(E_BADALLOC)][noexport][requires($has_function(Memalign))]
 [section(.text.crt.except.heap.rare_helpers)]
-PValloc:(size_t n_bytes) -> void *;
-
-@@@throws: E_BADALLOC: ...
-[noexport][ATTR_RETNONNULL]
-[ATTR_WUNUSED][ATTR_MALL_PAGEALIGNED][ATTR_ALLOC_SIZE((1))]
-[requires($has_function(Memalign))]
-[dependency_include(<hybrid/__limits.h>)]
-[section(.text.crt.except.heap.rare_helpers)]
-Valloc:(size_t n_bytes) -> void * {
-	return Memalign(getpagesize(), n_bytes);
+Valloc:(size_t num_bytes) -> [nonnull, memalign(getpagesize(), num_bytes)] void * {
+	return Memalign(getpagesize(), num_bytes);
 }
 
 
 %
 %#ifdef __USE_KOS
-@@@throws: E_BADALLOC: ...
-[ATTR_WUNUSED][ATTR_MALL_DEFAULT_ALIGNED][ATTR_ALLOC_SIZE((2))]
-[ATTR_MALLOC][requires($has_function(Malloc))][ATTR_RETNONNULL]
-[section(.text.crt.except.heap.rare_helpers)]
-Memdup:([nonnull] void const *__restrict ptr, size_t n_bytes) -> void * {
+[throws(E_BADALLOC)][requires($has_function(Malloc))][section(.text.crt.except.heap.rare_helpers)]
+Memdup:([nonnull] void const *__restrict ptr, size_t num_bytes) -> [nonnull, malloc(num_bytes)] void * {
 	void *result;
-	result = Malloc(n_bytes);
-	memcpy(result, ptr, n_bytes);
+	result = Malloc(num_bytes);
+	memcpy(result, ptr, num_bytes);
 	return result;
 }
 
 @@@throws: E_BADALLOC: ...
-[ATTR_WUNUSED][ATTR_MALL_DEFAULT_ALIGNED][ATTR_ALLOC_SIZE((2))]
-[ATTR_MALLOC][alias(__memcdup)][requires($has_function(memdup))]
-[section(.text.crt.except.heap.rare_helpers)][ATTR_RETNONNULL]
-Memcdup:([nonnull] void const *__restrict ptr, int needle, size_t n_bytes) -> void * {
-	if likely(n_bytes) {
+[throws(E_BADALLOC)][requires($has_function(Memdup))][section(.text.crt.except.heap.rare_helpers)]
+Memcdup:([nonnull] void const *__restrict ptr, int needle, size_t num_bytes) -> [nonnull, malloc(?)] void * {
+	if likely(num_bytes) {
 		void const *endaddr;
-		endaddr = memchr(ptr, needle, n_bytes - 1);
+		endaddr = memchr(ptr, needle, num_bytes - 1);
 		if (endaddr)
-			n_bytes = ((uintptr_t)endaddr - (uintptr_t)ptr) + 1;
+			num_bytes = ((uintptr_t)endaddr - (uintptr_t)ptr) + 1;
 	}
-	return Memdup(ptr, n_bytes);
+	return Memdup(ptr, num_bytes);
 }
 %#endif /* __USE_KOS */
 

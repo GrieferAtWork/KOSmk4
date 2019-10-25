@@ -633,6 +633,43 @@ local paren_match = {
 };
 
 @@Split a given argument list into the individual arguments
+function findfirstch_parenaware(text: string, find_chars: string, start: int = 0, end: int = -1): int {
+	if (end < 0)
+		end = #text;
+	local i = start;
+	while (i < end) {
+		local ch = text[i];
+		if (ch in find_chars)
+			return i;
+		if (ch in ["(", "[", "{"]) {
+			i = text.indexmatch(ch, paren_match[ch], i + 1) + 1;
+			continue;
+		}
+		if (ch == "/" && text.substr(i + 1, i + 2) == "*") {
+			i = text.index("*/", i + 2) + 2;
+			continue;
+		}
+		if (ch in ["\"", "\'"]) {
+			++i;
+			while (i < end) {
+				local ch2 = text[i];
+				if (ch2 == ch)
+					break;
+				if (ch2 == "\\") {
+					++i;
+					if (i >= end)
+						break;
+				}
+				++i;
+			}
+			continue;
+		}
+		++i;
+	}
+	return -1;
+}
+
+@@Split a given argument list into the individual arguments
 function split_argument_list_args(l: string): {string...} {
 	local i = 0;
 	local len = #l;
@@ -728,11 +765,15 @@ function split_variable_name(s: string): (string, string) {
 }
 
 
+global split_argument_list;
+
 @@Parse special annotations applied to a function return type
 @@@param: args: A list of (typ, name) for each argument taken
 function parse_return_type_annotations(return_type: string,
 		args: {(string, string)...},
-		function_attr: List with string = none, file: string = none, line: int = none): string {
+		function_attr: List with string = none,
+		arglist_attributes: List with string = none,
+		file: string = none, line: int = none): string {
 	function err(message: string) {
 		print getFilenameForLog(file),;
 		print "(",;
@@ -745,98 +786,132 @@ function parse_return_type_annotations(return_type: string,
 		local e = return_type.findmatch("[", "]", 1);
 		if (e < 0)
 			break;
-		local attr = return_type[1:e].strip();
+		local attr_text = return_type[1:e].strip();
 		return_type = return_type[e + 1:].lstrip();
-		if (attr in ["nonnull", "notnull"] || attr.replace(" ", "") in ["1..1"]) {
-			if ("ATTR_RETNONNULL" in function_attr)
-				err("Duplicate attribute: ATTR_RETNONNULL");
-			function_attr.append("ATTR_RETNONNULL");
-		} else if (attr in ["nullable"] || attr.replace(" ", "") in ["0..1"]) {
-			;
-		} else if (attr in ["wunused"]) {
-			if ("ATTR_WUNUSED" in function_attr)
-				err("Duplicate attribute: ATTR_WUNUSED");
-			function_attr.append("ATTR_WUNUSED");
-		} else if (attr in ["restrict"]) {
-			if ("ATTR_MALLOC" in function_attr)
-				err("Duplicate attribute: ATTR_MALLOC");
-			function_attr.append("ATTR_MALLOC");
-		} else if (attr.startswith("malloc") || attr.startswith("realloc") ||
-		           attr.startswith("realign") || attr.startswith("memalign")) {
-			local is_memalign = attr.startswith("memalign");
-			local is_realloc = attr.startswith("realloc");
-			local is_realign = attr.startswith("realign");
-			local argslist = attr[(is_memalign ? 8 : (is_realloc || is_realign) ? 7 : 6):].lstrip();
-			local is_unaligned = argslist.startswith("_unaligned");
-			if (is_unaligned)
-				argslist = argslist[10:];
-			if ("ATTR_WUNUSED" !in function_attr)
-				function_attr.append("ATTR_WUNUSED");
-			if (!is_realloc && !is_realign) {
-				if ("ATTR_MALLOC" in function_attr)
-					err("Duplicate attribute: ATTR_MALLOC");
-				function_attr.append("ATTR_MALLOC");
-			} else {
-				if ("ATTR_MALLOC" in function_attr)
-					err("realloc()-like functions mustn't be declared with `ATTR_MALLOC'");
-			}
-			if (argslist.startswith("(") && argslist.endswith(")")) {
-				argslist = argslist[1:-1];
-				if (is_realloc || is_realign) {
-					/* First argument is the pointer that gets reallocated */
-					argslist = argslist.partition(",")[2];
-					argslist = argslist.strip();
+		for (local attr: split_argument_list_args(attr_text)) {
+			if (attr in ["nonnull", "notnull"] || attr.replace(" ", "") in ["1..1"]) {
+				if ("ATTR_RETNONNULL" !in function_attr)
+					function_attr.append("ATTR_RETNONNULL");
+			} else if (attr in ["nullable"] || attr.replace(" ", "") in ["0..1"]) {
+				;
+			} else if (attr in ["wunused"]) {
+				if ("ATTR_WUNUSED" !in function_attr)
+					function_attr.append("ATTR_WUNUSED");
+			} else if (attr in ["restrict"]) {
+				if ("ATTR_MALLOC" !in function_attr)
+					function_attr.append("ATTR_MALLOC");
+			} else if (attr.startswith("malloc") || attr.startswith("realloc") ||
+			           attr.startswith("realign") || attr.startswith("memalign")) {
+				local is_memalign = attr.startswith("memalign");
+				local is_realloc = attr.startswith("realloc");
+				local is_realign = attr.startswith("realign");
+				local argslist = attr[(is_memalign ? 8 : (is_realloc || is_realign) ? 7 : 6):].lstrip();
+				local is_unaligned = argslist.startswith("_unaligned");
+				if (is_unaligned)
+					argslist = argslist[10:];
+				if ("ATTR_WUNUSED" !in function_attr)
+					function_attr.append("ATTR_WUNUSED");
+				if (!is_realloc && !is_realign) {
+					if ("ATTR_MALLOC" !in function_attr)
+						function_attr.append("ATTR_MALLOC");
+				} else {
+					if ("ATTR_MALLOC" in function_attr)
+						err("realloc()-like functions mustn't be declared with `ATTR_MALLOC'");
 				}
-				if (is_memalign || is_realign) {
-					local alignment;
-					alignment, none, argslist = argslist.partition(",")...;
-					alignment = alignment.strip();
-					argslist = argslist.strip();
-					/* Check the argument list for an argument with the same name as `alignment'.
-					 * If it's not one of them, assume a fixed alignment annotation. */
-					local alignment_argi = none;
+				if (argslist.startswith("(") && argslist.endswith(")")) {
+					argslist = argslist[1:-1];
+					if (is_realloc || is_realign) {
+						/* First argument is the pointer that gets reallocated */
+						argslist = argslist.partition(",")[2];
+						argslist = argslist.strip();
+					}
+					if (is_memalign || is_realign) {
+						local alignment;
+						alignment, none, argslist = argslist.partition(",")...;
+						alignment = alignment.strip();
+						argslist = argslist.strip();
+						/* Check the argument list for an argument with the same name as `alignment'.
+						* If it's not one of them, assume a fixed alignment annotation. */
+						local alignment_argi = none;
+						import enumerate from util;
+						for (local i, data: enumerate(args)) {
+							if (alignment == data[1]) {
+								alignment_argi = i;
+								break;
+							}
+						}
+						if (alignment_argi !is none) {
+							function_attr.append("ATTR_ALLOC_ALIGN({})".format({ alignment_argi + 1 }));
+						} else if (alignment in ["PAGESIZE", "__SIZEOF_PAGE__"] ||
+						           alignment.replace(" ", "") in ["getpagesize()"]) {
+							function_attr.append("ATTR_MALL_PAGEALIGNED");
+						} else {
+							function_attr.append("ATTR_ASSUME_ALIGNED({})".format({ alignment }));
+						}
+					} else if (!is_unaligned) {
+						/* Non-aligning functions get the default mall-alignment attribute */
+						function_attr.append("ATTR_MALL_DEFAULT_ALIGNED");
+					}
+					/* Parse the second argument, which is the name of the argument
+					* that describes the size of the data blob returned by the function.
+					* Optionally, more than once argument may be specified like this:
+					* >> calloc(size_t count, size_t num_bytes) -> [malloc(count * num_bytes)] void *; */
+					local count_arg_indices = [];
+					for (local n: argslist.split("*")) {
+						n = n.strip();
+						if (n in ["?"])
+							continue;
+						for (local i = 0;; ++i) {
+							if (i >= #args)
+								goto unknown_malloc_argument_size;
+							local an = args[i][1];
+							if (an == n) {
+								count_arg_indices.append(i);
+								break;
+							}
+						}
+					}
+					if (count_arg_indices) {
+						function_attr.append("ATTR_ALLOC_SIZE(({}))"
+							.format({ ", ".join(count_arg_indices.each + 1) }));
+					}
+unknown_malloc_argument_size:
+					;
+				} else if (argslist) {
+					err("Unrecognized text after `[malloc' or `[memalign': " + repr(argslist));
+				}
+			} else if (attr.startswith("==")) {
+				attr = attr[2:].lstrip();
+				if ("+" in attr) /* Also allow some kind of offset from another argument. */
+					attr = attr[:attr.index("+")].rstrip();
+				if (attr.issymbol()) {
+					/* Check if the named argument has the [nonnull] tag */
 					import enumerate from util;
 					for (local i, data: enumerate(args)) {
-						if (alignment == data[1]) {
-							alignment_argi = i;
-							break;
-						}
-					}
-					if (alignment_argi !is none) {
-						function_attr.append("ATTR_ALLOC_ALIGN({})".format({ alignment_argi + 1 }));
-					} else {
-						function_attr.append("ATTR_ASSUME_ALIGNED({})".format({ alignment }));
-					}
-				} else if (!is_unaligned) {
-					/* Non-aligning functions get the default mall-alignment attribute */
-					function_attr.append("ATTR_MALL_DEFAULT_ALIGNED");
-				}
-				/* Parse the second argument, which is the name of the argument
-				 * that describes the size of the data blob returned by the function.
-				 * Optionally, more than once argument may be specified like this:
-				 * >> calloc(size_t count, size_t num_bytes) -> [malloc(count * num_bytes)] void *; */
-				local count_arg_indices = [];
-				for (local n: argslist.split("*")) {
-					n = n.strip();
-					for (local i = 0;; ++i) {
-						if (i >= #args)
-							err("Unknown argument: {!r}".format({ n }));
-						local an = args[i][1];
-						if (an == n) {
-							count_arg_indices.append(i);
-							break;
+						if (data[1] == attr) {
+							local str_i = str(i + 1);
+							for (local x: arglist_attributes) {
+								if (x.startswith("ATTR_NONNULL((") &&
+								    x.endswith("))")) {
+									for (local j: x[14:-2].split(",")) {
+										j = j.strip();
+										if (j == str_i) {
+											if ("ATTR_RETNONNULL" !in function_attr)
+												function_attr.append("ATTR_RETNONNULL");
+											break;
+										}
+									}
+								}
+							}
+							goto found_equals_argument;
 						}
 					}
 				}
-				if (count_arg_indices) {
-					function_attr.append("ATTR_ALLOC_SIZE(({}))"
-						.format({ ", ".join(count_arg_indices.each + 1) }));
-				}
-			} else if (argslist) {
-				err("Unrecognized text after `[malloc' or `[memalign': " + repr(argslist));
+found_equals_argument:
+				;
+			} else {
+				err("Unknown return-type attribute " + repr(attr));
 			}
-		} else {
-			err("Unknown return-type attribute " + repr(attr));
 		}
 	}
 	return return_type;
@@ -858,32 +933,34 @@ function split_argument_list(l: string,
 			local e = typ.findmatch("[", "]", 1);
 			if (e < 0)
 				break;
-			local attr = typ[1:e].strip();
+			local attr_text = typ[1:e].strip();
 			typ = typ[e + 1:].lstrip();
-			if (attr in ["nonnull", "notnull"] || attr.replace(" ", "") in ["1..1"]) {
+			for (local attr: split_argument_list_args(attr_text)) {
+				if (attr in ["nonnull", "notnull"] || attr.replace(" ", "") in ["1..1"]) {
 add_nonnull:
-				non_null_arguments.append(i);
-			} else if (attr in ["nullable"] || attr.replace(" ", "") in ["0..1"]) {
-				;
-			} else if (attr.startswith("inp(") && attr.endswith(")")) {
-				goto add_nonnull;
-			} else if (attr.startswith("outp(") && attr.endswith(")")) {
-				goto add_nonnull;
-			} else if (attr.startswith("inoutp(") && attr.endswith(")")) {
-				goto add_nonnull;
-			} else if (attr.startswith("inp_opt(") && attr.endswith(")")) {
-				;
-			} else if (attr.startswith("outp_opt(") && attr.endswith(")")) {
-				;
-			} else if (attr.startswith("inoutp_opt(") && attr.endswith(")")) {
-				;
-			} else {
-				print getFilenameForLog(file),;
-				print "(",;
-				print line,;
-				print ") : Error : Unknown argument attribute ",;
-				print repr(attr);
-				throw Error("Unknown argument attribute " + repr(attr));
+					non_null_arguments.append(i);
+				} else if (attr in ["nullable"] || attr.replace(" ", "") in ["0..1"]) {
+					;
+				} else if (attr.startswith("inp(") && attr.endswith(")")) {
+					goto add_nonnull;
+				} else if (attr.startswith("outp(") && attr.endswith(")")) {
+					goto add_nonnull;
+				} else if (attr.startswith("inoutp(") && attr.endswith(")")) {
+					goto add_nonnull;
+				} else if (attr.startswith("inp_opt(") && attr.endswith(")")) {
+					;
+				} else if (attr.startswith("outp_opt(") && attr.endswith(")")) {
+					;
+				} else if (attr.startswith("inoutp_opt(") && attr.endswith(")")) {
+					;
+				} else {
+					print getFilenameForLog(file),;
+					print "(",;
+					print line,;
+					print ") : Error : Unknown argument attribute ",;
+					print repr(attr);
+					throw Error("Unknown argument attribute " + repr(attr));
+				}
 			}
 		}
 		yield (typ, nam);
@@ -2488,48 +2565,48 @@ again_enum_name:
 			do ++i;
 			while (text.isspace(i));
 			local return_type = "void";
-			if (text.substr(i, i+2) == "->") {
+			if (text.substr(i, i + 2) == "->") {
 				i += 2;
 				local return_type_start = i;
-				i = text.find("{", return_type_start);
-				local j = text.find("=", return_type_start);
-				local k = text.find(";", return_type_start);
-				local l = text.find("%", return_type_start);
-				if (i < 0 || (j >= 0 && j < i)) i = j;
-				if (i < 0 || (k >= 0 && k < i)) i = k;
-				if (i < 0 || (l >= 0 && l < i)) i = l;
-				if (i < 0) err(return_type_start, "Expected `;', `{', `%' or `=' after return type");
-				local inner_end = text.find("[", return_type_start, i);
-				if (inner_end >= 0) {
+				i = findfirstch_parenaware(text, "{=;%", return_type_start);
+				if (i < 0)
+					err(return_type_start, "Expected `;', `{', `%' or `=' after return type");
+				local return_type_end = findfirstch_parenaware(text, "[", return_type_start, i);
+				if (return_type_end >= 0) {
 					for (;;) {
-						local temp = inner_end + 1;
+						local temp = return_type_end + 1;
 						while (temp < i && text.isspace(temp))
 							++temp;
 						if (temp >= i) {
-							inner_end = i;
+							return_type_end = i;
 							break;
 						}
 						if (text[temp] == "(")
 							break;
-						inner_end = text.findmatch("[", "]", temp, i);
-						if (inner_end < 0) {
-							inner_end = i;
+						return_type_end = text.findmatch("[", "]", temp, i);
+						if (return_type_end < 0) {
+							return_type_end = i;
 							break;
 						}
-						++inner_end;
-						while (inner_end < #text && text.isspace(temp))
-							++inner_end;
+						++return_type_end;
+						return_type_end = findfirstch_parenaware(text, "[", return_type_end, i);
+						if (return_type_end < 0) {
+							return_type_end = i;
+							break;
+						}
 					}
-					i = inner_end;
+					i = return_type_end;
 				}
 				return_type = text.substr(return_type_start, i).strip();
 				if (return_type.startswith("[")) {
 					local myline = text.count("\n", 0, argument_list_start) + 1;
+					local arglist_attributes = List();
 					local arglist = Tuple(split_argument_list(
-						argument_list, none, filename, myline));
+						argument_list, arglist_attributes, filename, myline));
 					return_type = parse_return_type_annotations(
 						return_type, arglist,
-						function_attributes, filename, myline);
+						function_attributes,
+						arglist_attributes, filename, myline);
 				}
 			}
 			local ch = text[i];
@@ -2925,6 +3002,16 @@ again_enum_name:
 			fun.impl_section = impl_section;
 			fun.dependency_string = dependency_string;
 			fun.helper_function = helper_function;
+			if ((doc is string && !doc) && function_throws_anno) {
+				/* Auto-generate one documentation line for every
+				 * type of exception which may be thrown by the function */
+				File.Writer throws_anno;
+				for (local x: function_throws_anno)
+					throws_anno << "@throws: " << x << ": ...\n";
+				if (doc && !doc.endswith("\n"))
+					doc += "\n";
+				doc += throws_anno.string.strip();
+			}
 			fun.doc = doc;
 			if (include_line_directives) {
 				fun.block_starting_line = text.count("\n", 0, block_start);

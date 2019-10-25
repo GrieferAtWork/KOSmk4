@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x83d25cd */
+/* HASH CRC-32:0x39110b87 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -19,13 +19,28 @@
  */
 #ifndef __local_memcasemem_l_defined
 #define __local_memcasemem_l_defined 1
+/* Dependency: "tolower_l" from "ctype" */
+#ifndef ____localdep_tolower_l_defined
+#define ____localdep_tolower_l_defined 1
+#if defined(__CRT_HAVE_tolower_l)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_tolower_l,(int __ch, __locale_t __locale),tolower_l,(__ch,__locale))
+#elif defined(__CRT_HAVE__tolower_l)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_tolower_l,(int __ch, __locale_t __locale),_tolower_l,(__ch,__locale))
+#elif defined(__CRT_HAVE___tolower_l)
+__CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_tolower_l,(int __ch, __locale_t __locale),__tolower_l,(__ch,__locale))
+#else /* LIBC: tolower_l */
+#include <local/ctype/tolower_l.h>
+#define __localdep_tolower_l (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tolower_l))
+#endif /* tolower_l... */
+#endif /* !____localdep_tolower_l_defined */
+
 /* Dependency: "memcasecmp_l" from "string" */
 #ifndef ____localdep_memcasecmp_l_defined
 #define ____localdep_memcasecmp_l_defined 1
 #if defined(__CRT_HAVE_memcasecmp_l)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcasecmp_l,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes, __locale_t __locale),memcasecmp_l,(__s1,__s2,__n_bytes,__locale))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcasecmp_l,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes, __locale_t __locale),memcasecmp_l,(__s1,__s2,__n_bytes,__locale))
 #elif defined(__CRT_HAVE__memicmp_l)
-__CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcasecmp_l,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes, __locale_t __locale),_memicmp_l,(__s1,__s2,__n_bytes,__locale))
+__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_memcasecmp_l,(void const *__s1, void const *__s2, __SIZE_TYPE__ __n_bytes, __locale_t __locale),_memicmp_l,(__s1,__s2,__n_bytes,__locale))
 #else /* LIBC: memcasecmp_l */
 #include <local/string/memcasecmp_l.h>
 #define __localdep_memcasecmp_l (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memcasecmp_l))
@@ -33,18 +48,49 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,
 #endif /* !____localdep_memcasecmp_l_defined */
 
 __NAMESPACE_LOCAL_BEGIN
+#include <features.h>
+/* Return the address of a sub-string `needle...+=needlelen' stored within `haystack...+=haystacklen'
+ * During comprisons, casing of character is ignored using the given `locale' (s.a. `memmem()')
+ * If no such sub-string exists, return `NULL' instead.
+ * #ifdef _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
+ * When `needlelen' is ZERO(0), also return `NULL' unconditionally.
+ * #else // _MEMMEM_EMPTY_NEEDLE_NULL_SOURCE
+ * When `needlelen' is ZERO(0), re-return `haystack + haystacklen' unconditionally.
+ * #endif // !_MEMMEM_EMPTY_NEEDLE_NULL_SOURCE */
 __LOCAL_LIBC(memcasemem_l) __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)) void *
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(memcasemem_l))(void const *__haystack,
                                                           __SIZE_TYPE__ __haystacklen,
                                                           void const *__needle,
                                                           __SIZE_TYPE__ __needlelen,
                                                           __locale_t __locale) {
-#line 2451 "kos/src/libc/magic/string.c"
-	__BYTE_TYPE__ *__iter = (__BYTE_TYPE__ *)__haystack;
-	while (__haystacklen >= __needlelen) {
-		if (__localdep_memcasecmp_l(__iter, __needle, __needlelen, __locale) == 0)
-			return (void *)__iter;
-		++__iter;
+#line 2540 "kos/src/libc/magic/string.c"
+	__BYTE_TYPE__ *__candidate, __marker;
+	__BYTE_TYPE__ *__hayend;
+#if defined(__USE_MEMMEM_EMPTY_NEEDLE_NULL) && !defined(__BUILDING_LIBC)
+	if __unlikely(!__needlelen || __needlelen > __haystacklen)
+		return __NULLPTR;
+#else /* __USE_MEMMEM_EMPTY_NEEDLE_NULL && !__BUILDING_LIBC */
+	if __unlikely(!__needlelen)
+		return (__BYTE_TYPE__ *)__haystack + __haystacklen;
+	if __unlikely(__needlelen > __haystacklen)
+		return __NULLPTR;
+#endif /* !__USE_MEMMEM_EMPTY_NEEDLE_NULL || __BUILDING_LIBC */
+	__haystacklen -= (__needlelen - 1);
+	__marker       = __localdep_tolower_l(*(__BYTE_TYPE__ *)__needle, __locale);
+	__hayend       = (__BYTE_TYPE__ *)__haystack + __haystacklen;
+	for (;;) {
+		for (__candidate = (__BYTE_TYPE__ *)__haystack; __candidate < __hayend; ++__candidate) {
+			__BYTE_TYPE__ __b = *__candidate;
+			if (__b == __marker || __localdep_tolower_l(__b, __locale) == __marker)
+				goto __got_candidate;
+		}
+		break;
+__got_candidate:
+		if (__localdep_memcasecmp_l(__candidate, __needle, __needlelen, __locale) == 0)
+			return (void *)__candidate;
+		++__candidate;
+		__haystacklen = ((__BYTE_TYPE__ *)__haystack + __haystacklen) - __candidate;
+		__haystack    = (void const *)__candidate;
 	}
 	return __NULLPTR;
 }

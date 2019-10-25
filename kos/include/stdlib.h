@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x35a09f0a */
+/* HASH CRC-32:0xf6e22e7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2051,7 +2051,7 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW,__p_
 #ifndef ____p___argc_defined
 #define ____p___argc_defined 1
 #if defined(__CRT_HAVE___p___argc)
-__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL,int *,__NOTHROW_NCX,__p___argc,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,int *,__NOTHROW_NCX,__p___argc,(void),())
 #else /* LIBC: __p___argc */
 #undef ____p___argc_defined
 #endif /* __p___argc... */
@@ -2059,7 +2059,7 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL,int *,__NOTHROW_NCX,__p___argc,(void),
 #ifndef ____p___argv_defined
 #define ____p___argv_defined 1
 #if defined(__CRT_HAVE___p___argv)
-__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW_NCX,__p___argv,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char ***,__NOTHROW_NCX,__p___argv,(void),())
 #else /* LIBC: __p___argv */
 #undef ____p___argv_defined
 #endif /* __p___argv... */
@@ -2067,7 +2067,7 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL,char ***,__NOTHROW_NCX,__p___argv,(voi
 #ifndef ____p__pgmptr_defined
 #define ____p__pgmptr_defined 1
 #if defined(__CRT_HAVE___p__pgmptr)
-__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL,char **,__NOTHROW_NCX,__p__pgmptr,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,char **,__NOTHROW_NCX,__p__pgmptr,(void),())
 #else /* LIBC: __p__pgmptr */
 #undef ____p__pgmptr_defined
 #endif /* __p__pgmptr... */
@@ -2075,7 +2075,7 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL,char **,__NOTHROW_NCX,__p__pgmptr,(voi
 #ifndef ____p___wargv_defined
 #define ____p___wargv_defined 1
 #if defined(__CRT_HAVE___p___wargv)
-__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL,wchar_t ***,__NOTHROW_NCX,__p___wargv,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,wchar_t ***,__NOTHROW_NCX,__p___wargv,(void),())
 #else /* LIBC: __p___wargv */
 #undef ____p___wargv_defined
 #endif /* __p___wargv... */
@@ -2083,7 +2083,7 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL,wchar_t ***,__NOTHROW_NCX,__p___wargv,
 #ifndef ____p__wenviron_defined
 #define ____p__wenviron_defined 1
 #if defined(__CRT_HAVE___p__wenviron)
-__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL,wchar_t ***,__NOTHROW_NCX,__p__wenviron,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,wchar_t ***,__NOTHROW_NCX,__p__wenviron,(void),())
 #else /* LIBC: __p__wenviron */
 #undef ____p__wenviron_defined
 #endif /* __p__wenviron... */
@@ -2091,7 +2091,7 @@ __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL,wchar_t ***,__NOTHROW_NCX,__p__wenviro
 #ifndef ____p__wpgmptr_defined
 #define ____p__wpgmptr_defined 1
 #if defined(__CRT_HAVE___p__wpgmptr)
-__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL,wchar_t **,__NOTHROW_NCX,__p__wpgmptr,(void),())
+__CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,wchar_t **,__NOTHROW_NCX,__p__wpgmptr,(void),())
 #else /* LIBC: __p__wpgmptr */
 #undef ____p__wpgmptr_defined
 #endif /* __p__wpgmptr... */
