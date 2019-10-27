@@ -166,6 +166,7 @@ __NOTHROW_NCX(__DLFCN_CALL dlgetmodule)(char const *__name,
 __IMPDEF __ATTR_WUNUSED __fd_t __NOTHROW_NCX(__DLFCN_CALL dlmodulefd)(void *__handle);
 
 /* Return the internally used filename for the given module `HANDLE'
+ * Note that this path is an absolute, canonical (realpath()) filename.
  * @param: HANDLE: A handle returned by `dlopen()'.
  * @return: * :    The absolute, unambiguous filename for the given module `HANDLE'
  * @return: NULL:  Error (s.a. `dlerror()') */
