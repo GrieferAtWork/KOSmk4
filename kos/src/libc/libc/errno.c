@@ -293,7 +293,9 @@ NOBLOCK /*dos*/errno_t NOTHROW(LIBDCALL libd_geterrno)(void) {
 	return *libd_errno_p();
 }
 
+DEFINE_PUBLIC_ALIAS(_dosmaperr, libd_seterrno);
 DEFINE_PUBLIC_ALIAS(__set_doserrno, libd_seterrno);
+DEFINE_INTERN_ALIAS(libc__dosmaperr, libd_seterrno);
 DEFINE_INTERN_ALIAS(libd___set_doserrno, libd_seterrno);
 INTERN ATTR_SECTION(".text.crt.dos.errno_access.__set_doserrno")
 NOBLOCK syscall_slong_t NOTHROW(LIBDCALL libd_seterrno)(/*dos*/errno_t value) {
@@ -303,7 +305,6 @@ NOBLOCK syscall_slong_t NOTHROW(LIBDCALL libd_seterrno)(/*dos*/errno_t value) {
 	d->ed_kind  = LIBC_ERRNO_KIND_DOS;
 	return -1;
 }
-
 
 DEFINE_PUBLIC_ALIAS(__doserrno, libd_nterrno_p);
 DEFINE_INTERN_ALIAS(libd___doserrno, libd_nterrno_p);

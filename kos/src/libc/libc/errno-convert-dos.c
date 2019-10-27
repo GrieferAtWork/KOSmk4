@@ -46,7 +46,6 @@ NOBLOCK /*nt*/errno_t NOTHROW(LIBDCALL libd_errno_kos2nt)(/*kos*/errno_t value) 
 	return libd_errno_dos2nt(libd_errno_kos2dos(value));
 }
 
-DEFINE_PUBLIC_ALIAS(_dosmaperr, libd_errno_nt2dos);
 DEFINE_PUBLIC_ALIAS(errno_nt2dos, libd_errno_nt2dos);
 DEFINE_INTERN_ALIAS(libd__dosmaperr, libd_errno_nt2dos);
 INTERN ATTR_SECTION(".text.crt.dos.errno_access.errno_nt2dos")
