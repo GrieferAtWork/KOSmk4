@@ -689,7 +689,7 @@ NOTHROW_RPC(LIBCCALL libc_system)(char const *__restrict command)
 	if (cpid < 0)
 		return -1;
 	for (;;) {
-		error = waitpid(cpid, &status, WEXITED);
+		error = waitpid(cpid, &status, 0);
 		if (error == cpid)
 			break;
 		if (error >= 0)
@@ -697,7 +697,9 @@ NOTHROW_RPC(LIBCCALL libc_system)(char const *__restrict command)
 		if (libc_geterrno() != EINTR)
 			return -1;
 	}
-	return status;
+	return WIFEXITED(status)
+	       ? WEXITSTATUS(status)
+	       : 1;
 }
 /*[[[end:system]]]*/
 
