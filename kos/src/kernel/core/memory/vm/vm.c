@@ -4293,11 +4293,16 @@ NOTHROW(KCALL vm_copyinphys)(PHYS vm_phys_t dst,
 	if unlikely(!num_bytes)
 		return;
 	bufsize = stack_avail() / 2;
-	if (bufsize > 1024)
-		bufsize -= 1024;
+	if (bufsize > 512 * sizeof(void *))
+		bufsize -= 512 * sizeof(void *);
+	else {
+		bufsize = 128 * sizeof(void *);
+	}
 	if (bufsize > num_bytes)
 		bufsize = num_bytes;
 	else {
+		if unlikely(!bufsize)
+			bufsize = pagedir_pagesize();
 		/* XXX: Try to acquire a lock to the kernel VM and try to temporarily
 		 *      make use of some unused region of virtual memory to temporarily
 		 *      map both `dst' and `src', allowing us to transfer data directly.

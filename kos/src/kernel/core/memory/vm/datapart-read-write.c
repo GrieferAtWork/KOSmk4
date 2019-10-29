@@ -162,7 +162,7 @@ vm_datapart_writev_phys(struct vm_datapart *__restrict self,
 
 
 
-FUNDEF NONNULL((1)) size_t KCALL
+PUBLIC NONNULL((1)) size_t KCALL
 vm_datapart_read_buffered(struct vm_datapart *__restrict self,
                           USER CHECKED void *dst,
                           size_t num_bytes,
@@ -171,8 +171,10 @@ vm_datapart_read_buffered(struct vm_datapart *__restrict self,
 	size_t temp, bufsize = stack_avail();
 	byte_t *buf;
 	size_t result = 0;
-	if (bufsize > 512 * sizeof(void *))
-		bufsize -= 512 * sizeof(void *);
+	/* TODO: Don't use an intermediate buffer!
+	 *       Instead, use memcpy_nopf(), and write faulting bytes 1 byte at a time! */
+	if (bufsize > 2048 * sizeof(void *))
+		bufsize -= 2048 * sizeof(void *);
 	else {
 		bufsize = 128 * sizeof(void *);
 	}
@@ -201,7 +203,7 @@ vm_datapart_read_buffered(struct vm_datapart *__restrict self,
 	return result;
 }
 
-FUNDEF NONNULL((1)) size_t KCALL
+PUBLIC NONNULL((1)) size_t KCALL
 vm_datapart_write_buffered(struct vm_datapart *__restrict self,
                            USER CHECKED void const *src,
                            size_t num_bytes,
@@ -211,8 +213,10 @@ vm_datapart_write_buffered(struct vm_datapart *__restrict self,
 	size_t temp, bufsize = stack_avail();
 	byte_t *buf;
 	size_t result = 0;
-	if (bufsize > 512 * sizeof(void *))
-		bufsize -= 512 * sizeof(void *);
+	/* TODO: Don't use an intermediate buffer!
+	 *       Instead, use memcpy_nopf(), and write faulting bytes 1 byte at a time! */
+	if (bufsize > 2048 * sizeof(void *))
+		bufsize -= 2048 * sizeof(void *);
 	else {
 		bufsize = 128 * sizeof(void *);
 	}

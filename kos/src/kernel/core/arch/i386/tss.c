@@ -232,33 +232,52 @@ DEFINE_DBG_BZERO(&PERCPU(x86_cputss_df).t_ecx, sizeof(x86_cputss_df.t_ecx));
 
 PUBLIC NOBLOCK WUNUSED size_t
 NOTHROW(KCALL stack_avail)(void) {
-	uintptr_t sp = __rdsp();
+	vm_virt_t start, end;
+	vm_virt_t sp = (vm_virt_t)__rdsp();
 #ifndef __x86_64__
 	struct cpu *c = THIS_CPU;
-	if unlikely(FORCPU(c, x86_cputss_df.t_ecx))
-		sp -= (uintptr_t)VM_PAGE2ADDR(FORCPU(c, x86_this_dfstack).vn_node.a_vmin);
-	else
+	if unlikely(FORCPU(c, x86_cputss_df.t_ecx)) {
+		struct vm_node const *node;
+		node  = &FORCPU(c, x86_this_dfstack);
+		start = VM_NODE_STARTADDR(node);
+		end   = VM_NODE_ENDADDR(node);
+	} else
 #endif /* !__x86_64__ */
 	{
-		sp -= (uintptr_t)VM_PAGE2ADDR(THIS_KERNEL_STACK->vn_node.a_vmin);
+		struct vm_node const *node;
+		node  = THIS_KERNEL_STACK;
+		start = VM_NODE_STARTADDR(node);
+		end   = VM_NODE_ENDADDR(node);
 	}
-	return sp;
+	if likely(sp >= start && sp < end)
+		return (size_t)(sp - start);
+	return 0;
 }
 
 PUBLIC NOBLOCK WUNUSED size_t
 NOTHROW(KCALL stack_inuse)(void) {
-	uintptr_t sp = __rdsp();
+	vm_virt_t start, end;
+	vm_virt_t sp = (vm_virt_t)__rdsp();
 #ifndef __x86_64__
 	struct cpu *c = THIS_CPU;
-	if unlikely(FORCPU(c, x86_cputss_df.t_ecx))
-		sp = (uintptr_t)VM_PAGE2ADDR(FORCPU(c, x86_this_dfstack).vn_node.a_vmax + 1) - sp;
-	else
+	if unlikely(FORCPU(c, x86_cputss_df.t_ecx)) {
+		struct vm_node const *node;
+		node  = &FORCPU(c, x86_this_dfstack);
+		start = VM_NODE_STARTADDR(node);
+		end   = VM_NODE_ENDADDR(node);
+	} else
 #endif /* !__x86_64__ */
 	{
-		sp = (uintptr_t)VM_PAGE2ADDR(PERTASK_GET(*(vm_vpage_t *)&_this_kernel_stack.vn_node.a_vmax) + 1) - sp;
+		struct vm_node const *node;
+		node  = THIS_KERNEL_STACK;
+		start = VM_NODE_STARTADDR(node);
+		end   = VM_NODE_ENDADDR(node);
 	}
-	return sp;
+	if likely(sp >= start && sp < end)
+		return (size_t)(end - sp);
+	return 0;
 }
+
 PUBLIC NOBLOCK WUNUSED ATTR_CONST ATTR_RETNONNULL
 struct vm_node const *NOTHROW(KCALL stack_current)(void) {
 	struct vm_node const *result;

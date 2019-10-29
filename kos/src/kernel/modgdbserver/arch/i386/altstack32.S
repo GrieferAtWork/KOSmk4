@@ -47,6 +47,7 @@ INTERN_FUNCTION(GDB_MainWithAlternateStack)
 	leave
 	.cfi_restore %ebp
 	.cfi_adjust_cfa_offset -4
+	.cfi_def_cfa_register %esp
 	ret
 	.cfi_endproc
 END(GDB_MainWithAlternateStack)
