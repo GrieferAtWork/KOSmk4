@@ -19,23 +19,23 @@
 
 #ifdef __INTELLISENSE__
 #include "vio.c"
-#define IO_READ 1
-//#define IO_WRITE 1
-#endif
+#define DEFINE_IO_READ 1
+//#define DEFINE_IO_WRITE 1
+#endif /* __INTELLISENSE__ */
 
 DECL_BEGIN
 
-#if (defined(IO_READ) + defined(IO_WRITE)) != 1
-#error "Must #define IO_READ or IO_WRITE before #include-ing  this file"
+#if (defined(DEFINE_IO_READ) + defined(DEFINE_IO_WRITE)) != 1
+#error "Must #define DEFINE_IO_READ or DEFINE_IO_WRITE before #include-ing  this file"
 #endif
 
 
-#ifdef IO_READ
+#ifdef DEFINE_IO_READ
 PUBLIC NONNULL((1)) void KCALL
 vio_copyfromvio_to_phys(struct vio_args *__restrict args,
                         vm_phys_t dst, vm_daddr_t src,
                         size_t num_bytes)
-#elif defined(IO_WRITE)
+#elif defined(DEFINE_IO_WRITE)
 PUBLIC NONNULL((1)) void KCALL
 vio_copytovio_from_phys(struct vio_args *__restrict args,
                         vm_daddr_t dst, vm_phys_t src,
@@ -50,9 +50,9 @@ vio_copytovio_from_phys(struct vio_args *__restrict args,
 	is_first = true;
 	tramp    = THIS_TRAMPOLINE_PAGE;
 	TRY {
-#ifdef IO_READ
+#ifdef DEFINE_IO_READ
 #define PHYS_BUF   dst
-#elif defined(IO_WRITE)
+#elif defined(DEFINE_IO_WRITE)
 #define PHYS_BUF   src
 #endif
 		for (;;) {
@@ -62,7 +62,7 @@ vio_copytovio_from_phys(struct vio_args *__restrict args,
 			page_bytes = PAGESIZE - (PHYS_BUF & (PAGESIZE - 1));
 			if (page_bytes > num_bytes)
 				page_bytes = num_bytes;
-#ifdef IO_READ
+#ifdef DEFINE_IO_READ
 			if (is_first) {
 				backup = pagedir_push_mapone(tramp, pageaddr,
 				                             PAGEDIR_MAP_FWRITE);
@@ -70,7 +70,7 @@ vio_copytovio_from_phys(struct vio_args *__restrict args,
 				pagedir_mapone(tramp, pageaddr,
 				               PAGEDIR_MAP_FWRITE);
 			}
-#elif defined(IO_WRITE)
+#elif defined(DEFINE_IO_WRITE)
 			if (is_first) {
 				backup = pagedir_push_mapone(tramp, pageaddr,
 				                             PAGEDIR_MAP_FREAD);
@@ -81,12 +81,12 @@ vio_copytovio_from_phys(struct vio_args *__restrict args,
 #endif
 			pagedir_syncone(tramp);
 			/* Copy memory. */
-#ifdef IO_READ
+#ifdef DEFINE_IO_READ
 			vio_copyfromvio(args,
 			                (byte_t *)(VM_PAGE2ADDR(tramp) + (ptrdiff_t)(PHYS_BUF & (PAGESIZE - 1))),
 			                src,
 			                page_bytes);
-#elif defined(IO_WRITE)
+#elif defined(DEFINE_IO_WRITE)
 			vio_copytovio(args,
 			              dst,
 			              (byte_t *)(VM_PAGE2ADDR(tramp) + (ptrdiff_t)(PHYS_BUF & (PAGESIZE - 1))),
@@ -96,9 +96,9 @@ vio_copytovio_from_phys(struct vio_args *__restrict args,
 				break;
 			num_bytes -= page_bytes;
 			PHYS_BUF += page_bytes;
-#ifdef IO_READ
+#ifdef DEFINE_IO_READ
 			src += page_bytes;
-#elif defined(IO_WRITE)
+#elif defined(DEFINE_IO_WRITE)
 			dst += page_bytes;
 #endif
 		}
@@ -112,8 +112,8 @@ vio_copytovio_from_phys(struct vio_args *__restrict args,
 }
 
 
-#undef IO_WRITE
-#undef IO_READ
+#undef DEFINE_IO_WRITE
+#undef DEFINE_IO_READ
 
 
 DECL_END

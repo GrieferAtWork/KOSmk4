@@ -1884,7 +1884,6 @@
 #define __CRT_HAVE_vm_datablock_physical 1
 #define __CRT_HAVE_vm_datablock_physical_type 1
 #define __CRT_HAVE_vm_datablock_read 1
-#define __CRT_HAVE_vm_datablock_read_buffered 1
 #define __CRT_HAVE_vm_datablock_read_unsafe 1
 #define __CRT_HAVE_vm_datablock_readp 1
 #define __CRT_HAVE_vm_datablock_readv 1
@@ -1899,7 +1898,6 @@
 #define __CRT_HAVE_vm_datablock_vio_writev 1
 #define __CRT_HAVE_vm_datablock_vio_writev_phys 1
 #define __CRT_HAVE_vm_datablock_write 1
-#define __CRT_HAVE_vm_datablock_write_buffered 1
 #define __CRT_HAVE_vm_datablock_write_unsafe 1
 #define __CRT_HAVE_vm_datablock_writep 1
 #define __CRT_HAVE_vm_datablock_writev 1

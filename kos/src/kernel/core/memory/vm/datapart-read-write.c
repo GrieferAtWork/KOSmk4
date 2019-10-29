@@ -247,17 +247,21 @@ vm_datapart_write_buffered(struct vm_datapart *__restrict self,
 DECL_END
 
 #ifndef __INTELLISENSE__
-#define IO_READ 1
-#define IO_PHYS 1
+#undef DEFINE_IO_READ
+#undef DEFINE_IO_PHYS
+#undef DEFINE_IO_WRITE
+
+#define DEFINE_IO_READ 1
+#define DEFINE_IO_PHYS 1
 #include "datapart-read-write-base.c.inl"
-#define IO_WRITE 1
-#define IO_PHYS 1
+#define DEFINE_IO_WRITE 1
+#define DEFINE_IO_PHYS 1
 #include "datapart-read-write-base.c.inl"
-#define IO_READ 1
+#define DEFINE_IO_READ 1
 #include "datapart-read-write-base.c.inl"
-#define IO_WRITE 1
+#define DEFINE_IO_WRITE 1
 #include "datapart-read-write-base.c.inl"
-#endif
+#endif /* !__INTELLISENSE__ */
 
 
 #endif /* !GUARD_KERNEL_SRC_MEMORY_VM_VM_DATAPART_READ_WRITE_C_INL */

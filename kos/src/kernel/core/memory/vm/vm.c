@@ -2805,53 +2805,45 @@ done:
 #ifndef __INTELLISENSE__
 DECL_END
 
-#undef IO_READ
-#undef IO_WRITE
-#undef IO_PHYS
-#undef IO_VECTOR
-#undef IO_UNSAFE
-#undef IO_BUFFERED
+#undef DEFINE_IO_READ
+#undef DEFINE_IO_WRITE
+#undef DEFINE_IO_PHYS
+#undef DEFINE_IO_VECTOR
+#undef DEFINE_IO_UNSAFE
 
-#define IO_READ 1
-#define IO_UNSAFE 1
+#define DEFINE_IO_READ 1
+#define DEFINE_IO_UNSAFE 1
 #include "vm-datablock-read-write-base.c.inl"
-#define IO_WRITE 1
-#define IO_UNSAFE 1
-#include "vm-datablock-read-write-base.c.inl"
-
-#define IO_READ 1
-#define IO_BUFFERED 1
-#include "vm-datablock-read-write-base.c.inl"
-#define IO_WRITE 1
-#define IO_BUFFERED 1
+#define DEFINE_IO_WRITE 1
+#define DEFINE_IO_UNSAFE 1
 #include "vm-datablock-read-write-base.c.inl"
 
-#define IO_READ 1
-#define IO_PHYS 1
-#define IO_VECTOR 1
+#define DEFINE_IO_READ 1
+#define DEFINE_IO_PHYS 1
+#define DEFINE_IO_VECTOR 1
 #include "vm-datablock-read-write-base.c.inl"
-#define IO_WRITE 1
-#define IO_PHYS 1
-#define IO_VECTOR 1
-#include "vm-datablock-read-write-base.c.inl"
-
-#define IO_READ 1
-#define IO_PHYS 1
-#include "vm-datablock-read-write-base.c.inl"
-#define IO_WRITE 1
-#define IO_PHYS 1
+#define DEFINE_IO_WRITE 1
+#define DEFINE_IO_PHYS 1
+#define DEFINE_IO_VECTOR 1
 #include "vm-datablock-read-write-base.c.inl"
 
-#define IO_READ 1
-#define IO_VECTOR 1
+#define DEFINE_IO_READ 1
+#define DEFINE_IO_PHYS 1
 #include "vm-datablock-read-write-base.c.inl"
-#define IO_WRITE 1
-#define IO_VECTOR 1
+#define DEFINE_IO_WRITE 1
+#define DEFINE_IO_PHYS 1
 #include "vm-datablock-read-write-base.c.inl"
 
-#define IO_READ 1
+#define DEFINE_IO_READ 1
+#define DEFINE_IO_VECTOR 1
 #include "vm-datablock-read-write-base.c.inl"
-#define IO_WRITE 1
+#define DEFINE_IO_WRITE 1
+#define DEFINE_IO_VECTOR 1
+#include "vm-datablock-read-write-base.c.inl"
+
+#define DEFINE_IO_READ 1
+#include "vm-datablock-read-write-base.c.inl"
+#define DEFINE_IO_WRITE 1
 #include "vm-datablock-read-write-base.c.inl"
 
 DECL_BEGIN

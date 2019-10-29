@@ -875,70 +875,70 @@ FUNDEF NONNULL((1)) void KCALL _block_device_writev_phys_sync(struct block_devic
 #ifndef __INTELLISENSE__
 DECL_END
 
-#undef IO_READ
-#undef IO_WRITE
-#undef IO_SECTOR
-#undef IO_PHYS
-#undef IO_VECTOR
+#undef DEFINE_IO_READ
+#undef DEFINE_IO_WRITE
+#undef DEFINE_IO_SECTOR
+#undef DEFINE_IO_PHYS
+#undef DEFINE_IO_VECTOR
 
-#define IO_READ 1
-#define IO_SECTOR 1
-#define IO_PHYS 1
+#define DEFINE_IO_READ 1
+#define DEFINE_IO_SECTOR 1
+#define DEFINE_IO_PHYS 1
 #include "block-async-io.c.inl"
-#define IO_READ 1
-#define IO_SECTOR 1
+#define DEFINE_IO_READ 1
+#define DEFINE_IO_SECTOR 1
 #include "block-async-io.c.inl"
-#define IO_WRITE 1
-#define IO_SECTOR 1
-#define IO_PHYS 1
+#define DEFINE_IO_WRITE 1
+#define DEFINE_IO_SECTOR 1
+#define DEFINE_IO_PHYS 1
 #include "block-async-io.c.inl"
-#define IO_WRITE 1
-#define IO_SECTOR 1
-#include "block-async-io.c.inl"
-
-#define IO_VECTOR 1
-#define IO_READ 1
-#define IO_SECTOR 1
-#define IO_PHYS 1
-#include "block-async-io.c.inl"
-#define IO_VECTOR 1
-#define IO_READ 1
-#define IO_SECTOR 1
-#include "block-async-io.c.inl"
-#define IO_VECTOR 1
-#define IO_WRITE 1
-#define IO_SECTOR 1
-#define IO_PHYS 1
-#include "block-async-io.c.inl"
-#define IO_VECTOR 1
-#define IO_WRITE 1
-#define IO_SECTOR 1
+#define DEFINE_IO_WRITE 1
+#define DEFINE_IO_SECTOR 1
 #include "block-async-io.c.inl"
 
-#define IO_READ 1
-#define IO_PHYS 1
+#define DEFINE_IO_VECTOR 1
+#define DEFINE_IO_READ 1
+#define DEFINE_IO_SECTOR 1
+#define DEFINE_IO_PHYS 1
 #include "block-async-io.c.inl"
-#define IO_READ 1
+#define DEFINE_IO_VECTOR 1
+#define DEFINE_IO_READ 1
+#define DEFINE_IO_SECTOR 1
 #include "block-async-io.c.inl"
-#define IO_WRITE 1
-#define IO_PHYS 1
+#define DEFINE_IO_VECTOR 1
+#define DEFINE_IO_WRITE 1
+#define DEFINE_IO_SECTOR 1
+#define DEFINE_IO_PHYS 1
 #include "block-async-io.c.inl"
-#define IO_WRITE 1
+#define DEFINE_IO_VECTOR 1
+#define DEFINE_IO_WRITE 1
+#define DEFINE_IO_SECTOR 1
 #include "block-async-io.c.inl"
 
-#define IO_VECTOR 1
-#define IO_READ 1
-#define IO_PHYS 1
+#define DEFINE_IO_READ 1
+#define DEFINE_IO_PHYS 1
 #include "block-async-io.c.inl"
-#define IO_READ 1
-#define IO_VECTOR 1
+#define DEFINE_IO_READ 1
 #include "block-async-io.c.inl"
-#define IO_VECTOR 1
-#define IO_WRITE 1
-#define IO_PHYS 1
+#define DEFINE_IO_WRITE 1
+#define DEFINE_IO_PHYS 1
 #include "block-async-io.c.inl"
-#define IO_VECTOR 1
-#define IO_WRITE 1
+#define DEFINE_IO_WRITE 1
+#include "block-async-io.c.inl"
+
+#define DEFINE_IO_VECTOR 1
+#define DEFINE_IO_READ 1
+#define DEFINE_IO_PHYS 1
+#include "block-async-io.c.inl"
+#define DEFINE_IO_READ 1
+#define DEFINE_IO_VECTOR 1
+#include "block-async-io.c.inl"
+#define DEFINE_IO_VECTOR 1
+#define DEFINE_IO_WRITE 1
+#define DEFINE_IO_PHYS 1
+#include "block-async-io.c.inl"
+#define DEFINE_IO_VECTOR 1
+#define DEFINE_IO_WRITE 1
 #include "block-async-io.c.inl"
 
 DECL_BEGIN

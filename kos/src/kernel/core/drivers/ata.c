@@ -1809,184 +1809,184 @@ DECL_END
 
 #ifndef __INTELLISENSE__
 
-#undef IO_READ
-#undef IO_WRITE
-#undef IO_PHYS
-#undef IO_VECTOR
-#undef IO_DMA
-#undef IO_LBA28
-#undef IO_LBA48
-#undef IO_CHS
+#undef DEFINE_IO_READ
+#undef DEFINE_IO_WRITE
+#undef DEFINE_IO_PHYS
+#undef DEFINE_IO_VECTOR
+#undef DEFINE_IO_DMA
+#undef DEFINE_IO_LBA28
+#undef DEFINE_IO_LBA48
+#undef DEFINE_IO_CHS
 
 /* PIO Transfer helper functions. */
-#define IO_VECTOR 1
-#define IO_PHYS 1
-#define IO_READ 1
+#define DEFINE_IO_VECTOR 1
+#define DEFINE_IO_PHYS 1
+#define DEFINE_IO_READ 1
 #include "ata/ata-pio-transfer.c.inl"
-#define IO_VECTOR 1
-#define IO_READ 1
+#define DEFINE_IO_VECTOR 1
+#define DEFINE_IO_READ 1
 #include "ata/ata-pio-transfer.c.inl"
-#define IO_PHYS 1
-#define IO_READ 1
+#define DEFINE_IO_PHYS 1
+#define DEFINE_IO_READ 1
 #include "ata/ata-pio-transfer.c.inl"
-#define IO_READ 1
+#define DEFINE_IO_READ 1
 #include "ata/ata-pio-transfer.c.inl"
-#define IO_VECTOR 1
-#define IO_PHYS 1
-#define IO_WRITE 1
+#define DEFINE_IO_VECTOR 1
+#define DEFINE_IO_PHYS 1
+#define DEFINE_IO_WRITE 1
 #include "ata/ata-pio-transfer.c.inl"
-#define IO_VECTOR 1
-#define IO_WRITE 1
+#define DEFINE_IO_VECTOR 1
+#define DEFINE_IO_WRITE 1
 #include "ata/ata-pio-transfer.c.inl"
-#define IO_PHYS 1
-#define IO_WRITE 1
+#define DEFINE_IO_PHYS 1
+#define DEFINE_IO_WRITE 1
 #include "ata/ata-pio-transfer.c.inl"
-#define IO_WRITE 1
+#define DEFINE_IO_WRITE 1
 #include "ata/ata-pio-transfer.c.inl"
 
 
 /* DMA + READ */
-#define IO_DMA 1
-#define IO_VECTOR 1
-#define IO_PHYS 1
-#define IO_READ 1
+#define DEFINE_IO_DMA 1
+#define DEFINE_IO_VECTOR 1
+#define DEFINE_IO_PHYS 1
+#define DEFINE_IO_READ 1
 #include "ata/ata-io.c.inl"
-#define IO_DMA 1
-#define IO_VECTOR 1
-#define IO_READ 1
+#define DEFINE_IO_DMA 1
+#define DEFINE_IO_VECTOR 1
+#define DEFINE_IO_READ 1
 #include "ata/ata-io.c.inl"
-#define IO_DMA 1
-#define IO_PHYS 1
-#define IO_READ 1
+#define DEFINE_IO_DMA 1
+#define DEFINE_IO_PHYS 1
+#define DEFINE_IO_READ 1
 #include "ata/ata-io.c.inl"
-#define IO_DMA 1
-#define IO_READ 1
+#define DEFINE_IO_DMA 1
+#define DEFINE_IO_READ 1
 #include "ata/ata-io.c.inl"
 
 /* DMA + WRITE */
-#define IO_DMA 1
-#define IO_VECTOR 1
-#define IO_PHYS 1
-#define IO_WRITE 1
+#define DEFINE_IO_DMA 1
+#define DEFINE_IO_VECTOR 1
+#define DEFINE_IO_PHYS 1
+#define DEFINE_IO_WRITE 1
 #include "ata/ata-io.c.inl"
-#define IO_DMA 1
-#define IO_VECTOR 1
-#define IO_WRITE 1
+#define DEFINE_IO_DMA 1
+#define DEFINE_IO_VECTOR 1
+#define DEFINE_IO_WRITE 1
 #include "ata/ata-io.c.inl"
-#define IO_DMA 1
-#define IO_PHYS 1
-#define IO_WRITE 1
+#define DEFINE_IO_DMA 1
+#define DEFINE_IO_PHYS 1
+#define DEFINE_IO_WRITE 1
 #include "ata/ata-io.c.inl"
-#define IO_DMA 1
-#define IO_WRITE 1
+#define DEFINE_IO_DMA 1
+#define DEFINE_IO_WRITE 1
 #include "ata/ata-io.c.inl"
 
 /* CHS + READ */
-#define IO_CHS 1
-#define IO_VECTOR 1
-#define IO_PHYS 1
-#define IO_READ 1
+#define DEFINE_IO_CHS 1
+#define DEFINE_IO_VECTOR 1
+#define DEFINE_IO_PHYS 1
+#define DEFINE_IO_READ 1
 #include "ata/ata-io.c.inl"
-#define IO_CHS 1
-#define IO_VECTOR 1
-#define IO_READ 1
+#define DEFINE_IO_CHS 1
+#define DEFINE_IO_VECTOR 1
+#define DEFINE_IO_READ 1
 #include "ata/ata-io.c.inl"
-#define IO_CHS 1
-#define IO_PHYS 1
-#define IO_READ 1
+#define DEFINE_IO_CHS 1
+#define DEFINE_IO_PHYS 1
+#define DEFINE_IO_READ 1
 #include "ata/ata-io.c.inl"
-#define IO_CHS 1
-#define IO_READ 1
+#define DEFINE_IO_CHS 1
+#define DEFINE_IO_READ 1
 #include "ata/ata-io.c.inl"
 
 /* CHS + WRITE */
-#define IO_CHS 1
-#define IO_VECTOR 1
-#define IO_PHYS 1
-#define IO_WRITE 1
+#define DEFINE_IO_CHS 1
+#define DEFINE_IO_VECTOR 1
+#define DEFINE_IO_PHYS 1
+#define DEFINE_IO_WRITE 1
 #include "ata/ata-io.c.inl"
-#define IO_CHS 1
-#define IO_VECTOR 1
-#define IO_WRITE 1
+#define DEFINE_IO_CHS 1
+#define DEFINE_IO_VECTOR 1
+#define DEFINE_IO_WRITE 1
 #include "ata/ata-io.c.inl"
-#define IO_CHS 1
-#define IO_PHYS 1
-#define IO_WRITE 1
+#define DEFINE_IO_CHS 1
+#define DEFINE_IO_PHYS 1
+#define DEFINE_IO_WRITE 1
 #include "ata/ata-io.c.inl"
-#define IO_CHS 1
-#define IO_WRITE 1
+#define DEFINE_IO_CHS 1
+#define DEFINE_IO_WRITE 1
 #include "ata/ata-io.c.inl"
 
 /* LBA28 + READ */
-#define IO_LBA28 1
-#define IO_VECTOR 1
-#define IO_PHYS 1
-#define IO_READ 1
+#define DEFINE_IO_LBA28 1
+#define DEFINE_IO_VECTOR 1
+#define DEFINE_IO_PHYS 1
+#define DEFINE_IO_READ 1
 #include "ata/ata-io.c.inl"
-#define IO_LBA28 1
-#define IO_VECTOR 1
-#define IO_READ 1
+#define DEFINE_IO_LBA28 1
+#define DEFINE_IO_VECTOR 1
+#define DEFINE_IO_READ 1
 #include "ata/ata-io.c.inl"
-#define IO_LBA28 1
-#define IO_PHYS 1
-#define IO_READ 1
+#define DEFINE_IO_LBA28 1
+#define DEFINE_IO_PHYS 1
+#define DEFINE_IO_READ 1
 #include "ata/ata-io.c.inl"
-#define IO_LBA28 1
-#define IO_READ 1
+#define DEFINE_IO_LBA28 1
+#define DEFINE_IO_READ 1
 #include "ata/ata-io.c.inl"
 
 /* LBA28 + WRITE */
-#define IO_LBA28 1
-#define IO_VECTOR 1
-#define IO_PHYS 1
-#define IO_WRITE 1
+#define DEFINE_IO_LBA28 1
+#define DEFINE_IO_VECTOR 1
+#define DEFINE_IO_PHYS 1
+#define DEFINE_IO_WRITE 1
 #include "ata/ata-io.c.inl"
-#define IO_LBA28 1
-#define IO_VECTOR 1
-#define IO_WRITE 1
+#define DEFINE_IO_LBA28 1
+#define DEFINE_IO_VECTOR 1
+#define DEFINE_IO_WRITE 1
 #include "ata/ata-io.c.inl"
-#define IO_LBA28 1
-#define IO_PHYS 1
-#define IO_WRITE 1
+#define DEFINE_IO_LBA28 1
+#define DEFINE_IO_PHYS 1
+#define DEFINE_IO_WRITE 1
 #include "ata/ata-io.c.inl"
-#define IO_LBA28 1
-#define IO_WRITE 1
+#define DEFINE_IO_LBA28 1
+#define DEFINE_IO_WRITE 1
 #include "ata/ata-io.c.inl"
 
 /* LBA48 + READ */
-#define IO_LBA48 1
-#define IO_VECTOR 1
-#define IO_PHYS 1
-#define IO_READ 1
+#define DEFINE_IO_LBA48 1
+#define DEFINE_IO_VECTOR 1
+#define DEFINE_IO_PHYS 1
+#define DEFINE_IO_READ 1
 #include "ata/ata-io.c.inl"
-#define IO_LBA48 1
-#define IO_VECTOR 1
-#define IO_READ 1
+#define DEFINE_IO_LBA48 1
+#define DEFINE_IO_VECTOR 1
+#define DEFINE_IO_READ 1
 #include "ata/ata-io.c.inl"
-#define IO_LBA48 1
-#define IO_PHYS 1
-#define IO_READ 1
+#define DEFINE_IO_LBA48 1
+#define DEFINE_IO_PHYS 1
+#define DEFINE_IO_READ 1
 #include "ata/ata-io.c.inl"
-#define IO_LBA48 1
-#define IO_READ 1
+#define DEFINE_IO_LBA48 1
+#define DEFINE_IO_READ 1
 #include "ata/ata-io.c.inl"
 
 /* LBA48 + WRITE */
-#define IO_LBA48 1
-#define IO_VECTOR 1
-#define IO_PHYS 1
-#define IO_WRITE 1
+#define DEFINE_IO_LBA48 1
+#define DEFINE_IO_VECTOR 1
+#define DEFINE_IO_PHYS 1
+#define DEFINE_IO_WRITE 1
 #include "ata/ata-io.c.inl"
-#define IO_LBA48 1
-#define IO_VECTOR 1
-#define IO_WRITE 1
+#define DEFINE_IO_LBA48 1
+#define DEFINE_IO_VECTOR 1
+#define DEFINE_IO_WRITE 1
 #include "ata/ata-io.c.inl"
-#define IO_LBA48 1
-#define IO_PHYS 1
-#define IO_WRITE 1
+#define DEFINE_IO_LBA48 1
+#define DEFINE_IO_PHYS 1
+#define DEFINE_IO_WRITE 1
 #include "ata/ata-io.c.inl"
-#define IO_LBA48 1
-#define IO_WRITE 1
+#define DEFINE_IO_LBA48 1
+#define DEFINE_IO_WRITE 1
 #include "ata/ata-io.c.inl"
 
 #endif /* !__INTELLISENSE__ */

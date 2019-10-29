@@ -18,7 +18,8 @@
  */
 #ifdef __INTELLISENSE__
 #include "node.c"
-#define IO_READ 1
+#define DEFINE_IO_READ 1
+//#define DEFINE_IO_WRITE 1
 #endif
 
 #include <fs/node.h>
@@ -30,7 +31,7 @@
 
 DECL_BEGIN
 
-#ifdef IO_READ
+#ifdef DEFINE_IO_READ
 /* @param: partrelative_pageno: In data-pages, the part-relative offset to the first uninitialized data-page.
  * @param: num_data_pages:      In data-pages, the number of continuous, modified data-pages. */
 #define INODE_DO_LOAD_DATAPART_PAGES_DEFINED 1
@@ -40,7 +41,7 @@ inode_do_load_datapart_pages(struct inode *__restrict self,
                              size_t partrelative_pageno,
                              size_t num_data_pages,
                              struct aio_multihandle *__restrict aio)
-#else
+#elif defined(DEFINE_IO_WRITE)
 /* @param: partrelative_pageno: In data-pages, the part-relative offset to the first modified data-page.
  * @param: num_data_pages:      In data-pages, the number of continuous, modified data-pages. */
 INTERN NONNULL((1, 2)) void KCALL
@@ -75,13 +76,13 @@ inode_do_save_datapart_pages(struct inode *__restrict self,
 		assert(first_ppage_index < part->dp_ramdata.rd_block0.rb_size);
 		phys_buf = VM_PPAGE2ADDR(part->dp_ramdata.rd_block0.rb_start + first_ppage_index);
 		phys_buf += ppage_offset;
-#ifdef IO_READ
+#ifdef DEFINE_IO_READ
 		(*self->i_type->it_file.f_pread)(self,
 		                                 phys_buf,
 		                                 num_bytes,
 		                                 file_position,
 		                                 aio);
-#else
+#elif defined(DEFINE_IO_WRITE)
 		(*self->i_type->it_file.f_pwrite)(self,
 		                                  phys_buf,
 		                                  num_bytes,
@@ -111,13 +112,13 @@ inode_do_save_datapart_pages(struct inode *__restrict self,
 				num_block_bytes = num_bytes;
 			phys_buf = VM_PPAGE2ADDR(blocks[i].rb_start + first_ppage_index);
 			phys_buf += ppage_offset;
-#ifdef IO_READ
+#ifdef DEFINE_IO_READ
 			(*self->i_type->it_file.f_pread)(self,
 			                                 phys_buf,
 			                                 num_block_bytes,
 			                                 file_position,
 			                                 aio);
-#else
+#elif defined(DEFINE_IO_WRITE)
 			(*self->i_type->it_file.f_pwrite)(self,
 			                                  phys_buf,
 			                                  num_block_bytes,
@@ -134,7 +135,7 @@ inode_do_save_datapart_pages(struct inode *__restrict self,
 	}
 }
 
-#ifdef IO_READ
+#ifdef DEFINE_IO_READ
 INTDEF NONNULL((1, 2)) void KCALL
 inode_do_load_datapart_pages_sync(struct inode *__restrict self,
                                   struct vm_datapart *__restrict part,
@@ -161,10 +162,7 @@ inode_do_load_datapart_pages_sync(struct inode *__restrict self,
 	}
 	aio_multihandle_generic_fini(&hand);
 }
-#endif
-
-#ifdef CONFIG_VIO
-#endif /* CONFIG_VIO */
+#endif /* DEFINE_IO_READ */
 
 
 DECL_END
@@ -174,5 +172,6 @@ DECL_END
 #undef FUNC0
 #undef VIRT_BUF
 #undef PHYS_BUF
-#undef IO_PHYS
-#undef IO_READ
+#undef DEFINE_IO_PHYS
+#undef DEFINE_IO_WRITE
+#undef DEFINE_IO_READ

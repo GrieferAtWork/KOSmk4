@@ -18,7 +18,7 @@
  */
 #ifdef __INTELLISENSE__
 #include "node.c"
-#endif
+#endif /* __INTELLISENSE__ */
 
 #include <fs/node.h>
 #include <kernel/swap.h>
@@ -29,42 +29,42 @@
 #include "../memory/vm/vm-partapi.h"
 
 #ifdef __INTELLISENSE__
-#undef IO_ASYNC
-#undef IO_READ
-#undef IO_WRITE
-#undef IO_PHYS
-#undef IO_VECTOR
-#undef IO_KERNEL
+#undef DEFINE_IO_ASYNC
+#undef DEFINE_IO_READ
+#undef DEFINE_IO_WRITE
+#undef DEFINE_IO_PHYS
+#undef DEFINE_IO_VECTOR
+#undef DEFINE_IO_KERNEL
 
-//#define IO_ASYNC 1
-#define IO_READ 1
-//#define IO_WRITE 1
-#define IO_PHYS 1
-#define IO_VECTOR 1
-//#define IO_KERNEL 1
-#endif
+//#define DEFINE_IO_ASYNC 1
+#define DEFINE_IO_READ 1
+//#define DEFINE_IO_WRITE 1
+#define DEFINE_IO_PHYS 1
+#define DEFINE_IO_VECTOR 1
+//#define DEFINE_IO_KERNEL 1
+#endif /* __INTELLISENSE__ */
 
 DECL_BEGIN
 
-#if defined(IO_VECTOR) && defined(IO_PHYS)
+#if defined(DEFINE_IO_VECTOR) && defined(DEFINE_IO_PHYS)
 #define FUNC0(x) x##v_phys
-#elif defined(IO_PHYS)
+#elif defined(DEFINE_IO_PHYS)
 #define FUNC0(x) x##_phys
-#elif defined(IO_VECTOR) && defined(IO_KERNEL)
+#elif defined(DEFINE_IO_VECTOR) && defined(DEFINE_IO_KERNEL)
 #define FUNC0(x) x##kv
-#elif defined(IO_VECTOR)
+#elif defined(DEFINE_IO_VECTOR)
 #define FUNC0(x) x##v
-#elif defined(IO_KERNEL)
+#elif defined(DEFINE_IO_KERNEL)
 #define FUNC0(x) x##k
 #else
 #define FUNC0(x) x
 #endif
-#ifdef IO_READ
+#ifdef DEFINE_IO_READ
 #define FUNC1(x) FUNC0(x##read_locked)
 #else
 #define FUNC1(x) FUNC0(x##write)
 #endif
-#ifdef IO_ASYNC
+#ifdef DEFINE_IO_ASYNC
 #define FUNC2(x) FUNC1(x##a)
 #else
 #define FUNC2    FUNC1
@@ -94,94 +94,94 @@ inode_do_save_datapart_pages(struct inode *__restrict self,
 
 
 
-#ifdef IO_READ
+#ifdef DEFINE_IO_READ
 INTERN
 #else
 PUBLIC
 #endif
-#ifdef IO_ASYNC
-#if defined(IO_VECTOR) || defined(IO_KERNEL)
+#ifdef DEFINE_IO_ASYNC
+#if defined(DEFINE_IO_VECTOR) || defined(DEFINE_IO_KERNEL)
     NONNULL((1, 2, 5))
-#else /* IO_VECTOR */
+#else /* DEFINE_IO_VECTOR */
     NONNULL((1, 5))
-#endif /* !IO_VECTOR */
-#else /* IO_ASYNC */
-#if defined(IO_VECTOR) || defined(IO_KERNEL)
+#endif /* !DEFINE_IO_VECTOR */
+#else /* DEFINE_IO_ASYNC */
+#if defined(DEFINE_IO_VECTOR) || defined(DEFINE_IO_KERNEL)
     NONNULL((1, 2))
-#else /* IO_VECTOR */
+#else /* DEFINE_IO_VECTOR */
     NONNULL((1))
-#endif /* !IO_VECTOR */
-#endif /* !IO_ASYNC */
+#endif /* !DEFINE_IO_VECTOR */
+#endif /* !DEFINE_IO_ASYNC */
     void
-#ifdef IO_ASYNC
+#ifdef DEFINE_IO_ASYNC
 NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
-#if defined(IO_VECTOR) && defined(IO_PHYS)
+#if defined(DEFINE_IO_VECTOR) && defined(DEFINE_IO_PHYS)
                              struct aio_pbuffer *__restrict buf,
-#elif defined(IO_VECTOR)
+#elif defined(DEFINE_IO_VECTOR)
                              struct aio_buffer *__restrict buf,
-#elif defined(IO_PHYS)
+#elif defined(DEFINE_IO_PHYS)
                              vm_phys_t buf,
-#elif defined(IO_READ) && defined(IO_KERNEL)
+#elif defined(DEFINE_IO_READ) && defined(DEFINE_IO_KERNEL)
                              void *__restrict buf,
-#elif defined(IO_READ)
+#elif defined(DEFINE_IO_READ)
                              CHECKED USER void *buf,
-#elif defined(IO_KERNEL)
+#elif defined(DEFINE_IO_KERNEL)
                              void const *__restrict buf,
 #else
                              CHECKED USER void const *buf,
 #endif
                              size_t num_bytes, pos_t file_position,
                              struct aio_multihandle *__restrict aio)
-#else /* IO_ASYNC */
+#else /* DEFINE_IO_ASYNC */
 (KCALL FUNC2(inode_))(struct inode *__restrict self,
-#if defined(IO_VECTOR) && defined(IO_PHYS)
+#if defined(DEFINE_IO_VECTOR) && defined(DEFINE_IO_PHYS)
                       struct aio_pbuffer *__restrict buf,
-#elif defined(IO_VECTOR)
+#elif defined(DEFINE_IO_VECTOR)
                       struct aio_buffer *__restrict buf,
-#elif defined(IO_PHYS)
+#elif defined(DEFINE_IO_PHYS)
                       vm_phys_t buf,
-#elif defined(IO_READ) && defined(IO_KERNEL)
+#elif defined(DEFINE_IO_READ) && defined(DEFINE_IO_KERNEL)
                       void *__restrict buf,
-#elif defined(IO_READ)
+#elif defined(DEFINE_IO_READ)
                       CHECKED USER void *buf,
-#elif defined(IO_KERNEL)
+#elif defined(DEFINE_IO_KERNEL)
                       void const *__restrict buf,
 #else
                       CHECKED USER void const *buf,
 #endif
                       size_t num_bytes,
                       pos_t file_position)
-#endif /* !IO_ASYNC */
-#ifdef IO_ASYNC
-#ifdef IO_PHYS
+#endif /* !DEFINE_IO_ASYNC */
+#ifdef DEFINE_IO_ASYNC
+#ifdef DEFINE_IO_PHYS
 		THROWS_INDIRECT(E_FSERROR_DELETED, E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...)
-#else /* IO_PHYS */
+#else /* DEFINE_IO_PHYS */
 		THROWS_INDIRECT(E_FSERROR_DELETED, E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, E_SEGFAULT, ...)
-#endif /* !IO_PHYS */
-#else /* IO_ASYNC */
-#ifdef IO_PHYS
+#endif /* !DEFINE_IO_PHYS */
+#else /* DEFINE_IO_ASYNC */
+#ifdef DEFINE_IO_PHYS
 		THROWS(E_FSERROR_DELETED, E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...)
-#else /* IO_PHYS */
+#else /* DEFINE_IO_PHYS */
 		THROWS(E_FSERROR_DELETED, E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, E_SEGFAULT, ...)
-#endif /* !IO_PHYS */
-#endif /* !IO_ASYNC */
+#endif /* !DEFINE_IO_PHYS */
+#endif /* !DEFINE_IO_ASYNC */
 {
-#ifdef IO_ASYNC
+#ifdef DEFINE_IO_ASYNC
 	TRY {
 		struct vm_datapart *part;
 		size_t max_io_bytes;
-#ifdef IO_VECTOR
+#ifdef DEFINE_IO_VECTOR
 		uintptr_t buf_offset;
 #endif
-#ifndef IO_READ
+#ifndef DEFINE_IO_READ
 		SCOPED_WRITELOCK((struct vm_datablock *)self);
-#ifdef IO_PHYS
+#ifdef DEFINE_IO_PHYS
 		if unlikely(!self->i_type->it_file.f_pwritev)
 			THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_WRITE);
-#elif defined(IO_VECTOR)
+#elif defined(DEFINE_IO_VECTOR)
 		if unlikely(!self->i_type->it_file.f_writev)
 			THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_WRITE);
-#elif defined(IO_PHYS)
+#elif defined(DEFINE_IO_PHYS)
 		if unlikely(!self->i_type->it_file.f_pwrite)
 			THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_WRITE);
 #else
@@ -213,16 +213,16 @@ NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 #endif
 		if unlikely(self->db_parts == VM_DATABLOCK_ANONPARTS) {
 			/* The INode uses anonymous parts. -> Use read-through / write-through */
-#ifdef IO_READ
-#if defined(IO_VECTOR) && defined(IO_PHYS)
+#ifdef DEFINE_IO_READ
+#if defined(DEFINE_IO_VECTOR) && defined(DEFINE_IO_PHYS)
 			if (!self->i_type->it_file.f_preadv)
 				THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READ);
 			(*self->i_type->it_file.f_preadv)(self, buf, num_bytes, file_position, aio);
-#elif defined(IO_VECTOR)
+#elif defined(DEFINE_IO_VECTOR)
 			if (!self->i_type->it_file.f_readv)
 				THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READ);
 			(*self->i_type->it_file.f_readv)(self, buf, num_bytes, file_position, aio);
-#elif defined(IO_PHYS)
+#elif defined(DEFINE_IO_PHYS)
 			if (!self->i_type->it_file.f_pread)
 				THROW(E_FSERROR_UNSUPPORTED_OPERATION, E_FILESYSTEM_OPERATION_READ);
 			(*self->i_type->it_file.f_pread)(self, buf, num_bytes, file_position, aio);
@@ -233,11 +233,11 @@ NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 #endif
 #else
 			TRY {
-#if defined(IO_VECTOR) && defined(IO_PHYS)
+#if defined(DEFINE_IO_VECTOR) && defined(DEFINE_IO_PHYS)
 				(*self->i_type->it_file.f_pwritev)(self, buf, num_bytes, file_position, aio);
-#elif defined(IO_VECTOR)
+#elif defined(DEFINE_IO_VECTOR)
 				(*self->i_type->it_file.f_writev)(self, buf, num_bytes, file_position, aio);
-#elif defined(IO_PHYS)
+#elif defined(DEFINE_IO_PHYS)
 				(*self->i_type->it_file.f_pwrite)(self, buf, num_bytes, file_position, aio);
 #else
 				(*self->i_type->it_file.f_write)(self, buf, num_bytes, file_position, aio);
@@ -263,15 +263,15 @@ NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 			args.va_access_partoff  = 0;
 			args.va_state           = NULL;
 			/* Invoke VIO callbacks as vio_read() operations. */
-#if defined(IO_PHYS) && !defined(IO_VECTOR)
-#ifdef IO_READ
+#if defined(DEFINE_IO_PHYS) && !defined(DEFINE_IO_VECTOR)
+#ifdef DEFINE_IO_READ
 			vio_copyfromvio_to_phys(&args, buf, file_position, num_bytes);
-#else  /* IO_READ */
+#else  /* DEFINE_IO_READ */
 			vio_copytovio_from_phys(&args, file_position, buf, num_bytes);
-#endif /* !IO_READ */
-#elif defined(IO_VECTOR)
+#endif /* !DEFINE_IO_READ */
+#elif defined(DEFINE_IO_VECTOR)
 			{
-#ifdef IO_PHYS
+#ifdef DEFINE_IO_PHYS
 				struct aio_pbuffer_entry ent;
 				AIO_PBUFFER_FOREACH_N(ent, buf)
 #else
@@ -281,38 +281,38 @@ NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 				{
 					if (ent.ab_size > num_bytes)
 						ent.ab_size = num_bytes;
-#ifdef IO_PHYS
-#ifdef IO_READ
+#ifdef DEFINE_IO_PHYS
+#ifdef DEFINE_IO_READ
 					vio_copyfromvio_to_phys(&args,
 					                        ent.ab_base,
 					                        file_position,
 					                        ent.ab_size);
-#else  /* IO_READ */
+#else  /* DEFINE_IO_READ */
 					vio_copytovio_from_phys(&args,
 					                        ent.ab_base,
 					                        file_position,
 					                        ent.ab_size);
-#endif /* !IO_READ */
-#else  /* IO_PHYS */
-#ifdef IO_READ
+#endif /* !DEFINE_IO_READ */
+#else  /* DEFINE_IO_PHYS */
+#ifdef DEFINE_IO_READ
 					vio_copyfromvio(&args,
 					                (byte_t *)ent.ab_base,
 					                file_position,
 					                ent.ab_size);
-#else  /* IO_READ */
+#else  /* DEFINE_IO_READ */
 					vio_copytovio(&args,
 					              file_position,
 					              (byte_t *)ent.ab_base,
 					              ent.ab_size);
-#endif /* !IO_READ */
-#endif /* !IO_PHYS */
+#endif /* !DEFINE_IO_READ */
+#endif /* !DEFINE_IO_PHYS */
 					if (ent.ab_size >= num_bytes)
 						break;
 					num_bytes -= ent.ab_size;
 					file_position += ent.ab_size;
 				}
 			}
-#elif defined(IO_READ)
+#elif defined(DEFINE_IO_READ)
 			vio_copyfromvio(&args, buf, file_position, num_bytes);
 #else
 			vio_copytovio(&args, file_position, buf, num_bytes);
@@ -321,7 +321,7 @@ NOTHROW(KCALL FUNC2(inode_))(struct inode *__restrict self,
 		}
 #endif /* CONFIG_VIO */
 
-#ifdef IO_VECTOR
+#ifdef DEFINE_IO_VECTOR
 		buf_offset = 0;
 #endif
 load_next_part:
@@ -333,31 +333,31 @@ load_next_part:
 		                               CEILDIV(num_bytes + (file_position % pagedir_pagesize()), pagedir_pagesize()));
 		TRY {
 			vm_daddr_t part_offset = (vm_daddr_t)(file_position - vm_datapart_startbyte(part));
-#ifdef IO_VECTOR
-#ifdef IO_PHYS
+#ifdef DEFINE_IO_VECTOR
+#ifdef DEFINE_IO_PHYS
 			struct aio_pbuffer view;
 			aio_pbuffer_init_view_after(&view, buf, buf_offset);
 #else
 			struct aio_buffer view;
 			aio_buffer_init_view_after(&view, buf, buf_offset);
 #endif
-#ifdef IO_READ
+#ifdef DEFINE_IO_READ
 			max_io_bytes = FUNC0(vm_datapart_read)(part, &view, part_offset);
-#else  /* IO_READ */
+#else  /* DEFINE_IO_READ */
 			max_io_bytes = FUNC0(vm_datapart_write)(part, &view, num_bytes, part_offset);
-#endif /* !IO_READ */
-#elif defined(IO_KERNEL)
-#ifdef IO_READ
+#endif /* !DEFINE_IO_READ */
+#elif defined(DEFINE_IO_KERNEL)
+#ifdef DEFINE_IO_READ
 			max_io_bytes = vm_datapart_read_unsafe(part, buf, num_bytes, part_offset);
-#else  /* IO_READ */
+#else  /* DEFINE_IO_READ */
 			max_io_bytes = vm_datapart_write_unsafe(part, buf, num_bytes, num_bytes, part_offset);
-#endif /* !IO_READ */
+#endif /* !DEFINE_IO_READ */
 #else
-#ifdef IO_READ
+#ifdef DEFINE_IO_READ
 			max_io_bytes = FUNC0(vm_datapart_read)(part, buf, num_bytes, part_offset);
-#else  /* IO_READ */
+#else  /* DEFINE_IO_READ */
 			max_io_bytes = FUNC0(vm_datapart_write)(part, buf, num_bytes, num_bytes, part_offset);
-#endif /* !IO_READ */
+#endif /* !DEFINE_IO_READ */
 #endif
 		} EXCEPT {
 			decref(part);
@@ -368,9 +368,9 @@ load_next_part:
 		/* Check if all requested bytes have now been read. */
 		if (max_io_bytes >= num_bytes)
 			return;
-#ifdef IO_VECTOR
+#ifdef DEFINE_IO_VECTOR
 		buf_offset += max_io_bytes;
-#elif defined(IO_PHYS)
+#elif defined(DEFINE_IO_PHYS)
 		buf += max_io_bytes;
 #else
 		buf = (byte_t *)buf + max_io_bytes;
@@ -381,7 +381,7 @@ load_next_part:
 	} EXCEPT {
 		aio_multihandle_fail(aio);
 	}
-#else /* IO_ASYNC */
+#else /* DEFINE_IO_ASYNC */
 	struct aio_multihandle_generic hand;
 	aio_multihandle_generic_init(&hand);
 	TRY {
@@ -404,19 +404,19 @@ load_next_part:
 		RETHROW();
 	}
 	aio_multihandle_generic_fini(&hand);
-#endif /* !IO_ASYNC */
+#endif /* !DEFINE_IO_ASYNC */
 }
 
-#ifdef IO_READ
+#ifdef DEFINE_IO_READ
 #define FUNC1_READ(x) FUNC0(x##read)
-#ifdef IO_ASYNC
+#ifdef DEFINE_IO_ASYNC
 #define FUNC2_READ(x) FUNC1_READ(x##a)
-#else /* IO_ASYNC */
+#else /* DEFINE_IO_ASYNC */
 #define FUNC2_READ    FUNC1_READ
-#endif /* !IO_ASYNC */
+#endif /* !DEFINE_IO_ASYNC */
 
 
-#ifdef IO_PHYS
+#ifdef DEFINE_IO_PHYS
 #ifndef INODE_FLEX_READ_PHYS_DEFINED
 #define INODE_FLEX_READ_PHYS_DEFINED 1
 PRIVATE size_t KCALL
@@ -470,118 +470,118 @@ do_inode_flexread_phys(struct inode *__restrict self,
 
 #endif /* !INODE_FLEX_READ_PHYS_DEFINED */
 
-#endif /* IO_PHYS */
+#endif /* DEFINE_IO_PHYS */
 
 
-#ifdef IO_ASYNC
-#ifdef IO_VECTOR
+#ifdef DEFINE_IO_ASYNC
+#ifdef DEFINE_IO_VECTOR
     NONNULL((1, 2, 5))
-#else /* IO_VECTOR */
+#else /* DEFINE_IO_VECTOR */
     NONNULL((1, 5))
-#endif /* !IO_VECTOR */
-#else /* IO_ASYNC */
-#ifdef IO_VECTOR
+#endif /* !DEFINE_IO_VECTOR */
+#else /* DEFINE_IO_ASYNC */
+#ifdef DEFINE_IO_VECTOR
     NONNULL((1, 2))
-#else /* IO_VECTOR */
+#else /* DEFINE_IO_VECTOR */
     NONNULL((1))
-#endif /* !IO_VECTOR */
-#endif /* !IO_ASYNC */
+#endif /* !DEFINE_IO_VECTOR */
+#endif /* !DEFINE_IO_ASYNC */
     size_t
-#ifdef IO_ASYNC
+#ifdef DEFINE_IO_ASYNC
 NOTHROW(KCALL FUNC2_READ(inode_))(struct inode *__restrict self,
-#if defined(IO_VECTOR) && defined(IO_PHYS)
+#if defined(DEFINE_IO_VECTOR) && defined(DEFINE_IO_PHYS)
                                   struct aio_pbuffer *__restrict buf,
-#elif defined(IO_VECTOR)
+#elif defined(DEFINE_IO_VECTOR)
                                   struct aio_buffer *__restrict buf,
-#elif defined(IO_PHYS)
+#elif defined(DEFINE_IO_PHYS)
                                   vm_phys_t buf,
 #else
                                   CHECKED USER void *buf,
 #endif
                                   size_t num_bytes, pos_t file_position,
                                   struct aio_multihandle *__restrict aio)
-#else /* IO_ASYNC */
+#else /* DEFINE_IO_ASYNC */
 (KCALL FUNC2_READ(inode_))(struct inode *__restrict self,
-#if defined(IO_VECTOR) && defined(IO_PHYS)
+#if defined(DEFINE_IO_VECTOR) && defined(DEFINE_IO_PHYS)
                            struct aio_pbuffer *__restrict buf,
-#elif defined(IO_VECTOR)
+#elif defined(DEFINE_IO_VECTOR)
                            struct aio_buffer *__restrict buf,
-#elif defined(IO_PHYS)
+#elif defined(DEFINE_IO_PHYS)
                            vm_phys_t buf,
 #else
                            CHECKED USER void *buf,
 #endif
                            size_t num_bytes,
                            pos_t file_position)
-#endif /* !IO_ASYNC */
-#ifdef IO_ASYNC
-#ifdef IO_PHYS
+#endif /* !DEFINE_IO_ASYNC */
+#ifdef DEFINE_IO_ASYNC
+#ifdef DEFINE_IO_PHYS
 		THROWS_INDIRECT(E_FSERROR_DELETED, E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...)
-#else /* IO_PHYS */
+#else /* DEFINE_IO_PHYS */
 		THROWS_INDIRECT(E_FSERROR_DELETED, E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, E_SEGFAULT, ...)
-#endif /* !IO_PHYS */
-#else /* IO_ASYNC */
-#ifdef IO_PHYS
+#endif /* !DEFINE_IO_PHYS */
+#else /* DEFINE_IO_ASYNC */
+#ifdef DEFINE_IO_PHYS
 		THROWS(E_FSERROR_DELETED, E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...)
-#else /* IO_PHYS */
+#else /* DEFINE_IO_PHYS */
 		THROWS(E_FSERROR_DELETED, E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, E_SEGFAULT, ...)
-#endif /* !IO_PHYS */
-#endif /* !IO_ASYNC */
+#endif /* !DEFINE_IO_PHYS */
+#endif /* !DEFINE_IO_ASYNC */
 {
 	pos_t file_end;
 	/* Check for special case: The INode implements the flexible-read interface. */
 	if (self->i_type->it_file.f_flexread) {
-#if defined(IO_VECTOR)
+#if defined(DEFINE_IO_VECTOR)
 		size_t temp, result = 0;
-#ifdef IO_PHYS
+#ifdef DEFINE_IO_PHYS
 		struct aio_pbuffer_entry ent;
 		AIO_PBUFFER_FOREACH_N(ent, buf)
-#else /* IO_PHYS */
+#else /* DEFINE_IO_PHYS */
 		struct aio_buffer_entry ent;
 		AIO_BUFFER_FOREACH_N(ent, buf)
-#endif /* !IO_PHYS */
+#endif /* !DEFINE_IO_PHYS */
 		{
-#ifdef IO_PHYS
+#ifdef DEFINE_IO_PHYS
 			temp = do_inode_flexread_phys(self,
 			                              ent.ab_base,
 			                              ent.ab_size,
 			                              file_position);
-#else /* IO_PHYS */
+#else /* DEFINE_IO_PHYS */
 			temp = (*self->i_type->it_file.f_flexread)(self,
 			                                           ent.ab_base,
 			                                           ent.ab_size,
 			                                           file_position);
-#endif /* !IO_PHYS */
+#endif /* !DEFINE_IO_PHYS */
 			result += temp;
 			if (temp < ent.ab_size)
 				break;
 			file_position += temp;
 		}
-#ifdef IO_ASYNC
+#ifdef DEFINE_IO_ASYNC
 		(void)aio;
-#endif /* IO_ASYNC */
+#endif /* DEFINE_IO_ASYNC */
 		return result;
-#elif defined(IO_PHYS)
-#ifdef IO_ASYNC
+#elif defined(DEFINE_IO_PHYS)
+#ifdef DEFINE_IO_ASYNC
 		size_t result;
 		result = do_inode_flexread_phys(self, buf, num_bytes, file_position);
 		(void)aio;
 		return result;
-#else /* IO_ASYNC */
+#else /* DEFINE_IO_ASYNC */
 		return do_inode_flexread_phys(self, buf, num_bytes, file_position);
-#endif /* !IO_ASYNC */
+#endif /* !DEFINE_IO_ASYNC */
 #else
-#ifdef IO_ASYNC
+#ifdef DEFINE_IO_ASYNC
 		size_t result;
 		result = (*self->i_type->it_file.f_flexread)(self, buf, num_bytes, file_position);
 		(void)aio;
 		return result;
-#else /* IO_ASYNC */
+#else /* DEFINE_IO_ASYNC */
 		return (*self->i_type->it_file.f_flexread)(self, buf, num_bytes, file_position);
-#endif /* !IO_ASYNC */
+#endif /* !DEFINE_IO_ASYNC */
 #endif
 	}
-#ifdef IO_ASYNC
+#ifdef DEFINE_IO_ASYNC
 	TRY
 #endif
 	{
@@ -607,7 +607,7 @@ again_check_size:
 			              buf,
 			              num_bytes,
 			              file_position
-#ifdef IO_ASYNC
+#ifdef DEFINE_IO_ASYNC
 			              , aio
 #endif
 			              );
@@ -619,7 +619,7 @@ again_check_size:
 		rwlock_endread(&self->db_lock);
 		return num_bytes;
 	}
-#ifdef IO_ASYNC
+#ifdef DEFINE_IO_ASYNC
 	EXCEPT {
 		aio_multihandle_fail(aio);
 	}
@@ -628,62 +628,62 @@ again_check_size:
 }
 
 
-#ifndef IO_ASYNC
-#ifdef IO_VECTOR
+#ifndef DEFINE_IO_ASYNC
+#ifdef DEFINE_IO_VECTOR
     NONNULL((1, 2))
-#else /* IO_VECTOR */
+#else /* DEFINE_IO_VECTOR */
     NONNULL((1))
-#endif /* !IO_VECTOR */
+#endif /* !DEFINE_IO_VECTOR */
     size_t
 (KCALL PP_CAT2(FUNC0(inode_read),_blocking))(struct inode *__restrict self,
-#if defined(IO_VECTOR) && defined(IO_PHYS)
+#if defined(DEFINE_IO_VECTOR) && defined(DEFINE_IO_PHYS)
                                              struct aio_pbuffer *__restrict buf,
-#elif defined(IO_VECTOR)
+#elif defined(DEFINE_IO_VECTOR)
                                              struct aio_buffer *__restrict buf,
-#elif defined(IO_PHYS)
+#elif defined(DEFINE_IO_PHYS)
                                              vm_phys_t buf,
 #else
                                              CHECKED USER void *buf,
 #endif
                                              size_t num_bytes,
                                              pos_t file_position)
-#ifdef IO_PHYS
+#ifdef DEFINE_IO_PHYS
 		THROWS(E_FSERROR_DELETED, E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, ...)
-#else /* IO_PHYS */
+#else /* DEFINE_IO_PHYS */
 		THROWS(E_FSERROR_DELETED, E_FSERROR_UNSUPPORTED_OPERATION, E_IOERROR, E_SEGFAULT, ...)
-#endif /* !IO_PHYS */
+#endif /* !DEFINE_IO_PHYS */
 {
 	pos_t file_end;
 	/* Check for special case: The INode implements the flexible-read interface. */
 	if (self->i_type->it_file.f_flexread) {
-#if defined(IO_VECTOR)
+#if defined(DEFINE_IO_VECTOR)
 		size_t temp, result = 0;
-#ifdef IO_PHYS
+#ifdef DEFINE_IO_PHYS
 		struct aio_pbuffer_entry ent;
 		AIO_PBUFFER_FOREACH_N(ent, buf)
-#else /* IO_PHYS */
+#else /* DEFINE_IO_PHYS */
 		struct aio_buffer_entry ent;
 		AIO_BUFFER_FOREACH_N(ent, buf)
-#endif /* !IO_PHYS */
+#endif /* !DEFINE_IO_PHYS */
 		{
-#ifdef IO_PHYS
+#ifdef DEFINE_IO_PHYS
 			temp = do_inode_flexread_phys(self,
 			                              ent.ab_base,
 			                              ent.ab_size,
 			                              file_position);
-#else /* IO_PHYS */
+#else /* DEFINE_IO_PHYS */
 			temp = (*self->i_type->it_file.f_flexread)(self,
 			                                           ent.ab_base,
 			                                           ent.ab_size,
 			                                           file_position);
-#endif /* !IO_PHYS */
+#endif /* !DEFINE_IO_PHYS */
 			result += temp;
 			if (temp < ent.ab_size)
 				break;
 			file_position += temp;
 		}
 		return result;
-#elif defined(IO_PHYS)
+#elif defined(DEFINE_IO_PHYS)
 		return do_inode_flexread_phys(self, buf, num_bytes, file_position);
 #else
 		return (*self->i_type->it_file.f_flexread)(self, buf, num_bytes, file_position);
@@ -709,9 +709,9 @@ again_check_size:
 		              buf,
 		              num_bytes,
 		              file_position
-#ifdef IO_ASYNC
+#ifdef DEFINE_IO_ASYNC
 		              , aio
-#endif /* IO_ASYNC */
+#endif /* DEFINE_IO_ASYNC */
 		              );
 	} EXCEPT {
 		if (rwlock_endread(&self->db_lock))
@@ -743,7 +743,7 @@ wait_for_data:
 
 #undef FUNC2_READ
 #undef FUNC1_READ
-#endif /* IO_READ */
+#endif /* DEFINE_IO_READ */
 
 
 DECL_END
@@ -753,9 +753,9 @@ DECL_END
 #undef FUNC0
 #undef VIRT_BUF
 #undef PHYS_BUF
-#undef IO_ASYNC
-#undef IO_VECTOR
-#undef IO_PHYS
-#undef IO_READ
-#undef IO_WRITE
-#undef IO_KERNEL
+#undef DEFINE_IO_ASYNC
+#undef DEFINE_IO_VECTOR
+#undef DEFINE_IO_PHYS
+#undef DEFINE_IO_READ
+#undef DEFINE_IO_WRITE
+#undef DEFINE_IO_KERNEL

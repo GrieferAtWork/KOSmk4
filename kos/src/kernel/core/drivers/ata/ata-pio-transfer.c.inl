@@ -19,30 +19,30 @@
 #ifdef __INTELLISENSE__
 #include "../ata.c"
 
-#define IO_READ 1
-//#define IO_WRITE 1
-//#define IO_VECTOR 1
-#define IO_PHYS 1
+#define DEFINE_IO_READ 1
+//#define DEFINE_IO_WRITE 1
+//#define DEFINE_IO_VECTOR 1
+#define DEFINE_IO_PHYS 1
 #endif
 
-#if (defined(IO_READ) + defined(IO_WRITE)) != 1
-#error "Must #define exactly one of `IO_READ' or `IO_WRITE'"
+#if (defined(DEFINE_IO_READ) + defined(DEFINE_IO_WRITE)) != 1
+#error "Must #define exactly one of `DEFINE_IO_READ' or `DEFINE_IO_WRITE'"
 #endif
 
-#if defined(IO_VECTOR) && defined(IO_PHYS)
+#if defined(DEFINE_IO_VECTOR) && defined(DEFINE_IO_PHYS)
 #define FUNC_VECTORPHYS(x)  x##VectorPhys
 #define BUFFER_TYPE         struct aio_pbuffer *__restrict
 #define VECTOR_TYPE         struct aio_pbuffer
 #define ENTRY_TYPE          struct aio_pbuffer_entry
-#elif defined(IO_VECTOR)
+#elif defined(DEFINE_IO_VECTOR)
 #define FUNC_VECTORPHYS(x)  x##Vector
 #define BUFFER_TYPE         struct aio_buffer *__restrict
 #define VECTOR_TYPE         struct aio_buffer
 #define ENTRY_TYPE          struct aio_buffer_entry
-#elif defined(IO_PHYS)
+#elif defined(DEFINE_IO_PHYS)
 #define FUNC_VECTORPHYS(x)  x##Phys
 #define BUFFER_TYPE         vm_phys_t
-#elif defined(IO_READ)
+#elif defined(DEFINE_IO_READ)
 #define FUNC_VECTORPHYS(x)  x
 #define BUFFER_TYPE         USER CHECKED byte_t *
 #else
@@ -52,17 +52,17 @@
 
 DECL_BEGIN
 
-#ifdef IO_PHYS
-#if defined(IO_READ) ? !defined(INSW_PHYS_DEFINED) : !defined(OUTSW_PHYS_DEFINED)
-#ifdef IO_READ
+#ifdef DEFINE_IO_PHYS
+#if defined(DEFINE_IO_READ) ? !defined(INSW_PHYS_DEFINED) : !defined(OUTSW_PHYS_DEFINED)
+#ifdef DEFINE_IO_READ
 #define INSW_PHYS_DEFINED 1
 LOCAL void KCALL vm_insw_phys(port_t port, vm_phys_t buf, size_t count)
-#else /* IO_READ */
+#else /* DEFINE_IO_READ */
 #define OUTSW_PHYS_DEFINED 1
 LOCAL void KCALL vm_outsw_phys(port_t port, vm_phys_t buf, size_t count)
-#endif /* !IO_READ */
+#endif /* !DEFINE_IO_READ */
 {
-#ifdef IO_READ
+#ifdef DEFINE_IO_READ
 #define PAGEDIR_MAPPING_FLAGS  (PAGEDIR_MAP_FREAD|PAGEDIR_MAP_FWRITE)
 #else
 #define PAGEDIR_MAPPING_FLAGS   PAGEDIR_MAP_FREAD
@@ -91,7 +91,7 @@ LOCAL void KCALL vm_outsw_phys(port_t port, vm_phys_t buf, size_t count)
 			pagedir_syncone(tramp);
 			/* Transfer to/from memory. */
 			assert(tramp != 0);
-#ifdef IO_READ
+#ifdef DEFINE_IO_READ
 			insw(port, (void *)(VM_PAGE2ADDR(tramp) + (ptrdiff_t)(buf & (pagedir_pagesize() - 1))), page_words);
 #elif 1 /* ATA output apparently requires a small pause before every written word. */
 			{
@@ -118,12 +118,12 @@ LOCAL void KCALL vm_outsw_phys(port_t port, vm_phys_t buf, size_t count)
 #undef PAGEDIR_MAPPING_FLAGS
 }
 #endif /* !(INSW|OUTSW)_PHYS_DEFINED */
-#endif /* IO_PHYS */
+#endif /* DEFINE_IO_PHYS */
 
 
 /* PIO-based data transfer helpers for passing data to/from an ATA drive. */
 LOCAL errr_t
-#ifdef IO_READ
+#ifdef DEFINE_IO_READ
 (KCALL FUNC_VECTORPHYS(Ata_ReceiveDataSectors))
 #else
 (KCALL FUNC_VECTORPHYS(Ata_TransmitDataSectors))
@@ -133,15 +133,15 @@ LOCAL errr_t
                                                  BUFFER_TYPE buffer,
                                                  u16 num_sectors)
 {
-#ifdef IO_VECTOR
+#ifdef DEFINE_IO_VECTOR
 	ENTRY_TYPE ent        = buffer->ab_head;
 	size_t next_ent_index = 1;
-#ifdef IO_PHYS
+#ifdef DEFINE_IO_PHYS
 	assert(aio_pbuffer_size(buffer) == 2 * num_sectors * ATA_SECTOR_SIZE(drive));
-#else /* IO_PHYS */
+#else /* DEFINE_IO_PHYS */
 	assert(aio_buffer_size(buffer) == 2 * num_sectors * ATA_SECTOR_SIZE(drive));
-#endif /* !IO_PHYS */
-#endif /* IO_VECTOR */
+#endif /* !DEFINE_IO_PHYS */
+#endif /* DEFINE_IO_VECTOR */
 	TRY {
 		for (;;) {
 			struct sig *signal;
@@ -163,13 +163,13 @@ LOCAL errr_t
 			if (num_sectors != 1)
 				task_connect(&bus->b_piointr);
 			Ata_WaitForDrq(bus->b_busio, bus->b_ctrlio);
-#if defined(IO_PHYS) && defined(IO_READ)
+#if defined(DEFINE_IO_PHYS) && defined(DEFINE_IO_READ)
 #define DO_IO(port, buf, count) vm_insw_phys(port, buf, count)
-#elif defined(IO_PHYS) && defined(IO_WRITE)
+#elif defined(DEFINE_IO_PHYS) && defined(DEFINE_IO_WRITE)
 #define DO_IO(port, buf, count) vm_outsw_phys(port, buf, count)
-#elif defined(IO_READ)
+#elif defined(DEFINE_IO_READ)
 #define DO_IO(port, buf, count) insw(port, buf, count)
-#elif defined(IO_WRITE)
+#elif defined(DEFINE_IO_WRITE)
 #define DO_IO(port, buf, count) \
 			do {                              \
 				size_t _i, _cnt = (count);    \
@@ -178,7 +178,7 @@ LOCAL errr_t
 					outw(port, _buf[_i]);     \
 			} __WHILE0
 #endif
-#ifdef IO_VECTOR
+#ifdef DEFINE_IO_VECTOR
 			{
 				size_t io_bytes = ATA_SECTOR_SIZE(drive);
 				while (io_bytes) {
@@ -201,46 +201,46 @@ LOCAL errr_t
 							u8 bytes[2];
 							u16 word;
 						} data;
-#ifdef IO_READ
+#ifdef DEFINE_IO_READ
 						data.word = inw(bus->b_busio + ATA_DATA);
-#ifdef IO_PHYS
+#ifdef DEFINE_IO_PHYS
 						vm_copytophys((vm_phys_t)(ent.ab_base + ent.ab_size - 1), &data.bytes[0], 1);
-#else /* IO_PHYS */
+#else /* DEFINE_IO_PHYS */
 						((u8 *)ent.ab_base)[ent.ab_size - 1] = data.bytes[0];
-#endif /* !IO_PHYS */
-#else /* IO_READ */
-#ifdef IO_PHYS
+#endif /* !DEFINE_IO_PHYS */
+#else /* DEFINE_IO_READ */
+#ifdef DEFINE_IO_PHYS
 						vm_copyfromphys(&data.bytes[0], (vm_phys_t)(ent.ab_base + ent.ab_size - 1), 1);
-#else /* IO_PHYS */
+#else /* DEFINE_IO_PHYS */
 						data.bytes[0] = ((u8 *)ent.ab_base)[ent.ab_size - 1];
-#endif /* !IO_PHYS */
-#endif /* !IO_READ */
+#endif /* !DEFINE_IO_PHYS */
+#endif /* !DEFINE_IO_READ */
 						assert(next_ent_index < buffer->ab_entc);
 						AIO_BUFFER_GETENT(ent, buffer, next_ent_index);
 						assert(ent.ab_size);
 						++next_ent_index;
-#ifdef IO_READ
-#ifdef IO_PHYS
+#ifdef DEFINE_IO_READ
+#ifdef DEFINE_IO_PHYS
 						vm_copytophys(ent.ab_base, &data.bytes[1], 1);
 						++ent.ab_base;
-#else /* IO_PHYS */
+#else /* DEFINE_IO_PHYS */
 						((u8 *)ent.ab_base)[0] = data.bytes[1];
 						ent.ab_base            = (byte_t *)ent.ab_base + 1;
-#endif /* !IO_PHYS */
-#else /* IO_READ */
-#ifdef IO_PHYS
+#endif /* !DEFINE_IO_PHYS */
+#else /* DEFINE_IO_READ */
+#ifdef DEFINE_IO_PHYS
 						vm_copyfromphys(&data.bytes[1], ent.ab_base, 1);
 						++ent.ab_base;
-#else /* IO_PHYS */
+#else /* DEFINE_IO_PHYS */
 						data.bytes[1] = ((u8 *)ent.ab_base)[0];
 						ent.ab_base   = (byte_t *)ent.ab_base + 1;
-#endif /* !IO_PHYS */
+#endif /* !DEFINE_IO_PHYS */
 						outw(bus->b_busio + ATA_DATA, data.word);
-#endif /* !IO_READ */
+#endif /* !DEFINE_IO_READ */
 						--ent.ab_size;
 					}
 					ent.ab_size -= max_bytes;
-#ifdef IO_PHYS
+#ifdef DEFINE_IO_PHYS
 					ent.ab_base += max_bytes;
 #else
 					ent.ab_base = (byte_t *)ent.ab_base + max_bytes;
@@ -280,7 +280,7 @@ DECL_END
 #undef BUFFER_TYPE
 #undef VECTOR_TYPE
 #undef ENTRY_TYPE
-#undef IO_READ
-#undef IO_WRITE
-#undef IO_VECTOR
-#undef IO_PHYS
+#undef DEFINE_IO_READ
+#undef DEFINE_IO_WRITE
+#undef DEFINE_IO_VECTOR
+#undef DEFINE_IO_PHYS

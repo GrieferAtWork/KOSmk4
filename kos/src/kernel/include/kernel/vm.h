@@ -1108,10 +1108,6 @@ FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_writev_phys(struct vm_datablock *
  * acquire a lock to `self' when doing so is impossible) */
 FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_read_unsafe(struct vm_datablock *__restrict self, void *__restrict dst, size_t num_bytes, vm_daddr_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_write_unsafe(struct vm_datablock *__restrict self, void const *__restrict src, size_t num_bytes, vm_daddr_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-/* Perform I/O using an intermediate buffer, thus solving the deadlock
- * scenario possible when using `vm_datablock_(read|write)_unsafe' */
-FUNDEF NONNULL((1)) void KCALL vm_datablock_read_buffered(struct vm_datablock *__restrict self, USER CHECKED void *dst, size_t num_bytes, vm_daddr_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
-FUNDEF NONNULL((1)) void KCALL vm_datablock_write_buffered(struct vm_datablock *__restrict self, USER CHECKED void const *src, size_t num_bytes, vm_daddr_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 
 
 #ifndef CONFIG_NO_VIO

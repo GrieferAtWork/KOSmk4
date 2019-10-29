@@ -34,10 +34,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long .Lname8 /* index: 8 */
-	.weak vm_datablock_read_buffered; .long vm_datablock_read_buffered
-	.reloc ., R_386_SIZE32, vm_datablock_read_buffered; .long 0
-	.long 0xff403e4
+	.long 0 /* index: 8 */
+	.long 0
+	.long 0
+	.long 0
 	.long 0 /* index: 9 */
 	.long 0
 	.long 0
@@ -7734,10 +7734,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak memcpyl; .long memcpyl
 	.reloc ., R_386_SIZE32, memcpyl; .long 0
 	.long 0x3c3a78c
-	.long .Lname1933 /* index: 1933 */
-	.weak vm_datablock_write_buffered; .long vm_datablock_write_buffered
-	.reloc ., R_386_SIZE32, vm_datablock_write_buffered; .long 0
-	.long 0xa349104
+	.long 0 /* index: 1933 */
+	.long 0
+	.long 0
+	.long 0
 	.long .Lname1934 /* index: 1934 */
 	.weak unwind_fde_find; .long unwind_fde_find
 	.reloc ., R_386_SIZE32, unwind_fde_find; .long 0
@@ -16400,8 +16400,6 @@ END(kernel_symbol_table)
 	.string "krealloc_in_place"
 .Lname6:
 	.string "slab_malloc16"
-.Lname8:
-	.string "vm_datablock_read_buffered"
 .Lname11:
 	.string "inode_writek"
 .Lname13:
@@ -18356,8 +18354,6 @@ END(kernel_symbol_table)
 	.string "sys_socket"
 .Lname1932:
 	.string "memcpyl"
-.Lname1933:
-	.string "vm_datablock_write_buffered"
 .Lname1934:
 	.string "unwind_fde_find"
 .Lname1939:

@@ -18,13 +18,12 @@
  */
 #ifdef __INTELLISENSE__
 #include "vm.c"
-#define IO_READ 1
-//#define IO_WRITE 1
-//#define IO_PHYS 1
-//#define IO_VECTOR 1
-//#define IO_UNSAFE 1
-//#define IO_BUFFERED 1
-#endif
+#define DEFINE_IO_READ 1
+//#define DEFINE_IO_WRITE 1
+//#define DEFINE_IO_PHYS 1
+//#define DEFINE_IO_VECTOR 1
+//#define DEFINE_IO_UNSAFE 1
+#endif /* __INTELLISENSE__ */
 
 #include <kernel/aio.h>
 #include <kernel/vio.h>
@@ -32,140 +31,132 @@
 
 DECL_BEGIN
 
-#ifdef IO_READ
+#ifdef DEFINE_IO_READ
 #define FUNC_RW(x)     vm_datablock_read##x
 #define FUNC_VIO_RW(x) vm_datablock_vio_read##x
-#else /* IO_READ */
+#else /* DEFINE_IO_READ */
 #define FUNC_RW(x)     vm_datablock_write##x
 #define FUNC_VIO_RW(x) vm_datablock_vio_write##x
-#endif /* !IO_READ */
+#endif /* !DEFINE_IO_READ */
 
 
-#ifdef IO_READ
-#if defined(IO_PHYS) && defined(IO_VECTOR)
+#ifdef DEFINE_IO_READ
+#if defined(DEFINE_IO_PHYS) && defined(DEFINE_IO_VECTOR)
 #define DO_PART_IO vm_datapart_readv_phys
-#elif defined(IO_VECTOR)
+#elif defined(DEFINE_IO_VECTOR)
 #define DO_PART_IO vm_datapart_readv
-#elif defined(IO_PHYS)
+#elif defined(DEFINE_IO_PHYS)
 #define DO_PART_IO vm_datapart_read_phys
-#elif defined(IO_BUFFERED)
-#define DO_PART_IO vm_datapart_read_buffered
-#elif defined(IO_UNSAFE)
+#elif defined(DEFINE_IO_UNSAFE)
 #define DO_PART_IO vm_datapart_read_unsafe
 #else
 #define DO_PART_IO vm_datapart_read
 #endif
-#else /* IO_READ */
-#if defined(IO_PHYS) && defined(IO_VECTOR)
+#else /* DEFINE_IO_READ */
+#if defined(DEFINE_IO_PHYS) && defined(DEFINE_IO_VECTOR)
 #define DO_PART_IO vm_datapart_writev_phys
-#elif defined(IO_VECTOR)
+#elif defined(DEFINE_IO_VECTOR)
 #define DO_PART_IO vm_datapart_writev
-#elif defined(IO_PHYS)
+#elif defined(DEFINE_IO_PHYS)
 #define DO_PART_IO vm_datapart_write_phys
-#elif defined(IO_BUFFERED)
-#define DO_PART_IO vm_datapart_write_buffered
-#elif defined(IO_UNSAFE)
+#elif defined(DEFINE_IO_UNSAFE)
 #define DO_PART_IO vm_datapart_write_unsafe
 #else
 #define DO_PART_IO vm_datapart_write
 #endif
-#endif /* !IO_READ */
+#endif /* !DEFINE_IO_READ */
 
 
 #ifndef CONFIG_NO_VIO
 /* Perform datablock access through VIO callbacks. */
-#ifdef IO_READ
-#if defined(IO_PHYS) && defined(IO_VECTOR)
+#ifdef DEFINE_IO_READ
+#if defined(DEFINE_IO_PHYS) && defined(DEFINE_IO_VECTOR)
 #define DO_VIO_ACCESS  vm_datablock_vio_readv_phys
-#elif defined(IO_VECTOR)
+#elif defined(DEFINE_IO_VECTOR)
 #define DO_VIO_ACCESS  vm_datablock_vio_readv
-#elif defined(IO_PHYS)
+#elif defined(DEFINE_IO_PHYS)
 #define DO_VIO_ACCESS  vm_datablock_vio_read_phys
 #else
 #define DO_VIO_ACCESS  vm_datablock_vio_read
 #endif
-#else /* IO_READ */
-#if defined(IO_PHYS) && defined(IO_VECTOR)
+#else /* DEFINE_IO_READ */
+#if defined(DEFINE_IO_PHYS) && defined(DEFINE_IO_VECTOR)
 #define DO_VIO_ACCESS  vm_datablock_vio_writev_phys
-#elif defined(IO_VECTOR)
+#elif defined(DEFINE_IO_VECTOR)
 #define DO_VIO_ACCESS  vm_datablock_vio_writev
-#elif defined(IO_PHYS)
+#elif defined(DEFINE_IO_PHYS)
 #define DO_VIO_ACCESS  vm_datablock_vio_write_phys
 #else
 #define DO_VIO_ACCESS  vm_datablock_vio_write
 #endif
-#endif /* !IO_READ */
+#endif /* !DEFINE_IO_READ */
 #endif /* !CONFIG_NO_VIO */
 
 
 
 PUBLIC
-#ifdef IO_VECTOR
+#ifdef DEFINE_IO_VECTOR
 	NONNULL((1, 2))
-#else /* IO_VECTOR */
+#else /* DEFINE_IO_VECTOR */
 	NONNULL((1))
-#endif /* !IO_VECTOR */
+#endif /* !DEFINE_IO_VECTOR */
 void
-#if defined(IO_VECTOR) && defined(IO_PHYS)
+#if defined(DEFINE_IO_VECTOR) && defined(DEFINE_IO_PHYS)
 KCALL FUNC_RW(vp)
-#elif defined(IO_VECTOR)
+#elif defined(DEFINE_IO_VECTOR)
 KCALL FUNC_RW(v)
-#elif defined(IO_PHYS)
+#elif defined(DEFINE_IO_PHYS)
 KCALL FUNC_RW(p)
-#elif defined(IO_UNSAFE)
+#elif defined(DEFINE_IO_UNSAFE)
 /* Same as the `vm_datablock_(read|write)', however make the assumption that the
  * memory backing is `safe' (i.e. access could never cause a #PF attempting to
  * acquire a lock to `self' when doing so is impossible) */
 KCALL FUNC_RW(_unsafe)
-#elif defined(IO_BUFFERED)
-/* Perform I/O using an intermediate buffer, thus solving the deadlock
- * scenario possible when using `vm_datablock_(read|write)_unsafe' */
-KCALL FUNC_RW(_buffered)
-#elif defined(IO_READ)
+#elif defined(DEFINE_IO_READ)
 KCALL vm_datablock_read
 #else
 KCALL vm_datablock_write
 #endif
                           (struct vm_datablock *__restrict self,
-#if defined(IO_VECTOR) && defined(IO_PHYS)
+#if defined(DEFINE_IO_VECTOR) && defined(DEFINE_IO_PHYS)
                            struct aio_pbuffer const *__restrict buf,
-#elif defined(IO_VECTOR)
+#elif defined(DEFINE_IO_VECTOR)
                            struct aio_buffer const *__restrict buf,
-#elif defined(IO_PHYS)
+#elif defined(DEFINE_IO_PHYS)
                            vm_phys_t buf,
-#elif defined(IO_READ) && defined(IO_UNSAFE)
+#elif defined(DEFINE_IO_READ) && defined(DEFINE_IO_UNSAFE)
                            void *buf,
-#elif defined(IO_UNSAFE)
+#elif defined(DEFINE_IO_UNSAFE)
                            void const *buf,
-#elif defined(IO_READ)
+#elif defined(DEFINE_IO_READ)
                            USER CHECKED void *buf,
 #else
                            USER CHECKED void const *buf,
 #endif
                            size_t num_bytes,
                            vm_daddr_t src_offset)
-#ifdef IO_PHYS
+#ifdef DEFINE_IO_PHYS
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...)
-#else /* IO_PHYS */
+#else /* DEFINE_IO_PHYS */
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...)
-#endif /* !IO_PHYS */
+#endif /* !DEFINE_IO_PHYS */
 {
 	REF struct vm_datapart *part;
-#ifdef IO_VECTOR
-#ifdef IO_PHYS
+#ifdef DEFINE_IO_VECTOR
+#ifdef DEFINE_IO_PHYS
 	struct aio_pbuffer view,view2;
-#else /* IO_PHYS */
+#else /* DEFINE_IO_PHYS */
 	struct aio_buffer view,view2;
-#endif /* !IO_PHYS */
-#endif /* IO_VECTOR */
+#endif /* !DEFINE_IO_PHYS */
+#endif /* DEFINE_IO_VECTOR */
 #ifndef CONFIG_NO_VIO
 	if (self->db_vio) {
 		/* Perform I/O through VIO functionality. */
 		DO_VIO_ACCESS(self,
 		              buf,
-#ifndef IO_VECTOR
+#ifndef DEFINE_IO_VECTOR
 		              num_bytes,
-#endif /* !IO_VECTOR */
+#endif /* !DEFINE_IO_VECTOR */
 		              src_offset);
 		return;
 	}
@@ -179,12 +170,12 @@ KCALL vm_datablock_write
 		TRY {
 			temp = DO_PART_IO(part,
 			                  buf,
-#ifndef IO_VECTOR
+#ifndef DEFINE_IO_VECTOR
 			                  num_bytes,
-#endif /* !IO_VECTOR */
-#ifdef IO_WRITE
+#endif /* !DEFINE_IO_VECTOR */
+#ifdef DEFINE_IO_WRITE
 			                  num_bytes,
-#endif /* !IO_WRITE */
+#endif /* !DEFINE_IO_WRITE */
 			                  src_offset - vm_datapart_startbyte(part));
 		} EXCEPT {
 			decref(part);
@@ -195,7 +186,7 @@ KCALL vm_datablock_write
 		if (temp >= num_bytes)
 			break;
 		num_bytes -= temp;
-#if defined(IO_VECTOR) && defined(IO_PHYS)
+#if defined(DEFINE_IO_VECTOR) && defined(DEFINE_IO_PHYS)
 		if (buf == &view) {
 			aio_pbuffer_init_view_after(&view2, &view, temp);
 			buf = &view2;
@@ -203,7 +194,7 @@ KCALL vm_datablock_write
 			aio_pbuffer_init_view_after(&view, buf, temp);
 			buf = &view;
 		}
-#elif defined(IO_VECTOR)
+#elif defined(DEFINE_IO_VECTOR)
 		if (buf == &view) {
 			aio_buffer_init_view_after(&view2, &view, temp);
 			buf = &view2;
@@ -211,7 +202,7 @@ KCALL vm_datablock_write
 			aio_buffer_init_view_after(&view, buf, temp);
 			buf = &view;
 		}
-#elif defined(IO_PHYS)
+#elif defined(DEFINE_IO_PHYS)
 		buf += temp;
 #else
 		buf = (byte_t *)buf + temp;
@@ -222,36 +213,36 @@ KCALL vm_datablock_write
 
 
 #ifndef CONFIG_NO_VIO
-#if !defined(IO_BUFFERED) && !defined(IO_UNSAFE)
+#if !defined(DEFINE_IO_UNSAFE)
 
 /* Perform datablock access through VIO callbacks. */
 PUBLIC
-#ifdef IO_VECTOR
+#ifdef DEFINE_IO_VECTOR
 	NONNULL((1, 2))
-#else /* IO_VECTOR */
+#else /* DEFINE_IO_VECTOR */
 	NONNULL((1))
-#endif /* !IO_VECTOR */
+#endif /* !DEFINE_IO_VECTOR */
 	void
-#if defined(IO_VECTOR) && defined(IO_PHYS)
+#if defined(DEFINE_IO_VECTOR) && defined(DEFINE_IO_PHYS)
 KCALL FUNC_VIO_RW(v_phys)
-#elif defined(IO_VECTOR)
+#elif defined(DEFINE_IO_VECTOR)
 KCALL FUNC_VIO_RW(v)
-#elif defined(IO_PHYS)
+#elif defined(DEFINE_IO_PHYS)
 KCALL FUNC_VIO_RW(_phys)
-#elif defined(IO_READ)
+#elif defined(DEFINE_IO_READ)
 KCALL vm_datablock_vio_read
 #else
 KCALL vm_datablock_vio_write
 #endif
                               (struct vm_datablock *__restrict self,
-#if defined(IO_VECTOR) && defined(IO_PHYS)
+#if defined(DEFINE_IO_VECTOR) && defined(DEFINE_IO_PHYS)
                                struct aio_pbuffer const *__restrict buf,
-#elif defined(IO_VECTOR)
+#elif defined(DEFINE_IO_VECTOR)
                                struct aio_buffer const *__restrict buf,
-#elif defined(IO_PHYS)
+#elif defined(DEFINE_IO_PHYS)
                                vm_phys_t buf,
                                size_t num_bytes,
-#elif defined(IO_READ)
+#elif defined(DEFINE_IO_READ)
                                USER CHECKED void *buf,
                                size_t num_bytes,
 #else
@@ -259,13 +250,13 @@ KCALL vm_datablock_vio_write
                                size_t num_bytes,
 #endif
                                vm_daddr_t src_offset)
-#ifdef IO_PHYS
+#ifdef DEFINE_IO_PHYS
        THROWS(...)
-#else /* IO_PHYS */
+#else /* DEFINE_IO_PHYS */
        THROWS(E_SEGFAULT,...)
-#endif /* !IO_PHYS */
+#endif /* !DEFINE_IO_PHYS */
 {
-#if defined(IO_PHYS) && defined(IO_VECTOR)
+#if defined(DEFINE_IO_PHYS) && defined(DEFINE_IO_VECTOR)
 	struct aio_pbuffer_entry ent;
 	AIO_PBUFFER_FOREACH(ent, buf) {
 		FUNC_VIO_RW(_phys)(self,
@@ -274,21 +265,21 @@ KCALL vm_datablock_vio_write
 		                   src_offset);
 		src_offset += ent.ab_size;
 	}
-#elif defined(IO_VECTOR)
+#elif defined(DEFINE_IO_VECTOR)
 	struct aio_buffer_entry ent;
 	AIO_BUFFER_FOREACH(ent,buf) {
-#ifdef IO_READ
+#ifdef DEFINE_IO_READ
 		vm_datablock_vio_read
-#else /* IO_READ */
+#else /* DEFINE_IO_READ */
 		vm_datablock_vio_write
-#endif /* !IO_READ */
+#endif /* !DEFINE_IO_READ */
 		                      (self,
 		                       ent.ab_base,
 		                       ent.ab_size,
 		                       src_offset);
 		src_offset += ent.ab_size;
 	}
-#elif defined(IO_PHYS)
+#elif defined(DEFINE_IO_PHYS)
 	uintptr_t backup; vm_vpage_t tramp;
 	bool is_first;
 	if unlikely(!num_bytes) return;
@@ -302,7 +293,7 @@ KCALL vm_datablock_vio_write
 			page_bytes = PAGESIZE - (buf & (PAGESIZE - 1));
 			if (page_bytes > num_bytes)
 				page_bytes = num_bytes;
-#ifdef IO_READ
+#ifdef DEFINE_IO_READ
 			if (is_first) {
 				backup = pagedir_push_mapone(tramp, pageaddr,
 				                             PAGEDIR_MAP_FWRITE);
@@ -310,7 +301,7 @@ KCALL vm_datablock_vio_write
 				pagedir_mapone(tramp, pageaddr,
 				               PAGEDIR_MAP_FWRITE);
 			}
-#else /* IO_READ */
+#else /* DEFINE_IO_READ */
 			if (is_first) {
 				backup = pagedir_push_mapone(tramp, pageaddr,
 				                             PAGEDIR_MAP_FREAD);
@@ -318,14 +309,14 @@ KCALL vm_datablock_vio_write
 				pagedir_mapone(tramp, pageaddr,
 				               PAGEDIR_MAP_FREAD);
 			}
-#endif /* !IO_READ */
+#endif /* !DEFINE_IO_READ */
 			pagedir_syncone(tramp);
 			/* Perform VIO memory access. */
-#ifdef IO_READ
+#ifdef DEFINE_IO_READ
 			vm_datablock_vio_read
-#else /* IO_READ */
+#else /* DEFINE_IO_READ */
 			vm_datablock_vio_write
-#endif /* !IO_READ */
+#endif /* !DEFINE_IO_READ */
 			                      (self,
 			                       (byte_t *)VM_PAGE2ADDR(tramp) + (ptrdiff_t)(buf & (PAGESIZE - 1)),
 			                       page_bytes,
@@ -359,11 +350,11 @@ KCALL vm_datablock_vio_write
 #define VIO_LARGEBLOCK_TYPE u32
 #endif /* !CONFIG_VIO_HAS_QWORD */
 
-#ifdef IO_READ
+#ifdef DEFINE_IO_READ
 #define DO_VIO(T, w, n) UNALIGNED_SET##n((T *)buf, vio_read##w(&args, src_offset))
-#else /* IO_READ */
+#else /* DEFINE_IO_READ */
 #define DO_VIO(T, w, n) vio_write##w(&args, src_offset, UNALIGNED_GET##n((T *)buf))
-#endif /* !IO_READ */
+#endif /* !DEFINE_IO_READ */
 	for (; num_bytes >= VIO_LARGEBLOCK_SIZE;
 	     src_offset += VIO_LARGEBLOCK_SIZE,
 	     num_bytes -= VIO_LARGEBLOCK_SIZE,
@@ -389,18 +380,18 @@ KCALL vm_datablock_vio_write
 	}
 #undef DO_VIO
 	if (num_bytes & 1) {
-#ifdef IO_READ
+#ifdef DEFINE_IO_READ
 		*(u8 *)buf = vio_readb(&args, src_offset);
-#else /* IO_READ */
+#else /* DEFINE_IO_READ */
 		vio_writeb(&args, src_offset, *(u8 *)buf);
-#endif /* !IO_READ */
+#endif /* !DEFINE_IO_READ */
 	}
 #undef VIO_LARGEBLOCK_TYPE
 #undef VIO_LARGEBLOCK_SIZE
 #endif
 }
 
-#endif /* !IO_BUFFERED && !IO_UNSAFE */
+#endif /* !DEFINE_IO_UNSAFE */
 #endif /* !CONFIG_NO_VIO */
 
 
@@ -411,9 +402,8 @@ DECL_END
 #undef FUNC_RW
 #undef DO_VIO_ACCESS
 #undef DO_PART_IO
-#undef IO_READ
-#undef IO_WRITE
-#undef IO_PHYS
-#undef IO_VECTOR
-#undef IO_UNSAFE
-#undef IO_BUFFERED
+#undef DEFINE_IO_READ
+#undef DEFINE_IO_WRITE
+#undef DEFINE_IO_PHYS
+#undef DEFINE_IO_VECTOR
+#undef DEFINE_IO_UNSAFE

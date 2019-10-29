@@ -18,18 +18,18 @@
  */
 #ifdef __INTELLISENSE__
 #include "datapart-read-write.c"
-//#define IO_READ 1
-#define IO_WRITE 1
-//#define IO_PHYS 1
+//#define DEFINE_IO_READ 1
+#define DEFINE_IO_WRITE 1
+//#define DEFINE_IO_PHYS 1
 #endif
 
 DECL_BEGIN
 
-#if defined(IO_READ) && defined(IO_PHYS)
+#if defined(DEFINE_IO_READ) && defined(DEFINE_IO_PHYS)
 #define FUNC0(x) x##read_phys
-#elif defined(IO_READ)
+#elif defined(DEFINE_IO_READ)
 #define FUNC0(x) x##read
-#elif defined(IO_PHYS)
+#elif defined(DEFINE_IO_PHYS)
 #define FUNC0(x) x##write_phys
 #else
 #define FUNC0(x) x##write
@@ -44,20 +44,20 @@ DECL_BEGIN
  *       that `self' is either INCORE or LOCKED */
 PUBLIC NONNULL((1)) void KCALL
 FUNC0(vm_datapart_do_)(struct vm_datapart *__restrict self,
-#ifdef IO_PHYS
+#ifdef DEFINE_IO_PHYS
                        vm_phys_t buf,
-#elif defined(IO_READ)
+#elif defined(DEFINE_IO_READ)
                        USER CHECKED void *buf,
 #else
                        USER CHECKED void const *buf,
 #endif
                        size_t num_bytes,
                        vm_daddr_t offset)
-#ifdef IO_PHYS
+#ifdef DEFINE_IO_PHYS
 		THROWS(...)
-#else /* IO_PHYS */
+#else /* DEFINE_IO_PHYS */
 		THROWS(E_SEGFAULT, ...)
-#endif /* !IO_PHYS */
+#endif /* !DEFINE_IO_PHYS */
 {
 	size_t data_pagesize;
 	assert(sync_reading(self) || !isshared(self) ||
@@ -75,74 +75,74 @@ FUNC0(vm_datapart_do_)(struct vm_datapart *__restrict self,
 				max_io = num_bytes;
 			data_base = vm_datapart_loaddatapage(self,
 			                                     (vm_dpage_t)(offset >> VM_DATABLOCK_ADDRSHIFT(self->dp_block)),
-#ifdef IO_READ
+#ifdef DEFINE_IO_READ
 			                                     false
-#else /* IO_READ */
+#else /* DEFINE_IO_READ */
 			                                     true
-#endif /* !IO_READ */
+#endif /* !DEFINE_IO_READ */
 			                                     );
 			/* Copy data to/from the data part memory back-end */
-#ifdef IO_PHYS
-#ifdef IO_READ
+#ifdef DEFINE_IO_PHYS
+#ifdef DEFINE_IO_READ
 			vm_copyinphys(buf, (vm_phys_t)(data_base + page_offset), max_io);
-#else /* IO_READ */
+#else /* DEFINE_IO_READ */
 			vm_copyinphys((vm_phys_t)(data_base + page_offset), buf, max_io);
-#endif /* !IO_READ */
-#else /* IO_PHYS */
-#ifdef IO_READ
+#endif /* !DEFINE_IO_READ */
+#else /* DEFINE_IO_PHYS */
+#ifdef DEFINE_IO_READ
 			vm_copyfromphys(buf, (vm_phys_t)(data_base + page_offset), max_io);
-#else /* IO_READ */
+#else /* DEFINE_IO_READ */
 			vm_copytophys((vm_phys_t)(data_base + page_offset), buf, max_io);
-#endif /* !IO_READ */
-#endif /* !IO_PHYS */
+#endif /* !DEFINE_IO_READ */
+#endif /* !DEFINE_IO_PHYS */
 			if (max_io >= num_bytes)
 				break;
 			num_bytes -= max_io;
 			offset += max_io;
-#ifdef IO_PHYS
+#ifdef DEFINE_IO_PHYS
 			buf += max_io;
-#else /* IO_PHYS */
+#else /* DEFINE_IO_PHYS */
 			buf = (byte_t *)buf + max_io;
-#endif /* !IO_PHYS */
+#endif /* !DEFINE_IO_PHYS */
 		}
 	}
 }
 
 
 
-#ifdef IO_PHYS
+#ifdef DEFINE_IO_PHYS
 PUBLIC NONNULL((1)) size_t KCALL
 FUNC0(vm_datapart_)(struct vm_datapart *__restrict self,
                     vm_phys_t buf,
                     size_t num_bytes,
-#ifdef IO_WRITE
+#ifdef DEFINE_IO_WRITE
                     size_t split_bytes,
-#endif /* IO_WRITE */
+#endif /* DEFINE_IO_WRITE */
                     vm_daddr_t offset)
 		THROWS(E_WOULDBLOCK, E_BADALLOC, ...)
-#else /* IO_PHYS */
+#else /* DEFINE_IO_PHYS */
 /* Same as the `vm_datapart_(read|write)', however make the assumption that the
  * memory backing is `safe' (i.e. access could never cause a #PF attempting to
  * acquire a lock to `self' when doing so is impossible) */
 PUBLIC NONNULL((1, 2)) size_t KCALL
-#ifdef IO_READ
+#ifdef DEFINE_IO_READ
 vm_datapart_read_unsafe(struct vm_datapart *__restrict self,
                         void *__restrict buf,
                         size_t num_bytes,
                         vm_daddr_t offset)
-#else /* IO_READ */
+#else /* DEFINE_IO_READ */
 vm_datapart_write_unsafe(struct vm_datapart *__restrict self,
                          void const *__restrict buf,
                          size_t num_bytes,
                          size_t split_bytes,
                          vm_daddr_t offset)
-#endif /* !IO_READ */
+#endif /* !DEFINE_IO_READ */
 		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...)
-#endif /* !IO_PHYS */
+#endif /* !DEFINE_IO_PHYS */
 {
 	size_t result;
 	vm_datapart_lockread_setcore(self);
-#ifndef IO_READ
+#ifndef DEFINE_IO_READ
 	/* Special case: Must also unshare copy-on-write mappings. */
 	if likely(!self->dp_crefs) {
 		incref(self);
@@ -195,7 +195,7 @@ vm_datapart_write_unsafe(struct vm_datapart *__restrict self,
 		}
 	}
 do_has_part:
-#endif /* !IO_READ */
+#endif /* !DEFINE_IO_READ */
 	TRY {
 		if unlikely(offset >= (vm_daddr_t)vm_datapart_numbytes(self))
 			result = 0;
@@ -203,11 +203,11 @@ do_has_part:
 			result = (size_t)((vm_daddr_t)vm_datapart_numbytes(self) - offset); /* XXX: Overflow? */
 			if (result > num_bytes)
 				result = num_bytes;
-#if defined(IO_READ) && defined(IO_PHYS)
+#if defined(DEFINE_IO_READ) && defined(DEFINE_IO_PHYS)
 			vm_datapart_do_read_phys(self, buf, result, offset);
-#elif defined(IO_READ)
+#elif defined(DEFINE_IO_READ)
 			vm_datapart_do_read(self, buf, result, offset);
-#elif defined(IO_PHYS)
+#elif defined(DEFINE_IO_PHYS)
 			vm_datapart_do_write_phys(self, buf, result, offset);
 #else
 			vm_datapart_do_write(self, buf, result, offset);
@@ -215,15 +215,15 @@ do_has_part:
 		}
 	} EXCEPT {
 		sync_endread(self);
-#ifndef IO_READ
+#ifndef DEFINE_IO_READ
 		vm_datapart_decref_and_merge(self);
-#endif /* !IO_READ */
+#endif /* !DEFINE_IO_READ */
 		RETHROW();
 	}
 	sync_endread(self);
-#ifndef IO_READ
+#ifndef DEFINE_IO_READ
 	vm_datapart_decref_and_merge(self);
-#endif /* !IO_READ */
+#endif /* !DEFINE_IO_READ */
 	return result;
 }
 
@@ -231,6 +231,6 @@ do_has_part:
 DECL_END
 
 #undef FUNC0
-#undef IO_PHYS
-#undef IO_READ
-#undef IO_WRITE
+#undef DEFINE_IO_PHYS
+#undef DEFINE_IO_READ
+#undef DEFINE_IO_WRITE

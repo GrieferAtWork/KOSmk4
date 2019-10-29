@@ -1893,34 +1893,34 @@ DECL_END
 #ifndef __INTELLISENSE__
 #ifdef CONFIG_VIO
 
-#define NAME              xch
-#define OP(oldval, value) value
+#define DEFINE_VIO_NAME              xch
+#define DEFINE_VIO_OP(oldval, value) value
 #include "vio-arith-impl.c.inl"
 
-#define NAME              add
-#define OP(oldval, value) oldval + value
+#define DEFINE_VIO_NAME              add
+#define DEFINE_VIO_OP(oldval, value) oldval + value
 #include "vio-arith-impl.c.inl"
 
-#define NAME              sub
-#define OP(oldval, value) oldval - value
+#define DEFINE_VIO_NAME              sub
+#define DEFINE_VIO_OP(oldval, value) oldval - value
 #include "vio-arith-impl.c.inl"
 
-#define NAME              and
-#define OP(oldval, value) oldval & value
+#define DEFINE_VIO_NAME              and
+#define DEFINE_VIO_OP(oldval, value) oldval & value
 #include "vio-arith-impl.c.inl"
 
-#define NAME              or
-#define OP(oldval, value) oldval | value
+#define DEFINE_VIO_NAME              or
+#define DEFINE_VIO_OP(oldval, value) oldval | value
 #include "vio-arith-impl.c.inl"
 
-#define NAME              xor
-#define OP(oldval, value) oldval ^ value
+#define DEFINE_VIO_NAME              xor
+#define DEFINE_VIO_OP(oldval, value) oldval ^ value
 #include "vio-arith-impl.c.inl"
 
 
-#define IO_READ 1
+#define DEFINE_IO_READ 1
 #include "vio-copy.c.inl"
-#define IO_WRITE 1
+#define DEFINE_IO_WRITE 1
 #include "vio-copy.c.inl"
 
 #endif /* CONFIG_VIO */

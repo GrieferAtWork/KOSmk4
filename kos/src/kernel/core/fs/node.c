@@ -4600,117 +4600,120 @@ PUBLIC struct vm_datablock_type inode_datablock_type = {
 DECL_END
 
 #ifndef __INTELLISENSE__
-#undef IO_READ
-#undef IO_WRITE
-#undef IO_ASYNC
-#undef IO_PHYS
-#undef IO_VECTOR
+#undef DEFINE_IO_READ
+#undef DEFINE_IO_WRITE
+#undef DEFINE_IO_ASYNC
+#undef DEFINE_IO_PHYS
+#undef DEFINE_IO_VECTOR
+#undef DEFINE_IO_KERNEL
 
 
-#define IO_READ 1
+#define DEFINE_IO_READ 1
 #include "node-partio.c.inl"
+#define DEFINE_IO_WRITE 1
 #include "node-partio.c.inl"
 
 /* Define `inode_a(read|write)[v][p]' */
-#define IO_READ 1
-#define IO_ASYNC 1
+#define DEFINE_IO_READ 1
+#define DEFINE_IO_ASYNC 1
 #include "node-io.c.inl"
-#define IO_READ 1
-#define IO_ASYNC 1
-#define IO_PHYS 1
+#define DEFINE_IO_READ 1
+#define DEFINE_IO_ASYNC 1
+#define DEFINE_IO_PHYS 1
 #include "node-io.c.inl"
-#define IO_WRITE 1
-#define IO_ASYNC 1
+#define DEFINE_IO_WRITE 1
+#define DEFINE_IO_ASYNC 1
 #include "node-io.c.inl"
-#define IO_WRITE 1
-#define IO_ASYNC 1
-#define IO_PHYS 1
+#define DEFINE_IO_WRITE 1
+#define DEFINE_IO_ASYNC 1
+#define DEFINE_IO_PHYS 1
 #include "node-io.c.inl"
-#define IO_READ 1
-#define IO_ASYNC 1
-#define IO_VECTOR 1
+#define DEFINE_IO_READ 1
+#define DEFINE_IO_ASYNC 1
+#define DEFINE_IO_VECTOR 1
 #include "node-io.c.inl"
-#define IO_WRITE 1
-#define IO_ASYNC 1
-#define IO_VECTOR 1
+#define DEFINE_IO_WRITE 1
+#define DEFINE_IO_ASYNC 1
+#define DEFINE_IO_VECTOR 1
 #include "node-io.c.inl"
-#define IO_READ 1
-#define IO_PHYS 1
-#define IO_ASYNC 1
-#define IO_VECTOR 1
+#define DEFINE_IO_READ 1
+#define DEFINE_IO_PHYS 1
+#define DEFINE_IO_ASYNC 1
+#define DEFINE_IO_VECTOR 1
 #include "node-io.c.inl"
-#define IO_WRITE 1
-#define IO_PHYS 1
-#define IO_ASYNC 1
-#define IO_VECTOR 1
+#define DEFINE_IO_WRITE 1
+#define DEFINE_IO_PHYS 1
+#define DEFINE_IO_ASYNC 1
+#define DEFINE_IO_VECTOR 1
 #include "node-io.c.inl"
-#define IO_ASYNC 1
-#define IO_WRITE 1
-#define IO_KERNEL 1
+#define DEFINE_IO_ASYNC 1
+#define DEFINE_IO_WRITE 1
+#define DEFINE_IO_KERNEL 1
 #include "node-io.c.inl"
-#define IO_ASYNC 1
-#define IO_READ 1
-#define IO_KERNEL 1
+#define DEFINE_IO_ASYNC 1
+#define DEFINE_IO_READ 1
+#define DEFINE_IO_KERNEL 1
 #include "node-io.c.inl"
 
 /* Define `inode_(read|write)[v][p]' */
-#define IO_READ 1
+#define DEFINE_IO_READ 1
 #include "node-io.c.inl"
-#define IO_READ 1
-#define IO_PHYS 1
+#define DEFINE_IO_READ 1
+#define DEFINE_IO_PHYS 1
 #include "node-io.c.inl"
-#define IO_WRITE 1
+#define DEFINE_IO_WRITE 1
 #include "node-io.c.inl"
-#define IO_WRITE 1
-#define IO_PHYS 1
+#define DEFINE_IO_WRITE 1
+#define DEFINE_IO_PHYS 1
 #include "node-io.c.inl"
-#define IO_READ 1
-#define IO_VECTOR 1
+#define DEFINE_IO_READ 1
+#define DEFINE_IO_VECTOR 1
 #include "node-io.c.inl"
-#define IO_WRITE 1
-#define IO_VECTOR 1
+#define DEFINE_IO_WRITE 1
+#define DEFINE_IO_VECTOR 1
 #include "node-io.c.inl"
-#define IO_READ 1
-#define IO_PHYS 1
-#define IO_VECTOR 1
+#define DEFINE_IO_READ 1
+#define DEFINE_IO_PHYS 1
+#define DEFINE_IO_VECTOR 1
 #include "node-io.c.inl"
-#define IO_WRITE 1
-#define IO_PHYS 1
-#define IO_VECTOR 1
+#define DEFINE_IO_WRITE 1
+#define DEFINE_IO_PHYS 1
+#define DEFINE_IO_VECTOR 1
 #include "node-io.c.inl"
-#define IO_WRITE 1
-#define IO_KERNEL 1
+#define DEFINE_IO_WRITE 1
+#define DEFINE_IO_KERNEL 1
 #include "node-io.c.inl"
-#define IO_READ 1
-#define IO_KERNEL 1
+#define DEFINE_IO_READ 1
+#define DEFINE_IO_KERNEL 1
 #include "node-io.c.inl"
 
 
 /* Define `inode_[a]readall[v,p]' */
-#define IO_ASYNC 1
-#define IO_PHYS 1
-#define IO_VECTOR 1
+#define DEFINE_IO_ASYNC 1
+#define DEFINE_IO_PHYS 1
+#define DEFINE_IO_VECTOR 1
 #include "node-extio.c.inl"
-#define IO_ASYNC 1
-#define IO_VECTOR 1
+#define DEFINE_IO_ASYNC 1
+#define DEFINE_IO_VECTOR 1
 #include "node-extio.c.inl"
-#define IO_ASYNC 1
-#define IO_PHYS 1
+#define DEFINE_IO_ASYNC 1
+#define DEFINE_IO_PHYS 1
 #include "node-extio.c.inl"
-#define IO_ASYNC 1
-#define IO_KERNEL 1
+#define DEFINE_IO_ASYNC 1
+#define DEFINE_IO_KERNEL 1
 #include "node-extio.c.inl"
-#define IO_ASYNC 1
+#define DEFINE_IO_ASYNC 1
 #include "node-extio.c.inl"
-#define IO_PHYS 1
-#define IO_VECTOR 1
+#define DEFINE_IO_PHYS 1
+#define DEFINE_IO_VECTOR 1
 #include "node-extio.c.inl"
-#define IO_VECTOR 1
+#define DEFINE_IO_VECTOR 1
 #include "node-extio.c.inl"
-#define IO_PHYS 1
+#define DEFINE_IO_PHYS 1
 #include "node-extio.c.inl"
-#define IO_KERNEL 1
+#define DEFINE_IO_KERNEL 1
 #include "node-extio.c.inl"
+/**/
 #include "node-extio.c.inl"
 
 #endif /* !__INTELLISENSE__ */

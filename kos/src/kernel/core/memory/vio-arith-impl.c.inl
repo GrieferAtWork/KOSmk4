@@ -20,19 +20,19 @@
 #ifdef __INTELLISENSE__
 #include "vio.c"
 
-#define NAME             xch
-#define OP(oldval,value) value
+#define DEFINE_VIO_NAME              xch
+#define DEFINE_VIO_OP(oldval, value) value
 #endif /* __INTELLISENSE__ */
 
 DECL_BEGIN
 
 #define FUNC3(name, bwlq) vio_##name##bwlq
 #define FUNC2(name, bwlq) FUNC3(name, bwlq)
-#define FUNC(bwlq)        FUNC2(NAME, bwlq)
+#define FUNC(bwlq)        FUNC2(DEFINE_VIO_NAME, bwlq)
 
 #define COMPONENT3(name) dtv_##name
 #define COMPONENT2(name) COMPONENT3(name)
-#define COMPONENT        COMPONENT2(NAME)
+#define COMPONENT        COMPONENT2(DEFINE_VIO_NAME)
 
 PUBLIC NONNULL((1)) u8 KCALL
 FUNC(b)(struct vio_args *__restrict args, vm_daddr_t addr, u8 value, bool atomic) {
@@ -41,7 +41,7 @@ FUNC(b)(struct vio_args *__restrict args, vm_daddr_t addr, u8 value, bool atomic
 	if (type->COMPONENT.f_byte)
 		return (*type->COMPONENT.f_byte)(args, addr, value, atomic);
 	result = vio_readb(args, addr);
-	while ((new_result = vio_cmpxch_or_writeb(args, addr, result, OP(result, value), atomic)) != result)
+	while ((new_result = vio_cmpxch_or_writeb(args, addr, result, DEFINE_VIO_OP(result, value), atomic)) != result)
 		result = new_result;
 	return new_result;
 }
@@ -53,7 +53,7 @@ FUNC(w)(struct vio_args *__restrict args, vm_daddr_t addr, u16 value, bool atomi
 	if (type->COMPONENT.f_word && ((uintptr_t)addr & 1) == 0)
 		return (*type->COMPONENT.f_word)(args, addr, value, atomic);
 	result = vio_readw(args, addr);
-	while ((new_result = vio_cmpxch_or_writew(args, addr, result, OP(result, value), atomic)) != result)
+	while ((new_result = vio_cmpxch_or_writew(args, addr, result, DEFINE_VIO_OP(result, value), atomic)) != result)
 		result = new_result;
 	return new_result;
 }
@@ -65,7 +65,7 @@ FUNC(l)(struct vio_args *__restrict args, vm_daddr_t addr, u32 value, bool atomi
 	if (type->COMPONENT.f_dword && ((uintptr_t)addr & 3) == 0)
 		return (*type->COMPONENT.f_dword)(args, addr, value, atomic);
 	result = vio_readl(args, addr);
-	while ((new_result = vio_cmpxch_or_writel(args, addr, result, OP(result, value), atomic)) != result)
+	while ((new_result = vio_cmpxch_or_writel(args, addr, result, DEFINE_VIO_OP(result, value), atomic)) != result)
 		result = new_result;
 	return new_result;
 }
@@ -78,20 +78,20 @@ FUNC(q)(struct vio_args *__restrict args, vm_daddr_t addr, u64 value, bool atomi
 	if (type->COMPONENT.f_qword && ((uintptr_t)addr & 7) == 0)
 		return (*type->COMPONENT.f_qword)(args, addr, value, atomic);
 	result = vio_readq(args, addr);
-	while ((new_result = vio_cmpxch_or_writeq(args, addr, result, OP(result, value), atomic)) != result)
+	while ((new_result = vio_cmpxch_or_writeq(args, addr, result, DEFINE_VIO_OP(result, value), atomic)) != result)
 		result = new_result;
 	return new_result;
 }
 #endif /* CONFIG_VIO_HAS_QWORD */
 
-#undef OP
+#undef DEFINE_VIO_OP
 #undef FUNC3
 #undef FUNC2
 #undef FUNC
 #undef COMPONENT3
 #undef COMPONENT2
 #undef COMPONENT
-#undef NAME
+#undef DEFINE_VIO_NAME
 
 DECL_END
 
