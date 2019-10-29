@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6aee47e3 */
+/* HASH CRC-32:0x31560514 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,9 +57,9 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(iscntrl))(int __ch) {
 #include <__hybrid/__byteorder.__h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 	return (*__localdep___ctype_b_loc())[__ch] & (1 << 9);
-#else
+#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
 	return (*__localdep___ctype_b_loc())[__ch] & (1 << 1);
-#endif
+#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
 #elif defined(__CRT_HAVE___locale_ctype_ptr) && defined(__CRT_CYG)
 	return ((__localdep___locale_ctype_ptr() + 1)[__ch & 0xff] & 040) != 0;
 #elif defined(__CRT_HAVE__isctype) && defined(__CRT_DOS)

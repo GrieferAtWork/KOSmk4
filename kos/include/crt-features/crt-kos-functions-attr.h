@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe5a04bd */
+/* HASH CRC-32:0x32c76e38 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3938,6 +3938,17 @@
 #define __CRT_ATTR_PURE_fuzzy_wmemcmp 1
 #define __CRT_ATTR_PURE_hasmntopt 1
 #define __CRT_ATTR_PURE_index 1
+#define __CRT_ATTR_PURE_isalnum_l 1
+#define __CRT_ATTR_PURE_isalpha_l 1
+#define __CRT_ATTR_PURE_isblank_l 1
+#define __CRT_ATTR_PURE_iscntrl_l 1
+#define __CRT_ATTR_PURE_isdigit_l 1
+#define __CRT_ATTR_PURE_isgraph_l 1
+#define __CRT_ATTR_PURE_islower_l 1
+#define __CRT_ATTR_PURE_isprint_l 1
+#define __CRT_ATTR_PURE_ispunct_l 1
+#define __CRT_ATTR_PURE_isspace_l 1
+#define __CRT_ATTR_PURE_isupper_l 1
 #define __CRT_ATTR_PURE_iswalnum_l 1
 #define __CRT_ATTR_PURE_iswalpha_l 1
 #define __CRT_ATTR_PURE_iswblank_l 1
@@ -3951,6 +3962,7 @@
 #define __CRT_ATTR_PURE_iswspace_l 1
 #define __CRT_ATTR_PURE_iswupper_l 1
 #define __CRT_ATTR_PURE_iswxdigit_l 1
+#define __CRT_ATTR_PURE_isxdigit_l 1
 #define __CRT_ATTR_PURE_malloc_usable_size 1
 #define __CRT_ATTR_PURE_mbsinit 1
 #define __CRT_ATTR_PURE_memcasemem 1
@@ -4101,6 +4113,8 @@
 #define __CRT_ATTR_PURE_timegm64 1
 #define __CRT_ATTR_PURE_timelocal 1
 #define __CRT_ATTR_PURE_timelocal64 1
+#define __CRT_ATTR_PURE_tolower_l 1
+#define __CRT_ATTR_PURE_toupper_l 1
 #define __CRT_ATTR_PURE_towlower_l 1
 #define __CRT_ATTR_PURE_towupper_l 1
 #define __CRT_ATTR_PURE_versionsort 1
@@ -4322,34 +4336,23 @@
 #define __CRT_ATTR_CONST_imaxabs 1
 #define __CRT_ATTR_CONST_imaxdiv 1
 #define __CRT_ATTR_CONST_isalnum 1
-#define __CRT_ATTR_CONST_isalnum_l 1
 #define __CRT_ATTR_CONST_isalpha 1
-#define __CRT_ATTR_CONST_isalpha_l 1
 #define __CRT_ATTR_CONST_isblank 1
-#define __CRT_ATTR_CONST_isblank_l 1
 #define __CRT_ATTR_CONST_iscntrl 1
-#define __CRT_ATTR_CONST_iscntrl_l 1
 #define __CRT_ATTR_CONST_isdigit 1
-#define __CRT_ATTR_CONST_isdigit_l 1
 #define __CRT_ATTR_CONST_isgraph 1
-#define __CRT_ATTR_CONST_isgraph_l 1
 #define __CRT_ATTR_CONST_isinf 1
 #define __CRT_ATTR_CONST_isinff 1
 #define __CRT_ATTR_CONST_isinfl 1
 #define __CRT_ATTR_CONST_isleadbyte 1
 #define __CRT_ATTR_CONST_islower 1
-#define __CRT_ATTR_CONST_islower_l 1
 #define __CRT_ATTR_CONST_isnan 1
 #define __CRT_ATTR_CONST_isnanf 1
 #define __CRT_ATTR_CONST_isnanl 1
 #define __CRT_ATTR_CONST_isprint 1
-#define __CRT_ATTR_CONST_isprint_l 1
 #define __CRT_ATTR_CONST_ispunct 1
-#define __CRT_ATTR_CONST_ispunct_l 1
 #define __CRT_ATTR_CONST_isspace 1
-#define __CRT_ATTR_CONST_isspace_l 1
 #define __CRT_ATTR_CONST_isupper 1
-#define __CRT_ATTR_CONST_isupper_l 1
 #define __CRT_ATTR_CONST_iswalnum 1
 #define __CRT_ATTR_CONST_iswalpha 1
 #define __CRT_ATTR_CONST_iswascii 1
@@ -4364,7 +4367,6 @@
 #define __CRT_ATTR_CONST_iswupper 1
 #define __CRT_ATTR_CONST_iswxdigit 1
 #define __CRT_ATTR_CONST_isxdigit 1
-#define __CRT_ATTR_CONST_isxdigit_l 1
 #define __CRT_ATTR_CONST_labs 1
 #define __CRT_ATTR_CONST_ldiv 1
 #define __CRT_ATTR_CONST_llabs 1
@@ -4393,9 +4395,7 @@
 #define __CRT_ATTR_CONST_strerrorname_s 1
 #define __CRT_ATTR_CONST_strsignal_s 1
 #define __CRT_ATTR_CONST_tolower 1
-#define __CRT_ATTR_CONST_tolower_l 1
 #define __CRT_ATTR_CONST_toupper 1
-#define __CRT_ATTR_CONST_toupper_l 1
 #define __CRT_ATTR_CONST_towlower 1
 #define __CRT_ATTR_CONST_towupper 1
 #define __CRT_ATTR_CONST_trunc 1

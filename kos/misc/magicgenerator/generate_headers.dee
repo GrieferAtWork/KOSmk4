@@ -633,7 +633,9 @@ local paren_match = {
 };
 
 @@Split a given argument list into the individual arguments
-function findfirstch_parenaware(text: string, find_chars: string, start: int = 0, end: int = -1): int {
+function findfirstch_parenaware(
+		text: string, find_chars: string,
+		start: int = 0, end: int = -1): int {
 	if (end < 0)
 		end = #text;
 	local i = start;

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcfd78194 */
+/* HASH CRC-32:0x76e5e735 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -131,7 +131,7 @@ NOTHROW(LIBCCALL libc_isblank)(int ch) {
 	return (u8)ch == 0x09 || (u8)ch == 0x20;
 }
 
-INTERN ATTR_CONST WUNUSED
+INTERN ATTR_PURE WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.ctype.iscntrl_l") int
 NOTHROW_NCX(LIBCCALL libc_iscntrl_l)(int ch,
                                      __locale_t locale) {
@@ -140,106 +140,106 @@ NOTHROW_NCX(LIBCCALL libc_iscntrl_l)(int ch,
 	return libc_iscntrl(ch);
 }
 
-INTERN ATTR_CONST WUNUSED
+INTERN ATTR_PURE WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.ctype.isspace_l") int
 NOTHROW_NCX(LIBCCALL libc_isspace_l)(int ch,
                                      __locale_t locale) {
-#line 359 "kos/src/libc/magic/ctype.c"
+#line 360 "kos/src/libc/magic/ctype.c"
 	(void)locale;
 	return libc_isspace(ch);
 }
 
-INTERN ATTR_CONST WUNUSED
+INTERN ATTR_PURE WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.ctype.isupper_l") int
 NOTHROW_NCX(LIBCCALL libc_isupper_l)(int ch,
                                      __locale_t locale) {
-#line 381 "kos/src/libc/magic/ctype.c"
+#line 382 "kos/src/libc/magic/ctype.c"
 	(void)locale;
 	return libc_isupper(ch);
 }
 
-INTERN ATTR_CONST WUNUSED
+INTERN ATTR_PURE WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.ctype.islower_l") int
 NOTHROW_NCX(LIBCCALL libc_islower_l)(int ch,
                                      __locale_t locale) {
-#line 403 "kos/src/libc/magic/ctype.c"
+#line 404 "kos/src/libc/magic/ctype.c"
 	(void)locale;
 	return libc_islower(ch);
 }
 
-INTERN ATTR_CONST WUNUSED
+INTERN ATTR_PURE WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.ctype.isalpha_l") int
 NOTHROW_NCX(LIBCCALL libc_isalpha_l)(int ch,
                                      __locale_t locale) {
-#line 425 "kos/src/libc/magic/ctype.c"
+#line 426 "kos/src/libc/magic/ctype.c"
 	(void)locale;
 	return libc_isalpha(ch);
 }
 
-INTERN ATTR_CONST WUNUSED
+INTERN ATTR_PURE WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.ctype.isdigit_l") int
 NOTHROW_NCX(LIBCCALL libc_isdigit_l)(int ch,
                                      __locale_t locale) {
-#line 447 "kos/src/libc/magic/ctype.c"
+#line 448 "kos/src/libc/magic/ctype.c"
 	(void)locale;
 	return libc_isdigit(ch);
 }
 
-INTERN ATTR_CONST WUNUSED
+INTERN ATTR_PURE WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.ctype.isxdigit_l") int
 NOTHROW_NCX(LIBCCALL libc_isxdigit_l)(int ch,
                                       __locale_t locale) {
-#line 469 "kos/src/libc/magic/ctype.c"
+#line 470 "kos/src/libc/magic/ctype.c"
 	(void)locale;
 	return libc_isxdigit(ch);
 }
 
-INTERN ATTR_CONST WUNUSED
+INTERN ATTR_PURE WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.ctype.isalnum_l") int
 NOTHROW_NCX(LIBCCALL libc_isalnum_l)(int ch,
                                      __locale_t locale) {
-#line 491 "kos/src/libc/magic/ctype.c"
+#line 492 "kos/src/libc/magic/ctype.c"
 	(void)locale;
 	return libc_isalnum(ch);
 }
 
-INTERN ATTR_CONST WUNUSED
+INTERN ATTR_PURE WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.ctype.ispunct_l") int
 NOTHROW_NCX(LIBCCALL libc_ispunct_l)(int ch,
                                      __locale_t locale) {
-#line 513 "kos/src/libc/magic/ctype.c"
+#line 514 "kos/src/libc/magic/ctype.c"
 	(void)locale;
 	return libc_ispunct(ch);
 }
 
-INTERN ATTR_CONST WUNUSED
+INTERN ATTR_PURE WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.ctype.isgraph_l") int
 NOTHROW_NCX(LIBCCALL libc_isgraph_l)(int ch,
                                      __locale_t locale) {
-#line 535 "kos/src/libc/magic/ctype.c"
+#line 536 "kos/src/libc/magic/ctype.c"
 	(void)locale;
 	return libc_isgraph(ch);
 }
 
-INTERN ATTR_CONST WUNUSED
+INTERN ATTR_PURE WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.ctype.isprint_l") int
 NOTHROW_NCX(LIBCCALL libc_isprint_l)(int ch,
                                      __locale_t locale) {
-#line 557 "kos/src/libc/magic/ctype.c"
+#line 558 "kos/src/libc/magic/ctype.c"
 	(void)locale;
 	return libc_isprint(ch);
 }
 
-INTERN ATTR_CONST WUNUSED
+INTERN ATTR_PURE WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.ctype.isblank_l") int
 NOTHROW_NCX(LIBCCALL libc_isblank_l)(int ch,
                                      __locale_t locale) {
-#line 579 "kos/src/libc/magic/ctype.c"
+#line 580 "kos/src/libc/magic/ctype.c"
 	(void)locale;
 	return libc_isblank(ch);
 }
 
-INTERN ATTR_CONST WUNUSED
+INTERN ATTR_PURE WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.ctype.tolower_l") int
 NOTHROW_NCX(LIBCCALL libc_tolower_l)(int ch,
                                      __locale_t locale) {
@@ -249,7 +249,7 @@ NOTHROW_NCX(LIBCCALL libc_tolower_l)(int ch,
 	return libc_tolower(ch);
 }
 
-INTERN ATTR_CONST WUNUSED
+INTERN ATTR_PURE WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.unicode.locale.ctype.toupper_l") int
 NOTHROW_NCX(LIBCCALL libc_toupper_l)(int ch,
                                      __locale_t locale) {

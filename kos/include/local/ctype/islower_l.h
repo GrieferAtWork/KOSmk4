@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8eca9971 */
+/* HASH CRC-32:0x43da42f9 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,17 +53,17 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep_islower,(int __
 #endif /* !____localdep_islower_defined */
 
 __NAMESPACE_LOCAL_BEGIN
-__LOCAL_LIBC(islower_l) __ATTR_CONST __ATTR_WUNUSED int
+__LOCAL_LIBC(islower_l) __ATTR_PURE __ATTR_WUNUSED int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(islower_l))(int __ch,
                                                        __locale_t __locale) {
-#line 403 "kos/src/libc/magic/ctype.c"
+#line 404 "kos/src/libc/magic/ctype.c"
 #if defined(__CRT_HAVE___ctype_b_loc) && defined(__CRT_GLC)
 #include <__hybrid/__byteorder.__h>
 #if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
 	return __locale->__ctype_b[__ch] & (1 << 1);
-#else
+#else /* __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__ */
 	return __locale->__ctype_b[__ch] & (1 << 9);
-#endif
+#endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
 #elif defined(__CRT_HAVE___locale_ctype_ptr_l) && defined(__CRT_CYG)
 	return ((__localdep___locale_ctype_ptr_l(__locale) + 1)[__ch & 0xff] & 3) == 2;
 #elif defined(__CRT_HAVE__isctype_l) && defined(__CRT_DOS)
