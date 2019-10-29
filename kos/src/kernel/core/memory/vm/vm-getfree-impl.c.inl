@@ -108,7 +108,8 @@ NOTHROW(KCALL krand_exponential)(uintptr_t rand_limit, uintptr_t rand_avg) {
 /* Get/set ASLR-disabled (defaults to `false'; can also be
  * enabled by passing `noaslr' on the kernel commandline)
  * When enabled, the `VM_GETFREE_ASLR' is simply ignored
- * when passed to either `vm_getfree()' or `vmb_getfree()' */
+ * when passed to either `vm_getfree()' or `vmb_getfree()'
+ * @return: * : The state of ASLR_DISABLED prior to the call being made. */
 #ifdef VM_GETFREE_VMB
 INTDEF bool vm_aslr_disabled;
 #else /* VM_GETFREE_VMB */

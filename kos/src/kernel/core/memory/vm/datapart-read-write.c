@@ -19,6 +19,7 @@
 #ifndef GUARD_KERNEL_SRC_MEMORY_VM_VM_DATAPART_READ_WRITE_C_INL
 #define GUARD_KERNEL_SRC_MEMORY_VM_VM_DATAPART_READ_WRITE_C_INL 1
 #define _KOS_SOURCE 1
+#define _GNU_SOURCE 1
 
 #include <kernel/compiler.h>
 
@@ -28,46 +29,15 @@
 #include <sched/task.h>
 
 #include <hybrid/align.h>
-#include <hybrid/alloca.h>
 #include <hybrid/atomic.h>
 #include <hybrid/overflow.h>
 
+#include <alloca.h>
 #include <assert.h>
 #include <string.h>
+#include <limits.h>
 
 DECL_BEGIN
-
-/* Read/write data to/from the given data part.
- * NOTE: When given a virtual memory buffer, these functions automatically
- *       check if the memory backing that buffer could potentially overlap
- *       with `self', in which case reading is performed using an intermediate
- *       buffer, so-as to prevent a possible dead-lock when `self' is already
- *       locked, whilst a #PF caused by writing to the target buffer attempts
- *       to acquire another lock to `self'
- * NOTE: The caller must _NOT_ be holding any lock to `self', the associated
- *       block, or any VM-tree when calling this function.
- * @return: * : The number of written bytes. */
-PUBLIC NONNULL((1)) size_t KCALL
-vm_datapart_read(struct vm_datapart *__restrict self,
-                 USER CHECKED void *dst,
-                 size_t num_bytes,
-                 vm_daddr_t src_offset)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
-	/* TODO: Check of `dst' overlaps with `self'. - If they don't, directly copy memory! */
-	return vm_datapart_read_buffered(self, dst, num_bytes, src_offset);
-}
-
-PUBLIC NONNULL((1)) size_t KCALL
-vm_datapart_write(struct vm_datapart *__restrict self,
-                  USER CHECKED void const *src,
-                  size_t num_bytes,
-                  size_t split_bytes,
-                  vm_daddr_t dst_offset)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
-	/* TODO: Check of `src' overlaps with `self'. - If they don't, directly copy memory! */
-	return vm_datapart_write_buffered(self, src, num_bytes, split_bytes, dst_offset);
-}
-
 
 PUBLIC NONNULL((1, 2)) size_t KCALL
 vm_datapart_readv(struct vm_datapart *__restrict self,
@@ -158,98 +128,13 @@ vm_datapart_writev_phys(struct vm_datapart *__restrict self,
 }
 
 
-
-
-
-
-PUBLIC NONNULL((1)) size_t KCALL
-vm_datapart_read_buffered(struct vm_datapart *__restrict self,
-                          USER CHECKED void *dst,
-                          size_t num_bytes,
-                          vm_daddr_t src_offset)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
-	size_t temp, bufsize = stack_avail();
-	byte_t *buf;
-	size_t result = 0;
-	/* TODO: Don't use an intermediate buffer!
-	 *       Instead, use memcpy_nopf(), and write faulting bytes 1 byte at a time! */
-	if (bufsize > 2048 * sizeof(void *))
-		bufsize -= 2048 * sizeof(void *);
-	else {
-		bufsize = 128 * sizeof(void *);
-	}
-	if (bufsize > num_bytes)
-		bufsize = num_bytes;
-	buf = (byte_t *)ALLOCA(bufsize);
-	while (num_bytes) {
-		assert(bufsize <= num_bytes);
-		temp = vm_datapart_read_unsafe(self,
-		                               buf,
-		                               bufsize,
-		                               src_offset);
-		if (!temp)
-			break;
-		assert(temp <= bufsize);
-		COMPILER_BARRIER();
-		memcpy(dst, buf, temp);
-		COMPILER_BARRIER();
-		dst = (byte_t *)dst + temp;
-		result += temp;
-		src_offset += temp;
-		num_bytes -= temp;
-		if (bufsize > num_bytes)
-			bufsize = num_bytes;
-	}
-	return result;
-}
-
-PUBLIC NONNULL((1)) size_t KCALL
-vm_datapart_write_buffered(struct vm_datapart *__restrict self,
-                           USER CHECKED void const *src,
-                           size_t num_bytes,
-                           size_t split_bytes,
-                           vm_daddr_t dst_offset)
-		THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...) {
-	size_t temp, bufsize = stack_avail();
-	byte_t *buf;
-	size_t result = 0;
-	/* TODO: Don't use an intermediate buffer!
-	 *       Instead, use memcpy_nopf(), and write faulting bytes 1 byte at a time! */
-	if (bufsize > 2048 * sizeof(void *))
-		bufsize -= 2048 * sizeof(void *);
-	else {
-		bufsize = 128 * sizeof(void *);
-	}
-	if (bufsize > num_bytes)
-		bufsize = num_bytes;
-	buf = (byte_t *)ALLOCA(bufsize);
-	while (num_bytes) {
-		COMPILER_BARRIER();
-		memcpy(buf, src, bufsize);
-		COMPILER_BARRIER();
-		temp = vm_datapart_write_unsafe(self,
-		                                buf,
-		                                bufsize,
-		                                split_bytes,
-		                                dst_offset);
-		if (!temp)
-			break;
-		src = (byte_t *)src + temp;
-		result += temp;
-		dst_offset += temp;
-		num_bytes -= temp;
-		if (bufsize > num_bytes)
-			bufsize = num_bytes;
-	}
-	return result;
-}
-
 DECL_END
 
 #ifndef __INTELLISENSE__
 #undef DEFINE_IO_READ
 #undef DEFINE_IO_PHYS
 #undef DEFINE_IO_WRITE
+#undef DEFINE_IO_NOPF
 
 #define DEFINE_IO_READ 1
 #define DEFINE_IO_PHYS 1
@@ -261,6 +146,23 @@ DECL_END
 #include "datapart-read-write-base.c.inl"
 #define DEFINE_IO_WRITE 1
 #include "datapart-read-write-base.c.inl"
+
+#define DEFINE_IO_READ 1
+#define DEFINE_IO_NOPF 1
+#include "datapart-read-write-base.c.inl"
+#define DEFINE_IO_WRITE 1
+#define DEFINE_IO_NOPF 1
+#include "datapart-read-write-base.c.inl"
+
+#define DEFINE_IO_READ 1
+#include "datapart-read-write-buffered.c.inl"
+#define DEFINE_IO_WRITE 1
+#include "datapart-read-write-buffered.c.inl"
+
+#define DEFINE_IO_READ 1
+#include "datapart-read-write-auto.c.inl"
+#define DEFINE_IO_WRITE 1
+#include "datapart-read-write-auto.c.inl"
 #endif /* !__INTELLISENSE__ */
 
 

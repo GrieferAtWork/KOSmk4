@@ -1864,8 +1864,10 @@
 #define __CRT_HAVE_vm_clone 1
 #define __CRT_HAVE_vm_clrhwbreak 1
 #define __CRT_HAVE_vm_copyfromphys 1
+#define __CRT_HAVE_vm_copyfromphys_nopf 1
 #define __CRT_HAVE_vm_copyinphys 1
 #define __CRT_HAVE_vm_copytophys 1
+#define __CRT_HAVE_vm_copytophys_nopf 1
 #define __CRT_HAVE_vm_datablock_anonymize 1
 #define __CRT_HAVE_vm_datablock_anonymous 1
 #define __CRT_HAVE_vm_datablock_anonymous_type 1
@@ -1913,8 +1915,10 @@
 #define __CRT_HAVE_vm_datapart_do_copyram 1
 #define __CRT_HAVE_vm_datapart_do_enumdma 1
 #define __CRT_HAVE_vm_datapart_do_read 1
+#define __CRT_HAVE_vm_datapart_do_read_nopf 1
 #define __CRT_HAVE_vm_datapart_do_read_phys 1
 #define __CRT_HAVE_vm_datapart_do_write 1
+#define __CRT_HAVE_vm_datapart_do_write_nopf 1
 #define __CRT_HAVE_vm_datapart_do_write_phys 1
 #define __CRT_HAVE_vm_datapart_free 1
 #define __CRT_HAVE_vm_datapart_freeram 1
@@ -1950,6 +1954,7 @@
 #define __CRT_HAVE_vm_datapart_pageaddr 1
 #define __CRT_HAVE_vm_datapart_read 1
 #define __CRT_HAVE_vm_datapart_read_buffered 1
+#define __CRT_HAVE_vm_datapart_read_nopf 1
 #define __CRT_HAVE_vm_datapart_read_phys 1
 #define __CRT_HAVE_vm_datapart_read_unsafe 1
 #define __CRT_HAVE_vm_datapart_readv 1
@@ -1959,6 +1964,7 @@
 #define __CRT_HAVE_vm_datapart_sync 1
 #define __CRT_HAVE_vm_datapart_write 1
 #define __CRT_HAVE_vm_datapart_write_buffered 1
+#define __CRT_HAVE_vm_datapart_write_nopf 1
 #define __CRT_HAVE_vm_datapart_write_phys 1
 #define __CRT_HAVE_vm_datapart_write_unsafe 1
 #define __CRT_HAVE_vm_datapart_writev 1
@@ -2024,6 +2030,7 @@
 #define __CRT_HAVE_vm_onexec_callbacks 1
 #define __CRT_HAVE_vm_onfini_callbacks 1
 #define __CRT_HAVE_vm_oninit_callbacks 1
+#define __CRT_HAVE_vm_prefault 1
 #define __CRT_HAVE_vm_protect 1
 #define __CRT_HAVE_vm_ramfile_type 1
 #define __CRT_HAVE_vm_read 1

@@ -530,6 +530,21 @@ FUNDEF NONNULL((1)) void KCALL vm_datapart_do_write(struct vm_datapart *__restri
 FUNDEF NONNULL((1)) void KCALL vm_datapart_do_read_phys(struct vm_datapart *__restrict self, vm_phys_t dst, size_t num_bytes, vm_daddr_t src_offset) THROWS(...);
 FUNDEF NONNULL((1)) void KCALL vm_datapart_do_write_phys(struct vm_datapart *__restrict self, vm_phys_t src, size_t num_bytes, vm_daddr_t dst_offset) THROWS(...);
 
+/* Same as `vm_datapart_do_read()' / `vm_datapart_do_write()', but copy memory
+ * into the supplied user-space buffer `dst' / `src' using `memcpy_nopf()', meaning
+ * that these functions will never cause the given buffer to become faulted, or invoke
+ * VIO callbacks in case the given buffer is a VIO memory mapping.
+ * @return: * : The number of trailing bytes from the given buffer that could not be
+ *              accessed (i.e. memcpy_nopf() returned non-zero upon attempting to access
+ *              them). When this is non-zero, then the caller should manually access the
+ *              affected byte (_after_ releasing their lock on `self'), then proceed to
+ *              re-acquire the lock on `self', before manually reading/writing the single
+ *              byte previously read/allocated, before finally moving on to reading/writing
+ *              into the remainder of the original buffer, once again allowing for user-space
+ *              memory faults. */
+FUNDEF NONNULL((1)) size_t KCALL vm_datapart_do_read_nopf(struct vm_datapart *__restrict self, USER CHECKED void *dst, size_t num_bytes, vm_daddr_t src_offset) THROWS(...);
+FUNDEF NONNULL((1)) size_t KCALL vm_datapart_do_write_nopf(struct vm_datapart *__restrict self, USER CHECKED void const *src, size_t num_bytes, vm_daddr_t dst_offset) THROWS(...);
+
 
 /* Read/write data to/from the given data part.
  * NOTE: When given a virtual memory buffer, these functions automatically
@@ -543,7 +558,8 @@ FUNDEF NONNULL((1)) void KCALL vm_datapart_do_write_phys(struct vm_datapart *__r
  * @param: split_bytes: The number of bytes after which to split the part in
  *                      order to minimize the memory impact of copy-on-write.
  *                      Usually the same as `num_bytes'
- * @return: * : The number of written bytes. */
+ * @return: * : The number of read/written bytes (limited by `num_bytes',
+ *              and `vm_datapart_numbytes(self) - (src|dst)_offset'). */
 FUNDEF NONNULL((1)) size_t KCALL vm_datapart_read(struct vm_datapart *__restrict self, USER CHECKED void *dst, size_t num_bytes, vm_daddr_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF NONNULL((1)) size_t KCALL vm_datapart_write(struct vm_datapart *__restrict self, USER CHECKED void const *src, size_t num_bytes, size_t split_bytes, vm_daddr_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF NONNULL((1)) size_t KCALL vm_datapart_read_phys(struct vm_datapart *__restrict self, vm_phys_t dst, size_t num_bytes, vm_daddr_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
@@ -552,13 +568,63 @@ FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_readv(struct vm_datapart *__rest
 FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_writev(struct vm_datapart *__restrict self, struct aio_buffer const *__restrict buf, size_t split_bytes, vm_daddr_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_readv_phys(struct vm_datapart *__restrict self, struct aio_pbuffer const *__restrict buf, vm_daddr_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_writev_phys(struct vm_datapart *__restrict self, struct aio_pbuffer const *__restrict buf, size_t split_bytes, vm_daddr_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+
 /* Same as the `vm_datapart_(read|write)', however make the assumption that the
  * memory backing is `safe' (i.e. access could never cause a #PF attempting to
- * acquire a lock to `self' when doing so is impossible) */
+ * acquire a lock to `self' when doing so is impossible; i.e. `dst'/`src' are
+ * guarantied to not be apart of a mapping of `self', or be otherwise accessed
+ * by code called from a page-fault handler) */
 FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_read_unsafe(struct vm_datapart *__restrict self, void *__restrict dst, size_t num_bytes, vm_daddr_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF NONNULL((1, 2)) size_t KCALL vm_datapart_write_unsafe(struct vm_datapart *__restrict self, void const *__restrict src, size_t num_bytes, size_t split_bytes, vm_daddr_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
+
+/* Read/Write memory to/from the given data part without causing a #PF due
+ * to access made to the given `dst'/`src' buffers (s.a. `memcpy_nopf()').
+ * @assume(num_bytes <= SSIZE_MAX);
+ * @return: >= 0:
+ *     Successfully transferred all possible data in regards to the actual size
+ *     of `self' encountered when the lock associated with it was held. This may
+ *     be less than num_bytes' in case the data part ended up being smaller that
+ *     the given buffer, where it should be noted that a data part can shrink at
+ *     any time that its lock isn't being held due to possibly getting split by
+ *     another thread.
+ * @return: < 0:
+ *     Failed to read/write the last `-return' bytes of the given buffer,
+ *     as accessing them triggers a #PF for the range:
+ *         `(dst|src) + (num_bytes - (size_t)(-return)) ... (dst|src) + num_bytes - 1'
+ *     As such, the first `num_bytes - (size_t)(-return)' bytes were successfully
+ *     read/written, and the caller should not attempt to read/write them again, but
+ *     should instead manually read/write at least 1 byte starting at:
+ *         `((byte_t *)(dst|src))[num_bytes - (size_t)(-return)]'
+ *     using a temporary buffer, in order to allow the associated memory mapping to
+ *     be faulted while not holding any locks to VM control structures, also allowing
+ *     for the proper handling in case the memory associated with `dst'/`src' is backed
+ *     by a VIO memory mapping. */
+FUNDEF NONNULL((1, 2)) ssize_t KCALL
+vm_datapart_read_nopf(struct vm_datapart *__restrict self,
+                      USER CHECKED void *dst, size_t num_bytes,
+                      vm_daddr_t src_offset)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+FUNDEF NONNULL((1, 2)) ssize_t KCALL
+vm_datapart_write_nopf(struct vm_datapart *__restrict self,
+                       USER CHECKED void const *src, size_t num_bytes,
+                       size_t split_bytes, vm_daddr_t dst_offset)
+		THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+
 /* Perform I/O using an intermediate buffer, thus solving the deadlock
- * scenario possible when using `vm_datapart_(read|write)_unsafe' */
+ * scenario possible when using `vm_datapart_(read|write)_unsafe', as
+ * well as to perform the faulting/vio-interaction needed when a call
+ * to `vm_datapart_(read|write)_nopf()' returned a negative value.
+ * Even though they can, these functions should _not_ be used to transfer
+ * a data part in its entirety, since they rely on a limited-size buffer
+ * allocated on the kernel stack, meaning that their use requires the
+ * indirection of an intermediate memory location.
+ * In general, raw I/O on data parts should always be performed with the
+ * help of `vm_datapart_(read|write)()', which will automatically try to
+ * call the `*_nopf()' function, and fall back for a limited number of
+ * bytes to making use of `vm_datapart_(read|write)_buffered()' for handling
+ * VIO, as well as faulting memory mappings. (s.a. `vm_prefault()')
+ * @return: * : The number of read/written bytes (limited by `num_bytes',
+ *              and `vm_datapart_numbytes(self) - (src|dst)_offset'). */
 FUNDEF NONNULL((1)) size_t KCALL vm_datapart_read_buffered(struct vm_datapart *__restrict self, USER CHECKED void *dst, size_t num_bytes, vm_daddr_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF NONNULL((1)) size_t KCALL vm_datapart_write_buffered(struct vm_datapart *__restrict self, USER CHECKED void const *src, size_t num_bytes, size_t split_bytes, vm_daddr_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 
@@ -901,16 +967,16 @@ struct vm_datablock {
 
 #ifndef VM_DATABLOCK_ADDRSHIFT
 #define VM_DATABLOCK_ADDRSHIFT(x) (PAGESHIFT - VM_DATABLOCK_PAGESHIFT(x))
-#endif
+#endif /* !VM_DATABLOCK_ADDRSHIFT */
 #ifndef VM_DATABLOCK_PAGEALIGN
 #define VM_DATABLOCK_PAGEALIGN(x) ((size_t)1 << VM_DATABLOCK_PAGESHIFT(x))
-#endif
+#endif /* !VM_DATABLOCK_PAGEALIGN */
 #ifndef VM_DATABLOCK_PAGEMASK
 #define VM_DATABLOCK_PAGEMASK(x)  (((size_t)1 << VM_DATABLOCK_PAGESHIFT(x)) - 1)
-#endif
+#endif /* !VM_DATABLOCK_PAGEMASK */
 #ifndef VM_DATABLOCK_PAGESIZE
 #define VM_DATABLOCK_PAGESIZE(x)  ((size_t)PAGESIZE >> VM_DATABLOCK_PAGESHIFT(x))
-#endif
+#endif /* !VM_DATABLOCK_PAGESIZE */
 
 
 /* Convert between different address types.
@@ -931,14 +997,14 @@ vm_vpage_t VM_DATABLOCK_DPAGE2VPAGE(struct vm_datablock const *__restrict self, 
 vm_dpage_t VM_DATABLOCK_DADDR2DPAGE(struct vm_datablock const *__restrict self, vm_daddr_t daddr);
 vm_dpage_t VM_DATABLOCK_VADDR2DPAGE(struct vm_datablock const *__restrict self, vm_virt_t vaddr);
 vm_dpage_t VM_DATABLOCK_VPAGE2DPAGE(struct vm_datablock const *__restrict self, vm_vpage_t vpage);
-#else
+#else /* __INTELLISENSE__ */
 #define VM_DATABLOCK_DPAGE2DADDR(self,dpage) ((vm_daddr_t)(dpage) << VM_DATABLOCK_ADDRSHIFT(self))
 #define VM_DATABLOCK_DPAGE2VADDR(self,dpage) ((vm_virt_t)(dpage) << VM_DATABLOCK_ADDRSHIFT(self))
 #define VM_DATABLOCK_DPAGE2VPAGE(self,dpage) ((vm_vpage_t)(dpage) >> VM_DATABLOCK_PAGESHIFT(self))
 #define VM_DATABLOCK_DADDR2DPAGE(self,daddr) ((vm_dpage_t)(daddr) >> VM_DATABLOCK_ADDRSHIFT(self))
 #define VM_DATABLOCK_VADDR2DPAGE(self,vaddr) ((vm_dpage_t)(vaddr) >> VM_DATABLOCK_ADDRSHIFT(self))
 #define VM_DATABLOCK_VPAGE2DPAGE(self,vpage) ((vm_dpage_t)(vpage) << VM_DATABLOCK_PAGESHIFT(self))
-#endif
+#endif /* !__INTELLISENSE__ */
 
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_datablock_destroy)(struct vm_datablock *__restrict self);
@@ -1039,11 +1105,11 @@ vm_datablock_anonymize(struct vm_datablock *__restrict self)
 #ifdef __INTELLISENSE__
 FUNDEF NOBLOCK NONNULL((1)) bool
 NOTHROW(KCALL vm_datablock_deanonymize)(struct vm_datablock *__restrict self);
-#else
+#else /* __INTELLISENSE__ */
 #define vm_datablock_deanonymize(self)                               \
 	__hybrid_atomic_cmpxch((self)->db_parts, VM_DATABLOCK_ANONPARTS, \
 	                       NULL, __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
-#endif
+#endif /* !__INTELLISENSE__ */
 
 
 /* Synchronize all modified data pages within the specified address range.
@@ -1103,6 +1169,7 @@ FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_readv(struct vm_datablock *__rest
 FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_writev(struct vm_datablock *__restrict self, struct aio_buffer const *__restrict buf, size_t num_bytes, vm_daddr_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, E_SEGFAULT, ...);
 FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_readv_phys(struct vm_datablock *__restrict self, struct aio_pbuffer const *__restrict buf, size_t num_bytes, vm_daddr_t src_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
 FUNDEF NONNULL((1, 2)) void KCALL vm_datablock_writev_phys(struct vm_datablock *__restrict self, struct aio_pbuffer const *__restrict buf, size_t num_bytes, vm_daddr_t dst_offset) THROWS(E_WOULDBLOCK, E_BADALLOC, ...);
+
 /* Same as the `vm_datablock_(read|write)', however make the assumption that the
  * memory backing is `safe' (i.e. access could never cause a #PF attempting to
  * acquire a lock to `self' when doing so is impossible) */
@@ -1302,22 +1369,22 @@ NOTHROW(KCALL vm_node_update_write_access_locked_vm)(struct vm_node *__restrict 
                                                      struct vm *__restrict locked_vm);
 
 
-#define VM_NODE_MIN(self)             ((self)->vn_node.a_vmin)
-#define VM_NODE_MAX(self)             ((self)->vn_node.a_vmax)
-#define VM_NODE_START(self)           ((self)->vn_node.a_vmin)
+#define VM_NODE_MIN(self)   ((self)->vn_node.a_vmin)
+#define VM_NODE_MAX(self)   ((self)->vn_node.a_vmax)
+#define VM_NODE_START(self) ((self)->vn_node.a_vmin)
 #define VM_NODE_SIZE(self)  ((size_t)(((self)->vn_node.a_vmax - (self)->vn_node.a_vmin) + 1))
-#define VM_NODE_END(self)             ((self)->vn_node.a_vmax + 1)
+#define VM_NODE_END(self)   ((self)->vn_node.a_vmax + 1)
 
-#define VM_NODE_MINADDR(self)     VM_PAGE2ADDR((self)->vn_node.a_vmin)
-#define VM_NODE_MAXADDR(self)    ((vm_virt_t)(((self)->vn_node.a_vmax * PAGESIZE) + (PAGESIZE - 1)))
-#define VM_NODE_STARTADDR(self)   VM_PAGE2ADDR((self)->vn_node.a_vmin)
-#define VM_NODE_ENDADDR(self)     VM_PAGE2ADDR((self)->vn_node.a_vmax + 1)
-#define VM_NODE_BYTESIZE(self)    (size_t)(VM_NODE_SIZE(self) * PAGESIZE)
+#define VM_NODE_MINADDR(self)   VM_PAGE2ADDR((self)->vn_node.a_vmin)
+#define VM_NODE_MAXADDR(self)   ((vm_virt_t)(((self)->vn_node.a_vmax * PAGESIZE) + (PAGESIZE - 1)))
+#define VM_NODE_STARTADDR(self) VM_PAGE2ADDR((self)->vn_node.a_vmin)
+#define VM_NODE_ENDADDR(self)   VM_PAGE2ADDR((self)->vn_node.a_vmax + 1)
+#define VM_NODE_BYTESIZE(self)  (size_t)(VM_NODE_SIZE(self) * PAGESIZE)
 
-#define VM_NODE_HASNEXT(self,vm)   ((self)->vn_byaddr.ln_next != NULL)
-#define VM_NODE_HASPREV(self,vm)   ((self)->vn_byaddr.ln_pself != &LLIST_HEAD((vm)->v_byaddr))
-#define VM_NODE_NEXT(self)         ((self)->vn_byaddr.ln_next)
-#define VM_NODE_PREV(self)           __COMPILER_CONTAINER_OF((self)->vn_byaddr.ln_pself,struct vm_node,vn_byaddr.ln_next)
+#define VM_NODE_HASNEXT(self, vm) ((self)->vn_byaddr.ln_next != NULL)
+#define VM_NODE_HASPREV(self, vm) ((self)->vn_byaddr.ln_pself != &LLIST_HEAD((vm)->v_byaddr))
+#define VM_NODE_NEXT(self)        ((self)->vn_byaddr.ln_next)
+#define VM_NODE_PREV(self)        __COMPILER_CONTAINER_OF((self)->vn_byaddr.ln_pself,struct vm_node,vn_byaddr.ln_next)
 
 struct vm {
 	/* Top-level controller for virtual memory bindings. */
@@ -1358,8 +1425,8 @@ DATDEF struct vm vm_kernel;
 
 /* The VM that is currently active within the calling thread */
 DATDEF ATTR_PERTASK REF struct vm *_this_vm;
-#define THIS_VM     PERTASK_GET(_this_vm)
-#define PERVM(x) (*(__typeof__(&(x)))((uintptr_t)THIS_VM+(uintptr_t)&(x)))
+#define THIS_VM  PERTASK_GET(_this_vm)
+#define PERVM(x) (*(__typeof__(&(x)))((uintptr_t)THIS_VM + (uintptr_t)&(x)))
 
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_free)(struct vm *__restrict self);
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_destroy)(struct vm *__restrict self);
@@ -1428,10 +1495,10 @@ FUNDEF NOBLOCK void NOTHROW(KCALL vm_kernel_treelock_tryservice)(void);
 #define vm_treelock_upgrade_nx(self) ((self) == &vm_kernel ? vm_kernel_treelock_upgrade_nx() : atomic_rwlock_upgrade_nx(&(self)->v_treelock))
 #define vm_treelock_tryupgrade(self) ((self) == &vm_kernel ? vm_kernel_treelock_tryupgrade() : atomic_rwlock_tryupgrade(&(self)->v_treelock))
 #define vm_treelock_downgrade(self)  ((self) == &vm_kernel ? vm_kernel_treelock_downgrade() : atomic_rwlock_downgrade(&(self)->v_treelock))
-#define vm_treelock_reading(self)      atomic_rwlock_reading(&(self)->v_treelock)
-#define vm_treelock_writing(self)      atomic_rwlock_writing(&(self)->v_treelock)
-#define vm_treelock_canread(self)      atomic_rwlock_canread(&(self)->v_treelock)
-#define vm_treelock_canwrite(self)     atomic_rwlock_writing(&(self)->v_treelock)
+#define vm_treelock_reading(self)    atomic_rwlock_reading(&(self)->v_treelock)
+#define vm_treelock_writing(self)    atomic_rwlock_writing(&(self)->v_treelock)
+#define vm_treelock_canread(self)    atomic_rwlock_canread(&(self)->v_treelock)
+#define vm_treelock_canwrite(self)   atomic_rwlock_writing(&(self)->v_treelock)
 
 /* Define C++ sync API hooks. */
 __DEFINE_SYNC_RWLOCK(struct vm,
@@ -1468,8 +1535,8 @@ FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_tasklock_endread)(struct vm *_
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_tasklock_end)(struct vm *__restrict self);
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_tasklock_downgrade)(struct vm *__restrict self);
 FUNDEF NOBLOCK NONNULL((1)) void NOTHROW(KCALL vm_tasklock_tryservice)(struct vm *__restrict self);
-#define vm_tasklock_reading(self)   atomic_rwlock_reading(&(self)->v_tasklock)
-#define vm_tasklock_writing(self)   atomic_rwlock_writing(&(self)->v_tasklock)
+#define vm_tasklock_reading(self) atomic_rwlock_reading(&(self)->v_tasklock)
+#define vm_tasklock_writing(self) atomic_rwlock_writing(&(self)->v_tasklock)
 
 
 
@@ -1554,21 +1621,22 @@ NOTHROW(KCALL vm_getfree)(struct vm *__restrict effective_vm,
                           vm_vpage_t hint, size_t num_pages,
                           size_t min_alignment_in_pages,
                           unsigned int mode);
-#define VM_GETFREE_ABOVE      0x0000 /* Search for viable, free mappings that are `>= hint' */
-#define VM_GETFREE_BELOW      0x0001 /* Search for viable, free mappings that are `<= hint-num_pages'  */
-#define VM_GETFREE_STRICT     0x0002 /* After a search for free space failed to yielding a viable memory
-                                      * location in accordance to `VM_GETFREE_ABOVE|VM_GETFREE_BELOW',
-                                      * do _NOT_ re-attempt the search into the other direction. */
-#define VM_GETFREE_ASLR       0x0004 /* Randomize return values (see above) */
+#define VM_GETFREE_ABOVE  0x0000 /* Search for viable, free mappings that are `>= hint' */
+#define VM_GETFREE_BELOW  0x0001 /* Search for viable, free mappings that are `<= hint-num_pages'  */
+#define VM_GETFREE_STRICT 0x0002 /* After a search for free space failed to yielding a viable memory
+                                  * location in accordance to `VM_GETFREE_ABOVE|VM_GETFREE_BELOW',
+                                  * do _NOT_ re-attempt the search into the other direction. */
+#define VM_GETFREE_ASLR   0x0004 /* Randomize return values (see above) */
 /* TODO: Flag `VM_GETFREE_USER'  --  When `effective_vm' is `&vm_kernel', allow returned pointers
  *       to be apart of user-space, as opposed to only ever returning kernel-space pointers. */
-#define VM_GETFREE_ERROR     (VM_VPAGE_MAX + __CCAST(vm_vpage_t)1)
+#define VM_GETFREE_ERROR  (VM_VPAGE_MAX + __CCAST(vm_vpage_t)1)
 
 
 /* Get/set ASLR-disabled (defaults to `false'; can also be
  * enabled by passing `noaslr' on the kernel commandline)
  * When enabled, the `VM_GETFREE_ASLR' is simply ignored
- * when passed to either `vm_getfree()' or `vmb_getfree()' */
+ * when passed to either `vm_getfree()' or `vmb_getfree()'
+ * @return: * : The state of ASLR_DISABLED prior to the call being made. */
 FUNDEF bool NOTHROW(KCALL vm_get_aslr_disabled)(void);
 FUNDEF bool NOTHROW(KCALL vm_set_aslr_disabled)(bool new_disabled);
 
@@ -1715,6 +1783,55 @@ NOTHROW(FCALL vm_isused)(struct vm *__restrict effective_vm,
                          vm_vpage_t min_page,
                          vm_vpage_t max_page);
 
+/* Try to prefault memory for the given address range within the current VM.
+ * This function is intended to be used in conjunction with `memcpy_nopf()',
+ * as well as functions using it in order to speed up the lock-copy-unlock-do_buffered_io-repeat
+ * cycle by potentially allowing the caller to skip having to perform buffered I/O
+ * in cases where the backing memory can be made to be backed by real, physical memory,
+ * as opposed to not being mapped at all, or being mapped by VIO memory.
+ * NOTE: This function should only be used as a hint for figuring out how buffered I/O should
+ *       be performed in face of a memory range that cannot be accessed by `memcpy_nopf()'.
+ *       In practice, this means that code using it should be aware that as far as the reliable
+ *       semantics of this function go, one valid implementation could simply look like this:
+ *       >> PUBLIC size_t FCALL
+ *       >> vm_prefault(USER CHECKED void const *addr, size_t num_bytes, bool for_writing)
+ *       >>         THROWS(E_WOULDBLOCK, E_BADALLOC) {
+ *       >>     assert(num_bytes != 0);
+ *       >>     (void)addr;
+ *       >>     (void)num_bytes;
+ *       >>     (void)for_writing;
+ *       >>     // Always return 1, indicating a the necessity of performing just a bit of
+ *       >>     // buffered I/O, which will automatically fault at least some memory on access,
+ *       >>     // as well as handle the case of VIO memory being accessed.
+ *       >>     return 1;
+ *       >> }
+ * NOTE: For a valid usage example of this function, you may look at the implementation of
+ *       the `vm_datapart_(read|write)()' function pair, which uses it in order to determine
+ *       the number of bytes that must be processed using `vm_datapart_(read|write)_buffered()'
+ * @param: for_writing: When true, make sure that memory within the associated gets
+ *                      faulted such that copy-on-write operations are carried out.
+ *                      Otherwise, only make sure that memory from the given range
+ *                      can be read from (though again: even this is only to be taken
+ *                      as a hint. - This function is allowed to just do nothing if
+ *                      it wants to)
+ * @assume(num_bytes != 0);
+ * @return: 0 :
+ *     At least 1 page of memory (the one containing `addr') was faulted.
+ *     In this case, the caller can immediately go back to performing direct I/O,
+ *     though the possibility exists that either due to the backing physical memory
+ *     for the given address range being swapped out, or this function choosing not
+ *     to prefault the given range in its entirety, more transfer errors may still
+ *     occur as memory from the given range is accessed using `memcpy_nopf()'.
+ *     Another possible reason for more transfer errors could be a VIO, or unmapped
+ *     segment of memory starting further into the given range.
+ * @return: >= 1 && <= num_bytes:
+ *     In this case, the return value indicates the number of bytes that could not
+ *     be faulted (either because not being mapped, or due to being mapped to VIO) */
+FUNDEF size_t FCALL vm_prefault(USER CHECKED void const *addr,
+                                size_t num_bytes, bool for_writing)
+		THROWS(E_WOULDBLOCK, E_BADALLOC);
+
+
 /* Synchronize changes to `effective_vm' in the given address range.
  * In SMP, this function will automatically communicate changes to other
  * CPUs making use of the same VM, and doing this synchronously.
@@ -1769,10 +1886,18 @@ FUNDEF NOBLOCK void NOTHROW(FCALL vm_kernel_syncone)(vm_vpage_t page_index);
 FUNDEF NOBLOCK void NOTHROW(FCALL vm_kernel_syncall)(void);
 
 /* Copy memory to/from the physical address space. */
-FUNDEF NONNULL((1)) void KCALL vm_copyfromphys(USER CHECKED void *dst, PHYS vm_phys_t src, size_t num_bytes) THROWS(E_SEGFAULT);
-FUNDEF NONNULL((2)) void KCALL vm_copytophys(PHYS vm_phys_t dst, USER CHECKED void const *src, size_t num_bytes) THROWS(E_SEGFAULT);
+FUNDEF void KCALL vm_copyfromphys(USER CHECKED void *dst, PHYS vm_phys_t src, size_t num_bytes) THROWS(E_SEGFAULT);
+FUNDEF void KCALL vm_copytophys(PHYS vm_phys_t dst, USER CHECKED void const *src, size_t num_bytes) THROWS(E_SEGFAULT);
 FUNDEF NOBLOCK void NOTHROW(KCALL vm_copyinphys)(PHYS vm_phys_t dst, PHYS vm_phys_t src, size_t num_bytes);
 FUNDEF NOBLOCK void NOTHROW(KCALL vm_memsetphys)(PHYS vm_phys_t dst, int byte, size_t num_bytes);
+
+/* no-#PF variants of `vm_copy(from|to)phys()'.
+ * @return: 0 : The copy operation completed without any problems.
+ * @return: * : The number of bytes that could not be transfered.
+ *              The affected memory range is:
+ *               - `(dst|src) + num_bytes - return ... (dst|src) + num_bytes - 1' */
+FUNDEF size_t NOTHROW(KCALL vm_copyfromphys_nopf)(USER CHECKED void *dst, PHYS vm_phys_t src, size_t num_bytes);
+FUNDEF size_t NOTHROW(KCALL vm_copytophys_nopf)(PHYS vm_phys_t dst, USER CHECKED void const *src, size_t num_bytes);
 
 /* read/write memory to/form the address space of a given VM
  * Note that these functions behave similar to memcpy_nopf(), in that they
@@ -1782,14 +1907,21 @@ FUNDEF NOBLOCK void NOTHROW(KCALL vm_memsetphys)(PHYS vm_phys_t dst, int byte, s
  *              The affected memory ranges are:
  *               - `dst + num_bytes - return ... dst + num_bytes - 1'
  *               - `src + num_bytes - return ... src + num_bytes - 1' */
+/* TODO: Change the argument order of this function, so that the
+ *       VM comes first, and the VM-address becomes a `vm_virt_t' */
 FUNDEF NOBLOCK size_t
 NOTHROW(KCALL vm_read_nopf)(USER CHECKED void *dst, struct vm *__restrict src_vm,
                             UNCHECKED void const *src_addr, size_t num_bytes);
+/* TODO: Change the argument order of this function, so that the
+ *       VM comes first, and the VM-address becomes a `vm_virt_t' */
 FUNDEF NOBLOCK size_t
 NOTHROW(KCALL vm_write_nopf)(struct vm *__restrict dst_vm, UNCHECKED void *dst_addr,
                              USER CHECKED void const *src, size_t num_bytes);
+/* TODO: Change the argument order of this function, so that the
+ *       VM comes first, and the VM-address becomes a `vm_virt_t' */
 FUNDEF NOBLOCK size_t
-NOTHROW(KCALL vm_memset_nopf)(struct vm *__restrict dst_vm, UNCHECKED void *dst_addr,
+NOTHROW(KCALL vm_memset_nopf)(
+                              struct vm *__restrict dst_vm, UNCHECKED void *dst_addr,
                               int byte, size_t num_bytes);
 
 
@@ -1799,17 +1931,23 @@ NOTHROW(KCALL vm_memset_nopf)(struct vm *__restrict dst_vm, UNCHECKED void *dst_
  * well as properly accessing VIO.
  * @param: force_readable_source:      When true, force `src_addr' to be readable, ignoring `VM_PROT_READ'
  * @param: force_writable_destination: When true, force `dst_addr' to be writable, invoking COW as needed.  */
+/* TODO: Change the argument order of this function, so that the
+ *       VM comes first, and the VM-address becomes a `vm_virt_t' */
 FUNDEF void KCALL
 vm_read(USER CHECKED void *dst, struct vm *__restrict src_vm,
         UNCHECKED void const *src_addr, size_t num_bytes,
         bool force_readable_source DFL(false))
 		THROWS(E_SEGFAULT, E_WOULDBLOCK);
+/* TODO: Change the argument order of this function, so that the
+ *       VM comes first, and the VM-address becomes a `vm_virt_t' */
 FUNDEF void KCALL
 vm_write(struct vm *__restrict dst_vm, UNCHECKED void *dst_addr,
          USER CHECKED void const *src, size_t num_bytes,
          bool force_writable_destination DFL(false))
 		THROWS(E_SEGFAULT, E_WOULDBLOCK);
 /* Same as `vm_write()', but implement memset() semantics instead. */
+/* TODO: Change the argument order of this function, so that the
+ *       VM comes first, and the VM-address becomes a `vm_virt_t' */
 FUNDEF void KCALL
 vm_memset(struct vm *__restrict dst_vm, UNCHECKED void *dst_addr,
           int byte, size_t num_bytes,

@@ -455,9 +455,9 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.reloc ., R_386_SIZE32, handle_installhop; .long 0
 	.long 0x8bab070
 	.long .Lname113 /* index: 113 */
-	.weak vm_tasklock_write_nx; .long vm_tasklock_write_nx
-	.reloc ., R_386_SIZE32, vm_tasklock_write_nx; .long 0
-	.long 0xb3e4d68
+	.weak vm_datapart_do_read_nopf; .long vm_datapart_do_read_nopf
+	.reloc ., R_386_SIZE32, vm_datapart_do_read_nopf; .long 0
+	.long 0xea90df6
 	.long 0 /* index: 114 */
 	.long 0
 	.long 0
@@ -538,10 +538,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 134 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname134 /* index: 134 */
+	.weak vm_copyfromphys_nopf; .long vm_copyfromphys_nopf
+	.reloc ., R_386_SIZE32, vm_copyfromphys_nopf; .long 0
+	.long 0xe867086
 	.long .Lname135 /* index: 135 */
 	.weak mall_validate_padding; .long mall_validate_padding
 	.reloc ., R_386_SIZE32, mall_validate_padding; .long 0
@@ -2502,10 +2502,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 625 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname625 /* index: 625 */
+	.weak vm_datapart_read_nopf; .long vm_datapart_read_nopf
+	.reloc ., R_386_SIZE32, vm_datapart_read_nopf; .long 0
+	.long 0xab90b86
 	.long 0 /* index: 626 */
 	.long 0
 	.long 0
@@ -2694,10 +2694,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak x86_fpustate_save; .long x86_fpustate_save
 	.reloc ., R_386_SIZE32, x86_fpustate_save; .long 0
 	.long 0x7b18e15
-	.long 0 /* index: 673 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname673 /* index: 673 */
+	.weak vm_tasklock_write_nx; .long vm_tasklock_write_nx
+	.reloc ., R_386_SIZE32, vm_tasklock_write_nx; .long 0
+	.long 0xb3e4d68
 	.long 0 /* index: 674 */
 	.long 0
 	.long 0
@@ -5734,10 +5734,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak vpage_realloc_untraced_nx; .long vpage_realloc_untraced_nx
 	.reloc ., R_386_SIZE32, vpage_realloc_untraced_nx; .long 0
 	.long 0x921d598
-	.long 0 /* index: 1433 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname1433 /* index: 1433 */
+	.weak vm_prefault; .long vm_prefault
+	.reloc ., R_386_SIZE32, vm_prefault; .long 0
+	.long 0x8c1be44
 	.long 0 /* index: 1434 */
 	.long 0
 	.long 0
@@ -8922,10 +8922,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak kffree; .long kffree
 	.reloc ., R_386_SIZE32, kffree; .long 0
 	.long 0x71cd8b5
-	.long 0 /* index: 2230 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2230 /* index: 2230 */
+	.weak vm_datapart_write_nopf; .long vm_datapart_write_nopf
+	.reloc ., R_386_SIZE32, vm_datapart_write_nopf; .long 0
+	.long 0x9a008b6
 	.long .Lname2231 /* index: 2231 */
 	.weak rwlock_reading; .long rwlock_reading
 	.reloc ., R_386_SIZE32, rwlock_reading; .long 0
@@ -11034,10 +11034,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak dbg_readline; .long dbg_readline
 	.reloc ., R_386_SIZE32, dbg_readline; .long 0
 	.long 0xdd3fac5
-	.long 0 /* index: 2758 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2758 /* index: 2758 */
+	.weak vm_copytophys_nopf; .long vm_copytophys_nopf
+	.reloc ., R_386_SIZE32, vm_copytophys_nopf; .long 0
+	.long 0x1708ac6
 	.long .Lname2759 /* index: 2759 */
 	.weak sys_rt_sigpending; .long sys_rt_sigpending
 	.reloc ., R_386_SIZE32, sys_rt_sigpending; .long 0
@@ -11326,10 +11326,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 2831 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname2831 /* index: 2831 */
+	.weak vm_datapart_do_write_nopf; .long vm_datapart_do_write_nopf
+	.reloc ., R_386_SIZE32, vm_datapart_do_write_nopf; .long 0
+	.long 0xa9fadf6
 	.long 0 /* index: 2832 */
 	.long 0
 	.long 0
@@ -16501,7 +16501,7 @@ END(kernel_symbol_table)
 .Lname112:
 	.string "handle_installhop"
 .Lname113:
-	.string "vm_tasklock_write_nx"
+	.string "vm_datapart_do_read_nopf"
 .Lname115:
 	.string "task_exec_asynchronous_srpc"
 .Lname116:
@@ -16528,6 +16528,8 @@ END(kernel_symbol_table)
 	.string "debug_dlunlocksections"
 .Lname132:
 	.string "sys_creat"
+.Lname134:
+	.string "vm_copyfromphys_nopf"
 .Lname135:
 	.string "mall_validate_padding"
 .Lname149:
@@ -17052,6 +17054,8 @@ END(kernel_symbol_table)
 	.string "sys_mlockall"
 .Lname623:
 	.string "validate_writable_opt"
+.Lname625:
+	.string "vm_datapart_read_nopf"
 .Lname627:
 	.string "cpu_enable_preemptive_interrupts"
 .Lname628:
@@ -17098,6 +17102,8 @@ END(kernel_symbol_table)
 	.string "path_getchild_and_parent_inode"
 .Lname672:
 	.string "x86_fpustate_save"
+.Lname673:
+	.string "vm_tasklock_write_nx"
 .Lname675:
 	.string "inode_awrite_phys"
 .Lname676:
@@ -17870,6 +17876,8 @@ END(kernel_symbol_table)
 	.string "pipe_writer_destroy"
 .Lname1432:
 	.string "vpage_realloc_untraced_nx"
+.Lname1433:
+	.string "vm_prefault"
 .Lname1439:
 	.string "handle_manager_clone"
 .Lname1442:
@@ -18652,6 +18660,8 @@ END(kernel_symbol_table)
 	.string "path_lock_upgrade"
 .Lname2229:
 	.string "kffree"
+.Lname2230:
+	.string "vm_datapart_write_nopf"
 .Lname2231:
 	.string "rwlock_reading"
 .Lname2233:
@@ -19208,6 +19218,8 @@ END(kernel_symbol_table)
 	.string "directory_mknod"
 .Lname2757:
 	.string "dbg_readline"
+.Lname2758:
+	.string "vm_copytophys_nopf"
 .Lname2759:
 	.string "sys_rt_sigpending"
 .Lname2761:
@@ -19284,6 +19296,8 @@ END(kernel_symbol_table)
 	.string "cpu_sendipi"
 .Lname2827:
 	.string "sys_madvise"
+.Lname2831:
+	.string "vm_datapart_do_write_nopf"
 .Lname2835:
 	.string "inode_sync"
 .Lname2836:
