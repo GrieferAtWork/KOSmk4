@@ -214,6 +214,7 @@
 	CB(PREFIX.FILE.unlocked.write.utility.* PREFIX.FILE.unlocked.write.putc.*) \
 	CB(PREFIX.FILE.unlocked.seek.pos.* PREFIX.FILE.unlocked.seek.seek.* PREFIX.FILE.unlocked.seek.utility.*) \
 	CB(PREFIX.FILE.unlocked.utility.*) \
+	CB(PREFIX.FILE.utility.ext.*) \
 	CB(PREFIX.io.large.lock.* PREFIX.io.large.seek.* PREFIX.io.large.utility.* PREFIX.io.lock.* PREFIX.io.poll.* PREFIX.io.seek.* PREFIX.io.sync.* PREFIX.io.utility.*) \
 	CB(PREFIX.fs.property.* PREFIX.fs.basic_property.*) \
 	CB(PREFIX.fs.environ.*) \

@@ -45,6 +45,7 @@
 #define __IO_FILE_IOREADING 0x40000000 /* NOT ORIGINALLY DEFINED IN DOS: The buffer is currently being read into and must not be changed or resized. */
 #define __IO_FILE_IOISATTY  0x20000000 /* NOT ORIGINALLY DEFINED IN DOS: The buffer refers to a TTY */
 #define __IO_FILE_IONOTATTY 0x10000000 /* NOT ORIGINALLY DEFINED IN DOS: The buffer doesn't refer to a TTY */
+#define __IO_FILE_IONOLOCK  0x08000000 /* NOT ORIGINALLY DEFINED IN DOS: The buffer does not perform any locking (s.a. `__fsetlocking()') */
 
 
 #ifdef __CC__

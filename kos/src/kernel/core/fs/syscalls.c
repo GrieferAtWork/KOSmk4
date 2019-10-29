@@ -2359,6 +2359,7 @@ DEFINE_SYSCALL2(errno_t, kfstat, fd_t, fd,
 	decref(hnd);
 	return -EOK;
 }
+
 DEFINE_SYSCALL4(errno_t, kfstatat, fd_t, dirfd,
                 USER UNCHECKED char const *, filename,
                 USER UNCHECKED struct stat *, statbuf,

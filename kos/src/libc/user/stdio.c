@@ -25,6 +25,7 @@
 #include "malloc.h"
 #include "stdlib.h"
 #include "stdio.h"
+#include "stdio-api.h"
 
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
@@ -64,116 +65,6 @@ DECL_BEGIN
 #define libc_ferror_unlocked libc_ferror
 #define libc_feof_unlocked   libc_feof
 
-#undef __LOCAL_stdin
-#undef __LOCAL_stdout
-#undef __LOCAL_stderr
-#define __LOCAL_stdin        stdin
-#define __LOCAL_stdout       stdout
-#define __LOCAL_stderr       stderr
-
-#undef ___IOFBF
-#undef ___IOLBF
-#undef ___IONBF
-#undef __BUFSIZ
-#define ___IOFBF _IOFBF
-#define ___IOLBF _IOLBF
-#define ___IONBF _IONBF
-#define __BUFSIZ BUFSIZ
-
-
-#define IO_RW           __IO_FILE_IORW      /* The file was opened for read+write permissions ('+' flag) */
-#define IO_MALLBUF      __IO_FILE_IOMALLBUF /* The buffer was allocated internally. */
-#define IO_READING      __IO_FILE_IOREADING /* The buffer can be used for reading and writing. */
-#define IO_FSYNC        __IO_FILE_IOCOMMIT  /* Also synchronize the underlying file after flushing the buffer. */
-#define IO_NODYNSCALE   __IO_FILE_IOUSERBUF /* The buffer is not allowed to dynamically change its buffer size. */
-#define IO_LNBUF        __IO_FILE_IOLNBUF   /* The buffer is line-buffered, meaning that it will
-                                             * flush its data whenever a line-feed is printed.
-                                             * Additionally if the `IO_ISATTY' flag is set,
-                                             * attempting to read from a line-buffered file will cause
-                                             * all other existing line-buffered files to be synchronized
-                                             * first. This is done to ensure that interactive files are
-                                             * always up-to-date before data is read from one of them. */
-#define IO_LNIFTYY      __IO_FILE_IOLNIFTYY /* Automatically set/delete the `IO_LNBUF' and
-                                             * `IO_ISATTY' flags, and add/remove the file from
-                                             * `fb_ttys' the next time this comes into question. To determine
-                                             * this, the pointed-to file is tested for being a TTY device
-                                             * using `DeeFile_IsAtty(fb_file)'.
-                                             * HINT: This flag is set for all newly created buffers by default. */
-#define IO_ISATTY       __IO_FILE_IOISATTY  /* This buffer refers to a TTY device. */
-#define IO_NOTATTY      __IO_FILE_IONOTATTY /* This buffer does not refer to a TTY device. */
-#define IO_HASVTAB      __IO_FILE_IONOFD    /* The file uses a V-table, rather than a file descriptor. */
-
-/* Flags not defined by deemon, but required by the C standard. */
-#define IO_EOF          __IO_FILE_IOEOF /* Set when the file pointed to by 'if_fd' has been exhausted. */
-#define IO_ERR          __IO_FILE_IOERR /* Set when an I/O error occurred. */
-
-
-
-/* NOTE: The KOS FILE type is derived from deemon's FileBuffer type.
- *       Flags re-appear using the following map:
- *          ~FILE_BUFFER_FSTATICBUF     <---> IO_MALLBUF
- *          ~FILE_BUFFER_FREADONLY      <---> IO_RW
- *          FILE_BUFFER_FSYNC           <---> IO_FSYNC
- *          FILE_BUFFER_FREADING        <---> IO_READING
- *          FILE_BUFFER_FNODYNSCALE     <---> IO_NODYNSCALE
- *          FILE_BUFFER_FLNBUF          <---> IO_LNBUF
- *          FILE_BUFFER_FLNIFTTY        <---> IO_LNIFTYY
- *          FILE_BUFFER_FISATTY         <---> IO_ISATTY
- *          FILE_BUFFER_FNOTATTY        <---> IO_NOTATTY
- *       Members re-appear using the following map:
- *          fb_lock  <---> if_exdata->io_lock
- *          fb_file  <---> IO_HASVTAB: if_exdata->io_vtab + if_exdata->io_magi
- *                        !IO_HASVTAB: if_fd
- *          fb_ptr   <---> if_ptr
- *          fb_cnt   <---> if_cnt
- *          fb_chng  <---> if_exdata->io_chng
- *          fb_chsz  <---> if_exdata->io_chsz
- *          fb_base  <---> if_base
- *          fb_size  <---> if_bufsiz
- *          fb_ttych <---> if_exdata->io_lnch
- *          fb_fblk  <---> if_exdata->io_fblk
- *          fb_fpos  <---> if_exdata->io_fpos
- *          fb_flag  <---> if_flag
- */
-
-struct iofile_data_novtab {
-	uintptr_t                  io_zero;   /* Always ZERO(0). - Required for binary compatibility with DOS. */
-	__WEAK refcnt_t            io_refcnt; /* Reference counter. */
-	struct atomic_owner_rwlock io_lock;   /* Lock for the file. */
-	byte_t                    *io_chng;   /* [>= :if_base][+io_chsz <= :if_base + :if_bufsiz]
-	                                       * [valid_if(io_chsz != 0)][lock(fb_lock)]
-	                                       * Pointer to the first character that was
-	                                       * changed since the buffer had been loaded. */
-	size_t                     io_chsz;   /* [lock(fb_lock)] Amount of bytes that were changed. */
-	LLIST_NODE(FILE)           io_lnch;   /* [lock(changed_linebuffered_files_lock)][0..1] Chain of line-buffered file that have changed and must be flushed before another line-buffered file is read. */
-	LLIST_NODE(FILE)           io_link;   /* [lock(all_files_lock)][0..1] Entry in the global chain of open files. (Used by `fcloseall()', as well as flushing all open files during `exit()') */
-	uintptr_t                  io_fver;   /* [lock(flushall_lock)] Last time that this file was flushed because of a global flush. */
-	pos64_t                    io_fblk;   /* The starting address of the data block currently stored in `if_base'. */
-	pos64_t                    io_fpos;   /* The current (assumed) position within the underlying file stream. */
-#undef IOFILE_HAVE_MBS
-//	mbstate_t                  io_mbs;    /* MB State used for translating unicode data. */
-};
-#define IOFILE_DATA_NOVTAB_INIT()                    \
-	{                                                \
-		/* .io_refcnt = */ 2,                        \
-		/* .io_zero   = */ 0,                        \
-		/* .io_lock   = */ ATOMIC_OWNER_RWLOCK_INIT, \
-		/* .io_chng   = */ NULL,                     \
-		/* .io_chsz   = */ 0,                        \
-		/* .io_lnch   = */ LLIST_INITNODE,           \
-		/* .io_link   = */ LLIST_INITNODE,           \
-		/* .io_fblk   = */ 0,                        \
-		/* .io_fpos   = */ 0                         \
-	}
-
-struct iofile_data: iofile_data_novtab {
-	/* All of the following fields only exist when `IO_HASVTAB' is set. */
-	cookie_io_functions_t      io_vtab; /* [const] File buffer */
-	void                      *io_magi; /* [const] Magic cook */
-};
-
-
-
 PRIVATE ATTR_SECTION(".data.crt.FILE.locked.utility.std_files_io") 
 struct iofile_data_novtab std_files_io[3] = {
 	/* [0] = */ IOFILE_DATA_NOVTAB_INIT(),
@@ -200,28 +91,6 @@ DEFINE_NOREL_GLOBAL_META(FILE *, stderr, ".crt.FILE.locked.write.write.stderr");
 #define stdin  GET_NOREL_GLOBAL(stdin)
 #define stdout GET_NOREL_GLOBAL(stdout)
 #define stderr GET_NOREL_GLOBAL(stderr)
-
-
-#define FEOF(self)      ((self)->if_flag & IO_EOF)
-#define FERROR(self)    ((self)->if_flag & IO_ERR)
-#define FSETERROR(self) ((self)->if_flag |= IO_ERR)
-#define FCLEARERR(self) ((self)->if_flag &= ~(IO_ERR | IO_EOF))
-
-#define IOBUF_MAX                8192
-#define IOBUF_MIN                512
-#define IOBUF_RELOCATE_THRESHOLD 2048 /* When >= this amount of bytes are unused in the buffer, free them. */
-
-#define file_reading(x)     atomic_owner_rwlock_reading(&(x)->if_exdata->io_lock)
-#define file_writing(x)     atomic_owner_rwlock_writing(&(x)->if_exdata->io_lock)
-#define file_tryread(x)     atomic_owner_rwlock_tryread(&(x)->if_exdata->io_lock)
-#define file_trywrite(x)    atomic_owner_rwlock_trywrite(&(x)->if_exdata->io_lock)
-#define file_tryupgrade(x)  atomic_owner_rwlock_tryupgrade(&(x)->if_exdata->io_lock)
-#define file_read(x)        atomic_owner_rwlock_read(&(x)->if_exdata->io_lock)
-#define file_write(x)       atomic_owner_rwlock_write(&(x)->if_exdata->io_lock)
-#define file_upgrade(x)     atomic_owner_rwlock_upgrade(&(x)->if_exdata->io_lock)
-#define file_downgrade(x)   atomic_owner_rwlock_downgrade(&(x)->if_exdata->io_lock)
-#define file_endread(x)     atomic_owner_rwlock_endread(&(x)->if_exdata->io_lock)
-#define file_endwrite(x)    atomic_owner_rwlock_endwrite(&(x)->if_exdata->io_lock)
 
 
 /* [0..1][lock(all_files_lock)] Chain of all files.
@@ -402,7 +271,7 @@ NONNULL((1)) int LIBCCALL file_system_trunc(FILE *__restrict self, pos64_t new_s
 }
 
 /* Determine if `self' is a TTY */
-PRIVATE ATTR_SECTION(".text.crt.FILE.core.utility.file_determine_isatty")
+INTERN ATTR_SECTION(".text.crt.FILE.core.utility.file_determine_isatty")
 NONNULL((1)) void LIBCCALL file_determine_isatty(FILE *__restrict self) {
 	uint32_t flags = self->if_flag;
 	if (!(flags & (IO_NOTATTY | IO_ISATTY))) {
@@ -532,7 +401,7 @@ err:
 	return -1;
 }
 
-PRIVATE ATTR_SECTION(".text.crt.FILE.core.write.file_sync")
+INTERN NONNULL((1)) ATTR_SECTION(".text.crt.FILE.core.write.file_sync")
 int LIBCCALL file_sync(FILE *__restrict self) {
 	pos64_t abs_chngpos;
 	size_t changed_size;
@@ -598,43 +467,17 @@ err:
 PRIVATE ATTR_SECTION(".text.crt.FILE.locked.write.utility.file_sync_locked")
 int LIBCCALL file_sync_locked(FILE *__restrict self) {
 	int result;
-	file_write(self);
-	result = file_sync(self);
-	file_endwrite(self);
+	if (FMUSTLOCK(self)) {
+		file_write(self);
+		result = file_sync(self);
+		file_endwrite(self);
+	} else {
+		result = file_sync(self);
+	}
 	return result;
 }
 
-LOCAL ATTR_SECTION(".text.crt.FILE.core.utility.file_tryincref")
-WUNUSED bool LIBCCALL file_tryincref(FILE *__restrict self) {
-	refcnt_t refcnt;
-	struct iofile_data *ex;
-	assert(self);
-	ex = self->if_exdata;
-	assert(ex);
-	do {
-		refcnt = ATOMIC_READ(ex->io_refcnt);
-		if unlikely(refcnt == 0)
-			return false;
-	} while (!ATOMIC_CMPXCH_WEAK(ex->io_refcnt, refcnt, refcnt + 1));
-	return true;
-}
-
-LOCAL ATTR_SECTION(".text.crt.FILE.core.utility.file_incref")
-void LIBCCALL file_incref(FILE *__restrict self) {
-#ifdef NDEBUG
-	struct iofile_data *ex;
-	assert(self);
-	ex = self->if_exdata;
-	assert(ex);
-	ATOMIC_FETCHINC(ex->io_refcnt);
-#else /* NDEBUG */
-	bool ok;
-	ok = file_tryincref(self);
-	assert(ok);
-#endif /* !NDEBUG */
-}
-
-PRIVATE ATTR_SECTION(".text.crt.FILE.core.utility.file_decref")
+INTERN NONNULL((1)) ATTR_SECTION(".text.crt.FILE.core.utility.file_decref")
 void LIBCCALL file_decref(FILE *__restrict self) {
 	refcnt_t refcnt;
 	struct iofile_data *ex;
@@ -705,7 +548,7 @@ void LIBCCALL file_decref(FILE *__restrict self) {
 
 
 /* Synchronize unwritten data of all line-buffered files. */
-PRIVATE ATTR_SECTION(".text.crt.FILE.core.write.file_sync_lnfiles")
+INTERN ATTR_SECTION(".text.crt.FILE.core.write.file_sync_lnfiles")
 void LIBCCALL file_sync_lnfiles(void) {
 	while (ATOMIC_READ(changed_linebuffered_files) != NULL) {
 		FILE *fp;
@@ -727,9 +570,13 @@ void LIBCCALL file_sync_lnfiles(void) {
 		LLIST_UNBIND(fp, if_exdata->io_lnch);
 		atomic_rwlock_endwrite(&changed_linebuffered_files_lock);
 		/* Synchronize this buffer. */
-		file_write(fp);
-		file_sync(fp);
-		file_endwrite(fp);
+		if (FMUSTLOCK(fp)) {
+			file_write(fp);
+			file_sync(fp);
+			file_endwrite(fp);
+		} else {
+			file_sync(fp);
+		}
 		file_decref(fp);
 	}
 done:
@@ -750,10 +597,15 @@ void LIBCCALL file_do_syncall_locked(uintptr_t version) {
 		if (!fp)
 			break;
 do_flush_fp:
-		file_write(fp);
-		fp->if_exdata->io_fver = version;
-		file_sync(fp);
-		file_endwrite(fp);
+		if (FMUSTLOCK(fp)) {
+			file_write(fp);
+			fp->if_exdata->io_fver = version;
+			file_sync(fp);
+			file_endwrite(fp);
+		} else {
+			fp->if_exdata->io_fver = version;
+			file_sync(fp);
+		}
 		atomic_rwlock_read(&all_files_lock);
 		next_fp = LLIST_NEXT(fp, if_exdata->io_link);
 		while (next_fp &&
@@ -842,7 +694,7 @@ void LIBCCALL file_syncall_unlocked(void) {
 
 
 /* High-level, common read-from-file function. */
-PRIVATE ATTR_SECTION(".text.crt.FILE.core.read.file_readdata")
+INTERN ATTR_SECTION(".text.crt.FILE.core.read.file_readdata")
 NONNULL((1)) size_t LIBCCALL file_readdata(FILE *__restrict self,
                                            void *buf, size_t num_bytes) {
 	ssize_t read_size;
@@ -1014,7 +866,7 @@ err:
 
 
 /* High-level, common write-to-file function. */
-PRIVATE ATTR_SECTION(".text.crt.FILE.core.write.file_writedata")
+INTERN ATTR_SECTION(".text.crt.FILE.core.write.file_writedata")
 NONNULL((1)) size_t LIBCCALL file_writedata(FILE *__restrict self,
                                             void const *buf, size_t num_bytes) {
 	size_t result = 0;
@@ -1162,7 +1014,7 @@ err0:
 	return 0;
 }
 
-PRIVATE ATTR_SECTION(".text.crt.FILE.core.write.file_writedata")
+INTERN ATTR_SECTION(".text.crt.FILE.core.write.file_writedata")
 NONNULL((1)) pos64_t LIBCCALL file_seek(FILE *__restrict self,
                                         off64_t off, int whence) {
 	pos64_t result;
@@ -1255,7 +1107,7 @@ err0:
 }
 
 
-PRIVATE ATTR_SECTION(".text.crt.FILE.core.read.file_getc")
+INTERN ATTR_SECTION(".text.crt.FILE.core.read.file_getc")
 WUNUSED NONNULL((1)) int LIBCCALL file_getc(FILE *__restrict self) {
 	uint8_t *new_buffer;
 	ssize_t read_size;
@@ -1408,7 +1260,7 @@ err0:
 	goto done;
 }
 
-PRIVATE ATTR_SECTION(".text.crt.FILE.core.read.file_ungetc")
+INTERN ATTR_SECTION(".text.crt.FILE.core.read.file_ungetc")
 WUNUSED NONNULL((1)) int LIBCCALL file_ungetc(FILE *__restrict self, unsigned char ch) {
 	uint8_t *new_buffer;
 	size_t new_bufsize, inc_size;
@@ -1470,7 +1322,7 @@ err:
 }
 
 
-PRIVATE ATTR_SECTION(".text.crt.FILE.core.write.file_truncate")
+INTERN ATTR_SECTION(".text.crt.FILE.core.write.file_truncate")
 WUNUSED NONNULL((1)) int LIBCCALL file_truncate(FILE *__restrict self,
                                                 pos64_t new_size) {
 	pos64_t abs_pos, abs_end;
@@ -1581,9 +1433,9 @@ struct open_option const open_options[] = {
 
 /* @param: poflags: When non-NULL, filled with `O_*'
  * @return: * :     Set of `IO_*' */
-PRIVATE ATTR_SECTION(".text.crt.FILE.core.utility.file_evalmodes")
+INTERN ATTR_SECTION(".text.crt.FILE.core.utility.file_evalmodes")
 WUNUSED uint32_t LIBCCALL file_evalmodes(char const *modes,
-                                        oflag_t *poflags) {
+                                         oflag_t *poflags) {
 	/* IO_LNIFTYY: Check if the stream handle is a tty
 	 *             the first time it is read from. */
 	uint32_t result = IO_LNIFTYY;
@@ -1674,8 +1526,9 @@ found_option:
 }
 
 
-PRIVATE ATTR_SECTION(".text.crt.FILE.core.utility.file_openfd")
-WUNUSED FILE *LIBCCALL file_openfd(fd_t fd, uint32_t flags) {
+/* @param: flags: Set of `IO_*' */
+INTERN ATTR_SECTION(".text.crt.FILE.core.utility.file_openfd")
+WUNUSED FILE *LIBCCALL file_openfd(/*inherit(on_success)*/ fd_t fd, uint32_t flags) {
 	FILE *result;
 	struct iofile_data *ex;
 	result = (FILE *)calloc(1,
@@ -1688,7 +1541,7 @@ WUNUSED FILE *LIBCCALL file_openfd(fd_t fd, uint32_t flags) {
 	result->if_fd     = fd; /* Inherit reference */
 	atomic_owner_rwlock_cinit(&ex->io_lock);
 	assert(ex->io_zero == 0);
-	ex->io_refcnt = 1;
+	ex->io_refcnt   = 1;
 	result->if_flag = flags;
 	/* Insert the new file stream into the global list of them. */
 	allfiles_insert(result);
@@ -1697,7 +1550,7 @@ done:
 }
 
 
-PRIVATE ATTR_SECTION(".text.crt.FILE.core.utility.file_openfd")
+INTERN NONNULL((1)) ATTR_SECTION(".text.crt.FILE.core.utility.file_openfd")
 WUNUSED FILE *LIBCCALL file_reopenfd(FILE *__restrict self,
                                      fd_t fd, uint32_t flags) {
 	struct iofile_data *ex;
@@ -1728,7 +1581,7 @@ WUNUSED FILE *LIBCCALL file_reopenfd(FILE *__restrict self,
 }
 
 
-PRIVATE ATTR_SECTION(".text.crt.FILE.core.utility.file_openfd")
+INTERN NONNULL((1)) ATTR_SECTION(".text.crt.FILE.core.utility.file_openfd")
 WUNUSED FILE *LIBCCALL file_opencookie(cookie_io_functions_t const *__restrict io,
                                        void *magic, uint32_t flags) {
 	FILE *result;
@@ -1756,8 +1609,12 @@ done:
 
 
 
-/*[[[start:implementation]]]*/
 
+
+
+
+
+/*[[[start:implementation]]]*/
 
 #undef libc_flushall
 DEFINE_PUBLIC_ALIAS(_flushall, libc_flushall);
@@ -1865,9 +1722,13 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.write.utility.fflush") int
 	int result;
 	if (!stream)
 		return flushall();
-	file_write(stream);
-	result = file_sync(stream);
-	file_endwrite(stream);
+	if (FMUSTLOCK(stream)) {
+		file_write(stream);
+		result = file_sync(stream);
+		file_endwrite(stream);
+	} else {
+		result = file_sync(stream);
+	}
 	return result;
 }
 /*[[[end:fflush]]]*/
@@ -1912,12 +1773,19 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.read.read.fread") size_t
 		FSETERROR(stream);
 		return 0;
 	}
-	file_write(stream);
-	result = file_readdata(stream, buf, total);
-	/* Unread the last partially read element. */
-	if unlikely(result != total)
-		file_seek(stream, -(result % elemsize), SEEK_CUR);
-	file_endwrite(stream);
+	if (FMUSTLOCK(stream)) {
+		file_write(stream);
+		result = file_readdata(stream, buf, total);
+		/* Unread the last partially read element. */
+		if unlikely(result != total)
+			file_seek(stream, -(result % elemsize), SEEK_CUR);
+		file_endwrite(stream);
+	} else {
+		result = file_readdata(stream, buf, total);
+		/* Unread the last partially read element. */
+		if unlikely(result != total)
+			file_seek(stream, -(result % elemsize), SEEK_CUR);
+	}
 	return result / elemsize;
 }
 /*[[[end:fread]]]*/
@@ -1976,9 +1844,13 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.write.write.fwrite") size_t
 		FSETERROR(stream);
 		return 0;
 	}
-	file_write(stream);
-	result = file_writedata(stream, buf, total);
-	file_endwrite(stream);
+	if (FMUSTLOCK(stream)) {
+		file_write(stream);
+		result = file_writedata(stream, buf, total);
+		file_endwrite(stream);
+	} else {
+		result = file_writedata(stream, buf, total);
+	}
 	return result / elemsize;
 }
 /*[[[end:fwrite]]]*/
@@ -2025,11 +1897,17 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.write.write.file_printer") ssize_t
 	ssize_t result;
 	if unlikely(!me)
 		return 0;
-	file_write(me);
-	result = (ssize_t)file_writedata(me, data, datalen * sizeof(char));
-	if unlikely(!result && FERROR(me))
-		result = -1;
-	file_endwrite(me);
+	if (FMUSTLOCK(me)) {
+		file_write(me);
+		result = (ssize_t)file_writedata(me, data, datalen * sizeof(char));
+		if unlikely(!result && FERROR(me))
+			result = -1;
+		file_endwrite(me);
+	} else {
+		result = (ssize_t)file_writedata(me, data, datalen * sizeof(char));
+		if unlikely(!result && FERROR(me))
+			result = -1;
+	}
 	return result;
 }
 /*[[[end:file_printer]]]*/
@@ -2089,10 +1967,15 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.seek.seek.fseek") int
 	int result;
 	if unlikely(!stream)
 		return (int)libc_seterrno(EINVAL);
-	file_write(stream);
-	file_seek(stream, (off64_t)off, whence);
-	result = unlikely(FERROR(stream)) ? -1 : 0;
-	file_endwrite(stream);
+	if (FMUSTLOCK(stream)) {
+		file_write(stream);
+		file_seek(stream, (off64_t)off, whence);
+		result = unlikely(FERROR(stream)) ? -1 : 0;
+		file_endwrite(stream);
+	} else {
+		file_seek(stream, (off64_t)off, whence);
+		result = unlikely(FERROR(stream)) ? -1 : 0;
+	}
 	return result;
 }
 /*[[[end:fseek]]]*/
@@ -2155,10 +2038,15 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.seek.seek.fseeko") int
 	int result;
 	if unlikely(!stream)
 		return (int)libc_seterrno(EINVAL);
-	file_write(stream);
-	file_seek(stream, (off64_t)off, whence);
-	result = unlikely(FERROR(stream)) ? -1 : 0;
-	file_endwrite(stream);
+	if (FMUSTLOCK(stream)) {
+		file_write(stream);
+		file_seek(stream, (off64_t)off, whence);
+		result = unlikely(FERROR(stream)) ? -1 : 0;
+		file_endwrite(stream);
+	} else {
+		file_seek(stream, (off64_t)off, whence);
+		result = unlikely(FERROR(stream)) ? -1 : 0;
+	}
 	return result;
 }
 /*[[[end:fseeko]]]*/
@@ -2179,10 +2067,15 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.seek.seek.fseeko64") int
 	int result;
 	if unlikely(!stream)
 		return (int)libc_seterrno(EINVAL);
-	file_write(stream);
-	file_seek(stream, (off64_t)off, whence);
-	result = unlikely(FERROR(stream)) ? -1 : 0;
-	file_endwrite(stream);
+	if (FMUSTLOCK(stream)) {
+		file_write(stream);
+		file_seek(stream, (off64_t)off, whence);
+		result = unlikely(FERROR(stream)) ? -1 : 0;
+		file_endwrite(stream);
+	} else {
+		file_seek(stream, (off64_t)off, whence);
+		result = unlikely(FERROR(stream)) ? -1 : 0;
+	}
 	return result;
 }
 #endif /* MAGIC:alias */
@@ -2540,9 +2433,13 @@ NOTHROW_NCX(LIBCCALL libc_ungetc)(int ch,
 		libc_seterrno(EINVAL);
 		return EOF;
 	}
-	file_write(stream);
-	result = file_ungetc(stream, (unsigned char)(unsigned int)ch);
-	file_endwrite(stream);
+	if (FMUSTLOCK(stream)) {
+		file_write(stream);
+		result = file_ungetc(stream, (unsigned char)(unsigned int)ch);
+		file_endwrite(stream);
+	} else {
+		result = file_ungetc(stream, (unsigned char)(unsigned int)ch);
+	}
 	return result;
 }
 /*[[[end:ungetc]]]*/
@@ -2574,10 +2471,15 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.seek.utility.rewind") void
 /*[[[body:rewind]]]*/
 {
 	if likely(stream) {
-		file_write(stream);
-		file_seek(stream, 0, SEEK_SET);
-		stream->if_flag &= ~(IO_EOF | IO_ERR);
-		file_endwrite(stream);
+		if (FMUSTLOCK(stream)) {
+			file_write(stream);
+			file_seek(stream, 0, SEEK_SET);
+			stream->if_flag &= ~(IO_EOF | IO_ERR);
+			file_endwrite(stream);
+		} else {
+			file_seek(stream, 0, SEEK_SET);
+			stream->if_flag &= ~(IO_EOF | IO_ERR);
+		}
 	}
 }
 /*[[[end:rewind]]]*/
@@ -2627,9 +2529,13 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.utility.fftruncate") int
 		libc_seterrno(EINVAL);
 		return -1;
 	}
-	file_write(stream);
-	result = file_truncate(stream, (pos64_t)length);
-	file_endwrite(stream);
+	if (FMUSTLOCK(stream)) {
+		file_write(stream);
+		result = file_truncate(stream, (pos64_t)length);
+		file_endwrite(stream);
+	} else {
+		result = file_truncate(stream, (pos64_t)length);
+	}
 	return result;
 }
 /*[[[end:fftruncate]]]*/
@@ -2672,9 +2578,13 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.utility.fftruncate64") int
 		libc_seterrno(EINVAL);
 		return -1;
 	}
-	file_write(stream);
-	result = file_truncate(stream, (pos64_t)length);
-	file_endwrite(stream);
+	if (FMUSTLOCK(stream)) {
+		file_write(stream);
+		result = file_truncate(stream, (pos64_t)length);
+		file_endwrite(stream);
+	} else {
+		result = file_truncate(stream, (pos64_t)length);
+	}
 	return result;
 }
 #endif /* MAGIC:alias */
@@ -2718,15 +2628,25 @@ NOTHROW_NCX(LIBCCALL libc_setvbuf)(FILE *__restrict stream,
 	int result;
 	if unlikely(!stream)
 		return (int)libc_seterrno(EINVAL);
-	file_write(stream);
-	result = file_sync(stream);
-	if likely(result == 0) {
-		result = file_setmode(stream,
-		                      buf,
-		                      modes,
-		                      bufsize);
+	if (FMUSTLOCK(stream)) {
+		file_write(stream);
+		result = file_sync(stream);
+		if likely(result == 0) {
+			result = file_setmode(stream,
+			                      buf,
+			                      modes,
+			                      bufsize);
+		}
+		file_endwrite(stream);
+	} else {
+		result = file_sync(stream);
+		if likely(result == 0) {
+			result = file_setmode(stream,
+			                      buf,
+			                      modes,
+			                      bufsize);
+		}
 	}
-	file_endwrite(stream);
 	return result;
 }
 /*[[[end:setvbuf]]]*/
@@ -3201,9 +3121,13 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.read.getc.fgetc") int
 		libc_seterrno(EINVAL);
 		return EOF;
 	}
-	file_write(stream);
-	result = file_getc(stream);
-	file_endwrite(stream);
+	if (FMUSTLOCK(stream)) {
+		file_write(stream);
+		result = file_getc(stream);
+		file_endwrite(stream);
+	} else {
+		result = file_getc(stream);
+	}
 	return result;
 }
 /*[[[end:fgetc]]]*/
@@ -4932,7 +4856,8 @@ NOTHROW_RPC(LIBCCALL libc_fdreopen)(fd_t fd,
 		libc_seterrno(EINVAL);
 		goto done;
 	}
-	file_write(stream);
+	if (FMUSTLOCK(stream))
+		file_write(stream);
 	oldfd = stream->if_fd;
 	if unlikely(fd == oldfd) {
 		file_endwrite(stream);
@@ -4941,8 +4866,9 @@ NOTHROW_RPC(LIBCCALL libc_fdreopen)(fd_t fd,
 		goto done;
 	}
 	stream->if_fd   = fd;
-	stream->if_flag = IO_LNIFTYY;
-	file_endwrite(stream);
+	stream->if_flag = IO_LNIFTYY | (stream->if_flag & IO_NOLOCK);
+	if (FMUSTLOCK(stream))
+		file_endwrite(stream);
 	sys_close(oldfd);
 done:
 	return stream;
@@ -4995,9 +4921,13 @@ NOTHROW_RPC(LIBCCALL libc_freopen)(char const *__restrict filename,
 	fd    = open(filename, oflags, 0644);
 	if unlikely(fd < 0)
 		return NULL;
-	file_write(stream);
-	result = file_reopenfd(stream, fd, flags);
-	file_endwrite(stream);
+	if (FMUSTLOCK(stream)) {
+		file_write(stream);
+		result = file_reopenfd(stream, fd, flags);
+		file_endwrite(stream);
+	} else {
+		result = file_reopenfd(stream, fd, flags);
+	}
 	if unlikely(!result)
 		sys_close(fd);
 	return result;

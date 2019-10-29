@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb1ed136f */
+/* HASH CRC-32:0x92d1fa3c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -183,10 +183,19 @@ __CRT_FUNCTION(__ctype_tolower_loc,0,(),0,(),int32_t const **)
 __CRT_FUNCTION(__ctype_toupper_loc,0,(),0,(),int32_t const **)
 __CRT_FUNCTION(__doserrno,0,(),0,(),u32 *)
 __CRT_FUNCTION(__errno_location,0,(),0,(),errno_t *)
+__CRT_FUNCTION(__fbufsize,0,(),1,(FILE *,fp),size_t)
+__CRT_FUNCTION(__flbf,0,(),1,(FILE *,fp),int)
 __CRT_FUNCTION(__fpclassify,0,(),1,(double,val),int)
 __CRT_FUNCTION(__fpclassifyf,0,(),1,(float,val),int)
 __CRT_FUNCTION(__fpclassifyl,0,(),1,(long double,val),int)
 __CRT_FUNCTION(__fpecode,0,(),0,(),int *)
+__CRT_FUNCTION(__fpending,0,(),1,(FILE *,fp),size_t)
+__CRT_FUNCTION(__fpurge,0,(),1,(FILE *,fp),void)
+__CRT_FUNCTION(__freadable,0,(),1,(FILE *,fp),int)
+__CRT_FUNCTION(__freading,0,(),1,(FILE *,fp),int)
+__CRT_FUNCTION(__fsetlocking,0,(),2,(FILE *,fp,int,type),int)
+__CRT_FUNCTION(__fwritable,0,(),1,(FILE *,fp),int)
+__CRT_FUNCTION(__fwriting,0,(),1,(FILE *,fp),int)
 __CRT_FUNCTION(__h_errno_location,0,(),0,(),int *)
 __CRT_FUNCTION(__issignaling,0,(),1,(double,val),int)
 __CRT_FUNCTION(__issignalingf,0,(),1,(float,val),int)
@@ -278,6 +287,7 @@ __CRT_FUNCTION(_findnext32i64,0,(),2,(intptr_t,findfd,struct _finddata32i64_t *_
 __CRT_FUNCTION(_findnext64,0,(),2,(intptr_t,findfd,struct __finddata64_t *__restrict,finddata),int)
 __CRT_FUNCTION(_flsbuf,0,(),2,(int,ch,FILE *__restrict,stream),int)
 __CRT_FUNCTION(_flushall,0,(),0,(),int)
+__CRT_FUNCTION(_flushlbf,0,(),0,(),void)
 __CRT_FUNCTION(_fpclass,0,(),1,(double,x),int)
 __CRT_FUNCTION(_fprintf_l,0,(),VA(3),(FILE *__restrict,stream,char const *__restrict,format,locale_t,locale),__STDC_INT_AS_SIZE_T)
 __CRT_FUNCTION(_fprintf_p,0,(),VA(2),(FILE *__restrict,stream,char const *__restrict,format),__STDC_INT_AS_SIZE_T)

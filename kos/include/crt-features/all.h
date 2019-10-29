@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x867bf1a */
+/* HASH CRC-32:0x6bc8e05b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -536,6 +536,7 @@
 #define __CRT_HAVE___fabs 1
 #define __CRT_HAVE___fabsf 1
 #define __CRT_HAVE___fabsl 1
+#define __CRT_HAVE___fbufsize 1
 #define __CRT_HAVE___fcntl 1
 #define __CRT_HAVE___fdim 1
 #define __CRT_HAVE___fdimf 1
@@ -544,6 +545,7 @@
 #define __CRT_HAVE___finite 1
 #define __CRT_HAVE___finitef 1
 #define __CRT_HAVE___finitel 1
+#define __CRT_HAVE___flbf 1
 #define __CRT_HAVE___floor 1
 #define __CRT_HAVE___floorf 1
 #define __CRT_HAVE___floorl 1
@@ -564,10 +566,17 @@
 #define __CRT_HAVE___fpclassifyf 1
 #define __CRT_HAVE___fpclassifyl 1
 #define __CRT_HAVE___fpecode 1
+#define __CRT_HAVE___fpending 1
+#define __CRT_HAVE___fpurge 1
+#define __CRT_HAVE___freadable 1
+#define __CRT_HAVE___freading 1
 #define __CRT_HAVE___freelocale 1
 #define __CRT_HAVE___frexp 1
 #define __CRT_HAVE___frexpf 1
 #define __CRT_HAVE___frexpl 1
+#define __CRT_HAVE___fsetlocking 1
+#define __CRT_HAVE___fwritable 1
+#define __CRT_HAVE___fwriting 1
 #define __CRT_HAVE___gamma 1
 #define __CRT_HAVE___gammaf 1
 #define __CRT_HAVE___gammal 1
@@ -992,6 +1001,7 @@
 #define __CRT_HAVE__finite 1
 #define __CRT_HAVE__flsbuf 1
 #define __CRT_HAVE__flushall 1
+#define __CRT_HAVE__flushlbf 1
 #define __CRT_HAVE__fpclass 1
 #define __CRT_HAVE__fpreset 1
 #define __CRT_HAVE__fprintf_l 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa0ece4c2 */
+/* HASH CRC-32:0xe5a04bd */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -673,12 +673,14 @@
 #define __CRT_ATTR_NOTHROW_NCX___fabs 1
 #define __CRT_ATTR_NOTHROW_NCX___fabsf 1
 #define __CRT_ATTR_NOTHROW_NCX___fabsl 1
+#define __CRT_ATTR_NOTHROW_NCX___fbufsize 1
 #define __CRT_ATTR_NOTHROW_NCX___fdim 1
 #define __CRT_ATTR_NOTHROW_NCX___fdimf 1
 #define __CRT_ATTR_NOTHROW_NCX___fdiml 1
 #define __CRT_ATTR_NOTHROW_NCX___finite 1
 #define __CRT_ATTR_NOTHROW_NCX___finitef 1
 #define __CRT_ATTR_NOTHROW_NCX___finitel 1
+#define __CRT_ATTR_NOTHROW_NCX___flbf 1
 #define __CRT_ATTR_NOTHROW_NCX___floor 1
 #define __CRT_ATTR_NOTHROW_NCX___floorf 1
 #define __CRT_ATTR_NOTHROW_NCX___floorl 1
@@ -695,9 +697,16 @@
 #define __CRT_ATTR_NOTHROW_NCX___fmodf 1
 #define __CRT_ATTR_NOTHROW_NCX___fmodl 1
 #define __CRT_ATTR_NOTHROW_NCX___fpecode 1
+#define __CRT_ATTR_NOTHROW_NCX___fpending 1
+#define __CRT_ATTR_NOTHROW_NCX___fpurge 1
+#define __CRT_ATTR_NOTHROW_NCX___freadable 1
+#define __CRT_ATTR_NOTHROW_NCX___freading 1
 #define __CRT_ATTR_NOTHROW_NCX___frexp 1
 #define __CRT_ATTR_NOTHROW_NCX___frexpf 1
 #define __CRT_ATTR_NOTHROW_NCX___frexpl 1
+#define __CRT_ATTR_NOTHROW_NCX___fsetlocking 1
+#define __CRT_ATTR_NOTHROW_NCX___fwritable 1
+#define __CRT_ATTR_NOTHROW_NCX___fwriting 1
 #define __CRT_ATTR_NOTHROW_NCX___gamma 1
 #define __CRT_ATTR_NOTHROW_NCX___gammaf 1
 #define __CRT_ATTR_NOTHROW_NCX___gammal 1
@@ -947,6 +956,7 @@
 #define __CRT_ATTR_NOTHROW_NCX__fileno 1
 #define __CRT_ATTR_NOTHROW_NCX__findclose 1
 #define __CRT_ATTR_NOTHROW_NCX__finite 1
+#define __CRT_ATTR_NOTHROW_NCX__flushlbf 1
 #define __CRT_ATTR_NOTHROW_NCX__fpreset 1
 #define __CRT_ATTR_NOTHROW_NCX__fputchar 1
 #define __CRT_ATTR_NOTHROW_NCX__free_dbg 1
@@ -3737,6 +3747,13 @@
 
 
 /* ATTR_PURE */
+#define __CRT_ATTR_PURE___fbufsize 1
+#define __CRT_ATTR_PURE___flbf 1
+#define __CRT_ATTR_PURE___fpending 1
+#define __CRT_ATTR_PURE___freadable 1
+#define __CRT_ATTR_PURE___freading 1
+#define __CRT_ATTR_PURE___fwritable 1
+#define __CRT_ATTR_PURE___fwriting 1
 #define __CRT_ATTR_PURE__atof_l 1
 #define __CRT_ATTR_PURE__atoi64 1
 #define __CRT_ATTR_PURE__atoi64_l 1
