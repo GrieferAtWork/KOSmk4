@@ -47,6 +47,7 @@
 	.fs.exec.exec*  .sched.access*    # Keep fork() and exec() functions together
 	.sched.thread*
 	.sched.pthread*
+	.sched.futex* .sched.futexlock* .sched.futexexpr* .sched.futexlockexpr*
 	.sched.semaphore*
 	.sched.param*
 	.sched.process*
@@ -176,6 +177,7 @@
 	CB(PREFIX.sched.access.* PREFIX.fs.exec.exec.*) \
 	CB(PREFIX.sched.thread.*) \
 	CB(PREFIX.sched.pthread.*) \
+	CB(PREFIX.sched.futex.* PREFIX.sched.futexexpr.* PREFIX.sched.futexlock.* PREFIX.sched.futexlockexpr.*) \
 	CB(PREFIX.sched.semaphore.*) \
 	CB(PREFIX.sched.param.*) \
 	CB(PREFIX.sched.process.*) \

@@ -31,17 +31,17 @@ struct vm_futex;
 struct vm_datapart;
 
 struct vm_futex {
-	WEAK refcnt_t     f_refcnt; /* Futex reference counter. */
+	WEAK refcnt_t        f_refcnt; /* Futex reference counter. */
 	XATOMIC_WEAKLYREF(struct vm_datapart)
-	                  f_part;   /* [0..1] The data part associated with this futex.
-	                             * Note that this part may change at any time in order to deal
-	                             * with the part being split. Additionally, if the part is destroyed
-	                             * the this pointer is cleared, meaning that a NULL-value indicate
-	                             * that the futex is dangling and that `f_tree' has become invalid. */
+	                     f_part;   /* [0..1] The data part associated with this futex.
+	                                * Note that this part may change at any time in order to deal
+	                                * with the part being split. Additionally, if the part is destroyed
+	                                * the this pointer is cleared, meaning that a NULL-value indicate
+	                                * that the futex is dangling and that `f_tree' has become invalid. */
 	ATREE_NODE_SINGLE(struct vm_futex, uintptr_t)
-	                  f_tree;   /* [lock(f_part->dp_lock)][valid_if(!wasdestroyed(f_tree))]
-	                             * The tree of futex objects that exist within the data part.
-	                             * The associated tree-root can be found under `f_part->dp_futex->fc_tree' */
+	                     f_tree;   /* [lock(f_part->dp_lock)][valid_if(!wasdestroyed(f_tree))]
+	                                * The tree of futex objects that exist within the data part.
+	                                * The associated tree-root can be found under `f_part->dp_futex->fc_tree' */
 	union {
 		struct sig       f_signal; /* [valid_if(f_refcnt != 0)] The signal used to implement the futex. */
 		struct vm_futex *f_ndead;  /* [valid_if(f_refcnt == 0)] Next dead futex pointer. */
@@ -50,8 +50,8 @@ struct vm_futex {
 
 #define vm_futex_alloc()              ((struct vm_futex *)kmalloc(sizeof(struct vm_futex), GFP_NORMAL))
 #define vm_futex_allocf(gfp_flags)    ((struct vm_futex *)kmalloc(sizeof(struct vm_futex), gfp_flags))
-#define vm_futex_allocf_nx(gfp_flags) ((struct vm_futex *)kmalloc(sizeof(struct vm_futex), gfp_flags))
-#define vm_futex_free(p) kfree(p)
+#define vm_futex_allocf_nx(gfp_flags) ((struct vm_futex *)kmalloc_nx(sizeof(struct vm_futex), gfp_flags))
+#define vm_futex_free(p)              kfree(p)
 
 /* Destroy the given futex due to its reference counter having reached zero. */
 FUNDEF NOBLOCK NONNULL((1)) void
@@ -149,7 +149,9 @@ FUNDEF WUNUSED NONNULL((1)) REF struct vm_futex *
 		THROWS(E_WOULDBLOCK, E_SEGFAULT);
 
 /* Broadcast to all thread waiting for a futex at `futex_address' within the current VM */
-FUNDEF void FCALL vm_futex_broadcast(void *futex_address) THROWS(E_WOULDBLOCK, E_SEGFAULT);
+FUNDEF void FCALL
+vm_futex_broadcast(void *futex_address)
+		THROWS(E_WOULDBLOCK, E_SEGFAULT);
 
 
 DECL_END

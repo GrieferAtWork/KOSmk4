@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdec9fb02 */
+/* HASH CRC-32:0x4c8507c9 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -532,16 +532,90 @@
  * @return: -EOK:    `state' was NULL and the trap returned successfully
  * @return: -ENOENT: No debugger is connected to the calling process/process-group/system */
 #define __NR32_debugtrap                  0x80000011 /* errno_t debugtrap(struct ucpustate const *state, struct debugtrap_reason const *reason) */
+/* >> lfutex(2)
+ * Provide the bottom-most API for implementing user-space synchronization on KOS
+ * @param: futex_op: One of:
+ *    - LFUTEX_WAKE:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKE, size_t count)
+ *    - LFUTEX_NOP:                (lfutex_t *uaddr, syscall_ulong_t LFUTEX_NOP, size_t ignored)
+ *    - LFUTEX_WAIT:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT, lfutex ignored, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_LOCK:          (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_LOCK, lfutex_t lock_value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE, lfutex_t value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_UNTIL:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL, lfutex_t value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_ABOVE:   (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_ABOVE, lfutex_t value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BELOW:   (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_BELOW, lfutex_t value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BITMASK: (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_BITMASK, lfutex_t bitmask, struct timespec const *timeout, lfutex_t setmask)
+ *    - LFUTEX_WAIT_UNTIL_BITMASK: (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL_BITMASK, lfutex_t bitmask, struct timespec const *timeout, lfutex_t setmask)
+ *    - LFUTEX_WAIT_WHILE_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
+ *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
+ * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @return: * : Depending on `futex_op'
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @throw:  E_INVALID_ARGUMENT: The given `futex_op' is invalid
+ * @throw:  E_INTERRUPT:        A blocking futex-wait operation was interrupted
+ * @return: -ETIMEDOUT:         A blocking futex-wait operation has timed out */
 #define __NR32_lfutex                     0x80000012 /* syscall_slong_t lfutex(uintptr_t *uaddr, syscall_ulong_t futex_op, uintptr_t val, struct __timespec64 const *timeout, uintptr_t val2) */
 #define __NR32_lseek64                    0x80000013 /* int64_t lseek64(fd_t fd, int64_t offset, syscall_ulong_t whence) */
-#define __NR32_lfutexlock                 0x80000014 /* syscall_slong_t lfutexlock(uintptr_t *ulockaddr, uintptr_t *uaddr, syscall_ulong_t futex_op, uintptr_t val, struct __timespec64 const *timeout, uintptr_t val2) */
-#define __NR32_lfutexexpr                 0x80000015 /* errno_t lfutexexpr(uintptr_t *uaddr, void *base, struct lfutexexpr const *exprv, size_t exprc, struct __timespec64 const *timeout, syscall_ulong_t timeout_flags) */
-#define __NR32_lfutexlockexpr             0x80000016 /* errno_t lfutexlockexpr(uintptr_t *ulockaddr, void *base, struct lfutexexpr const *exprv, size_t exprc, struct __timespec64 const *timeout, syscall_ulong_t timeout_flags) */
+/* >> lfutexexpr(2)
+ * The lfutexexpr() system call can be used to specify arbitrarily complex
+ * expressions that must atomically (in relation to other futex operations)
+ * hold true before the scheduler will suspend the calling thread, as well as
+ * have the calling thread wait for any number of futex objects associated with
+ * any address that is checked as part of the expression. (s.a. `lfutex()')
+ * Notes:
+ *   - This is the only futex function that can be used to wait on multiple futex
+ *     objects (i.e. resume execution when `LFUTEX_WAKE' is called on _any_ of them)
+ *   - For more precise control over waiting on futex objects, as well as waiting on
+ *     futexes in conjunction with waiting on other things such as files, see the
+ *     documentation on this topic (lfutex() and select()) at the top of <kos/futex.h>
+ * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
+ * @param: exprv:         Vector of expressions for which to check
+ * @param: exprc:         Number of expressions given in `exprv'
+ * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
+ * @return: * : The first non-zero return value from executing all of the given `exprv'
+ *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*' functions
+ *              to see their possible return values, which are always `0' when they would
+ *              perform a wait operation, and usually `1' otherwise) or `0' if the calling
+ *              thread had to perform a wait operation, at which point this function returning
+ *              that value means that you've once again been re-awoken.
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
+ * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
+ * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
+#define __NR32_lfutexexpr                 0x80000014 /* errno_t lfutexexpr(void *base, size_t exprc, struct lfutexexpr const *exprv, struct __timespec64 const *timeout, syscall_ulong_t timeout_flags) */
+/* >> lfutexlockexpr(2)
+ * A function that is similar to `lfutexexpr()', but allows for the use of one central
+ * locking futex that is used for waiting and may be distinct from any other given futex
+ * object pointer.
+ * Notes:
+ *   - This function only has the calling thread wait on a single futex `ulockaddr',
+ *     rather than having it wait on an arbitrary number of futexes, as would be the case when
+ *     the `lfutexexpr()' function is used.
+ *   - For more precise control over waiting on futex objects, as well as waiting on futexes
+ *     in conjunction with waiting on other things such as files, see the documentation on
+ *     this topic (lfutex() and select()) at the top of <kos/futex.h>
+ * @param: ulockaddr:     Address of the futex lock to-be used / The futex on which to wait
+ * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
+ * @param: exprv:         Vector of expressions for which to check
+ * @param: exprc:         Number of expressions given in `exprv'
+ * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
+ * @return: * : The first non-zero return value from executing all of the given `exprv'
+ *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*' functions
+ *              to see their possible return values, which are always `0' when they would
+ *              perform a wait operation, and usually `1' otherwise) or `0' if the calling
+ *              thread had to perform a wait operation, at which point this function returning
+ *              that value means that you've once again been re-awoken.
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
+ * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
+ * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
+#define __NR32_lfutexlockexpr             0x80000015 /* errno_t lfutexlockexpr(uintptr_t *ulockaddr, void *base, size_t exprc, struct lfutexexpr const *exprv, struct __timespec64 const *timeout, syscall_ulong_t timeout_flags) */
 /* Create and return a new tty terminal controller connected to the given keyboard and display
  * The newly created device automatically gets assigned an arbitrary device number, before
  * being made available under a file `/dev/${name}' (or rather: as ${name} within the devfs)
  * @param: reserved: Reserved set of flags (Must pass `0'; for future expansion) */
-#define __NR32_mktty                      0x80000017 /* fd_t mktty(fd_t keyboard, fd_t display, char const *name, syscall_ulong_t rsvd) */
+#define __NR32_mktty                      0x80000016 /* fd_t mktty(fd_t keyboard, fd_t display, char const *name, syscall_ulong_t rsvd) */
 /* Raise a signal within the calling thread alongside the given CPU state
  * This system call is used when translating exceptions into POSIX signal in error mode #4
  * @param: state: The state state at which to raise the signal, or `NULL' if the signal should
@@ -550,8 +624,7 @@
  *                return to the text location described by it.
  * TODO: Add a flags argument to control if the current signal mask
  *       should be ignored (currently, it's always being ignored) */
-#define __NR32_raiseat                    0x80000018 /* errno_t raiseat(struct ucpustate const *state, struct __siginfo_struct const *si) */
-#define __NR32_stime64                    0x80000019 /* errno_t stime64(time64_t const *t) */
+#define __NR32_raiseat                    0x80000017 /* errno_t raiseat(struct ucpustate const *state, struct __siginfo_struct const *si) */
 /* Trigger a coredump of the calling process.
  * @param: curr_state:       The state as is still valid after any possible unwinding has already been done
  *                           Note that this state does not necessarily point to the location that originally
@@ -576,7 +649,8 @@
  *                           allowing coredumps to also be triggerred for unhandled signals.
  * @param: unwind_error:     The unwind error that caused the coredump, or `UNWIND_NOTHROW' if unwinding
  *                           was never actually performed, and `exception' is actually a `siginfo_t *' */
-#define __NR32_coredump                   0x8000001a /* errno_t coredump(struct ucpustate const *curr_state, struct ucpustate const *orig_state, void const *const *traceback_vector, size_t traceback_length, struct exception_data const *exception, syscall_ulong_t unwind_error) */
+#define __NR32_coredump                   0x80000018 /* errno_t coredump(struct ucpustate const *curr_state, struct ucpustate const *orig_state, void const *const *traceback_vector, size_t traceback_length, struct exception_data const *exception, syscall_ulong_t unwind_error) */
+#define __NR32_stime64                    0x80000019 /* errno_t stime64(time64_t const *t) */
 #define __NR32_utime64                    0x8000001e /* errno_t utime64(char const *filename, struct utimbuf64 const *times) */
 #define __NR32_ioctlf                     0x80000036 /* syscall_slong_t ioctlf(fd_t fd, syscall_ulong_t command, iomode_t mode, void *arg) */
 #define __NR32_fsmode                     0x8000003c /* uint64_t fsmode(uint64_t mode) */
@@ -993,13 +1067,12 @@
 #define __NR32RM_debugtrap                  0
 #define __NR32RM_lfutex                     1
 #define __NR32RM_lseek64                    0
-#define __NR32RM_lfutexlock                 1
 #define __NR32RM_lfutexexpr                 1
 #define __NR32RM_lfutexlockexpr             1
 #define __NR32RM_mktty                      0
 #define __NR32RM_raiseat                    2
-#define __NR32RM_stime64                    0
 #define __NR32RM_coredump                   2
+#define __NR32RM_stime64                    0
 #define __NR32RM_utime64                    0
 #define __NR32RM_ioctlf                     0
 #define __NR32RM_fsmode                     2
@@ -1359,13 +1432,12 @@
 #define __NR32CP_debugtrap                  0
 #define __NR32CP_lfutex                     1
 #define __NR32CP_lseek64                    1
-#define __NR32CP_lfutexlock                 1
 #define __NR32CP_lfutexexpr                 1
 #define __NR32CP_lfutexlockexpr             1
 #define __NR32CP_mktty                      0
 #define __NR32CP_raiseat                    0
-#define __NR32CP_stime64                    0
 #define __NR32CP_coredump                   0
+#define __NR32CP_stime64                    0
 #define __NR32CP_utime64                    1
 #define __NR32CP_ioctlf                     1
 #define __NR32CP_fsmode                     0
@@ -1725,13 +1797,12 @@
 #define __NR32RT_debugtrap                  errno_t
 #define __NR32RT_lfutex                     syscall_slong_t
 #define __NR32RT_lseek64                    int64_t
-#define __NR32RT_lfutexlock                 syscall_slong_t
 #define __NR32RT_lfutexexpr                 errno_t
 #define __NR32RT_lfutexlockexpr             errno_t
 #define __NR32RT_mktty                      fd_t
 #define __NR32RT_raiseat                    errno_t
-#define __NR32RT_stime64                    errno_t
 #define __NR32RT_coredump                   errno_t
+#define __NR32RT_stime64                    errno_t
 #define __NR32RT_utime64                    errno_t
 #define __NR32RT_ioctlf                     syscall_slong_t
 #define __NR32RT_fsmode                     uint64_t
@@ -2571,22 +2642,15 @@
 #define __NR32AT0_lseek64                    fd_t
 #define __NR32AT1_lseek64                    int64_t
 #define __NR32AT2_lseek64                    syscall_ulong_t
-#define __NR32AT0_lfutexlock                 uintptr_t *
-#define __NR32AT1_lfutexlock                 uintptr_t *
-#define __NR32AT2_lfutexlock                 syscall_ulong_t
-#define __NR32AT3_lfutexlock                 uintptr_t
-#define __NR32AT4_lfutexlock                 struct __timespec64 const *
-#define __NR32AT5_lfutexlock                 uintptr_t
-#define __NR32AT0_lfutexexpr                 uintptr_t *
-#define __NR32AT1_lfutexexpr                 void *
+#define __NR32AT0_lfutexexpr                 void *
+#define __NR32AT1_lfutexexpr                 size_t
 #define __NR32AT2_lfutexexpr                 struct lfutexexpr const *
-#define __NR32AT3_lfutexexpr                 size_t
-#define __NR32AT4_lfutexexpr                 struct __timespec64 const *
-#define __NR32AT5_lfutexexpr                 syscall_ulong_t
+#define __NR32AT3_lfutexexpr                 struct __timespec64 const *
+#define __NR32AT4_lfutexexpr                 syscall_ulong_t
 #define __NR32AT0_lfutexlockexpr             uintptr_t *
 #define __NR32AT1_lfutexlockexpr             void *
-#define __NR32AT2_lfutexlockexpr             struct lfutexexpr const *
-#define __NR32AT3_lfutexlockexpr             size_t
+#define __NR32AT2_lfutexlockexpr             size_t
+#define __NR32AT3_lfutexlockexpr             struct lfutexexpr const *
 #define __NR32AT4_lfutexlockexpr             struct __timespec64 const *
 #define __NR32AT5_lfutexlockexpr             syscall_ulong_t
 #define __NR32AT0_mktty                      fd_t
@@ -2595,13 +2659,13 @@
 #define __NR32AT3_mktty                      syscall_ulong_t
 #define __NR32AT0_raiseat                    struct ucpustate const *
 #define __NR32AT1_raiseat                    struct __siginfo_struct const *
-#define __NR32AT0_stime64                    time64_t const *
 #define __NR32AT0_coredump                   struct ucpustate const *
 #define __NR32AT1_coredump                   struct ucpustate const *
 #define __NR32AT2_coredump                   void const *const *
 #define __NR32AT3_coredump                   size_t
 #define __NR32AT4_coredump                   struct exception_data const *
 #define __NR32AT5_coredump                   syscall_ulong_t
+#define __NR32AT0_stime64                    time64_t const *
 #define __NR32AT0_utime64                    char const *
 #define __NR32AT1_utime64                    struct utimbuf64 const *
 #define __NR32AT0_ioctlf                     fd_t
@@ -3551,22 +3615,15 @@
 #define __NR32AN0_lseek64                    "fd"
 #define __NR32AN1_lseek64                    "offset"
 #define __NR32AN2_lseek64                    "whence"
-#define __NR32AN0_lfutexlock                 "ulockaddr"
-#define __NR32AN1_lfutexlock                 "uaddr"
-#define __NR32AN2_lfutexlock                 "futex_op"
-#define __NR32AN3_lfutexlock                 "val"
-#define __NR32AN4_lfutexlock                 "timeout"
-#define __NR32AN5_lfutexlock                 "val2"
-#define __NR32AN0_lfutexexpr                 "uaddr"
-#define __NR32AN1_lfutexexpr                 "base"
+#define __NR32AN0_lfutexexpr                 "base"
+#define __NR32AN1_lfutexexpr                 "exprc"
 #define __NR32AN2_lfutexexpr                 "exprv"
-#define __NR32AN3_lfutexexpr                 "exprc"
-#define __NR32AN4_lfutexexpr                 "timeout"
-#define __NR32AN5_lfutexexpr                 "timeout_flags"
+#define __NR32AN3_lfutexexpr                 "timeout"
+#define __NR32AN4_lfutexexpr                 "timeout_flags"
 #define __NR32AN0_lfutexlockexpr             "ulockaddr"
 #define __NR32AN1_lfutexlockexpr             "base"
-#define __NR32AN2_lfutexlockexpr             "exprv"
-#define __NR32AN3_lfutexlockexpr             "exprc"
+#define __NR32AN2_lfutexlockexpr             "exprc"
+#define __NR32AN3_lfutexlockexpr             "exprv"
 #define __NR32AN4_lfutexlockexpr             "timeout"
 #define __NR32AN5_lfutexlockexpr             "timeout_flags"
 #define __NR32AN0_mktty                      "keyboard"
@@ -3575,13 +3632,13 @@
 #define __NR32AN3_mktty                      "rsvd"
 #define __NR32AN0_raiseat                    "state"
 #define __NR32AN1_raiseat                    "si"
-#define __NR32AN0_stime64                    "t"
 #define __NR32AN0_coredump                   "curr_state"
 #define __NR32AN1_coredump                   "orig_state"
 #define __NR32AN2_coredump                   "traceback_vector"
 #define __NR32AN3_coredump                   "traceback_length"
 #define __NR32AN4_coredump                   "exception"
 #define __NR32AN5_coredump                   "unwind_error"
+#define __NR32AN0_stime64                    "t"
 #define __NR32AN0_utime64                    "filename"
 #define __NR32AN1_utime64                    "times"
 #define __NR32AN0_ioctlf                     "fd"
@@ -5549,42 +5606,28 @@
 #define __NR32ATRA1_lseek64(fd, offset, whence) ,offset
 #define __NR32ATRF2_lseek64                    "%#Ix=%s"
 #define __NR32ATRA2_lseek64(fd, offset, whence) ,(whence),(whence) == SEEK_SET ? "SEEK_SET" : (whence) == SEEK_CUR ? "SEEK_CUR" : (whence) == SEEK_END ? "SEEK_END" : (whence) == SEEK_DATA ? "SEEK_DATA" : (whence) == SEEK_HOLE ? "SEEK_HOLE" : "?"
-#define __NR32ATRF0_lfutexlock                 "%p"
-#define __NR32ATRA0_lfutexlock(ulockaddr, uaddr, futex_op, val, timeout, val2) ,ulockaddr
-#define __NR32ATRF1_lfutexlock                 "%p"
-#define __NR32ATRA1_lfutexlock(ulockaddr, uaddr, futex_op, val, timeout, val2) ,uaddr
-#define __NR32ATRF2_lfutexlock                 "%#Ix"
-#define __NR32ATRA2_lfutexlock(ulockaddr, uaddr, futex_op, val, timeout, val2) ,(uintptr_t)(futex_op)
-#define __NR32ATRF3_lfutexlock                 "%p"
-#define __NR32ATRA3_lfutexlock(ulockaddr, uaddr, futex_op, val, timeout, val2) ,val
-#define __NR32ATRF4_lfutexlock                 "%p"
-#define __NR32ATRA4_lfutexlock(ulockaddr, uaddr, futex_op, val, timeout, val2) ,timeout
-#define __NR32ATRF5_lfutexlock                 "%p"
-#define __NR32ATRA5_lfutexlock(ulockaddr, uaddr, futex_op, val, timeout, val2) ,val2
 #define __NR32ATRF0_lfutexexpr                 "%p"
-#define __NR32ATRA0_lfutexexpr(uaddr, base, exprv, exprc, timeout, timeout_flags) ,uaddr
-#define __NR32ATRF1_lfutexexpr                 "%p"
-#define __NR32ATRA1_lfutexexpr(uaddr, base, exprv, exprc, timeout, timeout_flags) ,base
+#define __NR32ATRA0_lfutexexpr(base, exprc, exprv, timeout, timeout_flags) ,base
+#define __NR32ATRF1_lfutexexpr                 "%Iu"
+#define __NR32ATRA1_lfutexexpr(base, exprc, exprv, timeout, timeout_flags) ,exprc
 #define __NR32ATRF2_lfutexexpr                 "%p"
-#define __NR32ATRA2_lfutexexpr(uaddr, base, exprv, exprc, timeout, timeout_flags) ,exprv
-#define __NR32ATRF3_lfutexexpr                 "%Iu"
-#define __NR32ATRA3_lfutexexpr(uaddr, base, exprv, exprc, timeout, timeout_flags) ,exprc
-#define __NR32ATRF4_lfutexexpr                 "%p"
-#define __NR32ATRA4_lfutexexpr(uaddr, base, exprv, exprc, timeout, timeout_flags) ,timeout
-#define __NR32ATRF5_lfutexexpr                 "%#Ix"
-#define __NR32ATRA5_lfutexexpr(uaddr, base, exprv, exprc, timeout, timeout_flags) ,(uintptr_t)(timeout_flags)
+#define __NR32ATRA2_lfutexexpr(base, exprc, exprv, timeout, timeout_flags) ,exprv
+#define __NR32ATRF3_lfutexexpr                 "%p"
+#define __NR32ATRA3_lfutexexpr(base, exprc, exprv, timeout, timeout_flags) ,timeout
+#define __NR32ATRF4_lfutexexpr                 "%#Ix"
+#define __NR32ATRA4_lfutexexpr(base, exprc, exprv, timeout, timeout_flags) ,(uintptr_t)(timeout_flags)
 #define __NR32ATRF0_lfutexlockexpr             "%p"
-#define __NR32ATRA0_lfutexlockexpr(ulockaddr, base, exprv, exprc, timeout, timeout_flags) ,ulockaddr
+#define __NR32ATRA0_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) ,ulockaddr
 #define __NR32ATRF1_lfutexlockexpr             "%p"
-#define __NR32ATRA1_lfutexlockexpr(ulockaddr, base, exprv, exprc, timeout, timeout_flags) ,base
-#define __NR32ATRF2_lfutexlockexpr             "%p"
-#define __NR32ATRA2_lfutexlockexpr(ulockaddr, base, exprv, exprc, timeout, timeout_flags) ,exprv
-#define __NR32ATRF3_lfutexlockexpr             "%Iu"
-#define __NR32ATRA3_lfutexlockexpr(ulockaddr, base, exprv, exprc, timeout, timeout_flags) ,exprc
+#define __NR32ATRA1_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) ,base
+#define __NR32ATRF2_lfutexlockexpr             "%Iu"
+#define __NR32ATRA2_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) ,exprc
+#define __NR32ATRF3_lfutexlockexpr             "%p"
+#define __NR32ATRA3_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) ,exprv
 #define __NR32ATRF4_lfutexlockexpr             "%p"
-#define __NR32ATRA4_lfutexlockexpr(ulockaddr, base, exprv, exprc, timeout, timeout_flags) ,timeout
+#define __NR32ATRA4_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) ,timeout
 #define __NR32ATRF5_lfutexlockexpr             "%#Ix"
-#define __NR32ATRA5_lfutexlockexpr(ulockaddr, base, exprv, exprc, timeout, timeout_flags) ,(uintptr_t)(timeout_flags)
+#define __NR32ATRA5_lfutexlockexpr(ulockaddr, base, exprc, exprv, timeout, timeout_flags) ,(uintptr_t)(timeout_flags)
 #define __NR32ATRF0_mktty                      "%d"
 #define __NR32ATRA0_mktty(keyboard, display, name, rsvd) ,(int)(keyboard)
 #define __NR32ATRF1_mktty                      "%d"
@@ -5597,8 +5640,6 @@
 #define __NR32ATRA0_raiseat(state, si)         ,state
 #define __NR32ATRF1_raiseat                    "%p"
 #define __NR32ATRA1_raiseat(state, si)         ,si
-#define __NR32ATRF0_stime64                    "%p"
-#define __NR32ATRA0_stime64(t)                 ,t
 #define __NR32ATRF0_coredump                   "%p"
 #define __NR32ATRA0_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) ,curr_state
 #define __NR32ATRF1_coredump                   "%p"
@@ -5611,6 +5652,8 @@
 #define __NR32ATRA4_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) ,exception
 #define __NR32ATRF5_coredump                   "%#Ix"
 #define __NR32ATRA5_coredump(curr_state, orig_state, traceback_vector, traceback_length, exception, unwind_error) ,(uintptr_t)(unwind_error)
+#define __NR32ATRF0_stime64                    "%p"
+#define __NR32ATRA0_stime64(t)                 ,t
 #define __NR32ATRF0_utime64                    "%q"
 #define __NR32ATRA0_utime64(filename, times)   ,(validate_readable_opt(filename,1),filename)
 #define __NR32ATRF1_utime64                    "%p"
@@ -6316,13 +6359,12 @@
 #define __NR32AC_debugtrap                  2
 #define __NR32AC_lfutex                     5
 #define __NR32AC_lseek64                    3
-#define __NR32AC_lfutexlock                 6
-#define __NR32AC_lfutexexpr                 6
+#define __NR32AC_lfutexexpr                 5
 #define __NR32AC_lfutexlockexpr             6
 #define __NR32AC_mktty                      4
 #define __NR32AC_raiseat                    2
-#define __NR32AC_stime64                    1
 #define __NR32AC_coredump                   6
+#define __NR32AC_stime64                    1
 #define __NR32AC_utime64                    2
 #define __NR32AC_ioctlf                     4
 #define __NR32AC_fsmode                     1
@@ -6682,13 +6724,12 @@
 #define __NR32AM_debugtrap(a, b, c, d, e, f)                  (struct ucpustate const *)a, (struct debugtrap_reason const *)b
 #define __NR32AM_lfutex(a, b, c, d, e, f)                     (__uintptr_t *)a, (__syscall_ulong_t)b, (__uintptr_t)c, (struct __timespec64 const *)d, (__uintptr_t)e
 #define __NR32AM_lseek64(a, b, c, d, e, f)                    (__fd_t)a, (__int64_t)((__uint64_t)b | (__uint64_t)c << 32), (__syscall_ulong_t)d
-#define __NR32AM_lfutexlock(a, b, c, d, e, f)                 (__uintptr_t *)a, (__uintptr_t *)b, (__syscall_ulong_t)c, (__uintptr_t)d, (struct __timespec64 const *)e, (__uintptr_t)f
-#define __NR32AM_lfutexexpr(a, b, c, d, e, f)                 (__uintptr_t *)a, (void *)b, (struct lfutexexpr const *)c, (__size_t)d, (struct __timespec64 const *)e, (__syscall_ulong_t)f
-#define __NR32AM_lfutexlockexpr(a, b, c, d, e, f)             (__uintptr_t *)a, (void *)b, (struct lfutexexpr const *)c, (__size_t)d, (struct __timespec64 const *)e, (__syscall_ulong_t)f
+#define __NR32AM_lfutexexpr(a, b, c, d, e, f)                 (void *)a, (__size_t)b, (struct lfutexexpr const *)c, (struct __timespec64 const *)d, (__syscall_ulong_t)e
+#define __NR32AM_lfutexlockexpr(a, b, c, d, e, f)             (__uintptr_t *)a, (void *)b, (__size_t)c, (struct lfutexexpr const *)d, (struct __timespec64 const *)e, (__syscall_ulong_t)f
 #define __NR32AM_mktty(a, b, c, d, e, f)                      (__fd_t)a, (__fd_t)b, (char const *)c, (__syscall_ulong_t)d
 #define __NR32AM_raiseat(a, b, c, d, e, f)                    (struct ucpustate const *)a, (struct __siginfo_struct const *)b
-#define __NR32AM_stime64(a, b, c, d, e, f)                    (__time64_t const *)a
 #define __NR32AM_coredump(a, b, c, d, e, f)                   (struct ucpustate const *)a, (struct ucpustate const *)b, (void const *const *)c, (__size_t)d, (struct exception_data const *)e, (__syscall_ulong_t)f
+#define __NR32AM_stime64(a, b, c, d, e, f)                    (__time64_t const *)a
 #define __NR32AM_utime64(a, b, c, d, e, f)                    (char const *)a, (struct utimbuf64 const *)b
 #define __NR32AM_ioctlf(a, b, c, d, e, f)                     (__fd_t)a, (__syscall_ulong_t)b, (__iomode_t)c, (void *)d
 #define __NR32AM_fsmode(a, b, c, d, e, f)                     (__uint64_t)((__uint64_t)a | (__uint64_t)b << 32)
@@ -7048,13 +7089,12 @@
 #define __NR32AP_debugtrap(a, b)                              (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AP_lfutex(a, b, c, d, e)                        (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR32AP_lseek64(a, b, c)                             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)((__uint64_t)b >> 32), (__syscall_ulong_t)c
-#define __NR32AP_lfutexlock(a, b, c, d, e, f)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
-#define __NR32AP_lfutexexpr(a, b, c, d, e, f)                 (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
+#define __NR32AP_lfutexexpr(a, b, c, d, e)                    (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e
 #define __NR32AP_lfutexlockexpr(a, b, c, d, e, f)             (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
 #define __NR32AP_mktty(a, b, c, d)                            (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NR32AP_raiseat(a, b)                                (__syscall_ulong_t)a, (__syscall_ulong_t)b
-#define __NR32AP_stime64(a)                                   (__syscall_ulong_t)a
 #define __NR32AP_coredump(a, b, c, d, e, f)                   (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d, (__syscall_ulong_t)e, (__syscall_ulong_t)f
+#define __NR32AP_stime64(a)                                   (__syscall_ulong_t)a
 #define __NR32AP_utime64(a, b)                                (__syscall_ulong_t)a, (__syscall_ulong_t)b
 #define __NR32AP_ioctlf(a, b, c, d)                           (__syscall_ulong_t)a, (__syscall_ulong_t)b, (__syscall_ulong_t)c, (__syscall_ulong_t)d
 #define __NR32AP_fsmode(a)                                    (__syscall_ulong_t)a, (__syscall_ulong_t)((__uint64_t)a >> 32)
@@ -7425,13 +7465,12 @@
 #define __NR32AC386_debugtrap                  2
 #define __NR32AC386_lfutex                     5
 #define __NR32AC386_lseek64                    4
-#define __NR32AC386_lfutexlock                 6
-#define __NR32AC386_lfutexexpr                 6
+#define __NR32AC386_lfutexexpr                 5
 #define __NR32AC386_lfutexlockexpr             6
 #define __NR32AC386_mktty                      4
 #define __NR32AC386_raiseat                    2
-#define __NR32AC386_stime64                    1
 #define __NR32AC386_coredump                   6
+#define __NR32AC386_stime64                    1
 #define __NR32AC386_utime64                    2
 #define __NR32AC386_ioctlf                     4
 #define __NR32AC386_fsmode                     2

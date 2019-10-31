@@ -1399,7 +1399,6 @@
 #define __CRT_HAVE_sys_lchown32 1
 #define __CRT_HAVE_sys_lfutex 1
 #define __CRT_HAVE_sys_lfutexexpr 1
-#define __CRT_HAVE_sys_lfutexlock 1
 #define __CRT_HAVE_sys_lfutexlockexpr 1
 #define __CRT_HAVE_sys_lgetxattr 1
 #define __CRT_HAVE_sys_link 1
@@ -1890,7 +1889,7 @@
 #define __CRT_HAVE_vm_datablock_findchanged 1
 #define __CRT_HAVE_vm_datablock_getfutex 1
 #define __CRT_HAVE_vm_datablock_getfutex_existing 1
-#define __CRT_HAVE_vm_datablock_haschanges 1
+#define __CRT_HAVE_vm_datablock_haschanged 1
 #define __CRT_HAVE_vm_datablock_locatepart 1
 #define __CRT_HAVE_vm_datablock_locatepart_exact 1
 #define __CRT_HAVE_vm_datablock_lock_trywrite_parts 1

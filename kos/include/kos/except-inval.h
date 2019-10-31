@@ -141,6 +141,11 @@ enum {
 	E_INVALID_ARGUMENT_CONTEXT_DEBUG_REASON,                       /* E_INVALID_ARGUMENT_BAD_VALUE: Bad reason code passed to `debugtrap()' */
 	E_INVALID_ARGUMENT_CONTEXT_BAD_PERSONALITY,                    /* E_INVALID_ARGUMENT_BAD_VALUE:    Bad personality code passed to `SYSCTL_SYSCALL_(GET|SET)_PERSONALITY'
 	                                                                * E_INVALID_ARGUMENT_UNKNOWN_FLAG: The least significant argument-bit of `SYSCTL_SYSCALL_GET_PERSONALITY' was set (arg should be `kp << 1') */
+	E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP,                          /* E_INVALID_ARGUMENT_BAD_VALUE: The `futex_op' given to one of `lfutex()', `lfutexlock()', `lfutexexpr()' or `lfutexlockexpr()' is invalid.
+	                                                                * E_INVALID_ARGUMENT_UNKNOWN_FLAG: When masked with `LFUTEX_FLAGMASK', `futex_op' contains bits not defined by `LFUTEX_WAIT_FLAG_*'
+	                                                                * E_INVALID_ARGUMENT_RESERVED_FLAG: The `timeout' argument was non-NULL, but `futex_op & LFUTEX_FLAGMASK' contained non-zero `LFUTEX_WAIT_FLAG_TIMEOUT_*' flags. 
+	                                                                * E_INVALID_ARGUMENT_RESERVED_FLAG: `LFUTEX_USES_TIMEOUT(futex_op)' was false, but the `LFUTEX_WAIT_FLAG_TIMEOUT_*' bits were set.
+	                                                                * E_INVALID_ARGUMENT_RESERVED_FLAG: `LFUTEX_USES_TIMEOUT(futex_op)' was true, but unused flag bits were set. */
 };
 #endif /* __CC__ */
 /*[[[AUTO]]]*/
@@ -256,6 +261,13 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_BAD_PIPE_BUFFER_SIZE               E_INVALID_ARGUMENT_CONTEXT_BAD_PIPE_BUFFER_SIZE               /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to pass a too low value to `F_SETPIPE_SZ' */
 #define E_INVALID_ARGUMENT_CONTEXT_BAD_INTEGER                        E_INVALID_ARGUMENT_CONTEXT_BAD_INTEGER                        /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to write an invalid integer to a system configuration file */
 #define E_INVALID_ARGUMENT_CONTEXT_DEBUG_REASON                       E_INVALID_ARGUMENT_CONTEXT_DEBUG_REASON                       /* E_INVALID_ARGUMENT_BAD_VALUE: Bad reason code passed to `debugtrap()' */
+#define E_INVALID_ARGUMENT_CONTEXT_BAD_PERSONALITY                    E_INVALID_ARGUMENT_CONTEXT_BAD_PERSONALITY                    /* E_INVALID_ARGUMENT_BAD_VALUE:    Bad personality code passed to `SYSCTL_SYSCALL_(GET|SET)_PERSONALITY'
+                                                                                                                                     * E_INVALID_ARGUMENT_UNKNOWN_FLAG: The least significant argument-bit of `SYSCTL_SYSCALL_GET_PERSONALITY' was set (arg should be `kp << 1') */
+#define E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP                          E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP                          /* E_INVALID_ARGUMENT_BAD_VALUE: The `futex_op' given to one of `lfutex()', `lfutexlock()', `lfutexexpr()' or `lfutexlockexpr()' is invalid.
+                                                                                                                                     * E_INVALID_ARGUMENT_UNKNOWN_FLAG: When masked with `LFUTEX_FLAGMASK', `futex_op' contains bits not defined by `LFUTEX_WAIT_FLAG_*'
+                                                                                                                                     * E_INVALID_ARGUMENT_RESERVED_FLAG: The `timeout' argument was non-NULL, but `futex_op & LFUTEX_FLAGMASK' contained non-zero `LFUTEX_WAIT_FLAG_TIMEOUT_*' flags.
+                                                                                                                                     * E_INVALID_ARGUMENT_RESERVED_FLAG: `LFUTEX_USES_TIMEOUT(futex_op)' was false, but the `LFUTEX_WAIT_FLAG_TIMEOUT_*' bits were set.
+                                                                                                                                     * E_INVALID_ARGUMENT_RESERVED_FLAG: `LFUTEX_USES_TIMEOUT(futex_op)' was true, but unused flag bits were set. */
 #else /* __COMPILER_PREFERR_ENUMS */
 #define E_INVALID_ARGUMENT_CONTEXT_GENERIC                            0   /* Generic context */
 #define E_INVALID_ARGUMENT_CONTEXT_SETFD_OFLAG                        1   /* E_INVALID_ARGUMENT_UNKNOWN_FLAG: Unknown `O_*' flag passed to `F_SETFD' */
@@ -368,6 +380,13 @@ enum {
 #define E_INVALID_ARGUMENT_CONTEXT_BAD_PIPE_BUFFER_SIZE               99  /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to pass a too low value to `F_SETPIPE_SZ' */
 #define E_INVALID_ARGUMENT_CONTEXT_BAD_INTEGER                        100 /* E_INVALID_ARGUMENT_BAD_VALUE: Attempted to write an invalid integer to a system configuration file */
 #define E_INVALID_ARGUMENT_CONTEXT_DEBUG_REASON                       101 /* E_INVALID_ARGUMENT_BAD_VALUE: Bad reason code passed to `debugtrap()' */
+#define E_INVALID_ARGUMENT_CONTEXT_BAD_PERSONALITY                    102 /* E_INVALID_ARGUMENT_BAD_VALUE:    Bad personality code passed to `SYSCTL_SYSCALL_(GET|SET)_PERSONALITY'
+                                                                           * E_INVALID_ARGUMENT_UNKNOWN_FLAG: The least significant argument-bit of `SYSCTL_SYSCALL_GET_PERSONALITY' was set (arg should be `kp << 1') */
+#define E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP                          103 /* E_INVALID_ARGUMENT_BAD_VALUE: The `futex_op' given to one of `lfutex()', `lfutexlock()', `lfutexexpr()' or `lfutexlockexpr()' is invalid.
+                                                                           * E_INVALID_ARGUMENT_UNKNOWN_FLAG: When masked with `LFUTEX_FLAGMASK', `futex_op' contains bits not defined by `LFUTEX_WAIT_FLAG_*'
+                                                                           * E_INVALID_ARGUMENT_RESERVED_FLAG: The `timeout' argument was non-NULL, but `futex_op & LFUTEX_FLAGMASK' contained non-zero `LFUTEX_WAIT_FLAG_TIMEOUT_*' flags.
+                                                                           * E_INVALID_ARGUMENT_RESERVED_FLAG: `LFUTEX_USES_TIMEOUT(futex_op)' was false, but the `LFUTEX_WAIT_FLAG_TIMEOUT_*' bits were set.
+                                                                           * E_INVALID_ARGUMENT_RESERVED_FLAG: `LFUTEX_USES_TIMEOUT(futex_op)' was true, but unused flag bits were set. */
 #endif /* !__COMPILER_PREFERR_ENUMS */
 /*[[[end]]]*/
 

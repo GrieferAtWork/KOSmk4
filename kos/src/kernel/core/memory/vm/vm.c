@@ -2441,7 +2441,7 @@ done:
 /* Check if there are changed parts within the specified address range.
  * NOTE: The caller must be holding a read-lock on `self' */
 PUBLIC NOBLOCK NONNULL((1)) bool
-NOTHROW(KCALL vm_datablock_haschanges)(struct vm_datablock *__restrict self,
+NOTHROW(KCALL vm_datablock_haschanged)(struct vm_datablock *__restrict self,
                                        vm_dpage_t minpage, vm_dpage_t maxpage) {
 	struct vm_datapart *part;
 	vm_dpage_t partrel_minpage;

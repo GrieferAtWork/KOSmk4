@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe56bd816 */
+/* HASH CRC-32:0x3ce7d47d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,8 +28,8 @@
 DECL_BEGIN
 
 /* >> lfutex(2)
- * High-level wrapper around the lfutex system call
- * @param: command: One of:
+ * Provide the bottom-most API for implementing user-space synchronization on KOS
+ * @param: futex_op: One of:
  *    - LFUTEX_WAKE:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKE, size_t count)
  *    - LFUTEX_NOP:                (lfutex_t *uaddr, syscall_ulong_t LFUTEX_NOP, size_t ignored)
  *    - LFUTEX_WAIT:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT, lfutex ignored, struct timespec const *timeout)
@@ -43,15 +43,15 @@ DECL_BEGIN
  *    - LFUTEX_WAIT_WHILE_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
  *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
  * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @return: * : Depending on `command'
+ * @return: * : Depending on `futex_op'
  * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    The given `command' is invalid
+ * @return: -1:EINVAL:    The given `futex_op' is invalid
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-INTDEF NONNULL((1)) ssize_t NOTHROW_RPC(LIBCCALL libc_lfutex)(lfutex_t *uaddr, syscall_ulong_t command, lfutex_t val, /*struct timespec const *timeout, lfutex_t val2*/...);
+INTDEF NONNULL((1)) ssize_t NOTHROW_RPC(LIBCCALL libc_lfutex)(lfutex_t *uaddr, syscall_ulong_t futex_op, lfutex_t val, /*struct timespec const *timeout, lfutex_t val2*/...);
 /* >> lfutex(2)
- * High-level wrapper around the lfutex system call
- * @param: command: One of:
+ * Provide the bottom-most API for implementing user-space synchronization on KOS
+ * @param: futex_op: One of:
  *    - LFUTEX_WAKE:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKE, size_t count)
  *    - LFUTEX_NOP:                (lfutex_t *uaddr, syscall_ulong_t LFUTEX_NOP, size_t ignored)
  *    - LFUTEX_WAIT:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT, lfutex ignored, struct timespec const *timeout)
@@ -65,12 +65,12 @@ INTDEF NONNULL((1)) ssize_t NOTHROW_RPC(LIBCCALL libc_lfutex)(lfutex_t *uaddr, s
  *    - LFUTEX_WAIT_WHILE_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
  *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
  * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @return: * : Depending on `command'
+ * @return: * : Depending on `futex_op'
  * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    The given `command' is invalid
+ * @return: -1:EINVAL:    The given `futex_op' is invalid
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-INTDEF NONNULL((1)) ssize_t NOTHROW_RPC(LIBCCALL libc_lfutex64)(lfutex_t *uaddr, syscall_ulong_t command, lfutex_t val, /*struct timespec64 const *timeout, lfutex_t val2*/...);
+INTDEF NONNULL((1)) ssize_t NOTHROW_RPC(LIBCCALL libc_lfutex64)(lfutex_t *uaddr, syscall_ulong_t futex_op, lfutex_t val, /*struct timespec64 const *timeout, lfutex_t val2*/...);
 /* Wake up to `MAX_WAKE' threads waiting for `*UADDR'
  * @return: * : The number of woken threads
  * @return: -1:EFAULT: A faulty pointer was given */

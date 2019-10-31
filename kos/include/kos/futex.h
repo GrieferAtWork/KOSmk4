@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6d91bcf9 */
+/* HASH CRC-32:0x45604b53 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,10 +45,42 @@ __SYSDECL_BEGIN
 typedef __uintptr_t lfutex_t;
 #endif /* !__lfutex_t_defined */
 
+/*
+ * `lfutex() and select()' (or `poll()')
+ *
+ * On KOS, it is fairly simple to use any of the available `LFUTEX_WAIT_*' operations
+ * in conjunction with a call to `poll()' (though note that the `LFUTEX_WAIT_WHILE_CMPXCH()'
+ * and `LFUTEX_WAIT_UNTIL_CMPXCH()' operators will possibly modify pointed-to memory in
+ * a way that makes repeated polling behave unexpectedly, requiring user-space to take
+ * proper case that the behavior will be what is actually intended)
+ *
+ * Other than this, there exists 2 ways of polling for futex objects
+ * in parallel to polling any other type of file descriptor, as well
+ * polling for sleeping child processes (either through use of a file
+ * descriptor created using `TODO:waitfd(pid) (similar to `signalfd()',
+ * but may be used to wait for processes in a way that is similar to
+ * the waitpid() function)', or through use of `kpoll()').
+ *
+ * - Using the `kpoll()' system call, which allows for the use of poll
+ *   descriptors that describe any kind of user-space-visible handle on
+ *   which a given process can wait (a regular `fd_t' (using `POLLIN|
+ *   POLLOUT|...'), a `pid_t' (using `waitpid()'), or an `lfutex_t'
+ *   (using any of the `LFUTEX_WAIT_*' operators that are available))
+ *   When targeting KOS specifically, this is the preferred way of going
+ *   about passively waiting for a futex, as it doesn't require the
+ *   creation of any additional kernel-space object.
+ *   TODO: Implement the `kpoll()' system call
+ *
+ * - Using the regular `poll()' / `select()' family of system calls, after
+ *   having created 
+ *
+ */
+
+
 #if defined(__CRT_HAVE_lfutex64) && (defined(__USE_TIME_BITS64))
 /* >> lfutex(2)
- * High-level wrapper around the lfutex system call
- * @param: command: One of:
+ * Provide the bottom-most API for implementing user-space synchronization on KOS
+ * @param: futex_op: One of:
  *    - LFUTEX_WAKE:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKE, size_t count)
  *    - LFUTEX_NOP:                (lfutex_t *uaddr, syscall_ulong_t LFUTEX_NOP, size_t ignored)
  *    - LFUTEX_WAIT:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT, lfutex ignored, struct timespec const *timeout)
@@ -62,16 +94,16 @@ typedef __uintptr_t lfutex_t;
  *    - LFUTEX_WAIT_WHILE_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
  *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
  * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @return: * : Depending on `command'
+ * @return: * : Depending on `futex_op'
  * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    The given `command' is invalid
+ * @return: -1:EINVAL:    The given `futex_op' is invalid
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,lfutex,(lfutex_t *__uaddr, __syscall_ulong_t __command, lfutex_t __val, /*struct timespec const *timeout, lfutex_t val2*/...),lfutex64,(__uaddr,__command,__val,))
+__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,lfutex,(lfutex_t *__uaddr, __syscall_ulong_t __futex_op, lfutex_t __val, /*struct timespec const *timeout, lfutex_t val2*/...),lfutex64,(__uaddr,__futex_op,__val,))
 #elif defined(__CRT_HAVE_lfutex) && (!defined(__USE_TIME_BITS64))
 /* >> lfutex(2)
- * High-level wrapper around the lfutex system call
- * @param: command: One of:
+ * Provide the bottom-most API for implementing user-space synchronization on KOS
+ * @param: futex_op: One of:
  *    - LFUTEX_WAKE:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKE, size_t count)
  *    - LFUTEX_NOP:                (lfutex_t *uaddr, syscall_ulong_t LFUTEX_NOP, size_t ignored)
  *    - LFUTEX_WAIT:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT, lfutex ignored, struct timespec const *timeout)
@@ -85,17 +117,17 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,lfutex,(lfutex_t *_
  *    - LFUTEX_WAIT_WHILE_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
  *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
  * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @return: * : Depending on `command'
+ * @return: * : Depending on `futex_op'
  * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    The given `command' is invalid
+ * @return: -1:EINVAL:    The given `futex_op' is invalid
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-__CDECLARE(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,lfutex,(lfutex_t *__uaddr, __syscall_ulong_t __command, lfutex_t __val, /*struct timespec const *timeout, lfutex_t val2*/...),(__uaddr,__command,__val,))
+__CDECLARE(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,lfutex,(lfutex_t *__uaddr, __syscall_ulong_t __futex_op, lfutex_t __val, /*struct timespec const *timeout, lfutex_t val2*/...),(__uaddr,__futex_op,__val,))
 #elif (defined(__CRT_HAVE_lfutex) || defined(__CRT_HAVE_lfutex64))
 #include <local/kos.futex/lfutex.h>
 /* >> lfutex(2)
- * High-level wrapper around the lfutex system call
- * @param: command: One of:
+ * Provide the bottom-most API for implementing user-space synchronization on KOS
+ * @param: futex_op: One of:
  *    - LFUTEX_WAKE:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKE, size_t count)
  *    - LFUTEX_NOP:                (lfutex_t *uaddr, syscall_ulong_t LFUTEX_NOP, size_t ignored)
  *    - LFUTEX_WAIT:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT, lfutex ignored, struct timespec const *timeout)
@@ -109,19 +141,19 @@ __CDECLARE(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,lfutex,(lfutex_t *__
  *    - LFUTEX_WAIT_WHILE_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
  *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
  * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @return: * : Depending on `command'
+ * @return: * : Depending on `futex_op'
  * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    The given `command' is invalid
+ * @return: -1:EINVAL:    The given `futex_op' is invalid
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-__NAMESPACE_LOCAL_USING_OR_IMPL(lfutex, __FORCELOCAL __ATTR_NONNULL((1)) __SSIZE_TYPE__ __NOTHROW_RPC(__LIBCCALL lfutex)(lfutex_t *__uaddr, __syscall_ulong_t __command, lfutex_t __val, /*struct timespec const *timeout, lfutex_t val2*/...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lfutex))(__uaddr, __command, __val, ); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(lfutex, __FORCELOCAL __ATTR_NONNULL((1)) __SSIZE_TYPE__ __NOTHROW_RPC(__LIBCCALL lfutex)(lfutex_t *__uaddr, __syscall_ulong_t __futex_op, lfutex_t __val, /*struct timespec const *timeout, lfutex_t val2*/...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lfutex))(__uaddr, __futex_op, __val, ); })
 #endif /* lfutex... */
 
 #ifdef __USE_TIME64
 #if defined(__CRT_HAVE_lfutex64)
 /* >> lfutex(2)
- * High-level wrapper around the lfutex system call
- * @param: command: One of:
+ * Provide the bottom-most API for implementing user-space synchronization on KOS
+ * @param: futex_op: One of:
  *    - LFUTEX_WAKE:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKE, size_t count)
  *    - LFUTEX_NOP:                (lfutex_t *uaddr, syscall_ulong_t LFUTEX_NOP, size_t ignored)
  *    - LFUTEX_WAIT:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT, lfutex ignored, struct timespec const *timeout)
@@ -135,16 +167,16 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lfutex, __FORCELOCAL __ATTR_NONNULL((1)) __SSIZE
  *    - LFUTEX_WAIT_WHILE_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
  *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
  * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @return: * : Depending on `command'
+ * @return: * : Depending on `futex_op'
  * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    The given `command' is invalid
+ * @return: -1:EINVAL:    The given `futex_op' is invalid
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-__CDECLARE(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,lfutex64,(lfutex_t *__uaddr, __syscall_ulong_t __command, lfutex_t __val, /*struct timespec64 const *timeout, lfutex_t val2*/...),(__uaddr,__command,__val,))
+__CDECLARE(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,lfutex64,(lfutex_t *__uaddr, __syscall_ulong_t __futex_op, lfutex_t __val, /*struct timespec64 const *timeout, lfutex_t val2*/...),(__uaddr,__futex_op,__val,))
 #elif defined(__CRT_HAVE_lfutex) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 /* >> lfutex(2)
- * High-level wrapper around the lfutex system call
- * @param: command: One of:
+ * Provide the bottom-most API for implementing user-space synchronization on KOS
+ * @param: futex_op: One of:
  *    - LFUTEX_WAKE:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKE, size_t count)
  *    - LFUTEX_NOP:                (lfutex_t *uaddr, syscall_ulong_t LFUTEX_NOP, size_t ignored)
  *    - LFUTEX_WAIT:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT, lfutex ignored, struct timespec const *timeout)
@@ -158,17 +190,17 @@ __CDECLARE(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,lfutex64,(lfutex_t *
  *    - LFUTEX_WAIT_WHILE_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
  *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
  * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @return: * : Depending on `command'
+ * @return: * : Depending on `futex_op'
  * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    The given `command' is invalid
+ * @return: -1:EINVAL:    The given `futex_op' is invalid
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,lfutex64,(lfutex_t *__uaddr, __syscall_ulong_t __command, lfutex_t __val, /*struct timespec64 const *timeout, lfutex_t val2*/...),lfutex,(__uaddr,__command,__val,))
+__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,lfutex64,(lfutex_t *__uaddr, __syscall_ulong_t __futex_op, lfutex_t __val, /*struct timespec64 const *timeout, lfutex_t val2*/...),lfutex,(__uaddr,__futex_op,__val,))
 #elif defined(__CRT_HAVE_lfutex)
 #include <local/kos.futex/lfutex64.h>
 /* >> lfutex(2)
- * High-level wrapper around the lfutex system call
- * @param: command: One of:
+ * Provide the bottom-most API for implementing user-space synchronization on KOS
+ * @param: futex_op: One of:
  *    - LFUTEX_WAKE:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKE, size_t count)
  *    - LFUTEX_NOP:                (lfutex_t *uaddr, syscall_ulong_t LFUTEX_NOP, size_t ignored)
  *    - LFUTEX_WAIT:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT, lfutex ignored, struct timespec const *timeout)
@@ -182,12 +214,12 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,lfutex64,(lfutex_t 
  *    - LFUTEX_WAIT_WHILE_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
  *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
  * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @return: * : Depending on `command'
+ * @return: * : Depending on `futex_op'
  * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    The given `command' is invalid
+ * @return: -1:EINVAL:    The given `futex_op' is invalid
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-__NAMESPACE_LOCAL_USING_OR_IMPL(lfutex64, __FORCELOCAL __ATTR_NONNULL((1)) __SSIZE_TYPE__ __NOTHROW_RPC(__LIBCCALL lfutex64)(lfutex_t *__uaddr, __syscall_ulong_t __command, lfutex_t __val, /*struct timespec64 const *timeout, lfutex_t val2*/...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lfutex64))(__uaddr, __command, __val, ); })
+__NAMESPACE_LOCAL_USING_OR_IMPL(lfutex64, __FORCELOCAL __ATTR_NONNULL((1)) __SSIZE_TYPE__ __NOTHROW_RPC(__LIBCCALL lfutex64)(lfutex_t *__uaddr, __syscall_ulong_t __futex_op, lfutex_t __val, /*struct timespec64 const *timeout, lfutex_t val2*/...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lfutex64))(__uaddr, __futex_op, __val, ); })
 #endif /* lfutex64... */
 #endif /* __USE_TIME64 */
 #if defined(__CRT_HAVE_futex_wake)

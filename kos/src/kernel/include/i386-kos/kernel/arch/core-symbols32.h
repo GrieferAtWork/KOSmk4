@@ -3046,10 +3046,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 761 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname761 /* index: 761 */
+	.weak vm_datablock_haschanged; .long vm_datablock_haschanged
+	.reloc ., R_386_SIZE32, vm_datablock_haschanged; .long 0
+	.long 0xb096dd4
 	.long 0 /* index: 762 */
 	.long 0
 	.long 0
@@ -13966,10 +13966,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.weak rwlock_writing_r; .long rwlock_writing_r
 	.reloc ., R_386_SIZE32, rwlock_writing_r; .long 0
 	.long 0x508bda2
-	.long .Lname3491 /* index: 3491 */
-	.weak vm_datablock_haschanges; .long vm_datablock_haschanges
-	.reloc ., R_386_SIZE32, vm_datablock_haschanges; .long 0
-	.long 0xb096da3
+	.long 0 /* index: 3491 */
+	.long 0
+	.long 0
+	.long 0
 	.long .Lname3492 /* index: 3492 */
 	.weak debuginfo_cu_parser_loadattr_compile_unit; .long debuginfo_cu_parser_loadattr_compile_unit
 	.reloc ., R_386_SIZE32, debuginfo_cu_parser_loadattr_compile_unit; .long 0
@@ -16302,10 +16302,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long .Lname4075 /* index: 4075 */
-	.weak sys_lfutexlock; .long sys_lfutexlock
-	.reloc ., R_386_SIZE32, sys_lfutexlock; .long 0
-	.long 0xa591feb
+	.long 0 /* index: 4075 */
+	.long 0
+	.long 0
+	.long 0
 	.long 0 /* index: 4076 */
 	.long 0
 	.long 0
@@ -17202,6 +17202,8 @@ END(kernel_symbol_table)
 	.string "memset_nopf"
 .Lname759:
 	.string "keyboard_buffer_putkey"
+.Lname761:
+	.string "vm_datablock_haschanged"
 .Lname764:
 	.string "slab_kmalloc_nx4"
 .Lname766:
@@ -20020,8 +20022,6 @@ END(kernel_symbol_table)
 	.string "vm_datapart_lockread_setcore"
 .Lname3490:
 	.string "rwlock_writing_r"
-.Lname3491:
-	.string "vm_datablock_haschanges"
 .Lname3492:
 	.string "debuginfo_cu_parser_loadattr_compile_unit"
 .Lname3493:
@@ -20676,8 +20676,6 @@ END(kernel_symbol_table)
 	.string "sys_mincore"
 .Lname4071:
 	.string "memchrw"
-.Lname4075:
-	.string "sys_lfutexlock"
 .Lname4080:
 	.string "sys_kcmp"
 .Lname4081:

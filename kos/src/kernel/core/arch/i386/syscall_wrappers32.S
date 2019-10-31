@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x330f2b8a */
+/* HASH CRC-32:0xdc005e4c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -338,13 +338,12 @@ EXTERN(sys_set_library_listdef)
 EXTERN(sys_debugtrap)
 EXTERN(sys_lfutex)
 EXTERN(sys_lseek64)
-EXTERN(sys_lfutexlock)
 EXTERN(sys_lfutexexpr)
 EXTERN(sys_lfutexlockexpr)
 EXTERN(sys_mktty)
 EXTERN(sys_raiseat)
-EXTERN(sys_stime64)
 EXTERN(sys_coredump)
+EXTERN(sys_stime64)
 EXTERN(sys_utime64)
 EXTERN(sys_ioctlf)
 EXTERN(sys_fsmode)
@@ -12703,6 +12702,27 @@ INTERN_FUNCTION(__asm32_int80_debugtrap)
 	.cfi_endproc
 END(__asm32_int80_debugtrap)
 
+/* >> lfutex(2)
+ * Provide the bottom-most API for implementing user-space synchronization on KOS
+ * @param: futex_op: One of:
+ *    - LFUTEX_WAKE:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKE, size_t count)
+ *    - LFUTEX_NOP:                (lfutex_t *uaddr, syscall_ulong_t LFUTEX_NOP, size_t ignored)
+ *    - LFUTEX_WAIT:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT, lfutex ignored, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_LOCK:          (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_LOCK, lfutex_t lock_value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE, lfutex_t value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_UNTIL:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL, lfutex_t value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_ABOVE:   (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_ABOVE, lfutex_t value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BELOW:   (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_BELOW, lfutex_t value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BITMASK: (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_BITMASK, lfutex_t bitmask, struct timespec const *timeout, lfutex_t setmask)
+ *    - LFUTEX_WAIT_UNTIL_BITMASK: (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL_BITMASK, lfutex_t bitmask, struct timespec const *timeout, lfutex_t setmask)
+ *    - LFUTEX_WAIT_WHILE_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
+ *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
+ * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @return: * : Depending on `futex_op'
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @throw:  E_INVALID_ARGUMENT: The given `futex_op' is invalid
+ * @throw:  E_INTERRUPT:        A blocking futex-wait operation was interrupted
+ * @return: -ETIMEDOUT:         A blocking futex-wait operation has timed out */
 .section .text.x86.asm32_syscall_int80.lfutex
 	/* syscall_slong_t lfutex(uintptr_t *uaddr,
 	 *                        syscall_ulong_t futex_op,
@@ -12789,15 +12809,41 @@ INTERN_FUNCTION(__asm32_int80_lseek64)
 	.cfi_endproc
 END(__asm32_int80_lseek64)
 
-.section .text.x86.asm32_syscall_int80.lfutexlock
-	/* syscall_slong_t lfutexlock(uintptr_t *ulockaddr,
-	 *                            uintptr_t *uaddr,
-	 *                            syscall_ulong_t futex_op,
-	 *                            uintptr_t val,
-	 *                            struct __timespec64 const *timeout,
-	 *                            uintptr_t val2) */
-	.weak __asm32_int80_lfutexlock
-INTERN_FUNCTION(__asm32_int80_lfutexlock)
+/* >> lfutexexpr(2)
+ * The lfutexexpr() system call can be used to specify arbitrarily complex
+ * expressions that must atomically (in relation to other futex operations)
+ * hold true before the scheduler will suspend the calling thread, as well as
+ * have the calling thread wait for any number of futex objects associated with
+ * any address that is checked as part of the expression. (s.a. `lfutex()')
+ * Notes:
+ *   - This is the only futex function that can be used to wait on multiple futex
+ *     objects (i.e. resume execution when `LFUTEX_WAKE' is called on _any_ of them)
+ *   - For more precise control over waiting on futex objects, as well as waiting on
+ *     futexes in conjunction with waiting on other things such as files, see the
+ *     documentation on this topic (lfutex() and select()) at the top of <kos/futex.h>
+ * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
+ * @param: exprv:         Vector of expressions for which to check
+ * @param: exprc:         Number of expressions given in `exprv'
+ * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
+ * @return: * : The first non-zero return value from executing all of the given `exprv'
+ *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*' functions
+ *              to see their possible return values, which are always `0' when they would
+ *              perform a wait operation, and usually `1' otherwise) or `0' if the calling
+ *              thread had to perform a wait operation, at which point this function returning
+ *              that value means that you've once again been re-awoken.
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
+ * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
+ * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
+.section .text.x86.asm32_syscall_int80.lfutexexpr
+	/* errno_t lfutexexpr(void *base,
+	 *                    size_t exprc,
+	 *                    struct lfutexexpr const *exprv,
+	 *                    struct __timespec64 const *timeout,
+	 *                    syscall_ulong_t timeout_flags) */
+	.weak __asm32_int80_lfutexexpr
+INTERN_FUNCTION(__asm32_int80_lfutexexpr)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality
 	.cfi_lsda 0, 0x80000014
@@ -12814,54 +12860,6 @@ INTERN_FUNCTION(__asm32_int80_lfutexlock)
 	movw   %ax, %es
 	movw   $(SEGMENT_KERNEL_FSBASE), %ax
 	movw   %ax, %fs
-	pushl_cfi_r %ebp  /* Arg #5 */
-	pushl_cfi_r %edi  /* Arg #4 */
-	pushl_cfi_r %esi  /* Arg #3 */
-	pushl_cfi_r %edx  /* Arg #2 */
-	pushl_cfi_r %ecx  /* Arg #1 */
-	pushl_cfi_r %ebx  /* Arg #0 */
-	call   sys_lfutexlock
-	popl_cfi_r %ebx
-	popl_cfi_r %ecx
-	popl_cfi_r %edx
-	addl   $12, %esp
-	.cfi_adjust_cfa_offset -12
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	iret
-	.cfi_endproc
-END(__asm32_int80_lfutexlock)
-
-.section .text.x86.asm32_syscall_int80.lfutexexpr
-	/* errno_t lfutexexpr(uintptr_t *uaddr,
-	 *                    void *base,
-	 *                    struct lfutexexpr const *exprv,
-	 *                    size_t exprc,
-	 *                    struct __timespec64 const *timeout,
-	 *                    syscall_ulong_t timeout_flags) */
-	.weak __asm32_int80_lfutexexpr
-INTERN_FUNCTION(__asm32_int80_lfutexexpr)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality
-	.cfi_lsda 0, 0x80000015
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	movw   %ax, %es
-	movw   $(SEGMENT_KERNEL_FSBASE), %ax
-	movw   %ax, %fs
-	pushl_cfi_r %ebp  /* Arg #5 */
 	pushl_cfi_r %edi  /* Arg #4 */
 	pushl_cfi_r %esi  /* Arg #3 */
 	pushl_cfi_r %edx  /* Arg #2 */
@@ -12871,8 +12869,8 @@ INTERN_FUNCTION(__asm32_int80_lfutexexpr)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $12, %esp
-	.cfi_adjust_cfa_offset -12
+	addl   $8, %esp
+	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -12883,18 +12881,45 @@ INTERN_FUNCTION(__asm32_int80_lfutexexpr)
 	.cfi_endproc
 END(__asm32_int80_lfutexexpr)
 
+/* >> lfutexlockexpr(2)
+ * A function that is similar to `lfutexexpr()', but allows for the use of one central
+ * locking futex that is used for waiting and may be distinct from any other given futex
+ * object pointer.
+ * Notes:
+ *   - This function only has the calling thread wait on a single futex `ulockaddr',
+ *     rather than having it wait on an arbitrary number of futexes, as would be the case when
+ *     the `lfutexexpr()' function is used.
+ *   - For more precise control over waiting on futex objects, as well as waiting on futexes
+ *     in conjunction with waiting on other things such as files, see the documentation on
+ *     this topic (lfutex() and select()) at the top of <kos/futex.h>
+ * @param: ulockaddr:     Address of the futex lock to-be used / The futex on which to wait
+ * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
+ * @param: exprv:         Vector of expressions for which to check
+ * @param: exprc:         Number of expressions given in `exprv'
+ * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
+ * @return: * : The first non-zero return value from executing all of the given `exprv'
+ *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*' functions
+ *              to see their possible return values, which are always `0' when they would
+ *              perform a wait operation, and usually `1' otherwise) or `0' if the calling
+ *              thread had to perform a wait operation, at which point this function returning
+ *              that value means that you've once again been re-awoken.
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
+ * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
+ * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
 .section .text.x86.asm32_syscall_int80.lfutexlockexpr
 	/* errno_t lfutexlockexpr(uintptr_t *ulockaddr,
 	 *                        void *base,
-	 *                        struct lfutexexpr const *exprv,
 	 *                        size_t exprc,
+	 *                        struct lfutexexpr const *exprv,
 	 *                        struct __timespec64 const *timeout,
 	 *                        syscall_ulong_t timeout_flags) */
 	.weak __asm32_int80_lfutexlockexpr
 INTERN_FUNCTION(__asm32_int80_lfutexlockexpr)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality
-	.cfi_lsda 0, 0x80000016
+	.cfi_lsda 0, 0x80000015
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
@@ -12943,7 +12968,7 @@ END(__asm32_int80_lfutexlockexpr)
 INTERN_FUNCTION(__asm32_int80_mktty)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality
-	.cfi_lsda 0, 0x80000017
+	.cfi_lsda 0, 0x80000016
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
@@ -12991,7 +13016,7 @@ END(__asm32_int80_mktty)
 INTERN_FUNCTION(__asm32_int80_raiseat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality
-	.cfi_lsda 0, 0x80000018
+	.cfi_lsda 0, 0x80000017
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
@@ -13021,6 +13046,77 @@ INTERN_FUNCTION(__asm32_int80_raiseat)
 	iret
 	.cfi_endproc
 END(__asm32_int80_raiseat)
+
+/* Trigger a coredump of the calling process.
+ * @param: curr_state:       The state as is still valid after any possible unwinding has already been done
+ *                           Note that this state does not necessarily point to the location that originally
+ *                           caused the problem that escalated into a coredump, but is the last valid stack-
+ *                           unwind location at which unwinding could no longer continue.
+ *                           When `NULL', `orig_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
+ * @param: orig_state:       The original CPU state at where the associated `exception' got triggered
+ *                           When `NULL', `curr_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
+ *                           When `curr_state' is also `NULL', then the current CPU state is used instead.
+ * @param: traceback_vector: (potentially incomplete) vector of additional program pointers that were
+ *                           travered when the stack was walked from `orig_state' to `curr_state'
+ *                           Note that earlier entires within this vector are further up the call-stack, with
+ *                           traceback_vector[0] being meant to be the call-site of the function of `orig_state'.
+ *                           Note that when `traceback_length != 0 && traceback_vector[traceback_length-1] == UCPUSTATE_PC(*curr_state)',
+ *                           it can be assumed that the traceback is complete and contains all travered instruction locations.
+ *                           In this case, a traceback displayed to a human should not include the text location at
+ *                           `traceback_vector[traceback_length-1]', since that location would also be printed when
+ *                           unwinding is completed for the purposes of displaying a traceback.
+ * @param: traceback_length: The number of program counters stored within `traceback_vector'
+ * @param: exception:        The exception that resulted in the coredump (or `NULL' to get the same behavior as `E_OK')
+ *                           Note that when `unwind_error == UNWIND_SUCCESS', this argument is interpreted as `siginfo_t *',
+ *                           allowing coredumps to also be triggerred for unhandled signals.
+ * @param: unwind_error:     The unwind error that caused the coredump, or `UNWIND_NOTHROW' if unwinding
+ *                           was never actually performed, and `exception' is actually a `siginfo_t *' */
+.section .text.x86.asm32_syscall_int80.coredump
+	/* errno_t coredump(struct ucpustate const *curr_state,
+	 *                  struct ucpustate const *orig_state,
+	 *                  void const *const *traceback_vector,
+	 *                  size_t traceback_length,
+	 *                  struct exception_data const *exception,
+	 *                  syscall_ulong_t unwind_error) */
+	.weak __asm32_int80_coredump
+INTERN_FUNCTION(__asm32_int80_coredump)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality
+	.cfi_lsda 0, 0x80000018
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	pushl_cfi_r %ebp  /* Arg #5 */
+	pushl_cfi_r %edi  /* Arg #4 */
+	pushl_cfi_r %esi  /* Arg #3 */
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	call   sys_coredump
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	addl   $12, %esp
+	.cfi_adjust_cfa_offset -12
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	iret
+	.cfi_endproc
+END(__asm32_int80_coredump)
 
 .section .text.x86.asm32_syscall_int80.stime64
 	/* errno_t stime64(time64_t const *t) */
@@ -13058,77 +13154,6 @@ INTERN_FUNCTION(__asm32_int80_stime64)
 	iret
 	.cfi_endproc
 END(__asm32_int80_stime64)
-
-/* Trigger a coredump of the calling process.
- * @param: curr_state:       The state as is still valid after any possible unwinding has already been done
- *                           Note that this state does not necessarily point to the location that originally
- *                           caused the problem that escalated into a coredump, but is the last valid stack-
- *                           unwind location at which unwinding could no longer continue.
- *                           When `NULL', `orig_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
- * @param: orig_state:       The original CPU state at where the associated `exception' got triggered
- *                           When `NULL', `curr_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
- *                           When `curr_state' is also `NULL', then the current CPU state is used instead.
- * @param: traceback_vector: (potentially incomplete) vector of additional program pointers that were
- *                           travered when the stack was walked from `orig_state' to `curr_state'
- *                           Note that earlier entires within this vector are further up the call-stack, with
- *                           traceback_vector[0] being meant to be the call-site of the function of `orig_state'.
- *                           Note that when `traceback_length != 0 && traceback_vector[traceback_length-1] == UCPUSTATE_PC(*curr_state)',
- *                           it can be assumed that the traceback is complete and contains all travered instruction locations.
- *                           In this case, a traceback displayed to a human should not include the text location at
- *                           `traceback_vector[traceback_length-1]', since that location would also be printed when
- *                           unwinding is completed for the purposes of displaying a traceback.
- * @param: traceback_length: The number of program counters stored within `traceback_vector'
- * @param: exception:        The exception that resulted in the coredump (or `NULL' to get the same behavior as `E_OK')
- *                           Note that when `unwind_error == UNWIND_SUCCESS', this argument is interpreted as `siginfo_t *',
- *                           allowing coredumps to also be triggerred for unhandled signals.
- * @param: unwind_error:     The unwind error that caused the coredump, or `UNWIND_NOTHROW' if unwinding
- *                           was never actually performed, and `exception' is actually a `siginfo_t *' */
-.section .text.x86.asm32_syscall_int80.coredump
-	/* errno_t coredump(struct ucpustate const *curr_state,
-	 *                  struct ucpustate const *orig_state,
-	 *                  void const *const *traceback_vector,
-	 *                  size_t traceback_length,
-	 *                  struct exception_data const *exception,
-	 *                  syscall_ulong_t unwind_error) */
-	.weak __asm32_int80_coredump
-INTERN_FUNCTION(__asm32_int80_coredump)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality
-	.cfi_lsda 0, 0x8000001a
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	movw   %ax, %es
-	movw   $(SEGMENT_KERNEL_FSBASE), %ax
-	movw   %ax, %fs
-	pushl_cfi_r %ebp  /* Arg #5 */
-	pushl_cfi_r %edi  /* Arg #4 */
-	pushl_cfi_r %esi  /* Arg #3 */
-	pushl_cfi_r %edx  /* Arg #2 */
-	pushl_cfi_r %ecx  /* Arg #1 */
-	pushl_cfi_r %ebx  /* Arg #0 */
-	call   sys_coredump
-	popl_cfi_r %ebx
-	popl_cfi_r %ecx
-	popl_cfi_r %edx
-	addl   $12, %esp
-	.cfi_adjust_cfa_offset -12
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	iret
-	.cfi_endproc
-END(__asm32_int80_coredump)
 
 .section .text.x86.asm32_syscall_int80.utime64
 	/* errno_t utime64(char const *filename,
@@ -27391,6 +27416,27 @@ INTERN_FUNCTION(__asm32_sysenter_debugtrap)
 	.cfi_endproc
 END(__asm32_sysenter_debugtrap)
 
+/* >> lfutex(2)
+ * Provide the bottom-most API for implementing user-space synchronization on KOS
+ * @param: futex_op: One of:
+ *    - LFUTEX_WAKE:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKE, size_t count)
+ *    - LFUTEX_NOP:                (lfutex_t *uaddr, syscall_ulong_t LFUTEX_NOP, size_t ignored)
+ *    - LFUTEX_WAIT:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT, lfutex ignored, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_LOCK:          (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_LOCK, lfutex_t lock_value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE, lfutex_t value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_UNTIL:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL, lfutex_t value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_ABOVE:   (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_ABOVE, lfutex_t value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BELOW:   (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_BELOW, lfutex_t value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BITMASK: (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_BITMASK, lfutex_t bitmask, struct timespec const *timeout, lfutex_t setmask)
+ *    - LFUTEX_WAIT_UNTIL_BITMASK: (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL_BITMASK, lfutex_t bitmask, struct timespec const *timeout, lfutex_t setmask)
+ *    - LFUTEX_WAIT_WHILE_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
+ *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
+ * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @return: * : Depending on `futex_op'
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @throw:  E_INVALID_ARGUMENT: The given `futex_op' is invalid
+ * @throw:  E_INTERRUPT:        A blocking futex-wait operation was interrupted
+ * @return: -ETIMEDOUT:         A blocking futex-wait operation has timed out */
 .section .text.x86.asm32_syscall_sysenter.lfutex
 	/* syscall_slong_t lfutex(uintptr_t *uaddr,
 	 *                        syscall_ulong_t futex_op,
@@ -27479,15 +27525,41 @@ INTERN_FUNCTION(__asm32_sysenter_lseek64)
 	.cfi_endproc
 END(__asm32_sysenter_lseek64)
 
-.section .text.x86.asm32_syscall_sysenter.lfutexlock
-	/* syscall_slong_t lfutexlock(uintptr_t *ulockaddr,
-	 *                            uintptr_t *uaddr,
-	 *                            syscall_ulong_t futex_op,
-	 *                            uintptr_t val,
-	 *                            struct __timespec64 const *timeout,
-	 *                            uintptr_t val2) */
-	.weak __asm32_sysenter_lfutexlock
-INTERN_FUNCTION(__asm32_sysenter_lfutexlock)
+/* >> lfutexexpr(2)
+ * The lfutexexpr() system call can be used to specify arbitrarily complex
+ * expressions that must atomically (in relation to other futex operations)
+ * hold true before the scheduler will suspend the calling thread, as well as
+ * have the calling thread wait for any number of futex objects associated with
+ * any address that is checked as part of the expression. (s.a. `lfutex()')
+ * Notes:
+ *   - This is the only futex function that can be used to wait on multiple futex
+ *     objects (i.e. resume execution when `LFUTEX_WAKE' is called on _any_ of them)
+ *   - For more precise control over waiting on futex objects, as well as waiting on
+ *     futexes in conjunction with waiting on other things such as files, see the
+ *     documentation on this topic (lfutex() and select()) at the top of <kos/futex.h>
+ * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
+ * @param: exprv:         Vector of expressions for which to check
+ * @param: exprc:         Number of expressions given in `exprv'
+ * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
+ * @return: * : The first non-zero return value from executing all of the given `exprv'
+ *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*' functions
+ *              to see their possible return values, which are always `0' when they would
+ *              perform a wait operation, and usually `1' otherwise) or `0' if the calling
+ *              thread had to perform a wait operation, at which point this function returning
+ *              that value means that you've once again been re-awoken.
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
+ * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
+ * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
+.section .text.x86.asm32_syscall_sysenter.lfutexexpr
+	/* errno_t lfutexexpr(void *base,
+	 *                    size_t exprc,
+	 *                    struct lfutexexpr const *exprv,
+	 *                    struct __timespec64 const *timeout,
+	 *                    syscall_ulong_t timeout_flags) */
+	.weak __asm32_sysenter_lfutexexpr
+INTERN_FUNCTION(__asm32_sysenter_lfutexexpr)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality
 	.cfi_lsda 0, 0xc0000014
@@ -27506,56 +27578,6 @@ INTERN_FUNCTION(__asm32_sysenter_lfutexlock)
 	movw   %ax, %fs
 	cmpl   $KERNEL_BASE, %ebp
 	jae    __asm32_bad_sysenter_extension
-	pushl_cfi   4(%ebp)  /* Arg #5 (WARNING: SEGFAULT!) */
-	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
-	pushl_cfi_r %esi  /* Arg #3 */
-	pushl_cfi_r %edx  /* Arg #2 */
-	pushl_cfi_r %ecx  /* Arg #1 */
-	pushl_cfi_r %ebx  /* Arg #0 */
-	call   sys_lfutexlock
-	popl_cfi_r %ebx
-	popl_cfi_r %ecx
-	popl_cfi_r %edx
-	addl   $12, %esp
-	.cfi_adjust_cfa_offset -12
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	X86_IRET_BUT_PREFER_SYSEXIT
-	.cfi_endproc
-END(__asm32_sysenter_lfutexlock)
-
-.section .text.x86.asm32_syscall_sysenter.lfutexexpr
-	/* errno_t lfutexexpr(uintptr_t *uaddr,
-	 *                    void *base,
-	 *                    struct lfutexexpr const *exprv,
-	 *                    size_t exprc,
-	 *                    struct __timespec64 const *timeout,
-	 *                    syscall_ulong_t timeout_flags) */
-	.weak __asm32_sysenter_lfutexexpr
-INTERN_FUNCTION(__asm32_sysenter_lfutexexpr)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality
-	.cfi_lsda 0, 0xc0000015
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	movw   %ax, %es
-	movw   $(SEGMENT_KERNEL_FSBASE), %ax
-	movw   %ax, %fs
-	cmpl   $KERNEL_BASE, %ebp
-	jae    __asm32_bad_sysenter_extension
-	pushl_cfi   4(%ebp)  /* Arg #5 (WARNING: SEGFAULT!) */
 	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
 	pushl_cfi_r %esi  /* Arg #3 */
 	pushl_cfi_r %edx  /* Arg #2 */
@@ -27565,8 +27587,8 @@ INTERN_FUNCTION(__asm32_sysenter_lfutexexpr)
 	popl_cfi_r %ebx
 	popl_cfi_r %ecx
 	popl_cfi_r %edx
-	addl   $12, %esp
-	.cfi_adjust_cfa_offset -12
+	addl   $8, %esp
+	.cfi_adjust_cfa_offset -8
 	popl_cfi %fs
 	.cfi_restore_iret_fs
 	popl_cfi %es
@@ -27577,18 +27599,45 @@ INTERN_FUNCTION(__asm32_sysenter_lfutexexpr)
 	.cfi_endproc
 END(__asm32_sysenter_lfutexexpr)
 
+/* >> lfutexlockexpr(2)
+ * A function that is similar to `lfutexexpr()', but allows for the use of one central
+ * locking futex that is used for waiting and may be distinct from any other given futex
+ * object pointer.
+ * Notes:
+ *   - This function only has the calling thread wait on a single futex `ulockaddr',
+ *     rather than having it wait on an arbitrary number of futexes, as would be the case when
+ *     the `lfutexexpr()' function is used.
+ *   - For more precise control over waiting on futex objects, as well as waiting on futexes
+ *     in conjunction with waiting on other things such as files, see the documentation on
+ *     this topic (lfutex() and select()) at the top of <kos/futex.h>
+ * @param: ulockaddr:     Address of the futex lock to-be used / The futex on which to wait
+ * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
+ * @param: exprv:         Vector of expressions for which to check
+ * @param: exprc:         Number of expressions given in `exprv'
+ * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
+ * @return: * : The first non-zero return value from executing all of the given `exprv'
+ *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*' functions
+ *              to see their possible return values, which are always `0' when they would
+ *              perform a wait operation, and usually `1' otherwise) or `0' if the calling
+ *              thread had to perform a wait operation, at which point this function returning
+ *              that value means that you've once again been re-awoken.
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
+ * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
+ * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
 .section .text.x86.asm32_syscall_sysenter.lfutexlockexpr
 	/* errno_t lfutexlockexpr(uintptr_t *ulockaddr,
 	 *                        void *base,
-	 *                        struct lfutexexpr const *exprv,
 	 *                        size_t exprc,
+	 *                        struct lfutexexpr const *exprv,
 	 *                        struct __timespec64 const *timeout,
 	 *                        syscall_ulong_t timeout_flags) */
 	.weak __asm32_sysenter_lfutexlockexpr
 INTERN_FUNCTION(__asm32_sysenter_lfutexlockexpr)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality
-	.cfi_lsda 0, 0xc0000016
+	.cfi_lsda 0, 0xc0000015
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
@@ -27639,7 +27688,7 @@ END(__asm32_sysenter_lfutexlockexpr)
 INTERN_FUNCTION(__asm32_sysenter_mktty)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality
-	.cfi_lsda 0, 0xc0000017
+	.cfi_lsda 0, 0xc0000016
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
@@ -27687,7 +27736,7 @@ END(__asm32_sysenter_mktty)
 INTERN_FUNCTION(__asm32_sysenter_raiseat)
 	.cfi_startproc simple
 	.cfi_personality 0, x86_syscall_personality
-	.cfi_lsda 0, 0xc0000018
+	.cfi_lsda 0, 0xc0000017
 	.cfi_iret_signal_frame
 	.cfi_def_cfa %esp, 0
 	pushl_cfi %ds
@@ -27717,6 +27766,79 @@ INTERN_FUNCTION(__asm32_sysenter_raiseat)
 	X86_IRET_BUT_PREFER_SYSEXIT
 	.cfi_endproc
 END(__asm32_sysenter_raiseat)
+
+/* Trigger a coredump of the calling process.
+ * @param: curr_state:       The state as is still valid after any possible unwinding has already been done
+ *                           Note that this state does not necessarily point to the location that originally
+ *                           caused the problem that escalated into a coredump, but is the last valid stack-
+ *                           unwind location at which unwinding could no longer continue.
+ *                           When `NULL', `orig_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
+ * @param: orig_state:       The original CPU state at where the associated `exception' got triggered
+ *                           When `NULL', `curr_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
+ *                           When `curr_state' is also `NULL', then the current CPU state is used instead.
+ * @param: traceback_vector: (potentially incomplete) vector of additional program pointers that were
+ *                           travered when the stack was walked from `orig_state' to `curr_state'
+ *                           Note that earlier entires within this vector are further up the call-stack, with
+ *                           traceback_vector[0] being meant to be the call-site of the function of `orig_state'.
+ *                           Note that when `traceback_length != 0 && traceback_vector[traceback_length-1] == UCPUSTATE_PC(*curr_state)',
+ *                           it can be assumed that the traceback is complete and contains all travered instruction locations.
+ *                           In this case, a traceback displayed to a human should not include the text location at
+ *                           `traceback_vector[traceback_length-1]', since that location would also be printed when
+ *                           unwinding is completed for the purposes of displaying a traceback.
+ * @param: traceback_length: The number of program counters stored within `traceback_vector'
+ * @param: exception:        The exception that resulted in the coredump (or `NULL' to get the same behavior as `E_OK')
+ *                           Note that when `unwind_error == UNWIND_SUCCESS', this argument is interpreted as `siginfo_t *',
+ *                           allowing coredumps to also be triggerred for unhandled signals.
+ * @param: unwind_error:     The unwind error that caused the coredump, or `UNWIND_NOTHROW' if unwinding
+ *                           was never actually performed, and `exception' is actually a `siginfo_t *' */
+.section .text.x86.asm32_syscall_sysenter.coredump
+	/* errno_t coredump(struct ucpustate const *curr_state,
+	 *                  struct ucpustate const *orig_state,
+	 *                  void const *const *traceback_vector,
+	 *                  size_t traceback_length,
+	 *                  struct exception_data const *exception,
+	 *                  syscall_ulong_t unwind_error) */
+	.weak __asm32_sysenter_coredump
+INTERN_FUNCTION(__asm32_sysenter_coredump)
+	.cfi_startproc simple
+	.cfi_personality 0, x86_syscall_personality
+	.cfi_lsda 0, 0xc0000018
+	.cfi_iret_signal_frame
+	.cfi_def_cfa %esp, 0
+	pushl_cfi %ds
+	.cfi_restore_iret_ds_or_offset -4
+	pushl_cfi %es
+	.cfi_restore_iret_es_or_offset -8
+	pushl_cfi %fs
+	.cfi_restore_iret_fs_or_offset -12
+	movw   $(SEGMENT_USER_DATA_RPL), %ax
+	movw   %ax, %ds
+	movw   %ax, %es
+	movw   $(SEGMENT_KERNEL_FSBASE), %ax
+	movw   %ax, %fs
+	cmpl   $KERNEL_BASE, %ebp
+	jae    __asm32_bad_sysenter_extension
+	pushl_cfi   4(%ebp)  /* Arg #5 (WARNING: SEGFAULT!) */
+	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
+	pushl_cfi_r %esi  /* Arg #3 */
+	pushl_cfi_r %edx  /* Arg #2 */
+	pushl_cfi_r %ecx  /* Arg #1 */
+	pushl_cfi_r %ebx  /* Arg #0 */
+	call   sys_coredump
+	popl_cfi_r %ebx
+	popl_cfi_r %ecx
+	popl_cfi_r %edx
+	addl   $12, %esp
+	.cfi_adjust_cfa_offset -12
+	popl_cfi %fs
+	.cfi_restore_iret_fs
+	popl_cfi %es
+	.cfi_restore_iret_es
+	popl_cfi %ds
+	.cfi_restore_iret_ds
+	X86_IRET_BUT_PREFER_SYSEXIT
+	.cfi_endproc
+END(__asm32_sysenter_coredump)
 
 .section .text.x86.asm32_syscall_sysenter.stime64
 	/* errno_t stime64(time64_t const *t) */
@@ -27754,79 +27876,6 @@ INTERN_FUNCTION(__asm32_sysenter_stime64)
 	X86_IRET_BUT_PREFER_SYSEXIT
 	.cfi_endproc
 END(__asm32_sysenter_stime64)
-
-/* Trigger a coredump of the calling process.
- * @param: curr_state:       The state as is still valid after any possible unwinding has already been done
- *                           Note that this state does not necessarily point to the location that originally
- *                           caused the problem that escalated into a coredump, but is the last valid stack-
- *                           unwind location at which unwinding could no longer continue.
- *                           When `NULL', `orig_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
- * @param: orig_state:       The original CPU state at where the associated `exception' got triggered
- *                           When `NULL', `curr_state' is used instead, and `traceback_vector' and `traceback_length' are ignored.
- *                           When `curr_state' is also `NULL', then the current CPU state is used instead.
- * @param: traceback_vector: (potentially incomplete) vector of additional program pointers that were
- *                           travered when the stack was walked from `orig_state' to `curr_state'
- *                           Note that earlier entires within this vector are further up the call-stack, with
- *                           traceback_vector[0] being meant to be the call-site of the function of `orig_state'.
- *                           Note that when `traceback_length != 0 && traceback_vector[traceback_length-1] == UCPUSTATE_PC(*curr_state)',
- *                           it can be assumed that the traceback is complete and contains all travered instruction locations.
- *                           In this case, a traceback displayed to a human should not include the text location at
- *                           `traceback_vector[traceback_length-1]', since that location would also be printed when
- *                           unwinding is completed for the purposes of displaying a traceback.
- * @param: traceback_length: The number of program counters stored within `traceback_vector'
- * @param: exception:        The exception that resulted in the coredump (or `NULL' to get the same behavior as `E_OK')
- *                           Note that when `unwind_error == UNWIND_SUCCESS', this argument is interpreted as `siginfo_t *',
- *                           allowing coredumps to also be triggerred for unhandled signals.
- * @param: unwind_error:     The unwind error that caused the coredump, or `UNWIND_NOTHROW' if unwinding
- *                           was never actually performed, and `exception' is actually a `siginfo_t *' */
-.section .text.x86.asm32_syscall_sysenter.coredump
-	/* errno_t coredump(struct ucpustate const *curr_state,
-	 *                  struct ucpustate const *orig_state,
-	 *                  void const *const *traceback_vector,
-	 *                  size_t traceback_length,
-	 *                  struct exception_data const *exception,
-	 *                  syscall_ulong_t unwind_error) */
-	.weak __asm32_sysenter_coredump
-INTERN_FUNCTION(__asm32_sysenter_coredump)
-	.cfi_startproc simple
-	.cfi_personality 0, x86_syscall_personality
-	.cfi_lsda 0, 0xc000001a
-	.cfi_iret_signal_frame
-	.cfi_def_cfa %esp, 0
-	pushl_cfi %ds
-	.cfi_restore_iret_ds_or_offset -4
-	pushl_cfi %es
-	.cfi_restore_iret_es_or_offset -8
-	pushl_cfi %fs
-	.cfi_restore_iret_fs_or_offset -12
-	movw   $(SEGMENT_USER_DATA_RPL), %ax
-	movw   %ax, %ds
-	movw   %ax, %es
-	movw   $(SEGMENT_KERNEL_FSBASE), %ax
-	movw   %ax, %fs
-	cmpl   $KERNEL_BASE, %ebp
-	jae    __asm32_bad_sysenter_extension
-	pushl_cfi   4(%ebp)  /* Arg #5 (WARNING: SEGFAULT!) */
-	pushl_cfi   0(%ebp)  /* Arg #4 (WARNING: SEGFAULT!) */
-	pushl_cfi_r %esi  /* Arg #3 */
-	pushl_cfi_r %edx  /* Arg #2 */
-	pushl_cfi_r %ecx  /* Arg #1 */
-	pushl_cfi_r %ebx  /* Arg #0 */
-	call   sys_coredump
-	popl_cfi_r %ebx
-	popl_cfi_r %ecx
-	popl_cfi_r %edx
-	addl   $12, %esp
-	.cfi_adjust_cfa_offset -12
-	popl_cfi %fs
-	.cfi_restore_iret_fs
-	popl_cfi %es
-	.cfi_restore_iret_es
-	popl_cfi %ds
-	.cfi_restore_iret_ds
-	X86_IRET_BUT_PREFER_SYSEXIT
-	.cfi_endproc
-END(__asm32_sysenter_coredump)
 
 .section .text.x86.asm32_syscall_sysenter.utime64
 	/* errno_t utime64(char const *filename,

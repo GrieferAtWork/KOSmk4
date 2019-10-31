@@ -19,6 +19,7 @@
 
 %[define_replacement(lfutex_t = __uintptr_t)]
 %[define_replacement(syscall_ulong_t = __syscall_ulong_t)]
+%[default_impl_section(.text.crt.sched.futex)]
 
 %{
 #include <features.h>
@@ -38,6 +39,38 @@ __SYSDECL_BEGIN
 #define __lfutex_t_defined 1
 typedef __uintptr_t lfutex_t;
 #endif /* !__lfutex_t_defined */
+
+/*
+ * `lfutex() and select()' (or `poll()')
+ *
+ * On KOS, it is fairly simple to use any of the available `LFUTEX_WAIT_*' operations
+ * in conjunction with a call to `poll()' (though note that the `LFUTEX_WAIT_WHILE_CMPXCH()'
+ * and `LFUTEX_WAIT_UNTIL_CMPXCH()' operators will possibly modify pointed-to memory in
+ * a way that makes repeated polling behave unexpectedly, requiring user-space to take
+ * proper case that the behavior will be what is actually intended)
+ *
+ * Other than this, there exists 2 ways of polling for futex objects
+ * in parallel to polling any other type of file descriptor, as well
+ * polling for sleeping child processes (either through use of a file
+ * descriptor created using `TODO:waitfd(pid) (similar to `signalfd()',
+ * but may be used to wait for processes in a way that is similar to
+ * the waitpid() function)', or through use of `kpoll()').
+ *
+ * - Using the `kpoll()' system call, which allows for the use of poll
+ *   descriptors that describe any kind of user-space-visible handle on
+ *   which a given process can wait (a regular `fd_t' (using `POLLIN|
+ *   POLLOUT|...'), a `pid_t' (using `waitpid()'), or an `lfutex_t'
+ *   (using any of the `LFUTEX_WAIT_*' operators that are available))
+ *   When targeting KOS specifically, this is the preferred way of going
+ *   about passively waiting for a futex, as it doesn't require the
+ *   creation of any additional kernel-space object.
+ *   TODO: Implement the `kpoll()' system call
+ *
+ * - Using the regular `poll()' / `select()' family of system calls, after
+ *   having created 
+ *
+ */
+
 
 }
 
@@ -206,12 +239,12 @@ typedef __uintptr_t lfutex_t;
 
 
 [cp][doc_alias(lfutex)][ignore][vartypes($uintptr_t, $uintptr_t)]
-lfutex32:([nonnull] lfutex_t *uaddr, $syscall_ulong_t command, lfutex_t val, /*struct timespec const *timeout, lfutex_t val2*/...) -> $ssize_t = lfutex?;
+lfutex32:([nonnull] lfutex_t *uaddr, $syscall_ulong_t futex_op, lfutex_t val, /*struct timespec const *timeout, lfutex_t val2*/...) -> $ssize_t = lfutex?;
 
 
 @@>> lfutex(2)
-@@High-level wrapper around the lfutex system call
-@@@param: command: One of:
+@@Provide the bottom-most API for implementing user-space synchronization on KOS
+@@@param: futex_op: One of:
 @@   - LFUTEX_WAKE:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKE, size_t count)
 @@   - LFUTEX_NOP:                (lfutex_t *uaddr, syscall_ulong_t LFUTEX_NOP, size_t ignored)
 @@   - LFUTEX_WAIT:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT, lfutex ignored, struct timespec const *timeout)
@@ -225,9 +258,9 @@ lfutex32:([nonnull] lfutex_t *uaddr, $syscall_ulong_t command, lfutex_t val, /*s
 @@   - LFUTEX_WAIT_WHILE_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
 @@   - LFUTEX_WAIT_UNTIL_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
 @@@param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
-@@@return: * : Depending on `command'
+@@@return: * : Depending on `futex_op'
 @@@return: -1:EFAULT:    A faulty pointer was given
-@@@return: -1:EINVAL:    The given `command' is invalid
+@@@return: -1:EINVAL:    The given `futex_op' is invalid
 @@@return: -1:EINTR:     A blocking futex-wait operation was interrupted
 @@@return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out
 [cp][vartypes(void *, $uintptr_t)]
@@ -235,39 +268,35 @@ lfutex32:([nonnull] lfutex_t *uaddr, $syscall_ulong_t command, lfutex_t val, /*s
 [dependency_string(defined(__CRT_HAVE_lfutex) || defined(__CRT_HAVE_lfutex64))]
 [if(defined(__USE_TIME_BITS64)), preferred_alias(lfutex64)]
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(lfutex)]
-lfutex:([nonnull] lfutex_t *uaddr, $syscall_ulong_t command, lfutex_t val, /*struct timespec const *timeout, lfutex_t val2*/...) -> $ssize_t {
+lfutex:([nonnull] lfutex_t *uaddr, $syscall_ulong_t futex_op, lfutex_t val, /*struct timespec const *timeout, lfutex_t val2*/...) -> $ssize_t {
 #ifdef __CRT_HAVE_lfutex
 	va_list args;
 	lfutex_t val2;
 	struct timespec32 tms32;
 	struct timespec64 *timeout;
-	if (!@LFUTEX_USES_TIMEOUT@(command))
-		return lfutex32(uaddr, command, val);
 	va_start(args, val);
 	timeout = va_arg(args, struct timespec64 *);
 	val2 = va_arg(args, lfutex_t);
 	va_end(args);
-	if (!timeout)
-		return lfutex32(uaddr, command, val, (struct timespec32 *)NULL, val2);
+	if (!timeout || !@LFUTEX_USES_TIMEOUT@(futex_op))
+		return lfutex32(uaddr, futex_op, val, (struct timespec32 *)NULL, val2);
 	tms32.@tv_sec@  = (__time32_t)timeout->@tv_sec@;
 	tms32.@tv_nsec@ = timeout->@tv_nsec@;
-	return lfutex32(uaddr, command, val, &tms32, val2);
+	return lfutex32(uaddr, futex_op, val, &tms32, val2);
 #else /* __CRT_HAVE_lfutex */
 	va_list args;
 	lfutex_t val2;
 	struct timespec64 tms64;
 	struct timespec32 *timeout;
-	if (!@LFUTEX_USES_TIMEOUT@(command))
-		return lfutex64(uaddr, command, val);
 	va_start(args, val);
 	timeout = va_arg(args, struct timespec32 *);
 	val2 = va_arg(args, lfutex_t);
 	va_end(args);
-	if (!timeout)
-		return lfutex64(uaddr, command, val, (struct timespec64 *)NULL, val2);
+	if (!timeout || !@LFUTEX_USES_TIMEOUT@(futex_op))
+		return lfutex64(uaddr, futex_op, val, (struct timespec64 *)NULL, val2);
 	tms64.@tv_sec@  = (__time64_t)timeout->@tv_sec@;
 	tms64.@tv_nsec@ = timeout->@tv_nsec@;
-	return lfutex64(uaddr, command, val, &tms64, val2);
+	return lfutex64(uaddr, futex_op, val, &tms64, val2);
 #endif /* !__CRT_HAVE_lfutex */
 }
 
@@ -276,22 +305,20 @@ lfutex:([nonnull] lfutex_t *uaddr, $syscall_ulong_t command, lfutex_t val, /*str
 [cp][time64_variant_of(lfutex)][vartypes(void *, $uintptr_t)]
 [requires(defined(__CRT_HAVE_lfutex))]
 [dependency_string(defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex))]
-lfutex64:([nonnull] lfutex_t *uaddr, $syscall_ulong_t command, lfutex_t val, /*struct timespec64 const *timeout, lfutex_t val2*/...) -> $ssize_t {
+lfutex64:([nonnull] lfutex_t *uaddr, $syscall_ulong_t futex_op, lfutex_t val, /*struct timespec64 const *timeout, lfutex_t val2*/...) -> $ssize_t {
 	va_list args;
 	lfutex_t val2;
 	struct timespec32 tms32;
 	struct timespec64 *timeout;
-	if (!@LFUTEX_USES_TIMEOUT@(command))
-		return lfutex32(uaddr, command, val);
 	va_start(args, val);
 	timeout = va_arg(args, struct timespec64 *);
 	val2 = va_arg(args, lfutex_t);
 	va_end(args);
-	if (!timeout)
-		return lfutex32(uaddr, command, val, (struct timespec32 *)NULL, val2);
+	if (!timeout || !@LFUTEX_USES_TIMEOUT@(futex_op))
+		return lfutex32(uaddr, futex_op, val, (struct timespec32 *)NULL, val2);
 	tms32.@tv_sec@  = (__time32_t)timeout->@tv_sec@;
 	tms32.@tv_nsec@ = timeout->@tv_nsec@;
-	return lfutex32(uaddr, command, val, &tms32, val2);
+	return lfutex32(uaddr, futex_op, val, &tms32, val2);
 }
 %#endif /* __USE_TIME64 */
 

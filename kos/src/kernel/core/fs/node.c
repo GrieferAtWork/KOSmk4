@@ -1247,7 +1247,7 @@ again_do_remove_from_super_for_delete:
 	}
 	if (modified & INODE_FCHANGED) {
 		/* Check for further modifications only starting with the second pass! */
-		if (!first_pass && !vm_datablock_haschanges(self))
+		if (!first_pass && !vm_datablock_haschanged(self))
 			goto done_data_sync;
 		sync_endwrite(self);
 		/* Synchronize data. */

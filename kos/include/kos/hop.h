@@ -887,6 +887,10 @@ struct hop_pipe_unwrite /*[PREFIX(puw_)]*/ {
                                                               * Write 0/1 to *result, indicative of:
                                                               *  - 0: The data block wasn't anonymous (aka. was already deanonymized).
                                                               *  - 1: The data block has been deanonymized. */
+/* TODO: Access to some of the other vm_datablock_* functions:
+ *   - HOP_DATABLOCK_OPEN_PART       -- vm_datablock_locatepart()
+ *   - HOP_DATABLOCK_OPEN_PART_EXACT -- vm_datablock_locatepart_exact()
+ *   - HOP_DATABLOCK_HAS_CHANGED     -- vm_datablock_haschanged() */
 #define HOP_INODE_OPEN_SUPERBLOCK                 0x00010007 /* [struct hop_openfd *arg] Open the superblock associated with an INode.
                                                               * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't an INode. */
 #define HOP_INODE_CHMOD                           0x00010008 /* [struct hop_inode_chmod *arg] Extended interface for changing file permissions in a more controlled manner.
@@ -1112,6 +1116,21 @@ struct hop_pipe_unwrite /*[PREFIX(puw_)]*/ {
 /* TODO: HOP_TASK_RPC -- FD-interface for the `rpc_schedule()' system call */
 
 
+/* TODO: HOP_DATAPART_STAT        -- `vm_datapart_(num|min|max|start|end)(byte[s]|dpage[s]|vpage[s])()' */
+/* TODO: HOP_DATAPART_HAS_CHANGED -- vm_datapart_has_changed() */
+/* TODO: HOP_DATAPART_SYNC        -- vm_datapart_sync() */
+/* TODO: HOP_DATAPART_SPLIT       -- vm_datapart_split() */
+
+/* TODO: HOP_FUTEX_STAT               (Return HOP_FUTEX_ISWAITING, HOP_FUTEX_GET_ADDRESS, and some generalized info about HOP_FUTEX_OPEN_DATABLOCK) */
+/* TODO: HOP_FUTEX_ISWAITING          (returns true if threads are currently waiting on the futex) */
+/* TODO: HOP_FUTEX_BROADCAST          (wrapper for `sig_broadcast()' the signal of a particual futex) */
+/* TODO: HOP_FUTEX_OPEN_DATABPART     (returns a `HANDLE_TYPE_DATABLOCK' object) */
+/* TODO: HOP_FUTEX_OPEN_DATABLOCK     (returns a `HANDLE_TYPE_DATABLOCK' object) */
+/* TODO: HOP_FUTEX_GET_ADDRESS        (returns the address of the futex within its data-block) */
+/* TODO: HOP_FUTEXFD_STAT             (returns a `HANDLE_TYPE_FUTEX' object) */
+/* TODO: HOP_FUTEXFD_OPEN_FUTEX       (returns a `HANDLE_TYPE_FUTEX' object) */
+/* TODO: HOP_MPFUTEXFD_OPEN_DATABLOCK (returns a `HANDLE_TYPE_DATABLOCK' object) */
+
 
 /* For `HANDLE_TYPE_PIPE', `HANDLE_TYPE_PIPE_READER' and `HANDLE_TYPE_PIPE_WRITER' */
 #define HOP_PIPE_STAT                             0x000c0001 /* [struct hop_pipe_stat *result] Return statistics about the pipe */
@@ -1119,11 +1138,11 @@ struct hop_pipe_unwrite /*[PREFIX(puw_)]*/ {
 #define HOP_PIPE_SETLIM                           0x000c0003 /* [size_t value] Set the max allocated pipe size to `value'. */
 #define HOP_PIPE_XCHLIM                           0x000c0004 /* [uint64_t *value] Exchange the old max allocated pipe size with `*value'. */
 #define HOP_PIPE_WRITESOME                        0x000c0005 /* [struct hop_pipe_writesome *data] A hybrid between `write()' with and without IO_NONBLOCK:
-                                                              *  write() w/o IO_NONBLOCK: Block until _all_ data was written
-                                                              *  write() w/ IO_NONBLOCK:  Don't block and only write data until the pipe limit is reached
-                                                              *  HOP_PIPE_WRITESOME:      Block until _any_ data was written
-                                                              *                           NOTE: When this HOP is invoked with the `IO_NONBLOCK' flag,
-                                                              *                           it will behave identical to `write() w/ IO_NONBLOCK' */
+                                                              * write() w/o IO_NONBLOCK: Block until _all_ data was written
+                                                              * write() w/ IO_NONBLOCK:  Don't block and only write data until the pipe limit is reached
+                                                              * HOP_PIPE_WRITESOME:      Block until _any_ data was written
+                                                              *                          NOTE: When this HOP is invoked with the `IO_NONBLOCK' flag,
+                                                              *                          it will behave identical to `write() w/ IO_NONBLOCK' */
 #define HOP_PIPE_VWRITESOME                       0x000c0006 /* [struct hop_pipe_vwritesome *data] Vectored variant of `HOP_PIPE_WRITESOME' */
 #define HOP_PIPE_SKIPDATA                         0x000c0007 /* [struct hop_pipe_skipdata *data] Skip buffered data, rather than reading it. */
 #define HOP_PIPE_UNREAD                           0x000c0008 /* [struct hop_pipe_unread *data] Try to unread previously read, but not yet written data. */

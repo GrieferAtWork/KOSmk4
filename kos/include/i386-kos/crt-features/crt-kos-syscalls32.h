@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb7354496 */
+/* HASH CRC-32:0x3da7bf78 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -331,13 +331,12 @@
 #define __CRT_HAVE_sys_debugtrap 1
 #define __CRT_HAVE_sys_lfutex 1
 #define __CRT_HAVE_sys_lseek64 1
-#define __CRT_HAVE_sys_lfutexlock 1
 #define __CRT_HAVE_sys_lfutexexpr 1
 #define __CRT_HAVE_sys_lfutexlockexpr 1
 #define __CRT_HAVE_sys_mktty 1
 #define __CRT_HAVE_sys_raiseat 1
-#define __CRT_HAVE_sys_stime64 1
 #define __CRT_HAVE_sys_coredump 1
+#define __CRT_HAVE_sys_stime64 1
 #define __CRT_HAVE_sys_utime64 1
 #define __CRT_HAVE_sys_ioctlf 1
 #define __CRT_HAVE_sys_fsmode 1
@@ -696,13 +695,12 @@
 #define __CRT_HAVE_sys_Xdebugtrap 1
 #define __CRT_HAVE_sys_Xlfutex 1
 #define __CRT_HAVE_sys_Xlseek64 1
-#define __CRT_HAVE_sys_Xlfutexlock 1
 #define __CRT_HAVE_sys_Xlfutexexpr 1
 #define __CRT_HAVE_sys_Xlfutexlockexpr 1
 #define __CRT_HAVE_sys_Xmktty 1
 #define __CRT_HAVE_sys_Xraiseat 1
-#define __CRT_HAVE_sys_Xstime64 1
 #define __CRT_HAVE_sys_Xcoredump 1
+#define __CRT_HAVE_sys_Xstime64 1
 #define __CRT_HAVE_sys_Xutime64 1
 #define __CRT_HAVE_sys_Xioctlf 1
 #define __CRT_HAVE_sys_Xfsmode 1

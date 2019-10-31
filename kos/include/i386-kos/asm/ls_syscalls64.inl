@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa2fe289a */
+/* HASH CRC-32:0x732c5d4 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -405,12 +405,12 @@ __SYSCALL_EXTENDED(debugtrap)
 __SYSCALL_EXTENDED(select64)
 __SYSCALL_EXTENDED(rpc_service)
 __SYSCALL_EXTENDED(lfutex)
-__SYSCALL_EXTENDED(lfutexlock)
 __SYSCALL_EXTENDED(lfutexexpr)
 __SYSCALL_EXTENDED(lfutexlockexpr)
 __SYSCALL_EXTENDED(mktty)
 __SYSCALL_EXTENDED(raiseat)
 __SYSCALL_EXTENDED(coredump)
+__SYSCALL_EXTENDED_UNUSED(0x8000001f, 31, 31)
 __SYSCALL_EXTENDED_UNUSED(0x80000020, 32, 32)
 __SYSCALL_EXTENDED_UNUSED(0x80000021, 33, 33)
 __SYSCALL_EXTENDED_UNUSED(0x80000022, 34, 34)

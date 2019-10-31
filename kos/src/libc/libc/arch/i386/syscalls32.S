@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x84bf2abe */
+/* HASH CRC-32:0x55876f7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -11651,6 +11651,27 @@ INTERN_FUNCTION(libc_sys_debugtrap)
 	.cfi_endproc
 END(libc_sys_debugtrap)
 
+/* >> lfutex(2)
+ * Provide the bottom-most API for implementing user-space synchronization on KOS
+ * @param: futex_op: One of:
+ *    - LFUTEX_WAKE:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKE, size_t count)
+ *    - LFUTEX_NOP:                (lfutex_t *uaddr, syscall_ulong_t LFUTEX_NOP, size_t ignored)
+ *    - LFUTEX_WAIT:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT, lfutex ignored, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_LOCK:          (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_LOCK, lfutex_t lock_value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE, lfutex_t value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_UNTIL:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL, lfutex_t value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_ABOVE:   (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_ABOVE, lfutex_t value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BELOW:   (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_BELOW, lfutex_t value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BITMASK: (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_BITMASK, lfutex_t bitmask, struct timespec const *timeout, lfutex_t setmask)
+ *    - LFUTEX_WAIT_UNTIL_BITMASK: (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL_BITMASK, lfutex_t bitmask, struct timespec const *timeout, lfutex_t setmask)
+ *    - LFUTEX_WAIT_WHILE_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
+ *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
+ * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @return: * : Depending on `futex_op'
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @throw:  E_INVALID_ARGUMENT: The given `futex_op' is invalid
+ * @throw:  E_INTERRUPT:        A blocking futex-wait operation was interrupted
+ * @return: -ETIMEDOUT:         A blocking futex-wait operation has timed out */
 .section .text.crt.syscall.lfutex
 /* syscall_slong_t lfutex(uintptr_t *uaddr,
  *                        syscall_ulong_t futex_op,
@@ -11741,85 +11762,54 @@ INTERN_FUNCTION(libc_sys_lseek64)
 	.cfi_endproc
 END(libc_sys_lseek64)
 
-.section .text.crt.syscall.lfutexlock
-/* syscall_slong_t lfutexlock(uintptr_t *ulockaddr,
- *                            uintptr_t *uaddr,
- *                            syscall_ulong_t futex_op,
- *                            uintptr_t val,
- *                            struct __timespec64 const *timeout,
- *                            uintptr_t val2) */
-INTERN_FUNCTION(libc_sys_lfutexlock)
-	/* Argument count: 6 */
-	.cfi_startproc
-	movl   $SYS_lfutexlock, %eax
-#ifdef CONFIG_SYSCALL_USING_INT80
-	pushl_cfi_r %ebx
-	pushl_cfi_r %esi
-	pushl_cfi_r %edi
-	pushl_cfi_r %ebp
-	movl   20(%esp), %ebx
-	movl   24(%esp), %ecx
-	movl   28(%esp), %edx
-	movl   32(%esp), %esi
-	movl   36(%esp), %edi
-	movl   40(%esp), %ebp
-	clc
-	int    $0x80
-	popl_cfi_r %ebp
-	popl_cfi_r %edi
-	popl_cfi_r %esi
-	popl_cfi_r %ebx
-	ret
-#elif defined(CONFIG_SYSCALL_USING_SYSENTER)
-	pushl_cfi_r %edi
-	pushl_cfi_r %ebp
-	pushl_cfi_r %ebx
-	pushl_cfi_r %esi
-	movl   20(%esp), %ebx
-	movl   24(%esp), %ecx
-	movl   28(%esp), %edx
-	movl   32(%esp), %esi
-	pushl_cfi 40(%esp)
-	pushl_cfi 40(%esp)
-	call   libc_x86_sysenter_common
-	addl   $8, %esp
-	.cfi_adjust_cfa_offset -8
-	popl_cfi_r %esi
-	popl_cfi_r %ebx
-	popl_cfi_r %ebp
-	popl_cfi_r %edi
-	ret
-#else
-	jmp    libc_x86_exec_syscall6
-#endif
-	.cfi_endproc
-END(libc_sys_lfutexlock)
-
+/* >> lfutexexpr(2)
+ * The lfutexexpr() system call can be used to specify arbitrarily complex
+ * expressions that must atomically (in relation to other futex operations)
+ * hold true before the scheduler will suspend the calling thread, as well as
+ * have the calling thread wait for any number of futex objects associated with
+ * any address that is checked as part of the expression. (s.a. `lfutex()')
+ * Notes:
+ *   - This is the only futex function that can be used to wait on multiple futex
+ *     objects (i.e. resume execution when `LFUTEX_WAKE' is called on _any_ of them)
+ *   - For more precise control over waiting on futex objects, as well as waiting on
+ *     futexes in conjunction with waiting on other things such as files, see the
+ *     documentation on this topic (lfutex() and select()) at the top of <kos/futex.h>
+ * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
+ * @param: exprv:         Vector of expressions for which to check
+ * @param: exprc:         Number of expressions given in `exprv'
+ * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
+ * @return: * : The first non-zero return value from executing all of the given `exprv'
+ *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*' functions
+ *              to see their possible return values, which are always `0' when they would
+ *              perform a wait operation, and usually `1' otherwise) or `0' if the calling
+ *              thread had to perform a wait operation, at which point this function returning
+ *              that value means that you've once again been re-awoken.
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
+ * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
+ * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
 .section .text.crt.syscall.lfutexexpr
-/* errno_t lfutexexpr(uintptr_t *uaddr,
- *                    void *base,
- *                    struct lfutexexpr const *exprv,
+/* errno_t lfutexexpr(void *base,
  *                    size_t exprc,
+ *                    struct lfutexexpr const *exprv,
  *                    struct __timespec64 const *timeout,
  *                    syscall_ulong_t timeout_flags) */
 INTERN_FUNCTION(libc_sys_lfutexexpr)
-	/* Argument count: 6 */
+	/* Argument count: 5 */
 	.cfi_startproc
 	movl   $SYS_lfutexexpr, %eax
 #ifdef CONFIG_SYSCALL_USING_INT80
 	pushl_cfi_r %ebx
 	pushl_cfi_r %esi
 	pushl_cfi_r %edi
-	pushl_cfi_r %ebp
-	movl   20(%esp), %ebx
-	movl   24(%esp), %ecx
-	movl   28(%esp), %edx
-	movl   32(%esp), %esi
-	movl   36(%esp), %edi
-	movl   40(%esp), %ebp
+	movl   16(%esp), %ebx
+	movl   20(%esp), %ecx
+	movl   24(%esp), %edx
+	movl   28(%esp), %esi
+	movl   32(%esp), %edi
 	clc
 	int    $0x80
-	popl_cfi_r %ebp
 	popl_cfi_r %edi
 	popl_cfi_r %esi
 	popl_cfi_r %ebx
@@ -11833,27 +11823,53 @@ INTERN_FUNCTION(libc_sys_lfutexexpr)
 	movl   24(%esp), %ecx
 	movl   28(%esp), %edx
 	movl   32(%esp), %esi
-	pushl_cfi 40(%esp)
-	pushl_cfi 40(%esp)
+	pushl_cfi 36(%esp)
 	call   libc_x86_sysenter_common
-	addl   $8, %esp
-	.cfi_adjust_cfa_offset -8
+	addl   $4, %esp
+	.cfi_adjust_cfa_offset -4
 	popl_cfi_r %esi
 	popl_cfi_r %ebx
 	popl_cfi_r %ebp
 	popl_cfi_r %edi
 	ret
 #else
-	jmp    libc_x86_exec_syscall6
+	jmp    libc_x86_exec_syscall5
 #endif
 	.cfi_endproc
 END(libc_sys_lfutexexpr)
 
+/* >> lfutexlockexpr(2)
+ * A function that is similar to `lfutexexpr()', but allows for the use of one central
+ * locking futex that is used for waiting and may be distinct from any other given futex
+ * object pointer.
+ * Notes:
+ *   - This function only has the calling thread wait on a single futex `ulockaddr',
+ *     rather than having it wait on an arbitrary number of futexes, as would be the case when
+ *     the `lfutexexpr()' function is used.
+ *   - For more precise control over waiting on futex objects, as well as waiting on futexes
+ *     in conjunction with waiting on other things such as files, see the documentation on
+ *     this topic (lfutex() and select()) at the top of <kos/futex.h>
+ * @param: ulockaddr:     Address of the futex lock to-be used / The futex on which to wait
+ * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
+ * @param: exprv:         Vector of expressions for which to check
+ * @param: exprc:         Number of expressions given in `exprv'
+ * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
+ * @return: * : The first non-zero return value from executing all of the given `exprv'
+ *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*' functions
+ *              to see their possible return values, which are always `0' when they would
+ *              perform a wait operation, and usually `1' otherwise) or `0' if the calling
+ *              thread had to perform a wait operation, at which point this function returning
+ *              that value means that you've once again been re-awoken.
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
+ * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
+ * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
 .section .text.crt.syscall.lfutexlockexpr
 /* errno_t lfutexlockexpr(uintptr_t *ulockaddr,
  *                        void *base,
- *                        struct lfutexexpr const *exprv,
  *                        size_t exprc,
+ *                        struct lfutexexpr const *exprv,
  *                        struct __timespec64 const *timeout,
  *                        syscall_ulong_t timeout_flags) */
 INTERN_FUNCTION(libc_sys_lfutexlockexpr)
@@ -11989,35 +12005,6 @@ INTERN_FUNCTION(libc_sys_raiseat)
 	.cfi_endproc
 END(libc_sys_raiseat)
 
-.section .text.crt.syscall.stime64
-/* errno_t stime64(time64_t const *t) */
-INTERN_FUNCTION(libc_sys_stime64)
-	/* Argument count: 1 */
-	.cfi_startproc
-	movl   $SYS_stime64, %eax
-#ifdef CONFIG_SYSCALL_USING_INT80
-	pushl_cfi_r %ebx
-	movl   8(%esp), %ebx
-	clc
-	int    $0x80
-	popl_cfi_r %ebx
-	ret
-#elif defined(CONFIG_SYSCALL_USING_SYSENTER)
-	pushl_cfi_r %edi
-	pushl_cfi_r %ebp
-	pushl_cfi_r %ebx
-	movl   16(%esp), %ebx
-	call   libc_x86_sysenter_common
-	popl_cfi_r %ebx
-	popl_cfi_r %ebp
-	popl_cfi_r %edi
-	ret
-#else
-	jmp    libc_x86_exec_syscall1
-#endif
-	.cfi_endproc
-END(libc_sys_stime64)
-
 /* Trigger a coredump of the calling process.
  * @param: curr_state:       The state as is still valid after any possible unwinding has already been done
  *                           Note that this state does not necessarily point to the location that originally
@@ -12095,6 +12082,35 @@ INTERN_FUNCTION(libc_sys_coredump)
 #endif
 	.cfi_endproc
 END(libc_sys_coredump)
+
+.section .text.crt.syscall.stime64
+/* errno_t stime64(time64_t const *t) */
+INTERN_FUNCTION(libc_sys_stime64)
+	/* Argument count: 1 */
+	.cfi_startproc
+	movl   $SYS_stime64, %eax
+#ifdef CONFIG_SYSCALL_USING_INT80
+	pushl_cfi_r %ebx
+	movl   8(%esp), %ebx
+	clc
+	int    $0x80
+	popl_cfi_r %ebx
+	ret
+#elif defined(CONFIG_SYSCALL_USING_SYSENTER)
+	pushl_cfi_r %edi
+	pushl_cfi_r %ebp
+	pushl_cfi_r %ebx
+	movl   16(%esp), %ebx
+	call   libc_x86_sysenter_common
+	popl_cfi_r %ebx
+	popl_cfi_r %ebp
+	popl_cfi_r %edi
+	ret
+#else
+	jmp    libc_x86_exec_syscall1
+#endif
+	.cfi_endproc
+END(libc_sys_stime64)
 
 .section .text.crt.syscall.utime64
 /* errno_t utime64(char const *filename,
@@ -24908,6 +24924,27 @@ INTERN_FUNCTION(libc_sys_Xdebugtrap)
 	.cfi_endproc
 END(libc_sys_Xdebugtrap)
 
+/* >> lfutex(2)
+ * Provide the bottom-most API for implementing user-space synchronization on KOS
+ * @param: futex_op: One of:
+ *    - LFUTEX_WAKE:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKE, size_t count)
+ *    - LFUTEX_NOP:                (lfutex_t *uaddr, syscall_ulong_t LFUTEX_NOP, size_t ignored)
+ *    - LFUTEX_WAIT:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT, lfutex ignored, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_LOCK:          (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_LOCK, lfutex_t lock_value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE, lfutex_t value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_UNTIL:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL, lfutex_t value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_ABOVE:   (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_ABOVE, lfutex_t value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BELOW:   (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_BELOW, lfutex_t value, struct timespec const *timeout)
+ *    - LFUTEX_WAIT_WHILE_BITMASK: (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_BITMASK, lfutex_t bitmask, struct timespec const *timeout, lfutex_t setmask)
+ *    - LFUTEX_WAIT_UNTIL_BITMASK: (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL_BITMASK, lfutex_t bitmask, struct timespec const *timeout, lfutex_t setmask)
+ *    - LFUTEX_WAIT_WHILE_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
+ *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
+ * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @return: * : Depending on `futex_op'
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @throw:  E_INVALID_ARGUMENT: The given `futex_op' is invalid
+ * @throw:  E_INTERRUPT:        A blocking futex-wait operation was interrupted
+ * @return: -ETIMEDOUT:         A blocking futex-wait operation has timed out */
 .section .text.crt.syscall.Xlfutex
 /* syscall_slong_t lfutex(uintptr_t *uaddr,
  *                        syscall_ulong_t futex_op,
@@ -24998,85 +25035,54 @@ INTERN_FUNCTION(libc_sys_Xlseek64)
 	.cfi_endproc
 END(libc_sys_Xlseek64)
 
-.section .text.crt.syscall.Xlfutexlock
-/* syscall_slong_t lfutexlock(uintptr_t *ulockaddr,
- *                            uintptr_t *uaddr,
- *                            syscall_ulong_t futex_op,
- *                            uintptr_t val,
- *                            struct __timespec64 const *timeout,
- *                            uintptr_t val2) */
-INTERN_FUNCTION(libc_sys_Xlfutexlock)
-	/* Argument count: 6 */
-	.cfi_startproc
-	movl   $SYS_lfutexlock, %eax
-#ifdef CONFIG_SYSCALL_USING_INT80
-	pushl_cfi_r %ebx
-	pushl_cfi_r %esi
-	pushl_cfi_r %edi
-	pushl_cfi_r %ebp
-	movl   20(%esp), %ebx
-	movl   24(%esp), %ecx
-	movl   28(%esp), %edx
-	movl   32(%esp), %esi
-	movl   36(%esp), %edi
-	movl   40(%esp), %ebp
-	stc
-	int    $0x80
-	popl_cfi_r %ebp
-	popl_cfi_r %edi
-	popl_cfi_r %esi
-	popl_cfi_r %ebx
-	ret
-#elif defined(CONFIG_SYSCALL_USING_SYSENTER)
-	pushl_cfi_r %edi
-	pushl_cfi_r %ebp
-	pushl_cfi_r %ebx
-	pushl_cfi_r %esi
-	movl   20(%esp), %ebx
-	movl   24(%esp), %ecx
-	movl   28(%esp), %edx
-	movl   32(%esp), %esi
-	pushl_cfi 40(%esp)
-	pushl_cfi 40(%esp)
-	call   libc_x86_sysenter_Xcommon
-	addl   $8, %esp
-	.cfi_adjust_cfa_offset -8
-	popl_cfi_r %esi
-	popl_cfi_r %ebx
-	popl_cfi_r %ebp
-	popl_cfi_r %edi
-	ret
-#else
-	jmp    libc_x86_exec_Xsyscall6
-#endif
-	.cfi_endproc
-END(libc_sys_Xlfutexlock)
-
+/* >> lfutexexpr(2)
+ * The lfutexexpr() system call can be used to specify arbitrarily complex
+ * expressions that must atomically (in relation to other futex operations)
+ * hold true before the scheduler will suspend the calling thread, as well as
+ * have the calling thread wait for any number of futex objects associated with
+ * any address that is checked as part of the expression. (s.a. `lfutex()')
+ * Notes:
+ *   - This is the only futex function that can be used to wait on multiple futex
+ *     objects (i.e. resume execution when `LFUTEX_WAKE' is called on _any_ of them)
+ *   - For more precise control over waiting on futex objects, as well as waiting on
+ *     futexes in conjunction with waiting on other things such as files, see the
+ *     documentation on this topic (lfutex() and select()) at the top of <kos/futex.h>
+ * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
+ * @param: exprv:         Vector of expressions for which to check
+ * @param: exprc:         Number of expressions given in `exprv'
+ * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
+ * @return: * : The first non-zero return value from executing all of the given `exprv'
+ *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*' functions
+ *              to see their possible return values, which are always `0' when they would
+ *              perform a wait operation, and usually `1' otherwise) or `0' if the calling
+ *              thread had to perform a wait operation, at which point this function returning
+ *              that value means that you've once again been re-awoken.
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
+ * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
+ * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
 .section .text.crt.syscall.Xlfutexexpr
-/* errno_t lfutexexpr(uintptr_t *uaddr,
- *                    void *base,
- *                    struct lfutexexpr const *exprv,
+/* errno_t lfutexexpr(void *base,
  *                    size_t exprc,
+ *                    struct lfutexexpr const *exprv,
  *                    struct __timespec64 const *timeout,
  *                    syscall_ulong_t timeout_flags) */
 INTERN_FUNCTION(libc_sys_Xlfutexexpr)
-	/* Argument count: 6 */
+	/* Argument count: 5 */
 	.cfi_startproc
 	movl   $SYS_lfutexexpr, %eax
 #ifdef CONFIG_SYSCALL_USING_INT80
 	pushl_cfi_r %ebx
 	pushl_cfi_r %esi
 	pushl_cfi_r %edi
-	pushl_cfi_r %ebp
-	movl   20(%esp), %ebx
-	movl   24(%esp), %ecx
-	movl   28(%esp), %edx
-	movl   32(%esp), %esi
-	movl   36(%esp), %edi
-	movl   40(%esp), %ebp
+	movl   16(%esp), %ebx
+	movl   20(%esp), %ecx
+	movl   24(%esp), %edx
+	movl   28(%esp), %esi
+	movl   32(%esp), %edi
 	stc
 	int    $0x80
-	popl_cfi_r %ebp
 	popl_cfi_r %edi
 	popl_cfi_r %esi
 	popl_cfi_r %ebx
@@ -25090,27 +25096,53 @@ INTERN_FUNCTION(libc_sys_Xlfutexexpr)
 	movl   24(%esp), %ecx
 	movl   28(%esp), %edx
 	movl   32(%esp), %esi
-	pushl_cfi 40(%esp)
-	pushl_cfi 40(%esp)
+	pushl_cfi 36(%esp)
 	call   libc_x86_sysenter_Xcommon
-	addl   $8, %esp
-	.cfi_adjust_cfa_offset -8
+	addl   $4, %esp
+	.cfi_adjust_cfa_offset -4
 	popl_cfi_r %esi
 	popl_cfi_r %ebx
 	popl_cfi_r %ebp
 	popl_cfi_r %edi
 	ret
 #else
-	jmp    libc_x86_exec_Xsyscall6
+	jmp    libc_x86_exec_Xsyscall5
 #endif
 	.cfi_endproc
 END(libc_sys_Xlfutexexpr)
 
+/* >> lfutexlockexpr(2)
+ * A function that is similar to `lfutexexpr()', but allows for the use of one central
+ * locking futex that is used for waiting and may be distinct from any other given futex
+ * object pointer.
+ * Notes:
+ *   - This function only has the calling thread wait on a single futex `ulockaddr',
+ *     rather than having it wait on an arbitrary number of futexes, as would be the case when
+ *     the `lfutexexpr()' function is used.
+ *   - For more precise control over waiting on futex objects, as well as waiting on futexes
+ *     in conjunction with waiting on other things such as files, see the documentation on
+ *     this topic (lfutex() and select()) at the top of <kos/futex.h>
+ * @param: ulockaddr:     Address of the futex lock to-be used / The futex on which to wait
+ * @param: base:          Base pointer added to the `fe_offset' fields of given expressions
+ * @param: exprv:         Vector of expressions for which to check
+ * @param: exprc:         Number of expressions given in `exprv'
+ * @param: timeout:       Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
+ * @param: timeout_flags: Set of `LFUTEX_WAIT_FLAG_TIMEOUT_*'
+ * @return: * : The first non-zero return value from executing all of the given `exprv'
+ *              in order (s.a. the documentations of the individual `LFUTEX_WAIT_*' functions
+ *              to see their possible return values, which are always `0' when they would
+ *              perform a wait operation, and usually `1' otherwise) or `0' if the calling
+ *              thread had to perform a wait operation, at which point this function returning
+ *              that value means that you've once again been re-awoken.
+ * @return: -1:EFAULT:    A faulty pointer was given
+ * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
+ * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
+ * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
 .section .text.crt.syscall.Xlfutexlockexpr
 /* errno_t lfutexlockexpr(uintptr_t *ulockaddr,
  *                        void *base,
- *                        struct lfutexexpr const *exprv,
  *                        size_t exprc,
+ *                        struct lfutexexpr const *exprv,
  *                        struct __timespec64 const *timeout,
  *                        syscall_ulong_t timeout_flags) */
 INTERN_FUNCTION(libc_sys_Xlfutexlockexpr)
@@ -25246,35 +25278,6 @@ INTERN_FUNCTION(libc_sys_Xraiseat)
 	.cfi_endproc
 END(libc_sys_Xraiseat)
 
-.section .text.crt.syscall.Xstime64
-/* errno_t stime64(time64_t const *t) */
-INTERN_FUNCTION(libc_sys_Xstime64)
-	/* Argument count: 1 */
-	.cfi_startproc
-	movl   $SYS_stime64, %eax
-#ifdef CONFIG_SYSCALL_USING_INT80
-	pushl_cfi_r %ebx
-	movl   8(%esp), %ebx
-	stc
-	int    $0x80
-	popl_cfi_r %ebx
-	ret
-#elif defined(CONFIG_SYSCALL_USING_SYSENTER)
-	pushl_cfi_r %edi
-	pushl_cfi_r %ebp
-	pushl_cfi_r %ebx
-	movl   16(%esp), %ebx
-	call   libc_x86_sysenter_Xcommon
-	popl_cfi_r %ebx
-	popl_cfi_r %ebp
-	popl_cfi_r %edi
-	ret
-#else
-	jmp    libc_x86_exec_Xsyscall1
-#endif
-	.cfi_endproc
-END(libc_sys_Xstime64)
-
 /* Trigger a coredump of the calling process.
  * @param: curr_state:       The state as is still valid after any possible unwinding has already been done
  *                           Note that this state does not necessarily point to the location that originally
@@ -25352,6 +25355,35 @@ INTERN_FUNCTION(libc_sys_Xcoredump)
 #endif
 	.cfi_endproc
 END(libc_sys_Xcoredump)
+
+.section .text.crt.syscall.Xstime64
+/* errno_t stime64(time64_t const *t) */
+INTERN_FUNCTION(libc_sys_Xstime64)
+	/* Argument count: 1 */
+	.cfi_startproc
+	movl   $SYS_stime64, %eax
+#ifdef CONFIG_SYSCALL_USING_INT80
+	pushl_cfi_r %ebx
+	movl   8(%esp), %ebx
+	stc
+	int    $0x80
+	popl_cfi_r %ebx
+	ret
+#elif defined(CONFIG_SYSCALL_USING_SYSENTER)
+	pushl_cfi_r %edi
+	pushl_cfi_r %ebp
+	pushl_cfi_r %ebx
+	movl   16(%esp), %ebx
+	call   libc_x86_sysenter_Xcommon
+	popl_cfi_r %ebx
+	popl_cfi_r %ebp
+	popl_cfi_r %edi
+	ret
+#else
+	jmp    libc_x86_exec_Xsyscall1
+#endif
+	.cfi_endproc
+END(libc_sys_Xstime64)
 
 .section .text.crt.syscall.Xutime64
 /* errno_t utime64(char const *filename,
@@ -27513,13 +27545,12 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_set_library_listdef, libc_sys_set_library_listdef)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_debugtrap, libc_sys_debugtrap)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_lfutex, libc_sys_lfutex)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_lseek64, libc_sys_lseek64)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_lfutexlock, libc_sys_lfutexlock)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_lfutexexpr, libc_sys_lfutexexpr)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_lfutexlockexpr, libc_sys_lfutexlockexpr)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_mktty, libc_sys_mktty)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_raiseat, libc_sys_raiseat)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_stime64, libc_sys_stime64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_coredump, libc_sys_coredump)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_stime64, libc_sys_stime64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_utime64, libc_sys_utime64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_ioctlf, libc_sys_ioctlf)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_fsmode, libc_sys_fsmode)
@@ -27877,13 +27908,12 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_Xset_library_listdef, libc_sys_Xset_library_listdef
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xdebugtrap, libc_sys_Xdebugtrap)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xlfutex, libc_sys_Xlfutex)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xlseek64, libc_sys_Xlseek64)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xlfutexlock, libc_sys_Xlfutexlock)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xlfutexexpr, libc_sys_Xlfutexexpr)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xlfutexlockexpr, libc_sys_Xlfutexlockexpr)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xmktty, libc_sys_Xmktty)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xraiseat, libc_sys_Xraiseat)
-DEFINE_PUBLIC_WEAK_ALIAS(sys_Xstime64, libc_sys_Xstime64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xcoredump, libc_sys_Xcoredump)
+DEFINE_PUBLIC_WEAK_ALIAS(sys_Xstime64, libc_sys_Xstime64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xutime64, libc_sys_Xutime64)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xioctlf, libc_sys_Xioctlf)
 DEFINE_PUBLIC_WEAK_ALIAS(sys_Xfsmode, libc_sys_Xfsmode)

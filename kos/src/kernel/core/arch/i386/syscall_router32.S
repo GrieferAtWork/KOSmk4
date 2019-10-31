@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd9038242 */
+/* HASH CRC-32:0x56c406f0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -342,13 +342,12 @@ EXTERN(sys_set_library_listdef)
 EXTERN(sys_debugtrap)
 EXTERN(sys_lfutex)
 EXTERN(sys_lseek64)
-EXTERN(sys_lfutexlock)
 EXTERN(sys_lfutexexpr)
 EXTERN(sys_lfutexlockexpr)
 EXTERN(sys_mktty)
 EXTERN(sys_raiseat)
-EXTERN(sys_stime64)
 EXTERN(sys_coredump)
+EXTERN(sys_stime64)
 EXTERN(sys_utime64)
 EXTERN(sys_ioctlf)
 EXTERN(sys_fsmode)
@@ -708,13 +707,12 @@ INTERN(__asm32_int80_set_library_listdef)
 INTERN(__asm32_int80_debugtrap)
 INTERN(__asm32_int80_lfutex)
 INTERN(__asm32_int80_lseek64)
-INTERN(__asm32_int80_lfutexlock)
 INTERN(__asm32_int80_lfutexexpr)
 INTERN(__asm32_int80_lfutexlockexpr)
 INTERN(__asm32_int80_mktty)
 INTERN(__asm32_int80_raiseat)
-INTERN(__asm32_int80_stime64)
 INTERN(__asm32_int80_coredump)
+INTERN(__asm32_int80_stime64)
 INTERN(__asm32_int80_utime64)
 INTERN(__asm32_int80_ioctlf)
 INTERN(__asm32_int80_fsmode)
@@ -1074,13 +1072,12 @@ INTERN(__asm32_sysenter_set_library_listdef)
 INTERN(__asm32_sysenter_debugtrap)
 INTERN(__asm32_sysenter_lfutex)
 INTERN(__asm32_sysenter_lseek64)
-INTERN(__asm32_sysenter_lfutexlock)
 INTERN(__asm32_sysenter_lfutexexpr)
 INTERN(__asm32_sysenter_lfutexlockexpr)
 INTERN(__asm32_sysenter_mktty)
 INTERN(__asm32_sysenter_raiseat)
-INTERN(__asm32_sysenter_stime64)
 INTERN(__asm32_sysenter_coredump)
+INTERN(__asm32_sysenter_stime64)
 INTERN(__asm32_sysenter_utime64)
 INTERN(__asm32_sysenter_ioctlf)
 INTERN(__asm32_sysenter_fsmode)
@@ -1531,13 +1528,13 @@ PUBLIC_OBJECT(__asm32_exsyscallrouter_int80)
 	.long __asm32_int80_debugtrap               /* 0x80000011 */
 	.long __asm32_int80_lfutex                  /* 0x80000012 */
 	.long __asm32_int80_lseek64                 /* 0x80000013 */
-	.long __asm32_int80_lfutexlock              /* 0x80000014 */
-	.long __asm32_int80_lfutexexpr              /* 0x80000015 */
-	.long __asm32_int80_lfutexlockexpr          /* 0x80000016 */
-	.long __asm32_int80_mktty                   /* 0x80000017 */
-	.long __asm32_int80_raiseat                 /* 0x80000018 */
+	.long __asm32_int80_lfutexexpr              /* 0x80000014 */
+	.long __asm32_int80_lfutexlockexpr          /* 0x80000015 */
+	.long __asm32_int80_mktty                   /* 0x80000016 */
+	.long __asm32_int80_raiseat                 /* 0x80000017 */
+	.long __asm32_int80_coredump                /* 0x80000018 */
 	.long __asm32_int80_stime64                 /* 0x80000019 */
-	.long __asm32_int80_coredump                /* 0x8000001a */
+	.long __asm32_int80_invalid
 	.long __asm32_int80_invalid
 	.long __asm32_int80_invalid
 	.long __asm32_int80_invalid
@@ -2254,13 +2251,13 @@ PUBLIC_OBJECT(__asm32_exsyscallrouter_sysenter)
 	.long __asm32_sysenter_debugtrap               /* 0x80000011 */
 	.long __asm32_sysenter_lfutex                  /* 0x80000012 */
 	.long __asm32_sysenter_lseek64                 /* 0x80000013 */
-	.long __asm32_sysenter_lfutexlock              /* 0x80000014 */
-	.long __asm32_sysenter_lfutexexpr              /* 0x80000015 */
-	.long __asm32_sysenter_lfutexlockexpr          /* 0x80000016 */
-	.long __asm32_sysenter_mktty                   /* 0x80000017 */
-	.long __asm32_sysenter_raiseat                 /* 0x80000018 */
+	.long __asm32_sysenter_lfutexexpr              /* 0x80000014 */
+	.long __asm32_sysenter_lfutexlockexpr          /* 0x80000015 */
+	.long __asm32_sysenter_mktty                   /* 0x80000016 */
+	.long __asm32_sysenter_raiseat                 /* 0x80000017 */
+	.long __asm32_sysenter_coredump                /* 0x80000018 */
 	.long __asm32_sysenter_stime64                 /* 0x80000019 */
-	.long __asm32_sysenter_coredump                /* 0x8000001a */
+	.long __asm32_sysenter_invalid
 	.long __asm32_sysenter_invalid
 	.long __asm32_sysenter_invalid
 	.long __asm32_sysenter_invalid
@@ -2977,13 +2974,13 @@ PUBLIC_OBJECT(__c32_exsyscallrouter)
 	.long sys_debugtrap               /* 0x80000011 */
 	.long sys_lfutex                  /* 0x80000012 */
 	.long sys_lseek64                 /* 0x80000013 */
-	.long sys_lfutexlock              /* 0x80000014 */
-	.long sys_lfutexexpr              /* 0x80000015 */
-	.long sys_lfutexlockexpr          /* 0x80000016 */
-	.long sys_mktty                   /* 0x80000017 */
-	.long sys_raiseat                 /* 0x80000018 */
+	.long sys_lfutexexpr              /* 0x80000014 */
+	.long sys_lfutexlockexpr          /* 0x80000015 */
+	.long sys_mktty                   /* 0x80000016 */
+	.long sys_raiseat                 /* 0x80000017 */
+	.long sys_coredump                /* 0x80000018 */
 	.long sys_stime64                 /* 0x80000019 */
-	.long sys_coredump                /* 0x8000001a */
+	.long sys_invalid0
 	.long sys_invalid0
 	.long sys_invalid0
 	.long sys_invalid0

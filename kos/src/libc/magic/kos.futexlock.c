@@ -19,6 +19,7 @@
 
 %[define_replacement(lfutex_t = __uintptr_t)]
 %[define_replacement(syscall_ulong_t = __syscall_ulong_t)]
+%[default_impl_section(.text.crt.sched.futexlock)]
 
 %{
 #include <features.h>
@@ -42,16 +43,20 @@ typedef __uintptr_t lfutex_t;
 }
 
 [cp][doc_alias(lfutexlock)][ignore][vartypes($uintptr_t, $uintptr_t)]
-lfutexlock32:([nonnull] lfutex_t *ulockaddr, [nonnull] lfutex_t *uaddr, [nonnull] lfutex_t *uaddr, $syscall_ulong_t command, lfutex_t val, /*struct timespec const *timeout, lfutex_t val2*/...) -> $ssize_t = lfutexlock?;
+lfutexlock32:([nonnull] lfutex_t *ulockaddr, [nonnull] lfutex_t *uaddr,
+              $syscall_ulong_t futex_op, lfutex_t val,
+              /*struct timespec const *timeout, lfutex_t val2*/...) -> $ssize_t = lfutexlock?;
 
-@@>> lfutexlock(2)
-@@High-level wrapper around the lfutexlockat system call
+@@>> lfutexlock(3)
+@@Helper function to implement the behavior of `lfutexlockexpr()' for only a single futex.
 @@This function behaves identical to the lfutex() system call, except that it takes
-@@two futex addresses, where `ulockaddr' is used as a flag specifying that threads may
-@@be waiting to be awoken once `LFUTEX_WAKE' is invoked on that memory location, whilst
-@@the other futex address is used for the wait-while-condition checking, the same way
-@@those checks would also be performed by the `lfutex() system call'
-@@@param: command: One of:
+@@two futex addresses, where `ulockaddr' is used as a counter specifying the max number
+@@of how threads that may be waiting (though less than that may be waiting for real) to be
+@@awoken once `LFUTEX_WAKE' is invoked on that memory location (aka. `futexlock_wakeall(ulockaddr)'),
+@@whilst the other futex address (i.e. `uaddr') is used for the wait-while-condition checking,
+@@the same way those checks would
+@@also be performed by the `lfutex() system call'
+@@@param: futex_op: One of:
 @@   - LFUTEX_WAKE:              (lfutex_t *ulockaddr, lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKE, size_t count)
 @@   - LFUTEX_NOP:               (lfutex_t *ulockaddr, lfutex_t *uaddr, syscall_ulong_t LFUTEX_NOP, size_t ignored)
 @@   - LFUTEX_WAIT:              (lfutex_t *ulockaddr, lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT, lfutexlock ignored, struct timespec const *timeout)
@@ -63,9 +68,9 @@ lfutexlock32:([nonnull] lfutex_t *ulockaddr, [nonnull] lfutex_t *uaddr, [nonnull
 @@   - LFUTEX_WAIT_WHILE_CMPXCH: (lfutex_t *ulockaddr, lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
 @@   - LFUTEX_WAIT_UNTIL_CMPXCH: (lfutex_t *ulockaddr, lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
 @@@param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
-@@@return: * : Depending on `command'
+@@@return: * : Depending on `futex_op'
 @@@return: -1:EFAULT:    A faulty pointer was given
-@@@return: -1:EINVAL:    The given `command' is invalid
+@@@return: -1:EINVAL:    The given `futex_op' is invalid
 @@@return: -1:EINTR:     A blocking futex-wait operation was interrupted
 @@@return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out
 [cp][vartypes(void *, $uintptr_t)]
@@ -73,39 +78,35 @@ lfutexlock32:([nonnull] lfutex_t *ulockaddr, [nonnull] lfutex_t *uaddr, [nonnull
 [dependency_string(defined(__CRT_HAVE_lfutexlock) || defined(__CRT_HAVE_lfutexlock64))]
 [if(defined(__USE_TIME_BITS64)), preferred_alias(lfutexlock64)]
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(lfutexlock)]
-lfutexlock:([nonnull] lfutex_t *ulockaddr, [nonnull] lfutex_t *uaddr, $syscall_ulong_t command, lfutex_t val, /*struct timespec const *timeout, lfutex_t val2*/...) -> $ssize_t {
+lfutexlock:([nonnull] lfutex_t *ulockaddr, [nonnull] lfutex_t *uaddr, $syscall_ulong_t futex_op, lfutex_t val, /*struct timespec const *timeout, lfutex_t val2*/...) -> $ssize_t {
 #ifdef __CRT_HAVE_lfutexlock
 	va_list args;
 	lfutex_t val2;
 	struct timespec32 tms32;
 	struct timespec64 *timeout;
-	if (!@LFUTEX_USES_TIMEOUT@(command))
-		return lfutexlock32(ulockaddr, uaddr, command, val);
 	va_start(args, val);
 	timeout = va_arg(args, struct timespec64 *);
 	val2 = va_arg(args, lfutex_t);
 	va_end(args);
-	if (!timeout)
-		return lfutexlock32(ulockaddr, uaddr, command, val, (struct timespec32 *)NULL, val2);
+	if (!timeout || !@LFUTEX_USES_TIMEOUT@(futex_op))
+		return lfutexlock32(ulockaddr, uaddr, futex_op, val, (struct timespec32 *)NULL, val2);
 	tms32.@tv_sec@  = (__time32_t)timeout->@tv_sec@;
 	tms32.@tv_nsec@ = timeout->@tv_nsec@;
-	return lfutexlock32(ulockaddr, uaddr, command, val, &tms32, val2);
+	return lfutexlock32(ulockaddr, uaddr, futex_op, val, &tms32, val2);
 #else /* __CRT_HAVE_lfutexlock */
 	va_list args;
 	lfutex_t val2;
 	struct timespec64 tms64;
 	struct timespec32 *timeout;
-	if (!@LFUTEX_USES_TIMEOUT@(command))
-		return lfutexlock64(ulockaddr, uaddr, command, val);
 	va_start(args, val);
 	timeout = va_arg(args, struct timespec32 *);
 	val2 = va_arg(args, lfutex_t);
 	va_end(args);
-	if (!timeout)
-		return lfutexlock64(ulockaddr, uaddr, command, val, (struct timespec64 *)NULL, val2);
+	if (!timeout || !@LFUTEX_USES_TIMEOUT@(futex_op))
+		return lfutexlock64(ulockaddr, uaddr, futex_op, val, (struct timespec64 *)NULL, val2);
 	tms64.@tv_sec@  = (__time64_t)timeout->@tv_sec@;
 	tms64.@tv_nsec@ = timeout->@tv_nsec@;
-	return lfutexlock64(ulockaddr, uaddr, command, val, &tms64, val2);
+	return lfutexlock64(ulockaddr, uaddr, futex_op, val, &tms64, val2);
 #endif /* !__CRT_HAVE_lfutexlock */
 }
 
@@ -115,22 +116,20 @@ lfutexlock:([nonnull] lfutex_t *ulockaddr, [nonnull] lfutex_t *uaddr, $syscall_u
 [cp][time64_variant_of(lfutexlock)][vartypes(void *, $uintptr_t)]
 [requires(defined(__CRT_HAVE_lfutexlock))]
 [dependency_string(defined(__CRT_HAVE_lfutexlock64) || defined(__CRT_HAVE_lfutexlock))]
-lfutexlock64:([nonnull] lfutex_t *ulockaddr, [nonnull] lfutex_t *uaddr, $syscall_ulong_t command, lfutex_t val, /*struct timespec64 const *timeout, lfutex_t val2*/...) -> $ssize_t {
+lfutexlock64:([nonnull] lfutex_t *ulockaddr, [nonnull] lfutex_t *uaddr, $syscall_ulong_t futex_op, lfutex_t val, /*struct timespec64 const *timeout, lfutex_t val2*/...) -> $ssize_t {
 	va_list args;
 	lfutex_t val2;
 	struct timespec32 tms32;
 	struct timespec64 *timeout;
-	if (!@LFUTEX_USES_TIMEOUT@(command))
-		return lfutexlock32(ulockaddr, uaddr, command, val);
 	va_start(args, val);
 	timeout = va_arg(args, struct timespec64 *);
 	val2 = va_arg(args, lfutex_t);
 	va_end(args);
-	if (!timeout)
-		return lfutexlock32(ulockaddr, uaddr, command, val, (struct timespec32 *)NULL, val2);
+	if (!timeout || !@LFUTEX_USES_TIMEOUT@(futex_op))
+		return lfutexlock32(ulockaddr, uaddr, futex_op, val, (struct timespec32 *)NULL, val2);
 	tms32.@tv_sec@  = (__time32_t)timeout->@tv_sec@;
 	tms32.@tv_nsec@ = timeout->@tv_nsec@;
-	return lfutexlock32(ulockaddr, uaddr, command, val, &tms32, val2);
+	return lfutexlock32(ulockaddr, uaddr, futex_op, val, &tms32, val2);
 }
 %#endif /* __USE_TIME64 */
 

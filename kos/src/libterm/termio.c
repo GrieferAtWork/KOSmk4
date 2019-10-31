@@ -1405,8 +1405,9 @@ again_connect:
 			/* self->t_ibuf.rb_avail == 0 */
 			LFUTEXEXPR_TEQUAL(struct terminal, t_ibuf.rb_avail, 0)
 		};
-		if (lfutexlockexpr(&self->t_ibuf.rb_nempty, self, expr,
-		                   COMPILER_LENOF(expr), NULL, 0) < 0)
+		if (lfutexlockexpr(&self->t_ibuf.rb_nempty, self,
+		                   COMPILER_LENOF(expr), expr,
+		                   NULL, 0) < 0)
 			return -1;
 	}
 #endif /* !__KERNEL__ */

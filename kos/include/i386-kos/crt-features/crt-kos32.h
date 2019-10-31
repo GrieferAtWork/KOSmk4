@@ -3403,7 +3403,6 @@
 #define __CRT_HAVE_sys_Xlchown32 1
 #define __CRT_HAVE_sys_Xlfutex 1
 #define __CRT_HAVE_sys_Xlfutexexpr 1
-#define __CRT_HAVE_sys_Xlfutexlock 1
 #define __CRT_HAVE_sys_Xlfutexlockexpr 1
 #define __CRT_HAVE_sys_Xlgetxattr 1
 #define __CRT_HAVE_sys_Xlink 1
@@ -3765,7 +3764,6 @@
 #define __CRT_HAVE_sys_lchown32 1
 #define __CRT_HAVE_sys_lfutex 1
 #define __CRT_HAVE_sys_lfutexexpr 1
-#define __CRT_HAVE_sys_lfutexlock 1
 #define __CRT_HAVE_sys_lfutexlockexpr 1
 #define __CRT_HAVE_sys_lgetxattr 1
 #define __CRT_HAVE_sys_link 1

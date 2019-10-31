@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x11222ccf */
+/* HASH CRC-32:0xade7fd66 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -343,13 +343,12 @@ EXTERN(sys32_set_library_listdef)
 EXTERN(sys32_debugtrap)
 EXTERN(sys32_lfutex)
 EXTERN(sys32_lseek64)
-EXTERN(sys32_lfutexlock)
 EXTERN(sys32_lfutexexpr)
 EXTERN(sys32_lfutexlockexpr)
 EXTERN(sys32_mktty)
 EXTERN(sys32_raiseat)
-EXTERN(sys32_stime64)
 EXTERN(sys32_coredump)
+EXTERN(sys32_stime64)
 EXTERN(sys32_utime64)
 EXTERN(sys32_ioctlf)
 EXTERN(sys32_fsmode)
@@ -668,7 +667,6 @@ EXTERN(sys_debugtrap)
 EXTERN(sys_select64)
 EXTERN(sys_rpc_service)
 EXTERN(sys_lfutex)
-EXTERN(sys_lfutexlock)
 EXTERN(sys_lfutexexpr)
 EXTERN(sys_lfutexlockexpr)
 EXTERN(sys_mktty)
@@ -969,7 +967,6 @@ INTERN(__asm64_syscall_debugtrap)
 INTERN(__asm64_syscall_select64)
 INTERN(__asm64_syscall_rpc_service)
 INTERN(__asm64_syscall_lfutex)
-INTERN(__asm64_syscall_lfutexlock)
 INTERN(__asm64_syscall_lfutexexpr)
 INTERN(__asm64_syscall_lfutexlockexpr)
 INTERN(__asm64_syscall_mktty)
@@ -1311,13 +1308,12 @@ INTERN(__asm32_int80_set_library_listdef)
 INTERN(__asm32_int80_debugtrap)
 INTERN(__asm32_int80_lfutex)
 INTERN(__asm32_int80_lseek64)
-INTERN(__asm32_int80_lfutexlock)
 INTERN(__asm32_int80_lfutexexpr)
 INTERN(__asm32_int80_lfutexlockexpr)
 INTERN(__asm32_int80_mktty)
 INTERN(__asm32_int80_raiseat)
-INTERN(__asm32_int80_stime64)
 INTERN(__asm32_int80_coredump)
+INTERN(__asm32_int80_stime64)
 INTERN(__asm32_int80_utime64)
 INTERN(__asm32_int80_ioctlf)
 INTERN(__asm32_int80_fsmode)
@@ -1677,13 +1673,12 @@ INTERN(__asm32_sysenter_set_library_listdef)
 INTERN(__asm32_sysenter_debugtrap)
 INTERN(__asm32_sysenter_lfutex)
 INTERN(__asm32_sysenter_lseek64)
-INTERN(__asm32_sysenter_lfutexlock)
 INTERN(__asm32_sysenter_lfutexexpr)
 INTERN(__asm32_sysenter_lfutexlockexpr)
 INTERN(__asm32_sysenter_mktty)
 INTERN(__asm32_sysenter_raiseat)
-INTERN(__asm32_sysenter_stime64)
 INTERN(__asm32_sysenter_coredump)
+INTERN(__asm32_sysenter_stime64)
 INTERN(__asm32_sysenter_utime64)
 INTERN(__asm32_sysenter_ioctlf)
 INTERN(__asm32_sysenter_fsmode)
@@ -2090,12 +2085,12 @@ PUBLIC_OBJECT(__asm64_exsyscallrouter)
 	.quad __asm64_syscall_select64              /* 0x80000017 */
 	.quad __asm64_syscall_rpc_service           /* 0x80000018 */
 	.quad __asm64_syscall_lfutex                /* 0x80000019 */
-	.quad __asm64_syscall_lfutexlock            /* 0x8000001a */
-	.quad __asm64_syscall_lfutexexpr            /* 0x8000001b */
-	.quad __asm64_syscall_lfutexlockexpr        /* 0x8000001c */
-	.quad __asm64_syscall_mktty                 /* 0x8000001d */
-	.quad __asm64_syscall_raiseat               /* 0x8000001e */
-	.quad __asm64_syscall_coredump              /* 0x8000001f */
+	.quad __asm64_syscall_lfutexexpr            /* 0x8000001a */
+	.quad __asm64_syscall_lfutexlockexpr        /* 0x8000001b */
+	.quad __asm64_syscall_mktty                 /* 0x8000001c */
+	.quad __asm64_syscall_raiseat               /* 0x8000001d */
+	.quad __asm64_syscall_coredump              /* 0x8000001e */
+	.quad __asm64_syscall_invalid
 	.quad __asm64_syscall_invalid
 	.quad __asm64_syscall_invalid
 	.quad __asm64_syscall_invalid
@@ -2722,12 +2717,12 @@ PUBLIC_OBJECT(__c64_exsyscallrouter)
 	.quad sys_select64              /* 0x80000017 */
 	.quad sys_rpc_service           /* 0x80000018 */
 	.quad sys_lfutex                /* 0x80000019 */
-	.quad sys_lfutexlock            /* 0x8000001a */
-	.quad sys_lfutexexpr            /* 0x8000001b */
-	.quad sys_lfutexlockexpr        /* 0x8000001c */
-	.quad sys_mktty                 /* 0x8000001d */
-	.quad sys_raiseat               /* 0x8000001e */
-	.quad sys_coredump              /* 0x8000001f */
+	.quad sys_lfutexexpr            /* 0x8000001a */
+	.quad sys_lfutexlockexpr        /* 0x8000001b */
+	.quad sys_mktty                 /* 0x8000001c */
+	.quad sys_raiseat               /* 0x8000001d */
+	.quad sys_coredump              /* 0x8000001e */
+	.quad sys_invalid0
 	.quad sys_invalid0
 	.quad sys_invalid0
 	.quad sys_invalid0
@@ -3398,13 +3393,13 @@ PUBLIC_OBJECT(__asm32_exsyscallrouter_int80)
 	.quad __asm32_int80_debugtrap               /* 0x80000011 */
 	.quad __asm32_int80_lfutex                  /* 0x80000012 */
 	.quad __asm32_int80_lseek64                 /* 0x80000013 */
-	.quad __asm32_int80_lfutexlock              /* 0x80000014 */
-	.quad __asm32_int80_lfutexexpr              /* 0x80000015 */
-	.quad __asm32_int80_lfutexlockexpr          /* 0x80000016 */
-	.quad __asm32_int80_mktty                   /* 0x80000017 */
-	.quad __asm32_int80_raiseat                 /* 0x80000018 */
+	.quad __asm32_int80_lfutexexpr              /* 0x80000014 */
+	.quad __asm32_int80_lfutexlockexpr          /* 0x80000015 */
+	.quad __asm32_int80_mktty                   /* 0x80000016 */
+	.quad __asm32_int80_raiseat                 /* 0x80000017 */
+	.quad __asm32_int80_coredump                /* 0x80000018 */
 	.quad __asm32_int80_stime64                 /* 0x80000019 */
-	.quad __asm32_int80_coredump                /* 0x8000001a */
+	.quad __asm32_int80_invalid
 	.quad __asm32_int80_invalid
 	.quad __asm32_int80_invalid
 	.quad __asm32_int80_invalid
@@ -4121,13 +4116,13 @@ PUBLIC_OBJECT(__asm32_exsyscallrouter_sysenter)
 	.quad __asm32_sysenter_debugtrap               /* 0x80000011 */
 	.quad __asm32_sysenter_lfutex                  /* 0x80000012 */
 	.quad __asm32_sysenter_lseek64                 /* 0x80000013 */
-	.quad __asm32_sysenter_lfutexlock              /* 0x80000014 */
-	.quad __asm32_sysenter_lfutexexpr              /* 0x80000015 */
-	.quad __asm32_sysenter_lfutexlockexpr          /* 0x80000016 */
-	.quad __asm32_sysenter_mktty                   /* 0x80000017 */
-	.quad __asm32_sysenter_raiseat                 /* 0x80000018 */
+	.quad __asm32_sysenter_lfutexexpr              /* 0x80000014 */
+	.quad __asm32_sysenter_lfutexlockexpr          /* 0x80000015 */
+	.quad __asm32_sysenter_mktty                   /* 0x80000016 */
+	.quad __asm32_sysenter_raiseat                 /* 0x80000017 */
+	.quad __asm32_sysenter_coredump                /* 0x80000018 */
 	.quad __asm32_sysenter_stime64                 /* 0x80000019 */
-	.quad __asm32_sysenter_coredump                /* 0x8000001a */
+	.quad __asm32_sysenter_invalid
 	.quad __asm32_sysenter_invalid
 	.quad __asm32_sysenter_invalid
 	.quad __asm32_sysenter_invalid
@@ -4844,13 +4839,13 @@ PUBLIC_OBJECT(__c32_exsyscallrouter)
 	.quad sys32_debugtrap               /* 0x80000011 */
 	.quad sys32_lfutex                  /* 0x80000012 */
 	.quad sys32_lseek64                 /* 0x80000013 */
-	.quad sys32_lfutexlock              /* 0x80000014 */
-	.quad sys32_lfutexexpr              /* 0x80000015 */
-	.quad sys32_lfutexlockexpr          /* 0x80000016 */
-	.quad sys32_mktty                   /* 0x80000017 */
-	.quad sys32_raiseat                 /* 0x80000018 */
+	.quad sys32_lfutexexpr              /* 0x80000014 */
+	.quad sys32_lfutexlockexpr          /* 0x80000015 */
+	.quad sys32_mktty                   /* 0x80000016 */
+	.quad sys32_raiseat                 /* 0x80000017 */
+	.quad sys32_coredump                /* 0x80000018 */
 	.quad sys32_stime64                 /* 0x80000019 */
-	.quad sys32_coredump                /* 0x8000001a */
+	.quad sys32_invalid0
 	.quad sys32_invalid0
 	.quad sys32_invalid0
 	.quad sys32_invalid0

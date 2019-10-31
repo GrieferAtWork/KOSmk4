@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2faf3626 */
+/* HASH CRC-32:0x66da6470 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,14 +25,16 @@
 #ifndef ____localdep_lfutexlock64_defined
 #define ____localdep_lfutexlock64_defined 1
 #if defined(__CRT_HAVE_lfutexlock64)
-/* >> lfutexlock(2)
- * High-level wrapper around the lfutexlockat system call
+/* >> lfutexlock(3)
+ * Helper function to implement the behavior of `lfutexlockexpr()' for only a single futex.
  * This function behaves identical to the lfutex() system call, except that it takes
- * two futex addresses, where `ulockaddr' is used as a flag specifying that threads may
- * be waiting to be awoken once `LFUTEX_WAKE' is invoked on that memory location, whilst
- * the other futex address is used for the wait-while-condition checking, the same way
- * those checks would also be performed by the `lfutex() system call'
- * @param: command: One of:
+ * two futex addresses, where `ulockaddr' is used as a counter specifying the max number
+ * of how threads that may be waiting (though less than that may be waiting for real) to be
+ * awoken once `LFUTEX_WAKE' is invoked on that memory location (aka. `futexlock_wakeall(ulockaddr)'),
+ * whilst the other futex address (i.e. `uaddr') is used for the wait-while-condition checking,
+ * the same way those checks would
+ * also be performed by the `lfutex() system call'
+ * @param: futex_op: One of:
  *    - LFUTEX_WAKE:              (lfutex_t *ulockaddr, lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKE, size_t count)
  *    - LFUTEX_NOP:               (lfutex_t *ulockaddr, lfutex_t *uaddr, syscall_ulong_t LFUTEX_NOP, size_t ignored)
  *    - LFUTEX_WAIT:              (lfutex_t *ulockaddr, lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT, lfutexlock ignored, struct timespec const *timeout)
@@ -44,21 +46,23 @@
  *    - LFUTEX_WAIT_WHILE_CMPXCH: (lfutex_t *ulockaddr, lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
  *    - LFUTEX_WAIT_UNTIL_CMPXCH: (lfutex_t *ulockaddr, lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
  * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @return: * : Depending on `command'
+ * @return: * : Depending on `futex_op'
  * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    The given `command' is invalid
+ * @return: -1:EINVAL:    The given `futex_op' is invalid
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfutexlock64,(__uintptr_t *__ulockaddr, __uintptr_t *__uaddr, __syscall_ulong_t __command, __uintptr_t __val, /*struct timespec64 const *timeout, lfutex_t val2*/...),lfutexlock64,(__ulockaddr,__uaddr,__command,__val,))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfutexlock64,(__uintptr_t *__ulockaddr, __uintptr_t *__uaddr, __syscall_ulong_t __futex_op, __uintptr_t __val, /*struct timespec64 const *timeout, lfutex_t val2*/...),lfutexlock64,(__ulockaddr,__uaddr,__futex_op,__val,))
 #elif defined(__CRT_HAVE_lfutexlock) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-/* >> lfutexlock(2)
- * High-level wrapper around the lfutexlockat system call
+/* >> lfutexlock(3)
+ * Helper function to implement the behavior of `lfutexlockexpr()' for only a single futex.
  * This function behaves identical to the lfutex() system call, except that it takes
- * two futex addresses, where `ulockaddr' is used as a flag specifying that threads may
- * be waiting to be awoken once `LFUTEX_WAKE' is invoked on that memory location, whilst
- * the other futex address is used for the wait-while-condition checking, the same way
- * those checks would also be performed by the `lfutex() system call'
- * @param: command: One of:
+ * two futex addresses, where `ulockaddr' is used as a counter specifying the max number
+ * of how threads that may be waiting (though less than that may be waiting for real) to be
+ * awoken once `LFUTEX_WAKE' is invoked on that memory location (aka. `futexlock_wakeall(ulockaddr)'),
+ * whilst the other futex address (i.e. `uaddr') is used for the wait-while-condition checking,
+ * the same way those checks would
+ * also be performed by the `lfutex() system call'
+ * @param: futex_op: One of:
  *    - LFUTEX_WAKE:              (lfutex_t *ulockaddr, lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKE, size_t count)
  *    - LFUTEX_NOP:               (lfutex_t *ulockaddr, lfutex_t *uaddr, syscall_ulong_t LFUTEX_NOP, size_t ignored)
  *    - LFUTEX_WAIT:              (lfutex_t *ulockaddr, lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT, lfutexlock ignored, struct timespec const *timeout)
@@ -70,22 +74,24 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfute
  *    - LFUTEX_WAIT_WHILE_CMPXCH: (lfutex_t *ulockaddr, lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
  *    - LFUTEX_WAIT_UNTIL_CMPXCH: (lfutex_t *ulockaddr, lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
  * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @return: * : Depending on `command'
+ * @return: * : Depending on `futex_op'
  * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    The given `command' is invalid
+ * @return: -1:EINVAL:    The given `futex_op' is invalid
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-__CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfutexlock64,(__uintptr_t *__ulockaddr, __uintptr_t *__uaddr, __syscall_ulong_t __command, __uintptr_t __val, /*struct timespec64 const *timeout, lfutex_t val2*/...),lfutexlock,(__ulockaddr,__uaddr,__command,__val,))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfutexlock64,(__uintptr_t *__ulockaddr, __uintptr_t *__uaddr, __syscall_ulong_t __futex_op, __uintptr_t __val, /*struct timespec64 const *timeout, lfutex_t val2*/...),lfutexlock,(__ulockaddr,__uaddr,__futex_op,__val,))
 #elif defined(__CRT_HAVE_lfutexlock)
 #include <local/kos.futexlock/lfutexlock64.h>
-/* >> lfutexlock(2)
- * High-level wrapper around the lfutexlockat system call
+/* >> lfutexlock(3)
+ * Helper function to implement the behavior of `lfutexlockexpr()' for only a single futex.
  * This function behaves identical to the lfutex() system call, except that it takes
- * two futex addresses, where `ulockaddr' is used as a flag specifying that threads may
- * be waiting to be awoken once `LFUTEX_WAKE' is invoked on that memory location, whilst
- * the other futex address is used for the wait-while-condition checking, the same way
- * those checks would also be performed by the `lfutex() system call'
- * @param: command: One of:
+ * two futex addresses, where `ulockaddr' is used as a counter specifying the max number
+ * of how threads that may be waiting (though less than that may be waiting for real) to be
+ * awoken once `LFUTEX_WAKE' is invoked on that memory location (aka. `futexlock_wakeall(ulockaddr)'),
+ * whilst the other futex address (i.e. `uaddr') is used for the wait-while-condition checking,
+ * the same way those checks would
+ * also be performed by the `lfutex() system call'
+ * @param: futex_op: One of:
  *    - LFUTEX_WAKE:              (lfutex_t *ulockaddr, lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKE, size_t count)
  *    - LFUTEX_NOP:               (lfutex_t *ulockaddr, lfutex_t *uaddr, syscall_ulong_t LFUTEX_NOP, size_t ignored)
  *    - LFUTEX_WAIT:              (lfutex_t *ulockaddr, lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT, lfutexlock ignored, struct timespec const *timeout)
@@ -97,9 +103,9 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfute
  *    - LFUTEX_WAIT_WHILE_CMPXCH: (lfutex_t *ulockaddr, lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
  *    - LFUTEX_WAIT_UNTIL_CMPXCH: (lfutex_t *ulockaddr, lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
  * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @return: * : Depending on `command'
+ * @return: * : Depending on `futex_op'
  * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    The given `command' is invalid
+ * @return: -1:EINVAL:    The given `futex_op' is invalid
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
 #define __localdep_lfutexlock64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lfutexlock64))
@@ -114,7 +120,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futexlock_waitwhile_exactbits))(__uin
                                                                            __uintptr_t *__uaddr,
                                                                            __uintptr_t __bitmask,
                                                                            __uintptr_t __setmask) {
-#line 221 "kos/src/libc/magic/kos.futexlock.c"
+#line 220 "kos/src/libc/magic/kos.futexlock.c"
 	return __localdep_lfutexlock64(__ulockaddr, __uaddr, LFUTEX_WAIT_WHILE_BITMASK, __bitmask, (struct __timespec64 *)__NULLPTR, __setmask);
 }
 __NAMESPACE_LOCAL_END

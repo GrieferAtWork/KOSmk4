@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5356d85d */
+/* HASH CRC-32:0x62671fa */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,14 +27,16 @@
 
 DECL_BEGIN
 
-/* >> lfutexlock(2)
- * High-level wrapper around the lfutexlockat system call
+/* >> lfutexlock(3)
+ * Helper function to implement the behavior of `lfutexlockexpr()' for only a single futex.
  * This function behaves identical to the lfutex() system call, except that it takes
- * two futex addresses, where `ulockaddr' is used as a flag specifying that threads may
- * be waiting to be awoken once `LFUTEX_WAKE' is invoked on that memory location, whilst
- * the other futex address is used for the wait-while-condition checking, the same way
- * those checks would also be performed by the `lfutex() system call'
- * @param: command: One of:
+ * two futex addresses, where `ulockaddr' is used as a counter specifying the max number
+ * of how threads that may be waiting (though less than that may be waiting for real) to be
+ * awoken once `LFUTEX_WAKE' is invoked on that memory location (aka. `futexlock_wakeall(ulockaddr)'),
+ * whilst the other futex address (i.e. `uaddr') is used for the wait-while-condition checking,
+ * the same way those checks would
+ * also be performed by the `lfutex() system call'
+ * @param: futex_op: One of:
  *    - LFUTEX_WAKE:              (lfutex_t *ulockaddr, lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKE, size_t count)
  *    - LFUTEX_NOP:               (lfutex_t *ulockaddr, lfutex_t *uaddr, syscall_ulong_t LFUTEX_NOP, size_t ignored)
  *    - LFUTEX_WAIT:              (lfutex_t *ulockaddr, lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT, lfutexlock ignored, struct timespec const *timeout)
@@ -46,20 +48,22 @@ DECL_BEGIN
  *    - LFUTEX_WAIT_WHILE_CMPXCH: (lfutex_t *ulockaddr, lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
  *    - LFUTEX_WAIT_UNTIL_CMPXCH: (lfutex_t *ulockaddr, lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
  * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @return: * : Depending on `command'
+ * @return: * : Depending on `futex_op'
  * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    The given `command' is invalid
+ * @return: -1:EINVAL:    The given `futex_op' is invalid
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-INTDEF NONNULL((1, 2)) ssize_t NOTHROW_RPC(LIBCCALL libc_lfutexlock)(lfutex_t *ulockaddr, lfutex_t *uaddr, syscall_ulong_t command, lfutex_t val, /*struct timespec const *timeout, lfutex_t val2*/...);
-/* >> lfutexlock(2)
- * High-level wrapper around the lfutexlockat system call
+INTDEF NONNULL((1, 2)) ssize_t NOTHROW_RPC(LIBCCALL libc_lfutexlock)(lfutex_t *ulockaddr, lfutex_t *uaddr, syscall_ulong_t futex_op, lfutex_t val, /*struct timespec const *timeout, lfutex_t val2*/...);
+/* >> lfutexlock(3)
+ * Helper function to implement the behavior of `lfutexlockexpr()' for only a single futex.
  * This function behaves identical to the lfutex() system call, except that it takes
- * two futex addresses, where `ulockaddr' is used as a flag specifying that threads may
- * be waiting to be awoken once `LFUTEX_WAKE' is invoked on that memory location, whilst
- * the other futex address is used for the wait-while-condition checking, the same way
- * those checks would also be performed by the `lfutex() system call'
- * @param: command: One of:
+ * two futex addresses, where `ulockaddr' is used as a counter specifying the max number
+ * of how threads that may be waiting (though less than that may be waiting for real) to be
+ * awoken once `LFUTEX_WAKE' is invoked on that memory location (aka. `futexlock_wakeall(ulockaddr)'),
+ * whilst the other futex address (i.e. `uaddr') is used for the wait-while-condition checking,
+ * the same way those checks would
+ * also be performed by the `lfutex() system call'
+ * @param: futex_op: One of:
  *    - LFUTEX_WAKE:              (lfutex_t *ulockaddr, lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKE, size_t count)
  *    - LFUTEX_NOP:               (lfutex_t *ulockaddr, lfutex_t *uaddr, syscall_ulong_t LFUTEX_NOP, size_t ignored)
  *    - LFUTEX_WAIT:              (lfutex_t *ulockaddr, lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT, lfutexlock ignored, struct timespec const *timeout)
@@ -71,12 +75,12 @@ INTDEF NONNULL((1, 2)) ssize_t NOTHROW_RPC(LIBCCALL libc_lfutexlock)(lfutex_t *u
  *    - LFUTEX_WAIT_WHILE_CMPXCH: (lfutex_t *ulockaddr, lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
  *    - LFUTEX_WAIT_UNTIL_CMPXCH: (lfutex_t *ulockaddr, lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
  * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @return: * : Depending on `command'
+ * @return: * : Depending on `futex_op'
  * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    The given `command' is invalid
+ * @return: -1:EINVAL:    The given `futex_op' is invalid
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-INTDEF NONNULL((1, 2)) ssize_t NOTHROW_RPC(LIBCCALL libc_lfutexlock64)(lfutex_t *ulockaddr, lfutex_t *uaddr, syscall_ulong_t command, lfutex_t val, /*struct timespec64 const *timeout, lfutex_t val2*/...);
+INTDEF NONNULL((1, 2)) ssize_t NOTHROW_RPC(LIBCCALL libc_lfutexlock64)(lfutex_t *ulockaddr, lfutex_t *uaddr, syscall_ulong_t futex_op, lfutex_t val, /*struct timespec64 const *timeout, lfutex_t val2*/...);
 /* A more efficient variant of `futex_wake()' that can be used to wake up threads waiting
  * on some given futex-lock. - This method of waking is faster, since it doesn't invoke a
  * system call when no thread is waiting on the given lock */

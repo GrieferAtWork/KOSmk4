@@ -672,7 +672,8 @@ vm_datapart_split(struct vm_datapart *__restrict self, size_t vpage_offset)
  * wrong. - Instead, return `VM_DATAPART_SPLIT_NX_FAILED', though `NULL' is still
  * returned in the event that `vpage_offset' is too large. */
 FUNDEF NONNULL((1)) REF struct vm_datapart *
-NOTHROW(KCALL vm_datapart_split_nx)(struct vm_datapart *__restrict self, size_t vpage_offset);
+NOTHROW(KCALL vm_datapart_split_nx)(struct vm_datapart *__restrict self,
+                                    size_t vpage_offset);
 #define VM_DATAPART_SPLIT_NX_FAILED ((REF struct vm_datapart *)-1)
 
 
@@ -1136,7 +1137,7 @@ vm_datablock_sync(struct vm_datablock *__restrict self,
 /* Check if there are changed parts within the specified address range.
  * NOTE: The caller must be holding a read-lock on `self' */
 FUNDEF NOBLOCK NONNULL((1)) bool
-NOTHROW(KCALL vm_datablock_haschanges)(struct vm_datablock *__restrict self,
+NOTHROW(KCALL vm_datablock_haschanged)(struct vm_datablock *__restrict self,
                                        vm_dpage_t minpage DFL((vm_dpage_t)0),
                                        vm_dpage_t maxpage DFL((vm_dpage_t)-1));
 

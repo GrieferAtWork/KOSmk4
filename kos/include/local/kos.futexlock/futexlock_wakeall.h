@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb662cb8c */
+/* HASH CRC-32:0xa8824388 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,7 +45,7 @@ __NAMESPACE_LOCAL_BEGIN
  * system call when no thread is waiting on the given lock */
 __LOCAL_LIBC(futexlock_wakeall) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(futexlock_wakeall))(__uintptr_t *__ulockaddr) {
-#line 152 "kos/src/libc/magic/kos.futexlock.c"
+#line 151 "kos/src/libc/magic/kos.futexlock.c"
 	return __localdep_futexlock_wake(__ulockaddr, (__SIZE_TYPE__)-1);
 }
 __NAMESPACE_LOCAL_END

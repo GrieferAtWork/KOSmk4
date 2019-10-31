@@ -785,19 +785,6 @@ again_mapat:
 
 //TODO:FUNDEF void *(__ARCH_SYSCALLCC sys_mremap)(void *old_address, size_t old_size, size_t new_size, syscall_ulong_t flags, void *new_address) THROWS(...);
 
-
-//DEFINE_SYSCALL5(syscall_slong_t, lfutex,
-//                USER UNCHECKED uintptr_t *, uaddr, syscall_ulong_t, futex_op, uintptr_t, val,
-//                USER UNCHECKED struct timespec64 const *, timeout, uintptr_t, val2) {
-//	/* TODO */
-//	return -ENOSYS;
-//}
-
-//TODO:#define __NR_lfutex                     0x80000012 /* syscall_slong_t lfutex(uintptr_t *uaddr, syscall_ulong_t futex_op, uintptr_t val, struct timespec64 const *timeout, uintptr_t val2) */
-//TODO:#define __NR_lfutexlock                 0x80000014 /* syscall_slong_t lfutexlock(uintptr_t *ulockaddr, uintptr_t *uaddr, syscall_ulong_t futex_op, uintptr_t val, struct timespec64 const *timeout, uintptr_t val2) */
-//TODO:#define __NR_lfutexexpr                 0x80000015 /* errno_t lfutexexpr(uintptr_t *uaddr, void *base, struct lfutexexpr const *exprv, size_t exprc, struct timespec64 const *timeout, syscall_ulong_t timeout_flags) */
-//TODO:#define __NR_lfutexlockexpr             0x80000016 /* errno_t lfutexlockexpr(uintptr_t *ulockaddr, void *base, struct lfutexexpr const *exprv, size_t exprc, struct timespec64 const *timeout, syscall_ulong_t timeout_flags) */
-
 DECL_END
 
 #endif /* !GUARD_KERNEL_SRC_MEMORY_VM_SYSCALLS_C */

@@ -717,7 +717,10 @@ write_hashed_file("include/kos/except-codes.def", [](fp){
 				} else {
 					fp << "#elif ";
 				}
-				fp << "defined(" << def << ")\n";
+				fp << "defined(" << def << ")";
+				if (def == "__i386__")
+					fp << " || defined(__x86_64__)";
+				fp << "\n";
 			}
 			fp << tempfp;
 		}
@@ -753,7 +756,10 @@ write_hashed_file("include/kos/except-codes.def", [](fp){
 		} else {
 			fp << "#elif ";
 		}
-		fp << "defined(" << def << ")\n";
+		fp << "defined(" << def << ")";
+		if (def == "__i386__")
+			fp << " || defined(__x86_64__)";
+		fp << "\n";
 		print_classes(decls, def);
 	}
 	if (!isfirst)

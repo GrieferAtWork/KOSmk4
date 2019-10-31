@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6bfae17 */
+/* HASH CRC-32:0xda8ccdbe */
 DEFINE_PUBLIC_WEAK_ALIAS(sys_read, sys_invalid3);                   /* 0 */
 DEFINE_PUBLIC_WEAK_ALIAS(sys_write, sys_invalid3);                  /* 1 */
 DEFINE_PUBLIC_WEAK_ALIAS(sys_open, sys_invalid3);                   /* 2 */
@@ -269,12 +269,11 @@ DEFINE_PUBLIC_WEAK_ALIAS(sys_debugtrap, sys_invalid2);              /* 0x8000001
 DEFINE_PUBLIC_WEAK_ALIAS(sys_select64, sys_invalid5);               /* 0x80000017 */
 DEFINE_PUBLIC_WEAK_ALIAS(sys_rpc_service, sys_invalid0);            /* 0x80000018 */
 DEFINE_PUBLIC_WEAK_ALIAS(sys_lfutex, sys_invalid5);                 /* 0x80000019 */
-DEFINE_PUBLIC_WEAK_ALIAS(sys_lfutexlock, sys_invalid6);             /* 0x8000001a */
-DEFINE_PUBLIC_WEAK_ALIAS(sys_lfutexexpr, sys_invalid6);             /* 0x8000001b */
-DEFINE_PUBLIC_WEAK_ALIAS(sys_lfutexlockexpr, sys_invalid6);         /* 0x8000001c */
-DEFINE_PUBLIC_WEAK_ALIAS(sys_mktty, sys_invalid4);                  /* 0x8000001d */
-DEFINE_PUBLIC_WEAK_ALIAS(sys_raiseat, sys_invalid2);                /* 0x8000001e */
-DEFINE_PUBLIC_WEAK_ALIAS(sys_coredump, sys_invalid6);               /* 0x8000001f */
+DEFINE_PUBLIC_WEAK_ALIAS(sys_lfutexexpr, sys_invalid5);             /* 0x8000001a */
+DEFINE_PUBLIC_WEAK_ALIAS(sys_lfutexlockexpr, sys_invalid6);         /* 0x8000001b */
+DEFINE_PUBLIC_WEAK_ALIAS(sys_mktty, sys_invalid4);                  /* 0x8000001c */
+DEFINE_PUBLIC_WEAK_ALIAS(sys_raiseat, sys_invalid2);                /* 0x8000001d */
+DEFINE_PUBLIC_WEAK_ALIAS(sys_coredump, sys_invalid6);               /* 0x8000001e */
 DEFINE_PUBLIC_WEAK_ALIAS(sys_getitimer64, sys_invalid2);            /* 0x80000024 */
 DEFINE_PUBLIC_WEAK_ALIAS(sys_setitimer64, sys_invalid3);            /* 0x80000026 */
 DEFINE_PUBLIC_WEAK_ALIAS(sys_kreaddir, sys_invalid4);               /* 0x8000004e */

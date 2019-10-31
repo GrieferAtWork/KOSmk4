@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x92d1fa3c */
+/* HASH CRC-32:0x2acf4cd */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1225,14 +1225,14 @@ __CRT_FUNCTION(ldexpf,0,(),2,(float,x,int,exponent),float)
 __CRT_FUNCTION(ldexpl,0,(),2,(long double,x,int,exponent),long double)
 __CRT_FUNCTION(ldiv,0,(),2,(long,numer,long,denom),ldiv_t)
 __CRT_FUNCTION(lfind,0,(),5,(void const *,key,void const *,base,size_t *,nmemb,size_t,size,__compar_fn_t,compar),void *)
-__CRT_FUNCTION(lfutex,0,(),4,(lfutex_t *,uaddr,syscall_ulong_t,command,lfutex_t,val,/*struct timespec const *timeout, lfutex_t val2*/...,),ssize_t)
-__CRT_FUNCTION(lfutex64,1,(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__,lfutex),4,(lfutex_t *,uaddr,syscall_ulong_t,command,lfutex_t,val,/*struct timespec64 const *timeout, lfutex_t val2*/...,),ssize_t)
-__CRT_FUNCTION(lfutexexpr,0,(),6,(lfutex_t *,uaddr,void *,base,struct lfutexexpr const *,exprv,size_t,exprc,struct timespec const *,timeout,unsigned int,timeout_flags),int)
-__CRT_FUNCTION(lfutexexpr64,1,(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__,lfutexexpr),6,(lfutex_t *,uaddr,void *,base,struct lfutexexpr const *,exprv,size_t,exprc,struct timespec64 const *,timeout,unsigned int,timeout_flags),int)
-__CRT_FUNCTION(lfutexlock,0,(),5,(lfutex_t *,ulockaddr,lfutex_t *,uaddr,syscall_ulong_t,command,lfutex_t,val,/*struct timespec const *timeout, lfutex_t val2*/...,),ssize_t)
-__CRT_FUNCTION(lfutexlock64,1,(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__,lfutexlock),5,(lfutex_t *,ulockaddr,lfutex_t *,uaddr,syscall_ulong_t,command,lfutex_t,val,/*struct timespec64 const *timeout, lfutex_t val2*/...,),ssize_t)
-__CRT_FUNCTION(lfutexlockexpr,0,(),6,(lfutex_t *,ulockaddr,void *,base,struct lfutexexpr const *,exprv,size_t,exprc,struct timespec const *,timeout,unsigned int,timeout_flags),int)
-__CRT_FUNCTION(lfutexlockexpr64,1,(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__,lfutexlockexpr),6,(lfutex_t *,ulockaddr,void *,base,struct lfutexexpr const *,exprv,size_t,exprc,struct timespec64 const *,timeout,unsigned int,timeout_flags),int)
+__CRT_FUNCTION(lfutex,0,(),4,(lfutex_t *,uaddr,syscall_ulong_t,futex_op,lfutex_t,val,/*struct timespec const *timeout, lfutex_t val2*/...,),ssize_t)
+__CRT_FUNCTION(lfutex64,1,(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__,lfutex),4,(lfutex_t *,uaddr,syscall_ulong_t,futex_op,lfutex_t,val,/*struct timespec64 const *timeout, lfutex_t val2*/...,),ssize_t)
+__CRT_FUNCTION(lfutexexpr,0,(),5,(void *,base,size_t,exprc,struct lfutexexpr const *,exprv,struct timespec const *,timeout,unsigned int,timeout_flags),int)
+__CRT_FUNCTION(lfutexexpr64,1,(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__,lfutexexpr),5,(void *,base,size_t,exprc,struct lfutexexpr const *,exprv,struct timespec64 const *,timeout,unsigned int,timeout_flags),int)
+__CRT_FUNCTION(lfutexlock,0,(),5,(lfutex_t *,ulockaddr,lfutex_t *,uaddr,syscall_ulong_t,futex_op,lfutex_t,val,/*struct timespec const *timeout, lfutex_t val2*/...,),ssize_t)
+__CRT_FUNCTION(lfutexlock64,1,(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__,lfutexlock),5,(lfutex_t *,ulockaddr,lfutex_t *,uaddr,syscall_ulong_t,futex_op,lfutex_t,val,/*struct timespec64 const *timeout, lfutex_t val2*/...,),ssize_t)
+__CRT_FUNCTION(lfutexlockexpr,0,(),6,(lfutex_t *,ulockaddr,void *,base,size_t,exprc,struct lfutexexpr const *,exprv,struct timespec const *,timeout,unsigned int,timeout_flags),int)
+__CRT_FUNCTION(lfutexlockexpr64,1,(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__,lfutexlockexpr),6,(lfutex_t *,ulockaddr,void *,base,size_t,exprc,struct lfutexexpr const *,exprv,struct timespec64 const *,timeout,unsigned int,timeout_flags),int)
 __CRT_FUNCTION(lgamma,0,(),1,(double,x),double)
 __CRT_FUNCTION(lgamma_r,0,(),2,(double,x,int *,signgamp),double)
 __CRT_FUNCTION(lgammaf,0,(),1,(float,x),float)

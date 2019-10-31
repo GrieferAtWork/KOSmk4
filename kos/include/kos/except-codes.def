@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcec540a7 */
+/* HASH CRC-32:0x51cade20 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -152,7 +152,7 @@ END
 
 
 
-#if defined(__i386__)
+#if defined(__i386__) || defined(__x86_64__)
 CLASS(E_SEGFAULT,MESSAGE("Segmentation fault"),ERRNO(EFAULT),())
 	SUBCLASS(E_SEGFAULT_UNMAPPED,MESSAGE("Attempted to access a faulty memory location"),NO_ERRNO,(MEMBER(void *,addr) MEMBER(uintptr_t,context)))
 	SUBCLASS(E_SEGFAULT_READONLY,MESSAGE("Attempted to write to a read-only memory location"),NO_ERRNO,(MEMBER(void *,addr) MEMBER(uintptr_t,context)))
