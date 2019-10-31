@@ -27,7 +27,7 @@ DECL_BEGIN
 /* Decrement the reference counter of `self', and try to merge it with sibling data parts.
  * This functionality is combined with a decref() since a data part can only be merged when
  * it is only visible from within its own data block, or for any VM mapping, the latter only
- * allowing the part to the merged if _all_ mappings are layed out in a way that has the part
+ * allowing the part to the merged if _all_ mappings are laid out in a way that has the part
  * be mapped alongside its closest siblings in a continuous memory mapping.
  * Note that a data part will never be merged if it has any outside references which would
  * keep it being visible outside the small region that is controllable by the part itself.

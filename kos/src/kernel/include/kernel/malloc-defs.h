@@ -265,26 +265,28 @@ typedef unsigned int gfp_t;
                             *       due to an overlap with some other memory mapping. */
 
 /* Mask of GFP flags that are inherited by recursive allocations for control structures. */
-#define GFP_INHERIT  (GFP_ATOMIC|GFP_NOOVER|GFP_NOMMAP|GFP_NOTRIM|GFP_NOSWAP|GFP_NOCLRC|GFP_VCBASE)
+#define GFP_INHERIT                                      \
+	(GFP_ATOMIC | GFP_NOOVER | GFP_NOMMAP | GFP_NOTRIM | \
+	 GFP_NOSWAP | GFP_NOCLRC | GFP_VCBASE)
 
 
 #ifdef CONFIG_DEBUG_MALLOC
 #define GFP_NOLEAK  0x1000 /* Don't consider the datablock a leak, even if it cannot be reached. */
 #define GFP_NOWALK  0x2000 /* When searching for memory leaks, don't search the datablock for
                             * pointers that may point to other heap-blocks. */
-#else
+#else /* CONFIG_DEBUG_MALLOC */
 #define GFP_NOLEAK  0x0000 /* Don't consider the datablock a leak, even if it cannot be reached. */
 #define GFP_NOWALK  0x0000 /* When searching for memory leaks, don't search the datablock for
                             * pointers that may point to other heap-blocks. */
-#endif
+#endif /* !CONFIG_DEBUG_MALLOC */
 
 
 
 #ifdef CONFIG_DEBUG_HEAP
 #define SIZEOF_MFREE   (__SIZE_C(5) * __SIZEOF_POINTER__ + __SIZE_C(2))
-#else
+#else /* CONFIG_DEBUG_HEAP */
 #define SIZEOF_MFREE   (__SIZE_C(5) * __SIZEOF_POINTER__ + __SIZE_C(1))
-#endif
+#endif /* !CONFIG_DEBUG_HEAP */
 #define HEAP_MINSIZE  ((SIZEOF_MFREE + (HEAP_ALIGNMENT - 1)) & ~(HEAP_ALIGNMENT - 1u))
 
 
@@ -292,7 +294,7 @@ typedef unsigned int gfp_t;
 #define CONFIG_USE_SLAB_ALLOCATORS 1
 
 
-#if 1 /* Only use slabs for allocations smaller than the minimum allowed allocation. */
+#if 0 /* Only use slabs for allocations smaller than the minimum allowed allocation. */
 #define SLAB_MAXSIZE   (HEAP_MINSIZE - HEAP_ALIGNMENT)
 #else
 #define SLAB_MAXSIZE   (__SIZE_C(8) * __SIZEOF_POINTER__)
@@ -301,14 +303,14 @@ typedef unsigned int gfp_t;
 #if SLAB_MAXSIZE < (HEAP_MINSIZE - HEAP_ALIGNMENT)
 #undef SLAB_MAXSIZE
 #define SLAB_MAXSIZE   (HEAP_MINSIZE - HEAP_ALIGNMENT)
-#endif
+#endif /* SLAB_MAXSIZE < (HEAP_MINSIZE - HEAP_ALIGNMENT) */
 
 
 
 #if SLAB_MAXSIZE <= HEAP_ALIGNMENT
 /* No point in using slab allocators now... */
 #undef CONFIG_USE_SLAB_ALLOCATORS
-#endif
+#endif /* SLAB_MAXSIZE <= HEAP_ALIGNMENT */
 
 #if defined(CONFIG_USE_SLAB_ALLOCATORS) || defined(__DEEMON__)
 #define KERNEL_SLAB_COUNT      (SLAB_MAXSIZE / HEAP_ALIGNMENT)
@@ -316,16 +318,16 @@ typedef unsigned int gfp_t;
 /*[[[deemon
 local is_first = true;
 local limit = 16;
-for (local align: [4,8,16]) {
-	print is_first ? "#if" : "#elif","HEAP_ALIGNMENT ==",align;
+for (local align: [4, 8, 16]) {
+	print is_first ? "#if" : "#elif", "HEAP_ALIGNMENT ==", align;
 	is_first = false;
-	print "#if KERNEL_SLAB_COUNT >=",limit + 1;
+	print "#if KERNEL_SLAB_COUNT >=", limit + 1;
 	print "#error Extend me";
-	for (local x: [limit:0,-1]) {
+	for (local x: [limit:0, -1]) {
 		if (x == 1) {
 			print "#else";
 		} else {
-			print "#elif KERNEL_SLAB_COUNT >=",x;
+			print "#elif KERNEL_SLAB_COUNT >=", x;
 		}
 		print "#define SLAB_FOREACH_SIZE(func)",;
 		for (local y: [1:x + 1])

@@ -30,6 +30,7 @@
 DECL_BEGIN
 
 
+struct vm_futex;
 struct vm_datablock_type_vio;
 struct vio_args {
 	struct vm_datablock_type_vio const *va_type;  /* [1..1][== va_block->db_type->dt_vio] */
@@ -39,6 +40,30 @@ struct vio_args {
 	vm_vpage_t                          va_access_pageaddr; /* The accessed page address. */
 	struct icpustate                   *va_state; /* [0..1] The CPU state at the time of the access being made (or `NULL' when accessed through other means). */
 };
+
+
+/* VIO and futex:
+ *  - In general, using futex operation on VIO memory works the same way it
+ *    works for regular memory. No special distinction is made for VIO memory.
+ *  - However, vio callbacks are obviously able, and allowed to perform blocking
+ *    operations, including both the lookup, and subsequent use of futex functions,
+ *    including both the broadcasting of, and waiting for a futex's signal.
+ *  - For convenience, you may use `vio_getfutex[_existing]()' in order to access
+ *    the futex associated with the address that is being accessed.
+ */
+
+/* Return a reference to the futex associated with the accessed address. */
+FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct vm_futex *KCALL
+vio_getfutex(struct vio_args const *__restrict args)
+		THROWS(E_WOULDBLOCK, E_BADALLOC);
+
+/* Same as `vio_getfutex()', but don't allocate a new
+ * futex object if none already exists for the accessed address
+ * @return: * : The futex associated with the accessed address
+ * @return: NULL: No futex exists for the accessed address. */
+FUNDEF WUNUSED NONNULL((1)) REF struct vm_futex *KCALL
+vio_getfutex_existing(struct vio_args const *__restrict args)
+		THROWS(E_WOULDBLOCK, E_BADALLOC);
 
 
 struct vm_datablock_type_vio {
@@ -131,7 +156,6 @@ struct vm_datablock_type_vio {
 		NONNULL((1)) u64 (KCALL *f_qword)(struct vio_args *__restrict args, vm_daddr_t addr, u64 mask, bool atomic);
 #endif /* CONFIG_VIO_HAS_QWORD */
 	} dtv_xor;
-	/* TODO: Bindings for futex() operations */
 
 	/* Invoked as the result of the user attempting to call into VIO memory.
 	 * When this operator is called, `regs' will have already been updated to

@@ -404,18 +404,18 @@ DECL_END
 /*[[[deemon
 local is_first = true;
 local limit = 16;
-for (local align: [4,8,16]) {
-	print is_first ? "#if" : "#elif","HEAP_ALIGNMENT ==",align;
+for (local align: [4, 8, 16]) {
+	print is_first ? "#if" : "#elif", "HEAP_ALIGNMENT ==", align;
 	is_first = false;
-	print "#if KERNEL_SLAB_COUNT >=",limit + 1;
+	print "#if KERNEL_SLAB_COUNT >=", limit + 1;
 	print "#error Extend me";
 	print "#endif";
-	for (local x: [1:limit,-1]) {
-		print "#if KERNEL_SLAB_COUNT >=",x;
-		print "#define SEGMENT_SIZE",x * align;
+	for (local x: [1:limit, -1]) {
+		print "#if KERNEL_SLAB_COUNT >=", x;
+		print "#define SEGMENT_SIZE", x * align;
 		print "#include \"slab-impl.c.inl\"";
 		if (x > 1)
-			print "#define NEXT_SEGMENT_SIZE",x * align;
+			print "#define NEXT_SEGMENT_SIZE", x * align;
 		print "#endif";
 	}
 }

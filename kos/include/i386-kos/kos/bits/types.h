@@ -123,6 +123,9 @@ __vm_phys_t ____intellisense_vm_ppage2addr(__vm_ppage_t __x);
 __UINTPTR_TYPE__ ____intellisense_vm_addr2page(__UINTPTR_TYPE__ __x);
 __vm_vpage_t ____intellisense_vm_addr2page(__vm_virt_t __x);
 __vm_ppage_t ____intellisense_vm_addr2page(__vm_phys_t __x);
+#if __SIZEOF_POINTER__ != 8
+__UINT64_TYPE__ ____intellisense_vm_addr2page(__UINT64_TYPE__ __x);
+#endif /* __SIZEOF_POINTER__ != 8 */
 }}
 #define __VM_PPAGE2ADDR  __intern::____intellisense_vm_ppage2addr
 #define __VM_PAGE2ADDR   __intern::____intellisense_vm_page2addr

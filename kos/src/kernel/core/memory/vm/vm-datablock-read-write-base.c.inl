@@ -374,7 +374,7 @@ KCALL vm_datablock_vio_write
 	}
 #endif /* CONFIG_VIO_HAS_QWORD */
 	if (num_bytes & 2) {
-		DO_VIO(u32, w, 16);
+		DO_VIO(u16, w, 16);
 		buf = (byte_t *)buf + 2;
 		src_offset += 2;
 	}

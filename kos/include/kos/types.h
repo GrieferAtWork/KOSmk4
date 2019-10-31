@@ -274,7 +274,7 @@ typedef __upid_t upid_t;
 
 #ifndef __iomode_t_defined
 #define __iomode_t_defined 1
-typedef __iomode_t iomode_t;
+typedef __iomode_t iomode_t; /* Set of `IO_*' */
 #endif /* !__iomode_t_defined */
 
 #ifndef __useconds_t_defined

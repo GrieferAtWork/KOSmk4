@@ -24,6 +24,7 @@
 #include <kernel/memory.h>
 #include <kernel/paging.h>
 #include <kernel/vm.h>
+#include <kernel/vm/futex.h>
 
 #ifndef VM_PAGE_UNUSED_BITS
 #define VM_PAGE_UNUSED_BITS   PAGESHIFT
@@ -78,6 +79,17 @@
 #define N_NODEPATH               vn_node
 #define ATREE_LOCAL_SEMI0(Tkey)  VM_SEMI0
 #define ATREE_LOCAL_LEVEL0(Tkey) VM_LEVEL0
+#define ATREE_HEADER_ONLY 1
+#include <hybrid/sequence/atree-abi.h>
+#undef ATREE_HEADER_ONLY
+
+/* Implement the ABI for the address tree used by vm. */
+#define ATREE(x)                 vm_parttree_##x
+#define ATREE_FUN                INTDEF
+#define ATREE_CALL               KCALL
+#define Tkey                     vm_dpage_t
+#define T                        struct vm_datapart
+#define N_NODEPATH               dp_tree
 #define ATREE_HEADER_ONLY 1
 #include <hybrid/sequence/atree-abi.h>
 #undef ATREE_HEADER_ONLY

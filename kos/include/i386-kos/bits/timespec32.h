@@ -33,7 +33,7 @@
 #define __timespec64   timespec
 #define __timespec_alt __timespec32
 #ifdef __USE_TIME64
-#define timespec64    timespec32_64
+#define timespec64    timespec
 #endif /* __USE_TIME64 */
 
 #define __OFFSET_TIMESPEC_SEC    __OFFSET_TIMESPEC32_64_SEC

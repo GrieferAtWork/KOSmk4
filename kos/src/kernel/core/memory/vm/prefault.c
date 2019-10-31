@@ -76,9 +76,6 @@ vm_prefault(USER CHECKED void const *addr,
             size_t num_bytes, bool for_writing)
 		THROWS(E_WOULDBLOCK, E_BADALLOC) {
 	assert(num_bytes != 0);
-	(void)addr;
-	(void)num_bytes;
-	(void)for_writing;
 	/* This function shares some of its code with `vm_read()' / `vm_write()', except that
 	 * the contents of memory don't actually get modified.
 	 * In practice, try to prefault the entirety of the indicated address range, but stop
@@ -134,12 +131,15 @@ vm_prefault(USER CHECKED void const *addr,
 	 *     >>     break;
 	 *     >> }
 	 *     Where ITER_ADDR is initialized to `addr', and during `continue' is updated to
-	 *     instead referr to `VM_NODE_ENDADDR(CURRENT_NODE)'.
+	 *     instead refer to `VM_NODE_ENDADDR(CURRENT_NODE)'.
 	 * Regardless of why iteration stops, always return `0' at this point, indicating that
 	 * at least some part of the given range can be accessed using direct I/O.
 	 */
 
 	/* TODO: Implement me! :) */
+	(void)addr;
+	(void)num_bytes;
+	(void)for_writing;
 
 	return 1;
 }

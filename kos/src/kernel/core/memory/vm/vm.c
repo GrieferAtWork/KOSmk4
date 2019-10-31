@@ -32,6 +32,7 @@
 #include <kernel/rand.h>
 #include <kernel/swap.h>
 #include <kernel/vm.h>
+#include <kernel/vm/futex.h>
 #include <sched/cpu.h>
 #include <sched/pid.h>
 
@@ -71,7 +72,9 @@
 #define Tkey                     vm_dpage_t
 #define T                        struct vm_datapart
 #define N_NODEPATH               dp_tree
+#define ATREE_IMPLEMENTATION_ONLY 1
 #include <hybrid/sequence/atree-abi.h>
+#undef ATREE_IMPLEMENTATION_ONLY
 
 
 DECL_BEGIN
@@ -97,6 +100,33 @@ NOTHROW(KCALL vm_datapart_free)(struct vm_datapart *__restrict self) {
 	} else {
 		kfree(self);
 	}
+}
+
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL vm_futextree_clear_part_pointers)(struct vm_futex *__restrict self) {
+again:
+	self->f_part.clear();
+	if (self->f_tree.a_min) {
+		if (self->f_tree.a_max)
+			vm_futextree_clear_part_pointers(self->f_tree.a_max);
+		self = self->f_tree.a_min;
+		goto again;
+	}
+	if (self->f_tree.a_max) {
+		self = self->f_tree.a_max;
+		goto again;
+	}
+}
+
+/* Delete the `f_part' pointers of all `struct vm_futex' objects
+ * that can still be reached from the given address tree. */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL vm_futex_controller_destroy)(struct vm_futex_controller *__restrict self) {
+	/* Clear part pointers */
+	if (self->fc_tree)
+		vm_futextree_clear_part_pointers(self->fc_tree);
+	/* Free the controller object. */
+	vm_futex_controller_free(self);
 }
 
 PUBLIC NOBLOCK NONNULL((1)) void
@@ -150,19 +180,22 @@ NOTHROW(KCALL vm_datapart_destroy)(struct vm_datapart *__restrict self,
 
 	default: break;
 	}
-	if (self->dp_futex) {
-		/* TODO */
-	}
+	/* Destroy any associated futex controller (if one still exists) */
+	if (self->dp_futex)
+		vm_futex_controller_destroy(self->dp_futex);
 	if (self->dp_flags & VM_DATAPART_FLAG_HEAPPPP)
 		kfree(self->dp_pprop_p);
 	xdecref(self->dp_block); /* May be NULL due to incomplete initialization... */
 	vm_datapart_free(self);
 }
 
+/* (possibly) delete the futex controller of `self' if it is no longer in use. */
+INTDEF NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL vm_datapart_maybe_delete_futex_controller)(struct vm_datapart *__restrict self);
 
-
-#define VM_DATAPART_MUST_SERVICE_STALE(self) \
-	(ATOMIC_READ((self)->dp_stale) != NULL)
+#define VM_DATAPART_MUST_SERVICE_STALE(self)  \
+	(ATOMIC_READ((self)->dp_stale) != NULL || \
+	 (self->dp_futex && ATOMIC_READ((self)->dp_futex->fc_dead) != NULL))
 
 PRIVATE NOBLOCK void
 NOTHROW(KCALL vm_datapart_service_stale)(struct vm_datapart *__restrict self) {
@@ -177,6 +210,34 @@ NOTHROW(KCALL vm_datapart_service_stale)(struct vm_datapart *__restrict self) {
 		/*decref_nokill(self); // The reference to `vn_part' was already dropped! (s.a. `vm_node_destroy()') */
 		vm_node_free(chain);
 		chain = next;
+	}
+	if (self->dp_futex) {
+		/* Also check for servicing dead futex objects. */
+		struct vm_futex_controller *fc;
+		struct vm_futex *dead, *next;
+		fc   = self->dp_futex;
+		dead = ATOMIC_XCH(fc->fc_dead, NULL);
+		while (dead) {
+			next = dead->f_ndead;
+#ifdef NDEBUG
+			vm_futextree_remove(&fc->fc_tree, dead->f_tree.a_vaddr,
+			                    fc->fc_semi0, fc->fc_level0);
+#else /* NDEBUG */
+			{
+				struct vm_futex *removed;
+				removed = vm_futextree_remove_at(&fc->fc_tree,
+				                                 dead->f_tree.a_vaddr,
+				                                 fc->fc_semi0,
+				                                 fc->fc_level0);
+				assertf(removed == dead, "%p != %p (addr: %p)",
+				        removed, dead, dead->f_tree.a_vaddr);
+			}
+#endif /* !NDEBUG */
+			vm_futex_free(dead);
+			dead = next;
+		}
+		/* Check if we should (possibly) delete the futex controller. */
+		vm_datapart_maybe_delete_futex_controller(self);
 	}
 }
 

@@ -28,34 +28,249 @@
 
 DECL_BEGIN
 
-//#ifndef SPLIT_FUTEX_DEFINED
-//#define SPLIT_FUTEX_DEFINED 1
-//PRIVATE void KCALL
-//split_futex_descriptors(struct vm_datapart *__restrict lo,
-//                        struct vm_datapart *__restrict hi,
-//                        struct vm_futex *__restrict ftx,
-//                        uintptr_t addr_offset) {
-//	struct vm_futex *ftx_lo, *ftx_hi;
-//again:
-//	ftx_lo = ftx->f_tree.a_min;
-//	ftx_hi = ftx->f_tree.a_max;
-//	if (ftx->f_tree.a_vaddr < addr_offset) {
-//		vm_futextree_insert(&lo->dp_futex, ftx);
-//	} else {
-//		ftx->f_tree.a_vaddr -= addr_offset;
-//		vm_futextree_insert(&hi->dp_futex, ftx);
-//	}
-//	if (ftx_lo) {
-//		if (ftx_hi)
-//			split_futex_descriptors(lo, hi, ftx_hi, addr_offset);
-//		ftx = ftx_lo;
-//		goto again;
-//	} else if (ftx_hi) {
-//		ftx = ftx_hi;
-//		goto again;
-//	}
-//}
-//#endif
+#ifndef SPLIT_FUTEX_HELPERS_DEFINED
+#define SPLIT_FUTEX_HELPERS_DEFINED 1
+
+PRIVATE NOBLOCK NONNULL((1)) struct vm_futex **
+NOTHROW(KCALL vm_futextree_prlocate_at_at_not_destroyed)(struct vm_futex **__restrict proot,
+                                                         uintptr_t key_min, uintptr_t key_max,
+                                                         uintptr_t *__restrict paddr_semi,
+                                                         unsigned int *__restrict paddr_level) {
+	struct vm_futex *root;
+	uintptr_t addr_semi = *paddr_semi;
+	unsigned int addr_level = *paddr_level;
+	/* addr_semi is the center point splitting the max
+	 * ranges of the underlying sb_min/sb_max branches. */
+	while ((root = *proot) != NULL) {
+		/* Check if the given key lies within this branch. */
+		if (key_min <= root->f_tree.a_vaddr &&
+		    key_max >= root->f_tree.a_vaddr) {
+			if (!wasdestroyed(root)) {
+				*paddr_semi  = addr_semi;
+				*paddr_level = addr_level;
+				return proot;
+			}
+		}
+		assertf(addr_level != (ATREE_LEVEL_T)-1,
+		        "proot      = %p\n"
+		        "*proot     = %p\n"
+		        "key_min    = %p\n"
+		        "key_max    = %p\n"
+		        "addr_semi  = %p\n",
+		        proot, *proot,
+		        key_min,
+		        key_max,
+		        addr_semi);
+		if (key_min < addr_semi) {
+			if (key_max >= addr_semi) {
+				struct vm_futex **result;
+				/* Also search the max-branch */
+				uintptr_t temp_semi = addr_semi;
+				unsigned int temp_level = addr_level;
+				ATREE_WALKMAX(uintptr_t, temp_semi, temp_level);
+				result = vm_futextree_prlocate_at_at_not_destroyed(&root->f_tree.a_max,
+				                                                   key_min, key_max,
+				                                                   &temp_semi, &temp_level);
+				if (result != NULL) {
+					*paddr_semi  = temp_semi;
+					*paddr_level = temp_level;
+					return result;
+				}
+			}
+			/* Continue with min-branch */
+			ATREE_WALKMIN(uintptr_t, addr_semi, addr_level);
+			proot = &root->f_tree.a_min;
+		} else {
+			/* Continue with max-branch */
+			ATREE_WALKMAX(uintptr_t, addr_semi, addr_level);
+			proot = &root->f_tree.a_max;
+		}
+	}
+	return NULL;
+}
+
+PRIVATE NOBLOCK NONNULL((1)) struct vm_futex *
+NOTHROW(KCALL vm_futextree_rremove_at_not_destroyed)(struct vm_futex **__restrict proot,
+                                                     uintptr_t key_min, uintptr_t key_max,
+                                                     uintptr_t addr_semi,
+                                                     unsigned int addr_level) {
+	struct vm_futex **remove_head;
+	remove_head = vm_futextree_prlocate_at_at_not_destroyed(proot,
+	                                                        key_min, key_max,
+	                                                        &addr_semi, &addr_level);
+	return remove_head != NULL
+	       ? vm_futextree_pop_at(remove_head, addr_semi, addr_level)
+	       : NULL;
+}
+
+/* Try to increment the reference counters of all futex objects and
+ * keep track of those with the lowest and greatest addresses, updating
+ * the given `p(min|max)addr' pointers as needed.
+ * @return: true:  No destroyed futex objects exist.
+ * @return: false: At least one futex object wasn't incref'd because it was already destroyed. */
+PRIVATE NOBLOCK NONNULL((1, 2, 3)) bool
+NOTHROW(KCALL vm_futextree_tryincref_all_and_collect_minmax)(struct vm_futex *__restrict tree,
+                                                             uintptr_t *__restrict pminaddr,
+                                                             uintptr_t *__restrict pmaxaddr
+#ifndef NDEBUG
+                                                             ,
+                                                             struct vm_datapart *__restrict expected_part
+#endif /* !NDEBUG */
+                                                             ) {
+	bool result = true;
+again:
+#ifndef NDEBUG
+	assert(tree->f_part.m_pointer == expected_part);
+#endif /* !NDEBUG */
+	/* Try to acquire a reference (Only update min/max or alive futex objects) */
+	if (tryincref(tree)) {
+		/* Keep track of the lowest and greatest address
+		 * that is bound to a futex that is still alive. */
+		uintptr_t addr = tree->f_tree.a_vaddr;
+		if (*pminaddr > addr)
+			*pminaddr = addr;
+		if (*pmaxaddr < addr)
+			*pmaxaddr = addr;
+	} else {
+		result = false;
+	}
+	if (tree->f_tree.a_min) {
+		if (tree->f_tree.a_max) {
+			result &= vm_futextree_tryincref_all_and_collect_minmax(tree->f_tree.a_max,
+			                                                        pminaddr,
+			                                                        pmaxaddr
+#ifndef NDEBUG
+			                                                        ,
+			                                                        expected_part
+#endif /* !NDEBUG */
+			                                                        );
+		}
+		tree = tree->f_tree.a_min;
+		goto again;
+	}
+	if (tree->f_tree.a_max) {
+		tree = tree->f_tree.a_max;
+		goto again;
+	}
+	return result;
+}
+
+
+/* Subtract `bytes_to_subtract' from all futex objects,
+ * then insert them into the given `*pnew_tree' */
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(KCALL vm_futextree_subtract_addr_and_reform_tree)(struct vm_futex *__restrict tree,
+                                                          struct vm_futex **__restrict pnew_tree,
+                                                          uintptr_t bytes_to_subtract,
+                                                          uintptr_t new_tree_semi0,
+                                                          unsigned int new_tree_level0) {
+	struct vm_futex *lo, *hi;
+again:
+	lo = tree->f_tree.a_min;
+	hi = tree->f_tree.a_max;
+	assert(!wasdestroyed(tree));
+	assert(tree->f_tree.a_vaddr >= bytes_to_subtract);
+	/* Update the leaf's address. */
+	tree->f_tree.a_vaddr -= bytes_to_subtract;
+	/* Insert the leaf into the new tree. */
+	vm_futextree_insert_at(pnew_tree, tree,
+	                       new_tree_semi0,
+	                       new_tree_level0);
+	/* Recurse through all leaves. */
+	if (hi) {
+		if (lo) {
+			vm_futextree_subtract_addr_and_reform_tree(lo, pnew_tree,
+			                                           bytes_to_subtract,
+			                                           new_tree_semi0,
+			                                           new_tree_level0);
+		}
+		tree = hi;
+		goto again;
+	}
+	if (lo) {
+		tree = lo;
+		goto again;
+	}
+}
+
+
+/* Decrement the reference counter of each futex object
+ * that hasn't been destroyed within the tree. */
+PRIVATE NOBLOCK NONNULL((1)) void
+NOTHROW(KCALL vm_futextree_decref_all_if_not_destroyed)(struct vm_futex *__restrict tree
+#ifndef NDEBUG
+                                                        ,
+                                                        struct vm_datapart *__restrict expected_part
+#endif /* !NDEBUG */
+                                                        ) {
+	/* Note that even when a futex object gets destroyed due to this, we can
+	 * assume that the tree pointers will not affected because the caller is
+	 * still holding a lock to the associated `expected_part', meaning that
+	 * `vm_futex_destroy()' isn't allowed to modify the tree. */
+again:
+#ifndef NDEBUG
+	assert(tree->f_part.m_pointer == expected_part);
+#endif /* !NDEBUG */
+	if (!wasdestroyed(tree))
+		decref_unlikely(tree);
+	if (tree->f_tree.a_min) {
+		if (tree->f_tree.a_max) {
+			vm_futextree_decref_all_if_not_destroyed(tree->f_tree.a_max
+#ifndef NDEBUG
+			                                         ,
+			                                         expected_part
+#endif /* !NDEBUG */
+			                                         );
+		}
+		tree = tree->f_tree.a_min;
+		goto again;
+	}
+	if (tree->f_tree.a_max) {
+		tree = tree->f_tree.a_max;
+		goto again;
+	}
+}
+
+PRIVATE NOBLOCK NONNULL((1, 2)) void
+NOTHROW(KCALL vm_futextree_set_part_pointer_and_decref_all)(struct vm_futex *__restrict tree,
+                                                            struct vm_datapart *__restrict new_part_pointer
+#ifndef NDEBUG
+                                                            ,
+                                                            struct vm_datapart *__restrict expected_part
+#endif /* !NDEBUG */
+                                                            ) {
+	/* Note that even when a futex object gets destroyed due to this, we can
+	 * assume that the tree pointers will not affected because the caller is
+	 * still holding a lock to the associated `expected_part', meaning that
+	 * `vm_futex_destroy()' isn't allowed to modify the tree. */
+again:
+#ifndef NDEBUG
+	assert(tree->f_part.m_pointer == expected_part);
+#endif /* !NDEBUG */
+	assert(!wasdestroyed(tree));
+	/* Set the new part pointer (such that it now points to the upper-half datapart) */
+	tree->f_part.set(new_part_pointer);
+	decref_unlikely(tree);
+	if (tree->f_tree.a_min) {
+		if (tree->f_tree.a_max) {
+			vm_futextree_set_part_pointer_and_decref_all(tree->f_tree.a_max,
+			                                             new_part_pointer
+#ifndef NDEBUG
+			                                             ,
+			                                             expected_part
+#endif /* !NDEBUG */
+			                                             );
+		}
+		tree = tree->f_tree.a_min;
+		goto again;
+	}
+	if (tree->f_tree.a_max) {
+		tree = tree->f_tree.a_max;
+		goto again;
+	}
+}
+
+#endif /* !SPLIT_FUTEX_HELPERS_DEFINED */
 
 
 #ifdef SPLIT_NX
@@ -298,7 +513,9 @@ again_lock_datapart:
 		/* At this point, we've got all the locks we could possibly need.
 		 * Now to move on to setup the higher half data part! */
 		result->dp_refcnt = 1; /* The reference that's going to be returned */
-		shared_rwlock_init(&result->dp_lock);
+		/* NOTE: Initialize with read-access, since we need that to update the data-part
+		 *       pointers of transferred futex objects once everything else has been done. */
+		shared_rwlock_init_read(&result->dp_lock);
 		result->dp_tree.a_vmin = self->dp_tree.a_vmin + (vpage_offset << VM_DATABLOCK_PAGESHIFT(self->dp_block));
 		result->dp_tree.a_vmax = self->dp_tree.a_vmax;
 		assert(result->dp_tree.a_vmin <= result->dp_tree.a_vmax);
@@ -404,6 +621,36 @@ again_lock_datapart:
 			sync_endwrite(self);
 			vm_set_clear(&vms);
 			goto again_lock_datapart;
+		}
+
+		/* Check if we must allocate a secondary futex controller for the upper-half datapart.
+		 * For this purpose, we do a simplified check that is guarantied to catch all cases
+		 * where a controller will be required, by simply checking if there is at least one
+		 * futex allocated within the address range of the upper-half datapart. */
+		if (self->dp_futex && !result->dp_futex &&
+		    vm_futextree_rlocate_at(self->dp_futex->fc_tree,
+		                            (uintptr_t)VM_PAGE2ADDR(vpage_offset),
+		                            (uintptr_t)-1,
+		                            self->dp_futex->fc_semi0,
+		                            self->dp_futex->fc_level0)) {
+			struct vm_futex_controller *hifc;
+			hifc = vm_futex_controller_allocf_nx(GFP_ATOMIC | GFP_PREFLT | GFP_VCBASE);
+			if (!hifc) {
+				/* Must allocate while blocking. */
+				vm_set_lockendwrite_all(&vms);
+				sync_endwrite(self);
+				vm_set_clear(&vms);
+#ifdef SPLIT_NX
+				hifc = vm_futex_controller_allocf_nx(GFP_PREFLT | GFP_VCBASE);
+				if unlikely(!hifc)
+					goto err;
+#else /* SPLIT_NX */
+				hifc = vm_futex_controller_allocf(GFP_PREFLT | GFP_VCBASE);
+#endif /* !SPLIT_NX */
+				result->dp_futex = hifc;
+				goto again_lock_datapart;
+			}
+			result->dp_futex = hifc;
 		}
 
 		switch (result->dp_state) {
@@ -582,26 +829,196 @@ again_lock_datapart:
 	}
 #endif /* !SPLIT_NX */
 
+	/*----------------------------------------------------------*
+	 | This is the point of no return, where nothing may go     |
+	 | wrong anymore, and we start modifying the original       |
+	 | datapart to only represent the lower half of the mapping |
+	 *----------------------------------------------------------*/
+
 	/* Split (and update) futex descriptors. */
-	result->dp_futex = NULL; /* TODO */
-
-//	if unlikely(self->dp_futex) {
-//		/* Unlikely, since only few dataparts ever carry futex objects. */
-//		struct vm_futex_controller *ctl;
-//		ctl            = self->dp_futex;
-//		self->dp_futex = NULL;
-//		assert(vm_datapart_maxdpage(self) + 1 == vm_datapart_mindpage(result));
-//		split_futex_descriptors(self,
-//		                        result,
-//		                        ctl,
-//		                        (uintptr_t)VM_PAGE2ADDR(vpage_offset));
-//	}
-
-	/* +----------------------------------------------------------+
-	 * | This is the point of no return, where nothing may go     |
-	 * | wrong anymore, and we start modifying the original       |
-	 * | datapart to only represent the lower half of the mapping |
-	 * +----------------------------------------------------------+ */
+	if (!self->dp_futex || self->dp_futex->fc_tree == NULL) {
+set_result_no_futex:
+		if unlikely(result->dp_futex != NULL) {
+			vm_futex_controller_free(result->dp_futex);
+			result->dp_futex = NULL;
+		}
+	} else {
+		/* Splitting a futex controller has multiple steps:
+		 *     #1: Enumerate all existing futex objects and use `tryincref()' to
+		 *         acquire references to all of them. Once this is done, we can
+		 *         assume that all futex objects that are `!wasdestroyed(FUTEX)'
+		 *         are those that can qualify for being part of the transfer:
+		 *           - Because we're holding a reference to each of them, it is
+		 *             guarantied that none of them will end up getting destroyed
+		 *             before we are done
+		 *           - Because we are holding a lock to `self->dp_lock', we are
+		 *             guarantied that no additional futex objects can appear.
+		 *         The combination of these 2 (valid) assumptions then allows us
+		 *         to assume that the set of qualifying futex objects will be
+		 *         consistent until we're done.
+		 *     #2: Figure out the lowest and greatest address to which a futex
+		 *         that isn't destroyed has been bound.
+		 *         If all these addresses...
+		 *            ... lie within the lower-half data part (i.e. `self'), then nothing
+		 *                else is left to be done, and the references acquired by step #1
+		 *                will automatically be released by the call to `vm_futextree_decref_all()'
+		 *                further down below.
+		 *            ... lie within the upper-half data part (i.e. `result'), and no futex
+		 *                object exists that had already been destroyed, then simply
+		 *                assign the controller pointer to `result', and set the controller
+		 *                pointer of `self' to `NULL'.
+		 *                Afterwards, subtract the new size of the lower-half data part from
+		 *                all futex objects and re-create the atree from scratch (also: update
+		 *                the `fc_(semi|level)0' fields)
+		 *                Then jump to the end of futex splitting code.
+		 *         Otherwise, if futex objects exist for both the lower-half and upper-half data
+		 *         parts, or futex objects exist that have already been destroyed, then a secondary
+		 *         futex controller needs to be allocated for `result'. Note that this third option
+		 *         is the only one that leads to step #4
+		 *     #4: At this point, once again enumerate all futex objects of `self' and transfer
+		 *         all those that belong into the upper-half data part into the newly allocated
+		 *         futex controller after subtracting the size of the lower-half data part from
+		 *         their address indices.
+		 */
+		struct vm_futex *transfer_futex;
+		struct vm_futex_controller *lofc;
+		struct vm_futex_controller *hifc;
+		uintptr_t minaddr = (uintptr_t)-1;
+		uintptr_t maxaddr = 0;
+		uintptr_t lofc_maxaddr;
+		bool all_futexes_alive;
+		lofc = self->dp_futex;
+again_incref_futexes:
+		all_futexes_alive = vm_futextree_tryincref_all_and_collect_minmax(lofc->fc_tree,
+		                                                                  &minaddr,
+		                                                                  &maxaddr
+#ifndef NDEBUG
+		                                                                  ,
+		                                                                  self
+#endif /* !NDEBUG */
+		                                                                  );
+		/* Integrity check: When all futex objects are alive, then the dead-pointer
+		 *                  has to be NULL. Note though that the opposite doesn't
+		 *                  hold true, since a futex may be dead, but the thread that
+		 *                  initiated the decref() may not yet have gotten around to
+		 *                  actually appending the futex to the associated controller's
+		 *                  chain of dead futex objects. */
+		assert(all_futexes_alive ? lofc->fc_dead == NULL
+		                         : true);
+		if unlikely(minaddr > maxaddr)
+			goto set_result_no_futex; /* Special case: All futex objects were already destroyed. */
+		/* Figure out the greatest address that should be
+		 * kept apart of the lower-half futex controller.
+		 * We choose to use the greatest address for this, since this
+		 * prevents the possibly of an overflow when the the split
+		 * happens at an offset of `SIZE_MAX' */
+		lofc_maxaddr = (uintptr_t)VM_PAGE2ADDR(vpage_offset) - 1;
+		if (maxaddr <= lofc_maxaddr) {
+			/* Simple case: The futex with the greatest address will still be apart of
+			 *              the lower-half (i.e. old; i.e. `self') datapart, meaning
+			 *              that we don't actually have to do anything! */
+			/* TODO: Re-Calculate best-fit semi/level values for the tree (since it's
+			 *       max-size is now lower than before).
+			 *       If this calculation turns up different values than the old ones,
+			 *       then we must also re-form the tree. */
+			goto set_result_no_futex;
+		}
+		if (minaddr > lofc_maxaddr) {
+			if (!all_futexes_alive) {
+				/* Check if we can maybe service the futex controller so
+				 * that all futexes that are dead now end up going away... */
+				struct vm_futex *dead;
+				dead = ATOMIC_XCH(lofc->fc_dead, NULL);
+				if (dead != NULL) {
+					struct vm_futex *next;
+					do {
+						next = dead->f_ndead;
+#ifdef NDEBUG
+						vm_futextree_remove(&lofc->fc_tree, dead->f_tree.a_vaddr,
+						                    lofc->fc_semi0, lofc->fc_level0);
+#else /* NDEBUG */
+						{
+							struct vm_futex *removed;
+							removed = vm_futextree_remove_at(&lofc->fc_tree,
+							                                 dead->f_tree.a_vaddr,
+							                                 lofc->fc_semi0,
+							                                 lofc->fc_level0);
+							assertf(removed == dead, "%p != %p (addr: %p)",
+							        removed, dead, dead->f_tree.a_vaddr);
+						}
+#endif /* !NDEBUG */
+						vm_futex_free(dead);
+					} while ((dead = next) != NULL);
+					vm_futextree_decref_all_if_not_destroyed(lofc->fc_tree
+#ifndef NDEBUG
+					                                         ,
+					                                         self
+#endif /* !NDEBUG */
+					                                         );
+					/* Incref all futex objects once again.
+					 * Maybe this time around, they'll all end up being alive... */
+					goto again_incref_futexes;
+				} else {
+					/* Some futex objects are dead, but none of them appear in the
+					 * chain of dead futex objects. This can happen when the thread
+					 * that did the final decref() hasn't gotten around to adding
+					 * the futex to the chain of dead ones of the associated controller.
+					 * In this case, we also mustn't let the upper-half datapart inherit
+					 * the futex controller, since we must uphold the assumption that
+					 * any data parts futex controller is [1..1][const] so-long as it
+					 * contains at least one futex with a reference counter of ZERO(0),
+					 * and that futex has yet to be added to the controller's chain
+					 * of dead futex objects. */
+				}
+			} else {
+				/* Another (fairly) simple case: All futex objects ended up belonging onto
+				 * the upper-half (i.e. `new'; i.e. `result') datapart, and there are no
+				 * futex objects that dead. In this case, we can simply have the upper-half
+				 * datapart inherit the futex controller of the lower-half one. */
+				assert(result->dp_futex != lofc);
+				if (result->dp_futex)
+					vm_futex_controller_free(result->dp_futex);
+				result->dp_futex = lofc;
+				self->dp_futex   = NULL; /* Stolen by `result->dp_futex'. */
+				assert(lofc->fc_tree != NULL);
+				/* TODO: Calculate best-fit semi/level values for the tree. */
+				lofc->fc_semi0  = ATREE_SEMI0(uintptr_t);
+				lofc->fc_level0 = ATREE_LEVEL0(uintptr_t);
+				/* Reform the futex tree. */
+				vm_futextree_subtract_addr_and_reform_tree(lofc->fc_tree,
+				                                           &lofc->fc_tree,
+				                                           lofc_maxaddr + 1,
+				                                           lofc->fc_semi0,
+				                                           lofc->fc_level0);
+				goto done_futex;
+			}
+		}
+		/* Both the lower-half and upper-half data parts will end up containing
+		 * futex objects. - In this case, we must allocate a secondary futex
+		 * controller which we can then assign to `result', before filling it
+		 * with only those futexes that are aren't destroyed, and have an
+		 * address that is `> lofc_maxaddr'
+		 * NOTE: Because we're already past the point of no return at this point,
+		 *       we _have_ to make sure that earlier code has already allocated
+		 *       the secondary futex controller by this point! */
+		hifc = result->dp_futex;
+		assertf(hifc != NULL,
+		        "Earlier code must pre-allocate the futex controller for this case!");
+		/* TODO: Calculate best-fit semi/level values for the tree. */
+		hifc->fc_semi0  = ATREE_SEMI0(uintptr_t);
+		hifc->fc_level0 = ATREE_LEVEL0(uintptr_t);
+		/* Remove all affected  */
+		while ((transfer_futex = vm_futextree_rremove_at_not_destroyed(&lofc->fc_tree,
+		                                                               lofc_maxaddr + 1, (uintptr_t)-1,
+		                                                               lofc->fc_semi0, lofc->fc_level0)) != NULL) {
+			assert(transfer_futex->f_tree.a_vaddr > lofc_maxaddr);
+			transfer_futex->f_tree.a_vaddr -= lofc_maxaddr + 1;
+			vm_futextree_insert_at(&hifc->fc_tree, transfer_futex,
+			                       hifc->fc_semi0, hifc->fc_level0);
+		}
+		/* And we're done! (though some more cleanup will be happening further down below...) */
+	}
+done_futex:
 
 	/* Try to truncate the page property vector of `self' */
 	if (self->dp_flags & VM_DATAPART_FLAG_HEAPPPP) {
@@ -609,7 +1026,9 @@ again_lock_datapart:
 		size_t bitsize_size;
 		uintptr_t *new_vector;
 		low_num_dpages = vpage_offset << VM_DATABLOCK_PAGESHIFT(self->dp_block);
-		bitsize_size   = CEILDIV(low_num_dpages, BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS) * sizeof(uintptr_t);
+		bitsize_size = CEILDIV(low_num_dpages,
+		                       BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS) *
+		               sizeof(uintptr_t);
 		new_vector = (uintptr_t *)krealloc_nx(self->dp_pprop_p,
 		                                      bitsize_size,
 		                                      GFP_ATOMIC | GFP_LOCKED |
@@ -738,10 +1157,40 @@ again_lock_datapart:
 
 	/* Release all of the locks we've acquired. */
 	vm_set_lockendwrite_all(&vms);
+
+	/* Deal with the aftermath of splitting a futex controller. */
+	if (self->dp_futex && self->dp_futex->fc_tree) {
+		/* Release the references previously acquired on futex objects. */
+		vm_futextree_decref_all_if_not_destroyed(self->dp_futex->fc_tree
+#ifndef NDEBUG
+		                                         ,
+		                                         self
+#endif /* !NDEBUG */
+		                                         );
+	}
+
 	sync_endwrite(self);
 	if (vm_node_vector != vm_node_buffer)
 		kfree(vm_node_vector);
 	vm_set_fini(&vms);
+
+	/* Deal with the aftermath of splitting a futex controller. */
+	if (result->dp_futex && result->dp_futex->fc_tree) {
+		/* Update the data-block pointers of all futex objects that were moved.
+		 * Then, decrement the reference counters of all futex objects by one,
+		 * thus undoing the incref() that was done prior to the transfer. */
+		vm_futextree_set_part_pointer_and_decref_all(result->dp_futex->fc_tree,
+		                                             result
+#ifndef NDEBUG
+		                                             ,
+		                                             self
+#endif /* !NDEBUG */
+		                                             );
+	}
+
+	/* Release the read-lock with which the resulting data part was initialized. */
+	sync_endread(result);
+
 	return result;
 #ifdef SPLIT_NX
 err:

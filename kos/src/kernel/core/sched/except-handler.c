@@ -26,7 +26,8 @@
 #include <kernel/syscall.h>
 #include <kernel/types.h>
 #include <kernel/user.h>
-#include <kernel/vm.h> /* DEFINE_PERVM_ONEXEC() */
+#include <kernel/vm.h>       /* DEFINE_PERVM_ONEXEC() */
+#include <kernel/vm/futex.h> /* vm_futex_broadcast() */
 #include <sched/except-handler.h>
 #include <sched/pid.h>
 #include <sched/task.h>

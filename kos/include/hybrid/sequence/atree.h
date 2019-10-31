@@ -76,16 +76,16 @@ __DECL_BEGIN
 #define ATREE_HEAD(T) T *
 #define ATREE_NODE(T, Tkey)                   \
 	struct {                                  \
-		T *a_min;    /* [0..1] Lower node. */ \
-		T *a_max;    /* [0..1] Upper node. */ \
+		T   *a_min;  /* [0..1] Lower node. */ \
+		T   *a_max;  /* [0..1] Upper node. */ \
 		Tkey a_vmin; /* Lower bound. */       \
 		Tkey a_vmax; /* Upper bound. */       \
 	}
 
 #define ATREE_NODE_SINGLE(T, Tkey)             \
 	struct {                                   \
-		T *a_min;     /* [0..1] Lower node. */ \
-		T *a_max;     /* [0..1] Upper node. */ \
+		T   *a_min;   /* [0..1] Lower node. */ \
+		T   *a_max;   /* [0..1] Upper node. */ \
 		Tkey a_vaddr; /* Node address. */      \
 	}
 

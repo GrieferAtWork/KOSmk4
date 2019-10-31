@@ -64,7 +64,6 @@ struct vm;
 struct vm_node;
 struct vm_datapart;
 struct vm_datablock;
-struct vm_futex;
 struct vm_futex_controller;
 
 #ifndef __gfp_t_defined
@@ -80,9 +79,9 @@ typedef unsigned int gfp_t;
 #ifdef __CC__
 #ifdef ALTERNATIVE_TYPE
 typedef ALTERNATIVE_TYPE(u64) vm_dpage_t; /* Data block page number. */
-#else
+#else /* ALTERNATIVE_TYPE */
 typedef u64                   vm_dpage_t; /* Data block page number. */
-#endif
+#endif /* !ALTERNATIVE_TYPE */
 typedef pos_t                 vm_daddr_t; /* Data block address. */
 
 
@@ -236,17 +235,34 @@ struct vm_datapart {
 		}                          dp_swpdata; /* [VM_DATAPART_STATE_INSWAP] */
 #endif /* !CONFIG_NO_SWAP */
 	};
-	union {                                       /* Bitset of per-page properties. */
+	union {                                    /* Bitset of per-page properties. */
 		/* NOTE: Modifications to these property bitsets only require a read-lock on `dp_lock' */
-		WEAK uintptr_t             dp_pprop;      /* [lock(READ(dp_lock))][valid_if(!VM_DATAPART_FLAG_HEAPPPP)] Inline bitset. */
-		WEAK uintptr_t            *dp_pprop_p;    /* [lock(READ(dp_lock))][0..CEILDIV(vm_datapart_numdpages(self),BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS)]
-		                                           * [valid_if(VM_DATAPART_FLAG_HEAPPPP)][owned][lock(dp_lock)]
-		                                           * Dynamically allocated bitset (or `NULL' when all pages have a state
-		                                           * identical to `VM_DATAPART_PPP_INITIALIZED', and changes are not
-		                                           * required for tracking, also requiring that `VM_DATAPART_FLAG_TRKCHNG'
-		                                           * not be set) */
+		WEAK uintptr_t             dp_pprop;   /* [lock(READ(dp_lock))][valid_if(!VM_DATAPART_FLAG_HEAPPPP)] Inline bitset. */
+		WEAK uintptr_t            *dp_pprop_p; /* [lock(READ(dp_lock))][0..CEILDIV(vm_datapart_numdpages(self),BITSOF(uintptr_t) / VM_DATAPART_PPP_BITS)]
+		                                        * [valid_if(VM_DATAPART_FLAG_HEAPPPP)][owned][lock(dp_lock)]
+		                                        * Dynamically allocated bitset (or `NULL' when all pages have a state
+		                                        * identical to `VM_DATAPART_PPP_INITIALIZED', and changes are not
+		                                        * required for tracking, also requiring that `VM_DATAPART_FLAG_TRKCHNG'
+		                                        * not be set) */
 	};
-	struct vm_futex_controller    *dp_futex;      /* [0..1][lock(WRITE_ONCE)][owned] Futex support controller. */
+	struct vm_futex_controller    *dp_futex;   /* [0..1][lock(dp_lock)][owned] Futex support controller.
+	                                            * Lazily allocated/de-allocated as futex objects are being used.
+	                                            * NOTE: For the duration of at least one futex object existing,
+	                                            *       this field can be considered `[1..1][const]'
+	                                            *       However, you still may not dereference this field from
+	                                            *      `struct vm_futex::f_part' without first acquiring `dp_lock',
+	                                            *       since there exists a chance that the associated is currently
+	                                            *       being split, and that the futex is currently being moved
+	                                            *       to the data part then responsible for the upper half of memory.
+	                                            *       The only case where this does not apply is you dereference the
+	                                            *      `f_part' pointer of a futex object with a reference counter of
+	                                            *       ZERO(0), since this would guaranty that the futex will not be
+	                                            *       carried over during a potential data-part split, as the process
+	                                            *       of splitting a data part containing futex objects also involves
+	                                            *       first acquiring references to all those futex objects in order
+	                                            *       to ensure a consistent set of those futex objects that are
+	                                            *       still alive (in other words: `vm_futex_destroy()' is allowed to,
+	                                            *       and as a matter of fact: _is_ dereferencing this field) */
 };
 
 FUNDEF NOBLOCK NONNULL((1)) void
@@ -254,12 +270,13 @@ NOTHROW(KCALL vm_datapart_free)(struct vm_datapart *__restrict self);
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_datapart_destroy)(struct vm_datapart *__restrict self,
                                    bool is_zero DFL(false));
-DEFINE_REFCOUNT_FUNCTIONS(struct vm_datapart,dp_refcnt,vm_datapart_destroy);
+DEFINE_REFCOUNT_FUNCTIONS(struct vm_datapart, dp_refcnt, vm_datapart_destroy);
+
 
 /* Decrement the reference counter of `self', and try to merge it with sibling data parts.
  * This functionality is combined with a decref() since a data part can only be merged when
  * it is only visible from within its own data block, or for any VM mapping, the latter only
- * allowing the part to the merged if _all_ mappings are layed out in a way that has the part
+ * allowing the part to the merged if _all_ mappings are laid out in a way that has the part
  * be mapped alongside its closest siblings in a continuous memory mapping.
  * Note that a data part will never be merged if it has any outside references which would
  * keep it being visible outside the small region that is controllable by the part itself.
@@ -338,7 +355,7 @@ NOBLOCK vm_vpage64_t NOTHROW(KCALL vm_datapart_startvpage)(struct vm_datapart *_
 NOBLOCK vm_daddr_t NOTHROW(KCALL vm_datapart_endbyte)(struct vm_datapart *__restrict self);
 NOBLOCK vm_dpage_t NOTHROW(KCALL vm_datapart_enddpage)(struct vm_datapart *__restrict self);
 NOBLOCK vm_vpage64_t NOTHROW(KCALL vm_datapart_endvpage)(struct vm_datapart *__restrict self);
-#else
+#else /* __INTELLISENSE__ */
 #define vm_datapart_numbytes(self)   ((u64)(((self)->dp_tree.a_vmax - (self)->dp_tree.a_vmin) + 1) << VM_DATABLOCK_ADDRSHIFT((self)->dp_block))
 #define vm_datapart_numdpages(self)  ((u64)(((self)->dp_tree.a_vmax - (self)->dp_tree.a_vmin) + 1))
 #define vm_datapart_numvpages(self)  ((size_t)(((self)->dp_tree.a_vmax - (self)->dp_tree.a_vmin) + 1) >> VM_DATABLOCK_PAGESHIFT((self)->dp_block))
@@ -354,7 +371,7 @@ NOBLOCK vm_vpage64_t NOTHROW(KCALL vm_datapart_endvpage)(struct vm_datapart *__r
 #define vm_datapart_endbyte(self)    (((vm_daddr_t)(self)->dp_tree.a_vmax + 1) << VM_DATABLOCK_ADDRSHIFT((self)->dp_block))
 #define vm_datapart_enddpage(self)   ((vm_dpage_t)(self)->dp_tree.a_vmax + 1)
 #define vm_datapart_endvpage(self)   (vm_datapart_maxvpage(self) + 1)
-#endif
+#endif /* !__INTELLISENSE__ */
 
 
 /* Allocate/free ram/swap data for the given data part.
@@ -391,14 +408,14 @@ FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_datapart_do_ffreeram)(struct vm_datapart *__restrict self, bool is_zero);
 FUNDEF NOBLOCK NONNULL((1)) void
 NOTHROW(KCALL vm_datapart_do_freeram)(struct vm_datapart *__restrict self);
-#else
+#else /* __INTELLISENSE__ */
 #define vm_datapart_do_ccfreeram(self) \
         vm_do_ccfreeram(&(self)->dp_ramdata.rd_block0,(self)->dp_ramdata.rd_blockv)
 #define vm_datapart_do_ffreeram(self,is_zero) \
         vm_do_ffreeram(&(self)->dp_ramdata.rd_block0,(self)->dp_ramdata.rd_blockv,is_zero)
 #define vm_datapart_do_freeram(self) \
         vm_do_freeram(&(self)->dp_ramdata.rd_block0,(self)->dp_ramdata.rd_blockv)
-#endif
+#endif /* !__INTELLISENSE__ */
 
 /* Copy the physical memory backing of `src' into `dst'.
  * The caller is responsible to ensure that both parts are INCORE or LOCKED,
@@ -682,12 +699,6 @@ FUNDEF WUNUSED NONNULL((1)) bool NOTHROW(FCALL vm_datapart_lockwrite_setcore_uns
 FUNDEF WUNUSED NONNULL((1)) bool NOTHROW(FCALL vm_datapart_lockread_setcore_nx)(struct vm_datapart *__restrict self);
 FUNDEF WUNUSED NONNULL((1)) bool NOTHROW(FCALL vm_datapart_lockread_setcore_unsharecow_nx)(struct vm_datapart *__restrict self);
 
-/* Return (and allocate on first access) the futex controller for a given datapart `self' */
-FUNDEF WUNUSED ATTR_CONST ATTR_RETNONNULL NONNULL((1)) struct vm_futex_controller *FCALL
-vm_datapart_futexctl(struct vm_datapart *__restrict self) THROWS(E_BADALLOC, E_WOULDBLOCK);
-FUNDEF WUNUSED ATTR_CONST NONNULL((1)) struct vm_futex_controller *
-NOTHROW(FCALL vm_datapart_futexctl_nx)(struct vm_datapart *__restrict self);
-
 
 /* Return the address of a physical page at the given `vpage_offset'
  * The caller must be holding a read- or write-lock on `self',
@@ -873,7 +884,7 @@ struct vm_datablock {
 	struct vm_datablock_type const     *db_type;   /* [1..1][const] The type descriptor for this datablock. */
 #ifdef CONFIG_VIO
 	struct vm_datablock_type_vio const *db_vio;    /* [0..1][const] VIO callbacks (or NULL if the datablock doesn't use VIO). */
-#endif
+#endif /* CONFIG_VIO */
 	REF LLIST(struct vm_datapart)       db_parts;  /* [0..1][lock(db_lock)] The first part of this datablock.
 	                                                * NOTE: When set to `VM_DATABLOCK_ANONPARTS', new parts are always
 	                                                *       allocated anonymously, and never added to the actual datablock.
@@ -2119,9 +2130,6 @@ NOTHROW(KCALL vm_enumdmav_nx)(struct vm *__restrict effective_vm,
  *       passed to `vm_startdma*()', or an identical memory copy of it. */
 FUNDEF NONNULL((1)) NOBLOCK void
 NOTHROW(FCALL vm_stopdma)(struct vm_dmalock *__restrict lockvec, size_t lockcnt);
-
-/* Broadcast to all thread waiting for a futex at `futex_address' within the current VM */
-FUNDEF void FCALL vm_futex_broadcast(void *futex_address) THROWS(E_WOULDBLOCK, E_SEGFAULT);
 
 struct path;
 struct directory_entry;

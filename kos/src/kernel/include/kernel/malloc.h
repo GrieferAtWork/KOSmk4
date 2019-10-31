@@ -176,7 +176,7 @@ FORCELOCAL WUNUSED ATTR_MALLOC ATTR_RETNONNULL VIRT void *KCALL
 kmalloc(size_t n_bytes, gfp_t flags) THROWS(E_BADALLOC, E_WOULDBLOCK) {
 	if (__builtin_constant_p(n_bytes)) {
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
-		if (n_bytes < HEAP_MINSIZE) {
+		if (n_bytes < SLAB_MAXSIZE) {
 #ifdef __OMIT_SLAB_MALLOC_CONSTANT_P_WRAPPERS
 			return __os_slab_kmalloc(n_bytes, flags);
 #else /* __OMIT_SLAB_MALLOC_CONSTANT_P_WRAPPERS */
@@ -277,7 +277,7 @@ FORCELOCAL WUNUSED ATTR_MALLOC VIRT void *
 NOTHROW(KCALL kmalloc_nx)(size_t n_bytes, gfp_t flags) {
 	if (__builtin_constant_p(n_bytes)) {
 #ifdef CONFIG_USE_SLAB_ALLOCATORS
-		if (n_bytes < HEAP_MINSIZE) {
+		if (n_bytes < SLAB_MAXSIZE) {
 #ifdef __OMIT_SLAB_MALLOC_CONSTANT_P_WRAPPERS
 			return __os_slab_kmalloc_nx(n_bytes, flags);
 #else /* __OMIT_SLAB_MALLOC_CONSTANT_P_WRAPPERS */

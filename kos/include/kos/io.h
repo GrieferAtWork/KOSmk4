@@ -32,7 +32,7 @@ __DECL_BEGIN
 #ifdef __CC__
 #ifndef __iomode_t_defined
 #define __iomode_t_defined 1
-typedef __iomode_t iomode_t;
+typedef __iomode_t iomode_t; /* Set of `IO_*' */
 #endif /* !__iomode_t_defined */
 
 #ifndef __readdir_mode_t_defined
@@ -80,16 +80,16 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 #endif /* !S_IFMT */
 
 #ifndef S_ISDIR
-#define S_ISDIR(x)  (((x)&S_IFMT) == S_IFDIR)
-#define S_ISCHR(x)  (((x)&S_IFMT) == S_IFCHR)
-#define S_ISBLK(x)  (((x)&S_IFMT) == S_IFBLK)
-#define S_ISREG(x)  (((x)&S_IFMT) == S_IFREG)
-#define S_ISFIFO(x) (((x)&S_IFMT) == S_IFIFO)
-#define S_ISLNK(x)  (((x)&S_IFMT) == S_IFLNK)
-#endif
+#define S_ISDIR(x)  (((x) & S_IFMT) == S_IFDIR)
+#define S_ISCHR(x)  (((x) & S_IFMT) == S_IFCHR)
+#define S_ISBLK(x)  (((x) & S_IFMT) == S_IFBLK)
+#define S_ISREG(x)  (((x) & S_IFMT) == S_IFREG)
+#define S_ISFIFO(x) (((x) & S_IFMT) == S_IFIFO)
+#define S_ISLNK(x)  (((x) & S_IFMT) == S_IFLNK)
+#endif /* !S_ISDIR */
 #ifndef S_ISDEV
-#define S_ISDEV(x)  (((x)&0130000) == 0020000) /* S_IFCHR|S_IFBLK */
-#endif
+#define S_ISDEV(x)  (((x) & 0130000) == 0020000) /* S_IFCHR|S_IFBLK */
+#endif /* !S_ISDEV */
 
 
 /* Directory entry types (`struct dirent::d_type'). */
@@ -162,7 +162,7 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 #define O_CLOEXEC    0x0080000 /* Close the file during exec() */
 #define O_CLOFORK    0x0100000 /* Close the handle when the file descriptors are unshared (s.a. `CLONE_FILES') */
 #define O_PATH       0x0200000 /* Open a path for *at system calls. */
-#define O_TMPFILE   (0x0400000|O_DIRECTORY)
+#define O_TMPFILE   (0x0400000 | O_DIRECTORY)
 #define O_SYMLINK    0x2000000 /* Open a symlink itself, rather than dereferencing it.
                                 * NOTE: When combined with `O_EXCL', throw an `E_FSERROR_NOT_A_SYMBOLIC_LINK:
                                 *       E_FILESYSTEM_NOT_A_SYMBOLIC_LINK_OPEN' if the file isn't a symbolic link.
@@ -253,10 +253,10 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 /* fcntl() commands */
 #ifndef F_DUPFD
 #define F_DUPFD            0 /* Duplicate file descriptor. */
-#define F_GETFD            1 /* Get file descriptor flags (as a set of `O_CLOFORK|O_CLOEXEC'). */
-#define F_SETFD            2 /* Set file descriptor flags (as a set of `O_CLOFORK|O_CLOEXEC'). */
-#define F_GETFL            3 /* Get file status flags (as a set of `O_APPEND|O_NONBLOCK|O_SYNC|O_ASYNC|O_DIRECT'). */
-#define F_SETFL            4 /* Set file status flags (as a set of `O_APPEND|O_NONBLOCK|O_SYNC|O_ASYNC|O_DIRECT'). */
+#define F_GETFD            1 /* Get file descriptor flags (as a set of `O_CLOFORK | O_CLOEXEC'). */
+#define F_SETFD            2 /* Set file descriptor flags (as a set of `O_CLOFORK | O_CLOEXEC'). */
+#define F_GETFL            3 /* Get file status flags (as a set of `O_APPEND | O_NONBLOCK | O_SYNC | O_ASYNC | O_DIRECT'). */
+#define F_SETFL            4 /* Set file status flags (as a set of `O_APPEND | O_NONBLOCK | O_SYNC | O_ASYNC | O_DIRECT'). */
 #define F_GETLK32          5 /* Get record locking info. */
 #define F_SETLK32          6 /* Set record locking info (non-blocking). */
 #define F_SETLKW32         7 /* Set record locking info (blocking).    */
@@ -314,29 +314,29 @@ typedef unsigned int poll_mode_t; /* Set of `POLL*' */
 
 /* Mask of flags accepted by the kos extension functions:
  *  `readf', `writef', `preadf', `pwritef', `ioctlf()', `hopf()' */
-#define IO_USERF_MASK  (IO_APPEND|IO_NONBLOCK|IO_SYNC|IO_ASYNC|IO_DIRECT)
+#define IO_USERF_MASK (IO_APPEND | IO_NONBLOCK | IO_SYNC | IO_ASYNC | IO_DIRECT)
 
 /* Mask of flags modifiable via `F_SETFD' / `F_SETFL' */
-#define IO_SETFL_MASK  (IO_APPEND|IO_NONBLOCK|IO_SYNC|IO_ASYNC|IO_DIRECT)
+#define IO_SETFL_MASK (IO_APPEND | IO_NONBLOCK | IO_SYNC | IO_ASYNC | IO_DIRECT)
 
 /* Mask for handle flags (flags not inherited during `dup()'). */
-#define IO_SETFD_MASK  (IO_CLOEXEC|IO_CLOFORK)
+#define IO_SETFD_MASK (IO_CLOEXEC | IO_CLOFORK)
 
 /* NOTE: The following flags don't affect I/O, but are stored in the same field.
- *       Additionally, their `O_*' quivalent have different values. */
-#define IO_HANDLE_CLOEXEC             IO_CLOEXEC /* Close during exec() */
-#define IO_HANDLE_CLOFORK             IO_CLOFORK /* Close during fork() */
-#define IO_HANDLE_FFROM_OPENFLAG(x)  (__CCAST(__iomode_t)(((x)&0x180000) >> 17))
-#define IO_HANDLE_FTO_OPENFLAG(x)   ((__CCAST(__oflag_t)(x)&0xc) << 17)
+ *       Additionally, their `O_*' equivalent have different values. */
+#define IO_HANDLE_CLOEXEC           IO_CLOEXEC /* Close during exec() */
+#define IO_HANDLE_CLOFORK           IO_CLOFORK /* Close during fork() */
+#define IO_HANDLE_FFROM_OPENFLAG(x) (__CCAST(__iomode_t)(((x) & 0x180000) >> 17))
+#define IO_HANDLE_FTO_OPENFLAG(x)   ((__CCAST(__oflag_t)(x) & 0xc) << 17)
 /* Similar to `IO_HANDLE_FFROM_O()' / `IO_HANDLE_FTO_O()', but used for converting `FD_*' flags. */
 #define IO_HANDLE_FFROM_FD(x) (__CCAST(__iomode_t)((x) << 2))
 #define IO_HANDLE_FTO_FD(x)   (__CCAST(__oflag_t)(x) >> 2)
 
 /* Convert I/O flags to/from `O_*' flags. */
-#define IO_FROM_OPENFLAG(x)            (((x)&0xfff3)|IO_HANDLE_FFROM_OPENFLAG(x))
-#define IO_TO_OPENFLAG(x)              (((x)&0xfff3)|IO_HANDLE_FTO_OPENFLAG(x))
-#define IO_FROM_OPENFLAG_NOHANDLE(x)   ((x)&0xfff3)
-#define IO_TO_OPENFLAG_NOHANDLE(x)     ((x)&0xfff3)
+#define IO_FROM_OPENFLAG(x)          (((x) & 0xfff3) | IO_HANDLE_FFROM_OPENFLAG(x))
+#define IO_TO_OPENFLAG(x)            (((x) & 0xfff3) | IO_HANDLE_FTO_OPENFLAG(x))
+#define IO_FROM_OPENFLAG_NOHANDLE(x) ((x) & 0xfff3)
+#define IO_TO_OPENFLAG_NOHANDLE(x)   ((x) & 0xfff3)
 #endif /* !IO_GENERIC */
 
 
