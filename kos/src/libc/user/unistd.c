@@ -1938,15 +1938,42 @@ NOTHROW_RPC(LIBCCALL libc_setusershell)(void)
 }
 /*[[[end:setusershell]]]*/
 
+PRIVATE ATTR_SECTION(".rodata.crt.system.utility.root") char const root[] = "/";
+PRIVATE ATTR_SECTION(".rodata.crt.system.utility.dev_null") char const dev_null[] = "/dev/null";
+
 /*[[[head:daemon,hash:CRC-32=0x22155f43]]]*/
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.utility.daemon") int
 NOTHROW_RPC(LIBCCALL libc_daemon)(int nochdir,
                                   int noclose)
 /*[[[body:daemon]]]*/
 {
-	CRT_UNIMPLEMENTED("daemon"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	pid_t cpid;
+	cpid = fork();
+	if (cpid < 0)
+		return -1;
+	if (cpid != 0)
+		_Exit(0); /* The parent process dies. */
+	if (setsid() < 0)
+		return -1;
+	if (!nochdir)
+		chdir(root);
+	if (!noclose) {
+		fd_t i, nul = open(dev_null, O_RDWR);
+		if (nul < 0)
+			return -1;
+		/* NOTE: Glibc does an additional check to ensure that `nul' really
+		 *       is a character-device with the correct dev_t. We could do
+		 *       that as well, however I'd consider a system where /dev/null
+		 *       isn't actually /dev/null to already be broken... (and the
+		 *       check only adds unnecessary overhead if you ask me) */
+		for (i = 0; i < 3; ++i) {
+			if (nul != i)
+				sys_dup2(nul, i);
+		}
+		if (nul >= 3)
+			sys_close(nul);
+	}
+	return 0;
 }
 /*[[[end:daemon]]]*/
 
@@ -1956,7 +1983,6 @@ ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify.revoke") int
 NOTHROW_RPC(LIBCCALL libc_revoke)(char const *file)
 /*[[[body:revoke]]]*/
 {
-	CRT_UNIMPLEMENTED("revoke"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
 }
