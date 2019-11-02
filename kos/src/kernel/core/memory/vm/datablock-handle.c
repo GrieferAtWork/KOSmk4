@@ -16,8 +16,8 @@
  *    misrepresented as being the original software.                          *
  * 3. This notice may not be removed or altered from any source distribution. *
  */
-#ifndef GUARD_KERNEL_SRC_MEMORY_VM_DATABLOCK_HANDLE_OPERATIONS_C
-#define GUARD_KERNEL_SRC_MEMORY_VM_DATABLOCK_HANDLE_OPERATIONS_C 1
+#ifndef GUARD_KERNEL_SRC_MEMORY_VM_DATABLOCK_HANDLE_C
+#define GUARD_KERNEL_SRC_MEMORY_VM_DATABLOCK_HANDLE_C 1
 #define _KOS_SOURCE 1
 
 #include <kernel/compiler.h>
@@ -26,9 +26,11 @@
 #include <fs/vfs.h>
 #include <kernel/aio.h>
 #include <kernel/except.h>
+#include <kernel/handle-proto.h>
 #include <kernel/handle.h>
 #include <kernel/user.h>
 #include <kernel/vm.h>
+#include <kernel/vm/futex.h>
 
 #include <hybrid/atomic.h>
 
@@ -36,12 +38,13 @@
 #include <kos/hop.h>
 #include <sys/stat.h>
 
+#include <errno.h>
 #include <string.h>
 
 DECL_BEGIN
 
 /* DATABLOCK HANDLE OPERATIONS */
-DEFINE_HANDLE_REFCNT_FUNCTIONS(datablock,struct vm_datablock)
+DEFINE_HANDLE_REFCNT_FUNCTIONS(datablock, struct vm_datablock)
 
 INTERN size_t KCALL
 handle_datablock_pread(struct vm_datablock *__restrict self,
@@ -377,6 +380,78 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 		*(int *)arg = vm_datablock_deanonymize(self) ? 1 : 0;
 		break;
 
+	case HOP_DATABLOCK_OPEN_PART:
+	case HOP_DATABLOCK_OPEN_PART_EXACT: {
+		size_t struct_size;
+		struct hop_datablock_openpart *data;
+		REF struct vm_datapart *part;
+		struct handle hnd;
+		validate_writable(arg, sizeof(struct hop_datablock_openpart));
+		data        = (struct hop_datablock_openpart *)arg;
+		struct_size = ATOMIC_READ(data->dop_struct_size);
+		if (struct_size != sizeof(struct hop_datablock_openpart))
+			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_datablock_openpart), struct_size);
+		part = cmd == HOP_DATABLOCK_OPEN_PART_EXACT
+		       ? vm_datablock_locatepart_exact(self,
+		                                       (vm_vpage64_t)data->dop_pageno,
+		                                       (size_t)data->dop_pages_hint)
+		       : vm_datablock_locatepart(self,
+		                                 (vm_vpage64_t)data->dop_pageno,
+		                                 (size_t)data->dop_pages_hint);
+		FINALLY_DECREF_UNLIKELY(part);
+		COMPILER_WRITE_BARRIER();
+		data->dop_pageno = (u64)vm_datapart_startvpage(part);
+		COMPILER_WRITE_BARRIER();
+		hnd.h_type = HANDLE_TYPE_DATAPART;
+		hnd.h_mode = mode;
+		hnd.h_data = part;
+		return handle_installhop(&data->dop_openfd, hnd);
+	}	break;
+
+	case HOP_DATABLOCK_HASCHANGED: {
+		size_t struct_size;
+		struct hop_datablock_haschanged *data;
+		bool haschanged;
+		validate_writable(arg, sizeof(struct hop_datablock_haschanged));
+		data        = (struct hop_datablock_haschanged *)arg;
+		struct_size = ATOMIC_READ(data->dhc_struct_size);
+		if (struct_size != sizeof(struct hop_datablock_haschanged))
+			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_datablock_haschanged), struct_size);
+		haschanged = vm_datablock_haschanged(self,
+		                                     VM_DATABLOCK_DADDR2DPAGE(self, (vm_daddr_t)data->dhc_minbyte),
+		                                     VM_DATABLOCK_DADDR2DPAGE(self, (vm_daddr_t)data->dhc_maxbyte));
+		COMPILER_WRITE_BARRIER();
+		data->dhc_result = haschanged ? HOP_DATABLOCK_HASCHANGED_FLAG_DIDCHANGE
+		                              : HOP_DATABLOCK_HASCHANGED_FLAG_UNCHANGED;
+		COMPILER_WRITE_BARRIER();
+	}	break;
+
+	case HOP_DATABLOCK_OPEN_FUTEX:
+	case HOP_DATABLOCK_OPEN_FUTEX_EXISTING: {
+		size_t struct_size;
+		struct hop_datablock_open_futex *data;
+		REF struct vm_futex *ftx;
+		struct handle hnd;
+		/* [struct hop_datablock_open_futex *result] Return an existing a futex for the given address. */
+		validate_writable(arg, sizeof(struct hop_datablock_open_futex));
+		data        = (struct hop_datablock_open_futex *)arg;
+		struct_size = ATOMIC_READ(data->dof_struct_size);
+		if (struct_size != sizeof(struct hop_datablock_open_futex))
+			THROW(E_BUFFER_TOO_SMALL, sizeof(struct hop_datablock_open_futex), struct_size);
+		if (cmd == HOP_DATABLOCK_OPEN_FUTEX_EXISTING) {
+			ftx = vm_datablock_getfutex_existing(self, (vm_daddr_t)data->dof_address);
+			if (!ftx)
+				return -ENOENT;
+		} else {
+			ftx = vm_datablock_getfutex(self, (vm_daddr_t)data->dof_address);
+		}
+		FINALLY_DECREF_UNLIKELY(ftx);
+		hnd.h_type = HANDLE_TYPE_FUTEX;
+		hnd.h_mode = mode;
+		hnd.h_data = ftx;
+		return handle_installhop(&data->dof_openfd, hnd);
+	}	break;
+
 	case HOP_INODE_OPEN_SUPERBLOCK:
 		if (!vm_datablock_isinode(self))
 			THROW(E_INVALID_HANDLE_FILETYPE,
@@ -387,10 +462,10 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 			      0);
 		{
 			struct handle result_handle;
-			result_handle.h_data = ((struct inode *)self)->i_super;
 			result_handle.h_mode = mode;
 			result_handle.h_type = HANDLE_TYPE_DATABLOCK;
-			handle_installhop((USER UNCHECKED struct hop_openfd *)arg, result_handle);
+			result_handle.h_data = ((struct inode *)self)->i_super;
+			return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, result_handle);
 		}
 		break;
 
@@ -1103,7 +1178,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 			result_handle.h_mode = mode;
 			result_handle.h_type = HANDLE_TYPE_BLOCKDEVICE;
 			(struct superblock *)self;
-			handle_installhop((USER UNCHECKED struct hop_openfd *)arg, result_handle);
+			return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, result_handle);
 		}
 		break;
 
@@ -1121,17 +1196,10 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 			sync_read(&((struct superblock *)self)->s_wall_lock);
 			result_handle.h_data = incref(((struct superblock *)self)->s_wall);
 			sync_endread(&((struct superblock *)self)->s_wall_lock);
-			TRY {
-				result_handle.h_mode = mode;
-				result_handle.h_type = HANDLE_TYPE_CLOCK;
-				(struct superblock *)self;
-				handle_installhop((USER UNCHECKED struct hop_openfd *)arg, result_handle);
-			}
-			EXCEPT {
-				decref((struct wall_clock *)result_handle.h_data);
-				RETHROW();
-			}
-			decref((struct wall_clock *)result_handle.h_data);
+			FINALLY_DECREF_UNLIKELY((struct wall_clock *)result_handle.h_data);
+			result_handle.h_mode = mode;
+			result_handle.h_type = HANDLE_TYPE_CLOCK;
+			return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, result_handle);
 		}
 		break;
 #endif
@@ -1150,7 +1218,7 @@ handle_datablock_hop(struct vm_datablock *__restrict self,
 			result_handle.h_mode = mode;
 			result_handle.h_type = HANDLE_TYPE_DRIVER;
 			(struct superblock *)self;
-			handle_installhop((USER UNCHECKED struct hop_openfd *)arg, result_handle);
+			return handle_installhop((USER UNCHECKED struct hop_openfd *)arg, result_handle);
 		}
 		break;
 
@@ -1213,19 +1281,15 @@ handle_datablock_stat(struct vm_datablock *__restrict self,
 	}
 }
 
-INTERN REF struct vm_datablock *KCALL
-handle_blockdevice_mmap(struct vm_datablock *__restrict self,
-                        vm_vpage64_t *__restrict UNUSED(pminpage),
-                        vm_vpage64_t *__restrict UNUSED(pmaxpage)) {
+INTERN WUNUSED ATTR_RETNONNULL NONNULL((1, 2, 3)) REF struct vm_datablock *KCALL
+handle_datablock_mmap(struct vm_datablock *__restrict self,
+                      vm_vpage64_t *__restrict UNUSED(pminpage),
+                      vm_vpage64_t *__restrict UNUSED(pmaxpage))
+		THROWS(...) {
 	return incref(self);
 }
 
 
-
-/* VM HANDLE OPERATIONS */
-DEFINE_HANDLE_REFCNT_FUNCTIONS(vm, struct vm)
-/* TODO: Implement more handle operators. */
-
 DECL_END
 
-#endif /* !GUARD_KERNEL_SRC_MEMORY_VM_DATABLOCK_HANDLE_OPERATIONS_C */
+#endif /* !GUARD_KERNEL_SRC_MEMORY_VM_DATABLOCK_HANDLE_C */

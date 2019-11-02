@@ -120,7 +120,7 @@ FUNDEF WUNUSED NONNULL((1)) REF struct vm_futex *
  *          and once again lookup the `vm_node'.
  *       -> In the end, there exists no API also found on linux that would make use of this
  *          function, however on KOS it is possible to access this function through use of
- *          the HANDLE_TYPE_DATABLOCK-specific hop() function `<TODO:Add a hop for this>'
+ *          the HANDLE_TYPE_DATABLOCK-specific hop() function `HOP_DATABLOCK_OPEN_FUTEX[_EXISTING]'
  * @return: * : The futex associated with the given `addr' */
 FUNDEF WUNUSED ATTR_RETNONNULL NONNULL((1)) REF struct vm_futex *
 (KCALL vm_datablock_getfutex)(struct vm_datablock *__restrict self, vm_daddr_t addr)

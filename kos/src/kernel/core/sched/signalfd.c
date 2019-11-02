@@ -21,7 +21,9 @@
 
 #include <kernel/compiler.h>
 
+#include <kernel/aio.h>
 #include <kernel/except.h>
+#include <kernel/handle-proto.h>
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
 #include <kernel/syscall.h>
@@ -221,6 +223,12 @@ handle_signalfd_read(struct signalfd *__restrict self,
 	}
 	return result;
 }
+
+DEFINE_HANDLE_READV_FROM_READ(signalfd, struct signalfd)
+DEFINE_HANDLE_AREAD_FROM_READ(signalfd, struct signalfd)
+DEFINE_HANDLE_AREADV_FROM_READV(signalfd, struct signalfd)
+
+
 
 INTERN poll_mode_t KCALL
 handle_signalfd_poll(struct signalfd *__restrict self,

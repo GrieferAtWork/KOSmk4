@@ -27,6 +27,7 @@
 #include <fs/vfs.h>
 #include <kernel/cache.h>
 #include <kernel/except.h>
+#include <kernel/handle-proto.h>
 #include <kernel/handle.h>
 #include <kernel/heap.h>
 #include <kernel/malloc.h>

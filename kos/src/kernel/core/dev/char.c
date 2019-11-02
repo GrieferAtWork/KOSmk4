@@ -32,6 +32,7 @@
 #include <kernel/aio.h>
 #include <kernel/debugger.h>
 #include <kernel/except.h>
+#include <kernel/handle-proto.h>
 #include <kernel/handle.h>
 #include <kernel/heap.h>
 #include <kernel/malloc.h>
@@ -606,84 +607,14 @@ handle_characterdevice_pwritev(struct character_device *__restrict self,
 	return result;
 }
 
-INTERN size_t KCALL
-handle_characterdevice_aread(struct character_device *__restrict self,
-                             USER CHECKED void *dst, size_t num_bytes,
-                             iomode_t mode,
-                             struct aio_multihandle *__restrict aio) {
-	size_t result;
-	result = handle_characterdevice_read(self, dst, num_bytes, mode);
-	return result;
-}
-
-INTERN size_t KCALL
-handle_characterdevice_awrite(struct character_device *__restrict self,
-                              USER CHECKED void const *src, size_t num_bytes,
-                              iomode_t mode,
-                              struct aio_multihandle *__restrict aio) {
-	size_t result;
-	result = handle_characterdevice_write(self, src, num_bytes, mode);
-	return result;
-}
-
-INTERN size_t KCALL
-handle_characterdevice_areadv(struct character_device *__restrict self,
-                              struct aio_buffer *__restrict dst,
-                              size_t num_bytes, iomode_t mode,
-                              struct aio_multihandle *__restrict aio) {
-	size_t result;
-	result = handle_characterdevice_readv(self, dst, num_bytes, mode);
-	return result;
-}
-
-INTERN size_t KCALL
-handle_characterdevice_awritev(struct character_device *__restrict self,
-                               struct aio_buffer *__restrict src,
-                               size_t num_bytes, iomode_t mode,
-                               struct aio_multihandle *__restrict aio) {
-	size_t result;
-	result = handle_characterdevice_writev(self, src, num_bytes, mode);
-	return result;
-}
-
-INTERN size_t KCALL
-handle_characterdevice_apread(struct character_device *__restrict self,
-                              USER CHECKED void *dst,
-                              size_t num_bytes, pos_t addr, iomode_t mode,
-                              struct aio_multihandle *__restrict aio) {
-	size_t result;
-	result = handle_characterdevice_pread(self, dst, num_bytes, addr, mode);
-	return result;
-}
-
-INTERN size_t KCALL
-handle_characterdevice_apwrite(struct character_device *__restrict self,
-                               USER CHECKED void const *src,
-                               size_t num_bytes, pos_t addr, iomode_t mode,
-                               struct aio_multihandle *__restrict aio) {
-	size_t result;
-	result = handle_characterdevice_pwrite(self, src, num_bytes, addr, mode);
-	return result;
-}
-
-INTERN size_t KCALL
-handle_characterdevice_apreadv(struct character_device *__restrict self,
-                               struct aio_buffer *__restrict dst,
-                               size_t num_bytes, pos_t addr, iomode_t mode,
-                               struct aio_multihandle *__restrict aio) {
-	size_t result;
-	result = handle_characterdevice_preadv(self, dst, num_bytes, addr, mode);
-	return result;
-}
-INTERN size_t KCALL
-handle_characterdevice_apwritev(struct character_device *__restrict self,
-                                struct aio_buffer *__restrict src,
-                                size_t num_bytes, pos_t addr, iomode_t mode,
-                                struct aio_multihandle *__restrict aio) {
-	size_t result;
-	result = handle_characterdevice_pwritev(self, src, num_bytes, addr, mode);
-	return result;
-}
+DEFINE_HANDLE_AREAD_FROM_READ(characterdevice, struct character_device)
+DEFINE_HANDLE_AWRITE_FROM_WRITE(characterdevice, struct character_device)
+DEFINE_HANDLE_AREADV_FROM_READV(characterdevice, struct character_device)
+DEFINE_HANDLE_AWRITEV_FROM_WRITEV(characterdevice, struct character_device)
+DEFINE_HANDLE_APREAD_FROM_PREAD(characterdevice, struct character_device)
+DEFINE_HANDLE_APWRITE_FROM_PWRITE(characterdevice, struct character_device)
+DEFINE_HANDLE_APREADV_FROM_PREADV(characterdevice, struct character_device)
+DEFINE_HANDLE_APWRITEV_FROM_PWRITEV(characterdevice, struct character_device)
 
 INTERN syscall_slong_t KCALL
 handle_characterdevice_ioctl(struct character_device *__restrict self, syscall_ulong_t cmd,

@@ -2170,6 +2170,12 @@ vm_datapart_do_savepart(struct vm_datapart *__restrict self, struct vm_datablock
  *                                             changed pages within the given address range
  *                                             before doing all of the work associated with
  *                                             re-mapping all shared mappings as read-only.
+ *                                       NOTE: This is merely a hint, and only affects the
+ *                                             performance of this function. - It is ignored
+ *                                             when no SHARED memory mappings exist, and should
+ *                                             only be set to TRUE when the caller hasn't already
+ *                                             been told in one way or another that there
+ *                                             probably are changed pages within the given range.
  * @return: * : The number of saved data pages. */
 PUBLIC NONNULL((1)) vm_dpage_t KCALL
 vm_datapart_sync(struct vm_datapart *__restrict self,
@@ -4210,7 +4216,7 @@ DECL_END
 #define VM_GETFREE_VM 1
 #include "vm-getfree-impl.c.inl"
 DECL_BEGIN
-#endif
+#endif /* !__INTELLISENSE__ */
 
 
 #ifndef __INTELLISENSE__
@@ -4220,7 +4226,95 @@ DECL_END
 #define VM_DEFINE_PROTECT 1
 #include "vm-unmap_protect.c.inl"
 DECL_BEGIN
-#endif
+#endif /* !__INTELLISENSE__ */
+
+
+
+
+/* Sync changes made to file mappings within the given address
+ * range with on-disk file images. (s.a. `vm_datablock_sync()')
+ * NOTE: Memory ranges that aren't actually mapped are simply ignored.
+ * @return: * : The number of sychronozed bytes. (yes: those are bytes and not pages) */
+PUBLIC u64 FCALL
+vm_syncmem(struct vm *__restrict effective_vm,
+           vm_vpage_t minpage, vm_vpage_t maxpage)
+		THROWS(E_WOULDBLOCK, ...) {
+	u64 result = 0;
+	vm_nodetree_minmax_t minmax;
+again:
+	sync_read(effective_vm);
+	minmax.mm_min = minmax.mm_max = NULL;
+	vm_nodetree_minmaxlocate(effective_vm->v_tree,
+	                         minpage, maxpage, &minmax);
+	assert((minmax.mm_min != NULL) ==
+	       (minmax.mm_max != NULL));
+	if (minmax.mm_min) {
+		struct vm_node *iter;
+		for (iter = minmax.mm_min;;) {
+			REF struct vm_datapart *part;
+			vm_vpage_t node_minpage, node_maxpage;
+			vm_vpage_t used_minpage, used_maxpage;
+			vm_vpage_t partrel_minpage, partrel_maxpage;
+			vm_dpage_t partrel_mindpage, partrel_maxdpage;
+			vm_dpage_t num_synced_pages;
+			unsigned int addrshift;
+			if ((part = iter->vn_part) == NULL)
+				goto no_changes_in_node;
+#ifdef CONFIG_VIO
+			if unlikely(ATOMIC_READ(part->dp_state) == VM_DATAPART_STATE_VIOPRT)
+				goto no_changes_in_node;
+#endif /* CONFIG_VIO */
+			if (!(ATOMIC_READ(part->dp_flags) & VM_DATAPART_FLAG_CHANGED))
+				goto no_changes_in_node;
+			node_minpage = VM_NODE_MIN(iter);
+			node_maxpage = VM_NODE_MAX(iter);
+			used_minpage = node_minpage;
+			used_maxpage = node_maxpage;
+			if (used_minpage < minpage)
+				used_minpage = minpage;
+			if (used_maxpage > maxpage)
+				used_maxpage = maxpage;
+			partrel_minpage  = (vm_vpage_t)(used_minpage - node_minpage);
+			partrel_maxpage  = (vm_vpage_t)(used_maxpage - node_minpage);
+			partrel_mindpage = VM_DATABLOCK_VPAGE2DPAGE(iter->vn_block, partrel_minpage);
+			partrel_maxdpage = VM_DATABLOCK_VPAGE2DPAGE(iter->vn_block, partrel_maxpage);
+			/* Do a full check for any changes within the given range.
+			 * If there are none, don't unlock the VM, but simply continue
+			 * searching for any changes that may need to be synced. */
+			if (!vm_datapart_haschanged(part, partrel_mindpage, partrel_maxdpage))
+				goto no_changes_in_node;
+			/* Acquire a reference to the data part. */
+			incref(part);
+			addrshift = VM_DATABLOCK_ADDRSHIFT(iter->vn_block);
+			sync_endread(effective_vm);
+			{
+				FINALLY_DECREF_UNLIKELY(part);
+				/* Sync changes that happened within this datapart. */
+				num_synced_pages = vm_datapart_sync(part,
+				                                    partrel_mindpage,
+				                                    partrel_maxdpage);
+			}
+			/* Keep track of the number of actually synced bytes.
+			 * We use bytes for this as it represents a common base-line in
+			 * terms of `VM_DATABLOCK_PAGESHIFT()' vs. `pagedir_pagesize()' */
+			result += (u64)num_synced_pages << addrshift;
+			/* NOTE: We don't do a check `if (used_maxpage >= maxpage) break;', because
+			 *       the associated data part may have been truncated or replaced with
+			 *       a different mapping since we've unlocked the VM, meaning that in
+			 *       order to safely sync everything, we can only really truncate the
+			 *       start of the search area. */
+			if (minpage < used_minpage)
+				minpage = used_minpage;
+			goto again;
+no_changes_in_node:
+			if (iter == minmax.mm_max)
+				break;
+			iter = iter->vn_byaddr.ln_next;
+		}
+	}
+	sync_endread(effective_vm);
+	return result;
+}
 
 
 

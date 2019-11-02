@@ -518,6 +518,9 @@ hop_do_generic_operation(struct handle *__restrict hand,
                          USER UNCHECKED void *arg) {
 	switch (hop_command) {
 
+#define MANGLE_HANDLE_DATA_POINTER(p) \
+	(u64)(uintptr_t)(p) /* TODO: Option to mangle kernel-space pointers! */
+
 	case HOP_HANDLE_STAT: {
 		struct hop_handle_stat st;
 		char const *name;
@@ -527,7 +530,7 @@ hop_do_generic_operation(struct handle *__restrict hand,
 		st.hs_type        = hand->h_type;
 		st.hs_kind        = handle_typekind(hand);
 		st.hs_refcnt      = (*handle_type_db.h_refcnt[hand->h_type])(hand->h_data);
-		st.hs_address     = hand->h_data;
+		st.hs_address     = MANGLE_HANDLE_DATA_POINTER(hand->h_data);
 		name              = handle_type_db.h_typename[hand->h_type];
 		memcpy(st.hs_typename, name, strnlen(name, COMPILER_LENOF(st.hs_typename) - 1));
 		COMPILER_BARRIER();
@@ -556,23 +559,23 @@ hop_do_generic_operation(struct handle *__restrict hand,
 		break;
 
 	case HOP_HANDLE_GETADDRESS:
-		validate_writable(arg, sizeof(void *));
-		*(void **)arg = hand->h_data;
+		validate_writable(arg, sizeof(u64));
+		*(USER u64 *)arg = MANGLE_HANDLE_DATA_POINTER(hand->h_data);
 		break;
 
 	case HOP_HANDLE_GETTYPE:
-		validate_writable(arg, sizeof(uintptr_half_t));
-		*(uintptr_half_t *)arg = hand->h_type;
+		validate_writable(arg, sizeof(uint16_t));
+		*(USER uint16_t *)arg = (uint16_t)hand->h_type;
 		break;
 
 	case HOP_HANDLE_GETKIND:
-		validate_writable(arg, sizeof(uintptr_half_t));
-		*(uintptr_half_t *)arg = handle_typekind(hand);
+		validate_writable(arg, sizeof(uint16_t));
+		*(USER uint16_t *)arg = (uint16_t)handle_typekind(hand);
 		break;
 
 	case HOP_HANDLE_GETMODE:
-		validate_writable(arg, sizeof(iomode_t));
-		*(iomode_t *)arg = hand->h_mode;
+		validate_writable(arg, sizeof(uint16_t));
+		*(USER uint16_t *)arg = (uint16_t)hand->h_mode;
 		break;
 
 	case HOP_HANDLE_DUP: {

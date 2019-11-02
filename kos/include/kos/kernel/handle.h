@@ -74,11 +74,10 @@
 #define HANDLE_TYPE_EVENTFD_FENCE   0x0012 /* `struct eventfd' (without `EFD_SEMAPHORE') */
 #define HANDLE_TYPE_EVENTFD_SEMA    0x0013 /* `struct eventfd' (with `EFD_SEMAPHORE') */
 #define HANDLE_TYPE_SIGNALFD        0x0014 /* `struct signalfd' */
-/* TODO: HANDLE_TYPE_DATAPART (NOTE: The handle's decref() operation should call `vm_datapart_decref_and_merge()'!) */
-/* TODO: HANDLE_TYPE_FUTEX */
-/* TODO: HANDLE_TYPE_FUTEXFD */
-/* TODO: HANDLE_TYPE_MPFUTEXFD */
-#define HANDLE_TYPE_COUNT           0x0015 /* # of recognized handle types
+#define HANDLE_TYPE_DATAPART        0x0015 /* `struct vm_datapart' */
+#define HANDLE_TYPE_FUTEX           0x0016 /* `struct vm_futex' */
+#define HANDLE_TYPE_FUTEXFD         0x0017 /* `struct vm_futexfd' */
+#define HANDLE_TYPE_COUNT           0x0018 /* # of recognized handle types
                                             * NOTE: After changing this value, be sure to
                                             * `touch /kos/src/kernel/include/kernel/handle.h' */
 

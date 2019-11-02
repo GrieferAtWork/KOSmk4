@@ -26,6 +26,7 @@
 #include <kernel/aio.h>
 #include <kernel/driver-param.h>
 #include <kernel/except.h>
+#include <kernel/handle-proto.h>
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
 #include <kernel/syscall.h>
@@ -441,6 +442,13 @@ handle_pipe_writev(struct pipe *__restrict self,
 	return result;
 }
 
+DEFINE_HANDLE_AREAD_FROM_READ(pipe, struct pipe)
+DEFINE_HANDLE_AWRITE_FROM_WRITE(pipe, struct pipe)
+DEFINE_HANDLE_AREADV_FROM_READV(pipe, struct pipe)
+DEFINE_HANDLE_AWRITEV_FROM_WRITEV(pipe, struct pipe)
+
+
+
 
 INTERN void KCALL
 handle_pipe_truncate(struct pipe *__restrict self,
@@ -498,6 +506,7 @@ handle_pipe_reader_readv(struct pipe_reader *__restrict self,
                          struct aio_buffer *__restrict dst, size_t num_bytes, iomode_t mode) {
 	return handle_pipe_readv(self->pr_pipe, dst, num_bytes, mode);
 }
+
 
 INTERN pos_t KCALL
 handle_pipe_reader_seek(struct pipe_reader *__restrict self,

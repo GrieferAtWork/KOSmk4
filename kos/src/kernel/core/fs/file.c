@@ -27,6 +27,7 @@
 #include <fs/node.h>
 #include <fs/vfs.h>
 #include <kernel/except.h>
+#include <kernel/handle-proto.h>
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
 #include <kernel/user.h>
@@ -60,7 +61,7 @@ NOTHROW(KCALL file_destroy)(struct file *__restrict self) {
 #undef CONFIG_BLOCKING_REGULAR_FILE_READ
 //#define CONFIG_BLOCKING_REGULAR_FILE_READ 1
 
-DEFINE_HANDLE_REFCNT_FUNCTIONS(file,struct file)
+DEFINE_HANDLE_REFCNT_FUNCTIONS(file, struct file)
 INTERN size_t KCALL
 handle_file_read(struct file *__restrict self,
                  USER CHECKED void *dst,

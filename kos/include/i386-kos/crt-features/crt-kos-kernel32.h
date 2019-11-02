@@ -2063,6 +2063,7 @@
 #define __CRT_HAVE_vm_sync_locked 1
 #define __CRT_HAVE_vm_syncall 1
 #define __CRT_HAVE_vm_syncall_locked 1
+#define __CRT_HAVE_vm_syncmem 1
 #define __CRT_HAVE_vm_syncone 1
 #define __CRT_HAVE_vm_syncone_locked 1
 #define __CRT_HAVE_vm_tasklock_downgrade 1

@@ -886,10 +886,10 @@ PUBLIC_OBJECT(kernel_symbol_table)
 	.long 0
 	.long 0
 	.long 0
-	.long 0 /* index: 221 */
-	.long 0
-	.long 0
-	.long 0
+	.long .Lname221 /* index: 221 */
+	.weak vm_syncmem; .long vm_syncmem
+	.reloc ., R_386_SIZE32, vm_syncmem; .long 0
+	.long 0xb0350dd
 	.long 0 /* index: 222 */
 	.long 0
 	.long 0
@@ -16620,6 +16620,8 @@ END(kernel_symbol_table)
 	.string "swap_malloc_part"
 .Lname219:
 	.string "sys_unlink"
+.Lname221:
+	.string "vm_syncmem"
 .Lname223:
 	.string "sys_nice"
 .Lname226:

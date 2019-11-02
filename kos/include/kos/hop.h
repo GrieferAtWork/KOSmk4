@@ -37,9 +37,9 @@ __SYSDECL_BEGIN
 
 #if __SIZEOF_POINTER__ < 8
 #define __HOP_PAD_POINTER(name) __uint32_t name;
-#else
+#else /* __SIZEOF_POINTER__ < 8 */
 #define __HOP_PAD_POINTER(name) /* nothing */
-#endif
+#endif /* __SIZEOF_POINTER__ >= 8 */
 
 #ifndef __hop_openfd_defined
 #define __hop_openfd_defined 1
@@ -65,6 +65,39 @@ struct hop_openfd /*[PREFIX(of_)]*/ {
 #endif /* __CC__ */
 #endif /* !__hop_openfd_defined */
 
+
+#define __OFFSET_HOP_HANDLE_STAT_STRUCT_SIZE 0
+#define __OFFSET_HOP_HANDLE_STAT_MODE        4
+#define __OFFSET_HOP_HANDLE_STAT_TYPE        8
+#define __OFFSET_HOP_HANDLE_STAT_KIND        10
+#define __OFFSET_HOP_HANDLE_STAT_REFCNT      16
+#define __OFFSET_HOP_HANDLE_STAT_ADDRESS     24
+#define __OFFSET_HOP_HANDLE_STAT_TYPENAME    32
+#define __SIZEOF_HOP_HANDLE_STAT             64
+#ifdef __CC__
+struct hop_handle_stat /*[PREFIX(hs_)]*/ {
+	__uint32_t            hs_struct_size;  /* [== sizeof(struct hop_handle_stat)]
+	                                        * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
+	                                        * this value is too small or doesn't match any recognized
+	                                        * structure version. */
+	__uint16_t            hs_mode;         /* The I/O mode with which this handle operates (set of `IO_*'). */
+	__uint16_t          __hs_pad1;         /* ... */
+	__uint16_t            hs_type;         /* The handle type (one of `HANDLE_TYPE_*'). */
+	__uint16_t            hs_kind;         /* The handle kind (one of `HANDLE_TYPEKIND_*'). */
+	__uint32_t          __hs_pad2;         /* ... */
+	__uintptr_t           hs_refcnt;       /* Reference counter of this handle. */
+	__HOP_PAD_POINTER  (__hs_pad3)         /* ... */
+	__uint64_t            hs_address;      /* Kernel-space pointer to the address where data of this handle is stored.
+	                                        * Note: Do not rely on this actually being the proper address when interfacing
+	                                        *       with custom drivers (as a matter of fact: custom drivers should never
+	                                        *       blindly trust kernel-space pointers passed from user-space, and should
+	                                        *       always instead make use of handles to kernel-space objects).
+	                                        *       Anyways: the kernel is allowed to mangle the actual address however
+	                                        *                it pleases, so-long as the value stored here ends up being
+	                                        *                unique. */
+	char                  hs_typename[32]; /* The name of the handle's type. */
+};
+#endif /* __CC__ */
 
 
 #define HOP_DATABLOCK_STAT_FEATURE_NONE    0x00000000 /* No special features. */
@@ -169,6 +202,65 @@ struct hop_datablock_syncbytes /*[PREFIX(dsb_)]*/ {
 };
 #endif /* __CC__ */
 
+#define __OFFSET_HOP_DATABLOCK_OPENPART_STRUCT_SIZE 0
+#define __OFFSET_HOP_DATABLOCK_OPENPART_PAGENO      8
+#define __OFFSET_HOP_DATABLOCK_OPENPART_PAGES_HINT  16
+#define __OFFSET_HOP_DATABLOCK_OPENPART_OPENFD      24
+#define __SIZEOF_HOP_DATABLOCK_OPENPART             32
+#ifdef __CC__
+struct hop_datablock_openpart /*[PREFIX(dop_)]*/ {
+	__uint32_t        dop_struct_size; /* [== sizeof(struct hop_datablock_openpart)]
+	                                    * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
+	                                    * this value is too small or doesn't match any recognized
+	                                    * structure version. */
+	__uint32_t      __dop_pad;         /* ... */
+	__uint64_t        dop_pageno;      /* [IN]  The page-index (vm_vpage64_t) of the first page that should be opened.
+	                                    * [OUT] The page-index (vm_vpage64_t) of the first page that was opened.
+	                                    *       This is equal to the `ds_minpage' field return by `HOP_DATAPART_STAT',
+	                                    *       and may be lower than the originally given `dop_pageno' when
+	                                    *       `HOP_DATABLOCK_OPEN_PART' was used, but guarantied to be equal to the
+	                                    *       original value when `HOP_DATABLOCK_OPEN_PART_EXACT' was used. */
+	__uint64_t        dop_pages_hint;  /* [IN]  Hint for the number of pages across which the part should span. */
+	struct hop_openfd dop_openfd;      /* File descriptor open controller (filled with a handle for the part). */
+};
+#endif /* __CC__ */
+
+
+#define HOP_DATABLOCK_HASCHANGED_FLAG_UNCHANGED 0x0000 /* No changes were made */
+#define HOP_DATABLOCK_HASCHANGED_FLAG_DIDCHANGE 0x0001 /* Changes have been found */
+#define __OFFSET_HOP_DATABLOCK_HASCHANGED_STRUCT_SIZE 0
+#define __OFFSET_HOP_DATABLOCK_HASCHANGED_MINBYTE     8
+#define __OFFSET_HOP_DATABLOCK_HASCHANGED_MAXBYTE     16
+#define __SIZEOF_HOP_DATABLOCK_HASCHANGED             24
+#ifdef __CC__
+struct hop_datablock_haschanged /*[PREFIX(dhc_)]*/ {
+	__uint32_t        dhc_struct_size; /* [== sizeof(struct hop_datablock_haschanged)]
+	                                    * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
+	                                    * this value is too small or doesn't match any recognized
+	                                    * structure version. */
+	__uint32_t        dhc_result;      /* [OUT] Set to a set of `HOP_DATABLOCK_HASCHANGED_FLAG_*'. */
+	__uint64_t        dhc_minbyte;     /* [IN] Lowest byte to check for changes */
+	__uint64_t        dhc_maxbyte;     /* [IN] Greatest byte to check for changes */
+};
+#endif /* __CC__ */
+
+
+#define __OFFSET_HOP_DATABLOCK_OPEN_FUTEX_STRUCT_SIZE 0
+#define __OFFSET_HOP_DATABLOCK_OPEN_FUTEX_ADDRESS     8
+#define __OFFSET_HOP_DATABLOCK_OPEN_FUTEX_OPENFD      16
+#define __SIZEOF_HOP_DATABLOCK_OPEN_FUTEX             24
+#ifdef __CC__
+struct hop_datablock_open_futex /*[PREFIX(dof_)]*/ {
+	__uint32_t          dof_struct_size; /* [== sizeof(struct hop_datablock_open_futex)]
+	                                      * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
+	                                      * this value is too small or doesn't match any recognized
+	                                      * structure version. */
+	__uint32_t        __dof_pad1;        /* ... */
+	__uint64_t          dof_address;     /* [IN] Address of the futex */
+	struct hop_openfd   dof_openfd;      /* File descriptor open controller (filled with a handle for the futex). */
+};
+#endif /* __CC__ */
+
 
 #ifndef BLOCK_DEVICE_FLAG_NORMAL
 #define BLOCK_DEVICE_FLAG_NORMAL    0x0000 /* Normal block-device flags. */
@@ -215,33 +307,6 @@ struct hop_blockdevice_openpart /*[PREFIX(bop_)]*/ {
 	                                    * structure version. */
 	__uint32_t        bop_partno;      /* Total number of bytes available. */
 	struct hop_openfd bop_openfd;      /* File descriptor open controller. */
-};
-#endif /* __CC__ */
-
-#define __OFFSET_HOP_HANDLE_STAT_STRUCT_SIZE 0
-#define __OFFSET_HOP_HANDLE_STAT_MODE        4
-#define __OFFSET_HOP_HANDLE_STAT_TYPE        8
-#define __OFFSET_HOP_HANDLE_STAT_KIND        10
-#define __OFFSET_HOP_HANDLE_STAT_REFCNT      16
-#define __OFFSET_HOP_HANDLE_STAT_ADDRESS     24
-#define __OFFSET_HOP_HANDLE_STAT_TYPENAME    32
-#define __SIZEOF_HOP_HANDLE_STAT             64
-#ifdef __CC__
-struct hop_handle_stat /*[PREFIX(hs_)]*/ {
-	__uint32_t            hs_struct_size;  /* [== sizeof(struct hop_handle_stat)]
-	                                        * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
-	                                        * this value is too small or doesn't match any recognized
-	                                        * structure version. */
-	__uint16_t            hs_mode;         /* The I/O mode with which this handle operates (set of `IO_*'). */
-	__uint16_t          __hs_pad1;         /* ... */
-	__uint16_t            hs_type;         /* The handle type (one of `HANDLE_TYPE_*'). */
-	__uint16_t            hs_kind;         /* The handle kind (one of `HANDLE_TYPEKIND_*'). */
-	__uint32_t          __hs_pad2;         /* ... */
-	__uintptr_t           hs_refcnt;       /* Reference counter of this handle. */
-	__HOP_PAD_POINTER  (__hs_pad3)         /* ... */
-	void                 *hs_address;      /* Kernel-space pointer to the address where data of this handle is stored. */
-	__HOP_PAD_POINTER  (__hs_pad4)         /* ... */
-	char                  hs_typename[32]; /* The name of the handle's type. */
 };
 #endif /* __CC__ */
 
@@ -856,6 +921,54 @@ struct hop_pipe_unwrite /*[PREFIX(puw_)]*/ {
 #endif /* __CC__ */
 
 
+
+#define HOP_DATAPART_STAT_FEATURE_NONE         0x00000000 /* No special features. */
+#define HOP_DATAPART_STAT_FEATURE_ISLOCKED     0x00000001 /* s.a. VM_DATAPART_FLAG_LOCKED. */
+#define HOP_DATAPART_STAT_FEATURE_HASCHANGED   0x00000004 /* s.a. VM_DATAPART_FLAG_CHANGED. */
+#define HOP_DATAPART_STAT_FEATURE_KEEPRAM      0x00000800 /* s.a. `VM_DATAPART_FLAG_KEEPRAM'. */
+#define HOP_DATAPART_STAT_FEATURE_TRKCHNG      0x00001000 /* s.a. `VM_DATAPART_FLAG_TRKCHNG'. */
+#define HOP_DATAPART_STAT_FEATURE_COREPRT      0x00004000 /* s.a. `VM_DATAPART_FLAG_COREPRT'. */
+#define HOP_DATAPART_STAT_FEATURE_KERNPRT      0x00008000 /* s.a. `VM_DATAPART_FLAG_KERNPRT'. */
+#define HOP_DATAPART_STAT_FEATURE_ISANON       0x00010000 /* The datapart is anonymous. */
+#define HOP_DATAPART_STAT_FEATURE_HASFUTEXCTRL 0x00020000 /* The datapart has a futex controller. */
+#define HOP_DATAPART_STAT_FEATURE_HASFUTEXLIVE 0x00040000 /* The datapart has live futex objects (implies `HOP_DATAPART_STAT_FEATURE_HASFUTEXCTRL'). */
+#define HOP_DATAPART_STAT_FEATURE_HASCMAP      0x00100000 /* The datapart has copy-on-write memory mappings. */
+#define HOP_DATAPART_STAT_FEATURE_HASSMAP      0x00200000 /* The datapart has shared memory mappings. */
+#define HOP_DATAPART_STAT_STATE_ABSENT 0x0000 /* s.a. `VM_DATAPART_STATE_ABSENT' */
+#define HOP_DATAPART_STAT_STATE_INCORE 0x0001 /* s.a. `VM_DATAPART_STATE_INCORE' */
+#define HOP_DATAPART_STAT_STATE_LOCKED 0x0002 /* s.a. `VM_DATAPART_STATE_LOCKED' */
+#define HOP_DATAPART_STAT_STATE_INSWAP 0x0003 /* s.a. `VM_DATAPART_STATE_INSWAP' */
+#define HOP_DATAPART_STAT_STATE_VIOPRT 0x0004 /* s.a. `VM_DATAPART_STATE_VIOPRT' */
+#define __OFFSET_HOP_DATAPART_STAT_STRUCT_SIZE 0
+#define __OFFSET_HOP_DATAPART_STAT_FEATURES    4
+#define __OFFSET_HOP_DATAPART_STAT_STATE       8
+#define __OFFSET_HOP_DATAPART_STAT_MINADDR     16
+#define __OFFSET_HOP_DATAPART_STAT_MAXADDR     24
+#define __OFFSET_HOP_DATAPART_STAT_MINVPAGE    32
+#define __OFFSET_HOP_DATAPART_STAT_MAXVPAGE    40
+#define __OFFSET_HOP_DATAPART_STAT_MINDPAGE    48
+#define __OFFSET_HOP_DATAPART_STAT_MAXDPAGE    56
+#define __SIZEOF_HOP_DATAPART_STAT             64
+#ifdef __CC__
+struct hop_datapart_stat /*[PREFIX(ds_)]*/ {
+	__uint32_t   ds_struct_size;          /* [== sizeof(struct hop_datablock_stat)]
+	                                       * The kernel may throw an `E_BUFFER_TOO_SMALL' exception if
+	                                       * this value is too small or doesn't match any recognized
+	                                       * structure version. */
+	__uint32_t   ds_features;             /* [OUT] Set of `HOP_DATAPART_STAT_FEATURE_*' */
+	__uint32_t   ds_state;                /* [OUT] One of `HOP_DATAPART_STAT_STATE_*' */
+	__uint32_t __ds_pad;                  /* ... */
+	__uint64_t   ds_minaddr;              /* [OUT] Lowest address within the associated datablock mapped by this part. */
+	__uint64_t   ds_maxaddr;              /* [OUT] Greatest address within the associated datablock mapped by this part.
+	                                       *       Note that this value may decrease over time, as the data part gets split. */
+	__uint64_t   ds_minvpage;             /* [OUT] Lowest virt-page number mapped by this part. */
+	__uint64_t   ds_maxvpage;             /* [OUT] Greatest virt-page number mapped by this part (may decrease over time). */
+	__uint64_t   ds_mindpage;             /* [OUT] Lowest data-page number mapped by this part. */
+	__uint64_t   ds_maxdpage;             /* [OUT] Greatest data-page number mapped by this part (may decrease over time). */
+};
+#endif /* __CC__ */
+
+
 #undef __HOP_PAD_POINTER
 
 
@@ -865,10 +978,10 @@ struct hop_pipe_unwrite /*[PREFIX(puw_)]*/ {
 #define HOP_HANDLE_REOPEN                         0xffff0003 /* [struct hop_openfd *result] Re-open the given handle
                                                               * NOTE: The value returned by `hop()' is identical to the value written to `result->of_hint'. */
 #define HOP_HANDLE_GETREFCNT                      0xffff0004 /* [uintptr_t *result] Return the reference counter for the given handle. */
-#define HOP_HANDLE_GETADDRESS                     0xffff0005 /* [void **result] Return the kernel-space address of the handle. */
-#define HOP_HANDLE_GETTYPE                        0xffff0006 /* [__UINTPTR_HALF_TYPE__ *result] Return the handle's type. */
-#define HOP_HANDLE_GETKIND                        0xffff0007 /* [__UINTPTR_HALF_TYPE__ *result] Return the handle's kind. */
-#define HOP_HANDLE_GETMODE                        0xffff0008 /* [__iomode_t *result] Return the handle's I/O mode. */
+#define HOP_HANDLE_GETADDRESS                     0xffff0005 /* [uint64_t *result] Return the kernel-space address of the handle (s.a. `struct hop_handle_stat::hs_address'). */
+#define HOP_HANDLE_GETTYPE                        0xffff0006 /* [uint16_t *result] Return the handle's type. */
+#define HOP_HANDLE_GETKIND                        0xffff0007 /* [uint16_t *result] Return the handle's kind. */
+#define HOP_HANDLE_GETMODE                        0xffff0008 /* [uint16_t *result] Return the handle's I/O mode (s.a. `iomode_t'). */
 #define HOP_HANDLE_DUP                            0xffff0009 /* Quick alias for `dup(fd)' (`hop()' returns the new file handle) */
 #define HOP_HANDLE_DUP_CLOEXEC                    0xffff000a /* Quick alias for `dup(fd)' + set the CLOEXEC flag (`hop()' returns the new file handle) */
 #define HOP_HANDLE_DUP_CLOFORK                    0xffff000b /* Quick alias for `dup(fd)' + set the CLOFORK flag (`hop()' returns the new file handle) */
@@ -887,28 +1000,38 @@ struct hop_pipe_unwrite /*[PREFIX(puw_)]*/ {
                                                               * Write 0/1 to *result, indicative of:
                                                               *  - 0: The data block wasn't anonymous (aka. was already deanonymized).
                                                               *  - 1: The data block has been deanonymized. */
-/* TODO: Access to some of the other vm_datablock_* functions:
- *   - HOP_DATABLOCK_OPEN_PART       -- vm_datablock_locatepart()
- *   - HOP_DATABLOCK_OPEN_PART_EXACT -- vm_datablock_locatepart_exact()
- *   - HOP_DATABLOCK_HAS_CHANGED     -- vm_datablock_haschanged() */
-#define HOP_INODE_OPEN_SUPERBLOCK                 0x00010007 /* [struct hop_openfd *arg] Open the superblock associated with an INode.
+#define HOP_DATABLOCK_OPEN_PART                   0x00010007 /* [struct hop_datablock_openpart *arg] Lookup (and create if missing) the data
+                                                              * part associated with a given page offset (s.a. `vm_datablock_locatepart()')
+                                                              * @return: * : The value written to `arg->dop_openfd.of_hint' */
+#define HOP_DATABLOCK_OPEN_PART_EXACT             0x00010008 /* [struct hop_datablock_openpart *arg] Same as `HOP_DATABLOCK_OPEN_PART', but make sure
+                                                              * that the part begins at the exact given offset (s.a. `vm_datablock_locatepart_exact()')
+                                                              * @return: * : The value written to `arg->dop_openfd.of_hint' */
+#define HOP_DATABLOCK_HASCHANGED                  0x00010009 /* [struct hop_datablock_haschanged *arg] Check for changes within
+                                                              * the given address range (s.a. `vm_datablock_haschanged()') */
+#define HOP_DATABLOCK_OPEN_FUTEX                  0x0001000a /* [struct hop_datablock_open_futex *result] Return, or create a futex for the given address.
+                                                              * @return: * : The value written to `result->dof_openfd.of_hint' */
+#define HOP_DATABLOCK_OPEN_FUTEX_EXISTING         0x0001000b /* [struct hop_datablock_open_futex *result] Return an existing a futex for the given address.
+                                                              * @return: * : The value written to `result->dof_openfd.of_hint'
+                                                              * @return: -ENOENT: No futex exists for the given address */
+#define HOP_INODE_OPEN_SUPERBLOCK                 0x00010101 /* [struct hop_openfd *arg] Open the superblock associated with an INode.
+                                                              * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't an INode.
+                                                              * @return: * : The value written to `arg->of_hint' */
+#define HOP_INODE_CHMOD                           0x00010102 /* [struct hop_inode_chmod *arg] Extended interface for changing file permissions in a more controlled manner.
                                                               * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't an INode. */
-#define HOP_INODE_CHMOD                           0x00010008 /* [struct hop_inode_chmod *arg] Extended interface for changing file permissions in a more controlled manner.
-                                                              * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't an INode. */
-#define HOP_INODE_CHOWN                           0x00010009 /* [struct hop_inode_chown *arg] Extended interface for changing file ownership in a more controlled manner.
+#define HOP_INODE_CHOWN                           0x00010103 /* [struct hop_inode_chown *arg] Extended interface for changing file ownership in a more controlled manner.
                                                               * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't an INode. */
 /* TODO: HOP_INODE_READ_BLOCKING -- An always-blocking version of read(2) that uses the kernel-space function
  *                                 `inode_read_blocking', which starts blocking when reading past the end of
  *                                  a regular file, and gets unblocked when another process writes the missing
  *                                  data. */
-#define HOP_DIRECTORY_OPENNODE                    0x0001000a /* [struct hop_directory_opennode *arg] Extended interface for traversing a directory.
+#define HOP_DIRECTORY_OPENNODE                    0x00010301 /* [struct hop_directory_opennode *arg] Extended interface for traversing a directory.
                                                               * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a directory INode.
                                                               * @throw: E_FSERROR_FILE_NOT_FOUND: [...]
                                                               * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: [...]
                                                               * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_UNMOUNTED: [...]
                                                               * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_READDIR: [...]
                                                               * @throw: E_IOERROR: [...] */
-#define HOP_DIRECTORY_CREATFILE                   0x0001000b /* [struct hop_directory_creatfile *arg] Extended interface for creating new files.
+#define HOP_DIRECTORY_CREATFILE                   0x00010302 /* [struct hop_directory_creatfile *arg] Extended interface for creating new files.
                                                               * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a directory INode.
                                                               * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: [...] (The containing directory was deleted)
                                                               * @throw: E_FSERROR_ILLEGAL_PATH: [...]
@@ -919,7 +1042,7 @@ struct hop_pipe_unwrite /*[PREFIX(puw_)]*/ {
                                                               * @throw: E_FSERROR_UNSUPPORTED_OPERATION: [...]
                                                               * @throw: E_FSERROR_READONLY: [...]
                                                               * @throw: E_IOERROR: [...] */
-#define HOP_DIRECTORY_REMOVE                      0x0001000c /* [struct hop_directory_remove *arg] Extended interface for removing files.
+#define HOP_DIRECTORY_REMOVE                      0x00010303 /* [struct hop_directory_remove *arg] Extended interface for removing files.
                                                               * WARNING: This function may leave behind stale PATH nodes which may still be accessible,
                                                               *          with most operations performed on them resulting in `E_FSERROR_DELETED' exceptions.
                                                               * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a directory INode.
@@ -937,7 +1060,7 @@ struct hop_pipe_unwrite /*[PREFIX(puw_)]*/ {
                                                               * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_TRUNC:  Cannot truncate non-empty files to 0 bytes in order to delete their data
                                                               * @throw: E_FSERROR_READONLY:            [...]
                                                               * @throw: E_IOERROR:                     [...] */
-#define HOP_DIRECTORY_RENAME                      0x0001000d /* [struct hop_directory_rename *arg] Extended interface for renaming files.
+#define HOP_DIRECTORY_RENAME                      0x00010304 /* [struct hop_directory_rename *arg] Extended interface for renaming files.
                                                               * WARNING: This function may leave behind stale PATH nodes which may still be accessible,
                                                               *          with most operations performed on them resulting in `E_FSERROR_DELETED' exceptions.
                                                               * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a directory INode.
@@ -956,7 +1079,7 @@ struct hop_pipe_unwrite /*[PREFIX(puw_)]*/ {
                                                               * @throw: E_FSERROR_ACCESS_DENIED:       [...]
                                                               * @throw: E_FSERROR_READONLY:            [...]
                                                               * @throw: E_IOERROR:                     [...] */
-#define HOP_DIRECTORY_LINK                        0x0001000e /* [struct hop_directory_link *arg] Extended interface for creating hard links.
+#define HOP_DIRECTORY_LINK                        0x00010305 /* [struct hop_directory_link *arg] Extended interface for creating hard links.
                                                               * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a directory INode.
                                                               * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_LINK: [...]
                                                               * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_FILE: [...] (`dli_linknode' was deleted)
@@ -970,7 +1093,7 @@ struct hop_pipe_unwrite /*[PREFIX(puw_)]*/ {
                                                               * @throw: E_FSERROR_TOO_MANY_HARD_LINKS: [...]
                                                               * @throw: E_FSERROR_READONLY:            [...]
                                                               * @throw: E_IOERROR:                     [...] */
-#define HOP_DIRECTORY_SYMLINK                     0x0001000f /* [struct hop_directory_symlink *arg] Extended interface for creating symbolic links.
+#define HOP_DIRECTORY_SYMLINK                     0x00010306 /* [struct hop_directory_symlink *arg] Extended interface for creating symbolic links.
                                                               * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a directory INode.
                                                               * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_SYMLINK: [...]
                                                               * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: [...] (The given directory was deleted)
@@ -981,7 +1104,7 @@ struct hop_pipe_unwrite /*[PREFIX(puw_)]*/ {
                                                               * @throw: E_FSERROR_DISK_FULL:           [...]
                                                               * @throw: E_FSERROR_READONLY:            [...]
                                                               * @throw: E_IOERROR:                     [...] */
-#define HOP_DIRECTORY_MKNOD                       0x00010010 /* [struct hop_directory_mknod *arg] Extended interface for create filesystem nodes.
+#define HOP_DIRECTORY_MKNOD                       0x00010307 /* [struct hop_directory_mknod *arg] Extended interface for create filesystem nodes.
                                                               * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a directory INode.
                                                               * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_MKNOD: [...]
                                                               * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: [...] (The given directory was deleted)
@@ -992,7 +1115,7 @@ struct hop_pipe_unwrite /*[PREFIX(puw_)]*/ {
                                                               * @throw: E_FSERROR_DISK_FULL:           [...]
                                                               * @throw: E_FSERROR_READONLY:            [...]
                                                               * @throw: E_IOERROR:                     [...] */
-#define HOP_DIRECTORY_MKDIR                       0x00010011 /* [struct hop_directory_mkdir *arg] Extended interface for create directories.
+#define HOP_DIRECTORY_MKDIR                       0x00010308 /* [struct hop_directory_mkdir *arg] Extended interface for create directories.
                                                               * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a directory INode.
                                                               * @throw: E_FSERROR_UNSUPPORTED_OPERATION:E_FILESYSTEM_OPERATION_MKDIR: [...]
                                                               * @throw: E_FSERROR_DELETED:E_FILESYSTEM_DELETED_PATH: [...] (The given directory was deleted)
@@ -1003,14 +1126,17 @@ struct hop_pipe_unwrite /*[PREFIX(puw_)]*/ {
                                                               * @throw: E_FSERROR_DISK_FULL:           [...]
                                                               * @throw: E_FSERROR_READONLY:            [...]
                                                               * @throw: E_IOERROR:                     [...] */
-#define HOP_SUPERBLOCK_OPEN_BLOCKDEVICE           0x00010012 /* [struct hop_openfd *arg] Open the block-device associated with a superblock.
+#define HOP_SUPERBLOCK_OPEN_BLOCKDEVICE           0x00010501 /* [struct hop_openfd *arg] Open the block-device associated with a superblock.
                                                               * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a superblock.
-                                                              * @throw: E_NO_SUCH_BLOCKDEVICE: No block device is bound to the given superblock. */
-#define HOP_SUPERBLOCK_OPEN_WALL                  0x00010013 /* [struct hop_openfd *arg] Open the wall-clock associated with a superblock.
-                                                              * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a superblock. */
-#define HOP_SUPERBLOCK_OPEN_DRIVER                0x00010014 /* [struct hop_openfd *arg] Open the driver associated with a superblock.
-                                                              * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a superblock. */
-#define HOP_SUPERBLOCK_SYNC                       0x00010015 /* [unsigned int sync_device] Synchronize the given superblock (when `sync_device' is non-zero, also sync the associated block device (if any)).
+                                                              * @throw: E_NO_SUCH_BLOCKDEVICE: No block device is bound to the given superblock.
+                                                              * @return: * : The value written to `arg->of_hint' */
+#define HOP_SUPERBLOCK_OPEN_WALL                  0x00010502 /* [struct hop_openfd *arg] Open the wall-clock associated with a superblock.
+                                                              * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a superblock.
+                                                              * @return: * : The value written to `arg->of_hint' */
+#define HOP_SUPERBLOCK_OPEN_DRIVER                0x00010503 /* [struct hop_openfd *arg] Open the driver associated with a superblock.
+                                                              * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a superblock.
+                                                              * @return: * : The value written to `arg->of_hint' */
+#define HOP_SUPERBLOCK_SYNC                       0x00010504 /* [unsigned int sync_device] Synchronize the given superblock (when `sync_device' is non-zero, also sync the associated block device (if any)).
                                                               * @throw: E_INVALID_HANDLE_FILETYPE: The given handle wasn't a superblock. */
 
 
@@ -1116,72 +1242,93 @@ struct hop_pipe_unwrite /*[PREFIX(puw_)]*/ {
 /* TODO: HOP_TASK_RPC -- FD-interface for the `rpc_schedule()' system call */
 
 
-/* TODO: HOP_DATAPART_STAT        -- `vm_datapart_(num|min|max|start|end)(byte[s]|dpage[s]|vpage[s])()' */
-/* TODO: HOP_DATAPART_HAS_CHANGED -- vm_datapart_has_changed() */
-/* TODO: HOP_DATAPART_SYNC        -- vm_datapart_sync() */
-/* TODO: HOP_DATAPART_SPLIT       -- vm_datapart_split() */
-
-/* TODO: HOP_FUTEX_STAT               (Return HOP_FUTEX_ISWAITING, HOP_FUTEX_GET_ADDRESS, and some generalized info about HOP_FUTEX_OPEN_DATABLOCK) */
-/* TODO: HOP_FUTEX_ISWAITING          (returns true if threads are currently waiting on the futex) */
-/* TODO: HOP_FUTEX_BROADCAST          (wrapper for `sig_broadcast()' the signal of a particual futex) */
-/* TODO: HOP_FUTEX_OPEN_DATABPART     (returns a `HANDLE_TYPE_DATABLOCK' object) */
-/* TODO: HOP_FUTEX_OPEN_DATABLOCK     (returns a `HANDLE_TYPE_DATABLOCK' object) */
-/* TODO: HOP_FUTEX_GET_ADDRESS        (returns the address of the futex within its data-block) */
-/* TODO: HOP_FUTEXFD_STAT             (returns a `HANDLE_TYPE_FUTEX' object) */
-/* TODO: HOP_FUTEXFD_OPEN_FUTEX       (returns a `HANDLE_TYPE_FUTEX' object) */
-/* TODO: HOP_MPFUTEXFD_OPEN_DATABLOCK (returns a `HANDLE_TYPE_DATABLOCK' object) */
 
 
 /* For `HANDLE_TYPE_PIPE', `HANDLE_TYPE_PIPE_READER' and `HANDLE_TYPE_PIPE_WRITER' */
-#define HOP_PIPE_STAT                             0x000c0001 /* [struct hop_pipe_stat *result] Return statistics about the pipe */
-#define HOP_PIPE_GETLIM                           0x000c0002 /* [uint64_t *result] Return the max allocated size of the pipe. */
-#define HOP_PIPE_SETLIM                           0x000c0003 /* [size_t value] Set the max allocated pipe size to `value'. */
-#define HOP_PIPE_XCHLIM                           0x000c0004 /* [uint64_t *value] Exchange the old max allocated pipe size with `*value'. */
-#define HOP_PIPE_WRITESOME                        0x000c0005 /* [struct hop_pipe_writesome *data] A hybrid between `write()' with and without IO_NONBLOCK:
-                                                              * write() w/o IO_NONBLOCK: Block until _all_ data was written
-                                                              * write() w/ IO_NONBLOCK:  Don't block and only write data until the pipe limit is reached
-                                                              * HOP_PIPE_WRITESOME:      Block until _any_ data was written
-                                                              *                          NOTE: When this HOP is invoked with the `IO_NONBLOCK' flag,
-                                                              *                          it will behave identical to `write() w/ IO_NONBLOCK' */
-#define HOP_PIPE_VWRITESOME                       0x000c0006 /* [struct hop_pipe_vwritesome *data] Vectored variant of `HOP_PIPE_WRITESOME' */
-#define HOP_PIPE_SKIPDATA                         0x000c0007 /* [struct hop_pipe_skipdata *data] Skip buffered data, rather than reading it. */
-#define HOP_PIPE_UNREAD                           0x000c0008 /* [struct hop_pipe_unread *data] Try to unread previously read, but not yet written data. */
-#define HOP_PIPE_UNWRITE                          0x000c0009 /* [struct hop_pipe_unwrite *data] Try to unwrite previously written, but not yet read data. */
-#define HOP_PIPE_SETWRITTEN                       0x000c000a /* [IN:uint64_t *data] Set the total number of written bytes to `*data' (no-op if `*data' is greater than what is currently written, but not read)
-                                                              * [OUT:uint64_t *data] Return the number of available bytes for reading afterwards. */
-#define HOP_PIPE_CLOSE                            0x000c000b /* Explicitly close the pipe (same as `HOP_PIPE_SETLIM(0)')
-                                                              * Internally, this is automatically done when either last reader,
-                                                              * or the last writer object associated with some pipe is destroyed.
-                                                              * When a pipe is closed, no new data can be written to it (since it's
-                                                              * limit is set to 0), once all remaining data has been read, read() on
-                                                              * the pipe will no longer block, but instead always return 0 immediately.
-                                                              * A pipe can be un-closed by re-assigning a new limit value. */
-#define HOP_PIPE_OPEN_PIPE                        0x000c000c /* [struct hop_openfd *arg] Open the associated `HANDLE_TYPE_PIPE' of a `HANDLE_TYPE_PIPE_READER' or `HANDLE_TYPE_PIPE_WRITER' */
-#define HOP_PIPE_CREATE_READER                    0x000c000d /* [struct hop_openfd *arg] Create a new reader object for the associated pipe.
-                                                              * When the pipe(2) system call is used to create a new pipe, the internal `HANDLE_TYPE_PIPE'
-                                                              * object is hidden from user-space, and instead is wrapped by 1 reader, and 1 writer object.
-                                                              * By using `HOP_PIPE_CREATE_READER' and `HOP_PIPE_CREATE_WRITER', additional reader/writer
-                                                              * objects can be created for a pipe (although pretty much identical behavior can be achived by
-                                                              * simply dup(2)-ing the original reader/writer).
-                                                              * Once either all reader objects have been destroyed, or all writer objects have, the underlying
-                                                              * pipe object is closed by having its limit set to 0 (s.a. `HOP_PIPE_CLOSE') */
-#define HOP_PIPE_CREATE_WRITER                    0x000c000e /* [struct hop_openfd *arg] Create a new writer object for the associated pipe.
-                                                              * When the pipe(2) system call is used to create a new pipe, the internal `HANDLE_TYPE_PIPE'
-                                                              * object is hidden from user-space, and instead is wrapped by 1 reader, and 1 writer object.
-                                                              * By using `HOP_PIPE_CREATE_READER' and `HOP_PIPE_CREATE_WRITER', additional reader/writer
-                                                              * objects can be created for a pipe (although pretty much identical behavior can be achived by
-                                                              * simply dup(2)-ing the original reader/writer).
-                                                              * Once either all reader objects have been destroyed, or all writer objects have, the underlying
-                                                              * pipe object is closed by having its limit set to 0 (s.a. `HOP_PIPE_CLOSE') */
+#define HOP_PIPE_STAT          0x000c0001 /* [struct hop_pipe_stat *result] Return statistics about the pipe */
+#define HOP_PIPE_GETLIM        0x000c0002 /* [uint64_t *result] Return the max allocated size of the pipe. */
+#define HOP_PIPE_SETLIM        0x000c0003 /* [size_t value] Set the max allocated pipe size to `value'. */
+#define HOP_PIPE_XCHLIM        0x000c0004 /* [uint64_t *value] Exchange the old max allocated pipe size with `*value'. */
+#define HOP_PIPE_WRITESOME     0x000c0005 /* [struct hop_pipe_writesome *data] A hybrid between `write()' with and without IO_NONBLOCK:
+                                           * write() w/o IO_NONBLOCK: Block until _all_ data was written
+                                           * write() w/ IO_NONBLOCK:  Don't block and only write data until the pipe limit is reached
+                                           * HOP_PIPE_WRITESOME:      Block until _any_ data was written
+                                           *                          NOTE: When this HOP is invoked with the `IO_NONBLOCK' flag,
+                                           *                          it will behave identical to `write() w/ IO_NONBLOCK' */
+#define HOP_PIPE_VWRITESOME    0x000c0006 /* [struct hop_pipe_vwritesome *data] Vectored variant of `HOP_PIPE_WRITESOME' */
+#define HOP_PIPE_SKIPDATA      0x000c0007 /* [struct hop_pipe_skipdata *data] Skip buffered data, rather than reading it. */
+#define HOP_PIPE_UNREAD        0x000c0008 /* [struct hop_pipe_unread *data] Try to unread previously read, but not yet written data. */
+#define HOP_PIPE_UNWRITE       0x000c0009 /* [struct hop_pipe_unwrite *data] Try to unwrite previously written, but not yet read data. */
+#define HOP_PIPE_SETWRITTEN    0x000c000a /* [IN:uint64_t *data] Set the total number of written bytes to `*data' (no-op if `*data' is greater than what is currently written, but not read)
+                                           * [OUT:uint64_t *data] Return the number of available bytes for reading afterwards. */
+#define HOP_PIPE_CLOSE         0x000c000b /* Explicitly close the pipe (same as `HOP_PIPE_SETLIM(0)')
+                                           * Internally, this is automatically done when either last reader,
+                                           * or the last writer object associated with some pipe is destroyed.
+                                           * When a pipe is closed, no new data can be written to it (since it's
+                                           * limit is set to 0), once all remaining data has been read, read() on
+                                           * the pipe will no longer block, but instead always return 0 immediately.
+                                           * A pipe can be un-closed by re-assigning a new limit value. */
+#define HOP_PIPE_OPEN_PIPE     0x000c000c /* [struct hop_openfd *arg] Open the associated `HANDLE_TYPE_PIPE' of a `HANDLE_TYPE_PIPE_READER' or `HANDLE_TYPE_PIPE_WRITER' */
+#define HOP_PIPE_CREATE_READER 0x000c000d /* [struct hop_openfd *arg] Create a new reader object for the associated pipe.
+                                           * When the pipe(2) system call is used to create a new pipe, the internal `HANDLE_TYPE_PIPE'
+                                           * object is hidden from user-space, and instead is wrapped by 1 reader, and 1 writer object.
+                                           * By using `HOP_PIPE_CREATE_READER' and `HOP_PIPE_CREATE_WRITER', additional reader/writer
+                                           * objects can be created for a pipe (although pretty much identical behavior can be achieved by
+                                           * simply dup(2)-ing the original reader/writer).
+                                           * Once either all reader objects have been destroyed, or all writer objects have, the underlying
+                                           * pipe object is closed by having its limit set to 0 (s.a. `HOP_PIPE_CLOSE') */
+#define HOP_PIPE_CREATE_WRITER 0x000c000e /* [struct hop_openfd *arg] Create a new writer object for the associated pipe.
+                                           * When the pipe(2) system call is used to create a new pipe, the internal `HANDLE_TYPE_PIPE'
+                                           * object is hidden from user-space, and instead is wrapped by 1 reader, and 1 writer object.
+                                           * By using `HOP_PIPE_CREATE_READER' and `HOP_PIPE_CREATE_WRITER', additional reader/writer
+                                           * objects can be created for a pipe (although pretty much identical behavior can be achieved by
+                                           * simply dup(2)-ing the original reader/writer).
+                                           * Once either all reader objects have been destroyed, or all writer objects have, the underlying
+                                           * pipe object is closed by having its limit set to 0 (s.a. `HOP_PIPE_CLOSE') */
 
 
 /* For `HANDLE_TYPE_PIDNS' */
-#define HOP_PIDNS_GET_INDIRECTION                 0x000f0001 /* [uint64_t *result] Return the indirection level of the given pidns */
-#define HOP_PIDNS_OPEN_PARENT                     0x000f0002 /* [struct hop_openfd *result] Open the parent of a given pidns.
-                                                              * @throw: E_NO_SUCH_PIDNS: The given PID namespace is the root-namespace. */
+#define HOP_PIDNS_GET_INDIRECTION 0x000f0001 /* [uint64_t *result] Return the indirection level of the given pidns */
+#define HOP_PIDNS_OPEN_PARENT     0x000f0002 /* [struct hop_openfd *result] Open the parent of a given pidns.
+                                              * @throw: E_NO_SUCH_PIDNS: The given PID namespace is the root-namespace. */
 
 
 
+/* HANDLE_TYPE_DATAPART */
+#define HOP_DATAPART_OPEN_DATABLOCK      0x00150001 /* [struct hop_openfd *result] Open the datablock associated with the given datapart.
+                                                     * @return: * : The value written to `result->of_hint' */
+#define HOP_DATAPART_OPEN_FUTEX          0x00150002 /* [struct hop_datablock_open_futex *result] Return, or create a futex for the given address.
+                                                     * @return: * : The value written to `result->dof_openfd.of_hint' */
+#define HOP_DATAPART_OPEN_FUTEX_EXISTING 0x00150003 /* [struct hop_datablock_open_futex *result] Return an existing a futex for the given address.
+                                                     * @return: * : The value written to `result->dof_openfd.of_hint'
+                                                     * @return: -ENOENT: No futex exists for the given address
+                                                     * @return: -ERANGE: The given address lies outside of the bounds of this datapart
+                                                     *                   Note that this can happen arbitrarily since it is possible that
+                                                     *                   the datapart is truncated between the time of you accessing it,
+                                                     *                   and invoking this command! */
+#define HOP_DATAPART_STAT                0x00150004 /* [struct hop_datapart_stat *result] Read information about the datapart */
+#define HOP_DATAPART_HASCHANGED          0x00150005 /* [struct hop_datablock_haschanged *result] Check for changes within the data part (s.a. `vm_datapart_haschanged()') */
+//TODO:#define HOP_DATAPART_SYNC         -- vm_datapart_sync() */
+//TODO:#define HOP_DATAPART_SPLIT        -- vm_datapart_split() */
+
+/* HANDLE_TYPE_FUTEX */
+#define HOP_FUTEX_OPEN_DATAPART          0x00160001 /* [struct hop_openfd *arg] Open the datapart associated with a given futex.
+                                                     * @return: * : The value written to `result->of_hint'
+                                                     * @return: -EOWNERDEAD: The datapart associated with the futex was destroyed. */
+#define HOP_FUTEX_OPEN_DATABLOCK         0x00160002 /* [struct hop_openfd *arg] Open the datablock associated with the datapart associated with a given futex.
+                                                     * @return: * : The value written to `result->of_hint'
+                                                     * @return: -EOWNERDEAD: The datapart associated with the futex was destroyed. */
+#define HOP_FUTEX_ISWAITING              0x00160003 /* @return: 1: There are threads are currently waiting on the futex
+                                                     * @return: 0: No threads are waiting for this futex */
+#define HOP_FUTEX_BROADCAST              0x00160004 /* Broadcast a wakeup-signal to all threads waiting for this futex.
+                                                     * @return: *: The number of threads to which the signal was sent. */
+/* TODO: HOP_FUTEX_GET_ADDRESS        (returns the address of the futex within its data-block) */
+/* TODO: HOP_FUTEX_STAT               (Return HOP_FUTEX_ISWAITING, HOP_FUTEX_GET_ADDRESS, and some generalized info about HOP_FUTEX_OPEN_DATABLOCK) */
+
+/* HANDLE_TYPE_FUTEXFD */
+/* TODO: HOP_FUTEXFD_STAT             (returns a `HANDLE_TYPE_FUTEX' object) */
+/* TODO: HOP_FUTEXFD_OPEN_FUTEX       (returns a `HANDLE_TYPE_FUTEX' object) */
+/* TODO: HOP_FUTEXFD_OPEN_DATABLOCK   (returns a `HANDLE_TYPE_DATABLOCK' object) */
 /* TODO: HANDLE_TYPE_DRIVER */
 /* TODO: HANDLE_TYPE_DRIVER:d_cmdline */
 /* TODO: HANDLE_TYPE_DRIVER:STAT:d_flags */

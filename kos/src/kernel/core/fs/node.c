@@ -30,6 +30,7 @@
 #include <kernel/debugger.h>
 #include <kernel/driver.h>
 #include <kernel/except.h>
+#include <kernel/handle-proto.h>
 #include <kernel/handle.h>
 #include <kernel/heap.h>
 #include <kernel/malloc.h>
@@ -101,6 +102,15 @@ handle_directoryentry_read(struct directory_entry *__restrict self,
                            iomode_t mode) {
 	return handle_directoryentry_pread(self, dst, num_bytes, 0, mode);
 }
+
+DEFINE_HANDLE_READV_FROM_READ(directoryentry, struct directory_entry)
+DEFINE_HANDLE_PREADV_FROM_PREAD(directoryentry, struct directory_entry)
+DEFINE_HANDLE_AREAD_FROM_READ(directoryentry, struct directory_entry)
+DEFINE_HANDLE_AREADV_FROM_READV(directoryentry, struct directory_entry)
+DEFINE_HANDLE_APREAD_FROM_PREAD(directoryentry, struct directory_entry)
+DEFINE_HANDLE_APREADV_FROM_PREADV(directoryentry, struct directory_entry)
+
+
 
 LOCAL size_t KCALL
 directory_entry_usersize(struct directory_entry const *__restrict self) {

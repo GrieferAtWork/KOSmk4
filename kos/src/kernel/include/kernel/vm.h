@@ -529,9 +529,9 @@ NOTHROW(KCALL vm_datapart_haschanged)(struct vm_datapart *__restrict self,
  * @return: * : The number of saved data pages. */
 FUNDEF NONNULL((1)) vm_dpage_t KCALL
 vm_datapart_sync(struct vm_datapart *__restrict self,
-                 vm_dpage_t partrel_min_dpage,
-                 vm_dpage_t partrel_max_dpage,
-                 bool recheck_modifications_before_remap)
+                 vm_dpage_t partrel_min_dpage DFL(0),
+                 vm_dpage_t partrel_max_dpage DFL((vm_dpage_t)-1),
+                 bool recheck_modifications_before_remap DFL(false))
 		THROWS(E_WOULDBLOCK, ...);
 
 
@@ -1842,6 +1842,16 @@ NOTHROW(FCALL vm_isused)(struct vm *__restrict effective_vm,
 FUNDEF size_t FCALL vm_prefault(USER CHECKED void const *addr,
                                 size_t num_bytes, bool for_writing)
 		THROWS(E_WOULDBLOCK, E_BADALLOC);
+
+/* Sync changes made to file mappings within the given address
+ * range with on-disk file images. (s.a. `vm_datablock_sync()')
+ * NOTE: Memory ranges that aren't actually mapped are simply ignored.
+ * @return: * : The number of sychronozed bytes. (yes: those are bytes and not pages) */
+FUNDEF u64 FCALL
+vm_syncmem(struct vm *__restrict effective_vm,
+           vm_vpage_t minpage DFL((vm_vpage_t)0),
+           vm_vpage_t maxpage DFL((vm_vpage_t)-1))
+		THROWS(E_WOULDBLOCK, ...);
 
 
 /* Synchronize changes to `effective_vm' in the given address range.

@@ -332,45 +332,45 @@ __NAMESPACE_INT_END
 	}
 
 #ifdef __INTELLISENSE__
-#define DEFINE_REFCOUNT_FUNCTIONS_EX(T, field, destroy_, Tdestroy)                               \
-	extern "C++" {                                                                               \
-	T operator,(T, __NAMESPACE_INT_SYM __refcnt_select_tag);                                     \
-	NOBLOCK WUNUSED NONNULL((1)) __UINTPTR_TYPE__ NOTHROW(KCALL getrefcnt)(T * __restrict self); \
-	NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL isshared)(T * __restrict self);            \
-	NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL tryincref)(T * __restrict self);           \
-	NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL wasdestroyed)(T * __restrict self);        \
-	NOBLOCK T *NOTHROW(KCALL xincref)(T * __restrict self);                                      \
-	NOBLOCK ATTR_RETNONNULL NONNULL((1)) T *NOTHROW(KCALL incref)(T * __restrict self);          \
-	NOBLOCK NONNULL((1)) void NOTHROW(KCALL destroy)(T * __restrict self);                       \
-	NOBLOCK NONNULL((1)) void NOTHROW(KCALL decref)(T * __restrict self);                        \
-	NOBLOCK NONNULL((1)) void NOTHROW(KCALL decref_nokill)(T * __restrict self);                 \
-	NOBLOCK NONNULL((1)) void NOTHROW(KCALL decref_likely)(T * __restrict self);                 \
-	NOBLOCK NONNULL((1)) void NOTHROW(KCALL decref_unlikely)(T * __restrict self);               \
-	NOBLOCK void NOTHROW(KCALL xdecref)(T * self);                                               \
-	NOBLOCK void NOTHROW(KCALL xdecref_nokill)(T * self);                                        \
-	NOBLOCK void NOTHROW(KCALL xdecref_likely)(T * self);                                        \
-	NOBLOCK void NOTHROW(KCALL xdecref_unlikely)(T * self);                                      \
+#define DEFINE_REFCOUNT_FUNCTIONS_EX(T, field, destroy_, Tdestroy)                                     \
+	extern "C++" {                                                                                     \
+	T operator,(T, __NAMESPACE_INT_SYM __refcnt_select_tag);                                           \
+	NOBLOCK WUNUSED NONNULL((1)) __UINTPTR_TYPE__ NOTHROW(KCALL getrefcnt)(T const * __restrict self); \
+	NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL isshared)(T const * __restrict self);            \
+	NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL tryincref)(T * __restrict self);                 \
+	NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL wasdestroyed)(T const * __restrict self);        \
+	NOBLOCK T *NOTHROW(KCALL xincref)(T * __restrict self);                                            \
+	NOBLOCK ATTR_RETNONNULL NONNULL((1)) T *NOTHROW(KCALL incref)(T * __restrict self);                \
+	NOBLOCK NONNULL((1)) void NOTHROW(KCALL destroy)(T * __restrict self);                             \
+	NOBLOCK NONNULL((1)) void NOTHROW(KCALL decref)(T * __restrict self);                              \
+	NOBLOCK NONNULL((1)) void NOTHROW(KCALL decref_nokill)(T * __restrict self);                       \
+	NOBLOCK NONNULL((1)) void NOTHROW(KCALL decref_likely)(T * __restrict self);                       \
+	NOBLOCK NONNULL((1)) void NOTHROW(KCALL decref_unlikely)(T * __restrict self);                     \
+	NOBLOCK void NOTHROW(KCALL xdecref)(T * self);                                                     \
+	NOBLOCK void NOTHROW(KCALL xdecref_nokill)(T * self);                                              \
+	NOBLOCK void NOTHROW(KCALL xdecref_likely)(T * self);                                              \
+	NOBLOCK void NOTHROW(KCALL xdecref_unlikely)(T * self);                                            \
 	}
-#define DEFINE_WEAKREFCOUNT_FUNCTIONS_EX(T, field, destroy_, Tdestroy)                               \
-	extern "C++" {                                                                                   \
-	T operator,(T, __NAMESPACE_INT_SYM __weakrefcnt_select_tag);                                     \
-	NOBLOCK WUNUSED NONNULL((1)) __UINTPTR_TYPE__ NOTHROW(KCALL getweakrefcnt)(T * __restrict self); \
-	NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL isweakshared)(T * __restrict self);            \
-	NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL tryweakincref)(T * __restrict self);           \
-	NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL wasweakdestroyed)(T * __restrict self);        \
-	NOBLOCK T *NOTHROW(KCALL xweakincref)(T * __restrict self);                                      \
-	NOBLOCK ATTR_RETNONNULL NONNULL((1)) T *NOTHROW(KCALL weakincref)(T * __restrict self);          \
-	NOBLOCK NONNULL((1)) void NOTHROW(KCALL weakdestroy)(T * __restrict self);                       \
-	NOBLOCK NONNULL((1)) void NOTHROW(KCALL weakdecref)(T * __restrict self);                        \
-	NOBLOCK NONNULL((1)) void NOTHROW(KCALL weakdecref_nokill)(T * __restrict self);                 \
-	NOBLOCK NONNULL((1)) void NOTHROW(KCALL weakdecref_likely)(T * __restrict self);                 \
-	NOBLOCK NONNULL((1)) void NOTHROW(KCALL weakdecref_unlikely)(T * __restrict self);               \
-	NOBLOCK void NOTHROW(KCALL xweakdecref)(T * self);                                               \
-	NOBLOCK void NOTHROW(KCALL xweakdecref_nokill)(T * self);                                        \
-	NOBLOCK void NOTHROW(KCALL xweakdecref_likely)(T * self);                                        \
-	NOBLOCK void NOTHROW(KCALL xweakdecref_unlikely)(T * self);                                      \
+#define DEFINE_WEAKREFCOUNT_FUNCTIONS_EX(T, field, destroy_, Tdestroy)                                     \
+	extern "C++" {                                                                                         \
+	T operator,(T, __NAMESPACE_INT_SYM __weakrefcnt_select_tag);                                           \
+	NOBLOCK WUNUSED NONNULL((1)) __UINTPTR_TYPE__ NOTHROW(KCALL getweakrefcnt)(T const * __restrict self); \
+	NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL isweakshared)(T * __restrict self);                  \
+	NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL tryweakincref)(T * __restrict self);                 \
+	NOBLOCK WUNUSED NONNULL((1)) __BOOL NOTHROW(KCALL wasweakdestroyed)(T const * __restrict self);        \
+	NOBLOCK T *NOTHROW(KCALL xweakincref)(T * __restrict self);                                            \
+	NOBLOCK ATTR_RETNONNULL NONNULL((1)) T *NOTHROW(KCALL weakincref)(T * __restrict self);                \
+	NOBLOCK NONNULL((1)) void NOTHROW(KCALL weakdestroy)(T * __restrict self);                             \
+	NOBLOCK NONNULL((1)) void NOTHROW(KCALL weakdecref)(T * __restrict self);                              \
+	NOBLOCK NONNULL((1)) void NOTHROW(KCALL weakdecref_nokill)(T * __restrict self);                       \
+	NOBLOCK NONNULL((1)) void NOTHROW(KCALL weakdecref_likely)(T * __restrict self);                       \
+	NOBLOCK NONNULL((1)) void NOTHROW(KCALL weakdecref_unlikely)(T * __restrict self);                     \
+	NOBLOCK void NOTHROW(KCALL xweakdecref)(T * self);                                                     \
+	NOBLOCK void NOTHROW(KCALL xweakdecref_nokill)(T * self);                                              \
+	NOBLOCK void NOTHROW(KCALL xweakdecref_likely)(T * self);                                              \
+	NOBLOCK void NOTHROW(KCALL xweakdecref_unlikely)(T * self);                                            \
 	}
-#else
+#else /* __INTELLISENSE__ */
 
 #ifdef NDEBUG
 #define DEFINE_REFCOUNT_FUNCTIONS_EX(T, field, destroy_, Tdestroy)                                   \
@@ -380,7 +380,7 @@ __NAMESPACE_INT_END
 	public:                                                                                          \
 		typedef __typeof__(((T *)0)->field) refcnt_t;                                                \
 		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) refcnt_t                                       \
-		(KCALL getrefcnt)(T *__restrict self) __CXX_NOEXCEPT {                                       \
+		(KCALL getrefcnt)(T const *__restrict self) __CXX_NOEXCEPT {                                 \
 			return __hybrid_atomic_load(self->field, __ATOMIC_ACQUIRE);                              \
 		}                                                                                            \
 		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void                                           \
@@ -431,7 +431,7 @@ __NAMESPACE_INT_END
 	public:                                                                                          \
 		typedef __typeof__(((T *)0)->field) refcnt_t;                                                \
 		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) refcnt_t                                       \
-		(KCALL getrefcnt)(T *__restrict self) __CXX_NOEXCEPT {                                       \
+		(KCALL getrefcnt)(T const *__restrict self) __CXX_NOEXCEPT {                                 \
 			return __hybrid_atomic_load(self->field, __ATOMIC_ACQUIRE);                              \
 		}                                                                                            \
 		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void                                           \
@@ -484,7 +484,7 @@ __NAMESPACE_INT_END
 	public:                                                                                                   \
 		typedef __typeof__(((T *)0)->field) refcnt_t;                                                         \
 		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) refcnt_t                                                \
-		(KCALL getrefcnt)(T *__restrict self) __CXX_NOEXCEPT {                                                \
+		(KCALL getrefcnt)(T const *__restrict self) __CXX_NOEXCEPT {                                          \
 			return __hybrid_atomic_load(self->field, __ATOMIC_ACQUIRE);                                       \
 		}                                                                                                     \
 		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void                                                    \
@@ -546,7 +546,7 @@ __NAMESPACE_INT_END
 	public:                                                                                                   \
 		typedef __typeof__(((T *)0)->field) refcnt_t;                                                         \
 		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) refcnt_t                                                \
-		(KCALL getrefcnt)(T *__restrict self) __CXX_NOEXCEPT {                                                \
+		(KCALL getrefcnt)(T const *__restrict self) __CXX_NOEXCEPT {                                          \
 			return __hybrid_atomic_load(self->field, __ATOMIC_ACQUIRE);                                       \
 		}                                                                                                     \
 		static __CXX_FORCEINLINE NOBLOCK NONNULL((1)) void                                                    \
@@ -605,19 +605,19 @@ __NAMESPACE_INT_END
 
 template<class T>
 FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) __UINTPTR_TYPE__
-NOTHROW(KCALL getrefcnt)(T *__restrict self) {
+NOTHROW(KCALL getrefcnt)(T const *__restrict self) {
 	return REFCNT_METHODS(T)::getrefcnt(self);
 }
 
 template<class T>
 FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL
-NOTHROW(KCALL isshared)(T *__restrict self) {
+NOTHROW(KCALL isshared)(T const *__restrict self) {
 	return REFCNT_METHODS(T)::getrefcnt(self) > 1;
 }
 
 template<class T>
 FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL
-NOTHROW(KCALL wasdestroyed)(T *__restrict self) {
+NOTHROW(KCALL wasdestroyed)(T const *__restrict self) {
 	return REFCNT_METHODS(T)::getrefcnt(self) == 0;
 }
 
@@ -698,19 +698,19 @@ NOTHROW(KCALL xdecref_unlikely)(T *self) {
 
 template<class T>
 FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) __UINTPTR_TYPE__
-NOTHROW(KCALL getweakrefcnt)(T *__restrict self) {
+NOTHROW(KCALL getweakrefcnt)(T const *__restrict self) {
 	return WEAKREFCNT_METHODS(T)::getrefcnt(self);
 }
 
 template<class T>
 FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL
-NOTHROW(KCALL isweakshared)(T *__restrict self) {
+NOTHROW(KCALL isweakshared)(T const *__restrict self) {
 	return WEAKREFCNT_METHODS(T)::getrefcnt(self) > 1;
 }
 
 template<class T>
 FORCELOCAL NOBLOCK WUNUSED NONNULL((1)) __BOOL
-NOTHROW(KCALL wasweakdestroyed)(T *__restrict self) {
+NOTHROW(KCALL wasweakdestroyed)(T const *__restrict self) {
 	return WEAKREFCNT_METHODS(T)::getrefcnt(self) == 0;
 }
 
@@ -793,9 +793,8 @@ NOTHROW(KCALL xweakdecref_unlikely)(T *self) {
 		WEAKREFCNT_METHODS(T)::decref_unlikely(self);
 }
 
+#endif /* !__INTELLISENSE__ */
 
-
-#endif
 #define DEFINE_REFCOUNT_FUNCTIONS(T, field, destroy_) \
 	DEFINE_REFCOUNT_FUNCTIONS_EX(T, field, destroy_, T)
 #define DEFINE_WEAKREFCOUNT_FUNCTIONS(T, field, destroy_) \

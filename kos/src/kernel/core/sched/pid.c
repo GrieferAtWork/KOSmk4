@@ -26,6 +26,7 @@
 
 #include <dev/ttybase.h>
 #include <kernel/except.h>
+#include <kernel/handle-proto.h>
 #include <kernel/handle.h>
 #include <kernel/malloc.h>
 #include <kernel/rand.h>
@@ -2181,7 +2182,6 @@ DEFINE_SYSCALL4(pid_t, wait4, pid_t, upid,
 
 /* Task HOP functions */
 DEFINE_HANDLE_REFCNT_FUNCTIONS(task, struct taskpid)
-DEFINE_HANDLE_REFCNT_FUNCTIONS(pidns, struct pidns)
 INTERN void KCALL
 handle_task_stat(struct taskpid *__restrict self,
                  USER CHECKED struct stat *result) {
@@ -2211,7 +2211,7 @@ handle_task_poll(struct taskpid *__restrict self, poll_mode_t what) {
 
 INTERN syscall_slong_t KCALL
 handle_task_hop(struct taskpid *__restrict self, syscall_ulong_t cmd,
-                USER UNCHECKED struct taskpid *arg, iomode_t mode) {
+                USER UNCHECKED void *arg, iomode_t mode) {
 	switch (cmd) {
 
 	case HOP_TASK_JOIN: {
@@ -2555,6 +2555,7 @@ err_exited:
 
 
 
+DEFINE_HANDLE_REFCNT_FUNCTIONS(pidns, struct pidns)
 INTERN syscall_slong_t KCALL
 handle_pidns_hop(struct pidns *__restrict self,
                  syscall_ulong_t cmd,

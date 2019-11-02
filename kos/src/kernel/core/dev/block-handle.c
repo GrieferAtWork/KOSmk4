@@ -26,6 +26,7 @@
 #include <fs/node.h>
 #include <kernel/aio.h>
 #include <kernel/compat.h>
+#include <kernel/handle-proto.h>
 #include <kernel/handle.h>
 #include <kernel/user.h>
 
@@ -43,23 +44,24 @@
 DECL_BEGIN
 
 
-DEFINE_HANDLE_REFCNT_FUNCTIONS(blockdevice,struct basic_block_device)
+DEFINE_HANDLE_REFCNT_FUNCTIONS(blockdevice, struct basic_block_device)
 
 
-INTERN size_t
-(KCALL handle_blockdevice_pread)(struct basic_block_device *__restrict self,
-                                 USER CHECKED void *dst, size_t num_bytes,
-                                 pos_t addr, iomode_t mode) {
+INTERN size_t KCALL
+handle_blockdevice_pread(struct basic_block_device *__restrict self,
+                         USER CHECKED void *dst, size_t num_bytes,
+                         pos_t addr, iomode_t mode) {
 	block_device_read(self,
 	                  dst,
 	                  num_bytes,
 	                  addr);
 	return num_bytes;
 }
-INTERN size_t
-(KCALL handle_blockdevice_pwrite)(struct basic_block_device *__restrict self,
-                                  USER CHECKED void const *src, size_t num_bytes,
-                                  pos_t addr, iomode_t mode) {
+
+INTERN size_t KCALL
+handle_blockdevice_pwrite(struct basic_block_device *__restrict self,
+                          USER CHECKED void const *src, size_t num_bytes,
+                          pos_t addr, iomode_t mode) {
 	block_device_write(self,
 	                   src,
 	                   num_bytes,
@@ -67,20 +69,21 @@ INTERN size_t
 	return num_bytes;
 }
 
-INTERN size_t
-(KCALL handle_blockdevice_preadv)(struct basic_block_device *__restrict self,
-                                  struct aio_buffer *__restrict dst, size_t num_bytes,
-                                  pos_t addr, iomode_t mode) {
+INTERN size_t KCALL
+handle_blockdevice_preadv(struct basic_block_device *__restrict self,
+                          struct aio_buffer *__restrict dst, size_t num_bytes,
+                          pos_t addr, iomode_t mode) {
 	block_device_readv(self,
 	                   dst,
 	                   num_bytes,
 	                   addr);
 	return num_bytes;
 }
-INTERN size_t
-(KCALL handle_blockdevice_pwritev)(struct basic_block_device *__restrict self,
-                                   struct aio_buffer *__restrict src, size_t num_bytes,
-                                   pos_t addr, iomode_t mode) {
+
+INTERN size_t KCALL
+handle_blockdevice_pwritev(struct basic_block_device *__restrict self,
+                           struct aio_buffer *__restrict src, size_t num_bytes,
+                           pos_t addr, iomode_t mode) {
 	block_device_writev(self,
 	                    src,
 	                    num_bytes,
@@ -88,12 +91,11 @@ INTERN size_t
 	return num_bytes;
 }
 
-
-INTERN size_t
-(KCALL handle_blockdevice_apread)(struct basic_block_device *__restrict self,
-                                  USER CHECKED void *dst, size_t num_bytes,
-                                  pos_t addr, iomode_t mode,
-                                  struct aio_multihandle *__restrict aio) {
+INTERN size_t KCALL
+handle_blockdevice_apread(struct basic_block_device *__restrict self,
+                          USER CHECKED void *dst, size_t num_bytes,
+                          pos_t addr, iomode_t mode,
+                          struct aio_multihandle *__restrict aio) {
 	block_device_aread(self,
 	                   dst,
 	                   num_bytes,
@@ -101,11 +103,12 @@ INTERN size_t
 	                   aio_multihandle_allochandle(aio));
 	return num_bytes;
 }
-INTERN size_t
-(KCALL handle_blockdevice_apwrite)(struct basic_block_device *__restrict self,
-                                   USER CHECKED void const *src, size_t num_bytes,
-                                   pos_t addr, iomode_t mode,
-                                   struct aio_multihandle *__restrict aio) {
+
+INTERN size_t KCALL
+handle_blockdevice_apwrite(struct basic_block_device *__restrict self,
+                           USER CHECKED void const *src, size_t num_bytes,
+                           pos_t addr, iomode_t mode,
+                           struct aio_multihandle *__restrict aio) {
 	block_device_awrite(self,
 	                    src,
 	                    num_bytes,
@@ -114,11 +117,11 @@ INTERN size_t
 	return num_bytes;
 }
 
-INTERN size_t
-(KCALL handle_blockdevice_apreadv)(struct basic_block_device *__restrict self,
-                                   struct aio_buffer *__restrict dst, size_t num_bytes,
-                                   pos_t addr, iomode_t mode,
-                                   struct aio_multihandle *__restrict aio) {
+INTERN size_t KCALL
+handle_blockdevice_apreadv(struct basic_block_device *__restrict self,
+                           struct aio_buffer *__restrict dst, size_t num_bytes,
+                           pos_t addr, iomode_t mode,
+                           struct aio_multihandle *__restrict aio) {
 	block_device_areadv(self,
 	                    dst,
 	                    num_bytes,
@@ -126,11 +129,12 @@ INTERN size_t
 	                    aio_multihandle_allochandle(aio));
 	return num_bytes;
 }
-INTERN size_t
-(KCALL handle_blockdevice_apwritev)(struct basic_block_device *__restrict self,
-                                    struct aio_buffer *__restrict src, size_t num_bytes,
-                                    pos_t addr, iomode_t mode,
-                                    struct aio_multihandle *__restrict aio) {
+
+INTERN size_t KCALL
+handle_blockdevice_apwritev(struct basic_block_device *__restrict self,
+                            struct aio_buffer *__restrict src, size_t num_bytes,
+                            pos_t addr, iomode_t mode,
+                            struct aio_multihandle *__restrict aio) {
 	block_device_awritev(self,
 	                     src,
 	                     num_bytes,
