@@ -94,9 +94,9 @@
 #   define __CXX_NOEXCEPT_IFNX(expr) /* nothing */
 #endif
 
-#if !defined(__INTELLISENSE__) && !defined(__KERNEL__)
+#if !defined(__KOS__) || !defined(__KERNEL__)
 #define __COMPILER_PREFERR_ENUMS 1
-#endif /* !__INTELLISENSE__ && !__KERNEL__ */
+#endif /* !__KOS__ || !__KERNEL__ */
 
 #ifndef __ELF__
 #   define __CXX_CLASSMEMBER inline

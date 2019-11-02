@@ -23,8 +23,6 @@
 
 #include "../api.h"
 /**/
-#include "../libc/capture-varargs.h"
-
 #include <hybrid/align.h>
 #include <hybrid/host.h>
 #include <hybrid/limits.h>
@@ -35,6 +33,8 @@
 #include <sys/param.h>
 #include <sys/stat.h>
 #include <sys/sysinfo.h>
+#include <sys/time.h>
+#include <sys/utsname.h>
 
 #include <assert.h>
 #include <dirent.h>
@@ -43,14 +43,15 @@
 #include <grp.h>
 #include <limits.h>
 #include <pwd.h>
+#include <stdint.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
 #include <syslog.h>
 #include <termios.h>
 #include <unistd.h>
-#include <sys/utsname.h>
 
+#include "../libc/capture-varargs.h"
 #include "stdlib.h"
 #include "unistd.h"
 
@@ -344,8 +345,12 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.utility.sleep") unsigned int
 NOTHROW_RPC(LIBCCALL libc_sleep)(unsigned int seconds)
 /*[[[body:sleep]]]*/
 {
-	libc_seterrno(ENOSYS);
-	return seconds;
+	struct timespec req, rem;
+	req.tv_sec  = seconds;
+	req.tv_nsec = 0;
+	rem.tv_sec  = 0;
+	sys_nanosleep(&req, &rem);
+	return rem.tv_sec;
 }
 /*[[[end:sleep]]]*/
 
