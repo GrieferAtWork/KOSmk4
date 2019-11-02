@@ -695,6 +695,19 @@ NOTHROW_NCX(LIBCCALL libc_tcsetpgrp)(fd_t fd,
 }
 /*[[[end:tcsetpgrp]]]*/
 
+/*[[[head:getlogin_r,hash:CRC-32=0x9043a5b2]]]*/
+INTERN NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.getlogin_r") int
+NOTHROW_RPC(LIBCCALL libc_getlogin_r)(char *name,
+                                      size_t name_len)
+/*[[[body:getlogin_r]]]*/
+{
+	CRT_UNIMPLEMENTED("getlogin_r"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return -1;
+}
+/*[[[end:getlogin_r]]]*/
+
 /*[[[head:getlogin,hash:CRC-32=0xfe587258]]]*/
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.getlogin") char *
@@ -1408,9 +1421,15 @@ NOTHROW_NCX(LIBCCALL libc_ualarm)(useconds_t value,
                                   useconds_t interval)
 /*[[[body:ualarm]]]*/
 {
-	CRT_UNIMPLEMENTED("ualarm"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+	struct itimerval timer, otimer;
+	timer.it_value.tv_sec     = value / 1000000;
+	timer.it_value.tv_usec    = value % 1000000;
+	timer.it_interval.tv_sec  = interval / 1000000;
+	timer.it_interval.tv_usec = interval % 1000000;
+	if (setitimer(ITIMER_REAL, &timer, &otimer) < 0)
+		return -1;
+	return (otimer.it_value.tv_sec * 1000000) +
+	       (otimer.it_value.tv_usec);
 }
 /*[[[end:ualarm]]]*/
 
@@ -1621,15 +1640,27 @@ NOTHROW_NCX(LIBCCALL libc_setregid)(gid_t rgid,
 }
 /*[[[end:setregid]]]*/
 
+PRIVATE ATTR_SECTION(".rodata.crt.system.configuration.hostid_pathname") char const hostid_pathname[] = "/etc";
+PRIVATE ATTR_SECTION(".rodata.crt.system.configuration.hostid_filename") char const hostid_filename[] = "/etc/hostid";
+
 /*[[[head:gethostid,hash:CRC-32=0x2867d86]]]*/
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.system.configuration.gethostid") long int
 NOTHROW_NCX(LIBCCALL libc_gethostid)(void)
 /*[[[body:gethostid]]]*/
 {
-	CRT_UNIMPLEMENTED("gethostid"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	fd_t fd;
+	uint32_t id32;
+	fd = sys_open(hostid_filename, O_RDONLY, 0);
+	if (fd >= 0) {
+		ssize_t count;
+		count = readall(fd, &id32, 4);
+		sys_close(fd);
+		if (count == 4)
+			return (long int)(unsigned long int)id32;
+	}
+	/* XXX: Glibc also tries to use the host's IP address here... */
+	return 0;
 }
 /*[[[end:gethostid]]]*/
 
@@ -1638,9 +1669,38 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.system.configuration.sethostid") int
 NOTHROW_NCX(LIBCCALL libc_sethostid)(long int id)
 /*[[[body:sethostid]]]*/
 {
-	CRT_UNIMPLEMENTED("sethostid"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
+	fd_t fd;
+	ssize_t count;
+	uint32_t id32;
+#if __SIZEOF_LONG__ > 4
+	if (id & ~UINT32_C(0xffffffff)) {
+		libc_seterrno(EOVERFLOW);
+		return -1;
+	}
+#endif /* __SIZEOF_LONG__ > 4 */
+	fd = sys_open(hostid_filename, O_CREAT | O_WRONLY | O_TRUNC, 0644);
+	if (fd < 0) {
+		if (fd == -ENOTDIR) {
+			/* Check if /etc was already created. */
+			fd = sys_mkdir(hostid_pathname, 0644);
+			if (fd == -EOK || fd == -EEXIST) {
+				fd = sys_open(hostid_filename, O_CREAT | O_WRONLY | O_TRUNC, 0644);
+				if (fd >= 0)
+					goto got_fd;
+			}
+		}
+		return libc_seterrno_syserr(fd);
+	}
+got_fd:
+	id32  = (uint32_t)(unsigned long int)id;
+	count = writeall(fd, &id32, 4);
+	sys_close(fd);
+	if (count <= 0) {
+		if (!count)
+			libc_seterrno(ENOSPC); /* ??? */
+		return -1;
+	}
+	return 0;
 }
 /*[[[end:sethostid]]]*/
 
@@ -1733,19 +1793,6 @@ NOTHROW_RPC(LIBCCALL libc_readlink)(char const *__restrict path,
 	return libc_seterrno_syserr(result);
 }
 /*[[[end:readlink]]]*/
-
-/*[[[head:getlogin_r,hash:CRC-32=0x9043a5b2]]]*/
-INTERN NONNULL((1))
-ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.getlogin_r") int
-NOTHROW_RPC(LIBCCALL libc_getlogin_r)(char *name,
-                                      size_t name_len)
-/*[[[body:getlogin_r]]]*/
-{
-	CRT_UNIMPLEMENTED("getlogin_r"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return -1;
-}
-/*[[[end:getlogin_r]]]*/
 
 /*[[[head:gethostname,hash:CRC-32=0x21837829]]]*/
 /* >> gethostname(3)
