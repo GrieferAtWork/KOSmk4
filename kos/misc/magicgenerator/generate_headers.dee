@@ -6125,7 +6125,7 @@ for (local comnam, funcs: components) {
 	local compath = "include/libc/{}.h".format({ comnam });
 	local slow_compath = "include/libc/slow/{}.h".format({ comnam });
 	print "Creating combinatory libc-header: ", compath;
-	if (libc_fast_functions) {
+	if (libc_fast_functions || libc_slow_functions) {
 		write_hashed_file(compath, [](fp) {
 			write_libc_header(fp, comnam, libc_fast_functions, libc_slow_functions);
 		});

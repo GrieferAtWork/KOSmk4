@@ -47,17 +47,26 @@
 
 /*[[[deemon
 local chk_include = {
+	"eti.h",
+	"form.h",
+	"menu.h",
+	"panel.h",
 	"curses.h",
+	"ncurses_cfg.h",
+	"ncurses_def.h",
+	"nc_tparm.h",
 	"ncurses.h",
 	"ncurses_dll.h",
 	"term.h",
+	"term_entry.h",
 	"termcap.h",
-	"unctrl.h"
+	"tic.h",
+	"unctrl.h",
 };
 
 import fs;
 function incdir(prefix, path) {
-	for (local x: fs.dir(path)) {
+	for (local x: fs.dir(path).sorted()) {
 		local total = fs.joinpath(path, x);
 		if (fs.stat.isdir(total)) {
 			if (x in ["i386-kos", "c++", "local", "compiler", "crt-features", "__ice__", "system-test"])
@@ -90,6 +99,11 @@ function incdir(prefix, path) {
 incdir("", "../../include");
 //print "#endif";
 ]]]*/
+#include <ConcurrencySal.h>
+#include <__crt.h>
+#include <__stdinc.h>
+#include <_ansi.h>
+#include <_newlib_version.h>
 #include <aliases.h>
 #include <alloc.h>
 #include <alloca.h>
@@ -137,8 +151,8 @@ incdir("", "../../include");
 #include <bits/ioctls.h>
 #include <bits/ipc.h>
 #include <bits/itimerval.h>
-#include <bits/locale.h>
 #include <bits/local_lim.h>
+#include <bits/locale.h>
 #include <bits/math-vector.h>
 #include <bits/mathdef.h>
 #include <bits/mbstate.h>
@@ -147,11 +161,15 @@ incdir("", "../../include");
 #include <bits/nan.h>
 #include <bits/netdb.h>
 #include <bits/oflags.h>
+#include <bits/os_defines.h>
 #include <bits/param.h>
 #include <bits/poll.h>
 #include <bits/posix1_lim.h>
 #include <bits/posix2_lim.h>
 #include <bits/posix_opt.h>
+#include <bits/pthreadinit.h>
+#include <bits/pthreadtypes.h>
+#include <bits/pthreadvalues.h>
 #include <bits/resource.h>
 #include <bits/sched.h>
 #include <bits/select.h>
@@ -183,6 +201,7 @@ incdir("", "../../include");
 #include <bits/syscall.h>
 #include <bits/syslog-path.h>
 #include <bits/termios.h>
+#include <bits/threads.h>
 #include <bits/time.h>
 #include <bits/timerfd.h>
 #include <bits/timespec-cxx-support.h>
@@ -190,16 +209,20 @@ incdir("", "../../include");
 #include <bits/timeval-cxx-support.h>
 #include <bits/timeval.h>
 #include <bits/timex.h>
-#include <bits/types/clockid_t.h>
-#include <bits/types/clock_t.h>
 #include <bits/types/FILE.h>
+#include <bits/types/__FILE.h>
+#include <bits/types/__locale_t.h>
+#include <bits/types/__mbstate_t.h>
+#include <bits/types/__sigset_t.h>
+#include <bits/types/clock_t.h>
+#include <bits/types/clockid_t.h>
 #include <bits/types/locale_t.h>
 #include <bits/types/mbstate_t.h>
+#include <bits/types/sig_atomic_t.h>
 #include <bits/types/sigevent_t.h>
 #include <bits/types/siginfo_t.h>
 #include <bits/types/sigset_t.h>
 #include <bits/types/sigval_t.h>
-#include <bits/types/sig_atomic_t.h>
 #include <bits/types/stack_t.h>
 #include <bits/types/struct_iovec.h>
 #include <bits/types/struct_itimerspec.h>
@@ -209,13 +232,9 @@ incdir("", "../../include");
 #include <bits/types/struct_timespec.h>
 #include <bits/types/struct_timeval.h>
 #include <bits/types/struct_tm.h>
-#include <bits/types/timer_t.h>
 #include <bits/types/time_t.h>
+#include <bits/types/timer_t.h>
 #include <bits/types/wint_t.h>
-#include <bits/types/__FILE.h>
-#include <bits/types/__locale_t.h>
-#include <bits/types/__mbstate_t.h>
-#include <bits/types/__sigset_t.h>
 #include <bits/types.h>
 #include <bits/typesizes.h>
 #include <bits/uformat-printer.h>
@@ -233,8 +252,8 @@ incdir("", "../../include");
 #include <bits/xopen_lim.h>
 #include <bits/xtitypes.h>
 #include <byteswap.h>
-#include <ConcurrencySal.h>
 #include <cpio.h>
+#include <crtdbg.h>
 #include <crtdefs.h>
 #include <crypt.h>
 #include <ctype.h>
@@ -249,50 +268,27 @@ incdir("", "../../include");
 #include <elf.h>
 #include <endian.h>
 #include <errno.h>
+#if __has_include(<eti.h>)
+#include <eti.h>
+#endif /* __has_include(<eti.h>) */
 #include <execinfo.h>
 #include <fcntl.h>
 #include <features.h>
+#include <fenv.h>
 #include <file.h>
 #include <float.h>
 #include <fnmatch.h>
+#if __has_include(<form.h>)
+#include <form.h>
+#endif /* __has_include(<form.h>) */
 #include <format-printer.h>
+#include <format-reader.h>
 #include <getopt.h>
 #include <getpagesize.h>
 #include <glob.h>
-#include <gnu/lib-names.h>
 #include <gnu/stubs.h>
+#include <gnu/lib-names.h>
 #include <grp.h>
-#include <hybrid/align.h>
-#include <hybrid/alloca.h>
-#include <hybrid/atomic.h>
-#include <hybrid/bit.h>
-#include <hybrid/byteorder.h>
-#include <hybrid/byteswap.h>
-#include <hybrid/compiler.h>
-#include <hybrid/debug-alignment.h>
-#include <hybrid/floatcore.h>
-#include <hybrid/host.h>
-#include <hybrid/limitcore.h>
-#include <hybrid/limits.h>
-#include <hybrid/minmax.h>
-#include <hybrid/overflow.h>
-#include <hybrid/pointer.h>
-#include <hybrid/pp/bubble.h>
-#include <hybrid/pp/__bubble.h>
-#include <hybrid/pp/__va_nargs.h>
-#include <hybrid/sched/yield.h>
-#include <hybrid/sched/__gettid.h>
-#include <hybrid/sched/__yield.h>
-#include <hybrid/sequence/atree.h>
-#include <hybrid/sequence/list.h>
-#include <hybrid/sequence/vector.h>
-#include <hybrid/struct.h>
-#include <hybrid/sync/atomic-once.h>
-#include <hybrid/sync/atomic-owner-rwlock.h>
-#include <hybrid/sync/atomic-rwlock.h>
-#include <hybrid/typecore.h>
-#include <hybrid/unaligned.h>
-#include <hybrid/wordbits.h>
 #include <hybrid/__alloca.h>
 #include <hybrid/__asm.h>
 #include <hybrid/__assembly.h>
@@ -309,6 +305,37 @@ incdir("", "../../include");
 #include <hybrid/__rotate.h>
 #include <hybrid/__unaligned.h>
 #include <hybrid/__wordbits.h>
+#include <hybrid/align.h>
+#include <hybrid/alloca.h>
+#include <hybrid/atomic.h>
+#include <hybrid/bit.h>
+#include <hybrid/byteorder.h>
+#include <hybrid/byteswap.h>
+#include <hybrid/compiler.h>
+#include <hybrid/debug-alignment.h>
+#include <hybrid/floatcore.h>
+#include <hybrid/host.h>
+#include <hybrid/limitcore.h>
+#include <hybrid/limits.h>
+#include <hybrid/minmax.h>
+#include <hybrid/overflow.h>
+#include <hybrid/pointer.h>
+#include <hybrid/pp/__bubble.h>
+#include <hybrid/pp/__va_nargs.h>
+#include <hybrid/pp/bubble.h>
+#include <hybrid/sched/__gettid.h>
+#include <hybrid/sched/__yield.h>
+#include <hybrid/sched/yield.h>
+#include <hybrid/sequence/atree.h>
+#include <hybrid/sequence/list.h>
+#include <hybrid/sequence/vector.h>
+#include <hybrid/struct.h>
+#include <hybrid/sync/atomic-once.h>
+#include <hybrid/sync/atomic-owner-rwlock.h>
+#include <hybrid/sync/atomic-rwlock.h>
+#include <hybrid/typecore.h>
+#include <hybrid/unaligned.h>
+#include <hybrid/wordbits.h>
 #include <ieee754.h>
 #include <ifaddrs.h>
 #include <inttypes.h>
@@ -332,6 +359,7 @@ incdir("", "../../include");
 #include <kos/debugtrap.h>
 #include <kos/dev.h>
 #include <kos/except-handler.h>
+#include <kos/except-inval.h>
 #include <kos/except-io.h>
 #include <kos/except.h>
 #include <kos/fcntl.h>
@@ -343,25 +371,32 @@ incdir("", "../../include");
 #include <kos/hybrid/heap.h>
 #include <kos/hybrid/library.h>
 #include <kos/hybrid/sched-signal.h>
+#include <kos/io/ohci.h>
 #include <kos/io/pci.h>
 #include <kos/io/ps2.h>
+#include <kos/io/scsi.h>
 #include <kos/io/serial.h>
 #include <kos/io/uhci.h>
+#include <kos/io/usb-class.h>
+#include <kos/io/usb-hid.h>
+#include <kos/io/usb-hub.h>
+#include <kos/io/usb.h>
 #include <kos/io/vga.h>
 #include <kos/io.h>
 #include <kos/ioctl/clock.h>
 #include <kos/ioctl/keyboard.h>
 #include <kos/ioctl/mouse.h>
 #include <kos/jiffies.h>
-#include <kos/kernel/handle.h>
 #include <kos/kernel/types.h>
+#include <kos/kernel/handle.h>
 #include <kos/keyboard.h>
 #include <kos/lazybind.h>
 #include <kos/library-listdef.h>
 #include <kos/malloc.h>
+#include <kos/personality.h>
 #include <kos/process.h>
-#include <kos/sys/ioctl.h>
 #include <kos/sys/stat.h>
+#include <kos/sys/ioctl.h>
 #include <kos/syscalls.h>
 #include <kos/sysctl.h>
 #include <kos/thread.h>
@@ -380,8 +415,10 @@ incdir("", "../../include");
 #include <libc/slow/ctype.h>
 #include <libc/slow/malloc.h>
 #include <libc/slow/parts.uchar.string.h>
+#include <libc/slow/stdlib.h>
 #include <libc/slow/string.h>
 #include <libc/slow/unicode.h>
+#include <libc/stdlib.h>
 #include <libc/string.h>
 #include <libc/unicode.h>
 #include <libcmdline/api.h>
@@ -403,29 +440,29 @@ incdir("", "../../include");
 #include <libdisasm/disassembler.h>
 #include <libdisasm/format.h>
 #include <libgen.h>
-#include <libinstrlen/api.h>
 #include <libinstrlen/instrlen.h>
+#include <libinstrlen/api.h>
 #include <libio.h>
 #include <libjson/api.h>
 #include <libjson/generator.h>
 #include <libjson/parser.h>
 #include <libjson/writer.h>
-#include <libkeymap/api.h>
 #include <libkeymap/keymap.h>
-#include <libregdump/api.h>
+#include <libkeymap/api.h>
 #include <libregdump/printer.h>
-#include <libregex/api.h>
+#include <libregdump/api.h>
 #include <libregex/regex.h>
+#include <libregex/api.h>
 #include <librpc/api.h>
-#include <librpc/bits/rpc.h>
 #include <librpc/bits/syscall-info.h>
+#include <librpc/bits/rpc.h>
 #include <librpc/rpc.h>
-#include <libterm/api.h>
 #include <libterm/termio.h>
+#include <libterm/api.h>
 #include <libunwind/api.h>
 #include <libunwind/arch-register.h>
-#include <libunwind/cfi/i386.h>
 #include <libunwind/cfi/x86_64.h>
+#include <libunwind/cfi/i386.h>
 #include <libunwind/cfi.h>
 #include <libunwind/eh_frame.h>
 #include <libunwind/except.h>
@@ -438,11 +475,14 @@ incdir("", "../../include");
 #include <libvideo/gfx/api.h>
 #include <libvideo/gfx/buffer.h>
 #include <libvideo/gfx/gfx.h>
-#include <libvideo/window/api.h>
 #include <libvideo/window/window.h>
+#include <libvideo/window/api.h>
 #include <libvm86/api.h>
 #include <libvm86/emulator.h>
 #include <libvm86/intrin86.h>
+#include <libzlib/api.h>
+#include <libzlib/error.h>
+#include <libzlib/inflate.h>
 #include <limits.h>
 #include <linux/fd.h>
 #include <linux/fs.h>
@@ -466,6 +506,10 @@ incdir("", "../../include");
 #include <linux/types.h>
 #include <linux/vt.h>
 #include <locale.h>
+#include <machine/_default_types.h>
+#include <machine/_endian.h>
+#include <machine/_time.h>
+#include <machine/_types.h>
 #include <machine/ansi.h>
 #include <machine/endian.h>
 #include <machine/malloc.h>
@@ -476,20 +520,28 @@ incdir("", "../../include");
 #include <machine/termios.h>
 #include <machine/time.h>
 #include <machine/types.h>
-#include <machine/_default_types.h>
-#include <machine/_endian.h>
-#include <machine/_time.h>
-#include <machine/_types.h>
 #include <malloc.h>
 #include <malloca.h>
 #include <math.h>
 #include <mem.h>
 #include <memory.h>
+#if __has_include(<menu.h>)
+#include <menu.h>
+#endif /* __has_include(<menu.h>) */
 #include <minmax.h>
 #include <mntent.h>
+#if __has_include(<nc_tparm.h>)
+#include <nc_tparm.h>
+#endif /* __has_include(<nc_tparm.h>) */
 #if __has_include(<ncurses.h>)
 #include <ncurses.h>
 #endif /* __has_include(<ncurses.h>) */
+#if __has_include(<ncurses_cfg.h>)
+#include <ncurses_cfg.h>
+#endif /* __has_include(<ncurses_cfg.h>) */
+#if __has_include(<ncurses_def.h>)
+#include <ncurses_def.h>
+#endif /* __has_include(<ncurses_def.h>) */
 #if __has_include(<ncurses_dll.h>)
 #include <ncurses_dll.h>
 #endif /* __has_include(<ncurses_dll.h>) */
@@ -515,6 +567,9 @@ incdir("", "../../include");
 #include <newlib.h>
 #include <optimized/string.h>
 #include <osfcn.h>
+#if __has_include(<panel.h>)
+#include <panel.h>
+#endif /* __has_include(<panel.h>) */
 #include <parts/assert.h>
 #include <parts/cyg/errno.h>
 #include <parts/dos/errno.h>
@@ -531,8 +586,8 @@ incdir("", "../../include");
 #include <parts/uchar/stdio.h>
 #include <parts/uchar/stdlib.h>
 #include <parts/uchar/string.h>
-#include <parts/uchar/sys/mman.h>
 #include <parts/uchar/sys/stat.h>
+#include <parts/uchar/sys/mman.h>
 #include <parts/uchar/time.h>
 #include <parts/uchar/unistd.h>
 #include <parts/uchar/utime.h>
@@ -567,11 +622,13 @@ incdir("", "../../include");
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdio_ext.h>
 #include <stdlib.h>
 #include <stdnoreturn.h>
 #include <string.h>
 #include <strings.h>
 #include <stropts.h>
+#include <sys/_types.h>
 #include <sys/acct.h>
 #include <sys/auxv.h>
 #include <sys/bitypes.h>
@@ -640,17 +697,23 @@ incdir("", "../../include");
 #include <sys/vt.h>
 #include <sys/wait.h>
 #include <sys/xattr.h>
-#include <sys/_types.h>
 #include <syscall.h>
 #include <syslog.h>
 #if __has_include(<term.h>)
 #include <term.h>
 #endif /* __has_include(<term.h>) */
+#if __has_include(<term_entry.h>)
+#include <term_entry.h>
+#endif /* __has_include(<term_entry.h>) */
 #if __has_include(<termcap.h>)
 #include <termcap.h>
 #endif /* __has_include(<termcap.h>) */
 #include <termio.h>
 #include <termios.h>
+#include <threads.h>
+#if __has_include(<tic.h>)
+#include <tic.h>
+#endif /* __has_include(<tic.h>) */
 #include <time.h>
 #include <ttyent.h>
 #include <uchar.h>
@@ -672,9 +735,7 @@ incdir("", "../../include");
 #include <wchar.h>
 #include <wctype.h>
 #include <xlocale.h>
-#include <_ansi.h>
-#include <_newlib_version.h>
-#include <__crt.h>
-#include <__stdinc.h>
+#include <zconf.h>
+#include <zlib.h>
 //[[[end]]]
 

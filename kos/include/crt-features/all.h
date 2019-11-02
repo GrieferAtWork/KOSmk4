@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6bc8e05b */
+/* HASH CRC-32:0xe3a043a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1472,6 +1472,7 @@
 #define __CRT_HAVE_c16getcwd 1
 #define __CRT_HAVE_c16rtomb 1
 #define __CRT_HAVE_c32rtomb 1
+#define __CRT_HAVE_call_once 1
 #define __CRT_HAVE_calloc 1
 #define __CRT_HAVE_canonicalize_file_name 1
 #define __CRT_HAVE_cbrt 1
@@ -1511,6 +1512,13 @@
 #define __CRT_HAVE_close 1
 #define __CRT_HAVE_closedir 1
 #define __CRT_HAVE_closelog 1
+#define __CRT_HAVE_cnd_broadcast 1
+#define __CRT_HAVE_cnd_destroy 1
+#define __CRT_HAVE_cnd_init 1
+#define __CRT_HAVE_cnd_signal 1
+#define __CRT_HAVE_cnd_timedwait 1
+#define __CRT_HAVE_cnd_timedwait64 1
+#define __CRT_HAVE_cnd_wait 1
 #define __CRT_HAVE_confstr 1
 #define __CRT_HAVE_connect 1
 #define __CRT_HAVE_copysign 1
@@ -2570,6 +2578,13 @@
 #define __CRT_HAVE_msgrcv 1
 #define __CRT_HAVE_msgsnd 1
 #define __CRT_HAVE_msync 1
+#define __CRT_HAVE_mtx_destroy 1
+#define __CRT_HAVE_mtx_init 1
+#define __CRT_HAVE_mtx_lock 1
+#define __CRT_HAVE_mtx_timedlock 1
+#define __CRT_HAVE_mtx_timedlock64 1
+#define __CRT_HAVE_mtx_trylock 1
+#define __CRT_HAVE_mtx_unlock 1
 #define __CRT_HAVE_munlock 1
 #define __CRT_HAVE_munlockall 1
 #define __CRT_HAVE_munmap 1
@@ -2712,6 +2727,7 @@
 #define __CRT_HAVE_pthread_cond_init 1
 #define __CRT_HAVE_pthread_cond_signal 1
 #define __CRT_HAVE_pthread_cond_timedwait 1
+#define __CRT_HAVE_pthread_cond_timedwait64 1
 #define __CRT_HAVE_pthread_cond_wait 1
 #define __CRT_HAVE_pthread_condattr_destroy 1
 #define __CRT_HAVE_pthread_condattr_getclock 1
@@ -2744,6 +2760,7 @@
 #define __CRT_HAVE_pthread_mutex_lock 1
 #define __CRT_HAVE_pthread_mutex_setprioceiling 1
 #define __CRT_HAVE_pthread_mutex_timedlock 1
+#define __CRT_HAVE_pthread_mutex_timedlock64 1
 #define __CRT_HAVE_pthread_mutex_trylock 1
 #define __CRT_HAVE_pthread_mutex_unlock 1
 #define __CRT_HAVE_pthread_mutexattr_destroy 1
@@ -2765,7 +2782,9 @@
 #define __CRT_HAVE_pthread_rwlock_init 1
 #define __CRT_HAVE_pthread_rwlock_rdlock 1
 #define __CRT_HAVE_pthread_rwlock_timedrdlock 1
+#define __CRT_HAVE_pthread_rwlock_timedrdlock64 1
 #define __CRT_HAVE_pthread_rwlock_timedwrlock 1
+#define __CRT_HAVE_pthread_rwlock_timedwrlock64 1
 #define __CRT_HAVE_pthread_rwlock_tryrdlock 1
 #define __CRT_HAVE_pthread_rwlock_trywrlock 1
 #define __CRT_HAVE_pthread_rwlock_unlock 1
@@ -2794,6 +2813,7 @@
 #define __CRT_HAVE_pthread_spin_trylock 1
 #define __CRT_HAVE_pthread_spin_unlock 1
 #define __CRT_HAVE_pthread_testcancel 1
+#define __CRT_HAVE_pthread_timedjoin64_np 1
 #define __CRT_HAVE_pthread_timedjoin_np 1
 #define __CRT_HAVE_pthread_tryjoin_np 1
 #define __CRT_HAVE_pthread_yield 1
@@ -3315,6 +3335,15 @@
 #define __CRT_HAVE_tgammaf 1
 #define __CRT_HAVE_tgammal 1
 #define __CRT_HAVE_tgsigqueueinfo 1
+#define __CRT_HAVE_thrd_create 1
+#define __CRT_HAVE_thrd_current 1
+#define __CRT_HAVE_thrd_detach 1
+#define __CRT_HAVE_thrd_equal 1
+#define __CRT_HAVE_thrd_exit 1
+#define __CRT_HAVE_thrd_join 1
+#define __CRT_HAVE_thrd_sleep 1
+#define __CRT_HAVE_thrd_sleep64 1
+#define __CRT_HAVE_thrd_yield 1
 #define __CRT_HAVE_time 1
 #define __CRT_HAVE_time64 1
 #define __CRT_HAVE_timegm 1
@@ -3358,6 +3387,10 @@
 #define __CRT_HAVE_truncf 1
 #define __CRT_HAVE_truncl 1
 #define __CRT_HAVE_tsearch 1
+#define __CRT_HAVE_tss_create 1
+#define __CRT_HAVE_tss_delete 1
+#define __CRT_HAVE_tss_get 1
+#define __CRT_HAVE_tss_set 1
 #define __CRT_HAVE_ttyname 1
 #define __CRT_HAVE_ttyname_r 1
 #define __CRT_HAVE_ttyslot 1

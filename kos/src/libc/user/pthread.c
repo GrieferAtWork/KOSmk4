@@ -428,11 +428,10 @@ NOTHROW_RPC(LIBCCALL libc_pthread_timedjoin_np)(pthread_t pthread,
 }
 /*[[[end:pthread_timedjoin_np]]]*/
 
-/*[[[head:pthread_detach,hash:CRC-32=0x676e98e9]]]*/
+/*[[[head:pthread_detach,hash:CRC-32=0x3e01c1ba]]]*/
 /* Indicate that the thread THREAD is never to be joined with PTHREAD_JOIN.
  * The resources of THREAD will therefore be freed immediately when it
- * terminates, instead of waiting for another thread to perform PTHREAD_JOIN
- * on it */
+ * terminates, instead of waiting for another thread to perform PTHREAD_JOIN on it */
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_detach") int
 NOTHROW_NCX(LIBCCALL libc_pthread_detach)(pthread_t pthread)
 /*[[[body:pthread_detach]]]*/
@@ -1575,11 +1574,11 @@ NOTHROW_NCX(LIBCCALL libc_pthread_mutex_lock)(pthread_mutex_t *mutex)
 }
 /*[[[end:pthread_mutex_lock]]]*/
 
-/*[[[head:pthread_mutex_timedlock,hash:CRC-32=0xcaa5fb93]]]*/
+/*[[[head:pthread_mutex_timedlock,hash:CRC-32=0x4789d8d6]]]*/
 /* Wait until lock becomes available, or specified time passes */
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_mutex_timedlock") int
-NOTHROW_NCX(LIBCCALL libc_pthread_mutex_timedlock)(pthread_mutex_t *__restrict mutex,
+NOTHROW_RPC(LIBCCALL libc_pthread_mutex_timedlock)(pthread_mutex_t *__restrict mutex,
                                                    struct timespec const *__restrict abstime)
 /*[[[body:pthread_mutex_timedlock]]]*/
 {
@@ -1905,9 +1904,9 @@ NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_tryrdlock)(pthread_rwlock_t *rwlock)
 }
 /*[[[end:pthread_rwlock_tryrdlock]]]*/
 
-/*[[[head:pthread_rwlock_timedrdlock,hash:CRC-32=0x2b8d6d2]]]*/
+/*[[[head:pthread_rwlock_timedrdlock,hash:CRC-32=0x3f11d88e]]]*/
 /* Try to acquire read lock for RWLOCK or return after specfied time */
-INTERN NONNULL((1))
+INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_rwlock_timedrdlock") int
 NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedrdlock)(pthread_rwlock_t *__restrict rwlock,
                                                       struct timespec const *__restrict abstime)
@@ -1945,9 +1944,9 @@ NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_trywrlock)(pthread_rwlock_t *rwlock)
 }
 /*[[[end:pthread_rwlock_trywrlock]]]*/
 
-/*[[[head:pthread_rwlock_timedwrlock,hash:CRC-32=0xc0b7562b]]]*/
+/*[[[head:pthread_rwlock_timedwrlock,hash:CRC-32=0xfc4265f5]]]*/
 /* Try to acquire write lock for RWLOCK or return after specfied time */
-INTERN NONNULL((1))
+INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_rwlock_timedwrlock") int
 NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedwrlock)(pthread_rwlock_t *__restrict rwlock,
                                                       struct timespec const *__restrict abstime)
@@ -2123,12 +2122,12 @@ NOTHROW_RPC(LIBCCALL libc_pthread_cond_wait)(pthread_cond_t *__restrict cond,
 }
 /*[[[end:pthread_cond_wait]]]*/
 
-/*[[[head:pthread_cond_timedwait,hash:CRC-32=0xb8b9597a]]]*/
+/*[[[head:pthread_cond_timedwait,hash:CRC-32=0x9715cce6]]]*/
 /* Wait for condition variable COND to be signaled or broadcast until
  * ABSTIME. MUTEX is assumed to be locked before. ABSTIME is an
  * absolute time specification; zero is the beginning of the epoch
  * (00:00:00 GMT, January 1, 1970). */
-INTERN NONNULL((1, 2))
+INTERN NONNULL((1, 2, 3))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_cond_timedwait") int
 NOTHROW_RPC(LIBCCALL libc_pthread_cond_timedwait)(pthread_cond_t *__restrict cond,
                                                   pthread_mutex_t *__restrict mutex,
@@ -2501,18 +2500,116 @@ NOTHROW_NCX(LIBCCALL libc___pthread_register_cancel_defer)(__pthread_unwind_buf_
 }
 /*[[[end:__pthread_register_cancel_defer]]]*/
 
+/*[[[head:pthread_mutex_timedlock64,hash:CRC-32=0x9b0d055d]]]*/
+/* Wait until lock becomes available, or specified time passes */
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_pthread_mutex_timedlock64, libc_pthread_mutex_timedlock);
+#else
+INTERN NONNULL((1, 2))
+ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_mutex_timedlock64") int
+NOTHROW_RPC(LIBCCALL libc_pthread_mutex_timedlock64)(pthread_mutex_t *__restrict mutex,
+                                                     struct timespec64 const *__restrict abstime)
+/*[[[body:pthread_mutex_timedlock64]]]*/
+{
+	CRT_UNIMPLEMENTED("pthread_mutex_timedlock64"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return -1;
+}
+#endif /* MAGIC:alias */
+/*[[[end:pthread_mutex_timedlock64]]]*/
+
+/*[[[head:pthread_cond_timedwait64,hash:CRC-32=0xa876cc99]]]*/
+/* Wait for condition variable COND to be signaled or broadcast until
+ * ABSTIME. MUTEX is assumed to be locked before. ABSTIME is an
+ * absolute time specification; zero is the beginning of the epoch
+ * (00:00:00 GMT, January 1, 1970). */
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_pthread_cond_timedwait64, libc_pthread_cond_timedwait);
+#else
+INTERN NONNULL((1, 2, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_cond_timedwait64") int
+NOTHROW_RPC(LIBCCALL libc_pthread_cond_timedwait64)(pthread_cond_t *__restrict cond,
+                                                    pthread_mutex_t *__restrict mutex,
+                                                    struct timespec64 const *__restrict abstime)
+/*[[[body:pthread_cond_timedwait64]]]*/
+{
+	CRT_UNIMPLEMENTED("pthread_cond_timedwait64"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return -1;
+}
+#endif /* MAGIC:alias */
+/*[[[end:pthread_cond_timedwait64]]]*/
+
+/*[[[head:pthread_timedjoin64_np,hash:CRC-32=0x2be70a09]]]*/
+/* Make calling thread wait for termination of the thread THREAD, but only
+ * until TIMEOUT. The exit status of the thread is stored in
+ * *THREAD_RETURN, if THREAD_RETURN is not NULL. */
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_pthread_timedjoin64_np, libc_pthread_timedjoin_np);
+#else
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_timedjoin64_np") int
+NOTHROW_RPC(LIBCCALL libc_pthread_timedjoin64_np)(pthread_t pthread,
+                                                  void **thread_return,
+                                                  struct timespec64 const *abstime)
+/*[[[body:pthread_timedjoin64_np]]]*/
+{
+	CRT_UNIMPLEMENTED("pthread_timedjoin64_np"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return -1;
+}
+#endif /* MAGIC:alias */
+/*[[[end:pthread_timedjoin64_np]]]*/
+
+/*[[[head:pthread_rwlock_timedrdlock64,hash:CRC-32=0x28b490d2]]]*/
+/* Try to acquire read lock for RWLOCK or return after specfied time */
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_pthread_rwlock_timedrdlock64, libc_pthread_rwlock_timedrdlock);
+#else
+INTERN NONNULL((1, 2))
+ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_rwlock_timedrdlock64") int
+NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedrdlock64)(pthread_rwlock_t *__restrict rwlock,
+                                                        struct timespec64 const *__restrict abstime)
+/*[[[body:pthread_rwlock_timedrdlock64]]]*/
+{
+	CRT_UNIMPLEMENTED("pthread_rwlock_timedrdlock64"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return -1;
+}
+#endif /* MAGIC:alias */
+/*[[[end:pthread_rwlock_timedrdlock64]]]*/
+
+/*[[[head:pthread_rwlock_timedwrlock64,hash:CRC-32=0x307decc5]]]*/
+/* Try to acquire write lock for RWLOCK or return after specfied time */
+#if __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__
+DEFINE_INTERN_ALIAS(libc_pthread_rwlock_timedwrlock64, libc_pthread_rwlock_timedwrlock);
+#else
+INTERN NONNULL((1, 2))
+ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_rwlock_timedwrlock64") int
+NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedwrlock64)(pthread_rwlock_t *__restrict rwlock,
+                                                        struct timespec64 const *__restrict abstime)
+/*[[[body:pthread_rwlock_timedwrlock64]]]*/
+{
+	CRT_UNIMPLEMENTED("pthread_rwlock_timedwrlock64"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return -1;
+}
+#endif /* MAGIC:alias */
+/*[[[end:pthread_rwlock_timedwrlock64]]]*/
+
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0xabc8c404]]]*/
+/*[[[start:exports,hash:CRC-32=0x6decb3a4]]]*/
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_create, libc_pthread_create);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_exit, libc_pthread_exit);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_join, libc_pthread_join);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_tryjoin_np, libc_pthread_tryjoin_np);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_timedjoin_np, libc_pthread_timedjoin_np);
+DEFINE_PUBLIC_WEAK_ALIAS(pthread_timedjoin64_np, libc_pthread_timedjoin64_np);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_detach, libc_pthread_detach);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_self, libc_pthread_self);
+DEFINE_PUBLIC_WEAK_ALIAS(thrd_current, libc_pthread_self);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_attr_init, libc_pthread_attr_init);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_attr_destroy, libc_pthread_attr_destroy);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_attr_getdetachstate, libc_pthread_attr_getdetachstate);
@@ -2547,9 +2644,11 @@ DEFINE_PUBLIC_WEAK_ALIAS(pthread_gettid_np, libc_pthread_gettid_np);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_getconcurrency, libc_pthread_getconcurrency);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_setconcurrency, libc_pthread_setconcurrency);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_yield, libc_pthread_yield);
+DEFINE_PUBLIC_WEAK_ALIAS(thrd_yield, libc_pthread_yield);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_setaffinity_np, libc_pthread_setaffinity_np);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_getaffinity_np, libc_pthread_getaffinity_np);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_once, libc_pthread_once);
+DEFINE_PUBLIC_WEAK_ALIAS(call_once, libc_pthread_once);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_setcancelstate, libc_pthread_setcancelstate);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_setcanceltype, libc_pthread_setcanceltype);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_cancel, libc_pthread_cancel);
@@ -2561,9 +2660,11 @@ DEFINE_PUBLIC_WEAK_ALIAS(__pthread_unregister_cancel_restore, libc___pthread_unr
 DEFINE_PUBLIC_WEAK_ALIAS(__pthread_unwind_next, libc___pthread_unwind_next);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_mutex_init, libc_pthread_mutex_init);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_mutex_destroy, libc_pthread_mutex_destroy);
+DEFINE_PUBLIC_WEAK_ALIAS(mtx_destroy, libc_pthread_mutex_destroy);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_mutex_trylock, libc_pthread_mutex_trylock);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_mutex_lock, libc_pthread_mutex_lock);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_mutex_timedlock, libc_pthread_mutex_timedlock);
+DEFINE_PUBLIC_WEAK_ALIAS(pthread_mutex_timedlock64, libc_pthread_mutex_timedlock64);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_mutex_unlock, libc_pthread_mutex_unlock);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_mutex_getprioceiling, libc_pthread_mutex_getprioceiling);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_mutex_setprioceiling, libc_pthread_mutex_setprioceiling);
@@ -2588,9 +2689,11 @@ DEFINE_PUBLIC_WEAK_ALIAS(pthread_rwlock_destroy, libc_pthread_rwlock_destroy);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_rwlock_rdlock, libc_pthread_rwlock_rdlock);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_rwlock_tryrdlock, libc_pthread_rwlock_tryrdlock);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_rwlock_timedrdlock, libc_pthread_rwlock_timedrdlock);
+DEFINE_PUBLIC_WEAK_ALIAS(pthread_rwlock_timedrdlock64, libc_pthread_rwlock_timedrdlock64);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_rwlock_wrlock, libc_pthread_rwlock_wrlock);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_rwlock_trywrlock, libc_pthread_rwlock_trywrlock);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_rwlock_timedwrlock, libc_pthread_rwlock_timedwrlock);
+DEFINE_PUBLIC_WEAK_ALIAS(pthread_rwlock_timedwrlock64, libc_pthread_rwlock_timedwrlock64);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_rwlock_unlock, libc_pthread_rwlock_unlock);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_rwlockattr_init, libc_pthread_rwlockattr_init);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_rwlockattr_destroy, libc_pthread_rwlockattr_destroy);
@@ -2600,10 +2703,12 @@ DEFINE_PUBLIC_WEAK_ALIAS(pthread_rwlockattr_getkind_np, libc_pthread_rwlockattr_
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_rwlockattr_setkind_np, libc_pthread_rwlockattr_setkind_np);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_cond_init, libc_pthread_cond_init);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_cond_destroy, libc_pthread_cond_destroy);
+DEFINE_PUBLIC_WEAK_ALIAS(cnd_destroy, libc_pthread_cond_destroy);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_cond_signal, libc_pthread_cond_signal);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_cond_broadcast, libc_pthread_cond_broadcast);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_cond_wait, libc_pthread_cond_wait);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_cond_timedwait, libc_pthread_cond_timedwait);
+DEFINE_PUBLIC_WEAK_ALIAS(pthread_cond_timedwait64, libc_pthread_cond_timedwait64);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_condattr_init, libc_pthread_condattr_init);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_condattr_destroy, libc_pthread_condattr_destroy);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_condattr_getpshared, libc_pthread_condattr_getpshared);
@@ -2624,7 +2729,9 @@ DEFINE_PUBLIC_WEAK_ALIAS(pthread_barrierattr_getpshared, libc_pthread_barrieratt
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_barrierattr_setpshared, libc_pthread_barrierattr_setpshared);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_key_create, libc_pthread_key_create);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_key_delete, libc_pthread_key_delete);
+DEFINE_PUBLIC_WEAK_ALIAS(tss_delete, libc_pthread_key_delete);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_getspecific, libc_pthread_getspecific);
+DEFINE_PUBLIC_WEAK_ALIAS(tss_get, libc_pthread_getspecific);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_setspecific, libc_pthread_setspecific);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_getcpuclockid, libc_pthread_getcpuclockid);
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_atfork, libc_pthread_atfork);

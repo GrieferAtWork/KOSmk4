@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbd43f93b */
+/* HASH CRC-32:0x124f816 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ INTERN ATTR_CONST
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.pthread_equal") int
 NOTHROW_NCX(LIBCCALL libc_pthread_equal)(pthread_t pthread1,
                                          pthread_t pthread2) {
-#line 234 "kos/src/libc/magic/pthread.c"
+#line 316 "kos/src/libc/magic/pthread.c"
 	return pthread1 == pthread2;
 }
 
@@ -43,7 +43,7 @@ NOTHROW_NCX(LIBCCALL libc_pthread_equal)(pthread_t pthread1,
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.pthread.__pthread_cleanup_routine") void
 NOTHROW_NCX(LIBCCALL libc___pthread_cleanup_routine)(struct __pthread_cleanup_frame *frame) {
-#line 556 "kos/src/libc/magic/pthread.c"
+#line 640 "kos/src/libc/magic/pthread.c"
 	if (frame->__do_it)
 		(*frame->__cancel_routine)(frame->__cancel_arg);
 }
@@ -51,6 +51,7 @@ NOTHROW_NCX(LIBCCALL libc___pthread_cleanup_routine)(struct __pthread_cleanup_fr
 #endif /* !__KERNEL__ */
 #ifndef __KERNEL__
 DEFINE_PUBLIC_WEAK_ALIAS(pthread_equal, libc_pthread_equal);
+DEFINE_PUBLIC_WEAK_ALIAS(thrd_equal, libc_pthread_equal);
 DEFINE_PUBLIC_WEAK_ALIAS(__pthread_cleanup_routine, libc___pthread_cleanup_routine);
 #endif /* !__KERNEL__ */
 

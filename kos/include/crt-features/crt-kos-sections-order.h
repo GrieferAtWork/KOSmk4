@@ -175,7 +175,7 @@
 #define __CRT_LINKORDER_SECTIONS(CB, PREFIX) \
 	CB(PREFIX.errno_access.* PREFIX.application.exit.*) \
 	CB(PREFIX.sched.access.* PREFIX.fs.exec.exec.*) \
-	CB(PREFIX.sched.thread.*) \
+	CB(PREFIX.sched.threads.* PREFIX.sched.thread.*) \
 	CB(PREFIX.sched.pthread.*) \
 	CB(PREFIX.sched.futex.* PREFIX.sched.futexexpr.* PREFIX.sched.futexlock.* PREFIX.sched.futexlockexpr.*) \
 	CB(PREFIX.sched.semaphore.*) \

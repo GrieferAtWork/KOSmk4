@@ -68,7 +68,7 @@ __SYSDECL_BEGIN
 #ifndef POLLWRBAND
 #   define POLLWRBAND  0x200 /* Priority data may be written. */
 #endif /* !POLLWRBAND */
-#endif
+#endif /* __USE_XOPEN || __USE_XOPEN2K8 */
 
 #ifdef __USE_GNU
 /* These are extensions for Linux. */
@@ -81,7 +81,7 @@ __SYSDECL_BEGIN
 #ifndef POLLRDHUP
 #   define POLLRDHUP   0x2000
 #endif /* !POLLRDHUP */
-#endif
+#endif /* __USE_GNU */
 
 /* Event types always implicitly polled for. These bits need
  * not be set in `events', but they will appear in `revents'

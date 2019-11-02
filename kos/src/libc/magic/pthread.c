@@ -17,8 +17,22 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 
-%[define_replacement(clockid_t = __clockid_t)]
 %[default_impl_section(.text.crt.sched.pthread)]
+%[define_replacement(clockid_t = __clockid_t)]
+%[define_replacement(pthread_t = __pthread_t)]
+%[define_replacement(pthread_attr_t = __pthread_attr_t)]
+%[define_replacement(pthread_mutex_t = __pthread_mutex_t)]
+%[define_replacement(pthread_mutexattr_t = __pthread_mutexattr_t)]
+%[define_replacement(pthread_cond_t = __pthread_cond_t)]
+%[define_replacement(pthread_condattr_t = __pthread_condattr_t)]
+%[define_replacement(pthread_key_t = __pthread_key_t)]
+%[define_replacement(pthread_once_t = __pthread_once_t)]
+%[define_replacement(pthread_rwlock_t = __pthread_rwlock_t)]
+%[define_replacement(pthread_rwlockattr_t = __pthread_rwlockattr_t)]
+%[define_replacement(pthread_spinlock_t = __pthread_spinlock_t)]
+%[define_replacement(pthread_barrier_t = __pthread_barrier_t)]
+%[define_replacement(pthread_barrierattr_t = __pthread_barrierattr_t)]
+
 
 %{
 #include <features.h>
@@ -27,6 +41,8 @@
 #include <time.h>
 
 #include <bits/pthreadtypes.h>
+#include <bits/pthreadvalues.h>
+#include <bits/pthreadinit.h>
 #include <bits/setjmp.h>
 #include <bits/wordsize.h>
 
@@ -52,125 +68,114 @@ __SYSDECL_BEGIN
 
 
 /* Detach state. */
-#define PTHREAD_CREATE_JOINABLE 0
-#define PTHREAD_CREATE_DETACHED 1
+}%[enum @macro @undef {
+	PTHREAD_CREATE_JOINABLE = __PTHREAD_CREATE_JOINABLE,
+	PTHREAD_CREATE_DETACHED = __PTHREAD_CREATE_DETACHED
+}]%{
 
 /* Mutex types. */
-#define PTHREAD_MUTEX_TIMED_NP      0
-#define PTHREAD_MUTEX_RECURSIVE_NP  1
-#define PTHREAD_MUTEX_ERRORCHECK_NP 2
-#define PTHREAD_MUTEX_ADAPTIVE_NP   3
-#if defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)
-#define PTHREAD_MUTEX_NORMAL     PTHREAD_MUTEX_TIMED_NP
-#define PTHREAD_MUTEX_RECURSIVE  PTHREAD_MUTEX_RECURSIVE_NP
-#define PTHREAD_MUTEX_ERRORCHECK PTHREAD_MUTEX_ERRORCHECK_NP
-#define PTHREAD_MUTEX_DEFAULT    PTHREAD_MUTEX_NORMAL
-#endif
-#ifdef __USE_GNU
-/* For compatibility. */
-#define PTHREAD_MUTEX_FAST_NP    PTHREAD_MUTEX_TIMED_NP
-#endif /* __USE_GNU */
+}%[enum @macro @undef {
+	PTHREAD_MUTEX_TIMED_NP      = __PTHREAD_MUTEX_TIMED,
+	PTHREAD_MUTEX_RECURSIVE_NP  = __PTHREAD_MUTEX_RECURSIVE,
+	PTHREAD_MUTEX_ERRORCHECK_NP = __PTHREAD_MUTEX_ERRORCHECK,
+	PTHREAD_MUTEX_ADAPTIVE_NP   = __PTHREAD_MUTEX_ADAPTIVE,
+%#if defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)
+	PTHREAD_MUTEX_NORMAL     = __PTHREAD_MUTEX_TIMED,
+	PTHREAD_MUTEX_RECURSIVE  = __PTHREAD_MUTEX_RECURSIVE,
+	PTHREAD_MUTEX_ERRORCHECK = __PTHREAD_MUTEX_ERRORCHECK,
+	PTHREAD_MUTEX_DEFAULT    = PTHREAD_MUTEX_NORMAL,
+%#endif /* __USE_UNIX98 || __USE_XOPEN2K8 */
+%#ifdef __USE_GNU
+	PTHREAD_MUTEX_FAST_NP = __PTHREAD_MUTEX_TIMED, /* For compatibility. */
+%#endif /* __USE_GNU */
+%#ifdef __USE_XOPEN2K
+	PTHREAD_MUTEX_STALLED    = __PTHREAD_MUTEX_STALLED, /* Robust mutex or not flags. */
+	PTHREAD_MUTEX_ROBUST     = __PTHREAD_MUTEX_ROBUST,  /* ... */
+	PTHREAD_MUTEX_STALLED_NP = __PTHREAD_MUTEX_STALLED, /* ... */
+	PTHREAD_MUTEX_ROBUST_NP  = __PTHREAD_MUTEX_ROBUST,  /* ... */
+%#endif /* __USE_XOPEN2K */
+}]%{
 
-#ifdef __USE_XOPEN2K
-/* Robust mutex or not flags. */
-#define PTHREAD_MUTEX_STALLED    0
-#define PTHREAD_MUTEX_ROBUST     1
-#define PTHREAD_MUTEX_STALLED_NP PTHREAD_MUTEX_STALLED
-#define PTHREAD_MUTEX_ROBUST_NP  PTHREAD_MUTEX_ROBUST
-#endif /* __USE_XOPEN2K */
 
 #if defined(__USE_POSIX199506) || defined(__USE_UNIX98)
 /* Mutex protocols. */
-#define PTHREAD_PRIO_NONE    0
-#define PTHREAD_PRIO_INHERIT 1
-#define PTHREAD_PRIO_PROTECT 2
-#endif
+}%[enum @macro @undef {
+	PTHREAD_PRIO_NONE    = __PTHREAD_PRIO_NONE,
+	PTHREAD_PRIO_INHERIT = __PTHREAD_PRIO_INHERIT,
+	PTHREAD_PRIO_PROTECT = __PTHREAD_PRIO_PROTECT,
+}]%{
+#endif /* __USE_POSIX199506 || __USE_UNIX98 */
 
 /* Read-write lock types. */
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K)
-#define PTHREAD_RWLOCK_PREFER_READER_NP              0
-#define PTHREAD_RWLOCK_PREFER_WRITER_NP              1
-#define PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP 2
-#define PTHREAD_RWLOCK_DEFAULT_NP  PTHREAD_RWLOCK_PREFER_READER_NP
-
-/* Define __PTHREAD_RWLOCK_INT_FLAGS_SHARED to 1 if pthread_rwlock_t
- * has the shared field. All 64-bit architectures have the shared field
- * in pthread_rwlock_t. */
-#ifndef __PTHREAD_RWLOCK_INT_FLAGS_SHARED
-#if __WORDSIZE == 64
-#define __PTHREAD_RWLOCK_INT_FLAGS_SHARED 1
-#endif
-#endif
+}%[enum @macro @undef {
+	PTHREAD_RWLOCK_PREFER_READER_NP              = __PTHREAD_RWLOCK_PREFER_READER,
+	PTHREAD_RWLOCK_PREFER_WRITER_NP              = __PTHREAD_RWLOCK_PREFER_WRITER,
+	PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP = __PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE,
+	PTHREAD_RWLOCK_DEFAULT_NP                    = __PTHREAD_RWLOCK_PREFER_READER,
+}]%{
 #endif  /* __USE_UNIX98 || __USE_XOPEN2K */
 
-
 /* Scheduler inheritance. */
-#define PTHREAD_INHERIT_SCHED  0
-#define PTHREAD_EXPLICIT_SCHED 1
+}%[enum @macro @undef {
+	PTHREAD_INHERIT_SCHED  = __PTHREAD_INHERIT_SCHED,
+	PTHREAD_EXPLICIT_SCHED = __PTHREAD_EXPLICIT_SCHED
+}]%{
 
 /* Scope handling. */
-#define PTHREAD_SCOPE_SYSTEM   0
-#define PTHREAD_SCOPE_PROCESS  1
+}%[enum @macro @undef {
+	PTHREAD_SCOPE_SYSTEM  = __PTHREAD_SCOPE_SYSTEM,
+	PTHREAD_SCOPE_PROCESS = __PTHREAD_SCOPE_PROCESS
+}]%{
 
 /* Process shared or private flag. */
-#define PTHREAD_PROCESS_PRIVATE 0
-#define PTHREAD_PROCESS_SHARED  1
+}%[enum @macro @undef {
+	PTHREAD_PROCESS_PRIVATE = __PTHREAD_PROCESS_PRIVATE,
+	PTHREAD_PROCESS_SHARED  = __PTHREAD_PROCESS_SHARED
+}]%{
 
 /* Cancellation */
-#define PTHREAD_CANCEL_ENABLE  0
-#define PTHREAD_CANCEL_DISABLE 1
-#define PTHREAD_CANCEL_DEFERRED     0
-#define PTHREAD_CANCEL_ASYNCHRONOUS 1
-#define PTHREAD_CANCELED (__CCAST(void *)(-1))
+}%[enum @macro @undef {
+	PTHREAD_CANCEL_ENABLE       = __PTHREAD_CANCEL_ENABLE,
+	PTHREAD_CANCEL_DISABLE      = __PTHREAD_CANCEL_DISABLE,
+	PTHREAD_CANCEL_DEFERRED     = __PTHREAD_CANCEL_DEFERRED,
+	PTHREAD_CANCEL_ASYNCHRONOUS = __PTHREAD_CANCEL_ASYNCHRONOUS
+}]%{
+#define PTHREAD_CANCELED __PTHREAD_CANCELED
 
 /* Single execution handling. */
-#define PTHREAD_ONCE_INIT 0
+#define PTHREAD_ONCE_INIT __PTHREAD_ONCE_INIT
 
 #ifdef __USE_XOPEN2K
 /* Value returned by 'pthread_barrier_wait' for one of the threads
  * after the required number of threads have called this function.
  * -1 is distinct from 0 and all errno constants */
-#define PTHREAD_BARRIER_SERIAL_THREAD (-1)
-#endif
+#define PTHREAD_BARRIER_SERIAL_THREAD __PTHREAD_BARRIER_SERIAL_THREAD
+#endif /* __USE_XOPEN2K */
 
 
 
 #ifdef __CC__
 
-#ifdef __PTHREAD_MUTEX_HAVE_PREV
-#define PTHREAD_MUTEX_INITIALIZER               { { 0, 0, 0, 0, 0, __PTHREAD_SPINS, { 0, 0 } } }
+#define PTHREAD_MUTEX_INITIALIZER               __PTHREAD_MUTEX_INITIALIZER
 #ifdef __USE_GNU
-#define PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP  { { 0, 0, 0, 0, PTHREAD_MUTEX_RECURSIVE_NP, __PTHREAD_SPINS, { 0, 0 } } }
-#define PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP { { 0, 0, 0, 0, PTHREAD_MUTEX_ERRORCHECK_NP, __PTHREAD_SPINS, { 0, 0 } } }
-#define PTHREAD_ADAPTIVE_MUTEX_INITIALIZER_NP   { { 0, 0, 0, 0, PTHREAD_MUTEX_ADAPTIVE_NP, __PTHREAD_SPINS, { 0, 0 } } }
+#define PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP  __PTHREAD_RECURSIVE_MUTEX_INITIALIZER
+#define PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP __PTHREAD_ERRORCHECK_MUTEX_INITIALIZER
+#define PTHREAD_ADAPTIVE_MUTEX_INITIALIZER_NP   __PTHREAD_ADAPTIVE_MUTEX_INITIALIZER
 #endif /* __USE_GNU */
-#else /* __PTHREAD_MUTEX_HAVE_PREV */
-#define PTHREAD_MUTEX_INITIALIZER  { { 0, 0, 0, 0, 0, { __PTHREAD_SPINS } } }
-#ifdef __USE_GNU
-#define PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP  { { 0, 0, 0, PTHREAD_MUTEX_RECURSIVE_NP, 0, { __PTHREAD_SPINS } } }
-#define PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP { { 0, 0, 0, PTHREAD_MUTEX_ERRORCHECK_NP, 0, { __PTHREAD_SPINS } } }
-#define PTHREAD_ADAPTIVE_MUTEX_INITIALIZER_NP   { { 0, 0, 0, PTHREAD_MUTEX_ADAPTIVE_NP, 0, { __PTHREAD_SPINS } } }
-#endif /* __USE_GNU */
-#endif /* !__PTHREAD_MUTEX_HAVE_PREV */
 
 /* Read-write lock types. */
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K)
 
 /* Read-write lock initializers. */
-#define PTHREAD_RWLOCK_INITIALIZER { { 0, 0, 0, 0, 0, 0, 0, 0, __PTHREAD_RWLOCK_ELISION_EXTRA, 0, 0 } }
+#define PTHREAD_RWLOCK_INITIALIZER __PTHREAD_RWLOCK_INITIALIZER
 #ifdef __USE_GNU
-#ifdef __PTHREAD_RWLOCK_INT_FLAGS_SHARED
-#define PTHREAD_RWLOCK_WRITER_NONRECURSIVE_INITIALIZER_NP { { 0, 0, 0, 0, 0, 0, 0, 0, __PTHREAD_RWLOCK_ELISION_EXTRA, 0, PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP } }
-#elif __BYTE_ORDER == __LITTLE_ENDIAN
-#define PTHREAD_RWLOCK_WRITER_NONRECURSIVE_INITIALIZER_NP { { 0, 0, 0, 0, 0, 0, PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP, 0, __PTHREAD_RWLOCK_ELISION_EXTRA, 0, 0 } }
-#else
-#define PTHREAD_RWLOCK_WRITER_NONRECURSIVE_INITIALIZER_NP { { 0, 0, 0, 0, 0, 0, 0, 0, 0, PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP, 0 } }
-#endif
+#define PTHREAD_RWLOCK_WRITER_NONRECURSIVE_INITIALIZER_NP __PTHREAD_RWLOCK_WRITER_NONRECURSIVE_INITIALIZER
 #endif /* __USE_GNU */
 #endif  /* __USE_UNIX98 || __USE_XOPEN2K */
 
 /* Conditional variable handling. */
-#define PTHREAD_COND_INITIALIZER { { 0, 0, 0, 0, 0, (void *) 0, 0, 0 } }
+#define PTHREAD_COND_INITIALIZER __PTHREAD_COND_INITIALIZER
 
 /* Cleanup buffers */
 struct _pthread_cleanup_buffer {
@@ -180,7 +185,32 @@ struct _pthread_cleanup_buffer {
 	struct _pthread_cleanup_buffer *__prev;             /* Chaining of cleanup functions. */
 };
 
+#ifndef ____pthread_start_routine_t_defined
+#define ____pthread_start_routine_t_defined 1
 typedef void *(*__pthread_start_routine_t)(void *);
+#endif /* !____pthread_start_routine_t_defined */
+
+typedef __pthread_t pthread_t;
+#ifndef __pthread_attr_t_defined
+#define __pthread_attr_t_defined 1
+typedef __pthread_attr_t pthread_attr_t;
+#endif /* !__pthread_attr_t_defined */
+typedef __pthread_mutex_t pthread_mutex_t;
+typedef __pthread_mutexattr_t pthread_mutexattr_t;
+typedef __pthread_cond_t pthread_cond_t;
+typedef __pthread_condattr_t pthread_condattr_t;
+typedef __pthread_key_t pthread_key_t;
+typedef __pthread_once_t pthread_once_t;
+#if defined(__USE_UNIX98) || defined(__USE_XOPEN2K)
+typedef __pthread_rwlock_t pthread_rwlock_t;
+typedef __pthread_rwlockattr_t pthread_rwlockattr_t;
+#endif /* __USE_UNIX98 || __USE_XOPEN2K */
+#ifdef __USE_XOPEN2K
+typedef __pthread_spinlock_t pthread_spinlock_t;
+typedef __pthread_barrier_t pthread_barrier_t;
+typedef __pthread_barrierattr_t pthread_barrierattr_t;
+#endif /* __USE_XOPEN2K */
+
 
 }
 
@@ -190,6 +220,13 @@ typedef void *(*__pthread_start_routine_t)(void *);
 @@Create a new thread, starting with execution of START-ROUTINE
 @@getting passed ARG. Creation attributed come from ATTR. The new
 @@handle is stored in *NEWTHREAD
+[decl_include(<bits/pthreadtypes.h>)]
+[decl_prefix(
+#ifndef ____pthread_start_routine_t_defined
+#define ____pthread_start_routine_t_defined 1
+typedef void *(*__pthread_start_routine_t)(void *);
+#endif /* !____pthread_start_routine_t_defined */
+)]
 pthread_create:([nonnull] pthread_t *__restrict newthread, pthread_attr_t const *__restrict attr,
                 [nonnull] __pthread_start_routine_t start_routine, void *__restrict arg) -> int;
 
@@ -202,11 +239,13 @@ pthread_create:([nonnull] pthread_t *__restrict newthread, pthread_attr_t const 
 @@Make calling thread wait for termination of the thread THREAD. The
 @@exit status of the thread is stored in *THREAD_RETURN, if THREAD_RETURN
 @@is not NULL
+[decl_include(<bits/pthreadtypes.h>)]
 [cp] pthread_join:(pthread_t pthread, void **thread_return) -> int;
 
 %#ifdef __USE_GNU
 @@Check whether thread THREAD has terminated. If yes return the status of
 @@the thread in *THREAD_RETURN, if THREAD_RETURN is not NULL
+[decl_include(<bits/pthreadtypes.h>)]
 pthread_tryjoin_np:(pthread_t pthread, void **thread_return) -> int;
 
 %
@@ -215,19 +254,62 @@ pthread_tryjoin_np:(pthread_t pthread, void **thread_return) -> int;
 @@Make calling thread wait for termination of the thread THREAD, but only
 @@until TIMEOUT. The exit status of the thread is stored in
 @@*THREAD_RETURN, if THREAD_RETURN is not NULL.
-[cp] pthread_timedjoin_np:(pthread_t pthread, void **thread_return, struct timespec const *abstime) -> int;
+[if(defined(__USE_TIME_BITS64)), preferred_alias(pthread_timedjoin64_np)]
+[if(!defined(__USE_TIME_BITS64)), preferred_alias(pthread_timedjoin_np)][cp]
+[decl_include(<bits/pthreadtypes.h>)]
+[decl_include(<bits/timespec.h>)]
+[requires(defined(__CRT_HAVE_pthread_timedjoin_np) || defined(__CRT_HAVE_pthread_timedjoin64_np))]
+pthread_timedjoin_np:(pthread_t pthread, void **thread_return,
+                      struct timespec const *abstime) -> int {
+#ifdef __CRT_HAVE_pthread_timedjoin_np
+	int result;
+	struct timespec32 abstime32;
+	abstime32.@tv_sec@  = (time32_t)abstime->@tv_sec@;
+	abstime32.@tv_nsec@ = abstime->@tv_nsec@;
+	result = pthread_timedjoin32_np(pthread, thread_return, &abstime32);
+	return result;
+#else /* __CRT_HAVE_pthread_timedjoin_np */
+	int result;
+	struct timespec64 abstime64;
+	abstime64.@tv_sec@  = (time64_t)abstime->@tv_sec@;
+	abstime64.@tv_nsec@ = abstime->@tv_nsec@;
+	result = pthread_timedjoin64_np(pthread, thread_return, &abstime32);
+	return result;
+#endif /* !__CRT_HAVE_pthread_timedjoin_np */
+}
+
+%#ifdef __USE_TIME64
+[decl_include(<bits/pthreadtypes.h>)][doc_alias(pthread_timedjoin_np)]
+[decl_include(<bits/timespec.h>)][ignore][cp]
+pthread_timedjoin32_np:(pthread_t pthread, void **thread_return,
+                        struct timespec32 const *abstime) -> int = pthread_timedjoin_np?;
+
+[cp][time64_variant_of(pthread_timedjoin_np)]
+[decl_include(<bits/pthreadtypes.h>)]
+[decl_include(<bits/timespec.h>)]
+[requires($has_function(pthread_timedjoin32_np))]
+pthread_timedjoin64_np:(pthread_t pthread, void **thread_return,
+                        struct timespec64 const *abstime) -> int {
+	int result;
+	struct timespec32 abstime32;
+	abstime32.@tv_sec@  = (time32_t)abstime->@tv_sec@;
+	abstime32.@tv_nsec@ = abstime->@tv_nsec@;
+	result = pthread_timedjoin32_np(pthread, thread_return, &abstime32);
+	return result;
+}
+
+%#endif /* __USE_TIME64 */
 %#endif /* __USE_GNU */
 
 %
 @@Indicate that the thread THREAD is never to be joined with PTHREAD_JOIN.
 @@The resources of THREAD will therefore be freed immediately when it
-@@terminates, instead of waiting for another thread to perform PTHREAD_JOIN
-@@on it
+@@terminates, instead of waiting for another thread to perform PTHREAD_JOIN on it
 pthread_detach:(pthread_t pthread) -> int;
 
 %
 @@Obtain the identifier of the current thread
-[ATTR_CONST] pthread_self:() -> pthread_t;
+[export_alias(thrd_current)][ATTR_CONST] pthread_self:() -> pthread_t;
 
 @@Compare two thread identifiers
 [ATTR_CONST] pthread_equal:(pthread_t pthread1, pthread_t pthread2) -> int {
@@ -409,7 +491,7 @@ pthread_setconcurrency:(int level) -> int;
 @@This function is similar to the POSIX `sched_yield' function but
 @@might be differently implemented in the case of a m-on-n thread
 @@implementation
-[alias(sched_yield)] pthread_yield:(void) -> int;
+[alias(sched_yield, thrd_yield)] pthread_yield:() -> int;
 
 %
 @@Limit specified thread THREAD to run only on the processors represented in CPUSET
@@ -422,7 +504,7 @@ pthread_getaffinity_np:(pthread_t pthread, size_t cpusetsize, [nonnull] cpu_set_
 
 
 %
-%typedef void (*__pthread_once_routine_t)(void);
+%typedef void (__LIBCCALL *__pthread_once_routine_t)(void);
 
 %
 %/* Functions for handling initialization. */
@@ -432,7 +514,9 @@ pthread_getaffinity_np:(pthread_t pthread, size_t cpusetsize, [nonnull] cpu_set_
 @@only once, even if pthread_once is executed several times with the
 @@same ONCE_CONTROL argument. ONCE_CONTROL must point to a static or
 @@extern variable initialized to PTHREAD_ONCE_INIT.
-[throws] pthread_once:([nonnull] pthread_once_t *once_control, [nonnull] __pthread_once_routine_t init_routine) -> int;
+[throws][export_alias(call_once)]
+pthread_once:([nonnull] pthread_once_t *once_control,
+              [nonnull] __pthread_once_routine_t init_routine) -> int;
 
 %
 %/* Functions for handling cancellation.
@@ -479,10 +563,10 @@ typedef struct {
 
 /* Structure to hold the cleanup handler information. */
 struct __pthread_cleanup_frame {
-	void (*__cancel_routine) (void *);
-	void  *__cancel_arg;
-	int    __do_it;
-	int    __cancel_type;
+	void (__LIBCCALL *__cancel_routine) (void *);
+	void             *__cancel_arg;
+	int               __do_it;
+	int               __cancel_type;
 };
 }
 
@@ -492,12 +576,12 @@ struct __pthread_cleanup_frame {
 #ifdef __cplusplus
 /* Class to handle cancellation handler invocation. */
 class __pthread_cleanup_class {
-	void (*__cancel_routine) (void *);
-	void  *__cancel_arg;
-	int    __do_it;
-	int    __cancel_type;
+	void (__LIBCCALL *__cancel_routine) (void *);
+	void             *__cancel_arg;
+	int               __do_it;
+	int               __cancel_type;
 public:
-	__CXX_CLASSMEMBER __pthread_cleanup_class (void (*__fct)(void *), void *__arg)
+	__CXX_CLASSMEMBER __pthread_cleanup_class (void (__LIBCCALL *__fct)(void *), void *__arg)
 		: __cancel_routine(__fct), __cancel_arg(__arg), __do_it(1)
 	{ }
 	__CXX_CLASSMEMBER ~__pthread_cleanup_class() {
@@ -616,8 +700,8 @@ __pthread_cleanup_routine:([nonnull] struct __pthread_cleanup_frame *frame) {
 %#define pthread_cleanup_push(routine, arg)                                                                    \
 %	do {                                                                                                      \
 %		__pthread_unwind_buf_t __cancel_buf;                                                                  \
-%		void (*__cancel_routine)(void *) = (routine);                                                         \
-%		void *__cancel_arg               = (arg);                                                             \
+%		void (__LIBCCALL *__cancel_routine)(void *) = (routine);                                              \
+%		void *__cancel_arg                          = (arg);                                                  \
 %		int __not_first_call = __sigsetjmp((struct __jmp_buf_tag *)(void *)__cancel_buf.__cancel_jmp_buf, 0); \
 %		if __unlikely(__not_first_call) {                                                                     \
 %			(*__cancel_routine)(__cancel_arg);                                                                \
@@ -652,7 +736,7 @@ __pthread_unregister_cancel:([nonnull] __pthread_unwind_buf_t *buf);
 %#define pthread_cleanup_push_defer_np(routine, arg)                                                           \
 %	do {                                                                                                      \
 %		__pthread_unwind_buf_t __cancel_buf;                                                                  \
-%		void (*__cancel_routine)(void *) = (routine);                                                         \
+%		void (__LIBCCALL *__cancel_routine)(void *) = (routine);                                              \
 %		void *__cancel_arg               = (arg);                                                             \
 %		int __not_first_call = __sigsetjmp((struct __jmp_buf_tag *)(void *)__cancel_buf.__cancel_jmp_buf, 0); \
 %		if __unlikely(__not_first_call) {                                                                     \
@@ -703,6 +787,7 @@ pthread_mutex_init:([nonnull] pthread_mutex_t *mutex, pthread_mutexattr_t const 
 
 %
 @@Destroy a mutex
+[export_alias(mtx_destroy)]
 pthread_mutex_destroy:([nonnull] pthread_mutex_t *mutex) -> int;
 
 %
@@ -716,9 +801,55 @@ pthread_mutex_lock:([nonnull] pthread_mutex_t *mutex) -> int;
 %
 %#ifdef __USE_XOPEN2K
 @@Wait until lock becomes available, or specified time passes
+[if(defined(__USE_TIME_BITS64)), preferred_alias(pthread_mutex_timedlock64)]
+[if(!defined(__USE_TIME_BITS64)), preferred_alias(pthread_mutex_timedlock)][cp]
+[decl_include(<bits/pthreadtypes.h>)]
+[decl_include(<bits/timespec.h>)]
+[requires(defined(__CRT_HAVE_pthread_mutex_timedlock) || defined(__CRT_HAVE_pthread_mutex_timedlock64))]
 pthread_mutex_timedlock:([nonnull] pthread_mutex_t *__restrict mutex,
-                         [nonnull] struct timespec const *__restrict abstime) -> int;
-%#endif
+                         [nonnull] struct timespec const *__restrict abstime) -> int {
+#ifdef __CRT_HAVE_pthread_mutex_timedlock
+	int result;
+	struct timespec32 abstime32;
+	abstime32.@tv_sec@  = (time32_t)abstime->@tv_sec@;
+	abstime32.@tv_nsec@ = abstime->@tv_nsec@;
+	result = pthread_mutex_timedlock32(mutex, &abstime32);
+	return result;
+#else /* __CRT_HAVE_pthread_mutex_timedlock */
+	int result;
+	struct timespec64 abstime64;
+	abstime64.@tv_sec@  = (time64_t)abstime->@tv_sec@;
+	abstime64.@tv_nsec@ = abstime->@tv_nsec@;
+	result = pthread_mutex_timedlock64(mutex, &abstime64);
+	return result;
+#endif /* !__CRT_HAVE_pthread_mutex_timedlock */
+}
+
+%#ifdef __USE_TIME64
+[ignore][cp][doc_alias(pthread_mutex_timedlock)]
+[decl_include(<bits/pthreadtypes.h>)]
+[decl_include(<bits/timespec.h>)]
+pthread_mutex_timedlock32:([nonnull] pthread_mutex_t *__restrict mutex,
+                           [nonnull] struct timespec const *__restrict abstime)
+		-> int = pthread_mutex_timedlock?;
+
+[doc_alias(pthread_mutex_timedlock)][cp]
+[time64_variant_of(pthread_mutex_timedlock)]
+[decl_include(<bits/pthreadtypes.h>)]
+[decl_include(<bits/timespec.h>)]
+[requires($has_function(pthread_mutex_timedlock32))]
+pthread_mutex_timedlock64:([nonnull] pthread_mutex_t *__restrict mutex,
+                           [nonnull] struct timespec64 const *__restrict abstime) -> int {
+	int result;
+	struct timespec32 abstime32;
+	abstime32.@tv_sec@  = (time32_t)abstime->@tv_sec@;
+	abstime32.@tv_nsec@ = abstime->@tv_nsec@;
+	result = pthread_mutex_timedlock32(mutex, &abstime32);
+	return result;
+}
+
+%#endif /* __USE_TIME64 */
+%#endif /* __USE_XOPEN2K */
 
 %
 @@Unlock a mutex
@@ -842,8 +973,56 @@ pthread_rwlock_tryrdlock:([nonnull] pthread_rwlock_t *rwlock) -> int;
 %#ifdef __USE_XOPEN2K
 
 @@Try to acquire read lock for RWLOCK or return after specfied time
-[cp] pthread_rwlock_timedrdlock:([nonnull] pthread_rwlock_t *__restrict rwlock,
-                                 [nullable] struct timespec const *__restrict abstime) -> int;
+[if(defined(__USE_TIME_BITS64)), preferred_alias(pthread_rwlock_timedrdlock64)]
+[if(!defined(__USE_TIME_BITS64)), preferred_alias(pthread_rwlock_timedrdlock)]
+[decl_include(<bits/pthreadtypes.h>)]
+[decl_include(<bits/timespec.h>)][cp]
+[requires(defined(__CRT_HAVE_pthread_rwlock_timedrdlock) || defined(__CRT_HAVE_pthread_rwlock_timedrdlock64))]
+pthread_rwlock_timedrdlock:([nonnull] pthread_rwlock_t *__restrict rwlock,
+                            [nonnull] struct timespec const *__restrict abstime) -> int {
+#ifdef __CRT_HAVE_pthread_rwlock_timedrdlock
+	int result;
+	struct timespec32 abstime32;
+	abstime32.@tv_sec@  = (time32_t)abstime->@tv_sec@;
+	abstime32.@tv_nsec@ = abstime->@tv_nsec@;
+	result = pthread_rwlock_timedrdlock32(rwlock, &abstime32);
+	return result;
+#else /* __CRT_HAVE_pthread_rwlock_timedrdlock */
+	int result;
+	struct timespec64 abstime64;
+	abstime64.@tv_sec@  = (time64_t)abstime->@tv_sec@;
+	abstime64.@tv_nsec@ = abstime->@tv_nsec@;
+	result = pthread_rwlock_timedrdlock64(rwlock, &abstime32);
+	return result;
+#endif /* !__CRT_HAVE_pthread_rwlock_timedrdlock */
+}
+
+%#ifdef __USE_TIME64
+
+[cp][doc_alias(pthread_rwlock_timedrdlock)]
+[decl_include(<bits/pthreadtypes.h>)]
+[decl_include(<bits/timespec.h>)]
+pthread_rwlock_timedrdlock32:([nonnull] pthread_rwlock_t *__restrict rwlock,
+                              [nonnull] struct timespec32 const *__restrict abstime)
+		-> int = pthread_rwlock_timedrdlock?;
+
+[cp][doc_alias(pthread_rwlock_timedrdlock)]
+[time64_variant_of(pthread_rwlock_timedrdlock)]
+[decl_include(<bits/pthreadtypes.h>)]
+[decl_include(<bits/timespec.h>)]
+[requires($has_function(pthread_rwlock_timedrdlock32))]
+pthread_rwlock_timedrdlock64:([nonnull] pthread_rwlock_t *__restrict rwlock,
+                              [nonnull] struct timespec64 const *__restrict abstime) -> int {
+	int result;
+	struct timespec32 abstime32;
+	abstime32.@tv_sec@  = (time32_t)abstime->@tv_sec@;
+	abstime32.@tv_nsec@ = abstime->@tv_nsec@;
+	result = pthread_rwlock_timedrdlock32(rwlock, &abstime32);
+	return result;
+}
+
+
+%#endif /* __USE_TIME64 */
 %#endif /* __USE_XOPEN2K */
 
 %
@@ -858,8 +1037,54 @@ pthread_rwlock_trywrlock:([nonnull] pthread_rwlock_t *rwlock) -> int;
 %#ifdef __USE_XOPEN2K
 
 @@Try to acquire write lock for RWLOCK or return after specfied time
-[cp] pthread_rwlock_timedwrlock:([nonnull] pthread_rwlock_t *__restrict rwlock,
-                                 [nullable] struct timespec const *__restrict abstime) -> int;
+[if(defined(__USE_TIME_BITS64)), preferred_alias(pthread_rwlock_timedwrlock64)]
+[if(!defined(__USE_TIME_BITS64)), preferred_alias(pthread_rwlock_timedwrlock)]
+[decl_include(<bits/pthreadtypes.h>)]
+[decl_include(<bits/timespec.h>)][cp]
+[requires(defined(__CRT_HAVE_pthread_rwlock_timedwrlock) || defined(__CRT_HAVE_pthread_rwlock_timedwrlock64))]
+pthread_rwlock_timedwrlock:([nonnull] pthread_rwlock_t *__restrict rwlock,
+                            [nonnull] struct timespec const *__restrict abstime) -> int {
+#ifdef __CRT_HAVE_pthread_rwlock_timedwrlock
+	int result;
+	struct timespec32 abstime32;
+	abstime32.@tv_sec@  = (time32_t)abstime->@tv_sec@;
+	abstime32.@tv_nsec@ = abstime->@tv_nsec@;
+	result = pthread_rwlock_timedwrlock32(rwlock, &abstime32);
+	return result;
+#else /* __CRT_HAVE_pthread_rwlock_timedwrlock */
+	int result;
+	struct timespec64 abstime64;
+	abstime64.@tv_sec@  = (time64_t)abstime->@tv_sec@;
+	abstime64.@tv_nsec@ = abstime->@tv_nsec@;
+	result = pthread_rwlock_timedwrlock64(rwlock, &abstime32);
+	return result;
+#endif /* !__CRT_HAVE_pthread_rwlock_timedwrlock */
+}
+
+%#ifdef __USE_TIME64
+
+[cp][doc_alias(pthread_rwlock_timedwrlock)]
+[decl_include(<bits/pthreadtypes.h>)]
+[decl_include(<bits/timespec.h>)]
+pthread_rwlock_timedwrlock32:([nonnull] pthread_rwlock_t *__restrict rwlock,
+                              [nonnull] struct timespec32 const *__restrict abstime)
+		-> int = pthread_rwlock_timedwrlock?;
+
+[cp][doc_alias(pthread_rwlock_timedwrlock)]
+[time64_variant_of(pthread_rwlock_timedwrlock)]
+[decl_include(<bits/pthreadtypes.h>)]
+[decl_include(<bits/timespec.h>)]
+[requires($has_function(pthread_rwlock_timedwrlock32))]
+pthread_rwlock_timedwrlock64:([nonnull] pthread_rwlock_t *__restrict rwlock,
+                              [nonnull] struct timespec64 const *__restrict abstime) -> int {
+	int result;
+	struct timespec32 abstime32;
+	abstime32.@tv_sec@  = (time32_t)abstime->@tv_sec@;
+	abstime32.@tv_nsec@ = abstime->@tv_nsec@;
+	result = pthread_rwlock_timedwrlock32(rwlock, &abstime32);
+	return result;
+}
+%#endif /* __USE_TIME64 */
 %#endif /* __USE_XOPEN2K */
 
 %
@@ -907,6 +1132,7 @@ pthread_cond_init:([nonnull] pthread_cond_t *__restrict cond,
 
 %
 @@Destroy condition variable COND
+[export_alias(cnd_destroy)]
 pthread_cond_destroy:([nonnull] pthread_cond_t *cond) -> int;
 
 %
@@ -928,11 +1154,57 @@ pthread_cond_broadcast:([nonnull] pthread_cond_t *cond) -> int;
 @@ABSTIME. MUTEX is assumed to be locked before. ABSTIME is an
 @@absolute time specification; zero is the beginning of the epoch
 @@(00:00:00 GMT, January 1, 1970).
-[cp] pthread_cond_timedwait:([nonnull] pthread_cond_t *__restrict cond,
-                             [nonnull] pthread_mutex_t *__restrict mutex,
-                             [nullable] struct timespec const *__restrict abstime) -> int;
-/* TODO: 64-bit variants of functions taking timespec */
-/* TODO: Integration with __USE_TIME_BITS64 */
+[if(defined(__USE_TIME_BITS64)), preferred_alias(pthread_cond_timedwait64)]
+[if(!defined(__USE_TIME_BITS64)), preferred_alias(pthread_cond_timedwait)][cp]
+[decl_include(<bits/pthreadtypes.h>)]
+[decl_include(<bits/timespec.h>)]
+[requires(defined(__CRT_HAVE_pthread_cond_timedwait) || defined(__CRT_HAVE_pthread_cond_timedwait64))]
+pthread_cond_timedwait:([nonnull] pthread_cond_t *__restrict cond,
+                        [nonnull] pthread_mutex_t *__restrict mutex,
+                        [nonnull] struct timespec const *__restrict abstime) -> int {
+#ifdef __CRT_HAVE_pthread_cond_timedwait
+	int result;
+	struct timespec32 abstime32;
+	abstime32.@tv_sec@  = (time32_t)abstime->@tv_sec@;
+	abstime32.@tv_nsec@ = abstime->@tv_nsec@;
+	result = pthread_cond_timedwait32(cond, mutex, &abstime32);
+	return result;
+#else /* __CRT_HAVE_pthread_cond_timedwait */
+	int result;
+	struct timespec64 abstime64;
+	abstime64.@tv_sec@  = (time64_t)abstime->@tv_sec@;
+	abstime64.@tv_nsec@ = abstime->@tv_nsec@;
+	result = pthread_cond_timedwait64(cond, mutex, &abstime64);
+	return result;
+#endif /* !__CRT_HAVE_pthread_cond_timedwait */
+}
+
+%#ifdef __USE_TIME64
+[ignore][cp]
+[decl_include(<bits/pthreadtypes.h>)]
+[decl_include(<bits/timespec.h>)]
+pthread_cond_timedwait32:([nonnull] pthread_cond_t *__restrict cond,
+                          [nonnull] pthread_mutex_t *__restrict mutex,
+                          [nonnull] struct timespec32 const *__restrict abstime)
+		-> int = pthread_cond_timedwait?;
+
+[cp][doc_alias(pthread_cond_timedwait)][time64_variant_of(pthread_cond_timedwait)]
+[decl_include(<bits/pthreadtypes.h>)]
+[decl_include(<bits/timespec.h>)]
+[requires($has_function(pthread_cond_timedwait32))]
+pthread_cond_timedwait64:([nonnull] pthread_cond_t *__restrict cond,
+                          [nonnull] pthread_mutex_t *__restrict mutex,
+                          [nonnull] struct timespec64 const *__restrict abstime) -> int {
+	int result;
+	struct timespec32 abstime32;
+	abstime32.@tv_sec@  = (time32_t)abstime->@tv_sec@;
+	abstime32.@tv_nsec@ = abstime->@tv_nsec@;
+	result = pthread_cond_timedwait32(cond, mutex, &abstime32);
+	return result;
+}
+
+%#endif /* __USE_TIME64 */
+
 
 %
 %/* Functions for handling condition variable attributes. */
@@ -1033,8 +1305,12 @@ pthread_barrierattr_setpshared:([nonnull] pthread_barrierattr_t *attr, int pshar
 %/* Functions for handling thread-specific data. */
 
 
-%
-%typedef void (*__pthread_destr_function_t)(void *);
+%{
+#ifndef ____pthread_destr_function_t_defined
+#define ____pthread_destr_function_t_defined 1
+typedef void (__LIBCCALL *__pthread_destr_function_t)(void *);
+#endif /* !____pthread_destr_function_t_defined */
+}
 
 
 %
@@ -1044,16 +1320,23 @@ pthread_barrierattr_setpshared:([nonnull] pthread_barrierattr_t *attr, int pshar
 @@associated to that key when the key is destroyed.
 @@DESTR_FUNCTION is not called if the value associated is NULL when
 @@the key is destroyed
+[decl_prefix(
+#ifndef ____pthread_destr_function_t_defined
+#define ____pthread_destr_function_t_defined 1
+typedef void (__LIBCCALL *__pthread_destr_function_t)(void *);
+#endif /* !____pthread_destr_function_t_defined */
+)]
 pthread_key_create:([nonnull] pthread_key_t *key,
                     [nullable] __pthread_destr_function_t destr_function) -> int;
 
 %
 @@Destroy KEY
+[export_alias(tss_delete)]
 pthread_key_delete:(pthread_key_t key) -> int;
 
 %
 @@Return current value of the thread-specific data slot identified by KEY
-pthread_getspecific:(pthread_key_t key) -> void *;
+[export_alias(tss_get)] pthread_getspecific:(pthread_key_t key) -> void *;
 
 %
 @@Store POINTER in the thread-specific data slot identified by KEY
@@ -1066,7 +1349,7 @@ pthread_getcpuclockid:(pthread_t pthread_id, [nonnull] $clockid_t *clock_id) -> 
 %#endif /* __USE_XOPEN2K */
 
 %
-%typedef void (*__pthread_atfork_func_t)(void);
+%typedef void (__LIBCCALL *__pthread_atfork_func_t)(void);
 
 %
 @@Install handlers to be called when a new process is created with FORK.

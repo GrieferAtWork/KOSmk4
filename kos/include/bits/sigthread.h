@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xff8574ae */
+/* HASH CRC-32:0xd2f8e1b9 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,7 @@ __CDECLARE(,int,__NOTHROW_NCX,pthread_sigmask,(int __how, struct __sigset_struct
 #ifndef __pthread_kill_defined
 #define __pthread_kill_defined 1
 #if defined(__CRT_HAVE_pthread_kill)
-__CDECLARE(,int,__NOTHROW_NCX,pthread_kill,(pthread_t __threadid, int __signo),(__threadid,__signo))
+__CDECLARE(,int,__NOTHROW_NCX,pthread_kill,(__pthread_t __threadid, int __signo),(__threadid,__signo))
 #else /* LIBC: pthread_kill */
 #undef __pthread_kill_defined
 #endif /* pthread_kill... */
@@ -57,7 +57,7 @@ __CDECLARE(,int,__NOTHROW_NCX,pthread_kill,(pthread_t __threadid, int __signo),(
 #ifndef __pthread_sigqueue_defined
 #define __pthread_sigqueue_defined 1
 #if defined(__CRT_HAVE_pthread_sigqueue)
-__CDECLARE(,int,__NOTHROW_NCX,pthread_sigqueue,(pthread_t __threadid, int __signo, union sigval const __value),(__threadid,__signo,__value))
+__CDECLARE(,int,__NOTHROW_NCX,pthread_sigqueue,(__pthread_t __threadid, int __signo, union sigval const __value),(__threadid,__signo,__value))
 #else /* LIBC: pthread_sigqueue */
 #undef __pthread_sigqueue_defined
 #endif /* pthread_sigqueue... */

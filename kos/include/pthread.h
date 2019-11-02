@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa860e592 */
+/* HASH CRC-32:0xd3b494b6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,6 +34,8 @@
 #include <time.h>
 
 #include <bits/pthreadtypes.h>
+#include <bits/pthreadvalues.h>
+#include <bits/pthreadinit.h>
 #include <bits/setjmp.h>
 #include <bits/wordsize.h>
 
@@ -59,125 +61,268 @@ __SYSDECL_BEGIN
 
 
 /* Detach state. */
-#define PTHREAD_CREATE_JOINABLE 0
-#define PTHREAD_CREATE_DETACHED 1
+#undef PTHREAD_CREATE_JOINABLE
+#undef PTHREAD_CREATE_DETACHED
+#ifdef __CC__
+enum {
+	PTHREAD_CREATE_JOINABLE = __PTHREAD_CREATE_JOINABLE,
+	PTHREAD_CREATE_DETACHED = __PTHREAD_CREATE_DETACHED
+};
+#endif /* __CC__ */
+#ifdef __COMPILER_PREFERR_ENUMS
+#define PTHREAD_CREATE_JOINABLE PTHREAD_CREATE_JOINABLE
+#define PTHREAD_CREATE_DETACHED PTHREAD_CREATE_DETACHED
+#else /* __COMPILER_PREFERR_ENUMS */
+#define PTHREAD_CREATE_JOINABLE __PTHREAD_CREATE_JOINABLE
+#define PTHREAD_CREATE_DETACHED __PTHREAD_CREATE_DETACHED
+#endif /* !__COMPILER_PREFERR_ENUMS */
 
 /* Mutex types. */
-#define PTHREAD_MUTEX_TIMED_NP      0
-#define PTHREAD_MUTEX_RECURSIVE_NP  1
-#define PTHREAD_MUTEX_ERRORCHECK_NP 2
-#define PTHREAD_MUTEX_ADAPTIVE_NP   3
+#undef PTHREAD_MUTEX_TIMED_NP
+#undef PTHREAD_MUTEX_RECURSIVE_NP
+#undef PTHREAD_MUTEX_ERRORCHECK_NP
+#undef PTHREAD_MUTEX_ADAPTIVE_NP
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)
-#define PTHREAD_MUTEX_NORMAL     PTHREAD_MUTEX_TIMED_NP
-#define PTHREAD_MUTEX_RECURSIVE  PTHREAD_MUTEX_RECURSIVE_NP
-#define PTHREAD_MUTEX_ERRORCHECK PTHREAD_MUTEX_ERRORCHECK_NP
-#define PTHREAD_MUTEX_DEFAULT    PTHREAD_MUTEX_NORMAL
-#endif
+#undef PTHREAD_MUTEX_NORMAL
+#undef PTHREAD_MUTEX_RECURSIVE
+#undef PTHREAD_MUTEX_ERRORCHECK
+#undef PTHREAD_MUTEX_DEFAULT
+#endif /* __USE_UNIX98 || __USE_XOPEN2K8 */
 #ifdef __USE_GNU
-/* For compatibility. */
-#define PTHREAD_MUTEX_FAST_NP    PTHREAD_MUTEX_TIMED_NP
+#undef PTHREAD_MUTEX_FAST_NP
 #endif /* __USE_GNU */
-
 #ifdef __USE_XOPEN2K
-/* Robust mutex or not flags. */
-#define PTHREAD_MUTEX_STALLED    0
-#define PTHREAD_MUTEX_ROBUST     1
-#define PTHREAD_MUTEX_STALLED_NP PTHREAD_MUTEX_STALLED
-#define PTHREAD_MUTEX_ROBUST_NP  PTHREAD_MUTEX_ROBUST
+#undef PTHREAD_MUTEX_STALLED
+#undef PTHREAD_MUTEX_ROBUST
+#undef PTHREAD_MUTEX_STALLED_NP
+#undef PTHREAD_MUTEX_ROBUST_NP
 #endif /* __USE_XOPEN2K */
+#ifdef __CC__
+enum {
+	PTHREAD_MUTEX_TIMED_NP      = __PTHREAD_MUTEX_TIMED,
+	PTHREAD_MUTEX_RECURSIVE_NP  = __PTHREAD_MUTEX_RECURSIVE,
+	PTHREAD_MUTEX_ERRORCHECK_NP = __PTHREAD_MUTEX_ERRORCHECK,
+	PTHREAD_MUTEX_ADAPTIVE_NP   = __PTHREAD_MUTEX_ADAPTIVE,
+#if defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)
+	PTHREAD_MUTEX_NORMAL        = __PTHREAD_MUTEX_TIMED,
+	PTHREAD_MUTEX_RECURSIVE     = __PTHREAD_MUTEX_RECURSIVE,
+	PTHREAD_MUTEX_ERRORCHECK    = __PTHREAD_MUTEX_ERRORCHECK,
+	PTHREAD_MUTEX_DEFAULT       = PTHREAD_MUTEX_NORMAL,
+#endif /* __USE_UNIX98 || __USE_XOPEN2K8 */
+#ifdef __USE_GNU
+	PTHREAD_MUTEX_FAST_NP       = __PTHREAD_MUTEX_TIMED,      /* For compatibility. */
+#endif /* __USE_GNU */
+#ifdef __USE_XOPEN2K
+	PTHREAD_MUTEX_STALLED       = __PTHREAD_MUTEX_STALLED,    /* Robust mutex or not flags. */
+	PTHREAD_MUTEX_ROBUST        = __PTHREAD_MUTEX_ROBUST,     /* ... */
+	PTHREAD_MUTEX_STALLED_NP    = __PTHREAD_MUTEX_STALLED,    /* ... */
+	PTHREAD_MUTEX_ROBUST_NP     = __PTHREAD_MUTEX_ROBUST     /* ... */
+#endif /* __USE_XOPEN2K */
+};
+#endif /* __CC__ */
+#ifdef __COMPILER_PREFERR_ENUMS
+#define PTHREAD_MUTEX_TIMED_NP      PTHREAD_MUTEX_TIMED_NP
+#define PTHREAD_MUTEX_RECURSIVE_NP  PTHREAD_MUTEX_RECURSIVE_NP
+#define PTHREAD_MUTEX_ERRORCHECK_NP PTHREAD_MUTEX_ERRORCHECK_NP
+#define PTHREAD_MUTEX_ADAPTIVE_NP   PTHREAD_MUTEX_ADAPTIVE_NP
+#if defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)
+#define PTHREAD_MUTEX_NORMAL        PTHREAD_MUTEX_NORMAL
+#define PTHREAD_MUTEX_RECURSIVE     PTHREAD_MUTEX_RECURSIVE
+#define PTHREAD_MUTEX_ERRORCHECK    PTHREAD_MUTEX_ERRORCHECK
+#define PTHREAD_MUTEX_DEFAULT       PTHREAD_MUTEX_DEFAULT
+#endif /* __USE_UNIX98 || __USE_XOPEN2K8 */
+#ifdef __USE_GNU
+#define PTHREAD_MUTEX_FAST_NP       PTHREAD_MUTEX_FAST_NP       /* For compatibility. */
+#endif /* __USE_GNU */
+#ifdef __USE_XOPEN2K
+#define PTHREAD_MUTEX_STALLED       PTHREAD_MUTEX_STALLED       /* Robust mutex or not flags. */
+#define PTHREAD_MUTEX_ROBUST        PTHREAD_MUTEX_ROBUST        /* ... */
+#define PTHREAD_MUTEX_STALLED_NP    PTHREAD_MUTEX_STALLED_NP    /* ... */
+#define PTHREAD_MUTEX_ROBUST_NP     PTHREAD_MUTEX_ROBUST_NP     /* ... */
+#endif /* __USE_XOPEN2K */
+#else /* __COMPILER_PREFERR_ENUMS */
+#define PTHREAD_MUTEX_TIMED_NP      __PTHREAD_MUTEX_TIMED
+#define PTHREAD_MUTEX_RECURSIVE_NP  __PTHREAD_MUTEX_RECURSIVE
+#define PTHREAD_MUTEX_ERRORCHECK_NP __PTHREAD_MUTEX_ERRORCHECK
+#define PTHREAD_MUTEX_ADAPTIVE_NP   __PTHREAD_MUTEX_ADAPTIVE
+#if defined(__USE_UNIX98) || defined(__USE_XOPEN2K8)
+#define PTHREAD_MUTEX_NORMAL        __PTHREAD_MUTEX_TIMED
+#define PTHREAD_MUTEX_RECURSIVE     __PTHREAD_MUTEX_RECURSIVE
+#define PTHREAD_MUTEX_ERRORCHECK    __PTHREAD_MUTEX_ERRORCHECK
+#define PTHREAD_MUTEX_DEFAULT       PTHREAD_MUTEX_NORMAL
+#endif /* __USE_UNIX98 || __USE_XOPEN2K8 */
+#ifdef __USE_GNU
+#define PTHREAD_MUTEX_FAST_NP       __PTHREAD_MUTEX_TIMED      /* For compatibility. */
+#endif /* __USE_GNU */
+#ifdef __USE_XOPEN2K
+#define PTHREAD_MUTEX_STALLED       __PTHREAD_MUTEX_STALLED    /* Robust mutex or not flags. */
+#define PTHREAD_MUTEX_ROBUST        __PTHREAD_MUTEX_ROBUST     /* ... */
+#define PTHREAD_MUTEX_STALLED_NP    __PTHREAD_MUTEX_STALLED    /* ... */
+#define PTHREAD_MUTEX_ROBUST_NP     __PTHREAD_MUTEX_ROBUST     /* ... */
+#endif /* __USE_XOPEN2K */
+#endif /* !__COMPILER_PREFERR_ENUMS */
+
 
 #if defined(__USE_POSIX199506) || defined(__USE_UNIX98)
 /* Mutex protocols. */
-#define PTHREAD_PRIO_NONE    0
-#define PTHREAD_PRIO_INHERIT 1
-#define PTHREAD_PRIO_PROTECT 2
-#endif
+#undef PTHREAD_PRIO_NONE
+#undef PTHREAD_PRIO_INHERIT
+#undef PTHREAD_PRIO_PROTECT
+#ifdef __CC__
+enum {
+	PTHREAD_PRIO_NONE    = __PTHREAD_PRIO_NONE,
+	PTHREAD_PRIO_INHERIT = __PTHREAD_PRIO_INHERIT,
+	PTHREAD_PRIO_PROTECT = __PTHREAD_PRIO_PROTECT
+};
+#endif /* __CC__ */
+#ifdef __COMPILER_PREFERR_ENUMS
+#define PTHREAD_PRIO_NONE    PTHREAD_PRIO_NONE
+#define PTHREAD_PRIO_INHERIT PTHREAD_PRIO_INHERIT
+#define PTHREAD_PRIO_PROTECT PTHREAD_PRIO_PROTECT
+#else /* __COMPILER_PREFERR_ENUMS */
+#define PTHREAD_PRIO_NONE    __PTHREAD_PRIO_NONE
+#define PTHREAD_PRIO_INHERIT __PTHREAD_PRIO_INHERIT
+#define PTHREAD_PRIO_PROTECT __PTHREAD_PRIO_PROTECT
+#endif /* !__COMPILER_PREFERR_ENUMS */
+#endif /* __USE_POSIX199506 || __USE_UNIX98 */
 
 /* Read-write lock types. */
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K)
-#define PTHREAD_RWLOCK_PREFER_READER_NP              0
-#define PTHREAD_RWLOCK_PREFER_WRITER_NP              1
-#define PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP 2
-#define PTHREAD_RWLOCK_DEFAULT_NP  PTHREAD_RWLOCK_PREFER_READER_NP
-
-/* Define __PTHREAD_RWLOCK_INT_FLAGS_SHARED to 1 if pthread_rwlock_t
- * has the shared field. All 64-bit architectures have the shared field
- * in pthread_rwlock_t. */
-#ifndef __PTHREAD_RWLOCK_INT_FLAGS_SHARED
-#if __WORDSIZE == 64
-#define __PTHREAD_RWLOCK_INT_FLAGS_SHARED 1
-#endif
-#endif
+#undef PTHREAD_RWLOCK_PREFER_READER_NP
+#undef PTHREAD_RWLOCK_PREFER_WRITER_NP
+#undef PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP
+#undef PTHREAD_RWLOCK_DEFAULT_NP
+#ifdef __CC__
+enum {
+	PTHREAD_RWLOCK_PREFER_READER_NP              = __PTHREAD_RWLOCK_PREFER_READER,
+	PTHREAD_RWLOCK_PREFER_WRITER_NP              = __PTHREAD_RWLOCK_PREFER_WRITER,
+	PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP = __PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE,
+	PTHREAD_RWLOCK_DEFAULT_NP                    = __PTHREAD_RWLOCK_PREFER_READER
+};
+#endif /* __CC__ */
+#ifdef __COMPILER_PREFERR_ENUMS
+#define PTHREAD_RWLOCK_PREFER_READER_NP              PTHREAD_RWLOCK_PREFER_READER_NP
+#define PTHREAD_RWLOCK_PREFER_WRITER_NP              PTHREAD_RWLOCK_PREFER_WRITER_NP
+#define PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP
+#define PTHREAD_RWLOCK_DEFAULT_NP                    PTHREAD_RWLOCK_DEFAULT_NP
+#else /* __COMPILER_PREFERR_ENUMS */
+#define PTHREAD_RWLOCK_PREFER_READER_NP              __PTHREAD_RWLOCK_PREFER_READER
+#define PTHREAD_RWLOCK_PREFER_WRITER_NP              __PTHREAD_RWLOCK_PREFER_WRITER
+#define PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP __PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE
+#define PTHREAD_RWLOCK_DEFAULT_NP                    __PTHREAD_RWLOCK_PREFER_READER
+#endif /* !__COMPILER_PREFERR_ENUMS */
 #endif  /* __USE_UNIX98 || __USE_XOPEN2K */
 
-
 /* Scheduler inheritance. */
-#define PTHREAD_INHERIT_SCHED  0
-#define PTHREAD_EXPLICIT_SCHED 1
+#undef PTHREAD_INHERIT_SCHED
+#undef PTHREAD_EXPLICIT_SCHED
+#ifdef __CC__
+enum {
+	PTHREAD_INHERIT_SCHED  = __PTHREAD_INHERIT_SCHED,
+	PTHREAD_EXPLICIT_SCHED = __PTHREAD_EXPLICIT_SCHED
+};
+#endif /* __CC__ */
+#ifdef __COMPILER_PREFERR_ENUMS
+#define PTHREAD_INHERIT_SCHED  PTHREAD_INHERIT_SCHED
+#define PTHREAD_EXPLICIT_SCHED PTHREAD_EXPLICIT_SCHED
+#else /* __COMPILER_PREFERR_ENUMS */
+#define PTHREAD_INHERIT_SCHED  __PTHREAD_INHERIT_SCHED
+#define PTHREAD_EXPLICIT_SCHED __PTHREAD_EXPLICIT_SCHED
+#endif /* !__COMPILER_PREFERR_ENUMS */
 
 /* Scope handling. */
-#define PTHREAD_SCOPE_SYSTEM   0
-#define PTHREAD_SCOPE_PROCESS  1
+#undef PTHREAD_SCOPE_SYSTEM
+#undef PTHREAD_SCOPE_PROCESS
+#ifdef __CC__
+enum {
+	PTHREAD_SCOPE_SYSTEM  = __PTHREAD_SCOPE_SYSTEM,
+	PTHREAD_SCOPE_PROCESS = __PTHREAD_SCOPE_PROCESS
+};
+#endif /* __CC__ */
+#ifdef __COMPILER_PREFERR_ENUMS
+#define PTHREAD_SCOPE_SYSTEM  PTHREAD_SCOPE_SYSTEM
+#define PTHREAD_SCOPE_PROCESS PTHREAD_SCOPE_PROCESS
+#else /* __COMPILER_PREFERR_ENUMS */
+#define PTHREAD_SCOPE_SYSTEM  __PTHREAD_SCOPE_SYSTEM
+#define PTHREAD_SCOPE_PROCESS __PTHREAD_SCOPE_PROCESS
+#endif /* !__COMPILER_PREFERR_ENUMS */
 
 /* Process shared or private flag. */
-#define PTHREAD_PROCESS_PRIVATE 0
-#define PTHREAD_PROCESS_SHARED  1
+#undef PTHREAD_PROCESS_PRIVATE
+#undef PTHREAD_PROCESS_SHARED
+#ifdef __CC__
+enum {
+	PTHREAD_PROCESS_PRIVATE = __PTHREAD_PROCESS_PRIVATE,
+	PTHREAD_PROCESS_SHARED  = __PTHREAD_PROCESS_SHARED
+};
+#endif /* __CC__ */
+#ifdef __COMPILER_PREFERR_ENUMS
+#define PTHREAD_PROCESS_PRIVATE PTHREAD_PROCESS_PRIVATE
+#define PTHREAD_PROCESS_SHARED  PTHREAD_PROCESS_SHARED
+#else /* __COMPILER_PREFERR_ENUMS */
+#define PTHREAD_PROCESS_PRIVATE __PTHREAD_PROCESS_PRIVATE
+#define PTHREAD_PROCESS_SHARED  __PTHREAD_PROCESS_SHARED
+#endif /* !__COMPILER_PREFERR_ENUMS */
 
 /* Cancellation */
-#define PTHREAD_CANCEL_ENABLE  0
-#define PTHREAD_CANCEL_DISABLE 1
-#define PTHREAD_CANCEL_DEFERRED     0
-#define PTHREAD_CANCEL_ASYNCHRONOUS 1
-#define PTHREAD_CANCELED (__CCAST(void *)(-1))
+#undef PTHREAD_CANCEL_ENABLE
+#undef PTHREAD_CANCEL_DISABLE
+#undef PTHREAD_CANCEL_DEFERRED
+#undef PTHREAD_CANCEL_ASYNCHRONOUS
+#ifdef __CC__
+enum {
+	PTHREAD_CANCEL_ENABLE       = __PTHREAD_CANCEL_ENABLE,
+	PTHREAD_CANCEL_DISABLE      = __PTHREAD_CANCEL_DISABLE,
+	PTHREAD_CANCEL_DEFERRED     = __PTHREAD_CANCEL_DEFERRED,
+	PTHREAD_CANCEL_ASYNCHRONOUS = __PTHREAD_CANCEL_ASYNCHRONOUS
+};
+#endif /* __CC__ */
+#ifdef __COMPILER_PREFERR_ENUMS
+#define PTHREAD_CANCEL_ENABLE       PTHREAD_CANCEL_ENABLE
+#define PTHREAD_CANCEL_DISABLE      PTHREAD_CANCEL_DISABLE
+#define PTHREAD_CANCEL_DEFERRED     PTHREAD_CANCEL_DEFERRED
+#define PTHREAD_CANCEL_ASYNCHRONOUS PTHREAD_CANCEL_ASYNCHRONOUS
+#else /* __COMPILER_PREFERR_ENUMS */
+#define PTHREAD_CANCEL_ENABLE       __PTHREAD_CANCEL_ENABLE
+#define PTHREAD_CANCEL_DISABLE      __PTHREAD_CANCEL_DISABLE
+#define PTHREAD_CANCEL_DEFERRED     __PTHREAD_CANCEL_DEFERRED
+#define PTHREAD_CANCEL_ASYNCHRONOUS __PTHREAD_CANCEL_ASYNCHRONOUS
+#endif /* !__COMPILER_PREFERR_ENUMS */
+#define PTHREAD_CANCELED __PTHREAD_CANCELED
 
 /* Single execution handling. */
-#define PTHREAD_ONCE_INIT 0
+#define PTHREAD_ONCE_INIT __PTHREAD_ONCE_INIT
 
 #ifdef __USE_XOPEN2K
 /* Value returned by 'pthread_barrier_wait' for one of the threads
  * after the required number of threads have called this function.
  * -1 is distinct from 0 and all errno constants */
-#define PTHREAD_BARRIER_SERIAL_THREAD (-1)
-#endif
+#define PTHREAD_BARRIER_SERIAL_THREAD __PTHREAD_BARRIER_SERIAL_THREAD
+#endif /* __USE_XOPEN2K */
 
 
 
 #ifdef __CC__
 
-#ifdef __PTHREAD_MUTEX_HAVE_PREV
-#define PTHREAD_MUTEX_INITIALIZER               { { 0, 0, 0, 0, 0, __PTHREAD_SPINS, { 0, 0 } } }
+#define PTHREAD_MUTEX_INITIALIZER               __PTHREAD_MUTEX_INITIALIZER
 #ifdef __USE_GNU
-#define PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP  { { 0, 0, 0, 0, PTHREAD_MUTEX_RECURSIVE_NP, __PTHREAD_SPINS, { 0, 0 } } }
-#define PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP { { 0, 0, 0, 0, PTHREAD_MUTEX_ERRORCHECK_NP, __PTHREAD_SPINS, { 0, 0 } } }
-#define PTHREAD_ADAPTIVE_MUTEX_INITIALIZER_NP   { { 0, 0, 0, 0, PTHREAD_MUTEX_ADAPTIVE_NP, __PTHREAD_SPINS, { 0, 0 } } }
+#define PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP  __PTHREAD_RECURSIVE_MUTEX_INITIALIZER
+#define PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP __PTHREAD_ERRORCHECK_MUTEX_INITIALIZER
+#define PTHREAD_ADAPTIVE_MUTEX_INITIALIZER_NP   __PTHREAD_ADAPTIVE_MUTEX_INITIALIZER
 #endif /* __USE_GNU */
-#else /* __PTHREAD_MUTEX_HAVE_PREV */
-#define PTHREAD_MUTEX_INITIALIZER  { { 0, 0, 0, 0, 0, { __PTHREAD_SPINS } } }
-#ifdef __USE_GNU
-#define PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP  { { 0, 0, 0, PTHREAD_MUTEX_RECURSIVE_NP, 0, { __PTHREAD_SPINS } } }
-#define PTHREAD_ERRORCHECK_MUTEX_INITIALIZER_NP { { 0, 0, 0, PTHREAD_MUTEX_ERRORCHECK_NP, 0, { __PTHREAD_SPINS } } }
-#define PTHREAD_ADAPTIVE_MUTEX_INITIALIZER_NP   { { 0, 0, 0, PTHREAD_MUTEX_ADAPTIVE_NP, 0, { __PTHREAD_SPINS } } }
-#endif /* __USE_GNU */
-#endif /* !__PTHREAD_MUTEX_HAVE_PREV */
 
 /* Read-write lock types. */
 #if defined(__USE_UNIX98) || defined(__USE_XOPEN2K)
 
 /* Read-write lock initializers. */
-#define PTHREAD_RWLOCK_INITIALIZER { { 0, 0, 0, 0, 0, 0, 0, 0, __PTHREAD_RWLOCK_ELISION_EXTRA, 0, 0 } }
+#define PTHREAD_RWLOCK_INITIALIZER __PTHREAD_RWLOCK_INITIALIZER
 #ifdef __USE_GNU
-#ifdef __PTHREAD_RWLOCK_INT_FLAGS_SHARED
-#define PTHREAD_RWLOCK_WRITER_NONRECURSIVE_INITIALIZER_NP { { 0, 0, 0, 0, 0, 0, 0, 0, __PTHREAD_RWLOCK_ELISION_EXTRA, 0, PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP } }
-#elif __BYTE_ORDER == __LITTLE_ENDIAN
-#define PTHREAD_RWLOCK_WRITER_NONRECURSIVE_INITIALIZER_NP { { 0, 0, 0, 0, 0, 0, PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP, 0, __PTHREAD_RWLOCK_ELISION_EXTRA, 0, 0 } }
-#else
-#define PTHREAD_RWLOCK_WRITER_NONRECURSIVE_INITIALIZER_NP { { 0, 0, 0, 0, 0, 0, 0, 0, 0, PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP, 0 } }
-#endif
+#define PTHREAD_RWLOCK_WRITER_NONRECURSIVE_INITIALIZER_NP __PTHREAD_RWLOCK_WRITER_NONRECURSIVE_INITIALIZER
 #endif /* __USE_GNU */
 #endif  /* __USE_UNIX98 || __USE_XOPEN2K */
 
 /* Conditional variable handling. */
-#define PTHREAD_COND_INITIALIZER { { 0, 0, 0, 0, 0, (void *) 0, 0, 0 } }
+#define PTHREAD_COND_INITIALIZER __PTHREAD_COND_INITIALIZER
 
 /* Cleanup buffers */
 struct _pthread_cleanup_buffer {
@@ -187,7 +332,32 @@ struct _pthread_cleanup_buffer {
 	struct _pthread_cleanup_buffer *__prev;             /* Chaining of cleanup functions. */
 };
 
+#ifndef ____pthread_start_routine_t_defined
+#define ____pthread_start_routine_t_defined 1
 typedef void *(*__pthread_start_routine_t)(void *);
+#endif /* !____pthread_start_routine_t_defined */
+
+typedef __pthread_t pthread_t;
+#ifndef __pthread_attr_t_defined
+#define __pthread_attr_t_defined 1
+typedef __pthread_attr_t pthread_attr_t;
+#endif /* !__pthread_attr_t_defined */
+typedef __pthread_mutex_t pthread_mutex_t;
+typedef __pthread_mutexattr_t pthread_mutexattr_t;
+typedef __pthread_cond_t pthread_cond_t;
+typedef __pthread_condattr_t pthread_condattr_t;
+typedef __pthread_key_t pthread_key_t;
+typedef __pthread_once_t pthread_once_t;
+#if defined(__USE_UNIX98) || defined(__USE_XOPEN2K)
+typedef __pthread_rwlock_t pthread_rwlock_t;
+typedef __pthread_rwlockattr_t pthread_rwlockattr_t;
+#endif /* __USE_UNIX98 || __USE_XOPEN2K */
+#ifdef __USE_XOPEN2K
+typedef __pthread_spinlock_t pthread_spinlock_t;
+typedef __pthread_barrier_t pthread_barrier_t;
+typedef __pthread_barrierattr_t pthread_barrierattr_t;
+#endif /* __USE_XOPEN2K */
+
 
 
 #if defined(__CRT_HAVE_pthread_create)
@@ -218,25 +388,57 @@ __CDECLARE(,int,__NOTHROW_NCX,pthread_tryjoin_np,(pthread_t __pthread, void **__
 
 struct timespec;
 
-#if defined(__CRT_HAVE_pthread_timedjoin_np)
+#if defined(__CRT_HAVE_pthread_timedjoin64_np) && (defined(__USE_TIME_BITS64))
+/* Make calling thread wait for termination of the thread THREAD, but only
+ * until TIMEOUT. The exit status of the thread is stored in
+ * *THREAD_RETURN, if THREAD_RETURN is not NULL. */
+__CREDIRECT(,int,__NOTHROW_RPC,pthread_timedjoin_np,(pthread_t __pthread, void **__thread_return, struct timespec const *__abstime),pthread_timedjoin64_np,(__pthread,__thread_return,__abstime))
+#elif defined(__CRT_HAVE_pthread_timedjoin_np) && (!defined(__USE_TIME_BITS64))
 /* Make calling thread wait for termination of the thread THREAD, but only
  * until TIMEOUT. The exit status of the thread is stored in
  * *THREAD_RETURN, if THREAD_RETURN is not NULL. */
 __CDECLARE(,int,__NOTHROW_RPC,pthread_timedjoin_np,(pthread_t __pthread, void **__thread_return, struct timespec const *__abstime),(__pthread,__thread_return,__abstime))
+#elif (defined(__CRT_HAVE_pthread_timedjoin_np) || defined(__CRT_HAVE_pthread_timedjoin64_np))
+#include <local/pthread/pthread_timedjoin_np.h>
+/* Make calling thread wait for termination of the thread THREAD, but only
+ * until TIMEOUT. The exit status of the thread is stored in
+ * *THREAD_RETURN, if THREAD_RETURN is not NULL. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_timedjoin_np, __FORCELOCAL int __NOTHROW_RPC(__LIBCCALL pthread_timedjoin_np)(pthread_t __pthread, void **__thread_return, struct timespec const *__abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_timedjoin_np))(__pthread, __thread_return, __abstime); })
 #endif /* pthread_timedjoin_np... */
+#ifdef __USE_TIME64
+#if defined(__CRT_HAVE_pthread_timedjoin64_np)
+/* Make calling thread wait for termination of the thread THREAD, but only
+ * until TIMEOUT. The exit status of the thread is stored in
+ * *THREAD_RETURN, if THREAD_RETURN is not NULL. */
+__CDECLARE(,int,__NOTHROW_RPC,pthread_timedjoin64_np,(pthread_t __pthread, void **__thread_return, struct timespec64 const *__abstime),(__pthread,__thread_return,__abstime))
+#elif defined(__CRT_HAVE_pthread_timedjoin_np) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* Make calling thread wait for termination of the thread THREAD, but only
+ * until TIMEOUT. The exit status of the thread is stored in
+ * *THREAD_RETURN, if THREAD_RETURN is not NULL. */
+__CREDIRECT(,int,__NOTHROW_RPC,pthread_timedjoin64_np,(pthread_t __pthread, void **__thread_return, struct timespec64 const *__abstime),pthread_timedjoin_np,(__pthread,__thread_return,__abstime))
+#elif defined(__CRT_HAVE_pthread_timedjoin_np)
+#include <local/pthread/pthread_timedjoin64_np.h>
+/* Make calling thread wait for termination of the thread THREAD, but only
+ * until TIMEOUT. The exit status of the thread is stored in
+ * *THREAD_RETURN, if THREAD_RETURN is not NULL. */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_timedjoin64_np, __FORCELOCAL int __NOTHROW_RPC(__LIBCCALL pthread_timedjoin64_np)(pthread_t __pthread, void **__thread_return, struct timespec64 const *__abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_timedjoin64_np))(__pthread, __thread_return, __abstime); })
+#endif /* pthread_timedjoin64_np... */
+#endif /* __USE_TIME64 */
 #endif /* __USE_GNU */
 
 #if defined(__CRT_HAVE_pthread_detach)
 /* Indicate that the thread THREAD is never to be joined with PTHREAD_JOIN.
  * The resources of THREAD will therefore be freed immediately when it
- * terminates, instead of waiting for another thread to perform PTHREAD_JOIN
- * on it */
+ * terminates, instead of waiting for another thread to perform PTHREAD_JOIN on it */
 __CDECLARE(,int,__NOTHROW_NCX,pthread_detach,(pthread_t __pthread),(__pthread))
 #endif /* pthread_detach... */
 
 #if defined(__CRT_HAVE_pthread_self)
 /* Obtain the identifier of the current thread */
 __CDECLARE(__ATTR_CONST,pthread_t,__NOTHROW_NCX,pthread_self,(void),())
+#elif defined(__CRT_HAVE_thrd_current)
+/* Obtain the identifier of the current thread */
+__CREDIRECT(__ATTR_CONST,pthread_t,__NOTHROW_NCX,pthread_self,(void),thrd_current,())
 #endif /* pthread_self... */
 #if defined(__CRT_HAVE_pthread_equal)
 /* Compare two thread identifiers */
@@ -450,6 +652,12 @@ __CDECLARE(,int,__NOTHROW_NCX,pthread_yield,(void),())
  * might be differently implemented in the case of a m-on-n thread
  * implementation */
 __CREDIRECT(,int,__NOTHROW_NCX,pthread_yield,(void),sched_yield,())
+#elif defined(__CRT_HAVE_thrd_yield)
+/* Yield the processor to another thread or process.
+ * This function is similar to the POSIX `sched_yield' function but
+ * might be differently implemented in the case of a m-on-n thread
+ * implementation */
+__CREDIRECT(,int,__NOTHROW_NCX,pthread_yield,(void),thrd_yield,())
 #endif /* pthread_yield... */
 
 #if defined(__CRT_HAVE_pthread_setaffinity_np)
@@ -463,7 +671,7 @@ __CDECLARE(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,pthread_getaffinity_np,(pthread
 #endif /* pthread_getaffinity_np... */
 #endif /* __USE_GNU */
 
-typedef void (*__pthread_once_routine_t)(void);
+typedef void (__LIBCCALL *__pthread_once_routine_t)(void);
 
 /* Functions for handling initialization. */
 
@@ -473,6 +681,12 @@ typedef void (*__pthread_once_routine_t)(void);
  * same ONCE_CONTROL argument. ONCE_CONTROL must point to a static or
  * extern variable initialized to PTHREAD_ONCE_INIT. */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,,pthread_once,(pthread_once_t *__once_control, __pthread_once_routine_t __init_routine),(__once_control,__init_routine)) __THROWS(...)
+#elif defined(__CRT_HAVE_call_once)
+/* Guarantee that the initialization function INIT_ROUTINE will be called
+ * only once, even if pthread_once is executed several times with the
+ * same ONCE_CONTROL argument. ONCE_CONTROL must point to a static or
+ * extern variable initialized to PTHREAD_ONCE_INIT. */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,,pthread_once,(pthread_once_t *__once_control, __pthread_once_routine_t __init_routine),call_once,(__once_control,__init_routine)) __THROWS(...)
 #endif /* pthread_once... */
 
 /* Functions for handling cancellation.
@@ -524,21 +738,21 @@ typedef struct {
 
 /* Structure to hold the cleanup handler information. */
 struct __pthread_cleanup_frame {
-	void (*__cancel_routine) (void *);
-	void  *__cancel_arg;
-	int    __do_it;
-	int    __cancel_type;
+	void (__LIBCCALL *__cancel_routine) (void *);
+	void             *__cancel_arg;
+	int               __do_it;
+	int               __cancel_type;
 };
 #if defined(__GNUC__) && defined(__EXCEPTIONS)
 #ifdef __cplusplus
 /* Class to handle cancellation handler invocation. */
 class __pthread_cleanup_class {
-	void (*__cancel_routine) (void *);
-	void  *__cancel_arg;
-	int    __do_it;
-	int    __cancel_type;
+	void (__LIBCCALL *__cancel_routine) (void *);
+	void             *__cancel_arg;
+	int               __do_it;
+	int               __cancel_type;
 public:
-	__CXX_CLASSMEMBER __pthread_cleanup_class (void (*__fct)(void *), void *__arg)
+	__CXX_CLASSMEMBER __pthread_cleanup_class (void (__LIBCCALL *__fct)(void *), void *__arg)
 		: __cancel_routine(__fct), __cancel_arg(__arg), __do_it(1)
 	{ }
 	__CXX_CLASSMEMBER ~__pthread_cleanup_class() {
@@ -655,8 +869,8 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(__pthread_cleanup_routine, __FORCELOCAL __ATTR_N
 #define pthread_cleanup_push(routine, arg)                                                                    \
 	do {                                                                                                      \
 		__pthread_unwind_buf_t __cancel_buf;                                                                  \
-		void (*__cancel_routine)(void *) = (routine);                                                         \
-		void *__cancel_arg               = (arg);                                                             \
+		void (__LIBCCALL *__cancel_routine)(void *) = (routine);                                              \
+		void *__cancel_arg                          = (arg);                                                  \
 		int __not_first_call = __sigsetjmp((struct __jmp_buf_tag *)(void *)__cancel_buf.__cancel_jmp_buf, 0); \
 		if __unlikely(__not_first_call) {                                                                     \
 			(*__cancel_routine)(__cancel_arg);                                                                \
@@ -689,7 +903,7 @@ __CDECLARE_VOID(__cleanup_fct_attribute __ATTR_NONNULL((1)),__NOTHROW_NCX,__pthr
 #define pthread_cleanup_push_defer_np(routine, arg)                                                           \
 	do {                                                                                                      \
 		__pthread_unwind_buf_t __cancel_buf;                                                                  \
-		void (*__cancel_routine)(void *) = (routine);                                                         \
+		void (__LIBCCALL *__cancel_routine)(void *) = (routine);                                              \
 		void *__cancel_arg               = (arg);                                                             \
 		int __not_first_call = __sigsetjmp((struct __jmp_buf_tag *)(void *)__cancel_buf.__cancel_jmp_buf, 0); \
 		if __unlikely(__not_first_call) {                                                                     \
@@ -741,6 +955,9 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pthread_mutex_init,(pthread_mut
 #if defined(__CRT_HAVE_pthread_mutex_destroy)
 /* Destroy a mutex */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pthread_mutex_destroy,(pthread_mutex_t *__mutex),(__mutex))
+#elif defined(__CRT_HAVE_mtx_destroy)
+/* Destroy a mutex */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pthread_mutex_destroy,(pthread_mutex_t *__mutex),mtx_destroy,(__mutex))
 #endif /* pthread_mutex_destroy... */
 
 #if defined(__CRT_HAVE_pthread_mutex_trylock)
@@ -754,11 +971,31 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pthread_mutex_lock,(pthread_mut
 #endif /* pthread_mutex_lock... */
 
 #ifdef __USE_XOPEN2K
-#if defined(__CRT_HAVE_pthread_mutex_timedlock)
+#if defined(__CRT_HAVE_pthread_mutex_timedlock64) && (defined(__USE_TIME_BITS64))
 /* Wait until lock becomes available, or specified time passes */
-__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,pthread_mutex_timedlock,(pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime),(__mutex,__abstime))
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,pthread_mutex_timedlock,(pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime),pthread_mutex_timedlock64,(__mutex,__abstime))
+#elif defined(__CRT_HAVE_pthread_mutex_timedlock) && (!defined(__USE_TIME_BITS64))
+/* Wait until lock becomes available, or specified time passes */
+__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,pthread_mutex_timedlock,(pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime),(__mutex,__abstime))
+#elif (defined(__CRT_HAVE_pthread_mutex_timedlock) || defined(__CRT_HAVE_pthread_mutex_timedlock64))
+#include <local/pthread/pthread_mutex_timedlock.h>
+/* Wait until lock becomes available, or specified time passes */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_mutex_timedlock, __FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL pthread_mutex_timedlock)(pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_mutex_timedlock))(__mutex, __abstime); })
 #endif /* pthread_mutex_timedlock... */
-#endif
+#ifdef __USE_TIME64
+#if defined(__CRT_HAVE_pthread_mutex_timedlock64)
+/* Wait until lock becomes available, or specified time passes */
+__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,pthread_mutex_timedlock64,(pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __abstime),(__mutex,__abstime))
+#elif defined(__CRT_HAVE_pthread_mutex_timedlock) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* Wait until lock becomes available, or specified time passes */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,pthread_mutex_timedlock64,(pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __abstime),pthread_mutex_timedlock,(__mutex,__abstime))
+#elif defined(__CRT_HAVE_pthread_mutex_timedlock)
+#include <local/pthread/pthread_mutex_timedlock64.h>
+/* Wait until lock becomes available, or specified time passes */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_mutex_timedlock64, __FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL pthread_mutex_timedlock64)(pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_mutex_timedlock64))(__mutex, __abstime); })
+#endif /* pthread_mutex_timedlock64... */
+#endif /* __USE_TIME64 */
+#endif /* __USE_XOPEN2K */
 
 #if defined(__CRT_HAVE_pthread_mutex_unlock)
 /* Unlock a mutex */
@@ -890,10 +1127,34 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pthread_rwlock_tryrdlock,(pthre
 #endif /* pthread_rwlock_tryrdlock... */
 
 #ifdef __USE_XOPEN2K
+#if defined(__CRT_HAVE_pthread_rwlock_timedrdlock64) && (defined(__USE_TIME_BITS64))
+/* Try to acquire read lock for RWLOCK or return after specfied time */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,pthread_rwlock_timedrdlock,(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __abstime),pthread_rwlock_timedrdlock64,(__rwlock,__abstime))
+#elif defined(__CRT_HAVE_pthread_rwlock_timedrdlock) && (!defined(__USE_TIME_BITS64))
+/* Try to acquire read lock for RWLOCK or return after specfied time */
+__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,pthread_rwlock_timedrdlock,(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __abstime),(__rwlock,__abstime))
+#elif (defined(__CRT_HAVE_pthread_rwlock_timedrdlock) || defined(__CRT_HAVE_pthread_rwlock_timedrdlock64))
+#include <local/pthread/pthread_rwlock_timedrdlock.h>
+/* Try to acquire read lock for RWLOCK or return after specfied time */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_timedrdlock, __FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL pthread_rwlock_timedrdlock)(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_timedrdlock))(__rwlock, __abstime); })
+#endif /* pthread_rwlock_timedrdlock... */
+#ifdef __USE_TIME64
 #if defined(__CRT_HAVE_pthread_rwlock_timedrdlock)
 /* Try to acquire read lock for RWLOCK or return after specfied time */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,pthread_rwlock_timedrdlock,(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __abstime),(__rwlock,__abstime))
-#endif /* pthread_rwlock_timedrdlock... */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,pthread_rwlock_timedrdlock32,(pthread_rwlock_t *__restrict __rwlock, struct timespec32 const *__restrict __abstime),pthread_rwlock_timedrdlock,(__rwlock,__abstime))
+#endif /* pthread_rwlock_timedrdlock32... */
+#if defined(__CRT_HAVE_pthread_rwlock_timedrdlock64)
+/* Try to acquire read lock for RWLOCK or return after specfied time */
+__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,pthread_rwlock_timedrdlock64,(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __abstime),(__rwlock,__abstime))
+#elif defined(__CRT_HAVE_pthread_rwlock_timedrdlock) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* Try to acquire read lock for RWLOCK or return after specfied time */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,pthread_rwlock_timedrdlock64,(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __abstime),pthread_rwlock_timedrdlock,(__rwlock,__abstime))
+#elif defined(__CRT_HAVE_pthread_rwlock_timedrdlock)
+#include <local/pthread/pthread_rwlock_timedrdlock64.h>
+/* Try to acquire read lock for RWLOCK or return after specfied time */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_timedrdlock64, __FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL pthread_rwlock_timedrdlock64)(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_timedrdlock64))(__rwlock, __abstime); })
+#endif /* pthread_rwlock_timedrdlock64... */
+#endif /* __USE_TIME64 */
 #endif /* __USE_XOPEN2K */
 
 #if defined(__CRT_HAVE_pthread_rwlock_wrlock)
@@ -907,10 +1168,34 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pthread_rwlock_trywrlock,(pthre
 #endif /* pthread_rwlock_trywrlock... */
 
 #ifdef __USE_XOPEN2K
+#if defined(__CRT_HAVE_pthread_rwlock_timedwrlock64) && (defined(__USE_TIME_BITS64))
+/* Try to acquire write lock for RWLOCK or return after specfied time */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,pthread_rwlock_timedwrlock,(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __abstime),pthread_rwlock_timedwrlock64,(__rwlock,__abstime))
+#elif defined(__CRT_HAVE_pthread_rwlock_timedwrlock) && (!defined(__USE_TIME_BITS64))
+/* Try to acquire write lock for RWLOCK or return after specfied time */
+__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,pthread_rwlock_timedwrlock,(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __abstime),(__rwlock,__abstime))
+#elif (defined(__CRT_HAVE_pthread_rwlock_timedwrlock) || defined(__CRT_HAVE_pthread_rwlock_timedwrlock64))
+#include <local/pthread/pthread_rwlock_timedwrlock.h>
+/* Try to acquire write lock for RWLOCK or return after specfied time */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_timedwrlock, __FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL pthread_rwlock_timedwrlock)(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_timedwrlock))(__rwlock, __abstime); })
+#endif /* pthread_rwlock_timedwrlock... */
+#ifdef __USE_TIME64
 #if defined(__CRT_HAVE_pthread_rwlock_timedwrlock)
 /* Try to acquire write lock for RWLOCK or return after specfied time */
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,pthread_rwlock_timedwrlock,(pthread_rwlock_t *__restrict __rwlock, struct timespec const *__restrict __abstime),(__rwlock,__abstime))
-#endif /* pthread_rwlock_timedwrlock... */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,pthread_rwlock_timedwrlock32,(pthread_rwlock_t *__restrict __rwlock, struct timespec32 const *__restrict __abstime),pthread_rwlock_timedwrlock,(__rwlock,__abstime))
+#endif /* pthread_rwlock_timedwrlock32... */
+#if defined(__CRT_HAVE_pthread_rwlock_timedwrlock64)
+/* Try to acquire write lock for RWLOCK or return after specfied time */
+__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,pthread_rwlock_timedwrlock64,(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __abstime),(__rwlock,__abstime))
+#elif defined(__CRT_HAVE_pthread_rwlock_timedwrlock) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* Try to acquire write lock for RWLOCK or return after specfied time */
+__CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,pthread_rwlock_timedwrlock64,(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __abstime),pthread_rwlock_timedwrlock,(__rwlock,__abstime))
+#elif defined(__CRT_HAVE_pthread_rwlock_timedwrlock)
+#include <local/pthread/pthread_rwlock_timedwrlock64.h>
+/* Try to acquire write lock for RWLOCK or return after specfied time */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_rwlock_timedwrlock64, __FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL pthread_rwlock_timedwrlock64)(pthread_rwlock_t *__restrict __rwlock, struct timespec64 const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_rwlock_timedwrlock64))(__rwlock, __abstime); })
+#endif /* pthread_rwlock_timedwrlock64... */
+#endif /* __USE_TIME64 */
 #endif /* __USE_XOPEN2K */
 
 #if defined(__CRT_HAVE_pthread_rwlock_unlock)
@@ -962,6 +1247,9 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pthread_cond_init,(pthread_cond
 #if defined(__CRT_HAVE_pthread_cond_destroy)
 /* Destroy condition variable COND */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pthread_cond_destroy,(pthread_cond_t *__cond),(__cond))
+#elif defined(__CRT_HAVE_cnd_destroy)
+/* Destroy condition variable COND */
+__CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pthread_cond_destroy,(pthread_cond_t *__cond),cnd_destroy,(__cond))
 #endif /* pthread_cond_destroy... */
 
 #if defined(__CRT_HAVE_pthread_cond_signal)
@@ -980,13 +1268,48 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pthread_cond_broadcast,(pthread
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,pthread_cond_wait,(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex),(__cond,__mutex))
 #endif /* pthread_cond_wait... */
 
-#if defined(__CRT_HAVE_pthread_cond_timedwait)
+#if defined(__CRT_HAVE_pthread_cond_timedwait64) && (defined(__USE_TIME_BITS64))
 /* Wait for condition variable COND to be signaled or broadcast until
  * ABSTIME. MUTEX is assumed to be locked before. ABSTIME is an
  * absolute time specification; zero is the beginning of the epoch
  * (00:00:00 GMT, January 1, 1970). */
-__CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,pthread_cond_timedwait,(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime),(__cond,__mutex,__abstime))
+__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,pthread_cond_timedwait,(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime),pthread_cond_timedwait64,(__cond,__mutex,__abstime))
+#elif defined(__CRT_HAVE_pthread_cond_timedwait) && (!defined(__USE_TIME_BITS64))
+/* Wait for condition variable COND to be signaled or broadcast until
+ * ABSTIME. MUTEX is assumed to be locked before. ABSTIME is an
+ * absolute time specification; zero is the beginning of the epoch
+ * (00:00:00 GMT, January 1, 1970). */
+__CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,pthread_cond_timedwait,(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime),(__cond,__mutex,__abstime))
+#elif (defined(__CRT_HAVE_pthread_cond_timedwait) || defined(__CRT_HAVE_pthread_cond_timedwait64))
+#include <local/pthread/pthread_cond_timedwait.h>
+/* Wait for condition variable COND to be signaled or broadcast until
+ * ABSTIME. MUTEX is assumed to be locked before. ABSTIME is an
+ * absolute time specification; zero is the beginning of the epoch
+ * (00:00:00 GMT, January 1, 1970). */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_cond_timedwait, __FORCELOCAL __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_RPC(__LIBCCALL pthread_cond_timedwait)(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_cond_timedwait))(__cond, __mutex, __abstime); })
 #endif /* pthread_cond_timedwait... */
+#ifdef __USE_TIME64
+#if defined(__CRT_HAVE_pthread_cond_timedwait64)
+/* Wait for condition variable COND to be signaled or broadcast until
+ * ABSTIME. MUTEX is assumed to be locked before. ABSTIME is an
+ * absolute time specification; zero is the beginning of the epoch
+ * (00:00:00 GMT, January 1, 1970). */
+__CDECLARE(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,pthread_cond_timedwait64,(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __abstime),(__cond,__mutex,__abstime))
+#elif defined(__CRT_HAVE_pthread_cond_timedwait) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
+/* Wait for condition variable COND to be signaled or broadcast until
+ * ABSTIME. MUTEX is assumed to be locked before. ABSTIME is an
+ * absolute time specification; zero is the beginning of the epoch
+ * (00:00:00 GMT, January 1, 1970). */
+__CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,pthread_cond_timedwait64,(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __abstime),pthread_cond_timedwait,(__cond,__mutex,__abstime))
+#elif defined(__CRT_HAVE_pthread_cond_timedwait)
+#include <local/pthread/pthread_cond_timedwait64.h>
+/* Wait for condition variable COND to be signaled or broadcast until
+ * ABSTIME. MUTEX is assumed to be locked before. ABSTIME is an
+ * absolute time specification; zero is the beginning of the epoch
+ * (00:00:00 GMT, January 1, 1970). */
+__NAMESPACE_LOCAL_USING_OR_IMPL(pthread_cond_timedwait64, __FORCELOCAL __ATTR_NONNULL((1, 2, 3)) int __NOTHROW_RPC(__LIBCCALL pthread_cond_timedwait64)(pthread_cond_t *__restrict __cond, pthread_mutex_t *__restrict __mutex, struct timespec64 const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_cond_timedwait64))(__cond, __mutex, __abstime); })
+#endif /* pthread_cond_timedwait64... */
+#endif /* __USE_TIME64 */
 
 /* Functions for handling condition variable attributes. */
 
@@ -1090,8 +1413,10 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pthread_barrierattr_setpshared,
 #endif /* __USE_XOPEN2K */
 
 /* Functions for handling thread-specific data. */
-
-typedef void (*__pthread_destr_function_t)(void *);
+#ifndef ____pthread_destr_function_t_defined
+#define ____pthread_destr_function_t_defined 1
+typedef void (__LIBCCALL *__pthread_destr_function_t)(void *);
+#endif /* !____pthread_destr_function_t_defined */
 
 #if defined(__CRT_HAVE_pthread_key_create)
 /* Create a key value identifying a location in the thread-specific
@@ -1106,11 +1431,17 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,pthread_key_create,(pthread_key
 #if defined(__CRT_HAVE_pthread_key_delete)
 /* Destroy KEY */
 __CDECLARE(,int,__NOTHROW_NCX,pthread_key_delete,(pthread_key_t __key),(__key))
+#elif defined(__CRT_HAVE_tss_delete)
+/* Destroy KEY */
+__CREDIRECT(,int,__NOTHROW_NCX,pthread_key_delete,(pthread_key_t __key),tss_delete,(__key))
 #endif /* pthread_key_delete... */
 
 #if defined(__CRT_HAVE_pthread_getspecific)
 /* Return current value of the thread-specific data slot identified by KEY */
 __CDECLARE(,void *,__NOTHROW_NCX,pthread_getspecific,(pthread_key_t __key),(__key))
+#elif defined(__CRT_HAVE_tss_get)
+/* Return current value of the thread-specific data slot identified by KEY */
+__CREDIRECT(,void *,__NOTHROW_NCX,pthread_getspecific,(pthread_key_t __key),tss_get,(__key))
 #endif /* pthread_getspecific... */
 
 #if defined(__CRT_HAVE_pthread_setspecific)
@@ -1125,7 +1456,7 @@ __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,pthread_getcpuclockid,(pthread_
 #endif /* pthread_getcpuclockid... */
 #endif /* __USE_XOPEN2K */
 
-typedef void (*__pthread_atfork_func_t)(void);
+typedef void (__LIBCCALL *__pthread_atfork_func_t)(void);
 
 #if defined(__CRT_HAVE_pthread_atfork)
 /* Install handlers to be called when a new process is created with FORK.

@@ -489,6 +489,8 @@ EOF
 		install_header menu.h
 		install_header panel.h
 		install_header curses.h
+		install_header ncurses_cfg.h
+		install_header ncurses_def.h
 		install_header_ex "$SRCPATH/include/nc_tparm.h" nc_tparm.h
 		echo "Installing header:/include/ncurses.h"
 		echo '#include "curses.h"' > "$KOS_ROOT/kos/include/ncurses.h"

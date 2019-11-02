@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8bc561ae */
+/* HASH CRC-32:0xa20f3cf7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep__heapmin,(void),_heapmin,())
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(malloc_trim) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(malloc_trim))(__SIZE_TYPE__ __pad) {
-#line 123 "kos/src/libc/magic/malloc.c"
+#line 130 "kos/src/libc/magic/malloc.c"
 #ifdef __CRT_HAVE__heapmin
 	(void)__pad;
 	return __localdep__heapmin() ? 1 : 0;

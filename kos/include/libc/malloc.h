@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x80e43790 */
+/* HASH CRC-32:0xc16b9a0a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,9 +24,6 @@
 #include <__crt.h>
 #include "slow/malloc.h"
 
-#define __libc_malloc __libc_slow_malloc
-#define __libc_calloc __libc_slow_calloc
-#define __libc_realloc __libc_slow_realloc
-#define __libc_free __libc_slow_free
+#include "stdlib.h"
 
 #endif /* !_LIBC_MALLOC_H */

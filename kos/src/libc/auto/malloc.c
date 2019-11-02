@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc676f493 */
+/* HASH CRC-32:0xf989775f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ DECL_BEGIN
 #ifndef __KERNEL__
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.heap.utility.malloc_trim") int
 NOTHROW_NCX(LIBCCALL libc_malloc_trim)(size_t pad) {
-#line 123 "kos/src/libc/magic/malloc.c"
+#line 130 "kos/src/libc/magic/malloc.c"
 	/* NO-OP (indicate failure to release memory) */
 	(void)pad;
 	return 0;
@@ -39,7 +39,7 @@ NOTHROW_NCX(LIBCCALL libc_malloc_trim)(size_t pad) {
 INTERN ATTR_WEAK ATTR_SECTION(".text.crt.heap.utility.mallopt") int
 NOTHROW_NCX(LIBCCALL libc_mallopt)(int parameter_number,
                                    int parameter_value) {
-#line 140 "kos/src/libc/magic/malloc.c"
+#line 147 "kos/src/libc/magic/malloc.c"
 	/* NO-OP */
 	(void)parameter_number;
 	(void)parameter_value;

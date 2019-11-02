@@ -29,6 +29,8 @@ __ice__
 /kos/include/tic.h
 /kos/include/ncurses.h
 /kos/include/ncurses_dll.h
+/kos/include/ncurses_cfg.h
+/kos/include/ncurses_def.h
 /kos/include/term.h
 /kos/include/termcap.h
 /kos/include/unctrl.h

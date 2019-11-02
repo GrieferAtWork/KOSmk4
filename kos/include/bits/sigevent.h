@@ -37,7 +37,7 @@ __SYSDECL_BEGIN
 #ifdef __CC__
 #ifndef __pthread_attr_t_defined
 #define __pthread_attr_t_defined 1
-typedef union pthread_attr_t pthread_attr_t;
+typedef union __pthread_attr pthread_attr_t;
 #endif /* !__pthread_attr_t_defined */
 #endif /* __CC__ */
 
@@ -72,7 +72,7 @@ typedef struct sigevent /*[PREFIX(sigev_)]*/ {
 	} _sigev_un;
 	};
 #endif /* !__USE_KOS */
-#else
+#else /* __COMPILER_HAVE_TRANSPARENT_STRUCT && __COMPILER_HAVE_TRANSPARENT_UNION */
 	union {
 		__INT32_TYPE__ _pad[__SIGEV_PAD_SIZE];
 		/* When SIGEV_SIGNAL and SIGEV_THREAD_ID set, LWP ID of the thread to receive the signal. */
@@ -84,7 +84,7 @@ typedef struct sigevent /*[PREFIX(sigev_)]*/ {
 	} _sigev_un;
 #define sigev_notify_function   _sigev_un._sigev_thread._function
 #define sigev_notify_attributes _sigev_un._sigev_thread._attribute
-#endif
+#endif /* !__COMPILER_HAVE_TRANSPARENT_STRUCT || !__COMPILER_HAVE_TRANSPARENT_UNION */
 } sigevent_t;
 #endif /* __CC__ */
 

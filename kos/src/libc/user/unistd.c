@@ -1984,6 +1984,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.fs.modify.revoke") int
 NOTHROW_RPC(LIBCCALL libc_revoke)(char const *file)
 /*[[[body:revoke]]]*/
 {
+	CRT_UNIMPLEMENTED("revoke"); /* TODO */
 	libc_seterrno(ENOSYS);
 	return -1;
 }

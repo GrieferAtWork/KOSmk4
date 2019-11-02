@@ -197,7 +197,10 @@ STATIC_ASSERT(WINT_MAX          == __WINT_MAX__);
 
 
 
-#include <bits/pthreadtypes.h>
+#include <pthread.h>
+STATIC_ASSERT(sizeof(pthread_t) == __SIZEOF_PTHREAD_T);
+STATIC_ASSERT(sizeof(pthread_key_t) == __SIZEOF_PTHREAD_KEY_T);
+STATIC_ASSERT(sizeof(pthread_once_t) == __SIZEOF_PTHREAD_ONCE_T);
 STATIC_ASSERT(sizeof(pthread_attr_t) == __SIZEOF_PTHREAD_ATTR_T);
 STATIC_ASSERT(sizeof(pthread_mutex_t) == __SIZEOF_PTHREAD_MUTEX_T);
 STATIC_ASSERT(sizeof(pthread_mutexattr_t) == __SIZEOF_PTHREAD_MUTEXATTR_T);
@@ -207,6 +210,14 @@ STATIC_ASSERT(sizeof(pthread_rwlock_t) == __SIZEOF_PTHREAD_RWLOCK_T);
 STATIC_ASSERT(sizeof(pthread_rwlockattr_t) == __SIZEOF_PTHREAD_RWLOCKATTR_T);
 STATIC_ASSERT(sizeof(pthread_barrier_t) == __SIZEOF_PTHREAD_BARRIER_T);
 STATIC_ASSERT(sizeof(pthread_barrierattr_t) == __SIZEOF_PTHREAD_BARRIERATTR_T);
+
+
+#include <threads.h>
+STATIC_ASSERT(sizeof(thrd_t) == __SIZEOF_PTHREAD_T);
+STATIC_ASSERT(sizeof(tss_t) == __SIZEOF_PTHREAD_KEY_T);
+STATIC_ASSERT(sizeof(once_flag) == __SIZEOF_PTHREAD_ONCE_T);
+STATIC_ASSERT(sizeof(mtx_t) == __SIZEOF_PTHREAD_MUTEX_T);
+STATIC_ASSERT(sizeof(cnd_t) == __SIZEOF_PTHREAD_COND_T);
 
 
 #include <elf.h>

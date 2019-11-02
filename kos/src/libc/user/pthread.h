@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf669c580 */
+/* HASH CRC-32:0xeb9bd866 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,10 +47,13 @@ INTDEF int NOTHROW_NCX(LIBCCALL libc_pthread_tryjoin_np)(pthread_t pthread, void
  * until TIMEOUT. The exit status of the thread is stored in
  * *THREAD_RETURN, if THREAD_RETURN is not NULL. */
 INTDEF int NOTHROW_RPC(LIBCCALL libc_pthread_timedjoin_np)(pthread_t pthread, void **thread_return, struct timespec const *abstime);
+/* Make calling thread wait for termination of the thread THREAD, but only
+ * until TIMEOUT. The exit status of the thread is stored in
+ * *THREAD_RETURN, if THREAD_RETURN is not NULL. */
+INTDEF int NOTHROW_RPC(LIBCCALL libc_pthread_timedjoin64_np)(pthread_t pthread, void **thread_return, struct timespec64 const *abstime);
 /* Indicate that the thread THREAD is never to be joined with PTHREAD_JOIN.
  * The resources of THREAD will therefore be freed immediately when it
- * terminates, instead of waiting for another thread to perform PTHREAD_JOIN
- * on it */
+ * terminates, instead of waiting for another thread to perform PTHREAD_JOIN on it */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_pthread_detach)(pthread_t pthread);
 /* Obtain the identifier of the current thread */
 INTDEF ATTR_CONST pthread_t NOTHROW_NCX(LIBCCALL libc_pthread_self)(void);
@@ -172,7 +175,9 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_pthread_mutex_trylock)(pthread
 /* Lock a mutex */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_pthread_mutex_lock)(pthread_mutex_t *mutex);
 /* Wait until lock becomes available, or specified time passes */
-INTDEF NONNULL((1, 2)) int NOTHROW_NCX(LIBCCALL libc_pthread_mutex_timedlock)(pthread_mutex_t *__restrict mutex, struct timespec const *__restrict abstime);
+INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_pthread_mutex_timedlock)(pthread_mutex_t *__restrict mutex, struct timespec const *__restrict abstime);
+/* Wait until lock becomes available, or specified time passes */
+INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_pthread_mutex_timedlock64)(pthread_mutex_t *__restrict mutex, struct timespec64 const *__restrict abstime);
 /* Unlock a mutex */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_pthread_mutex_unlock)(pthread_mutex_t *mutex);
 /* Get the priority ceiling of MUTEX */
@@ -221,13 +226,17 @@ INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_rdlock)(pthread
 /* Try to acquire read lock for RWLOCK */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_tryrdlock)(pthread_rwlock_t *rwlock);
 /* Try to acquire read lock for RWLOCK or return after specfied time */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedrdlock)(pthread_rwlock_t *__restrict rwlock, struct timespec const *__restrict abstime);
+INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedrdlock)(pthread_rwlock_t *__restrict rwlock, struct timespec const *__restrict abstime);
+/* Try to acquire read lock for RWLOCK or return after specfied time */
+INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedrdlock64)(pthread_rwlock_t *__restrict rwlock, struct timespec64 const *__restrict abstime);
 /* Acquire write lock for RWLOCK */
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_wrlock)(pthread_rwlock_t *rwlock);
 /* Try to acquire write lock for RWLOCK */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_trywrlock)(pthread_rwlock_t *rwlock);
 /* Try to acquire write lock for RWLOCK or return after specfied time */
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedwrlock)(pthread_rwlock_t *__restrict rwlock, struct timespec const *__restrict abstime);
+INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedwrlock)(pthread_rwlock_t *__restrict rwlock, struct timespec const *__restrict abstime);
+/* Try to acquire write lock for RWLOCK or return after specfied time */
+INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_pthread_rwlock_timedwrlock64)(pthread_rwlock_t *__restrict rwlock, struct timespec64 const *__restrict abstime);
 /* Unlock RWLOCK */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_pthread_rwlock_unlock)(pthread_rwlock_t *rwlock);
 /* Initialize attribute object ATTR with default values */
@@ -258,7 +267,12 @@ INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_pthread_cond_wait)(pthread_
  * ABSTIME. MUTEX is assumed to be locked before. ABSTIME is an
  * absolute time specification; zero is the beginning of the epoch
  * (00:00:00 GMT, January 1, 1970). */
-INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_pthread_cond_timedwait)(pthread_cond_t *__restrict cond, pthread_mutex_t *__restrict mutex, struct timespec const *__restrict abstime);
+INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC(LIBCCALL libc_pthread_cond_timedwait)(pthread_cond_t *__restrict cond, pthread_mutex_t *__restrict mutex, struct timespec const *__restrict abstime);
+/* Wait for condition variable COND to be signaled or broadcast until
+ * ABSTIME. MUTEX is assumed to be locked before. ABSTIME is an
+ * absolute time specification; zero is the beginning of the epoch
+ * (00:00:00 GMT, January 1, 1970). */
+INTDEF NONNULL((1, 2, 3)) int NOTHROW_RPC(LIBCCALL libc_pthread_cond_timedwait64)(pthread_cond_t *__restrict cond, pthread_mutex_t *__restrict mutex, struct timespec64 const *__restrict abstime);
 /* Initialize condition variable attribute ATTR */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_pthread_condattr_init)(pthread_condattr_t *attr);
 /* Destroy condition variable attribute ATTR */

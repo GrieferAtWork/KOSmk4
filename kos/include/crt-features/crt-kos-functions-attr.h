@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x32c76e38 */
+/* HASH CRC-32:0xd313cfb4 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -43,6 +43,7 @@
 #define __CRT_ATTR_NORETURN_pthread_exit 1
 #define __CRT_ATTR_NORETURN_quick_exit 1
 #define __CRT_ATTR_NORETURN_sigreturn 1
+#define __CRT_ATTR_NORETURN_thrd_exit 1
 
 
 /* ATTR_NOTHROW */
@@ -1564,6 +1565,10 @@
 #define __CRT_ATTR_NOTHROW_NCX_close 1
 #define __CRT_ATTR_NOTHROW_NCX_closedir 1
 #define __CRT_ATTR_NOTHROW_NCX_closelog 1
+#define __CRT_ATTR_NOTHROW_NCX_cnd_broadcast 1
+#define __CRT_ATTR_NOTHROW_NCX_cnd_destroy 1
+#define __CRT_ATTR_NOTHROW_NCX_cnd_init 1
+#define __CRT_ATTR_NOTHROW_NCX_cnd_signal 1
 #define __CRT_ATTR_NOTHROW_NCX_confstr 1
 #define __CRT_ATTR_NOTHROW_NCX_crt_asctime_s 1
 #define __CRT_ATTR_NOTHROW_NCX_crt_c16utime32 1
@@ -2120,6 +2125,10 @@
 #define __CRT_ATTR_NOTHROW_NCX_mremap 1
 #define __CRT_ATTR_NOTHROW_NCX_msgctl 1
 #define __CRT_ATTR_NOTHROW_NCX_msgget 1
+#define __CRT_ATTR_NOTHROW_NCX_mtx_destroy 1
+#define __CRT_ATTR_NOTHROW_NCX_mtx_init 1
+#define __CRT_ATTR_NOTHROW_NCX_mtx_trylock 1
+#define __CRT_ATTR_NOTHROW_NCX_mtx_unlock 1
 #define __CRT_ATTR_NOTHROW_NCX_munlock 1
 #define __CRT_ATTR_NOTHROW_NCX_munlockall 1
 #define __CRT_ATTR_NOTHROW_NCX_munmap 1
@@ -2241,7 +2250,6 @@
 #define __CRT_ATTR_NOTHROW_NCX_pthread_mutex_init 1
 #define __CRT_ATTR_NOTHROW_NCX_pthread_mutex_lock 1
 #define __CRT_ATTR_NOTHROW_NCX_pthread_mutex_setprioceiling 1
-#define __CRT_ATTR_NOTHROW_NCX_pthread_mutex_timedlock 1
 #define __CRT_ATTR_NOTHROW_NCX_pthread_mutex_trylock 1
 #define __CRT_ATTR_NOTHROW_NCX_pthread_mutex_unlock 1
 #define __CRT_ATTR_NOTHROW_NCX_pthread_mutexattr_destroy 1
@@ -2637,6 +2645,11 @@
 #define __CRT_ATTR_NOTHROW_NCX_tempnam 1
 #define __CRT_ATTR_NOTHROW_NCX_tfind 1
 #define __CRT_ATTR_NOTHROW_NCX_tgsigqueueinfo 1
+#define __CRT_ATTR_NOTHROW_NCX_thrd_create 1
+#define __CRT_ATTR_NOTHROW_NCX_thrd_current 1
+#define __CRT_ATTR_NOTHROW_NCX_thrd_detach 1
+#define __CRT_ATTR_NOTHROW_NCX_thrd_equal 1
+#define __CRT_ATTR_NOTHROW_NCX_thrd_yield 1
 #define __CRT_ATTR_NOTHROW_NCX_time 1
 #define __CRT_ATTR_NOTHROW_NCX_time32 1
 #define __CRT_ATTR_NOTHROW_NCX_time64 1
@@ -2676,6 +2689,10 @@
 #define __CRT_ATTR_NOTHROW_NCX_truncate32 1
 #define __CRT_ATTR_NOTHROW_NCX_truncate64 1
 #define __CRT_ATTR_NOTHROW_NCX_tsearch 1
+#define __CRT_ATTR_NOTHROW_NCX_tss_create 1
+#define __CRT_ATTR_NOTHROW_NCX_tss_delete 1
+#define __CRT_ATTR_NOTHROW_NCX_tss_get 1
+#define __CRT_ATTR_NOTHROW_NCX_tss_set 1
 #define __CRT_ATTR_NOTHROW_NCX_ttyslot 1
 #define __CRT_ATTR_NOTHROW_NCX_twalk 1
 #define __CRT_ATTR_NOTHROW_NCX_tzset 1
@@ -3122,6 +3139,9 @@
 #define __CRT_ATTR_NOTHROW_RPC_clock_nanosleep 1
 #define __CRT_ATTR_NOTHROW_RPC_clock_nanosleep32 1
 #define __CRT_ATTR_NOTHROW_RPC_clock_nanosleep64 1
+#define __CRT_ATTR_NOTHROW_RPC_cnd_timedwait 1
+#define __CRT_ATTR_NOTHROW_RPC_cnd_timedwait64 1
+#define __CRT_ATTR_NOTHROW_RPC_cnd_wait 1
 #define __CRT_ATTR_NOTHROW_RPC_connect 1
 #define __CRT_ATTR_NOTHROW_RPC_creat 1
 #define __CRT_ATTR_NOTHROW_RPC_creat64 1
@@ -3419,6 +3439,9 @@
 #define __CRT_ATTR_NOTHROW_RPC_msgrcv 1
 #define __CRT_ATTR_NOTHROW_RPC_msgsnd 1
 #define __CRT_ATTR_NOTHROW_RPC_msync 1
+#define __CRT_ATTR_NOTHROW_RPC_mtx_lock 1
+#define __CRT_ATTR_NOTHROW_RPC_mtx_timedlock 1
+#define __CRT_ATTR_NOTHROW_RPC_mtx_timedlock64 1
 #define __CRT_ATTR_NOTHROW_RPC_name_to_handle_at 1
 #define __CRT_ATTR_NOTHROW_RPC_nanosleep 1
 #define __CRT_ATTR_NOTHROW_RPC_nanosleep32 1
@@ -3458,13 +3481,24 @@
 #define __CRT_ATTR_NOTHROW_RPC_pselect64 1
 #define __CRT_ATTR_NOTHROW_RPC_pthread_barrier_wait 1
 #define __CRT_ATTR_NOTHROW_RPC_pthread_cond_timedwait 1
+#define __CRT_ATTR_NOTHROW_RPC_pthread_cond_timedwait32 1
+#define __CRT_ATTR_NOTHROW_RPC_pthread_cond_timedwait64 1
 #define __CRT_ATTR_NOTHROW_RPC_pthread_cond_wait 1
 #define __CRT_ATTR_NOTHROW_RPC_pthread_join 1
+#define __CRT_ATTR_NOTHROW_RPC_pthread_mutex_timedlock 1
+#define __CRT_ATTR_NOTHROW_RPC_pthread_mutex_timedlock32 1
+#define __CRT_ATTR_NOTHROW_RPC_pthread_mutex_timedlock64 1
 #define __CRT_ATTR_NOTHROW_RPC_pthread_rwlock_rdlock 1
 #define __CRT_ATTR_NOTHROW_RPC_pthread_rwlock_timedrdlock 1
+#define __CRT_ATTR_NOTHROW_RPC_pthread_rwlock_timedrdlock32 1
+#define __CRT_ATTR_NOTHROW_RPC_pthread_rwlock_timedrdlock64 1
 #define __CRT_ATTR_NOTHROW_RPC_pthread_rwlock_timedwrlock 1
+#define __CRT_ATTR_NOTHROW_RPC_pthread_rwlock_timedwrlock32 1
+#define __CRT_ATTR_NOTHROW_RPC_pthread_rwlock_timedwrlock64 1
 #define __CRT_ATTR_NOTHROW_RPC_pthread_rwlock_wrlock 1
 #define __CRT_ATTR_NOTHROW_RPC_pthread_testcancel 1
+#define __CRT_ATTR_NOTHROW_RPC_pthread_timedjoin32_np 1
+#define __CRT_ATTR_NOTHROW_RPC_pthread_timedjoin64_np 1
 #define __CRT_ATTR_NOTHROW_RPC_pthread_timedjoin_np 1
 #define __CRT_ATTR_NOTHROW_RPC_putgrent 1
 #define __CRT_ATTR_NOTHROW_RPC_putmsg 1
@@ -3575,6 +3609,10 @@
 #define __CRT_ATTR_NOTHROW_RPC_system 1
 #define __CRT_ATTR_NOTHROW_RPC_tcdrain 1
 #define __CRT_ATTR_NOTHROW_RPC_tee 1
+#define __CRT_ATTR_NOTHROW_RPC_thrd_join 1
+#define __CRT_ATTR_NOTHROW_RPC_thrd_sleep 1
+#define __CRT_ATTR_NOTHROW_RPC_thrd_sleep32 1
+#define __CRT_ATTR_NOTHROW_RPC_thrd_sleep64 1
 #define __CRT_ATTR_NOTHROW_RPC_tmpfile 1
 #define __CRT_ATTR_NOTHROW_RPC_tmpfile64 1
 #define __CRT_ATTR_NOTHROW_RPC_tmpfile_s 1

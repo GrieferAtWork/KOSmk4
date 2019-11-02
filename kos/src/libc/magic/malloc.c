@@ -19,6 +19,13 @@
 
 %[default_impl_section(.text.crt.heap.malloc)]
 
+%(libc_fast){
+#include "stdlib.h"
+}
+%(libc_slow){
+#include "stdlib.h"
+}
+
 %{
 #include <features.h>
 

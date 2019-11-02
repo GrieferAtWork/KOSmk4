@@ -47,10 +47,10 @@ struct __sigset_struct;
 }
 
 [guard] pthread_sigmask:(int how, $sigset_t const *__restrict newmask, $sigset_t *__restrict oldmask) -> int;
-[guard] pthread_kill:(pthread_t threadid, int signo) -> int;
+[guard] pthread_kill:($pthread_t threadid, int signo) -> int;
 
 %#ifdef __USE_GNU
-[guard] pthread_sigqueue:(pthread_t threadid, int signo, union sigval const value) -> int;
+[guard] pthread_sigqueue:($pthread_t threadid, int signo, union sigval const value) -> int;
 %#endif /* __USE_GNU */
 
 %{

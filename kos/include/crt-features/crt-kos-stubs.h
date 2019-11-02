@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x53776a62 */
+/* HASH CRC-32:0x225fb7b4 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -130,12 +130,10 @@
 #define __CRT_STUB_clock 1
 #define __CRT_STUB_clock_getcpuclockid 1
 #define __CRT_STUB_closelog 1
-#define __CRT_STUB_confstr 1
 #define __CRT_STUB_cos 1
 #define __CRT_STUB_cosh 1
 #define __CRT_STUB_crypt 1
 #define __CRT_STUB_crypt_r 1
-#define __CRT_STUB_daemon 1
 #define __CRT_STUB_drand48 1
 #define __CRT_STUB_drand48_r 1
 #define __CRT_STUB_drem 1
@@ -237,7 +235,6 @@
 #define __CRT_STUB_gethostbyname_r 1
 #define __CRT_STUB_gethostent 1
 #define __CRT_STUB_gethostent_r 1
-#define __CRT_STUB_gethostid 1
 #define __CRT_STUB_getifaddrs 1
 #define __CRT_STUB_getipv4sourcefilter 1
 #define __CRT_STUB_getloadavg 1
@@ -463,6 +460,7 @@
 #define __CRT_STUB_pthread_cond_init 1
 #define __CRT_STUB_pthread_cond_signal 1
 #define __CRT_STUB_pthread_cond_timedwait 1
+#define __CRT_STUB_pthread_cond_timedwait64 1
 #define __CRT_STUB_pthread_cond_wait 1
 #define __CRT_STUB_pthread_condattr_destroy 1
 #define __CRT_STUB_pthread_condattr_getclock 1
@@ -482,6 +480,7 @@
 #define __CRT_STUB_pthread_mutex_lock 1
 #define __CRT_STUB_pthread_mutex_setprioceiling 1
 #define __CRT_STUB_pthread_mutex_timedlock 1
+#define __CRT_STUB_pthread_mutex_timedlock64 1
 #define __CRT_STUB_pthread_mutex_trylock 1
 #define __CRT_STUB_pthread_mutex_unlock 1
 #define __CRT_STUB_pthread_mutexattr_destroy 1
@@ -503,7 +502,9 @@
 #define __CRT_STUB_pthread_rwlock_init 1
 #define __CRT_STUB_pthread_rwlock_rdlock 1
 #define __CRT_STUB_pthread_rwlock_timedrdlock 1
+#define __CRT_STUB_pthread_rwlock_timedrdlock64 1
 #define __CRT_STUB_pthread_rwlock_timedwrlock 1
+#define __CRT_STUB_pthread_rwlock_timedwrlock64 1
 #define __CRT_STUB_pthread_rwlock_tryrdlock 1
 #define __CRT_STUB_pthread_rwlock_trywrlock 1
 #define __CRT_STUB_pthread_rwlock_unlock 1
@@ -522,6 +523,7 @@
 #define __CRT_STUB_pthread_spin_lock 1
 #define __CRT_STUB_pthread_spin_trylock 1
 #define __CRT_STUB_pthread_spin_unlock 1
+#define __CRT_STUB_pthread_timedjoin64_np 1
 #define __CRT_STUB_ptsname 1
 #define __CRT_STUB_ptsname_r 1
 #define __CRT_STUB_putgrent 1
@@ -575,7 +577,6 @@
 #define __CRT_STUB_setgrent 1
 #define __CRT_STUB_setgroups 1
 #define __CRT_STUB_sethostent 1
-#define __CRT_STUB_sethostid 1
 #define __CRT_STUB_setipv4sourcefilter 1
 #define __CRT_STUB_setkey 1
 #define __CRT_STUB_setkey_r 1
@@ -629,13 +630,14 @@
 #define __CRT_STUB_tanh 1
 #define __CRT_STUB_tempnam 1
 #define __CRT_STUB_tgamma 1
+#define __CRT_STUB_thrd_sleep 1
+#define __CRT_STUB_thrd_sleep64 1
 #define __CRT_STUB_timespec_get 1
 #define __CRT_STUB_tmpfile 1
 #define __CRT_STUB_tmpnam 1
 #define __CRT_STUB_tmpnam_r 1
 #define __CRT_STUB_ttyslot 1
 #define __CRT_STUB_tzset 1
-#define __CRT_STUB_ualarm 1
 #define __CRT_STUB_ulckpwdf 1
 #define __CRT_STUB_ungetwc 1
 #define __CRT_STUB_ungetwc_unlocked 1
