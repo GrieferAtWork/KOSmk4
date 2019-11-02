@@ -42,6 +42,7 @@
 #include <fcntl.h>
 #include <grp.h>
 #include <limits.h>
+#include <paths.h>
 #include <pwd.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -2204,9 +2205,111 @@ NOTHROW_NCX(LIBCCALL libc_confstr)(int name,
                                    size_t buflen)
 /*[[[body:confstr]]]*/
 {
-	CRT_UNIMPLEMENTED("confstr"); /* TODO */
-	libc_seterrno(ENOSYS);
-	return 0;
+#define DEFINE_STRING(name, text) \
+	PRIVATE ATTR_SECTION(".rodata.crt.system.configuration.confstr_" #name) char const name[] = text
+	size_t result;
+	DEFINE_STRING(empty_string, "");
+	char const *result_string = empty_string;
+	switch (name) {
+
+	case _CS_PATH: {
+		DEFINE_STRING(cs_path, _PATH_DEFPATH);
+		result_string = cs_path;
+	}	break;
+
+#define _CS_GNU_LIBC_VERSION                     2
+#define _CS_GNU_LIBPTHREAD_VERSION               3
+
+#define _CS_V6_WIDTH_RESTRICTED_ENVS             1
+#define _CS_V5_WIDTH_RESTRICTED_ENVS             4
+#define _CS_V7_WIDTH_RESTRICTED_ENVS             5
+#define _CS_XBS5_ILP32_OFF32_CFLAGS              1100
+#define _CS_XBS5_ILP32_OFF32_LDFLAGS             1101
+#define _CS_XBS5_ILP32_OFFBIG_CFLAGS             1104
+#define _CS_XBS5_ILP32_OFFBIG_LDFLAGS            1105
+#define _CS_XBS5_LP64_OFF64_CFLAGS               1108
+#define _CS_XBS5_LP64_OFF64_LDFLAGS              1109
+#define _CS_POSIX_V6_ILP32_OFF32_CFLAGS          1116
+#define _CS_POSIX_V6_ILP32_OFF32_LDFLAGS         1117
+#define _CS_POSIX_V6_ILP32_OFFBIG_CFLAGS         1120
+#define _CS_POSIX_V6_ILP32_OFFBIG_LDFLAGS        1121
+#define _CS_POSIX_V6_LP64_OFF64_CFLAGS           1124
+#define _CS_POSIX_V6_LP64_OFF64_LDFLAGS          1125
+#define _CS_POSIX_V7_ILP32_OFF32_CFLAGS          1132
+#define _CS_POSIX_V7_ILP32_OFF32_LDFLAGS         1133
+#define _CS_POSIX_V7_ILP32_OFFBIG_CFLAGS         1136
+#define _CS_POSIX_V7_ILP32_OFFBIG_LDFLAGS        1137
+#define _CS_POSIX_V7_LP64_OFF64_CFLAGS           1140
+#define _CS_POSIX_V7_LP64_OFF64_LDFLAGS          1141
+
+	case _CS_LFS_CFLAGS:
+	case _CS_LFS_LINTFLAGS: {
+		DEFINE_STRING(define_LFS, "-D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64");
+		result_string = define_LFS;
+	}	break;
+
+	case _CS_LFS64_CFLAGS:
+	case _CS_LFS64_LINTFLAGS: {
+		DEFINE_STRING(define_LFS64, "-D_LARGEFILE64_SOURCE");
+		result_string = define_LFS64;
+	}	break;
+
+	case _CS_LFS_LDFLAGS:
+	case _CS_LFS_LIBS:
+	case _CS_LFS64_LDFLAGS:
+	case _CS_LFS64_LIBS:
+	case _CS_XBS5_ILP32_OFF32_LIBS:
+	case _CS_XBS5_ILP32_OFF32_LINTFLAGS:
+	case _CS_XBS5_ILP32_OFFBIG_LIBS:
+	case _CS_XBS5_ILP32_OFFBIG_LINTFLAGS:
+	case _CS_XBS5_LP64_OFF64_LIBS:
+	case _CS_XBS5_LP64_OFF64_LINTFLAGS:
+	case _CS_XBS5_LPBIG_OFFBIG_CFLAGS:
+	case _CS_XBS5_LPBIG_OFFBIG_LDFLAGS:
+	case _CS_XBS5_LPBIG_OFFBIG_LIBS:
+	case _CS_XBS5_LPBIG_OFFBIG_LINTFLAGS:
+	case _CS_POSIX_V6_ILP32_OFF32_LIBS:
+	case _CS_POSIX_V6_ILP32_OFF32_LINTFLAGS:
+	case _CS_POSIX_V6_ILP32_OFFBIG_LIBS:
+	case _CS_POSIX_V6_ILP32_OFFBIG_LINTFLAGS:
+	case _CS_POSIX_V6_LP64_OFF64_LIBS:
+	case _CS_POSIX_V6_LP64_OFF64_LINTFLAGS:
+	case _CS_POSIX_V6_LPBIG_OFFBIG_CFLAGS:
+	case _CS_POSIX_V6_LPBIG_OFFBIG_LDFLAGS:
+	case _CS_POSIX_V6_LPBIG_OFFBIG_LIBS:
+	case _CS_POSIX_V6_LPBIG_OFFBIG_LINTFLAGS:
+	case _CS_POSIX_V7_ILP32_OFF32_LIBS:
+	case _CS_POSIX_V7_ILP32_OFF32_LINTFLAGS:
+	case _CS_POSIX_V7_ILP32_OFFBIG_LIBS:
+	case _CS_POSIX_V7_ILP32_OFFBIG_LINTFLAGS:
+	case _CS_POSIX_V7_LP64_OFF64_LIBS:
+	case _CS_POSIX_V7_LP64_OFF64_LINTFLAGS:
+	case _CS_POSIX_V7_LPBIG_OFFBIG_CFLAGS:
+	case _CS_POSIX_V7_LPBIG_OFFBIG_LDFLAGS:
+	case _CS_POSIX_V7_LPBIG_OFFBIG_LIBS:
+	case _CS_POSIX_V7_LPBIG_OFFBIG_LINTFLAGS:
+		break;
+
+	case _CS_V6_ENV:
+	case _CS_V7_ENV: {
+		DEFINE_STRING(cs_v67_env, "POSIXLY_CORRECT=1");
+		result_string = cs_v67_env;
+	}	break;
+
+	default:
+		libc_seterrno(EINVAL);
+		return 0;
+	}
+	result = strlen(result_string) + 1;
+	if (buflen && buf) {
+		if (buflen >= result) {
+			memcpy(buf, result_string, result * sizeof(char));
+		} else {
+			memcpy(buf, result_string, (buflen - 1) * sizeof(char));
+			buf[buflen - 1] = '\0';
+		}
+	}
+	return result;
 }
 /*[[[end:confstr]]]*/
 

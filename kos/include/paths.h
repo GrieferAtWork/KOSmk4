@@ -62,6 +62,11 @@ __SYSDECL_BEGIN
 #   define _PATH_STDPATH  "/bin:/usr/sbin:/sbin" /* All standard utilities path. */
 #   define _PATH_MAILDIR  "/var/spool/mail/"
 #   define _PATH_VI       "/bin/vi"
+#elif defined(__KOS__)
+#   define _PATH_DEFPATH  "/bin:/usr/bin" /* Default search path. */
+#   define _PATH_STDPATH  "/bin:/usr/bin:/usr/sbin:/sbin" /* All standard utilities path. */
+#   define _PATH_MAILDIR  "/var/mail"
+#   define _PATH_VI       "/bin/vi"
 #else
 #   define _PATH_DEFPATH  "/usr/bin:/bin" /* Default search path. */
 #   define _PATH_STDPATH  "/usr/bin:/bin:/usr/sbin:/sbin" /* All standard utilities path. */
