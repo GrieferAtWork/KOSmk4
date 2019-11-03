@@ -258,7 +258,6 @@ NOTHROW_NCX(LIBCCALL libc_futexlock_wakeall)(lfutex_t *ulockaddr)
 		return 0; /* No waiting threads. */
 	if (!(__hybrid_atomic_fetchand(*ulockaddr, ~LFUTEX_WAIT_LOCK_WAITERS, __ATOMIC_SEQ_CST) & LFUTEX_WAIT_LOCK_WAITERS))
 		return 0; /* No waiting threads. */
-	return futex_wakeall(ulockaddr);
 	result = sys_lfutex(ulockaddr, LFUTEX_WAKE, (uintptr_t)-1, NULL, 0);
 	return libc_seterrno_syserr(result);
 }
