@@ -16,6 +16,7 @@ KOSmk4 no longer is a small kernel. I'd say it has reached the point of really b
 - [Notes on building KOS](#building-notes)
 - [Building & using Bochs to run KOS](#bochs)
 - [Automatic System Headers](#headers)
+- [GPL Licensing](#gpl)
 
 
 <a name="applications"></a>
@@ -693,3 +694,23 @@ Lastly, if there ever ends up being some gaping flaw in how KOS defines function
 
 
 
+
+
+<a name="gpl"></a>
+## GPL Licensing
+
+WARNING: NOTHING IN THE FOLLOWING SECTION IS LEGAL ADVICE, OR MAY BE CONSIDERED AS LEGALLY BINDING IN ANY SORT OF COURT! IT'S ONLY PURPOSE IS TO HELP CLARIFY HOW TO DEAL WITH CODE THAT IS LICENSED DIFFERENTLY!
+
+Certain components of KOS, its (system-)headers, libraries, or some other component found as part of its source tree, as one is presented with in whatever form of distribution you may encouter it (KOS's source tree) in, may contain certain parts that are not necessarily licensed under the ZLib license (the ZLib license being the primary license under which all of the ~new~ (as in: specifically written for the purpose of use with KOS) code falls)
+
+One example for this would be the implementation of the libc function `qsort()`, as exported from the header `<stdlib.h>`, who's implementation has been lifted from GLibc (which is not licensed under ZLib, and as such requires derived code's direct (as in: static inclusion during linking, or automatic inline substitution during compilation, as opposed to dynamic linking at runtime) use in any derived software to also comply with its (GLibc's) license agreement)
+
+For this purpose, note that the ZLib license is compatible with GPL (which is the license that applies to the aformentioned `qsort()` function), meaning that use of KOS in its entirety in any product requires that product to comply with the requirements of both GPL, as well as ZLib.
+
+For the purpose of using only parts of KOS (such as copy-pasting a piece of KOS-specific code), it is usually sufficient to include a copy of the copyright notice that should be found in either the original source file, or can also be found at the top of this file, as well as include a reference (e.g. a link) to the original source, and document the fact if changes have been made. However, once any code is included that is not part of the aformentioned KOS-specific (~new~) code (such code is plainly marked as such), you once again will have to comply to its specific copyright requirements as well.
+
+Note that for this purpose, GPL was only mentioned as an example, but not as the rule, as other pieces of code may exist that use different licenses yet.
+
+In practice this means that the KOS source tree, and its repository are required to remain open-source forever, thus complying with GPL, however other projects are allowed to lift KOS-specific code (and KOS-specific code only), and only have to comply with requirements stated by the ZLib license. (e.g. You could steal my pageframe allocator system and use it in a commercial kernel, so-long as you neither claim to have written it yourself, and as an extension: don't claim to have written everything in your project yourself, as well as take the blame when it does end up breaking for some reason at some point)
+
+Another important distinction applies to GPL code that has been modified for the purpose of being made functional with KOS. Such code will always be marked as such and must be handled as falling under both the GPL, and the ZLib license, meaning that it, too, has to remain open-source, may not end up being used in commercial products, and any further changes made to it in the context of other projects will also have to be marked as such (in this case it sufficies to include all pre-exting copyright notices, before adding your own (GPL- and ZLib-compatible) license alongside a comment stating something something along the lines of `Originally lifted from https://github.com/GrieferAtWork/KOSmk4/..., before changes were made to the original source material`) The exact changes are not required to be marked on a per-line basis, since the inclusion of a reference to the original source would allow one to perform a diff between the two versions to determine changes made.
