@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb6047522 */
+/* HASH CRC-32:0xe144c9ec */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -109,190 +109,195 @@
 #define __CRT_SECTINFO_dos_wchar_FILE_unlocked_write_putc       (87, .dos.wchar.FILE.unlocked.write.putc, dos_wchar_FILE_unlocked_write_putc)
 #define __CRT_SECTINFO_dos_wchar_FILE_unlocked_write_write      (88, .dos.wchar.FILE.unlocked.write.write, dos_wchar_FILE_unlocked_write_write)
 #define __CRT_SECTINFO_dos_wchar_errno                          (89, .dos.wchar.errno, dos_wchar_errno)
-#define __CRT_SECTINFO_dos_wchar_fs_exec_exec                   (90, .dos.wchar.fs.exec.exec, dos_wchar_fs_exec_exec)
-#define __CRT_SECTINFO_dos_wchar_fs_exec_spawn                  (91, .dos.wchar.fs.exec.spawn, dos_wchar_fs_exec_spawn)
-#define __CRT_SECTINFO_dos_wchar_fs_exec_system                 (92, .dos.wchar.fs.exec.system, dos_wchar_fs_exec_system)
-#define __CRT_SECTINFO_dos_wchar_fs_modify_time                 (93, .dos.wchar.fs.modify_time, dos_wchar_fs_modify_time)
-#define __CRT_SECTINFO_dos_wchar_fs_stat                        (94, .dos.wchar.fs.stat, dos_wchar_fs_stat)
-#define __CRT_SECTINFO_dos_wchar_heap_strdup                    (95, .dos.wchar.heap.strdup, dos_wchar_heap_strdup)
-#define __CRT_SECTINFO_dos_wchar_string_format                  (96, .dos.wchar.string.format, dos_wchar_string_format)
-#define __CRT_SECTINFO_dos_wchar_string_memory                  (97, .dos.wchar.string.memory, dos_wchar_string_memory)
-#define __CRT_SECTINFO_dos_wchar_unicode_convert                (98, .dos.wchar.unicode.convert, dos_wchar_unicode_convert)
-#define __CRT_SECTINFO_dos_wchar_unicode_locale_convert         (99, .dos.wchar.unicode.locale.convert, dos_wchar_unicode_locale_convert)
-#define __CRT_SECTINFO_dos_wchar_unicode_locale_format_strftime (100, .dos.wchar.unicode.locale.format.strftime, dos_wchar_unicode_locale_format_strftime)
-#define __CRT_SECTINFO_dos_wchar_unicode_locale_memory          (101, .dos.wchar.unicode.locale.memory, dos_wchar_unicode_locale_memory)
-#define __CRT_SECTINFO_dos_wchar_unicode_static_convert         (102, .dos.wchar.unicode.static.convert, dos_wchar_unicode_static_convert)
-#define __CRT_SECTINFO_dos_wchar_unicode_static_format_printf   (103, .dos.wchar.unicode.static.format.printf, dos_wchar_unicode_static_format_printf)
-#define __CRT_SECTINFO_dos_wchar_unicode_static_format_scanf    (104, .dos.wchar.unicode.static.format.scanf, dos_wchar_unicode_static_format_scanf)
-#define __CRT_SECTINFO_dos_wchar_unicode_static_format_strftime (105, .dos.wchar.unicode.static.format.strftime, dos_wchar_unicode_static_format_strftime)
-#define __CRT_SECTINFO_dos_wchar_unicode_static_mbs             (106, .dos.wchar.unicode.static.mbs, dos_wchar_unicode_static_mbs)
-#define __CRT_SECTINFO_dos_wchar_unicode_static_memory          (107, .dos.wchar.unicode.static.memory, dos_wchar_unicode_static_memory)
-#define __CRT_SECTINFO_errno                                    (108, .errno, errno)
-#define __CRT_SECTINFO_errno_access                             (109, .errno_access, errno_access)
-#define __CRT_SECTINFO_except_fs_basic_property                 (110, .except.fs.basic_property, except_fs_basic_property)
-#define __CRT_SECTINFO_except_fs_exec_exec                      (111, .except.fs.exec.exec, except_fs_exec_exec)
-#define __CRT_SECTINFO_except_fs_modify                         (112, .except.fs.modify, except_fs_modify)
-#define __CRT_SECTINFO_except_fs_modify_time                    (113, .except.fs.modify_time, except_fs_modify_time)
-#define __CRT_SECTINFO_except_fs_property                       (114, .except.fs.property, except_fs_property)
-#define __CRT_SECTINFO_except_fs_stat                           (115, .except.fs.stat, except_fs_stat)
-#define __CRT_SECTINFO_except_fs_utility                        (116, .except.fs.utility, except_fs_utility)
-#define __CRT_SECTINFO_except_heap_malloc                       (117, .except.heap.malloc, except_heap_malloc)
-#define __CRT_SECTINFO_except_heap_rare_helpers                 (118, .except.heap.rare_helpers, except_heap_rare_helpers)
-#define __CRT_SECTINFO_except_io_access                         (119, .except.io.access, except_io_access)
-#define __CRT_SECTINFO_except_io_large_read                     (120, .except.io.large.read, except_io_large_read)
-#define __CRT_SECTINFO_except_io_large_seek                     (121, .except.io.large.seek, except_io_large_seek)
-#define __CRT_SECTINFO_except_io_large_write                    (122, .except.io.large.write, except_io_large_write)
-#define __CRT_SECTINFO_except_io_read                           (123, .except.io.read, except_io_read)
-#define __CRT_SECTINFO_except_io_seek                           (124, .except.io.seek, except_io_seek)
-#define __CRT_SECTINFO_except_io_sync                           (125, .except.io.sync, except_io_sync)
-#define __CRT_SECTINFO_except_io_utility                        (126, .except.io.utility, except_io_utility)
-#define __CRT_SECTINFO_except_io_write                          (127, .except.io.write, except_io_write)
-#define __CRT_SECTINFO_except_sched_access                      (128, .except.sched.access, except_sched_access)
-#define __CRT_SECTINFO_except_sched_param                       (129, .except.sched.param, except_sched_param)
-#define __CRT_SECTINFO_except_sched_process                     (130, .except.sched.process, except_sched_process)
-#define __CRT_SECTINFO_except_sched_user                        (131, .except.sched.user, except_sched_user)
-#define __CRT_SECTINFO_except_system_configuration              (132, .except.system.configuration, except_system_configuration)
-#define __CRT_SECTINFO_except_system_utility                    (133, .except.system.utility, except_system_utility)
-#define __CRT_SECTINFO_fs_basic_property                        (134, .fs.basic_property, fs_basic_property)
-#define __CRT_SECTINFO_fs_dir                                   (135, .fs.dir, fs_dir)
-#define __CRT_SECTINFO_fs_environ                               (136, .fs.environ, fs_environ)
-#define __CRT_SECTINFO_fs_exec_exec                             (137, .fs.exec.exec, fs_exec_exec)
-#define __CRT_SECTINFO_fs_exec_posix_spawn                      (138, .fs.exec.posix_spawn, fs_exec_posix_spawn)
-#define __CRT_SECTINFO_fs_exec_spawn                            (139, .fs.exec.spawn, fs_exec_spawn)
-#define __CRT_SECTINFO_fs_exec_system                           (140, .fs.exec.system, fs_exec_system)
-#define __CRT_SECTINFO_fs_modify                                (141, .fs.modify, fs_modify)
-#define __CRT_SECTINFO_fs_modify_time                           (142, .fs.modify_time, fs_modify_time)
-#define __CRT_SECTINFO_fs_mount                                 (143, .fs.mount, fs_mount)
-#define __CRT_SECTINFO_fs_property                              (144, .fs.property, fs_property)
-#define __CRT_SECTINFO_fs_stat                                  (145, .fs.stat, fs_stat)
-#define __CRT_SECTINFO_fs_stat_glc                              (146, .fs.stat_glc, fs_stat_glc)
-#define __CRT_SECTINFO_fs_statfs_statfs                         (147, .fs.statfs.statfs, fs_statfs_statfs)
-#define __CRT_SECTINFO_fs_statfs_statvfs                        (148, .fs.statfs.statvfs, fs_statfs_statvfs)
-#define __CRT_SECTINFO_fs_swap                                  (149, .fs.swap, fs_swap)
-#define __CRT_SECTINFO_fs_utility                               (150, .fs.utility, fs_utility)
-#define __CRT_SECTINFO_heap_helpers                             (151, .heap.helpers, heap_helpers)
-#define __CRT_SECTINFO_heap_malloc                              (152, .heap.malloc, heap_malloc)
-#define __CRT_SECTINFO_heap_mman                                (153, .heap.mman, heap_mman)
-#define __CRT_SECTINFO_heap_rare_helpers                        (154, .heap.rare_helpers, heap_rare_helpers)
-#define __CRT_SECTINFO_heap_strdup                              (155, .heap.strdup, heap_strdup)
-#define __CRT_SECTINFO_heap_utility                             (156, .heap.utility, heap_utility)
-#define __CRT_SECTINFO_io_access                                (157, .io.access, io_access)
-#define __CRT_SECTINFO_io_large_lock                            (158, .io.large.lock, io_large_lock)
-#define __CRT_SECTINFO_io_large_read                            (159, .io.large.read, io_large_read)
-#define __CRT_SECTINFO_io_large_seek                            (160, .io.large.seek, io_large_seek)
-#define __CRT_SECTINFO_io_large_utility                         (161, .io.large.utility, io_large_utility)
-#define __CRT_SECTINFO_io_large_write                           (162, .io.large.write, io_large_write)
-#define __CRT_SECTINFO_io_lock                                  (163, .io.lock, io_lock)
-#define __CRT_SECTINFO_io_poll                                  (164, .io.poll, io_poll)
-#define __CRT_SECTINFO_io_read                                  (165, .io.read, io_read)
-#define __CRT_SECTINFO_io_seek                                  (166, .io.seek, io_seek)
-#define __CRT_SECTINFO_io_stropts                               (167, .io.stropts, io_stropts)
-#define __CRT_SECTINFO_io_sync                                  (168, .io.sync, io_sync)
-#define __CRT_SECTINFO_io_tty                                   (169, .io.tty, io_tty)
-#define __CRT_SECTINFO_io_utility                               (170, .io.utility, io_utility)
-#define __CRT_SECTINFO_io_write                                 (171, .io.write, io_write)
-#define __CRT_SECTINFO_math_fenv                                (172, .math.fenv, math_fenv)
-#define __CRT_SECTINFO_math_float                               (173, .math.float, math_float)
-#define __CRT_SECTINFO_math_math                                (174, .math.math, math_math)
-#define __CRT_SECTINFO_math_utility                             (175, .math.utility, math_utility)
-#define __CRT_SECTINFO_net_convert                              (176, .net.convert, net_convert)
-#define __CRT_SECTINFO_net_db                                   (177, .net.db, net_db)
-#define __CRT_SECTINFO_net_ether                                (178, .net.ether, net_ether)
-#define __CRT_SECTINFO_net_inet                                 (179, .net.inet, net_inet)
-#define __CRT_SECTINFO_net_inet_6_RFC_2292                      (180, .net.inet.6.RFC_2292, net_inet_6_RFC_2292)
-#define __CRT_SECTINFO_net_inet_6_RFC_3542                      (181, .net.inet.6.RFC_3542, net_inet_6_RFC_3542)
-#define __CRT_SECTINFO_net_inet_6_bind_reserved                 (182, .net.inet.6.bind_reserved, net_inet_6_bind_reserved)
-#define __CRT_SECTINFO_net_inet_6_ipv4_source_filter            (183, .net.inet.6.ipv4_source_filter, net_inet_6_ipv4_source_filter)
-#define __CRT_SECTINFO_net_inet_6_source_filter                 (184, .net.inet.6.source_filter, net_inet_6_source_filter)
-#define __CRT_SECTINFO_net_interface                            (185, .net.interface, net_interface)
-#define __CRT_SECTINFO_net_rpc                                  (186, .net.rpc, net_rpc)
-#define __CRT_SECTINFO_net_socket                               (187, .net.socket, net_socket)
-#define __CRT_SECTINFO_obstack                                  (188, .obstack, obstack)
-#define __CRT_SECTINFO_random                                   (189, .random, random)
-#define __CRT_SECTINFO_sched_access                             (190, .sched.access, sched_access)
-#define __CRT_SECTINFO_sched_eventfd                            (191, .sched.eventfd, sched_eventfd)
-#define __CRT_SECTINFO_sched_futex                              (192, .sched.futex, sched_futex)
-#define __CRT_SECTINFO_sched_futexexpr                          (193, .sched.futexexpr, sched_futexexpr)
-#define __CRT_SECTINFO_sched_futexlock                          (194, .sched.futexlock, sched_futexlock)
-#define __CRT_SECTINFO_sched_futexlockexpr                      (195, .sched.futexlockexpr, sched_futexlockexpr)
-#define __CRT_SECTINFO_sched_msg                                (196, .sched.msg, sched_msg)
-#define __CRT_SECTINFO_sched_param                              (197, .sched.param, sched_param)
-#define __CRT_SECTINFO_sched_process                            (198, .sched.process, sched_process)
-#define __CRT_SECTINFO_sched_pthread                            (199, .sched.pthread, sched_pthread)
-#define __CRT_SECTINFO_sched_resource                           (200, .sched.resource, sched_resource)
-#define __CRT_SECTINFO_sched_semaphore                          (201, .sched.semaphore, sched_semaphore)
-#define __CRT_SECTINFO_sched_signal                             (202, .sched.signal, sched_signal)
-#define __CRT_SECTINFO_sched_signalfd                           (203, .sched.signalfd, sched_signalfd)
-#define __CRT_SECTINFO_sched_thread                             (204, .sched.thread, sched_thread)
-#define __CRT_SECTINFO_sched_threads                            (205, .sched.threads, sched_threads)
-#define __CRT_SECTINFO_sched_user                               (206, .sched.user, sched_user)
-#define __CRT_SECTINFO_sched_utility                            (207, .sched.utility, sched_utility)
-#define __CRT_SECTINFO_string_encrypt                           (208, .string.encrypt, string_encrypt)
-#define __CRT_SECTINFO_string_format                            (209, .string.format, string_format)
-#define __CRT_SECTINFO_string_match                             (210, .string.match, string_match)
-#define __CRT_SECTINFO_string_memory                            (211, .string.memory, string_memory)
-#define __CRT_SECTINFO_system                                   (212, .system, system)
-#define __CRT_SECTINFO_system_adjtime                           (213, .system.adjtime, system_adjtime)
-#define __CRT_SECTINFO_system_configuration                     (214, .system.configuration, system_configuration)
-#define __CRT_SECTINFO_system_info                              (215, .system.info, system_info)
-#define __CRT_SECTINFO_system_mman                              (216, .system.mman, system_mman)
-#define __CRT_SECTINFO_system_ptrace                            (217, .system.ptrace, system_ptrace)
-#define __CRT_SECTINFO_system_reboot                            (218, .system.reboot, system_reboot)
-#define __CRT_SECTINFO_system_syslog                            (219, .system.syslog, system_syslog)
-#define __CRT_SECTINFO_system_utility                           (220, .system.utility, system_utility)
-#define __CRT_SECTINFO_time                                     (221, .time, time)
-#define __CRT_SECTINFO_timer                                    (222, .timer, timer)
-#define __CRT_SECTINFO_unicode_UTF                              (223, .unicode.UTF, unicode_UTF)
-#define __CRT_SECTINFO_unicode_locale_convert                   (224, .unicode.locale.convert, unicode_locale_convert)
-#define __CRT_SECTINFO_unicode_locale_ctype                     (225, .unicode.locale.ctype, unicode_locale_ctype)
-#define __CRT_SECTINFO_unicode_locale_memory                    (226, .unicode.locale.memory, unicode_locale_memory)
-#define __CRT_SECTINFO_unicode_mbr                              (227, .unicode.mbr, unicode_mbr)
-#define __CRT_SECTINFO_unicode_static_convert                   (228, .unicode.static.convert, unicode_static_convert)
-#define __CRT_SECTINFO_unicode_static_ctype                     (229, .unicode.static.ctype, unicode_static_ctype)
-#define __CRT_SECTINFO_unicode_static_format_printf             (230, .unicode.static.format.printf, unicode_static_format_printf)
-#define __CRT_SECTINFO_unicode_static_format_scanf              (231, .unicode.static.format.scanf, unicode_static_format_scanf)
-#define __CRT_SECTINFO_unicode_static_memory                    (232, .unicode.static.memory, unicode_static_memory)
-#define __CRT_SECTINFO_unsorted                                 (233, .unsorted, unsorted)
-#define __CRT_SECTINFO_utility_glob                             (234, .utility.glob, utility_glob)
-#define __CRT_SECTINFO_utility_klog                             (235, .utility.klog, utility_klog)
-#define __CRT_SECTINFO_utility_regex                            (236, .utility.regex, utility_regex)
-#define __CRT_SECTINFO_utility_search                           (237, .utility.search, utility_search)
-#define __CRT_SECTINFO_utility_shm                              (238, .utility.shm, utility_shm)
-#define __CRT_SECTINFO_utility_stdlib                           (239, .utility.stdlib, utility_stdlib)
-#define __CRT_SECTINFO_wchar_FILE_locked_access                 (240, .wchar.FILE.locked.access, wchar_FILE_locked_access)
-#define __CRT_SECTINFO_wchar_FILE_locked_read_getc              (241, .wchar.FILE.locked.read.getc, wchar_FILE_locked_read_getc)
-#define __CRT_SECTINFO_wchar_FILE_locked_read_read              (242, .wchar.FILE.locked.read.read, wchar_FILE_locked_read_read)
-#define __CRT_SECTINFO_wchar_FILE_locked_read_scanf             (243, .wchar.FILE.locked.read.scanf, wchar_FILE_locked_read_scanf)
-#define __CRT_SECTINFO_wchar_FILE_locked_utility                (244, .wchar.FILE.locked.utility, wchar_FILE_locked_utility)
-#define __CRT_SECTINFO_wchar_FILE_locked_write_printf           (245, .wchar.FILE.locked.write.printf, wchar_FILE_locked_write_printf)
-#define __CRT_SECTINFO_wchar_FILE_locked_write_putc             (246, .wchar.FILE.locked.write.putc, wchar_FILE_locked_write_putc)
-#define __CRT_SECTINFO_wchar_FILE_locked_write_write            (247, .wchar.FILE.locked.write.write, wchar_FILE_locked_write_write)
-#define __CRT_SECTINFO_wchar_FILE_unlocked_read_getc            (248, .wchar.FILE.unlocked.read.getc, wchar_FILE_unlocked_read_getc)
-#define __CRT_SECTINFO_wchar_FILE_unlocked_read_read            (249, .wchar.FILE.unlocked.read.read, wchar_FILE_unlocked_read_read)
-#define __CRT_SECTINFO_wchar_FILE_unlocked_read_scanf           (250, .wchar.FILE.unlocked.read.scanf, wchar_FILE_unlocked_read_scanf)
-#define __CRT_SECTINFO_wchar_FILE_unlocked_write_printf         (251, .wchar.FILE.unlocked.write.printf, wchar_FILE_unlocked_write_printf)
-#define __CRT_SECTINFO_wchar_FILE_unlocked_write_putc           (252, .wchar.FILE.unlocked.write.putc, wchar_FILE_unlocked_write_putc)
-#define __CRT_SECTINFO_wchar_FILE_unlocked_write_write          (253, .wchar.FILE.unlocked.write.write, wchar_FILE_unlocked_write_write)
-#define __CRT_SECTINFO_wchar_fs_exec_exec                       (254, .wchar.fs.exec.exec, wchar_fs_exec_exec)
-#define __CRT_SECTINFO_wchar_fs_exec_spawn                      (255, .wchar.fs.exec.spawn, wchar_fs_exec_spawn)
-#define __CRT_SECTINFO_wchar_fs_exec_system                     (256, .wchar.fs.exec.system, wchar_fs_exec_system)
-#define __CRT_SECTINFO_wchar_fs_modify_time                     (257, .wchar.fs.modify_time, wchar_fs_modify_time)
-#define __CRT_SECTINFO_wchar_heap_strdup                        (258, .wchar.heap.strdup, wchar_heap_strdup)
-#define __CRT_SECTINFO_wchar_string_format                      (259, .wchar.string.format, wchar_string_format)
-#define __CRT_SECTINFO_wchar_string_memory                      (260, .wchar.string.memory, wchar_string_memory)
-#define __CRT_SECTINFO_wchar_unicode_convert                    (261, .wchar.unicode.convert, wchar_unicode_convert)
-#define __CRT_SECTINFO_wchar_unicode_locale_convert             (262, .wchar.unicode.locale.convert, wchar_unicode_locale_convert)
-#define __CRT_SECTINFO_wchar_unicode_locale_ctype               (263, .wchar.unicode.locale.ctype, wchar_unicode_locale_ctype)
-#define __CRT_SECTINFO_wchar_unicode_locale_format_strftime     (264, .wchar.unicode.locale.format.strftime, wchar_unicode_locale_format_strftime)
-#define __CRT_SECTINFO_wchar_unicode_locale_mbs                 (265, .wchar.unicode.locale.mbs, wchar_unicode_locale_mbs)
-#define __CRT_SECTINFO_wchar_unicode_locale_memory              (266, .wchar.unicode.locale.memory, wchar_unicode_locale_memory)
-#define __CRT_SECTINFO_wchar_unicode_static_convert             (267, .wchar.unicode.static.convert, wchar_unicode_static_convert)
-#define __CRT_SECTINFO_wchar_unicode_static_ctype               (268, .wchar.unicode.static.ctype, wchar_unicode_static_ctype)
-#define __CRT_SECTINFO_wchar_unicode_static_format_printf       (269, .wchar.unicode.static.format.printf, wchar_unicode_static_format_printf)
-#define __CRT_SECTINFO_wchar_unicode_static_format_scanf        (270, .wchar.unicode.static.format.scanf, wchar_unicode_static_format_scanf)
-#define __CRT_SECTINFO_wchar_unicode_static_format_strftime     (271, .wchar.unicode.static.format.strftime, wchar_unicode_static_format_strftime)
-#define __CRT_SECTINFO_wchar_unicode_static_mbs                 (272, .wchar.unicode.static.mbs, wchar_unicode_static_mbs)
-#define __CRT_SECTINFO_wchar_unicode_static_memory              (273, .wchar.unicode.static.memory, wchar_unicode_static_memory)
+#define __CRT_SECTINFO_dos_wchar_errno_utility                  (90, .dos.wchar.errno.utility, dos_wchar_errno_utility)
+#define __CRT_SECTINFO_dos_wchar_fs_exec_exec                   (91, .dos.wchar.fs.exec.exec, dos_wchar_fs_exec_exec)
+#define __CRT_SECTINFO_dos_wchar_fs_exec_spawn                  (92, .dos.wchar.fs.exec.spawn, dos_wchar_fs_exec_spawn)
+#define __CRT_SECTINFO_dos_wchar_fs_exec_system                 (93, .dos.wchar.fs.exec.system, dos_wchar_fs_exec_system)
+#define __CRT_SECTINFO_dos_wchar_fs_modify                      (94, .dos.wchar.fs.modify, dos_wchar_fs_modify)
+#define __CRT_SECTINFO_dos_wchar_fs_modify_time                 (95, .dos.wchar.fs.modify_time, dos_wchar_fs_modify_time)
+#define __CRT_SECTINFO_dos_wchar_fs_stat                        (96, .dos.wchar.fs.stat, dos_wchar_fs_stat)
+#define __CRT_SECTINFO_dos_wchar_fs_utility                     (97, .dos.wchar.fs.utility, dos_wchar_fs_utility)
+#define __CRT_SECTINFO_dos_wchar_heap_strdup                    (98, .dos.wchar.heap.strdup, dos_wchar_heap_strdup)
+#define __CRT_SECTINFO_dos_wchar_string_format                  (99, .dos.wchar.string.format, dos_wchar_string_format)
+#define __CRT_SECTINFO_dos_wchar_string_memory                  (100, .dos.wchar.string.memory, dos_wchar_string_memory)
+#define __CRT_SECTINFO_dos_wchar_unicode_convert                (101, .dos.wchar.unicode.convert, dos_wchar_unicode_convert)
+#define __CRT_SECTINFO_dos_wchar_unicode_locale_convert         (102, .dos.wchar.unicode.locale.convert, dos_wchar_unicode_locale_convert)
+#define __CRT_SECTINFO_dos_wchar_unicode_locale_format_strftime (103, .dos.wchar.unicode.locale.format.strftime, dos_wchar_unicode_locale_format_strftime)
+#define __CRT_SECTINFO_dos_wchar_unicode_locale_memory          (104, .dos.wchar.unicode.locale.memory, dos_wchar_unicode_locale_memory)
+#define __CRT_SECTINFO_dos_wchar_unicode_static_convert         (105, .dos.wchar.unicode.static.convert, dos_wchar_unicode_static_convert)
+#define __CRT_SECTINFO_dos_wchar_unicode_static_format_printf   (106, .dos.wchar.unicode.static.format.printf, dos_wchar_unicode_static_format_printf)
+#define __CRT_SECTINFO_dos_wchar_unicode_static_format_scanf    (107, .dos.wchar.unicode.static.format.scanf, dos_wchar_unicode_static_format_scanf)
+#define __CRT_SECTINFO_dos_wchar_unicode_static_format_strftime (108, .dos.wchar.unicode.static.format.strftime, dos_wchar_unicode_static_format_strftime)
+#define __CRT_SECTINFO_dos_wchar_unicode_static_mbs             (109, .dos.wchar.unicode.static.mbs, dos_wchar_unicode_static_mbs)
+#define __CRT_SECTINFO_dos_wchar_unicode_static_memory          (110, .dos.wchar.unicode.static.memory, dos_wchar_unicode_static_memory)
+#define __CRT_SECTINFO_errno                                    (111, .errno, errno)
+#define __CRT_SECTINFO_errno_utility                            (112, .errno.utility, errno_utility)
+#define __CRT_SECTINFO_errno_access                             (113, .errno_access, errno_access)
+#define __CRT_SECTINFO_except_fs_basic_property                 (114, .except.fs.basic_property, except_fs_basic_property)
+#define __CRT_SECTINFO_except_fs_exec_exec                      (115, .except.fs.exec.exec, except_fs_exec_exec)
+#define __CRT_SECTINFO_except_fs_modify                         (116, .except.fs.modify, except_fs_modify)
+#define __CRT_SECTINFO_except_fs_modify_time                    (117, .except.fs.modify_time, except_fs_modify_time)
+#define __CRT_SECTINFO_except_fs_property                       (118, .except.fs.property, except_fs_property)
+#define __CRT_SECTINFO_except_fs_stat                           (119, .except.fs.stat, except_fs_stat)
+#define __CRT_SECTINFO_except_fs_utility                        (120, .except.fs.utility, except_fs_utility)
+#define __CRT_SECTINFO_except_heap_malloc                       (121, .except.heap.malloc, except_heap_malloc)
+#define __CRT_SECTINFO_except_heap_rare_helpers                 (122, .except.heap.rare_helpers, except_heap_rare_helpers)
+#define __CRT_SECTINFO_except_io_access                         (123, .except.io.access, except_io_access)
+#define __CRT_SECTINFO_except_io_large_read                     (124, .except.io.large.read, except_io_large_read)
+#define __CRT_SECTINFO_except_io_large_seek                     (125, .except.io.large.seek, except_io_large_seek)
+#define __CRT_SECTINFO_except_io_large_write                    (126, .except.io.large.write, except_io_large_write)
+#define __CRT_SECTINFO_except_io_read                           (127, .except.io.read, except_io_read)
+#define __CRT_SECTINFO_except_io_seek                           (128, .except.io.seek, except_io_seek)
+#define __CRT_SECTINFO_except_io_sync                           (129, .except.io.sync, except_io_sync)
+#define __CRT_SECTINFO_except_io_utility                        (130, .except.io.utility, except_io_utility)
+#define __CRT_SECTINFO_except_io_write                          (131, .except.io.write, except_io_write)
+#define __CRT_SECTINFO_except_sched_access                      (132, .except.sched.access, except_sched_access)
+#define __CRT_SECTINFO_except_sched_param                       (133, .except.sched.param, except_sched_param)
+#define __CRT_SECTINFO_except_sched_process                     (134, .except.sched.process, except_sched_process)
+#define __CRT_SECTINFO_except_sched_user                        (135, .except.sched.user, except_sched_user)
+#define __CRT_SECTINFO_except_system_configuration              (136, .except.system.configuration, except_system_configuration)
+#define __CRT_SECTINFO_except_system_utility                    (137, .except.system.utility, except_system_utility)
+#define __CRT_SECTINFO_fs_basic_property                        (138, .fs.basic_property, fs_basic_property)
+#define __CRT_SECTINFO_fs_dir                                   (139, .fs.dir, fs_dir)
+#define __CRT_SECTINFO_fs_environ                               (140, .fs.environ, fs_environ)
+#define __CRT_SECTINFO_fs_exec_exec                             (141, .fs.exec.exec, fs_exec_exec)
+#define __CRT_SECTINFO_fs_exec_posix_spawn                      (142, .fs.exec.posix_spawn, fs_exec_posix_spawn)
+#define __CRT_SECTINFO_fs_exec_spawn                            (143, .fs.exec.spawn, fs_exec_spawn)
+#define __CRT_SECTINFO_fs_exec_system                           (144, .fs.exec.system, fs_exec_system)
+#define __CRT_SECTINFO_fs_modify                                (145, .fs.modify, fs_modify)
+#define __CRT_SECTINFO_fs_modify_time                           (146, .fs.modify_time, fs_modify_time)
+#define __CRT_SECTINFO_fs_mount                                 (147, .fs.mount, fs_mount)
+#define __CRT_SECTINFO_fs_property                              (148, .fs.property, fs_property)
+#define __CRT_SECTINFO_fs_stat                                  (149, .fs.stat, fs_stat)
+#define __CRT_SECTINFO_fs_stat_glc                              (150, .fs.stat_glc, fs_stat_glc)
+#define __CRT_SECTINFO_fs_statfs_statfs                         (151, .fs.statfs.statfs, fs_statfs_statfs)
+#define __CRT_SECTINFO_fs_statfs_statvfs                        (152, .fs.statfs.statvfs, fs_statfs_statvfs)
+#define __CRT_SECTINFO_fs_swap                                  (153, .fs.swap, fs_swap)
+#define __CRT_SECTINFO_fs_utility                               (154, .fs.utility, fs_utility)
+#define __CRT_SECTINFO_heap_helpers                             (155, .heap.helpers, heap_helpers)
+#define __CRT_SECTINFO_heap_malloc                              (156, .heap.malloc, heap_malloc)
+#define __CRT_SECTINFO_heap_mman                                (157, .heap.mman, heap_mman)
+#define __CRT_SECTINFO_heap_rare_helpers                        (158, .heap.rare_helpers, heap_rare_helpers)
+#define __CRT_SECTINFO_heap_strdup                              (159, .heap.strdup, heap_strdup)
+#define __CRT_SECTINFO_heap_utility                             (160, .heap.utility, heap_utility)
+#define __CRT_SECTINFO_io_access                                (161, .io.access, io_access)
+#define __CRT_SECTINFO_io_large_lock                            (162, .io.large.lock, io_large_lock)
+#define __CRT_SECTINFO_io_large_read                            (163, .io.large.read, io_large_read)
+#define __CRT_SECTINFO_io_large_seek                            (164, .io.large.seek, io_large_seek)
+#define __CRT_SECTINFO_io_large_utility                         (165, .io.large.utility, io_large_utility)
+#define __CRT_SECTINFO_io_large_write                           (166, .io.large.write, io_large_write)
+#define __CRT_SECTINFO_io_lock                                  (167, .io.lock, io_lock)
+#define __CRT_SECTINFO_io_poll                                  (168, .io.poll, io_poll)
+#define __CRT_SECTINFO_io_read                                  (169, .io.read, io_read)
+#define __CRT_SECTINFO_io_seek                                  (170, .io.seek, io_seek)
+#define __CRT_SECTINFO_io_stropts                               (171, .io.stropts, io_stropts)
+#define __CRT_SECTINFO_io_sync                                  (172, .io.sync, io_sync)
+#define __CRT_SECTINFO_io_tty                                   (173, .io.tty, io_tty)
+#define __CRT_SECTINFO_io_utility                               (174, .io.utility, io_utility)
+#define __CRT_SECTINFO_io_write                                 (175, .io.write, io_write)
+#define __CRT_SECTINFO_math_fenv                                (176, .math.fenv, math_fenv)
+#define __CRT_SECTINFO_math_float                               (177, .math.float, math_float)
+#define __CRT_SECTINFO_math_math                                (178, .math.math, math_math)
+#define __CRT_SECTINFO_math_utility                             (179, .math.utility, math_utility)
+#define __CRT_SECTINFO_net_convert                              (180, .net.convert, net_convert)
+#define __CRT_SECTINFO_net_db                                   (181, .net.db, net_db)
+#define __CRT_SECTINFO_net_ether                                (182, .net.ether, net_ether)
+#define __CRT_SECTINFO_net_inet                                 (183, .net.inet, net_inet)
+#define __CRT_SECTINFO_net_inet_6_RFC_2292                      (184, .net.inet.6.RFC_2292, net_inet_6_RFC_2292)
+#define __CRT_SECTINFO_net_inet_6_RFC_3542                      (185, .net.inet.6.RFC_3542, net_inet_6_RFC_3542)
+#define __CRT_SECTINFO_net_inet_6_bind_reserved                 (186, .net.inet.6.bind_reserved, net_inet_6_bind_reserved)
+#define __CRT_SECTINFO_net_inet_6_ipv4_source_filter            (187, .net.inet.6.ipv4_source_filter, net_inet_6_ipv4_source_filter)
+#define __CRT_SECTINFO_net_inet_6_source_filter                 (188, .net.inet.6.source_filter, net_inet_6_source_filter)
+#define __CRT_SECTINFO_net_interface                            (189, .net.interface, net_interface)
+#define __CRT_SECTINFO_net_rpc                                  (190, .net.rpc, net_rpc)
+#define __CRT_SECTINFO_net_socket                               (191, .net.socket, net_socket)
+#define __CRT_SECTINFO_obstack                                  (192, .obstack, obstack)
+#define __CRT_SECTINFO_random                                   (193, .random, random)
+#define __CRT_SECTINFO_sched_access                             (194, .sched.access, sched_access)
+#define __CRT_SECTINFO_sched_eventfd                            (195, .sched.eventfd, sched_eventfd)
+#define __CRT_SECTINFO_sched_futex                              (196, .sched.futex, sched_futex)
+#define __CRT_SECTINFO_sched_futexexpr                          (197, .sched.futexexpr, sched_futexexpr)
+#define __CRT_SECTINFO_sched_futexlock                          (198, .sched.futexlock, sched_futexlock)
+#define __CRT_SECTINFO_sched_futexlockexpr                      (199, .sched.futexlockexpr, sched_futexlockexpr)
+#define __CRT_SECTINFO_sched_msg                                (200, .sched.msg, sched_msg)
+#define __CRT_SECTINFO_sched_param                              (201, .sched.param, sched_param)
+#define __CRT_SECTINFO_sched_process                            (202, .sched.process, sched_process)
+#define __CRT_SECTINFO_sched_pthread                            (203, .sched.pthread, sched_pthread)
+#define __CRT_SECTINFO_sched_resource                           (204, .sched.resource, sched_resource)
+#define __CRT_SECTINFO_sched_semaphore                          (205, .sched.semaphore, sched_semaphore)
+#define __CRT_SECTINFO_sched_signal                             (206, .sched.signal, sched_signal)
+#define __CRT_SECTINFO_sched_signalfd                           (207, .sched.signalfd, sched_signalfd)
+#define __CRT_SECTINFO_sched_thread                             (208, .sched.thread, sched_thread)
+#define __CRT_SECTINFO_sched_threads                            (209, .sched.threads, sched_threads)
+#define __CRT_SECTINFO_sched_user                               (210, .sched.user, sched_user)
+#define __CRT_SECTINFO_sched_utility                            (211, .sched.utility, sched_utility)
+#define __CRT_SECTINFO_string_encrypt                           (212, .string.encrypt, string_encrypt)
+#define __CRT_SECTINFO_string_format                            (213, .string.format, string_format)
+#define __CRT_SECTINFO_string_match                             (214, .string.match, string_match)
+#define __CRT_SECTINFO_string_memory                            (215, .string.memory, string_memory)
+#define __CRT_SECTINFO_system                                   (216, .system, system)
+#define __CRT_SECTINFO_system_adjtime                           (217, .system.adjtime, system_adjtime)
+#define __CRT_SECTINFO_system_configuration                     (218, .system.configuration, system_configuration)
+#define __CRT_SECTINFO_system_info                              (219, .system.info, system_info)
+#define __CRT_SECTINFO_system_mman                              (220, .system.mman, system_mman)
+#define __CRT_SECTINFO_system_ptrace                            (221, .system.ptrace, system_ptrace)
+#define __CRT_SECTINFO_system_reboot                            (222, .system.reboot, system_reboot)
+#define __CRT_SECTINFO_system_syslog                            (223, .system.syslog, system_syslog)
+#define __CRT_SECTINFO_system_utility                           (224, .system.utility, system_utility)
+#define __CRT_SECTINFO_time                                     (225, .time, time)
+#define __CRT_SECTINFO_timer                                    (226, .timer, timer)
+#define __CRT_SECTINFO_unicode_UTF                              (227, .unicode.UTF, unicode_UTF)
+#define __CRT_SECTINFO_unicode_locale_convert                   (228, .unicode.locale.convert, unicode_locale_convert)
+#define __CRT_SECTINFO_unicode_locale_ctype                     (229, .unicode.locale.ctype, unicode_locale_ctype)
+#define __CRT_SECTINFO_unicode_locale_memory                    (230, .unicode.locale.memory, unicode_locale_memory)
+#define __CRT_SECTINFO_unicode_mbr                              (231, .unicode.mbr, unicode_mbr)
+#define __CRT_SECTINFO_unicode_static_convert                   (232, .unicode.static.convert, unicode_static_convert)
+#define __CRT_SECTINFO_unicode_static_ctype                     (233, .unicode.static.ctype, unicode_static_ctype)
+#define __CRT_SECTINFO_unicode_static_format_printf             (234, .unicode.static.format.printf, unicode_static_format_printf)
+#define __CRT_SECTINFO_unicode_static_format_scanf              (235, .unicode.static.format.scanf, unicode_static_format_scanf)
+#define __CRT_SECTINFO_unicode_static_memory                    (236, .unicode.static.memory, unicode_static_memory)
+#define __CRT_SECTINFO_unsorted                                 (237, .unsorted, unsorted)
+#define __CRT_SECTINFO_utility_glob                             (238, .utility.glob, utility_glob)
+#define __CRT_SECTINFO_utility_klog                             (239, .utility.klog, utility_klog)
+#define __CRT_SECTINFO_utility_regex                            (240, .utility.regex, utility_regex)
+#define __CRT_SECTINFO_utility_search                           (241, .utility.search, utility_search)
+#define __CRT_SECTINFO_utility_shm                              (242, .utility.shm, utility_shm)
+#define __CRT_SECTINFO_utility_stdlib                           (243, .utility.stdlib, utility_stdlib)
+#define __CRT_SECTINFO_wchar_FILE_locked_access                 (244, .wchar.FILE.locked.access, wchar_FILE_locked_access)
+#define __CRT_SECTINFO_wchar_FILE_locked_read_getc              (245, .wchar.FILE.locked.read.getc, wchar_FILE_locked_read_getc)
+#define __CRT_SECTINFO_wchar_FILE_locked_read_read              (246, .wchar.FILE.locked.read.read, wchar_FILE_locked_read_read)
+#define __CRT_SECTINFO_wchar_FILE_locked_read_scanf             (247, .wchar.FILE.locked.read.scanf, wchar_FILE_locked_read_scanf)
+#define __CRT_SECTINFO_wchar_FILE_locked_utility                (248, .wchar.FILE.locked.utility, wchar_FILE_locked_utility)
+#define __CRT_SECTINFO_wchar_FILE_locked_write_printf           (249, .wchar.FILE.locked.write.printf, wchar_FILE_locked_write_printf)
+#define __CRT_SECTINFO_wchar_FILE_locked_write_putc             (250, .wchar.FILE.locked.write.putc, wchar_FILE_locked_write_putc)
+#define __CRT_SECTINFO_wchar_FILE_locked_write_write            (251, .wchar.FILE.locked.write.write, wchar_FILE_locked_write_write)
+#define __CRT_SECTINFO_wchar_FILE_unlocked_read_getc            (252, .wchar.FILE.unlocked.read.getc, wchar_FILE_unlocked_read_getc)
+#define __CRT_SECTINFO_wchar_FILE_unlocked_read_read            (253, .wchar.FILE.unlocked.read.read, wchar_FILE_unlocked_read_read)
+#define __CRT_SECTINFO_wchar_FILE_unlocked_read_scanf           (254, .wchar.FILE.unlocked.read.scanf, wchar_FILE_unlocked_read_scanf)
+#define __CRT_SECTINFO_wchar_FILE_unlocked_write_printf         (255, .wchar.FILE.unlocked.write.printf, wchar_FILE_unlocked_write_printf)
+#define __CRT_SECTINFO_wchar_FILE_unlocked_write_putc           (256, .wchar.FILE.unlocked.write.putc, wchar_FILE_unlocked_write_putc)
+#define __CRT_SECTINFO_wchar_FILE_unlocked_write_write          (257, .wchar.FILE.unlocked.write.write, wchar_FILE_unlocked_write_write)
+#define __CRT_SECTINFO_wchar_fs_exec_exec                       (258, .wchar.fs.exec.exec, wchar_fs_exec_exec)
+#define __CRT_SECTINFO_wchar_fs_exec_spawn                      (259, .wchar.fs.exec.spawn, wchar_fs_exec_spawn)
+#define __CRT_SECTINFO_wchar_fs_exec_system                     (260, .wchar.fs.exec.system, wchar_fs_exec_system)
+#define __CRT_SECTINFO_wchar_fs_modify                          (261, .wchar.fs.modify, wchar_fs_modify)
+#define __CRT_SECTINFO_wchar_fs_modify_time                     (262, .wchar.fs.modify_time, wchar_fs_modify_time)
+#define __CRT_SECTINFO_wchar_heap_strdup                        (263, .wchar.heap.strdup, wchar_heap_strdup)
+#define __CRT_SECTINFO_wchar_string_format                      (264, .wchar.string.format, wchar_string_format)
+#define __CRT_SECTINFO_wchar_string_memory                      (265, .wchar.string.memory, wchar_string_memory)
+#define __CRT_SECTINFO_wchar_unicode_convert                    (266, .wchar.unicode.convert, wchar_unicode_convert)
+#define __CRT_SECTINFO_wchar_unicode_locale_convert             (267, .wchar.unicode.locale.convert, wchar_unicode_locale_convert)
+#define __CRT_SECTINFO_wchar_unicode_locale_ctype               (268, .wchar.unicode.locale.ctype, wchar_unicode_locale_ctype)
+#define __CRT_SECTINFO_wchar_unicode_locale_format_strftime     (269, .wchar.unicode.locale.format.strftime, wchar_unicode_locale_format_strftime)
+#define __CRT_SECTINFO_wchar_unicode_locale_mbs                 (270, .wchar.unicode.locale.mbs, wchar_unicode_locale_mbs)
+#define __CRT_SECTINFO_wchar_unicode_locale_memory              (271, .wchar.unicode.locale.memory, wchar_unicode_locale_memory)
+#define __CRT_SECTINFO_wchar_unicode_static_convert             (272, .wchar.unicode.static.convert, wchar_unicode_static_convert)
+#define __CRT_SECTINFO_wchar_unicode_static_ctype               (273, .wchar.unicode.static.ctype, wchar_unicode_static_ctype)
+#define __CRT_SECTINFO_wchar_unicode_static_format_printf       (274, .wchar.unicode.static.format.printf, wchar_unicode_static_format_printf)
+#define __CRT_SECTINFO_wchar_unicode_static_format_scanf        (275, .wchar.unicode.static.format.scanf, wchar_unicode_static_format_scanf)
+#define __CRT_SECTINFO_wchar_unicode_static_format_strftime     (276, .wchar.unicode.static.format.strftime, wchar_unicode_static_format_strftime)
+#define __CRT_SECTINFO_wchar_unicode_static_mbs                 (277, .wchar.unicode.static.mbs, wchar_unicode_static_mbs)
+#define __CRT_SECTINFO_wchar_unicode_static_memory              (278, .wchar.unicode.static.memory, wchar_unicode_static_memory)
 #define __CRT_ENUMERATE_SECTIONS(CB) \
 	CB(__CRT_SECTINFO_FILE_core_read)                           \
 	CB(__CRT_SECTINFO_FILE_core_seek)                           \
@@ -384,11 +389,14 @@
 	CB(__CRT_SECTINFO_dos_wchar_FILE_unlocked_write_putc)       \
 	CB(__CRT_SECTINFO_dos_wchar_FILE_unlocked_write_write)      \
 	CB(__CRT_SECTINFO_dos_wchar_errno)                          \
+	CB(__CRT_SECTINFO_dos_wchar_errno_utility)                  \
 	CB(__CRT_SECTINFO_dos_wchar_fs_exec_exec)                   \
 	CB(__CRT_SECTINFO_dos_wchar_fs_exec_spawn)                  \
 	CB(__CRT_SECTINFO_dos_wchar_fs_exec_system)                 \
+	CB(__CRT_SECTINFO_dos_wchar_fs_modify)                      \
 	CB(__CRT_SECTINFO_dos_wchar_fs_modify_time)                 \
 	CB(__CRT_SECTINFO_dos_wchar_fs_stat)                        \
+	CB(__CRT_SECTINFO_dos_wchar_fs_utility)                     \
 	CB(__CRT_SECTINFO_dos_wchar_heap_strdup)                    \
 	CB(__CRT_SECTINFO_dos_wchar_string_format)                  \
 	CB(__CRT_SECTINFO_dos_wchar_string_memory)                  \
@@ -403,6 +411,7 @@
 	CB(__CRT_SECTINFO_dos_wchar_unicode_static_mbs)             \
 	CB(__CRT_SECTINFO_dos_wchar_unicode_static_memory)          \
 	CB(__CRT_SECTINFO_errno)                                    \
+	CB(__CRT_SECTINFO_errno_utility)                            \
 	CB(__CRT_SECTINFO_errno_access)                             \
 	CB(__CRT_SECTINFO_except_fs_basic_property)                 \
 	CB(__CRT_SECTINFO_except_fs_exec_exec)                      \
@@ -551,6 +560,7 @@
 	CB(__CRT_SECTINFO_wchar_fs_exec_exec)                       \
 	CB(__CRT_SECTINFO_wchar_fs_exec_spawn)                      \
 	CB(__CRT_SECTINFO_wchar_fs_exec_system)                     \
+	CB(__CRT_SECTINFO_wchar_fs_modify)                          \
 	CB(__CRT_SECTINFO_wchar_fs_modify_time)                     \
 	CB(__CRT_SECTINFO_wchar_heap_strdup)                        \
 	CB(__CRT_SECTINFO_wchar_string_format)                      \
@@ -906,7 +916,6 @@
 
 /* .text.crt.dos.errno.* */
 #define __CRT_DOS_SECTION__strerror_s                       __CRT_SECTINFO_dos_errno                                /* .text.crt.dos.errno._strerror_s */
-#define __CRT_DOS_SECTION__wperror                          __CRT_SECTINFO_dos_errno                                /* .text.crt.dos.errno._wperror */
 #define __CRT_SECTION___doserrno                            __CRT_SECTINFO_dos_errno                                /* .text.crt.dos.errno.__doserrno */
 #define __CRT_SECTION__get_doserrno                         __CRT_SECTINFO_dos_errno                                /* .text.crt.dos.errno._get_doserrno */
 #define __CRT_SECTION__set_doserrno                         __CRT_SECTINFO_dos_errno                                /* .text.crt.dos.errno._set_doserrno */
@@ -914,7 +923,6 @@
 #define __CRT_SECTION__seterrormode                         __CRT_SECTINFO_dos_errno                                /* .text.crt.dos.errno._seterrormode */
 #define __CRT_SECTION__strerror                             __CRT_SECTINFO_dos_errno                                /* .text.crt.dos.errno._strerror */
 #define __CRT_SECTION__strerror_s                           __CRT_SECTINFO_dos_errno                                /* .text.crt.dos.errno._strerror_s */
-#define __CRT_SECTION__wperror                              __CRT_SECTINFO_dos_errno                                /* .text.crt.dos.errno._wperror */
 
 /* .text.crt.dos.fs.dlfcn.* */
 #define __CRT_SECTION__getdllprocaddr                       __CRT_SECTINFO_dos_fs_dlfcn                             /* .text.crt.dos.fs.dlfcn._getdllprocaddr */
@@ -1211,26 +1219,139 @@
 #define __CRT_SECTION_qsort_s                               __CRT_SECTINFO_dos_utility                              /* .text.crt.dos.utility.qsort_s */
 
 /* .text.crt.dos.wchar.FILE.locked.access.* */
+#define __CRT_DOS_SECTION__wfdopen                          __CRT_SECTINFO_dos_wchar_FILE_locked_access             /* .text.crt.dos.wchar.FILE.locked.access._wfdopen */
+#define __CRT_DOS_SECTION__wfopen_s                         __CRT_SECTINFO_dos_wchar_FILE_locked_access             /* .text.crt.dos.wchar.FILE.locked.access._wfopen_s */
+#define __CRT_DOS_SECTION__wfreopen_s                       __CRT_SECTINFO_dos_wchar_FILE_locked_access             /* .text.crt.dos.wchar.FILE.locked.access._wfreopen_s */
+#define __CRT_DOS_SECTION__wfsopen                          __CRT_SECTINFO_dos_wchar_FILE_locked_access             /* .text.crt.dos.wchar.FILE.locked.access._wfsopen */
 #define __CRT_DOS_SECTION_open_wmemstream                   __CRT_SECTINFO_dos_wchar_FILE_locked_access             /* .text.crt.dos.wchar.FILE.locked.access.open_wmemstream */
+#define __CRT_DOS_SECTION_wfopen                            __CRT_SECTINFO_dos_wchar_FILE_locked_access             /* .text.crt.dos.wchar.FILE.locked.access.wfopen */
+#define __CRT_DOS_SECTION_wfreopen                          __CRT_SECTINFO_dos_wchar_FILE_locked_access             /* .text.crt.dos.wchar.FILE.locked.access.wfreopen */
+#define __CRT_DOS_SECTION_wpopen                            __CRT_SECTINFO_dos_wchar_FILE_locked_access             /* .text.crt.dos.wchar.FILE.locked.access.wpopen */
+#define __CRT_SECTION__wfdopen                              __CRT_SECTINFO_dos_wchar_FILE_locked_access             /* .text.crt.dos.wchar.FILE.locked.access._wfdopen */
+#define __CRT_SECTION__wfopen_s                             __CRT_SECTINFO_dos_wchar_FILE_locked_access             /* .text.crt.dos.wchar.FILE.locked.access._wfopen_s */
+#define __CRT_SECTION__wfreopen_s                           __CRT_SECTINFO_dos_wchar_FILE_locked_access             /* .text.crt.dos.wchar.FILE.locked.access._wfreopen_s */
+#define __CRT_SECTION__wfsopen                              __CRT_SECTINFO_dos_wchar_FILE_locked_access             /* .text.crt.dos.wchar.FILE.locked.access._wfsopen */
 
 /* .text.crt.dos.wchar.FILE.locked.read.getc.* */
 #define __CRT_DOS_SECTION_getwchar                          __CRT_SECTINFO_dos_wchar_FILE_locked_read_getc          /* .text.crt.dos.wchar.FILE.locked.read.getc.getwchar */
 #define __CRT_DOS_SECTION_fgetwc                            __CRT_SECTINFO_dos_wchar_FILE_locked_read_getc          /* .text.crt.dos.wchar.FILE.locked.read.getc.fgetwc */
 
 /* .text.crt.dos.wchar.FILE.locked.read.read.* */
+#define __CRT_DOS_SECTION__getws_s                          __CRT_SECTINFO_dos_wchar_FILE_locked_read_read          /* .text.crt.dos.wchar.FILE.locked.read.read._getws_s */
 #define __CRT_DOS_SECTION_fgetws                            __CRT_SECTINFO_dos_wchar_FILE_locked_read_read          /* .text.crt.dos.wchar.FILE.locked.read.read.fgetws */
+#define __CRT_SECTION__getws_s                              __CRT_SECTINFO_dos_wchar_FILE_locked_read_read          /* .text.crt.dos.wchar.FILE.locked.read.read._getws_s */
 
 /* .text.crt.dos.wchar.FILE.locked.read.scanf.* */
+#define __CRT_DOS_SECTION__fwscanf_l                        __CRT_SECTINFO_dos_wchar_FILE_locked_read_scanf         /* .text.crt.dos.wchar.FILE.locked.read.scanf._fwscanf_l */
+#define __CRT_DOS_SECTION__snwscanf                         __CRT_SECTINFO_dos_wchar_FILE_locked_read_scanf         /* .text.crt.dos.wchar.FILE.locked.read.scanf._snwscanf */
+#define __CRT_DOS_SECTION__snwscanf_l                       __CRT_SECTINFO_dos_wchar_FILE_locked_read_scanf         /* .text.crt.dos.wchar.FILE.locked.read.scanf._snwscanf_l */
+#define __CRT_DOS_SECTION__snwscanf_s_l                     __CRT_SECTINFO_dos_wchar_FILE_locked_read_scanf         /* .text.crt.dos.wchar.FILE.locked.read.scanf._snwscanf_s_l */
+#define __CRT_DOS_SECTION__swscanf_l                        __CRT_SECTINFO_dos_wchar_FILE_locked_read_scanf         /* .text.crt.dos.wchar.FILE.locked.read.scanf._swscanf_l */
+#define __CRT_DOS_SECTION__vfwscanf_l                       __CRT_SECTINFO_dos_wchar_FILE_locked_read_scanf         /* .text.crt.dos.wchar.FILE.locked.read.scanf._vfwscanf_l */
+#define __CRT_DOS_SECTION__vsnwscanf                        __CRT_SECTINFO_dos_wchar_FILE_locked_read_scanf         /* .text.crt.dos.wchar.FILE.locked.read.scanf._vsnwscanf */
+#define __CRT_DOS_SECTION__vsnwscanf_l                      __CRT_SECTINFO_dos_wchar_FILE_locked_read_scanf         /* .text.crt.dos.wchar.FILE.locked.read.scanf._vsnwscanf_l */
+#define __CRT_DOS_SECTION__vsnwscanf_s_l                    __CRT_SECTINFO_dos_wchar_FILE_locked_read_scanf         /* .text.crt.dos.wchar.FILE.locked.read.scanf._vsnwscanf_s_l */
+#define __CRT_DOS_SECTION__vswscanf_l                       __CRT_SECTINFO_dos_wchar_FILE_locked_read_scanf         /* .text.crt.dos.wchar.FILE.locked.read.scanf._vswscanf_l */
+#define __CRT_DOS_SECTION__vwscanf_l                        __CRT_SECTINFO_dos_wchar_FILE_locked_read_scanf         /* .text.crt.dos.wchar.FILE.locked.read.scanf._vwscanf_l */
+#define __CRT_DOS_SECTION__wscanf_l                         __CRT_SECTINFO_dos_wchar_FILE_locked_read_scanf         /* .text.crt.dos.wchar.FILE.locked.read.scanf._wscanf_l */
 #define __CRT_DOS_SECTION_fwscanf                           __CRT_SECTINFO_dos_wchar_FILE_locked_read_scanf         /* .text.crt.dos.wchar.FILE.locked.read.scanf.fwscanf */
 #define __CRT_DOS_SECTION_vfwscanf                          __CRT_SECTINFO_dos_wchar_FILE_locked_read_scanf         /* .text.crt.dos.wchar.FILE.locked.read.scanf.vfwscanf */
 #define __CRT_DOS_SECTION_vwscanf                           __CRT_SECTINFO_dos_wchar_FILE_locked_read_scanf         /* .text.crt.dos.wchar.FILE.locked.read.scanf.vwscanf */
 #define __CRT_DOS_SECTION_wscanf                            __CRT_SECTINFO_dos_wchar_FILE_locked_read_scanf         /* .text.crt.dos.wchar.FILE.locked.read.scanf.wscanf */
+#define __CRT_SECTION__fwscanf_l                            __CRT_SECTINFO_dos_wchar_FILE_locked_read_scanf         /* .text.crt.dos.wchar.FILE.locked.read.scanf._fwscanf_l */
+#define __CRT_SECTION__snwscanf                             __CRT_SECTINFO_dos_wchar_FILE_locked_read_scanf         /* .text.crt.dos.wchar.FILE.locked.read.scanf._snwscanf */
+#define __CRT_SECTION__snwscanf_l                           __CRT_SECTINFO_dos_wchar_FILE_locked_read_scanf         /* .text.crt.dos.wchar.FILE.locked.read.scanf._snwscanf_l */
+#define __CRT_SECTION__snwscanf_s_l                         __CRT_SECTINFO_dos_wchar_FILE_locked_read_scanf         /* .text.crt.dos.wchar.FILE.locked.read.scanf._snwscanf_s_l */
+#define __CRT_SECTION__swscanf_l                            __CRT_SECTINFO_dos_wchar_FILE_locked_read_scanf         /* .text.crt.dos.wchar.FILE.locked.read.scanf._swscanf_l */
+#define __CRT_SECTION__vfwscanf_l                           __CRT_SECTINFO_dos_wchar_FILE_locked_read_scanf         /* .text.crt.dos.wchar.FILE.locked.read.scanf._vfwscanf_l */
+#define __CRT_SECTION__vsnwscanf                            __CRT_SECTINFO_dos_wchar_FILE_locked_read_scanf         /* .text.crt.dos.wchar.FILE.locked.read.scanf._vsnwscanf */
+#define __CRT_SECTION__vsnwscanf_l                          __CRT_SECTINFO_dos_wchar_FILE_locked_read_scanf         /* .text.crt.dos.wchar.FILE.locked.read.scanf._vsnwscanf_l */
+#define __CRT_SECTION__vsnwscanf_s_l                        __CRT_SECTINFO_dos_wchar_FILE_locked_read_scanf         /* .text.crt.dos.wchar.FILE.locked.read.scanf._vsnwscanf_s_l */
+#define __CRT_SECTION__vswscanf_l                           __CRT_SECTINFO_dos_wchar_FILE_locked_read_scanf         /* .text.crt.dos.wchar.FILE.locked.read.scanf._vswscanf_l */
+#define __CRT_SECTION__vwscanf_l                            __CRT_SECTINFO_dos_wchar_FILE_locked_read_scanf         /* .text.crt.dos.wchar.FILE.locked.read.scanf._vwscanf_l */
+#define __CRT_SECTION__wscanf_l                             __CRT_SECTINFO_dos_wchar_FILE_locked_read_scanf         /* .text.crt.dos.wchar.FILE.locked.read.scanf._wscanf_l */
 
 /* .text.crt.dos.wchar.FILE.locked.write.printf.* */
+#define __CRT_DOS_SECTION__fwprintf_l                       __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._fwprintf_l */
+#define __CRT_DOS_SECTION__fwprintf_p                       __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._fwprintf_p */
+#define __CRT_DOS_SECTION__fwprintf_p_l                     __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._fwprintf_p_l */
+#define __CRT_DOS_SECTION__fwprintf_s_l                     __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._fwprintf_s_l */
+#define __CRT_DOS_SECTION__scwprintf                        __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._scwprintf */
+#define __CRT_DOS_SECTION__scwprintf_l                      __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._scwprintf_l */
+#define __CRT_DOS_SECTION__scwprintf_p                      __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._scwprintf_p */
+#define __CRT_DOS_SECTION__scwprintf_p_l                    __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._scwprintf_p_l */
+#define __CRT_DOS_SECTION__snwprintf_l                      __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._snwprintf_l */
+#define __CRT_DOS_SECTION__snwprintf_s                      __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._snwprintf_s */
+#define __CRT_DOS_SECTION__snwprintf_s_l                    __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._snwprintf_s_l */
+#define __CRT_DOS_SECTION__swprintf_c_l                     __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._swprintf_c_l */
+#define __CRT_DOS_SECTION__swprintf_p                       __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._swprintf_p */
+#define __CRT_DOS_SECTION__swprintf_p_l                     __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._swprintf_p_l */
+#define __CRT_DOS_SECTION__swprintf_s_l                     __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._swprintf_s_l */
+#define __CRT_DOS_SECTION__vfwprintf_l                      __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._vfwprintf_l */
+#define __CRT_DOS_SECTION__vfwprintf_p                      __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._vfwprintf_p */
+#define __CRT_DOS_SECTION__vfwprintf_p_l                    __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._vfwprintf_p_l */
+#define __CRT_DOS_SECTION__vfwprintf_s_l                    __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._vfwprintf_s_l */
+#define __CRT_DOS_SECTION__vscwprintf                       __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._vscwprintf */
+#define __CRT_DOS_SECTION__vscwprintf_l                     __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._vscwprintf_l */
+#define __CRT_DOS_SECTION__vscwprintf_p                     __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._vscwprintf_p */
+#define __CRT_DOS_SECTION__vscwprintf_p_l                   __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._vscwprintf_p_l */
+#define __CRT_DOS_SECTION__vsnwprintf_l                     __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._vsnwprintf_l */
+#define __CRT_DOS_SECTION__vsnwprintf_s                     __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._vsnwprintf_s */
+#define __CRT_DOS_SECTION__vsnwprintf_s_l                   __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._vsnwprintf_s_l */
+#define __CRT_DOS_SECTION__vswprintf_c_l                    __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._vswprintf_c_l */
+#define __CRT_DOS_SECTION__vswprintf_p                      __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._vswprintf_p */
+#define __CRT_DOS_SECTION__vswprintf_p_l                    __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._vswprintf_p_l */
+#define __CRT_DOS_SECTION__vswprintf_s_l                    __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._vswprintf_s_l */
+#define __CRT_DOS_SECTION__vwprintf_l                       __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._vwprintf_l */
+#define __CRT_DOS_SECTION__vwprintf_p                       __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._vwprintf_p */
+#define __CRT_DOS_SECTION__vwprintf_p_l                     __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._vwprintf_p_l */
+#define __CRT_DOS_SECTION__vwprintf_s_l                     __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._vwprintf_s_l */
+#define __CRT_DOS_SECTION__wprintf_l                        __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._wprintf_l */
+#define __CRT_DOS_SECTION__wprintf_p                        __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._wprintf_p */
+#define __CRT_DOS_SECTION__wprintf_p_l                      __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._wprintf_p_l */
+#define __CRT_DOS_SECTION__wprintf_s_l                      __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._wprintf_s_l */
 #define __CRT_DOS_SECTION_fwprintf                          __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf.fwprintf */
 #define __CRT_DOS_SECTION_vfwprintf                         __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf.vfwprintf */
 #define __CRT_DOS_SECTION_vwprintf                          __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf.vwprintf */
 #define __CRT_DOS_SECTION_wprintf                           __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf.wprintf */
+#define __CRT_SECTION__fwprintf_l                           __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._fwprintf_l */
+#define __CRT_SECTION__fwprintf_p                           __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._fwprintf_p */
+#define __CRT_SECTION__fwprintf_p_l                         __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._fwprintf_p_l */
+#define __CRT_SECTION__fwprintf_s_l                         __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._fwprintf_s_l */
+#define __CRT_SECTION__scwprintf                            __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._scwprintf */
+#define __CRT_SECTION__scwprintf_l                          __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._scwprintf_l */
+#define __CRT_SECTION__scwprintf_p                          __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._scwprintf_p */
+#define __CRT_SECTION__scwprintf_p_l                        __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._scwprintf_p_l */
+#define __CRT_SECTION__snwprintf_l                          __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._snwprintf_l */
+#define __CRT_SECTION__snwprintf_s                          __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._snwprintf_s */
+#define __CRT_SECTION__snwprintf_s_l                        __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._snwprintf_s_l */
+#define __CRT_SECTION__swprintf_c_l                         __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._swprintf_c_l */
+#define __CRT_SECTION__swprintf_p                           __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._swprintf_p */
+#define __CRT_SECTION__swprintf_p_l                         __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._swprintf_p_l */
+#define __CRT_SECTION__swprintf_s_l                         __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._swprintf_s_l */
+#define __CRT_SECTION__vfwprintf_l                          __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._vfwprintf_l */
+#define __CRT_SECTION__vfwprintf_p                          __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._vfwprintf_p */
+#define __CRT_SECTION__vfwprintf_p_l                        __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._vfwprintf_p_l */
+#define __CRT_SECTION__vfwprintf_s_l                        __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._vfwprintf_s_l */
+#define __CRT_SECTION__vscwprintf                           __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._vscwprintf */
+#define __CRT_SECTION__vscwprintf_l                         __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._vscwprintf_l */
+#define __CRT_SECTION__vscwprintf_p                         __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._vscwprintf_p */
+#define __CRT_SECTION__vscwprintf_p_l                       __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._vscwprintf_p_l */
+#define __CRT_SECTION__vsnwprintf_l                         __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._vsnwprintf_l */
+#define __CRT_SECTION__vsnwprintf_s                         __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._vsnwprintf_s */
+#define __CRT_SECTION__vsnwprintf_s_l                       __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._vsnwprintf_s_l */
+#define __CRT_SECTION__vswprintf_c_l                        __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._vswprintf_c_l */
+#define __CRT_SECTION__vswprintf_p                          __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._vswprintf_p */
+#define __CRT_SECTION__vswprintf_p_l                        __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._vswprintf_p_l */
+#define __CRT_SECTION__vswprintf_s_l                        __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._vswprintf_s_l */
+#define __CRT_SECTION__vwprintf_l                           __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._vwprintf_l */
+#define __CRT_SECTION__vwprintf_p                           __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._vwprintf_p */
+#define __CRT_SECTION__vwprintf_p_l                         __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._vwprintf_p_l */
+#define __CRT_SECTION__vwprintf_s_l                         __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._vwprintf_s_l */
+#define __CRT_SECTION__wprintf_l                            __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._wprintf_l */
+#define __CRT_SECTION__wprintf_p                            __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._wprintf_p */
+#define __CRT_SECTION__wprintf_p_l                          __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._wprintf_p_l */
+#define __CRT_SECTION__wprintf_s_l                          __CRT_SECTINFO_dos_wchar_FILE_locked_write_printf       /* .text.crt.dos.wchar.FILE.locked.write.printf._wprintf_s_l */
 
 /* .text.crt.dos.wchar.FILE.locked.write.putc.* */
 #define __CRT_DOS_SECTION_fputwc                            __CRT_SECTINFO_dos_wchar_FILE_locked_write_putc         /* .text.crt.dos.wchar.FILE.locked.write.putc.fputwc */
@@ -1238,7 +1359,9 @@
 #define __CRT_DOS_SECTION_ungetwc                           __CRT_SECTINFO_dos_wchar_FILE_locked_write_putc         /* .text.crt.dos.wchar.FILE.locked.write.putc.ungetwc */
 
 /* .text.crt.dos.wchar.FILE.locked.write.write.* */
+#define __CRT_DOS_SECTION__putws                            __CRT_SECTINFO_dos_wchar_FILE_locked_write_write        /* .text.crt.dos.wchar.FILE.locked.write.write._putws */
 #define __CRT_DOS_SECTION_fputws                            __CRT_SECTINFO_dos_wchar_FILE_locked_write_write        /* .text.crt.dos.wchar.FILE.locked.write.write.fputws */
+#define __CRT_SECTION__putws                                __CRT_SECTINFO_dos_wchar_FILE_locked_write_write        /* .text.crt.dos.wchar.FILE.locked.write.write._putws */
 
 /* .text.crt.dos.wchar.FILE.unlocked.read.getc.* */
 #define __CRT_DOS_SECTION_getwchar_unlocked                 __CRT_SECTINFO_dos_wchar_FILE_unlocked_read_getc        /* .text.crt.dos.wchar.FILE.unlocked.read.getc.getwchar_unlocked */
@@ -1277,6 +1400,10 @@
 #define __CRT_SECTION__wcserror                             __CRT_SECTINFO_dos_wchar_errno                          /* .text.crt.dos.wchar.errno._wcserror */
 #define __CRT_SECTION__wcserror_s                           __CRT_SECTINFO_dos_wchar_errno                          /* .text.crt.dos.wchar.errno._wcserror_s */
 
+/* .text.crt.dos.wchar.errno.utility.* */
+#define __CRT_SECTION__wperror                              __CRT_SECTINFO_dos_wchar_errno_utility                  /* .text.crt.dos.wchar.errno.utility._wperror */
+#define __CRT_DOS_SECTION__wperror                          __CRT_SECTINFO_dos_wchar_errno_utility                  /* .text.crt.dos.wchar.errno.utility._wperror */
+
 /* .text.crt.dos.wchar.fs.exec.exec.* */
 #define __CRT_DOS_SECTION_wexecl                            __CRT_SECTINFO_dos_wchar_fs_exec_exec                   /* .text.crt.dos.wchar.fs.exec.exec.wexecl */
 #define __CRT_DOS_SECTION_wexecle                           __CRT_SECTINFO_dos_wchar_fs_exec_exec                   /* .text.crt.dos.wchar.fs.exec.exec.wexecle */
@@ -1300,6 +1427,9 @@
 /* .text.crt.dos.wchar.fs.exec.system.* */
 #define __CRT_DOS_SECTION_wsystem                           __CRT_SECTINFO_dos_wchar_fs_exec_system                 /* .text.crt.dos.wchar.fs.exec.system.wsystem */
 
+/* .text.crt.dos.wchar.fs.modify.* */
+#define __CRT_DOS_SECTION_wremove                           __CRT_SECTINFO_dos_wchar_fs_modify                      /* .text.crt.dos.wchar.fs.modify.wremove */
+
 /* .text.crt.dos.wchar.fs.modify_time.* */
 #define __CRT_DOS_SECTION_wutime64                          __CRT_SECTINFO_dos_wchar_fs_modify_time                 /* .text.crt.dos.wchar.fs.modify_time.wutime64 */
 #define __CRT_DOS_SECTION_wutime                            __CRT_SECTINFO_dos_wchar_fs_modify_time                 /* .text.crt.dos.wchar.fs.modify_time.wutime */
@@ -1313,6 +1443,12 @@
 #define __CRT_SECTION__wstat32i64                           __CRT_SECTINFO_dos_wchar_fs_stat                        /* .text.crt.dos.wchar.fs.stat._wstat32i64 */
 #define __CRT_SECTION__wstat64                              __CRT_SECTINFO_dos_wchar_fs_stat                        /* .text.crt.dos.wchar.fs.stat._wstat64 */
 #define __CRT_SECTION__wstat64i32                           __CRT_SECTINFO_dos_wchar_fs_stat                        /* .text.crt.dos.wchar.fs.stat._wstat64i32 */
+
+/* .text.crt.dos.wchar.fs.utility.* */
+#define __CRT_DOS_SECTION__wtempnam                         __CRT_SECTINFO_dos_wchar_fs_utility                     /* .text.crt.dos.wchar.fs.utility._wtempnam */
+#define __CRT_DOS_SECTION__wtmpnam_s                        __CRT_SECTINFO_dos_wchar_fs_utility                     /* .text.crt.dos.wchar.fs.utility._wtmpnam_s */
+#define __CRT_SECTION__wtempnam                             __CRT_SECTINFO_dos_wchar_fs_utility                     /* .text.crt.dos.wchar.fs.utility._wtempnam */
+#define __CRT_SECTION__wtmpnam_s                            __CRT_SECTINFO_dos_wchar_fs_utility                     /* .text.crt.dos.wchar.fs.utility._wtmpnam_s */
 
 /* .text.crt.dos.wchar.heap.strdup.* */
 #define __CRT_DOS_SECTION_wcsndup                           __CRT_SECTINFO_dos_wchar_heap_strdup                    /* .text.crt.dos.wchar.heap.strdup.wcsndup */
@@ -1512,6 +1648,9 @@
 #define __CRT_SECTION_strerror_s                            __CRT_SECTINFO_errno                                    /* .text.crt.errno.strerror_s */
 #define __CRT_SECTION_strerrorname_s                        __CRT_SECTINFO_errno                                    /* .text.crt.errno.strerrorname_s */
 #define __CRT_SECTION_strsignal_s                           __CRT_SECTINFO_errno                                    /* .text.crt.errno.strsignal_s */
+
+/* .text.crt.errno.utility.* */
+#define __CRT_SECTION_perror                                __CRT_SECTINFO_errno_utility                            /* .text.crt.errno.utility.perror */
 
 /* .text.crt.errno_access.* */
 #define __CRT_SECTION___errno_location                      __CRT_SECTINFO_errno_access                             /* .text.crt.errno_access.__errno_location */
@@ -3617,6 +3756,9 @@
 
 /* .text.crt.wchar.FILE.locked.access.* */
 #define __CRT_SECTION_open_wmemstream                       __CRT_SECTINFO_wchar_FILE_locked_access                 /* .text.crt.wchar.FILE.locked.access.open_wmemstream */
+#define __CRT_SECTION_wfopen                                __CRT_SECTINFO_wchar_FILE_locked_access                 /* .text.crt.wchar.FILE.locked.access.wfopen */
+#define __CRT_SECTION_wfreopen                              __CRT_SECTINFO_wchar_FILE_locked_access                 /* .text.crt.wchar.FILE.locked.access.wfreopen */
+#define __CRT_SECTION_wpopen                                __CRT_SECTINFO_wchar_FILE_locked_access                 /* .text.crt.wchar.FILE.locked.access.wpopen */
 
 /* .text.crt.wchar.FILE.locked.read.getc.* */
 #define __CRT_SECTION_getwchar                              __CRT_SECTINFO_wchar_FILE_locked_read_getc              /* .text.crt.wchar.FILE.locked.read.getc.getwchar */
@@ -3701,6 +3843,9 @@
 
 /* .text.crt.wchar.fs.exec.system.* */
 #define __CRT_SECTION_wsystem                               __CRT_SECTINFO_wchar_fs_exec_system                     /* .text.crt.wchar.fs.exec.system.wsystem */
+
+/* .text.crt.wchar.fs.modify.* */
+#define __CRT_SECTION_wremove                               __CRT_SECTINFO_wchar_fs_modify                          /* .text.crt.wchar.fs.modify.wremove */
 
 /* .text.crt.wchar.fs.modify_time.* */
 #define __CRT_SECTION_wutime64                              __CRT_SECTINFO_wchar_fs_modify_time                     /* .text.crt.wchar.fs.modify_time.wutime64 */

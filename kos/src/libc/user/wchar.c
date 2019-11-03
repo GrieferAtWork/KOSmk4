@@ -36,6 +36,31 @@
 #include "string.h"
 #include "wchar.h"
 
+#define libc_vswprintf_s libc_vswprintf
+#define libd_vswprintf_s libd_vswprintf
+#define libc_swprintf_s  libc_swprintf
+#define libd_swprintf_s  libd_swprintf
+#define libc_vfwprintf_s libc_vfwprintf
+#define libd_vfwprintf_s libd_vfwprintf
+#define libc_fwprintf_s  libc_fwprintf
+#define libd_fwprintf_s  libd_fwprintf
+#define libc_vwprintf_s  libc_vwprintf
+#define libd_vwprintf_s  libd_vwprintf
+#define libc_wprintf_s   libc_wprintf
+#define libd_wprintf_s   libd_wprintf
+#define libc_vswscanf_s  libc_vswscanf
+#define libd_vswscanf_s  libd_vswscanf
+#define libc_swscanf_s   libc_swscanf
+#define libd_swscanf_s   libd_swscanf
+#define libc_vfwscanf_s  libc_vfwscanf
+#define libd_vfwscanf_s  libd_vfwscanf
+#define libc_fwscanf_s   libc_fwscanf
+#define libd_fwscanf_s   libd_fwscanf
+#define libc_vwscanf_s   libc_vwscanf
+#define libd_vwscanf_s   libd_vwscanf
+#define libc_wscanf_s    libc_wscanf
+#define libd_wscanf_s    libd_wscanf
+
 DECL_BEGIN
 
 #undef stdin
@@ -1564,26 +1589,808 @@ NOTHROW_NCX(LIBDCALL libd___wcserror_s)(char16_t *buf,
 }
 /*[[[end:DOS$__wcserror_s]]]*/
 
+/*[[[head:_vwprintf_p,hash:CRC-32=0x2a6c4722]]]*/
+INTERN NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._vwprintf_p") __STDC_INT_AS_SSIZE_T
+(LIBCCALL libc__vwprintf_p)(char32_t const *format,
+                            va_list args)
+		__THROWS(...)
+/*[[[body:_vwprintf_p]]]*/
+/*AUTO*/{
+	return libc__vfwprintf_p(__LOCAL_stdout, format, args);
+}
+/*[[[end:_vwprintf_p]]]*/
+
+/*[[[head:DOS$_vwprintf_p,hash:CRC-32=0x224e7039]]]*/
+INTERN NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._vwprintf_p") __STDC_INT_AS_SSIZE_T
+(LIBDCALL libd__vwprintf_p)(char16_t const *format,
+                            va_list args)
+		__THROWS(...)
+/*[[[body:DOS$_vwprintf_p]]]*/
+/*AUTO*/{
+	return libd__vfwprintf_p(__LOCAL_stdout, format, args);
+}
+/*[[[end:DOS$_vwprintf_p]]]*/
+
+/*[[[head:_wprintf_p,hash:CRC-32=0x3c809805]]]*/
+INTERN NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._wprintf_p") __STDC_INT_AS_SSIZE_T
+(VLIBCCALL libc__wprintf_p)(char32_t const *format,
+                            ...)
+		__THROWS(...)
+/*[[[body:_wprintf_p]]]*/
+/*AUTO*/{
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = libc__vwprintf_p(format, args);
+	va_end(args);
+	return result;
+}
+/*[[[end:_wprintf_p]]]*/
+
+/*[[[head:DOS$_wprintf_p,hash:CRC-32=0x35dea273]]]*/
+INTERN NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._wprintf_p") __STDC_INT_AS_SSIZE_T
+(VLIBDCALL libd__wprintf_p)(char16_t const *format,
+                            ...)
+		__THROWS(...)
+/*[[[body:DOS$_wprintf_p]]]*/
+/*AUTO*/{
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = libd__vwprintf_p(format, args);
+	va_end(args);
+	return result;
+}
+/*[[[end:DOS$_wprintf_p]]]*/
+
+/*[[[head:_fwscanf_l,hash:CRC-32=0x1c70916c]]]*/
+INTERN WUNUSED NONNULL((1, 2))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf._fwscanf_l") __STDC_INT_AS_SSIZE_T
+(VLIBCCALL libc__fwscanf_l)(FILE *stream,
+                            char32_t const *format,
+                            locale_t locale,
+                            ...)
+		__THROWS(...)
+/*[[[body:_fwscanf_l]]]*/
+/*AUTO*/{
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libc__vfwscanf_l(stream, format, locale, args);
+	va_end(args);
+	return result;
+}
+/*[[[end:_fwscanf_l]]]*/
+
+/*[[[head:DOS$_fwscanf_l,hash:CRC-32=0x14e0a3f7]]]*/
+INTERN WUNUSED NONNULL((1, 2))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf._fwscanf_l") __STDC_INT_AS_SSIZE_T
+(VLIBDCALL libd__fwscanf_l)(FILE *stream,
+                            char16_t const *format,
+                            locale_t locale,
+                            ...)
+		__THROWS(...)
+/*[[[body:DOS$_fwscanf_l]]]*/
+/*AUTO*/{
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libd__vfwscanf_l(stream, format, locale, args);
+	va_end(args);
+	return result;
+}
+/*[[[end:DOS$_fwscanf_l]]]*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*[[[head:_wscanf_l,hash:CRC-32=0x26a251ea]]]*/
+INTERN WUNUSED NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf._wscanf_l") __STDC_INT_AS_SSIZE_T
+(VLIBCCALL libc__wscanf_l)(char32_t const *format,
+                           locale_t locale,
+                           ...)
+		__THROWS(...)
+/*[[[body:_wscanf_l]]]*/
+/*AUTO*/{
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libc__vwscanf_l(format, locale, args);
+	va_end(args);
+	return result;
+}
+/*[[[end:_wscanf_l]]]*/
+
+/*[[[head:DOS$_wscanf_l,hash:CRC-32=0x5f4fb531]]]*/
+INTERN WUNUSED NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf._wscanf_l") __STDC_INT_AS_SSIZE_T
+(VLIBDCALL libd__wscanf_l)(char16_t const *format,
+                           locale_t locale,
+                           ...)
+		__THROWS(...)
+/*[[[body:DOS$_wscanf_l]]]*/
+/*AUTO*/{
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libd__vwscanf_l(format, locale, args);
+	va_end(args);
+	return result;
+}
+/*[[[end:DOS$_wscanf_l]]]*/
+
+
+
+/*[[[head:_wfsopen,hash:CRC-32=0x73cac798]]]*/
+INTERN WUNUSED NONNULL((1, 2))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access._wfsopen") FILE *
+NOTHROW_NCX(LIBCCALL libc__wfsopen)(char32_t const *filename,
+                                    char32_t const *mode,
+                                    int sh_flag)
+/*[[[body:_wfsopen]]]*/
+{
+	CRT_UNIMPLEMENTED("_wfsopen"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return NULL;
+}
+/*[[[end:_wfsopen]]]*/
+
+/*[[[head:DOS$_wfsopen,hash:CRC-32=0xddbb32f1]]]*/
+INTERN WUNUSED NONNULL((1, 2))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access._wfsopen") FILE *
+NOTHROW_NCX(LIBDCALL libd__wfsopen)(char16_t const *filename,
+                                    char16_t const *mode,
+                                    int sh_flag)
+/*[[[body:DOS$_wfsopen]]]*/
+{
+	CRT_UNIMPLEMENTED("_wfsopen"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return NULL;
+}
+/*[[[end:DOS$_wfsopen]]]*/
+
+/*[[[head:_wfdopen,hash:CRC-32=0xf6cb83a3]]]*/
+INTERN WUNUSED NONNULL((2))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access._wfdopen") FILE *
+NOTHROW_NCX(LIBCCALL libc__wfdopen)(fd_t fd,
+                                    char32_t const *mode)
+/*[[[body:_wfdopen]]]*/
+{
+	CRT_UNIMPLEMENTED("_wfdopen"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return NULL;
+}
+/*[[[end:_wfdopen]]]*/
+
+/*[[[head:DOS$_wfdopen,hash:CRC-32=0x9c2d8e15]]]*/
+INTERN WUNUSED NONNULL((2))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access._wfdopen") FILE *
+NOTHROW_NCX(LIBDCALL libd__wfdopen)(fd_t fd,
+                                    char16_t const *mode)
+/*[[[body:DOS$_wfdopen]]]*/
+{
+	CRT_UNIMPLEMENTED("_wfdopen"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return NULL;
+}
+/*[[[end:DOS$_wfdopen]]]*/
+
+
+
+
+
+/*[[[head:_wfopen_s,hash:CRC-32=0xcc91613c]]]*/
+INTERN NONNULL((1, 2, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access._wfopen_s") errno_t
+NOTHROW_NCX(LIBCCALL libc__wfopen_s)(FILE **pstream,
+                                     char32_t const *filename,
+                                     char32_t const *mode)
+/*[[[body:_wfopen_s]]]*/
+{
+	CRT_UNIMPLEMENTED("_wfopen_s"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+/*[[[end:_wfopen_s]]]*/
+
+/*[[[head:DOS$_wfopen_s,hash:CRC-32=0xae128a21]]]*/
+INTERN NONNULL((1, 2, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access._wfopen_s") errno_t
+NOTHROW_NCX(LIBDCALL libd__wfopen_s)(FILE **pstream,
+                                     char16_t const *filename,
+                                     char16_t const *mode)
+/*[[[body:DOS$_wfopen_s]]]*/
+{
+	CRT_UNIMPLEMENTED("_wfopen_s"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+/*[[[end:DOS$_wfopen_s]]]*/
+
+/*[[[head:_wfreopen_s,hash:CRC-32=0x6e87ad15]]]*/
+INTERN NONNULL((1, 2, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access._wfreopen_s") errno_t
+NOTHROW_NCX(LIBCCALL libc__wfreopen_s)(FILE **pstream,
+                                       char32_t const *filename,
+                                       char32_t const *mode,
+                                       FILE *stream)
+/*[[[body:_wfreopen_s]]]*/
+{
+	CRT_UNIMPLEMENTED("_wfreopen_s"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+/*[[[end:_wfreopen_s]]]*/
+
+/*[[[head:DOS$_wfreopen_s,hash:CRC-32=0xdb4f6874]]]*/
+INTERN NONNULL((1, 2, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.access._wfreopen_s") errno_t
+NOTHROW_NCX(LIBDCALL libd__wfreopen_s)(FILE **pstream,
+                                       char16_t const *filename,
+                                       char16_t const *mode,
+                                       FILE *stream)
+/*[[[body:DOS$_wfreopen_s]]]*/
+{
+	CRT_UNIMPLEMENTED("_wfreopen_s"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+/*[[[end:DOS$_wfreopen_s]]]*/
+
+/*[[[head:_getws_s,hash:CRC-32=0xc74abf91]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.read._getws_s") char32_t *
+NOTHROW_NCX(LIBCCALL libc__getws_s)(char32_t *buf,
+                                    size_t buflen)
+/*[[[body:_getws_s]]]*/
+/*AUTO*/{
+	return libc_fgetws(buf, buflen, __LOCAL_stdin);
+}
+/*[[[end:_getws_s]]]*/
+
+/*[[[head:DOS$_getws_s,hash:CRC-32=0x6e7cbed8]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.read._getws_s") char16_t *
+NOTHROW_NCX(LIBDCALL libd__getws_s)(char16_t *buf,
+                                    size_t buflen)
+/*[[[body:DOS$_getws_s]]]*/
+/*AUTO*/{
+	return libd_fgetws(buf, buflen, __LOCAL_stdin);
+}
+/*[[[end:DOS$_getws_s]]]*/
+
+/*[[[head:_putws,hash:CRC-32=0x148cafda]]]*/
+INTERN NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.write._putws") __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(LIBCCALL libc__putws)(char32_t const *string)
+/*[[[body:_putws]]]*/
+/*AUTO*/{
+	return libc_fputws(string, __LOCAL_stdout);
+}
+/*[[[end:_putws]]]*/
+
+/*[[[head:DOS$_putws,hash:CRC-32=0x3a031efc]]]*/
+INTERN NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.write._putws") __STDC_INT_AS_SIZE_T
+NOTHROW_NCX(LIBDCALL libd__putws)(char16_t const *string)
+/*[[[body:DOS$_putws]]]*/
+/*AUTO*/{
+	return libd_fputws(string, __LOCAL_stdout);
+}
+/*[[[end:DOS$_putws]]]*/
+
+/*[[[head:_wtempnam,hash:CRC-32=0xddbca9c8]]]*/
+INTERN WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.utility._wtempnam") char32_t *
+NOTHROW_NCX(LIBCCALL libc__wtempnam)(char32_t const *directory,
+                                     char32_t const *file_prefix)
+/*[[[body:_wtempnam]]]*/
+{
+	CRT_UNIMPLEMENTED("_wtempnam"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return NULL;
+}
+/*[[[end:_wtempnam]]]*/
+
+/*[[[head:DOS$_wtempnam,hash:CRC-32=0xbc1e511a]]]*/
+INTERN WUNUSED
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.utility._wtempnam") char16_t *
+NOTHROW_NCX(LIBDCALL libd__wtempnam)(char16_t const *directory,
+                                     char16_t const *file_prefix)
+/*[[[body:DOS$_wtempnam]]]*/
+{
+	CRT_UNIMPLEMENTED("_wtempnam"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return NULL;
+}
+/*[[[end:DOS$_wtempnam]]]*/
+
+/*[[[head:_wperror,hash:CRC-32=0xd6a3a2ce]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.errno.utility._wperror") void
+NOTHROW_NCX(LIBCCALL libc__wperror)(char32_t const *errmsg)
+/*[[[body:_wperror]]]*/
+{
+	CRT_UNIMPLEMENTED("_wperror"); /* TODO */
+	libc_seterrno(ENOSYS);
+}
+/*[[[end:_wperror]]]*/
+
+/*[[[head:DOS$_wperror,hash:CRC-32=0x7c2eb7ac]]]*/
+INTERN ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.errno.utility._wperror") void
+NOTHROW_NCX(LIBDCALL libd__wperror)(char16_t const *errmsg)
+/*[[[body:DOS$_wperror]]]*/
+{
+	CRT_UNIMPLEMENTED("_wperror"); /* TODO */
+	libc_seterrno(ENOSYS);
+}
+/*[[[end:DOS$_wperror]]]*/
+
+
+
+/*[[[head:_wtmpnam_s,hash:CRC-32=0x1268f60]]]*/
+INTERN NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.utility._wtmpnam_s") errno_t
+NOTHROW_NCX(LIBCCALL libc__wtmpnam_s)(char32_t *dst,
+                                      size_t wchar_count)
+/*[[[body:_wtmpnam_s]]]*/
+{
+	CRT_UNIMPLEMENTED("_wtmpnam_s"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+/*[[[end:_wtmpnam_s]]]*/
+
+/*[[[head:DOS$_wtmpnam_s,hash:CRC-32=0x878b516]]]*/
+INTERN NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.fs.utility._wtmpnam_s") errno_t
+NOTHROW_NCX(LIBDCALL libd__wtmpnam_s)(char16_t *dst,
+                                      size_t wchar_count)
+/*[[[body:DOS$_wtmpnam_s]]]*/
+{
+	CRT_UNIMPLEMENTED("_wtmpnam_s"); /* TODO */
+	libc_seterrno(ENOSYS);
+	return 0;
+}
+/*[[[end:DOS$_wtmpnam_s]]]*/
+
+/*[[[head:_vfwscanf_l,hash:CRC-32=0xf9b9604a]]]*/
+INTERN WUNUSED NONNULL((1, 2))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf._vfwscanf_l") __STDC_INT_AS_SSIZE_T
+(LIBCCALL libc__vfwscanf_l)(FILE *stream,
+                            char32_t const *format,
+                            locale_t locale,
+                            va_list args)
+		__THROWS(...)
+/*[[[body:_vfwscanf_l]]]*/
+/*AUTO*/{
+	(void)locale;
+	return libc_vfwscanf(stream, format, args);
+}
+/*[[[end:_vfwscanf_l]]]*/
+
+/*[[[head:DOS$_vfwscanf_l,hash:CRC-32=0xa5597af5]]]*/
+INTERN WUNUSED NONNULL((1, 2))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf._vfwscanf_l") __STDC_INT_AS_SSIZE_T
+(LIBDCALL libd__vfwscanf_l)(FILE *stream,
+                            char16_t const *format,
+                            locale_t locale,
+                            va_list args)
+		__THROWS(...)
+/*[[[body:DOS$_vfwscanf_l]]]*/
+/*AUTO*/{
+	(void)locale;
+	return libd_vfwscanf(stream, format, args);
+}
+/*[[[end:DOS$_vfwscanf_l]]]*/
+
+/*[[[head:_vwscanf_l,hash:CRC-32=0x77f130e4]]]*/
+INTERN WUNUSED NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf._vwscanf_l") __STDC_INT_AS_SSIZE_T
+(LIBCCALL libc__vwscanf_l)(char32_t const *format,
+                           locale_t locale,
+                           va_list args)
+		__THROWS(...)
+/*[[[body:_vwscanf_l]]]*/
+/*AUTO*/{
+	(void)locale;
+	return libc_vwscanf(format, args);
+}
+/*[[[end:_vwscanf_l]]]*/
+
+/*[[[head:DOS$_vwscanf_l,hash:CRC-32=0x75d7fb59]]]*/
+INTERN WUNUSED NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf._vwscanf_l") __STDC_INT_AS_SSIZE_T
+(LIBDCALL libd__vwscanf_l)(char16_t const *format,
+                           locale_t locale,
+                           va_list args)
+		__THROWS(...)
+/*[[[body:DOS$_vwscanf_l]]]*/
+/*AUTO*/{
+	(void)locale;
+	return libd_vwscanf(format, args);
+}
+/*[[[end:DOS$_vwscanf_l]]]*/
+
+/*[[[head:_vwprintf_l,hash:CRC-32=0xb6a114cd]]]*/
+INTERN NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._vwprintf_l") __STDC_INT_AS_SSIZE_T
+(LIBCCALL libc__vwprintf_l)(char32_t const *format,
+                            locale_t locale,
+                            va_list args)
+		__THROWS(...)
+/*[[[body:_vwprintf_l]]]*/
+/*AUTO*/{
+	(void)locale;
+	return libc_vwprintf(format, args);
+}
+/*[[[end:_vwprintf_l]]]*/
+
+/*[[[head:DOS$_vwprintf_l,hash:CRC-32=0xf8278997]]]*/
+INTERN NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._vwprintf_l") __STDC_INT_AS_SSIZE_T
+(LIBDCALL libd__vwprintf_l)(char16_t const *format,
+                            locale_t locale,
+                            va_list args)
+		__THROWS(...)
+/*[[[body:DOS$_vwprintf_l]]]*/
+/*AUTO*/{
+	(void)locale;
+	return libd_vwprintf(format, args);
+}
+/*[[[end:DOS$_vwprintf_l]]]*/
+
+/*[[[head:_wprintf_l,hash:CRC-32=0xa46ef4af]]]*/
+INTERN NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._wprintf_l") __STDC_INT_AS_SSIZE_T
+(VLIBCCALL libc__wprintf_l)(char32_t const *format,
+                            locale_t locale,
+                            ...)
+		__THROWS(...)
+/*[[[body:_wprintf_l]]]*/
+/*AUTO*/{
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libc__vwprintf_l(format, locale, args);
+	va_end(args);
+	return result;
+}
+/*[[[end:_wprintf_l]]]*/
+
+/*[[[head:DOS$_wprintf_l,hash:CRC-32=0xf9e7e2aa]]]*/
+INTERN NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._wprintf_l") __STDC_INT_AS_SSIZE_T
+(VLIBDCALL libd__wprintf_l)(char16_t const *format,
+                            locale_t locale,
+                            ...)
+		__THROWS(...)
+/*[[[body:DOS$_wprintf_l]]]*/
+/*AUTO*/{
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libd__vwprintf_l(format, locale, args);
+	va_end(args);
+	return result;
+}
+/*[[[end:DOS$_wprintf_l]]]*/
+
+/*[[[head:_vwprintf_p_l,hash:CRC-32=0x14549442]]]*/
+INTERN NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._vwprintf_p_l") __STDC_INT_AS_SSIZE_T
+(LIBCCALL libc__vwprintf_p_l)(char32_t const *format,
+                              locale_t locale,
+                              va_list args)
+		__THROWS(...)
+/*[[[body:_vwprintf_p_l]]]*/
+/*AUTO*/{
+	(void)locale;
+	return libc__vwprintf_p(format, args);
+}
+/*[[[end:_vwprintf_p_l]]]*/
+
+/*[[[head:DOS$_vwprintf_p_l,hash:CRC-32=0xcf3506be]]]*/
+INTERN NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._vwprintf_p_l") __STDC_INT_AS_SSIZE_T
+(LIBDCALL libd__vwprintf_p_l)(char16_t const *format,
+                              locale_t locale,
+                              va_list args)
+		__THROWS(...)
+/*[[[body:DOS$_vwprintf_p_l]]]*/
+/*AUTO*/{
+	(void)locale;
+	return libd__vwprintf_p(format, args);
+}
+/*[[[end:DOS$_vwprintf_p_l]]]*/
+
+/*[[[head:_wprintf_p_l,hash:CRC-32=0xfc232d80]]]*/
+INTERN NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._wprintf_p_l") __STDC_INT_AS_SSIZE_T
+(VLIBCCALL libc__wprintf_p_l)(char32_t const *format,
+                              locale_t locale,
+                              ...)
+		__THROWS(...)
+/*[[[body:_wprintf_p_l]]]*/
+/*AUTO*/{
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libc__vwprintf_p_l(format, locale, args);
+	va_end(args);
+	return result;
+}
+/*[[[end:_wprintf_p_l]]]*/
+
+/*[[[head:DOS$_wprintf_p_l,hash:CRC-32=0x2b14bf22]]]*/
+INTERN NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._wprintf_p_l") __STDC_INT_AS_SSIZE_T
+(VLIBDCALL libd__wprintf_p_l)(char16_t const *format,
+                              locale_t locale,
+                              ...)
+		__THROWS(...)
+/*[[[body:DOS$_wprintf_p_l]]]*/
+/*AUTO*/{
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libd__vwprintf_p_l(format, locale, args);
+	va_end(args);
+	return result;
+}
+/*[[[end:DOS$_wprintf_p_l]]]*/
+
+/*[[[head:_vwprintf_s_l,hash:CRC-32=0x4791c112]]]*/
+INTERN NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._vwprintf_s_l") __STDC_INT_AS_SSIZE_T
+(LIBCCALL libc__vwprintf_s_l)(char32_t const *format,
+                              locale_t locale,
+                              va_list args)
+		__THROWS(...)
+/*[[[body:_vwprintf_s_l]]]*/
+/*AUTO*/{
+	(void)locale;
+	return libc_vwprintf_s(format, args);
+}
+/*[[[end:_vwprintf_s_l]]]*/
+
+/*[[[head:DOS$_vwprintf_s_l,hash:CRC-32=0x9cf053ee]]]*/
+INTERN NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._vwprintf_s_l") __STDC_INT_AS_SSIZE_T
+(LIBDCALL libd__vwprintf_s_l)(char16_t const *format,
+                              locale_t locale,
+                              va_list args)
+		__THROWS(...)
+/*[[[body:DOS$_vwprintf_s_l]]]*/
+/*AUTO*/{
+	(void)locale;
+	return libd_vwprintf_s(format, args);
+}
+/*[[[end:DOS$_vwprintf_s_l]]]*/
+
+/*[[[head:_wprintf_s_l,hash:CRC-32=0x108c715a]]]*/
+INTERN NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._wprintf_s_l") __STDC_INT_AS_SSIZE_T
+(VLIBCCALL libc__wprintf_s_l)(char32_t const *format,
+                              locale_t locale,
+                              ...)
+		__THROWS(...)
+/*[[[body:_wprintf_s_l]]]*/
+/*AUTO*/{
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libc__vwprintf_s_l(format, locale, args);
+	va_end(args);
+	return result;
+}
+/*[[[end:_wprintf_s_l]]]*/
+
+/*[[[head:DOS$_wprintf_s_l,hash:CRC-32=0xc7bbe3f8]]]*/
+INTERN NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._wprintf_s_l") __STDC_INT_AS_SSIZE_T
+(VLIBDCALL libd__wprintf_s_l)(char16_t const *format,
+                              locale_t locale,
+                              ...)
+		__THROWS(...)
+/*[[[body:DOS$_wprintf_s_l]]]*/
+/*AUTO*/{
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libd__vwprintf_s_l(format, locale, args);
+	va_end(args);
+	return result;
+}
+/*[[[end:DOS$_wprintf_s_l]]]*/
+
+/*[[[head:_vfwprintf_l,hash:CRC-32=0x998b7a6c]]]*/
+INTERN NONNULL((1, 2))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._vfwprintf_l") __STDC_INT_AS_SSIZE_T
+(LIBCCALL libc__vfwprintf_l)(FILE *stream,
+                             char32_t const *format,
+                             locale_t locale,
+                             va_list args)
+		__THROWS(...)
+/*[[[body:_vfwprintf_l]]]*/
+/*AUTO*/{
+	(void)locale;
+	return libc_vfwprintf(stream, format, args);
+}
+/*[[[end:_vfwprintf_l]]]*/
+
+/*[[[head:DOS$_vfwprintf_l,hash:CRC-32=0x67dc8161]]]*/
+INTERN NONNULL((1, 2))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._vfwprintf_l") __STDC_INT_AS_SSIZE_T
+(LIBDCALL libd__vfwprintf_l)(FILE *stream,
+                             char16_t const *format,
+                             locale_t locale,
+                             va_list args)
+		__THROWS(...)
+/*[[[body:DOS$_vfwprintf_l]]]*/
+/*AUTO*/{
+	(void)locale;
+	return libd_vfwprintf(stream, format, args);
+}
+/*[[[end:DOS$_vfwprintf_l]]]*/
+
+/*[[[head:_fwprintf_l,hash:CRC-32=0xc82d80c6]]]*/
+INTERN NONNULL((1, 2))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._fwprintf_l") __STDC_INT_AS_SSIZE_T
+(VLIBCCALL libc__fwprintf_l)(FILE *stream,
+                             char32_t const *format,
+                             locale_t locale,
+                             ...)
+		__THROWS(...)
+/*[[[body:_fwprintf_l]]]*/
+/*AUTO*/{
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libc__vfwprintf_l(stream, format, locale, args);
+	va_end(args);
+	return result;
+}
+/*[[[end:_fwprintf_l]]]*/
+
+/*[[[head:DOS$_fwprintf_l,hash:CRC-32=0xdfeadb6f]]]*/
+INTERN NONNULL((1, 2))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._fwprintf_l") __STDC_INT_AS_SSIZE_T
+(VLIBDCALL libd__fwprintf_l)(FILE *stream,
+                             char16_t const *format,
+                             locale_t locale,
+                             ...)
+		__THROWS(...)
+/*[[[body:DOS$_fwprintf_l]]]*/
+/*AUTO*/{
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libd__vfwprintf_l(stream, format, locale, args);
+	va_end(args);
+	return result;
+}
+/*[[[end:DOS$_fwprintf_l]]]*/
+
+/*[[[head:_vfwprintf_s_l,hash:CRC-32=0xcc1886f9]]]*/
+INTERN NONNULL((1, 2))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._vfwprintf_s_l") __STDC_INT_AS_SSIZE_T
+(LIBCCALL libc__vfwprintf_s_l)(FILE *stream,
+                               char32_t const *format,
+                               locale_t locale,
+                               va_list args)
+		__THROWS(...)
+/*[[[body:_vfwprintf_s_l]]]*/
+/*AUTO*/{
+	(void)locale;
+	return libc_vfwprintf_s(stream, format, args);
+}
+/*[[[end:_vfwprintf_s_l]]]*/
+
+/*[[[head:DOS$_vfwprintf_s_l,hash:CRC-32=0x5f7ce075]]]*/
+INTERN NONNULL((1, 2))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._vfwprintf_s_l") __STDC_INT_AS_SSIZE_T
+(LIBDCALL libd__vfwprintf_s_l)(FILE *stream,
+                               char16_t const *format,
+                               locale_t locale,
+                               va_list args)
+		__THROWS(...)
+/*[[[body:DOS$_vfwprintf_s_l]]]*/
+/*AUTO*/{
+	(void)locale;
+	return libd_vfwprintf_s(stream, format, args);
+}
+/*[[[end:DOS$_vfwprintf_s_l]]]*/
+
+/*[[[head:_fwprintf_s_l,hash:CRC-32=0x679b9dd0]]]*/
+INTERN NONNULL((1, 2))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._fwprintf_s_l") __STDC_INT_AS_SSIZE_T
+(VLIBCCALL libc__fwprintf_s_l)(FILE *stream,
+                               char32_t const *format,
+                               locale_t locale,
+                               ...)
+		__THROWS(...)
+/*[[[body:_fwprintf_s_l]]]*/
+/*AUTO*/{
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libc__vfwprintf_s_l(stream, format, locale, args);
+	va_end(args);
+	return result;
+}
+/*[[[end:_fwprintf_s_l]]]*/
+
+/*[[[head:DOS$_fwprintf_s_l,hash:CRC-32=0xbc441700]]]*/
+INTERN NONNULL((1, 2))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._fwprintf_s_l") __STDC_INT_AS_SSIZE_T
+(VLIBDCALL libd__fwprintf_s_l)(FILE *stream,
+                               char16_t const *format,
+                               locale_t locale,
+                               ...)
+		__THROWS(...)
+/*[[[body:DOS$_fwprintf_s_l]]]*/
+/*AUTO*/{
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libd__vfwprintf_s_l(stream, format, locale, args);
+	va_end(args);
+	return result;
+}
+/*[[[end:DOS$_fwprintf_s_l]]]*/
+
 /*[[[end:implementation]]]*/
 
 
 
-/*[[[start:exports,hash:CRC-32=0x7aaab96f]]]*/
+/*[[[start:exports,hash:CRC-32=0x444f8c3d]]]*/
 #undef fwprintf
+#undef fwprintf_s
 #undef wprintf
+#undef wprintf_s
 #undef fwscanf
+#undef fwscanf_s
 #undef wscanf
+#undef wscanf_s
 #undef fwprintf_unlocked
 #undef wprintf_unlocked
 #undef fwscanf_unlocked
 #undef wscanf_unlocked
+#undef _wprintf_p
+#undef _wprintf_l
+#undef _wprintf_p_l
+#undef _wprintf_s_l
+#undef _fwprintf_l
+#undef _fwprintf_s_l
+#undef _fwscanf_l
+#undef _fwscanf_s_l
+#undef _wscanf_l
+#undef _wscanf_s_l
 DEFINE_PUBLIC_WEAK_ALIAS(getwchar, libc_getwchar);
+DEFINE_PUBLIC_WEAK_ALIAS(_fgetwchar, libc_getwchar);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$getwchar, libd_getwchar);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_fgetwchar, libd_getwchar);
 DEFINE_PUBLIC_WEAK_ALIAS(fgetwc, libc_fgetwc);
 DEFINE_PUBLIC_WEAK_ALIAS(getwc, libc_fgetwc);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$fgetwc, libd_fgetwc);
 DEFINE_PUBLIC_WEAK_ALIAS(putwchar, libc_putwchar);
+DEFINE_PUBLIC_WEAK_ALIAS(_fputwchar, libc_putwchar);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$putwchar, libd_putwchar);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_fputwchar, libd_putwchar);
 DEFINE_PUBLIC_WEAK_ALIAS(fputwc, libc_fputwc);
 DEFINE_PUBLIC_WEAK_ALIAS(putwc, libc_fputwc);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$fputwc, libd_fputwc);
@@ -1594,20 +2401,28 @@ DEFINE_PUBLIC_WEAK_ALIAS(DOS$fputws, libd_fputws);
 DEFINE_PUBLIC_WEAK_ALIAS(ungetwc, libc_ungetwc);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$ungetwc, libd_ungetwc);
 DEFINE_PUBLIC_WEAK_ALIAS(fwprintf, libc_fwprintf);
+DEFINE_PUBLIC_WEAK_ALIAS(fwprintf_s, libc_fwprintf);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$fwprintf, libd_fwprintf);
 DEFINE_PUBLIC_WEAK_ALIAS(vfwprintf, libc_vfwprintf);
+DEFINE_PUBLIC_WEAK_ALIAS(vfwprintf_s, libc_vfwprintf);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$vfwprintf, libd_vfwprintf);
 DEFINE_PUBLIC_WEAK_ALIAS(wprintf, libc_wprintf);
+DEFINE_PUBLIC_WEAK_ALIAS(wprintf_s, libc_wprintf);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$wprintf, libd_wprintf);
 DEFINE_PUBLIC_WEAK_ALIAS(vwprintf, libc_vwprintf);
+DEFINE_PUBLIC_WEAK_ALIAS(vwprintf_s, libc_vwprintf);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$vwprintf, libd_vwprintf);
 DEFINE_PUBLIC_WEAK_ALIAS(fwscanf, libc_fwscanf);
+DEFINE_PUBLIC_WEAK_ALIAS(fwscanf_s, libc_fwscanf);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$fwscanf, libd_fwscanf);
 DEFINE_PUBLIC_WEAK_ALIAS(wscanf, libc_wscanf);
+DEFINE_PUBLIC_WEAK_ALIAS(wscanf_s, libc_wscanf);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$wscanf, libd_wscanf);
 DEFINE_PUBLIC_WEAK_ALIAS(vfwscanf, libc_vfwscanf);
+DEFINE_PUBLIC_WEAK_ALIAS(vfwscanf_s, libc_vfwscanf);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$vfwscanf, libd_vfwscanf);
 DEFINE_PUBLIC_WEAK_ALIAS(vwscanf, libc_vwscanf);
+DEFINE_PUBLIC_WEAK_ALIAS(vwscanf_s, libc_vwscanf);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$vwscanf, libd_vwscanf);
 DEFINE_PUBLIC_WEAK_ALIAS(mbsnrtowcs, libc_mbsnrtowcs);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$mbsnrtowcs, libd_mbsnrtowcs);
@@ -1617,7 +2432,6 @@ DEFINE_PUBLIC_WEAK_ALIAS(open_wmemstream, libc_open_wmemstream);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$open_wmemstream, libd_open_wmemstream);
 DEFINE_PUBLIC_WEAK_ALIAS(wcsdup, libc_wcsdup);
 DEFINE_PUBLIC_WEAK_ALIAS(_wcsdup, libc_wcsdup);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$wcsdup, libd_wcsdup);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wcsdup, libd_wcsdup);
 DEFINE_PUBLIC_WEAK_ALIAS(wcwidth, libc_wcwidth);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$wcwidth, libd_wcwidth);
@@ -1628,29 +2442,26 @@ DEFINE_PUBLIC_WEAK_ALIAS(DOS$getwchar_unlocked, libd_getwchar_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(putwchar_unlocked, libc_putwchar_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$putwchar_unlocked, libd_putwchar_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(fgetwc_unlocked, libc_fgetwc_unlocked);
-DEFINE_PUBLIC_WEAK_ALIAS(_fgetwc_nolock, libc_fgetwc_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(getwc_unlocked, libc_fgetwc_unlocked);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$fgetwc_unlocked, libd_fgetwc_unlocked);
+DEFINE_PUBLIC_WEAK_ALIAS(_fgetwc_nolock, libc_fgetwc_unlocked);
+DEFINE_PUBLIC_WEAK_ALIAS(_getwc_nolock, libc_fgetwc_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$_fgetwc_nolock, libd_fgetwc_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(fputwc_unlocked, libc_fputwc_unlocked);
-DEFINE_PUBLIC_WEAK_ALIAS(_fputwc_nolock, libc_fputwc_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(putwc_unlocked, libc_fputwc_unlocked);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$fputwc_unlocked, libd_fputwc_unlocked);
+DEFINE_PUBLIC_WEAK_ALIAS(_fputwc_nolock, libc_fputwc_unlocked);
+DEFINE_PUBLIC_WEAK_ALIAS(_putwc_nolock, libc_fputwc_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$_fputwc_nolock, libd_fputwc_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(fgetws_unlocked, libc_fgetws_unlocked);
-DEFINE_PUBLIC_WEAK_ALIAS(_fgetws_nolock, libc_fgetws_unlocked);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$fgetws_unlocked, libd_fgetws_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$_fgetws_nolock, libd_fgetws_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(fputws_unlocked, libc_fputws_unlocked);
-DEFINE_PUBLIC_WEAK_ALIAS(_fputws_nolock, libc_fputws_unlocked);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$fputws_unlocked, libd_fputws_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$_fputws_nolock, libd_fputws_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(file_wprinter, libc_file_wprinter);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$file_wprinter, libd_file_wprinter);
 DEFINE_PUBLIC_WEAK_ALIAS(file_wprinter_unlocked, libc_file_wprinter_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$file_wprinter_unlocked, libd_file_wprinter_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(ungetwc_unlocked, libc_ungetwc_unlocked);
-DEFINE_PUBLIC_WEAK_ALIAS(DOS$ungetwc_unlocked, libd_ungetwc_unlocked);
+DEFINE_PUBLIC_WEAK_ALIAS(_ungetwc_nolock, libc_ungetwc_unlocked);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_ungetwc_nolock, libd_ungetwc_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(vfwprintf_unlocked, libc_vfwprintf_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$vfwprintf_unlocked, libd_vfwprintf_unlocked);
 DEFINE_PUBLIC_WEAK_ALIAS(fwprintf_unlocked, libc_fwprintf_unlocked);
@@ -1677,6 +2488,54 @@ DEFINE_PUBLIC_WEAK_ALIAS(__wcserror, libc___wcserror);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$__wcserror, libd___wcserror);
 DEFINE_PUBLIC_WEAK_ALIAS(__wcserror_s, libc___wcserror_s);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$__wcserror_s, libd___wcserror_s);
+DEFINE_PUBLIC_WEAK_ALIAS(_vwprintf_p, libc__vwprintf_p);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_vwprintf_p, libd__vwprintf_p);
+DEFINE_PUBLIC_WEAK_ALIAS(_wprintf_p, libc__wprintf_p);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wprintf_p, libd__wprintf_p);
+DEFINE_PUBLIC_WEAK_ALIAS(_vwprintf_l, libc__vwprintf_l);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_vwprintf_l, libd__vwprintf_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_wprintf_l, libc__wprintf_l);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wprintf_l, libd__wprintf_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_vwprintf_p_l, libc__vwprintf_p_l);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_vwprintf_p_l, libd__vwprintf_p_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_wprintf_p_l, libc__wprintf_p_l);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wprintf_p_l, libd__wprintf_p_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_vwprintf_s_l, libc__vwprintf_s_l);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_vwprintf_s_l, libd__vwprintf_s_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_wprintf_s_l, libc__wprintf_s_l);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wprintf_s_l, libd__wprintf_s_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_vfwprintf_l, libc__vfwprintf_l);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_vfwprintf_l, libd__vfwprintf_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_fwprintf_l, libc__fwprintf_l);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_fwprintf_l, libd__fwprintf_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_vfwprintf_s_l, libc__vfwprintf_s_l);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_vfwprintf_s_l, libd__vfwprintf_s_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_fwprintf_s_l, libc__fwprintf_s_l);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_fwprintf_s_l, libd__fwprintf_s_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_fwscanf_l, libc__fwscanf_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_fwscanf_s_l, libc__fwscanf_l);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_fwscanf_l, libd__fwscanf_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_wscanf_l, libc__wscanf_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_wscanf_s_l, libc__wscanf_l);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wscanf_l, libd__wscanf_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_wfsopen, libc__wfsopen);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wfsopen, libd__wfsopen);
+DEFINE_PUBLIC_WEAK_ALIAS(_wfdopen, libc__wfdopen);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wfdopen, libd__wfdopen);
+DEFINE_PUBLIC_WEAK_ALIAS(_wfopen_s, libc__wfopen_s);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wfopen_s, libd__wfopen_s);
+DEFINE_PUBLIC_WEAK_ALIAS(_wfreopen_s, libc__wfreopen_s);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wfreopen_s, libd__wfreopen_s);
+DEFINE_PUBLIC_WEAK_ALIAS(_getws_s, libc__getws_s);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_getws_s, libd__getws_s);
+DEFINE_PUBLIC_WEAK_ALIAS(_putws, libc__putws);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_putws, libd__putws);
+DEFINE_PUBLIC_WEAK_ALIAS(_wtempnam, libc__wtempnam);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wtempnam, libd__wtempnam);
+DEFINE_PUBLIC_WEAK_ALIAS(_wperror, libc__wperror);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wperror, libd__wperror);
+DEFINE_PUBLIC_WEAK_ALIAS(_wtmpnam_s, libc__wtmpnam_s);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_wtmpnam_s, libd__wtmpnam_s);
 /*[[[end:exports]]]*/
 
 DECL_END

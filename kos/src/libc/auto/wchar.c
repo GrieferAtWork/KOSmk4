@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x849dcb34 */
+/* HASH CRC-32:0x242b0ca2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -843,7 +843,7 @@ NOTHROW_NCX(VLIBDCALL libd_swscanf)(char16_t const *__restrict src,
 	return result;
 }
 
-INTERN NONNULL((1, 3)) ATTR_LIBC_WPRINTF(3, 0)
+INTERN NONNULL((3)) ATTR_LIBC_WPRINTF(3, 0)
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.unicode.static.format.printf.vswprintf") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBCCALL libc_vswprintf)(char32_t *__restrict buf,
                                      size_t buflen,
@@ -853,7 +853,7 @@ NOTHROW_NCX(LIBCCALL libc_vswprintf)(char32_t *__restrict buf,
 	/* TODO: format_wprintf() */
 	return 0;
 }
-INTERN NONNULL((1, 3)) ATTR_LIBC_WPRINTF(3, 0)
+INTERN NONNULL((3)) ATTR_LIBC_WPRINTF(3, 0)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf.vswprintf") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(LIBDCALL libd_vswprintf)(char16_t *__restrict buf,
                                      size_t buflen,
@@ -864,7 +864,7 @@ NOTHROW_NCX(LIBDCALL libd_vswprintf)(char16_t *__restrict buf,
 	return 0;
 }
 
-INTERN NONNULL((1, 3)) ATTR_LIBC_WPRINTF(3, 4)
+INTERN NONNULL((3)) ATTR_LIBC_WPRINTF(3, 4)
 ATTR_WEAK ATTR_SECTION(".text.crt.wchar.unicode.static.format.printf.swprintf") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBCCALL libc_swprintf)(char32_t *__restrict buf,
                                      size_t buflen,
@@ -878,7 +878,7 @@ NOTHROW_NCX(VLIBCCALL libc_swprintf)(char32_t *__restrict buf,
 	va_end(args);
 	return result;
 }
-INTERN NONNULL((1, 3)) ATTR_LIBC_WPRINTF(3, 4)
+INTERN NONNULL((3)) ATTR_LIBC_WPRINTF(3, 4)
 ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.unicode.static.format.printf.swprintf") __STDC_INT_AS_SIZE_T
 NOTHROW_NCX(VLIBDCALL libd_swprintf)(char16_t *__restrict buf,
                                      size_t buflen,
@@ -3901,11 +3901,915 @@ NOTHROW_NCX(LIBDCALL libd_wcsupr)(char16_t *__restrict str) {
 	return str;
 }
 
+INTERN WUNUSED NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._vscwprintf") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(LIBCCALL libc__vscwprintf)(char32_t const *format,
+                                       va_list args) {
+#line 1717 "kos/src/libc/magic/wchar.c"
+	return libc_vswprintf(NULL, 0, format, args);
+}
+INTERN WUNUSED NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._vscwprintf") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(LIBDCALL libd__vscwprintf)(char16_t const *format,
+                                       va_list args) {
+#line 1717 "kos/src/libc/magic/wchar.c"
+	return libd_vswprintf(NULL, 0, format, args);
+}
+
+INTERN WUNUSED NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._scwprintf") int
+NOTHROW_NCX(VLIBCCALL libc__scwprintf)(char32_t const *format,
+                                       ...) {
+#line 1723 "kos/src/libc/magic/wchar.c"
+	int result;
+	va_list args;
+	va_start(args, format);
+	result = libc__vscwprintf(format, args);
+	va_end(args);
+	return result;
+}
+INTERN WUNUSED NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._scwprintf") int
+NOTHROW_NCX(VLIBDCALL libd__scwprintf)(char16_t const *format,
+                                       ...) {
+#line 1723 "kos/src/libc/magic/wchar.c"
+	int result;
+	va_list args;
+	va_start(args, format);
+	result = libd__vscwprintf(format, args);
+	va_end(args);
+	return result;
+}
+
+INTERN WUNUSED NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._vscwprintf_p") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(LIBCCALL libc__vscwprintf_p)(char32_t const *format,
+                                         va_list args) {
+#line 1726 "kos/src/libc/magic/wchar.c"
+	(void)format;
+	(void)args;
+	/* TODO */
+	return 0;
+}
+INTERN WUNUSED NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._vscwprintf_p") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(LIBDCALL libd__vscwprintf_p)(char16_t const *format,
+                                         va_list args) {
+#line 1726 "kos/src/libc/magic/wchar.c"
+	(void)format;
+	(void)args;
+	/* TODO */
+	return 0;
+}
+
+INTERN WUNUSED NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._scwprintf_p") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(VLIBCCALL libc__scwprintf_p)(char32_t const *format,
+                                         ...) {
+#line 1735 "kos/src/libc/magic/wchar.c"
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = libc__vscwprintf_p(format, args);
+	va_end(args);
+	return result;
+}
+INTERN WUNUSED NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._scwprintf_p") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(VLIBDCALL libd__scwprintf_p)(char16_t const *format,
+                                         ...) {
+#line 1735 "kos/src/libc/magic/wchar.c"
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = libd__vscwprintf_p(format, args);
+	va_end(args);
+	return result;
+}
+
+INTERN WUNUSED NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._vscwprintf_l") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(LIBCCALL libc__vscwprintf_l)(char32_t const *format,
+                                         locale_t locale,
+                                         va_list args) {
+#line 1739 "kos/src/libc/magic/wchar.c"
+	(void)locale;
+	return libc__vscwprintf(format, args);
+}
+INTERN WUNUSED NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._vscwprintf_l") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(LIBDCALL libd__vscwprintf_l)(char16_t const *format,
+                                         locale_t locale,
+                                         va_list args) {
+#line 1739 "kos/src/libc/magic/wchar.c"
+	(void)locale;
+	return libd__vscwprintf(format, args);
+}
+
+INTERN WUNUSED NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._scwprintf_l") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(VLIBCCALL libc__scwprintf_l)(char32_t const *format,
+                                         locale_t locale,
+                                         ...) {
+#line 1747 "kos/src/libc/magic/wchar.c"
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libc__vscwprintf_l(format, locale, args);
+	va_end(args);
+	return result;
+}
+INTERN WUNUSED NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._scwprintf_l") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(VLIBDCALL libd__scwprintf_l)(char16_t const *format,
+                                         locale_t locale,
+                                         ...) {
+#line 1747 "kos/src/libc/magic/wchar.c"
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libd__vscwprintf_l(format, locale, args);
+	va_end(args);
+	return result;
+}
+
+INTERN WUNUSED NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._vscwprintf_p_l") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(LIBCCALL libc__vscwprintf_p_l)(char32_t const *format,
+                                           locale_t locale,
+                                           va_list args) {
+#line 1751 "kos/src/libc/magic/wchar.c"
+	(void)locale;
+	return libc__vscwprintf_p(format, args);
+}
+INTERN WUNUSED NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._vscwprintf_p_l") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(LIBDCALL libd__vscwprintf_p_l)(char16_t const *format,
+                                           locale_t locale,
+                                           va_list args) {
+#line 1751 "kos/src/libc/magic/wchar.c"
+	(void)locale;
+	return libd__vscwprintf_p(format, args);
+}
+
+INTERN WUNUSED NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._scwprintf_p_l") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(VLIBCCALL libc__scwprintf_p_l)(char32_t const *format,
+                                           locale_t locale,
+                                           ...) {
+#line 1759 "kos/src/libc/magic/wchar.c"
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libc__vscwprintf_p_l(format, locale, args);
+	va_end(args);
+	return result;
+}
+INTERN WUNUSED NONNULL((1))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._scwprintf_p_l") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(VLIBDCALL libd__scwprintf_p_l)(char16_t const *format,
+                                           locale_t locale,
+                                           ...) {
+#line 1759 "kos/src/libc/magic/wchar.c"
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libd__vscwprintf_p_l(format, locale, args);
+	va_end(args);
+	return result;
+}
+
+INTERN NONNULL((4))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._vsnwprintf_s") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(LIBCCALL libc__vsnwprintf_s)(char32_t *buf,
+                                         size_t bufsize,
+                                         size_t buflen,
+                                         char32_t const *format,
+                                         va_list args) {
+#line 1771 "kos/src/libc/magic/wchar.c"
+	(void)buflen;
+	return libc_vswprintf(buf, bufsize, format, args);
+}
+INTERN NONNULL((4))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._vsnwprintf_s") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(LIBDCALL libd__vsnwprintf_s)(char16_t *buf,
+                                         size_t bufsize,
+                                         size_t buflen,
+                                         char16_t const *format,
+                                         va_list args) {
+#line 1771 "kos/src/libc/magic/wchar.c"
+	(void)buflen;
+	return libd_vswprintf(buf, bufsize, format, args);
+}
+
+INTERN NONNULL((4))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._snwprintf_s") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(VLIBCCALL libc__snwprintf_s)(char32_t *buf,
+                                         size_t bufsize,
+                                         size_t buflen,
+                                         char32_t const *format,
+                                         ...) {
+#line 1779 "kos/src/libc/magic/wchar.c"
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = libc__vsnwprintf_s(buf, bufsize, buflen, format, args);
+	va_end(args);
+	return result;
+}
+INTERN NONNULL((4))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._snwprintf_s") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(VLIBDCALL libd__snwprintf_s)(char16_t *buf,
+                                         size_t bufsize,
+                                         size_t buflen,
+                                         char16_t const *format,
+                                         ...) {
+#line 1779 "kos/src/libc/magic/wchar.c"
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = libd__vsnwprintf_s(buf, bufsize, buflen, format, args);
+	va_end(args);
+	return result;
+}
+
+INTERN NONNULL((1, 2))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._vfwprintf_p") __STDC_INT_AS_SSIZE_T
+(LIBCCALL libc__vfwprintf_p)(FILE *stream,
+                             char32_t const *format,
+                             va_list args) __THROWS(...) {
+#line 1784 "kos/src/libc/magic/wchar.c"
+	(void)stream;
+	(void)format;
+	(void)args;
+	/* TODO */
+	return 0;
+}
+INTERN NONNULL((1, 2))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._vfwprintf_p") __STDC_INT_AS_SSIZE_T
+(LIBDCALL libd__vfwprintf_p)(FILE *stream,
+                             char16_t const *format,
+                             va_list args) __THROWS(...) {
+#line 1784 "kos/src/libc/magic/wchar.c"
+	(void)stream;
+	(void)format;
+	(void)args;
+	/* TODO */
+	return 0;
+}
+
+INTERN NONNULL((1, 2))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._fwprintf_p") __STDC_INT_AS_SSIZE_T
+(VLIBCCALL libc__fwprintf_p)(FILE *stream,
+                             char32_t const *format,
+                             ...) __THROWS(...) {
+#line 1795 "kos/src/libc/magic/wchar.c"
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = libc__vfwprintf_p(stream, format, args);
+	va_end(args);
+	return result;
+}
+INTERN NONNULL((1, 2))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._fwprintf_p") __STDC_INT_AS_SSIZE_T
+(VLIBDCALL libd__fwprintf_p)(FILE *stream,
+                             char16_t const *format,
+                             ...) __THROWS(...) {
+#line 1795 "kos/src/libc/magic/wchar.c"
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = libd__vfwprintf_p(stream, format, args);
+	va_end(args);
+	return result;
+}
+
+INTERN NONNULL((1, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._vswprintf_p") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(LIBCCALL libc__vswprintf_p)(char32_t *buf,
+                                        size_t bufsize,
+                                        char32_t const *format,
+                                        va_list args) {
+#line 1810 "kos/src/libc/magic/wchar.c"
+	(void)buf;
+	(void)bufsize;
+	(void)format;
+	(void)args;
+	/* TODO */
+	return 0;
+}
+INTERN NONNULL((1, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._vswprintf_p") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(LIBDCALL libd__vswprintf_p)(char16_t *buf,
+                                        size_t bufsize,
+                                        char16_t const *format,
+                                        va_list args) {
+#line 1810 "kos/src/libc/magic/wchar.c"
+	(void)buf;
+	(void)bufsize;
+	(void)format;
+	(void)args;
+	/* TODO */
+	return 0;
+}
+
+INTERN NONNULL((1, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._swprintf_p") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(VLIBCCALL libc__swprintf_p)(char32_t *dst,
+                                        size_t bufsize,
+                                        char32_t const *format,
+                                        ...) {
+#line 1822 "kos/src/libc/magic/wchar.c"
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = libc__vswprintf_p(dst, bufsize, format, args);
+	va_end(args);
+	return result;
+}
+INTERN NONNULL((1, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._swprintf_p") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(VLIBDCALL libd__swprintf_p)(char16_t *dst,
+                                        size_t bufsize,
+                                        char16_t const *format,
+                                        ...) {
+#line 1822 "kos/src/libc/magic/wchar.c"
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = libd__vswprintf_p(dst, bufsize, format, args);
+	va_end(args);
+	return result;
+}
+
+INTERN NONNULL((1, 2))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._vfwprintf_p_l") __STDC_INT_AS_SSIZE_T
+(LIBCCALL libc__vfwprintf_p_l)(FILE *stream,
+                               char32_t const *format,
+                               locale_t locale,
+                               va_list args) __THROWS(...) {
+#line 1876 "kos/src/libc/magic/wchar.c"
+	(void)locale;
+	return libc__vfwprintf_p(stream, format, args);
+}
+INTERN NONNULL((1, 2))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._vfwprintf_p_l") __STDC_INT_AS_SSIZE_T
+(LIBDCALL libd__vfwprintf_p_l)(FILE *stream,
+                               char16_t const *format,
+                               locale_t locale,
+                               va_list args) __THROWS(...) {
+#line 1876 "kos/src/libc/magic/wchar.c"
+	(void)locale;
+	return libd__vfwprintf_p(stream, format, args);
+}
+
+INTERN NONNULL((1, 2))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._fwprintf_p_l") __STDC_INT_AS_SSIZE_T
+(VLIBCCALL libc__fwprintf_p_l)(FILE *stream,
+                               char32_t const *format,
+                               locale_t locale,
+                               ...) __THROWS(...) {
+#line 1885 "kos/src/libc/magic/wchar.c"
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libc__vfwprintf_p_l(stream, format, locale, args);
+	va_end(args);
+	return result;
+}
+INTERN NONNULL((1, 2))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._fwprintf_p_l") __STDC_INT_AS_SSIZE_T
+(VLIBDCALL libd__fwprintf_p_l)(FILE *stream,
+                               char16_t const *format,
+                               locale_t locale,
+                               ...) __THROWS(...) {
+#line 1885 "kos/src/libc/magic/wchar.c"
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libd__vfwprintf_p_l(stream, format, locale, args);
+	va_end(args);
+	return result;
+}
+
+INTERN NONNULL((1, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._vswprintf_c_l") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(LIBCCALL libc__vswprintf_c_l)(char32_t *dst,
+                                          size_t bufsize,
+                                          char32_t const *format,
+                                          locale_t locale,
+                                          va_list args) {
+#line 1906 "kos/src/libc/magic/wchar.c"
+	(void)locale;
+	return libc__vswprintf_c(dst, bufsize, format, args);
+}
+INTERN NONNULL((1, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._vswprintf_c_l") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(LIBDCALL libd__vswprintf_c_l)(char16_t *dst,
+                                          size_t bufsize,
+                                          char16_t const *format,
+                                          locale_t locale,
+                                          va_list args) {
+#line 1906 "kos/src/libc/magic/wchar.c"
+	(void)locale;
+	return libd__vswprintf_c(dst, bufsize, format, args);
+}
+
+INTERN NONNULL((1, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._swprintf_c_l") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(VLIBCCALL libc__swprintf_c_l)(char32_t *dst,
+                                          size_t bufsize,
+                                          char32_t const *format,
+                                          locale_t locale,
+                                          ...) {
+#line 1915 "kos/src/libc/magic/wchar.c"
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libc__vswprintf_c_l(dst, bufsize, format, locale, args);
+	va_end(args);
+	return result;
+}
+INTERN NONNULL((1, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._swprintf_c_l") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(VLIBDCALL libd__swprintf_c_l)(char16_t *dst,
+                                          size_t bufsize,
+                                          char16_t const *format,
+                                          locale_t locale,
+                                          ...) {
+#line 1915 "kos/src/libc/magic/wchar.c"
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libd__vswprintf_c_l(dst, bufsize, format, locale, args);
+	va_end(args);
+	return result;
+}
+
+INTERN NONNULL((1, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._vswprintf_p_l") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(LIBCCALL libc__vswprintf_p_l)(char32_t *dst,
+                                          size_t bufsize,
+                                          char32_t const *format,
+                                          locale_t locale,
+                                          va_list args) {
+#line 1921 "kos/src/libc/magic/wchar.c"
+	(void)locale;
+	return libc__vswprintf_p(dst, bufsize, format, args);
+}
+INTERN NONNULL((1, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._vswprintf_p_l") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(LIBDCALL libd__vswprintf_p_l)(char16_t *dst,
+                                          size_t bufsize,
+                                          char16_t const *format,
+                                          locale_t locale,
+                                          va_list args) {
+#line 1921 "kos/src/libc/magic/wchar.c"
+	(void)locale;
+	return libd__vswprintf_p(dst, bufsize, format, args);
+}
+
+INTERN NONNULL((1, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._swprintf_p_l") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(VLIBCCALL libc__swprintf_p_l)(char32_t *dst,
+                                          size_t bufsize,
+                                          char32_t const *format,
+                                          locale_t locale,
+                                          ...) {
+#line 1930 "kos/src/libc/magic/wchar.c"
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libc__vswprintf_p_l(dst, bufsize, format, locale, args);
+	va_end(args);
+	return result;
+}
+INTERN NONNULL((1, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._swprintf_p_l") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(VLIBDCALL libd__swprintf_p_l)(char16_t *dst,
+                                          size_t bufsize,
+                                          char16_t const *format,
+                                          locale_t locale,
+                                          ...) {
+#line 1930 "kos/src/libc/magic/wchar.c"
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libd__vswprintf_p_l(dst, bufsize, format, locale, args);
+	va_end(args);
+	return result;
+}
+
+INTERN NONNULL((1, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._vswprintf_s_l") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(LIBCCALL libc__vswprintf_s_l)(char32_t *dst,
+                                          size_t wchar_count,
+                                          char32_t const *format,
+                                          locale_t locale,
+                                          va_list args) {
+#line 1936 "kos/src/libc/magic/wchar.c"
+	(void)locale;
+	return libc_vswprintf_s(dst, wchar_count, format, args);
+}
+INTERN NONNULL((1, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._vswprintf_s_l") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(LIBDCALL libd__vswprintf_s_l)(char16_t *dst,
+                                          size_t wchar_count,
+                                          char16_t const *format,
+                                          locale_t locale,
+                                          va_list args) {
+#line 1936 "kos/src/libc/magic/wchar.c"
+	(void)locale;
+	return libd_vswprintf_s(dst, wchar_count, format, args);
+}
+
+INTERN NONNULL((1, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._swprintf_s_l") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(VLIBCCALL libc__swprintf_s_l)(char32_t *dst,
+                                          size_t wchar_count,
+                                          char32_t const *format,
+                                          locale_t locale,
+                                          ...) {
+#line 1944 "kos/src/libc/magic/wchar.c"
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libc__vswprintf_s_l(dst, wchar_count, format, locale, args);
+	va_end(args);
+	return result;
+}
+INTERN NONNULL((1, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._swprintf_s_l") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(VLIBDCALL libd__swprintf_s_l)(char16_t *dst,
+                                          size_t wchar_count,
+                                          char16_t const *format,
+                                          locale_t locale,
+                                          ...) {
+#line 1944 "kos/src/libc/magic/wchar.c"
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libd__vswprintf_s_l(dst, wchar_count, format, locale, args);
+	va_end(args);
+	return result;
+}
+
+INTERN NONNULL((1, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._vsnwprintf_l") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(LIBCCALL libc__vsnwprintf_l)(char32_t *dst,
+                                         size_t bufsize,
+                                         char32_t const *format,
+                                         locale_t locale,
+                                         va_list args) {
+#line 1950 "kos/src/libc/magic/wchar.c"
+	(void)locale;
+	return libc_vswprintf(dst, bufsize, format, args);
+}
+INTERN NONNULL((1, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._vsnwprintf_l") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(LIBDCALL libd__vsnwprintf_l)(char16_t *dst,
+                                         size_t bufsize,
+                                         char16_t const *format,
+                                         locale_t locale,
+                                         va_list args) {
+#line 1950 "kos/src/libc/magic/wchar.c"
+	(void)locale;
+	return libd_vswprintf(dst, bufsize, format, args);
+}
+
+INTERN NONNULL((1, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._snwprintf_l") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(VLIBCCALL libc__snwprintf_l)(char32_t *dst,
+                                         size_t bufsize,
+                                         char32_t const *format,
+                                         locale_t locale,
+                                         ...) {
+#line 1958 "kos/src/libc/magic/wchar.c"
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libc__vsnwprintf_l(dst, bufsize, format, locale, args);
+	va_end(args);
+	return result;
+}
+INTERN NONNULL((1, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._snwprintf_l") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(VLIBDCALL libd__snwprintf_l)(char16_t *dst,
+                                         size_t bufsize,
+                                         char16_t const *format,
+                                         locale_t locale,
+                                         ...) {
+#line 1958 "kos/src/libc/magic/wchar.c"
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libd__vsnwprintf_l(dst, bufsize, format, locale, args);
+	va_end(args);
+	return result;
+}
+
+INTERN NONNULL((1, 4))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._vsnwprintf_s_l") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(LIBCCALL libc__vsnwprintf_s_l)(char32_t *dst,
+                                           size_t wchar_count,
+                                           size_t bufsize,
+                                           char32_t const *format,
+                                           locale_t locale,
+                                           va_list args) {
+#line 1964 "kos/src/libc/magic/wchar.c"
+	(void)locale;
+	return libc__vsnwprintf_s(dst, wchar_count, bufsize, format, args);
+}
+INTERN NONNULL((1, 4))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._vsnwprintf_s_l") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(LIBDCALL libd__vsnwprintf_s_l)(char16_t *dst,
+                                           size_t wchar_count,
+                                           size_t bufsize,
+                                           char16_t const *format,
+                                           locale_t locale,
+                                           va_list args) {
+#line 1964 "kos/src/libc/magic/wchar.c"
+	(void)locale;
+	return libd__vsnwprintf_s(dst, wchar_count, bufsize, format, args);
+}
+
+INTERN NONNULL((1, 4))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._snwprintf_s_l") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(VLIBCCALL libc__snwprintf_s_l)(char32_t *dst,
+                                           size_t wchar_count,
+                                           size_t bufsize,
+                                           char32_t const *format,
+                                           locale_t locale,
+                                           ...) {
+#line 1973 "kos/src/libc/magic/wchar.c"
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libc__vsnwprintf_s_l(dst, wchar_count, bufsize, format, locale, args);
+	va_end(args);
+	return result;
+}
+INTERN NONNULL((1, 4))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.write.printf._snwprintf_s_l") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(VLIBDCALL libd__snwprintf_s_l)(char16_t *dst,
+                                           size_t wchar_count,
+                                           size_t bufsize,
+                                           char16_t const *format,
+                                           locale_t locale,
+                                           ...) {
+#line 1973 "kos/src/libc/magic/wchar.c"
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libd__vsnwprintf_s_l(dst, wchar_count, bufsize, format, locale, args);
+	va_end(args);
+	return result;
+}
+
+INTERN WUNUSED NONNULL((1, 2))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf._vswscanf_l") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(LIBCCALL libc__vswscanf_l)(char32_t const *src,
+                                       char32_t const *format,
+                                       locale_t locale,
+                                       va_list args) {
+#line 1997 "kos/src/libc/magic/wchar.c"
+	(void)locale;
+	return libc_vswscanf(src, format, args);
+}
+INTERN WUNUSED NONNULL((1, 2))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf._vswscanf_l") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(LIBDCALL libd__vswscanf_l)(char16_t const *src,
+                                       char16_t const *format,
+                                       locale_t locale,
+                                       va_list args) {
+#line 1997 "kos/src/libc/magic/wchar.c"
+	(void)locale;
+	return libd_vswscanf(src, format, args);
+}
+
+INTERN WUNUSED NONNULL((1, 2))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf._swscanf_l") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(VLIBCCALL libc__swscanf_l)(char32_t const *src,
+                                       char32_t const *format,
+                                       locale_t locale,
+                                       ...) {
+#line 2006 "kos/src/libc/magic/wchar.c"
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libc__vswscanf_l(src, format, locale, args);
+	va_end(args);
+	return result;
+}
+INTERN WUNUSED NONNULL((1, 2))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf._swscanf_l") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(VLIBDCALL libd__swscanf_l)(char16_t const *src,
+                                       char16_t const *format,
+                                       locale_t locale,
+                                       ...) {
+#line 2006 "kos/src/libc/magic/wchar.c"
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libd__vswscanf_l(src, format, locale, args);
+	va_end(args);
+	return result;
+}
+
+INTERN WUNUSED NONNULL((1, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf._vsnwscanf") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(LIBCCALL libc__vsnwscanf)(char32_t const *src,
+                                      size_t bufsize,
+                                      char32_t const *format,
+                                      va_list args) {
+#line 2013 "kos/src/libc/magic/wchar.c"
+	(void)src;
+	(void)bufsize;
+	(void)format;
+	(void)args;
+	/* TODO */
+	return 0;
+}
+INTERN WUNUSED NONNULL((1, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf._vsnwscanf") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(LIBDCALL libd__vsnwscanf)(char16_t const *src,
+                                      size_t bufsize,
+                                      char16_t const *format,
+                                      va_list args) {
+#line 2013 "kos/src/libc/magic/wchar.c"
+	(void)src;
+	(void)bufsize;
+	(void)format;
+	(void)args;
+	/* TODO */
+	return 0;
+}
+
+INTERN WUNUSED NONNULL((1, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf._snwscanf") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(VLIBCCALL libc__snwscanf)(char32_t const *src,
+                                      size_t bufsize,
+                                      char32_t const *format,
+                                      ...) {
+#line 2025 "kos/src/libc/magic/wchar.c"
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = libc__vsnwscanf(src, bufsize, format, args);
+	va_end(args);
+	return result;
+}
+INTERN WUNUSED NONNULL((1, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf._snwscanf") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(VLIBDCALL libd__snwscanf)(char16_t const *src,
+                                      size_t bufsize,
+                                      char16_t const *format,
+                                      ...) {
+#line 2025 "kos/src/libc/magic/wchar.c"
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, format);
+	result = libd__vsnwscanf(src, bufsize, format, args);
+	va_end(args);
+	return result;
+}
+
+INTERN WUNUSED NONNULL((1, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf._vsnwscanf_l") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(LIBCCALL libc__vsnwscanf_l)(char32_t const *src,
+                                        size_t bufsize,
+                                        char32_t const *format,
+                                        locale_t locale,
+                                        va_list args) {
+#line 2030 "kos/src/libc/magic/wchar.c"
+	(void)locale;
+	return libc__vsnwscanf(src, bufsize, format, args);
+}
+INTERN WUNUSED NONNULL((1, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf._vsnwscanf_l") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(LIBDCALL libd__vsnwscanf_l)(char16_t const *src,
+                                        size_t bufsize,
+                                        char16_t const *format,
+                                        locale_t locale,
+                                        va_list args) {
+#line 2030 "kos/src/libc/magic/wchar.c"
+	(void)locale;
+	return libd__vsnwscanf(src, bufsize, format, args);
+}
+
+INTERN WUNUSED NONNULL((1, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf._snwscanf_l") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(VLIBCCALL libc__snwscanf_l)(char32_t const *src,
+                                        size_t bufsize,
+                                        char32_t const *format,
+                                        locale_t locale,
+                                        ...) {
+#line 2038 "kos/src/libc/magic/wchar.c"
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libc__vsnwscanf_l(src, bufsize, format, locale, args);
+	va_end(args);
+	return result;
+}
+INTERN WUNUSED NONNULL((1, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf._snwscanf_l") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(VLIBDCALL libd__snwscanf_l)(char16_t const *src,
+                                        size_t bufsize,
+                                        char16_t const *format,
+                                        locale_t locale,
+                                        ...) {
+#line 2038 "kos/src/libc/magic/wchar.c"
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libd__vsnwscanf_l(src, bufsize, format, locale, args);
+	va_end(args);
+	return result;
+}
+
+INTERN WUNUSED NONNULL((1, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf._vsnwscanf_s_l") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(LIBCCALL libc__vsnwscanf_s_l)(char32_t const *src,
+                                          size_t bufsize,
+                                          char32_t const *format,
+                                          locale_t locale,
+                                          va_list args) {
+#line 2046 "kos/src/libc/magic/wchar.c"
+	(void)locale;
+	return libc__vsnwscanf_s(src, bufsize, format, args);
+}
+INTERN WUNUSED NONNULL((1, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf._vsnwscanf_s_l") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(LIBDCALL libd__vsnwscanf_s_l)(char16_t const *src,
+                                          size_t bufsize,
+                                          char16_t const *format,
+                                          locale_t locale,
+                                          va_list args) {
+#line 2046 "kos/src/libc/magic/wchar.c"
+	(void)locale;
+	return libd__vsnwscanf_s(src, bufsize, format, args);
+}
+
+INTERN WUNUSED NONNULL((1, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf._snwscanf_s_l") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(VLIBCCALL libc__snwscanf_s_l)(char32_t const *src,
+                                          size_t bufsize,
+                                          char32_t const *format,
+                                          locale_t locale,
+                                          ...) {
+#line 2054 "kos/src/libc/magic/wchar.c"
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libc__vsnwscanf_s_l(src, bufsize, format, locale, args);
+	va_end(args);
+	return result;
+}
+INTERN WUNUSED NONNULL((1, 3))
+ATTR_WEAK ATTR_SECTION(".text.crt.dos.wchar.FILE.locked.read.scanf._snwscanf_s_l") __STDC_INT_AS_SSIZE_T
+NOTHROW_NCX(VLIBDCALL libd__snwscanf_s_l)(char16_t const *src,
+                                          size_t bufsize,
+                                          char16_t const *format,
+                                          locale_t locale,
+                                          ...) {
+#line 2054 "kos/src/libc/magic/wchar.c"
+	__STDC_INT_AS_SSIZE_T result;
+	va_list args;
+	va_start(args, locale);
+	result = libd__vsnwscanf_s_l(src, bufsize, format, locale, args);
+	va_end(args);
+	return result;
+}
+
 #endif /* !__KERNEL__ */
 #ifndef __KERNEL__
 #undef swscanf
+#undef swscanf_s
 #undef swprintf
 #undef _swprintf
+#undef swprintf_s
+#undef _swprintf_c
+#undef _scwprintf
+#undef _scwprintf_p
+#undef _scwprintf_l
+#undef _scwprintf_p_l
+#undef _snwprintf_s
+#undef _fwprintf_p
+#undef _swprintf_p
+#undef _fwprintf_p_l
+#undef _swprintf_c_l
+#undef _swprintf_p_l
+#undef _swprintf_s_l
+#undef _snwprintf_l
+#undef _snwprintf_s_l
+#undef _swscanf_l
+#undef _swscanf_s_l
+#undef _snwscanf
+#undef _snwscanf_s
+#undef _snwscanf_l
+#undef _snwscanf_s_l
 DEFINE_PUBLIC_WEAK_ALIAS(btowc, libc_btowc);
 DEFINE_PUBLIC_WEAK_ALIAS(wctob, libc_wctob);
 DEFINE_PUBLIC_WEAK_ALIAS(mbrtowc, libc_mbrtowc);
@@ -3976,11 +4880,16 @@ DEFINE_PUBLIC_WEAK_ALIAS(wmemchr, libc_wmemchr);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$wmemchr, libd_wmemchr);
 DEFINE_PUBLIC_WEAK_ALIAS(fwide, libc_fwide);
 DEFINE_PUBLIC_WEAK_ALIAS(swscanf, libc_swscanf);
+DEFINE_PUBLIC_WEAK_ALIAS(swscanf_s, libc_swscanf);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$swscanf, libd_swscanf);
 DEFINE_PUBLIC_WEAK_ALIAS(vswprintf, libc_vswprintf);
+DEFINE_PUBLIC_WEAK_ALIAS(vswprintf_s, libc_vswprintf);
+DEFINE_PUBLIC_WEAK_ALIAS(_vswprintf_c, libc_vswprintf);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$vswprintf, libd_vswprintf);
 DEFINE_PUBLIC_WEAK_ALIAS(swprintf, libc_swprintf);
 DEFINE_PUBLIC_WEAK_ALIAS(_swprintf, libc_swprintf);
+DEFINE_PUBLIC_WEAK_ALIAS(swprintf_s, libc_swprintf);
+DEFINE_PUBLIC_WEAK_ALIAS(_swprintf_c, libc_swprintf);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$swprintf, libd_swprintf);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$_swprintf, libd_swprintf);
 DEFINE_PUBLIC_WEAK_ALIAS(wcstof, libc_wcstof);
@@ -3994,6 +4903,7 @@ DEFINE_PUBLIC_WEAK_ALIAS(wcstoull, libc_wcstoull);
 DEFINE_PUBLIC_WEAK_ALIAS(wcstouq, libc_wcstoull);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$wcstoull, libd_wcstoull);
 DEFINE_PUBLIC_WEAK_ALIAS(vswscanf, libc_vswscanf);
+DEFINE_PUBLIC_WEAK_ALIAS(vswscanf_s, libc_vswscanf);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$vswscanf, libd_vswscanf);
 DEFINE_PUBLIC_WEAK_ALIAS(wcscasecmp, libc_wcscasecmp);
 DEFINE_PUBLIC_WEAK_ALIAS(_wcsicmp, libc_wcscasecmp);
@@ -4210,6 +5120,68 @@ DEFINE_PUBLIC_WEAK_ALIAS(DOS$wcslwr, libd_wcslwr);
 DEFINE_PUBLIC_WEAK_ALIAS(wcsupr, libc_wcsupr);
 DEFINE_PUBLIC_WEAK_ALIAS(_wcsupr, libc_wcsupr);
 DEFINE_PUBLIC_WEAK_ALIAS(DOS$wcsupr, libd_wcsupr);
+DEFINE_PUBLIC_WEAK_ALIAS(_vscwprintf, libc__vscwprintf);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_vscwprintf, libd__vscwprintf);
+DEFINE_PUBLIC_WEAK_ALIAS(_scwprintf, libc__scwprintf);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_scwprintf, libd__scwprintf);
+DEFINE_PUBLIC_WEAK_ALIAS(_vscwprintf_p, libc__vscwprintf_p);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_vscwprintf_p, libd__vscwprintf_p);
+DEFINE_PUBLIC_WEAK_ALIAS(_scwprintf_p, libc__scwprintf_p);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_scwprintf_p, libd__scwprintf_p);
+DEFINE_PUBLIC_WEAK_ALIAS(_vscwprintf_l, libc__vscwprintf_l);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_vscwprintf_l, libd__vscwprintf_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_scwprintf_l, libc__scwprintf_l);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_scwprintf_l, libd__scwprintf_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_vscwprintf_p_l, libc__vscwprintf_p_l);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_vscwprintf_p_l, libd__vscwprintf_p_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_scwprintf_p_l, libc__scwprintf_p_l);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_scwprintf_p_l, libd__scwprintf_p_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_vsnwprintf_s, libc__vsnwprintf_s);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_vsnwprintf_s, libd__vsnwprintf_s);
+DEFINE_PUBLIC_WEAK_ALIAS(_snwprintf_s, libc__snwprintf_s);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_snwprintf_s, libd__snwprintf_s);
+DEFINE_PUBLIC_WEAK_ALIAS(_vfwprintf_p, libc__vfwprintf_p);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_vfwprintf_p, libd__vfwprintf_p);
+DEFINE_PUBLIC_WEAK_ALIAS(_fwprintf_p, libc__fwprintf_p);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_fwprintf_p, libd__fwprintf_p);
+DEFINE_PUBLIC_WEAK_ALIAS(_vswprintf_p, libc__vswprintf_p);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_vswprintf_p, libd__vswprintf_p);
+DEFINE_PUBLIC_WEAK_ALIAS(_swprintf_p, libc__swprintf_p);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_swprintf_p, libd__swprintf_p);
+DEFINE_PUBLIC_WEAK_ALIAS(_vfwprintf_p_l, libc__vfwprintf_p_l);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_vfwprintf_p_l, libd__vfwprintf_p_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_fwprintf_p_l, libc__fwprintf_p_l);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_fwprintf_p_l, libd__fwprintf_p_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_vswprintf_c_l, libc__vswprintf_c_l);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_vswprintf_c_l, libd__vswprintf_c_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_swprintf_c_l, libc__swprintf_c_l);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_swprintf_c_l, libd__swprintf_c_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_vswprintf_p_l, libc__vswprintf_p_l);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_vswprintf_p_l, libd__vswprintf_p_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_swprintf_p_l, libc__swprintf_p_l);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_swprintf_p_l, libd__swprintf_p_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_vswprintf_s_l, libc__vswprintf_s_l);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_vswprintf_s_l, libd__vswprintf_s_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_swprintf_s_l, libc__swprintf_s_l);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_swprintf_s_l, libd__swprintf_s_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_vsnwprintf_l, libc__vsnwprintf_l);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_vsnwprintf_l, libd__vsnwprintf_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_snwprintf_l, libc__snwprintf_l);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_snwprintf_l, libd__snwprintf_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_vsnwprintf_s_l, libc__vsnwprintf_s_l);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_vsnwprintf_s_l, libd__vsnwprintf_s_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_snwprintf_s_l, libc__snwprintf_s_l);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_snwprintf_s_l, libd__snwprintf_s_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_swscanf_l, libc__swscanf_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_swscanf_s_l, libc__swscanf_l);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_swscanf_l, libd__swscanf_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_snwscanf, libc__snwscanf);
+DEFINE_PUBLIC_WEAK_ALIAS(_snwscanf_s, libc__snwscanf);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_snwscanf, libd__snwscanf);
+DEFINE_PUBLIC_WEAK_ALIAS(_snwscanf_l, libc__snwscanf_l);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_snwscanf_l, libd__snwscanf_l);
+DEFINE_PUBLIC_WEAK_ALIAS(_snwscanf_s_l, libc__snwscanf_s_l);
+DEFINE_PUBLIC_WEAK_ALIAS(DOS$_snwscanf_s_l, libd__snwscanf_s_l);
 #endif /* !__KERNEL__ */
 
 DECL_END

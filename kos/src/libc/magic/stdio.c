@@ -1708,8 +1708,8 @@ __asprintf:([nonnull] char **__restrict pstr, [nonnull] char const *__restrict f
 
 
 
-#ifdef __USE_KOS
 }
+%#ifdef __USE_KOS
 
 %[default_impl_section(.text.crt.FILE.locked.access)]
 
@@ -2033,7 +2033,9 @@ __SYSDECL_END
 
 
 
-#ifdef __USE_DOS
+}
+%#ifdef __USE_DOS
+%{
 #define _NFILE          512
 #define _NSTREAM_       512
 #define _IOB_ENTRIES    20
@@ -2062,8 +2064,9 @@ __SYSDECL_END
 #define _CRT_PERROR_DEFINED 1
 #endif /* !_CRT_PERROR_DEFINED */
 
-#ifdef __CC__
-
+}
+%#ifdef __CC__
+%{
 #ifndef __errno_t_defined
 #define __errno_t_defined 1
 typedef __errno_t errno_t;
@@ -2707,10 +2710,135 @@ _ungetc_nolock:(int ch, [nonnull] $FILE *__restrict stream) -> int = ungetc;
 %{
 #define SYS_OPEN     _SYS_OPEN
 
-#endif /* __CC__ */
-#endif /* __USE_DOS */
-
 }
+
+
+%#ifndef _WSTDIO_DEFINED
+%#define _WSTDIO_DEFINED 1
+
+%{
+#ifndef WEOF
+#if __SIZEOF_WCHAR_T__ == 4
+#define WEOF 0xffffffffu
+#else /* __SIZEOF_WCHAR_T__ == 4 */
+#define WEOF (__CCAST(__WINT_TYPE__)0xffff)
+#endif /* __SIZEOF_WCHAR_T__ != 4 */
+#endif /* !WEOF */
+}
+
+%[insert:extern(fgetwc)]
+%[insert:extern(fputwc)]
+%[insert:extern(getwc)]
+%[insert:extern(getwchar)]
+%[insert:extern(putwc)]
+%[insert:extern(putwchar)]
+%[insert:extern(ungetwc)]
+%[insert:extern(fgetws)]
+%[insert:extern(fputws)]
+%[insert:extern(vfwprintf)]
+%[insert:extern(fwprintf)]
+%[insert:extern(vfwscanf)]
+%[insert:extern(fwscanf)]
+%[insert:extern(vwprintf)]
+%[insert:extern(wprintf)]
+%[insert:extern(vwscanf)]
+%[insert:extern(wscanf)]
+%[insert:extern(vswscanf)]
+%[insert:extern(swscanf)]
+
+%#ifdef __USE_DOS_SLIB
+%[insert:extern(vswprintf_s)]
+%[insert:extern(swprintf_s)]
+%[insert:extern(vfwprintf_s)]
+%[insert:extern(fwprintf_s)]
+%[insert:extern(vwprintf_s)]
+%[insert:extern(wprintf_s)]
+%[insert:extern(vswscanf_s)]
+%[insert:extern(swscanf_s)]
+%[insert:extern(vfwscanf_s)]
+%[insert:extern(fwscanf_s)]
+%[insert:extern(vwscanf_s)]
+%[insert:extern(wscanf_s)]
+%#endif /* __USE_DOS_SLIB */
+%[insert:extern(_vscwprintf)]
+%[insert:extern(_scwprintf)]
+%[insert:extern(_vscwprintf_p)]
+%[insert:extern(_scwprintf_p)]
+%[insert:extern(_vscwprintf_l)]
+%[insert:extern(_scwprintf_l)]
+%[insert:extern(_vscwprintf_p_l)]
+%[insert:extern(_scwprintf_p_l)]
+%[insert:extern(_vswprintf_c)]
+%[insert:extern(_swprintf_c)]
+%[insert:extern(_vsnwprintf_s)]
+%[insert:extern(_snwprintf_s)]
+%[insert:extern(_vfwprintf_p)]
+%[insert:extern(_fwprintf_p)]
+%[insert:extern(_vwprintf_p)]
+%[insert:extern(_wprintf_p)]
+%[insert:extern(_vswprintf_p)]
+%[insert:extern(_swprintf_p)]
+%[insert:extern(_vwprintf_l)]
+%[insert:extern(_wprintf_l)]
+%[insert:extern(_vwprintf_p_l)]
+%[insert:extern(_wprintf_p_l)]
+%[insert:extern(_vwprintf_s_l)]
+%[insert:extern(_wprintf_s_l)]
+%[insert:extern(_vfwprintf_l)]
+%[insert:extern(_fwprintf_l)]
+%[insert:extern(_vfwprintf_p_l)]
+%[insert:extern(_fwprintf_p_l)]
+%[insert:extern(_vfwprintf_s_l)]
+%[insert:extern(_fwprintf_s_l)]
+%[insert:extern(_vswprintf_c_l)]
+%[insert:extern(_swprintf_c_l)]
+%[insert:extern(_vswprintf_p_l)]
+%[insert:extern(_swprintf_p_l)]
+%[insert:extern(_vswprintf_s_l)]
+%[insert:extern(_swprintf_s_l)]
+%[insert:extern(_vsnwprintf_l)]
+%[insert:extern(_snwprintf_l)]
+%[insert:extern(_vsnwprintf_s_l)]
+%[insert:extern(_snwprintf_s_l)]
+%[insert:extern(_fwscanf_l)]
+%[insert:extern(_fwscanf_s_l)]
+%[insert:extern(_swscanf_l)]
+%[insert:extern(_swscanf_s_l)]
+%[insert:extern(_snwscanf)]
+%[insert:extern(_snwscanf_l)]
+%[insert:extern(_snwscanf_s)]
+%[insert:extern(_snwscanf_s_l)]
+%[insert:extern(_wscanf_l)]
+%[insert:extern(_wscanf_s_l)]
+%[insert:extern(_wfsopen)]
+%[insert:extern(_wfdopen)]
+%[insert:extern(_wfopen_s)]
+%[insert:extern(_wfreopen_s)]
+%[insert:extern(_wfopen)]
+%[insert:extern(_wfreopen)]
+%[insert:extern(_fgetwchar)]
+%[insert:extern(_fputwchar)]
+%[insert:extern(_getws_s)]
+%[insert:extern(_putws)]
+%[insert:extern(_wtempnam)]
+%#ifndef _CRT_WPERROR_DEFINED
+%#define _CRT_WPERROR_DEFINED
+%[insert:extern(_wperror)]
+%#endif  /* _CRT_WPERROR_DEFINED */
+%[insert:extern(_wpopen)]
+%[insert:extern(_wremove)]
+%[insert:extern(_wtmpnam_s)]
+%[insert:extern(_fgetwc_nolock)]
+%[insert:extern(_fputwc_nolock)]
+%[insert:extern(_ungetwc_nolock)]
+%[insert:extern(_getwc_nolock)]
+%[insert:extern(_putwc_nolock)]
+%#endif /* !_WSTDIO_DEFINED */
+
+
+%#endif /* __CC__ */
+%#endif /* __USE_DOS */
+%
 
 //__STDC_INT_AS_SSIZE_T
 

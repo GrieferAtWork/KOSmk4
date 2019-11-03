@@ -2579,8 +2579,7 @@ _lrotr:(unsigned long val, int shift) -> unsigned long {
 %
 %#ifndef _CRT_PERROR_DEFINED
 %#define _CRT_PERROR_DEFINED 1
-%[default_impl_section(.text.crt.dos.errno)]
-[cp][guard][nouser] perror:(char const *message);
+%[insert:extern(perror)]
 %#endif  /* _CRT_PERROR_DEFINED */
 
 %

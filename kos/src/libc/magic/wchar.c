@@ -371,7 +371,7 @@ wcsxfrm:([nonnull] wchar_t *dst, [inp(maxlen)] wchar_t const *__restrict src, $s
 %[default_impl_section({.text.crt.wchar.FILE.locked.read.getc|.text.crt.dos.wchar.FILE.locked.read.getc})]
 [cp_stdio][std][std_guard][wchar][requires_include(<__crt.h>)]
 [requires(!defined(__NO_STDSTREAMS) && $has_function(fgetwc))]
-[dependency_include(<local/stdstreams.h>)][same_impl]
+[dependency_include(<local/stdstreams.h>)][same_impl][export_alias(_fgetwchar)]
 getwchar:() -> wint_t {
 	return fgetwc(@__LOCAL_stdin@);
 }
@@ -381,7 +381,7 @@ getwchar:() -> wint_t {
 [section({.text.crt.wchar.FILE.locked.write.putc|.text.crt.dos.wchar.FILE.locked.write.putc})]
 [cp_stdio][std][std_guard][wchar][requires_include(<__crt.h>)]
 [requires(!defined(__NO_STDSTREAMS) && $has_function(fputwc))]
-[dependency_include(<local/stdstreams.h>)][same_impl]
+[dependency_include(<local/stdstreams.h>)][same_impl][export_alias(_fputwchar)]
 putwchar:(wchar_t wc) -> wint_t {
 	return fputwc(wc, @__LOCAL_stdout@);
 }
@@ -583,7 +583,7 @@ swscanf:([nonnull] wchar_t const *__restrict src, [nonnull] wchar_t const *__res
 
 [std][std_guard][ATTR_LIBC_WPRINTF(3, 0)][wchar]
 [section({.text.crt.wchar.unicode.static.format.printf|.text.crt.dos.wchar.unicode.static.format.printf})]
-vswprintf:([outp(min(return+1,buflen))] wchar_t *__restrict buf, size_t buflen,
+vswprintf:([outp_opt(min(return+1,buflen))] wchar_t *__restrict buf, size_t buflen,
            [nonnull] wchar_t const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T {
 	/* TODO: format_wprintf() */
 	return 0;
@@ -591,7 +591,7 @@ vswprintf:([outp(min(return+1,buflen))] wchar_t *__restrict buf, size_t buflen,
 
 [std][std_guard][ATTR_LIBC_WPRINTF(3, 4)][wchar][export_alias(_swprintf)]
 [section({.text.crt.wchar.unicode.static.format.printf|.text.crt.dos.wchar.unicode.static.format.printf})]
-swprintf:([outp(min(return+1,buflen))] wchar_t *__restrict buf, size_t buflen,
+swprintf:([outp_opt(min(return+1,buflen))] wchar_t *__restrict buf, size_t buflen,
           [nonnull] wchar_t const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T
 	%{auto_block(printf(vswprintf))}
 
@@ -763,7 +763,7 @@ open_wmemstream:(wchar_t **bufloc, $size_t *sizeloc) -> $FILE *;
 [section({.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory})]
 wcsnlen:([nonnull] wchar_t const *__restrict string, $size_t maxlen) -> $size_t %{copy(%auto, str2wcs)}
 
-[requires($has_function(malloc))][ATTR_WUNUSED][export_alias(_wcsdup)]
+[requires($has_function(malloc))][ATTR_WUNUSED][dosname(_wcsdup)]
 [ATTR_MALL_DEFAULT_ALIGNED][ATTR_MALLOC][wchar][guard]
 [section({.text.crt.wchar.heap.strdup|.text.crt.dos.wchar.heap.strdup})][same_impl]
 wcsdup:([nonnull] wchar_t const *__restrict string) -> wchar_t * %{copy(%auto, str2wcs)}
@@ -934,15 +934,15 @@ getwc_unlocked:([notnull] $FILE *__restrict stream) -> $wint_t = fgetwc_unlocked
 [section({.text.crt.wchar.FILE.unlocked.write.putc|.text.crt.dos.wchar.FILE.unlocked.write.putc})]
 putwc_unlocked:(wchar_t wc, [notnull] $FILE *__restrict stream) -> $wint_t = fputwc_unlocked;
 
-[cp_stdio][export_alias(_fgetwc_nolock)][wchar]
+[cp_stdio][wchar][dosname(_fgetwc_nolock)]
 [section({.text.crt.wchar.FILE.unlocked.read.getc|.text.crt.dos.wchar.FILE.unlocked.read.getc})]
 fgetwc_unlocked:([notnull] $FILE *__restrict stream) -> $wint_t;
 
-[cp_stdio][export_alias(_fputwc_nolock)][wchar]
+[cp_stdio][wchar][dosname(_fputwc_nolock)]
 [section({.text.crt.wchar.FILE.unlocked.write.putc|.text.crt.dos.wchar.FILE.unlocked.write.putc})]
 fputwc_unlocked:(wchar_t wc, [notnull] $FILE *__restrict stream) -> $wint_t;
 
-[cp_stdio][alias(fgetws)][export_alias(_fgetws_nolock)][wchar][dependency_include(<parts/errno.h>)][same_impl]
+[cp_stdio][alias(fgetws)][wchar][dosname(_fgetws_nolock)][dependency_include(<parts/errno.h>)][same_impl]
 [section({.text.crt.wchar.FILE.unlocked.read.read|.text.crt.dos.wchar.FILE.unlocked.read.read})]
 [requires($has_function(fgetwc_unlocked) && $has_function(ungetwc_unlocked) && $has_function(ferror_unlocked))][same_impl]
 [impl_prefix(
@@ -993,7 +993,7 @@ fgetws_unlocked:([outp(bufsize)] wchar_t *__restrict buf, __STDC_INT_AS_SIZE_T b
 }
 
 [section({.text.crt.wchar.FILE.unlocked.write.write|.text.crt.dos.wchar.FILE.unlocked.write.write})]
-[cp_stdio][export_alias(_fputws_nolock)][wchar][same_impl][requires($has_function(file_wprinter_unlocked))]
+[cp_stdio][dosname(_fputws_nolock)][wchar][same_impl][requires($has_function(file_wprinter_unlocked))]
 fputws_unlocked:([notnull] wchar_t const *__restrict string, [notnull] $FILE *__restrict stream) -> __STDC_INT_AS_SIZE_T {
 	__STDC_INT_AS_SIZE_T result;
 	result = file_wprinter_unlocked(stream, string, wcslen(string));
@@ -1068,7 +1068,7 @@ file_wprinter_unlocked:([nonnull] void *arg, [inp(datalen)] wchar_t const *__res
 }
 
 
-[alias(ungetwc)]
+[alias(ungetwc)][dosname(_ungetwc_nolock)]
 [wchar][user][section({.text.crt.wchar.FILE.unlocked.write.putc|.text.crt.dos.wchar.FILE.unlocked.write.putc})]
 ungetwc_unlocked:($wint_t ch, [nonnull] $FILE *__restrict stream) -> $wint_t;
 
@@ -1688,6 +1688,435 @@ wcsupr:(wchar_t *__restrict str) -> wchar_t * %{copy(%auto, str2wcs)}
 %#endif /* __USE_DOS || __USE_KOS */
 
 
+%#ifdef __USE_DOS
+%#ifndef _WSTDIO_DEFINED
+%#define _WSTDIO_DEFINED 1
+
+%#ifdef __USE_DOS_SLIB
+%[default_impl_section(.text.crt.dos.wchar.FILE.locked.write.printf)]
+[guard][wchar] vswprintf_s:([outp(wchar_count)] wchar_t *dst, $size_t wchar_count, [nonnull] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T = vswprintf;
+[guard][wchar] swprintf_s:([outp(wchar_count)] wchar_t *dst, $size_t wchar_count, [nonnull] wchar_t const *format, ...) -> __STDC_INT_AS_SSIZE_T = swprintf;
+[guard][wchar][cp_stdio] vfwprintf_s:([nonnull] $FILE *stream, [nonnull] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T = vfwprintf;
+[guard][wchar][cp_stdio] fwprintf_s:([nonnull] $FILE *stream, [nonnull] wchar_t const *format, ...) -> __STDC_INT_AS_SSIZE_T = fwprintf;
+[guard][wchar][cp_stdio] vwprintf_s:([nonnull] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T = vwprintf;
+[guard][wchar][cp_stdio] wprintf_s:([nonnull] wchar_t const *format, ...) -> __STDC_INT_AS_SSIZE_T = wprintf;
+
+%[default_impl_section(.text.crt.dos.wchar.FILE.locked.read.scanf)]
+[guard][ATTR_WUNUSED] vswscanf_s:([nonnull] wchar_t const *src, [nonnull] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T = vswscanf;
+[guard][ATTR_WUNUSED] swscanf_s:([nonnull] wchar_t const *src, [nonnull] wchar_t const *format, ...) -> __STDC_INT_AS_SSIZE_T = swscanf;
+[guard][ATTR_WUNUSED][cp_stdio] vfwscanf_s:([nonnull] $FILE *stream, [nonnull] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T = vfwscanf;
+[guard][ATTR_WUNUSED][cp_stdio] fwscanf_s:([nonnull] $FILE *stream, [nonnull] wchar_t const *format, ...) -> __STDC_INT_AS_SSIZE_T = fwscanf;
+[guard][ATTR_WUNUSED][cp_stdio] vwscanf_s:([nonnull] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T = vwscanf;
+[guard][ATTR_WUNUSED][cp_stdio] wscanf_s:([nonnull] wchar_t const *format, ...) -> __STDC_INT_AS_SSIZE_T = wscanf;
+
+%#endif /* __USE_DOS_SLIB */
+
+%[default_impl_section(.text.crt.dos.wchar.FILE.locked.write.printf)]
+[guard][wchar][ATTR_WUNUSED][same_impl]
+_vscwprintf:([nonnull] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+	return vswprintf(NULL, 0, format, args);
+}
+
+[guard][wchar][ATTR_WUNUSED]
+_scwprintf:([nonnull] wchar_t const *format, ...)
+		-> int %{auto_block(printf(%auto))}
+
+[guard][wchar][ATTR_WUNUSED]
+_vscwprintf_p:([nonnull] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+	(void)format;
+	(void)args;
+	/* TODO */
+	return 0;
+}
+
+[guard][wchar][ATTR_WUNUSED]
+_scwprintf_p:([nonnull] wchar_t const *format, ...)
+		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
+
+[guard][wchar][ATTR_WUNUSED]
+_vscwprintf_l:([nonnull] wchar_t const *format,
+               [nullable] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+	(void)locale;
+	return _vscwprintf(format, args);
+}
+
+[guard][wchar][ATTR_WUNUSED]
+_scwprintf_l:([nonnull] wchar_t const *format,
+              [nullable] $locale_t locale, ...)
+		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
+
+[guard][wchar][ATTR_WUNUSED]
+_vscwprintf_p_l:([nonnull] wchar_t const *format,
+                 [nullable] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+	(void)locale;
+	return _vscwprintf_p(format, args);
+}
+
+[guard][wchar][ATTR_WUNUSED]
+_scwprintf_p_l:([nonnull] wchar_t const *format,
+                [nullable] $locale_t locale, ...)
+		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
+
+[guard][wchar]
+_vswprintf_c:([outp(bufsize)] wchar_t *buf, $size_t bufsize,
+              [nonnull] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T = vswprintf;
+
+[guard][wchar]
+_swprintf_c:([outp(bufsize)] wchar_t *buf, $size_t bufsize,
+             [nonnull] wchar_t const *format, ...) = swprintf;
+
+[guard][wchar]
+_vsnwprintf_s:([outp_opt(min(return,bufsize,buflen))] wchar_t *buf, $size_t bufsize, $size_t buflen,
+               [nonnull] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+	(void)buflen;
+	return vswprintf(buf, bufsize, format, args);
+}
+
+[guard][wchar]
+_snwprintf_s:([outp_opt(min(return,bufsize,buflen))] wchar_t *buf, $size_t bufsize,
+              $size_t buflen, [nonnull] wchar_t const *format, ...)
+		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
+
+
+[guard][wchar][cp_stdio]
+_vfwprintf_p:([nonnull] $FILE *stream,
+              [nonnull] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+	(void)stream;
+	(void)format;
+	(void)args;
+	/* TODO */
+	return 0;
+}
+
+[guard][wchar][cp_stdio]
+_fwprintf_p:([nonnull] $FILE *stream,
+             [nonnull] wchar_t const *format, ...)
+		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
+
+[guard][wchar][cp_stdio]
+[same_impl][requires(!defined(__NO_STDSTREAMS) && $has_function(_vfwprintf_p))]
+[dependency_include(<local/stdstreams.h>)]
+_vwprintf_p:([nonnull] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+	return _vfwprintf_p(@__LOCAL_stdout@, format, args);
+}
+
+[guard][wchar][cp_stdio]
+_wprintf_p:([nonnull] wchar_t const *format, ...)
+		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
+
+[guard][wchar]
+_vswprintf_p:([outp(bufsize)] wchar_t *buf, $size_t bufsize,
+              [nonnull] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+	(void)buf;
+	(void)bufsize;
+	(void)format;
+	(void)args;
+	/* TODO */
+	return 0;
+}
+
+[guard][wchar]
+_swprintf_p:([outp(bufsize)] wchar_t *dst, $size_t bufsize,
+             [nonnull] wchar_t const *format, ...)
+		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
+
+[guard][wchar][cp_stdio][same_impl][requires($has_function(vwprintf))]
+_vwprintf_l:([nonnull] wchar_t const *format,
+             [nullable] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+	(void)locale;
+	return vwprintf(format, args);
+}
+
+[guard][wchar][cp_stdio]
+_wprintf_l:([nonnull] wchar_t const *format, [nullable] $locale_t locale, ...)
+		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
+
+
+[guard][wchar][cp_stdio][same_impl][requires($has_function(_vwprintf_p))]
+_vwprintf_p_l:([nonnull] wchar_t const *format,
+               [nullable] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+	(void)locale;
+	return _vwprintf_p(format, args);
+}
+
+[guard][wchar][cp_stdio]
+_wprintf_p_l:([nonnull] wchar_t const *format, [nullable] $locale_t locale, ...)
+		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
+
+
+[guard][wchar][cp_stdio][same_impl][requires($has_function(vwprintf_s))]
+_vwprintf_s_l:([nonnull] wchar_t const *format,
+               [nullable] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+	(void)locale;
+	return vwprintf_s(format, args);
+}
+
+[guard][wchar][cp_stdio]
+_wprintf_s_l:([nonnull] wchar_t const *format, [nullable] $locale_t locale, ...)
+		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
+
+
+[guard][wchar][cp_stdio][same_impl][requires($has_function(vfwprintf))]
+_vfwprintf_l:([nonnull] $FILE *stream, [nonnull] wchar_t const *format,
+              [nullable] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+	(void)locale;
+	return vfwprintf(stream, format, args);
+}
+
+[guard][wchar][cp_stdio]
+_fwprintf_l:([nonnull] $FILE *stream, [nonnull] wchar_t const *format,
+             [nullable] $locale_t locale, ...)
+		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
+
+
+[guard][wchar][cp_stdio][same_impl][requires($has_function(_vfwprintf_p))]
+_vfwprintf_p_l:([nonnull] $FILE *stream,
+                [nonnull] wchar_t const *format,
+                [nullable] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+	(void)locale;
+	return _vfwprintf_p(stream, format, args);
+}
+
+[guard][wchar][cp_stdio]
+_fwprintf_p_l:([nonnull] $FILE *stream,
+               [nonnull] wchar_t const *format,
+               [nullable] $locale_t locale, ...)
+		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
+
+
+[guard][wchar][cp_stdio][same_impl][requires($has_function(vfwprintf_s))]
+_vfwprintf_s_l:([nonnull] $FILE *stream,
+                [nonnull] wchar_t const *format,
+                [nullable] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+	(void)locale;
+	return vfwprintf_s(stream, format, args);
+}
+
+[guard][wchar][cp_stdio]
+_fwprintf_s_l:([nonnull] $FILE *stream,
+               [nonnull] wchar_t const *format,
+               [nullable] $locale_t locale, ...)
+		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
+
+
+[guard][wchar]
+_vswprintf_c_l:([outp(bufsize)] wchar_t *dst, $size_t bufsize,
+                [nonnull] wchar_t const *format,
+                [nullable] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+	(void)locale;
+	return _vswprintf_c(dst, bufsize, format, args);
+}
+
+[guard][wchar]
+_swprintf_c_l:([outp(bufsize)] wchar_t *dst, $size_t bufsize,
+               [nonnull] wchar_t const *format,
+               [nullable] $locale_t locale, ...)
+		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
+
+
+[guard][wchar]
+_vswprintf_p_l:([outp(bufsize)] wchar_t *dst, $size_t bufsize,
+                [nonnull] wchar_t const *format,
+                [nullable] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+	(void)locale;
+	return _vswprintf_p(dst, bufsize, format, args);
+}
+
+[guard][wchar]
+_swprintf_p_l:([outp(bufsize)] wchar_t *dst, $size_t bufsize,
+               [nonnull] wchar_t const *format,
+               [nullable] $locale_t locale, ...)
+		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
+
+
+[guard][wchar]
+_vswprintf_s_l:([outp(wchar_count)] wchar_t *dst, $size_t wchar_count,
+                [nonnull] wchar_t const *format,
+                [nullable] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+	(void)locale;
+	return vswprintf_s(dst, wchar_count, format, args);
+}
+
+[guard][wchar]
+_swprintf_s_l:([outp(wchar_count)] wchar_t *dst, $size_t wchar_count,
+               [nonnull] wchar_t const *format, [nullable] $locale_t locale, ...)
+		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
+
+
+[guard][wchar]
+_vsnwprintf_l:([outp(bufsize)] wchar_t *dst, $size_t bufsize,
+               [nonnull] wchar_t const *format,
+               [nullable] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+	(void)locale;
+	return vswprintf(dst, bufsize, format, args);
+}
+
+[guard][wchar]
+_snwprintf_l:([outp(bufsize)] wchar_t *dst, $size_t bufsize,
+              [nonnull] wchar_t const *format, [nullable] $locale_t locale, ...)
+		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
+
+
+[guard][wchar]
+_vsnwprintf_s_l:([outp(wchar_count)] wchar_t *dst, $size_t wchar_count,
+                 $size_t bufsize, [nonnull] wchar_t const *format,
+                 [nullable] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+	(void)locale;
+	return _vsnwprintf_s(dst, wchar_count, bufsize, format, args);
+}
+
+[guard][wchar]
+_snwprintf_s_l:([outp(wchar_count)] wchar_t *dst, $size_t wchar_count,
+                $size_t bufsize, [nonnull] wchar_t const *format,
+                [nullable] $locale_t locale, ...)
+		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
+
+
+
+%[default_impl_section(.text.crt.dos.wchar.FILE.locked.read.scanf)]
+
+[ignore][wchar][cp_stdio][ATTR_WUNUSED][same_impl][requires($has_function(vfwscanf))]
+_vfwscanf_l:([nonnull] $FILE *stream, [nonnull] wchar_t const *format,
+             [nullable] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+	(void)locale;
+	return vfwscanf(stream, format, args);
+}
+
+[guard][wchar][cp_stdio][ATTR_WUNUSED]
+_fwscanf_l:([nonnull] $FILE *stream, [nonnull] wchar_t const *format,
+            [nullable] $locale_t locale, ...)
+		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
+
+[ignore][wchar][cp_stdio][ATTR_WUNUSED] _vfwscanf_s_l:([nonnull] $FILE *stream, [nonnull] wchar_t const *format, [nullable] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T = _vfwscanf_l;
+[guard][wchar][cp_stdio][ATTR_WUNUSED] _fwscanf_s_l:([nonnull] $FILE *stream, [nonnull] wchar_t const *format, [nullable] $locale_t locale, ...) -> __STDC_INT_AS_SSIZE_T = _fwscanf_l;
+
+[ignore][wchar][ATTR_WUNUSED]
+_vswscanf_l:([nonnull] wchar_t const *src,
+             [nonnull] wchar_t const *format,
+             [nullable] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+	(void)locale;
+	return vswscanf(src, format, args);
+}
+
+[guard][wchar][ATTR_WUNUSED]
+_swscanf_l:([nonnull] wchar_t const *src,
+            [nonnull] wchar_t const *format,
+            [nullable] $locale_t locale, ...)
+		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
+
+[ignore][wchar][ATTR_WUNUSED] _vswscanf_s_l:([nonnull] wchar_t const *src, [nonnull] wchar_t const *format, [nullable] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T = _vswscanf_l;
+[guard][wchar][ATTR_WUNUSED] _swscanf_s_l:([nonnull] wchar_t const *src, [nonnull] wchar_t const *format, [nullable] $locale_t locale, ...) -> __STDC_INT_AS_SSIZE_T = _swscanf_l;
+
+[ignore][wchar][ATTR_WUNUSED]
+_vsnwscanf:([inp(bufsize)] wchar_t const *src, $size_t bufsize,
+            [nonnull] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+	(void)src;
+	(void)bufsize;
+	(void)format;
+	(void)args;
+	/* TODO */
+	return 0;
+}
+
+[guard][wchar][ATTR_WUNUSED]
+_snwscanf:([inp(bufsize)] wchar_t const *src, $size_t bufsize,
+           [nonnull] wchar_t const *format, ...)
+		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
+
+[ignore][wchar][ATTR_WUNUSED]
+_vsnwscanf_l:([inp(bufsize)] wchar_t const *src, $size_t bufsize,
+              [nonnull] wchar_t const *format, [nullable] $locale_t locale,
+              $va_list args) -> __STDC_INT_AS_SSIZE_T {
+	(void)locale;
+	return _vsnwscanf(src, bufsize, format, args);
+}
+
+[guard][wchar][ATTR_WUNUSED]
+_snwscanf_l:([inp(bufsize)] wchar_t const *src, $size_t bufsize,
+             [nonnull] wchar_t const *format, [nullable] $locale_t locale, ...)
+		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
+
+[ignore][wchar][ATTR_WUNUSED] _vsnwscanf_s:([inp(bufsize)] wchar_t const *src, $size_t bufsize, [nonnull] wchar_t const *format, $va_list args) -> __STDC_INT_AS_SSIZE_T = _vsnwscanf;
+[guard][wchar][ATTR_WUNUSED] _snwscanf_s:([inp(bufsize)] wchar_t const *src, $size_t bufsize, [nonnull] wchar_t const *format, ...) -> __STDC_INT_AS_SSIZE_T = _snwscanf;
+
+[ignore][wchar][ATTR_WUNUSED][same_impl]
+_vsnwscanf_s_l:([inp(bufsize)] wchar_t const *src, $size_t bufsize,
+                [nonnull] wchar_t const *format, [nullable] $locale_t locale,
+                $va_list args) -> __STDC_INT_AS_SSIZE_T {
+	(void)locale;
+	return _vsnwscanf_s(src, bufsize, format, args);
+}
+
+[guard][wchar][ATTR_WUNUSED]
+_snwscanf_s_l:([inp(bufsize)] wchar_t const *src, $size_t bufsize,
+               [nonnull] wchar_t const *format, [nullable] $locale_t locale, ...)
+		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
+
+[ignore][wchar][cp_stdio][ATTR_WUNUSED][requires($has_function(vwscanf))][same_impl]
+_vwscanf_l:([nonnull] wchar_t const *format, [nullable] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T {
+	(void)locale;
+	return vwscanf(format, args);
+}
+[guard][wchar][cp_stdio][ATTR_WUNUSED][same_impl]
+_wscanf_l:([nonnull] wchar_t const *format, [nullable] $locale_t locale, ...)
+		-> __STDC_INT_AS_SSIZE_T %{auto_block(printf(%auto))}
+
+[ignore][wchar][cp_stdio][ATTR_WUNUSED] _vwscanf_s_l:([nonnull] wchar_t const *format, [nullable] $locale_t locale, $va_list args) -> __STDC_INT_AS_SSIZE_T = _vwscanf_l;
+[guard][wchar][cp_stdio][ATTR_WUNUSED] _wscanf_s_l:([nonnull] wchar_t const *format, [nullable] $locale_t locale, ...) -> __STDC_INT_AS_SSIZE_T = _wscanf_l;
+
+
+%[default_impl_section(.text.crt.dos.wchar.FILE.locked.access)]
+[guard][wchar][ATTR_WUNUSED] _wfsopen:([nonnull] wchar_t const *filename, [nonnull] wchar_t const *mode, int sh_flag) -> $FILE *;
+[guard][wchar][ATTR_WUNUSED] _wfdopen:($fd_t fd, [nonnull] wchar_t const *mode) -> $FILE *;
+[guard][wchar] _wfopen_s:([nonnull] $FILE **pstream, [nonnull] wchar_t const *filename, [nonnull] wchar_t const *mode) -> $errno_t;
+[guard][wchar] _wfreopen_s:([nonnull] $FILE **pstream, [nonnull] wchar_t const *filename, [nonnull] wchar_t const *mode, $FILE *stream) -> $errno_t;
+[guard][wchar][alias(*)][attribute(*)] _wfopen:(*) = wfopen;
+[guard][wchar][alias(*)][attribute(*)] _wfreopen:(*) = wfreopen;
+
+[guard][wchar][alias(*)][attribute(*)] _fgetwchar:(*) = getwchar;
+[guard][wchar][alias(*)][attribute(*)] _fputwchar:(*) = putwchar;
+
+[requires_include(<__crt.h>)]
+[requires($has_function(fgetws) && !defined(__NO_STDSTREAMS))]
+[section(.text.crt.dos.wchar.FILE.locked.read.read)][same_impl]
+[guard][wchar] _getws_s:(wchar_t *buf, $size_t buflen) -> wchar_t * {
+	return fgetws(buf, buflen, @__LOCAL_stdin@);
+}
+
+[requires_include(<__crt.h>)]
+[requires($has_function(fputws) && !defined(__NO_STDSTREAMS))]
+[section(.text.crt.dos.wchar.FILE.locked.write.write)][same_impl]
+[guard][wchar] _putws:([nonnull] wchar_t const *string) -> __STDC_INT_AS_SIZE_T {
+	return fputws(string, @__LOCAL_stdout@);
+}
+
+[section(.text.crt.dos.wchar.fs.utility)]
+[guard][wchar][ATTR_WUNUSED]
+_wtempnam:([nullable] wchar_t const *directory,
+           [nullable] wchar_t const *file_prefix) -> wchar_t *;
+
+%#ifndef _CRT_WPERROR_DEFINED
+%#define _CRT_WPERROR_DEFINED
+[section(.text.crt.dos.wchar.errno.utility)][guard][wchar]
+_wperror:([nullable] wchar_t const *errmsg);
+%#endif  /* _CRT_WPERROR_DEFINED */
+
+[guard][wchar][alias(*)][attribute(*)] _wpopen:(*) = wpopen;
+[guard][wchar][alias(*)][attribute(*)] _wremove:(*) = wremove;
+
+[guard][wchar][section(.text.crt.dos.wchar.fs.utility)]
+_wtmpnam_s:([outp(wchar_count)] wchar_t *dst, $size_t wchar_count) -> $errno_t;
+
+[guard][wchar][attribute(*)][alias(*)] _fgetwc_nolock:(*) = fgetwc_unlocked;
+[guard][wchar][attribute(*)][alias(*)] _fputwc_nolock:(*) = fputwc_unlocked;
+[guard][wchar][attribute(*)][alias(*)] _ungetwc_nolock:(*) = ungetwc_unlocked;
+[guard][wchar][attribute(*)][alias(*)] _getwc_nolock:(*) = fgetwc_unlocked;
+[guard][wchar][attribute(*)][alias(*)] _putwc_nolock:(*) = fputwc_unlocked;
+
+%#endif /* !_WSTDIO_DEFINED */
+%#endif /* __USE_DOS */
+
+
 %{
 
 #endif /* __CC__ */
@@ -1698,19 +2127,19 @@ __SYSDECL_END
 
 #if defined(_FORMAT_PRINTER_H) && !defined(_PARTS_WCHAR_FORMAT_PRINTER_H)
 #include <parts/wchar/format-printer.h>
-#endif
+#endif /* _FORMAT_PRINTER_H && !_PARTS_WCHAR_FORMAT_PRINTER_H */
 
 #if defined(_PROCESS_H) && !defined(_PARTS_WCHAR_PROCESS_H)
 #include <parts/wchar/process.h>
-#endif
+#endif /* _PROCESS_H && !_PARTS_WCHAR_PROCESS_H */
 
 #if defined(_UTIME_H) && !defined(_PARTS_WCHAR_UTIME_H)
 #include <parts/wchar/utime.h>
-#endif
+#endif /* _UTIME_H && !_PARTS_WCHAR_UTIME_H */
 
 #if defined(_UNISTD_H) && !defined(_PARTS_WCHAR_UNISTD_H)
 #include <parts/wchar/unistd.h>
-#endif
+#endif /* _UNISTD_H && !_PARTS_WCHAR_UNISTD_H */
 
 #endif /* __USE_KOS */
 

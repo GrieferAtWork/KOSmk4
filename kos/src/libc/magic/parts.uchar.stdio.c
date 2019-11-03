@@ -145,7 +145,18 @@ __SYSDECL_BEGIN
 [alias(*)][attribute(*)] fc32scanf_unlocked:(*) %{uchar(fwscanf_unlocked)}
 [alias(*)][attribute(*)] c16scanf_unlocked:(*) %{uchar(wscanf_unlocked)}
 [alias(*)][attribute(*)] c32scanf_unlocked:(*) %{uchar(wscanf_unlocked)}
+
+/* Functions from `parts.wchar.stdio.c' */
+[alias(*)][attribute(*)] c16remove:(*) %{uchar(wremove)}
+[alias(*)][attribute(*)] c32remove:(*) %{uchar(wremove)}
+[alias(*)][attribute(*)] c16fopen:(*) %{uchar(wfopen)}
+[alias(*)][attribute(*)] c32fopen:(*) %{uchar(wfopen)}
+[alias(*)][attribute(*)] c16freopen:(*) %{uchar(wfreopen)}
+[alias(*)][attribute(*)] c32freopen:(*) %{uchar(wfreopen)}
+[alias(*)][attribute(*)] c16popen:(*) %{uchar(wpopen)}
+[alias(*)][attribute(*)] c32popen:(*) %{uchar(wpopen)}
 %#endif /* __USE_KOS */
+
 
 %{
 

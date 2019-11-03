@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9c3eb161 */
+/* HASH CRC-32:0x53c8c965 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2905,7 +2905,15 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_lrotr, __FORCELOCAL __ATTR_CONST unsigned long 
 #define _CRT_PERROR_DEFINED 1
 #ifndef __perror_defined
 #define __perror_defined 1
-#if defined(__CRT_HAVE_perror)
+#ifdef __std_perror_defined
+__NAMESPACE_STD_USING(perror)
+#elif defined(__CRT_HAVE_perror)
+/* Print a given `MESSAGE' alongside `strerror(errno)' to stderr:
+ * >> if (message) {
+ * >>     fprintf(stderr, "%s: %s\n", message, strerror(errno));
+ * >> } else {
+ * >>     fprintf(stderr, "%s\n", strerror(errno));
+ * >> } */
 __CDECLARE_VOID(,__NOTHROW_RPC,perror,(char const *__message),(__message))
 #else /* LIBC: perror */
 #undef __perror_defined

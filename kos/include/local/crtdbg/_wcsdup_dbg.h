@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa0b2348f */
+/* HASH CRC-32:0xcde9cfdf */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__wcsdup_dbg_defined
-#if ((defined(__CRT_HAVE_wcsdup) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_c16dup) || (defined(__CRT_HAVE__wcsdup) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_DOS$_wcsdup) || defined(__CRT_HAVE_DOS$wcsdup) || defined(__CRT_HAVE_DOS$_wcsdup) || (defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc)) || (__has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)) || defined(__CRT_HAVE_malloc))
+#if ((defined(__CRT_HAVE_wcsdup) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_c16dup) || (defined(__CRT_HAVE__wcsdup) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_DOS$_wcsdup) || defined(__CRT_HAVE_DOS$_wcsdup) || (defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc)) || (__has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)) || defined(__CRT_HAVE_malloc))
 #define __local__wcsdup_dbg_defined 1
 /* Dependency: "c16dup" from "parts.uchar.string" */
 #ifndef ____localdep_c16dup_defined
@@ -29,8 +29,6 @@ __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONN
 __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_c16dup,(__CHAR16_TYPE__ const *__restrict __string),_wcsdup,(__string))
 #elif defined(__CRT_HAVE_DOS$_wcsdup)
 __CREDIRECT_DOS(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_c16dup,(__CHAR16_TYPE__ const *__restrict __string),_wcsdup,(__string))
-#elif defined(__CRT_HAVE_DOS$wcsdup)
-__CREDIRECT_DOS(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_c16dup,(__CHAR16_TYPE__ const *__restrict __string),wcsdup,(__string))
 #elif defined(__CRT_HAVE_DOS$_wcsdup)
 __CREDIRECT_DOS(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_c16dup,(__CHAR16_TYPE__ const *__restrict __string),_wcsdup,(__string))
 #elif (defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc)) || (__has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)) || defined(__CRT_HAVE_malloc)
@@ -59,5 +57,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_wcsdup_dbg))(__WCHAR16_TYPE__ const 
 	return (__WCHAR16_TYPE__ *)__localdep_c16dup((__CHAR16_TYPE__ const *)__string);
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((defined(__CRT_HAVE_wcsdup) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_c16dup) || (defined(__CRT_HAVE__wcsdup) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_DOS$_wcsdup) || defined(__CRT_HAVE_DOS$wcsdup) || defined(__CRT_HAVE_DOS$_wcsdup) || (defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc)) || (__has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)) || defined(__CRT_HAVE_malloc)) */
+#endif /* ((defined(__CRT_HAVE_wcsdup) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_c16dup) || (defined(__CRT_HAVE__wcsdup) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_DOS$_wcsdup) || defined(__CRT_HAVE_DOS$_wcsdup) || (defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc)) || (__has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)) || defined(__CRT_HAVE_malloc)) */
 #endif /* !__local__wcsdup_dbg_defined */

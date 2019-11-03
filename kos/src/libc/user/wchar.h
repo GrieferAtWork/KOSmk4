@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xed325951 */
+/* HASH CRC-32:0xb586026 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -119,6 +119,56 @@ INTDEF char32_t *NOTHROW_NCX(LIBCCALL libc___wcserror)(char32_t const *message);
 INTDEF char16_t *NOTHROW_NCX(LIBDCALL libd___wcserror)(char16_t const *message);
 INTDEF errno_t NOTHROW_NCX(LIBCCALL libc___wcserror_s)(char32_t *buf, size_t bufsize, char32_t const *message);
 INTDEF errno_t NOTHROW_NCX(LIBDCALL libd___wcserror_s)(char16_t *buf, size_t bufsize, char16_t const *message);
+INTDEF NONNULL((1)) __STDC_INT_AS_SSIZE_T (LIBCCALL libc__vwprintf_p)(char32_t const *format, va_list args) __THROWS(...);
+INTDEF NONNULL((1)) __STDC_INT_AS_SSIZE_T (LIBDCALL libd__vwprintf_p)(char16_t const *format, va_list args) __THROWS(...);
+INTDEF NONNULL((1)) __STDC_INT_AS_SSIZE_T (VLIBCCALL libc__wprintf_p)(char32_t const *format, ...) __THROWS(...);
+INTDEF NONNULL((1)) __STDC_INT_AS_SSIZE_T (VLIBDCALL libd__wprintf_p)(char16_t const *format, ...) __THROWS(...);
+INTDEF NONNULL((1)) __STDC_INT_AS_SSIZE_T (LIBCCALL libc__vwprintf_l)(char32_t const *format, locale_t locale, va_list args) __THROWS(...);
+INTDEF NONNULL((1)) __STDC_INT_AS_SSIZE_T (LIBDCALL libd__vwprintf_l)(char16_t const *format, locale_t locale, va_list args) __THROWS(...);
+INTDEF NONNULL((1)) __STDC_INT_AS_SSIZE_T (VLIBCCALL libc__wprintf_l)(char32_t const *format, locale_t locale, ...) __THROWS(...);
+INTDEF NONNULL((1)) __STDC_INT_AS_SSIZE_T (VLIBDCALL libd__wprintf_l)(char16_t const *format, locale_t locale, ...) __THROWS(...);
+INTDEF NONNULL((1)) __STDC_INT_AS_SSIZE_T (LIBCCALL libc__vwprintf_p_l)(char32_t const *format, locale_t locale, va_list args) __THROWS(...);
+INTDEF NONNULL((1)) __STDC_INT_AS_SSIZE_T (LIBDCALL libd__vwprintf_p_l)(char16_t const *format, locale_t locale, va_list args) __THROWS(...);
+INTDEF NONNULL((1)) __STDC_INT_AS_SSIZE_T (VLIBCCALL libc__wprintf_p_l)(char32_t const *format, locale_t locale, ...) __THROWS(...);
+INTDEF NONNULL((1)) __STDC_INT_AS_SSIZE_T (VLIBDCALL libd__wprintf_p_l)(char16_t const *format, locale_t locale, ...) __THROWS(...);
+INTDEF NONNULL((1)) __STDC_INT_AS_SSIZE_T (LIBCCALL libc__vwprintf_s_l)(char32_t const *format, locale_t locale, va_list args) __THROWS(...);
+INTDEF NONNULL((1)) __STDC_INT_AS_SSIZE_T (LIBDCALL libd__vwprintf_s_l)(char16_t const *format, locale_t locale, va_list args) __THROWS(...);
+INTDEF NONNULL((1)) __STDC_INT_AS_SSIZE_T (VLIBCCALL libc__wprintf_s_l)(char32_t const *format, locale_t locale, ...) __THROWS(...);
+INTDEF NONNULL((1)) __STDC_INT_AS_SSIZE_T (VLIBDCALL libd__wprintf_s_l)(char16_t const *format, locale_t locale, ...) __THROWS(...);
+INTDEF NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (LIBCCALL libc__vfwprintf_l)(FILE *stream, char32_t const *format, locale_t locale, va_list args) __THROWS(...);
+INTDEF NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (LIBDCALL libd__vfwprintf_l)(FILE *stream, char16_t const *format, locale_t locale, va_list args) __THROWS(...);
+INTDEF NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (VLIBCCALL libc__fwprintf_l)(FILE *stream, char32_t const *format, locale_t locale, ...) __THROWS(...);
+INTDEF NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (VLIBDCALL libd__fwprintf_l)(FILE *stream, char16_t const *format, locale_t locale, ...) __THROWS(...);
+INTDEF NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (LIBCCALL libc__vfwprintf_s_l)(FILE *stream, char32_t const *format, locale_t locale, va_list args) __THROWS(...);
+INTDEF NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (LIBDCALL libd__vfwprintf_s_l)(FILE *stream, char16_t const *format, locale_t locale, va_list args) __THROWS(...);
+INTDEF NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (VLIBCCALL libc__fwprintf_s_l)(FILE *stream, char32_t const *format, locale_t locale, ...) __THROWS(...);
+INTDEF NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (VLIBDCALL libd__fwprintf_s_l)(FILE *stream, char16_t const *format, locale_t locale, ...) __THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (LIBCCALL libc__vfwscanf_l)(FILE *stream, char32_t const *format, locale_t locale, va_list args) __THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (LIBDCALL libd__vfwscanf_l)(FILE *stream, char16_t const *format, locale_t locale, va_list args) __THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (VLIBCCALL libc__fwscanf_l)(FILE *stream, char32_t const *format, locale_t locale, ...) __THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T (VLIBDCALL libd__fwscanf_l)(FILE *stream, char16_t const *format, locale_t locale, ...) __THROWS(...);
+INTDEF WUNUSED NONNULL((1)) __STDC_INT_AS_SSIZE_T (LIBCCALL libc__vwscanf_l)(char32_t const *format, locale_t locale, va_list args) __THROWS(...);
+INTDEF WUNUSED NONNULL((1)) __STDC_INT_AS_SSIZE_T (LIBDCALL libd__vwscanf_l)(char16_t const *format, locale_t locale, va_list args) __THROWS(...);
+INTDEF WUNUSED NONNULL((1)) __STDC_INT_AS_SSIZE_T (VLIBCCALL libc__wscanf_l)(char32_t const *format, locale_t locale, ...) __THROWS(...);
+INTDEF WUNUSED NONNULL((1)) __STDC_INT_AS_SSIZE_T (VLIBDCALL libd__wscanf_l)(char16_t const *format, locale_t locale, ...) __THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_NCX(LIBCCALL libc__wfsopen)(char32_t const *filename, char32_t const *mode, int sh_flag);
+INTDEF WUNUSED NONNULL((1, 2)) FILE *NOTHROW_NCX(LIBDCALL libd__wfsopen)(char16_t const *filename, char16_t const *mode, int sh_flag);
+INTDEF WUNUSED NONNULL((2)) FILE *NOTHROW_NCX(LIBCCALL libc__wfdopen)(fd_t fd, char32_t const *mode);
+INTDEF WUNUSED NONNULL((2)) FILE *NOTHROW_NCX(LIBDCALL libd__wfdopen)(fd_t fd, char16_t const *mode);
+INTDEF NONNULL((1, 2, 3)) errno_t NOTHROW_NCX(LIBCCALL libc__wfopen_s)(FILE **pstream, char32_t const *filename, char32_t const *mode);
+INTDEF NONNULL((1, 2, 3)) errno_t NOTHROW_NCX(LIBDCALL libd__wfopen_s)(FILE **pstream, char16_t const *filename, char16_t const *mode);
+INTDEF NONNULL((1, 2, 3)) errno_t NOTHROW_NCX(LIBCCALL libc__wfreopen_s)(FILE **pstream, char32_t const *filename, char32_t const *mode, FILE *stream);
+INTDEF NONNULL((1, 2, 3)) errno_t NOTHROW_NCX(LIBDCALL libd__wfreopen_s)(FILE **pstream, char16_t const *filename, char16_t const *mode, FILE *stream);
+INTDEF char32_t *NOTHROW_NCX(LIBCCALL libc__getws_s)(char32_t *buf, size_t buflen);
+INTDEF char16_t *NOTHROW_NCX(LIBDCALL libd__getws_s)(char16_t *buf, size_t buflen);
+INTDEF NONNULL((1)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBCCALL libc__putws)(char32_t const *string);
+INTDEF NONNULL((1)) __STDC_INT_AS_SIZE_T NOTHROW_NCX(LIBDCALL libd__putws)(char16_t const *string);
+INTDEF WUNUSED char32_t *NOTHROW_NCX(LIBCCALL libc__wtempnam)(char32_t const *directory, char32_t const *file_prefix);
+INTDEF WUNUSED char16_t *NOTHROW_NCX(LIBDCALL libd__wtempnam)(char16_t const *directory, char16_t const *file_prefix);
+INTDEF void NOTHROW_NCX(LIBCCALL libc__wperror)(char32_t const *errmsg);
+INTDEF void NOTHROW_NCX(LIBDCALL libd__wperror)(char16_t const *errmsg);
+INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBCCALL libc__wtmpnam_s)(char32_t *dst, size_t wchar_count);
+INTDEF NONNULL((1)) errno_t NOTHROW_NCX(LIBDCALL libd__wtmpnam_s)(char16_t *dst, size_t wchar_count);
 
 DECL_END
 

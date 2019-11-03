@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa79d39da */
+/* HASH CRC-32:0x18e0abb3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1671,7 +1671,7 @@ NOTHROW_NCX(LIBCCALL libc__makepath)(char *__restrict buf,
                                      char const *dir,
                                      char const *file,
                                      char const *ext) {
-#line 2614 "kos/src/libc/magic/stdlib.c"
+#line 2613 "kos/src/libc/magic/stdlib.c"
 	libc__makepath_s(buf, (size_t)-1, drive, dir, file, ext);
 }
 
@@ -1682,7 +1682,7 @@ NOTHROW_NCX(LIBCCALL libc__splitpath)(char const *__restrict abspath,
                                       char *dir,
                                       char *file,
                                       char *ext) {
-#line 2619 "kos/src/libc/magic/stdlib.c"
+#line 2618 "kos/src/libc/magic/stdlib.c"
 	libc__splitpath_s(abspath, drive, (size_t)-1, dir, (size_t)-1, file, (size_t)-1, ext, (size_t)-1);
 }
 
@@ -1695,7 +1695,7 @@ NOTHROW_NCX(LIBCCALL libc__makepath_s)(char *buf,
                                        char const *dir,
                                        char const *file,
                                        char const *ext) {
-#line 2626 "kos/src/libc/magic/stdlib.c"
+#line 2625 "kos/src/libc/magic/stdlib.c"
 	/* TODO */
 	return 0;
 }
@@ -1712,7 +1712,7 @@ NOTHROW_NCX(LIBCCALL libc__splitpath_s)(char const *__restrict abspath,
                                         size_t filelen,
                                         char *ext,
                                         size_t extlen) {
-#line 2636 "kos/src/libc/magic/stdlib.c"
+#line 2635 "kos/src/libc/magic/stdlib.c"
 	/* TODO */
 	return 0;
 }
@@ -1722,7 +1722,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.convert.itoa") char *
 NOTHROW_NCX(LIBCCALL libc_itoa)(int val,
                                 char *dst,
                                 int radix) {
-#line 2717 "kos/src/libc/magic/stdlib.c"
+#line 2716 "kos/src/libc/magic/stdlib.c"
 	libc__itoa_s(val, dst, (size_t)-1, radix);
 	return dst;
 }
@@ -1732,7 +1732,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.convert.ltoa") char *
 NOTHROW_NCX(LIBCCALL libc_ltoa)(long val,
                                 char *dst,
                                 int radix) {
-#line 2725 "kos/src/libc/magic/stdlib.c"
+#line 2724 "kos/src/libc/magic/stdlib.c"
 	libc__ltoa_s(val, dst, (size_t)-1, radix);
 	return dst;
 }
@@ -1742,7 +1742,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.unicode.static.convert.ultoa") char *
 NOTHROW_NCX(LIBCCALL libc_ultoa)(unsigned long val,
                                  char *dst,
                                  int radix) {
-#line 2732 "kos/src/libc/magic/stdlib.c"
+#line 2731 "kos/src/libc/magic/stdlib.c"
 	libc__ultoa_s(val, dst, (size_t)-1, radix);
 	return dst;
 }
@@ -1753,7 +1753,7 @@ NOTHROW_NCX(LIBCCALL libc_strto64_l)(char const *__restrict nptr,
                                      char **endptr,
                                      int base,
                                      locale_t locale) {
-#line 2764 "kos/src/libc/magic/stdlib.c"
+#line 2763 "kos/src/libc/magic/stdlib.c"
 	(void)locale;
 	return libc_strto64(nptr, endptr, base);
 }
@@ -1764,7 +1764,7 @@ NOTHROW_NCX(LIBCCALL libc_strtou64_l)(char const *__restrict nptr,
                                       char **endptr,
                                       int base,
                                       locale_t locale) {
-#line 2773 "kos/src/libc/magic/stdlib.c"
+#line 2772 "kos/src/libc/magic/stdlib.c"
 	(void)locale;
 	return libc_strtou64(nptr, endptr, base);
 }

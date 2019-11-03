@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa0a9029e */
+/* HASH CRC-32:0xb8a15b35 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fgetc32s_unlocked_defined
-#if (defined(__CRT_HAVE_fgetwc_unlocked) || defined(__CRT_HAVE__fgetwc_nolock)) && (defined(__CRT_HAVE_ungetwc_unlocked) || defined(__CRT_HAVE_ungetwc)) && (defined(__CRT_HAVE_ferror_unlocked) || defined(__CRT_HAVE_ferror))
+#if (defined(__CRT_HAVE_fgetwc_unlocked) || defined(__CRT_HAVE__fgetwc_nolock)) && (defined(__CRT_HAVE_ungetwc_unlocked) || defined(__CRT_HAVE_ungetwc) || defined(__CRT_HAVE__ungetwc_nolock)) && (defined(__CRT_HAVE_ferror_unlocked) || defined(__CRT_HAVE_ferror))
 #define __local_fgetc32s_unlocked_defined 1
 #include <kos/anno.h>
 #include <parts/errno.h>
@@ -55,6 +55,8 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferr
 __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_ungetc32_unlocked,(__WINT_TYPE__ __ch, __FILE *__restrict __stream),ungetwc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE_ungetwc) && (__SIZEOF_WCHAR_T__ == 4)
 __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_ungetc32_unlocked,(__WINT_TYPE__ __ch, __FILE *__restrict __stream),ungetwc,(__ch,__stream))
+#elif defined(__CRT_HAVE__ungetwc_nolock) && (__SIZEOF_WCHAR_T__ == 4)
+__CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_ungetc32_unlocked,(__WINT_TYPE__ __ch, __FILE *__restrict __stream),_ungetwc_nolock,(__ch,__stream))
 #else /* LIBC: ungetc32_unlocked */
 #undef ____localdep_ungetc32_unlocked_defined
 #endif /* ungetc32_unlocked... */
@@ -110,5 +112,5 @@ __LOCAL_LIBC(fgetc32s_unlocked) __ATTR_NONNULL((1, 3)) __CHAR32_TYPE__ *
 	return __buf;
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_fgetwc_unlocked) || defined(__CRT_HAVE__fgetwc_nolock)) && (defined(__CRT_HAVE_ungetwc_unlocked) || defined(__CRT_HAVE_ungetwc)) && (defined(__CRT_HAVE_ferror_unlocked) || defined(__CRT_HAVE_ferror)) */
+#endif /* (defined(__CRT_HAVE_fgetwc_unlocked) || defined(__CRT_HAVE__fgetwc_nolock)) && (defined(__CRT_HAVE_ungetwc_unlocked) || defined(__CRT_HAVE_ungetwc) || defined(__CRT_HAVE__ungetwc_nolock)) && (defined(__CRT_HAVE_ferror_unlocked) || defined(__CRT_HAVE_ferror)) */
 #endif /* !__local_fgetc32s_unlocked_defined */

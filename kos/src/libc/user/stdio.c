@@ -1349,7 +1349,8 @@ WUNUSED NONNULL((1)) char16_t LIBCCALL file_getc16(FILE *__restrict self) {
 			goto done;
 		if unlikely(error == 0) {
 			/* Shouldn't happen (a surrogate was written) */
-			file_ungetc(self, (unsigned char)buf[0]);
+			if (file_ungetc(self, (unsigned char)buf[0]) == EOF)
+				result = EOF16;
 			goto done;
 		}
 		if unlikely(error == (size_t)-1) {
@@ -5125,6 +5126,12 @@ NOTHROW_RPC(LIBCCALL libc_freopen_unlocked)(char const *__restrict filename,
 /*[[[impl:fopen64]]]*/
 /*[[[impl:freopen64]]]*/
 /*[[[impl:freopen64_unlocked]]]*/
+
+
+
+
+
+
 DEFINE_INTERN_ALIAS(libc_freopen64, libc_freopen);
 DEFINE_INTERN_ALIAS(libc_freopen64_unlocked, libc_freopen_unlocked);
 DEFINE_INTERN_ALIAS(libc_fopen64, libc_fopen);

@@ -945,15 +945,27 @@ add_nonnull:
 					;
 				} else if (attr.startswith("inp(") && attr.endswith(")")) {
 					goto add_nonnull;
+				} else if (attr.startswith("inpb(") && attr.endswith(")")) {
+					goto add_nonnull;
 				} else if (attr.startswith("outp(") && attr.endswith(")")) {
+					goto add_nonnull;
+				} else if (attr.startswith("outpb(") && attr.endswith(")")) {
 					goto add_nonnull;
 				} else if (attr.startswith("inoutp(") && attr.endswith(")")) {
 					goto add_nonnull;
+				} else if (attr.startswith("inoutpb(") && attr.endswith(")")) {
+					goto add_nonnull;
 				} else if (attr.startswith("inp_opt(") && attr.endswith(")")) {
+					;
+				} else if (attr.startswith("inpb_opt(") && attr.endswith(")")) {
 					;
 				} else if (attr.startswith("outp_opt(") && attr.endswith(")")) {
 					;
+				} else if (attr.startswith("outpb_opt(") && attr.endswith(")")) {
+					;
 				} else if (attr.startswith("inoutp_opt(") && attr.endswith(")")) {
+					;
+				} else if (attr.startswith("inoutpb_opt(") && attr.endswith(")")) {
 					;
 				} else {
 					print getFilenameForLog(file),;
@@ -2562,7 +2574,11 @@ again_enum_name:
 				err(i, "Expected \"(\", but got " + repr text[i]);
 			else ++i;
 			local argument_list_start = i;
-			i = text.indexmatch("(", ")", i);
+			try {
+				i = text.indexmatch("(", ")", i);
+			} catch (...) {
+				err(i, "Failed to find matching `)' for `('");
+			}
 			local argument_list = text.substr(argument_list_start, i);
 			do ++i;
 			while (text.isspace(i));
@@ -2614,7 +2630,11 @@ again_enum_name:
 			local ch = text[i];
 			while (ch == "[") {
 				local overload_tag_start = i + 1;
-				i = text.indexmatch("[", "]", i + 1);
+				try {
+					i = text.indexmatch("[", "]", i + 1);
+				} catch (...) {
+					err(i + 1, "Failed to find matching `]' for `['");
+				}
 				local overload_block = text.substr(overload_tag_start, i);
 				do ++i;
 				while (text.isspace(i));
@@ -2630,7 +2650,11 @@ again_enum_name:
 					++overload_i;
 				}
 				local overload_argument_list_start = overload_i;
-				overload_i = overload_block.indexmatch("(", ")", overload_i);
+				try {
+					overload_i = overload_block.indexmatch("(", ")", overload_i);
+				} catch (...) {
+					err(overload_i, "Failed to find matching `)' for `('");
+				}
 				local overload_argument_list = overload_block.substr(overload_argument_list_start, overload_i);
 				++overload_i;
 				local overload_return_type = overload_block.substr(overload_i).strip();
@@ -2827,6 +2851,13 @@ again_enum_name:
 						break;
 					case "printf": {
 						local vprintf_function = get_mode_arg();
+						if (vprintf_function == "%auto") {
+							local s = 0;
+							while (s < #funname && funname[s] in "_")
+								++s;
+							vprintf_function = "{}v{}".format({
+								funname[:s], funname[s:] });
+						}
 						local arglist = Tuple(split_argument_list(argument_list));
 						local printf_pattern =
 						"{{\n"
@@ -2929,7 +2960,11 @@ again_enum_name:
 				if (ch != "{")
 					err(i, "Expected \";\", \"{\", \"%\" or \"=\", but got " + repr text[i]);
 				else ++i;
-				i = text.indexmatch("{", "}", i) + 1;
+				try {
+					i = text.indexmatch("{", "}", i) + 1;
+				} catch (...) {
+					err(i, "Failed to find matching `}' for `{'");
+				}
 				block = text.substr(block_start, i).rstrip();
 			}
 			local fun = Function();

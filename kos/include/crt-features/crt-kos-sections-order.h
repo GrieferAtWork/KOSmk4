@@ -250,7 +250,7 @@
 	CB(PREFIX.fs.modify_time.* PREFIX.fs.mount.* PREFIX.fs.swap.*) \
 	CB(PREFIX.fs.statfs.statvfs.* PREFIX.fs.statfs.statfs.*) \
 	CB(PREFIX.timer.*) \
-	CB(PREFIX.errno.*) \
+	CB(PREFIX.errno.utility.* PREFIX.errno.*) \
 	CB(PREFIX.database.shell.*) \
 	CB(PREFIX.database.group.*) \
 	CB(PREFIX.database.shadow.*) \
@@ -285,6 +285,7 @@
 	CB(PREFIX.wchar.FILE.unlocked.write.printf.*) \
 	CB(PREFIX.wchar.FILE.unlocked.write.putc.*) \
 	CB(PREFIX.wchar.fs.exec.system.* PREFIX.wchar.fs.exec.spawn.*) \
+	CB(PREFIX.wchar.fs.modify.*) \
 	CB(PREFIX.wchar.string.memory.*) \
 	CB(PREFIX.wchar.unicode.static.memory.*) \
 	CB(PREFIX.wchar.unicode.static.ctype.*) \
@@ -348,7 +349,9 @@
 	CB(PREFIX.dos.wchar.FILE.unlocked.write.printf.*) \
 	CB(PREFIX.dos.wchar.FILE.unlocked.write.putc.*) \
 	CB(PREFIX.dos.wchar.fs.exec.system.* PREFIX.dos.wchar.fs.exec.spawn.*) \
+	CB(PREFIX.dos.wchar.fs.modify.*) \
 	CB(PREFIX.dos.wchar.fs.stat.*) \
+	CB(PREFIX.dos.wchar.fs.utility.*) \
 	CB(PREFIX.dos.wchar.string.memory.*) \
 	CB(PREFIX.dos.wchar.unicode.static.memory.*) \
 	CB(PREFIX.dos.wchar.unicode.static.convert.*) \
@@ -361,7 +364,7 @@
 	CB(PREFIX.dos.wchar.unicode.static.mbs.*) \
 	CB(PREFIX.dos.wchar.unicode.convert.*) \
 	CB(PREFIX.dos.wchar.fs.modify_time.*) \
-	CB(PREFIX.dos.wchar.errno.*) \
+	CB(PREFIX.dos.wchar.errno.utility.* PREFIX.dos.wchar.errno.*) \
 	CB(PREFIX.except.sched.access.* PREFIX.except.fs.exec.exec.*) \
 	CB(PREFIX.except.sched.param.*) \
 	CB(PREFIX.except.sched.process.*) \

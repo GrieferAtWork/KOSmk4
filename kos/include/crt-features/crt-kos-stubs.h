@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x55ed3ecd */
+/* HASH CRC-32:0xf4d381c5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -107,7 +107,13 @@
 #define __CRT_STUB__statusfp2 1
 #define __CRT_STUB__wcserror 1
 #define __CRT_STUB__wcserror_s 1
+#define __CRT_STUB__wfdopen 1
+#define __CRT_STUB__wfopen_s 1
+#define __CRT_STUB__wfreopen_s 1
+#define __CRT_STUB__wfsopen 1
 #define __CRT_STUB__wperror 1
+#define __CRT_STUB__wtempnam 1
+#define __CRT_STUB__wtmpnam_s 1
 #define __CRT_STUB_a64l 1
 #define __CRT_STUB_acos 1
 #define __CRT_STUB_acosh 1
@@ -641,9 +647,13 @@
 #define __CRT_STUB_vfwscanf_unlocked 1
 #define __CRT_STUB_vhangup 1
 #define __CRT_STUB_wcsnrtombs 1
+#define __CRT_STUB_wfopen 1
 #define __CRT_STUB_wfreadlinkat 1
+#define __CRT_STUB_wfreopen 1
 #define __CRT_STUB_wgetlogin 1
 #define __CRT_STUB_wgetlogin_r 1
+#define __CRT_STUB_wpopen 1
+#define __CRT_STUB_wremove 1
 #define __CRT_STUB_writev 1
 #define __CRT_STUB_wttyname 1
 #define __CRT_STUB_wttyname_r 1
