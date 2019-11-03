@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb944df83 */
+/* HASH CRC-32:0xd492d0e6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -69,7 +69,7 @@ __LOCAL_LIBC(vscanf) __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 0) 
 (__LIBCCALL __LIBC_LOCAL_NAME(vscanf))(char const *__restrict __format,
                                        __builtin_va_list __args) __THROWS(...) {
 #line 850 "kos/src/libc/magic/stdio.c"
-	return __localdep_vfscanf(__stdin, __format, __args);
+	return __localdep_vfscanf(__LOCAL_stdin, __format, __args);
 }
 __NAMESPACE_LOCAL_END
 #endif /* !defined(__NO_STDSTREAMS) && ((defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fread) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock)))) && ((defined(__CRT_HAVE_ungetc_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_ungetc)) || (__has_builtin(__builtin_vfscanf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_vfscanf)) || (defined(__CRT_HAVE_vfscanf_unlocked) && defined(__USE_STDIO_UNLOCKED)) || defined(__CRT_HAVE_vfscanf) || defined(__CRT_HAVE__vfscanf) || defined(__CRT_HAVE__vfscanf_s) || defined(__CRT_HAVE___vfscanf)) */

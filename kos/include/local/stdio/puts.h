@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x30451e5b */
+/* HASH CRC-32:0xac365d0a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -88,9 +88,9 @@ __LOCAL_LIBC(puts) __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T
 (__LIBCCALL __LIBC_LOCAL_NAME(puts))(char const *__restrict __string) __THROWS(...) {
 #line 543 "kos/src/libc/magic/stdio.c"
 	__STDC_INT_AS_SSIZE_T __result, __temp;
-	__result = __localdep_fputs(__string, __stdout);
+	__result = __localdep_fputs(__string, __LOCAL_stdout);
 	if (__result >= 0) {
-		__temp = __localdep_fputc('\n', __stdout);
+		__temp = __localdep_fputc('\n', __LOCAL_stdout);
 		if (__temp <= 0)
 			__result = __temp;
 		else

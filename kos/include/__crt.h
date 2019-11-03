@@ -73,6 +73,8 @@
 
 #undef __CRT_GENERIC
 #if defined(__CRT_FREESTANDING)
+#undef __NO_STDSTREAMS
+#define __NO_STDSTREAMS 1
 #undef __CRT_CYG_NATIVE
 #undef __CRT_GLC_NATIVE
 #undef __CRT_DOS_NATIVE

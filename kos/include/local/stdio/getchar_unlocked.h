@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe3b26fee */
+/* HASH CRC-32:0xf87dd7ae */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -52,7 +52,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(getchar_unlocked) int
 (__LIBCCALL __LIBC_LOCAL_NAME(getchar_unlocked))(void) __THROWS(...) {
 #line 1298 "kos/src/libc/magic/stdio.c"
-	return __localdep_fgetc_unlocked(__stdin);
+	return __localdep_fgetc_unlocked(__LOCAL_stdin);
 }
 __NAMESPACE_LOCAL_END
 #endif /* !defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fgetc_unlocked) || defined(__CRT_HAVE_getc_unlocked) || defined(__CRT_HAVE_fgetc) || defined(__CRT_HAVE_getc) || defined(__CRT_HAVE_fread_unlocked) || defined(__CRT_HAVE__fread_nolock) || defined(__CRT_HAVE_fread) || defined(__CRT_HAVE_fread_s)) */

@@ -541,9 +541,9 @@ fputs:([nonnull] char const *__restrict str,
 [dependency_include(<local/stdstreams.h>)][crtbuiltin]
 puts:([nonnull] char const *__restrict string) -> __STDC_INT_AS_SSIZE_T {
 	__STDC_INT_AS_SSIZE_T result, temp;
-	result = fputs(string, stdout);
+	result = fputs(string, @__LOCAL_stdout@);
 	if (result >= 0) {
-		temp = fputc('\n', stdout);
+		temp = fputc('\n', @__LOCAL_stdout@);
 		if (temp <= 0)
 			result = temp;
 		else
@@ -804,7 +804,7 @@ fprintf:([nonnull] FILE *__restrict stream, [nonnull] char const *__restrict for
 [alias(vprintf_s)][dependency_include(<local/stdstreams.h>)]
 [section(.text.crt.FILE.locked.write.printf)][crtbuiltin]
 vprintf:([nonnull] char const *__restrict format, $va_list args) -> __STDC_INT_AS_SSIZE_T {
-	return vfprintf(stdout, format, args);
+	return vfprintf(@__LOCAL_stdout@, format, args);
 }
 
 @@Print data to `stdout', following `FORMAT'
@@ -847,7 +847,7 @@ vfscanf:([nonnull] FILE *__restrict stream, [nonnull] char const *__restrict for
 [if(defined(__USE_STDIO_UNLOCKED)), preferred_alias(vscanf_unlocked)]
 [section(.text.crt.FILE.locked.read.scanf)][crtbuiltin]
 vscanf:([nonnull] char const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T {
-	return vfscanf(stdin, format, args);
+	return vfscanf(@__LOCAL_stdin@, format, args);
 }
 %(std)#endif /* __USE_ISOC99 || __USE_DOS */
 
@@ -1295,7 +1295,7 @@ putc_unlocked:(int ch, [nonnull] $FILE *__restrict stream) -> int = fputc_unlock
 [cp_stdio][noexport][dependency_include(<local/stdstreams.h>)]
 [same_impl][requires(!defined(__NO_STDSTREAMS) && $has_function(fgetc_unlocked))]
 getchar_unlocked:() -> int {
-	return fgetc_unlocked(stdin);
+	return fgetc_unlocked(@__LOCAL_stdin@);
 }
 
 %[default_impl_section(.text.crt.FILE.unlocked.write.putc)]
@@ -1304,7 +1304,7 @@ getchar_unlocked:() -> int {
 [cp_stdio][noexport][dependency_include(<local/stdstreams.h>)][crtbuiltin]
 [same_impl][requires(!defined(__NO_STDSTREAMS) && $has_function(fputc_unlocked))]
 putchar_unlocked:(int ch) -> int {
-	return fputc_unlocked(ch, stdout);
+	return fputc_unlocked(ch, @__LOCAL_stdout@);
 }
 
 %[default_impl_section(.text.crt.FILE.locked.utility)]
@@ -1906,9 +1906,9 @@ fftruncate_unlocked:([nonnull] $FILE *__restrict stream, __PIO_OFFSET length) ->
 [requires(!defined(__NO_STDSTREAMS) && $has_function(fputs_unlocked))]
 puts_unlocked:([nonnull] char const *__restrict string) -> __STDC_INT_AS_SSIZE_T {
 	__STDC_INT_AS_SSIZE_T result, temp;
-	result = fputs_unlocked(string, stdout);
+	result = fputs_unlocked(string, @__LOCAL_stdout@);
 	if (result >= 0) {
-		temp = fputc_unlocked('\n', stdout);
+		temp = fputc_unlocked('\n', @__LOCAL_stdout@);
 		if (temp <= 0)
 			result = temp;
 		else
@@ -2592,7 +2592,7 @@ fread_s:([outp(min(return*elemsize,elemcount*elemsize,bufsize))] void *__restric
 [same_impl][requires(!defined(__NO_STDSTREAMS) && $has_function(fgets))]
 [dependency_include(<local/stdstreams.h>)]
 gets_s:([outp(min(strlen(return),bufsize))] char *__restrict buf, rsize_t bufsize) -> char * {
-	return fgets(buf, (int)(unsigned int)bufsize, stdin);
+	return fgets(buf, (int)(unsigned int)bufsize, @__LOCAL_stdin@);
 }
 
 /* TODO: Header implementations of all of these printf functions */

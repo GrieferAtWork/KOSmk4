@@ -2893,9 +2893,9 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.write.write.puts") __STDC_INT_AS_S
 /*[[[body:puts]]]*/
 /*AUTO*/{
 	__STDC_INT_AS_SSIZE_T result, temp;
-	result = libc_fputs(string, stdout);
+	result = libc_fputs(string, __LOCAL_stdout);
 	if (result >= 0) {
-		temp = libc_fputc('\n', stdout);
+		temp = libc_fputc('\n', __LOCAL_stdout);
 		if (temp <= 0)
 			result = temp;
 		else
@@ -2913,9 +2913,9 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.write.write.puts_unlocked") __ST
 /*[[[body:puts_unlocked]]]*/
 /*AUTO*/{
 	__STDC_INT_AS_SSIZE_T result, temp;
-	result = libc_fputs_unlocked(string, stdout);
+	result = libc_fputs_unlocked(string, __LOCAL_stdout);
 	if (result >= 0) {
-		temp = libc_fputc_unlocked('\n', stdout);
+		temp = libc_fputc_unlocked('\n', __LOCAL_stdout);
 		if (temp <= 0)
 			result = temp;
 		else
@@ -3070,7 +3070,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.read.getc.getchar_unlocke
 		__THROWS(...)
 /*[[[body:getchar_unlocked]]]*/
 /*AUTO*/{
-	return libc_fgetc_unlocked(stdin);
+	return libc_fgetc_unlocked(__LOCAL_stdin);
 }
 /*[[[end:getchar_unlocked]]]*/
 
@@ -3092,7 +3092,7 @@ INTERN ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.write.putc.putchar_unlock
 		__THROWS(...)
 /*[[[body:putchar_unlocked]]]*/
 /*AUTO*/{
-	return libc_fputc_unlocked(ch, stdout);
+	return libc_fputc_unlocked(ch, __LOCAL_stdout);
 }
 /*[[[end:putchar_unlocked]]]*/
 

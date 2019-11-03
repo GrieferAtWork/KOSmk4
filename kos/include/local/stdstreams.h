@@ -19,43 +19,13 @@
  */
 #ifndef __local_stdstream_defined
 #define __local_stdstream_defined 1
+#include <__crt.h>
 #ifndef __NO_STDSTREAMS
-#ifdef __cplusplus
-
-#ifndef __stdstreams_defined
-#define __stdstreams_defined 1
-#undef stdin
-#undef stdout
-#undef stderr
-#ifdef __CRT_CYG_PRIMARY
-#   define stdin  (__CYG_REENT->__cyg_stdin)
-#   define stdout (__CYG_REENT->__cyg_stdout)
-#   define stderr (__CYG_REENT->__cyg_stderr)
-#elif defined(__CRT_DOS_PRIMARY)
-#ifdef __USE_DOS_LINKOBJECTS
-__LIBC FILE _iob[];
-#   define stdin    (_iob+0)
-#   define stdout   (_iob+1)
-#   define stderr   (_iob+2)
-#else /* __USE_DOS_LINKOBJECTS */
-__LIBC __ATTR_WUNUSED __ATTR_RETNONNULL FILE *__NOTHROW(__LIBCCALL __iob_func)(void);
-#   define stdin    (__iob_func()+0)
-#   define stdout   (__iob_func()+1)
-#   define stderr   (__iob_func()+2)
-#endif /* !__USE_DOS_LINKOBJECTS */
-#else
-__LIBC __FILE *stdin;
-#define stdin  stdin
-__LIBC __FILE *stdout;
-#define stdout stdout
-__LIBC __FILE *stderr;
-#define stderr stderr
-#endif
-#endif /* !__stdstreams_defined */
-
-#else /* __cplusplus */
-
-#ifdef __CRT_CYG_PRIMARY
+#ifdef __stdstreams_defined
+#define __LOCAL_stdin    stdin
+#define __LOCAL_stdout   stdout
+#define __LOCAL_stderr   stderr
+#elif defined(__CRT_CYG_PRIMARY)
 #include <sys/reent.h>
 #define __LOCAL_stdin  (__CYG_REENT->__cyg_stdin)
 #define __LOCAL_stdout (__CYG_REENT->__cyg_stdout)
@@ -96,7 +66,5 @@ __LIBC __FILE *stderr;
 #define __LOCAL_stdout   stdout
 #define __LOCAL_stderr   stderr
 #endif
-
-#endif /* !__cplusplus */
 #endif /* !__NO_STDSTREAMS */
 #endif /* !__local_stdstream_defined */
