@@ -45,9 +45,9 @@
  * member indicates, for each member file.  */
 
 
-#define ARMAG "!<arch>\n" /* String that begins an archive file. */
-#define SARMAG 8          /* Size of that string. */
-#define ARFMAG "`\n"      /* String in ar_fmag at end of each header. */
+#define ARMAG  "!<arch>\n" /* String that begins an archive file. */
+#define SARMAG 8           /* Size of that string. */
+#define ARFMAG "`\n"       /* String in ar_fmag at end of each header. */
 
 #ifdef __CC__
 __SYSDECL_BEGIN

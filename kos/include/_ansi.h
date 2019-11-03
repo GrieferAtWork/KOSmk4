@@ -28,21 +28,21 @@
 
 #if defined(__STDC__) || 1
 #define _HAVE_STDC
-#endif
+#endif /* __STDC__ */
 
 #ifdef _HAVE_STD_CXX
-#define _BEGIN_STD_C __NAMSPACE_STD_BEGIN __DECL_BEGIN
-#define _END_STD_C   __DECL_END __NAMSPACE_STD_END
-#else
+#define _BEGIN_STD_C __DECL_BEGIN __NAMESPACE_STD_BEGIN
+#define _END_STD_C   __NAMESPACE_STD_END __DECL_END
+#else /* _HAVE_STD_CXX */
 #define _BEGIN_STD_C __DECL_BEGIN
 #define _END_STD_C   __DECL_END
-#endif
+#endif /* !_HAVE_STD_CXX */
 
 #ifdef __NO_ATTR_NOTHROW_SUFFIX
 #define _NOTHROW /* Nothing */
-#else
+#else /* __NO_ATTR_NOTHROW_SUFFIX */
 #define _NOTHROW __ATTR_NOTHROW
-#endif
+#endif /* !__NO_ATTR_NOTHROW_SUFFIX */
 
 #ifdef _HAVE_STDC
 #   define _PTR      void *
@@ -60,13 +60,10 @@
 #   define _DEFUN(name,arglist,args) name(args)
 #   define _DEFUN_VOID(name)         name(_NOARGS)
 #   define _CAST_VOID               (void)
-#ifndef _LONG_DOUBLE
-#   define _LONG_DOUBLE              long double
-#endif
 #ifndef _PARAMS
 #   define _PARAMS(paramlist)        paramlist
-#endif
-#else
+#endif /* !_PARAMS */
+#else /* _HAVE_STDC */
 #   define _PTR                         char *
 #   define _AND                         ;
 #   define _NOARGS                      /* Nothing */
@@ -80,18 +77,27 @@
 #   define _DEFUN(name,arglist,args)    name arglist args;
 #   define _DEFUN_VOID(name)            name()
 #   define _CAST_VOID                   /* Nothing */
-#   define _LONG_DOUBLE                 double
 #ifndef _PARAMS
 #   define _PARAMS(paramlist)          ()
-#endif
-#endif
+#endif /* !_PARAMS */
+#endif /* !_HAVE_STDC */
+
+#ifndef _LONG_DOUBLE
+#ifdef __COMPILER_HAVE_LONGDOUBLE
+#define _LONG_DOUBLE long double
+#else /* __COMPILER_HAVE_LONGDOUBLE */
+#define _LONG_DOUBLE double
+#endif /* !__COMPILER_HAVE_LONGDOUBLE */
+#endif /* _LONG_DOUBLE */
+
 
 #define _ATTRIBUTE(attrs) __attribute__(attrs)
 #if defined(__GNUC__) && !defined(__GNUC_STDC_INLINE__)
-#   define _ELIDABLE_INLINE extern __ATTR_FORCEINLINE
-#else
-#   define _ELIDABLE_INLINE static __ATTR_INLINE
-#endif
+#define _ELIDABLE_INLINE extern __ATTR_FORCEINLINE
+#else /* __GNUC__ && !__GNUC_STDC_INLINE__ */
+#define _ELIDABLE_INLINE static __ATTR_INLINE
+#endif /* !__GNUC__ || __GNUC_STDC_INLINE__ */
+
 #define _NOINLINE        __ATTR_NOINLINE
 #define _NOINLINE_STATIC __ATTR_NOINLINE static
 
