@@ -20,6 +20,7 @@
 #define _KOS_BITS_FUTEX_H 1
 
 #include <__stdinc.h>
+#include <hybrid/typecore.h>
 
 /* KOS futex operations (for use with the lfutex() system
  * call, though can't be used with the futex() system call!). */
@@ -128,9 +129,15 @@
 #define LFUTEX_MPFDBIT            0x00000200
 
 
-#define LFUTEX_WAIT_LOCK_TIDMASK  0x3fffffff /* Mask for the TID. */
-#define LFUTEX_WAIT_LOCK_WAITERS  0x40000000 /* Flag: Set by the kernel before waiting for the futex. */
-#define LFUTEX_WAIT_LOCK_OWNDIED  0x80000000 /* Flag: Set by the kernel if a robust futex died. */
+#if __SIZEOF_POINTER__ >= 8
+#define LFUTEX_WAIT_LOCK_TIDMASK  __UINT64_C(0x3fffffffffffffff) /* Mask for the TID. */
+#define LFUTEX_WAIT_LOCK_WAITERS  __UINT64_C(0x4000000000000000) /* Flag: Set by the kernel before waiting for the futex. */
+#define LFUTEX_WAIT_LOCK_OWNDIED  __UINT64_C(0x8000000000000000) /* Flag: Set by the kernel if a robust futex died. */
+#else /* __SIZEOF_POINTER__ >= 8 */
+#define LFUTEX_WAIT_LOCK_TIDMASK  __UINT32_C(0x3fffffff) /* Mask for the TID. */
+#define LFUTEX_WAIT_LOCK_WAITERS  __UINT32_C(0x40000000) /* Flag: Set by the kernel before waiting for the futex. */
+#define LFUTEX_WAIT_LOCK_OWNDIED  __UINT32_C(0x80000000) /* Flag: Set by the kernel if a robust futex died. */
+#endif /* __SIZEOF_POINTER__ < 8 */
 
 /* Check if the given futex command `x' uses the timeout argument. */
 #define LFUTEX_USES_TIMEOUT(x) ((x) & 0x10)
