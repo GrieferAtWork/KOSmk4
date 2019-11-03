@@ -1918,6 +1918,7 @@
 #define __CRT_HAVE_futex_waitwhile_exactbits 1
 #define __CRT_HAVE_futex_wake 1
 #define __CRT_HAVE_futex_wakeall 1
+#define __CRT_HAVE_futex_wakemask 1
 #define __CRT_HAVE_futexlock_timedwaitlock 1
 #define __CRT_HAVE_futexlock_timedwaitlock64 1
 #define __CRT_HAVE_futexlock_timedwaituntil 1

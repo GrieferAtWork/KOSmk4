@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd313cfb4 */
+/* HASH CRC-32:0x1b7253d1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1765,6 +1765,7 @@
 #define __CRT_ATTR_NOTHROW_NCX_funlockfile 1
 #define __CRT_ATTR_NOTHROW_NCX_futex_wake 1
 #define __CRT_ATTR_NOTHROW_NCX_futex_wakeall 1
+#define __CRT_ATTR_NOTHROW_NCX_futex_wakemask 1
 #define __CRT_ATTR_NOTHROW_NCX_futexlock_wake 1
 #define __CRT_ATTR_NOTHROW_NCX_futexlock_wakeall 1
 #define __CRT_ATTR_NOTHROW_NCX_futimes 1

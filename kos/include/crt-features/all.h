@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe3a043a */
+/* HASH CRC-32:0x935f3e96 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1898,6 +1898,7 @@
 #define __CRT_HAVE_futex_waitwhile_exactbits64 1
 #define __CRT_HAVE_futex_wake 1
 #define __CRT_HAVE_futex_wakeall 1
+#define __CRT_HAVE_futex_wakemask 1
 #define __CRT_HAVE_futexlock_timedwaitlock 1
 #define __CRT_HAVE_futexlock_timedwaitlock64 1
 #define __CRT_HAVE_futexlock_timedwaituntil 1

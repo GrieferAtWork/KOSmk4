@@ -338,14 +338,13 @@ again:
 		goto again;
 	/* If there are waiting threads, wake one of them. */
 	if (oldval & LFUTEX_WAIT_LOCK_WAITERS) {
-		/* NOTE: Make use of `LFUTEX_WAKELOCK' to do the equivalent of:
+		/* NOTE: Make use of `LFUTEX_WAKEMASK' to do the equivalent of:
 		 * >> if (!sys_lfutex(&self->s_count, LFUTEX_WAKE, 1, NULL, 0)) {
 		 * >>     ATOMIC_FETCHAND(&self->s_count, ~LFUTEX_WAIT_LOCK_WAITERS);
 		 * >>     sys_lfutex(&self->s_count, LFUTEX_WAKE, (size_t)-1, NULL, 0);
-		 * >> }
-		 */
-		sys_lfutex(&self->s_count, LFUTEX_WAKELOCK,
-		           1, NULL, ~LFUTEX_WAIT_LOCK_WAITERS);
+		 * >> } */
+		sys_lfutex(&self->s_count, LFUTEX_WAKEMASK, 1,
+		           (struct timespec64 const *)(uintptr_t)~LFUTEX_WAIT_LOCK_WAITERS, 0);
 	}
 	return 0;
 }

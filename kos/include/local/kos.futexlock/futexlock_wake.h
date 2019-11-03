@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb1e4a519 */
+/* HASH CRC-32:0x4f098ea3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,86 +18,31 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_futexlock_wake_defined
-#if (defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex))
+#if (defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex) || defined(__CRT_HAVE_futex_wakemask))
 #define __local_futexlock_wake_defined 1
 #include <hybrid/__atomic.h>
-/* Dependency: "lfutex64" from "kos.futex" */
-#ifndef ____localdep_lfutex64_defined
-#define ____localdep_lfutex64_defined 1
-#if defined(__CRT_HAVE_lfutex64)
-/* >> lfutex(2)
- * Provide the bottom-most API for implementing user-space synchronization on KOS
- * @param: futex_op: One of:
- *    - LFUTEX_WAKE:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKE, size_t count)
- *    - LFUTEX_NOP:                (lfutex_t *uaddr, syscall_ulong_t LFUTEX_NOP, size_t ignored)
- *    - LFUTEX_WAIT:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT, lfutex ignored, struct timespec const *timeout)
- *    - LFUTEX_WAIT_LOCK:          (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_LOCK, lfutex_t lock_value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE, lfutex_t value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_UNTIL:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL, lfutex_t value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_ABOVE:   (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_ABOVE, lfutex_t value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BELOW:   (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_BELOW, lfutex_t value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BITMASK: (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_BITMASK, lfutex_t bitmask, struct timespec const *timeout, lfutex_t setmask)
- *    - LFUTEX_WAIT_UNTIL_BITMASK: (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL_BITMASK, lfutex_t bitmask, struct timespec const *timeout, lfutex_t setmask)
- *    - LFUTEX_WAIT_WHILE_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
- *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
- * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @return: * : Depending on `futex_op'
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    The given `futex_op' is invalid
- * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
- * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfutex64,(__uintptr_t *__uaddr, __syscall_ulong_t __futex_op, __uintptr_t __val, /*struct timespec64 const *timeout, lfutex_t val2*/...),lfutex64,(__uaddr,__futex_op,__val,))
-#elif defined(__CRT_HAVE_lfutex) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
-/* >> lfutex(2)
- * Provide the bottom-most API for implementing user-space synchronization on KOS
- * @param: futex_op: One of:
- *    - LFUTEX_WAKE:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKE, size_t count)
- *    - LFUTEX_NOP:                (lfutex_t *uaddr, syscall_ulong_t LFUTEX_NOP, size_t ignored)
- *    - LFUTEX_WAIT:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT, lfutex ignored, struct timespec const *timeout)
- *    - LFUTEX_WAIT_LOCK:          (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_LOCK, lfutex_t lock_value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE, lfutex_t value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_UNTIL:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL, lfutex_t value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_ABOVE:   (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_ABOVE, lfutex_t value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BELOW:   (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_BELOW, lfutex_t value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BITMASK: (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_BITMASK, lfutex_t bitmask, struct timespec const *timeout, lfutex_t setmask)
- *    - LFUTEX_WAIT_UNTIL_BITMASK: (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL_BITMASK, lfutex_t bitmask, struct timespec const *timeout, lfutex_t setmask)
- *    - LFUTEX_WAIT_WHILE_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
- *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
- * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @return: * : Depending on `futex_op'
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    The given `futex_op' is invalid
- * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
- * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfutex64,(__uintptr_t *__uaddr, __syscall_ulong_t __futex_op, __uintptr_t __val, /*struct timespec64 const *timeout, lfutex_t val2*/...),lfutex,(__uaddr,__futex_op,__val,))
-#elif defined(__CRT_HAVE_lfutex)
-#include <local/kos.futex/lfutex64.h>
-/* >> lfutex(2)
- * Provide the bottom-most API for implementing user-space synchronization on KOS
- * @param: futex_op: One of:
- *    - LFUTEX_WAKE:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAKE, size_t count)
- *    - LFUTEX_NOP:                (lfutex_t *uaddr, syscall_ulong_t LFUTEX_NOP, size_t ignored)
- *    - LFUTEX_WAIT:               (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT, lfutex ignored, struct timespec const *timeout)
- *    - LFUTEX_WAIT_LOCK:          (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_LOCK, lfutex_t lock_value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE, lfutex_t value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_UNTIL:         (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL, lfutex_t value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_ABOVE:   (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_ABOVE, lfutex_t value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BELOW:   (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_BELOW, lfutex_t value, struct timespec const *timeout)
- *    - LFUTEX_WAIT_WHILE_BITMASK: (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_BITMASK, lfutex_t bitmask, struct timespec const *timeout, lfutex_t setmask)
- *    - LFUTEX_WAIT_UNTIL_BITMASK: (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL_BITMASK, lfutex_t bitmask, struct timespec const *timeout, lfutex_t setmask)
- *    - LFUTEX_WAIT_WHILE_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_WHILE_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
- *    - LFUTEX_WAIT_UNTIL_CMPXCH:  (lfutex_t *uaddr, syscall_ulong_t LFUTEX_WAIT_UNTIL_CMPXCH, lfutex_t oldval, struct timespec const *timeout, lfutex_t newval)
- * @param: timeout: Timeout for wait operations (s.a. `LFUTEX_WAIT_FLAG_TIMEOUT_*')
- * @return: * : Depending on `futex_op'
- * @return: -1:EFAULT:    A faulty pointer was given
- * @return: -1:EINVAL:    The given `futex_op' is invalid
- * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
- * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-#define __localdep_lfutex64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lfutex64))
-#else /* CUSTOM: lfutex64 */
-#undef ____localdep_lfutex64_defined
-#endif /* lfutex64... */
-#endif /* !____localdep_lfutex64_defined */
+
+#include <kos/bits/futex.h>
+/* Dependency: "futex_wakemask" from "kos.futex" */
+#ifndef ____localdep_futex_wakemask_defined
+#define ____localdep_futex_wakemask_defined 1
+#if defined(__CRT_HAVE_futex_wakemask)
+/* Similar to `futex_wake()', however once there are no more threads that
+ * can be awoken, perform the following operation: `*uaddr = (*uaddr & mask_and) | mask_or'
+ * @return: * : The number of woken threads
+ * @return: -1:EFAULT: A faulty pointer was given */
+__CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_futex_wakemask,(__uintptr_t *__uaddr, __SIZE_TYPE__ __max_wake, __uintptr_t __mask_and, __uintptr_t __mask_or),futex_wakemask,(__uaddr,__max_wake,__mask_and,__mask_or))
+#elif defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
+#include <local/kos.futex/futex_wakemask.h>
+/* Similar to `futex_wake()', however once there are no more threads that
+ * can be awoken, perform the following operation: `*uaddr = (*uaddr & mask_and) | mask_or'
+ * @return: * : The number of woken threads
+ * @return: -1:EFAULT: A faulty pointer was given */
+#define __localdep_futex_wakemask (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(futex_wakemask))
+#else /* CUSTOM: futex_wakemask */
+#undef ____localdep_futex_wakemask_defined
+#endif /* futex_wakemask... */
+#endif /* !____localdep_futex_wakemask_defined */
 
 __NAMESPACE_LOCAL_BEGIN
 /* A more efficient variant of `futex_wake()' that can be used to wake up threads waiting
@@ -106,11 +51,11 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(futexlock_wake) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(futexlock_wake))(__uintptr_t *__ulockaddr,
                                                             __SIZE_TYPE__ __max_wake) {
-#line 143 "kos/src/libc/magic/kos.futexlock.c"
-	if (__hybrid_atomic_xch(*__ulockaddr, 0, __ATOMIC_SEQ_CST) == 0)
+#line 147 "kos/src/libc/magic/kos.futexlock.c"
+	if (!(__hybrid_atomic_load(*__ulockaddr, __ATOMIC_ACQUIRE) & __LFUTEX_WAIT_LOCK_WAITERS))
 		return 0; /* No waiting threads. */
-	return __localdep_lfutex64(__ulockaddr, LFUTEX_WAKE, __max_wake);
+	return __localdep_futex_wakemask(&__ulockaddr, 1, (__uintptr_t)~__LFUTEX_WAIT_LOCK_WAITERS, 0);
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)) */
+#endif /* (defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex) || defined(__CRT_HAVE_futex_wakemask)) */
 #endif /* !__local_futexlock_wake_defined */

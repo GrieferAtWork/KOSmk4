@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf48ce53f */
+/* HASH CRC-32:0x3c0c42fe */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,7 +51,7 @@
  * @return: -1:EINVAL:    One of the given commands is invalid, or `exprc' was `0'
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
-__CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_lfutexexpr32,(void *__base, struct lfutexexpr const *__exprv, __SIZE_TYPE__ __exprc, struct __timespec64 const *__timeout, unsigned int __timeout_flags),lfutexexpr,(__base,__exprv,__exprc,__timeout,__timeout_flags))
+__CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,__localdep_lfutexexpr32,(void *__base, __SIZE_TYPE__ __exprc, struct lfutexexpr const *__exprv, struct __timespec64 const *__timeout, unsigned int __timeout_flags),lfutexexpr,(__base,__exprc,__exprv,__timeout,__timeout_flags))
 #else /* LIBC: lfutexexpr */
 #undef ____localdep_lfutexexpr32_defined
 #endif /* lfutexexpr32... */
@@ -187,7 +187,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(lfutexexpr))(void *__base,
                                                         struct lfutexexpr const *__exprv,
                                                         struct __TM_TYPE(timespec) const *__timeout,
                                                         unsigned int __timeout_flags) {
-#line 208 "kos/src/libc/magic/kos.futexexpr.c"
+#line 214 "kos/src/libc/magic/kos.futexexpr.c"
 #ifdef __CRT_HAVE_lfutexexpr
 	struct __timespec32 __tms32;
 	if (!__timeout)

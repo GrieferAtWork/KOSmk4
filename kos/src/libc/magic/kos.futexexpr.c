@@ -167,9 +167,15 @@ __NAMESPACE_INT_END
 
 
 [cp][doc_alias(lfutexexpr)][ignore]
-lfutexexpr32:(void *base, [nonnull] struct lfutexexpr const *exprv, $size_t exprc, struct timespec64 const *timeout, unsigned int timeout_flags) -> int = lfutexexpr?;
+lfutexexpr32:(void *base, $size_t exprc,
+              [nonnull] struct lfutexexpr const *exprv,
+              struct timespec64 const *timeout,
+              unsigned int timeout_flags) -> int = lfutexexpr?;
 [cp][doc_alias(lfutexlockexpr)][ignore]
-lfutexlockexpr32:([nonnull] lfutex_t *ulockaddr, void *base, [nonnull] struct lfutexexpr const *exprv, $size_t exprc, struct timespec64 const *timeout, unsigned int timeout_flags) -> int = lfutexlockexpr?;
+lfutexlockexpr32:([nonnull] lfutex_t *ulockaddr, void *base,
+                  $size_t exprc, [nonnull] struct lfutexexpr const *exprv,
+                  struct timespec64 const *timeout,
+                  unsigned int timeout_flags) -> int = lfutexlockexpr?;
 
 
 @@>> lfutexexpr(2)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x863f2ed8 */
+/* HASH CRC-32:0x558ea573 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -45,7 +45,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: -1:EFAULT: A faulty pointer was given */
 __LOCAL_LIBC(futex_wakeall) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(futex_wakeall))(__uintptr_t *__uaddr) {
-#line 339 "kos/src/libc/magic/kos.futex.c"
+#line 340 "kos/src/libc/magic/kos.futex.c"
 	return __localdep_futex_wake(__uaddr, (__SIZE_TYPE__)-1);
 }
 __NAMESPACE_LOCAL_END

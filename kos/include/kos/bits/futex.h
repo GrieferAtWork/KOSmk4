@@ -38,11 +38,20 @@
 #define LFUTEX_GETFUTEX_EXISTING  0x00000003 /* [struct hop_openfd *val]
                                               * Same as `LFUTEX_GETFUTEX', but don't create a futex where there is none already.
                                               * If no futex already exists, simply return `-ENOENT', and don't throw an error */
-#define LFUTEX_WAKELOCK           0x00000004 /* >> result = 0;
+#define LFUTEX_WAKEMASK           0x00000004 /* Same as `LFUTEX_WAKE', but clear/set certain bits once there are no
+                                              * more threads to wake up, before broadcasting all remaining threads to
+                                              * ensure that futex bits are in a consistent state.
+                                              * Mainly intended to be used like this (allowing something like `sem_post()'
+                                              * to be implemented without the need of a system call whenever there
+                                              * aren't any waiting threads):
+                                              * >> if (BIT_SET(LFUTEX_WAIT_LOCK_WAITERS))
+                                              * >>     wakemask(timeout: ~LFUTEX_WAIT_LOCK_WAITERS, val2: 0);
+                                              * Behavior:
+                                              * >> result = 0;
                                               * >> while (val && sig_send(uaddr))
                                               * >>     ++result;
                                               * >> if (result < val && val != 0) {
-                                              * >>     *uaddr &= val2;
+                                              * >>     *uaddr = (*uaddr & (lfutex_t)timeout) | val2;
                                               * >>     result += sig_broadcast(uaddr);
                                               * >>     if (result > val)
                                               * >>         result = val;
@@ -136,7 +145,7 @@
  *          the data part used by a MPFUTEXFD object can be gained through use
  *          of the `HOP_MPFUTEXFD_OPEN_DATAPART' hop() function.
  */
-#define LFUTEX_MPFDBIT            0x00000200
+#define LFUTEX_MPFDBIT              0x00000200
 
 
 #if __SIZEOF_POINTER__ >= 8

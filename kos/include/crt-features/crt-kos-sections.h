@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x535d4575 */
+/* HASH CRC-32:0x210beec */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2577,6 +2577,7 @@
 #define __CRT_SECTION_futex_timedwaitwhile_exactbits        __CRT_SECTINFO_sched_futex                              /* .text.crt.sched.futex.futex_timedwaitwhile_exactbits */
 #define __CRT_SECTION_futex_timedwaitwhile_exactbits64      __CRT_SECTINFO_sched_futex                              /* .text.crt.sched.futex.futex_timedwaitwhile_exactbits64 */
 #define __CRT_SECTION_futex_wakeall                         __CRT_SECTINFO_sched_futex                              /* .text.crt.sched.futex.futex_wakeall */
+#define __CRT_SECTION_futex_wakemask                        __CRT_SECTINFO_sched_futex                              /* .text.crt.sched.futex.futex_wakemask */
 #define __CRT_SECTION_lfutex                                __CRT_SECTINFO_sched_futex                              /* .text.crt.sched.futex.lfutex */
 #define __CRT_SECTION_lfutex64                              __CRT_SECTINFO_sched_futex                              /* .text.crt.sched.futex.lfutex64 */
 

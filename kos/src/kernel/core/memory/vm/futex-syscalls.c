@@ -156,8 +156,41 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 		}
 	}	break;
 
-	case LFUTEX_WAKELOCK: {
+	case LFUTEX_WAKEMASK: {
 		size_t count = (size_t)val;
+		lfutex_t mask_and = (lfutex_t)timeout;
+		lfutex_t mask_or  = (lfutex_t)val2;
+#ifdef __OPTIMIZE_SIZE__
+#define APPLY_MASK()                                            \
+		do {                                                    \
+			lfutex_t _oldval;                                   \
+			COMPILER_WRITE_BARRIER();                           \
+			do {                                                \
+				_oldval = ATOMIC_READ(*uaddr);                  \
+			} while (!ATOMIC_CMPXCH_WEAK(*uaddr, _oldval,       \
+			                             (_oldval & mask_and) | \
+			                             mask_or));             \
+			COMPILER_WRITE_BARRIER();                           \
+		} __WHILE0
+#else /* __OPTIMIZE_SIZE__ */
+#define APPLY_MASK()                                                \
+		do {                                                        \
+			COMPILER_WRITE_BARRIER();                               \
+			if likely(!mask_or) {                                   \
+				ATOMIC_FETCHAND(*uaddr, mask_and);                  \
+			} else if (mask_and == (lfutex_t)-1) {                  \
+				ATOMIC_FETCHOR(*uaddr, mask_or);                    \
+			} else {                                                \
+				lfutex_t _oldval;                                   \
+				do {                                                \
+					_oldval = ATOMIC_READ(*uaddr);                  \
+				} while (!ATOMIC_CMPXCH_WEAK(*uaddr, _oldval,       \
+				                             (_oldval & mask_and) | \
+				                             mask_or));             \
+			}                                                       \
+			COMPILER_WRITE_BARRIER();                               \
+		} __WHILE0
+#endif /* !__OPTIMIZE_SIZE__ */
 		if unlikely((futex_op & LFUTEX_FLAGMASK) != 0) {
 			THROW(E_INVALID_ARGUMENT_RESERVED_FLAG,
 			      E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP,
@@ -169,24 +202,23 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 		f = vm_getfutex_existing(THIS_VM, (vm_virt_t)uaddr);
 		result = 0;
 		if (!f) {
-			COMPILER_WRITE_BARRIER();
-			ATOMIC_FETCHAND(*uaddr, val2);
-			COMPILER_WRITE_BARRIER();
-			/* Do a second check for the futex, thus ensuring that
-			 * we're interlocked with the `ATOMIC_FETCHAND()' */
+			APPLY_MASK();
+			/* Do a second check for the futex, thus ensuring
+			 * that we're interlocked with `APPLY_MASK()' */
 			f = vm_getfutex_existing(THIS_VM, (vm_virt_t)uaddr);
-			if unlikely(f)
-				goto do_handle_with_futex;
+			if unlikely(f) {
+				result = sig_broadcast(&f->f_signal);
+				decref_unlikely(f);
+				if ((size_t)result > count)
+					result = (syscall_slong_t)count;
+			}
 		} else {
-do_handle_with_futex:
 			FINALLY_DECREF_UNLIKELY(f);
 			if (count == (size_t)-1) {
+				/* Since we're doing a broadcast, no need to wait
+				 * with the signal application until later! */
+				APPLY_MASK();
 				result = sig_broadcast(&f->f_signal);
-				COMPILER_WRITE_BARRIER();
-				ATOMIC_FETCHAND(*uaddr, val2);
-				COMPILER_WRITE_BARRIER();
-				/* Broadcast again after modifying the memory location. */
-				result += sig_broadcast(&f->f_signal);
 			} else {
 				/* Only signal at most `count' connected threads.
 				 * TODO: Make sure that when a already received signal connection is discarded
@@ -198,9 +230,7 @@ do_handle_with_futex:
 				while (count) {
 					if (!sig_send(&f->f_signal)) {
 						size_t temp;
-						COMPILER_WRITE_BARRIER();
-						ATOMIC_FETCHAND(*uaddr, val2);
-						COMPILER_WRITE_BARRIER();
+						APPLY_MASK();
 						/* Broadcast again after modifying the memory location. */
 						temp = sig_broadcast(&f->f_signal);
 						if unlikely(temp > count)
@@ -213,6 +243,7 @@ do_handle_with_futex:
 				}
 			}
 		}
+#undef APPLY_MASK
 	}	break;
 
 	case LFUTEX_NOP:

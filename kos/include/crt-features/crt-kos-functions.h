@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x236b27e9 */
+/* HASH CRC-32:0xa41172c4 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -858,6 +858,7 @@ __CRT_FUNCTION(futex_timedwaitwhile_cmpxch64,1,(__SIZEOF_TIME32_T__ == __SIZEOF_
 __CRT_FUNCTION(futex_timedwaitwhile_exactbits,0,(),4,(lfutex_t *,uaddr,lfutex_t,bitmask,lfutex_t,setmask,struct timespec const *,rel_timeout),int)
 __CRT_FUNCTION(futex_timedwaitwhile_exactbits64,1,(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__,futex_timedwaitwhile_exactbits),4,(lfutex_t *,uaddr,lfutex_t,bitmask,lfutex_t,setmask,struct timespec64 const *,rel_timeout),int)
 __CRT_FUNCTION(futex_wakeall,0,(),1,(lfutex_t *,uaddr),ssize_t)
+__CRT_FUNCTION(futex_wakemask,0,(),4,(lfutex_t *,uaddr,size_t,max_wake,lfutex_t,mask_and,lfutex_t,mask_or),ssize_t)
 __CRT_FUNCTION(futexlock_timedwaitlock,0,(),3,(lfutex_t *,ulockaddr,lfutex_t *,uaddr,struct timespec const *,rel_timeout),int)
 __CRT_FUNCTION(futexlock_timedwaitlock64,1,(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__,futexlock_timedwaitlock),3,(lfutex_t *,ulockaddr,lfutex_t *,uaddr,struct timespec64 const *,rel_timeout),int)
 __CRT_FUNCTION(futexlock_timedwaituntil,0,(),4,(lfutex_t *,ulockaddr,lfutex_t *,uaddr,lfutex_t,not_equal_to_value,struct timespec const *,rel_timeout),int)
