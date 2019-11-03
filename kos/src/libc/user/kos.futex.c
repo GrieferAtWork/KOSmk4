@@ -107,14 +107,15 @@ NOTHROW_RPC(LIBCCALL libc_lfutex)(lfutex_t *uaddr,
 	return libc_seterrno_syserr(result);
 #else /* __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ */
 	if (!timeout || !LFUTEX_USES_TIMEOUT(futex_op)) {
-		return lfutex64(uaddr, futex_op, val,
-		                (struct timespec64 *)NULL, val2);
+		result = lfutex64(uaddr, futex_op, val,
+		                  (struct timespec64 *)NULL, val2);
 	} else {
 		struct timespec64 tms64;
 		tms64.tv_sec  = (time64_t)timeout->tv_sec;
 		tms64.tv_nsec = timeout->tv_nsec;
-		return lfutex64(uaddr, futex_op, val, &tms64, val2);
+		result = lfutex64(uaddr, futex_op, val, &tms64, val2);
 	}
+	return result;
 #endif /* __SIZEOF_TIME32_T__ != __SIZEOF_TIME64_T__ */
 }
 /*[[[end:lfutex]]]*/
