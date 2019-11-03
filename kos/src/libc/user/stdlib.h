@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x51b23474 */
+/* HASH CRC-32:0x49acfbf3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -117,7 +117,7 @@ INTDEF NONNULL((1)) void NOTHROW_NCX(LIBCCALL libc_setkey)(char const *key);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_grantpt)(fd_t fd);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_unlockpt)(fd_t fd);
 INTDEF WUNUSED char *NOTHROW_NCX(LIBCCALL libc_ptsname)(fd_t fd);
-INTDEF WUNUSED int NOTHROW_RPC(LIBCCALL libc_posix_openpt)(oflag_t oflag);
+INTDEF WUNUSED int NOTHROW_RPC(LIBCCALL libc_posix_openpt)(oflag_t oflags);
 INTDEF WUNUSED NONNULL((1)) char *NOTHROW_NCX(LIBCCALL libc_secure_getenv)(char const *varname);
 INTDEF NONNULL((2)) int NOTHROW_NCX(LIBCCALL libc_ptsname_r)(fd_t fd, char *buf, size_t buflen);
 INTDEF int NOTHROW_RPC(LIBCCALL libc_getpt)(void);

@@ -289,7 +289,7 @@ NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_destroy)(posix_spawn_file_act
 }
 /*[[[end:posix_spawn_file_actions_destroy]]]*/
 
-/*[[[head:posix_spawn_file_actions_addopen,hash:CRC-32=0xf266d515]]]*/
+/*[[[head:posix_spawn_file_actions_addopen,hash:CRC-32=0x78758c3a]]]*/
 /* Add an action to FILE-ACTIONS which tells the implementation
  * to call `open' for the given file during the `spawn' call */
 INTERN NONNULL((1, 3))
@@ -297,7 +297,7 @@ ATTR_WEAK ATTR_SECTION(".text.crt.fs.exec.posix_spawn.posix_spawn_file_actions_a
 NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addopen)(posix_spawn_file_actions_t *__restrict file_actions,
                                                             fd_t fd,
                                                             char const *__restrict path,
-                                                            oflag_t oflag,
+                                                            oflag_t oflags,
                                                             mode_t mode)
 /*[[[body:posix_spawn_file_actions_addopen]]]*/
 {

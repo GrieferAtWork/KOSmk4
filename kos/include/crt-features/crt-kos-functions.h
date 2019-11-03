@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb68e75d6 */
+/* HASH CRC-32:0x4bbc3479 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1504,11 +1504,11 @@ __CRT_FUNCTION(posix_fallocate,0,(),3,(fd_t,fd,off_t,offset,off_t,length),int)
 __CRT_FUNCTION(posix_fallocate64,1,(__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__,posix_fallocate),3,(fd_t,fd,off64_t,offset,off64_t,length),int)
 __CRT_FUNCTION(posix_madvise,0,(),3,(void *,addr,size_t,len,int,advice),int)
 __CRT_FUNCTION(posix_memalign,0,(),3,(void **__restrict,pp,size_t,alignment,size_t,n_bytes),int)
-__CRT_FUNCTION(posix_openpt,0,(),1,(oflag_t,oflag),int)
+__CRT_FUNCTION(posix_openpt,0,(),1,(oflag_t,oflags),int)
 __CRT_FUNCTION(posix_spawn,0,(),6,(pid_t *__restrict,pid,char const *__restrict,path,posix_spawn_file_actions_t const *,file_actions,posix_spawnattr_t const *,attrp,__TARGV,,__TENVP,),int)
 __CRT_FUNCTION(posix_spawn_file_actions_addclose,0,(),2,(posix_spawn_file_actions_t *__restrict,file_actions,fd_t,fd),int)
 __CRT_FUNCTION(posix_spawn_file_actions_adddup2,0,(),3,(posix_spawn_file_actions_t *__restrict,file_actions,fd_t,fd,fd_t,newfd),int)
-__CRT_FUNCTION(posix_spawn_file_actions_addopen,0,(),5,(posix_spawn_file_actions_t *__restrict,file_actions,fd_t,fd,char const *__restrict,path,oflag_t,oflag,mode_t,mode),int)
+__CRT_FUNCTION(posix_spawn_file_actions_addopen,0,(),5,(posix_spawn_file_actions_t *__restrict,file_actions,fd_t,fd,char const *__restrict,path,oflag_t,oflags,mode_t,mode),int)
 __CRT_FUNCTION(posix_spawn_file_actions_destroy,0,(),1,(posix_spawn_file_actions_t *__restrict,file_actions),int)
 __CRT_FUNCTION(posix_spawn_file_actions_init,0,(),1,(posix_spawn_file_actions_t *__restrict,file_actions),int)
 __CRT_FUNCTION(posix_spawnattr_destroy,0,(),1,(posix_spawnattr_t *__restrict,attr),int)
@@ -1850,7 +1850,7 @@ __CRT_FUNCTION(sem_close,0,(),1,(sem_t *,sem),int)
 __CRT_FUNCTION(sem_destroy,0,(),1,(sem_t *,sem),int)
 __CRT_FUNCTION(sem_getvalue,0,(),2,(sem_t *__restrict,sem,int *__restrict,sval),int)
 __CRT_FUNCTION(sem_init,0,(),3,(sem_t *,sem,int,pshared,unsigned int,value),int)
-__CRT_FUNCTION(sem_open,0,(),VA(2),(char const *,name,oflag_t,oflag),sem_t *)
+__CRT_FUNCTION(sem_open,0,(),VA(2),(char const *,name,oflag_t,oflags),sem_t *)
 __CRT_FUNCTION(sem_post,0,(),1,(sem_t *,sem),int)
 __CRT_FUNCTION(sem_timedwait,0,(),2,(sem_t *__restrict,sem,struct timespec const *__restrict,abstime),int)
 __CRT_FUNCTION(sem_timedwait64,1,(__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__,sem_timedwait),2,(sem_t *__restrict,sem,struct timespec64 const *__restrict,abstime),int)
@@ -1929,7 +1929,7 @@ __CRT_FUNCTION(setvbuf_unlocked,0,(),4,(FILE *__restrict,stream,char *__restrict
 __CRT_FUNCTION(setxattr,0,(),5,(char const *,path,char const *,name,void const *,buf,size_t,bufsize,int,flags),int)
 __CRT_FUNCTION(sgetspent,0,(),1,(char const *__restrict,string),struct spwd *)
 __CRT_FUNCTION(sgetspent_r,0,(),5,(char const *__restrict,string,struct spwd *__restrict,result_buf,char *__restrict,buffer,size_t,buflen,struct spwd **__restrict,result),int)
-__CRT_FUNCTION(shm_open,0,(),3,(char const *,name,oflag_t,oflag,mode_t,mode),int)
+__CRT_FUNCTION(shm_open,0,(),3,(char const *,name,oflag_t,oflags,mode_t,mode),int)
 __CRT_FUNCTION(shm_unlink,0,(),1,(char const *,name),int)
 __CRT_FUNCTION(shmat,0,(),3,(int,shmid,void const *,shmaddr,int,shmflg),void *)
 __CRT_FUNCTION(shmctl,0,(),3,(int,shmid,int,cmd,struct shmid_ds *,buf),int)

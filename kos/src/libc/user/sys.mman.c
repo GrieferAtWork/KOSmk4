@@ -164,11 +164,11 @@ NOTHROW_NCX(LIBCCALL libc_munlockall)(void)
 }
 /*[[[end:munlockall]]]*/
 
-/*[[[head:shm_open,hash:CRC-32=0x7bedb1d5]]]*/
+/*[[[head:shm_open,hash:CRC-32=0xf5e38312]]]*/
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.system.mman.shm_open") int
 NOTHROW_RPC(LIBCCALL libc_shm_open)(char const *name,
-                                    oflag_t oflag,
+                                    oflag_t oflags,
                                     mode_t mode)
 /*[[[body:shm_open]]]*/
 {

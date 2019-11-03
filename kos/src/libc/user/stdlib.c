@@ -1437,10 +1437,10 @@ NOTHROW_NCX(LIBCCALL libc_ptsname)(fd_t fd)
 }
 /*[[[end:ptsname]]]*/
 
-/*[[[head:posix_openpt,hash:CRC-32=0xea4ea142]]]*/
+/*[[[head:posix_openpt,hash:CRC-32=0x48dcac22]]]*/
 INTERN WUNUSED
 ATTR_WEAK ATTR_SECTION(".text.crt.io.tty.posix_openpt") int
-NOTHROW_RPC(LIBCCALL libc_posix_openpt)(oflag_t oflag)
+NOTHROW_RPC(LIBCCALL libc_posix_openpt)(oflag_t oflags)
 /*[[[body:posix_openpt]]]*/
 {
 	CRT_UNIMPLEMENTED("posix_openpt"); /* TODO */

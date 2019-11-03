@@ -66,7 +66,7 @@ NOTHROW_NCX(LIBCCALL libc_sem_destroy)(sem_t *sem)
 INTERN NONNULL((1))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.semaphore.sem_open") sem_t *
 NOTHROW_RPC_KOS(VLIBCCALL libc_sem_open)(char const *name,
-                                         oflag_t oflag,
+                                         oflag_t oflags,
                                          ...)
 /*[[[body:sem_open]]]*/
 {

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfcaeae48 */
+/* HASH CRC-32:0x6fc75ac9 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -68,7 +68,7 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_init)
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_destroy)(posix_spawn_file_actions_t *__restrict file_actions);
 /* Add an action to FILE-ACTIONS which tells the implementation
  * to call `open' for the given file during the `spawn' call */
-INTDEF NONNULL((1, 3)) int NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addopen)(posix_spawn_file_actions_t *__restrict file_actions, fd_t fd, char const *__restrict path, oflag_t oflag, mode_t mode);
+INTDEF NONNULL((1, 3)) int NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addopen)(posix_spawn_file_actions_t *__restrict file_actions, fd_t fd, char const *__restrict path, oflag_t oflags, mode_t mode);
 /* Add an action to FILE-ACTIONS which tells the implementation to
  * call `close' for the given file descriptor during the `spawn' call */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_posix_spawn_file_actions_addclose)(posix_spawn_file_actions_t *__restrict file_actions, fd_t fd);

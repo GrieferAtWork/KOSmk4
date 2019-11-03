@@ -318,7 +318,7 @@ munlock:([nonnull] void const *addr, size_t len) -> int;
 mlockall:(int flags) -> int;
 
 munlockall:() -> int;
-[cp] shm_open:([nonnull] char const *name, $oflag_t oflag, mode_t mode) -> int;
+[cp] shm_open:([nonnull] char const *name, $oflag_t oflags, mode_t mode) -> int;
 [cp] shm_unlink:([nonnull] char const *name) -> int;
 
 %

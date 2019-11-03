@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4aa8e266 */
+/* HASH CRC-32:0xf63696ce */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -324,7 +324,7 @@ __CDECLARE(,int,__NOTHROW_NCX,mlockall,(int __flags),(__flags))
 __CDECLARE(,int,__NOTHROW_NCX,munlockall,(void),())
 #endif /* munlockall... */
 #if defined(__CRT_HAVE_shm_open)
-__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,shm_open,(char const *__name, __oflag_t __oflag, mode_t __mode),(__name,__oflag,__mode))
+__CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,shm_open,(char const *__name, __oflag_t __oflags, mode_t __mode),(__name,__oflags,__mode))
 #endif /* shm_open... */
 #if defined(__CRT_HAVE_shm_unlink)
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,shm_unlink,(char const *__name),(__name))

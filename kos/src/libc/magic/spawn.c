@@ -225,7 +225,7 @@ posix_spawn_file_actions_destroy:([nonnull] posix_spawn_file_actions_t *__restri
 @@to call `open' for the given file during the `spawn' call
 posix_spawn_file_actions_addopen:([nonnull] posix_spawn_file_actions_t *__restrict file_actions,
                                   $fd_t fd, [nonnull] char const *__restrict path,
-                                  $oflag_t oflag, mode_t mode) -> int;
+                                  $oflag_t oflags, mode_t mode) -> int;
 
 %
 @@Add an action to FILE-ACTIONS which tells the implementation to

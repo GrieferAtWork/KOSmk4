@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbc6f063f */
+/* HASH CRC-32:0x7ca1aab4 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_munlock)(void const *addr, siz
 /* @param flags: Set of `MCL_CURRENT|MCL_FUTURE|MCL_ONFAULT' */
 INTDEF int NOTHROW_NCX(LIBCCALL libc_mlockall)(int flags);
 INTDEF int NOTHROW_NCX(LIBCCALL libc_munlockall)(void);
-INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_shm_open)(char const *name, oflag_t oflag, mode_t mode);
+INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_shm_open)(char const *name, oflag_t oflags, mode_t mode);
 INTDEF NONNULL((1)) int NOTHROW_RPC(LIBCCALL libc_shm_unlink)(char const *name);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_madvise)(void *addr, size_t len, int advice);
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_mincore)(void *start, size_t len, unsigned char *vec);

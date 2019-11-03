@@ -1469,7 +1469,7 @@ unlockpt:($fd_t fd) -> int;
 
 %
 %#ifdef __USE_XOPEN2KXSI
-[cp][ATTR_WUNUSED] posix_openpt:($oflag_t oflag) -> int;
+[cp][ATTR_WUNUSED] posix_openpt:($oflag_t oflags) -> int;
 %#endif /* __USE_XOPEN2KXSI */
 
 

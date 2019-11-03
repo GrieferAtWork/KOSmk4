@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf42014b3 */
+/* HASH CRC-32:0xc0ad09df */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sem_init)(sem_t *sem, int psha
 /* Free resources associated with semaphore object SEM */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sem_destroy)(sem_t *sem);
 /* Open a named semaphore NAME with open flags OFLAG */
-INTDEF NONNULL((1)) sem_t *NOTHROW_RPC_KOS(VLIBCCALL libc_sem_open)(char const *name, oflag_t oflag, ...);
+INTDEF NONNULL((1)) sem_t *NOTHROW_RPC_KOS(VLIBCCALL libc_sem_open)(char const *name, oflag_t oflags, ...);
 /* Close descriptor for named semaphore SEM */
 INTDEF NONNULL((1)) int NOTHROW_NCX(LIBCCALL libc_sem_close)(sem_t *sem);
 /* Remove named semaphore NAME */

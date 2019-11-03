@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf6e22e7 */
+/* HASH CRC-32:0x9c3eb161 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1748,7 +1748,7 @@ __CDECLARE(__ATTR_WUNUSED,char *,__NOTHROW_NCX,ptsname,(__fd_t __fd),(__fd))
 
 #ifdef __USE_XOPEN2KXSI
 #if defined(__CRT_HAVE_posix_openpt)
-__CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_RPC,posix_openpt,(__oflag_t __oflag),(__oflag))
+__CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_RPC,posix_openpt,(__oflag_t __oflags),(__oflags))
 #endif /* posix_openpt... */
 #endif /* __USE_XOPEN2KXSI */
 #ifdef __USE_GNU

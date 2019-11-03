@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd0ad90e */
+/* HASH CRC-32:0x3099af70 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -220,7 +220,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,posix_spawn_file_actions_destro
 #if defined(__CRT_HAVE_posix_spawn_file_actions_addopen)
 /* Add an action to FILE-ACTIONS which tells the implementation
  * to call `open' for the given file during the `spawn' call */
-__CDECLARE(__ATTR_NONNULL((1, 3)),int,__NOTHROW_NCX,posix_spawn_file_actions_addopen,(posix_spawn_file_actions_t *__restrict __file_actions, __fd_t __fd, char const *__restrict __path, __oflag_t __oflag, mode_t __mode),(__file_actions,__fd,__path,__oflag,__mode))
+__CDECLARE(__ATTR_NONNULL((1, 3)),int,__NOTHROW_NCX,posix_spawn_file_actions_addopen,(posix_spawn_file_actions_t *__restrict __file_actions, __fd_t __fd, char const *__restrict __path, __oflag_t __oflags, mode_t __mode),(__file_actions,__fd,__path,__oflags,__mode))
 #endif /* posix_spawn_file_actions_addopen... */
 
 #if defined(__CRT_HAVE_posix_spawn_file_actions_addclose)
