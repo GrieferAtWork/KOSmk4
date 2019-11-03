@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2bf7e6b4 */
+/* HASH CRC-32:0x7172738d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -565,9 +565,6 @@
 #define __stub_sched_getcpu 1
 #define __stub_seed48 1
 #define __stub_seed48_r 1
-#define __stub_sem_close 1
-#define __stub_sem_open 1
-#define __stub_sem_unlink 1
 #define __stub_semctl 1
 #define __stub_semget 1
 #define __stub_semop 1

@@ -138,7 +138,13 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 			if (count == (size_t)-1) {
 				result = sig_broadcast(&f->f_signal);
 			} else {
-				/* Only signal at most `count' connected threads. */
+				/* Only signal at most `count' connected threads.
+				 * TODO: Make sure that when a already received signal connection is discarded
+				 *      (such as is the case when `task_popconnections()' appears in an except-
+				 *       path), the already delivered signal gets broadcast, thus ensuring that
+				 *       sending a signal to a single thread (like we do here), don't end up
+				 *       being ignored because the thread that was chosen ended up terminating!
+				 */
 				while (count) {
 					if (!sig_send(&f->f_signal))
 						break;
@@ -147,6 +153,65 @@ DEFINE_SYSCALL5(syscall_slong_t, lfutex,
 				}
 			}
 			decref_unlikely(f);
+		}
+	}	break;
+
+	case LFUTEX_WAKELOCK: {
+		size_t count = (size_t)val;
+		if unlikely((futex_op & LFUTEX_FLAGMASK) != 0) {
+			THROW(E_INVALID_ARGUMENT_RESERVED_FLAG,
+			      E_INVALID_ARGUMENT_CONTEXT_LFUTEX_OP,
+			      futex_op,
+			      LFUTEX_FLAGMASK,
+			      futex_op & LFUTEX_FLAGMASK);
+		}
+		validate_user(uaddr, 1);
+		f = vm_getfutex_existing(THIS_VM, (vm_virt_t)uaddr);
+		result = 0;
+		if (!f) {
+			COMPILER_WRITE_BARRIER();
+			ATOMIC_FETCHAND(*uaddr, val2);
+			COMPILER_WRITE_BARRIER();
+			/* Do a second check for the futex, thus ensuring that
+			 * we're interlocked with the `ATOMIC_FETCHAND()' */
+			f = vm_getfutex_existing(THIS_VM, (vm_virt_t)uaddr);
+			if unlikely(f)
+				goto do_handle_with_futex;
+		} else {
+do_handle_with_futex:
+			FINALLY_DECREF_UNLIKELY(f);
+			if (count == (size_t)-1) {
+				result = sig_broadcast(&f->f_signal);
+				COMPILER_WRITE_BARRIER();
+				ATOMIC_FETCHAND(*uaddr, val2);
+				COMPILER_WRITE_BARRIER();
+				/* Broadcast again after modifying the memory location. */
+				result += sig_broadcast(&f->f_signal);
+			} else {
+				/* Only signal at most `count' connected threads.
+				 * TODO: Make sure that when a already received signal connection is discarded
+				 *      (such as is the case when `task_popconnections()' appears in an except-
+				 *       path), the already delivered signal gets broadcast, thus ensuring that
+				 *       sending a signal to a single thread (like we do here), don't end up
+				 *       being ignored because the thread that was chosen ended up terminating!
+				 */
+				while (count) {
+					if (!sig_send(&f->f_signal)) {
+						size_t temp;
+						COMPILER_WRITE_BARRIER();
+						ATOMIC_FETCHAND(*uaddr, val2);
+						COMPILER_WRITE_BARRIER();
+						/* Broadcast again after modifying the memory location. */
+						temp = sig_broadcast(&f->f_signal);
+						if unlikely(temp > count)
+							temp = count;
+						result += temp;
+						break;
+					}
+					++result;
+					--count;
+				}
+			}
 		}
 	}	break;
 

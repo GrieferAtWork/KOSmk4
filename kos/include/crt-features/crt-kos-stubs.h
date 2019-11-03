@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x225fb7b4 */
+/* HASH CRC-32:0x76267687 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -565,9 +565,6 @@
 #define __CRT_STUB_sched_getcpu 1
 #define __CRT_STUB_seed48 1
 #define __CRT_STUB_seed48_r 1
-#define __CRT_STUB_sem_close 1
-#define __CRT_STUB_sem_open 1
-#define __CRT_STUB_sem_unlink 1
 #define __CRT_STUB_semctl 1
 #define __CRT_STUB_semget 1
 #define __CRT_STUB_semop 1

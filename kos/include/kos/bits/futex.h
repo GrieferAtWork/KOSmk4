@@ -38,6 +38,16 @@
 #define LFUTEX_GETFUTEX_EXISTING  0x00000003 /* [struct hop_openfd *val]
                                               * Same as `LFUTEX_GETFUTEX', but don't create a futex where there is none already.
                                               * If no futex already exists, simply return `-ENOENT', and don't throw an error */
+#define LFUTEX_WAKELOCK           0x00000004 /* >> result = 0;
+                                              * >> while (val && sig_send(uaddr))
+                                              * >>     ++result;
+                                              * >> if (result < val && val != 0) {
+                                              * >>     *uaddr &= val2;
+                                              * >>     result += sig_broadcast(uaddr);
+                                              * >>     if (result > val)
+                                              * >>         result = val;
+                                              * >> }
+                                              * >> return result; */
 #define LFUTEX_WAIT               0x00000010 /* >> return waitfor(uaddr); // 0, E_INTERRUPT or -ETIMEDOUT */
 #define LFUTEX_WAIT_LOCK          0x00000011 /* >> if ((*uaddr & LFUTEX_WAIT_LOCK_TIDMASK) == 0) {
                                               * >>     *uaddr = (*uaddr & ~LFUTEX_WAIT_LOCK_TIDMASK) | (val ? val : gettid());
