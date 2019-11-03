@@ -62,6 +62,8 @@ local chk_include = {
 	"termcap.h",
 	"tic.h",
 	"unctrl.h",
+	"zconf.h",
+	"zlib.h",
 };
 
 import fs;
@@ -593,6 +595,7 @@ incdir("", "../../include");
 #include <parts/uchar/utime.h>
 #include <parts/wchar/format-printer.h>
 #include <parts/wchar/process.h>
+#include <parts/wchar/stdio.h>
 #include <parts/wchar/sys/stat.h>
 #include <parts/wchar/unistd.h>
 #include <parts/wchar/utime.h>
@@ -735,7 +738,11 @@ incdir("", "../../include");
 #include <wchar.h>
 #include <wctype.h>
 #include <xlocale.h>
+#if __has_include(<zconf.h>)
 #include <zconf.h>
+#endif /* __has_include(<zconf.h>) */
+#if __has_include(<zlib.h>)
 #include <zlib.h>
+#endif /* __has_include(<zlib.h>) */
 //[[[end]]]
 
