@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x53743aa5 */
+/* HASH CRC-32:0x94b8f7d4 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,6 +28,7 @@
 DECL_BEGIN
 
 DECL_END
+#include <pthread.h>
 #include <bits/sigset.h>
 DECL_BEGIN
 

@@ -23,6 +23,7 @@
 
 %(user){
 DECL_END
+#include <pthread.h>
 #include <bits/sigset.h>
 DECL_BEGIN
 
