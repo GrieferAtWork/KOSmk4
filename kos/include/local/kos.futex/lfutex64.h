@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x61e7a107 */
+/* HASH CRC-32:0x84b7e07c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -82,9 +82,9 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(lfutex64))(__uintptr_t *__uaddr,
 	__builtin_va_list __args;
 	__uintptr_t __val2;
 	struct __timespec32 __tms32;
-	struct __timespec64 *__timeout;
+	struct __timespec64 const *__timeout;
 	__builtin_va_start(__args, __val);
-	__timeout = __builtin_va_arg(__args, struct __timespec64 *);
+	__timeout = __builtin_va_arg(__args, struct __timespec64 const *);
 	__val2 = __builtin_va_arg(__args, __uintptr_t);
 	__builtin_va_end(__args);
 	if (!__timeout || !LFUTEX_USES_TIMEOUT(__futex_op))

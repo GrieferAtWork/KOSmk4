@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe0ebe7db */
+/* HASH CRC-32:0x2ea98c76 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -110,8 +110,8 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futex_waitwhile_aboveequal))(__uintpt
                                                                         __uintptr_t __above_equal_value) {
 #line 399 "kos/src/libc/magic/kos.futex.c"
 	if __unlikely(!__above_equal_value)
-		return __localdep_lfutex64(__uaddr, LFUTEX_WAIT, 0, (struct __timespec64 *)__NULLPTR);
-	return __localdep_lfutex64(__uaddr, LFUTEX_WAIT_WHILE_ABOVE, __above_equal_value - 1, (struct __timespec64 *)__NULLPTR);
+		return __localdep_lfutex64(__uaddr, LFUTEX_WAIT, 0, (struct __timespec64 const *)__NULLPTR);
+	return __localdep_lfutex64(__uaddr, LFUTEX_WAIT_WHILE_ABOVE, __above_equal_value - 1, (struct __timespec64 const *)__NULLPTR);
 }
 __NAMESPACE_LOCAL_END
 #endif /* (defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)) */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb6c8ab1e */
+/* HASH CRC-32:0x7bd0540b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -109,7 +109,7 @@ __LOCAL_LIBC(futex_waituntil) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futex_waituntil))(__uintptr_t *__uaddr,
                                                              __uintptr_t __not_equal_to_value) {
 #line 361 "kos/src/libc/magic/kos.futex.c"
-	return __localdep_lfutex64(__uaddr, LFUTEX_WAIT_UNTIL, __not_equal_to_value, (struct __timespec64 *)__NULLPTR);
+	return __localdep_lfutex64(__uaddr, LFUTEX_WAIT_UNTIL, __not_equal_to_value, (struct __timespec64 const *)__NULLPTR);
 }
 __NAMESPACE_LOCAL_END
 #endif /* (defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)) */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa2e135d */
+/* HASH CRC-32:0x79e6d17 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -121,8 +121,8 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futexlock_waitwhile_belowequal))(__ui
                                                                             __uintptr_t __below_equal_value) {
 #line 194 "kos/src/libc/magic/kos.futexlock.c"
 	if __unlikely(__below_equal_value == (__uintptr_t)-1)
-		return __localdep_lfutexlock64(__ulockaddr, __uaddr, LFUTEX_WAIT, 0, (struct __timespec64 *)__NULLPTR);
-	return __localdep_lfutexlock64(__ulockaddr, __uaddr, LFUTEX_WAIT_WHILE_BELOW, __below_equal_value + 1, (struct __timespec64 *)__NULLPTR);
+		return __localdep_lfutexlock64(__ulockaddr, __uaddr, LFUTEX_WAIT, 0, (struct __timespec64 const *)__NULLPTR);
+	return __localdep_lfutexlock64(__ulockaddr, __uaddr, LFUTEX_WAIT_WHILE_BELOW, __below_equal_value + 1, (struct __timespec64 const *)__NULLPTR);
 }
 __NAMESPACE_LOCAL_END
 #endif /* (defined(__CRT_HAVE_lfutexlock64) || defined(__CRT_HAVE_lfutexlock)) */

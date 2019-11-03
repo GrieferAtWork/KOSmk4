@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x24e7fef3 */
+/* HASH CRC-32:0xd3505a0d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -108,7 +108,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: -1:ETIMEDOUT: The given `rel_timeout' has expired */
 __LOCAL_LIBC(futex_timedwaitlock64) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futex_timedwaitlock64))(__uintptr_t *__uaddr,
-                                                                   struct __timespec64 *__rel_timeout) {
+                                                                   struct __timespec64 const *__rel_timeout) {
 #line 765 "kos/src/libc/magic/kos.futex.c"
 	return __localdep_lfutex64(__uaddr, LFUTEX_WAIT_LOCK, 0, __rel_timeout);
 }
