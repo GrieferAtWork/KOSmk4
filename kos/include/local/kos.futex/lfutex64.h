@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1e90ac85 */
+/* HASH CRC-32:0x62898061 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,9 @@
 #ifndef __local_lfutex64_defined
 #if defined(__CRT_HAVE_lfutex)
 #define __local_lfutex64_defined 1
+#include <bits/types.h>
+#include <bits/types.h>
+#include <bits/timespec.h>
 /* Dependency: "lfutex32" from "kos.futex" */
 #ifndef ____localdep_lfutex32_defined
 #define ____localdep_lfutex32_defined 1
@@ -80,7 +83,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(lfutex64))(__uintptr_t *__uaddr,
                                                       __syscall_ulong_t __futex_op,
                                                       __uintptr_t __val,
                                                       /*struct timespec64 const *timeout, lfutex_t val2*/...) {
-#line 310 "kos/src/libc/magic/kos.futex.c"
+#line 312 "kos/src/libc/magic/kos.futex.c"
 	__builtin_va_list __args;
 	__uintptr_t __val2;
 	struct __timespec32 __tms32;

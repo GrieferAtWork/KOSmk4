@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x59c7cfb8 */
+/* HASH CRC-32:0x8e1e5abb */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,7 +20,11 @@
 #ifndef __local_futexlock_waituntil_cmpxch_defined
 #if (defined(__CRT_HAVE_lfutexlock64) || defined(__CRT_HAVE_lfutexlock))
 #define __local_futexlock_waituntil_cmpxch_defined 1
+#include <bits/types.h>
+#include <bits/types.h>
 #include <kos/bits/futex.h>
+
+#include <bits/timespec.h>
 /* Dependency: "lfutexlock64" from "kos.futexlock" */
 #ifndef ____localdep_lfutexlock64_defined
 #define ____localdep_lfutexlock64_defined 1
@@ -115,12 +119,17 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfute
 #endif /* !____localdep_lfutexlock64_defined */
 
 __NAMESPACE_LOCAL_BEGIN
+/* Wait if `*uaddr != old_value', and set `*uaddr = new_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted (*uaddr was still set to new_value) */
 __LOCAL_LIBC(futexlock_waituntil_cmpxch) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futexlock_waituntil_cmpxch))(__uintptr_t *__ulockaddr,
                                                                         __uintptr_t *__uaddr,
                                                                         __uintptr_t __old_value,
                                                                         __uintptr_t __new_value) {
-#line 218 "kos/src/libc/magic/kos.futexlock.c"
+#line 244 "kos/src/libc/magic/kos.futexlock.c"
 	return __localdep_lfutexlock64(__ulockaddr, __uaddr, LFUTEX_WAIT_UNTIL_CMPXCH, __old_value, (struct __timespec64 const *)__NULLPTR, __new_value);
 }
 __NAMESPACE_LOCAL_END

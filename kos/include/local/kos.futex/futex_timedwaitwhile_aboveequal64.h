@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6629b9cf */
+/* HASH CRC-32:0x41bf7e08 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,10 @@
 #ifndef __local_futex_timedwaitwhile_aboveequal64_defined
 #if (defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex))
 #define __local_futex_timedwaitwhile_aboveequal64_defined 1
+#include <bits/types.h>
+#include <bits/types.h>
+
+#include <bits/timespec.h>
 #include <kos/bits/futex.h>
 /* Dependency: "lfutex64" from "kos.futex" */
 #ifndef ____localdep_lfutex64_defined
@@ -113,7 +117,7 @@ __LOCAL_LIBC(futex_timedwaitwhile_aboveequal64) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futex_timedwaitwhile_aboveequal64))(__uintptr_t *__uaddr,
                                                                                __uintptr_t __above_equal_value,
                                                                                struct __timespec64 const *__rel_timeout) {
-#line 749 "kos/src/libc/magic/kos.futex.c"
+#line 803 "kos/src/libc/magic/kos.futex.c"
 	if __unlikely(!__above_equal_value)
 		return __localdep_lfutex64(__uaddr, LFUTEX_WAIT, 0, __rel_timeout);
 	return __localdep_lfutex64(__uaddr, LFUTEX_WAIT_WHILE_ABOVE, __above_equal_value - 1, __rel_timeout);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c0c42fe */
+/* HASH CRC-32:0x8f2bb143 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,13 @@
 #ifndef __local_lfutexexpr_defined
 #if (defined(__CRT_HAVE_lfutexexpr) || defined(__CRT_HAVE_lfutexexpr64))
 #define __local_lfutexexpr_defined 1
+#include <bits/timespec.h>
+#include <kos/bits/futex-expr.h>
+#include <bits/types.h>
+
+#include <bits/timespec.h>
+
+#include <kos/bits/futex-expr.h>
 /* Dependency: "lfutexexpr32" from "kos.futexexpr" */
 #ifndef ____localdep_lfutexexpr32_defined
 #define ____localdep_lfutexexpr32_defined 1
@@ -187,7 +194,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(lfutexexpr))(void *__base,
                                                         struct lfutexexpr const *__exprv,
                                                         struct __TM_TYPE(timespec) const *__timeout,
                                                         unsigned int __timeout_flags) {
-#line 214 "kos/src/libc/magic/kos.futexexpr.c"
+#line 223 "kos/src/libc/magic/kos.futexexpr.c"
 #ifdef __CRT_HAVE_lfutexexpr
 	struct __timespec32 __tms32;
 	if (!__timeout)

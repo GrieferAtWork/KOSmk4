@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x670c17ac */
+/* HASH CRC-32:0x56fbdb3c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,7 +20,11 @@
 #ifndef __local_futexlock_waitwhile_aboveequal_defined
 #if (defined(__CRT_HAVE_lfutexlock64) || defined(__CRT_HAVE_lfutexlock))
 #define __local_futexlock_waitwhile_aboveequal_defined 1
+#include <bits/types.h>
+#include <bits/types.h>
 #include <kos/bits/futex.h>
+
+#include <bits/timespec.h>
 /* Dependency: "lfutexlock64" from "kos.futexlock" */
 #ifndef ____localdep_lfutexlock64_defined
 #define ____localdep_lfutexlock64_defined 1
@@ -115,11 +119,16 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfute
 #endif /* !____localdep_lfutexlock64_defined */
 
 __NAMESPACE_LOCAL_BEGIN
+/* Wait if `*uaddr >= above_equal_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted */
 __LOCAL_LIBC(futexlock_waitwhile_aboveequal) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futexlock_waitwhile_aboveequal))(__uintptr_t *__ulockaddr,
                                                                             __uintptr_t *__uaddr,
                                                                             __uintptr_t __above_equal_value) {
-#line 196 "kos/src/libc/magic/kos.futexlock.c"
+#line 216 "kos/src/libc/magic/kos.futexlock.c"
 	if __unlikely(!__above_equal_value)
 		return __localdep_lfutexlock64(__ulockaddr, __uaddr, LFUTEX_WAIT, 0, (struct __timespec64 const *)__NULLPTR);
 	return __localdep_lfutexlock64(__ulockaddr, __uaddr, LFUTEX_WAIT_WHILE_ABOVE, __above_equal_value - 1, (struct __timespec64 const *)__NULLPTR);

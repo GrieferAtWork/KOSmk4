@@ -167,11 +167,17 @@ __NAMESPACE_INT_END
 
 
 [cp][doc_alias(lfutexexpr)][ignore]
+[decl_include(<bits/timespec.h>)]
+[decl_include(<kos/bits/futex-expr.h>)]
 lfutexexpr32:(void *base, $size_t exprc,
               [nonnull] struct lfutexexpr const *exprv,
               struct timespec64 const *timeout,
               unsigned int timeout_flags) -> int = lfutexexpr?;
+
 [cp][doc_alias(lfutexlockexpr)][ignore]
+[decl_include(<bits/types.h>)]
+[decl_include(<bits/timespec.h>)]
+[decl_include(<kos/bits/futex-expr.h>)]
 lfutexlockexpr32:([nonnull] lfutex_t *ulockaddr, void *base,
                   $size_t exprc, [nonnull] struct lfutexexpr const *exprv,
                   struct timespec64 const *timeout,
@@ -207,6 +213,9 @@ lfutexlockexpr32:([nonnull] lfutex_t *ulockaddr, void *base,
 @@@return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out
 [cp][requires(defined(__CRT_HAVE_lfutexexpr) || defined(__CRT_HAVE_lfutexexpr64))]
 [dependency_string(defined(__CRT_HAVE_lfutexexpr) || defined(__CRT_HAVE_lfutexexpr64))]
+[decl_include(<bits/types.h>)]
+[decl_include(<bits/timespec.h>)]
+[decl_include(<kos/bits/futex-expr.h>)]
 [if(defined(__USE_TIME_BITS64)), preferred_alias(lfutexexpr64)]
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(lfutexexpr)]
 lfutexexpr:(void *base, $size_t exprc, [nonnull] struct lfutexexpr const *exprv,
@@ -257,6 +266,9 @@ lfutexexpr:(void *base, $size_t exprc, [nonnull] struct lfutexexpr const *exprv,
 @@@return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out
 [cp][requires(defined(__CRT_HAVE_lfutexlockexpr) || defined(__CRT_HAVE_lfutexlockexpr64))]
 [dependency_string(defined(__CRT_HAVE_lfutexlockexpr) || defined(__CRT_HAVE_lfutexlockexpr64))]
+[decl_include(<bits/types.h>)]
+[decl_include(<bits/timespec.h>)]
+[decl_include(<kos/bits/futex-expr.h>)]
 [if(defined(__USE_TIME_BITS64)), preferred_alias(lfutexlockexpr64)]
 [if(!defined(__USE_TIME_BITS64)), preferred_alias(lfutexlockexpr)]
 [section(.text.crt.sched.futexlockexpr)]
@@ -284,6 +296,8 @@ lfutexlockexpr:([nonnull] lfutex_t *ulockaddr, void *base,
 %#ifdef __USE_TIME64
 [cp][time64_variant_of(lfutexexpr)][requires(defined(__CRT_HAVE_lfutexexpr))]
 [dependency_string(defined(__CRT_HAVE_lfutexexpr64) || defined(__CRT_HAVE_lfutexexpr))]
+[decl_include(<bits/timespec.h>)]
+[decl_include(<kos/bits/futex-expr.h>)]
 lfutexexpr64:(void *base, $size_t exprc, [nonnull] struct lfutexexpr const *exprv,
               struct timespec64 const *timeout, unsigned int timeout_flags) -> int {
 	struct timespec32 tms32;
@@ -297,6 +311,9 @@ lfutexexpr64:(void *base, $size_t exprc, [nonnull] struct lfutexexpr const *expr
 [cp][time64_variant_of(lfutexlockexpr)][requires(defined(__CRT_HAVE_lfutexlockexpr))]
 [dependency_string(defined(__CRT_HAVE_lfutexlockexpr64) || defined(__CRT_HAVE_lfutexlockexpr))]
 [section(.text.crt.sched.futexlockexpr)]
+[decl_include(<bits/types.h>)]
+[decl_include(<bits/timespec.h>)]
+[decl_include(<kos/bits/futex-expr.h>)]
 lfutexlockexpr64:([nonnull] lfutex_t *ulockaddr, void *base,
                   $size_t exprc, [nonnull] struct lfutexexpr const *exprv,
                   struct timespec64 const *timeout, unsigned int timeout_flags) -> int {

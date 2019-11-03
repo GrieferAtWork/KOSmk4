@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe92df85b */
+/* HASH CRC-32:0x4e8e02eb */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,14 @@
 #ifndef __local_lfutexlockexpr64_defined
 #if defined(__CRT_HAVE_lfutexlockexpr)
 #define __local_lfutexlockexpr64_defined 1
+#include <bits/types.h>
+#include <bits/timespec.h>
+#include <kos/bits/futex-expr.h>
+#include <bits/types.h>
+
+#include <bits/timespec.h>
+
+#include <kos/bits/futex-expr.h>
 /* Dependency: "lfutexlockexpr32" from "kos.futexexpr" */
 #ifndef ____localdep_lfutexlockexpr32_defined
 #define ____localdep_lfutexlockexpr32_defined 1
@@ -92,7 +100,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(lfutexlockexpr64))(__uintptr_t *__ulo
                                                               struct lfutexexpr const *__exprv,
                                                               struct __timespec64 const *__timeout,
                                                               unsigned int __timeout_flags) {
-#line 303 "kos/src/libc/magic/kos.futexexpr.c"
+#line 320 "kos/src/libc/magic/kos.futexexpr.c"
 	struct __timespec32 __tms32;
 	if (!__timeout)
 		return __localdep_lfutexlockexpr32(__ulockaddr, __base, __exprc, __exprv, __NULLPTR, 0);

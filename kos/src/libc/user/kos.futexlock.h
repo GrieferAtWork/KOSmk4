@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9ec7fec2 */
+/* HASH CRC-32:0x7491bac3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -89,18 +89,83 @@ INTDEF NONNULL((1)) ssize_t NOTHROW_NCX(LIBCCALL libc_futexlock_wake)(lfutex_t *
  * on some given futex-lock. - This method of waking is faster, since it doesn't invoke a
  * system call when no thread is waiting on the given lock */
 INTDEF NONNULL((1)) ssize_t NOTHROW_NCX(LIBCCALL libc_futexlock_wakeall)(lfutex_t *ulockaddr);
+/* Wait if `*uaddr == equal_to_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_futexlock_waitwhile)(lfutex_t *ulockaddr, lfutex_t *uaddr, lfutex_t equal_to_value);
+/* Wait if `*uaddr != not_equal_to_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_futexlock_waituntil)(lfutex_t *ulockaddr, lfutex_t *uaddr, lfutex_t not_equal_to_value);
+/* Wait if `*uaddr > above_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_futexlock_waitwhile_above)(lfutex_t *ulockaddr, lfutex_t *uaddr, lfutex_t above_value);
+/* Wait if `*uaddr < below_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_futexlock_waitwhile_below)(lfutex_t *ulockaddr, lfutex_t *uaddr, lfutex_t below_value);
+/* Wait if `*uaddr >= above_equal_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_futexlock_waitwhile_aboveequal)(lfutex_t *ulockaddr, lfutex_t *uaddr, lfutex_t above_equal_value);
+/* Wait if `*uaddr <= below_equal_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_futexlock_waitwhile_belowequal)(lfutex_t *ulockaddr, lfutex_t *uaddr, lfutex_t below_equal_value);
+/* Wait if `*uaddr == old_value', and set `*uaddr = new_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted (*uaddr was still set to new_value) */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_futexlock_waitwhile_cmpxch)(lfutex_t *ulockaddr, lfutex_t *uaddr, lfutex_t old_value, lfutex_t new_value);
+/* Wait if `*uaddr != old_value', and set `*uaddr = new_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted (*uaddr was still set to new_value) */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_futexlock_waituntil_cmpxch)(lfutex_t *ulockaddr, lfutex_t *uaddr, lfutex_t old_value, lfutex_t new_value);
+/* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted (*uaddr was still set to new_value) */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_futexlock_waitlock)(lfutex_t *ulockaddr, lfutex_t *uaddr);
+/* Wait if `(*uaddr & bitmask) == setmask'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_futexlock_waitwhile_exactbits)(lfutex_t *ulockaddr, lfutex_t *uaddr, lfutex_t bitmask, lfutex_t setmask);
+/* Wait if `(*uaddr & bitmask) != setmask'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_futexlock_waituntil_exactbits)(lfutex_t *ulockaddr, lfutex_t *uaddr, lfutex_t bitmask, lfutex_t setmask);
+/* Wait if `(*uaddr & bitmask) != 0'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_futexlock_waitwhile_anybit)(lfutex_t *ulockaddr, lfutex_t *uaddr, lfutex_t bitmask);
+/* Wait if `(*uaddr & bitmask) == bitmask'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted */
 INTDEF NONNULL((1, 2)) int NOTHROW_RPC(LIBCCALL libc_futexlock_waitwhile_allbits)(lfutex_t *ulockaddr, lfutex_t *uaddr, lfutex_t bitmask);
 /* Wait if `*uaddr == equal_to_value'
  * @return: 0: Did wait

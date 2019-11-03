@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4f098ea3 */
+/* HASH CRC-32:0x38635801 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,8 @@
 #ifndef __local_futexlock_wake_defined
 #if (defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex) || defined(__CRT_HAVE_futex_wakemask))
 #define __local_futexlock_wake_defined 1
+#include <bits/types.h>
+#include <bits/types.h>
 #include <hybrid/__atomic.h>
 
 #include <kos/bits/futex.h>
@@ -51,7 +53,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(futexlock_wake) __ATTR_NONNULL((1)) __SSIZE_TYPE__
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(futexlock_wake))(__uintptr_t *__ulockaddr,
                                                             __SIZE_TYPE__ __max_wake) {
-#line 147 "kos/src/libc/magic/kos.futexlock.c"
+#line 150 "kos/src/libc/magic/kos.futexlock.c"
 	if (!(__hybrid_atomic_load(*__ulockaddr, __ATOMIC_ACQUIRE) & __LFUTEX_WAIT_LOCK_WAITERS))
 		return 0; /* No waiting threads. */
 	return __localdep_futex_wakemask(&__ulockaddr, 1, (__uintptr_t)~__LFUTEX_WAIT_LOCK_WAITERS, 0);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x34b2e22e */
+/* HASH CRC-32:0x45d018bf */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,10 @@
 #ifndef __local_futex_waitlock_defined
 #if (defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex))
 #define __local_futex_waitlock_defined 1
+#include <bits/types.h>
+#include <bits/types.h>
+#include <bits/timespec.h>
+
 #include <kos/bits/futex.h>
 /* Dependency: "lfutex64" from "kos.futex" */
 #ifndef ____localdep_lfutex64_defined
@@ -110,7 +114,7 @@ __NAMESPACE_LOCAL_BEGIN
  * @return: -1:EINTR:  Operation was interrupted (*uaddr was still set to new_value) */
 __LOCAL_LIBC(futex_waitlock) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futex_waitlock))(__uintptr_t *__uaddr) {
-#line 459 "kos/src/libc/magic/kos.futex.c"
+#line 481 "kos/src/libc/magic/kos.futex.c"
 	return __localdep_lfutex64(__uaddr, LFUTEX_WAIT_LOCK, 0, (struct __timespec64 const *)__NULLPTR);
 }
 __NAMESPACE_LOCAL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x935f3e96 */
+/* HASH CRC-32:0x411e1146 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1883,19 +1883,15 @@
 #define __CRT_HAVE_futex_waituntil 1
 #define __CRT_HAVE_futex_waituntil_cmpxch 1
 #define __CRT_HAVE_futex_waituntil_exactbits 1
-#define __CRT_HAVE_futex_waituntil_exactbits64 1
 #define __CRT_HAVE_futex_waitwhile 1
 #define __CRT_HAVE_futex_waitwhile_above 1
 #define __CRT_HAVE_futex_waitwhile_aboveequal 1
 #define __CRT_HAVE_futex_waitwhile_allbits 1
-#define __CRT_HAVE_futex_waitwhile_allbits64 1
 #define __CRT_HAVE_futex_waitwhile_anybit 1
-#define __CRT_HAVE_futex_waitwhile_anybit64 1
 #define __CRT_HAVE_futex_waitwhile_below 1
 #define __CRT_HAVE_futex_waitwhile_belowequal 1
 #define __CRT_HAVE_futex_waitwhile_cmpxch 1
 #define __CRT_HAVE_futex_waitwhile_exactbits 1
-#define __CRT_HAVE_futex_waitwhile_exactbits64 1
 #define __CRT_HAVE_futex_wake 1
 #define __CRT_HAVE_futex_wakeall 1
 #define __CRT_HAVE_futex_wakemask 1
@@ -1931,19 +1927,15 @@
 #define __CRT_HAVE_futexlock_waituntil 1
 #define __CRT_HAVE_futexlock_waituntil_cmpxch 1
 #define __CRT_HAVE_futexlock_waituntil_exactbits 1
-#define __CRT_HAVE_futexlock_waituntil_exactbits64 1
 #define __CRT_HAVE_futexlock_waitwhile 1
 #define __CRT_HAVE_futexlock_waitwhile_above 1
 #define __CRT_HAVE_futexlock_waitwhile_aboveequal 1
 #define __CRT_HAVE_futexlock_waitwhile_allbits 1
-#define __CRT_HAVE_futexlock_waitwhile_allbits64 1
 #define __CRT_HAVE_futexlock_waitwhile_anybit 1
-#define __CRT_HAVE_futexlock_waitwhile_anybit64 1
 #define __CRT_HAVE_futexlock_waitwhile_below 1
 #define __CRT_HAVE_futexlock_waitwhile_belowequal 1
 #define __CRT_HAVE_futexlock_waitwhile_cmpxch 1
 #define __CRT_HAVE_futexlock_waitwhile_exactbits 1
-#define __CRT_HAVE_futexlock_waitwhile_exactbits64 1
 #define __CRT_HAVE_futexlock_wake 1
 #define __CRT_HAVE_futexlock_wakeall 1
 #define __CRT_HAVE_futime 1

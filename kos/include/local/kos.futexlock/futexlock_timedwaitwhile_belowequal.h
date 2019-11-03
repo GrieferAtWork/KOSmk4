@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc51551c4 */
+/* HASH CRC-32:0xe0c3d600 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,10 @@
 #ifndef __local_futexlock_timedwaitwhile_belowequal_defined
 #if (defined(__CRT_HAVE_lfutexlock) || defined(__CRT_HAVE_lfutexlock64))
 #define __local_futexlock_timedwaitwhile_belowequal_defined 1
+#include <bits/types.h>
+#include <bits/types.h>
+
+#include <bits/timespec.h>
 #include <kos/bits/futex.h>
 /* Dependency: "lfutexlock" from "kos.futexlock" */
 #ifndef ____localdep_lfutexlock_defined
@@ -126,7 +130,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futexlock_timedwaitwhile_belowequal))
                                                                                  __uintptr_t *__uaddr,
                                                                                  __uintptr_t __below_equal_value,
                                                                                  struct __TM_TYPE(timespec) const *__rel_timeout) {
-#line 318 "kos/src/libc/magic/kos.futexlock.c"
+#line 369 "kos/src/libc/magic/kos.futexlock.c"
 	if __unlikely(__below_equal_value == (__uintptr_t)-1)
 		return __localdep_lfutexlock(__ulockaddr, __uaddr, LFUTEX_WAIT, 0, __rel_timeout);
 	return __localdep_lfutexlock(__ulockaddr, __uaddr, LFUTEX_WAIT_WHILE_BELOW, __below_equal_value + 1, __rel_timeout);

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x30d5ac52 */
+/* HASH CRC-32:0xc15fe8f9 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,10 @@
 #ifndef __local_futexlock_timedwaituntil_exactbits64_defined
 #if (defined(__CRT_HAVE_lfutexlock64) || defined(__CRT_HAVE_lfutexlock))
 #define __local_futexlock_timedwaituntil_exactbits64_defined 1
+#include <bits/types.h>
+#include <bits/types.h>
+
+#include <bits/timespec.h>
 #include <kos/bits/futex.h>
 /* Dependency: "lfutexlock64" from "kos.futexlock" */
 #ifndef ____localdep_lfutexlock64_defined
@@ -126,7 +130,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futexlock_timedwaituntil_exactbits64)
                                                                                   __uintptr_t __bitmask,
                                                                                   __uintptr_t __setmask,
                                                                                   struct __timespec64 const *__rel_timeout) {
-#line 458 "kos/src/libc/magic/kos.futexlock.c"
+#line 559 "kos/src/libc/magic/kos.futexlock.c"
 	return __localdep_lfutexlock64(__ulockaddr, __uaddr, LFUTEX_WAIT_UNTIL_BITMASK, __bitmask, __rel_timeout, __setmask);
 }
 __NAMESPACE_LOCAL_END

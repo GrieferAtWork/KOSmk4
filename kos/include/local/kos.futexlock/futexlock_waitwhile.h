@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5fbffb9a */
+/* HASH CRC-32:0x18793fdb */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,7 +20,11 @@
 #ifndef __local_futexlock_waitwhile_defined
 #if (defined(__CRT_HAVE_lfutexlock64) || defined(__CRT_HAVE_lfutexlock))
 #define __local_futexlock_waitwhile_defined 1
+#include <bits/types.h>
+#include <bits/types.h>
 #include <kos/bits/futex.h>
+
+#include <bits/timespec.h>
 /* Dependency: "lfutexlock64" from "kos.futexlock" */
 #ifndef ____localdep_lfutexlock64_defined
 #define ____localdep_lfutexlock64_defined 1
@@ -115,11 +119,16 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfute
 #endif /* !____localdep_lfutexlock64_defined */
 
 __NAMESPACE_LOCAL_BEGIN
+/* Wait if `*uaddr == equal_to_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted */
 __LOCAL_LIBC(futexlock_waitwhile) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futexlock_waitwhile))(__uintptr_t *__ulockaddr,
                                                                  __uintptr_t *__uaddr,
                                                                  __uintptr_t __equal_to_value) {
-#line 167 "kos/src/libc/magic/kos.futexlock.c"
+#line 172 "kos/src/libc/magic/kos.futexlock.c"
 	return __localdep_lfutexlock64(__ulockaddr, __uaddr, LFUTEX_WAIT_WHILE, __equal_to_value, (struct __timespec64 const *)__NULLPTR);
 }
 __NAMESPACE_LOCAL_END

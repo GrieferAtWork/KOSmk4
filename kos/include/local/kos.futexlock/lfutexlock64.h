@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7ec25c5e */
+/* HASH CRC-32:0x4246fb48 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,9 @@
 #ifndef __local_lfutexlock64_defined
 #if defined(__CRT_HAVE_lfutexlock)
 #define __local_lfutexlock64_defined 1
+#include <bits/types.h>
+#include <bits/types.h>
+#include <bits/timespec.h>
 /* Dependency: "lfutexlock32" from "kos.futexlock" */
 #ifndef ____localdep_lfutexlock32_defined
 #define ____localdep_lfutexlock32_defined 1
@@ -89,7 +92,7 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(lfutexlock64))(__uintptr_t *__ulockad
                                                           __syscall_ulong_t __futex_op,
                                                           __uintptr_t __val,
                                                           /*struct timespec64 const *timeout, lfutex_t val2*/...) {
-#line 122 "kos/src/libc/magic/kos.futexlock.c"
+#line 125 "kos/src/libc/magic/kos.futexlock.c"
 	__builtin_va_list __args;
 	__uintptr_t __val2;
 	struct __timespec32 __tms32;

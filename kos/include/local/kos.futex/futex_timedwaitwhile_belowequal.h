@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x64949c62 */
+/* HASH CRC-32:0x31b6a6f3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,10 @@
 #ifndef __local_futex_timedwaitwhile_belowequal_defined
 #if (defined(__CRT_HAVE_lfutex) || defined(__CRT_HAVE_lfutex64))
 #define __local_futex_timedwaitwhile_belowequal_defined 1
+#include <bits/types.h>
+#include <bits/types.h>
+
+#include <bits/timespec.h>
 #include <kos/bits/futex.h>
 /* Dependency: "lfutex" from "kos.futex" */
 #ifndef ____localdep_lfutex_defined
@@ -113,7 +117,7 @@ __LOCAL_LIBC(futex_timedwaitwhile_belowequal) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futex_timedwaitwhile_belowequal))(__uintptr_t *__uaddr,
                                                                              __uintptr_t __below_equal_value,
                                                                              struct __TM_TYPE(timespec) const *__rel_timeout) {
-#line 611 "kos/src/libc/magic/kos.futex.c"
+#line 651 "kos/src/libc/magic/kos.futex.c"
 	if __unlikely(__below_equal_value == (__uintptr_t)-1)
 		return __localdep_lfutex(__uaddr, LFUTEX_WAIT, 0, __rel_timeout);
 	return __localdep_lfutex(__uaddr, LFUTEX_WAIT_WHILE_BELOW, __below_equal_value + 1, __rel_timeout);

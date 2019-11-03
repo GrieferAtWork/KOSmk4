@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x210beec */
+/* HASH CRC-32:0x1aaf05dc */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2576,6 +2576,20 @@
 #define __CRT_SECTION_futex_timedwaitwhile_cmpxch64         __CRT_SECTINFO_sched_futex                              /* .text.crt.sched.futex.futex_timedwaitwhile_cmpxch64 */
 #define __CRT_SECTION_futex_timedwaitwhile_exactbits        __CRT_SECTINFO_sched_futex                              /* .text.crt.sched.futex.futex_timedwaitwhile_exactbits */
 #define __CRT_SECTION_futex_timedwaitwhile_exactbits64      __CRT_SECTINFO_sched_futex                              /* .text.crt.sched.futex.futex_timedwaitwhile_exactbits64 */
+#define __CRT_SECTION_futex_waitlock                        __CRT_SECTINFO_sched_futex                              /* .text.crt.sched.futex.futex_waitlock */
+#define __CRT_SECTION_futex_waituntil                       __CRT_SECTINFO_sched_futex                              /* .text.crt.sched.futex.futex_waituntil */
+#define __CRT_SECTION_futex_waituntil_cmpxch                __CRT_SECTINFO_sched_futex                              /* .text.crt.sched.futex.futex_waituntil_cmpxch */
+#define __CRT_SECTION_futex_waituntil_exactbits             __CRT_SECTINFO_sched_futex                              /* .text.crt.sched.futex.futex_waituntil_exactbits */
+#define __CRT_SECTION_futex_waitwhile                       __CRT_SECTINFO_sched_futex                              /* .text.crt.sched.futex.futex_waitwhile */
+#define __CRT_SECTION_futex_waitwhile_above                 __CRT_SECTINFO_sched_futex                              /* .text.crt.sched.futex.futex_waitwhile_above */
+#define __CRT_SECTION_futex_waitwhile_aboveequal            __CRT_SECTINFO_sched_futex                              /* .text.crt.sched.futex.futex_waitwhile_aboveequal */
+#define __CRT_SECTION_futex_waitwhile_allbits               __CRT_SECTINFO_sched_futex                              /* .text.crt.sched.futex.futex_waitwhile_allbits */
+#define __CRT_SECTION_futex_waitwhile_anybit                __CRT_SECTINFO_sched_futex                              /* .text.crt.sched.futex.futex_waitwhile_anybit */
+#define __CRT_SECTION_futex_waitwhile_below                 __CRT_SECTINFO_sched_futex                              /* .text.crt.sched.futex.futex_waitwhile_below */
+#define __CRT_SECTION_futex_waitwhile_belowequal            __CRT_SECTINFO_sched_futex                              /* .text.crt.sched.futex.futex_waitwhile_belowequal */
+#define __CRT_SECTION_futex_waitwhile_cmpxch                __CRT_SECTINFO_sched_futex                              /* .text.crt.sched.futex.futex_waitwhile_cmpxch */
+#define __CRT_SECTION_futex_waitwhile_exactbits             __CRT_SECTINFO_sched_futex                              /* .text.crt.sched.futex.futex_waitwhile_exactbits */
+#define __CRT_SECTION_futex_wake                            __CRT_SECTINFO_sched_futex                              /* .text.crt.sched.futex.futex_wake */
 #define __CRT_SECTION_futex_wakeall                         __CRT_SECTINFO_sched_futex                              /* .text.crt.sched.futex.futex_wakeall */
 #define __CRT_SECTION_futex_wakemask                        __CRT_SECTINFO_sched_futex                              /* .text.crt.sched.futex.futex_wakemask */
 #define __CRT_SECTION_lfutex                                __CRT_SECTINFO_sched_futex                              /* .text.crt.sched.futex.lfutex */
@@ -2612,6 +2626,19 @@
 #define __CRT_SECTION_futexlock_timedwaitwhile_cmpxch64     __CRT_SECTINFO_sched_futexlock                          /* .text.crt.sched.futexlock.futexlock_timedwaitwhile_cmpxch64 */
 #define __CRT_SECTION_futexlock_timedwaitwhile_exactbits    __CRT_SECTINFO_sched_futexlock                          /* .text.crt.sched.futexlock.futexlock_timedwaitwhile_exactbits */
 #define __CRT_SECTION_futexlock_timedwaitwhile_exactbits64  __CRT_SECTINFO_sched_futexlock                          /* .text.crt.sched.futexlock.futexlock_timedwaitwhile_exactbits64 */
+#define __CRT_SECTION_futexlock_waitlock                    __CRT_SECTINFO_sched_futexlock                          /* .text.crt.sched.futexlock.futexlock_waitlock */
+#define __CRT_SECTION_futexlock_waituntil                   __CRT_SECTINFO_sched_futexlock                          /* .text.crt.sched.futexlock.futexlock_waituntil */
+#define __CRT_SECTION_futexlock_waituntil_cmpxch            __CRT_SECTINFO_sched_futexlock                          /* .text.crt.sched.futexlock.futexlock_waituntil_cmpxch */
+#define __CRT_SECTION_futexlock_waituntil_exactbits         __CRT_SECTINFO_sched_futexlock                          /* .text.crt.sched.futexlock.futexlock_waituntil_exactbits */
+#define __CRT_SECTION_futexlock_waitwhile                   __CRT_SECTINFO_sched_futexlock                          /* .text.crt.sched.futexlock.futexlock_waitwhile */
+#define __CRT_SECTION_futexlock_waitwhile_above             __CRT_SECTINFO_sched_futexlock                          /* .text.crt.sched.futexlock.futexlock_waitwhile_above */
+#define __CRT_SECTION_futexlock_waitwhile_aboveequal        __CRT_SECTINFO_sched_futexlock                          /* .text.crt.sched.futexlock.futexlock_waitwhile_aboveequal */
+#define __CRT_SECTION_futexlock_waitwhile_allbits           __CRT_SECTINFO_sched_futexlock                          /* .text.crt.sched.futexlock.futexlock_waitwhile_allbits */
+#define __CRT_SECTION_futexlock_waitwhile_anybit            __CRT_SECTINFO_sched_futexlock                          /* .text.crt.sched.futexlock.futexlock_waitwhile_anybit */
+#define __CRT_SECTION_futexlock_waitwhile_below             __CRT_SECTINFO_sched_futexlock                          /* .text.crt.sched.futexlock.futexlock_waitwhile_below */
+#define __CRT_SECTION_futexlock_waitwhile_belowequal        __CRT_SECTINFO_sched_futexlock                          /* .text.crt.sched.futexlock.futexlock_waitwhile_belowequal */
+#define __CRT_SECTION_futexlock_waitwhile_cmpxch            __CRT_SECTINFO_sched_futexlock                          /* .text.crt.sched.futexlock.futexlock_waitwhile_cmpxch */
+#define __CRT_SECTION_futexlock_waitwhile_exactbits         __CRT_SECTINFO_sched_futexlock                          /* .text.crt.sched.futexlock.futexlock_waitwhile_exactbits */
 #define __CRT_SECTION_futexlock_wake                        __CRT_SECTINFO_sched_futexlock                          /* .text.crt.sched.futexlock.futexlock_wake */
 #define __CRT_SECTION_futexlock_wakeall                     __CRT_SECTINFO_sched_futexlock                          /* .text.crt.sched.futexlock.futexlock_wakeall */
 #define __CRT_SECTION_lfutexlock                            __CRT_SECTINFO_sched_futexlock                          /* .text.crt.sched.futexlock.lfutexlock */

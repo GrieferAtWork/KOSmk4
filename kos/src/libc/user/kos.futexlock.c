@@ -263,7 +263,12 @@ NOTHROW_NCX(LIBCCALL libc_futexlock_wakeall)(lfutex_t *ulockaddr)
 }
 /*[[[end:futexlock_wakeall]]]*/
 
-/*[[[head:futexlock_waitwhile,hash:CRC-32=0xeddc295c]]]*/
+/*[[[head:futexlock_waitwhile,hash:CRC-32=0x5b552966]]]*/
+/* Wait if `*uaddr == equal_to_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted */
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.futexlock.futexlock_waitwhile") int
 NOTHROW_RPC(LIBCCALL libc_futexlock_waitwhile)(lfutex_t *ulockaddr,
@@ -283,7 +288,12 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_waitwhile)(lfutex_t *ulockaddr,
 }
 /*[[[end:futexlock_waitwhile]]]*/
 
-/*[[[head:futexlock_waituntil,hash:CRC-32=0xa4ef3cb4]]]*/
+/*[[[head:futexlock_waituntil,hash:CRC-32=0x207658f6]]]*/
+/* Wait if `*uaddr != not_equal_to_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted */
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.futexlock.futexlock_waituntil") int
 NOTHROW_RPC(LIBCCALL libc_futexlock_waituntil)(lfutex_t *ulockaddr,
@@ -303,7 +313,12 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_waituntil)(lfutex_t *ulockaddr,
 }
 /*[[[end:futexlock_waituntil]]]*/
 
-/*[[[head:futexlock_waitwhile_above,hash:CRC-32=0x455d4119]]]*/
+/*[[[head:futexlock_waitwhile_above,hash:CRC-32=0x842c0b02]]]*/
+/* Wait if `*uaddr > above_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted */
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.futexlock.futexlock_waitwhile_above") int
 NOTHROW_RPC(LIBCCALL libc_futexlock_waitwhile_above)(lfutex_t *ulockaddr,
@@ -323,7 +338,12 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_waitwhile_above)(lfutex_t *ulockaddr,
 }
 /*[[[end:futexlock_waitwhile_above]]]*/
 
-/*[[[head:futexlock_waitwhile_below,hash:CRC-32=0x59d9a689]]]*/
+/*[[[head:futexlock_waitwhile_below,hash:CRC-32=0xbde2072d]]]*/
+/* Wait if `*uaddr < below_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted */
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.futexlock.futexlock_waitwhile_below") int
 NOTHROW_RPC(LIBCCALL libc_futexlock_waitwhile_below)(lfutex_t *ulockaddr,
@@ -343,7 +363,12 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_waitwhile_below)(lfutex_t *ulockaddr,
 }
 /*[[[end:futexlock_waitwhile_below]]]*/
 
-/*[[[head:futexlock_waitwhile_aboveequal,hash:CRC-32=0xf1b5fc3d]]]*/
+/*[[[head:futexlock_waitwhile_aboveequal,hash:CRC-32=0x3be63af5]]]*/
+/* Wait if `*uaddr >= above_equal_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted */
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.futexlock.futexlock_waitwhile_aboveequal") int
 NOTHROW_RPC(LIBCCALL libc_futexlock_waitwhile_aboveequal)(lfutex_t *ulockaddr,
@@ -365,7 +390,12 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_waitwhile_aboveequal)(lfutex_t *ulockaddr,
 }
 /*[[[end:futexlock_waitwhile_aboveequal]]]*/
 
-/*[[[head:futexlock_waitwhile_belowequal,hash:CRC-32=0x2b3acecf]]]*/
+/*[[[head:futexlock_waitwhile_belowequal,hash:CRC-32=0x157a637d]]]*/
+/* Wait if `*uaddr <= below_equal_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted */
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.futexlock.futexlock_waitwhile_belowequal") int
 NOTHROW_RPC(LIBCCALL libc_futexlock_waitwhile_belowequal)(lfutex_t *ulockaddr,
@@ -387,7 +417,12 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_waitwhile_belowequal)(lfutex_t *ulockaddr,
 }
 /*[[[end:futexlock_waitwhile_belowequal]]]*/
 
-/*[[[head:futexlock_waitwhile_cmpxch,hash:CRC-32=0x9a019cff]]]*/
+/*[[[head:futexlock_waitwhile_cmpxch,hash:CRC-32=0xb0000915]]]*/
+/* Wait if `*uaddr == old_value', and set `*uaddr = new_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted (*uaddr was still set to new_value) */
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.futexlock.futexlock_waitwhile_cmpxch") int
 NOTHROW_RPC(LIBCCALL libc_futexlock_waitwhile_cmpxch)(lfutex_t *ulockaddr,
@@ -408,7 +443,12 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_waitwhile_cmpxch)(lfutex_t *ulockaddr,
 }
 /*[[[end:futexlock_waitwhile_cmpxch]]]*/
 
-/*[[[head:futexlock_waituntil_cmpxch,hash:CRC-32=0x78ec6ab2]]]*/
+/*[[[head:futexlock_waituntil_cmpxch,hash:CRC-32=0xc652d43c]]]*/
+/* Wait if `*uaddr != old_value', and set `*uaddr = new_value'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted (*uaddr was still set to new_value) */
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.futexlock.futexlock_waituntil_cmpxch") int
 NOTHROW_RPC(LIBCCALL libc_futexlock_waituntil_cmpxch)(lfutex_t *ulockaddr,
@@ -429,7 +469,12 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_waituntil_cmpxch)(lfutex_t *ulockaddr,
 }
 /*[[[end:futexlock_waituntil_cmpxch]]]*/
 
-/*[[[head:futexlock_waitlock,hash:CRC-32=0x7a511298]]]*/
+/*[[[head:futexlock_waitlock,hash:CRC-32=0x5253f63d]]]*/
+/* Acquire a managed futex lock (s.a. `LFUTEX_WAIT_LOCK')
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted (*uaddr was still set to new_value) */
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.futexlock.futexlock_waitlock") int
 NOTHROW_RPC(LIBCCALL libc_futexlock_waitlock)(lfutex_t *ulockaddr,
@@ -448,7 +493,12 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_waitlock)(lfutex_t *ulockaddr,
 }
 /*[[[end:futexlock_waitlock]]]*/
 
-/*[[[head:futexlock_waitwhile_exactbits,hash:CRC-32=0x627bff9d]]]*/
+/*[[[head:futexlock_waitwhile_exactbits,hash:CRC-32=0xd4f80f94]]]*/
+/* Wait if `(*uaddr & bitmask) == setmask'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted */
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.futexlock.futexlock_waitwhile_exactbits") int
 NOTHROW_RPC(LIBCCALL libc_futexlock_waitwhile_exactbits)(lfutex_t *ulockaddr,
@@ -469,7 +519,12 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_waitwhile_exactbits)(lfutex_t *ulockaddr,
 }
 /*[[[end:futexlock_waitwhile_exactbits]]]*/
 
-/*[[[head:futexlock_waituntil_exactbits,hash:CRC-32=0x41f1399e]]]*/
+/*[[[head:futexlock_waituntil_exactbits,hash:CRC-32=0x52a4e4ed]]]*/
+/* Wait if `(*uaddr & bitmask) != setmask'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted */
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.futexlock.futexlock_waituntil_exactbits") int
 NOTHROW_RPC(LIBCCALL libc_futexlock_waituntil_exactbits)(lfutex_t *ulockaddr,
@@ -490,7 +545,12 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_waituntil_exactbits)(lfutex_t *ulockaddr,
 }
 /*[[[end:futexlock_waituntil_exactbits]]]*/
 
-/*[[[head:futexlock_waitwhile_anybit,hash:CRC-32=0x9d62162e]]]*/
+/*[[[head:futexlock_waitwhile_anybit,hash:CRC-32=0x35684d09]]]*/
+/* Wait if `(*uaddr & bitmask) != 0'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted */
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.futexlock.futexlock_waitwhile_anybit") int
 NOTHROW_RPC(LIBCCALL libc_futexlock_waitwhile_anybit)(lfutex_t *ulockaddr,
@@ -510,7 +570,12 @@ NOTHROW_RPC(LIBCCALL libc_futexlock_waitwhile_anybit)(lfutex_t *ulockaddr,
 }
 /*[[[end:futexlock_waitwhile_anybit]]]*/
 
-/*[[[head:futexlock_waitwhile_allbits,hash:CRC-32=0x373886df]]]*/
+/*[[[head:futexlock_waitwhile_allbits,hash:CRC-32=0xb3791c9]]]*/
+/* Wait if `(*uaddr & bitmask) == bitmask'
+ * @return: 0: Did wait
+ * @return: 1: Didn't wait
+ * @return: -1:EFAULT: A faulty pointer was given
+ * @return: -1:EINTR:  Operation was interrupted */
 INTERN NONNULL((1, 2))
 ATTR_WEAK ATTR_SECTION(".text.crt.sched.futexlock.futexlock_waitwhile_allbits") int
 NOTHROW_RPC(LIBCCALL libc_futexlock_waitwhile_allbits)(lfutex_t *ulockaddr,

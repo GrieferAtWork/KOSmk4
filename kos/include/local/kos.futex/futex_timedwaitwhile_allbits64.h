@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc9a9ac8f */
+/* HASH CRC-32:0x5efecaf5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,10 @@
 #ifndef __local_futex_timedwaitwhile_allbits64_defined
 #if (defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex))
 #define __local_futex_timedwaitwhile_allbits64_defined 1
+#include <bits/types.h>
+#include <bits/types.h>
+
+#include <bits/timespec.h>
 #include <kos/bits/futex.h>
 /* Dependency: "lfutex64" from "kos.futex" */
 #ifndef ____localdep_lfutex64_defined
@@ -112,7 +116,7 @@ __LOCAL_LIBC(futex_timedwaitwhile_allbits64) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futex_timedwaitwhile_allbits64))(__uintptr_t *__uaddr,
                                                                             __uintptr_t __bitmask,
                                                                             struct __timespec64 const *__rel_timeout) {
-#line 801 "kos/src/libc/magic/kos.futex.c"
+#line 863 "kos/src/libc/magic/kos.futex.c"
 	return __localdep_lfutex64(__uaddr, LFUTEX_WAIT_WHILE_BITMASK, __bitmask, __rel_timeout, __bitmask);
 }
 __NAMESPACE_LOCAL_END

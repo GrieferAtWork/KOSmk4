@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x11799974 */
+/* HASH CRC-32:0x4cbaa9ae */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -20,6 +20,8 @@
 #ifndef __local_futex_waituntil_defined
 #if (defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex))
 #define __local_futex_waituntil_defined 1
+#include <bits/types.h>
+#include <bits/types.h>
 #include <kos/bits/futex.h>
 /* Dependency: "lfutex64" from "kos.futex" */
 #ifndef ____localdep_lfutex64_defined
@@ -111,7 +113,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(futex_waituntil) __ATTR_NONNULL((1)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futex_waituntil))(__uintptr_t *__uaddr,
                                                              __uintptr_t __not_equal_to_value) {
-#line 373 "kos/src/libc/magic/kos.futex.c"
+#line 380 "kos/src/libc/magic/kos.futex.c"
 	return __localdep_lfutex64(__uaddr, LFUTEX_WAIT_UNTIL, __not_equal_to_value, (struct __timespec64 const *)__NULLPTR);
 }
 __NAMESPACE_LOCAL_END
