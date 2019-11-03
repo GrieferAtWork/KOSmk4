@@ -34,8 +34,8 @@ typedef struct __ATTR_PACKED __mbstate {
 	 * can conform to DOS's 4-byte `mbstate_t' structure. */
 	__UINT32_TYPE__  __word;
 } __mbstate_t;
-#define __MBSTATE_ISINIT(x)   ((x)->__word == 0)
-#define __MBSTATE_INIT         {0}
+#define __MBSTATE_ISINIT(x) ((x)->__word == 0)
+#define __MBSTATE_INIT      { 0 }
 
 #define __MBSTATE_TYPE_MASK     0xfc000000
 #define __MBSTATE_TYPE_EMPTY    0x00000000

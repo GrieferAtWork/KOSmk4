@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f528714 */
+/* HASH CRC-32:0x270e21ad */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,6 +32,8 @@ __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_fputc16_u
 __CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_fputc16_unlocked,(__CHAR16_TYPE__ __wc, __FILE *__restrict __stream),_fputwc_nolock,(__wc,__stream))
 #elif defined(__CRT_HAVE_DOS$fputwc_unlocked)
 __CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_fputc16_unlocked,(__CHAR16_TYPE__ __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
+#elif defined(__CRT_HAVE_DOS$_fputwc_nolock)
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_fputc16_unlocked,(__CHAR16_TYPE__ __wc, __FILE *__restrict __stream),_fputwc_nolock,(__wc,__stream))
 #else /* LIBC: fputc16_unlocked */
 #undef ____localdep_fputc16_unlocked_defined
 #endif /* fputc16_unlocked... */
@@ -50,7 +52,7 @@ __LOCAL_LIBC(file_c16printer_unlocked) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(file_c16printer_unlocked))(void *__arg,
                                                          __CHAR16_TYPE__ const *__restrict __data,
                                                          __SIZE_TYPE__ __datalen) __THROWS(...) {
-#line 1036 "kos/src/libc/magic/wchar.c"
+#line 1062 "kos/src/libc/magic/wchar.c"
 	__SIZE_TYPE__ __i;
 	for (__i = 0; __i < __datalen; ++__i) {
 		if (__localdep_fputc16_unlocked(__data[__i], (__FILE *)__arg) == __WEOF)

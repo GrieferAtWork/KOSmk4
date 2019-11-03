@@ -40,7 +40,7 @@ __SYSDECL_BEGIN
 #if __SIZEOF_WCHAR_T__ == 4
 #define WEOF 0xffffffffu
 #else /* __SIZEOF_WCHAR_T__ == 4 */
-#define WEOF (__CCAST(__WINT_TYPE__) 0xffff)
+#define WEOF (__CCAST(__WINT_TYPE__)0xffff)
 #endif /* __SIZEOF_WCHAR_T__ != 4 */
 #endif /* !WEOF */
 

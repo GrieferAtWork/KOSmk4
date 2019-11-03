@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb2daabba */
+/* HASH CRC-32:0x2305fd6b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -281,7 +281,7 @@ __SYSDECL_BEGIN
 #if __SIZEOF_WCHAR_T__ == 4
 #define WEOF 0xffffffffu
 #else /* __SIZEOF_WCHAR_T__ == 4 */
-#define WEOF (__CCAST(__WINT_TYPE__) 0xffff)
+#define WEOF (__CCAST(__WINT_TYPE__)0xffff)
 #endif /* __SIZEOF_WCHAR_T__ != 4 */
 #endif /* !WEOF */
 
@@ -1733,9 +1733,15 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wcsdup, __FORCELOCAL __ATTR_MALLOC __ATTR_MALL_D
 #ifdef __USE_XOPEN
 #if defined(__CRT_HAVE_wcwidth)
 __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,wcwidth,(wchar_t __ch),(__ch))
+#else /* LIBC: wcwidth */
+#include <local/wchar/wcwidth.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(wcwidth, __FORCELOCAL __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL wcwidth)(wchar_t __ch) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcwidth))(__ch); })
 #endif /* wcwidth... */
 #if defined(__CRT_HAVE_wcswidth)
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,wcswidth,(wchar_t const *__restrict __string, __SIZE_TYPE__ __num_chars),(__string,__num_chars))
+#else /* LIBC: wcswidth */
+#include <local/wchar/wcswidth.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(wcswidth, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL wcswidth)(wchar_t const *__restrict __string, __SIZE_TYPE__ __num_chars) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wcswidth))(__string, __num_chars); })
 #endif /* wcswidth... */
 #endif /* __USE_XOPEN */
 
@@ -2098,27 +2104,29 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_WSCANF(2, 0),__STD
 #endif /* vfwscanf_unlocked... */
 #if defined(__CRT_HAVE_vwscanf_unlocked)
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 0),__STDC_INT_AS_SIZE_T,,vwscanf_unlocked,(wchar_t const *__restrict __format, __builtin_va_list __args),(__format,__args)) __THROWS(...)
-#elif defined(__CRT_HAVE_vwscanf)
-__CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 0),__STDC_INT_AS_SIZE_T,,vwscanf_unlocked,(wchar_t const *__restrict __format, __builtin_va_list __args),vwscanf,(__format,__args)) __THROWS(...)
-#elif defined(__CRT_HAVE_vfwscanf) && !defined(__NO_STDSTREAMS)
-#include <local/wchar/vwscanf.h>
-__FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 0) __STDC_INT_AS_SIZE_T (__LIBCCALL vwscanf_unlocked)(wchar_t const *__restrict __format, __builtin_va_list __args) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vwscanf))(__format, __args); }
+#elif (defined(__CRT_HAVE_vfwscanf_unlocked) || defined(__CRT_HAVE_vfwscanf)) && !defined(__NO_STDSTREAMS)
+#include <local/wchar/vwscanf_unlocked.h>
+__NAMESPACE_LOCAL_USING_OR_IMPL(vwscanf_unlocked, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 0) __STDC_INT_AS_SIZE_T (__LIBCCALL vwscanf_unlocked)(wchar_t const *__restrict __format, __builtin_va_list __args) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vwscanf_unlocked))(__format, __args); })
 #endif /* vwscanf_unlocked... */
 #if defined(__CRT_HAVE_fwscanf_unlocked)
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_SCANF(2, 3) __STDC_INT_AS_SIZE_T (__VLIBCCALL fwscanf_unlocked)(__FILE *__restrict __stream, wchar_t const *__restrict __format, ...) __THROWS(...) __CASMNAME_SAME("fwscanf_unlocked");
-#elif defined(__CRT_HAVE_fwscanf) && !defined(__NO_ASMNAME)
-__LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_SCANF(2, 3) __STDC_INT_AS_SIZE_T (__VLIBCCALL fwscanf_unlocked)(__FILE *__restrict __stream, wchar_t const *__restrict __format, ...) __THROWS(...) __CASMNAME("fwscanf");
-#elif defined(__CRT_HAVE_vfwscanf)
-#include <local/wchar/fwscanf.h>
-#define fwscanf_unlocked (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fwscanf))
+#elif defined(__CRT_HAVE_vfwscanf_unlocked) || defined(__CRT_HAVE_vfwscanf)
+#include <local/wchar/fwscanf_unlocked.h>
+#ifdef __cplusplus
+__NAMESPACE_LOCAL_USING(fwscanf_unlocked)
+#else /* __cplusplus */
+#define fwscanf_unlocked (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fwscanf_unlocked))
+#endif /* !__cplusplus */
 #endif /* fwscanf_unlocked... */
 #if defined(__CRT_HAVE_wscanf_unlocked)
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 2) __STDC_INT_AS_SIZE_T (__VLIBCCALL wscanf_unlocked)(wchar_t const *__restrict __format, ...) __THROWS(...) __CASMNAME_SAME("wscanf_unlocked");
-#elif defined(__CRT_HAVE_wscanf) && !defined(__NO_ASMNAME)
-__LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 2) __STDC_INT_AS_SIZE_T (__VLIBCCALL wscanf_unlocked)(wchar_t const *__restrict __format, ...) __THROWS(...) __CASMNAME("wscanf");
-#elif (defined(__CRT_HAVE_vfwscanf) && !defined(__NO_STDSTREAMS) || defined(__CRT_HAVE_vwscanf))
-#include <local/wchar/wscanf.h>
-#define wscanf_unlocked (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wscanf))
+#elif ((defined(__CRT_HAVE_vfwscanf_unlocked) || defined(__CRT_HAVE_vfwscanf)) && !defined(__NO_STDSTREAMS) || defined(__CRT_HAVE_vwscanf_unlocked))
+#include <local/wchar/wscanf_unlocked.h>
+#ifdef __cplusplus
+__NAMESPACE_LOCAL_USING(wscanf_unlocked)
+#else /* __cplusplus */
+#define wscanf_unlocked (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wscanf_unlocked))
+#endif /* !__cplusplus */
 #endif /* wscanf_unlocked... */
 
 

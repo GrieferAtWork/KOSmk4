@@ -51,6 +51,10 @@
 #define __CRT_HAVE_DOS$__wcsxfrm_l 1
 #define __CRT_HAVE_DOS$_creat 1
 #define __CRT_HAVE_DOS$_errno 1
+#define __CRT_HAVE_DOS$_fgetwc_nolock 1
+#define __CRT_HAVE_DOS$_fgetws_nolock 1
+#define __CRT_HAVE_DOS$_fputwc_nolock 1
+#define __CRT_HAVE_DOS$_fputws_nolock 1
 #define __CRT_HAVE_DOS$_ftime32_s 1
 #define __CRT_HAVE_DOS$_ftime64_s 1
 #define __CRT_HAVE_DOS$_mbstowcs_l 1
@@ -61,6 +65,7 @@
 #define __CRT_HAVE_DOS$_strerror_s 1
 #define __CRT_HAVE_DOS$_swprintf 1
 #define __CRT_HAVE_DOS$_wchdir 1
+#define __CRT_HAVE_DOS$_wcsdup 1
 #define __CRT_HAVE_DOS$_wcserror 1
 #define __CRT_HAVE_DOS$_wcserror_s 1
 #define __CRT_HAVE_DOS$_wcslwr_s 1
@@ -160,6 +165,7 @@
 #define __CRT_HAVE_DOS$vfwprintf 1
 #define __CRT_HAVE_DOS$vfwprintf_unlocked 1
 #define __CRT_HAVE_DOS$vfwscanf 1
+#define __CRT_HAVE_DOS$vfwscanf_unlocked 1
 #define __CRT_HAVE_DOS$vswprintf 1
 #define __CRT_HAVE_DOS$vswscanf 1
 #define __CRT_HAVE_DOS$vwprintf 1
@@ -1032,6 +1038,8 @@
 #define __CRT_HAVE__fdopen 1
 #define __CRT_HAVE__fflush_nolock 1
 #define __CRT_HAVE__fgetchar 1
+#define __CRT_HAVE__fgetwc_nolock 1
+#define __CRT_HAVE__fgetws_nolock 1
 #define __CRT_HAVE__filbuf 1
 #define __CRT_HAVE__filelength 1
 #define __CRT_HAVE__filelengthi64 1
@@ -1056,6 +1064,8 @@
 #define __CRT_HAVE__fprintf_p_l 1
 #define __CRT_HAVE__fprintf_s_l 1
 #define __CRT_HAVE__fputchar 1
+#define __CRT_HAVE__fputwc_nolock 1
+#define __CRT_HAVE__fputws_nolock 1
 #define __CRT_HAVE__fread_nolock_s 1
 #define __CRT_HAVE__free_dbg 1
 #define __CRT_HAVE__fscanf_l 1

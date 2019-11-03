@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x45c10a06 */
+/* HASH CRC-32:0xa13bb929 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -667,6 +667,8 @@ __CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__NOTHROW_NCX,fgetc16_unlocked,(__
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),__WINT_TYPE__,__NOTHROW_NCX,fgetc16_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
 #elif defined(__CRT_HAVE_DOS$fgetwc_unlocked)
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),__WINT_TYPE__,__NOTHROW_NCX,fgetc16_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
+#elif defined(__CRT_HAVE_DOS$_fgetwc_nolock)
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),__WINT_TYPE__,__NOTHROW_NCX,fgetc16_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
 #endif /* fgetc16_unlocked... */
 #if defined(__CRT_HAVE_fgetwc_unlocked) && (__SIZEOF_WCHAR_T__ == 4)
 __CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__NOTHROW_NCX,fgetc32_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
@@ -701,6 +703,8 @@ __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,fputc16_unlocked,(ch
 __CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,fputc16_unlocked,(char16_t __wc, __FILE *__restrict __stream),_fputwc_nolock,(__wc,__stream))
 #elif defined(__CRT_HAVE_DOS$fputwc_unlocked)
 __CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,fputc16_unlocked,(char16_t __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
+#elif defined(__CRT_HAVE_DOS$_fputwc_nolock)
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,fputc16_unlocked,(char16_t __wc, __FILE *__restrict __stream),_fputwc_nolock,(__wc,__stream))
 #endif /* fputc16_unlocked... */
 #if defined(__CRT_HAVE_fputwc_unlocked) && (__SIZEOF_WCHAR_T__ == 4)
 __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,fputc32_unlocked,(char32_t __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
@@ -719,6 +723,8 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1, 3)),char16_t *,__NOTHROW_NCX,fgetc16s_unlocke
 __CREDIRECT_DOS(__ATTR_NONNULL((1, 3)),char16_t *,__NOTHROW_NCX,fgetc16s_unlocked,(char16_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),_fgetws_nolock,(__buf,__bufsize,__stream))
 #elif defined(__CRT_HAVE_DOS$fgetws_unlocked)
 __CREDIRECT_DOS(__ATTR_NONNULL((1, 3)),char16_t *,__NOTHROW_NCX,fgetc16s_unlocked,(char16_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),fgetws_unlocked,(__buf,__bufsize,__stream))
+#elif defined(__CRT_HAVE_DOS$_fgetws_nolock)
+__CREDIRECT_DOS(__ATTR_NONNULL((1, 3)),char16_t *,__NOTHROW_NCX,fgetc16s_unlocked,(char16_t *__restrict __buf, __STDC_INT_AS_SIZE_T __bufsize, __FILE *__restrict __stream),_fgetws_nolock,(__buf,__bufsize,__stream))
 #elif (defined(__CRT_HAVE_fgetwc_unlocked) || defined(__CRT_HAVE__fgetwc_nolock)) && (defined(__CRT_HAVE_ungetwc_unlocked) || defined(__CRT_HAVE_ungetwc)) && (defined(__CRT_HAVE_ferror_unlocked) || defined(__CRT_HAVE_ferror))
 #if __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/fgetws_unlocked.h>
@@ -751,6 +757,8 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,fputc16s_u
 __CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,fputc16s_unlocked,(char16_t const *__restrict __string, __FILE *__restrict __stream),_fputws_nolock,(__string,__stream))
 #elif defined(__CRT_HAVE_DOS$fputws_unlocked)
 __CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,fputc16s_unlocked,(char16_t const *__restrict __string, __FILE *__restrict __stream),fputws_unlocked,(__string,__stream))
+#elif defined(__CRT_HAVE_DOS$_fputws_nolock)
+__CREDIRECT_DOS(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,fputc16s_unlocked,(char16_t const *__restrict __string, __FILE *__restrict __stream),_fputws_nolock,(__string,__stream))
 #elif defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE__fputwc_nolock) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_file_wprinter)
 #if __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/fputws_unlocked.h>
@@ -1020,7 +1028,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_WSCANF(2, 0),__STD
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 0),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,vc16scanf_unlocked,(char16_t const *__restrict __format, __builtin_va_list __args),vwscanf_unlocked,(__format,__args))
 #elif defined(__CRT_HAVE_DOS$vwscanf_unlocked)
 __CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 0),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,vc16scanf_unlocked,(char16_t const *__restrict __format, __builtin_va_list __args),vwscanf_unlocked,(__format,__args))
-#elif defined(__CRT_HAVE_vfwscanf) && !defined(__NO_STDSTREAMS)
+#elif (defined(__CRT_HAVE_vfwscanf_unlocked) || defined(__CRT_HAVE_vfwscanf)) && !defined(__NO_STDSTREAMS)
 #if __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/vwscanf_unlocked.h>
 __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 0) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL vc16scanf_unlocked)(char16_t const *__restrict __format, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vwscanf_unlocked))((__WCHAR_TYPE__ const *)__format, __args); }
@@ -1031,7 +1039,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(vc16scanf_unlocked, __FORCELOCAL __ATTR_WUNUSED 
 #endif /* vc16scanf_unlocked... */
 #if defined(__CRT_HAVE_vwscanf_unlocked) && (__SIZEOF_WCHAR_T__ == 4)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 0),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,vc32scanf_unlocked,(char32_t const *__restrict __format, __builtin_va_list __args),vwscanf_unlocked,(__format,__args))
-#elif defined(__CRT_HAVE_vfwscanf) && !defined(__NO_STDSTREAMS)
+#elif (defined(__CRT_HAVE_vfwscanf_unlocked) || defined(__CRT_HAVE_vfwscanf)) && !defined(__NO_STDSTREAMS)
 #if __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/vwscanf_unlocked.h>
 __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 0) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__LIBCCALL vc32scanf_unlocked)(char32_t const *__restrict __format, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(vwscanf_unlocked))((__WCHAR_TYPE__ const *)__format, __args); }
@@ -1044,7 +1052,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(vc32scanf_unlocked, __FORCELOCAL __ATTR_WUNUSED 
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_SCANF(2, 3) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL fc16scanf_unlocked)(__FILE *__restrict __stream, char16_t const *__restrict __format, ...) __CASMNAME("fwscanf_unlocked");
 #elif defined(__CRT_HAVE_DOS$fwscanf_unlocked) && !defined(__NO_ASMNAME)
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_SCANF(2, 3) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBDCALL fc16scanf_unlocked)(__FILE *__restrict __stream, char16_t const *__restrict __format, ...) __CASMNAME_DOS("fwscanf_unlocked");
-#elif defined(__CRT_HAVE_vfwscanf)
+#elif defined(__CRT_HAVE_vfwscanf_unlocked) || defined(__CRT_HAVE_vfwscanf)
 #if __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/fwscanf_unlocked.h>
 #define fc16scanf_unlocked (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fwscanf_unlocked))
@@ -1059,7 +1067,7 @@ __NAMESPACE_LOCAL_USING(fc16scanf_unlocked)
 #endif /* fc16scanf_unlocked... */
 #if defined(__CRT_HAVE_fwscanf_unlocked) && (__SIZEOF_WCHAR_T__ == 4) && !defined(__NO_ASMNAME)
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_SCANF(2, 3) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL fc32scanf_unlocked)(__FILE *__restrict __stream, char32_t const *__restrict __format, ...) __CASMNAME("fwscanf_unlocked");
-#elif defined(__CRT_HAVE_vfwscanf)
+#elif defined(__CRT_HAVE_vfwscanf_unlocked) || defined(__CRT_HAVE_vfwscanf)
 #if __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/fwscanf_unlocked.h>
 #define fc32scanf_unlocked (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fwscanf_unlocked))
@@ -1076,7 +1084,7 @@ __NAMESPACE_LOCAL_USING(fc32scanf_unlocked)
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 2) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL c16scanf_unlocked)(char16_t const *__restrict __format, ...) __CASMNAME("wscanf_unlocked");
 #elif defined(__CRT_HAVE_DOS$wscanf_unlocked) && !defined(__NO_ASMNAME)
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 2) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBDCALL c16scanf_unlocked)(char16_t const *__restrict __format, ...) __CASMNAME_DOS("wscanf_unlocked");
-#elif (defined(__CRT_HAVE_vfwscanf) && !defined(__NO_STDSTREAMS) || defined(__CRT_HAVE_vwscanf))
+#elif ((defined(__CRT_HAVE_vfwscanf_unlocked) || defined(__CRT_HAVE_vfwscanf)) && !defined(__NO_STDSTREAMS) || defined(__CRT_HAVE_vwscanf_unlocked))
 #if __SIZEOF_WCHAR_T__ == 2
 #include <local/wchar/wscanf_unlocked.h>
 #define c16scanf_unlocked (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wscanf_unlocked))
@@ -1091,7 +1099,7 @@ __NAMESPACE_LOCAL_USING(c16scanf_unlocked)
 #endif /* c16scanf_unlocked... */
 #if defined(__CRT_HAVE_wscanf_unlocked) && (__SIZEOF_WCHAR_T__ == 4) && !defined(__NO_ASMNAME)
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 2) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL c32scanf_unlocked)(char32_t const *__restrict __format, ...) __CASMNAME("wscanf_unlocked");
-#elif (defined(__CRT_HAVE_vfwscanf) && !defined(__NO_STDSTREAMS) || defined(__CRT_HAVE_vwscanf))
+#elif ((defined(__CRT_HAVE_vfwscanf_unlocked) || defined(__CRT_HAVE_vfwscanf)) && !defined(__NO_STDSTREAMS) || defined(__CRT_HAVE_vwscanf_unlocked))
 #if __SIZEOF_WCHAR_T__ == 4
 #include <local/wchar/wscanf_unlocked.h>
 #define c32scanf_unlocked (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wscanf_unlocked))

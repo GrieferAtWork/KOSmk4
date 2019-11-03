@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7172738d */
+/* HASH CRC-32:0x18878e5b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -192,19 +192,14 @@
 #define __stub_fgetpwent_r 1
 #define __stub_fgetspent 1
 #define __stub_fgetspent_r 1
-#define __stub_fgetwc 1
-#define __stub_fgetwc_unlocked 1
 #define __stub_fmod 1
 #define __stub_fpathconf 1
 #define __stub_fpreset 1
-#define __stub_fputwc 1
-#define __stub_fputwc_unlocked 1
 #define __stub_freeaddrinfo 1
 #define __stub_freeifaddrs 1
 #define __stub_freelocale 1
 #define __stub_frexp 1
 #define __stub_ftok 1
-#define __stub_fwscanf_unlocked 1
 #define __stub_gai_cancel 1
 #define __stub_gai_error 1
 #define __stub_gai_strerror 1
@@ -636,8 +631,6 @@
 #define __stub_ttyslot 1
 #define __stub_tzset 1
 #define __stub_ulckpwdf 1
-#define __stub_ungetwc 1
-#define __stub_ungetwc_unlocked 1
 #define __stub_unlockpt 1
 #define __stub_updwtmp 1
 #define __stub_updwtmpx 1
@@ -645,16 +638,13 @@
 #define __stub_utmpname 1
 #define __stub_utmpxname 1
 #define __stub_vfwscanf 1
+#define __stub_vfwscanf_unlocked 1
 #define __stub_vhangup 1
-#define __stub_vwscanf_unlocked 1
 #define __stub_wcsnrtombs 1
-#define __stub_wcswidth 1
-#define __stub_wcwidth 1
 #define __stub_wfreadlinkat 1
 #define __stub_wgetlogin 1
 #define __stub_wgetlogin_r 1
 #define __stub_writev 1
-#define __stub_wscanf_unlocked 1
 #define __stub_wttyname 1
 #define __stub_wttyname_r 1
 #define __stub_y0 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x894664e */
+/* HASH CRC-32:0x2fa00c74 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,6 +33,8 @@ __CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_fgetc16_u
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_fgetc16_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
 #elif defined(__CRT_HAVE_DOS$fgetwc_unlocked)
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_fgetc16_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
+#elif defined(__CRT_HAVE_DOS$_fgetwc_nolock)
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_fgetc16_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
 #else /* LIBC: fgetc16_unlocked */
 #undef ____localdep_fgetc16_unlocked_defined
 #endif /* fgetc16_unlocked... */
@@ -41,7 +43,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_fgetc
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(getchar16_unlocked) __WINT_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(getchar16_unlocked))(void) __THROWS(...) {
-#line 893 "kos/src/libc/magic/wchar.c"
+#line 919 "kos/src/libc/magic/wchar.c"
 	return __localdep_fgetc16_unlocked(__LOCAL_stdin);
 }
 __NAMESPACE_LOCAL_END

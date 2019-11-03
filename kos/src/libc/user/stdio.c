@@ -22,11 +22,6 @@
 #include "../api.h"
 /**/
 
-#include "malloc.h"
-#include "stdlib.h"
-#include "stdio.h"
-#include "stdio-api.h"
-
 #include <hybrid/align.h>
 #include <hybrid/atomic.h>
 #include <hybrid/minmax.h>
@@ -49,10 +44,14 @@
 #include <stdlib.h>
 #include <string.h>
 #include <syslog.h>
+#include <unicode.h>
 #include <unistd.h>
 
 #include "format-printer.h"
 #include "malloc.h"
+#include "stdio-api.h"
+#include "stdio.h"
+#include "stdlib.h"
 #include "string.h"
 
 DECL_BEGIN
@@ -1321,6 +1320,176 @@ err:
 	return EOF;
 }
 
+INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.core.read.file_getc16")
+WUNUSED NONNULL((1)) char16_t LIBCCALL file_getc16(FILE *__restrict self) {
+	char16_t result;
+	struct iofile_data *ex;
+	assert(self);
+	ex = self->if_exdata;
+	assert(ex);
+	/* Check for a pending surrogate */
+	if ((ex->io_mbs.__word & __MBSTATE_TYPE_MASK) == __MBSTATE_TYPE_WR_UTF16_LO) {
+		result = (char16_t)(0xdc00 + (ex->io_mbs.__word & 0x000003ff));
+		ex->io_mbs.__word = 0;
+		goto done;
+	}
+	/* Try to complete an in-progress utf-8 sequence. */
+	for (;;) {
+		size_t error;
+		char buf[1];
+		int ch;
+		ch = file_getc(self);
+		if (ch == EOF) {
+			result = EOF16;
+			goto done;
+		}
+		buf[0] = (char)(unsigned char)(unsigned int)ch;
+		error  = unicode_c8toc16(&result, buf, 1, &ex->io_mbs);
+		if likely(error > 0) /* Completed sequence. */
+			goto done;
+		if unlikely(error == 0) {
+			/* Shouldn't happen (a surrogate was written) */
+			file_ungetc(self, (unsigned char)buf[0]);
+			goto done;
+		}
+		if unlikely(error == (size_t)-1) {
+			/* Unicode error. */
+			libc_seterrno(EILSEQ);
+			self->if_flag |= IO_ERR;
+			result = EOF16;
+			goto done;
+		}
+		/* Incomplete sequence (continue reading...) */
+	}
+done:
+	return result;
+}
+
+INTERN ATTR_SECTION(".text.crt.wchar.FILE.core.read.file_getc32")
+WUNUSED NONNULL((1)) char32_t LIBCCALL file_getc32(FILE *__restrict self) {
+	char32_t result;
+	struct iofile_data *ex;
+	assert(self);
+	ex = self->if_exdata;
+	assert(ex);
+	/* Try to complete an in-progress utf-8 sequence. */
+	for (;;) {
+		size_t error;
+		char buf[1];
+		int ch;
+		ch = file_getc(self);
+		if (ch == EOF) {
+			result = EOF32;
+			goto done;
+		}
+		buf[0] = (char)(unsigned char)(unsigned int)ch;
+		error  = unicode_c8toc32(&result, buf, 1, &ex->io_mbs);
+		if likely(error > 0) /* Completed sequence. */
+			goto done;
+		if unlikely(error == (size_t)-1) {
+			/* Unicode error. */
+			libc_seterrno(EILSEQ);
+			self->if_flag |= IO_ERR;
+			result = EOF32;
+			goto done;
+		}
+		/* Incomplete sequence (continue reading...) */
+	}
+done:
+	return result;
+}
+
+
+INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.core.read.file_ungetc16")
+WUNUSED NONNULL((1)) char16_t LIBCCALL file_ungetc16(FILE *__restrict self, char16_t ch) {
+	char32_t unget_char;
+	char16_t result = ch;
+	struct iofile_data *ex;
+	assert(self);
+	ex = self->if_exdata;
+	assert(ex);
+	/* Check for a pending surrogate */
+	if ((ex->io_mbs.__word & __MBSTATE_TYPE_MASK) == __MBSTATE_TYPE_WR_UTF16_LO) {
+		char16_t lo_surrogate;
+		if unlikely(ch < UTF16_HIGH_SURROGATE_MIN || ch > UTF16_HIGH_SURROGATE_MAX) {
+set_ilseq:
+			libc_seterrno(EILSEQ);
+			self->if_flag |= IO_ERR;
+			result = EOF16;
+			goto done;
+		}
+		lo_surrogate = (char16_t)(0xdc00 + (ex->io_mbs.__word & 0x000003ff));
+		ex->io_mbs.__word = 0;
+		unget_char = ch;
+		unget_char -= 0xd800;
+		unget_char <<= 10;
+		unget_char += 0x10000 - 0xdc00;
+		unget_char += lo_surrogate;
+	} else {
+		if unlikely(ch >= UTF16_HIGH_SURROGATE_MIN &&
+		            ch <= UTF16_HIGH_SURROGATE_MAX)
+			goto set_ilseq;
+		unget_char = ch;
+	}
+	if (file_ungetc32(self, unget_char) == EOF32)
+		result = EOF16;
+done:
+	return result;
+}
+
+INTERN ATTR_SECTION(".text.crt.wchar.FILE.core.read.file_ungetc32")
+WUNUSED NONNULL((1)) char32_t LIBCCALL file_ungetc32(FILE *__restrict self, char32_t ch) {
+	char32_t result = ch;
+	char buf[UNICODE_UTF8_MAXLEN], *end;
+	end = unicode_writeutf8(buf, ch);
+	assert(end > buf);
+	do {
+		--end;
+		if (file_ungetc(self, (unsigned char)*end) == EOF) {
+			result = EOF32;
+			break;
+		}
+	} while (end > buf);
+	return result;
+}
+
+INTERN ATTR_SECTION(".text.crt.dos.wchar.FILE.core.write.file_print16")
+WUNUSED NONNULL((1)) ssize_t LIBCCALL
+file_print16(void *self, char16_t const *__restrict data, size_t datalen) {
+	ssize_t result;
+	struct format_16to8_data arg;
+	struct iofile_data *ex;
+	FILE *me = (FILE *)self;
+	assert(me);
+	ex = me->if_exdata;
+	assert(ex);
+	arg.fd_arg       = self;
+	arg.fd_printer   = &libc_file_printer_unlocked;
+	arg.fd_surrogate = 0;
+	/* Check for a the pending surrogate pair */
+	if ((ex->io_mbs.__word & __MBSTATE_TYPE_MASK) == __MBSTATE_TYPE_UTF16_LO) {
+		arg.fd_surrogate = 0xdc00 + (ex->io_mbs.__word & 0x000003ff);
+		ex->io_mbs.__word = 0;
+	}
+	result = format_16to8(&arg, data, datalen);
+	/* Update the pending surrogate pair */
+	if (arg.fd_surrogate)
+		ex->io_mbs.__word = __MBSTATE_TYPE_UTF16_LO | (arg.fd_surrogate - 0xdc00);
+	return result;
+}
+
+INTERN ATTR_SECTION(".text.crt.wchar.FILE.core.write.file_print32")
+WUNUSED NONNULL((1)) ssize_t LIBCCALL
+file_print32(void *self, char32_t const *__restrict data, size_t datalen) {
+	ssize_t result;
+	struct format_32to8_data arg;
+	arg.fd_printer = &libc_file_printer_unlocked;
+	arg.fd_arg     = self;
+	result = format_32to8(&arg, data, datalen);
+	return result;
+}
+
+
 
 INTERN ATTR_SECTION(".text.crt.FILE.core.write.file_truncate")
 WUNUSED NONNULL((1)) int LIBCCALL file_truncate(FILE *__restrict self,
@@ -1574,9 +1743,7 @@ WUNUSED FILE *LIBCCALL file_reopenfd(FILE *__restrict self,
 	ex->io_chsz = 0;
 	ex->io_fblk = 0;
 	ex->io_fpos = 0;
-#ifdef IOFILE_HAVE_MBS
 	ex->io_mbs.__word = 0;
-#endif /* IOFILE_HAVE_MBS */
 	return self;
 }
 
@@ -1895,8 +2062,6 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.locked.write.write.file_printer") ssize_t
 {
 	FILE *me = (FILE *)arg;
 	ssize_t result;
-	if unlikely(!me)
-		return 0;
 	if (FMUSTLOCK(me)) {
 		file_write(me);
 		result = (ssize_t)file_writedata(me, data, datalen * sizeof(char));
@@ -1924,8 +2089,6 @@ ATTR_WEAK ATTR_SECTION(".text.crt.FILE.unlocked.write.write.file_printer_unlocke
 {
 	FILE *me = (FILE *)arg;
 	ssize_t result;
-	if unlikely(!me)
-		return 0;
 	result = (ssize_t)file_writedata(me, data, datalen * sizeof(char));
 	if unlikely(!result && FERROR(me))
 		result = -1;

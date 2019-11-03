@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x208285d1 */
+/* HASH CRC-32:0xe1772728 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,6 +33,8 @@ __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_fputc16_u
 __CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_fputc16_unlocked,(__CHAR16_TYPE__ __wc, __FILE *__restrict __stream),_fputwc_nolock,(__wc,__stream))
 #elif defined(__CRT_HAVE_DOS$fputwc_unlocked)
 __CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_fputc16_unlocked,(__CHAR16_TYPE__ __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream))
+#elif defined(__CRT_HAVE_DOS$_fputwc_nolock)
+__CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_fputc16_unlocked,(__CHAR16_TYPE__ __wc, __FILE *__restrict __stream),_fputwc_nolock,(__wc,__stream))
 #else /* LIBC: fputc16_unlocked */
 #undef ____localdep_fputc16_unlocked_defined
 #endif /* fputc16_unlocked... */
@@ -41,7 +43,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_fputc
 __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(putchar16_unlocked) __WINT_TYPE__
 (__LIBCCALL __LIBC_LOCAL_NAME(putchar16_unlocked))(__CHAR16_TYPE__ __wc) __THROWS(...) {
-#line 900 "kos/src/libc/magic/wchar.c"
+#line 926 "kos/src/libc/magic/wchar.c"
 	return __localdep_fputc16_unlocked(__wc, __LOCAL_stdin);
 }
 __NAMESPACE_LOCAL_END

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x57c90701 */
+/* HASH CRC-32:0xed325951 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -101,6 +101,8 @@ INTDEF NONNULL((1)) ATTR_LIBC_WPRINTF(1, 2) __STDC_INT_AS_SIZE_T (VLIBCCALL libc
 INTDEF NONNULL((1)) ATTR_LIBC_WPRINTF(1, 2) __STDC_INT_AS_SIZE_T (VLIBDCALL libd_wprintf_unlocked)(char16_t const *__restrict format, ...) __THROWS(...);
 INTDEF NONNULL((1)) ATTR_LIBC_WPRINTF(1, 0) __STDC_INT_AS_SIZE_T (LIBCCALL libc_vwprintf_unlocked)(char32_t const *__restrict format, va_list args) __THROWS(...);
 INTDEF NONNULL((1)) ATTR_LIBC_WPRINTF(1, 0) __STDC_INT_AS_SIZE_T (LIBDCALL libd_vwprintf_unlocked)(char16_t const *__restrict format, va_list args) __THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) ATTR_LIBC_WSCANF(2, 0) __STDC_INT_AS_SIZE_T (LIBCCALL libc_vfwscanf_unlocked)(FILE *__restrict stream, char32_t const *__restrict format, va_list args) __THROWS(...);
+INTDEF WUNUSED NONNULL((1, 2)) ATTR_LIBC_WSCANF(2, 0) __STDC_INT_AS_SIZE_T (LIBDCALL libd_vfwscanf_unlocked)(FILE *__restrict stream, char16_t const *__restrict format, va_list args) __THROWS(...);
 INTDEF WUNUSED NONNULL((1)) ATTR_LIBC_SCANF(1, 0) __STDC_INT_AS_SIZE_T (LIBCCALL libc_vwscanf_unlocked)(char32_t const *__restrict format, va_list args) __THROWS(...);
 INTDEF WUNUSED NONNULL((1)) ATTR_LIBC_SCANF(1, 0) __STDC_INT_AS_SIZE_T (LIBDCALL libd_vwscanf_unlocked)(char16_t const *__restrict format, va_list args) __THROWS(...);
 INTDEF WUNUSED NONNULL((1, 2)) ATTR_LIBC_SCANF(2, 3) __STDC_INT_AS_SIZE_T (VLIBCCALL libc_fwscanf_unlocked)(FILE *__restrict stream, char32_t const *__restrict format, ...) __THROWS(...);

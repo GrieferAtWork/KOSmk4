@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa6363bd */
+/* HASH CRC-32:0xa3bc1290 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,6 +33,8 @@ __CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_fgetc16_u
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_fgetc16_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
 #elif defined(__CRT_HAVE_DOS$fgetwc_unlocked)
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_fgetc16_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream))
+#elif defined(__CRT_HAVE_DOS$_fgetwc_nolock)
+__CREDIRECT_DOS(__ATTR_NONNULL((1)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_fgetc16_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream))
 #else /* LIBC: fgetc16_unlocked */
 #undef ____localdep_fgetc16_unlocked_defined
 #endif /* fgetc16_unlocked... */
@@ -52,7 +54,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferr
 #endif /* ferror_unlocked... */
 #endif /* !____localdep_ferror_unlocked_defined */
 
-/* Dependency: "ungetwc_unlocked" from "wchar" */
+/* Dependency: "ungetwc_unlocked" */
 #ifndef ____localdep_ungetc16_unlocked_defined
 #define ____localdep_ungetc16_unlocked_defined 1
 #if defined(__CRT_HAVE_ungetwc_unlocked) && (__SIZEOF_WCHAR_T__ == 2)
@@ -63,7 +65,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_ungetc16_
 __CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_ungetc16_unlocked,(__WINT_TYPE__ __ch, __FILE *__restrict __stream),ungetwc,(__ch,__stream))
 #elif defined(__CRT_HAVE_DOS$ungetwc_unlocked)
 __CREDIRECT_DOS(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_ungetc16_unlocked,(__WINT_TYPE__ __ch, __FILE *__restrict __stream),ungetwc_unlocked,(__ch,__stream))
-#else /* LIBC: ungetwc_unlocked */
+#else /* LIBC: ungetc16_unlocked */
 #undef ____localdep_ungetc16_unlocked_defined
 #endif /* ungetc16_unlocked... */
 #endif /* !____localdep_ungetc16_unlocked_defined */
@@ -80,7 +82,7 @@ __LOCAL_LIBC(fgetc16s_unlocked) __ATTR_NONNULL((1, 3)) __CHAR16_TYPE__ *
 (__LIBCCALL __LIBC_LOCAL_NAME(fgetc16s_unlocked))(__CHAR16_TYPE__ *__restrict __buf,
                                                   __STDC_INT_AS_SIZE_T __bufsize,
                                                   __FILE *__restrict __stream) __THROWS(...) {
-#line 932 "kos/src/libc/magic/wchar.c"
+#line 958 "kos/src/libc/magic/wchar.c"
 	__SIZE_TYPE__ __n;
 	if __unlikely(!__buf || !__bufsize) {
 		/* The buffer cannot be empty! */

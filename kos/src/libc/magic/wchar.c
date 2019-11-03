@@ -64,7 +64,7 @@ __SYSDECL_BEGIN
 #if __SIZEOF_WCHAR_T__ == 4
 #define WEOF 0xffffffffu
 #else /* __SIZEOF_WCHAR_T__ == 4 */
-#define WEOF (__CCAST(__WINT_TYPE__) 0xffff)
+#define WEOF (__CCAST(__WINT_TYPE__)0xffff)
 #endif /* __SIZEOF_WCHAR_T__ != 4 */
 #endif /* !WEOF */
 
@@ -628,7 +628,9 @@ wcstoull:([notnull] wchar_t const *__restrict nptr, [nullable] wchar_t **endptr,
 
 %[default_impl_section({.text.crt.wchar.FILE.locked.read.scanf|.text.crt.dos.wchar.FILE.locked.read.scanf})]
 [cp_stdio][std][std_guard][ATTR_WUNUSED][ATTR_LIBC_WSCANF(2, 0)][wchar]
-vfwscanf:([nonnull] FILE *__restrict stream, [nonnull] wchar_t const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T;
+vfwscanf:([nonnull] FILE *__restrict stream,
+          [nonnull] wchar_t const *__restrict format, $va_list args)
+		-> __STDC_INT_AS_SIZE_T;
 /* TODO: format_scanf() implementation for `vfwscanf'! */
 
 [cp_stdio][std][std_guard][ATTR_WUNUSED][ATTR_LIBC_WSCANF(1, 0)]
@@ -761,7 +763,7 @@ open_wmemstream:(wchar_t **bufloc, $size_t *sizeloc) -> $FILE *;
 [section({.text.crt.wchar.string.memory|.text.crt.dos.wchar.string.memory})]
 wcsnlen:([nonnull] wchar_t const *__restrict string, $size_t maxlen) -> $size_t %{copy(%auto, str2wcs)}
 
-[requires($has_function(malloc))][ATTR_WUNUSED][alias(_wcsdup)]
+[requires($has_function(malloc))][ATTR_WUNUSED][export_alias(_wcsdup)]
 [ATTR_MALL_DEFAULT_ALIGNED][ATTR_MALLOC][wchar][guard]
 [section({.text.crt.wchar.heap.strdup|.text.crt.dos.wchar.heap.strdup})][same_impl]
 wcsdup:([nonnull] wchar_t const *__restrict string) -> wchar_t * %{copy(%auto, str2wcs)}
@@ -771,11 +773,35 @@ wcsdup:([nonnull] wchar_t const *__restrict string) -> wchar_t * %{copy(%auto, s
 %
 %#ifdef __USE_XOPEN
 [section({.text.crt.wchar.unicode.static.mbs|.text.crt.dos.wchar.unicode.static.mbs})]
-[ATTR_WUNUSED][wchar] wcwidth:(wchar_t ch) -> int;
+[dependency_include(<libc/unicode.h>)][same_impl][user][noexport]
+[ATTR_WUNUSED][wchar] wcwidth:(wchar_t ch) -> int {
+#if __SIZEOF_WCHAR_T__ == 2
+	if (ch >= UTF16_HIGH_SURROGATE_MIN &&
+	    ch <= UTF16_LOW_SURROGATE_MAX)
+		return 0;
+#endif /* __SIZEOF_WCHAR_T__ == 2 */
+	if (@__libc_unicode_isprint@(ch))
+		return 1;
+	if (ch == 0)
+		return 0;
+	return -1;
+}
 
-[ATTR_WUNUSED][wchar]
+[ATTR_WUNUSED][wchar][same_impl][user][noexport]
 [section({.text.crt.wchar.unicode.static.mbs|.text.crt.dos.wchar.unicode.static.mbs})]
-wcswidth:([inp(num_chars)] wchar_t const *__restrict string, $size_t num_chars) -> int;
+wcswidth:([inp(num_chars)] wchar_t const *__restrict string, $size_t num_chars) -> int {
+	int temp, result = 0;
+	for (; num_chars; --num_chars, ++string) {
+		wchar_t ch = *string;
+		if (!ch)
+			break;
+		temp = wcwidth(ch);
+		if (temp < 0)
+			return temp;
+		result += temp;
+	}
+	return 0;
+}
 %#endif /* __USE_XOPEN */
 
 %
@@ -908,15 +934,15 @@ getwc_unlocked:([notnull] $FILE *__restrict stream) -> $wint_t = fgetwc_unlocked
 [section({.text.crt.wchar.FILE.unlocked.write.putc|.text.crt.dos.wchar.FILE.unlocked.write.putc})]
 putwc_unlocked:(wchar_t wc, [notnull] $FILE *__restrict stream) -> $wint_t = fputwc_unlocked;
 
-[cp_stdio][alias(_fgetwc_nolock)][wchar]
+[cp_stdio][export_alias(_fgetwc_nolock)][wchar]
 [section({.text.crt.wchar.FILE.unlocked.read.getc|.text.crt.dos.wchar.FILE.unlocked.read.getc})]
 fgetwc_unlocked:([notnull] $FILE *__restrict stream) -> $wint_t;
 
-[cp_stdio][alias(_fputwc_nolock)][wchar]
+[cp_stdio][export_alias(_fputwc_nolock)][wchar]
 [section({.text.crt.wchar.FILE.unlocked.write.putc|.text.crt.dos.wchar.FILE.unlocked.write.putc})]
 fputwc_unlocked:(wchar_t wc, [notnull] $FILE *__restrict stream) -> $wint_t;
 
-[cp_stdio][alias(fgetws)][alias(_fgetws_nolock)][wchar][dependency_include(<parts/errno.h>)][same_impl]
+[cp_stdio][alias(fgetws)][export_alias(_fgetws_nolock)][wchar][dependency_include(<parts/errno.h>)][same_impl]
 [section({.text.crt.wchar.FILE.unlocked.read.read|.text.crt.dos.wchar.FILE.unlocked.read.read})]
 [requires($has_function(fgetwc_unlocked) && $has_function(ungetwc_unlocked) && $has_function(ferror_unlocked))][same_impl]
 [impl_prefix(
@@ -967,7 +993,7 @@ fgetws_unlocked:([outp(bufsize)] wchar_t *__restrict buf, __STDC_INT_AS_SIZE_T b
 }
 
 [section({.text.crt.wchar.FILE.unlocked.write.write|.text.crt.dos.wchar.FILE.unlocked.write.write})]
-[cp_stdio][alias(_fputws_nolock)][wchar][same_impl][requires($has_function(file_wprinter_unlocked))]
+[cp_stdio][export_alias(_fputws_nolock)][wchar][same_impl][requires($has_function(file_wprinter_unlocked))]
 fputws_unlocked:([notnull] wchar_t const *__restrict string, [notnull] $FILE *__restrict stream) -> __STDC_INT_AS_SIZE_T {
 	__STDC_INT_AS_SIZE_T result;
 	result = file_wprinter_unlocked(stream, string, wcslen(string));
@@ -1042,8 +1068,9 @@ file_wprinter_unlocked:([nonnull] void *arg, [inp(datalen)] wchar_t const *__res
 }
 
 
+[alias(ungetwc)]
 [wchar][user][section({.text.crt.wchar.FILE.unlocked.write.putc|.text.crt.dos.wchar.FILE.unlocked.write.putc})]
-ungetwc_unlocked:($wint_t ch, [nonnull] $FILE *__restrict stream) -> $wint_t = ungetwc;
+ungetwc_unlocked:($wint_t ch, [nonnull] $FILE *__restrict stream) -> $wint_t;
 
 [cp_stdio][ATTR_LIBC_WPRINTF(2, 0)][wchar][requires($has_function(file_wprinter_unlocked))]
 [section({.text.crt.wchar.FILE.unlocked.write.printf|.text.crt.dos.wchar.FILE.unlocked.write.printf})][same_impl]
@@ -1070,17 +1097,26 @@ vwprintf_unlocked:([nonnull] wchar_t const *__restrict format, $va_list args) ->
 }
 
 %[default_impl_section({.text.crt.wchar.FILE.unlocked.read.scanf|.text.crt.dos.wchar.FILE.unlocked.read.scanf})]
-[cp_stdio][ATTR_WUNUSED][ATTR_LIBC_WSCANF(2, 0)][wchar]
-vfwscanf_unlocked:([nonnull] $FILE *__restrict stream, [nonnull] wchar_t const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T = vfwscanf;
+[cp_stdio][ATTR_WUNUSED][ATTR_LIBC_WSCANF(2, 0)][wchar][alias(vfwscanf)]
+vfwscanf_unlocked:([nonnull] $FILE *__restrict stream,
+                   [nonnull] wchar_t const *__restrict format, $va_list args)
+		-> __STDC_INT_AS_SIZE_T;
+/* TODO: Inline implementation for `vfwscanf_unlocked()' */
 
 [cp_stdio][ATTR_LIBC_SCANF(1, 0)][ATTR_WUNUSED][user][wchar]
-vwscanf_unlocked:([nonnull] wchar_t const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T = vwscanf;
+[requires($has_function(vfwscanf_unlocked) && !defined(__NO_STDSTREAMS))]
+[dependency_include(<local/stdstreams.h>)][same_impl]
+vwscanf_unlocked:([nonnull] wchar_t const *__restrict format, $va_list args) -> __STDC_INT_AS_SIZE_T {
+	return vfwscanf_unlocked(@__LOCAL_stdin@, format, args);
+}
 
 [cp_stdio][ATTR_LIBC_SCANF(2, 3)][ATTR_WUNUSED][user][wchar]
-fwscanf_unlocked:([nonnull] $FILE *__restrict stream, [nonnull] wchar_t const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T = fwscanf;
+fwscanf_unlocked:([nonnull] $FILE *__restrict stream, [nonnull] wchar_t const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T
+	%{auto_block(printf(vfwscanf_unlocked))}
 
 [cp_stdio][ATTR_LIBC_SCANF(1, 2)][ATTR_WUNUSED][user][wchar]
-wscanf_unlocked:([nonnull] wchar_t const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T = wscanf;
+wscanf_unlocked:([nonnull] wchar_t const *__restrict format, ...) -> __STDC_INT_AS_SIZE_T
+	%{auto_block(printf(vwscanf_unlocked))}
 
 
 %
@@ -1489,7 +1525,7 @@ wildwcscasecmp_l:([nonnull] wchar_t const *pattern, [nonnull] wchar_t const *str
 %#ifndef _WSTRING_DEFINED
 %#define _WSTRING_DEFINED 1
 
-[guard][attribute(*)][alias(*)] _wcsdup:(*) = wcsdup;
+[guard][attribute(*)][alias(*)][wchar] _wcsdup:(*) = wcsdup;
 
 %
 %#ifdef __USE_DOS_SLIB

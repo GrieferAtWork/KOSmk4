@@ -22,6 +22,7 @@
 #include "../api.h"
 /**/
 
+#include <bits/mbstate.h>
 #include <hybrid/atomic.h>
 #include <hybrid/sequence/list.h>
 #include <hybrid/sync/atomic-owner-rwlock.h>
@@ -31,8 +32,22 @@
 
 #include <libio.h>
 #include <assert.h>
+#include <stdint.h>
 
 DECL_BEGIN
+
+#undef EOF
+#undef WEOF
+#define EOF   (-1)
+#define EOF16 ((char16_t)UINT16_C(0xffff))
+#define EOF32 ((char32_t)UINT32_C(0xffffffff))
+
+
+
+#ifndef __mbstate_t_defined
+#define __mbstate_t_defined 1
+typedef __mbstate_t mbstate_t;
+#endif /* !__mbstate_t_defined */
 
 #undef __LOCAL_stdin
 #undef __LOCAL_stdout
@@ -123,8 +138,7 @@ struct iofile_data_novtab {
 	uintptr_t                  io_fver;   /* [lock(flushall_lock)] Last time that this file was flushed because of a global flush. */
 	pos64_t                    io_fblk;   /* The starting address of the data block currently stored in `if_base'. */
 	pos64_t                    io_fpos;   /* The current (assumed) position within the underlying file stream. */
-#undef IOFILE_HAVE_MBS
-//	mbstate_t                  io_mbs;    /* MB State used for translating unicode data. */
+	mbstate_t                  io_mbs;    /* MB State used for translating unicode data. */
 };
 #define IOFILE_DATA_NOVTAB_INIT()                    \
 	{                                                \
@@ -141,8 +155,8 @@ struct iofile_data_novtab {
 
 struct iofile_data: iofile_data_novtab {
 	/* All of the following fields only exist when `IO_HASVTAB' is set. */
-	cookie_io_functions_t      io_vtab; /* [const] File buffer */
-	void                      *io_magi; /* [const] Magic cook */
+	cookie_io_functions_t io_vtab; /* [const] File buffer */
+	void                 *io_magi; /* [const] Magic cook */
 };
 
 
@@ -231,6 +245,17 @@ INTDEF NONNULL((1)) pos64_t LIBCCALL file_seek(FILE *__restrict self, off64_t of
 INTDEF WUNUSED NONNULL((1)) int LIBCCALL file_getc(FILE *__restrict self);
 INTDEF WUNUSED NONNULL((1)) int LIBCCALL file_ungetc(FILE *__restrict self, unsigned char ch);
 INTDEF WUNUSED NONNULL((1)) int LIBCCALL file_truncate(FILE *__restrict self, pos64_t new_size);
+
+/* Unicode integration */
+INTDEF WUNUSED NONNULL((1)) char16_t LIBCCALL file_getc16(FILE *__restrict self);
+INTDEF WUNUSED NONNULL((1)) char16_t LIBCCALL file_ungetc16(FILE *__restrict self, char16_t ch);
+INTDEF WUNUSED NONNULL((1)) char32_t LIBCCALL file_getc32(FILE *__restrict self);
+INTDEF WUNUSED NONNULL((1)) char32_t LIBCCALL file_ungetc32(FILE *__restrict self, char32_t ch);
+
+/* 8/16/32-bit format-printers for FILE objects. */
+INTDEF WUNUSED NONNULL((1)) ssize_t LIBCCALL file_print16(void *self, char16_t const *__restrict data, size_t datalen);
+INTDEF WUNUSED NONNULL((1)) ssize_t LIBCCALL file_print32(void *self, char32_t const *__restrict data, size_t datalen);
+
 
 /* @param: poflags: When non-NULL, filled with `O_*'
  * @return: * :     Set of `IO_*' */

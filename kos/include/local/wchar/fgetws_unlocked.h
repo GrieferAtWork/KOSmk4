@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc8bddfda */
+/* HASH CRC-32:0xa4a631fe */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -48,7 +48,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferr
 #endif /* ferror_unlocked... */
 #endif /* !____localdep_ferror_unlocked_defined */
 
-/* Dependency: "ungetwc_unlocked" from "wchar" */
+/* Dependency: "ungetwc_unlocked" */
 #ifndef ____localdep_ungetwc_unlocked_defined
 #define ____localdep_ungetwc_unlocked_defined 1
 #if defined(__CRT_HAVE_ungetwc_unlocked)
@@ -72,7 +72,7 @@ __LOCAL_LIBC(fgetws_unlocked) __ATTR_NONNULL((1, 3)) __WCHAR_TYPE__ *
 (__LIBCCALL __LIBC_LOCAL_NAME(fgetws_unlocked))(__WCHAR_TYPE__ *__restrict __buf,
                                                 __STDC_INT_AS_SIZE_T __bufsize,
                                                 __FILE *__restrict __stream) __THROWS(...) {
-#line 932 "kos/src/libc/magic/wchar.c"
+#line 958 "kos/src/libc/magic/wchar.c"
 	__SIZE_TYPE__ __n;
 	if __unlikely(!__buf || !__bufsize) {
 		/* The buffer cannot be empty! */

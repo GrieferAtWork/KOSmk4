@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x76267687 */
+/* HASH CRC-32:0x55ed3ecd */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -192,19 +192,14 @@
 #define __CRT_STUB_fgetpwent_r 1
 #define __CRT_STUB_fgetspent 1
 #define __CRT_STUB_fgetspent_r 1
-#define __CRT_STUB_fgetwc 1
-#define __CRT_STUB_fgetwc_unlocked 1
 #define __CRT_STUB_fmod 1
 #define __CRT_STUB_fpathconf 1
 #define __CRT_STUB_fpreset 1
-#define __CRT_STUB_fputwc 1
-#define __CRT_STUB_fputwc_unlocked 1
 #define __CRT_STUB_freeaddrinfo 1
 #define __CRT_STUB_freeifaddrs 1
 #define __CRT_STUB_freelocale 1
 #define __CRT_STUB_frexp 1
 #define __CRT_STUB_ftok 1
-#define __CRT_STUB_fwscanf_unlocked 1
 #define __CRT_STUB_gai_cancel 1
 #define __CRT_STUB_gai_error 1
 #define __CRT_STUB_gai_strerror 1
@@ -636,8 +631,6 @@
 #define __CRT_STUB_ttyslot 1
 #define __CRT_STUB_tzset 1
 #define __CRT_STUB_ulckpwdf 1
-#define __CRT_STUB_ungetwc 1
-#define __CRT_STUB_ungetwc_unlocked 1
 #define __CRT_STUB_unlockpt 1
 #define __CRT_STUB_updwtmp 1
 #define __CRT_STUB_updwtmpx 1
@@ -645,16 +638,13 @@
 #define __CRT_STUB_utmpname 1
 #define __CRT_STUB_utmpxname 1
 #define __CRT_STUB_vfwscanf 1
+#define __CRT_STUB_vfwscanf_unlocked 1
 #define __CRT_STUB_vhangup 1
-#define __CRT_STUB_vwscanf_unlocked 1
 #define __CRT_STUB_wcsnrtombs 1
-#define __CRT_STUB_wcswidth 1
-#define __CRT_STUB_wcwidth 1
 #define __CRT_STUB_wfreadlinkat 1
 #define __CRT_STUB_wgetlogin 1
 #define __CRT_STUB_wgetlogin_r 1
 #define __CRT_STUB_writev 1
-#define __CRT_STUB_wscanf_unlocked 1
 #define __CRT_STUB_wttyname 1
 #define __CRT_STUB_wttyname_r 1
 #define __CRT_STUB_y0 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1aaf05dc */
+/* HASH CRC-32:0xb6047522 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1249,6 +1249,7 @@
 
 /* .text.crt.dos.wchar.FILE.unlocked.read.scanf.* */
 #define __CRT_DOS_SECTION_fwscanf_unlocked                  __CRT_SECTINFO_dos_wchar_FILE_unlocked_read_scanf       /* .text.crt.dos.wchar.FILE.unlocked.read.scanf.fwscanf_unlocked */
+#define __CRT_DOS_SECTION_vfwscanf_unlocked                 __CRT_SECTINFO_dos_wchar_FILE_unlocked_read_scanf       /* .text.crt.dos.wchar.FILE.unlocked.read.scanf.vfwscanf_unlocked */
 #define __CRT_DOS_SECTION_vwscanf_unlocked                  __CRT_SECTINFO_dos_wchar_FILE_unlocked_read_scanf       /* .text.crt.dos.wchar.FILE.unlocked.read.scanf.vwscanf_unlocked */
 #define __CRT_DOS_SECTION_wscanf_unlocked                   __CRT_SECTINFO_dos_wchar_FILE_unlocked_read_scanf       /* .text.crt.dos.wchar.FILE.unlocked.read.scanf.wscanf_unlocked */
 
@@ -3658,6 +3659,7 @@
 
 /* .text.crt.wchar.FILE.unlocked.read.scanf.* */
 #define __CRT_SECTION_fwscanf_unlocked                      __CRT_SECTINFO_wchar_FILE_unlocked_read_scanf           /* .text.crt.wchar.FILE.unlocked.read.scanf.fwscanf_unlocked */
+#define __CRT_SECTION_vfwscanf_unlocked                     __CRT_SECTINFO_wchar_FILE_unlocked_read_scanf           /* .text.crt.wchar.FILE.unlocked.read.scanf.vfwscanf_unlocked */
 #define __CRT_SECTION_vwscanf_unlocked                      __CRT_SECTINFO_wchar_FILE_unlocked_read_scanf           /* .text.crt.wchar.FILE.unlocked.read.scanf.vwscanf_unlocked */
 #define __CRT_SECTION_wscanf_unlocked                       __CRT_SECTINFO_wchar_FILE_unlocked_read_scanf           /* .text.crt.wchar.FILE.unlocked.read.scanf.wscanf_unlocked */
 

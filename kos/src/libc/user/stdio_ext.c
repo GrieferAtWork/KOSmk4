@@ -144,12 +144,14 @@ NOTHROW_NCX(LIBCCALL libc___fpurge)(FILE *fp)
 		fp->if_cnt  = 0;
 		ex->io_chng = fp->if_base;
 		ex->io_chsz = 0;
+		ex->io_mbs.__word = 0;
 		file_endwrite(fp);
 	} else {
 		fp->if_ptr += fp->if_cnt;
 		fp->if_cnt  = 0;
 		ex->io_chng = fp->if_base;
 		ex->io_chsz = 0;
+		ex->io_mbs.__word = 0;
 	}
 }
 /*[[[end:__fpurge]]]*/

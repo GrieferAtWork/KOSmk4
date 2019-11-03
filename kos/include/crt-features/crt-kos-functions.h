@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x655dae30 */
+/* HASH CRC-32:0x142dcea8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -3314,7 +3314,6 @@ __CRT_FAKE_FUNCTION(vfc32printf_unlocked,0,(),3,(FILE *__restrict,stream,char32_
 __CRT_FAKE_FUNCTION(vfc32scanf,0,(),3,(FILE *__restrict,stream,char32_t const *__restrict,format,va_list,args),__STDC_INT_AS_SIZE_T)
 __CRT_FAKE_FUNCTION(vfc32scanf_unlocked,0,(),3,(FILE *__restrict,stream,char32_t const *__restrict,format,va_list,args),__STDC_INT_AS_SIZE_T)
 __CRT_FAKE_FUNCTION(vfprintf_s,0,(),3,(FILE *__restrict,stream,char const *__restrict,format,va_list,args),__STDC_INT_AS_SIZE_T)
-__CRT_FAKE_FUNCTION(vfwscanf_unlocked,0,(),3,(FILE *__restrict,stream,char32_t const *__restrict,format,va_list,args),__STDC_INT_AS_SIZE_T)
 __CRT_FAKE_FUNCTION(vprintf_s,0,(),2,(char const *__restrict,format,va_list,args),__STDC_INT_AS_SIZE_T)
 __CRT_FAKE_FUNCTION(vsc16printf,0,(),4,(char16_t *__restrict,buf,size_t,buflen,char16_t const *__restrict,format,va_list,args),__STDC_INT_AS_SIZE_T)
 __CRT_FAKE_FUNCTION(vsc16scanf,0,(),3,(char16_t const *__restrict,src,char16_t const *__restrict,format,va_list,args),__STDC_INT_AS_SIZE_T)
@@ -3421,6 +3420,7 @@ __CRT_KOS_WCHAR_FUNCTION(ungetwc_unlocked,0,(),2,(wint_t,ch,FILE *__restrict,str
 __CRT_KOS_WCHAR_FUNCTION(vfwprintf,0,(),3,(FILE *__restrict,stream,char32_t const *__restrict,format,va_list,args),__STDC_INT_AS_SIZE_T)
 __CRT_KOS_WCHAR_FUNCTION(vfwprintf_unlocked,0,(),3,(FILE *__restrict,stream,char32_t const *__restrict,format,va_list,args),__STDC_INT_AS_SIZE_T)
 __CRT_KOS_WCHAR_FUNCTION(vfwscanf,0,(),3,(FILE *__restrict,stream,char32_t const *__restrict,format,va_list,args),__STDC_INT_AS_SIZE_T)
+__CRT_KOS_WCHAR_FUNCTION(vfwscanf_unlocked,0,(),3,(FILE *__restrict,stream,char32_t const *__restrict,format,va_list,args),__STDC_INT_AS_SIZE_T)
 __CRT_KOS_WCHAR_FUNCTION(vswprintf,0,(),4,(char32_t *__restrict,buf,size_t,buflen,char32_t const *__restrict,format,va_list,args),__STDC_INT_AS_SIZE_T)
 __CRT_KOS_WCHAR_FUNCTION(vswscanf,0,(),3,(char32_t const *__restrict,src,char32_t const *__restrict,format,va_list,args),__STDC_INT_AS_SIZE_T)
 __CRT_KOS_WCHAR_FUNCTION(vwprintf,0,(),2,(char32_t const *__restrict,format,va_list,args),__STDC_INT_AS_SIZE_T)
@@ -3680,6 +3680,7 @@ __CRT_DOS_WCHAR_FUNCTION(ungetwc_unlocked,0,(),2,(wint_t,ch,FILE *__restrict,str
 __CRT_DOS_WCHAR_FUNCTION(vfwprintf,0,(),3,(FILE *__restrict,stream,char16_t const *__restrict,format,va_list,args),__STDC_INT_AS_SIZE_T)
 __CRT_DOS_WCHAR_FUNCTION(vfwprintf_unlocked,0,(),3,(FILE *__restrict,stream,char16_t const *__restrict,format,va_list,args),__STDC_INT_AS_SIZE_T)
 __CRT_DOS_WCHAR_FUNCTION(vfwscanf,0,(),3,(FILE *__restrict,stream,char16_t const *__restrict,format,va_list,args),__STDC_INT_AS_SIZE_T)
+__CRT_DOS_WCHAR_FUNCTION(vfwscanf_unlocked,0,(),3,(FILE *__restrict,stream,char16_t const *__restrict,format,va_list,args),__STDC_INT_AS_SIZE_T)
 __CRT_DOS_WCHAR_FUNCTION(vswprintf,0,(),4,(char16_t *__restrict,buf,size_t,buflen,char16_t const *__restrict,format,va_list,args),__STDC_INT_AS_SIZE_T)
 __CRT_DOS_WCHAR_FUNCTION(vswscanf,0,(),3,(char16_t const *__restrict,src,char16_t const *__restrict,format,va_list,args),__STDC_INT_AS_SIZE_T)
 __CRT_DOS_WCHAR_FUNCTION(vwprintf,0,(),2,(char16_t const *__restrict,format,va_list,args),__STDC_INT_AS_SIZE_T)
