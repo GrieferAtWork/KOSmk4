@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa8b438fa */
+/* HASH CRC-32:0x7494f30c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -622,6 +622,8 @@
 #define __stub_srand48 1
 #define __stub_srand48_r 1
 #define __stub_srandom_r 1
+#define __stub_strfmon 1
+#define __stub_strfmon_l 1
 #define __stub_stty 1
 #define __stub_swapcontext 1
 #define __stub_tan 1

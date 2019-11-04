@@ -130,12 +130,13 @@
 #define THROWS __THROWS
 #endif
 
-#define ATTR_LIBC_PRINTF(a,b)    __ATTR_LIBC_PRINTF(a,b)
-#define ATTR_LIBC_PRINTF_P(a,b)  __ATTR_LIBC_PRINTF_P(a,b)
-#define ATTR_LIBC_SCANF(a,b)     __ATTR_LIBC_SCANF(a,b)
-#define ATTR_LIBC_WPRINTF(a,b)   __ATTR_LIBC_WPRINTF(a,b)
-#define ATTR_LIBC_WPRINTF_P(a,b) __ATTR_LIBC_WPRINTF_P(a,b)
-#define ATTR_LIBC_WSCANF(a,b)    __ATTR_LIBC_WSCANF(a,b)
+#define ATTR_LIBC_PRINTF(a, b)    __ATTR_LIBC_PRINTF(a, b)
+#define ATTR_LIBC_PRINTF_P(a, b)  __ATTR_LIBC_PRINTF_P(a, b)
+#define ATTR_LIBC_SCANF(a, b)     __ATTR_LIBC_SCANF(a, b)
+#define ATTR_LIBC_STRFMON(a, b)   __ATTR_LIBC_STRFMON(a, b)
+#define ATTR_LIBC_WPRINTF(a, b)   __ATTR_LIBC_WPRINTF(a, b)
+#define ATTR_LIBC_WPRINTF_P(a, b) __ATTR_LIBC_WPRINTF_P(a, b)
+#define ATTR_LIBC_WSCANF(a, b)    __ATTR_LIBC_WSCANF(a, b)
 
 #include <ctype.h>
 

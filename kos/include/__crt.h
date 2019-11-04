@@ -190,12 +190,13 @@
 #endif
 
 
-#define __ATTR_LIBC_PRINTF(a,b)    /* nothing */
-#define __ATTR_LIBC_PRINTF_P(a,b)  /* nothing */
-#define __ATTR_LIBC_SCANF(a,b)     /* nothing */
-#define __ATTR_LIBC_WPRINTF(a,b)   /* nothing */
-#define __ATTR_LIBC_WPRINTF_P(a,b) /* nothing */
-#define __ATTR_LIBC_WSCANF(a,b)    /* nothing */
+#define __ATTR_LIBC_PRINTF(a, b)    /* nothing */
+#define __ATTR_LIBC_PRINTF_P(a, b)  /* nothing */
+#define __ATTR_LIBC_SCANF(a, b)     /* nothing */
+#define __ATTR_LIBC_STRFMON(a, b)   /* nothing */
+#define __ATTR_LIBC_WPRINTF(a, b)   /* nothing */
+#define __ATTR_LIBC_WPRINTF_P(a, b) /* nothing */
+#define __ATTR_LIBC_WSCANF(a, b)    /* nothing */
 
 #ifndef __LIBC_MALLOC_ALIGNMENT
 #include <hybrid/typecore.h>

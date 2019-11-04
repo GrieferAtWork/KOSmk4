@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8c85f087 */
+/* HASH CRC-32:0x9d658ebb */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -2062,6 +2062,8 @@ __CRT_FUNCTION(strerror,0,(),1,(int,errnum),char *)
 __CRT_FUNCTION(strerror_l,0,(),2,(int,errnum,locale_t,locale),char *)
 __CRT_FUNCTION(strerror_s,0,(),1,(int,errnum),char const *)
 __CRT_FUNCTION(strerrorname_s,0,(),1,(int,errnum),char const *)
+__CRT_FUNCTION(strfmon,0,(),VA(3),(char *__restrict,s,size_t,maxsize,char const *__restrict,format),ssize_t)
+__CRT_FUNCTION(strfmon_l,0,(),VA(4),(char *__restrict,s,size_t,maxsize,locale_t,loc,const char *__restrict,format),ssize_t)
 __CRT_FUNCTION(strfry,0,(),1,(char *__restrict,string),char *)
 __CRT_FUNCTION(strftime,0,(),4,(char *__restrict,buf,size_t,bufsize,char const *__restrict,format,__STRUCT_TM const *__restrict,tp),size_t)
 __CRT_FUNCTION(strftime_l,0,(),5,(char *__restrict,buf,size_t,bufsize,char const *__restrict,format,__STRUCT_TM const *__restrict,tp,locale_t,locale),size_t)

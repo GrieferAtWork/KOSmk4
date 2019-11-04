@@ -261,7 +261,7 @@
 	CB(PREFIX.database.utmpx.*) \
 	CB(PREFIX.io.stropts.*) \
 	CB(PREFIX.obstack.*) \
-	CB(PREFIX.utility.glob.* PREFIX.utility.klog.* PREFIX.utility.regex.* PREFIX.utility.search.* PREFIX.utility.shm.* PREFIX.utility.stdlib.*) \
+	CB(PREFIX.utility.glob.* PREFIX.utility.klog.* PREFIX.utility.monetary.* PREFIX.utility.regex.* PREFIX.utility.search.* PREFIX.utility.shm.* PREFIX.utility.stdlib.*) \
 	CB(PREFIX.system.*) \
 	CB(PREFIX.sched.resource.*) \
 	CB(PREFIX.sched.msg.*) \

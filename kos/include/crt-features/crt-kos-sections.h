@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe144c9ec */
+/* HASH CRC-32:0x66eb1a0f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -259,45 +259,46 @@
 #define __CRT_SECTINFO_unsorted                                 (237, .unsorted, unsorted)
 #define __CRT_SECTINFO_utility_glob                             (238, .utility.glob, utility_glob)
 #define __CRT_SECTINFO_utility_klog                             (239, .utility.klog, utility_klog)
-#define __CRT_SECTINFO_utility_regex                            (240, .utility.regex, utility_regex)
-#define __CRT_SECTINFO_utility_search                           (241, .utility.search, utility_search)
-#define __CRT_SECTINFO_utility_shm                              (242, .utility.shm, utility_shm)
-#define __CRT_SECTINFO_utility_stdlib                           (243, .utility.stdlib, utility_stdlib)
-#define __CRT_SECTINFO_wchar_FILE_locked_access                 (244, .wchar.FILE.locked.access, wchar_FILE_locked_access)
-#define __CRT_SECTINFO_wchar_FILE_locked_read_getc              (245, .wchar.FILE.locked.read.getc, wchar_FILE_locked_read_getc)
-#define __CRT_SECTINFO_wchar_FILE_locked_read_read              (246, .wchar.FILE.locked.read.read, wchar_FILE_locked_read_read)
-#define __CRT_SECTINFO_wchar_FILE_locked_read_scanf             (247, .wchar.FILE.locked.read.scanf, wchar_FILE_locked_read_scanf)
-#define __CRT_SECTINFO_wchar_FILE_locked_utility                (248, .wchar.FILE.locked.utility, wchar_FILE_locked_utility)
-#define __CRT_SECTINFO_wchar_FILE_locked_write_printf           (249, .wchar.FILE.locked.write.printf, wchar_FILE_locked_write_printf)
-#define __CRT_SECTINFO_wchar_FILE_locked_write_putc             (250, .wchar.FILE.locked.write.putc, wchar_FILE_locked_write_putc)
-#define __CRT_SECTINFO_wchar_FILE_locked_write_write            (251, .wchar.FILE.locked.write.write, wchar_FILE_locked_write_write)
-#define __CRT_SECTINFO_wchar_FILE_unlocked_read_getc            (252, .wchar.FILE.unlocked.read.getc, wchar_FILE_unlocked_read_getc)
-#define __CRT_SECTINFO_wchar_FILE_unlocked_read_read            (253, .wchar.FILE.unlocked.read.read, wchar_FILE_unlocked_read_read)
-#define __CRT_SECTINFO_wchar_FILE_unlocked_read_scanf           (254, .wchar.FILE.unlocked.read.scanf, wchar_FILE_unlocked_read_scanf)
-#define __CRT_SECTINFO_wchar_FILE_unlocked_write_printf         (255, .wchar.FILE.unlocked.write.printf, wchar_FILE_unlocked_write_printf)
-#define __CRT_SECTINFO_wchar_FILE_unlocked_write_putc           (256, .wchar.FILE.unlocked.write.putc, wchar_FILE_unlocked_write_putc)
-#define __CRT_SECTINFO_wchar_FILE_unlocked_write_write          (257, .wchar.FILE.unlocked.write.write, wchar_FILE_unlocked_write_write)
-#define __CRT_SECTINFO_wchar_fs_exec_exec                       (258, .wchar.fs.exec.exec, wchar_fs_exec_exec)
-#define __CRT_SECTINFO_wchar_fs_exec_spawn                      (259, .wchar.fs.exec.spawn, wchar_fs_exec_spawn)
-#define __CRT_SECTINFO_wchar_fs_exec_system                     (260, .wchar.fs.exec.system, wchar_fs_exec_system)
-#define __CRT_SECTINFO_wchar_fs_modify                          (261, .wchar.fs.modify, wchar_fs_modify)
-#define __CRT_SECTINFO_wchar_fs_modify_time                     (262, .wchar.fs.modify_time, wchar_fs_modify_time)
-#define __CRT_SECTINFO_wchar_heap_strdup                        (263, .wchar.heap.strdup, wchar_heap_strdup)
-#define __CRT_SECTINFO_wchar_string_format                      (264, .wchar.string.format, wchar_string_format)
-#define __CRT_SECTINFO_wchar_string_memory                      (265, .wchar.string.memory, wchar_string_memory)
-#define __CRT_SECTINFO_wchar_unicode_convert                    (266, .wchar.unicode.convert, wchar_unicode_convert)
-#define __CRT_SECTINFO_wchar_unicode_locale_convert             (267, .wchar.unicode.locale.convert, wchar_unicode_locale_convert)
-#define __CRT_SECTINFO_wchar_unicode_locale_ctype               (268, .wchar.unicode.locale.ctype, wchar_unicode_locale_ctype)
-#define __CRT_SECTINFO_wchar_unicode_locale_format_strftime     (269, .wchar.unicode.locale.format.strftime, wchar_unicode_locale_format_strftime)
-#define __CRT_SECTINFO_wchar_unicode_locale_mbs                 (270, .wchar.unicode.locale.mbs, wchar_unicode_locale_mbs)
-#define __CRT_SECTINFO_wchar_unicode_locale_memory              (271, .wchar.unicode.locale.memory, wchar_unicode_locale_memory)
-#define __CRT_SECTINFO_wchar_unicode_static_convert             (272, .wchar.unicode.static.convert, wchar_unicode_static_convert)
-#define __CRT_SECTINFO_wchar_unicode_static_ctype               (273, .wchar.unicode.static.ctype, wchar_unicode_static_ctype)
-#define __CRT_SECTINFO_wchar_unicode_static_format_printf       (274, .wchar.unicode.static.format.printf, wchar_unicode_static_format_printf)
-#define __CRT_SECTINFO_wchar_unicode_static_format_scanf        (275, .wchar.unicode.static.format.scanf, wchar_unicode_static_format_scanf)
-#define __CRT_SECTINFO_wchar_unicode_static_format_strftime     (276, .wchar.unicode.static.format.strftime, wchar_unicode_static_format_strftime)
-#define __CRT_SECTINFO_wchar_unicode_static_mbs                 (277, .wchar.unicode.static.mbs, wchar_unicode_static_mbs)
-#define __CRT_SECTINFO_wchar_unicode_static_memory              (278, .wchar.unicode.static.memory, wchar_unicode_static_memory)
+#define __CRT_SECTINFO_utility_monetary                         (240, .utility.monetary, utility_monetary)
+#define __CRT_SECTINFO_utility_regex                            (241, .utility.regex, utility_regex)
+#define __CRT_SECTINFO_utility_search                           (242, .utility.search, utility_search)
+#define __CRT_SECTINFO_utility_shm                              (243, .utility.shm, utility_shm)
+#define __CRT_SECTINFO_utility_stdlib                           (244, .utility.stdlib, utility_stdlib)
+#define __CRT_SECTINFO_wchar_FILE_locked_access                 (245, .wchar.FILE.locked.access, wchar_FILE_locked_access)
+#define __CRT_SECTINFO_wchar_FILE_locked_read_getc              (246, .wchar.FILE.locked.read.getc, wchar_FILE_locked_read_getc)
+#define __CRT_SECTINFO_wchar_FILE_locked_read_read              (247, .wchar.FILE.locked.read.read, wchar_FILE_locked_read_read)
+#define __CRT_SECTINFO_wchar_FILE_locked_read_scanf             (248, .wchar.FILE.locked.read.scanf, wchar_FILE_locked_read_scanf)
+#define __CRT_SECTINFO_wchar_FILE_locked_utility                (249, .wchar.FILE.locked.utility, wchar_FILE_locked_utility)
+#define __CRT_SECTINFO_wchar_FILE_locked_write_printf           (250, .wchar.FILE.locked.write.printf, wchar_FILE_locked_write_printf)
+#define __CRT_SECTINFO_wchar_FILE_locked_write_putc             (251, .wchar.FILE.locked.write.putc, wchar_FILE_locked_write_putc)
+#define __CRT_SECTINFO_wchar_FILE_locked_write_write            (252, .wchar.FILE.locked.write.write, wchar_FILE_locked_write_write)
+#define __CRT_SECTINFO_wchar_FILE_unlocked_read_getc            (253, .wchar.FILE.unlocked.read.getc, wchar_FILE_unlocked_read_getc)
+#define __CRT_SECTINFO_wchar_FILE_unlocked_read_read            (254, .wchar.FILE.unlocked.read.read, wchar_FILE_unlocked_read_read)
+#define __CRT_SECTINFO_wchar_FILE_unlocked_read_scanf           (255, .wchar.FILE.unlocked.read.scanf, wchar_FILE_unlocked_read_scanf)
+#define __CRT_SECTINFO_wchar_FILE_unlocked_write_printf         (256, .wchar.FILE.unlocked.write.printf, wchar_FILE_unlocked_write_printf)
+#define __CRT_SECTINFO_wchar_FILE_unlocked_write_putc           (257, .wchar.FILE.unlocked.write.putc, wchar_FILE_unlocked_write_putc)
+#define __CRT_SECTINFO_wchar_FILE_unlocked_write_write          (258, .wchar.FILE.unlocked.write.write, wchar_FILE_unlocked_write_write)
+#define __CRT_SECTINFO_wchar_fs_exec_exec                       (259, .wchar.fs.exec.exec, wchar_fs_exec_exec)
+#define __CRT_SECTINFO_wchar_fs_exec_spawn                      (260, .wchar.fs.exec.spawn, wchar_fs_exec_spawn)
+#define __CRT_SECTINFO_wchar_fs_exec_system                     (261, .wchar.fs.exec.system, wchar_fs_exec_system)
+#define __CRT_SECTINFO_wchar_fs_modify                          (262, .wchar.fs.modify, wchar_fs_modify)
+#define __CRT_SECTINFO_wchar_fs_modify_time                     (263, .wchar.fs.modify_time, wchar_fs_modify_time)
+#define __CRT_SECTINFO_wchar_heap_strdup                        (264, .wchar.heap.strdup, wchar_heap_strdup)
+#define __CRT_SECTINFO_wchar_string_format                      (265, .wchar.string.format, wchar_string_format)
+#define __CRT_SECTINFO_wchar_string_memory                      (266, .wchar.string.memory, wchar_string_memory)
+#define __CRT_SECTINFO_wchar_unicode_convert                    (267, .wchar.unicode.convert, wchar_unicode_convert)
+#define __CRT_SECTINFO_wchar_unicode_locale_convert             (268, .wchar.unicode.locale.convert, wchar_unicode_locale_convert)
+#define __CRT_SECTINFO_wchar_unicode_locale_ctype               (269, .wchar.unicode.locale.ctype, wchar_unicode_locale_ctype)
+#define __CRT_SECTINFO_wchar_unicode_locale_format_strftime     (270, .wchar.unicode.locale.format.strftime, wchar_unicode_locale_format_strftime)
+#define __CRT_SECTINFO_wchar_unicode_locale_mbs                 (271, .wchar.unicode.locale.mbs, wchar_unicode_locale_mbs)
+#define __CRT_SECTINFO_wchar_unicode_locale_memory              (272, .wchar.unicode.locale.memory, wchar_unicode_locale_memory)
+#define __CRT_SECTINFO_wchar_unicode_static_convert             (273, .wchar.unicode.static.convert, wchar_unicode_static_convert)
+#define __CRT_SECTINFO_wchar_unicode_static_ctype               (274, .wchar.unicode.static.ctype, wchar_unicode_static_ctype)
+#define __CRT_SECTINFO_wchar_unicode_static_format_printf       (275, .wchar.unicode.static.format.printf, wchar_unicode_static_format_printf)
+#define __CRT_SECTINFO_wchar_unicode_static_format_scanf        (276, .wchar.unicode.static.format.scanf, wchar_unicode_static_format_scanf)
+#define __CRT_SECTINFO_wchar_unicode_static_format_strftime     (277, .wchar.unicode.static.format.strftime, wchar_unicode_static_format_strftime)
+#define __CRT_SECTINFO_wchar_unicode_static_mbs                 (278, .wchar.unicode.static.mbs, wchar_unicode_static_mbs)
+#define __CRT_SECTINFO_wchar_unicode_static_memory              (279, .wchar.unicode.static.memory, wchar_unicode_static_memory)
 #define __CRT_ENUMERATE_SECTIONS(CB) \
 	CB(__CRT_SECTINFO_FILE_core_read)                           \
 	CB(__CRT_SECTINFO_FILE_core_seek)                           \
@@ -539,6 +540,7 @@
 	CB(__CRT_SECTINFO_unsorted)                                 \
 	CB(__CRT_SECTINFO_utility_glob)                             \
 	CB(__CRT_SECTINFO_utility_klog)                             \
+	CB(__CRT_SECTINFO_utility_monetary)                         \
 	CB(__CRT_SECTINFO_utility_regex)                            \
 	CB(__CRT_SECTINFO_utility_search)                           \
 	CB(__CRT_SECTINFO_utility_shm)                              \
@@ -3707,6 +3709,10 @@
 
 /* .text.crt.utility.klog.* */
 #define __CRT_SECTION_klogctl                               __CRT_SECTINFO_utility_klog                             /* .text.crt.utility.klog.klogctl */
+
+/* .text.crt.utility.monetary.* */
+#define __CRT_SECTION_strfmon_l                             __CRT_SECTINFO_utility_monetary                         /* .text.crt.utility.monetary.strfmon_l */
+#define __CRT_SECTION_strfmon                               __CRT_SECTINFO_utility_monetary                         /* .text.crt.utility.monetary.strfmon */
 
 /* .text.crt.utility.regex.* */
 #define __CRT_SECTION_re_compile_fastmap                    __CRT_SECTINFO_utility_regex                            /* .text.crt.utility.regex.re_compile_fastmap */
