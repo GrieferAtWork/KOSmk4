@@ -34,9 +34,9 @@
 # prefix, before later being added to the back of the previous sections list
 # Rules that appear on the same line are interchangeable/interleaved
 	@REPEAT    .wchar*
+	@REPEAT    .except*
 	@REPEAT    .dos*
 	@REPEAT    .dos.wchar*
-	@REPEAT    .except*
 
 
 # Core-application components
@@ -169,6 +169,7 @@
 	.sched.msg*                       # <sys/msg.h>
 	.string.encrypt*                  # String encryption
 	.string.match*                    # String matching functions
+	.string.argz*                     # <argz.h>
 	.unsorted*                        # Everything else...
 
 ]]]*/
@@ -225,7 +226,7 @@
 	CB(PREFIX.fs.dir.*) \
 	CB(PREFIX.fs.stat_glc.* PREFIX.fs.stat.*) \
 	CB(PREFIX.fs.utility.*) \
-	CB(PREFIX.string.memory.* PREFIX.string.argz.*) \
+	CB(PREFIX.string.memory.*) \
 	CB(PREFIX.unicode.UTF.*) \
 	CB(PREFIX.unicode.static.memory.*) \
 	CB(PREFIX.unicode.static.ctype.*) \
@@ -267,6 +268,7 @@
 	CB(PREFIX.sched.msg.*) \
 	CB(PREFIX.string.encrypt.*) \
 	CB(PREFIX.string.match.*) \
+	CB(PREFIX.string.argz.*) \
 	CB(PREFIX.unsorted.*) \
 	CB(PREFIX.wchar.fs.exec.exec.*) \
 	CB(PREFIX.wchar.heap.strdup.*) \
@@ -301,6 +303,21 @@
 	CB(PREFIX.wchar.unicode.locale.mbs.*) \
 	CB(PREFIX.wchar.unicode.convert.*) \
 	CB(PREFIX.wchar.fs.modify_time.*) \
+	CB(PREFIX.except.sched.access.* PREFIX.except.fs.exec.exec.*) \
+	CB(PREFIX.except.sched.param.*) \
+	CB(PREFIX.except.sched.process.*) \
+	CB(PREFIX.except.sched.user.*) \
+	CB(PREFIX.except.heap.malloc.*) \
+	CB(PREFIX.except.heap.rare_helpers.*) \
+	CB(PREFIX.except.io.large.read.* PREFIX.except.io.large.write.* PREFIX.except.io.read.* PREFIX.except.io.write.*) \
+	CB(PREFIX.except.io.access.*) \
+	CB(PREFIX.except.io.large.seek.* PREFIX.except.io.seek.* PREFIX.except.io.sync.* PREFIX.except.io.utility.*) \
+	CB(PREFIX.except.fs.property.* PREFIX.except.fs.basic_property.*) \
+	CB(PREFIX.except.fs.modify.*) \
+	CB(PREFIX.except.fs.stat.*) \
+	CB(PREFIX.except.fs.utility.*) \
+	CB(PREFIX.except.fs.modify_time.*) \
+	CB(PREFIX.except.system.utility.* PREFIX.except.system.configuration.*) \
 	CB(PREFIX.dos.application.init.*) \
 	CB(PREFIX.dos.sched.thread.*) \
 	CB(PREFIX.dos.sched.signal.*) \
@@ -365,21 +382,6 @@
 	CB(PREFIX.dos.wchar.unicode.convert.*) \
 	CB(PREFIX.dos.wchar.fs.modify_time.*) \
 	CB(PREFIX.dos.wchar.errno.utility.* PREFIX.dos.wchar.errno.*) \
-	CB(PREFIX.except.sched.access.* PREFIX.except.fs.exec.exec.*) \
-	CB(PREFIX.except.sched.param.*) \
-	CB(PREFIX.except.sched.process.*) \
-	CB(PREFIX.except.sched.user.*) \
-	CB(PREFIX.except.heap.malloc.*) \
-	CB(PREFIX.except.heap.rare_helpers.*) \
-	CB(PREFIX.except.io.large.read.* PREFIX.except.io.large.write.* PREFIX.except.io.read.* PREFIX.except.io.write.*) \
-	CB(PREFIX.except.io.access.*) \
-	CB(PREFIX.except.io.large.seek.* PREFIX.except.io.seek.* PREFIX.except.io.sync.* PREFIX.except.io.utility.*) \
-	CB(PREFIX.except.fs.property.* PREFIX.except.fs.basic_property.*) \
-	CB(PREFIX.except.fs.modify.*) \
-	CB(PREFIX.except.fs.stat.*) \
-	CB(PREFIX.except.fs.utility.*) \
-	CB(PREFIX.except.fs.modify_time.*) \
-	CB(PREFIX.except.system.utility.* PREFIX.except.system.configuration.*) \
 /**/
 //[[[end]]]
 
