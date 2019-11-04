@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x10293bed */
+/* HASH CRC-32:0x7f0293ce */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -90,7 +90,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,sem_timedwait,(sem_t *__rest
 #elif defined(__CRT_HAVE_sem_timedwait64) && (defined(__USE_TIME_BITS64))
 /* Similar to `sem_wait' but wait only until ABSTIME */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,sem_timedwait,(sem_t *__restrict __sem, struct timespec const *__restrict __abstime),sem_timedwait64,(__sem,__abstime))
-#elif (defined(__CRT_HAVE_sem_timedwait) || defined(__CRT_HAVE_sem_timedwait64))
+#elif defined(__CRT_HAVE_sem_timedwait) || defined(__CRT_HAVE_sem_timedwait64)
 #include <local/semaphore/sem_timedwait.h>
 /* Similar to `sem_wait' but wait only until ABSTIME */
 __NAMESPACE_LOCAL_USING_OR_IMPL(sem_timedwait, __FORCELOCAL __ATTR_NONNULL((1, 2)) int __NOTHROW_RPC(__LIBCCALL sem_timedwait)(sem_t *__restrict __sem, struct timespec const *__restrict __abstime) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sem_timedwait))(__sem, __abstime); })

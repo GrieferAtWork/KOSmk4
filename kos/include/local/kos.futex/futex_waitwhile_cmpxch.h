@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe4ecae59 */
+/* HASH CRC-32:0x58eb379e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_futex_waitwhile_cmpxch_defined
-#if (defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex))
+#if defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 #define __local_futex_waitwhile_cmpxch_defined 1
 #include <bits/types.h>
 #include <bits/types.h>
@@ -120,5 +120,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futex_waitwhile_cmpxch))(__uintptr_t 
 	return __localdep_lfutex64(__uaddr, LFUTEX_WAIT_WHILE_CMPXCH, __old_value, (struct __timespec64 const *)__NULLPTR, __new_value);
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)) */
+#endif /* defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex) */
 #endif /* !__local_futex_waitwhile_cmpxch_defined */

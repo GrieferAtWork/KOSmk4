@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x19f0ac89 */
+/* HASH CRC-32:0x218e90f3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_futex_timedwaitwhile_defined
-#if (defined(__CRT_HAVE_lfutex) || defined(__CRT_HAVE_lfutex64))
+#if defined(__CRT_HAVE_lfutex) || defined(__CRT_HAVE_lfutex64)
 #define __local_futex_timedwaitwhile_defined 1
 #include <bits/types.h>
 #include <bits/types.h>
@@ -76,7 +76,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfutex,(
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
 __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_lfutex,(__uintptr_t *__uaddr, __syscall_ulong_t __futex_op, __uintptr_t __val, /*struct timespec const *timeout, lfutex_t val2*/...),lfutex,(__uaddr,__futex_op,__val,))
-#elif (defined(__CRT_HAVE_lfutex) || defined(__CRT_HAVE_lfutex64))
+#elif defined(__CRT_HAVE_lfutex) || defined(__CRT_HAVE_lfutex64)
 #include <local/kos.futex/lfutex.h>
 /* >> lfutex(2)
  * Provide the bottom-most API for implementing user-space synchronization on KOS
@@ -121,5 +121,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futex_timedwaitwhile))(__uintptr_t *_
 	return __localdep_lfutex(__uaddr, LFUTEX_WAIT_WHILE, __equal_to_value, __rel_timeout);
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_lfutex) || defined(__CRT_HAVE_lfutex64)) */
+#endif /* defined(__CRT_HAVE_lfutex) || defined(__CRT_HAVE_lfutex64) */
 #endif /* !__local_futex_timedwaitwhile_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7595fade */
+/* HASH CRC-32:0x1ca80704 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fftruncate64_unlocked_defined
-#if ((defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE__chsize)) || defined(__CRT_HAVE_ftruncate64) || (defined(__CRT_HAVE_ftruncate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || defined(__CRT_HAVE__chsize_s)) && (defined(__CRT_HAVE_fileno_unlocked) || defined(__CRT_HAVE__fileno) || defined(__CRT_HAVE_fileno))
+#if (defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE__chsize) || defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s)) && (defined(__CRT_HAVE_fileno_unlocked) || defined(__CRT_HAVE__fileno) || defined(__CRT_HAVE_fileno))
 #define __local_fftruncate64_unlocked_defined 1
 #include <kos/anno.h>
 /* Dependency: "fileno_unlocked" from "stdio" */
@@ -53,7 +53,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate64,(__fd_t __fd, __PIO_OFFSET
 /* >> ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate64,(__fd_t __fd, __PIO_OFFSET64 __length),_chsize_s,(__fd,__length))
-#elif (defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE__chsize))
+#elif defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE__chsize)
 #include <local/unistd/ftruncate64.h>
 /* >> ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
@@ -86,5 +86,5 @@ __LOCAL_LIBC(fftruncate64_unlocked) __ATTR_NONNULL((1)) int
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE__chsize)) || defined(__CRT_HAVE_ftruncate64) || (defined(__CRT_HAVE_ftruncate) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__) || defined(__CRT_HAVE__chsize_s)) && (defined(__CRT_HAVE_fileno_unlocked) || defined(__CRT_HAVE__fileno) || defined(__CRT_HAVE_fileno)) */
+#endif /* (defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE__chsize) || defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s)) && (defined(__CRT_HAVE_fileno_unlocked) || defined(__CRT_HAVE__fileno) || defined(__CRT_HAVE_fileno)) */
 #endif /* !__local_fftruncate64_unlocked_defined */

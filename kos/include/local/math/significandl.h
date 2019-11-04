@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x97dafd99 */
+/* HASH CRC-32:0xfd53c42a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_significandl_defined
-#if ((__has_builtin(__builtin_significand) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_significand)) || defined(__CRT_HAVE_significand) || defined(__CRT_HAVE___significand))
+#if defined(__CRT_HAVE_significand) || defined(__CRT_HAVE___significand)
 #define __local_significandl_defined 1
 /* Dependency: "significand" */
 #ifndef ____localdep_significand_defined
@@ -45,5 +45,5 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(significandl))(long double __x) {
 	return (long double)__localdep_significand((double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((__has_builtin(__builtin_significand) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_significand)) || defined(__CRT_HAVE_significand) || defined(__CRT_HAVE___significand)) */
+#endif /* defined(__CRT_HAVE_significand) || defined(__CRT_HAVE___significand) */
 #endif /* !__local_significandl_defined */

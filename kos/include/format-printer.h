@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x72dbedd4 */
+/* HASH CRC-32:0xd05deb81 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -760,7 +760,7 @@ struct format_aprintf_data {
  *                  printed to the aprintf-printer at one point.
  *                  (e.g. `format_aprintf_printer(&my_printer, "\0", 1)') */
 __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,format_aprintf_pack,(struct format_aprintf_data *__restrict __self, __SIZE_TYPE__ *__pstrlen),(__self,__pstrlen))
-#elif (__has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_realloc)) || defined(__CRT_HAVE_realloc)
+#elif defined(__CRT_HAVE_realloc)
 #include <local/format-printer/format_aprintf_pack.h>
 /* Pack and finalize a given aprintf format printer
  * Together with `format_aprintf_printer()', the aprintf
@@ -787,7 +787,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_aprintf_pack, __FORCELOCAL __ATTR_MALLOC 
 #if defined(__CRT_HAVE_format_aprintf_printer)
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_aprintf_printer,(/*struct format_aprintf_data **/void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen),(__arg,__data,__datalen))
-#elif (__has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_realloc)) || defined(__CRT_HAVE_realloc)
+#elif defined(__CRT_HAVE_realloc)
 #include <local/format-printer/format_aprintf_printer.h>
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_aprintf_printer, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_aprintf_printer)(/*struct format_aprintf_data **/void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_aprintf_printer))(__arg, __data, __datalen); })

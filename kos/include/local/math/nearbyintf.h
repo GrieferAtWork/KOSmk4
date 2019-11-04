@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc649cf92 */
+/* HASH CRC-32:0x4eacf095 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_nearbyintf_defined
-#if ((__has_builtin(__builtin_nearbyint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nearbyint)) || defined(__CRT_HAVE_nearbyint) || defined(__CRT_HAVE___nearbyint))
+#if defined(__CRT_HAVE_nearbyint) || defined(__CRT_HAVE___nearbyint)
 #define __local_nearbyintf_defined 1
 /* Dependency: "nearbyint" */
 #ifndef ____localdep_nearbyint_defined
@@ -49,5 +49,5 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(nearbyintf))(float __x) {
 	return (float)__localdep_nearbyint((double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((__has_builtin(__builtin_nearbyint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nearbyint)) || defined(__CRT_HAVE_nearbyint) || defined(__CRT_HAVE___nearbyint)) */
+#endif /* defined(__CRT_HAVE_nearbyint) || defined(__CRT_HAVE___nearbyint) */
 #endif /* !__local_nearbyintf_defined */

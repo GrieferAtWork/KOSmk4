@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe99ce805 */
+/* HASH CRC-32:0xa288f29d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_file_c16printer_unlocked_defined
-#if (defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE__fputwc_nolock))
+#if defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE__fputwc_nolock)
 #define __local_file_c16printer_unlocked_defined 1
 #include <kos/anno.h>
 /* Dependency: "fputwc_unlocked" */
@@ -59,5 +59,5 @@ __LOCAL_LIBC(file_c16printer_unlocked) __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__
 	return (__SSIZE_TYPE__)__i;
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE__fputwc_nolock)) */
+#endif /* defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE__fputwc_nolock) */
 #endif /* !__local_file_c16printer_unlocked_defined */

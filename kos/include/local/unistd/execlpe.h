@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf60037f2 */
+/* HASH CRC-32:0x91c7b470 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_execlpe_defined
-#if (defined(__CRT_HAVE_execvpe) || defined(__CRT_HAVE__execvpe))
+#if defined(__CRT_HAVE_execvpe) || defined(__CRT_HAVE__execvpe)
 #define __local_execlpe_defined 1
 #include <parts/redirect-exec.h>
 /* Dependency: "execvp" */
@@ -56,5 +56,5 @@ __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(execlpe))(char const *__restrict __f
 	__REDIRECT_EXECLE(char, __localdep_execvp, __file, __args)
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_execvpe) || defined(__CRT_HAVE__execvpe)) */
+#endif /* defined(__CRT_HAVE_execvpe) || defined(__CRT_HAVE__execvpe) */
 #endif /* !__local_execlpe_defined */

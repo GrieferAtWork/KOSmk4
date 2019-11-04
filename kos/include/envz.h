@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xacd9e46 */
+/* HASH CRC-32:0x33418195 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -134,7 +134,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(envz_get, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSE
  * because when merging with another envz, the null entry can override an
  * entry in the other one. Such entries can be removed with `envz_strip()' */
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),error_t,__NOTHROW_NCX,envz_add,(char **__restrict __penvz, size_t *__restrict __penvz_len, char const *__restrict __name, char const *__value),(__penvz,__penvz_len,__name,__value))
-#elif ((__has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_realloc)) || defined(__CRT_HAVE_realloc)) && ((__has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_realloc)) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_argz_append) || defined(__CRT_HAVE___argz_create_sep) || defined(__CRT_HAVE_argz_add) || defined(__CRT_HAVE___argz_add))
+#elif defined(__CRT_HAVE_realloc)
 #include <local/envz/envz_add.h>
 /* Adds an entry for `NAME' with value `VALUE' to `ENVZ & ENVZ_LEN'. If an entry
  * with the same name already exists in `ENVZ', it is removed. If `VALUE' is
@@ -149,7 +149,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(envz_add, __FORCELOCAL __ATTR_NONNULL((1, 2, 3))
  * If `OVERRIDE' is true, then values in `ENVZ2' will supersede those
  * with the same name in `ENV', otherwise they don't */
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),error_t,__NOTHROW_NCX,envz_merge,(char **__restrict __penvz, size_t *__restrict __penvz_len, char const *__restrict __envz2, size_t __envz2_len, int __override_),(__penvz,__penvz_len,__envz2,__envz2_len,__override_))
-#elif (__has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_realloc)) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_argz_append) || defined(__CRT_HAVE___argz_create_sep)
+#elif defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_argz_append) || defined(__CRT_HAVE___argz_create_sep)
 #include <local/envz/envz_merge.h>
 /* Adds each entry in `ENVZ2' to `ENVZ & ENVZ_LEN', as if with `envz_add()'.
  * If `OVERRIDE' is true, then values in `ENVZ2' will supersede those

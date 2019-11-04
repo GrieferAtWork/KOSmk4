@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbe9b0fc8 */
+/* HASH CRC-32:0x7e2cd4a1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -886,7 +886,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,acosf,(float __x),(__x))
 #elif defined(__CRT_HAVE___acosf)
 /* Arc cosine of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,acosf,(float __x),__acosf,(__x))
-#elif (__has_builtin(__builtin_acos) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_acos)) || defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos)
+#elif defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos)
 __NAMESPACE_STD_END
 #include <local/math/acosf.h>
 __NAMESPACE_STD_BEGIN
@@ -907,7 +907,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,asinf,(float __x),(__x))
 #elif defined(__CRT_HAVE___asinf)
 /* Arc sine of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,asinf,(float __x),__asinf,(__x))
-#elif (__has_builtin(__builtin_asin) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_asin)) || defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin)
+#elif defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin)
 __NAMESPACE_STD_END
 #include <local/math/asinf.h>
 __NAMESPACE_STD_BEGIN
@@ -928,7 +928,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,atanf,(float __x),(__x))
 #elif defined(__CRT_HAVE___atanf)
 /* Arc tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,atanf,(float __x),__atanf,(__x))
-#elif (__has_builtin(__builtin_atan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atan)) || defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan)
+#elif defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan)
 __NAMESPACE_STD_END
 #include <local/math/atanf.h>
 __NAMESPACE_STD_BEGIN
@@ -949,7 +949,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,atan2f,(float __y, float __x),(__y,__x
 #elif defined(__CRT_HAVE___atan2f)
 /* Arc tangent of Y/X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,atan2f,(float __y, float __x),__atan2f,(__y,__x))
-#elif (__has_builtin(__builtin_atan2) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atan2)) || defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2)
+#elif defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2)
 __NAMESPACE_STD_END
 #include <local/math/atan2f.h>
 __NAMESPACE_STD_BEGIN
@@ -970,7 +970,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,cosf,(float __x),(__x))
 #elif defined(__CRT_HAVE___cosf)
 /* Cosine of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,cosf,(float __x),__cosf,(__x))
-#elif (__has_builtin(__builtin_cos) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_cos)) || defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos)
+#elif defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos)
 __NAMESPACE_STD_END
 #include <local/math/cosf.h>
 __NAMESPACE_STD_BEGIN
@@ -991,7 +991,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,sinf,(float __x),(__x))
 #elif defined(__CRT_HAVE___sinf)
 /* Sine of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,sinf,(float __x),__sinf,(__x))
-#elif (__has_builtin(__builtin_sin) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sin)) || defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)
+#elif defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)
 __NAMESPACE_STD_END
 #include <local/math/sinf.h>
 __NAMESPACE_STD_BEGIN
@@ -1012,7 +1012,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,tanf,(float __x),(__x))
 #elif defined(__CRT_HAVE___tanf)
 /* Tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,tanf,(float __x),__tanf,(__x))
-#elif (__has_builtin(__builtin_tan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tan)) || defined(__CRT_HAVE_tan) || defined(__CRT_HAVE___tan)
+#elif defined(__CRT_HAVE_tan) || defined(__CRT_HAVE___tan)
 __NAMESPACE_STD_END
 #include <local/math/tanf.h>
 __NAMESPACE_STD_BEGIN
@@ -1040,7 +1040,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,acosl,(long double __x),acos,(_
 #elif defined(__CRT_HAVE___acos) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Arc cosine of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,acosl,(long double __x),__acos,(__x))
-#elif (__has_builtin(__builtin_acos) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_acos)) || defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos)
+#elif defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos)
 __NAMESPACE_STD_END
 #include <local/math/acosl.h>
 __NAMESPACE_STD_BEGIN
@@ -1067,7 +1067,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,asinl,(long double __x),asin,(_
 #elif defined(__CRT_HAVE___asin) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Arc sine of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,asinl,(long double __x),__asin,(__x))
-#elif (__has_builtin(__builtin_asin) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_asin)) || defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin)
+#elif defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin)
 __NAMESPACE_STD_END
 #include <local/math/asinl.h>
 __NAMESPACE_STD_BEGIN
@@ -1094,7 +1094,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,atanl,(long double __x),atan,(_
 #elif defined(__CRT_HAVE___atan) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Arc tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,atanl,(long double __x),__atan,(__x))
-#elif (__has_builtin(__builtin_atan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atan)) || defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan)
+#elif defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan)
 __NAMESPACE_STD_END
 #include <local/math/atanl.h>
 __NAMESPACE_STD_BEGIN
@@ -1121,7 +1121,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,atan2l,(long double __y, long d
 #elif defined(__CRT_HAVE___atan2) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Arc tangent of Y/X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,atan2l,(long double __y, long double __x),__atan2,(__y,__x))
-#elif (__has_builtin(__builtin_atan2) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atan2)) || defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2)
+#elif defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2)
 __NAMESPACE_STD_END
 #include <local/math/atan2l.h>
 __NAMESPACE_STD_BEGIN
@@ -1148,7 +1148,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,cosl,(long double __x),cos,(__x
 #elif defined(__CRT_HAVE___cos) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Cosine of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,cosl,(long double __x),__cos,(__x))
-#elif (__has_builtin(__builtin_cos) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_cos)) || defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos)
+#elif defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos)
 __NAMESPACE_STD_END
 #include <local/math/cosl.h>
 __NAMESPACE_STD_BEGIN
@@ -1175,7 +1175,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,sinl,(long double __x),sin,(__x
 #elif defined(__CRT_HAVE___sin) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Sine of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,sinl,(long double __x),__sin,(__x))
-#elif (__has_builtin(__builtin_sin) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sin)) || defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)
+#elif defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)
 __NAMESPACE_STD_END
 #include <local/math/sinl.h>
 __NAMESPACE_STD_BEGIN
@@ -1202,7 +1202,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,tanl,(long double __x),tan,(__x
 #elif defined(__CRT_HAVE___tan) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,tanl,(long double __x),__tan,(__x))
-#elif (__has_builtin(__builtin_tan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tan)) || defined(__CRT_HAVE_tan) || defined(__CRT_HAVE___tan)
+#elif defined(__CRT_HAVE_tan) || defined(__CRT_HAVE___tan)
 __NAMESPACE_STD_END
 #include <local/math/tanl.h>
 __NAMESPACE_STD_BEGIN
@@ -1271,7 +1271,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,coshf,(float __x),(__x))
 #elif defined(__CRT_HAVE___coshf)
 /* Hyperbolic cosine of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,coshf,(float __x),__coshf,(__x))
-#elif (__has_builtin(__builtin_cosh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_cosh)) || defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh)
+#elif defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh)
 __NAMESPACE_STD_END
 #include <local/math/coshf.h>
 __NAMESPACE_STD_BEGIN
@@ -1292,7 +1292,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,sinhf,(float __x),(__x))
 #elif defined(__CRT_HAVE___sinhf)
 /* Hyperbolic sine of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,sinhf,(float __x),__sinhf,(__x))
-#elif (__has_builtin(__builtin_sinh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sinh)) || defined(__CRT_HAVE_sinh) || defined(__CRT_HAVE___sinh)
+#elif defined(__CRT_HAVE_sinh) || defined(__CRT_HAVE___sinh)
 __NAMESPACE_STD_END
 #include <local/math/sinhf.h>
 __NAMESPACE_STD_BEGIN
@@ -1313,7 +1313,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,tanhf,(float __x),(__x))
 #elif defined(__CRT_HAVE___tanhf)
 /* Hyperbolic tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,tanhf,(float __x),__tanhf,(__x))
-#elif (__has_builtin(__builtin_tanh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tanh)) || defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh)
+#elif defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh)
 __NAMESPACE_STD_END
 #include <local/math/tanhf.h>
 __NAMESPACE_STD_BEGIN
@@ -1341,7 +1341,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,coshl,(long double __x),cosh,(_
 #elif defined(__CRT_HAVE___cosh) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Hyperbolic cosine of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,coshl,(long double __x),__cosh,(__x))
-#elif (__has_builtin(__builtin_cosh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_cosh)) || defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh)
+#elif defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh)
 __NAMESPACE_STD_END
 #include <local/math/coshl.h>
 __NAMESPACE_STD_BEGIN
@@ -1368,7 +1368,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,sinhl,(long double __x),sinh,(_
 #elif defined(__CRT_HAVE___sinh) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Hyperbolic sine of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,sinhl,(long double __x),__sinh,(__x))
-#elif (__has_builtin(__builtin_sinh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sinh)) || defined(__CRT_HAVE_sinh) || defined(__CRT_HAVE___sinh)
+#elif defined(__CRT_HAVE_sinh) || defined(__CRT_HAVE___sinh)
 __NAMESPACE_STD_END
 #include <local/math/sinhl.h>
 __NAMESPACE_STD_BEGIN
@@ -1395,7 +1395,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,tanhl,(long double __x),tanh,(_
 #elif defined(__CRT_HAVE___tanh) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Hyperbolic tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,tanhl,(long double __x),__tanh,(__x))
-#elif (__has_builtin(__builtin_tanh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tanh)) || defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh)
+#elif defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh)
 __NAMESPACE_STD_END
 #include <local/math/tanhl.h>
 __NAMESPACE_STD_BEGIN
@@ -1464,7 +1464,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,acoshf,(float __x),(__x))
 #elif defined(__CRT_HAVE___acoshf)
 /* Hyperbolic arc cosine of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,acoshf,(float __x),__acoshf,(__x))
-#elif (__has_builtin(__builtin_acosh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_acosh)) || defined(__CRT_HAVE_acosh) || defined(__CRT_HAVE___acosh)
+#elif defined(__CRT_HAVE_acosh) || defined(__CRT_HAVE___acosh)
 __NAMESPACE_STD_END
 #include <local/math/acoshf.h>
 __NAMESPACE_STD_BEGIN
@@ -1485,7 +1485,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,asinhf,(float __x),(__x))
 #elif defined(__CRT_HAVE___asinhf)
 /* Hyperbolic arc sine of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,asinhf,(float __x),__asinhf,(__x))
-#elif (__has_builtin(__builtin_asinh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_asinh)) || defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh)
+#elif defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh)
 __NAMESPACE_STD_END
 #include <local/math/asinhf.h>
 __NAMESPACE_STD_BEGIN
@@ -1506,7 +1506,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,atanhf,(float __x),(__x))
 #elif defined(__CRT_HAVE___atanhf)
 /* Hyperbolic arc tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,atanhf,(float __x),__atanhf,(__x))
-#elif (__has_builtin(__builtin_atanh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atanh)) || defined(__CRT_HAVE_atanh) || defined(__CRT_HAVE___atanh)
+#elif defined(__CRT_HAVE_atanh) || defined(__CRT_HAVE___atanh)
 __NAMESPACE_STD_END
 #include <local/math/atanhf.h>
 __NAMESPACE_STD_BEGIN
@@ -1534,7 +1534,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,acoshl,(long double __x),acosh,
 #elif defined(__CRT_HAVE___acosh) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Hyperbolic arc cosine of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,acoshl,(long double __x),__acosh,(__x))
-#elif (__has_builtin(__builtin_acosh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_acosh)) || defined(__CRT_HAVE_acosh) || defined(__CRT_HAVE___acosh)
+#elif defined(__CRT_HAVE_acosh) || defined(__CRT_HAVE___acosh)
 __NAMESPACE_STD_END
 #include <local/math/acoshl.h>
 __NAMESPACE_STD_BEGIN
@@ -1561,7 +1561,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,asinhl,(long double __x),asinh,
 #elif defined(__CRT_HAVE___asinh) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Hyperbolic arc sine of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,asinhl,(long double __x),__asinh,(__x))
-#elif (__has_builtin(__builtin_asinh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_asinh)) || defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh)
+#elif defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh)
 __NAMESPACE_STD_END
 #include <local/math/asinhl.h>
 __NAMESPACE_STD_BEGIN
@@ -1588,7 +1588,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,atanhl,(long double __x),atanh,
 #elif defined(__CRT_HAVE___atanh) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Hyperbolic arc tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,atanhl,(long double __x),__atanh,(__x))
-#elif (__has_builtin(__builtin_atanh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atanh)) || defined(__CRT_HAVE_atanh) || defined(__CRT_HAVE___atanh)
+#elif defined(__CRT_HAVE_atanh) || defined(__CRT_HAVE___atanh)
 __NAMESPACE_STD_END
 #include <local/math/atanhl.h>
 __NAMESPACE_STD_BEGIN
@@ -1703,7 +1703,7 @@ __CDECLARE(__DECL_SIMD_expf __ATTR_WUNUSED,float,__NOTHROW,expf,(float __x),(__x
 #elif defined(__CRT_HAVE___expf)
 /* Exponential function of X */
 __CREDIRECT(__DECL_SIMD_expf __ATTR_WUNUSED,float,__NOTHROW,expf,(float __x),__expf,(__x))
-#elif (__has_builtin(__builtin_exp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exp)) || defined(__CRT_HAVE_exp) || defined(__CRT_HAVE___exp)
+#elif defined(__CRT_HAVE_exp) || defined(__CRT_HAVE___exp)
 __NAMESPACE_STD_END
 #include <local/math/expf.h>
 __NAMESPACE_STD_BEGIN
@@ -1724,7 +1724,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW_NCX,frexpf,(float __x, int *__pexponen
 #elif defined(__CRT_HAVE___frexpf)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW_NCX,frexpf,(float __x, int *__pexponent),__frexpf,(__x,__pexponent))
-#elif (__has_builtin(__builtin_frexp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_frexp)) || defined(__CRT_HAVE_frexp) || defined(__CRT_HAVE___frexp)
+#elif defined(__CRT_HAVE_frexp) || defined(__CRT_HAVE___frexp)
 __NAMESPACE_STD_END
 #include <local/math/frexpf.h>
 __NAMESPACE_STD_BEGIN
@@ -1745,7 +1745,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,ldexpf,(float __x, int __exponent),(__
 #elif defined(__CRT_HAVE___ldexpf)
 /* X times (two to the EXP power) */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,ldexpf,(float __x, int __exponent),__ldexpf,(__x,__exponent))
-#elif (__has_builtin(__builtin_ldexp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ldexp)) || defined(__CRT_HAVE_ldexp) || defined(__CRT_HAVE___ldexp)
+#elif defined(__CRT_HAVE_ldexp) || defined(__CRT_HAVE___ldexp)
 __NAMESPACE_STD_END
 #include <local/math/ldexpf.h>
 __NAMESPACE_STD_BEGIN
@@ -1766,7 +1766,7 @@ __CDECLARE(__DECL_SIMD_logf __ATTR_WUNUSED,float,__NOTHROW,logf,(float __x),(__x
 #elif defined(__CRT_HAVE___logf)
 /* Natural logarithm of X */
 __CREDIRECT(__DECL_SIMD_logf __ATTR_WUNUSED,float,__NOTHROW,logf,(float __x),__logf,(__x))
-#elif (__has_builtin(__builtin_log) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log)) || defined(__CRT_HAVE_log) || defined(__CRT_HAVE___log)
+#elif defined(__CRT_HAVE_log) || defined(__CRT_HAVE___log)
 __NAMESPACE_STD_END
 #include <local/math/logf.h>
 __NAMESPACE_STD_BEGIN
@@ -1787,7 +1787,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,log10f,(float __x),(__x))
 #elif defined(__CRT_HAVE___log10f)
 /* Base-ten logarithm of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,log10f,(float __x),__log10f,(__x))
-#elif (__has_builtin(__builtin_log10) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log10)) || defined(__CRT_HAVE_log10) || defined(__CRT_HAVE___log10)
+#elif defined(__CRT_HAVE_log10) || defined(__CRT_HAVE___log10)
 __NAMESPACE_STD_END
 #include <local/math/log10f.h>
 __NAMESPACE_STD_BEGIN
@@ -1808,7 +1808,7 @@ __CDECLARE(__ATTR_NONNULL((2)),float,__NOTHROW_NCX,modff,(float __x, float *__ip
 #elif defined(__CRT_HAVE___modff)
 /* Break VALUE into integral and fractional parts */
 __CREDIRECT(__ATTR_NONNULL((2)),float,__NOTHROW_NCX,modff,(float __x, float *__iptr),__modff,(__x,__iptr))
-#elif (__has_builtin(__builtin_modf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_modf)) || defined(__CRT_HAVE_modf) || defined(__CRT_HAVE___modf)
+#elif defined(__CRT_HAVE_modf) || defined(__CRT_HAVE___modf)
 __NAMESPACE_STD_END
 #include <local/math/modff.h>
 __NAMESPACE_STD_BEGIN
@@ -1836,7 +1836,7 @@ __CREDIRECT(__DECL_SIMD_expl __ATTR_WUNUSED,long double,__NOTHROW,expl,(long dou
 #elif defined(__CRT_HAVE___exp) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Exponential function of X */
 __CREDIRECT(__DECL_SIMD_expl __ATTR_WUNUSED,long double,__NOTHROW,expl,(long double __x),__exp,(__x))
-#elif (__has_builtin(__builtin_exp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exp)) || defined(__CRT_HAVE_exp) || defined(__CRT_HAVE___exp)
+#elif defined(__CRT_HAVE_exp) || defined(__CRT_HAVE___exp)
 __NAMESPACE_STD_END
 #include <local/math/expl.h>
 __NAMESPACE_STD_BEGIN
@@ -1863,7 +1863,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW_NCX,frexpl,(long double __x, in
 #elif defined(__CRT_HAVE___frexp) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW_NCX,frexpl,(long double __x, int *__pexponent),__frexp,(__x,__pexponent))
-#elif (__has_builtin(__builtin_frexp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_frexp)) || defined(__CRT_HAVE_frexp) || defined(__CRT_HAVE___frexp)
+#elif defined(__CRT_HAVE_frexp) || defined(__CRT_HAVE___frexp)
 __NAMESPACE_STD_END
 #include <local/math/frexpl.h>
 __NAMESPACE_STD_BEGIN
@@ -1890,7 +1890,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,ldexpl,(long double __x, int __
 #elif defined(__CRT_HAVE___ldexp) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* X times (two to the EXP power) */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,ldexpl,(long double __x, int __exponent),__ldexp,(__x,__exponent))
-#elif (__has_builtin(__builtin_ldexp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ldexp)) || defined(__CRT_HAVE_ldexp) || defined(__CRT_HAVE___ldexp)
+#elif defined(__CRT_HAVE_ldexp) || defined(__CRT_HAVE___ldexp)
 __NAMESPACE_STD_END
 #include <local/math/ldexpl.h>
 __NAMESPACE_STD_BEGIN
@@ -1917,7 +1917,7 @@ __CREDIRECT(__DECL_SIMD_logl __ATTR_WUNUSED,long double,__NOTHROW,logl,(long dou
 #elif defined(__CRT_HAVE___log) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Natural logarithm of X */
 __CREDIRECT(__DECL_SIMD_logl __ATTR_WUNUSED,long double,__NOTHROW,logl,(long double __x),__log,(__x))
-#elif (__has_builtin(__builtin_log) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log)) || defined(__CRT_HAVE_log) || defined(__CRT_HAVE___log)
+#elif defined(__CRT_HAVE_log) || defined(__CRT_HAVE___log)
 __NAMESPACE_STD_END
 #include <local/math/logl.h>
 __NAMESPACE_STD_BEGIN
@@ -1944,7 +1944,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,log10l,(long double __x),log10,
 #elif defined(__CRT_HAVE___log10) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Base-ten logarithm of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,log10l,(long double __x),__log10,(__x))
-#elif (__has_builtin(__builtin_log10) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log10)) || defined(__CRT_HAVE_log10) || defined(__CRT_HAVE___log10)
+#elif defined(__CRT_HAVE_log10) || defined(__CRT_HAVE___log10)
 __NAMESPACE_STD_END
 #include <local/math/log10l.h>
 __NAMESPACE_STD_BEGIN
@@ -1971,7 +1971,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),long double,__NOTHROW_NCX,modfl,(long double __x
 #elif defined(__CRT_HAVE_modf) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Break VALUE into integral and fractional parts */
 __CREDIRECT(__ATTR_NONNULL((2)),long double,__NOTHROW_NCX,modfl,(long double __x, long double *__iptr),modf,(__x,__iptr))
-#elif (__has_builtin(__builtin_modf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_modf)) || defined(__CRT_HAVE_modf) || defined(__CRT_HAVE___modf)
+#elif defined(__CRT_HAVE_modf) || defined(__CRT_HAVE___modf)
 __NAMESPACE_STD_END
 #include <local/math/modfl.h>
 __NAMESPACE_STD_BEGIN
@@ -2043,7 +2043,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,expm1f,(float __x),(__x))
 #elif defined(__CRT_HAVE___expm1f)
 /* Return exp(X) - 1 */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,expm1f,(float __x),__expm1f,(__x))
-#elif (__has_builtin(__builtin_expm1) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_expm1)) || defined(__CRT_HAVE_expm1) || defined(__CRT_HAVE___expm1)
+#elif defined(__CRT_HAVE_expm1) || defined(__CRT_HAVE___expm1)
 __NAMESPACE_STD_END
 #include <local/math/expm1f.h>
 __NAMESPACE_STD_BEGIN
@@ -2064,7 +2064,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,log1pf,(float __x),(__x))
 #elif defined(__CRT_HAVE___log1pf)
 /* Return log(1 + X) */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,log1pf,(float __x),__log1pf,(__x))
-#elif (__has_builtin(__builtin_log1p) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log1p)) || defined(__CRT_HAVE_log1p) || defined(__CRT_HAVE___log1p)
+#elif defined(__CRT_HAVE_log1p) || defined(__CRT_HAVE___log1p)
 __NAMESPACE_STD_END
 #include <local/math/log1pf.h>
 __NAMESPACE_STD_BEGIN
@@ -2085,7 +2085,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,logbf,(float __x),(__x))
 #elif defined(__CRT_HAVE___logbf)
 /* Return the base 2 signed integral exponent of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,logbf,(float __x),__logbf,(__x))
-#elif (__has_builtin(__builtin_logb) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_logb)) || defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb)
+#elif defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb)
 __NAMESPACE_STD_END
 #include <local/math/logbf.h>
 __NAMESPACE_STD_BEGIN
@@ -2113,7 +2113,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,expm1l,(long double __x),expm1,
 #elif defined(__CRT_HAVE___expm1) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return exp(X) - 1 */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,expm1l,(long double __x),__expm1,(__x))
-#elif (__has_builtin(__builtin_expm1) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_expm1)) || defined(__CRT_HAVE_expm1) || defined(__CRT_HAVE___expm1)
+#elif defined(__CRT_HAVE_expm1) || defined(__CRT_HAVE___expm1)
 __NAMESPACE_STD_END
 #include <local/math/expm1l.h>
 __NAMESPACE_STD_BEGIN
@@ -2140,7 +2140,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,log1pl,(long double __x),log1p,
 #elif defined(__CRT_HAVE___log1p) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return log(1 + X) */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,log1pl,(long double __x),__log1p,(__x))
-#elif (__has_builtin(__builtin_log1p) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log1p)) || defined(__CRT_HAVE_log1p) || defined(__CRT_HAVE___log1p)
+#elif defined(__CRT_HAVE_log1p) || defined(__CRT_HAVE___log1p)
 __NAMESPACE_STD_END
 #include <local/math/log1pl.h>
 __NAMESPACE_STD_BEGIN
@@ -2167,7 +2167,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,logbl,(long double __x),logb,(_
 #elif defined(__CRT_HAVE___logb) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return the base 2 signed integral exponent of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,logbl,(long double __x),__logb,(__x))
-#elif (__has_builtin(__builtin_logb) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_logb)) || defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb)
+#elif defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb)
 __NAMESPACE_STD_END
 #include <local/math/logbl.h>
 __NAMESPACE_STD_BEGIN
@@ -2222,7 +2222,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,exp2f,(float __x),(__x))
 #elif defined(__CRT_HAVE___exp2f)
 /* Compute base-2 exponential of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,exp2f,(float __x),__exp2f,(__x))
-#elif (__has_builtin(__builtin_exp2) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exp2)) || defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2)
+#elif defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2)
 __NAMESPACE_STD_END
 #include <local/math/exp2f.h>
 __NAMESPACE_STD_BEGIN
@@ -2243,7 +2243,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,log2f,(float __x),(__x))
 #elif defined(__CRT_HAVE___log2f)
 /* Compute base-2 logarithm of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,log2f,(float __x),__log2f,(__x))
-#elif (__has_builtin(__builtin_log2) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log2)) || defined(__CRT_HAVE_log2) || defined(__CRT_HAVE___log2)
+#elif defined(__CRT_HAVE_log2) || defined(__CRT_HAVE___log2)
 __NAMESPACE_STD_END
 #include <local/math/log2f.h>
 __NAMESPACE_STD_BEGIN
@@ -2271,7 +2271,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,exp2l,(long double __x),exp2,(_
 #elif defined(__CRT_HAVE___exp2) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Compute base-2 exponential of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,exp2l,(long double __x),__exp2,(__x))
-#elif (__has_builtin(__builtin_exp2) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exp2)) || defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2)
+#elif defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2)
 __NAMESPACE_STD_END
 #include <local/math/exp2l.h>
 __NAMESPACE_STD_BEGIN
@@ -2298,7 +2298,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,log2l,(long double __x),log2,(_
 #elif defined(__CRT_HAVE___log2) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Compute base-2 logarithm of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,log2l,(long double __x),__log2,(__x))
-#elif (__has_builtin(__builtin_log2) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log2)) || defined(__CRT_HAVE_log2) || defined(__CRT_HAVE___log2)
+#elif defined(__CRT_HAVE_log2) || defined(__CRT_HAVE___log2)
 __NAMESPACE_STD_END
 #include <local/math/log2l.h>
 __NAMESPACE_STD_BEGIN
@@ -2353,7 +2353,7 @@ __CDECLARE(__DECL_SIMD_powf __ATTR_WUNUSED,float,__NOTHROW,powf,(float __x, floa
 #elif defined(__CRT_HAVE___powf)
 /* Return X to the Y power */
 __CREDIRECT(__DECL_SIMD_powf __ATTR_WUNUSED,float,__NOTHROW,powf,(float __x, float __y),__powf,(__x,__y))
-#elif (__has_builtin(__builtin_pow) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_pow)) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow)
+#elif defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow)
 __NAMESPACE_STD_END
 #include <local/math/powf.h>
 __NAMESPACE_STD_BEGIN
@@ -2374,7 +2374,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,sqrtf,(float __x),(__x))
 #elif defined(__CRT_HAVE___sqrtf)
 /* Return the square root of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,sqrtf,(float __x),__sqrtf,(__x))
-#elif (__has_builtin(__builtin_sqrt) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sqrt)) || defined(__CRT_HAVE_sqrt) || defined(__CRT_HAVE___sqrt)
+#elif defined(__CRT_HAVE_sqrt) || defined(__CRT_HAVE___sqrt)
 __NAMESPACE_STD_END
 #include <local/math/sqrtf.h>
 __NAMESPACE_STD_BEGIN
@@ -2402,7 +2402,7 @@ __CREDIRECT(__DECL_SIMD_powl __ATTR_WUNUSED,long double,__NOTHROW,powl,(long dou
 #elif defined(__CRT_HAVE___pow) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return X to the Y power */
 __CREDIRECT(__DECL_SIMD_powl __ATTR_WUNUSED,long double,__NOTHROW,powl,(long double __x, long double __y),__pow,(__x,__y))
-#elif (__has_builtin(__builtin_pow) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_pow)) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow)
+#elif defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow)
 __NAMESPACE_STD_END
 #include <local/math/powl.h>
 __NAMESPACE_STD_BEGIN
@@ -2429,7 +2429,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,sqrtl,(long double __x),sqrt,(_
 #elif defined(__CRT_HAVE___sqrt) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return the square root of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,sqrtl,(long double __x),__sqrt,(__x))
-#elif (__has_builtin(__builtin_sqrt) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sqrt)) || defined(__CRT_HAVE_sqrt) || defined(__CRT_HAVE___sqrt)
+#elif defined(__CRT_HAVE_sqrt) || defined(__CRT_HAVE___sqrt)
 __NAMESPACE_STD_END
 #include <local/math/sqrtl.h>
 __NAMESPACE_STD_BEGIN
@@ -2468,7 +2468,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,hypotf,(float __x, float __y),(__x,__y
 #elif defined(__CRT_HAVE___hypotf)
 /* Return `sqrt(X*X + Y*Y)' */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,hypotf,(float __x, float __y),__hypotf,(__x,__y))
-#elif (__has_builtin(__builtin_hypot) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_hypot)) || defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE___hypot)
+#elif defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE___hypot)
 __NAMESPACE_STD_END
 #include <local/math/hypotf.h>
 __NAMESPACE_STD_BEGIN
@@ -2496,7 +2496,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,hypotl,(long double __x, long d
 #elif defined(__CRT_HAVE___hypot) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return `sqrt(X*X + Y*Y)' */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,hypotl,(long double __x, long double __y),__hypot,(__x,__y))
-#elif (__has_builtin(__builtin_hypot) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_hypot)) || defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE___hypot)
+#elif defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE___hypot)
 __NAMESPACE_STD_END
 #include <local/math/hypotl.h>
 __NAMESPACE_STD_BEGIN
@@ -2536,7 +2536,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,cbrtf,(float __x),(__x))
 #elif defined(__CRT_HAVE___cbrtf)
 /* Return the cube root of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,cbrtf,(float __x),__cbrtf,(__x))
-#elif (__has_builtin(__builtin_cbrt) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_cbrt)) || defined(__CRT_HAVE_cbrt) || defined(__CRT_HAVE___cbrt)
+#elif defined(__CRT_HAVE_cbrt) || defined(__CRT_HAVE___cbrt)
 __NAMESPACE_STD_END
 #include <local/math/cbrtf.h>
 __NAMESPACE_STD_BEGIN
@@ -2564,7 +2564,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,cbrtl,(long double __x),cbrt,(_
 #elif defined(__CRT_HAVE___cbrt) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return the cube root of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,cbrtl,(long double __x),__cbrt,(__x))
-#elif (__has_builtin(__builtin_cbrt) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_cbrt)) || defined(__CRT_HAVE_cbrt) || defined(__CRT_HAVE___cbrt)
+#elif defined(__CRT_HAVE_cbrt) || defined(__CRT_HAVE___cbrt)
 __NAMESPACE_STD_END
 #include <local/math/cbrtl.h>
 __NAMESPACE_STD_BEGIN
@@ -2700,7 +2700,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,fmodf,(float __x, float __y),(__x,__y)
 #elif defined(__CRT_HAVE___fmodf)
 /* Floating-point modulo remainder of X/Y */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,fmodf,(float __x, float __y),__fmodf,(__x,__y))
-#elif (__has_builtin(__builtin_fmod) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fmod)) || defined(__CRT_HAVE_fmod) || defined(__CRT_HAVE___fmod)
+#elif defined(__CRT_HAVE_fmod) || defined(__CRT_HAVE___fmod)
 __NAMESPACE_STD_END
 #include <local/math/fmodf.h>
 __NAMESPACE_STD_BEGIN
@@ -2776,7 +2776,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,fmodl,(long double __x, long do
 #elif defined(__CRT_HAVE___fmod) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Floating-point modulo remainder of X/Y */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,fmodl,(long double __x, long double __y),__fmod,(__x,__y))
-#elif (__has_builtin(__builtin_fmod) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fmod)) || defined(__CRT_HAVE_fmod) || defined(__CRT_HAVE___fmod)
+#elif defined(__CRT_HAVE_fmod) || defined(__CRT_HAVE___fmod)
 __NAMESPACE_STD_END
 #include <local/math/fmodl.h>
 __NAMESPACE_STD_BEGIN
@@ -2942,7 +2942,7 @@ __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL erff)(float __x) { return
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,erff,(float __x),(__x))
 #elif defined(__CRT_HAVE___erff)
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,erff,(float __x),__erff,(__x))
-#elif (__has_builtin(__builtin_erf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_erf)) || defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf)
+#elif defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf)
 __NAMESPACE_STD_END
 #include <local/math/erff.h>
 __NAMESPACE_STD_BEGIN
@@ -2959,7 +2959,7 @@ __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL erfcf)(float __x) { retur
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,erfcf,(float __x),(__x))
 #elif defined(__CRT_HAVE___erfcf)
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,erfcf,(float __x),__erfcf,(__x))
-#elif (__has_builtin(__builtin_erfc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_erfc)) || defined(__CRT_HAVE_erfc) || defined(__CRT_HAVE___erfc)
+#elif defined(__CRT_HAVE_erfc) || defined(__CRT_HAVE___erfc)
 __NAMESPACE_STD_END
 #include <local/math/erfcf.h>
 __NAMESPACE_STD_BEGIN
@@ -2980,7 +2980,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,lgammaf,(float __x),__lgammaf,(__x))
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,lgammaf,(float __x),__gammaf,(__x))
 #elif defined(__CRT_HAVE_gammaf)
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,lgammaf,(float __x),gammaf,(__x))
-#elif (__has_builtin(__builtin_lgamma) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lgamma)) || defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma) || defined(__CRT_HAVE_gamma)
+#elif defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma) || defined(__CRT_HAVE_gamma)
 __NAMESPACE_STD_END
 #include <local/math/lgammaf.h>
 __NAMESPACE_STD_BEGIN
@@ -3002,7 +3002,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,erfl,(long double __x),__erfl,(
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,erfl,(long double __x),erf,(__x))
 #elif defined(__CRT_HAVE___erf) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,erfl,(long double __x),__erf,(__x))
-#elif (__has_builtin(__builtin_erf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_erf)) || defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf)
+#elif defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf)
 __NAMESPACE_STD_END
 #include <local/math/erfl.h>
 __NAMESPACE_STD_BEGIN
@@ -3023,7 +3023,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,erfcl,(long double __x),__erfcl
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,erfcl,(long double __x),erfc,(__x))
 #elif defined(__CRT_HAVE___erfc) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,erfcl,(long double __x),__erfc,(__x))
-#elif (__has_builtin(__builtin_erfc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_erfc)) || defined(__CRT_HAVE_erfc) || defined(__CRT_HAVE___erfc)
+#elif defined(__CRT_HAVE_erfc) || defined(__CRT_HAVE___erfc)
 __NAMESPACE_STD_END
 #include <local/math/erfcl.h>
 __NAMESPACE_STD_BEGIN
@@ -3052,7 +3052,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,lgammal,(long double __x),__lga
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,lgammal,(long double __x),__gamma,(__x))
 #elif defined(__CRT_HAVE_gamma) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,lgammal,(long double __x),gamma,(__x))
-#elif (__has_builtin(__builtin_lgamma) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lgamma)) || defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma) || defined(__CRT_HAVE_gamma)
+#elif defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma) || defined(__CRT_HAVE_gamma)
 __NAMESPACE_STD_END
 #include <local/math/lgammal.h>
 __NAMESPACE_STD_BEGIN
@@ -3090,7 +3090,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,tgammaf,(float __x),(__x))
 #elif defined(__CRT_HAVE___tgammaf)
 /* True gamma function */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,tgammaf,(float __x),__tgammaf,(__x))
-#elif (__has_builtin(__builtin_tgamma) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tgamma)) || defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma)
+#elif defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma)
 __NAMESPACE_STD_END
 #include <local/math/tgammaf.h>
 __NAMESPACE_STD_BEGIN
@@ -3118,7 +3118,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,tgammal,(long double __x),tgamm
 #elif defined(__CRT_HAVE___tgamma) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* True gamma function */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,tgammal,(long double __x),__tgamma,(__x))
-#elif (__has_builtin(__builtin_tgamma) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tgamma)) || defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma)
+#elif defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma)
 __NAMESPACE_STD_END
 #include <local/math/tgammal.h>
 __NAMESPACE_STD_BEGIN
@@ -3206,7 +3206,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,rintf,(float __x),(__x))
 #elif defined(__CRT_HAVE___rintf)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,rintf,(float __x),__rintf,(__x))
-#elif (__has_builtin(__builtin_rint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_rint)) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
+#elif defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
 __NAMESPACE_STD_END
 #include <local/math/rintf.h>
 __NAMESPACE_STD_BEGIN
@@ -3227,7 +3227,7 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,nextafterf,(float __x, fl
 #elif defined(__CRT_HAVE___nextafterf)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,nextafterf,(float __x, float __y),__nextafterf,(__x,__y))
-#elif (__has_builtin(__builtin_nextafter) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nextafter)) || defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter)
+#elif defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter)
 __NAMESPACE_STD_END
 #include <local/math/nextafterf.h>
 __NAMESPACE_STD_BEGIN
@@ -3248,7 +3248,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,remainderf,(float __x, float __y),(__x
 #elif defined(__CRT_HAVE___remainderf)
 /* Return the remainder of integer divison X / Y with infinite precision */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,remainderf,(float __x, float __y),__remainderf,(__x,__y))
-#elif (__has_builtin(__builtin_remainder) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remainder)) || defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE___remainder)
+#elif defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE___remainder)
 __NAMESPACE_STD_END
 #include <local/math/remainderf.h>
 __NAMESPACE_STD_BEGIN
@@ -3269,7 +3269,7 @@ __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW,ilogbf,(float __x),(__x))
 #elif defined(__CRT_HAVE___ilogbf)
 /* Return the binary exponent of X, which must be nonzero */
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,ilogbf,(float __x),__ilogbf,(__x))
-#elif (__has_builtin(__builtin_ilogb) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ilogb)) || defined(__CRT_HAVE_ilogb) || defined(__CRT_HAVE___ilogb)
+#elif defined(__CRT_HAVE_ilogb) || defined(__CRT_HAVE___ilogb)
 __NAMESPACE_STD_END
 #include <local/math/ilogbf.h>
 __NAMESPACE_STD_BEGIN
@@ -3297,7 +3297,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,rintl,(long double __x),rint,(_
 #elif defined(__CRT_HAVE___rint) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,rintl,(long double __x),__rint,(__x))
-#elif (__has_builtin(__builtin_rint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_rint)) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
+#elif defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
 __NAMESPACE_STD_END
 #include <local/math/rintl.h>
 __NAMESPACE_STD_BEGIN
@@ -3324,7 +3324,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,nextafterl,(long d
 #elif defined(__CRT_HAVE___nextafter) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,nextafterl,(long double __x, long double __y),__nextafter,(__x,__y))
-#elif (__has_builtin(__builtin_nextafter) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nextafter)) || defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter)
+#elif defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter)
 __NAMESPACE_STD_END
 #include <local/math/nextafterl.h>
 __NAMESPACE_STD_BEGIN
@@ -3351,7 +3351,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,remainderl,(long double __x, lo
 #elif defined(__CRT_HAVE___remainder) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return the remainder of integer divison X / Y with infinite precision */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,remainderl,(long double __x, long double __y),__remainder,(__x,__y))
-#elif (__has_builtin(__builtin_remainder) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remainder)) || defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE___remainder)
+#elif defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE___remainder)
 __NAMESPACE_STD_END
 #include <local/math/remainderl.h>
 __NAMESPACE_STD_BEGIN
@@ -3378,7 +3378,7 @@ __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,ilogbl,(long double __x),ilogb,(__x))
 #elif defined(__CRT_HAVE___ilogb) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return the binary exponent of X, which must be nonzero */
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,ilogbl,(long double __x),__ilogb,(__x))
-#elif (__has_builtin(__builtin_ilogb) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ilogb)) || defined(__CRT_HAVE_ilogb) || defined(__CRT_HAVE___ilogb)
+#elif defined(__CRT_HAVE_ilogb) || defined(__CRT_HAVE___ilogb)
 __NAMESPACE_STD_END
 #include <local/math/ilogbl.h>
 __NAMESPACE_STD_BEGIN
@@ -3645,7 +3645,7 @@ __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL nexttowardf)
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,nexttowardf,(float __x, long double __y),(__x,__y))
 #elif defined(__CRT_HAVE___nexttowardf)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,nexttowardf,(float __x, long double __y),__nexttowardf,(__x,__y))
-#elif (__has_builtin(__builtin_nexttoward) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nexttoward)) || defined(__CRT_HAVE_nexttoward) || defined(__CRT_HAVE___nexttoward)
+#elif defined(__CRT_HAVE_nexttoward) || defined(__CRT_HAVE___nexttoward)
 __NAMESPACE_STD_END
 #include <local/math/nexttowardf.h>
 __NAMESPACE_STD_BEGIN
@@ -3665,7 +3665,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,scalbnf,(float __x, int __n),(__x,__n)
 #elif defined(__CRT_HAVE___scalbnf)
 /* Return X times (2 to the Nth power) */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,scalbnf,(float __x, int __n),__scalbnf,(__x,__n))
-#elif (__has_builtin(__builtin_scalbn) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalbn)) || defined(__CRT_HAVE_scalbn) || defined(__CRT_HAVE___scalbn)
+#elif defined(__CRT_HAVE_scalbn) || defined(__CRT_HAVE___scalbn)
 __NAMESPACE_STD_END
 #include <local/math/scalbnf.h>
 __NAMESPACE_STD_BEGIN
@@ -3686,7 +3686,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,scalblnf,(float __x, long int __n),(__
 #elif defined(__CRT_HAVE___scalblnf)
 /* Return X times (2 to the Nth power) */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,scalblnf,(float __x, long int __n),__scalblnf,(__x,__n))
-#elif (__has_builtin(__builtin_scalbln) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalbln)) || defined(__CRT_HAVE_scalbln) || defined(__CRT_HAVE___scalbln)
+#elif defined(__CRT_HAVE_scalbln) || defined(__CRT_HAVE___scalbln)
 __NAMESPACE_STD_END
 #include <local/math/scalblnf.h>
 __NAMESPACE_STD_BEGIN
@@ -3710,7 +3710,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,nearbyintf,(float __x),(__x))
 /* Round X to integral value in floating-point format using current
  * rounding direction, but do not raise inexact exception */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,nearbyintf,(float __x),__nearbyintf,(__x))
-#elif (__has_builtin(__builtin_nearbyint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nearbyint)) || defined(__CRT_HAVE_nearbyint) || defined(__CRT_HAVE___nearbyint)
+#elif defined(__CRT_HAVE_nearbyint) || defined(__CRT_HAVE___nearbyint)
 __NAMESPACE_STD_END
 #include <local/math/nearbyintf.h>
 __NAMESPACE_STD_BEGIN
@@ -3774,7 +3774,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,remquof,(float __x, float __y, int *__
  * of x/y and magnitude congruent `mod 2^n' to the magnitude of
  * the integral quotient x/y, with n >= 3 */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,remquof,(float __x, float __y, int *__pquo),__remquof,(__x,__y,__pquo))
-#elif (__has_builtin(__builtin_remquo) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remquo)) || defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo)
+#elif defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo)
 __NAMESPACE_STD_END
 #include <local/math/remquof.h>
 __NAMESPACE_STD_BEGIN
@@ -3797,7 +3797,7 @@ __CDECLARE(__ATTR_WUNUSED,long int,__NOTHROW,lrintf,(float __x),(__x))
 #elif defined(__CRT_HAVE___lrintf)
 /* Round X to nearest integral value according to current rounding direction */
 __CREDIRECT(__ATTR_WUNUSED,long int,__NOTHROW,lrintf,(float __x),__lrintf,(__x))
-#elif (__has_builtin(__builtin_lrint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lrint)) || defined(__CRT_HAVE_lrint) || defined(__CRT_HAVE___lrint)
+#elif defined(__CRT_HAVE_lrint) || defined(__CRT_HAVE___lrint)
 __NAMESPACE_STD_END
 #include <local/math/lrintf.h>
 __NAMESPACE_STD_BEGIN
@@ -3899,7 +3899,7 @@ __CDECLARE(__ATTR_WUNUSED,__LONGLONG,__NOTHROW,llrintf,(float __x),(__x))
 #elif defined(__CRT_HAVE___llrintf)
 /* Round X to nearest integral value according to current rounding direction */
 __CREDIRECT(__ATTR_WUNUSED,__LONGLONG,__NOTHROW,llrintf,(float __x),__llrintf,(__x))
-#elif (__has_builtin(__builtin_llrint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_llrint)) || defined(__CRT_HAVE_llrint) || defined(__CRT_HAVE___llrint)
+#elif defined(__CRT_HAVE_llrint) || defined(__CRT_HAVE___llrint)
 __NAMESPACE_STD_END
 #include <local/math/llrintf.h>
 __NAMESPACE_STD_BEGIN
@@ -3939,7 +3939,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,nexttowardl,(long 
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,nexttowardl,(long double __x, long double __y),nexttoward,(__x,__y))
 #elif defined(__CRT_HAVE___nexttoward) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,nexttowardl,(long double __x, long double __y),__nexttoward,(__x,__y))
-#elif (__has_builtin(__builtin_nexttoward) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nexttoward)) || defined(__CRT_HAVE_nexttoward) || defined(__CRT_HAVE___nexttoward)
+#elif defined(__CRT_HAVE_nexttoward) || defined(__CRT_HAVE___nexttoward)
 __NAMESPACE_STD_END
 #include <local/math/nexttowardl.h>
 __NAMESPACE_STD_BEGIN
@@ -3965,7 +3965,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,scalbnl,(long double __x, int _
 #elif defined(__CRT_HAVE___scalbn) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return X times (2 to the Nth power) */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,scalbnl,(long double __x, int __n),__scalbn,(__x,__n))
-#elif (__has_builtin(__builtin_scalbn) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalbn)) || defined(__CRT_HAVE_scalbn) || defined(__CRT_HAVE___scalbn)
+#elif defined(__CRT_HAVE_scalbn) || defined(__CRT_HAVE___scalbn)
 __NAMESPACE_STD_END
 #include <local/math/scalbnl.h>
 __NAMESPACE_STD_BEGIN
@@ -3992,7 +3992,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,scalblnl,(long double __x, long
 #elif defined(__CRT_HAVE___scalbln) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return X times (2 to the Nth power) */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,scalblnl,(long double __x, long int __n),__scalbln,(__x,__n))
-#elif (__has_builtin(__builtin_scalbln) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalbln)) || defined(__CRT_HAVE_scalbln) || defined(__CRT_HAVE___scalbln)
+#elif defined(__CRT_HAVE_scalbln) || defined(__CRT_HAVE___scalbln)
 __NAMESPACE_STD_END
 #include <local/math/scalblnl.h>
 __NAMESPACE_STD_BEGIN
@@ -4024,7 +4024,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,nearbyintl,(long double __x),ne
 /* Round X to integral value in floating-point format using current
  * rounding direction, but do not raise inexact exception */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,nearbyintl,(long double __x),__nearbyint,(__x))
-#elif (__has_builtin(__builtin_nearbyint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nearbyint)) || defined(__CRT_HAVE_nearbyint) || defined(__CRT_HAVE___nearbyint)
+#elif defined(__CRT_HAVE_nearbyint) || defined(__CRT_HAVE___nearbyint)
 __NAMESPACE_STD_END
 #include <local/math/nearbyintl.h>
 __NAMESPACE_STD_BEGIN
@@ -4098,7 +4098,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,remquol,(long double __x, long 
  * of x/y and magnitude congruent `mod 2^n' to the magnitude of
  * the integral quotient x/y, with n >= 3 */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,remquol,(long double __x, long double __y, int *__pquo),__remquo,(__x,__y,__pquo))
-#elif (__has_builtin(__builtin_remquo) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remquo)) || defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo)
+#elif defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo)
 __NAMESPACE_STD_END
 #include <local/math/remquol.h>
 __NAMESPACE_STD_BEGIN
@@ -4127,7 +4127,7 @@ __CREDIRECT(__ATTR_WUNUSED,long int,__NOTHROW,lrintl,(long double __x),lrint,(__
 #elif defined(__CRT_HAVE___lrint) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Round X to nearest integral value according to current rounding direction */
 __CREDIRECT(__ATTR_WUNUSED,long int,__NOTHROW,lrintl,(long double __x),__lrint,(__x))
-#elif (__has_builtin(__builtin_lrint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lrint)) || defined(__CRT_HAVE_lrint) || defined(__CRT_HAVE___lrint)
+#elif defined(__CRT_HAVE_lrint) || defined(__CRT_HAVE___lrint)
 __NAMESPACE_STD_END
 #include <local/math/lrintl.h>
 __NAMESPACE_STD_BEGIN
@@ -4235,7 +4235,7 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGLONG,__NOTHROW,llrintl,(long double __x),llrint
 #elif defined(__CRT_HAVE___llrint) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Round X to nearest integral value according to current rounding direction */
 __CREDIRECT(__ATTR_WUNUSED,__LONGLONG,__NOTHROW,llrintl,(long double __x),__llrint,(__x))
-#elif (__has_builtin(__builtin_llrint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_llrint)) || defined(__CRT_HAVE_llrint) || defined(__CRT_HAVE___llrint)
+#elif defined(__CRT_HAVE_llrint) || defined(__CRT_HAVE___llrint)
 __NAMESPACE_STD_END
 #include <local/math/llrintl.h>
 __NAMESPACE_STD_BEGIN
@@ -4275,7 +4275,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,acos,(float __x),acosf,(__x))
 #elif defined(__CRT_HAVE___acosf)
 /* Arc cosine of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,acos,(float __x),__acosf,(__x))
-#elif (__has_builtin(__builtin_acos) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_acos)) || defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos)
+#elif defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/acosf.h>
@@ -4293,7 +4293,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,asin,(float __x),asinf,(__x))
 #elif defined(__CRT_HAVE___asinf)
 /* Arc sine of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,asin,(float __x),__asinf,(__x))
-#elif (__has_builtin(__builtin_asin) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_asin)) || defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin)
+#elif defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/asinf.h>
@@ -4311,7 +4311,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,atan,(float __x),atanf,(__x))
 #elif defined(__CRT_HAVE___atanf)
 /* Arc tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,atan,(float __x),__atanf,(__x))
-#elif (__has_builtin(__builtin_atan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atan)) || defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan)
+#elif defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/atanf.h>
@@ -4329,7 +4329,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,atan2,(float __y, float __x),atan2f,(
 #elif defined(__CRT_HAVE___atan2f)
 /* Arc tangent of Y/X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,atan2,(float __y, float __x),__atan2f,(__y,__x))
-#elif (__has_builtin(__builtin_atan2) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atan2)) || defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2)
+#elif defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/atan2f.h>
@@ -4347,7 +4347,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,cos,(float __x),cosf,(__x))
 #elif defined(__CRT_HAVE___cosf)
 /* Cosine of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,cos,(float __x),__cosf,(__x))
-#elif (__has_builtin(__builtin_cos) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_cos)) || defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos)
+#elif defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/cosf.h>
@@ -4365,7 +4365,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,sin,(float __x),sinf,(__x))
 #elif defined(__CRT_HAVE___sinf)
 /* Sine of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,sin,(float __x),__sinf,(__x))
-#elif (__has_builtin(__builtin_sin) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sin)) || defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)
+#elif defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/sinf.h>
@@ -4383,7 +4383,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,tan,(float __x),tanf,(__x))
 #elif defined(__CRT_HAVE___tanf)
 /* Tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,tan,(float __x),__tanf,(__x))
-#elif (__has_builtin(__builtin_tan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tan)) || defined(__CRT_HAVE_tan) || defined(__CRT_HAVE___tan)
+#elif defined(__CRT_HAVE_tan) || defined(__CRT_HAVE___tan)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/tanf.h>
@@ -4401,7 +4401,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,cosh,(float __x),coshf,(__x))
 #elif defined(__CRT_HAVE___coshf)
 /* Hyperbolic cosine of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,cosh,(float __x),__coshf,(__x))
-#elif (__has_builtin(__builtin_cosh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_cosh)) || defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh)
+#elif defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/coshf.h>
@@ -4419,7 +4419,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,sinh,(float __x),sinhf,(__x))
 #elif defined(__CRT_HAVE___sinhf)
 /* Hyperbolic sine of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,sinh,(float __x),__sinhf,(__x))
-#elif (__has_builtin(__builtin_sinh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sinh)) || defined(__CRT_HAVE_sinh) || defined(__CRT_HAVE___sinh)
+#elif defined(__CRT_HAVE_sinh) || defined(__CRT_HAVE___sinh)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/sinhf.h>
@@ -4437,7 +4437,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,tanh,(float __x),tanhf,(__x))
 #elif defined(__CRT_HAVE___tanhf)
 /* Hyperbolic tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,tanh,(float __x),__tanhf,(__x))
-#elif (__has_builtin(__builtin_tanh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tanh)) || defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh)
+#elif defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/tanhf.h>
@@ -4455,7 +4455,7 @@ __CREDIRECT(__DECL_SIMD_expf __ATTR_WUNUSED,float,__NOTHROW,exp,(float __x),expf
 #elif defined(__CRT_HAVE___expf)
 /* Exponential function of X */
 __CREDIRECT(__DECL_SIMD_expf __ATTR_WUNUSED,float,__NOTHROW,exp,(float __x),__expf,(__x))
-#elif (__has_builtin(__builtin_exp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exp)) || defined(__CRT_HAVE_exp) || defined(__CRT_HAVE___exp)
+#elif defined(__CRT_HAVE_exp) || defined(__CRT_HAVE___exp)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/expf.h>
@@ -4473,7 +4473,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW_NCX,frexp,(float __x, int *__pexponen
 #elif defined(__CRT_HAVE___frexpf)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW_NCX,frexp,(float __x, int *__pexponent),__frexpf,(__x,__pexponent))
-#elif (__has_builtin(__builtin_frexp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_frexp)) || defined(__CRT_HAVE_frexp) || defined(__CRT_HAVE___frexp)
+#elif defined(__CRT_HAVE_frexp) || defined(__CRT_HAVE___frexp)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/frexpf.h>
@@ -4491,7 +4491,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,ldexp,(float __x, int __exponent),lde
 #elif defined(__CRT_HAVE___ldexpf)
 /* X times (two to the EXP power) */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,ldexp,(float __x, int __exponent),__ldexpf,(__x,__exponent))
-#elif (__has_builtin(__builtin_ldexp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ldexp)) || defined(__CRT_HAVE_ldexp) || defined(__CRT_HAVE___ldexp)
+#elif defined(__CRT_HAVE_ldexp) || defined(__CRT_HAVE___ldexp)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/ldexpf.h>
@@ -4509,7 +4509,7 @@ __CREDIRECT(__DECL_SIMD_logf __ATTR_WUNUSED,float,__NOTHROW,log,(float __x),logf
 #elif defined(__CRT_HAVE___logf)
 /* Natural logarithm of X */
 __CREDIRECT(__DECL_SIMD_logf __ATTR_WUNUSED,float,__NOTHROW,log,(float __x),__logf,(__x))
-#elif (__has_builtin(__builtin_log) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log)) || defined(__CRT_HAVE_log) || defined(__CRT_HAVE___log)
+#elif defined(__CRT_HAVE_log) || defined(__CRT_HAVE___log)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/logf.h>
@@ -4527,7 +4527,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,log10,(float __x),log10f,(__x))
 #elif defined(__CRT_HAVE___log10f)
 /* Base-ten logarithm of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,log10,(float __x),__log10f,(__x))
-#elif (__has_builtin(__builtin_log10) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log10)) || defined(__CRT_HAVE_log10) || defined(__CRT_HAVE___log10)
+#elif defined(__CRT_HAVE_log10) || defined(__CRT_HAVE___log10)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/log10f.h>
@@ -4545,7 +4545,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),float,__NOTHROW_NCX,modf,(float __x, float *__ip
 #elif defined(__CRT_HAVE___modff)
 /* Break VALUE into integral and fractional parts */
 __CREDIRECT(__ATTR_NONNULL((2)),float,__NOTHROW_NCX,modf,(float __x, float *__iptr),__modff,(__x,__iptr))
-#elif (__has_builtin(__builtin_modf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_modf)) || defined(__CRT_HAVE_modf) || defined(__CRT_HAVE___modf)
+#elif defined(__CRT_HAVE_modf) || defined(__CRT_HAVE___modf)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/modff.h>
@@ -4563,7 +4563,7 @@ __CREDIRECT(__DECL_SIMD_powf __ATTR_WUNUSED,float,__NOTHROW,pow,(float __x, floa
 #elif defined(__CRT_HAVE___powf)
 /* Return X to the Y power */
 __CREDIRECT(__DECL_SIMD_powf __ATTR_WUNUSED,float,__NOTHROW,pow,(float __x, float __y),__powf,(__x,__y))
-#elif (__has_builtin(__builtin_pow) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_pow)) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow)
+#elif defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/powf.h>
@@ -4581,7 +4581,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,sqrt,(float __x),sqrtf,(__x))
 #elif defined(__CRT_HAVE___sqrtf)
 /* Return the square root of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,sqrt,(float __x),__sqrtf,(__x))
-#elif (__has_builtin(__builtin_sqrt) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sqrt)) || defined(__CRT_HAVE_sqrt) || defined(__CRT_HAVE___sqrt)
+#elif defined(__CRT_HAVE_sqrt) || defined(__CRT_HAVE___sqrt)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/sqrtf.h>
@@ -4653,7 +4653,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,fmod,(float __x, float __y),fmodf,(__
 #elif defined(__CRT_HAVE___fmodf)
 /* Floating-point modulo remainder of X/Y */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,fmod,(float __x, float __y),__fmodf,(__x,__y))
-#elif (__has_builtin(__builtin_fmod) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fmod)) || defined(__CRT_HAVE_fmod) || defined(__CRT_HAVE___fmod)
+#elif defined(__CRT_HAVE_fmod) || defined(__CRT_HAVE___fmod)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/fmodf.h>
@@ -4678,7 +4678,7 @@ __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,acos,(long double __x),(__x))
 #elif defined(__CRT_HAVE___acos) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Arc cosine of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,acos,(long double __x),__acos,(__x))
-#elif (__has_builtin(__builtin_acos) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_acos)) || defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos)
+#elif defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/acosl.h>
@@ -4702,7 +4702,7 @@ __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,asin,(long double __x),(__x))
 #elif defined(__CRT_HAVE___asin) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Arc sine of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,asin,(long double __x),__asin,(__x))
-#elif (__has_builtin(__builtin_asin) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_asin)) || defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin)
+#elif defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/asinl.h>
@@ -4726,7 +4726,7 @@ __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,atan,(long double __x),(__x))
 #elif defined(__CRT_HAVE___atan) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Arc tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,atan,(long double __x),__atan,(__x))
-#elif (__has_builtin(__builtin_atan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atan)) || defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan)
+#elif defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/atanl.h>
@@ -4750,7 +4750,7 @@ __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,atan2,(long double __y, long dou
 #elif defined(__CRT_HAVE___atan2) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Arc tangent of Y/X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,atan2,(long double __y, long double __x),__atan2,(__y,__x))
-#elif (__has_builtin(__builtin_atan2) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atan2)) || defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2)
+#elif defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/atan2l.h>
@@ -4774,7 +4774,7 @@ __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,cos,(long double __x),(__x))
 #elif defined(__CRT_HAVE___cos) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Cosine of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,cos,(long double __x),__cos,(__x))
-#elif (__has_builtin(__builtin_cos) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_cos)) || defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos)
+#elif defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/cosl.h>
@@ -4798,7 +4798,7 @@ __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,sin,(long double __x),(__x))
 #elif defined(__CRT_HAVE___sin) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Sine of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,sin,(long double __x),__sin,(__x))
-#elif (__has_builtin(__builtin_sin) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sin)) || defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)
+#elif defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/sinl.h>
@@ -4822,7 +4822,7 @@ __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,tan,(long double __x),(__x))
 #elif defined(__CRT_HAVE___tan) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,tan,(long double __x),__tan,(__x))
-#elif (__has_builtin(__builtin_tan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tan)) || defined(__CRT_HAVE_tan) || defined(__CRT_HAVE___tan)
+#elif defined(__CRT_HAVE_tan) || defined(__CRT_HAVE___tan)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/tanl.h>
@@ -4846,7 +4846,7 @@ __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,cosh,(long double __x),(__x))
 #elif defined(__CRT_HAVE___cosh) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Hyperbolic cosine of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,cosh,(long double __x),__cosh,(__x))
-#elif (__has_builtin(__builtin_cosh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_cosh)) || defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh)
+#elif defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/coshl.h>
@@ -4870,7 +4870,7 @@ __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,sinh,(long double __x),(__x))
 #elif defined(__CRT_HAVE___sinh) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Hyperbolic sine of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,sinh,(long double __x),__sinh,(__x))
-#elif (__has_builtin(__builtin_sinh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sinh)) || defined(__CRT_HAVE_sinh) || defined(__CRT_HAVE___sinh)
+#elif defined(__CRT_HAVE_sinh) || defined(__CRT_HAVE___sinh)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/sinhl.h>
@@ -4894,7 +4894,7 @@ __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,tanh,(long double __x),(__x))
 #elif defined(__CRT_HAVE___tanh) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Hyperbolic tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,tanh,(long double __x),__tanh,(__x))
-#elif (__has_builtin(__builtin_tanh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tanh)) || defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh)
+#elif defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/tanhl.h>
@@ -4918,7 +4918,7 @@ __CDECLARE(__DECL_SIMD_expl __ATTR_WUNUSED,long double,__NOTHROW,exp,(long doubl
 #elif defined(__CRT_HAVE___exp) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Exponential function of X */
 __CREDIRECT(__DECL_SIMD_expl __ATTR_WUNUSED,long double,__NOTHROW,exp,(long double __x),__exp,(__x))
-#elif (__has_builtin(__builtin_exp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exp)) || defined(__CRT_HAVE_exp) || defined(__CRT_HAVE___exp)
+#elif defined(__CRT_HAVE_exp) || defined(__CRT_HAVE___exp)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/expl.h>
@@ -4942,7 +4942,7 @@ __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW_NCX,frexp,(long double __x, int 
 #elif defined(__CRT_HAVE___frexp) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW_NCX,frexp,(long double __x, int *__pexponent),__frexp,(__x,__pexponent))
-#elif (__has_builtin(__builtin_frexp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_frexp)) || defined(__CRT_HAVE_frexp) || defined(__CRT_HAVE___frexp)
+#elif defined(__CRT_HAVE_frexp) || defined(__CRT_HAVE___frexp)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/frexpl.h>
@@ -4966,7 +4966,7 @@ __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,ldexp,(long double __x, int __ex
 #elif defined(__CRT_HAVE___ldexp) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* X times (two to the EXP power) */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,ldexp,(long double __x, int __exponent),__ldexp,(__x,__exponent))
-#elif (__has_builtin(__builtin_ldexp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ldexp)) || defined(__CRT_HAVE_ldexp) || defined(__CRT_HAVE___ldexp)
+#elif defined(__CRT_HAVE_ldexp) || defined(__CRT_HAVE___ldexp)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/ldexpl.h>
@@ -4990,7 +4990,7 @@ __CDECLARE(__DECL_SIMD_logl __ATTR_WUNUSED,long double,__NOTHROW,log,(long doubl
 #elif defined(__CRT_HAVE___log) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Natural logarithm of X */
 __CREDIRECT(__DECL_SIMD_logl __ATTR_WUNUSED,long double,__NOTHROW,log,(long double __x),__log,(__x))
-#elif (__has_builtin(__builtin_log) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log)) || defined(__CRT_HAVE_log) || defined(__CRT_HAVE___log)
+#elif defined(__CRT_HAVE_log) || defined(__CRT_HAVE___log)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/logl.h>
@@ -5014,7 +5014,7 @@ __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,log10,(long double __x),(__x))
 #elif defined(__CRT_HAVE___log10) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Base-ten logarithm of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,log10,(long double __x),__log10,(__x))
-#elif (__has_builtin(__builtin_log10) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log10)) || defined(__CRT_HAVE_log10) || defined(__CRT_HAVE___log10)
+#elif defined(__CRT_HAVE_log10) || defined(__CRT_HAVE___log10)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/log10l.h>
@@ -5038,7 +5038,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),long double,__NOTHROW_NCX,modf,(long double __x,
 #elif defined(__CRT_HAVE_modf) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Break VALUE into integral and fractional parts */
 __CDECLARE(__ATTR_NONNULL((2)),long double,__NOTHROW_NCX,modf,(long double __x, long double *__iptr),(__x,__iptr))
-#elif (__has_builtin(__builtin_modf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_modf)) || defined(__CRT_HAVE_modf) || defined(__CRT_HAVE___modf)
+#elif defined(__CRT_HAVE_modf) || defined(__CRT_HAVE___modf)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/modfl.h>
@@ -5062,7 +5062,7 @@ __CDECLARE(__DECL_SIMD_powl __ATTR_WUNUSED,long double,__NOTHROW,pow,(long doubl
 #elif defined(__CRT_HAVE___pow) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return X to the Y power */
 __CREDIRECT(__DECL_SIMD_powl __ATTR_WUNUSED,long double,__NOTHROW,pow,(long double __x, long double __y),__pow,(__x,__y))
-#elif (__has_builtin(__builtin_pow) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_pow)) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow)
+#elif defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/powl.h>
@@ -5086,7 +5086,7 @@ __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,sqrt,(long double __x),(__x))
 #elif defined(__CRT_HAVE___sqrt) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return the square root of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,sqrt,(long double __x),__sqrt,(__x))
-#elif (__has_builtin(__builtin_sqrt) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sqrt)) || defined(__CRT_HAVE_sqrt) || defined(__CRT_HAVE___sqrt)
+#elif defined(__CRT_HAVE_sqrt) || defined(__CRT_HAVE___sqrt)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/sqrtl.h>
@@ -5164,7 +5164,7 @@ __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,fmod,(long double __x, long doub
 #elif defined(__CRT_HAVE___fmod) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Floating-point modulo remainder of X/Y */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,fmod,(long double __x, long double __y),__fmod,(__x,__y))
-#elif (__has_builtin(__builtin_fmod) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fmod)) || defined(__CRT_HAVE_fmod) || defined(__CRT_HAVE___fmod)
+#elif defined(__CRT_HAVE_fmod) || defined(__CRT_HAVE___fmod)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/fmodl.h>
@@ -5184,7 +5184,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,acosh,(float __x),acoshf,(__x))
 #elif defined(__CRT_HAVE___acoshf)
 /* Hyperbolic arc cosine of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,acosh,(float __x),__acoshf,(__x))
-#elif (__has_builtin(__builtin_acosh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_acosh)) || defined(__CRT_HAVE_acosh) || defined(__CRT_HAVE___acosh)
+#elif defined(__CRT_HAVE_acosh) || defined(__CRT_HAVE___acosh)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/acoshf.h>
@@ -5202,7 +5202,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,asinh,(float __x),asinhf,(__x))
 #elif defined(__CRT_HAVE___asinhf)
 /* Hyperbolic arc sine of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,asinh,(float __x),__asinhf,(__x))
-#elif (__has_builtin(__builtin_asinh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_asinh)) || defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh)
+#elif defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/asinhf.h>
@@ -5220,7 +5220,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,atanh,(float __x),atanhf,(__x))
 #elif defined(__CRT_HAVE___atanhf)
 /* Hyperbolic arc tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,atanh,(float __x),__atanhf,(__x))
-#elif (__has_builtin(__builtin_atanh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atanh)) || defined(__CRT_HAVE_atanh) || defined(__CRT_HAVE___atanh)
+#elif defined(__CRT_HAVE_atanh) || defined(__CRT_HAVE___atanh)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/atanhf.h>
@@ -5238,7 +5238,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,expm1,(float __x),expm1f,(__x))
 #elif defined(__CRT_HAVE___expm1f)
 /* Return exp(X) - 1 */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,expm1,(float __x),__expm1f,(__x))
-#elif (__has_builtin(__builtin_expm1) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_expm1)) || defined(__CRT_HAVE_expm1) || defined(__CRT_HAVE___expm1)
+#elif defined(__CRT_HAVE_expm1) || defined(__CRT_HAVE___expm1)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/expm1f.h>
@@ -5256,7 +5256,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,log1p,(float __x),log1pf,(__x))
 #elif defined(__CRT_HAVE___log1pf)
 /* Return log(1 + X) */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,log1p,(float __x),__log1pf,(__x))
-#elif (__has_builtin(__builtin_log1p) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log1p)) || defined(__CRT_HAVE_log1p) || defined(__CRT_HAVE___log1p)
+#elif defined(__CRT_HAVE_log1p) || defined(__CRT_HAVE___log1p)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/log1pf.h>
@@ -5274,7 +5274,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,logb,(float __x),logbf,(__x))
 #elif defined(__CRT_HAVE___logbf)
 /* Return the base 2 signed integral exponent of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,logb,(float __x),__logbf,(__x))
-#elif (__has_builtin(__builtin_logb) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_logb)) || defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb)
+#elif defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/logbf.h>
@@ -5292,7 +5292,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,cbrt,(float __x),cbrtf,(__x))
 #elif defined(__CRT_HAVE___cbrtf)
 /* Return the cube root of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,cbrt,(float __x),__cbrtf,(__x))
-#elif (__has_builtin(__builtin_cbrt) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_cbrt)) || defined(__CRT_HAVE_cbrt) || defined(__CRT_HAVE___cbrt)
+#elif defined(__CRT_HAVE_cbrt) || defined(__CRT_HAVE___cbrt)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/cbrtf.h>
@@ -5310,7 +5310,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,rint,(float __x),rintf,(__x))
 #elif defined(__CRT_HAVE___rintf)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,rint,(float __x),__rintf,(__x))
-#elif (__has_builtin(__builtin_rint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_rint)) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
+#elif defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/rintf.h>
@@ -5328,7 +5328,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,nextafter,(float __x, fl
 #elif defined(__CRT_HAVE___nextafterf)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,nextafter,(float __x, float __y),__nextafterf,(__x,__y))
-#elif (__has_builtin(__builtin_nextafter) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nextafter)) || defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter)
+#elif defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/nextafterf.h>
@@ -5346,7 +5346,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,remainder,(float __x, float __y),rema
 #elif defined(__CRT_HAVE___remainderf)
 /* Return the remainder of integer divison X / Y with infinite precision */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,remainder,(float __x, float __y),__remainderf,(__x,__y))
-#elif (__has_builtin(__builtin_remainder) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remainder)) || defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE___remainder)
+#elif defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE___remainder)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/remainderf.h>
@@ -5364,7 +5364,7 @@ __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,ilogb,(float __x),ilogbf,(__x))
 #elif defined(__CRT_HAVE___ilogbf)
 /* Return the binary exponent of X, which must be nonzero */
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,ilogb,(float __x),__ilogbf,(__x))
-#elif (__has_builtin(__builtin_ilogb) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ilogb)) || defined(__CRT_HAVE_ilogb) || defined(__CRT_HAVE___ilogb)
+#elif defined(__CRT_HAVE_ilogb) || defined(__CRT_HAVE___ilogb)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/ilogbf.h>
@@ -5389,7 +5389,7 @@ __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,acosh,(long double __x),(__x))
 #elif defined(__CRT_HAVE___acosh) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Hyperbolic arc cosine of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,acosh,(long double __x),__acosh,(__x))
-#elif (__has_builtin(__builtin_acosh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_acosh)) || defined(__CRT_HAVE_acosh) || defined(__CRT_HAVE___acosh)
+#elif defined(__CRT_HAVE_acosh) || defined(__CRT_HAVE___acosh)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/acoshl.h>
@@ -5413,7 +5413,7 @@ __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,asinh,(long double __x),(__x))
 #elif defined(__CRT_HAVE___asinh) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Hyperbolic arc sine of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,asinh,(long double __x),__asinh,(__x))
-#elif (__has_builtin(__builtin_asinh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_asinh)) || defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh)
+#elif defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/asinhl.h>
@@ -5437,7 +5437,7 @@ __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,atanh,(long double __x),(__x))
 #elif defined(__CRT_HAVE___atanh) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Hyperbolic arc tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,atanh,(long double __x),__atanh,(__x))
-#elif (__has_builtin(__builtin_atanh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atanh)) || defined(__CRT_HAVE_atanh) || defined(__CRT_HAVE___atanh)
+#elif defined(__CRT_HAVE_atanh) || defined(__CRT_HAVE___atanh)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/atanhl.h>
@@ -5461,7 +5461,7 @@ __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,expm1,(long double __x),(__x))
 #elif defined(__CRT_HAVE___expm1) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return exp(X) - 1 */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,expm1,(long double __x),__expm1,(__x))
-#elif (__has_builtin(__builtin_expm1) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_expm1)) || defined(__CRT_HAVE_expm1) || defined(__CRT_HAVE___expm1)
+#elif defined(__CRT_HAVE_expm1) || defined(__CRT_HAVE___expm1)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/expm1l.h>
@@ -5485,7 +5485,7 @@ __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,log1p,(long double __x),(__x))
 #elif defined(__CRT_HAVE___log1p) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return log(1 + X) */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,log1p,(long double __x),__log1p,(__x))
-#elif (__has_builtin(__builtin_log1p) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log1p)) || defined(__CRT_HAVE_log1p) || defined(__CRT_HAVE___log1p)
+#elif defined(__CRT_HAVE_log1p) || defined(__CRT_HAVE___log1p)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/log1pl.h>
@@ -5509,7 +5509,7 @@ __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,logb,(long double __x),(__x))
 #elif defined(__CRT_HAVE___logb) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return the base 2 signed integral exponent of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,logb,(long double __x),__logb,(__x))
-#elif (__has_builtin(__builtin_logb) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_logb)) || defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb)
+#elif defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/logbl.h>
@@ -5533,7 +5533,7 @@ __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,cbrt,(long double __x),(__x))
 #elif defined(__CRT_HAVE___cbrt) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return the cube root of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,cbrt,(long double __x),__cbrt,(__x))
-#elif (__has_builtin(__builtin_cbrt) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_cbrt)) || defined(__CRT_HAVE_cbrt) || defined(__CRT_HAVE___cbrt)
+#elif defined(__CRT_HAVE_cbrt) || defined(__CRT_HAVE___cbrt)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/cbrtl.h>
@@ -5557,7 +5557,7 @@ __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,rint,(long double __x),(__x))
 #elif defined(__CRT_HAVE___rint) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,rint,(long double __x),__rint,(__x))
-#elif (__has_builtin(__builtin_rint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_rint)) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
+#elif defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/rintl.h>
@@ -5581,7 +5581,7 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,nextafter,(long dou
 #elif defined(__CRT_HAVE___nextafter) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,nextafter,(long double __x, long double __y),__nextafter,(__x,__y))
-#elif (__has_builtin(__builtin_nextafter) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nextafter)) || defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter)
+#elif defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/nextafterl.h>
@@ -5605,7 +5605,7 @@ __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,remainder,(long double __x, long
 #elif defined(__CRT_HAVE___remainder) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return the remainder of integer divison X / Y with infinite precision */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,remainder,(long double __x, long double __y),__remainder,(__x,__y))
-#elif (__has_builtin(__builtin_remainder) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remainder)) || defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE___remainder)
+#elif defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE___remainder)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/remainderl.h>
@@ -5629,7 +5629,7 @@ __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW,ilogb,(long double __x),(__x))
 #elif defined(__CRT_HAVE___ilogb) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return the binary exponent of X, which must be nonzero */
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,ilogb,(long double __x),__ilogb,(__x))
-#elif (__has_builtin(__builtin_ilogb) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ilogb)) || defined(__CRT_HAVE_ilogb) || defined(__CRT_HAVE___ilogb)
+#elif defined(__CRT_HAVE_ilogb) || defined(__CRT_HAVE___ilogb)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/ilogbl.h>
@@ -5650,7 +5650,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,exp2,(float __x),exp2f,(__x))
 #elif defined(__CRT_HAVE___exp2f)
 /* Compute base-2 exponential of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,exp2,(float __x),__exp2f,(__x))
-#elif (__has_builtin(__builtin_exp2) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exp2)) || defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2)
+#elif defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/exp2f.h>
@@ -5668,7 +5668,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,log2,(float __x),log2f,(__x))
 #elif defined(__CRT_HAVE___log2f)
 /* Compute base-2 logarithm of X */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,log2,(float __x),__log2f,(__x))
-#elif (__has_builtin(__builtin_log2) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log2)) || defined(__CRT_HAVE_log2) || defined(__CRT_HAVE___log2)
+#elif defined(__CRT_HAVE_log2) || defined(__CRT_HAVE___log2)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/log2f.h>
@@ -5704,7 +5704,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,tgamma,(float __x),tgammaf,(__x))
 #elif defined(__CRT_HAVE___tgammaf)
 /* True gamma function */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,tgamma,(float __x),__tgammaf,(__x))
-#elif (__has_builtin(__builtin_tgamma) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tgamma)) || defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma)
+#elif defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/tgammaf.h>
@@ -5719,7 +5719,7 @@ __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL nexttoward)(
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,nexttoward,(float __x, long double __y),nexttowardf,(__x,__y))
 #elif defined(__CRT_HAVE___nexttowardf)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,nexttoward,(float __x, long double __y),__nexttowardf,(__x,__y))
-#elif (__has_builtin(__builtin_nexttoward) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nexttoward)) || defined(__CRT_HAVE_nexttoward) || defined(__CRT_HAVE___nexttoward)
+#elif defined(__CRT_HAVE_nexttoward) || defined(__CRT_HAVE___nexttoward)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/nexttowardf.h>
@@ -5736,7 +5736,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,scalbn,(float __x, int __n),scalbnf,(
 #elif defined(__CRT_HAVE___scalbnf)
 /* Return X times (2 to the Nth power) */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,scalbn,(float __x, int __n),__scalbnf,(__x,__n))
-#elif (__has_builtin(__builtin_scalbn) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalbn)) || defined(__CRT_HAVE_scalbn) || defined(__CRT_HAVE___scalbn)
+#elif defined(__CRT_HAVE_scalbn) || defined(__CRT_HAVE___scalbn)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/scalbnf.h>
@@ -5754,7 +5754,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,scalbln,(float __x, long int __n),sca
 #elif defined(__CRT_HAVE___scalblnf)
 /* Return X times (2 to the Nth power) */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,scalbln,(float __x, long int __n),__scalblnf,(__x,__n))
-#elif (__has_builtin(__builtin_scalbln) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalbln)) || defined(__CRT_HAVE_scalbln) || defined(__CRT_HAVE___scalbln)
+#elif defined(__CRT_HAVE_scalbln) || defined(__CRT_HAVE___scalbln)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/scalblnf.h>
@@ -5775,7 +5775,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,nearbyint,(float __x),nearbyintf,(__x
 /* Round X to integral value in floating-point format using current
  * rounding direction, but do not raise inexact exception */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,nearbyint,(float __x),__nearbyintf,(__x))
-#elif (__has_builtin(__builtin_nearbyint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nearbyint)) || defined(__CRT_HAVE_nearbyint) || defined(__CRT_HAVE___nearbyint)
+#elif defined(__CRT_HAVE_nearbyint) || defined(__CRT_HAVE___nearbyint)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/nearbyintf.h>
@@ -5840,7 +5840,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,remquo,(float __x, float __y, int *__
  * of x/y and magnitude congruent `mod 2^n' to the magnitude of
  * the integral quotient x/y, with n >= 3 */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,remquo,(float __x, float __y, int *__pquo),__remquof,(__x,__y,__pquo))
-#elif (__has_builtin(__builtin_remquo) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remquo)) || defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo)
+#elif defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/remquof.h>
@@ -5860,7 +5860,7 @@ __CREDIRECT(__ATTR_WUNUSED,long int,__NOTHROW,lrint,(float __x),lrintf,(__x))
 #elif defined(__CRT_HAVE___lrintf)
 /* Round X to nearest integral value according to current rounding direction */
 __CREDIRECT(__ATTR_WUNUSED,long int,__NOTHROW,lrint,(float __x),__lrintf,(__x))
-#elif (__has_builtin(__builtin_lrint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lrint)) || defined(__CRT_HAVE_lrint) || defined(__CRT_HAVE___lrint)
+#elif defined(__CRT_HAVE_lrint) || defined(__CRT_HAVE___lrint)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/lrintf.h>
@@ -5969,7 +5969,7 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGLONG,__NOTHROW,llrint,(float __x),llrintf,(__x)
 #elif defined(__CRT_HAVE___llrintf)
 /* Round X to nearest integral value according to current rounding direction */
 __CREDIRECT(__ATTR_WUNUSED,__LONGLONG,__NOTHROW,llrint,(float __x),__llrintf,(__x))
-#elif (__has_builtin(__builtin_llrint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_llrint)) || defined(__CRT_HAVE_llrint) || defined(__CRT_HAVE___llrint)
+#elif defined(__CRT_HAVE_llrint) || defined(__CRT_HAVE___llrint)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/llrintf.h>
@@ -6013,7 +6013,7 @@ __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,exp2,(long double __x),(__x))
 #elif defined(__CRT_HAVE___exp2) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Compute base-2 exponential of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,exp2,(long double __x),__exp2,(__x))
-#elif (__has_builtin(__builtin_exp2) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exp2)) || defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2)
+#elif defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/exp2l.h>
@@ -6037,7 +6037,7 @@ __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,log2,(long double __x),(__x))
 #elif defined(__CRT_HAVE___log2) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Compute base-2 logarithm of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,log2,(long double __x),__log2,(__x))
-#elif (__has_builtin(__builtin_log2) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log2)) || defined(__CRT_HAVE_log2) || defined(__CRT_HAVE___log2)
+#elif defined(__CRT_HAVE_log2) || defined(__CRT_HAVE___log2)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/log2l.h>
@@ -6079,7 +6079,7 @@ __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,tgamma,(long double __x),(__x))
 #elif defined(__CRT_HAVE___tgamma) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* True gamma function */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,tgamma,(long double __x),__tgamma,(__x))
-#elif (__has_builtin(__builtin_tgamma) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tgamma)) || defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma)
+#elif defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/tgammal.h>
@@ -6098,7 +6098,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,nexttoward,(long d
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,nexttoward,(long double __x, long double __y),(__x,__y))
 #elif defined(__CRT_HAVE___nexttoward) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,nexttoward,(long double __x, long double __y),__nexttoward,(__x,__y))
-#elif (__has_builtin(__builtin_nexttoward) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nexttoward)) || defined(__CRT_HAVE_nexttoward) || defined(__CRT_HAVE___nexttoward)
+#elif defined(__CRT_HAVE_nexttoward) || defined(__CRT_HAVE___nexttoward)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/nexttowardl.h>
@@ -6121,7 +6121,7 @@ __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,scalbn,(long double __x, int __n
 #elif defined(__CRT_HAVE___scalbn) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return X times (2 to the Nth power) */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,scalbn,(long double __x, int __n),__scalbn,(__x,__n))
-#elif (__has_builtin(__builtin_scalbn) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalbn)) || defined(__CRT_HAVE_scalbn) || defined(__CRT_HAVE___scalbn)
+#elif defined(__CRT_HAVE_scalbn) || defined(__CRT_HAVE___scalbn)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/scalbnl.h>
@@ -6145,7 +6145,7 @@ __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,scalbln,(long double __x, long i
 #elif defined(__CRT_HAVE___scalbln) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return X times (2 to the Nth power) */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,scalbln,(long double __x, long int __n),__scalbln,(__x,__n))
-#elif (__has_builtin(__builtin_scalbln) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalbln)) || defined(__CRT_HAVE_scalbln) || defined(__CRT_HAVE___scalbln)
+#elif defined(__CRT_HAVE_scalbln) || defined(__CRT_HAVE___scalbln)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/scalblnl.h>
@@ -6174,7 +6174,7 @@ __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,nearbyint,(long double __x),(__x
 /* Round X to integral value in floating-point format using current
  * rounding direction, but do not raise inexact exception */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,nearbyint,(long double __x),__nearbyint,(__x))
-#elif (__has_builtin(__builtin_nearbyint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nearbyint)) || defined(__CRT_HAVE_nearbyint) || defined(__CRT_HAVE___nearbyint)
+#elif defined(__CRT_HAVE_nearbyint) || defined(__CRT_HAVE___nearbyint)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/nearbyintl.h>
@@ -6249,7 +6249,7 @@ __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,remquo,(long double __x, long do
  * of x/y and magnitude congruent `mod 2^n' to the magnitude of
  * the integral quotient x/y, with n >= 3 */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,remquo,(long double __x, long double __y, int *__pquo),__remquo,(__x,__y,__pquo))
-#elif (__has_builtin(__builtin_remquo) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remquo)) || defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo)
+#elif defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/remquol.h>
@@ -6275,7 +6275,7 @@ __CDECLARE(__ATTR_WUNUSED,long int,__NOTHROW,lrint,(long double __x),(__x))
 #elif defined(__CRT_HAVE___lrint) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Round X to nearest integral value according to current rounding direction */
 __CREDIRECT(__ATTR_WUNUSED,long int,__NOTHROW,lrint,(long double __x),__lrint,(__x))
-#elif (__has_builtin(__builtin_lrint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lrint)) || defined(__CRT_HAVE_lrint) || defined(__CRT_HAVE___lrint)
+#elif defined(__CRT_HAVE_lrint) || defined(__CRT_HAVE___lrint)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/lrintl.h>
@@ -6390,7 +6390,7 @@ __CDECLARE(__ATTR_WUNUSED,__LONGLONG,__NOTHROW,llrint,(long double __x),(__x))
 #elif defined(__CRT_HAVE___llrint) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Round X to nearest integral value according to current rounding direction */
 __CREDIRECT(__ATTR_WUNUSED,__LONGLONG,__NOTHROW,llrint,(long double __x),__llrint,(__x))
-#elif (__has_builtin(__builtin_llrint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_llrint)) || defined(__CRT_HAVE_llrint) || defined(__CRT_HAVE___llrint)
+#elif defined(__CRT_HAVE_llrint) || defined(__CRT_HAVE___llrint)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/llrintl.h>
@@ -6430,7 +6430,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,hypot,(float __x, float __y),hypotf,(
 #elif defined(__CRT_HAVE___hypotf)
 /* Return `sqrt(X*X + Y*Y)' */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,hypot,(float __x, float __y),__hypotf,(__x,__y))
-#elif (__has_builtin(__builtin_hypot) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_hypot)) || defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE___hypot)
+#elif defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE___hypot)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/hypotf.h>
@@ -6445,7 +6445,7 @@ __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL erf)(float __x) { return 
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,erf,(float __x),erff,(__x))
 #elif defined(__CRT_HAVE___erff)
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,erf,(float __x),__erff,(__x))
-#elif (__has_builtin(__builtin_erf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_erf)) || defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf)
+#elif defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/erff.h>
@@ -6459,7 +6459,7 @@ __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL erfc)(float __x) { return
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,erfc,(float __x),erfcf,(__x))
 #elif defined(__CRT_HAVE___erfcf)
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,erfc,(float __x),__erfcf,(__x))
-#elif (__has_builtin(__builtin_erfc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_erfc)) || defined(__CRT_HAVE_erfc) || defined(__CRT_HAVE___erfc)
+#elif defined(__CRT_HAVE_erfc) || defined(__CRT_HAVE___erfc)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/erfcf.h>
@@ -6477,7 +6477,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,lgamma,(float __x),__lgammaf,(__x))
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,lgamma,(float __x),__gammaf,(__x))
 #elif defined(__CRT_HAVE_gammaf)
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,lgamma,(float __x),gammaf,(__x))
-#elif (__has_builtin(__builtin_lgamma) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lgamma)) || defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma) || defined(__CRT_HAVE_gamma)
+#elif defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma) || defined(__CRT_HAVE_gamma)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/lgammaf.h>
@@ -6501,7 +6501,7 @@ __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,hypot,(long double __x, long dou
 #elif defined(__CRT_HAVE___hypot) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return `sqrt(X*X + Y*Y)' */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,hypot,(long double __x, long double __y),__hypot,(__x,__y))
-#elif (__has_builtin(__builtin_hypot) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_hypot)) || defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE___hypot)
+#elif defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE___hypot)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/hypotl.h>
@@ -6520,7 +6520,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,erf,(long double __x),__erfl,(_
 __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,erf,(long double __x),(__x))
 #elif defined(__CRT_HAVE___erf) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,erf,(long double __x),__erf,(__x))
-#elif (__has_builtin(__builtin_erf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_erf)) || defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf)
+#elif defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/erfl.h>
@@ -6538,7 +6538,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,erfc,(long double __x),__erfcl,
 __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,erfc,(long double __x),(__x))
 #elif defined(__CRT_HAVE___erfc) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,erfc,(long double __x),__erfc,(__x))
-#elif (__has_builtin(__builtin_erfc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_erfc)) || defined(__CRT_HAVE_erfc) || defined(__CRT_HAVE___erfc)
+#elif defined(__CRT_HAVE_erfc) || defined(__CRT_HAVE___erfc)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/erfcl.h>
@@ -6564,7 +6564,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,lgamma,(long double __x),__lgam
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,lgamma,(long double __x),__gamma,(__x))
 #elif defined(__CRT_HAVE_gamma) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,lgamma,(long double __x),gamma,(__x))
-#elif (__has_builtin(__builtin_lgamma) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lgamma)) || defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma) || defined(__CRT_HAVE_gamma)
+#elif defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma) || defined(__CRT_HAVE_gamma)
 } /* extern "C++" { */
 __NAMESPACE_STD_END
 #include <local/math/lgammal.h>
@@ -7345,7 +7345,7 @@ __CDECLARE_VOID(__DECL_SIMD_sincosf __ATTR_NONNULL((2, 3)),__NOTHROW,sincosf,(fl
 #elif defined(__CRT_HAVE___sincosf)
 /* Cosine and sine of X */
 __CREDIRECT_VOID(__DECL_SIMD_sincosf __ATTR_NONNULL((2, 3)),__NOTHROW,sincosf,(float __x, float *__psinx, float *__pcosx),__sincosf,(__x,__psinx,__pcosx))
-#elif (__has_builtin(__builtin_sincos) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sincos)) || defined(__CRT_HAVE_sincos) || defined(__CRT_HAVE___sincos)
+#elif defined(__CRT_HAVE_sincos) || defined(__CRT_HAVE___sincos)
 #include <local/math/sincosf.h>
 /* Cosine and sine of X */
 __NAMESPACE_LOCAL_USING_OR_IMPL(sincosf, __FORCELOCAL __DECL_SIMD_sincosf __ATTR_NONNULL((2, 3)) void __NOTHROW(__LIBCCALL sincosf)(float __x, float *__psinx, float *__pcosx) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sincosf))(__x, __psinx, __pcosx); })
@@ -7359,7 +7359,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,exp10f,(float __x),(__x))
 #elif defined(__CRT_HAVE___exp10f)
 /* A function missing in all standards: compute exponent to base ten */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,exp10f,(float __x),__exp10f,(__x))
-#elif (__has_builtin(__builtin_exp10) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exp10)) || defined(__CRT_HAVE_exp10) || defined(__CRT_HAVE___exp10)
+#elif defined(__CRT_HAVE_exp10) || defined(__CRT_HAVE___exp10)
 #include <local/math/exp10f.h>
 /* A function missing in all standards: compute exponent to base ten */
 __NAMESPACE_LOCAL_USING_OR_IMPL(exp10f, __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL exp10f)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(exp10f))(__x); })
@@ -7373,7 +7373,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,pow10f,(float __x),(__x))
 #elif defined(__CRT_HAVE___pow10f)
 /* Another name occasionally used */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,pow10f,(float __x),__pow10f,(__x))
-#elif (__has_builtin(__builtin_pow10) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_pow10)) || defined(__CRT_HAVE_pow10) || defined(__CRT_HAVE___pow10)
+#elif defined(__CRT_HAVE_pow10) || defined(__CRT_HAVE___pow10)
 #include <local/math/pow10f.h>
 /* Another name occasionally used */
 __NAMESPACE_LOCAL_USING_OR_IMPL(pow10f, __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL pow10f)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pow10f))(__x); })
@@ -7394,7 +7394,7 @@ __CREDIRECT_VOID(__DECL_SIMD_sincosl __ATTR_NONNULL((2, 3)),__NOTHROW,sincosl,(l
 #elif defined(__CRT_HAVE_sincos) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Cosine and sine of X */
 __CREDIRECT_VOID(__DECL_SIMD_sincosl __ATTR_NONNULL((2, 3)),__NOTHROW,sincosl,(long double __x, long double *__psinx, long double *__pcosx),sincos,(__x,__psinx,__pcosx))
-#elif (__has_builtin(__builtin_sincos) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sincos)) || defined(__CRT_HAVE_sincos) || defined(__CRT_HAVE___sincos)
+#elif defined(__CRT_HAVE_sincos) || defined(__CRT_HAVE___sincos)
 #include <local/math/sincosl.h>
 /* Cosine and sine of X */
 __NAMESPACE_LOCAL_USING_OR_IMPL(sincosl, __FORCELOCAL __DECL_SIMD_sincosl __ATTR_NONNULL((2, 3)) void __NOTHROW(__LIBCCALL sincosl)(long double __x, long double *__psinx, long double *__pcosx) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sincosl))(__x, __psinx, __pcosx); })
@@ -7414,7 +7414,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,exp10l,(long double __x),exp10,
 #elif defined(__CRT_HAVE___exp10) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* A function missing in all standards: compute exponent to base ten */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,exp10l,(long double __x),__exp10,(__x))
-#elif (__has_builtin(__builtin_exp10) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exp10)) || defined(__CRT_HAVE_exp10) || defined(__CRT_HAVE___exp10)
+#elif defined(__CRT_HAVE_exp10) || defined(__CRT_HAVE___exp10)
 #include <local/math/exp10l.h>
 /* A function missing in all standards: compute exponent to base ten */
 __NAMESPACE_LOCAL_USING_OR_IMPL(exp10l, __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL exp10l)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(exp10l))(__x); })
@@ -7434,7 +7434,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,pow10l,(long double __x),pow10,
 #elif defined(__CRT_HAVE___pow10) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Another name occasionally used */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,pow10l,(long double __x),__pow10,(__x))
-#elif (__has_builtin(__builtin_pow10) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_pow10)) || defined(__CRT_HAVE_pow10) || defined(__CRT_HAVE___pow10)
+#elif defined(__CRT_HAVE_pow10) || defined(__CRT_HAVE___pow10)
 #include <local/math/pow10l.h>
 /* Another name occasionally used */
 __NAMESPACE_LOCAL_USING_OR_IMPL(pow10l, __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL pow10l)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pow10l))(__x); })
@@ -7541,7 +7541,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,dremf,(float __x, float __y),(__x,__y)
 #elif defined(__CRT_HAVE___dremf)
 /* Return the remainder of X/Y */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,dremf,(float __x, float __y),__dremf,(__x,__y))
-#elif (__has_builtin(__builtin_drem) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_drem)) || defined(__CRT_HAVE_drem) || defined(__CRT_HAVE___drem)
+#elif defined(__CRT_HAVE_drem) || defined(__CRT_HAVE___drem)
 #include <local/math/dremf.h>
 /* Return the remainder of X/Y */
 __NAMESPACE_LOCAL_USING_OR_IMPL(dremf, __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL dremf)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dremf))(__x, __y); })
@@ -7555,7 +7555,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,significandf,(float __x),(__x))
 #elif defined(__CRT_HAVE___significandf)
 /* Return the fractional part of X after dividing out `ilogb (X)' */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,significandf,(float __x),__significandf,(__x))
-#elif (__has_builtin(__builtin_significand) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_significand)) || defined(__CRT_HAVE_significand) || defined(__CRT_HAVE___significand)
+#elif defined(__CRT_HAVE_significand) || defined(__CRT_HAVE___significand)
 #include <local/math/significandf.h>
 /* Return the fractional part of X after dividing out `ilogb (X)' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(significandf, __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL significandf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(significandf))(__x); })
@@ -7590,7 +7590,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,dreml,(long double __x, long do
 #elif defined(__CRT_HAVE___drem) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return the remainder of X/Y */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,dreml,(long double __x, long double __y),__drem,(__x,__y))
-#elif (__has_builtin(__builtin_drem) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_drem)) || defined(__CRT_HAVE_drem) || defined(__CRT_HAVE___drem)
+#elif defined(__CRT_HAVE_drem) || defined(__CRT_HAVE___drem)
 #include <local/math/dreml.h>
 /* Return the remainder of X/Y */
 __NAMESPACE_LOCAL_USING_OR_IMPL(dreml, __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL dreml)(long double __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dreml))(__x, __y); })
@@ -7610,7 +7610,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,significandl,(long double __x),
 #elif defined(__CRT_HAVE___significand) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return the fractional part of X after dividing out `ilogb (X)' */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,significandl,(long double __x),__significand,(__x))
-#elif (__has_builtin(__builtin_significand) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_significand)) || defined(__CRT_HAVE_significand) || defined(__CRT_HAVE___significand)
+#elif defined(__CRT_HAVE_significand) || defined(__CRT_HAVE___significand)
 #include <local/math/significandl.h>
 /* Return the fractional part of X after dividing out `ilogb (X)' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(significandl, __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL significandl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(significandl))(__x); })
@@ -7718,7 +7718,7 @@ __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL j0f)(float __x) { return 
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,j0f,(float __x),(__x))
 #elif defined(__CRT_HAVE___j0f)
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,j0f,(float __x),__j0f,(__x))
-#elif (__has_builtin(__builtin_j0) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_j0)) || defined(__CRT_HAVE_j0) || defined(__CRT_HAVE___j0)
+#elif defined(__CRT_HAVE_j0) || defined(__CRT_HAVE___j0)
 #include <local/math/j0f.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(j0f, __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL j0f)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(j0f))(__x); })
 #endif /* j0f... */
@@ -7728,7 +7728,7 @@ __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL j1f)(float __x) { return 
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,j1f,(float __x),(__x))
 #elif defined(__CRT_HAVE___j1f)
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,j1f,(float __x),__j1f,(__x))
-#elif (__has_builtin(__builtin_j1) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_j1)) || defined(__CRT_HAVE_j1) || defined(__CRT_HAVE___j1)
+#elif defined(__CRT_HAVE_j1) || defined(__CRT_HAVE___j1)
 #include <local/math/j1f.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(j1f, __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL j1f)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(j1f))(__x); })
 #endif /* j1f... */
@@ -7738,7 +7738,7 @@ __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL jnf)(int __n, float __x) 
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,jnf,(int __n, float __x),(__n,__x))
 #elif defined(__CRT_HAVE___jnf)
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,jnf,(int __n, float __x),__jnf,(__n,__x))
-#elif (__has_builtin(__builtin_jn) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_jn)) || defined(__CRT_HAVE_jn) || defined(__CRT_HAVE___jn)
+#elif defined(__CRT_HAVE_jn) || defined(__CRT_HAVE___jn)
 #include <local/math/jnf.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(jnf, __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL jnf)(int __n, float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(jnf))(__n, __x); })
 #endif /* jnf... */
@@ -7748,7 +7748,7 @@ __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL y0f)(float __x) { return 
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,y0f,(float __x),(__x))
 #elif defined(__CRT_HAVE___y0f)
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,y0f,(float __x),__y0f,(__x))
-#elif (__has_builtin(__builtin_y0) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_y0)) || defined(__CRT_HAVE_y0) || defined(__CRT_HAVE___y0)
+#elif defined(__CRT_HAVE_y0) || defined(__CRT_HAVE___y0)
 #include <local/math/y0f.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(y0f, __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL y0f)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(y0f))(__x); })
 #endif /* y0f... */
@@ -7758,7 +7758,7 @@ __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL y1f)(float __x) { return 
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,y1f,(float __x),(__x))
 #elif defined(__CRT_HAVE___y1f)
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,y1f,(float __x),__y1f,(__x))
-#elif (__has_builtin(__builtin_y1) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_y1)) || defined(__CRT_HAVE_y1) || defined(__CRT_HAVE___y1)
+#elif defined(__CRT_HAVE_y1) || defined(__CRT_HAVE___y1)
 #include <local/math/y1f.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(y1f, __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL y1f)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(y1f))(__x); })
 #endif /* y1f... */
@@ -7768,7 +7768,7 @@ __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL ynf)(int __n, float __x) 
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,ynf,(int __n, float __x),(__n,__x))
 #elif defined(__CRT_HAVE___ynf)
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,ynf,(int __n, float __x),__ynf,(__n,__x))
-#elif (__has_builtin(__builtin_yn) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_yn)) || defined(__CRT_HAVE_yn) || defined(__CRT_HAVE___yn)
+#elif defined(__CRT_HAVE_yn) || defined(__CRT_HAVE___yn)
 #include <local/math/ynf.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(ynf, __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL ynf)(int __n, float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ynf))(__n, __x); })
 #endif /* ynf... */
@@ -7783,7 +7783,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,j0l,(long double __x),__j0l,(__
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,j0l,(long double __x),j0,(__x))
 #elif defined(__CRT_HAVE___j0) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,j0l,(long double __x),__j0,(__x))
-#elif (__has_builtin(__builtin_j0) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_j0)) || defined(__CRT_HAVE_j0) || defined(__CRT_HAVE___j0)
+#elif defined(__CRT_HAVE_j0) || defined(__CRT_HAVE___j0)
 #include <local/math/j0l.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(j0l, __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL j0l)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(j0l))(__x); })
 #endif /* j0l... */
@@ -7797,7 +7797,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,j1l,(long double __x),__j1l,(__
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,j1l,(long double __x),j1,(__x))
 #elif defined(__CRT_HAVE___j1) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,j1l,(long double __x),__j1,(__x))
-#elif (__has_builtin(__builtin_j1) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_j1)) || defined(__CRT_HAVE_j1) || defined(__CRT_HAVE___j1)
+#elif defined(__CRT_HAVE_j1) || defined(__CRT_HAVE___j1)
 #include <local/math/j1l.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(j1l, __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL j1l)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(j1l))(__x); })
 #endif /* j1l... */
@@ -7811,7 +7811,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,jnl,(int __n, long double __x),
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,jnl,(int __n, long double __x),jn,(__n,__x))
 #elif defined(__CRT_HAVE___jn) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,jnl,(int __n, long double __x),__jn,(__n,__x))
-#elif (__has_builtin(__builtin_jn) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_jn)) || defined(__CRT_HAVE_jn) || defined(__CRT_HAVE___jn)
+#elif defined(__CRT_HAVE_jn) || defined(__CRT_HAVE___jn)
 #include <local/math/jnl.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(jnl, __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL jnl)(int __n, long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(jnl))(__n, __x); })
 #endif /* jnl... */
@@ -7825,7 +7825,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,y0l,(long double __x),__y0l,(__
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,y0l,(long double __x),y0,(__x))
 #elif defined(__CRT_HAVE___y0) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,y0l,(long double __x),__y0,(__x))
-#elif (__has_builtin(__builtin_y0) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_y0)) || defined(__CRT_HAVE_y0) || defined(__CRT_HAVE___y0)
+#elif defined(__CRT_HAVE_y0) || defined(__CRT_HAVE___y0)
 #include <local/math/y0l.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(y0l, __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL y0l)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(y0l))(__x); })
 #endif /* y0l... */
@@ -7839,7 +7839,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,y1l,(long double __x),__y1l,(__
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,y1l,(long double __x),y1,(__x))
 #elif defined(__CRT_HAVE___y1) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,y1l,(long double __x),__y1,(__x))
-#elif (__has_builtin(__builtin_y1) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_y1)) || defined(__CRT_HAVE_y1) || defined(__CRT_HAVE___y1)
+#elif defined(__CRT_HAVE_y1) || defined(__CRT_HAVE___y1)
 #include <local/math/y1l.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(y1l, __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL y1l)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(y1l))(__x); })
 #endif /* y1l... */
@@ -7853,7 +7853,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,ynl,(int __n, long double __x),
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,ynl,(int __n, long double __x),yn,(__n,__x))
 #elif defined(__CRT_HAVE___yn) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,ynl,(int __n, long double __x),__yn,(__n,__x))
-#elif (__has_builtin(__builtin_yn) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_yn)) || defined(__CRT_HAVE_yn) || defined(__CRT_HAVE___yn)
+#elif defined(__CRT_HAVE_yn) || defined(__CRT_HAVE___yn)
 #include <local/math/ynl.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(ynl, __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL ynl)(int __n, long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ynl))(__n, __x); })
 #endif /* ynl... */
@@ -7887,7 +7887,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,gammaf,(float __x),lgammaf,(__x))
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,gammaf,(float __x),__gammaf,(__x))
 #elif defined(__CRT_HAVE___lgammaf)
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,gammaf,(float __x),__lgammaf,(__x))
-#elif (__has_builtin(__builtin_lgamma) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lgamma)) || defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma) || defined(__CRT_HAVE_gamma)
+#elif defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma) || defined(__CRT_HAVE_gamma)
 #include <local/math/lgammaf.h>
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL gammaf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgammaf))(__x); }
 #endif /* gammaf... */
@@ -7902,7 +7902,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,gammal,(long double __x),lgamma
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,gammal,(long double __x),__gammal,(__x))
 #elif defined(__CRT_HAVE___lgammal)
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,gammal,(long double __x),__lgammal,(__x))
-#elif (__has_builtin(__builtin_lgamma) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lgamma)) || defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma) || defined(__CRT_HAVE_gamma)
+#elif defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma) || defined(__CRT_HAVE_gamma)
 #include <local/math/lgammal.h>
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL gammal)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgammal))(__x); }
 #endif /* gammal... */
@@ -7940,7 +7940,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW_NCX,lgammaf_r,(float __x, int *__signg
  * `signgam'.  The reentrant version instead takes a pointer and stores
  * the value through it */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW_NCX,lgammaf_r,(float __x, int *__signgamp),__lgammaf_r,(__x,__signgamp))
-#elif (__has_builtin(__builtin_lgamma_r) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lgamma_r)) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r)
+#elif defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r)
 #include <local/math/lgammaf_r.h>
 /* Reentrant version of lgamma. This function uses the global variable
  * `signgam'.  The reentrant version instead takes a pointer and stores
@@ -7968,7 +7968,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW_NCX,lgammal_r,(long double __x,
  * `signgam'.  The reentrant version instead takes a pointer and stores
  * the value through it */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW_NCX,lgammal_r,(long double __x, int *__signgamp),lgamma_r,(__x,__signgamp))
-#elif (__has_builtin(__builtin_lgamma_r) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lgamma_r)) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r)
+#elif defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r)
 #include <local/math/lgammal_r.h>
 /* Reentrant version of lgamma. This function uses the global variable
  * `signgam'.  The reentrant version instead takes a pointer and stores
@@ -8006,7 +8006,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,scalbf,(float __x, float __n),__scalb
 #elif defined(__CRT_HAVE__scalbf)
 /* Return X times (2 to the Nth power) */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,scalbf,(float __x, float __n),_scalbf,(__x,__n))
-#elif (__has_builtin(__builtin_scalb) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalb)) || defined(__CRT_HAVE_scalb) || defined(__CRT_HAVE___scalb) || defined(__CRT_HAVE__scalb)
+#elif defined(__CRT_HAVE_scalb) || defined(__CRT_HAVE___scalb) || defined(__CRT_HAVE__scalb)
 #include <local/math/scalbf.h>
 /* Return X times (2 to the Nth power) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(scalbf, __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL scalbf)(float __x, float __n) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scalbf))(__x, __n); })
@@ -8030,7 +8030,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,scalbl,(long double __x, long d
 #elif defined(__CRT_HAVE___scalb) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return X times (2 to the Nth power) */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,scalbl,(long double __x, long double __n),__scalb,(__x,__n))
-#elif (__has_builtin(__builtin_scalb) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalb)) || defined(__CRT_HAVE_scalb) || defined(__CRT_HAVE___scalb) || defined(__CRT_HAVE__scalb)
+#elif defined(__CRT_HAVE_scalb) || defined(__CRT_HAVE___scalb) || defined(__CRT_HAVE__scalb)
 #include <local/math/scalbl.h>
 /* Return X times (2 to the Nth power) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(scalbl, __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL scalbl)(long double __x, long double __n) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scalbl))(__x, __n); })
@@ -8120,7 +8120,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__acosf,(float __x),acosf,(__x))
 #elif defined(__CRT_HAVE___acosf)
 /* Arc cosine of X */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__acosf,(float __x),(__x))
-#elif (__has_builtin(__builtin_acos) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_acos)) || defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos)
+#elif defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos)
 #include <local/math/acosf.h>
 /* Arc cosine of X */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __acosf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(acosf))(__x); }
@@ -8134,7 +8134,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__asinf,(float __x),asinf,(__x))
 #elif defined(__CRT_HAVE___asinf)
 /* Arc sine of X */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__asinf,(float __x),(__x))
-#elif (__has_builtin(__builtin_asin) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_asin)) || defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin)
+#elif defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin)
 #include <local/math/asinf.h>
 /* Arc sine of X */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __asinf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(asinf))(__x); }
@@ -8148,7 +8148,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__atanf,(float __x),atanf,(__x))
 #elif defined(__CRT_HAVE___atanf)
 /* Arc tangent of X */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__atanf,(float __x),(__x))
-#elif (__has_builtin(__builtin_atan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atan)) || defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan)
+#elif defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan)
 #include <local/math/atanf.h>
 /* Arc tangent of X */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __atanf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atanf))(__x); }
@@ -8162,7 +8162,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__atan2f,(float __y, float __x),atan2
 #elif defined(__CRT_HAVE___atan2f)
 /* Arc tangent of Y/X */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__atan2f,(float __y, float __x),(__y,__x))
-#elif (__has_builtin(__builtin_atan2) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atan2)) || defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2)
+#elif defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2)
 #include <local/math/atan2f.h>
 /* Arc tangent of Y/X */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __atan2f)(float __y, float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atan2f))(__y, __x); }
@@ -8176,7 +8176,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__cosf,(float __x),cosf,(__x))
 #elif defined(__CRT_HAVE___cosf)
 /* Cosine of X */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__cosf,(float __x),(__x))
-#elif (__has_builtin(__builtin_cos) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_cos)) || defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos)
+#elif defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos)
 #include <local/math/cosf.h>
 /* Cosine of X */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __cosf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cosf))(__x); }
@@ -8190,7 +8190,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__sinf,(float __x),sinf,(__x))
 #elif defined(__CRT_HAVE___sinf)
 /* Sine of X */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__sinf,(float __x),(__x))
-#elif (__has_builtin(__builtin_sin) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sin)) || defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)
+#elif defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)
 #include <local/math/sinf.h>
 /* Sine of X */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __sinf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sinf))(__x); }
@@ -8204,7 +8204,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__tanf,(float __x),tanf,(__x))
 #elif defined(__CRT_HAVE___tanf)
 /* Tangent of X */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__tanf,(float __x),(__x))
-#elif (__has_builtin(__builtin_tan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tan)) || defined(__CRT_HAVE_tan) || defined(__CRT_HAVE___tan)
+#elif defined(__CRT_HAVE_tan) || defined(__CRT_HAVE___tan)
 #include <local/math/tanf.h>
 /* Tangent of X */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __tanf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tanf))(__x); }
@@ -8218,7 +8218,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__coshf,(float __x),coshf,(__x))
 #elif defined(__CRT_HAVE___coshf)
 /* Hyperbolic cosine of X */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__coshf,(float __x),(__x))
-#elif (__has_builtin(__builtin_cosh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_cosh)) || defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh)
+#elif defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh)
 #include <local/math/coshf.h>
 /* Hyperbolic cosine of X */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __coshf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(coshf))(__x); }
@@ -8232,7 +8232,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__sinhf,(float __x),sinhf,(__x))
 #elif defined(__CRT_HAVE___sinhf)
 /* Hyperbolic sine of X */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__sinhf,(float __x),(__x))
-#elif (__has_builtin(__builtin_sinh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sinh)) || defined(__CRT_HAVE_sinh) || defined(__CRT_HAVE___sinh)
+#elif defined(__CRT_HAVE_sinh) || defined(__CRT_HAVE___sinh)
 #include <local/math/sinhf.h>
 /* Hyperbolic sine of X */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __sinhf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sinhf))(__x); }
@@ -8246,7 +8246,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__tanhf,(float __x),tanhf,(__x))
 #elif defined(__CRT_HAVE___tanhf)
 /* Hyperbolic tangent of X */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__tanhf,(float __x),(__x))
-#elif (__has_builtin(__builtin_tanh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tanh)) || defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh)
+#elif defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh)
 #include <local/math/tanhf.h>
 /* Hyperbolic tangent of X */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __tanhf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tanhf))(__x); }
@@ -8267,7 +8267,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__acosl,(long double __x),acos,
 #elif defined(__CRT_HAVE___acos) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Arc cosine of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__acosl,(long double __x),__acos,(__x))
-#elif (__has_builtin(__builtin_acos) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_acos)) || defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos)
+#elif defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos)
 #include <local/math/acosl.h>
 /* Arc cosine of X */
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __acosl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(acosl))(__x); }
@@ -8287,7 +8287,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__asinl,(long double __x),asin,
 #elif defined(__CRT_HAVE___asin) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Arc sine of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__asinl,(long double __x),__asin,(__x))
-#elif (__has_builtin(__builtin_asin) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_asin)) || defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin)
+#elif defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin)
 #include <local/math/asinl.h>
 /* Arc sine of X */
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __asinl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(asinl))(__x); }
@@ -8307,7 +8307,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__atanl,(long double __x),atan,
 #elif defined(__CRT_HAVE___atan) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Arc tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__atanl,(long double __x),__atan,(__x))
-#elif (__has_builtin(__builtin_atan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atan)) || defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan)
+#elif defined(__CRT_HAVE_atan) || defined(__CRT_HAVE___atan)
 #include <local/math/atanl.h>
 /* Arc tangent of X */
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __atanl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atanl))(__x); }
@@ -8327,7 +8327,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__atan2l,(long double __y, long
 #elif defined(__CRT_HAVE___atan2) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Arc tangent of Y/X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__atan2l,(long double __y, long double __x),__atan2,(__y,__x))
-#elif (__has_builtin(__builtin_atan2) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atan2)) || defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2)
+#elif defined(__CRT_HAVE_atan2) || defined(__CRT_HAVE___atan2)
 #include <local/math/atan2l.h>
 /* Arc tangent of Y/X */
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __atan2l)(long double __y, long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atan2l))(__y, __x); }
@@ -8347,7 +8347,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__cosl,(long double __x),cos,(_
 #elif defined(__CRT_HAVE___cos) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Cosine of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__cosl,(long double __x),__cos,(__x))
-#elif (__has_builtin(__builtin_cos) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_cos)) || defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos)
+#elif defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos)
 #include <local/math/cosl.h>
 /* Cosine of X */
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __cosl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cosl))(__x); }
@@ -8367,7 +8367,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__sinl,(long double __x),sin,(_
 #elif defined(__CRT_HAVE___sin) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Sine of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__sinl,(long double __x),__sin,(__x))
-#elif (__has_builtin(__builtin_sin) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sin)) || defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)
+#elif defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)
 #include <local/math/sinl.h>
 /* Sine of X */
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __sinl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sinl))(__x); }
@@ -8387,7 +8387,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__tanl,(long double __x),tan,(_
 #elif defined(__CRT_HAVE___tan) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__tanl,(long double __x),__tan,(__x))
-#elif (__has_builtin(__builtin_tan) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tan)) || defined(__CRT_HAVE_tan) || defined(__CRT_HAVE___tan)
+#elif defined(__CRT_HAVE_tan) || defined(__CRT_HAVE___tan)
 #include <local/math/tanl.h>
 /* Tangent of X */
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __tanl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tanl))(__x); }
@@ -8407,7 +8407,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__coshl,(long double __x),cosh,
 #elif defined(__CRT_HAVE___cosh) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Hyperbolic cosine of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__coshl,(long double __x),__cosh,(__x))
-#elif (__has_builtin(__builtin_cosh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_cosh)) || defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh)
+#elif defined(__CRT_HAVE_cosh) || defined(__CRT_HAVE___cosh)
 #include <local/math/coshl.h>
 /* Hyperbolic cosine of X */
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __coshl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(coshl))(__x); }
@@ -8427,7 +8427,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__sinhl,(long double __x),sinh,
 #elif defined(__CRT_HAVE___sinh) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Hyperbolic sine of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__sinhl,(long double __x),__sinh,(__x))
-#elif (__has_builtin(__builtin_sinh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sinh)) || defined(__CRT_HAVE_sinh) || defined(__CRT_HAVE___sinh)
+#elif defined(__CRT_HAVE_sinh) || defined(__CRT_HAVE___sinh)
 #include <local/math/sinhl.h>
 /* Hyperbolic sine of X */
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __sinhl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sinhl))(__x); }
@@ -8447,7 +8447,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__tanhl,(long double __x),tanh,
 #elif defined(__CRT_HAVE___tanh) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Hyperbolic tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__tanhl,(long double __x),__tanh,(__x))
-#elif (__has_builtin(__builtin_tanh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tanh)) || defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh)
+#elif defined(__CRT_HAVE_tanh) || defined(__CRT_HAVE___tanh)
 #include <local/math/tanhl.h>
 /* Hyperbolic tangent of X */
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __tanhl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tanhl))(__x); }
@@ -8470,7 +8470,7 @@ __CREDIRECT_VOID(__DECL_SIMD_sincosf __ATTR_NONNULL((2, 3)),__NOTHROW,__sincosf,
 #elif defined(__CRT_HAVE___sincosf)
 /* Cosine and sine of X */
 __CDECLARE_VOID(__DECL_SIMD_sincosf __ATTR_NONNULL((2, 3)),__NOTHROW,__sincosf,(float __x, float *__psinx, float *__pcosx),(__x,__psinx,__pcosx))
-#elif (__has_builtin(__builtin_sincos) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sincos)) || defined(__CRT_HAVE_sincos) || defined(__CRT_HAVE___sincos)
+#elif defined(__CRT_HAVE_sincos) || defined(__CRT_HAVE___sincos)
 #include <local/math/sincosf.h>
 /* Cosine and sine of X */
 __FORCELOCAL __DECL_SIMD_sincosf __ATTR_NONNULL((2, 3)) void __NOTHROW(__LIBCCALL __sincosf)(float __x, float *__psinx, float *__pcosx) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sincosf))(__x, __psinx, __pcosx); }
@@ -8491,7 +8491,7 @@ __CREDIRECT_VOID(__DECL_SIMD_sincosl __ATTR_NONNULL((2, 3)),__NOTHROW,__sincosl,
 #elif defined(__CRT_HAVE_sincos) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Cosine and sine of X */
 __CREDIRECT_VOID(__DECL_SIMD_sincosl __ATTR_NONNULL((2, 3)),__NOTHROW,__sincosl,(long double __x, long double *__psinx, long double *__pcosx),sincos,(__x,__psinx,__pcosx))
-#elif (__has_builtin(__builtin_sincos) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sincos)) || defined(__CRT_HAVE_sincos) || defined(__CRT_HAVE___sincos)
+#elif defined(__CRT_HAVE_sincos) || defined(__CRT_HAVE___sincos)
 #include <local/math/sincosl.h>
 /* Cosine and sine of X */
 __FORCELOCAL __DECL_SIMD_sincosl __ATTR_NONNULL((2, 3)) void __NOTHROW(__LIBCCALL __sincosl)(long double __x, long double *__psinx, long double *__pcosx) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sincosl))(__x, __psinx, __pcosx); }
@@ -8529,7 +8529,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__acoshf,(float __x),acoshf,(__x))
 #elif defined(__CRT_HAVE___acoshf)
 /* Hyperbolic arc cosine of X */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__acoshf,(float __x),(__x))
-#elif (__has_builtin(__builtin_acosh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_acosh)) || defined(__CRT_HAVE_acosh) || defined(__CRT_HAVE___acosh)
+#elif defined(__CRT_HAVE_acosh) || defined(__CRT_HAVE___acosh)
 #include <local/math/acoshf.h>
 /* Hyperbolic arc cosine of X */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __acoshf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(acoshf))(__x); }
@@ -8543,7 +8543,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__asinhf,(float __x),asinhf,(__x))
 #elif defined(__CRT_HAVE___asinhf)
 /* Hyperbolic arc sine of X */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__asinhf,(float __x),(__x))
-#elif (__has_builtin(__builtin_asinh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_asinh)) || defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh)
+#elif defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh)
 #include <local/math/asinhf.h>
 /* Hyperbolic arc sine of X */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __asinhf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(asinhf))(__x); }
@@ -8557,7 +8557,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__atanhf,(float __x),atanhf,(__x))
 #elif defined(__CRT_HAVE___atanhf)
 /* Hyperbolic arc tangent of X */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__atanhf,(float __x),(__x))
-#elif (__has_builtin(__builtin_atanh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atanh)) || defined(__CRT_HAVE_atanh) || defined(__CRT_HAVE___atanh)
+#elif defined(__CRT_HAVE_atanh) || defined(__CRT_HAVE___atanh)
 #include <local/math/atanhf.h>
 /* Hyperbolic arc tangent of X */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __atanhf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atanhf))(__x); }
@@ -8578,7 +8578,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__acoshl,(long double __x),acos
 #elif defined(__CRT_HAVE___acosh) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Hyperbolic arc cosine of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__acoshl,(long double __x),__acosh,(__x))
-#elif (__has_builtin(__builtin_acosh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_acosh)) || defined(__CRT_HAVE_acosh) || defined(__CRT_HAVE___acosh)
+#elif defined(__CRT_HAVE_acosh) || defined(__CRT_HAVE___acosh)
 #include <local/math/acoshl.h>
 /* Hyperbolic arc cosine of X */
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __acoshl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(acoshl))(__x); }
@@ -8598,7 +8598,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__asinhl,(long double __x),asin
 #elif defined(__CRT_HAVE___asinh) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Hyperbolic arc sine of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__asinhl,(long double __x),__asinh,(__x))
-#elif (__has_builtin(__builtin_asinh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_asinh)) || defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh)
+#elif defined(__CRT_HAVE_asinh) || defined(__CRT_HAVE___asinh)
 #include <local/math/asinhl.h>
 /* Hyperbolic arc sine of X */
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __asinhl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(asinhl))(__x); }
@@ -8618,7 +8618,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__atanhl,(long double __x),atan
 #elif defined(__CRT_HAVE___atanh) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Hyperbolic arc tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__atanhl,(long double __x),__atanh,(__x))
-#elif (__has_builtin(__builtin_atanh) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_atanh)) || defined(__CRT_HAVE_atanh) || defined(__CRT_HAVE___atanh)
+#elif defined(__CRT_HAVE_atanh) || defined(__CRT_HAVE___atanh)
 #include <local/math/atanhl.h>
 /* Hyperbolic arc tangent of X */
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __atanhl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(atanhl))(__x); }
@@ -8676,7 +8676,7 @@ __CREDIRECT(__DECL_SIMD_expf __ATTR_WUNUSED,float,__NOTHROW,__expf,(float __x),e
 #elif defined(__CRT_HAVE___expf)
 /* Exponential function of X */
 __CDECLARE(__DECL_SIMD_expf __ATTR_WUNUSED,float,__NOTHROW,__expf,(float __x),(__x))
-#elif (__has_builtin(__builtin_exp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exp)) || defined(__CRT_HAVE_exp) || defined(__CRT_HAVE___exp)
+#elif defined(__CRT_HAVE_exp) || defined(__CRT_HAVE___exp)
 #include <local/math/expf.h>
 /* Exponential function of X */
 __FORCELOCAL __DECL_SIMD_expf __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __expf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(expf))(__x); }
@@ -8690,7 +8690,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW_NCX,__frexpf,(float __x, int *__pexpo
 #elif defined(__CRT_HAVE___frexpf)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW_NCX,__frexpf,(float __x, int *__pexponent),(__x,__pexponent))
-#elif (__has_builtin(__builtin_frexp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_frexp)) || defined(__CRT_HAVE_frexp) || defined(__CRT_HAVE___frexp)
+#elif defined(__CRT_HAVE_frexp) || defined(__CRT_HAVE___frexp)
 #include <local/math/frexpf.h>
 /* Break VALUE into a normalized fraction and an integral power of 2 */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW_NCX(__LIBCCALL __frexpf)(float __x, int *__pexponent) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(frexpf))(__x, __pexponent); }
@@ -8704,7 +8704,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__ldexpf,(float __x, int __exponent),
 #elif defined(__CRT_HAVE___ldexpf)
 /* X times (two to the EXP power) */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__ldexpf,(float __x, int __exponent),(__x,__exponent))
-#elif (__has_builtin(__builtin_ldexp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ldexp)) || defined(__CRT_HAVE_ldexp) || defined(__CRT_HAVE___ldexp)
+#elif defined(__CRT_HAVE_ldexp) || defined(__CRT_HAVE___ldexp)
 #include <local/math/ldexpf.h>
 /* X times (two to the EXP power) */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __ldexpf)(float __x, int __exponent) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ldexpf))(__x, __exponent); }
@@ -8718,7 +8718,7 @@ __CREDIRECT(__DECL_SIMD_logf __ATTR_WUNUSED,float,__NOTHROW,__logf,(float __x),l
 #elif defined(__CRT_HAVE___logf)
 /* Natural logarithm of X */
 __CDECLARE(__DECL_SIMD_logf __ATTR_WUNUSED,float,__NOTHROW,__logf,(float __x),(__x))
-#elif (__has_builtin(__builtin_log) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log)) || defined(__CRT_HAVE_log) || defined(__CRT_HAVE___log)
+#elif defined(__CRT_HAVE_log) || defined(__CRT_HAVE___log)
 #include <local/math/logf.h>
 /* Natural logarithm of X */
 __FORCELOCAL __DECL_SIMD_logf __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __logf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(logf))(__x); }
@@ -8732,7 +8732,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__log10f,(float __x),log10f,(__x))
 #elif defined(__CRT_HAVE___log10f)
 /* Base-ten logarithm of X */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__log10f,(float __x),(__x))
-#elif (__has_builtin(__builtin_log10) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log10)) || defined(__CRT_HAVE_log10) || defined(__CRT_HAVE___log10)
+#elif defined(__CRT_HAVE_log10) || defined(__CRT_HAVE___log10)
 #include <local/math/log10f.h>
 /* Base-ten logarithm of X */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __log10f)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(log10f))(__x); }
@@ -8746,7 +8746,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),float,__NOTHROW_NCX,__modff,(float __x, float *_
 #elif defined(__CRT_HAVE___modff)
 /* Break VALUE into integral and fractional parts */
 __CDECLARE(__ATTR_NONNULL((2)),float,__NOTHROW_NCX,__modff,(float __x, float *__iptr),(__x,__iptr))
-#elif (__has_builtin(__builtin_modf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_modf)) || defined(__CRT_HAVE_modf) || defined(__CRT_HAVE___modf)
+#elif defined(__CRT_HAVE_modf) || defined(__CRT_HAVE___modf)
 #include <local/math/modff.h>
 /* Break VALUE into integral and fractional parts */
 __FORCELOCAL __ATTR_NONNULL((2)) float __NOTHROW_NCX(__LIBCCALL __modff)(float __x, float *__iptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(modff))(__x, __iptr); }
@@ -8767,7 +8767,7 @@ __CREDIRECT(__DECL_SIMD_expl __ATTR_WUNUSED,long double,__NOTHROW,__expl,(long d
 #elif defined(__CRT_HAVE___exp) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Exponential function of X */
 __CREDIRECT(__DECL_SIMD_expl __ATTR_WUNUSED,long double,__NOTHROW,__expl,(long double __x),__exp,(__x))
-#elif (__has_builtin(__builtin_exp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exp)) || defined(__CRT_HAVE_exp) || defined(__CRT_HAVE___exp)
+#elif defined(__CRT_HAVE_exp) || defined(__CRT_HAVE___exp)
 #include <local/math/expl.h>
 /* Exponential function of X */
 __FORCELOCAL __DECL_SIMD_expl __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __expl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(expl))(__x); }
@@ -8787,7 +8787,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW_NCX,__frexpl,(long double __x, 
 #elif defined(__CRT_HAVE___frexp) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW_NCX,__frexpl,(long double __x, int *__pexponent),__frexp,(__x,__pexponent))
-#elif (__has_builtin(__builtin_frexp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_frexp)) || defined(__CRT_HAVE_frexp) || defined(__CRT_HAVE___frexp)
+#elif defined(__CRT_HAVE_frexp) || defined(__CRT_HAVE___frexp)
 #include <local/math/frexpl.h>
 /* Break VALUE into a normalized fraction and an integral power of 2 */
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW_NCX(__LIBCCALL __frexpl)(long double __x, int *__pexponent) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(frexpl))(__x, __pexponent); }
@@ -8807,7 +8807,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__ldexpl,(long double __x, int 
 #elif defined(__CRT_HAVE___ldexp) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* X times (two to the EXP power) */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__ldexpl,(long double __x, int __exponent),__ldexp,(__x,__exponent))
-#elif (__has_builtin(__builtin_ldexp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ldexp)) || defined(__CRT_HAVE_ldexp) || defined(__CRT_HAVE___ldexp)
+#elif defined(__CRT_HAVE_ldexp) || defined(__CRT_HAVE___ldexp)
 #include <local/math/ldexpl.h>
 /* X times (two to the EXP power) */
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __ldexpl)(long double __x, int __exponent) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ldexpl))(__x, __exponent); }
@@ -8827,7 +8827,7 @@ __CREDIRECT(__DECL_SIMD_logl __ATTR_WUNUSED,long double,__NOTHROW,__logl,(long d
 #elif defined(__CRT_HAVE___log) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Natural logarithm of X */
 __CREDIRECT(__DECL_SIMD_logl __ATTR_WUNUSED,long double,__NOTHROW,__logl,(long double __x),__log,(__x))
-#elif (__has_builtin(__builtin_log) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log)) || defined(__CRT_HAVE_log) || defined(__CRT_HAVE___log)
+#elif defined(__CRT_HAVE_log) || defined(__CRT_HAVE___log)
 #include <local/math/logl.h>
 /* Natural logarithm of X */
 __FORCELOCAL __DECL_SIMD_logl __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __logl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(logl))(__x); }
@@ -8847,7 +8847,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__log10l,(long double __x),log1
 #elif defined(__CRT_HAVE___log10) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Base-ten logarithm of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__log10l,(long double __x),__log10,(__x))
-#elif (__has_builtin(__builtin_log10) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log10)) || defined(__CRT_HAVE_log10) || defined(__CRT_HAVE___log10)
+#elif defined(__CRT_HAVE_log10) || defined(__CRT_HAVE___log10)
 #include <local/math/log10l.h>
 /* Base-ten logarithm of X */
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __log10l)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(log10l))(__x); }
@@ -8867,7 +8867,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),long double,__NOTHROW_NCX,__modfl,(long double _
 #elif defined(__CRT_HAVE_modf) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Break VALUE into integral and fractional parts */
 __CREDIRECT(__ATTR_NONNULL((2)),long double,__NOTHROW_NCX,__modfl,(long double __x, long double *__iptr),modf,(__x,__iptr))
-#elif (__has_builtin(__builtin_modf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_modf)) || defined(__CRT_HAVE_modf) || defined(__CRT_HAVE___modf)
+#elif defined(__CRT_HAVE_modf) || defined(__CRT_HAVE___modf)
 #include <local/math/modfl.h>
 /* Break VALUE into integral and fractional parts */
 __FORCELOCAL __ATTR_NONNULL((2)) long double __NOTHROW_NCX(__LIBCCALL __modfl)(long double __x, long double *__iptr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(modfl))(__x, __iptr); }
@@ -8898,7 +8898,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__exp10f,(float __x),exp10f,(__x))
 #elif defined(__CRT_HAVE___exp10f)
 /* A function missing in all standards: compute exponent to base ten */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__exp10f,(float __x),(__x))
-#elif (__has_builtin(__builtin_exp10) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exp10)) || defined(__CRT_HAVE_exp10) || defined(__CRT_HAVE___exp10)
+#elif defined(__CRT_HAVE_exp10) || defined(__CRT_HAVE___exp10)
 #include <local/math/exp10f.h>
 /* A function missing in all standards: compute exponent to base ten */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __exp10f)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(exp10f))(__x); }
@@ -8912,7 +8912,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__pow10f,(float __x),pow10f,(__x))
 #elif defined(__CRT_HAVE___pow10f)
 /* Another name occasionally used */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__pow10f,(float __x),(__x))
-#elif (__has_builtin(__builtin_pow10) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_pow10)) || defined(__CRT_HAVE_pow10) || defined(__CRT_HAVE___pow10)
+#elif defined(__CRT_HAVE_pow10) || defined(__CRT_HAVE___pow10)
 #include <local/math/pow10f.h>
 /* Another name occasionally used */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __pow10f)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pow10f))(__x); }
@@ -8933,7 +8933,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__exp10l,(long double __x),exp1
 #elif defined(__CRT_HAVE___exp10) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* A function missing in all standards: compute exponent to base ten */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__exp10l,(long double __x),__exp10,(__x))
-#elif (__has_builtin(__builtin_exp10) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exp10)) || defined(__CRT_HAVE_exp10) || defined(__CRT_HAVE___exp10)
+#elif defined(__CRT_HAVE_exp10) || defined(__CRT_HAVE___exp10)
 #include <local/math/exp10l.h>
 /* A function missing in all standards: compute exponent to base ten */
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __exp10l)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(exp10l))(__x); }
@@ -8953,7 +8953,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__pow10l,(long double __x),pow1
 #elif defined(__CRT_HAVE___pow10) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Another name occasionally used */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__pow10l,(long double __x),__pow10,(__x))
-#elif (__has_builtin(__builtin_pow10) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_pow10)) || defined(__CRT_HAVE_pow10) || defined(__CRT_HAVE___pow10)
+#elif defined(__CRT_HAVE_pow10) || defined(__CRT_HAVE___pow10)
 #include <local/math/pow10l.h>
 /* Another name occasionally used */
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __pow10l)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pow10l))(__x); }
@@ -8995,7 +8995,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__expm1f,(float __x),expm1f,(__x))
 #elif defined(__CRT_HAVE___expm1f)
 /* Return exp(X) - 1 */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__expm1f,(float __x),(__x))
-#elif (__has_builtin(__builtin_expm1) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_expm1)) || defined(__CRT_HAVE_expm1) || defined(__CRT_HAVE___expm1)
+#elif defined(__CRT_HAVE_expm1) || defined(__CRT_HAVE___expm1)
 #include <local/math/expm1f.h>
 /* Return exp(X) - 1 */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __expm1f)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(expm1f))(__x); }
@@ -9009,7 +9009,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__log1pf,(float __x),log1pf,(__x))
 #elif defined(__CRT_HAVE___log1pf)
 /* Return log(1 + X) */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__log1pf,(float __x),(__x))
-#elif (__has_builtin(__builtin_log1p) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log1p)) || defined(__CRT_HAVE_log1p) || defined(__CRT_HAVE___log1p)
+#elif defined(__CRT_HAVE_log1p) || defined(__CRT_HAVE___log1p)
 #include <local/math/log1pf.h>
 /* Return log(1 + X) */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __log1pf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(log1pf))(__x); }
@@ -9023,7 +9023,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__logbf,(float __x),logbf,(__x))
 #elif defined(__CRT_HAVE___logbf)
 /* Return the base 2 signed integral exponent of X */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__logbf,(float __x),(__x))
-#elif (__has_builtin(__builtin_logb) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_logb)) || defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb)
+#elif defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb)
 #include <local/math/logbf.h>
 /* Return the base 2 signed integral exponent of X */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __logbf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(logbf))(__x); }
@@ -9044,7 +9044,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__expm1l,(long double __x),expm
 #elif defined(__CRT_HAVE___expm1) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return exp(X) - 1 */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__expm1l,(long double __x),__expm1,(__x))
-#elif (__has_builtin(__builtin_expm1) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_expm1)) || defined(__CRT_HAVE_expm1) || defined(__CRT_HAVE___expm1)
+#elif defined(__CRT_HAVE_expm1) || defined(__CRT_HAVE___expm1)
 #include <local/math/expm1l.h>
 /* Return exp(X) - 1 */
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __expm1l)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(expm1l))(__x); }
@@ -9064,7 +9064,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__log1pl,(long double __x),log1
 #elif defined(__CRT_HAVE___log1p) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return log(1 + X) */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__log1pl,(long double __x),__log1p,(__x))
-#elif (__has_builtin(__builtin_log1p) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log1p)) || defined(__CRT_HAVE_log1p) || defined(__CRT_HAVE___log1p)
+#elif defined(__CRT_HAVE_log1p) || defined(__CRT_HAVE___log1p)
 #include <local/math/log1pl.h>
 /* Return log(1 + X) */
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __log1pl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(log1pl))(__x); }
@@ -9084,7 +9084,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__logbl,(long double __x),logb,
 #elif defined(__CRT_HAVE___logb) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return the base 2 signed integral exponent of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__logbl,(long double __x),__logb,(__x))
-#elif (__has_builtin(__builtin_logb) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_logb)) || defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb)
+#elif defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb)
 #include <local/math/logbl.h>
 /* Return the base 2 signed integral exponent of X */
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __logbl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(logbl))(__x); }
@@ -9116,7 +9116,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__exp2f,(float __x),exp2f,(__x))
 #elif defined(__CRT_HAVE___exp2f)
 /* Compute base-2 exponential of X */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__exp2f,(float __x),(__x))
-#elif (__has_builtin(__builtin_exp2) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exp2)) || defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2)
+#elif defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2)
 #include <local/math/exp2f.h>
 /* Compute base-2 exponential of X */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __exp2f)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(exp2f))(__x); }
@@ -9130,7 +9130,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__log2f,(float __x),log2f,(__x))
 #elif defined(__CRT_HAVE___log2f)
 /* Compute base-2 logarithm of X */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__log2f,(float __x),(__x))
-#elif (__has_builtin(__builtin_log2) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log2)) || defined(__CRT_HAVE_log2) || defined(__CRT_HAVE___log2)
+#elif defined(__CRT_HAVE_log2) || defined(__CRT_HAVE___log2)
 #include <local/math/log2f.h>
 /* Compute base-2 logarithm of X */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __log2f)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(log2f))(__x); }
@@ -9151,7 +9151,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__exp2l,(long double __x),exp2,
 #elif defined(__CRT_HAVE___exp2) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Compute base-2 exponential of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__exp2l,(long double __x),__exp2,(__x))
-#elif (__has_builtin(__builtin_exp2) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_exp2)) || defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2)
+#elif defined(__CRT_HAVE_exp2) || defined(__CRT_HAVE___exp2)
 #include <local/math/exp2l.h>
 /* Compute base-2 exponential of X */
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __exp2l)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(exp2l))(__x); }
@@ -9171,7 +9171,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__log2l,(long double __x),log2,
 #elif defined(__CRT_HAVE___log2) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Compute base-2 logarithm of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__log2l,(long double __x),__log2,(__x))
-#elif (__has_builtin(__builtin_log2) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log2)) || defined(__CRT_HAVE_log2) || defined(__CRT_HAVE___log2)
+#elif defined(__CRT_HAVE_log2) || defined(__CRT_HAVE___log2)
 #include <local/math/log2l.h>
 /* Compute base-2 logarithm of X */
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __log2l)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(log2l))(__x); }
@@ -9201,7 +9201,7 @@ __CREDIRECT(__DECL_SIMD_powf __ATTR_WUNUSED,float,__NOTHROW,__powf,(float __x, f
 #elif defined(__CRT_HAVE___powf)
 /* Return X to the Y power */
 __CDECLARE(__DECL_SIMD_powf __ATTR_WUNUSED,float,__NOTHROW,__powf,(float __x, float __y),(__x,__y))
-#elif (__has_builtin(__builtin_pow) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_pow)) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow)
+#elif defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow)
 #include <local/math/powf.h>
 /* Return X to the Y power */
 __FORCELOCAL __DECL_SIMD_powf __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __powf)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(powf))(__x, __y); }
@@ -9215,7 +9215,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__sqrtf,(float __x),sqrtf,(__x))
 #elif defined(__CRT_HAVE___sqrtf)
 /* Return the square root of X */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__sqrtf,(float __x),(__x))
-#elif (__has_builtin(__builtin_sqrt) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sqrt)) || defined(__CRT_HAVE_sqrt) || defined(__CRT_HAVE___sqrt)
+#elif defined(__CRT_HAVE_sqrt) || defined(__CRT_HAVE___sqrt)
 #include <local/math/sqrtf.h>
 /* Return the square root of X */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __sqrtf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sqrtf))(__x); }
@@ -9236,7 +9236,7 @@ __CREDIRECT(__DECL_SIMD_powl __ATTR_WUNUSED,long double,__NOTHROW,__powl,(long d
 #elif defined(__CRT_HAVE___pow) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return X to the Y power */
 __CREDIRECT(__DECL_SIMD_powl __ATTR_WUNUSED,long double,__NOTHROW,__powl,(long double __x, long double __y),__pow,(__x,__y))
-#elif (__has_builtin(__builtin_pow) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_pow)) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow)
+#elif defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow)
 #include <local/math/powl.h>
 /* Return X to the Y power */
 __FORCELOCAL __DECL_SIMD_powl __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __powl)(long double __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(powl))(__x, __y); }
@@ -9256,7 +9256,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__sqrtl,(long double __x),sqrt,
 #elif defined(__CRT_HAVE___sqrt) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return the square root of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__sqrtl,(long double __x),__sqrt,(__x))
-#elif (__has_builtin(__builtin_sqrt) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sqrt)) || defined(__CRT_HAVE_sqrt) || defined(__CRT_HAVE___sqrt)
+#elif defined(__CRT_HAVE_sqrt) || defined(__CRT_HAVE___sqrt)
 #include <local/math/sqrtl.h>
 /* Return the square root of X */
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __sqrtl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sqrtl))(__x); }
@@ -9280,7 +9280,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__hypotf,(float __x, float __y),hypot
 #elif defined(__CRT_HAVE___hypotf)
 /* Return `sqrt(X*X + Y*Y)' */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__hypotf,(float __x, float __y),(__x,__y))
-#elif (__has_builtin(__builtin_hypot) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_hypot)) || defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE___hypot)
+#elif defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE___hypot)
 #include <local/math/hypotf.h>
 /* Return `sqrt(X*X + Y*Y)' */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __hypotf)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(hypotf))(__x, __y); }
@@ -9301,7 +9301,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__hypotl,(long double __x, long
 #elif defined(__CRT_HAVE___hypot) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return `sqrt(X*X + Y*Y)' */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__hypotl,(long double __x, long double __y),__hypot,(__x,__y))
-#elif (__has_builtin(__builtin_hypot) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_hypot)) || defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE___hypot)
+#elif defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE___hypot)
 #include <local/math/hypotl.h>
 /* Return `sqrt(X*X + Y*Y)' */
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __hypotl)(long double __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(hypotl))(__x, __y); }
@@ -9326,7 +9326,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__cbrtf,(float __x),cbrtf,(__x))
 #elif defined(__CRT_HAVE___cbrtf)
 /* Return the cube root of X */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__cbrtf,(float __x),(__x))
-#elif (__has_builtin(__builtin_cbrt) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_cbrt)) || defined(__CRT_HAVE_cbrt) || defined(__CRT_HAVE___cbrt)
+#elif defined(__CRT_HAVE_cbrt) || defined(__CRT_HAVE___cbrt)
 #include <local/math/cbrtf.h>
 /* Return the cube root of X */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __cbrtf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cbrtf))(__x); }
@@ -9347,7 +9347,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__cbrtl,(long double __x),cbrt,
 #elif defined(__CRT_HAVE___cbrt) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return the cube root of X */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__cbrtl,(long double __x),__cbrt,(__x))
-#elif (__has_builtin(__builtin_cbrt) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_cbrt)) || defined(__CRT_HAVE_cbrt) || defined(__CRT_HAVE___cbrt)
+#elif defined(__CRT_HAVE_cbrt) || defined(__CRT_HAVE___cbrt)
 #include <local/math/cbrtl.h>
 /* Return the cube root of X */
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __cbrtl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(cbrtl))(__x); }
@@ -9485,7 +9485,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__fmodf,(float __x, float __y),fmodf,
 #elif defined(__CRT_HAVE___fmodf)
 /* Floating-point modulo remainder of X/Y */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__fmodf,(float __x, float __y),(__x,__y))
-#elif (__has_builtin(__builtin_fmod) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fmod)) || defined(__CRT_HAVE_fmod) || defined(__CRT_HAVE___fmod)
+#elif defined(__CRT_HAVE_fmod) || defined(__CRT_HAVE___fmod)
 #include <local/math/fmodf.h>
 /* Floating-point modulo remainder of X/Y */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __fmodf)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmodf))(__x, __y); }
@@ -9568,7 +9568,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__fmodl,(long double __x, long 
 #elif defined(__CRT_HAVE___fmod) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Floating-point modulo remainder of X/Y */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__fmodl,(long double __x, long double __y),__fmod,(__x,__y))
-#elif (__has_builtin(__builtin_fmod) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fmod)) || defined(__CRT_HAVE_fmod) || defined(__CRT_HAVE___fmod)
+#elif defined(__CRT_HAVE_fmod) || defined(__CRT_HAVE___fmod)
 #include <local/math/fmodl.h>
 /* Floating-point modulo remainder of X/Y */
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __fmodl)(long double __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmodl))(__x, __y); }
@@ -9626,7 +9626,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__dremf,(float __x, float __y),dremf,
 #elif defined(__CRT_HAVE___dremf)
 /* Return the remainder of X/Y */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__dremf,(float __x, float __y),(__x,__y))
-#elif (__has_builtin(__builtin_drem) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_drem)) || defined(__CRT_HAVE_drem) || defined(__CRT_HAVE___drem)
+#elif defined(__CRT_HAVE_drem) || defined(__CRT_HAVE___drem)
 #include <local/math/dremf.h>
 /* Return the remainder of X/Y */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __dremf)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dremf))(__x, __y); }
@@ -9640,7 +9640,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__significandf,(float __x),significan
 #elif defined(__CRT_HAVE___significandf)
 /* Return the fractional part of X after dividing out `ilogb (X)' */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__significandf,(float __x),(__x))
-#elif (__has_builtin(__builtin_significand) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_significand)) || defined(__CRT_HAVE_significand) || defined(__CRT_HAVE___significand)
+#elif defined(__CRT_HAVE_significand) || defined(__CRT_HAVE___significand)
 #include <local/math/significandf.h>
 /* Return the fractional part of X after dividing out `ilogb (X)' */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __significandf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(significandf))(__x); }
@@ -9661,7 +9661,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__dreml,(long double __x, long 
 #elif defined(__CRT_HAVE___drem) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return the remainder of X/Y */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__dreml,(long double __x, long double __y),__drem,(__x,__y))
-#elif (__has_builtin(__builtin_drem) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_drem)) || defined(__CRT_HAVE_drem) || defined(__CRT_HAVE___drem)
+#elif defined(__CRT_HAVE_drem) || defined(__CRT_HAVE___drem)
 #include <local/math/dreml.h>
 /* Return the remainder of X/Y */
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __dreml)(long double __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dreml))(__x, __y); }
@@ -9681,7 +9681,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__significandl,(long double __x
 #elif defined(__CRT_HAVE___significand) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return the fractional part of X after dividing out `ilogb (X)' */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__significandl,(long double __x),__significand,(__x))
-#elif (__has_builtin(__builtin_significand) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_significand)) || defined(__CRT_HAVE_significand) || defined(__CRT_HAVE___significand)
+#elif defined(__CRT_HAVE_significand) || defined(__CRT_HAVE___significand)
 #include <local/math/significandl.h>
 /* Return the fractional part of X after dividing out `ilogb (X)' */
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __significandl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(significandl))(__x); }
@@ -9867,7 +9867,7 @@ __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __j0f)(float __x) { retur
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__j0f,(float __x),j0f,(__x))
 #elif defined(__CRT_HAVE___j0f)
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__j0f,(float __x),(__x))
-#elif (__has_builtin(__builtin_j0) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_j0)) || defined(__CRT_HAVE_j0) || defined(__CRT_HAVE___j0)
+#elif defined(__CRT_HAVE_j0) || defined(__CRT_HAVE___j0)
 #include <local/math/j0f.h>
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __j0f)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(j0f))(__x); }
 #endif /* __j0f... */
@@ -9877,7 +9877,7 @@ __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __j1f)(float __x) { retur
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__j1f,(float __x),j1f,(__x))
 #elif defined(__CRT_HAVE___j1f)
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__j1f,(float __x),(__x))
-#elif (__has_builtin(__builtin_j1) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_j1)) || defined(__CRT_HAVE_j1) || defined(__CRT_HAVE___j1)
+#elif defined(__CRT_HAVE_j1) || defined(__CRT_HAVE___j1)
 #include <local/math/j1f.h>
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __j1f)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(j1f))(__x); }
 #endif /* __j1f... */
@@ -9887,7 +9887,7 @@ __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __jnf)(int __n, float __x
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__jnf,(int __n, float __x),jnf,(__n,__x))
 #elif defined(__CRT_HAVE___jnf)
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__jnf,(int __n, float __x),(__n,__x))
-#elif (__has_builtin(__builtin_jn) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_jn)) || defined(__CRT_HAVE_jn) || defined(__CRT_HAVE___jn)
+#elif defined(__CRT_HAVE_jn) || defined(__CRT_HAVE___jn)
 #include <local/math/jnf.h>
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __jnf)(int __n, float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(jnf))(__n, __x); }
 #endif /* __jnf... */
@@ -9897,7 +9897,7 @@ __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __y0f)(float __x) { retur
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__y0f,(float __x),y0f,(__x))
 #elif defined(__CRT_HAVE___y0f)
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__y0f,(float __x),(__x))
-#elif (__has_builtin(__builtin_y0) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_y0)) || defined(__CRT_HAVE_y0) || defined(__CRT_HAVE___y0)
+#elif defined(__CRT_HAVE_y0) || defined(__CRT_HAVE___y0)
 #include <local/math/y0f.h>
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __y0f)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(y0f))(__x); }
 #endif /* __y0f... */
@@ -9907,7 +9907,7 @@ __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __y1f)(float __x) { retur
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__y1f,(float __x),y1f,(__x))
 #elif defined(__CRT_HAVE___y1f)
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__y1f,(float __x),(__x))
-#elif (__has_builtin(__builtin_y1) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_y1)) || defined(__CRT_HAVE_y1) || defined(__CRT_HAVE___y1)
+#elif defined(__CRT_HAVE_y1) || defined(__CRT_HAVE___y1)
 #include <local/math/y1f.h>
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __y1f)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(y1f))(__x); }
 #endif /* __y1f... */
@@ -9917,7 +9917,7 @@ __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __ynf)(int __n, float __x
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__ynf,(int __n, float __x),ynf,(__n,__x))
 #elif defined(__CRT_HAVE___ynf)
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__ynf,(int __n, float __x),(__n,__x))
-#elif (__has_builtin(__builtin_yn) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_yn)) || defined(__CRT_HAVE_yn) || defined(__CRT_HAVE___yn)
+#elif defined(__CRT_HAVE_yn) || defined(__CRT_HAVE___yn)
 #include <local/math/ynf.h>
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __ynf)(int __n, float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ynf))(__n, __x); }
 #endif /* __ynf... */
@@ -9932,7 +9932,7 @@ __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,__j0l,(long double __x),(__x))
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__j0l,(long double __x),j0,(__x))
 #elif defined(__CRT_HAVE___j0) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__j0l,(long double __x),__j0,(__x))
-#elif (__has_builtin(__builtin_j0) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_j0)) || defined(__CRT_HAVE_j0) || defined(__CRT_HAVE___j0)
+#elif defined(__CRT_HAVE_j0) || defined(__CRT_HAVE___j0)
 #include <local/math/j0l.h>
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __j0l)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(j0l))(__x); }
 #endif /* __j0l... */
@@ -9946,7 +9946,7 @@ __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,__j1l,(long double __x),(__x))
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__j1l,(long double __x),j1,(__x))
 #elif defined(__CRT_HAVE___j1) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__j1l,(long double __x),__j1,(__x))
-#elif (__has_builtin(__builtin_j1) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_j1)) || defined(__CRT_HAVE_j1) || defined(__CRT_HAVE___j1)
+#elif defined(__CRT_HAVE_j1) || defined(__CRT_HAVE___j1)
 #include <local/math/j1l.h>
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __j1l)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(j1l))(__x); }
 #endif /* __j1l... */
@@ -9960,7 +9960,7 @@ __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,__jnl,(int __n, long double __x)
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__jnl,(int __n, long double __x),jn,(__n,__x))
 #elif defined(__CRT_HAVE___jn) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__jnl,(int __n, long double __x),__jn,(__n,__x))
-#elif (__has_builtin(__builtin_jn) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_jn)) || defined(__CRT_HAVE_jn) || defined(__CRT_HAVE___jn)
+#elif defined(__CRT_HAVE_jn) || defined(__CRT_HAVE___jn)
 #include <local/math/jnl.h>
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __jnl)(int __n, long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(jnl))(__n, __x); }
 #endif /* __jnl... */
@@ -9974,7 +9974,7 @@ __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,__y0l,(long double __x),(__x))
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__y0l,(long double __x),y0,(__x))
 #elif defined(__CRT_HAVE___y0) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__y0l,(long double __x),__y0,(__x))
-#elif (__has_builtin(__builtin_y0) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_y0)) || defined(__CRT_HAVE_y0) || defined(__CRT_HAVE___y0)
+#elif defined(__CRT_HAVE_y0) || defined(__CRT_HAVE___y0)
 #include <local/math/y0l.h>
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __y0l)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(y0l))(__x); }
 #endif /* __y0l... */
@@ -9988,7 +9988,7 @@ __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,__y1l,(long double __x),(__x))
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__y1l,(long double __x),y1,(__x))
 #elif defined(__CRT_HAVE___y1) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__y1l,(long double __x),__y1,(__x))
-#elif (__has_builtin(__builtin_y1) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_y1)) || defined(__CRT_HAVE_y1) || defined(__CRT_HAVE___y1)
+#elif defined(__CRT_HAVE_y1) || defined(__CRT_HAVE___y1)
 #include <local/math/y1l.h>
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __y1l)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(y1l))(__x); }
 #endif /* __y1l... */
@@ -10002,7 +10002,7 @@ __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,__ynl,(int __n, long double __x)
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__ynl,(int __n, long double __x),yn,(__n,__x))
 #elif defined(__CRT_HAVE___yn) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__ynl,(int __n, long double __x),__yn,(__n,__x))
-#elif (__has_builtin(__builtin_yn) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_yn)) || defined(__CRT_HAVE_yn) || defined(__CRT_HAVE___yn)
+#elif defined(__CRT_HAVE_yn) || defined(__CRT_HAVE___yn)
 #include <local/math/ynl.h>
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __ynl)(int __n, long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ynl))(__n, __x); }
 #endif /* __ynl... */
@@ -10035,7 +10035,7 @@ __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __erff)(float __x) { retu
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__erff,(float __x),erff,(__x))
 #elif defined(__CRT_HAVE___erff)
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__erff,(float __x),(__x))
-#elif (__has_builtin(__builtin_erf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_erf)) || defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf)
+#elif defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf)
 #include <local/math/erff.h>
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __erff)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(erff))(__x); }
 #endif /* __erff... */
@@ -10045,7 +10045,7 @@ __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __erfcf)(float __x) { ret
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__erfcf,(float __x),erfcf,(__x))
 #elif defined(__CRT_HAVE___erfcf)
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__erfcf,(float __x),(__x))
-#elif (__has_builtin(__builtin_erfc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_erfc)) || defined(__CRT_HAVE_erfc) || defined(__CRT_HAVE___erfc)
+#elif defined(__CRT_HAVE_erfc) || defined(__CRT_HAVE___erfc)
 #include <local/math/erfcf.h>
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __erfcf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(erfcf))(__x); }
 #endif /* __erfcf... */
@@ -10059,7 +10059,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__lgammaf,(float __x),(__x))
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__lgammaf,(float __x),__gammaf,(__x))
 #elif defined(__CRT_HAVE_gammaf)
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__lgammaf,(float __x),gammaf,(__x))
-#elif (__has_builtin(__builtin_lgamma) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lgamma)) || defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma) || defined(__CRT_HAVE_gamma)
+#elif defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma) || defined(__CRT_HAVE_gamma)
 #include <local/math/lgammaf.h>
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __lgammaf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgammaf))(__x); }
 #endif /* __lgammaf... */
@@ -10074,7 +10074,7 @@ __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,__erfl,(long double __x),(__x))
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__erfl,(long double __x),erf,(__x))
 #elif defined(__CRT_HAVE___erf) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__erfl,(long double __x),__erf,(__x))
-#elif (__has_builtin(__builtin_erf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_erf)) || defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf)
+#elif defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf)
 #include <local/math/erfl.h>
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __erfl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(erfl))(__x); }
 #endif /* __erfl... */
@@ -10088,7 +10088,7 @@ __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW,__erfcl,(long double __x),(__x))
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__erfcl,(long double __x),erfc,(__x))
 #elif defined(__CRT_HAVE___erfc) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__erfcl,(long double __x),__erfc,(__x))
-#elif (__has_builtin(__builtin_erfc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_erfc)) || defined(__CRT_HAVE_erfc) || defined(__CRT_HAVE___erfc)
+#elif defined(__CRT_HAVE_erfc) || defined(__CRT_HAVE___erfc)
 #include <local/math/erfcl.h>
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __erfcl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(erfcl))(__x); }
 #endif /* __erfcl... */
@@ -10110,7 +10110,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__lgammal,(long double __x),__l
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__lgammal,(long double __x),__gamma,(__x))
 #elif defined(__CRT_HAVE_gamma) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__lgammal,(long double __x),gamma,(__x))
-#elif (__has_builtin(__builtin_lgamma) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lgamma)) || defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma) || defined(__CRT_HAVE_gamma)
+#elif defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma) || defined(__CRT_HAVE_gamma)
 #include <local/math/lgammal.h>
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __lgammal)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgammal))(__x); }
 #endif /* __lgammal... */
@@ -10134,7 +10134,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__tgammaf,(float __x),tgammaf,(__x))
 #elif defined(__CRT_HAVE___tgammaf)
 /* True gamma function */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__tgammaf,(float __x),(__x))
-#elif (__has_builtin(__builtin_tgamma) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tgamma)) || defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma)
+#elif defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma)
 #include <local/math/tgammaf.h>
 /* True gamma function */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __tgammaf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tgammaf))(__x); }
@@ -10155,7 +10155,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__tgammal,(long double __x),tga
 #elif defined(__CRT_HAVE___tgamma) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* True gamma function */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__tgammal,(long double __x),__tgamma,(__x))
-#elif (__has_builtin(__builtin_tgamma) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tgamma)) || defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma)
+#elif defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma)
 #include <local/math/tgammal.h>
 /* True gamma function */
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __tgammal)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tgammal))(__x); }
@@ -10183,7 +10183,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__gammaf,(float __x),__lgammaf,(__x))
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__gammaf,(float __x),(__x))
 #elif defined(__CRT_HAVE_gammaf)
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__gammaf,(float __x),gammaf,(__x))
-#elif (__has_builtin(__builtin_lgamma) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lgamma)) || defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma) || defined(__CRT_HAVE_gamma)
+#elif defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma) || defined(__CRT_HAVE_gamma)
 #include <local/math/lgammaf.h>
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __gammaf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgammaf))(__x); }
 #endif /* __gammaf... */
@@ -10206,7 +10206,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__gammal,(long double __x),__lg
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__gammal,(long double __x),__gamma,(__x))
 #elif defined(__CRT_HAVE_gamma) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__gammal,(long double __x),gamma,(__x))
-#elif (__has_builtin(__builtin_lgamma) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lgamma)) || defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma) || defined(__CRT_HAVE_gamma)
+#elif defined(__CRT_HAVE_lgamma) || defined(__CRT_HAVE___lgamma) || defined(__CRT_HAVE___gamma) || defined(__CRT_HAVE_gamma)
 #include <local/math/lgammal.h>
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __gammal)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lgammal))(__x); }
 #endif /* __gammal... */
@@ -10239,7 +10239,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW_NCX,__lgammaf_r,(float __x, int *__si
  * `signgam'.  The reentrant version instead takes a pointer and stores
  * the value through it */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW_NCX,__lgammaf_r,(float __x, int *__signgamp),(__x,__signgamp))
-#elif (__has_builtin(__builtin_lgamma_r) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lgamma_r)) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r)
+#elif defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r)
 #include <local/math/lgammaf_r.h>
 /* Reentrant version of lgamma. This function uses the global variable
  * `signgam'.  The reentrant version instead takes a pointer and stores
@@ -10267,7 +10267,7 @@ __CDECLARE(__ATTR_WUNUSED,long double,__NOTHROW_NCX,__lgammal_r,(long double __x
  * `signgam'.  The reentrant version instead takes a pointer and stores
  * the value through it */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW_NCX,__lgammal_r,(long double __x, int *__signgamp),lgamma_r,(__x,__signgamp))
-#elif (__has_builtin(__builtin_lgamma_r) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lgamma_r)) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r)
+#elif defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r)
 #include <local/math/lgammal_r.h>
 /* Reentrant version of lgamma. This function uses the global variable
  * `signgam'.  The reentrant version instead takes a pointer and stores
@@ -10318,7 +10318,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__rintf,(float __x),rintf,(__x))
 #elif defined(__CRT_HAVE___rintf)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__rintf,(float __x),(__x))
-#elif (__has_builtin(__builtin_rint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_rint)) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
+#elif defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
 #include <local/math/rintf.h>
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __rintf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rintf))(__x); }
@@ -10332,7 +10332,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__nextafterf,(float __x,
 #elif defined(__CRT_HAVE___nextafterf)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__nextafterf,(float __x, float __y),(__x,__y))
-#elif (__has_builtin(__builtin_nextafter) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nextafter)) || defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter)
+#elif defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter)
 #include <local/math/nextafterf.h>
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __nextafterf)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextafterf))(__x, __y); }
@@ -10346,7 +10346,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__remainderf,(float __x, float __y),r
 #elif defined(__CRT_HAVE___remainderf)
 /* Return the remainder of integer divison X / Y with infinite precision */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__remainderf,(float __x, float __y),(__x,__y))
-#elif (__has_builtin(__builtin_remainder) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remainder)) || defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE___remainder)
+#elif defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE___remainder)
 #include <local/math/remainderf.h>
 /* Return the remainder of integer divison X / Y with infinite precision */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __remainderf)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remainderf))(__x, __y); }
@@ -10360,7 +10360,7 @@ __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,__ilogbf,(float __x),ilogbf,(__x))
 #elif defined(__CRT_HAVE___ilogbf)
 /* Return the binary exponent of X, which must be nonzero */
 __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW,__ilogbf,(float __x),(__x))
-#elif (__has_builtin(__builtin_ilogb) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ilogb)) || defined(__CRT_HAVE_ilogb) || defined(__CRT_HAVE___ilogb)
+#elif defined(__CRT_HAVE_ilogb) || defined(__CRT_HAVE___ilogb)
 #include <local/math/ilogbf.h>
 /* Return the binary exponent of X, which must be nonzero */
 __FORCELOCAL __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __ilogbf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ilogbf))(__x); }
@@ -10381,7 +10381,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__rintl,(long double __x),rint,
 #elif defined(__CRT_HAVE___rint) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__rintl,(long double __x),__rint,(__x))
-#elif (__has_builtin(__builtin_rint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_rint)) || defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
+#elif defined(__CRT_HAVE_rint) || defined(__CRT_HAVE___rint)
 #include <local/math/rintl.h>
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __rintl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rintl))(__x); }
@@ -10401,7 +10401,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,__nextafterl,(long
 #elif defined(__CRT_HAVE___nextafter) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,__nextafterl,(long double __x, long double __y),__nextafter,(__x,__y))
-#elif (__has_builtin(__builtin_nextafter) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nextafter)) || defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter)
+#elif defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter)
 #include <local/math/nextafterl.h>
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __nextafterl)(long double __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nextafterl))(__x, __y); }
@@ -10421,7 +10421,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__remainderl,(long double __x, 
 #elif defined(__CRT_HAVE___remainder) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return the remainder of integer divison X / Y with infinite precision */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__remainderl,(long double __x, long double __y),__remainder,(__x,__y))
-#elif (__has_builtin(__builtin_remainder) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remainder)) || defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE___remainder)
+#elif defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE___remainder)
 #include <local/math/remainderl.h>
 /* Return the remainder of integer divison X / Y with infinite precision */
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __remainderl)(long double __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(remainderl))(__x, __y); }
@@ -10441,7 +10441,7 @@ __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,__ilogbl,(long double __x),ilogb,(__x))
 #elif defined(__CRT_HAVE___ilogb) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return the binary exponent of X, which must be nonzero */
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW,__ilogbl,(long double __x),__ilogb,(__x))
-#elif (__has_builtin(__builtin_ilogb) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ilogb)) || defined(__CRT_HAVE_ilogb) || defined(__CRT_HAVE___ilogb)
+#elif defined(__CRT_HAVE_ilogb) || defined(__CRT_HAVE___ilogb)
 #include <local/math/ilogbl.h>
 /* Return the binary exponent of X, which must be nonzero */
 __FORCELOCAL __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __ilogbl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ilogbl))(__x); }
@@ -10604,7 +10604,7 @@ __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __nexttoward
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__nexttowardf,(float __x, long double __y),nexttowardf,(__x,__y))
 #elif defined(__CRT_HAVE___nexttowardf)
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__nexttowardf,(float __x, long double __y),(__x,__y))
-#elif (__has_builtin(__builtin_nexttoward) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nexttoward)) || defined(__CRT_HAVE_nexttoward) || defined(__CRT_HAVE___nexttoward)
+#elif defined(__CRT_HAVE_nexttoward) || defined(__CRT_HAVE___nexttoward)
 #include <local/math/nexttowardf.h>
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __nexttowardf)(float __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nexttowardf))(__x, __y); }
 #endif /* __nexttowardf... */
@@ -10617,7 +10617,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__scalbnf,(float __x, int __n),scalbn
 #elif defined(__CRT_HAVE___scalbnf)
 /* Return X times (2 to the Nth power) */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__scalbnf,(float __x, int __n),(__x,__n))
-#elif (__has_builtin(__builtin_scalbn) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalbn)) || defined(__CRT_HAVE_scalbn) || defined(__CRT_HAVE___scalbn)
+#elif defined(__CRT_HAVE_scalbn) || defined(__CRT_HAVE___scalbn)
 #include <local/math/scalbnf.h>
 /* Return X times (2 to the Nth power) */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __scalbnf)(float __x, int __n) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scalbnf))(__x, __n); }
@@ -10631,7 +10631,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__scalblnf,(float __x, long int __n),
 #elif defined(__CRT_HAVE___scalblnf)
 /* Return X times (2 to the Nth power) */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__scalblnf,(float __x, long int __n),(__x,__n))
-#elif (__has_builtin(__builtin_scalbln) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalbln)) || defined(__CRT_HAVE_scalbln) || defined(__CRT_HAVE___scalbln)
+#elif defined(__CRT_HAVE_scalbln) || defined(__CRT_HAVE___scalbln)
 #include <local/math/scalblnf.h>
 /* Return X times (2 to the Nth power) */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __scalblnf)(float __x, long int __n) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scalblnf))(__x, __n); }
@@ -10648,7 +10648,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__nearbyintf,(float __x),nearbyintf,(
 /* Round X to integral value in floating-point format using current
  * rounding direction, but do not raise inexact exception */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__nearbyintf,(float __x),(__x))
-#elif (__has_builtin(__builtin_nearbyint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nearbyint)) || defined(__CRT_HAVE_nearbyint) || defined(__CRT_HAVE___nearbyint)
+#elif defined(__CRT_HAVE_nearbyint) || defined(__CRT_HAVE___nearbyint)
 #include <local/math/nearbyintf.h>
 /* Round X to integral value in floating-point format using current
  * rounding direction, but do not raise inexact exception */
@@ -10701,7 +10701,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__remquof,(float __x, float __y, int 
  * of x/y and magnitude congruent `mod 2^n' to the magnitude of
  * the integral quotient x/y, with n >= 3 */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__remquof,(float __x, float __y, int *__pquo),(__x,__y,__pquo))
-#elif (__has_builtin(__builtin_remquo) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remquo)) || defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo)
+#elif defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo)
 #include <local/math/remquof.h>
 /* Compute remainder of X and Y and put in *QUO a value with sign
  * of x/y and magnitude congruent `mod 2^n' to the magnitude of
@@ -10717,7 +10717,7 @@ __CREDIRECT(__ATTR_WUNUSED,long int,__NOTHROW,__lrintf,(float __x),lrintf,(__x))
 #elif defined(__CRT_HAVE___lrintf)
 /* Round X to nearest integral value according to current rounding direction */
 __CDECLARE(__ATTR_WUNUSED,long int,__NOTHROW,__lrintf,(float __x),(__x))
-#elif (__has_builtin(__builtin_lrint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lrint)) || defined(__CRT_HAVE_lrint) || defined(__CRT_HAVE___lrint)
+#elif defined(__CRT_HAVE_lrint) || defined(__CRT_HAVE___lrint)
 #include <local/math/lrintf.h>
 /* Round X to nearest integral value according to current rounding direction */
 __FORCELOCAL __ATTR_WUNUSED long int __NOTHROW(__LIBCCALL __lrintf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lrintf))(__x); }
@@ -10823,7 +10823,7 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGLONG,__NOTHROW,__llrintf,(float __x),llrintf,(_
 #elif defined(__CRT_HAVE___llrintf)
 /* Round X to nearest integral value according to current rounding direction */
 __CDECLARE(__ATTR_WUNUSED,__LONGLONG,__NOTHROW,__llrintf,(float __x),(__x))
-#elif (__has_builtin(__builtin_llrint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_llrint)) || defined(__CRT_HAVE_llrint) || defined(__CRT_HAVE___llrint)
+#elif defined(__CRT_HAVE_llrint) || defined(__CRT_HAVE___llrint)
 #include <local/math/llrintf.h>
 /* Round X to nearest integral value according to current rounding direction */
 __FORCELOCAL __ATTR_WUNUSED __LONGLONG __NOTHROW(__LIBCCALL __llrintf)(float __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(llrintf))(__x); }
@@ -10854,7 +10854,7 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,__nexttowardl,(long
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,__nexttowardl,(long double __x, long double __y),nexttoward,(__x,__y))
 #elif defined(__CRT_HAVE___nexttoward) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,long double,__NOTHROW,__nexttowardl,(long double __x, long double __y),__nexttoward,(__x,__y))
-#elif (__has_builtin(__builtin_nexttoward) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nexttoward)) || defined(__CRT_HAVE_nexttoward) || defined(__CRT_HAVE___nexttoward)
+#elif defined(__CRT_HAVE_nexttoward) || defined(__CRT_HAVE___nexttoward)
 #include <local/math/nexttowardl.h>
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __nexttowardl)(long double __x, long double __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(nexttowardl))(__x, __y); }
 #endif /* __nexttowardl... */
@@ -10873,7 +10873,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__scalbnl,(long double __x, int
 #elif defined(__CRT_HAVE___scalbn) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return X times (2 to the Nth power) */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__scalbnl,(long double __x, int __n),__scalbn,(__x,__n))
-#elif (__has_builtin(__builtin_scalbn) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalbn)) || defined(__CRT_HAVE_scalbn) || defined(__CRT_HAVE___scalbn)
+#elif defined(__CRT_HAVE_scalbn) || defined(__CRT_HAVE___scalbn)
 #include <local/math/scalbnl.h>
 /* Return X times (2 to the Nth power) */
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __scalbnl)(long double __x, int __n) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scalbnl))(__x, __n); }
@@ -10893,7 +10893,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__scalblnl,(long double __x, lo
 #elif defined(__CRT_HAVE___scalbln) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return X times (2 to the Nth power) */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__scalblnl,(long double __x, long int __n),__scalbln,(__x,__n))
-#elif (__has_builtin(__builtin_scalbln) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalbln)) || defined(__CRT_HAVE_scalbln) || defined(__CRT_HAVE___scalbln)
+#elif defined(__CRT_HAVE_scalbln) || defined(__CRT_HAVE___scalbln)
 #include <local/math/scalblnl.h>
 /* Return X times (2 to the Nth power) */
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __scalblnl)(long double __x, long int __n) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scalblnl))(__x, __n); }
@@ -10918,7 +10918,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__nearbyintl,(long double __x),
 /* Round X to integral value in floating-point format using current
  * rounding direction, but do not raise inexact exception */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__nearbyintl,(long double __x),__nearbyint,(__x))
-#elif (__has_builtin(__builtin_nearbyint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nearbyint)) || defined(__CRT_HAVE_nearbyint) || defined(__CRT_HAVE___nearbyint)
+#elif defined(__CRT_HAVE_nearbyint) || defined(__CRT_HAVE___nearbyint)
 #include <local/math/nearbyintl.h>
 /* Round X to integral value in floating-point format using current
  * rounding direction, but do not raise inexact exception */
@@ -10981,7 +10981,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__remquol,(long double __x, lon
  * of x/y and magnitude congruent `mod 2^n' to the magnitude of
  * the integral quotient x/y, with n >= 3 */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__remquol,(long double __x, long double __y, int *__pquo),__remquo,(__x,__y,__pquo))
-#elif (__has_builtin(__builtin_remquo) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remquo)) || defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo)
+#elif defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo)
 #include <local/math/remquol.h>
 /* Compute remainder of X and Y and put in *QUO a value with sign
  * of x/y and magnitude congruent `mod 2^n' to the magnitude of
@@ -11003,7 +11003,7 @@ __CREDIRECT(__ATTR_WUNUSED,long int,__NOTHROW,__lrintl,(long double __x),lrint,(
 #elif defined(__CRT_HAVE___lrint) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Round X to nearest integral value according to current rounding direction */
 __CREDIRECT(__ATTR_WUNUSED,long int,__NOTHROW,__lrintl,(long double __x),__lrint,(__x))
-#elif (__has_builtin(__builtin_lrint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lrint)) || defined(__CRT_HAVE_lrint) || defined(__CRT_HAVE___lrint)
+#elif defined(__CRT_HAVE_lrint) || defined(__CRT_HAVE___lrint)
 #include <local/math/lrintl.h>
 /* Round X to nearest integral value according to current rounding direction */
 __FORCELOCAL __ATTR_WUNUSED long int __NOTHROW(__LIBCCALL __lrintl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lrintl))(__x); }
@@ -11094,7 +11094,7 @@ __CREDIRECT(__ATTR_WUNUSED,__LONGLONG,__NOTHROW,__llrintl,(long double __x),llri
 #elif defined(__CRT_HAVE___llrint) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Round X to nearest integral value according to current rounding direction */
 __CREDIRECT(__ATTR_WUNUSED,__LONGLONG,__NOTHROW,__llrintl,(long double __x),__llrint,(__x))
-#elif (__has_builtin(__builtin_llrint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_llrint)) || defined(__CRT_HAVE_llrint) || defined(__CRT_HAVE___llrint)
+#elif defined(__CRT_HAVE_llrint) || defined(__CRT_HAVE___llrint)
 #include <local/math/llrintl.h>
 /* Round X to nearest integral value according to current rounding direction */
 __FORCELOCAL __ATTR_WUNUSED __LONGLONG __NOTHROW(__LIBCCALL __llrintl)(long double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(llrintl))(__x); }
@@ -11142,7 +11142,7 @@ __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,__scalbf,(float __x, float __n),(__x,_
 #elif defined(__CRT_HAVE__scalbf)
 /* Return X times (2 to the Nth power) */
 __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,__scalbf,(float __x, float __n),_scalbf,(__x,__n))
-#elif (__has_builtin(__builtin_scalb) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalb)) || defined(__CRT_HAVE_scalb) || defined(__CRT_HAVE___scalb) || defined(__CRT_HAVE__scalb)
+#elif defined(__CRT_HAVE_scalb) || defined(__CRT_HAVE___scalb) || defined(__CRT_HAVE__scalb)
 #include <local/math/scalbf.h>
 /* Return X times (2 to the Nth power) */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __scalbf)(float __x, float __n) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scalbf))(__x, __n); }
@@ -11166,7 +11166,7 @@ __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__scalbl,(long double __x, long
 #elif defined(__CRT_HAVE___scalb) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 /* Return X times (2 to the Nth power) */
 __CREDIRECT(__ATTR_WUNUSED,long double,__NOTHROW,__scalbl,(long double __x, long double __n),__scalb,(__x,__n))
-#elif (__has_builtin(__builtin_scalb) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalb)) || defined(__CRT_HAVE_scalb) || defined(__CRT_HAVE___scalb) || defined(__CRT_HAVE__scalb)
+#elif defined(__CRT_HAVE_scalb) || defined(__CRT_HAVE___scalb) || defined(__CRT_HAVE__scalb)
 #include <local/math/scalbl.h>
 /* Return X times (2 to the Nth power) */
 __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __scalbl)(long double __x, long double __n) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scalbl))(__x, __n); }

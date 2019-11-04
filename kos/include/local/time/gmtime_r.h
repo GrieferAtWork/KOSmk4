@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x39cd076 */
+/* HASH CRC-32:0xed3dfe88 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,7 +60,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,__localdep_dos_gmtime
 #elif defined(__CRT_HAVE__gmtime64_s) && (!defined(__USE_TIME_BITS64))
 /* Return the `struct tm' representation of *TIMER in UTC, using *TP to store the result */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,__localdep_dos_gmtime_s,(__STRUCT_TM *__restrict __tp, __TM_TYPE(time) const *__restrict __timer),_gmtime64_s,(__tp,__timer))
-#elif (defined(__CRT_HAVE__gmtime32_s) || defined(__CRT_HAVE__gmtime64_s))
+#elif defined(__CRT_HAVE__gmtime32_s) || defined(__CRT_HAVE__gmtime64_s)
 #include <local/time/dos_gmtime_s.h>
 /* Return the `struct tm' representation of *TIMER in UTC, using *TP to store the result */
 #define __localdep_dos_gmtime_s (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dos_gmtime_s))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x36a87c20 */
+/* HASH CRC-32:0xae74d208 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_eventfd_read_defined
-#if (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read))
+#if defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)
 #define __local_eventfd_read_defined 1
 #include <parts/errno.h>
 /* Dependency: "read" */
@@ -61,5 +61,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(eventfd_read))(__fd_t __fd,
 	return -1;
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)) */
+#endif /* defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read) */
 #endif /* !__local_eventfd_read_defined */

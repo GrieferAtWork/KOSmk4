@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xae6e7cd6 */
+/* HASH CRC-32:0xe930fd6e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_PReadAll64_defined
-#if (defined(__CRT_HAVE_PRead) || defined(__CRT_HAVE_PRead64) || (defined(__CRT_HAVE_PRead) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__))
+#if defined(__CRT_HAVE_PRead) || defined(__CRT_HAVE_PRead64)
 #define __local_PReadAll64_defined 1
 #include <kos/anno.h>
 /* Dependency: "PRead64" from "kos.unistd" */
@@ -72,5 +72,5 @@ __LOCAL_LIBC(PReadAll64) __ATTR_NONNULL((2)) __SIZE_TYPE__
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_PRead) || defined(__CRT_HAVE_PRead64) || (defined(__CRT_HAVE_PRead) && __SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)) */
+#endif /* defined(__CRT_HAVE_PRead) || defined(__CRT_HAVE_PRead64) */
 #endif /* !__local_PReadAll64_defined */

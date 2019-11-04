@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe8924a0f */
+/* HASH CRC-32:0x862b6d0a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -448,6 +448,7 @@ INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__strupr_s_l)(char *buf, size_t buflen, 
 #define libc__strnicmp_l libc_strncasecmp_l
 INTDEF errno_t NOTHROW_NCX(LIBCCALL libc__strnset_s)(char *__restrict buf, size_t buflen, int ch, size_t maxlen);
 #define libc__strrev libc_strrev
+#define libc__strxfrm_l libc_strxfrm_l
 #define libc_stricmp libc_strcasecmp
 #define libc_strcmpi libc_strcasecmp
 #define libc_strnicmp libc_strncasecmp

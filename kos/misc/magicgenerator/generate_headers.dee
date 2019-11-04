@@ -44,7 +44,9 @@ local copyright =
 
 import fs;
 import * from deemon;
+import enumerate from util;
 import hash from hashlib;
+import optimizePreprocessorExpression from ..libgen.optiexpr;
 
 
 global hashfunc = "CRC-32";
@@ -355,9 +357,28 @@ function add_paren_if_necessary(text: string, used_for_logical_and: bool): strin
 	return text;
 }
 
-
+local paren_match = {
+	"(" : ")",
+	"[" : "]",
+	"{" : "}",
+};
 
 global Function;
+
+global functions_prototypes;
+
+function form_has_function_expression(name: string): string {
+	local func = functions_prototypes.get(name.rstrip("?"));
+	if (func !is none)
+		return func.get_dependency_string();
+	if (name.endswith("?"))
+		return key_crt_have(name.rstrip("?"));
+	throw "Unknown function " + repr name;
+}
+
+global DirectivesEnvironmentFunctions = {
+	"has_function" : form_has_function_expression
+};
 
 class DirectivesEnvironment {
 	this = default;
@@ -368,8 +389,12 @@ class DirectivesEnvironment {
 		}
 	}
 	operator [](key: Object): Object {
-		if (key is string && key.startswith("$"))
-			return self.operator . (key[1:]);
+		if (key is string && key.startswith("$")) {
+			local name = key[1:];
+			if (name in DirectivesEnvironmentFunctions)
+				return DirectivesEnvironmentFunctions[name];
+			return self.operator . (name);
+		}
 		return values[key];
 	}
 	operator []= (key: Object, value: Object) {
@@ -528,7 +553,9 @@ function split_words(
 							yield (false, "\n" * start_i);
 					}	break;
 					default:
-						throw "Unknown directive {!r} (with {!r}) in {!r}".format({ cmd, directive, text });
+						throw Error(
+							"Unknown directive {!r} (with {!r}) in {!r}"
+								.format({ cmd, directive, text }));
 					}
 					continue;
 				}
@@ -625,12 +652,6 @@ function is_implicitly_castable(src_type: string, dst_type: string): bool {
 }
 
 
-
-local paren_match = {
-	"(" : ")",
-	"[" : "]",
-	"{" : "}",
-};
 
 @@Split a given argument list into the individual arguments
 function findfirstch_parenaware(
@@ -835,7 +856,6 @@ function parse_return_type_annotations(return_type: string,
 						/* Check the argument list for an argument with the same name as `alignment'.
 						* If it's not one of them, assume a fixed alignment annotation. */
 						local alignment_argi = none;
-						import enumerate from util;
 						for (local i, data: enumerate(args)) {
 							if (alignment == data[1]) {
 								alignment_argi = i;
@@ -888,7 +908,6 @@ unknown_malloc_argument_size:
 					attr = attr[:attr.index("+")].rstrip();
 				if (attr.issymbol()) {
 					/* Check if the named argument has the [nonnull] tag */
-					import enumerate from util;
 					for (local i, data: enumerate(args)) {
 						if (data[1] == attr) {
 							local str_i = str(i + 1);
@@ -1929,7 +1948,6 @@ again_enum_name:
 					if (enum_name)
 						tempfp << enum_name << " ";
 					tempfp << "{\n";
-					import enumerate from util;
 					for (local i, data: enumerate(enums)) {
 						if (data is string) {
 							tempfp << data;
@@ -2132,6 +2150,7 @@ again_enum_name:
 					dont_export_symbol = "auto";
 					break;
 #endif
+				case "noauto":
 				case "noexport":
 					dont_export_symbol = true;
 					break;
@@ -2301,6 +2320,14 @@ again_enum_name:
 				case "nouser":
 					nouser = true;
 					douser = false;
+					break;
+				case "userimpl":
+					/* Force the implementation to appear in the user exports list */
+					export_in_kernel   = false;
+					dont_export_symbol = true;
+					douser             = true;
+					nouser             = false;
+					same_impl          = true;
 					break;
 				case "user":
 					douser = true;
@@ -3586,7 +3613,7 @@ class Function {
 			if (define_require_string in ["", "1"])
 				return "1";
 			format_define_require_string(fp, define_require_string);
-			local block_deps = fp.string;
+			local block_deps = optimizePreprocessorExpression(fp.string);
 			if (block_deps in ["", "1"])
 				return "1";
 			for (local none, cond: enum_link_conditions())
@@ -3630,9 +3657,7 @@ class Function {
 			    result.findmatch("(", ")", 1) == #result - 1)
 				result = result[1:-1];
 		}
-		return result
-			.replace("1 && ", "")
-			.replace(" && 1", "");
+		return optimizePreprocessorExpression(result);
 	}
 
 	public property defaultEnv: {string: Object} = {
@@ -4056,7 +4081,9 @@ class Function {
 			for (local none, word: split_words(requires_prefix, env: this))
 				fp << word;
 			fp << "#if ";
-			format_define_require_string(fp, define_require_string);
+			File.Writer tempfp;
+			format_define_require_string(tempfp, define_require_string);
+			fp << optimizePreprocessorExpression(tempfp.string);
 			fp << "\n";
 		}
 		fp << "#define __local_" << used_name << "_defined 1\n";
@@ -4155,7 +4182,9 @@ class Function {
 		fp << "\n__NAMESPACE_LOCAL_END\n";
 		if (define_require_string) {
 			fp << "#endif /* ";
-			format_define_require_string_comment(fp, define_require_string);
+			File.Writer tempfp;
+			format_define_require_string_comment(tempfp, define_require_string);
+			fp << optimizePreprocessorExpression(tempfp.string);
 			fp << " */\n";
 		}
 		fp << "#endif /* !__local_" << used_name << "_defined */\n";
@@ -4842,7 +4871,7 @@ skip_alias_redirections:
 					if (effective_define_require) {
 						File.Writer tempfp;
 						format_define_require_string(tempfp, effective_define_require);
-						tempfp = tempfp.string;
+						tempfp = optimizePreprocessorExpression(tempfp.string);
 						if (tempfp !in ["", "1"]) {
 							fp << "#elif " << tempfp << "\n";
 							always_available = false;
@@ -4864,7 +4893,7 @@ skip_alias_redirections:
 					if (effective_define_require) {
 						File.Writer tempfp;
 						format_define_require_string(tempfp, effective_define_require);
-						tempfp = tempfp.string;
+						tempfp = optimizePreprocessorExpression(tempfp.string);
 						if (tempfp !in ["", "1"]) {
 							fp << "#elif " << tempfp << "\n";
 							always_available = false;
@@ -5456,7 +5485,7 @@ skip_alias_redirections2:
 				if (effective_define_require) {
 					File.Writer tempfp;
 					format_define_require_string(tempfp, effective_define_require);
-					tempfp = tempfp.string;
+					tempfp = optimizePreprocessorExpression(tempfp.string);
 					if (tempfp !in ["", "1"]) {
 						fp << "#elif " << tempfp << "\n";
 						always_available = false;
@@ -5478,7 +5507,7 @@ skip_alias_redirections2:
 				if (effective_define_require) {
 					File.Writer tempfp;
 					format_define_require_string(tempfp, effective_define_require);
-					tempfp = tempfp.string;
+					tempfp = optimizePreprocessorExpression(tempfp.string);
 					if (tempfp in ["", "1"]) {
 						fp << "#else /* LIBC: " << symbol_name << " */\n";
 					} else {
@@ -7405,7 +7434,6 @@ write_hashed_file_l("include/crt-features/crt-kos-sections.h", [](fp) {
 	known_libc_sections.update(sections_map.keys);
 	local libc_sections = List(known_libc_sections);
 	libc_sections.sort();
-	import util;
 	function sectinfo_name(name: string): string {
 		return "__CRT_SECTINFO_{}".format({ name.lstrip(".").replace(".", "_") });
 	}
@@ -7413,12 +7441,12 @@ write_hashed_file_l("include/crt-features/crt-kos-sections.h", [](fp) {
 		return name.lstrip(".").replace(".", "_");
 	}
 	local longest_section_name = 0;
-	for (local i, name: util.enumerate(libc_sections)) {
+	for (local i, name: enumerate(libc_sections)) {
 		local temp = #sectinfo_name(name);
 		if (longest_section_name < temp)
 			longest_section_name = temp;
 	}
-	for (local i, name: util.enumerate(libc_sections)) {
+	for (local i, name: enumerate(libc_sections)) {
 		local temp = sectinfo_name(name);
 		fp << "#define " << temp << (" " * (longest_section_name - #temp));
 		fp << " (" << i << ", " << name << ", " << sectinfo_symbol(name) << ")\n";
@@ -7668,7 +7696,6 @@ function update_sections_order(filename: string) {
 	section_rules = full_section_rules;
 	@@Sorted list of section rules, sorted descendingly by rule length
 	@@The first element describes the rule's index within the
-	import enumerate from util;
 	local sorted_section_rules: {(int, string)...} = List();
 	for (local i, names: enumerate(section_rules)) {
 		for (local n: names)

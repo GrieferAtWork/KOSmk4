@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf87712f1 */
+/* HASH CRC-32:0xaef7a763 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_tmpfile_s_defined
-#if (defined(__CRT_HAVE_tmpfile) || defined(__CRT_HAVE_tmpfile64))
+#if defined(__CRT_HAVE_tmpfile) || defined(__CRT_HAVE_tmpfile64)
 #define __local_tmpfile_s_defined 1
 #include <parts/errno.h>
 /* Dependency: "tmpfile" */
@@ -50,5 +50,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(tmpfile_s))(__FILE **__pstream) {
 	return 0;
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_tmpfile) || defined(__CRT_HAVE_tmpfile64)) */
+#endif /* defined(__CRT_HAVE_tmpfile) || defined(__CRT_HAVE_tmpfile64) */
 #endif /* !__local_tmpfile_s_defined */

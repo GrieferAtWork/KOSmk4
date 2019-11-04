@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaa46208a */
+/* HASH CRC-32:0x4c6846d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_spawnlp_defined
-#if (defined(__CRT_HAVE_spawnvp) || defined(__CRT_HAVE__spawnvp))
+#if defined(__CRT_HAVE_spawnvp) || defined(__CRT_HAVE__spawnvp)
 #define __local_spawnlp_defined 1
 #include <parts/redirect-exec.h>
 /* Dependency: "spawnvp" */
@@ -43,5 +43,5 @@ __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(spawnlp))(int __mode,
 	__REDIRECT_SPAWNLP(char, __localdep_spawnvp, __mode, __file, __args)
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_spawnvp) || defined(__CRT_HAVE__spawnvp)) */
+#endif /* defined(__CRT_HAVE_spawnvp) || defined(__CRT_HAVE__spawnvp) */
 #endif /* !__local_spawnlp_defined */

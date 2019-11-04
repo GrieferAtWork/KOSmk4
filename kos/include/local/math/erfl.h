@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1689a3fa */
+/* HASH CRC-32:0xda745b24 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_erfl_defined
-#if ((__has_builtin(__builtin_erf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_erf)) || defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf))
+#if defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf)
 #define __local_erfl_defined 1
 /* Dependency: "erf" */
 #ifndef ____localdep_erf_defined
@@ -41,5 +41,5 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(erfl))(long double __x) {
 	return (long double)__localdep_erf((double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((__has_builtin(__builtin_erf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_erf)) || defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf)) */
+#endif /* defined(__CRT_HAVE_erf) || defined(__CRT_HAVE___erf) */
 #endif /* !__local_erfl_defined */

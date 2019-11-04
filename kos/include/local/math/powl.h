@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7245b137 */
+/* HASH CRC-32:0xcf500cf5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_powl_defined
-#if ((__has_builtin(__builtin_pow) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_pow)) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow))
+#if defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow)
 #define __local_powl_defined 1
 #include <bits/math-vector.h>
 #include <bits/math-vector.h>
@@ -48,5 +48,5 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(powl))(long double __x,
 	return (long double)__localdep_pow((double)__x, (double)__y);
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((__has_builtin(__builtin_pow) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_pow)) || defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow)) */
+#endif /* defined(__CRT_HAVE_pow) || defined(__CRT_HAVE___pow) */
 #endif /* !__local_powl_defined */

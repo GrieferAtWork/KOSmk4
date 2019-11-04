@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x299d9487 */
+/* HASH CRC-32:0xbf31d22b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_pselect_defined
-#if (defined(__CRT_HAVE_pselect) || defined(__CRT_HAVE_pselect64))
+#if defined(__CRT_HAVE_pselect) || defined(__CRT_HAVE_pselect64)
 #define __local_pselect_defined 1
 /* Dependency: "pselect64" from "sys.select" */
 #ifndef ____localdep_pselect64_defined
@@ -71,5 +71,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pselect))(__STDC_INT_AS_SIZE_T __nfds
 #endif /* !__CRT_HAVE_pselect64 */
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_pselect) || defined(__CRT_HAVE_pselect64)) */
+#endif /* defined(__CRT_HAVE_pselect) || defined(__CRT_HAVE_pselect64) */
 #endif /* !__local_pselect_defined */

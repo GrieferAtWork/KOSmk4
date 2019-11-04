@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa700a122 */
+/* HASH CRC-32:0xdf589544 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -184,7 +184,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(hsearch, __FORCELOCAL ENTRY *__NOTHROW_NCX(__LIB
 #if defined(__CRT_HAVE_hcreate)
 /* Create a new hashing table which will at most contain NEL elements */
 __CDECLARE(,int,__NOTHROW_NCX,hcreate,(size_t __nel),(__nel))
-#elif (defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc)) || (__has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)) || defined(__CRT_HAVE_malloc) || (__has_builtin(__builtin_calloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_calloc)) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_hcreate_r)
+#elif defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_hcreate_r)
 #include <local/search/hcreate.h>
 /* Create a new hashing table which will at most contain NEL elements */
 __NAMESPACE_LOCAL_USING_OR_IMPL(hcreate, __FORCELOCAL int __NOTHROW_NCX(__LIBCCALL hcreate)(size_t __nel) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(hcreate))(__nel); })
@@ -192,7 +192,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(hcreate, __FORCELOCAL int __NOTHROW_NCX(__LIBCCA
 #if defined(__CRT_HAVE_hdestroy)
 /* Destroy current internal hashing table */
 __CDECLARE_VOID(,__NOTHROW_NCX,hdestroy,(void),())
-#elif (__has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE_hdestroy_r)
+#elif defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) || defined(__CRT_HAVE_hdestroy_r)
 #include <local/search/hdestroy.h>
 /* Destroy current internal hashing table */
 __NAMESPACE_LOCAL_USING_OR_IMPL(hdestroy, __FORCELOCAL void __NOTHROW_NCX(__LIBCCALL hdestroy)(void) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(hdestroy))(); })
@@ -218,7 +218,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(hsearch_r, __FORCELOCAL int __NOTHROW_NCX(__LIBC
 #if defined(__CRT_HAVE_hcreate_r)
 /* Reentrant versions which can handle multiple hashing tables at the same time */
 __CDECLARE(,int,__NOTHROW_NCX,hcreate_r,(size_t __nel, struct hsearch_data *__htab),(__nel,__htab))
-#elif (defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc)) || (__has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)) || defined(__CRT_HAVE_malloc) || (__has_builtin(__builtin_calloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_calloc)) || defined(__CRT_HAVE_calloc)
+#elif defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_malloc)
 #include <local/search/hcreate_r.h>
 /* Reentrant versions which can handle multiple hashing tables at the same time */
 __NAMESPACE_LOCAL_USING_OR_IMPL(hcreate_r, __FORCELOCAL int __NOTHROW_NCX(__LIBCCALL hcreate_r)(size_t __nel, struct hsearch_data *__htab) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(hcreate_r))(__nel, __htab); })
@@ -226,7 +226,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(hcreate_r, __FORCELOCAL int __NOTHROW_NCX(__LIBC
 #if defined(__CRT_HAVE_hdestroy_r)
 /* Reentrant versions which can handle multiple hashing tables at the same time */
 __CDECLARE_VOID(,__NOTHROW_NCX,hdestroy_r,(struct hsearch_data *__htab),(__htab))
-#elif (__has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+#elif defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 #include <local/search/hdestroy_r.h>
 /* Reentrant versions which can handle multiple hashing tables at the same time */
 __NAMESPACE_LOCAL_USING_OR_IMPL(hdestroy_r, __FORCELOCAL void __NOTHROW_NCX(__LIBCCALL hdestroy_r)(struct hsearch_data *__htab) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(hdestroy_r))(__htab); })
@@ -244,7 +244,7 @@ __CDECLARE(,void *,__NOTHROW_NCX,tsearch,(void const *__key, void **__vrootp, __
 /* Search for an entry matching the given KEY in the tree
  * pointed to by *ROOTP and insert a new element if not found */
 __CREDIRECT(,void *,__NOTHROW_NCX,tsearch,(void const *__key, void **__vrootp, __compar_fn_t __compar),__tsearch,(__key,__vrootp,__compar))
-#elif (defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc)) || (__has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)) || defined(__CRT_HAVE_malloc)
+#elif defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_malloc)
 #include <local/search/tsearch.h>
 /* Search for an entry matching the given KEY in the tree
  * pointed to by *ROOTP and insert a new element if not found */
@@ -270,7 +270,7 @@ __CDECLARE(,void *,__NOTHROW_NCX,tdelete,(void const *__restrict __key, void **_
 #elif defined(__CRT_HAVE___tdelete)
 /* Remove the element matching KEY from the tree pointed to by *ROOTP */
 __CREDIRECT(,void *,__NOTHROW_NCX,tdelete,(void const *__restrict __key, void **__restrict __vrootp, __compar_fn_t __compar),__tdelete,(__key,__vrootp,__compar))
-#elif (__has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+#elif defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 #include <local/search/tdelete.h>
 /* Remove the element matching KEY from the tree pointed to by *ROOTP */
 __NAMESPACE_LOCAL_USING_OR_IMPL(tdelete, __FORCELOCAL void *__NOTHROW_NCX(__LIBCCALL tdelete)(void const *__restrict __key, void **__restrict __vrootp, __compar_fn_t __compar) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tdelete))(__key, __vrootp, __compar); })
@@ -297,7 +297,7 @@ typedef void (*__free_fn_t) (void *__nodep);
 #if defined(__CRT_HAVE_tdestroy)
 /* Destroy the whole tree, call FREEFCT for each node or leaf */
 __CDECLARE_VOID(,__NOTHROW_NCX,tdestroy,(void *__root, __free_fn_t __freefct),(__root,__freefct))
-#elif (__has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+#elif defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 #include <local/search/tdestroy.h>
 /* Destroy the whole tree, call FREEFCT for each node or leaf */
 __NAMESPACE_LOCAL_USING_OR_IMPL(tdestroy, __FORCELOCAL void __NOTHROW_NCX(__LIBCCALL tdestroy)(void *__root, __free_fn_t __freefct) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tdestroy))(__root, __freefct); })

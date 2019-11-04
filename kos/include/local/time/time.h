@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x738eed32 */
+/* HASH CRC-32:0xa15b729e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_time_defined
-#if (defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE__time32))
+#if defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE__time32)
 #define __local_time_defined 1
 /* Dependency: "time32" from "time" */
 #ifndef ____localdep_time32_defined
@@ -46,7 +46,7 @@ __CREDIRECT(,__time64_t,__NOTHROW_NCX,__localdep_time64,(__time64_t *__timer),ti
 #elif defined(__CRT_HAVE__time64)
 /* Return the current time and put it in *TIMER if TIMER is not NULL */
 __CREDIRECT(,__time64_t,__NOTHROW_NCX,__localdep_time64,(__time64_t *__timer),_time64,(__timer))
-#elif (defined(__CRT_HAVE_time) || defined(__CRT_HAVE__time32))
+#elif defined(__CRT_HAVE_time) || defined(__CRT_HAVE__time32)
 #include <local/time/time64.h>
 /* Return the current time and put it in *TIMER if TIMER is not NULL */
 #define __localdep_time64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(time64))
@@ -73,5 +73,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(time))(__TM_TYPE(time) *__timer) {
 #endif /* !__USE_TIME_BITS64 */
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE__time32)) */
+#endif /* defined(__CRT_HAVE_time64) || defined(__CRT_HAVE__time64) || defined(__CRT_HAVE_time) || defined(__CRT_HAVE__time32) */
 #endif /* !__local_time_defined */

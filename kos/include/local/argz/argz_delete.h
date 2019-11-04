@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe803bbe0 */
+/* HASH CRC-32:0x3d35fbf7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -87,9 +87,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_delete))(char **__restrict __par
 	__newlen    = *__pargz_len - __entrylen;
 	*__pargz_len = __newlen;
 	if __unlikely(__newlen == 0) {
-#if (__has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 		__localdep_free(*__pargz);
-#endif /* (__has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) */
+#endif /* defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) */
 		*__pargz = __NULLPTR;
 		return;
 	}

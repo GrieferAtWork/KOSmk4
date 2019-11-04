@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaba6aaee */
+/* HASH CRC-32:0xb0af9d54 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_gai_suspend_defined
-#if (defined(__CRT_HAVE_gai_suspend64) || defined(__CRT_HAVE_gai_suspend))
+#if defined(__CRT_HAVE_gai_suspend64) || defined(__CRT_HAVE_gai_suspend)
 #define __local_gai_suspend_defined 1
 /* Dependency: "crt_gai_suspend" from "netdb" */
 #ifndef ____localdep_crt_gai_suspend_defined
@@ -93,5 +93,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(gai_suspend))(struct gaicb const *con
 #endif
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_gai_suspend64) || defined(__CRT_HAVE_gai_suspend)) */
+#endif /* defined(__CRT_HAVE_gai_suspend64) || defined(__CRT_HAVE_gai_suspend) */
 #endif /* !__local_gai_suspend_defined */

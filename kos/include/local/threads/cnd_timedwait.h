@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3096110 */
+/* HASH CRC-32:0x26bbfd25 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_cnd_timedwait_defined
-#if ((defined(__CRT_HAVE_pthread_cond_timedwait) || defined(__CRT_HAVE_pthread_cond_timedwait64)) || (defined(__CRT_HAVE_pthread_cond_timedwait64) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE_pthread_cond_timedwait) && !defined(__USE_TIME_BITS64)))
+#if defined(__CRT_HAVE_pthread_cond_timedwait) || defined(__CRT_HAVE_pthread_cond_timedwait64)
 #define __local_cnd_timedwait_defined 1
 #include <bits/pthreadtypes.h>
 #include <bits/timespec.h>
@@ -42,7 +42,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_pthread_cond_
  * absolute time specification; zero is the beginning of the epoch
  * (00:00:00 GMT, January 1, 1970). */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_pthread_cond_timedwait,(__pthread_cond_t *__restrict __cond, __pthread_mutex_t *__restrict __mutex, struct __TM_TYPE(timespec) const *__restrict __abstime),pthread_cond_timedwait,(__cond,__mutex,__abstime))
-#elif (defined(__CRT_HAVE_pthread_cond_timedwait) || defined(__CRT_HAVE_pthread_cond_timedwait64))
+#elif defined(__CRT_HAVE_pthread_cond_timedwait) || defined(__CRT_HAVE_pthread_cond_timedwait64)
 #include <local/pthread/pthread_cond_timedwait.h>
 /* Wait for condition variable COND to be signaled or broadcast until
  * ABSTIME. MUTEX is assumed to be locked before. ABSTIME is an
@@ -74,5 +74,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(cnd_timedwait))(__cnd_t *__restrict _
 	return 2; /* thrd_error */
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((defined(__CRT_HAVE_pthread_cond_timedwait) || defined(__CRT_HAVE_pthread_cond_timedwait64)) || (defined(__CRT_HAVE_pthread_cond_timedwait64) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE_pthread_cond_timedwait) && !defined(__USE_TIME_BITS64))) */
+#endif /* defined(__CRT_HAVE_pthread_cond_timedwait) || defined(__CRT_HAVE_pthread_cond_timedwait64) */
 #endif /* !__local_cnd_timedwait_defined */

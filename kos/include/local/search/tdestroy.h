@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x46d2bf3e */
+/* HASH CRC-32:0x102f5b11 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_tdestroy_defined
-#if ((__has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 #define __local_tdestroy_defined 1
 /* Dependency: "free" */
 #ifndef ____localdep_free_defined
@@ -62,5 +62,5 @@ __again:
 	}
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((__has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)) */
+#endif /* defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) */
 #endif /* !__local_tdestroy_defined */

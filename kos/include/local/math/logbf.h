@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8cb5f022 */
+/* HASH CRC-32:0x3caa8584 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_logbf_defined
-#if ((__has_builtin(__builtin_logb) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_logb)) || defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb))
+#if defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb)
 #define __local_logbf_defined 1
 /* Dependency: "logb" */
 #ifndef ____localdep_logb_defined
@@ -48,5 +48,5 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(logbf))(float __x) {
 	return (float)__localdep_logb((double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((__has_builtin(__builtin_logb) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_logb)) || defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb)) */
+#endif /* defined(__CRT_HAVE_logb) || defined(__CRT_HAVE___logb) || defined(__CRT_HAVE__logb) */
 #endif /* !__local_logbf_defined */

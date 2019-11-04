@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8dacc00b */
+/* HASH CRC-32:0x1539c52 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_lrintl_defined
-#if ((__has_builtin(__builtin_lrint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lrint)) || defined(__CRT_HAVE_lrint) || defined(__CRT_HAVE___lrint))
+#if defined(__CRT_HAVE_lrint) || defined(__CRT_HAVE___lrint)
 #define __local_lrintl_defined 1
 /* Dependency: "lrint" */
 #ifndef ____localdep_lrint_defined
@@ -45,5 +45,5 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(lrintl))(long double __x) {
 	return (long int)__localdep_lrint((double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((__has_builtin(__builtin_lrint) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lrint)) || defined(__CRT_HAVE_lrint) || defined(__CRT_HAVE___lrint)) */
+#endif /* defined(__CRT_HAVE_lrint) || defined(__CRT_HAVE___lrint) */
 #endif /* !__local_lrintl_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c980cf */
+/* HASH CRC-32:0x40f30594 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -361,7 +361,7 @@ __CREDIRECT(__ATTR_WUNUSED,float,__NOTHROW,_scalbf,(float __x, float __n),__scal
 #elif defined(__CRT_HAVE__scalbf)
 /* Return X times (2 to the Nth power) */
 __CDECLARE(__ATTR_WUNUSED,float,__NOTHROW,_scalbf,(float __x, float __n),(__x,__n))
-#elif (__has_builtin(__builtin_scalb) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalb)) || defined(__CRT_HAVE_scalb) || defined(__CRT_HAVE___scalb) || defined(__CRT_HAVE__scalb)
+#elif defined(__CRT_HAVE_scalb) || defined(__CRT_HAVE___scalb) || defined(__CRT_HAVE__scalb)
 #include <local/math/scalbf.h>
 /* Return X times (2 to the Nth power) */
 __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL _scalbf)(float __x, float __n) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(scalbf))(__x, __n); }

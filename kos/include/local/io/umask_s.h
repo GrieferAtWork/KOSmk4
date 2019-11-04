@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x25279e8e */
+/* HASH CRC-32:0x33efcd5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_umask_s_defined
-#if (defined(__CRT_HAVE_umask) || defined(__CRT_HAVE__umask))
+#if defined(__CRT_HAVE_umask) || defined(__CRT_HAVE__umask)
 #define __local_umask_s_defined 1
 #include <bits/types.h>
 #include <parts/errno.h>
@@ -45,5 +45,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(umask_s))(__mode_t __newmode,
 	return 0;
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_umask) || defined(__CRT_HAVE__umask)) */
+#endif /* defined(__CRT_HAVE_umask) || defined(__CRT_HAVE__umask) */
 #endif /* !__local_umask_s_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f904511 */
+/* HASH CRC-32:0xa1d3b56d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -60,7 +60,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,__localdep_dos_ctime_
 #elif defined(__CRT_HAVE__ctime64_s) && (!defined(__USE_TIME_BITS64))
 /* Equivalent to `asctime_r (localtime_r (timer, *TMP*), buf)' */
 __CREDIRECT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,__localdep_dos_ctime_s,(char __buf[26], __SIZE_TYPE__ __bufsize, __TM_TYPE(time) const *__restrict __timer),_ctime64_s,(__buf,__bufsize,__timer))
-#elif (defined(__CRT_HAVE__ctime32_s) || defined(__CRT_HAVE__ctime64_s))
+#elif defined(__CRT_HAVE__ctime32_s) || defined(__CRT_HAVE__ctime64_s)
 #include <local/time/dos_ctime_s.h>
 /* Equivalent to `asctime_r (localtime_r (timer, *TMP*), buf)' */
 #define __localdep_dos_ctime_s (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dos_ctime_s))

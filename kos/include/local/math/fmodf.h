@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1c33b5b5 */
+/* HASH CRC-32:0x1b49bad7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fmodf_defined
-#if ((__has_builtin(__builtin_fmod) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fmod)) || defined(__CRT_HAVE_fmod) || defined(__CRT_HAVE___fmod))
+#if defined(__CRT_HAVE_fmod) || defined(__CRT_HAVE___fmod)
 #define __local_fmodf_defined 1
 /* Dependency: "fmod" */
 #ifndef ____localdep_fmod_defined
@@ -46,5 +46,5 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(fmodf))(float __x,
 	return (float)__localdep_fmod((double)__x, (double)__y);
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((__has_builtin(__builtin_fmod) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_fmod)) || defined(__CRT_HAVE_fmod) || defined(__CRT_HAVE___fmod)) */
+#endif /* defined(__CRT_HAVE_fmod) || defined(__CRT_HAVE___fmod) */
 #endif /* !__local_fmodf_defined */

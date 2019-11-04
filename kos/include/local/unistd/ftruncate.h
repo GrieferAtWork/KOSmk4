@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x81eaa71d */
+/* HASH CRC-32:0x93b4064b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_ftruncate_defined
-#if (defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE__chsize) || defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s))
+#if defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE__chsize) || defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s)
 #define __local_ftruncate_defined 1
 /* Dependency: "ftruncate32" from "unistd" */
 #ifndef ____localdep_ftruncate32_defined
@@ -47,7 +47,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate64,(__fd_t __fd, __PIO_OFFSET
 /* >> ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate64,(__fd_t __fd, __PIO_OFFSET64 __length),_chsize_s,(__fd,__length))
-#elif (defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE__chsize))
+#elif defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE__chsize)
 #include <local/unistd/ftruncate64.h>
 /* >> ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
@@ -71,5 +71,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ftruncate))(__fd_t __fd,
 #endif
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE__chsize) || defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s)) */
+#endif /* defined(__CRT_HAVE_ftruncate) || defined(__CRT_HAVE__chsize) || defined(__CRT_HAVE_ftruncate64) || defined(__CRT_HAVE__chsize_s) */
 #endif /* !__local_ftruncate_defined */

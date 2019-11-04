@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x62480d02 */
+/* HASH CRC-32:0x601adbfe */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fputc32s_defined
-#if (defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked))
+#if defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked)
 #define __local_fputc32s_defined 1
 #include <kos/anno.h>
 /* Dependency: "file_wprinter" from "wchar" */
@@ -75,5 +75,5 @@ __LOCAL_LIBC(fputc32s) __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SIZE_T
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked)) */
+#endif /* defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) */
 #endif /* !__local_fputc32s_defined */

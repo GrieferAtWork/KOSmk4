@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb3caa90b */
+/* HASH CRC-32:0xfda46ff */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_utime_defined
-#if (defined(__CRT_HAVE_utime) || defined(__CRT_HAVE__utime32) || defined(__CRT_HAVE_utime64) || defined(__CRT_HAVE__utime64))
+#if defined(__CRT_HAVE_utime) || defined(__CRT_HAVE__utime32) || defined(__CRT_HAVE_utime64) || defined(__CRT_HAVE__utime64)
 #define __local_utime_defined 1
 /* Dependency: "crt_utime32" from "utime" */
 #ifndef ____localdep_crt_utime32_defined
@@ -41,7 +41,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_utime64,(char const
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_utime64,(char const *__filename, struct utimbuf64 const *__file_times),_utime64,(__filename,__file_times))
 #elif defined(__CRT_HAVE_utime) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_utime64,(char const *__filename, struct utimbuf64 const *__file_times),utime,(__filename,__file_times))
-#elif (defined(__CRT_HAVE_utime) || defined(__CRT_HAVE__utime32))
+#elif defined(__CRT_HAVE_utime) || defined(__CRT_HAVE__utime32)
 #include <local/utime/utime64.h>
 #define __localdep_utime64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(utime64))
 #else /* CUSTOM: utime64 */
@@ -81,5 +81,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(utime))(char const *__filename,
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_utime) || defined(__CRT_HAVE__utime32) || defined(__CRT_HAVE_utime64) || defined(__CRT_HAVE__utime64)) */
+#endif /* defined(__CRT_HAVE_utime) || defined(__CRT_HAVE__utime32) || defined(__CRT_HAVE_utime64) || defined(__CRT_HAVE__utime64) */
 #endif /* !__local_utime_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf4040459 */
+/* HASH CRC-32:0xa9873864 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__msize_dbg_defined
-#if (defined(__CRT_HAVE__msize) || defined(__CRT_HAVE_malloc_usable_size))
+#if defined(__CRT_HAVE__msize) || defined(__CRT_HAVE_malloc_usable_size)
 #define __local__msize_dbg_defined 1
 /* Dependency: "_msize" from "malloc" */
 #ifndef ____localdep__msize_defined
@@ -41,5 +41,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_msize_dbg))(void *__ptr,
 	return __localdep__msize(__ptr);
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE__msize) || defined(__CRT_HAVE_malloc_usable_size)) */
+#endif /* defined(__CRT_HAVE__msize) || defined(__CRT_HAVE_malloc_usable_size) */
 #endif /* !__local__msize_dbg_defined */

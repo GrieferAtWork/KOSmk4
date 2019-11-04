@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb07bba19 */
+/* HASH CRC-32:0xfdb86e1b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sinl_defined
-#if ((__has_builtin(__builtin_sin) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sin)) || defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin))
+#if defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)
 #define __local_sinl_defined 1
 #include <bits/math-vector.h>
 /* Dependency: "sin" */
@@ -46,5 +46,5 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(sinl))(long double __x) {
 	return (long double)__localdep_sin((double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((__has_builtin(__builtin_sin) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sin)) || defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin)) */
+#endif /* defined(__CRT_HAVE_sin) || defined(__CRT_HAVE___sin) */
 #endif /* !__local_sinl_defined */

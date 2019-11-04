@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbe62c005 */
+/* HASH CRC-32:0xa81d83da */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_c16execl_defined
-#if ((defined(__CRT_HAVE_wexecv) && __SIZEOF_WCHAR_T__ == 2) || (defined(__CRT_HAVE__wexecv) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_DOS$_wexecv) || defined(__CRT_HAVE_DOS$_wexecv))
+#if (defined(__CRT_HAVE_wexecv) && __SIZEOF_WCHAR_T__ == 2) || (defined(__CRT_HAVE__wexecv) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_DOS$_wexecv)
 #define __local_c16execl_defined 1
 #include <parts/redirect-exec.h>
 /* Dependency: "c16execv" from "parts.uchar.process" */
@@ -46,5 +46,5 @@ __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(c16execl))(__CHAR16_TYPE__ const *__
 	__REDIRECT_EXECL(__CHAR16_TYPE__, __localdep_c16execv, __path, __args)
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((defined(__CRT_HAVE_wexecv) && __SIZEOF_WCHAR_T__ == 2) || (defined(__CRT_HAVE__wexecv) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_DOS$_wexecv) || defined(__CRT_HAVE_DOS$_wexecv)) */
+#endif /* (defined(__CRT_HAVE_wexecv) && __SIZEOF_WCHAR_T__ == 2) || (defined(__CRT_HAVE__wexecv) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_DOS$_wexecv) */
 #endif /* !__local_c16execl_defined */

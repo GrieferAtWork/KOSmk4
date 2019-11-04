@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba4282fe */
+/* HASH CRC-32:0xaa85eda2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_Truncate_defined
-#if (defined(__CRT_HAVE_Truncate64) || defined(__CRT_HAVE_Truncate))
+#if defined(__CRT_HAVE_Truncate64) || defined(__CRT_HAVE_Truncate)
 #define __local_Truncate_defined 1
 #include <kos/anno.h>
 /* Dependency: "Truncate64" from "kos.unistd" */
@@ -68,5 +68,5 @@ __LOCAL_LIBC(Truncate) __ATTR_NONNULL((1)) void
 #endif /* !__CRT_HAVE_truncate64 */
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_Truncate64) || defined(__CRT_HAVE_Truncate)) */
+#endif /* defined(__CRT_HAVE_Truncate64) || defined(__CRT_HAVE_Truncate) */
 #endif /* !__local_Truncate_defined */

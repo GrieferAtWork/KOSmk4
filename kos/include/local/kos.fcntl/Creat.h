@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7d40421b */
+/* HASH CRC-32:0x8bfecd35 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_Creat_defined
-#if (defined(__CRT_HAVE_Open64) || defined(__CRT_HAVE_Open))
+#if defined(__CRT_HAVE_Open64) || defined(__CRT_HAVE_Open)
 #define __local_Creat_defined 1
 #include <kos/anno.h>
 #include <bits/types.h>
@@ -31,7 +31,7 @@
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,,__localdep_Open,(char const *__filename, __oflag_t __oflags),Open64,(__filename,__oflags),__oflags,1,(__mode_t)) __THROWS(...)
 #elif defined(__CRT_HAVE_Open) && (!defined(__USE_FILE_OFFSET64))
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,,__localdep_Open,(char const *__filename, __oflag_t __oflags),Open,(__filename,__oflags),__oflags,1,(__mode_t)) __THROWS(...)
-#elif (defined(__CRT_HAVE_Open64) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_OpenAt) || defined(__CRT_HAVE_OpenAt64))))
+#elif defined(__CRT_HAVE_Open64) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_OpenAt) || defined(__CRT_HAVE_OpenAt64)))
 #include <local/kos.fcntl/Open.h>
 #define __localdep_Open (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Open))
 #else /* CUSTOM: Open */
@@ -47,5 +47,5 @@ __LOCAL_LIBC(Creat) __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t
 	return __localdep_Open(__filename, O_CREAT|O_WRONLY|O_TRUNC, __mode);
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_Open64) || defined(__CRT_HAVE_Open)) */
+#endif /* defined(__CRT_HAVE_Open64) || defined(__CRT_HAVE_Open) */
 #endif /* !__local_Creat_defined */

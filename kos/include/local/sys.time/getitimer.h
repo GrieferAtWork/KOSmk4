@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x18a5a493 */
+/* HASH CRC-32:0xa30c0a39 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_getitimer_defined
-#if (defined(__CRT_HAVE_getitimer) || defined(__CRT_HAVE_getitimer64))
+#if defined(__CRT_HAVE_getitimer) || defined(__CRT_HAVE_getitimer64)
 #define __local_getitimer_defined 1
 /* Dependency: "getitimer32" from "sys.time" */
 #ifndef ____localdep_getitimer32_defined
@@ -85,5 +85,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(getitimer))(__itimer_which_t __which,
 #endif /* !__CRT_HAVE_getitimer */
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_getitimer) || defined(__CRT_HAVE_getitimer64)) */
+#endif /* defined(__CRT_HAVE_getitimer) || defined(__CRT_HAVE_getitimer64) */
 #endif /* !__local_getitimer_defined */

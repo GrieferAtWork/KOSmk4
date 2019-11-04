@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa2883db6 */
+/* HASH CRC-32:0x7aeab835 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_gettimeofday64_defined
-#if (defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday))
+#if defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday)
 #define __local_gettimeofday64_defined 1
 /* Dependency: "gettimeofday32" from "sys.time" */
 #ifndef ____localdep_gettimeofday32_defined
@@ -64,5 +64,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(gettimeofday64))(struct __timeval64 *
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday)) */
+#endif /* defined(__CRT_HAVE_gettimeofday) || defined(__CRT_HAVE___gettimeofday) */
 #endif /* !__local_gettimeofday64_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1985ee32 */
+/* HASH CRC-32:0x1f9b9c28 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_nexttowardl_defined
-#if ((__has_builtin(__builtin_nexttoward) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nexttoward)) || defined(__CRT_HAVE_nexttoward) || defined(__CRT_HAVE___nexttoward))
+#if defined(__CRT_HAVE_nexttoward) || defined(__CRT_HAVE___nexttoward)
 #define __local_nexttowardl_defined 1
 /* Dependency: "nexttoward" */
 #ifndef ____localdep_nexttoward_defined
@@ -42,5 +42,5 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(nexttowardl))(long double __x,
 	return (long double)__localdep_nexttoward((double)__x, (double)__y);
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((__has_builtin(__builtin_nexttoward) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nexttoward)) || defined(__CRT_HAVE_nexttoward) || defined(__CRT_HAVE___nexttoward)) */
+#endif /* defined(__CRT_HAVE_nexttoward) || defined(__CRT_HAVE___nexttoward) */
 #endif /* !__local_nexttowardl_defined */

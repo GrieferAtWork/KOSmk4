@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa3ecbd32 */
+/* HASH CRC-32:0x484b2443 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_ilogbl_defined
-#if ((__has_builtin(__builtin_ilogb) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ilogb)) || defined(__CRT_HAVE_ilogb) || defined(__CRT_HAVE___ilogb))
+#if defined(__CRT_HAVE_ilogb) || defined(__CRT_HAVE___ilogb)
 #define __local_ilogbl_defined 1
 /* Dependency: "ilogb" */
 #ifndef ____localdep_ilogb_defined
@@ -45,5 +45,5 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ilogbl))(long double __x) {
 	return (int)__localdep_ilogb((double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((__has_builtin(__builtin_ilogb) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ilogb)) || defined(__CRT_HAVE_ilogb) || defined(__CRT_HAVE___ilogb)) */
+#endif /* defined(__CRT_HAVE_ilogb) || defined(__CRT_HAVE___ilogb) */
 #endif /* !__local_ilogbl_defined */

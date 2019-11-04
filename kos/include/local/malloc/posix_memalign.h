@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4f3d157c */
+/* HASH CRC-32:0x28adaedc */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_posix_memalign_defined
-#if (defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc))
+#if defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc)
 #define __local_posix_memalign_defined 1
 #include <parts/errno.h>
 /* Dependency: "memalign" from "malloc" */
@@ -54,5 +54,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(posix_memalign))(void **__restrict __
 	return 0;
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc)) */
+#endif /* defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) */
 #endif /* !__local_posix_memalign_defined */

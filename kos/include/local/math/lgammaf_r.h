@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8a884613 */
+/* HASH CRC-32:0x10824b55 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_lgammaf_r_defined
-#if ((__has_builtin(__builtin_lgamma_r) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lgamma_r)) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r))
+#if defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r)
 #define __local_lgammaf_r_defined 1
 /* Dependency: "lgamma_r" */
 #ifndef ____localdep_lgamma_r_defined
@@ -54,5 +54,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(lgammaf_r))(float __x,
 	return (float)__localdep_lgamma_r((double)__x, __signgamp);
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((__has_builtin(__builtin_lgamma_r) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_lgamma_r)) || defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r)) */
+#endif /* defined(__CRT_HAVE_lgamma_r) || defined(__CRT_HAVE___lgamma_r) */
 #endif /* !__local_lgammaf_r_defined */

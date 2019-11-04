@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xece248e9 */
+/* HASH CRC-32:0x87d7d35e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_acosl_defined
-#if ((__has_builtin(__builtin_acos) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_acos)) || defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos))
+#if defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos)
 #define __local_acosl_defined 1
 /* Dependency: "acos" */
 #ifndef ____localdep_acos_defined
@@ -45,5 +45,5 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(acosl))(long double __x) {
 	return (long double)__localdep_acos((double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((__has_builtin(__builtin_acos) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_acos)) || defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos)) */
+#endif /* defined(__CRT_HAVE_acos) || defined(__CRT_HAVE___acos) */
 #endif /* !__local_acosl_defined */

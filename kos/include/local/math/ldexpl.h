@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9aee89f1 */
+/* HASH CRC-32:0xfd0dd295 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_ldexpl_defined
-#if ((__has_builtin(__builtin_ldexp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ldexp)) || defined(__CRT_HAVE_ldexp) || defined(__CRT_HAVE___ldexp))
+#if defined(__CRT_HAVE_ldexp) || defined(__CRT_HAVE___ldexp)
 #define __local_ldexpl_defined 1
 /* Dependency: "ldexp" */
 #ifndef ____localdep_ldexp_defined
@@ -46,5 +46,5 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(ldexpl))(long double __x,
 	return (long double)__localdep_ldexp((double)__x, __exponent);
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((__has_builtin(__builtin_ldexp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_ldexp)) || defined(__CRT_HAVE_ldexp) || defined(__CRT_HAVE___ldexp)) */
+#endif /* defined(__CRT_HAVE_ldexp) || defined(__CRT_HAVE___ldexp) */
 #endif /* !__local_ldexpl_defined */

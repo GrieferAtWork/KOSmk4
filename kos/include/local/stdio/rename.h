@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x208ea00b */
+/* HASH CRC-32:0xeb875b98 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_rename_defined
-#if (defined(__CRT_HAVE_renameat) || defined(__CRT_HAVE_frenameat) || defined(__CRT_HAVE_renameat))
+#if defined(__CRT_HAVE_renameat) || defined(__CRT_HAVE_frenameat)
 #define __local_rename_defined 1
 /* Dependency: "renameat" from "stdio" */
 #ifndef ____localdep_renameat_defined
@@ -43,5 +43,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(rename))(char const *__oldname,
 	return __localdep_renameat(__CRT_AT_FDCWD, __oldname, __CRT_AT_FDCWD, __newname_or_path);
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_renameat) || defined(__CRT_HAVE_frenameat) || defined(__CRT_HAVE_renameat)) */
+#endif /* defined(__CRT_HAVE_renameat) || defined(__CRT_HAVE_frenameat) */
 #endif /* !__local_rename_defined */

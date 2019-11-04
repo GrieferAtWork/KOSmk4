@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb47cf4e */
+/* HASH CRC-32:0xe6b17d0a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__telli64_defined
-#if (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek))
+#if defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)
 #define __local__telli64_defined 1
 #include <bits/types.h>
 /* Dependency: "lseek64" from "unistd" */
@@ -53,5 +53,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_telli64))(__fd_t __fd) {
 	return __localdep_lseek64(__fd, 0, 1);
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)) */
+#endif /* defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek) */
 #endif /* !__local__telli64_defined */

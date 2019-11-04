@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x96455712 */
+/* HASH CRC-32:0x11473cad */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_remainderl_defined
-#if ((__has_builtin(__builtin_remainder) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remainder)) || defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE___remainder))
+#if defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE___remainder)
 #define __local_remainderl_defined 1
 /* Dependency: "remainder" */
 #ifndef ____localdep_remainder_defined
@@ -46,5 +46,5 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(remainderl))(long double __x,
 	return (long double)__localdep_remainder((double)__x, (double)__y);
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((__has_builtin(__builtin_remainder) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remainder)) || defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE___remainder)) */
+#endif /* defined(__CRT_HAVE_remainder) || defined(__CRT_HAVE___remainder) */
 #endif /* !__local_remainderl_defined */

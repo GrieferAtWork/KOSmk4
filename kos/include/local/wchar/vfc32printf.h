@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa30c7054 */
+/* HASH CRC-32:0xfc21c7ce */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_vfc32printf_defined
-#if (defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked))
+#if defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked)
 #define __local_vfc32printf_defined 1
 #include <kos/anno.h>
 #include <bits/wformat-printer.h>
@@ -334,5 +334,5 @@ __LOCAL_LIBC(vfc32printf) __ATTR_NONNULL((1, 2)) __ATTR_LIBC_WPRINTF(2, 0) __STD
 	return (__STDC_INT_AS_SSIZE_T)__localdep_format_vc32printf(&__localdep_file_c32printer, __stream, __format, __args);
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked)) */
+#endif /* defined(__CRT_HAVE_fputwc) || defined(__CRT_HAVE_putwc) || defined(__CRT_HAVE_file_wprinter) || defined(__CRT_HAVE_file_wprinter_unlocked) */
 #endif /* !__local_vfc32printf_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x967a5f3 */
+/* HASH CRC-32:0xf9a13e12 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_nextafterf_defined
-#if ((__has_builtin(__builtin_nextafter) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nextafter)) || defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter))
+#if defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter)
 #define __local_nextafterf_defined 1
 /* Dependency: "nextafter" */
 #ifndef ____localdep_nextafter_defined
@@ -49,5 +49,5 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(nextafterf))(float __x,
 	return (float)__localdep_nextafter((double)__x, (double)__y);
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((__has_builtin(__builtin_nextafter) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_nextafter)) || defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter)) */
+#endif /* defined(__CRT_HAVE_nextafter) || defined(__CRT_HAVE___nextafter) || defined(__CRT_HAVE__nextafter) */
 #endif /* !__local_nextafterf_defined */

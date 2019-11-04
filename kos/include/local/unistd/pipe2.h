@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x701ba7cd */
+/* HASH CRC-32:0xa931bb0b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_pipe2_defined
-#if (defined(__CRT_HAVE__pipe) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe))
+#if defined(__CRT_HAVE__pipe) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe)
 #define __local_pipe2_defined 1
 /* Dependency: "pipe" from "unistd" */
 #ifndef ____localdep_pipe_defined
@@ -50,5 +50,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(pipe2))(__fd_t __pipedes[2],
 	return __localdep_pipe(__pipedes);
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE__pipe) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe)) */
+#endif /* defined(__CRT_HAVE__pipe) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) */
 #endif /* !__local_pipe2_defined */

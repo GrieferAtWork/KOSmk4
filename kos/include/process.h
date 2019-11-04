@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x774f0326 */
+/* HASH CRC-32:0x297f3895 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -232,7 +232,7 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _execl)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _execl)(char const *__restrict __path, char const *__args, ... /*, (char *)NULL*/) __CASMNAME_SAME("_execl");
-#elif (__has_builtin(__builtin_execv) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execv)) || defined(__CRT_HAVE_execv) || defined(__CRT_HAVE__execv)
+#elif defined(__CRT_HAVE_execv) || defined(__CRT_HAVE__execv)
 #include <local/unistd/execl.h>
 /* >> execl(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
@@ -254,7 +254,7 @@ __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _e
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinal */
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _execle)(char const *__restrict __path, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __CASMNAME_SAME("_execle");
-#elif (__has_builtin(__builtin_execve) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execve)) || defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)
+#elif defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)
 #include <local/unistd/execle.h>
 /* >> execle(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
@@ -276,7 +276,7 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _execlp
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL _execlp)(char const *__restrict __file, char const *__args, ... /*, (char *)NULL*/) __CASMNAME_SAME("_execlp");
-#elif (__has_builtin(__builtin_execvp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execvp)) || defined(__CRT_HAVE_execvp) || defined(__CRT_HAVE__execvp)
+#elif defined(__CRT_HAVE_execvp) || defined(__CRT_HAVE__execvp)
 #include <local/unistd/execlp.h>
 /* >> execlp(3)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
@@ -648,7 +648,7 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execl)(
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execl)(char const *__restrict __path, char const *__args, ... /*, (char *)NULL*/) __CASMNAME("_execl");
-#elif (__has_builtin(__builtin_execv) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execv)) || defined(__CRT_HAVE_execv) || defined(__CRT_HAVE__execv)
+#elif defined(__CRT_HAVE_execv) || defined(__CRT_HAVE__execv)
 #include <local/unistd/execl.h>
 #ifdef __cplusplus
 __NAMESPACE_LOCAL_USING(execl)
@@ -679,7 +679,7 @@ __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL ex
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list, and setting `environ' to a `char **' passed after the NULL sentinal */
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execle)(char const *__restrict __path, char const *__args, ... /*, (char *)NULL, (char **)environ*/) __CASMNAME("_execle");
-#elif (__has_builtin(__builtin_execve) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execve)) || defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)
+#elif defined(__CRT_HAVE_execve) || defined(__CRT_HAVE__execve)
 #include <local/unistd/execle.h>
 #ifdef __cplusplus
 __NAMESPACE_LOCAL_USING(execle)
@@ -710,7 +710,7 @@ __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execlp)
  * Replace the calling process with the application image referred to by `PATH' / `FILE'
  * and execute it's `main()' method, passing the list of NULL-terminated `ARGS'-list */
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL execlp)(char const *__restrict __file, char const *__args, ... /*, (char *)NULL*/) __CASMNAME("_execlp");
-#elif (__has_builtin(__builtin_execvp) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execvp)) || defined(__CRT_HAVE_execvp) || defined(__CRT_HAVE__execvp)
+#elif defined(__CRT_HAVE_execvp) || defined(__CRT_HAVE__execvp)
 #include <local/unistd/execlp.h>
 #ifdef __cplusplus
 __NAMESPACE_LOCAL_USING(execlp)

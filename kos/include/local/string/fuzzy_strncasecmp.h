@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfd128127 */
+/* HASH CRC-32:0x42147089 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fuzzy_strncasecmp_defined
-#if (!defined(__NO_MALLOCA) || defined(__CRT_HAVE_fuzzy_memcasecmp))
+#if !defined(__NO_MALLOCA) || defined(__CRT_HAVE_fuzzy_memcasecmp)
 #define __local_fuzzy_strncasecmp_defined 1
 #include <parts/malloca.h>
 /* Dependency: "fuzzy_memcasecmp" from "string" */
@@ -60,5 +60,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fuzzy_strncasecmp))(char const *__s1,
 	return __localdep_fuzzy_memcasecmp(__s1, __localdep_strnlen(__s1, __s1_maxlen), __s2, __localdep_strnlen(__s2, __s2_maxlen));
 }
 __NAMESPACE_LOCAL_END
-#endif /* (!defined(__NO_MALLOCA) || defined(__CRT_HAVE_fuzzy_memcasecmp)) */
+#endif /* !defined(__NO_MALLOCA) || defined(__CRT_HAVE_fuzzy_memcasecmp) */
 #endif /* !__local_fuzzy_strncasecmp_defined */

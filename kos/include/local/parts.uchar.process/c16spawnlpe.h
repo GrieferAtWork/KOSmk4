@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe8130cc3 */
+/* HASH CRC-32:0xcc0613fe */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_c16spawnlpe_defined
-#if ((defined(__CRT_HAVE_wspawnvpe) && __SIZEOF_WCHAR_T__ == 2) || (defined(__CRT_HAVE__wspawnvpe) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_DOS$_wspawnvpe) || defined(__CRT_HAVE_DOS$_wspawnvpe))
+#if (defined(__CRT_HAVE_wspawnvpe) && __SIZEOF_WCHAR_T__ == 2) || (defined(__CRT_HAVE__wspawnvpe) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_DOS$_wspawnvpe)
 #define __local_c16spawnlpe_defined 1
 #include <parts/redirect-exec.h>
 /* Dependency: "c16spawnvpe" from "parts.uchar.process" */
@@ -47,5 +47,5 @@ __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(c16spawnlpe))(int __mode,
 	__REDIRECT_SPAWNLE(__CHAR16_TYPE__, __localdep_c16spawnvpe, __mode, __file, __args)
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((defined(__CRT_HAVE_wspawnvpe) && __SIZEOF_WCHAR_T__ == 2) || (defined(__CRT_HAVE__wspawnvpe) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_DOS$_wspawnvpe) || defined(__CRT_HAVE_DOS$_wspawnvpe)) */
+#endif /* (defined(__CRT_HAVE_wspawnvpe) && __SIZEOF_WCHAR_T__ == 2) || (defined(__CRT_HAVE__wspawnvpe) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_DOS$_wspawnvpe) */
 #endif /* !__local_c16spawnlpe_defined */

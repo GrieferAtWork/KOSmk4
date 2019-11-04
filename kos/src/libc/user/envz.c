@@ -154,11 +154,11 @@ NOTHROW_NCX(LIBCCALL libc_envz_strip)(char **__restrict penvz,
 	newlen = (size_t)(end - start);
 	if (newlen < oldlen) {
 		*penvz_len = newlen;
-#if (__has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_realloc)) || defined(__CRT_HAVE_realloc)
+#if defined(__CRT_HAVE_realloc)
 		start = (char *)libc_realloc(start, newlen);
 		if likely(start)
 			*penvz = start;
-#endif /* (__has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_realloc)) || defined(__CRT_HAVE_realloc) */
+#endif /* defined(__CRT_HAVE_realloc) */
 	}
 }
 /*[[[end:envz_strip]]]*/

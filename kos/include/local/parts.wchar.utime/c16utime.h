@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaf473028 */
+/* HASH CRC-32:0xce246e89 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_c16utime_defined
-#if (defined(__CRT_HAVE_wutime) || defined(__CRT_HAVE__wutime32) || defined(__CRT_HAVE_wutime64) || defined(__CRT_HAVE__wutime64))
+#if defined(__CRT_HAVE_wutime) || defined(__CRT_HAVE__wutime32) || defined(__CRT_HAVE_wutime64) || defined(__CRT_HAVE__wutime64)
 #define __local_c16utime_defined 1
 /* Dependency: "crt_wutime32" from "parts.wchar.utime" */
 #ifndef ____localdep_crt_c16utime32_defined
@@ -51,7 +51,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_c16utime64,(__C
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_c16utime64,(__CHAR16_TYPE__ const *__filename, struct utimbuf64 const *__file_times),wutime,(__filename,__file_times))
 #elif defined(__CRT_HAVE_DOS$wutime64)
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_c16utime64,(__CHAR16_TYPE__ const *__filename, struct utimbuf64 const *__file_times),wutime64,(__filename,__file_times))
-#elif (defined(__CRT_HAVE_wutime) || defined(__CRT_HAVE__wutime32))
+#elif defined(__CRT_HAVE_wutime) || defined(__CRT_HAVE__wutime32)
 #if __SIZEOF_WCHAR_T__ == 2
 #include <local/parts.wchar.utime/wutime64.h>
 #define __localdep_c16utime64(filename, file_times) (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wutime64))((__WCHAR_TYPE__ const *)(filename), file_times)
@@ -96,5 +96,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(c16utime))(__CHAR16_TYPE__ const *__f
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_wutime) || defined(__CRT_HAVE__wutime32) || defined(__CRT_HAVE_wutime64) || defined(__CRT_HAVE__wutime64)) */
+#endif /* defined(__CRT_HAVE_wutime) || defined(__CRT_HAVE__wutime32) || defined(__CRT_HAVE_wutime64) || defined(__CRT_HAVE__wutime64) */
 #endif /* !__local_c16utime_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9d1a6b62 */
+/* HASH CRC-32:0x478ae093 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_execl_defined
-#if ((__has_builtin(__builtin_execv) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execv)) || defined(__CRT_HAVE_execv) || defined(__CRT_HAVE__execv))
+#if defined(__CRT_HAVE_execv) || defined(__CRT_HAVE__execv)
 #define __local_execl_defined 1
 #include <parts/redirect-exec.h>
 /* Dependency: "execv" */
@@ -56,5 +56,5 @@ __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(execl))(char const *__restrict __pat
 	__REDIRECT_EXECL(char, __localdep_execv, __path, __args)
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((__has_builtin(__builtin_execv) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_execv)) || defined(__CRT_HAVE_execv) || defined(__CRT_HAVE__execv)) */
+#endif /* defined(__CRT_HAVE_execv) || defined(__CRT_HAVE__execv) */
 #endif /* !__local_execl_defined */

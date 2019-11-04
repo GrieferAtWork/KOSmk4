@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x83a69e92 */
+/* HASH CRC-32:0x26673596 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_dup3_defined
-#if (defined(__CRT_HAVE_dup2) || defined(__CRT_HAVE__dup2) || defined(__CRT_HAVE___dup2))
+#if defined(__CRT_HAVE_dup2) || defined(__CRT_HAVE__dup2) || defined(__CRT_HAVE___dup2)
 #define __local_dup3_defined 1
 /* Dependency: "dup2" */
 #ifndef ____localdep_dup2_defined
@@ -52,5 +52,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(dup3))(__fd_t __oldfd,
 	return __newfd != __oldfd ? __localdep_dup2(__oldfd, __newfd) : -1;
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_dup2) || defined(__CRT_HAVE__dup2) || defined(__CRT_HAVE___dup2)) */
+#endif /* defined(__CRT_HAVE_dup2) || defined(__CRT_HAVE__dup2) || defined(__CRT_HAVE___dup2) */
 #endif /* !__local_dup3_defined */

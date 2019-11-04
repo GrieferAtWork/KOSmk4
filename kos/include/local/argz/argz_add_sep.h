@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x109cfbe3 */
+/* HASH CRC-32:0xd60f84e2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_argz_add_sep_defined
-#if ((__has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_realloc)) || defined(__CRT_HAVE_realloc))
+#if defined(__CRT_HAVE_realloc)
 #define __local_argz_add_sep_defined 1
 #include <parts/errno.h>
 /* Dependency: "strlen" from "string" */
@@ -136,5 +136,5 @@ __again_check_ch:
 	return 0;
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((__has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_realloc)) || defined(__CRT_HAVE_realloc)) */
+#endif /* defined(__CRT_HAVE_realloc) */
 #endif /* !__local_argz_add_sep_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc1a1ba0d */
+/* HASH CRC-32:0x34dcd145 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_modff_defined
-#if ((__has_builtin(__builtin_modf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_modf)) || defined(__CRT_HAVE_modf) || defined(__CRT_HAVE___modf))
+#if defined(__CRT_HAVE_modf) || defined(__CRT_HAVE___modf)
 #define __local_modff_defined 1
 /* Dependency: "modf" */
 #ifndef ____localdep_modf_defined
@@ -50,5 +50,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(modff))(float __x,
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((__has_builtin(__builtin_modf) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_modf)) || defined(__CRT_HAVE_modf) || defined(__CRT_HAVE___modf)) */
+#endif /* defined(__CRT_HAVE_modf) || defined(__CRT_HAVE___modf) */
 #endif /* !__local_modff_defined */

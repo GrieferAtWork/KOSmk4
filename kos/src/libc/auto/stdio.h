@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3a1719e0 */
+/* HASH CRC-32:0xfc36eb43 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -97,6 +97,9 @@ INTDEF NONNULL((3)) ATTR_LIBC_PRINTF(3, 4) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIB
 INTDEF NONNULL((3)) ATTR_LIBC_PRINTF(3, 5) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBCCALL libc__snprintf_c_l)(char *__restrict buf, size_t bufsize, char const *__restrict format, locale_t locale, ...);
 INTDEF NONNULL((4)) ATTR_LIBC_PRINTF(4, 5) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBCCALL libc__snprintf_s)(char *__restrict buf, size_t bufsize, size_t buflen, char const *__restrict format, ...);
 INTDEF NONNULL((4)) ATTR_LIBC_PRINTF(4, 6) __STDC_INT_AS_SIZE_T NOTHROW_NCX(VLIBCCALL libc__snprintf_s_l)(char *__restrict buf, size_t bufsize, size_t buflen, char const *__restrict format, locale_t locale, ...);
+/* Print a formatted string to a given in-member string buffer `BUF'
+ * Always return the REQUIRED buffer size (excluding a trailing NUL-character), and never write more than `BUFLEN' characters to `BUF' */
+#define libc_sprintf_s libc_snprintf
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Always return the REQUIRED buffer size (excluding a trailing NUL-character), and never write more than `BUFLEN' characters to `BUF' */
 #define libc_vsprintf_s libc_vsnprintf

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x69a32b01 */
+/* HASH CRC-32:0x2ac75933 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -358,6 +358,8 @@ INTDEF NONNULL((1, 3)) errno_t NOTHROW_NCX(LIBDCALL libd_wmemmove_s)(char16_t *d
 #define libd__wcslwr_l libd_wcslwr_l
 #define libc__wcsupr_l libc_wcsupr_l
 #define libd__wcsupr_l libd_wcsupr_l
+#define libc__wcsxfrm_l libc_wcsxfrm_l
+#define libd__wcsxfrm_l libd_wcsxfrm_l
 #define libc__wcscoll_l libc_wcscoll_l
 #define libd__wcscoll_l libd_wcscoll_l
 #define libc__wcsicoll libc_wcscasecoll
@@ -390,7 +392,10 @@ INTDEF ATTR_RETNONNULL NONNULL((1)) char32_t *NOTHROW_NCX(LIBCCALL libc_wcsupr)(
 INTDEF ATTR_RETNONNULL NONNULL((1)) char16_t *NOTHROW_NCX(LIBDCALL libd_wcsupr)(char16_t *__restrict str);
 #define libc_vswprintf_s libc_vswprintf
 #define libd_vswprintf_s libd_vswprintf
+#define libc_swprintf_s libc_swprintf
+#define libd_swprintf_s libd_swprintf
 #define libc_vswscanf_s libc_vswscanf
+#define libc_swscanf_s libc_swscanf
 INTDEF WUNUSED NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vscwprintf)(char32_t const *format, va_list args);
 INTDEF WUNUSED NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vscwprintf)(char16_t const *format, va_list args);
 INTDEF WUNUSED NONNULL((1)) int NOTHROW_NCX(VLIBCCALL libc__scwprintf)(char32_t const *format, ...);
@@ -409,6 +414,8 @@ INTDEF WUNUSED NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__sc
 INTDEF WUNUSED NONNULL((1)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__scwprintf_p_l)(char16_t const *format, locale_t locale, ...);
 #define libc__vswprintf_c libc_vswprintf
 #define libd__vswprintf_c libd_vswprintf
+#define libc__swprintf_c libc_swprintf
+#define libd__swprintf_c libd_swprintf
 INTDEF NONNULL((4)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vsnwprintf_s)(char32_t *buf, size_t bufsize, size_t buflen, char32_t const *format, va_list args);
 INTDEF NONNULL((4)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vsnwprintf_s)(char16_t *buf, size_t bufsize, size_t buflen, char16_t const *format, va_list args);
 INTDEF NONNULL((4)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__snwprintf_s)(char32_t *buf, size_t bufsize, size_t buflen, char32_t const *format, ...);
@@ -451,6 +458,8 @@ INTDEF WUNUSED NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc_
 INTDEF WUNUSED NONNULL((1, 2)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__swscanf_l)(char16_t const *src, char16_t const *format, locale_t locale, ...);
 #define libc__vswscanf_s_l libc__vswscanf_l
 #define libd__vswscanf_s_l libd__vswscanf_l
+#define libc__swscanf_s_l libc__swscanf_l
+#define libd__swscanf_s_l libd__swscanf_l
 INTDEF WUNUSED NONNULL((1, 3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vsnwscanf)(char32_t const *src, size_t bufsize, char32_t const *format, va_list args);
 INTDEF WUNUSED NONNULL((1, 3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vsnwscanf)(char16_t const *src, size_t bufsize, char16_t const *format, va_list args);
 INTDEF WUNUSED NONNULL((1, 3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__snwscanf)(char32_t const *src, size_t bufsize, char32_t const *format, ...);
@@ -461,6 +470,8 @@ INTDEF WUNUSED NONNULL((1, 3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc_
 INTDEF WUNUSED NONNULL((1, 3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBDCALL libd__snwscanf_l)(char16_t const *src, size_t bufsize, char16_t const *format, locale_t locale, ...);
 #define libc__vsnwscanf_s libc__vsnwscanf
 #define libd__vsnwscanf_s libd__vsnwscanf
+#define libc__snwscanf_s libc__snwscanf
+#define libd__snwscanf_s libd__snwscanf
 INTDEF WUNUSED NONNULL((1, 3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBCCALL libc__vsnwscanf_s_l)(char32_t const *src, size_t bufsize, char32_t const *format, locale_t locale, va_list args);
 INTDEF WUNUSED NONNULL((1, 3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(LIBDCALL libd__vsnwscanf_s_l)(char16_t const *src, size_t bufsize, char16_t const *format, locale_t locale, va_list args);
 INTDEF WUNUSED NONNULL((1, 3)) __STDC_INT_AS_SSIZE_T NOTHROW_NCX(VLIBCCALL libc__snwscanf_s_l)(char32_t const *src, size_t bufsize, char32_t const *format, locale_t locale, ...);

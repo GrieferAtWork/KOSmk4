@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6d63e7d4 */
+/* HASH CRC-32:0x5ddb6bab */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__ftime64_s_defined
-#if (defined(__CRT_HAVE__ftime32_s) || defined(__CRT_HAVE_ftime) || defined(__CRT_HAVE_ftime64) || defined(__CRT_HAVE__ftime32) || defined(__CRT_HAVE__ftime64))
+#if defined(__CRT_HAVE__ftime32_s) || defined(__CRT_HAVE_ftime) || defined(__CRT_HAVE_ftime64) || defined(__CRT_HAVE__ftime32) || defined(__CRT_HAVE__ftime64)
 #define __local__ftime64_s_defined 1
 #include <parts/errno.h>
 /* Dependency: "__crt_ftime64" from "sys.timeb" */
@@ -112,5 +112,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_ftime64_s))(struct __timeb64 *__time
 #endif
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE__ftime32_s) || defined(__CRT_HAVE_ftime) || defined(__CRT_HAVE_ftime64) || defined(__CRT_HAVE__ftime32) || defined(__CRT_HAVE__ftime64)) */
+#endif /* defined(__CRT_HAVE__ftime32_s) || defined(__CRT_HAVE_ftime) || defined(__CRT_HAVE_ftime64) || defined(__CRT_HAVE__ftime32) || defined(__CRT_HAVE__ftime64) */
 #endif /* !__local__ftime64_s_defined */

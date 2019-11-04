@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4fedfccb */
+/* HASH CRC-32:0x42568e6c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sem_timedwait_defined
-#if (defined(__CRT_HAVE_sem_timedwait) || defined(__CRT_HAVE_sem_timedwait64))
+#if defined(__CRT_HAVE_sem_timedwait) || defined(__CRT_HAVE_sem_timedwait64)
 #define __local_sem_timedwait_defined 1
 /* Dependency: "sem_timedwait32" from "semaphore" */
 #ifndef ____localdep_sem_timedwait32_defined
@@ -68,5 +68,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(sem_timedwait))(sem_t *__restrict __s
 #endif /* !__CRT_HAVE_sem_timedwait */
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_sem_timedwait) || defined(__CRT_HAVE_sem_timedwait64)) */
+#endif /* defined(__CRT_HAVE_sem_timedwait) || defined(__CRT_HAVE_sem_timedwait64) */
 #endif /* !__local_sem_timedwait_defined */

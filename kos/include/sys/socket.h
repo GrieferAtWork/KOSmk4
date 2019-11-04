@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xca6d04e0 */
+/* HASH CRC-32:0xe507837c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -281,7 +281,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,recvmmsg,(__fd_t __sockfd, str
 /* Receive up to VLEN messages as described by VMESSAGES from socket FD.
  * Returns the number of messages received or -1 for errors. */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,recvmmsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, unsigned int __vlen, int __flags, struct timespec *__tmo),(__sockfd,__vmessages,__vlen,__flags,__tmo))
-#elif (defined(__CRT_HAVE_recvmmsg) || defined(__CRT_HAVE_recvmmsg64))
+#elif defined(__CRT_HAVE_recvmmsg) || defined(__CRT_HAVE_recvmmsg64)
 #include <local/sys.socket/recvmmsg.h>
 /* Receive up to VLEN messages as described by VMESSAGES from socket FD.
  * Returns the number of messages received or -1 for errors. */

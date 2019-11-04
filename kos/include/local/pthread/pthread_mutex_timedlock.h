@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1c82312e */
+/* HASH CRC-32:0xd959d263 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_pthread_mutex_timedlock_defined
-#if (defined(__CRT_HAVE_pthread_mutex_timedlock) || defined(__CRT_HAVE_pthread_mutex_timedlock64))
+#if defined(__CRT_HAVE_pthread_mutex_timedlock) || defined(__CRT_HAVE_pthread_mutex_timedlock64)
 #define __local_pthread_mutex_timedlock_defined 1
 #include <bits/pthreadtypes.h>
 #include <bits/timespec.h>
@@ -77,5 +77,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_mutex_timedlock))(__pthread_m
 #endif /* !__CRT_HAVE_pthread_mutex_timedlock */
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_pthread_mutex_timedlock) || defined(__CRT_HAVE_pthread_mutex_timedlock64)) */
+#endif /* defined(__CRT_HAVE_pthread_mutex_timedlock) || defined(__CRT_HAVE_pthread_mutex_timedlock64) */
 #endif /* !__local_pthread_mutex_timedlock_defined */

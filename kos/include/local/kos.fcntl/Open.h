@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x10de3fe5 */
+/* HASH CRC-32:0x3dcc06a7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_Open_defined
-#if (defined(__CRT_HAVE_Open64) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_OpenAt) || defined(__CRT_HAVE_OpenAt64))))
+#if defined(__CRT_HAVE_Open64) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_OpenAt) || defined(__CRT_HAVE_OpenAt64)))
 #define __local_Open_defined 1
 #include <kos/anno.h>
 #include <bits/types.h>
@@ -71,5 +71,5 @@ __LOCAL_LIBC(Open) __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_Open64) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_OpenAt) || defined(__CRT_HAVE_OpenAt64)))) */
+#endif /* defined(__CRT_HAVE_Open64) || (defined(__CRT_AT_FDCWD) && (defined(__CRT_HAVE_OpenAt) || defined(__CRT_HAVE_OpenAt64))) */
 #endif /* !__local_Open_defined */

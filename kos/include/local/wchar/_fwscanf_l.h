@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x66ec47f0 */
+/* HASH CRC-32:0x1206d779 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__fwscanf_l_defined
-#if (defined(__CRT_HAVE_vfwscanf) || defined(__CRT_HAVE__vfwscanf_l))
+#if defined(__CRT_HAVE_vfwscanf) || defined(__CRT_HAVE__vfwscanf_l)
 #define __local__fwscanf_l_defined 1
 #include <kos/anno.h>
 /* Dependency: "_vfwscanf_l" from "wchar" */
@@ -49,5 +49,5 @@ __LOCAL_LIBC(_fwscanf_l) __ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __STDC_INT_AS_SSI
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_vfwscanf) || defined(__CRT_HAVE__vfwscanf_l)) */
+#endif /* defined(__CRT_HAVE_vfwscanf) || defined(__CRT_HAVE__vfwscanf_l) */
 #endif /* !__local__fwscanf_l_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe8f30923 */
+/* HASH CRC-32:0xe26059eb */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_wget_current_dir_name_defined
-#if (defined(__CRT_HAVE_wgetcwd) || defined(__CRT_HAVE__wgetcwd))
+#if defined(__CRT_HAVE_wgetcwd) || defined(__CRT_HAVE__wgetcwd)
 #define __local_wget_current_dir_name_defined 1
 /* Dependency: "wgetcwd" from "parts.wchar.unistd" */
 #ifndef ____localdep_wgetcwd_defined
@@ -43,5 +43,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wget_current_dir_name))(void) {
 	return __localdep_wgetcwd(__NULLPTR, 0);
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_wgetcwd) || defined(__CRT_HAVE__wgetcwd)) */
+#endif /* defined(__CRT_HAVE_wgetcwd) || defined(__CRT_HAVE__wgetcwd) */
 #endif /* !__local_wget_current_dir_name_defined */

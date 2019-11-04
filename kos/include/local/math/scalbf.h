@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa22b1cee */
+/* HASH CRC-32:0x7a5b602c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_scalbf_defined
-#if ((__has_builtin(__builtin_scalb) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalb)) || defined(__CRT_HAVE_scalb) || defined(__CRT_HAVE___scalb) || defined(__CRT_HAVE__scalb))
+#if defined(__CRT_HAVE_scalb) || defined(__CRT_HAVE___scalb) || defined(__CRT_HAVE__scalb)
 #define __local_scalbf_defined 1
 /* Dependency: "scalb" */
 #ifndef ____localdep_scalb_defined
@@ -49,5 +49,5 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(scalbf))(float __x,
 	return (float)__localdep_scalb((double)__x, (double)__n);
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((__has_builtin(__builtin_scalb) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_scalb)) || defined(__CRT_HAVE_scalb) || defined(__CRT_HAVE___scalb) || defined(__CRT_HAVE__scalb)) */
+#endif /* defined(__CRT_HAVE_scalb) || defined(__CRT_HAVE___scalb) || defined(__CRT_HAVE__scalb) */
 #endif /* !__local_scalbf_defined */

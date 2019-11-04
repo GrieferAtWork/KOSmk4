@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b4acc87 */
+/* HASH CRC-32:0x14619efc */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_clearerr_s_defined
-#if (defined(__CRT_HAVE_clearerr) || defined(__CRT_HAVE_clearerr_unlocked))
+#if defined(__CRT_HAVE_clearerr) || defined(__CRT_HAVE_clearerr_unlocked)
 #define __local_clearerr_s_defined 1
 #include <parts/errno.h>
 /* Dependency: "clearerr" */
@@ -48,5 +48,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(clearerr_s))(__FILE *__restrict __str
 	return 0;
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_clearerr) || defined(__CRT_HAVE_clearerr_unlocked)) */
+#endif /* defined(__CRT_HAVE_clearerr) || defined(__CRT_HAVE_clearerr_unlocked) */
 #endif /* !__local_clearerr_s_defined */

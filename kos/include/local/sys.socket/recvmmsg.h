@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x158e2370 */
+/* HASH CRC-32:0xe9dcca6c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_recvmmsg_defined
-#if (defined(__CRT_HAVE_recvmmsg) || defined(__CRT_HAVE_recvmmsg64))
+#if defined(__CRT_HAVE_recvmmsg) || defined(__CRT_HAVE_recvmmsg64)
 #define __local_recvmmsg_defined 1
 /* Dependency: "recvmmsg64" from "sys.socket" */
 #ifndef ____localdep_recvmmsg64_defined
@@ -80,5 +80,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(recvmmsg))(__fd_t __sockfd,
 #endif
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_recvmmsg) || defined(__CRT_HAVE_recvmmsg64)) */
+#endif /* defined(__CRT_HAVE_recvmmsg) || defined(__CRT_HAVE_recvmmsg64) */
 #endif /* !__local_recvmmsg_defined */

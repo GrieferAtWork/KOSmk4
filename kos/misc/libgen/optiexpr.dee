@@ -1,0 +1,459 @@
+/* Copyright (c) 2018 Griefer@Work                                            *
+ *                                                                            *
+ * This software is provided 'as-is', without any express or implied          *
+ * warranty. In no event will the authors be held liable for any damages      *
+ * arising from the use of this software.                                     *
+ *                                                                            *
+ * Permission is granted to anyone to use this software for any purpose,      *
+ * including commercial applications, and to alter it and redistribute it     *
+ * freely, subject to the following restrictions:                             *
+ *                                                                            *
+ * 1. The origin of this software must not be misrepresented; you must not    *
+ *    claim that you wrote the original software. If you use this software    *
+ *    in a product, an acknowledgement in the product documentation would be  *
+ *    appreciated but is not required.                                        *
+ * 2. Altered source versions must be plainly marked as such, and must not be *
+ *    misrepresented as being the original software.                          *
+ * 3. This notice may not be removed or altered from any source distribution. *
+ */
+
+import * from deemon;
+import * from util;
+
+
+class PPBranch {
+	optimize() {}
+}
+global PPBranchNot;
+global PPBranchAnd;
+global PPBranchOr;
+
+function equalPPBranches(a: Object, b: Object): bool {
+	if (type(a) !== type(b))
+		return false;
+	if (type(a) == PPBranchNot)
+		return equalPPBranches(a.branch, b.branch);
+	if (type(a) == PPBranchOr || type(a) == PPBranchAnd) {
+		local ca = a.conditions;
+		local cb = b.conditions;
+		if (#ca != #cb)
+			return false;
+		for (local i = 0; i < #ca; ++i) {
+			if (!equalPPBranches(ca[i], cb[i]))
+				return false;
+		}
+		return true;
+	}
+	return a == b;
+}
+
+function isPPBranchInList(l: {Object...}, b: Object): bool {
+	for (local x: l) {
+		if (equalPPBranches(x, b))
+			return true;
+	}
+	return false;
+}
+
+function invertPPBranch(b: Object): Object {
+	if (b is PPBranchNot)
+		return b.branch; /* Resolve inner branches */
+	if (b is PPBranchAnd || b is PPBranchOr) {
+		/* !(a && b) --> !a || !b */
+		/* !(a || b) --> !a && !b */
+		local returnBranchType = b is PPBranchAnd ? PPBranchOr : PPBranchAnd;
+		local conditions = List(
+			for (local cb: b.conditions)
+				invertPPBranch(cb));
+		return returnBranchType(conditions);
+	}
+	return PPBranchNot(b);
+}
+
+function optimizePPBranch(b: Object): Object {
+	for (;;) {
+		if (b is PPBranchNot) {
+			local inner;
+			inner = optimizePPBranch(b.branch);
+			b.branch = inner;
+			if (inner is PPBranchNot) {
+				b = inner.branch;
+				continue;
+			}
+			if (inner is PPBranchAnd || inner is PPBranchOr) {
+				b = invertPPBranch(inner);
+				continue;
+			}
+			break;
+		}
+		if (b is PPBranchAnd || b is PPBranchOr) {
+			b.optimize();
+			if (#b.conditions == 0) {
+				b = b is PPBranchAnd ? "1" : "0";
+				break;
+			}
+			if (#b.conditions == 1) {
+				b = b.conditions[0];
+				continue;
+			}
+			break;
+		}
+		break;
+	}
+	return b;
+}
+
+
+function removeDuplicatePPBranches(b: {Object...}): {Object...} {
+	local result = [];
+	for (local x: b) {
+		if (!isPPBranchInList(result, x))
+			result.append(x);
+	}
+	return result;
+}
+
+
+class PPBranchNot: PPBranch {
+	member branch: Object;
+	this = default;
+	operator str() {
+		if (branch is PPBranchAnd || branch is PPBranchOr)
+			return "!({})".format({ branch });
+		return "!" + branch;
+	}
+}
+
+class PPBranchAnd: PPBranch {
+	member conditions: {Object...};
+	this(branches: {Object...}) {
+		conditions = List(branches);
+	}
+	operator repr() {
+		return "PPBranchAnd({!r})".format({ conditions });
+	}
+	operator str() {
+		File.Writer fp;
+		local isFirst = true;
+		for (local x: conditions) {
+			if (!isFirst)
+				fp << " && ";
+			isFirst = false;
+			if (x is PPBranchOr) {
+				fp << "(" << x << ")";
+			} else {
+				fp << x;
+			}
+		}
+		return fp.string;
+	}
+	optimize() {
+		/* Optimize inner branches. */
+		for (local i = 0; i < #conditions; ++i) {
+			conditions[i] = optimizePPBranch(conditions[i]);
+		}
+		/* Remove unnecessary branches. */
+		for (local i = 0; i < #conditions;) {
+			local b = conditions[i];
+			if (b is string) {
+				if (b == "1") {
+					conditions.erase(i);
+					continue;
+				}
+				if (b == "0") {
+					conditions = ["0"];
+					return;
+				}
+			}
+			++i;
+		}
+		local i = 0;
+again_conditions_i:
+		while (i < #conditions) {
+			local b = conditions[i];
+			/* Inline inner branches. */
+			if (b is PPBranchAnd) {
+				conditions.erase(i);
+				conditions.insertall(i, b.conditions);
+				continue;
+			}
+			/* Remove implied branches:
+			 * (a || b || c) && b --> b */
+			if (b is PPBranchOr) {
+				for (local c: b.conditions) {
+					if (isPPBranchInList(conditions, c)) {
+						conditions.erase(i);
+						goto again_conditions_i;
+					}
+				}
+			}
+			++i;
+		}
+		/* Remove duplicate branches */
+		conditions = removeDuplicatePPBranches(conditions);
+	}
+}
+
+class PPBranchOr: PPBranch {
+	member conditions: {Object...};
+	this(branches: {Object...}) {
+		conditions = List(branches);
+	}
+	operator repr() {
+		return "PPBranchOr({!r})".format({ conditions });
+	}
+	operator str() {
+		File.Writer fp;
+		local isFirst = true;
+		for (local x: conditions) {
+			if (!isFirst)
+				fp << " || ";
+			isFirst = false;
+			if (x is PPBranchAnd) {
+				fp << "(" << x << ")";
+			} else {
+				fp << x;
+			}
+		}
+		return fp.string;
+	}
+	optimize() {
+		/* Optimize branches. */
+		for (local i = 0; i < #conditions; ++i) {
+			conditions[i] = optimizePPBranch(conditions[i]);
+		}
+		/* Remove unnecessary branches. */
+		for (local i = 0; i < #conditions;) {
+			local b = conditions[i];
+			if (b is string) {
+				if (b == "1") {
+					conditions = ["1"];
+					return;
+				}
+				if (b == "0") {
+					conditions.erase(i);
+					continue;
+				}
+			}
+			++i;
+		}
+		local i = 0;
+again_conditions_i:
+		while (i < #conditions) {
+			local b = conditions[i];
+			/* Inline inner branches. */
+			if (b is PPBranchOr) {
+				conditions.erase(i);
+				conditions.insertall(i, b.conditions);
+				continue;
+			}
+			/* Remove implied branches:
+			 * (a && b && c) || b --> b */
+			if (b is PPBranchAnd) {
+				for (local c: b.conditions) {
+					if (isPPBranchInList(conditions, c)) {
+						conditions.erase(i);
+						goto again_conditions_i;
+					}
+				}
+			}
+			++i;
+		}
+		conditions = removeDuplicatePPBranches(conditions);
+	}
+}
+
+class PPBranchParser {
+	member expr: string;
+	member tok: string;
+	member pos: int;
+	member end: int;
+	this(expr: string) {
+		this.expr = expr;
+		this.pos = 0;
+		this.end = #expr;
+		this.tok = "";
+	}
+	next(): string {
+		while (pos < end && expr.isspace(pos))
+			++pos;
+		if (pos >= end) {
+			tok = "";
+			goto done;
+		}
+		local start = pos;
+		local ch = expr[start];
+		++pos;
+		switch (ch) {
+
+		case "&":
+		case "|":
+			if (pos < end && expr[pos] == ch)
+				++pos;
+			break;
+
+		case "\"":
+		case "\'":
+			++pos;
+			while (pos < end) {
+				local ch2 = expr[pos];
+				++pos;
+				if (ch2 == "\\") {
+					++pos;
+				} else if (ch2 == ch) {
+					break;
+				}
+			}
+			break;
+
+		case "/":
+			if (pos < end && expr[pos] == "*") {
+				pos = expr.find("*/", pos + 1, end);
+				if (pos < 0)
+					pos = end;
+			}
+			break;
+
+		default:
+			if (ch.issymstrt() || ch.isalnum()) {
+				while (pos < end && expr.issymcont(pos))
+					++pos;
+			}
+			break;
+		}
+		tok = expr[start:pos];
+done:
+		return tok;
+	}
+}
+
+global parsePPBranch;
+function parsePPBranchUnary(parser: PPBranchParser): Object {
+	local start, tok;
+	switch (parser.tok) {
+
+	case "":
+		throw Error(
+			"Expected expression `)' after `(' (got {!r} in {!r})"
+				.format({ parser.tok, parser.expr }));
+
+	case "!": {
+		parser.next();
+		local inner = parsePPBranchUnary(parser);
+		inner = inner is string ? "!" + inner : PPBranchNot(inner);
+		return inner;
+	}	break;
+
+	case "(": {
+		start = parser.pos - #parser.tok;
+		parser.next();
+		local inner = parsePPBranch(parser);
+		if (parser.tok != ")") {
+			throw Error(
+				"Missing `)' after `(' following {!r} (got {!r} in {!r})"
+					.format({ inner, parser.tok, parser.expr }));
+		}
+		tok = parser.next();
+		if (tok !in ["", "||", "&&", ")"])
+			goto handle_generic_expression;
+		if (inner is string) {
+			inner = inner.strip();
+			if (!inner.startswith("(") ||
+			    !inner.endswith(")") ||
+			    inner.findmatch("(", ")", 1) != #inner - 1)
+				inner = "({})".format({ inner });
+		}
+		return inner;
+	}	break;
+
+	default:
+		break;
+	}
+	start = parser.pos - #parser.tok;
+	for (;;) {
+		tok = parser.next();
+		if (tok in ["", "||", "&&", ")"])
+			break;
+handle_generic_expression:
+		if (tok in ["(", "{", "["]) {
+			local starttok = tok;
+			local endtok = {
+				"(" : ")",
+				"[" : "]",
+				"{" : "}",
+			}[tok];
+			local recursion = 0;
+			for (;;) {
+				tok = parser.next();
+				if (tok == "")
+					break;
+				if (tok == starttok)
+					++recursion;
+				else if (tok == endtok) {
+					if (!recursion)
+						break;
+					--recursion;
+				}
+			}
+		}
+	}
+	return parser.expr[start:parser.pos - #parser.tok].strip();
+}
+
+function parsePPBranchAnd(parser: PPBranchParser): Object {
+	local r = parsePPBranchUnary(parser);
+	while (parser.tok == "&&") {
+		if (r !is List)
+			r = [r];
+		parser.next();
+		r.append(parsePPBranchUnary(parser));
+	}
+	if (r is List)
+		r = PPBranchAnd(r);
+	return r;
+}
+
+function parsePPBranch(parser: PPBranchParser): Object {
+	local r = parsePPBranchAnd(parser);
+	while (parser.tok == "||") {
+		if (r !is List)
+			r = [r];
+		parser.next();
+		r.append(parsePPBranchAnd(parser));
+	}
+	if (r is List)
+		r = PPBranchOr(r);
+	return r;
+}
+
+
+@@Try to optimize away redundant expressions
+function optimizePreprocessorExpression(expr: string): string {
+	local parser = PPBranchParser(expr.strip());
+	if (!parser.next())
+		return "1";
+	local branch = parsePPBranch(parser);
+	while (parser.pos < parser.end && parser.expr.isspace(parser.pos))
+		++parser.pos;
+	if (parser.pos < parser.end) {
+		throw Error(
+			"Unused tail {!r} in expression {!r}".format({
+				parser.expr[parser.pos:parser.end], parser.expr }));
+	}
+	branch = optimizePPBranch(branch);
+	return str(branch);
+}
+
+
+assert optimizePreprocessorExpression("") == "1";
+assert optimizePreprocessorExpression("(defined(foo) || defined(bar))") == "defined(foo) || defined(bar)";
+assert optimizePreprocessorExpression("foo || bar") == "foo || bar";
+assert optimizePreprocessorExpression("foo || bar && 1") == "foo || bar";
+assert optimizePreprocessorExpression("foo || bar && 0") == "foo";
+assert optimizePreprocessorExpression("foo || (bar && 1)") == "foo || bar";
+assert optimizePreprocessorExpression("foo || (bar && 0)") == "foo";
+assert optimizePreprocessorExpression("foo || !(bar && baz)") == "foo || !bar || !baz";
+assert optimizePreprocessorExpression("foo && !(bar || baz)") == "foo && !bar && !baz";
+assert optimizePreprocessorExpression(
+"defined(__CRT_HAVE_tmpfile64) || defined(__CRT_HAVE_tmpfile) || (defined(__CRT_HAVE_tmpfile) && (!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0))"
+) == "defined(__CRT_HAVE_tmpfile64) || defined(__CRT_HAVE_tmpfile)";

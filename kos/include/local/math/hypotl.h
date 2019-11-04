@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd6a95fe3 */
+/* HASH CRC-32:0x36bda0f0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_hypotl_defined
-#if ((__has_builtin(__builtin_hypot) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_hypot)) || defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE___hypot))
+#if defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE___hypot)
 #define __local_hypotl_defined 1
 /* Dependency: "hypot" */
 #ifndef ____localdep_hypot_defined
@@ -46,5 +46,5 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(hypotl))(long double __x,
 	return (long double)__localdep_hypot((double)__x, (double)__y);
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((__has_builtin(__builtin_hypot) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_hypot)) || defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE___hypot)) */
+#endif /* defined(__CRT_HAVE_hypot) || defined(__CRT_HAVE___hypot) */
 #endif /* !__local_hypotl_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf63696ce */
+/* HASH CRC-32:0x87a7c525 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -287,7 +287,7 @@ __CREDIRECT(__ATTR_WUNUSED,void *,__NOTHROW_NCX,mmap,(void *__addr, size_t __len
  *               MAP_NONBLOCK|MAP_NORESERVE|MAP_POPULATE|MAP_STACK|MAP_SYNC|
  *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_DONT_OVERRIDE' */
 __CDECLARE(__ATTR_WUNUSED,void *,__NOTHROW_NCX,mmap,(void *__addr, size_t __len, int __prot, int __flags, __fd_t __fd, __off32_t __offset),(__addr,__len,__prot,__flags,__fd,__offset))
-#elif (defined(__CRT_HAVE_mmap) || defined(__CRT_HAVE_mmap64))
+#elif defined(__CRT_HAVE_mmap) || defined(__CRT_HAVE_mmap64)
 #include <local/sys.mman/mmap.h>
 /* @param prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
  * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd

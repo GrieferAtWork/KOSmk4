@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe63226fb */
+/* HASH CRC-32:0xb5fb0aec */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,7 +61,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16utime,(char16_t const *
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16utime,(char16_t const *__filename, struct utimbuf const *__file_times),wutime,(__filename,__file_times))
 #elif defined(__CRT_HAVE_DOS$_wutime32)
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16utime,(char16_t const *__filename, struct utimbuf const *__file_times),_wutime32,(__filename,__file_times))
-#elif (defined(__CRT_HAVE_wutime) || defined(__CRT_HAVE__wutime32) || defined(__CRT_HAVE_wutime64) || defined(__CRT_HAVE__wutime64))
+#elif defined(__CRT_HAVE_wutime) || defined(__CRT_HAVE__wutime32) || defined(__CRT_HAVE_wutime64) || defined(__CRT_HAVE__wutime64)
 #if __SIZEOF_WCHAR_T__ == 2
 #include <local/parts.wchar.utime/wutime.h>
 __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL c16utime)(char16_t const *__filename, struct utimbuf const *__file_times) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wutime))((__WCHAR_TYPE__ const *)__filename, __file_times); }
@@ -80,7 +80,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32utime,(char32_t const *__fi
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32utime,(char32_t const *__filename, struct utimbuf const *__file_times),wutime,(__filename,__file_times))
 #elif defined(__CRT_HAVE__wutime32) && (!defined(__USE_TIME_BITS64) && (__SIZEOF_WCHAR_T__ == 4))
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32utime,(char32_t const *__filename, struct utimbuf const *__file_times),_wutime32,(__filename,__file_times))
-#elif (defined(__CRT_HAVE_wutime) || defined(__CRT_HAVE__wutime32) || defined(__CRT_HAVE_wutime64) || defined(__CRT_HAVE__wutime64))
+#elif defined(__CRT_HAVE_wutime) || defined(__CRT_HAVE__wutime32) || defined(__CRT_HAVE_wutime64) || defined(__CRT_HAVE__wutime64)
 #if __SIZEOF_WCHAR_T__ == 4
 #include <local/parts.wchar.utime/wutime.h>
 __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL c32utime)(char32_t const *__filename, struct utimbuf const *__file_times) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wutime))((__WCHAR_TYPE__ const *)__filename, __file_times); }
@@ -102,7 +102,7 @@ __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16utime64,(__CHAR16_TYPE_
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16utime64,(__CHAR16_TYPE__ const *__filename, struct utimbuf64 const *__file_times),wutime,(__filename,__file_times))
 #elif defined(__CRT_HAVE_DOS$wutime64)
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16utime64,(__CHAR16_TYPE__ const *__filename, struct utimbuf64 const *__file_times),wutime64,(__filename,__file_times))
-#elif (defined(__CRT_HAVE_wutime) || defined(__CRT_HAVE__wutime32))
+#elif defined(__CRT_HAVE_wutime) || defined(__CRT_HAVE__wutime32)
 #if __SIZEOF_WCHAR_T__ == 2
 #include <local/parts.wchar.utime/wutime64.h>
 __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL c16utime64)(__CHAR16_TYPE__ const *__filename, struct utimbuf64 const *__file_times) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wutime64))((__WCHAR_TYPE__ const *)__filename, __file_times); }
@@ -117,7 +117,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32utime64,(__CHAR32_TYPE__ co
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32utime64,(__CHAR32_TYPE__ const *__filename, struct utimbuf64 const *__file_times),_wutime64,(__filename,__file_times))
 #elif defined(__CRT_HAVE_wutime) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ && (__SIZEOF_WCHAR_T__ == 4))
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32utime64,(__CHAR32_TYPE__ const *__filename, struct utimbuf64 const *__file_times),wutime,(__filename,__file_times))
-#elif (defined(__CRT_HAVE_wutime) || defined(__CRT_HAVE__wutime32))
+#elif defined(__CRT_HAVE_wutime) || defined(__CRT_HAVE__wutime32)
 #if __SIZEOF_WCHAR_T__ == 4
 #include <local/parts.wchar.utime/wutime64.h>
 __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL c32utime64)(__CHAR32_TYPE__ const *__filename, struct utimbuf64 const *__file_times) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(wutime64))((__WCHAR_TYPE__ const *)__filename, __file_times); }

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x57e76685 */
+/* HASH CRC-32:0x452dca23 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_kreaddir64_defined
-#if (defined(__CRT_HAVE_kreaddirf64) || (defined(__CRT_HAVE_kreaddirf) && defined(_DIRENT_MATCHES_DIRENT64)))
+#if defined(__CRT_HAVE_kreaddirf64) || (defined(__CRT_HAVE_kreaddirf) && defined(_DIRENT_MATCHES_DIRENT64))
 #define __local_kreaddir64_defined 1
 /* Dependency: "kreaddirf64" */
 #ifndef ____localdep_kreaddirf64_defined
@@ -45,5 +45,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(kreaddir64))(__fd_t __fd,
 	return __localdep_kreaddirf64(__fd, __buf, __bufsize, __mode, 0);
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_kreaddirf64) || (defined(__CRT_HAVE_kreaddirf) && defined(_DIRENT_MATCHES_DIRENT64))) */
+#endif /* defined(__CRT_HAVE_kreaddirf64) || (defined(__CRT_HAVE_kreaddirf) && defined(_DIRENT_MATCHES_DIRENT64)) */
 #endif /* !__local_kreaddir64_defined */

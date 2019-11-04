@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b136f3e */
+/* HASH CRC-32:0x977509de */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_ntp_gettime_defined
-#if (defined(__CRT_HAVE_ntp_gettimex) || defined(__CRT_HAVE_ntp_gettimex64))
+#if defined(__CRT_HAVE_ntp_gettimex) || defined(__CRT_HAVE_ntp_gettimex64)
 #define __local_ntp_gettime_defined 1
 /* Dependency: "ntp_gettime32" from "sys.timex" */
 #ifndef ____localdep_ntp_gettime32_defined
@@ -82,5 +82,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ntp_gettime))(struct ntptimeval *__re
 #endif /* !__CRT_HAVE_ntp_gettimex */
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_ntp_gettimex) || defined(__CRT_HAVE_ntp_gettimex64)) */
+#endif /* defined(__CRT_HAVE_ntp_gettimex) || defined(__CRT_HAVE_ntp_gettimex64) */
 #endif /* !__local_ntp_gettime_defined */

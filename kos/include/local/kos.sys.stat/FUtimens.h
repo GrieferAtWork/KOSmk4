@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x91f9fb76 */
+/* HASH CRC-32:0xc7ae0e40 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_FUtimens_defined
-#if (defined(__CRT_HAVE_FUtimens) || defined(__CRT_HAVE_FUtimens64))
+#if defined(__CRT_HAVE_FUtimens) || defined(__CRT_HAVE_FUtimens64)
 #define __local_FUtimens_defined 1
 #include <kos/anno.h>
 /* Dependency: "FUtimens64" from "kos.sys.stat" */
@@ -76,5 +76,5 @@ __LOCAL_LIBC(FUtimens) void
 #endif /* !__CRT_HAVE_UTimensAt64 */
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_FUtimens) || defined(__CRT_HAVE_FUtimens64)) */
+#endif /* defined(__CRT_HAVE_FUtimens) || defined(__CRT_HAVE_FUtimens64) */
 #endif /* !__local_FUtimens_defined */

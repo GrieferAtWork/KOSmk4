@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1fc4d7dd */
+/* HASH CRC-32:0x29d85bf9 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__wscanf_l_defined
-#if ((defined(__CRT_HAVE_vfwscanf) && !defined(__NO_STDSTREAMS) || defined(__CRT_HAVE_vwscanf)) || defined(__CRT_HAVE__vwscanf_l))
+#if (defined(__CRT_HAVE_vfwscanf) && !defined(__NO_STDSTREAMS)) || defined(__CRT_HAVE_vwscanf) || defined(__CRT_HAVE__vwscanf_l)
 #define __local__wscanf_l_defined 1
 #include <kos/anno.h>
 /* Dependency: "_vwscanf_l" from "wchar" */
@@ -26,7 +26,7 @@
 #define ____localdep__vwscanf_l_defined 1
 #if defined(__CRT_HAVE__vwscanf_l)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__STDC_INT_AS_SSIZE_T,,__localdep__vwscanf_l,(__WCHAR_TYPE__ const *__format, __locale_t __locale, __builtin_va_list __args),_vwscanf_l,(__format,__locale,__args)) __THROWS(...)
-#elif (defined(__CRT_HAVE_vfwscanf) && !defined(__NO_STDSTREAMS) || defined(__CRT_HAVE_vwscanf))
+#elif (defined(__CRT_HAVE_vfwscanf) && !defined(__NO_STDSTREAMS)) || defined(__CRT_HAVE_vwscanf)
 #include <local/wchar/_vwscanf_l.h>
 #define __localdep__vwscanf_l (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_vwscanf_l))
 #else /* CUSTOM: _vwscanf_l */
@@ -48,5 +48,5 @@ __LOCAL_LIBC(_wscanf_l) __ATTR_WUNUSED __ATTR_NONNULL((1)) __STDC_INT_AS_SSIZE_T
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((defined(__CRT_HAVE_vfwscanf) && !defined(__NO_STDSTREAMS) || defined(__CRT_HAVE_vwscanf)) || defined(__CRT_HAVE__vwscanf_l)) */
+#endif /* (defined(__CRT_HAVE_vfwscanf) && !defined(__NO_STDSTREAMS)) || defined(__CRT_HAVE_vwscanf) || defined(__CRT_HAVE__vwscanf_l) */
 #endif /* !__local__wscanf_l_defined */

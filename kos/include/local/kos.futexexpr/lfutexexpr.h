@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f2bb143 */
+/* HASH CRC-32:0x3bd9c6d7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_lfutexexpr_defined
-#if (defined(__CRT_HAVE_lfutexexpr) || defined(__CRT_HAVE_lfutexexpr64))
+#if defined(__CRT_HAVE_lfutexexpr) || defined(__CRT_HAVE_lfutexexpr64)
 #define __local_lfutexexpr_defined 1
 #include <bits/timespec.h>
 #include <kos/bits/futex-expr.h>
@@ -212,5 +212,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(lfutexexpr))(void *__base,
 #endif /* !__CRT_HAVE_lfutexexpr */
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_lfutexexpr) || defined(__CRT_HAVE_lfutexexpr64)) */
+#endif /* defined(__CRT_HAVE_lfutexexpr) || defined(__CRT_HAVE_lfutexexpr64) */
 #endif /* !__local_lfutexexpr_defined */

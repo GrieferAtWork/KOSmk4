@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6f30cddd */
+/* HASH CRC-32:0x23216459 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1819,7 +1819,7 @@ __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONN
  *                  printed to the waprintf-printer at one point.
  *                  (e.g. `format_c16aprintf_printer(&my_printer, L"\0", 1)') */
 __CREDIRECT_DOS(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),char16_t *,__NOTHROW_NCX,format_c16aprintf_pack,(struct format_c16aprintf_data *__restrict __self, __SIZE_TYPE__ *__pstrlen),format_waprintf_pack,(__self,__pstrlen))
-#elif (__has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_realloc)) || defined(__CRT_HAVE_realloc)
+#elif defined(__CRT_HAVE_realloc)
 #if __SIZEOF_WCHAR_T__ == 2
 #include <local/parts.wchar.format-printer/format_waprintf_pack.h>
 /* Pack and finalize a given aprintf format printer
@@ -1890,7 +1890,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_c16aprintf_pack, __FORCELOCAL __ATTR_MALL
  *                  printed to the waprintf-printer at one point.
  *                  (e.g. `format_c32aprintf_printer(&my_printer, L"\0", 1)') */
 __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)),char32_t *,__NOTHROW_NCX,format_c32aprintf_pack,(struct format_c32aprintf_data *__restrict __self, __SIZE_TYPE__ *__pstrlen),format_waprintf_pack,(__self,__pstrlen))
-#elif (__has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_realloc)) || defined(__CRT_HAVE_realloc)
+#elif defined(__CRT_HAVE_realloc)
 #if __SIZEOF_WCHAR_T__ == 4
 #include <local/parts.wchar.format-printer/format_waprintf_pack.h>
 /* Pack and finalize a given aprintf format printer
@@ -1945,7 +1945,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,f
 #elif defined(__CRT_HAVE_DOS$format_waprintf_printer)
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
 __CREDIRECT_DOS(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_c16aprintf_printer,(/*struct format_waprintf_data **/void *__arg, char16_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_waprintf_printer,(__arg,__data,__datalen))
-#elif (__has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_realloc)) || defined(__CRT_HAVE_realloc)
+#elif defined(__CRT_HAVE_realloc)
 #if __SIZEOF_WCHAR_T__ == 2
 #include <local/parts.wchar.format-printer/format_waprintf_printer.h>
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
@@ -1959,7 +1959,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_c16aprintf_printer, __FORCELOCAL __ATTR_W
 #if defined(__CRT_HAVE_format_waprintf_printer) && (__SIZEOF_WCHAR_T__ == 4)
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_c32aprintf_printer,(/*struct format_waprintf_data **/void *__arg, char32_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_waprintf_printer,(__arg,__data,__datalen))
-#elif (__has_builtin(__builtin_realloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_realloc)) || defined(__CRT_HAVE_realloc)
+#elif defined(__CRT_HAVE_realloc)
 #if __SIZEOF_WCHAR_T__ == 4
 #include <local/parts.wchar.format-printer/format_waprintf_printer.h>
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned */

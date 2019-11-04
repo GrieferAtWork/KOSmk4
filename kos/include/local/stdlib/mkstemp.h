@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcec811a8 */
+/* HASH CRC-32:0xf347def9 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_mkstemp_defined
-#if (defined(__CRT_HAVE_mktemp) || defined(__CRT_HAVE__mktemp) || defined(__CRT_HAVE___mktemp))
+#if defined(__CRT_HAVE_mktemp) || defined(__CRT_HAVE__mktemp) || defined(__CRT_HAVE___mktemp)
 #define __local_mkstemp_defined 1
 /* Dependency: "mktemp" */
 #ifndef ____localdep_mktemp_defined
@@ -41,5 +41,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(mkstemp))(char *__template_) {
 	return __localdep_mktemp(__template_) ? 0 : -1;
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_mktemp) || defined(__CRT_HAVE__mktemp) || defined(__CRT_HAVE___mktemp)) */
+#endif /* defined(__CRT_HAVE_mktemp) || defined(__CRT_HAVE__mktemp) || defined(__CRT_HAVE___mktemp) */
 #endif /* !__local_mkstemp_defined */

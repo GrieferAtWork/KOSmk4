@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa3ec7e9d */
+/* HASH CRC-32:0xf439b3ce */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_hdestroy_r_defined
-#if ((__has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
+#if defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 #define __local_hdestroy_r_defined 1
 #include <parts/errno.h>
 /* Dependency: "free" */
@@ -52,5 +52,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hdestroy_r))(struct hsearch_data *__h
 	__htab->table = __NULLPTR;
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((__has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)) */
+#endif /* defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) */
 #endif /* !__local_hdestroy_r_defined */

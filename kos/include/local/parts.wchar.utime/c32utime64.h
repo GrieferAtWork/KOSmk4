@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5e06858a */
+/* HASH CRC-32:0x8c54bb63 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_c32utime64_defined
-#if (defined(__CRT_HAVE_wutime) || defined(__CRT_HAVE__wutime32))
+#if defined(__CRT_HAVE_wutime) || defined(__CRT_HAVE__wutime32)
 #define __local_c32utime64_defined 1
 /* Dependency: "crt_wutime32" from "parts.wchar.utime" */
 #ifndef ____localdep_crt_c32utime32_defined
@@ -55,5 +55,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(c32utime64))(__CHAR32_TYPE__ const *_
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_wutime) || defined(__CRT_HAVE__wutime32)) */
+#endif /* defined(__CRT_HAVE_wutime) || defined(__CRT_HAVE__wutime32) */
 #endif /* !__local_c32utime64_defined */

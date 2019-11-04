@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa8a002c2 */
+/* HASH CRC-32:0x2ecbdd76 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sincosl_defined
-#if ((__has_builtin(__builtin_sincos) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sincos)) || defined(__CRT_HAVE_sincos) || defined(__CRT_HAVE___sincos))
+#if defined(__CRT_HAVE_sincos) || defined(__CRT_HAVE___sincos)
 #define __local_sincosl_defined 1
 #include <bits/math-vector.h>
 #include <bits/math-vector.h>
@@ -52,5 +52,5 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(sincosl))(long double __x,
 	*__pcosx = (long double)__cosx;
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((__has_builtin(__builtin_sincos) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sincos)) || defined(__CRT_HAVE_sincos) || defined(__CRT_HAVE___sincos)) */
+#endif /* defined(__CRT_HAVE_sincos) || defined(__CRT_HAVE___sincos) */
 #endif /* !__local_sincosl_defined */

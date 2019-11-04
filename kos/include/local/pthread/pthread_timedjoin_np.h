@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f5b487b */
+/* HASH CRC-32:0x48a9bfea */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_pthread_timedjoin_np_defined
-#if (defined(__CRT_HAVE_pthread_timedjoin_np) || defined(__CRT_HAVE_pthread_timedjoin64_np))
+#if defined(__CRT_HAVE_pthread_timedjoin_np) || defined(__CRT_HAVE_pthread_timedjoin64_np)
 #define __local_pthread_timedjoin_np_defined 1
 #include <bits/pthreadtypes.h>
 #include <bits/timespec.h>
@@ -88,5 +88,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pthread_timedjoin_np))(__pthread_t __
 #endif /* !__CRT_HAVE_pthread_timedjoin_np */
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_pthread_timedjoin_np) || defined(__CRT_HAVE_pthread_timedjoin64_np)) */
+#endif /* defined(__CRT_HAVE_pthread_timedjoin_np) || defined(__CRT_HAVE_pthread_timedjoin64_np) */
 #endif /* !__local_pthread_timedjoin_np_defined */

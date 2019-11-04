@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x12ddbdf5 */
+/* HASH CRC-32:0x96e03c29 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sqrtl_defined
-#if ((__has_builtin(__builtin_sqrt) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sqrt)) || defined(__CRT_HAVE_sqrt) || defined(__CRT_HAVE___sqrt))
+#if defined(__CRT_HAVE_sqrt) || defined(__CRT_HAVE___sqrt)
 #define __local_sqrtl_defined 1
 /* Dependency: "sqrt" */
 #ifndef ____localdep_sqrt_defined
@@ -45,5 +45,5 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(sqrtl))(long double __x) {
 	return (long double)__localdep_sqrt((double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((__has_builtin(__builtin_sqrt) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_sqrt)) || defined(__CRT_HAVE_sqrt) || defined(__CRT_HAVE___sqrt)) */
+#endif /* defined(__CRT_HAVE_sqrt) || defined(__CRT_HAVE___sqrt) */
 #endif /* !__local_sqrtl_defined */

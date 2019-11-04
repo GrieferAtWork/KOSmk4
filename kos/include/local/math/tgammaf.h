@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc1654498 */
+/* HASH CRC-32:0xb384ca8e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_tgammaf_defined
-#if ((__has_builtin(__builtin_tgamma) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tgamma)) || defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma))
+#if defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma)
 #define __local_tgammaf_defined 1
 /* Dependency: "tgamma" */
 #ifndef ____localdep_tgamma_defined
@@ -45,5 +45,5 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(tgammaf))(float __x) {
 	return (float)__localdep_tgamma((double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((__has_builtin(__builtin_tgamma) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_tgamma)) || defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma)) */
+#endif /* defined(__CRT_HAVE_tgamma) || defined(__CRT_HAVE___tgamma) */
 #endif /* !__local_tgammaf_defined */

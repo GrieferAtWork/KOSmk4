@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x30f5753d */
+/* HASH CRC-32:0x6fdee890 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_futex_timedwaitwhile_above64_defined
-#if (defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex))
+#if defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 #define __local_futex_timedwaitwhile_above64_defined 1
 #include <bits/types.h>
 #include <bits/types.h>
@@ -121,5 +121,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(futex_timedwaitwhile_above64))(__uint
 	return __localdep_lfutex64(__uaddr, LFUTEX_WAIT_WHILE_ABOVE, __above_value, __rel_timeout);
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)) */
+#endif /* defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex) */
 #endif /* !__local_futex_timedwaitwhile_above64_defined */

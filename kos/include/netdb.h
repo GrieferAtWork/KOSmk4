@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xef9a34a */
+/* HASH CRC-32:0x2f7e6d7a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -631,7 +631,7 @@ __CREDIRECT(,int,__NOTHROW_RPC,gai_suspend,(struct gaicb const *const __list[], 
  * This function is not part of POSIX and therefore no official
  * cancellation point */
 __CDECLARE(,int,__NOTHROW_RPC,gai_suspend,(struct gaicb const *const __list[], int __ent, struct timespec const *__timeout),(__list,__ent,__timeout))
-#elif (defined(__CRT_HAVE_gai_suspend64) || defined(__CRT_HAVE_gai_suspend))
+#elif defined(__CRT_HAVE_gai_suspend64) || defined(__CRT_HAVE_gai_suspend)
 #include <local/netdb/gai_suspend.h>
 /* Suspend execution of the thread until at least one of the ENT requests
  * in LIST is handled. If TIMEOUT is not a null pointer it specifies the

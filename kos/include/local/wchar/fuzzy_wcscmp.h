@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd0bfbd2 */
+/* HASH CRC-32:0x31b4eeb0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fuzzy_wcscmp_defined
-#if (!defined(__NO_MALLOCA) || defined(__CRT_HAVE_fuzzy_wmemcmp))
+#if !defined(__NO_MALLOCA) || defined(__CRT_HAVE_fuzzy_wmemcmp)
 #define __local_fuzzy_wcscmp_defined 1
 #include <parts/malloca.h>
 /* Dependency: "fuzzy_wmemcmp" from "wchar" */
@@ -57,5 +57,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(fuzzy_wcscmp))(__WCHAR_TYPE__ const *
 	return __localdep_fuzzy_wmemcmp(__s1, __localdep_wcslen(__s1), __s2, __localdep_wcslen(__s2));
 }
 __NAMESPACE_LOCAL_END
-#endif /* (!defined(__NO_MALLOCA) || defined(__CRT_HAVE_fuzzy_wmemcmp)) */
+#endif /* !defined(__NO_MALLOCA) || defined(__CRT_HAVE_fuzzy_wmemcmp) */
 #endif /* !__local_fuzzy_wcscmp_defined */

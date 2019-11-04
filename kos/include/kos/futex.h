@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa8b5f014 */
+/* HASH CRC-32:0xec7ea0b0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -125,7 +125,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,lfutex,(lfutex_t *_
  * @return: -1:EINTR:     A blocking futex-wait operation was interrupted
  * @return: -1:ETIMEDOUT: A blocking futex-wait operation has timed out */
 __CDECLARE(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_RPC,lfutex,(lfutex_t *__uaddr, __syscall_ulong_t __futex_op, lfutex_t __val, /*struct timespec const *timeout, lfutex_t val2*/...),(__uaddr,__futex_op,__val,))
-#elif (defined(__CRT_HAVE_lfutex) || defined(__CRT_HAVE_lfutex64))
+#elif defined(__CRT_HAVE_lfutex) || defined(__CRT_HAVE_lfutex64)
 #include <local/kos.futex/lfutex.h>
 /* >> lfutex(2)
  * Provide the bottom-most API for implementing user-space synchronization on KOS
@@ -245,7 +245,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(futex_wake, __FORCELOCAL __ATTR_NONNULL((1)) __S
  * @return: * : The number of woken threads
  * @return: -1:EFAULT: A faulty pointer was given */
 __CDECLARE(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,futex_wakeall,(lfutex_t *__uaddr),(__uaddr))
-#elif (defined(__CRT_HAVE_futex_wake) || defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex))
+#elif defined(__CRT_HAVE_futex_wake) || defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 #include <local/kos.futex/futex_wakeall.h>
 /* Wake all threads waiting for `*UADDR' (same as `futex_wake(uaddr, (size_t)-1)')
  * @return: * : The number of woken threads
@@ -1477,7 +1477,7 @@ extern "C++" {
  * @return: * : The number of woken threads
  * @return: -1:EFAULT: A faulty pointer was given */
 __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,futex_wake,(lfutex_t *__uaddr),futex_wakeall,(__uaddr))
-#elif (defined(__CRT_HAVE_futex_wake) || defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex))
+#elif defined(__CRT_HAVE_futex_wake) || defined(__CRT_HAVE_lfutex64) || defined(__CRT_HAVE_lfutex)
 } /* extern "C++" { */
 #include <local/kos.futex/futex_wakeall.h>
 extern "C++" {

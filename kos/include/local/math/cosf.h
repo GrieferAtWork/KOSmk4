@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc51acb49 */
+/* HASH CRC-32:0x41d40471 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_cosf_defined
-#if ((__has_builtin(__builtin_cos) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_cos)) || defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos))
+#if defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos)
 #define __local_cosf_defined 1
 #include <bits/math-vector.h>
 /* Dependency: "cos" */
@@ -46,5 +46,5 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(cosf))(float __x) {
 	return (float)__localdep_cos((double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((__has_builtin(__builtin_cos) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_cos)) || defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos)) */
+#endif /* defined(__CRT_HAVE_cos) || defined(__CRT_HAVE___cos) */
 #endif /* !__local_cosf_defined */

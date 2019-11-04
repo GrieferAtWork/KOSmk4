@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfc6e6cb7 */
+/* HASH CRC-32:0x49b2cafa */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_asinf_defined
-#if ((__has_builtin(__builtin_asin) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_asin)) || defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin))
+#if defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin)
 #define __local_asinf_defined 1
 /* Dependency: "asin" */
 #ifndef ____localdep_asin_defined
@@ -45,5 +45,5 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(asinf))(float __x) {
 	return (float)__localdep_asin((double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((__has_builtin(__builtin_asin) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_asin)) || defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin)) */
+#endif /* defined(__CRT_HAVE_asin) || defined(__CRT_HAVE___asin) */
 #endif /* !__local_asinf_defined */

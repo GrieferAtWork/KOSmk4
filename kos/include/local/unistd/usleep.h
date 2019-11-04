@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x419f52ee */
+/* HASH CRC-32:0xc8799af6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_usleep_defined
-#if (defined(__CRT_HAVE___crtSleep) || defined(__CRT_HAVE_delay))
+#if defined(__CRT_HAVE___crtSleep) || defined(__CRT_HAVE_delay)
 #define __local_usleep_defined 1
 /* Dependency: "__crtSleep" from "unistd" */
 #ifndef ____localdep___crtSleep_defined
@@ -43,5 +43,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(usleep))(__useconds_t __useconds) {
 	return 0;
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE___crtSleep) || defined(__CRT_HAVE_delay)) */
+#endif /* defined(__CRT_HAVE___crtSleep) || defined(__CRT_HAVE_delay) */
 #endif /* !__local_usleep_defined */

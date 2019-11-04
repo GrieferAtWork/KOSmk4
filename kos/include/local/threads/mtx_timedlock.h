@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x48fa6118 */
+/* HASH CRC-32:0x24375802 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_mtx_timedlock_defined
-#if ((defined(__CRT_HAVE_pthread_mutex_timedlock) || defined(__CRT_HAVE_pthread_mutex_timedlock64)) || (defined(__CRT_HAVE_pthread_mutex_timedlock64) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE_pthread_mutex_timedlock) && !defined(__USE_TIME_BITS64)))
+#if defined(__CRT_HAVE_pthread_mutex_timedlock) || defined(__CRT_HAVE_pthread_mutex_timedlock64)
 #define __local_mtx_timedlock_defined 1
 #include <bits/pthreadtypes.h>
 #include <bits/timespec.h>
@@ -34,7 +34,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_pthread_mutex_ti
 #elif defined(__CRT_HAVE_pthread_mutex_timedlock) && (!defined(__USE_TIME_BITS64))
 /* Wait until lock becomes available, or specified time passes */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_pthread_mutex_timedlock,(__pthread_mutex_t *__restrict __mutex, struct __TM_TYPE(timespec) const *__restrict __abstime),pthread_mutex_timedlock,(__mutex,__abstime))
-#elif (defined(__CRT_HAVE_pthread_mutex_timedlock) || defined(__CRT_HAVE_pthread_mutex_timedlock64))
+#elif defined(__CRT_HAVE_pthread_mutex_timedlock) || defined(__CRT_HAVE_pthread_mutex_timedlock64)
 #include <local/pthread/pthread_mutex_timedlock.h>
 /* Wait until lock becomes available, or specified time passes */
 #define __localdep_pthread_mutex_timedlock (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(pthread_mutex_timedlock))
@@ -59,5 +59,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(mtx_timedlock))(__mtx_t *__restrict _
 	return 2; /* thrd_error */
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((defined(__CRT_HAVE_pthread_mutex_timedlock) || defined(__CRT_HAVE_pthread_mutex_timedlock64)) || (defined(__CRT_HAVE_pthread_mutex_timedlock64) && defined(__USE_TIME_BITS64)) || (defined(__CRT_HAVE_pthread_mutex_timedlock) && !defined(__USE_TIME_BITS64))) */
+#endif /* defined(__CRT_HAVE_pthread_mutex_timedlock) || defined(__CRT_HAVE_pthread_mutex_timedlock64) */
 #endif /* !__local_mtx_timedlock_defined */

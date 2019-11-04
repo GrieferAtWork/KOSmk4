@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe148ab03 */
+/* HASH CRC-32:0xbbcbb639 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_spawnlpe_defined
-#if (defined(__CRT_HAVE_spawnvpe) || defined(__CRT_HAVE__spawnvpe))
+#if defined(__CRT_HAVE_spawnvpe) || defined(__CRT_HAVE__spawnvpe)
 #define __local_spawnlpe_defined 1
 #include <parts/redirect-exec.h>
 /* Dependency: "spawnvpe" */
@@ -43,5 +43,5 @@ __NOTHROW_RPC(__VLIBCCALL __LIBC_LOCAL_NAME(spawnlpe))(int __mode,
 	__REDIRECT_SPAWNLPE(char, __localdep_spawnvpe, __mode, __file, __args)
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_spawnvpe) || defined(__CRT_HAVE__spawnvpe)) */
+#endif /* defined(__CRT_HAVE_spawnvpe) || defined(__CRT_HAVE__spawnvpe) */
 #endif /* !__local_spawnlpe_defined */

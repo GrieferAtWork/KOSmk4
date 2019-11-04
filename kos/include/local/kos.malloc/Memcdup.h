@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4099a7e4 */
+/* HASH CRC-32:0x4f406744 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_Memcdup_defined
-#if (defined(__CRT_HAVE_Malloc) || defined(__CRT_HAVE_Memdup))
+#if defined(__CRT_HAVE_Malloc) || defined(__CRT_HAVE_Memdup)
 #define __local_Memcdup_defined 1
 #include <kos/anno.h>
 #ifdef __LIBC_BIND_OPTIMIZATIONS
@@ -71,5 +71,5 @@ __LOCAL_LIBC(Memcdup) __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNUL
 	return __localdep_Memdup(__ptr, __num_bytes);
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_Malloc) || defined(__CRT_HAVE_Memdup)) */
+#endif /* defined(__CRT_HAVE_Malloc) || defined(__CRT_HAVE_Memdup) */
 #endif /* !__local_Memcdup_defined */

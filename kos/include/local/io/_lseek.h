@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f9c5837 */
+/* HASH CRC-32:0xcc7b6bfc */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__lseek_defined
-#if (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64))
+#if defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64)
 #define __local__lseek_defined 1
 #include <bits/types.h>
 /* Dependency: "lseek64" from "unistd" */
@@ -55,5 +55,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_lseek))(__fd_t __fd,
 	return __localdep_lseek64(__fd, (__off64_t)__offset, __whence);
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64)) */
+#endif /* defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) */
 #endif /* !__local__lseek_defined */

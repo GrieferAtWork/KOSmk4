@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8027da8 */
+/* HASH CRC-32:0x2f4f84c9 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_jnl_defined
-#if ((__has_builtin(__builtin_jn) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_jn)) || defined(__CRT_HAVE_jn) || defined(__CRT_HAVE___jn))
+#if defined(__CRT_HAVE_jn) || defined(__CRT_HAVE___jn)
 #define __local_jnl_defined 1
 /* Dependency: "jn" */
 #ifndef ____localdep_jn_defined
@@ -42,5 +42,5 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(jnl))(int __n,
 	return (long double)__localdep_jn(__n, (double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((__has_builtin(__builtin_jn) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_jn)) || defined(__CRT_HAVE_jn) || defined(__CRT_HAVE___jn)) */
+#endif /* defined(__CRT_HAVE_jn) || defined(__CRT_HAVE___jn) */
 #endif /* !__local_jnl_defined */

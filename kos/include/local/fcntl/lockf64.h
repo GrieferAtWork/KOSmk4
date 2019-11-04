@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3458915 */
+/* HASH CRC-32:0x9e61f367 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_lockf64_defined
-#if (defined(__CRT_HAVE_lockf) || defined(__CRT_HAVE__locking) || defined(__CRT_HAVE_locking))
+#if defined(__CRT_HAVE_lockf) || defined(__CRT_HAVE__locking) || defined(__CRT_HAVE_locking)
 #define __local_lockf64_defined 1
 #include <bits/types.h>
 #include <bits/types.h>
@@ -57,5 +57,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(lockf64))(__fd_t __fd,
 #endif /* !__CRT_HAVE_lockf */
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_lockf) || defined(__CRT_HAVE__locking) || defined(__CRT_HAVE_locking)) */
+#endif /* defined(__CRT_HAVE_lockf) || defined(__CRT_HAVE__locking) || defined(__CRT_HAVE_locking) */
 #endif /* !__local_lockf64_defined */

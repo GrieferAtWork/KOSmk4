@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfafa68a4 */
+/* HASH CRC-32:0x7cc30660 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_hcreate_defined
-#if ((defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc)) || (__has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)) || defined(__CRT_HAVE_malloc) || (__has_builtin(__builtin_calloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_calloc)) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_hcreate_r))
+#if defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_hcreate_r)
 #define __local_hcreate_defined 1
 #ifndef __hsearch_data_defined
 #define __hsearch_data_defined 1
@@ -35,7 +35,7 @@ struct hsearch_data {
 #if defined(__CRT_HAVE_hcreate_r)
 /* Reentrant versions which can handle multiple hashing tables at the same time */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_hcreate_r,(__SIZE_TYPE__ __nel, struct hsearch_data *__htab),hcreate_r,(__nel,__htab))
-#elif (defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc)) || (__has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)) || defined(__CRT_HAVE_malloc) || (__has_builtin(__builtin_calloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_calloc)) || defined(__CRT_HAVE_calloc)
+#elif defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_malloc)
 #include <local/search/hcreate_r.h>
 /* Reentrant versions which can handle multiple hashing tables at the same time */
 #define __localdep_hcreate_r (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(hcreate_r))
@@ -56,5 +56,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(hcreate))(__SIZE_TYPE__ __nel) {
 	return __localdep_hcreate_r(__nel, &__htab);
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc)) || (__has_builtin(__builtin_malloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_malloc)) || defined(__CRT_HAVE_malloc) || (__has_builtin(__builtin_calloc) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_calloc)) || defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_hcreate_r)) */
+#endif /* defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_malloc) || defined(__CRT_HAVE_hcreate_r) */
 #endif /* !__local_hcreate_defined */

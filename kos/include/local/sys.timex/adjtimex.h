@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb26e8f44 */
+/* HASH CRC-32:0x5c9b7d71 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_adjtimex_defined
-#if (defined(__CRT_HAVE_adjtimex) || defined(__CRT_HAVE___adjtimex) || defined(__CRT_HAVE_adjtimex64) || defined(__CRT_HAVE___adjtimex64))
+#if defined(__CRT_HAVE_adjtimex) || defined(__CRT_HAVE___adjtimex) || defined(__CRT_HAVE_adjtimex64) || defined(__CRT_HAVE___adjtimex64)
 #define __local_adjtimex_defined 1
 /* Dependency: "adjtimex32" from "sys.timex" */
 #ifndef ____localdep_adjtimex32_defined
@@ -41,7 +41,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_adjtimex64,(struct 
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_adjtimex64,(struct timex64 *__restrict __ntx),__adjtimex64,(__ntx))
 #elif defined(__CRT_HAVE_adjtimex) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_adjtimex64,(struct timex64 *__restrict __ntx),adjtimex,(__ntx))
-#elif (defined(__CRT_HAVE_adjtimex) || defined(__CRT_HAVE___adjtimex))
+#elif defined(__CRT_HAVE_adjtimex) || defined(__CRT_HAVE___adjtimex)
 #include <local/sys.timex/adjtimex64.h>
 #define __localdep_adjtimex64 (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(adjtimex64))
 #else /* CUSTOM: adjtimex64 */
@@ -152,5 +152,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(adjtimex))(struct timex *__restrict _
 	return __result;
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_adjtimex) || defined(__CRT_HAVE___adjtimex) || defined(__CRT_HAVE_adjtimex64) || defined(__CRT_HAVE___adjtimex64)) */
+#endif /* defined(__CRT_HAVE_adjtimex) || defined(__CRT_HAVE___adjtimex) || defined(__CRT_HAVE_adjtimex64) || defined(__CRT_HAVE___adjtimex64) */
 #endif /* !__local_adjtimex_defined */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x39ea6457 */
+/* HASH CRC-32:0x7982c71a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_remquof_defined
-#if ((__has_builtin(__builtin_remquo) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remquo)) || defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo))
+#if defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo)
 #define __local_remquof_defined 1
 /* Dependency: "remquo" */
 #ifndef ____localdep_remquo_defined
@@ -55,5 +55,5 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(remquof))(float __x,
 	return (float)__localdep_remquo((double)__x, (double)__y, __pquo);
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((__has_builtin(__builtin_remquo) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_remquo)) || defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo)) */
+#endif /* defined(__CRT_HAVE_remquo) || defined(__CRT_HAVE___remquo) */
 #endif /* !__local_remquof_defined */

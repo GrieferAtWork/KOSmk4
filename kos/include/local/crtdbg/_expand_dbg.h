@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x51e1698d */
+/* HASH CRC-32:0xf6240852 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__expand_dbg_defined
-#if (defined(__CRT_HAVE_realloc_in_place) || defined(__CRT_HAVE__expand))
+#if defined(__CRT_HAVE_realloc_in_place) || defined(__CRT_HAVE__expand)
 #define __local__expand_dbg_defined 1
 /* Dependency: "realloc_in_place" */
 #ifndef ____localdep_realloc_in_place_defined
@@ -56,5 +56,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(_expand_dbg))(void *__ptr,
 	return __localdep_realloc_in_place(__ptr, __num_bytes);
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_realloc_in_place) || defined(__CRT_HAVE__expand)) */
+#endif /* defined(__CRT_HAVE_realloc_in_place) || defined(__CRT_HAVE__expand) */
 #endif /* !__local__expand_dbg_defined */

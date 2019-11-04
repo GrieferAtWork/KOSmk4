@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2e0c6163 */
+/* HASH CRC-32:0x7dfb1d66 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_logf_defined
-#if ((__has_builtin(__builtin_log) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log)) || defined(__CRT_HAVE_log) || defined(__CRT_HAVE___log))
+#if defined(__CRT_HAVE_log) || defined(__CRT_HAVE___log)
 #define __local_logf_defined 1
 #include <bits/math-vector.h>
 #include <bits/math-vector.h>
@@ -47,5 +47,5 @@ __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(logf))(float __x) {
 	return (float)__localdep_log((double)__x);
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((__has_builtin(__builtin_log) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_log)) || defined(__CRT_HAVE_log) || defined(__CRT_HAVE___log)) */
+#endif /* defined(__CRT_HAVE_log) || defined(__CRT_HAVE___log) */
 #endif /* !__local_logf_defined */

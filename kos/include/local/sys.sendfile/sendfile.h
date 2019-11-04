@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb5d8ea6c */
+/* HASH CRC-32:0xec2f2475 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sendfile_defined
-#if (defined(__CRT_HAVE_sendfile) || defined(__CRT_HAVE_sendfile64))
+#if defined(__CRT_HAVE_sendfile) || defined(__CRT_HAVE_sendfile64)
 #define __local_sendfile_defined 1
 /* Dependency: "sendfile64" from "sys.sendfile" */
 #ifndef ____localdep_sendfile64_defined
@@ -95,5 +95,5 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(sendfile))(__fd_t __out_fd,
 #endif /* !__CRT_HAVE_mmap64 */
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_sendfile) || defined(__CRT_HAVE_sendfile64)) */
+#endif /* defined(__CRT_HAVE_sendfile) || defined(__CRT_HAVE_sendfile64) */
 #endif /* !__local_sendfile_defined */

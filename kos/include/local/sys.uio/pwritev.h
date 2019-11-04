@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x94e8917f */
+/* HASH CRC-32:0xc545a1d1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_pwritev_defined
-#if (defined(__CRT_HAVE_pwritev) || defined(__CRT_HAVE_pwritev64))
+#if defined(__CRT_HAVE_pwritev) || defined(__CRT_HAVE_pwritev64)
 #define __local_pwritev_defined 1
 /* Dependency: "pwritev64" from "sys.uio" */
 #ifndef ____localdep_pwritev64_defined
@@ -59,5 +59,5 @@ __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(pwritev))(__fd_t __fd,
 #endif
 }
 __NAMESPACE_LOCAL_END
-#endif /* (defined(__CRT_HAVE_pwritev) || defined(__CRT_HAVE_pwritev64)) */
+#endif /* defined(__CRT_HAVE_pwritev) || defined(__CRT_HAVE_pwritev64) */
 #endif /* !__local_pwritev_defined */
