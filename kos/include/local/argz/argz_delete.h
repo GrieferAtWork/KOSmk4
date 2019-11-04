@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe5e2d4ee */
+/* HASH CRC-32:0xe803bbe0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,6 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_argz_delete_defined
-#if ((__has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))
 #define __local_argz_delete_defined 1
 #ifdef __LIBC_BIND_OPTIMIZATIONS
 #include <optimized/string.h>
@@ -80,7 +79,7 @@ __LOCAL_LIBC(argz_delete) __ATTR_NONNULL((1, 2)) void
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_delete))(char **__restrict __pargz,
                                                          __SIZE_TYPE__ *__restrict __pargz_len,
                                                          char *__entry) {
-#line 357 "kos/src/libc/magic/argz.c"
+#line 355 "kos/src/libc/magic/argz.c"
 	__SIZE_TYPE__ __entrylen, __newlen;
 	if __unlikely(!__entry)
 		return;
@@ -88,7 +87,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_delete))(char **__restrict __par
 	__newlen    = *__pargz_len - __entrylen;
 	*__pargz_len = __newlen;
 	if __unlikely(__newlen == 0) {
+#if (__has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 		__localdep_free(*__pargz);
+#endif /* (__has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) */
 		*__pargz = __NULLPTR;
 		return;
 	}
@@ -97,5 +98,4 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_delete))(char **__restrict __par
 	        sizeof(char));
 }
 __NAMESPACE_LOCAL_END
-#endif /* ((__has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)) */
 #endif /* !__local_argz_delete_defined */

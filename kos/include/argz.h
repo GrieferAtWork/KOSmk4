@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0e13b76 */
+/* HASH CRC-32:0x565f5c74 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -379,7 +379,7 @@ __CDECLARE_VOID(__ATTR_NONNULL((1, 2)),__NOTHROW_NCX,argz_delete,(char **__restr
  * of the given `PARGZ & PARGZ_LEN', and not just a string equal to one
  * of the elements... (took me a while to realize this one) */
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),__NOTHROW_NCX,argz_delete,(char **__restrict __pargz, size_t *__restrict __pargz_len, char *__entry),__argz_add_sep,(__pargz,__pargz_len,__entry))
-#elif (__has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+#else /* LIBC: argz_delete */
 #include <local/argz/argz_delete.h>
 /* Delete `ENTRY' from `PARGZ & PARGZ_LEN', if it appears there
  * Note that `ENTRY' must be the actual pointer to one of the elements
@@ -405,7 +405,7 @@ __CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),__NOTHROW_NCX,__argz_delete,(char **__re
  * of the given `PARGZ & PARGZ_LEN', and not just a string equal to one
  * of the elements... (took me a while to realize this one) */
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),__NOTHROW_NCX,__argz_delete,(char **__restrict __pargz, size_t *__restrict __pargz_len, char *__entry),__argz_add_sep,(__pargz,__pargz_len,__entry))
-#elif (__has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
+#else /* LIBC: argz_delete */
 #include <local/argz/argz_delete.h>
 /* Delete `ENTRY' from `PARGZ & PARGZ_LEN', if it appears there
  * Note that `ENTRY' must be the actual pointer to one of the elements

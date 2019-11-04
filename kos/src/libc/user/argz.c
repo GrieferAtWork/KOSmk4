@@ -26,6 +26,7 @@
 #include "malloc.h"
 #include "string.h"
 #include "argz.h"
+#include <parts/errno.h>
 
 DECL_BEGIN
 
@@ -271,7 +272,9 @@ NOTHROW_NCX(LIBCCALL libc_argz_delete)(char **__restrict pargz,
 	newlen    = *pargz_len - entrylen;
 	*pargz_len = newlen;
 	if unlikely(newlen == 0) {
+#if (__has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 		libc_free(*pargz);
+#endif /* (__has_builtin(__builtin_free) && defined(__LIBC_BIND_CRTBUILTINS) && defined(__CRT_HAVE_free)) || defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree) */
 		*pargz = NULL;
 		return;
 	}

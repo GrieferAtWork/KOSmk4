@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd62cbcf5 */
+/* HASH CRC-32:0x7bea4664 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -609,6 +609,12 @@ __CRT_FUNCTION(endttyent,0,(),0,(),int)
 __CRT_FUNCTION(endusershell,0,(),0,(),void)
 __CRT_FUNCTION(endutent,0,(),0,(),void)
 __CRT_FUNCTION(endutxent,0,(),0,(),void)
+__CRT_FUNCTION(envz_add,0,(),4,(char **__restrict,penvz,size_t *__restrict,penvz_len,char const *__restrict,name,char const *,value),error_t)
+__CRT_FUNCTION(envz_entry,0,(),3,(char const *__restrict,envz,size_t,envz_len,char const *__restrict,name),char *)
+__CRT_FUNCTION(envz_get,0,(),3,(char const *__restrict,envz,size_t,envz_len,char const *__restrict,name),char *)
+__CRT_FUNCTION(envz_merge,0,(),5,(char **__restrict,penvz,size_t *__restrict,penvz_len,char const *__restrict,envz2,size_t,envz2_len,int,override_),error_t)
+__CRT_FUNCTION(envz_remove,0,(),3,(char **__restrict,penvz,size_t *__restrict,penvz_len,char const *__restrict,name),void)
+__CRT_FUNCTION(envz_strip,0,(),2,(char **__restrict,penvz,size_t *__restrict,penvz_len),void)
 __CRT_FUNCTION(eof,0,(),1,(fd_t,fd),int)
 __CRT_FUNCTION(epoll_create,0,(),1,(int,size),fd_t)
 __CRT_FUNCTION(epoll_create1,0,(),1,(int,flags),fd_t)

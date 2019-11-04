@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbb2e3add */
+/* HASH CRC-32:0xfd167cb4 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,11 +40,10 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(argz_stringify))(char *__argz,
                                                             __SIZE_TYPE__ __len,
                                                             int __sep) {
 #line 225 "kos/src/libc/magic/argz.c"
-	__SIZE_TYPE__ __i;
 	/* replace(base: argz, count: len - 1, old: '\0', new: sep); */
 	if __unlikely(!__len)
 		return;
-	for (__i = 0;;) {
+	for (;;) {
 		__SIZE_TYPE__ __temp;
 		__temp = __localdep_strlen(__argz) + 1;
 		if (__temp >= __len)

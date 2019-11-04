@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf30af6ff */
+/* HASH CRC-32:0x7f2a58f8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1720,6 +1720,12 @@
 #define __CRT_ATTR_NOTHROW_NCX_endrpcent 1
 #define __CRT_ATTR_NOTHROW_NCX_endusershell 1
 #define __CRT_ATTR_NOTHROW_NCX_endutent 1
+#define __CRT_ATTR_NOTHROW_NCX_envz_add 1
+#define __CRT_ATTR_NOTHROW_NCX_envz_entry 1
+#define __CRT_ATTR_NOTHROW_NCX_envz_get 1
+#define __CRT_ATTR_NOTHROW_NCX_envz_merge 1
+#define __CRT_ATTR_NOTHROW_NCX_envz_remove 1
+#define __CRT_ATTR_NOTHROW_NCX_envz_strip 1
 #define __CRT_ATTR_NOTHROW_NCX_eof 1
 #define __CRT_ATTR_NOTHROW_NCX_epoll_create 1
 #define __CRT_ATTR_NOTHROW_NCX_epoll_create1 1
@@ -4047,6 +4053,8 @@
 #define __CRT_ATTR_PURE_c32toimax 1
 #define __CRT_ATTR_PURE_c32toumax 1
 #define __CRT_ATTR_PURE_c32verscmp 1
+#define __CRT_ATTR_PURE_envz_entry 1
+#define __CRT_ATTR_PURE_envz_get 1
 #define __CRT_ATTR_PURE_fegetround 1
 #define __CRT_ATTR_PURE_fnmatch 1
 #define __CRT_ATTR_PURE_fuzzy_c16casecmp 1

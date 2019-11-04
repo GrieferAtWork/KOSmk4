@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xee883eca */
+/* HASH CRC-32:0x173cf530 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1691,6 +1691,12 @@
 #define __CRT_HAVE_endusershell 1
 #define __CRT_HAVE_endutent 1
 #define __CRT_HAVE_endutxent 1
+#define __CRT_HAVE_envz_add 1
+#define __CRT_HAVE_envz_entry 1
+#define __CRT_HAVE_envz_get 1
+#define __CRT_HAVE_envz_merge 1
+#define __CRT_HAVE_envz_remove 1
+#define __CRT_HAVE_envz_strip 1
 #define __CRT_HAVE_eof 1
 #define __CRT_HAVE_epoll_create 1
 #define __CRT_HAVE_epoll_create1 1

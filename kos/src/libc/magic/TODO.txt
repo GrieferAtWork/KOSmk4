@@ -3,7 +3,6 @@ Add a library `libcmdline' for encoding/decoding   char *cmdline <---> char *arg
 Add support for *_chk variants (using __builtin_object_size())
 
 argp.c
-envz.c
 err.c
 error.c
 langinfo.c

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8f36a82 */
+/* HASH CRC-32:0xf94a6c46 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -80,11 +80,10 @@ NOTHROW_NCX(LIBCCALL libc_argz_stringify)(char *argz,
                                           size_t len,
                                           int sep) {
 #line 225 "kos/src/libc/magic/argz.c"
-	size_t i;
 	/* replace(base: argz, count: len - 1, old: '\0', new: sep); */
 	if unlikely(!len)
 		return;
-	for (i = 0;;) {
+	for (;;) {
 		size_t temp;
 		temp = libc_strlen(argz) + 1;
 		if (temp >= len)

@@ -1738,6 +1738,12 @@
 #define __CRT_HAVE_endutent 1
 #define __CRT_HAVE_endutxent 1
 #define __CRT_HAVE_environ 1
+#define __CRT_HAVE_envz_add 1
+#define __CRT_HAVE_envz_entry 1
+#define __CRT_HAVE_envz_get 1
+#define __CRT_HAVE_envz_merge 1
+#define __CRT_HAVE_envz_remove 1
+#define __CRT_HAVE_envz_strip 1
 #define __CRT_HAVE_eof 1
 #define __CRT_HAVE_epoll_create 1
 #define __CRT_HAVE_epoll_create1 1

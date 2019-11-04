@@ -226,7 +226,7 @@
 	CB(PREFIX.fs.dir.*) \
 	CB(PREFIX.fs.stat_glc.* PREFIX.fs.stat.*) \
 	CB(PREFIX.fs.utility.*) \
-	CB(PREFIX.string.memory.*) \
+	CB(PREFIX.string.memory.* PREFIX.string.envz.*) \
 	CB(PREFIX.unicode.UTF.*) \
 	CB(PREFIX.unicode.static.memory.*) \
 	CB(PREFIX.unicode.static.ctype.*) \

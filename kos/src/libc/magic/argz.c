@@ -222,11 +222,10 @@ argz_extract:([inp(argz_len)] char const *__restrict argz, size_t argz_len, [non
 @@all the '\0's except the last into the character `SEP'
 [alias(__argz_stringify)]
 argz_stringify:(char *argz, size_t len, int sep) {
-	size_t i;
 	/* replace(base: argz, count: len - 1, old: '\0', new: sep); */
 	if unlikely(!len)
 		return;
-	for (i = 0;;) {
+	for (;;) {
 		size_t temp;
 		temp = strlen(argz) + 1;
 		if (temp >= len)
@@ -349,8 +348,7 @@ again_check_ch:
 @@Note that `ENTRY' must be the actual pointer to one of the elements
 @@of the given `PARGZ & PARGZ_LEN', and not just a string equal to one
 @@of the elements... (took me a while to realize this one)
-[alias(__argz_add_sep)][same_impl]
-[requires($has_function(free))]
+[alias(__argz_add_sep)][userimpl]
 argz_delete:([nonnull] char **__restrict pargz,
              [nonnull] size_t *__restrict pargz_len,
              [nullable] char *entry) {
@@ -361,7 +359,9 @@ argz_delete:([nonnull] char **__restrict pargz,
 	newlen    = *pargz_len - entrylen;
 	*pargz_len = newlen;
 	if unlikely(newlen == 0) {
+#if @@yield $has_function("free")@@
 		free(*pargz);
+#endif @@yield "/* " + $has_function("free") + " */"@@
 		*pargz = NULL;
 		return;
 	}
