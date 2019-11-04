@@ -525,7 +525,7 @@ __DECL_BEGIN
 #ifndef __errno
 #ifndef ____errno_location_defined
 #define ____errno_location_defined 1
-#if defined(__CRT_HAVE___errno_location)
+#ifdef __CRT_HAVE___errno_location
 __CDECLARE(__ATTR_WUNUSED __ATTR_CONST,int *,__NOTHROW_NCX,__errno_location,(void),())
 #elif defined(__CRT_HAVE__errno)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_CONST,int *,__NOTHROW_NCX,__errno_location,(void),_errno,())

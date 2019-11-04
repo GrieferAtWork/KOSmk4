@@ -1257,11 +1257,7 @@ truncate:([notnull] char const *file, __PIO_OFFSET length) -> int {
 #if defined(__CRT_HAVE_truncate64)
 	return truncate64(file, (__PIO_OFFSET64)length);
 #elif defined(__CRT_HAVE_truncate)
-#ifdef __USE_KOS
 	return truncate32(file, (__pos32_t)length);
-#else /* __USE_KOS */
-	return truncate32(file, (__off32_t)length);
-#endif /* !__USE_KOS */
 #else
 	int result;
 	fd_t fd;
@@ -1269,9 +1265,9 @@ truncate:([notnull] char const *file, __PIO_OFFSET length) -> int {
 	if __unlikely(fd < 0)
 		return -1;
 	result = ftruncate(fd, length);
-#if defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close)
+#if @@yield $has_function("close")@@
 	close(fd);
-#endif
+#endif @@yield "/* " + $has_function("close") + " */"@@
 	return result;
 #endif
 }
@@ -1310,9 +1306,9 @@ truncate64:([notnull] char const *file, __PIO_OFFSET64 length) -> int {
 	if __unlikely(fd < 0)
 		return -1;
 	result = ftruncate64(fd, length);
-#if defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close)
+#if @@yield $has_function("close")@@
 	close(fd);
-#endif
+#endif @@yield "/* " + $has_function("close") + " */"@@
 	return result;
 #endif
 }
@@ -1338,7 +1334,7 @@ fexecve:($fd_t fd, [notnull] @__TARGV@, [notnull] @__TENVP@) -> int;
 
 %
 %#if defined(__USE_MISC) || defined(__USE_XOPEN)
-[section(.text.crt.sched.param)][noexport][user]
+[section(.text.crt.sched.param)][userimpl]
 nice:(int inc) -> int {
 	(void)inc;
 	/* It should be sufficient to emulate this is a no-op. */

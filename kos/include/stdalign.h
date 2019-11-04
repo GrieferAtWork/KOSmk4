@@ -21,7 +21,7 @@
 
 #include "__stdinc.h"
 
-#ifndef __cplusplus /* TODO: Also define is not provided by the c++ compiler! */
+#ifndef __cplusplus /* XXX: Also define if not provided by the c++ compiler! */
 
 #ifndef __alignas_is_defined
 #define __alignas_is_defined 1

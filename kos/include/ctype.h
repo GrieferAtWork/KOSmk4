@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6b3430e */
+/* HASH CRC-32:0x8f902b9e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -412,10 +412,10 @@ __LOCAL __ATTR_WUNUSED __ATTR_CONST __BOOL __NOTHROW(__LIBCCALL __ascii_isblank)
 __NAMESPACE_INT_BEGIN
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__UINT16_TYPE__ const **,__NOTHROW,__ctype_b_loc,(void),())
 #ifndef __NO_XBLOCK
-#if defined(__CRT_HAVE___ctype_tolower_loc)
+#ifdef __CRT_HAVE___ctype_tolower_loc
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__INT32_TYPE__ const **,__NOTHROW,__ctype_tolower_loc,(void),())
 #endif /* __CRT_HAVE___ctype_tolower_loc */
-#if defined(__CRT_HAVE___ctype_toupper_loc)
+#ifdef __CRT_HAVE___ctype_toupper_loc
 __CDECLARE(__ATTR_CONST __ATTR_RETNONNULL __ATTR_WUNUSED,__INT32_TYPE__ const **,__NOTHROW,__ctype_toupper_loc,(void),())
 #endif /* __CRT_HAVE___ctype_toupper_loc */
 #endif /* !__NO_XBLOCK */
@@ -480,10 +480,10 @@ __NAMESPACE_INT_END
 #endif /* !__USE_XOPEN2K8 */
 #endif /* __BYTE_ORDER__ != __ORDER_BIG_ENDIAN__ */
 #ifndef __NO_XBLOCK
-#if defined(__CRT_HAVE___ctype_tolower_loc)
+#ifdef __CRT_HAVE___ctype_tolower_loc
 #define __inline_tolower(ch)  __XBLOCK({ int __tol_ch = (int)(ch); __XRETURN __tol_ch >= -128 && __tol_ch < 256 ? (*__ctype_tolower_loc())[__tol_ch] : __tol_ch; })
 #endif /* __CRT_HAVE___ctype_tolower_loc */
-#if defined(__CRT_HAVE___ctype_toupper_loc)
+#ifdef __CRT_HAVE___ctype_toupper_loc
 #define __inline_toupper(ch)  __XBLOCK({ int __tol_ch = (int)(ch); __XRETURN __tol_ch >= -128 && __tol_ch < 256 ? (*__ctype_toupper_loc())[__tol_ch] : __tol_ch; })
 #endif /* __CRT_HAVE___ctype_toupper_loc */
 #endif /* !__NO_XBLOCK */

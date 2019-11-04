@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4f9a3ad9 */
+/* HASH CRC-32:0xa29d6f6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -46,7 +46,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(toupper) __ATTR_CONST __ATTR_WUNUSED int
 __NOTHROW(__LIBCCALL __LIBC_LOCAL_NAME(toupper))(int __ch) {
 #line 299 "kos/src/libc/magic/ctype.c"
-#if defined(__CRT_HAVE___ctype_toupper_loc) && defined(__CRT_CYG)
+#if (defined(__CRT_HAVE___ctype_toupper_loc)) && defined(__CRT_CYG)
 	return __ch >= -128 && __ch < 256 ? (*__localdep___ctype_toupper_loc())[__ch] : __ch;
 #else
 	return __localdep_islower(__ch) ? ((__UINT8_TYPE__)__ch-0x20) : __ch;

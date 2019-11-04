@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x833aaaba */
+/* HASH CRC-32:0xd7c83fe7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -47,7 +47,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(ftruncate64) int
 __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(ftruncate64))(__fd_t __fd,
                                                          __PIO_OFFSET64 __length) {
-#line 1663 "kos/src/libc/magic/unistd.c"
+#line 1659 "kos/src/libc/magic/unistd.c"
 	return __localdep_ftruncate32(__fd, (__pos32_t)__length);
 }
 __NAMESPACE_LOCAL_END

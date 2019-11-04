@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x242b0ca2 */
+/* HASH CRC-32:0xb1dc3f6c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -1427,7 +1427,7 @@ struct tm {
 	int         tm_wday;     /* day of week [0, 6] (Sunday = 0). */
 	int         tm_yday;     /* day of year [0, 365]. */
 	int         tm_isdst;    /* daylight savings flag. */
-#if defined(__CRT_GLC)
+#ifdef __CRT_GLC
 #ifdef __USE_MISC
 	long int    tm_gmtoff;   /* Seconds east of UTC. */
 	char const *tm_zone;     /* Timezone abbreviation. */
@@ -1435,7 +1435,7 @@ struct tm {
 	long int    __tm_gmtoff; /* Seconds east of UTC. */
 	char const *__tm_zone;   /* Timezone abbreviation. */
 #endif /* !__USE_MISC */
-#endif /* !... */
+#endif /* __CRT_GLC */
 };
 __NAMESPACE_STD_END
 #endif /* !__std_tm_defined */
@@ -1470,7 +1470,7 @@ struct tm {
 	int         tm_wday;     /* day of week [0, 6] (Sunday = 0). */
 	int         tm_yday;     /* day of year [0, 365]. */
 	int         tm_isdst;    /* daylight savings flag. */
-#if defined(__CRT_GLC)
+#ifdef __CRT_GLC
 #ifdef __USE_MISC
 	long int    tm_gmtoff;   /* Seconds east of UTC. */
 	char const *tm_zone;     /* Timezone abbreviation. */
@@ -1478,7 +1478,7 @@ struct tm {
 	long int    __tm_gmtoff; /* Seconds east of UTC. */
 	char const *__tm_zone;   /* Timezone abbreviation. */
 #endif /* !__USE_MISC */
-#endif /* !... */
+#endif /* __CRT_GLC */
 };
 __NAMESPACE_STD_END
 #endif /* !__std_tm_defined */

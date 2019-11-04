@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2659c817 */
+/* HASH CRC-32:0x8fb70d7b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -160,11 +160,7 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(c16truncate))(__CHAR16_TYPE__ const *
 #if defined(__CRT_HAVE_wtruncate64)
 	return __localdep_c16truncate64(__file, (__PIO_OFFSET64)__length);
 #elif defined(__CRT_HAVE_wtruncate)
-#ifdef __USE_KOS
 	return __localdep_c16truncate32(__file, (__pos32_t)__length);
-#else /* __USE_KOS */
-	return __localdep_c16truncate32(__file, (__off32_t)__length);
-#endif /* !__USE_KOS */
 #else
 	int __result;
 	__fd_t __fd;
@@ -172,9 +168,9 @@ __NOTHROW_NCX(__LIBCCALL __LIBC_LOCAL_NAME(c16truncate))(__CHAR16_TYPE__ const *
 	if __unlikely(__fd < 0)
 		return -1;
 	__result = __localdep_ftruncate(__fd, __length);
-#if defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close)
+#if defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close)
 	__localdep_close(__fd);
-#endif
+#endif /* defined(__CRT_HAVE_close) || defined(__CRT_HAVE__close) || defined(__CRT_HAVE___close) */
 	return __result;
 #endif
 }

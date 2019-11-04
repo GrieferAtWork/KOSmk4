@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc0896a92 */
+/* HASH CRC-32:0x88fc9a9 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ __NAMESPACE_LOCAL_BEGIN
 __LOCAL_LIBC(wsymlink) __ATTR_NONNULL((1, 2)) int
 __NOTHROW_RPC(__LIBCCALL __LIBC_LOCAL_NAME(wsymlink))(__WCHAR_TYPE__ const *__link_text,
                                                       __WCHAR_TYPE__ const *__target_path) {
-#line 1490 "kos/src/libc/magic/unistd.c"
+#line 1486 "kos/src/libc/magic/unistd.c"
 	/* TODO: Header-implementation for `symlink()' on DOS (using the windows API) */
 	return __localdep_wsymlinkat(__link_text, __CRT_AT_FDCWD, __target_path);
 }

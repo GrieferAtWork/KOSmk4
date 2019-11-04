@@ -4792,7 +4792,7 @@ __FORCELOCAL __ATTR_WUNUSED __ATTR_CONST size_t __NOTHROW(__LIBCCALL __forward_s
 __NAMESPACE_STD_END
 #ifndef __CXX_SYSTEM_HEADER
 __NAMESPACE_STD_USING(__forward_size)
-#endif
+#endif /* !__CXX_SYSTEM_HEADER */
 #define strlen(x) __forward_size(__builtin_constant_p(x) ? __builtin_strlen(x) : (__NAMESPACE_STD_SYM strlen)(x))
 #else /* __cplusplus */
 #define strlen(x) (__builtin_constant_p(x) ? __builtin_strlen(x) : (strlen)(x))
