@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x722ccd28 */
+/* HASH CRC-32:0xee883eca */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -464,6 +464,18 @@
 #define __CRT_HAVE___acosl 1
 #define __CRT_HAVE___adjtimex 1
 #define __CRT_HAVE___adjtimex64 1
+#define __CRT_HAVE___argz_add 1
+#define __CRT_HAVE___argz_add_sep 1
+#define __CRT_HAVE___argz_append 1
+#define __CRT_HAVE___argz_count 1
+#define __CRT_HAVE___argz_create 1
+#define __CRT_HAVE___argz_create_sep 1
+#define __CRT_HAVE___argz_delete 1
+#define __CRT_HAVE___argz_extract 1
+#define __CRT_HAVE___argz_insert 1
+#define __CRT_HAVE___argz_next 1
+#define __CRT_HAVE___argz_replace 1
+#define __CRT_HAVE___argz_stringify 1
 #define __CRT_HAVE___asin 1
 #define __CRT_HAVE___asinf 1
 #define __CRT_HAVE___asinh 1
@@ -815,6 +827,7 @@
 #define __CRT_HAVE___strcoll_l 1
 #define __CRT_HAVE___strdup 1
 #define __CRT_HAVE___strerror_r 1
+#define __CRT_HAVE___strfmon_l 1
 #define __CRT_HAVE___strftime_l 1
 #define __CRT_HAVE___strncasecmp_l 1
 #define __CRT_HAVE___strndup 1
@@ -1510,6 +1523,18 @@
 #define __CRT_HAVE_aligned_alloc 1
 #define __CRT_HAVE_alphasort 1
 #define __CRT_HAVE_alphasort64 1
+#define __CRT_HAVE_argz_add 1
+#define __CRT_HAVE_argz_add_sep 1
+#define __CRT_HAVE_argz_append 1
+#define __CRT_HAVE_argz_count 1
+#define __CRT_HAVE_argz_create 1
+#define __CRT_HAVE_argz_create_sep 1
+#define __CRT_HAVE_argz_delete 1
+#define __CRT_HAVE_argz_extract 1
+#define __CRT_HAVE_argz_insert 1
+#define __CRT_HAVE_argz_next 1
+#define __CRT_HAVE_argz_replace 1
+#define __CRT_HAVE_argz_stringify 1
 #define __CRT_HAVE_asctime 1
 #define __CRT_HAVE_asctime_r 1
 #define __CRT_HAVE_asctime_s 1

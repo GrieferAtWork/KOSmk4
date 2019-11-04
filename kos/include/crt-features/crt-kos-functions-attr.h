@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x18fa17f */
+/* HASH CRC-32:0xf30af6ff */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -606,6 +606,18 @@
 #define __CRT_ATTR_NOTHROW_NCX___acoshl 1
 #define __CRT_ATTR_NOTHROW_NCX___acosl 1
 #define __CRT_ATTR_NOTHROW_NCX___adjtimex 1
+#define __CRT_ATTR_NOTHROW_NCX___argz_add 1
+#define __CRT_ATTR_NOTHROW_NCX___argz_add_sep 1
+#define __CRT_ATTR_NOTHROW_NCX___argz_append 1
+#define __CRT_ATTR_NOTHROW_NCX___argz_count 1
+#define __CRT_ATTR_NOTHROW_NCX___argz_create 1
+#define __CRT_ATTR_NOTHROW_NCX___argz_create_sep 1
+#define __CRT_ATTR_NOTHROW_NCX___argz_delete 1
+#define __CRT_ATTR_NOTHROW_NCX___argz_extract 1
+#define __CRT_ATTR_NOTHROW_NCX___argz_insert 1
+#define __CRT_ATTR_NOTHROW_NCX___argz_next 1
+#define __CRT_ATTR_NOTHROW_NCX___argz_replace 1
+#define __CRT_ATTR_NOTHROW_NCX___argz_stringify 1
 #define __CRT_ATTR_NOTHROW_NCX___asin 1
 #define __CRT_ATTR_NOTHROW_NCX___asinf 1
 #define __CRT_ATTR_NOTHROW_NCX___asinh 1
@@ -1292,6 +1304,18 @@
 #define __CRT_ATTR_NOTHROW_NCX_aligned_alloc 1
 #define __CRT_ATTR_NOTHROW_NCX_alphasort 1
 #define __CRT_ATTR_NOTHROW_NCX_alphasort64 1
+#define __CRT_ATTR_NOTHROW_NCX_argz_add 1
+#define __CRT_ATTR_NOTHROW_NCX_argz_add_sep 1
+#define __CRT_ATTR_NOTHROW_NCX_argz_append 1
+#define __CRT_ATTR_NOTHROW_NCX_argz_count 1
+#define __CRT_ATTR_NOTHROW_NCX_argz_create 1
+#define __CRT_ATTR_NOTHROW_NCX_argz_create_sep 1
+#define __CRT_ATTR_NOTHROW_NCX_argz_delete 1
+#define __CRT_ATTR_NOTHROW_NCX_argz_extract 1
+#define __CRT_ATTR_NOTHROW_NCX_argz_insert 1
+#define __CRT_ATTR_NOTHROW_NCX_argz_next 1
+#define __CRT_ATTR_NOTHROW_NCX_argz_replace 1
+#define __CRT_ATTR_NOTHROW_NCX_argz_stringify 1
 #define __CRT_ATTR_NOTHROW_NCX_asctime 1
 #define __CRT_ATTR_NOTHROW_NCX_asctime_r 1
 #define __CRT_ATTR_NOTHROW_NCX_asctime_s 1
@@ -3859,6 +3883,8 @@
 
 
 /* ATTR_PURE */
+#define __CRT_ATTR_PURE___argz_count 1
+#define __CRT_ATTR_PURE___argz_next 1
 #define __CRT_ATTR_PURE___fbufsize 1
 #define __CRT_ATTR_PURE___flbf 1
 #define __CRT_ATTR_PURE___fpending 1
@@ -3914,6 +3940,8 @@
 #define __CRT_ATTR_PURE_a64l 1
 #define __CRT_ATTR_PURE_alphasort 1
 #define __CRT_ATTR_PURE_alphasort64 1
+#define __CRT_ATTR_PURE_argz_count 1
+#define __CRT_ATTR_PURE_argz_next 1
 #define __CRT_ATTR_PURE_atoi 1
 #define __CRT_ATTR_PURE_atol 1
 #define __CRT_ATTR_PURE_atoll 1

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd4fd0508 */
+/* HASH CRC-32:0x3db34fd0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,6 +53,8 @@ __LIBC __ATTR_NONNULL((1, 3)) __ATTR_LIBC_STRFMON(3, 4) ssize_t __NOTHROW_NCX(__
 #ifdef __USE_XOPEN2K8
 #if defined(__CRT_HAVE_strfmon_l)
 __LIBC __ATTR_NONNULL((1, 4)) __ATTR_LIBC_STRFMON(4, 5) ssize_t __NOTHROW_NCX(__VLIBCCALL strfmon_l)(char *__restrict __s, size_t __maxsize, __locale_t __loc, const char *__restrict __format, ...) __CASMNAME_SAME("strfmon_l");
+#elif defined(__CRT_HAVE___strfmon_l) && !defined(__NO_ASMNAME)
+__LIBC __ATTR_NONNULL((1, 4)) __ATTR_LIBC_STRFMON(4, 5) ssize_t __NOTHROW_NCX(__VLIBCCALL strfmon_l)(char *__restrict __s, size_t __maxsize, __locale_t __loc, const char *__restrict __format, ...) __CASMNAME("__strfmon_l");
 #endif /* strfmon_l... */
 #endif /* __USE_XOPEN2K8 */
 #endif /* __CC__ */

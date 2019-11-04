@@ -65,11 +65,13 @@ NOTHROW_NCX(VLIBCCALL libc_strfmon_l)(char *__restrict s,
 
 
 
-/*[[[start:exports,hash:CRC-32=0x6301ef2b]]]*/
+/*[[[start:exports,hash:CRC-32=0x8cfe79bd]]]*/
 #undef strfmon
 #undef strfmon_l
+#undef __strfmon_l
 DEFINE_PUBLIC_WEAK_ALIAS(strfmon, libc_strfmon);
 DEFINE_PUBLIC_WEAK_ALIAS(strfmon_l, libc_strfmon_l);
+DEFINE_PUBLIC_WEAK_ALIAS(__strfmon_l, libc_strfmon_l);
 /*[[[end:exports]]]*/
 
 DECL_END
