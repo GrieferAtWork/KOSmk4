@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3312cc54 */
+/* HASH CRC-32:0xf6cda539 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "__signbit" */
 #ifndef ____localdep___signbit_defined
 #define ____localdep___signbit_defined 1
-#if defined(__CRT_HAVE___signbit)
+#ifdef __CRT_HAVE___signbit
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___signbit,(double __val),__signbit,(__val))
 #elif defined(__CRT_HAVE__dsign)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___signbit,(double __val),_dsign,(__val))

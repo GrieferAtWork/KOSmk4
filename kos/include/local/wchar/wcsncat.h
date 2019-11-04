@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1392e0f */
+/* HASH CRC-32:0x3e6f3a33 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "wcsnlen" from "wchar" */
 #ifndef ____localdep_wcsnlen_defined
 #define ____localdep_wcsnlen_defined 1
-#if defined(__CRT_HAVE_wcsnlen)
+#ifdef __CRT_HAVE_wcsnlen
 /* Same as `wcslen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsnlen,(__WCHAR_TYPE__ const *__restrict __string, __SIZE_TYPE__ __maxlen),wcsnlen,(__string,__maxlen))
 #else /* LIBC: wcsnlen */
@@ -35,7 +35,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHR
 /* Dependency: "wcsend" from "wchar" */
 #ifndef ____localdep_wcsend_defined
 #define ____localdep_wcsend_defined 1
-#if defined(__CRT_HAVE_wcsend)
+#ifdef __CRT_HAVE_wcsend
 /* Same as `STR+wcslen(STR)' */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wcsend,(__WCHAR_TYPE__ const *__restrict __string),wcsend,(__string))
 #else /* LIBC: wcsend */
@@ -48,7 +48,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__W
 /* Dependency: "wmemcpy" from "wchar" */
 #ifndef ____localdep_wmemcpy_defined
 #define ____localdep_wmemcpy_defined 1
-#if defined(__CRT_HAVE_wmemcpy)
+#ifdef __CRT_HAVE_wmemcpy
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemcpy,(__WCHAR_TYPE__ *__restrict __dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),wmemcpy,(__dst,__src,__num_chars))
 #elif defined(__CRT_HAVE_memcpyw) && (__SIZEOF_WCHAR_T__ == 2)
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemcpy,(__WCHAR_TYPE__ *__restrict __dst, __WCHAR_TYPE__ const *__restrict __src, __SIZE_TYPE__ __num_chars),memcpyw,(__dst,__src,__num_chars))

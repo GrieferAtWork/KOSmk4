@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4c1ec430 */
+/* HASH CRC-32:0xe7721bc8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -77,46 +77,46 @@ enum {
 
 #ifdef __CC__
 
-#if defined(__CRT_HAVE___fbufsize)
+#ifdef __CRT_HAVE___fbufsize
 /* Return the size of the buffer of FP in bytes currently in use by the given stream */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__fbufsize,(__FILE *__fp),(__fp))
 #endif /* __fbufsize... */
-#if defined(__CRT_HAVE___freading)
+#ifdef __CRT_HAVE___freading
 /* Return non-zero value iff the stream FP is opened readonly,
  * or if the last operation on the stream was a read operation */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__freading,(__FILE *__fp),(__fp))
 #endif /* __freading... */
-#if defined(__CRT_HAVE___fwriting)
+#ifdef __CRT_HAVE___fwriting
 /* Return non-zero value iff the stream FP is opened write-only or
  * append-only, or if the last operation on the stream was a write
  * operation */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__fwriting,(__FILE *__fp),(__fp))
 #endif /* __fwriting... */
-#if defined(__CRT_HAVE___freadable)
+#ifdef __CRT_HAVE___freadable
 /* Return non-zero value iff stream FP is not opened write-only or append-only */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__freadable,(__FILE *__fp),(__fp))
 #endif /* __freadable... */
-#if defined(__CRT_HAVE___fwritable)
+#ifdef __CRT_HAVE___fwritable
 /* Return non-zero value iff stream FP is not opened read-only */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__fwritable,(__FILE *__fp),(__fp))
 #endif /* __fwritable... */
-#if defined(__CRT_HAVE___flbf)
+#ifdef __CRT_HAVE___flbf
 /* Return non-zero value iff the stream FP is line-buffered */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__flbf,(__FILE *__fp),(__fp))
 #endif /* __flbf... */
-#if defined(__CRT_HAVE___fpurge)
+#ifdef __CRT_HAVE___fpurge
 /* Discard all pending buffered I/O on the stream FP */
 __CDECLARE_VOID(__ATTR_NONNULL((1)),__NOTHROW_NCX,__fpurge,(__FILE *__fp),(__fp))
 #endif /* __fpurge... */
-#if defined(__CRT_HAVE___fpending)
+#ifdef __CRT_HAVE___fpending
 /* Return amount of output in bytes pending on a stream FP */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),size_t,__NOTHROW_NCX,__fpending,(__FILE *__fp),(__fp))
 #endif /* __fpending... */
-#if defined(__CRT_HAVE__flushlbf)
+#ifdef __CRT_HAVE__flushlbf
 /* Flush all line-buffered files */
 __CDECLARE_VOID(,__NOTHROW_NCX,_flushlbf,(void),())
 #endif /* _flushlbf... */
-#if defined(__CRT_HAVE___fsetlocking)
+#ifdef __CRT_HAVE___fsetlocking
 /* Set locking status of stream FP to TYPE */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__fsetlocking,(__FILE *__fp, int __type),(__fp,__type))
 #endif /* __fsetlocking... */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd8b99b0f */
+/* HASH CRC-32:0x52e810c0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,7 +34,7 @@ struct format_aprintf_data {
 /* Dependency: "format_vprintf" from "format-printer" */
 #ifndef ____localdep_format_vprintf_defined
 #define ____localdep_format_vprintf_defined 1
-#if defined(__CRT_HAVE_format_vprintf)
+#ifdef __CRT_HAVE_format_vprintf
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings
@@ -219,7 +219,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 3)) __ATTR_LIBC_PRINTF(3, 0),__SSIZE_TYPE__,,__lo
 /* Dependency: "format_aprintf_printer" from "format-printer" */
 #ifndef ____localdep_format_aprintf_printer_defined
 #define ____localdep_format_aprintf_printer_defined 1
-#if defined(__CRT_HAVE_format_aprintf_printer)
+#ifdef __CRT_HAVE_format_aprintf_printer
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_aprintf_printer,(/*struct format_aprintf_data **/void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen),format_aprintf_printer,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_realloc)
@@ -250,7 +250,7 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_free,(void *__mallptr),cfree,(__mallp
 /* Dependency: "format_aprintf_pack" from "format-printer" */
 #ifndef ____localdep_format_aprintf_pack_defined
 #define ____localdep_format_aprintf_pack_defined 1
-#if defined(__CRT_HAVE_format_aprintf_pack)
+#ifdef __CRT_HAVE_format_aprintf_pack
 /* Pack and finalize a given aprintf format printer
  * Together with `format_aprintf_printer()', the aprintf
  * format printer sub-system should be used as follows:

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8cf9ddc0 */
+/* HASH CRC-32:0x4c79212d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "vstrdupf" from "string" */
 #ifndef ____localdep_vstrdupf_defined
 #define ____localdep_vstrdupf_defined 1
-#if defined(__CRT_HAVE_vstrdupf)
+#ifdef __CRT_HAVE_vstrdupf
 /* Print the given `FORMAT' into a newly allocated, heap-allocated string */
 __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_LIBC_PRINTF(1, 0),char *,__NOTHROW_NCX,__localdep_vstrdupf,(char const *__restrict __format, __builtin_va_list __args),vstrdupf,(__format,__args))
 #elif ((defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_pack)) && (defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_format_aprintf_printer)) && (defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree))) || defined(__CRT_HAVE_vasprintf)

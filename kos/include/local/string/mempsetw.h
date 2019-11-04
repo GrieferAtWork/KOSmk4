@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2e84f9e3 */
+/* HASH CRC-32:0xcf8ad7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 /* Dependency: "memsetw" from "string" */
 #ifndef ____localdep_memsetw_defined
 #define ____localdep_memsetw_defined 1
-#if defined(__fast_memsetw_defined)
+#ifdef __fast_memsetw_defined
 /* Fill memory with a given word */
 #define __localdep_memsetw (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memsetw))
 #elif defined(__CRT_HAVE_memsetw)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x17c08774 */
+/* HASH CRC-32:0x3d4a120c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 /* Dependency: "_vprintf_s_l" from "stdio" */
 #ifndef ____localdep__vprintf_s_l_defined
 #define ____localdep__vprintf_s_l_defined 1
-#if defined(__CRT_HAVE__vprintf_s_l)
+#ifdef __CRT_HAVE__vprintf_s_l
 __CREDIRECT(__ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 0),__STDC_INT_AS_SIZE_T,,__localdep__vprintf_s_l,(char const *__restrict __format, __locale_t __locale, __builtin_va_list __args),_vprintf_s_l,(__format,__locale,__args)) __THROWS(...)
 #elif defined(__CRT_HAVE__vprintf_l)
 __CREDIRECT(__ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 0),__STDC_INT_AS_SIZE_T,,__localdep__vprintf_s_l,(char const *__restrict __format, __locale_t __locale, __builtin_va_list __args),_vprintf_l,(__format,__locale,__args)) __THROWS(...)

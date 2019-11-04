@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x52054ee9 */
+/* HASH CRC-32:0x14ff5a0b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,7 +66,7 @@ struct pollfd {
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 #endif /* !__pollfd_defined */
 
-#if defined(__CRT_HAVE_poll)
+#ifdef __CRT_HAVE_poll
 /* @param timeout: Timeout in milliseconds (or negative for infinity) */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,poll,(struct pollfd *__fds, nfds_t __nfds, int __timeout),(__fds,__nfds,__timeout))
 #elif defined(__CRT_HAVE___poll)
@@ -84,7 +84,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ppoll, __FORCELOCAL __ATTR_NONNULL((1)) int __NO
 #endif /* ppoll... */
 
 #ifdef __USE_TIME64
-#if defined(__CRT_HAVE_ppoll64)
+#ifdef __CRT_HAVE_ppoll64
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,ppoll64,(struct pollfd *__fds, nfds_t __nfds, struct timespec64 const *__timeout, struct __sigset_struct const *__ss),(__fds,__nfds,__timeout,__ss))
 #elif defined(__CRT_HAVE_ppoll) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,ppoll64,(struct pollfd *__fds, nfds_t __nfds, struct timespec64 const *__timeout, struct __sigset_struct const *__ss),ppoll,(__fds,__nfds,__timeout,__ss))

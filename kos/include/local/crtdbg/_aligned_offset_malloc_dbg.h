@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2f73608d */
+/* HASH CRC-32:0x629ca39a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "_aligned_offset_malloc" from "stdlib" */
 #ifndef ____localdep__aligned_offset_malloc_defined
 #define ____localdep__aligned_offset_malloc_defined 1
-#if defined(__CRT_HAVE__aligned_offset_malloc)
+#ifdef __CRT_HAVE__aligned_offset_malloc
 __CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,__localdep__aligned_offset_malloc,(__SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset),_aligned_offset_malloc,(__num_bytes,__min_alignment,__offset))
 #elif defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_malloc)
 #include <local/stdlib/_aligned_offset_malloc.h>

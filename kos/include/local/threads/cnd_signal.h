@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c83dc1a */
+/* HASH CRC-32:0x4c8170f8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_cnd_signal_defined
-#if defined(__CRT_HAVE_pthread_cond_signal)
+#ifdef __CRT_HAVE_pthread_cond_signal
 #define __local_cnd_signal_defined 1
 #include <bits/threads.h>
 
@@ -26,7 +26,7 @@
 /* Dependency: "pthread_cond_signal" */
 #ifndef ____localdep_pthread_cond_signal_defined
 #define ____localdep_pthread_cond_signal_defined 1
-#if defined(__CRT_HAVE_pthread_cond_signal)
+#ifdef __CRT_HAVE_pthread_cond_signal
 /* Wake up one thread waiting for condition variable COND */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pthread_cond_signal,(__pthread_cond_t *__cond),pthread_cond_signal,(__cond))
 #else /* LIBC: pthread_cond_signal */

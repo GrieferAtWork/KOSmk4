@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x115eda3c */
+/* HASH CRC-32:0x50c96e7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -95,7 +95,7 @@ typedef __CHAR32_TYPE__ char32_t;
 #define __STD_UTF_32__ 1
 
 __NAMESPACE_STD_BEGIN
-#if defined(__CRT_HAVE_mbrtoc16)
+#ifdef __CRT_HAVE_mbrtoc16
 __CDECLARE(,size_t,__NOTHROW_NCX,mbrtoc16,(char16_t *__restrict __pc16, char const *__restrict __s, size_t __n, __mbstate_t *__restrict __mbs),(__pc16,__s,__n,__mbs))
 #else /* LIBC: mbrtoc16 */
 __NAMESPACE_STD_END
@@ -103,7 +103,7 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(mbrtoc16, __FORCELOCAL size_t __NOTHROW_NCX(__LIBCCALL mbrtoc16)(char16_t *__restrict __pc16, char const *__restrict __s, size_t __n, __mbstate_t *__restrict __mbs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mbrtoc16))(__pc16, __s, __n, __mbs); })
 #endif /* mbrtoc16... */
-#if defined(__CRT_HAVE_mbrtoc32)
+#ifdef __CRT_HAVE_mbrtoc32
 __CDECLARE(,size_t,__NOTHROW_NCX,mbrtoc32,(char32_t *__restrict __pc32, char const *__restrict __s, size_t __n, __mbstate_t *__restrict __mbs),(__pc32,__s,__n,__mbs))
 #else /* LIBC: mbrtoc32 */
 __NAMESPACE_STD_END
@@ -111,7 +111,7 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(mbrtoc32, __FORCELOCAL size_t __NOTHROW_NCX(__LIBCCALL mbrtoc32)(char32_t *__restrict __pc32, char const *__restrict __s, size_t __n, __mbstate_t *__restrict __mbs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mbrtoc32))(__pc32, __s, __n, __mbs); })
 #endif /* mbrtoc32... */
-#if defined(__CRT_HAVE_c16rtomb)
+#ifdef __CRT_HAVE_c16rtomb
 __CDECLARE(,size_t,__NOTHROW_NCX,c16rtomb,(char *__restrict __s, char16_t __c16, __mbstate_t *__restrict __mbs),(__s,__c16,__mbs))
 #else /* LIBC: c16rtomb */
 __NAMESPACE_STD_END
@@ -119,7 +119,7 @@ __NAMESPACE_STD_END
 __NAMESPACE_STD_BEGIN
 __NAMESPACE_LOCAL_USING_OR_IMPL(c16rtomb, __FORCELOCAL size_t __NOTHROW_NCX(__LIBCCALL c16rtomb)(char *__restrict __s, char16_t __c16, __mbstate_t *__restrict __mbs) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16rtomb))(__s, __c16, __mbs); })
 #endif /* c16rtomb... */
-#if defined(__CRT_HAVE_c32rtomb)
+#ifdef __CRT_HAVE_c32rtomb
 __CDECLARE(,size_t,__NOTHROW_NCX,c32rtomb,(char *__restrict __s, char32_t __c32, __mbstate_t *__restrict __mbs),(__s,__c32,__mbs))
 #else /* LIBC: c32rtomb */
 __NAMESPACE_STD_END

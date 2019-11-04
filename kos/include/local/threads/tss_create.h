@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd55840e9 */
+/* HASH CRC-32:0x656ba94a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_tss_create_defined
-#if defined(__CRT_HAVE_pthread_key_create)
+#ifdef __CRT_HAVE_pthread_key_create
 #define __local_tss_create_defined 1
 #ifndef ____pthread_destr_function_t_defined
 #define ____pthread_destr_function_t_defined 1
@@ -30,7 +30,7 @@ typedef void (__LIBCCALL *__pthread_destr_function_t)(void *);
 /* Dependency: "pthread_key_create" */
 #ifndef ____localdep_pthread_key_create_defined
 #define ____localdep_pthread_key_create_defined 1
-#if defined(__CRT_HAVE_pthread_key_create)
+#ifdef __CRT_HAVE_pthread_key_create
 /* Create a key value identifying a location in the thread-specific
  * data area. Each thread maintains a distinct thread-specific data
  * area. DESTR_FUNCTION, if non-NULL, is called with the value

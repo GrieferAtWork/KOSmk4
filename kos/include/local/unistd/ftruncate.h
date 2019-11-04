@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x93b4064b */
+/* HASH CRC-32:0xe6919335 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "ftruncate32" from "unistd" */
 #ifndef ____localdep_ftruncate32_defined
 #define ____localdep_ftruncate32_defined 1
-#if defined(__CRT_HAVE_ftruncate)
+#ifdef __CRT_HAVE_ftruncate
 /* >> ftruncate(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate32,(__fd_t __fd, __pos32_t __length),ftruncate,(__fd,__length))
@@ -35,7 +35,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate32,(__fd_t __fd, __pos32_t __
 /* Dependency: "ftruncate64" from "unistd" */
 #ifndef ____localdep_ftruncate64_defined
 #define ____localdep_ftruncate64_defined 1
-#if defined(__CRT_HAVE_ftruncate64)
+#ifdef __CRT_HAVE_ftruncate64
 /* >> ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate64,(__fd_t __fd, __PIO_OFFSET64 __length),ftruncate64,(__fd,__length))

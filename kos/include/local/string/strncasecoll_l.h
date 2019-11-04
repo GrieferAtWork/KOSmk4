@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb2b464eb */
+/* HASH CRC-32:0x6e55c004 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "strncasecoll" from "string" */
 #ifndef ____localdep_strncasecoll_defined
 #define ____localdep_strncasecoll_defined 1
-#if defined(__CRT_HAVE_strncasecoll)
+#ifdef __CRT_HAVE_strncasecoll
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strncasecoll,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen),strncasecoll,(__s1,__s2,__maxlen))
 #elif defined(__CRT_HAVE__strnicoll)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strncasecoll,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen),_strnicoll,(__s1,__s2,__maxlen))

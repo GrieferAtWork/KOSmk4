@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x45ce45e8 */
+/* HASH CRC-32:0xf318b3f2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "rawmemchrw" from "string" */
 #ifndef ____localdep_rawmemchrw_defined
 #define ____localdep_rawmemchrw_defined 1
-#if defined(__CRT_HAVE_rawmemchrw)
+#ifdef __CRT_HAVE_rawmemchrw
 /* Same as `memchrw' with a search limit of `(size_t)-1 / 2' */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_rawmemchrw,(void const *__restrict __haystack, __UINT16_TYPE__ __word),rawmemchrw,(__haystack,__word))
 #else /* LIBC: rawmemchrw */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcee3036f */
+/* HASH CRC-32:0xa4ce8c88 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "lseek32" from "unistd" */
 #ifndef ____localdep_lseek32_defined
 #define ____localdep_lseek32_defined 1
-#if defined(__CRT_HAVE_lseek)
+#ifdef __CRT_HAVE_lseek
 /* >> lseek32(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __CREDIRECT(,__off32_t,__NOTHROW_NCX,__localdep_lseek32,(__fd_t __fd, __off32_t __offset, int __whence),lseek,(__fd,__offset,__whence))

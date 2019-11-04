@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf64536e8 */
+/* HASH CRC-32:0x42b6f272 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "iswalnum_l" from "wctype" */
 #ifndef ____localdep_iswalnum_l_defined
 #define ____localdep_iswalnum_l_defined 1
-#if defined(__CRT_HAVE_iswalnum_l)
+#ifdef __CRT_HAVE_iswalnum_l
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswalnum_l,(__WINT_TYPE__ __wc, __locale_t __locale),iswalnum_l,(__wc,__locale))
 #elif defined(__CRT_HAVE__iswalnum_l)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswalnum_l,(__WINT_TYPE__ __wc, __locale_t __locale),_iswalnum_l,(__wc,__locale))

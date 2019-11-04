@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6fabcfaa */
+/* HASH CRC-32:0xae89a117 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,19 +33,19 @@
 __SYSDECL_BEGIN
 
 #ifdef __CC__
-#if defined(__CRT_HAVE_sysinfo)
+#ifdef __CRT_HAVE_sysinfo
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,sysinfo,(struct sysinfo *__info),(__info))
 #endif /* sysinfo... */
-#if defined(__CRT_HAVE_get_nprocs_conf)
+#ifdef __CRT_HAVE_get_nprocs_conf
 __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_RPC,get_nprocs_conf,(void),())
 #endif /* get_nprocs_conf... */
-#if defined(__CRT_HAVE_get_nprocs)
+#ifdef __CRT_HAVE_get_nprocs
 __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_RPC,get_nprocs,(void),())
 #endif /* get_nprocs... */
-#if defined(__CRT_HAVE_get_phys_pages)
+#ifdef __CRT_HAVE_get_phys_pages
 __CDECLARE(__ATTR_WUNUSED,__INTPTR_TYPE__,__NOTHROW_RPC,get_phys_pages,(void),())
 #endif /* get_phys_pages... */
-#if defined(__CRT_HAVE_get_avphys_pages)
+#ifdef __CRT_HAVE_get_avphys_pages
 __CDECLARE(__ATTR_WUNUSED,__INTPTR_TYPE__,__NOTHROW_RPC,get_avphys_pages,(void),())
 #endif /* get_avphys_pages... */
 #endif /* __CC__ */

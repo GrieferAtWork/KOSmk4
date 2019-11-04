@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4e8e02eb */
+/* HASH CRC-32:0x48454f8d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_lfutexlockexpr64_defined
-#if defined(__CRT_HAVE_lfutexlockexpr)
+#ifdef __CRT_HAVE_lfutexlockexpr
 #define __local_lfutexlockexpr64_defined 1
 #include <bits/types.h>
 #include <bits/timespec.h>
@@ -31,7 +31,7 @@
 /* Dependency: "lfutexlockexpr32" from "kos.futexexpr" */
 #ifndef ____localdep_lfutexlockexpr32_defined
 #define ____localdep_lfutexlockexpr32_defined 1
-#if defined(__CRT_HAVE_lfutexlockexpr)
+#ifdef __CRT_HAVE_lfutexlockexpr
 /* >> lfutexlockexpr(2)
  * A function that is similar to `lfutexexpr()', but allows for the use of one central
  * locking futex that is used for waiting and may be distinct from any other given futex

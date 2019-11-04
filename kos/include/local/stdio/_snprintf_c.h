@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x259be349 */
+/* HASH CRC-32:0xb81adc57 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "_vsnprintf_c" from "stdio" */
 #ifndef ____localdep__vsnprintf_c_defined
 #define ____localdep__vsnprintf_c_defined 1
-#if defined(__CRT_HAVE__vsnprintf_c)
+#ifdef __CRT_HAVE__vsnprintf_c
 /* WARNING: This function returns the number of written character. - Not the required buffer size! */
 __CREDIRECT(__ATTR_NONNULL((3)) __ATTR_LIBC_PRINTF(3, 0),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep__vsnprintf_c,(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, __builtin_va_list __args),_vsnprintf_c,(__buf,__bufsize,__format,__args))
 #elif defined(__CRT_HAVE__vsnprintf)

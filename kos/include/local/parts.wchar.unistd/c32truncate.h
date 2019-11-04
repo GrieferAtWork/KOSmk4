@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x90552def */
+/* HASH CRC-32:0x3f030876 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -116,7 +116,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate,(__fd_t __fd, __PIO_OFFSET _
 /* Dependency: "close" */
 #ifndef ____localdep_close_defined
 #define ____localdep_close_defined 1
-#if defined(__CRT_HAVE_close)
+#ifdef __CRT_HAVE_close
 /* >> close(2)
  * Close a file handle */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),close,(__fd))

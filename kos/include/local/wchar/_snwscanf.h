@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x41210907 */
+/* HASH CRC-32:0x6954023c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "_vsnwscanf" from "wchar" */
 #ifndef ____localdep__vsnwscanf_defined
 #define ____localdep__vsnwscanf_defined 1
-#if defined(__CRT_HAVE__vsnwscanf)
+#ifdef __CRT_HAVE__vsnwscanf
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep__vsnwscanf,(__WCHAR_TYPE__ const *__src, __SIZE_TYPE__ __bufsize, __WCHAR_TYPE__ const *__format, __builtin_va_list __args),_vsnwscanf,(__src,__bufsize,__format,__args))
 #else /* LIBC: _vsnwscanf */
 #include <local/wchar/_vsnwscanf.h>

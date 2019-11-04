@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd2109a15 */
+/* HASH CRC-32:0xd9e5b643 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_format_c32aprintf_pack_defined
-#if defined(__CRT_HAVE_realloc)
+#ifdef __CRT_HAVE_realloc
 #define __local_format_c32aprintf_pack_defined 1
 #include <hybrid/__assert.h>
 

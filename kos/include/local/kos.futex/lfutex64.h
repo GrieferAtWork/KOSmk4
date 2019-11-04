@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x62898061 */
+/* HASH CRC-32:0xa7d053e1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_lfutex64_defined
-#if defined(__CRT_HAVE_lfutex)
+#ifdef __CRT_HAVE_lfutex
 #define __local_lfutex64_defined 1
 #include <bits/types.h>
 #include <bits/types.h>
@@ -26,7 +26,7 @@
 /* Dependency: "lfutex32" from "kos.futex" */
 #ifndef ____localdep_lfutex32_defined
 #define ____localdep_lfutex32_defined 1
-#if defined(__CRT_HAVE_lfutex)
+#ifdef __CRT_HAVE_lfutex
 /* >> lfutex(2)
  * Provide the bottom-most API for implementing user-space synchronization on KOS
  * @param: futex_op: One of:

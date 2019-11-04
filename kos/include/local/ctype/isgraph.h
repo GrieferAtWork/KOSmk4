@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x57e0a336 */
+/* HASH CRC-32:0xc732c9d8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "__ctype_b_loc" from "ctype" */
 #ifndef ____localdep___ctype_b_loc_defined
 #define ____localdep___ctype_b_loc_defined 1
-#if defined(__CRT_HAVE___ctype_b_loc)
+#ifdef __CRT_HAVE___ctype_b_loc
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__UINT16_TYPE__ const **,__NOTHROW,__localdep___ctype_b_loc,(void),__ctype_b_loc,())
 #else /* LIBC: __ctype_b_loc */
 #undef ____localdep___ctype_b_loc_defined
@@ -32,7 +32,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,__UINT16_TYPE__ const **,__NOTHROW,__loc
 /* Dependency: "__locale_ctype_ptr" from "ctype" */
 #ifndef ____localdep___locale_ctype_ptr_defined
 #define ____localdep___locale_ctype_ptr_defined 1
-#if defined(__CRT_HAVE___locale_ctype_ptr)
+#ifdef __CRT_HAVE___locale_ctype_ptr
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep___locale_ctype_ptr,(void),__locale_ctype_ptr,())
 #else /* LIBC: __locale_ctype_ptr */
 #undef ____localdep___locale_ctype_ptr_defined
@@ -42,7 +42,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep___loca
 /* Dependency: "_isctype" from "ctype" */
 #ifndef ____localdep__isctype_defined
 #define ____localdep__isctype_defined 1
-#if defined(__CRT_HAVE__isctype)
+#ifdef __CRT_HAVE__isctype
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep__isctype,(int __ch, int __mask),_isctype,(__ch,__mask))
 #else /* LIBC: _isctype */
 #undef ____localdep__isctype_defined

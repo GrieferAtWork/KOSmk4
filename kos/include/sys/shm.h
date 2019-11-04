@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x102bcca4 */
+/* HASH CRC-32:0x48d3e608 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -57,16 +57,16 @@ typedef __key_t key_t;
 typedef __TM_TYPE(time) time_t;
 #endif /* !__time_t_defined */
 
-#if defined(__CRT_HAVE_shmctl)
+#ifdef __CRT_HAVE_shmctl
 __CDECLARE(,int,__NOTHROW_NCX,shmctl,(int __shmid, int __cmd, struct shmid_ds *__buf),(__shmid,__cmd,__buf))
 #endif /* shmctl... */
-#if defined(__CRT_HAVE_shmget)
+#ifdef __CRT_HAVE_shmget
 __CDECLARE(,int,__NOTHROW_NCX,shmget,(key_t __key, size_t __size, int __shmflg),(__key,__size,__shmflg))
 #endif /* shmget... */
-#if defined(__CRT_HAVE_shmat)
+#ifdef __CRT_HAVE_shmat
 __CDECLARE(,void *,__NOTHROW_NCX,shmat,(int __shmid, void const *__shmaddr, int __shmflg),(__shmid,__shmaddr,__shmflg))
 #endif /* shmat... */
-#if defined(__CRT_HAVE_shmdt)
+#ifdef __CRT_HAVE_shmdt
 __CDECLARE(,int,__NOTHROW_NCX,shmdt,(void const *__shmaddr),(__shmaddr))
 #endif /* shmdt... */
 

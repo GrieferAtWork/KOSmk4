@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6859a6f3 */
+/* HASH CRC-32:0x9964e10b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,12 +18,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__dupenv_s_dbg_defined
-#if defined(__CRT_HAVE__dupenv_s)
+#ifdef __CRT_HAVE__dupenv_s
 #define __local__dupenv_s_dbg_defined 1
 /* Dependency: "_dupenv_s" */
 #ifndef ____localdep__dupenv_s_defined
 #define ____localdep__dupenv_s_defined 1
-#if defined(__CRT_HAVE__dupenv_s)
+#ifdef __CRT_HAVE__dupenv_s
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_NCX,__localdep__dupenv_s,(char **__restrict __pbuf, __SIZE_TYPE__ *__pbuflen, char const *__varname),_dupenv_s,(__pbuf,__pbuflen,__varname))
 #else /* LIBC: _dupenv_s */
 #undef ____localdep__dupenv_s_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4dd7aa87 */
+/* HASH CRC-32:0x9e78a560 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "memrev" from "string" */
 #ifndef ____localdep_memrev_defined
 #define ____localdep_memrev_defined 1
-#if defined(__CRT_HAVE_memrev)
+#ifdef __CRT_HAVE_memrev
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memrev,(void *__restrict __base, __SIZE_TYPE__ __n_bytes),memrev,(__base,__n_bytes))
 #else /* LIBC: memrev */
 #include <local/string/memrev.h>
@@ -33,7 +33,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_N
 /* Dependency: "strlen" from "string" */
 #ifndef ____localdep_strlen_defined
 #define ____localdep_strlen_defined 1
-#if defined(__CRT_HAVE_strlen)
+#ifdef __CRT_HAVE_strlen
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __string),strlen,(__string))
 #else /* LIBC: strlen */

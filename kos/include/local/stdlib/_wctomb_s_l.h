@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc1a20dc */
+/* HASH CRC-32:0x75456d11 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "wctomb_s" from "stdlib" */
 #ifndef ____localdep_wctomb_s_defined
 #define ____localdep_wctomb_s_defined 1
-#if defined(__CRT_HAVE_wctomb_s)
+#ifdef __CRT_HAVE_wctomb_s
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,__localdep_wctomb_s,(int *__presult, char *__buf, __SIZE_TYPE__ __buflen, __WCHAR_TYPE__ __wc),wctomb_s,(__presult,__buf,__buflen,__wc))
 #else /* LIBC: wctomb_s */
 #include <local/stdlib/wctomb_s.h>

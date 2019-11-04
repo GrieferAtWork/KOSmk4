@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeba2279 */
+/* HASH CRC-32:0x66918489 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "getcwd" */
 #ifndef ____localdep_getcwd_defined
 #define ____localdep_getcwd_defined 1
-#if defined(__CRT_HAVE_getcwd)
+#ifdef __CRT_HAVE_getcwd
 /* >> getcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
 __CREDIRECT(,char *,__NOTHROW_RPC,__localdep_getcwd,(char *__buf, __SIZE_TYPE__ __bufsize),getcwd,(__buf,__bufsize))

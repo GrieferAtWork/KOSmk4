@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x38af19f0 */
+/* HASH CRC-32:0xeb51a71 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -193,20 +193,20 @@ struct __EPOLL_PACKED epoll_event {
 #pragma pop_macro("ptr")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
-#if defined(__CRT_HAVE_epoll_create)
+#ifdef __CRT_HAVE_epoll_create
 /* Creates an epoll instance.  Returns an fd for the new instance.
  * The "size" parameter is a hint specifying the number of file
  * descriptors to be associated with the new instance. The fd
  * returned by epoll_create() should be closed with close() */
 __CDECLARE(__ATTR_WUNUSED,__fd_t,__NOTHROW_NCX,epoll_create,(int __size),(__size))
 #endif /* epoll_create... */
-#if defined(__CRT_HAVE_epoll_create1)
+#ifdef __CRT_HAVE_epoll_create1
 /* Same as epoll_create but with an FLAGS parameter.
  * The unused SIZE parameter has been dropped
  * @param: flags: Set of `EPOLL_*' */
 __CDECLARE(__ATTR_WUNUSED,__fd_t,__NOTHROW_NCX,epoll_create1,(int __flags),(__flags))
 #endif /* epoll_create1... */
-#if defined(__CRT_HAVE_epoll_ctl)
+#ifdef __CRT_HAVE_epoll_ctl
 /* Manipulate an epoll instance "epfd". Returns 0 in case of success,
  * -1 in case of error (the "errno" variable will contain the
  * specific error code) The "op" parameter is one of the EPOLL_CTL_*
@@ -215,7 +215,7 @@ __CDECLARE(__ATTR_WUNUSED,__fd_t,__NOTHROW_NCX,epoll_create1,(int __flags),(__fl
  * is interested in and any associated user data */
 __CDECLARE(,int,__NOTHROW_NCX,epoll_ctl,(__fd_t __epfd, enum __epoll_ctl __op, __fd_t __fd, struct epoll_event *__event),(__epfd,__op,__fd,__event))
 #endif /* epoll_ctl... */
-#if defined(__CRT_HAVE_epoll_wait)
+#ifdef __CRT_HAVE_epoll_wait
 /* Wait for events on an epoll instance "epfd". Returns the number of
  * triggered events returned in "events" buffer. Or -1 in case of
  * error with the "errno" variable set to the specific error code. The
@@ -225,7 +225,7 @@ __CDECLARE(,int,__NOTHROW_NCX,epoll_ctl,(__fd_t __epfd, enum __epoll_ctl __op, _
  * specifies the maximum wait time in milliseconds (-1 == infinite). */
 __CDECLARE(,int,__NOTHROW_RPC,epoll_wait,(__fd_t __epfd, struct epoll_event *__events, int __maxevents, int __timeout),(__epfd,__events,__maxevents,__timeout))
 #endif /* epoll_wait... */
-#if defined(__CRT_HAVE_epoll_pwait)
+#ifdef __CRT_HAVE_epoll_pwait
 /* Same as epoll_wait, but the thread's signal mask is temporarily
  * and atomically replaced with the one provided as parameter */
 __CDECLARE(,int,__NOTHROW_RPC,epoll_pwait,(__fd_t __epfd, struct epoll_event *__events, int __maxevents, int __timeout, sigset_t const *__ss),(__epfd,__events,__maxevents,__timeout,__ss))

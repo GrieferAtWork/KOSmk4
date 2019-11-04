@@ -444,6 +444,31 @@ function optimizePreprocessorExpression(expr: string): string {
 	return str(branch);
 }
 
+@@Returns either `#ifdef FOO' or `#if COMPLICATED_EXPR'
+function wrapProcessorExpressionForIf(expr: string): string {
+	if (expr.startswith("defined")) {
+		local temp = expr[7:].lstrip();
+		if (temp.startswith("(") && temp.endswith(")") &&
+		    temp.findmatch("(", ")", 1) == #temp - 1)
+			return "#ifdef " + temp[1:-1].strip();
+	}
+	if (expr.startswith("!")) {
+		local temp = expr[1:].lstrip();
+		if (temp.startswith("defined")) {
+			temp = expr[7:].lstrip();
+			if (temp.startswith("(") && temp.endswith(")") &&
+				temp.findmatch("(", ")", 1) == #temp - 1)
+				return "#ifndef " + temp[1:-1].strip();
+		}
+	}
+	return "#if " + expr;
+}
+
+function optimizeAndWrapProcessorExpressionForIf(expr: string): string {
+	return wrapProcessorExpressionForIf(
+		optimizePreprocessorExpression(
+			expr));
+}
 
 assert optimizePreprocessorExpression("") == "1";
 assert optimizePreprocessorExpression("(defined(foo) || defined(bar))") == "defined(foo) || defined(bar)";

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x72ceb6ab */
+/* HASH CRC-32:0xb5f220ad */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,12 +18,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_renameat_defined
-#if defined(__CRT_HAVE_frenameat)
+#ifdef __CRT_HAVE_frenameat
 #define __local_renameat_defined 1
 /* Dependency: "frenameat" */
 #ifndef ____localdep_frenameat_defined
 #define ____localdep_frenameat_defined 1
-#if defined(__CRT_HAVE_frenameat)
+#ifdef __CRT_HAVE_frenameat
 /* @param flags: Set of `0|AT_DOSPATH' */
 __CREDIRECT(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,__localdep_frenameat,(__fd_t __oldfd, char const *__oldname, __fd_t __newfd, char const *__newname_or_path, __atflag_t __flags),frenameat,(__oldfd,__oldname,__newfd,__newname_or_path,__flags))
 #else /* LIBC: frenameat */

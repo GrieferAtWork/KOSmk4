@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4afaaf73 */
+/* HASH CRC-32:0x806ae1af */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 /* Dependency: "_filbuf" */
 #ifndef ____localdep__filbuf_defined
 #define ____localdep__filbuf_defined 1
-#if defined(__CRT_HAVE__filbuf)
+#ifdef __CRT_HAVE__filbuf
 __CREDIRECT(__ATTR_NONNULL((1)),int,,__localdep__filbuf,(__FILE *__restrict __stream),_filbuf,(__stream)) __THROWS(...)
 #else /* LIBC: _filbuf */
 #undef ____localdep__filbuf_defined

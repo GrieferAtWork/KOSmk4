@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1eb41b44 */
+/* HASH CRC-32:0x5f23589e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -136,16 +136,16 @@ __SYSDECL_BEGIN
 
 
 #ifdef __CC__
-#if defined(__CRT_HAVE_closelog)
+#ifdef __CRT_HAVE_closelog
 __CDECLARE_VOID(,__NOTHROW_NCX,closelog,(void),())
 #endif /* closelog... */
-#if defined(__CRT_HAVE_openlog)
+#ifdef __CRT_HAVE_openlog
 __CDECLARE_VOID(,__NOTHROW_RPC,openlog,(char const *__ident, int __option, int __facility),(__ident,__option,__facility))
 #endif /* openlog... */
-#if defined(__CRT_HAVE_setlogmask)
+#ifdef __CRT_HAVE_setlogmask
 __CDECLARE(,int,__NOTHROW_NCX,setlogmask,(int __mask),(__mask))
 #endif /* setlogmask... */
-#if defined(__CRT_HAVE_syslog)
+#ifdef __CRT_HAVE_syslog
 __LIBC __ATTR_NONNULL((2)) __ATTR_LIBC_PRINTF(2,3) void __NOTHROW_RPC(__VLIBCCALL syslog)(int __level, char const *__format, ...) __CASMNAME_SAME("syslog");
 #elif defined(__CRT_HAVE_syslog_printer) || defined(__CRT_HAVE_vsyslog)
 #include <local/sys.syslog/syslog.h>
@@ -157,7 +157,7 @@ __NAMESPACE_LOCAL_USING(syslog)
 #endif /* syslog... */
 
 #ifdef __USE_MISC
-#if defined(__CRT_HAVE_vsyslog)
+#ifdef __CRT_HAVE_vsyslog
 __CDECLARE_VOID(__ATTR_NONNULL((2)) __ATTR_LIBC_PRINTF(2,0),__NOTHROW_RPC,vsyslog,(int __level, char const *__format, __builtin_va_list __args),(__level,__format,__args))
 #elif defined(__CRT_HAVE_syslog_printer)
 #include <local/sys.syslog/vsyslog.h>
@@ -166,7 +166,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(vsyslog, __FORCELOCAL __ATTR_NONNULL((2)) __ATTR
 #endif /* __USE_MISC */
 
 #ifdef __USE_KOS
-#if defined(__CRT_HAVE_syslog_printer)
+#ifdef __CRT_HAVE_syslog_printer
 /* Helper functions for printing to the system log */
 __CDECLARE(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,syslog_printer,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),(__arg,__data,__datalen))
 #endif /* syslog_printer... */

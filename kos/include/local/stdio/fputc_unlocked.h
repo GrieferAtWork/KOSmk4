@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x587fe86f */
+/* HASH CRC-32:0x6f3477f7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 /* Dependency: "_flsbuf" */
 #ifndef ____localdep__flsbuf_defined
 #define ____localdep__flsbuf_defined 1
-#if defined(__CRT_HAVE__flsbuf)
+#ifdef __CRT_HAVE__flsbuf
 __CREDIRECT(__ATTR_NONNULL((2)),int,,__localdep__flsbuf,(int __ch, __FILE *__restrict __stream),_flsbuf,(__ch,__stream)) __THROWS(...)
 #else /* LIBC: _flsbuf */
 #undef ____localdep__flsbuf_defined

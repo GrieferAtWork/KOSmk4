@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7808d6b9 */
+/* HASH CRC-32:0xb39126d4 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "asctime_r" from "time" */
 #ifndef ____localdep_asctime_r_defined
 #define ____localdep_asctime_r_defined 1
-#if defined(__CRT_HAVE_asctime_r)
+#ifdef __CRT_HAVE_asctime_r
 /* Return in BUF a string of the form "Day Mon dd hh:mm:ss yyyy\n"
  * that is the representation of TP in this format */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_asctime_r,(__STRUCT_TM const *__restrict __tp, char __buf[26]),asctime_r,(__tp,__buf))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf88f435a */
+/* HASH CRC-32:0x5cffaad1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -164,7 +164,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(ntp_adjtime, __FORCELOCAL __ATTR_NONNULL((1)) in
 #endif /* ntp_adjtime... */
 
 #ifdef __USE_TIME64
-#if defined(__CRT_HAVE_adjtimex64)
+#ifdef __CRT_HAVE_adjtimex64
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,adjtimex64,(struct timex64 *__restrict __ntx),(__ntx))
 #elif defined(__CRT_HAVE___adjtimex64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,adjtimex64,(struct timex64 *__restrict __ntx),__adjtimex64,(__ntx))
@@ -174,7 +174,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,adjtimex64,(struct timex64 *__
 #include <local/sys.timex/adjtimex64.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(adjtimex64, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL adjtimex64)(struct timex64 *__restrict __ntx) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(adjtimex64))(__ntx); })
 #endif /* adjtimex64... */
-#if defined(__CRT_HAVE_ntp_adjtime64)
+#ifdef __CRT_HAVE_ntp_adjtime64
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,ntp_adjtime64,(struct timex64 *__restrict __tntx),(__tntx))
 #elif defined(__CRT_HAVE_ntp_adjtime) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,ntp_adjtime64,(struct timex64 *__restrict __tntx),ntp_adjtime,(__tntx))

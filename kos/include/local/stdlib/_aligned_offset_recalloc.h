@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1e453993 */
+/* HASH CRC-32:0x9caa8f7d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 /* Dependency: "_aligned_offset_malloc" from "stdlib" */
 #ifndef ____localdep__aligned_offset_malloc_defined
 #define ____localdep__aligned_offset_malloc_defined 1
-#if defined(__CRT_HAVE__aligned_offset_malloc)
+#ifdef __CRT_HAVE__aligned_offset_malloc
 __CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,__localdep__aligned_offset_malloc,(__SIZE_TYPE__ __num_bytes, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset),_aligned_offset_malloc,(__num_bytes,__min_alignment,__offset))
 #elif defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_malloc)
 #include <local/stdlib/_aligned_offset_malloc.h>
@@ -39,7 +39,7 @@ __CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW
 /* Dependency: "_aligned_msize" from "stdlib" */
 #ifndef ____localdep__aligned_msize_defined
 #define ____localdep__aligned_msize_defined 1
-#if defined(__CRT_HAVE__aligned_msize)
+#ifdef __CRT_HAVE__aligned_msize
 __CREDIRECT(__ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep__aligned_msize,(void *__mptr, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset),_aligned_msize,(__mptr,__min_alignment,__offset))
 #else /* LIBC: _aligned_msize */
 #include <local/stdlib/_aligned_msize.h>
@@ -50,7 +50,7 @@ __CREDIRECT(__ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep__aligned_msize
 /* Dependency: "memcpy" from "string" */
 #ifndef ____localdep_memcpy_defined
 #define ____localdep_memcpy_defined 1
-#if defined(__fast_memcpy_defined)
+#ifdef __fast_memcpy_defined
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 #define __localdep_memcpy (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpy))
@@ -69,7 +69,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHRO
 /* Dependency: "memset" from "string" */
 #ifndef ____localdep_memset_defined
 #define ____localdep_memset_defined 1
-#if defined(__fast_memset_defined)
+#ifdef __fast_memset_defined
 /* Fill memory with a given byte
  * @return: * : Always re-returns `dst' */
 #define __localdep_memset (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memset))
@@ -88,7 +88,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_N
 /* Dependency: "_aligned_free" from "stdlib" */
 #ifndef ____localdep__aligned_free_defined
 #define ____localdep__aligned_free_defined 1
-#if defined(__CRT_HAVE__aligned_free)
+#ifdef __CRT_HAVE__aligned_free
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep__aligned_free,(void *__mptr),_aligned_free,(__mptr))
 #elif defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)
 #include <local/stdlib/_aligned_free.h>

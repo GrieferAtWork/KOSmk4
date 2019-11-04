@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc8eebbab */
+/* HASH CRC-32:0xd7c946e4 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "rawmemrchrl" from "string" */
 #ifndef ____localdep_rawmemrchrl_defined
 #define ____localdep_rawmemrchrl_defined 1
-#if defined(__CRT_HAVE_rawmemrchrl)
+#ifdef __CRT_HAVE_rawmemrchrl
 /* Same as `memrchrl' without a search limit, starting at `(byte_t *)HAYSTACK-4' */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_rawmemrchrl,(void const *__restrict __haystack, __UINT32_TYPE__ __dword),rawmemrchrl,(__haystack,__dword))
 #else /* LIBC: rawmemrchrl */

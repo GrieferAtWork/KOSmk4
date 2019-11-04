@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x78c25bd1 */
+/* HASH CRC-32:0xf90ebf8a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -40,7 +40,7 @@ __CREDIRECT_DOS(,int,__NOTHROW_NCX,__localdep_c16truncate32,(__CHAR16_TYPE__ con
 /* Dependency: "open64" from "fcntl" */
 #ifndef ____localdep_open64_defined
 #define ____localdep_open64_defined 1
-#if defined(__CRT_HAVE_open64)
+#ifdef __CRT_HAVE_open64
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open64,(char const *__filename, __oflag_t __oflags),open64,(__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE___open64)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_open64,(char const *__filename, __oflag_t __oflags),__open64,(__filename,__oflags),__oflags,1,(__mode_t))
@@ -78,7 +78,7 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,__localdep_
 /* Dependency: "ftruncate64" from "unistd" */
 #ifndef ____localdep_ftruncate64_defined
 #define ____localdep_ftruncate64_defined 1
-#if defined(__CRT_HAVE_ftruncate64)
+#ifdef __CRT_HAVE_ftruncate64
 /* >> ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate64,(__fd_t __fd, __PIO_OFFSET64 __length),ftruncate64,(__fd,__length))
@@ -103,7 +103,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate64,(__fd_t __fd, __PIO_OFFSET
 /* Dependency: "close" */
 #ifndef ____localdep_close_defined
 #define ____localdep_close_defined 1
-#if defined(__CRT_HAVE_close)
+#ifdef __CRT_HAVE_close
 /* >> close(2)
  * Close a file handle */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),close,(__fd))

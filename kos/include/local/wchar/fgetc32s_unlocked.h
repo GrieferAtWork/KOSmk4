@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb8a15b35 */
+/* HASH CRC-32:0xc12aaca8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_fgetc32_u
 /* Dependency: "ferror_unlocked" from "stdio" */
 #ifndef ____localdep_ferror_unlocked_defined
 #define ____localdep_ferror_unlocked_defined 1
-#if defined(__CRT_HAVE_ferror_unlocked)
+#ifdef __CRT_HAVE_ferror_unlocked
 /* Same as `ferror()', but performs I/O without acquiring a lock to `STREAM' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror_unlocked,(__FILE *__restrict __stream),ferror_unlocked,(__stream))
 #elif defined(__CRT_HAVE_ferror)

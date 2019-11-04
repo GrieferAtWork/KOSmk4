@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x81c67b06 */
+/* HASH CRC-32:0xacfa9240 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ struct __format_snprintf_data {
 /* Dependency: "format_vprintf" from "format-printer" */
 #ifndef ____localdep_format_vprintf_defined
 #define ____localdep_format_vprintf_defined 1
-#if defined(__CRT_HAVE_format_vprintf)
+#ifdef __CRT_HAVE_format_vprintf
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings
@@ -215,7 +215,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 3)) __ATTR_LIBC_PRINTF(3, 0),__SSIZE_TYPE__,,__lo
 /* Dependency: "format_snprintf_printer" from "format-printer" */
 #ifndef ____localdep_format_snprintf_printer_defined
 #define ____localdep_format_snprintf_printer_defined 1
-#if defined(__CRT_HAVE_format_snprintf_printer)
+#ifdef __CRT_HAVE_format_snprintf_printer
 /* Format-printer implementation for printing to a string buffer like `snprintf' would
  * WARNING: No trailing NUL-character is implicitly appended
  * NOTE: The number of written characters is `ORIG_BUFSIZE - ARG->sd_bufsiz'

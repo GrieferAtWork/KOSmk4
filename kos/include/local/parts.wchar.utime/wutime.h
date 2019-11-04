@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x98762925 */
+/* HASH CRC-32:0x75eb664e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "crt_wutime32" from "parts.wchar.utime" */
 #ifndef ____localdep_crt_wutime32_defined
 #define ____localdep_crt_wutime32_defined 1
-#if defined(__CRT_HAVE_wutime)
+#ifdef __CRT_HAVE_wutime
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_wutime32,(__WCHAR_TYPE__ const *__filename, struct __utimbuf32 const *__file_times),wutime,(__filename,__file_times))
 #elif defined(__CRT_HAVE__wutime32)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_wutime32,(__WCHAR_TYPE__ const *__filename, struct __utimbuf32 const *__file_times),_wutime32,(__filename,__file_times))
@@ -35,7 +35,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_wutime32,(__WCH
 /* Dependency: "wutime64" from "parts.wchar.utime" */
 #ifndef ____localdep_wutime64_defined
 #define ____localdep_wutime64_defined 1
-#if defined(__CRT_HAVE_wutime64)
+#ifdef __CRT_HAVE_wutime64
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_wutime64,(__WCHAR_TYPE__ const *__filename, struct utimbuf64 const *__file_times),wutime64,(__filename,__file_times))
 #elif defined(__CRT_HAVE__wutime64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_wutime64,(__WCHAR_TYPE__ const *__filename, struct utimbuf64 const *__file_times),_wutime64,(__filename,__file_times))

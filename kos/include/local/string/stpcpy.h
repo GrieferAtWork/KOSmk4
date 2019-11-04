@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x941fef3f */
+/* HASH CRC-32:0x6f30f5e0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 /* Dependency: "mempcpy" from "string" */
 #ifndef ____localdep_mempcpy_defined
 #define ____localdep_mempcpy_defined 1
-#if defined(__fast_mempcpy_defined)
+#ifdef __fast_mempcpy_defined
 /* Same as `memcpy', but return `DST+N_BYTES', rather than `DST' */
 #define __localdep_mempcpy (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempcpy))
 #elif defined(__CRT_HAVE_mempcpy)
@@ -44,7 +44,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHRO
 /* Dependency: "strlen" from "string" */
 #ifndef ____localdep_strlen_defined
 #define ____localdep_strlen_defined 1
-#if defined(__CRT_HAVE_strlen)
+#ifdef __CRT_HAVE_strlen
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __string),strlen,(__string))
 #else /* LIBC: strlen */

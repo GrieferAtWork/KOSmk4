@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e2cd4a1 */
+/* HASH CRC-32:0x4dc3c10f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -8041,70 +8041,70 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(scalbl, __FORCELOCAL __ATTR_WUNUSED long double 
 
 
 #if 1 /* GLIBc aliases */
-#if defined(__CRT_HAVE___acos)
+#ifdef __CRT_HAVE___acos
 /* Arc cosine of X */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__acos,(double __x),(__x))
 #elif defined(__CRT_HAVE_acos)
 /* Arc cosine of X */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__acos,(double __x),acos,(__x))
 #endif /* __acos... */
-#if defined(__CRT_HAVE___asin)
+#ifdef __CRT_HAVE___asin
 /* Arc sine of X */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__asin,(double __x),(__x))
 #elif defined(__CRT_HAVE_asin)
 /* Arc sine of X */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__asin,(double __x),asin,(__x))
 #endif /* __asin... */
-#if defined(__CRT_HAVE___atan)
+#ifdef __CRT_HAVE___atan
 /* Arc tangent of X */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__atan,(double __x),(__x))
 #elif defined(__CRT_HAVE_atan)
 /* Arc tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__atan,(double __x),atan,(__x))
 #endif /* __atan... */
-#if defined(__CRT_HAVE___atan2)
+#ifdef __CRT_HAVE___atan2
 /* Arc tangent of Y/X */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__atan2,(double __y, double __x),(__y,__x))
 #elif defined(__CRT_HAVE_atan2)
 /* Arc tangent of Y/X */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__atan2,(double __y, double __x),atan2,(__y,__x))
 #endif /* __atan2... */
-#if defined(__CRT_HAVE___cos)
+#ifdef __CRT_HAVE___cos
 /* Cosine of X */
 __CDECLARE(__DECL_SIMD_cos __ATTR_WUNUSED,double,__NOTHROW,__cos,(double __x),(__x))
 #elif defined(__CRT_HAVE_cos)
 /* Cosine of X */
 __CREDIRECT(__DECL_SIMD_cos __ATTR_WUNUSED,double,__NOTHROW,__cos,(double __x),cos,(__x))
 #endif /* __cos... */
-#if defined(__CRT_HAVE___sin)
+#ifdef __CRT_HAVE___sin
 /* Sine of X */
 __CDECLARE(__DECL_SIMD_sin __ATTR_WUNUSED,double,__NOTHROW,__sin,(double __x),(__x))
 #elif defined(__CRT_HAVE_sin)
 /* Sine of X */
 __CREDIRECT(__DECL_SIMD_sin __ATTR_WUNUSED,double,__NOTHROW,__sin,(double __x),sin,(__x))
 #endif /* __sin... */
-#if defined(__CRT_HAVE___tan)
+#ifdef __CRT_HAVE___tan
 /* Tangent of X */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__tan,(double __x),(__x))
 #elif defined(__CRT_HAVE_tan)
 /* Tangent of X */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__tan,(double __x),tan,(__x))
 #endif /* __tan... */
-#if defined(__CRT_HAVE___cosh)
+#ifdef __CRT_HAVE___cosh
 /* Hyperbolic cosine of X */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__cosh,(double __x),(__x))
 #elif defined(__CRT_HAVE_cosh)
 /* Hyperbolic cosine of X */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__cosh,(double __x),cosh,(__x))
 #endif /* __cosh... */
-#if defined(__CRT_HAVE___sinh)
+#ifdef __CRT_HAVE___sinh
 /* Hyperbolic sine of X */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__sinh,(double __x),(__x))
 #elif defined(__CRT_HAVE_sinh)
 /* Hyperbolic sine of X */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__sinh,(double __x),sinh,(__x))
 #endif /* __sinh... */
-#if defined(__CRT_HAVE___tanh)
+#ifdef __CRT_HAVE___tanh
 /* Hyperbolic tangent of X */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__tanh,(double __x),(__x))
 #elif defined(__CRT_HAVE_tanh)
@@ -8454,7 +8454,7 @@ __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __tanhl)(long doubl
 #endif /* __tanhl... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #ifdef __USE_GNU
-#if defined(__CRT_HAVE___sincos)
+#ifdef __CRT_HAVE___sincos
 /* Cosine and sine of X */
 __CDECLARE_VOID(__DECL_SIMD_sincos __ATTR_NONNULL((2, 3)),__NOTHROW,__sincos,(double __x, double *__psinx, double *__pcosx),(__x,__psinx,__pcosx))
 #elif defined(__CRT_HAVE_sincos)
@@ -8499,21 +8499,21 @@ __FORCELOCAL __DECL_SIMD_sincosl __ATTR_NONNULL((2, 3)) void __NOTHROW(__LIBCCAL
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_GNU */
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
-#if defined(__CRT_HAVE___acosh)
+#ifdef __CRT_HAVE___acosh
 /* Hyperbolic arc cosine of X */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__acosh,(double __x),(__x))
 #elif defined(__CRT_HAVE_acosh)
 /* Hyperbolic arc cosine of X */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__acosh,(double __x),acosh,(__x))
 #endif /* __acosh... */
-#if defined(__CRT_HAVE___asinh)
+#ifdef __CRT_HAVE___asinh
 /* Hyperbolic arc sine of X */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__asinh,(double __x),(__x))
 #elif defined(__CRT_HAVE_asinh)
 /* Hyperbolic arc sine of X */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__asinh,(double __x),asinh,(__x))
 #endif /* __asinh... */
-#if defined(__CRT_HAVE___atanh)
+#ifdef __CRT_HAVE___atanh
 /* Hyperbolic arc tangent of X */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__atanh,(double __x),(__x))
 #elif defined(__CRT_HAVE_atanh)
@@ -8625,42 +8625,42 @@ __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __atanhl)(long doub
 #endif /* __atanhl... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
-#if defined(__CRT_HAVE___exp)
+#ifdef __CRT_HAVE___exp
 /* Exponential function of X */
 __CDECLARE(__DECL_SIMD_exp __ATTR_WUNUSED,double,__NOTHROW,__exp,(double __x),(__x))
 #elif defined(__CRT_HAVE_exp)
 /* Exponential function of X */
 __CREDIRECT(__DECL_SIMD_exp __ATTR_WUNUSED,double,__NOTHROW,__exp,(double __x),exp,(__x))
 #endif /* __exp... */
-#if defined(__CRT_HAVE___frexp)
+#ifdef __CRT_HAVE___frexp
 /* Break VALUE into a normalized fraction and an integral power of 2 */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW_NCX,__frexp,(double __x, int *__pexponent),(__x,__pexponent))
 #elif defined(__CRT_HAVE_frexp)
 /* Break VALUE into a normalized fraction and an integral power of 2 */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW_NCX,__frexp,(double __x, int *__pexponent),frexp,(__x,__pexponent))
 #endif /* __frexp... */
-#if defined(__CRT_HAVE___ldexp)
+#ifdef __CRT_HAVE___ldexp
 /* X times (two to the EXP power) */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__ldexp,(double __x, int __exponent),(__x,__exponent))
 #elif defined(__CRT_HAVE_ldexp)
 /* X times (two to the EXP power) */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__ldexp,(double __x, int __exponent),ldexp,(__x,__exponent))
 #endif /* __ldexp... */
-#if defined(__CRT_HAVE___log)
+#ifdef __CRT_HAVE___log
 /* Natural logarithm of X */
 __CDECLARE(__DECL_SIMD_log __ATTR_WUNUSED,double,__NOTHROW,__log,(double __x),(__x))
 #elif defined(__CRT_HAVE_log)
 /* Natural logarithm of X */
 __CREDIRECT(__DECL_SIMD_log __ATTR_WUNUSED,double,__NOTHROW,__log,(double __x),log,(__x))
 #endif /* __log... */
-#if defined(__CRT_HAVE___log10)
+#ifdef __CRT_HAVE___log10
 /* Base-ten logarithm of X */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__log10,(double __x),(__x))
 #elif defined(__CRT_HAVE_log10)
 /* Base-ten logarithm of X */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__log10,(double __x),log10,(__x))
 #endif /* __log10... */
-#if defined(__CRT_HAVE___modf)
+#ifdef __CRT_HAVE___modf
 /* Break VALUE into integral and fractional parts */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),double,__NOTHROW_NCX,__modf,(double __x, double *__iptr),(__x,__iptr))
 #elif defined(__CRT_HAVE_modf)
@@ -8875,14 +8875,14 @@ __FORCELOCAL __ATTR_NONNULL((2)) long double __NOTHROW_NCX(__LIBCCALL __modfl)(l
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 #ifdef __USE_GNU
-#if defined(__CRT_HAVE___exp10)
+#ifdef __CRT_HAVE___exp10
 /* A function missing in all standards: compute exponent to base ten */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__exp10,(double __x),(__x))
 #elif defined(__CRT_HAVE_exp10)
 /* A function missing in all standards: compute exponent to base ten */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__exp10,(double __x),exp10,(__x))
 #endif /* __exp10... */
-#if defined(__CRT_HAVE___pow10)
+#ifdef __CRT_HAVE___pow10
 /* Another name occasionally used */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__pow10,(double __x),(__x))
 #elif defined(__CRT_HAVE_pow10)
@@ -8962,21 +8962,21 @@ __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __pow10l)(long doub
 #endif /* __USE_GNU */
 
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
-#if defined(__CRT_HAVE___expm1)
+#ifdef __CRT_HAVE___expm1
 /* Return exp(X) - 1 */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__expm1,(double __x),(__x))
 #elif defined(__CRT_HAVE_expm1)
 /* Return exp(X) - 1 */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__expm1,(double __x),expm1,(__x))
 #endif /* __expm1... */
-#if defined(__CRT_HAVE___log1p)
+#ifdef __CRT_HAVE___log1p
 /* Return log(1 + X) */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__log1p,(double __x),(__x))
 #elif defined(__CRT_HAVE_log1p)
 /* Return log(1 + X) */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__log1p,(double __x),log1p,(__x))
 #endif /* __log1p... */
-#if defined(__CRT_HAVE___logb)
+#ifdef __CRT_HAVE___logb
 /* Return the base 2 signed integral exponent of X */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__logb,(double __x),(__x))
 #elif defined(__CRT_HAVE__logb)
@@ -9093,14 +9093,14 @@ __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __logbl)(long doubl
 #endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
 
 #ifdef __USE_ISOC99
-#if defined(__CRT_HAVE___exp2)
+#ifdef __CRT_HAVE___exp2
 /* Compute base-2 exponential of X */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__exp2,(double __x),(__x))
 #elif defined(__CRT_HAVE_exp2)
 /* Compute base-2 exponential of X */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__exp2,(double __x),exp2,(__x))
 #endif /* __exp2... */
-#if defined(__CRT_HAVE___log2)
+#ifdef __CRT_HAVE___log2
 /* Compute base-2 logarithm of X */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__log2,(double __x),(__x))
 #elif defined(__CRT_HAVE_log2)
@@ -9178,14 +9178,14 @@ __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __log2l)(long doubl
 #endif /* __log2l... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_ISOC99 */
-#if defined(__CRT_HAVE___pow)
+#ifdef __CRT_HAVE___pow
 /* Return X to the Y power */
 __CDECLARE(__DECL_SIMD_pow __ATTR_WUNUSED,double,__NOTHROW,__pow,(double __x, double __y),(__x,__y))
 #elif defined(__CRT_HAVE_pow)
 /* Return X to the Y power */
 __CREDIRECT(__DECL_SIMD_pow __ATTR_WUNUSED,double,__NOTHROW,__pow,(double __x, double __y),pow,(__x,__y))
 #endif /* __pow... */
-#if defined(__CRT_HAVE___sqrt)
+#ifdef __CRT_HAVE___sqrt
 /* Return the square root of X */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__sqrt,(double __x),(__x))
 #elif defined(__CRT_HAVE_sqrt)
@@ -9264,7 +9264,7 @@ __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __sqrtl)(long doubl
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 
 #if defined(__USE_XOPEN) || defined(__USE_ISOC99)
-#if defined(__CRT_HAVE___hypot)
+#ifdef __CRT_HAVE___hypot
 /* Return `sqrt(X*X + Y*Y)' */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__hypot,(double __x, double __y),(__x,__y))
 #elif defined(__CRT_HAVE_hypot)
@@ -9310,7 +9310,7 @@ __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __hypotl)(long doub
 #endif /* __USE_XOPEN || __USE_ISOC99 */
 
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
-#if defined(__CRT_HAVE___cbrt)
+#ifdef __CRT_HAVE___cbrt
 /* Return the cube root of X */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__cbrt,(double __x),(__x))
 #elif defined(__CRT_HAVE_cbrt)
@@ -9396,7 +9396,7 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__floor,(double __x),(__
 /* Largest integer not greater than X */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __floor)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(floor))(__x); }
 #endif /* __floor... */
-#if defined(__CRT_HAVE___fmod)
+#ifdef __CRT_HAVE___fmod
 /* Floating-point modulo remainder of X/Y */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__fmod,(double __x, double __y),(__x,__y))
 #elif defined(__CRT_HAVE_fmod)
@@ -9603,14 +9603,14 @@ __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __finitel)(lon
 #endif /* __finitel... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #ifdef __USE_MISC
-#if defined(__CRT_HAVE___drem)
+#ifdef __CRT_HAVE___drem
 /* Return the remainder of X/Y */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__drem,(double __x, double __y),(__x,__y))
 #elif defined(__CRT_HAVE_drem)
 /* Return the remainder of X/Y */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__drem,(double __x, double __y),drem,(__x,__y))
 #endif /* __drem... */
-#if defined(__CRT_HAVE___significand)
+#ifdef __CRT_HAVE___significand
 /* Return the fractional part of X after dividing out `ilogb (X)' */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__significand,(double __x),(__x))
 #elif defined(__CRT_HAVE_significand)
@@ -9829,32 +9829,32 @@ __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __isnanl)(long
 
 /* Bessel functions. */
 #if defined(__USE_MISC) || defined(__USE_XOPEN)
-#if defined(__CRT_HAVE___j0)
+#ifdef __CRT_HAVE___j0
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__j0,(double __x),(__x))
 #elif defined(__CRT_HAVE_j0)
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__j0,(double __x),j0,(__x))
 #endif /* __j0... */
-#if defined(__CRT_HAVE___j1)
+#ifdef __CRT_HAVE___j1
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__j1,(double __x),(__x))
 #elif defined(__CRT_HAVE_j1)
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__j1,(double __x),j1,(__x))
 #endif /* __j1... */
-#if defined(__CRT_HAVE___jn)
+#ifdef __CRT_HAVE___jn
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__jn,(int __n, double __x),(__n,__x))
 #elif defined(__CRT_HAVE_jn)
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__jn,(int __n, double __x),jn,(__n,__x))
 #endif /* __jn... */
-#if defined(__CRT_HAVE___y0)
+#ifdef __CRT_HAVE___y0
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__y0,(double __x),(__x))
 #elif defined(__CRT_HAVE_y0)
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__y0,(double __x),y0,(__x))
 #endif /* __y0... */
-#if defined(__CRT_HAVE___y1)
+#ifdef __CRT_HAVE___y1
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__y1,(double __x),(__x))
 #elif defined(__CRT_HAVE_y1)
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__y1,(double __x),y1,(__x))
 #endif /* __y1... */
-#if defined(__CRT_HAVE___yn)
+#ifdef __CRT_HAVE___yn
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__yn,(int __n, double __x),(__n,__x))
 #elif defined(__CRT_HAVE_yn)
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__yn,(int __n, double __x),yn,(__n,__x))
@@ -10010,17 +10010,17 @@ __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __ynl)(int __n, lon
 #endif /* __USE_MISC */
 
 #if defined(__USE_XOPEN) || defined(__USE_ISOC99)
-#if defined(__CRT_HAVE___erf)
+#ifdef __CRT_HAVE___erf
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__erf,(double __x),(__x))
 #elif defined(__CRT_HAVE_erf)
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__erf,(double __x),erf,(__x))
 #endif /* __erf... */
-#if defined(__CRT_HAVE___erfc)
+#ifdef __CRT_HAVE___erfc
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__erfc,(double __x),(__x))
 #elif defined(__CRT_HAVE_erfc)
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__erfc,(double __x),erfc,(__x))
 #endif /* __erfc... */
-#if defined(__CRT_HAVE___lgamma)
+#ifdef __CRT_HAVE___lgamma
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__lgamma,(double __x),(__x))
 #elif defined(__CRT_HAVE___gamma)
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__lgamma,(double __x),__gamma,(__x))
@@ -10118,7 +10118,7 @@ __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __lgammal)(long dou
 #endif /* __USE_XOPEN || __USE_ISOC99 */
 
 #ifdef __USE_ISOC99
-#if defined(__CRT_HAVE___tgamma)
+#ifdef __CRT_HAVE___tgamma
 /* True gamma function */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__tgamma,(double __x),(__x))
 #elif defined(__CRT_HAVE_tgamma)
@@ -10164,7 +10164,7 @@ __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __tgammal)(long dou
 #endif /* __USE_ISOC99 */
 
 #if defined(__USE_MISC) || (defined(__USE_XOPEN) && !defined(__USE_XOPEN2K))
-#if defined(__CRT_HAVE___lgamma)
+#ifdef __CRT_HAVE___lgamma
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__gamma,(double __x),__lgamma,(__x))
 #elif defined(__CRT_HAVE___gamma)
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__gamma,(double __x),(__x))
@@ -10213,7 +10213,7 @@ __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __gammal)(long doub
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_MISC || (__USE_XOPEN && !__USE_XOPEN2K) */
 #ifdef __USE_MISC
-#if defined(__CRT_HAVE___lgamma_r)
+#ifdef __CRT_HAVE___lgamma_r
 /* Reentrant version of lgamma. This function uses the global variable
  * `signgam'.  The reentrant version instead takes a pointer and stores
  * the value through it */
@@ -10278,14 +10278,14 @@ __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW_NCX(__LIBCCALL __lgammal_r)(lo
 #endif /* __USE_MISC */
 
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_ISOC99)
-#if defined(__CRT_HAVE___rint)
+#ifdef __CRT_HAVE___rint
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__rint,(double __x),(__x))
 #elif defined(__CRT_HAVE_rint)
 /* Return the integer nearest X in the direction of the prevailing rounding mode */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__rint,(double __x),rint,(__x))
 #endif /* __rint... */
-#if defined(__CRT_HAVE___nextafter)
+#ifdef __CRT_HAVE___nextafter
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__nextafter,(double __x, double __y),(__x,__y))
 #elif defined(__CRT_HAVE__nextafter)
@@ -10295,14 +10295,14 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__nextafter,(double __x
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__nextafter,(double __x, double __y),nextafter,(__x,__y))
 #endif /* __nextafter... */
-#if defined(__CRT_HAVE___remainder)
+#ifdef __CRT_HAVE___remainder
 /* Return the remainder of integer divison X / Y with infinite precision */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__remainder,(double __x, double __y),(__x,__y))
 #elif defined(__CRT_HAVE_remainder)
 /* Return the remainder of integer divison X / Y with infinite precision */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__remainder,(double __x, double __y),remainder,(__x,__y))
 #endif /* __remainder... */
-#if defined(__CRT_HAVE___ilogb)
+#ifdef __CRT_HAVE___ilogb
 /* Return the binary exponent of X, which must be nonzero */
 __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW,__ilogb,(double __x),(__x))
 #elif defined(__CRT_HAVE_ilogb)
@@ -10450,26 +10450,26 @@ __FORCELOCAL __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __ilogbl)(long double __x) 
 #endif /* __USE_XOPEN_EXTENDED || __USE_ISOC99 */
 
 #ifdef __USE_ISOC99
-#if defined(__CRT_HAVE___nexttoward)
+#ifdef __CRT_HAVE___nexttoward
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__nexttoward,(double __x, long double __y),(__x,__y))
 #elif defined(__CRT_HAVE_nexttoward)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__nexttoward,(double __x, long double __y),nexttoward,(__x,__y))
 #endif /* __nexttoward... */
-#if defined(__CRT_HAVE___scalbn)
+#ifdef __CRT_HAVE___scalbn
 /* Return X times (2 to the Nth power) */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__scalbn,(double __x, int __n),(__x,__n))
 #elif defined(__CRT_HAVE_scalbn)
 /* Return X times (2 to the Nth power) */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__scalbn,(double __x, int __n),scalbn,(__x,__n))
 #endif /* __scalbn... */
-#if defined(__CRT_HAVE___scalbln)
+#ifdef __CRT_HAVE___scalbln
 /* Return X times (2 to the Nth power) */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__scalbln,(double __x, long int __n),(__x,__n))
 #elif defined(__CRT_HAVE_scalbln)
 /* Return X times (2 to the Nth power) */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__scalbln,(double __x, long int __n),scalbln,(__x,__n))
 #endif /* __scalbln... */
-#if defined(__CRT_HAVE___nearbyint)
+#ifdef __CRT_HAVE___nearbyint
 /* Round X to integral value in floating-point format using current
  * rounding direction, but do not raise inexact exception */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__nearbyint,(double __x),(__x))
@@ -10510,7 +10510,7 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__trunc,(double __x),(__
  * format nearest but not larger in magnitude */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL __trunc)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(trunc))(__x); }
 #endif /* __trunc... */
-#if defined(__CRT_HAVE___remquo)
+#ifdef __CRT_HAVE___remquo
 /* Compute remainder of X and Y and put in *QUO a value with sign
  * of x/y and magnitude congruent `mod 2^n' to the magnitude of
  * the integral quotient x/y, with n >= 3 */
@@ -10521,7 +10521,7 @@ __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__remquo,(double __x, double __y, int
  * the integral quotient x/y, with n >= 3 */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,__remquo,(double __x, double __y, int *__pquo),remquo,(__x,__y,__pquo))
 #endif /* __remquo... */
-#if defined(__CRT_HAVE___lrint)
+#ifdef __CRT_HAVE___lrint
 /* Round X to nearest integral value according to current rounding direction */
 __CDECLARE(__ATTR_WUNUSED,long int,__NOTHROW,__lrint,(double __x),(__x))
 #elif defined(__CRT_HAVE_lrint)
@@ -10793,7 +10793,7 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,float,__NOTHROW,__fmaf,(float __x, float 
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED float __NOTHROW(__LIBCCALL __fmaf)(float __x, float __y, float __z) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fmaf))(__x, __y, __z); }
 #endif /* __fmaf... */
 #ifdef __COMPILER_HAVE_LONGLONG
-#if defined(__CRT_HAVE___llrint)
+#ifdef __CRT_HAVE___llrint
 /* Round X to nearest integral value according to current rounding direction */
 __CDECLARE(__ATTR_WUNUSED,__LONGLONG,__NOTHROW,__llrint,(double __x),(__x))
 #elif defined(__CRT_HAVE_llrint)
@@ -11118,7 +11118,7 @@ __FORCELOCAL __ATTR_WUNUSED __LONGLONG __NOTHROW(__LIBCCALL __llroundl)(long dou
 #endif /* __USE_ISOC99 */
 
 #if defined(__USE_MISC) || (defined(__USE_XOPEN_EXTENDED) && !defined(__USE_XOPEN2K8))
-#if defined(__CRT_HAVE___scalb)
+#ifdef __CRT_HAVE___scalb
 /* Return X times (2 to the Nth power) */
 __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,__scalb,(double __x, double __n),(__x,__n))
 #elif defined(__CRT_HAVE__scalb)
@@ -11178,17 +11178,17 @@ __FORCELOCAL __ATTR_WUNUSED long double __NOTHROW(__LIBCCALL __scalbl)(long doub
 
 /* Floating point classification */
 #ifdef __USE_ISOC99
-#if defined(__CRT_HAVE___fpclassify)
+#ifdef __CRT_HAVE___fpclassify
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassify,(double __val),(__val))
 #elif defined(__CRT_HAVE__dclass)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassify,(double __val),_dclass,(__val))
 #endif /* __fpclassify... */
-#if defined(__CRT_HAVE___signbit)
+#ifdef __CRT_HAVE___signbit
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__signbit,(double __val),(__val))
 #elif defined(__CRT_HAVE__dsign)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__signbit,(double __val),_dsign,(__val))
 #endif /* __signbit... */
-#if defined(__CRT_HAVE___fpclassifyf)
+#ifdef __CRT_HAVE___fpclassifyf
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassifyf,(float __val),(__val))
 #elif defined(__CRT_HAVE__fdclass)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassifyf,(float __val),_fdclass,(__val))
@@ -11196,7 +11196,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassifyf,(float __val
 #include <local/math/__fpclassifyf.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(__fpclassifyf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __fpclassifyf)(float __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__fpclassifyf))(__val); })
 #endif /* __fpclassifyf... */
-#if defined(__CRT_HAVE___signbitf)
+#ifdef __CRT_HAVE___signbitf
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__signbitf,(float __val),(__val))
 #elif defined(__CRT_HAVE__fdsign)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__signbitf,(float __val),_fdsign,(__val))
@@ -11205,7 +11205,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__signbitf,(float __val),_
 __NAMESPACE_LOCAL_USING_OR_IMPL(__signbitf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __signbitf)(float __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__signbitf))(__val); })
 #endif /* __signbitf... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
-#if defined(__CRT_HAVE___fpclassifyl)
+#ifdef __CRT_HAVE___fpclassifyl
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassifyl,(long double __val),(__val))
 #elif defined(__CRT_HAVE__ldclass)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassifyl,(long double __val),_ldclass,(__val))
@@ -11215,7 +11215,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__fpclassifyl,(long double
 #include <local/math/__fpclassifyl.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(__fpclassifyl, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __fpclassifyl)(long double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__fpclassifyl))(__val); })
 #endif /* __fpclassifyl... */
-#if defined(__CRT_HAVE___signbitl)
+#ifdef __CRT_HAVE___signbitl
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__signbitl,(long double __val),(__val))
 #elif defined(__CRT_HAVE__ldsign)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__signbitl,(long double __val),_ldsign,(__val))
@@ -11229,17 +11229,17 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(__signbitl, __FORCELOCAL __ATTR_CONST __ATTR_WUN
 #endif /* __USE_ISOC99 */
 
 #ifdef __USE_GNU
-#if defined(__CRT_HAVE___issignaling)
+#ifdef __CRT_HAVE___issignaling
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__issignaling,(double __val),(__val))
 #endif /* __issignaling... */
-#if defined(__CRT_HAVE___issignalingf)
+#ifdef __CRT_HAVE___issignalingf
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__issignalingf,(float __val),(__val))
 #elif defined(__CRT_HAVE___issignaling)
 #include <local/math/__issignalingf.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(__issignalingf, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL __issignalingf)(float __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(__issignalingf))(__val); })
 #endif /* __issignalingf... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
-#if defined(__CRT_HAVE___issignalingl)
+#ifdef __CRT_HAVE___issignalingl
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__issignalingl,(long double __val),(__val))
 #elif defined(__CRT_HAVE___issignaling) && (__SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__issignalingl,(long double __val),__issignaling,(__val))
@@ -11249,17 +11249,17 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(__issignalingl, __FORCELOCAL __ATTR_CONST __ATTR
 #endif /* __issignalingl... */
 #endif /* __COMPILER_HAVE_LONGDOUBLE */
 #endif /* __USE_GNU */
-#if defined(__CRT_HAVE__dpcomp)
+#ifdef __CRT_HAVE__dpcomp
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__dos_dpcomp,(double __x, double __y),_dpcomp,(__x,__y))
 #endif /* __dos_dpcomp... */
-#if defined(__CRT_HAVE__fdpcomp)
+#ifdef __CRT_HAVE__fdpcomp
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__dos_fdpcomp,(float __x, float __y),_fdpcomp,(__x,__y))
 #elif defined(__CRT_HAVE__dpcomp)
 #include <local/math/_fdpcomp.h>
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL __dos_fdpcomp)(float __x, float __y) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_fdpcomp))(__x, __y); }
 #endif /* __dos_fdpcomp... */
 #ifdef __COMPILER_HAVE_LONGDOUBLE
-#if defined(__CRT_HAVE__ldpcomp)
+#ifdef __CRT_HAVE__ldpcomp
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__dos_ldpcomp,(long double __x, long double __y),_ldpcomp,(__x,__y))
 #elif defined(__CRT_HAVE__dpcomp)
 #include <local/math/_ldpcomp.h>

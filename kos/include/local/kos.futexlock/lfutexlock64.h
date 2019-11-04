@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4246fb48 */
+/* HASH CRC-32:0xc47915be */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_lfutexlock64_defined
-#if defined(__CRT_HAVE_lfutexlock)
+#ifdef __CRT_HAVE_lfutexlock
 #define __local_lfutexlock64_defined 1
 #include <bits/types.h>
 #include <bits/types.h>
@@ -26,7 +26,7 @@
 /* Dependency: "lfutexlock32" from "kos.futexlock" */
 #ifndef ____localdep_lfutexlock32_defined
 #define ____localdep_lfutexlock32_defined 1
-#if defined(__CRT_HAVE_lfutexlock)
+#ifdef __CRT_HAVE_lfutexlock
 /* >> lfutexlock(3)
  * Helper function to implement the behavior of `lfutexlockexpr()' for only a single futex.
  * This function behaves identical to the lfutex() system call, except that it takes

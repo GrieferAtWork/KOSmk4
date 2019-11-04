@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x76f73618 */
+/* HASH CRC-32:0xcaccfe0e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,12 +18,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_ppoll64_defined
-#if defined(__CRT_HAVE_ppoll)
+#ifdef __CRT_HAVE_ppoll
 #define __local_ppoll64_defined 1
 /* Dependency: "ppoll32" from "sys.poll" */
 #ifndef ____localdep_ppoll32_defined
 #define ____localdep_ppoll32_defined 1
-#if defined(__CRT_HAVE_ppoll)
+#ifdef __CRT_HAVE_ppoll
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_ppoll32,(struct pollfd *__fds, __UINTPTR_TYPE__ __nfds, struct __timespec32 const *__timeout, struct __sigset_struct const *__ss),ppoll,(__fds,__nfds,__timeout,__ss))
 #else /* LIBC: ppoll */
 #undef ____localdep_ppoll32_defined

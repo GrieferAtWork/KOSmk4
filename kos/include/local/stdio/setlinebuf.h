@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x35c620c1 */
+/* HASH CRC-32:0x22cdd8e1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,12 +18,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_setlinebuf_defined
-#if defined(__CRT_HAVE_setvbuf)
+#ifdef __CRT_HAVE_setvbuf
 #define __local_setlinebuf_defined 1
 /* Dependency: "setvbuf" */
 #ifndef ____localdep_setvbuf_defined
 #define ____localdep_setvbuf_defined 1
-#if defined(__CRT_HAVE_setvbuf)
+#ifdef __CRT_HAVE_setvbuf
 /* Set the buffer and buffer-mode to-be used by the given `STREAM'
  * @param modes: One of `_IOFBF', `_IOLBF' or `_IONBF' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_setvbuf,(__FILE *__restrict __stream, char *__restrict __buf, int __modes, __SIZE_TYPE__ __bufsize),setvbuf,(__stream,__buf,__modes,__bufsize))

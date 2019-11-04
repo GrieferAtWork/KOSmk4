@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc545a1d1 */
+/* HASH CRC-32:0x5d868e14 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "pwritev64" from "sys.uio" */
 #ifndef ____localdep_pwritev64_defined
 #define ____localdep_pwritev64_defined 1
-#if defined(__CRT_HAVE_pwritev64)
+#ifdef __CRT_HAVE_pwritev64
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pwritev64,(__fd_t __fd, struct iovec const *__iovec, __STDC_INT_AS_SIZE_T __count, __off64_t __offset),pwritev64,(__fd,__iovec,__count,__offset))
 #elif defined(__CRT_HAVE_pwritev) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pwritev64,(__fd_t __fd, struct iovec const *__iovec, __STDC_INT_AS_SIZE_T __count, __off64_t __offset),pwritev,(__fd,__iovec,__count,__offset))
@@ -38,7 +38,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pwritev6
 /* Dependency: "pwritev32" from "sys.uio" */
 #ifndef ____localdep_pwritev32_defined
 #define ____localdep_pwritev32_defined 1
-#if defined(__CRT_HAVE_pwritev)
+#ifdef __CRT_HAVE_pwritev
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pwritev32,(__fd_t __fd, struct iovec const *__iovec, __STDC_INT_AS_SIZE_T __count, __off32_t __offset),pwritev,(__fd,__iovec,__count,__offset))
 #else /* LIBC: pwritev */
 #undef ____localdep_pwritev32_defined

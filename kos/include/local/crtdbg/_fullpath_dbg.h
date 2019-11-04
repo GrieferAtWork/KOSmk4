@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc0511a85 */
+/* HASH CRC-32:0x38771c19 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,12 +18,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__fullpath_dbg_defined
-#if defined(__CRT_HAVE__fullpath)
+#ifdef __CRT_HAVE__fullpath
 #define __local__fullpath_dbg_defined 1
 /* Dependency: "_fullpath" */
 #ifndef ____localdep__fullpath_defined
 #define ____localdep__fullpath_defined 1
-#if defined(__CRT_HAVE__fullpath)
+#ifdef __CRT_HAVE__fullpath
 __CREDIRECT(,char *,__NOTHROW_RPC,__localdep__fullpath,(char *__buf, char const *__path, __SIZE_TYPE__ __buflen),_fullpath,(__buf,__path,__buflen))
 #else /* LIBC: _fullpath */
 #undef ____localdep__fullpath_defined

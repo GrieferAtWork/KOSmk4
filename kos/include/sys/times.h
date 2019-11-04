@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x94ece133 */
+/* HASH CRC-32:0xa79413d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,7 +65,7 @@ struct tms {
 	clock_t tms_cstime; /* System CPU time of dead children. */
 };
 
-#if defined(__CRT_HAVE_times)
+#ifdef __CRT_HAVE_times
 /* Store the CPU time used by this process and all its
  * dead children (and their dead children) in BUFFER.
  * Return the elapsed real time, or (clock_t) -1 for errors.

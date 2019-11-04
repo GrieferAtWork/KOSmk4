@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb653e385 */
+/* HASH CRC-32:0xc75f39a6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 /* Dependency: "strchrnul" from "string" */
 #ifndef ____localdep_strchrnul_defined
 #define ____localdep_strchrnul_defined 1
-#if defined(__CRT_HAVE_strchrnul)
+#ifdef __CRT_HAVE_strchrnul
 /* Same as `strchr', but return `strend(STR)', rather than `NULL' if `NEEDLE' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strchrnul,(char const *__restrict __haystack, int __needle),strchrnul,(__haystack,__needle))
 #else /* LIBC: strchrnul */
@@ -38,7 +38,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),cha
 /* Dependency: "strend" from "string" */
 #ifndef ____localdep_strend_defined
 #define ____localdep_strend_defined 1
-#if defined(__CRT_HAVE_strend)
+#ifdef __CRT_HAVE_strend
 /* Same as `STR+strlen(STR)' */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strend,(char const *__restrict __string),strend,(__string))
 #else /* LIBC: strend */
@@ -51,7 +51,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),cha
 /* Dependency: "memmove" from "string" */
 #ifndef ____localdep_memmove_defined
 #define ____localdep_memmove_defined 1
-#if defined(__fast_memmove_defined)
+#ifdef __fast_memmove_defined
 /* Move memory between potentially overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 #define __localdep_memmove (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmove))

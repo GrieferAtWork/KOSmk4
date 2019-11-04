@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc8c3e350 */
+/* HASH CRC-32:0x24ce2437 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 /* Dependency: "unicode_c8toc32" from "unicode" */
 #ifndef ____localdep_unicode_c8toc32_defined
 #define ____localdep_unicode_c8toc32_defined 1
-#if defined(__CRT_HAVE_unicode_c8toc32)
+#ifdef __CRT_HAVE_unicode_c8toc32
 /* @return: *:          Success (*pc32 was filled; the return value is the number of bytes taken from `s')
  * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)
  * @return: (size_t)-2: Success, but no character was generated (s...+=n, together with `mbs' doesn't for a full character, but `mbs' was updated) */

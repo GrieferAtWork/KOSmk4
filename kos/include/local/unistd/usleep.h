@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc8799af6 */
+/* HASH CRC-32:0x2ecfe5fe */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "__crtSleep" from "unistd" */
 #ifndef ____localdep___crtSleep_defined
 #define ____localdep___crtSleep_defined 1
-#if defined(__CRT_HAVE___crtSleep)
+#ifdef __CRT_HAVE___crtSleep
 /* Hidden function exported by DOS that allows for millisecond precision */
 __CREDIRECT_VOID(,__NOTHROW_RPC,__localdep___crtSleep,(__UINT32_TYPE__ __msecs),__crtSleep,(__msecs))
 #elif defined(__CRT_HAVE_delay)

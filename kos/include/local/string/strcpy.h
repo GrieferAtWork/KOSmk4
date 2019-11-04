@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1304bd43 */
+/* HASH CRC-32:0x7701db52 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 /* Dependency: "memcpy" from "string" */
 #ifndef ____localdep_memcpy_defined
 #define ____localdep_memcpy_defined 1
-#if defined(__fast_memcpy_defined)
+#ifdef __fast_memcpy_defined
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 #define __localdep_memcpy (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpy))
@@ -44,7 +44,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHRO
 /* Dependency: "strlen" from "string" */
 #ifndef ____localdep_strlen_defined
 #define ____localdep_strlen_defined 1
-#if defined(__CRT_HAVE_strlen)
+#ifdef __CRT_HAVE_strlen
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __string),strlen,(__string))
 #else /* LIBC: strlen */

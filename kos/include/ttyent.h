@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1b0d29e5 */
+/* HASH CRC-32:0xb1aabe58 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -83,16 +83,16 @@ struct ttyent {
 	char           *ty_comment; /* comment field */
 };
 
-#if defined(__CRT_HAVE_getttyent)
+#ifdef __CRT_HAVE_getttyent
 __CDECLARE(,struct ttyent *,__NOTHROW_RPC_KOS,getttyent,(void),())
 #endif /* getttyent... */
-#if defined(__CRT_HAVE_getttynam)
+#ifdef __CRT_HAVE_getttynam
 __CDECLARE(__ATTR_NONNULL((1)),struct ttyent *,__NOTHROW_RPC_KOS,getttynam,(char const *__tty),(__tty))
 #endif /* getttynam... */
-#if defined(__CRT_HAVE_setttyent)
+#ifdef __CRT_HAVE_setttyent
 __CDECLARE(,int,__NOTHROW_RPC_KOS,setttyent,(void),())
 #endif /* setttyent... */
-#if defined(__CRT_HAVE_endttyent)
+#ifdef __CRT_HAVE_endttyent
 __CDECLARE(,int,__NOTHROW_RPC_KOS,endttyent,(void),())
 #endif /* endttyent... */
 #endif /* __CC__ */

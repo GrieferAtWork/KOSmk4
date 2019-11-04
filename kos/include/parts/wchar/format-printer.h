@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x601b74cd */
+/* HASH CRC-32:0xf85d3a64 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,7 +59,7 @@ __SYSDECL_BEGIN
 typedef __pwformatprinter pwformatprinter;
 #endif /* !__pwformatprinter_defined */
 
-#if defined(__CRT_HAVE_format_wrepeat)
+#ifdef __CRT_HAVE_format_wrepeat
 /* Repeat `CH' a number of `NUM_REPETITIONS' times
  * The usual format-printer rules apply, and this function
  * is allowed to call `PRINTER' as often as it chooses */
@@ -71,7 +71,7 @@ __CDECLARE(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,format_wrepeat,(pwfo
  * is allowed to call `PRINTER' as often as it chooses */
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_wrepeat, __FORCELOCAL __ATTR_NONNULL((1)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_wrepeat)(pwformatprinter __printer, void *__arg, wchar_t __ch, __SIZE_TYPE__ __num_repetitions) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wrepeat))(__printer, __arg, __ch, __num_repetitions); })
 #endif /* format_wrepeat... */
-#if defined(__CRT_HAVE_format_wescape)
+#ifdef __CRT_HAVE_format_wescape
 /* Do C-style escape on the given text, printing it to the given printer.
  * Input:
  * >> Hello "World" W
@@ -103,7 +103,7 @@ __CDECLARE(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,format_wescape,(pwfo
  * @param: TEXTLEN: The total number of bytes to escape, starting at `text' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_wescape, __FORCELOCAL __ATTR_NONNULL((1)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_wescape)(pwformatprinter __printer, void *__arg, /*utf-8*/ wchar_t const *__restrict __text, __SIZE_TYPE__ __textlen, unsigned int __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wescape))(__printer, __arg, __text, __textlen, __flags); })
 #endif /* format_wescape... */
-#if defined(__CRT_HAVE_format_whexdump)
+#ifdef __CRT_HAVE_format_whexdump
 /* Print a hex dump of the given data using the provided format printer
  * @param: PRINTER:  A function called for all quoted portions of the text
  * @param: DATA:     A pointer to the data that should be dumped
@@ -131,7 +131,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_whexdump, __FORCELOCAL __ATTR_NONNULL((1)
 
 
 
-#if defined(__CRT_HAVE_format_vwprintf)
+#ifdef __CRT_HAVE_format_vwprintf
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings
@@ -311,7 +311,7 @@ __CDECLARE(__ATTR_NONNULL((1, 3)) __ATTR_LIBC_PRINTF(3, 0),__SSIZE_TYPE__,__NOTH
  *  - ...               There are a _lot_ more... */
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_vwprintf, __FORCELOCAL __ATTR_NONNULL((1, 3)) __ATTR_LIBC_PRINTF(3, 0) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_vwprintf)(pwformatprinter __printer, void *__arg, wchar_t const *__restrict __format, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_vwprintf))(__printer, __arg, __format, __args); })
 #endif /* format_vwprintf... */
-#if defined(__CRT_HAVE_format_wprintf)
+#ifdef __CRT_HAVE_format_wprintf
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings
@@ -498,7 +498,7 @@ __NAMESPACE_LOCAL_USING(format_wprintf)
 
 
 
-#if defined(__CRT_HAVE_format_wsprintf_printer)
+#ifdef __CRT_HAVE_format_wsprintf_printer
 /* Format-printer implementation for printing to a string buffer like `wsprintf' would
  * WARNING: No trailing NUL-character is implicitly appended */
 __CDECLARE(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_wsprintf_printer,(/*wchar_t ***/void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen),(__arg,__data,__datalen))
@@ -521,7 +521,7 @@ struct format_wsnprintf_data {
 #define FORMAT_WSNPRINTF_INIT(buf, bufsize)       { buf, bufsize }
 #define format_wsnprintf_init(self, buf, bufsize) ((self)->sd_buffer = (buf), (self)->sd_bufsiz = (bufsize))
 
-#if defined(__CRT_HAVE_format_wsnprintf_printer)
+#ifdef __CRT_HAVE_format_wsnprintf_printer
 /* Format-printer implementation for printing to a string buffer like `wsnprintf' would
  * WARNING: No trailing NUL-character is implicitly appended
  * NOTE: The number of written characters is `ORIG_BUFSIZE - ARG->sd_bufsiz'
@@ -546,7 +546,7 @@ __CDECLARE(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_wwidth,(void 
 /* Returns the width (number of characters; not bytes) of the given unicode string */
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_wwidth, __FORCELOCAL __ATTR_NONNULL((2)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_wwidth)(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_wwidth))(__arg, __data, __datalen); })
 #endif /* format_wwidth... */
-#if defined(__CRT_HAVE_format_length)
+#ifdef __CRT_HAVE_format_length
 /* Always re-return `datalen' and ignore all other arguments */
 __CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,format_wlength,(void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_length,(__arg,__data,__datalen))
 #else /* LIBC: format_length */
@@ -590,7 +590,7 @@ struct format_waprintf_data {
 #endif /* __SIZEOF_POINTER__ != ... */
 #endif /* !NDEBUG */
 
-#if defined(__CRT_HAVE_format_waprintf_pack)
+#ifdef __CRT_HAVE_format_waprintf_pack
 /* Pack and finalize a given aprintf format printer
  * Together with `format_waprintf_printer()', the aprintf
  * format printer sub-system should be used as follows:
@@ -636,7 +636,7 @@ __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNU
  *                  (e.g. `format_waprintf_printer(&my_printer, L"\0", 1)') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_waprintf_pack, __FORCELOCAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) wchar_t *__NOTHROW_NCX(__LIBCCALL format_waprintf_pack)(struct format_waprintf_data *__restrict __self, __SIZE_TYPE__ *__pstrlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_waprintf_pack))(__self, __pstrlen); })
 #endif /* format_waprintf_pack... */
-#if defined(__CRT_HAVE_format_waprintf_printer)
+#ifdef __CRT_HAVE_format_waprintf_printer
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_waprintf_printer,(/*struct format_waprintf_data **/void *__arg, wchar_t const *__restrict __data, __SIZE_TYPE__ __datalen),(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_realloc)

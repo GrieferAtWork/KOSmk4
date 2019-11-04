@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc0ca63ff */
+/* HASH CRC-32:0xe79f3869 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "unicode_writeutf8" from "unicode" */
 #ifndef ____localdep_unicode_writeutf8_defined
 #define ____localdep_unicode_writeutf8_defined 1
-#if defined(__CRT_HAVE_unicode_writeutf8)
+#ifdef __CRT_HAVE_unicode_writeutf8
 /* Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
  * This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst' */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_unicode_writeutf8,(/*utf-8*/ char *__restrict __dst, __CHAR32_TYPE__ __ch),unicode_writeutf8,(__dst,__ch))

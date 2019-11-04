@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe4b83d7c */
+/* HASH CRC-32:0x39c4e24f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,7 +61,7 @@
 /* Dependency: "format_wrepeat" from "parts.wchar.format-printer" */
 #ifndef ____localdep_format_wrepeat_defined
 #define ____localdep_format_wrepeat_defined 1
-#if defined(__CRT_HAVE_format_wrepeat)
+#ifdef __CRT_HAVE_format_wrepeat
 /* Repeat `CH' a number of `NUM_REPETITIONS' times
  * The usual format-printer rules apply, and this function
  * is allowed to call `PRINTER' as often as it chooses */
@@ -78,7 +78,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_w
 /* Dependency: "format_wescape" from "parts.wchar.format-printer" */
 #ifndef ____localdep_format_wescape_defined
 #define ____localdep_format_wescape_defined 1
-#if defined(__CRT_HAVE_format_wescape)
+#ifdef __CRT_HAVE_format_wescape
 /* Do C-style escape on the given text, printing it to the given printer.
  * Input:
  * >> Hello "World" W
@@ -115,7 +115,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_w
 /* Dependency: "format_whexdump" from "parts.wchar.format-printer" */
 #ifndef ____localdep_format_whexdump_defined
 #define ____localdep_format_whexdump_defined 1
-#if defined(__CRT_HAVE_format_whexdump)
+#ifdef __CRT_HAVE_format_whexdump
 /* Print a hex dump of the given data using the provided format printer
  * @param: PRINTER:  A function called for all quoted portions of the text
  * @param: DATA:     A pointer to the data that should be dumped
@@ -144,7 +144,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_w
 /* Dependency: "unicode_writeutf16" from "unicode" */
 #ifndef ____localdep_unicode_writeutf16_defined
 #define ____localdep_unicode_writeutf16_defined 1
-#if defined(__CRT_HAVE_unicode_writeutf16)
+#ifdef __CRT_HAVE_unicode_writeutf16
 /* Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
  * This function will write at most `UNICODE_UTF16_CURLEN' bytes to `dst' */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_unicode_writeutf16,(/*utf-16*/__CHAR16_TYPE__ *__restrict __dst, __CHAR32_TYPE__ __ch),unicode_writeutf16,(__dst,__ch))

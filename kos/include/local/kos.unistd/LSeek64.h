@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbf526033 */
+/* HASH CRC-32:0xb7af4e24 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,13 +18,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_LSeek64_defined
-#if defined(__CRT_HAVE_LSeek)
+#ifdef __CRT_HAVE_LSeek
 #define __local_LSeek64_defined 1
 #include <kos/anno.h>
 /* Dependency: "LSeek32" from "kos.unistd" */
 #ifndef ____localdep_LSeek32_defined
 #define ____localdep_LSeek32_defined 1
-#if defined(__CRT_HAVE_LSeek)
+#ifdef __CRT_HAVE_LSeek
 /* >> lseek32(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __CREDIRECT(,__pos32_t,,__localdep_LSeek32,(__fd_t __fd, __off32_t __offset, int __whence),LSeek,(__fd,__offset,__whence)) __THROWS(...)

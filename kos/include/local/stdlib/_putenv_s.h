@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa6425684 */
+/* HASH CRC-32:0x3ad352fa */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,13 +18,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__putenv_s_defined
-#if defined(__CRT_HAVE_setenv)
+#ifdef __CRT_HAVE_setenv
 #define __local__putenv_s_defined 1
 #include <parts/errno.h>
 /* Dependency: "setenv" from "stdlib" */
 #ifndef ____localdep_setenv_defined
 #define ____localdep_setenv_defined 1
-#if defined(__CRT_HAVE_setenv)
+#ifdef __CRT_HAVE_setenv
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_setenv,(char const *__varname, char const *__val, int __replace),setenv,(__varname,__val,__replace))
 #elif defined(__CRT_HAVE__putenv_s)
 #include <local/stdlib/setenv.h>

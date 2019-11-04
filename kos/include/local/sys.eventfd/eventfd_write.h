@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf8a64dc3 */
+/* HASH CRC-32:0x96c59a48 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 /* Dependency: "write" */
 #ifndef ____localdep_write_defined
 #define ____localdep_write_defined 1
-#if defined(__CRT_HAVE_write)
+#ifdef __CRT_HAVE_write
 /* >> write(2)
  * Write data to a given file descriptor `FD' and return the number of bytes written */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_write,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize),write,(__fd,__buf,__bufsize))

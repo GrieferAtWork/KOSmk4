@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7bf4f9e9 */
+/* HASH CRC-32:0x402b5d40 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "umask" */
 #ifndef ____localdep_umask_defined
 #define ____localdep_umask_defined 1
-#if defined(__CRT_HAVE_umask)
+#ifdef __CRT_HAVE_umask
 __CREDIRECT(,__mode_t,__NOTHROW_NCX,__localdep_umask,(__mode_t __mode),umask,(__mode))
 #elif defined(__CRT_HAVE__umask)
 __CREDIRECT(,__mode_t,__NOTHROW_NCX,__localdep_umask,(__mode_t __mode),_umask,(__mode))

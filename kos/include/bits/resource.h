@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x75b3a686 */
+/* HASH CRC-32:0x9dbfa647 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -309,11 +309,11 @@ typedef enum __rlimit_resource __rlimit_resource_t;
 typedef int __rlimit_resource_t;
 #endif /* !__COMPILER_PREFERR_ENUMS */
 
-#if defined(__CRT_HAVE_prlimit)
+#ifdef __CRT_HAVE_prlimit
 __CDECLARE(,int,__NOTHROW_NCX,prlimit,(__pid_t __pid, __rlimit_resource_t __resource, struct rlimit const *__new_limit, struct rlimit *__old_limit),(__pid,__resource,__new_limit,__old_limit))
 #endif /* prlimit... */
 #ifdef __USE_LARGEFILE64
-#if defined(__CRT_HAVE_prlimit64)
+#ifdef __CRT_HAVE_prlimit64
 __CDECLARE(,int,__NOTHROW_NCX,prlimit64,(__pid_t __pid, __rlimit_resource_t __resource, struct rlimit64 const *__new_limit, struct rlimit64 *__old_limit),(__pid,__resource,__new_limit,__old_limit))
 #elif defined(__CRT_HAVE_prlimit) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 __CREDIRECT(,int,__NOTHROW_NCX,prlimit64,(__pid_t __pid, __rlimit_resource_t __resource, struct rlimit64 const *__new_limit, struct rlimit64 *__old_limit),prlimit,(__pid,__resource,__new_limit,__old_limit))

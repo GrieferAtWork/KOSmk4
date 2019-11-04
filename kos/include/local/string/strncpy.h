@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5b727daa */
+/* HASH CRC-32:0x1401bd9f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHR
 /* Dependency: "memcpy" from "string" */
 #ifndef ____localdep_memcpy_defined
 #define ____localdep_memcpy_defined 1
-#if defined(__fast_memcpy_defined)
+#ifdef __fast_memcpy_defined
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 #define __localdep_memcpy (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpy))
@@ -60,7 +60,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),void *,__NOTHRO
 /* Dependency: "memset" from "string" */
 #ifndef ____localdep_memset_defined
 #define ____localdep_memset_defined 1
-#if defined(__fast_memset_defined)
+#ifdef __fast_memset_defined
 /* Fill memory with a given byte
  * @return: * : Always re-returns `dst' */
 #define __localdep_memset (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memset))

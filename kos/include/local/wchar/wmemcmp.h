@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8c93eb86 */
+/* HASH CRC-32:0xb98d5dfa */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 /* Dependency: "memcmpw" from "string" */
 #ifndef ____localdep_memcmpw_defined
 #define ____localdep_memcmpw_defined 1
-#if defined(__fast_memcmpw_defined)
+#ifdef __fast_memcmpw_defined
 /* Compare memory buffers and return the difference of the first non-matching word */
 #define __localdep_memcmpw (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpw))
 #elif defined(__CRT_HAVE_memcmpw)
@@ -44,7 +44,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__INT16_TYPE__,__N
 /* Dependency: "memcmpl" from "string" */
 #ifndef ____localdep_memcmpl_defined
 #define ____localdep_memcmpl_defined 1
-#if defined(__fast_memcmpl_defined)
+#ifdef __fast_memcmpl_defined
 /* Compare memory buffers and return the difference of the first non-matching dword */
 #define __localdep_memcmpl (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcmpl))
 #elif defined(__CRT_HAVE_memcmpl)
@@ -63,7 +63,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__INT32_TYPE__,__N
 /* Dependency: "memcmp" from "string" */
 #ifndef ____localdep_memcmp_defined
 #define ____localdep_memcmp_defined 1
-#if defined(__fast_memcmp_defined)
+#ifdef __fast_memcmp_defined
 /* Compare memory buffers and return the difference of the first non-matching byte
  * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
  * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'

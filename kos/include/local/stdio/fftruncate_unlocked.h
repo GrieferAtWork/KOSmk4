@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf446986 */
+/* HASH CRC-32:0x1a3dea07 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 /* Dependency: "fileno_unlocked" from "stdio" */
 #ifndef ____localdep_fileno_unlocked_defined
 #define ____localdep_fileno_unlocked_defined 1
-#if defined(__CRT_HAVE_fileno_unlocked)
+#ifdef __CRT_HAVE_fileno_unlocked
 /* Same as `fileno()', but performs I/O without acquiring a lock to `STREAM' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,__localdep_fileno_unlocked,(__FILE *__restrict __stream),fileno_unlocked,(__stream))
 #elif defined(__CRT_HAVE__fileno)

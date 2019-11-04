@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2dfd71e5 */
+/* HASH CRC-32:0xd5c4a6d1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -38,7 +38,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHR
 /* Dependency: "tolower_l" from "ctype" */
 #ifndef ____localdep_tolower_l_defined
 #define ____localdep_tolower_l_defined 1
-#if defined(__CRT_HAVE_tolower_l)
+#ifdef __CRT_HAVE_tolower_l
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_tolower_l,(int __ch, __locale_t __locale),tolower_l,(__ch,__locale))
 #elif defined(__CRT_HAVE__tolower_l)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_tolower_l,(int __ch, __locale_t __locale),_tolower_l,(__ch,__locale))

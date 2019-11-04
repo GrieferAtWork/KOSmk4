@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7a685560 */
+/* HASH CRC-32:0x8c6f1b02 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "ntp_adjtime32" from "sys.timex" */
 #ifndef ____localdep_ntp_adjtime32_defined
 #define ____localdep_ntp_adjtime32_defined 1
-#if defined(__CRT_HAVE_ntp_adjtime)
+#ifdef __CRT_HAVE_ntp_adjtime
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ntp_adjtime32,(struct __timex32 *__restrict __tntx),ntp_adjtime,(__tntx))
 #else /* LIBC: ntp_adjtime */
 #undef ____localdep_ntp_adjtime32_defined
@@ -33,7 +33,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ntp_adjtime32,(stru
 /* Dependency: "ntp_adjtime64" from "sys.timex" */
 #ifndef ____localdep_ntp_adjtime64_defined
 #define ____localdep_ntp_adjtime64_defined 1
-#if defined(__CRT_HAVE_ntp_adjtime64)
+#ifdef __CRT_HAVE_ntp_adjtime64
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ntp_adjtime64,(struct timex64 *__restrict __tntx),ntp_adjtime64,(__tntx))
 #elif defined(__CRT_HAVE_ntp_adjtime) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ntp_adjtime64,(struct timex64 *__restrict __tntx),ntp_adjtime,(__tntx))

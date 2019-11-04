@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd2e82bfe */
+/* HASH CRC-32:0x93a278d8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,13 +18,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_PWrite_defined
-#if defined(__CRT_HAVE_PWrite64)
+#ifdef __CRT_HAVE_PWrite64
 #define __local_PWrite_defined 1
 #include <kos/anno.h>
 /* Dependency: "PWrite64" from "kos.unistd" */
 #ifndef ____localdep_PWrite64_defined
 #define ____localdep_PWrite64_defined 1
-#if defined(__CRT_HAVE_PWrite64)
+#ifdef __CRT_HAVE_PWrite64
 /* >> pwrite64(2)
  * Write data to a file at a specific offset */
 __CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,,__localdep_PWrite64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos64_t __offset),PWrite64,(__fd,__buf,__bufsize,__offset)) __THROWS(...)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe8686be4 */
+/* HASH CRC-32:0xc4bc65ad */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "ecvt_r" from "stdlib" */
 #ifndef ____localdep_ecvt_r_defined
 #define ____localdep_ecvt_r_defined 1
-#if defined(__CRT_HAVE_ecvt_r)
+#ifdef __CRT_HAVE_ecvt_r
 __CREDIRECT(__ATTR_NONNULL((3, 4, 5)),int,__NOTHROW_NCX,__localdep_ecvt_r,(double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign, char *__restrict __buf, __SIZE_TYPE__ __len),ecvt_r,(__val,__ndigit,__decptr,__sign,__buf,__len))
 #else /* LIBC: ecvt_r */
 #include <local/stdlib/ecvt_r.h>

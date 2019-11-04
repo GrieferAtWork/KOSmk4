@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xeb875b98 */
+/* HASH CRC-32:0x8415689e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "renameat" from "stdio" */
 #ifndef ____localdep_renameat_defined
 #define ____localdep_renameat_defined 1
-#if defined(__CRT_HAVE_renameat)
+#ifdef __CRT_HAVE_renameat
 __CREDIRECT(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,__localdep_renameat,(__fd_t __oldfd, char const *__oldname, __fd_t __newfd, char const *__newname_or_path),renameat,(__oldfd,__oldname,__newfd,__newname_or_path))
 #elif defined(__CRT_HAVE_frenameat)
 #include <local/stdio/renameat.h>

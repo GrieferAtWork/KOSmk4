@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7cc30660 */
+/* HASH CRC-32:0x7975a6f0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ struct hsearch_data {
 /* Dependency: "hcreate_r" from "search" */
 #ifndef ____localdep_hcreate_r_defined
 #define ____localdep_hcreate_r_defined 1
-#if defined(__CRT_HAVE_hcreate_r)
+#ifdef __CRT_HAVE_hcreate_r
 /* Reentrant versions which can handle multiple hashing tables at the same time */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_hcreate_r,(__SIZE_TYPE__ __nel, struct hsearch_data *__htab),hcreate_r,(__nel,__htab))
 #elif defined(__CRT_HAVE_calloc) || defined(__CRT_HAVE_realloc) || defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc) || defined(__CRT_HAVE_malloc)

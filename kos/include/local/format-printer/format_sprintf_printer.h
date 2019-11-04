@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf9b176fa */
+/* HASH CRC-32:0x4473dd14 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 /* Dependency: "mempcpy" from "string" */
 #ifndef ____localdep_mempcpy_defined
 #define ____localdep_mempcpy_defined 1
-#if defined(__fast_mempcpy_defined)
+#ifdef __fast_mempcpy_defined
 /* Same as `memcpy', but return `DST+N_BYTES', rather than `DST' */
 #define __localdep_mempcpy (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempcpy))
 #elif defined(__CRT_HAVE_mempcpy)

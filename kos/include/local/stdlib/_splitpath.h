@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbffac98d */
+/* HASH CRC-32:0x8e64a50d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "_splitpath_s" from "stdlib" */
 #ifndef ____localdep__splitpath_s_defined
 #define ____localdep__splitpath_s_defined 1
-#if defined(__CRT_HAVE__splitpath_s)
+#ifdef __CRT_HAVE__splitpath_s
 __CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep__splitpath_s,(char const *__restrict __abspath, char *__drive, __SIZE_TYPE__ __drivelen, char *__dir, __SIZE_TYPE__ __dirlen, char *__file, __SIZE_TYPE__ __filelen, char *__ext, __SIZE_TYPE__ __extlen),_splitpath_s,(__abspath,__drive,__drivelen,__dir,__dirlen,__file,__filelen,__ext,__extlen))
 #else /* LIBC: _splitpath_s */
 #include <local/stdlib/_splitpath_s.h>

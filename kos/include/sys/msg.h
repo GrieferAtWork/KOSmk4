@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7552504 */
+/* HASH CRC-32:0x1c4fa7d0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -99,19 +99,19 @@ struct msgbuf {
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 #endif /* __USE_GNU */
 
-#if defined(__CRT_HAVE_msgctl)
+#ifdef __CRT_HAVE_msgctl
 /* Message queue control operation */
 __CDECLARE(,int,__NOTHROW_NCX,msgctl,(int __msqid, int __cmd, struct msqid_ds *__buf),(__msqid,__cmd,__buf))
 #endif /* msgctl... */
-#if defined(__CRT_HAVE_msgget)
+#ifdef __CRT_HAVE_msgget
 /* Get messages queue */
 __CDECLARE(,int,__NOTHROW_NCX,msgget,(key_t __key, int __msgflg),(__key,__msgflg))
 #endif /* msgget... */
-#if defined(__CRT_HAVE_msgrcv)
+#ifdef __CRT_HAVE_msgrcv
 /* Receive message from message queue */
 __CDECLARE(,ssize_t,__NOTHROW_RPC,msgrcv,(int __msqid, void *__msgp, size_t __msgsz, __LONGPTR_TYPE__ __msgtyp, int __msgflg),(__msqid,__msgp,__msgsz,__msgtyp,__msgflg))
 #endif /* msgrcv... */
-#if defined(__CRT_HAVE_msgsnd)
+#ifdef __CRT_HAVE_msgsnd
 /* Send message to message queue */
 __CDECLARE(,int,__NOTHROW_RPC,msgsnd,(int __msqid, const void *__msgp, size_t __msgsz, int __msgflg),(__msqid,__msgp,__msgsz,__msgflg))
 #endif /* msgsnd... */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd339cb26 */
+/* HASH CRC-32:0x9a922bc5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "faccessat" */
 #ifndef ____localdep_faccessat_defined
 #define ____localdep_faccessat_defined 1
-#if defined(__CRT_HAVE_faccessat)
+#ifdef __CRT_HAVE_faccessat
 /* >> faccessat(2)
  * @param: TYPE: Set of `X_OK|W_OK|R_OK'
  * Test for access to the specified file `DFD:FILE', testing for `TYPE' */

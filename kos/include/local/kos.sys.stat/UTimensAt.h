@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5965342e */
+/* HASH CRC-32:0xf92b2da0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 /* Dependency: "UTimensAt64" from "kos.sys.stat" */
 #ifndef ____localdep_UTimensAt64_defined
 #define ____localdep_UTimensAt64_defined 1
-#if defined(__CRT_HAVE_UTimensAt64)
+#ifdef __CRT_HAVE_UTimensAt64
 /* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
 __CREDIRECT_VOID(__ATTR_NONNULL((2)),,__localdep_UTimensAt64,(__fd_t __dirfd, char const *__filename, struct __timespec64 const __times[2/*or:3*/], __atflag_t __flags),UTimensAt64,(__dirfd,__filename,__times,__flags)) __THROWS(...)
 #elif defined(__CRT_HAVE_UTimensAt) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
@@ -42,7 +42,7 @@ __CREDIRECT_VOID(__ATTR_NONNULL((2)),,__localdep_UTimensAt64,(__fd_t __dirfd, ch
 /* Dependency: "UTimensAt32" from "kos.sys.stat" */
 #ifndef ____localdep_UTimensAt32_defined
 #define ____localdep_UTimensAt32_defined 1
-#if defined(__CRT_HAVE_UTimensAt)
+#ifdef __CRT_HAVE_UTimensAt
 /* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
 __CREDIRECT_VOID(__ATTR_NONNULL((2)),,__localdep_UTimensAt32,(__fd_t __dirfd, char const *__filename, struct __TM_TYPE(timespec) const __times[2/*or:3*/], __atflag_t __flags),UTimensAt,(__dirfd,__filename,__times,__flags)) __THROWS(...)
 #else /* LIBC: UTimensAt */

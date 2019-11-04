@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe0ef7a5e */
+/* HASH CRC-32:0x21d029c5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,12 +18,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__searchenv_defined
-#if defined(__CRT_HAVE__searchenv_s)
+#ifdef __CRT_HAVE__searchenv_s
 #define __local__searchenv_defined 1
 /* Dependency: "_searchenv_s" */
 #ifndef ____localdep__searchenv_s_defined
 #define ____localdep__searchenv_s_defined 1
-#if defined(__CRT_HAVE__searchenv_s)
+#ifdef __CRT_HAVE__searchenv_s
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),__errno_t,__NOTHROW_RPC,__localdep__searchenv_s,(char const *__file, char const *__envvar, char *__restrict __resultpath, __SIZE_TYPE__ __buflen),_searchenv_s,(__file,__envvar,__resultpath,__buflen))
 #else /* LIBC: _searchenv_s */
 #undef ____localdep__searchenv_s_defined

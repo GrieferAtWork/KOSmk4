@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x98bafdf7 */
+/* HASH CRC-32:0xd61ea5c3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,13 +18,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_PRead_defined
-#if defined(__CRT_HAVE_PRead64)
+#ifdef __CRT_HAVE_PRead64
 #define __local_PRead_defined 1
 #include <kos/anno.h>
 /* Dependency: "PRead64" from "kos.unistd" */
 #ifndef ____localdep_PRead64_defined
 #define ____localdep_PRead64_defined 1
-#if defined(__CRT_HAVE_PRead64)
+#ifdef __CRT_HAVE_PRead64
 /* >> pread64(2)
  * Read data from a file at a specific offset */
 __CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,,__localdep_PRead64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos64_t __offset),PRead64,(__fd,__buf,__bufsize,__offset)) __THROWS(...)

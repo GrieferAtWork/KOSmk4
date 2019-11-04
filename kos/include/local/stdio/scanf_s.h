@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x87241aa6 */
+/* HASH CRC-32:0x27439cbb */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,13 +18,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_scanf_s_defined
-#if defined(__CRT_HAVE_vscanf_s)
+#ifdef __CRT_HAVE_vscanf_s
 #define __local_scanf_s_defined 1
 #include <kos/anno.h>
 /* Dependency: "vscanf_s" */
 #ifndef ____localdep_vscanf_s_defined
 #define ____localdep_vscanf_s_defined 1
-#if defined(__CRT_HAVE_vscanf_s)
+#ifdef __CRT_HAVE_vscanf_s
 __CREDIRECT(__ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF(1, 0),__STDC_INT_AS_SIZE_T,,__localdep_vscanf_s,(char const *__restrict __format, __builtin_va_list __args),vscanf_s,(__format,__args)) __THROWS(...)
 #else /* LIBC: vscanf_s */
 #undef ____localdep_vscanf_s_defined

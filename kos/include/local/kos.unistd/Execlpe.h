@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfb67edfc */
+/* HASH CRC-32:0xacc552fc */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,14 +18,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_Execlpe_defined
-#if defined(__CRT_HAVE_Execvpe)
+#ifdef __CRT_HAVE_Execvpe
 #define __local_Execlpe_defined 1
 #include <kos/anno.h>
 #include <parts/redirect-exec.h>
 /* Dependency: "Execvpe" */
 #ifndef ____localdep_Execvpe_defined
 #define ____localdep_Execvpe_defined 1
-#if defined(__CRT_HAVE_Execvpe)
+#ifdef __CRT_HAVE_Execvpe
 /* >> execvpe(3)
  * Replace the calling process with the application image referred to by `FILE'
  * and execute it's `main()' method, passing the given `ARGV', and setting `environ' to `ENVP' */

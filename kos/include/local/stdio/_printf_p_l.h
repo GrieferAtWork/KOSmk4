@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x267e530b */
+/* HASH CRC-32:0x6e74909b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 /* Dependency: "_vprintf_p_l" from "stdio" */
 #ifndef ____localdep__vprintf_p_l_defined
 #define ____localdep__vprintf_p_l_defined 1
-#if defined(__CRT_HAVE__vprintf_p_l)
+#ifdef __CRT_HAVE__vprintf_p_l
 __CREDIRECT(__ATTR_NONNULL((1)) __ATTR_LIBC_PRINTF_P(1, 0),__STDC_INT_AS_SIZE_T,,__localdep__vprintf_p_l,(char const *__restrict __format, __locale_t __locale, __builtin_va_list __args),_vprintf_p_l,(__format,__locale,__args)) __THROWS(...)
 #elif (!defined(__NO_STDSTREAMS) && (defined(__CRT_HAVE_fwrite) || defined(__CRT_HAVE_fwrite_s) || defined(__CRT_HAVE_fputc) || defined(__CRT_HAVE_putc) || (defined(__CRT_DOS) && defined(__CRT_HAVE__flsbuf)) || (defined(__USE_STDIO_UNLOCKED) && (defined(__CRT_HAVE_fwrite_unlocked) || defined(__CRT_HAVE__fwrite_nolock) || defined(__CRT_HAVE_fputc_unlocked) || defined(__CRT_HAVE_putc_unlocked))) || defined(__CRT_HAVE__vfprintf_p))) || defined(__CRT_HAVE__vprintf_p)
 #include <local/stdio/_vprintf_p_l.h>

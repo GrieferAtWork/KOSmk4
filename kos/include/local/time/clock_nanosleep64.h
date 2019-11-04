@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x72283a76 */
+/* HASH CRC-32:0xf26fdf44 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "clock_nanosleep32" from "time" */
 #ifndef ____localdep_clock_nanosleep32_defined
 #define ____localdep_clock_nanosleep32_defined 1
-#if defined(__CRT_HAVE_clock_nanosleep)
+#ifdef __CRT_HAVE_clock_nanosleep
 /* High-resolution sleep with the specified clock */
 __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,__localdep_clock_nanosleep32,(__clockid_t __clock_id, int __flags, struct __timespec32 const *__restrict __requested_time, struct __timespec32 *__remaining),clock_nanosleep,(__clock_id,__flags,__requested_time,__remaining))
 #elif defined(__CRT_HAVE___clock_nanosleep)

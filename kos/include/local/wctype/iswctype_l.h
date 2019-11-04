@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x331a2f7b */
+/* HASH CRC-32:0x80a35a37 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "iswctype" from "wctype" */
 #ifndef ____localdep_iswctype_defined
 #define ____localdep_iswctype_defined 1
-#if defined(__CRT_HAVE_iswctype)
+#ifdef __CRT_HAVE_iswctype
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswctype,(__WINT_TYPE__ __wc, __WCTYPE_TYPE__ __desc),iswctype,(__wc,__desc))
 #elif defined(__CRT_HAVE_is_wctype)
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswctype,(__WINT_TYPE__ __wc, __WCTYPE_TYPE__ __desc),is_wctype,(__wc,__desc))

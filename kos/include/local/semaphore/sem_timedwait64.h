@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5047e895 */
+/* HASH CRC-32:0xdc4610e9 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,12 +18,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sem_timedwait64_defined
-#if defined(__CRT_HAVE_sem_timedwait)
+#ifdef __CRT_HAVE_sem_timedwait
 #define __local_sem_timedwait64_defined 1
 /* Dependency: "sem_timedwait32" from "semaphore" */
 #ifndef ____localdep_sem_timedwait32_defined
 #define ____localdep_sem_timedwait32_defined 1
-#if defined(__CRT_HAVE_sem_timedwait)
+#ifdef __CRT_HAVE_sem_timedwait
 /* Similar to `sem_wait' but wait only until ABSTIME */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_sem_timedwait32,(sem_t *__restrict __sem, struct __timespec32 const *__restrict __abstime),sem_timedwait,(__sem,__abstime))
 #else /* LIBC: sem_timedwait */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6bf06575 */
+/* HASH CRC-32:0xf6799650 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 /* Dependency: "memset" from "string" */
 #ifndef ____localdep_memset_defined
 #define ____localdep_memset_defined 1
-#if defined(__fast_memset_defined)
+#ifdef __fast_memset_defined
 /* Fill memory with a given byte
  * @return: * : Always re-returns `dst' */
 #define __localdep_memset (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memset))

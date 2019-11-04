@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf3032fcc */
+/* HASH CRC-32:0x8f22f2c7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_Memdup_defined
-#if defined(__CRT_HAVE_Malloc)
+#ifdef __CRT_HAVE_Malloc
 #define __local_Memdup_defined 1
 #include <kos/anno.h>
 #ifdef __LIBC_BIND_OPTIMIZATIONS
@@ -27,7 +27,7 @@
 /* Dependency: "Malloc" */
 #ifndef ____localdep_Malloc_defined
 #define ____localdep_Malloc_defined 1
-#if defined(__CRT_HAVE_Malloc)
+#ifdef __CRT_HAVE_Malloc
 /* @throws: E_BADALLOC: ... */
 __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,,__localdep_Malloc,(__SIZE_TYPE__ __num_bytes),Malloc,(__num_bytes)) __THROWS(E_BADALLOC)
 #else /* LIBC: Malloc */
@@ -38,7 +38,7 @@ __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_W
 /* Dependency: "memcpy" from "string" */
 #ifndef ____localdep_memcpy_defined
 #define ____localdep_memcpy_defined 1
-#if defined(__fast_memcpy_defined)
+#ifdef __fast_memcpy_defined
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 #define __localdep_memcpy (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpy))

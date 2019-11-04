@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa326464d */
+/* HASH CRC-32:0x6a713d2a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -104,7 +104,7 @@ __CREDIRECT_VOID(,__NOTHROW_NCX,free,(void *__mallptr),cfree,(__mallptr))
 #undef __free_defined
 #endif /* free... */
 #endif /* !__free_defined */
-#if defined(__CRT_HAVE_realloc_in_place)
+#ifdef __CRT_HAVE_realloc_in_place
 /* @EXCEPT: `realloc_in_place()' will return `NULL' if the reallocation isn't
  *           possible due to the requested memory above `MALLPTR' already being
  *           in use. However, an `E_BADALLOC' exception is thrown if insufficient
@@ -119,11 +119,11 @@ __CDECLARE(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_N
  *           the operation */
 __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,realloc_in_place,(void *__restrict __mallptr, size_t __n_bytes),_expand,(__mallptr,__n_bytes))
 #endif /* realloc_in_place... */
-#if defined(__CRT_HAVE_posix_memalign)
+#ifdef __CRT_HAVE_posix_memalign
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,crt_posix_memalign,(void **__restrict __pp, size_t __alignment, size_t __n_bytes),posix_memalign,(__pp,__alignment,__n_bytes))
 #endif /* crt_posix_memalign... */
 
-#if defined(__CRT_HAVE_memalign)
+#ifdef __CRT_HAVE_memalign
 __CDECLARE(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_ALIGN(1),void *,__NOTHROW_NCX,memalign,(size_t __alignment, size_t __n_bytes),(__alignment,__n_bytes))
 #elif defined(__CRT_HAVE_aligned_alloc)
 __CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_ALIGN(1),void *,__NOTHROW_NCX,memalign,(size_t __alignment, size_t __n_bytes),aligned_alloc,(__alignment,__n_bytes))
@@ -132,12 +132,12 @@ __CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_ALI
 __NAMESPACE_LOCAL_USING_OR_IMPL(memalign, __FORCELOCAL __ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_ALIGN(1) void *__NOTHROW_NCX(__LIBCCALL memalign)(size_t __alignment, size_t __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memalign))(__alignment, __n_bytes); })
 #endif /* memalign... */
 
-#if defined(__CRT_HAVE_pvalloc)
+#ifdef __CRT_HAVE_pvalloc
 __CDECLARE(__ATTR_MALLOC __ATTR_MALL_PAGEALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,pvalloc,(size_t __n_bytes),(__n_bytes))
 #endif /* pvalloc... */
 #ifndef __valloc_defined
 #define __valloc_defined 1
-#if defined(__CRT_HAVE_valloc)
+#ifdef __CRT_HAVE_valloc
 __CDECLARE(__ATTR_MALL_PAGEALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,__NOTHROW_NCX,valloc,(__SIZE_TYPE__ __n_bytes),(__n_bytes))
 #elif defined(__CRT_HAVE_posix_memalign) || defined(__CRT_HAVE_memalign) || defined(__CRT_HAVE_aligned_alloc)
 #include <local/malloc/valloc.h>
@@ -161,7 +161,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(posix_memalign, __FORCELOCAL __ATTR_NONNULL((1))
 #endif /* !__posix_memalign_defined */
 #ifndef __cfree_defined
 #define __cfree_defined 1
-#if defined(__CRT_HAVE_free)
+#ifdef __CRT_HAVE_free
 __CREDIRECT_VOID(,__NOTHROW_NCX,cfree,(void *__restrict __mallptr),free,(__mallptr))
 #elif defined(__CRT_HAVE_cfree)
 __CDECLARE_VOID(,__NOTHROW_NCX,cfree,(void *__restrict __mallptr),(__mallptr))
@@ -170,25 +170,25 @@ __CDECLARE_VOID(,__NOTHROW_NCX,cfree,(void *__restrict __mallptr),(__mallptr))
 #endif /* cfree... */
 #endif /* !__cfree_defined */
 
-#if defined(__CRT_HAVE_malloc_trim)
+#ifdef __CRT_HAVE_malloc_trim
 __CDECLARE(,int,__NOTHROW_NCX,malloc_trim,(size_t __pad),(__pad))
 #else /* LIBC: malloc_trim */
 #include <local/malloc/malloc_trim.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(malloc_trim, __FORCELOCAL int __NOTHROW_NCX(__LIBCCALL malloc_trim)(size_t __pad) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(malloc_trim))(__pad); })
 #endif /* malloc_trim... */
 
-#if defined(__CRT_HAVE_malloc_usable_size)
+#ifdef __CRT_HAVE_malloc_usable_size
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,size_t,__NOTHROW_NCX,malloc_usable_size,(void *__restrict __mallptr),(__mallptr))
 #elif defined(__CRT_HAVE__msize)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,size_t,__NOTHROW_NCX,malloc_usable_size,(void *__restrict __mallptr),_msize,(__mallptr))
 #endif /* malloc_usable_size... */
-#if defined(__CRT_HAVE_mallopt)
+#ifdef __CRT_HAVE_mallopt
 __CDECLARE(,int,__NOTHROW_NCX,mallopt,(int __parameter_number, int __parameter_value),(__parameter_number,__parameter_value))
 #else /* LIBC: mallopt */
 #include <local/malloc/mallopt.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(mallopt, __FORCELOCAL int __NOTHROW_NCX(__LIBCCALL mallopt)(int __parameter_number, int __parameter_value) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mallopt))(__parameter_number, __parameter_value); })
 #endif /* mallopt... */
-#if defined(__CRT_HAVE___memdup)
+#ifdef __CRT_HAVE___memdup
 __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__memdup,(void const *__restrict __ptr, size_t __n_bytes),(__ptr,__n_bytes))
 #elif defined(__CRT_HAVE_memdup)
 __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__memdup,(void const *__restrict __ptr, size_t __n_bytes),memdup,(__ptr,__n_bytes))
@@ -196,7 +196,7 @@ __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONN
 #include <local/malloc/memdup.h>
 __FORCELOCAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBCCALL __memdup)(void const *__restrict __ptr, size_t __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memdup))(__ptr, __n_bytes); }
 #endif /* __memdup... */
-#if defined(__CRT_HAVE___memcdup)
+#ifdef __CRT_HAVE___memcdup
 __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__memcdup,(void const *__restrict __ptr, int __needle, size_t __n_bytes),(__ptr,__needle,__n_bytes))
 #elif defined(__CRT_HAVE_memcdup)
 __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__memcdup,(void const *__restrict __ptr, int __needle, size_t __n_bytes),memcdup,(__ptr,__needle,__n_bytes))
@@ -206,7 +206,7 @@ __FORCELOCAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NON
 #endif /* __memcdup... */
 
 #ifdef __USE_KOS
-#if defined(__CRT_HAVE_memdup)
+#ifdef __CRT_HAVE_memdup
 __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,memdup,(void const *__restrict __ptr, size_t __n_bytes),(__ptr,__n_bytes))
 #elif defined(__CRT_HAVE___memdup)
 __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,memdup,(void const *__restrict __ptr, size_t __n_bytes),__memdup,(__ptr,__n_bytes))
@@ -214,7 +214,7 @@ __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONN
 #include <local/malloc/memdup.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(memdup, __FORCELOCAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_ALLOC_SIZE((2)) void *__NOTHROW_NCX(__LIBCCALL memdup)(void const *__restrict __ptr, size_t __n_bytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(memdup))(__ptr, __n_bytes); })
 #endif /* memdup... */
-#if defined(__CRT_HAVE_memcdup)
+#ifdef __CRT_HAVE_memcdup
 __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,memcdup,(void const *__restrict __ptr, int __needle, size_t __n_bytes),(__ptr,__needle,__n_bytes))
 #elif defined(__CRT_HAVE___memcdup)
 __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,memcdup,(void const *__restrict __ptr, int __needle, size_t __n_bytes),__memcdup,(__ptr,__needle,__n_bytes))
@@ -224,7 +224,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(memcdup, __FORCELOCAL __ATTR_MALLOC __ATTR_MALL_
 #endif /* memcdup... */
 #endif /* __USE_KOS */
 #ifdef __USE_DOS
-#if defined(__CRT_HAVE__msize)
+#ifdef __CRT_HAVE__msize
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,size_t,__NOTHROW_NCX,_msize,(void *__restrict __mallptr),(__mallptr))
 #elif defined(__CRT_HAVE_malloc_usable_size)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,size_t,__NOTHROW_NCX,_msize,(void *__restrict __mallptr),malloc_usable_size,(__mallptr))

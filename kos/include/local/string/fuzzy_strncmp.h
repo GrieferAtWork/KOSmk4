@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xab64ddf8 */
+/* HASH CRC-32:0x2e3e4d58 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 /* Dependency: "fuzzy_memcmp" from "string" */
 #ifndef ____localdep_fuzzy_memcmp_defined
 #define ____localdep_fuzzy_memcmp_defined 1
-#if defined(__CRT_HAVE_fuzzy_memcmp)
+#ifdef __CRT_HAVE_fuzzy_memcmp
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_fuzzy_memcmp,(void const *__s1, __SIZE_TYPE__ __s1_bytes, void const *__s2, __SIZE_TYPE__ __s2_bytes),fuzzy_memcmp,(__s1,__s1_bytes,__s2,__s2_bytes))
 #elif !defined(__NO_MALLOCA)
 #include <local/string/fuzzy_memcmp.h>

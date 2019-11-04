@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x40a1bed1 */
+/* HASH CRC-32:0xfb9752b1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 /* Dependency: "spawnve" */
 #ifndef ____localdep_spawnve_defined
 #define ____localdep_spawnve_defined 1
-#if defined(__CRT_HAVE_spawnve)
+#ifdef __CRT_HAVE_spawnve
 __CREDIRECT(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,__localdep_spawnve,(int __mode, char const *__restrict __path, __TARGV, __TENVP),spawnve,(__mode,__path, ___argv, ___envp))
 #elif defined(__CRT_HAVE__spawnve)
 __CREDIRECT(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,__localdep_spawnve,(int __mode, char const *__restrict __path, __TARGV, __TENVP),_spawnve,(__mode,__path, ___argv, ___envp))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc534b57d */
+/* HASH CRC-32:0x9e7d72c9 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -37,7 +37,7 @@ __SYSDECL_BEGIN
 
 #ifndef __Fcntl_defined
 #define __Fcntl_defined 1
-#if defined(__CRT_HAVE_Fcntl)
+#ifdef __CRT_HAVE_Fcntl
 __LIBC __STDC_INT_AS_SSIZE_T (__VLIBCCALL Fcntl)(__fd_t __fd, int __cmd, ...) __THROWS(...) __CASMNAME_SAME("Fcntl");
 #else /* LIBC: Fcntl */
 #undef __Fcntl_defined
@@ -75,7 +75,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(Creat, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNUL
 #endif /* !__Creat_defined */
 
 #ifdef __USE_LARGEFILE64
-#if defined(__CRT_HAVE_Open64)
+#ifdef __CRT_HAVE_Open64
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t (__VLIBCCALL Open64)(char const *__filename, __oflag_t __oflags, ...) __THROWS(...) __CASMNAME_SAME("Open64");
 #elif defined(__CRT_HAVE_Open) && (!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,,Open64,(char const *__filename, __oflag_t __oflags),Open,(__filename,__oflags),__oflags,1,(__mode_t)) __THROWS(...)
@@ -89,7 +89,7 @@ __NAMESPACE_LOCAL_USING(Open64)
 #endif /* Open64... */
 #ifndef __Creat64_defined
 #define __Creat64_defined 1
-#if defined(__CRT_HAVE_Creat64)
+#ifdef __CRT_HAVE_Creat64
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,,Creat64,(char const *__filename, __mode_t __mode),(__filename,__mode)) __THROWS(...)
 #elif defined(__CRT_HAVE_Creat) && (!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,,Creat64,(char const *__filename, __mode_t __mode),Creat,(__filename,__mode)) __THROWS(...)
@@ -123,7 +123,7 @@ __NAMESPACE_LOCAL_USING(OpenAt)
 #ifdef __USE_LARGEFILE64
 #ifndef __OpenAt64_defined
 #define __OpenAt64_defined 1
-#if defined(__CRT_HAVE_OpenAt64)
+#ifdef __CRT_HAVE_OpenAt64
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((2)) __fd_t (__VLIBCCALL OpenAt64)(__fd_t __dirfd, char const *__filename, __oflag_t __oflags, ...) __THROWS(...) __CASMNAME_SAME("OpenAt64");
 #elif defined(__CRT_HAVE_OpenAt) && (!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,,OpenAt64,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),OpenAt,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t)) __THROWS(...)

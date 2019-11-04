@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc0c3d5f3 */
+/* HASH CRC-32:0x14d351f8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 /* Dependency: "fuzzy_wmemcasecmp_l" from "wchar" */
 #ifndef ____localdep_fuzzy_wmemcasecmp_l_defined
 #define ____localdep_fuzzy_wmemcasecmp_l_defined 1
-#if defined(__CRT_HAVE_fuzzy_wmemcasecmp_l)
+#ifdef __CRT_HAVE_fuzzy_wmemcasecmp_l
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_fuzzy_wmemcasecmp_l,(__WCHAR_TYPE__ const *__s1, __SIZE_TYPE__ __s1_bytes, __WCHAR_TYPE__ const *__s2, __SIZE_TYPE__ __s2_bytes, __locale_t __locale),fuzzy_wmemcasecmp_l,(__s1,__s1_bytes,__s2,__s2_bytes,__locale))
 #elif !defined(__NO_MALLOCA)
 #include <local/wchar/fuzzy_wmemcasecmp_l.h>
@@ -37,7 +37,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NO
 /* Dependency: "wcsnlen" from "wchar" */
 #ifndef ____localdep_wcsnlen_defined
 #define ____localdep_wcsnlen_defined 1
-#if defined(__CRT_HAVE_wcsnlen)
+#ifdef __CRT_HAVE_wcsnlen
 /* Same as `wcslen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsnlen,(__WCHAR_TYPE__ const *__restrict __string, __SIZE_TYPE__ __maxlen),wcsnlen,(__string,__maxlen))
 #else /* LIBC: wcsnlen */

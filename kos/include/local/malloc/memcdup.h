@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf4909220 */
+/* HASH CRC-32:0x1bca8e93 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 /* Dependency: "memchr" from "string" */
 #ifndef ____localdep_memchr_defined
 #define ____localdep_memchr_defined 1
-#if defined(__fast_memchr_defined)
+#ifdef __fast_memchr_defined
 /* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
 #define __localdep_memchr (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memchr))
 #elif defined(__CRT_HAVE_memchr)
@@ -42,7 +42,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,
 /* Dependency: "memdup" from "malloc" */
 #ifndef ____localdep_memdup_defined
 #define ____localdep_memdup_defined 1
-#if defined(__CRT_HAVE_memdup)
+#ifdef __CRT_HAVE_memdup
 __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_memdup,(void const *__restrict __ptr, __SIZE_TYPE__ __n_bytes),memdup,(__ptr,__n_bytes))
 #elif defined(__CRT_HAVE___memdup)
 __CREDIRECT(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_ALLOC_SIZE((2)),void *,__NOTHROW_NCX,__localdep_memdup,(void const *__restrict __ptr, __SIZE_TYPE__ __n_bytes),__memdup,(__ptr,__n_bytes))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2701424a */
+/* HASH CRC-32:0xcec511b2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "strcasecmp_l" from "string" */
 #ifndef ____localdep_strcasecmp_l_defined
 #define ____localdep_strcasecmp_l_defined 1
-#if defined(__CRT_HAVE_strcasecmp_l)
+#ifdef __CRT_HAVE_strcasecmp_l
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strcasecmp_l,(char const *__s1, char const *__s2, __locale_t __locale),strcasecmp_l,(__s1,__s2,__locale))
 #elif defined(__CRT_HAVE__stricmp_l)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strcasecmp_l,(char const *__s1, char const *__s2, __locale_t __locale),_stricmp_l,(__s1,__s2,__locale))

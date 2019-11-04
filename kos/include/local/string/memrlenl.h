@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf9d31288 */
+/* HASH CRC-32:0xa21d6103 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 /* Dependency: "memrendl" from "string" */
 #ifndef ____localdep_memrendl_defined
 #define ____localdep_memrendl_defined 1
-#if defined(__fast_memrendl_defined)
+#ifdef __fast_memrendl_defined
 /* Same as `memrchrl', but return `HAYSTACK-1', rather than `NULL' if `NEEDLE' wasn't found. */
 #define __localdep_memrendl (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memrendl))
 #elif defined(__CRT_HAVE_memrendl)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x554a167a */
+/* HASH CRC-32:0xc06f475 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 /* Dependency: "fuzzy_wmemcasecmp" from "wchar" */
 #ifndef ____localdep_fuzzy_wmemcasecmp_defined
 #define ____localdep_fuzzy_wmemcasecmp_defined 1
-#if defined(__CRT_HAVE_fuzzy_wmemcasecmp)
+#ifdef __CRT_HAVE_fuzzy_wmemcasecmp
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_fuzzy_wmemcasecmp,(__WCHAR_TYPE__ const *__s1, __SIZE_TYPE__ __s1_bytes, __WCHAR_TYPE__ const *__s2, __SIZE_TYPE__ __s2_bytes),fuzzy_wmemcasecmp,(__s1,__s1_bytes,__s2,__s2_bytes))
 #elif !defined(__NO_MALLOCA)
 #include <local/wchar/fuzzy_wmemcasecmp.h>

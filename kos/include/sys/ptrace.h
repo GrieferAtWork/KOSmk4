@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x467304b0 */
+/* HASH CRC-32:0x4cbe76e9 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -438,7 +438,7 @@ struct __ptrace_peeksiginfo_args {
 #pragma pop_macro("off")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
-#if defined(__CRT_HAVE_ptrace)
+#ifdef __CRT_HAVE_ptrace
 /* Perform process tracing functions. REQUEST is one of
  * the values above, and determines the action to be taken.
  * For all requests except PTRACE_TRACEME, PID specifies the process to be traced.

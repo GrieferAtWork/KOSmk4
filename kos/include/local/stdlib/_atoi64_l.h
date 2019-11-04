@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x33d5644e */
+/* HASH CRC-32:0x9171876c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "strto64_l" from "stdlib" */
 #ifndef ____localdep_strto64_l_defined
 #define ____localdep_strto64_l_defined 1
-#if defined(__CRT_HAVE_strto64_l)
+#ifdef __CRT_HAVE_strto64_l
 __CREDIRECT(__ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,__localdep_strto64_l,(char const *__restrict __nptr, char **__endptr, int __base, __locale_t __locale),strto64_l,(__nptr,__endptr,__base,__locale))
 #elif defined(__CRT_HAVE__strtoi64_l)
 __CREDIRECT(__ATTR_NONNULL((1)),__INT64_TYPE__,__NOTHROW_NCX,__localdep_strto64_l,(char const *__restrict __nptr, char **__endptr, int __base, __locale_t __locale),_strtoi64_l,(__nptr,__endptr,__base,__locale))

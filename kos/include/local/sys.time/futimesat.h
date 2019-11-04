@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc98cbd3 */
+/* HASH CRC-32:0x750435f5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "futimesat32" from "sys.time" */
 #ifndef ____localdep_futimesat32_defined
 #define ____localdep_futimesat32_defined 1
-#if defined(__CRT_HAVE_futimesat)
+#ifdef __CRT_HAVE_futimesat
 /* Same as `utimes', but takes an open file descriptor instead of a name */
 __CREDIRECT(__ATTR_NONNULL((2, 3)),int,__NOTHROW_NCX,__localdep_futimesat32,(__fd_t __fd, char const *__file, struct __timeval32 const __tvp[2]),futimesat,(__fd,__file,__tvp))
 #else /* LIBC: futimesat */
@@ -34,7 +34,7 @@ __CREDIRECT(__ATTR_NONNULL((2, 3)),int,__NOTHROW_NCX,__localdep_futimesat32,(__f
 /* Dependency: "futimesat64" from "sys.time" */
 #ifndef ____localdep_futimesat64_defined
 #define ____localdep_futimesat64_defined 1
-#if defined(__CRT_HAVE_futimesat64)
+#ifdef __CRT_HAVE_futimesat64
 /* Same as `utimes', but takes an open file descriptor instead of a name */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_futimesat64,(__fd_t __fd, char const *__file, struct __timeval64 const __tvp[2]),futimesat64,(__fd,__file,__tvp))
 #elif defined(__CRT_HAVE_futimesat) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)

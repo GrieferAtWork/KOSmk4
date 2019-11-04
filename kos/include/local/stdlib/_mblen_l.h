@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xec69a6e3 */
+/* HASH CRC-32:0xa9a3400e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "mblen" from "stdlib" */
 #ifndef ____localdep_mblen_defined
 #define ____localdep_mblen_defined 1
-#if defined(__CRT_HAVE_mblen)
+#ifdef __CRT_HAVE_mblen
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_mblen,(char const *__s, __SIZE_TYPE__ __n),mblen,(__s,__n))
 #else /* LIBC: mblen */
 #include <local/stdlib/mblen.h>

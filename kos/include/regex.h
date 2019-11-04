@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x70099f22 */
+/* HASH CRC-32:0x697ac7e7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -290,12 +290,12 @@ typedef struct {
 #ifdef __CC__
 
 #ifdef __USE_GNU
-#if defined(__CRT_HAVE_re_set_syntax)
+#ifdef __CRT_HAVE_re_set_syntax
 /* Sets the current default syntax to SYNTAX, and return the old syntax.
  * You can also simply assign to the `re_syntax_options' variable */
 __CDECLARE(,reg_syntax_t,__NOTHROW_NCX,re_set_syntax,(reg_syntax_t __syntax),(__syntax))
 #endif /* re_set_syntax... */
-#if defined(__CRT_HAVE_re_compile_pattern)
+#ifdef __CRT_HAVE_re_compile_pattern
 /* Compile the regular expression PATTERN, with length LENGTH
  * and syntax given by the global `re_syntax_options', into the buffer
  * BUFFER. Return NULL if successful, and an error string if not.
@@ -304,12 +304,12 @@ __CDECLARE(,reg_syntax_t,__NOTHROW_NCX,re_set_syntax,(reg_syntax_t __syntax),(__
  * `regcomp', with a malloc'ed value, or set to NULL before calling `regfree' */
 __CDECLARE(,char const *,__NOTHROW_NCX,re_compile_pattern,(char const *__pattern, size_t __length, struct re_pattern_buffer *__buffer),(__pattern,__length,__buffer))
 #endif /* re_compile_pattern... */
-#if defined(__CRT_HAVE_re_compile_fastmap)
+#ifdef __CRT_HAVE_re_compile_fastmap
 /* Compile a fastmap for the compiled pattern in BUFFER; used to
  * accelerate searches. Return 0 if successful and -2 if was an internal error */
 __CDECLARE(,int,__NOTHROW_NCX,re_compile_fastmap,(struct re_pattern_buffer *__buffer),(__buffer))
 #endif /* re_compile_fastmap... */
-#if defined(__CRT_HAVE_re_search)
+#ifdef __CRT_HAVE_re_search
 /* Search in the string STRING (with length LENGTH) for the pattern
  * compiled into BUFFER. Start searching at position START, for RANGE
  * characters. Return the starting position of the match, -1 for no
@@ -317,21 +317,21 @@ __CDECLARE(,int,__NOTHROW_NCX,re_compile_fastmap,(struct re_pattern_buffer *__bu
  * information in REGS (if REGS and BUFFER->no_sub are nonzero) */
 __CDECLARE(,int,__NOTHROW_NCX,re_search,(struct re_pattern_buffer *__buffer, char const *__string, int __length, int __start, int __range, struct re_registers *__regs),(__buffer,__string,__length,__start,__range,__regs))
 #endif /* re_search... */
-#if defined(__CRT_HAVE_re_search_2)
+#ifdef __CRT_HAVE_re_search_2
 /* Like `re_search', but search in the concatenation of STRING1
  * and STRING2. Also, stop searching at index START + STOP */
 __CDECLARE(,int,__NOTHROW_NCX,re_search_2,(struct re_pattern_buffer *__buffer, char const *__string1, int __length1, char const *__string2, int __length2, int __start, int __range, struct re_registers *__regs, int __stop),(__buffer,__string1,__length1,__string2,__length2,__start,__range,__regs,__stop))
 #endif /* re_search_2... */
-#if defined(__CRT_HAVE_re_match)
+#ifdef __CRT_HAVE_re_match
 /* Like `re_search', but return how many characters in STRING
  * the regexp in BUFFER matched, starting at position START */
 __CDECLARE(,int,__NOTHROW_NCX,re_match,(struct re_pattern_buffer *__buffer, char const *__string, int __length, int __start, struct re_registers *__regs),(__buffer,__string,__length,__start,__regs))
 #endif /* re_match... */
-#if defined(__CRT_HAVE_re_match_2)
+#ifdef __CRT_HAVE_re_match_2
 /* Relates to `re_match' as `re_search_2' relates to `re_search' */
 __CDECLARE(,int,__NOTHROW_NCX,re_match_2,(struct re_pattern_buffer *__buffer, char const *__string1, int __length1, char const *__string2, int __length2, int __start, struct re_registers *__regs, int __stop),(__buffer,__string1,__length1,__string2,__length2,__start,__regs,__stop))
 #endif /* re_match_2... */
-#if defined(__CRT_HAVE_re_set_registers)
+#ifdef __CRT_HAVE_re_set_registers
 /* Set REGS to hold NUM_REGS registers, storing them in STARTS and
  * ENDS. Subsequent matches using BUFFER and REGS will use this memory
  * for recording register information. STARTS and ENDS must be allocated
@@ -342,16 +342,16 @@ __CDECLARE(,int,__NOTHROW_NCX,re_match_2,(struct re_pattern_buffer *__buffer, ch
 __CDECLARE_VOID(,__NOTHROW_NCX,re_set_registers,(struct re_pattern_buffer *__buffer, struct re_registers *__regs, unsigned int __num_regs, regoff_t *__starts, regoff_t *__ends),(__buffer,__regs,__num_regs,__starts,__ends))
 #endif /* re_set_registers... */
 #endif /* __USE_GNU */
-#if defined(__CRT_HAVE_regcomp)
+#ifdef __CRT_HAVE_regcomp
 __CDECLARE(,int,__NOTHROW_NCX,regcomp,(regex_t *__restrict __preg, char const *__restrict __pattern, int __cflags),(__preg,__pattern,__cflags))
 #endif /* regcomp... */
-#if defined(__CRT_HAVE_regexec)
+#ifdef __CRT_HAVE_regexec
 __CDECLARE(,int,__NOTHROW_NCX,regexec,(regex_t const *__restrict __preg, char const *__restrict __string, size_t __nmatch, regmatch_t __pmatch[__restrict_arr], int __eflags),(__preg,__string,__nmatch,__pmatch,__eflags))
 #endif /* regexec... */
-#if defined(__CRT_HAVE_regerror)
+#ifdef __CRT_HAVE_regerror
 __CDECLARE(,size_t,__NOTHROW_NCX,regerror,(int __errcode, regex_t const *__restrict __preg, char *__restrict __errbuf, size_t __errbuf_size),(__errcode,__preg,__errbuf,__errbuf_size))
 #endif /* regerror... */
-#if defined(__CRT_HAVE_regfree)
+#ifdef __CRT_HAVE_regfree
 __CDECLARE_VOID(,__NOTHROW_NCX,regfree,(regex_t *__preg),(__preg))
 #endif /* regfree... */
 

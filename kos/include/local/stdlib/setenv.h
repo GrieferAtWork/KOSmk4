@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x84a12c8a */
+/* HASH CRC-32:0x7774fe0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,12 +18,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_setenv_defined
-#if defined(__CRT_HAVE__putenv_s)
+#ifdef __CRT_HAVE__putenv_s
 #define __local_setenv_defined 1
 /* Dependency: "getenv" */
 #ifndef ____localdep_getenv_defined
 #define ____localdep_getenv_defined 1
-#if defined(__CRT_HAVE_getenv)
+#ifdef __CRT_HAVE_getenv
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_getenv,(char const *__varname),getenv,(__varname))
 #else /* LIBC: getenv */
 #undef ____localdep_getenv_defined
@@ -33,7 +33,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_g
 /* Dependency: "dos_putenv_s" from "stdlib" */
 #ifndef ____localdep_dos_putenv_s_defined
 #define ____localdep_dos_putenv_s_defined 1
-#if defined(__CRT_HAVE__putenv_s)
+#ifdef __CRT_HAVE__putenv_s
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_dos_putenv_s,(char const *__varname, char const *__val),_putenv_s,(__varname,__val))
 #else /* LIBC: _putenv_s */
 #undef ____localdep_dos_putenv_s_defined

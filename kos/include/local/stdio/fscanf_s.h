@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x453cfcc3 */
+/* HASH CRC-32:0x1fdce210 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,13 +18,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fscanf_s_defined
-#if defined(__CRT_HAVE_vfscanf_s)
+#ifdef __CRT_HAVE_vfscanf_s
 #define __local_fscanf_s_defined 1
 #include <kos/anno.h>
 /* Dependency: "vfscanf_s" */
 #ifndef ____localdep_vfscanf_s_defined
 #define ____localdep_vfscanf_s_defined 1
-#if defined(__CRT_HAVE_vfscanf_s)
+#ifdef __CRT_HAVE_vfscanf_s
 __CREDIRECT(__ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 0),__STDC_INT_AS_SIZE_T,,__localdep_vfscanf_s,(__FILE *__restrict __stream, char const *__restrict __format, __builtin_va_list __args),vfscanf_s,(__stream,__format,__args)) __THROWS(...)
 #else /* LIBC: vfscanf_s */
 #undef ____localdep_vfscanf_s_defined

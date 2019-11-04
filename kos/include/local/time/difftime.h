@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x194bb79d */
+/* HASH CRC-32:0x4a63539d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "difftime32" from "time" */
 #ifndef ____localdep_difftime32_defined
 #define ____localdep_difftime32_defined 1
-#if defined(__CRT_HAVE_difftime)
+#ifdef __CRT_HAVE_difftime
 /* Return the difference between TIME1 and TIME0 */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_difftime32,(__time32_t __time1, __time32_t __time0),difftime,(__time1,__time0))
 #elif defined(__CRT_HAVE__difftime32)
@@ -36,7 +36,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_difftime32,(
 /* Dependency: "difftime64" from "time" */
 #ifndef ____localdep_difftime64_defined
 #define ____localdep_difftime64_defined 1
-#if defined(__CRT_HAVE_difftime64)
+#ifdef __CRT_HAVE_difftime64
 /* Return the difference between TIME1 and TIME0 */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW_NCX,__localdep_difftime64,(__time64_t __time1, __time64_t __time0),difftime64,(__time1,__time0))
 #elif defined(__CRT_HAVE_difftime) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)

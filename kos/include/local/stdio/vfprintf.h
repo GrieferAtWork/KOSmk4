@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6153d380 */
+/* HASH CRC-32:0xa6b615fe */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 /* Dependency: "format_vprintf" from "format-printer" */
 #ifndef ____localdep_format_vprintf_defined
 #define ____localdep_format_vprintf_defined 1
-#if defined(__CRT_HAVE_format_vprintf)
+#ifdef __CRT_HAVE_format_vprintf
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings

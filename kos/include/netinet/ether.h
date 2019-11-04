@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe4e6d0e4 */
+/* HASH CRC-32:0xb70dcd57 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,31 +53,31 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 
-#if defined(__CRT_HAVE_ether_ntoa)
+#ifdef __CRT_HAVE_ether_ntoa
 /* Convert 48 bit Ethernet ADDRess to ASCII */
 __CDECLARE(,char *,__NOTHROW_RPC_KOS,ether_ntoa,(struct ether_addr const *__addr),(__addr))
 #endif /* ether_ntoa... */
-#if defined(__CRT_HAVE_ether_ntoa_r)
+#ifdef __CRT_HAVE_ether_ntoa_r
 /* Convert 48 bit Ethernet ADDRess to ASCII */
 __CDECLARE(,char *,__NOTHROW_RPC_KOS,ether_ntoa_r,(struct ether_addr const *__addr, char *__buf),(__addr,__buf))
 #endif /* ether_ntoa_r... */
-#if defined(__CRT_HAVE_ether_aton)
+#ifdef __CRT_HAVE_ether_aton
 /* Convert ASCII string S to 48 bit Ethernet address */
 __CDECLARE(,struct ether_addr *,__NOTHROW_RPC_KOS,ether_aton,(char const *__asc),(__asc))
 #endif /* ether_aton... */
-#if defined(__CRT_HAVE_ether_aton_r)
+#ifdef __CRT_HAVE_ether_aton_r
 /* Convert ASCII string S to 48 bit Ethernet address */
 __CDECLARE(,struct ether_addr *,__NOTHROW_RPC_KOS,ether_aton_r,(char const *__asc, struct ether_addr *__addr),(__asc,__addr))
 #endif /* ether_aton_r... */
-#if defined(__CRT_HAVE_ether_ntohost)
+#ifdef __CRT_HAVE_ether_ntohost
 /* Map 48 bit Ethernet number ADDR to HOSTNAME */
 __CDECLARE(,int,__NOTHROW_RPC_KOS,ether_ntohost,(char *__hostname, struct ether_addr const *__addr),(__hostname,__addr))
 #endif /* ether_ntohost... */
-#if defined(__CRT_HAVE_ether_hostton)
+#ifdef __CRT_HAVE_ether_hostton
 /* Map HOSTNAME to 48 bit Ethernet address */
 __CDECLARE(,int,__NOTHROW_RPC_KOS,ether_hostton,(char const *__hostname, struct ether_addr *__addr),(__hostname,__addr))
 #endif /* ether_hostton... */
-#if defined(__CRT_HAVE_ether_line)
+#ifdef __CRT_HAVE_ether_line
 /* Scan LINE and set ADDR and HOSTNAME */
 __CDECLARE(,int,__NOTHROW_RPC_KOS,ether_line,(char const *__line, struct ether_addr *__addr, char *__hostname),(__line,__addr,__hostname))
 #endif /* ether_line... */

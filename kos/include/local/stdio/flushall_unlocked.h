@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x443f2a34 */
+/* HASH CRC-32:0x7b396c8d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "fflush_unlocked" from "stdio" */
 #ifndef ____localdep_fflush_unlocked_defined
 #define ____localdep_fflush_unlocked_defined 1
-#if defined(__CRT_HAVE_fflush_unlocked)
+#ifdef __CRT_HAVE_fflush_unlocked
 /* Same as `fflush()', but performs I/O without acquiring a lock to `STREAM' */
 __CREDIRECT(,int,,__localdep_fflush_unlocked,(__FILE *__stream),fflush_unlocked,(__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE_fflush)
@@ -45,7 +45,7 @@ __CREDIRECT(,int,,__localdep_fflush_unlocked,(__FILE *__stream),fflush,(__stream
 /* Dependency: "_flushall" from "stdio" */
 #ifndef ____localdep__flushall_defined
 #define ____localdep__flushall_defined 1
-#if defined(__CRT_HAVE__flushall)
+#ifdef __CRT_HAVE__flushall
 __CREDIRECT(,int,,__localdep__flushall,(void),_flushall,()) __THROWS(...)
 #else /* LIBC: _flushall */
 #include <local/stdio/_flushall.h>

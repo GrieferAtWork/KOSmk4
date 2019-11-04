@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcd4811e4 */
+/* HASH CRC-32:0xa49821ea */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "wcsend" from "wchar" */
 #ifndef ____localdep_wcsend_defined
 #define ____localdep_wcsend_defined 1
-#if defined(__CRT_HAVE_wcsend)
+#ifdef __CRT_HAVE_wcsend
 /* Same as `STR+wcslen(STR)' */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wcsend,(__WCHAR_TYPE__ const *__restrict __string),wcsend,(__string))
 #else /* LIBC: wcsend */

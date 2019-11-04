@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3407d26 */
+/* HASH CRC-32:0xb20961cf */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,12 +18,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sleep_defined
-#if defined(__CRT_HAVE__sleep)
+#ifdef __CRT_HAVE__sleep
 #define __local_sleep_defined 1
 /* Dependency: "dos_sleep" from "unistd" */
 #ifndef ____localdep_dos_sleep_defined
 #define ____localdep_dos_sleep_defined 1
-#if defined(__CRT_HAVE__sleep)
+#ifdef __CRT_HAVE__sleep
 /* Sleep for up to `DURATION' seconds */
 __CREDIRECT_VOID(,__NOTHROW_RPC,__localdep_dos_sleep,(__UINT32_TYPE__ __duration),_sleep,(__duration))
 #else /* LIBC: _sleep */

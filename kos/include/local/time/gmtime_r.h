@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xed3dfe88 */
+/* HASH CRC-32:0x62bc9524 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,7 +72,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,__localdep_dos_gmtime
 /* Dependency: "gmtime64_r" from "time" */
 #ifndef ____localdep_gmtime64_r_defined
 #define ____localdep_gmtime64_r_defined 1
-#if defined(__CRT_HAVE_gmtime64_r)
+#ifdef __CRT_HAVE_gmtime64_r
 /* Return the `struct tm' representation of *TIMER in UTC, using *TP to store the result */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__STRUCT_TM *,__NOTHROW_NCX,__localdep_gmtime64_r,(__time64_t const *__restrict __timer, __STRUCT_TM *__restrict __tp),gmtime64_r,(__timer,__tp))
 #elif defined(__CRT_HAVE_gmtime_r) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)

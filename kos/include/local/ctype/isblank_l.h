@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x33f7effa */
+/* HASH CRC-32:0x489696c7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "__locale_ctype_ptr_l" from "ctype" */
 #ifndef ____localdep___locale_ctype_ptr_l_defined
 #define ____localdep___locale_ctype_ptr_l_defined 1
-#if defined(__CRT_HAVE___locale_ctype_ptr_l)
+#ifdef __CRT_HAVE___locale_ctype_ptr_l
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW_NCX,__localdep___locale_ctype_ptr_l,(__locale_t __locale),__locale_ctype_ptr_l,(__locale))
 #else /* LIBC: __locale_ctype_ptr_l */
 #undef ____localdep___locale_ctype_ptr_l_defined

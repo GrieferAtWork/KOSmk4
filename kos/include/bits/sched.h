@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb767e276 */
+/* HASH CRC-32:0x9930a8ef */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -442,12 +442,12 @@ struct sched_param {
 
 #if defined(__USE_GNU) || defined(__USE_KOS)
 typedef int (__LIBCCALL *__clone_func_t)(void *__arg);
-#if defined(__CRT_HAVE_clone)
+#ifdef __CRT_HAVE_clone
 __LIBC __ATTR_NONNULL((1)) __pid_t __NOTHROW_NCX(__VLIBCCALL clone)(__clone_func_t __fn, void *__child_stack, int __flags, void *__arg, ... /* pid_t *ptid, void *newtls, pid_t *ctid */) __CASMNAME_SAME("clone");
 #elif defined(__CRT_HAVE___clone)
 __CVREDIRECT(__ATTR_NONNULL((1)),__pid_t,__NOTHROW_NCX,clone,(__clone_func_t __fn, void *__child_stack, int __flags, void *__arg),__clone,(__fn,__child_stack,__flags,__arg),__arg,3,(__pid_t,void *,__pid_t))
 #endif /* clone... */
-#if defined(__CRT_HAVE_unshare)
+#ifdef __CRT_HAVE_unshare
 /* >> unshare(2)
  * Unshare certain components of the calling thread that may be shared with other
  * threads or processes, such as the filesystem, or opened file descriptors.
@@ -474,7 +474,7 @@ __CVREDIRECT(__ATTR_NONNULL((1)),__pid_t,__NOTHROW_NCX,clone,(__clone_func_t __f
  *                 - CLONE_SIGHAND:   Unshare signal handlers (KOS extension) */
 __CDECLARE(,int,__NOTHROW_NCX,unshare,(int __flags),(__flags))
 #endif /* unshare... */
-#if defined(__CRT_HAVE_sched_getcpu)
+#ifdef __CRT_HAVE_sched_getcpu
 /* >> sched_getcpu(3)
  * Returns the number of the CPU for the calling thread.
  * Note that due to unforseeable scheduling conditions, this may change at any
@@ -483,7 +483,7 @@ __CDECLARE(,int,__NOTHROW_NCX,unshare,(int __flags),(__flags))
  * as a hint */
 __CDECLARE(,int,__NOTHROW_NCX,sched_getcpu,(void),())
 #endif /* sched_getcpu... */
-#if defined(__CRT_HAVE_setns)
+#ifdef __CRT_HAVE_setns
 /* >> setns(2)
  * With `FD' referring to a namespace, reassociate the calling thread with that namespace.
  * For this purpose, `FD' was opened for one of the files in `/proc/[pid]/ns/'
@@ -495,7 +495,7 @@ __CDECLARE(,int,__NOTHROW_NCX,setns,(__fd_t __fd, int __nstype),(__fd,__nstype))
 #endif /* setns... */
 
 #ifdef __USE_KOS
-#if defined(__CRT_HAVE_exit_thread)
+#ifdef __CRT_HAVE_exit_thread
 /* Exits the current thread by invoking the SYS_exit system call,
  * after performing some additional cleanup not done by the kernel.
  * Assuming that the calling thread was constructed by `clone()',

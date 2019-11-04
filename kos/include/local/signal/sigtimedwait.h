@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xba57e41d */
+/* HASH CRC-32:0xee2bc443 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "sigtimedwait64" from "signal" */
 #ifndef ____localdep_sigtimedwait64_defined
 #define ____localdep_sigtimedwait64_defined 1
-#if defined(__CRT_HAVE_sigtimedwait64)
+#ifdef __CRT_HAVE_sigtimedwait64
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_sigtimedwait64,(struct __sigset_struct const *__restrict __set, siginfo_t *__restrict __info, struct __timespec64 const *__timeout),sigtimedwait64,(__set,__info,__timeout))
 #elif defined(__CRT_HAVE_sigtimedwait) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_sigtimedwait64,(struct __sigset_struct const *__restrict __set, siginfo_t *__restrict __info, struct __timespec64 const *__timeout),sigtimedwait,(__set,__info,__timeout))
@@ -38,7 +38,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_sigtimedwait64,(str
 /* Dependency: "sigtimedwait32" from "signal" */
 #ifndef ____localdep_sigtimedwait32_defined
 #define ____localdep_sigtimedwait32_defined 1
-#if defined(__CRT_HAVE_sigtimedwait)
+#ifdef __CRT_HAVE_sigtimedwait
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_sigtimedwait32,(struct __sigset_struct const *__restrict __set, siginfo_t *__restrict __info, struct __timespec32 const *__timeout),sigtimedwait,(__set,__info,__timeout))
 #else /* LIBC: sigtimedwait */
 #undef ____localdep_sigtimedwait32_defined

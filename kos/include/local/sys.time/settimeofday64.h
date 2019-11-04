@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa4160629 */
+/* HASH CRC-32:0x90c02d7e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,12 +18,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_settimeofday64_defined
-#if defined(__CRT_HAVE_settimeofday)
+#ifdef __CRT_HAVE_settimeofday
 #define __local_settimeofday64_defined 1
 /* Dependency: "settimeofday32" from "sys.time" */
 #ifndef ____localdep_settimeofday32_defined
 #define ____localdep_settimeofday32_defined 1
-#if defined(__CRT_HAVE_settimeofday)
+#ifdef __CRT_HAVE_settimeofday
 /* Set the current time of day and timezone information.
  * This call is restricted to the super-user */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_settimeofday32,(struct __timeval32 const *__tv, struct timezone const *__tz),settimeofday,(__tv,__tz))

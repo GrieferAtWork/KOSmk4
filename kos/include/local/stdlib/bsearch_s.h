@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf17e6e0d */
+/* HASH CRC-32:0xa217bf84 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@ typedef int (__LIBCCALL *__dos_compar_d_fn_t)(void *__arg, void const *__a, void
 /* Dependency: "bsearch_r" from "stdlib" */
 #ifndef ____localdep_bsearch_r_defined
 #define ____localdep_bsearch_r_defined 1
-#if defined(__CRT_HAVE_bsearch_r)
+#ifdef __CRT_HAVE_bsearch_r
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2, 5)),void *,__NOTHROW_NCX,__localdep_bsearch_r,(void const *__pkey, void const *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_d_fn_t __cmp, void *__arg),bsearch_r,(__pkey,__pbase,__item_count,__item_size,__cmp,__arg))
 #else /* LIBC: bsearch_r */
 #include <local/stdlib/bsearch_r.h>

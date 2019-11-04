@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x80d89c68 */
+/* HASH CRC-32:0xc1e7c110 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 
-#if defined(__CRT_HAVE_getauxval)
+#ifdef __CRT_HAVE_getauxval
 /* Return the value associated with an Elf*_auxv_t type from the auxv list
  * passed to the program on startup.  If TYPE was not present in the auxv
  * list, returns zero and sets errno to ENOENT */

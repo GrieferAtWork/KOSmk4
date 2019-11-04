@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x73860c43 */
+/* HASH CRC-32:0x456edcf3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -66,7 +66,7 @@ struct _diskfree_t {
 #define _GETDISKFREE_DEFINED 1
 #ifndef ___getdiskfree_defined
 #define ___getdiskfree_defined 1
-#if defined(__CRT_HAVE__getdiskfree)
+#ifdef __CRT_HAVE__getdiskfree
 __CDECLARE(,unsigned int,__NOTHROW_RPC,_getdiskfree,(unsigned int __drive, struct _diskfree_t *__diskfree),(__drive,__diskfree))
 #else /* LIBC: _getdiskfree */
 #undef ___getdiskfree_defined
@@ -80,7 +80,7 @@ __FORCELOCAL void (__LIBCCALL _enable)(void) { __sti(); }
 #endif /* __i386__ || __x86_64__ */
 
 #ifdef __USE_OLD_DOS
-#if defined(__CRT_HAVE_delay)
+#ifdef __CRT_HAVE_delay
 /* Sleep for `mill' milliseconds (1/1.000 seconds) */
 __CDECLARE_VOID(,__NOTHROW_RPC,delay,(unsigned int __mill),(__mill))
 #elif defined(__CRT_HAVE___crtSleep)
@@ -91,12 +91,12 @@ __CREDIRECT_VOID(,__NOTHROW_RPC,delay,(unsigned int __mill),__crtSleep,(__mill))
 /* Sleep for `mill' milliseconds (1/1.000 seconds) */
 __NAMESPACE_LOCAL_USING_OR_IMPL(delay, __FORCELOCAL void __NOTHROW_RPC(__LIBCCALL delay)(unsigned int __mill) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(delay))(__mill); })
 #endif /* delay... */
-#if defined(__CRT_HAVE__getdiskfree)
+#ifdef __CRT_HAVE__getdiskfree
 __CREDIRECT(,unsigned int,__NOTHROW_RPC,_dos_getdiskfree,(int __drive, struct diskfree_t *__diskfree),_getdiskfree,(__drive,__diskfree))
 #endif /* _dos_getdiskfree... */
 #ifndef __sleep_defined
 #define __sleep_defined 1
-#if defined(__CRT_HAVE_sleep)
+#ifdef __CRT_HAVE_sleep
 __CDECLARE_VOID(,__NOTHROW_RPC,sleep,(unsigned int __seconds),(__seconds))
 #else /* LIBC: _sleep */
 #undef __sleep_defined
@@ -104,7 +104,7 @@ __CDECLARE_VOID(,__NOTHROW_RPC,sleep,(unsigned int __seconds),(__seconds))
 #endif /* !__sleep_defined */
 #ifndef __unlink_defined
 #define __unlink_defined 1
-#if defined(__CRT_HAVE_unlink)
+#ifdef __CRT_HAVE_unlink
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,unlink,(char const *__file),(__file))

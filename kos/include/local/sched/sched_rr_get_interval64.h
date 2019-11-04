@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfd78a301 */
+/* HASH CRC-32:0x96878b37 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,12 +18,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sched_rr_get_interval64_defined
-#if defined(__CRT_HAVE_sched_rr_get_interval)
+#ifdef __CRT_HAVE_sched_rr_get_interval
 #define __local_sched_rr_get_interval64_defined 1
 /* Dependency: "sched_rr_get_interval32" from "sched" */
 #ifndef ____localdep_sched_rr_get_interval32_defined
 #define ____localdep_sched_rr_get_interval32_defined 1
-#if defined(__CRT_HAVE_sched_rr_get_interval)
+#ifdef __CRT_HAVE_sched_rr_get_interval
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_rr_get_interval32,(__pid_t __pid, struct __timespec32 *__tms),sched_rr_get_interval,(__pid,__tms))
 #else /* LIBC: sched_rr_get_interval */
 #undef ____localdep_sched_rr_get_interval32_defined

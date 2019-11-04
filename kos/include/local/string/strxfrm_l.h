@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe3f644f9 */
+/* HASH CRC-32:0xf5e8b4fb */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "strxfrm" from "string" */
 #ifndef ____localdep_strxfrm_defined
 #define ____localdep_strxfrm_defined 1
-#if defined(__CRT_HAVE_strxfrm)
+#ifdef __CRT_HAVE_strxfrm
 __CREDIRECT(__ATTR_NONNULL((2)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strxfrm,(char *__dst, char const *__restrict __src, __SIZE_TYPE__ __maxlen),strxfrm,(__dst,__src,__maxlen))
 #else /* LIBC: strxfrm */
 #include <local/string/strxfrm.h>

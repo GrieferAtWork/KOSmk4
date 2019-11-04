@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x223253f3 */
+/* HASH CRC-32:0x4c4fcc71 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "futimes32" from "sys.time" */
 #ifndef ____localdep_futimes32_defined
 #define ____localdep_futimes32_defined 1
-#if defined(__CRT_HAVE_futimes)
+#ifdef __CRT_HAVE_futimes
 /* Same as `utimes', but does not follow symbolic links */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_futimes32,(__fd_t __fd, struct __timeval32 const __tvp[2]),futimes,(__fd,__tvp))
 #else /* LIBC: futimes */
@@ -34,7 +34,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_futimes32,(__fd_t __fd, struct __timev
 /* Dependency: "futimes64" from "sys.time" */
 #ifndef ____localdep_futimes64_defined
 #define ____localdep_futimes64_defined 1
-#if defined(__CRT_HAVE_futimes64)
+#ifdef __CRT_HAVE_futimes64
 /* Same as `utimes', but does not follow symbolic links */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_futimes64,(__fd_t __fd, struct __timeval64 const __tvp[2]),futimes64,(__fd,__tvp))
 #elif defined(__CRT_HAVE_lutimes) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)

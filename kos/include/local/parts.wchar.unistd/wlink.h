@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x423a96b4 */
+/* HASH CRC-32:0xc36ee064 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "wlinkat" from "parts.wchar.unistd" */
 #ifndef ____localdep_wlinkat_defined
 #define ____localdep_wlinkat_defined 1
-#if defined(__CRT_HAVE_wlinkat)
+#ifdef __CRT_HAVE_wlinkat
 /* >> wlinkat(2)
  * Create a hard link from `FROMFD:FROM', leading to `TOFD:TO' */
 __CREDIRECT(__ATTR_NONNULL((2, 4)),int,__NOTHROW_RPC,__localdep_wlinkat,(__fd_t __fromfd, __WCHAR_TYPE__ const *__from, __fd_t __tofd, __WCHAR_TYPE__ const *__to, __atflag_t __flags),wlinkat,(__fromfd,__from,__tofd,__to,__flags))

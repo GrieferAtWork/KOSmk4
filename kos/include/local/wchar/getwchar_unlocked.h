@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x449f149a */
+/* HASH CRC-32:0x48ef5fa1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 /* Dependency: "fgetwc_unlocked" */
 #ifndef ____localdep_fgetwc_unlocked_defined
 #define ____localdep_fgetwc_unlocked_defined 1
-#if defined(__CRT_HAVE_fgetwc_unlocked)
+#ifdef __CRT_HAVE_fgetwc_unlocked
 __CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,,__localdep_fgetwc_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE__fgetwc_nolock)
 __CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,,__localdep_fgetwc_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream)) __THROWS(...)

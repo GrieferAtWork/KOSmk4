@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2c1ea386 */
+/* HASH CRC-32:0x607df4c7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 /* Dependency: "format_vwprintf" from "parts.wchar.format-printer" */
 #ifndef ____localdep_format_vwprintf_defined
 #define ____localdep_format_vwprintf_defined 1
-#if defined(__CRT_HAVE_format_vwprintf)
+#ifdef __CRT_HAVE_format_vwprintf
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings

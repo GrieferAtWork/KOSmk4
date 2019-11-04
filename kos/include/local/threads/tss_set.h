@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf368b54 */
+/* HASH CRC-32:0x5b92dc9b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_tss_set_defined
-#if defined(__CRT_HAVE_pthread_setspecific)
+#ifdef __CRT_HAVE_pthread_setspecific
 #define __local_tss_set_defined 1
 #include <bits/threads.h>
 
@@ -26,7 +26,7 @@
 /* Dependency: "pthread_setspecific" */
 #ifndef ____localdep_pthread_setspecific_defined
 #define ____localdep_pthread_setspecific_defined 1
-#if defined(__CRT_HAVE_pthread_setspecific)
+#ifdef __CRT_HAVE_pthread_setspecific
 /* Store POINTER in the thread-specific data slot identified by KEY */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_pthread_setspecific,(__pthread_key_t __key, void const *__pointer),pthread_setspecific,(__key,__pointer))
 #else /* LIBC: pthread_setspecific */

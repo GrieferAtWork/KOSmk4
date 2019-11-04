@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x94c0e9f */
+/* HASH CRC-32:0x513b94ad */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 /* Dependency: "fread_unlocked" from "stdio" */
 #ifndef ____localdep_fread_unlocked_defined
 #define ____localdep_fread_unlocked_defined 1
-#if defined(__CRT_HAVE_fread_unlocked)
+#ifdef __CRT_HAVE_fread_unlocked
 /* Same as `fread()', but performs I/O without acquiring a lock to `STREAM' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 4)),__SIZE_TYPE__,,__localdep_fread_unlocked,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fread_unlocked,(__buf,__elemsize,__elemcount,__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE__fread_nolock)

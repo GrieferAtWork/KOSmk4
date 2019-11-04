@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2feb0aee */
+/* HASH CRC-32:0x324af7a4 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -178,7 +178,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_c
 /* Dependency: "unicode_writeutf16" from "unicode" */
 #ifndef ____localdep_unicode_writeutf16_defined
 #define ____localdep_unicode_writeutf16_defined 1
-#if defined(__CRT_HAVE_unicode_writeutf16)
+#ifdef __CRT_HAVE_unicode_writeutf16
 /* Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
  * This function will write at most `UNICODE_UTF16_CURLEN' bytes to `dst' */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NCX,__localdep_unicode_writeutf16,(/*utf-16*/__CHAR16_TYPE__ *__restrict __dst, __CHAR32_TYPE__ __ch),unicode_writeutf16,(__dst,__ch))
@@ -193,7 +193,7 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),__CHAR16_TYPE__ *,__NOTHROW_NC
 /* Dependency: "format_wwidth" from "parts.wchar.format-printer" */
 #ifndef ____localdep_format_c32width_defined
 #define ____localdep_format_c32width_defined 1
-#if defined(__CRT_HAVE_format_length)
+#ifdef __CRT_HAVE_format_length
 /* Returns the width (number of characters; not bytes) of the given unicode string */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_c32width,(void *__arg, __CHAR32_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),format_length,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_format_wwidth) && (__SIZEOF_WCHAR_T__ == 4)

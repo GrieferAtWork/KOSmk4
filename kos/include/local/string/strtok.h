@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x70eb32b */
+/* HASH CRC-32:0xb9a07a8f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "strtok_r" from "string" */
 #ifndef ____localdep_strtok_r_defined
 #define ____localdep_strtok_r_defined 1
-#if defined(__CRT_HAVE_strtok_r)
+#ifdef __CRT_HAVE_strtok_r
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((2, 3)),char *,__NOTHROW_NCX,__localdep_strtok_r,(char *__string, char const *__delim, char **__restrict __save_ptr),strtok_r,(__string,__delim,__save_ptr))
 #elif defined(__CRT_HAVE_strtok_s)
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((2, 3)),char *,__NOTHROW_NCX,__localdep_strtok_r,(char *__string, char const *__delim, char **__restrict __save_ptr),strtok_s,(__string,__delim,__save_ptr))

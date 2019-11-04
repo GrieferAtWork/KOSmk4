@@ -46,7 +46,11 @@ import fs;
 import * from deemon;
 import enumerate from util;
 import hash from hashlib;
-import optimizePreprocessorExpression from ..libgen.optiexpr;
+import
+	optimizePreprocessorExpression,
+	wrapProcessorExpressionForIf,
+	optimizeAndWrapProcessorExpressionForIf
+from ..libgen.optiexpr;
 
 
 global hashfunc = "CRC-32";
@@ -178,6 +182,10 @@ global all_crt_features = HashSet();
 function key_crt_have(x) {
 	all_crt_features.insert(x);
 	return "defined(__CRT_HAVE_{})".format({ x });
+}
+function key_crt_have_pp(x) {
+	all_crt_features.insert(x);
+	return "__CRT_HAVE_{}".format({ x });
 }
 function key_attr_header(x) {
 	if (x.startswith("@") && x.endswith("@"))
@@ -362,6 +370,55 @@ local paren_match = {
 	"[" : "]",
 	"{" : "}",
 };
+
+function printIfdefCond(
+		fp: File, isFirst: bool, cond: string): File {
+	if (isFirst)
+		return fp << optimizeAndWrapProcessorExpressionForIf(cond) << "\n";
+	return fp << "#elif " << optimizePreprocessorExpression(cond) << "\n";
+}
+
+function printIfdefCrtHaveAndCond(
+		fp: File, isFirst: bool, haveSymbolName: string, cond: string = none): File {
+	if (isFirst) {
+		if (!cond)
+			return fp << "#ifdef " << key_crt_have_pp(haveSymbolName) << "\n";
+		return fp << optimizeAndWrapProcessorExpressionForIf(
+			"{} && ({})".format({ key_crt_have(haveSymbolName),
+			cond
+		})) << "\n";
+	}
+	if (!cond)
+		return fp << "#elif " << key_crt_have(haveSymbolName) << "\n";
+	return fp << "#elif " << optimizePreprocessorExpression(
+		"{} && ({})".format({ key_crt_have(haveSymbolName),
+		cond
+	})) << "\n";
+}
+
+function printIfdefCrtHaveAndCond2(
+		fp: File, isFirst: bool, haveSymbolName: string,
+		cond: string, cond2: string): File {
+	if (!cond2)
+		return printIfdefCrtHaveAndCond(fp, isFirst, haveSymbolName, cond);
+	if (!cond)
+		return printIfdefCrtHaveAndCond(fp, isFirst, haveSymbolName, cond2);
+	if (isFirst) {
+		return fp
+			<< optimizeAndWrapProcessorExpressionForIf(
+				"{} && ({}) && ({})".format({
+					key_crt_have(haveSymbolName),
+					cond, cond2
+			})) << "\n";
+	}
+	return fp
+		<< "#elif "
+		<< optimizePreprocessorExpression(
+			"{} && ({}) && ({})".format({
+				key_crt_have(haveSymbolName),
+				cond, cond2
+		})) << "\n";
+}
 
 global Function;
 
@@ -4080,10 +4137,9 @@ class Function {
 		if (define_require_string) {
 			for (local none, word: split_words(requires_prefix, env: this))
 				fp << word;
-			fp << "#if ";
 			File.Writer tempfp;
 			format_define_require_string(tempfp, define_require_string);
-			fp << optimizePreprocessorExpression(tempfp.string);
+			fp << optimizeAndWrapProcessorExpressionForIf(tempfp.string);
 			fp << "\n";
 		}
 		fp << "#define __local_" << used_name << "_defined 1\n";
@@ -4547,21 +4603,22 @@ do_return_crt:
 			fp << "#ifndef " << guard_name << "\n"
 			      "#define " << guard_name << " 1\n";
 		}
+		local is_first = true;
 		if (keyname === key_libc || keyname === key_libc_slow) {
-			fp << "#";
+			/* ... */
 		} else if (namespace_name !is none && guarded_function) {
 			fp << "#ifdef __" << my_name << "_defined\n";
 			fp << "__NAMESPACE_GLB_USING(" << my_name << ")\n";
-			fp << "#el";
+			is_first = false;
 		} else if (namespace_name is none && std_guard && export_in_std) {
 			fp << "#ifdef __std_" << my_name << "_defined\n";
 			fp << "__NAMESPACE_STD_USING(" << my_name << ")\n";
-			fp << "#el";
-		} else {
-			fp << "#";
+			is_first = false;
 		}
 		if (include_overloads && extended_overloads) {
-			fp << "if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_" + component_name.upper().replace(".", "_") + "_H_PROTO)\n";
+			fp << (is_first ? "#if " : "#elif ")
+				<< "defined(__cplusplus) && defined(__CORRECT_ISO_CPP_" + component_name.upper().replace(".", "_") + "_H_PROTO)\n";
+			is_first = false;
 			function print_redirection(alias_name) {
 				fp << "extern \"C++\" {\n";
 				local is_nothrow = "";
@@ -4629,12 +4686,8 @@ do_return_crt:
 				if (symbol_preferred_impl) {
 					local is_first = true;
 					for (local cond, impl: symbol_preferred_impl) {
-						fp << "#";
-						if (!is_first)
-							fp << "el";
-						fp << "if ";
+						printIfdefCond(fp, is_first, cond);
 						is_first = false;
-						fp << cond << "\n";
 						fp << "extern \"C++\" {\n";
 						for (local args, return_type: extended_overloads) {
 							File.Writer return_type_fp;
@@ -4716,9 +4769,7 @@ do_return_crt:
 					fp << "}\n";
 				}
 				for (local cond, alias_name: preferred_aliases) {
-					fp << "#elif " << key_crt_have(alias_name);
-					if (cond) fp << " && (" << cond << ")";
-					fp << "\n";
+					printIfdefCrtHaveAndCond(fp, false, alias_name, cond);
 					print_redirection(alias_name);
 				}
 				if (block is FunctionAlias) {
@@ -4734,59 +4785,47 @@ do_return_crt:
 				local did_alias_primary = false;
 				local is_first = true;
 				for (local cond, alias_name: preferred_aliases) {
-					fp << (is_first ? "#if " : "#elif ");
+					printIfdefCrtHaveAndCond(fp, is_first, alias_name, cond);
 					is_first = false;
-					fp << key_crt_have(alias_name);
-					if (cond) fp << " && (" << cond << ")";
-					fp << "\n";
 					print_redirection(alias_name);
 					if (alias_name == symbol_name)
 						did_alias_primary = true;
 				}
 				if (!skip_self_alias) {
-					fp << (is_first ? "#if " : "#elif ") << key_crt_have(name) << "\n";
+					printIfdefCrtHaveAndCond(fp, is_first, name);
 					is_first = false;
 					print_redirection(name);
 				}
 				if (!did_alias_primary) {
-					fp << (is_first ? "#if " : "#elif ") << key_crt_have(symbol_name) << "\n";
+					printIfdefCrtHaveAndCond(fp, is_first, symbol_name);
+					is_first = false;
 					print_redirection(symbol_name);
 				}
 			} else if (skip_self_alias) {
 				local is_first = true;
 				for (local cond, alias_name: preferred_aliases) {
-					fp << "#" << (is_first ? "" : "el") << "if "
-						<< key_crt_have(alias_name);
+					printIfdefCrtHaveAndCond(fp, is_first, alias_name, cond);
 					is_first = false;
-					if (cond) fp << " && (" << cond << ")";
-					fp << "\n";
 					print_redirection(alias_name);
 				}
 				for (local cond, alias_name: aliases) {
-					fp << "#" << (is_first ? "" : "el") << "if "
-						<< key_crt_have(alias_name);
+					printIfdefCrtHaveAndCond(fp, is_first, alias_name, cond);
 					is_first = false;
-					if (cond) fp << " && (" << cond << ")";
-					fp << "\n";
 					print_redirection(alias_name);
 				}
 				goto skip_alias_redirections;
 			} else {
-				fp << "#";
+				local is_first = true;
 				for (local cond, alias_name: preferred_aliases) {
-					fp << "if " << key_crt_have(alias_name);
-					if (cond) fp << " && (" << cond << ")";
-					fp << "\n";
+					printIfdefCrtHaveAndCond(fp, is_first, alias_name, cond);
+					is_first = false;
 					print_redirection(alias_name);
-					fp << "#el";
 				}
-				fp << "if " << key_crt_have(symbol_name) << "\n";
+				printIfdefCrtHaveAndCond(fp, is_first, symbol_name);
 				print_redirection(symbol_name);
 			}
 			for (local cond, alias_name: aliases) {
-				fp << "#elif " << key_crt_have(alias_name);
-				if (cond) fp << " && (" << cond << ")";
-				fp << "\n";
+				printIfdefCrtHaveAndCond(fp, false, alias_name, cond);
 				print_redirection(alias_name);
 			}
 skip_alias_redirections:
@@ -4915,7 +4954,13 @@ skip_alias_redirections:
 			fp << "#else /* __cplusplus && __CORRECT_ISO_CPP_"
 				<< component_name.upper().replace(".", "_")
 				<< "_H_PROTO */\n";
-			fp << "#";
+			is_first = true;
+		}
+		function print_redirection_extra_cond(alias_name) {
+			if (args_is_varargs && my_name != alias_name && !vartypes &&
+			    get_asmnamef_for(alias_name) is none)
+				return "!defined(__NO_ASMNAME)";
+			return "";
 		}
 		function print_redirection(alias_name) {
 			function print_same_name_declaration() {
@@ -4950,12 +4995,10 @@ skip_alias_redirections:
 				fp << join_variable_name(return_type_fp.string, function_decl_fp.string);
 			}
 			if (args_is_varargs && (("DOS$" + my_name) == alias_name)) {
-				fp << "\n";
 				print_same_name_declaration();
 				fp << " __CASMNAME_SAME_DOS(" << repr(my_name) << ");\n";
 			} else if (my_name == alias_name) {
 				if (args_is_varargs) {
-					fp << "\n";
 					print_same_name_declaration();
 					fp << " __CASMNAME_SAME(" << repr(my_name) << ");\n";
 				} else {
@@ -4974,7 +5017,6 @@ skip_alias_redirections:
 					local rt = return_type_for(alias_name);
 					if (rt == "void")
 						is_void_return = true;
-					fp << "\n";
 					print_doc(fp);
 					fp << "__CDECLARE";
 					if (is_void_return) fp << "_VOID";
@@ -5016,7 +5058,6 @@ skip_alias_redirections:
 						local rt = return_type_for(alias_name);
 						if (rt == "void")
 							is_void_return = true;
-						fp << "\n";
 						print_doc(fp);
 						fp << "__CVREDIRECT";
 						if (is_void_return) fp << "_VOID";
@@ -5061,7 +5102,6 @@ skip_alias_redirections:
 						local rt = return_type_for(alias_name);
 						if (rt == "void")
 							is_void_return = true;
-						fp << "\n";
 						print_doc(fp);
 						fp << "__CVFREDIRECT";
 						if (is_void_return) fp << "_VOID";
@@ -5086,7 +5126,8 @@ skip_alias_redirections:
 						printThrowsAnnotation(fp);
 						fp << "\n";
 					} else {
-						fp << " && !defined(__NO_ASMNAME)\n";
+						/* Printed by print_redirection_extra_cond():
+						 * >> fp << " && !defined(__NO_ASMNAME)\n"; */
 						print_same_name_declaration();
 						fp << " __CASMNAME";
 						if (alias_name.startswith("DOS$")) {
@@ -5111,7 +5152,6 @@ skip_alias_redirections:
 					local rt = return_type_for(alias_name);
 					if (rt == "void")
 						is_void_return = true;
-					fp << "\n";
 					print_doc(fp);
 					fp << "__CREDIRECT";
 					if (is_void_return) fp << "_VOID";
@@ -5142,12 +5182,10 @@ skip_alias_redirections:
 				}
 			}
 		}
-		fp << "if";
 		if (symbol_preferred_impl) {
-			local is_first = true;
 			for (local cond, impl: symbol_preferred_impl) {
+				printIfdefCond(fp, is_first, cond);
 				is_first = false;
-				fp << " " << cond << "\n";
 				print_doc(fp);
 				fp << "__FORCELOCAL ";
 				local is_nothrow = "";
@@ -5180,12 +5218,17 @@ skip_alias_redirections:
 				do_transform_block(
 					fp, impl, key_identity, key_identity,
 					key_underscore, transform_argument_types, none);
-				fp << "\n#elif";
+				fp << "\n";
 			}
 		}
 		/* Try to link an optimized version of the function */
 		if (symbol_has_fast_implementation) {
-			fp << " defined(__fast_" << symbol_name << "_defined)";
+			if (is_first) {
+				fp << "#ifdef __fast_" << symbol_name << "_defined";
+				is_first = false;
+			} else {
+				fp << "#elif defined(__fast_" << symbol_name << "_defined)";
+			}
 			if (args_is_varargs) {
 				fp << " && defined(__cplusplus)\n";
 				fp << "__NAMESPACE_FAST_USING(" << symbol_name << ")\n";
@@ -5278,80 +5321,83 @@ skip_alias_redirections:
 				}
 			}
 			for (local cond, alias_name: preferred_aliases) {
-				fp << "#elif " << key_crt_have(alias_name);
-				if (cond) fp << " && (" << cond << ")";
+				printIfdefCrtHaveAndCond2(fp, false, alias_name, cond,
+					print_redirection_extra_cond(alias_name));
 				print_redirection(alias_name);
 			}
 			if (block is FunctionAlias) {
 				if (!skip_self_alias) {
 					fp << "#elif " << key_crt_have(name);
+					if (local extra = print_redirection_extra_cond(name))
+						fp << " && " << extra;
+					fp << "\n";
 					print_redirection(name);
 				}
 				fp << "#elif " << key_crt_have(symbol_name);
+				if (local extra = print_redirection_extra_cond(symbol_name))
+					fp << " && " << extra;
+				fp << "\n";
 				print_redirection(symbol_name);
 			} else if (!skip_self_alias) {
 				fp << "#elif " << key_crt_have(symbol_name);
+				if (local extra = print_redirection_extra_cond(symbol_name))
+					fp << " && " << extra;
+				fp << "\n";
 				print_redirection(symbol_name);
 			}
 		} else if (block is FunctionAlias) {
-			local is_first = true;
 			local did_alias_primary = false;
 			for (local cond, alias_name: preferred_aliases) {
-				if (!is_first)
-					fp << "#elif";
-				fp << " " << key_crt_have(alias_name);
-				if (cond) fp << " && (" << cond << ")";
-				print_redirection(alias_name);
+				printIfdefCrtHaveAndCond2(fp, is_first, alias_name, cond,
+					print_redirection_extra_cond(alias_name));
 				is_first = false;
+				print_redirection(alias_name);
 				if (alias_name == symbol_name)
 					did_alias_primary = true;
 			}
 			if (!skip_self_alias) {
-				if (!is_first)
-					fp << "#elif";
+				printIfdefCrtHaveAndCond(fp, is_first, name,
+					print_redirection_extra_cond(name));
 				is_first = false;
-				fp << " " << key_crt_have(name);
 				print_redirection(name);
 			}
 			if (!did_alias_primary) {
-				if (!is_first)
-					fp << "#elif";
-				fp << " " << key_crt_have(symbol_name);
+				printIfdefCrtHaveAndCond(fp, is_first, symbol_name,
+					print_redirection_extra_cond(symbol_name));
+				is_first = false;
 				print_redirection(symbol_name);
 			}
 		} else if (skip_self_alias) {
-			local is_first = true;
 			for (local cond, alias_name: preferred_aliases) {
-				if (!is_first)
-					fp << "#elif";
+				printIfdefCrtHaveAndCond2(fp, is_first, alias_name, cond,
+					print_redirection_extra_cond(alias_name));
 				is_first = false;
-				fp << " " << key_crt_have(alias_name);
-				if (cond) fp << " && (" << cond << ")";
 				print_redirection(alias_name);
 			}
 			for (local cond, alias_name: aliases) {
-				if (!is_first)
-					fp << "#elif";
+				printIfdefCrtHaveAndCond2(fp, is_first, alias_name, cond,
+					print_redirection_extra_cond(alias_name));
 				is_first = false;
-				fp << " " << key_crt_have(alias_name);
-				if (cond) fp << " && (" << cond << ")";
 				print_redirection(alias_name);
 			}
 			assert !is_first, "name = " + name;
 			goto skip_alias_redirections2;
 		} else {
 			for (local cond, alias_name: preferred_aliases) {
-				fp << " " << key_crt_have(alias_name);
-				if (cond) fp << " && (" << cond << ")";
+				printIfdefCrtHaveAndCond2(fp, is_first, alias_name, cond,
+					print_redirection_extra_cond(alias_name));
+				is_first = false;
 				print_redirection(alias_name);
-				fp << "#elif";
 			}
-			fp << " " << key_crt_have(symbol_name);
+			printIfdefCrtHaveAndCond(fp, is_first, symbol_name,
+				print_redirection_extra_cond(symbol_name));
+			is_first = false;
 			print_redirection(symbol_name);
 		}
 		for (local cond, alias_name: aliases) {
-			fp << "#elif " << key_crt_have(alias_name);
-			if (cond) fp << " && (" << cond << ")";
+			printIfdefCrtHaveAndCond2(fp, is_first, alias_name, cond,
+				print_redirection_extra_cond(alias_name));
+			is_first = false;
 			print_redirection(alias_name);
 		}
 skip_alias_redirections2:

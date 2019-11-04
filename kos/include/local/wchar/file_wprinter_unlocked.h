@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1f7a629b */
+/* HASH CRC-32:0x3126d58b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 /* Dependency: "fputwc_unlocked" */
 #ifndef ____localdep_fputwc_unlocked_defined
 #define ____localdep_fputwc_unlocked_defined 1
-#if defined(__CRT_HAVE_fputwc_unlocked)
+#ifdef __CRT_HAVE_fputwc_unlocked
 __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,,__localdep_fputwc_unlocked,(__WCHAR_TYPE__ __wc, __FILE *__restrict __stream),fputwc_unlocked,(__wc,__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE__fputwc_nolock)
 __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,,__localdep_fputwc_unlocked,(__WCHAR_TYPE__ __wc, __FILE *__restrict __stream),_fputwc_nolock,(__wc,__stream)) __THROWS(...)

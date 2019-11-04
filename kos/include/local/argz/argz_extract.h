@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd82d610e */
+/* HASH CRC-32:0xa8851d4b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "strlen" from "string" */
 #ifndef ____localdep_strlen_defined
 #define ____localdep_strlen_defined 1
-#if defined(__CRT_HAVE_strlen)
+#ifdef __CRT_HAVE_strlen
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __string),strlen,(__string))
 #else /* LIBC: strlen */

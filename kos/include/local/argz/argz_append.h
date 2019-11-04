@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa066af96 */
+/* HASH CRC-32:0x5c637c8f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_argz_append_defined
-#if defined(__CRT_HAVE_realloc)
+#ifdef __CRT_HAVE_realloc
 #define __local_argz_append_defined 1
 #ifdef __LIBC_BIND_OPTIMIZATIONS
 #include <optimized/string.h>
@@ -41,7 +41,7 @@ __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),vo
 /* Dependency: "memcpy" from "string" */
 #ifndef ____localdep_memcpy_defined
 #define ____localdep_memcpy_defined 1
-#if defined(__fast_memcpy_defined)
+#ifdef __fast_memcpy_defined
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 #define __localdep_memcpy (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpy))

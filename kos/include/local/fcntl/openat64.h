@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa4b4790d */
+/* HASH CRC-32:0x14fc270 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,14 +18,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_openat64_defined
-#if defined(__CRT_HAVE_openat)
+#ifdef __CRT_HAVE_openat
 #define __local_openat64_defined 1
 #include <bits/types.h>
 #include <bits/types.h>
 /* Dependency: "openat32" from "fcntl" */
 #ifndef ____localdep_openat32_defined
 #define ____localdep_openat32_defined 1
-#if defined(__CRT_HAVE_openat)
+#ifdef __CRT_HAVE_openat
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__NOTHROW_RPC,__localdep_openat32,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),openat,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
 #else /* LIBC: openat */
 #undef ____localdep_openat32_defined

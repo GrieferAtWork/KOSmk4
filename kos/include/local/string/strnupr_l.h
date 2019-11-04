@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xad9a040a */
+/* HASH CRC-32:0x4872cb6e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "toupper_l" from "ctype" */
 #ifndef ____localdep_toupper_l_defined
 #define ____localdep_toupper_l_defined 1
-#if defined(__CRT_HAVE_toupper_l)
+#ifdef __CRT_HAVE_toupper_l
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_toupper_l,(int __ch, __locale_t __locale),toupper_l,(__ch,__locale))
 #elif defined(__CRT_HAVE__toupper_l)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_toupper_l,(int __ch, __locale_t __locale),_toupper_l,(__ch,__locale))

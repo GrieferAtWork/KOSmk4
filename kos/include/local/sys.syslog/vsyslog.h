@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x916d86e */
+/* HASH CRC-32:0x6a494728 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,13 +18,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_vsyslog_defined
-#if defined(__CRT_HAVE_syslog_printer)
+#ifdef __CRT_HAVE_syslog_printer
 #define __local_vsyslog_defined 1
 #include <bits/format-printer.h>
 /* Dependency: "format_vprintf" from "format-printer" */
 #ifndef ____localdep_format_vprintf_defined
 #define ____localdep_format_vprintf_defined 1
-#if defined(__CRT_HAVE_format_vprintf)
+#ifdef __CRT_HAVE_format_vprintf
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings
@@ -209,7 +209,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 3)) __ATTR_LIBC_PRINTF(3, 0),__SSIZE_TYPE__,,__lo
 /* Dependency: "syslog_printer" */
 #ifndef ____localdep_syslog_printer_defined
 #define ____localdep_syslog_printer_defined 1
-#if defined(__CRT_HAVE_syslog_printer)
+#ifdef __CRT_HAVE_syslog_printer
 /* Helper functions for printing to the system log */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_syslog_printer,(void *__arg, char const *__restrict __data, __SIZE_TYPE__ __datalen),syslog_printer,(__arg,__data,__datalen))
 #else /* LIBC: syslog_printer */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x619a0fec */
+/* HASH CRC-32:0xeb51bf2b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,15 +56,15 @@ __CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),,LStat,(char const *__restrict __filenam
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
 
 #ifdef __USE_LARGEFILE64
-#if defined(__CRT_HAVE_KStat64)
+#ifdef __CRT_HAVE_KStat64
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),,Stat64,(char const *__restrict __filename, struct stat64 *__restrict __buf),KStat64,(__filename,__buf)) __THROWS(...)
 #endif /* Stat64... */
-#if defined(__CRT_HAVE_KFStat64)
+#ifdef __CRT_HAVE_KFStat64
 __CREDIRECT_VOID(__ATTR_NONNULL((2)),,FStat64,(__fd_t __fd, struct stat64 *__restrict __buf),KFStat64,(__fd,__buf)) __THROWS(...)
 #endif /* FStat64... */
 
 #if defined(__USE_XOPEN_EXTENDED) || defined(__USE_XOPEN2K)
-#if defined(__CRT_HAVE_KLStat64)
+#ifdef __CRT_HAVE_KLStat64
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 2)),,LStat64,(char const *__restrict __filename, struct stat64 *__restrict __buf),KLStat64,(__filename,__buf)) __THROWS(...)
 #endif /* LStat64... */
 #endif /* __USE_XOPEN_EXTENDED || __USE_XOPEN2K */
@@ -81,67 +81,67 @@ __CREDIRECT_VOID(__ATTR_NONNULL((2, 3)),,FStatAt,(__fd_t __dirfd, char const *__
 __CREDIRECT_VOID(__ATTR_NONNULL((2, 3)),,FStatAt,(__fd_t __dirfd, char const *__restrict __filename, struct stat *__restrict __buf, __atflag_t __flags),KFStatAt64,(__dirfd,__filename,__buf,__flags)) __THROWS(...)
 #endif /* FStatAt... */
 #ifdef __USE_LARGEFILE64
-#if defined(__CRT_HAVE_KFStatAt64)
+#ifdef __CRT_HAVE_KFStatAt64
 /* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_DOSPATH' */
 __CREDIRECT_VOID(__ATTR_NONNULL((2, 3)),,FStatAt64,(__fd_t __dirfd, char const *__restrict __filename, struct stat64 *__restrict __buf, __atflag_t __flags),KFStatAt64,(__dirfd,__filename,__buf,__flags)) __THROWS(...)
 #endif /* FStatAt64... */
 #endif /* __USE_LARGEFILE64 */
 #endif /* __USE_ATFILE */
 
-#if defined(__CRT_HAVE_Mkdir)
+#ifdef __CRT_HAVE_Mkdir
 __CDECLARE_VOID(__ATTR_NONNULL((1)),,Mkdir,(char const *__pathname, __mode_t __mode),(__pathname,__mode)) __THROWS(...)
 #endif /* Mkdir... */
 
-#if defined(__CRT_HAVE_Chmod)
+#ifdef __CRT_HAVE_Chmod
 __CDECLARE_VOID(__ATTR_NONNULL((1)),,Chmod,(char const *__filename, __mode_t __mode),(__filename,__mode)) __THROWS(...)
 #endif /* Chmod... */
 
 #ifdef __USE_MISC
-#if defined(__CRT_HAVE_LChmod)
+#ifdef __CRT_HAVE_LChmod
 __CDECLARE_VOID(__ATTR_NONNULL((1)),,LChmod,(char const *__filename, __mode_t __mode),(__filename,__mode)) __THROWS(...)
 #endif /* LChmod... */
 #endif /* __USE_MISC */
 
 #if defined(__USE_KOS) && defined(__USE_ATFILE)
-#if defined(__CRT_HAVE_FMkdirAt)
+#ifdef __CRT_HAVE_FMkdirAt
 /* @param flags: Set of `0|AT_DOSPATH' */
 __CDECLARE_VOID(__ATTR_NONNULL((2)),,FMkdirAt,(__fd_t __dirfd, char const *__pathname, __mode_t __mode, __atflag_t __flags),(__dirfd,__pathname,__mode,__flags)) __THROWS(...)
 #endif /* FMkdirAt... */
-#if defined(__CRT_HAVE_FMknodAt)
+#ifdef __CRT_HAVE_FMknodAt
 /* @param flags: Set of `0|AT_DOSPATH' */
 __CDECLARE_VOID(__ATTR_NONNULL((2)),,FMknodAt,(__fd_t __dirfd, char const *__nodename, __mode_t __mode, __dev_t __dev, __atflag_t __flags),(__dirfd,__nodename,__mode,__dev,__flags)) __THROWS(...)
 #endif /* FMknodAt... */
 #endif /* __USE_KOS && __USE_ATFILE */
 
-#if defined(__CRT_HAVE_Mkfifo)
+#ifdef __CRT_HAVE_Mkfifo
 __CDECLARE_VOID(__ATTR_NONNULL((1)),,Mkfifo,(char const *__fifoname, __mode_t __mode),(__fifoname,__mode)) __THROWS(...)
 #endif /* Mkfifo... */
 
 #ifdef __USE_ATFILE
-#if defined(__CRT_HAVE_FChmodAt)
+#ifdef __CRT_HAVE_FChmodAt
 /* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_DOSPATH' */
 __CDECLARE_VOID(__ATTR_NONNULL((2)),,FChmodAt,(__fd_t __dirfd, char const *__filename, __mode_t __mode, __atflag_t __flags),(__dirfd,__filename,__mode,__flags)) __THROWS(...)
 #endif /* FChmodAt... */
-#if defined(__CRT_HAVE_MkdirAt)
+#ifdef __CRT_HAVE_MkdirAt
 __CDECLARE_VOID(__ATTR_NONNULL((2)),,MkdirAt,(__fd_t __dirfd, char const *__pathname, __mode_t __mode),(__dirfd,__pathname,__mode)) __THROWS(...)
 #endif /* MkdirAt... */
-#if defined(__CRT_HAVE_MkfifoAt)
+#ifdef __CRT_HAVE_MkfifoAt
 __CDECLARE_VOID(__ATTR_NONNULL((2)),,MkfifoAt,(__fd_t __dirfd, char const *__fifoname, __mode_t __mode),(__dirfd,__fifoname,__mode)) __THROWS(...)
 #endif /* MkfifoAt... */
 #endif /* __USE_ATFILE */
 
 #ifdef __USE_POSIX
-#if defined(__CRT_HAVE_FChmod)
+#ifdef __CRT_HAVE_FChmod
 __CDECLARE_VOID(,,FChmod,(__fd_t __fd, __mode_t __mode),(__fd,__mode)) __THROWS(...)
 #endif /* FChmod... */
 #endif /* __USE_POSIX */
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
-#if defined(__CRT_HAVE_Mknod)
+#ifdef __CRT_HAVE_Mknod
 __CDECLARE_VOID(__ATTR_NONNULL((1)),,Mknod,(char const *__nodename, __mode_t __mode, __dev_t __dev),(__nodename,__mode,__dev)) __THROWS(...)
 #endif /* Mknod... */
 #ifdef __USE_ATFILE
-#if defined(__CRT_HAVE_MknodAt)
+#ifdef __CRT_HAVE_MknodAt
 __CDECLARE_VOID(__ATTR_NONNULL((2)),,MknodAt,(__fd_t __dirfd, char const *__nodename, __mode_t __mode, __dev_t __dev),(__dirfd,__nodename,__mode,__dev)) __THROWS(...)
 #endif /* MknodAt... */
 #endif /* __USE_ATFILE */
@@ -160,7 +160,7 @@ __CDECLARE_VOID(__ATTR_NONNULL((2)),,UTimensAt,(__fd_t __dirfd, char const *__fi
 __NAMESPACE_LOCAL_USING_OR_IMPL(UTimensAt, __FORCELOCAL __ATTR_NONNULL((2)) void (__LIBCCALL UTimensAt)(__fd_t __dirfd, char const *__filename, struct timespec const __times[2/*or:3*/], __atflag_t __flags) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(UTimensAt))(__dirfd, __filename, __times, __flags); })
 #endif /* UTimensAt... */
 #ifdef __USE_TIME64
-#if defined(__CRT_HAVE_UTimensAt64)
+#ifdef __CRT_HAVE_UTimensAt64
 /* @param flags: Set of `0|AT_SYMLINK_NOFOLLOW|AT_CHANGE_CTIME|AT_DOSPATH' */
 __CDECLARE_VOID(__ATTR_NONNULL((2)),,UTimensAt64,(__fd_t __dirfd, char const *__filename, struct timespec64 const __times[2/*or:3*/], __atflag_t __flags),(__dirfd,__filename,__times,__flags)) __THROWS(...)
 #elif defined(__CRT_HAVE_UTimensAt) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
@@ -184,7 +184,7 @@ __CDECLARE_VOID(,,FUtimens,(__fd_t __fd, struct timespec const __times[2/*or:3*/
 __NAMESPACE_LOCAL_USING_OR_IMPL(FUtimens, __FORCELOCAL void (__LIBCCALL FUtimens)(__fd_t __fd, struct timespec const __times[2/*or:3*/]) __THROWS(...) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(FUtimens))(__fd, __times); })
 #endif /* FUtimens... */
 #ifdef __USE_TIME64
-#if defined(__CRT_HAVE_FUtimens64)
+#ifdef __CRT_HAVE_FUtimens64
 __CDECLARE_VOID(,,FUtimens64,(__fd_t __fd, struct timespec64 const __times[2/*or:3*/]),(__fd,__times)) __THROWS(...)
 #elif defined(__CRT_HAVE_FUtimens) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 __CREDIRECT_VOID(,,FUtimens64,(__fd_t __fd, struct timespec64 const __times[2/*or:3*/]),FUtimens,(__fd,__times)) __THROWS(...)

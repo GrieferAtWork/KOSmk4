@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6d38af9c */
+/* HASH CRC-32:0xe5556727 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -104,14 +104,14 @@ typedef union {
 #endif
 #endif /* !__WAIT_MACROS_DEFINED */
 
-#if defined(__CRT_HAVE_wait)
+#ifdef __CRT_HAVE_wait
 /* Wait for any child process (same as `waitpid(-1, STAT_LOC, 0);') */
 __CDECLARE(,__pid_t,__NOTHROW_RPC,wait,(__WAIT_STATUS __stat_loc),(__stat_loc))
 #elif defined(__CRT_HAVE___wait)
 /* Wait for any child process (same as `waitpid(-1, STAT_LOC, 0);') */
 __CREDIRECT(,__pid_t,__NOTHROW_RPC,wait,(__WAIT_STATUS __stat_loc),__wait,(__stat_loc))
 #endif /* wait... */
-#if defined(__CRT_HAVE_waitpid)
+#ifdef __CRT_HAVE_waitpid
 /* Wait for a child process:
  *  - `pid < -1':  Wait for any child process whose process group ID is `-PID'
  *  - `pid == -1': Wait for any child process
@@ -134,7 +134,7 @@ __CREDIRECT(,__pid_t,__NOTHROW_RPC,waitpid,(__pid_t __pid, __WAIT_STATUS __stat_
 #define __id_t_defined 1
 typedef __id_t id_t;
 #endif /* !__id_t_defined */
-#if defined(__CRT_HAVE_waitid)
+#ifdef __CRT_HAVE_waitid
 /* @param options: At least one of `WEXITED|WSTOPPED|WCONTINUED', optionally or'd with `WNOHANG|WNOWAIT' */
 __CDECLARE(,int,__NOTHROW_RPC,waitid,(idtype_t __idtype, id_t __id, siginfo_t *__infop, int __options),(__idtype,__id,__infop,__options))
 #endif /* waitid... */
@@ -142,7 +142,7 @@ __CDECLARE(,int,__NOTHROW_RPC,waitid,(idtype_t __idtype, id_t __id, siginfo_t *_
 
 #if defined(__USE_MISC) || defined(__USE_XOPEN_EXTENDED)
 struct rusage;
-#if defined(__CRT_HAVE_wait3)
+#ifdef __CRT_HAVE_wait3
 /* Same as `waitpid(-1,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 __CDECLARE(,__pid_t,__NOTHROW_RPC,wait3,(__WAIT_STATUS __stat_loc, int __options, struct rusage *__usage),(__stat_loc,__options,__usage))
@@ -150,7 +150,7 @@ __CDECLARE(,__pid_t,__NOTHROW_RPC,wait3,(__WAIT_STATUS __stat_loc, int __options
 #endif /* __USE_MISC || __USE_XOPEN_EXTENDED */
 
 #ifdef __USE_MISC
-#if defined(__CRT_HAVE_wait4)
+#ifdef __CRT_HAVE_wait4
 /* Same as `waitpid(pid,STAT_LOC,OPTIONS)', though also fills in `USAGE' when non-NULL
  * @param options: Set of `WNOHANG|WUNTRACED|WCONTINUED' (as a KOS extension, `WNOWAIT' is also accepted) */
 __CDECLARE(,__pid_t,__NOTHROW_RPC,wait4,(__pid_t __pid, __WAIT_STATUS __stat_loc, int __options, struct rusage *__usage),(__pid,__stat_loc,__options,__usage))
@@ -158,7 +158,7 @@ __CDECLARE(,__pid_t,__NOTHROW_RPC,wait4,(__pid_t __pid, __WAIT_STATUS __stat_loc
 #endif /* __USE_MISC */
 
 #ifdef __USE_KOS
-#if defined(__CRT_HAVE_detach)
+#ifdef __CRT_HAVE_detach
 /* >> detach(2)
  * Detach the descriptor of `PID' from the thread that
  * would have received a signal when it changes state,

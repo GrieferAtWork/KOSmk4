@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x42568e6c */
+/* HASH CRC-32:0x24f4321c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "sem_timedwait32" from "semaphore" */
 #ifndef ____localdep_sem_timedwait32_defined
 #define ____localdep_sem_timedwait32_defined 1
-#if defined(__CRT_HAVE_sem_timedwait)
+#ifdef __CRT_HAVE_sem_timedwait
 /* Similar to `sem_wait' but wait only until ABSTIME */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_sem_timedwait32,(sem_t *__restrict __sem, struct __timespec32 const *__restrict __abstime),sem_timedwait,(__sem,__abstime))
 #else /* LIBC: sem_timedwait */
@@ -34,7 +34,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_sem_timedwait32,
 /* Dependency: "sem_timedwait64" from "semaphore" */
 #ifndef ____localdep_sem_timedwait64_defined
 #define ____localdep_sem_timedwait64_defined 1
-#if defined(__CRT_HAVE_sem_timedwait64)
+#ifdef __CRT_HAVE_sem_timedwait64
 /* Similar to `sem_wait' but wait only until ABSTIME */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_sem_timedwait64,(sem_t *__restrict __sem, struct __timespec64 const *__restrict __abstime),sem_timedwait64,(__sem,__abstime))
 #elif defined(__CRT_HAVE_sem_timedwait) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)

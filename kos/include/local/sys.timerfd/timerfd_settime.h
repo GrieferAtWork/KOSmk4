@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x50642bef */
+/* HASH CRC-32:0x650bf647 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "timerfd_settime32" from "sys.timerfd" */
 #ifndef ____localdep_timerfd_settime32_defined
 #define ____localdep_timerfd_settime32_defined 1
-#if defined(__CRT_HAVE_timerfd_settime)
+#ifdef __CRT_HAVE_timerfd_settime
 /* Set next expiration time of interval timer source UFD to UTMR.
  * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout utmr
  * is absolute. Optionally return the old expiration time in OTMR */
@@ -36,7 +36,7 @@ __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,__localdep_timerfd_settime32,(
 /* Dependency: "timerfd_settime64" from "sys.timerfd" */
 #ifndef ____localdep_timerfd_settime64_defined
 #define ____localdep_timerfd_settime64_defined 1
-#if defined(__CRT_HAVE_timerfd_settime64)
+#ifdef __CRT_HAVE_timerfd_settime64
 /* Set next expiration time of interval timer source UFD to UTMR.
  * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout utmr
  * is absolute. Optionally return the old expiration time in OTMR */

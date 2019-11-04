@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x94174787 */
+/* HASH CRC-32:0x4b2f01e9 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -126,7 +126,7 @@ struct utsname {
 #pragma pop_macro("sysname")
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 
-#if defined(__CRT_HAVE_uname)
+#ifdef __CRT_HAVE_uname
 /* Put information about the system in NAME */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,uname,(struct utsname *__name),(__name))
 #endif /* uname... */

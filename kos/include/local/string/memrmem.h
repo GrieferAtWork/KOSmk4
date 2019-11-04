@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfd809751 */
+/* HASH CRC-32:0xa42a4cab */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 /* Dependency: "memrchr" from "string" */
 #ifndef ____localdep_memrchr_defined
 #define ____localdep_memrchr_defined 1
-#if defined(__CRT_HAVE_memrchr)
+#ifdef __CRT_HAVE_memrchr
 /* Descendingly search for `NEEDLE', starting at `HAYSTACK+N_BYTES'. - Return `NULL' if `NEEDLE' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memrchr,(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),memrchr,(__haystack,__needle,__n_bytes))
 #else /* LIBC: memrchr */
@@ -38,7 +38,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,
 /* Dependency: "memcmp" from "string" */
 #ifndef ____localdep_memcmp_defined
 #define ____localdep_memcmp_defined 1
-#if defined(__fast_memcmp_defined)
+#ifdef __fast_memcmp_defined
 /* Compare memory buffers and return the difference of the first non-matching byte
  * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
  * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'

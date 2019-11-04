@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x327d81b9 */
+/* HASH CRC-32:0x82a3df1a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 /* Dependency: "memmove" from "string" */
 #ifndef ____localdep_memmove_defined
 #define ____localdep_memmove_defined 1
-#if defined(__fast_memmove_defined)
+#ifdef __fast_memmove_defined
 /* Move memory between potentially overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 #define __localdep_memmove (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmove))

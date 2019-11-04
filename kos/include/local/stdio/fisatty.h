@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x13f13bf9 */
+/* HASH CRC-32:0x148daa18 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "isatty" */
 #ifndef ____localdep_isatty_defined
 #define ____localdep_isatty_defined 1
-#if defined(__CRT_HAVE_isatty)
+#ifdef __CRT_HAVE_isatty
 /* >> isatty(2)
  * @return: 1: Is a tty
  * @return: 0: Not a tty

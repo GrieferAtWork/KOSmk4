@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xced3cd5f */
+/* HASH CRC-32:0xb73f6bd7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 /* Dependency: "fuzzy_memcasecmp" from "string" */
 #ifndef ____localdep_fuzzy_memcasecmp_defined
 #define ____localdep_fuzzy_memcasecmp_defined 1
-#if defined(__CRT_HAVE_fuzzy_memcasecmp)
+#ifdef __CRT_HAVE_fuzzy_memcasecmp
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_fuzzy_memcasecmp,(void const *__s1, __SIZE_TYPE__ __s1_bytes, void const *__s2, __SIZE_TYPE__ __s2_bytes),fuzzy_memcasecmp,(__s1,__s1_bytes,__s2,__s2_bytes))
 #elif !defined(__NO_MALLOCA)
 #include <local/string/fuzzy_memcasecmp.h>
@@ -37,7 +37,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__
 /* Dependency: "strlen" from "string" */
 #ifndef ____localdep_strlen_defined
 #define ____localdep_strlen_defined 1
-#if defined(__CRT_HAVE_strlen)
+#ifdef __CRT_HAVE_strlen
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __string),strlen,(__string))
 #else /* LIBC: strlen */

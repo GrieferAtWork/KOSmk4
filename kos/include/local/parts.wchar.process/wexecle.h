@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb16559c8 */
+/* HASH CRC-32:0xf5543cbf */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 /* Dependency: "wexecve" */
 #ifndef ____localdep_wexecve_defined
 #define ____localdep_wexecve_defined 1
-#if defined(__CRT_HAVE_wexecve)
+#ifdef __CRT_HAVE_wexecve
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_wexecve,(__WCHAR_TYPE__ const *__restrict __path, __TWARGV, __TWENVP),wexecve,(__path,____TWARGV,____TWENVP))
 #elif defined(__CRT_HAVE__wexecve)
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_wexecve,(__WCHAR_TYPE__ const *__restrict __path, __TWARGV, __TWENVP),_wexecve,(__path,____TWARGV,____TWENVP))

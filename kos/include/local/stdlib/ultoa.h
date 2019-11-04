@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9040861e */
+/* HASH CRC-32:0x21b52691 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "_ultoa_s" from "stdlib" */
 #ifndef ____localdep__ultoa_s_defined
 #define ____localdep__ultoa_s_defined 1
-#if defined(__CRT_HAVE__ultoa_s)
+#ifdef __CRT_HAVE__ultoa_s
 __CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ultoa_s,(unsigned long __val, char *__buf, __SIZE_TYPE__ __bufsize, int __radix),_ultoa_s,(__val,__buf,__bufsize,__radix))
 #elif defined(__CRT_HAVE_ultoa_s)
 __CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ultoa_s,(unsigned long __val, char *__buf, __SIZE_TYPE__ __bufsize, int __radix),ultoa_s,(__val,__buf,__bufsize,__radix))

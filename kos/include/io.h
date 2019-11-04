@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1a2be0a9 */
+/* HASH CRC-32:0x2b5519b3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -108,7 +108,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(rename, __FORCELOCAL __ATTR_NONNULL((1, 2)) int 
 #endif /* !__rename_defined */
 #ifndef __unlink_defined
 #define __unlink_defined 1
-#if defined(__CRT_HAVE_unlink)
+#ifdef __CRT_HAVE_unlink
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,unlink,(char const *__file),(__file))
@@ -163,7 +163,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(creat, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNUL
 #endif /* !__creat_defined */
 #ifndef __access_defined
 #define __access_defined 1
-#if defined(__CRT_HAVE_access)
+#ifdef __CRT_HAVE_access
 /* >> access(2)
  * @param: TYPE: Set of `X_OK|W_OK|R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE' */
@@ -185,7 +185,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(access, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNU
 #endif /* !__access_defined */
 #ifndef __chmod_defined
 #define __chmod_defined 1
-#if defined(__CRT_HAVE_chmod)
+#ifdef __CRT_HAVE_chmod
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,chmod,(char const *__filename, __mode_t __mode),(__filename,__mode))
 #elif defined(__CRT_HAVE__chmod)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,chmod,(char const *__filename, __mode_t __mode),_chmod,(__filename,__mode))
@@ -195,7 +195,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,chmod,(char const *__filename,
 #endif /* !__chmod_defined */
 #ifndef __close_defined
 #define __close_defined 1
-#if defined(__CRT_HAVE_close)
+#ifdef __CRT_HAVE_close
 /* >> close(2)
  * Close a file handle */
 __CDECLARE(,int,__NOTHROW_NCX,close,(__fd_t __fd),(__fd))
@@ -213,7 +213,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,close,(__fd_t __fd),__close,(__fd))
 #endif /* !__close_defined */
 #ifndef __dup_defined
 #define __dup_defined 1
-#if defined(__CRT_HAVE_dup)
+#ifdef __CRT_HAVE_dup
 /* >> dup(2)
  * @return: * : Returns the new handle upon success.
  * Duplicate a file referred to by `FD' and return its duplicated handle number */
@@ -224,7 +224,7 @@ __CDECLARE(__ATTR_WUNUSED,__fd_t,__NOTHROW_NCX,dup,(__fd_t __fd),(__fd))
 #endif /* !__dup_defined */
 #ifndef __dup2_defined
 #define __dup2_defined 1
-#if defined(__CRT_HAVE_dup2)
+#ifdef __CRT_HAVE_dup2
 /* >> dup2(2)
  * @return: NEWFD: Returns the new handle upon success.
  * Duplicate a file referred to by `OLDFD' into `NEWFD' */
@@ -245,7 +245,7 @@ __CREDIRECT(,__fd_t,__NOTHROW_NCX,dup2,(__fd_t __oldfd, __fd_t __newfd),__dup2,(
 #endif /* !__dup2_defined */
 #ifndef __isatty_defined
 #define __isatty_defined 1
-#if defined(__CRT_HAVE_isatty)
+#ifdef __CRT_HAVE_isatty
 /* >> isatty(2)
  * @return: 1: Is a tty
  * @return: 0: Not a tty
@@ -294,7 +294,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lseek, __FORCELOCAL __FS_TYPE(off) __NOTHROW_NCX
 #endif /* !__lseek_defined */
 #ifndef __mktemp_defined
 #define __mktemp_defined 1
-#if defined(__CRT_HAVE_mktemp)
+#ifdef __CRT_HAVE_mktemp
 __CDECLARE(__ATTR_NONNULL((1)),char *,__NOTHROW_NCX,mktemp,(char *__template_),(__template_))
 #elif defined(__CRT_HAVE__mktemp)
 __CREDIRECT(__ATTR_NONNULL((1)),char *,__NOTHROW_NCX,mktemp,(char *__template_),_mktemp,(__template_))
@@ -306,7 +306,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),char *,__NOTHROW_NCX,mktemp,(char *__template_),
 #endif /* !__mktemp_defined */
 #ifndef __umask_defined
 #define __umask_defined 1
-#if defined(__CRT_HAVE_umask)
+#ifdef __CRT_HAVE_umask
 __CDECLARE(,__mode_t,__NOTHROW_NCX,umask,(__mode_t __mode),(__mode))
 #elif defined(__CRT_HAVE__umask)
 __CREDIRECT(,__mode_t,__NOTHROW_NCX,umask,(__mode_t __mode),_umask,(__mode))
@@ -316,7 +316,7 @@ __CREDIRECT(,__mode_t,__NOTHROW_NCX,umask,(__mode_t __mode),_umask,(__mode))
 #endif /* !__umask_defined */
 #ifndef __read_defined
 #define __read_defined 1
-#if defined(__CRT_HAVE_read)
+#ifdef __CRT_HAVE_read
 /* >> read(2)
  * Read data from a given file descriptor `FD' and return the number of bytes read.
  * A return value of ZERO(0) is indicative of EOF */
@@ -337,7 +337,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,read,(__fd_t __fd, void *_
 #endif /* !__read_defined */
 #ifndef __write_defined
 #define __write_defined 1
-#if defined(__CRT_HAVE_write)
+#ifdef __CRT_HAVE_write
 /* >> write(2)
  * Write data to a given file descriptor `FD' and return the number of bytes written */
 __CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,write,(__fd_t __fd, void const *__buf, size_t __bufsize),(__fd,__buf,__bufsize))
@@ -353,7 +353,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,write,(__fd_t __fd, void c
 #undef __write_defined
 #endif /* write... */
 #endif /* !__write_defined */
-#if defined(__CRT_HAVE__access)
+#ifdef __CRT_HAVE__access
 /* >> access(2)
  * @param: TYPE: Set of `X_OK|W_OK|R_OK'
  * Test for access to the specified file `FILE', testing for `TYPE' */
@@ -380,15 +380,15 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,_creat,(char 
 #include <local/fcntl/creat.h>
 __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__LIBCCALL _creat)(char const *__filename, __mode_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(creat))(__filename, __mode); }
 #endif /* _creat... */
-#if defined(__CRT_HAVE__chmod)
+#ifdef __CRT_HAVE__chmod
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_chmod,(char const *__filename, __mode_t __mode),(__filename,__mode))
 #elif defined(__CRT_HAVE_chmod)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_chmod,(char const *__filename, __mode_t __mode),chmod,(__filename,__mode))
 #endif /* _chmod... */
-#if defined(__CRT_HAVE__access_s)
+#ifdef __CRT_HAVE__access_s
 __CDECLARE(__ATTR_NONNULL((1)),errno_t,__NOTHROW_RPC,_access_s,(char const *__filename, int __type),(__filename,__type))
 #endif /* _access_s... */
-#if defined(__CRT_HAVE__chsize)
+#ifdef __CRT_HAVE__chsize
 /* >> ftruncate(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CDECLARE(,int,__NOTHROW_NCX,_chsize,(__fd_t __fd, __LONG32_TYPE__ __size),(__fd,__size))
@@ -406,7 +406,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,_chsize,(__fd_t __fd, __LONG32_TYPE__ __size),chs
  * Truncate the given file `FD' to a length of `LENGTH' */
 __FORCELOCAL int __NOTHROW_NCX(__LIBCCALL _chsize)(__fd_t __fd, __LONG32_TYPE__ __size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ftruncate))(__fd, (__PIO_OFFSET)__size); }
 #endif /* _chsize... */
-#if defined(__CRT_HAVE__chsize_s)
+#ifdef __CRT_HAVE__chsize_s
 /* >> ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CDECLARE(,errno_t,__NOTHROW_NCX,_chsize_s,(__fd_t __fd, __INT64_TYPE__ __size),(__fd,__size))
@@ -420,7 +420,7 @@ __CREDIRECT(,errno_t,__NOTHROW_NCX,_chsize_s,(__fd_t __fd, __INT64_TYPE__ __size
  * Truncate the given file `FD' to a length of `LENGTH' */
 __FORCELOCAL errno_t __NOTHROW_NCX(__LIBCCALL _chsize_s)(__fd_t __fd, __INT64_TYPE__ __size) { return (errno_t)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ftruncate64))(__fd, (__PIO_OFFSET64)__size); }
 #endif /* _chsize_s... */
-#if defined(__CRT_HAVE__commit)
+#ifdef __CRT_HAVE__commit
 /* >> fsync(2)
  * Synchronize a file (including its descriptor which contains timestamps, and its size),
  * meaning that changes to its data and/or descriptor are written to disk */
@@ -442,7 +442,7 @@ __CREDIRECT(,int,__NOTHROW_RPC,_commit,(__fd_t __fd),fdatasync,(__fd))
  * meaning that changes to its data and/or descriptor are written to disk */
 __FORCELOCAL int __NOTHROW_RPC(__LIBCCALL _commit)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fsync))(__fd); }
 #endif /* _commit... */
-#if defined(__CRT_HAVE__lseek)
+#ifdef __CRT_HAVE__lseek
 __CDECLARE(,__LONG32_TYPE__,__NOTHROW_NCX,_lseek,(__fd_t __fd, __LONG32_TYPE__ __offset, int __whence),(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE_lseek)
 __CREDIRECT(,__LONG32_TYPE__,__NOTHROW_NCX,_lseek,(__fd_t __fd, __LONG32_TYPE__ __offset, int __whence),lseek,(__fd,__offset,__whence))
@@ -450,7 +450,7 @@ __CREDIRECT(,__LONG32_TYPE__,__NOTHROW_NCX,_lseek,(__fd_t __fd, __LONG32_TYPE__ 
 #include <local/io/_lseek.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_lseek, __FORCELOCAL __LONG32_TYPE__ __NOTHROW_NCX(__LIBCCALL _lseek)(__fd_t __fd, __LONG32_TYPE__ __offset, int __whence) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_lseek))(__fd, __offset, __whence); })
 #endif /* _lseek... */
-#if defined(__CRT_HAVE__lseeki64)
+#ifdef __CRT_HAVE__lseeki64
 /* >> lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __CDECLARE(,__INT64_TYPE__,__NOTHROW_NCX,_lseeki64,(__fd_t __fd, __INT64_TYPE__ __offset, int __whence),(__fd,__offset,__whence))
@@ -464,7 +464,7 @@ __CREDIRECT(,__INT64_TYPE__,__NOTHROW_NCX,_lseeki64,(__fd_t __fd, __INT64_TYPE__
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __FORCELOCAL __INT64_TYPE__ __NOTHROW_NCX(__LIBCCALL _lseeki64)(__fd_t __fd, __INT64_TYPE__ __offset, int __whence) { return (__INT64_TYPE__)(__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(lseek64))(__fd, (__off64_t)__offset, __whence); }
 #endif /* _lseeki64... */
-#if defined(__CRT_HAVE__locking)
+#ifdef __CRT_HAVE__locking
 __CDECLARE(,int,__NOTHROW_RPC,_locking,(__fd_t __fd, int __lockmode, __LONG32_TYPE__ __length),(__fd,__lockmode,__length))
 #elif defined(__CRT_HAVE_locking)
 __CREDIRECT(,int,__NOTHROW_RPC,_locking,(__fd_t __fd, int __lockmode, __LONG32_TYPE__ __length),locking,(__fd,__lockmode,__length))
@@ -477,7 +477,7 @@ __FORCELOCAL int __NOTHROW_RPC(__LIBCCALL _locking)(__fd_t __fd, int __lockmode,
 
 #ifndef ___unlink_defined
 #define ___unlink_defined 1
-#if defined(__CRT_HAVE__unlink)
+#ifdef __CRT_HAVE__unlink
 /* >> unlink(2)
  * Remove a file, symbolic link, device or FIFO referred to by `FILE' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_unlink,(char const *__filename),(__filename))
@@ -495,7 +495,7 @@ __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL _unlink)(char cons
 #endif /* _unlink... */
 #endif /* !___unlink_defined */
 
-#if defined(__CRT_HAVE__close)
+#ifdef __CRT_HAVE__close
 /* >> close(2)
  * Close a file handle */
 __CDECLARE(,int,__NOTHROW_NCX,_close,(__fd_t __fd),(__fd))
@@ -504,7 +504,7 @@ __CDECLARE(,int,__NOTHROW_NCX,_close,(__fd_t __fd),(__fd))
  * Close a file handle */
 __CREDIRECT(,int,__NOTHROW_NCX,_close,(__fd_t __fd),close,(__fd))
 #endif /* _close... */
-#if defined(__CRT_HAVE__dup)
+#ifdef __CRT_HAVE__dup
 /* >> dup(2)
  * @return: * : Returns the new handle upon success.
  * Duplicate a file referred to by `FD' and return its duplicated handle number */
@@ -515,7 +515,7 @@ __CDECLARE(,__fd_t,__NOTHROW_NCX,_dup,(__fd_t __fd),(__fd))
  * Duplicate a file referred to by `FD' and return its duplicated handle number */
 __CREDIRECT(,__fd_t,__NOTHROW_NCX,_dup,(__fd_t __fd),dup,(__fd))
 #endif /* _dup... */
-#if defined(__CRT_HAVE__dup2)
+#ifdef __CRT_HAVE__dup2
 /* >> dup2(2)
  * @return: NEWFD: Returns the new handle upon success.
  * Duplicate a file referred to by `OLDFD' into `NEWFD' */
@@ -527,7 +527,7 @@ __CDECLARE(,__fd_t,__NOTHROW_NCX,_dup2,(__fd_t __oldfd, __fd_t __newfd),(__oldfd
 __CREDIRECT(,__fd_t,__NOTHROW_NCX,_dup2,(__fd_t __oldfd, __fd_t __newfd),dup2,(__oldfd,__newfd))
 #endif /* _dup2... */
 
-#if defined(__CRT_HAVE__read)
+#ifdef __CRT_HAVE__read
 /* >> read(2)
  * Read data from a given file descriptor `FD' and return the number of bytes read.
  * A return value of ZERO(0) is indicative of EOF */
@@ -538,7 +538,7 @@ __CDECLARE(,ssize_t,__NOTHROW_RPC,_read,(__fd_t __fd, void *__buf, size_t __bufs
  * A return value of ZERO(0) is indicative of EOF */
 __CREDIRECT(,ssize_t,__NOTHROW_RPC,_read,(__fd_t __fd, void *__buf, size_t __bufsize),read,(__fd,__buf,__bufsize))
 #endif /* _read... */
-#if defined(__CRT_HAVE__write)
+#ifdef __CRT_HAVE__write
 /* >> write(2)
  * Write data to a given file descriptor `FD' and return the number of bytes written */
 __CDECLARE(,ssize_t,__NOTHROW_RPC,_write,(__fd_t __fd, void const *__buf, size_t __bufsize),(__fd,__buf,__bufsize))
@@ -557,7 +557,7 @@ __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__VLIBCCALL _open
 #include <local/fcntl/open.h>
 #define _open (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(open))
 #endif /* _open... */
-#if defined(__CRT_HAVE__setmode)
+#ifdef __CRT_HAVE__setmode
 __CDECLARE(,__oflag_t,__NOTHROW_NCX,_setmode,(__fd_t __fd, __oflag_t __mode),(__fd,__mode))
 #elif defined(__CRT_HAVE_setmode)
 __CREDIRECT(,__oflag_t,__NOTHROW_NCX,_setmode,(__fd_t __fd, __oflag_t __mode),setmode,(__fd,__mode))
@@ -565,12 +565,12 @@ __CREDIRECT(,__oflag_t,__NOTHROW_NCX,_setmode,(__fd_t __fd, __oflag_t __mode),se
 #include <local/io/setmode.h>
 __FORCELOCAL __oflag_t __NOTHROW_NCX(__LIBCCALL _setmode)(__fd_t __fd, __oflag_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(setmode))(__fd, __mode); }
 #endif /* _setmode... */
-#if defined(__CRT_HAVE__umask)
+#ifdef __CRT_HAVE__umask
 __CDECLARE(,__mode_t,__NOTHROW_NCX,_umask,(__mode_t __mode),(__mode))
 #elif defined(__CRT_HAVE_umask)
 __CREDIRECT(,__mode_t,__NOTHROW_NCX,_umask,(__mode_t __mode),umask,(__mode))
 #endif /* _umask... */
-#if defined(__CRT_HAVE__isatty)
+#ifdef __CRT_HAVE__isatty
 /* >> isatty(2)
  * @return: 1: Is a tty
  * @return: 0: Not a tty
@@ -585,64 +585,64 @@ __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,_isatty,(__fd_t __fd),isatty,(__fd)
 #endif /* _isatty... */
 
 
-#if defined(__CRT_HAVE__findclose)
+#ifdef __CRT_HAVE__findclose
 __CDECLARE(,int,__NOTHROW_NCX,_findclose,(intptr_t __findfd),(__findfd))
 #endif /* _findclose... */
-#if defined(__CRT_HAVE__findfirst32)
+#ifdef __CRT_HAVE__findfirst32
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),intptr_t,__NOTHROW_RPC,_findfirst32,(char const *__restrict __filename, struct _finddata32_t *__restrict __finddata),(__filename,__finddata))
 #elif defined(__CRT_HAVE__findfirst)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),intptr_t,__NOTHROW_RPC,_findfirst32,(char const *__restrict __filename, struct _finddata32_t *__restrict __finddata),_findfirst,(__filename,__finddata))
 #endif /* _findfirst32... */
-#if defined(__CRT_HAVE__findfirst32i64)
+#ifdef __CRT_HAVE__findfirst32i64
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),intptr_t,__NOTHROW_RPC,_findfirst32i64,(char const *__restrict __filename, struct _finddata32i64_t *__restrict __finddata),(__filename,__finddata))
 #elif defined(__CRT_HAVE__findfirsti64)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),intptr_t,__NOTHROW_RPC,_findfirst32i64,(char const *__restrict __filename, struct _finddata32i64_t *__restrict __finddata),_findfirsti64,(__filename,__finddata))
 #endif /* _findfirst32i64... */
-#if defined(__CRT_HAVE__findnext32)
+#ifdef __CRT_HAVE__findnext32
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,_findnext32,(intptr_t __findfd, struct _finddata32_t *__restrict __finddata),(__findfd,__finddata))
 #elif defined(__CRT_HAVE__findnext)
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,_findnext32,(intptr_t __findfd, struct _finddata32_t *__restrict __finddata),_findnext,(__findfd,__finddata))
 #endif /* _findnext32... */
-#if defined(__CRT_HAVE__findnext32i64)
+#ifdef __CRT_HAVE__findnext32i64
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,_findnext32i64,(intptr_t __findfd, struct _finddata32i64_t *__restrict __finddata),(__findfd,__finddata))
 #elif defined(__CRT_HAVE__findnexti64)
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,_findnext32i64,(intptr_t __findfd, struct _finddata32i64_t *__restrict __finddata),_findnexti64,(__findfd,__finddata))
 #endif /* _findnext32i64... */
-#if defined(__CRT_HAVE__findfirst64i32)
+#ifdef __CRT_HAVE__findfirst64i32
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),intptr_t,__NOTHROW_RPC,_findfirst64i32,(char const *__restrict __filename, struct _finddata64i32_t *__restrict __finddata),(__filename,__finddata))
 #elif defined(__CRT_HAVE__findfirst64)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),intptr_t,__NOTHROW_RPC,_findfirst64i32,(char const *__restrict __filename, struct _finddata64i32_t *__restrict __finddata),_findfirst64,(__filename,__finddata))
 #endif /* _findfirst64i32... */
-#if defined(__CRT_HAVE__findfirst64)
+#ifdef __CRT_HAVE__findfirst64
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),intptr_t,__NOTHROW_RPC,_findfirst64,(char const *__restrict __filename, struct __finddata64_t *__restrict __finddata),(__filename,__finddata))
 #elif defined(__CRT_HAVE__findfirst64i32)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),intptr_t,__NOTHROW_RPC,_findfirst64,(char const *__restrict __filename, struct __finddata64_t *__restrict __finddata),_findfirst64i32,(__filename,__finddata))
 #endif /* _findfirst64... */
-#if defined(__CRT_HAVE__findnext64)
+#ifdef __CRT_HAVE__findnext64
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,_findnext64,(intptr_t __findfd, struct __finddata64_t *__restrict __finddata),(__findfd,__finddata))
 #elif defined(__CRT_HAVE__findnext64i32)
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,_findnext64,(intptr_t __findfd, struct __finddata64_t *__restrict __finddata),_findnext64i32,(__findfd,__finddata))
 #endif /* _findnext64... */
-#if defined(__CRT_HAVE__findnext64i32)
+#ifdef __CRT_HAVE__findnext64i32
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,_findnext64i32,(intptr_t __findfd, struct _finddata64i32_t *__restrict __finddata),(__findfd,__finddata))
 #elif defined(__CRT_HAVE__findnext64)
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,_findnext64i32,(intptr_t __findfd, struct _finddata64i32_t *__restrict __finddata),_findnext64,(__findfd,__finddata))
 #endif /* _findnext64i32... */
 
-#if defined(__CRT_HAVE__sopen_s)
+#ifdef __CRT_HAVE__sopen_s
 __CDECLARE(__ATTR_NONNULL((1, 2)),errno_t,__NOTHROW_RPC,_sopen_s,(__fd_t *__fd, char const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode),(__fd,__filename,__oflags,__sflags,__mode))
 #elif defined(__CRT_HAVE__sopen_s_nolock)
 __CREDIRECT(__ATTR_NONNULL((1, 2)),errno_t,__NOTHROW_RPC,_sopen_s,(__fd_t *__fd, char const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode),_sopen_s_nolock,(__fd,__filename,__oflags,__sflags,__mode))
 #endif /* _sopen_s... */
-#if defined(__CRT_HAVE__sopen_s_nolock)
+#ifdef __CRT_HAVE__sopen_s_nolock
 __CDECLARE(__ATTR_NONNULL((1, 2)),errno_t,__NOTHROW_RPC,_sopen_s_nolock,(__fd_t *__fd, char const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode),(__fd,__filename,__oflags,__sflags,__mode))
 #elif defined(__CRT_HAVE__sopen_s)
 __CREDIRECT(__ATTR_NONNULL((1, 2)),errno_t,__NOTHROW_RPC,_sopen_s_nolock,(__fd_t *__fd, char const *__filename, __oflag_t __oflags, int __sflags, __mode_t __mode),_sopen_s,(__fd,__filename,__oflags,__sflags,__mode))
 #endif /* _sopen_s_nolock... */
-#if defined(__CRT_HAVE__mktemp_s)
+#ifdef __CRT_HAVE__mktemp_s
 __CDECLARE(__ATTR_NONNULL((1)),errno_t,__NOTHROW_NCX,_mktemp_s,(char *__template_, size_t __size),(__template_,__size))
 #endif /* _mktemp_s... */
-#if defined(__CRT_HAVE__sopen)
+#ifdef __CRT_HAVE__sopen
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__VLIBCCALL _sopen)(char const *__filename, __oflag_t __oflags, int __sflags, ...) __CASMNAME_SAME("_sopen");
 #elif defined(__CRT_HAVE_sopen)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,_sopen,(char const *__filename, __oflag_t __oflags, int __sflags),sopen,(__filename,__oflags,__sflags),__sflags,1,(__mode_t))
@@ -650,13 +650,13 @@ __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,_sopen,(cha
 #include <local/io/sopen.h>
 #define _sopen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sopen))
 #endif /* _sopen... */
-#if defined(__CRT_HAVE__pipe)
+#ifdef __CRT_HAVE__pipe
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,_pipe,(__fd_t __pipedes[2], __UINT32_TYPE__ __pipesize, __oflag_t __textmode),(__pipedes,__pipesize,__textmode))
 #elif defined(__CRT_HAVE__pipe) || defined(__CRT_HAVE_pipe) || defined(__CRT_HAVE___pipe) || defined(__CRT_HAVE_pipe2)
 #include <local/io/_pipe.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_pipe, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL _pipe)(__fd_t __pipedes[2], __UINT32_TYPE__ __pipesize, __oflag_t __textmode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_pipe))(__pipedes, __pipesize, __textmode); })
 #endif /* _pipe... */
-#if defined(__CRT_HAVE__eof)
+#ifdef __CRT_HAVE__eof
 __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,_eof,(__fd_t __fd),(__fd))
 #elif defined(__CRT_HAVE_eof)
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,_eof,(__fd_t __fd),eof,(__fd))
@@ -664,7 +664,7 @@ __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,_eof,(__fd_t __fd),eof,(__fd))
 #include <local/io/eof.h>
 __FORCELOCAL __ATTR_WUNUSED int __NOTHROW_NCX(__LIBCCALL _eof)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(eof))(__fd); }
 #endif /* _eof... */
-#if defined(__CRT_HAVE__filelength)
+#ifdef __CRT_HAVE__filelength
 __CDECLARE(__ATTR_WUNUSED,__LONG32_TYPE__,__NOTHROW_NCX,_filelength,(__fd_t __fd),(__fd))
 #elif defined(__CRT_HAVE_filelength)
 __CREDIRECT(__ATTR_WUNUSED,__LONG32_TYPE__,__NOTHROW_NCX,_filelength,(__fd_t __fd),filelength,(__fd))
@@ -672,7 +672,7 @@ __CREDIRECT(__ATTR_WUNUSED,__LONG32_TYPE__,__NOTHROW_NCX,_filelength,(__fd_t __f
 #include <local/io/filelength.h>
 __FORCELOCAL __ATTR_WUNUSED __LONG32_TYPE__ __NOTHROW_NCX(__LIBCCALL _filelength)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(filelength))(__fd); }
 #endif /* _filelength... */
-#if defined(__CRT_HAVE__tell)
+#ifdef __CRT_HAVE__tell
 __CDECLARE(__ATTR_WUNUSED,__LONG32_TYPE__,__NOTHROW_NCX,_tell,(__fd_t __fd),(__fd))
 #elif defined(__CRT_HAVE_tell)
 __CREDIRECT(__ATTR_WUNUSED,__LONG32_TYPE__,__NOTHROW_NCX,_tell,(__fd_t __fd),tell,(__fd))
@@ -680,37 +680,37 @@ __CREDIRECT(__ATTR_WUNUSED,__LONG32_TYPE__,__NOTHROW_NCX,_tell,(__fd_t __fd),tel
 #include <local/io/tell.h>
 __FORCELOCAL __ATTR_WUNUSED __LONG32_TYPE__ __NOTHROW_NCX(__LIBCCALL _tell)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tell))(__fd); }
 #endif /* _tell... */
-#if defined(__CRT_HAVE__filelengthi64)
+#ifdef __CRT_HAVE__filelengthi64
 __CDECLARE(__ATTR_WUNUSED,__INT64_TYPE__,__NOTHROW_NCX,_filelengthi64,(__fd_t __fd),(__fd))
 #elif defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)
 #include <local/io/_filelengthi64.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_filelengthi64, __FORCELOCAL __ATTR_WUNUSED __INT64_TYPE__ __NOTHROW_NCX(__LIBCCALL _filelengthi64)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_filelengthi64))(__fd); })
 #endif /* _filelengthi64... */
-#if defined(__CRT_HAVE__telli64)
+#ifdef __CRT_HAVE__telli64
 __CDECLARE(__ATTR_WUNUSED,__INT64_TYPE__,__NOTHROW_NCX,_telli64,(__fd_t __fd),(__fd))
 #elif defined(__CRT_HAVE_lseek64) || defined(__CRT_HAVE__lseeki64) || defined(__CRT_HAVE_lseek) || defined(__CRT_HAVE__lseek) || defined(__CRT_HAVE___lseek)
 #include <local/io/_telli64.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_telli64, __FORCELOCAL __ATTR_WUNUSED __INT64_TYPE__ __NOTHROW_NCX(__LIBCCALL _telli64)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_telli64))(__fd); })
 #endif /* _telli64... */
-#if defined(__CRT_HAVE_umask_s)
+#ifdef __CRT_HAVE_umask_s
 __CDECLARE(,errno_t,__NOTHROW_NCX,umask_s,(__mode_t __newmode, __mode_t *__oldmode),(__newmode,__oldmode))
 #elif defined(__CRT_HAVE_umask) || defined(__CRT_HAVE__umask)
 #include <local/io/umask_s.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(umask_s, __FORCELOCAL errno_t __NOTHROW_NCX(__LIBCCALL umask_s)(__mode_t __newmode, __mode_t *__oldmode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(umask_s))(__newmode, __oldmode); })
 #endif /* umask_s... */
-#if defined(__CRT_HAVE___lock_fhandle)
+#ifdef __CRT_HAVE___lock_fhandle
 __CDECLARE(,int,__NOTHROW_RPC,__lock_fhandle,(__fd_t __fd),(__fd))
 #endif /* __lock_fhandle... */
-#if defined(__CRT_HAVE__unlock_fhandle)
+#ifdef __CRT_HAVE__unlock_fhandle
 __CDECLARE_VOID(,__NOTHROW_NCX,_unlock_fhandle,(__fd_t __fd),(__fd))
 #endif /* _unlock_fhandle... */
-#if defined(__CRT_HAVE__get_osfhandle)
+#ifdef __CRT_HAVE__get_osfhandle
 __CDECLARE(__ATTR_WUNUSED,intptr_t,__NOTHROW_NCX,_get_osfhandle,(__fd_t __fd),(__fd))
 #elif !defined(__CRT_DOS)
 #include <local/io/_get_osfhandle.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_get_osfhandle, __FORCELOCAL __ATTR_WUNUSED intptr_t __NOTHROW_NCX(__LIBCCALL _get_osfhandle)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_get_osfhandle))(__fd); })
 #endif /* _get_osfhandle... */
-#if defined(__CRT_HAVE__open_osfhandle)
+#ifdef __CRT_HAVE__open_osfhandle
 __CDECLARE(__ATTR_WUNUSED,__fd_t,__NOTHROW_NCX,_open_osfhandle,(intptr_t __osfd, __oflag_t __flags),(__osfd,__flags))
 #elif !defined(__CRT_DOS)
 #include <local/io/_open_osfhandle.h>
@@ -720,7 +720,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_open_osfhandle, __FORCELOCAL __ATTR_WUNUSED __f
 
 /* Weird, new functions not apart of any standard. */
 
-#if defined(__CRT_HAVE_setmode)
+#ifdef __CRT_HAVE_setmode
 __CDECLARE(,__oflag_t,__NOTHROW_NCX,setmode,(__fd_t __fd, __oflag_t __mode),(__fd,__mode))
 #elif defined(__CRT_HAVE__setmode)
 __CREDIRECT(,__oflag_t,__NOTHROW_NCX,setmode,(__fd_t __fd, __oflag_t __mode),_setmode,(__fd,__mode))
@@ -728,7 +728,7 @@ __CREDIRECT(,__oflag_t,__NOTHROW_NCX,setmode,(__fd_t __fd, __oflag_t __mode),_se
 #include <local/io/setmode.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(setmode, __FORCELOCAL __oflag_t __NOTHROW_NCX(__LIBCCALL setmode)(__fd_t __fd, __oflag_t __mode) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(setmode))(__fd, __mode); })
 #endif /* setmode... */
-#if defined(__CRT_HAVE_chsize)
+#ifdef __CRT_HAVE_chsize
 /* >> ftruncate(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CDECLARE(,int,__NOTHROW_NCX,chsize,(__fd_t __fd, __LONG32_TYPE__ __$size),(__fd,__$size))
@@ -746,7 +746,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,chsize,(__fd_t __fd, __LONG32_TYPE__ __$size),_ch
  * Truncate the given file `FD' to a length of `LENGTH' */
 __FORCELOCAL int __NOTHROW_NCX(__LIBCCALL chsize)(__fd_t __fd, __LONG32_TYPE__ __$size) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(ftruncate))(__fd, (__PIO_OFFSET)__$size); }
 #endif /* chsize... */
-#if defined(__CRT_HAVE_locking)
+#ifdef __CRT_HAVE_locking
 __CDECLARE(,int,__NOTHROW_RPC,locking,(__fd_t __fd, int __lockmode, __LONG32_TYPE__ __numofbytes),(__fd,__lockmode,__numofbytes))
 #elif defined(__CRT_HAVE__locking)
 __CREDIRECT(,int,__NOTHROW_RPC,locking,(__fd_t __fd, int __lockmode, __LONG32_TYPE__ __numofbytes),_locking,(__fd,__lockmode,__numofbytes))
@@ -756,7 +756,7 @@ __CREDIRECT(,int,__NOTHROW_RPC,locking,(__fd_t __fd, int __lockmode, __LONG32_TY
 #include <local/io/locking.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(locking, __FORCELOCAL int __NOTHROW_RPC(__LIBCCALL locking)(__fd_t __fd, int __lockmode, __LONG32_TYPE__ __numofbytes) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(locking))(__fd, __lockmode, __numofbytes); })
 #endif /* locking... */
-#if defined(__CRT_HAVE_sopen)
+#ifdef __CRT_HAVE_sopen
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__VLIBCCALL sopen)(char const *__filename, __oflag_t __oflags, int __sflags, ...) __CASMNAME_SAME("sopen");
 #elif defined(__CRT_HAVE__sopen)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,sopen,(char const *__filename, __oflag_t __oflags, int __sflags),_sopen,(__filename,__oflags,__sflags),__sflags,1,(__mode_t))
@@ -768,7 +768,7 @@ __NAMESPACE_LOCAL_USING(sopen)
 #define sopen (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sopen))
 #endif /* !__cplusplus */
 #endif /* sopen... */
-#if defined(__CRT_HAVE_filelength)
+#ifdef __CRT_HAVE_filelength
 __CDECLARE(__ATTR_WUNUSED,__LONG32_TYPE__,__NOTHROW_NCX,filelength,(__fd_t __fd),(__fd))
 #elif defined(__CRT_HAVE__filelength)
 __CREDIRECT(__ATTR_WUNUSED,__LONG32_TYPE__,__NOTHROW_NCX,filelength,(__fd_t __fd),_filelength,(__fd))
@@ -776,7 +776,7 @@ __CREDIRECT(__ATTR_WUNUSED,__LONG32_TYPE__,__NOTHROW_NCX,filelength,(__fd_t __fd
 #include <local/io/filelength.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(filelength, __FORCELOCAL __ATTR_WUNUSED __LONG32_TYPE__ __NOTHROW_NCX(__LIBCCALL filelength)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(filelength))(__fd); })
 #endif /* filelength... */
-#if defined(__CRT_HAVE_tell)
+#ifdef __CRT_HAVE_tell
 __CDECLARE(__ATTR_WUNUSED,__LONG32_TYPE__,__NOTHROW_NCX,tell,(__fd_t __fd),(__fd))
 #elif defined(__CRT_HAVE__tell)
 __CREDIRECT(__ATTR_WUNUSED,__LONG32_TYPE__,__NOTHROW_NCX,tell,(__fd_t __fd),_tell,(__fd))
@@ -784,7 +784,7 @@ __CREDIRECT(__ATTR_WUNUSED,__LONG32_TYPE__,__NOTHROW_NCX,tell,(__fd_t __fd),_tel
 #include <local/io/tell.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(tell, __FORCELOCAL __ATTR_WUNUSED __LONG32_TYPE__ __NOTHROW_NCX(__LIBCCALL tell)(__fd_t __fd) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(tell))(__fd); })
 #endif /* tell... */
-#if defined(__CRT_HAVE_eof)
+#ifdef __CRT_HAVE_eof
 __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,eof,(__fd_t __fd),(__fd))
 #elif defined(__CRT_HAVE__eof)
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,eof,(__fd_t __fd),_eof,(__fd))

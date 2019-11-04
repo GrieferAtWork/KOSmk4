@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x815bb68a */
+/* HASH CRC-32:0x8c7dd3dd */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,7 +54,7 @@ __NAMESPACE_STD_END
 /* Dependency: "crt_strftime_l" from "time" */
 #ifndef ____localdep_crt_strftime_l_defined
 #define ____localdep_crt_strftime_l_defined 1
-#if defined(__CRT_HAVE_strftime_l)
+#ifdef __CRT_HAVE_strftime_l
 /* Similar to `strftime' but take the information from
  * the provided locale and not the global locale */
 __CREDIRECT(__ATTR_NONNULL((1, 3, 4)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_crt_strftime_l,(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, __STRUCT_TM const *__restrict __tp, __locale_t __locale),strftime_l,(__buf,__bufsize,__format,__tp,__locale))

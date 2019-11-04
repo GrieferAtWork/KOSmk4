@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe4b03320 */
+/* HASH CRC-32:0x429004a4 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "wcscasecmp" from "wchar" */
 #ifndef ____localdep_wcscasecmp_defined
 #define ____localdep_wcscasecmp_defined 1
-#if defined(__CRT_HAVE_wcscasecmp)
+#ifdef __CRT_HAVE_wcscasecmp
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcscasecmp,(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2),wcscasecmp,(__s1,__s2))
 #elif defined(__CRT_HAVE__wcsicmp)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_wcscasecmp,(__WCHAR_TYPE__ const *__s1, __WCHAR_TYPE__ const *__s2),_wcsicmp,(__s1,__s2))

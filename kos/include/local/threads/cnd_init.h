@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x22ac1eb7 */
+/* HASH CRC-32:0xd6e625bc */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_cnd_init_defined
-#if defined(__CRT_HAVE_pthread_cond_init)
+#ifdef __CRT_HAVE_pthread_cond_init
 #define __local_cnd_init_defined 1
 #include <bits/threads.h>
 
@@ -26,7 +26,7 @@
 /* Dependency: "pthread_cond_init" */
 #ifndef ____localdep_pthread_cond_init_defined
 #define ____localdep_pthread_cond_init_defined 1
-#if defined(__CRT_HAVE_pthread_cond_init)
+#ifdef __CRT_HAVE_pthread_cond_init
 /* Initialize condition variable COND using attributes ATTR, or use
  * the default values if later is NULL */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pthread_cond_init,(__pthread_cond_t *__restrict __cond, __pthread_condattr_t const *__restrict __cond_attr),pthread_cond_init,(__cond,__cond_attr))

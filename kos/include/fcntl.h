@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6025a8af */
+/* HASH CRC-32:0x3c823c1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -104,32 +104,32 @@ __SYSDECL_BEGIN
 #ifdef __CC__
 
 #ifdef __USE_GNU
-#if defined(__CRT_HAVE_readahead)
+#ifdef __CRT_HAVE_readahead
 __CDECLARE(,__SSIZE_TYPE__,__NOTHROW_NCX,readahead,(__fd_t __fd, __off64_t __offset, __SIZE_TYPE__ __count),(__fd,__offset,__count))
 #else /* LIBC: readahead */
 #include <local/fcntl/readahead.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(readahead, __FORCELOCAL __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL readahead)(__fd_t __fd, __off64_t __offset, __SIZE_TYPE__ __count) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(readahead))(__fd, __offset, __count); })
 #endif /* readahead... */
-#if defined(__CRT_HAVE_sync_file_range)
+#ifdef __CRT_HAVE_sync_file_range
 __CDECLARE(,int,__NOTHROW_NCX,sync_file_range,(__fd_t __fd, __off64_t __offset, __off64_t __count, unsigned int __flags),(__fd,__offset,__count,__flags))
 #else /* LIBC: sync_file_range */
 #include <local/fcntl/sync_file_range.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(sync_file_range, __FORCELOCAL int __NOTHROW_NCX(__LIBCCALL sync_file_range)(__fd_t __fd, __off64_t __offset, __off64_t __count, unsigned int __flags) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sync_file_range))(__fd, __offset, __count, __flags); })
 #endif /* sync_file_range... */
 struct iovec;
-#if defined(__CRT_HAVE_vmsplice)
+#ifdef __CRT_HAVE_vmsplice
 __CDECLARE(,__SSIZE_TYPE__,__NOTHROW_RPC,vmsplice,(__fd_t __fdout, struct iovec const *__iov, __SIZE_TYPE__ __count, unsigned int __flags),(__fdout,__iov,__count,__flags))
 #endif /* vmsplice... */
-#if defined(__CRT_HAVE_splice)
+#ifdef __CRT_HAVE_splice
 __CDECLARE(,__SSIZE_TYPE__,__NOTHROW_RPC,splice,(__fd_t __fdin, __off64_t *__offin, __fd_t __fdout, __off64_t *__offout, __SIZE_TYPE__ __length, unsigned int __flags),(__fdin,__offin,__fdout,__offout,__length,__flags))
 #endif /* splice... */
-#if defined(__CRT_HAVE_tee)
+#ifdef __CRT_HAVE_tee
 __CDECLARE(,__SSIZE_TYPE__,__NOTHROW_RPC,tee,(__fd_t __fdin, __fd_t __fdout, __SIZE_TYPE__ __length, unsigned int __flags),(__fdin,__fdout,__length,__flags))
 #endif /* tee... */
-#if defined(__CRT_HAVE_name_to_handle_at)
+#ifdef __CRT_HAVE_name_to_handle_at
 __CDECLARE(,int,__NOTHROW_RPC,name_to_handle_at,(__fd_t __dirfd, char const *__name, struct file_handle *__handle, int *__mnt_id, int __flags),(__dirfd,__name,__handle,__mnt_id,__flags))
 #endif /* name_to_handle_at... */
-#if defined(__CRT_HAVE_open_by_handle_at)
+#ifdef __CRT_HAVE_open_by_handle_at
 __CDECLARE(,__fd_t,__NOTHROW_RPC,open_by_handle_at,(__fd_t __mountdirfd, struct file_handle *__handle, int __flags),(__mountdirfd,__handle,__flags))
 #endif /* open_by_handle_at... */
 #if defined(__CRT_HAVE_fallocate64) && (defined(__USE_FILE_OFFSET64))
@@ -141,7 +141,7 @@ __CDECLARE(,int,__NOTHROW_NCX,fallocate,(__fd_t __fd, int __mode, __off32_t __of
 __NAMESPACE_LOCAL_USING_OR_IMPL(fallocate, __FORCELOCAL int __NOTHROW_NCX(__LIBCCALL fallocate)(__fd_t __fd, int __mode, __FS_TYPE(off) __offset, __FS_TYPE(off) __length) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(fallocate))(__fd, __mode, __offset, __length); })
 #endif /* fallocate... */
 #ifdef __USE_LARGEFILE64
-#if defined(__CRT_HAVE_fallocate64)
+#ifdef __CRT_HAVE_fallocate64
 __CDECLARE(,int,__NOTHROW_NCX,fallocate64,(__fd_t __fd, int __mode, __off64_t __offset, __off64_t __length),(__fd,__mode,__offset,__length))
 #elif defined(__CRT_HAVE_fallocate) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 __CREDIRECT(,int,__NOTHROW_NCX,fallocate64,(__fd_t __fd, int __mode, __off64_t __offset, __off64_t __length),fallocate,(__fd,__mode,__offset,__length))
@@ -153,7 +153,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(fallocate64, __FORCELOCAL int __NOTHROW_NCX(__LI
 #endif /* __USE_GNU */
 #ifndef __fcntl_defined
 #define __fcntl_defined 1
-#if defined(__CRT_HAVE_fcntl)
+#ifdef __CRT_HAVE_fcntl
 __LIBC __STDC_INT_AS_SSIZE_T __NOTHROW_NCX(__VLIBCCALL fcntl)(__fd_t __fd, int __cmd, ...) __CASMNAME_SAME("fcntl");
 #elif defined(__CRT_HAVE___fcntl)
 __CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,fcntl,(__fd_t __fd, int __cmd),__fcntl,(__fd,__cmd),__cmd,1,(void *))
@@ -199,7 +199,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(creat, __FORCELOCAL __ATTR_WUNUSED __ATTR_NONNUL
 #endif /* !__creat_defined */
 
 #ifdef __USE_LARGEFILE64
-#if defined(__CRT_HAVE_open64)
+#ifdef __CRT_HAVE_open64
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((1)) __fd_t __NOTHROW_RPC(__VLIBCCALL open64)(char const *__filename, __oflag_t __oflags, ...) __CASMNAME_SAME("open64");
 #elif defined(__CRT_HAVE___open64)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,open64,(char const *__filename, __oflag_t __oflags),__open64,(__filename,__oflags),__oflags,1,(__mode_t))
@@ -217,7 +217,7 @@ __NAMESPACE_LOCAL_USING(open64)
 #endif /* open64... */
 #ifndef __creat64_defined
 #define __creat64_defined 1
-#if defined(__CRT_HAVE_creat64)
+#ifdef __CRT_HAVE_creat64
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,creat64,(char const *__filename, __mode_t __mode),(__filename,__mode))
 #elif defined(__CRT_HAVE_creat) && (!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_RPC,creat64,(char const *__filename, __mode_t __mode),creat,(__filename,__mode))
@@ -253,7 +253,7 @@ __NAMESPACE_LOCAL_USING(openat)
 #ifdef __USE_LARGEFILE64
 #ifndef __openat64_defined
 #define __openat64_defined 1
-#if defined(__CRT_HAVE_openat64)
+#ifdef __CRT_HAVE_openat64
 __LIBC __ATTR_WUNUSED __ATTR_NONNULL((2)) __fd_t __NOTHROW_RPC(__VLIBCCALL openat64)(__fd_t __dirfd, char const *__filename, __oflag_t __oflags, ...) __CASMNAME_SAME("openat64");
 #elif defined(__CRT_HAVE_openat) && (!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__NOTHROW_RPC,openat64,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),openat,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
@@ -289,7 +289,7 @@ __CDECLARE(,int,__NOTHROW_NCX,posix_fallocate,(__fd_t __fd, __off32_t __offset, 
 __NAMESPACE_LOCAL_USING_OR_IMPL(posix_fallocate, __FORCELOCAL int __NOTHROW_NCX(__LIBCCALL posix_fallocate)(__fd_t __fd, __FS_TYPE(off) __offset, __FS_TYPE(off) __length) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_fallocate))(__fd, __offset, __length); })
 #endif /* posix_fallocate... */
 #ifdef __USE_LARGEFILE64
-#if defined(__CRT_HAVE_posix_fadvise64)
+#ifdef __CRT_HAVE_posix_fadvise64
 __CDECLARE(,int,__NOTHROW_NCX,posix_fadvise64,(__fd_t __fd, __off64_t __offset, __off64_t __length, int __advise),(__fd,__offset,__length,__advise))
 #elif defined(__CRT_HAVE_posix_fadvise) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 __CREDIRECT(,int,__NOTHROW_NCX,posix_fadvise64,(__fd_t __fd, __off64_t __offset, __off64_t __length, int __advise),posix_fadvise,(__fd,__offset,__length,__advise))
@@ -297,7 +297,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,posix_fadvise64,(__fd_t __fd, __off64_t __offset,
 #include <local/fcntl/posix_fadvise64.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(posix_fadvise64, __FORCELOCAL int __NOTHROW_NCX(__LIBCCALL posix_fadvise64)(__fd_t __fd, __off64_t __offset, __off64_t __length, int __advise) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(posix_fadvise64))(__fd, __offset, __length, __advise); })
 #endif /* posix_fadvise64... */
-#if defined(__CRT_HAVE_posix_fallocate64)
+#ifdef __CRT_HAVE_posix_fallocate64
 __CDECLARE(,int,__NOTHROW_NCX,posix_fallocate64,(__fd_t __fd, __off64_t __offset, __off64_t __length),(__fd,__offset,__length))
 #elif defined(__CRT_HAVE_posix_fallocate) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 __CREDIRECT(,int,__NOTHROW_NCX,posix_fallocate64,(__fd_t __fd, __off64_t __offset, __off64_t __length),posix_fallocate,(__fd,__offset,__length))
@@ -335,7 +335,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(lockf, __FORCELOCAL int __NOTHROW_RPC(__LIBCCALL
 #ifdef __USE_LARGEFILE64
 #ifndef __lockf64_defined
 #define __lockf64_defined 1
-#if defined(__CRT_HAVE_lockf64)
+#ifdef __CRT_HAVE_lockf64
 __CDECLARE(,int,__NOTHROW_RPC,lockf64,(__fd_t __fd, int __cmd, __off64_t __length),(__fd,__cmd,__length))
 #elif defined(__CRT_HAVE_lockf) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 __CREDIRECT(,int,__NOTHROW_RPC,lockf64,(__fd_t __fd, int __cmd, __off64_t __length),lockf,(__fd,__cmd,__length))

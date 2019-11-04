@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x45bdeb7f */
+/* HASH CRC-32:0x5c20cf55 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 /* Dependency: "memchrw" from "string" */
 #ifndef ____localdep_memchrw_defined
 #define ____localdep_memchrw_defined 1
-#if defined(__fast_memchrw_defined)
+#ifdef __fast_memchrw_defined
 /* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
 #define __localdep_memchrw (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memchrw))
 #elif defined(__CRT_HAVE_memchrw)
@@ -44,7 +44,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__N
 /* Dependency: "memchrl" from "string" */
 #ifndef ____localdep_memchrl_defined
 #define ____localdep_memchrl_defined 1
-#if defined(__fast_memchrl_defined)
+#ifdef __fast_memchrl_defined
 /* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
 #define __localdep_memchrl (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memchrl))
 #elif defined(__CRT_HAVE_memchrl)
@@ -63,7 +63,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__N
 /* Dependency: "memchr" from "string" */
 #ifndef ____localdep_memchr_defined
 #define ____localdep_memchr_defined 1
-#if defined(__fast_memchr_defined)
+#ifdef __fast_memchr_defined
 /* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
 #define __localdep_memchr (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memchr))
 #elif defined(__CRT_HAVE_memchr)

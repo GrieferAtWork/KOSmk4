@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9e824e16 */
+/* HASH CRC-32:0x910d5e2f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_fwscanf_defined
-#if defined(__CRT_HAVE_vfwscanf)
+#ifdef __CRT_HAVE_vfwscanf
 #define __local_fwscanf_defined 1
 #include <kos/anno.h>
 /* Dependency: "vfwscanf" */

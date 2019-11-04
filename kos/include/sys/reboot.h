@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4c02a241 */
+/* HASH CRC-32:0xce22351b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,7 +41,7 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 
-#if defined(__CRT_HAVE_reboot)
+#ifdef __CRT_HAVE_reboot
 /* Reboot or halt the system
  * @param: howto: One of the `RB_*' constants above */
 __CDECLARE(,int,__NOTHROW_NCX,reboot,(int __howto),(__howto))

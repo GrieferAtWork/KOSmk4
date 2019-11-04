@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x14b73744 */
+/* HASH CRC-32:0x7f923b15 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 /* Dependency: "vfwprintf_unlocked" from "wchar" */
 #ifndef ____localdep_vfwprintf_unlocked_defined
 #define ____localdep_vfwprintf_unlocked_defined 1
-#if defined(__CRT_HAVE_vfwprintf_unlocked)
+#ifdef __CRT_HAVE_vfwprintf_unlocked
 __CREDIRECT(__ATTR_NONNULL((1, 2)) __ATTR_LIBC_WPRINTF(2, 0),__STDC_INT_AS_SIZE_T,,__localdep_vfwprintf_unlocked,(__FILE *__restrict __stream, __WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwprintf_unlocked,(__stream,__format,__args)) __THROWS(...)
 #elif defined(__CRT_HAVE_fputwc_unlocked) || defined(__CRT_HAVE__fputwc_nolock) || defined(__CRT_HAVE_file_wprinter_unlocked) || defined(__CRT_HAVE_file_wprinter)
 #include <local/wchar/vfwprintf_unlocked.h>

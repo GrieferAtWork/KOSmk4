@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbadc023f */
+/* HASH CRC-32:0x47ca86f3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "maybe_split_for_insert" from "search" */
 #ifndef ____localdep_maybe_split_for_insert_defined
 #define ____localdep_maybe_split_for_insert_defined 1
-#if defined(__CRT_HAVE_maybe_split_for_insert)
+#ifdef __CRT_HAVE_maybe_split_for_insert
 /* Possibly "split" a node with two red successors, and/or fix up two red
  * edges in a row. ROOTP is a pointer to the lowest node we visited, PARENTP
  * and GPARENTP pointers to its parent/grandparent. P_R and GP_R contain the

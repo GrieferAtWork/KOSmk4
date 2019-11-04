@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x26673596 */
+/* HASH CRC-32:0x5c2f4428 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "dup2" */
 #ifndef ____localdep_dup2_defined
 #define ____localdep_dup2_defined 1
-#if defined(__CRT_HAVE_dup2)
+#ifdef __CRT_HAVE_dup2
 /* >> dup2(2)
  * @return: NEWFD: Returns the new handle upon success.
  * Duplicate a file referred to by `OLDFD' into `NEWFD' */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa30bc3c6 */
+/* HASH CRC-32:0x4671ec0a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 /* Dependency: "fuzzy_wmemcmp" from "wchar" */
 #ifndef ____localdep_fuzzy_wmemcmp_defined
 #define ____localdep_fuzzy_wmemcmp_defined 1
-#if defined(__CRT_HAVE_fuzzy_wmemcmp)
+#ifdef __CRT_HAVE_fuzzy_wmemcmp
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_fuzzy_wmemcmp,(__WCHAR_TYPE__ const *__s1, __SIZE_TYPE__ __s1_chars, __WCHAR_TYPE__ const *__s2, __SIZE_TYPE__ __s2_chars),fuzzy_wmemcmp,(__s1,__s1_chars,__s2,__s2_chars))
 #elif !defined(__NO_MALLOCA)
 #include <local/wchar/fuzzy_wmemcmp.h>
@@ -37,7 +37,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NO
 /* Dependency: "wcsnlen" from "wchar" */
 #ifndef ____localdep_wcsnlen_defined
 #define ____localdep_wcsnlen_defined 1
-#if defined(__CRT_HAVE_wcsnlen)
+#ifdef __CRT_HAVE_wcsnlen
 /* Same as `wcslen', but don't exceed `MAX_CHARS' characters (Same as `memlen[...](STR, '\0', MAX_CHARS)´) */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_wcsnlen,(__WCHAR_TYPE__ const *__restrict __string, __SIZE_TYPE__ __maxlen),wcsnlen,(__string,__maxlen))
 #else /* LIBC: wcsnlen */

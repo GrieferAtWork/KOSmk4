@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7576e658 */
+/* HASH CRC-32:0x31892db1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 /* Dependency: "_vscanf_l" from "stdio" */
 #ifndef ____localdep__vscanf_l_defined
 #define ____localdep__vscanf_l_defined 1
-#if defined(__CRT_HAVE__vscanf_l)
+#ifdef __CRT_HAVE__vscanf_l
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 3),__STDC_INT_AS_SIZE_T,,__localdep__vscanf_l,(char const *__restrict __format, __locale_t __locale, __builtin_va_list __args),_vscanf_l,(__format,__locale,__args)) __THROWS(...)
 #elif defined(__CRT_HAVE__vscanf_s_l)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 3),__STDC_INT_AS_SIZE_T,,__localdep__vscanf_l,(char const *__restrict __format, __locale_t __locale, __builtin_va_list __args),_vscanf_s_l,(__format,__locale,__args)) __THROWS(...)

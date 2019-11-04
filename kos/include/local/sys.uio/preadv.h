@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5232c5af */
+/* HASH CRC-32:0x9ed0ad38 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "preadv64" from "sys.uio" */
 #ifndef ____localdep_preadv64_defined
 #define ____localdep_preadv64_defined 1
-#if defined(__CRT_HAVE_preadv64)
+#ifdef __CRT_HAVE_preadv64
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_preadv64,(__fd_t __fd, struct iovec const *__iovec, __STDC_INT_AS_SIZE_T __count, __off64_t __offset),preadv64,(__fd,__iovec,__count,__offset))
 #elif defined(__CRT_HAVE_preadv) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_preadv64,(__fd_t __fd, struct iovec const *__iovec, __STDC_INT_AS_SIZE_T __count, __off64_t __offset),preadv,(__fd,__iovec,__count,__offset))
@@ -38,7 +38,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__lo
 /* Dependency: "preadv32" from "sys.uio" */
 #ifndef ____localdep_preadv32_defined
 #define ____localdep_preadv32_defined 1
-#if defined(__CRT_HAVE_preadv)
+#ifdef __CRT_HAVE_preadv
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_preadv32,(__fd_t __fd, struct iovec const *__iovec, __STDC_INT_AS_SIZE_T __count, __off32_t __offset),preadv,(__fd,__iovec,__count,__offset))
 #else /* LIBC: preadv */
 #undef ____localdep_preadv32_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe5fcaedf */
+/* HASH CRC-32:0x524fc5f6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "__fpclassify" */
 #ifndef ____localdep___fpclassify_defined
 #define ____localdep___fpclassify_defined 1
-#if defined(__CRT_HAVE___fpclassify)
+#ifdef __CRT_HAVE___fpclassify
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___fpclassify,(double __val),__fpclassify,(__val))
 #elif defined(__CRT_HAVE__dclass)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___fpclassify,(double __val),_dclass,(__val))

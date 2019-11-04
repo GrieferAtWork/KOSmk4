@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd10e07f0 */
+/* HASH CRC-32:0x5acf9c11 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "vsyslog" from "sys.syslog" */
 #ifndef ____localdep_vsyslog_defined
 #define ____localdep_vsyslog_defined 1
-#if defined(__CRT_HAVE_vsyslog)
+#ifdef __CRT_HAVE_vsyslog
 __CREDIRECT_VOID(__ATTR_NONNULL((2)) __ATTR_LIBC_PRINTF(2,0),__NOTHROW_RPC,__localdep_vsyslog,(int __level, char const *__format, __builtin_va_list __args),vsyslog,(__level,__format,__args))
 #elif defined(__CRT_HAVE_syslog_printer)
 #include <local/sys.syslog/vsyslog.h>

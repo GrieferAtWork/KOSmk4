@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1d33f52 */
+/* HASH CRC-32:0x66771e13 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "memrxendw" from "string" */
 #ifndef ____localdep_memrxendw_defined
 #define ____localdep_memrxendw_defined 1
-#if defined(__CRT_HAVE_memrxendw)
+#ifdef __CRT_HAVE_memrxendw
 /* Same as `memrendw', but search for non-matching locations. */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT16_TYPE__ *,__NOTHROW_NCX,__localdep_memrxendw,(void const *__restrict __haystack, __UINT16_TYPE__ __word, __SIZE_TYPE__ __n_words),memrxendw,(__haystack,__word,__n_words))
 #else /* LIBC: memrxendw */

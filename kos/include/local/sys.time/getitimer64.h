@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x71c738 */
+/* HASH CRC-32:0xdd7f3f00 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,12 +18,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_getitimer64_defined
-#if defined(__CRT_HAVE_getitimer)
+#ifdef __CRT_HAVE_getitimer
 #define __local_getitimer64_defined 1
 /* Dependency: "getitimer32" from "sys.time" */
 #ifndef ____localdep_getitimer32_defined
 #define ____localdep_getitimer32_defined 1
-#if defined(__CRT_HAVE_getitimer)
+#ifdef __CRT_HAVE_getitimer
 /* Set *VALUE to the current setting of timer WHICH.
  * Return 0 on success, -1 on errors */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_getitimer32,(__itimer_which_t __which, struct __itimerval32 *__curr_value),getitimer,(__which,__curr_value))

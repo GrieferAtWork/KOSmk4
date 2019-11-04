@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x88b75d99 */
+/* HASH CRC-32:0x57a0aaf0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "usleep" from "unistd" */
 #ifndef ____localdep_usleep_defined
 #define ____localdep_usleep_defined 1
-#if defined(__CRT_HAVE_usleep)
+#ifdef __CRT_HAVE_usleep
 /* Sleep for `useconds' microseconds (1/1.000.000 seconds) */
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_usleep,(__useconds_t __useconds),usleep,(__useconds))
 #elif defined(__CRT_HAVE___crtSleep) || defined(__CRT_HAVE_delay)

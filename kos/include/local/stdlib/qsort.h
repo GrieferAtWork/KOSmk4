@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x40cec653 */
+/* HASH CRC-32:0xbafcef94 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@ typedef int (__LIBCCALL *__compar_d_fn_t)(void const *__a, void const *__b, void
 /* Dependency: "qsort_r" from "stdlib" */
 #ifndef ____localdep_qsort_r_defined
 #define ____localdep_qsort_r_defined 1
-#if defined(__CRT_HAVE_qsort_r)
+#ifdef __CRT_HAVE_qsort_r
 __CREDIRECT_VOID(__ATTR_NONNULL((1, 4)),,__localdep_qsort_r,(void *__pbase, __SIZE_TYPE__ __item_count, __SIZE_TYPE__ __item_size, __compar_d_fn_t __cmp, void *__arg),qsort_r,(__pbase,__item_count,__item_size,__cmp,__arg)) __THROWS(...)
 #else /* LIBC: qsort_r */
 #include <local/stdlib/qsort_r.h>

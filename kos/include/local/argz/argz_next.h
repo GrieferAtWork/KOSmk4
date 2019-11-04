@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x75c3710a */
+/* HASH CRC-32:0xcc43c14f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "strend" from "string" */
 #ifndef ____localdep_strend_defined
 #define ____localdep_strend_defined 1
-#if defined(__CRT_HAVE_strend)
+#ifdef __CRT_HAVE_strend
 /* Same as `STR+strlen(STR)' */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strend,(char const *__restrict __string),strend,(__string))
 #else /* LIBC: strend */

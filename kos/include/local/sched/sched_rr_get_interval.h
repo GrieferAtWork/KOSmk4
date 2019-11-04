@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbdaad54c */
+/* HASH CRC-32:0xc2679044 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "sched_rr_get_interval32" from "sched" */
 #ifndef ____localdep_sched_rr_get_interval32_defined
 #define ____localdep_sched_rr_get_interval32_defined 1
-#if defined(__CRT_HAVE_sched_rr_get_interval)
+#ifdef __CRT_HAVE_sched_rr_get_interval
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_rr_get_interval32,(__pid_t __pid, struct __timespec32 *__tms),sched_rr_get_interval,(__pid,__tms))
 #else /* LIBC: sched_rr_get_interval */
 #undef ____localdep_sched_rr_get_interval32_defined
@@ -33,7 +33,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_rr_get_interval32,(__pid_t __pid
 /* Dependency: "sched_rr_get_interval64" from "sched" */
 #ifndef ____localdep_sched_rr_get_interval64_defined
 #define ____localdep_sched_rr_get_interval64_defined 1
-#if defined(__CRT_HAVE_sched_rr_get_interval64)
+#ifdef __CRT_HAVE_sched_rr_get_interval64
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_rr_get_interval64,(__pid_t __pid, struct __timespec64 *__tms),sched_rr_get_interval64,(__pid,__tms))
 #elif defined(__CRT_HAVE_sched_rr_get_interval) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_sched_rr_get_interval64,(__pid_t __pid, struct __timespec64 *__tms),sched_rr_get_interval,(__pid,__tms))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe507837c */
+/* HASH CRC-32:0x4e52a4d7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -141,7 +141,7 @@ struct mmsghdr {
 #endif /* !__mmsghdr_defined */
 #endif
 
-#if defined(__CRT_HAVE_socket)
+#ifdef __CRT_HAVE_socket
 /* Create a new socket of type TYPE in domain DOMAIN, using
  * protocol PROTOCOL.  If PROTOCOL is zero, one is chosen automatically.
  * Returns a file descriptor for the new socket, or -1 for errors */
@@ -152,22 +152,22 @@ __CDECLARE(__ATTR_WUNUSED,__fd_t,__NOTHROW_NCX,socket,(int __domain, int __type,
  * Returns a file descriptor for the new socket, or -1 for errors */
 __CREDIRECT(__ATTR_WUNUSED,__fd_t,__NOTHROW_NCX,socket,(int __domain, int __type, int __protocol),__socket,(__domain,__type,__protocol))
 #endif /* socket... */
-#if defined(__CRT_HAVE_socketpair)
+#ifdef __CRT_HAVE_socketpair
 /* Create two new sockets, of type TYPE in domain DOMAIN and using
  * protocol PROTOCOL, which are connected to each other, and put file
  * descriptors for them in FDS[0] and FDS[1].  If PROTOCOL is zero,
  * one will be chosen automatically.  Returns 0 on success, -1 for errors */
 __CDECLARE(__ATTR_NONNULL((4)),int,__NOTHROW_NCX,socketpair,(int __domain, int __type, int __protocol, __fd_t __fds[2]),(__domain,__type,__protocol,__fds))
 #endif /* socketpair... */
-#if defined(__CRT_HAVE_bind)
+#ifdef __CRT_HAVE_bind
 /* Give the socket FD the local address ADDR (which is LEN bytes long) */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,bind,(__fd_t __sockfd, __CONST_SOCKADDR_ARG __addr, socklen_t __addr_len),(__sockfd,__addr,__addr_len))
 #endif /* bind... */
-#if defined(__CRT_HAVE_getsockname)
+#ifdef __CRT_HAVE_getsockname
 /* Put the local address of FD into *ADDR and its length in *LEN */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getsockname,(__fd_t __sockfd, __SOCKADDR_ARG __addr, socklen_t *__restrict __addr_len),(__sockfd,__addr,__addr_len))
 #endif /* getsockname... */
-#if defined(__CRT_HAVE_connect)
+#ifdef __CRT_HAVE_connect
 /* Open a connection on socket FD to peer at ADDR (which LEN bytes long).
  * For connectionless socket types, just set the default address to send to
  * and the only address from which to accept transmissions.
@@ -180,19 +180,19 @@ __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,connect,(__fd_t __sockfd, __CON
  * Return 0 on success, -1 for errors */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,connect,(__fd_t __sockfd, __CONST_SOCKADDR_ARG __addr, socklen_t __addr_len),__connect,(__sockfd,__addr,__addr_len))
 #endif /* connect... */
-#if defined(__CRT_HAVE_getpeername)
+#ifdef __CRT_HAVE_getpeername
 /* Put the address of the peer connected to socket FD into *ADDR
  * (which is *LEN bytes long), and its actual length into *LEN */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getpeername,(__fd_t __sockfd, __SOCKADDR_ARG __addr, socklen_t *__restrict __addr_len),(__sockfd,__addr,__addr_len))
 #endif /* getpeername... */
-#if defined(__CRT_HAVE_send)
+#ifdef __CRT_HAVE_send
 /* Send BUFSIZE bytes of BUF to socket FD.  Returns the number sent or -1 */
 __CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,send,(__fd_t __sockfd, void const *__buf, size_t __bufsize, int __flags),(__sockfd,__buf,__bufsize,__flags))
 #elif defined(__CRT_HAVE___send)
 /* Send BUFSIZE bytes of BUF to socket FD.  Returns the number sent or -1 */
 __CREDIRECT(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,send,(__fd_t __sockfd, void const *__buf, size_t __bufsize, int __flags),__send,(__sockfd,__buf,__bufsize,__flags))
 #endif /* send... */
-#if defined(__CRT_HAVE_recv)
+#ifdef __CRT_HAVE_recv
 /* Read BUFSIZE bytes into BUF from socket FD.
  * Returns the number read or -1 for errors */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,recv,(__fd_t __sockfd, void *__buf, size_t __bufsize, int __flags),(__sockfd,__buf,__bufsize,__flags))
@@ -201,46 +201,46 @@ __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,recv,(__fd_t
  * Returns the number read or -1 for errors */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,recv,(__fd_t __sockfd, void *__buf, size_t __bufsize, int __flags),__recv,(__sockfd,__buf,__bufsize,__flags))
 #endif /* recv... */
-#if defined(__CRT_HAVE_sendto)
+#ifdef __CRT_HAVE_sendto
 /* Send BUFSIZE bytes of BUF on socket FD to peer at address ADDR
  * (which is ADDR_LEN bytes long). Returns the number sent, or -1 for errors. */
 __CDECLARE(__ATTR_NONNULL((2, 5)),ssize_t,__NOTHROW_RPC,sendto,(__fd_t __sockfd, void const *__buf, size_t __bufsize, int __flags, __CONST_SOCKADDR_ARG __addr, socklen_t __addr_len),(__sockfd,__buf,__bufsize,__flags,__addr,__addr_len))
 #endif /* sendto... */
-#if defined(__CRT_HAVE_recvfrom)
+#ifdef __CRT_HAVE_recvfrom
 /* Read BUFSIZE bytes into BUF through socket FD.
  * If ADDR is not NULL, fill in *ADDR_LEN bytes of it with tha address of
  * the sender, and store the actual size of the address in *ADDR_LEN.
  * Returns the number of bytes read or -1 for errors */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2, 5)),ssize_t,__NOTHROW_RPC,recvfrom,(__fd_t __sockfd, void *__restrict __buf, size_t __bufsize, int __flags, __SOCKADDR_ARG __addr, socklen_t *__restrict __addr_len),(__sockfd,__buf,__bufsize,__flags,__addr,__addr_len))
 #endif /* recvfrom... */
-#if defined(__CRT_HAVE_sendmsg)
+#ifdef __CRT_HAVE_sendmsg
 /* Send a message described MESSAGE on socket FD.
  * Returns the number of bytes sent, or -1 for errors */
 __CDECLARE(__ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,sendmsg,(__fd_t __sockfd, struct msghdr const *__message, int __flags),(__sockfd,__message,__flags))
 #endif /* sendmsg... */
-#if defined(__CRT_HAVE_recvmsg)
+#ifdef __CRT_HAVE_recvmsg
 /* Receive a message as described by MESSAGE from socket FD.
  * Returns the number of bytes read or -1 for errors. */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((2)),ssize_t,__NOTHROW_RPC,recvmsg,(__fd_t __sockfd, struct msghdr *__message, int __flags),(__sockfd,__message,__flags))
 #endif /* recvmsg... */
-#if defined(__CRT_HAVE_getsockopt)
+#ifdef __CRT_HAVE_getsockopt
 /* Put the current value for socket FD's option OPTNAME at protocol level LEVEL
  * into OPTVAL (which is *OPTLEN bytes long), and set *OPTLEN to the value's
  * actual length.  Returns 0 on success, -1 for errors */
 __CDECLARE(__ATTR_NONNULL((4)),int,__NOTHROW_NCX,getsockopt,(__fd_t __sockfd, int __level, int __optname, void *__restrict __optval, socklen_t *__restrict __optlen),(__sockfd,__level,__optname,__optval,__optlen))
 #endif /* getsockopt... */
-#if defined(__CRT_HAVE_setsockopt)
+#ifdef __CRT_HAVE_setsockopt
 /* Set socket FD's option OPTNAME at protocol level LEVEL to *OPTVAL (which is OPTLEN bytes long).
  * Returns 0 on success, -1 for errors */
 __CDECLARE(__ATTR_NONNULL((4)),int,__NOTHROW_NCX,setsockopt,(__fd_t __sockfd, int __level, int __optname, void const *__optval, socklen_t __optlen),(__sockfd,__level,__optname,__optval,__optlen))
 #endif /* setsockopt... */
-#if defined(__CRT_HAVE_listen)
+#ifdef __CRT_HAVE_listen
 /* Prepare to accept connections on socket FD.
  * MAX_BACKLOG connection requests will be queued before further requests are refused.
  * Returns 0 on success, -1 for errors */
 __CDECLARE(,int,__NOTHROW_NCX,listen,(__fd_t __sockfd, int __max_backlog),(__sockfd,__max_backlog))
 #endif /* listen... */
-#if defined(__CRT_HAVE_accept)
+#ifdef __CRT_HAVE_accept
 /* Await a connection on socket FD.
  * When a connection arrives, open a new socket to communicate with it,
  * set *ADDR (which is *ADDR_LEN bytes long) to the address of the connecting
@@ -248,7 +248,7 @@ __CDECLARE(,int,__NOTHROW_NCX,listen,(__fd_t __sockfd, int __max_backlog),(__soc
  * new socket's descriptor, or -1 for errors */
 __CDECLARE(__ATTR_NONNULL((2)),__fd_t,__NOTHROW_RPC,accept,(__fd_t __sockfd, __SOCKADDR_ARG __addr, socklen_t *__restrict __addr_len),(__sockfd,__addr,__addr_len))
 #endif /* accept... */
-#if defined(__CRT_HAVE_shutdown)
+#ifdef __CRT_HAVE_shutdown
 /* Shut down all or part of the connection open on socket FD.
  * HOW determines what to shut down:
  *     - SHUT_RD   = No more receptions;
@@ -259,12 +259,12 @@ __CDECLARE(,int,__NOTHROW_NCX,shutdown,(__fd_t __sockfd, int __how),(__sockfd,__
 #endif /* shutdown... */
 
 #ifdef __USE_GNU
-#if defined(__CRT_HAVE_accept4)
+#ifdef __CRT_HAVE_accept4
 /* Similar to 'accept' but takes an additional parameter to specify flags.
  * @param: FLAGS: Set of `SOCK_NONBLOCK|SOCK_CLOEXEC|SOCK_CLOFORK' */
 __CDECLARE(__ATTR_NONNULL((2)),__fd_t,__NOTHROW_RPC,accept4,(__fd_t __sockfd, __SOCKADDR_ARG __addr, socklen_t *__restrict __addr_len, int __flags),(__sockfd,__addr,__addr_len,__flags))
 #endif /* accept4... */
-#if defined(__CRT_HAVE_sendmmsg)
+#ifdef __CRT_HAVE_sendmmsg
 /* Send a VLEN messages as described by VMESSAGES to socket FD.
  * Returns the number of datagrams successfully written or -1 for errors */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,sendmmsg,(__fd_t __sockfd, struct mmsghdr *__vmessages, unsigned int __vlen, int __flags),(__sockfd,__vmessages,__vlen,__flags))
@@ -288,7 +288,7 @@ __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,recvmmsg,(__fd_t __sockfd, stru
 __NAMESPACE_LOCAL_USING_OR_IMPL(recvmmsg, __FORCELOCAL __ATTR_NONNULL((2)) int __NOTHROW_RPC(__LIBCCALL recvmmsg)(__fd_t __sockfd, struct mmsghdr *__vmessages, unsigned int __vlen, int __flags, struct timespec *__tmo) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(recvmmsg))(__sockfd, __vmessages, __vlen, __flags, __tmo); })
 #endif /* recvmmsg... */
 #ifdef __USE_TIME64
-#if defined(__CRT_HAVE_recvmmsg64)
+#ifdef __CRT_HAVE_recvmmsg64
 /* Receive up to VLEN messages as described by VMESSAGES from socket FD.
  * Returns the number of messages received or -1 for errors. */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,recvmmsg64,(__fd_t __sockfd, struct mmsghdr *__vmessages, unsigned int __vlen, int __flags, struct __timespec64 *__tmo),(__sockfd,__vmessages,__vlen,__flags,__tmo))
@@ -306,14 +306,14 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(recvmmsg64, __FORCELOCAL __ATTR_NONNULL((2)) int
 #endif /* __USE_GNU */
 
 #ifdef __USE_XOPEN2K
-#if defined(__CRT_HAVE_sockatmark)
+#ifdef __CRT_HAVE_sockatmark
 /* Determine whether socket is at a out-of-band mark */
 __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,sockatmark,(__fd_t __sockfd),(__sockfd))
 #endif /* sockatmark... */
 #endif /* __USE_XOPEN2K */
 
 #ifdef __USE_MISC
-#if defined(__CRT_HAVE_isfdtype)
+#ifdef __CRT_HAVE_isfdtype
 /* FDTYPE is S_IFSOCK or another S_IF* macro defined in <sys/stat.h>;
  * returns 1 if FD is open on an object of the indicated
  * type, 0 if not, or -1 for errors (setting errno) */

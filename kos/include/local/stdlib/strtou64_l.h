@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf87d3772 */
+/* HASH CRC-32:0xedf41471 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "strtou64" from "stdlib" */
 #ifndef ____localdep_strtou64_defined
 #define ____localdep_strtou64_defined 1
-#if defined(__CRT_HAVE_strtou64)
+#ifdef __CRT_HAVE_strtou64
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,__localdep_strtou64,(char const *__restrict __nptr, char **__endptr, int __base),strtou64,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE__strtoui64)
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),__UINT64_TYPE__,__NOTHROW_NCX,__localdep_strtou64,(char const *__restrict __nptr, char **__endptr, int __base),_strtoui64,(__nptr,__endptr,__base))

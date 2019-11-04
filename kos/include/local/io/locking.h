@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdd974bc5 */
+/* HASH CRC-32:0xd3f10082 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,14 +18,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_locking_defined
-#if defined(__CRT_HAVE_lockf64)
+#ifdef __CRT_HAVE_lockf64
 #define __local_locking_defined 1
 #include <bits/types.h>
 #include <bits/types.h>
 /* Dependency: "lockf64" from "fcntl" */
 #ifndef ____localdep_lockf64_defined
 #define ____localdep_lockf64_defined 1
-#if defined(__CRT_HAVE_lockf64)
+#ifdef __CRT_HAVE_lockf64
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_lockf64,(__fd_t __fd, int __cmd, __off64_t __length),lockf64,(__fd,__cmd,__length))
 #elif defined(__CRT_HAVE_lockf) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_lockf64,(__fd_t __fd, int __cmd, __off64_t __length),lockf,(__fd,__cmd,__length))

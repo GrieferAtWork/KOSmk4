@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc8c9dee */
+/* HASH CRC-32:0xc81fe1a2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,12 +18,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__getdcwd_dbg_defined
-#if defined(__CRT_HAVE__getdcwd)
+#ifdef __CRT_HAVE__getdcwd
 #define __local__getdcwd_dbg_defined 1
 /* Dependency: "_getdcwd" */
 #ifndef ____localdep__getdcwd_defined
 #define ____localdep__getdcwd_defined 1
-#if defined(__CRT_HAVE__getdcwd)
+#ifdef __CRT_HAVE__getdcwd
 __CREDIRECT(,char *,__NOTHROW_RPC,__localdep__getdcwd,(int __drive, char *__buf, __SIZE_TYPE__ __size),_getdcwd,(__drive,__buf,__size))
 #else /* LIBC: _getdcwd */
 #undef ____localdep__getdcwd_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4bf036b1 */
+/* HASH CRC-32:0x6bb6a534 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -33,7 +33,7 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 
-#if defined(__CRT_HAVE_dirname)
+#ifdef __CRT_HAVE_dirname
 /* Return directory part of PATH or "." if none is available */
 __CDECLARE(__ATTR_RETNONNULL,char *,__NOTHROW_NCX,dirname,(char *__path),(__path))
 #else /* LIBC: dirname */
@@ -41,7 +41,7 @@ __CDECLARE(__ATTR_RETNONNULL,char *,__NOTHROW_NCX,dirname,(char *__path),(__path
 /* Return directory part of PATH or "." if none is available */
 __NAMESPACE_LOCAL_USING_OR_IMPL(dirname, __FORCELOCAL __ATTR_RETNONNULL char *__NOTHROW_NCX(__LIBCCALL dirname)(char *__path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(dirname))(__path); })
 #endif /* dirname... */
-#if defined(__CRT_HAVE___xpg_basename)
+#ifdef __CRT_HAVE___xpg_basename
 /* Return final component of PATH.
  * This is the weird XPG version of this function. It sometimes will
  * modify its argument. Therefore we normally use the GNU version (in

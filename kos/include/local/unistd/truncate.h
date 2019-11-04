@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x19ab288e */
+/* HASH CRC-32:0x7aeec11e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 /* Dependency: "truncate64" from "unistd" */
 #ifndef ____localdep_truncate64_defined
 #define ____localdep_truncate64_defined 1
-#if defined(__CRT_HAVE_truncate64)
+#ifdef __CRT_HAVE_truncate64
 /* >> truncate64(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_truncate64,(char const *__file, __PIO_OFFSET64 __length),truncate64,(__file,__length))
@@ -45,7 +45,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_truncate64,(char co
 /* Dependency: "truncate32" from "unistd" */
 #ifndef ____localdep_truncate32_defined
 #define ____localdep_truncate32_defined 1
-#if defined(__CRT_HAVE_truncate)
+#ifdef __CRT_HAVE_truncate
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_truncate32,(char const *__file, __pos32_t __length),truncate,(__file,__length))
@@ -113,7 +113,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate,(__fd_t __fd, __PIO_OFFSET _
 /* Dependency: "close" */
 #ifndef ____localdep_close_defined
 #define ____localdep_close_defined 1
-#if defined(__CRT_HAVE_close)
+#ifdef __CRT_HAVE_close
 /* >> close(2)
  * Close a file handle */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_close,(__fd_t __fd),close,(__fd))

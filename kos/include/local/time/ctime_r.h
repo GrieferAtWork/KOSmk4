@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa1d3b56d */
+/* HASH CRC-32:0xdde1df6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,7 +72,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,__localdep_dos_ctime_
 /* Dependency: "asctime_r" from "time" */
 #ifndef ____localdep_asctime_r_defined
 #define ____localdep_asctime_r_defined 1
-#if defined(__CRT_HAVE_asctime_r)
+#ifdef __CRT_HAVE_asctime_r
 /* Return in BUF a string of the form "Day Mon dd hh:mm:ss yyyy\n"
  * that is the representation of TP in this format */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_asctime_r,(__STRUCT_TM const *__restrict __tp, char __buf[26]),asctime_r,(__tp,__buf))
@@ -87,7 +87,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_asctime_r,(__
 /* Dependency: "localtime_r" from "time" */
 #ifndef ____localdep_localtime_r_defined
 #define ____localdep_localtime_r_defined 1
-#if defined(__CRT_HAVE_localtime_r)
+#ifdef __CRT_HAVE_localtime_r
 /* Return the `struct tm' representation of *TIMER in local time, using *TP to store the result */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__STRUCT_TM *,__NOTHROW_NCX,__localdep_localtime_r,(__TM_TYPE(time) const *__restrict __timer, __STRUCT_TM *__restrict __tp),localtime_r,(__timer,__tp))
 #else /* LIBC: localtime_r */

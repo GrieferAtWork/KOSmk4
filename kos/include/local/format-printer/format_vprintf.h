@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4ef237f6 */
+/* HASH CRC-32:0xe1542e54 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,7 +62,7 @@
 /* Dependency: "format_repeat" from "format-printer" */
 #ifndef ____localdep_format_repeat_defined
 #define ____localdep_format_repeat_defined 1
-#if defined(__CRT_HAVE_format_repeat)
+#ifdef __CRT_HAVE_format_repeat
 /* Repeat `CH' a number of `NUM_REPETITIONS' times
  * The usual format-printer rules apply, and this function
  * is allowed to call `PRINTER' as often as it chooses */
@@ -79,7 +79,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,,__localdep_format_repeat,(__pfor
 /* Dependency: "format_escape" from "format-printer" */
 #ifndef ____localdep_format_escape_defined
 #define ____localdep_format_escape_defined 1
-#if defined(__CRT_HAVE_format_escape)
+#ifdef __CRT_HAVE_format_escape
 /* Do C-style escape on the given text, printing it to the given printer.
  * Input:
  * >> Hello "World" W
@@ -131,7 +131,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,,__localdep_format_escape,(__pfor
 /* Dependency: "format_hexdump" from "format-printer" */
 #ifndef ____localdep_format_hexdump_defined
 #define ____localdep_format_hexdump_defined 1
-#if defined(__CRT_HAVE_format_hexdump)
+#ifdef __CRT_HAVE_format_hexdump
 /* Print a hex dump of the given data using the provided format printer
  * @param: PRINTER:  A function called for all quoted portions of the text
  * @param: DATA:     A pointer to the data that should be dumped
@@ -160,7 +160,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__SSIZE_TYPE__,,__localdep_format_hexdump,(__pfo
 /* Dependency: "unicode_writeutf8" from "unicode" */
 #ifndef ____localdep_unicode_writeutf8_defined
 #define ____localdep_unicode_writeutf8_defined 1
-#if defined(__CRT_HAVE_unicode_writeutf8)
+#ifdef __CRT_HAVE_unicode_writeutf8
 /* Write a given Unicode character `ch' to `dst' and return a pointer to its end location.
  * This function will write at most `UNICODE_UTF8_CURLEN' bytes to `dst' */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_unicode_writeutf8,(/*utf-8*/ char *__restrict __dst, __CHAR32_TYPE__ __ch),unicode_writeutf8,(__dst,__ch))
@@ -175,7 +175,7 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localde
 /* Dependency: "format_width" from "format-printer" */
 #ifndef ____localdep_format_width_defined
 #define ____localdep_format_width_defined 1
-#if defined(__CRT_HAVE_format_width)
+#ifdef __CRT_HAVE_format_width
 /* Returns the width (number of characters; not bytes) of the given unicode string */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,__localdep_format_width,(void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen),format_width,(__arg,__data,__datalen))
 #else /* LIBC: format_width */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdf82b049 */
+/* HASH CRC-32:0x23616b5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,7 +54,7 @@ __NAMESPACE_STD_END
 /* Dependency: "dos_ctime64_s" from "time" */
 #ifndef ____localdep_dos_ctime64_s_defined
 #define ____localdep_dos_ctime64_s_defined 1
-#if defined(__CRT_HAVE__ctime64_s)
+#ifdef __CRT_HAVE__ctime64_s
 /* Equivalent to `asctime_s(buf, bufsize, localtime_r(timer, *TMP*))' */
 __CREDIRECT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,__localdep_dos_ctime64_s,(char __buf[26], __SIZE_TYPE__ __bufsize, __time64_t const *__restrict __timer),_ctime64_s,(__buf,__bufsize,__timer))
 #elif defined(__CRT_HAVE__gmtime32_s)
@@ -69,7 +69,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,__localdep_dos_ctime6
 /* Dependency: "asctime_r" from "time" */
 #ifndef ____localdep_asctime_r_defined
 #define ____localdep_asctime_r_defined 1
-#if defined(__CRT_HAVE_asctime_r)
+#ifdef __CRT_HAVE_asctime_r
 /* Return in BUF a string of the form "Day Mon dd hh:mm:ss yyyy\n"
  * that is the representation of TP in this format */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_asctime_r,(__STRUCT_TM const *__restrict __tp, char __buf[26]),asctime_r,(__tp,__buf))
@@ -84,7 +84,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),char *,__NOTHROW_NCX,__localdep_asctime_r,(__
 /* Dependency: "localtime64_r" from "time" */
 #ifndef ____localdep_localtime64_r_defined
 #define ____localdep_localtime64_r_defined 1
-#if defined(__CRT_HAVE_localtime64_r)
+#ifdef __CRT_HAVE_localtime64_r
 /* Return the `struct tm' representation of *TIMER in local time, using *TP to store the result */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__STRUCT_TM *,__NOTHROW_NCX,__localdep_localtime64_r,(__time64_t const *__restrict __timer, __STRUCT_TM *__restrict __tp),localtime64_r,(__timer,__tp))
 #elif defined(__CRT_HAVE_localtime_r) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)

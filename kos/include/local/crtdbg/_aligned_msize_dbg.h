@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xefc4a080 */
+/* HASH CRC-32:0x6d456537 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "_aligned_msize" from "stdlib" */
 #ifndef ____localdep__aligned_msize_defined
 #define ____localdep__aligned_msize_defined 1
-#if defined(__CRT_HAVE__aligned_msize)
+#ifdef __CRT_HAVE__aligned_msize
 __CREDIRECT(__ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep__aligned_msize,(void *__mptr, __SIZE_TYPE__ __min_alignment, __SIZE_TYPE__ __offset),_aligned_msize,(__mptr,__min_alignment,__offset))
 #else /* LIBC: _aligned_msize */
 #include <local/stdlib/_aligned_msize.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x92f8eaff */
+/* HASH CRC-32:0x224a5b3d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 /* Dependency: "wspawnvpe" */
 #ifndef ____localdep_wspawnvpe_defined
 #define ____localdep_wspawnvpe_defined 1
-#if defined(__CRT_HAVE_wspawnvpe)
+#ifdef __CRT_HAVE_wspawnvpe
 __CREDIRECT(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,__localdep_wspawnvpe,(int __mode, __WCHAR_TYPE__ const *__restrict __file, __TWARGV, __TWENVP),wspawnvpe,(__mode,__file,____TWARGV,____TWENVP))
 #elif defined(__CRT_HAVE__wspawnvpe)
 __CREDIRECT(__ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,__localdep_wspawnvpe,(int __mode, __WCHAR_TYPE__ const *__restrict __file, __TWARGV, __TWENVP),_wspawnvpe,(__mode,__file,____TWARGV,____TWENVP))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe780e81e */
+/* HASH CRC-32:0xceb93fd */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "strnend" from "string" */
 #ifndef ____localdep_strnend_defined
 #define ____localdep_strnend_defined 1
-#if defined(__CRT_HAVE_strnend)
+#ifdef __CRT_HAVE_strnend
 /* Same as `STR+strnlen(STR, MAX_CHARS)' */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strnend,(char const *__restrict __string, __SIZE_TYPE__ __maxlen),strnend,(__string,__maxlen))
 #else /* LIBC: strnend */

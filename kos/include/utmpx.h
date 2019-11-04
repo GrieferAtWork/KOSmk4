@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcd0abe76 */
+/* HASH CRC-32:0x149afe8b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -71,48 +71,48 @@ struct utmp;
 typedef __pid_t pid_t;
 #endif /* !__pid_t_defined */
 
-#if defined(__CRT_HAVE_setutxent)
+#ifdef __CRT_HAVE_setutxent
 /* Open user accounting database */
 __CDECLARE_VOID(,__NOTHROW_RPC,setutxent,(void),())
 #endif /* setutxent... */
-#if defined(__CRT_HAVE_endutxent)
+#ifdef __CRT_HAVE_endutxent
 /* Close user accounting database */
 __CDECLARE_VOID(,__NOTHROW_RPC_NOKOS,endutxent,(void),())
 #endif /* endutxent... */
-#if defined(__CRT_HAVE_getutxent)
+#ifdef __CRT_HAVE_getutxent
 /* Get the next entry from the user accounting database */
 __CDECLARE(,struct utmpx *,__NOTHROW_RPC,getutxent,(void),())
 #endif /* getutxent... */
-#if defined(__CRT_HAVE_getutxid)
+#ifdef __CRT_HAVE_getutxid
 /* Get the user accounting database entry corresponding to ID */
 __CDECLARE(,struct utmpx *,__NOTHROW_RPC,getutxid,(struct utmpx const *__id),(__id))
 #endif /* getutxid... */
-#if defined(__CRT_HAVE_getutxline)
+#ifdef __CRT_HAVE_getutxline
 /* Get the user accounting database entry corresponding to LINE */
 __CDECLARE(,struct utmpx *,__NOTHROW_RPC,getutxline,(struct utmpx const *__line),(__line))
 #endif /* getutxline... */
-#if defined(__CRT_HAVE_pututxline)
+#ifdef __CRT_HAVE_pututxline
 /* Write the entry UTMPX into the user accounting database */
 __CDECLARE(,struct utmpx *,__NOTHROW_RPC,pututxline,(struct utmpx const *__utmpx),(__utmpx))
 #endif /* pututxline... */
 
 #ifdef __USE_GNU
-#if defined(__CRT_HAVE_utmpxname)
+#ifdef __CRT_HAVE_utmpxname
 /* Change name of the utmpx file to be examined.
  * This function is not part of POSIX and therefore no official cancellation point */
 __CDECLARE(,int,__NOTHROW_RPC,utmpxname,(char const *__file),(__file))
 #endif /* utmpxname... */
-#if defined(__CRT_HAVE_updwtmpx)
+#ifdef __CRT_HAVE_updwtmpx
 /* Append entry UTMP to the wtmpx-like file WTMPX_FILE.
  * This function is not part of POSIX and therefore no official cancellation point */
 __CDECLARE_VOID(,__NOTHROW_RPC,updwtmpx,(char const *__wtmpx_file, struct utmpx const *__utmpx),(__wtmpx_file,__utmpx))
 #endif /* updwtmpx... */
-#if defined(__CRT_HAVE_getutmp)
+#ifdef __CRT_HAVE_getutmp
 /* Copy the information in UTMPX to UTMP.
  * This function is not part of POSIX and therefore no official cancellation point */
 __CDECLARE_VOID(,__NOTHROW_RPC,getutmp,(struct utmpx const *__utmpx, struct utmp *__utmp),(__utmpx,__utmp))
 #endif /* getutmp... */
-#if defined(__CRT_HAVE_getutmpx)
+#ifdef __CRT_HAVE_getutmpx
 /* Copy the information in UTMP to UTMPX.
  * This function is not part of POSIX and therefore no official cancellation point */
 __CDECLARE_VOID(,__NOTHROW_RPC,getutmpx,(struct utmp const *__utmp, struct utmpx *__utmpx),(__utmp,__utmpx))

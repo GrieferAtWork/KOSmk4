@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1bd93478 */
+/* HASH CRC-32:0xa650fb2c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "scandirat64" */
 #ifndef ____localdep_scandirat64_defined
 #define ____localdep_scandirat64_defined 1
-#if defined(__CRT_HAVE_scandirat64)
+#ifdef __CRT_HAVE_scandirat64
 /* 64-bit variant of `scandirat()' */
 __CREDIRECT(__ATTR_NONNULL((2, 3)),int,__NOTHROW_RPC,__localdep_scandirat64,(__fd_t __dirfd, char const *__restrict __dir, struct dirent64 ***__restrict __namelist, __scandir64_selector_t __selector, __scandir64_cmp_t __cmp),scandirat64,(__dirfd,__dir,__namelist,__selector,__cmp))
 #elif defined(__CRT_HAVE_scandirat) && (defined(_DIRENT_MATCHES_DIRENT64))

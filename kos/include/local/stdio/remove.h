@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x820469ec */
+/* HASH CRC-32:0x2b45162 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "removeat" */
 #ifndef ____localdep_removeat_defined
 #define ____localdep_removeat_defined 1
-#if defined(__CRT_HAVE_removeat)
+#ifdef __CRT_HAVE_removeat
 /* Remove a file or directory `FILENAME' relative to a given base directory `DIRFD' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_removeat,(__fd_t __dirfd, char const *__filename),removeat,(__dirfd,__filename))
 #else /* LIBC: removeat */

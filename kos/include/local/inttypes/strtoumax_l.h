@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc109c69e */
+/* HASH CRC-32:0x29385c0a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "strtoumax" from "inttypes" */
 #ifndef ____localdep_strtoumax_defined
 #define ____localdep_strtoumax_defined 1
-#if defined(__CRT_HAVE_strtoumax)
+#ifdef __CRT_HAVE_strtoumax
 __CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoumax,(char const *__restrict __nptr, char **__endptr, int __base),strtoumax,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtoul) && (__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__)
 __CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,__localdep_strtoumax,(char const *__restrict __nptr, char **__endptr, int __base),strtoul,(__nptr,__endptr,__base))

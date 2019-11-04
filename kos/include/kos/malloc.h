@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x547bfba9 */
+/* HASH CRC-32:0x2e9470a6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,27 +35,27 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 
-#if defined(__CRT_HAVE_Malloc)
+#ifdef __CRT_HAVE_Malloc
 /* @throws: E_BADALLOC: ... */
 __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,,Malloc,(size_t __num_bytes),(__num_bytes)) __THROWS(E_BADALLOC)
 #endif /* Malloc... */
-#if defined(__CRT_HAVE_Calloc)
+#ifdef __CRT_HAVE_Calloc
 /* @throws: E_BADALLOC: ... */
 __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1, 2)),void *,,Calloc,(size_t __count, size_t __num_bytes),(__count,__num_bytes)) __THROWS(E_BADALLOC)
 #endif /* Calloc... */
-#if defined(__CRT_HAVE_Realloc)
+#ifdef __CRT_HAVE_Realloc
 /* @throws: E_BADALLOC: ... */
 __CDECLARE(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)),void *,,Realloc,(void *__mallptr, size_t __num_bytes),(__mallptr,__num_bytes)) __THROWS(E_BADALLOC)
 #endif /* Realloc... */
-#if defined(__CRT_HAVE_Memalign)
+#ifdef __CRT_HAVE_Memalign
 /* @throws: E_BADALLOC: ... */
 __CDECLARE(__ATTR_MALLOC __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_ALIGN(1),void *,,Memalign,(size_t __alignment, size_t __num_bytes),(__alignment,__num_bytes)) __THROWS(E_BADALLOC)
 #endif /* Memalign... */
-#if defined(__CRT_HAVE_PValloc)
+#ifdef __CRT_HAVE_PValloc
 /* @throws: E_BADALLOC: ... */
 __CDECLARE(__ATTR_MALLOC __ATTR_MALL_PAGEALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,,PValloc,(size_t __num_bytes),(__num_bytes)) __THROWS(E_BADALLOC)
 #endif /* PValloc... */
-#if defined(__CRT_HAVE_Valloc)
+#ifdef __CRT_HAVE_Valloc
 /* @throws: E_BADALLOC: ... */
 __CDECLARE(__ATTR_MALLOC __ATTR_MALL_PAGEALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_ALLOC_SIZE((1)),void *,,Valloc,(size_t __num_bytes),(__num_bytes)) __THROWS(E_BADALLOC)
 #elif defined(__CRT_HAVE_Memalign)
@@ -65,7 +65,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(Valloc, __FORCELOCAL __ATTR_MALLOC __ATTR_MALL_P
 #endif /* Valloc... */
 
 #ifdef __USE_KOS
-#if defined(__CRT_HAVE_Memdup)
+#ifdef __CRT_HAVE_Memdup
 /* @throws: E_BADALLOC: ... */
 __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_ALLOC_SIZE((2)),void *,,Memdup,(void const *__restrict __ptr, size_t __num_bytes),(__ptr,__num_bytes)) __THROWS(E_BADALLOC)
 #elif defined(__CRT_HAVE_Malloc)
@@ -73,7 +73,7 @@ __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WU
 /* @throws: E_BADALLOC: ... */
 __NAMESPACE_LOCAL_USING_OR_IMPL(Memdup, __FORCELOCAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_ALLOC_SIZE((2)) void *(__LIBCCALL Memdup)(void const *__restrict __ptr, size_t __num_bytes) __THROWS(E_BADALLOC) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(Memdup))(__ptr, __num_bytes); })
 #endif /* Memdup... */
-#if defined(__CRT_HAVE_Memcdup)
+#ifdef __CRT_HAVE_Memcdup
 /* @throws: E_BADALLOC: ... */
 __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,,Memcdup,(void const *__restrict __ptr, int __needle, size_t __num_bytes),(__ptr,__needle,__num_bytes)) __THROWS(E_BADALLOC)
 #elif defined(__CRT_HAVE_Malloc) || defined(__CRT_HAVE_Memdup)

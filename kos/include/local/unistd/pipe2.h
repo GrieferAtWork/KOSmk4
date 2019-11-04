@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa931bb0b */
+/* HASH CRC-32:0x5676d6ce */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "pipe" from "unistd" */
 #ifndef ____localdep_pipe_defined
 #define ____localdep_pipe_defined 1
-#if defined(__CRT_HAVE_pipe)
+#ifdef __CRT_HAVE_pipe
 /* >> pipe(2)
  * Create a new pair of connected pipes ([0] = reader, [1] = writer) */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pipe,(__fd_t __pipedes[2]),pipe,(__pipedes))

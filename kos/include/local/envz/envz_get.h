@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2fdbe1f1 */
+/* HASH CRC-32:0xf1de541c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "envz_entry" from "envz" */
 #ifndef ____localdep_envz_entry_defined
 #define ____localdep_envz_entry_defined 1
-#if defined(__CRT_HAVE_envz_entry)
+#ifdef __CRT_HAVE_envz_entry
 /* Returns a pointer to the entry in `ENVZ' for `NAME', or `NULL' if there is none
  * Note that if `name' contains a `=' character, only characters leading up to this
  * position are actually compared! */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x89968854 */
+/* HASH CRC-32:0x6e11d28f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_mtx_init_defined
-#if defined(__CRT_HAVE_pthread_mutex_init)
+#ifdef __CRT_HAVE_pthread_mutex_init
 #define __local_mtx_init_defined 1
 #include <bits/threads.h>
 
@@ -28,7 +28,7 @@
 /* Dependency: "pthread_mutex_init" */
 #ifndef ____localdep_pthread_mutex_init_defined
 #define ____localdep_pthread_mutex_init_defined 1
-#if defined(__CRT_HAVE_pthread_mutex_init)
+#ifdef __CRT_HAVE_pthread_mutex_init
 /* Initialize a mutex */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pthread_mutex_init,(__pthread_mutex_t *__mutex, __pthread_mutexattr_t const *__mutexattr),pthread_mutex_init,(__mutex,__mutexattr))
 #else /* LIBC: pthread_mutex_init */
@@ -39,7 +39,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pthread_mutex_init,
 /* Dependency: "pthread_mutexattr_init" */
 #ifndef ____localdep_pthread_mutexattr_init_defined
 #define ____localdep_pthread_mutexattr_init_defined 1
-#if defined(__CRT_HAVE_pthread_mutexattr_init)
+#ifdef __CRT_HAVE_pthread_mutexattr_init
 /* Initialize mutex attribute object ATTR with default attributes (kind is PTHREAD_MUTEX_TIMED_NP) */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pthread_mutexattr_init,(__pthread_mutexattr_t *__attr),pthread_mutexattr_init,(__attr))
 #else /* LIBC: pthread_mutexattr_init */
@@ -50,7 +50,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pthread_mutexattr_i
 /* Dependency: "pthread_mutexattr_settype" */
 #ifndef ____localdep_pthread_mutexattr_settype_defined
 #define ____localdep_pthread_mutexattr_settype_defined 1
-#if defined(__CRT_HAVE_pthread_mutexattr_settype)
+#ifdef __CRT_HAVE_pthread_mutexattr_settype
 /* Set the mutex kind attribute in *ATTR to KIND (either PTHREAD_MUTEX_NORMAL,
  * PTHREAD_MUTEX_RECURSIVE, PTHREAD_MUTEX_ERRORCHECK, or PTHREAD_MUTEX_DEFAULT) */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pthread_mutexattr_settype,(__pthread_mutexattr_t *__attr, int __kind),pthread_mutexattr_settype,(__attr,__kind))
@@ -62,7 +62,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pthread_mutexattr_s
 /* Dependency: "pthread_mutexattr_destroy" */
 #ifndef ____localdep_pthread_mutexattr_destroy_defined
 #define ____localdep_pthread_mutexattr_destroy_defined 1
-#if defined(__CRT_HAVE_pthread_mutexattr_destroy)
+#ifdef __CRT_HAVE_pthread_mutexattr_destroy
 /* Destroy mutex attribute object ATTR */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pthread_mutexattr_destroy,(__pthread_mutexattr_t *__attr),pthread_mutexattr_destroy,(__attr))
 #else /* LIBC: pthread_mutexattr_destroy */

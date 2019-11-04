@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8950578f */
+/* HASH CRC-32:0xeb5f6abe */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,7 +64,7 @@ enum {
 
 #ifdef __CC__
 
-#if defined(__CRT_HAVE_timerfd_create)
+#ifdef __CRT_HAVE_timerfd_create
 /* Return file descriptor for new interval timer source */
 __CDECLARE(,__fd_t,__NOTHROW,timerfd_create,(clockid_t __clock_id, int __flags),(__clock_id,__flags))
 #endif /* timerfd_create... */
@@ -97,7 +97,7 @@ __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,timerfd_gettime,(__fd_t __ufd, 
 __NAMESPACE_LOCAL_USING_OR_IMPL(timerfd_gettime, __FORCELOCAL __ATTR_NONNULL((2)) int __NOTHROW_NCX(__LIBCCALL timerfd_gettime)(__fd_t __ufd, struct itimerspec *__restrict __otmr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timerfd_gettime))(__ufd, __otmr); })
 #endif /* timerfd_gettime... */
 #ifdef __USE_TIME64
-#if defined(__CRT_HAVE_timerfd_settime64)
+#ifdef __CRT_HAVE_timerfd_settime64
 /* Set next expiration time of interval timer source UFD to UTMR.
  * If FLAGS has the TFD_TIMER_ABSTIME flag set the timeout utmr
  * is absolute. Optionally return the old expiration time in OTMR */
@@ -114,7 +114,7 @@ __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,timerfd_settime64,(__fd_t __uf
  * is absolute. Optionally return the old expiration time in OTMR */
 __NAMESPACE_LOCAL_USING_OR_IMPL(timerfd_settime64, __FORCELOCAL __ATTR_NONNULL((3)) int __NOTHROW_NCX(__LIBCCALL timerfd_settime64)(__fd_t __ufd, int __flags, struct itimerspec64 const *__utmr, struct itimerspec64 *__otmr) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(timerfd_settime64))(__ufd, __flags, __utmr, __otmr); })
 #endif /* timerfd_settime64... */
-#if defined(__CRT_HAVE_timerfd_gettime64)
+#ifdef __CRT_HAVE_timerfd_gettime64
 /* Return the next expiration time of UFD */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,timerfd_gettime64,(__fd_t __ufd, struct itimerspec64 *__restrict __otmr),(__ufd,__otmr))
 #elif defined(__CRT_HAVE_timerfd_gettime) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)

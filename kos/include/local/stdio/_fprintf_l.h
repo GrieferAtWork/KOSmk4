@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb0413a51 */
+/* HASH CRC-32:0x29a0ce7e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 /* Dependency: "_vfprintf_l" from "stdio" */
 #ifndef ____localdep__vfprintf_l_defined
 #define ____localdep__vfprintf_l_defined 1
-#if defined(__CRT_HAVE__vfprintf_l)
+#ifdef __CRT_HAVE__vfprintf_l
 __CREDIRECT(__ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 0),__STDC_INT_AS_SIZE_T,,__localdep__vfprintf_l,(__FILE *__restrict __stream, char const *__restrict __format, __locale_t __locale, __builtin_va_list __args),_vfprintf_l,(__stream,__format,__locale,__args)) __THROWS(...)
 #elif defined(__CRT_HAVE__vfprintf_s_l)
 __CREDIRECT(__ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 0),__STDC_INT_AS_SIZE_T,,__localdep__vfprintf_l,(__FILE *__restrict __stream, char const *__restrict __format, __locale_t __locale, __builtin_va_list __args),_vfprintf_s_l,(__stream,__format,__locale,__args)) __THROWS(...)

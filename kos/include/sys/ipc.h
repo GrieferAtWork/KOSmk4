@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7f3af47b */
+/* HASH CRC-32:0x5aeabb8f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -56,7 +56,7 @@ typedef __mode_t mode_t;
 typedef __key_t key_t;
 #endif /* !__key_t_defined */
 
-#if defined(__CRT_HAVE_ftok)
+#ifdef __CRT_HAVE_ftok
 /* Generates key for System V style IPC */
 __CDECLARE(__ATTR_NONNULL((1)),key_t,__NOTHROW_RPC,ftok,(char const *__pathname, int __proj_id),(__pathname,__proj_id))
 #endif /* ftok... */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb7f94f0e */
+/* HASH CRC-32:0xf63a5fb3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 /* Dependency: "pwriteall64" from "unistd" */
 #ifndef ____localdep_pwriteall64_defined
 #define ____localdep_pwriteall64_defined 1
-#if defined(__CRT_HAVE_pwriteall64)
+#ifdef __CRT_HAVE_pwriteall64
 /* >> pwriteall64(3)
  * Same as `writeall(3)', but using `pwrite64(2)' instead of `write()' */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pwriteall64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __PIO_OFFSET64 __offset),pwriteall64,(__fd,__buf,__bufsize,__offset))

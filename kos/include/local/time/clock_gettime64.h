@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x56569a2e */
+/* HASH CRC-32:0xe9d8ff1d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "clock_gettime32" from "time" */
 #ifndef ____localdep_clock_gettime32_defined
 #define ____localdep_clock_gettime32_defined 1
-#if defined(__CRT_HAVE_clock_gettime)
+#ifdef __CRT_HAVE_clock_gettime
 /* Get current value of clock CLOCK_ID and store it in TP */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_gettime32,(__clockid_t __clock_id, struct __timespec32 *__tp),clock_gettime,(__clock_id,__tp))
 #elif defined(__CRT_HAVE___clock_gettime)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x455d67c5 */
+/* HASH CRC-32:0x1d6a5b7c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,7 +54,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(wutime, __FORCELOCAL __ATTR_NONNULL((1)) int __N
 #endif /* wutime... */
 
 #ifdef __USE_TIME64
-#if defined(__CRT_HAVE_wutime64)
+#ifdef __CRT_HAVE_wutime64
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wutime64,(__WCHAR_TYPE__ const *__filename, struct utimbuf64 const *__file_times),(__filename,__file_times))
 #elif defined(__CRT_HAVE__wutime64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,wutime64,(__WCHAR_TYPE__ const *__filename, struct utimbuf64 const *__file_times),_wutime64,(__filename,__file_times))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8c7b13fb */
+/* HASH CRC-32:0x3c277f67 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 /* Dependency: "_vfwprintf_p" from "wchar" */
 #ifndef ____localdep__vfwprintf_p_defined
 #define ____localdep__vfwprintf_p_defined 1
-#if defined(__CRT_HAVE__vfwprintf_p)
+#ifdef __CRT_HAVE__vfwprintf_p
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,,__localdep__vfwprintf_p,(__FILE *__stream, __WCHAR_TYPE__ const *__format, __builtin_va_list __args),_vfwprintf_p,(__stream,__format,__args)) __THROWS(...)
 #else /* LIBC: _vfwprintf_p */
 #include <local/wchar/_vfwprintf_p.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x57487f30 */
+/* HASH CRC-32:0x9fec2ba8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "_vsprintf_p" from "stdio" */
 #ifndef ____localdep__vsprintf_p_defined
 #define ____localdep__vsprintf_p_defined 1
-#if defined(__CRT_HAVE__vsprintf_p)
+#ifdef __CRT_HAVE__vsprintf_p
 __CREDIRECT(__ATTR_NONNULL((3)) __ATTR_LIBC_PRINTF_P(3, 0),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep__vsprintf_p,(char *__restrict __buf, __SIZE_TYPE__ __bufsize, char const *__restrict __format, __builtin_va_list __args),_vsprintf_p,(__buf,__bufsize,__format,__args))
 #else /* LIBC: _vsprintf_p */
 #include <local/stdio/_vsprintf_p.h>

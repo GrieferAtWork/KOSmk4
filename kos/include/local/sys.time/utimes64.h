@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x95e6708d */
+/* HASH CRC-32:0xac1b2d70 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,12 +18,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_utimes64_defined
-#if defined(__CRT_HAVE_utimes)
+#ifdef __CRT_HAVE_utimes
 #define __local_utimes64_defined 1
 /* Dependency: "utimes32" from "sys.time" */
 #ifndef ____localdep_utimes32_defined
 #define ____localdep_utimes32_defined 1
-#if defined(__CRT_HAVE_utimes)
+#ifdef __CRT_HAVE_utimes
 /* Change the access time of FILE to TVP[0] and the modification time of
  * FILE to TVP[1]. If TVP is a null pointer, use the current time instead.
  * Returns 0 on success, -1 on errors */

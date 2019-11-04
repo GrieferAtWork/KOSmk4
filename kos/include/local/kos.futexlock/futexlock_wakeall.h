@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa61b44d3 */
+/* HASH CRC-32:0x873d6338 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@
 /* Dependency: "futex_wakeall" from "kos.futex" */
 #ifndef ____localdep_futex_wakeall_defined
 #define ____localdep_futex_wakeall_defined 1
-#if defined(__CRT_HAVE_futex_wakeall)
+#ifdef __CRT_HAVE_futex_wakeall
 /* Wake all threads waiting for `*UADDR' (same as `futex_wake(uaddr, (size_t)-1)')
  * @return: * : The number of woken threads
  * @return: -1:EFAULT: A faulty pointer was given */

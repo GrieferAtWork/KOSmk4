@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xde493b30 */
+/* HASH CRC-32:0x6673b98e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 /* Dependency: "vfwscanf_unlocked" */
 #ifndef ____localdep_vfwscanf_unlocked_defined
 #define ____localdep_vfwscanf_unlocked_defined 1
-#if defined(__CRT_HAVE_vfwscanf_unlocked)
+#ifdef __CRT_HAVE_vfwscanf_unlocked
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_WSCANF(2, 0),__STDC_INT_AS_SIZE_T,,__localdep_vfwscanf_unlocked,(__FILE *__restrict __stream, __WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwscanf_unlocked,(__stream,__format,__args)) __THROWS(...)
 #elif defined(__CRT_HAVE_vfwscanf)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)) __ATTR_LIBC_WSCANF(2, 0),__STDC_INT_AS_SIZE_T,,__localdep_vfwscanf_unlocked,(__FILE *__restrict __stream, __WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),vfwscanf,(__stream,__format,__args)) __THROWS(...)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x94f1ff18 */
+/* HASH CRC-32:0x991020bf */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,12 +18,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_umount_defined
-#if defined(__CRT_HAVE_umount2)
+#ifdef __CRT_HAVE_umount2
 #define __local_umount_defined 1
 /* Dependency: "umount2" */
 #ifndef ____localdep_umount2_defined
 #define ____localdep_umount2_defined 1
-#if defined(__CRT_HAVE_umount2)
+#ifdef __CRT_HAVE_umount2
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_umount2,(char const *__special_file, int __flags),umount2,(__special_file,__flags))
 #else /* LIBC: umount2 */
 #undef ____localdep_umount2_defined

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf45169f2 */
+/* HASH CRC-32:0xbf8c7c05 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "div" from "stdlib" */
 #ifndef ____localdep_div_defined
 #define ____localdep_div_defined 1
-#if defined(__CRT_HAVE_div)
+#ifdef __CRT_HAVE_div
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __div_struct,__NOTHROW_NCX,__localdep_div,(int __numer, int __denom),div,(__numer,__denom))
 #elif defined(__CRT_HAVE_ldiv) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,struct __div_struct,__NOTHROW_NCX,__localdep_div,(int __numer, int __denom),ldiv,(__numer,__denom))

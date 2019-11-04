@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb9b633d1 */
+/* HASH CRC-32:0x871b6b32 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 /* Dependency: "wspawnvp" */
 #ifndef ____localdep_wspawnvp_defined
 #define ____localdep_wspawnvp_defined 1
-#if defined(__CRT_HAVE_wspawnvp)
+#ifdef __CRT_HAVE_wspawnvp
 __CREDIRECT(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_wspawnvp,(int __mode, __WCHAR_TYPE__ const *__restrict __file, __TWARGV),wspawnvp,(__mode,__file,____TWARGV))
 #elif defined(__CRT_HAVE__wspawnvp)
 __CREDIRECT(__ATTR_NONNULL((2, 3)),__pid_t,__NOTHROW_RPC,__localdep_wspawnvp,(int __mode, __WCHAR_TYPE__ const *__restrict __file, __TWARGV),_wspawnvp,(__mode,__file,____TWARGV))

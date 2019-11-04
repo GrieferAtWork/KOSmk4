@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xcc85336c */
+/* HASH CRC-32:0x86485a38 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -51,7 +51,7 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 
-#if defined(__CRT_HAVE_klogctl)
+#ifdef __CRT_HAVE_klogctl
 /* Control the kernel's logging facility.  This corresponds exactly to
  * the kernel's syslog system call, but that name is easily confused
  * with the user-level syslog facility, which is something completely

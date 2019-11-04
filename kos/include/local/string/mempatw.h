@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa30060b9 */
+/* HASH CRC-32:0xd61461a0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 /* Dependency: "mempsetw" from "string" */
 #ifndef ____localdep_mempsetw_defined
 #define ____localdep_mempsetw_defined 1
-#if defined(__fast_mempsetw_defined)
+#ifdef __fast_mempsetw_defined
 /* Same as `memsetw', but return `DST+N_WORDS', rather than `DST' */
 #define __localdep_mempsetw (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempsetw))
 #elif defined(__CRT_HAVE_mempsetw)

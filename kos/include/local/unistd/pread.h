@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb570768b */
+/* HASH CRC-32:0x54c65c02 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "pread64" from "unistd" */
 #ifndef ____localdep_pread64_defined
 #define ____localdep_pread64_defined 1
-#if defined(__CRT_HAVE_pread64)
+#ifdef __CRT_HAVE_pread64
 /* >> pread64(2)
  * Read data from a file at a specific offset */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pread64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __PIO_OFFSET64 __offset),pread64,(__fd,__buf,__bufsize,__offset))
@@ -81,7 +81,7 @@ __CREDIRECT(,__off32_t,__NOTHROW_NCX,__localdep_lseek,(__fd_t __fd, __off32_t __
 /* Dependency: "read" */
 #ifndef ____localdep_read_defined
 #define ____localdep_read_defined 1
-#if defined(__CRT_HAVE_read)
+#ifdef __CRT_HAVE_read
 /* >> read(2)
  * Read data from a given file descriptor `FD' and return the number of bytes read.
  * A return value of ZERO(0) is indicative of EOF */

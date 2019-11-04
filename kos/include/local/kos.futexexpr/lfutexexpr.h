@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3bd9c6d7 */
+/* HASH CRC-32:0x64e84627 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@
 /* Dependency: "lfutexexpr32" from "kos.futexexpr" */
 #ifndef ____localdep_lfutexexpr32_defined
 #define ____localdep_lfutexexpr32_defined 1
-#if defined(__CRT_HAVE_lfutexexpr)
+#ifdef __CRT_HAVE_lfutexexpr
 /* >> lfutexexpr(2)
  * The lfutexexpr() system call can be used to specify arbitrarily complex
  * expressions that must atomically (in relation to other futex operations)
@@ -67,7 +67,7 @@ __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_RPC,__localdep_lfutexexpr32,(void 
 /* Dependency: "lfutexexpr64" from "kos.futexexpr" */
 #ifndef ____localdep_lfutexexpr64_defined
 #define ____localdep_lfutexexpr64_defined 1
-#if defined(__CRT_HAVE_lfutexexpr64)
+#ifdef __CRT_HAVE_lfutexexpr64
 /* >> lfutexexpr(2)
  * The lfutexexpr() system call can be used to specify arbitrarily complex
  * expressions that must atomically (in relation to other futex operations)

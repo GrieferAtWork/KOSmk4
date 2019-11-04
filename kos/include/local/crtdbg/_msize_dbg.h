@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa9873864 */
+/* HASH CRC-32:0xfcd9110 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "_msize" from "malloc" */
 #ifndef ____localdep__msize_defined
 #define ____localdep__msize_defined 1
-#if defined(__CRT_HAVE__msize)
+#ifdef __CRT_HAVE__msize
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep__msize,(void *__restrict __mallptr),_msize,(__mallptr))
 #elif defined(__CRT_HAVE_malloc_usable_size)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__SIZE_TYPE__,__NOTHROW_NCX,__localdep__msize,(void *__restrict __mallptr),malloc_usable_size,(__mallptr))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9dd02ece */
+/* HASH CRC-32:0x8d5ee582 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "wctype" from "wctype" */
 #ifndef ____localdep_wctype_defined
 #define ____localdep_wctype_defined 1
-#if defined(__CRT_HAVE_wctype)
+#ifdef __CRT_HAVE_wctype
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__WCTYPE_TYPE__,__NOTHROW_NCX,__localdep_wctype,(char const *__prop),wctype,(__prop))
 #else /* LIBC: wctype */
 #include <local/wctype/wctype.h>

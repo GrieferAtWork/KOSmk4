@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x998bf579 */
+/* HASH CRC-32:0x9f43ccac */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_openat_defined
-#if defined(__CRT_HAVE_openat64)
+#ifdef __CRT_HAVE_openat64
 #define __local_openat_defined 1
 #include <bits/types.h>
 #include <bits/types.h>
@@ -26,7 +26,7 @@
 /* Dependency: "openat64" from "fcntl" */
 #ifndef ____localdep_openat64_defined
 #define ____localdep_openat64_defined 1
-#if defined(__CRT_HAVE_openat64)
+#ifdef __CRT_HAVE_openat64
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__NOTHROW_RPC,__localdep_openat64,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),openat64,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))
 #elif defined(__CRT_HAVE_openat) && (!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),__fd_t,__NOTHROW_RPC,__localdep_openat64,(__fd_t __dirfd, char const *__filename, __oflag_t __oflags),openat,(__dirfd,__filename,__oflags),__oflags,1,(__mode_t))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2d829557 */
+/* HASH CRC-32:0xf2ed5ff7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "strncoll" from "string" */
 #ifndef ____localdep_strncoll_defined
 #define ____localdep_strncoll_defined 1
-#if defined(__CRT_HAVE_strncoll)
+#ifdef __CRT_HAVE_strncoll
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strncoll,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen),strncoll,(__s1,__s2,__maxlen))
 #elif defined(__CRT_HAVE__strncoll)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strncoll,(char const *__s1, char const *__s2, __SIZE_TYPE__ __maxlen),_strncoll,(__s1,__s2,__maxlen))

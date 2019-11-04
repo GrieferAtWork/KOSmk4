@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xac0b16fa */
+/* HASH CRC-32:0xf5cc735d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "timer_settime32" from "time" */
 #ifndef ____localdep_timer_settime32_defined
 #define ____localdep_timer_settime32_defined 1
-#if defined(__CRT_HAVE_timer_settime)
+#ifdef __CRT_HAVE_timer_settime
 /* Set timer TIMERID to VALUE, returning old value in OVALUE */
 __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,__localdep_timer_settime32,(timer_t __timerid, int __flags, struct __itimerspec32 const *__restrict __value, struct __itimerspec32 *__ovalue),timer_settime,(__timerid,__flags,__value,__ovalue))
 #else /* LIBC: timer_settime */
@@ -34,7 +34,7 @@ __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,__localdep_timer_settime32,(ti
 /* Dependency: "timer_settime64" from "time" */
 #ifndef ____localdep_timer_settime64_defined
 #define ____localdep_timer_settime64_defined 1
-#if defined(__CRT_HAVE_timer_settime64)
+#ifdef __CRT_HAVE_timer_settime64
 /* Set timer TIMERID to VALUE, returning old value in OVALUE */
 __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,__localdep_timer_settime64,(timer_t __timerid, int __flags, struct itimerspec64 const *__restrict __value, struct itimerspec64 *__restrict __ovalue),timer_settime64,(__timerid,__flags,__value,__ovalue))
 #elif defined(__CRT_HAVE_timer_settime) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)

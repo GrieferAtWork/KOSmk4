@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x63be6121 */
+/* HASH CRC-32:0x88c16c7a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@
 /* Dependency: "memcpyq" from "string" */
 #ifndef ____localdep_memcpyq_defined
 #define ____localdep_memcpyq_defined 1
-#if defined(__fast_memcpyq_defined)
+#ifdef __fast_memcpyq_defined
 /* Copy memory between non-overlapping memory blocks. */
 #define __localdep_memcpyq (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpyq))
 #elif defined(__CRT_HAVE_memcpyq)
@@ -43,7 +43,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT64_TYPE__
 /* Dependency: "memcpyl" from "string" */
 #ifndef ____localdep_memcpyl_defined
 #define ____localdep_memcpyl_defined 1
-#if defined(__fast_memcpyl_defined)
+#ifdef __fast_memcpyl_defined
 /* Copy memory between non-overlapping memory blocks. */
 #define __localdep_memcpyl (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpyl))
 #elif defined(__CRT_HAVE_memcpyl)
@@ -62,7 +62,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__
 /* Dependency: "memcpyw" from "string" */
 #ifndef ____localdep_memcpyw_defined
 #define ____localdep_memcpyw_defined 1
-#if defined(__fast_memcpyw_defined)
+#ifdef __fast_memcpyw_defined
 /* Copy memory between non-overlapping memory blocks. */
 #define __localdep_memcpyw (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpyw))
 #elif defined(__CRT_HAVE_memcpyw)
@@ -81,7 +81,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__
 /* Dependency: "memcpy" from "string" */
 #ifndef ____localdep_memcpy_defined
 #define ____localdep_memcpy_defined 1
-#if defined(__fast_memcpy_defined)
+#ifdef __fast_memcpy_defined
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 #define __localdep_memcpy (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpy))

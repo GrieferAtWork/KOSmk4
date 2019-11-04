@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x23216459 */
+/* HASH CRC-32:0xe39d733b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -926,7 +926,7 @@ __FORCELOCAL __ATTR_NONNULL((1, 3)) __ATTR_LIBC_PRINTF(3, 0) __SSIZE_TYPE__ __NO
  *  - ...               There are a _lot_ more... */
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_vc32printf, __FORCELOCAL __ATTR_NONNULL((1, 3)) __ATTR_LIBC_PRINTF(3, 0) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_vc32printf)(pc32formatprinter __printer, void *__arg, char32_t const *__restrict __format, __builtin_va_list __args) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_vc32printf))(__printer, __arg, __format, __args); })
 #endif /* format_vc32printf... */
-#if defined(__CRT_HAVE_format_wprintf) && (__SIZEOF_WCHAR_T__ == 2) && !defined(__NO_ASMNAME)
+#if defined(__CRT_HAVE_format_wprintf) && (__SIZEOF_WCHAR_T__ == 2) && (!defined(__NO_ASMNAME))
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings
@@ -1015,7 +1015,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_vc32printf, __FORCELOCAL __ATTR_NONNULL((
  *  - syslog:           Unbuffered system-log output.
  *  - ...               There are a _lot_ more... */
 __LIBC __ATTR_NONNULL((1, 3)) __ATTR_LIBC_PRINTF(3, 4) __SSIZE_TYPE__ __NOTHROW_NCX(__VLIBCCALL format_c16printf)(pc16formatprinter __printer, void *__arg, char16_t const *__restrict __format, ...) __CASMNAME("format_wprintf");
-#elif defined(__CRT_HAVE_DOS$format_wprintf) && !defined(__NO_ASMNAME)
+#elif defined(__CRT_HAVE_DOS$format_wprintf) && (!defined(__NO_ASMNAME))
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings
@@ -1289,7 +1289,7 @@ __NAMESPACE_LOCAL_USING(format_c16printf)
 #define format_c16printf (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_c16printf))
 #endif /* !__cplusplus */
 #endif /* format_c16printf... */
-#if defined(__CRT_HAVE_format_wprintf) && (__SIZEOF_WCHAR_T__ == 4) && !defined(__NO_ASMNAME)
+#if defined(__CRT_HAVE_format_wprintf) && (__SIZEOF_WCHAR_T__ == 4) && (!defined(__NO_ASMNAME))
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings
@@ -1684,7 +1684,7 @@ __FORCELOCAL __ATTR_NONNULL((2)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_
 /* Returns the width (number of characters; not bytes) of the given unicode string */
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_c16width, __FORCELOCAL __ATTR_NONNULL((2)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_c16width)(void *__arg, char16_t const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_c16width))(__arg, __data, __datalen); })
 #endif /* format_c16width... */
-#if defined(__CRT_HAVE_format_length)
+#ifdef __CRT_HAVE_format_length
 /* Returns the width (number of characters; not bytes) of the given unicode string */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_c32width,(void *__arg, char32_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_length,(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_format_wwidth) && (__SIZEOF_WCHAR_T__ == 4)
@@ -1699,7 +1699,7 @@ __FORCELOCAL __ATTR_NONNULL((2)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_
 /* Returns the width (number of characters; not bytes) of the given unicode string */
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_c32width, __FORCELOCAL __ATTR_NONNULL((2)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_c32width)(void *__arg, char32_t const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_c32width))(__arg, __data, __datalen); })
 #endif /* format_c32width... */
-#if defined(__CRT_HAVE_format_length)
+#ifdef __CRT_HAVE_format_length
 /* Always re-return `datalen' and ignore all other arguments */
 __CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,format_c16length,(void *__arg, char16_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_length,(__arg,__data,__datalen))
 #else /* LIBC: format_length */
@@ -1707,7 +1707,7 @@ __CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,format_c16length,(void *__arg, char16_
 /* Always re-return `datalen' and ignore all other arguments */
 __FORCELOCAL __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_c16length)(void *__arg, char16_t const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_length))(__arg, (/*utf-8*/ char const *)__data, __datalen); }
 #endif /* format_c16length... */
-#if defined(__CRT_HAVE_format_length)
+#ifdef __CRT_HAVE_format_length
 /* Always re-return `datalen' and ignore all other arguments */
 __CREDIRECT(,__SSIZE_TYPE__,__NOTHROW_NCX,format_c32length,(void *__arg, char32_t const *__restrict __data, __SIZE_TYPE__ __datalen),format_length,(__arg,__data,__datalen))
 #else /* LIBC: format_length */

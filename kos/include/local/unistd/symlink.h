@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2ba471c7 */
+/* HASH CRC-32:0x13e946ed */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "symlinkat" */
 #ifndef ____localdep_symlinkat_defined
 #define ____localdep_symlinkat_defined 1
-#if defined(__CRT_HAVE_symlinkat)
+#ifdef __CRT_HAVE_symlinkat
 /* >> symlinkat(3)
  * Create a new symbolic link loaded with `LINK_TEXT' as link
  * text, at the filesystem location referred to by `TOFD:TARGET_PATH' */

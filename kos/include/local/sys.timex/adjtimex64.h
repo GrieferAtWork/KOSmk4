@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x86e4f265 */
+/* HASH CRC-32:0x34799725 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "adjtimex32" from "sys.timex" */
 #ifndef ____localdep_adjtimex32_defined
 #define ____localdep_adjtimex32_defined 1
-#if defined(__CRT_HAVE_adjtimex)
+#ifdef __CRT_HAVE_adjtimex
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_adjtimex32,(struct __timex32 *__restrict ____ntx),adjtimex,(____ntx))
 #elif defined(__CRT_HAVE___adjtimex)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_adjtimex32,(struct __timex32 *__restrict ____ntx),__adjtimex,(____ntx))

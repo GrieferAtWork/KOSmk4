@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7edb73ca */
+/* HASH CRC-32:0x3f8c6ae6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "vdprintf" from "stdio" */
 #ifndef ____localdep_vdprintf_defined
 #define ____localdep_vdprintf_defined 1
-#if defined(__CRT_HAVE_vdprintf)
+#ifdef __CRT_HAVE_vdprintf
 __CREDIRECT(__ATTR_NONNULL((2)) __ATTR_LIBC_PRINTF(2, 0),__STDC_INT_AS_SSIZE_T,__NOTHROW_RPC,__localdep_vdprintf,(__fd_t __fd, char const *__restrict __format, __builtin_va_list __args),vdprintf,(__fd,__format,__args))
 #elif defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)
 #include <local/stdio/vdprintf.h>

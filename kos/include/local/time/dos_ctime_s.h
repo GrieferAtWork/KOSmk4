@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x304ea794 */
+/* HASH CRC-32:0xa5fc4612 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "dos_ctime64_s" from "time" */
 #ifndef ____localdep_dos_ctime64_s_defined
 #define ____localdep_dos_ctime64_s_defined 1
-#if defined(__CRT_HAVE__ctime64_s)
+#ifdef __CRT_HAVE__ctime64_s
 /* Equivalent to `asctime_s(buf, bufsize, localtime_r(timer, *TMP*))' */
 __CREDIRECT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,__localdep_dos_ctime64_s,(char __buf[26], __SIZE_TYPE__ __bufsize, __time64_t const *__restrict __timer),_ctime64_s,(__buf,__bufsize,__timer))
 #elif defined(__CRT_HAVE__gmtime32_s)
@@ -38,7 +38,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,__localdep_dos_ctime6
 /* Dependency: "dos_ctime32_s" from "time" */
 #ifndef ____localdep_dos_ctime32_s_defined
 #define ____localdep_dos_ctime32_s_defined 1
-#if defined(__CRT_HAVE__ctime32_s)
+#ifdef __CRT_HAVE__ctime32_s
 /* Equivalent to `asctime_s(buf, bufsize, localtime_r(timer, *TMP*))' */
 __CREDIRECT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,__localdep_dos_ctime32_s,(char __buf[26], __SIZE_TYPE__ __bufsize, __time32_t const *__restrict __timer),_ctime32_s,(__buf,__bufsize,__timer))
 #else /* LIBC: _ctime32_s */

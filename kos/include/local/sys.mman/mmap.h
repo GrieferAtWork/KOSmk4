@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf8947a3d */
+/* HASH CRC-32:0x57a7a6f8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "mmap64" from "sys.mman" */
 #ifndef ____localdep_mmap64_defined
 #define ____localdep_mmap64_defined 1
-#if defined(__CRT_HAVE_mmap64)
+#ifdef __CRT_HAVE_mmap64
 /* @param prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
  * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
@@ -53,7 +53,7 @@ __CREDIRECT(__ATTR_WUNUSED,void *,__NOTHROW_NCX,__localdep_mmap64,(void *__addr,
 /* Dependency: "mmap32" from "sys.mman" */
 #ifndef ____localdep_mmap32_defined
 #define ____localdep_mmap32_defined 1
-#if defined(__CRT_HAVE_mmap)
+#ifdef __CRT_HAVE_mmap
 /* @param prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
  * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|

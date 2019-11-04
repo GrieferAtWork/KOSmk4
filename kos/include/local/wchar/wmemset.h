@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x58e694d6 */
+/* HASH CRC-32:0xf582fe37 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 /* Dependency: "memsetw" from "string" */
 #ifndef ____localdep_memsetw_defined
 #define ____localdep_memsetw_defined 1
-#if defined(__fast_memsetw_defined)
+#ifdef __fast_memsetw_defined
 /* Fill memory with a given word */
 #define __localdep_memsetw (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memsetw))
 #elif defined(__CRT_HAVE_memsetw)
@@ -41,7 +41,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT16_TYPE__ *,
 /* Dependency: "memsetl" from "string" */
 #ifndef ____localdep_memsetl_defined
 #define ____localdep_memsetl_defined 1
-#if defined(__fast_memsetl_defined)
+#ifdef __fast_memsetl_defined
 /* Fill memory with a given dword */
 #define __localdep_memsetl (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memsetl))
 #elif defined(__CRT_HAVE_memsetl)
@@ -57,7 +57,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,
 /* Dependency: "memset" from "string" */
 #ifndef ____localdep_memset_defined
 #define ____localdep_memset_defined 1
-#if defined(__fast_memset_defined)
+#ifdef __fast_memset_defined
 /* Fill memory with a given byte
  * @return: * : Always re-returns `dst' */
 #define __localdep_memset (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memset))

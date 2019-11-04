@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x20bbb226 */
+/* HASH CRC-32:0x7442e338 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 /* Dependency: "_filbuf" */
 #ifndef ____localdep__filbuf_defined
 #define ____localdep__filbuf_defined 1
-#if defined(__CRT_HAVE__filbuf)
+#ifdef __CRT_HAVE__filbuf
 __CREDIRECT(__ATTR_NONNULL((1)),int,,__localdep__filbuf,(__FILE *__restrict __stream),_filbuf,(__stream)) __THROWS(...)
 #else /* LIBC: _filbuf */
 #undef ____localdep__filbuf_defined
@@ -34,7 +34,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,,__localdep__filbuf,(__FILE *__restrict __st
 /* Dependency: "crt_fread_unlocked" from "stdio" */
 #ifndef ____localdep_crt_fread_unlocked_defined
 #define ____localdep_crt_fread_unlocked_defined 1
-#if defined(__CRT_HAVE_fread_unlocked)
+#ifdef __CRT_HAVE_fread_unlocked
 __CREDIRECT(__ATTR_NONNULL((1, 4)),__SIZE_TYPE__,,__localdep_crt_fread_unlocked,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),fread_unlocked,(__buf,__elemsize,__elemcount,__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE__fread_nolock)
 __CREDIRECT(__ATTR_NONNULL((1, 4)),__SIZE_TYPE__,,__localdep_crt_fread_unlocked,(void *__restrict __buf, __SIZE_TYPE__ __elemsize, __SIZE_TYPE__ __elemcount, __FILE *__restrict __stream),_fread_nolock,(__buf,__elemsize,__elemcount,__stream)) __THROWS(...)

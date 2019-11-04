@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x35990b0 */
+/* HASH CRC-32:0x94a9a580 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -575,7 +575,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32lchown, __FORCELOCAL __ATTR_NONNULL((1)) int 
 #define __PIO_OFFSET64   __off64_t
 #endif
 #endif /* !__PIO_OFFSET */
-#if defined(__CRT_HAVE_wtruncate64) && (defined(__USE_FILE_OFFSET64) && __SIZEOF_WCHAR_T__ == 2)
+#if defined(__CRT_HAVE_wtruncate64) && defined(__USE_FILE_OFFSET64) && __SIZEOF_WCHAR_T__ == 2
 /* >> c16truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c16truncate,(char16_t const *__file, __PIO_OFFSET __length),wtruncate64,(__file,__length))
@@ -583,7 +583,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c16truncate,(char16_t const *_
 /* >> c16truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c16truncate,(char16_t const *__file, __PIO_OFFSET __length),wtruncate64,(__file,__length))
-#elif defined(__CRT_HAVE_wtruncate) && (!defined(__USE_FILE_OFFSET64) && __SIZEOF_WCHAR_T__ == 2)
+#elif defined(__CRT_HAVE_wtruncate) && !defined(__USE_FILE_OFFSET64) && __SIZEOF_WCHAR_T__ == 2
 /* >> c16truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c16truncate,(char16_t const *__file, __PIO_OFFSET __length),wtruncate,(__file,__length))
@@ -612,11 +612,11 @@ __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL c16truncate)(char1
 __NAMESPACE_LOCAL_USING_OR_IMPL(c16truncate, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL c16truncate)(char16_t const *__file, __PIO_OFFSET __length) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16truncate))(__file, __length); })
 #endif /* LIBC: c16truncate */
 #endif /* c16truncate... */
-#if defined(__CRT_HAVE_wtruncate64) && (defined(__USE_FILE_OFFSET64) && __SIZEOF_WCHAR_T__ == 4)
+#if defined(__CRT_HAVE_wtruncate64) && defined(__USE_FILE_OFFSET64) && __SIZEOF_WCHAR_T__ == 4
 /* >> c32truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c32truncate,(char32_t const *__file, __PIO_OFFSET __length),wtruncate64,(__file,__length))
-#elif defined(__CRT_HAVE_wtruncate) && (!defined(__USE_FILE_OFFSET64) && __SIZEOF_WCHAR_T__ == 4)
+#elif defined(__CRT_HAVE_wtruncate) && !defined(__USE_FILE_OFFSET64) && __SIZEOF_WCHAR_T__ == 4
 /* >> c32truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,c32truncate,(char32_t const *__file, __PIO_OFFSET __length),wtruncate,(__file,__length))

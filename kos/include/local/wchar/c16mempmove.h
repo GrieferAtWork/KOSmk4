@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xef57c3bf */
+/* HASH CRC-32:0x780e11ce */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 /* Dependency: "mempmovew" from "string" */
 #ifndef ____localdep_mempmovew_defined
 #define ____localdep_mempmovew_defined 1
-#if defined(__fast_mempmovew_defined)
+#ifdef __fast_mempmovew_defined
 /* Same as `memmovew', but return `DST+N_WORDS', rather than `DST' */
 #define __localdep_mempmovew (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovew))
 #elif defined(__CRT_HAVE_mempmovew)
@@ -41,7 +41,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__
 /* Dependency: "mempmovel" from "string" */
 #ifndef ____localdep_mempmovel_defined
 #define ____localdep_mempmovel_defined 1
-#if defined(__fast_mempmovel_defined)
+#ifdef __fast_mempmovel_defined
 /* Same as `memmovew', but return `DST+N_DWORDS', rather than `DST' */
 #define __localdep_mempmovel (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmovel))
 #elif defined(__CRT_HAVE_mempmovel)
@@ -57,7 +57,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__
 /* Dependency: "mempmove" from "string" */
 #ifndef ____localdep_mempmove_defined
 #define ____localdep_mempmove_defined 1
-#if defined(__fast_mempmove_defined)
+#ifdef __fast_mempmove_defined
 /* Same as `memmove', but return `DST+N_BYTES', rather than `DST' */
 #define __localdep_mempmove (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempmove))
 #elif defined(__CRT_HAVE_mempmove)

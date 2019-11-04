@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x452dca23 */
+/* HASH CRC-32:0x313b420e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "kreaddirf64" */
 #ifndef ____localdep_kreaddirf64_defined
 #define ____localdep_kreaddirf64_defined 1
-#if defined(__CRT_HAVE_kreaddirf64)
+#ifdef __CRT_HAVE_kreaddirf64
 /* 64-bit variant of `kreaddirf()' */
 __CREDIRECT(__ATTR_WUNUSED,__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_kreaddirf64,(__fd_t __fd, struct dirent64 *__buf, __SIZE_TYPE__ __bufsize, unsigned int __mode, __oflag_t __flags),kreaddirf64,(__fd,__buf,__bufsize,__mode,__flags))
 #elif defined(__CRT_HAVE_kreaddirf) && (defined(_DIRENT_MATCHES_DIRENT64))

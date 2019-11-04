@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x89be01ca */
+/* HASH CRC-32:0xc5b26fbe */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "clock_getres32" from "time" */
 #ifndef ____localdep_clock_getres32_defined
 #define ____localdep_clock_getres32_defined 1
-#if defined(__CRT_HAVE_clock_getres)
+#ifdef __CRT_HAVE_clock_getres
 /* Get resolution of clock CLOCK_ID */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_getres32,(__clockid_t __clock_id, struct __timespec32 *__res),clock_getres,(__clock_id,__res))
 #elif defined(__CRT_HAVE___clock_getres)
@@ -37,7 +37,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_getres32,(__c
 /* Dependency: "clock_getres64" from "time" */
 #ifndef ____localdep_clock_getres64_defined
 #define ____localdep_clock_getres64_defined 1
-#if defined(__CRT_HAVE_clock_getres64)
+#ifdef __CRT_HAVE_clock_getres64
 /* Get resolution of clock CLOCK_ID */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_getres64,(__clockid_t __clock_id, struct __timespec64 *__res),clock_getres64,(__clock_id,__res))
 #elif defined(__CRT_HAVE_clock_getres) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5aef35f */
+/* HASH CRC-32:0xb7edd9a7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "_vsnprintf_s" from "stdio" */
 #ifndef ____localdep__vsnprintf_s_defined
 #define ____localdep__vsnprintf_s_defined 1
-#if defined(__CRT_HAVE__vsnprintf_s)
+#ifdef __CRT_HAVE__vsnprintf_s
 __CREDIRECT(__ATTR_NONNULL((4)) __ATTR_LIBC_PRINTF(4, 0),__STDC_INT_AS_SIZE_T,__NOTHROW_NCX,__localdep__vsnprintf_s,(char *__restrict __buf, __SIZE_TYPE__ __bufsize, __SIZE_TYPE__ __buflen, char const *__restrict __format, __builtin_va_list __args),_vsnprintf_s,(__buf,__bufsize,__buflen,__format,__args))
 #else /* LIBC: _vsnprintf_s */
 #include <local/stdio/_vsnprintf_s.h>

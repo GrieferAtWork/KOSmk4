@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x993f2844 */
+/* HASH CRC-32:0xea1dcbe5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,12 +18,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_sendfile64_defined
-#if defined(__CRT_HAVE_sendfile)
+#ifdef __CRT_HAVE_sendfile
 #define __local_sendfile64_defined 1
 /* Dependency: "sendfile32" from "sys.sendfile" */
 #ifndef ____localdep_sendfile32_defined
 #define ____localdep_sendfile32_defined 1
-#if defined(__CRT_HAVE_sendfile)
+#ifdef __CRT_HAVE_sendfile
 /* Send up to COUNT bytes from file associated with IN_FD starting at *OFFSET
  * to descriptor OUT_FD. Set *OFFSET to the IN_FD's file position following the
  * read bytes. If OFFSET is a null pointer, use the normal file position instead.

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3f856876 */
+/* HASH CRC-32:0x3e9c9db8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,7 +54,7 @@ __NAMESPACE_STD_END
 /* Dependency: "strptime" from "time" */
 #ifndef ____localdep_strptime_defined
 #define ____localdep_strptime_defined 1
-#if defined(__CRT_HAVE_strptime)
+#ifdef __CRT_HAVE_strptime
 /* Parse S according to FORMAT and store binary time information in TP.
  * The return value is a pointer to the first unparsed character in S */
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),char *,__NOTHROW_NCX,__localdep_strptime,(char const *__restrict __s, char const *__restrict __format, __STRUCT_TM *__restrict __tp),strptime,(__s,__format,__tp))

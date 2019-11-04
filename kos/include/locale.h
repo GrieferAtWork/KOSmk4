@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd83cc3da */
+/* HASH CRC-32:0xece0de89 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -286,7 +286,7 @@ __NAMESPACE_STD_USING(lconv)
 __NAMESPACE_STD_BEGIN
 #ifndef __std_setlocale_defined
 #define __std_setlocale_defined 1
-#if defined(__CRT_HAVE_setlocale)
+#ifdef __CRT_HAVE_setlocale
 /* Set and/or return the current locale */
 __CDECLARE(,char *,__NOTHROW_NCX,setlocale,(int __category, char const *__locale),(__category,__locale))
 #else /* LIBC: setlocale */
@@ -295,7 +295,7 @@ __CDECLARE(,char *,__NOTHROW_NCX,setlocale,(int __category, char const *__locale
 #endif /* !__std_setlocale_defined */
 #ifndef __std_localeconv_defined
 #define __std_localeconv_defined 1
-#if defined(__CRT_HAVE_localeconv)
+#ifdef __CRT_HAVE_localeconv
 /* Return the numeric/monetary information for the current locale */
 __CDECLARE(,struct lconv *,__NOTHROW_NCX,localeconv,(void),())
 #else /* LIBC: localeconv */
@@ -325,7 +325,7 @@ __NAMESPACE_STD_USING(localeconv)
  *
  * Attention: all these functions are *not* standardized in any form.
  * This is a proof-of-concept implementation. */
-#if defined(__CRT_HAVE_newlocale)
+#ifdef __CRT_HAVE_newlocale
 /* Return a reference to a data structure representing a set of locale
  * datasets. Unlike for the CATEGORY parameter for `setlocale' the
  * CATEGORY_MASK parameter here uses a single bit for each category,
@@ -338,7 +338,7 @@ __CDECLARE(,__locale_t,__NOTHROW_NCX,newlocale,(int __category_mask, char const 
  * made by OR'ing together LC_*_MASK bits above */
 __CREDIRECT(,__locale_t,__NOTHROW_NCX,newlocale,(int __category_mask, char const *__locale, __locale_t __base),__newlocale,(__category_mask,__locale,__base))
 #endif /* newlocale... */
-#if defined(__CRT_HAVE_duplocale)
+#ifdef __CRT_HAVE_duplocale
 /* Return a duplicate of the set of locale in DATASET.
  * All usage counters are increased if necessary */
 __CDECLARE(,__locale_t,__NOTHROW_NCX,duplocale,(__locale_t __dataset),(__dataset))
@@ -347,7 +347,7 @@ __CDECLARE(,__locale_t,__NOTHROW_NCX,duplocale,(__locale_t __dataset),(__dataset
  * All usage counters are increased if necessary */
 __CREDIRECT(,__locale_t,__NOTHROW_NCX,duplocale,(__locale_t __dataset),__duplocale,(__dataset))
 #endif /* duplocale... */
-#if defined(__CRT_HAVE_freelocale)
+#ifdef __CRT_HAVE_freelocale
 /* Free the data associated with a locale dataset
  * previously returned by a call to `setlocale_r' */
 __CDECLARE_VOID(,__NOTHROW_NCX,freelocale,(__locale_t __dataset),(__dataset))
@@ -356,7 +356,7 @@ __CDECLARE_VOID(,__NOTHROW_NCX,freelocale,(__locale_t __dataset),(__dataset))
  * previously returned by a call to `setlocale_r' */
 __CREDIRECT_VOID(,__NOTHROW_NCX,freelocale,(__locale_t __dataset),__freelocale,(__dataset))
 #endif /* freelocale... */
-#if defined(__CRT_HAVE_uselocale)
+#ifdef __CRT_HAVE_uselocale
 /* Switch the current thread's locale to DATASET.
  * If DATASET is null, instead just return the current setting.
  * The special value LC_GLOBAL_LOCALE is the initial setting

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5589e438 */
+/* HASH CRC-32:0x3b77ab6c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -59,7 +59,7 @@ struct _diskfree_t {
 #endif /* __COMPILER_HAVE_PRAGMA_PUSHMACRO */
 #endif /* !_DISKFREE_T_DEFINED */
 
-#if defined(__CRT_HAVE__getcwd)
+#ifdef __CRT_HAVE__getcwd
 /* >> getcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
 __CDECLARE(,char *,__NOTHROW_RPC,_getcwd,(char *__buf, size_t __bufsize),(__buf,__bufsize))
@@ -68,7 +68,7 @@ __CDECLARE(,char *,__NOTHROW_RPC,_getcwd,(char *__buf, size_t __bufsize),(__buf,
  * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
 __CREDIRECT(,char *,__NOTHROW_RPC,_getcwd,(char *__buf, size_t __bufsize),getcwd,(__buf,__bufsize))
 #endif /* _getcwd... */
-#if defined(__CRT_HAVE__chdir)
+#ifdef __CRT_HAVE__chdir
 /* >> chdir(2)
  * Change the current working directory to `PATH' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_chdir,(char const *__path),(__path))
@@ -77,7 +77,7 @@ __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_chdir,(char const *__path),(__
  * Change the current working directory to `PATH' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_chdir,(char const *__path),chdir,(__path))
 #endif /* _chdir... */
-#if defined(__CRT_HAVE__rmdir)
+#ifdef __CRT_HAVE__rmdir
 /* >> rmdir(2)
  * Remove a directory referred to by `PATH' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_rmdir,(char const *__path),(__path))
@@ -92,16 +92,16 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_rmdir,(char const *__path),rm
 __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__LIBCCALL _rmdir)(char const *__path) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(rmdir))(__path); }
 #endif /* _rmdir... */
 #define _getdcwd_nolock _getdcwd
-#if defined(__CRT_HAVE__getdcwd)
+#ifdef __CRT_HAVE__getdcwd
 __CDECLARE(,char *,__NOTHROW_RPC,_getdcwd,(int __drive, char *__buf, size_t __size),(__drive,__buf,__size))
 #endif /* _getdcwd... */
-#if defined(__CRT_HAVE__chdrive)
+#ifdef __CRT_HAVE__chdrive
 __CDECLARE(,int,__NOTHROW_RPC,_chdrive,(int __drive),(__drive))
 #endif /* _chdrive... */
-#if defined(__CRT_HAVE__getdrive)
+#ifdef __CRT_HAVE__getdrive
 __CDECLARE(,int,__NOTHROW_RPC,_getdrive,(void),())
 #endif /* _getdrive... */
-#if defined(__CRT_HAVE__getdrives)
+#ifdef __CRT_HAVE__getdrives
 __CDECLARE(,__ULONG32_TYPE__,__NOTHROW_RPC,_getdrives,(void),())
 #endif /* _getdrives... */
 
@@ -109,7 +109,7 @@ __CDECLARE(,__ULONG32_TYPE__,__NOTHROW_RPC,_getdrives,(void),())
 #define _GETDISKFREE_DEFINED 1
 #ifndef ___getdiskfree_defined
 #define ___getdiskfree_defined 1
-#if defined(__CRT_HAVE__getdiskfree)
+#ifdef __CRT_HAVE__getdiskfree
 __CDECLARE(,unsigned int,__NOTHROW_RPC,_getdiskfree,(unsigned int __drive, struct _diskfree_t *__diskfree),(__drive,__diskfree))
 #else /* LIBC: _getdiskfree */
 #undef ___getdiskfree_defined
@@ -118,7 +118,7 @@ __CDECLARE(,unsigned int,__NOTHROW_RPC,_getdiskfree,(unsigned int __drive, struc
 #endif /* !_GETDISKFREE_DEFINED */
 #ifndef __getcwd_defined
 #define __getcwd_defined 1
-#if defined(__CRT_HAVE_getcwd)
+#ifdef __CRT_HAVE_getcwd
 /* >> getcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
 __CDECLARE(,char *,__NOTHROW_RPC,getcwd,(char *__buf, size_t __bufsize),(__buf,__bufsize))
@@ -132,7 +132,7 @@ __CREDIRECT(,char *,__NOTHROW_RPC,getcwd,(char *__buf, size_t __bufsize),_getcwd
 #endif /* !__getcwd_defined */
 #ifndef __rmdir_defined
 #define __rmdir_defined 1
-#if defined(__CRT_HAVE_rmdir)
+#ifdef __CRT_HAVE_rmdir
 /* >> rmdir(2)
  * Remove a directory referred to by `PATH' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,rmdir,(char const *__path),(__path))
@@ -149,7 +149,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(rmdir, __FORCELOCAL __ATTR_NONNULL((1)) int __NO
 #undef __rmdir_defined
 #endif /* rmdir... */
 #endif /* !__rmdir_defined */
-#if defined(__CRT_HAVE__mkdir)
+#ifdef __CRT_HAVE__mkdir
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,_mkdir,(char const *__path),(__path))
 #elif defined(__CRT_HAVE_mkdir)
 #include <local/direct/_mkdir.h>
@@ -157,7 +157,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(_mkdir, __FORCELOCAL __ATTR_NONNULL((1)) int __N
 #endif /* _mkdir... */
 #ifndef __mkdir_defined
 #define __mkdir_defined 1
-#if defined(__CRT_HAVE_mkdir)
+#ifdef __CRT_HAVE_mkdir
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,mkdir,(char const *__path),(__path))
 #elif defined(__CRT_HAVE__mkdir)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,mkdir,(char const *__path),_mkdir,(__path))

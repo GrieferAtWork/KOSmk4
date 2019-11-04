@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x23f3bb8f */
+/* HASH CRC-32:0x2217f97b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 /* Dependency: "memmovew" from "string" */
 #ifndef ____localdep_memmovew_defined
 #define ____localdep_memmovew_defined 1
-#if defined(__fast_memmovew_defined)
+#ifdef __fast_memmovew_defined
 /* Move memory between potentially overlapping memory blocks. */
 #define __localdep_memmovew (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmovew))
 #elif defined(__CRT_HAVE_memmovew)
@@ -44,7 +44,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT16_TYPE__
 /* Dependency: "memmovel" from "string" */
 #ifndef ____localdep_memmovel_defined
 #define ____localdep_memmovel_defined 1
-#if defined(__fast_memmovel_defined)
+#ifdef __fast_memmovel_defined
 /* Move memory between potentially overlapping memory blocks. */
 #define __localdep_memmovel (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmovel))
 #elif defined(__CRT_HAVE_memmovel)
@@ -63,7 +63,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__UINT32_TYPE__
 /* Dependency: "memmove" from "string" */
 #ifndef ____localdep_memmove_defined
 #define ____localdep_memmove_defined 1
-#if defined(__fast_memmove_defined)
+#ifdef __fast_memmove_defined
 /* Move memory between potentially overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 #define __localdep_memmove (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmove))

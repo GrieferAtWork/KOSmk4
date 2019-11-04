@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xccf382de */
+/* HASH CRC-32:0xcad7d01b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "wcsnend" from "wchar" */
 #ifndef ____localdep_wcsnend_defined
 #define ____localdep_wcsnend_defined 1
-#if defined(__CRT_HAVE_wcsnend)
+#ifdef __CRT_HAVE_wcsnend
 /* Same as `STR+wcsnlen(STR, MAX_CHARS)' */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wcsnend,(__WCHAR_TYPE__ const *__restrict __string, __SIZE_TYPE__ __maxlen),wcsnend,(__string,__maxlen))
 #else /* LIBC: wcsnend */

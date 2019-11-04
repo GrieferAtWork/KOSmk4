@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf87a95ad */
+/* HASH CRC-32:0xf28a306a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_cnd_wait_defined
-#if defined(__CRT_HAVE_pthread_cond_wait)
+#ifdef __CRT_HAVE_pthread_cond_wait
 #define __local_cnd_wait_defined 1
 #include <bits/threads.h>
 
@@ -26,7 +26,7 @@
 /* Dependency: "pthread_cond_wait" */
 #ifndef ____localdep_pthread_cond_wait_defined
 #define ____localdep_pthread_cond_wait_defined 1
-#if defined(__CRT_HAVE_pthread_cond_wait)
+#ifdef __CRT_HAVE_pthread_cond_wait
 /* Wait for condition variable COND to be signaled or broadcast.
  * MUTEX is assumed to be locked before. */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_pthread_cond_wait,(__pthread_cond_t *__restrict __cond, __pthread_mutex_t *__restrict __mutex),pthread_cond_wait,(__cond,__mutex))

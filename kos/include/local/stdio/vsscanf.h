@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xff97cdb8 */
+/* HASH CRC-32:0xc4d9bff8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "format_vscanf" from "format-printer" */
 #ifndef ____localdep_format_vscanf_defined
 #define ____localdep_format_vscanf_defined 1
-#if defined(__CRT_HAVE_format_vscanf)
+#ifdef __CRT_HAVE_format_vscanf
 /* Generic scanf implementation
  * Taking a regular scanf-style format string and argument, these
  * functions will call the given `SCANNER' function which in
@@ -80,7 +80,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 4)) __ATTR_LIBC_SCANF(4, 0),__SSIZE_TYPE__,,__
 /* Dependency: "unicode_readutf8" from "unicode" */
 #ifndef ____localdep_unicode_readutf8_defined
 #define ____localdep_unicode_readutf8_defined 1
-#if defined(__CRT_HAVE_unicode_readutf8)
+#ifdef __CRT_HAVE_unicode_readutf8
 /* Read a single Unicode character from a given UTF-8 string */
 __CREDIRECT(__ATTR_NONNULL((1)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf8,(/*utf-8*/ char const **__restrict __ptext),unicode_readutf8,(__ptext))
 #else /* LIBC: unicode_readutf8 */
@@ -93,7 +93,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode
 /* Dependency: "unicode_readutf8_rev" from "unicode" */
 #ifndef ____localdep_unicode_readutf8_rev_defined
 #define ____localdep_unicode_readutf8_rev_defined 1
-#if defined(__CRT_HAVE_unicode_readutf8_rev)
+#ifdef __CRT_HAVE_unicode_readutf8_rev
 /* Same as `unicode_readutf8', but read backwards, with `*ptext'
  * starting out as a pointer after the character to be read, before
  * being updated to point to the start of the character that was read */

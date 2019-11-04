@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf4118343 */
+/* HASH CRC-32:0x99fd1bfd */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 /* Dependency: "lfind" from "search" */
 #ifndef ____localdep_lfind_defined
 #define ____localdep_lfind_defined 1
-#if defined(__CRT_HAVE_lfind)
+#ifdef __CRT_HAVE_lfind
 /* Perform linear search for KEY by comparing by COMPAR in an array [BASE, BASE+NMEMB*SIZE) */
 __CREDIRECT(,void *,__NOTHROW_NCX,__localdep_lfind,(void const *__key, void const *__base, __SIZE_TYPE__ *__nmemb, __SIZE_TYPE__ __size, __compar_fn_t __compar),lfind,(__key,__base,__nmemb,__size,__compar))
 #else /* LIBC: lfind */
@@ -38,7 +38,7 @@ __CREDIRECT(,void *,__NOTHROW_NCX,__localdep_lfind,(void const *__key, void cons
 /* Dependency: "memcpy" from "string" */
 #ifndef ____localdep_memcpy_defined
 #define ____localdep_memcpy_defined 1
-#if defined(__fast_memcpy_defined)
+#ifdef __fast_memcpy_defined
 /* Copy memory between non-overlapping memory blocks.
  * @return: * : Always re-returns `dst' */
 #define __localdep_memcpy (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpy))

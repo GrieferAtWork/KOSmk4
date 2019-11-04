@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb82ae442 */
+/* HASH CRC-32:0x85a81daa */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@
 /* Dependency: "pthread_rwlock_timedwrlock32" from "pthread" */
 #ifndef ____localdep_pthread_rwlock_timedwrlock32_defined
 #define ____localdep_pthread_rwlock_timedwrlock32_defined 1
-#if defined(__CRT_HAVE_pthread_rwlock_timedwrlock)
+#ifdef __CRT_HAVE_pthread_rwlock_timedwrlock
 /* Try to acquire write lock for RWLOCK or return after specfied time */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_pthread_rwlock_timedwrlock32,(__pthread_rwlock_t *__restrict __rwlock, struct __timespec32 const *__restrict __abstime),pthread_rwlock_timedwrlock,(__rwlock,__abstime))
 #else /* LIBC: pthread_rwlock_timedwrlock */
@@ -39,7 +39,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_pthread_rwlock_t
 /* Dependency: "pthread_rwlock_timedwrlock64" from "pthread" */
 #ifndef ____localdep_pthread_rwlock_timedwrlock64_defined
 #define ____localdep_pthread_rwlock_timedwrlock64_defined 1
-#if defined(__CRT_HAVE_pthread_rwlock_timedwrlock64)
+#ifdef __CRT_HAVE_pthread_rwlock_timedwrlock64
 /* Try to acquire write lock for RWLOCK or return after specfied time */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_pthread_rwlock_timedwrlock64,(__pthread_rwlock_t *__restrict __rwlock, struct __timespec64 const *__restrict __abstime),pthread_rwlock_timedwrlock64,(__rwlock,__abstime))
 #elif defined(__CRT_HAVE_pthread_rwlock_timedwrlock) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)

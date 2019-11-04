@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1fdfe536 */
+/* HASH CRC-32:0x8e842421 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,12 +18,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_ctermid_r_defined
-#if defined(__CRT_HAVE_ctermid)
+#ifdef __CRT_HAVE_ctermid
 #define __local_ctermid_r_defined 1
 /* Dependency: "ctermid" */
 #ifndef ____localdep_ctermid_defined
 #define ____localdep_ctermid_defined 1
-#if defined(__CRT_HAVE_ctermid)
+#ifdef __CRT_HAVE_ctermid
 __CREDIRECT(,char *,__NOTHROW_NCX,__localdep_ctermid,(char *__s),ctermid,(__s))
 #else /* LIBC: ctermid */
 #undef ____localdep_ctermid_defined

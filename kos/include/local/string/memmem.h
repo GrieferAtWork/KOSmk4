@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd7abdb1f */
+/* HASH CRC-32:0x1074c078 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 /* Dependency: "memchr" from "string" */
 #ifndef ____localdep_memchr_defined
 #define ____localdep_memchr_defined 1
-#if defined(__fast_memchr_defined)
+#ifdef __fast_memchr_defined
 /* Ascendingly search for `NEEDLE', starting at `HAYSTACK'. - Return `NULL' if `NEEDLE' wasn't found. */
 #define __localdep_memchr (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memchr))
 #elif defined(__CRT_HAVE_memchr)
@@ -41,7 +41,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,
 /* Dependency: "memcmp" from "string" */
 #ifndef ____localdep_memcmp_defined
 #define ____localdep_memcmp_defined 1
-#if defined(__fast_memcmp_defined)
+#ifdef __fast_memcmp_defined
 /* Compare memory buffers and return the difference of the first non-matching byte
  * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
  * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'

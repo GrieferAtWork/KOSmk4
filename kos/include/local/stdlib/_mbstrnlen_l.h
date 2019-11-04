@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa16f8f45 */
+/* HASH CRC-32:0x50f827c7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "_mbstrnlen" from "stdlib" */
 #ifndef ____localdep__mbstrnlen_defined
 #define ____localdep__mbstrnlen_defined 1
-#if defined(__CRT_HAVE__mbstrnlen)
+#ifdef __CRT_HAVE__mbstrnlen
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep__mbstrnlen,(char const *__str, __SIZE_TYPE__ __maxlen),_mbstrnlen,(__str,__maxlen))
 #else /* LIBC: _mbstrnlen */
 #include <local/stdlib/_mbstrnlen.h>

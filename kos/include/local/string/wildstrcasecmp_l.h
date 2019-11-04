@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x458e9723 */
+/* HASH CRC-32:0xace9954a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "tolower_l" from "ctype" */
 #ifndef ____localdep_tolower_l_defined
 #define ____localdep_tolower_l_defined 1
-#if defined(__CRT_HAVE_tolower_l)
+#ifdef __CRT_HAVE_tolower_l
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_tolower_l,(int __ch, __locale_t __locale),tolower_l,(__ch,__locale))
 #elif defined(__CRT_HAVE__tolower_l)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_tolower_l,(int __ch, __locale_t __locale),_tolower_l,(__ch,__locale))
@@ -37,7 +37,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_tolower_l,(i
 /* Dependency: "strcasecmp_l" from "string" */
 #ifndef ____localdep_strcasecmp_l_defined
 #define ____localdep_strcasecmp_l_defined 1
-#if defined(__CRT_HAVE_strcasecmp_l)
+#ifdef __CRT_HAVE_strcasecmp_l
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strcasecmp_l,(char const *__s1, char const *__s2, __locale_t __locale),strcasecmp_l,(__s1,__s2,__locale))
 #elif defined(__CRT_HAVE__stricmp_l)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strcasecmp_l,(char const *__s1, char const *__s2, __locale_t __locale),_stricmp_l,(__s1,__s2,__locale))

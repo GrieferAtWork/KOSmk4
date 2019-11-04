@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7fab47ec */
+/* HASH CRC-32:0x2cee12f7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 /* Dependency: "format_vwprintf" from "parts.wchar.format-printer" */
 #ifndef ____localdep_format_vwprintf_defined
 #define ____localdep_format_vwprintf_defined 1
-#if defined(__CRT_HAVE_format_vwprintf)
+#ifdef __CRT_HAVE_format_vwprintf
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings
@@ -211,7 +211,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 3)) __ATTR_LIBC_PRINTF(3, 0),__SSIZE_TYPE__,__NOT
 /* Dependency: "file_wprinter_unlocked" from "wchar" */
 #ifndef ____localdep_file_wprinter_unlocked_defined
 #define ____localdep_file_wprinter_unlocked_defined 1
-#if defined(__CRT_HAVE_file_wprinter_unlocked)
+#ifdef __CRT_HAVE_file_wprinter_unlocked
 /* Same as `file_wprinter()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,,__localdep_file_wprinter_unlocked,(void *__arg, __WCHAR_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter_unlocked,(__arg,__data,__datalen)) __THROWS(...)
 #elif defined(__CRT_HAVE_file_wprinter)

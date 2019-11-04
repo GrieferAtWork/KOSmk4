@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x32a080d2 */
+/* HASH CRC-32:0xeac937ce */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "memrev" from "string" */
 #ifndef ____localdep_memrev_defined
 #define ____localdep_memrev_defined 1
-#if defined(__CRT_HAVE_memrev)
+#ifdef __CRT_HAVE_memrev
 __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memrev,(void *__restrict __base, __SIZE_TYPE__ __n_bytes),memrev,(__base,__n_bytes))
 #else /* LIBC: memrev */
 #include <local/string/memrev.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x12792687 */
+/* HASH CRC-32:0x5ffa4316 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -42,7 +42,7 @@ __SYSDECL_BEGIN
 
 #ifndef __wremove_defined
 #define __wremove_defined 1
-#if defined(__CRT_HAVE_wremove)
+#ifdef __CRT_HAVE_wremove
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wremove,(wchar_t const *__filename),(__filename))
 #elif defined(__CRT_HAVE__wremove)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wremove,(wchar_t const *__filename),_wremove,(__filename))
@@ -50,19 +50,19 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,wremove,(wchar_t const *__file
 #undef __wremove_defined
 #endif /* wremove... */
 #endif /* !__wremove_defined */
-#if defined(__CRT_HAVE_wfopen)
+#ifdef __CRT_HAVE_wfopen
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_NCX,wfopen,(wchar_t const *__filename, wchar_t const *__mode),(__filename,__mode))
 #elif defined(__CRT_HAVE__wfopen)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_NCX,wfopen,(wchar_t const *__filename, wchar_t const *__mode),_wfopen,(__filename,__mode))
 #endif /* wfopen... */
-#if defined(__CRT_HAVE_wfreopen)
+#ifdef __CRT_HAVE_wfreopen
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_NCX,wfreopen,(wchar_t const *__filename, wchar_t const *__mode, __FILE *__stream),(__filename,__mode,__stream))
 #elif defined(__CRT_HAVE__wfreopen)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_NCX,wfreopen,(wchar_t const *__filename, wchar_t const *__mode, __FILE *__stream),_wfreopen,(__filename,__mode,__stream))
 #endif /* wfreopen... */
 #ifndef __wpopen_defined
 #define __wpopen_defined 1
-#if defined(__CRT_HAVE_wpopen)
+#ifdef __CRT_HAVE_wpopen
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_NCX,wpopen,(wchar_t const *__command, wchar_t const *__mode),(__command,__mode))
 #elif defined(__CRT_HAVE__wpopen)
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_NCX,wpopen,(wchar_t const *__command, wchar_t const *__mode),_wpopen,(__command,__mode))

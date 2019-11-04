@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x16e101ea */
+/* HASH CRC-32:0xf24819a3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,12 +18,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_obstack_printf_defined
-#if defined(__CRT_HAVE_obstack_vprintf)
+#ifdef __CRT_HAVE_obstack_vprintf
 #define __local_obstack_printf_defined 1
 /* Dependency: "obstack_vprintf" */
 #ifndef ____localdep_obstack_vprintf_defined
 #define ____localdep_obstack_vprintf_defined 1
-#if defined(__CRT_HAVE_obstack_vprintf)
+#ifdef __CRT_HAVE_obstack_vprintf
 __CREDIRECT(__ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 0),int,__NOTHROW_NCX,__localdep_obstack_vprintf,(struct obstack *__restrict __obstack_, char const *__restrict __format, __builtin_va_list __args),obstack_vprintf,(__obstack_,__format,__args))
 #else /* LIBC: obstack_vprintf */
 #undef ____localdep_obstack_vprintf_defined

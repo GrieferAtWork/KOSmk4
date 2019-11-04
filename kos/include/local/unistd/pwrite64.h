@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc76916cf */
+/* HASH CRC-32:0xd847c442 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "pwrite32" from "unistd" */
 #ifndef ____localdep_pwrite32_defined
 #define ____localdep_pwrite32_defined 1
-#if defined(__CRT_HAVE_pwrite)
+#ifdef __CRT_HAVE_pwrite
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pwrite32,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize, __pos32_t __offset),pwrite,(__fd,__buf,__bufsize,__offset))
 #else /* LIBC: pwrite */
 #undef ____localdep_pwrite32_defined
@@ -33,7 +33,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pwrite32
 /* Dependency: "lseek64" from "unistd" */
 #ifndef ____localdep_lseek64_defined
 #define ____localdep_lseek64_defined 1
-#if defined(__CRT_HAVE_lseek64)
+#ifdef __CRT_HAVE_lseek64
 /* >> lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __CREDIRECT(,__off64_t,__NOTHROW_NCX,__localdep_lseek64,(__fd_t __fd, __off64_t __offset, int __whence),lseek64,(__fd,__offset,__whence))
@@ -58,7 +58,7 @@ __CREDIRECT(,__off64_t,__NOTHROW_NCX,__localdep_lseek64,(__fd_t __fd, __off64_t 
 /* Dependency: "write" */
 #ifndef ____localdep_write_defined
 #define ____localdep_write_defined 1
-#if defined(__CRT_HAVE_write)
+#ifdef __CRT_HAVE_write
 /* >> write(2)
  * Write data to a given file descriptor `FD' and return the number of bytes written */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_write,(__fd_t __fd, void const *__buf, __SIZE_TYPE__ __bufsize),write,(__fd,__buf,__bufsize))
@@ -78,7 +78,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_write,(_
 /* Dependency: "lseek32" from "unistd" */
 #ifndef ____localdep_lseek32_defined
 #define ____localdep_lseek32_defined 1
-#if defined(__CRT_HAVE_lseek)
+#ifdef __CRT_HAVE_lseek
 /* >> lseek32(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __CREDIRECT(,__off32_t,__NOTHROW_NCX,__localdep_lseek32,(__fd_t __fd, __off32_t __offset, int __whence),lseek,(__fd,__offset,__whence))

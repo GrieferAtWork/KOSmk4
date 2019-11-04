@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe8b5f4d */
+/* HASH CRC-32:0x84fd0aab */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,14 +18,14 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_thrd_sleep64_defined
-#if defined(__CRT_HAVE_thrd_sleep)
+#ifdef __CRT_HAVE_thrd_sleep
 #define __local_thrd_sleep64_defined 1
 #include <bits/timespec.h>
 #include <bits/timespec.h>
 /* Dependency: "thrd_sleep32" from "threads" */
 #ifndef ____localdep_thrd_sleep32_defined
 #define ____localdep_thrd_sleep32_defined 1
-#if defined(__CRT_HAVE_thrd_sleep)
+#ifdef __CRT_HAVE_thrd_sleep
 /* Block current thread execution for at least the time pointed by TIME_POINT.
  * The current thread may resume if receives a signal. In that case, if REMAINING
  * is not NULL, the remaining time is stored in the object pointed by it

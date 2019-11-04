@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe3c5abbd */
+/* HASH CRC-32:0x2ae4364d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,12 +18,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__CrtSetDbgFlag_defined
-#if defined(__CRT_HAVE___p__crtDbgFlag)
+#ifdef __CRT_HAVE___p__crtDbgFlag
 #define __local__CrtSetDbgFlag_defined 1
 /* Dependency: "__p__crtDbgFlag" */
 #ifndef ____localdep___p__crtDbgFlag_defined
 #define ____localdep___p__crtDbgFlag_defined 1
-#if defined(__CRT_HAVE___p__crtDbgFlag)
+#ifdef __CRT_HAVE___p__crtDbgFlag
 __CREDIRECT(,int *,__NOTHROW_NCX,__localdep___p__crtDbgFlag,(void),__p__crtDbgFlag,())
 #else /* LIBC: __p__crtDbgFlag */
 #undef ____localdep___p__crtDbgFlag_defined

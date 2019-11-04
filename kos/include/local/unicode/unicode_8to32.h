@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x90fbc91e */
+/* HASH CRC-32:0x4bedfeb5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "unicode_readutf8_n" from "unicode" */
 #ifndef ____localdep_unicode_readutf8_n_defined
 #define ____localdep_unicode_readutf8_n_defined 1
-#if defined(__CRT_HAVE_unicode_readutf8_n)
+#ifdef __CRT_HAVE_unicode_readutf8_n
 /* Same as `unicode_readutf8()', but don't read past `text_end' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__CHAR32_TYPE__,__NOTHROW_NCX,__localdep_unicode_readutf8_n,(/*utf-8*/ char const **__restrict __ptext, char const *__text_end),unicode_readutf8_n,(__ptext,__text_end))
 #else /* LIBC: unicode_readutf8_n */

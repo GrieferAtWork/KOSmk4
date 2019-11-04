@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x735603fe */
+/* HASH CRC-32:0x23e8b3a5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -89,7 +89,7 @@ struct mntent {
 	__INT32_TYPE__ mnt_passno; /* Pass number for `fsck'. */
 };
 
-#if defined(__CRT_HAVE_setmntent)
+#ifdef __CRT_HAVE_setmntent
 /* Prepare to begin reading and/or writing mount table
  * entries from the beginning of FILE.  MODE is as for `fopen' */
 __CDECLARE(__ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,setmntent,(char const *__file, char const *__mode),(__file,__mode))
@@ -98,14 +98,14 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,setmntent,(char const *
  * entries from the beginning of FILE.  MODE is as for `fopen' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__FILE *,__NOTHROW_RPC,setmntent,(char const *__file, char const *__mode),__setmntent,(__file,__mode))
 #endif /* setmntent... */
-#if defined(__CRT_HAVE_getmntent)
+#ifdef __CRT_HAVE_getmntent
 /* Read one mount table entry from STREAM.  Returns a pointer to storage
  * reused on the next call, or null for EOF or error (use feof/ferror to check) */
 __CDECLARE(__ATTR_NONNULL((1)),struct mntent *,__NOTHROW_RPC,getmntent,(__FILE *__stream),(__stream))
 #endif /* getmntent... */
 
 #ifdef __USE_MISC
-#if defined(__CRT_HAVE_getmntent_r)
+#ifdef __CRT_HAVE_getmntent_r
 /* Reentrant version of the above function */
 __CDECLARE(__ATTR_NONNULL((1, 2, 3)),struct mntent *,__NOTHROW_RPC,getmntent_r,(__FILE *__restrict __stream, struct mntent *__restrict __result, char *__restrict __buffer, __STDC_INT_AS_SIZE_T __bufsize),(__stream,__result,__buffer,__bufsize))
 #elif defined(__CRT_HAVE___getmntent_r)
@@ -114,12 +114,12 @@ __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),struct mntent *,__NOTHROW_RPC,getmntent_r,
 #endif /* getmntent_r... */
 #endif /* __USE_MISC */
 
-#if defined(__CRT_HAVE_addmntent)
+#ifdef __CRT_HAVE_addmntent
 /* Write the mount table entry described by MNT to STREAM.
  * Return zero on success, nonzero on failure */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,addmntent,(__FILE *__restrict __stream, struct mntent const *__restrict __mnt),(__stream,__mnt))
 #endif /* addmntent... */
-#if defined(__CRT_HAVE_endmntent)
+#ifdef __CRT_HAVE_endmntent
 /* Close a stream opened with `setmntent' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_NOKOS,endmntent,(__FILE *__stream),(__stream))
 #elif defined(__CRT_HAVE_fclose)
@@ -129,7 +129,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_NOKOS,endmntent,(__FILE *__str
 /* Close a stream opened with `setmntent' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC_NOKOS,endmntent,(__FILE *__stream),__endmntent,(__stream))
 #endif /* endmntent... */
-#if defined(__CRT_HAVE_hasmntopt)
+#ifdef __CRT_HAVE_hasmntopt
 /* Search MNT->mnt_opts for an option matching OPT.
  * Returns the address of the substring, or null if none found */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,char *,__NOTHROW_NCX,hasmntopt,(struct mntent const *__mnt, char const *__opt),(__mnt,__opt))

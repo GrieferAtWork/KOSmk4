@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9c6d6ce5 */
+/* HASH CRC-32:0x73d6d5c0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "_ui64toa_s" from "stdlib" */
 #ifndef ____localdep__ui64toa_s_defined
 #define ____localdep__ui64toa_s_defined 1
-#if defined(__CRT_HAVE__ui64toa_s)
+#ifdef __CRT_HAVE__ui64toa_s
 __CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ui64toa_s,(__UINT64_TYPE__ __val, char *__buf, __SIZE_TYPE__ __bufsize, int __radix),_ui64toa_s,(__val,__buf,__bufsize,__radix))
 #elif defined(__CRT_HAVE_ui64toa_s)
 __CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__ui64toa_s,(__UINT64_TYPE__ __val, char *__buf, __SIZE_TYPE__ __bufsize, int __radix),ui64toa_s,(__val,__buf,__bufsize,__radix))

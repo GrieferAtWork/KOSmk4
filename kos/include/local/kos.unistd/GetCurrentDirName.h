@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7e591f6 */
+/* HASH CRC-32:0xdf13020b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,13 +18,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_GetCurrentDirName_defined
-#if defined(__CRT_HAVE_GetCwd)
+#ifdef __CRT_HAVE_GetCwd
 #define __local_GetCurrentDirName_defined 1
 #include <kos/anno.h>
 /* Dependency: "GetCwd" */
 #ifndef ____localdep_GetCwd_defined
 #define ____localdep_GetCwd_defined 1
-#if defined(__CRT_HAVE_GetCwd)
+#ifdef __CRT_HAVE_GetCwd
 /* >> getcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `chdir(2)' */
 __CREDIRECT(,char *,,__localdep_GetCwd,(char *__buf, __SIZE_TYPE__ __bufsize),GetCwd,(__buf,__bufsize)) __THROWS(...)

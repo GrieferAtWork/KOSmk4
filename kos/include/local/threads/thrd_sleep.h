@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x98e0482b */
+/* HASH CRC-32:0x32f197f9 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 /* Dependency: "thrd_sleep32" from "threads" */
 #ifndef ____localdep_thrd_sleep32_defined
 #define ____localdep_thrd_sleep32_defined 1
-#if defined(__CRT_HAVE_thrd_sleep)
+#ifdef __CRT_HAVE_thrd_sleep
 /* Block current thread execution for at least the time pointed by TIME_POINT.
  * The current thread may resume if receives a signal. In that case, if REMAINING
  * is not NULL, the remaining time is stored in the object pointed by it
@@ -41,7 +41,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_thrd_sleep32,(struc
 /* Dependency: "thrd_sleep64" from "threads" */
 #ifndef ____localdep_thrd_sleep64_defined
 #define ____localdep_thrd_sleep64_defined 1
-#if defined(__CRT_HAVE_thrd_sleep64)
+#ifdef __CRT_HAVE_thrd_sleep64
 /* Block current thread execution for at least the time pointed by TIME_POINT.
  * The current thread may resume if receives a signal. In that case, if REMAINING
  * is not NULL, the remaining time is stored in the object pointed by it

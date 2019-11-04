@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf449952 */
+/* HASH CRC-32:0xa8e8e06 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,7 +39,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHR
 /* Dependency: "rand" from "stdlib" */
 #ifndef ____localdep_rand_defined
 #define ____localdep_rand_defined 1
-#if defined(__CRT_HAVE_rand)
+#ifdef __CRT_HAVE_rand
 __CREDIRECT(,int,__NOTHROW,__localdep_rand,(void),rand,())
 #elif defined(__CRT_HAVE_random) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
 __CREDIRECT(,int,__NOTHROW,__localdep_rand,(void),random,())

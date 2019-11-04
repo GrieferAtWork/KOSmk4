@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc0fca542 */
+/* HASH CRC-32:0x60ee6825 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "strcoll" from "string" */
 #ifndef ____localdep_strcoll_defined
 #define ____localdep_strcoll_defined 1
-#if defined(__CRT_HAVE_strcoll)
+#ifdef __CRT_HAVE_strcoll
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,__localdep_strcoll,(char const *__s1, char const *__s2),strcoll,(__s1,__s2))
 #else /* LIBC: strcoll */
 #include <local/string/strcoll.h>

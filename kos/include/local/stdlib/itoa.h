@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5429c3c2 */
+/* HASH CRC-32:0x44d470e5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "_itoa_s" from "stdlib" */
 #ifndef ____localdep__itoa_s_defined
 #define ____localdep__itoa_s_defined 1
-#if defined(__CRT_HAVE__itoa_s)
+#ifdef __CRT_HAVE__itoa_s
 __CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__itoa_s,(int __val, char *__buf, __SIZE_TYPE__ __bufsize, int __radix),_itoa_s,(__val,__buf,__bufsize,__radix))
 #elif defined(__CRT_HAVE_itoa_s)
 __CREDIRECT(__ATTR_NONNULL((2)),__errno_t,__NOTHROW_NCX,__localdep__itoa_s,(int __val, char *__buf, __SIZE_TYPE__ __bufsize, int __radix),itoa_s,(__val,__buf,__bufsize,__radix))

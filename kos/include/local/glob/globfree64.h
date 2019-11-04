@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdf17e2b1 */
+/* HASH CRC-32:0x4e8734c7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@ struct __glob64_struct;
 /* Dependency: "globfree32" from "glob" */
 #ifndef ____localdep_globfree32_defined
 #define ____localdep_globfree32_defined 1
-#if defined(__CRT_HAVE_globfree)
+#ifdef __CRT_HAVE_globfree
 /* Free storage allocated in PGLOB by a previous `glob' call */
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_globfree32,(void *__pglob),globfree,(__pglob))
 #else /* LIBC: globfree */

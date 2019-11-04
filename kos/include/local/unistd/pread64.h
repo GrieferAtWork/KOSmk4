@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb9b8085b */
+/* HASH CRC-32:0xe9fb77ce */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "pread32" from "unistd" */
 #ifndef ____localdep_pread32_defined
 #define ____localdep_pread32_defined 1
-#if defined(__CRT_HAVE_pread)
+#ifdef __CRT_HAVE_pread
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pread32,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __pos32_t __offset),pread,(__fd,__buf,__bufsize,__offset))
 #else /* LIBC: pread */
 #undef ____localdep_pread32_defined
@@ -33,7 +33,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_pread32,
 /* Dependency: "lseek64" from "unistd" */
 #ifndef ____localdep_lseek64_defined
 #define ____localdep_lseek64_defined 1
-#if defined(__CRT_HAVE_lseek64)
+#ifdef __CRT_HAVE_lseek64
 /* >> lseek64(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __CREDIRECT(,__off64_t,__NOTHROW_NCX,__localdep_lseek64,(__fd_t __fd, __off64_t __offset, int __whence),lseek64,(__fd,__offset,__whence))
@@ -58,7 +58,7 @@ __CREDIRECT(,__off64_t,__NOTHROW_NCX,__localdep_lseek64,(__fd_t __fd, __off64_t 
 /* Dependency: "read" */
 #ifndef ____localdep_read_defined
 #define ____localdep_read_defined 1
-#if defined(__CRT_HAVE_read)
+#ifdef __CRT_HAVE_read
 /* >> read(2)
  * Read data from a given file descriptor `FD' and return the number of bytes read.
  * A return value of ZERO(0) is indicative of EOF */
@@ -81,7 +81,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_read,(__
 /* Dependency: "lseek32" from "unistd" */
 #ifndef ____localdep_lseek32_defined
 #define ____localdep_lseek32_defined 1
-#if defined(__CRT_HAVE_lseek)
+#ifdef __CRT_HAVE_lseek
 /* >> lseek32(2)
  * Change the position of the file read/write pointer within a file referred to by `FD' */
 __CREDIRECT(,__off32_t,__NOTHROW_NCX,__localdep_lseek32,(__fd_t __fd, __off32_t __offset, int __whence),lseek,(__fd,__offset,__whence))

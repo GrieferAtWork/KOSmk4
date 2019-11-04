@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3b57658f */
+/* HASH CRC-32:0x5301c49b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,12 +18,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_mmap64_defined
-#if defined(__CRT_HAVE_mmap)
+#ifdef __CRT_HAVE_mmap
 #define __local_mmap64_defined 1
 /* Dependency: "mmap32" from "sys.mman" */
 #ifndef ____localdep_mmap32_defined
 #define ____localdep_mmap32_defined 1
-#if defined(__CRT_HAVE_mmap)
+#ifdef __CRT_HAVE_mmap
 /* @param prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
  * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|

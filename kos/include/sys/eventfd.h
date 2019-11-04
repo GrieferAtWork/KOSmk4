@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7c9c4bdb */
+/* HASH CRC-32:0x780c03bd */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -61,11 +61,11 @@ __SYSDECL_BEGIN
 typedef uint64_t eventfd_t;
 #endif /* !__eventfd_t_defined */
 
-#if defined(__CRT_HAVE_eventfd)
+#ifdef __CRT_HAVE_eventfd
 /* Return file descriptor for generic event channel. Set initial value to COUNT */
 __CDECLARE(__ATTR_WUNUSED,__fd_t,__NOTHROW_NCX,eventfd,(unsigned int __count, int __flags),(__count,__flags))
 #endif /* eventfd... */
-#if defined(__CRT_HAVE_eventfd_read)
+#ifdef __CRT_HAVE_eventfd_read
 /* Read event counter and possibly wait for events */
 __CDECLARE(,int,__NOTHROW_RPC,eventfd_read,(__fd_t __fd, eventfd_t *__value),(__fd,__value))
 #elif defined(__CRT_HAVE_read) || defined(__CRT_HAVE__read) || defined(__CRT_HAVE___read)
@@ -73,7 +73,7 @@ __CDECLARE(,int,__NOTHROW_RPC,eventfd_read,(__fd_t __fd, eventfd_t *__value),(__
 /* Read event counter and possibly wait for events */
 __NAMESPACE_LOCAL_USING_OR_IMPL(eventfd_read, __FORCELOCAL int __NOTHROW_RPC(__LIBCCALL eventfd_read)(__fd_t __fd, eventfd_t *__value) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(eventfd_read))(__fd, __value); })
 #endif /* eventfd_read... */
-#if defined(__CRT_HAVE_eventfd_write)
+#ifdef __CRT_HAVE_eventfd_write
 /* Increment event counter */
 __CDECLARE(,int,__NOTHROW_RPC,eventfd_write,(__fd_t __fd, eventfd_t __value),(__fd,__value))
 #elif defined(__CRT_HAVE_write) || defined(__CRT_HAVE__write) || defined(__CRT_HAVE___write)

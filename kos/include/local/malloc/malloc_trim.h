@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa20f3cf7 */
+/* HASH CRC-32:0xf046c26 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "_heapmin" from "malloc" */
 #ifndef ____localdep__heapmin_defined
 #define ____localdep__heapmin_defined 1
-#if defined(__CRT_HAVE__heapmin)
+#ifdef __CRT_HAVE__heapmin
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep__heapmin,(void),_heapmin,())
 #else /* LIBC: _heapmin */
 #undef ____localdep__heapmin_defined

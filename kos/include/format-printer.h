@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd05deb81 */
+/* HASH CRC-32:0x34924372 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -62,7 +62,7 @@ typedef __pformatgetc pformatgetc;
 typedef __pformatungetc pformatungetc;
 #endif /* !__pformatprinter_defined */
 
-#if defined(__CRT_HAVE_format_repeat)
+#ifdef __CRT_HAVE_format_repeat
 /* Repeat `CH' a number of `NUM_REPETITIONS' times
  * The usual format-printer rules apply, and this function
  * is allowed to call `PRINTER' as often as it chooses */
@@ -83,7 +83,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_repeat, __FORCELOCAL __ATTR_NONNULL((1)) 
 #define FORMAT_ESCAPE_FNOASCII  0x0010 /* Disable regular ascii-characters and print everything using special encodings. */
 #define FORMAT_ESCAPE_FUPPERHEX 0x0020 /* Use uppercase characters for hex (e.g.: `"\xAB"'). */
 
-#if defined(__CRT_HAVE_format_escape)
+#ifdef __CRT_HAVE_format_escape
 /* Do C-style escape on the given text, printing it to the given printer.
  * Input:
  * >> Hello "World" W
@@ -142,7 +142,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_escape, __FORCELOCAL __ATTR_NONNULL((1)) 
 #define FORMAT_HEXDUMP_QWORDS     0x3000 /* Dump data as qwords (uint64_t). */
 #define FORMAT_HEXDUMP_SIZEMASK   0x3000 /* Mask for the dump size. */
 
-#if defined(__CRT_HAVE_format_hexdump)
+#ifdef __CRT_HAVE_format_hexdump
 /* Print a hex dump of the given data using the provided format printer
  * @param: PRINTER:  A function called for all quoted portions of the text
  * @param: DATA:     A pointer to the data that should be dumped
@@ -170,7 +170,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(format_hexdump, __FORCELOCAL __ATTR_NONNULL((1))
 
 
 
-#if defined(__CRT_HAVE_format_vprintf)
+#ifdef __CRT_HAVE_format_vprintf
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings
@@ -350,7 +350,7 @@ __CDECLARE(__ATTR_NONNULL((1, 3)) __ATTR_LIBC_PRINTF(3, 0),__SSIZE_TYPE__,,forma
  *  - ...               There are a _lot_ more... */
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_vprintf, __FORCELOCAL __ATTR_NONNULL((1, 3)) __ATTR_LIBC_PRINTF(3, 0) __SSIZE_TYPE__ (__LIBCCALL format_vprintf)(pformatprinter __printer, void *__arg, char const *__restrict __format, __builtin_va_list __args) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_vprintf))(__printer, __arg, __format, __args); })
 #endif /* format_vprintf... */
-#if defined(__CRT_HAVE_format_printf)
+#ifdef __CRT_HAVE_format_printf
 /* Generic printf implementation
  * Taking a regular printf-style format string and arguments, these
  * functions will call the given `PRINTER' callback with various strings
@@ -538,7 +538,7 @@ __NAMESPACE_LOCAL_USING(format_printf)
 
 
 
-#if defined(__CRT_HAVE_format_vscanf)
+#ifdef __CRT_HAVE_format_vscanf
 /* Generic scanf implementation
  * Taking a regular scanf-style format string and argument, these
  * functions will call the given `SCANNER' function which in
@@ -590,7 +590,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2, 4)) __ATTR_LIBC_SCANF(4, 0),__SSIZE_TYPE__,,for
  * @return: EOF: `PGETC' returned EOF the first time an attempt at reading was made */
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_vscanf, __FORCELOCAL __ATTR_NONNULL((1, 2, 4)) __ATTR_LIBC_SCANF(4, 0) __SSIZE_TYPE__ (__LIBCCALL format_vscanf)(pformatgetc __pgetc, pformatungetc __pungetc, void *__arg, char const *__restrict __format, __builtin_va_list __args) __THROWS(...) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_vscanf))(__pgetc, __pungetc, __arg, __format, __args); })
 #endif /* format_vscanf... */
-#if defined(__CRT_HAVE_format_scanf)
+#ifdef __CRT_HAVE_format_scanf
 /* Generic scanf implementation
  * Taking a regular scanf-style format string and argument, these
  * functions will call the given `SCANNER' function which in
@@ -649,7 +649,7 @@ __NAMESPACE_LOCAL_USING(format_scanf)
 
 
 
-#if defined(__CRT_HAVE_format_sprintf_printer)
+#ifdef __CRT_HAVE_format_sprintf_printer
 /* Format-printer implementation for printing to a string buffer like `sprintf' would
  * WARNING: No trailing NUL-character is implicitly appended */
 __CDECLARE(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_sprintf_printer,(/*char ***/void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen),(__arg,__data,__datalen))
@@ -672,7 +672,7 @@ struct format_snprintf_data {
 #define FORMAT_SNPRINTF_INIT(buf, bufsize)       { buf, bufsize }
 #define format_snprintf_init(self, buf, bufsize) ((self)->sd_buffer = (buf), (self)->sd_bufsiz = (bufsize))
 
-#if defined(__CRT_HAVE_format_snprintf_printer)
+#ifdef __CRT_HAVE_format_snprintf_printer
 /* Format-printer implementation for printing to a string buffer like `snprintf' would
  * WARNING: No trailing NUL-character is implicitly appended
  * NOTE: The number of written characters is `ORIG_BUFSIZE - ARG->sd_bufsiz'
@@ -686,7 +686,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_snprintf_p
  * NOTE: The number of required characters is `ARG->sd_buffer - ORIG_BUF', or alternatively the sum of return values of all calls to `format_snprintf_printer()' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_snprintf_printer, __FORCELOCAL __ATTR_NONNULL((1, 2)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_snprintf_printer)(/*struct format_snprintf_data**/void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_snprintf_printer))(__arg, __data, __datalen); })
 #endif /* format_snprintf_printer... */
-#if defined(__CRT_HAVE_format_width)
+#ifdef __CRT_HAVE_format_width
 /* Returns the width (number of characters; not bytes) of the given unicode string */
 __CDECLARE(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_width,(void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen),(__arg,__data,__datalen))
 #else /* LIBC: format_width */
@@ -694,7 +694,7 @@ __CDECLARE(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_width,(void *
 /* Returns the width (number of characters; not bytes) of the given unicode string */
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_width, __FORCELOCAL __ATTR_NONNULL((2)) __SSIZE_TYPE__ __NOTHROW_NCX(__LIBCCALL format_width)(void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_width))(__arg, __data, __datalen); })
 #endif /* format_width... */
-#if defined(__CRT_HAVE_format_length)
+#ifdef __CRT_HAVE_format_length
 /* Always re-return `datalen' and ignore all other arguments */
 __CDECLARE(,__SSIZE_TYPE__,__NOTHROW_NCX,format_length,(void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen),(__arg,__data,__datalen))
 #else /* LIBC: format_length */
@@ -738,7 +738,7 @@ struct format_aprintf_data {
 #endif /* __SIZEOF_POINTER__ != ... */
 #endif /* !NDEBUG */
 
-#if defined(__CRT_HAVE_format_aprintf_pack)
+#ifdef __CRT_HAVE_format_aprintf_pack
 /* Pack and finalize a given aprintf format printer
  * Together with `format_aprintf_printer()', the aprintf
  * format printer sub-system should be used as follows:
@@ -784,7 +784,7 @@ __CDECLARE(__ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNU
  *                  (e.g. `format_aprintf_printer(&my_printer, "\0", 1)') */
 __NAMESPACE_LOCAL_USING_OR_IMPL(format_aprintf_pack, __FORCELOCAL __ATTR_MALLOC __ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_NONNULL((1)) char *__NOTHROW_NCX(__LIBCCALL format_aprintf_pack)(struct format_aprintf_data *__restrict __self, __SIZE_TYPE__ *__pstrlen) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(format_aprintf_pack))(__self, __pstrlen); })
 #endif /* format_aprintf_pack... */
-#if defined(__CRT_HAVE_format_aprintf_printer)
+#ifdef __CRT_HAVE_format_aprintf_printer
 /* Print data to a dynamically allocated heap buffer. On error, -1 is returned */
 __CDECLARE(__ATTR_WUNUSED __ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,__NOTHROW_NCX,format_aprintf_printer,(/*struct format_aprintf_data **/void *__arg, /*utf-8*/ char const *__restrict __data, __SIZE_TYPE__ __datalen),(__arg,__data,__datalen))
 #elif defined(__CRT_HAVE_realloc)

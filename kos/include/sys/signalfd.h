@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa5d0b153 */
+/* HASH CRC-32:0x3a9b905e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -81,7 +81,7 @@ struct signalfd_siginfo {
 	uint8_t  __pad[48];
 };
 
-#if defined(__CRT_HAVE_signalfd)
+#ifdef __CRT_HAVE_signalfd
 /* Request notification for delivery of signals in MASK to be performed using descriptor FD */
 __CDECLARE(__ATTR_NONNULL((2)),__fd_t,__NOTHROW_NCX,signalfd,(__fd_t __fd, sigset_t const *__mask, int __flags),(__fd,__mask,__flags))
 #endif /* signalfd... */

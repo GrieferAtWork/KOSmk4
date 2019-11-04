@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf1f1c36f */
+/* HASH CRC-32:0xada7bd9 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_pthread_mutex_timedlock64_defined
-#if defined(__CRT_HAVE_pthread_mutex_timedlock)
+#ifdef __CRT_HAVE_pthread_mutex_timedlock
 #define __local_pthread_mutex_timedlock64_defined 1
 #include <bits/pthreadtypes.h>
 #include <bits/timespec.h>
@@ -28,7 +28,7 @@
 /* Dependency: "pthread_mutex_timedlock32" from "pthread" */
 #ifndef ____localdep_pthread_mutex_timedlock32_defined
 #define ____localdep_pthread_mutex_timedlock32_defined 1
-#if defined(__CRT_HAVE_pthread_mutex_timedlock)
+#ifdef __CRT_HAVE_pthread_mutex_timedlock
 /* Wait until lock becomes available, or specified time passes */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_pthread_mutex_timedlock32,(__pthread_mutex_t *__restrict __mutex, struct __TM_TYPE(timespec) const *__restrict __abstime),pthread_mutex_timedlock,(__mutex,__abstime))
 #else /* LIBC: pthread_mutex_timedlock */

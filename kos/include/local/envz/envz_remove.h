@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfc54928f */
+/* HASH CRC-32:0xce69322 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "envz_entry" from "envz" */
 #ifndef ____localdep_envz_entry_defined
 #define ____localdep_envz_entry_defined 1
-#if defined(__CRT_HAVE_envz_entry)
+#ifdef __CRT_HAVE_envz_entry
 /* Returns a pointer to the entry in `ENVZ' for `NAME', or `NULL' if there is none
  * Note that if `name' contains a `=' character, only characters leading up to this
  * position are actually compared! */
@@ -39,7 +39,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((3)),char *,__NOTHROW_NCX,
 /* Dependency: "argz_delete" from "argz" */
 #ifndef ____localdep_argz_delete_defined
 #define ____localdep_argz_delete_defined 1
-#if defined(__CRT_HAVE_argz_delete)
+#ifdef __CRT_HAVE_argz_delete
 /* Delete `ENTRY' from `PARGZ & PARGZ_LEN', if it appears there
  * Note that `ENTRY' must be the actual pointer to one of the elements
  * of the given `PARGZ & PARGZ_LEN', and not just a string equal to one

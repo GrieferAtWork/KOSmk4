@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf347def9 */
+/* HASH CRC-32:0x987f0da6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "mktemp" */
 #ifndef ____localdep_mktemp_defined
 #define ____localdep_mktemp_defined 1
-#if defined(__CRT_HAVE_mktemp)
+#ifdef __CRT_HAVE_mktemp
 __CREDIRECT(__ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_mktemp,(char *__template_),mktemp,(__template_))
 #elif defined(__CRT_HAVE__mktemp)
 __CREDIRECT(__ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_mktemp,(char *__template_),_mktemp,(__template_))

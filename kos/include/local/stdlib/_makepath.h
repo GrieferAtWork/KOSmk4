@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc7102ce9 */
+/* HASH CRC-32:0x28e7c1a2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "_makepath_s" from "stdlib" */
 #ifndef ____localdep__makepath_s_defined
 #define ____localdep__makepath_s_defined 1
-#if defined(__CRT_HAVE__makepath_s)
+#ifdef __CRT_HAVE__makepath_s
 __CREDIRECT(__ATTR_NONNULL((1)),__errno_t,__NOTHROW_NCX,__localdep__makepath_s,(char *__buf, __SIZE_TYPE__ __buflen, char const *__drive, char const *__dir, char const *__file, char const *__ext),_makepath_s,(__buf,__buflen,__drive,__dir,__file,__ext))
 #else /* LIBC: _makepath_s */
 #include <local/stdlib/_makepath_s.h>

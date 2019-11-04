@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1298b93d */
+/* HASH CRC-32:0x7e236a6f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -35,7 +35,7 @@ __SYSDECL_BEGIN
 #ifdef __CC__
 #ifndef __Ioctl_defined
 #define __Ioctl_defined 1
-#if defined(__CRT_HAVE_Ioctl)
+#ifdef __CRT_HAVE_Ioctl
 /* Perform the I/O control operation specified by REQUEST on FD.
  * One argument may follow; its presence and type depend on REQUEST.
  * Return value depends on REQUEST. Usually -1 indicates error */

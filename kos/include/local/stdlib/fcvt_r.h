@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdb07461 */
+/* HASH CRC-32:0xe75f9efc */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "dos_fcvt_s" from "stdlib" */
 #ifndef ____localdep_dos_fcvt_s_defined
 #define ____localdep_dos_fcvt_s_defined 1
-#if defined(__CRT_HAVE__fcvt_s)
+#ifdef __CRT_HAVE__fcvt_s
 __CREDIRECT(__ATTR_NONNULL((1, 5, 6)),__errno_t,__NOTHROW_NCX,__localdep_dos_fcvt_s,(char *__buf, __SIZE_TYPE__ __buflen, double __val, int __ndigit, int *__restrict __decptr, int *__restrict __sign),_fcvt_s,(__buf,__buflen,__val,__ndigit,__decptr,__sign))
 #else /* LIBC: _fcvt_s */
 #undef ____localdep_dos_fcvt_s_defined

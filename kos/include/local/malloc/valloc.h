@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e80c434 */
+/* HASH CRC-32:0x254fa1cd */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 /* Dependency: "memalign" from "malloc" */
 #ifndef ____localdep_memalign_defined
 #define ____localdep_memalign_defined 1
-#if defined(__CRT_HAVE_memalign)
+#ifdef __CRT_HAVE_memalign
 __CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_ALIGN(1),void *,__NOTHROW_NCX,__localdep_memalign,(__SIZE_TYPE__ __alignment, __SIZE_TYPE__ __n_bytes),memalign,(__alignment,__n_bytes))
 #elif defined(__CRT_HAVE_aligned_alloc)
 __CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_ALIGN(1),void *,__NOTHROW_NCX,__localdep_memalign,(__SIZE_TYPE__ __alignment, __SIZE_TYPE__ __n_bytes),aligned_alloc,(__alignment,__n_bytes))
@@ -39,7 +39,7 @@ __CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2)) __ATTR_ALLOC_ALI
 /* Dependency: "getpagesize" from "unistd" */
 #ifndef ____localdep_getpagesize_defined
 #define ____localdep_getpagesize_defined 1
-#if defined(__CRT_HAVE_getpagesize)
+#ifdef __CRT_HAVE_getpagesize
 /* >> getpagesize(3)
  * Return the size of a PAGE (in bytes) */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_getpagesize,(void),getpagesize,())

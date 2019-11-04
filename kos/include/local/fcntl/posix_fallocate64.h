@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbbc4973d */
+/* HASH CRC-32:0xda017873 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 /* Dependency: "posix_fallocate32" from "fcntl" */
 #ifndef ____localdep_posix_fallocate32_defined
 #define ____localdep_posix_fallocate32_defined 1
-#if defined(__CRT_HAVE_posix_fallocate)
+#ifdef __CRT_HAVE_posix_fallocate
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_posix_fallocate32,(__fd_t __fd, __off32_t __offset, __off32_t __length),posix_fallocate,(__fd,__offset,__length))
 #else /* LIBC: posix_fallocate */
 #undef ____localdep_posix_fallocate32_defined

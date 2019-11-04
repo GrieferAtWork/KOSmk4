@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd7bc2cfa */
+/* HASH CRC-32:0xb0a357cd */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,12 +18,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_setitimer64_defined
-#if defined(__CRT_HAVE_setitimer)
+#ifdef __CRT_HAVE_setitimer
 #define __local_setitimer64_defined 1
 /* Dependency: "setitimer32" from "sys.time" */
 #ifndef ____localdep_setitimer32_defined
 #define ____localdep_setitimer32_defined 1
-#if defined(__CRT_HAVE_setitimer)
+#ifdef __CRT_HAVE_setitimer
 /* Set the timer WHICH to *NEWVAL. If OLDVAL is not NULL, set *OLDVAL to the old value of timer WHICH.
  * Returns 0 on success, -1 on errors */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_setitimer32,(__itimer_which_t __which, struct __itimerval32 const *__restrict __newval, struct __itimerval32 *__restrict __oldval),setitimer,(__which,__newval,__oldval))

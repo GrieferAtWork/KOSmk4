@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x576d8a0e */
+/* HASH CRC-32:0x2ab78e7e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -74,7 +74,7 @@ __CDECLARE(,ssize_t,__NOTHROW_NCX,sendfile,(__fd_t __out_fd, __fd_t __in_fd, off
 __NAMESPACE_LOCAL_USING_OR_IMPL(sendfile, __FORCELOCAL ssize_t __NOTHROW_NCX(__LIBCCALL sendfile)(__fd_t __out_fd, __fd_t __in_fd, off_t *__offset, size_t __count) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(sendfile))(__out_fd, __in_fd, __offset, __count); })
 #endif /* sendfile... */
 #ifdef __USE_LARGEFILE64
-#if defined(__CRT_HAVE_sendfile64)
+#ifdef __CRT_HAVE_sendfile64
 /* Send up to COUNT bytes from file associated with IN_FD starting at *OFFSET
  * to descriptor OUT_FD. Set *OFFSET to the IN_FD's file position following the
  * read bytes. If OFFSET is a null pointer, use the normal file position instead.

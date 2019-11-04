@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd028d79f */
+/* HASH CRC-32:0x4410f0c3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 /* Dependency: "posix_fadvise64" from "fcntl" */
 #ifndef ____localdep_posix_fadvise64_defined
 #define ____localdep_posix_fadvise64_defined 1
-#if defined(__CRT_HAVE_posix_fadvise64)
+#ifdef __CRT_HAVE_posix_fadvise64
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_posix_fadvise64,(__fd_t __fd, __off64_t __offset, __off64_t __length, int __advise),posix_fadvise64,(__fd,__offset,__length,__advise))
 #elif defined(__CRT_HAVE_posix_fadvise) && (__SIZEOF_OFF32_T__ == __SIZEOF_OFF64_T__)
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_posix_fadvise64,(__fd_t __fd, __off64_t __offset, __off64_t __length, int __advise),posix_fadvise,(__fd,__offset,__length,__advise))
@@ -37,7 +37,7 @@ __CREDIRECT(,int,__NOTHROW_NCX,__localdep_posix_fadvise64,(__fd_t __fd, __off64_
 /* Dependency: "posix_fadvise32" from "fcntl" */
 #ifndef ____localdep_posix_fadvise32_defined
 #define ____localdep_posix_fadvise32_defined 1
-#if defined(__CRT_HAVE_posix_fadvise)
+#ifdef __CRT_HAVE_posix_fadvise
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_posix_fadvise32,(__fd_t __fd, __off32_t __offset, __off32_t __length, int __advise),posix_fadvise,(__fd,__offset,__length,__advise))
 #else /* LIBC: posix_fadvise */
 #undef ____localdep_posix_fadvise32_defined

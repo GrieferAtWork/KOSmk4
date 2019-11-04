@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x694885fa */
+/* HASH CRC-32:0xb9244133 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 /* Dependency: "memmovel" from "string" */
 #ifndef ____localdep_memmovel_defined
 #define ____localdep_memmovel_defined 1
-#if defined(__fast_memmovel_defined)
+#ifdef __fast_memmovel_defined
 /* Move memory between potentially overlapping memory blocks. */
 #define __localdep_memmovel (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memmovel))
 #elif defined(__CRT_HAVE_memmovel)

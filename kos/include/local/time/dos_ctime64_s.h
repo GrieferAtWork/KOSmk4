@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc0e5a95e */
+/* HASH CRC-32:0x67b7c377 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,12 +18,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_dos_ctime64_s_defined
-#if defined(__CRT_HAVE__gmtime32_s)
+#ifdef __CRT_HAVE__gmtime32_s
 #define __local_dos_ctime64_s_defined 1
 /* Dependency: "dos_ctime32_s" from "time" */
 #ifndef ____localdep_dos_ctime32_s_defined
 #define ____localdep_dos_ctime32_s_defined 1
-#if defined(__CRT_HAVE__ctime32_s)
+#ifdef __CRT_HAVE__ctime32_s
 /* Equivalent to `asctime_s(buf, bufsize, localtime_r(timer, *TMP*))' */
 __CREDIRECT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,__localdep_dos_ctime32_s,(char __buf[26], __SIZE_TYPE__ __bufsize, __time32_t const *__restrict __timer),_ctime32_s,(__buf,__bufsize,__timer))
 #else /* LIBC: _ctime32_s */

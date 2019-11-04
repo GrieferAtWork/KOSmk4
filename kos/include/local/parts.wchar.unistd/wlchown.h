@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd6f47025 */
+/* HASH CRC-32:0x3eb2fe1d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "wfchownat" from "parts.wchar.unistd" */
 #ifndef ____localdep_wfchownat_defined
 #define ____localdep_wfchownat_defined 1
-#if defined(__CRT_HAVE_wfchownat)
+#ifdef __CRT_HAVE_wfchownat
 /* >> wfchownat(2)
  * Change the ownership of a given `DFD:FILE' to `GROUP:OWNER' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_wfchownat,(__fd_t __dfd, __WCHAR_TYPE__ const *__file, __uid_t __owner, __gid_t __group, __atflag_t __flags),wfchownat,(__dfd,__file,__owner,__group,__flags))

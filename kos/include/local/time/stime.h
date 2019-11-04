@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd236dfbd */
+/* HASH CRC-32:0xd0b7b331 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "stime32" from "time" */
 #ifndef ____localdep_stime32_defined
 #define ____localdep_stime32_defined 1
-#if defined(__CRT_HAVE_stime)
+#ifdef __CRT_HAVE_stime
 /* Set the system time to *WHEN. This call is restricted to the superuser */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_stime32,(__time32_t const *__when),stime,(__when))
 #else /* LIBC: stime */
@@ -34,7 +34,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_stime32,(__time32_t
 /* Dependency: "stime64" from "time" */
 #ifndef ____localdep_stime64_defined
 #define ____localdep_stime64_defined 1
-#if defined(__CRT_HAVE_stime64)
+#ifdef __CRT_HAVE_stime64
 /* Set the system time to *WHEN. This call is restricted to the superuser */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_stime64,(__time64_t const *__when),stime64,(__when))
 #elif defined(__CRT_HAVE_stime) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)

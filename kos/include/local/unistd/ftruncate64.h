@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6e345e8c */
+/* HASH CRC-32:0x833aaaba */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "ftruncate32" from "unistd" */
 #ifndef ____localdep_ftruncate32_defined
 #define ____localdep_ftruncate32_defined 1
-#if defined(__CRT_HAVE_ftruncate)
+#ifdef __CRT_HAVE_ftruncate
 /* >> ftruncate(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate32,(__fd_t __fd, __pos32_t __length),ftruncate,(__fd,__length))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe26059eb */
+/* HASH CRC-32:0x8e62c175 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "wgetcwd" from "parts.wchar.unistd" */
 #ifndef ____localdep_wgetcwd_defined
 #define ____localdep_wgetcwd_defined 1
-#if defined(__CRT_HAVE_wgetcwd)
+#ifdef __CRT_HAVE_wgetcwd
 /* >> wgetcwd(2)
  * Return the path of the current working directory, relative to the filesystem root set by `wchdir(2)' */
 __CREDIRECT(,__WCHAR_TYPE__ *,__NOTHROW_RPC,__localdep_wgetcwd,(__WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __bufsize),wgetcwd,(__buf,__bufsize))

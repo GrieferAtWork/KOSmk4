@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1ca80704 */
+/* HASH CRC-32:0x997325cc */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 /* Dependency: "fileno_unlocked" from "stdio" */
 #ifndef ____localdep_fileno_unlocked_defined
 #define ____localdep_fileno_unlocked_defined 1
-#if defined(__CRT_HAVE_fileno_unlocked)
+#ifdef __CRT_HAVE_fileno_unlocked
 /* Same as `fileno()', but performs I/O without acquiring a lock to `STREAM' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,__localdep_fileno_unlocked,(__FILE *__restrict __stream),fileno_unlocked,(__stream))
 #elif defined(__CRT_HAVE__fileno)
@@ -41,7 +41,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,__NOTHROW_NCX,__localdep_f
 /* Dependency: "ftruncate64" from "unistd" */
 #ifndef ____localdep_ftruncate64_defined
 #define ____localdep_ftruncate64_defined 1
-#if defined(__CRT_HAVE_ftruncate64)
+#ifdef __CRT_HAVE_ftruncate64
 /* >> ftruncate64(2)
  * Truncate the given file `FD' to a length of `LENGTH' */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_ftruncate64,(__fd_t __fd, __PIO_OFFSET64 __length),ftruncate64,(__fd,__length))

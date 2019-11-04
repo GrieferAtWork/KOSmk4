@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x27bcf03d */
+/* HASH CRC-32:0x2f58b2e5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "difftime32" from "time" */
 #ifndef ____localdep_difftime32_defined
 #define ____localdep_difftime32_defined 1
-#if defined(__CRT_HAVE_difftime)
+#ifdef __CRT_HAVE_difftime
 /* Return the difference between TIME1 and TIME0 */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,__localdep_difftime32,(__time32_t __time1, __time32_t __time0),difftime,(__time1,__time0))
 #elif defined(__CRT_HAVE__difftime32)

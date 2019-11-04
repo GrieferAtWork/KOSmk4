@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x850c761a */
+/* HASH CRC-32:0xddaeaf4e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 /* Dependency: "fcntl" */
 #ifndef ____localdep_fcntl_defined
 #define ____localdep_fcntl_defined 1
-#if defined(__CRT_HAVE_fcntl)
+#ifdef __CRT_HAVE_fcntl
 __CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_fcntl,(__fd_t __fd, int __cmd),fcntl,(__fd,__cmd),__cmd,1,(void *))
 #elif defined(__CRT_HAVE___fcntl)
 __CVREDIRECT(,__STDC_INT_AS_SSIZE_T,__NOTHROW_NCX,__localdep_fcntl,(__fd_t __fd, int __cmd),__fcntl,(__fd,__cmd),__cmd,1,(void *))

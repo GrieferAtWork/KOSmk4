@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2a32cb92 */
+/* HASH CRC-32:0x20ae0422 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "link" from "unistd" */
 #ifndef ____localdep_link_defined
 #define ____localdep_link_defined 1
-#if defined(__CRT_HAVE_link)
+#ifdef __CRT_HAVE_link
 /* >> link(2)
  * Create a hard link from `FROM', leading to `TO' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_link,(char const *__from, char const *__to),link,(__from,__to))

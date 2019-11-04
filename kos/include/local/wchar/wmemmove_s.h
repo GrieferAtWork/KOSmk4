@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf4689cf3 */
+/* HASH CRC-32:0xb4ffcefe */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "wmemmove" from "wchar" */
 #ifndef ____localdep_wmemmove_defined
 #define ____localdep_wmemmove_defined 1
-#if defined(__CRT_HAVE_wmemmove)
+#ifdef __CRT_HAVE_wmemmove
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemmove,(__WCHAR_TYPE__ *__dst, __WCHAR_TYPE__ const *__src, __SIZE_TYPE__ __num_chars),wmemmove,(__dst,__src,__num_chars))
 #elif defined(__CRT_HAVE_memmovew) && (__SIZEOF_WCHAR_T__ == 2)
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wmemmove,(__WCHAR_TYPE__ *__dst, __WCHAR_TYPE__ const *__src, __SIZE_TYPE__ __num_chars),memmovew,(__dst,__src,__num_chars))

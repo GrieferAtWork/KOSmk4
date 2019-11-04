@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa7d5012c */
+/* HASH CRC-32:0x7f536165 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@ struct __glob64_struct;
 /* Dependency: "glob32" from "glob" */
 #ifndef ____localdep_glob32_defined
 #define ____localdep_glob32_defined 1
-#if defined(__CRT_HAVE_glob)
+#ifdef __CRT_HAVE_glob
 /* Do glob searching for PATTERN, placing results in PGLOB.
  * The bits defined above may be set in FLAGS.
  * If a directory cannot be opened or read and ERRFUNC is not nil,

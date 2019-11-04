@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7a03985 */
+/* HASH CRC-32:0x90d899b5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 /* Dependency: "fgetwc_unlocked" */
 #ifndef ____localdep_fgetwc_unlocked_defined
 #define ____localdep_fgetwc_unlocked_defined 1
-#if defined(__CRT_HAVE_fgetwc_unlocked)
+#ifdef __CRT_HAVE_fgetwc_unlocked
 __CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,,__localdep_fgetwc_unlocked,(__FILE *__restrict __stream),fgetwc_unlocked,(__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE__fgetwc_nolock)
 __CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,,__localdep_fgetwc_unlocked,(__FILE *__restrict __stream),_fgetwc_nolock,(__stream)) __THROWS(...)
@@ -37,7 +37,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),__WINT_TYPE__,,__localdep_fgetwc_unlocked,(__FIL
 /* Dependency: "ferror_unlocked" from "stdio" */
 #ifndef ____localdep_ferror_unlocked_defined
 #define ____localdep_ferror_unlocked_defined 1
-#if defined(__CRT_HAVE_ferror_unlocked)
+#ifdef __CRT_HAVE_ferror_unlocked
 /* Same as `ferror()', but performs I/O without acquiring a lock to `STREAM' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror_unlocked,(__FILE *__restrict __stream),ferror_unlocked,(__stream))
 #elif defined(__CRT_HAVE_ferror)
@@ -51,7 +51,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferr
 /* Dependency: "ungetwc_unlocked" */
 #ifndef ____localdep_ungetwc_unlocked_defined
 #define ____localdep_ungetwc_unlocked_defined 1
-#if defined(__CRT_HAVE_ungetwc_unlocked)
+#ifdef __CRT_HAVE_ungetwc_unlocked
 __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_ungetwc_unlocked,(__WINT_TYPE__ __ch, __FILE *__restrict __stream),ungetwc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE_ungetwc)
 __CREDIRECT(__ATTR_NONNULL((2)),__WINT_TYPE__,__NOTHROW_NCX,__localdep_ungetwc_unlocked,(__WINT_TYPE__ __ch, __FILE *__restrict __stream),ungetwc,(__ch,__stream))

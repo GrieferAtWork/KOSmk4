@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x2ca2e648 */
+/* HASH CRC-32:0xbe6c4100 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 /* Dependency: "memcpyl" from "string" */
 #ifndef ____localdep_memcpyl_defined
 #define ____localdep_memcpyl_defined 1
-#if defined(__fast_memcpyl_defined)
+#ifdef __fast_memcpyl_defined
 /* Copy memory between non-overlapping memory blocks. */
 #define __localdep_memcpyl (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memcpyl))
 #elif defined(__CRT_HAVE_memcpyl)

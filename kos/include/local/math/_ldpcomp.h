@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe88ae4b5 */
+/* HASH CRC-32:0xd0b2cdc */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,12 +18,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__ldpcomp_defined
-#if defined(__CRT_HAVE__dpcomp)
+#ifdef __CRT_HAVE__dpcomp
 #define __local__ldpcomp_defined 1
 /* Dependency: "_dpcomp" from "math" */
 #ifndef ____localdep__dpcomp_defined
 #define ____localdep__dpcomp_defined 1
-#if defined(__CRT_HAVE__dpcomp)
+#ifdef __CRT_HAVE__dpcomp
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep__dpcomp,(double __x, double __y),_dpcomp,(__x,__y))
 #else /* LIBC: _dpcomp */
 #undef ____localdep__dpcomp_defined

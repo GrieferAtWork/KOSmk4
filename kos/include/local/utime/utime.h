@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfda46ff */
+/* HASH CRC-32:0xb9f508c3 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "crt_utime32" from "utime" */
 #ifndef ____localdep_crt_utime32_defined
 #define ____localdep_crt_utime32_defined 1
-#if defined(__CRT_HAVE_utime)
+#ifdef __CRT_HAVE_utime
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_utime32,(char const *__filename, struct __utimbuf32 const *__file_times),utime,(__filename,__file_times))
 #elif defined(__CRT_HAVE__utime32)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_utime32,(char const *__filename, struct __utimbuf32 const *__file_times),_utime32,(__filename,__file_times))
@@ -35,7 +35,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_crt_utime32,(char c
 /* Dependency: "utime64" from "utime" */
 #ifndef ____localdep_utime64_defined
 #define ____localdep_utime64_defined 1
-#if defined(__CRT_HAVE_utime64)
+#ifdef __CRT_HAVE_utime64
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_utime64,(char const *__filename, struct utimbuf64 const *__file_times),utime64,(__filename,__file_times))
 #elif defined(__CRT_HAVE__utime64)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_utime64,(char const *__filename, struct utimbuf64 const *__file_times),_utime64,(__filename,__file_times))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x71a5d945 */
+/* HASH CRC-32:0x74205a06 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "readlinkat" */
 #ifndef ____localdep_readlinkat_defined
 #define ____localdep_readlinkat_defined 1
-#if defined(__CRT_HAVE_readlinkat)
+#ifdef __CRT_HAVE_readlinkat
 /* >> readlinkat(2)
  * Read the text of a symbolic link under `DFD:PATH' into the provided buffer.
  * WARNING: This function is badly designed and will neither append a trailing

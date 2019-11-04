@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf41c9515 */
+/* HASH CRC-32:0x7d1c2c4 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "memrxendl" from "string" */
 #ifndef ____localdep_memrxendl_defined
 #define ____localdep_memrxendl_defined 1
-#if defined(__CRT_HAVE_memrxendl)
+#ifdef __CRT_HAVE_memrxendl
 /* Same as `memrendl', but search for non-matching locations. */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__UINT32_TYPE__ *,__NOTHROW_NCX,__localdep_memrxendl,(void const *__restrict __haystack, __UINT32_TYPE__ __dword, __SIZE_TYPE__ __n_dwords),memrxendl,(__haystack,__dword,__n_dwords))
 #else /* LIBC: memrxendl */

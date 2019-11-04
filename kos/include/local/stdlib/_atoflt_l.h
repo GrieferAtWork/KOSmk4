@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfb3977ca */
+/* HASH CRC-32:0x738403f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "strtof_l" from "stdlib" */
 #ifndef ____localdep_strtof_l_defined
 #define ____localdep_strtof_l_defined 1
-#if defined(__CRT_HAVE_strtof_l)
+#ifdef __CRT_HAVE_strtof_l
 __CREDIRECT(__ATTR_NONNULL((1)),float,__NOTHROW_NCX,__localdep_strtof_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),strtof_l,(__nptr,__endptr,__locale))
 #elif defined(__CRT_HAVE__strtof_l)
 __CREDIRECT(__ATTR_NONNULL((1)),float,__NOTHROW_NCX,__localdep_strtof_l,(char const *__restrict __nptr, char **__endptr, __locale_t __locale),_strtof_l,(__nptr,__endptr,__locale))

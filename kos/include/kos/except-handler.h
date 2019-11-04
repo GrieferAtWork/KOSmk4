@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xef48a12d */
+/* HASH CRC-32:0xadfb082f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -224,7 +224,7 @@ __SYSDECL_BEGIN
 typedef __except_handler_t except_handler_t;
 #endif /* !__except_handler_t_defined */
 
-#if defined(__CRT_HAVE_set_exception_handler)
+#ifdef __CRT_HAVE_set_exception_handler
 /* Set the exception handler mode for the calling thread.
  * Examples:
  *     Set mode #1: set_exception_handler(EXCEPT_HANDLER_MODE_DISABLED, NULL, NULL)
@@ -242,7 +242,7 @@ typedef __except_handler_t except_handler_t;
  * @return: -1:EINVAL: The given MODE is invalid */
 __CDECLARE(,int,__NOTHROW,set_exception_handler,(int __mode, except_handler_t __handler, void *__handler_sp),(__mode,__handler,__handler_sp))
 #endif /* set_exception_handler... */
-#if defined(__CRT_HAVE_get_exception_handler)
+#ifdef __CRT_HAVE_get_exception_handler
 /* Get the current exception handler mode for the calling thread.
  * @param: PMODE:       When non-NULL, store the current mode, which is encoded as:
  *                       - One of `EXCEPT_HANDLER_MODE_(DISABLED|ENABLED|SIGHAND)'

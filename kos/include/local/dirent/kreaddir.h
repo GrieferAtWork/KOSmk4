@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc80fd074 */
+/* HASH CRC-32:0x3443203f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "kreaddirf" */
 #ifndef ____localdep_kreaddirf_defined
 #define ____localdep_kreaddirf_defined 1
-#if defined(__CRT_HAVE_kreaddirf)
+#ifdef __CRT_HAVE_kreaddirf
 /* The KOS-specific system call for reading a single directory entry
  * from a file descriptor referring to an open directory stream.
  * @param: MODE: One of `READDIR_*' (See below)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x33418195 */
+/* HASH CRC-32:0x5564ae3a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -55,7 +55,7 @@ __SYSDECL_BEGIN
 #ifdef __CC__
 
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_ENVZ_H_PROTO)
-#if defined(__CRT_HAVE_envz_entry)
+#ifdef __CRT_HAVE_envz_entry
 extern "C++" {
 /* Returns a pointer to the entry in `ENVZ' for `NAME', or `NULL' if there is none
  * Note that if `name' contains a `=' character, only characters leading up to this
@@ -80,7 +80,7 @@ __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((3)) char const *__NOTHRO
 }
 #endif /* envz_entry... */
 #else /* __cplusplus && __CORRECT_ISO_CPP_ENVZ_H_PROTO */
-#if defined(__CRT_HAVE_envz_entry)
+#ifdef __CRT_HAVE_envz_entry
 /* Returns a pointer to the entry in `ENVZ' for `NAME', or `NULL' if there is none
  * Note that if `name' contains a `=' character, only characters leading up to this
  * position are actually compared! */
@@ -94,7 +94,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(envz_entry, __FORCELOCAL __ATTR_PURE __ATTR_WUNU
 #endif /* envz_entry... */
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_ENVZ_H_PROTO */
 #if defined(__cplusplus) && defined(__CORRECT_ISO_CPP_ENVZ_H_PROTO)
-#if defined(__CRT_HAVE_envz_get)
+#ifdef __CRT_HAVE_envz_get
 extern "C++" {
 /* Returns a pointer to the value portion of the entry
  * in `ENVZ' for `NAME', or `NULL' if there is none. */
@@ -115,7 +115,7 @@ __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED char const *__NOTHROW_NCX(__LIBCCALL env
 }
 #endif /* envz_get... */
 #else /* __cplusplus && __CORRECT_ISO_CPP_ENVZ_H_PROTO */
-#if defined(__CRT_HAVE_envz_get)
+#ifdef __CRT_HAVE_envz_get
 /* Returns a pointer to the value portion of the entry
  * in `ENVZ' for `NAME', or `NULL' if there is none. */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,char *,__NOTHROW_NCX,envz_get,(char const *__restrict __envz, size_t __envz_len, char const *__restrict __name),(__envz,__envz_len,__name))
@@ -126,7 +126,7 @@ __CDECLARE(__ATTR_PURE __ATTR_WUNUSED,char *,__NOTHROW_NCX,envz_get,(char const 
 __NAMESPACE_LOCAL_USING_OR_IMPL(envz_get, __FORCELOCAL __ATTR_PURE __ATTR_WUNUSED char *__NOTHROW_NCX(__LIBCCALL envz_get)(char const *__restrict __envz, size_t __envz_len, char const *__restrict __name) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(envz_get))(__envz, __envz_len, __name); })
 #endif /* envz_get... */
 #endif /* !__cplusplus || !__CORRECT_ISO_CPP_ENVZ_H_PROTO */
-#if defined(__CRT_HAVE_envz_add)
+#ifdef __CRT_HAVE_envz_add
 /* Adds an entry for `NAME' with value `VALUE' to `ENVZ & ENVZ_LEN'. If an entry
  * with the same name already exists in `ENVZ', it is removed. If `VALUE' is
  * `NULL', then the new entry will not have a value portion, meaning that `envz_get()'
@@ -144,7 +144,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2, 3)),error_t,__NOTHROW_NCX,envz_add,(char **__re
  * entry in the other one. Such entries can be removed with `envz_strip()' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(envz_add, __FORCELOCAL __ATTR_NONNULL((1, 2, 3)) error_t __NOTHROW_NCX(__LIBCCALL envz_add)(char **__restrict __penvz, size_t *__restrict __penvz_len, char const *__restrict __name, char const *__value) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(envz_add))(__penvz, __penvz_len, __name, __value); })
 #endif /* envz_add... */
-#if defined(__CRT_HAVE_envz_merge)
+#ifdef __CRT_HAVE_envz_merge
 /* Adds each entry in `ENVZ2' to `ENVZ & ENVZ_LEN', as if with `envz_add()'.
  * If `OVERRIDE' is true, then values in `ENVZ2' will supersede those
  * with the same name in `ENV', otherwise they don't */
@@ -156,7 +156,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2, 3)),error_t,__NOTHROW_NCX,envz_merge,(char **__
  * with the same name in `ENV', otherwise they don't */
 __NAMESPACE_LOCAL_USING_OR_IMPL(envz_merge, __FORCELOCAL __ATTR_NONNULL((1, 2, 3)) error_t __NOTHROW_NCX(__LIBCCALL envz_merge)(char **__restrict __penvz, size_t *__restrict __penvz_len, char const *__restrict __envz2, size_t __envz2_len, int __override_) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(envz_merge))(__penvz, __penvz_len, __envz2, __envz2_len, __override_); })
 #endif /* envz_merge... */
-#if defined(__CRT_HAVE_envz_remove)
+#ifdef __CRT_HAVE_envz_remove
 /* Remove the entry for `NAME' from `ENVZ & ENVZ_LEN', if any */
 __CDECLARE_VOID(__ATTR_NONNULL((1, 2, 3)),__NOTHROW_NCX,envz_remove,(char **__restrict __penvz, size_t *__restrict __penvz_len, char const *__restrict __name),(__penvz,__penvz_len,__name))
 #else /* LIBC: envz_remove */
@@ -164,7 +164,7 @@ __CDECLARE_VOID(__ATTR_NONNULL((1, 2, 3)),__NOTHROW_NCX,envz_remove,(char **__re
 /* Remove the entry for `NAME' from `ENVZ & ENVZ_LEN', if any */
 __NAMESPACE_LOCAL_USING_OR_IMPL(envz_remove, __FORCELOCAL __ATTR_NONNULL((1, 2, 3)) void __NOTHROW_NCX(__LIBCCALL envz_remove)(char **__restrict __penvz, size_t *__restrict __penvz_len, char const *__restrict __name) { (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(envz_remove))(__penvz, __penvz_len, __name); })
 #endif /* envz_remove... */
-#if defined(__CRT_HAVE_envz_strip)
+#ifdef __CRT_HAVE_envz_strip
 /* Remove entries that have no value attached */
 __CDECLARE_VOID(__ATTR_NONNULL((1, 2)),__NOTHROW_NCX,envz_strip,(char **__restrict __penvz, size_t *__restrict __penvz_len),(__penvz,__penvz_len))
 #else /* LIBC: envz_strip */

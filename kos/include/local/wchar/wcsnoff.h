@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbfc9607d */
+/* HASH CRC-32:0x37184979 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "wcsnchrnul" from "wchar" */
 #ifndef ____localdep_wcsnchrnul_defined
 #define ____localdep_wcsnchrnul_defined 1
-#if defined(__CRT_HAVE_wcsnchrnul)
+#ifdef __CRT_HAVE_wcsnchrnul
 /* Same as `wcsnchr', but return `wcsnend(STR, MAX_CHARS)', rather than `NULL' if `NEEDLE' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__WCHAR_TYPE__ *,__NOTHROW_NCX,__localdep_wcsnchrnul,(__WCHAR_TYPE__ const *__restrict __haystack, __WCHAR_TYPE__ __needle, __SIZE_TYPE__ __maxlen),wcsnchrnul,(__haystack,__needle,__maxlen))
 #else /* LIBC: wcsnchrnul */

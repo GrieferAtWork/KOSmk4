@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x626b56a */
+/* HASH CRC-32:0x8f24d45c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@
 /* Dependency: "unicode_c8toc16" from "unicode" */
 #ifndef ____localdep_unicode_c8toc16_defined
 #define ____localdep_unicode_c8toc16_defined 1
-#if defined(__CRT_HAVE_unicode_c8toc16)
+#ifdef __CRT_HAVE_unicode_c8toc16
 /* @return: *:          Success (*pc16 was filled; the return value is the number of bytes taken from `s')
  * @return: 0:          Success (*pc16 was filled; `mbs' was modified, but nothing was read from `s'; in this case, a surrogate was written)
  * @return: (size_t)-1: Unicode error (the given input string isn't a valid unicode sequence)

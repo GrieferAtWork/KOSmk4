@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x330fa72e */
+/* HASH CRC-32:0x412773f4 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "_mbstowcs_s_l" from "stdlib" */
 #ifndef ____localdep__mbstowcs_s_l_defined
 #define ____localdep__mbstowcs_s_l_defined 1
-#if defined(__CRT_HAVE__mbstowcs_s_l)
+#ifdef __CRT_HAVE__mbstowcs_s_l
 __CREDIRECT(,__errno_t,__NOTHROW_NCX,__localdep__mbstowcs_s_l,(__SIZE_TYPE__ *__presult, __WCHAR_TYPE__ *__buf, __SIZE_TYPE__ __buflen, char const *__src, __SIZE_TYPE__ __maxlen, __locale_t __locale),_mbstowcs_s_l,(__presult,__buf,__buflen,__src,__maxlen,__locale))
 #else /* LIBC: _mbstowcs_s_l */
 #include <local/stdlib/_mbstowcs_s_l.h>

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc774cd6e */
+/* HASH CRC-32:0xe01f7d71 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -28,7 +28,7 @@
 /* Dependency: "futex_wakemask" from "kos.futex" */
 #ifndef ____localdep_futex_wakemask_defined
 #define ____localdep_futex_wakemask_defined 1
-#if defined(__CRT_HAVE_futex_wakemask)
+#ifdef __CRT_HAVE_futex_wakemask
 /* Similar to `futex_wake()', however once there are no more threads that
  * can be awoken, perform the following operation: `*uaddr = (*uaddr & mask_and) | mask_or'
  * @return: * : The number of woken threads

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x92c74b2d */
+/* HASH CRC-32:0xba8d67ef */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "strerror_s" from "string" */
 #ifndef ____localdep_strerror_s_defined
 #define ____localdep_strerror_s_defined 1
-#if defined(__CRT_HAVE_strerror_s)
+#ifdef __CRT_HAVE_strerror_s
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW,__localdep_strerror_s,(int __errnum),strerror_s,(__errnum))
 #else /* LIBC: strerror_s */
 #include <local/string/strerror_s.h>
@@ -50,7 +50,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1, 2)),char *,__NOTHRO
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Return the number of written characters, excluding a trailing NUL-character */
 __FORCELOCAL __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL __localdep_sprintf)(char *__restrict __buf, char const *__restrict __format, ...) { return __builtin_sprintf(__buf, __format, __builtin_va_arg_pack()); }
-#elif defined(__CRT_HAVE_sprintf) && !defined(__NO_ASMNAME)
+#elif defined(__CRT_HAVE_sprintf) && (!defined(__NO_ASMNAME))
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Return the number of written characters, excluding a trailing NUL-character */
 __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL __localdep_sprintf)(char *__restrict __buf, char const *__restrict __format, ...) __CASMNAME("sprintf");

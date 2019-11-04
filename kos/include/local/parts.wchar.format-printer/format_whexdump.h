@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x221832dc */
+/* HASH CRC-32:0x6d3624bd */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -29,7 +29,7 @@
 /* Dependency: "format_wrepeat" from "parts.wchar.format-printer" */
 #ifndef ____localdep_format_wrepeat_defined
 #define ____localdep_format_wrepeat_defined 1
-#if defined(__CRT_HAVE_format_wrepeat)
+#ifdef __CRT_HAVE_format_wrepeat
 /* Repeat `CH' a number of `NUM_REPETITIONS' times
  * The usual format-printer rules apply, and this function
  * is allowed to call `PRINTER' as often as it chooses */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb5fb0aec */
+/* HASH CRC-32:0x647b2dc2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -41,13 +41,13 @@ __SYSDECL_BEGIN
 
 #if defined(__CRT_HAVE_wutime) && (__SIZEOF_WCHAR_T__ == 2)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16utime,(char16_t const *__filename, struct utimbuf const *__file_times),wutime,(__filename,__file_times))
-#elif defined(__CRT_HAVE_wutime64) && (defined(__USE_TIME_BITS64) && (__SIZEOF_WCHAR_T__ == 2))
+#elif defined(__CRT_HAVE_wutime64) && defined(__USE_TIME_BITS64) && (__SIZEOF_WCHAR_T__ == 2)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16utime,(char16_t const *__filename, struct utimbuf const *__file_times),wutime64,(__filename,__file_times))
-#elif defined(__CRT_HAVE__wutime64) && (defined(__USE_TIME_BITS64) && (__SIZEOF_WCHAR_T__ == 2))
+#elif defined(__CRT_HAVE__wutime64) && defined(__USE_TIME_BITS64) && (__SIZEOF_WCHAR_T__ == 2)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16utime,(char16_t const *__filename, struct utimbuf const *__file_times),_wutime64,(__filename,__file_times))
-#elif defined(__CRT_HAVE_wutime) && (!defined(__USE_TIME_BITS64) && (__SIZEOF_WCHAR_T__ == 2))
+#elif defined(__CRT_HAVE_wutime) && !defined(__USE_TIME_BITS64) && (__SIZEOF_WCHAR_T__ == 2)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16utime,(char16_t const *__filename, struct utimbuf const *__file_times),wutime,(__filename,__file_times))
-#elif defined(__CRT_HAVE__wutime32) && (!defined(__USE_TIME_BITS64) && (__SIZEOF_WCHAR_T__ == 2))
+#elif defined(__CRT_HAVE__wutime32) && !defined(__USE_TIME_BITS64) && (__SIZEOF_WCHAR_T__ == 2)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16utime,(char16_t const *__filename, struct utimbuf const *__file_times),_wutime32,(__filename,__file_times))
 #elif defined(__CRT_HAVE_DOS$wutime64) && (defined(__USE_TIME_BITS64))
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16utime,(char16_t const *__filename, struct utimbuf const *__file_times),wutime64,(__filename,__file_times))
@@ -72,13 +72,13 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c16utime, __FORCELOCAL __ATTR_NONNULL((1)) int _
 #endif /* c16utime... */
 #if defined(__CRT_HAVE_wutime) && (__SIZEOF_WCHAR_T__ == 4)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32utime,(char32_t const *__filename, struct utimbuf const *__file_times),wutime,(__filename,__file_times))
-#elif defined(__CRT_HAVE_wutime64) && (defined(__USE_TIME_BITS64) && (__SIZEOF_WCHAR_T__ == 4))
+#elif defined(__CRT_HAVE_wutime64) && defined(__USE_TIME_BITS64) && (__SIZEOF_WCHAR_T__ == 4)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32utime,(char32_t const *__filename, struct utimbuf const *__file_times),wutime64,(__filename,__file_times))
-#elif defined(__CRT_HAVE__wutime64) && (defined(__USE_TIME_BITS64) && (__SIZEOF_WCHAR_T__ == 4))
+#elif defined(__CRT_HAVE__wutime64) && defined(__USE_TIME_BITS64) && (__SIZEOF_WCHAR_T__ == 4)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32utime,(char32_t const *__filename, struct utimbuf const *__file_times),_wutime64,(__filename,__file_times))
-#elif defined(__CRT_HAVE_wutime) && (!defined(__USE_TIME_BITS64) && (__SIZEOF_WCHAR_T__ == 4))
+#elif defined(__CRT_HAVE_wutime) && !defined(__USE_TIME_BITS64) && (__SIZEOF_WCHAR_T__ == 4)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32utime,(char32_t const *__filename, struct utimbuf const *__file_times),wutime,(__filename,__file_times))
-#elif defined(__CRT_HAVE__wutime32) && (!defined(__USE_TIME_BITS64) && (__SIZEOF_WCHAR_T__ == 4))
+#elif defined(__CRT_HAVE__wutime32) && !defined(__USE_TIME_BITS64) && (__SIZEOF_WCHAR_T__ == 4)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32utime,(char32_t const *__filename, struct utimbuf const *__file_times),_wutime32,(__filename,__file_times))
 #elif defined(__CRT_HAVE_wutime) || defined(__CRT_HAVE__wutime32) || defined(__CRT_HAVE_wutime64) || defined(__CRT_HAVE__wutime64)
 #if __SIZEOF_WCHAR_T__ == 4
@@ -94,7 +94,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c32utime, __FORCELOCAL __ATTR_NONNULL((1)) int _
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16utime64,(__CHAR16_TYPE__ const *__filename, struct utimbuf64 const *__file_times),wutime64,(__filename,__file_times))
 #elif defined(__CRT_HAVE__wutime64) && (__SIZEOF_WCHAR_T__ == 2)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16utime64,(__CHAR16_TYPE__ const *__filename, struct utimbuf64 const *__file_times),_wutime64,(__filename,__file_times))
-#elif defined(__CRT_HAVE_wutime) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ && (__SIZEOF_WCHAR_T__ == 2))
+#elif defined(__CRT_HAVE_wutime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ && (__SIZEOF_WCHAR_T__ == 2)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16utime64,(__CHAR16_TYPE__ const *__filename, struct utimbuf64 const *__file_times),wutime,(__filename,__file_times))
 #elif defined(__CRT_HAVE_DOS$_wutime64)
 __CREDIRECT_DOS(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c16utime64,(__CHAR16_TYPE__ const *__filename, struct utimbuf64 const *__file_times),_wutime64,(__filename,__file_times))
@@ -115,7 +115,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(c16utime64, __FORCELOCAL __ATTR_NONNULL((1)) int
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32utime64,(__CHAR32_TYPE__ const *__filename, struct utimbuf64 const *__file_times),wutime64,(__filename,__file_times))
 #elif defined(__CRT_HAVE__wutime64) && (__SIZEOF_WCHAR_T__ == 4)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32utime64,(__CHAR32_TYPE__ const *__filename, struct utimbuf64 const *__file_times),_wutime64,(__filename,__file_times))
-#elif defined(__CRT_HAVE_wutime) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ && (__SIZEOF_WCHAR_T__ == 4))
+#elif defined(__CRT_HAVE_wutime) && __SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__ && (__SIZEOF_WCHAR_T__ == 4)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,c32utime64,(__CHAR32_TYPE__ const *__filename, struct utimbuf64 const *__file_times),wutime,(__filename,__file_times))
 #elif defined(__CRT_HAVE_wutime) || defined(__CRT_HAVE__wutime32)
 #if __SIZEOF_WCHAR_T__ == 4

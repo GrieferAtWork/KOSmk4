@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6144c97e */
+/* HASH CRC-32:0x124e670e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,7 +54,7 @@ __NAMESPACE_STD_END
 /* Dependency: "mktime32" from "time" */
 #ifndef ____localdep_mktime32_defined
 #define ____localdep_mktime32_defined 1
-#if defined(__CRT_HAVE_mktime)
+#ifdef __CRT_HAVE_mktime
 /* Return the `time_t' representation of TP and normalize TP */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time32_t,__NOTHROW_NCX,__localdep_mktime32,(__STRUCT_TM __KOS_FIXED_CONST *__tp),mktime,(__tp))
 #elif defined(__CRT_HAVE__mktime32)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x64cfac24 */
+/* HASH CRC-32:0xc2c83f24 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 /* Dependency: "fuzzy_memcmpw" from "string" */
 #ifndef ____localdep_fuzzy_memcmpw_defined
 #define ____localdep_fuzzy_memcmpw_defined 1
-#if defined(__CRT_HAVE_fuzzy_memcmpw)
+#ifdef __CRT_HAVE_fuzzy_memcmpw
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_fuzzy_memcmpw,(void const *__s1, __SIZE_TYPE__ __s1_words, void const *__s2, __SIZE_TYPE__ __s2_words),fuzzy_memcmpw,(__s1,__s1_words,__s2,__s2_words))
 #elif !defined(__NO_MALLOCA)
 #include <local/string/fuzzy_memcmpw.h>
@@ -37,7 +37,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__
 /* Dependency: "fuzzy_memcmpl" from "string" */
 #ifndef ____localdep_fuzzy_memcmpl_defined
 #define ____localdep_fuzzy_memcmpl_defined 1
-#if defined(__CRT_HAVE_fuzzy_memcmpl)
+#ifdef __CRT_HAVE_fuzzy_memcmpl
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_fuzzy_memcmpl,(void const *__s1, __SIZE_TYPE__ __s1_dwords, void const *__s2, __SIZE_TYPE__ __s2_dwords),fuzzy_memcmpl,(__s1,__s1_dwords,__s2,__s2_dwords))
 #elif !defined(__NO_MALLOCA)
 #include <local/string/fuzzy_memcmpl.h>
@@ -50,7 +50,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__
 /* Dependency: "fuzzy_memcmp" from "string" */
 #ifndef ____localdep_fuzzy_memcmp_defined
 #define ____localdep_fuzzy_memcmp_defined 1
-#if defined(__CRT_HAVE_fuzzy_memcmp)
+#ifdef __CRT_HAVE_fuzzy_memcmp
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_fuzzy_memcmp,(void const *__s1, __SIZE_TYPE__ __s1_bytes, void const *__s2, __SIZE_TYPE__ __s2_bytes),fuzzy_memcmp,(__s1,__s1_bytes,__s2,__s2_bytes))
 #elif !defined(__NO_MALLOCA)
 #include <local/string/fuzzy_memcmp.h>

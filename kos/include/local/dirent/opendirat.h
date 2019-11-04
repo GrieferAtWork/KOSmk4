@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x30f22d5c */
+/* HASH CRC-32:0x314d363b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,12 +18,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_opendirat_defined
-#if defined(__CRT_HAVE_fopendirat)
+#ifdef __CRT_HAVE_fopendirat
 #define __local_opendirat_defined 1
 /* Dependency: "fopendirat" */
 #ifndef ____localdep_fopendirat_defined
 #define ____localdep_fopendirat_defined 1
-#if defined(__CRT_HAVE_fopendirat)
+#ifdef __CRT_HAVE_fopendirat
 /* Directory-handle-relative, and flags-enabled versions of `opendir(3)' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((2)),DIR *,__NOTHROW_RPC,__localdep_fopendirat,(__fd_t __dirfd, char const *__name, __oflag_t __oflags),fopendirat,(__dirfd,__name,__oflags))
 #else /* LIBC: fopendirat */

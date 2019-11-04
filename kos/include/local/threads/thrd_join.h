@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x60bb8d6c */
+/* HASH CRC-32:0xf732fc20 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_thrd_join_defined
-#if defined(__CRT_HAVE_pthread_join)
+#ifdef __CRT_HAVE_pthread_join
 #define __local_thrd_join_defined 1
 #include <bits/pthreadtypes.h>
 #include <hybrid/typecore.h>
@@ -27,7 +27,7 @@
 /* Dependency: "pthread_join" */
 #ifndef ____localdep_pthread_join_defined
 #define ____localdep_pthread_join_defined 1
-#if defined(__CRT_HAVE_pthread_join)
+#ifdef __CRT_HAVE_pthread_join
 /* Make calling thread wait for termination of the thread THREAD. The
  * exit status of the thread is stored in *THREAD_RETURN, if THREAD_RETURN
  * is not NULL */

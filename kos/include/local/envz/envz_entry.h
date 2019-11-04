@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x59064555 */
+/* HASH CRC-32:0x12d1ceb1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 /* Dependency: "stroff" from "string" */
 #ifndef ____localdep_stroff_defined
 #define ____localdep_stroff_defined 1
-#if defined(__CRT_HAVE_stroff)
+#ifdef __CRT_HAVE_stroff
 /* Same as `strchrnul', but return the offset from `STR', rather than the actual address */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_stroff,(char const *__restrict __haystack, int __needle),stroff,(__haystack,__needle))
 #else /* LIBC: stroff */
@@ -38,7 +38,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHR
 /* Dependency: "memcmp" from "string" */
 #ifndef ____localdep_memcmp_defined
 #define ____localdep_memcmp_defined 1
-#if defined(__fast_memcmp_defined)
+#ifdef __fast_memcmp_defined
 /* Compare memory buffers and return the difference of the first non-matching byte
  * @return:  < 0: `s1...+=n_bytes'  < `s2...+=n_bytes'
  * @return: == 0: `s1...+=n_bytes' == `s2...+=n_bytes'
@@ -69,7 +69,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,
 /* Dependency: "strend" from "string" */
 #ifndef ____localdep_strend_defined
 #define ____localdep_strend_defined 1
-#if defined(__CRT_HAVE_strend)
+#ifdef __CRT_HAVE_strend
 /* Same as `STR+strlen(STR)' */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strend,(char const *__restrict __string),strend,(__string))
 #else /* LIBC: strend */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x673cbabf */
+/* HASH CRC-32:0x648258e1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "mbtowc" from "stdlib" */
 #ifndef ____localdep_mbtowc_defined
 #define ____localdep_mbtowc_defined 1
-#if defined(__CRT_HAVE_mbtowc)
+#ifdef __CRT_HAVE_mbtowc
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_mbtowc,(__WCHAR_TYPE__ *__restrict __pwc, char const *__restrict __s, __SIZE_TYPE__ __n),mbtowc,(__pwc,__s,__n))
 #else /* LIBC: mbtowc */
 #include <local/stdlib/mbtowc.h>

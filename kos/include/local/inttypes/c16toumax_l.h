@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8ffc26bd */
+/* HASH CRC-32:0xd72af68c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,15 +24,15 @@
 #define ____localdep_c16toumax_defined 1
 #if defined(__CRT_HAVE_wcstoumax) && (__SIZEOF_WCHAR_T__ == 2)
 __CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,__localdep_c16toumax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstoumax,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE_wcstoul) && (__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__)
+#elif defined(__CRT_HAVE_wcstoul) && __SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG__
 __CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,__localdep_c16toumax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstoul,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE_wcstoull) && (__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__)
+#elif defined(__CRT_HAVE_wcstoull) && __SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__
 __CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,__localdep_c16toumax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstoull,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE_wcstouq) && (__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__)
+#elif defined(__CRT_HAVE_wcstouq) && __SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == __SIZEOF_LONG_LONG__
 __CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,__localdep_c16toumax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstouq,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE_wcstou64) && (__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == 8)
+#elif defined(__CRT_HAVE_wcstou64) && __SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == 8
 __CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,__localdep_c16toumax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstou64,(__nptr,__endptr,__base))
-#elif defined(__CRT_HAVE_wcstou32) && (__SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == 4)
+#elif defined(__CRT_HAVE_wcstou32) && __SIZEOF_WCHAR_T__ == 2 && __SIZEOF_INTMAX_T__ == 4
 __CREDIRECT(__ATTR_PURE __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,__localdep_c16toumax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstou32,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_DOS$wcstoul) && (__SIZEOF_INTMAX_T__ == __SIZEOF_LONG__)
 __CREDIRECT_DOS(__ATTR_PURE __ATTR_NONNULL((1)),__UINTMAX_TYPE__,__NOTHROW_NCX,__localdep_c16toumax,(__CHAR16_TYPE__ const *__restrict __nptr, __CHAR16_TYPE__ **__endptr, int __base),wcstoul,(__nptr,__endptr,__base))

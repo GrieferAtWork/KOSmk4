@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x895cc0fd */
+/* HASH CRC-32:0x741ac0a6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "wcstod" from "wchar" */
 #ifndef ____localdep_wcstod_defined
 #define ____localdep_wcstod_defined 1
-#if defined(__CRT_HAVE_wcstod)
+#ifdef __CRT_HAVE_wcstod
 __CREDIRECT(__ATTR_NONNULL((1)),double,__NOTHROW_NCX,__localdep_wcstod,(__WCHAR_TYPE__ const *__restrict __nptr, __WCHAR_TYPE__ **__endptr),wcstod,(__nptr,__endptr))
 #else /* LIBC: wcstod */
 #include <local/wchar/wcstod.h>

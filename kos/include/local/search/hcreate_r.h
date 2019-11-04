@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd1aa9730 */
+/* HASH CRC-32:0xe7656ccc */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -26,7 +26,7 @@
 /* Dependency: "isprime" from "search" */
 #ifndef ____localdep_isprime_defined
 #define ____localdep_isprime_defined 1
-#if defined(__CRT_HAVE_isprime)
+#ifdef __CRT_HAVE_isprime
 /* For the used double hash method the table size has to be a prime. To
  * correct the user given table size we need a prime test.  This trivial
  * algorithm is adequate because

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc09fac05 */
+/* HASH CRC-32:0xb848cad8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 /* Dependency: "read" */
 #ifndef ____localdep_read_defined
 #define ____localdep_read_defined 1
-#if defined(__CRT_HAVE_read)
+#ifdef __CRT_HAVE_read
 /* >> read(2)
  * Read data from a given file descriptor `FD' and return the number of bytes read.
  * A return value of ZERO(0) is indicative of EOF */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x87a7c525 */
+/* HASH CRC-32:0x3f520a0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -296,42 +296,42 @@ __CDECLARE(__ATTR_WUNUSED,void *,__NOTHROW_NCX,mmap,(void *__addr, size_t __len,
  *               MAP_UNINITIALIZED|MAP_DONT_MAP|MAP_DONT_OVERRIDE' */
 __NAMESPACE_LOCAL_USING_OR_IMPL(mmap, __FORCELOCAL __ATTR_WUNUSED void *__NOTHROW_NCX(__LIBCCALL mmap)(void *__addr, size_t __len, int __prot, int __flags, __fd_t __fd, __FS_TYPE(off) __offset) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(mmap))(__addr, __len, __prot, __flags, __fd, __offset); })
 #endif /* mmap... */
-#if defined(__CRT_HAVE_munmap)
+#ifdef __CRT_HAVE_munmap
 /* Unmap memory from `addr...+=len' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,munmap,(void *__addr, size_t __len),(__addr,__len))
 #endif /* munmap... */
-#if defined(__CRT_HAVE_mprotect)
+#ifdef __CRT_HAVE_mprotect
 /* @param prot: Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|
  *              PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED|PROT_GROWSUP|
  *              PROT_GROWSDOWN' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,mprotect,(void *__addr, size_t __len, int __prot),(__addr,__len,__prot))
 #endif /* mprotect... */
-#if defined(__CRT_HAVE_msync)
+#ifdef __CRT_HAVE_msync
 /* @param flags: Set of `MS_ASYNC|MS_INVALIDATE|MS_SYNC' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,msync,(void *__addr, size_t __len, int __flags),(__addr,__len,__flags))
 #endif /* msync... */
-#if defined(__CRT_HAVE_mlock)
+#ifdef __CRT_HAVE_mlock
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,mlock,(void const *__addr, size_t __len),(__addr,__len))
 #endif /* mlock... */
-#if defined(__CRT_HAVE_munlock)
+#ifdef __CRT_HAVE_munlock
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,munlock,(void const *__addr, size_t __len),(__addr,__len))
 #endif /* munlock... */
-#if defined(__CRT_HAVE_mlockall)
+#ifdef __CRT_HAVE_mlockall
 /* @param flags: Set of `MCL_CURRENT|MCL_FUTURE|MCL_ONFAULT' */
 __CDECLARE(,int,__NOTHROW_NCX,mlockall,(int __flags),(__flags))
 #endif /* mlockall... */
-#if defined(__CRT_HAVE_munlockall)
+#ifdef __CRT_HAVE_munlockall
 __CDECLARE(,int,__NOTHROW_NCX,munlockall,(void),())
 #endif /* munlockall... */
-#if defined(__CRT_HAVE_shm_open)
+#ifdef __CRT_HAVE_shm_open
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,shm_open,(char const *__name, __oflag_t __oflags, mode_t __mode),(__name,__oflags,__mode))
 #endif /* shm_open... */
-#if defined(__CRT_HAVE_shm_unlink)
+#ifdef __CRT_HAVE_shm_unlink
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,shm_unlink,(char const *__name),(__name))
 #endif /* shm_unlink... */
 
 #ifdef __USE_MISC
-#if defined(__CRT_HAVE_madvise)
+#ifdef __CRT_HAVE_madvise
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,madvise,(void *__addr, size_t __len, int __advice),(__addr,__len,__advice))
 #elif defined(__CRT_HAVE___madvise)
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,madvise,(void *__addr, size_t __len, int __advice),__madvise,(__addr,__len,__advice))
@@ -339,13 +339,13 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,madvise,(void *__addr, size_t 
 #include <local/sys.mman/madvise.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(madvise, __FORCELOCAL __ATTR_NONNULL((1)) int __NOTHROW_NCX(__LIBCCALL madvise)(void *__addr, size_t __len, int __advice) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(madvise))(__addr, __len, __advice); })
 #endif /* madvise... */
-#if defined(__CRT_HAVE_mincore)
+#ifdef __CRT_HAVE_mincore
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,mincore,(void *__start, size_t __len, unsigned char *__vec),(__start,__len,__vec))
 #endif /* mincore... */
 #endif /* __USE_MISC */
 
 #ifdef __USE_LARGEFILE64
-#if defined(__CRT_HAVE_mmap64)
+#ifdef __CRT_HAVE_mmap64
 /* @param prot:  Either `PROT_NONE', or set of `PROT_EXEC|PROT_WRITE|PROT_READ|PROT_SEM|PROT_LOOSE|PROT_SHARED'
  * @param flags: One of `MAP_SHARED`, 'MAP_SHARED_VALIDATE' or `MAP_PRIVATE', optionally or'd
  *               with a set of `MAP_ANONYMOUS|MAP_FIXED|MAP_GROWSDOWN|MAP_LOCKED|
@@ -371,7 +371,7 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(mmap64, __FORCELOCAL __ATTR_WUNUSED void *__NOTH
 #endif /* __USE_LARGEFILE64 */
 
 #ifdef __USE_XOPEN2K
-#if defined(__CRT_HAVE_posix_madvise)
+#ifdef __CRT_HAVE_posix_madvise
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,posix_madvise,(void *__addr, size_t __len, int __advice),(__addr,__len,__advice))
 #else /* LIBC: posix_madvise */
 #include <local/sys.mman/posix_madvise.h>
@@ -380,11 +380,11 @@ __NAMESPACE_LOCAL_USING_OR_IMPL(posix_madvise, __FORCELOCAL __ATTR_NONNULL((1)) 
 #endif /* __USE_XOPEN2K */
 
 #ifdef __USE_GNU
-#if defined(__CRT_HAVE_mremap)
+#ifdef __CRT_HAVE_mremap
 /* @param flags: Set of `MREMAP_MAYMOVE|MREMAP_FIXED' */
 __LIBC void *__NOTHROW_NCX(__VLIBCCALL mremap)(void *__addr, size_t __old_len, size_t __new_len, int __flags, ... /* void *new_address */) __CASMNAME_SAME("mremap");
 #endif /* mremap... */
-#if defined(__CRT_HAVE_remap_file_pages)
+#ifdef __CRT_HAVE_remap_file_pages
 __CDECLARE(,int,__NOTHROW_NCX,remap_file_pages,(void *__start, size_t __size, int __prot, size_t __pgoff, int __flags),(__start,__size,__prot,__pgoff,__flags))
 #endif /* remap_file_pages... */
 #endif /* __USE_GNU */

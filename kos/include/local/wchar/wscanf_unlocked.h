@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4f04fe15 */
+/* HASH CRC-32:0x7bac958c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 /* Dependency: "vwscanf_unlocked" from "wchar" */
 #ifndef ____localdep_vwscanf_unlocked_defined
 #define ____localdep_vwscanf_unlocked_defined 1
-#if defined(__CRT_HAVE_vwscanf_unlocked)
+#ifdef __CRT_HAVE_vwscanf_unlocked
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)) __ATTR_LIBC_SCANF(1, 0),__STDC_INT_AS_SIZE_T,,__localdep_vwscanf_unlocked,(__WCHAR_TYPE__ const *__restrict __format, __builtin_va_list __args),vwscanf_unlocked,(__format,__args)) __THROWS(...)
 #elif (defined(__CRT_HAVE_vfwscanf_unlocked) || defined(__CRT_HAVE_vfwscanf)) && !defined(__NO_STDSTREAMS)
 #include <local/wchar/vwscanf_unlocked.h>

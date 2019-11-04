@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe2bc07bc */
+/* HASH CRC-32:0x5d69e561 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -53,17 +53,17 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 
-#if defined(__CRT_HAVE_getcontext)
+#ifdef __CRT_HAVE_getcontext
 /* Get user context and store it in variable pointed to by UCP */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,getcontext,(ucontext_t *__restrict __ucp),(__ucp))
 #endif /* getcontext... */
 
-#if defined(__CRT_HAVE_setcontext)
+#ifdef __CRT_HAVE_setcontext
 /* Set user context from information of variable pointed to by UCP */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,setcontext,(ucontext_t const *__restrict __ucp),(__ucp))
 #endif /* setcontext... */
 
-#if defined(__CRT_HAVE_swapcontext)
+#ifdef __CRT_HAVE_swapcontext
 /* Save current context in context variable pointed to by OUCP and set
  * context from variable pointed to by UCP */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,swapcontext,(ucontext_t *__restrict __oucp, ucontext_t const *__restrict __ucp),(__oucp,__ucp))
@@ -71,7 +71,7 @@ __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,swapcontext,(ucontext_t *__r
 
 typedef void (*__makecontext_func_t)(void);
 
-#if defined(__CRT_HAVE_makecontext)
+#ifdef __CRT_HAVE_makecontext
 /* Manipulate user context UCP to continue with calling functions FUNC
  * and the ARGC-1 parameters following ARGC when the context is used
  * the next time in `setcontext' or `swapcontext'.

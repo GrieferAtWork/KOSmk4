@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x5df808ff */
+/* HASH CRC-32:0xfb6b63ab */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_cnd_broadcast_defined
-#if defined(__CRT_HAVE_pthread_cond_broadcast)
+#ifdef __CRT_HAVE_pthread_cond_broadcast
 #define __local_cnd_broadcast_defined 1
 #include <bits/threads.h>
 
@@ -26,7 +26,7 @@
 /* Dependency: "pthread_cond_broadcast" */
 #ifndef ____localdep_pthread_cond_broadcast_defined
 #define ____localdep_pthread_cond_broadcast_defined 1
-#if defined(__CRT_HAVE_pthread_cond_broadcast)
+#ifdef __CRT_HAVE_pthread_cond_broadcast
 /* Wake up all threads waiting for condition variables COND */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pthread_cond_broadcast,(__pthread_cond_t *__cond),pthread_cond_broadcast,(__cond))
 #else /* LIBC: pthread_cond_broadcast */

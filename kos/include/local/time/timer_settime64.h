@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe7d7646b */
+/* HASH CRC-32:0x81371f4e */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,12 +18,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_timer_settime64_defined
-#if defined(__CRT_HAVE_timer_settime)
+#ifdef __CRT_HAVE_timer_settime
 #define __local_timer_settime64_defined 1
 /* Dependency: "timer_settime32" from "time" */
 #ifndef ____localdep_timer_settime32_defined
 #define ____localdep_timer_settime32_defined 1
-#if defined(__CRT_HAVE_timer_settime)
+#ifdef __CRT_HAVE_timer_settime
 /* Set timer TIMERID to VALUE, returning old value in OVALUE */
 __CREDIRECT(__ATTR_NONNULL((3)),int,__NOTHROW_NCX,__localdep_timer_settime32,(timer_t __timerid, int __flags, struct __itimerspec32 const *__restrict __value, struct __itimerspec32 *__ovalue),timer_settime,(__timerid,__flags,__value,__ovalue))
 #else /* LIBC: timer_settime */

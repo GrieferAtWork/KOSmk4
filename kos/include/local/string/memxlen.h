@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x686a447e */
+/* HASH CRC-32:0x14862bcc */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "memxend" from "string" */
 #ifndef ____localdep_memxend_defined
 #define ____localdep_memxend_defined 1
-#if defined(__CRT_HAVE_memxend)
+#ifdef __CRT_HAVE_memxend
 /* Same as `memend', but search for non-matching locations. */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),void *,__NOTHROW_NCX,__localdep_memxend,(void const *__restrict __haystack, int __needle, __SIZE_TYPE__ __n_bytes),memxend,(__haystack,__needle,__n_bytes))
 #else /* LIBC: memxend */

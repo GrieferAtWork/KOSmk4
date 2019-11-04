@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3c1a7c60 */
+/* HASH CRC-32:0x6e24714d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -34,19 +34,19 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 
-#if defined(__CRT_HAVE_gnu_dev_major)
+#ifdef __CRT_HAVE_gnu_dev_major
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__major_t,__NOTHROW,gnu_dev_major,(__dev_t __dev),(__dev))
 #else /* LIBC: gnu_dev_major */
 #include <local/sys.sysmacros/gnu_dev_major.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(gnu_dev_major, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __major_t __NOTHROW(__LIBCCALL gnu_dev_major)(__dev_t __dev) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(gnu_dev_major))(__dev); })
 #endif /* gnu_dev_major... */
-#if defined(__CRT_HAVE_gnu_dev_minor)
+#ifdef __CRT_HAVE_gnu_dev_minor
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__minor_t,__NOTHROW,gnu_dev_minor,(__dev_t __dev),(__dev))
 #else /* LIBC: gnu_dev_minor */
 #include <local/sys.sysmacros/gnu_dev_minor.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(gnu_dev_minor, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED __minor_t __NOTHROW(__LIBCCALL gnu_dev_minor)(__dev_t __dev) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(gnu_dev_minor))(__dev); })
 #endif /* gnu_dev_minor... */
-#if defined(__CRT_HAVE_gnu_dev_makedev)
+#ifdef __CRT_HAVE_gnu_dev_makedev
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,__dev_t,__NOTHROW,gnu_dev_makedev,(__major_t __major, __minor_t __minor),(__major,__minor))
 #else /* LIBC: gnu_dev_makedev */
 #include <local/sys.sysmacros/gnu_dev_makedev.h>

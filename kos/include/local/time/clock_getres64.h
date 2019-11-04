@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b19a125 */
+/* HASH CRC-32:0xa0747e45 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "clock_getres32" from "time" */
 #ifndef ____localdep_clock_getres32_defined
 #define ____localdep_clock_getres32_defined 1
-#if defined(__CRT_HAVE_clock_getres)
+#ifdef __CRT_HAVE_clock_getres
 /* Get resolution of clock CLOCK_ID */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_getres32,(__clockid_t __clock_id, struct __timespec32 *__res),clock_getres,(__clock_id,__res))
 #elif defined(__CRT_HAVE___clock_getres)

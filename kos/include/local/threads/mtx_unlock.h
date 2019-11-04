@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x341213b */
+/* HASH CRC-32:0x3a0c4f62 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_mtx_unlock_defined
-#if defined(__CRT_HAVE_pthread_mutex_unlock)
+#ifdef __CRT_HAVE_pthread_mutex_unlock
 #define __local_mtx_unlock_defined 1
 #include <bits/threads.h>
 
@@ -26,7 +26,7 @@
 /* Dependency: "pthread_mutex_unlock" */
 #ifndef ____localdep_pthread_mutex_unlock_defined
 #define ____localdep_pthread_mutex_unlock_defined 1
-#if defined(__CRT_HAVE_pthread_mutex_unlock)
+#ifdef __CRT_HAVE_pthread_mutex_unlock
 /* Unlock a mutex */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_pthread_mutex_unlock,(__pthread_mutex_t *__mutex),pthread_mutex_unlock,(__mutex))
 #else /* LIBC: pthread_mutex_unlock */

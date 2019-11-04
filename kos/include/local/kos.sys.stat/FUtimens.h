@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc7ae0e40 */
+/* HASH CRC-32:0xe2a6e915 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 /* Dependency: "FUtimens64" from "kos.sys.stat" */
 #ifndef ____localdep_FUtimens64_defined
 #define ____localdep_FUtimens64_defined 1
-#if defined(__CRT_HAVE_FUtimens64)
+#ifdef __CRT_HAVE_FUtimens64
 __CREDIRECT_VOID(,,__localdep_FUtimens64,(__fd_t __fd, struct __timespec64 const __times[2/*or:3*/]),FUtimens64,(__fd,__times)) __THROWS(...)
 #elif defined(__CRT_HAVE_FUtimens) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 __CREDIRECT_VOID(,,__localdep_FUtimens64,(__fd_t __fd, struct __timespec64 const __times[2/*or:3*/]),FUtimens,(__fd,__times)) __THROWS(...)
@@ -39,7 +39,7 @@ __CREDIRECT_VOID(,,__localdep_FUtimens64,(__fd_t __fd, struct __timespec64 const
 /* Dependency: "FUtimens32" from "kos.sys.stat" */
 #ifndef ____localdep_FUtimens32_defined
 #define ____localdep_FUtimens32_defined 1
-#if defined(__CRT_HAVE_FUtimens)
+#ifdef __CRT_HAVE_FUtimens
 __CREDIRECT_VOID(,,__localdep_FUtimens32,(__fd_t __fd, struct __TM_TYPE(timespec) const __times[2/*or:3*/]),FUtimens,(__fd,__times)) __THROWS(...)
 #else /* LIBC: FUtimens */
 #undef ____localdep_FUtimens32_defined

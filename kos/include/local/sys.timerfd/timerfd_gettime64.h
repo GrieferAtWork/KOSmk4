@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6d05eaa1 */
+/* HASH CRC-32:0x66ffdbe7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,12 +18,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_timerfd_gettime64_defined
-#if defined(__CRT_HAVE_timerfd_gettime)
+#ifdef __CRT_HAVE_timerfd_gettime
 #define __local_timerfd_gettime64_defined 1
 /* Dependency: "timerfd_gettime32" from "sys.timerfd" */
 #ifndef ____localdep_timerfd_gettime32_defined
 #define ____localdep_timerfd_gettime32_defined 1
-#if defined(__CRT_HAVE_timerfd_gettime)
+#ifdef __CRT_HAVE_timerfd_gettime
 /* Return the next expiration time of UFD */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_timerfd_gettime32,(__fd_t __ufd, struct __itimerspec32 *__restrict __otmr),timerfd_gettime,(__ufd,__otmr))
 #else /* LIBC: timerfd_gettime */

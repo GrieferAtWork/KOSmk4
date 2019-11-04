@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1fd2e1c */
+/* HASH CRC-32:0x16c831b6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -30,7 +30,7 @@
 /* Dependency: "format_repeat" from "format-printer" */
 #ifndef ____localdep_format_repeat_defined
 #define ____localdep_format_repeat_defined 1
-#if defined(__CRT_HAVE_format_repeat)
+#ifdef __CRT_HAVE_format_repeat
 /* Repeat `CH' a number of `NUM_REPETITIONS' times
  * The usual format-printer rules apply, and this function
  * is allowed to call `PRINTER' as often as it chooses */

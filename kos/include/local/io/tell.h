@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x81beba65 */
+/* HASH CRC-32:0x77fa06bf */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 /* Dependency: "_lseek" from "io" */
 #ifndef ____localdep__lseek_defined
 #define ____localdep__lseek_defined 1
-#if defined(__CRT_HAVE__lseek)
+#ifdef __CRT_HAVE__lseek
 __CREDIRECT(,__LONG32_TYPE__,__NOTHROW_NCX,__localdep__lseek,(__fd_t __fd, __LONG32_TYPE__ __offset, int __whence),_lseek,(__fd,__offset,__whence))
 #elif defined(__CRT_HAVE_lseek)
 __CREDIRECT(,__LONG32_TYPE__,__NOTHROW_NCX,__localdep__lseek,(__fd_t __fd, __LONG32_TYPE__ __offset, int __whence),lseek,(__fd,__offset,__whence))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb00b476 */
+/* HASH CRC-32:0x2946eabd */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_pthread_cond_timedwait64_defined
-#if defined(__CRT_HAVE_pthread_cond_timedwait)
+#ifdef __CRT_HAVE_pthread_cond_timedwait
 #define __local_pthread_cond_timedwait64_defined 1
 #include <bits/pthreadtypes.h>
 #include <bits/timespec.h>
@@ -28,7 +28,7 @@
 /* Dependency: "pthread_cond_timedwait32" from "pthread" */
 #ifndef ____localdep_pthread_cond_timedwait32_defined
 #define ____localdep_pthread_cond_timedwait32_defined 1
-#if defined(__CRT_HAVE_pthread_cond_timedwait)
+#ifdef __CRT_HAVE_pthread_cond_timedwait
 __CREDIRECT(__ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,__localdep_pthread_cond_timedwait32,(__pthread_cond_t *__restrict __cond, __pthread_mutex_t *__restrict __mutex, struct __timespec32 const *__restrict __abstime),pthread_cond_timedwait,(__cond,__mutex,__abstime))
 #else /* LIBC: pthread_cond_timedwait */
 #undef ____localdep_pthread_cond_timedwait32_defined

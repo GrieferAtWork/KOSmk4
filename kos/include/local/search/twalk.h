@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x48465957 */
+/* HASH CRC-32:0x1c1badb9 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "trecurse" from "search" */
 #ifndef ____localdep_trecurse_defined
 #define ____localdep_trecurse_defined 1
-#if defined(__CRT_HAVE_trecurse)
+#ifdef __CRT_HAVE_trecurse
 /* Walk the nodes of a tree.
  * ROOT is the root of the tree to be walked, ACTION the function to be
  * called at each node. LEVEL is the level of ROOT in the whole tree */

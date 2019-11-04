@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4e3091eb */
+/* HASH CRC-32:0x6b68e098 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "nanosleep32" from "time" */
 #ifndef ____localdep_nanosleep32_defined
 #define ____localdep_nanosleep32_defined 1
-#if defined(__CRT_HAVE_nanosleep)
+#ifdef __CRT_HAVE_nanosleep
 /* Pause execution for a number of nanoseconds */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_nanosleep32,(struct __TM_TYPE(timespec) const *__requested_time, struct __timespec32 *__remaining),nanosleep,(__requested_time,__remaining))
 #elif defined(__CRT_HAVE___nanosleep)
@@ -37,7 +37,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_nanosleep32,(struct
 /* Dependency: "nanosleep64" from "time" */
 #ifndef ____localdep_nanosleep64_defined
 #define ____localdep_nanosleep64_defined 1
-#if defined(__CRT_HAVE_nanosleep64)
+#ifdef __CRT_HAVE_nanosleep64
 /* Pause execution for a number of nanoseconds */
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_nanosleep64,(struct __timespec64 const *__restrict __requested_time, struct __timespec64 *__remaining),nanosleep64,(__requested_time,__remaining))
 #elif defined(__CRT_HAVE_nanosleep) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)

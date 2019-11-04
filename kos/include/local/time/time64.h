@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8baf4678 */
+/* HASH CRC-32:0x337adbc1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "time32" from "time" */
 #ifndef ____localdep_time32_defined
 #define ____localdep_time32_defined 1
-#if defined(__CRT_HAVE_time)
+#ifdef __CRT_HAVE_time
 /* Return the current time and put it in *TIMER if TIMER is not NULL */
 __CREDIRECT(,__time32_t,__NOTHROW_NCX,__localdep_time32,(__time32_t *__timer),time,(__timer))
 #elif defined(__CRT_HAVE__time32)

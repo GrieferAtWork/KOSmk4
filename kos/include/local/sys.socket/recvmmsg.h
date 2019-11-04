@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe9dcca6c */
+/* HASH CRC-32:0xb1d52d95 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "recvmmsg64" from "sys.socket" */
 #ifndef ____localdep_recvmmsg64_defined
 #define ____localdep_recvmmsg64_defined 1
-#if defined(__CRT_HAVE_recvmmsg64)
+#ifdef __CRT_HAVE_recvmmsg64
 /* Receive up to VLEN messages as described by VMESSAGES from socket FD.
  * Returns the number of messages received or -1 for errors. */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_recvmmsg64,(__fd_t __sockfd, struct mmsghdr *__vmessages, unsigned int __vlen, int __flags, struct __timespec64 *__tmo),recvmmsg64,(__sockfd,__vmessages,__vlen,__flags,__tmo))
@@ -44,7 +44,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_RPC,__localdep_recvmmsg64,(__fd_t 
 /* Dependency: "recvmmsg32" from "sys.socket" */
 #ifndef ____localdep_recvmmsg32_defined
 #define ____localdep_recvmmsg32_defined 1
-#if defined(__CRT_HAVE_recvmmsg)
+#ifdef __CRT_HAVE_recvmmsg
 /* Receive up to VLEN messages as described by VMESSAGES from socket FD.
  * Returns the number of messages received or -1 for errors. */
 __CREDIRECT_VOID(__ATTR_NONNULL((2)),__NOTHROW_RPC,__localdep_recvmmsg32,(__fd_t __sockfd, struct mmsghdr *__vmessages, unsigned int __vlen, int __flags, struct __timespec32 *__tmo),recvmmsg,(__sockfd,__vmessages,__vlen,__flags,__tmo))

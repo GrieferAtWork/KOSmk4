@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xfd383e67 */
+/* HASH CRC-32:0x97cb753a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "dos_mkdir" from "sys.stat" */
 #ifndef ____localdep_dos_mkdir_defined
 #define ____localdep_dos_mkdir_defined 1
-#if defined(__CRT_HAVE__mkdir)
+#ifdef __CRT_HAVE__mkdir
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,__localdep_dos_mkdir,(char const *__pathname),_mkdir,(__pathname))
 #else /* LIBC: _mkdir */
 #undef ____localdep_dos_mkdir_defined

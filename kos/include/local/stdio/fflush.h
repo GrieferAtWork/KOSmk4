@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x22d8da60 */
+/* HASH CRC-32:0x310b7de5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "crt_flushall" from "stdio" */
 #ifndef ____localdep_crt_flushall_defined
 #define ____localdep_crt_flushall_defined 1
-#if defined(__CRT_HAVE__flushall)
+#ifdef __CRT_HAVE__flushall
 __CREDIRECT(,int,,__localdep_crt_flushall,(void),_flushall,()) __THROWS(...)
 #else /* LIBC: _flushall */
 #undef ____localdep_crt_flushall_defined

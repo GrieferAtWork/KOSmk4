@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4c748251 */
+/* HASH CRC-32:0x1fc4d3f0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "srand" from "stdlib" */
 #ifndef ____localdep_srand_defined
 #define ____localdep_srand_defined 1
-#if defined(__CRT_HAVE_srand)
+#ifdef __CRT_HAVE_srand
 __CREDIRECT_VOID(,__NOTHROW,__localdep_srand,(long __seed),srand,(__seed))
 #elif defined(__CRT_HAVE_srandom) && (__SIZEOF_INT__ == __SIZEOF_LONG__)
 __CREDIRECT_VOID(,__NOTHROW,__localdep_srand,(long __seed),srandom,(__seed))

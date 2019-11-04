@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd894b600 */
+/* HASH CRC-32:0xcf07ad34 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "clock_gettime32" from "time" */
 #ifndef ____localdep_clock_gettime32_defined
 #define ____localdep_clock_gettime32_defined 1
-#if defined(__CRT_HAVE_clock_gettime)
+#ifdef __CRT_HAVE_clock_gettime
 /* Get current value of clock CLOCK_ID and store it in TP */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_gettime32,(__clockid_t __clock_id, struct __timespec32 *__tp),clock_gettime,(__clock_id,__tp))
 #elif defined(__CRT_HAVE___clock_gettime)
@@ -37,7 +37,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_gettime32,(__
 /* Dependency: "clock_gettime64" from "time" */
 #ifndef ____localdep_clock_gettime64_defined
 #define ____localdep_clock_gettime64_defined 1
-#if defined(__CRT_HAVE_clock_gettime64)
+#ifdef __CRT_HAVE_clock_gettime64
 /* Get current value of clock CLOCK_ID and store it in TP */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_clock_gettime64,(__clockid_t __clock_id, struct __timespec64 *__tp),clock_gettime64,(__clock_id,__tp))
 #elif defined(__CRT_HAVE_clock_gettime) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)

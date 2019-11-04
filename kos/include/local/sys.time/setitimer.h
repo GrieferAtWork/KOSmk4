@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x64f4e906 */
+/* HASH CRC-32:0xcdd6a996 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "setitimer32" from "sys.time" */
 #ifndef ____localdep_setitimer32_defined
 #define ____localdep_setitimer32_defined 1
-#if defined(__CRT_HAVE_setitimer)
+#ifdef __CRT_HAVE_setitimer
 /* Set the timer WHICH to *NEWVAL. If OLDVAL is not NULL, set *OLDVAL to the old value of timer WHICH.
  * Returns 0 on success, -1 on errors */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_setitimer32,(__itimer_which_t __which, struct __itimerval32 const *__restrict __newval, struct __itimerval32 *__restrict __oldval),setitimer,(__which,__newval,__oldval))
@@ -35,7 +35,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_setitimer32,(__itim
 /* Dependency: "setitimer64" from "sys.time" */
 #ifndef ____localdep_setitimer64_defined
 #define ____localdep_setitimer64_defined 1
-#if defined(__CRT_HAVE_setitimer64)
+#ifdef __CRT_HAVE_setitimer64
 /* Set the timer WHICH to *NEWVAL. If OLDVAL is not NULL, set *OLDVAL to the old value of timer WHICH.
  * Returns 0 on success, -1 on errors */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_setitimer64,(__itimer_which_t __which, struct itimerval64 const *__newval, struct itimerval64 *__oldval),setitimer64,(__which,__newval,__oldval))

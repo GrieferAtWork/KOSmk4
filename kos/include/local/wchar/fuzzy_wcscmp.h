@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x31b4eeb0 */
+/* HASH CRC-32:0x68f10638 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 /* Dependency: "fuzzy_wmemcmp" from "wchar" */
 #ifndef ____localdep_fuzzy_wmemcmp_defined
 #define ____localdep_fuzzy_wmemcmp_defined 1
-#if defined(__CRT_HAVE_fuzzy_wmemcmp)
+#ifdef __CRT_HAVE_fuzzy_wmemcmp
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 3)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_fuzzy_wmemcmp,(__WCHAR_TYPE__ const *__s1, __SIZE_TYPE__ __s1_chars, __WCHAR_TYPE__ const *__s2, __SIZE_TYPE__ __s2_chars),fuzzy_wmemcmp,(__s1,__s1_chars,__s2,__s2_chars))
 #elif !defined(__NO_MALLOCA)
 #include <local/wchar/fuzzy_wmemcmp.h>

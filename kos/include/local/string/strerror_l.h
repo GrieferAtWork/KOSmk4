@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb9a1383e */
+/* HASH CRC-32:0xb03e3b8b */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "strerror" from "string" */
 #ifndef ____localdep_strerror_defined
 #define ____localdep_strerror_defined 1
-#if defined(__CRT_HAVE_strerror)
+#ifdef __CRT_HAVE_strerror
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED,char *,__NOTHROW_NCX,__localdep_strerror,(int __errnum),strerror,(__errnum))
 #else /* LIBC: strerror */
 #include <local/string/strerror.h>

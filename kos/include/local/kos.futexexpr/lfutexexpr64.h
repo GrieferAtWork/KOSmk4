@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe56d0e9c */
+/* HASH CRC-32:0xebc83948 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_lfutexexpr64_defined
-#if defined(__CRT_HAVE_lfutexexpr)
+#ifdef __CRT_HAVE_lfutexexpr
 #define __local_lfutexexpr64_defined 1
 #include <bits/timespec.h>
 #include <kos/bits/futex-expr.h>
@@ -28,7 +28,7 @@
 /* Dependency: "lfutexexpr32" from "kos.futexexpr" */
 #ifndef ____localdep_lfutexexpr32_defined
 #define ____localdep_lfutexexpr32_defined 1
-#if defined(__CRT_HAVE_lfutexexpr)
+#ifdef __CRT_HAVE_lfutexexpr
 /* >> lfutexexpr(2)
  * The lfutexexpr() system call can be used to specify arbitrarily complex
  * expressions that must atomically (in relation to other futex operations)

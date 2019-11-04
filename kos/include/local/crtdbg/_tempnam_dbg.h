@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdeaf2a02 */
+/* HASH CRC-32:0x4b0d35bd */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "tempnam" */
 #ifndef ____localdep_tempnam_defined
 #define ____localdep_tempnam_defined 1
-#if defined(__CRT_HAVE_tempnam)
+#ifdef __CRT_HAVE_tempnam
 __CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_NCX,__localdep_tempnam,(char const *__dir, char const *__pfx),tempnam,(__dir,__pfx))
 #elif defined(__CRT_HAVE__tempnam)
 __CREDIRECT(__ATTR_MALLOC __ATTR_WUNUSED,char *,__NOTHROW_NCX,__localdep_tempnam,(char const *__dir, char const *__pfx),_tempnam,(__dir,__pfx))

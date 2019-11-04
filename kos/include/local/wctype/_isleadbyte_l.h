@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x74cd756b */
+/* HASH CRC-32:0xe8e33e6f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "isleadbyte" from "wctype" */
 #ifndef ____localdep_isleadbyte_defined
 #define ____localdep_isleadbyte_defined 1
-#if defined(__CRT_HAVE_isleadbyte)
+#ifdef __CRT_HAVE_isleadbyte
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_isleadbyte,(int __wc),isleadbyte,(__wc))
 #else /* LIBC: isleadbyte */
 #include <local/wctype/isleadbyte.h>

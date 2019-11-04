@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xd33c9280 */
+/* HASH CRC-32:0x6223f880 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 /* Dependency: "mempsetw" from "string" */
 #ifndef ____localdep_mempsetw_defined
 #define ____localdep_mempsetw_defined 1
-#if defined(__fast_mempsetw_defined)
+#ifdef __fast_mempsetw_defined
 /* Same as `memsetw', but return `DST+N_WORDS', rather than `DST' */
 #define __localdep_mempsetw (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempsetw))
 #elif defined(__CRT_HAVE_mempsetw)
@@ -41,7 +41,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT16_TYPE__ *,
 /* Dependency: "mempsetl" from "string" */
 #ifndef ____localdep_mempsetl_defined
 #define ____localdep_mempsetl_defined 1
-#if defined(__fast_mempsetl_defined)
+#ifdef __fast_mempsetl_defined
 /* Same as `memsetl', but return `DST+N_DWORDS', rather than `DST' */
 #define __localdep_mempsetl (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempsetl))
 #elif defined(__CRT_HAVE_mempsetl)
@@ -57,7 +57,7 @@ __CREDIRECT(__ATTR_LEAF __ATTR_RETNONNULL __ATTR_NONNULL((1)),__UINT32_TYPE__ *,
 /* Dependency: "mempset" from "string" */
 #ifndef ____localdep_mempset_defined
 #define ____localdep_mempset_defined 1
-#if defined(__fast_mempset_defined)
+#ifdef __fast_mempset_defined
 /* Same as `memset', but return `DST+N_BYTES', rather than `DST' */
 #define __localdep_mempset (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(mempset))
 #elif defined(__CRT_HAVE_mempset)

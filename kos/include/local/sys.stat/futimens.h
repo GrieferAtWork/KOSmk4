@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf0317537 */
+/* HASH CRC-32:0xf6bc3f5f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "futimens64" from "sys.stat" */
 #ifndef ____localdep_futimens64_defined
 #define ____localdep_futimens64_defined 1
-#if defined(__CRT_HAVE_futimens64)
+#ifdef __CRT_HAVE_futimens64
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_futimens64,(__fd_t __fd, struct __timespec64 const __times[2/*or:3*/]),futimens64,(__fd,__times))
 #elif defined(__CRT_HAVE_futimens) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_futimens64,(__fd_t __fd, struct __timespec64 const __times[2/*or:3*/]),futimens,(__fd,__times))
@@ -38,7 +38,7 @@ __CREDIRECT(,int,__NOTHROW_RPC,__localdep_futimens64,(__fd_t __fd, struct __time
 /* Dependency: "futimens32" from "sys.stat" */
 #ifndef ____localdep_futimens32_defined
 #define ____localdep_futimens32_defined 1
-#if defined(__CRT_HAVE_futimens)
+#ifdef __CRT_HAVE_futimens
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_futimens32,(__fd_t __fd, struct __TM_TYPE(timespec) const __times[2/*or:3*/]),futimens,(__fd,__times))
 #else /* LIBC: futimens */
 #undef ____localdep_futimens32_defined

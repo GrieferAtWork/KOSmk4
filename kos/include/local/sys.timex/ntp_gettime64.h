@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1c255f8f */
+/* HASH CRC-32:0x977e19b8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,12 +18,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_ntp_gettime64_defined
-#if defined(__CRT_HAVE_ntp_gettimex)
+#ifdef __CRT_HAVE_ntp_gettimex
 #define __local_ntp_gettime64_defined 1
 /* Dependency: "ntp_gettime32" from "sys.timex" */
 #ifndef ____localdep_ntp_gettime32_defined
 #define ____localdep_ntp_gettime32_defined 1
-#if defined(__CRT_HAVE_ntp_gettimex)
+#ifdef __CRT_HAVE_ntp_gettimex
 __CREDIRECT(__ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ntp_gettime32,(struct __ntptimeval32 *__restrict __ntv),ntp_gettimex,(__ntv))
 #else /* LIBC: ntp_gettimex */
 #undef ____localdep_ntp_gettime32_defined

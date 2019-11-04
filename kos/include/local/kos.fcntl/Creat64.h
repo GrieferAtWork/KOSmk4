@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe7ecf2a2 */
+/* HASH CRC-32:0x358d02e2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -27,7 +27,7 @@
 /* Dependency: "Open64" from "kos.fcntl" */
 #ifndef ____localdep_Open64_defined
 #define ____localdep_Open64_defined 1
-#if defined(__CRT_HAVE_Open64)
+#ifdef __CRT_HAVE_Open64
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,,__localdep_Open64,(char const *__filename, __oflag_t __oflags),Open64,(__filename,__oflags),__oflags,1,(__mode_t)) __THROWS(...)
 #elif defined(__CRT_HAVE_Open) && (!defined(__O_LARGEFILE) || (__O_LARGEFILE+0) == 0)
 __CVREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),__fd_t,,__localdep_Open64,(char const *__filename, __oflag_t __oflags),Open,(__filename,__oflags),__oflags,1,(__mode_t)) __THROWS(...)

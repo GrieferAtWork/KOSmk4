@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x22a669ea */
+/* HASH CRC-32:0x7424b50f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_pthread_rwlock_timedrdlock64_defined
-#if defined(__CRT_HAVE_pthread_rwlock_timedrdlock)
+#ifdef __CRT_HAVE_pthread_rwlock_timedrdlock
 #define __local_pthread_rwlock_timedrdlock64_defined 1
 #include <bits/pthreadtypes.h>
 #include <bits/timespec.h>
@@ -28,7 +28,7 @@
 /* Dependency: "pthread_rwlock_timedrdlock32" from "pthread" */
 #ifndef ____localdep_pthread_rwlock_timedrdlock32_defined
 #define ____localdep_pthread_rwlock_timedrdlock32_defined 1
-#if defined(__CRT_HAVE_pthread_rwlock_timedrdlock)
+#ifdef __CRT_HAVE_pthread_rwlock_timedrdlock
 /* Try to acquire read lock for RWLOCK or return after specfied time */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,__localdep_pthread_rwlock_timedrdlock32,(__pthread_rwlock_t *__restrict __rwlock, struct __timespec32 const *__restrict __abstime),pthread_rwlock_timedrdlock,(__rwlock,__abstime))
 #else /* LIBC: pthread_rwlock_timedrdlock */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3bd3c466 */
+/* HASH CRC-32:0x2e71ac0c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 /* Dependency: "preadall64" from "unistd" */
 #ifndef ____localdep_preadall64_defined
 #define ____localdep_preadall64_defined 1
-#if defined(__CRT_HAVE_preadall64)
+#ifdef __CRT_HAVE_preadall64
 /* >> preadall64(3)
  * Same as `readall(3)', but using `pread64(2)' instead of `read()' */
 __CREDIRECT(__ATTR_NONNULL((2)),__SSIZE_TYPE__,__NOTHROW_RPC,__localdep_preadall64,(__fd_t __fd, void *__buf, __SIZE_TYPE__ __bufsize, __PIO_OFFSET64 __offset),preadall64,(__fd,__buf,__bufsize,__offset))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4ff532ff */
+/* HASH CRC-32:0xfc5e1700 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,13 +18,13 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_thrd_detach_defined
-#if defined(__CRT_HAVE_pthread_detach)
+#ifdef __CRT_HAVE_pthread_detach
 #define __local_thrd_detach_defined 1
 #include <bits/threads.h>
 /* Dependency: "pthread_detach" */
 #ifndef ____localdep_pthread_detach_defined
 #define ____localdep_pthread_detach_defined 1
-#if defined(__CRT_HAVE_pthread_detach)
+#ifdef __CRT_HAVE_pthread_detach
 /* Indicate that the thread THREAD is never to be joined with PTHREAD_JOIN.
  * The resources of THREAD will therefore be freed immediately when it
  * terminates, instead of waiting for another thread to perform PTHREAD_JOIN on it */

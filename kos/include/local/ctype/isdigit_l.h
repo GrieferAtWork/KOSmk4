@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x921bbe8a */
+/* HASH CRC-32:0x80a9a0a8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "__locale_ctype_ptr_l" from "ctype" */
 #ifndef ____localdep___locale_ctype_ptr_l_defined
 #define ____localdep___locale_ctype_ptr_l_defined 1
-#if defined(__CRT_HAVE___locale_ctype_ptr_l)
+#ifdef __CRT_HAVE___locale_ctype_ptr_l
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW_NCX,__localdep___locale_ctype_ptr_l,(__locale_t __locale),__locale_ctype_ptr_l,(__locale))
 #else /* LIBC: __locale_ctype_ptr_l */
 #undef ____localdep___locale_ctype_ptr_l_defined
@@ -32,7 +32,7 @@ __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,char const *,__NOTHROW_NCX,__localdep___
 /* Dependency: "_isctype_l" from "ctype" */
 #ifndef ____localdep__isctype_l_defined
 #define ____localdep__isctype_l_defined 1
-#if defined(__CRT_HAVE__isctype_l)
+#ifdef __CRT_HAVE__isctype_l
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep__isctype_l,(int __ch, int __mask, __locale_t __locale),_isctype_l,(__ch,__mask,__locale))
 #else /* LIBC: _isctype_l */
 #undef ____localdep__isctype_l_defined

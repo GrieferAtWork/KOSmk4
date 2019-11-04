@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x16ca7a59 */
+/* HASH CRC-32:0xeb61ba15 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "strtol" from "stdlib" */
 #ifndef ____localdep_strtol_defined
 #define ____localdep_strtol_defined 1
-#if defined(__CRT_HAVE_strtol)
+#ifdef __CRT_HAVE_strtol
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),long,__NOTHROW_NCX,__localdep_strtol,(char const *__restrict __nptr, char **__endptr, int __base),strtol,(__nptr,__endptr,__base))
 #elif defined(__CRT_HAVE_strtoll) && (__SIZEOF_LONG__ == __SIZEOF_LONG_LONG__)
 __CREDIRECT(__ATTR_LEAF __ATTR_NONNULL((1)),long,__NOTHROW_NCX,__localdep_strtol,(char const *__restrict __nptr, char **__endptr, int __base),strtoll,(__nptr,__endptr,__base))

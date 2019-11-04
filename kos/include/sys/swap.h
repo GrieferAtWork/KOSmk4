@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc5cd8e60 */
+/* HASH CRC-32:0xe8d7a15 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -39,11 +39,11 @@ __SYSDECL_BEGIN
 
 #ifdef __CC__
 
-#if defined(__CRT_HAVE_swapon)
+#ifdef __CRT_HAVE_swapon
 /* @param swapflags: Set of `SWAP_FLAG_*' */
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,swapon,(char const *__path, int __swapflags),(__path,__swapflags))
 #endif /* swapon... */
-#if defined(__CRT_HAVE_swapoff)
+#ifdef __CRT_HAVE_swapoff
 __CDECLARE(__ATTR_NONNULL((1)),int,__NOTHROW_RPC,swapoff,(char const *__path),(__path))
 #endif /* swapoff... */
 

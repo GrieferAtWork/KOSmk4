@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x35e6444f */
+/* HASH CRC-32:0x7ccb7ef7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -87,7 +87,7 @@ __NAMESPACE_LOCAL_END
 /* Dependency: "crt_asctime_s" from "time" */
 #ifndef ____localdep_crt_asctime_s_defined
 #define ____localdep_crt_asctime_s_defined 1
-#if defined(__CRT_HAVE_asctime_s)
+#ifdef __CRT_HAVE_asctime_s
 /* Return in BUF a string of the form "Day Mon dd hh:mm:ss yyyy\n"
  * that is the representation of TP in this format */
 __CREDIRECT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,__localdep_crt_asctime_s,(char *__restrict __buf, __SIZE_TYPE__ __buflen, __STRUCT_TM const *__restrict __tp),asctime_s,(__buf,__buflen,__tp))
@@ -103,7 +103,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 3)),__errno_t,__NOTHROW_NCX,__localdep_crt_asctim
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Return the number of written characters, excluding a trailing NUL-character */
 __FORCELOCAL __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL __localdep_sprintf)(char *__restrict __buf, char const *__restrict __format, ...) { return __builtin_sprintf(__buf, __format, __builtin_va_arg_pack()); }
-#elif defined(__CRT_HAVE_sprintf) && !defined(__NO_ASMNAME)
+#elif defined(__CRT_HAVE_sprintf) && (!defined(__NO_ASMNAME))
 /* Print a formatted string to a given in-member string buffer `BUF'
  * Return the number of written characters, excluding a trailing NUL-character */
 __LIBC __ATTR_NONNULL((1, 2)) __ATTR_LIBC_PRINTF(2, 3) __STDC_INT_AS_SIZE_T __NOTHROW_NCX(__VLIBCCALL __localdep_sprintf)(char *__restrict __buf, char const *__restrict __format, ...) __CASMNAME("sprintf");

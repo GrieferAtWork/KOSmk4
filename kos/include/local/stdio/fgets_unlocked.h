@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x4bef9c37 */
+/* HASH CRC-32:0xe5dc500f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 /* Dependency: "fgetc_unlocked" from "stdio" */
 #ifndef ____localdep_fgetc_unlocked_defined
 #define ____localdep_fgetc_unlocked_defined 1
-#if defined(__CRT_HAVE_fgetc_unlocked)
+#ifdef __CRT_HAVE_fgetc_unlocked
 /* Same as `fgetc()', but performs I/O without acquiring a lock to `STREAM' */
 __CREDIRECT(__ATTR_NONNULL((1)),int,,__localdep_fgetc_unlocked,(__FILE *__restrict __stream),fgetc_unlocked,(__stream)) __THROWS(...)
 #elif defined(__CRT_HAVE_getc_unlocked)
@@ -49,7 +49,7 @@ __CREDIRECT(__ATTR_NONNULL((1)),int,,__localdep_fgetc_unlocked,(__FILE *__restri
 /* Dependency: "ferror_unlocked" from "stdio" */
 #ifndef ____localdep_ferror_unlocked_defined
 #define ____localdep_ferror_unlocked_defined 1
-#if defined(__CRT_HAVE_ferror_unlocked)
+#ifdef __CRT_HAVE_ferror_unlocked
 /* Same as `ferror()', but performs I/O without acquiring a lock to `STREAM' */
 __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferror_unlocked,(__FILE *__restrict __stream),ferror_unlocked,(__stream))
 #elif defined(__CRT_HAVE_ferror)
@@ -63,7 +63,7 @@ __CREDIRECT(__ATTR_WUNUSED __ATTR_NONNULL((1)),int,__NOTHROW_NCX,__localdep_ferr
 /* Dependency: "ungetc_unlocked" from "stdio" */
 #ifndef ____localdep_ungetc_unlocked_defined
 #define ____localdep_ungetc_unlocked_defined 1
-#if defined(__CRT_HAVE_ungetc_unlocked)
+#ifdef __CRT_HAVE_ungetc_unlocked
 /* Unget a single character byte of data previously returned by `getc()' */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_ungetc_unlocked,(int __ch, __FILE *__restrict __stream),ungetc_unlocked,(__ch,__stream))
 #elif defined(__CRT_HAVE_ungetc)

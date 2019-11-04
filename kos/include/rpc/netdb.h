@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7cb3bdaa */
+/* HASH CRC-32:0x439fa391 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -64,30 +64,30 @@ struct rpcent {
 	__STDC_INT32_AS_SSIZE_T r_number;  /* RPC program number. */
 };
 
-#if defined(__CRT_HAVE_setrpcent)
+#ifdef __CRT_HAVE_setrpcent
 __CDECLARE_VOID(,__NOTHROW_RPC_KOS,setrpcent,(int __stayopen),(__stayopen))
 #endif /* setrpcent... */
-#if defined(__CRT_HAVE_endrpcent)
+#ifdef __CRT_HAVE_endrpcent
 __CDECLARE_VOID(,__NOTHROW_NCX,endrpcent,(void),())
 #endif /* endrpcent... */
-#if defined(__CRT_HAVE_getrpcbyname)
+#ifdef __CRT_HAVE_getrpcbyname
 __CDECLARE(,struct rpcent *,__NOTHROW_RPC_KOS,getrpcbyname,(char const *__name),(__name))
 #endif /* getrpcbyname... */
-#if defined(__CRT_HAVE_getrpcbynumber)
+#ifdef __CRT_HAVE_getrpcbynumber
 __CDECLARE(,struct rpcent *,__NOTHROW_RPC_KOS,getrpcbynumber,(int __number),(__number))
 #endif /* getrpcbynumber... */
-#if defined(__CRT_HAVE_getrpcent)
+#ifdef __CRT_HAVE_getrpcent
 __CDECLARE(,struct rpcent *,__NOTHROW_RPC_KOS,getrpcent,(void),())
 #endif /* getrpcent... */
 
 #ifdef __USE_MISC
-#if defined(__CRT_HAVE_getrpcbyname_r)
+#ifdef __CRT_HAVE_getrpcbyname_r
 __CDECLARE(,int,__NOTHROW_RPC_KOS,getrpcbyname_r,(char const *__name, struct rpcent *__result_buf, char *__buffer, size_t __buflen, struct rpcent **__result),(__name,__result_buf,__buffer,__buflen,__result))
 #endif /* getrpcbyname_r... */
-#if defined(__CRT_HAVE_getrpcbynumber_r)
+#ifdef __CRT_HAVE_getrpcbynumber_r
 __CDECLARE(,int,__NOTHROW_RPC_KOS,getrpcbynumber_r,(int __number, struct rpcent *__result_buf, char *__buffer, size_t __buflen, struct rpcent **__result),(__number,__result_buf,__buffer,__buflen,__result))
 #endif /* getrpcbynumber_r... */
-#if defined(__CRT_HAVE_getrpcent_r)
+#ifdef __CRT_HAVE_getrpcent_r
 __CDECLARE(,int,__NOTHROW_RPC_KOS,getrpcent_r,(struct rpcent *__result_buf, char *__buffer, size_t __buflen, struct rpcent **__result),(__result_buf,__buffer,__buflen,__result))
 #endif /* getrpcent_r... */
 #endif /* __USE_MISC */

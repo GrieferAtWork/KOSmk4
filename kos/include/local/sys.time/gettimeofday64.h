@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7aeab835 */
+/* HASH CRC-32:0xbb6c0bc0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "gettimeofday32" from "sys.time" */
 #ifndef ____localdep_gettimeofday32_defined
 #define ____localdep_gettimeofday32_defined 1
-#if defined(__CRT_HAVE_gettimeofday)
+#ifdef __CRT_HAVE_gettimeofday
 /* Get the current time of day and timezone information,
  * putting it into *TV and *TZ.  If TZ is NULL, *TZ is not filled.
  * Returns 0 on success, -1 on errors.

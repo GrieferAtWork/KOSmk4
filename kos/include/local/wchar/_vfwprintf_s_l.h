@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa9424f2a */
+/* HASH CRC-32:0xa7a5881a */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 /* Dependency: "vfwprintf_s" from "wchar" */
 #ifndef ____localdep_vfwprintf_s_defined
 #define ____localdep_vfwprintf_s_defined 1
-#if defined(__CRT_HAVE_vfwprintf_s)
+#ifdef __CRT_HAVE_vfwprintf_s
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,,__localdep_vfwprintf_s,(__FILE *__stream, __WCHAR_TYPE__ const *__format, __builtin_va_list __args),vfwprintf_s,(__stream,__format,__args)) __THROWS(...)
 #elif defined(__CRT_HAVE_vfwprintf)
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__STDC_INT_AS_SSIZE_T,,__localdep_vfwprintf_s,(__FILE *__stream, __WCHAR_TYPE__ const *__format, __builtin_va_list __args),vfwprintf,(__stream,__format,__args)) __THROWS(...)

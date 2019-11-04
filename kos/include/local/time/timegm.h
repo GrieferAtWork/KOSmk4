@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x7bec8221 */
+/* HASH CRC-32:0x557a8607 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -54,7 +54,7 @@ __NAMESPACE_STD_END
 /* Dependency: "timegm64" from "time" */
 #ifndef ____localdep_timegm64_defined
 #define ____localdep_timegm64_defined 1
-#if defined(__CRT_HAVE_timegm64)
+#ifdef __CRT_HAVE_timegm64
 /* Like `mktime', but for TP represents Universal Time, not local time */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__time64_t,__NOTHROW_NCX,__localdep_timegm64,(__STRUCT_TM *__tp),timegm64,(__tp))
 #elif defined(__CRT_HAVE_timegm) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)

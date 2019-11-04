@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x6ee3dd3e */
+/* HASH CRC-32:0x325ae443 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -32,7 +32,7 @@ struct hsearch_data {
 /* Dependency: "hdestroy_r" from "search" */
 #ifndef ____localdep_hdestroy_r_defined
 #define ____localdep_hdestroy_r_defined 1
-#if defined(__CRT_HAVE_hdestroy_r)
+#ifdef __CRT_HAVE_hdestroy_r
 /* Reentrant versions which can handle multiple hashing tables at the same time */
 __CREDIRECT_VOID(,__NOTHROW_NCX,__localdep_hdestroy_r,(struct hsearch_data *__htab),hdestroy_r,(__htab))
 #elif defined(__CRT_HAVE_free) || defined(__CRT_HAVE_cfree)

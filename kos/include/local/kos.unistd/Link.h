@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbccbdf3b */
+/* HASH CRC-32:0x6e3fc458 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 /* Dependency: "LinkAt" */
 #ifndef ____localdep_LinkAt_defined
 #define ____localdep_LinkAt_defined 1
-#if defined(__CRT_HAVE_LinkAt)
+#ifdef __CRT_HAVE_LinkAt
 /* >> linkat(2)
  * Create a hard link from `FROMFD:FROM', leading to `TOFD:TO' */
 __CREDIRECT_VOID(__ATTR_NONNULL((2, 4)),,__localdep_LinkAt,(__fd_t __fromfd, char const *__from, __fd_t __tofd, char const *__to, __atflag_t __flags),LinkAt,(__fromfd,__from,__tofd,__to,__flags)) __THROWS(...)

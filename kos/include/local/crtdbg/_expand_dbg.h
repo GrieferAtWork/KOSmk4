@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf6240852 */
+/* HASH CRC-32:0x9687eeb1 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "realloc_in_place" */
 #ifndef ____localdep_realloc_in_place_defined
 #define ____localdep_realloc_in_place_defined 1
-#if defined(__CRT_HAVE_realloc_in_place)
+#ifdef __CRT_HAVE_realloc_in_place
 /* @EXCEPT: `realloc_in_place()' will return `NULL' if the reallocation isn't
  *           possible due to the requested memory above `MALLPTR' already being
  *           in use. However, an `E_BADALLOC' exception is thrown if insufficient

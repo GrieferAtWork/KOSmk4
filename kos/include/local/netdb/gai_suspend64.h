@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xdabbb0f3 */
+/* HASH CRC-32:0xc32c6259 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,12 +18,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_gai_suspend64_defined
-#if defined(__CRT_HAVE_gai_suspend)
+#ifdef __CRT_HAVE_gai_suspend
 #define __local_gai_suspend64_defined 1
 /* Dependency: "crt_gai_suspend" from "netdb" */
 #ifndef ____localdep_crt_gai_suspend_defined
 #define ____localdep_crt_gai_suspend_defined 1
-#if defined(__CRT_HAVE_gai_suspend)
+#ifdef __CRT_HAVE_gai_suspend
 /* Suspend execution of the thread until at least one of the ENT requests
  * in LIST is handled. If TIMEOUT is not a null pointer it specifies the
  * longest time the function keeps waiting before returning with an error.

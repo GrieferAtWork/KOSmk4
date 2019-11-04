@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x31258f58 */
+/* HASH CRC-32:0xa7632a5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -65,7 +65,7 @@
 #ifdef __CC__
 __SYSDECL_BEGIN
 
-#if defined(__CRT_HAVE_fnmatch)
+#ifdef __CRT_HAVE_fnmatch
 /* Match NAME against the filename pattern PATTERN,
  * returning zero if it matches, FNM_NOMATCH if not */
 __CDECLARE(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1, 2)),int,__NOTHROW_NCX,fnmatch,(char const *__pattern, char const *__name, int __match_flags),(__pattern,__name,__match_flags))

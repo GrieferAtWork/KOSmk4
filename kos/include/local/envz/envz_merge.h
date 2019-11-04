@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x3054f4c7 */
+/* HASH CRC-32:0x472808c */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "envz_entry" from "envz" */
 #ifndef ____localdep_envz_entry_defined
 #define ____localdep_envz_entry_defined 1
-#if defined(__CRT_HAVE_envz_entry)
+#ifdef __CRT_HAVE_envz_entry
 /* Returns a pointer to the entry in `ENVZ' for `NAME', or `NULL' if there is none
  * Note that if `name' contains a `=' character, only characters leading up to this
  * position are actually compared! */
@@ -40,7 +40,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((3)),char *,__NOTHROW_NCX,
 /* Dependency: "strlen" from "string" */
 #ifndef ____localdep_strlen_defined
 #define ____localdep_strlen_defined 1
-#if defined(__CRT_HAVE_strlen)
+#ifdef __CRT_HAVE_strlen
 /* Return the length of the string in characters (Same as `rawmemlen[...](STR, '\0')') */
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHROW_NCX,__localdep_strlen,(char const *__restrict __string),strlen,(__string))
 #else /* LIBC: strlen */
@@ -53,7 +53,7 @@ __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED __ATTR_NONNULL((1)),__SIZE_TYPE__,__NOTHR
 /* Dependency: "argz_append" from "argz" */
 #ifndef ____localdep_argz_append_defined
 #define ____localdep_argz_append_defined 1
-#if defined(__CRT_HAVE_argz_append)
+#ifdef __CRT_HAVE_argz_append
 /* Append `BUF', of length `BUF_LEN' to the argz vector in `PARGZ & PARGZ_LEN' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,__localdep_argz_append,(char **__restrict __pargz, __SIZE_TYPE__ *__restrict __pargz_len, char const *__restrict __buf, __SIZE_TYPE__ __buf_len),argz_append,(__pargz,__pargz_len,__buf,__buf_len))
 #elif defined(__CRT_HAVE___argz_create_sep)
@@ -71,7 +71,7 @@ __CREDIRECT(__ATTR_NONNULL((1, 2)),__errno_t,__NOTHROW_NCX,__localdep_argz_appen
 /* Dependency: "argz_delete" from "argz" */
 #ifndef ____localdep_argz_delete_defined
 #define ____localdep_argz_delete_defined 1
-#if defined(__CRT_HAVE_argz_delete)
+#ifdef __CRT_HAVE_argz_delete
 /* Delete `ENTRY' from `PARGZ & PARGZ_LEN', if it appears there
  * Note that `ENTRY' must be the actual pointer to one of the elements
  * of the given `PARGZ & PARGZ_LEN', and not just a string equal to one

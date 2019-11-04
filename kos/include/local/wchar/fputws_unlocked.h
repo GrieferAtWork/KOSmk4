@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xa62a5617 */
+/* HASH CRC-32:0xc7a79abf */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 /* Dependency: "file_wprinter_unlocked" from "wchar" */
 #ifndef ____localdep_file_wprinter_unlocked_defined
 #define ____localdep_file_wprinter_unlocked_defined 1
-#if defined(__CRT_HAVE_file_wprinter_unlocked)
+#ifdef __CRT_HAVE_file_wprinter_unlocked
 /* Same as `file_wprinter()', but performs I/O without acquiring a lock to `($FILE *)ARG' */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__SSIZE_TYPE__,,__localdep_file_wprinter_unlocked,(void *__arg, __WCHAR_TYPE__ const *__restrict __data, __SIZE_TYPE__ __datalen),file_wprinter_unlocked,(__arg,__data,__datalen)) __THROWS(...)
 #elif defined(__CRT_HAVE_file_wprinter)

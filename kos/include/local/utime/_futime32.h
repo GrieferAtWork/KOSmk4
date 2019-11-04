@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xed98d8f */
+/* HASH CRC-32:0x8705e8b5 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "crt_futime64" from "utime" */
 #ifndef ____localdep_crt_futime64_defined
 #define ____localdep_crt_futime64_defined 1
-#if defined(__CRT_HAVE_futime64)
+#ifdef __CRT_HAVE_futime64
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_crt_futime64,(__fd_t __fd, struct __utimbuf64 const *__file_times),futime64,(__fd,__file_times))
 #elif defined(__CRT_HAVE__futime64)
 __CREDIRECT(,int,__NOTHROW_RPC,__localdep_crt_futime64,(__fd_t __fd, struct __utimbuf64 const *__file_times),_futime64,(__fd,__file_times))

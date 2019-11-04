@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xc7141fad */
+/* HASH CRC-32:0xb56fb886 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,12 +18,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local__recalloc_dbg_defined
-#if defined(__CRT_HAVE__recalloc)
+#ifdef __CRT_HAVE__recalloc
 #define __local__recalloc_dbg_defined 1
 /* Dependency: "_recalloc" */
 #ifndef ____localdep__recalloc_defined
 #define ____localdep__recalloc_defined 1
-#if defined(__CRT_HAVE__recalloc)
+#ifdef __CRT_HAVE__recalloc
 __CREDIRECT(__ATTR_MALL_DEFAULT_ALIGNED __ATTR_WUNUSED __ATTR_ALLOC_SIZE((2, 3)),void *,__NOTHROW_NCX,__localdep__recalloc,(void *__mptr, __SIZE_TYPE__ __count, __SIZE_TYPE__ __num_bytes),_recalloc,(__mptr,__count,__num_bytes))
 #else /* LIBC: _recalloc */
 #undef ____localdep__recalloc_defined

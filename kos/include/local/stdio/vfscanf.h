@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x1775535a */
+/* HASH CRC-32:0xaeac2bd6 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 /* Dependency: "format_vscanf" from "format-printer" */
 #ifndef ____localdep_format_vscanf_defined
 #define ____localdep_format_vscanf_defined 1
-#if defined(__CRT_HAVE_format_vscanf)
+#ifdef __CRT_HAVE_format_vscanf
 /* Generic scanf implementation
  * Taking a regular scanf-style format string and argument, these
  * functions will call the given `SCANNER' function which in

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x466648fd */
+/* HASH CRC-32:0x743ee50d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -72,7 +72,7 @@ __NAMESPACE_LOCAL_END
 /* Dependency: "localtime64" from "time" */
 #ifndef ____localdep_localtime64_defined
 #define ____localdep_localtime64_defined 1
-#if defined(__CRT_HAVE_localtime64)
+#ifdef __CRT_HAVE_localtime64
 /* Return the `struct tm' representation of *TIMER in the local timezone */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__STRUCT_TM *,__NOTHROW_NCX,__localdep_localtime64,(__time64_t const *__timer),localtime64,(__timer))
 #elif defined(__CRT_HAVE_localtime) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)
@@ -91,7 +91,7 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__STRUCT_TM *,_
 /* Dependency: "localtime32" from "time" */
 #ifndef ____localdep_localtime32_defined
 #define ____localdep_localtime32_defined 1
-#if defined(__CRT_HAVE_localtime)
+#ifdef __CRT_HAVE_localtime
 /* Return the `struct tm' representation of *TIMER in the local timezone */
 __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__STRUCT_TM *,__NOTHROW_NCX,__localdep_localtime32,(__time64_t const *__timer),localtime,(__timer))
 #elif defined(__CRT_HAVE__localtime32)
@@ -105,7 +105,7 @@ __CREDIRECT(__ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),__STRUCT_TM *,_
 /* Dependency: "localtime_r" from "time" */
 #ifndef ____localdep_localtime_r_defined
 #define ____localdep_localtime_r_defined 1
-#if defined(__CRT_HAVE_localtime_r)
+#ifdef __CRT_HAVE_localtime_r
 /* Return the `struct tm' representation of *TIMER in local time, using *TP to store the result */
 __CREDIRECT(__ATTR_NONNULL((1, 2)),__STRUCT_TM *,__NOTHROW_NCX,__localdep_localtime_r,(__TM_TYPE(time) const *__restrict __timer, __STRUCT_TM *__restrict __tp),localtime_r,(__timer,__tp))
 #else /* LIBC: localtime_r */

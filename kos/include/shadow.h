@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x92386d2 */
+/* HASH CRC-32:0x1bb629ed */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -88,58 +88,58 @@ struct spwd {
 	__ULONGPTR_TYPE__ sp_flag;    /* Reserved. */
 };
 
-#if defined(__CRT_HAVE_setspent)
+#ifdef __CRT_HAVE_setspent
 /* Open database for reading.
  * This function is not part of POSIX and therefore no official cancellation point */
 __CDECLARE_VOID(,__NOTHROW_RPC,setspent,(void),())
 #endif /* setspent... */
-#if defined(__CRT_HAVE_endspent)
+#ifdef __CRT_HAVE_endspent
 /* Close database. */
 __CDECLARE_VOID(,__NOTHROW_RPC_NOKOS,endspent,(void),())
 #endif /* endspent... */
-#if defined(__CRT_HAVE_getspent)
+#ifdef __CRT_HAVE_getspent
 /* Get next entry from database, perhaps after opening the file.
  * This function is not part of POSIX and therefore no official cancellation point */
 __CDECLARE(,struct spwd *,__NOTHROW_RPC,getspent,(void),())
 #endif /* getspent... */
-#if defined(__CRT_HAVE_getspnam)
+#ifdef __CRT_HAVE_getspnam
 /* Get shadow entry matching NAME.
  * This function is not part of POSIX and therefore no official cancellation point */
 __CDECLARE(__ATTR_NONNULL((1)),struct spwd *,__NOTHROW_RPC,getspnam,(char const *__restrict __name),(__name))
 #endif /* getspnam... */
-#if defined(__CRT_HAVE_sgetspent)
+#ifdef __CRT_HAVE_sgetspent
 /* Read shadow entry from STRING.
  * This function is not part of POSIX and therefore no official cancellation point */
 __CDECLARE(__ATTR_NONNULL((1)),struct spwd *,__NOTHROW_RPC,sgetspent,(char const *__restrict __string),(__string))
 #endif /* sgetspent... */
-#if defined(__CRT_HAVE_fgetspent)
+#ifdef __CRT_HAVE_fgetspent
 /* Read next shadow entry from STREAM.
  * This function is not part of POSIX and therefore no official cancellation point */
 __CDECLARE(__ATTR_NONNULL((1)),struct spwd *,__NOTHROW_RPC,fgetspent,(__FILE *__restrict __stream),(__stream))
 #endif /* fgetspent... */
-#if defined(__CRT_HAVE_putspent)
+#ifdef __CRT_HAVE_putspent
 /* Write line containing shadow password entry to stream.
  * This function is not part of POSIX and therefore no official cancellation point */
 __CDECLARE(__ATTR_NONNULL((1, 2)),int,__NOTHROW_RPC,putspent,(struct spwd const *__restrict __p, __FILE *__restrict __stream),(__p,__stream))
 #endif /* putspent... */
 
 #ifdef __USE_MISC
-#if defined(__CRT_HAVE_getspent_r)
+#ifdef __CRT_HAVE_getspent_r
 /* Reentrant versions of some of the functions above.
  * These functions are not part of POSIX and therefore no official cancellation point */
 __CDECLARE(__ATTR_NONNULL((1, 2, 4)),int,__NOTHROW_RPC,getspent_r,(struct spwd *__restrict __result_buf, char *__restrict __buffer, size_t __buflen, struct spwd **__restrict __result),(__result_buf,__buffer,__buflen,__result))
 #endif /* getspent_r... */
-#if defined(__CRT_HAVE_getspnam_r)
+#ifdef __CRT_HAVE_getspnam_r
 /* Reentrant versions of some of the functions above.
  * These functions are not part of POSIX and therefore no official cancellation point */
 __CDECLARE(__ATTR_NONNULL((1, 2, 3, 5)),int,__NOTHROW_RPC,getspnam_r,(char const *__restrict __name, struct spwd *__restrict __result_buf, char *__restrict __buffer, size_t __buflen, struct spwd **__restrict __result),(__name,__result_buf,__buffer,__buflen,__result))
 #endif /* getspnam_r... */
-#if defined(__CRT_HAVE_sgetspent_r)
+#ifdef __CRT_HAVE_sgetspent_r
 /* Reentrant versions of some of the functions above.
  * These functions are not part of POSIX and therefore no official cancellation point */
 __CDECLARE(__ATTR_NONNULL((1, 2, 3, 5)),int,__NOTHROW_RPC,sgetspent_r,(char const *__restrict __string, struct spwd *__restrict __result_buf, char *__restrict __buffer, size_t __buflen, struct spwd **__restrict __result),(__string,__result_buf,__buffer,__buflen,__result))
 #endif /* sgetspent_r... */
-#if defined(__CRT_HAVE_fgetspent_r)
+#ifdef __CRT_HAVE_fgetspent_r
 /* Reentrant versions of some of the functions above.
  * These functions are not part of POSIX and therefore no official cancellation point */
 __CDECLARE(__ATTR_NONNULL((1, 2, 3, 5)),int,__NOTHROW_RPC,fgetspent_r,(__FILE *__restrict __stream, struct spwd *__restrict __result_buf, char *__restrict __buffer, size_t __buflen, struct spwd **__restrict __result),(__stream,__result_buf,__buffer,__buflen,__result))
@@ -148,11 +148,11 @@ __CDECLARE(__ATTR_NONNULL((1, 2, 3, 5)),int,__NOTHROW_RPC,fgetspent_r,(__FILE *_
 
 /* The simple locking functionality provided here is not suitable for multi-threaded applications.  */
 
-#if defined(__CRT_HAVE_lckpwdf)
+#ifdef __CRT_HAVE_lckpwdf
 /* Protect password file against multi writers */
 __CDECLARE(,int,__NOTHROW_RPC_KOS,lckpwdf,(void),())
 #endif /* lckpwdf... */
-#if defined(__CRT_HAVE_ulckpwdf)
+#ifdef __CRT_HAVE_ulckpwdf
 /* Unlock password file */
 __CDECLARE(,int,__NOTHROW_NCX,ulckpwdf,(void),())
 #endif /* ulckpwdf... */

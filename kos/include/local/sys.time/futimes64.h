@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x745e1035 */
+/* HASH CRC-32:0x6c38a92 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,12 +18,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_futimes64_defined
-#if defined(__CRT_HAVE_futimes)
+#ifdef __CRT_HAVE_futimes
 #define __local_futimes64_defined 1
 /* Dependency: "futimes32" from "sys.time" */
 #ifndef ____localdep_futimes32_defined
 #define ____localdep_futimes32_defined 1
-#if defined(__CRT_HAVE_futimes)
+#ifdef __CRT_HAVE_futimes
 /* Same as `utimes', but does not follow symbolic links */
 __CREDIRECT(,int,__NOTHROW_NCX,__localdep_futimes32,(__fd_t __fd, struct __timeval32 const __tvp[2]),futimes,(__fd,__tvp))
 #else /* LIBC: futimes */

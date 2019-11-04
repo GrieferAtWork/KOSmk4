@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x72df8cc4 */
+/* HASH CRC-32:0x87f817d7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_pthread_timedjoin64_np_defined
-#if defined(__CRT_HAVE_pthread_timedjoin_np)
+#ifdef __CRT_HAVE_pthread_timedjoin_np
 #define __local_pthread_timedjoin64_np_defined 1
 #include <bits/pthreadtypes.h>
 #include <bits/timespec.h>
@@ -28,7 +28,7 @@
 /* Dependency: "pthread_timedjoin32_np" from "pthread" */
 #ifndef ____localdep_pthread_timedjoin32_np_defined
 #define ____localdep_pthread_timedjoin32_np_defined 1
-#if defined(__CRT_HAVE_pthread_timedjoin_np)
+#ifdef __CRT_HAVE_pthread_timedjoin_np
 /* Make calling thread wait for termination of the thread THREAD, but only
  * until TIMEOUT. The exit status of the thread is stored in
  * *THREAD_RETURN, if THREAD_RETURN is not NULL. */

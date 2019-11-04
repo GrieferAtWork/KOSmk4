@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x477631fe */
+/* HASH CRC-32:0x76dcfecb */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "wcwidth" from "wchar" */
 #ifndef ____localdep_wcwidth_defined
 #define ____localdep_wcwidth_defined 1
-#if defined(__CRT_HAVE_wcwidth)
+#ifdef __CRT_HAVE_wcwidth
 __CREDIRECT(__ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_wcwidth,(__WCHAR_TYPE__ __ch),wcwidth,(__ch))
 #else /* LIBC: wcwidth */
 #include <local/wchar/wcwidth.h>

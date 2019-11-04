@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x77363f46 */
+/* HASH CRC-32:0x9bb96623 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -23,7 +23,7 @@
 /* Dependency: "timerfd_gettime32" from "sys.timerfd" */
 #ifndef ____localdep_timerfd_gettime32_defined
 #define ____localdep_timerfd_gettime32_defined 1
-#if defined(__CRT_HAVE_timerfd_gettime)
+#ifdef __CRT_HAVE_timerfd_gettime
 /* Return the next expiration time of UFD */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_timerfd_gettime32,(__fd_t __ufd, struct __itimerspec32 *__restrict __otmr),timerfd_gettime,(__ufd,__otmr))
 #else /* LIBC: timerfd_gettime */
@@ -34,7 +34,7 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_timerfd_gettime32,(
 /* Dependency: "timerfd_gettime64" from "sys.timerfd" */
 #ifndef ____localdep_timerfd_gettime64_defined
 #define ____localdep_timerfd_gettime64_defined 1
-#if defined(__CRT_HAVE_timerfd_gettime64)
+#ifdef __CRT_HAVE_timerfd_gettime64
 /* Return the next expiration time of UFD */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,__localdep_timerfd_gettime64,(__fd_t __ufd, struct itimerspec64 *__restrict __otmr),timerfd_gettime64,(__ufd,__otmr))
 #elif defined(__CRT_HAVE_timerfd_gettime) && (__SIZEOF_TIME32_T__ == __SIZEOF_TIME64_T__)

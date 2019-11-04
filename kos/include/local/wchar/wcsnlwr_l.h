@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x164d83b2 */
+/* HASH CRC-32:0x82ed1f16 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "towlower_l" from "wctype" */
 #ifndef ____localdep_towlower_l_defined
 #define ____localdep_towlower_l_defined 1
-#if defined(__CRT_HAVE_towlower_l)
+#ifdef __CRT_HAVE_towlower_l
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towlower_l,(__WINT_TYPE__ __wc, __locale_t __locale),towlower_l,(__wc,__locale))
 #elif defined(__CRT_HAVE__towlower_l)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,__WINT_TYPE__,__NOTHROW_NCX,__localdep_towlower_l,(__WINT_TYPE__ __wc, __locale_t __locale),_towlower_l,(__wc,__locale))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x40f30594 */
+/* HASH CRC-32:0x619f02a8 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -153,27 +153,27 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 #ifdef __USE_DOS
 
 #ifdef __CC__
-#if defined(__CRT_HAVE__clearfp)
+#ifdef __CRT_HAVE__clearfp
 __CDECLARE(,__UINT32_TYPE__,__NOTHROW_NCX,_clearfp,(void),())
 #endif /* _clearfp... */
-#if defined(__CRT_HAVE__controlfp)
+#ifdef __CRT_HAVE__controlfp
 __CDECLARE(,__UINT32_TYPE__,__NOTHROW_NCX,_controlfp,(__UINT32_TYPE__ __newval, __UINT32_TYPE__ __mask),(__newval,__mask))
 #endif /* _controlfp... */
-#if defined(__CRT_HAVE__set_controlfp)
+#ifdef __CRT_HAVE__set_controlfp
 __CDECLARE_VOID(,__NOTHROW_NCX,_set_controlfp,(__UINT32_TYPE__ __newval, __UINT32_TYPE__ __mask),(__newval,__mask))
 #endif /* _set_controlfp... */
-#if defined(__CRT_HAVE__controlfp_s)
+#ifdef __CRT_HAVE__controlfp_s
 __CDECLARE(,__errno_t,__NOTHROW_NCX,_controlfp_s,(__UINT32_TYPE__ *__pcurrent, __UINT32_TYPE__ __newval, __UINT32_TYPE__ __mask),(__pcurrent,__newval,__mask))
 #endif /* _controlfp_s... */
-#if defined(__CRT_HAVE__statusfp)
+#ifdef __CRT_HAVE__statusfp
 __CDECLARE(,__UINT32_TYPE__,__NOTHROW_NCX,_statusfp,(void),())
 #endif /* _statusfp... */
-#if defined(__CRT_HAVE__fpreset)
+#ifdef __CRT_HAVE__fpreset
 __CDECLARE_VOID(,__NOTHROW_NCX,_fpreset,(void),())
 #elif defined(__CRT_HAVE_fpreset)
 __CREDIRECT_VOID(,__NOTHROW_NCX,_fpreset,(void),fpreset,())
 #endif /* _fpreset... */
-#if defined(__CRT_HAVE__statusfp2)
+#ifdef __CRT_HAVE__statusfp2
 __CDECLARE_VOID(,__NOTHROW_NCX,_statusfp2,(__UINT32_TYPE__ *__x86_stat, __UINT32_TYPE__ *__sse2_stat),(__x86_stat,__sse2_stat))
 #endif /* _statusfp2... */
 #endif /* __CC__ */
@@ -225,15 +225,15 @@ __CDECLARE_VOID(,__NOTHROW_NCX,_statusfp2,(__UINT32_TYPE__ *__x86_stat, __UINT32
 #endif
 
 #ifdef __CC__
-#if defined(__CRT_HAVE__control87)
+#ifdef __CRT_HAVE__control87
 __CDECLARE(,__UINT32_TYPE__,__NOTHROW_NCX,_control87,(__UINT32_TYPE__ __newval, __UINT32_TYPE__ __mask),(__newval,__mask))
 #endif /* _control87... */
 #if defined(__x86_64__) || defined(__i386__)
-#if defined(__CRT_HAVE___control87_2)
+#ifdef __CRT_HAVE___control87_2
 __CDECLARE(,int,__NOTHROW_NCX,__control87_2,(__UINT32_TYPE__ __newval, __UINT32_TYPE__ __mask, __UINT32_TYPE__ *__x86_control_word, __UINT32_TYPE__ *__sse2_control_word),(__newval,__mask,__x86_control_word,__sse2_control_word))
 #endif /* __control87_2... */
 #endif /* X64... */
-#if defined(__CRT_HAVE___fpecode)
+#ifdef __CRT_HAVE___fpecode
 __CDECLARE(,int *,__NOTHROW_NCX,__fpecode,(void),())
 #endif /* __fpecode... */
 #define _fpecode      (*__fpecode())
@@ -275,13 +275,13 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,_copysign,(double __num,
 /* Return X with its signed changed to Y's */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL _copysign)(double __num, double __sign) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(copysign))(__num, __sign); }
 #endif /* _copysign... */
-#if defined(__CRT_HAVE__chgsign)
+#ifdef __CRT_HAVE__chgsign
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,_chgsign,(double __x),(__x))
 #else /* LIBC: _chgsign */
 #include <local/float/_chgsign.h>
 __NAMESPACE_LOCAL_USING_OR_IMPL(_chgsign, __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED double __NOTHROW(__LIBCCALL _chgsign)(double __x) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(_chgsign))(__x); })
 #endif /* _chgsign... */
-#if defined(__CRT_HAVE___scalb)
+#ifdef __CRT_HAVE___scalb
 /* Return X times (2 to the Nth power) */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,_scalb,(double __x, double __n),__scalb,(__x,__n))
 #elif defined(__CRT_HAVE__scalb)
@@ -291,7 +291,7 @@ __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,_scalb,(double __x, double __n),(__x,
 /* Return X times (2 to the Nth power) */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,_scalb,(double __x, double __n),scalb,(__x,__n))
 #endif /* _scalb... */
-#if defined(__CRT_HAVE___logb)
+#ifdef __CRT_HAVE___logb
 /* Return the base 2 signed integral exponent of X */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,_logb,(double __x),__logb,(__x))
 #elif defined(__CRT_HAVE__logb)
@@ -301,7 +301,7 @@ __CDECLARE(__ATTR_WUNUSED,double,__NOTHROW,_logb,(double __x),(__x))
 /* Return the base 2 signed integral exponent of X */
 __CREDIRECT(__ATTR_WUNUSED,double,__NOTHROW,_logb,(double __x),logb,(__x))
 #endif /* _logb... */
-#if defined(__CRT_HAVE___nextafter)
+#ifdef __CRT_HAVE___nextafter
 /* Return X + epsilon if X < Y, X - epsilon if X > Y */
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,double,__NOTHROW,_nextafter,(double __x, double __y),__nextafter,(__x,__y))
 #elif defined(__CRT_HAVE__nextafter)
@@ -345,7 +345,7 @@ __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_isnan,(double __val),(__va
 /* Return nonzero if VALUE is not a number */
 __FORCELOCAL __ATTR_CONST __ATTR_WUNUSED int __NOTHROW(__LIBCCALL _isnan)(double __val) { return (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(isnan))(__val); }
 #endif /* _isnan... */
-#if defined(__CRT_HAVE__fpclass)
+#ifdef __CRT_HAVE__fpclass
 __CDECLARE(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,_fpclass,(double __x),(__x))
 #endif /* _fpclass... */
 #if defined(__x86_64__) || defined(__i386__)
@@ -381,7 +381,7 @@ __FORCELOCAL __ATTR_WUNUSED float __NOTHROW(__LIBCCALL _scalbf)(float __x, float
 #define _FPCLASS_PINF   0x0200 /* positive infinity. */
 
 #ifdef __CC__
-#if defined(__CRT_HAVE_fpreset)
+#ifdef __CRT_HAVE_fpreset
 __CDECLARE_VOID(,__NOTHROW_NCX,fpreset,(void),())
 #elif defined(__CRT_HAVE__fpreset)
 __CREDIRECT_VOID(,__NOTHROW_NCX,fpreset,(void),_fpreset,())

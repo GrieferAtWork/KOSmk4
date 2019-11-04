@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbfa7487b */
+/* HASH CRC-32:0xd50ab66d */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,12 +18,12 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local___issignalingl_defined
-#if defined(__CRT_HAVE___issignaling)
+#ifdef __CRT_HAVE___issignaling
 #define __local___issignalingl_defined 1
 /* Dependency: "__issignaling" */
 #ifndef ____localdep___issignaling_defined
 #define ____localdep___issignaling_defined 1
-#if defined(__CRT_HAVE___issignaling)
+#ifdef __CRT_HAVE___issignaling
 __CREDIRECT(__ATTR_CONST __ATTR_WUNUSED,int,__NOTHROW,__localdep___issignaling,(double __val),__issignaling,(__val))
 #else /* LIBC: __issignaling */
 #undef ____localdep___issignaling_defined

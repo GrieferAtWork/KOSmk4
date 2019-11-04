@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x8b44019a */
+/* HASH CRC-32:0xfd5fe612 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -141,7 +141,7 @@ __NAMESPACE_STD_USING(fexcept_t)
 __NAMESPACE_STD_BEGIN
 #ifndef __std_feclearexcept_defined
 #define __std_feclearexcept_defined 1
-#if defined(__CRT_HAVE_feclearexcept)
+#ifdef __CRT_HAVE_feclearexcept
 /* Clear the supported exceptions represented by EXCEPTS */
 __CDECLARE(,int,__NOTHROW,feclearexcept,(int __excepts),(__excepts))
 #else /* LIBC: feclearexcept */
@@ -150,7 +150,7 @@ __CDECLARE(,int,__NOTHROW,feclearexcept,(int __excepts),(__excepts))
 #endif /* !__std_feclearexcept_defined */
 #ifndef __std_fegetexceptflag_defined
 #define __std_fegetexceptflag_defined 1
-#if defined(__CRT_HAVE_fegetexceptflag)
+#ifdef __CRT_HAVE_fegetexceptflag
 /* Store implementation-defined representation of the exception
  * flags indicated by EXCEPTS in the object pointed to by FLAGP */
 __CDECLARE(,int,__NOTHROW_NCX,fegetexceptflag,(fexcept_t *__flagp, int __excepts),(__flagp,__excepts))
@@ -160,7 +160,7 @@ __CDECLARE(,int,__NOTHROW_NCX,fegetexceptflag,(fexcept_t *__flagp, int __excepts
 #endif /* !__std_fegetexceptflag_defined */
 #ifndef __std_feraiseexcept_defined
 #define __std_feraiseexcept_defined 1
-#if defined(__CRT_HAVE_feraiseexcept)
+#ifdef __CRT_HAVE_feraiseexcept
 /* Raise the supported exceptions represented by EXCEPTS */
 __CDECLARE(,int,__NOTHROW,feraiseexcept,(int __excepts),(__excepts))
 #else /* LIBC: feraiseexcept */
@@ -169,7 +169,7 @@ __CDECLARE(,int,__NOTHROW,feraiseexcept,(int __excepts),(__excepts))
 #endif /* !__std_feraiseexcept_defined */
 #ifndef __std_fesetexceptflag_defined
 #define __std_fesetexceptflag_defined 1
-#if defined(__CRT_HAVE_fesetexceptflag)
+#ifdef __CRT_HAVE_fesetexceptflag
 /* Set complete status for exceptions indicated by EXCEPTS according
  * to the representation in the object pointed to by FLAGP */
 __CDECLARE(,int,__NOTHROW_NCX,fesetexceptflag,(fexcept_t const *__flagp, int __excepts),(__flagp,__excepts))
@@ -179,7 +179,7 @@ __CDECLARE(,int,__NOTHROW_NCX,fesetexceptflag,(fexcept_t const *__flagp, int __e
 #endif /* !__std_fesetexceptflag_defined */
 #ifndef __std_fetestexcept_defined
 #define __std_fetestexcept_defined 1
-#if defined(__CRT_HAVE_fetestexcept)
+#ifdef __CRT_HAVE_fetestexcept
 /* Determine which of subset of the exceptions
  * specified by EXCEPTS are currently set */
 __CDECLARE(,int,__NOTHROW,fetestexcept,(int __excepts),(__excepts))
@@ -189,7 +189,7 @@ __CDECLARE(,int,__NOTHROW,fetestexcept,(int __excepts),(__excepts))
 #endif /* !__std_fetestexcept_defined */
 #ifndef __std_fegetround_defined
 #define __std_fegetround_defined 1
-#if defined(__CRT_HAVE_fegetround)
+#ifdef __CRT_HAVE_fegetround
 /* Get current rounding direction */
 __CDECLARE(__ATTR_PURE,int,__NOTHROW,fegetround,(void),())
 #else /* LIBC: fegetround */
@@ -198,7 +198,7 @@ __CDECLARE(__ATTR_PURE,int,__NOTHROW,fegetround,(void),())
 #endif /* !__std_fegetround_defined */
 #ifndef __std_fesetround_defined
 #define __std_fesetround_defined 1
-#if defined(__CRT_HAVE_fesetround)
+#ifdef __CRT_HAVE_fesetround
 /* Establish the rounding direction represented by ROUND */
 __CDECLARE(,int,__NOTHROW,fesetround,(int __rounding_direction),(__rounding_direction))
 #else /* LIBC: fesetround */
@@ -207,7 +207,7 @@ __CDECLARE(,int,__NOTHROW,fesetround,(int __rounding_direction),(__rounding_dire
 #endif /* !__std_fesetround_defined */
 #ifndef __std_fegetenv_defined
 #define __std_fegetenv_defined 1
-#if defined(__CRT_HAVE_fegetenv)
+#ifdef __CRT_HAVE_fegetenv
 /* Store the current floating-point environment in the object pointed to by ENVP */
 __CDECLARE(,int,__NOTHROW_NCX,fegetenv,(fenv_t *___envp),(___envp))
 #else /* LIBC: fegetenv */
@@ -216,7 +216,7 @@ __CDECLARE(,int,__NOTHROW_NCX,fegetenv,(fenv_t *___envp),(___envp))
 #endif /* !__std_fegetenv_defined */
 #ifndef __std_feholdexcept_defined
 #define __std_feholdexcept_defined 1
-#if defined(__CRT_HAVE_feholdexcept)
+#ifdef __CRT_HAVE_feholdexcept
 /* Save the current environment in the object pointed to by ENVP, clear
  * exception flags and install a non-stop mode (if available) for all exceptions */
 __CDECLARE(,int,__NOTHROW_NCX,feholdexcept,(fenv_t *___envp),(___envp))
@@ -226,7 +226,7 @@ __CDECLARE(,int,__NOTHROW_NCX,feholdexcept,(fenv_t *___envp),(___envp))
 #endif /* !__std_feholdexcept_defined */
 #ifndef __std_fesetenv_defined
 #define __std_fesetenv_defined 1
-#if defined(__CRT_HAVE_fesetenv)
+#ifdef __CRT_HAVE_fesetenv
 /* Establish the floating-point environment represented by the object pointed to by ENVP */
 __CDECLARE(,int,__NOTHROW_NCX,fesetenv,(fenv_t const *___envp),(___envp))
 #else /* LIBC: fesetenv */
@@ -235,7 +235,7 @@ __CDECLARE(,int,__NOTHROW_NCX,fesetenv,(fenv_t const *___envp),(___envp))
 #endif /* !__std_fesetenv_defined */
 #ifndef __std_feupdateenv_defined
 #define __std_feupdateenv_defined 1
-#if defined(__CRT_HAVE_feupdateenv)
+#ifdef __CRT_HAVE_feupdateenv
 /* Save current exceptions in temporary storage, install environment
  * represented by object pointed to by ENVP and raise exceptions
  * according to saved exceptions */
@@ -293,19 +293,19 @@ __NAMESPACE_STD_USING(feupdateenv)
 #endif /* !__feupdateenv_defined && !__std_feupdateenv_defined */
 #endif /* !__CXX_SYSTEM_HEADER */
 #ifdef __USE_GNU
-#if defined(__CRT_HAVE_feenableexcept)
+#ifdef __CRT_HAVE_feenableexcept
 /* Enable individual exceptions.  Will not enable more exceptions than
  * EXCEPTS specifies.  Returns the previous enabled exceptions if all
  * exceptions are successfully set, otherwise returns -1 */
 __CDECLARE(,int,__NOTHROW,feenableexcept,(int __excepts),(__excepts))
 #endif /* feenableexcept... */
-#if defined(__CRT_HAVE_fedisableexcept)
+#ifdef __CRT_HAVE_fedisableexcept
 /* Disable individual exceptions.  Will not disable more exceptions than
  * EXCEPTS specifies.  Returns the previous enabled exceptions if all
  * exceptions are successfully disabled, otherwise returns -1 */
 __CDECLARE(,int,__NOTHROW,fedisableexcept,(int __excepts),(__excepts))
 #endif /* fedisableexcept... */
-#if defined(__CRT_HAVE_fegetexcept)
+#ifdef __CRT_HAVE_fegetexcept
 /* Return enabled exceptions */
 __CDECLARE(,int,__NOTHROW,fegetexcept,(void),())
 #endif /* fegetexcept... */

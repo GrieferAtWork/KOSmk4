@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xaa85eda2 */
+/* HASH CRC-32:0xf0c76559 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -24,7 +24,7 @@
 /* Dependency: "Truncate64" from "kos.unistd" */
 #ifndef ____localdep_Truncate64_defined
 #define ____localdep_Truncate64_defined 1
-#if defined(__CRT_HAVE_Truncate64)
+#ifdef __CRT_HAVE_Truncate64
 /* >> truncate64(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),,__localdep_Truncate64,(char const *__file, __pos64_t __length),Truncate64,(__file,__length)) __THROWS(...)
@@ -45,7 +45,7 @@ __CREDIRECT_VOID(__ATTR_NONNULL((1)),,__localdep_Truncate64,(char const *__file,
 /* Dependency: "Truncate32" from "kos.unistd" */
 #ifndef ____localdep_Truncate32_defined
 #define ____localdep_Truncate32_defined 1
-#if defined(__CRT_HAVE_Truncate)
+#ifdef __CRT_HAVE_Truncate
 /* >> truncate(2)
  * Truncate the given file `FILE' to a length of `LENGTH' */
 __CREDIRECT_VOID(__ATTR_NONNULL((1)),,__localdep_Truncate32,(char const *__file, __pos32_t __length),Truncate,(__file,__length)) __THROWS(...)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9cd6c210 */
+/* HASH CRC-32:0xdd771ec0 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "iswalpha_l" from "wctype" */
 #ifndef ____localdep_iswalpha_l_defined
 #define ____localdep_iswalpha_l_defined 1
-#if defined(__CRT_HAVE_iswalpha_l)
+#ifdef __CRT_HAVE_iswalpha_l
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswalpha_l,(__WINT_TYPE__ __wc, __locale_t __locale),iswalpha_l,(__wc,__locale))
 #elif defined(__CRT_HAVE__iswalpha_l)
 __CREDIRECT(__ATTR_PURE __ATTR_WUNUSED,int,__NOTHROW_NCX,__localdep_iswalpha_l,(__WINT_TYPE__ __wc, __locale_t __locale),_iswalpha_l,(__wc,__locale))

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xbbdbdaa0 */
+/* HASH CRC-32:0x172ef917 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 /* Dependency: "memsetq" from "string" */
 #ifndef ____localdep_memsetq_defined
 #define ____localdep_memsetq_defined 1
-#if defined(__fast_memsetq_defined)
+#ifdef __fast_memsetq_defined
 /* Fill memory with a given qword */
 #define __localdep_memsetq (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memsetq))
 #elif defined(__CRT_HAVE_memsetq)

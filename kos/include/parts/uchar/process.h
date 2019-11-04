@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x796f099 */
+/* HASH CRC-32:0x7271ade7 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -110,11 +110,11 @@ __CREDIRECT(__ATTR_NONNULL((2, 3)) __ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,c
 #elif defined(__CRT_HAVE__wexecvpe) && (__SIZEOF_WCHAR_T__ == 4)
 __CREDIRECT(__ATTR_NONNULL((2, 3)) __ATTR_NONNULL((1, 2, 3)),int,__NOTHROW_RPC,c32execvpe,(char32_t const *__restrict __path, __T32ARGV, __T32ENVP),_wexecvpe,(__path, ___argv, ___envp))
 #endif /* c32execvpe... */
-#if defined(__CRT_HAVE_wexecl) && (__SIZEOF_WCHAR_T__ == 2) && !defined(__NO_ASMNAME)
+#if defined(__CRT_HAVE_wexecl) && (__SIZEOF_WCHAR_T__ == 2) && (!defined(__NO_ASMNAME))
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL c16execl)(char16_t const *__restrict __path, char16_t const *__args, ... /*, (char16_t *)NULL*/) __CASMNAME("wexecl");
-#elif defined(__CRT_HAVE__wexecl) && (__SIZEOF_WCHAR_T__ == 2) && !defined(__NO_ASMNAME)
+#elif defined(__CRT_HAVE__wexecl) && (__SIZEOF_WCHAR_T__ == 2) && (!defined(__NO_ASMNAME))
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL c16execl)(char16_t const *__restrict __path, char16_t const *__args, ... /*, (char16_t *)NULL*/) __CASMNAME("_wexecl");
-#elif defined(__CRT_HAVE_DOS$_wexecl) && !defined(__NO_ASMNAME)
+#elif defined(__CRT_HAVE_DOS$_wexecl) && (!defined(__NO_ASMNAME))
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBDCALL c16execl)(char16_t const *__restrict __path, char16_t const *__args, ... /*, (char16_t *)NULL*/) __CASMNAME_DOS("_wexecl");
 #elif (defined(__CRT_HAVE_wexecv) && __SIZEOF_WCHAR_T__ == 2) || (defined(__CRT_HAVE__wexecv) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_DOS$_wexecv)
 #include <local/parts.uchar.process/c16execl.h>
@@ -124,9 +124,9 @@ __NAMESPACE_LOCAL_USING(c16execl)
 #define c16execl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16execl))
 #endif /* !__cplusplus */
 #endif /* c16execl... */
-#if defined(__CRT_HAVE_wexecl) && (__SIZEOF_WCHAR_T__ == 4) && !defined(__NO_ASMNAME)
+#if defined(__CRT_HAVE_wexecl) && (__SIZEOF_WCHAR_T__ == 4) && (!defined(__NO_ASMNAME))
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL c32execl)(char32_t const *__restrict __path, char32_t const *__args, ... /*, (char32_t *)NULL*/) __CASMNAME("wexecl");
-#elif defined(__CRT_HAVE__wexecl) && (__SIZEOF_WCHAR_T__ == 4) && !defined(__NO_ASMNAME)
+#elif defined(__CRT_HAVE__wexecl) && (__SIZEOF_WCHAR_T__ == 4) && (!defined(__NO_ASMNAME))
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL c32execl)(char32_t const *__restrict __path, char32_t const *__args, ... /*, (char32_t *)NULL*/) __CASMNAME("_wexecl");
 #elif (defined(__CRT_HAVE_wexecv) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE__wexecv) && __SIZEOF_WCHAR_T__ == 4)
 #include <local/parts.uchar.process/c32execl.h>
@@ -136,11 +136,11 @@ __NAMESPACE_LOCAL_USING(c32execl)
 #define c32execl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32execl))
 #endif /* !__cplusplus */
 #endif /* c32execl... */
-#if defined(__CRT_HAVE_wexeclp) && (__SIZEOF_WCHAR_T__ == 2) && !defined(__NO_ASMNAME)
+#if defined(__CRT_HAVE_wexeclp) && (__SIZEOF_WCHAR_T__ == 2) && (!defined(__NO_ASMNAME))
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL c16execlp)(char16_t const *__restrict __file, char16_t const *__args, ... /*, (char16_t *)NULL*/) __CASMNAME("wexeclp");
-#elif defined(__CRT_HAVE__wexeclp) && (__SIZEOF_WCHAR_T__ == 2) && !defined(__NO_ASMNAME)
+#elif defined(__CRT_HAVE__wexeclp) && (__SIZEOF_WCHAR_T__ == 2) && (!defined(__NO_ASMNAME))
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL c16execlp)(char16_t const *__restrict __file, char16_t const *__args, ... /*, (char16_t *)NULL*/) __CASMNAME("_wexeclp");
-#elif defined(__CRT_HAVE_DOS$_wexeclp) && !defined(__NO_ASMNAME)
+#elif defined(__CRT_HAVE_DOS$_wexeclp) && (!defined(__NO_ASMNAME))
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBDCALL c16execlp)(char16_t const *__restrict __file, char16_t const *__args, ... /*, (char16_t *)NULL*/) __CASMNAME_DOS("_wexeclp");
 #elif (defined(__CRT_HAVE_wexecvp) && __SIZEOF_WCHAR_T__ == 2) || (defined(__CRT_HAVE__wexecvp) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_DOS$_wexecvp)
 #include <local/parts.uchar.process/c16execlp.h>
@@ -150,9 +150,9 @@ __NAMESPACE_LOCAL_USING(c16execlp)
 #define c16execlp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16execlp))
 #endif /* !__cplusplus */
 #endif /* c16execlp... */
-#if defined(__CRT_HAVE_wexeclp) && (__SIZEOF_WCHAR_T__ == 4) && !defined(__NO_ASMNAME)
+#if defined(__CRT_HAVE_wexeclp) && (__SIZEOF_WCHAR_T__ == 4) && (!defined(__NO_ASMNAME))
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL c32execlp)(char32_t const *__restrict __file, char32_t const *__args, ... /*, (char32_t *)NULL*/) __CASMNAME("wexeclp");
-#elif defined(__CRT_HAVE__wexeclp) && (__SIZEOF_WCHAR_T__ == 4) && !defined(__NO_ASMNAME)
+#elif defined(__CRT_HAVE__wexeclp) && (__SIZEOF_WCHAR_T__ == 4) && (!defined(__NO_ASMNAME))
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL c32execlp)(char32_t const *__restrict __file, char32_t const *__args, ... /*, (char32_t *)NULL*/) __CASMNAME("_wexeclp");
 #elif (defined(__CRT_HAVE_wexecvp) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE__wexecvp) && __SIZEOF_WCHAR_T__ == 4)
 #include <local/parts.uchar.process/c32execlp.h>
@@ -162,11 +162,11 @@ __NAMESPACE_LOCAL_USING(c32execlp)
 #define c32execlp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32execlp))
 #endif /* !__cplusplus */
 #endif /* c32execlp... */
-#if defined(__CRT_HAVE_wexecle) && (__SIZEOF_WCHAR_T__ == 2) && !defined(__NO_ASMNAME)
+#if defined(__CRT_HAVE_wexecle) && (__SIZEOF_WCHAR_T__ == 2) && (!defined(__NO_ASMNAME))
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL c16execle)(char16_t const *__restrict __path, char16_t const *__args, ... /*, (char16_t *)NULL, char16_t **environ*/) __CASMNAME("wexecle");
-#elif defined(__CRT_HAVE__wexecle) && (__SIZEOF_WCHAR_T__ == 2) && !defined(__NO_ASMNAME)
+#elif defined(__CRT_HAVE__wexecle) && (__SIZEOF_WCHAR_T__ == 2) && (!defined(__NO_ASMNAME))
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL c16execle)(char16_t const *__restrict __path, char16_t const *__args, ... /*, (char16_t *)NULL, char16_t **environ*/) __CASMNAME("_wexecle");
-#elif defined(__CRT_HAVE_DOS$_wexecle) && !defined(__NO_ASMNAME)
+#elif defined(__CRT_HAVE_DOS$_wexecle) && (!defined(__NO_ASMNAME))
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBDCALL c16execle)(char16_t const *__restrict __path, char16_t const *__args, ... /*, (char16_t *)NULL, char16_t **environ*/) __CASMNAME_DOS("_wexecle");
 #elif (defined(__CRT_HAVE_wexecve) && __SIZEOF_WCHAR_T__ == 2) || (defined(__CRT_HAVE__wexecve) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_DOS$_wexecve)
 #include <local/parts.uchar.process/c16execle.h>
@@ -176,9 +176,9 @@ __NAMESPACE_LOCAL_USING(c16execle)
 #define c16execle (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16execle))
 #endif /* !__cplusplus */
 #endif /* c16execle... */
-#if defined(__CRT_HAVE_wexecle) && (__SIZEOF_WCHAR_T__ == 4) && !defined(__NO_ASMNAME)
+#if defined(__CRT_HAVE_wexecle) && (__SIZEOF_WCHAR_T__ == 4) && (!defined(__NO_ASMNAME))
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL c32execle)(char32_t const *__restrict __path, char32_t const *__args, ... /*, (char32_t *)NULL, char32_t **environ*/) __CASMNAME("wexecle");
-#elif defined(__CRT_HAVE__wexecle) && (__SIZEOF_WCHAR_T__ == 4) && !defined(__NO_ASMNAME)
+#elif defined(__CRT_HAVE__wexecle) && (__SIZEOF_WCHAR_T__ == 4) && (!defined(__NO_ASMNAME))
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL c32execle)(char32_t const *__restrict __path, char32_t const *__args, ... /*, (char32_t *)NULL, char32_t **environ*/) __CASMNAME("_wexecle");
 #elif (defined(__CRT_HAVE_wexecve) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE__wexecve) && __SIZEOF_WCHAR_T__ == 4)
 #include <local/parts.uchar.process/c32execle.h>
@@ -188,11 +188,11 @@ __NAMESPACE_LOCAL_USING(c32execle)
 #define c32execle (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32execle))
 #endif /* !__cplusplus */
 #endif /* c32execle... */
-#if defined(__CRT_HAVE_wexeclpe) && (__SIZEOF_WCHAR_T__ == 2) && !defined(__NO_ASMNAME)
+#if defined(__CRT_HAVE_wexeclpe) && (__SIZEOF_WCHAR_T__ == 2) && (!defined(__NO_ASMNAME))
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL c16execlpe)(char16_t const *__restrict __file, char16_t const *__args, ... /*, (char16_t *)NULL, char16_t **environ*/) __CASMNAME("wexeclpe");
-#elif defined(__CRT_HAVE__wexeclpe) && (__SIZEOF_WCHAR_T__ == 2) && !defined(__NO_ASMNAME)
+#elif defined(__CRT_HAVE__wexeclpe) && (__SIZEOF_WCHAR_T__ == 2) && (!defined(__NO_ASMNAME))
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL c16execlpe)(char16_t const *__restrict __file, char16_t const *__args, ... /*, (char16_t *)NULL, char16_t **environ*/) __CASMNAME("_wexeclpe");
-#elif defined(__CRT_HAVE_DOS$_wexeclpe) && !defined(__NO_ASMNAME)
+#elif defined(__CRT_HAVE_DOS$_wexeclpe) && (!defined(__NO_ASMNAME))
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBDCALL c16execlpe)(char16_t const *__restrict __file, char16_t const *__args, ... /*, (char16_t *)NULL, char16_t **environ*/) __CASMNAME_DOS("_wexeclpe");
 #elif (defined(__CRT_HAVE_wexecvpe) && __SIZEOF_WCHAR_T__ == 2) || (defined(__CRT_HAVE__wexecvpe) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_DOS$_wexecvpe)
 #include <local/parts.uchar.process/c16execlpe.h>
@@ -202,9 +202,9 @@ __NAMESPACE_LOCAL_USING(c16execlpe)
 #define c16execlpe (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16execlpe))
 #endif /* !__cplusplus */
 #endif /* c16execlpe... */
-#if defined(__CRT_HAVE_wexeclpe) && (__SIZEOF_WCHAR_T__ == 4) && !defined(__NO_ASMNAME)
+#if defined(__CRT_HAVE_wexeclpe) && (__SIZEOF_WCHAR_T__ == 4) && (!defined(__NO_ASMNAME))
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL c32execlpe)(char32_t const *__restrict __file, char32_t const *__args, ... /*, (char32_t *)NULL, char32_t **environ*/) __CASMNAME("wexeclpe");
-#elif defined(__CRT_HAVE__wexeclpe) && (__SIZEOF_WCHAR_T__ == 4) && !defined(__NO_ASMNAME)
+#elif defined(__CRT_HAVE__wexeclpe) && (__SIZEOF_WCHAR_T__ == 4) && (!defined(__NO_ASMNAME))
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((1)) int __NOTHROW_RPC(__VLIBCCALL c32execlpe)(char32_t const *__restrict __file, char32_t const *__args, ... /*, (char32_t *)NULL, char32_t **environ*/) __CASMNAME("_wexeclpe");
 #elif (defined(__CRT_HAVE_wexecvpe) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE__wexecvpe) && __SIZEOF_WCHAR_T__ == 4)
 #include <local/parts.uchar.process/c32execlpe.h>
@@ -270,11 +270,11 @@ __CREDIRECT(__ATTR_NONNULL((2, 3, 4)) __ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHRO
 #elif defined(__CRT_HAVE__wspawnvpe) && (__SIZEOF_WCHAR_T__ == 4)
 __CREDIRECT(__ATTR_NONNULL((2, 3, 4)) __ATTR_NONNULL((2, 3, 4)),__pid_t,__NOTHROW_RPC,c32spawnvpe,(int __mode, char32_t const *__restrict __path, __T32ARGV, __T32ENVP),_wspawnvpe,(__mode,__path, ___argv, ___envp))
 #endif /* c32spawnvpe... */
-#if defined(__CRT_HAVE_wspawnl) && (__SIZEOF_WCHAR_T__ == 2) && !defined(__NO_ASMNAME)
+#if defined(__CRT_HAVE_wspawnl) && (__SIZEOF_WCHAR_T__ == 2) && (!defined(__NO_ASMNAME))
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL c16spawnl)(int __mode, char16_t const *__restrict __path, char16_t const *__args, ... /*, (char16_t *)NULL*/) __CASMNAME("wspawnl");
-#elif defined(__CRT_HAVE__wspawnl) && (__SIZEOF_WCHAR_T__ == 2) && !defined(__NO_ASMNAME)
+#elif defined(__CRT_HAVE__wspawnl) && (__SIZEOF_WCHAR_T__ == 2) && (!defined(__NO_ASMNAME))
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL c16spawnl)(int __mode, char16_t const *__restrict __path, char16_t const *__args, ... /*, (char16_t *)NULL*/) __CASMNAME("_wspawnl");
-#elif defined(__CRT_HAVE_DOS$_wspawnl) && !defined(__NO_ASMNAME)
+#elif defined(__CRT_HAVE_DOS$_wspawnl) && (!defined(__NO_ASMNAME))
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBDCALL c16spawnl)(int __mode, char16_t const *__restrict __path, char16_t const *__args, ... /*, (char16_t *)NULL*/) __CASMNAME_DOS("_wspawnl");
 #elif (defined(__CRT_HAVE_wspawnv) && __SIZEOF_WCHAR_T__ == 2) || (defined(__CRT_HAVE__wspawnv) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_DOS$_wspawnv)
 #include <local/parts.uchar.process/c16spawnl.h>
@@ -284,9 +284,9 @@ __NAMESPACE_LOCAL_USING(c16spawnl)
 #define c16spawnl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16spawnl))
 #endif /* !__cplusplus */
 #endif /* c16spawnl... */
-#if defined(__CRT_HAVE_wspawnl) && (__SIZEOF_WCHAR_T__ == 4) && !defined(__NO_ASMNAME)
+#if defined(__CRT_HAVE_wspawnl) && (__SIZEOF_WCHAR_T__ == 4) && (!defined(__NO_ASMNAME))
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL c32spawnl)(int __mode, char32_t const *__restrict __path, char32_t const *__args, ... /*, (char32_t *)NULL*/) __CASMNAME("wspawnl");
-#elif defined(__CRT_HAVE__wspawnl) && (__SIZEOF_WCHAR_T__ == 4) && !defined(__NO_ASMNAME)
+#elif defined(__CRT_HAVE__wspawnl) && (__SIZEOF_WCHAR_T__ == 4) && (!defined(__NO_ASMNAME))
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL c32spawnl)(int __mode, char32_t const *__restrict __path, char32_t const *__args, ... /*, (char32_t *)NULL*/) __CASMNAME("_wspawnl");
 #elif (defined(__CRT_HAVE_wspawnv) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE__wspawnv) && __SIZEOF_WCHAR_T__ == 4)
 #include <local/parts.uchar.process/c32spawnl.h>
@@ -296,11 +296,11 @@ __NAMESPACE_LOCAL_USING(c32spawnl)
 #define c32spawnl (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32spawnl))
 #endif /* !__cplusplus */
 #endif /* c32spawnl... */
-#if defined(__CRT_HAVE_wspawnlp) && (__SIZEOF_WCHAR_T__ == 2) && !defined(__NO_ASMNAME)
+#if defined(__CRT_HAVE_wspawnlp) && (__SIZEOF_WCHAR_T__ == 2) && (!defined(__NO_ASMNAME))
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL c16spawnlp)(int __mode, char16_t const *__restrict __file, char16_t const *__args, ... /*, (char16_t *)NULL*/) __CASMNAME("wspawnlp");
-#elif defined(__CRT_HAVE__wspawnlp) && (__SIZEOF_WCHAR_T__ == 2) && !defined(__NO_ASMNAME)
+#elif defined(__CRT_HAVE__wspawnlp) && (__SIZEOF_WCHAR_T__ == 2) && (!defined(__NO_ASMNAME))
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL c16spawnlp)(int __mode, char16_t const *__restrict __file, char16_t const *__args, ... /*, (char16_t *)NULL*/) __CASMNAME("_wspawnlp");
-#elif defined(__CRT_HAVE_DOS$_wspawnlp) && !defined(__NO_ASMNAME)
+#elif defined(__CRT_HAVE_DOS$_wspawnlp) && (!defined(__NO_ASMNAME))
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBDCALL c16spawnlp)(int __mode, char16_t const *__restrict __file, char16_t const *__args, ... /*, (char16_t *)NULL*/) __CASMNAME_DOS("_wspawnlp");
 #elif (defined(__CRT_HAVE_wspawnvp) && __SIZEOF_WCHAR_T__ == 2) || (defined(__CRT_HAVE__wspawnvp) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_DOS$_wspawnvp)
 #include <local/parts.uchar.process/c16spawnlp.h>
@@ -310,9 +310,9 @@ __NAMESPACE_LOCAL_USING(c16spawnlp)
 #define c16spawnlp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16spawnlp))
 #endif /* !__cplusplus */
 #endif /* c16spawnlp... */
-#if defined(__CRT_HAVE_wspawnlp) && (__SIZEOF_WCHAR_T__ == 4) && !defined(__NO_ASMNAME)
+#if defined(__CRT_HAVE_wspawnlp) && (__SIZEOF_WCHAR_T__ == 4) && (!defined(__NO_ASMNAME))
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL c32spawnlp)(int __mode, char32_t const *__restrict __file, char32_t const *__args, ... /*, (char32_t *)NULL*/) __CASMNAME("wspawnlp");
-#elif defined(__CRT_HAVE__wspawnlp) && (__SIZEOF_WCHAR_T__ == 4) && !defined(__NO_ASMNAME)
+#elif defined(__CRT_HAVE__wspawnlp) && (__SIZEOF_WCHAR_T__ == 4) && (!defined(__NO_ASMNAME))
 __LIBC __ATTR_SENTINEL __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL c32spawnlp)(int __mode, char32_t const *__restrict __file, char32_t const *__args, ... /*, (char32_t *)NULL*/) __CASMNAME("_wspawnlp");
 #elif (defined(__CRT_HAVE_wspawnvp) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE__wspawnvp) && __SIZEOF_WCHAR_T__ == 4)
 #include <local/parts.uchar.process/c32spawnlp.h>
@@ -322,11 +322,11 @@ __NAMESPACE_LOCAL_USING(c32spawnlp)
 #define c32spawnlp (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32spawnlp))
 #endif /* !__cplusplus */
 #endif /* c32spawnlp... */
-#if defined(__CRT_HAVE_wspawnle) && (__SIZEOF_WCHAR_T__ == 2) && !defined(__NO_ASMNAME)
+#if defined(__CRT_HAVE_wspawnle) && (__SIZEOF_WCHAR_T__ == 2) && (!defined(__NO_ASMNAME))
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL c16spawnle)(int __mode, char16_t const *__restrict __path, char16_t const *__args, ... /*, (char16_t *)NULL, char16_t **environ*/) __CASMNAME("wspawnle");
-#elif defined(__CRT_HAVE__wspawnle) && (__SIZEOF_WCHAR_T__ == 2) && !defined(__NO_ASMNAME)
+#elif defined(__CRT_HAVE__wspawnle) && (__SIZEOF_WCHAR_T__ == 2) && (!defined(__NO_ASMNAME))
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL c16spawnle)(int __mode, char16_t const *__restrict __path, char16_t const *__args, ... /*, (char16_t *)NULL, char16_t **environ*/) __CASMNAME("_wspawnle");
-#elif defined(__CRT_HAVE_DOS$_wspawnle) && !defined(__NO_ASMNAME)
+#elif defined(__CRT_HAVE_DOS$_wspawnle) && (!defined(__NO_ASMNAME))
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBDCALL c16spawnle)(int __mode, char16_t const *__restrict __path, char16_t const *__args, ... /*, (char16_t *)NULL, char16_t **environ*/) __CASMNAME_DOS("_wspawnle");
 #elif (defined(__CRT_HAVE_wspawnve) && __SIZEOF_WCHAR_T__ == 2) || (defined(__CRT_HAVE__wspawnve) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_DOS$_wspawnve)
 #include <local/parts.uchar.process/c16spawnle.h>
@@ -336,9 +336,9 @@ __NAMESPACE_LOCAL_USING(c16spawnle)
 #define c16spawnle (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16spawnle))
 #endif /* !__cplusplus */
 #endif /* c16spawnle... */
-#if defined(__CRT_HAVE_wspawnle) && (__SIZEOF_WCHAR_T__ == 4) && !defined(__NO_ASMNAME)
+#if defined(__CRT_HAVE_wspawnle) && (__SIZEOF_WCHAR_T__ == 4) && (!defined(__NO_ASMNAME))
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL c32spawnle)(int __mode, char32_t const *__restrict __path, char32_t const *__args, ... /*, (char32_t *)NULL, char32_t **environ*/) __CASMNAME("wspawnle");
-#elif defined(__CRT_HAVE__wspawnle) && (__SIZEOF_WCHAR_T__ == 4) && !defined(__NO_ASMNAME)
+#elif defined(__CRT_HAVE__wspawnle) && (__SIZEOF_WCHAR_T__ == 4) && (!defined(__NO_ASMNAME))
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL c32spawnle)(int __mode, char32_t const *__restrict __path, char32_t const *__args, ... /*, (char32_t *)NULL, char32_t **environ*/) __CASMNAME("_wspawnle");
 #elif (defined(__CRT_HAVE_wspawnve) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE__wspawnve) && __SIZEOF_WCHAR_T__ == 4)
 #include <local/parts.uchar.process/c32spawnle.h>
@@ -348,11 +348,11 @@ __NAMESPACE_LOCAL_USING(c32spawnle)
 #define c32spawnle (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c32spawnle))
 #endif /* !__cplusplus */
 #endif /* c32spawnle... */
-#if defined(__CRT_HAVE_wspawnlpe) && (__SIZEOF_WCHAR_T__ == 2) && !defined(__NO_ASMNAME)
+#if defined(__CRT_HAVE_wspawnlpe) && (__SIZEOF_WCHAR_T__ == 2) && (!defined(__NO_ASMNAME))
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL c16spawnlpe)(int __mode, char16_t const *__restrict __file, char16_t const *__args, ... /*, (char16_t *)NULL, char16_t **environ*/) __CASMNAME("wspawnlpe");
-#elif defined(__CRT_HAVE__wspawnlpe) && (__SIZEOF_WCHAR_T__ == 2) && !defined(__NO_ASMNAME)
+#elif defined(__CRT_HAVE__wspawnlpe) && (__SIZEOF_WCHAR_T__ == 2) && (!defined(__NO_ASMNAME))
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL c16spawnlpe)(int __mode, char16_t const *__restrict __file, char16_t const *__args, ... /*, (char16_t *)NULL, char16_t **environ*/) __CASMNAME("_wspawnlpe");
-#elif defined(__CRT_HAVE_DOS$_wspawnlpe) && !defined(__NO_ASMNAME)
+#elif defined(__CRT_HAVE_DOS$_wspawnlpe) && (!defined(__NO_ASMNAME))
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBDCALL c16spawnlpe)(int __mode, char16_t const *__restrict __file, char16_t const *__args, ... /*, (char16_t *)NULL, char16_t **environ*/) __CASMNAME_DOS("_wspawnlpe");
 #elif (defined(__CRT_HAVE_wspawnvpe) && __SIZEOF_WCHAR_T__ == 2) || (defined(__CRT_HAVE__wspawnvpe) && __SIZEOF_WCHAR_T__ == 2) || defined(__CRT_HAVE_DOS$_wspawnvpe)
 #include <local/parts.uchar.process/c16spawnlpe.h>
@@ -362,9 +362,9 @@ __NAMESPACE_LOCAL_USING(c16spawnlpe)
 #define c16spawnlpe (__NAMESPACE_LOCAL_SYM __LIBC_LOCAL_NAME(c16spawnlpe))
 #endif /* !__cplusplus */
 #endif /* c16spawnlpe... */
-#if defined(__CRT_HAVE_wspawnlpe) && (__SIZEOF_WCHAR_T__ == 4) && !defined(__NO_ASMNAME)
+#if defined(__CRT_HAVE_wspawnlpe) && (__SIZEOF_WCHAR_T__ == 4) && (!defined(__NO_ASMNAME))
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL c32spawnlpe)(int __mode, char32_t const *__restrict __file, char32_t const *__args, ... /*, (char32_t *)NULL, char32_t **environ*/) __CASMNAME("wspawnlpe");
-#elif defined(__CRT_HAVE__wspawnlpe) && (__SIZEOF_WCHAR_T__ == 4) && !defined(__NO_ASMNAME)
+#elif defined(__CRT_HAVE__wspawnlpe) && (__SIZEOF_WCHAR_T__ == 4) && (!defined(__NO_ASMNAME))
 __LIBC __ATTR_SENTINEL_O(1) __ATTR_NONNULL((2)) __pid_t __NOTHROW_RPC(__VLIBCCALL c32spawnlpe)(int __mode, char32_t const *__restrict __file, char32_t const *__args, ... /*, (char32_t *)NULL, char32_t **environ*/) __CASMNAME("_wspawnlpe");
 #elif (defined(__CRT_HAVE_wspawnvpe) && __SIZEOF_WCHAR_T__ == 4) || (defined(__CRT_HAVE__wspawnvpe) && __SIZEOF_WCHAR_T__ == 4)
 #include <local/parts.uchar.process/c32spawnlpe.h>

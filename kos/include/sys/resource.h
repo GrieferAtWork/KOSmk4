@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9982a9e1 */
+/* HASH CRC-32:0x2a2c2dc2 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -92,26 +92,26 @@ __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,setrlimit,(__rlimit_resource_t
  * Return 0 if successful, -1 if not (and sets errno) */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,setrlimit,(__rlimit_resource_t __resource, struct rlimit const *__rlimits),(__resource,__rlimits))
 #endif /* setrlimit... */
-#if defined(__CRT_HAVE_getrusage)
+#ifdef __CRT_HAVE_getrusage
 /* Return resource usage information on process indicated by WHO
  * and put it in *USAGE. Returns 0 for success, -1 for failure */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getrusage,(__rusage_who_t __who, struct rusage *__usage),(__who,__usage))
 #endif /* getrusage... */
-#if defined(__CRT_HAVE_getpriority)
+#ifdef __CRT_HAVE_getpriority
 /* Return the highest priority of any process specified by WHICH and
  * WHO (see above); if WHO is zero, the current process, process group,
  * or user (as specified by WHO) is used.  A lower priority number means
  * higher priority. Priorities range from PRIO_MIN to PRIO_MAX (above) */
 __CDECLARE(,int,__NOTHROW_NCX,getpriority,(__priority_which_t __which, id_t __who),(__which,__who))
 #endif /* getpriority... */
-#if defined(__CRT_HAVE_setpriority)
+#ifdef __CRT_HAVE_setpriority
 /* Set the priority of all processes specified by WHICH and WHO (see above) to PRIO.
  * Returns 0 on success, -1 on errors */
 __CDECLARE(,int,__NOTHROW_NCX,setpriority,(__priority_which_t __which, id_t __who, int __prio),(__which,__who,__prio))
 #endif /* setpriority... */
 
 #ifdef __USE_LARGEFILE64
-#if defined(__CRT_HAVE_getrlimit64)
+#ifdef __CRT_HAVE_getrlimit64
 /* Put the soft and hard limits for RESOURCE in *RLIMITS.
  * Returns 0 if successful, -1 if not (and sets errno) */
 __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getrlimit64,(__rlimit_resource_t __resource, struct rlimit64 *__rlimits),(__resource,__rlimits))
@@ -120,7 +120,7 @@ __CDECLARE(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getrlimit64,(__rlimit_resource_
  * Returns 0 if successful, -1 if not (and sets errno) */
 __CREDIRECT(__ATTR_NONNULL((2)),int,__NOTHROW_NCX,getrlimit64,(__rlimit_resource_t __resource, struct rlimit64 *__rlimits),getrlimit,(__resource,__rlimits))
 #endif /* getrlimit64... */
-#if defined(__CRT_HAVE_setrlimit64)
+#ifdef __CRT_HAVE_setrlimit64
 /* Set the soft and hard limits for RESOURCE to *RLIMITS.
  * Only the super-user can increase hard limits.
  * Return 0 if successful, -1 if not (and sets errno) */

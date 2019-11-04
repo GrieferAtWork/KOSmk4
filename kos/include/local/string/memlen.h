@@ -1,4 +1,4 @@
-/* HASH CRC-32:0x9bad9990 */
+/* HASH CRC-32:0xae0b1fcd */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -25,7 +25,7 @@
 /* Dependency: "memend" from "string" */
 #ifndef ____localdep_memend_defined
 #define ____localdep_memend_defined 1
-#if defined(__fast_memend_defined)
+#ifdef __fast_memend_defined
 /* Same as `memchr', but return `HAYSTACK+N_BYTES', rather than `NULL' if `NEEDLE' wasn't found. */
 #define __localdep_memend (__NAMESPACE_FAST_SYM __LIBC_FAST_NAME(memend))
 #elif defined(__CRT_HAVE_memend)

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xe92bf702 */
+/* HASH CRC-32:0x2bb50c23 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -152,7 +152,7 @@ struct option {
 
 #ifndef __getopt_defined
 #define __getopt_defined 1
-#if defined(__CRT_HAVE_getopt)
+#ifdef __CRT_HAVE_getopt
 /* Return the option character from OPTS just read.  Return -1 when
  * there are no more options.  For unrecognized options, or options
  * missing arguments, `optopt' is set to the option letter, and '?' is
@@ -173,10 +173,10 @@ __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,getopt,(int ___argc, char *const ___
 #undef __getopt_defined
 #endif /* getopt... */
 #endif /* !__getopt_defined */
-#if defined(__CRT_HAVE_getopt_long)
+#ifdef __CRT_HAVE_getopt_long
 __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,getopt_long,(int ___argc, char *const ___argv[], char const *__shortopts, struct option const *__longopts, int *__longind),(___argc,___argv,__shortopts,__longopts,__longind))
 #endif /* getopt_long... */
-#if defined(__CRT_HAVE_getopt_long_only)
+#ifdef __CRT_HAVE_getopt_long_only
 __CDECLARE(__ATTR_WUNUSED,int,__NOTHROW_NCX,getopt_long_only,(int ___argc, char *const ___argv[], char const *__shortopts, struct option const *__longopts, int *__longind),(___argc,___argv,__shortopts,__longopts,__longind))
 #endif /* getopt_long_only... */
 

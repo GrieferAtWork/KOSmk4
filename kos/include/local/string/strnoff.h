@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xf2a3d015 */
+/* HASH CRC-32:0x3b13e80f */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -22,7 +22,7 @@
 /* Dependency: "strnchrnul" from "string" */
 #ifndef ____localdep_strnchrnul_defined
 #define ____localdep_strnchrnul_defined 1
-#if defined(__CRT_HAVE_strnchrnul)
+#ifdef __CRT_HAVE_strnchrnul
 /* Same as `strnchr', but return `strnend(STR, MAX_CHARS)', rather than `NULL' if `NEEDLE' wasn't found. */
 __CREDIRECT(__ATTR_PURE __ATTR_RETNONNULL __ATTR_WUNUSED __ATTR_NONNULL((1)),char *,__NOTHROW_NCX,__localdep_strnchrnul,(char const *__restrict __haystack, int __needle, __SIZE_TYPE__ __maxlen),strnchrnul,(__haystack,__needle,__maxlen))
 #else /* LIBC: strnchrnul */

@@ -1,4 +1,4 @@
-/* HASH CRC-32:0xb19e118b */
+/* HASH CRC-32:0x69a83f63 */
 /* Copyright (c) 2019 Griefer@Work                                            *
  *                                                                            *
  * This software is provided 'as-is', without any express or implied          *
@@ -18,7 +18,7 @@
  * 3. This notice may not be removed or altered from any source distribution. *
  */
 #ifndef __local_thrd_create_defined
-#if defined(__CRT_HAVE_pthread_create)
+#ifdef __CRT_HAVE_pthread_create
 #define __local_thrd_create_defined 1
 #include <bits/pthreadtypes.h>
 #ifndef ____pthread_start_routine_t_defined
@@ -31,7 +31,7 @@ typedef void *(*__pthread_start_routine_t)(void *);
 /* Dependency: "pthread_create" */
 #ifndef ____localdep_pthread_create_defined
 #define ____localdep_pthread_create_defined 1
-#if defined(__CRT_HAVE_pthread_create)
+#ifdef __CRT_HAVE_pthread_create
 /* Create a new thread, starting with execution of START-ROUTINE
  * getting passed ARG. Creation attributed come from ATTR. The new
  * handle is stored in *NEWTHREAD */
