@@ -169,7 +169,7 @@
 	.sched.msg*                       # <sys/msg.h>
 	.string.encrypt*                  # String encryption
 	.string.match*                    # String matching functions
-	.string.argz*                     # <argz.h>
+	.string.argz*  .string.envz*      # <argz.h> and <envz.h>
 	.unsorted*                        # Everything else...
 
 ]]]*/
@@ -226,7 +226,7 @@
 	CB(PREFIX.fs.dir.*) \
 	CB(PREFIX.fs.stat_glc.* PREFIX.fs.stat.*) \
 	CB(PREFIX.fs.utility.*) \
-	CB(PREFIX.string.memory.* PREFIX.string.envz.*) \
+	CB(PREFIX.string.memory.*) \
 	CB(PREFIX.unicode.UTF.*) \
 	CB(PREFIX.unicode.static.memory.*) \
 	CB(PREFIX.unicode.static.ctype.*) \
@@ -268,7 +268,7 @@
 	CB(PREFIX.sched.msg.*) \
 	CB(PREFIX.string.encrypt.*) \
 	CB(PREFIX.string.match.*) \
-	CB(PREFIX.string.argz.*) \
+	CB(PREFIX.string.envz.* PREFIX.string.argz.*) \
 	CB(PREFIX.unsorted.*) \
 	CB(PREFIX.wchar.fs.exec.exec.*) \
 	CB(PREFIX.wchar.heap.strdup.*) \
