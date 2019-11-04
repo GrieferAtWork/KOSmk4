@@ -3323,6 +3323,8 @@
 #define __CRT_HAVE_strerror_r 1
 #define __CRT_HAVE_strerror_s 1
 #define __CRT_HAVE_strerrorname_s 1
+#define __CRT_HAVE_strfmon 1
+#define __CRT_HAVE_strfmon_l 1
 #define __CRT_HAVE_strfry 1
 #define __CRT_HAVE_strftime 1
 #define __CRT_HAVE_strftime_l 1
