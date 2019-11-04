@@ -76,7 +76,9 @@ function incdir(prefix, path) {
 			incdir(prefix + x + "/", total);
 			continue;
 		}
-		if (x !in ["atree-abi.h", "__atomic-gasm.h", "__atomic-msvc.h", "__stdcxx.h"]) {
+		if ("." !in x || x in ["__stdcxx.h"]) {
+			// c++ header
+		} else if (x !in ["atree-abi.h", "__atomic-gasm.h", "__atomic-msvc.h"]) {
 			if (x.endswith(".h") && !x.endswith("-impl.h")) {
 				local full;
 				if (".." in prefix) {
@@ -100,6 +102,7 @@ function incdir(prefix, path) {
 //print "#else";
 incdir("", "../../include");
 //print "#endif";
+
 ]]]*/
 #include <ConcurrencySal.h>
 #include <__crt.h>
@@ -532,6 +535,7 @@ incdir("", "../../include");
 #endif /* __has_include(<menu.h>) */
 #include <minmax.h>
 #include <mntent.h>
+#include <monetary.h>
 #if __has_include(<nc_tparm.h>)
 #include <nc_tparm.h>
 #endif /* __has_include(<nc_tparm.h>) */
@@ -745,4 +749,59 @@ incdir("", "../../include");
 #include <zlib.h>
 #endif /* __has_include(<zlib.h>) */
 //[[[end]]]
+
+
+#ifdef __cplusplus
+/* libstdc++ doesn't work in freestanding mode. */
+#ifndef __CRT_FREESTANDING
+/* libstdc++ doesn't work in kernel-space:
+ *  - missing functions that libstdc++ assumes to be there (locale, etc...)
+ *  - The fact that most libc functions are defined as STDCALL,
+ *    which breaks assigning them to to prototype pointers. */
+#ifndef __KERNEL__
+#undef min
+#undef max
+/* Some of the SAL bs also breaks libstdc++. */
+#undef __valid
+/* libstdc++ also doesn't like KOS's `error_code()' macro. */
+#undef error_code
+#include <__stdcxx.h>
+#include <atomic>
+#include <cassert>
+#include <cctype>
+#include <cerrno>
+#include <cfenv>
+#include <cfloat>
+#include <cinttypes>
+#include <ciso646>
+#include <climits>
+#include <clocale>
+#include <cmath>
+#include <csetjmp>
+#include <csignal>
+#include <cstdalign>
+#include <cstdarg>
+#include <cstdbool>
+#include <cstddef>
+#include <cstdint>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
+#include <cuchar>
+#include <cwchar>
+#include <cwctype>
+#include <exception>
+#include <initializer_list>
+#include <iterator>
+#include <memory>
+#include <mutex>
+#include <new>
+#include <string_view>
+#include <type_traits>
+#include <typeinfo>
+#include <utility>
+#endif /* !__KERNEL__ */
+#endif /* __CRT_FREESTANDING */
+#endif /* __cplusplus */
 
