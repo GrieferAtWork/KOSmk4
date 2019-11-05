@@ -1,4 +1,3 @@
-Add a library `libcmdline' for encoding/decoding   char *cmdline <---> char *argv[]
 
 Add support for *_chk variants (using __builtin_object_size())
 
@@ -6,8 +5,6 @@ argp.c
 err.c
 error.c
 langinfo.c
-libgen.c
-locale.c
 nl_types.c
 
 rpc.auth.c
